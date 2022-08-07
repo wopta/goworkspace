@@ -9,5 +9,5 @@ steps:
   - --source=.
   - --trigger-http
   - --runtime=go116
-  - --set-env-vars munichreBaseUrl=$_MUNICHREBASEURL,munichreTokenEndPoint=$_MUNICHRETOKENENDPOINT,munichreScope=$_MUNICHRESCOPE,munichreClientId=$_MUNICHRECLIENTID,munichreClientSecret=$_MUNICHRECLIENTSECRET,munichreSubscriptionKey=$_MUNICHRESUBSCRIPTIONKEY    
+  - --set-env-vars munichreBaseUrl='$_MUNICHREBASEURL',munichreTokenEndPoint='$_MUNICHRETOKENENDPOINT',munichreScope='$_MUNICHRESCOPE',munichreClientId='$_MUNICHRECLIENTID',munichreClientSecret='$_MUNICHRECLIENTSECRET',munichreSubscriptionKey='$_MUNICHRESUBSCRIPTIONKEY'    
    
