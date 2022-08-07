@@ -1,13 +1,28 @@
 package enrichVatCode
 
 import (
-	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
+
 	"os"
+
+	lib "github.com/wopta/goworkspace/lib"
 )
 
+var projectID = os.Getenv("GOOGLE_CLOUD_PROJECT")
+
+func init() {
+	// err is pre-declared to avoid shadowing client.
+}
+
+type publishRequest struct {
+	vat string `json:"vat"`
+}
+
+//  enrichVatCode
+// .
 // GOOGLE_CLOUD_PROJECT is a user-set environment variable.
 /*{
 	"BaseUrl":"https://api-devexternal.munichre.com/flowin/dev/api/V1",
@@ -20,48 +35,31 @@ import (
 	"UWRole":"Agent",
 	"SubProductId_PMIW":"35"
 }*/
-var projectID = os.Getenv("GOOGLE_CLOUD_PROJECT")
+func EnrichVatCode(w http.ResponseWriter, r *http.Request) {
 
-func init() {
-	// err is pre-declared to avoid shadowing client.
-}
+	os.Getenv("munichreBaseUrl")
+	os.Getenv("munichreSubscriptionKey")
+	os.Getenv("munichreSubscriptionHeader")
 
-type publishRequest struct {
-	vat string `json:"vat"`
-}
+	var url = "https://api-devexternal.munichre.com/flowin/dev/api/V1/api/company/vat/01654010345"
 
-// PublishMessage publishes a message to Pub/Sub. PublishMessage only works
-// with topics that already exist.
-func enrichVatCode(w http.ResponseWriter, r *http.Request) {
-	// Parse the request body to get the topic name and message.
-	p := publishRequest{}
-	if err := json.NewDecoder(r.Body).Decode(&p); err != nil {
-		log.Printf("json.NewDecoder: %v", err)
-		http.Error(w, "Error parsing request", http.StatusBadRequest)
-		return
-	}
-
-	var url = ""
-	client := &http.Client{}
+	client := lib.ClientCredentials(os.Getenv("munichreClientId"),
+		os.Getenv("munichreClientSecret"), os.Getenv("munichreScope"), os.Getenv("munichreTokenEndPoint"))
 	req, _ := http.NewRequest("GET", url, nil)
-	req.Header.Set("Ocp-Apim-Subscription-Key", "value")
+	req.Header.Set("Ocp-Apim-Subscription-Key", "59c92bc0095d4b8c803656a207150c32")
 	res, err := client.Do(req)
 	if err != nil {
-		//Handle Error
+		log.Println("errore:")
+		log.Println(err)
 	}
 	if res != nil {
+		body, err := ioutil.ReadAll(res.Body)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+		res.Body.Close()
+		fmt.Fprintf(w, string(body))
 	}
 
-	if p.vat == "" {
-		s := "missing 'topic' or 'message' parameter"
-		log.Println(s)
-		http.Error(w, s, http.StatusBadRequest)
-		return
-	}
-
-	// Publish and Get use r.Context() because they are only needed for this
-	// function invocation. If this were a background function, they would use
-	// the ctx passed as an argument.
-
-	fmt.Fprintf(w, "Message published: %v")
 }

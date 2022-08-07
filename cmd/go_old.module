@@ -1,4 +1,0 @@
-module main
-require enrichVatCode v1.0.0
-replace enrichVatCode v1.0.0 => ./enrichVatCode
-go 1.18
