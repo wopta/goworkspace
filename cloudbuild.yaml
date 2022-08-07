@@ -4,7 +4,7 @@ steps:
   - gcloud
   - functions
   - deploy
-  - ${TAG_NAME}
+  - ${BRANCH_NAME}
   - --region=europe-west1
   - --source=.
   - --trigger-http
