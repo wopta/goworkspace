@@ -6,7 +6,6 @@ steps:
   - deploy
   - enrich-vat
   - --region=europe-west1
-  - --gen1
   - --source=./functions/
   - --trigger-http
   - --runtime=go116
