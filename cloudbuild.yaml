@@ -4,7 +4,7 @@ steps:
   - gcloud
   - functions
   - deploy
-  - ${BRANCH_NAME}
+  - enrich-vat
   - --region=europe-west1
   - --gen2
   - --source=./functions/
@@ -12,4 +12,5 @@ steps:
   - --runtime=go116
   - --set-env-vars
   - munichreBaseUrl='$_MUNICHREBASEURL',munichreTokenEndPoint='$_MUNICHRETOKENENDPOINT',munichreScope='$_MUNICHRESCOPE',munichreClientId='$_MUNICHRECLIENTID',munichreClientSecret='$_MUNICHRECLIENTSECRET',munichreSubscriptionKey='$_MUNICHRESUBSCRIPTIONKEY'    
-
+  - --service-account=146852404745@cloudbuild.gserviceaccount.com 
+  - --project=positive-apex-350507
