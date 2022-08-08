@@ -10,7 +10,6 @@ steps:
   - --source=./functions/
   - --trigger-http
   - --runtime=go116
-  - --project=positive-apex-350507
   - --set-env-vars
   - munichreBaseUrl='$_MUNICHREBASEURL',munichreTokenEndPoint='$_MUNICHRETOKENENDPOINT',munichreScope='$_MUNICHRESCOPE',munichreClientId='$_MUNICHRECLIENTID',munichreClientSecret='$_MUNICHRECLIENTSECRET',munichreSubscriptionKey='$_MUNICHRESUBSCRIPTIONKEY'    
   - --service-account=146852404745@cloudbuild.gserviceaccount.com 
