@@ -9,7 +9,11 @@ steps:
     ls
   entrypoint: bash
 
-- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+- name: gcr.io/cloud-builders/gcloud:latest
+  entrypoint: "ls"
+  args: ["-lah","/"]
+
+- name: gcr.io/cloud-builders/gcloud:latest
   args:
   - gcloud
   - functions
