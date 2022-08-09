@@ -11,7 +11,7 @@ steps:
 
 - name: gcr.io/cloud-builders/gcloud:latest
   entrypoint: "ls"
-  args: ["-lah","/"]
+  args: ["-lah","/workspace"]
 
 - name: gcr.io/cloud-builders/gcloud:latest
   args:
