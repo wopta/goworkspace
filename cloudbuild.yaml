@@ -4,7 +4,7 @@ steps:
   args:
   - '-c'
   - |
-    export version=( $(grep -Eo '[[:digit:]]+|[^[:digit:]]+' <<<'$BRANCH_NAME') )
+    export VERSION=( $(grep -Eo '[[:digit:]]+|[^[:digit:]]+' <<<'$BRANCH_NAME') )
     echo ${version}
     ls
   entrypoint: bash
@@ -15,16 +15,17 @@ steps:
 
 - name: gcr.io/cloud-builders/gcloud:latest
   entrypoint: "echo"
-  args: ["$${version} "]
+  args: ["$VERSION} "]
 
 - name: gcr.io/cloud-builders/gcloud:latest
+  env: ['BUCKET_NAME=dummycblbucket', 'AUDIT_BUCKET_NAME=dummyAuditbucket']
   args:
   - functions
   - deploy
   - enrich-vat
   - --region=europe-west1
   - --source=/workspace/enrichVatCode
-  - --entry-point=$${version} 
+  - --entry-point=$VERSION 
   - --trigger-http
   - --runtime=go116
   - --set-env-vars
