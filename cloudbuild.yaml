@@ -1,16 +1,21 @@
 steps:
-- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+- name: 'gcr.io/cloud-builders/gcloud'
   args:
-  - gcloud
-  - functions
-  - deploy
-  - enrich-vat
-  - --region=europe-west1
-  - --source=./
-  - --trigger-http
-  - --runtime=go116
-  - --entry-point=EnrichVatCode 
-  - --set-env-vars
-  - munichreBaseUrl='$_MUNICHREBASEURL',munichreTokenEndPoint='$_MUNICHRETOKENENDPOINT',munichreScope='$_MUNICHRESCOPE',munichreClientId='$_MUNICHRECLIENTID',munichreClientSecret='$_MUNICHRECLIENTSECRET',munichreSubscriptionKey='$_MUNICHRESUBSCRIPTIONKEY'    
-  - --service-account=146852404745@cloudbuild.gserviceaccount.com 
-  - --project=positive-apex-350507
+  - '-c'
+  - |
+    version= text.split($BRANCH_NAME, "_")
+    echo ${version}
+    gcloud
+    functions
+    deploy
+    enrich-vat
+    --region=europe-west1
+    --source=./
+    --trigger-http
+    --runtime=go116
+    --entry-point=EnrichVatCode 
+    --set-env-vars
+    munichreBaseUrl='$_MUNICHREBASEURL',munichreTokenEndPoint='$_MUNICHRETOKENENDPOINT',munichreScope='$_MUNICHRESCOPE',munichreClientId='$_MUNICHRECLIENTID',munichreClientSecret='$_MUNICHRECLIENTSECRET',munichreSubscriptionKey='$_MUNICHRESUBSCRIPTIONKEY'    
+    --service-account=146852404745@cloudbuild.gserviceaccount.com 
+    --project=positive-apex-350507
+  entrypoint: bash
