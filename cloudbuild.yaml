@@ -4,8 +4,8 @@ steps:
   args:
   - '-c'
   - |
-    export VERSION=( $(grep -Eo '[[:digit:]]+|[^[:digit:]]+' <<<'$BRANCH_NAME') )
-    echo $VERSION
+    export _VERSION=( $(grep -Eo '[[:digit:]]+|[^[:digit:]]+' <<<'$BRANCH_NAME') )
+    echo $_VERSION
   entrypoint: bash
 
 - name: gcr.io/cloud-builders/gcloud:latest
@@ -14,7 +14,7 @@ steps:
 
 - name: gcr.io/cloud-builders/gcloud:latest
   entrypoint: "echo"
-  args: ["$VERSION} "]
+  args: ["$_VERSION} "]
 
 - name: gcr.io/cloud-builders/gcloud:latest
 
@@ -24,7 +24,7 @@ steps:
   - enrich-vat
   - --region=europe-west1
   - --source=/workspace/enrichVatCode
-  - --entry-point=$VERSION 
+  - --entry-point=$_VERSION 
   - --trigger-http
   - --runtime=go116
   - --set-env-vars
