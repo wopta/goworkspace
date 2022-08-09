@@ -16,7 +16,6 @@ steps:
     --runtime=go116 \
     --entry-point=EnrichVatCode \
     --service-account=146852404745@cloudbuild.gserviceaccount.com \
-    --project=positive-apex-350507 \
     --set-env-vars munichreBaseUrl=$_MUNICHREBASEURL,munichreTokenEndPoint=$_MUNICHRETOKENENDPOINT,munichreScope=$_MUNICHRESCOPE,munichreClientId=$_MUNICHRECLIENTID,munichreClientSecret=$_MUNICHRECLIENTSECRET,munichreSubscriptionKey=$_MUNICHRESUBSCRIPTIONKEY \  
-  
+    --project=positive-apex-350507 \
   entrypoint: bash
