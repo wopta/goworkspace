@@ -15,7 +15,7 @@ steps:
 
 - name: gcr.io/cloud-builders/gcloud:latest
   entrypoint: "echo"
-  args: ["${version} "]
+  args: ["$${version} "]
 
 - name: gcr.io/cloud-builders/gcloud:latest
   args:
@@ -24,7 +24,7 @@ steps:
   - enrich-vat
   - --region=europe-west1
   - --source=/workspace/enrichVatCode
-  - --entry-point=${version} 
+  - --entry-point=$${version} 
   - --trigger-http
   - --runtime=go116
   - --set-env-vars
