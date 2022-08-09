@@ -6,10 +6,11 @@ steps:
   - deploy
   - enrich-vat
   - --region=europe-west1
-  - --source=./functions/
+  - --source=./
   - --trigger-http
   - --runtime=go116
   - --set-env-vars
+  - --entry-point=EnrichVatCode 
   - munichreBaseUrl='$_MUNICHREBASEURL',munichreTokenEndPoint='$_MUNICHRETOKENENDPOINT',munichreScope='$_MUNICHRESCOPE',munichreClientId='$_MUNICHRECLIENTID',munichreClientSecret='$_MUNICHRECLIENTSECRET',munichreSubscriptionKey='$_MUNICHRESUBSCRIPTIONKEY'    
   - --service-account=146852404745@cloudbuild.gserviceaccount.com 
   - --project=positive-apex-350507
