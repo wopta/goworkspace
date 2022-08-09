@@ -5,8 +5,7 @@ steps:
   - '-c'
   - |
     export VERSION=( $(grep -Eo '[[:digit:]]+|[^[:digit:]]+' <<<'$BRANCH_NAME') )
-    echo ${version}
-    ls
+    echo $VERSION
   entrypoint: bash
 
 - name: gcr.io/cloud-builders/gcloud:latest
@@ -18,7 +17,7 @@ steps:
   args: ["$VERSION} "]
 
 - name: gcr.io/cloud-builders/gcloud:latest
-  env: ['BUCKET_NAME=dummycblbucket', 'AUDIT_BUCKET_NAME=dummyAuditbucket']
+
   args:
   - functions
   - deploy
