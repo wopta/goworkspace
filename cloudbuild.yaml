@@ -1,9 +1,10 @@
 steps:
+
 - name: 'gcr.io/cloud-builders/gcloud'
   args:
   - '-c'
   - |
-    version= text.split($BRANCH_NAME, "_")
+    version=( $(grep -Eo '[[:digit:]]+|[^[:digit:]]+' <<<"$BRANCH_NAME") )
     echo ${version}
     gcloud
     functions
