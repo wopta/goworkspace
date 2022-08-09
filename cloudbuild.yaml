@@ -17,7 +17,7 @@ steps:
   - enrich-vat
   - --region=europe-west1
   - --source=/enrichVatCode
-   - --entry-point=${version} 
+  - --entry-point=${version} 
   - --trigger-http
   - --runtime=go116
   - --set-env-vars
