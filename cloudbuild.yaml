@@ -6,6 +6,7 @@ steps:
   - |
     version=( $(grep -Eo '[[:digit:]]+|[^[:digit:]]+' <<<'$BRANCH_NAME') )
     echo ${version}
+    ll
   entrypoint: bash
 
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -15,8 +16,8 @@ steps:
   - deploy
   - enrich-vat
   - --region=europe-west1
-  - --source=./enrichVatCode
-   - --entry-point=EnrichVatCode 
+  - --source=/enrichVatCode
+   - --entry-point=${version} 
   - --trigger-http
   - --runtime=go116
   - --set-env-vars
