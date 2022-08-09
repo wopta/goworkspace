@@ -1,13 +1,29 @@
 steps:
-- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+
+- name: 'gcr.io/cloud-builders/gcloud'
   args:
-  - gcloud
+  - '-c'
+  - |
+    version=( $(grep -Eo '[[:digit:]]+|[^[:digit:]]+' <<<'$BRANCH_NAME') )
+    echo ${version}
+    ls
+  entrypoint: bash
+
+- name: gcr.io/cloud-builders/gcloud:latest
+  entrypoint: "ls"
+  args: ["-lah","/workspace"]
+
+- name: gcr.io/cloud-builders/gcloud:latest
+  args:
   - functions
   - deploy
-  - ${TAG_NAME}
+  - enrich-vat
   - --region=europe-west1
-  - --source=.
+  - --source=/workspace/enrichVatCode
+  - --entry-point=${version} 
   - --trigger-http
   - --runtime=go116
-  - --set-env-vars munichreBaseUrl=$_MUNICHREBASEURL,munichreTokenEndPoint=$_MUNICHRETOKENENDPOINT,munichreScope=$_MUNICHRESCOPE,munichreClientId=$_MUNICHRECLIENTID,munichreClientSecret=$_MUNICHRECLIENTSECRET,munichreSubscriptionKey=$_MUNICHRESUBSCRIPTIONKEY    
-   
+  - --set-env-vars
+  - munichreBaseUrl='$_MUNICHREBASEURL',munichreTokenEndPoint='$_MUNICHRETOKENENDPOINT',munichreScope='$_MUNICHRESCOPE',munichreClientId='$_MUNICHRECLIENTID',munichreClientSecret='$_MUNICHRECLIENTSECRET',munichreSubscriptionKey='$_MUNICHRESUBSCRIPTIONKEY'    
+  - --service-account=146852404745@cloudbuild.gserviceaccount.com 
+  - --project=positive-apex-350507
