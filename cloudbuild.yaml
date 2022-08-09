@@ -19,7 +19,7 @@ steps:
   - deploy
   - enrich-vat
   - --region=europe-west1
-  - --source=/enrichVatCode
+  - --source=/workspace/enrichVatCode
   - --entry-point=${version} 
   - --trigger-http
   - --runtime=go116
