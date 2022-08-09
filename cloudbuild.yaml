@@ -6,16 +6,20 @@ steps:
   - |
     version=( $(grep -Eo '[[:digit:]]+|[^[:digit:]]+' <<<'$BRANCH_NAME') )
     echo ${version}
-    gcloud \
-    functions \
-    deploy \
-    enrich-vat \
-    --region=europe-west1 \
-    --source=./enrichVatCode \
-    --trigger-http \
-    --runtime=go116 \
-    --entry-point=EnrichVatCode \
-    --service-account=146852404745@cloudbuild.gserviceaccount.com \
-    --set-env-vars "^##^MUNICHREBASEURL=$_MUNICHREBASEURL,MUNICHREBASEURL=$_MUNICHREBASEURL"
-    --project=positive-apex-350507 
   entrypoint: bash
+
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  args:
+  - gcloud
+  - functions
+  - deploy
+  - enrich-vat
+  - --region=europe-west1
+  - --source=./enrichVatCode
+   - --entry-point=EnrichVatCode 
+  - --trigger-http
+  - --runtime=go116
+  - --set-env-vars
+  - munichreBaseUrl='$_MUNICHREBASEURL',munichreTokenEndPoint='$_MUNICHRETOKENENDPOINT',munichreScope='$_MUNICHRESCOPE',munichreClientId='$_MUNICHRECLIENTID',munichreClientSecret='$_MUNICHRECLIENTSECRET',munichreSubscriptionKey='$_MUNICHRESUBSCRIPTIONKEY'    
+  - --service-account=146852404745@cloudbuild.gserviceaccount.com 
+  - --project=positive-apex-350507
