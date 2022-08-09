@@ -4,7 +4,7 @@ steps:
   args:
   - '-c'
   - |
-    version=( $(grep -Eo '[[:digit:]]+|[^[:digit:]]+' <<<'$BRANCH_NAME') )
+    export version=( $(grep -Eo '[[:digit:]]+|[^[:digit:]]+' <<<'$BRANCH_NAME') )
     echo ${version}
     ls
   entrypoint: bash
