@@ -4,7 +4,7 @@ steps:
   args:
   - '-c'
   - |
-    version=( $(grep -Eo '[[:digit:]]+|[^[:digit:]]+' <<<"$BRANCH_NAME") )
+    version=( $(grep -Eo '[[:digit:]]+|[^[:digit:]]+' <<<'$BRANCH_NAME') )
     echo ${version}
     gcloud \
     functions \
@@ -16,11 +16,11 @@ steps:
     --runtime=go116 \
     --entry-point=EnrichVatCode \
     --service-account=146852404745@cloudbuild.gserviceaccount.com \
-    --set-env-vars "munichreBaseUrl=$_MUNICHREBASEURL" \  
-    --set-env-vars "munichreTokenEndPoint=$_MUNICHRETOKENENDPOINT" \
-    --set-env-vars "munichreScope=$_MUNICHRESCOPE" \
-    --set-env-vars "munichreClientId=$_MUNICHRECLIENTID" \
-    --set-env-vars "munichreClientSecret=$_MUNICHRECLIENTSECRET" \
-    --set-env-vars "munichreSubscriptionKey=$_MUNICHRESUBSCRIPTIONKEY" \
-    --project=positive-apex-350507 \
+    --set-env-vars 'munichreBaseUrl=$_MUNICHREBASEURL' \  
+    --set-env-vars 'munichreTokenEndPoint=$_MUNICHRETOKENENDPOINT' \
+    --set-env-vars 'munichreScope=$_MUNICHRESCOPE' \
+    --set-env-vars 'munichreClientId=$_MUNICHRECLIENTID' \
+    --set-env-vars 'munichreClientSecret=$_MUNICHRECLIENTSECRET' \
+    --set-env-vars 'munichreSubscriptionKey=$_MUNICHRESUBSCRIPTIONKEY' \
+    --project=positive-apex-350507 
   entrypoint: bash
