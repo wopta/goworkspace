@@ -17,11 +17,12 @@ steps:
 
     name_camel=$(sed -r 's/(^|-)(\w)/\U\2/g' <<<"${strarr[0]}")
     echo "namefx camel : ${name_camel}"
+
     # Save a value to persistent volume mount: "/workspace"
     echo $namefx > /workspace/namefx.txt &&
     # Save another
     echo $name_camel > /workspace/entrypoint.txt
-    
+    ls -la
     gcloud functions deploy $namefx \
     --region=europe-west1 \
     --source=/workspace/enrich-vat \
