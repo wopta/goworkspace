@@ -29,10 +29,6 @@ steps:
   args: ["-lah","/workspace"]
 
 - name: gcr.io/cloud-builders/gcloud:latest
-  entrypoint: bash
-  args: [cat, workspace/namefx.txt]
-
-- name: gcr.io/cloud-builders/gcloud:latest
   args:
   - functions
   - deploy
