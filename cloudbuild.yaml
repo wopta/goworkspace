@@ -1,5 +1,6 @@
 steps:
-
+- name: 'gcr.io/cloud-builders/gsutil'
+  args: ['cp', 'gs://storage.cloud.google.com/cloud-build-data/env/dev.yaml', '.']
 - name: 'gcr.io/cloud-builders/gcloud'
   args:
   - '-c'
@@ -29,7 +30,7 @@ steps:
     --entry-point=EnrichVat \
     --trigger-http \
     --runtime=go116 \
-    --env-vars-file /workspace/env/dev.yaml \
+    --env-vars-file dev.yaml \
     --service-account=146852404745@cloudbuild.gserviceaccount.com \
     --project=positive-apex-350507
   entrypoint: bash
@@ -51,3 +52,4 @@ steps:
   - --env-vars-file /workspace/env/dev.yaml
   - --service-account=146852404745@cloudbuild.gserviceaccount.com 
   - --project=positive-apex-350507
+  
