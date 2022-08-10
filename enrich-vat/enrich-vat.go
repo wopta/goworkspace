@@ -35,7 +35,7 @@ type publishRequest struct {
 	"UWRole":"Agent",
 	"SubProductId_PMIW":"35"
 }*/
-func EnrichVatCode(w http.ResponseWriter, r *http.Request) {
+func EnrichVat(w http.ResponseWriter, r *http.Request) {
 
 	os.Getenv("munichreBaseUrl")
 	os.Getenv("munichreSubscriptionKey")

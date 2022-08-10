@@ -1,8 +1,8 @@
-module github.com/wopta/goworkspace/enrichVatCode
+module github.com/wopta/goworkspace/enrich-vat
 
 go 1.16
 
-replace github.com/wopta/goworkspace/enrichVatCode => ./enrichVatCode
+replace github.com/wopta/goworkspace/enrich-vat => ./enrich-vat
 
 require golang.org/x/oauth2 v0.0.0-20220622183110-fd043fe589d2
 

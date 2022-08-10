@@ -14,6 +14,8 @@ steps:
     read -a strarr <<< "$text"
     #Print the splitted words
     echo "Book Name : ${strarr[0]}"
+    name_upper=$(sed -r 's/(^|-)(\w)/\U\2/g' <<<"$TAG_NAME")
+    echo "Book Name : ${name_upper}"
     # Save a value to persistent volume mount: "/workspace"
     echo $namefx > /workspace/namefx.txt &&
     # Save another
