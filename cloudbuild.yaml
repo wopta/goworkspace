@@ -4,7 +4,20 @@ steps:
   args:
   - '-c'
   - |
-    export _VERSION=( $(grep -Eo '[[:digit:]]+|[^[:digit:]]+' <<<'$BRANCH_NAME') )
+    export namefx=( $(grep -Eo '[[:digit:]]+|[^[:digit:]]+' <<<'$TAG_NAME') )
+    #Read the string value
+    echo "Enter book name, author name and price by separating comma. "
+    read text
+    # Set comma as delimiter
+    IFS='/'
+    #Read the split words into an array based on comma delimiter
+    read -a strarr <<< "$text"
+    #Print the splitted words
+    echo "Book Name : ${strarr[0]}"
+    # Save a value to persistent volume mount: "/workspace"
+    echo $namefx > /workspace/namefx.txt &&
+    # Save another
+    expr 1 + 1 > /workspace/second.txt
     echo $_VERSION
   entrypoint: bash
 
@@ -14,10 +27,9 @@ steps:
 
 - name: gcr.io/cloud-builders/gcloud:latest
   entrypoint: "echo"
-  args: ["$_VERSION "]
+  args: ["$(cat /workspace/first.txt) "]
 
 - name: gcr.io/cloud-builders/gcloud:latest
-
   args:
   - functions
   - deploy
@@ -28,6 +40,6 @@ steps:
   - --trigger-http
   - --runtime=go116
   - --set-env-vars
-  - munichreBaseUrl='$_MUNICHREBASEURL',munichreTokenEndPoint='$_MUNICHRETOKENENDPOINT',munichreScope='$_MUNICHRESCOPE',munichreClientId='$_MUNICHRECLIENTID',munichreClientSecret='$_MUNICHRECLIENTSECRET',munichreSubscriptionKey='$_MUNICHRESUBSCRIPTIONKEY'    
+  - munichreBaseUrl="$_MUNICHREBASEURL",munichreTokenEndPoint="$_MUNICHRETOKENENDPOINT",munichreScope="$_MUNICHRESCOPE",munichreClientId="$_MUNICHRECLIENTID",munichreClientSecret="$_MUNICHRECLIENTSECRET",munichreSubscriptionKey="$_MUNICHRESUBSCRIPTIONKEY"  
   - --service-account=146852404745@cloudbuild.gserviceaccount.com 
   - --project=positive-apex-350507
