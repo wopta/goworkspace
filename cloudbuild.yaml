@@ -25,7 +25,7 @@ steps:
     # Save another
     echo $name_camel > /workspace/entrypoint.txt
     ls -la
-    gcloud functions deploy $namefx \
+    gcloud functions deploy ${strarr[0]} \
     --region=europe-west1 \
     --source=/workspace/enrich-vat \
     --entry-point=EnrichVat \
