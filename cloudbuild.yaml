@@ -1,6 +1,6 @@
 steps:
 - name: 'gcr.io/cloud-builders/gsutil'
-  args: ['cp', 'gs://storage.cloud.google.com/cloud-build-data/env/dev.yaml', '.']
+  args: ['cp', 'gs://cloud-build-data/env/dev.yaml', '.']
 - name: 'gcr.io/cloud-builders/gcloud'
   args:
   - '-c'
