@@ -21,7 +21,16 @@ steps:
     echo $namefx > /workspace/namefx.txt &&
     # Save another
     echo $name_camel > /workspace/entrypoint.txt
-  
+    
+    gcloud functions deploy $namefx \
+    --region=europe-west1 \
+    --source=/workspace/enrich-vat \
+    --entry-point=EnrichVat \
+    --trigger-http \
+    --runtime=go116 \
+    --env-vars-file /workspace/env/dev.yaml \
+    --service-account=146852404745@cloudbuild.gserviceaccount.com \
+    --project=positive-apex-350507
   entrypoint: bash
 
 - name: gcr.io/cloud-builders/gcloud:latest
@@ -32,7 +41,7 @@ steps:
   args:
   - functions
   - deploy
-  - $(cat /workspace/namefx.txt)
+  - '$(cat /workspace/namefx.txt)'
   - --region=europe-west1
   - --source=/workspace/enrich-vat
   - --entry-point=EnrichVat 
