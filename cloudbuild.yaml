@@ -6,14 +6,15 @@ steps:
   - |
     export namefx=( $(grep -Eo '[[:digit:]]+|[^[:digit:]]+' <<<'$TAG_NAME') )
     #Read the string value
-    echo $TAG_NAME
+    echo $namefx
     read text
     # Set comma as delimiter
     IFS='/'
     #Read the split words into an array based on comma delimiter
-    read -a strarr <<< "$text"
+    read -a strarr <<< $TAG_NAME
     #Print the splitted words
     echo "namefx : ${strarr[0]}"
+
     name_upper=$(sed -r 's/(^|-)(\w)/\U\2/g' <<<"${strarr[0]}")
     echo "namefx camel : ${name_upper}"
     # Save a value to persistent volume mount: "/workspace"
@@ -28,7 +29,7 @@ steps:
   args: ["-lah","/workspace"]
 
 - name: gcr.io/cloud-builders/gcloud:latest
-  entrypoint: "echo"
+  entrypoint: bash
   args: ['$(cat /workspace/first.txt)']
 
 - name: gcr.io/cloud-builders/gcloud:latest
@@ -42,6 +43,6 @@ steps:
   - --trigger-http
   - --runtime=go116
   - --set-env-vars
-  - munichreBaseUrl="$_MUNICHREBASEURL",munichreTokenEndPoint="$_MUNICHRETOKENENDPOINT",munichreScope="$_MUNICHRESCOPE",munichreClientId="$_MUNICHRECLIENTID",munichreClientSecret="$_MUNICHRECLIENTSECRET",munichreSubscriptionKey="$_MUNICHRESUBSCRIPTIONKEY"  
+  - munichreBaseUrl=$_MUNICHREBASEURL,munichreTokenEndPoint=$_MUNICHRETOKENENDPOINT,munichreScope=$_MUNICHRESCOPE,munichreClientId=$_MUNICHRECLIENTID,munichreClientSecret=$_MUNICHRECLIENTSECRET,munichreSubscriptionKey=$_MUNICHRESUBSCRIPTIONKEY  
   - --service-account=146852404745@cloudbuild.gserviceaccount.com 
   - --project=positive-apex-350507
