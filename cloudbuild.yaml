@@ -40,17 +40,4 @@ steps:
   entrypoint: "ls"
   args: ["-lah","/workspace"]
 
-- name: gcr.io/cloud-builders/gcloud:latest
-  args:
-  - functions
-  - deploy
-  - '$(cat /workspace/namefx.txt)'
-  - --region=europe-west1
-  - --source=/workspace/enrich-vat
-  - --entry-point=EnrichVat 
-  - --trigger-http
-  - --runtime=go116
-  - --env-vars-file /workspace/env/dev.yaml
-  - --service-account=146852404745@cloudbuild.gserviceaccount.com 
-  - --project=positive-apex-350507
   

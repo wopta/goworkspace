@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-
+	"net/url"
 	"os"
 
 	lib "github.com/wopta/goworkspace/lib"
@@ -39,13 +39,19 @@ func EnrichVat(w http.ResponseWriter, r *http.Request) {
 
 	os.Getenv("munichreBaseUrl")
 	os.Getenv("munichreSubscriptionKey")
-	os.Getenv("munichreSubscriptionHeader")
-
-	var url = "https://api-devexternal.munichre.com/flowin/dev/api/V1/api/company/vat/01654010345"
-
+	//os.Getenv("munichreSubscriptionHeader")
+	log.Println("log env:")
+	log.Println(os.Getenv("munichreTokenEndPoint"))
+	var urlstring = "https://api-devexternal.munichre.com/flowin/dev/api/V1/api/company/vat/%01654010345"
+	u, err := url.Parse(urlstring)
+	if err != nil {
+		panic(err)
+	}
+	log.Println("url parse:", u)
 	client := lib.ClientCredentials(os.Getenv("munichreClientId"),
 		os.Getenv("munichreClientSecret"), os.Getenv("munichreScope"), os.Getenv("munichreTokenEndPoint"))
-	req, _ := http.NewRequest("GET", url, nil)
+
+	req, _ := http.NewRequest("GET", urlstring, nil)
 	req.Header.Set("Ocp-Apim-Subscription-Key", "59c92bc0095d4b8c803656a207150c32")
 	res, err := client.Do(req)
 	if err != nil {
