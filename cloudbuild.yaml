@@ -15,6 +15,7 @@ steps:
     read -a strarr <<< $TAG_NAME
     #Print the splitted words
     echo "namefx : ${strarr[0]}"
+    namefx=$strarr[0]
 
     name_camel=$(sed -r 's/(^|-)(\w)/\U\2/g' <<<"${strarr[0]}")
     echo "namefx camel : ${name_camel}"
