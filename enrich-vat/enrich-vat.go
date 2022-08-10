@@ -35,21 +35,22 @@ type publishRequest struct {
 	"UWRole":"Agent",
 	"SubProductId_PMIW":"35"
 }*/
+
 func EnrichVat(w http.ResponseWriter, r *http.Request) {
 
-	os.Getenv("munichreBaseUrl")
+	os.Getenv("MUNICHREBASEURL")
 	os.Getenv("munichreSubscriptionKey")
 	//os.Getenv("munichreSubscriptionHeader")
 	log.Println("log env:")
-	log.Println(os.Getenv("munichreTokenEndPoint"))
+	log.Println(os.Getenv("MUNICHRETOKENENDPOINT"))
 	var urlstring = "https://api-devexternal.munichre.com/flowin/dev/api/V1/api/company/vat/%01654010345"
 	u, err := url.Parse(urlstring)
 	if err != nil {
 		panic(err)
 	}
 	log.Println("url parse:", u)
-	client := lib.ClientCredentials(os.Getenv("munichreClientId"),
-		os.Getenv("munichreClientSecret"), os.Getenv("munichreScope"), os.Getenv("munichreTokenEndPoint"))
+	client := lib.ClientCredentials(os.Getenv("MUNICHRECLIENTID"),
+		os.Getenv("MUNICHRECLIENTSECRET"), os.Getenv("MUNICHRESCOPE"), os.Getenv("MUNICHRETOKENENDPOINT"))
 
 	req, _ := http.NewRequest("GET", urlstring, nil)
 	req.Header.Set("Ocp-Apim-Subscription-Key", "59c92bc0095d4b8c803656a207150c32")
