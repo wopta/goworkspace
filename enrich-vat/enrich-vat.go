@@ -43,7 +43,7 @@ func EnrichVat(w http.ResponseWriter, r *http.Request) {
 	//os.Getenv("munichreSubscriptionHeader")
 	log.Println("log env:")
 	log.Println(os.Getenv("MUNICHRETOKENENDPOINT"))
-	var urlstring = "https://api-devexternal.munichre.com/flowin/dev/api/V1/api/company/vat/%01654010345"
+	var urlstring = "https://api-devexternal.munichre.com/flowin/dev/api/V1/api/company/vat/01654010345"
 	u, err := url.Parse(urlstring)
 	if err != nil {
 		panic(err)
