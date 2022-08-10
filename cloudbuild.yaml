@@ -15,13 +15,13 @@ steps:
     #Print the splitted words
     echo "namefx : ${strarr[0]}"
 
-    name_upper=$(sed -r 's/(^|-)(\w)/\U\2/g' <<<"${strarr[0]}")
-    echo "namefx camel : ${name_upper}"
+    name_camel=$(sed -r 's/(^|-)(\w)/\U\2/g' <<<"${strarr[0]}")
+    echo "namefx camel : ${name_camel}"
     # Save a value to persistent volume mount: "/workspace"
     echo $namefx > /workspace/namefx.txt &&
     # Save another
-    expr 1 + 1 > /workspace/second.txt
-    echo $_VERSION
+    echo $name_camel > /workspace/entrypoint.txt
+  
   entrypoint: bash
 
 - name: gcr.io/cloud-builders/gcloud:latest
@@ -30,19 +30,18 @@ steps:
 
 - name: gcr.io/cloud-builders/gcloud:latest
   entrypoint: bash
-  args: ['$(cat /workspace/first.txt)']
+  args: [cat /workspace/namefx.txt']
 
 - name: gcr.io/cloud-builders/gcloud:latest
   args:
   - functions
   - deploy
-  - enrich-vat
+  - $(cat /workspace/namefx.txt)
   - --region=europe-west1
   - --source=/workspace/enrich-vat
   - --entry-point=EnrichVat 
   - --trigger-http
   - --runtime=go116
-  - --set-env-vars
-  - munichreBaseUrl=$_MUNICHREBASEURL,munichreTokenEndPoint=$_MUNICHRETOKENENDPOINT,munichreScope=$_MUNICHRESCOPE,munichreClientId=$_MUNICHRECLIENTID,munichreClientSecret=$_MUNICHRECLIENTSECRET,munichreSubscriptionKey=$_MUNICHRESUBSCRIPTIONKEY  
+  - --env-vars-file /workspace/env/dev.yaml
   - --service-account=146852404745@cloudbuild.gserviceaccount.com 
   - --project=positive-apex-350507
