@@ -1,6 +1,7 @@
 package enrichVatCode
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -12,22 +13,20 @@ import (
 	lib "github.com/wopta/goworkspace/lib"
 )
 
+var projectID = os.Getenv("GOOGLE_CLOUD_PROJECT")
+
 func init() {
 	// err is pre-declared to avoid shadowing client.
 }
 
-type publishRequest struct {
-	vat string `json:"vat"`
-}
-
-func EnrichVat(w http.ResponseWriter, r *http.Request) {
-	log.Println("EnrichVat")
+func QuoteAllrisk(w http.ResponseWriter, r *http.Request) {
+	log.Println("QuoteAllrisk")
 	vat := strings.Split(r.RequestURI, "/")
 	log.Println(vat)
 	log.Println(len(vat))
-	if len(vat) > 2 {
-		if strings.EqualFold(vat[2], "munichre") {
-			var urlstring = os.Getenv("MUNICHREBASEURL") + "/api/company/vat/" + vat[1]
+	if len(vat) > 1 {
+		if strings.EqualFold(vat[1], "munichre") {
+			var urlstring = os.Getenv("MUNICHREBASEURL") + "/api/quote/rate/"
 			u, err := url.Parse(urlstring)
 			if err != nil {
 				panic(err)
@@ -35,8 +34,8 @@ func EnrichVat(w http.ResponseWriter, r *http.Request) {
 			log.Println("url parse:", u)
 			client := lib.ClientCredentials(os.Getenv("MUNICHRECLIENTID"),
 				os.Getenv("MUNICHRECLIENTSECRET"), os.Getenv("MUNICHRESCOPE"), os.Getenv("MUNICHRETOKENENDPOINT"))
-
-			req, _ := http.NewRequest("GET", urlstring, nil)
+			jsonData, _ := ioutil.ReadAll(r.Body)
+			req, _ := http.NewRequest(http.MethodPost, urlstring, bytes.NewBuffer(jsonData))
 			req.Header.Set("Ocp-Apim-Subscription-Key", os.Getenv("MUNICHRESUBSCRIPTIONKEY"))
 			res, err := client.Do(req)
 			if err != nil {

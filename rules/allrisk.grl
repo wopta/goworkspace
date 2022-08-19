@@ -1,0 +1,43 @@
+
+/*
+type ProfileAllrisk struct {
+	Vat              int64
+	SquareMeters     int64
+	IsBuildingOwner  bool
+	Revenue          int64
+	Address          string
+	Ateco            string
+	BusinessSector   string
+	BuildingType     string
+	BuildingMaterial string
+	BuildingYear     string
+	Employer         int64
+	IsAllarm         bool
+	Floor            int64
+	IsPRA            bool
+	Costruction      string
+	IsHolder         bool
+	Result        string
+}
+
+*/
+rule CheckEmployer "Check Employer values" salience 10 {
+    when 
+        In.Employer <= 4 
+    then
+        Log("In.Employer < 4 ");
+     
+        In.Result = "{ code:PMIWCT},";
+       Retract("CheckEmployer");
+
+}
+rule Check "Check Employer values" salience 9 {
+    when 
+        In.Employer > 4 
+    then
+        Log("In.Employer < 4 ");
+     
+        In.Result =In.Result + "{ code:PMIWCT},";
+       Retract("Check");
+
+}

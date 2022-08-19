@@ -4,5 +4,8 @@ use(
 ./enrich-vat
 ./lib
 ./cmd
-./functions
+./rules
+./quote-allrisk
+./models
+
 )

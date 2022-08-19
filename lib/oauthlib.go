@@ -1,4 +1,4 @@
-package oauthlib
+package lib
 
 import (
 	"context"

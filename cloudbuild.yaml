@@ -27,8 +27,8 @@ steps:
     ls -la
     gcloud functions deploy ${strarr[0]} \
     --region=europe-west1 \
-    --source=/workspace/enrich-vat \
-    --entry-point=EnrichVat \
+    --source=/workspace/${strarr[0]} \
+    --entry-point=${name_camel} \
     --trigger-http \
     --runtime=go116 \
     --env-vars-file dev.yaml \

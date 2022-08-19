@@ -1,0 +1,4638 @@
+
+{
+  "productCode": "T007",
+  "productDescription": "Gestione Auto",
+  "objsInsured": [
+    {
+      "codeObj": "001001",
+      "description": "1 Autovettura",
+      "coverages": [
+        {
+          "code": "G6673",
+          "description": "RCA auto uso privato/promiscuo",
+          "factors": [
+            {
+              "code": "_63",
+              "description": "Massimale RCA",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "22",
+                  "description": "s)   7.800.000 p)   7.800.000 c)   7.800.000"
+                },
+                {
+                  "code": "42",
+                  "description": "s)   9.000.000 p)   9.000.000 c)   9.000.000"
+                },
+                {
+                  "code": "23",
+                  "description": "s)  10.400.000 p)  10.400.000 c)  10.400.000"
+                },
+                {
+                  "code": "45",
+                  "description": "s)  12.000.000 p)  12.000.000 c)  12.000.000"
+                },
+                {
+                  "code": "27",
+                  "description": "s)  15.000.000 p)  15.000.000 c)  15.000.000"
+                },
+                {
+                  "code": "9",
+                  "description": "s)  25.000.000 p)  25.000.000 c)  25.000.000"
+                },
+                {
+                  "code": "66",
+                  "description": "s)           0 p)   6.450.000 c)   1.300.000"
+                }
+              ]
+            },
+            {
+              "code": "_62",
+              "description": "Franchigia RCA euro",
+              "factorType": "S",
+              "slave": true,
+              "possibleValues": []
+            },
+            {
+              "code": "_4981",
+              "description": "Tipo Guida",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "1",
+                  "description": "Libera"
+                },
+                {
+                  "code": "2",
+                  "description": "Esperta"
+                },
+                {
+                  "code": "3",
+                  "description": "Esclusiva"
+                },
+                {
+                  "code": "4",
+                  "description": "Azienda"
+                },
+                {
+                  "code": "5",
+                  "description": "Non Personalizzata"
+                },
+                {
+                  "code": "6",
+                  "description": "Donna"
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "1",
+            "description": "RCA"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6697",
+          "description": "Incendio auto",
+          "factors": [
+            {
+              "code": "_271",
+              "description": "Applicare il tasso di tariffa",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "0",
+                  "description": "No"
+                },
+                {
+                  "code": "1",
+                  "description": "Si"
+                }
+              ]
+            },
+            {
+              "code": "_570",
+              "description": "Tipo Incendio",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "2",
+                  "description": "Valore Intero"
+                },
+                {
+                  "code": "4",
+                  "description": "Primo Rischio Assoluto"
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "2",
+            "description": "Incendio"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6709",
+          "description": "Furto Auto",
+          "factors": [
+            {
+              "code": "_271",
+              "description": "Applicare il tasso di tariffa",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "0",
+                  "description": "No"
+                },
+                {
+                  "code": "1",
+                  "description": "Si"
+                }
+              ]
+            },
+            {
+              "code": "_304",
+              "description": "Tipo Furto",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "1",
+                  "description": "Solo Totale"
+                },
+                {
+                  "code": "2",
+                  "description": "Totale e Parziale"
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "3",
+            "description": "Furto"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6720",
+          "description": "Kasko Auto",
+          "factors": [
+            {
+              "code": "_271",
+              "description": "Applicare il tasso di tariffa",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "0",
+                  "description": "No"
+                },
+                {
+                  "code": "1",
+                  "description": "Si"
+                }
+              ]
+            },
+            {
+              "code": "_4782",
+              "description": "Scoperto Kasko",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "1",
+                  "description": "Scoperto 10 % min. 500"
+                },
+                {
+                  "code": "2",
+                  "description": "Scoperto 15 % min. 750"
+                },
+                {
+                  "code": "3",
+                  "description": "Fr. 20% min. 2.500"
+                }
+              ]
+            },
+            {
+              "code": "_171",
+              "description": "Scoperto %",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                }
+              ]
+            },
+            {
+              "code": "_170",
+              "description": "Scoperto minimo Euro",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                }
+              ]
+            },
+            {
+              "code": "_2313",
+              "description": "Tasso Riservato Direzione",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": []
+            },
+            {
+              "code": "_99",
+              "description": "Tipo Kasko",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "5",
+                  "description": "Totale"
+                }
+              ]
+            },
+            {
+              "code": "_300",
+              "description": "Scoperto",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "19",
+                  "description": "10% minimo   500"
+                },
+                {
+                  "code": "24",
+                  "description": "10% minimo   516"
+                },
+                {
+                  "code": "53",
+                  "description": "10% minimo   774"
+                },
+                {
+                  "code": "54",
+                  "description": "10% minimo   361"
+                }
+              ]
+            },
+            {
+              "code": "_221",
+              "description": "Franchigia",
+              "factorType": "T",
+              "slave": false
+            },
+            {
+              "code": "_4784",
+              "description": "Scoperto e Franchigia",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "1",
+                  "description": "  0% Fr.0% minimo     0"
+                },
+                {
+                  "code": "2",
+                  "description": "  0% Fr.4% minimo 1.000"
+                },
+                {
+                  "code": "3",
+                  "description": "  5% Fr.1% minimo   250"
+                },
+                {
+                  "code": "4",
+                  "description": "  5% Fr.2% minimo   500"
+                },
+                {
+                  "code": "5",
+                  "description": "  4% Fr.5% minimo 1.000"
+                },
+                {
+                  "code": "6",
+                  "description": " 10% Fr.1% minimo   250"
+                },
+                {
+                  "code": "7",
+                  "description": " 10% Fr.2% minimo   500"
+                },
+                {
+                  "code": "8",
+                  "description": " 10% Fr.4% minimo 1.000"
+                },
+                {
+                  "code": "9",
+                  "description": " 15% Fr.1% minimo   250"
+                },
+                {
+                  "code": "10",
+                  "description": " 15% Fr.2% minimo   500"
+                },
+                {
+                  "code": "11",
+                  "description": " 15% Fr.4% minimo 1.000"
+                },
+                {
+                  "code": "12",
+                  "description": " 20% Fr.1% minimo   250"
+                },
+                {
+                  "code": "13",
+                  "description": " 20% Fr.2% minimo   500"
+                },
+                {
+                  "code": "14",
+                  "description": " 20% Fr.4% minimo 1.000"
+                },
+                {
+                  "code": "15",
+                  "description": " 25% Fr.0% minimo     0"
+                },
+                {
+                  "code": "16",
+                  "description": " 25% Fr.1% minimo   250"
+                },
+                {
+                  "code": "17",
+                  "description": " 25% Fr.2% minimo   500"
+                },
+                {
+                  "code": "18",
+                  "description": " 25% Fr.4% minimo 1.000"
+                },
+                {
+                  "code": "19",
+                  "description": " 10% Fr.3% minimo   250"
+                },
+                {
+                  "code": "20",
+                  "description": " 15% Fr.4% minimo   250"
+                },
+                {
+                  "code": "21",
+                  "description": "  0% Fr.20% minimo 2.500"
+                },
+                {
+                  "code": "22",
+                  "description": " 10% Fr.3% minimo   750"
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "4",
+            "description": "Kasko"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G8808",
+          "description": "Collisione",
+          "factors": [
+            {
+              "code": "_4782",
+              "description": "Scoperto Kasko",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "1",
+                  "description": "Scoperto 10 % min. 500"
+                },
+                {
+                  "code": "2",
+                  "description": "Scoperto 15 % min. 750"
+                },
+                {
+                  "code": "4",
+                  "description": "Scoperto 20% min. 2000"
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "4",
+            "description": "Kasko"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G8809",
+          "description": "Collisione Danno Totale",
+          "factors": [
+            {
+              "code": "_4782",
+              "description": "Scoperto Kasko",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "1",
+                  "description": "Scoperto 10 % min. 500"
+                },
+                {
+                  "code": "2",
+                  "description": "Scoperto 15 % min. 750"
+                },
+                {
+                  "code": "4",
+                  "description": "Scoperto 20% min. 2000"
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "4",
+            "description": "Kasko"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6724",
+          "description": "Protezione Legale Auto",
+          "factors": [
+            {
+              "code": "_4763",
+              "description": "Garanzia Protezione Legale",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "2",
+                  "description": "Incidenti"
+                },
+                {
+                  "code": "3",
+                  "description": "Incidenti + Patente"
+                },
+                {
+                  "code": "4",
+                  "description": "Incidenti + Controversie"
+                },
+                {
+                  "code": "5",
+                  "description": "Incidenti + Patente + Controversie"
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "5",
+            "description": "Protezione Legale"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6733",
+          "description": "Assistenza Auto",
+          "factors": [
+            {
+              "code": "_4762",
+              "description": "Tipo Assistenza",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "1",
+                  "description": "Basic"
+                },
+                {
+                  "code": "2",
+                  "description": "Top"
+                },
+                {
+                  "code": "3",
+                  "description": "Work"
+                },
+                {
+                  "code": "4",
+                  "description": "Comfort"
+                },
+                {
+                  "code": "5",
+                  "description": "Start"
+                },
+                {
+                  "code": "6",
+                  "description": "Avant"
+                },
+                {
+                  "code": "7",
+                  "description": "Special"
+                },
+                {
+                  "code": "8",
+                  "description": "Camper"
+                },
+                {
+                  "code": "9",
+                  "description": "Start Plus"
+                },
+                {
+                  "code": "10",
+                  "description": "Avant Plus"
+                },
+                {
+                  "code": "11",
+                  "description": "Special Plus"
+                },
+                {
+                  "code": "12",
+                  "description": "Camper Plus"
+                },
+                {
+                  "code": "13",
+                  "description": "Deluxe"
+                },
+                {
+                  "code": "14",
+                  "description": "J Avant Plus"
+                },
+                {
+                  "code": "15",
+                  "description": "J Special Plus"
+                },
+                {
+                  "code": "16",
+                  "description": "Truck Medium"
+                },
+                {
+                  "code": "17",
+                  "description": "Truck Large"
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6740",
+          "description": "Atti Vandalici",
+          "factors": [
+            {
+              "code": "_271",
+              "description": "Applicare il tasso di tariffa",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "0",
+                  "description": "No"
+                },
+                {
+                  "code": "1",
+                  "description": "Si"
+                }
+              ]
+            },
+            {
+              "code": "_171",
+              "description": "Scoperto %",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "10",
+                  "description": " 10"
+                },
+                {
+                  "code": "15",
+                  "description": " 15"
+                }
+              ]
+            },
+            {
+              "code": "_170",
+              "description": "Scoperto minimo Euro",
+              "factorType": "T",
+              "slave": false
+            },
+            {
+              "code": "_2313",
+              "description": "Tasso Riservato Direzione",
+              "factorType": "T",
+              "slave": false
+            }
+          ],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6766",
+          "description": "Rimborso Oneri Fiscali",
+          "factors": [],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6747",
+          "description": "Cristalli",
+          "factors": [
+            {
+              "code": "_69",
+              "description": "Massimale",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "750.00",
+                  "description": "750,00"
+                },
+                {
+                  "code": "1000.00",
+                  "description": "1.000,00"
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6749",
+          "description": "Fenomeni Naturali",
+          "factors": [
+            {
+              "code": "_271",
+              "description": "Applicare il tasso di tariffa",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "0",
+                  "description": "No"
+                },
+                {
+                  "code": "1",
+                  "description": "Si"
+                }
+              ]
+            },
+            {
+              "code": "_171",
+              "description": "Scoperto %",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "10",
+                  "description": " 10"
+                },
+                {
+                  "code": "15",
+                  "description": " 15"
+                }
+              ]
+            },
+            {
+              "code": "_170",
+              "description": "Scoperto minimo Euro",
+              "factorType": "T",
+              "slave": false
+            },
+            {
+              "code": "_5839",
+              "description": "Danno Totale",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "0",
+                  "description": "No"
+                },
+                {
+                  "code": "1",
+                  "description": "Si"
+                }
+              ]
+            },
+            {
+              "code": "_2313",
+              "description": "Tasso Riservato Direzione",
+              "factorType": "T",
+              "slave": false
+            },
+            {
+              "code": "_3061",
+              "description": "Tipo eventi atmosferici",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "1",
+                  "description": "Base"
+                },
+                {
+                  "code": "2",
+                  "description": "Estesa"
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": [
+            {
+              "code": "FNESTE",
+              "description": "Fenomeni Naturali Estesa"
+            }
+          ]
+        },
+        {
+          "code": "G6753",
+          "description": "Inconvenienti Furto",
+          "factors": [],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6754",
+          "description": "Inconvenienti Incendio",
+          "factors": [],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6756",
+          "description": "Patente, documenti e targa",
+          "factors": [],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6757",
+          "description": "Protezione conducente - Morte e invalidità permanente",
+          "factors": [
+            {
+              "code": "_551",
+              "description": "Somma Assicurata",
+              "factorType": "T",
+              "slave": false
+            },
+            {
+              "code": "_765",
+              "description": "Franchigia Morte e IP %",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "0",
+                  "description": "  0"
+                },
+                {
+                  "code": "3",
+                  "description": "  3"
+                },
+                {
+                  "code": "5",
+                  "description": "  5"
+                },
+                {
+                  "code": "10",
+                  "description": " 10"
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6758",
+          "description": "Protezione conducente - Indennità ricovero",
+          "factors": [
+            {
+              "code": "_551",
+              "description": "Somma Assicurata",
+              "factorType": "T",
+              "slave": false
+            },
+            {
+              "code": "_66",
+              "description": "Indennita giornaliera Euro",
+              "factorType": "T",
+              "slave": false
+            },
+            {
+              "code": "_152",
+              "description": "Premio",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6759",
+          "description": "Protezione conducente - Rimborso spese di cura",
+          "factors": [
+            {
+              "code": "_69",
+              "description": "Massimale",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "5000.00",
+                  "description": "5.000,00"
+                },
+                {
+                  "code": "7500.00",
+                  "description": "7.500,00"
+                },
+                {
+                  "code": "2500.00",
+                  "description": "2.500,00"
+                },
+                {
+                  "code": "10000.00",
+                  "description": "10.000,00"
+                },
+                {
+                  "code": "1500.00",
+                  "description": "1.500,00"
+                }
+              ]
+            },
+            {
+              "code": "_152",
+              "description": "Premio",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6764",
+          "description": "Ripristino Airbag",
+          "factors": [],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6765",
+          "description": "Scaccia Pensieri",
+          "factors": [],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6771",
+          "description": "Assistenza Auto TTG",
+          "factors": [],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6776",
+          "description": "Trasportati",
+          "factors": [],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6780",
+          "description": "Inconvenienti",
+          "factors": [],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6781",
+          "description": "Recupero punti patente",
+          "factors": [],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6784",
+          "description": "Protezione Conducente auto",
+          "factors": [
+            {
+              "code": "_4746",
+              "description": "Forma copertura del conducente",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "1",
+                  "description": "Garanzia minima"
+                },
+                {
+                  "code": "2",
+                  "description": "Garanzia media"
+                },
+                {
+                  "code": "3",
+                  "description": "Garanzia massima"
+                }
+              ]
+            },
+            {
+              "code": "_4745",
+              "description": "Massimale Protezione del conducente",
+              "factorType": "S",
+              "slave": true,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "3",
+                  "description": "Morte) 25.000,00 IP) 25.000,00 Diaria)    15,00"
+                }
+              ]
+            },
+            {
+              "code": "_69",
+              "description": "Massimale",
+              "factorType": "T",
+              "slave": false
+            }
+          ],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6786",
+          "description": "Ritiro Patente autovetture",
+          "factors": [
+            {
+              "code": "_469",
+              "description": "Diaria",
+              "factorType": "T",
+              "slave": false
+            },
+            {
+              "code": "_64",
+              "description": "Formula",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "1",
+                  "description": "Per persona"
+                },
+                {
+                  "code": "2",
+                  "description": "Per veicolo"
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G7965",
+          "description": "Assistenza FC Special Plus",
+          "factors": [],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G7966",
+          "description": "Assistenza FC Avant Plus",
+          "factors": [],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        }
+      ],
+      "factors": [
+        {
+          "code": "_4909",
+          "description": "Indice di Merito",
+          "factorType": "T",
+          "slave": false
+        }
+      ],
+      "clauses": [
+        {
+          "code": "RCAT01",
+          "description": "Rinuncia a diritto rivalsa (Condizione speciale C)"
+        },
+        {
+          "code": "RCAT20",
+          "description": "Rinuncia alla rivalsa per guida in stato di ebbrezza (Condizione speciale N)"
+        },
+        {
+          "code": "RCAT21",
+          "description": "Danni provocati da veicoli identificati e non assicurati (Condizione speciale I)"
+        },
+        {
+          "code": "RCAT22",
+          "description": "Responsabilità civile per fatto di figli minori (Condizione speciale L)"
+        },
+        {
+          "code": "RCAT24",
+          "description": "Risarcimento in forma specifica (Condizione R)"
+        },
+        {
+          "code": "RCAT26",
+          "description": "Carta verde (Condizione Speciale G)"
+        },
+        {
+          "code": "RCAT27",
+          "description": "Condizione Speciale B - TUA Bonus Protetto"
+        },
+        {
+          "code": "RCAT28",
+          "description": "Rinuncia alla rivalsa per guida non abilitata e  trasporto irregolare (Condizione Speciale O)"
+        }
+      ]
+    },
+    {
+      "codeObj": "004001",
+      "description": "4 Autoveicolo trasp. cose",
+      "coverages": [
+        {
+          "code": "G6679",
+          "description": "RCA Autocarri",
+          "factors": [
+            {
+              "code": "_63",
+              "description": "Massimale RCA",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "22",
+                  "description": "s)   7.800.000 p)   7.800.000 c)   7.800.000"
+                },
+                {
+                  "code": "41",
+                  "description": "s)   8.000.000 p)   8.000.000 c)   8.000.000"
+                },
+                {
+                  "code": "42",
+                  "description": "s)   9.000.000 p)   9.000.000 c)   9.000.000"
+                },
+                {
+                  "code": "25",
+                  "description": "s)  10.000.000 p)  10.000.000 c)  10.000.000"
+                },
+                {
+                  "code": "45",
+                  "description": "s)  12.000.000 p)  12.000.000 c)  12.000.000"
+                },
+                {
+                  "code": "52",
+                  "description": "s)  13.000.000 p)  13.000.000 c)  13.000.000"
+                },
+                {
+                  "code": "27",
+                  "description": "s)  15.000.000 p)  15.000.000 c)  15.000.000"
+                },
+                {
+                  "code": "9",
+                  "description": "s)  25.000.000 p)  25.000.000 c)  25.000.000"
+                },
+                {
+                  "code": "66",
+                  "description": "s)           0 p)   6.450.000 c)   1.300.000"
+                }
+              ]
+            },
+            {
+              "code": "_62",
+              "description": "Franchigia RCA euro",
+              "factorType": "S",
+              "slave": true,
+              "possibleValues": []
+            },
+            {
+              "code": "_4827",
+              "description": "Settore Attività",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "19",
+                  "description": "Attività manufatturiere"
+                },
+                {
+                  "code": "20",
+                  "description": "Commercio all'ingrosso e al dettaglio"
+                },
+                {
+                  "code": "23",
+                  "description": "Trasporti, logistica e servizi postali"
+                },
+                {
+                  "code": "24",
+                  "description": "Edilizia ed impiantistica"
+                },
+                {
+                  "code": "27",
+                  "description": "Agricoltura e silvicoltura"
+                },
+                {
+                  "code": "28",
+                  "description": "Riparazione veicoli, elettr. beni di largo consumo"
+                },
+                {
+                  "code": "29",
+                  "description": "Alberghi e ristoranti"
+                },
+                {
+                  "code": "30",
+                  "description": "Altro"
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "1",
+            "description": "RCA"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6703",
+          "description": "Incendio Autocarro",
+          "factors": [
+            {
+              "code": "_570",
+              "description": "Tipo Incendio",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "1",
+                  "description": "Primo Rischio"
+                },
+                {
+                  "code": "2",
+                  "description": "Valore Intero"
+                },
+                {
+                  "code": "3",
+                  "description": "Primo Rischio Relativo"
+                },
+                {
+                  "code": "4",
+                  "description": "Primo Rischio Assoluto"
+                }
+              ]
+            },
+            {
+              "code": "_113",
+              "description": "Punti di sovratariffazione",
+              "factorType": "T",
+              "slave": false
+            }
+          ],
+          "section": {
+            "code": "2",
+            "description": "Incendio"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6715",
+          "description": "Furto Autocarro",
+          "factors": [
+            {
+              "code": "_4785",
+              "description": "Scoperto Furto",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                }
+              ]
+            },
+            {
+              "code": "_171",
+              "description": "Scoperto %",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                }
+              ]
+            },
+            {
+              "code": "_170",
+              "description": "Scoperto minimo Euro",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                }
+              ]
+            },
+            {
+              "code": "_113",
+              "description": "Punti di sovratariffazione",
+              "factorType": "T",
+              "slave": false
+            },
+            {
+              "code": "_304",
+              "description": "Tipo Furto",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "1",
+                  "description": "Solo Totale"
+                },
+                {
+                  "code": "2",
+                  "description": "Totale e Parziale"
+                }
+              ]
+            },
+            {
+              "code": "_4784",
+              "description": "Scoperto e Franchigia",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "1",
+                  "description": "  0% Fr.0% minimo     0"
+                },
+                {
+                  "code": "2",
+                  "description": "  0% Fr.4% minimo 1.000"
+                },
+                {
+                  "code": "3",
+                  "description": "  5% Fr.1% minimo   250"
+                },
+                {
+                  "code": "4",
+                  "description": "  5% Fr.2% minimo   500"
+                },
+                {
+                  "code": "5",
+                  "description": "  4% Fr.5% minimo 1.000"
+                },
+                {
+                  "code": "6",
+                  "description": " 10% Fr.1% minimo   250"
+                },
+                {
+                  "code": "7",
+                  "description": " 10% Fr.2% minimo   500"
+                },
+                {
+                  "code": "8",
+                  "description": " 10% Fr.4% minimo 1.000"
+                },
+                {
+                  "code": "9",
+                  "description": " 15% Fr.1% minimo   250"
+                },
+                {
+                  "code": "10",
+                  "description": " 15% Fr.2% minimo   500"
+                },
+                {
+                  "code": "11",
+                  "description": " 15% Fr.4% minimo 1.000"
+                },
+                {
+                  "code": "12",
+                  "description": " 20% Fr.1% minimo   250"
+                },
+                {
+                  "code": "13",
+                  "description": " 20% Fr.2% minimo   500"
+                },
+                {
+                  "code": "14",
+                  "description": " 20% Fr.4% minimo 1.000"
+                },
+                {
+                  "code": "15",
+                  "description": " 25% Fr.0% minimo     0"
+                },
+                {
+                  "code": "16",
+                  "description": " 25% Fr.1% minimo   250"
+                },
+                {
+                  "code": "17",
+                  "description": " 25% Fr.2% minimo   500"
+                },
+                {
+                  "code": "18",
+                  "description": " 25% Fr.4% minimo 1.000"
+                },
+                {
+                  "code": "19",
+                  "description": " 10% Fr.3% minimo   250"
+                },
+                {
+                  "code": "20",
+                  "description": " 15% Fr.4% minimo   250"
+                },
+                {
+                  "code": "21",
+                  "description": "  0% Fr.20% minimo 2.500"
+                },
+                {
+                  "code": "22",
+                  "description": " 10% Fr.3% minimo   750"
+                }
+              ]
+            },
+            {
+              "code": "_4792",
+              "description": "Scoperto Furto",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "1",
+                  "description": "C - accessori esclusi - scoperto nessuno"
+                },
+                {
+                  "code": "2",
+                  "description": "R - acc.ri esclusi - scop.1O% - min.154"
+                },
+                {
+                  "code": "3",
+                  "description": "M - acc.ri compresi - scop.1O% - min.154"
+                },
+                {
+                  "code": "4",
+                  "description": "S - acc.ri esclusi - scop.1O% - min.258"
+                },
+                {
+                  "code": "5",
+                  "description": "N - acc.ri compresi- scop.1O% - min.258"
+                },
+                {
+                  "code": "6",
+                  "description": "T - acc.ri esclusi - scop.1O% - min.516"
+                },
+                {
+                  "code": "7",
+                  "description": "U - acc.ri compresi- scop.1O% - min.516"
+                },
+                {
+                  "code": "8",
+                  "description": "O - acc.ri esclusi - scop.1O% - min.1.032"
+                },
+                {
+                  "code": "9",
+                  "description": "P - acc.ri esclusi - scop.15% - min.258"
+                },
+                {
+                  "code": "10",
+                  "description": "Y - acc.ri esclusi - scop.2O% - min.154"
+                },
+                {
+                  "code": "11",
+                  "description": "W - acc.ri compresi - scop.2O% - min.154"
+                },
+                {
+                  "code": "12",
+                  "description": "X - acc.ri esclusi - scop.2O% - min. 258"
+                },
+                {
+                  "code": "13",
+                  "description": "J - acc.ri compresi - scop.2O% - min.258"
+                },
+                {
+                  "code": "14",
+                  "description": "K - acc.ri esclusi - scop.2O% - min.516"
+                },
+                {
+                  "code": "15",
+                  "description": "Q - acc.ri esclusi - scop.3O% - min.516"
+                },
+                {
+                  "code": "16",
+                  "description": "D - accessori esclusi - scoperto 25%"
+                },
+                {
+                  "code": "17",
+                  "description": "Z- acc.ri esclusi - no scop.-FURTO TOTALE"
+                },
+                {
+                  "code": "18",
+                  "description": "V- acc.ri esclusi-scop. 10%-FURTO TOTALE"
+                },
+                {
+                  "code": "19",
+                  "description": "K - acc.ri esclusi - scop. 2O% - min.500"
+                },
+                {
+                  "code": "20",
+                  "description": "U - acc.ri compresi- scop.1O% - min.500"
+                },
+                {
+                  "code": "21",
+                  "description": "O - acc.ri esclusi - scop.1O% - min.1.000"
+                },
+                {
+                  "code": "22",
+                  "description": "R - acc.ri esclusi - scop.1O% - min.150"
+                },
+                {
+                  "code": "23",
+                  "description": "S - acc.ri esclusi - scop.1O% - min.250"
+                },
+                {
+                  "code": "24",
+                  "description": "N - acc.ri compresi- scop.1O% - min.250"
+                },
+                {
+                  "code": "25",
+                  "description": "T - acc.ri esclusi - scop.1O% - min.500"
+                },
+                {
+                  "code": "26",
+                  "description": "Y - acc.ri compresi - scop.20% - min. 500"
+                },
+                {
+                  "code": "27",
+                  "description": "K1- no acc / no scop FurTot / sc.20%min.500 FurPar"
+                },
+                {
+                  "code": "28",
+                  "description": "Y1- con acc/ no scop FurTot / sc.20%min.500 FurPar"
+                },
+                {
+                  "code": "29",
+                  "description": "T1- no acc / no scop FurTot / sc.10%min.500 FurPar"
+                },
+                {
+                  "code": "30",
+                  "description": "U1- con acc/ no scop FurTot / sc.10%min.500 FurPar"
+                },
+                {
+                  "code": "31",
+                  "description": "A - acc.ri esclusi - scop.2O% - min.1.000"
+                },
+                {
+                  "code": "32",
+                  "description": "D - acc.ri esclusi - scop.1O% - min.250"
+                },
+                {
+                  "code": "33",
+                  "description": "B- acc.ri compresi - scop.20% - min. 1.000"
+                },
+                {
+                  "code": "34",
+                  "description": "E- acc.ri compresi - scop.10% - min. 250"
+                },
+                {
+                  "code": "35",
+                  "description": "A1- no acc / no scop FurTot /sc.20%min.1000 FurPar"
+                },
+                {
+                  "code": "36",
+                  "description": "D1- no acc / no scop FurTot /sc.10%min.250 FurPar"
+                },
+                {
+                  "code": "37",
+                  "description": "B1- con acc/ no scop FurTot /sc.20%min.1000 FurPar"
+                },
+                {
+                  "code": "38",
+                  "description": "E1- con acc/ no scop FurTot /sc.10%min. 250 FurPar"
+                },
+                {
+                  "code": "39",
+                  "description": "C1 - accessori esclusi - scoperto nessuno"
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "3",
+            "description": "Furto"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6721",
+          "description": "Kasko Autocarro",
+          "factors": [
+            {
+              "code": "_171",
+              "description": "Scoperto %",
+              "factorType": "I",
+              "slave": false
+            },
+            {
+              "code": "_170",
+              "description": "Scoperto minimo Euro",
+              "factorType": "T",
+              "slave": false
+            },
+            {
+              "code": "_99",
+              "description": "Tipo Kasko",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "4",
+                  "description": "Collisione"
+                },
+                {
+                  "code": "5",
+                  "description": "Totale"
+                }
+              ]
+            },
+            {
+              "code": "_113",
+              "description": "Percentuale sovratariffazione",
+              "factorType": "T",
+              "slave": false
+            },
+            {
+              "code": "_300",
+              "description": "Scoperto",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "19",
+                  "description": "10% minimo   500"
+                },
+                {
+                  "code": "24",
+                  "description": "10% minimo   516"
+                },
+                {
+                  "code": "53",
+                  "description": "10% minimo   774"
+                },
+                {
+                  "code": "54",
+                  "description": "10% minimo   361"
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "4",
+            "description": "Kasko"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6726",
+          "description": "Protezione Legale Autocarro",
+          "factors": [
+            {
+              "code": "_4763",
+              "description": "Garanzia Protezione Legale",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "2",
+                  "description": "Incidenti"
+                },
+                {
+                  "code": "3",
+                  "description": "Incidenti + Patente"
+                },
+                {
+                  "code": "4",
+                  "description": "Incidenti + Controversie"
+                },
+                {
+                  "code": "5",
+                  "description": "Incidenti + Patente + Controversie"
+                }
+              ]
+            },
+            {
+              "code": "_69",
+              "description": "Massimale",
+              "factorType": "T",
+              "slave": false
+            }
+          ],
+          "section": {
+            "code": "5",
+            "description": "Protezione Legale"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6736",
+          "description": "Assistenza Autocarri",
+          "factors": [
+            {
+              "code": "_4762",
+              "description": "Tipo Assistenza",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "1",
+                  "description": "Basic"
+                },
+                {
+                  "code": "2",
+                  "description": "Top"
+                },
+                {
+                  "code": "3",
+                  "description": "Work"
+                },
+                {
+                  "code": "4",
+                  "description": "Comfort"
+                },
+                {
+                  "code": "5",
+                  "description": "Start"
+                },
+                {
+                  "code": "6",
+                  "description": "Avant"
+                },
+                {
+                  "code": "7",
+                  "description": "Special"
+                },
+                {
+                  "code": "8",
+                  "description": "Camper"
+                },
+                {
+                  "code": "9",
+                  "description": "Start Plus"
+                },
+                {
+                  "code": "10",
+                  "description": "Avant Plus"
+                },
+                {
+                  "code": "11",
+                  "description": "Special Plus"
+                },
+                {
+                  "code": "12",
+                  "description": "Camper Plus"
+                },
+                {
+                  "code": "14",
+                  "description": "J Avant Plus"
+                },
+                {
+                  "code": "15",
+                  "description": "J Special Plus"
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6742",
+          "description": "Atti Vandalici",
+          "factors": [
+            {
+              "code": "_171",
+              "description": "Scoperto %",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "10",
+                  "description": " 10"
+                },
+                {
+                  "code": "15",
+                  "description": " 15"
+                }
+              ]
+            },
+            {
+              "code": "_170",
+              "description": "Scoperto minimo Euro",
+              "factorType": "T",
+              "slave": false
+            }
+          ],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6767",
+          "description": "Rimborso Oneri Fiscali",
+          "factors": [],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6748",
+          "description": "Cristalli",
+          "factors": [
+            {
+              "code": "_69",
+              "description": "Massimale",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "750.00",
+                  "description": "750,00"
+                },
+                {
+                  "code": "1000.00",
+                  "description": "1.000,00"
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6751",
+          "description": "Fenomeni Naturali",
+          "factors": [
+            {
+              "code": "_171",
+              "description": "Scoperto %",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "10",
+                  "description": " 10"
+                },
+                {
+                  "code": "15",
+                  "description": " 15"
+                }
+              ]
+            },
+            {
+              "code": "_170",
+              "description": "Scoperto minimo Euro",
+              "factorType": "T",
+              "slave": false
+            },
+            {
+              "code": "_5839",
+              "description": "Danno Totale",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "0",
+                  "description": "No"
+                },
+                {
+                  "code": "1",
+                  "description": "Si"
+                }
+              ]
+            },
+            {
+              "code": "_3061",
+              "description": "Tipo eventi atmosferici",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "1",
+                  "description": "Base"
+                },
+                {
+                  "code": "2",
+                  "description": "Estesa"
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6754",
+          "description": "Inconvenienti Incendio",
+          "factors": [],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6769",
+          "description": "Operazioni Carico e Scarico",
+          "factors": [],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6757",
+          "description": "Protezione conducente - Morte e invalidità permanente",
+          "factors": [
+            {
+              "code": "_551",
+              "description": "Somma Assicurata",
+              "factorType": "T",
+              "slave": false
+            },
+            {
+              "code": "_765",
+              "description": "Franchigia Morte e IP %",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "0",
+                  "description": "  0"
+                },
+                {
+                  "code": "3",
+                  "description": "  3"
+                },
+                {
+                  "code": "5",
+                  "description": "  5"
+                },
+                {
+                  "code": "10",
+                  "description": " 10"
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6758",
+          "description": "Protezione conducente - Indennità ricovero",
+          "factors": [
+            {
+              "code": "_551",
+              "description": "Somma Assicurata",
+              "factorType": "T",
+              "slave": false
+            },
+            {
+              "code": "_66",
+              "description": "Indennita giornaliera Euro",
+              "factorType": "T",
+              "slave": false
+            },
+            {
+              "code": "_152",
+              "description": "Premio",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6759",
+          "description": "Protezione conducente - Rimborso spese di cura",
+          "factors": [
+            {
+              "code": "_69",
+              "description": "Massimale",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "5000.00",
+                  "description": "5.000,00"
+                },
+                {
+                  "code": "7500.00",
+                  "description": "7.500,00"
+                },
+                {
+                  "code": "2500.00",
+                  "description": "2.500,00"
+                },
+                {
+                  "code": "10000.00",
+                  "description": "10.000,00"
+                },
+                {
+                  "code": "1500.00",
+                  "description": "1.500,00"
+                }
+              ]
+            },
+            {
+              "code": "_152",
+              "description": "Premio",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6772",
+          "description": "Assistenza Autocarri TTG",
+          "factors": [],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6774",
+          "description": "Cristalli Autocarri",
+          "factors": [
+            {
+              "code": "_69",
+              "description": "Massimale",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "750.00",
+                  "description": "750,00"
+                },
+                {
+                  "code": "1000.00",
+                  "description": "1.000,00"
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6777",
+          "description": "Trasportati altri usi",
+          "factors": [],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6783",
+          "description": "Garanzie complementari Settore IV",
+          "factors": [],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6785",
+          "description": "Protezione Conducente IV",
+          "factors": [
+            {
+              "code": "_4746",
+              "description": "Forma copertura del conducente",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "1",
+                  "description": "Garanzia minima"
+                },
+                {
+                  "code": "2",
+                  "description": "Garanzia media"
+                },
+                {
+                  "code": "3",
+                  "description": "Garanzia massima"
+                }
+              ]
+            },
+            {
+              "code": "_4745",
+              "description": "Massimale Protezione del conducente",
+              "factorType": "S",
+              "slave": true,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "3",
+                  "description": "Morte) 25.000,00 IP) 25.000,00 Diaria)    15,00"
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6787",
+          "description": "Ritiro Patente Settore IV",
+          "factors": [
+            {
+              "code": "_469",
+              "description": "Diaria",
+              "factorType": "T",
+              "slave": false
+            },
+            {
+              "code": "_64",
+              "description": "Formula",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "1",
+                  "description": "Per persona"
+                },
+                {
+                  "code": "2",
+                  "description": "Per veicolo"
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G7967",
+          "description": "Assistenza FC Special Plus",
+          "factors": [],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G7968",
+          "description": "Assistenza FC Avant Plus",
+          "factors": [],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        }
+      ],
+      "factors": [
+        {
+          "code": "_4909",
+          "description": "Indice di Merito",
+          "factorType": "T",
+          "slave": false
+        }
+      ],
+      "clauses": [
+        {
+          "code": "RCAT01",
+          "description": "Rinuncia a diritto rivalsa (Condizione speciale C)"
+        },
+        {
+          "code": "RCA002",
+          "description": "Estensione terzi trasportati"
+        },
+        {
+          "code": "RCA003",
+          "description": "Trasporto gas tossici ed esplosivi"
+        },
+        {
+          "code": "RCA006",
+          "description": "Trasporto liquidi infiammabili"
+        },
+        {
+          "code": "RCA007",
+          "description": "Trasporto sostanze radioattive"
+        },
+        {
+          "code": "RCA005",
+          "description": "Trasporto marmi in blocco"
+        },
+        {
+          "code": "RCAT20",
+          "description": "Rinuncia alla rivalsa per guida in stato di ebbrezza (Condizione speciale N)"
+        },
+        {
+          "code": "RCAT26",
+          "description": "Carta verde (Condizione Speciale G)"
+        }
+      ]
+    },
+    {
+      "codeObj": "004002",
+      "description": "4 Camper / Autocasa",
+      "coverages": [
+        {
+          "code": "G6680",
+          "description": "RCA Autocarri usi speciali",
+          "factors": [
+            {
+              "code": "_4827",
+              "description": "Settore Attività",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "19",
+                  "description": "Attività manufatturiere"
+                },
+                {
+                  "code": "20",
+                  "description": "Commercio all'ingrosso e al dettaglio"
+                },
+                {
+                  "code": "23",
+                  "description": "Trasporti, logistica e servizi postali"
+                },
+                {
+                  "code": "24",
+                  "description": "Edilizia ed impiantistica"
+                },
+                {
+                  "code": "27",
+                  "description": "Agricoltura e silvicoltura"
+                },
+                {
+                  "code": "28",
+                  "description": "Riparazione veicoli, elettr. beni di largo consumo"
+                },
+                {
+                  "code": "29",
+                  "description": "Alberghi e ristoranti"
+                },
+                {
+                  "code": "30",
+                  "description": "Altro"
+                }
+              ]
+            },
+            {
+              "code": "_63",
+              "description": "Massimale RCA",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "22",
+                  "description": "s)   7.800.000 p)   7.800.000 c)   7.800.000"
+                },
+                {
+                  "code": "41",
+                  "description": "s)   8.000.000 p)   8.000.000 c)   8.000.000"
+                },
+                {
+                  "code": "42",
+                  "description": "s)   9.000.000 p)   9.000.000 c)   9.000.000"
+                },
+                {
+                  "code": "25",
+                  "description": "s)  10.000.000 p)  10.000.000 c)  10.000.000"
+                },
+                {
+                  "code": "45",
+                  "description": "s)  12.000.000 p)  12.000.000 c)  12.000.000"
+                },
+                {
+                  "code": "52",
+                  "description": "s)  13.000.000 p)  13.000.000 c)  13.000.000"
+                },
+                {
+                  "code": "27",
+                  "description": "s)  15.000.000 p)  15.000.000 c)  15.000.000"
+                },
+                {
+                  "code": "9",
+                  "description": "s)  25.000.000 p)  25.000.000 c)  25.000.000"
+                },
+                {
+                  "code": "66",
+                  "description": "s)           0 p)   6.450.000 c)   1.300.000"
+                }
+              ]
+            },
+            {
+              "code": "_62",
+              "description": "Franchigia RCA euro",
+              "factorType": "S",
+              "slave": true,
+              "possibleValues": []
+            }
+          ],
+          "section": {
+            "code": "1",
+            "description": "RCA"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6703",
+          "description": "Incendio Autocarro",
+          "factors": [
+            {
+              "code": "_570",
+              "description": "Tipo Incendio",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "1",
+                  "description": "Primo Rischio"
+                },
+                {
+                  "code": "2",
+                  "description": "Valore Intero"
+                },
+                {
+                  "code": "3",
+                  "description": "Primo Rischio Relativo"
+                },
+                {
+                  "code": "4",
+                  "description": "Primo Rischio Assoluto"
+                }
+              ]
+            },
+            {
+              "code": "_113",
+              "description": "Punti di sovratariffazione",
+              "factorType": "T",
+              "slave": false
+            }
+          ],
+          "section": {
+            "code": "2",
+            "description": "Incendio"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6715",
+          "description": "Furto Autocarro",
+          "factors": [
+            {
+              "code": "_4785",
+              "description": "Scoperto Furto",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                }
+              ]
+            },
+            {
+              "code": "_171",
+              "description": "Scoperto %",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                }
+              ]
+            },
+            {
+              "code": "_170",
+              "description": "Scoperto minimo Euro",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                }
+              ]
+            },
+            {
+              "code": "_113",
+              "description": "Punti di sovratariffazione",
+              "factorType": "T",
+              "slave": false
+            },
+            {
+              "code": "_304",
+              "description": "Tipo Furto",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "1",
+                  "description": "Solo Totale"
+                },
+                {
+                  "code": "2",
+                  "description": "Totale e Parziale"
+                }
+              ]
+            },
+            {
+              "code": "_4784",
+              "description": "Scoperto e Franchigia",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "1",
+                  "description": "  0% Fr.0% minimo     0"
+                },
+                {
+                  "code": "2",
+                  "description": "  0% Fr.4% minimo 1.000"
+                },
+                {
+                  "code": "3",
+                  "description": "  5% Fr.1% minimo   250"
+                },
+                {
+                  "code": "4",
+                  "description": "  5% Fr.2% minimo   500"
+                },
+                {
+                  "code": "5",
+                  "description": "  4% Fr.5% minimo 1.000"
+                },
+                {
+                  "code": "6",
+                  "description": " 10% Fr.1% minimo   250"
+                },
+                {
+                  "code": "7",
+                  "description": " 10% Fr.2% minimo   500"
+                },
+                {
+                  "code": "8",
+                  "description": " 10% Fr.4% minimo 1.000"
+                },
+                {
+                  "code": "9",
+                  "description": " 15% Fr.1% minimo   250"
+                },
+                {
+                  "code": "10",
+                  "description": " 15% Fr.2% minimo   500"
+                },
+                {
+                  "code": "11",
+                  "description": " 15% Fr.4% minimo 1.000"
+                },
+                {
+                  "code": "12",
+                  "description": " 20% Fr.1% minimo   250"
+                },
+                {
+                  "code": "13",
+                  "description": " 20% Fr.2% minimo   500"
+                },
+                {
+                  "code": "14",
+                  "description": " 20% Fr.4% minimo 1.000"
+                },
+                {
+                  "code": "15",
+                  "description": " 25% Fr.0% minimo     0"
+                },
+                {
+                  "code": "16",
+                  "description": " 25% Fr.1% minimo   250"
+                },
+                {
+                  "code": "17",
+                  "description": " 25% Fr.2% minimo   500"
+                },
+                {
+                  "code": "18",
+                  "description": " 25% Fr.4% minimo 1.000"
+                },
+                {
+                  "code": "19",
+                  "description": " 10% Fr.3% minimo   250"
+                },
+                {
+                  "code": "20",
+                  "description": " 15% Fr.4% minimo   250"
+                },
+                {
+                  "code": "21",
+                  "description": "  0% Fr.20% minimo 2.500"
+                },
+                {
+                  "code": "22",
+                  "description": " 10% Fr.3% minimo   750"
+                }
+              ]
+            },
+            {
+              "code": "_4792",
+              "description": "Scoperto Furto",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "1",
+                  "description": "C - accessori esclusi - scoperto nessuno"
+                },
+                {
+                  "code": "2",
+                  "description": "R - acc.ri esclusi - scop.1O% - min.154"
+                },
+                {
+                  "code": "3",
+                  "description": "M - acc.ri compresi - scop.1O% - min.154"
+                },
+                {
+                  "code": "4",
+                  "description": "S - acc.ri esclusi - scop.1O% - min.258"
+                },
+                {
+                  "code": "5",
+                  "description": "N - acc.ri compresi- scop.1O% - min.258"
+                },
+                {
+                  "code": "6",
+                  "description": "T - acc.ri esclusi - scop.1O% - min.516"
+                },
+                {
+                  "code": "7",
+                  "description": "U - acc.ri compresi- scop.1O% - min.516"
+                },
+                {
+                  "code": "8",
+                  "description": "O - acc.ri esclusi - scop.1O% - min.1.032"
+                },
+                {
+                  "code": "9",
+                  "description": "P - acc.ri esclusi - scop.15% - min.258"
+                },
+                {
+                  "code": "10",
+                  "description": "Y - acc.ri esclusi - scop.2O% - min.154"
+                },
+                {
+                  "code": "11",
+                  "description": "W - acc.ri compresi - scop.2O% - min.154"
+                },
+                {
+                  "code": "12",
+                  "description": "X - acc.ri esclusi - scop.2O% - min. 258"
+                },
+                {
+                  "code": "13",
+                  "description": "J - acc.ri compresi - scop.2O% - min.258"
+                },
+                {
+                  "code": "14",
+                  "description": "K - acc.ri esclusi - scop.2O% - min.516"
+                },
+                {
+                  "code": "15",
+                  "description": "Q - acc.ri esclusi - scop.3O% - min.516"
+                },
+                {
+                  "code": "16",
+                  "description": "D - accessori esclusi - scoperto 25%"
+                },
+                {
+                  "code": "17",
+                  "description": "Z- acc.ri esclusi - no scop.-FURTO TOTALE"
+                },
+                {
+                  "code": "18",
+                  "description": "V- acc.ri esclusi-scop. 10%-FURTO TOTALE"
+                },
+                {
+                  "code": "19",
+                  "description": "K - acc.ri esclusi - scop. 2O% - min.500"
+                },
+                {
+                  "code": "20",
+                  "description": "U - acc.ri compresi- scop.1O% - min.500"
+                },
+                {
+                  "code": "21",
+                  "description": "O - acc.ri esclusi - scop.1O% - min.1.000"
+                },
+                {
+                  "code": "22",
+                  "description": "R - acc.ri esclusi - scop.1O% - min.150"
+                },
+                {
+                  "code": "23",
+                  "description": "S - acc.ri esclusi - scop.1O% - min.250"
+                },
+                {
+                  "code": "24",
+                  "description": "N - acc.ri compresi- scop.1O% - min.250"
+                },
+                {
+                  "code": "25",
+                  "description": "T - acc.ri esclusi - scop.1O% - min.500"
+                },
+                {
+                  "code": "26",
+                  "description": "Y - acc.ri compresi - scop.20% - min. 500"
+                },
+                {
+                  "code": "27",
+                  "description": "K1- no acc / no scop FurTot / sc.20%min.500 FurPar"
+                },
+                {
+                  "code": "28",
+                  "description": "Y1- con acc/ no scop FurTot / sc.20%min.500 FurPar"
+                },
+                {
+                  "code": "29",
+                  "description": "T1- no acc / no scop FurTot / sc.10%min.500 FurPar"
+                },
+                {
+                  "code": "30",
+                  "description": "U1- con acc/ no scop FurTot / sc.10%min.500 FurPar"
+                },
+                {
+                  "code": "31",
+                  "description": "A - acc.ri esclusi - scop.2O% - min.1.000"
+                },
+                {
+                  "code": "32",
+                  "description": "D - acc.ri esclusi - scop.1O% - min.250"
+                },
+                {
+                  "code": "33",
+                  "description": "B- acc.ri compresi - scop.20% - min. 1.000"
+                },
+                {
+                  "code": "34",
+                  "description": "E- acc.ri compresi - scop.10% - min. 250"
+                },
+                {
+                  "code": "35",
+                  "description": "A1- no acc / no scop FurTot /sc.20%min.1000 FurPar"
+                },
+                {
+                  "code": "36",
+                  "description": "D1- no acc / no scop FurTot /sc.10%min.250 FurPar"
+                },
+                {
+                  "code": "37",
+                  "description": "B1- con acc/ no scop FurTot /sc.20%min.1000 FurPar"
+                },
+                {
+                  "code": "38",
+                  "description": "E1- con acc/ no scop FurTot /sc.10%min. 250 FurPar"
+                },
+                {
+                  "code": "39",
+                  "description": "C1 - accessori esclusi - scoperto nessuno"
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "3",
+            "description": "Furto"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6721",
+          "description": "Kasko Autocarro",
+          "factors": [
+            {
+              "code": "_171",
+              "description": "Scoperto %",
+              "factorType": "I",
+              "slave": false
+            },
+            {
+              "code": "_170",
+              "description": "Scoperto minimo Euro",
+              "factorType": "T",
+              "slave": false
+            },
+            {
+              "code": "_99",
+              "description": "Tipo Kasko",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "4",
+                  "description": "Collisione"
+                },
+                {
+                  "code": "5",
+                  "description": "Totale"
+                }
+              ]
+            },
+            {
+              "code": "_113",
+              "description": "Percentuale sovratariffazione",
+              "factorType": "T",
+              "slave": false
+            },
+            {
+              "code": "_300",
+              "description": "Scoperto",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "19",
+                  "description": "10% minimo   500"
+                },
+                {
+                  "code": "24",
+                  "description": "10% minimo   516"
+                },
+                {
+                  "code": "53",
+                  "description": "10% minimo   774"
+                },
+                {
+                  "code": "54",
+                  "description": "10% minimo   361"
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "4",
+            "description": "Kasko"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6726",
+          "description": "Protezione Legale Autocarro",
+          "factors": [
+            {
+              "code": "_4763",
+              "description": "Garanzia Protezione Legale",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "2",
+                  "description": "Incidenti"
+                },
+                {
+                  "code": "3",
+                  "description": "Incidenti + Patente"
+                },
+                {
+                  "code": "4",
+                  "description": "Incidenti + Controversie"
+                },
+                {
+                  "code": "5",
+                  "description": "Incidenti + Patente + Controversie"
+                }
+              ]
+            },
+            {
+              "code": "_69",
+              "description": "Massimale",
+              "factorType": "T",
+              "slave": false
+            }
+          ],
+          "section": {
+            "code": "5",
+            "description": "Protezione Legale"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6736",
+          "description": "Assistenza Autocarri",
+          "factors": [
+            {
+              "code": "_4762",
+              "description": "Tipo Assistenza",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "1",
+                  "description": "Basic"
+                },
+                {
+                  "code": "2",
+                  "description": "Top"
+                },
+                {
+                  "code": "3",
+                  "description": "Work"
+                },
+                {
+                  "code": "4",
+                  "description": "Comfort"
+                },
+                {
+                  "code": "5",
+                  "description": "Start"
+                },
+                {
+                  "code": "6",
+                  "description": "Avant"
+                },
+                {
+                  "code": "7",
+                  "description": "Special"
+                },
+                {
+                  "code": "8",
+                  "description": "Camper"
+                },
+                {
+                  "code": "9",
+                  "description": "Start Plus"
+                },
+                {
+                  "code": "10",
+                  "description": "Avant Plus"
+                },
+                {
+                  "code": "11",
+                  "description": "Special Plus"
+                },
+                {
+                  "code": "12",
+                  "description": "Camper Plus"
+                },
+                {
+                  "code": "14",
+                  "description": "J Avant Plus"
+                },
+                {
+                  "code": "15",
+                  "description": "J Special Plus"
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6742",
+          "description": "Atti Vandalici",
+          "factors": [
+            {
+              "code": "_171",
+              "description": "Scoperto %",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "10",
+                  "description": " 10"
+                },
+                {
+                  "code": "15",
+                  "description": " 15"
+                }
+              ]
+            },
+            {
+              "code": "_170",
+              "description": "Scoperto minimo Euro",
+              "factorType": "T",
+              "slave": false
+            }
+          ],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6767",
+          "description": "Rimborso Oneri Fiscali",
+          "factors": [],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6748",
+          "description": "Cristalli",
+          "factors": [
+            {
+              "code": "_69",
+              "description": "Massimale",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "750.00",
+                  "description": "750,00"
+                },
+                {
+                  "code": "1000.00",
+                  "description": "1.000,00"
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6751",
+          "description": "Fenomeni Naturali",
+          "factors": [
+            {
+              "code": "_171",
+              "description": "Scoperto %",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "10",
+                  "description": " 10"
+                },
+                {
+                  "code": "15",
+                  "description": " 15"
+                }
+              ]
+            },
+            {
+              "code": "_170",
+              "description": "Scoperto minimo Euro",
+              "factorType": "T",
+              "slave": false
+            },
+            {
+              "code": "_5839",
+              "description": "Danno Totale",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "0",
+                  "description": "No"
+                },
+                {
+                  "code": "1",
+                  "description": "Si"
+                }
+              ]
+            },
+            {
+              "code": "_3061",
+              "description": "Tipo eventi atmosferici",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "1",
+                  "description": "Base"
+                },
+                {
+                  "code": "2",
+                  "description": "Estesa"
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6754",
+          "description": "Inconvenienti Incendio",
+          "factors": [],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6769",
+          "description": "Operazioni Carico e Scarico",
+          "factors": [],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6757",
+          "description": "Protezione conducente - Morte e invalidità permanente",
+          "factors": [
+            {
+              "code": "_551",
+              "description": "Somma Assicurata",
+              "factorType": "T",
+              "slave": false
+            },
+            {
+              "code": "_765",
+              "description": "Franchigia Morte e IP %",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "0",
+                  "description": "  0"
+                },
+                {
+                  "code": "3",
+                  "description": "  3"
+                },
+                {
+                  "code": "5",
+                  "description": "  5"
+                },
+                {
+                  "code": "10",
+                  "description": " 10"
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6758",
+          "description": "Protezione conducente - Indennità ricovero",
+          "factors": [
+            {
+              "code": "_551",
+              "description": "Somma Assicurata",
+              "factorType": "T",
+              "slave": false
+            },
+            {
+              "code": "_66",
+              "description": "Indennita giornaliera Euro",
+              "factorType": "T",
+              "slave": false
+            },
+            {
+              "code": "_152",
+              "description": "Premio",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6759",
+          "description": "Protezione conducente - Rimborso spese di cura",
+          "factors": [
+            {
+              "code": "_69",
+              "description": "Massimale",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "5000.00",
+                  "description": "5.000,00"
+                },
+                {
+                  "code": "7500.00",
+                  "description": "7.500,00"
+                },
+                {
+                  "code": "2500.00",
+                  "description": "2.500,00"
+                },
+                {
+                  "code": "10000.00",
+                  "description": "10.000,00"
+                },
+                {
+                  "code": "1500.00",
+                  "description": "1.500,00"
+                }
+              ]
+            },
+            {
+              "code": "_152",
+              "description": "Premio",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6760",
+          "description": "Inconvenienti Furto",
+          "factors": [],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6761",
+          "description": "---Patente Documenti e Targa Camper",
+          "factors": [],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6770",
+          "description": "Non Auto Camper",
+          "factors": [],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6774",
+          "description": "Cristalli Autocarri",
+          "factors": [
+            {
+              "code": "_69",
+              "description": "Massimale",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "750.00",
+                  "description": "750,00"
+                },
+                {
+                  "code": "1000.00",
+                  "description": "1.000,00"
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6778",
+          "description": "Trasportati Camper",
+          "factors": [],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6783",
+          "description": "Garanzie complementari Settore IV",
+          "factors": [],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6787",
+          "description": "Ritiro Patente Settore IV",
+          "factors": [
+            {
+              "code": "_469",
+              "description": "Diaria",
+              "factorType": "T",
+              "slave": false
+            },
+            {
+              "code": "_64",
+              "description": "Formula",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "1",
+                  "description": "Per persona"
+                },
+                {
+                  "code": "2",
+                  "description": "Per veicolo"
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        }
+      ],
+      "factors": [],
+      "clauses": [
+        {
+          "code": "RCAT01",
+          "description": "Rinuncia a diritto rivalsa (Condizione speciale C)"
+        },
+        {
+          "code": "RCA002",
+          "description": "Estensione terzi trasportati"
+        },
+        {
+          "code": "RCA003",
+          "description": "Trasporto gas tossici ed esplosivi"
+        },
+        {
+          "code": "RCA006",
+          "description": "Trasporto liquidi infiammabili"
+        },
+        {
+          "code": "RCA007",
+          "description": "Trasporto sostanze radioattive"
+        },
+        {
+          "code": "RCAT20",
+          "description": "Rinuncia alla rivalsa per guida in stato di ebbrezza (Condizione speciale N)"
+        },
+        {
+          "code": "RCAT26",
+          "description": "Carta verde (Condizione Speciale G)"
+        }
+      ]
+    },
+    {
+      "codeObj": "005001",
+      "description": "5 Ciclomotore",
+      "coverages": [
+        {
+          "code": "G6684",
+          "description": "RCA Ciclomotore",
+          "factors": [
+            {
+              "code": "_63",
+              "description": "Massimale RCA",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "22",
+                  "description": "s)   7.800.000 p)   7.800.000 c)   7.800.000"
+                },
+                {
+                  "code": "23",
+                  "description": "s)  10.400.000 p)  10.400.000 c)  10.400.000"
+                },
+                {
+                  "code": "27",
+                  "description": "s)  15.000.000 p)  15.000.000 c)  15.000.000"
+                },
+                {
+                  "code": "9",
+                  "description": "s)  25.000.000 p)  25.000.000 c)  25.000.000"
+                },
+                {
+                  "code": "66",
+                  "description": "s)           0 p)   6.450.000 c)   1.300.000"
+                }
+              ]
+            },
+            {
+              "code": "_62",
+              "description": "Franchigia RCA euro",
+              "factorType": "S",
+              "slave": true,
+              "possibleValues": []
+            },
+            {
+              "code": "_4981",
+              "description": "Tipo Guida",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "1",
+                  "description": "Libera"
+                },
+                {
+                  "code": "2",
+                  "description": "Esperta"
+                },
+                {
+                  "code": "3",
+                  "description": "Esclusiva"
+                },
+                {
+                  "code": "4",
+                  "description": "Azienda"
+                },
+                {
+                  "code": "5",
+                  "description": "Non Personalizzata"
+                },
+                {
+                  "code": "6",
+                  "description": "Donna"
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "1",
+            "description": "RCA"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6705",
+          "description": "Incendio Ciclomotore",
+          "factors": [
+            {
+              "code": "_570",
+              "description": "Tipo Incendio",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "2",
+                  "description": "Valore Intero"
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "2",
+            "description": "Incendio"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6727",
+          "description": "Protezione Legale Ciclomotore",
+          "factors": [
+            {
+              "code": "_4763",
+              "description": "Garanzia Protezione Legale",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "2",
+                  "description": "Incidenti"
+                },
+                {
+                  "code": "3",
+                  "description": "Incidenti + Patente"
+                },
+                {
+                  "code": "4",
+                  "description": "Incidenti + Controversie"
+                },
+                {
+                  "code": "5",
+                  "description": "Incidenti + Patente + Controversie"
+                }
+              ]
+            },
+            {
+              "code": "_69",
+              "description": "Massimale",
+              "factorType": "T",
+              "slave": false
+            }
+          ],
+          "section": {
+            "code": "5",
+            "description": "Protezione Legale"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6754",
+          "description": "Inconvenienti Incendio",
+          "factors": [],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6757",
+          "description": "Protezione conducente - Morte e invalidità permanente",
+          "factors": [
+            {
+              "code": "_551",
+              "description": "Somma Assicurata",
+              "factorType": "T",
+              "slave": false
+            },
+            {
+              "code": "_765",
+              "description": "Franchigia Morte e IP %",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "0",
+                  "description": "  0"
+                },
+                {
+                  "code": "3",
+                  "description": "  3"
+                },
+                {
+                  "code": "5",
+                  "description": "  5"
+                },
+                {
+                  "code": "10",
+                  "description": " 10"
+                }
+              ]
+            },
+            {
+              "code": "_2695",
+              "description": "% Detraibilità",
+              "factorType": "I",
+              "slave": false
+            }
+          ],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6758",
+          "description": "Protezione conducente - Indennità ricovero",
+          "factors": [
+            {
+              "code": "_551",
+              "description": "Somma Assicurata",
+              "factorType": "T",
+              "slave": false
+            },
+            {
+              "code": "_66",
+              "description": "Indennita giornaliera Euro",
+              "factorType": "T",
+              "slave": false
+            }
+          ],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6759",
+          "description": "Protezione conducente - Rimborso spese di cura",
+          "factors": [
+            {
+              "code": "_69",
+              "description": "Massimale",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "5000.00",
+                  "description": "5.000,00"
+                },
+                {
+                  "code": "7500.00",
+                  "description": "7.500,00"
+                },
+                {
+                  "code": "2500.00",
+                  "description": "2.500,00"
+                },
+                {
+                  "code": "10000.00",
+                  "description": "10.000,00"
+                },
+                {
+                  "code": "1500.00",
+                  "description": "1.500,00"
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        }
+      ],
+      "factors": [
+        {
+          "code": "_92",
+          "description": "Numero posti",
+          "factorType": "T",
+          "slave": false
+        }
+      ],
+      "clauses": [
+        {
+          "code": "RCAT20",
+          "description": "Rinuncia alla rivalsa per guida in stato di ebbrezza (Condizione speciale N)"
+        },
+        {
+          "code": "RCAT26",
+          "description": "Carta verde (Condizione Speciale G)"
+        }
+      ]
+    },
+    {
+      "codeObj": "005003",
+      "description": "5 Motociclo",
+      "coverages": [
+        {
+          "code": "G6686",
+          "description": "RCA Motociclo",
+          "factors": [
+            {
+              "code": "_63",
+              "description": "Massimale RCA",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "22",
+                  "description": "s)   7.800.000 p)   7.800.000 c)   7.800.000"
+                },
+                {
+                  "code": "23",
+                  "description": "s)  10.400.000 p)  10.400.000 c)  10.400.000"
+                },
+                {
+                  "code": "27",
+                  "description": "s)  15.000.000 p)  15.000.000 c)  15.000.000"
+                },
+                {
+                  "code": "9",
+                  "description": "s)  25.000.000 p)  25.000.000 c)  25.000.000"
+                },
+                {
+                  "code": "66",
+                  "description": "s)           0 p)   6.450.000 c)   1.300.000"
+                }
+              ]
+            },
+            {
+              "code": "_62",
+              "description": "Franchigia RCA euro",
+              "factorType": "S",
+              "slave": true,
+              "possibleValues": []
+            },
+            {
+              "code": "_4981",
+              "description": "Tipo Guida",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "1",
+                  "description": "Libera"
+                },
+                {
+                  "code": "2",
+                  "description": "Esperta"
+                },
+                {
+                  "code": "3",
+                  "description": "Esclusiva"
+                },
+                {
+                  "code": "4",
+                  "description": "Azienda"
+                },
+                {
+                  "code": "5",
+                  "description": "Non Personalizzata"
+                },
+                {
+                  "code": "6",
+                  "description": "Donna"
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "1",
+            "description": "RCA"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6706",
+          "description": "Incendio Motociclo",
+          "factors": [
+            {
+              "code": "_570",
+              "description": "Tipo Incendio",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "2",
+                  "description": "Valore Intero"
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "2",
+            "description": "Incendio"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6717",
+          "description": "Furto Motociclo",
+          "factors": [
+            {
+              "code": "_4785",
+              "description": "Scoperto Furto",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "12",
+                  "description": "10% MIN 250"
+                },
+                {
+                  "code": "13",
+                  "description": "15% MIN 250"
+                },
+                {
+                  "code": "14",
+                  "description": "20% MIN 250"
+                },
+                {
+                  "code": "15",
+                  "description": "0% MIN 0"
+                }
+              ]
+            },
+            {
+              "code": "_304",
+              "description": "Tipo Furto",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "1",
+                  "description": "Solo Totale"
+                }
+              ]
+            },
+            {
+              "code": "_4784",
+              "description": "Scoperto e Franchigia",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "1",
+                  "description": "  0% Fr.0% minimo     0"
+                },
+                {
+                  "code": "2",
+                  "description": "  0% Fr.4% minimo 1.000"
+                },
+                {
+                  "code": "3",
+                  "description": "  5% Fr.1% minimo   250"
+                },
+                {
+                  "code": "4",
+                  "description": "  5% Fr.2% minimo   500"
+                },
+                {
+                  "code": "5",
+                  "description": "  4% Fr.5% minimo 1.000"
+                },
+                {
+                  "code": "6",
+                  "description": " 10% Fr.1% minimo   250"
+                },
+                {
+                  "code": "7",
+                  "description": " 10% Fr.2% minimo   500"
+                },
+                {
+                  "code": "8",
+                  "description": " 10% Fr.4% minimo 1.000"
+                },
+                {
+                  "code": "9",
+                  "description": " 15% Fr.1% minimo   250"
+                },
+                {
+                  "code": "10",
+                  "description": " 15% Fr.2% minimo   500"
+                },
+                {
+                  "code": "11",
+                  "description": " 15% Fr.4% minimo 1.000"
+                },
+                {
+                  "code": "12",
+                  "description": " 20% Fr.1% minimo   250"
+                },
+                {
+                  "code": "13",
+                  "description": " 20% Fr.2% minimo   500"
+                },
+                {
+                  "code": "14",
+                  "description": " 20% Fr.4% minimo 1.000"
+                },
+                {
+                  "code": "15",
+                  "description": " 25% Fr.0% minimo     0"
+                },
+                {
+                  "code": "16",
+                  "description": " 25% Fr.1% minimo   250"
+                },
+                {
+                  "code": "17",
+                  "description": " 25% Fr.2% minimo   500"
+                },
+                {
+                  "code": "18",
+                  "description": " 25% Fr.4% minimo 1.000"
+                },
+                {
+                  "code": "19",
+                  "description": " 10% Fr.3% minimo   250"
+                },
+                {
+                  "code": "20",
+                  "description": " 15% Fr.4% minimo   250"
+                },
+                {
+                  "code": "21",
+                  "description": "  0% Fr.20% minimo 2.500"
+                },
+                {
+                  "code": "22",
+                  "description": " 10% Fr.3% minimo   750"
+                }
+              ]
+            },
+            {
+              "code": "_4792",
+              "description": "Scoperto Furto",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "1",
+                  "description": "C - accessori esclusi - scoperto nessuno"
+                },
+                {
+                  "code": "2",
+                  "description": "R - acc.ri esclusi - scop.1O% - min.154"
+                },
+                {
+                  "code": "3",
+                  "description": "M - acc.ri compresi - scop.1O% - min.154"
+                },
+                {
+                  "code": "4",
+                  "description": "S - acc.ri esclusi - scop.1O% - min.258"
+                },
+                {
+                  "code": "5",
+                  "description": "N - acc.ri compresi- scop.1O% - min.258"
+                },
+                {
+                  "code": "6",
+                  "description": "T - acc.ri esclusi - scop.1O% - min.516"
+                },
+                {
+                  "code": "7",
+                  "description": "U - acc.ri compresi- scop.1O% - min.516"
+                },
+                {
+                  "code": "8",
+                  "description": "O - acc.ri esclusi - scop.1O% - min.1.032"
+                },
+                {
+                  "code": "9",
+                  "description": "P - acc.ri esclusi - scop.15% - min.258"
+                },
+                {
+                  "code": "10",
+                  "description": "Y - acc.ri esclusi - scop.2O% - min.154"
+                },
+                {
+                  "code": "11",
+                  "description": "W - acc.ri compresi - scop.2O% - min.154"
+                },
+                {
+                  "code": "12",
+                  "description": "X - acc.ri esclusi - scop.2O% - min. 258"
+                },
+                {
+                  "code": "13",
+                  "description": "J - acc.ri compresi - scop.2O% - min.258"
+                },
+                {
+                  "code": "14",
+                  "description": "K - acc.ri esclusi - scop.2O% - min.516"
+                },
+                {
+                  "code": "15",
+                  "description": "Q - acc.ri esclusi - scop.3O% - min.516"
+                },
+                {
+                  "code": "16",
+                  "description": "D - accessori esclusi - scoperto 25%"
+                },
+                {
+                  "code": "17",
+                  "description": "Z- acc.ri esclusi - no scop.-FURTO TOTALE"
+                },
+                {
+                  "code": "18",
+                  "description": "V- acc.ri esclusi-scop. 10%-FURTO TOTALE"
+                },
+                {
+                  "code": "19",
+                  "description": "K - acc.ri esclusi - scop. 2O% - min.500"
+                },
+                {
+                  "code": "20",
+                  "description": "U - acc.ri compresi- scop.1O% - min.500"
+                },
+                {
+                  "code": "21",
+                  "description": "O - acc.ri esclusi - scop.1O% - min.1.000"
+                },
+                {
+                  "code": "22",
+                  "description": "R - acc.ri esclusi - scop.1O% - min.150"
+                },
+                {
+                  "code": "23",
+                  "description": "S - acc.ri esclusi - scop.1O% - min.250"
+                },
+                {
+                  "code": "24",
+                  "description": "N - acc.ri compresi- scop.1O% - min.250"
+                },
+                {
+                  "code": "25",
+                  "description": "T - acc.ri esclusi - scop.1O% - min.500"
+                },
+                {
+                  "code": "26",
+                  "description": "Y - acc.ri compresi - scop.20% - min. 500"
+                },
+                {
+                  "code": "27",
+                  "description": "K1- no acc / no scop FurTot / sc.20%min.500 FurPar"
+                },
+                {
+                  "code": "28",
+                  "description": "Y1- con acc/ no scop FurTot / sc.20%min.500 FurPar"
+                },
+                {
+                  "code": "29",
+                  "description": "T1- no acc / no scop FurTot / sc.10%min.500 FurPar"
+                },
+                {
+                  "code": "30",
+                  "description": "U1- con acc/ no scop FurTot / sc.10%min.500 FurPar"
+                },
+                {
+                  "code": "31",
+                  "description": "A - acc.ri esclusi - scop.2O% - min.1.000"
+                },
+                {
+                  "code": "32",
+                  "description": "D - acc.ri esclusi - scop.1O% - min.250"
+                },
+                {
+                  "code": "33",
+                  "description": "B- acc.ri compresi - scop.20% - min. 1.000"
+                },
+                {
+                  "code": "34",
+                  "description": "E- acc.ri compresi - scop.10% - min. 250"
+                },
+                {
+                  "code": "35",
+                  "description": "A1- no acc / no scop FurTot /sc.20%min.1000 FurPar"
+                },
+                {
+                  "code": "36",
+                  "description": "D1- no acc / no scop FurTot /sc.10%min.250 FurPar"
+                },
+                {
+                  "code": "37",
+                  "description": "B1- con acc/ no scop FurTot /sc.20%min.1000 FurPar"
+                },
+                {
+                  "code": "38",
+                  "description": "E1- con acc/ no scop FurTot /sc.10%min. 250 FurPar"
+                },
+                {
+                  "code": "39",
+                  "description": "C1 - accessori esclusi - scoperto nessuno"
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "3",
+            "description": "Furto"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6728",
+          "description": "Protezione Legale Motociclo",
+          "factors": [
+            {
+              "code": "_4763",
+              "description": "Garanzia Protezione Legale",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "2",
+                  "description": "Incidenti"
+                },
+                {
+                  "code": "3",
+                  "description": "Incidenti + Patente"
+                },
+                {
+                  "code": "4",
+                  "description": "Incidenti + Controversie"
+                },
+                {
+                  "code": "5",
+                  "description": "Incidenti + Patente + Controversie"
+                }
+              ]
+            },
+            {
+              "code": "_69",
+              "description": "Massimale",
+              "factorType": "T",
+              "slave": false
+            }
+          ],
+          "section": {
+            "code": "5",
+            "description": "Protezione Legale"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6739",
+          "description": "Assistenza Motociclo",
+          "factors": [
+            {
+              "code": "_4762",
+              "description": "Tipo Assistenza",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "9",
+                  "description": "Start Plus"
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6768",
+          "description": "Non Auto - RC",
+          "factors": [],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6755",
+          "description": "Non Auto - Infortuni",
+          "factors": [],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6757",
+          "description": "Protezione conducente - Morte e invalidità permanente",
+          "factors": [
+            {
+              "code": "_551",
+              "description": "Somma Assicurata",
+              "factorType": "T",
+              "slave": false
+            },
+            {
+              "code": "_765",
+              "description": "Franchigia Morte e IP %",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "0",
+                  "description": "  0"
+                },
+                {
+                  "code": "3",
+                  "description": "  3"
+                },
+                {
+                  "code": "5",
+                  "description": "  5"
+                },
+                {
+                  "code": "10",
+                  "description": " 10"
+                }
+              ]
+            },
+            {
+              "code": "_2695",
+              "description": "% Detraibilità",
+              "factorType": "I",
+              "slave": false
+            }
+          ],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6758",
+          "description": "Protezione conducente - Indennità ricovero",
+          "factors": [
+            {
+              "code": "_551",
+              "description": "Somma Assicurata",
+              "factorType": "T",
+              "slave": false
+            },
+            {
+              "code": "_66",
+              "description": "Indennita giornaliera Euro",
+              "factorType": "T",
+              "slave": false
+            }
+          ],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6759",
+          "description": "Protezione conducente - Rimborso spese di cura",
+          "factors": [
+            {
+              "code": "_69",
+              "description": "Massimale",
+              "factorType": "S",
+              "slave": false,
+              "possibleValues": [
+                {
+                  "code": "-1",
+                  "description": " "
+                },
+                {
+                  "code": "5000.00",
+                  "description": "5.000,00"
+                },
+                {
+                  "code": "7500.00",
+                  "description": "7.500,00"
+                },
+                {
+                  "code": "2500.00",
+                  "description": "2.500,00"
+                },
+                {
+                  "code": "10000.00",
+                  "description": "10.000,00"
+                },
+                {
+                  "code": "1500.00",
+                  "description": "1.500,00"
+                }
+              ]
+            }
+          ],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6762",
+          "description": "Inconvenienti Furto",
+          "factors": [],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        },
+        {
+          "code": "G6776",
+          "description": "Trasportati",
+          "factors": [],
+          "section": {
+            "code": "6",
+            "description": "Varie"
+          },
+          "clauses": []
+        }
+      ],
+      "factors": [
+        {
+          "code": "_92",
+          "description": "Numero posti",
+          "factorType": "T",
+          "slave": false
+        },
+        {
+          "code": "_3429",
+          "description": "Segmento Commerciale",
+          "factorType": "S",
+          "slave": false,
+          "possibleValues": [
+            {
+              "code": "99",
+              "description": "Altro"
+            },
+            {
+              "code": "207",
+              "description": "Motard Hypersport"
+            },
+            {
+              "code": "208",
+              "description": "Naked Enduro stradale"
+            },
+            {
+              "code": "209",
+              "description": "Scooter."
+            },
+            {
+              "code": "210",
+              "description": "Sport tourer Custom"
+            }
+          ]
+        }
+      ],
+      "clauses": [
+        {
+          "code": "RCAT20",
+          "description": "Rinuncia alla rivalsa per guida in stato di ebbrezza (Condizione speciale N)"
+        },
+        {
+          "code": "CONDSS",
+          "description": "Condizione Speciale S"
+        },
+        {
+          "code": "RCAT26",
+          "description": "Carta verde (Condizione Speciale G)"
+        }
+      ]
+    }
+  ],
+  "policyFactors": [
+    {
+      "code": "_5040",
+      "description": "TUA Connesso",
+      "factorType": "C",
+      "slave": false
+    },
+    {
+      "code": "PcversioneIdfraz",
+      "description": "Frazionamento",
+      "factorType": "S",
+      "slave": false,
+      "possibleValues": [
+        {
+          "code": "4",
+          "description": "Semestrale"
+        },
+        {
+          "code": "5",
+          "description": "Annuale"
+        },
+        {
+          "code": "6",
+          "description": "Temporaneo"
+        },
+        {
+          "code": "20",
+          "description": "Mensilizzato"
+        }
+      ]
+    },
+    {
+      "code": "PcversioneBtacitorinnovo",
+      "description": "Tacito Rinnovo",
+      "factorType": "S",
+      "slave": false,
+      "possibleValues": [
+        {
+          "code": "1",
+          "description": "Si"
+        },
+        {
+          "code": "0",
+          "description": "No"
+        }
+      ]
+    },
+    {
+      "code": "PcversioneIdproduttore",
+      "description": "Partizione",
+      "factorType": "S",
+      "slave": false,
+      "possibleValues": [
+        {
+          "code": "400000006001015416",
+          "description": "001 - PARTIZIONE PRINCIPALE"
+        }
+      ]
+    },
+    {
+      "code": "PcpolizzaEprofilo",
+      "description": "Segmento",
+      "factorType": "S",
+      "slave": false,
+      "possibleValues": [
+        {
+          "code": "1",
+          "description": "Privato"
+        },
+        {
+          "code": "2",
+          "description": "Societa'"
+        },
+        {
+          "code": "3",
+          "description": "Clero secolare"
+        },
+        {
+          "code": "4",
+          "description": "No profit"
+        },
+        {
+          "code": "5",
+          "description": "Ente pubblico"
+        },
+        {
+          "code": "6",
+          "description": "Condominio"
+        },
+        {
+          "code": "7",
+          "description": "Industria e Costruzioni"
+        },
+        {
+          "code": "8",
+          "description": "Professioni e Sanita"
+        },
+        {
+          "code": "9",
+          "description": "Azienda Agricola"
+        },
+        {
+          "code": "10",
+          "description": "Commercio e Servizi"
+        },
+        {
+          "code": "11",
+          "description": "Amministrazione Pubblica"
+        },
+        {
+          "code": "12",
+          "description": "Specialty Lines"
+        },
+        {
+          "code": "13",
+          "description": "Clero regolare"
+        },
+        {
+          "code": "14",
+          "description": "Associazioni Sportive Dilettantistiche"
+        },
+        {
+          "code": "15",
+          "description": "Commercial"
+        }
+      ]
+    }
+  ],
+  "policyClauses": [
+    {
+      "code": "1CULTP",
+      "description": "Ulteriori estensioni/Precisazioni di polizza",
+      "clauseType": "TEXTAREA"
+    }
+  ],
+  "freeTax": false
+}
