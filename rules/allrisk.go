@@ -90,6 +90,9 @@ func Allrisk(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
+	profileAllriskJson.Result = prof.Result
+	resp, _ := json.Marshal(profileAllriskJson)
+	fmt.Fprintf(w, string(resp))
 	fmt.Println(prof.Revenue)
 	fmt.Println(prof.Result)
 }

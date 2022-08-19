@@ -20,6 +20,16 @@ steps:
     name_camel=$(sed -r 's/(^|-)(\w)/\U\2/g' <<<"${strarr[0]}")
     echo "namefx camel : ${name_camel}"
 
+    if [[ "${strarr[1]}" == *"dev"* ]]; then
+    echo "dev enviroment"
+      project=positive-apex-350507
+    fi
+     if [[ "${strarr[1]}" == *"prod"* ]]; then
+    echo "prod enviroment"
+      project=core-350507
+    fi
+   
+    
     # Save a value to persistent volume mount: "/workspace"
     echo $namefx > /workspace/namefx.txt &&
     # Save another
@@ -33,7 +43,7 @@ steps:
     --runtime=go116 \
     --env-vars-file dev.yaml \
     --service-account=146852404745@cloudbuild.gserviceaccount.com \
-    --project=positive-apex-350507
+    --project=${project}
   entrypoint: bash
 
 - name: gcr.io/cloud-builders/gcloud:latest
