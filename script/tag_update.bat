@@ -1,7 +1,8 @@
 cd ..
 echo %1
 echo %2
+echo %3
 git add .
-git commit -m %2
-git tag -a enrich-vat/%1 -m %2
-git push google enrich-vat/%1
+git commit -m %3
+git tag -a %1/%2 -m %3
+git push google %1/%2
