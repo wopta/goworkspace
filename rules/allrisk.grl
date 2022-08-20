@@ -18,26 +18,86 @@ type ProfileAllrisk struct {
 	Costruction      string
 	IsHolder         bool
 	Result        string
+    Fire             string
+	FireLow500k      string
+	FireUp500k       string
+	Theft            string
+	ThefteLow500k    string
+	TheftUp500k      string
+	Rct              string
+	Rco              string
+	RcoProd          string
 }
-
+{
+                        \"slug\":\"theft\",
+                        \"value\":{
+                           \"typeOfSumInsured\":\"firstLoss\",
+                           \"deductible\":\"0\",
+                           \"sumInsuredLimitOfIndemnity\":5000.00
+                        }
+                     },"
 */
-rule CheckEmployer "Check Employer values" salience 10 {
+rule CheckRct1 "Check Employer values" salience 10 {
     when 
-        In.Employer <= 4 
+        In.Rct =="OK" &&
+        In.Employer <= 4  
     then
-        Log("In.Employer < 4 ");
      
-        In.Result = "{ code:PMIWCT},";
-       Retract("CheckEmployer");
+       In.Result = In.Result + "'rctIndemnity':'1000000',";
+       Retract("CheckRct1");
 
 }
-rule Check "Check Employer values" salience 9 {
+rule CheckRct2 "Check Employer values" salience 9 {
     when 
+        In.Rct =="OK" &&
         In.Employer > 4 
     then
         Log("In.Employer < 4 ");
-     
-        In.Result =In.Result + "{ code:PMIWCT},";
-       Retract("Check");
+        In.Result = In.Result + "'rctIndemnity':'1500000',";
+        Retract("CheckRct2");
+
+}
+rule CheckRctRevenue1 "Check Revenue values" salience 8 {
+    when 
+        In.Rct == "OK" &&
+        In.Revenue <= 75000
+    then
+  
+  
+        In.Result = In.Result + "'rctDeductible':'0',";
+       Retract("CheckRctRevenue1");
+
+}
+rule CheckRctRevenue2 "Check Revenue values" salience 8 {
+    when 
+        In.Rct == "OK" &&
+         In.Revenue > 75000 &&
+        In.Revenue < 150000
+    then
+  
+        In.Result = In.Result + "'rctDeductible':'500',";
+       Retract("CheckRctRevenue2");
+
+}
+rule CheckRctRevenue3 "Check Revenue values" salience 8 {
+    when 
+        In.Rct == "OK" &&
+         In.Revenue > 150000 &&
+        In.Revenue < 500000
+    then
+  
+        In.Result = In.Result + "'rctDeductible':'1000',";
+       Retract("CheckRctRevenue3");
+
+}
+rule CheckRctRevenue4 "Check Revenue values" salience 8 {
+    when 
+        In.Rct == "OK" &&
+         In.Revenue > 500000 &&
+        In.Revenue < 1500000
+    then
+  
+        In.Result = In.Result + "'rctDeductible':'2000',";
+       Retract("CheckRctRevenue4");
 
 }

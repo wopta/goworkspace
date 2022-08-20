@@ -1,3 +1,5 @@
+
+Rem .\tag_update.bat rules 0.0.1.dev init_rules
 cd ..
 echo %1
 echo %2

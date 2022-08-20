@@ -23,10 +23,12 @@ steps:
     if [[ "${strarr[1]}" == *"dev"* ]]; then
     echo "dev enviroment"
       project=positive-apex-350507
+      env=dev
     fi
      if [[ "${strarr[1]}" == *"prod"* ]]; then
     echo "prod enviroment"
       project=core-350507
+      env=prod
     fi
    
     
@@ -41,7 +43,7 @@ steps:
     --entry-point=${name_camel} \
     --trigger-http \
     --runtime=go116 \
-    --env-vars-file dev.yaml \
+    --env-vars-file ${env}.yaml \
     --service-account=146852404745@cloudbuild.gserviceaccount.com \
     --project=${project}
   entrypoint: bash

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/go-gota/gota/dataframe"
 	"github.com/go-gota/gota/series"
@@ -56,15 +57,53 @@ func Allrisk(w http.ResponseWriter, r *http.Request) {
 	}
 	if fil.Nrow() > 0 {
 
-		prof.Fire = fil.Elem(0, 4).String()
-		prof.FireLow500k = fil.Elem(0, 5).String()
-		prof.FireUp500k = fil.Elem(0, 6).String()
-		prof.Theft = fil.Elem(0, 7).String()
-		prof.ThefteLow500k = fil.Elem(0, 8).String()
-		prof.TheftUp500k = fil.Elem(0, 9).String()
-		prof.Rct = fil.Elem(0, 10).String()
-		prof.Rco = fil.Elem(0, 11).String()
-		prof.RcoProd = fil.Elem(0, 12).String()
+		var compare = "OK"
+		if strings.Contains(fil.Elem(0, 4).String(), compare) {
+			prof.Fire = compare
+		} else {
+			prof.Fire = fil.Elem(0, 4).String()
+		}
+		if strings.Contains(fil.Elem(0, 5).String(), compare) {
+			prof.FireLow500k = compare
+		} else {
+			prof.FireLow500k = fil.Elem(0, 5).String()
+		}
+		if strings.Contains(fil.Elem(0, 6).String(), compare) {
+			prof.FireUp500k = compare
+		} else {
+			prof.FireUp500k = fil.Elem(0, 6).String()
+		}
+		if strings.Contains(fil.Elem(0, 7).String(), compare) {
+			prof.Theft = compare
+		} else {
+			prof.Theft = fil.Elem(0, 7).String()
+		}
+		if strings.Contains(fil.Elem(0, 8).String(), compare) {
+			prof.ThefteLow500k = compare
+		} else {
+			prof.ThefteLow500k = fil.Elem(0, 8).String()
+		}
+		if strings.Contains(fil.Elem(0, 9).String(), compare) {
+			prof.TheftUp500k = compare
+		} else {
+			prof.TheftUp500k = fil.Elem(0, 9).String()
+		}
+		if strings.Contains(fil.Elem(0, 10).String(), compare) {
+			prof.Rct = compare
+		} else {
+			prof.Rct = fil.Elem(0, 10).String()
+		}
+		if strings.Contains(fil.Elem(0, 11).String(), compare) {
+			prof.Rco = compare
+		} else {
+			prof.Rco = fil.Elem(0, 11).String()
+		}
+		if strings.Contains(fil.Elem(0, 12).String(), compare) {
+			prof.RcoProd = compare
+		} else {
+			prof.RcoProd = fil.Elem(0, 12).String()
+		}
+
 	}
 	//copier.CopyWithOption(&profileAllrisk, &profileAllriskJson, copier.Option{IgnoreEmpty: false, DeepCopy: true})
 
@@ -91,10 +130,12 @@ func Allrisk(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	profileAllriskJson.Result = prof.Result
-	resp, _ := json.Marshal(profileAllriskJson)
-	fmt.Fprintf(w, string(resp))
+	resp := strings.ReplaceAll(prof.Result, "'", "\"")
+	//resp, _ := json.Marshal(profileAllriskJson)
+	fmt.Fprintf(w, "{"+resp+"}")
 	fmt.Println(prof.Revenue)
 	fmt.Println(prof.Result)
+
 }
 
 type ProfileAllrisk struct {
