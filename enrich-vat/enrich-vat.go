@@ -23,6 +23,7 @@ type publishRequest struct {
 func EnrichVat(w http.ResponseWriter, r *http.Request) {
 	// Set CORS headers for the main request.
 	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "*")
 	log.Println("EnrichVat")
 	vat := strings.Split(r.RequestURI, "/")
 	log.Println(vat)
