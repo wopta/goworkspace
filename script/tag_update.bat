@@ -1,5 +1,5 @@
 
-Rem .\tag_update.bat rules 0.0.1.dev init_rules  .\tag_update.bat quoteAllrisk 0.0.1.dev init_quote_munich
+Rem .\tag_update.bat rules 0.0.1.dev init_rules  .\tag_update.bat quoteAllrisk 0.0.1.dev init_quote_munich  .\tag_update.bat enrich-vat 0.0.20.dev fix _cors  
 cd ..
 echo %1
 echo %2
