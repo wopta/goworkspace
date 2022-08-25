@@ -7,6 +7,9 @@ type ProfileAllrisk struct {
 	Revenue          int64
 	Address          string
 	Ateco            string
+	AtecoMacro       string
+	AtecoSub         string
+	AtecoDesc        string
 	BusinessSector   string
 	BuildingType     string
 	BuildingMaterial string
@@ -17,8 +20,8 @@ type ProfileAllrisk struct {
 	IsPRA            bool
 	Costruction      string
 	IsHolder         bool
-	Result        string
-    Fire             string
+	Result           string
+	Fire             string
 	FireLow500k      string
 	FireUp500k       string
 	Theft            string
@@ -27,34 +30,79 @@ type ProfileAllrisk struct {
 	Rct              string
 	Rco              string
 	RcoProd          string
+	Coverages        map[string]*Coverage
 }
-{
-                        \"slug\":\"theft\",
-                        \"value\":{
-                           \"typeOfSumInsured\":\"firstLoss\",
-                           \"deductible\":\"0\",
-                           \"sumInsuredLimitOfIndemnity\":5000.00
-                        }
-                     },"
+type Coverage struct {
+	TypeOfSumInsured           string
+	Deductible                 string
+	SumInsuredLimitOfIndemnity int64
+	Slug                       string
+	isBase                     bool
+	isYuor                     bool
+	isPremium                  bool
+}
+0 "third-party-liability",
+	1 "damage-to-goods-in-custody",
+	2 "defect-liability-workmanships",
+	3 "defect-liability-12-months",
+	4 "defect-liability-dm-37-2008",
+	5 "property-damage-due-to-theft",
+	6 "damage-to-goods-course-of-works",
+	7 "employers-liability",
+	8 "product-liability",
+	9 "third-party-liability-construction-company",
+	10 "legal-defence",
+	11 "cyber",
+    -------------------------------------------
+	"" = "building",
+	"" = "content",
+	"" = "lease-holders-interest",
+	"" = "burst-pipe",
+	"" = "power-surge",
+	"" = "atmospheric-event",
+	"" = "sociopolitical-event",
+	"" = "terrorism",
+	"" = "earthquake",
+	"" = "river-flood",
+	"" = "water-damage",
+	"" = "glass",
+	"" = "machinery-breakdown",
+	"" = "third-party-recourse",
+	"" = "theft",
+	"" = "valuables-in-safe-strongrooms",
+	"" = "valuables",
+	"" = "electronic-equipment",
+	"" = "increased-cost-of-working",
+	"" = "restoration-of-data",
+	"" = "software-under-license",
+	"" = "business-interruption",
+	"" = "property-owners-liability",
+	"" = "environmental-liability",
+	"" = "assistance",
+	
+  }
+
 */
-rule CheckRct1 "Check Employer values" salience 10 {
+rule CheckRctEmployer1 "Check Employer values" salience 10 {
     when 
         In.Rct =="OK" &&
         In.Employer <= 4  
     then
      
        In.Result = In.Result + "'rctIndemnity':'1000000',";
-       Retract("CheckRct1");
+       In.Coverages["third-party-liability"].SumInsuredLimitOfIndemnity = 1000000;
+       Retract("CheckRctEmployer1");
 
 }
-rule CheckRct2 "Check Employer values" salience 9 {
+rule CheckRctEmployer2 "Check Employer values" salience 9 {
     when 
         In.Rct =="OK" &&
         In.Employer > 4 
     then
         Log("In.Employer < 4 ");
         In.Result = In.Result + "'rctIndemnity':'1500000',";
-        Retract("CheckRct2");
+          In.Coverages["third-party-liability"].SumInsuredLimitOfIndemnity = 1500000;
+        Retract("CheckRctEmployer2");
 
 }
 rule CheckRctRevenue1 "Check Revenue values" salience 8 {
@@ -63,7 +111,7 @@ rule CheckRctRevenue1 "Check Revenue values" salience 8 {
         In.Revenue <= 75000
     then
   
-  
+   In.Coverages["third-party-liability"].Deductible = "0";
         In.Result = In.Result + "'rctDeductible':'0',";
        Retract("CheckRctRevenue1");
 
@@ -76,6 +124,7 @@ rule CheckRctRevenue2 "Check Revenue values" salience 8 {
     then
   
         In.Result = In.Result + "'rctDeductible':'500',";
+         In.Coverages["third-party-liability"].Deductible = "500";
        Retract("CheckRctRevenue2");
 
 }
@@ -86,18 +135,48 @@ rule CheckRctRevenue3 "Check Revenue values" salience 8 {
         In.Revenue < 500000
     then
   
-        In.Result = In.Result + "'rctDeductible':'1000',";
+      In.Coverages["third-party-liability"].Deductible = "1000";
        Retract("CheckRctRevenue3");
 
 }
 rule CheckRctRevenue4 "Check Revenue values" salience 8 {
     when 
         In.Rct == "OK" &&
-         In.Revenue > 500000 &&
+        In.Revenue > 500000 &&
         In.Revenue < 1500000
     then
   
-        In.Result = In.Result + "'rctDeductible':'2000',";
+       In.Coverages["third-party-liability"].Deductible = "2000";
        Retract("CheckRctRevenue4");
+
+}
+rule CheckBuilding1 "Check Building values" salience 8 {
+    when 
+        In.Rct == "OK" &&
+         In.BuildingType =="industriale"
+    then
+     
+   In.Coverages["building"].SumInsuredLimitOfIndemnity =  Max(50000, Min(In.SquareMeters * 600 ,1500000));
+       Retract("CheckBuilding1");
+
+}
+rule CheckBuilding2 "Check Building values" salience 8 {
+    when 
+        In.Rct == "OK" &&
+        In.BuildingType =="commerciale"
+    then
+     
+       In.Coverages["building"].SumInsuredLimitOfIndemnity =  Max(50000, Min(In.SquareMeters * 1000 ,1500000));
+       Retract("CheckBuilding2");
+
+}
+rule CheckBuilding3 "Check Building values" salience 8 {
+    when 
+        In.Rct == "OK" &&
+        In.BuildingType =="civile tipo ufficio"
+    then
+     
+       In.Coverages["building"].SumInsuredLimitOfIndemnity =  Max(50000, Min(In.SquareMeters * 1400 ,1500000));
+       Retract("CheckBuilding2");
 
 }
