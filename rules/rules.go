@@ -3,11 +3,8 @@ package rules
 import (
 	"log"
 	"net/http"
-	"os"
-	"path/filepath"
-	"strings"
 
-	lib "github.com/wopta/goworkspace/lib"
+	"strings"
 )
 
 func Rules(w http.ResponseWriter, r *http.Request) {
@@ -27,13 +24,7 @@ func Rules(w http.ResponseWriter, r *http.Request) {
 	log.Println(len(requestURI))
 	log.Println(requestURI[0])
 	log.Println(requestURI[1])
-	ex, err := os.Executable()
-	if err != nil {
-		panic(err)
-	}
-	exPath := filepath.Dir(ex)
-	log.Println(exPath)
-	lib.ReadDir()
+
 	if len(requestURI) >= 2 {
 		log.Println(requestURI[2])
 		if strings.EqualFold(requestURI[2], "allrisk") {

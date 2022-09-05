@@ -19,7 +19,7 @@ import (
 
 func Allrisk(w http.ResponseWriter, r *http.Request) {
 	//lib.Files("")
-
+	log.Println("Allriskr")
 	var profileAllriskJson models.ProfileAllriskJson
 	//var profileAllrisk ProfileAllrisk
 	df := lib.CsvToDataframe("data/Riclassificazione_Ateco.csv")
