@@ -3,6 +3,7 @@ package rules
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 
@@ -87,6 +88,7 @@ func Allrisk(w http.ResponseWriter, r *http.Request) {
 	dataCtx := ast.NewDataContext()
 	err = dataCtx.Add("In", prof)
 	if err != nil {
+		log.Println(err)
 		panic(err)
 	}
 	// lets prepare a rule definitionS
@@ -97,12 +99,14 @@ func Allrisk(w http.ResponseWriter, r *http.Request) {
 	//bs := pkg.NewBytesResource([]byte(fileRes))
 	err = ruleBuilder.BuildRuleFromResource("rules", "0.0.1", fileRes)
 	if err != nil {
+		log.Println(err)
 		panic(err)
 	}
 	knowledgeBase := knowledgeLibrary.NewKnowledgeBaseInstance("rules", "0.0.1")
 	eng := engine.NewGruleEngine()
 	err = eng.Execute(dataCtx, knowledgeBase)
 	if err != nil {
+		log.Println(err)
 		panic(err)
 	}
 
