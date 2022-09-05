@@ -45,7 +45,7 @@ steps:
     --runtime=go116 \
     --env-vars-file ${env}.yaml \
     --service-account=146852404745@cloudbuild.gserviceaccount.com \
-    --project=${project}
+    --project=${project} \
     --set-secrets 'SA_KEY=FUNCTION_SA_FE:latest'
   entrypoint: bash
 
