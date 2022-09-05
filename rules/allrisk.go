@@ -20,9 +20,10 @@ import (
 func Allrisk(w http.ResponseWriter, r *http.Request) {
 	//lib.Files("")
 	log.Println("Allriskr")
+	ricAteco := lib.GetFromStorage("function-data", "data/rules/Riclassificazione_Ateco.csv")
 	var profileAllriskJson models.ProfileAllriskJson
 	//var profileAllrisk ProfileAllrisk
-	df := lib.CsvToDataframe("data/Riclassificazione_Ateco.csv")
+	df := lib.CsvToDataframe(ricAteco)
 
 	err := json.NewDecoder(r.Body).Decode(&profileAllriskJson)
 	if err != nil {

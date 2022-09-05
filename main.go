@@ -33,7 +33,7 @@ func main() {
 	os.Setenv("munichreClientSecret", "nrDLtgtLiVhvaChj1sU7JiCBUZbztRXw2ROMBYxZ")
 	os.Setenv("munichreSubscriptionKey", "59c92bc0095d4b8c803656a207150c32")
 	os.Setenv("munichreSubscriptionHeader", "Ocp-Apim-Subscription-Key")
-
+	os.Setenv("SA_KEY", "./service-account-key.json")
 	enrich_vat := r.PathPrefix("/enrich-vat").Subrouter()
 	rules_sub := r.PathPrefix("/rules").Subrouter()
 	quote := r.PathPrefix("/quote").Subrouter()

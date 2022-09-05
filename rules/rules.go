@@ -1,6 +1,7 @@
 package rules
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -31,6 +32,8 @@ func Rules(w http.ResponseWriter, r *http.Request) {
 
 			Allrisk(w, r)
 		}
+	} else {
+		fmt.Fprintf(w, "")
 	}
 	//lib.Files("")
 

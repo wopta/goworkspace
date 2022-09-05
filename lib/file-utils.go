@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 
 	"cloud.google.com/go/storage"
+	"google.golang.org/api/option"
 )
 
 func Files(path string) {
@@ -52,14 +53,14 @@ func ReadDir() {
 	}
 	fmt.Println(dir)
 }
-func GetFromStorage() {
-	ctx := context.Background()
+func GetFromStorage(bucket string, file string) []byte {
 
-	client, err := storage.NewClient(ctx)
+	ctx := context.Background()
+	client, err := storage.NewClient(ctx, option.WithCredentialsFile(os.Getenv("SA_KEY")))
 	if err != nil {
 		log.Fatal(err)
 	}
-	rc, err := client.Bucket("cloud-build-data").Object("data-functions/Riclassificazione%20_Ateco.csv").NewReader(ctx)
+	rc, err := client.Bucket(bucket).Object(file).NewReader(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -70,5 +71,5 @@ func GetFromStorage() {
 		log.Fatal(err)
 	}
 	fmt.Println(slurp)
-
+	return slurp
 }

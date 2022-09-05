@@ -1,22 +1,16 @@
 package lib
 
 import (
-	"log"
-	"os"
+	"bytes"
 
 	"github.com/go-gota/gota/dataframe"
 )
 
 //import "github.com/go-gota/gota/series"
 
-func CsvToDataframe(filePath string) dataframe.DataFrame {
-
-	f, err := os.Open(filePath)
-	defer f.Close()
-	if err != nil {
-		log.Fatal("Unable to read input file "+filePath, err)
-	}
-	df := dataframe.ReadCSV(f,
+func CsvToDataframe(file []byte) dataframe.DataFrame {
+	reader := bytes.NewReader(file)
+	df := dataframe.ReadCSV(reader,
 		dataframe.WithDelimiter(';'),
 		dataframe.HasHeader(true))
 	return df
