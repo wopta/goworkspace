@@ -40,7 +40,7 @@ func readCsvFile(filePath string) [][]string {
 
 	return records
 }
-func readDir() {
+func ReadDir() {
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {
 		log.Fatal(err)
