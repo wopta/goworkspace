@@ -4,34 +4,19 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-
 	"strings"
+
+	lib "github.com/wopta/goworkspace/lib"
 )
 
 func Rules(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodOptions {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "POST")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-		w.Header().Set("Access-Control-Max-Age", "3600")
-		w.WriteHeader(http.StatusNoContent)
-		return
-	}
-	// Set CORS headers for the main request.
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+	lib.EnableCors(&w)
 	log.Println("Rules")
-	requestURI := strings.Split(r.RequestURI, "/")
-	log.Println(requestURI)
-	log.Println(len(requestURI))
-	log.Println(requestURI[0])
-	log.Println(requestURI[1])
 
-	if len(requestURI) >= 2 {
-		log.Println(requestURI[2])
-		if strings.EqualFold(requestURI[2], "allrisk") {
+	if strings.Contains(r.RequestURI, "/allrisk") {
 
-			Allrisk(w, r)
-		}
+		Allrisk(w, r)
+
 	} else {
 		fmt.Fprintf(w, "")
 	}

@@ -36,7 +36,7 @@ func Allrisk(w http.ResponseWriter, r *http.Request) {
 	)
 	fmt.Println("filtered", fil.Nrow())
 	fmt.Println("filtered", fil.Ncol())
-	fmt.Println("filtered", fil)
+	//fmt.Println("filtered", fil)
 
 	prof := &ProfileAllrisk{
 		Vat:              profileAllriskJson.Vat,
@@ -85,7 +85,7 @@ func Allrisk(w http.ResponseWriter, r *http.Request) {
 	}
 	//copier.CopyWithOption(&profileAllrisk, &profileAllriskJson, copier.Option{IgnoreEmpty: false, DeepCopy: true})
 
-	fmt.Println("profileAllrisk post copy:", prof)
+	//fmt.Println("profileAllrisk post copy:", prof)
 	dataCtx := ast.NewDataContext()
 	err = dataCtx.Add("In", prof)
 	if err != nil {
@@ -120,9 +120,9 @@ func Allrisk(w http.ResponseWriter, r *http.Request) {
 	}
 	resp, _ := json.Marshal(m)
 	fmt.Fprintf(w, string(resp))
-	fmt.Println(string(resp))
+	//fmt.Println(string(resp))
 
-	fmt.Println(prof.Coverages)
+	//fmt.Println(prof.Coverages)
 
 }
 

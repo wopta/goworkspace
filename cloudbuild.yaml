@@ -31,7 +31,6 @@ steps:
       env=prod
     fi
    
-    
     # Save a value to persistent volume mount: "/workspace"
     echo $namefx > /workspace/namefx.txt &&
     # Save another
