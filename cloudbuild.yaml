@@ -4,7 +4,7 @@ steps:
 - name: 'gcr.io/cloud-builders/gsutil'
   args: ['cp', 'gs://function-data/env/prod.yaml', '.']
 - name: 'gcr.io/cloud-builders/gsutil'
-  args: ['cp', 'gs://function-data/env/sa_key_frontend.json', '.']
+  args: ['cp', 'gs://function-data/env/sa_key_frontend.json', 'rules/']
 - name: 'gcr.io/cloud-builders/gcloud'
   args:
   - '-c'
