@@ -23,6 +23,7 @@ func Allrisk(w http.ResponseWriter, r *http.Request) {
 	log.Println("Allrisk")
 	log.Println(os.Getenv("SA_KEY"))
 	ricAteco := lib.GetFromStorage("function-data", "data/rules/Riclassificazione_Ateco.csv")
+	log.Println("GetFromStorage")
 	var profileAllriskJson models.ProfileAllriskJson
 	//var profileAllrisk ProfileAllrisk
 	df := lib.CsvToDataframe(ricAteco)
