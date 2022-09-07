@@ -3,6 +3,7 @@ package lib
 import (
 	"context"
 	"encoding/csv"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -10,6 +11,8 @@ import (
 	"path/filepath"
 
 	"cloud.google.com/go/storage"
+	models "github.com/wopta/goworkspace/models"
+	"golang.org/x/oauth2/google"
 	"google.golang.org/api/option"
 )
 
@@ -54,15 +57,17 @@ func ReadDir() {
 	fmt.Println(dir)
 }
 func GetFromStorage(bucket string, file string) []byte {
+	var credential models.Credential
+	err := json.Unmarshal([]byte(os.Getenv("SA_KEY")), &credential)
+	c, err := json.Marshal(credential)
 	ctx := context.Background()
-	client, err := storage.NewClient(ctx, option.WithCredentialsJSON([]byte(os.Getenv("SA_KEY"))))
-	if err != nil {
-		log.Fatal(err)
-	}
+	creds, err := google.CredentialsFromJSON(ctx, c, storage.ScopeReadOnly)
+	CheckError(err)
+	client, err := storage.NewClient(ctx, option.WithCredentials(creds))
+	//client, err := storage.NewClient(ctx, option.WithCredentialsFile("service-account-key.json"))
+	CheckError(err)
 	rc, err := client.Bucket(bucket).Object(file).NewReader(ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
+	CheckError(err)
 	slurp, err := ioutil.ReadAll(rc)
 
 	rc.Close()
