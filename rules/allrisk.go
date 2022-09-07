@@ -23,7 +23,8 @@ func Allrisk(w http.ResponseWriter, r *http.Request) {
 	lib.ReadDir()
 
 	///log.Println(os.Getenv("SA_KEY"))
-	ricAteco := lib.GetFromStorage("function-data", "data/rules/Riclassificazione_Ateco.csv", "/sa_key_frontend.json")
+	ricAteco := lib.GetFromStorage("function-data", "data/rules/Riclassificazione_Ateco.csv", "")
+	groule := lib.GetFromStorage("function-data", "function-data/grules/allrisk.grl", "")
 	log.Println("GetFromStorage")
 	var profileAllriskJson models.ProfileAllriskJson
 	//var profileAllrisk ProfileAllrisk
@@ -97,7 +98,7 @@ func Allrisk(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	// lets prepare a rule definitionS
-	fileRes := pkg.NewFileResource("rules/allrisk.grl")
+	fileRes := pkg.NewBytesResource(groule)
 	// Add the rule definition above into the library and name it 'TutorialRules'  version '0.0.1'
 	knowledgeLibrary := ast.NewKnowledgeLibrary()
 	ruleBuilder := builder.NewRuleBuilder(knowledgeLibrary)
