@@ -53,13 +53,15 @@ func ReadDir() {
 	}
 	fmt.Println(dir)
 }
-func GetFromStorage(bucket string, file string) []byte {
+func GetFromStorage(bucket string, file string, keyPath string) []byte {
 	//var credential models.Credential
 	log.Println("GetFromStorage")
 	//err := json.Unmarshal([]byte(os.Getenv("SA_KEY")), &credential)
 	//c, err := json.Marshal(credential)
 	ctx := context.Background()
-	client, err := storage.NewClient(ctx, option.WithCredentialsFile("./sa_key_frontend.json"))
+	files, err := ioutil.ReadDir("./")
+	log.Println(files)
+	client, err := storage.NewClient(ctx, option.WithCredentialsFile(keyPath))
 	CheckError(err)
 	rc, err := client.Bucket(bucket).Object(file).NewReader(ctx)
 	CheckError(err)
