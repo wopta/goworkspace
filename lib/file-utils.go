@@ -54,7 +54,7 @@ func ReadDir() {
 }
 func GetFromStorage(bucket string, file string, keyPath string) []byte {
 	//var credential models.Credential
-	log.Println("GetFromStorage")
+	log.Println("start GetFromStorage")
 	//err := json.Unmarshal([]byte(os.Getenv("SA_KEY")), &credential)
 	//c, err := json.Marshal(credential)
 	ctx := context.Background()
