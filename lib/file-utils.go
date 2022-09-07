@@ -12,7 +12,6 @@ import (
 
 	"cloud.google.com/go/storage"
 	models "github.com/wopta/goworkspace/models"
-	"golang.org/x/oauth2/google"
 	"google.golang.org/api/option"
 )
 
@@ -60,11 +59,11 @@ func GetFromStorage(bucket string, file string) []byte {
 	var credential models.Credential
 	log.Println(os.Getenv("SA_KEY"))
 	err := json.Unmarshal([]byte(os.Getenv("SA_KEY")), &credential)
-	c, err := json.Marshal(credential)
+	//c, err := json.Marshal(credential)
 	ctx := context.Background()
-	creds, err := google.CredentialsFromJSON(ctx, c, storage.ScopeReadOnly)
+
 	CheckError(err)
-	client, err := storage.NewClient(ctx, option.WithCredentials(creds))
+	client, err := storage.NewClient(ctx, option.WithCredentialsFile("sa_key_frontend.json"))
 	CheckError(err)
 	rc, err := client.Bucket(bucket).Object(file).NewReader(ctx)
 	CheckError(err)
