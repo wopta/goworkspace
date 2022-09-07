@@ -1,5 +1,6 @@
 cmd/
 env/
+/main.go
 ./main.go
 main.go
 *.sum
