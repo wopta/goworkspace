@@ -59,7 +59,7 @@ func GetFromStorage(bucket string, file string) []byte {
 	//err := json.Unmarshal([]byte(os.Getenv("SA_KEY")), &credential)
 	//c, err := json.Marshal(credential)
 	ctx := context.Background()
-	client, err := storage.NewClient(ctx, option.WithCredentialsFile("rules/sa_key_frontend.json"))
+	client, err := storage.NewClient(ctx, option.WithCredentialsFile("./sa_key_frontend.json"))
 	CheckError(err)
 	rc, err := client.Bucket(bucket).Object(file).NewReader(ctx)
 	CheckError(err)

@@ -171,6 +171,7 @@ type ProfileAllrisk struct {
 	Coverages        map[string]*Coverage
 }
 type Coverage struct {
+	Type                       string
 	TypeOfSumInsured           string
 	Deductible                 string
 	SumInsuredLimitOfIndemnity int64
