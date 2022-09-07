@@ -2,3 +2,6 @@ cmd/
 main.go
 *.sum
 *.json
+/main.go
+./main.go
+main.go
