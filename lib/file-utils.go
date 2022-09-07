@@ -64,7 +64,6 @@ func GetFromStorage(bucket string, file string) []byte {
 	creds, err := google.CredentialsFromJSON(ctx, c, storage.ScopeReadOnly)
 	CheckError(err)
 	client, err := storage.NewClient(ctx, option.WithCredentials(creds))
-	//client, err := storage.NewClient(ctx, option.WithCredentialsFile("service-account-key.json"))
 	CheckError(err)
 	rc, err := client.Bucket(bucket).Object(file).NewReader(ctx)
 	CheckError(err)
