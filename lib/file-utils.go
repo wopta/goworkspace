@@ -10,7 +10,6 @@ import (
 	"path/filepath"
 
 	"cloud.google.com/go/storage"
-	"google.golang.org/api/option"
 )
 
 func Files(path string) {
@@ -59,9 +58,7 @@ func GetFromStorage(bucket string, file string, keyPath string) []byte {
 	//err := json.Unmarshal([]byte(os.Getenv("SA_KEY")), &credential)
 	//c, err := json.Marshal(credential)
 	ctx := context.Background()
-	files, err := ioutil.ReadDir("./")
-	log.Println(files)
-	client, err := storage.NewClient(ctx, option.WithCredentialsFile(keyPath))
+	client, err := storage.NewClient(ctx)
 	CheckError(err)
 	rc, err := client.Bucket(bucket).Object(file).NewReader(ctx)
 	CheckError(err)
@@ -71,6 +68,5 @@ func GetFromStorage(bucket string, file string, keyPath string) []byte {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(slurp)
 	return slurp
 }
