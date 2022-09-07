@@ -3,7 +3,6 @@ package lib
 import (
 	"context"
 	"encoding/csv"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -11,7 +10,6 @@ import (
 	"path/filepath"
 
 	"cloud.google.com/go/storage"
-	models "github.com/wopta/goworkspace/models"
 	"google.golang.org/api/option"
 )
 
@@ -56,13 +54,11 @@ func ReadDir() {
 	fmt.Println(dir)
 }
 func GetFromStorage(bucket string, file string) []byte {
-	var credential models.Credential
+	//var credential models.Credential
 	log.Println(os.Getenv("SA_KEY"))
-	err := json.Unmarshal([]byte(os.Getenv("SA_KEY")), &credential)
+	//err := json.Unmarshal([]byte(os.Getenv("SA_KEY")), &credential)
 	//c, err := json.Marshal(credential)
 	ctx := context.Background()
-
-	CheckError(err)
 	client, err := storage.NewClient(ctx, option.WithCredentialsFile("sa_key_frontend.json"))
 	CheckError(err)
 	rc, err := client.Bucket(bucket).Object(file).NewReader(ctx)
