@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/go-gota/gota/dataframe"
@@ -19,7 +20,8 @@ import (
 
 func Allrisk(w http.ResponseWriter, r *http.Request) {
 	//lib.Files("")
-	log.Println("Allriskr")
+	log.Println("Allrisk")
+	log.Println(os.Getenv("SA_KEY"))
 	ricAteco := lib.GetFromStorage("function-data", "data/rules/Riclassificazione_Ateco.csv")
 	var profileAllriskJson models.ProfileAllriskJson
 	//var profileAllrisk ProfileAllrisk
