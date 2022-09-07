@@ -1,5 +1,5 @@
 cmd/
 env/
-main.go
+./main.go
 *.sum
 *.json
