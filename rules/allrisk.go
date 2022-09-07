@@ -19,7 +19,8 @@ import (
 )
 
 func Allrisk(w http.ResponseWriter, r *http.Request) {
-	//lib.Files("")
+	lib.Files("")
+	lib.ReadDir()
 	log.Println("Allrisk")
 	log.Println(os.Getenv("SA_KEY"))
 	ricAteco := lib.GetFromStorage("function-data", "data/rules/Riclassificazione_Ateco.csv", "./sa_key_frontend.json")
