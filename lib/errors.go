@@ -1,5 +1,7 @@
 package lib
 
-func check() {
-
+func Check(e error) {
+	if e != nil {
+		panic(e)
+	}
 }

@@ -54,9 +54,8 @@ func ReadDir() {
 	fmt.Println(dir)
 }
 func GetFromStorage(bucket string, file string) []byte {
-
 	ctx := context.Background()
-	client, err := storage.NewClient(ctx, option.WithCredentialsFile(os.Getenv("SA_KEY")))
+	client, err := storage.NewClient(ctx, option.WithCredentialsJSON([]byte(os.Getenv("SA_KEY"))))
 	if err != nil {
 		log.Fatal(err)
 	}
