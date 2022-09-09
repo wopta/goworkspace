@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/go-gota/gota/dataframe"
@@ -19,9 +20,6 @@ import (
 
 func Allrisk(w http.ResponseWriter, r *http.Request) {
 	log.Println("Allrisk")
-	lib.Files("/workspace")
-	lib.ReadDir()
-
 	///log.Println(os.Getenv("SA_KEY"))
 	ricAteco := lib.GetFromStorage("function-data", "data/rules/Riclassificazione_Ateco.csv", "")
 	groule := lib.GetFromStorage("function-data", "grules/allrisk.grl", "")
@@ -98,7 +96,14 @@ func Allrisk(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	// lets prepare a rule definitionS
-	fileRes := pkg.NewBytesResource(groule)
+
+	var fileRes pkg.Resource
+
+	if os.Getenv("env") == "dev" {
+		fileRes = pkg.NewFileResource("rules/allrisk.grl")
+	} else {
+		fileRes = pkg.NewBytesResource(groule)
+	}
 	// Add the rule definition above into the library and name it 'TutorialRules'  version '0.0.1'
 	knowledgeLibrary := ast.NewKnowledgeLibrary()
 	ruleBuilder := builder.NewRuleBuilder(knowledgeLibrary)
@@ -176,7 +181,7 @@ type Coverage struct {
 	Type                       string
 	TypeOfSumInsured           string
 	Deductible                 string
-	SumInsuredLimitOfIndemnity int64
+	SumInsuredLimitOfIndemnity float64
 	Slug                       string
 	IsBase                     bool
 	IsYuor                     bool
@@ -190,7 +195,7 @@ func initCoverage() map[string]*Coverage {
 		Slug:                       "third-party-liability",
 		TypeOfSumInsured:           "namedPerils",
 		Deductible:                 "0",
-		SumInsuredLimitOfIndemnity: 0,
+		SumInsuredLimitOfIndemnity: 0.0,
 		IsBase:                     false,
 		IsYuor:                     false,
 		IsPremium:                  false,
@@ -298,7 +303,7 @@ func initCoverage() map[string]*Coverage {
 		Slug:                       "building",
 		TypeOfSumInsured:           "namedPerils",
 		Deductible:                 "0",
-		SumInsuredLimitOfIndemnity: 0,
+		SumInsuredLimitOfIndemnity: 0.0,
 		IsBase:                     false,
 		IsYuor:                     false,
 		IsPremium:                  false,
