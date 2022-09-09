@@ -10,7 +10,7 @@ import (
 )
 
 func Rules(w http.ResponseWriter, r *http.Request) {
-	lib.EnableCors(&w)
+	lib.EnableCors(&w, r)
 	log.Println("Rules")
 
 	if strings.Contains(r.RequestURI, "/allrisk") {

@@ -20,7 +20,7 @@ func init() {
 }
 
 func QuoteAllrisk(w http.ResponseWriter, r *http.Request) {
-	//lib.EnableCors(&w)
+	lib.EnableCors(&w, r)
 	log.Println("QuoteAllrisk")
 	vat := strings.Split(r.RequestURI, "/")
 	log.Println(vat)
