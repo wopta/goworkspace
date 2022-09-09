@@ -27,6 +27,7 @@ func EnrichVat(w http.ResponseWriter, r *http.Request) {
 	vat := strings.Split(r.RequestURI, "/")
 	log.Println(vat)
 	log.Println(len(vat))
+	w.Header().Set("Content-Type", "application/json")
 	if len(vat) > 2 {
 		if strings.EqualFold(vat[2], "munichre") {
 			var urlstring = os.Getenv("MUNICHREBASEURL") + "/api/company/vat/" + vat[1]
