@@ -1,4 +1,5 @@
 go 1.16
+replace github.com/wopta/goworkspace/enrichVatCode => ./enrich-vat
 
 use(
 ./enrich-vat
@@ -7,5 +8,6 @@ use(
 ./rules
 ./quote-allrisk
 ./models
+./blockchain
 
 )
