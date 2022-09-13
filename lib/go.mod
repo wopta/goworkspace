@@ -2,7 +2,7 @@ module github.com/wopta/goworkspace/lib
 
 go 1.16
 
-replace github.com/wopta/goworkspace/lib => ./lib
+replace github.com/wopta/goworkspace/lib => ./
 
 //require golang.org/x/oauth2/clientcredentials v0.0.0-20220622183110-fd043fe589d2
 

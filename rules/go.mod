@@ -2,7 +2,7 @@ module github.com/wopta/goworkspace/rules
 
 go 1.16
 
-replace github.com/wopta/goworkspace/rules => ./rules
+replace github.com/wopta/goworkspace/rules => ./
 
 require github.com/hyperjumptech/grule-rule-engine v1.11.0
 

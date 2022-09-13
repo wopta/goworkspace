@@ -1,2 +1,3 @@
 go get ./...
+go mod tidy
 set FUNCTION_TARGET=rules

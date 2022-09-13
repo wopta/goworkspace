@@ -13,12 +13,14 @@ import (
 
 func init() {
 	log.Println("INIT Rules")
-	functions.HTTP("Rules", Rules)
-}
-func Rules(w http.ResponseWriter, r *http.Request) {
-	lib.EnableCors(&w, r)
 
+	functions.HTTP("rules", Rules)
+}
+
+func Rules(w http.ResponseWriter, r *http.Request) {
 	log.Println("Rules")
+	log.Println(r.RequestURI)
+	lib.EnableCors(&w, r)
 
 	if strings.Contains(r.RequestURI, "/allrisk") {
 
