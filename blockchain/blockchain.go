@@ -15,11 +15,7 @@ import (
 
 func Blockchain(w http.ResponseWriter, r *http.Request) {
 	lib.EnableCors(&w, r)
-	mux := http.NewServeMux()
-	mux.HandleFunc("/calculateHash", calculateHashf)
-	mux.HandleFunc("/mine", calculateHashf)
-	mux.HandleFunc("/addBlock", calculateHashf)
-	mux.ServeHTTP(w, r)
+
 }
 
 func calculateHashf(w http.ResponseWriter, r *http.Request) {}
