@@ -22,7 +22,7 @@ import (
 func init() {
 	log.Println("INIT WiseProxy")
 
-	functions.HTTP("wiseProxy", WiseProxy)
+	functions.HTTP("WiseProxy", WiseProxy)
 }
 
 func WiseProxy(w http.ResponseWriter, r *http.Request) {
