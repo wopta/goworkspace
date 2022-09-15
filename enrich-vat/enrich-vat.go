@@ -16,10 +16,6 @@ func init() {
 	// err is pre-declared to avoid shadowing client.
 }
 
-type publishRequest struct {
-	vat string `json:"vat"`
-}
-
 func EnrichVat(w http.ResponseWriter, r *http.Request) {
 	// Set CORS headers for the main request.
 	//lib.EnableCors(&w, r)

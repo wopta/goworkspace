@@ -64,8 +64,8 @@ func CreateBlockchain(difficulty int) models.Blockchain {
 		Timestamp: time.Now(),
 	}
 	return models.Blockchain{
-		genesisBlock,
-		[]models.Block{genesisBlock},
-		difficulty,
+		GenesisBlock: genesisBlock,
+		Chain:        []models.Block{genesisBlock},
+		Difficulty:   difficulty,
 	}
 }

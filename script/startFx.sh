@@ -1,3 +1,3 @@
 go get ./...
 go mod tidy
-set FUNCTION_TARGET=rules
+set FUNCTION_TARGET=wiseProxy

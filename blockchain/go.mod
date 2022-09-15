@@ -1,6 +1,6 @@
 module github.com/wopta/goworkspace/blochchain
 
-replace github.com/wopta/goworkspace/lib => ./
+replace github.com/wopta/goworkspace/blochchain => ./
 
 go 1.16
 

@@ -7,7 +7,8 @@ use(
 ./rules
 ./quote-allrisk
 ./models
-//./blockchain
+./wise-proxy
+./blockchain
 //./cmd
 
 )
