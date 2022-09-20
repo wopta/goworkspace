@@ -6,7 +6,6 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -21,7 +20,6 @@ import (
 
 func init() {
 	log.Println("INIT WiseProxy")
-
 	functions.HTTP("WiseProxy", WiseProxy)
 }
 
@@ -42,16 +40,17 @@ func WiseProxy(w http.ResponseWriter, r *http.Request) {
 	log.Println("urlstring: " + urlstring)
 	if strings.Contains(r.RequestURI, "/WebApiProduct") {
 		token = GetToken(false)
-		req, err := http.NewRequest(r.Method, urlstring, bytes.NewBuffer(jsonData))
-		lib.CheckError(err)
-		req.Header.Set("Autentication", token)
+		req, _ = http.NewRequest(r.Method, urlstring, bytes.NewBuffer(jsonData))
+		//lib.CheckError(err)
+		req.Header.Set("Authorization", "Bearer "+token)
 	} else {
 		token = GetToken(true)
-		req, err := http.NewRequest(r.Method, urlstring, bytes.NewBuffer(jsonData))
-		lib.CheckError(err)
-		req.Header.Set("Autentication", token)
-
+		req, _ = http.NewRequest(r.Method, urlstring, bytes.NewBuffer(jsonData))
+		//lib.CheckError(err)
+		req.Header.Set("Authorization", "Bearer "+token)
 	}
+	req.Header.Set("Content-Type", "application/json")
+	log.Println("call: request")
 	res, err := client.Do(req)
 	lib.CheckError(err)
 	defer res.Body.Close()
@@ -60,7 +59,6 @@ func WiseProxy(w http.ResponseWriter, r *http.Request) {
 		log.Println("body: " + string(body))
 		lib.CheckError(err)
 		res.Body.Close()
-
 		fmt.Fprintf(w, string(body))
 	}
 	//lib.Files("")
@@ -85,11 +83,11 @@ func GetToken(isFewfine bool) string {
 	tokenReq, err := http.Post(url, "application/json", login)
 	lib.CheckError(err)
 	defer tokenReq.Body.Close()
-
-	var result *WiseLoginResponse
-	b, err := io.ReadAll(tokenReq.Body)
-	log.Println(string(b))
-	err = json.NewDecoder(tokenReq.Body).Decode(&result)
+	//var result *WiseLoginResponse
+	result := &WiseLoginResponse{}
+	log.Println("decode json login")
+	body, err := ioutil.ReadAll(tokenReq.Body)
+	err = json.Unmarshal(body, &result)
 	lib.CheckError(err)
 	log.Println(result)
 	return result.DatiAuth.Token
@@ -102,8 +100,4 @@ type WiseLoginResponse struct {
 		TipoToken       string    `json:"tipoToken,omitempty"`
 		Token           string    `json:"token,omitempty"`
 	} `json:"datiAuth,omitempty"`
-	Esito struct {
-		BEsito           bool          `json:"bEsito,omitempty"`
-		ListErrorMessage []interface{} `json:"listErrorMessage,omitempty"`
-	} `json:"esito,omitempty"`
 }

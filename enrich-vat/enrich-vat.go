@@ -9,11 +9,14 @@ import (
 	"os"
 	"strings"
 
+	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	lib "github.com/wopta/goworkspace/lib"
 )
 
 func init() {
-	// err is pre-declared to avoid shadowing client.
+	log.Println("INIT Rules")
+
+	functions.HTTP("EnrichVat", EnrichVat)
 }
 
 func EnrichVat(w http.ResponseWriter, r *http.Request) {

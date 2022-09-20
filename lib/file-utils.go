@@ -12,7 +12,8 @@ import (
 	"cloud.google.com/go/storage"
 )
 
-func Files(path string) {
+func Files(path string) []string {
+	var res []string
 	if path == "" {
 		path = "./"
 	}
@@ -23,7 +24,9 @@ func Files(path string) {
 
 	for _, f := range files {
 		fmt.Println(f.Name())
+		res = append(res, f.Name())
 	}
+	return res
 }
 func readCsvFile(filePath string) [][]string {
 	f, err := os.Open(filePath)

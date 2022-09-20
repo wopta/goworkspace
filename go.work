@@ -9,6 +9,7 @@ use(
 ./models
 ./wise-proxy
 ./blockchain
+./accounting
 //./cmd
 
 )
