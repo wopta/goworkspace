@@ -30,9 +30,9 @@ func WiseProxy(w http.ResponseWriter, r *http.Request) {
 	lib.EnableCors(&w, r)
 	jsonData, _ := ioutil.ReadAll(r.Body)
 	client := http.Client{Timeout: time.Duration(1) * time.Second}
-	value := r.RequestURI
+	//value := r.RequestURI
 	log.Println("len(r.RequestURI): ", len(r.RequestURI))
-	substring := value[11:len(r.RequestURI)]
+	substring := r.RequestURI
 	log.Println("substring: " + substring)
 	var token string
 	var urlstring = os.Getenv("wiseBaseUrl") + substring
