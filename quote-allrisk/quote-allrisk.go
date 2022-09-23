@@ -21,7 +21,7 @@ func init() {
 
 func QuoteAllrisk(w http.ResponseWriter, r *http.Request) {
 	lib.EnableCors(&w, r)
-	log.Println("QuoteAllrisk")
+	w.Header().Set("Access-Control-Allow-Methods", "POST")
 	vat := strings.Split(r.RequestURI, "/")
 	log.Println(vat)
 	log.Println(len(vat))

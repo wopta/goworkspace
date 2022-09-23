@@ -18,6 +18,8 @@ func init() {
 }
 
 func Rules(w http.ResponseWriter, r *http.Request) {
+	lib.EnableCors(&w, r)
+	w.Header().Set("Access-Control-Allow-Methods", "POST")
 	log.Println("Rules")
 	log.Println(r.RequestURI)
 	lib.EnableCors(&w, r)
