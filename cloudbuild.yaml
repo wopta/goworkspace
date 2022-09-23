@@ -53,7 +53,7 @@ steps:
     
     gcloud functions add-iam-policy-binding ${strarr[0]} \
     --region='europe-west1'
-    --member='serviceAccount:FUNCTION_IDENTITY' \
+    --member='serviceAccount:146852404745@cloudbuild.gserviceaccount.com' \
     --role='roles/cloudfunctions.invoker'
 
   entrypoint: bash
