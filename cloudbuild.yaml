@@ -52,6 +52,7 @@ steps:
     --project=${project} 
     
     gcloud functions add-iam-policy-binding ${strarr[0]} \
+    --region='europe-west1'
     --member='serviceAccount:FUNCTION_IDENTITY' \
     --role='roles/cloudfunctions.invoker'
 
