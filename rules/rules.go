@@ -14,7 +14,7 @@ import (
 func init() {
 	log.Println("INIT Rules")
 
-	functions.HTTP("rules", Rules)
+	functions.HTTP("Rules", Rules)
 }
 
 func Rules(w http.ResponseWriter, r *http.Request) {
