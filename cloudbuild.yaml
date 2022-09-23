@@ -53,9 +53,8 @@ steps:
     
     gcloud functions add-iam-policy-binding ${strarr[0]} \
     --member='serviceAccount:FUNCTION_IDENTITY' \
-    --role='roles/cloudfunctions.invoker'gcloud functions add-iam-policy-binding FUNCTION \
-    --member='serviceAccount:FUNCTION_IDENTITY' \
     --role='roles/cloudfunctions.invoker'
+
   entrypoint: bash
 
 - name: gcr.io/cloud-builders/gcloud:latest
