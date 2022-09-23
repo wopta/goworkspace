@@ -47,9 +47,15 @@ steps:
     --trigger-http \
     --runtime=go116 \
     --env-vars-file ${env}.yaml \
+    --ingress-settings internal-only \
     --service-account=146852404745@cloudbuild.gserviceaccount.com \
     --project=${project} \
     
+    gcloud functions add-iam-policy-binding ${strarr[0]} \
+    --member='serviceAccount:FUNCTION_IDENTITY' \
+    --role='roles/cloudfunctions.invoker'gcloud functions add-iam-policy-binding FUNCTION \
+    --member='serviceAccount:FUNCTION_IDENTITY' \
+    --role='roles/cloudfunctions.invoker'
   entrypoint: bash
 
 - name: gcr.io/cloud-builders/gcloud:latest

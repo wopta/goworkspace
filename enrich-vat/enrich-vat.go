@@ -21,22 +21,8 @@ func init() {
 
 func EnrichVat(w http.ResponseWriter, r *http.Request) {
 	// Set CORS headers for the main request.
-	//lib.EnableCors(&w, r)
-	if r.Method == http.MethodOptions {
-		log.Println("---------------http.MethodOptions OPTION----------------------------------------------------------------")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "*")
-		w.Header().Set("Access-Control-Allow-Headers", "*")
-		w.Header().Set("Access-Control-Allow-Credentials", "true")
-		w.Header().Set("Access-Control-Max-Age", "3600")
-		w.WriteHeader(http.StatusNoContent)
-		return
-	}
-	// Set CORS headers for the main request.
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Headers", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "*")
-	w.Header().Set("Access-Control-Allow-Credentials", "true")
+	lib.EnableCors(&w, r)
+	w.Header().Set("Access-Control-Allow-Methods", "GET")
 	log.Println("EnrichVat")
 	vat := strings.Split(r.RequestURI, "/")
 	log.Println(vat)
