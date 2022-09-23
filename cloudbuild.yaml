@@ -49,7 +49,7 @@ steps:
     --env-vars-file ${env}.yaml \
     --ingress-settings internal-only \
     --service-account=146852404745@cloudbuild.gserviceaccount.com \
-    --project=${project} \
+    --project=${project} 
     
     gcloud functions add-iam-policy-binding ${strarr[0]} \
     --member='serviceAccount:FUNCTION_IDENTITY' \
