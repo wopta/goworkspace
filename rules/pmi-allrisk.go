@@ -29,7 +29,7 @@ func PmiAllrisk(w http.ResponseWriter, r *http.Request) {
 	//swich source by env for retive data
 	switch os.Getenv("env") {
 	case "local":
-		groule = lib.ErrorByte(ioutil.ReadFile("function-data/grules/" + rulesFile))
+		groule = lib.ErrorByte(ioutil.ReadFile("/function-data/grules/" + rulesFile))
 		ricAteco = lib.ErrorByte(ioutil.ReadFile("function-data/data/rules/Riclassificazione_Ateco.csv"))
 	case "dev":
 		groule = lib.GetFromStorage("function-data", "grules/"+rulesFile, "")
