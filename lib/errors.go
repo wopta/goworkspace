@@ -9,3 +9,8 @@ func CheckError(e error) {
 
 	}
 }
+
+func ErrorByte(b []byte, e error) []byte {
+	CheckError(e)
+	return b
+}

@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"strings"
 
-	// Blank-import the function package so the init() runs
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	lib "github.com/wopta/goworkspace/lib"
 )
@@ -18,19 +17,27 @@ func init() {
 }
 
 func Rules(w http.ResponseWriter, r *http.Request) {
+
 	lib.EnableCors(&w, r)
 	w.Header().Set("Access-Control-Allow-Methods", "POST")
 	log.Println("Rules")
+	base := "/rules"
+	if strings.Contains(r.RequestURI, "/rules") {
+		base = "/rules"
+	} else {
+		base = ""
+	}
 	log.Println(r.RequestURI)
 	lib.EnableCors(&w, r)
-
-	if strings.Contains(r.RequestURI, "/allrisk") {
-
+	switch os := r.RequestURI; os {
+	case base + "/allrisk":
 		Allrisk(w, r)
-
-	} else {
+	case base + "/pmi-allrisk":
+		PmiAllrisk(w, r)
+	default:
 		fmt.Fprintf(w, "")
 	}
+
 	//lib.Files("")
 
 }

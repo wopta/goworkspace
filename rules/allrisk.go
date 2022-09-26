@@ -122,6 +122,8 @@ func Allrisk(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//resp := strings.ReplaceAll(prof.Result, "'", "\"")
+	b, err := json.Marshal(prof.Coverages)
+	log.Println(string(b))
 
 	m := make([]*Coverage, 0, len(prof.Coverages))
 	for _, val := range prof.Coverages {
