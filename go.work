@@ -10,6 +10,8 @@ use(
 ./wise-proxy
 ./blockchain
 ./accounting
+./document
+./appcheck-proxy
 //./cmd
 
 )

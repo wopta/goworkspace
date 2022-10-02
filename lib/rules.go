@@ -21,14 +21,19 @@ func RulesFromJson(groule []byte, out []byte, in []byte, data []byte, w http.Res
 	dataContext := ast.NewDataContext()
 	// add your JSON Fact into data context using AddJSON() function.
 	err := dataContext.AddJSON("in", in)
+	log.Println("RulesFromJson in")
 	CheckError(err)
 	err = dataContext.AddJSON("out", out)
+	log.Println("RulesFromJson out")
 	CheckError(err)
 	err = dataContext.AddJSON("data", data)
+	log.Println("RulesFromJson data loaded")
 	CheckError(err)
 	err = dataContext.Add("fx", fx)
+	log.Println("RulesFromJson fx loaded")
 	CheckError(err)
 	underlying := pkg.NewBytesResource(groule)
+
 	CheckError(err)
 	resource := pkg.NewJSONResourceFromResource(underlying)
 	CheckError(err)
@@ -36,6 +41,7 @@ func RulesFromJson(groule []byte, out []byte, in []byte, data []byte, w http.Res
 	knowledgeLibrary := ast.NewKnowledgeLibrary()
 	ruleBuilder := builder.NewRuleBuilder(knowledgeLibrary)
 	//bs := pkg.NewBytesResource([]byte(fileRes))
+
 	err = ruleBuilder.BuildRuleFromResource("rules", "0.0.1", resource)
 	CheckError(err)
 	knowledgeBase := knowledgeLibrary.NewKnowledgeBaseInstance("rules", "0.0.1")

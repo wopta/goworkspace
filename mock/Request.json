@@ -7,12 +7,8 @@
          "vatnumber":{
             "value":"01340380193"
          },
-         "opre_eur":{
-            "value":50000.000000000000000000
-         },
-         "employees":{
-            "value":10.0
-         }
+         "opre_eur":{ "value":50000.000000000000000000},
+         "employees":{"value":10.0}
       },
       "answers":{
          "step1":[

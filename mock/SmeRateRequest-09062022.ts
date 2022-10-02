@@ -32,10 +32,7 @@ export interface BuildingAnswerValue {
   postcode: string;
   province: string;
   buildingType:
-    | "masonry"
-    | "reinforcedConcrete"
-    | "antiSeismicLaminatedTimber"
-    | "steel";
+    | "masonry","reinforcedConcrete","antiSeismicLaminatedTimber","steel";
   // numberOfFloors and constructionYear are mandatory (together with buildingType) if earthquake cover is given
   numberOfFloors?: "ground_floor" | "first" | "second" | "greater_than_second";
   constructionYear?: "before1972" | "1972between2009" | "after2009";

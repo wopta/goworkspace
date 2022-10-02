@@ -1,0 +1,2475 @@
+{
+    "bvdCompanyId": {
+        "value": "IT01654010345"
+    },
+    "vatnumber": {
+        "value": "01654010345"
+    },
+    "name_internat": {
+        "value": "Barilla G. E R. Fratelli - Societa' PER Azioni"
+    },
+    "addr_internat": {
+        "value": "Via Mantova 166"
+    },
+    "all_addresses_list_array": [
+        {
+            "value": "Via Mantova 166"
+        }
+    ],
+    "postcode": {
+        "value": "43122"
+    },
+    "city_internat": { "value": "Parma" },
+    "country": {
+        "value": "Italy"
+    },
+    "latlong": {
+        "value": "44.822944444444445,10.381194444444445"
+    },
+    "phone": {
+        "value": "+39 0521270621"
+    },
+    "website": {
+        "value":"www.barilla.it"
+    },
+    "natid_number": [
+        {
+            "value": "PR0169146"
+        },
+        {
+            "value": "01654010345"
+        },
+        {
+            "value": "01654010345"
+        },
+        {
+            "value": "IT01654010345"
+        },
+        {
+            "value": "529900HWBYCO8M2UN457"
+        },
+        {
+            "value": "01654010345"
+        }
+    ],
+    "natid_label": [
+        {
+            "value": "CCIAA number"
+        },
+        {
+            "value": "Codice fiscale"
+        },
+        {
+            "value": "Partita IVA"
+        },
+        {
+            "value": "European VAT number"
+        },
+        {
+            "value": "LEI"
+        },
+        {
+            "value": "TIN"
+        }
+    ],
+    "natid_type": [
+        {
+            "value": "Trade register number"
+        },
+        {
+            "value": "VAT/Tax number"
+        },
+        {
+            "value": "VAT/Tax number"
+        },
+        {
+            "value": "European VAT number"
+        },
+        {
+            "value": "Company ID number"
+        },
+        {
+            "value": "TIN"
+        }
+    ],
+    "traderegisternr": {
+        "value": "PR0169146"
+    },
+    "eurovat": {
+        "value": "IT01654010345"
+    },
+    "status_weekly": {
+        "value": "Active"
+    },
+    "slegalf": {
+        "value": "Public limited companies"
+    },
+    "legalfrm": {
+        "value": "One-person joint stock company - SPA"
+    },
+    "incorporation_date": {
+        "value": 1988
+    },
+    "listed": {
+        "value": "Unlisted"
+    },
+    "naicsccod2017": [
+        {
+            "value": "3118"
+        }
+    ],
+    "ussicccod": [
+        {
+            "value": "209"
+        }
+    ],
+    "nace2_main_section": [
+        {
+            "value": "C - Manufacturing"
+        }
+    ],
+    "naceccod2": [
+        {
+            "value": "1073"
+        }
+    ],
+    "nacecdes2": [
+        {
+            "value": "Manufacture of macaroni, noodles, couscous and similar farinaceous products"
+        }
+    ],
+    "natclass": [
+        {
+            "value": "ATECO 2007"
+        }
+    ],
+    "natpcod_set_array": [ {"value": "107300" }],
+    "natpdes_set_array": [
+        {
+            "value": "Manufacture of macaroni, noodles, couscous and similar farinaceous products"
+        }
+    ],
+    "employees": {
+        "value": 4186
+    },
+    "conscode": {
+        "value": "U2"
+    },
+    "toas": {
+        "value": 2710049000
+    },
+    "opre_eur": {
+        "value": 2946702000
+    },
+    "opre_type": {
+        "value": "Unconsolidated"
+    },
+    "opre_date": {
+        "value": "2020-12-31"
+    },
+    "crif_year_hist": [
+        {
+            "value": "2020"
+        }
+    ],
+    "crif_score_hist": [
+        {
+            "value": 770
+        }
+    ],
+    "crif_peer_descr_hist": [
+        {
+            "value": "Manufacture of macaroni, noodles, couscous and similar farinaceous products"
+        }
+    ],
+    "crif_peer_min_hist": [
+        {
+            "value": 238
+        }
+    ],
+    "crif_peer_max_hist": [
+        {
+            "value": 812
+        }
+    ],
+    "crif_peer_avg_hist": [
+        {
+            "value": 548
+        }
+    ],
+    "cpycontacts_header_firstnameoriginallanguagepreferred": [
+        {
+            "value": "Luca"
+        },
+        {
+            "value": "Paolo"
+        },
+        {
+            "value": "Emanuela"
+        },
+        {
+            "value": "Antonio"
+        },
+        {
+            "value": "Claudio"
+        },
+        {
+            "value": "Claudio"
+        },
+        {
+            "value": "Nicolaus"
+        },
+        {
+            "value": "Andrea"
+        },
+        {
+            "value": "Augusto"
+        },
+        {
+            "value": "Alberto"
+        },
+        {
+            "value": "Lorenzo"
+        },
+        {
+            "value": "Mario"
+        },
+        {
+            "value": "Marco"
+        },
+        {
+            "value": "Simone"
+        },
+        {
+            "value": "Barbara"
+        },
+        {
+            "value": "Gianluca"
+        },
+        {
+            "value": "Daniele"
+        },
+        {
+            "value": "Annamaria"
+        },
+        {
+            "value": "Michele"
+        },
+        {
+            "value": "Eliano"
+        },
+        {
+            "value": "Federica"
+        },
+        {
+            "value": "Alfredo"
+        },
+        {
+            "value": "Giovanni"
+        },
+        {
+            "value": "Angela"
+        },
+        {
+            "value": "Fabio"
+        },
+        {
+            "value": "Stefania"
+        },
+        {
+            "value": "Cinzia"
+        },
+        {
+            "value": "Paola"
+        },
+        {
+            "value": "Claudio"
+        },
+        {
+            "value": "Daniela"
+        },
+        {
+            "value": "Graziano"
+        },
+        {
+            "value": "Elena"
+        },
+        {
+            "value": "Marco"
+        },
+        {
+            "value": "Alessandro"
+        },
+        {
+            "value": "Giulia"
+        },
+        {
+            "value": "Domenico"
+        },
+        {
+            "value": "Federico"
+        },
+        {
+            "value": "Nicola"
+        },
+        {
+            "value": "Cristina"
+        },
+        {
+            "value": "Dennis"
+        },
+        {
+            "value": "Tiziano"
+        },
+        {
+            "value": "Oscar"
+        },
+        {
+            "value": "Guglielmo"
+        },
+        {
+            "value": "Gian Paolo"
+        },
+        {
+            "value": "Federico"
+        },
+        {
+            "value": "Roberto"
+        },
+        {
+            "value": "Enrico"
+        },
+        {
+            "value": "Stefano"
+        },
+        {
+            "value": "Chiara"
+        },
+        {
+            "value": "Sara"
+        },
+        {
+            "value": "Maria"
+        },
+        {
+            "value": "Carlo"
+        },
+        {
+            "value": "Carlo"
+        },
+        {
+            "value": "Silvia"
+        },
+        {
+            "value": "Eleonora"
+        },
+        {
+            "value": "Madilo"
+        },
+        {
+            "value": "Alessandro"
+        },
+        {
+            "value": "Roberto"
+        },
+        {
+            "value": "Francesca"
+        },
+        {
+            "value": "Giuseppe"
+        },
+        {
+            "value": "Alberto"
+        },
+        {
+            "value": "Antonio"
+        },
+        {
+            "value": "Nicola"
+        },
+        {
+            "value": "Chiara"
+        },
+        {
+            "value": "Paolo"
+        },
+        {
+            "value": "Maurizio"
+        },
+        {
+            "value": "Salvatore"
+        },
+        {
+            "value": "Eleonora"
+        },
+        {
+            "value": "Pietro"
+        },
+        {
+            "value": "Roberto"
+        },
+        {
+            "value": "Claudio Antonio"
+        },
+        {
+            "value": "Francesco"
+        },
+        {
+            "value": "Simona"
+        },
+        {
+            "value": "Fabio"
+        },
+        {
+            "value": "Pasquale"
+        },
+        {
+            "value": "Gianluca"
+        },
+        {
+            "value": "Andrea Pietro"
+        },
+        {
+            "value": "Carolina"
+        },
+        {
+            "value": "Talita Ramos"
+        },
+        {
+            "value": "Andrea"
+        },
+        {
+            "value": "Corrado"
+        },
+        {
+            "value": "Emilio"
+        },
+        {
+            "value": "Michela"
+        },
+        {
+            "value": "Bruno"
+        },
+        {
+            "value": "Massimo"
+        },
+        {
+            "value": "Bruno"
+        },
+        {
+            "value": "Paolo"
+        },
+        {
+            "value": "Elena"
+        },
+        {
+            "value": "Massimo"
+        },
+        {
+            "value": "Diego"
+        },
+        {
+            "value": "Andrea"
+        },
+        {
+            "value": "Cristina"
+        },
+        {
+            "value": "Luigi"
+        },
+        {
+            "value": "Anna"
+        },
+        {
+            "value": "Silvia"
+        },
+        {
+            "value": "Alessandra"
+        },
+        {
+            "value": "Francesca"
+        },
+        {
+            "value": "Francesco"
+        },
+        {
+            "value": "Matteo"
+        },
+        {
+            "value": "Giorgio"
+        },
+        {
+            "value": "Francesco"
+        },
+        {
+            "value": "Barbara"
+        },
+        {
+            "value": "Lucia"
+        },
+        {
+            "value": "Giorgio"
+        },
+        {
+            "value": "Alessandro"
+        },
+        {
+            "value": "Maria Luigia"
+        },
+        {
+            "value": "Alessandra"
+        },
+        {
+            "value": "Paolo"
+        },
+        {
+            "value": "Caterina Lucilla"
+        },
+        {
+            "value": "Sergio"
+        },
+        {
+            "value": "Oreste"
+        },
+        {
+            "value": "Andrea"
+        },
+        {
+            "value": "Elena"
+        },
+        {
+            "value": "Domenico"
+        },
+        {
+            "value": "Ilaria"
+        },
+        {
+            "value": "Simone"
+        },
+        {
+            "value": "Luca"
+        },
+        {
+            "value": "Rolando"
+        },
+        {
+            "value": "Roberto Angelo"
+        },
+        {
+            "value": "Paolo"
+        },
+        {
+            "value": "Marcello"
+        },
+        {
+            "value": "Angela"
+        },
+        {
+            "value": "Giorgio"
+        },
+        {
+            "value": "Nicola"
+        },
+        {
+            "value": "Cinzia"
+        },
+        {
+            "value": "Anna"
+        },
+        {
+            "value": "Manuel"
+        },
+        {
+            "value": "Roberto"
+        },
+        {
+            "value": "Giuseppe Emanuele"
+        },
+        {
+            "value": "Gianluigi"
+        },
+        {
+            "value": "Valentina"
+        },
+        {
+            "value": "Federica"
+        },
+        {
+            "value": "Paolo"
+        },
+        {
+            "value": "Barbara"
+        },
+        {
+            "value": "Claudio"
+        },
+        {
+            "value": "Marco"
+        },
+        {
+            "value": "Giancarlo"
+        },
+        {
+            "value": "Ferruccio"
+        },
+        {
+            "value": "Leonardo Giovanni"
+        },
+        {
+            "value": "Claudia"
+        },
+        {
+            "value": "Massimo"
+        },
+        {
+            "value": "Cinzia"
+        },
+        {
+            "value": "Alejandro"
+        },
+        {
+            "value": "Chiara"
+        },
+        {
+            "value": "Andrea"
+        },
+        {
+            "value": "Antonio"
+        },
+        {
+            "value": "Giovanni"
+        },
+        {
+            "value": "Francesco"
+        },
+        {
+            "value": "Filomena"
+        },
+        {
+            "value": "Matteo"
+        },
+        {
+            "value": "Fabrizio"
+        },
+        {
+            "value": "Paolo"
+        },
+        {
+            "value": "Nicola"
+        },
+        {
+            "value": "Michela"
+        },
+        {
+            "value": "Rosa Maria"
+        },
+        {
+            "value": "Francesco Enrico"
+        },
+        {
+            "value": "Stefano"
+        },
+        {
+            "value": "Andrea"
+        },
+        {
+            "value": "Chiara"
+        },
+        {
+            "value": "Enrico"
+        },
+        {
+            "value": "Giangaddo"
+        },
+        {
+            "value": "Fulvio Paolo"
+        },
+        {
+            "value": "Paola"
+        },
+        {
+            "value": "Giuseppe"
+        },
+        {
+            "value": "Vito"
+        },
+        {
+            "value": "Giovanni"
+        },
+        {
+            "value": "Ruggero"
+        },
+        {
+            "value": "Giorgio"
+        },
+        {
+            "value": "Gabriele"
+        },
+        {
+            "value": "Andrea"
+        },
+        {
+            "value": "Lucio"
+        },
+        {
+            "value": "Cesare"
+        },
+        {
+            "value": "Alessandro"
+        },
+        {
+            "value": "Ilaria Giuseppina Bice Di"
+        },
+        {
+            "value": "Alessandro"
+        },
+        {
+            "value": "Luca Fernando"
+        },
+        {
+            "value": "Mauro"
+        },
+        {
+            "value": "Mauro"
+        },
+        {
+            "value": "Edwige Claudie Emmanuelle"
+        },
+        {
+            "value": "Gustavo"
+        },
+        {
+            "value": "Julia"
+        },
+        {
+            "value": "Vincenzo"
+        },
+        {
+            "value": "Rana Farah"
+        },
+        {
+            "value": "Jose Ovidio"
+        },
+        {
+            "value": "Cinzia"
+        },
+        {
+            "value": "Nicola"
+        },
+        {
+            "value": "Roberto"
+        },
+        {
+            "value": "Alessandro"
+        },
+        {
+            "value": "Justin Emmanuel"
+        },
+        {
+            "value": "Pierpaolo"
+        },
+        {
+            "value": "Elena"
+        },
+        {
+            "value": "Gianluca"
+        },
+        {
+            "value": "Marco"
+        },
+        {
+            "value": "Alessia"
+        },
+        {
+            "value": "Valeria"
+        },
+        {
+            "value": "Roberto"
+        },
+        {
+            "value": "Giovanni"
+        },
+        {
+            "value": "Andrea"
+        },
+        {
+            "value": "Claudio"
+        },
+        {
+            "value": "Laura"
+        },
+        {
+            "value": "Maria Bianca"
+        },
+        {
+            "value": "Silvano"
+        },
+        {
+            "value": "Paola Argia"
+        },
+        {
+            "value": "Patrizia"
+        },
+        {
+            "value": "Ilenia"
+        },
+        {
+            "value": "Barbara"
+        },
+        {
+            "value": "Giovanna"
+        },
+        {
+            "value": "Massimiliano"
+        },
+        {
+            "value": "Mariapaola"
+        },
+        {
+            "value": "Marco"
+        },
+        {
+            "value": "Francesca"
+        },
+        {
+            "value": "Irina"
+        },
+        {
+            "value": "Mario"
+        },
+        {
+            "value": "Nicolai"
+        },
+        {
+            "value": "Michele"
+        },
+        {
+            "value": "Riccardo"
+        },
+        {
+            "value": "Maurizio"
+        }
+    ],
+    "cpycontacts_header_lastnameoriginallanguagepreferred": [
+        {
+            "value": "Barilla"
+        },
+        {
+            "value": "Barilla"
+        },
+        {
+            "value": "Barilla"
+        },
+        {
+            "value": "Belloni"
+        },
+        {
+            "value": "Colzani"
+        },
+        {
+            "value": "Colzani"
+        },
+        {
+            "value": "Issenmann"
+        },
+        {
+            "value": "Pontremoli"
+        },
+        {
+            "value": "Schianchi"
+        },
+        {
+            "value": "Pizzi"
+        },
+        {
+            "value": "Scarabelli"
+        },
+        {
+            "value": "Tardini"
+        },
+        {
+            "value": "Ziliotti"
+        },
+        {
+            "value": "Agostinelli"
+        },
+        {
+            "value": "Aldini"
+        },
+        {
+            "value": "Allodi"
+        },
+        {
+            "value": "Ambroset"
+        },
+        {
+            "value": "Ambrosio"
+        },
+        {
+            "value": "Amigoni"
+        },
+        {
+            "value": "Apicella"
+        },
+        {
+            "value": "Avanzini"
+        },
+        {
+            "value": "Baldassarre"
+        },
+        {
+            "value": "Ballerini"
+        },
+        {
+            "value": "Barborini"
+        },
+        {
+            "value": "Barigazzi"
+        },
+        {
+            "value": "Barone"
+        },
+        {
+            "value": "Bassi"
+        },
+        {
+            "value": "Beccaro"
+        },
+        {
+            "value": "Belli"
+        },
+        {
+            "value": "Belluscio"
+        },
+        {
+            "value": "Belmonte"
+        },
+        {
+            "value": "Bernardelli"
+        },
+        {
+            "value": "Beschi"
+        },
+        {
+            "value": "Bigliardi"
+        },
+        {
+            "value": "Bisceglie"
+        },
+        {
+            "value": "Bitondo"
+        },
+        {
+            "value": "Bocelli"
+        },
+        {
+            "value": "Bonini"
+        },
+        {
+            "value": "Bonoretti"
+        },
+        {
+            "value": "Borghetti"
+        },
+        {
+            "value": "Boselli"
+        },
+        {
+            "value": "Bottazzi"
+        },
+        {
+            "value": "Bozano"
+        },
+        {
+            "value": "Bruschetta"
+        },
+        {
+            "value": "Bucarelli"
+        },
+        {
+            "value": "Buttini"
+        },
+        {
+            "value": "Cademartiri"
+        },
+        {
+            "value": "Calvi"
+        },
+        {
+            "value": "Canedoli"
+        },
+        {
+            "value": "Cantoni"
+        },
+        {
+            "value": "Cappetta"
+        },
+        {
+            "value": "Carteri"
+        },
+        {
+            "value": "Carteri"
+        },
+        {
+            "value": "Casali"
+        },
+        {
+            "value": "Casella"
+        },
+        {
+            "value": "Castiglia"
+        },
+        {
+            "value": "Cerri"
+        },
+        {
+            "value": "Ciati"
+        },
+        {
+            "value": "Cobianchi"
+        },
+        {
+            "value": "Concari"
+        },
+        {
+            "value": "Coperchini"
+        },
+        {
+            "value": "Copercini"
+        },
+        {
+            "value": "Cornini"
+        },
+        {
+            "value": "Cramarossa"
+        },
+        {
+            "value": "Crino"
+        },
+        {
+            "value": "D'Anna"
+        },
+        {
+            "value": "Daidone"
+        },
+        {
+            "value": "Dalia"
+        },
+        {
+            "value": "De Albertis"
+        },
+        {
+            "value": "De Gennaro"
+        },
+        {
+            "value": "Deambrogio"
+        },
+        {
+            "value": "Del Porto"
+        },
+        {
+            "value": "Del Vecchio"
+        },
+        {
+            "value": "Di Gioia"
+        },
+        {
+            "value": "Di Sarno"
+        },
+        {
+            "value": "Di Tondo"
+        },
+        {
+            "value": "Dipace"
+        },
+        {
+            "value": "Diterlizzi"
+        },
+        {
+            "value": "Erickson"
+        },
+        {
+            "value": "Ferrari"
+        },
+        {
+            "value": "Ferrari"
+        },
+        {
+            "value": "Ferrari"
+        },
+        {
+            "value": "Ferrari"
+        },
+        {
+            "value": "Fiorenza"
+        },
+        {
+            "value": "Fiorini"
+        },
+        {
+            "value": "Flaiani"
+        },
+        {
+            "value": "Forlano"
+        },
+        {
+            "value": "Franchi"
+        },
+        {
+            "value": "Frau"
+        },
+        {
+            "value": "Fumagalli"
+        },
+        {
+            "value": "Furlani"
+        },
+        {
+            "value": "Gallina"
+        },
+        {
+            "value": "Ganazzoli"
+        },
+        {
+            "value": "Gandolfini"
+        },
+        {
+            "value": "Garsi"
+        },
+        {
+            "value": "Ghiretti"
+        },
+        {
+            "value": "Ghiretti"
+        },
+        {
+            "value": "Giliotti"
+        },
+        {
+            "value": "Gori"
+        },
+        {
+            "value": "Grandi"
+        },
+        {
+            "value": "Grieco"
+        },
+        {
+            "value": "Griguol"
+        },
+        {
+            "value": "Guareschi"
+        },
+        {
+            "value": "Guatteri"
+        },
+        {
+            "value": "Guglielmini"
+        },
+        {
+            "value": "Iacurso"
+        },
+        {
+            "value": "Iotti"
+        },
+        {
+            "value": "La Cava"
+        },
+        {
+            "value": "Lamanna"
+        },
+        {
+            "value": "Lambri"
+        },
+        {
+            "value": "Lanciotti"
+        },
+        {
+            "value": "Leporati"
+        },
+        {
+            "value": "Levati"
+        },
+        {
+            "value": "Liberatore"
+        },
+        {
+            "value": "Lodigiani"
+        },
+        {
+            "value": "Lonoce"
+        },
+        {
+            "value": "Maccagnani"
+        },
+        {
+            "value": "Maglione"
+        },
+        {
+            "value": "Magnani"
+        },
+        {
+            "value": "Maloberti"
+        },
+        {
+            "value": "Manici"
+        },
+        {
+            "value": "Manolli Malvestiti"
+        },
+        {
+            "value": "Marazzi"
+        },
+        {
+            "value": "Marcheselli"
+        },
+        {
+            "value": "Marchetti"
+        },
+        {
+            "value": "Margaritelli"
+        },
+        {
+            "value": "Mariani"
+        },
+        {
+            "value": "Marinozzi"
+        },
+        {
+            "value": "Marletta"
+        },
+        {
+            "value": "Mason"
+        },
+        {
+            "value": "Masotti"
+        },
+        {
+            "value": "Massari"
+        },
+        {
+            "value": "Melegari"
+        },
+        {
+            "value": "Melegari"
+        },
+        {
+            "value": "Melodia"
+        },
+        {
+            "value": "Michelotti"
+        },
+        {
+            "value": "Minervini"
+        },
+        {
+            "value": "Minzoni"
+        },
+        {
+            "value": "Mirone"
+        },
+        {
+            "value": "Moretti"
+        },
+        {
+            "value": "Moroni"
+        },
+        {
+            "value": "Mossini"
+        },
+        {
+            "value": "Murillas Moreno"
+        },
+        {
+            "value": "Nanni"
+        },
+        {
+            "value": "Napodano"
+        },
+        {
+            "value": "Nespoli"
+        },
+        {
+            "value": "Palopoli"
+        },
+        {
+            "value": "Panto"
+        },
+        {
+            "value": "Patruno"
+        },
+        {
+            "value": "Pauri"
+        },
+        {
+            "value": "Pellegrini"
+        },
+        {
+            "value": "Pellegrini"
+        },
+        {
+            "value": "Perizzolo"
+        },
+        {
+            "value": "Petronio"
+        },
+        {
+            "value": "Petrosino"
+        },
+        {
+            "value": "Piemontese"
+        },
+        {
+            "value": "Pietroni"
+        },
+        {
+            "value": "Pini"
+        },
+        {
+            "value": "Pisano"
+        },
+        {
+            "value": "Polverigiani"
+        },
+        {
+            "value": "Prati"
+        },
+        {
+            "value": "Profeta"
+        },
+        {
+            "value": "Provezza"
+        },
+        {
+            "value": "Puglia"
+        },
+        {
+            "value": "Pugliese"
+        },
+        {
+            "value": "Quarta"
+        },
+        {
+            "value": "Rabaglia"
+        },
+        {
+            "value": "Randazzo"
+        },
+        {
+            "value": "Rastelli"
+        },
+        {
+            "value": "Repetati"
+        },
+        {
+            "value": "Riva"
+        },
+        {
+            "value": "Ronchi"
+        },
+        {
+            "value": "Rossi"
+        },
+        {
+            "value": "Rossi"
+        },
+        {
+            "value": "Ruggeri"
+        },
+        {
+            "value": "Ruini"
+        },
+        {
+            "value": "Ruozi"
+        },
+        {
+            "value": "Ruozi"
+        },
+        {
+            "value": "Sausset"
+        },
+        {
+            "value": "Savino"
+        },
+        {
+            "value": "Schwoerer"
+        },
+        {
+            "value": "Sfregola"
+        },
+        {
+            "value": "Shehadeh"
+        },
+        {
+            "value": "Silva"
+        },
+        {
+            "value": "Sinisi"
+        },
+        {
+            "value": "Solfrizzi"
+        },
+        {
+            "value": "Soresini"
+        },
+        {
+            "value": "Spadini"
+        },
+        {
+            "value": "Steinbach"
+        },
+        {
+            "value": "Susani"
+        },
+        {
+            "value": "Tabellini"
+        },
+        {
+            "value": "Tagliavini"
+        },
+        {
+            "value": "Tambini"
+        },
+        {
+            "value": "Tassoni"
+        },
+        {
+            "value": "Terzi"
+        },
+        {
+            "value": "Torricelli"
+        },
+        {
+            "value": "Tortorici"
+        },
+        {
+            "value": "Tosi"
+        },
+        {
+            "value": "Tramontini"
+        },
+        {
+            "value": "Trinca Colonel"
+        },
+        {
+            "value": "Tulumello"
+        },
+        {
+            "value": "Turola"
+        },
+        {
+            "value": "Ucci"
+        },
+        {
+            "value": "Urbani"
+        },
+        {
+            "value": "Vendramet"
+        },
+        {
+            "value": "Venerucci"
+        },
+        {
+            "value": "Verani"
+        },
+        {
+            "value": "Verdelli"
+        },
+        {
+            "value": "Vetrucci"
+        },
+        {
+            "value": "Virginio"
+        },
+        {
+            "value": "Vitali"
+        },
+        {
+            "value": "Zaitseva"
+        },
+        {
+            "value": "Zanetti"
+        },
+        {
+            "value": "Zanettini"
+        },
+        {
+            "value": "Zerbini"
+        },
+        {
+            "value": "Zubani"
+        },
+        {
+            "value": "Zuelli"
+        }
+    ],
+    "cpycontacts_membership_function_dmc_current_only": [
+        {
+            "value": "Member of the Board; Deputy President of the Board of Directors"
+        },
+        {
+            "value": "Deputy President of the Board of Directors; Member of the Board"
+        },
+        {
+            "value": "Member of the Board"
+        },
+        {
+            "value": "Member of the Board"
+        },
+        {
+            "value": "Member of the Board"
+        },
+        {
+            "value": "General Manager"
+        },
+        {
+            "value": "Member of the Board"
+        },
+        {
+            "value": "Member of the Board"
+        },
+        {
+            "value": "President of the Statutory Board of Auditors"
+        },
+        {
+            "value": "Deputy Statutory Auditor"
+        },
+        {
+            "value": "Deputy Statutory Auditor"
+        },
+        {
+            "value": "Regular Statutory Auditor"
+        },
+        {
+            "value": "Regular Statutory Auditor"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Factory Director"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Technical Responsible"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        }
+    ],
+    "cpycontacts_membership_functionoriginaloriginallanguagepreferred": [
+        {
+            "value": "CONSIGLIERE;VICE PRESIDENTE CONSIGLIO AMMINISTRAZIONE"
+        },
+        {
+            "value": "CONSIGLIERE;VICE PRESIDENTE CONSIGLIO AMMINISTRAZIONE"
+        },
+        {
+            "value": "CONSIGLIERE"
+        },
+        {
+            "value": "CONSIGLIERE"
+        },
+        {
+            "value": "CONSIGLIERE"
+        },
+        {
+            "value": "AMMINISTRATORE DELEGATO"
+        },
+        {
+            "value": "CONSIGLIERE"
+        },
+        {
+            "value": "CONSIGLIERE"
+        },
+        {
+            "value": "PRESIDENTE DEL COLLEGIO SINDACALE"
+        },
+        {
+            "value": "SINDACO SUPPLENTE"
+        },
+        {
+            "value": "SINDACO SUPPLENTE"
+        },
+        {
+            "value": "SINDACO EFFETTIVO"
+        },
+        {
+            "value": "SINDACO EFFETTIVO"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "DIRETTORE DI STABILIMENTO"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value": "PROCURATORE SPECIALE"
+        },
+        {
+            "value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},
+            {"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},
+            {"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE 
+SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"RESPONSABILE TECNICO"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"},{"value":"PROCURATORE SPECIALE"}],"cpycontacts_membership_departmentfromhiercodefall2009":[{"value":"Board of Directors"},{"value":"Board of Directors"},{"value":"Board of Directors"},{"value":"Board of Directors"},{"value":"Board of Directors"},{"value":"Senior management"},{"value":"Board of Directors"},{"value":"Board of Directors"},{"value":"Audit Committee"},{"value":"Audit Committee"},{"value":"Audit Committee"},{"value":"Audit Committee"},{"value":"Audit Committee"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Operations & Production & Manufacturing"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior 
+management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior 
+management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Research & Development / Engineering"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"},{"value":"Senior management"}],"cpycontacts_membership_isashareholderformatted":[{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"},{"value":"No"}],"cpycontacts_header_birthdate":[{"value":"19600512"},{"value":"19610420"},{"value":"19680408"},{"value":"19540622"},{"value":"19570515"},{"value":"19570515"},{"value":"19500506"},{"value":"19571030"},{"value":"19460925"},{"value":"19400624"},{"value":"19700925"},{"value":"19610429"},{"value":"19560104"},{"value":"19840911"},{"value":"19690131"},{"value":"19590305"},{"value":"19701108"},{"value":"19790308"},{"value":"19660901"},{"value":"19710509"},{"value":"19670318"},{"value":"19600825"},{"value":"19600709"},{"value":"19760222"},{"value":"19640426"},{"value":"19691004"},{"value":"19740109"},{"value":"19670628"},{"value":"19611223"},{"value":"19680410"},{"value":"19660217"},{"value":"19651213"},{"value":"19660702"},{"value":"19770504"},{"value":"19900128"},{"value":"19630723"},{"value":"19860714"},{"value":"19900629"},{"value":"19690329"},{"value":"19840411"},{"value":"19590707"},{"value":"19660217"},{"value":"19660708"},{"value":"19741212"},{"value":"19800325"},{"value":"19670313"},{"value":"19650718"},{"value":"19560224"},{"value":"19760117"},{"value":"19710824"},{"value":"19801008"},{"value":"19650729"},{"value":"19650729"},{"value":"19741025"},{"value":"19800730"},{"value":"19691017"},{"value":"19590722"},{"value":"19610410"},{"value":"19820216"},{"value":"19581203"},{"value":"19591106"},{"value":"19600926"},{"value":"19870122"},{"value":"19870905"},{"value":"19650325"},{"value":"19550410"},{"value":"19720806"},{"value":"19910116"},{"value":"19600611"},{"value":"19601206"},{"value":"19661120"},{"value":"19630805"},{"value":"19930211"},{"value":"19700410"},{"value":"19761123"},{"value":"19710508"},{"value":"19780206"},{"value":"19671016"},{"value":"19800104"},{"value":"19710621"},{"value":"19660427"},{"value":"19620519"},{"value":"19821124"},{"value":"19591022"},{"value":"19770919"},{"value":"19581203"},{"value":"19720507"},{"value":"19890517"},{"value":"19591010"},{"value":"19780613"},{"value":"19850917"},{"value":"19790722"},{"value":"19640918"},{"value":"19820418"},{"value":"19650716"},{"value":"19671101"},{"value":"19760804"},{"value":"19771011"},{"value":"19810923"},{"value":"19680517"},{"value":"19830704"},{"value":"19680427"},{"value":"19660804"},{"value":"19600113"},{"value":"19691213"},{"value":"19661202"},{"value":"19710731"},{"value":"19630225"},{"value":"19820326"},{"value":"19620419"},{"value":"19570414"},{"value":"19700421"},{"value":"19850313"},{"value":"19690319"},{"value":"19780220"},{"value":"19840317"},{"value":"19770331"},{"value":"19650104"},{"value":"19620129"},{"value":"19570126"},{"value":"19670510"},{"value":"19670103"},{"value":"19590803"},{"value":"19710429"},{"value":"19630502"},{"value":"19600330"},{"value":"19720509"},{"value":"19811027"},{"value":"19840704"},{"value":"19790328"},{"value":"19680805"},{"value":"19790804"},{"value":"19551020"},{"value":"19750308"},{"value":"19820128"},{"value":"19610921"},{"value":"19780817"},{"value":"19571206"},{"value":"19701119"},{"value":"19680421"},{"value":"19610925"},{"value":"19621006"},{"value":"19750324"},{"value":"19790925"},{"value":"19640516"},{"value":"19730413"},{"value":"19640419"},{"value":"19670326"},{"value":"19820529"},{"value":"19720430"},{"value":"19620505"},{"value":"19640718"},{"value":"19671213"},{"value":"19660130"},{"value":"19630820"},{"value":"19621004"},{"value":"19640304"},{"value":"19600903"},{"value":"19780720"},{"value":"19560314"},{"value":"19711219"},{"value":"19810923"},{"value":"19711222"},{"value":"19740705"},{"value":"19800213"},{"value":"19620905"},{"value":"19710709"},{"value":"19710531"},{"value":"19720611"},{"value":"19650907"},{"value":"19571107"},{"value":"19690706"},{"value":"19680730"},{"value":"19690626"},{"value":"19831110"},{"value":"19641028"},{"value":"19571103"},{"value":"19571103"},{"value":"19750113"},{"value":"19710708"},{"value":"19740325"},{"value":"19611109"},{"value":"19660917"},{"value":"19720606"},{"value":"19720717"},{"value":"19640331"},{"value":"1962"},{"value":"19660522"},{"value":"19760102"},{"value":"19700302"},{"value":"19721225"},{"value":"19610419"},{"value":"19690105"},{"value":"19841119"},{"value":"19820316"},{"value":"19660114"},{"value":"19630829"},{"value":"19591212"},{"value":"19600714"},{"value":"19800420"},{"value":"19720501"},{"value":"19600220"},{"value":"19870910"},{"value":"19720201"},{"value":"19870708"},{"value":"19900214"},{"value":"19720913"},{"value":"19741011"},{"value":"19780731"},{"value":"19620208"},{"value":"19710923"},{"value":"19880309"},{"value":"19730521"},{"value":"19481114"},{"value":"19840402"},{"value":"19790208"},{"value":"19640912"}],"cpycontacts_header_iddirector":[{"value":"P007326409"},{"value":"P007326410"},{"value":"P007327056"},{"value":"P014139832"},{"value":"P149522717"},{"value":"P149522717"},{"value":"P341309298"},{"value":"P014335676"},{"value":"P014340086"},{"value":"P206316740"},{"value":"P014373883"},{"value":"P014322938"},{"value":"P014336864"},{"value":"P695718996"},{"value":"P350475937"},{"value":"P050741768"},{"value":"P355440497"},{"value":"P350482997"},{"value":"P185343291"},{"value":"P050741826"},{"value":"P050741828"},{"value":"P086737092"},{"value":"P050741831"},{"value":"P350476405"},{"value":"P014350837"},{"value":"P014353947"},{"value":"P119280935"},{"value":"P050741959"},{"value":"P167624043"},{"value":"P350476224"},{"value":"P159038824"},{"value":"P050742035"},{"value":"P436490931"},{"value":"P185343317"},{"value":"P635590123"},{"value":"P119280936"},{"value":"P667296277"},{"value":"P409595279"},{"value":"P333970587"},{"value":"P447182100"},{"value":"P050742127"},{"value":"P119280937"},{"value":"P119280938"},{"value":"P674849760"},{"value":"P508045732"},{"value":"P050742292"},{"value":"P050742317"},{"value":"P436359905"},{"value":"P385073333"},{"value":"P014359025"},{"value":"P506072894"},{"value":"P050742451"},{"value":"P050742451"},{"value":"P119280940"},{"value":"P350475588"},{"value":"P415758580"},{"value":"P014390139"},{"value":"P050742460"},{"value":"P159038845"},{"value":"P050742485"},{"value":"P014353838"},{"value":"P050742524"},{"value":"P007326807"},{"value":"P667297433"},{"value":"P050742565"},{"value":"P014359029"},{"value":"P246301558"},{"value":"P594205742"},{"value":"P333967324"},{"value":"P050742587"},{"value":"P200000562"},{"value":"P050742601"},{"value":"P498412018"},{"value":"P350475350"},{"value":"P204321643"},{"value":"P256127581"},{"value":"P445010528"},{"value":"P438554442"},{"value":"P438306313"},{"value":"P086540674"},{"value":"P050742660"},{"value":"P050742678"},{"value":"P204328469"},{"value":"P014351923"},{"value":"P272343996"},{"value":"P350484957"},{"value":"P050742754"},{"value":"P460511881"},{"value":"P159038855"},{"value":"P457254177"},{"value":"P680488750"},{"value":"P649126196"},{"value":"P014384623"},{"value":"P272353410"},{"value":"P159038857"},{"value":"P050742846"},{"value":"P349507902"},{"value":"P159038858"},{"value":"P262851747"},{"value":"P014359034"},{"value":"P096110973"},{"value":"P673714192"},{"value":"P349516327"},{"value":"P014359036"},{"value":"P159038873"},{"value":"P350484564"},{"value":"P432866831"},{"value":"P119280945"},{"value":"P713325163"},{"value":"P349512971"},{"value":"P119280946"},{"value":"P185343311"},{"value":"P420616434"},{"value":"P350466144"},{"value":"P470500203"},{"value":"P703362946"},{"value":"P119280947"},{"value":"P272377957"},{"value":"P086285032"},{"value":"P251286518"},{"value":"P333956654"},{"value":"P350483812"},{"value":"P258680480"},{"value":"P355432768"},{"value":"P259467534"},{"value":"P356057331"},{"value":"P424972066"},{"value":"P349519274"},{"value":"P436499089"},{"value":"P460517692"},{"value":"P218656404"},{"value":"P454149660"},{"value":"P333968516"},{"value":"P371039339"},{"value":"P713325660"},{"value":"P258507312"},{"value":"P258540848"},{"value":"P258479341"},{"value":"P159044567"},{"value":"P349516910"},{"value":"P259337305"},{"value":"P259465781"},{"value":"P186872213"},{"value":"P409597672"},{"value":"P258951590"},{"value":"P424963102"},{"value":"P014384619"},{"value":"P258035444"},{"value":"P258501988"},{"value":"P259470582"},{"value":"P258424199"},{"value":"P258727305"},{"value":"P259091266"},{"value":"P093362351"},{"value":"P258478202"},{"value":"P620190328"},{"value":"P014350526"},{"value":"P014350849"},{"value":"P197758480"},{"value":"P257986008"},{"value":"P014359015"},{"value":"P258407701"},{"value":"P349513797"},{"value":"P258626557"},{"value":"P436346451"},{"value":"P258653394"},{"value":"P258508501"},{"value":"P356010013"},{"value":"P349515621"},{"value":"P258975598"},{"value":"P007326597"},{"value":"P259550461"},{"value":"P258513013"},{"value":"P333960720"},{"value":"P498396158"},{"value":"P119300656"},{"value":"P050725967"},{"value":"P050725967"},{"value":"P258247680"},{"value":"P258614782"},{"value":"P258602952"},{"value":"P349513764"},{"value":"P289899819"},{"value":"P460525312"},{"value":"P436055005"},{"value":"P014359050"},{"value":"P014350850"},{"value":"P159039239"},{"value":"P649142847"},{"value":"P337511802"},{"value":"P385075543"},{"value":"P014359052"},{"value":"P344495554"},{"value":"P378926290"},{"value":"P272440574"},{"value":"P258441993"},{"value":"P258651462"},{"value":"P333960652"},{"value":"P262842068"},{"value":"P333959803"},{"value":"P635593090"},{"value":"P258375035"},{"value":"P380372314"},{"value":"P185375302"},{"value":"P674912322"},{"value":"P424970802"},{"value":"P262883962"},{"value":"P014359057"},{"value":"P258995716"},{"value":"P040207994"},{"value":"P506058515"},{"value":"P703355702"},{"value":"P407595857"},{"value":"P341098822"},{"value":"P259558475"},{"value":"P649128600"},{"value":"P087128113"}],"cpycontacts_membership_beginningnominationdate":[{"value":"20210511"},{"value":"20210511"},{"value":"20210511"},{"value":"20210511"},{"value":"20210511"},{"value":"20210511"},{"value":"20210511"},{"value":"20210511"},{"value":"20190507"},{"value":"20190507"},{"value":"20190507"},{"value":"20190507"},{"value":"20190507"},{"value":"20211001"},{"value":""},{"value":"20031016"},{"value":"20201005"},{"value":"20160526"},{"value":"20160201"},{"value":"20080729"},{"value":"20211001"},{"value":"20211001"},{"value":"20040426"},{"value":"20160530"},{"value":"20060207"},{"value":"20140213"},{"value":"20110119"},{"value":"20211001"},{"value":"20110614"},{"value":"20160608"},{"value":"20211001"},{"value":"20031016"},{"value":"20211001"},{"value":"20170310"},{"value":"20211001"},{"value":"20211001"},{"value":"20200729"},{"value":"20170626"},{"value":"20211001"},{"value":"20180719"},{"value":"20211001"},{"value":"20211001"},{"value":"20170310"},{"value":"20201029"},{"value":"20211001"},{"value":"20211001"},{"value":"20211001"},{"value":"20211001"},{"value":"20170310"},{"value":"20020507"},{"value":"20190701"},{"value":"20011115"},{"value":"20020201"},{"value":"20170310"},{"value":"20160530"},{"value":"20211001"},{"value":"20021125"},{"value":"20200204"},{"value":"20170310"},{"value":"20211001"},{"value":"20200629"},{"value":"20010629"},{"value":"20220204"},{"value":"20200729"},{"value":"20211001"},{"value":"20020319"},{"value":"20170310"},{"value":"20190912"},{"value":"20211001"},{"value":"20160704"},{"value":"20170310"},{"value":"20030120"},{"value":"20211001"},{"value":"20161006"},{"value":"20140505"},{"value":"20200629"},{"value":"20211001"},{"value":"20211001"},{"value":"20210728"},{"value":"20080623"},{"value":"20211001"},{"value":"20040419"},{"value":"20211004"},{"value":"20011123"},{"value":"20211001"},{"value":"20160526"},{"value":"20211001"},{"value":"20211001"},{"value":"20170310"},{"value":"20211001"},{"value":"20201211"},{"value":"20211001"},{"value":"20030129"},{"value":"20170310"},{"value":"20211019"},{"value":"20060222"},{"value":"20160525"},{"value":"20121214"},{"value":"20211001"},{"value":"20030203"},{"value":"20140731"},{"value":"20211001"},{"value":"20211001"},{"value":"20021114"},{"value":"20150101"},{"value":"20160526"},{"value":"20211004"},{"value":"20051221"},{"value":"20220204"},{"value":"20160525"},{"value":"20211001"},{"value":"20211001"},{"value":"20190321"},{"value":"20160608"},{"value":"20211001"},{"value":"20211202"},{"value":"20170310"},{"value":"20150722"},{"value":"20211001"},{"value":"20211001"},{"value":"20211001"},{"value":"20211001"},{"value":"20211001"},{"value":"20160708"},{"value":"20161003"},{"value":"20160804"},{"value":"20211001"},{"value":"20170310"},{"value":"20211001"},{"value":"20211001"},{"value":"20211001"},{"value":"20180906"},{"value":"20211001"},{"value":"20201029"},{"value":"20220204"},{"value":"20170310"},{"value":"20200629"},{"value":"20090626"},{"value":"20070221"},{"value":"20160525"},{"value":"20211001"},{"value":"20170310"},{"value":"20180409"},{"value":"20170719"},{"value":"20170310"},{"value":"20211001"},{"value":"20200629"},{"value":"20211001"},{"value":"20141001"},{"value":"20090210"},{"value":"20211001"},{"value":"20170310"},{"value":"20211001"},{"value":"20150429"},{"value":"20200629"},{"value":"20191025"},{"value":"20211001"},{"value":"20180409"},{"value":"20211001"},{"value":"20011219"},{"value":"20060207"},{"value":"20211001"},{"value":"20160525"},{"value":"20090326"},{"value":"20211001"},{"value":"20011010"},{"value":"20140207"},{"value":"20160804"},{"value":"20160525"},{"value":"20150101"},{"value":"20060529"},{"value":"20121213"},{"value":"20060529"},{"value":"20211001"},{"value":"20211001"},{"value":"20131125"},{"value":"20011113"},{"value":"20011204"},{"value":"20211001"},{"value":"20211001"},{"value":"20080623"},{"value":"20160525"},{"value":"20210924"},{"value":"20190405"},{"value":"20191002"},{"value":"20211001"},{"value":"20021125"},{"value":"20160201"},{"value":"20211001"},{"value":"20101202"},{"value":"20190504"},{"value":"20020924"},{"value":"20170310"},{"value":"20220127"},{"value":"20170310"},{"value":"20100729"},{"value":"20121213"},{"value":"20211001"},{"value":"20211001"},{"value":"20211001"},{"value":"20200127"},{"value":"20160201"},{"value":"20170201"},{"value":"20211202"},{"value":"20201111"},{"value":"20171102"},{"value":"20211001"},{"value":"20050310"},{"value":"20180409"},{"value":"20211001"},{"value":"20211001"},{"value":"20211202"},{"value":"20170601"},{"value":"20161214"},{"value":"20170310"},{"value":"20211001"},{"value":"20211001"}],"cpycontacts_header_fullnameoriginallanguagepreferred":[{"value":"KPMG S.P.A."}],"cpycontacts_membership_function_auditors_current":[{"value":"Auditor Company"}],"sub_name":[{"value":"3D FOOD S.R.L."}],"sub_country_iso_code":[{"value":"IT"}],"sub_city":[{"value":"PARMA"}],"sub_direct_pct":[{"value":"100.00"}],"sub_total_pct":[{"value":"100.00"}],"pl":[{"value":347451000}],"cuas":[{"value":790725000}],"ebta":[{"value":291388000}],"culi":[{"value":857489000}],"closdate":[{"value":2020}],"shfd":[{"value":1754607000}],"curr":[{"value":0.92}],"fias":[{"value":1919324000}],"ncli":[{"value":97951000}],"plbt":[{"value":407082000}],"cash":[{"value":104550000}],"cf":[{"value":439908000}],"stok":[{"value":205266000}],"fiex":[{"value":11147000}],"oppl":[{"value":198931000}],"ifas":[{"value":812206000}],"tfas":[{"value":766855000}],"ofas":[{"value":340262000}],"debt":[{"value":158339000}],"ocas":[{"value":427120000}],"ltdb":[{"value":245000}],"oncl":[{"value":97706000}],"loan":[{"value":142000}],"cred":[{"value":534314000}],"ocli":[{"value":323033000}],"turn":[{"value":2813867000}],"fire":[{"value":219298000}],"mate":[{"value":1134084000}],"staf":[{"value":338407000}],"pl_previous":[{"value":170013000}],"cuas_previous":[{"value":660097000}],"ebta_previous":[{"value":239000000}],"culi_previous":[{"value":756165000}],"closdate_previous":[{"value":2019}],"shfd_previous":[{"value":2205720000}],"curr_previous":[{"value":0.87}],"fias_previous":[{"value":2398071000}],"ncli_previous":[{"value":96284000}],"plbt_previous":[{"value":193251000}],"cash_previous":[{"value":66781000}],"cf_previous":[{"value":244011000}],"stok_previous":[{"value":184734000}],"fiex_previous":[{"value":10881000}],"oppl_previous":[{"value":165002000}],"ifas_previous":[{"value":34730000}],"tfas_previous":[{"value":659865000}],"ofas_previous":[{"value":1703476000}],"debt_previous":[{"value":158996000}],"ocas_previous":[{"value":316367000}],"ltdb_previous":[{"value":371000}],"oncl_previous":[{"value":95913000}],"loan_previous":[{"value":142000}],"cred_previous":[{"value":522757000}],"ocli_previous":[{"value":233266000}],"turn_previous":[{"value":2607608000}],"fire_previous":[{"value":39130000}],"mate_previous":[{"value":1026351000}],"staf_previous":[{"value":316636000}],"opre_eur_previous":[{"value":2707921000}],"ultimate_parent_company_bvdid":{"value":"IT06426000581"},"ultimate_parent_company_name":{"value":"Guido M. Barilla E F.Lli S.R.L. & C. Societa' IN Accomandita PER Azioni"},"ultimate_parent_company_ctryiso":{"value":"IT"},"ultimate_parent_company_opre_eur":{"value":null}}
