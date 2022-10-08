@@ -1,0 +1,58 @@
+{
+    "sme": {
+        "ateco": "103100",
+        "subproductId": 35.0,
+        "UW_role": "Agent",
+        "company": {
+            "country": {
+                "value": "Italy"
+            },
+            "vatnumber": {
+                "value": "06382641006"
+            },
+            "opre_eur": {
+                "value": 2508700.0
+            },
+            "employees": {
+                "value": 12.0
+            }
+        },
+        "answers": {
+            "step1": [
+                {
+                    "slug": "third-party-liability",
+                    "value": {
+                        "typeOfSumInsured": "firstLoss",
+                        "deductible": "1000",
+                        "sumInsuredLimitOfIndemnity": 1000000.00
+                    }
+                }
+            ],
+            "step2": [
+                {
+                    "buildingId": "2",
+                    "value": {
+                        "buildingType": "reinforcedConcrete",
+                        "numberOfFloors": "first",
+                        "constructionYear": "1972between2009",
+                        "alarm": "no",
+                        "typeOfInsurance": "namedPerils",
+                        "ateco": "103100",
+                        "postcode": "00195",
+                        "province": "RM",
+                        "answer": [
+                            {
+                                "slug": "building",
+                                "value": {
+                                    "typeOfSumInsured": "firstLoss",
+                                    "deductible": "1000",
+                                    "sumInsuredLimitOfIndemnity": 50000.0
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+}
