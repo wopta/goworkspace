@@ -5,7 +5,7 @@
         "salience": 10,
         "when": " data.rct ==\"X\"",
         "then": [
-            "fx.Test(\"\")",
+          
             "out[\"third-party-liability\"].IsYuor = true",
             " out[\"third-party-liability\"].IsPremium = true",
             " out[\"third-party-liability\"].IsBase = true",
@@ -249,7 +249,7 @@
         "salience": 1,
         "when": " data.rct ==\"X\" ",
         "then": [
-            "out[\"building\"].SumInsuredLimitOfIndemnity =  Max(50000.00, Min(In.SquareMeters * fx.GetBuildigValue(in.buildingType) ,1500000.00))",
+            "out[\"building\"].SumInsuredLimitOfIndemnity =  Max(50000.00, Min(in.squareMeters * fx.GetBuildigValue(in.buildingType) ,1500000.00))",
             " Retract(\"Building\")"
         ]
     },
@@ -360,7 +360,7 @@
         "salience": 1,
         "when": " out[\"building\"].SumInsuredLimitOfIndemnity > 0 && out[\"content\"].SumInsuredLimitOfIndemnity > 0",
         "then": [
-            "out[\"machinery-breakdown\"].SumInsuredLimitOfIndemnity =  Max(5000.00, Min((Round(((out[\"content\"].SumInsuredLimitOfIndemnity * fx.GetMachineryvalue(in.businessSector))+5000)/5000) * 5000),100000))",
+            "out[\"machinery-breakdown\"].SumInsuredLimitOfIndemnity =  Max(5000.00, Min((Round(((out[\"content\"].SumInsuredLimitOfIndemnity * fx.GetMachineryvalue(in.businessSector))+ 5000)/5000) * 5000.00),100000.00))",
             "out[\"machinery-breakdown\"].IsBase = false",
             "out[\"machinery-breakdown\"].IsYuor = false",
             "out[\"machinery-breakdown\"].IsPremium = true",
@@ -410,13 +410,13 @@
         "name": "Theft",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
         "salience": 1,
-        "when": " out[\"building\"].SumInsuredLimitOfIndemnity >0 || out[\"content\"].SumInsuredLimitOfIndemnity > 0",
+        "when": " out[\"building\"].SumInsuredLimitOfIndemnity > 0 || out[\"content\"].SumInsuredLimitOfIndemnity > 0",
         "then": [
-            "out[\"theft\"].SumInsuredLimitOfIndemnity =  Max(5000.00, Min((Round(((out[\"content\"].SumInsuredLimitOfIndemnity * fx.GetTheftValue(in.businessSector))+5000)/5000) * 5000),100000))",
+            "out[\"theft\"].SumInsuredLimitOfIndemnity =  Max(5000.00, Min((Round(((out[\"content\"].SumInsuredLimitOfIndemnity * fx.GetTheftValue(in.businessSector))+5000)/5000) * 5000.00),100000.00))",
             "out[\"theft\"].IsBase = false",
             "out[\"theft\"].IsYuor = true",
             "out[\"theft\"].IsPremium = true",
-            " Retract(\"Theft\")"
+            "Retract(\"Theft\")"
         ]
     },
     {
@@ -438,7 +438,7 @@
         "salience": 1,
         "when": " data.eletronic == \"X\" && out[\"content\"].SumInsuredLimitOfIndemnity > 0",
         "then": [
-            "out[\"electronic-equipment\"].SumInsuredLimitOfIndemnity = Max(5000.00, Min((Round(((out[\"content\"].SumInsuredLimitOfIndemnity * fx.GetTheftValue(in.businessSector))+5000)/5000) * 5000),100000))",
+            "out[\"electronic-equipment\"].SumInsuredLimitOfIndemnity = Max(5000.00, Min((Round(((out[\"content\"].SumInsuredLimitOfIndemnity * fx.GetTheftValue(in.businessSector)) + 5000)/5000) * 5000.00),100000.00))",
             "out[\"electronic-equipment\"].IsBase = false",
             "out[\"electronic-equipment\"].IsYuor = true",
             "out[\"electronic-equipment\"].IsPremium = true",
@@ -499,6 +499,18 @@
     },
     {
         "name": "Assistance",
+        "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
+        "salience": 1,
+        "when": " out[\"building\"].SumInsuredLimitOfIndemnity > 0 || out[\"content\"].SumInsuredLimitOfIndemnity > 0",
+        "then": [
+            "out[\"assistance\"].IsBase = true",
+            "out[\"assistance\"].IsYuor = true",
+            "out[\"assistance\"].IsPremium = true",
+            " Retract(\"Assistance\")"
+        ]
+    },
+    {
+        "name": "selfInsurance 500",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
         "salience": 1,
         "when": " out[\"building\"].SumInsuredLimitOfIndemnity > 0 || out[\"content\"].SumInsuredLimitOfIndemnity > 0",

@@ -133,7 +133,7 @@
     "name": "RctPropertyDamageDueToTheft",
     "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
     "salience": 1,
-    "when": " data.damageTheft     ==\"X\"",
+    "when": " data.damageTheft==\"X\"",
     "then": [
         "out[\"property-damage-due-to-theft\"].SumInsuredLimitOfIndemnity =out[\"third-party-liability\"].SumInsuredLimitOfIndemnity",
 		"out[\"property-damage-due-to-theft\"].IsBase = false",
@@ -146,7 +146,7 @@
     "name": "RctDamageToGoodsCourseOfWorks",
     "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
     "salience": 1,
-    "when": " data.damageThing     ==\"X\"",
+    "when": " data.damageThing ==\"X\"",
     "then": [
         "out[\"damage-to-goods-course-of-works\"].SumInsuredLimitOfIndemnity =out[\"third-party-liability\"].SumInsuredLimitOfIndemnity",
 		"out[\"damage-to-goods-course-of-works\"].IsBase = false",
@@ -185,9 +185,9 @@
     "name": "EmployersLiability",
     "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
     "salience": 1,
-    "when": " data.rct    ==\"X\" && in.employer >= 2",
+    "when": " data.rct ==\"X\" && in.employer >= 2",
     "then": [
-        "out[\"employers-liability\"].SumInsuredLimitOfIndemnity =out[\"third-party-liability\"].SumInsuredLimitOfIndemnity",
+        "out[\"employers-liability\"].SumInsuredLimitOfIndemnity = out[\"third-party-liability\"].SumInsuredLimitOfIndemnity",
 		"out[\"employers-liability\"].IsBase = true",
 		"out[\"employers-liability\"].IsYuor = true",
 		"out[\"employers-liabilityemployers-liability\"].IsPremium = true",
