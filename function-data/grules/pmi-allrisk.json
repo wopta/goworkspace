@@ -2,20 +2,21 @@
     {
         "name": "Rct",
         "desc": "check rct base ",
-        "salience": 10,
+        "salience": 100,
         "when": " data.rct ==\"X\"",
         "then": [
           
             "out[\"third-party-liability\"].IsYuor = true",
             " out[\"third-party-liability\"].IsPremium = true",
             " out[\"third-party-liability\"].IsBase = true",
+            "Log(\"activate rct true\")",
             " Retract(\"Rct\")"
         ]
     },
     {
         "name": "RctEmployer",
         "desc": "check employer value   <4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 99,
         "when": " data.rct ==\"X\" && in.employer <= 4 ",
         "then": [
             " out[\"third-party-liability\"].SumInsuredLimitOfIndemnity = 1000000.00 ",
@@ -25,7 +26,7 @@
     {
         "name": "RctEmployer2",
         "desc": "check employer value <4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 98,
         "when": " data.rct ==\"X\" && in.employer > 4 ",
         "then": [
             " out[\"third-party-liability\"].SumInsuredLimitOfIndemnity = 1500000.00 ",
@@ -35,7 +36,7 @@
     {
         "name": "RctRevenue1",
         "desc": "check employer value   <4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 97,
         "when": " data.rct ==\"X\" && in.revenue <= 75000 ",
         "then": [
             " out[\"third-party-liability\"].Deductible = \"0\"",
@@ -45,7 +46,7 @@
     {
         "name": "RctRevenue2",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 96,
         "when": " data.rct ==\"X\" && in.revenue > 75000 && in.revenue < 150000 ",
         "then": [
             " out[\"third-party-liability\"].Deductible = \"500\"",
@@ -55,7 +56,7 @@
     {
         "name": "RctRevenue3",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience":95,
         "when": " data.rct ==\"X\" && in.revenue > 150000 && in.revenue < 500000 ",
         "then": [
             " out[\"third-party-liability\"].Deductible = \"1000\"",
@@ -65,7 +66,7 @@
     {
         "name": "RctRevenue4",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 94,
         "when": " data.rct ==\"X\" && in.revenue > 1500000 && in.revenue < 1500000 ",
         "then": [
             " out[\"third-party-liability\"].Deductible = \"2000\"",
@@ -75,7 +76,7 @@
     {
         "name": "CheckRctVehicle",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 93,
         "when": " data.rcVehicle  ==\"X\"",
         "then": [
             "out[\"damage-to-goods-in-custody\"].SumInsuredLimitOfIndemnity =out[\"third-party-liability\"].SumInsuredLimitOfIndemnity",
@@ -89,7 +90,7 @@
     {
         "name": "RctDefectLiabilityWorkmanships",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 92,
         "when": " data.rcpo   ==\"X\"",
         "then": [
             "out[\"defect-liability-workmanships\"].SumInsuredLimitOfIndemnity =out[\"third-party-liability\"].SumInsuredLimitOfIndemnity",
@@ -103,7 +104,7 @@
     {
         "name": "RctDefectLiability12Months",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 91,
         "when": " data.rcp12   ==\"X\"",
         "then": [
             "out[\"defect-liability-12-months\"].SumInsuredLimitOfIndemnity =out[\"third-party-liability\"].SumInsuredLimitOfIndemnity",
@@ -117,7 +118,7 @@
     {
         "name": "RctDefectliability2008",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 90,
         "when": " data.rcp2008    ==\"X\"",
         "then": [
             "out[\"defect-liability-dm-37-2008\"].SumInsuredLimitOfIndemnity =out[\"third-party-liability\"].SumInsuredLimitOfIndemnity",
@@ -131,7 +132,7 @@
     {
         "name": "RctPropertyDamageDueToTheft",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 89,
         "when": " data.damageTheft     ==\"X\"",
         "then": [
             "out[\"property-damage-due-to-theft\"].SumInsuredLimitOfIndemnity =out[\"third-party-liability\"].SumInsuredLimitOfIndemnity",           
@@ -145,7 +146,7 @@
     {
         "name": "RctDamageToGoodsCourseOfWorks",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 88,
         "when": " data.damageThing     ==\"X\"",
         "then": [
             "out[\"damage-to-goods-course-of-works\"].SumInsuredLimitOfIndemnity =out[\"third-party-liability\"].SumInsuredLimitOfIndemnity",
@@ -159,7 +160,7 @@
     {
         "name": "RctThirdPartyLiabilityConstructionCompany",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 87,
         "when": " data.rcCostruction    ==\"X\"",
         "then": [
             "out[\"third-party-liability-construction-company\"].SumInsuredLimitOfIndemnity =out[\"third-party-liability\"].SumInsuredLimitOfIndemnity",
@@ -173,7 +174,7 @@
     {
         "name": "EmployersLiability",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 86,
         "when": " data.rct== \"X\" && in.employer >= 2",
         "then": [
             "out[\"employers-liability\"].SumInsuredLimitOfIndemnity =out[\"third-party-liability\"].SumInsuredLimitOfIndemnity",
@@ -186,7 +187,7 @@
     {
         "name": "CheckEmployersLiabilityEdili",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 85,
         "when": " data.rct ==\"X\" && in.employer >= 2 && in.businessSector ==\"edili\"",
         "then": [
             "out[\"employers-liability\"].SumInsuredLimitOfIndemnity = 500000.00",
@@ -199,7 +200,7 @@
     {
         "name": "ProductLiability",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 84,
         "when": " data.rcoProd ==\"X\" && in.employer >= 2 && in.businessSector ==\"edili\"",
         "then": [
             "out[\"product-liability\"].SumInsuredLimitOfIndemnity = 250000.00",
@@ -212,7 +213,7 @@
     {
         "name": "LegalDefence",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 83,
         "when": " data.rct ==\"X\" ",
         "then": [
             "out[\"legal-defence\"].SumInsuredLimitOfIndemnity = 500000.00",
@@ -225,7 +226,7 @@
     {
         "name": "Cyber",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 81,
         "when": " data.rct ==\"X\" ",
         "then": [
             "out[\"cyber\"].SumInsuredLimitOfIndemnity = 500000.00",
@@ -239,7 +240,7 @@
     {
         "name": "BuildingAndContent",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 80,
         "when": " data.rct ==\"X\" ",
         "then": [
             "out[\"building\"].IsBase = true",
@@ -254,7 +255,7 @@
     {
         "name": "Building",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 79,
         "when": " data.rct ==\"X\" ",
         "then": [
             "out[\"building\"].SumInsuredLimitOfIndemnity =  Max(50000.00, Min(in.squareMeters * fx.GetBuildigValue(in.buildingType) ,1500000.00))",
@@ -264,7 +265,7 @@
     {
         "name": "LeaseHoldersInterest",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 78,
         "when": " data.rct ==\"X\" ",
         "then": [
             "out[\"lease-holders-interest\"].SumInsuredLimitOfIndemnity =  Max(50000.00, Min(in.squareMeters * fx.GetBuildigValue(in.buildingType) ,1500000.00))",
@@ -275,7 +276,7 @@
     {
         "name": "Content",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 77,
         "when": " data.rct ==\"X\" ",
         "then": [
             "out[\"content\"].SumInsuredLimitOfIndemnity = Max(30000.00, Min(( out[\"building\"].SumInsuredLimitOfIndemnity * fx.GetContentValue(in.businessSector)),300000.00))",
@@ -286,7 +287,7 @@
     {
         "name": "ThirdPartyRecourse",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 76,
         "when": " data.fire ==\"X\" && out[\"building\"].SumInsuredLimitOfIndemnity > 0 && out[\"content\"].SumInsuredLimitOfIndemnity > 0",
         "then": [
             "out[\"third-party-recourse\"].SumInsuredLimitOfIndemnity = 150000.00",
@@ -300,7 +301,7 @@
     {
         "name": "WaterDamage",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 75,
         "when": " out[\"building\"].SumInsuredLimitOfIndemnity > 0 && out[\"content\"].SumInsuredLimitOfIndemnity > 0",
         "then": [
             "out[\"water-damage\"].SumInsuredLimitOfIndemnity = Max(5000.00, Min(( out[\"building\"].SumInsuredLimitOfIndemnity * 0.05)+(out[\"content\"].SumInsuredLimitOfIndemnity * 0.10),10000.00),100000.00)",
@@ -314,7 +315,7 @@
     {
         "name": "PowerSurge",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 74,
         "when": " out[\"building\"].SumInsuredLimitOfIndemnity > 0 && out[\"content\"].SumInsuredLimitOfIndemnity > 0",
         "then": [
             "out[\"power-surge\"].SumInsuredLimitOfIndemnity = Max(5000.00, Min(( out[\"building\"].SumInsuredLimitOfIndemnity * 0.03)+(out[\"content\"].SumInsuredLimitOfIndemnity * 0.10),5000.00),50000.00)",
@@ -328,7 +329,7 @@
     {
         "name": "AtmosphericEvent",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 73,
         "when": " out[\"building\"].SumInsuredLimitOfIndemnity > 0 && out[\"content\"].SumInsuredLimitOfIndemnity > 0",
         "then": [
             "out[\"atmospheric-event\"].SumInsuredLimitOfIndemnity =  out[\"building\"].SumInsuredLimitOfIndemnity + out[\"content\"].SumInsuredLimitOfIndemnity",
@@ -342,7 +343,7 @@
     {
         "name": "Terrorism",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 72,
         "when": " out[\"building\"].SumInsuredLimitOfIndemnity > 0 && out[\"content\"].SumInsuredLimitOfIndemnity > 0",
         "then": [
             "out[\"terrorism\"].SumInsuredLimitOfIndemnity =  out[\"building\"].SumInsuredLimitOfIndemnity + out[\"content\"].SumInsuredLimitOfIndemnity",
@@ -356,7 +357,7 @@
     {
         "name": "SociopoliticalEvent",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 71,
         "when": " out[\"building\"].SumInsuredLimitOfIndemnity > 0 && out[\"content\"].SumInsuredLimitOfIndemnity > 0",
         "then": [
             "out[\"sociopolitical-event\"].SumInsuredLimitOfIndemnity =  out[\"building\"].SumInsuredLimitOfIndemnity + out[\"content\"].SumInsuredLimitOfIndemnity",
@@ -370,7 +371,7 @@
     {
         "name": "BurstPipe",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 70,
         "when": " out[\"building\"].SumInsuredLimitOfIndemnity > 0 && out[\"content\"].SumInsuredLimitOfIndemnity > 0",
         "then": [
             "out[\"burst-pipe\"].SumInsuredLimitOfIndemnity =  out[\"building\"].SumInsuredLimitOfIndemnity + out[\"content\"].SumInsuredLimitOfIndemnity",
@@ -384,7 +385,7 @@
     {
         "name": "RiverFlood",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 69,
         "when": " out[\"building\"].SumInsuredLimitOfIndemnity > 0 && out[\"content\"].SumInsuredLimitOfIndemnity > 0",
         "then": [
             "out[\"river-flood\"].SumInsuredLimitOfIndemnity =  out[\"building\"].SumInsuredLimitOfIndemnity + out[\"content\"].SumInsuredLimitOfIndemnity",
@@ -398,7 +399,7 @@
     {
         "name": "Earthquake",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 68,
         "when": " out[\"building\"].SumInsuredLimitOfIndemnity > 0 && out[\"content\"].SumInsuredLimitOfIndemnity > 0",
         "then": [
             "out[\"earthquake\"].SumInsuredLimitOfIndemnity =  out[\"building\"].SumInsuredLimitOfIndemnity + out[\"content\"].SumInsuredLimitOfIndemnity",
@@ -412,7 +413,7 @@
     {
         "name": "MachineryBreakdown",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 67,
         "when": " out[\"building\"].SumInsuredLimitOfIndemnity > 0 && out[\"content\"].SumInsuredLimitOfIndemnity > 0",
         "then": [
             "out[\"machinery-breakdown\"].SumInsuredLimitOfIndemnity =  Max(5000.00, Min((Round(((out[\"content\"].SumInsuredLimitOfIndemnity * fx.GetMachineryvalue(in.businessSector))+ 5000)/5000) * 5000.00),100000.00))",
@@ -426,7 +427,7 @@
     {
         "name": "Glass",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 66,
         "when": " out[\"building\"].SumInsuredLimitOfIndemnity > 0 && out[\"content\"].SumInsuredLimitOfIndemnity > 0",
         "then": [
             "out[\"glass\"].SumInsuredLimitOfIndemnity =  2500.00",
@@ -440,7 +441,7 @@
     {
         "name": "PropertyOwnersLiability",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 65,
         "when": " out[\"building\"].SumInsuredLimitOfIndemnity >0 || out[\"content\"].SumInsuredLimitOfIndemnity > 0",
         "then": [
             "out[\"property-owners-liability\"].SumInsuredLimitOfIndemnity =  1000000.00",
@@ -454,7 +455,7 @@
     {
         "name": "EnvironmentalLiability",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 64,
         "when": " out[\"building\"].SumInsuredLimitOfIndemnity >0 || out[\"content\"].SumInsuredLimitOfIndemnity > 0",
         "then": [
             "out[\"environmental-liability\"].SumInsuredLimitOfIndemnity =  100000.00",
@@ -468,7 +469,7 @@
     {
         "name": "Theft",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 63,
         "when": " out[\"building\"].SumInsuredLimitOfIndemnity > 0 || out[\"content\"].SumInsuredLimitOfIndemnity > 0",
         "then": [
             "out[\"theft\"].SumInsuredLimitOfIndemnity =  Max(5000.00, Min((Round(((out[\"content\"].SumInsuredLimitOfIndemnity * fx.GetTheftValue(in.businessSector))+5000)/5000) * 5000.00),100000.00))",
@@ -482,7 +483,7 @@
     {
         "name": "ValuablesInSafeStrongrooms",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 62,
         "when": " out[\"building\"].SumInsuredLimitOfIndemnity > 0 || out[\"content\"].SumInsuredLimitOfIndemnity > 0",
         "then": [
             "out[\"valuables-in-safe-strongrooms\"].SumInsuredLimitOfIndemnity =  5000.00",
@@ -496,7 +497,7 @@
     {
         "name": "Valuables",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 61,
         "when": " out[\"building\"].SumInsuredLimitOfIndemnity > 0 || out[\"content\"].SumInsuredLimitOfIndemnity > 0",
         "then": [
             "out[\"valuables\"].SumInsuredLimitOfIndemnity =  2500.00",
@@ -510,7 +511,7 @@
     {
         "name": "ElectronicEquipment",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 60,
         "when": " data.eletronic == \"X\" && out[\"content\"].SumInsuredLimitOfIndemnity > 0",
         "then": [
             "out[\"electronic-equipment\"].SumInsuredLimitOfIndemnity = Max(5000.00, Min((Round(((out[\"content\"].SumInsuredLimitOfIndemnity * fx.GetTheftValue(in.businessSector)) + 5000)/5000) * 5000.00),100000.00))",
@@ -524,7 +525,7 @@
     {
         "name": "IncreasedCostOfWorking",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 59,
         "when": " out[\"building\"].SumInsuredLimitOfIndemnity > 0 || out[\"content\"].SumInsuredLimitOfIndemnity > 0",
         "then": [
             "out[\"increased-cost-of-working\"].SumInsuredLimitOfIndemnity =  10000.00",
@@ -538,7 +539,7 @@
     {
         "name": "SoftwareUnderLicense",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 58,
         "when": " out[\"building\"].SumInsuredLimitOfIndemnity > 0 || out[\"content\"].SumInsuredLimitOfIndemnity > 0",
         "then": [
             "out[\"software-under-license\"].SumInsuredLimitOfIndemnity =  10000.00",
@@ -552,7 +553,7 @@
     {
         "name": "RestorationOfData",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 57,
         "when": " out[\"building\"].SumInsuredLimitOfIndemnity > 0 || out[\"content\"].SumInsuredLimitOfIndemnity > 0",
         "then": [
             "out[\"restoration-of-data\"].SumInsuredLimitOfIndemnity =   (out[\"electronic-equipment\"].SumInsuredLimitOfIndemnity * 0.10)",
@@ -567,7 +568,7 @@
     {
         "name": "BusinessInterruption",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 56,
         "when": " out[\"building\"].SumInsuredLimitOfIndemnity > 0 || out[\"content\"].SumInsuredLimitOfIndemnity > 0",
         "then": [
             "out[\"business-interruption\"].SumInsuredLimitOfIndemnity =  250.00",
@@ -581,7 +582,7 @@
     {
         "name": "Assistance",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 55,
         "when": " out[\"building\"].SumInsuredLimitOfIndemnity > 0 || out[\"content\"].SumInsuredLimitOfIndemnity > 0",
         "then": [
             "out[\"assistance\"].IsBase = true",
@@ -591,30 +592,30 @@
         ]
     },
     {
-        "name": "selfInsurance500",
+        "name": "SelfInsurance500",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
-        "salience": 1,
+        "salience": 54,
         "when": "  out[\"third-party-liability\"].Deductible==\"500\"",
 
         "then": [
-            "out[\"atmospheric-event\"].selfInsurance = \"0.10\"",
-            "out[\"damage-to-goods-course-of-works\"].selfInsurance = \"0.10\"",
-            "out[\"damage-to-goods-in-custody\"].selfInsurance = \"0.10\"",
-            "out[\"defect-liability-12-months\"].selfInsurance = \"0.10\"",
-            "out[\"defect-liability-dm-37-2008\"].selfInsurance = \"0.10\"",
-            "out[\"defect-liability-workmanships\"].selfInsurance = \"0.10\"",
-            "out[\"employers-liability\"].selfInsurance = \"0.10\"",
-            "out[\"environmental-liability\"].selfInsurance = \"0.10\"",
-            "out[\"power-surge\"].selfInsurance = \"0.10\"",
-            "out[\"earthquake\"].selfInsurance = \"0.10\"",
-            "out[\"product-liability\"].selfInsurance = \"0.10\"",
-            "out[\"property-damage-due-to-theft\"].selfInsurance = \"0.10\"",
-            "out[\"river-flood\"].selfInsurance = \"0.10\"",
-            "out[\"sociopolitical-event\"].selfInsurance = \"0.10\"",
-            "out[\"terrorism\"].selfInsurance = \"0.10\"",
-            "out[\"third-party-recourse\"].selfInsurance = \"0.10\"",
-            "out[\"water-damage\"].selfInsurance = \"0.10\"",
-            " Retract(\"selfInsurance500\")"
+            "out[\"atmospheric-event\"].SelfInsurance = \"0.10\"",
+            "out[\"damage-to-goods-course-of-works\"].SelfInsurance = \"0.10\"",
+            "out[\"damage-to-goods-in-custody\"].SelfInsurance = \"0.10\"",
+            "out[\"defect-liability-12-months\"].SelfInsurance = \"0.10\"",
+            "out[\"defect-liability-dm-37-2008\"].SelfInsurance = \"0.10\"",
+            "out[\"defect-liability-workmanships\"].SelfInsurance = \"0.10\"",
+            "out[\"employers-liability\"].SelfInsurance = \"0.10\"",
+            "out[\"environmental-liability\"].SelfInsurance = \"0.10\"",
+            "out[\"power-surge\"].SelfInsurance = \"0.10\"",
+            "out[\"earthquake\"].SelfInsurance = \"0.10\"",
+            "out[\"product-liability\"].SelfInsurance = \"0.10\"",
+            "out[\"property-damage-due-to-theft\"].SelfInsurance = \"0.10\"",
+            "out[\"river-flood\"].SelfInsurance = \"0.10\"",
+            "out[\"sociopolitical-event\"].SelfInsurance = \"0.10\"",
+            "out[\"terrorism\"].SelfInsurance = \"0.10\"",
+            "out[\"third-party-recourse\"].SelfInsurance = \"0.10\"",
+            "out[\"water-damage\"].SelfInsurance = \"0.10\"",
+            " Retract(\"SelfInsurance500\")"
         ]
     }
 ]

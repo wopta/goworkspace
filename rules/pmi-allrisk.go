@@ -77,7 +77,7 @@ func PmiAllrisk(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Println(string(enrichByte))
-	lib.RulesFromJson(groule, out(), request, enrichByte, w)
+	lib.RulesFromJson(groule, initCoverage(), request, enrichByte, w)
 
 }
 
@@ -473,4 +473,373 @@ func out() []byte {
 			"message": ""
 		}
 	}`)
+}
+
+type Coverage struct {
+	Type                       string
+	TypeOfSumInsured           string
+	Deductible                 string
+	SumInsuredLimitOfIndemnity float64
+	Slug                       string
+	SelfInsurance              float64
+	IsBase                     bool
+	IsYuor                     bool
+	IsPremium                  bool
+}
+
+func initCoverage() map[string]*Coverage {
+
+	var res = make(map[string]*Coverage)
+	res["third-party-liability"] = &Coverage{
+		Slug:                       "third-party-liability",
+		TypeOfSumInsured:           "namedPerils",
+		Deductible:                 "0",
+		SumInsuredLimitOfIndemnity: 0.0,
+		IsBase:                     false,
+		IsYuor:                     false,
+		IsPremium:                  false,
+	}
+	res["damage-to-goods-in-custody"] = &Coverage{
+		Slug:                       "damage-to-goods-in-custody",
+		TypeOfSumInsured:           "namedPerils",
+		Deductible:                 "0",
+		SumInsuredLimitOfIndemnity: 0,
+		IsBase:                     false,
+		IsYuor:                     false,
+		IsPremium:                  false,
+	}
+	res["defect-liability-workmanships"] = &Coverage{
+		Slug:                       "defect-liability-workmanships",
+		TypeOfSumInsured:           "namedPerils",
+		Deductible:                 "0",
+		SumInsuredLimitOfIndemnity: 0,
+		IsBase:                     false,
+		IsYuor:                     false,
+		IsPremium:                  false,
+	}
+	res["defect-liability-12-months"] = &Coverage{
+		Slug:                       "defect-liability-12-months",
+		TypeOfSumInsured:           "namedPerils",
+		Deductible:                 "0",
+		SumInsuredLimitOfIndemnity: 0,
+		IsBase:                     false,
+		IsYuor:                     false,
+		IsPremium:                  false,
+	}
+	res["defect-liability-dm-37-2008"] = &Coverage{
+		Slug:                       "defect-liability-dm-37-2008",
+		TypeOfSumInsured:           "namedPerils",
+		Deductible:                 "0",
+		SumInsuredLimitOfIndemnity: 0,
+		IsBase:                     false,
+		IsYuor:                     false,
+		IsPremium:                  false,
+	}
+	res["property-damage-due-to-theft"] = &Coverage{
+		Slug:                       "property-damage-due-to-theft",
+		TypeOfSumInsured:           "namedPerils",
+		Deductible:                 "0",
+		SumInsuredLimitOfIndemnity: 0,
+		IsBase:                     false,
+		IsYuor:                     false,
+		IsPremium:                  false,
+	}
+	res["damage-to-goods-course-of-works"] = &Coverage{
+		Slug:                       "damage-to-goods-course-of-works",
+		TypeOfSumInsured:           "namedPerils",
+		Deductible:                 "0",
+		SumInsuredLimitOfIndemnity: 0,
+		IsBase:                     false,
+		IsYuor:                     false,
+		IsPremium:                  false,
+	}
+	res["employers-liability"] = &Coverage{
+		Slug:                       "employers-liability",
+		TypeOfSumInsured:           "namedPerils",
+		Deductible:                 "0",
+		SumInsuredLimitOfIndemnity: 0,
+		IsBase:                     false,
+		IsYuor:                     false,
+		IsPremium:                  false,
+	}
+	res["product-liability"] = &Coverage{
+		Slug:                       "product-liability",
+		TypeOfSumInsured:           "namedPerils",
+		Deductible:                 "0",
+		SumInsuredLimitOfIndemnity: 0,
+		IsBase:                     false,
+		IsYuor:                     false,
+		IsPremium:                  false,
+	}
+	res["third-party-liability-construction-company"] = &Coverage{
+		Slug:                       "third-party-liability-construction-company",
+		TypeOfSumInsured:           "namedPerils",
+		Deductible:                 "0",
+		SumInsuredLimitOfIndemnity: 0,
+		IsBase:                     false,
+		IsYuor:                     false,
+		IsPremium:                  false,
+	}
+	res["legal-defence"] = &Coverage{
+		Slug:                       "legal-defence",
+		TypeOfSumInsured:           "namedPerils",
+		Deductible:                 "0",
+		SumInsuredLimitOfIndemnity: 0,
+		IsBase:                     false,
+		IsYuor:                     false,
+		IsPremium:                  false,
+	}
+	res["cyber"] = &Coverage{
+		Slug:                       "cyber",
+		TypeOfSumInsured:           "namedPerils",
+		Deductible:                 "0",
+		SumInsuredLimitOfIndemnity: 0,
+		IsBase:                     false,
+		IsYuor:                     false,
+		IsPremium:                  false,
+	}
+	res["building"] = &Coverage{
+		Slug:                       "building",
+		TypeOfSumInsured:           "namedPerils",
+		Deductible:                 "0",
+		SumInsuredLimitOfIndemnity: 0.0,
+		IsBase:                     false,
+		IsYuor:                     false,
+		IsPremium:                  false,
+	}
+	res["content"] = &Coverage{
+		Slug:                       "content",
+		TypeOfSumInsured:           "namedPerils",
+		Deductible:                 "0",
+		SumInsuredLimitOfIndemnity: 0,
+		IsBase:                     false,
+		IsYuor:                     false,
+		IsPremium:                  false,
+	}
+	res["lease-holders-interest"] = &Coverage{
+		Slug:                       "lease-holders-interest",
+		TypeOfSumInsured:           "namedPerils",
+		Deductible:                 "0",
+		SumInsuredLimitOfIndemnity: 0,
+		IsBase:                     false,
+		IsYuor:                     false,
+		IsPremium:                  false,
+	}
+	res["burst-pipe"] = &Coverage{
+		Slug:                       "burst-pipe",
+		TypeOfSumInsured:           "namedPerils",
+		Deductible:                 "0",
+		SumInsuredLimitOfIndemnity: 0,
+		IsBase:                     false,
+		IsYuor:                     false,
+		IsPremium:                  false,
+	}
+	res["power-surge"] = &Coverage{
+		Slug:                       "power-surge",
+		TypeOfSumInsured:           "namedPerils",
+		Deductible:                 "0",
+		SumInsuredLimitOfIndemnity: 0,
+		IsBase:                     false,
+		IsYuor:                     false,
+		IsPremium:                  false,
+	}
+	res["atmospheric-event"] = &Coverage{
+		Slug:                       "atmospheric-event",
+		TypeOfSumInsured:           "namedPerils",
+		Deductible:                 "0",
+		SumInsuredLimitOfIndemnity: 0,
+		IsBase:                     false,
+		IsYuor:                     false,
+		IsPremium:                  false,
+	}
+	res["sociopolitical-event"] = &Coverage{
+		Slug:                       "sociopolitical-event",
+		TypeOfSumInsured:           "namedPerils",
+		Deductible:                 "0",
+		SumInsuredLimitOfIndemnity: 0,
+		IsBase:                     false,
+		IsYuor:                     false,
+		IsPremium:                  false,
+	}
+	res["terrorism"] = &Coverage{
+		Slug:                       "terrorism",
+		TypeOfSumInsured:           "namedPerils",
+		Deductible:                 "0",
+		SumInsuredLimitOfIndemnity: 0,
+		IsBase:                     false,
+		IsYuor:                     false,
+		IsPremium:                  false,
+	}
+	res["earthquake"] = &Coverage{
+		Slug:                       "earthquake",
+		TypeOfSumInsured:           "namedPerils",
+		Deductible:                 "0",
+		SumInsuredLimitOfIndemnity: 0,
+		IsBase:                     false,
+		IsYuor:                     false,
+		IsPremium:                  false,
+	}
+	res["river-flood"] = &Coverage{
+		Slug:                       "river-flood",
+		TypeOfSumInsured:           "namedPerils",
+		Deductible:                 "0",
+		SumInsuredLimitOfIndemnity: 0,
+		IsBase:                     false,
+		IsYuor:                     false,
+		IsPremium:                  false,
+	}
+	res["water-damage"] = &Coverage{
+		Slug:                       "water-damage",
+		TypeOfSumInsured:           "namedPerils",
+		Deductible:                 "0",
+		SumInsuredLimitOfIndemnity: 0,
+		IsBase:                     false,
+		IsYuor:                     false,
+		IsPremium:                  false,
+	}
+	res["glass"] = &Coverage{
+		Slug:                       "glass",
+		TypeOfSumInsured:           "namedPerils",
+		Deductible:                 "0",
+		SumInsuredLimitOfIndemnity: 0,
+		IsBase:                     false,
+		IsYuor:                     false,
+		IsPremium:                  false,
+	}
+	res["machinery-breakdown"] = &Coverage{
+		Slug:                       "machinery-breakdown",
+		TypeOfSumInsured:           "namedPerils",
+		Deductible:                 "0",
+		SumInsuredLimitOfIndemnity: 0,
+		IsBase:                     false,
+		IsYuor:                     false,
+		IsPremium:                  false,
+	}
+	res["third-party-recourse"] = &Coverage{
+		Slug:                       "third-party-recourse",
+		TypeOfSumInsured:           "namedPerils",
+		Deductible:                 "0",
+		SumInsuredLimitOfIndemnity: 0,
+		IsBase:                     false,
+		IsYuor:                     false,
+		IsPremium:                  false,
+	}
+	res["theft"] = &Coverage{
+		Slug:                       "theft",
+		TypeOfSumInsured:           "namedPerils",
+		Deductible:                 "0",
+		SumInsuredLimitOfIndemnity: 0,
+		IsBase:                     false,
+		IsYuor:                     false,
+		IsPremium:                  false,
+	}
+	res["valuables-in-safe-strongrooms"] = &Coverage{
+		Slug:                       "valuables-in-safe-strongrooms",
+		TypeOfSumInsured:           "namedPerils",
+		Deductible:                 "0",
+		SumInsuredLimitOfIndemnity: 0,
+		IsBase:                     false,
+		IsYuor:                     false,
+		IsPremium:                  false,
+	}
+	res["valuables"] = &Coverage{
+		Slug:                       "valuables",
+		TypeOfSumInsured:           "namedPerils",
+		Deductible:                 "0",
+		SumInsuredLimitOfIndemnity: 0,
+		IsBase:                     false,
+		IsYuor:                     false,
+		IsPremium:                  false,
+	}
+	res["electronic-equipment"] = &Coverage{
+		Slug:                       "electronic-equipment",
+		TypeOfSumInsured:           "namedPerils",
+		Deductible:                 "0",
+		SumInsuredLimitOfIndemnity: 0,
+		IsBase:                     false,
+		IsYuor:                     false,
+		IsPremium:                  false,
+	}
+	res["increased-cost-of-working"] = &Coverage{
+		Slug:                       "increased-cost-of-working",
+		TypeOfSumInsured:           "namedPerils",
+		Deductible:                 "0",
+		SumInsuredLimitOfIndemnity: 0,
+		IsBase:                     false,
+		IsYuor:                     false,
+		IsPremium:                  false,
+	}
+	res["restoration-of-data"] = &Coverage{
+		Slug:                       "restoration-of-data",
+		TypeOfSumInsured:           "namedPerils",
+		Deductible:                 "0",
+		SumInsuredLimitOfIndemnity: 0,
+		IsBase:                     false,
+		IsYuor:                     false,
+		IsPremium:                  false,
+	}
+	res["software-under-license"] = &Coverage{
+		Slug:                       "software-under-license",
+		TypeOfSumInsured:           "namedPerils",
+		Deductible:                 "0",
+		SumInsuredLimitOfIndemnity: 0,
+		IsBase:                     false,
+		IsYuor:                     false,
+		IsPremium:                  false,
+	}
+	res["business-interruption"] = &Coverage{
+		Slug:                       "business-interruption",
+		TypeOfSumInsured:           "namedPerils",
+		Deductible:                 "0",
+		SumInsuredLimitOfIndemnity: 0,
+		IsBase:                     false,
+		IsYuor:                     false,
+		IsPremium:                  false,
+	}
+	res["property-owners-liability"] = &Coverage{
+		Slug:                       "property-owners-liability",
+		TypeOfSumInsured:           "namedPerils",
+		Deductible:                 "0",
+		SumInsuredLimitOfIndemnity: 0,
+		IsBase:                     false,
+		IsYuor:                     false,
+		IsPremium:                  false,
+	}
+	res["property-owners-liability"] = &Coverage{
+		Slug:                       "property-owners-liability",
+		TypeOfSumInsured:           "namedPerils",
+		Deductible:                 "0",
+		SumInsuredLimitOfIndemnity: 0,
+		IsBase:                     false,
+		IsYuor:                     false,
+		IsPremium:                  false,
+	}
+	res["software-under-license"] = &Coverage{
+		Slug:                       "software-under-license",
+		TypeOfSumInsured:           "namedPerils",
+		Deductible:                 "0",
+		SumInsuredLimitOfIndemnity: 0,
+		IsBase:                     false,
+		IsYuor:                     false,
+		IsPremium:                  false,
+	}
+	res["environmental-liability"] = &Coverage{
+		Slug:                       "environmental-liability",
+		TypeOfSumInsured:           "namedPerils",
+		Deductible:                 "0",
+		SumInsuredLimitOfIndemnity: 0,
+		IsBase:                     false,
+		IsYuor:                     false,
+		IsPremium:                  false,
+	}
+	res["assistance"] = &Coverage{
+		Slug:                       "assistance",
+		TypeOfSumInsured:           "namedPerils",
+		Deductible:                 "0",
+		SumInsuredLimitOfIndemnity: 0,
+		IsBase:                     false,
+		IsYuor:                     false,
+		IsPremium:                  false,
+	}
+	return res
 }

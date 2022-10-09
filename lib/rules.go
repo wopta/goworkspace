@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -11,7 +12,7 @@ import (
 	"github.com/hyperjumptech/grule-rule-engine/pkg"
 )
 
-func RulesFromJson(groule []byte, out []byte, in []byte, data []byte, w http.ResponseWriter) {
+func RulesFromJson(groule []byte, out interface{}, in []byte, data []byte, w http.ResponseWriter) {
 
 	log.Println("RulesFromJson")
 	//rules := lib.CheckEbyte(ioutil.ReadFile("pmi-allrisk.json"))
@@ -23,7 +24,8 @@ func RulesFromJson(groule []byte, out []byte, in []byte, data []byte, w http.Res
 	err := dataContext.AddJSON("in", in)
 	log.Println("RulesFromJson in")
 	CheckError(err)
-	err = dataContext.AddJSON("out", out)
+	err = dataContext.Add("out", out)
+	//err = dataContext.AddJSON("out", out)
 	log.Println("RulesFromJson out")
 	CheckError(err)
 	err = dataContext.AddJSON("data", data)
@@ -48,9 +50,11 @@ func RulesFromJson(groule []byte, out []byte, in []byte, data []byte, w http.Res
 	eng := engine.NewGruleEngine()
 	err = eng.Execute(dataContext, knowledgeBase)
 	CheckError(err)
+
 	//resp := "execute"
-	//log.Println(string(out))
-	fmt.Fprintf(w, string(out))
+	b, err := json.Marshal(out)
+	CheckError(err)
+	fmt.Fprintf(w, string(b))
 
 }
 
