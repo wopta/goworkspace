@@ -1,1 +1,20 @@
-{"vat":123,"squareMeters":30,"isBuildingOwner":true,"revenue":123,"address":"test","ateco":"14.39.00","businessSector":"test","buildingType":"test","buildingMaterial":"test","buildingYear":"test","employer":3,"isAllarm":true,"floor":4,"isPra":true,"costruction":"test","isHolder":true,"whatToSay":"test","result":""}
+{
+    "vat": "01.13.40",
+    "squareMeters": 30,
+    "isBuildingOwner": true,
+    "revenue": 400000,
+    "address": "Aielli",
+    "ateco": "14.39.00",
+    "businessSector": "commerciale",
+    "buildingType": "commerciale",
+    "buildingMaterial": "reinforcedConcrete",
+    "buildingYear": "1972between2009",
+    "employer": 3,
+    "isAllarm": true,
+    "floor": 4,
+    "isPra": true,
+    "costruction": "test",
+    "isHolder": true,
+    "whatToSay": "test",
+    "result": ""
+}

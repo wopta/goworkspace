@@ -45,8 +45,8 @@ func PmiAllrisk(w http.ResponseWriter, r *http.Request) {
 	fil := df.Filter(
 		dataframe.F{Colidx: 5, Colname: "Codice Ateco 2007", Comparator: series.Eq, Comparando: result["ateco"]},
 	)
-	log.Println("filtered", fil.Nrow())
-	log.Println("filtered", fil.Ncol())
+	log.Println("filtered row", fil.Nrow())
+	log.Println("filtered col", fil.Ncol())
 	var enrichByte []byte
 
 	if fil.Nrow() > 0 {
@@ -72,6 +72,8 @@ func PmiAllrisk(w http.ResponseWriter, r *http.Request) {
 		"rcCostruction":"` + strings.ToUpper(fil.Elem(0, 26).String()) + `",
 		"eletronic":"` + strings.ToUpper(fil.Elem(0, 27).String()) + `",
 		"machineFaliure":"` + strings.ToUpper(fil.Elem(0, 28).String()) + `"}`)
+	} else {
+		enrichByte = []byte(`{}`)
 	}
 
 	log.Println(string(enrichByte))
@@ -138,10 +140,9 @@ func out() []byte {
 			"TypeOfSumInsured": "namedPerils",
 			"Deductible": "0",
 			"SumInsuredLimitOfIndemnity": 0.0,
-			"Slug": "content",
-			"IsBase": true,
-			"IsYuor": true,
-			"IsPremium": true
+			"IsBase": false,
+			"IsYuor": false,
+			"IsPremium": false
 		},
 		"cyber": {
 			"Type": "",
@@ -172,8 +173,8 @@ func out() []byte {
 			"selfInsurance":"0.00",
 			"Slug": "damage-to-goods-in-custody",
 			"IsBase": false,
-			"IsYuor": true,
-			"IsPremium": true
+			"IsYuor": false,
+			"IsPremium": false
 		},
 		"defect-liability-12-months": {
 			"Type": "",
@@ -235,9 +236,9 @@ func out() []byte {
 			"Deductible": "0",
 			"SumInsuredLimitOfIndemnity": 0.0,
 			"Slug": "employers-liability",
-			"IsBase": true,
-			"IsYuor": true,
-			"IsPremium": true
+			"IsBase": false,
+			"IsYuor": false,
+			"IsPremium": false
 		},
 		"environmental-liability": {
 			"Type": "",
@@ -412,9 +413,9 @@ func out() []byte {
 			"Deductible": "0",
 			"SumInsuredLimitOfIndemnity": 0.0,
 			"Slug": "third-party-liability",
-			"IsBase": true,
-			"IsYuor": true,
-			"IsPremium": true
+			"IsBase": false,
+			"IsYuor": false,
+			"IsPremium": false
 		},
 		"third-party-liability-construction-company": {
 			"Type": "",
@@ -423,8 +424,8 @@ func out() []byte {
 			"SumInsuredLimitOfIndemnity": 0.0,
 			"Slug": "third-party-liability-construction-company",
 			"IsBase": false,
-			"IsYuor": true,
-			"IsPremium": true
+			"IsYuor": false,
+			"IsPremium": false
 		},
 		"third-party-recourse": {
 			"Type": "",
