@@ -1,8 +1,8 @@
-module github.com/wopta/goworkspace/quote-allrisk
+module github.com/wopta/goworkspace/quote
 
 go 1.16
 
-replace github.com/wopta/goworkspace/quote-allrisk => ./
+replace github.com/wopta/goworkspace/quote => ./
 
 require golang.org/x/oauth2 v0.0.0-20220622183110-fd043fe589d2
 

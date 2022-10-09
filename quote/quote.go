@@ -1,4 +1,4 @@
-package enrichVatCode
+package quote
 
 import (
 	"bytes"
@@ -18,10 +18,10 @@ import (
 func init() {
 	log.Println("INIT Rules")
 
-	functions.HTTP("QuoteAllrisk", QuoteAllrisk)
+	functions.HTTP("QuoteAllrisk", Quote)
 }
 
-func QuoteAllrisk(w http.ResponseWriter, r *http.Request) {
+func Quote(w http.ResponseWriter, r *http.Request) {
 	lib.EnableCors(&w, r)
 	w.Header().Set("Access-Control-Allow-Methods", "POST")
 	vat := strings.Split(r.RequestURI, "/")

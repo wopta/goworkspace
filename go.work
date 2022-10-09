@@ -5,7 +5,7 @@ use(
 ./lib
 ./cmd
 ./rules
-./quote-allrisk
+./quote
 ./models
 ./wise-proxy
 ./blockchain
