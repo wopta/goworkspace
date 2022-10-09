@@ -18,7 +18,7 @@ import (
 func init() {
 	log.Println("INIT Rules")
 
-	functions.HTTP("QuoteAllrisk", Quote)
+	functions.HTTP("Quote", Quote)
 }
 
 func Quote(w http.ResponseWriter, r *http.Request) {
@@ -29,8 +29,8 @@ func Quote(w http.ResponseWriter, r *http.Request) {
 	log.Println(len(vat))
 	log.Println("QuoteAllrisk")
 	base := "/quote"
-	if strings.Contains(r.RequestURI, "/rules") {
-		base = "/rules"
+	if strings.Contains(r.RequestURI, "/quote") {
+		base = "/quote"
 	} else {
 		base = ""
 	}
@@ -50,20 +50,16 @@ func Quote(w http.ResponseWriter, r *http.Request) {
 func PmiMunich(w http.ResponseWriter, r *http.Request) {
 	var urlstring = os.Getenv("MUNICHREBASEURL") + "/api/quote/rate/"
 	u, err := url.Parse(urlstring)
-	if err != nil {
-		panic(err)
-	}
+	lib.CheckError(err)
 	log.Println("url parse:", u)
 	client := lib.ClientCredentials(os.Getenv("MUNICHRECLIENTID"),
 		os.Getenv("MUNICHRECLIENTSECRET"), os.Getenv("MUNICHRESCOPE"), os.Getenv("MUNICHRETOKENENDPOINT"))
 	jsonData, _ := ioutil.ReadAll(r.Body)
 	req, _ := http.NewRequest(http.MethodPost, urlstring, bytes.NewBuffer(jsonData))
 	req.Header.Set("Ocp-Apim-Subscription-Key", os.Getenv("MUNICHRESUBSCRIPTIONKEY"))
+	req.Header.Set("Content-Type", "application/json")
 	res, err := client.Do(req)
-	if err != nil {
-		log.Println("errore:")
-		log.Println(err)
-	}
+	lib.CheckError(err)
 	if res != nil {
 		body, err := ioutil.ReadAll(res.Body)
 
