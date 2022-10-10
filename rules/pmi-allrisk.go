@@ -481,7 +481,7 @@ type Coverage struct {
 	Deductible                 string
 	SumInsuredLimitOfIndemnity float64
 	Slug                       string
-	SelfInsurance              float64
+	SelfInsurance              string
 	IsBase                     bool
 	IsYuor                     bool
 	IsPremium                  bool
