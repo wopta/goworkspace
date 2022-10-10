@@ -592,6 +592,33 @@
         ]
     },
     {
+        "name": "SelfInsurance0",
+        "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
+        "salience": 54,
+        "when": "  out[\"third-party-liability\"].Deductible==\"0\"",
+
+        "then": [
+            "out[\"atmospheric-event\"].SelfInsurance = \"0.10\"",
+            "out[\"damage-to-goods-course-of-works\"].SelfInsurance = \"0.10\"",
+            "out[\"damage-to-goods-in-custody\"].SelfInsurance = \"0.10\"",
+            "out[\"defect-liability-12-months\"].SelfInsurance = \"0.10\"",
+            "out[\"defect-liability-dm-37-2008\"].SelfInsurance = \"0.10\"",
+            "out[\"defect-liability-workmanships\"].SelfInsurance = \"0.10\"",
+            "out[\"employers-liability\"].SelfInsurance = \"0.10\"",
+            "out[\"environmental-liability\"].SelfInsurance = \"0.10\"",
+            "out[\"power-surge\"].SelfInsurance = \"0.10\"",
+            "out[\"earthquake\"].SelfInsurance = \"0.10\"",
+            "out[\"product-liability\"].SelfInsurance = \"0.10\"",
+            "out[\"property-damage-due-to-theft\"].SelfInsurance = \"0.10\"",
+            "out[\"river-flood\"].SelfInsurance = \"0.10\"",
+            "out[\"sociopolitical-event\"].SelfInsurance = \"0.10\"",
+            "out[\"terrorism\"].SelfInsurance = \"0.10\"",
+            "out[\"third-party-recourse\"].SelfInsurance = \"0.10\"",
+            "out[\"water-damage\"].SelfInsurance = \"0.10\"",
+            " Retract(\"SelfInsurance0\")"
+        ]
+    },
+    {
         "name": "SelfInsurance500",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
         "salience": 54,
@@ -616,6 +643,60 @@
             "out[\"third-party-recourse\"].SelfInsurance = \"0.10\"",
             "out[\"water-damage\"].SelfInsurance = \"0.10\"",
             " Retract(\"SelfInsurance500\")"
+        ]
+    },
+    {
+        "name": "SelfInsurance1000",
+        "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
+        "salience": 53,
+        "when": "  out[\"third-party-liability\"].Deductible==\"1000\"",
+
+        "then": [
+            "out[\"atmospheric-event\"].SelfInsurance = \"0.10\"",
+            "out[\"damage-to-goods-course-of-works\"].SelfInsurance = \"0.10\"",
+            "out[\"damage-to-goods-in-custody\"].SelfInsurance = \"0.10\"",
+            "out[\"defect-liability-12-months\"].SelfInsurance = \"0.10\"",
+            "out[\"defect-liability-dm-37-2008\"].SelfInsurance = \"0.10\"",
+            "out[\"defect-liability-workmanships\"].SelfInsurance = \"0.10\"",
+            "out[\"employers-liability\"].SelfInsurance = \"0.10\"",
+            "out[\"environmental-liability\"].SelfInsurance = \"0.10\"",
+            "out[\"power-surge\"].SelfInsurance = \"0.10\"",
+            "out[\"earthquake\"].SelfInsurance = \"0.10\"",
+            "out[\"product-liability\"].SelfInsurance = \"0.10\"",
+            "out[\"property-damage-due-to-theft\"].SelfInsurance = \"0.10\"",
+            "out[\"river-flood\"].SelfInsurance = \"0.10\"",
+            "out[\"sociopolitical-event\"].SelfInsurance = \"0.10\"",
+            "out[\"terrorism\"].SelfInsurance = \"0.10\"",
+            "out[\"third-party-recourse\"].SelfInsurance = \"0.10\"",
+            "out[\"water-damage\"].SelfInsurance = \"0.10\"",
+            " Retract(\"SelfInsurance1000\")"
+        ]
+    },
+    {
+        "name": "SelfInsurance2000",
+        "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
+        "salience": 54,
+        "when": "  out[\"third-party-liability\"].Deductible==\"2000\"",
+
+        "then": [
+            "out[\"atmospheric-event\"].SelfInsurance = \"0.10\"",
+            "out[\"damage-to-goods-course-of-works\"].SelfInsurance = \"0.10\"",
+            "out[\"damage-to-goods-in-custody\"].SelfInsurance = \"0.10\"",
+            "out[\"defect-liability-12-months\"].SelfInsurance = \"0.10\"",
+            "out[\"defect-liability-dm-37-2008\"].SelfInsurance = \"0.10\"",
+            "out[\"defect-liability-workmanships\"].SelfInsurance = \"0.10\"",
+            "out[\"employers-liability\"].SelfInsurance = \"0.10\"",
+            "out[\"environmental-liability\"].SelfInsurance = \"0.10\"",
+            "out[\"power-surge\"].SelfInsurance = \"0.10\"",
+            "out[\"earthquake\"].SelfInsurance = \"0.10\"",
+            "out[\"product-liability\"].SelfInsurance = \"0.10\"",
+            "out[\"property-damage-due-to-theft\"].SelfInsurance = \"0.10\"",
+            "out[\"river-flood\"].SelfInsurance = \"0.10\"",
+            "out[\"sociopolitical-event\"].SelfInsurance = \"0.10\"",
+            "out[\"terrorism\"].SelfInsurance = \"0.10\"",
+            "out[\"third-party-recourse\"].SelfInsurance = \"0.10\"",
+            "out[\"water-damage\"].SelfInsurance = \"0.10\"",
+            " Retract(\"SelfInsurance2000\")"
         ]
     }
 ]

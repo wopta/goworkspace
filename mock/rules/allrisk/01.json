@@ -13,8 +13,6 @@
     "isAllarm": true,
     "floor": 4,
     "isPra": true,
-    "costruction": "test",
-    "isHolder": true,
-    "whatToSay": "test",
-    "result": ""
+    "isHolder": true
+
 }

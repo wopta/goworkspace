@@ -32,7 +32,7 @@ func Rules(w http.ResponseWriter, r *http.Request) {
 	switch os := r.RequestURI; os {
 	case base + "/allrisk":
 		PmiAllrisk(w, r)
-	case base + "/pmi-allrisk":
+	case base + "/pmi":
 		PmiAllrisk(w, r)
 	default:
 		fmt.Fprintf(w, "")
