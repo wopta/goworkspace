@@ -39,12 +39,3 @@ type ProfileAllrisk struct {
 	IsHolder         bool
 	Result           string
 }
-type Coverage struct {
-	TypeOfSumInsured           string
-	Deductible                 string
-	SumInsuredLimitOfIndemnity int64
-	Slug                       string
-	isBase                     bool
-	isYuor                     bool
-	isPremium                  bool
-}
