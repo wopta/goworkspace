@@ -10,7 +10,7 @@ import (
 	lib "github.com/wopta/goworkspace/lib"
 )
 
-func Works(w http.ResponseWriter, vat string) {
+func Works(w http.ResponseWriter) {
 	// Set CORS headers for the main request.
 	var (
 		works  []byte

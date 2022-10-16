@@ -42,9 +42,8 @@ func Enrich(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintf(w, "")
 		}
 
-		MunichVat(w, vat[base+1])
 	case "/works":
-
+		Works(w)
 	case "/ateco":
 
 	default:
