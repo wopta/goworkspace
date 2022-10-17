@@ -1,8 +1,8 @@
-module github.com/wopta/goworkspace/enrich-vat
+module github.com/wopta/goworkspace/enrich
 
 go 1.16
 
-replace github.com/wopta/goworkspace/enrich-vat => ./
+replace github.com/wopta/goworkspace/enrich => ./
 
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1

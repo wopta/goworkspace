@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strconv"
 
 	lib "github.com/wopta/goworkspace/lib"
 )
@@ -29,25 +28,26 @@ func Works(w http.ResponseWriter) {
 	for k, v := range df.Records() {
 		fmt.Println(v)
 		fmt.Println(k)
-		class, err := strconv.Atoi(v[1])
-		if v[2] == "x" {
-			self = true
-		}
-		if v[3] == "x" {
-			emp = true
-		}
-		if v[4] == "x" {
-			unself = true
-		}
+		if k > 0 {
 
-		lib.CheckError(err)
-		sub := Work{Work: v[0],
-			Class:          class,
-			IsSelfEmployed: self,
-			IsEmployed:     emp,
-			IsUnemployed:   unself,
+			if v[2] == "x" {
+				self = true
+			}
+			if v[3] == "x" {
+				emp = true
+			}
+			if v[4] == "x" {
+				unself = true
+			}
+
+			sub := Work{Work: v[0],
+				Class:          v[1],
+				IsSelfEmployed: self,
+				IsEmployed:     emp,
+				IsUnemployed:   unself,
+			}
+			result = append(result, sub)
 		}
-		result = append(result, sub)
 	}
 	b, err := json.Marshal(result)
 	lib.CheckError(err)
@@ -56,7 +56,7 @@ func Works(w http.ResponseWriter) {
 
 type Work struct {
 	Work           string `json:"work"`
-	Class          int    `json:"class"`
+	Class          string `json:"class"`
 	IsSelfEmployed bool   `json:"isSelfEmployed"`
 	IsEmployed     bool   `json:"isEmployed"`
 	IsUnemployed   bool   `json:"isUnemployed "`

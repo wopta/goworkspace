@@ -22,16 +22,17 @@ func Enrich(w http.ResponseWriter, r *http.Request) {
 	lib.EnableCors(&w, r)
 	w.Header().Set("Access-Control-Allow-Methods", "GET")
 	log.Println("EnrichVat")
+	log.Println(r.RequestURI)
 	vat := strings.Split(r.RequestURI, "/")
 	log.Println(vat)
 	log.Println(len(vat))
 	base := 1
-	if strings.Contains(vat[0], "enrich") {
-		base = 1
+	if strings.Contains(r.RequestURI, "enrich") {
+		base = 2
 	} else {
-		base = 0
+		base = 1
 	}
-
+	log.Println("base ", base)
 	log.Println(vat[base])
 	switch vat[base] {
 	case "vat":
@@ -39,15 +40,15 @@ func Enrich(w http.ResponseWriter, r *http.Request) {
 		case "munichre":
 			MunichVat(w, vat[base+2])
 		default:
-			fmt.Fprintf(w, "")
+			fmt.Fprintf(w, "missing service in path es. munichre")
 		}
 
-	case "/works":
+	case "works":
 		Works(w)
-	case "/ateco":
+	case "ateco":
 
 	default:
-		fmt.Fprintf(w, "")
+		fmt.Fprintf(w, "missing scope in path es. vat, works, ateco")
 	}
 
 }
