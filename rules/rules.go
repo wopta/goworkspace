@@ -30,8 +30,8 @@ func Rules(w http.ResponseWriter, r *http.Request) {
 	log.Println(r.RequestURI)
 	lib.EnableCors(&w, r)
 	switch os := r.RequestURI; os {
-	case base + "/risk/personas":
-		PmiAllrisk(w, r)
+	case base + "/risk/person":
+		Person(w, r)
 	case base + "/risk/pmi":
 		PmiAllrisk(w, r)
 	default:

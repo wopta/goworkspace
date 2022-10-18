@@ -22,6 +22,7 @@ import (
 	"os"
 
 	lib "github.com/wopta/goworkspace/lib"
+	models "github.com/wopta/goworkspace/models"
 )
 
 func Person(w http.ResponseWriter, r *http.Request) {
@@ -54,89 +55,196 @@ func Person(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func initCoverageP() map[string]*Coverage {
+func initCoverageP() map[string]*models.Coverage {
 
-	var res = make(map[string]*Coverage)
-	res["IPI"] = &Coverage{
-		Slug:                       "third-party-liability",
-		TypeOfSumInsured:           "namedPerils",
+	var res = make(map[string]*models.Coverage)
+	res["IPI"] = &models.Coverage{
+		Slug: "Invalidità Permanente Infortunio",
+
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0.0,
-		IsBase:                     false,
-		IsYuor:                     false,
-		IsPremium:                  false,
+		Base: models.CoverageValue{
+			Deductible:                 "0",
+			SumInsuredLimitOfIndemnity: 0.0,
+			SelfInsurance:              "0"},
+		Your: models.CoverageValue{
+			Deductible:                 "0",
+			SumInsuredLimitOfIndemnity: 0.0,
+			SelfInsurance:              "0"},
+		Premium: models.CoverageValue{
+			Deductible:                 "0",
+			SumInsuredLimitOfIndemnity: 0.0,
+			SelfInsurance:              "0"},
+		IsBase:    false,
+		IsYuor:    false,
+		IsPremium: false,
 	}
-	res["D"] = &Coverage{
-		Slug:                       "damage-to-goods-in-custody",
-		TypeOfSumInsured:           "namedPerils",
+	res["D"] = &models.Coverage{
+		Slug: "Decesso Infortunio",
+
 		Deductible:                 "0",
-		SumInsuredLimitOfIndemnity: 0,
-		IsBase:                     false,
-		IsYuor:                     false,
-		IsPremium:                  false,
+		SumInsuredLimitOfIndemnity: 0.0,
+		Base: models.CoverageValue{
+			Deductible:                 "0",
+			SumInsuredLimitOfIndemnity: 0.0,
+			SelfInsurance:              "0"},
+		Your: models.CoverageValue{
+			Deductible:                 "0",
+			SumInsuredLimitOfIndemnity: 0.0,
+			SelfInsurance:              "0"},
+		Premium: models.CoverageValue{
+			Deductible:                 "0",
+			SumInsuredLimitOfIndemnity: 0.0,
+			SelfInsurance:              "0"},
+		IsBase:    false,
+		IsYuor:    false,
+		IsPremium: false,
 	}
-	res["ITI"] = &Coverage{
-		Slug:                       "defect-liability-workmanships",
-		TypeOfSumInsured:           "namedPerils",
+	res["ITI"] = &models.Coverage{
+		Slug: "Inabilità Totale Infortunio",
+
 		Deductible:                 "0",
-		SumInsuredLimitOfIndemnity: 0,
-		IsBase:                     false,
-		IsYuor:                     false,
-		IsPremium:                  false,
+		SumInsuredLimitOfIndemnity: 0.0,
+		Base: models.CoverageValue{
+			Deductible:                 "0",
+			SumInsuredLimitOfIndemnity: 0.0,
+			SelfInsurance:              "0"},
+		Your: models.CoverageValue{
+			Deductible:                 "0",
+			SumInsuredLimitOfIndemnity: 0.0,
+			SelfInsurance:              "0"},
+		Premium: models.CoverageValue{
+			Deductible:                 "0",
+			SumInsuredLimitOfIndemnity: 0.0,
+			SelfInsurance:              "0"},
+		IsBase:    false,
+		IsYuor:    false,
+		IsPremium: false,
 	}
-	res["DR"] = &Coverage{
-		Slug:                       "defect-liability-12-months",
-		TypeOfSumInsured:           "namedPerils",
+	res["DRG"] = &models.Coverage{
+		Slug: "Diaria Ricovero / Gessatura Infortunio",
+
 		Deductible:                 "0",
-		SumInsuredLimitOfIndemnity: 0,
-		IsBase:                     false,
-		IsYuor:                     false,
-		IsPremium:                  false,
+		SumInsuredLimitOfIndemnity: 0.0,
+		Base: models.CoverageValue{
+			Deductible:                 "0",
+			SumInsuredLimitOfIndemnity: 0.0,
+			SelfInsurance:              "0"},
+		Your: models.CoverageValue{
+			Deductible:                 "0",
+			SumInsuredLimitOfIndemnity: 0.0,
+			SelfInsurance:              "0"},
+		Premium: models.CoverageValue{
+			Deductible:                 "0",
+			SumInsuredLimitOfIndemnity: 0.0,
+			SelfInsurance:              "0"},
+		IsBase:    false,
+		IsYuor:    false,
+		IsPremium: false,
 	}
-	res["DC"] = &Coverage{
-		Slug:                       "defect-liability-dm-37-2008",
-		TypeOfSumInsured:           "namedPerils",
+	res["DC"] = &models.Coverage{
+		Slug: "Diaria Convalescenza Infortunio",
+
 		Deductible:                 "0",
-		SumInsuredLimitOfIndemnity: 0,
-		IsBase:                     false,
-		IsYuor:                     false,
-		IsPremium:                  false,
+		SumInsuredLimitOfIndemnity: 0.0,
+		Base: models.CoverageValue{
+			Deductible:                 "0",
+			SumInsuredLimitOfIndemnity: 0.0,
+			SelfInsurance:              "0"},
+		Your: models.CoverageValue{
+			Deductible:                 "0",
+			SumInsuredLimitOfIndemnity: 0.0,
+			SelfInsurance:              "0"},
+		Premium: models.CoverageValue{
+			Deductible:                 "0",
+			SumInsuredLimitOfIndemnity: 0.0,
+			SelfInsurance:              "0"},
+		IsBase:    false,
+		IsYuor:    false,
+		IsPremium: false,
 	}
-	res["RSC"] = &Coverage{
-		Slug:                       "property-damage-due-to-theft",
-		TypeOfSumInsured:           "namedPerils",
+	res["RSC"] = &models.Coverage{
+		Slug:                       "Rimborso spese di cura Infortunio",
 		Deductible:                 "0",
-		SumInsuredLimitOfIndemnity: 0,
-		IsBase:                     false,
-		IsYuor:                     false,
-		IsPremium:                  false,
+		SumInsuredLimitOfIndemnity: 0.0,
+		Base: models.CoverageValue{
+			Deductible:                 "0",
+			SumInsuredLimitOfIndemnity: 0.0,
+			SelfInsurance:              "0"},
+		Your: models.CoverageValue{
+			Deductible:                 "0",
+			SumInsuredLimitOfIndemnity: 0.0,
+			SelfInsurance:              "0"},
+		Premium: models.CoverageValue{
+			Deductible:                 "0",
+			SumInsuredLimitOfIndemnity: 0.0,
+			SelfInsurance:              "0"},
+		IsBase:    false,
+		IsYuor:    false,
+		IsPremium: false,
 	}
-	res["IPM"] = &Coverage{
-		Slug:                       "damage-to-goods-course-of-works",
-		TypeOfSumInsured:           "namedPerils",
+	res["IPM"] = &models.Coverage{
+		Slug: "Invalidità Permanente Malattia IPM",
+
 		Deductible:                 "0",
-		SumInsuredLimitOfIndemnity: 0,
-		IsBase:                     false,
-		IsYuor:                     false,
-		IsPremium:                  false,
+		SumInsuredLimitOfIndemnity: 0.0,
+		Base: models.CoverageValue{
+			Deductible:                 "0",
+			SumInsuredLimitOfIndemnity: 0.0,
+			SelfInsurance:              "0"},
+		Your: models.CoverageValue{
+			Deductible:                 "0",
+			SumInsuredLimitOfIndemnity: 0.0,
+			SelfInsurance:              "0"},
+		Premium: models.CoverageValue{
+			Deductible:                 "0",
+			SumInsuredLimitOfIndemnity: 0.0,
+			SelfInsurance:              "0"},
+		IsBase:    false,
+		IsYuor:    false,
+		IsPremium: false,
 	}
-	res["ASS"] = &Coverage{
-		Slug:                       "employers-liability",
-		TypeOfSumInsured:           "namedPerils",
+	res["ASS"] = &models.Coverage{
+		Slug: "Assistenza",
+
 		Deductible:                 "0",
-		SumInsuredLimitOfIndemnity: 0,
-		IsBase:                     false,
-		IsYuor:                     false,
-		IsPremium:                  false,
+		SumInsuredLimitOfIndemnity: 0.0,
+		Base: models.CoverageValue{
+			Deductible:                 "0",
+			SumInsuredLimitOfIndemnity: 0.0,
+			SelfInsurance:              "0"},
+		Your: models.CoverageValue{
+			Deductible:                 "0",
+			SumInsuredLimitOfIndemnity: 0.0,
+			SelfInsurance:              "0"},
+		Premium: models.CoverageValue{
+			Deductible:                 "0",
+			SumInsuredLimitOfIndemnity: 0.0,
+			SelfInsurance:              "0"},
+		IsBase:    false,
+		IsYuor:    false,
+		IsPremium: false,
 	}
-	res["TL"] = &Coverage{
-		Slug:                       "product-liability",
-		TypeOfSumInsured:           "namedPerils",
+	res["TL"] = &models.Coverage{
+		Slug: "third-party-liability",
+
 		Deductible:                 "0",
-		SumInsuredLimitOfIndemnity: 0,
-		IsBase:                     false,
-		IsYuor:                     false,
-		IsPremium:                  false,
+		SumInsuredLimitOfIndemnity: 0.0,
+		Base: models.CoverageValue{
+			Deductible:                 "0",
+			SumInsuredLimitOfIndemnity: 0.0,
+			SelfInsurance:              "0"},
+		Your: models.CoverageValue{
+			Deductible:                 "0",
+			SumInsuredLimitOfIndemnity: 0.0,
+			SelfInsurance:              "0"},
+		Premium: models.CoverageValue{
+			Deductible:                 "0",
+			SumInsuredLimitOfIndemnity: 0.0,
+			SelfInsurance:              "0"},
+		IsBase:    false,
+		IsYuor:    false,
+		IsPremium: false,
 	}
 
 	return res
