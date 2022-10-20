@@ -6,10 +6,10 @@ replace github.com/wopta/goworkspace/document => ./
 
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
-	github.com/SebastiaanKlippert/go-wkhtmltopdf v1.7.1
-	github.com/adrg/go-wkhtmltopdf v0.3.0
+
+
 	github.com/google/uuid v1.3.0 // indirect
-	github.com/hyperjumptech/grule-rule-engine v1.11.0 // indirect
+    github.com/wopta/goworkspace/models v0.0.0-20221016203444-d89eb0cf00a2
 	github.com/johnfercher/maroto v0.38.0 // indirect
 	github.com/jung-kurt/gofpdf v1.16.2 // indirect
 	github.com/ruudk/golang-pdf417 v0.0.0-20201230142125-a7e3863a1245 // indirect

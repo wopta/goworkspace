@@ -1,8 +1,6 @@
 package document
 
 import (
-	"bytes"
-	"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -12,35 +10,21 @@ import (
 	"github.com/johnfercher/maroto/pkg/consts"
 	"github.com/johnfercher/maroto/pkg/pdf"
 	"github.com/johnfercher/maroto/pkg/props"
-
 	lib "github.com/wopta/goworkspace/lib"
+	model "github.com/wopta/goworkspace/models"
 )
 
 func init() {
 	log.Println("INIT Document")
-
 	functions.HTTP("Document", Document)
 }
 
 func Document(w http.ResponseWriter, r *http.Request) {
-	var (
-		templ *template.Template
-		err   error
-	)
-	data := PdfData{name: ""}
-	// use Go's default HTML template generation tools to generate your HTML
-	log.Println("use Go's default HTML template generation tools to generate your HTML")
-	templ, err = template.ParseFiles("document/template.html")
-	lib.CheckError(err)
-	// apply the parsed HTML template data and keep the result in a Buffer
-	log.Println(" apply the parsed HTML template data and keep the result in a Buffer")
-	var body bytes.Buffer
-	err = templ.Execute(&body, data)
-	lib.CheckError(err)
-	// Create object from reader.
-	inFile, err := os.Open("sample2.html")
-	lib.CheckError(err)
-	defer inFile.Close()
+	log.Println("Document")
+	lib.EnableCors(&w, r)
+
+	//data := PdfData{name: ""}
+
 	//begin := time.Now()
 	magenta := color.Color{
 		// Red is the amount of red
@@ -50,13 +34,32 @@ func Document(w http.ResponseWriter, r *http.Request) {
 		// Blue is the amount of red
 		Blue: 0,
 	}
-	darkGrayColor := color.NewBlack()
+	textBoldRight := props.Text{
+		Top:   1.5,
+		Size:  9,
+		Style: consts.Bold,
+		Align: consts.Center,
+	}
+	lineProp := props.Line{
+		Color: magenta,
+		Style: consts.Solid,
+		Width: 1.0,
+	}
+
+	//darkGrayColor := color.NewBlack()
+	rowHeight := 5.0
 	grayColor := color.NewBlack()
 	whiteColor := color.NewWhite()
+	textBold := props.Text{
+		Top:   3,
+		Style: consts.Bold,
+		Align: consts.Center,
+	}
 	header := []string{""}
 	contents := [][]string{{""}}
-
+	log.Println("Document 1")
 	m := pdf.NewMaroto(consts.Portrait, consts.A4)
+	log.Println("Document 2")
 	m.SetPageMargins(10, 15, 10)
 	//m.SetBorder(true)
 
@@ -65,23 +68,32 @@ func Document(w http.ResponseWriter, r *http.Request) {
 
 	m.RegisterFooter(func() {
 	})
-
+	log.Println("Document 3")
+	m.Line(1.0, lineProp)
 	m.Row(10, func() {
 		m.Col(12, func() {
-			m.Text("Invoice ABC123456789", props.Text{
-				Top:   3,
-				Style: consts.Bold,
-				Align: consts.Center,
-			})
+			m.Text("La tua assicurazione è operante per il seguente Assicurato e Garanzie ", textBold)
 		})
-		m.SetBackgroundColor(magenta)
+		//m.SetBackgroundColor(magenta)
 	})
-
-	m.SetBackgroundColor(darkGrayColor)
-
-	m.Row(7, func() {
-		m.Col(3, func() {
-			m.Text("Transactions", props.Text{
+	m.Line(1.0, props.Line{
+		Color: color.Color{
+			Red:   255,
+			Green: 100,
+			Blue:  50,
+		},
+		Style: consts.Dotted,
+		Width: 1.0,
+	})
+	//m.SetBackgroundColor(darkGrayColor)
+	log.Println("Document 4")
+	m.Row(rowHeight, func() {
+		m.Col(2, func() {
+			m.Text("Assicurato", textBoldRight)
+			m.Line(1.0, lineProp)
+		})
+		m.Col(2, func() {
+			m.Text("xxxx", props.Text{
 				Top:   1.5,
 				Size:  9,
 				Style: consts.Bold,
@@ -147,8 +159,9 @@ func Document(w http.ResponseWriter, r *http.Request) {
 		})
 		m.ColSpace(6)
 	})
-
-	err = m.OutputFileAndClose("internal/examples/pdfs/billing.pdf")
+	log.Println("Document 8")
+	//m.Output()
+	err := m.OutputFileAndClose("document/billing.pdf")
 	if err != nil {
 
 		os.Exit(1)
@@ -160,5 +173,7 @@ func Document(w http.ResponseWriter, r *http.Request) {
 }
 
 type PdfData struct {
-	name string
+	Tite  string
+	Users model.User
+	name  string
 }

@@ -11,8 +11,7 @@ require cloud.google.com/go/storage v1.25.0 // indirect
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
 	github.com/go-gota/gota v0.12.0
-	github.com/wopta/goworkspace v0.0.0-20221018133525-2aa5e65c3e23 // indirect
-	github.com/wopta/goworkspace/lib v0.0.0-20221016203444-d89eb0cf00a2
+	github.com/wopta/goworkspace/lib v0.0.0-20221010121324-2f0b53b5ce51
 	github.com/wopta/goworkspace/models v0.0.0-20221016203444-d89eb0cf00a2
 	golang.org/x/net v0.0.0-20220809184613-07c6da5e1ced // indirect
 	google.golang.org/protobuf v1.28.1 // indirect

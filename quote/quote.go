@@ -17,7 +17,6 @@ import (
 
 func init() {
 	log.Println("INIT Rules")
-
 	functions.HTTP("Quote", Quote)
 }
 
@@ -40,7 +39,7 @@ func Quote(w http.ResponseWriter, r *http.Request) {
 	switch os := r.RequestURI; os {
 	case base + "/pmi/munichre":
 		PmiMunich(w, r)
-	case base + "/pmi-allrisk":
+	case base + "/incident":
 
 	default:
 		fmt.Fprintf(w, "select right field")

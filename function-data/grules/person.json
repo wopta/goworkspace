@@ -1,15 +1,31 @@
 [
     {
-        "name": "Rct",
-        "desc": "check rct base ",
+        "name": "IPI",
+        "desc": "check Invalidità Permanente Infortunio ",
         "salience": 100,
-        "when": " data.rct ==\"X\"",
+        "when": " in.childrenScool",
         "then": [
-            "out[\"third-party-liability\"].IsYuor = true",
-            " out[\"third-party-liability\"].IsPremium = true",
-            " out[\"third-party-liability\"].IsBase = true",
-            "Log(\"activate rct true\")",
-            " Retract(\"Rct\")"
+            "Log(\"activate IPI\")",
+            "out[\"IPI\"].IsYuor = true",
+            "out[\"IPI\"].IsPremium = true",
+            "out[\"IPI\"].Base.SumInsuredLimitOfIndemnity = 100000",
+            "out[\"IPI\"].IsBase = true",
+            "Log(\"IPI\")",
+            " Retract(\"IPI\")"
+        ]
+    },
+    {
+        "name": "D", 
+        "desc": "check Decesso Infortunio ",
+        "salience": 99,
+        "when": " in.childrenScool",
+        "then": [
+            "out[\"D\"].IsYuor = true",
+            "out[\"D\"].IsPremium = true",
+            "out[\"D\"].Base.SumInsuredLimitOfIndemnity = 100000",
+            "out[\"D\"].IsBase = true",
+            "Log(\"D\")",
+            " Retract(\"D\")"
         ]
     }
 ]

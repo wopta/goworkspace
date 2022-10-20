@@ -13,6 +13,7 @@ use(
 ./document
 ./appcheck-proxy
 ./mail
+./wise-broker
 //./cmd
 
 )

@@ -1,24 +1,24 @@
 package models
 
-type Coverage struct {
+type CoverageJson struct {
 	Type                       string
 	TypeOfSumInsured           string
 	Description                string
 	Deductible                 string
 	SumInsuredLimitOfIndemnity float64
 	Price                      float64
-	Value                      *CoverageValue
-	Offer                      map[string]*CoverageValue
+	Value                      *CoverageJsonValue
+	Offer                      map[string]*CoverageJsonValue
 	Slug                       string
 	SelfInsurance              string
 	IsBase                     bool
 	IsYuor                     bool
 	IsPremium                  bool
-	Base                       *CoverageValue
-	Your                       *CoverageValue
-	Premium                    *CoverageValue
+	Base                       *CoverageJsonValue
+	Your                       *CoverageJsonValue
+	Premium                    *CoverageJsonValue
 }
-type CoverageValue struct {
+type CoverageJsonValue struct {
 	TypeOfSumInsured           string
 	Deductible                 string
 	SumInsuredLimitOfIndemnity float64
