@@ -106,6 +106,7 @@ func Send(resp http.ResponseWriter, obj *Request) {
 		username   = os.Getenv("EMAIL_USERNAME")
 		password   = os.Getenv("EMAIL_PASSWORD")
 		portNumber = os.Getenv("EMAIL_PORT")
+		file       []byte
 	)
 
 	const (
@@ -115,9 +116,25 @@ func Send(resp http.ResponseWriter, obj *Request) {
 	log.Println(password)
 	log.Println(host)
 	log.Println(portNumber)
+	switch os.Getenv("env") {
+	case "local":
+		file = lib.ErrorByte(ioutil.ReadFile("function-data/mail/mail_template.html"))
+		log.Println("rules", string(file))
+
+	case "dev":
+		file = lib.GetFromStorage("function-data", "mail/mail_template.html", "")
+
+	case "prod":
+		file = lib.GetFromStorage("core-350507-function-data", "mail/mail_template.html", "")
+
+	default:
+
+	}
 	tmplt := template.New("action")
 	var tpl bytes.Buffer
-	tmplt, _ = template.ParseFiles("mail/mail_template.html")
+
+	tmplt, err := tmplt.Parse(string(file))
+	lib.CheckError(err)
 	data := Data{Title: obj.Subject, Content: obj.Message}
 	tmplt.Execute(&tpl, data)
 	for _, _to := range obj.To {
@@ -177,8 +194,8 @@ func Send(resp http.ResponseWriter, obj *Request) {
 		log.Println(message)
 		// Connect to the SMTP Server
 		servername := "smtp.office365.com:587"
-		host, _, _ := net.SplitHostPort(servername)
-
+		host, _, err := net.SplitHostPort(servername)
+		lib.CheckError(err)
 		//auth := smtp.PlainAuth("", "website@wopta.it", "We20-tE22?", host)
 
 		// TLS config
