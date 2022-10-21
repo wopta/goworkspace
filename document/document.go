@@ -1,9 +1,10 @@
 package document
 
 import (
+	"encoding/json"
+	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/johnfercher/maroto/pkg/color"
@@ -11,7 +12,7 @@ import (
 	"github.com/johnfercher/maroto/pkg/pdf"
 	"github.com/johnfercher/maroto/pkg/props"
 	lib "github.com/wopta/goworkspace/lib"
-	model "github.com/wopta/goworkspace/models"
+	//model "github.com/wopta/goworkspace/models"
 )
 
 func init() {
@@ -22,150 +23,133 @@ func init() {
 func Document(w http.ResponseWriter, r *http.Request) {
 	log.Println("Document")
 	lib.EnableCors(&w, r)
+	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
+	log.Println(string(req))
+	var data PdfData
+	// Unmarshal or Decode the JSON to the interface.
+	//json.NewDecoder(req).Decode(&send)
+	defer r.Body.Close()
 
+	json.Unmarshal([]byte(req), &data)
 	//data := PdfData{name: ""}
 
 	//begin := time.Now()
+
 	magenta := color.Color{
-		// Red is the amount of red
-		Red: 0,
-		// Green is the amount of red
+		Red:   229,
 		Green: 0,
-		// Blue is the amount of red
-		Blue: 0,
+		Blue:  117,
 	}
+	gray := color.Color{
+		Red:   88,
+		Green: 90,
+		Blue:  93,
+	}
+	log.Println(gray)
 	textBoldRight := props.Text{
 		Top:   1.5,
 		Size:  9,
 		Style: consts.Bold,
 		Align: consts.Center,
 	}
-	lineProp := props.Line{
+	linePropMagenta := props.Line{
 		Color: magenta,
 		Style: consts.Solid,
-		Width: 1.0,
+		Width: 0.2,
 	}
 
 	//darkGrayColor := color.NewBlack()
 	rowHeight := 5.0
-	grayColor := color.NewBlack()
+	rowHeightSlim := 1.0
+	//blackColor := color.NewBlack()
 	whiteColor := color.NewWhite()
 	textBold := props.Text{
 		Top:   3,
 		Style: consts.Bold,
 		Align: consts.Center,
 	}
-	header := []string{""}
-	contents := [][]string{{""}}
+
+	textBoldMagenta := props.Text{
+		Color: magenta,
+		Top:   3,
+		Style: consts.Bold,
+		Align: consts.Center,
+	}
+	textMagenta := props.Text{
+		Color: magenta,
+		Top:   0,
+		Style: consts.Normal,
+		Align: consts.Left,
+		Size:  1,
+	}
+
+	log.Println(textBold)
 	log.Println("Document 1")
 	m := pdf.NewMaroto(consts.Portrait, consts.A4)
 	log.Println("Document 2")
 	m.SetPageMargins(10, 15, 10)
+	m.SetBackgroundColor(whiteColor)
+	m.SetFontLocation("document")
+
+	// Define font to all styles.
+	m.AddUTF8Font("Montserrat", consts.Normal, "Montserrat-Regular.ttf")
+	m.AddUTF8Font("Montserrat", consts.Bold, "Montserrat-Bold.ttf")
+	m.SetDefaultFontFamily("Montserrat")
 	//m.SetBorder(true)
 
 	m.RegisterHeader(func() {
+		m.Row(rowHeight, func() {
+			m.Col(12, func() {
+				_ = m.FileImage("document/ARTW_LOGO_RGB_400px.png", props.Rect{
+					Left:    5,
+					Top:     5,
+					Center:  true,
+					Percent: 85,
+				})
+			})
+		})
 	})
 
 	m.RegisterFooter(func() {
 	})
 	log.Println("Document 3")
-	m.Line(1.0, lineProp)
+
 	m.Row(10, func() {
 		m.Col(12, func() {
-			m.Text("La tua assicurazione è operante per il seguente Assicurato e Garanzie ", textBold)
+			m.Text("La tua assicurazione è operante per il seguente Assicurato e Garanzie ", textBoldMagenta)
 		})
 		//m.SetBackgroundColor(magenta)
 	})
-	m.Line(1.0, props.Line{
-		Color: color.Color{
-			Red:   255,
-			Green: 100,
-			Blue:  50,
-		},
-		Style: consts.Dotted,
-		Width: 1.0,
-	})
+	m.Line(1.0, linePropMagenta)
 	//m.SetBackgroundColor(darkGrayColor)
 	log.Println("Document 4")
 	m.Row(rowHeight, func() {
 		m.Col(2, func() {
-			m.Text("Assicurato", textBoldRight)
-			m.Line(1.0, lineProp)
+			m.Text("Assicurato:", textBoldRight)
+
 		})
+
 		m.Col(2, func() {
 			m.Text("xxxx", props.Text{
 				Top:   1.5,
 				Size:  9,
-				Style: consts.Bold,
+				Style: consts.Normal,
 				Align: consts.Center,
 			})
 		})
-		m.ColSpace(9)
 	})
 
-	m.SetBackgroundColor(whiteColor)
-
-	m.TableList(header, contents, props.TableList{
-		HeaderProp: props.TableListContent{
-			Size:      9,
-			GridSizes: []uint{3, 4, 2, 3},
-		},
-		ContentProp: props.TableListContent{
-			Size:      8,
-			GridSizes: []uint{3, 4, 2, 3},
-		},
-		Align:                consts.Center,
-		AlternatedBackground: &grayColor,
-		HeaderContentSpace:   1,
-		Line:                 false,
-	})
-
-	m.Row(20, func() {
-		m.ColSpace(7)
+	m.Row(rowHeightSlim, func() {
 		m.Col(2, func() {
-			m.Text("Total:", props.Text{
-				Top:   5,
-				Style: consts.Bold,
-				Size:  8,
-				Align: consts.Right,
-			})
-		})
-		m.Col(3, func() {
-			m.Text("R$ 2.567,00", props.Text{
-				Top:   5,
-				Style: consts.Bold,
-				Size:  8,
-				Align: consts.Center,
-			})
+			m.Text("_________________________________________________", textMagenta)
+
 		})
 	})
 
-	m.Row(15, func() {
-		m.Col(6, func() {
-			_ = m.Barcode("5123.151231.512314.1251251.123215", props.Barcode{
-				Percent: 0,
-				Proportion: props.Proportion{
-					Width:  20,
-					Height: 2,
-				},
-			})
-			m.Text("5123.151231.512314.1251251.123215", props.Text{
-				Top:    12,
-				Family: "",
-				Style:  consts.Bold,
-				Size:   9,
-				Align:  consts.Center,
-			})
-		})
-		m.ColSpace(6)
-	})
 	log.Println("Document 8")
 	//m.Output()
 	err := m.OutputFileAndClose("document/billing.pdf")
-	if err != nil {
-
-		os.Exit(1)
-	}
+	lib.CheckError(err)
 
 	//end := time.Now()
 	//fmt.Println(end.Sub(begin))
@@ -173,7 +157,26 @@ func Document(w http.ResponseWriter, r *http.Request) {
 }
 
 type PdfData struct {
-	Tite  string
-	Users model.User
-	name  string
+	Name         string  `json:"name"`
+	Surname      string  `json:"surname"`
+	FiscalCode   string  `json:"fiscalCode"`
+	Work         string  `json:"work"`
+	WorkType     string  `json:"workType"`
+	Class        string  `json:"class"`
+	CoverageType string  `json:"coverageType"`
+	Price        float64 `json:"price"`
+	PriceNett    float64 `json:"priceNett"`
+	Coverages    []struct {
+		Deductible                 string  `json:"deductible"`
+		SelfInsurance              string  `json:"selfInsurance"`
+		SumInsuredLimitOfIndemnity float64 `json:"sumInsuredLimitOfIndemnity"`
+		Price                      float64 `json:"price"`
+		PriceNett                  float64 `json:"priceNett"`
+	} `json:"coverages"`
+	Statements []struct {
+		Text string `json:"text"`
+	} `json:"statements"`
+	SpecialConditions []struct {
+		Text string `json:"text"`
+	} `json:"specialConditions"`
 }

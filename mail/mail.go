@@ -119,7 +119,6 @@ func Send(resp http.ResponseWriter, obj *Request) {
 	switch os.Getenv("env") {
 	case "local":
 		file = lib.ErrorByte(ioutil.ReadFile("function-data/mail/mail_template.html"))
-		log.Println("rules", string(file))
 
 	case "dev":
 		file = lib.GetFromStorage("function-data", "mail/mail_template.html", "")
@@ -191,7 +190,7 @@ func Send(resp http.ResponseWriter, obj *Request) {
 		}
 		//message += "\r\n" + body
 		log.Println("MESSAGE:----------------------")
-		log.Println(message)
+
 		// Connect to the SMTP Server
 		servername := "smtp.office365.com:587"
 		host, _, err := net.SplitHostPort(servername)
