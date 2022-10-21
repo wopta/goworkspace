@@ -221,11 +221,13 @@ func Send(resp http.ResponseWriter, obj *Request) {
 		err = c.Mail(from.Address)
 		lib.CheckError(err)
 		err = c.Rcpt(to.Address)
+		log.Println("end Rcpt:----------------------")
 		lib.CheckError(err)
 		// Data
 		w, err := c.Data()
 
 		lib.CheckError(err)
+		log.Println("start write massage:----------------------")
 		_, err = w.Write([]byte(message))
 		log.Println("end write massage:----------------------")
 		lib.CheckError(err)
