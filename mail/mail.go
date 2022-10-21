@@ -178,8 +178,7 @@ func Send(resp http.ResponseWriter, obj *Request) {
 
 		if obj.IsAttachment {
 			for k, v := range obj.Attachments {
-				log.Println(k)
-				log.Println(len(obj.Attachments))
+
 				var close bool
 				if k == len(obj.Attachments)-1 {
 					close = true
@@ -190,7 +189,7 @@ func Send(resp http.ResponseWriter, obj *Request) {
 		}
 		//message += "\r\n" + body
 		log.Println("MESSAGE:----------------------")
-
+		log.Println(message)
 		// Connect to the SMTP Server
 		servername := "smtp.office365.com:587"
 		host, _, err := net.SplitHostPort(servername)
