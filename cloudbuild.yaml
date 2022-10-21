@@ -37,7 +37,8 @@ steps:
       project=core-350507
       env=prod
     fi
-   
+        #--ingress-settings internal-only \
+    #--timeout=540 \
     # Save a value to persistent volume mount: "/workspace"
     echo $namefx > /workspace/namefx.txt &&
     # Save another
@@ -50,7 +51,6 @@ steps:
     --trigger-http \
     --runtime=go116 \
     --env-vars-file ${env}.yaml \
-    --ingress-settings internal-only \
     --service-account=146852404745@cloudbuild.gserviceaccount.com \
     --project=${project} 
     
