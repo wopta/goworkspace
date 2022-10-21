@@ -213,6 +213,7 @@ func Send(resp http.ResponseWriter, obj *Request) {
 		lib.CheckError(err)
 		c.StartTLS(tlsconfig)
 		lib.CheckError(err)
+		log.Println("end Tls:----------------------")
 		// Auth
 		err = c.Auth(LoginAuth(username, password))
 		lib.CheckError(err)
@@ -223,8 +224,10 @@ func Send(resp http.ResponseWriter, obj *Request) {
 		lib.CheckError(err)
 		// Data
 		w, err := c.Data()
+
 		lib.CheckError(err)
 		_, err = w.Write([]byte(message))
+		log.Println("end write massage:----------------------")
 		lib.CheckError(err)
 		err = w.Close()
 		lib.CheckError(err)
