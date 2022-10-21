@@ -205,7 +205,9 @@ func Send(resp http.ResponseWriter, obj *Request) {
 		// Here is the key, you need to call tls.Dial instead of smtp.Dial
 		// for smtp servers running on 465 that require an ssl connection
 		// from the very beginning (no starttls)
+		log.Println("end MESSAGE:----------------------")
 		conn, err := net.Dial("tcp", "smtp.office365.com:587")
+		log.Println("end DIAL:----------------------")
 		lib.CheckError(err)
 		c, err := smtp.NewClient(conn, host)
 		lib.CheckError(err)
