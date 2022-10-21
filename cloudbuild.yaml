@@ -51,6 +51,7 @@ steps:
     --runtime=go116 \
     --env-vars-file ${env}.yaml \
       #--ingress-settings internal-only \
+    --timeout=540 \
     --service-account=146852404745@cloudbuild.gserviceaccount.com \
     --project=${project} 
     
