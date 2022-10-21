@@ -43,7 +43,7 @@ steps:
     echo $namefx > /workspace/namefx.txt &&
     # Save another
     echo $name_camel > /workspace/entrypoint.txt
-    ls -la
+    #ls -la
     gcloud functions deploy ${strarr[0]} \
     --region=europe-west1 \
     --source=/workspace/${strarr[0]} \
@@ -51,7 +51,6 @@ steps:
     --trigger-http \
     --runtime=go116 \
     --env-vars-file ${env}.yaml \
-    --service-account=146852404745@cloudbuild.gserviceaccount.com \
     --project=${project} 
     
     gcloud functions add-iam-policy-binding ${strarr[0]} \
