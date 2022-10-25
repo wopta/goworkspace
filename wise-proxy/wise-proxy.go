@@ -29,7 +29,7 @@ func WiseProxy(w http.ResponseWriter, r *http.Request) {
 	log.Println(r.Method)
 	lib.EnableCors(&w, r)
 	jsonData, _ := ioutil.ReadAll(r.Body)
-	client := http.Client{Timeout: time.Duration(1) * time.Second}
+	client := http.Client{Timeout: time.Duration(5) * time.Second}
 	//value := r.RequestURI
 	log.Println("len(r.RequestURI): ", len(r.RequestURI))
 	substring := r.RequestURI
