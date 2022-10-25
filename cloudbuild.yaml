@@ -66,5 +66,5 @@ steps:
   entrypoint: "ls"
   args: ["-lah","/workspace"]
 
-  options:
+options:
   logging: CLOUD_LOGGING_ONLY
