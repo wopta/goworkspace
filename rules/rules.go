@@ -35,7 +35,7 @@ func Rules(w http.ResponseWriter, r *http.Request) {
 	case base + "/risk/pmi":
 		PmiAllrisk(w, r)
 	default:
-		fmt.Fprintf(w, "")
+		fmt.Fprintf(w, `{"message":"select path risk pmi or person"}`)
 	}
 
 	//lib.Files("")

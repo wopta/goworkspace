@@ -6,6 +6,17 @@ package rules
 
 INPUT:
 {
+	"age": 74,
+	"work": "select work list da elenco professioni",
+	"workType": "dipendente" ,
+	"coverageType": "24 ore" ,
+	"childrenScool":true,
+	"issue1500": 1,
+	"riskInLifeIs":1,
+	"class":2
+
+}
+{
 	age:75
 	work: "select work list da elenco professioni"
 	worktype: dipendente / autonomo / non lavoratore
@@ -36,6 +47,7 @@ func Person(w http.ResponseWriter, r *http.Request) {
 	const (
 		rulesFile = "person.json"
 	)
+
 	log.Println("Person")
 	request := lib.ErrorByte(ioutil.ReadAll(r.Body))
 	// Unmarshal or Decode the JSON to the interface.
@@ -54,7 +66,7 @@ func Person(w http.ResponseWriter, r *http.Request) {
 	default:
 
 	}
-	lib.RulesFromJson(groule, initCoverageP(), request, []byte(`{}`), w)
+	lib.RulesFromJson(groule, initCoverageP(), request, []byte(getData()), w)
 
 }
 
@@ -65,21 +77,23 @@ func initCoverageP() map[string]*models.Coverage {
 		Slug:                       "Invalidità Permanente Infortunio",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0.0,
-
 		Base: &models.CoverageValue{
 			Deductible:                 "0",
+			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
 		Your: &models.CoverageValue{
 			Deductible:                 "0",
+			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
 		Premium: &models.CoverageValue{
 			Deductible:                 "0",
+			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
 		IsBase:    false,
-		IsYuor:    false,
+		IsYour:    false,
 		IsPremium: false,
 	}
 	res["D"] = &models.Coverage{
@@ -88,18 +102,21 @@ func initCoverageP() map[string]*models.Coverage {
 		SumInsuredLimitOfIndemnity: 0.0,
 		Base: &models.CoverageValue{
 			Deductible:                 "0",
+			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
 		Your: &models.CoverageValue{
 			Deductible:                 "0",
+			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
 		Premium: &models.CoverageValue{
 			Deductible:                 "0",
+			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
 		IsBase:    false,
-		IsYuor:    false,
+		IsYour:    false,
 		IsPremium: false,
 	}
 	res["ITI"] = &models.Coverage{
@@ -109,18 +126,21 @@ func initCoverageP() map[string]*models.Coverage {
 		SumInsuredLimitOfIndemnity: 0.0,
 		Base: &models.CoverageValue{
 			Deductible:                 "0",
+			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
 		Your: &models.CoverageValue{
 			Deductible:                 "0",
+			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
 		Premium: &models.CoverageValue{
 			Deductible:                 "0",
+			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
 		IsBase:    false,
-		IsYuor:    false,
+		IsYour:    false,
 		IsPremium: false,
 	}
 	res["DRG"] = &models.Coverage{
@@ -130,39 +150,44 @@ func initCoverageP() map[string]*models.Coverage {
 		SumInsuredLimitOfIndemnity: 0.0,
 		Base: &models.CoverageValue{
 			Deductible:                 "0",
+			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
 		Your: &models.CoverageValue{
 			Deductible:                 "0",
+			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
 		Premium: &models.CoverageValue{
 			Deductible:                 "0",
+			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
 		IsBase:    false,
-		IsYuor:    false,
+		IsYour:    false,
 		IsPremium: false,
 	}
 	res["DC"] = &models.Coverage{
-		Slug: "Diaria Convalescenza Infortunio",
-
+		Slug:                       "Diaria Convalescenza Infortunio",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0.0,
 		Base: &models.CoverageValue{
 			Deductible:                 "0",
+			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
 		Your: &models.CoverageValue{
 			Deductible:                 "0",
+			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
 		Premium: &models.CoverageValue{
 			Deductible:                 "0",
+			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
 		IsBase:    false,
-		IsYuor:    false,
+		IsYour:    false,
 		IsPremium: false,
 	}
 	res["RSC"] = &models.Coverage{
@@ -171,18 +196,21 @@ func initCoverageP() map[string]*models.Coverage {
 		SumInsuredLimitOfIndemnity: 0.0,
 		Base: &models.CoverageValue{
 			Deductible:                 "0",
+			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
 		Your: &models.CoverageValue{
 			Deductible:                 "0",
+			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
 		Premium: &models.CoverageValue{
 			Deductible:                 "0",
+			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
 		IsBase:    false,
-		IsYuor:    false,
+		IsYour:    false,
 		IsPremium: false,
 	}
 	res["IPM"] = &models.Coverage{
@@ -192,18 +220,21 @@ func initCoverageP() map[string]*models.Coverage {
 		SumInsuredLimitOfIndemnity: 0.0,
 		Base: &models.CoverageValue{
 			Deductible:                 "0",
+			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
 		Your: &models.CoverageValue{
 			Deductible:                 "0",
+			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
 		Premium: &models.CoverageValue{
 			Deductible:                 "0",
+			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
 		IsBase:    false,
-		IsYuor:    false,
+		IsYour:    false,
 		IsPremium: false,
 	}
 	res["ASS"] = &models.Coverage{
@@ -213,18 +244,21 @@ func initCoverageP() map[string]*models.Coverage {
 		SumInsuredLimitOfIndemnity: 0.0,
 		Base: &models.CoverageValue{
 			Deductible:                 "0",
+			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
 		Your: &models.CoverageValue{
 			Deductible:                 "0",
+			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
 		Premium: &models.CoverageValue{
 			Deductible:                 "0",
+			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
 		IsBase:    false,
-		IsYuor:    false,
+		IsYour:    false,
 		IsPremium: false,
 	}
 	res["TL"] = &models.Coverage{
@@ -234,20 +268,135 @@ func initCoverageP() map[string]*models.Coverage {
 		SumInsuredLimitOfIndemnity: 0.0,
 		Base: &models.CoverageValue{
 			Deductible:                 "0",
+			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
 		Your: &models.CoverageValue{
 			Deductible:                 "0",
+			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
 		Premium: &models.CoverageValue{
 			Deductible:                 "0",
+			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
 		IsBase:    false,
-		IsYuor:    false,
+		IsYour:    false,
 		IsPremium: false,
 	}
 
 	return res
+}
+func getData() string {
+	return `{
+		"IPI": {
+			"extra":{
+			"1": {
+				"asorbable": {
+					"5": 1.08,
+					"10": 0.79
+				},
+				"absolute": {
+					"3": 1.13,
+					"5": 0.90,
+					"10": 0.74
+				}
+			}
+		},
+		"professional":{
+			"1": {
+				"asorbable": {
+					"5": 0.68,
+					"10": 0.50
+				},
+				"absolute": {
+					"3": 0.71,
+					"5": 0.57,
+					"10": 0.47
+				}
+			},
+			"2": {
+				"asorbable": {
+					"5": 0.88,
+					"10": 0.65
+				},
+				"absolute": {
+					"3": 0.92,
+					"5": 0.74,
+					"10": 0.60
+				}
+			},
+			"3": {
+				"asorbable": {
+					"5": 1.25,
+					"10": 0.92
+				},
+				"absolute": {
+					"3": 1.32,
+					"5": 1.06,
+					"10": 0.85
+				}
+			},
+			"4": {
+				"asorbable": {
+					"5": 1.45,
+					"10": 1.07
+				},
+				"absolute": {
+					"3": 1.52,
+					"5": 1.22,
+					"10": 0.99
+				}
+			}
+		},
+		"extraprof":{
+			"1": {
+				"asorbable": {
+					"5": 1.14,
+					"10": 0.83
+				},
+				"absolute": {
+					"3": 1.19,
+					"5": 0.95,
+					"10": 0.78
+				}
+			},
+			"2": {
+				"asorbable": {
+					"5": 1.46,
+					"10": 1.08
+				},
+				"absolute": {
+					"3": 1.53,
+					"5": 1.23,
+					"10": 1.00
+				}
+			},
+			"3": {
+				"asorbable": {
+					"5": 2.08,
+					"10": 1.53
+				},
+				"absolute": {
+					"3": 2.20,
+					"5": 1.76,
+					"10": 1.42
+				}
+			},
+			"4": {
+				"asorbable": {
+					"5": 2.41,
+					"10": 1.78
+				},
+				"absolute": {
+					"3": 2.54,
+					"5": 2.03,
+					"10":1.65
+				}
+			}
+		}
+	}
+	
+	}`
 }

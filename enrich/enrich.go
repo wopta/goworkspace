@@ -40,7 +40,7 @@ func Enrich(w http.ResponseWriter, r *http.Request) {
 		case "munichre":
 			MunichVat(w, vat[base+2])
 		default:
-			fmt.Fprintf(w, "missing service in path es. munichre")
+			fmt.Fprintf(w, `{"message":"missing service in path es. munichre"}`)
 		}
 
 	case "works":
@@ -48,7 +48,7 @@ func Enrich(w http.ResponseWriter, r *http.Request) {
 	case "ateco":
 
 	default:
-		fmt.Fprintf(w, "missing scope in path es. vat, works, ateco")
+		fmt.Fprintf(w, `{"message":"missing scope in path es. vat, works, ateco"}`)
 	}
 
 }

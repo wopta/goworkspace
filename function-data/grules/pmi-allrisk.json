@@ -1,4 +1,16 @@
 [
+   
+    {
+        "name": "RevenueCheck",
+        "desc": "check rct base ",
+        "salience": 1000,
+        "when": "in.revenue >500000",
+        "then": [
+
+            "Log(\"revenue to much\")",
+            " Complete()"
+        ]
+    },
     {
         "name": "Rct",
         "desc": "check rct base ",
@@ -607,15 +619,15 @@
             "out[\"employers-liability\"].SelfInsurance = \"0.10\"",
             "out[\"environmental-liability\"].SelfInsurance = \"0.10\"",
             "out[\"power-surge\"].SelfInsurance = \"0.10\"",
-            "out[\"earthquake\"].SelfInsurance = \"0.10\"",
+            "out[\"earthquake\"].SelfInsurance = \"0.05\"",
             "out[\"product-liability\"].SelfInsurance = \"0.10\"",
             "out[\"property-damage-due-to-theft\"].SelfInsurance = \"0.10\"",
-            "out[\"river-flood\"].SelfInsurance = \"0.10\"",
-            "out[\"sociopolitical-event\"].SelfInsurance = \"0.10\"",
-            "out[\"terrorism\"].SelfInsurance = \"0.10\"",
+            "out[\"river-flood\"].SelfInsurance = \"0.05\"",
+            "out[\"sociopolitical-event\"].SelfInsurance = \"0.05\"",
+            "out[\"terrorism\"].SelfInsurance = \"0.05\"",
             "out[\"third-party-recourse\"].SelfInsurance = \"0.10\"",
-            "out[\"water-damage\"].SelfInsurance = \"0.10\"",
-            " Retract(\"SelfInsurance0\")"
+            "out[\"water-damage\"].SelfInsurance = \"0.05\"",
+            "Retract(\"SelfInsurance0\")"
         ]
     },
     {
@@ -623,7 +635,6 @@
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
         "salience": 54,
         "when": "  out[\"third-party-liability\"].Deductible==\"500\"",
-
         "then": [
             "out[\"atmospheric-event\"].SelfInsurance = \"0.10\"",
             "out[\"damage-to-goods-course-of-works\"].SelfInsurance = \"0.10\"",
@@ -634,14 +645,14 @@
             "out[\"employers-liability\"].SelfInsurance = \"0.10\"",
             "out[\"environmental-liability\"].SelfInsurance = \"0.10\"",
             "out[\"power-surge\"].SelfInsurance = \"0.10\"",
-            "out[\"earthquake\"].SelfInsurance = \"0.10\"",
+            "out[\"earthquake\"].SelfInsurance = \"0.05\"",
             "out[\"product-liability\"].SelfInsurance = \"0.10\"",
             "out[\"property-damage-due-to-theft\"].SelfInsurance = \"0.10\"",
-            "out[\"river-flood\"].SelfInsurance = \"0.10\"",
-            "out[\"sociopolitical-event\"].SelfInsurance = \"0.10\"",
-            "out[\"terrorism\"].SelfInsurance = \"0.10\"",
+            "out[\"river-flood\"].SelfInsurance = \"0.05\"",
+            "out[\"sociopolitical-event\"].SelfInsurance = \"0.05\"",
+            "out[\"terrorism\"].SelfInsurance = \"0.05\"",
             "out[\"third-party-recourse\"].SelfInsurance = \"0.10\"",
-            "out[\"water-damage\"].SelfInsurance = \"0.10\"",
+            "out[\"water-damage\"].SelfInsurance = \"0.05\"",
             " Retract(\"SelfInsurance500\")"
         ]
     },
@@ -661,14 +672,14 @@
             "out[\"employers-liability\"].SelfInsurance = \"0.10\"",
             "out[\"environmental-liability\"].SelfInsurance = \"0.10\"",
             "out[\"power-surge\"].SelfInsurance = \"0.10\"",
-            "out[\"earthquake\"].SelfInsurance = \"0.10\"",
+            "out[\"earthquake\"].SelfInsurance = \"0.05\"",
             "out[\"product-liability\"].SelfInsurance = \"0.10\"",
             "out[\"property-damage-due-to-theft\"].SelfInsurance = \"0.10\"",
-            "out[\"river-flood\"].SelfInsurance = \"0.10\"",
-            "out[\"sociopolitical-event\"].SelfInsurance = \"0.10\"",
-            "out[\"terrorism\"].SelfInsurance = \"0.10\"",
+            "out[\"river-flood\"].SelfInsurance = \"0.05\"",
+            "out[\"sociopolitical-event\"].SelfInsurance = \"0.05\"",
+            "out[\"terrorism\"].SelfInsurance = \"0.05\"",
             "out[\"third-party-recourse\"].SelfInsurance = \"0.10\"",
-            "out[\"water-damage\"].SelfInsurance = \"0.10\"",
+            "out[\"water-damage\"].SelfInsurance = \"0.05\"",
             " Retract(\"SelfInsurance1000\")"
         ]
     },
@@ -697,6 +708,60 @@
             "out[\"third-party-recourse\"].SelfInsurance = \"0.10\"",
             "out[\"water-damage\"].SelfInsurance = \"0.10\"",
             " Retract(\"SelfInsurance2000\")"
+        ]
+    },
+    {
+        "name": "SelfInsurance3000",
+        "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
+        "salience": 54,
+        "when": "  out[\"third-party-liability\"].Deductible==\"3000\"",
+
+        "then": [
+            "out[\"atmospheric-event\"].SelfInsurance = \"0.10\"",
+            "out[\"damage-to-goods-course-of-works\"].SelfInsurance = \"0.10\"",
+            "out[\"damage-to-goods-in-custody\"].SelfInsurance = \"0.10\"",
+            "out[\"defect-liability-12-months\"].SelfInsurance = \"0.10\"",
+            "out[\"defect-liability-dm-37-2008\"].SelfInsurance = \"0.10\"",
+            "out[\"defect-liability-workmanships\"].SelfInsurance = \"0.10\"",
+            "out[\"employers-liability\"].SelfInsurance = \"0.10\"",
+            "out[\"environmental-liability\"].SelfInsurance = \"0.10\"",
+            "out[\"power-surge\"].SelfInsurance = \"0.10\"",
+            "out[\"earthquake\"].SelfInsurance = \"0.10\"",
+            "out[\"product-liability\"].SelfInsurance = \"0.10\"",
+            "out[\"property-damage-due-to-theft\"].SelfInsurance = \"0.10\"",
+            "out[\"river-flood\"].SelfInsurance = \"0.10\"",
+            "out[\"sociopolitical-event\"].SelfInsurance = \"0.10\"",
+            "out[\"terrorism\"].SelfInsurance = \"0.10\"",
+            "out[\"third-party-recourse\"].SelfInsurance = \"0.10\"",
+            "out[\"water-damage\"].SelfInsurance = \"0.10\"",
+            " Retract(\"SelfInsurance3000\")"
+        ]
+    },
+    {
+        "name": "SelfInsurance5000",
+        "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
+        "salience": 54,
+        "when": "  out[\"third-party-liability\"].Deductible==\"5000\"",
+
+        "then": [
+            "out[\"atmospheric-event\"].SelfInsurance = \"0.10\"",
+            "out[\"damage-to-goods-course-of-works\"].SelfInsurance = \"0.10\"",
+            "out[\"damage-to-goods-in-custody\"].SelfInsurance = \"0.10\"",
+            "out[\"defect-liability-12-months\"].SelfInsurance = \"0.10\"",
+            "out[\"defect-liability-dm-37-2008\"].SelfInsurance = \"0.10\"",
+            "out[\"defect-liability-workmanships\"].SelfInsurance = \"0.10\"",
+            "out[\"employers-liability\"].SelfInsurance = \"0.10\"",
+            "out[\"environmental-liability\"].SelfInsurance = \"0.10\"",
+            "out[\"power-surge\"].SelfInsurance = \"0.10\"",
+            "out[\"earthquake\"].SelfInsurance = \"0.10\"",
+            "out[\"product-liability\"].SelfInsurance = \"0.10\"",
+            "out[\"property-damage-due-to-theft\"].SelfInsurance = \"0.10\"",
+            "out[\"river-flood\"].SelfInsurance = \"0.10\"",
+            "out[\"sociopolitical-event\"].SelfInsurance = \"0.10\"",
+            "out[\"terrorism\"].SelfInsurance = \"0.10\"",
+            "out[\"third-party-recourse\"].SelfInsurance = \"0.10\"",
+            "out[\"water-damage\"].SelfInsurance = \"0.10\"",
+            " Retract(\"SelfInsurance5000\")"
         ]
     }
 ]

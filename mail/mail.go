@@ -236,7 +236,7 @@ func Send(resp http.ResponseWriter, obj *Request) {
 		err = w.Close()
 		lib.CheckError(err)
 		c.Quit()
-		fmt.Fprintf(resp, " mail send")
+		fmt.Fprintf(resp, `{"message":"Success send "}`)
 	}
 
 }

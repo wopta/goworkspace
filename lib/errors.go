@@ -1,6 +1,9 @@
 package lib
 
-import "log"
+import (
+	"log"
+	"net/http"
+)
 
 func CheckError(e error) {
 	if e != nil {
@@ -13,4 +16,13 @@ func CheckError(e error) {
 func ErrorByte(b []byte, e error) []byte {
 	CheckError(e)
 	return b
+}
+
+func CheckErrorResp(resp http.ResponseWriter, e error) {
+
+	if e != nil {
+		log.Fatal(e)
+		panic(e)
+
+	}
 }

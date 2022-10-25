@@ -12,7 +12,7 @@ type Coverage struct {
 	Slug                       string
 	SelfInsurance              string
 	IsBase                     bool
-	IsYuor                     bool
+	IsYour                     bool
 	IsPremium                  bool
 	Base                       *CoverageValue
 	Your                       *CoverageValue
@@ -21,6 +21,7 @@ type Coverage struct {
 type CoverageValue struct {
 	TypeOfSumInsured           string
 	Deductible                 string
+	DeductibleType             string
 	SumInsuredLimitOfIndemnity float64
 	SelfInsurance              string
 	Tax                        float64

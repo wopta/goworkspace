@@ -492,6 +492,7 @@ func initCoverage() map[string]*Coverage {
 	var res = make(map[string]*Coverage)
 	res["third-party-liability"] = &Coverage{
 		Slug:                       "third-party-liability",
+		Type:                       "company",
 		TypeOfSumInsured:           "namedPerils",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0.0,
@@ -501,6 +502,7 @@ func initCoverage() map[string]*Coverage {
 	}
 	res["damage-to-goods-in-custody"] = &Coverage{
 		Slug:                       "damage-to-goods-in-custody",
+		Type:                       "company",
 		TypeOfSumInsured:           "namedPerils",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0,
@@ -510,6 +512,7 @@ func initCoverage() map[string]*Coverage {
 	}
 	res["defect-liability-workmanships"] = &Coverage{
 		Slug:                       "defect-liability-workmanships",
+		Type:                       "company",
 		TypeOfSumInsured:           "namedPerils",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0,
@@ -519,6 +522,7 @@ func initCoverage() map[string]*Coverage {
 	}
 	res["defect-liability-12-months"] = &Coverage{
 		Slug:                       "defect-liability-12-months",
+		Type:                       "company",
 		TypeOfSumInsured:           "namedPerils",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0,
@@ -528,6 +532,7 @@ func initCoverage() map[string]*Coverage {
 	}
 	res["defect-liability-dm-37-2008"] = &Coverage{
 		Slug:                       "defect-liability-dm-37-2008",
+		Type:                       "company",
 		TypeOfSumInsured:           "namedPerils",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0,
@@ -537,6 +542,7 @@ func initCoverage() map[string]*Coverage {
 	}
 	res["property-damage-due-to-theft"] = &Coverage{
 		Slug:                       "property-damage-due-to-theft",
+		Type:                       "company",
 		TypeOfSumInsured:           "namedPerils",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0,
@@ -546,6 +552,7 @@ func initCoverage() map[string]*Coverage {
 	}
 	res["damage-to-goods-course-of-works"] = &Coverage{
 		Slug:                       "damage-to-goods-course-of-works",
+		Type:                       "company",
 		TypeOfSumInsured:           "namedPerils",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0,
@@ -555,6 +562,7 @@ func initCoverage() map[string]*Coverage {
 	}
 	res["employers-liability"] = &Coverage{
 		Slug:                       "employers-liability",
+		Type:                       "company",
 		TypeOfSumInsured:           "namedPerils",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0,
@@ -564,6 +572,7 @@ func initCoverage() map[string]*Coverage {
 	}
 	res["product-liability"] = &Coverage{
 		Slug:                       "product-liability",
+		Type:                       "company",
 		TypeOfSumInsured:           "namedPerils",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0,
@@ -573,6 +582,7 @@ func initCoverage() map[string]*Coverage {
 	}
 	res["third-party-liability-construction-company"] = &Coverage{
 		Slug:                       "third-party-liability-construction-company",
+		Type:                       "company",
 		TypeOfSumInsured:           "namedPerils",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0,
@@ -582,6 +592,7 @@ func initCoverage() map[string]*Coverage {
 	}
 	res["legal-defence"] = &Coverage{
 		Slug:                       "legal-defence",
+		Type:                       "company",
 		TypeOfSumInsured:           "namedPerils",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0,
@@ -591,6 +602,7 @@ func initCoverage() map[string]*Coverage {
 	}
 	res["cyber"] = &Coverage{
 		Slug:                       "cyber",
+		Type:                       "company",
 		TypeOfSumInsured:           "namedPerils",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0,
@@ -600,6 +612,7 @@ func initCoverage() map[string]*Coverage {
 	}
 	res["building"] = &Coverage{
 		Slug:                       "building",
+		Type:                       "building",
 		TypeOfSumInsured:           "namedPerils",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0.0,
@@ -609,6 +622,7 @@ func initCoverage() map[string]*Coverage {
 	}
 	res["content"] = &Coverage{
 		Slug:                       "content",
+		Type:                       "building",
 		TypeOfSumInsured:           "namedPerils",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0,
@@ -618,6 +632,7 @@ func initCoverage() map[string]*Coverage {
 	}
 	res["lease-holders-interest"] = &Coverage{
 		Slug:                       "lease-holders-interest",
+		Type:                       "building",
 		TypeOfSumInsured:           "namedPerils",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0,
@@ -627,6 +642,7 @@ func initCoverage() map[string]*Coverage {
 	}
 	res["burst-pipe"] = &Coverage{
 		Slug:                       "burst-pipe",
+		Type:                       "building",
 		TypeOfSumInsured:           "namedPerils",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0,
@@ -636,6 +652,7 @@ func initCoverage() map[string]*Coverage {
 	}
 	res["power-surge"] = &Coverage{
 		Slug:                       "power-surge",
+		Type:                       "building",
 		TypeOfSumInsured:           "namedPerils",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0,
@@ -645,6 +662,7 @@ func initCoverage() map[string]*Coverage {
 	}
 	res["atmospheric-event"] = &Coverage{
 		Slug:                       "atmospheric-event",
+		Type:                       "building",
 		TypeOfSumInsured:           "namedPerils",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0,
@@ -654,6 +672,7 @@ func initCoverage() map[string]*Coverage {
 	}
 	res["sociopolitical-event"] = &Coverage{
 		Slug:                       "sociopolitical-event",
+		Type:                       "building",
 		TypeOfSumInsured:           "namedPerils",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0,
@@ -663,6 +682,7 @@ func initCoverage() map[string]*Coverage {
 	}
 	res["terrorism"] = &Coverage{
 		Slug:                       "terrorism",
+		Type:                       "building",
 		TypeOfSumInsured:           "namedPerils",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0,
@@ -672,6 +692,7 @@ func initCoverage() map[string]*Coverage {
 	}
 	res["earthquake"] = &Coverage{
 		Slug:                       "earthquake",
+		Type:                       "building",
 		TypeOfSumInsured:           "namedPerils",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0,
@@ -681,6 +702,7 @@ func initCoverage() map[string]*Coverage {
 	}
 	res["river-flood"] = &Coverage{
 		Slug:                       "river-flood",
+		Type:                       "building",
 		TypeOfSumInsured:           "namedPerils",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0,
@@ -690,6 +712,7 @@ func initCoverage() map[string]*Coverage {
 	}
 	res["water-damage"] = &Coverage{
 		Slug:                       "water-damage",
+		Type:                       "building",
 		TypeOfSumInsured:           "namedPerils",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0,
@@ -699,6 +722,7 @@ func initCoverage() map[string]*Coverage {
 	}
 	res["glass"] = &Coverage{
 		Slug:                       "glass",
+		Type:                       "building",
 		TypeOfSumInsured:           "namedPerils",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0,
@@ -708,6 +732,7 @@ func initCoverage() map[string]*Coverage {
 	}
 	res["machinery-breakdown"] = &Coverage{
 		Slug:                       "machinery-breakdown",
+		Type:                       "building",
 		TypeOfSumInsured:           "namedPerils",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0,
@@ -717,6 +742,7 @@ func initCoverage() map[string]*Coverage {
 	}
 	res["third-party-recourse"] = &Coverage{
 		Slug:                       "third-party-recourse",
+		Type:                       "building",
 		TypeOfSumInsured:           "namedPerils",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0,
@@ -726,6 +752,7 @@ func initCoverage() map[string]*Coverage {
 	}
 	res["theft"] = &Coverage{
 		Slug:                       "theft",
+		Type:                       "building",
 		TypeOfSumInsured:           "namedPerils",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0,
@@ -735,6 +762,7 @@ func initCoverage() map[string]*Coverage {
 	}
 	res["valuables-in-safe-strongrooms"] = &Coverage{
 		Slug:                       "valuables-in-safe-strongrooms",
+		Type:                       "building",
 		TypeOfSumInsured:           "namedPerils",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0,
@@ -744,6 +772,7 @@ func initCoverage() map[string]*Coverage {
 	}
 	res["valuables"] = &Coverage{
 		Slug:                       "valuables",
+		Type:                       "building",
 		TypeOfSumInsured:           "namedPerils",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0,
@@ -753,6 +782,7 @@ func initCoverage() map[string]*Coverage {
 	}
 	res["electronic-equipment"] = &Coverage{
 		Slug:                       "electronic-equipment",
+		Type:                       "building",
 		TypeOfSumInsured:           "namedPerils",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0,
@@ -762,6 +792,7 @@ func initCoverage() map[string]*Coverage {
 	}
 	res["increased-cost-of-working"] = &Coverage{
 		Slug:                       "increased-cost-of-working",
+		Type:                       "building",
 		TypeOfSumInsured:           "namedPerils",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0,
@@ -771,6 +802,7 @@ func initCoverage() map[string]*Coverage {
 	}
 	res["restoration-of-data"] = &Coverage{
 		Slug:                       "restoration-of-data",
+		Type:                       "building",
 		TypeOfSumInsured:           "namedPerils",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0,
@@ -780,6 +812,7 @@ func initCoverage() map[string]*Coverage {
 	}
 	res["software-under-license"] = &Coverage{
 		Slug:                       "software-under-license",
+		Type:                       "building",
 		TypeOfSumInsured:           "namedPerils",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0,
@@ -789,6 +822,7 @@ func initCoverage() map[string]*Coverage {
 	}
 	res["business-interruption"] = &Coverage{
 		Slug:                       "business-interruption",
+		Type:                       "building",
 		TypeOfSumInsured:           "namedPerils",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0,
@@ -798,6 +832,7 @@ func initCoverage() map[string]*Coverage {
 	}
 	res["property-owners-liability"] = &Coverage{
 		Slug:                       "property-owners-liability",
+		Type:                       "building",
 		TypeOfSumInsured:           "namedPerils",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0,
@@ -807,6 +842,7 @@ func initCoverage() map[string]*Coverage {
 	}
 	res["property-owners-liability"] = &Coverage{
 		Slug:                       "property-owners-liability",
+		Type:                       "building",
 		TypeOfSumInsured:           "namedPerils",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0,
@@ -816,6 +852,7 @@ func initCoverage() map[string]*Coverage {
 	}
 	res["software-under-license"] = &Coverage{
 		Slug:                       "software-under-license",
+		Type:                       "building",
 		TypeOfSumInsured:           "namedPerils",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0,
@@ -825,6 +862,7 @@ func initCoverage() map[string]*Coverage {
 	}
 	res["environmental-liability"] = &Coverage{
 		Slug:                       "environmental-liability",
+		Type:                       "building",
 		TypeOfSumInsured:           "namedPerils",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0,
@@ -834,6 +872,7 @@ func initCoverage() map[string]*Coverage {
 	}
 	res["assistance"] = &Coverage{
 		Slug:                       "assistance",
+		Type:                       "building",
 		TypeOfSumInsured:           "namedPerils",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0,

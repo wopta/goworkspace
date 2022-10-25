@@ -3,30 +3,232 @@
         "name": "IPI",
         "desc": "check Invalidità Permanente Infortunio ",
         "salience": 100,
-        "when": " in.childrenScool",
+        "when": " true",
         "then": [
-            "Log(\"activate IPI\")",
-            "out[\"IPI\"].IsYuor = true",
+            "Log(\"activate IPI\" + out[\"IPI\"].IsYour)",
+            "out[\"IPI\"].IsYour = true",
             "out[\"IPI\"].IsPremium = true",
-            "out[\"IPI\"].Base.SumInsuredLimitOfIndemnity = 100000",
+            "out[\"IPI\"].Base.SumInsuredLimitOfIndemnity = 100000.00",
+            "out[\"IPI\"].Your.SumInsuredLimitOfIndemnity = 100000.00",
+            "out[\"IPI\"].Premium.SumInsuredLimitOfIndemnity = 150000.00",
             "out[\"IPI\"].IsBase = true",
             "Log(\"IPI\")",
             " Retract(\"IPI\")"
         ]
     },
     {
-        "name": "D", 
-        "desc": "check Decesso Infortunio ",
+        "name": "issue1500_1",
+        "desc": "check se ha figli a scuola  Invalidità Permanente Infortunio doppia",
         "salience": 99,
+        "when": " in.issue1500==1",
+        "then": [
+            "Log(\"activate IPI\")",
+            "out[\"IPI\"].IsYour = true",
+            "out[\"IPI\"].IsPremium = true",
+            "out[\"IPI\"].Base.SumInsuredLimitOfIndemnity = 200000",
+            "out[\"IPI\"].Your.SumInsuredLimitOfIndemnity = 200000",
+            "out[\"IPI\"].Premium.SumInsuredLimitOfIndemnity = 300000",
+            "out[\"IPI\"].IsBase = true",
+            "out[\"RSC\"].IsPremium = true",
+            "out[\"RSC\"].Premium.SumInsuredLimitOfIndemnity =10000",
+            "out[\"IPM\"].IsPremium = true",
+            "out[\"IPM\"].Premium.SumInsuredLimitOfIndemnity =50000",
+            "Log(\"IPI\")",
+            " Retract(\"issue1500_1\")"
+        ]
+    },
+    {
+        "name": "issue1500_2",
+        "desc": "check se ha figli a scuola  Invalidità Permanente Infortunio doppia",
+        "salience": 99,
+        "when": " in.issue1500==2",
+        "then": [
+            "out[\"RSC\"].IsPremium = true",
+            "out[\"RSC\"].Premium.SumInsuredLimitOfIndemnity =5000",
+            " Retract(\"issue1500_2\")"
+        ]
+    },
+    {
+        "name": "issue1500_3",
+        "desc": "check se ha figli a scuola  Invalidità Permanente Infortunio doppia",
+        "salience": 99,
+        "when": " in.issue1500==3",
+        "then": [
+            "Log(\"activate IPI\")",
+            "out[\"IPI\"].IsYour = true",
+            "out[\"IPI\"].IsPremium = true",
+            "out[\"IPI\"].Base.SumInsuredLimitOfIndemnity = 50000",
+            "out[\"IPI\"].Your.SumInsuredLimitOfIndemnity = 100000",
+            "out[\"IPI\"].Premium.SumInsuredLimitOfIndemnity = 150000",
+            "out[\"IPI\"].IsBase = true",
+            "out[\"RSC\"].IsPremium = true",
+            "out[\"RSC\"].Premium.SumInsuredLimitOfIndemnity =2500",
+            "Log(\"IPI\")",
+            " Retract(\"issue1500_3\")"
+        ]
+    },
+    {
+        "name": "riskInLifeIs_1",
+        "desc": "check se ha figli a scuola  Invalidità Permanente Infortunio doppia",
+        "salience": 99,
+        "when": " in.riskInLifeIs==1",
+        "then": [
+
+         
+            "out[\"IPI\"].Base.DeductibleType =\"absolute\"",
+            "out[\"IPI\"].Your.DeductibleType =\"absorbable\"",
+            "out[\"IPI\"].Premium.DeductibleType =\"absorbable\"",
+            "out[\"IPI\"].Base.Deductible =\"5\"",
+            "out[\"IPI\"].Your.Deductible =\"3\"",
+            "out[\"IPI\"].Premium.Deductible=\"3\"",
+            "out[\"IPM\"].IsPremium = true",
+            "out[\"IPM\"].Premium.SumInsuredLimitOfIndemnity =50000",
+            " Retract(\"riskInLifeIs_1\")"
+        ]
+    },
+    {
+        "name": "riskInLifeIs_2",
+        "desc": "check se ha figli a scuola  Invalidità Permanente Infortunio doppia",
+        "salience": 99,
+        "when": " in.riskInLifeIs==2",
+        "then": [
+
+         
+            "out[\"IPI\"].Base.DeductibleType =\"absolute\"",
+            "out[\"IPI\"].Your.DeductibleType =\"absorbable\"",
+            "out[\"IPI\"].Premium.DeductibleType =\"absorbable\"",
+            "out[\"IPI\"].Base.Deductible =\"5\"",
+            "out[\"IPI\"].Your.Deductible =\"5\"",
+            "out[\"IPI\"].Premium.Deductible=\"5\"",
+         
+            " Retract(\"riskInLifeIs_2\")"
+        ]
+    },
+    {
+        "name": "riskInLifeIs_3",
+        "desc": "check se ha figli a scuola  Invalidità Permanente Infortunio doppia",
+        "salience": 99,
+        "when": " in.riskInLifeIs==3",
+        "then": [
+
+            "out[\"IPI\"].Base.DeductibleType =\"absorbable\"",
+            "out[\"IPI\"].Your.DeductibleType =\"absorbable\"",
+            "out[\"IPI\"].Premium.DeductibleType =\"absorbable\"",
+            "out[\"IPI\"].Base.Deductible =\"10\"",
+            "out[\"IPI\"].Your.Deductible =\"5\"",
+            "out[\"IPI\"].Premium.Deductible=\"5\"",
+          
+            " Retract(\"riskInLifeIs_3\")"
+        ]
+    },
+    {
+        "name": "childrenScool", 
+        "desc": "check Decesso Infortunio ",
+        "salience": 98,
         "when": " in.childrenScool",
         "then": [
-            "out[\"D\"].IsYuor = true",
+            "out[\"D\"].IsYour = true",
             "out[\"D\"].IsPremium = true",
-            "out[\"D\"].Base.SumInsuredLimitOfIndemnity = 100000",
+            "out[\"D\"].Base.SumInsuredLimitOfIndemnity = out[\"IPI\"].Base.SumInsuredLimitOfIndemnity",
+            "out[\"D\"].Your.SumInsuredLimitOfIndemnity = out[\"IPI\"].Your.SumInsuredLimitOfIndemnity",
+            "out[\"D\"].Premium.SumInsuredLimitOfIndemnity =out[\"IPI\"].Premium.SumInsuredLimitOfIndemnity",
             "out[\"D\"].IsBase = true",
             "Log(\"D\")",
-            " Retract(\"D\")"
+            " Retract(\"childrenScool\")"
+        ]
+    },
+    {
+        "name": "workType1", 
+        "desc": "check Decesso Infortunio ",
+        "salience": 98,
+        "when": " in.workType==\"autonomo\"",
+        "then": [
+            "out[\"ITI\"].IsYour = true",
+            "out[\"ITI\"].IsPremium = true",
+            "out[\"ITI\"].Base.SumInsuredLimitOfIndemnity =0",
+            "out[\"ITI\"].Your.SumInsuredLimitOfIndemnity = 50",
+            "out[\"ITI\"].Premium.SumInsuredLimitOfIndemnity =100",
+            "out[\"ITI\"].IsBase = false",
+            "Log(\"ITI\")",
+            " Retract(\"workType1\")"
+        ]
+    },
+    {
+        "name": "workType2", 
+        "desc": "check Decesso Infortunio ",
+        "salience": 98,
+        "when": " in.workType==\"dipendente\"",
+        "then": [
+            "out[\"IPI\"].Type=\"extra\"",
+            "out[\"DC\"].IsPremium = true",
+            "out[\"DC\"].Premium.SumInsuredLimitOfIndemnity =100",
+            "Log(\"DC\")",
+            " Retract(\"workType2\")"
+        ]
+    },
+    {
+        "name": "workType1_issue1500_1", 
+        "desc": "check Decesso Infortunio ",
+        "salience": 98,
+        "when": " in.workType==\"autonomo\" && in.issue1500==1",
+        "then": [
+            "out[\"IPI\"].Type=\"professional\"",
+            "out[\"ITI\"].IsYour = true",
+            "out[\"ITI\"].IsPremium = true",
+            "out[\"ITI\"].Base.SumInsuredLimitOfIndemnity =0",
+            "out[\"ITI\"].Your.SumInsuredLimitOfIndemnity = 100",
+            "out[\"ITI\"].Premium.SumInsuredLimitOfIndemnity =150",
+            "out[\"ITI\"].IsBase = false",
+            "Log(\"ITI\")",
+            " Retract(\"workType1_issue1500_1\")"
+        ]
+    },
+    {
+        "name": "workType1_issue1500_2", 
+        "desc": "check Decesso Infortunio ",
+        "salience": 98,
+        "when": " in.workType==\"autonomo\" && in.issue1500==2 ",
+        "then": [
+            "out[\"ITI\"].IsYour = true",
+            "out[\"ITI\"].IsPremium = true",
+            "out[\"ITI\"].Base.SumInsuredLimitOfIndemnity =0",
+            "out[\"ITI\"].Your.SumInsuredLimitOfIndemnity = 75",
+            "out[\"ITI\"].Premium.SumInsuredLimitOfIndemnity =125",
+            "out[\"ITI\"].IsBase = false",
+     
+            "Log(\"ITI\")",
+            " Retract(\"workType1_issue1500_2\")"
+        ]
+    },
+    {
+        "name": "workType2_issue1500_1", 
+        "desc": "check Decesso Infortunio ",
+        "salience": 98,
+        "when": " in.workType==\"dipendente\" && in.issue1500==1",
+        "then": [
+            "out[\"DRG\"].IsYour = true",
+            "out[\"DRG\"].IsPremium = true",
+            "out[\"DRG\"].Base.SumInsuredLimitOfIndemnity =0",
+            "out[\"DRG\"].Your.SumInsuredLimitOfIndemnity = 100",
+            "out[\"DRG\"].Premium.SumInsuredLimitOfIndemnity =150",
+            "out[\"DRG\"].IsBase = false",
+            "out[\"DC\"].IsYour = true",
+            "out[\"DC\"].Your.SumInsuredLimitOfIndemnity = 50",
+            "Log(\"DRG\")",
+            " Retract(\"workType2_issue1500_1\")"
+        ]
+    },
+    {
+        "name": "calculateIPI", 
+        "desc": "calalcola tariffa ipi",
+        "salience": 98,
+        "when": " true",
+        "then": [
+            "out[\"IPI\"].Premium.PremiumNet=(out[\"IPI\"].Premium.SumInsuredLimitOfIndemnity/1000.0)*data[\"IPI\"][out[\"IPI\"].Type][in.class][out[\"IPI\"].Premium.DeductibleType][out[\"IPI\"].Premium.Deductible]",
+            
+            "Retract(\"calculateIPI\")"
         ]
     }
+
 ]
 

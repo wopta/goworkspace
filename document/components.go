@@ -1,6 +1,8 @@
 package document
 
 import (
+	"log"
+
 	"github.com/johnfercher/maroto/pkg/color"
 	"github.com/johnfercher/maroto/pkg/consts"
 	"github.com/johnfercher/maroto/pkg/pdf"
@@ -8,39 +10,49 @@ import (
 	//model "github.com/wopta/goworkspace/models"
 )
 
-func Customer(m pdf.Maroto) {
+type Skin struct {
+	LineColor         color.Color
+	TextColor         color.Color
+	TitleColor        color.Color
+	rowHeight         float64
+	rowtableHeight    float64
+	LineHeight        float64
+	Size              float64
+	SizeTitle         float64
+	TableHeight       float64
+	rowtableHeightMin float64
+}
+
+func (s Skin) CustomerRow(m pdf.Maroto, k string, v string) pdf.Maroto {
 	textBoldRight := props.Text{
 		Top:   1.5,
-		Size:  9,
+		Size:  s.Size,
 		Style: consts.Bold,
-		Align: consts.Center,
+		Align: consts.Right,
+		Color: s.TextColor,
 	}
-
-	magenta := color.Color{
-		Red:   229,
-		Green: 0,
-		Blue:  117,
+	textRight := props.Text{
+		Top:   1.5,
+		Size:  s.Size,
+		Style: consts.Bold,
+		Align: consts.Left,
+		Color: s.TextColor,
 	}
 	textMagenta := props.Text{
-		Color: magenta,
+		Color: s.LineColor,
 		Top:   0,
 		Style: consts.Normal,
 		Align: consts.Left,
-		Size:  1,
+		Size:  5,
 	}
-	m.Row(5, func() {
-		m.Col(2, func() {
-			m.Text("Assicurato:", textBoldRight)
+	m.Row(3, func() {
+		m.Col(4, func() {
+			m.Text(k, textBoldRight)
 
 		})
 
-		m.Col(2, func() {
-			m.Text("xxxx", props.Text{
-				Top:   1.5,
-				Size:  9,
-				Style: consts.Normal,
-				Align: consts.Center,
-			})
+		m.Col(4, func() {
+			m.Text(v, textRight)
 		})
 	})
 
@@ -50,4 +62,153 @@ func Customer(m pdf.Maroto) {
 
 		})
 	})
+	return m
+}
+func (s Skin) TableRow(m pdf.Maroto, colText []string, isLine bool, colspace uint, h float64) pdf.Maroto {
+
+	textBold := props.Text{
+		Top:   1.5,
+		Size:  s.Size,
+		Style: consts.Bold,
+		Align: consts.Left,
+		Color: s.TextColor,
+	}
+	text := props.Text{
+		Top:   1.5,
+		Size:  s.Size,
+		Style: consts.Normal,
+		Align: consts.Left,
+		Color: s.TextColor,
+	}
+	textLast := props.Text{
+		Top:   1.5,
+		Size:  s.Size,
+		Style: consts.Normal,
+		Align: consts.Right,
+		Color: s.TextColor,
+	}
+	linePropMagenta := props.Line{
+		Color: s.LineColor,
+		Style: consts.Solid,
+		Width: 0.2,
+	}
+	m.Row(h, func() {
+
+		for i, k := range colText {
+			var prop props.Text
+			prop = text
+			log.Println(len(colText))
+			if len(colText) >= 2 {
+				if i == 0 {
+					prop = textBold
+				} else if i == len(colText)-1 {
+					prop = textLast
+				} else {
+					prop = text
+				}
+			}
+			m.Col(colspace, func() {
+
+				m.Text(k, prop)
+
+			})
+		}
+
+	})
+	if isLine {
+		m.Line(s.LineHeight, linePropMagenta)
+	}
+
+	return m
+}
+func (s Skin) TableHeader(m pdf.Maroto, colText []string, isLine bool, colspace uint, h float64) pdf.Maroto {
+
+	textBold := props.Text{
+		Top:   1.5,
+		Size:  s.SizeTitle,
+		Style: consts.Bold,
+		Align: consts.Center,
+		Color: s.TextColor,
+	}
+
+	linePropMagenta := props.Line{
+		Color: s.LineColor,
+		Style: consts.Solid,
+		Width: 0.2,
+	}
+	m.Row(h, func() {
+
+		for _, k := range colText {
+
+			m.Col(colspace, func() {
+
+				m.Text(k, textBold)
+
+			})
+		}
+
+	})
+	if isLine {
+		m.Line(s.LineHeight, linePropMagenta)
+	}
+
+	return m
+}
+func (s Skin) RowBullet(m pdf.Maroto, k string, v string, style consts.Style) pdf.Maroto {
+	rowh := lenToHeight(v)
+	prop := props.Text{
+		Top:   1.5,
+		Size:  s.Size,
+		Style: style,
+		Align: consts.Left,
+		Color: s.TextColor,
+	}
+	propR := props.Text{
+		Top:   1.5,
+		Size:  s.Size,
+		Style: style,
+		Align: consts.Right,
+		Color: s.TextColor,
+	}
+
+	m.Row(rowh, func() {
+		m.Col(1, func() {
+			m.Text(k, propR)
+
+		})
+
+		m.Col(11, func() {
+			m.Text(v, prop)
+		})
+	})
+
+	return m
+}
+func (s Skin) RowCol1(m pdf.Maroto, v string, style consts.Style) pdf.Maroto {
+	rowh := lenToHeight(v)
+	prop := props.Text{
+		Top:             0.5,
+		Size:            s.Size,
+		Style:           style,
+		Align:           consts.Left,
+		Color:           s.TextColor,
+		VerticalPadding: 0.0,
+	}
+
+	m.Row(rowh, func() {
+
+		m.Col(12, func() {
+			m.Text(v, prop)
+		})
+	})
+
+	return m
+}
+func (s Skin) Space(m pdf.Maroto, h float64) pdf.Maroto {
+
+	m.Row(h, func() {
+		m.ColSpace(12)
+	})
+
+	return m
 }

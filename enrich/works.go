@@ -12,11 +12,12 @@ import (
 func Works(w http.ResponseWriter) {
 	// Set CORS headers for the main request.
 	var (
-		works  []byte
-		result []Work
-		self   bool
-		emp    bool
-		unself bool
+		works    []byte
+		result   []Work
+		self     bool
+		emp      bool
+		unself   bool
+		workType string
 	)
 	w.Header().Set("Access-Control-Allow-Methods", "GET")
 	log.Println("Work")
@@ -31,17 +32,21 @@ func Works(w http.ResponseWriter) {
 		if k > 0 {
 
 			if v[2] == "x" {
+				workType = "autonomo"
 				self = true
 			}
 			if v[3] == "x" {
+				workType = "dipendente"
 				emp = true
 			}
 			if v[4] == "x" {
+				workType = "disoccupato"
 				unself = true
 			}
 
 			sub := Work{Work: v[0],
 				Class:          v[1],
+				WorkType:       workType,
 				IsSelfEmployed: self,
 				IsEmployed:     emp,
 				IsUnemployed:   unself,
@@ -56,6 +61,7 @@ func Works(w http.ResponseWriter) {
 
 type Work struct {
 	Work           string `json:"work"`
+	WorkType       string `json:"workType"`
 	Class          string `json:"class"`
 	IsSelfEmployed bool   `json:"isSelfEmployed"`
 	IsEmployed     bool   `json:"isEmployed"`
