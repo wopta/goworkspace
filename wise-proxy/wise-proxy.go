@@ -5,7 +5,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/json"
-	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -55,11 +55,11 @@ func WiseProxy(w http.ResponseWriter, r *http.Request) {
 	lib.CheckError(err)
 	defer res.Body.Close()
 	if res != nil {
-		body, err := ioutil.ReadAll(res.Body)
-		log.Println("body: " + string(body))
-		lib.CheckError(err)
-
-		fmt.Fprintf(w, strings.ReplaceAll(string(body), "(MISSING)", ""))
+		//body, err := ioutil.ReadAll(res.Body)
+		//log.Println("body: " + string(body))
+		//lib.CheckError(err)
+		io.Copy(w, res.Body)
+		//fmt.Fprintf(w, strings.ReplaceAll(string(body), "(MISSING)", ""))
 		res.Body.Close()
 	}
 	//lib.Files("")
