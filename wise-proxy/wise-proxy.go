@@ -58,8 +58,8 @@ func WiseProxy(w http.ResponseWriter, r *http.Request) {
 		body, err := ioutil.ReadAll(res.Body)
 		log.Println("body: " + string(body))
 		lib.CheckError(err)
-		strings.ReplaceAll(string(body), "(MISSING)", "")
-		fmt.Fprintf(w, string(body))
+
+		fmt.Fprintf(w, strings.ReplaceAll(string(body), "(MISSING)", ""))
 		res.Body.Close()
 	}
 	//lib.Files("")
