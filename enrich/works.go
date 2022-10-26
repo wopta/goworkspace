@@ -22,13 +22,13 @@ func Works(w http.ResponseWriter) {
 	w.Header().Set("Access-Control-Allow-Methods", "GET")
 	log.Println("Work")
 	w.Header().Set("Content-Type", "application/json")
-	works = getWoprk()
+	works = getWork()
 
 	df := lib.CsvToDataframe(works)
 
 	for k, v := range df.Records() {
-		fmt.Println(v)
-		fmt.Println(k)
+		log.Println(v)
+		log.Println(k)
 		if k > 0 {
 
 			if v[2] == "x" {
@@ -56,7 +56,9 @@ func Works(w http.ResponseWriter) {
 	}
 	b, err := json.Marshal(result)
 	lib.CheckError(err)
-	fmt.Fprintf(w, string(b))
+	log.Println(string(b))
+
+	fmt.Fprintf(w, "{\"works\":"+string(b)+"}")
 }
 
 type Work struct {
@@ -68,7 +70,7 @@ type Work struct {
 	IsUnemployed   bool   `json:"isUnemployed "`
 }
 
-func getWoprk() []byte {
+func getWork() []byte {
 	return []byte(`Lista delle professioni;CLASSE;Autonomo;Dipendente;Non Lavoratore
 	Addetto di campeggio;1;x;x;
 	Addetto di sale bocce / biliardo / bowling;1;x;x;

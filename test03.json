@@ -606,7 +606,7 @@
                                 "txDatoVariabile": "",
                                 "nProgressivoParametro": 5,
                                 "cdValoreParametro": "2",
-                                "txValoreParametro": "ASSOLUTA 5%!"(MISSING),
+                                "txValoreParametro": "ASSOLUTA 5%",
                                 "elencoPrestazioni": null
                             },
                             {
@@ -6391,7 +6391,7 @@
                                     {
                                         "idCampo": 2121,
                                         "codice": "3",
-                                        "descrizione": "- di NON essere affetto da difetti fisici gravi ed invalidanti, da infermità e/o invalidità permanenti con postumi valutati in misura superiore al 50%!"(MISSING),
+                                        "descrizione": "- di NON essere affetto da difetti fisici gravi ed invalidanti, da infermità e/o invalidità permanenti con postumi valutati in misura superiore al 50%",
                                         "ordine": 23,
                                         "valore": "0,000000000000000000",
                                         "txCheckAggiuntivo": null,
@@ -6437,7 +6437,7 @@
                                         "codCampoCollegato": "0",
                                         "flgHaDipendenze": false,
                                         "flgVisibile": true,
-                                        "infoAggiuntive":"{\"key_frm_elenco_valori\":2134,\"id_frm_elenco_valori_prin\":0,\"id_frm_variabile\":39,\"descrizione\":\"- di NON essere affetto da difetti fisici gravi ed invalidanti, da infermità e/o invalidità permanenti con postumi valutati in misura superiore al 50%!\(MISSING)",\"id_descrizione\":2666643,\"descrizionelinguadefault\":\"- di NON essere affetto da difetti fisici gravi ed invalidanti, da infermità e/o invalidità permanenti con postumi valutati in misura superiore al 50%!\(MISSING)",\"flg_formato_variabile\":\"R\",\"flg_non_in_elenco_sino\":\"N\",\"dt_sto_effetto_fis\":\"2022-07-14T17:28:35.754\",\"dt_sto_scadenza_fis\":\"9999-12-31T00:00:00\",\"lunghezza\":0,\"precisione\":0,\"flg_testo_maiuscolo_sino\":\"N\",\"flg_obbligatorio_sino\":\"S\",\"formulaVisibilita\":null,\"formulaValidazione\":null,\"valore_default_stringa\":null,\"valore_default_data\":\"0001-01-01T00:00:00\",\"valore_default_numerico\":0.0,\"flgObbligatorio\":true,\"flgValido\":false}",
+                                        "infoAggiuntive": "{\"key_frm_elenco_valori\":2134,\"id_frm_elenco_valori_prin\":0,\"id_frm_variabile\":39,\"descrizione\":\"- di NON essere affetto da difetti fisici gravi ed invalidanti, da infermità e/o invalidità permanenti con postumi valutati in misura superiore al 50%\",\"id_descrizione\":2666643,\"descrizionelinguadefault\":\"- di NON essere affetto da difetti fisici gravi ed invalidanti, da infermità e/o invalidità permanenti con postumi valutati in misura superiore al 50%\",\"flg_formato_variabile\":\"R\",\"flg_non_in_elenco_sino\":\"N\",\"dt_sto_effetto_fis\":\"2022-07-14T17:28:35.754\",\"dt_sto_scadenza_fis\":\"9999-12-31T00:00:00\",\"lunghezza\":0,\"precisione\":0,\"flg_testo_maiuscolo_sino\":\"N\",\"flg_obbligatorio_sino\":\"S\",\"formulaVisibilita\":null,\"formulaValidazione\":null,\"valore_default_stringa\":null,\"valore_default_data\":\"0001-01-01T00:00:00\",\"valore_default_numerico\":0.0,\"flgObbligatorio\":true,\"flgValido\":false}",
                                         "listValoriMultipli": [
                                             {
                                                 "idCampo": "2122",
