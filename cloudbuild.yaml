@@ -55,10 +55,10 @@ steps:
     --project=${project} 
 
     
-    gcloud functions add-iam-policy-binding ${strarr[0]} \
-    --region='europe-west1' \
-    --member='serviceAccount:wopta-dev-cloudbuild-sa@positive-apex-350507.iam.gserviceaccount.com' \
-    --role='roles/cloudfunctions.invoker'
+     #gcloud functions add-iam-policy-binding ${strarr[0]} \
+    # --region='europe-west1' \
+    # --member='serviceAccount:wopta-dev-cloudbuild-sa@positive-apex-350507.iam.gserviceaccount.com' \
+    # --role='roles/cloudfunctions.invoker'
 
   entrypoint: bash
 

@@ -3,7 +3,7 @@
         "name": "IPI",
         "desc": "check Invalidità Permanente Infortunio ",
         "salience": 100,
-        "when": " true",
+        "when": " in.age< 65",
         "then": [
             "Log(\"activate IPI\" + out[\"IPI\"].IsYour)",
             "out[\"IPI\"].IsYour = true",
@@ -22,7 +22,7 @@
         "salience": 99,
         "when": " in.issue1500==1",
         "then": [
-            "Log(\"activate IPI\")",
+            "Log(\"activate issue1500_1\")",
             "out[\"IPI\"].IsYour = true",
             "out[\"IPI\"].IsPremium = true",
             "out[\"IPI\"].Base.SumInsuredLimitOfIndemnity = 200000",
@@ -54,7 +54,7 @@
         "salience": 99,
         "when": " in.issue1500==3",
         "then": [
-            "Log(\"activate IPI\")",
+            "Log(\"issue1500_3\")",
             "out[\"IPI\"].IsYour = true",
             "out[\"IPI\"].IsPremium = true",
             "out[\"IPI\"].Base.SumInsuredLimitOfIndemnity = 50000",
@@ -143,6 +143,15 @@
         "salience": 98,
         "when": " in.workType==\"autonomo\"",
         "then": [
+            "out[\"IPI\"].Type=\"professional\"",
+            "out[\"DRG\"].Type=\"professional\"",
+            "out[\"MI\"].Type=\"professional\"",
+            "out[\"IT\"].Type=\"professional\"",
+            "out[\"IPM\"].Type=\"professional\"",
+            "out[\"DC\"].Type=\"professional\"",
+            "out[\"RSC\"].Type=\"professional\"",
+            "out[\"DC\"].Type=\"professional\"",
+            "out[\"RSC\"].Type=\"professional\"",
             "out[\"ITI\"].IsYour = true",
             "out[\"ITI\"].IsPremium = true",
             "out[\"ITI\"].Base.SumInsuredLimitOfIndemnity =0",
@@ -160,6 +169,14 @@
         "when": " in.workType==\"dipendente\"",
         "then": [
             "out[\"IPI\"].Type=\"extra\"",
+            "out[\"DRG\"].Type=\"extra\"",
+            "out[\"MI\"].Type=\"extra\"",
+            "out[\"IT\"].Type=\"extra\"",
+            "out[\"IPM\"].Type=\"extra\"",
+            "out[\"DC\"].Type=\"extra\"",
+            "out[\"RSC\"].Type=\"extra\"",
+            "out[\"DC\"].Type=\"extra\"",
+            "out[\"RSC\"].Type=\"extra\"",
             "out[\"DC\"].IsPremium = true",
             "out[\"DC\"].Premium.SumInsuredLimitOfIndemnity =100",
             "Log(\"DC\")",
@@ -220,11 +237,38 @@
     },
     {
         "name": "calculateIPI", 
-        "desc": "calalcola tariffa ipi",
+        "desc": "calalcola tariffa ipi autonomo",
         "salience": 98,
-        "when": " true",
+        "when": "true",
         "then": [
-            "out[\"IPI\"].Premium.PremiumNet=(out[\"IPI\"].Premium.SumInsuredLimitOfIndemnity/1000.0)*data[\"IPI\"][out[\"IPI\"].Type][in.class][out[\"IPI\"].Premium.DeductibleType][out[\"IPI\"].Premium.Deductible]",
+            "Log(out[\"IPI\"].Premium.PremiumNet)",
+            "out[\"IPI\"].Premium.PremiumNet=(out[\"IPI\"].Premium.SumInsuredLimitOfIndemnity/1000.0)* data[\"IPI\"][out[\"IPI\"].Type][in.class][out[\"IPI\"].Premium.DeductibleType][out[\"IPI\"].Premium.Deductible]",
+            "out[\"IPI\"].Base.PremiumNet=(out[\"IPI\"].Base.SumInsuredLimitOfIndemnity/1000.0)*data[\"IPI\"][out[\"IPI\"].Type][in.class][out[\"IPI\"].Base.DeductibleType][out[\"IPI\"].Base.Deductible]",
+            "out[\"IPI\"].Your.PremiumNet=(out[\"IPI\"].Your.SumInsuredLimitOfIndemnity/1000.0)*data[\"IPI\"][out[\"IPI\"].Type][in.class][out[\"IPI\"].Your.DeductibleType][out[\"IPI\"].Your.Deductible]",
+            
+            "out[\"DRC\"].Premium.PremiumNet=out[\"DRC\"].Premium.SumInsuredLimitOfIndemnity* data[\"DRC\"][out[\"DRC\"].Type][in.class]",
+            "out[\"DRC\"].Base.PremiumNet=out[\"DRC\"].Base.SumInsuredLimitOfIndemnity*data[\"IPI\"][out[\"DRC\"].Type][in.class]",
+            "out[\"DRC\"].Your.PremiumNet=out[\"DRC\"].Your.SumInsuredLimitOfIndemnity*data[\"IPI\"][out[\"DRC\"].Type][in.class]",
+            
+            "out[\"MI\"].Premium.PremiumNet=(out[\"MI\"].Premium.SumInsuredLimitOfIndemnity/1000.0)* data[\"MI\"][out[\"MI\"].Type][in.class]",
+            "out[\"MI\"].Base.PremiumNet=(out[\"MI\"].Base.SumInsuredLimitOfIndemnity/1000.0)*data[\"IPI\"][out[\"MI\"].Type][in.class]",
+            "out[\"MI\"].Your.PremiumNet=(out[\"MI\"].Your.SumInsuredLimitOfIndemnity/1000.0)*data[\"IPI\"][out[\"MI\"].Type][in.class]",
+            
+            "out[\"IT\"].Premium.PremiumNet=out[\"IT\"].Premium.SumInsuredLimitOfIndemnity* data[\"IT\"][in.class][out[\"IT\"].Premium.DeductibleType][out[\"IT\"].Premium.Deductible]",
+            "out[\"IT\"].Base.PremiumNet=out[\"IT\"].Base.SumInsuredLimitOfIndemnity*data[\"IT\"][in.class][out[\"IT\"].Base.DeductibleType][out[\"IT\"].Base.Deductible]",
+            "out[\"IT\"].Your.PremiumNet=out[\"IT\"].Your.SumInsuredLimitOfIndemnity*data[\"IT\"][in.class][out[\"IT\"].Your.DeductibleType][out[\"IT\"].Your.Deductible]",
+            
+            "out[\"IPM\"].Premium.PremiumNet=(out[\"IPM\"].Premium.SumInsuredLimitOfIndemnity/1000.0)* data[\"IPM\"][in.age]",
+            "out[\"IPM\"].Base.PremiumNet=(out[\"IPM\"].Base.SumInsuredLimitOfIndemnity/1000.0)*data[\"IPI\"][in.age]",
+            "out[\"IPM\"].Your.PremiumNet=(out[\"IPM\"].Your.SumInsuredLimitOfIndemnity/1000.0)*data[\"IPI\"][in.age]",
+            
+            "out[\"DC\"].Premium.PremiumNet=out[\"DC\"].Premium.SumInsuredLimitOfIndemnity* data[\"DC\"][out[\"DC\"].Type][in.class]",
+            "out[\"DC\"].Base.PremiumNet=out[\"DC\"].Base.SumInsuredLimitOfIndemnity*data[\"DC\"][out[\"DC\"].Type][in.class]",
+            "out[\"DC\"].Your.PremiumNet=out[\"DC\"].Your.SumInsuredLimitOfIndemnity*data[\"DC\"][out[\"DC\"].Type][in.class]",
+            
+            "out[\"RSC\"].Premium.PremiumNet=data[\"RSC\"][out[\"RSC\"].Type][in.class][out[\"RSC\"].Premium.SumInsuredLimitOfIndemnity]",
+            "out[\"RSC\"].Base.PremiumNet=data[\"RSC\"][out[\"RSC\"].Type][in.class][out[\"RSC\"].Base.SumInsuredLimitOfIndemnity]",
+            "out[\"RSC\"].Your.PremiumNet=data[\"RSC\"][out[\"RSC\"].Type][in.class][out[\"RSC\"].Your.SumInsuredLimitOfIndemnity]",
             
             "Retract(\"calculateIPI\")"
         ]
