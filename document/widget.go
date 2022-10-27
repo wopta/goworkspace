@@ -21,10 +21,10 @@ func (s Skin) CoveragesTable(m pdf.Maroto, head []string, content [][]string) pd
 	}
 	return m
 }
-func (s Skin) Table(m pdf.Maroto, head []string, content [][]string, h float64) pdf.Maroto {
-	s.TableHeader(m, head, false, 6, 5.0)
+func (s Skin) Table(m pdf.Maroto, head []string, content [][]string, col uint, h float64) pdf.Maroto {
+	s.TableHeader(m, head, false, col, h)
 	for _, v := range content {
-		s.TableRow(m, v, false, 4, h)
+		s.TableRow(m, v, false, col, h)
 
 	}
 	return m

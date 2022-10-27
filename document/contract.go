@@ -1,7 +1,6 @@
 package document
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"io/ioutil"
 	"log"
@@ -16,7 +15,7 @@ import (
 	//model "github.com/wopta/goworkspace/models"
 )
 
-func Proposal(w http.ResponseWriter, r *http.Request) {
+func Contract(w http.ResponseWriter, r *http.Request) {
 	log.Println("Proposal")
 	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
 	log.Println(string(req))
@@ -78,13 +77,11 @@ func Proposal(w http.ResponseWriter, r *http.Request) {
 	m.AddUTF8Font("Montserrat", consts.Bold, "Montserrat-Bold.ttf")
 	m.SetDefaultFontFamily("Montserrat")
 	//m.SetBorder(true)
-	base64LogoPerson := base64.StdEncoding.EncodeToString(getFilesByEnv("document/logo_persona.png"))
-	base64LogoWopta := base64.StdEncoding.EncodeToString(getFilesByEnv("document/logo_persona.png"))
+
 	m.RegisterHeader(func() {
 		m.Row(15.0, func() {
 			m.Col(2, func() {
-
-				_ = m.Base64Image(base64LogoPerson, consts.Png, props.Rect{
+				_ = m.FileImage("document/logo_persona.png", props.Rect{
 					Left:    1,
 					Top:     1,
 					Center:  false,
@@ -112,7 +109,7 @@ func Proposal(w http.ResponseWriter, r *http.Request) {
 			})
 			m.ColSpace(6)
 			m.Col(2, func() {
-				_ = m.Base64Image(base64LogoWopta, consts.Png, props.Rect{
+				_ = m.FileImage("document/ARTW_LOGO_RGB_400px.png", props.Rect{
 					Left:    1,
 					Top:     1,
 					Center:  false,

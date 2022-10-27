@@ -98,7 +98,7 @@ func (s Skin) TableRow(m pdf.Maroto, colText []string, isLine bool, colspace uin
 			var prop props.Text
 			prop = text
 			log.Println(len(colText))
-			if len(colText) >= 2 {
+			if len(colText) > 2 {
 				if i == 0 {
 					prop = textBold
 				} else if i == len(colText)-1 {
