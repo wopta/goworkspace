@@ -14,7 +14,7 @@ func (s Skin) Customer(m pdf.Maroto, customer []Kv) pdf.Maroto {
 	return m
 }
 func (s Skin) CoveragesTable(m pdf.Maroto, head []string, content [][]string) pdf.Maroto {
-	s.TableHeader(m, head, true, 3, 5.0)
+	s.TableHeader(m, head, true, 3, 5.0, consts.Center)
 	for _, v := range content {
 		s.TableRow(m, v, true, 3, s.rowtableHeight)
 
@@ -22,7 +22,7 @@ func (s Skin) CoveragesTable(m pdf.Maroto, head []string, content [][]string) pd
 	return m
 }
 func (s Skin) Table(m pdf.Maroto, head []string, content [][]string, col uint, h float64) pdf.Maroto {
-	s.TableHeader(m, head, false, col, h)
+	s.TableHeader(m, head, false, col, h, consts.Left)
 	for _, v := range content {
 		s.TableRow(m, v, false, col, h)
 
@@ -30,7 +30,7 @@ func (s Skin) Table(m pdf.Maroto, head []string, content [][]string, col uint, h
 	return m
 }
 func (s Skin) TableLine(m pdf.Maroto, head []string, content [][]string) pdf.Maroto {
-	s.TableHeader(m, head, true, 4, s.rowtableHeight)
+	s.TableHeader(m, head, true, 4, s.rowtableHeight, consts.Center)
 	for _, v := range content {
 		s.TableRow(m, v, true, 4, s.rowtableHeight)
 

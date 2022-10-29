@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/csv"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -58,17 +59,45 @@ func ReadDir() {
 func GetFromStorage(bucket string, file string, keyPath string) []byte {
 	//var credential models.Credential
 	log.Println("start GetFromStorage")
-
 	ctx := context.Background()
 	client, err := storage.NewClient(ctx)
 	CheckError(err)
 	rc, err := client.Bucket(bucket).Object(file).NewReader(ctx)
 	CheckError(err)
 	slurp, err := ioutil.ReadAll(rc)
-
 	rc.Close()
-	if err != nil {
-		log.Fatal(err)
-	}
+	CheckError(err)
 	return slurp
+}
+func GetReaderGCS(bucket string, file string, keyPath string) io.Reader {
+	//var credential models.Credential
+	log.Println("start GetFromStorage")
+	ctx := context.Background()
+	client, err := storage.NewClient(ctx)
+	CheckError(err)
+	rc, err := client.Bucket(bucket).Object(file).NewReader(ctx)
+	CheckError(err)
+	slurp := rc
+	rc.Close()
+	CheckError(err)
+	return slurp
+}
+func deleteFiles() {
+
+}
+func PutToStorage(bucketname string, path string, file []byte) string {
+	// some process request msg, decode base64 to image byte
+	// create image file in current directory with os.create()
+	log.Println("start PutToStorage")
+	ctx := context.Background()
+	client, err := storage.NewClient(ctx)
+	CheckError(err)
+	bucket := client.Bucket(bucketname)
+	write := bucket.Object(path).NewWriter(ctx)
+	defer write.Close()
+	write.Write(file)
+	log.Println("write.MediaLink: " + write.MediaLink)
+
+	return write.MediaLink
+
 }

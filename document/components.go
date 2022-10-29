@@ -121,13 +121,13 @@ func (s Skin) TableRow(m pdf.Maroto, colText []string, isLine bool, colspace uin
 
 	return m
 }
-func (s Skin) TableHeader(m pdf.Maroto, colText []string, isLine bool, colspace uint, h float64) pdf.Maroto {
+func (s Skin) TableHeader(m pdf.Maroto, colText []string, isLine bool, colspace uint, h float64, c consts.Align) pdf.Maroto {
 
 	textBold := props.Text{
 		Top:   1.5,
 		Size:  s.SizeTitle,
 		Style: consts.Bold,
-		Align: consts.Center,
+		Align: c,
 		Color: s.TextColor,
 	}
 

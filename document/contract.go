@@ -40,8 +40,8 @@ func Contract(w http.ResponseWriter, r *http.Request) {
 			Green: 90,
 			Blue:  93,
 		},
-		Size:              6,
-		SizeTitle:         9,
+		Size:              9,
+		SizeTitle:         12,
 		rowHeight:         5.0,
 		rowtableHeight:    5.0,
 		rowtableHeightMin: 2.0,
@@ -312,8 +312,12 @@ func Contract(w http.ResponseWriter, r *http.Request) {
 	m = skin.AboutUs(m, "Chi siamo ", aboutUs)
 	log.Println("Document 8")
 	//m.Output()
+
+	out, _ := m.Output()
+	result := lib.PutToStorage("function-data", "temp/billing.pdf", out.Bytes())
 	err = m.OutputFileAndClose("document/billing.pdf")
 	lib.CheckError(err)
+	log.Println(result)
 
 	//end := time.Now()
 	//fmt.Println(end.Sub(begin))

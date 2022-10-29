@@ -2,12 +2,16 @@ package document
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
+	"mime/multipart"
 	"net/http"
-	"net/url"
+	"strings"
+
 	"os"
+	"path/filepath"
 	"time"
 
 	lib "github.com/wopta/goworkspace/lib"
@@ -15,33 +19,26 @@ import (
 )
 
 func SignNamirial(w http.ResponseWriter, r *http.Request) {
-	UploadFile(w, r)
-	fmt.Fprintf(w, "")
-}
-func Autorization(w http.ResponseWriter, r *http.Request) {
+	//file := lib.GetFromStorage("function-data", "document/billing.pdf", "")
 
-}
-func UploadFile(w http.ResponseWriter, r *http.Request) {
-	f := "Q2lhbyBEYXZpZGUsDQppIGZhdHRpIGUgaWwgY29kaWNlIHByb2RvdHRvIHBhcmxhbm8gZGEgc29saSwgbGUgcGVyaXppZSBhbmNoZSBzZSB0dSBpbnN1bHRpIHNlbnphIG5lYW5jaGUgc2FwZXJlIGNoaSwgc29ubyBwcm9mZXNzaW9uaXN0aSBjaGUgbGF2b3Jhbm8gcGVyIGdyb3NzZSBhemllbmRlIGUgbmVzc3VubyBkaSBlc3NpIGxhdm9yYSBwZXIgbmV4dW0gbWEgc29ubyBlc3Rlcm5pIGNoaWFtYXRpIHNvbG8gcGVyIHBlcml6aWUgcHJldmVudGl2ZSBzZSB2dW9pIHRlIGxpIHByZXNlbnRvIG1hZ2FyaSB0aSBhaXV0YW5vIGEgbWlnbGlvcmFyIGlsIHR1byBzdGFmZi4NClZvaSBub24gdmkgc2lldGUgcHJlc2VudGF0aSBhIGNvbiBuZXNzdW5hIHNvbHV6aW9uZSBzZSBub24gY29uIHVuYSBjaXRhemlvbmUgZGkgdW4gQXBpa2V5LCBtYSBzZW56YSBhcmdvbWVudGF6aW9uZSBlIHNlbnphIHVuIGRvY3VtZW50byBhIHVsdGVyaW9yZSBwcm92YSBkZWxsYSB2b3N0cm8gYXBwcm9jY2lvIHNiYWdsaWF0byBjaGUgdmkgaGEgcG9ydGF0byBpbiBxdWVzdGEgc2l0dWF6aW9uZSwgbmV4dW0gIHZpIGhhIGFyZ29tZW50YXRvIGUgaGEgcG9ydGF0byB1biBkb2N1bWVudG8gYSBzdXBwb3J0byBjb24gYWRkaXJpdHR1cmEgaWwgYm9pbGVycGxhdGUgZGVsIGNvZGljZSBwZXIgbOKAmWludGVncmF6aW9uZSBlIGlsIGdpb3JubyBkb3BvIGVyYSB0dXR0byBwcm9udG8gZSBjb25maWd1cmF0byBlIHF1ZXN0byBub24gbG8gcHVvaSBuZWdhcmUgYW5jaGUgcXVpIMOoIHR1dHRvIGZhY2lsbWVudGUgZGltb3N0cmFiaWxlLg0KVW4gY29udHJhdHRvIHNpIGZhIHBlciBldmFkZXJlIGRlbGxlIGF0dGl2aXTDoCwgbG8gc3RhZmZpbmcgIMOoIHN0YXJvIGNvbmNvcmRhdG8gaW5zaWVtZSBhIHRlIHBlciBxdWVzdG8gdGFzayBkaSBwcmV2ZW50aXZhemlvbmUgZSBhIGx1Z2xpbyBhYmJpYW1vIHBhZ2F0byBpbCBkb3BwaW8gcGVyIG5lc3N1bmEgYXR0aXZpdMOgIGluIG1lcml0byBtYSBsaSBub24gZXJhdmFtbyBwcm9udGkgbm9pIGVkIGluZmF0dGkgbm9uIGNpdG8gbWFpIGx1Z2xpbyBxdWluZGkgY29zaSB0aSBzdGFpIGRhbmRvIGxhIHphcHBhIG5laSBwaWVkaSBkYSBzb2xvIHBlcmNow6kgIMOoIGZhY2lsbWVudGUgZGltb3N0cmFiaWxlIGNoZSBkYSBhZ29zdG8gbm9uIGF2ZXRlIG5lYW5jaGUgaW5pemlhdG8uDQpEaW1taSBpbiBjaGUgZm9ybWF0byB2dW9pIGkgbG9nIG5lIGhvIGRpIHR1dHRlIGxlIG5hdHVyZSBzZSBub24gdGkgYmFzdGFubyBsZSAxMDAgZGljbyAxMDAgY2hpYW1hdGUgIGNoZSB0aSBobyBnacOgIGdpcmF0bw0KSW4gYWxsZWdhdG8gdHJvdmkgdW5hIG1haWwgY29uIHVuIHBheWxvYWQgY2hlIGdpw6AgZnVuemlvbmF2YSAoaG8gaSBsb2cgZGVsbGEgY2hpYW1hdGEgcGVyY2jDqSBs4oCZYWJiaWFtbyBmYXR0YSBpbnNpZW1lIGFkIEVucmljbyBhbmNoZSBzZSBobyBkb3Z1dG8gbWV0dGVybGEgcHViYmxpY2EgcGVyY2jDqSBub24gc2lldGUgcml1c2NpdGkgYSBzdmlsdXBwYXJlIGwgYXV0ZW50aWNhemlvbmUgdGUgbG8gcHXDsiBjb25mZXJtYXJlIGx1aSBkaXJldHRhbWVudGUpDQpJbiBxdWVsbGEgbWFpbCBkZWwgMjcvMDggIHJpY2hpZWRvIHVuYSBkZW1vIGlsIGRvcG8gYmVuIHVuIG1lc2UgY2hlICBjaSBzdGF2YXRlIGxhdm9yYW5kbyAoc2VtcHJlIHNlIGNpIGF2ZXRlIG1haSBsYXZvcmF0bykgaW4gY3VpIG5vbiBhdmV0ZSBtYWkgcmlzcG9zdG8gc2UgY2VyY2hpIGJlbmUgcG9pIHRyb3ZlcmFpIGFuY2hlIGlsIHNvbGxlY2l0byBhZCB1bHRlcmlvcmUgcmlwcm92YSBkaSBxdWFudG8gc2VpIHNmYXNhdG8gY29uIGxhIHJlYWx0w6AuDQpJbm9sdHJlIGluIGFsbGVnYXRvIGEgcXVlbGxhIG1haWwgdmkgY29uc2Vnbm8gaWwgbW9kZWwgZ2nDoCBzdmlsdXBwYXRvIHBlciBxdWVsbGEgY2hpYW1hdGEgYSByaXByb3ZhIGNoZSBhdmV2YXRlIHR1dHRlIGxlIGluZm8gcGVyIHN2aWx1cHBhcmxhLg0KUmliYWRpc2NvIHZpIHNpZXRlIGluY2FydGF0aSBvIGzigJlhdmV0ZSBwcmVzYSBzb3R0byBnYW1iYSDDqCBwYWxlc2UgYSB0dXR0aSBzb2xvIHR1IG5lZ2hpIGzigJlldmlkZW56YSBkZWkgZmF0dGkuDQpncmF6aWUNCkJ1b25hIHNlcmF0YQ0KDQoNCg=="
-	//var b bytes.Buffer
-	fileReader := bytes.NewReader([]byte(f))
-
-	os.Setenv("ESIGN_TOKEN_API", "vzx8fn3v9qi6x53zmfkgvg5cxmneoskpnj6fpk1qa092fgped8tfr5imbkev6zu9")
-
+	file, _ := os.Open("document/billing.pdf")
 	var urlstring = os.Getenv("ESIGN_BASEURL") + "v4/sspfile/uploadtemporary"
-	u, err := url.Parse(urlstring)
-	lib.CheckError(err)
-	log.Println("url parse:", u)
+	b, _ := ioutil.ReadAll(file)
+	SspFileId := <-postData(&b, urlstring)
+	log.Println("postData:", SspFileId)
+	//prepareEnvelop(SspFileId)
+	SspFileId = <-sendEnvelop(SspFileId)
+	log.Println("sendEnvelop:", SspFileId)
 
-	req, _ := http.NewRequest(http.MethodPost, urlstring, fileReader)
+}
+func Autorization() {
+	var urlstring = os.Getenv("ESIGN_BASEURL") + "v4/authorization"
 	client := &http.Client{
 		Timeout: time.Second * 10,
 	}
-
-	req.Header.Set("Content-Type", "multipart/form-data")
-	req.Header.Set("ApiToken", os.Getenv("ESIGN_TOKEN_API"))
-	req.Header.Set("OrganizationKey", os.Getenv("ESIGN_ORGA_KEY"))
-
+	req, _ := http.NewRequest(http.MethodGet, urlstring, nil)
+	req.Header.Set("apiToken", os.Getenv("ESIGN_TOKEN_API"))
+	log.Println("url parse:", req.Header)
 	res, err := client.Do(req)
 	lib.CheckError(err)
 
@@ -51,5 +48,666 @@ func UploadFile(w http.ResponseWriter, r *http.Request) {
 		res.Body.Close()
 		log.Println("body:", string(body))
 	}
+}
+func prepareEnvelop(id string) string {
+	log.Println("prepare")
+	//var b bytes.Buffer
+	//fileReader := bytes.NewReader([]byte())
+	var urlstring = os.Getenv("ESIGN_BASEURL") + "v4.0/envelope/prepare"
+	client := &http.Client{
+		Timeout: time.Second * 10,
+	}
+	req, _ := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(getPrepare(id)))
+	req.Header.Set("apiToken", os.Getenv("ESIGN_TOKEN_API"))
 
+	//header('Content-Length: ' . filesize($pdf));
+	log.Println("url parse:", req.Header)
+	res, err := client.Do(req)
+	lib.CheckError(err)
+	var r string
+	if res != nil {
+		body, err := ioutil.ReadAll(res.Body)
+		lib.CheckError(err)
+		var result map[string]string
+		json.Unmarshal([]byte(body), &result)
+		res.Body.Close()
+		r = result["SspFileId"]
+
+		log.Println("body:", string(body))
+	}
+
+	return r
+}
+func sendEnvelop(id string) <-chan string {
+	r := make(chan string)
+
+	go func() {
+		defer close(r)
+		log.Println("Send")
+		//var b bytes.Buffer
+		//fileReader := bytes.NewReader([]byte())
+		var urlstring = os.Getenv("ESIGN_BASEURL") + "v4.0/envelope/send"
+		client := &http.Client{
+			Timeout: time.Second * 10,
+		}
+		req, _ := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(getSend(id)))
+		req.Header.Set("apiToken", os.Getenv("ESIGN_TOKEN_API"))
+		req.Header.Set("Content-Type", "application/json")
+		//header('Content-Length: ' . filesize($pdf));
+
+		res, err := client.Do(req)
+		lib.CheckError(err)
+
+		if res != nil {
+			body, err := ioutil.ReadAll(res.Body)
+			lib.CheckError(err)
+			var result map[string]string
+			json.Unmarshal([]byte(body), &result)
+			res.Body.Close()
+
+			log.Println("body:", string(body))
+			r <- result["SspFileId"]
+
+		}
+	}()
+	return r
+}
+func postData(data *[]byte, host string) <-chan string {
+	r := make(chan string)
+
+	go func() {
+		defer close(r)
+
+		var b bytes.Buffer
+		w := multipart.NewWriter(&b)
+
+		// Add the field
+		fw, err := w.CreateFormFile("file", filepath.Base("billing.pdf"))
+		fw.Write((*data)[:])
+		// Don't forget to close the multipart writer.
+		// If you don't close it, your request will be missing the terminating boundary.
+		w.Close()
+
+		// Now that you have a form, you can submit it to your handler.
+		log.Println("Post")
+		req, err := http.NewRequest("POST", host, &b)
+		lib.CheckError(err)
+		// Don't forget to set the content type, this will contain the boundary.
+		req.Header.Set("apiToken", os.Getenv("ESIGN_TOKEN_API"))
+		req.Header.Set("Content-Type", w.FormDataContentType())
+
+		// Submit the request
+		client := &http.Client{}
+		res, err := client.Do(req)
+		var result map[string]string
+		resByte, err := ioutil.ReadAll(res.Body)
+		json.Unmarshal(resByte, &result)
+		res.Body.Close()
+		log.Println("Post 2")
+		r <- result["SspFileId"]
+		fmt.Println(res.StatusCode)
+	}()
+
+	return r
+}
+
+func getPrepare(id string) string {
+	return `{
+	"SspFileIds": [
+	  " ` + id + `"
+	],
+	"AdHocWorkstepConfiguration": {
+	  "WorkstepLabel": "string",
+	  "SmallTextZoomFactorPercent": 0,
+	  "WorkstepTimeToLiveInMinutes": 0,
+	  "FinishAction": {
+		"ClientActions": [
+		  {
+			"RemoveDocumentFromRecentDocumentList": true,
+			"CallClientActionOnlyAfterSuccessfulSync": true,
+			"ClientName": "string",
+			"CloseApp": true,
+			"Action": "string"
+		  }
+		]
+	  },
+	  "NoSequenceEnforced": true,
+	  "SigTemplate": {
+		"Size": {
+		  "Height": 0,
+		  "Width": 0
+		},
+		"AllowedSignatureTypes": [
+		  
+		]
+	  },
+	  "ParseFormFields": {
+		"MapRequiredFieldsToRequiredTask": true,
+		"FormsGrouping": "PerPage",
+		"ReturnSimplifiedConfig": true,
+		"AddKeepExistingValueFlag": true,
+		"ParseFormField": true
+	  },
+	  "AdhocPolicies": {
+		"AllowModificationsAfterSignature": true
+	  },
+	  "ViewerPreferences": {
+		"ShowPageNavigationBar": true,
+		"ShowThumbnails": true,
+		"SkipFinishConfirmDialog": true,
+		"SkipDocumentDialog": true,
+		"ShowImagesInFullWidth": true,
+		"DisableGeolocation": true,
+		"ShowDocumentDownloadDialogAfterAutomaticFinish": true,
+		"AttachmentsMaxFileSize": 0,
+		"SkipPreviewImageOnDisposableCertificate": true,
+		"LoadCustomJs": true,
+		"AllowCustomButtons": true,
+		"GuidingBehavior": "GuideOnlyRequiredTasks",
+		"FormFieldsGuidingBehavior": "AllowSubmitAlways",
+		"ShowVersionNumber": true,
+		"EnableWarningPopupOnLeave": true,
+		"WarningPopupDisplayAfter": "FillOrSignField",
+		"FinishWorkstepOnOpen": true,
+		"AutoFinishAfterRequiredTasksDone": true,
+		"GuidingBehaviorOnFinishedTask": "NoMove",
+		"SkipThankYouDialog": true,
+		"NativeAppsUrlScheme": "string",
+		"DocumentViewingMode": "EndlessPaperAllDocuments",
+		"ThumbnailMode": "ShowAllPages",
+		"ShowTopBar": true,
+		"DisplayRejectButtonInTopBar": true,
+		"MultipleSignatureTypesAndBatchSigningSettings": {
+		  "IsUseBatchSigningCheckedByDefault": true,
+		  "IsRememberSignatureTypeCheckedByDefault": true,
+		  "IsRememberBatchSigningDecisionCheckedByDefault": true,
+		  "SkipMultipleSignatureTypesAndBatchSigningDialogIfBatchSigningPossible": true
+		},
+		"VisibleAreaOptions": {
+		  "AllowedDomain": "string",
+		  "Enabled": true
+		},
+		"ShowStartGuidingHint": true,
+		"ShowStatusBar": true,
+		"ShowZoomButtons": true,
+		"ShowNoGeolocationWarning": true,
+		"AutoStartGuiding": true,
+		"ShowPageGap": true,
+		"ShowPageNavigationButtons": true,
+		"ShowFinishPossibleHint": true,
+		"SkipRejectConfirmDialog": true,
+		"BatchSigningType": "Basic",
+		"BatchSigningDisableNextButtonUntilDialogScrolledToBottom": true
+	  },
+	  "SignatureConfigurations": [
+		{
+		  "SpcId": "string",
+		  "PdfSignatureProperties": {
+			"PdfAConformant": true,
+			"PAdESPart4Compliant": true,
+			"IncludeSigningCertificateChain": true,
+			"SigningCertificateRevocationInformationIncludeMode": "DoNotInclude",
+			"SignatureTimestampData": {
+			  "Uri": "string",
+			  "Username": "string",
+			  "Password": "string",
+			  "SignatureHashAlgorithm": "Sha1",
+			  "AuthenticationCertifiateDescriptor": {
+				"Identifier": "string",
+				"Type": "string"
+			  }
+			},
+			"EnableEutlVerification": true,
+			"EnableValidateSigningCertificateName": true,
+			"SigningCertificateNameRegex": "string"
+		  },
+		  "PdfSignatureCryptographicData": {
+			"SignatureHashAlgorithm": "Sha1",
+			"SigningCertificateDescriptor": {
+			  "Identifier": "string",
+			  "Type": "Sha1Thumbprint",
+			  "Csp": "Default"
+			}
+		  },
+		  "CertificateFilter": {
+			"KeyUsages": [
+			  "string"
+			],
+			"ThumbPrints": [
+			  "string"
+			],
+			"RootThumbPrints": [
+			  "string"
+			]
+		  }
+		}
+	  ],
+	  "SigStringParsingConfiguration": {
+		"SigStringsForParsings": [
+		  {
+			"StartPattern": "string",
+			"EndPattern": "string",
+			"ClearSigString": true,
+			"SearchEntireWordOnly": true
+		  }
+		]
+	  },
+	  "GeneralPolicies": {
+		"AllowSaveDocument": true,
+		"AllowSaveAuditTrail": true,
+		"AllowRotatingPages": true,
+		"AllowAppendFileToWorkstep": true,
+		"AllowAppendTaskToWorkstep": true,
+		"AllowEmailDocument": true,
+		"AllowPrintDocument": true,
+		"AllowFinishWorkstep": true,
+		"AllowRejectWorkstep": true,
+		"AllowRejectWorkstepDelegation": true,
+		"AllowUndoLastAction": true,
+		"AllowColorizePdfForms": true,
+		"AllowAdhocPdfAttachments": true,
+		"AllowAdhocSignatures": true,
+		"AllowAdhocStampings": true,
+		"AllowAdhocFreeHandAnnotations": true,
+		"AllowAdhocTypewriterAnnotations": true,
+		"AllowAdhocPictureAnnotations": true,
+		"AllowAdhocPdfPageAppending": true,
+		"AllowReloadOfFinishedWorkstep": true
+	  },
+	  "FinalizeActions": {
+		
+	  },
+	  "TransactionCodeConfigurations": [
+		{
+		  "Id": "string",
+		  "HashAlgorithmIdentifier": "Sha1",
+		  "Texts": [
+			{
+			  "Language": "string",
+			  "Value": "string"
+			}
+		  ]
+		}
+	  ]
+	},
+	"PrepareSendEnvelopeStepsDescriptor": {
+	  "ClearFieldMarkupString": true
+	}
+  }`
+}
+
+func getSend(id string) string {
+	return `{
+  
+		"SspFileIds": [
+		  " ` + id + `"
+		],
+		"SendEnvelopeDescription":{
+			"Name": "Test.pdf",
+			"EmailSubject": "Please sign the enclosed envelope",
+			"EmailBody": "Dear #RecipientFirstName# #RecipientLastName#\n\n#PersonalMessage#\n\nPlease sign the envelope #EnvelopeName#\n\nEnvelope will expire at #ExpirationDate#",
+			"DisplayedEmailSender": "",
+			"EnableReminders": true,
+			"FirstReminderDayAmount": 5,
+			"RecurrentReminderDayAmount": 3,
+			"BeforeExpirationDayAmount": 3,
+			"ExpirationInSecondsAfterSending": 2419200,
+			"CallbackUrl": "",
+			"StatusUpdateCallbackUrl": "",
+			"LockFormFieldsAtEnvelopeFinish": false,
+			"Steps": [
+			  {
+				"OrderIndex": 1,
+				"Recipients": [
+				  {
+					"Email": "luca.barbieri@wopta.it",
+					"FirstName": "##name##",
+					"LastName": "##name##",
+					"LanguageCode": "it",
+					"EmailBodyExtra": "",
+					"DisableEmail": false,
+					"AddAndroidAppLink": false,
+					"AddIosAppLink": false,
+					"AddWindowsAppLink": false,
+					"AllowDelegation": true,
+					"AllowAccessFinishedWorkstep": false,
+					"SkipExternalDataValidation": false,
+					"AuthenticationMethods": [{
+						"Method": "Sms",
+						"Parameter": "+393668134257"
+		   }],
+					"IdentificationMethods": [],
+					"OtpData": {
+					  "PhoneMobile": "+393668134257"
+					}
+				  }
+				],
+				"EmailBodyExtra": "",
+				"RecipientType": "Signer",
+				"WorkstepConfiguration": {
+				  "WorkstepLabel": "Test.pdf",
+				  "SmallTextZoomFactorPercent": 100,
+				  "FinishAction": {
+					"ServerActions": [],
+					"ClientActions": []
+				  },
+				  "ReceiverInformation": {
+					"UserInformation": {
+					  "FirstName": "##name##",
+					  "LastName": "##name##",
+					  "EMail": "luca.barbieri@wopta.it"
+					},
+					"TransactionCodePushPluginData": []
+				  },
+				  "SenderInformation": {
+					"UserInformation": {
+					  "FirstName": "##name##",
+					  "LastName": "##name##",
+					  "EMail": "luca.barbieri@wopta.it"
+					}
+				  },
+				  "TransactionCodeConfigurations": [],
+				  "SignatureConfigurations": [],
+				  "ViewerPreferences": {
+					"FinishWorkstepOnOpen": false,
+					"VisibleAreaOptions": {
+					  "AllowedDomain": "",
+					  "Enabled": false
+					}
+				  },
+				  "ResourceUris": {
+					"DelegationUri": ""
+				  },
+				  "AuditingToolsConfiguration": {
+					"WriteAuditTrail": true
+				  },
+				  "Policy": {
+					"GeneralPolicies": {
+					  "AllowSaveDocument": true,
+					  "AllowSaveAuditTrail": true,
+					  "AllowRotatingPages": false,
+					  "AllowAppendFileToWorkstep": false,
+					  "AllowAppendTaskToWorkstep": false,
+					  "AllowEmailDocument": true,
+					  "AllowPrintDocument": true,
+					  "AllowFinishWorkstep": true,
+					  "AllowRejectWorkstep": true,
+					  "AllowRejectWorkstepDelegation": true,
+					  "AllowUndoLastAction": true,
+					  "AllowColorizePdfForms": false,
+					  "AllowAdhocPdfAttachments": false,
+					  "AllowAdhocSignatures": false,
+					  "AllowAdhocStampings": false,
+					  "AllowAdhocFreeHandAnnotations": false,
+					  "AllowAdhocTypewriterAnnotations": false,
+					  "AllowAdhocPictureAnnotations": false,
+					  "AllowAdhocPdfPageAppending": false,
+					  "AllowReloadOfFinishedWorkstep": true
+					},
+					"WorkstepTasks": {
+					  "PictureAnnotationMinResolution": 0,
+					  "PictureAnnotationMaxResolution": 0,
+					  "PictureAnnotationColorDepth": "Color16M",
+					  "SequenceMode": "NoSequenceEnforced",
+					  "PositionUnits": "PdfUnits",
+					  "ReferenceCorner": "Lower_Left",
+					  "Tasks": [
+						{
+						  "Texts": [
+							{
+							  "Language": "it",
+							  "Value": "Signature Disclosure Text"
+							},
+							{
+							  "Language": "*",
+							  "Value": "Signature Disclosure Text"
+							}
+						  ],
+						  "Headings": [
+							{
+							  "Language": "it",
+							  "Value": "Signature Disclosure Subject"
+							},
+							{
+							  "Language": "*",
+							  "Value": "Signature Disclosure Subject"
+							}
+						  ],
+						  "IsRequired": false,
+						  "Id": "ra",
+						  "DisplayName": "ra",
+						  "DocRefNumber": 1,
+						  "DiscriminatorType": "Agreements"
+						},
+						{
+						  "PositionPage": 2,
+						  "Position": {
+							"PositionX": 252.0,
+							"PositionY": 186.0
+						  },
+						  "Size": {
+							"Height": 80.0,
+							"Width": 190.0
+						  },
+						  "AdditionalParameters": [
+							{
+							  "Key": "enabled",
+							  "Value": "1"
+							},
+							{
+							  "Key": "completed",
+							  "Value": "0"
+							},
+							{
+							  "Key": "req",
+							  "Value": "1"
+							},
+							{
+							  "Key": "isPhoneNumberRequired",
+							  "Value": "0"
+							},
+							{
+							  "Key": "trValidityInSeconds",
+							  "Value": "60"
+							},
+							{
+							  "Key": "fd",
+							  "Value": ""
+							},
+							{
+							  "Key": "fd_dateformat",
+							  "Value": "dd-MM-yyyy HH:mm:ss"
+							},
+							{
+							  "Key": "fd_timezone",
+							  "Value": "datetimeutc"
+							}
+						  ],
+						  "AllowedSignatureTypes": [
+							{
+							  "TrModType": "TransactionCodeSenderPlugin",
+							  "TrValidityInSeconds": 300,
+							  "TrConfId": "otpSignatureSmsText",
+							  "IsPhoneNumberRequired": true,
+							  "Ly": "simpleTransactionCodeSms",
+							  "Id": "c787919a-b2fd-4849-8f97-98dee281da30",
+							  "DiscriminatorType": "SigTypeTransactionCode",
+							  "Preferred": false,
+							  "StampImprintConfiguration": {
+								"DisplayExtraInformation": true,
+								"DisplayEmail": true,
+								"DisplayIp": true,
+								"DisplayName": true,
+								"DisplaySignatureDate": true,
+								"FontFamily": "Times New Roman",
+								"FontSize": 11.0,
+								"OverrideLegacyStampImprint": false,
+								"DisplayTransactionId": true,
+								"DisplayTransaktionToken": true,
+								"DisplayPhoneNumber": true
+							  },
+							  "SignaturePluginConfigurationId": "ltaLevelId"
+							}
+						  ],
+						  "UseTimestamp": false,
+						  "IsRequired": true,
+						  "Id": "1#XyzmoDuplicateIdSeperator#Signature_e7ca3f6a-33fa-cdba-d696-1377fcad51c9",
+						  "DisplayName": "",
+						  "DocRefNumber": 1,
+						  "DiscriminatorType": "Signature"
+						}
+					  ]
+					},
+					"FinalizeActions": {
+					  "FinalizeActionList": [
+						{
+						  "DocRefNumbers": "*",
+						  "SpcId": "ltaLevelId",
+						  "DiscriminatorType": "Timestamp"
+						}
+					  ]
+					}
+				  },
+				  "Navigation": {
+					"HyperLinks": [],
+					"Links": [],
+					"LinkTargets": []
+				  }
+				},
+				"DocumentOptions": [
+				  {
+					"DocumentReference": "1",
+					"IsHidden": false
+				  }
+				],
+				"UseDefaultAgreements": true
+			  },
+			  
+			],
+			"AddFormFields": {
+			  "Forms": {}
+			},
+			"OverrideFormFieldValues": {
+			  "Forms": {}
+			},
+			"AttachSignedDocumentsToEnvelopeLog": false
+		  }
+	  }`
+}
+func getSendTemplate(id string) string {
+	return `{
+		"TemplateId": "string",
+		"EnvelopeOverrideOptions": {
+		  "Recipients": [
+			{
+			  "RecipientId": "string",
+			  "OrderIndex": 0,
+			  "Email": "string",
+			  "Recipient": {
+				"Email": "string",
+				"FirstName": "string",
+				"LastName": "string",
+				"LanguageCode": "string",
+				"EmailBodyExtra": "string",
+				"DisableEmail": true,
+				"AddAndroidAppLink": true,
+				"AddIosAppLink": true,
+				"AddWindowsAppLink": true,
+				"AllowDelegation": true,
+				"AllowAccessFinishedWorkstep": true,
+				"SkipExternalDataValidation": true,
+				"AuthenticationMethods": [
+				  {
+					"Method": "Pin",
+					"Parameter": "string",
+					"Filters": [
+					  {
+						"CompareOperation": "Equals",
+						"FilterId": "string",
+						"FilterValue": "string"
+					  }
+					]
+				  }
+				],
+				"IdentificationMethods": [
+				  {
+					"Method": "OAuth",
+					"Parameter": "string",
+					"Filters": [
+					  {
+						"CompareOperation": "Equals",
+						"FilterId": "string",
+						"FilterValue": "string"
+					  }
+					]
+				  }
+				],
+				"DisposableCertificateData": {
+				  "CountryResidence": "string",
+				  "DocumentIssuingCountry": "string",
+				  "IdentificationCountry": "string",
+				  "IdentificationType": "NONE",
+				  "PhoneMobile": "string",
+				  "DocumentType": "CI",
+				  "DocumentIssuedBy": "string",
+				  "DocumentIssuedOn": "2022-10-27T14:15:24.573Z",
+				  "DocumentExpiryDate": "2022-10-27T14:15:24.573Z",
+				  "SerialNumber": "string",
+				  "DocumentNumber": "string",
+				  "OverrideHolderInCaseOfMismatch": true
+				},
+				"SwissComCertificateData": {
+				  "PhoneNumber": "string",
+				  "Parameters": [
+					{
+					  "Key": "string",
+					  "Value": "string"
+					}
+				  ]
+				},
+				"RemoteCertificateData": {
+				  "UserId": "string",
+				  "DeviceId": "string"
+				},
+				"OtpData": {
+				  "PhoneMobile": "string"
+				},
+				"Pkcs7SignerData": {
+				  "AllowedPkcs7SignatureTypes": [
+					"LocalCertificate"
+				  ]
+				}
+			  }
+			}
+		  ],
+		  "AddFormFields": {
+			"Forms": {}
+		  },
+		  "OverrideFormFieldValues": {
+			"Forms": {}
+		  },
+		  "Name": "string",
+		  "EmailSubject": "string",
+		  "EmailBody": "string",
+		  "EnableReminders": true,
+		  "FirstReminderDayAmount": 0,
+		  "RecurrentReminderDayAmount": 0,
+		  "BeforeExpirationDayAmount": 0,
+		  "DaysUntilExpire": 0,
+		  "ExpirationDate": "2022-10-27T14:15:24.573Z",
+		  "ExpirationInSecondsAfterSending": 0,
+		  "CallbackUrl": "string",
+		  "StatusUpdateCallbackUrl": "string",
+		  "WorkstepEventCallback": {
+			"Url": "string",
+			"Blacklist": [
+			  "string"
+			],
+			"WhiteList": [
+			  "string"
+			]
+		  },
+		  "MetaDataXml": "string"
+		}
+	  }`
 }
