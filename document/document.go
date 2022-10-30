@@ -19,7 +19,7 @@ func init() {
 func Document(w http.ResponseWriter, r *http.Request) {
 	log.Println("Document")
 	lib.EnableCors(&w, r)
-
+	w.Header().Set("Access-Control-Allow-Methods", "POST")
 	lib.Router(w, r, map[string]func(http.ResponseWriter, *http.Request){
 		"/v1/proposal": Proposal,
 		"/v1/contract": Contract,
@@ -57,11 +57,10 @@ type PdfData struct {
 	Name         string `json:"name"`
 	Price        int64  `json:"price"`
 	PriceNett    int64  `json:"priceNett"`
-
-	Surname   string `json:"surname"`
-	Work      string `json:"work"`
-	WorkType  string `json:"workType"`
-	Coverages []struct {
+	Surname      string `json:"surname"`
+	Work         string `json:"work"`
+	WorkType     string `json:"workType"`
+	Coverages    []struct {
 		Deductible                 string `json:"deductible"`
 		Name                       string `json:"name"`
 		Price                      int64  `json:"price"`

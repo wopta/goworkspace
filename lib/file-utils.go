@@ -97,7 +97,7 @@ func PutToStorage(bucketname string, path string, file []byte) string {
 	defer write.Close()
 	write.Write(file)
 	log.Println("write.MediaLink: " + write.MediaLink)
-
+	//log.Println("write.MediaLink: " + write.)
 	return write.MediaLink
 
 }

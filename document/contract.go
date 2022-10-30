@@ -1,6 +1,7 @@
 package document
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"io/ioutil"
 	"log"
@@ -77,11 +78,13 @@ func Contract(w http.ResponseWriter, r *http.Request) {
 	m.AddUTF8Font("Montserrat", consts.Bold, "Montserrat-Bold.ttf")
 	m.SetDefaultFontFamily("Montserrat")
 	//m.SetBorder(true)
-
+	base64LogoPerson := base64.StdEncoding.EncodeToString(getFilesByEnv("document/logo_persona.png"))
+	base64LogoWopta := base64.StdEncoding.EncodeToString(getFilesByEnv("document/logo_persona.png"))
 	m.RegisterHeader(func() {
 		m.Row(15.0, func() {
 			m.Col(2, func() {
-				_ = m.FileImage("document/logo_persona.png", props.Rect{
+
+				_ = m.Base64Image(base64LogoPerson, consts.Png, props.Rect{
 					Left:    1,
 					Top:     1,
 					Center:  false,
@@ -109,7 +112,7 @@ func Contract(w http.ResponseWriter, r *http.Request) {
 			})
 			m.ColSpace(6)
 			m.Col(2, func() {
-				_ = m.FileImage("document/ARTW_LOGO_RGB_400px.png", props.Rect{
+				_ = m.Base64Image(base64LogoWopta, consts.Png, props.Rect{
 					Left:    1,
 					Top:     1,
 					Center:  false,
@@ -313,7 +316,8 @@ func Contract(w http.ResponseWriter, r *http.Request) {
 	log.Println("Document 8")
 	//m.Output()
 
-	out, _ := m.Output()
+	out, err := m.Output()
+	lib.CheckError(err)
 	result := lib.PutToStorage("function-data", "temp/billing.pdf", out.Bytes())
 	err = m.OutputFileAndClose("document/billing.pdf")
 	lib.CheckError(err)
