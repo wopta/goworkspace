@@ -27,7 +27,7 @@ func Document(w http.ResponseWriter, r *http.Request) {
 	})
 
 }
-func getFilesByEnv(file string) []byte {
+func getFilesByEnv(file string, isLocal bool) []byte {
 	var res1 []byte
 	switch os.Getenv("env") {
 
@@ -35,10 +35,36 @@ func getFilesByEnv(file string) []byte {
 		res1 = lib.ErrorByte(ioutil.ReadFile("function-data/" + file))
 
 	case "dev":
-		res1 = lib.GetFromStorage("function-data", file, "")
+		if isLocal {
+			res1 = lib.ErrorByte(ioutil.ReadFile("./serverless_function_source_code/assets/" + file))
+		} else {
+			res1 = lib.GetFromStorage("function-data", file, "")
+		}
 
 	case "prod":
 		res1 = lib.GetFromStorage("core-350507-function-data", file, "")
+
+	default:
+
+	}
+	return res1
+}
+func getPathByEnv(file string, isLocal bool) string {
+	var res1 string
+	switch os.Getenv("env") {
+
+	case "local":
+		res1 = "function-data/" + file
+
+	case "dev":
+		if isLocal {
+			res1 = "./serverless_function_source_code/assets/" + file
+		} else {
+			res1 = "function-data" + file
+		}
+
+	case "prod":
+		res1 = "core-350507-function-data" + file
 
 	default:
 

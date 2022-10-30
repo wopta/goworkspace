@@ -78,8 +78,8 @@ func Proposal(w http.ResponseWriter, r *http.Request) {
 	m.AddUTF8Font("Montserrat", consts.Bold, "Montserrat-Bold.ttf")
 	m.SetDefaultFontFamily("Montserrat")
 	//m.SetBorder(true)
-	base64LogoPerson := base64.StdEncoding.EncodeToString(getFilesByEnv("document/logo_persona.png"))
-	base64LogoWopta := base64.StdEncoding.EncodeToString(getFilesByEnv("document/logo_persona.png"))
+	base64LogoPerson := base64.StdEncoding.EncodeToString(getFilesByEnv("document/logo_persona.png", true))
+	base64LogoWopta := base64.StdEncoding.EncodeToString(getFilesByEnv("document/logo_persona.png", true))
 	m.RegisterHeader(func() {
 		m.Row(15.0, func() {
 			m.Col(2, func() {
