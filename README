@@ -7,7 +7,8 @@ Deploy:
 .\tag_update.bat rules 0.0.1.dev init_rules
 
 Download Mod dependency
-go env -w GOPRIVATE=github.com/<org_name>
+go env -w GOPRIVATE=github.com/wopta
+go mod download
 go get .
 
 cd ..
