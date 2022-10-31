@@ -1,10 +1,8 @@
 package document
 
 import (
-	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	lib "github.com/wopta/goworkspace/lib"
@@ -26,42 +24,6 @@ func Document(w http.ResponseWriter, r *http.Request) {
 		"/v1/sign":     SignNamirial,
 	})
 
-}
-func getFilesByEnv(file string) []byte {
-	var res1 []byte
-	switch os.Getenv("env") {
-
-	case "local":
-		res1 = lib.ErrorByte(ioutil.ReadFile("function-data/" + file))
-
-	case "dev":
-
-		res1 = lib.GetFromStorage("function-data", file, "")
-
-	case "prod":
-		res1 = lib.GetFromStorage("core-350507-function-data", file, "")
-
-	default:
-
-	}
-	return res1
-}
-func getPathByEnv(file string) string {
-	var res1 string
-	switch os.Getenv("env") {
-
-	case "local":
-		res1 = "function-data/" + file
-
-	case "dev":
-		res1 = "serverless_function_source_code/" + file
-	case "prod":
-		res1 = "core-350507-function-data/" + file
-
-	default:
-	}
-	log.Println(res1)
-	return res1
 }
 
 type Kv struct {

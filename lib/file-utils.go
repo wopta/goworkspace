@@ -101,3 +101,66 @@ func PutToStorage(bucketname string, path string, file []byte) string {
 	return write.MediaLink
 
 }
+
+func GetFilesByEnv(file string) []byte {
+	var res1 []byte
+	switch os.Getenv("env") {
+
+	case "local":
+		res1 = ErrorByte(ioutil.ReadFile("function-data/" + file))
+
+	case "dev":
+
+		res1 = GetFromStorage("function-data", file, "")
+
+	case "prod":
+		res1 = GetFromStorage("core-350507-function-data", file, "")
+
+	default:
+
+	}
+	return res1
+}
+func GetByteByEnv(file string, isLocal bool) []byte {
+	var res1 []byte
+	switch os.Getenv("env") {
+
+	case "local":
+		res1 = ErrorByte(ioutil.ReadFile("function-data/" + file))
+
+	case "dev":
+		if isLocal {
+			res1 = ErrorByte(ioutil.ReadFile("./serverless_function_source_code/" + file))
+		} else {
+			res1 = GetFromStorage("function-data", file, "")
+		}
+
+	case "prod":
+
+		if isLocal {
+			res1 = ErrorByte(ioutil.ReadFile("./serverless_function_source_code/" + file))
+		} else {
+			res1 = GetFromStorage("core-350507-function-data", file, "")
+		}
+	default:
+
+	}
+	return res1
+}
+func GetPathByEnv() string {
+	var res1 string
+	switch os.Getenv("env") {
+
+	case "local":
+		res1 = "function-data"
+
+	case "dev":
+		res1 = "./serverless_function_source_code"
+	case "prod":
+		res1 = "core-350507-function-data"
+
+	default:
+	}
+	log.Println(res1)
+	return res1
+}
