@@ -18,7 +18,7 @@ import (
 
 func Contract(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 	log.Println("Proposal")
-	lib.Files("./serverless_function_source_code/assets")
+	lib.Files("./")
 	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
 
 	base64LogoPerson := base64.StdEncoding.EncodeToString(getFilesByEnv("document/logo_persona.png"))

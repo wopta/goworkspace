@@ -59,8 +59,8 @@ func getPathByEnv(file string) string {
 		res1 = "core-350507-function-data/" + file
 
 	default:
-
 	}
+	log.Println(res1)
 	return res1
 }
 
