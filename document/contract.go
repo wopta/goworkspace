@@ -23,7 +23,7 @@ func Contract(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 
 	base64LogoPerson := base64.StdEncoding.EncodeToString(getFilesByEnv("document/logo_persona.png"))
 	base64LogoWopta := base64.StdEncoding.EncodeToString(getFilesByEnv("document/ARTW_LOGO_RGB_400px.png"))
-	fontNormal := getPathByEnv("Montserrat-Regular.ttf")
+	fontNormal := getPathByEnv("Montserrat_Regular.ttf")
 	fontBold := getPathByEnv("Montserrat-Bold.ttf")
 	var data DodumentData
 	defer r.Body.Close()
