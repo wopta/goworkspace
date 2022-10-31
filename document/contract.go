@@ -23,7 +23,7 @@ func Contract(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 
 	base64LogoPerson := base64.StdEncoding.EncodeToString(getFilesByEnv("document/logo_persona.png"))
 	base64LogoWopta := base64.StdEncoding.EncodeToString(getFilesByEnv("document/ARTW_LOGO_RGB_400px.png"))
-	fontNormal := getPathByEnv("Montserrat_Regular.ttf")
+	//fontNormal := getPathByEnv("Montserrat_Regular.ttf")
 	fontBold := getPathByEnv("Montserrat-Bold.ttf")
 	var data DodumentData
 	defer r.Body.Close()
@@ -71,9 +71,9 @@ func Contract(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 	log.Println("Document 2")
 	m.SetPageMargins(10, 15, 10)
 	m.SetBackgroundColor(whiteColor)
-	m.SetFontLocation("/")
+	m.SetFontLocation("serverless_function_source_code")
 	// Define font to all styles.
-	m.AddUTF8Font("Montserrat", consts.Normal, fontNormal)
+	m.AddUTF8Font("Montserrat", consts.Normal, "Montserrat_Regular.ttf")
 	m.AddUTF8Font("Montserrat", consts.Bold, fontBold)
 	m.SetDefaultFontFamily("Montserrat")
 	//m.SetBorder(true)
