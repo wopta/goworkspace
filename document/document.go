@@ -56,7 +56,7 @@ func getPathByEnv(file string) string {
 	case "dev":
 		res1 = "serverless_function_source_code/assets/" + file
 	case "prod":
-		res1 = "core-350507-function-data" + file
+		res1 = "core-350507-function-data/" + file
 
 	default:
 
