@@ -5,9 +5,20 @@ for functional architetture
 
 Deploy:
 .\tag_update.bat rules 0.0.1.dev init_rules
-Download Modul dependency
+
+Download Mod dependency
 go get .
 
+cd ..
+cd document
+go get github.com/wopta/goworkspace/lib
+go get github.com/wopta/goworkspace/models
+cd ..
+cd rules
+go get github.com/wopta/goworkspace/lib
+go get github.com/wopta/goworkspace/models
+go mod tidy
+Type:
 uint8       the set of all unsigned  8-bit integers (0 to 255)
 uint16      the set of all unsigned 16-bit integers (0 to 65535)
 uint32      the set of all unsigned 32-bit integers (0 to 4294967295)
