@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/johnfercher/maroto/pkg/color"
 	"github.com/johnfercher/maroto/pkg/consts"
@@ -43,7 +44,7 @@ func Contract(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 		},
 		Size:              9,
 		SizeTitle:         12,
-		rowHeight:         5.0,
+		rowHeight:         6.0,
 		rowtableHeight:    5.0,
 		rowtableHeightMin: 2.0,
 		LineHeight:        1.0,
@@ -126,7 +127,7 @@ func Contract(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 		tablePremium = append(tablePremium, []string{"Si rinnova a scadenza, salvo disdetta da inviare 30 giorni prima", "XXXXX  XXXXXXXXXXXXXXXXXXX (XX)"})
 		tablePremium = append(tablePremium, []string{"Prossimo pagamento il: 00/00/0000", "Mail:  xxxxxxxx@xxxxxxx.it"})
 		tablePremium = append(tablePremium, []string{"Sostituisce la polizza: = = = = = = = =", "Telefono: xxx.xxxxxxx"})
-		m = skin.Table(m, h, tablePremium, 6, 2.0)
+		m = skin.Table(m, h, tablePremium, 6, 3.0)
 	})
 
 	m.RegisterFooter(func() {
@@ -316,14 +317,18 @@ func Contract(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 
 	out, err := m.Output()
 	lib.CheckError(err)
-	filename := "temp/" + data.Name + "_" + data.Surname + "_contract.pdf"
+	now := time.Now() // current local time
+	layout := "2006-01-02"
+	t, _ := time.Parse(layout, now.String())
+
+	filename := "temp/" + data.Name + "_" + data.Surname + "_" + t.String() + "_contract.pdf"
 	result := lib.PutToStorage("function-data", filename, out.Bytes())
 	//err = m.OutputFileAndClose("document/billing.pdf")
 	lib.CheckError(err)
 	log.Println(result)
 	respObj := &DodumentResponse{
-		LinkGcs: result,
-		Bytes:   string(out.Bytes()),
+		LinkGcs: filename,
+		Bytes:   base64.StdEncoding.EncodeToString(out.Bytes()),
 	}
 	resp, e := json.Marshal(respObj)
 	lib.CheckError(e)

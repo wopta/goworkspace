@@ -66,21 +66,21 @@ func (s Skin) TableRow(m pdf.Maroto, colText []string, isLine bool, colspace uin
 
 	textBold := props.Text{
 		Top:   1.5,
-		Size:  s.Size,
+		Size:  s.Size - 3,
 		Style: consts.Bold,
 		Align: consts.Left,
 		Color: s.TextColor,
 	}
 	text := props.Text{
 		Top:   1.5,
-		Size:  s.Size,
+		Size:  s.Size - 3,
 		Style: consts.Normal,
 		Align: consts.Left,
 		Color: s.TextColor,
 	}
 	textLast := props.Text{
 		Top:   1.5,
-		Size:  s.Size,
+		Size:  s.Size - 3,
 		Style: consts.Normal,
 		Align: consts.Right,
 		Color: s.TextColor,
@@ -153,7 +153,7 @@ func (s Skin) TableHeader(m pdf.Maroto, colText []string, isLine bool, colspace 
 	return m
 }
 func (s Skin) RowBullet(m pdf.Maroto, k string, v string, style consts.Style) pdf.Maroto {
-	rowh := lenToHeight(v)
+	rowh := s.lenToHeight(v)
 	prop := props.Text{
 		Top:   1.5,
 		Size:  s.Size,
@@ -183,7 +183,7 @@ func (s Skin) RowBullet(m pdf.Maroto, k string, v string, style consts.Style) pd
 	return m
 }
 func (s Skin) RowCol1(m pdf.Maroto, v string, style consts.Style) pdf.Maroto {
-	rowh := lenToHeight(v)
+	rowh := s.lenToHeight(v)
 	prop := props.Text{
 		Top:             0.5,
 		Size:            s.Size,
