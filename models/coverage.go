@@ -2,6 +2,7 @@ package models
 
 type Coverage struct {
 	Type                       string
+	Beneficiary                User
 	TypeOfSumInsured           string
 	Description                string
 	Deductible                 string

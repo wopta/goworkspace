@@ -18,7 +18,7 @@ import (
 	//"google.golang.org/api/firebaseappcheck/v1"
 )
 
-func SignNamirial(w http.ResponseWriter, r *http.Request) string {
+func SignNamirial(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 	file := lib.GetFromStorage("function-data", "document/billing.pdf", "")
 	//file, _ := os.Open("document/billing.pdf")
 	var urlstring = os.Getenv("ESIGN_BASEURL") + "v4/sspfile/uploadtemporary"
@@ -28,7 +28,7 @@ func SignNamirial(w http.ResponseWriter, r *http.Request) string {
 	//prepareEnvelop(SspFileId)
 	SspFileId = <-sendEnvelop(SspFileId)
 	log.Println("sendEnvelop:", SspFileId)
-	return "{}"
+	return "{}", SspFileId
 
 }
 func Autorization() {

@@ -16,7 +16,7 @@ import (
 	//model "github.com/wopta/goworkspace/models"
 )
 
-func Contract(w http.ResponseWriter, r *http.Request) string {
+func Contract(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 	log.Println("Proposal")
 	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
 	log.Println(string(req))
@@ -325,6 +325,6 @@ func Contract(w http.ResponseWriter, r *http.Request) string {
 	}
 	resp, e := json.Marshal(respObj)
 	lib.CheckError(e)
-	return string(resp)
+	return string(resp), respObj
 
 }
