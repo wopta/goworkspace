@@ -321,7 +321,8 @@ func Contract(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 	lib.CheckError(err)
 	log.Println(result)
 	respObj := &DodumentResponse{
-		Bytes: string(out.Bytes()),
+		LinkGcs: result,
+		Bytes:   string(out.Bytes()),
 	}
 	resp, e := json.Marshal(respObj)
 	lib.CheckError(e)
