@@ -71,7 +71,7 @@ func Contract(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 	log.Println("Document 2")
 	m.SetPageMargins(10, 15, 10)
 	m.SetBackgroundColor(whiteColor)
-	m.SetFontLocation("serverless_function_source_code")
+	m.SetFontLocation("./serverless_function_source_code")
 	// Define font to all styles.
 	m.AddUTF8Font("Montserrat", consts.Normal, "Montserrat_Regular.ttf")
 	m.AddUTF8Font("Montserrat", consts.Bold, fontBold)
