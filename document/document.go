@@ -20,7 +20,7 @@ func Document(w http.ResponseWriter, r *http.Request) {
 	log.Println("Document")
 	lib.EnableCors(&w, r)
 	w.Header().Set("Access-Control-Allow-Methods", "POST")
-	lib.Router(w, r, map[string]func(http.ResponseWriter, *http.Request){
+	lib.Router(w, r, map[string]func(http.ResponseWriter, *http.Request) string{
 		"/v1/proposal": Proposal,
 		"/v1/contract": Contract,
 		"/v1/sign":     SignNamirial,
@@ -68,7 +68,11 @@ type Kv struct {
 	Key   string `json:"key"`
 	Value string `json:"value"`
 }
-type PdfData struct {
+type DodumentResponse struct {
+	LinkGcs string `json:"linkGcs"`
+	Bytes   string `json:"bytes"`
+}
+type DodumentData struct {
 	Class        string `json:"class"`
 	CoverageType string `json:"coverageType"`
 	FiscalCode   string `json:"fiscalCode"`

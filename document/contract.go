@@ -16,7 +16,7 @@ import (
 	//model "github.com/wopta/goworkspace/models"
 )
 
-func Contract(w http.ResponseWriter, r *http.Request) {
+func Contract(w http.ResponseWriter, r *http.Request) string {
 	log.Println("Proposal")
 	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
 	log.Println(string(req))
@@ -24,16 +24,11 @@ func Contract(w http.ResponseWriter, r *http.Request) {
 	base64LogoWopta := base64.StdEncoding.EncodeToString(getFilesByEnv("document/logo_persona.png"))
 	fontNormal := getPathByEnv("Montserrat-Regular.ttf")
 	fontBold := getPathByEnv("Montserrat-Bold.ttf")
-	var data PdfData
-	// Unmarshal or Decode the JSON to the interface.
-	//json.NewDecoder(req).Decode(&send)
+	var data DodumentData
 	defer r.Body.Close()
-
 	err := json.Unmarshal([]byte(req), &data)
 	lib.CheckError(err)
-	//data := PdfData{name: ""}
 	log.Println(&data)
-	//begin := time.Now()
 	skin := Skin{
 		LineColor: color.Color{
 			Red:   229,
@@ -325,8 +320,11 @@ func Contract(w http.ResponseWriter, r *http.Request) {
 	err = m.OutputFileAndClose("document/billing.pdf")
 	lib.CheckError(err)
 	log.Println(result)
-
-	//end := time.Now()
-	//fmt.Println(end.Sub(begin))
+	respObj := &DodumentResponse{
+		Bytes: string(out.Bytes()),
+	}
+	resp, e := json.Marshal(respObj)
+	lib.CheckError(e)
+	return string(resp)
 
 }

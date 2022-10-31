@@ -16,11 +16,11 @@ import (
 	//model "github.com/wopta/goworkspace/models"
 )
 
-func Proposal(w http.ResponseWriter, r *http.Request) {
+func Proposal(w http.ResponseWriter, r *http.Request) string {
 	log.Println("Proposal")
 	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
 	log.Println(string(req))
-	var data PdfData
+	var data DodumentData
 	// Unmarshal or Decode the JSON to the interface.
 	//json.NewDecoder(req).Decode(&send)
 	defer r.Body.Close()
@@ -318,7 +318,6 @@ func Proposal(w http.ResponseWriter, r *http.Request) {
 	err = m.OutputFileAndClose("document/billing.pdf")
 	lib.CheckError(err)
 
-	//end := time.Now()
-	//fmt.Println(end.Sub(begin))
+	return ""
 
 }

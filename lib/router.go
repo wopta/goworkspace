@@ -7,15 +7,15 @@ import (
 	"strings"
 )
 
-func Router(w http.ResponseWriter, r *http.Request, route map[string]func(http.ResponseWriter, *http.Request)) {
-
+func Router(w http.ResponseWriter, r *http.Request, route map[string]func(http.ResponseWriter, *http.Request) string) {
+	var result string
 	log.Println(r.RequestURI)
 	for k, v := range route {
 		var isFound bool
 		if strings.Contains(r.RequestURI, k) {
 
 			log.Println("found")
-			v(w, r)
+			result = v(w, r)
 			isFound = true
 		}
 		if !isFound {
@@ -23,5 +23,5 @@ func Router(w http.ResponseWriter, r *http.Request, route map[string]func(http.R
 		}
 
 	}
-
+	fmt.Fprintf(w, result)
 }
