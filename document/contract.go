@@ -316,7 +316,8 @@ func Contract(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 
 	out, err := m.Output()
 	lib.CheckError(err)
-	result := lib.PutToStorage("function-data", "temp/billing.pdf", out.Bytes())
+	filename := "temp/" + data.Name + "_" + data.Surname + "_contract.pdf"
+	result := lib.PutToStorage("function-data", filename, out.Bytes())
 	//err = m.OutputFileAndClose("document/billing.pdf")
 	lib.CheckError(err)
 	log.Println(result)
