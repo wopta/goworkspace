@@ -21,14 +21,14 @@ func Contract(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
 	log.Println(string(req))
 	base64LogoPerson := base64.StdEncoding.EncodeToString(getFilesByEnv("document/logo_persona.png"))
-	base64LogoWopta := base64.StdEncoding.EncodeToString(getFilesByEnv("document/logo_persona.png"))
+	base64LogoWopta := base64.StdEncoding.EncodeToString(getFilesByEnv("document/ARTW_LOGO_RGB_400px.png"))
 	fontNormal := getPathByEnv("Montserrat-Regular.ttf")
 	fontBold := getPathByEnv("Montserrat-Bold.ttf")
 	var data DodumentData
 	defer r.Body.Close()
 	err := json.Unmarshal([]byte(req), &data)
 	lib.CheckError(err)
-	log.Println(&data)
+
 	skin := Skin{
 		LineColor: color.Color{
 			Red:   229,
