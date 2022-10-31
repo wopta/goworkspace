@@ -12,5 +12,5 @@ require (
 	github.com/jung-kurt/gofpdf v1.16.2 // indirect
 	github.com/ruudk/golang-pdf417 v0.0.0-20201230142125-a7e3863a1245 // indirect
 	github.com/wopta/goworkspace/lib v1.0.4
-	github.com/wopta/goworkspace/models v1.0.4
+	github.com/wopta/goworkspace/models v1.0.0
 )
