@@ -18,6 +18,7 @@ import (
 
 func Contract(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 	log.Println("Proposal")
+	lib.Files("")
 	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
 	log.Println(string(req))
 	base64LogoPerson := base64.StdEncoding.EncodeToString(getFilesByEnv("document/logo_persona.png"))
@@ -70,8 +71,7 @@ func Contract(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 	log.Println("Document 2")
 	m.SetPageMargins(10, 15, 10)
 	m.SetBackgroundColor(whiteColor)
-	m.SetFontLocation("./")
-
+	m.SetFontLocation("/")
 	// Define font to all styles.
 	m.AddUTF8Font("Montserrat", consts.Normal, fontNormal)
 	m.AddUTF8Font("Montserrat", consts.Bold, fontBold)

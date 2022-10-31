@@ -1,8 +1,6 @@
 package document
 
 import (
-	"log"
-
 	"github.com/johnfercher/maroto/pkg/color"
 	"github.com/johnfercher/maroto/pkg/consts"
 	"github.com/johnfercher/maroto/pkg/pdf"
@@ -97,7 +95,7 @@ func (s Skin) TableRow(m pdf.Maroto, colText []string, isLine bool, colspace uin
 		for i, k := range colText {
 			var prop props.Text
 			prop = text
-			log.Println(len(colText))
+			//log.Println(len(colText))
 			if len(colText) > 2 {
 				if i == 0 {
 					prop = textBold
