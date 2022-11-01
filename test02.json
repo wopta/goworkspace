@@ -1,1681 +1,522 @@
-{"works":[{
-    "work": " Addetto di campeggio",
-    "workType": "dipendente",
-    "class": "1",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": false
-    },
-      {
-    "work": " Addetto di sale bocce / biliardo / bowling",
-    "workType": "dipendente",
-    "class": "1",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": false
-    },
-      {
-    "work": " Addetto in birrerie, paninoteche",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": false
-    },
-      {
-    "work": " Addetto pulizie in hotel/Alberghi",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": false
-    },
-      {
-    "work": " Addetto rivendita Gas in bombole, Olio Combustibile",
-    "workType": "dipendente",
-    "class": "3",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": false
-    },
-      {
-    "work": " Addetto stampa / pubblicità",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": false
-    },
-      {
-    "work": " Addetto/operatore di Laboratorio (senza uso e/o contatto con sostanze radioattive/nucleari o pericolose in genere)",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": false
-    },
-      {
-    "work": " Addetto/operatore stazioni di Lavaggio",
-    "workType": "dipendente",
-    "class": "3",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": false
-    },
-      {
-    "work": " Agente di Cambio",
-    "workType": "dipendente",
-    "class": "1",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": false
-    },
-      {
-    "work": " Agronomo",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": false
-    },
-      {
-    "work": " Allevatore",
-    "workType": "dipendente",
-    "class": "3",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": false
-    },
-      {
-    "work": " Amministratore Delegato, Direttore",
-    "workType": "dipendente",
-    "class": "1",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": false
-    },
-      {
-    "work": " Amministratore di Stabili",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": false
-    },
-      {
-    "work": " Antiquari, con restauro mobili e/o uso impalcature",
-    "workType": "dipendente",
-    "class": "4",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": false
-    },
-      {
-    "work": " Antiquari, senza restauro",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": false
-    },
-      {
-    "work": " Apicultore",
-    "workType": "dipendente",
-    "class": "3",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": false
-    },
-      {
-    "work": " Apprendista (mansioni di ufficio)",
-    "workType": "dipendente",
-    "class": "1",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": false
-    },
-      {
-    "work": " Architetto (con accesso a cantieri)",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": false
-    },
-      {
-    "work": " Architetto (senza accesso ai cantieri)",
-    "workType": "dipendente",
-    "class": "1",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": false
-    },
-      {
-    "work": " Artificiere/Addetto alla fabbricazione di esplosivi",
-    "workType": "dipendente",
-    "class": "S.E.",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": false
-    },
-      {
-    "work": " Artigiano generico (non in elenco)",
-    "workType": "dipendente",
-    "class": "3",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": false
-    },
-      {
-    "work": " Artista",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": false
-    },
-      {
-    "work": " Attuario",
-    "workType": "dipendente",
-    "class": "1",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": false
-    },
-      {
-    "work": " Ausiliario",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": false
-    },
-      {
-    "work": " Autista",
-    "workType": "dipendente",
-    "class": "3",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": false
-    },
-      {
-    "work": " Autista di furgoni con carico e scarico",
-    "workType": "dipendente",
-    "class": "4",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": false
-    },
-      {
-    "work": " Autotrasportatore (escluso trasporto merci esplosive e pericolose)",
-    "workType": "dipendente",
-    "class": "4",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": false
-    },
-      {
-    "work": " Autotrasportatore (incluso trasporto merci esplosive e pericolose)",
-    "workType": "dipendente",
-    "class": "4",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": false
-    },
-      {
-    "work": " Avvocato",
-    "workType": "dipendente",
-    "class": "1",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": false
-    },
-      {
-    "work": " Ballerino",
-    "workType": "dipendente",
-    "class": "S.E.",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": false
-    },
-      {
-    "work": " Barbiere",
-    "workType": "dipendente",
-    "class": "1",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": false
-    },
-      {
-    "work": " Barista",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": false
-    },
-      {
-    "work": " Benestante",
-    "workType": "disoccupato",
-    "class": "1",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Biologo (senza uso e/o contatto con sostanze radioattive/nucleari o pericolose in genere e con esclusione trattamento sangue, organi ed emoderivati)",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Calzolaio",
-    "workType": "dipendente",
-    "class": "3",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Cancelliere",
-    "workType": "dipendente",
-    "class": "1",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Carpentiere",
-    "workType": "dipendente",
-    "class": "4",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Carrozziere/Garagista",
-    "workType": "dipendente",
-    "class": "3",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Cartolaio",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Casalinga/o",
-    "workType": "disoccupato",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Casaro",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Cavatori con uso di esplosivi e lavoro manuale",
-    "workType": "dipendente",
-    "class": "S.E.",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Ceramista",
-    "workType": "dipendente",
-    "class": "3",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Chimico (senza uso e/o contatto con sostanze radioattive/nucleari o pericolose in genere)",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Collaboratore familiare",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Coltivatore",
-    "workType": "dipendente",
-    "class": "4",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Commercialista",
-    "workType": "dipendente",
-    "class": "1",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Commerciante al dettaglio/ingrosso (altri prodotti non in elenco)",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Commerciante Ambulante",
-    "workType": "dipendente",
-    "class": "3",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Commerciante di Abbigliamento e Accessori",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Commerciante di Arredamento e Articoli per la casa",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Commerciante di Articoli Fotografici",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Commerciante di Articoli Regalo",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Commerciante di Articoli Sportivi",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Commerciante di Calzature",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Commerciante di Elettrodomestici",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Commerciante di Giocattoli e hobbistica",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Commerciante di Legname",
-    "workType": "dipendente",
-    "class": "4",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Commerciante di Materiale Elettrico",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Commerciante di Materiali di costruzione",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Commerciante di Musica e Strumenti Musicali",
-    "workType": "dipendente",
-    "class": "1",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Commerciante di Passamanerie",
-    "workType": "dipendente",
-    "class": "1",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Commerciante di Teleria",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Commerciante di Valigerie, Articoli in pelle",
-    "workType": "dipendente",
-    "class": "1",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Commerciante Frutta e verdura",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Commerciante generico (non in elenco)",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Commerciante in Colorificio",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Commerciante in Ferramenta",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Commerciante per corrispondenza e catalogo",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Commerciante/Agente di Commercio (con uso di veicoli o macchinari)",
-    "workType": "dipendente",
-    "class": "3",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Commerciante/Agente di Commercio (senza uso di veicoli o macchinari)",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Commesso/Garzone/Cameriere",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Concessionario, Rivenditore",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Conciatore",
-    "workType": "dipendente",
-    "class": "3",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Consulente d'Azienda",
-    "workType": "dipendente",
-    "class": "1",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Consulente del Lavoro",
-    "workType": "dipendente",
-    "class": "1",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Controfigura",
-    "workType": "dipendente",
-    "class": "S.E.",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Cuoco",
-    "workType": "dipendente",
-    "class": "3",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Custode",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Dentista, Odontotecnico",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Dirigente/funzionario (con accesso agli ambienti produttivi/cantieri)",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Dirigente/funzionario (occupato solo in ufficio)",
-    "workType": "dipendente",
-    "class": "1",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Droghiere",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Ecclesiastico (senza attività missionaria, infermieristica o paramedica)",
-    "workType": "dipendente",
-    "class": "1",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Edicolante",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Elettrauto",
-    "workType": "dipendente",
-    "class": "3",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Elettricista (a contatto con correnti a bassa tensione)",
-    "workType": "dipendente",
-    "class": "3",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Elettricista (a contatto con correnti ad alta tensione)",
-    "workType": "dipendente",
-    "class": "4",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Erborista",
-    "workType": "dipendente",
-    "class": "1",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Fabbro",
-    "workType": "dipendente",
-    "class": "4",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Falegname",
-    "workType": "dipendente",
-    "class": "4",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Farmacista",
-    "workType": "dipendente",
-    "class": "1",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Fioraio",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Fisioterapista e professioni assimilabili/massaggiatore/estetista",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Fisioterapista/massaggiatore/ estetista",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Forze dell’ordine",
-    "workType": "dipendente",
-    "class": "S.E.",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Fotografo (anche all'esterno)",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Fotografo (solo in studio)",
-    "workType": "dipendente",
-    "class": "1",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Frutticultore",
-    "workType": "dipendente",
-    "class": "3",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Gastronomia/rosticceria",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Gelataio",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Geologo",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Geometra (con accesso a cantieri)",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Geometra (senza accesso ai cantieri)",
-    "workType": "dipendente",
-    "class": "1",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Giardiniere",
-    "workType": "dipendente",
-    "class": "3",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Gioielliere, orologiaio",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Giornalista (cronista, corrispondente) - no inviato di guerra",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Giornalista (occupato solo in studio)",
-    "workType": "dipendente",
-    "class": "1",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Grafico",
-    "workType": "dipendente",
-    "class": "1",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Guardia giurata, notturna, portavalori",
-    "workType": "dipendente",
-    "class": "S.E.",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Guardie armate",
-    "workType": "dipendente",
-    "class": "S.E.",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Guardie del corpo e Buttafuori",
-    "workType": "dipendente",
-    "class": "S.E.",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Guida alpina",
-    "workType": "dipendente",
-    "class": "N.A.",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Guida turistica",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Idraulico (con lavori in quota/impalcatura)",
-    "workType": "dipendente",
-    "class": "4",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Idraulico (no lavori in quota/impalcatura)",
-    "workType": "dipendente",
-    "class": "3",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Imbianchino (con accesso a ponti/impalcature)",
-    "workType": "dipendente",
-    "class": "4",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Imbianchino (senza accesso a ponti/impalcature)",
-    "workType": "dipendente",
-    "class": "3",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Impiegato/quadro",
-    "workType": "dipendente",
-    "class": "1",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Imprenditore edile (che non prende parte a lavori manuali)",
-    "workType": "autonomo",
-    "class": "3",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Imprenditore edile (che prende parte a lavori manuali)",
-    "workType": "autonomo",
-    "class": "4",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Imprenditore non edile (che non prende parte a lavori manuali)",
-    "workType": "autonomo",
-    "class": "1",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Imprenditore non edile (che prende parte a lavori manuali)",
-    "workType": "autonomo",
-    "class": "3",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Informatico",
-    "workType": "dipendente",
-    "class": "1",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Ingegnere (con accesso ai cantiere)",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Ingegnere (senza accesso ai cantieri)",
-    "workType": "dipendente",
-    "class": "1",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Insegnante di ballo, sci, tennis, scherma, atletica leggera",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Insegnante di educazione fisica",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Insegnante di scuole e docenti universitari",
-    "workType": "dipendente",
-    "class": "1",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Insegnanti di alpinismo, guide alpine",
-    "workType": "dipendente",
-    "class": "N.A.",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Insegnanti di judo, karatè, od altri similari, insegnanti di atletica pesante ed arti marziali",
-    "workType": "dipendente",
-    "class": "4",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Intermediario Immobiliare, finanziario e assicurativo",
-    "workType": "dipendente",
-    "class": "1",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Investigatore",
-    "workType": "dipendente",
-    "class": "S.E.",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Lattaio",
-    "workType": "dipendente",
-    "class": "1",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Lavoratore al frantoio",
-    "workType": "dipendente",
-    "class": "3",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Lavoro generico (con lavoro manuale) non in elenco",
-    "workType": "dipendente",
-    "class": "3",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Lavoro generico (con uso macchinari) non in elenco",
-    "workType": "dipendente",
-    "class": "3",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Lavoro generico (senza lavoro manuale) non in elenco",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Lavoro generico (senza uso macchinari) non in elenco",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Libraio",
-    "workType": "dipendente",
-    "class": "1",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Macellaio (esclusa macellazione)",
-    "workType": "dipendente",
-    "class": "3",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Magistrato",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Maschera (di sala cinematografica)",
-    "workType": "dipendente",
-    "class": "1",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Meccanico",
-    "workType": "dipendente",
-    "class": "3",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Mediatore",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Medico generico/specialista",
-    "workType": "dipendente",
-    "class": "1",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Medico generico/specialista (con attività di sala operatoria)",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Merciaio (lavoratore in merceria)",
-    "workType": "dipendente",
-    "class": "1",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Militare",
-    "workType": "dipendente",
-    "class": "S.E.",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Minatore/Cavatore con uso di esplosivi e lavoro manuale",
-    "workType": "dipendente",
-    "class": "S.E.",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Mobiliere",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Muratore",
-    "workType": "dipendente",
-    "class": "4",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Noleggiatore (non veicoli)",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Noleggiatore Veicoli",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Notaio",
-    "workType": "dipendente",
-    "class": "1",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Nullafacente/Disoccupato",
-    "workType": "disoccupato",
-    "class": "4",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Operaio (con uso di macchine con accesso a cantieri)",
-    "workType": "dipendente",
-    "class": "4",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Operaio (con uso di macchine senza accesso a cantieri)",
-    "workType": "dipendente",
-    "class": "4",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Operatore dello spettacolo (musicista, attore, presentatore)",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Operatore in stazione di Servizio, Benzinaio",
-    "workType": "dipendente",
-    "class": "3",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Orafo",
-    "workType": "dipendente",
-    "class": "3",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Ortolano",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Oste",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Ottico",
-    "workType": "dipendente",
-    "class": "1",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Palombaro/Sommozzatore",
-    "workType": "dipendente",
-    "class": "S.E.",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Panettiere",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Paramedico /Infermiere",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Pastaio/Fornaio/Panettiere (con uso di forno e macchinari)",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Pasticciere",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Pastore",
-    "workType": "dipendente",
-    "class": "3",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Pellicciaio",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Pensionato",
-    "workType": "disoccupato",
-    "class": "3",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Perito commerciale",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Perito elettronico, industriale, tessile, agrario, calligrafo, assicurativo",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Pescatore",
-    "workType": "dipendente",
-    "class": "4",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Piloti e Assistenti di Volo in servizio attivo",
-    "workType": "dipendente",
-    "class": "S.E.",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Politico",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Poliziotto",
-    "workType": "dipendente",
-    "class": "S.E.",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Procuratore Legale",
-    "workType": "dipendente",
-    "class": "1",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Professore universitario",
-    "workType": "dipendente",
-    "class": "1",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Radiologo",
-    "workType": "dipendente",
-    "class": "4",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Ragioniere",
-    "workType": "dipendente",
-    "class": "1",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Restauratore (con uso di ponti e impalcature)",
-    "workType": "dipendente",
-    "class": "4",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Restauratore (senza uso di ponti e impalcature)",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Restauratore e pittore con uso di ponti e impalcature",
-    "workType": "dipendente",
-    "class": "4",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Riparatore materiale elettrico ed elettronico",
-    "workType": "dipendente",
-    "class": "3",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Riparatore Orologi e Gioielli",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Ristoratore",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Salumiere",
-    "workType": "dipendente",
-    "class": "3",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Scrittore",
-    "workType": "dipendente",
-    "class": "1",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Servizi alla Persona",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Servizi Vari",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Speleologo",
-    "workType": "dipendente",
-    "class": "N.A.",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Sportivo Professionista",
-    "workType": "dipendente",
-    "class": "N.A.",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Studente",
-    "workType": "disoccupato",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Studente di scuole tecniche/professionali",
-    "workType": "disoccupato",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Stunt-men/Acrobati/Operatori su corda dell'edilizia acrobatica",
-    "workType": "dipendente",
-    "class": "S.E.",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Tabaccaio",
-    "workType": "dipendente",
-    "class": "2",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Tapparellista",
-    "workType": "dipendente",
-    "class": "4",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Tappezziere",
-    "workType": "dipendente",
-    "class": "3",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Taxista/Autista",
-    "workType": "dipendente",
-    "class": "3",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Tintore",
-    "workType": "dipendente",
-    "class": "3",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Tipografo",
-    "workType": "dipendente",
-    "class": "3",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Venditore Porta a Porta",
-    "workType": "dipendente",
-    "class": "3",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Veterinario",
-    "workType": "dipendente",
-    "class": "3",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Vetraio",
-    "workType": "dipendente",
-    "class": "3",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Vigili del Fuoco",
-    "workType": "dipendente",
-    "class": "S.E.",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Vigili Urbani",
-    "workType": "dipendente",
-    "class": "S.E.",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Viticultore",
-    "workType": "dipendente",
-    "class": "3",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
-    },
-      {
-    "work": " Altre non incluse in elenco",
-    "workType": "dipendente",
-    "class": "N.A.",
-    "isSelfEmployed": true,
-    "isEmployed": true,
-    "isUnemployed ": true
+{
+  "ASS": {
+    "DailyAllowance": "",
+    "LegalDefence": "",
+    "Assistance": "",
+    "IsYuor": false,
+    "Type": "",
+    "TypeOfSumInsured": "",
+    "Description": "",
+    "Deductible": "0",
+    "SumInsuredLimitOfIndemnity": 0,
+    "Price": 0,
+    "Value": null,
+    "Offer": null,
+    "Slug": "Assistenza",
+    "SelfInsurance": "",
+    "IsBase": false,
+    "IsYour": false,
+    "IsPremium": false,
+    "Base": {
+      "TypeOfSumInsured": "",
+      "Deductible": "0",
+      "DeductibleType": "",
+      "SumInsuredLimitOfIndemnity": 0,
+      "SelfInsurance": "0",
+      "Tax": 0,
+      "PremiumNet": 0,
+      "PremiumTaxAmount": 0,
+      "PremiumGross": 0
+    },
+    "Your": {
+      "TypeOfSumInsured": "",
+      "Deductible": "0",
+      "DeductibleType": "",
+      "SumInsuredLimitOfIndemnity": 0,
+      "SelfInsurance": "0",
+      "Tax": 0,
+      "PremiumNet": 0,
+      "PremiumTaxAmount": 0,
+      "PremiumGross": 0
+    },
+    "Premium": {
+      "TypeOfSumInsured": "",
+      "Deductible": "0",
+      "DeductibleType": "",
+      "SumInsuredLimitOfIndemnity": 0,
+      "SelfInsurance": "0",
+      "Tax": 0,
+      "PremiumNet": 0,
+      "PremiumTaxAmount": 0,
+      "PremiumGross": 0
     }
-    ]}
+  },
+  "D": {
+    "DailyAllowance": "",
+    "LegalDefence": "",
+    "Assistance": "",
+    "IsYuor": false,
+    "Type": "extra",
+    "TypeOfSumInsured": "",
+    "Description": "",
+    "Deductible": "0",
+    "SumInsuredLimitOfIndemnity": 0,
+    "Price": 0,
+    "Value": null,
+    "Offer": null,
+    "Slug": "Decesso Infortunio",
+    "SelfInsurance": "",
+    "IsBase": true,
+    "IsYour": true,
+    "IsPremium": true,
+    "Base": {
+      "TypeOfSumInsured": "",
+      "Deductible": "0",
+      "DeductibleType": "",
+      "SumInsuredLimitOfIndemnity": 200000,
+      "SelfInsurance": "0",
+      "Tax": 0,
+      "PremiumNet": 0,
+      "PremiumTaxAmount": 0,
+      "PremiumGross": 0
+    },
+    "Your": {
+      "TypeOfSumInsured": "",
+      "Deductible": "0",
+      "DeductibleType": "",
+      "SumInsuredLimitOfIndemnity": 200000,
+      "SelfInsurance": "0",
+      "Tax": 0,
+      "PremiumNet": 0,
+      "PremiumTaxAmount": 0,
+      "PremiumGross": 0
+    },
+    "Premium": {
+      "TypeOfSumInsured": "",
+      "Deductible": "0",
+      "DeductibleType": "",
+      "SumInsuredLimitOfIndemnity": 300000,
+      "SelfInsurance": "0",
+      "Tax": 0,
+      "PremiumNet": 0,
+      "PremiumTaxAmount": 0,
+      "PremiumGross": 0
+    }
+  },
+  "DC": {
+    "DailyAllowance": "",
+    "LegalDefence": "",
+    "Assistance": "",
+    "IsYuor": false,
+    "Type": "extra",
+    "TypeOfSumInsured": "",
+    "Description": "",
+    "Deductible": "0",
+    "SumInsuredLimitOfIndemnity": 0,
+    "Price": 0,
+    "Value": null,
+    "Offer": null,
+    "Slug": "Diaria Convalescenza Infortunio",
+    "SelfInsurance": "",
+    "IsBase": false,
+    "IsYour": true,
+    "IsPremium": true,
+    "Base": {
+      "TypeOfSumInsured": "",
+      "Deductible": "0",
+      "DeductibleType": "",
+      "SumInsuredLimitOfIndemnity": 0,
+      "SelfInsurance": "0",
+      "Tax": 0,
+      "PremiumNet": 0,
+      "PremiumTaxAmount": 0,
+      "PremiumGross": 0
+    },
+    "Your": {
+      "TypeOfSumInsured": "",
+      "Deductible": "0",
+      "DeductibleType": "",
+      "SumInsuredLimitOfIndemnity": 50,
+      "SelfInsurance": "0",
+      "Tax": 0,
+      "PremiumNet": 16.5,
+      "PremiumTaxAmount": 0,
+      "PremiumGross": 0
+    },
+    "Premium": {
+      "TypeOfSumInsured": "",
+      "Deductible": "0",
+      "DeductibleType": "",
+      "SumInsuredLimitOfIndemnity": 100,
+      "SelfInsurance": "0",
+      "Tax": 0,
+      "PremiumNet": 33,
+      "PremiumTaxAmount": 0,
+      "PremiumGross": 0
+    }
+  },
+  "DR": {
+    "DailyAllowance": "",
+    "LegalDefence": "",
+    "Assistance": "",
+    "IsYuor": false,
+    "Type": "extra",
+    "TypeOfSumInsured": "",
+    "Description": "",
+    "Deductible": "0",
+    "SumInsuredLimitOfIndemnity": 0,
+    "Price": 0,
+    "Value": null,
+    "Offer": null,
+    "Slug": "Diaria Ricovero / Gessatura Infortunio",
+    "SelfInsurance": "",
+    "IsBase": false,
+    "IsYour": true,
+    "IsPremium": true,
+    "Base": {
+      "TypeOfSumInsured": "",
+      "Deductible": "0",
+      "DeductibleType": "",
+      "SumInsuredLimitOfIndemnity": 0,
+      "SelfInsurance": "0",
+      "Tax": 0,
+      "PremiumNet": 0,
+      "PremiumTaxAmount": 0,
+      "PremiumGross": 0
+    },
+    "Your": {
+      "TypeOfSumInsured": "",
+      "Deductible": "0",
+      "DeductibleType": "",
+      "SumInsuredLimitOfIndemnity": 100,
+      "SelfInsurance": "0",
+      "Tax": 0,
+      "PremiumNet": 81,
+      "PremiumTaxAmount": 0,
+      "PremiumGross": 0
+    },
+    "Premium": {
+      "TypeOfSumInsured": "",
+      "Deductible": "0",
+      "DeductibleType": "",
+      "SumInsuredLimitOfIndemnity": 150,
+      "SelfInsurance": "0",
+      "Tax": 0,
+      "PremiumNet": 121.50000000000001,
+      "PremiumTaxAmount": 0,
+      "PremiumGross": 0
+    }
+  },
+  "IPI": {
+    "DailyAllowance": "",
+    "LegalDefence": "",
+    "Assistance": "",
+    "IsYuor": false,
+    "Type": "extra",
+    "TypeOfSumInsured": "",
+    "Description": "",
+    "Deductible": "0",
+    "SumInsuredLimitOfIndemnity": 0,
+    "Price": 0,
+    "Value": null,
+    "Offer": null,
+    "Slug": "Invalidità Permanente Infortunio",
+    "SelfInsurance": "",
+    "IsBase": true,
+    "IsYour": true,
+    "IsPremium": true,
+    "Base": {
+      "TypeOfSumInsured": "",
+      "Deductible": "5",
+      "DeductibleType": "absolute",
+      "SumInsuredLimitOfIndemnity": 200000,
+      "SelfInsurance": "0",
+      "Tax": 0,
+      "PremiumNet": 180,
+      "PremiumTaxAmount": 0,
+      "PremiumGross": 0
+    },
+    "Your": {
+      "TypeOfSumInsured": "",
+      "Deductible": "5",
+      "DeductibleType": "absorbable",
+      "SumInsuredLimitOfIndemnity": 200000,
+      "SelfInsurance": "0",
+      "Tax": 0,
+      "PremiumNet": 216,
+      "PremiumTaxAmount": 0,
+      "PremiumGross": 0
+    },
+    "Premium": {
+      "TypeOfSumInsured": "",
+      "Deductible": "5",
+      "DeductibleType": "absorbable",
+      "SumInsuredLimitOfIndemnity": 300000,
+      "SelfInsurance": "0",
+      "Tax": 0,
+      "PremiumNet": 324,
+      "PremiumTaxAmount": 0,
+      "PremiumGross": 0
+    }
+  },
+  "IPM": {
+    "DailyAllowance": "",
+    "LegalDefence": "",
+    "Assistance": "",
+    "IsYuor": false,
+    "Type": "extra",
+    "TypeOfSumInsured": "",
+    "Description": "",
+    "Deductible": "0",
+    "SumInsuredLimitOfIndemnity": 0,
+    "Price": 0,
+    "Value": null,
+    "Offer": null,
+    "Slug": "Invalidità Permanente Malattia IPM",
+    "SelfInsurance": "",
+    "IsBase": false,
+    "IsYour": false,
+    "IsPremium": true,
+    "Base": {
+      "TypeOfSumInsured": "",
+      "Deductible": "0",
+      "DeductibleType": "",
+      "SumInsuredLimitOfIndemnity": 0,
+      "SelfInsurance": "0",
+      "Tax": 0,
+      "PremiumNet": 0,
+      "PremiumTaxAmount": 0,
+      "PremiumGross": 0
+    },
+    "Your": {
+      "TypeOfSumInsured": "",
+      "Deductible": "0",
+      "DeductibleType": "",
+      "SumInsuredLimitOfIndemnity": 0,
+      "SelfInsurance": "0",
+      "Tax": 0,
+      "PremiumNet": 0,
+      "PremiumTaxAmount": 0,
+      "PremiumGross": 0
+    },
+    "Premium": {
+      "TypeOfSumInsured": "",
+      "Deductible": "0",
+      "DeductibleType": "",
+      "SumInsuredLimitOfIndemnity": 50000,
+      "SelfInsurance": "0",
+      "Tax": 0,
+      "PremiumNet": 207.50000000000003,
+      "PremiumTaxAmount": 0,
+      "PremiumGross": 0
+    }
+  },
+  "ITI": {
+    "DailyAllowance": "",
+    "LegalDefence": "",
+    "Assistance": "",
+    "IsYuor": false,
+    "Type": "extra",
+    "TypeOfSumInsured": "",
+    "Description": "",
+    "Deductible": "0",
+    "SumInsuredLimitOfIndemnity": 0,
+    "Price": 0,
+    "Value": null,
+    "Offer": null,
+    "Slug": "Inabilità Totale Infortunio",
+    "SelfInsurance": "",
+    "IsBase": false,
+    "IsYour": false,
+    "IsPremium": false,
+    "Base": {
+      "TypeOfSumInsured": "",
+      "Deductible": "15",
+      "DeductibleType": "",
+      "SumInsuredLimitOfIndemnity": 0,
+      "SelfInsurance": "0",
+      "Tax": 0,
+      "PremiumNet": 0,
+      "PremiumTaxAmount": 0,
+      "PremiumGross": 0
+    },
+    "Your": {
+      "TypeOfSumInsured": "",
+      "Deductible": "15",
+      "DeductibleType": "",
+      "SumInsuredLimitOfIndemnity": 0,
+      "SelfInsurance": "0",
+      "Tax": 0,
+      "PremiumNet": 0,
+      "PremiumTaxAmount": 0,
+      "PremiumGross": 0
+    },
+    "Premium": {
+      "TypeOfSumInsured": "",
+      "Deductible": "15",
+      "DeductibleType": "",
+      "SumInsuredLimitOfIndemnity": 0,
+      "SelfInsurance": "0",
+      "Tax": 0,
+      "PremiumNet": 0,
+      "PremiumTaxAmount": 0,
+      "PremiumGross": 0
+    }
+  },
+  "MI": {
+    "DailyAllowance": "",
+    "LegalDefence": "",
+    "Assistance": "",
+    "IsYuor": false,
+    "Type": "extra",
+    "TypeOfSumInsured": "",
+    "Description": "",
+    "Deductible": "0",
+    "SumInsuredLimitOfIndemnity": 0,
+    "Price": 0,
+    "Value": null,
+    "Offer": null,
+    "Slug": "Morete da infortunio",
+    "SelfInsurance": "",
+    "IsBase": false,
+    "IsYour": false,
+    "IsPremium": false,
+    "Base": {
+      "TypeOfSumInsured": "",
+      "Deductible": "0",
+      "DeductibleType": "",
+      "SumInsuredLimitOfIndemnity": 0,
+      "SelfInsurance": "0",
+      "Tax": 0,
+      "PremiumNet": 0,
+      "PremiumTaxAmount": 0,
+      "PremiumGross": 0
+    },
+    "Your": {
+      "TypeOfSumInsured": "",
+      "Deductible": "0",
+      "DeductibleType": "",
+      "SumInsuredLimitOfIndemnity": 0,
+      "SelfInsurance": "0",
+      "Tax": 0,
+      "PremiumNet": 0,
+      "PremiumTaxAmount": 0,
+      "PremiumGross": 0
+    },
+    "Premium": {
+      "TypeOfSumInsured": "",
+      "Deductible": "0",
+      "DeductibleType": "",
+      "SumInsuredLimitOfIndemnity": 0,
+      "SelfInsurance": "0",
+      "Tax": 0,
+      "PremiumNet": 0,
+      "PremiumTaxAmount": 0,
+      "PremiumGross": 0
+    }
+  },
+  "RSC": {
+    "DailyAllowance": "",
+    "LegalDefence": "",
+    "Assistance": "",
+    "IsYuor": false,
+    "Type": "extra",
+    "TypeOfSumInsured": "",
+    "Description": "",
+    "Deductible": "0",
+    "SumInsuredLimitOfIndemnity": 0,
+    "Price": 0,
+    "Value": null,
+    "Offer": null,
+    "Slug": "Rimborso spese di cura Infortunio",
+    "SelfInsurance": "",
+    "IsBase": false,
+    "IsYour": false,
+    "IsPremium": true,
+    "Base": {
+      "TypeOfSumInsured": "",
+      "Deductible": "0",
+      "DeductibleType": "",
+      "SumInsuredLimitOfIndemnity": 0,
+      "SelfInsurance": "0",
+      "Tax": 0,
+      "PremiumNet": 0,
+      "PremiumTaxAmount": 0,
+      "PremiumGross": 0
+    },
+    "Your": {
+      "TypeOfSumInsured": "",
+      "Deductible": "0",
+      "DeductibleType": "",
+      "SumInsuredLimitOfIndemnity": 0,
+      "SelfInsurance": "0",
+      "Tax": 0,
+      "PremiumNet": 0,
+      "PremiumTaxAmount": 0,
+      "PremiumGross": 0
+    },
+    "Premium": {
+      "TypeOfSumInsured": "",
+      "Deductible": "0",
+      "DeductibleType": "",
+      "SumInsuredLimitOfIndemnity": 10000,
+      "SelfInsurance": "0",
+      "Tax": 0,
+      "PremiumNet": 104.7,
+      "PremiumTaxAmount": 0,
+      "PremiumGross": 0
+    }
+  },
+  "TL": {
+    "DailyAllowance": "",
+    "LegalDefence": "",
+    "Assistance": "",
+    "IsYuor": false,
+    "Type": "",
+    "TypeOfSumInsured": "",
+    "Description": "",
+    "Deductible": "0",
+    "SumInsuredLimitOfIndemnity": 0,
+    "Price": 0,
+    "Value": null,
+    "Offer": null,
+    "Slug": "Tutela Legale",
+    "SelfInsurance": "",
+    "IsBase": false,
+    "IsYour": false,
+    "IsPremium": false,
+    "Base": {
+      "TypeOfSumInsured": "",
+      "Deductible": "0",
+      "DeductibleType": "",
+      "SumInsuredLimitOfIndemnity": 0,
+      "SelfInsurance": "0",
+      "Tax": 0,
+      "PremiumNet": 0,
+      "PremiumTaxAmount": 0,
+      "PremiumGross": 0
+    },
+    "Your": {
+      "TypeOfSumInsured": "",
+      "Deductible": "0",
+      "DeductibleType": "",
+      "SumInsuredLimitOfIndemnity": 0,
+      "SelfInsurance": "0",
+      "Tax": 0,
+      "PremiumNet": 0,
+      "PremiumTaxAmount": 0,
+      "PremiumGross": 0
+    },
+    "Premium": {
+      "TypeOfSumInsured": "",
+      "Deductible": "0",
+      "DeductibleType": "",
+      "SumInsuredLimitOfIndemnity": 0,
+      "SelfInsurance": "0",
+      "Tax": 0,
+      "PremiumNet": 0,
+      "PremiumTaxAmount": 0,
+      "PremiumGross": 0
+    }
+  }
+}

@@ -80,16 +80,19 @@ func initCoverageP() map[string]*Coverage {
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
+			PremiumNet:                 0.0,
 			SelfInsurance:              "0"},
 		Your: &CoverageValue{
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
+			PremiumNet:                 0.0,
 			SelfInsurance:              "0"},
 		Premium: &CoverageValue{
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
+			PremiumNet:                 0.0,
 			SelfInsurance:              "0"},
 		IsBase:    false,
 		IsYour:    false,
@@ -103,16 +106,19 @@ func initCoverageP() map[string]*Coverage {
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
+			PremiumNet:                 0.0,
 			SelfInsurance:              "0"},
 		Your: &CoverageValue{
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
+			PremiumNet:                 0.0,
 			SelfInsurance:              "0"},
 		Premium: &CoverageValue{
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
+			PremiumNet:                 0.0,
 			SelfInsurance:              "0"},
 		IsBase:    false,
 		IsYour:    false,
@@ -124,25 +130,28 @@ func initCoverageP() map[string]*Coverage {
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0.0,
 		Base: &CoverageValue{
-			Deductible:                 "0",
+			Deductible:                 "7",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
+			PremiumNet:                 0.0,
 			SelfInsurance:              "0"},
 		Your: &CoverageValue{
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
+			PremiumNet:                 0.0,
 			SelfInsurance:              "0"},
 		Premium: &CoverageValue{
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
+			PremiumNet:                 0.0,
 			SelfInsurance:              "0"},
 		IsBase:    false,
 		IsYour:    false,
 		IsPremium: false,
 	}
-	res["DRG"] = &Coverage{
+	res["DR"] = &Coverage{
 		Slug: "Diaria Ricovero / Gessatura Infortunio",
 
 		Deductible:                 "0",
@@ -151,16 +160,19 @@ func initCoverageP() map[string]*Coverage {
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
+			PremiumNet:                 0.0,
 			SelfInsurance:              "0"},
 		Your: &CoverageValue{
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
+			PremiumNet:                 0.0,
 			SelfInsurance:              "0"},
 		Premium: &CoverageValue{
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
+			PremiumNet:                 0.0,
 			SelfInsurance:              "0"},
 		IsBase:    false,
 		IsYour:    false,
@@ -174,6 +186,7 @@ func initCoverageP() map[string]*Coverage {
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
+			PremiumNet:                 0.0,
 			SelfInsurance:              "0"},
 		Your: &CoverageValue{
 			Deductible:                 "0",
@@ -184,6 +197,7 @@ func initCoverageP() map[string]*Coverage {
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
+			PremiumNet:                 0.0,
 			SelfInsurance:              "0"},
 		IsBase:    false,
 		IsYour:    false,
@@ -197,16 +211,19 @@ func initCoverageP() map[string]*Coverage {
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
+			PremiumNet:                 0.0,
 			SelfInsurance:              "0"},
 		Your: &CoverageValue{
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
+			PremiumNet:                 0.0,
 			SelfInsurance:              "0"},
 		Premium: &CoverageValue{
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
+			PremiumNet:                 0.0,
 			SelfInsurance:              "0"},
 		IsBase:    false,
 		IsYour:    false,
@@ -226,6 +243,7 @@ func initCoverageP() map[string]*Coverage {
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
+			PremiumNet:                 0.0,
 			SelfInsurance:              "0"},
 		Premium: &CoverageValue{
 			Deductible:                 "0",
@@ -245,23 +263,26 @@ func initCoverageP() map[string]*Coverage {
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
+			PremiumNet:                 0.0,
 			SelfInsurance:              "0"},
 		Your: &CoverageValue{
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
+			PremiumNet:                 0.0,
 			SelfInsurance:              "0"},
 		Premium: &CoverageValue{
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
+			PremiumNet:                 0.0,
 			SelfInsurance:              "0"},
 		IsBase:    false,
 		IsYour:    false,
 		IsPremium: false,
 	}
 	res["TL"] = &Coverage{
-		Slug: "third-party-liability",
+		Slug: "Tutela Legale",
 
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0.0,
@@ -269,16 +290,47 @@ func initCoverageP() map[string]*Coverage {
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
+			PremiumNet:                 0.0,
 			SelfInsurance:              "0"},
 		Your: &CoverageValue{
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
+			PremiumNet:                 0.0,
 			SelfInsurance:              "0"},
 		Premium: &CoverageValue{
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
+			PremiumNet:                 0.0,
+			SelfInsurance:              "0"},
+		IsBase:    false,
+		IsYour:    false,
+		IsPremium: false,
+	}
+
+	res["MI"] = &Coverage{
+		Slug: "Morete da infortunio",
+
+		Deductible:                 "0",
+		SumInsuredLimitOfIndemnity: 0.0,
+		Base: &CoverageValue{
+			Deductible:                 "0",
+			DeductibleType:             "",
+			SumInsuredLimitOfIndemnity: 0.0,
+			PremiumNet:                 0.0,
+			SelfInsurance:              "0"},
+		Your: &CoverageValue{
+			Deductible:                 "0",
+			DeductibleType:             "",
+			SumInsuredLimitOfIndemnity: 0.0,
+			PremiumNet:                 0.0,
+			SelfInsurance:              "0"},
+		Premium: &CoverageValue{
+			Deductible:                 "0",
+			DeductibleType:             "",
+			SumInsuredLimitOfIndemnity: 0.0,
+			PremiumNet:                 0.0,
 			SelfInsurance:              "0"},
 		IsBase:    false,
 		IsYour:    false,
@@ -292,7 +344,18 @@ func getData() string {
 		"IPI": {
 			"extra": {
 				"1": {
-					"asorbable": {
+					"absorbable": {
+						"5": 1.08,
+						"10": 0.79
+					},
+					"absolute": {
+						"3": 1.13,
+						"5": 0.90,
+						"10": 0.74
+					}
+				},
+				"2": {
+					"absorbable": {
 						"5": 1.08,
 						"10": 0.79
 					},
@@ -303,9 +366,30 @@ func getData() string {
 					}
 				}
 			},
+			"3": {
+				"absorbable": {
+					"5": 1.08,
+					"10": 0.79
+				},
+				"absolute": {
+					"3": 1.13,
+					"5": 0.90,
+					"10": 0.74
+				}
+			},"4": {
+				"absorbable": {
+					"5": 1.08,
+					"10": 0.79
+				},
+				"absolute": {
+					"3": 1.13,
+					"5": 0.90,
+					"10": 0.74
+				}
+			},
 			"professional": {
 				"1": {
-					"asorbable": {
+					"absorbable": {
 						"5": 0.68,
 						"10": 0.50
 					},
@@ -316,7 +400,7 @@ func getData() string {
 					}
 				},
 				"2": {
-					"asorbable": {
+					"absorbable": {
 						"5": 0.88,
 						"10": 0.65
 					},
@@ -327,7 +411,7 @@ func getData() string {
 					}
 				},
 				"3": {
-					"asorbable": {
+					"absorbable": {
 						"5": 1.25,
 						"10": 0.92
 					},
@@ -338,7 +422,7 @@ func getData() string {
 					}
 				},
 				"4": {
-					"asorbable": {
+					"absorbable": {
 						"5": 1.45,
 						"10": 1.07
 					},
@@ -351,7 +435,7 @@ func getData() string {
 			},
 			"extraprof": {
 				"1": {
-					"asorbable": {
+					"absorbable": {
 						"5": 1.14,
 						"10": 0.83
 					},
@@ -362,7 +446,7 @@ func getData() string {
 					}
 				},
 				"2": {
-					"asorbable": {
+					"absorbable": {
 						"5": 1.46,
 						"10": 1.08
 					},
@@ -373,7 +457,7 @@ func getData() string {
 					}
 				},
 				"3": {
-					"asorbable": {
+					"absorbable": {
 						"5": 2.08,
 						"10": 1.53
 					},
@@ -384,7 +468,7 @@ func getData() string {
 					}
 				},
 				"4": {
-					"asorbable": {
+					"absorbable": {
 						"5": 2.41,
 						"10": 1.78
 					},
@@ -396,9 +480,12 @@ func getData() string {
 				}
 			}
 		},
-		"DRC": {
+		"DR": {
 			"extra": {
-				"1": 0.81
+				"1": 0.81,
+				"2": 0.81,
+				"3": 0.81,
+				"4": 0.81
 			},
 			"professional": {
 				"1": 0.55,
@@ -415,7 +502,10 @@ func getData() string {
 		},
 		"MI": {
 			"extra": {
-				"1": 0.62
+				"1": 0.62,
+				"2": 0.62,
+				"3": 0.62,
+				"4": 0.62
 			},
 			"professional": {
 				"1": 0.38,
@@ -430,7 +520,7 @@ func getData() string {
 				"4": 1.48
 			}
 		},
-		"IT": {
+		"ITI": {
 			"1": {
 				"7": 4.17,
 				"15": 3.32
@@ -500,7 +590,10 @@ func getData() string {
 		},
 		"DC": {
 			"extra": {
-				"1": 0.33
+				"1": 0.33,
+				"2": 0.33,
+				"3": 0.33,
+				"4": 0.33
 			},
 			"professional": {
 				"1": 0.20,
@@ -519,6 +612,24 @@ func getData() string {
 		"RSC": {
 			"extra": {
 				"1": {
+					"2500":31.59,
+					"5000":56.95,
+					"10000":104.70,
+					"15000":148.91
+				},
+				"2": {
+					"2500":31.59,
+					"5000":56.95,
+					"10000":104.70,
+					"15000":148.91
+				},
+				"3": {
+					"2500":31.59,
+					"5000":56.95,
+					"10000":104.70,
+					"15000":148.91
+				},
+				"4": {
 					"2500":31.59,
 					"5000":56.95,
 					"10000":104.70,

@@ -2,7 +2,9 @@ package lib
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
+	"math"
 
 	"github.com/hyperjumptech/grule-rule-engine/ast"
 	"github.com/hyperjumptech/grule-rule-engine/builder"
@@ -59,6 +61,22 @@ func RulesFromJson(groule []byte, out interface{}, in []byte, data []byte) (stri
 type Fx struct {
 }
 
+func (p *Fx) ToString(value float64) string {
+	var r int
+	r = int(math.Round(value))
+	log.Println(r)
+
+	return fmt.Sprint(r)
+}
+func (p *Fx) SetCoverage(value float64) string {
+
+	return fmt.Sprintf("%f", value)
+}
+
+func (p *Fx) Tax(value float64) string {
+
+	return fmt.Sprintf("%f", value)
+}
 func (p *Fx) GetContentValue(buildingType string) float64 {
 	if buildingType == "SERVIZI MANUALI" {
 		return 0.10

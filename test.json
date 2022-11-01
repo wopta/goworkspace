@@ -1,271 +1,350 @@
-{"SendEnvelopeDescription":{
-  "Name": "Test.pdf",
-  "EmailSubject": "Please sign the enclosed envelope",
-  "EmailBody": "Dear #RecipientFirstName# #RecipientLastName#\n\n#PersonalMessage#\n\nPlease sign the envelope #EnvelopeName#\n\nEnvelope will expire at #ExpirationDate#",
-  "DisplayedEmailSender": "",
-  "EnableReminders": true,
-  "FirstReminderDayAmount": 5,
-  "RecurrentReminderDayAmount": 3,
-  "BeforeExpirationDayAmount": 3,
-  "ExpirationInSecondsAfterSending": 2419200,
-  "CallbackUrl": "",
-  "StatusUpdateCallbackUrl": "",
-  "LockFormFieldsAtEnvelopeFinish": false,
-  "Steps": [
-    {
-    "OrderIndex": 1,
-    "Recipients": [
-      {
-      "Email": "luca.barbieri@wopta.it",
-      "FirstName": "##name##",
-      "LastName": "##name##",
-      "LanguageCode": "it",
-      "EmailBodyExtra": "",
-      "DisableEmail": false,
-      "AddAndroidAppLink": false,
-      "AddIosAppLink": false,
-      "AddWindowsAppLink": false,
-      "AllowDelegation": true,
-      "AllowAccessFinishedWorkstep": false,
-      "SkipExternalDataValidation": false,
-      "AuthenticationMethods": [],
-      "IdentificationMethods": [],
-      "OtpData": {
-        "PhoneMobile": "+393668134257"
-      }
-      }
-    ],
-    "EmailBodyExtra": "",
-    "RecipientType": "Signer",
-    "WorkstepConfiguration": {
-      "WorkstepLabel": "Test.pdf",
-      "SmallTextZoomFactorPercent": 100,
-      "FinishAction": {
-      "ServerActions": [],
-      "ClientActions": []
-      },
-      "ReceiverInformation": {
-      "UserInformation": {
-        "FirstName": "##name##",
-        "LastName": "##name##",
-        "EMail": "luca.barbieri@wopta.it"
-      },
-      "TransactionCodePushPluginData": []
-      },
-      "SenderInformation": {
-      "UserInformation": {
-        "FirstName": "##name##",
-        "LastName": "##name##",
-        "EMail": "luca.barbieri@wopta.it"
-      }
-      },
-      "TransactionCodeConfigurations": [],
-      "SignatureConfigurations": [],
-      "ViewerPreferences": {
-      "FinishWorkstepOnOpen": false,
-      "VisibleAreaOptions": {
-        "AllowedDomain": "",
-        "Enabled": false
-      }
-      },
-      "ResourceUris": {
-      "DelegationUri": ""
-      },
-      "AuditingToolsConfiguration": {
-      "WriteAuditTrail": true
-      },
-      "Policy": {
-      "GeneralPolicies": {
-        "AllowSaveDocument": true,
-        "AllowSaveAuditTrail": true,
-        "AllowRotatingPages": false,
-        "AllowAppendFileToWorkstep": false,
-        "AllowAppendTaskToWorkstep": false,
-        "AllowEmailDocument": true,
-        "AllowPrintDocument": true,
-        "AllowFinishWorkstep": true,
-        "AllowRejectWorkstep": true,
-        "AllowRejectWorkstepDelegation": true,
-        "AllowUndoLastAction": true,
-        "AllowColorizePdfForms": false,
-        "AllowAdhocPdfAttachments": false,
-        "AllowAdhocSignatures": false,
-        "AllowAdhocStampings": false,
-        "AllowAdhocFreeHandAnnotations": false,
-        "AllowAdhocTypewriterAnnotations": false,
-        "AllowAdhocPictureAnnotations": false,
-        "AllowAdhocPdfPageAppending": false,
-        "AllowReloadOfFinishedWorkstep": true
-      },
-      "WorkstepTasks": {
-        "PictureAnnotationMinResolution": 0,
-        "PictureAnnotationMaxResolution": 0,
-        "PictureAnnotationColorDepth": "Color16M",
-        "SequenceMode": "NoSequenceEnforced",
-        "PositionUnits": "PdfUnits",
-        "ReferenceCorner": "Lower_Left",
-        "Tasks": [
-        {
-          "Texts": [
-          {
-            "Language": "it",
-            "Value": "Signature Disclosure Text"
-          },
-          {
-            "Language": "*",
-            "Value": "Signature Disclosure Text"
-          }
-          ],
-          "Headings": [
-          {
-            "Language": "it",
-            "Value": "Signature Disclosure Subject"
-          },
-          {
-            "Language": "*",
-            "Value": "Signature Disclosure Subject"
-          }
-          ],
-          "IsRequired": false,
-          "Id": "ra",
-          "DisplayName": "ra",
-          "DocRefNumber": 1,
-          "DiscriminatorType": "Agreements"
+{
+  "IPI": {
+    "extra": {
+      "1": {
+        "asorbable": {
+          "5": 1.08,
+          "10": 0.79
         },
-        {
-          "PositionPage": 2,
-          "Position": {
-          "PositionX": 252.0,
-          "PositionY": 686.0
-          },
-          "Size": {
-          "Height": 80.0,
-          "Width": 190.0
-          },
-          "AdditionalParameters": [
-          {
-            "Key": "enabled",
-            "Value": "1"
-          },
-          {
-            "Key": "completed",
-            "Value": "0"
-          },
-          {
-            "Key": "req",
-            "Value": "1"
-          },
-          {
-            "Key": "isPhoneNumberRequired",
-            "Value": "0"
-          },
-          {
-            "Key": "trValidityInSeconds",
-            "Value": "60"
-          },
-          {
-            "Key": "fd",
-            "Value": ""
-          },
-          {
-            "Key": "fd_dateformat",
-            "Value": "dd-MM-yyyy HH:mm:ss"
-          },
-          {
-            "Key": "fd_timezone",
-            "Value": "datetimeutc"
-          }
-          ],
-          "AllowedSignatureTypes": [
-          {
-            "TrModType": "TransactionCodeSenderPlugin",
-            "TrValidityInSeconds": 300,
-            "TrConfId": "otpSignatureSmsText",
-            "IsPhoneNumberRequired": true,
-            "Ly": "simpleTransactionCodeSms",
-            "Id": "c787919a-b2fd-4849-8f97-98dee281da30",
-            "DiscriminatorType": "SigTypeTransactionCode",
-            "Preferred": false,
-            "StampImprintConfiguration": {
-            "DisplayExtraInformation": true,
-            "DisplayEmail": true,
-            "DisplayIp": true,
-            "DisplayName": true,
-            "DisplaySignatureDate": true,
-            "FontFamily": "Times New Roman",
-            "FontSize": 11.0,
-            "OverrideLegacyStampImprint": false,
-            "DisplayTransactionId": true,
-            "DisplayTransaktionToken": true,
-            "DisplayPhoneNumber": true
-            },
-            "SignaturePluginConfigurationId": "ltaLevelId"
-          }
-          ],
-          "UseTimestamp": false,
-          "IsRequired": true,
-          "Id": "1#XyzmoDuplicateIdSeperator#Signature_e7ca3f6a-33fa-cdba-d696-1377fcad51c9",
-          "DisplayName": "",
-          "DocRefNumber": 1,
-          "DiscriminatorType": "Signature"
+        "absolute": {
+          "3": 1.13,
+          "5": 0.90,
+          "10": 0.74
         }
-        ]
       },
-      "FinalizeActions": {
-        "FinalizeActionList": [
-        {
-          "DocRefNumbers": "*",
-          "SpcId": "ltaLevelId",
-          "DiscriminatorType": "Timestamp"
+      "2": {
+        "asorbable": {
+          "5": 1.08,
+          "10": 0.79
+        },
+        "absolute": {
+          "3": 1.13,
+          "5": 0.90,
+          "10": 0.74
         }
-        ]
-      }
-      },
-      "Navigation": {
-      "HyperLinks": [],
-      "Links": [],
-      "LinkTargets": []
       }
     },
-    "DocumentOptions": [
-      {
-      "DocumentReference": "1",
-      "IsHidden": false
+    "3": {
+      "asorbable": {
+        "5": 1.08,
+        "10": 0.79
+      },
+      "absolute": {
+        "3": 1.13,
+        "5": 0.90,
+        "10": 0.74
       }
-    ],
-    "UseDefaultAgreements": true
+    },"4": {
+      "asorbable": {
+        "5": 1.08,
+        "10": 0.79
+      },
+      "absolute": {
+        "3": 1.13,
+        "5": 0.90,
+        "10": 0.74
+      }
     },
-    {
-    "OrderIndex": 2,
-    "Recipients": [
-      {
-      "Email": "luca.barbieri@wopta.it",
-      "FirstName": "##name##",
-      "LastName": "##name##",
-      "LanguageCode": "it",
-      "EmailBodyExtra": "",
-      "DisableEmail": false,
-      "AddAndroidAppLink": false,
-      "AddIosAppLink": false,
-      "AddWindowsAppLink": false,
-      "AllowDelegation": false,
-      "SkipExternalDataValidation": false,
-      "AuthenticationMethods": [],
-      "IdentificationMethods": []
+    "professional": {
+      "1": {
+        "asorbable": {
+          "5": 0.68,
+          "10": 0.50
+        },
+        "absolute": {
+          "3": 0.71,
+          "5": 0.57,
+          "10": 0.47
+        }
+      },
+      "2": {
+        "asorbable": {
+          "5": 0.88,
+          "10": 0.65
+        },
+        "absolute": {
+          "3": 0.92,
+          "5": 0.74,
+          "10": 0.60
+        }
+      },
+      "3": {
+        "asorbable": {
+          "5": 1.25,
+          "10": 0.92
+        },
+        "absolute": {
+          "3": 1.32,
+          "5": 1.06,
+          "10": 0.85
+        }
+      },
+      "4": {
+        "asorbable": {
+          "5": 1.45,
+          "10": 1.07
+        },
+        "absolute": {
+          "3": 1.52,
+          "5": 1.22,
+          "10": 0.99
+        }
       }
-    ],
-    "EmailBodyExtra": "",
-    "RecipientType": "Cc",
-    "DocumentOptions": [],
-    "UseDefaultAgreements": false
+    },
+    "extraprof": {
+      "1": {
+        "asorbable": {
+          "5": 1.14,
+          "10": 0.83
+        },
+        "absolute": {
+          "3": 1.19,
+          "5": 0.95,
+          "10": 0.78
+        }
+      },
+      "2": {
+        "asorbable": {
+          "5": 1.46,
+          "10": 1.08
+        },
+        "absolute": {
+          "3": 1.53,
+          "5": 1.23,
+          "10": 1.00
+        }
+      },
+      "3": {
+        "asorbable": {
+          "5": 2.08,
+          "10": 1.53
+        },
+        "absolute": {
+          "3": 2.20,
+          "5": 1.76,
+          "10": 1.42
+        }
+      },
+      "4": {
+        "asorbable": {
+          "5": 2.41,
+          "10": 1.78
+        },
+        "absolute": {
+          "3": 2.54,
+          "5": 2.03,
+          "10": 1.65
+        }
+      }
     }
-  ],
-  "AddFormFields": {
-    "Forms": {}
   },
-  "OverrideFormFieldValues": {
-    "Forms": {}
+  "DRC": {
+    "extra": {
+      "1": 0.81,
+      "2": 0.81,
+      "3": 0.81,
+      "4": 0.81
+    },
+    "professional": {
+      "1": 0.55,
+      "2": 0.66,
+      "3": 0.88,
+      "4": 1.04
+    },
+    "extraprof": {
+      "1": 0.87,
+      "2": 1.04,
+      "3": 1.40,
+      "4": 1.65
+    }
   },
-  "AttachSignedDocumentsToEnvelopeLog": false
+  "MI": {
+    "extra": {
+      "1": 0.62,
+      "2": 0.62,
+      "3": 0.62,
+      "4": 0.62
+    },
+    "professional": {
+      "1": 0.38,
+      "2": 0.50,
+      "3": 0.70,
+      "4": 0.89
+    },
+    "extraprof": {
+      "1": 0.64,
+      "2": 0.83,
+      "3": 1.16,
+      "4": 1.48
+    }
+  },
+  "IT": {
+    "1": {
+      "7": 4.17,
+      "15": 3.32
+    },
+    "2": {
+      "7": 4.98,
+      "15": 3.98
+    },
+    "3": {
+      "7": 5.80,
+      "15": 4.64
+    },
+    "4": {
+      "7": 7.46,
+      "15": 5.97
+    }
+  },
+  "IPM":  {
+    "18": 0.83,
+    "19": 0.83,
+    "20": 0.83,
+    "21": 0.83,
+    "22": 0.83,
+    "23": 0.83,
+    "24": 0.83,
+    "25": 0.83,
+    "26": 0.83,
+    "27": 0.83,
+    "28": 0.83,
+    "29": 0.83,
+    "30": 0.83,
+    "31": 1.00,
+    "32": 1.00,
+    "33": 1.00,
+    "34": 1.00,
+    "35": 1.00,
+    "36": 1.50,
+    "37": 1.50,
+    "38": 1.50,
+    "39": 1.50,
+    "40": 1.50,
+    "41": 2.06,
+    "42": 2.06,
+    "43": 2.06,
+    "44": 2.06,
+    "45": 2.06,
+    "46": 2.73,
+    "47": 2.73,
+    "48": 2.73,
+    "49": 2.73,
+    "50": 2.73,
+    "51": 3.32,
+    "52": 3.32,
+    "53": 3.32,
+    "54": 3.32,
+    "55": 3.32,
+    "56": 4.15,
+    "57": 4.15,
+    "58": 4.15,
+    "59": 4.15,
+    "60": 4.15,
+    "61": 4.15,
+    "62": 4.15,
+    "63": 4.15,
+    "64": 4.15,
+    "65": 4.15
+  },
+  "DC": {
+    "extra": {
+      "1": 0.33,
+      "2": 0.33,
+      "3": 0.33,
+      "4": 0.33
+    },
+    "professional": {
+      "1": 0.20,
+      "2": 0.25,
+      "3": 0.33,
+      "4": 0.40
+    },
+    "extraprof": {
+      "1": 0.32,
+      "2": 0.40,
+      "3": 0.53,
+      "4": 0.63
+    }
+  }
+  ,
+  "RSC": {
+    "extra": {
+      "1": {
+        "2500":31.59,
+        "5000":56.95,
+        "10000":104.70,
+        "15000":148.91
+      },
+      "2": {
+        "2500":31.59,
+        "5000":56.95,
+        "10000":104.70,
+        "15000":148.91
+      },
+      "3": {
+        "2500":31.59,
+        "5000":56.95,
+        "10000":104.70,
+        "15000":148.91
+      },
+      "4": {
+        "2500":31.59,
+        "5000":56.95,
+        "10000":104.70,
+        "15000":148.91
+      }
+    },
+    "professional": {
+      "1": {
+        "2500": 19.49,
+        "5000":35.13,
+        "10000":64.60,
+        "15000":91.87
+      },   
+      "2": {
+        "2500": 25.39,
+        "5000":45.77,
+        "10000":84.15,
+        "15000":119.67
+      },   
+      "3": {
+        "2500": 36.02,
+        "5000":64.92,
+        "10000":119.36,
+        "15000":169.76
+      },   
+      "4": {
+        "2500": 45.47,
+        "5000":81.97,
+        "10000":150.70,
+        "15000":214.34
+      }
+    },
+    "extraprof": { 
+    "1": {
+      "2500": 32.49,
+      "5000":58.55,
+      "10000":107.67,
+      "15000":153.12
+    },   
+    "2": {
+      "2500": 42.32,
+      "5000":76.28,
+      "10000":140.25,
+      "15000":199.45
+    },   
+    "3": {
+      "2500": 60.03,
+      "5000":108.20,
+      "10000":198.94,
+      "15000":282.93
+    },   
+    "4": {
+      "2500": 75.79,
+      "5000":136.62,
+      "10000":251.17,
+      "15000":357.23
+    }
+    }
   }
 }

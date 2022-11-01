@@ -2,8 +2,8 @@
     {
         "name": "IPI",
         "desc": "check Invalidità Permanente Infortunio ",
-        "salience": 100,
-        "when": " in.age< 65",
+        "salience": 1000,
+        "when": " in.age > 74",
         "then": [
             "Log(\"activate IPI\" + out[\"IPI\"].IsYour)",
             "out[\"IPI\"].IsYour = true",
@@ -13,7 +13,39 @@
             "out[\"IPI\"].Premium.SumInsuredLimitOfIndemnity = 150000.00",
             "out[\"IPI\"].IsBase = true",
             "Log(\"IPI\")",
-            " Retract(\"IPI\")"
+            " Complete()"
+        ]
+    },{
+        "name": "MaxAge",
+        "desc": "check Invalidità Permanente Infortunio ",
+        "salience": 1000,
+        "when": " in.age > 74",
+        "then": [
+            "Log(\"activate MaxAge\")",
+            "out[\"IPI\"].IsYour = true",
+            "out[\"IPI\"].IsPremium = true",
+            "out[\"IPI\"].Base.SumInsuredLimitOfIndemnity = 100000.00",
+            "out[\"IPI\"].Your.SumInsuredLimitOfIndemnity = 100000.00",
+            "out[\"IPI\"].Premium.SumInsuredLimitOfIndemnity = 150000.00",
+            "out[\"IPI\"].IsBase = true",
+            "Log(\"IPI\")",
+            " Retract(\"MaxAge\")"
+        ]
+    },{
+        "name": "MaxAgeIPI",
+        "desc": "check Invalidità Permanente Infortunio ",
+        "salience": 100,
+        "when": " in.age < 65",
+        "then": [
+            "Log(\"activate IPI\" + out[\"IPI\"].IsYour)",
+            "out[\"IPI\"].IsYour = true",
+            "out[\"IPI\"].IsPremium = true",
+            "out[\"IPI\"].Base.SumInsuredLimitOfIndemnity = 100000.00",
+            "out[\"IPI\"].Your.SumInsuredLimitOfIndemnity = 100000.00",
+            "out[\"IPI\"].Premium.SumInsuredLimitOfIndemnity = 150000.00",
+            "out[\"IPI\"].IsBase = true",
+            "Log(\"IPI\")",
+            " Retract(\"MaxAgeIPI\")"
         ]
     },
     {
@@ -43,6 +75,7 @@
         "salience": 99,
         "when": " in.issue1500==2",
         "then": [
+            "Log(\"issue1500_2\")",
             "out[\"RSC\"].IsPremium = true",
             "out[\"RSC\"].Premium.SumInsuredLimitOfIndemnity =5000",
             " Retract(\"issue1500_2\")"
@@ -63,7 +96,9 @@
             "out[\"IPI\"].IsBase = true",
             "out[\"RSC\"].IsPremium = true",
             "out[\"RSC\"].Premium.SumInsuredLimitOfIndemnity =2500",
-            "Log(\"IPI\")",
+            "out[\"ITI\"].Base.Deductible =\"15\"",
+            "out[\"ITI\"].Your.Deductible =\"15\"",
+            "out[\"ITI\"].Premium.Deductible=\"15\"",
             " Retract(\"issue1500_3\")"
         ]
     },
@@ -73,14 +108,17 @@
         "salience": 99,
         "when": " in.riskInLifeIs==1",
         "then": [
-
+            "Log(\"riskInLifeIs_1\")",
          
             "out[\"IPI\"].Base.DeductibleType =\"absolute\"",
             "out[\"IPI\"].Your.DeductibleType =\"absorbable\"",
             "out[\"IPI\"].Premium.DeductibleType =\"absorbable\"",
             "out[\"IPI\"].Base.Deductible =\"5\"",
-            "out[\"IPI\"].Your.Deductible =\"3\"",
-            "out[\"IPI\"].Premium.Deductible=\"3\"",
+            "out[\"IPI\"].Your.Deductible =\"5\"",
+            "out[\"IPI\"].Premium.Deductible=\"5\"",
+            "out[\"ITI\"].Base.Deductible =\"15\"",
+            "out[\"ITI\"].Your.Deductible =\"15\"",
+            "out[\"ITI\"].Premium.Deductible=\"15\"",
             "out[\"IPM\"].IsPremium = true",
             "out[\"IPM\"].Premium.SumInsuredLimitOfIndemnity =50000",
             " Retract(\"riskInLifeIs_1\")"
@@ -92,12 +130,12 @@
         "salience": 99,
         "when": " in.riskInLifeIs==2",
         "then": [
-
+            "Log(\"riskInLifeIs_2\")",
          
             "out[\"IPI\"].Base.DeductibleType =\"absolute\"",
             "out[\"IPI\"].Your.DeductibleType =\"absorbable\"",
             "out[\"IPI\"].Premium.DeductibleType =\"absorbable\"",
-            "out[\"IPI\"].Base.Deductible =\"5\"",
+            "out[\"IPI\"].Base.Deductible =\"3\"",
             "out[\"IPI\"].Your.Deductible =\"5\"",
             "out[\"IPI\"].Premium.Deductible=\"5\"",
          
@@ -110,7 +148,7 @@
         "salience": 99,
         "when": " in.riskInLifeIs==3",
         "then": [
-
+            "Log(\"riskInLifeIs_3\")",
             "out[\"IPI\"].Base.DeductibleType =\"absorbable\"",
             "out[\"IPI\"].Your.DeductibleType =\"absorbable\"",
             "out[\"IPI\"].Premium.DeductibleType =\"absorbable\"",
@@ -127,6 +165,7 @@
         "salience": 98,
         "when": " in.childrenScool",
         "then": [
+            "Log(\"childrenScool\")",
             "out[\"D\"].IsYour = true",
             "out[\"D\"].IsPremium = true",
             "out[\"D\"].Base.SumInsuredLimitOfIndemnity = out[\"IPI\"].Base.SumInsuredLimitOfIndemnity",
@@ -140,17 +179,18 @@
     {
         "name": "workType1", 
         "desc": "check Decesso Infortunio ",
-        "salience": 98,
+        "salience": 100,
         "when": " in.workType==\"autonomo\"",
         "then": [
+            "Log(\"workType1\")",
             "out[\"IPI\"].Type=\"professional\"",
-            "out[\"DRG\"].Type=\"professional\"",
+            "out[\"DR\"].Type=\"professional\"",
             "out[\"MI\"].Type=\"professional\"",
-            "out[\"IT\"].Type=\"professional\"",
+            "out[\"ITI\"].Type=\"professional\"",
             "out[\"IPM\"].Type=\"professional\"",
             "out[\"DC\"].Type=\"professional\"",
             "out[\"RSC\"].Type=\"professional\"",
-            "out[\"DC\"].Type=\"professional\"",
+            "out[\"D\"].Type=\"professional\"",
             "out[\"RSC\"].Type=\"professional\"",
             "out[\"ITI\"].IsYour = true",
             "out[\"ITI\"].IsPremium = true",
@@ -165,17 +205,18 @@
     {
         "name": "workType2", 
         "desc": "check Decesso Infortunio ",
-        "salience": 98,
+        "salience": 100,
         "when": " in.workType==\"dipendente\"",
         "then": [
+            "Log(\"workType2\")",
             "out[\"IPI\"].Type=\"extra\"",
-            "out[\"DRG\"].Type=\"extra\"",
+            "out[\"DR\"].Type=\"extra\"",
             "out[\"MI\"].Type=\"extra\"",
-            "out[\"IT\"].Type=\"extra\"",
+            "out[\"ITI\"].Type=\"extra\"",
             "out[\"IPM\"].Type=\"extra\"",
             "out[\"DC\"].Type=\"extra\"",
             "out[\"RSC\"].Type=\"extra\"",
-            "out[\"DC\"].Type=\"extra\"",
+            "out[\"D\"].Type=\"extra\"",
             "out[\"RSC\"].Type=\"extra\"",
             "out[\"DC\"].IsPremium = true",
             "out[\"DC\"].Premium.SumInsuredLimitOfIndemnity =100",
@@ -189,6 +230,7 @@
         "salience": 98,
         "when": " in.workType==\"autonomo\" && in.issue1500==1",
         "then": [
+            "Log(\"workType1_issue1500_1\")",
             "out[\"IPI\"].Type=\"professional\"",
             "out[\"ITI\"].IsYour = true",
             "out[\"ITI\"].IsPremium = true",
@@ -206,6 +248,7 @@
         "salience": 98,
         "when": " in.workType==\"autonomo\" && in.issue1500==2 ",
         "then": [
+            "Log(\"workType1_issue1500_2\")",
             "out[\"ITI\"].IsYour = true",
             "out[\"ITI\"].IsPremium = true",
             "out[\"ITI\"].Base.SumInsuredLimitOfIndemnity =0",
@@ -223,12 +266,13 @@
         "salience": 98,
         "when": " in.workType==\"dipendente\" && in.issue1500==1",
         "then": [
-            "out[\"DRG\"].IsYour = true",
-            "out[\"DRG\"].IsPremium = true",
-            "out[\"DRG\"].Base.SumInsuredLimitOfIndemnity =0",
-            "out[\"DRG\"].Your.SumInsuredLimitOfIndemnity = 100",
-            "out[\"DRG\"].Premium.SumInsuredLimitOfIndemnity =150",
-            "out[\"DRG\"].IsBase = false",
+            "Log(\"workType2_issue1500_1\")",
+            "out[\"DR\"].IsYour = true",
+            "out[\"DR\"].IsPremium = true",
+            "out[\"DR\"].Base.SumInsuredLimitOfIndemnity =0",
+            "out[\"DR\"].Your.SumInsuredLimitOfIndemnity = 100",
+            "out[\"DR\"].Premium.SumInsuredLimitOfIndemnity =150",
+            "out[\"DR\"].IsBase = false",
             "out[\"DC\"].IsYour = true",
             "out[\"DC\"].Your.SumInsuredLimitOfIndemnity = 50",
             "Log(\"DRG\")",
@@ -238,41 +282,55 @@
     {
         "name": "calculateIPI", 
         "desc": "calalcola tariffa ipi autonomo",
-        "salience": 98,
+        "salience": 1,
         "when": "true",
         "then": [
-            "Log(out[\"IPI\"].Premium.PremiumNet)",
-            "out[\"IPI\"].Premium.PremiumNet=(out[\"IPI\"].Premium.SumInsuredLimitOfIndemnity/1000.0)* data[\"IPI\"][out[\"IPI\"].Type][in.class][out[\"IPI\"].Premium.DeductibleType][out[\"IPI\"].Premium.Deductible]",
-            "out[\"IPI\"].Base.PremiumNet=(out[\"IPI\"].Base.SumInsuredLimitOfIndemnity/1000.0)*data[\"IPI\"][out[\"IPI\"].Type][in.class][out[\"IPI\"].Base.DeductibleType][out[\"IPI\"].Base.Deductible]",
-            "out[\"IPI\"].Your.PremiumNet=(out[\"IPI\"].Your.SumInsuredLimitOfIndemnity/1000.0)*data[\"IPI\"][out[\"IPI\"].Type][in.class][out[\"IPI\"].Your.DeductibleType][out[\"IPI\"].Your.Deductible]",
+            "Log(\"calculateIPI\")",
+            "out[\"IPI\"].Premium.PremiumNet=(out[\"IPI\"].Premium.SumInsuredLimitOfIndemnity/1000.0)* data[\"IPI\"][out[\"IPI\"].Type][fx.ToString(in.class)][out[\"IPI\"].Premium.DeductibleType][out[\"IPI\"].Premium.Deductible]",
+            "out[\"IPI\"].Base.PremiumNet=(out[\"IPI\"].Base.SumInsuredLimitOfIndemnity/1000.0) * data[\"IPI\"][out[\"IPI\"].Type][fx.ToString(in.class)][out[\"IPI\"].Base.DeductibleType][out[\"IPI\"].Base.Deductible]",
+            "out[\"IPI\"].Your.PremiumNet=(out[\"IPI\"].Your.SumInsuredLimitOfIndemnity/1000.0) * data[\"IPI\"][out[\"IPI\"].Type][fx.ToString(in.class)][out[\"IPI\"].Your.DeductibleType][out[\"IPI\"].Your.Deductible]",
             
-            "out[\"DRC\"].Premium.PremiumNet=out[\"DRC\"].Premium.SumInsuredLimitOfIndemnity* data[\"DRC\"][out[\"DRC\"].Type][in.class]",
-            "out[\"DRC\"].Base.PremiumNet=out[\"DRC\"].Base.SumInsuredLimitOfIndemnity*data[\"IPI\"][out[\"DRC\"].Type][in.class]",
-            "out[\"DRC\"].Your.PremiumNet=out[\"DRC\"].Your.SumInsuredLimitOfIndemnity*data[\"IPI\"][out[\"DRC\"].Type][in.class]",
+            "out[\"DR\"].Premium.PremiumNet=out[\"DR\"].Premium.SumInsuredLimitOfIndemnity * data[\"DR\"][out[\"DR\"].Type][fx.ToString(in.class)]",
+            "out[\"DR\"].Base.PremiumNet=out[\"DR\"].Base.SumInsuredLimitOfIndemnity * data[\"DR\"][out[\"DR\"].Type][fx.ToString(in.class)]",
+            "out[\"DR\"].Your.PremiumNet=out[\"DR\"].Your.SumInsuredLimitOfIndemnity * data[\"DR\"][out[\"DR\"].Type][fx.ToString(in.class)]",
             
-            "out[\"MI\"].Premium.PremiumNet=(out[\"MI\"].Premium.SumInsuredLimitOfIndemnity/1000.0)* data[\"MI\"][out[\"MI\"].Type][in.class]",
-            "out[\"MI\"].Base.PremiumNet=(out[\"MI\"].Base.SumInsuredLimitOfIndemnity/1000.0)*data[\"IPI\"][out[\"MI\"].Type][in.class]",
-            "out[\"MI\"].Your.PremiumNet=(out[\"MI\"].Your.SumInsuredLimitOfIndemnity/1000.0)*data[\"IPI\"][out[\"MI\"].Type][in.class]",
+            "out[\"MI\"].Premium.PremiumNet=(out[\"MI\"].Premium.SumInsuredLimitOfIndemnity/1000.0)* data[\"MI\"][out[\"MI\"].Type][fx.ToString(in.class)]",
+            "out[\"MI\"].Base.PremiumNet=(out[\"MI\"].Base.SumInsuredLimitOfIndemnity/1000.0)* data[\"MI\"][out[\"MI\"].Type][fx.ToString(in.class)]",
+            "out[\"MI\"].Your.PremiumNet=(out[\"MI\"].Your.SumInsuredLimitOfIndemnity/1000.0) * data[\"MI\"][out[\"MI\"].Type][fx.ToString(in.class)]",
             
-            "out[\"IT\"].Premium.PremiumNet=out[\"IT\"].Premium.SumInsuredLimitOfIndemnity* data[\"IT\"][in.class][out[\"IT\"].Premium.DeductibleType][out[\"IT\"].Premium.Deductible]",
-            "out[\"IT\"].Base.PremiumNet=out[\"IT\"].Base.SumInsuredLimitOfIndemnity*data[\"IT\"][in.class][out[\"IT\"].Base.DeductibleType][out[\"IT\"].Base.Deductible]",
-            "out[\"IT\"].Your.PremiumNet=out[\"IT\"].Your.SumInsuredLimitOfIndemnity*data[\"IT\"][in.class][out[\"IT\"].Your.DeductibleType][out[\"IT\"].Your.Deductible]",
+            "out[\"ITI\"].Premium.PremiumNet=out[\"ITI\"].Premium.SumInsuredLimitOfIndemnity* data[\"ITI\"][fx.ToString(in.class)][out[\"ITI\"].Premium.Deductible]",
+            "out[\"ITI\"].Base.PremiumNet=out[\"ITI\"].Base.SumInsuredLimitOfIndemnity*data[\"ITI\"][fx.ToString(in.class)][out[\"ITI\"].Base.Deductible]",
+            "out[\"ITI\"].Your.PremiumNet=out[\"ITI\"].Your.SumInsuredLimitOfIndemnity*data[\"ITI\"][fx.ToString(in.class)][out[\"ITI\"].Your.Deductible]",
             
-            "out[\"IPM\"].Premium.PremiumNet=(out[\"IPM\"].Premium.SumInsuredLimitOfIndemnity/1000.0)* data[\"IPM\"][in.age]",
-            "out[\"IPM\"].Base.PremiumNet=(out[\"IPM\"].Base.SumInsuredLimitOfIndemnity/1000.0)*data[\"IPI\"][in.age]",
-            "out[\"IPM\"].Your.PremiumNet=(out[\"IPM\"].Your.SumInsuredLimitOfIndemnity/1000.0)*data[\"IPI\"][in.age]",
+            "out[\"IPM\"].Premium.PremiumNet=(out[\"IPM\"].Premium.SumInsuredLimitOfIndemnity/1000.0)* data[\"IPM\"][fx.ToString(in.age)]",
+            "out[\"IPM\"].Base.PremiumNet=(out[\"IPM\"].Base.SumInsuredLimitOfIndemnity/1000.0)*data[\"IPM\"][fx.ToString(in.age)]",
+            "out[\"IPM\"].Your.PremiumNet=(out[\"IPM\"].Your.SumInsuredLimitOfIndemnity/1000.0)*data[\"IPM\"][fx.ToString(in.age)]",
             
-            "out[\"DC\"].Premium.PremiumNet=out[\"DC\"].Premium.SumInsuredLimitOfIndemnity* data[\"DC\"][out[\"DC\"].Type][in.class]",
-            "out[\"DC\"].Base.PremiumNet=out[\"DC\"].Base.SumInsuredLimitOfIndemnity*data[\"DC\"][out[\"DC\"].Type][in.class]",
-            "out[\"DC\"].Your.PremiumNet=out[\"DC\"].Your.SumInsuredLimitOfIndemnity*data[\"DC\"][out[\"DC\"].Type][in.class]",
+            "out[\"DC\"].Premium.PremiumNet=out[\"DC\"].Premium.SumInsuredLimitOfIndemnity* data[\"DC\"][out[\"DC\"].Type][fx.ToString(in.class)]",
+            "out[\"DC\"].Base.PremiumNet=out[\"DC\"].Base.SumInsuredLimitOfIndemnity*data[\"DC\"][out[\"DC\"].Type][fx.ToString(in.class)]",
+            "out[\"DC\"].Your.PremiumNet=out[\"DC\"].Your.SumInsuredLimitOfIndemnity*data[\"DC\"][out[\"DC\"].Type][fx.ToString(in.class)]",
             
-            "out[\"RSC\"].Premium.PremiumNet=data[\"RSC\"][out[\"RSC\"].Type][in.class][out[\"RSC\"].Premium.SumInsuredLimitOfIndemnity]",
-            "out[\"RSC\"].Base.PremiumNet=data[\"RSC\"][out[\"RSC\"].Type][in.class][out[\"RSC\"].Base.SumInsuredLimitOfIndemnity]",
-            "out[\"RSC\"].Your.PremiumNet=data[\"RSC\"][out[\"RSC\"].Type][in.class][out[\"RSC\"].Your.SumInsuredLimitOfIndemnity]",
-            
+            "out[\"RSC\"].Premium.PremiumNet=data[\"RSC\"][out[\"RSC\"].Type][fx.ToString(in.class)][fx.ToString(out[\"RSC\"].Premium.SumInsuredLimitOfIndemnity)]",
+    
             "Retract(\"calculateIPI\")"
+        ]
+    },
+    {
+        "name": "calculateIPI2", 
+        "desc": "calalcola tariffa ipi autonomo",
+        "salience": 2,
+        "when": "true",
+        "then": [
+                 "Log(\"type: \"+out[\"RSC\"].Type)",
+                 "Log(\"class: \"+fx.ToString(in.class))",
+                 "Log(\"Premium.DeductibleType: \"+out[\"RSC\"].Premium.DeductibleType)",
+                 "Log(\"Premium.Deductible: \"+out[\"RSC\"].Premium.Deductible)",
+                 "Log(\"SumInsuredLimitOfIndemnity: \"+out[\"RSC\"].SumInsuredLimitOfIndemnity)",
+
+             
+            
+            "Retract(\"calculateIPI2\")"
         ]
     }
 
 ]
-

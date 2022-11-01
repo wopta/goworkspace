@@ -9,10 +9,10 @@ require github.com/hyperjumptech/grule-rule-engine v1.11.0
 require cloud.google.com/go/storage v1.25.0 // indirect
 
 require (
+	cloud.google.com/go/firestore v1.8.0 // indirect
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
 	github.com/go-gota/gota v0.12.0
-	github.com/wopta/goworkspace/lib v0.0.0-20221025102511-4a83c40a8994
-	github.com/wopta/goworkspace/models v0.0.0-20221025102511-4a83c40a8994
-	golang.org/x/net v0.0.0-20220809184613-07c6da5e1ced // indirect
+	github.com/wopta/goworkspace/lib v0.0.0-20221101152222-fb0e7ae59da4
+	github.com/wopta/goworkspace/models v0.0.0-20221101152222-fb0e7ae59da4
 	google.golang.org/protobuf v1.28.1 // indirect
 )

@@ -1,5 +1,5 @@
 
-Rem .\push.bat  v0.0.2 init_rules
+Rem .\push.bat "init_rules"
 cd ..
 echo %1
 
