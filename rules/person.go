@@ -36,10 +36,9 @@ import (
 	"os"
 
 	lib "github.com/wopta/goworkspace/lib"
-	models "github.com/wopta/goworkspace/models"
 )
 
-func Person(w http.ResponseWriter, r *http.Request) {
+func Person(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 	var (
 		result map[string]interface{}
 		groule []byte
@@ -66,28 +65,28 @@ func Person(w http.ResponseWriter, r *http.Request) {
 	default:
 
 	}
-	lib.RulesFromJson(groule, initCoverageP(), request, []byte(getData()), w)
-
+	s, i := lib.RulesFromJson(groule, initCoverageP(), request, []byte(getData()))
+	return s, i
 }
 
-func initCoverageP() map[string]*models.Coverage {
+func initCoverageP() map[string]*Coverage {
 
-	var res = make(map[string]*models.Coverage)
-	res["IPI"] = &models.Coverage{
+	var res = make(map[string]*Coverage)
+	res["IPI"] = &Coverage{
 		Slug:                       "Invalidità Permanente Infortunio",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0.0,
-		Base: &models.CoverageValue{
+		Base: &CoverageValue{
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
-		Your: &models.CoverageValue{
+		Your: &CoverageValue{
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
-		Premium: &models.CoverageValue{
+		Premium: &CoverageValue{
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
@@ -96,21 +95,21 @@ func initCoverageP() map[string]*models.Coverage {
 		IsYour:    false,
 		IsPremium: false,
 	}
-	res["D"] = &models.Coverage{
+	res["D"] = &Coverage{
 		Slug:                       "Decesso Infortunio",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0.0,
-		Base: &models.CoverageValue{
+		Base: &CoverageValue{
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
-		Your: &models.CoverageValue{
+		Your: &CoverageValue{
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
-		Premium: &models.CoverageValue{
+		Premium: &CoverageValue{
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
@@ -119,22 +118,22 @@ func initCoverageP() map[string]*models.Coverage {
 		IsYour:    false,
 		IsPremium: false,
 	}
-	res["ITI"] = &models.Coverage{
+	res["ITI"] = &Coverage{
 		Slug: "Inabilità Totale Infortunio",
 
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0.0,
-		Base: &models.CoverageValue{
+		Base: &CoverageValue{
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
-		Your: &models.CoverageValue{
+		Your: &CoverageValue{
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
-		Premium: &models.CoverageValue{
+		Premium: &CoverageValue{
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
@@ -143,22 +142,22 @@ func initCoverageP() map[string]*models.Coverage {
 		IsYour:    false,
 		IsPremium: false,
 	}
-	res["DRG"] = &models.Coverage{
+	res["DRG"] = &Coverage{
 		Slug: "Diaria Ricovero / Gessatura Infortunio",
 
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0.0,
-		Base: &models.CoverageValue{
+		Base: &CoverageValue{
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
-		Your: &models.CoverageValue{
+		Your: &CoverageValue{
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
-		Premium: &models.CoverageValue{
+		Premium: &CoverageValue{
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
@@ -167,21 +166,21 @@ func initCoverageP() map[string]*models.Coverage {
 		IsYour:    false,
 		IsPremium: false,
 	}
-	res["DC"] = &models.Coverage{
+	res["DC"] = &Coverage{
 		Slug:                       "Diaria Convalescenza Infortunio",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0.0,
-		Base: &models.CoverageValue{
+		Base: &CoverageValue{
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
-		Your: &models.CoverageValue{
+		Your: &CoverageValue{
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
-		Premium: &models.CoverageValue{
+		Premium: &CoverageValue{
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
@@ -190,21 +189,21 @@ func initCoverageP() map[string]*models.Coverage {
 		IsYour:    false,
 		IsPremium: false,
 	}
-	res["RSC"] = &models.Coverage{
+	res["RSC"] = &Coverage{
 		Slug:                       "Rimborso spese di cura Infortunio",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0.0,
-		Base: &models.CoverageValue{
+		Base: &CoverageValue{
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
-		Your: &models.CoverageValue{
+		Your: &CoverageValue{
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
-		Premium: &models.CoverageValue{
+		Premium: &CoverageValue{
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
@@ -213,22 +212,22 @@ func initCoverageP() map[string]*models.Coverage {
 		IsYour:    false,
 		IsPremium: false,
 	}
-	res["IPM"] = &models.Coverage{
+	res["IPM"] = &Coverage{
 		Slug: "Invalidità Permanente Malattia IPM",
 
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0.0,
-		Base: &models.CoverageValue{
+		Base: &CoverageValue{
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
-		Your: &models.CoverageValue{
+		Your: &CoverageValue{
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
-		Premium: &models.CoverageValue{
+		Premium: &CoverageValue{
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
@@ -237,22 +236,22 @@ func initCoverageP() map[string]*models.Coverage {
 		IsYour:    false,
 		IsPremium: false,
 	}
-	res["ASS"] = &models.Coverage{
+	res["ASS"] = &Coverage{
 		Slug: "Assistenza",
 
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0.0,
-		Base: &models.CoverageValue{
+		Base: &CoverageValue{
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
-		Your: &models.CoverageValue{
+		Your: &CoverageValue{
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
-		Premium: &models.CoverageValue{
+		Premium: &CoverageValue{
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
@@ -261,22 +260,22 @@ func initCoverageP() map[string]*models.Coverage {
 		IsYour:    false,
 		IsPremium: false,
 	}
-	res["TL"] = &models.Coverage{
+	res["TL"] = &Coverage{
 		Slug: "third-party-liability",
 
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0.0,
-		Base: &models.CoverageValue{
+		Base: &CoverageValue{
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
-		Your: &models.CoverageValue{
+		Your: &CoverageValue{
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,
 			SelfInsurance:              "0"},
-		Premium: &models.CoverageValue{
+		Premium: &CoverageValue{
 			Deductible:                 "0",
 			DeductibleType:             "",
 			SumInsuredLimitOfIndemnity: 0.0,

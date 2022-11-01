@@ -50,30 +50,16 @@ func Mail(w http.ResponseWriter, r *http.Request) {
 	lib.EnableCors(&w, r)
 	w.Header().Set("Access-Control-Allow-Methods", "POST")
 	log.Println("mail")
-	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
-	log.Println(string(req))
-	var send Request
-	// Unmarshal or Decode the JSON to the interface.
-	//json.NewDecoder(req).Decode(&send)
-	defer r.Body.Close()
-
-	json.Unmarshal([]byte(req), &send)
-	base := "/mail"
-	if strings.Contains(r.RequestURI, "/mail") {
-		base = "/mail"
-	} else {
-		base = ""
-	}
 	log.Println(r.RequestURI)
 	lib.EnableCors(&w, r)
-	switch os := r.RequestURI; os {
-	case base + "/send":
-		Send(w, &send)
-	case base + "/read":
-
-	default:
-		fmt.Fprintf(w, " select path method send or read")
+	route := lib.RouteData{
+		Routes: []lib.Route{{
+			Route:   "/v1//send",
+			Hendler: Send,
+		},
+		},
 	}
+	route.Router(w, r)
 
 	//lib.Files("")
 
@@ -100,7 +86,7 @@ type Request struct {
 	TemplateName string       `json:"templateName,omitempty"`
 }
 
-func Send(resp http.ResponseWriter, obj *Request) {
+func Send(resp http.ResponseWriter, r *http.Request) (string, interface{}) {
 	var (
 		host       = os.Getenv("EMAIL_HOST")
 		username   = os.Getenv("EMAIL_USERNAME")
@@ -112,6 +98,14 @@ func Send(resp http.ResponseWriter, obj *Request) {
 	const (
 		boundary = "my-boundary-779"
 	)
+	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
+	log.Println(string(req))
+	var obj Request
+	// Unmarshal or Decode the JSON to the interface.
+	//json.NewDecoder(req).Decode(&send)
+	defer r.Body.Close()
+
+	json.Unmarshal([]byte(req), &obj)
 	log.Println(username)
 	log.Println(password)
 	log.Println(host)
@@ -236,9 +230,9 @@ func Send(resp http.ResponseWriter, obj *Request) {
 		err = w.Close()
 		lib.CheckError(err)
 		c.Quit()
-		fmt.Fprintf(resp, `{"message":"Success send "}`)
-	}
 
+	}
+	return `{"message":"Success send "}`, nil
 }
 
 type loginAuth struct {

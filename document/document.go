@@ -1,5 +1,8 @@
 package document
 
+/*
+
+ */
 import (
 	"log"
 	"net/http"
@@ -18,11 +21,22 @@ func Document(w http.ResponseWriter, r *http.Request) {
 	log.Println("Document")
 	lib.EnableCors(&w, r)
 	w.Header().Set("Access-Control-Allow-Methods", "POST")
-	lib.Router(w, r, map[string]func(http.ResponseWriter, *http.Request) (string, interface{}){
-		"/v1/proposal": Contract,
-		"/v1/contract": Contract,
-		"/v1/sign":     SignNamirial,
-	})
+	route := lib.RouteData{
+		Routes: []lib.Route{{
+			Route:   "/v1/proposal",
+			Hendler: Contract,
+		},
+			{
+				Route:   "/v1/contract",
+				Hendler: Contract,
+			},
+			{
+				Route:   "/v1/sign",
+				Hendler: SignNamirial,
+			},
+		},
+	}
+	route.Router(w, r)
 
 }
 

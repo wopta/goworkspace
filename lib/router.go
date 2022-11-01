@@ -7,16 +7,24 @@ import (
 	"strings"
 )
 
-func Router(w http.ResponseWriter, r *http.Request, route map[string]func(http.ResponseWriter, *http.Request) (string, interface{})) {
+type RouteData struct {
+	Routes []Route
+}
+type Route struct {
+	Route   string
+	Hendler func(http.ResponseWriter, *http.Request) (string, interface{})
+}
+
+func (router RouteData) Router(w http.ResponseWriter, r *http.Request) {
 	var result string
 	var isFound bool
 	log.Println(r.RequestURI)
-	for k, v := range route {
+	for _, v := range router.Routes {
 
-		if strings.Contains(r.RequestURI, k) {
+		if strings.Contains(r.RequestURI, v.Route) {
 
 			log.Println("found")
-			result, _ = v(w, r)
+			result, _ = v.Hendler(w, r)
 			isFound = true
 		}
 

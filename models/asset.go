@@ -1,16 +1,17 @@
 package models
 
 type Asset struct {
-	Name      string
-	Address   string
-	Type      string
-	Building  Building `json:"buildingType"`
-	Coverages []Coverage
+	Name      string     `json:"Name"`
+	Address   string     `json:"address"`
+	Type      string     `json:"type"`
+	Building  Building   `json:"building"`
+	Person    User       `json:"person"`
+	Coverages []Coverage `json:"coverages"`
 }
 type Building struct {
-	Name             string
-	Address          string
-	Type             string
+	Name             string `json:"Name"`
+	Address          string `json:"address"`
+	Type             string `json:"type"`
 	BuildingType     string `json:"buildingType"`
 	BuildingMaterial string `json:"buildingMaterial"`
 	BuildingYear     string `json:"buildingYear"`

@@ -42,7 +42,8 @@ func Enrich(w http.ResponseWriter, r *http.Request) {
 		default:
 			fmt.Fprintf(w, `{"message":"missing service in path es. munichre"}`)
 		}
-
+	case "cities":
+		Cities(w)
 	case "works":
 		Works(w)
 	case "ateco":

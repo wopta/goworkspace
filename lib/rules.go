@@ -2,9 +2,7 @@ package lib
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
-	"net/http"
 
 	"github.com/hyperjumptech/grule-rule-engine/ast"
 	"github.com/hyperjumptech/grule-rule-engine/builder"
@@ -12,7 +10,7 @@ import (
 	"github.com/hyperjumptech/grule-rule-engine/pkg"
 )
 
-func RulesFromJson(groule []byte, out interface{}, in []byte, data []byte, w http.ResponseWriter) {
+func RulesFromJson(groule []byte, out interface{}, in []byte, data []byte) (string, interface{}) {
 
 	log.Println("RulesFromJson")
 	//rules := lib.CheckEbyte(ioutil.ReadFile("pmi-allrisk.json"))
@@ -54,8 +52,8 @@ func RulesFromJson(groule []byte, out interface{}, in []byte, data []byte, w htt
 	//resp := "execute"
 	b, err := json.Marshal(out)
 	CheckError(err)
-	fmt.Fprintf(w, string(b))
 
+	return string(b), out
 }
 
 type Fx struct {
