@@ -19,6 +19,8 @@ type Skin struct {
 	SizeTitle         float64
 	TableHeight       float64
 	rowtableHeightMin float64
+	DynamicHeightMin  int
+	DynamicHeightDiv  float64
 }
 
 func (s Skin) CustomerRow(m pdf.Maroto, k string, v string) pdf.Maroto {
@@ -62,27 +64,27 @@ func (s Skin) CustomerRow(m pdf.Maroto, k string, v string) pdf.Maroto {
 	})
 	return m
 }
-func (s Skin) TableRow(m pdf.Maroto, colText []string, isLine bool, colspace uint, h float64) pdf.Maroto {
+func (s Skin) TableRow(m pdf.Maroto, colText []string, isLine bool, colspace uint, h float64, minus float64, c consts.Align) pdf.Maroto {
 
 	textBold := props.Text{
 		Top:   1.5,
-		Size:  s.Size - 3,
+		Size:  s.Size - minus,
 		Style: consts.Bold,
-		Align: consts.Left,
+		Align: c,
 		Color: s.TextColor,
 	}
 	text := props.Text{
 		Top:   1.5,
-		Size:  s.Size - 3,
+		Size:  s.Size - minus,
 		Style: consts.Normal,
-		Align: consts.Left,
+		Align: c,
 		Color: s.TextColor,
 	}
 	textLast := props.Text{
 		Top:   1.5,
-		Size:  s.Size - 3,
+		Size:  s.Size - minus,
 		Style: consts.Normal,
-		Align: consts.Right,
+		Align: c,
 		Color: s.TextColor,
 	}
 	linePropMagenta := props.Line{
@@ -119,11 +121,11 @@ func (s Skin) TableRow(m pdf.Maroto, colText []string, isLine bool, colspace uin
 
 	return m
 }
-func (s Skin) TableHeader(m pdf.Maroto, colText []string, isLine bool, colspace uint, h float64, c consts.Align) pdf.Maroto {
+func (s Skin) TableHeader(m pdf.Maroto, colText []string, isLine bool, colspace uint, h float64, c consts.Align, minus float64) pdf.Maroto {
 
 	textBold := props.Text{
 		Top:   1.5,
-		Size:  s.SizeTitle,
+		Size:  s.SizeTitle - minus,
 		Style: consts.Bold,
 		Align: c,
 		Color: s.TextColor,

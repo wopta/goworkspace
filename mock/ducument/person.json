@@ -1,4 +1,11 @@
 {
+  "policy":{
+    "id":"",
+    "company":"global",
+    "name":"persona",
+    "startDate":"",
+    "endDate":""
+  },
   "contractor":{
     "name": "Test",
      "surname": "1229199149",
@@ -19,7 +26,16 @@
          "sumInsuredLimitOfIndemnity": 15000,
          "price": 15000,
          "priceNett": 15000
-       }
+       },
+       {
+        "name":"test 2",
+      
+        "deductible": "2000",
+        "selfInsurance": "0.10",
+        "sumInsuredLimitOfIndemnity": 15000,
+        "price": 15000,
+        "priceNett": 15000
+      }
      ],
      "statements": [
        {

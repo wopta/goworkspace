@@ -1,6 +1,6 @@
 package models
 
-type Product struct {
+type Policy struct {
 	ID        *string `json:"id,omitempty"`
 	Company   *string `json:"company,omitempty"`
 	Name      *string `json:"name,omitempty"`

@@ -1,5 +1,18 @@
 package models
 
+import "encoding/json"
+
+func UnmarshalUser(data []byte) (Claim, error) {
+	var r Claim
+	err := json.Unmarshal(data, &r)
+	return r, err
+}
+
+func (r *User) Marshal() ([]byte, error) {
+
+	return json.Marshal(r)
+}
+
 type User struct {
 	Name         string `firestore:"name" json:"name,omitempty"`
 	Type         string `firestore:"type" json:"type,omitempty"`
@@ -17,4 +30,5 @@ type User struct {
 	RiskClass    string `firestore:"riskClass" json:"riskClass,omitempty"`
 	CreationDate string `firestore:"creationDate" json:"creationDate,omitempty"`
 	UpdatedDate  string `firestore:"updatedDate" json:"updatedDate,omitempty"`
+	Claims       Claim  `firestore:"claims" json:"claims,omitempty"`
 }

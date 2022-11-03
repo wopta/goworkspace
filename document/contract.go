@@ -18,14 +18,9 @@ import (
 )
 
 func Contract(w http.ResponseWriter, r *http.Request) (string, interface{}) {
-	log.Println("Proposal")
-	lib.Files("./serverless_function_source_code")
+	log.Println("Contract")
+	//lib.Files("./serverless_function_source_code")
 	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
-
-	base64LogoPerson := base64.StdEncoding.EncodeToString(lib.GetFilesByEnv("document/logo_persona.png"))
-	base64LogoWopta := base64.StdEncoding.EncodeToString(lib.GetFilesByEnv("document/ARTW_LOGO_RGB_400px.png"))
-	//fontNormal := getPathByEnv("Montserrat_Regular.ttf")
-	//fontBold := getPathByEnv("Montserrat-Bold.ttf")
 	var data DodumentData
 	defer r.Body.Close()
 	err := json.Unmarshal([]byte(req), &data)
@@ -44,10 +39,12 @@ func Contract(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 		},
 		Size:              9,
 		SizeTitle:         12,
-		rowHeight:         6.0,
+		rowHeight:         7.0,
 		rowtableHeight:    5.0,
 		rowtableHeightMin: 2.0,
 		LineHeight:        1.0,
+		DynamicHeightMin:  90,
+		DynamicHeightDiv:  25.0,
 	}
 
 	linePropMagenta := props.Line{
@@ -72,7 +69,8 @@ func Contract(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 	log.Println("Document 2")
 	m.SetPageMargins(10, 15, 10)
 	m.SetBackgroundColor(whiteColor)
-	m.SetFontLocation("serverless_function_source_code/assets")
+
+	m.SetFontLocation(lib.GetAssetPathByEnv("document"))
 	// Define font to all styles.
 	m.AddUTF8Font("Montserrat", consts.Normal, "montserrat_regular.ttf")
 	m.AddUTF8Font("Montserrat", consts.Bold, "montserrat_bold.ttf")
@@ -83,7 +81,7 @@ func Contract(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 		m.Row(15.0, func() {
 			m.Col(2, func() {
 
-				_ = m.Base64Image(base64LogoPerson, consts.Png, props.Rect{
+				_ = m.FileImage(lib.GetAssetPathByEnv("document")+"/logo_persona.png", props.Rect{
 					Left:    1,
 					Top:     1,
 					Center:  false,
@@ -95,7 +93,7 @@ func Contract(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 					Color:       skin.LineColor,
 					Top:         1,
 					Style:       consts.Bold,
-					Align:       consts.Left,
+					Align:       consts.Center,
 					Size:        skin.SizeTitle + 3,
 					Extrapolate: true,
 				})
@@ -111,7 +109,7 @@ func Contract(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 			})
 			m.ColSpace(6)
 			m.Col(2, func() {
-				_ = m.Base64Image(base64LogoWopta, consts.Png, props.Rect{
+				_ = m.FileImage(lib.GetAssetPathByEnv("document")+"/ARTW_LOGO_RGB_400px.png", props.Rect{
 					Left:    1,
 					Top:     1,
 					Center:  false,
@@ -254,15 +252,16 @@ func Contract(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 	m = skin.TitleSub(m, title, sub, body)
 	title = "Presa visione dei documenti precontrattuali e sottoscrizione Polizza "
 	body = "Ho scelto la ricezione della seguente documentazione su supporto cartaceo / via e-mail al seguente indirizzo: XXXXXXXXXX. Sono a conoscenza che, anche le future comunicazioni avverranno con questo mezzo e che qualora volessi modificare questa mia scelta potrò farlo scrivendo a Global Assistance, con le modalità previste nelle Condizioni Generali di Assicurazione.  "
-	m = skin.Title(m, title, body)
+	m = skin.Title(m, title, body, 18.0)
 	confirmationRecepit := []string{
 		"1. degli Allegati 3, 4 e 4-ter, di cui al Regolamento IVASS n. 40/2018, relativi agli obblighi informativi e di comportamento dell’Intermediario, inclusa l’informativa privacy dell’intermediario (ai sensi dell’art. 13 del regolamento UE n. 2016/679); ",
 		"2. del Set informativo, identificato dal modello XXXXXXXX ed. 2022, contenente: 1) documento informativo per i prodotti assicurativi danni (DIP Danni) e documento informativo precontrattuale aggiuntivo per i prodotti assicurativi danni (DIP Aggiuntivo danni) cui al Regolamento IVASS n. 41/2018; 2) Condizioni di Assicurazione comprensive di Glossario, che dichiaro altresì di conoscere ed accettare. ",
 	}
 
 	m = skin.TitleList(m, "", confirmationRecepit)
-	m = skin.Space(m, 10.0)
+	m = skin.Space(m, 3.0)
 	m = skin.Sign(m, "data.Name"+" "+"data.Surname", "Global Assistance")
+	m = skin.Space(m, 3.0)
 	title = "Le clausole della Polizza da approvare in modo specifico "
 	body = `Ai sensi degli artt. 1341 e 1342 Codice Civile, dichiaro di
 	 approvare in modo specifico, le disposizioni indicate nelle condizioni di
@@ -273,7 +272,7 @@ func Contract(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 	Invalidità Permanente da Malattia; Art. 38.3 Criteri di liquidazione dell’Invalidità Permanente da Malattia; 
 	Art. 38.4 Valutazione del danno – ricorso all’Arbitrato`
 
-	m = skin.Title(m, title, body)
+	m = skin.Title(m, title, body, 25.0)
 
 	h = []string{"Premio ", "Imponibile  ", "Imposte Assicurative ", "Totale"}
 	var tablePremium [][]string
@@ -286,13 +285,13 @@ func Contract(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 	bonifico e strumenti di pagamento elettronico, quali ad esempio, carte di 
 	credito e/o carte di debito, incluse le carte prepagate.`
 	m = skin.Space(m, 5.0)
-	m = skin.Title(m, title, body)
+	m = skin.Title(m, title, body, 25.0)
 	title = "Emissione polizza e pagamento della prima rata "
 	body = `Polizza emessa a Milano il 00/00/0000 per un importo di euro XXX,XX quale prima rata alla firma,
 	 il cui pagamento a saldo è da effettuarsi con i metodi di pagamento sopra indicati. 
 	Costituisce quietanza di pagamento la mail di conferma che Wopta invierà al Contraente. `
 
-	m = skin.Title(m, title, body)
+	m = skin.Title(m, title, body, 25.0)
 	m = skin.Sign(m, "data.Name"+" "+"data.Surname", "Wopta Assicurazioni")
 
 	m.AddPage()
@@ -314,7 +313,7 @@ func Contract(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 	m = skin.AboutUs(m, "Chi siamo ", aboutUs)
 	log.Println("Document 8")
 	//m.Output()
-
+	err = m.OutputFileAndClose("document/billing.pdf")
 	out, err := m.Output()
 	lib.CheckError(err)
 	now := time.Now() // current local time
@@ -323,7 +322,7 @@ func Contract(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 
 	filename := "temp/" + data.Name + "_" + data.Surname + "_" + t.String() + "_contract.pdf"
 	result := lib.PutToStorage("function-data", filename, out.Bytes())
-	//err = m.OutputFileAndClose("document/billing.pdf")
+
 	lib.CheckError(err)
 	log.Println(result)
 	respObj := &DodumentResponse{

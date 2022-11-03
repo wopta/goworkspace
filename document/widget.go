@@ -14,25 +14,25 @@ func (s Skin) Customer(m pdf.Maroto, customer []Kv) pdf.Maroto {
 	return m
 }
 func (s Skin) CoveragesTable(m pdf.Maroto, head []string, content [][]string) pdf.Maroto {
-	s.TableHeader(m, head, true, 3, 5.0, consts.Center)
+	s.TableHeader(m, head, true, 3, s.rowtableHeight+2, consts.Center, 0)
 	for _, v := range content {
-		s.TableRow(m, v, true, 3, s.rowtableHeight)
+		s.TableRow(m, v, true, 3, s.rowtableHeight, 0, consts.Center)
 
 	}
 	return m
 }
 func (s Skin) Table(m pdf.Maroto, head []string, content [][]string, col uint, h float64) pdf.Maroto {
-	s.TableHeader(m, head, false, col, h, consts.Left)
+	s.TableHeader(m, head, false, col, h+2, consts.Left, 1)
 	for _, v := range content {
-		s.TableRow(m, v, false, col, h)
+		s.TableRow(m, v, false, col, h, 1, consts.Left)
 
 	}
 	return m
 }
 func (s Skin) TableLine(m pdf.Maroto, head []string, content [][]string) pdf.Maroto {
-	s.TableHeader(m, head, true, 4, s.rowtableHeight, consts.Center)
+	s.TableHeader(m, head, true, 4, s.rowtableHeight+2, consts.Center, 0)
 	for _, v := range content {
-		s.TableRow(m, v, true, 4, s.rowtableHeight)
+		s.TableRow(m, v, true, 4, s.rowtableHeight, 0, consts.Center)
 
 	}
 	return m
@@ -149,7 +149,7 @@ func (s Skin) TitleSub(m pdf.Maroto, title string, subtitle string, body string)
 	}
 	bold := props.Text{
 		Top:   1,
-		Size:  s.SizeTitle,
+		Size:  s.Size,
 		Style: consts.Bold,
 		Align: consts.Left,
 		Color: s.TextColor,
@@ -157,7 +157,7 @@ func (s Skin) TitleSub(m pdf.Maroto, title string, subtitle string, body string)
 	normal := props.Text{
 		Top:   1,
 		Size:  s.Size,
-		Style: consts.Bold,
+		Style: consts.Normal,
 		Align: consts.Left,
 		Color: s.TextColor,
 	}
@@ -187,7 +187,7 @@ func (s Skin) TitleSub(m pdf.Maroto, title string, subtitle string, body string)
 	})
 	return m
 }
-func (s Skin) Title(m pdf.Maroto, title string, body string) pdf.Maroto {
+func (s Skin) Title(m pdf.Maroto, title string, body string, bodyHeight float64) pdf.Maroto {
 	prop := props.Text{
 		Top:   1.5,
 		Size:  s.SizeTitle,
@@ -210,7 +210,7 @@ func (s Skin) Title(m pdf.Maroto, title string, body string) pdf.Maroto {
 		})
 
 	})
-	m.Row(s.rowHeight, func() {
+	m.Row(bodyHeight, func() {
 		m.Col(10, func() {
 			m.Text(body, normal)
 
@@ -297,10 +297,9 @@ func (s Skin) AboutUs(m pdf.Maroto, title string, sub []Kv) pdf.Maroto {
 
 		})
 
-		//m.SetBackgroundColor(magenta)
 	})
 	for _, k := range sub {
-		m.Row(s.rowHeight, func() {
+		m.Row(15, func() {
 			m.Col(12, func() {
 				m.Text(k.Key, bold)
 
@@ -308,13 +307,12 @@ func (s Skin) AboutUs(m pdf.Maroto, title string, sub []Kv) pdf.Maroto {
 
 			//m.SetBackgroundColor(magenta)
 		})
-		m.Row(s.rowHeight+2, func() {
+		m.Row(25, func() {
 			m.Col(12, func() {
 				m.Text(k.Value, normal)
 
 			})
 
-			//m.SetBackgroundColor(magenta)
 		})
 	}
 

@@ -255,7 +255,7 @@ func Proposal(w http.ResponseWriter, r *http.Request) string {
 	m = skin.TitleSub(m, title, sub, body)
 	title = "Presa visione dei documenti precontrattuali e sottoscrizione Polizza "
 	body = "Ho scelto la ricezione della seguente documentazione su supporto cartaceo / via e-mail al seguente indirizzo: XXXXXXXXXX. Sono a conoscenza che, anche le future comunicazioni avverranno con questo mezzo e che qualora volessi modificare questa mia scelta potrò farlo scrivendo a Global Assistance, con le modalità previste nelle Condizioni Generali di Assicurazione.  "
-	m = skin.Title(m, title, body)
+	m = skin.Title(m, title, body, 25.0)
 	confirmationRecepit := []string{
 		"1. degli Allegati 3, 4 e 4-ter, di cui al Regolamento IVASS n. 40/2018, relativi agli obblighi informativi e di comportamento dell’Intermediario, inclusa l’informativa privacy dell’intermediario (ai sensi dell’art. 13 del regolamento UE n. 2016/679); ",
 		"2. del Set informativo, identificato dal modello XXXXXXXX ed. 2022, contenente: 1) documento informativo per i prodotti assicurativi danni (DIP Danni) e documento informativo precontrattuale aggiuntivo per i prodotti assicurativi danni (DIP Aggiuntivo danni) cui al Regolamento IVASS n. 41/2018; 2) Condizioni di Assicurazione comprensive di Glossario, che dichiaro altresì di conoscere ed accettare. ",
@@ -274,7 +274,7 @@ func Proposal(w http.ResponseWriter, r *http.Request) string {
 	Invalidità Permanente da Malattia; Art. 38.3 Criteri di liquidazione dell’Invalidità Permanente da Malattia; 
 	Art. 38.4 Valutazione del danno – ricorso all’Arbitrato`
 
-	m = skin.Title(m, title, body)
+	m = skin.Title(m, title, body, 25.0)
 
 	h = []string{"Premio ", "Imponibile  ", "Imposte Assicurative ", "Totale"}
 	var tablePremium [][]string
@@ -287,13 +287,13 @@ func Proposal(w http.ResponseWriter, r *http.Request) string {
 	bonifico e strumenti di pagamento elettronico, quali ad esempio, carte di 
 	credito e/o carte di debito, incluse le carte prepagate.`
 	m = skin.Space(m, 5.0)
-	m = skin.Title(m, title, body)
+	m = skin.Title(m, title, body, 25.0)
 	title = "Emissione polizza e pagamento della prima rata "
 	body = `Polizza emessa a Milano il 00/00/0000 per un importo di euro XXX,XX quale prima rata alla firma,
 	 il cui pagamento a saldo è da effettuarsi con i metodi di pagamento sopra indicati. 
 	Costituisce quietanza di pagamento la mail di conferma che Wopta invierà al Contraente. `
 
-	m = skin.Title(m, title, body)
+	m = skin.Title(m, title, body, 25.0)
 	m = skin.Sign(m, "data.Name"+" "+"data.Surname", "Wopta Assicurazioni")
 
 	m.AddPage()

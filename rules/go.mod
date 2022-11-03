@@ -14,5 +14,5 @@ require (
 	github.com/go-gota/gota v0.12.0
 	github.com/wopta/goworkspace/lib v0.0.0-20221101152222-fb0e7ae59da4
 	github.com/wopta/goworkspace/models v0.0.0-20221101152222-fb0e7ae59da4
-	google.golang.org/protobuf v1.28.1 // indirect
+
 )

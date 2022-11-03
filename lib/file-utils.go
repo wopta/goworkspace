@@ -147,17 +147,17 @@ func GetByteByEnv(file string, isLocal bool) []byte {
 	}
 	return res1
 }
-func GetPathByEnv() string {
+func GetAssetPathByEnv(base string) string {
 	var res1 string
 	switch os.Getenv("env") {
 
 	case "local":
-		res1 = "function-data"
+		res1 = base + "/assets"
 
 	case "dev":
 		res1 = "./serverless_function_source_code"
 	case "prod":
-		res1 = "core-350507-function-data"
+		res1 = "./serverless_function_source_code"
 
 	default:
 	}

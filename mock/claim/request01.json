@@ -1,0 +1,23 @@
+{
+    
+    "insertDate":"",
+    "updated":"",
+    "company":"",
+    "policy":"",
+    "description":"",
+    "idCompany":"",
+    "id":"",
+    "status":"",
+    "document":[{
+        "name":"",
+        "byte":""
+
+    }],
+    "history":[{
+        "name":"",
+        "byte":""
+
+    }]
+    
+
+}
