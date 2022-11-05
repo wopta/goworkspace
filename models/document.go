@@ -12,14 +12,10 @@ func (r *Document) Marshal() ([]byte, error) {
 	return json.Marshal(r)
 }
 
-// This file was generated from JSON Schema using quicktype, do not modify it directly.
-// To parse and unparse this JSON data, add this code to your project and do:
-//
-//    welcome, err := UnmarshalWelcome(bytes)
-//    bytes, err = welcome.Marshal()
-
 type Document struct {
-	Template          string             `json:"template"`
+	Uid               string             `json:"uid,omitempty"`
+	Template          string             `json:"template,omitempty"`
+	GcsFilename       string             `json:"gcsFilename,omitempty"`
 	Policy            *Policy            `json:"policy,omitempty"`
 	Contractor        *User              `json:"contractor,omitempty"`
 	Coverages         []Guarantee        `json:"coverages,omitempty"`

@@ -17,14 +17,14 @@ func (r *Claim) Marshal() ([]byte, error) {
 }
 
 type Claim struct {
-	InsertDate  *time.Time   `firestore:"insertDate,omitempty" json:"insertDate,omitempty"`
-	Updated     *string      `firestore:"updated,omitempty" json:"updated,omitempty"`
-	Company     *string      `firestore:"company,omitempty" json:"company,omitempty"`
-	Policy      *string      `firestore:"policy,omitempty" json:"policy,omitempty"`
-	Description *string      `firestore:"description,omitempty" json:"description,omitempty"`
-	IdCompany   *string      `firestore:"idCompany,omitempty" json:"idCompany,omitempty"`
-	Id          *string      `firestore:"id,omitempty" json:"id,omitempty"`
-	Status      *string      `firestore:"status,omitempty" json:"status,omitempty"`
+	InsertDate  time.Time    `firestore:"insertDate,omitempty" json:"insertDate,omitempty"`
+	Updated     string       `firestore:"updated,omitempty" json:"updated,omitempty"`
+	Company     string       `firestore:"company,omitempty" json:"company,omitempty"`
+	Policy      string       `firestore:"policy,omitempty" json:"policy,omitempty"`
+	Description string       `firestore:"description,omitempty" json:"description,omitempty"`
+	IdCompany   string       `firestore:"idCompany,omitempty" json:"idCompany,omitempty"`
+	Uid         string       `firestore:"uid,omitempty" json:"uid,omitempty"`
+	Status      string       `firestore:"status,omitempty" json:"status,omitempty"`
 	Document    []Attachment `firestore:"attachment,omitempty" json:"attachment,omitempty"`
 	History     []Claim      `firestore:"history,omitempty" json:"history,omitempty"`
 }

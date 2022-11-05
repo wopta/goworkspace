@@ -155,9 +155,9 @@ func GetAssetPathByEnv(base string) string {
 		res1 = base + "/assets"
 
 	case "dev":
-		res1 = "./serverless_function_source_code"
+		res1 = "./serverless_function_source_code/assets"
 	case "prod":
-		res1 = "./serverless_function_source_code"
+		res1 = "./serverless_function_source_code/assets"
 
 	default:
 	}

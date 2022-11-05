@@ -45,8 +45,12 @@ func put(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	claim, e := model.UnmarshalClaim(req)
 	lib.CheckError(e)
-	docsnap := lib.GetFirestore("users", *claim.Id)
+	docsnap := lib.GetFirestore("users", claim.Uid)
 	docsnap.DataTo(&user)
+	claims := append(user.Claims, claim)
+	user.Claims = claims
+	lib.SetFirestore("users", claim.Uid, user)
 	log.Println(user)
+
 	// lib.PutFirestore("users")
 }

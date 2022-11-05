@@ -6,77 +6,33 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
-	"github.com/johnfercher/maroto/pkg/color"
 	"github.com/johnfercher/maroto/pkg/consts"
-	"github.com/johnfercher/maroto/pkg/pdf"
 	"github.com/johnfercher/maroto/pkg/props"
 	lib "github.com/wopta/goworkspace/lib"
-	//model "github.com/wopta/goworkspace/models"
+	model "github.com/wopta/goworkspace/models"
 )
 
 func Contract(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 	log.Println("Contract")
 	//lib.Files("./serverless_function_source_code")
 	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
-	var data DodumentData
+	var data model.Policy
 	defer r.Body.Close()
 	err := json.Unmarshal([]byte(req), &data)
 	lib.CheckError(err)
+	resp, respObj := ContractObj(data)
+	return resp, respObj
+}
 
-	skin := Skin{
-		LineColor: color.Color{
-			Red:   229,
-			Green: 0,
-			Blue:  117,
-		},
-		TextColor: color.Color{
-			Red:   88,
-			Green: 90,
-			Blue:  93,
-		},
-		Size:              9,
-		SizeTitle:         12,
-		rowHeight:         7.0,
-		rowtableHeight:    5.0,
-		rowtableHeightMin: 2.0,
-		LineHeight:        1.0,
-		DynamicHeightMin:  90,
-		DynamicHeightDiv:  25.0,
-	}
-
-	linePropMagenta := props.Line{
-		Color: skin.LineColor,
-		Style: consts.Solid,
-		Width: 0.2,
-	}
-
-	//darkGrayColor := color.NewBlack()
-
-	//blackColor := color.NewBlack()
-	whiteColor := color.NewWhite()
-	textBold := props.Text{
-		Top:   1,
-		Style: consts.Bold,
-		Align: consts.Center,
-	}
-
+func ContractObj(data model.Policy) (string, interface{}) {
+	skin, linePropMagenta, textBold := getVar()
 	log.Println(textBold)
 	log.Println("Document 1")
-	m := pdf.NewMaroto(consts.Portrait, consts.A4)
-	log.Println("Document 2")
-	m.SetPageMargins(10, 15, 10)
-	m.SetBackgroundColor(whiteColor)
-
-	m.SetFontLocation(lib.GetAssetPathByEnv("document"))
-	// Define font to all styles.
-	m.AddUTF8Font("Montserrat", consts.Normal, "montserrat_regular.ttf")
-	m.AddUTF8Font("Montserrat", consts.Bold, "montserrat_bold.ttf")
-	m.SetDefaultFontFamily("Montserrat")
-	//m.SetBorder(true)
-
+	m := skin.initDefault()
 	m.RegisterHeader(func() {
 		m.Row(15.0, func() {
 			m.Col(2, func() {
@@ -119,16 +75,36 @@ func Contract(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 		})
 		h := []string{"I dati della tua Polizza ", "I tuoi dati"}
 		var tablePremium [][]string
-		tablePremium = append(tablePremium, []string{"Numero: XXXXXXXXX", "Contraente: XXXXXXX"})
-		tablePremium = append(tablePremium, []string{"Decorre dal:  00/00/0000 ore 24:00", "C.F. / P.IVA: XXXXXXXXXX"})
-		tablePremium = append(tablePremium, []string{"Scade il: 00/00/0000 ore 24:00", "Indirizzo:  XXXXXXXXX"})
+		tablePremium = append(tablePremium, []string{"Numero: " + data.ID, "Contraente: " + data.Contractor.Name + " " + data.Contractor.Surname})
+		tablePremium = append(tablePremium, []string{"Decorre dal: " + data.StartDate + " ore 24:00", "C.F. / P.IVA: " + data.Contractor.Surname})
+		tablePremium = append(tablePremium, []string{"Scade il: " + data.EndDate + " ore 24:00", "Indirizzo: " + data.Contractor.Address})
 		tablePremium = append(tablePremium, []string{"Si rinnova a scadenza, salvo disdetta da inviare 30 giorni prima", "XXXXX  XXXXXXXXXXXXXXXXXXX (XX)"})
-		tablePremium = append(tablePremium, []string{"Prossimo pagamento il: 00/00/0000", "Mail:  xxxxxxxx@xxxxxxx.it"})
-		tablePremium = append(tablePremium, []string{"Sostituisce la polizza: = = = = = = = =", "Telefono: xxx.xxxxxxx"})
+		tablePremium = append(tablePremium, []string{"Prossimo pagamento il: " + data.EndDate, "Mail:  " + data.Contractor.Mail})
+		tablePremium = append(tablePremium, []string{"Sostituisce la polizza: = = = = = = = =", "Telefono: " + data.Contractor.Phone})
 		m = skin.Table(m, h, tablePremium, 6, 3.0)
 	})
 
 	m.RegisterFooter(func() {
+		m.Row(15.0, func() {
+			m.Col(2, func() {
+				m.Text("Wopta per te. Persona è un prodotto assicurativo di Global Assistance Compagnia di assicurazioni e riassicurazioni S.p.A, distribuito da Wopta Assicurazioni S.r.l", props.Text{
+					Top:         1,
+					Style:       consts.Bold,
+					Align:       consts.Left,
+					Color:       skin.LineColor,
+					Size:        skin.SizeTitle,
+					Extrapolate: false,
+				})
+			})
+			m.Col(2, func() {
+				_ = m.FileImage(lib.GetAssetPathByEnv("document")+"/logo_global.png", props.Rect{
+					Left:    1,
+					Top:     1,
+					Center:  false,
+					Percent: 100,
+				})
+			})
+		})
 	})
 	log.Println("Document 3")
 	m = skin.Space(m, 10.0)
@@ -142,10 +118,10 @@ func Contract(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 				Size:  skin.SizeTitle,
 			})
 		})
-		//m.SetBackgroundColor(magenta)
+
 	})
 	m.Line(1.0, linePropMagenta)
-	//m.SetBackgroundColor(darkGrayColor)
+
 	log.Println("Document 4")
 	customer := []Kv{
 		{
@@ -153,19 +129,19 @@ func Contract(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 			Value: "1"},
 		{
 			Key:   "Cognome e Nome: ",
-			Value: data.Name + " " + data.Surname},
+			Value: data.Contractor.Name + " " + data.Contractor.Surname},
 		{
 			Key:   "Codice Fiscale: ",
-			Value: data.FiscalCode},
+			Value: data.Contractor.FiscalCode},
 		{
 			Key:   "Professione: ",
-			Value: data.Work},
+			Value: data.Contractor.Work},
 		{
 			Key:   "Tipo professione: ",
-			Value: data.WorkType},
+			Value: data.Contractor.WorkType},
 		{
 			Key:   "Classe rischio: ",
-			Value: data.Class},
+			Value: data.Contractor.RiskClass},
 		{
 			Key:   "Forma di copertura: ",
 			Value: data.CoverageType},
@@ -174,10 +150,11 @@ func Contract(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 	m = skin.Space(m, 10.0)
 	var table [][]string
 	h := []string{"Garanzie ", "Somma assicurata ", "Opzioni / Dettagli ", "Premio "}
-	for _, k := range data.Coverages {
-		r := []string{k.Name, strconv.Itoa(int(k.SumInsuredLimitOfIndemnity)), k.SelfInsurance, strconv.Itoa(int(k.Price))}
-		table = append(table, r)
-
+	for _, A := range data.Assets {
+		for _, k := range A.Guarantees {
+			r := []string{k.Name, strconv.Itoa(int(k.SumInsuredLimitOfIndemnity)), k.SelfInsurance, strconv.Itoa(int(k.Price))}
+			table = append(table, r)
+		}
 	}
 
 	m = skin.CoveragesTable(m, h, table)
@@ -243,7 +220,7 @@ func Contract(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 		//m.SetBackgroundColor(magenta)
 	})
 	m = skin.Space(m, 1.0)
-	m = skin.Sign(m, data.Name+" "+data.Surname, "Assicurato ")
+	m = skin.Sign(m, data.Contractor.Name+" "+data.Contractor.Surname, "Assicurato ")
 	m.AddPage()
 	m = skin.Space(m, 5.0)
 	title := "Condizioni Speciali in deroga alle Condizioni Generali di Assicurazione "
@@ -276,8 +253,8 @@ func Contract(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 
 	h = []string{"Premio ", "Imponibile  ", "Imposte Assicurative ", "Totale"}
 	var tablePremium [][]string
-	tablePremium = append(tablePremium, []string{"Annuale", strconv.Itoa(int(data.Price)), strconv.Itoa(int(data.Price)), strconv.Itoa(int(data.Price))})
-	tablePremium = append(tablePremium, []string{"Mensile", strconv.Itoa(int(data.Price)), strconv.Itoa(int(data.Price)), strconv.Itoa(int(data.Price))})
+	tablePremium = append(tablePremium, []string{"Annuale", strconv.Itoa(int(data.PriceNett)), strconv.Itoa(int(data.TaxAmount)), strconv.Itoa(int(data.PriceGross))})
+	tablePremium = append(tablePremium, []string{"Mensile", strconv.Itoa(int(data.PriceNett)), strconv.Itoa(int(data.TaxAmount)), strconv.Itoa(int(data.PriceGross))})
 	m = skin.Space(m, 10.0)
 	m = skin.TableLine(m, h, tablePremium)
 	title = "Come puoi pagare il premio "
@@ -304,7 +281,7 @@ func Contract(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 		{Key: "", Value: ""}}
 	m = skin.BulletList(m, customerList)
 	m = skin.RowCol1(m, "", consts.Normal)
-	m = skin.Sign(m, data.Name+" "+data.Surname, "Assicurato ")
+	m = skin.Sign(m, data.Contractor.Name+" "+data.Contractor.Surname, "Assicurato ")
 	aboutUs := []Kv{{
 		Key:   "Wopta Assicurazioni S.r.l.",
 		Value: " intermediario assicurativo, soggetto al controllo dell’IVASS ed iscritto dal 14.02.2022 al Registro Unico degli Intermediari, in Sezione A nr. A000701923, avente sede legale in Galleria del Corso, 1 – 20122 Milano (MI). Capitale sociale Euro 120.000 - Codice Fiscale, Reg. Imprese e Partita IVA: 12072020964 - Iscritta al Registro delle imprese di Milano – REA MI 2638708 ",
@@ -313,24 +290,29 @@ func Contract(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 	m = skin.AboutUs(m, "Chi siamo ", aboutUs)
 	log.Println("Document 8")
 	//m.Output()
-	err = m.OutputFileAndClose("document/billing.pdf")
-	out, err := m.Output()
-	lib.CheckError(err)
-	now := time.Now() // current local time
-	layout := "2006-01-02"
-	t, _ := time.Parse(layout, now.String())
+	var resp []byte
+	var respObj *DodumentResponse
+	if os.Getenv("env") == "local" {
+		err := m.OutputFileAndClose("document/contract.pdf")
+		lib.CheckError(err)
+	} else {
+		out, err := m.Output()
+		lib.CheckError(err)
+		now := time.Now() // current local time
+		layout := "2006-01-02"
+		t, _ := time.Parse(layout, now.String())
 
-	filename := "temp/" + data.Name + "_" + data.Surname + "_" + t.String() + "_contract.pdf"
-	result := lib.PutToStorage("function-data", filename, out.Bytes())
-
-	lib.CheckError(err)
-	log.Println(result)
-	respObj := &DodumentResponse{
-		LinkGcs: filename,
-		Bytes:   base64.StdEncoding.EncodeToString(out.Bytes()),
+		filename := "temp/" + data.Contractor.Name + "_" + data.Contractor.Surname + "_" + t.String() + "_contract.pdf"
+		result := lib.PutToStorage("function-data", filename, out.Bytes())
+		lib.CheckError(err)
+		log.Println(result)
+		data.DocumentName = filename
+		respObj = &DodumentResponse{
+			LinkGcs: filename,
+			Bytes:   base64.StdEncoding.EncodeToString(out.Bytes()),
+		}
+		resp, err = json.Marshal(respObj)
+		lib.CheckError(err)
 	}
-	resp, e := json.Marshal(respObj)
-	lib.CheckError(e)
 	return string(resp), respObj
-
 }

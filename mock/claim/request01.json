@@ -1,12 +1,12 @@
 {
-    
+
     "insertDate":"",
     "updated":"",
     "company":"",
     "policy":"",
     "description":"",
     "idCompany":"",
-    "id":"",
+    "uid":"",
     "status":"",
     "document":[{
         "name":"",

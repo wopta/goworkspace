@@ -15,21 +15,33 @@ import (
 	"time"
 
 	lib "github.com/wopta/goworkspace/lib"
+	model "github.com/wopta/goworkspace/models"
 	//"google.golang.org/api/firebaseappcheck/v1"
 )
 
 func SignNamirial(w http.ResponseWriter, r *http.Request) (string, interface{}) {
-	file := lib.GetFromStorage("function-data", "document/billing.pdf", "")
+
+	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
+	var data model.Policy
+	defer r.Body.Close()
+	err := json.Unmarshal([]byte(req), &data)
+	lib.CheckError(err)
 	//file, _ := os.Open("document/billing.pdf")
+
+	return NamirialOtp(data)
+
+}
+func NamirialOtp(data model.Policy) (string, interface{}) {
+
+	file := lib.GetFromStorage("function-data", data.DocumentName, "")
 	var urlstring = os.Getenv("ESIGN_BASEURL") + "v4/sspfile/uploadtemporary"
 	//b, _ := ioutil.ReadAll(file)
 	SspFileId := <-postData(&file, urlstring)
 	log.Println("postData:", SspFileId)
 	//prepareEnvelop(SspFileId)
-	SspFileId = <-sendEnvelop(SspFileId)
+	SspFileId = <-sendEnvelop(SspFileId, data)
 	log.Println("sendEnvelop:", SspFileId)
 	return "{}", SspFileId
-
 }
 func Autorization() {
 	var urlstring = os.Getenv("ESIGN_BASEURL") + "v4/authorization"
@@ -78,7 +90,7 @@ func prepareEnvelop(id string) string {
 
 	return r
 }
-func sendEnvelop(id string) <-chan string {
+func sendEnvelop(id string, data model.Policy) <-chan string {
 	r := make(chan string)
 
 	go func() {
@@ -90,7 +102,7 @@ func sendEnvelop(id string) <-chan string {
 		client := &http.Client{
 			Timeout: time.Second * 10,
 		}
-		req, _ := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(getSend(id)))
+		req, _ := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(getSend(id, data)))
 		req.Header.Set("apiToken", os.Getenv("ESIGN_TOKEN_API"))
 		req.Header.Set("Content-Type", "application/json")
 		//header('Content-Length: ' . filesize($pdf));
@@ -336,7 +348,7 @@ func getPrepare(id string) string {
   }`
 }
 
-func getSend(id string) string {
+func getSend(id string, data model.Policy) string {
 	return `{
   
 		"SspFileIds": [
@@ -360,9 +372,9 @@ func getSend(id string) string {
 				"OrderIndex": 1,
 				"Recipients": [
 				  {
-					"Email": "luca.barbieri@wopta.it",
-					"FirstName": "##name##",
-					"LastName": "##name##",
+					"Email": "` + data.Contractor.Mail + `",
+					"FirstName": "` + data.Contractor.Name + `",
+					"LastName": "` + data.Contractor.Surname + `",
 					"LanguageCode": "it",
 					"EmailBodyExtra": "",
 					"DisableEmail": false,
@@ -374,18 +386,18 @@ func getSend(id string) string {
 					"SkipExternalDataValidation": false,
 					"AuthenticationMethods": [{
 						"Method": "Sms",
-						"Parameter": "+393668134257"
+						"Parameter": "` + data.Contractor.Phone + `"
 		   }],
 					"IdentificationMethods": [],
 					"OtpData": {
-					  "PhoneMobile": "+393668134257"
+					  "PhoneMobile": "` + data.Contractor.Phone + `"
 					}
 				  }
 				],
 				"EmailBodyExtra": "",
 				"RecipientType": "Signer",
 				"WorkstepConfiguration": {
-				  "WorkstepLabel": "Test.pdf",
+				  "WorkstepLabel": "` + data.Contractor.Name + " " + data.Contractor.Surname + " " + data.Name + `",
 				  "SmallTextZoomFactorPercent": 100,
 				  "FinishAction": {
 					"ServerActions": [],
@@ -393,17 +405,17 @@ func getSend(id string) string {
 				  },
 				  "ReceiverInformation": {
 					"UserInformation": {
-					  "FirstName": "##name##",
-					  "LastName": "##name##",
-					  "EMail": "luca.barbieri@wopta.it"
+					  "FirstName": "` + data.Contractor.Name + `",
+					  "LastName": "` + data.Contractor.Surname + `",
+					  "EMail": "` + data.Contractor.Mail + `"
 					},
 					"TransactionCodePushPluginData": []
 				  },
 				  "SenderInformation": {
 					"UserInformation": {
-					  "FirstName": "##name##",
-					  "LastName": "##name##",
-					  "EMail": "luca.barbieri@wopta.it"
+					  "FirstName": "Wopta",
+					  "LastName": "Assicurazzioni",
+					  "EMail": "info@wopta.it"
 					}
 				  },
 				  "TransactionCodeConfigurations": [],
