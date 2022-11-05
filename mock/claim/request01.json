@@ -1,23 +1,26 @@
 {
-
-    "insertDate":"",
-    "updated":"",
-    "company":"",
-    "policy":"",
-    "description":"",
-    "idCompany":"",
-    "uid":"",
-    "status":"",
-    "document":[{
-        "name":"",
-        "byte":""
-
-    }],
-    "history":[{
-        "name":"",
-        "byte":""
-
-    }]
-    
-
+    "creationDate": "2022-11-03T19:23:01.574555",
+    "updated": "03/03/2023 17:34",
+    "company": "Global",
+    "policy": "",
+    "description": "",
+    "idCompany": "2",
+    "policyDescription": "Wopta Per Te. Persone - W00000614",
+    "policyId": "Wopta Per Te. Persone - W00000614",
+    "policyNumber": "W00000614",
+    "state": "open",
+    "uid": "GXIe8RivtkgpzpU8tjFg8kpF1On1",
+    "status": "",
+    "document": [
+        {
+            "name": "",
+            "byte": ""
+        }
+    ],
+    "history": [
+        {
+            "name": "",
+            "byte": ""
+        }
+    ]
 }

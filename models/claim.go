@@ -2,7 +2,6 @@ package models
 
 import (
 	"encoding/json"
-	"time"
 )
 
 func UnmarshalClaim(data []byte) (Claim, error) {
@@ -17,16 +16,19 @@ func (r *Claim) Marshal() ([]byte, error) {
 }
 
 type Claim struct {
-	InsertDate  time.Time    `firestore:"insertDate,omitempty" json:"insertDate,omitempty"`
-	Updated     string       `firestore:"updated,omitempty" json:"updated,omitempty"`
-	Company     string       `firestore:"company,omitempty" json:"company,omitempty"`
-	Policy      string       `firestore:"policy,omitempty" json:"policy,omitempty"`
-	Description string       `firestore:"description,omitempty" json:"description,omitempty"`
-	IdCompany   string       `firestore:"idCompany,omitempty" json:"idCompany,omitempty"`
-	Uid         string       `firestore:"uid,omitempty" json:"uid,omitempty"`
-	Status      string       `firestore:"status,omitempty" json:"status,omitempty"`
-	Document    []Attachment `firestore:"attachment,omitempty" json:"attachment,omitempty"`
-	History     []Claim      `firestore:"history,omitempty" json:"history,omitempty"`
+	PolicyDescription string       `firestore:"policyDescription,omitempty" json:"policyDescription,omitempty"`
+	PolicyId          string       `firestore:"policyId,omitempty" json:"policyId,omitempty"`
+	PolicyNumber      string       `firestore:"policyNumber,omitempty" json:"policyNumber,omitempty"`
+	CreationDate      string       `firestore:"creationDate,omitempty" json:"creationDate,omitempty"`
+	Updated           string       `firestore:"updated,omitempty" json:"updated,omitempty"`
+	Company           string       `firestore:"company,omitempty" json:"company,omitempty"`
+	Policy            string       `firestore:"policy,omitempty" json:"policy,omitempty"`
+	Description       string       `firestore:"description,omitempty" json:"description,omitempty"`
+	IdCompany         string       `firestore:"idCompany,omitempty" json:"idCompany,omitempty"`
+	Uid               string       `firestore:"uid,omitempty" json:"uid,omitempty"`
+	Status            string       `firestore:"status,omitempty" json:"status,omitempty"`
+	Document          []Attachment `firestore:"attachment,omitempty" json:"attachment,omitempty"`
+	History           []Claim      `firestore:"history,omitempty" json:"history,omitempty"`
 }
 
 type Attachment struct {
