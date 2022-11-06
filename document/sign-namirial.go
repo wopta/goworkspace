@@ -365,7 +365,7 @@ func getSend(id string, data model.Policy) string {
 			"BeforeExpirationDayAmount": 3,
 			"ExpirationInSecondsAfterSending": 2419200,
 			"CallbackUrl": "",
-			"StatusUpdateCallbackUrl": "https://www.mycallback.at?envelope=##EnvelopeId##&action=##Action##",
+			"StatusUpdateCallbackUrl": "https://europe-west1-positive-apex-350507.cloudfunctions.net/callback/v1/sign?envelope=##EnvelopeId##&action=##Action##",
 			"LockFormFieldsAtEnvelopeFinish": false,
 			"Steps": [
 			  {

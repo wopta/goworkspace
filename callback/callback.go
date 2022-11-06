@@ -5,9 +5,7 @@ import (
 	"net/http"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
-	"github.com/wopta/goworkspace/lib"
-	//lib "github.com/wopta/goworkspace/lib"
-	//"google.golang.org/api/firebaseappcheck/v1"
+	lib "github.com/wopta/goworkspace/lib"
 )
 
 func init() {
@@ -18,7 +16,7 @@ func init() {
 func Callback(w http.ResponseWriter, r *http.Request) {
 	log.Println("Callback")
 	lib.EnableCors(&w, r)
-	w.Header().Set("Access-Control-Allow-Methods", "POST")
+	//w.Header().Set("Access-Control-Allow-Methods", "POST")
 	route := lib.RouteData{
 		Routes: []lib.Route{
 
@@ -40,7 +38,6 @@ func Sign(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 	log.Println("Sign")
 	log.Println("GET params were:", r.URL.Query())
 
-	// if only one expected
 	envelope := r.URL.Query().Get("envelope")
 	action := r.URL.Query().Get("action")
 	log.Println(action)
