@@ -307,6 +307,7 @@ func ContractObj(data model.Policy) (string, interface{}) {
 		lib.CheckError(err)
 		log.Println(result)
 		data.DocumentName = filename
+		log.Println(filename)
 		respObj = &DodumentResponse{
 			LinkGcs: filename,
 			Bytes:   base64.StdEncoding.EncodeToString(out.Bytes()),

@@ -33,7 +33,7 @@ func SignNamirial(w http.ResponseWriter, r *http.Request) (string, interface{}) 
 }
 func NamirialOtp(data model.Policy) (string, interface{}) {
 
-	file := lib.GetFromStorage("function-data", data.DocumentName, "")
+	file := lib.GetFromStorage("function-data", "temp/"+data.DocumentName, "")
 	var urlstring = os.Getenv("ESIGN_BASEURL") + "v4/sspfile/uploadtemporary"
 	//b, _ := ioutil.ReadAll(file)
 	SspFileId := <-postData(&file, urlstring)
