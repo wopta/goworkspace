@@ -10,7 +10,7 @@ import (
 
 func init() {
 	log.Println("INIT Callback")
-	functions.HTTP("Broker", Callback)
+	functions.HTTP("Callback", Callback)
 }
 
 func Callback(w http.ResponseWriter, r *http.Request) {
