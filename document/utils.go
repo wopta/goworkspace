@@ -53,7 +53,7 @@ func getVar() (Skin, props.Line, props.Text) {
 		rowtableHeightMin: 2.0,
 		LineHeight:        1.0,
 		DynamicHeightMin:  90,
-		DynamicHeightDiv:  25.0,
+		DynamicHeightDiv:  20.0,
 	}
 
 	linePropMagenta := props.Line{

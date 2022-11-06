@@ -49,15 +49,15 @@ func ContractObj(data model.Policy) (string, interface{}) {
 					Color:       skin.LineColor,
 					Top:         1,
 					Style:       consts.Bold,
-					Align:       consts.Center,
+					Align:       consts.Left,
 					Size:        skin.SizeTitle + 3,
 					Extrapolate: true,
 				})
 
 				m.Text("Persona", props.Text{
 					Top:         6,
-					Style:       consts.Bold,
-					Align:       consts.Center,
+					Style:       consts.Italic,
+					Align:       consts.Left,
 					Color:       skin.TextColor,
 					Size:        skin.SizeTitle + 3,
 					Extrapolate: true,
@@ -86,7 +86,7 @@ func ContractObj(data model.Policy) (string, interface{}) {
 
 	m.RegisterFooter(func() {
 		m.Row(15.0, func() {
-			m.Col(2, func() {
+			m.Col(8, func() {
 				m.Text("Wopta per te. Persona è un prodotto assicurativo di Global Assistance Compagnia di assicurazioni e riassicurazioni S.p.A, distribuito da Wopta Assicurazioni S.r.l", props.Text{
 					Top:         1,
 					Style:       consts.Bold,
@@ -302,7 +302,7 @@ func ContractObj(data model.Policy) (string, interface{}) {
 		layout := "2006-01-02"
 		t, _ := time.Parse(layout, now.String())
 
-		filename := "temp/" + data.Contractor.Name + "_" + data.Contractor.Surname + "_" + t.String() + "_contract.pdf"
+		filename := "temp/" + data.Contractor.Name + "_" + data.Contractor.Surname + "_" + t.Format("02-Jan-2006") + "_contract.pdf"
 		result := lib.PutToStorage("function-data", filename, out.Bytes())
 		lib.CheckError(err)
 		log.Println(result)

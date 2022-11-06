@@ -36,7 +36,7 @@ func NamirialOtp(data model.Policy) (string, interface{}) {
 	file := lib.GetFromStorage("function-data", "temp/"+data.DocumentName, "")
 	var urlstring = os.Getenv("ESIGN_BASEURL") + "v4/sspfile/uploadtemporary"
 	//b, _ := ioutil.ReadAll(file)
-	SspFileId := <-postData(&file, urlstring)
+	SspFileId := <-postData(file, urlstring)
 	log.Println("postData:", SspFileId)
 	//prepareEnvelop(SspFileId)
 	SspFileId = <-sendEnvelop(SspFileId, data)
@@ -124,7 +124,7 @@ func sendEnvelop(id string, data model.Policy) <-chan string {
 	}()
 	return r
 }
-func postData(data *[]byte, host string) <-chan string {
+func postData(data []byte, host string) <-chan string {
 	r := make(chan string)
 
 	go func() {
@@ -135,7 +135,7 @@ func postData(data *[]byte, host string) <-chan string {
 
 		// Add the field
 		fw, err := w.CreateFormFile("file", filepath.Base("billing.pdf"))
-		fw.Write((*data)[:])
+		fw.Write((data)[:])
 		// Don't forget to close the multipart writer.
 		// If you don't close it, your request will be missing the terminating boundary.
 		w.Close()
