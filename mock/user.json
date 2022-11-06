@@ -1,0 +1,23 @@
+{
+
+    "emailVerified" :"emailVerified",
+	"uid" :"uid",
+	"name" :"name",
+	"type" :"type",
+	"cluster" :"cluster",
+	"surname" :"surname",
+	"address" :"address",
+	"postalCode" :"postalCode",
+	"role" :"role",
+	"work" :"work",
+	"workType" :"workType",
+	"mail" :"mail",
+	"phone" :"phone",
+	"fiscalCode" :"fiscalCode",
+	"vatCode" :"vatCode",
+	"riskClass" :"riskClass",
+	"creationDate" :"creationDate",
+	"updatedDate" :"updatedDate",
+	"policiesUid" :"policiesUid",
+	"claims" :"claims"
+}

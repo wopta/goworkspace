@@ -2,6 +2,7 @@ package models
 
 type Policy struct {
 	ID            string  `firestore:"id,omitempty" json:"id,omitempty"`
+	Uid           string  `firestore:"uid,omitempty" json:"uid,omitempty"`
 	Number        string  `firestore:"number,omitempty" json:"number,omitempty"`
 	NumberCompany string  `firestore:"numberCompany,omitempty" json:"numberCompany,omitempty"`
 	Status        string  `firestore:"status ,omitempty" json:"status ,omitempty"`

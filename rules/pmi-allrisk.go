@@ -31,7 +31,7 @@ func PmiAllrisk(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 	switch os.Getenv("env") {
 	case "local":
 		groule = lib.ErrorByte(ioutil.ReadFile("function-data/grules/" + rulesFile))
-		log.Println("rules", string(groule))
+
 		ricAteco = lib.ErrorByte(ioutil.ReadFile("function-data/data/rules/Riclassificazione_Ateco.csv"))
 	case "dev":
 		groule = lib.GetFromStorage("function-data", "grules/"+rulesFile, "")
@@ -79,6 +79,7 @@ func PmiAllrisk(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 
 	log.Println(string(enrichByte))
 	s, i := lib.RulesFromJson(groule, initCoverage(), request, enrichByte)
+
 	return s, i
 }
 

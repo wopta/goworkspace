@@ -1,0 +1,40 @@
+{
+"name":"Wopta",
+"product":[{
+    "name":"Wopta per te persona"
+
+    }],
+    "insurance":[{
+        "name":"infortunio",
+        "product":[{
+            "name":"infortunio",
+            "code":"infortunio",
+            "commission":"30%"
+            }]
+
+
+        }],
+"network":[{
+    "name":"wopta",
+    "commission":"20%",
+    "profitShareTheshold":"",
+    "profitShare":"",
+    "agents":[{
+        "name":"infortunio",
+        "uid":"",
+        "profitShare":"",
+        "commission":"20%",
+        "profitShareTheshold":"",
+        "product":[{
+            "name":"Wopta per te persona",
+            "profitShare":"",
+            "commission":"20%",
+            "profitShareTheshold":""
+            }]
+        }]
+
+
+}]
+
+
+}

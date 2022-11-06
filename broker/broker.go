@@ -10,7 +10,7 @@ import (
 )
 
 func init() {
-	log.Println("INIT AppcheckProxy")
+	log.Println("INIT Broker")
 	functions.HTTP("Broker", Broker)
 }
 

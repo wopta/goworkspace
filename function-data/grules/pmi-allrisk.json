@@ -200,7 +200,7 @@
         "name": "CheckEmployersLiabilityEdili",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
         "salience": 85,
-        "when": " data.rct ==\"X\" && in.employer >= 2 && in.businessSector ==\"edili\"",
+        "when": " data.rct ==\"X\" && in.employer >= 2 && data.businessSector ==\"EDILI\"",
         "then": [
             "out[\"employers-liability\"].SumInsuredLimitOfIndemnity = 500000.00",
             "out[\"employers-liability\"].IsBase = true",
@@ -213,7 +213,7 @@
         "name": "ProductLiability",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
         "salience": 84,
-        "when": " data.rcoProd ==\"X\" && in.employer >= 2 && in.businessSector ==\"edili\"",
+        "when": " data.rcoProd ==\"X\" && in.employer >= 2 && data.businessSector ==\"EDILI\"",
         "then": [
             "out[\"product-liability\"].SumInsuredLimitOfIndemnity = 250000.00",
             "out[\"product-liability\"].IsBase = false",
@@ -291,7 +291,7 @@
         "salience": 77,
         "when": " data.rct ==\"X\" ",
         "then": [
-            "out[\"content\"].SumInsuredLimitOfIndemnity = Max(30000.00, Min(( out[\"building\"].SumInsuredLimitOfIndemnity * fx.GetContentValue(in.businessSector)),300000.00))",
+            "out[\"content\"].SumInsuredLimitOfIndemnity = Max(30000.00, Min(( out[\"building\"].SumInsuredLimitOfIndemnity * fx.GetContentValue(data.businessSector )),300000.00))",
             "out[\"content\"].Deductible = out[\"third-party-liability\"].Deductible",
             "Retract(\"Content\")"
         ]
@@ -428,7 +428,7 @@
         "salience": 67,
         "when": " out[\"building\"].SumInsuredLimitOfIndemnity > 0 && out[\"content\"].SumInsuredLimitOfIndemnity > 0",
         "then": [
-            "out[\"machinery-breakdown\"].SumInsuredLimitOfIndemnity =  Max(5000.00, Min((Round(((out[\"content\"].SumInsuredLimitOfIndemnity * fx.GetMachineryvalue(in.businessSector))+ 5000)/5000) * 5000.00),100000.00))",
+            "out[\"machinery-breakdown\"].SumInsuredLimitOfIndemnity =  Max(5000.00, Min((Round(((out[\"content\"].SumInsuredLimitOfIndemnity * fx.GetMachineryvalue(data.businessSector ))+ 5000)/5000) * 5000.00),100000.00))",
          
             "out[\"machinery-breakdown\"].IsBase = false",
             "out[\"machinery-breakdown\"].IsYuor = false",
@@ -484,7 +484,7 @@
         "salience": 63,
         "when": " out[\"building\"].SumInsuredLimitOfIndemnity > 0 || out[\"content\"].SumInsuredLimitOfIndemnity > 0",
         "then": [
-            "out[\"theft\"].SumInsuredLimitOfIndemnity =  Max(5000.00, Min((Round(((out[\"content\"].SumInsuredLimitOfIndemnity * fx.GetTheftValue(in.businessSector))+5000)/5000) * 5000.00),100000.00))",
+            "out[\"theft\"].SumInsuredLimitOfIndemnity =  Max(5000.00, Min((Round(((out[\"content\"].SumInsuredLimitOfIndemnity * fx.GetTheftValue(data.businessSector ))+5000)/5000) * 5000.00),100000.00))",
             "out[\"theft\"].Deductible = out[\"third-party-liability\"].Deductible",
             "out[\"theft\"].IsBase = false",
             "out[\"theft\"].IsYuor = true",
@@ -526,7 +526,7 @@
         "salience": 60,
         "when": " data.eletronic == \"X\" && out[\"content\"].SumInsuredLimitOfIndemnity > 0",
         "then": [
-            "out[\"electronic-equipment\"].SumInsuredLimitOfIndemnity = Max(5000.00, Min((Round(((out[\"content\"].SumInsuredLimitOfIndemnity * fx.GetTheftValue(in.businessSector)) + 5000)/5000) * 5000.00),100000.00))",
+            "out[\"electronic-equipment\"].SumInsuredLimitOfIndemnity = Max(5000.00, Min((Round(((out[\"content\"].SumInsuredLimitOfIndemnity * fx.GetTheftValue(data.businessSector )) + 5000)/5000) * 5000.00),100000.00))",
             "out[\"electronic-equipment\"].Deductible =out[\"third-party-liability\"].Deductible",
             "out[\"electronic-equipment\"].IsBase = false",
             "out[\"electronic-equipment\"].IsYuor = true",

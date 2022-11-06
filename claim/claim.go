@@ -11,7 +11,7 @@ import (
 )
 
 func init() {
-	log.Println("INIT AppcheckProxy")
+	log.Println("INIT Claim")
 	functions.HTTP("Claim", Claim)
 }
 
