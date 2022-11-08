@@ -264,7 +264,7 @@ func initCoverage() map[string]*Coverage {
 	res["atmospheric-event"] = &Coverage{
 		Slug:                       "atmospheric-event",
 		Type:                       "building",
-		TypeOfSumInsured:           "firstLoss",
+		TypeOfSumInsured:           "replacementValue",
 		Deductible:                 "0",
 		SelfInsurance:              "0",
 		SumInsuredLimitOfIndemnity: 0,
@@ -297,7 +297,7 @@ func initCoverage() map[string]*Coverage {
 	res["earthquake"] = &Coverage{
 		Slug:                       "earthquake",
 		Type:                       "building",
-		TypeOfSumInsured:           "firstLoss",
+		TypeOfSumInsured:           "replacementValue",
 		Deductible:                 "0",
 		SelfInsurance:              "0",
 		SumInsuredLimitOfIndemnity: 0,
@@ -308,7 +308,7 @@ func initCoverage() map[string]*Coverage {
 	res["river-flood"] = &Coverage{
 		Slug:                       "river-flood",
 		Type:                       "building",
-		TypeOfSumInsured:           "firstLoss",
+		TypeOfSumInsured:           "replacementValue",
 		Deductible:                 "0",
 		SelfInsurance:              "0",
 		SumInsuredLimitOfIndemnity: 0,
@@ -319,7 +319,7 @@ func initCoverage() map[string]*Coverage {
 	res["water-damage"] = &Coverage{
 		Slug:                       "water-damage",
 		Type:                       "building",
-		TypeOfSumInsured:           "firstLoss",
+		TypeOfSumInsured:           "replacementValue",
 		SelfInsurance:              "0",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0,

@@ -390,7 +390,7 @@
         "name": "Building",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
         "salience": 79,
-        "when": " data.rct ==\"X\" ",
+        "when": " data.rct ==\"X\"  &&  data.fire ==\"X\"",
         "then": [
             "out[\"building\"].SumInsuredLimitOfIndemnity =  Max(50000.00, Min(in.squareMeters * fx.GetBuildigValue(in.buildingType) ,1500000.00))",
             " Retract(\"Building\")"
@@ -411,7 +411,7 @@
         "name": "Content",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
         "salience": 77,
-        "when": " data.rct ==\"X\" ",
+        "when": " data.rct ==\"X\" &&  data.fire ==\"X\"",
         "then": [
             "out[\"content\"].SumInsuredLimitOfIndemnity = Max(30000.00, Min(( out[\"building\"].SumInsuredLimitOfIndemnity * fx.GetContentValue(data.businessSector )),300000.00))",
            
@@ -420,7 +420,7 @@
     },
     {
         "name": "ThirdPartyRecourse",
-        "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
+        "desc": "check fire building and content for ThirdPartyRecourse ",
         "salience": 76,
         "when": " data.fire ==\"X\" && out[\"building\"].SumInsuredLimitOfIndemnity > 0 && out[\"content\"].SumInsuredLimitOfIndemnity > 0",
         "then": [
@@ -439,7 +439,7 @@
         "when": " out[\"building\"].SumInsuredLimitOfIndemnity > 0 && out[\"content\"].SumInsuredLimitOfIndemnity > 0",
         "then": [
             "out[\"water-damage\"].SumInsuredLimitOfIndemnity = Max(5000.00, Min(( out[\"building\"].SumInsuredLimitOfIndemnity * 0.05)+(out[\"content\"].SumInsuredLimitOfIndemnity * 0.10),10000.00),100000.00)",
-            
+            "out[\"water-damage\"].SumInsuredLimitOfIndemnity =0.7",
             "out[\"water-damage\"].IsBase = true",
             "out[\"water-damage\"].IsYuor = true",
             "out[\"water-damage\"].IsPremium = true",
@@ -523,7 +523,7 @@
         "when": " out[\"building\"].SumInsuredLimitOfIndemnity > 0 && out[\"content\"].SumInsuredLimitOfIndemnity > 0",
         "then": [
             "out[\"river-flood\"].SumInsuredLimitOfIndemnity =  out[\"building\"].SumInsuredLimitOfIndemnity + out[\"content\"].SumInsuredLimitOfIndemnity",
-          
+            "out[\"river-flood\"].SumInsuredLimitOfIndemnity = 0.7",
             "out[\"river-flood\"].IsBase = false",
             "out[\"river-flood\"].IsYuor = false",
             "out[\"river-flood\"].IsPremium = true",
@@ -537,7 +537,7 @@
         "when": " out[\"building\"].SumInsuredLimitOfIndemnity > 0 && out[\"content\"].SumInsuredLimitOfIndemnity > 0",
         "then": [
             "out[\"earthquake\"].SumInsuredLimitOfIndemnity =  out[\"building\"].SumInsuredLimitOfIndemnity + out[\"content\"].SumInsuredLimitOfIndemnity",
-            
+            "out[\"earthquake\"].SumInsuredLimitOfIndemnity =0.7",
             "out[\"earthquake\"].IsBase = false",
             "out[\"earthquake\"].IsYuor = false",
             "out[\"earthquake\"].IsPremium = true",
