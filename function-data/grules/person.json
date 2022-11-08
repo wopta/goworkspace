@@ -63,8 +63,7 @@
             "out[\"IPI\"].IsBase = true",
             "out[\"RSC\"].IsPremium = true",
             "out[\"RSC\"].Premium.SumInsuredLimitOfIndemnity =10000",
-            "out[\"IPM\"].IsPremium = true",
-            "out[\"IPM\"].Premium.SumInsuredLimitOfIndemnity =50000",
+            
             "Log(\"IPI\")",
             " Retract(\"issue1500_1\")"
         ]
@@ -119,8 +118,7 @@
             "out[\"ITI\"].Base.Deductible =\"15\"",
             "out[\"ITI\"].Your.Deductible =\"15\"",
             "out[\"ITI\"].Premium.Deductible=\"15\"",
-            "out[\"IPM\"].IsPremium = true",
-            "out[\"IPM\"].Premium.SumInsuredLimitOfIndemnity =50000",
+          
             " Retract(\"riskInLifeIs_1\")"
         ]
     },

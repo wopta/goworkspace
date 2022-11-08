@@ -12,7 +12,7 @@ require (
 	cloud.google.com/go/firestore v1.8.0 // indirect
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
 	github.com/go-gota/gota v0.12.0
-	github.com/wopta/goworkspace/lib v0.0.0-20221101152222-fb0e7ae59da4
-	github.com/wopta/goworkspace/models v0.0.0-20221101152222-fb0e7ae59da4
+	github.com/wopta/goworkspace/lib v0.0.0-20221106140834-bf7189807e2e
+	github.com/wopta/goworkspace/models v0.0.0-20221106140834-bf7189807e2e
 
 )
