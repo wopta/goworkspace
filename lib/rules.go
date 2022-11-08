@@ -153,7 +153,7 @@ func (p *Fx) GetBuildigValue(buildingType string) int {
 	if buildingType == "COMMERCIALE" {
 		return 1000
 	}
-	if buildingType == "CIVILE TIPO UFFICIO" {
+	if buildingType == "CIVILE_TIPO_UFFICIO" {
 		return 1400
 	}
 	return 0
