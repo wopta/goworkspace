@@ -18,6 +18,7 @@ type Guarantee struct {
 	SumInsuredLimitOfIndemnity float64                   `json:"sumInsuredLimitOfIndemnity,omitempty" json:"sumInsuredLimitOfIndemnity,omitempty"`
 	Deductible                 string                    `firestore:"deductible,omitempty" json:"deductible,omitempty"`
 	SelfInsurance              string                    `firestore:"selfInsurance,omitempty" json:"selfInsurance,omitempty"`
+	Tax                        float64                   `json:"tax,omitempty" json:"tax,omitempty"`
 	Price                      int64                     `firestore:"price,omitempty" json:"price,omitempty"`
 	PriceNett                  int64                     `firestore:"priceNett,omitempty" json:"priceNett,omitempty"`
 	PriceGross                 int64                     `firestore:"priceGross,omitempty" json:"priceGross   ,omitempty"`
