@@ -17,6 +17,8 @@
     "voucher": "voucher",
     "channel": "channel",
     "covenant": "covenant",
+    "update": "08/11/2023",
+    "created": "covenant",
     "taxAmount": 10,
     "priceNett": 10,
     "priceGross": 10,

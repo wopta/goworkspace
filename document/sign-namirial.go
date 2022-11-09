@@ -16,7 +16,6 @@ import (
 
 	lib "github.com/wopta/goworkspace/lib"
 	model "github.com/wopta/goworkspace/models"
-	//"google.golang.org/api/firebaseappcheck/v1"
 )
 
 func SignNamirial(w http.ResponseWriter, r *http.Request) (string, interface{}) {
