@@ -1,34 +1,49 @@
 {
 "name":"Wopta",
-"product":[{
-    "name":"Wopta per te persona"
+"products":[{
+    "name":"Wopta per te persona",
+    "company":[{
+        "name":"Global",
+        "code":"1",
+        "commission":0.30
+        }],
+        "guarantees": [
+            {
+                "name": "test 1",
+                "deductible": "2000",
+                "selfInsurance": "0.10",
+                "sumInsuredLimitOfIndemnity": 15000,
+                "price": 15000,
+                "priceNett": 15000
+            }
+        ]
 
     }],
-    "insurance":[{
+    "affinity":[{
         "name":"infortunio",
         "product":[{
             "name":"infortunio",
             "code":"infortunio",
-            "commission":"30%"
+            "commission":0.30
             }]
 
 
         }],
 "network":[{
     "name":"wopta",
-    "commission":"20%",
+    "commission":0.20,
     "profitShareTheshold":"",
     "profitShare":"",
     "agents":[{
         "name":"infortunio",
         "uid":"",
         "profitShare":"",
-        "commission":"20%",
-        "profitShareTheshold":"",
+        "commission":0.20,
+        "profitShareTheshold":100000,
         "product":[{
             "name":"Wopta per te persona",
             "profitShare":"",
-            "commission":"20%",
+            "commission":0.20,
             "profitShareTheshold":""
             }]
         }]

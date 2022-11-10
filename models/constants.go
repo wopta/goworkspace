@@ -6,8 +6,14 @@ const (
 	Customer = "Customer"
 )
 
-type Split string
+type PolicyStatus string
 
 const (
-	Splits = "Customer"
+	Init        = "Inizialize"
+	Proposal    = "Proposal"
+	Emit        = "Emit"
+	Sign        = "Sign"
+	Pay         = "Pay"
+	PS          = "Pay&Sign"
+	CompanyEmit = "CompanyEmit"
 )

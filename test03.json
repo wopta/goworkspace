@@ -1,524 +1,93 @@
-200 OK
-395.80 ms
 {
-  "ASS": {
-    "DailyAllowance": "",
-    "LegalDefence": "",
-    "Assistance": "",
-    "IsYuor": false,
-    "Type": "",
-    "TypeOfSumInsured": "",
-    "Description": "",
-    "Deductible": "0",
-    "SumInsuredLimitOfIndemnity": 0,
-    "Price": 0,
-    "Value": null,
-    "Offer": null,
-    "Slug": "Assistenza",
-    "SelfInsurance": "",
-    "IsBase": false,
-    "IsYour": false,
-    "IsPremium": false,
-    "Base": {
-      "TypeOfSumInsured": "",
-      "Deductible": "0",
-      "DeductibleType": "",
-      "SumInsuredLimitOfIndemnity": 0,
-      "SelfInsurance": "0",
-      "Tax": 0,
-      "PremiumNet": 0,
-      "PremiumTaxAmount": 0,
-      "PremiumGross": 0
+  "sme": {
+    "ateco": "",
+    "subproductId": 35.0,
+    "UW_role": "Agent",
+    "company": {
+      "country": {
+        "value": "Italy"
+      },
+      "vatnumber": {
+        "value": "01299930196"
+      },
+      "opre_eur": {
+        "value": 1978726.0
+      },
+      "employees": {
+        "value": 17.0
+      }
     },
-    "Your": {
-      "TypeOfSumInsured": "",
-      "Deductible": "0",
-      "DeductibleType": "",
-      "SumInsuredLimitOfIndemnity": 0,
-      "SelfInsurance": "0",
-      "Tax": 0,
-      "PremiumNet": 0,
-      "PremiumTaxAmount": 0,
-      "PremiumGross": 0
-    },
-    "Premium": {
-      "TypeOfSumInsured": "",
-      "Deductible": "0",
-      "DeductibleType": "",
-      "SumInsuredLimitOfIndemnity": 0,
-      "SelfInsurance": "0",
-      "Tax": 0,
-      "PremiumNet": 0,
-      "PremiumTaxAmount": 0,
-      "PremiumGross": 0
-    }
-  },
-  "D": {
-    "DailyAllowance": "",
-    "LegalDefence": "",
-    "Assistance": "",
-    "IsYuor": false,
-    "Type": "extra",
-    "TypeOfSumInsured": "",
-    "Description": "",
-    "Deductible": "0",
-    "SumInsuredLimitOfIndemnity": 0,
-    "Price": 0,
-    "Value": null,
-    "Offer": null,
-    "Slug": "Decesso Infortunio",
-    "SelfInsurance": "",
-    "IsBase": true,
-    "IsYour": true,
-    "IsPremium": true,
-    "Base": {
-      "TypeOfSumInsured": "",
-      "Deductible": "0",
-      "DeductibleType": "",
-      "SumInsuredLimitOfIndemnity": 200000,
-      "SelfInsurance": "0",
-      "Tax": 0,
-      "PremiumNet": 0,
-      "PremiumTaxAmount": 0,
-      "PremiumGross": 0
-    },
-    "Your": {
-      "TypeOfSumInsured": "",
-      "Deductible": "0",
-      "DeductibleType": "",
-      "SumInsuredLimitOfIndemnity": 200000,
-      "SelfInsurance": "0",
-      "Tax": 0,
-      "PremiumNet": 0,
-      "PremiumTaxAmount": 0,
-      "PremiumGross": 0
-    },
-    "Premium": {
-      "TypeOfSumInsured": "",
-      "Deductible": "0",
-      "DeductibleType": "",
-      "SumInsuredLimitOfIndemnity": 300000,
-      "SelfInsurance": "0",
-      "Tax": 0,
-      "PremiumNet": 0,
-      "PremiumTaxAmount": 0,
-      "PremiumGross": 0
-    }
-  },
-  "DC": {
-    "DailyAllowance": "",
-    "LegalDefence": "",
-    "Assistance": "",
-    "IsYuor": false,
-    "Type": "extra",
-    "TypeOfSumInsured": "",
-    "Description": "",
-    "Deductible": "0",
-    "SumInsuredLimitOfIndemnity": 0,
-    "Price": 0,
-    "Value": null,
-    "Offer": null,
-    "Slug": "Diaria Convalescenza Infortunio",
-    "SelfInsurance": "",
-    "IsBase": false,
-    "IsYour": true,
-    "IsPremium": true,
-    "Base": {
-      "TypeOfSumInsured": "",
-      "Deductible": "0",
-      "DeductibleType": "",
-      "SumInsuredLimitOfIndemnity": 0,
-      "SelfInsurance": "0",
-      "Tax": 0,
-      "PremiumNet": 0,
-      "PremiumTaxAmount": 0,
-      "PremiumGross": 0
-    },
-    "Your": {
-      "TypeOfSumInsured": "",
-      "Deductible": "0",
-      "DeductibleType": "",
-      "SumInsuredLimitOfIndemnity": 50,
-      "SelfInsurance": "0",
-      "Tax": 0,
-      "PremiumNet": 16.5,
-      "PremiumTaxAmount": 0,
-      "PremiumGross": 0
-    },
-    "Premium": {
-      "TypeOfSumInsured": "",
-      "Deductible": "0",
-      "DeductibleType": "",
-      "SumInsuredLimitOfIndemnity": 100,
-      "SelfInsurance": "0",
-      "Tax": 0,
-      "PremiumNet": 33,
-      "PremiumTaxAmount": 0,
-      "PremiumGross": 0
-    }
-  },
-  "DR": {
-    "DailyAllowance": "",
-    "LegalDefence": "",
-    "Assistance": "",
-    "IsYuor": false,
-    "Type": "extra",
-    "TypeOfSumInsured": "",
-    "Description": "",
-    "Deductible": "0",
-    "SumInsuredLimitOfIndemnity": 0,
-    "Price": 0,
-    "Value": null,
-    "Offer": null,
-    "Slug": "Diaria Ricovero / Gessatura Infortunio",
-    "SelfInsurance": "",
-    "IsBase": false,
-    "IsYour": true,
-    "IsPremium": true,
-    "Base": {
-      "TypeOfSumInsured": "",
-      "Deductible": "0",
-      "DeductibleType": "",
-      "SumInsuredLimitOfIndemnity": 0,
-      "SelfInsurance": "0",
-      "Tax": 0,
-      "PremiumNet": 0,
-      "PremiumTaxAmount": 0,
-      "PremiumGross": 0
-    },
-    "Your": {
-      "TypeOfSumInsured": "",
-      "Deductible": "0",
-      "DeductibleType": "",
-      "SumInsuredLimitOfIndemnity": 100,
-      "SelfInsurance": "0",
-      "Tax": 0,
-      "PremiumNet": 81,
-      "PremiumTaxAmount": 0,
-      "PremiumGross": 0
-    },
-    "Premium": {
-      "TypeOfSumInsured": "",
-      "Deductible": "0",
-      "DeductibleType": "",
-      "SumInsuredLimitOfIndemnity": 150,
-      "SelfInsurance": "0",
-      "Tax": 0,
-      "PremiumNet": 121.50000000000001,
-      "PremiumTaxAmount": 0,
-      "PremiumGross": 0
-    }
-  },
-  "IPI": {
-    "DailyAllowance": "",
-    "LegalDefence": "",
-    "Assistance": "",
-    "IsYuor": false,
-    "Type": "extra",
-    "TypeOfSumInsured": "",
-    "Description": "",
-    "Deductible": "0",
-    "SumInsuredLimitOfIndemnity": 0,
-    "Price": 0,
-    "Value": null,
-    "Offer": null,
-    "Slug": "Invalidità Permanente Infortunio",
-    "SelfInsurance": "",
-    "IsBase": true,
-    "IsYour": true,
-    "IsPremium": true,
-    "Base": {
-      "TypeOfSumInsured": "",
-      "Deductible": "5",
-      "DeductibleType": "absolute",
-      "SumInsuredLimitOfIndemnity": 200000,
-      "SelfInsurance": "0",
-      "Tax": 0,
-      "PremiumNet": 180,
-      "PremiumTaxAmount": 0,
-      "PremiumGross": 0
-    },
-    "Your": {
-      "TypeOfSumInsured": "",
-      "Deductible": "5",
-      "DeductibleType": "absorbable",
-      "SumInsuredLimitOfIndemnity": 200000,
-      "SelfInsurance": "0",
-      "Tax": 0,
-      "PremiumNet": 216,
-      "PremiumTaxAmount": 0,
-      "PremiumGross": 0
-    },
-    "Premium": {
-      "TypeOfSumInsured": "",
-      "Deductible": "5",
-      "DeductibleType": "absorbable",
-      "SumInsuredLimitOfIndemnity": 300000,
-      "SelfInsurance": "0",
-      "Tax": 0,
-      "PremiumNet": 324,
-      "PremiumTaxAmount": 0,
-      "PremiumGross": 0
-    }
-  },
-  "IPM": {
-    "DailyAllowance": "",
-    "LegalDefence": "",
-    "Assistance": "",
-    "IsYuor": false,
-    "Type": "extra",
-    "TypeOfSumInsured": "",
-    "Description": "",
-    "Deductible": "0",
-    "SumInsuredLimitOfIndemnity": 0,
-    "Price": 0,
-    "Value": null,
-    "Offer": null,
-    "Slug": "Invalidità Permanente Malattia IPM",
-    "SelfInsurance": "",
-    "IsBase": false,
-    "IsYour": false,
-    "IsPremium": false,
-    "Base": {
-      "TypeOfSumInsured": "",
-      "Deductible": "0",
-      "DeductibleType": "",
-      "SumInsuredLimitOfIndemnity": 0,
-      "SelfInsurance": "0",
-      "Tax": 0,
-      "PremiumNet": 0,
-      "PremiumTaxAmount": 0,
-      "PremiumGross": 0
-    },
-    "Your": {
-      "TypeOfSumInsured": "",
-      "Deductible": "0",
-      "DeductibleType": "",
-      "SumInsuredLimitOfIndemnity": 0,
-      "SelfInsurance": "0",
-      "Tax": 0,
-      "PremiumNet": 0,
-      "PremiumTaxAmount": 0,
-      "PremiumGross": 0
-    },
-    "Premium": {
-      "TypeOfSumInsured": "",
-      "Deductible": "0",
-      "DeductibleType": "",
-      "SumInsuredLimitOfIndemnity": 0,
-      "SelfInsurance": "0",
-      "Tax": 0,
-      "PremiumNet": 0,
-      "PremiumTaxAmount": 0,
-      "PremiumGross": 0
-    }
-  },
-  "ITI": {
-    "DailyAllowance": "",
-    "LegalDefence": "",
-    "Assistance": "",
-    "IsYuor": false,
-    "Type": "extra",
-    "TypeOfSumInsured": "",
-    "Description": "",
-    "Deductible": "0",
-    "SumInsuredLimitOfIndemnity": 0,
-    "Price": 0,
-    "Value": null,
-    "Offer": null,
-    "Slug": "Inabilità Totale Infortunio",
-    "SelfInsurance": "",
-    "IsBase": false,
-    "IsYour": false,
-    "IsPremium": false,
-    "Base": {
-      "TypeOfSumInsured": "",
-      "Deductible": "15",
-      "DeductibleType": "",
-      "SumInsuredLimitOfIndemnity": 0,
-      "SelfInsurance": "0",
-      "Tax": 0,
-      "PremiumNet": 0,
-      "PremiumTaxAmount": 0,
-      "PremiumGross": 0
-    },
-    "Your": {
-      "TypeOfSumInsured": "",
-      "Deductible": "15",
-      "DeductibleType": "",
-      "SumInsuredLimitOfIndemnity": 0,
-      "SelfInsurance": "0",
-      "Tax": 0,
-      "PremiumNet": 0,
-      "PremiumTaxAmount": 0,
-      "PremiumGross": 0
-    },
-    "Premium": {
-      "TypeOfSumInsured": "",
-      "Deductible": "15",
-      "DeductibleType": "",
-      "SumInsuredLimitOfIndemnity": 0,
-      "SelfInsurance": "0",
-      "Tax": 0,
-      "PremiumNet": 0,
-      "PremiumTaxAmount": 0,
-      "PremiumGross": 0
-    }
-  },
-  "MI": {
-    "DailyAllowance": "",
-    "LegalDefence": "",
-    "Assistance": "",
-    "IsYuor": false,
-    "Type": "extra",
-    "TypeOfSumInsured": "",
-    "Description": "",
-    "Deductible": "0",
-    "SumInsuredLimitOfIndemnity": 0,
-    "Price": 0,
-    "Value": null,
-    "Offer": null,
-    "Slug": "Morete da infortunio",
-    "SelfInsurance": "",
-    "IsBase": false,
-    "IsYour": false,
-    "IsPremium": false,
-    "Base": {
-      "TypeOfSumInsured": "",
-      "Deductible": "0",
-      "DeductibleType": "",
-      "SumInsuredLimitOfIndemnity": 0,
-      "SelfInsurance": "0",
-      "Tax": 0,
-      "PremiumNet": 0,
-      "PremiumTaxAmount": 0,
-      "PremiumGross": 0
-    },
-    "Your": {
-      "TypeOfSumInsured": "",
-      "Deductible": "0",
-      "DeductibleType": "",
-      "SumInsuredLimitOfIndemnity": 0,
-      "SelfInsurance": "0",
-      "Tax": 0,
-      "PremiumNet": 0,
-      "PremiumTaxAmount": 0,
-      "PremiumGross": 0
-    },
-    "Premium": {
-      "TypeOfSumInsured": "",
-      "Deductible": "0",
-      "DeductibleType": "",
-      "SumInsuredLimitOfIndemnity": 0,
-      "SelfInsurance": "0",
-      "Tax": 0,
-      "PremiumNet": 0,
-      "PremiumTaxAmount": 0,
-      "PremiumGross": 0
-    }
-  },
-  "RSC": {
-    "DailyAllowance": "",
-    "LegalDefence": "",
-    "Assistance": "",
-    "IsYuor": false,
-    "Type": "extra",
-    "TypeOfSumInsured": "",
-    "Description": "",
-    "Deductible": "0",
-    "SumInsuredLimitOfIndemnity": 0,
-    "Price": 0,
-    "Value": null,
-    "Offer": null,
-    "Slug": "Rimborso spese di cura Infortunio",
-    "SelfInsurance": "",
-    "IsBase": false,
-    "IsYour": false,
-    "IsPremium": true,
-    "Base": {
-      "TypeOfSumInsured": "",
-      "Deductible": "0",
-      "DeductibleType": "",
-      "SumInsuredLimitOfIndemnity": 0,
-      "SelfInsurance": "0",
-      "Tax": 0,
-      "PremiumNet": 0,
-      "PremiumTaxAmount": 0,
-      "PremiumGross": 0
-    },
-    "Your": {
-      "TypeOfSumInsured": "",
-      "Deductible": "0",
-      "DeductibleType": "",
-      "SumInsuredLimitOfIndemnity": 0,
-      "SelfInsurance": "0",
-      "Tax": 0,
-      "PremiumNet": 0,
-      "PremiumTaxAmount": 0,
-      "PremiumGross": 0
-    },
-    "Premium": {
-      "TypeOfSumInsured": "",
-      "Deductible": "0",
-      "DeductibleType": "",
-      "SumInsuredLimitOfIndemnity": 10000,
-      "SelfInsurance": "0",
-      "Tax": 0,
-      "PremiumNet": 104.7,
-      "PremiumTaxAmount": 0,
-      "PremiumGross": 0
-    }
-  },
-  "TL": {
-    "DailyAllowance": "",
-    "LegalDefence": "",
-    "Assistance": "",
-    "IsYuor": false,
-    "Type": "",
-    "TypeOfSumInsured": "",
-    "Description": "",
-    "Deductible": "0",
-    "SumInsuredLimitOfIndemnity": 0,
-    "Price": 0,
-    "Value": null,
-    "Offer": null,
-    "Slug": "Tutela Legale",
-    "SelfInsurance": "",
-    "IsBase": false,
-    "IsYour": false,
-    "IsPremium": false,
-    "Base": {
-      "TypeOfSumInsured": "",
-      "Deductible": "0",
-      "DeductibleType": "",
-      "SumInsuredLimitOfIndemnity": 0,
-      "SelfInsurance": "0",
-      "Tax": 0,
-      "PremiumNet": 0,
-      "PremiumTaxAmount": 0,
-      "PremiumGross": 0
-    },
-    "Your": {
-      "TypeOfSumInsured": "",
-      "Deductible": "0",
-      "DeductibleType": "",
-      "SumInsuredLimitOfIndemnity": 0,
-      "SelfInsurance": "0",
-      "Tax": 0,
-      "PremiumNet": 0,
-      "PremiumTaxAmount": 0,
-      "PremiumGross": 0
-    },
-    "Premium": {
-      "TypeOfSumInsured": "",
-      "Deductible": "0",
-      "DeductibleType": "",
-      "SumInsuredLimitOfIndemnity": 0,
-      "SelfInsurance": "0",
-      "Tax": 0,
-      "PremiumNet": 0,
-      "PremiumTaxAmount": 0,
-      "PremiumGross": 0
+    "answers": {
+      "step1": [],
+      "step2": [
+        {
+          "buildingId": "2",
+          "value": {
+            "buildingType": "masonry",
+            "numberOfFloors": "ground_floor",
+            "constructionYear": "before1972",
+            "alarm": "yes",
+            "typeOfInsurance": "allRisks",
+            "ateco": "620100",
+            "postcode": "26010",
+            "province": "CR",
+            "answer": [
+              {
+                "slug": "building",
+                "value": {
+                  "typeOfSumInsured": "replacementValue",
+                  "deductible": "500",
+                  "sumInsuredLimitOfIndemnity": 100000.0
+                }
+              },
+              {
+                "slug": "burst-pipe",
+                "value": {
+                  "typeOfSumInsured": "firstLoss",
+                  "deductible": "250",
+                  "sumInsuredLimitOfIndemnity": 0.0
+                }
+              },
+              {
+                "slug": "power-surge",
+                "value": {
+                  "typeOfSumInsured": "firstLoss",
+                  "deductible": "500",
+                  "selfInsurance": "0.10",
+                  "sumInsuredLimitOfIndemnity": 0.0
+                }
+              },
+              {
+                "slug": "atmospheric-event",
+                "value": {
+                  "typeOfSumInsured": "replacementValue",
+                  "deductible": "1500",
+                  "selfInsurance": "0.10",
+                  "sumInsuredLimitOfIndemnity": 100000.000000
+                }
+              },
+              {
+                "slug": "sociopolitical-event",
+                "value": {
+                  "typeOfSumInsured": "replacementValue",
+                  "deductible": "500",
+                  "selfInsurance": "0.05",
+                  "sumInsuredLimitOfIndemnity": 80000.000000
+                }
+              },
+              {
+                "slug": "terrorism",
+                "value": {
+                  "typeOfSumInsured": "replacementValue",
+                  "deductible": "500",
+                  "selfInsurance": "0.05",
+                  "sumInsuredLimitOfIndemnity": 50000.000000
+                }
+              }
+            ]
+          }
+        }
+      ]
     }
   }
 }
