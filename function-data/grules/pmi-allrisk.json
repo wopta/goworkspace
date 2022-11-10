@@ -51,6 +51,7 @@
         "salience": 97,
         "when": " data.rct ==\"X\" && in.revenue <= 75000 ",
         "then": [
+            " out[\"machinery-breakdown\"].Deductible = \"1500\"",
             " out[\"third-party-liability\"].Deductible = \"500\"",
             "out[\"employers-liability\"].Deductible =\"2600\"",
             "out[\"cyber\"].Deductible =\"500\"",
@@ -91,6 +92,7 @@
         "salience": 96,
         "when": " data.rct ==\"X\" && in.revenue > 75000 && in.revenue < 150000 ",
         "then": [
+            " out[\"machinery-breakdown\"].Deductible = \"1500\"",
             " out[\"third-party-liability\"].Deductible = \"500\"",
             "out[\"employers-liability\"].Deductible =\"2600\"",
             "out[\"cyber\"].Deductible =\"500\"",
@@ -131,6 +133,7 @@
         "salience":95,
         "when": " data.rct ==\"X\" && in.revenue > 150000 && in.revenue < 500000 ",
         "then": [
+            " out[\"machinery-breakdown\"].Deductible = \"1500\"",
             " out[\"third-party-liability\"].Deductible = \"1000\"",
             "out[\"employers-liability\"].Deductible =\"2600\"",
             "out[\"cyber\"].Deductible =\"1000\"",
@@ -172,6 +175,7 @@
         "salience": 94,
         "when": " data.rct ==\"X\" && in.revenue > 1500000 && in.revenue < 1500000 ",
         "then": [
+        " out[\"machinery-breakdown\"].Deductible = \"2000\"",
             " out[\"third-party-liability\"].Deductible = \"2000\"",
             "out[\"cyber\"].Deductible =\"2000\"",
             "out[\"employers-liability\"].Deductible =\"2600\"",
