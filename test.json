@@ -18,17 +18,48 @@
       }
     },
     "answers": {
-      "step1": [],
+      "step1": [
+        {
+          "slug": "third-party-liability",
+          "value": {
+            "typeOfSumInsured": "replacementValue",
+            "deductible": "500",
+            "sumInsuredLimitOfIndemnity": 1000000.00
+          }
+        },
+        {
+          "slug": "employers-liability",
+          "value": {
+            "typeOfSumInsured": "replacementValue",
+            "deductible": "2600",
+            "sumInsuredLimitOfIndemnity": 1000000.00
+          }
+        },
+        {
+          "slug": "legal-defence",
+          "value": {
+            "legalDefence": "basic"
+          }
+        },
+        {
+          "slug": "cyber",
+          "value": {
+            "typeOfSumInsured": "replacementValue",
+            "deductible": "500",
+            "sumInsuredLimitOfIndemnity": 10000.00
+          }
+        }
+      ],
       "step2": [
         {
           "buildingId": "2",
           "value": {
-            "buildingType": "masonry",
+            "buildingType": "reinforcedConcrete",
             "numberOfFloors": "greater_than_second",
-            "constructionYear": "after2009",
+            "constructionYear": "1972between2009",
             "alarm": "no",
             "typeOfInsurance": "namedPerils",
-            "ateco": "941220",
+            "ateco": "103100",
             "postcode": "26010",
             "province": "CR",
             "answer": [
@@ -36,111 +67,32 @@
                 "slug": "building",
                 "value": {
                   "typeOfSumInsured": "replacementValue",
-                  "deductible": "2000",
-                  "sumInsuredLimitOfIndemnity": 255000.0
+                  "deductible": "500",
+                  "sumInsuredLimitOfIndemnity": 300000.0
                 }
               },
               {
                 "slug": "content",
                 "value": {
                   "typeOfSumInsured": "replacementValue",
-                  "deductible": "2000",
-                  "sumInsuredLimitOfIndemnity": 40000.0
+                  "deductible": "500",
+                  "sumInsuredLimitOfIndemnity": 55000.0
                 }
               },
               {
                 "slug": "third-party-recourse",
                 "value": {
                   "typeOfSumInsured": "firstLoss",
-                  "deductible": "2000",
+                  "deductible": "1000",
                   "selfInsurance": "0.10",
                   "sumInsuredLimitOfIndemnity": 150000.00
-                }
-              },
-              {
-                "slug": "power-surge",
-                "value": {
-                  "typeOfSumInsured": "firstLoss",
-                  "deductible": "2000",
-                  "selfInsurance": "0.10",
-                  "sumInsuredLimitOfIndemnity": 20000.00
-                }
-              },
-              {
-                "slug": "atmospheric-event",
-                "value": {
-                  "typeOfSumInsured": "replacementValue",
-                  "deductible": "2000",
-                  "selfInsurance": "0.10",
-                  "sumInsuredLimitOfIndemnity": 295000.000000
-                }
-              },
-              {
-                "slug": "sociopolitical-event",
-                "value": {
-                  "typeOfSumInsured": "replacementValue",
-                  "deductible": "2000",
-                  "selfInsurance": "0.10",
-                  "sumInsuredLimitOfIndemnity": 236000.000000
-                }
-              },
-              {
-                "slug": "terrorism",
-                "value": {
-                  "typeOfSumInsured": "replacementValue",
-                  "deductible": "2000",
-                  "selfInsurance": "0.10",
-                  "sumInsuredLimitOfIndemnity": 147500.000000
-                }
-              },
-              {
-                "slug": "earthquake",
-                "value": {
-                  "typeOfSumInsured": "replacementValue",
-                  "deductible": "2000",
-                  "selfInsurance": "0.10",
-                  "sumInsuredLimitOfIndemnity": 0.7
-                }
-              },
-              {
-                "slug": "river-flood",
-                "value": {
-                  "typeOfSumInsured": "replacementValue",
-                  "deductible": "2000",
-                  "selfInsurance": "0.10",
-                  "sumInsuredLimitOfIndemnity": 0.7
-                }
-              },
-              {
-                "slug": "water-damage",
-                "value": {
-                  "typeOfSumInsured": "replacementValue",
-                  "deductible": "2000",
-                  "selfInsurance": "0.10",
-                  "sumInsuredLimitOfIndemnity": 0.7
-                }
-              },
-              {
-                "slug": "glass",
-                "value": {
-                  "typeOfSumInsured": "firstLoss",
-                  "deductible": "2000",
-                  "sumInsuredLimitOfIndemnity": 5000.00
-                }
-              },
-              {
-                "slug": "machinery-breakdown",
-                "value": {
-                  "typeOfSumInsured": "firstLoss",
-                  "deductible": "2000",
-                  "sumInsuredLimitOfIndemnity": 10000.00
                 }
               },
               {
                 "slug": "property-owners-liability",
                 "value": {
                   "typeOfSumInsured": "replacementValue",
-                  "deductible": "2000",
+                  "deductible": "1000",
                   "sumInsuredLimitOfIndemnity": 1000000.00
                 }
               },
@@ -148,7 +100,7 @@
                 "slug": "theft",
                 "value": {
                   "typeOfSumInsured": "firstLoss",
-                  "deductible": "2000",
+                  "deductible": "500",
                   "sumInsuredLimitOfIndemnity": 10000.00
                 }
               },
@@ -159,19 +111,10 @@
                 }
               },
               {
-                "slug": "business-interruption",
-                "value": {
-                  "typeOfSumInsured": "replacementValue",
-                  "deductible": "10days",
-                  "sumInsuredLimitOfIndemnity": 25000.0,
-                  "dailyAllowance": "500"
-                }
-              },
-              {
                 "slug": "electronic-equipment",
                 "value": {
                   "typeOfSumInsured": "firstLoss",
-                  "deductible": "2000",
+                  "deductible": "500",
                   "sumInsuredLimitOfIndemnity": 15000.00
                 }
               }
