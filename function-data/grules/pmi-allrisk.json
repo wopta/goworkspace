@@ -363,7 +363,7 @@
         "salience": 81,
         "when": " data.rct ==\"X\" ",
         "then": [
-            "out[\"cyber\"].SumInsuredLimitOfIndemnity = 500000.00",
+            "out[\"cyber\"].SumInsuredLimitOfIndemnity = 20000.00",
             
             "out[\"cyber\"].IsBase = false",
             "out[\"cyber\"].IsYuor = false",
