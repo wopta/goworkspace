@@ -352,9 +352,9 @@
         "name": "LegalDefence",
         "desc": "check employer value   < 4 and set SumInsuredLimitOfIndemnity ",
         "salience": 83,
-        "when": " data.rct ==\"X\" ",
+        "when": " data.rct ==\"X\" && in.employer <= 10 ",
         "then": [
-            "out[\"legal-defence\"].SumInsuredLimitOfIndemnity = 500000.00",
+            "out[\"legal-defence\"].LegalDefence= \"extended\"",
             "out[\"legal-defence\"].IsBase = false",
             "out[\"legal-defence\"].IsYuor = false",
             "out[\"legal-defence\"].IsPremium = true",

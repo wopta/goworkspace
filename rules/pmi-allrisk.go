@@ -195,7 +195,7 @@ func initCoverage() map[string]*Coverage {
 	res["legal-defence"] = &Coverage{
 		Slug:         "legal-defence",
 		Type:         "company",
-		LegalDefence: "extended",
+		LegalDefence: "basic",
 		IsBase:       false,
 		IsYuor:       false,
 		IsPremium:    false,
