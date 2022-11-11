@@ -41,6 +41,7 @@ type Coverage struct {
 	TypeOfSumInsured           string
 	Description                string
 	Deductible                 string
+	Tax                        float64
 	SumInsuredLimitOfIndemnity float64
 	Price                      float64
 	Value                      *CoverageValue
