@@ -14,6 +14,7 @@ type Building struct {
 	Name             string `firestore:"name,omitempty" json:"name,omitempty"`
 	Address          string `firestore:"address,omitempty" json:"address,omitempty"`
 	Type             string `firestore:"type,omitempty" json:"type,omitempty"`
+	SquareMeters     int64  `firestore:"squareMeters,omitempty" json:"squareMeters,omitempty"`
 	PostalCode       string `firestore:"postalCode" json:"postalCode,omitempty"`
 	City             string `firestore:"city" json:"city,omitempty"`
 	BuildingType     string `firestore:"buildingType,omitempty" json:"buildingType,omitempty"`
@@ -29,10 +30,12 @@ type Enterprise struct {
 	Name       string `firestore:"name,omitempty" json:"name,omitempty"`
 	Address    string `firestore:"address,omitempty" json:"address,omitempty"`
 	Type       string `firestore:"type,omitempty" json:"type,omitempty"`
-	PostalCode string `firestore:"postalCode" json:"postalCode,omitempty"`
-	City       string `firestore:"city" json:"city,omitempty"`
-	VatCode    string `firestore:"vatCode" json:"vatCode,omitempty"`
-	Ateco      string `firestore:"ateco" json:"ateco,omitempty"`
+	PostalCode string `firestore:"postalCode,omitempty" json:"postalCode,omitempty"`
+	City       string `firestore:"city,omitempty" json:"city,omitempty"`
+	VatCode    string `firestore:"vatCode,omitempty" json:"vatCode,omitempty"`
+	Ateco      string `firestore:"ateco,omitempty" json:"ateco,omitempty"`
+	Class      string `firestore:"class" json:"class,omitempty"`
+	Sector     string `firestore:"sector,omitempty" json:"sector,omitempty"`
 	Revenue    string `firestore:"revenue,omitempty" json:"revenue,omitempty"`
 	Employer   int64  `firestore:"employer,omitempty" json:"employer,omitempty"`
 }

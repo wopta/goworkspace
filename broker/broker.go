@@ -2,11 +2,15 @@ package broker
 
 import (
 	"encoding/json"
+	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
+	doc "github.com/wopta/goworkspace/document"
 	lib "github.com/wopta/goworkspace/lib"
+	mail "github.com/wopta/goworkspace/mail"
 	models "github.com/wopta/goworkspace/models"
 )
 
@@ -37,49 +41,47 @@ func Broker(w http.ResponseWriter, r *http.Request) {
 
 }
 func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}) {
-	policy := models.Policy{
-		ID:            "",
-		IdSign:        "",
-		IdPay:         "",
-		Uid:           "",
-		Number:        "",
-		NumberCompany: "",
-		Status:        "",
-		StatusHistory: []string{""},
-		Transactions:  []string{""},
-		Company:       "",
-		Name:          "",
-		StartDate:     "",
-		EndDate:       "",
-		CreationDate:  "",
-		Updated:       "",
-		Payment:       "",
-		PaymentType:   "",
-		PaymentSplit:  "",
-		IsPay:         false,
-		IsSign:        false,
-		CoverageType:  "",
-		Voucher:       "",
-		Channel:       "",
-		Covenant:      "",
-		TaxAmount:     0,
-		PriceNett:     0,
-		PriceGross:    0,
-		Contractor:    &models.User{},
-		DocumentName:  "",
-		Statements:    []models.Statement{{}},
-		Attachments:   []models.Attachment{{}},
-		Assets:        []models.Asset{{}},
-		Claim:         []models.Claim{{}},
-	}
-	log.Println(policy)
+	var policy models.Policy
+	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
+	defer r.Body.Close()
+	policy, e := models.UnmarshalPolicy(req)
+	policy.CreationDate = time.Now()
+	policy.Updated = time.Now()
+	policy.CreationDate = time.Now()
+	policy.Status = models.Proposal
+	company, numb := models.GetSequenceByProduct("global")
+	policy.NumberCompany = company
+	policy.Number = numb
+
 	b, e := json.Marshal(policy)
+	log.Println(string(b))
 	lib.CheckError(e)
-	ref, _ := lib.PutFirestore("policy", "", policy)
-	log.Println(ref)
-	return string(b), policy
+	ref, _ := lib.PutFirestore("policy", policy)
+	var obj mail.MailRequest
+	obj.From = "noreply@wopta.it"
+	obj.To = []string{policy.Contractor.Mail}
+	obj.Message = `<p>ciao </p> `
+	obj.Subject = "Wopta Proposta e set informantivo"
+	mail.SendMail(obj)
+	log.Println(ref.ID)
+
+	return `{"uid":"` + ref.ID + `"}`, policy
 }
 func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}) {
+	var (
+		result map[string]string
+	)
+
+	log.Println("PmiAllrisk")
+	request := lib.ErrorByte(ioutil.ReadAll(r.Body))
+	// Unmarshal or Decode the JSON to the interface.
+	json.Unmarshal([]byte(request), &result)
+	log.Println(result["uid"])
+	var policy models.Policy
+	docsnap := lib.GetFirestore("policy", string(result["uid"]))
+	docsnap.DataTo(&policy)
+	_, p := doc.ContractObj(policy)
+	policy.DocumentName = p.(doc.DodumentResponse).LinkGcs
 
 	return "", nil
 }

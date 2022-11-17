@@ -74,7 +74,7 @@ type Attachment struct {
 	Byte        string `json:"byte"`
 	ContentType string `json:"contentType,omitempty"`
 }
-type Request struct {
+type MailRequest struct {
 	From         string       `json:"from"`
 	To           []string     `json:"to"`
 	Message      string       `json:"message"`
@@ -87,6 +87,98 @@ type Request struct {
 }
 
 func Send(resp http.ResponseWriter, r *http.Request) (string, interface{}) {
+
+	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
+	log.Println(string(req))
+	var obj MailRequest
+	// Unmarshal or Decode the JSON to the interface.
+	//json.NewDecoder(req).Decode(&send)
+	defer r.Body.Close()
+
+	json.Unmarshal([]byte(req), &obj)
+	SendMail(obj)
+
+	return `{"message":"Success send "}`, nil
+}
+
+type loginAuth struct {
+	username, password string
+}
+
+func LoginAuth(username, password string) smtp.Auth {
+	return &loginAuth{username, password}
+}
+
+func (a *loginAuth) Start(server *smtp.ServerInfo) (string, []byte, error) {
+	return "LOGIN", []byte{}, nil
+}
+
+func (a *loginAuth) Next(fromServer []byte, more bool) ([]byte, error) {
+	if more {
+		switch string(fromServer) {
+		case "Username:":
+			return []byte(a.username), nil
+		case "Password:":
+			return []byte(a.password), nil
+		default:
+			return nil, errors.New("Unknown fromServer")
+		}
+	}
+	return nil, nil
+}
+func addAttachment(message string, name string, contentType string, data []byte, close bool) string {
+
+	const (
+		boundary = "my-boundary-779"
+	)
+	var ct string
+	if contentType == "" {
+		sct := strings.Split(name, ".")
+		ct = getContentType(sct[1])
+	} else {
+		ct = contentType
+	}
+
+	//b := base64.URLEncoding.EncodeToString(data)
+
+	//message += fmt.Sprintf("Content-Type: multipart/mixed; boundary=%s\n", boundary)
+	message += fmt.Sprintf("\r\n")
+	message += fmt.Sprintf("Content-Type: " + ct + "; charset=\"utf-8\"\r\n")
+	message += fmt.Sprintf("Content-Transfer-Encoding: base64\r\n")
+	message += fmt.Sprintf("Content-Disposition: attachment; filename=" + name + "\r\n")
+	message += fmt.Sprintf("Content-ID: <" + name + ">\r\n")
+	message += fmt.Sprintf(string(data))
+	message += fmt.Sprintf("\r\n--%s", boundary)
+	if close {
+		message += fmt.Sprintf("--")
+	}
+
+	return message
+}
+
+func getContentType(ext string) string {
+	m := make(map[string]string)
+	m["doc"] = "applicazione/msword"
+	m["docx"] = "applicazione/msword"
+	m["pdf"] = "applicazione/pdf"
+	m["GIF"] = "immagine/gif"
+	m["jpeg"] = "immagine/jpeg"
+	m["jpg"] = "immagine/jpeg"
+	m["jpe"] = "immagine/jpeg"
+	m["PNG"] = "immagine/png"
+	m["png"] = "immagine/png"
+	m["tiff"] = "immagine/tiff"
+	m["tif"] = "immagine/tiff"
+	m["xls"] = "application/vnd.ms-excel"
+	m["xlsx"] = "application/vnd.ms-excel"
+	m["pptx"] = "application/vnd.ms-powerpoint"
+	m["ppt"] = "application/vnd.ms-powerpoint"
+	m["txt"] = "text/plain"
+	m["zip"] = "applicazione/zip"
+	m["gzip"] = "applicazione/x-gzip"
+	return m[ext]
+}
+func SendMail(obj MailRequest) {
 	var (
 		host       = os.Getenv("EMAIL_HOST")
 		username   = os.Getenv("EMAIL_USERNAME")
@@ -98,14 +190,6 @@ func Send(resp http.ResponseWriter, r *http.Request) (string, interface{}) {
 	const (
 		boundary = "my-boundary-779"
 	)
-	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
-	log.Println(string(req))
-	var obj Request
-	// Unmarshal or Decode the JSON to the interface.
-	//json.NewDecoder(req).Decode(&send)
-	defer r.Body.Close()
-
-	json.Unmarshal([]byte(req), &obj)
 	log.Println(username)
 	log.Println(password)
 	log.Println(host)
@@ -232,83 +316,4 @@ func Send(resp http.ResponseWriter, r *http.Request) (string, interface{}) {
 		c.Quit()
 
 	}
-	return `{"message":"Success send "}`, nil
-}
-
-type loginAuth struct {
-	username, password string
-}
-
-func LoginAuth(username, password string) smtp.Auth {
-	return &loginAuth{username, password}
-}
-
-func (a *loginAuth) Start(server *smtp.ServerInfo) (string, []byte, error) {
-	return "LOGIN", []byte{}, nil
-}
-
-func (a *loginAuth) Next(fromServer []byte, more bool) ([]byte, error) {
-	if more {
-		switch string(fromServer) {
-		case "Username:":
-			return []byte(a.username), nil
-		case "Password:":
-			return []byte(a.password), nil
-		default:
-			return nil, errors.New("Unknown fromServer")
-		}
-	}
-	return nil, nil
-}
-func addAttachment(message string, name string, contentType string, data []byte, close bool) string {
-
-	const (
-		boundary = "my-boundary-779"
-	)
-	var ct string
-	if contentType == "" {
-		sct := strings.Split(name, ".")
-		ct = getContentType(sct[1])
-	} else {
-		ct = contentType
-	}
-
-	//b := base64.URLEncoding.EncodeToString(data)
-
-	//message += fmt.Sprintf("Content-Type: multipart/mixed; boundary=%s\n", boundary)
-	message += fmt.Sprintf("\r\n")
-	message += fmt.Sprintf("Content-Type: " + ct + "; charset=\"utf-8\"\r\n")
-	message += fmt.Sprintf("Content-Transfer-Encoding: base64\r\n")
-	message += fmt.Sprintf("Content-Disposition: attachment; filename=" + name + "\r\n")
-	message += fmt.Sprintf("Content-ID: <" + name + ">\r\n")
-	message += fmt.Sprintf(string(data))
-	message += fmt.Sprintf("\r\n--%s", boundary)
-	if close {
-		message += fmt.Sprintf("--")
-	}
-
-	return message
-}
-
-func getContentType(ext string) string {
-	m := make(map[string]string)
-	m["doc"] = "applicazione/msword"
-	m["docx"] = "applicazione/msword"
-	m["pdf"] = "applicazione/pdf"
-	m["GIF"] = "immagine/gif"
-	m["jpeg"] = "immagine/jpeg"
-	m["jpg"] = "immagine/jpeg"
-	m["jpe"] = "immagine/jpeg"
-	m["PNG"] = "immagine/png"
-	m["png"] = "immagine/png"
-	m["tiff"] = "immagine/tiff"
-	m["tif"] = "immagine/tiff"
-	m["xls"] = "application/vnd.ms-excel"
-	m["xlsx"] = "application/vnd.ms-excel"
-	m["pptx"] = "application/vnd.ms-powerpoint"
-	m["ppt"] = "application/vnd.ms-powerpoint"
-	m["txt"] = "text/plain"
-	m["zip"] = "applicazione/zip"
-	m["gzip"] = "applicazione/x-gzip"
-	return m[ext]
 }

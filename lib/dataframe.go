@@ -22,6 +22,7 @@ func CsvToDataframe(data []byte) dataframe.DataFrame {
 	df := dataframe.ReadCSV(reader,
 		dataframe.WithDelimiter(';'),
 		dataframe.HasHeader(true))
+	log.Println(df.Error())
 	return df
 }
 func FileToDf(path string, delimiter rune, header bool) dataframe.DataFrame {

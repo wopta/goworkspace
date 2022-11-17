@@ -76,10 +76,10 @@ func ContractObj(data model.Policy) (string, interface{}) {
 		h := []string{"I dati della tua Polizza ", "I tuoi dati"}
 		var tablePremium [][]string
 		tablePremium = append(tablePremium, []string{"Numero: " + data.ID, "Contraente: " + data.Contractor.Name + " " + data.Contractor.Surname})
-		tablePremium = append(tablePremium, []string{"Decorre dal: " + data.StartDate + " ore 24:00", "C.F. / P.IVA: " + data.Contractor.Surname})
-		tablePremium = append(tablePremium, []string{"Scade il: " + data.EndDate + " ore 24:00", "Indirizzo: " + data.Contractor.Address})
+		tablePremium = append(tablePremium, []string{"Decorre dal: " + data.StartDate.String() + " ore 24:00", "C.F. / P.IVA: " + data.Contractor.Surname})
+		tablePremium = append(tablePremium, []string{"Scade il: " + data.EndDate.String() + " ore 24:00", "Indirizzo: " + data.Contractor.Address})
 		tablePremium = append(tablePremium, []string{"Si rinnova a scadenza, salvo disdetta da inviare 30 giorni prima", "XXXXX  XXXXXXXXXXXXXXXXXXX (XX)"})
-		tablePremium = append(tablePremium, []string{"Prossimo pagamento il: " + data.EndDate, "Mail:  " + data.Contractor.Mail})
+		tablePremium = append(tablePremium, []string{"Prossimo pagamento il: " + data.EndDate.String(), "Mail:  " + data.Contractor.Mail})
 		tablePremium = append(tablePremium, []string{"Sostituisce la polizza: = = = = = = = =", "Telefono: " + data.Contractor.Phone})
 		m = skin.Table(m, h, tablePremium, 6, 3.0)
 	})

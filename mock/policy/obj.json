@@ -1,57 +1,98 @@
 {
     "id": "id",
+    "idPay": "idSign",
+    "idSign": "idpay",
     "uid": "uid",
-    "number": "number",
-    "numberCompany": "numberCompany",
-    "status ": "status ",
-    "company": "company",
-    "name": "name",
-    "startDate": "startDate",
-    "endDate": "endDate",
-    "payment": "payment",
-    "paymentType": "paymentType",
-    "paymentSplit": "paymentSplit",
-    "isPay": false,
-    "isSign": false,
-    "coverageType": "coverageType",
-    "voucher": "voucher",
-    "channel": "channel",
-    "covenant": "covenant",
-    "taxAmount": 10,
-    "priceNett": 10,
-    "priceGross": 10,
-    "contractor": {
-
-        "emailVerified" :true,
-        "uid" :"uid",
-        "name" :"name",
-        "type" :"type",
-        "cluster" :"cluster",
-        "surname" :"surname",
-        "address" :"address",
-        "postalCode" :"postalCode",
-        "role" :"role",
-        "work" :"work",
-        "workType" :"workType",
-        "mail" :"mail",
-        "phone" :"phone",
-        "fiscalCode" :"fiscalCode",
-        "vatCode" :"vatCode",
-        "riskClass" :"riskClass",
-        "creationDate" :"creationDate",
-        "updatedDate" :"updatedDate",
-        "policiesUid" :["policiesUid"],
-        "claims" :"claims"
-    },
-    "documentName": "documentName",
+    "number": "Number",
+    "numberCompany": "NumberCompany",
+    "status ": "Status",
+    "statusHistory ": [
+        "init"
+    ],
+    "transactions ": [
+        ""
+    ],
+    "company": "Global",
+    "name": "Pmi",
+    "startDate": "2022-11-12T17:39:34.8294666+01:00",
+    "endDate": "2022-11-12T17:39:34.8294666+01:00",
+    "creationDate": "2022-11-12T17:39:34.8294666+01:00",
+    "updated": "2022-11-12T17:39:34.8294666+01:00",
+    "payment": "Payment",
+    "paymentType": "PaymentType",
+    "paymentSplit": "PaymentSplit",
+    "coverageType": "CoverageType",
+    "voucher": "Voucher",
+    "channel": "Channel",
+    "covenant": "Covenant",
+    "contractor": {},
+    "statements": [
+        {
+            "Question": "",
+            "Answer": ""
+        }
+    ],
+    "attachments": [
+        {}
+    ],
     "guarantees": [
         {
-            "name": "test 1",
-            "deductible": "2000",
-            "selfInsurance": "0.10",
-            "sumInsuredLimitOfIndemnity": 15000,
-            "price": 15000,
-            "priceNett": 15000
+            "name": "test",
+            "address": "test",
+            "type": "test",
+            "building": {
+                "name": "test",
+                "address": "test",
+                "type": "test",
+                "squareMeters": 340,
+                "postalCode": "test",
+                "city": "test",
+                "buildingType": "test",
+                "buildingMaterial": "test",
+                "buildingYear": "test",
+                "isAllarm": true,
+                "floor": 4,
+                "costruction": "test",
+                "isHolder": true
+            },
+            "person": {},
+            "enterprise": {
+                "name": "test",
+                "address": "test",
+                "type": "test",
+                "postalCode": "test",
+                "city": "test",
+                "vatCode": "test",
+                "ateco": "test",
+                "revenue": "test",
+                "employer": 4
+            },
+            "isContractor": true,
+            "guarantees": [
+                {
+                    "type": "test",
+                    "beneficiary": {},
+                    "typeOfSumInsured": "test",
+                    "description": "test",
+                    "value": {},
+                    "slug": "test",
+                    "isBase": true,
+                    "isYour": true,
+                    "isPremium": true,
+                    "base": {},
+                    "your": {},
+                    "premium": {},
+                    "name": "test",
+                    "sumInsuredLimitOfIndemnity": 100000,
+                    "tax": 10.3,
+                    "price": 100000,
+                    "priceNett": 100000,
+                    "priceGross   ": 100000
+                }
+            ]
         }
+    ],
+    "claim": [
+        {}
     ]
 }
