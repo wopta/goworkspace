@@ -89,3 +89,9 @@ func GetNumberCompany(w http.ResponseWriter, r *http.Request) (string, interface
 
 	return "", nil
 }
+
+type BrokerResponse struct {
+	EnvelopSignId string `json:"envelopSignId"`
+	LinkGcs       string `json:"linkGcs"`
+	Bytes         string `json:"bytes"`
+}

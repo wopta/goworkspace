@@ -8,7 +8,7 @@ require (
 	firebase.google.com/go/v4 v4.8.0 // indirect
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
 	github.com/hyperjumptech/grule-rule-engine v1.11.0 // indirect
-	github.com/wopta/goworkspace/lib v0.0.0-20221109230317-146ed1c0976a
-	github.com/wopta/goworkspace/models v0.0.0-20221109230317-146ed1c0976a // indirect
+	github.com/wopta/goworkspace/lib v0.0.0-20221119181257-41328d67d709
+	github.com/wopta/goworkspace/models v0.0.0-20221119181257-41328d67d709 // indirect
 
 )
