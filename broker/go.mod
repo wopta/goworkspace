@@ -10,5 +10,7 @@ require (
 	github.com/hyperjumptech/grule-rule-engine v1.11.0 // indirect
 	github.com/wopta/goworkspace/lib v0.0.0-20221119181257-41328d67d709
 	github.com/wopta/goworkspace/models v0.0.0-20221119181257-41328d67d709 // indirect
+	github.com/wopta/goworkspace/mail v0.0.0-20221119181257-41328d67d709 // indirect
+	github.com/wopta/goworkspace/document v0.0.0-20221119181257-41328d67d709 // indirect
 
 )
