@@ -82,7 +82,7 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 	docsnap.DataTo(&policy)
 	_, p := doc.ContractObj(policy)
 	policy.DocumentName = p.(doc.DodumentResponse).LinkGcs
-
+	doc.NamirialOtp(policy)
 	return "", nil
 }
 func GetNumberCompany(w http.ResponseWriter, r *http.Request) (string, interface{}) {

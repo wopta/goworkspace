@@ -38,9 +38,10 @@ func NamirialOtp(data model.Policy) (string, interface{}) {
 	SspFileId := <-postData(file, urlstring)
 	log.Println("postData:", SspFileId)
 	//prepareEnvelop(SspFileId)
-	SspFileId = <-sendEnvelop(SspFileId, data)
-	log.Println("sendEnvelop:", SspFileId)
-	return "{}", SspFileId
+	id := <-sendEnvelop(SspFileId, data)
+	log.Println("sendEnvelop:", id)
+	GetEnvelop(id)
+	return "{}", id
 }
 func Autorization() {
 	var urlstring = os.Getenv("ESIGN_BASEURL") + "v4/authorization"
@@ -102,6 +103,40 @@ func sendEnvelop(id string, data model.Policy) <-chan string {
 			Timeout: time.Second * 10,
 		}
 		req, _ := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(getSend(id, data)))
+		req.Header.Set("apiToken", os.Getenv("ESIGN_TOKEN_API"))
+		req.Header.Set("Content-Type", "application/json")
+		//header('Content-Length: ' . filesize($pdf));
+
+		res, err := client.Do(req)
+		lib.CheckError(err)
+
+		if res != nil {
+			body, err := ioutil.ReadAll(res.Body)
+			lib.CheckError(err)
+			var result map[string]string
+			json.Unmarshal([]byte(body), &result)
+			res.Body.Close()
+
+			log.Println("body:", string(body))
+			r <- result["EnvelopeId"]
+
+		}
+	}()
+	return r
+}
+func GetEnvelop(id string) <-chan string {
+	r := make(chan string)
+
+	go func() {
+		defer close(r)
+		log.Println("Send")
+		//var b bytes.Buffer
+		//fileReader := bytes.NewReader([]byte())
+		var urlstring = os.Getenv("ESIGN_BASEURL") + "/v5/envelope/" + id
+		client := &http.Client{
+			Timeout: time.Second * 10,
+		}
+		req, _ := http.NewRequest(http.MethodGet, urlstring, nil)
 		req.Header.Set("apiToken", os.Getenv("ESIGN_TOKEN_API"))
 		req.Header.Set("Content-Type", "application/json")
 		//header('Content-Length: ' . filesize($pdf));
