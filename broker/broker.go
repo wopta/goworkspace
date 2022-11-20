@@ -43,8 +43,9 @@ func Broker(w http.ResponseWriter, r *http.Request) {
 func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 	var policy models.Policy
 	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
+	e := json.Unmarshal([]byte(req), &policy)
 	defer r.Body.Close()
-	policy, e := models.UnmarshalPolicy(req)
+	//policy, e := models.UnmarshalPolicy(req)
 	policy.CreationDate = time.Now()
 	policy.Updated = time.Now()
 	policy.CreationDate = time.Now()

@@ -3,17 +3,37 @@ package models
 type Roles string
 
 const (
-	Customer = "Customer"
+	customer Roles = "Customer"
 )
 
 type PolicyStatus string
 
 const (
-	Init        = "Inizialize"
-	Proposal    = "Proposal"
-	Emit        = "Emit"
-	Sign        = "Sign"
-	Pay         = "Pay"
-	PS          = "Pay&Sign"
-	CompanyEmit = "CompanyEmit"
+	Init        PolicyStatus = "Inizialize"
+	Proposal                 = "Proposal"
+	ToEmit                   = "ToEmit"
+	Emited                   = "Emited"
+	Sign                     = "Sign"
+	Pay                      = "Pay"
+	PS                       = "Pay&Sign"
+	CompanyEmit              = "CompanyEmit"
 )
+
+type PaySplit string
+
+const (
+	Montly PaySplit = "montly"
+	Year   PaySplit = "year"
+)
+
+type PayType string
+
+const (
+	Cc       PayType = "credit card"
+	Sdd      PayType = "sdd"
+	Transfer PayType = "transfer"
+)
+
+func t() {
+
+}

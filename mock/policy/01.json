@@ -1,18 +1,15 @@
 {
-    "id": "id",
-    "idPay": "idSign",
-    "idSign": "idpay",
-    "uid": "uid",
+
     "number": "Number",
     "numberCompany": "NumberCompany",
-    "status ": "Status",
+    "status ": "proposal",
     "statusHistory ": [
         "init"
     ],
     "transactions ": [
         ""
     ],
-    "company": "Global",
+    "company": "global",
     "name": "pmi",
     "startDate": "2022-11-12T17:39:34.8294666+01:00",
     "endDate": "2022-11-12T17:39:34.8294666+01:00",
@@ -28,20 +25,18 @@
     "contractor": {
         "name": "name",
         "type": "type",
-        "cluster": "cluster",
         "surname": "surname",
         "address": "address",
         "postalCode": "postalCode",
         "role": "role",
         "work": "work",
         "workType": "workType",
-        "mail": "mail",
-        "phone": "phone",
+        "mail": "luca.barbieri@wopta.it",
+        "phone": "+393668134257",
         "fiscalCode": "fiscalCode",
         "vatCode": "vatCode",
-        "riskClass": "riskClass",
-        "creationDate": "creationDate",
-        "updatedDate": "updatedDate"
+        "riskClass": "3"
+     
     },
     "statements": [
         {
@@ -114,7 +109,7 @@
                 "costruction": "test",
                 "isHolder": true
             },
-            "isContractor": true,
+            "isContractor": false,
             "guarantees": [
                 {
                     "type": "test",
@@ -138,8 +133,6 @@
                 }
             ]
         }
-    ],
-    "claim": [
-        {}
     ]
+   
 }

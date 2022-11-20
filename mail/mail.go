@@ -54,7 +54,7 @@ func Mail(w http.ResponseWriter, r *http.Request) {
 	lib.EnableCors(&w, r)
 	route := lib.RouteData{
 		Routes: []lib.Route{{
-			Route:   "/v1//send",
+			Route:   "/v1/send",
 			Hendler: Send,
 		},
 		},

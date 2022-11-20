@@ -25,10 +25,12 @@
 		a {
 			border: 0;
 			outline: none;
+			text-decoration: none;
 		}
 
 		a img {
 			border: none;
+			text-decoration: none;
 		}
 
 		table td{
@@ -72,7 +74,16 @@
 		 a {
 			color: white;
 		}
-   
+		.button {
+  background-color: #E50075; /* Green */
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
 	</style>
 </head>
 
@@ -89,40 +100,39 @@
                         </td>
                         <td   colspan="1" style="text-align: right;">
                             <img src="https://storage.googleapis.com/wopta-dev-strapi-bucket/O_White_fb19baa24d/O_White_fb19baa24d.png?w=30"
-							  height=30 alt="Wopta smile" style="height: 30px; -ms-interpolation-mode: bicubic;"></img>
+							  height=28 alt="Wopta smile" style="height: 28px; -ms-interpolation-mode: bicubic;"></img>
                         </td>
                     </tr>
 					<tr bgcolor="#ffffff">
 						<td bgcolor="#ffffff" 
 							style="text-align: left;"
-							colspan="4">
-							<p class="textmedium">
+							colspan="4" class="textmedium">
+						
 							{{.Content}}
-							</p>
+						
 						</td>
 					</tr>
-					<tr bgcolor="#5C595C" style="text-align:left;">
+					<tr bgcolor="#5C595C" style="border-radius: 30% 30% 0px 0px; text-align:center;">
 						<td bgcolor="#5C595C" colspan="4">
 							<a href="https://www.wopta.it">
-								<img src="https://storage.googleapis.com/wopta-dev-strapi-bucket/ARTW_LOGO_RGB_67de5e9659/ARTW_LOGO_RGB_67de5e9659.png" alt="Wopta Logo"
-                             height=50></img></a>
+								<img src="https://storage.googleapis.com/wopta-dev-strapi-bucket/ARTW_LOGO_RGB_67de5e9659/ARTW_LOGO_RGB_67de5e9659.png?imwidth=40" alt="Wopta Logo"
+                             height=30 style="height: 30px;"></img></a>
 						</td>
-						
 					</tr>
-					<tr bgcolor="#5C595C" style="text-align:center;">
-						<td bgcolor="#5C595C" class="textsmall">
-							<a href="mailto:info@wopta.it"></a><img src="https://storage.googleapis.com/wopta-dev-strapi-bucket/mail_white_ac7fbf20d0/mail_white_ac7fbf20d0.png" alt="Wopta Logo"
-                             height=25></img></br>
-							
+					<tr bgcolor="#5C595C" style="border-radius: 30% 30% 0px 0px; text-align:center;">
+						<td bgcolor="#5C595C"  class="textsmall">
+							<img src="https://storage.googleapis.com/wopta-dev-strapi-bucket/mail_white_ac7fbf20d0/mail_white_ac7fbf20d0.png?imwidth=30" alt="Wopta Logo"
+                             height=20  style="height:20px;"></img></br>
+							<a href="mailto:info@wopta.it" style="color: #ffffff;">
 								info@wopta.it</a>
 						</td>
 						
 						<td align="right"  bgcolor="#5C595C"
 										style="text-align: center;">
 										<a href="https://www.facebook.com/Wopta-Assicurazioni-111352414930469/"
-											style="border: 0;outline: none;">
-											<img alt="facebook"
-												src="https://www.wopta.it/_next/static/media/facebook.33fb471f.svg?imwidth=32"
+											style="border: 0;outline: none;text-decoration: none;">
+											<img alt="facebook" 
+												src="https://www.wopta.it/_next/static/media/facebook.33fb471f.svg?imwidth=30"
 												 height="20"
 												style="-ms-interpolation-mode: bicubic;border: none;">
 										</a>
@@ -131,19 +141,26 @@
 										style="text-align: center;">
 										<a href="https://www.linkedin.com/company/wopta-assicurazioni/" style="border: 0;outline: none;">
 											<img  height="20" alt="linkedin"
-												src="https://www.wopta.it/_next/static/media/linkedin.3068b789.svg?imwidth=48"
+												src="https://www.wopta.it/_next/static/media/linkedin.3068b789.svg?imwidth=30"
 												style="-ms-interpolation-mode: bicubic;border: none;">
 										</a>
 									</td>
-									<td align="right"  bgcolor="#5C595C" style="text-align:center;">
+									<td align="right"  bgcolor="#5C595C" style="text-align: center;">
 										<a href="https://www.instagram.com/wopta_assicurazioni/"
 											style="border: 0;outline: none;">
 											<img  height="20" alt="instagram"
-												src="https://www.wopta.it/_next/static/media/instagram.94562a3a.svg?imwidth=48"
+												src="https://www.wopta.it/_next/static/media/instagram.94562a3a.svg?imwidth=30"
 												style="-ms-interpolation-mode: bicubic;border: none;">
 										</a>
 									</td>
 					</tr>
+					<tr bgcolor="#5C595C"  >
+						<td align="left" colspan="4" style="color:white;text-align:center;border: solid 0px #5C595C;">
+			
+							<hr size="1" width="100%" color="#E50075"> 
+						</td>
+						
+		</tr>
 					<tr bgcolor="#5C595C"  >
 									<td align="left" colspan="4" style="color:white;text-align:center;border: solid 0px #5C595C;">
 						
