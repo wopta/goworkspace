@@ -53,12 +53,14 @@ func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 	policy.Updated = time.Now()
 	policy.CreationDate = time.Now()
 	policy.Status = models.Proposal
+	log.Println("GetSequenceByProduct")
 	company, numb := models.GetSequenceByProduct("global")
 	log.Println(string(company))
 	policy.NumberCompany = company
 	policy.Number = numb
-	ref, _ := lib.PutFirestore("policy", policy)
 	log.Println("save")
+	ref, _ := lib.PutFirestore("policy", policy)
+	log.Println("saved")
 	var obj mail.MailRequest
 	obj.From = "noreply@wopta.it"
 	obj.To = []string{policy.Contractor.Mail}
