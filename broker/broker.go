@@ -21,7 +21,7 @@ func init() {
 
 func Broker(w http.ResponseWriter, r *http.Request) {
 
-	log.Println("Callback")
+	log.Println("Broker")
 	lib.EnableCors(&w, r)
 	w.Header().Set("Access-Control-Allow-Methods", "POST")
 	route := lib.RouteData{
@@ -41,9 +41,12 @@ func Broker(w http.ResponseWriter, r *http.Request) {
 
 }
 func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}) {
+	log.Println("Proposal")
 	var policy models.Policy
 	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
+	log.Println(string(req))
 	e := json.Unmarshal([]byte(req), &policy)
+	lib.CheckError(e)
 	defer r.Body.Close()
 	//policy, e := models.UnmarshalPolicy(req)
 	policy.CreationDate = time.Now()
