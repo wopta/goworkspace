@@ -44,7 +44,7 @@ func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 	log.Println("Proposal")
 	var policy models.Policy
 	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
-	log.Println(string(req))
+
 	e := json.Unmarshal([]byte(req), &policy)
 	lib.CheckError(e)
 	defer r.Body.Close()
@@ -54,13 +54,11 @@ func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 	policy.CreationDate = time.Now()
 	policy.Status = models.Proposal
 	company, numb := models.GetSequenceByProduct("global")
+	log.Println(string(company))
 	policy.NumberCompany = company
 	policy.Number = numb
-
-	b, e := json.Marshal(policy)
-	log.Println(string(b))
-	lib.CheckError(e)
 	ref, _ := lib.PutFirestore("policy", policy)
+	log.Println("save")
 	var obj mail.MailRequest
 	obj.From = "noreply@wopta.it"
 	obj.To = []string{policy.Contractor.Mail}
