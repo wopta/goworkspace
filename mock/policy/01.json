@@ -1,14 +1,6 @@
 {
 
-    "number": "Number",
-    "numberCompany": "NumberCompany",
-    "status ": "proposal",
-    "statusHistory ": [
-        "init"
-    ],
-    "transactions ": [
-        ""
-    ],
+ 
     "company": "global",
     "name": "pmi",
     "startDate": "2022-11-12T17:39:34.8294666+01:00",
