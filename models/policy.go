@@ -26,14 +26,15 @@ func ToListData(query *firestore.DocumentIterator) []Policy {
 	var result []Policy
 	for {
 		d, err := query.Next()
+		log.Println("for")
 		if err != nil {
 			if err == iterator.Done {
 				break
 			}
-			var value *Policy
-			e := d.DataTo(value)
+			var value Policy
+			e := d.DataTo(&value)
 			lib.CheckError(e)
-			result = append(result, *value)
+			result = append(result, value)
 
 		}
 
