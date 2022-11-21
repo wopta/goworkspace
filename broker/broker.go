@@ -2,16 +2,20 @@ package broker
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
+	"cloud.google.com/go/firestore"
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	doc "github.com/wopta/goworkspace/document"
 	lib "github.com/wopta/goworkspace/lib"
 	mail "github.com/wopta/goworkspace/mail"
 	models "github.com/wopta/goworkspace/models"
+	"google.golang.org/api/iterator"
 )
 
 func init() {
@@ -54,7 +58,7 @@ func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 	policy.CreationDate = time.Now()
 	policy.Status = models.Proposal
 	log.Println("GetSequenceByProduct")
-	company, numb := models.GetSequenceByProduct("global")
+	company, numb := GetSequenceByProduct("global")
 	log.Println(string(company))
 	policy.NumberCompany = company
 	policy.Number = numb
@@ -66,6 +70,7 @@ func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 	obj.To = []string{policy.Contractor.Mail}
 	obj.Message = `<p>ciao </p> `
 	obj.Subject = "Wopta Proposta e set informantivo"
+	obj.IsHtml = true
 	mail.SendMail(obj)
 	log.Println(ref.ID)
 
@@ -98,4 +103,52 @@ type BrokerResponse struct {
 	EnvelopSignId string `json:"envelopSignId"`
 	LinkGcs       string `json:"linkGcs"`
 	Bytes         string `json:"bytes"`
+}
+
+func ToListData(query *firestore.DocumentIterator) []models.Policy {
+	var result []models.Policy
+	for {
+		d, err := query.Next()
+		log.Println("for")
+		if err != nil {
+			if err == iterator.Done {
+				break
+			}
+			var value models.Policy
+			e := d.DataTo(&value)
+			lib.CheckError(e)
+			result = append(result, value)
+
+		}
+
+	}
+	return result
+}
+func GetSequenceByProduct(name string) (string, int) {
+	var numberCompany string
+	var number int
+	log.Println("GetSequenceByProduct")
+	rn, e := lib.OrderWhereLimitFirestoreErr("policy", "", "company", "==", name, firestore.Desc, 1)
+	log.Println("RN")
+
+	if e != nil {
+		log.Println("e nil")
+		numberCompany = "49999999"
+	} else {
+		log.Println("else")
+		log.Println(rn)
+		policy := ToListData(rn)
+		intNumberCompany, e := strconv.Atoi(policy[1].NumberCompany)
+		lib.CheckError(e)
+		numberCompany = fmt.Sprint(intNumberCompany + 1)
+		number = policy[1].Number + 1
+	}
+	r, e := lib.OrderLimitFirestoreErr("policy", "number", firestore.Desc, 1)
+	if e != nil {
+		number = 1
+	} else {
+		policy := ToListData(r)
+		number = policy[1].Number + 1
+	}
+	return numberCompany, number
 }

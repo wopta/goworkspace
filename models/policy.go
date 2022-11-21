@@ -2,14 +2,10 @@ package models
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
-	"strconv"
 	"time"
 
-	"cloud.google.com/go/firestore"
 	lib "github.com/wopta/goworkspace/lib"
-	"google.golang.org/api/iterator"
 )
 
 func UnmarshalPolicy(data []byte) (Policy, error) {
@@ -21,52 +17,6 @@ func UnmarshalPolicy(data []byte) (Policy, error) {
 func (r *Policy) Marshal() ([]byte, error) {
 
 	return json.Marshal(r)
-}
-func ToListData(query *firestore.DocumentIterator) []Policy {
-	var result []Policy
-	for {
-		d, err := query.Next()
-		log.Println("for")
-		if err != nil {
-			if err == iterator.Done {
-				break
-			}
-			var value Policy
-			e := d.DataTo(&value)
-			lib.CheckError(e)
-			result = append(result, value)
-
-		}
-
-	}
-	return result
-}
-func GetSequenceByProduct(name string) (string, int) {
-	var numberCompany string
-	var number int
-	log.Println("GetSequenceByProduct")
-	rn, e := lib.OrderWhereLimitFirestoreErr("policy", "", "company", "==", name, firestore.Desc, 1)
-	log.Println("RN")
-	log.Println(rn)
-	if e != nil {
-		log.Println("e nil")
-		numberCompany = "49999999"
-	} else {
-		log.Println("else")
-		policy := ToListData(rn)
-		intNumberCompany, e := strconv.Atoi(policy[1].NumberCompany)
-		lib.CheckError(e)
-		numberCompany = fmt.Sprint(intNumberCompany + 1)
-		number = policy[1].Number + 1
-	}
-	r, e := lib.OrderLimitFirestoreErr("policy", "number", firestore.Desc, 1)
-	if e != nil {
-		number = 1
-	} else {
-		policy := ToListData(r)
-		number = policy[1].Number + 1
-	}
-	return numberCompany, number
 }
 
 type Policy struct {
