@@ -55,8 +55,8 @@ func GetSequenceByProduct(name string) (string, int) {
 		number = policy[1].Number + 1
 	}
 	r, e := lib.OrderLimitFirestoreErr("policy", "number", firestore.Desc, 1)
-	if e != nil {
-		number = 0
+	if e == nil {
+		number = 1
 	} else {
 		policy := ToListData(r)
 		number = policy[1].Number + 1
