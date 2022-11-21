@@ -116,6 +116,7 @@ func ToListData(query *firestore.DocumentIterator) []models.Policy {
 			}
 			var value models.Policy
 			e := d.DataTo(&value)
+			log.Println("todata")
 			lib.CheckError(e)
 			result = append(result, value)
 
