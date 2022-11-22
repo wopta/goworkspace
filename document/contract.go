@@ -28,7 +28,7 @@ func Contract(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 	return resp, respObj
 }
 
-func ContractObj(data model.Policy) (string, interface{}) {
+func ContractObj(data model.Policy) (string, DodumentResponse) {
 	skin, _, textBold, _, _ := getVar()
 	log.Println(textBold)
 	log.Println("Document 1")
@@ -261,7 +261,7 @@ func ContractObj(data model.Policy) (string, interface{}) {
 	log.Println("Document 8")
 	//m.Output()
 	var resp []byte
-	var respObj *DodumentResponse
+	var respObj DodumentResponse
 	if os.Getenv("env") == "local" {
 		err := m.OutputFileAndClose("document/contract.pdf")
 		lib.CheckError(err)
@@ -278,7 +278,7 @@ func ContractObj(data model.Policy) (string, interface{}) {
 		log.Println(result)
 		data.DocumentName = filename
 		log.Println(filename)
-		respObj = &DodumentResponse{
+		respObj = DodumentResponse{
 			LinkGcs: filename,
 			Bytes:   base64.StdEncoding.EncodeToString(out.Bytes()),
 		}

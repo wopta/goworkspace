@@ -90,7 +90,7 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 	docsnap := lib.GetFirestore("policy", string(result["uid"]))
 	docsnap.DataTo(&policy)
 	_, p := doc.ContractObj(policy)
-	policy.DocumentName = p.(doc.DodumentResponse).LinkGcs
+	policy.DocumentName = p.LinkGcs
 	doc.NamirialOtp(policy)
 	return "", nil
 }
