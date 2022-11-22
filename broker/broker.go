@@ -112,7 +112,6 @@ func ToListData(query *firestore.DocumentIterator) []models.Policy {
 		log.Println("for")
 		if err != nil {
 			log.Println("error")
-			lib.CheckError(err)
 
 			return nil
 		}
