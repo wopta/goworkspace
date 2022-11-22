@@ -112,8 +112,6 @@ func ToListData(query *firestore.DocumentIterator) []models.Policy {
 		log.Println("for")
 		if err != nil {
 			log.Println("error")
-
-			return nil
 		}
 		if err != nil {
 			if err == iterator.Done {
@@ -122,6 +120,7 @@ func ToListData(query *firestore.DocumentIterator) []models.Policy {
 			}
 
 		}
+
 		var value models.Policy
 
 		e := d.DataTo(&value)
@@ -129,6 +128,7 @@ func ToListData(query *firestore.DocumentIterator) []models.Policy {
 		log.Println("todata")
 		lib.CheckError(e)
 		result = append(result, value)
+
 		log.Println(len(result))
 	}
 	return result
