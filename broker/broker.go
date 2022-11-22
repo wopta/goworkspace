@@ -111,8 +111,9 @@ func ToListData(query *firestore.DocumentIterator) []models.Policy {
 		d, err := query.Next()
 		log.Println("for")
 		if err != nil {
-			lib.CheckError(err)
 			log.Println("error")
+			lib.CheckError(err)
+
 			return nil
 		}
 		if err != nil {
@@ -121,7 +122,7 @@ func ToListData(query *firestore.DocumentIterator) []models.Policy {
 				break
 			}
 			var value models.Policy
-			log.Println(d.Data())
+
 			e := d.DataTo(&value)
 
 			log.Println("todata")
@@ -137,7 +138,7 @@ func GetSequenceByProduct(name string) (string, int) {
 	var numberCompany string
 	var number int
 	log.Println("GetSequenceByProduct")
-	rn, e := lib.OrderWhereLimitFirestoreErr("policy", "", "company", "==", name, firestore.Desc, 1)
+	rn, e := lib.OrderWhereLimitFirestoreErr("policy", "company", "numberCompany", "==", name, firestore.Desc, 1)
 	log.Println("RN")
 	if e != nil {
 		log.Println("e nil")
