@@ -4,6 +4,7 @@ import (
 	"github.com/johnfercher/maroto/pkg/consts"
 	"github.com/johnfercher/maroto/pkg/pdf"
 	"github.com/johnfercher/maroto/pkg/props"
+	"github.com/wopta/goworkspace/models"
 	//model "github.com/wopta/goworkspace/models"
 )
 
@@ -317,4 +318,132 @@ func (s Skin) AboutUs(m pdf.Maroto, title string, sub []Kv) pdf.Maroto {
 	}
 
 	return m
+}
+func (s Skin) GetPersona(data models.Policy, m pdf.Maroto) pdf.Maroto {
+	linePropMagenta := props.Line{
+		Color: s.LineColor,
+		Style: consts.Solid,
+		Width: 0.2,
+	}
+	m.Row(10, func() {
+		m.Col(12, func() {
+			m.Text("La tua assicurazione è operante per il seguente Assicurato e Garanzie ", props.Text{
+				Color: s.LineColor,
+				Top:   5,
+				Style: consts.Bold,
+				Align: consts.Left,
+				Size:  s.SizeTitle,
+			})
+		})
+
+	})
+	m.Line(1.0, linePropMagenta)
+	customer := []Kv{
+		{
+			Key:   "Assicurato: ",
+			Value: "1"},
+		{
+			Key:   "Cognome e Nome: ",
+			Value: data.Contractor.Name + " " + data.Contractor.Surname},
+		{
+			Key:   "Codice Fiscale: ",
+			Value: data.Contractor.FiscalCode},
+		{
+			Key:   "Professione: ",
+			Value: data.Contractor.Work},
+		{
+			Key:   "Tipo professione: ",
+			Value: data.Contractor.WorkType},
+		{
+			Key:   "Classe rischio: ",
+			Value: data.Contractor.RiskClass},
+		{
+			Key:   "Forma di copertura: ",
+			Value: data.CoverageType},
+	}
+	m = s.Customer(m, customer)
+	return m
+
+}
+func (s Skin) GetPmi(data models.Policy, m pdf.Maroto) pdf.Maroto {
+
+	prop := props.Text{
+		Top:   1,
+		Size:  s.SizeTitle,
+		Style: consts.Bold,
+		Align: consts.Left,
+		Color: s.LineColor,
+	}
+	bold := props.Text{
+		Top:   1,
+		Size:  s.Size,
+		Style: consts.Bold,
+		Align: consts.Left,
+		Color: s.TextColor,
+	}
+	normal := props.Text{
+		Top:   1,
+		Size:  s.Size,
+		Style: consts.Bold,
+		Align: consts.Left,
+		Color: s.TextColor,
+	}
+
+	linePropMagenta := props.Line{
+		Color: s.LineColor,
+		Style: consts.Solid,
+		Width: 0.2,
+	}
+	m.Row(20, func() {
+		m.Col(8, func() {
+			m.Text("L’assicurazione è prestata per", prop)
+		})
+	})
+	m.Line(1.0, linePropMagenta)
+	m.Row(20, func() {
+		m.Col(2, func() {
+			m.Text("Attività", bold)
+
+		})
+		m.Col(8, func() {
+			m.Text(`title title`, normal)
+			m.Text(`title title`, props.Text{
+				Top:         6,
+				Style:       consts.Italic,
+				Align:       consts.Left,
+				Color:       s.TextColor,
+				Size:        s.Size,
+				Extrapolate: true,
+			})
+
+		})
+
+	})
+	m.Line(1.0, linePropMagenta)
+	m.Row(20, func() {
+		m.Col(2, func() {
+			m.Text("Sede 1", bold)
+
+		})
+		m.Col(8, func() {
+			m.Text("title", normal)
+
+		})
+
+	})
+
+	m.Line(1.0, linePropMagenta)
+	m.Row(20, func() {
+		m.Col(2, func() {
+			m.Text("Sede 1", bold)
+
+		})
+		m.Col(8, func() {
+			m.Text("title", normal)
+
+		})
+
+	})
+	return m
+
 }

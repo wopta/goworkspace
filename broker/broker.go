@@ -138,7 +138,6 @@ func GetSequenceByProduct(name string) (string, int) {
 	log.Println("GetSequenceByProduct")
 	rn, e := lib.OrderWhereLimitFirestoreErr("policy", "", "company", "==", name, firestore.Desc, 1)
 	log.Println("RN")
-
 	if e != nil {
 		log.Println("e nil")
 		numberCompany = "49999999"

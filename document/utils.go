@@ -34,7 +34,8 @@ func (s Skin) initDefault() pdf.Maroto {
 	m.SetDefaultFontFamily("Montserrat")
 	return m
 }
-func getVar() (Skin, props.Line, props.Text) {
+func getVar() (Skin, props.Line, props.Text, props.Text, props.Text) {
+
 	skin := Skin{
 		LineColor: color.Color{
 			Red:   229,
@@ -55,7 +56,13 @@ func getVar() (Skin, props.Line, props.Text) {
 		DynamicHeightMin:  90,
 		DynamicHeightDiv:  20.0,
 	}
-
+	magenta := props.Text{
+		Top:   1,
+		Size:  skin.SizeTitle,
+		Style: consts.Bold,
+		Align: consts.Left,
+		Color: skin.LineColor,
+	}
 	linePropMagenta := props.Line{
 		Color: skin.LineColor,
 		Style: consts.Solid,
@@ -67,5 +74,12 @@ func getVar() (Skin, props.Line, props.Text) {
 		Style: consts.Bold,
 		Align: consts.Center,
 	}
-	return skin, linePropMagenta, textBold
+	normal := props.Text{
+		Top:   1,
+		Size:  skin.Size,
+		Style: consts.Bold,
+		Align: consts.Left,
+		Color: skin.TextColor,
+	}
+	return skin, linePropMagenta, textBold, normal, magenta
 }

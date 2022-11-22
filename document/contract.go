@@ -29,7 +29,7 @@ func Contract(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 }
 
 func ContractObj(data model.Policy) (string, interface{}) {
-	skin, linePropMagenta, textBold := getVar()
+	skin, _, textBold, _, _ := getVar()
 	log.Println(textBold)
 	log.Println("Document 1")
 	m := skin.initDefault()
@@ -92,7 +92,7 @@ func ContractObj(data model.Policy) (string, interface{}) {
 					Style:       consts.Bold,
 					Align:       consts.Left,
 					Color:       skin.LineColor,
-					Size:        skin.SizeTitle,
+					Size:        skin.Size - 1,
 					Extrapolate: false,
 				})
 			})
@@ -108,45 +108,15 @@ func ContractObj(data model.Policy) (string, interface{}) {
 	})
 	log.Println("Document 3")
 	m = skin.Space(m, 10.0)
-	m.Row(10, func() {
-		m.Col(12, func() {
-			m.Text("La tua assicurazione è operante per il seguente Assicurato e Garanzie ", props.Text{
-				Color: skin.LineColor,
-				Top:   5,
-				Style: consts.Bold,
-				Align: consts.Left,
-				Size:  skin.SizeTitle,
-			})
-		})
-
-	})
-	m.Line(1.0, linePropMagenta)
 
 	log.Println("Document 4")
-	customer := []Kv{
-		{
-			Key:   "Assicurato: ",
-			Value: "1"},
-		{
-			Key:   "Cognome e Nome: ",
-			Value: data.Contractor.Name + " " + data.Contractor.Surname},
-		{
-			Key:   "Codice Fiscale: ",
-			Value: data.Contractor.FiscalCode},
-		{
-			Key:   "Professione: ",
-			Value: data.Contractor.Work},
-		{
-			Key:   "Tipo professione: ",
-			Value: data.Contractor.WorkType},
-		{
-			Key:   "Classe rischio: ",
-			Value: data.Contractor.RiskClass},
-		{
-			Key:   "Forma di copertura: ",
-			Value: data.CoverageType},
+	if data.Name == "persona" {
+		m = skin.GetPersona(data, m)
 	}
-	m = skin.Customer(m, customer)
+
+	if data.Name == "pmi" {
+		m = skin.GetPmi(data, m)
+	}
 	m = skin.Space(m, 10.0)
 	var table [][]string
 	h := []string{"Garanzie ", "Somma assicurata ", "Opzioni / Dettagli ", "Premio "}

@@ -110,7 +110,7 @@ func GetDefaultPolicy() (string, interface{}) {
 				BuildingYear:     "test",
 				SquareMeters:     340,
 				IsAllarm:         true,
-				Floor:            4,
+				Floor:            "",
 				Costruction:      "test",
 				IsHolder:         true},
 			Person: User{},

@@ -22,7 +22,7 @@ type Building struct {
 	BuildingYear     string `firestore:"buildingYear,omitempty" json:"buildingYear,omitempty"`
 	Employer         int64  `firestore:"employer,omitempty" json:"employer,omitempty"`
 	IsAllarm         bool   `firestore:"isAllarm,omitempty" json:"isAllarm,omitempty"`
-	Floor            int64  `firestore:"floor,omitempty" json:"floor,omitempty"`
+	Floor            string `firestore:"floor,omitempty" json:"floor,omitempty"`
 	Costruction      string `firestore:"costruction,omitempty" json:"costruction,omitempty"`
 	IsHolder         bool   `firestore:"isHolder,omitempty" json:"isHolder,omitempty"`
 }
