@@ -151,7 +151,7 @@ func GetSequenceByProduct(name string) (string, int) {
 		intNumberCompany, e := strconv.Atoi(policy[0].NumberCompany)
 		lib.CheckError(e)
 		numberCompany = fmt.Sprint(intNumberCompany + 1)
-		number = policy[1].Number + 1
+		number = policy[0].Number + 1
 	}
 	r, e := lib.OrderLimitFirestoreErr("policy", "number", firestore.Desc, 1)
 	if e != nil {
