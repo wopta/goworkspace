@@ -57,7 +57,7 @@ type Policy struct {
 }
 type Statement struct {
 	Question string
-	Answer   string
+	Answer   bool
 }
 
 func GetDefaultPolicy() (string, interface{}) {

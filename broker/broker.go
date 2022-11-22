@@ -58,10 +58,10 @@ func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 	policy.CreationDate = time.Now()
 	policy.Status = models.Proposal
 	log.Println("GetSequenceByProduct")
-	company, numb := GetSequenceByProduct("global")
-	log.Println(string(company))
-	policy.NumberCompany = company
-	policy.Number = numb
+	//company, numb := GetSequenceByProduct("global")
+	//log.Println(string(company))
+	//policy.NumberCompany = company
+	//policy.Number = numb
 	log.Println("save")
 	ref, _ := lib.PutFirestore("policy", policy)
 	log.Println("saved")
