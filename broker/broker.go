@@ -158,7 +158,7 @@ func GetSequenceByProduct(name string) (string, int) {
 		number = 1
 	} else {
 		policy := ToListData(r)
-		number = policy[1].Number + 1
+		number = policy[0].Number + 1
 	}
 	return numberCompany, number
 }
