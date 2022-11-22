@@ -129,7 +129,7 @@ func ToListData(query *firestore.DocumentIterator) []models.Policy {
 		log.Println("todata")
 		lib.CheckError(e)
 		result = append(result, value)
-
+		log.Println(len(result))
 	}
 	return result
 }
@@ -147,6 +147,7 @@ func GetSequenceByProduct(name string) (string, int) {
 		log.Println(rn)
 		policy := ToListData(rn)
 		log.Println("policy use")
+		log.Println(len(policy))
 		intNumberCompany, e := strconv.Atoi(policy[0].NumberCompany)
 		lib.CheckError(e)
 		numberCompany = fmt.Sprint(intNumberCompany + 1)
