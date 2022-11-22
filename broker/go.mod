@@ -9,8 +9,8 @@ require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
 	github.com/hyperjumptech/grule-rule-engine v1.11.0 // indirect
 	github.com/wopta/goworkspace/document v0.0.0-20221119181257-41328d67d709 // indirect
-	github.com/wopta/goworkspace/lib v0.0.0-20221121091731-b4b819635b9c
+	github.com/wopta/goworkspace/lib v0.0.0-20221122094244-96e541ee7842
 	github.com/wopta/goworkspace/mail v0.0.0-20221119181257-41328d67d709 // indirect
-	github.com/wopta/goworkspace/models v0.0.0-20221121105504-7a1ac961f3ba // indirect
+	github.com/wopta/goworkspace/models v0.0.0-20221122094244-96e541ee7842 // indirect
 
 )
