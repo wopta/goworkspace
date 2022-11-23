@@ -96,8 +96,6 @@ func sendEnvelop(id string, data model.Policy) <-chan string {
 	go func() {
 		defer close(r)
 		log.Println("Send")
-		//var b bytes.Buffer
-		//fileReader := bytes.NewReader([]byte())
 		var urlstring = os.Getenv("ESIGN_BASEURL") + "v4.0/envelope/send"
 		client := &http.Client{
 			Timeout: time.Second * 10,

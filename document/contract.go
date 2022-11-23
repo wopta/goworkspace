@@ -269,10 +269,10 @@ func ContractObj(data model.Policy) (string, DodumentResponse) {
 		out, err := m.Output()
 		lib.CheckError(err)
 		now := time.Now() // current local time
-		layout := "2006-01-02"
-		t, _ := time.Parse(layout, now.String())
-
-		filename := "temp/" + data.Contractor.Name + "_" + data.Contractor.Surname + "_" + t.Format("02-Jan-2006") + "_contract.pdf"
+		//layout := "2006-01-02"
+		//t, _ := time.Parse(layout, now.String())
+		timestamp := strconv.FormatInt(now.Unix(), 10)
+		filename := "temp/" + data.Contractor.Name + "_" + data.Contractor.Surname + "_" + timestamp + "_contract.pdf"
 		result := lib.PutToStorage("function-data", filename, out.Bytes())
 		lib.CheckError(err)
 		log.Println(result)
