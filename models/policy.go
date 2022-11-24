@@ -52,7 +52,7 @@ type Policy struct {
 	DocumentName  string       `firestore:"documentName,omitempty" json:"documentName,omitempty"`
 	Statements    []Statement  `firestore:"statements,omitempty" json:"statements,omitempty"`
 	Attachments   []Attachment `firestore:"attachments,omitempty" json:"attachments,omitempty"`
-	Assets        []Asset      `firestore:"guarantees,omitempty" json:"guarantees,omitempty"`
+	Assets        []Asset      `firestore:"assets,omitempty" json:"assets,omitempty"`
 	Claim         []Claim      `firestore:"claim ,omitempty" json:"claim,omitempty"`
 }
 type Statement struct {

@@ -81,7 +81,7 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 		result map[string]string
 	)
 
-	log.Println("PmiAllrisk")
+	log.Println("Emit")
 	request := lib.ErrorByte(ioutil.ReadAll(r.Body))
 	// Unmarshal or Decode the JSON to the interface.s
 	json.Unmarshal([]byte(request), &result)

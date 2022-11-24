@@ -30,6 +30,12 @@ func SignNamirial(w http.ResponseWriter, r *http.Request) (string, interface{}) 
 	return NamirialOtp(data)
 
 }
+
+type NamirialOtpResponse struct {
+	EnvelopeId string `json:"envelopeId"`
+	Url        string `json:"url"`
+}
+
 func NamirialOtp(data model.Policy) (string, interface{}) {
 
 	file := lib.GetFromStorage("function-data", data.DocumentName, "")
@@ -40,8 +46,12 @@ func NamirialOtp(data model.Policy) (string, interface{}) {
 	//prepareEnvelop(SspFileId)
 	id := <-sendEnvelop(SspFileId, data)
 	log.Println("sendEnvelop:", id)
-	GetEnvelop(id)
-	return "{}", id
+	url := <-GetEnvelop(id)
+	resp := NamirialOtpResponse{
+		EnvelopeId: id,
+		Url:        url,
+	}
+	return "{}", resp
 }
 func Autorization() {
 	var urlstring = os.Getenv("ESIGN_BASEURL") + "v4/authorization"
@@ -145,12 +155,13 @@ func GetEnvelop(id string) <-chan string {
 		if res != nil {
 			body, err := ioutil.ReadAll(res.Body)
 			lib.CheckError(err)
-			var result map[string]string
+			var result GetEvelopResponse
 			json.Unmarshal([]byte(body), &result)
 			res.Body.Close()
 
 			log.Println("body:", string(body))
-			r <- result["SspFileId"]
+
+			r <- result.Bulks[0].Steps[0].WorkstepRedirectionURL
 
 		}
 	}()
@@ -754,4 +765,52 @@ func getSendTemplate(id string) string {
 		  "MetaDataXml": "string"
 		}
 	  }`
+}
+
+func UnmarshalWelcome(data []byte) (GetEvelopResponse, error) {
+	var r GetEvelopResponse
+	err := json.Unmarshal(data, &r)
+	return r, err
+}
+
+func (r *GetEvelopResponse) Marshal() ([]byte, error) {
+	return json.Marshal(r)
+}
+
+type GetEvelopResponse struct {
+	Status                          string `json:"Status"`
+	SendDate                        string `json:"SendDate"`
+	ExpirationDate                  string `json:"ExpirationDate"`
+	ValidityFromCreationInDays      int64  `json:"ValidityFromCreationInDays"`
+	ExpirationInSecondsAfterSending int64  `json:"ExpirationInSecondsAfterSending"`
+	Bulks                           []Bulk `json:"Bulks"`
+
+	ID   string `json:"Id"`
+	Bulk string `json:"Bulk"`
+
+	LockFormFieldsAtEnvelopeFinish bool `json:"LockFormFieldsAtEnvelopeFinish"`
+}
+
+type Bulk struct {
+	Status            string        `json:"Status"`
+	Email             string        `json:"Email"`
+	LogDocumentID     string        `json:"LogDocumentId"`
+	FinishedDocuments []interface{} `json:"FinishedDocuments"`
+	Steps             []Step        `json:"Steps"`
+}
+
+type Step struct {
+	ID                          string `json:"Id"`
+	FirstName                   string `json:"FirstName"`
+	LastName                    string `json:"LastName"`
+	OrderIndex                  int64  `json:"OrderIndex"`
+	Email                       string `json:"Email"`
+	LanguageCode                string `json:"LanguageCode"`
+	Status                      string `json:"Status"`
+	StatusReason                string `json:"StatusReason"`
+	RecipientType               string `json:"RecipientType"`
+	WorkstepRedirectionURL      string `json:"WorkstepRedirectionUrl"`
+	AllowAccessFinishedWorkstep bool   `json:"AllowAccessFinishedWorkstep"`
+
+	IsParallel bool `json:"IsParallel"`
 }
