@@ -36,7 +36,7 @@ type NamirialOtpResponse struct {
 	Url        string `json:"url"`
 }
 
-func NamirialOtp(data model.Policy) (string, interface{}) {
+func NamirialOtp(data model.Policy) (string, NamirialOtpResponse) {
 
 	file := lib.GetFromStorage("function-data", data.DocumentName, "")
 	var urlstring = os.Getenv("ESIGN_BASEURL") + "v4/sspfile/uploadtemporary"

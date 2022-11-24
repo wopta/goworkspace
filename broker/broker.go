@@ -92,8 +92,9 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 	p := <-doc.ContractObj(policy)
 	log.Println(p.LinkGcs)
 	policy.DocumentName = p.LinkGcs
-	doc.NamirialOtp(policy)
-	return "", nil
+	_, res := doc.NamirialOtp(policy)
+	policy.IdSign = res.EnvelopeId
+	return "", res
 }
 func GetNumberCompany(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 
