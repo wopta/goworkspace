@@ -94,6 +94,7 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 	policy.DocumentName = p.LinkGcs
 	_, res := doc.NamirialOtp(policy)
 	policy.IdSign = res.EnvelopeId
+	lib.SetFirestore("policy", result["uid"], policy)
 	return "", res
 }
 func GetNumberCompany(w http.ResponseWriter, r *http.Request) (string, interface{}) {
