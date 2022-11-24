@@ -8,9 +8,9 @@ require (
 	firebase.google.com/go/v4 v4.8.0 // indirect
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
 	github.com/hyperjumptech/grule-rule-engine v1.11.0 // indirect
-	github.com/wopta/goworkspace/document v0.0.0-20221124102734-0612d015dec7 // indirect
-	github.com/wopta/goworkspace/lib v0.0.0-20221124102734-0612d015dec7
-	github.com/wopta/goworkspace/mail v0.0.0-20221124102734-0612d015dec7 // indirect
-	github.com/wopta/goworkspace/models v0.0.0-20221124102734-0612d015dec7 // indirect
+	github.com/wopta/goworkspace/document v0.0.0-20221124105315-492e4725dd68 // indirect
+	github.com/wopta/goworkspace/lib v0.0.0-20221124105315-492e4725dd68
+	github.com/wopta/goworkspace/mail v0.0.0-20221124105315-492e4725dd68 // indirect
+	github.com/wopta/goworkspace/models v0.0.0-20221124105315-492e4725dd68 // indirect
 
 )
