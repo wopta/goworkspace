@@ -56,8 +56,8 @@ type Policy struct {
 	Claim         []Claim      `firestore:"claim ,omitempty" json:"claim,omitempty"`
 }
 type Statement struct {
-	Question string
-	Answer   bool
+	Question string `firestore:"question ,omitempty" json:"question,omitempty"`
+	Answer   bool   `firestore:"answer ,omitempty" json:"answer,omitempty"`
 }
 
 func GetDefaultPolicy() (string, interface{}) {
