@@ -83,7 +83,7 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 
 	log.Println("PmiAllrisk")
 	request := lib.ErrorByte(ioutil.ReadAll(r.Body))
-	// Unmarshal or Decode the JSON to the interface.
+	// Unmarshal or Decode the JSON to the interface.s
 	json.Unmarshal([]byte(request), &result)
 	log.Println(result["uid"])
 	var policy models.Policy
