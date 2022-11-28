@@ -21,8 +21,8 @@ func (r *Policy) Marshal() ([]byte, error) {
 
 type Policy struct {
 	ID            string       `firestore:"id,omitempty" json:"id,omitempty"`
-	IdSign        string       `firestore:"idPay,omitempty" json:"idPay,omitempty"`
-	IdPay         string       `firestore:"idSign,omitempty" json:"idSign,omitempty"`
+	IdSign        string       `firestore:"idSign,omitempty" json:"idSign,omitempty"`
+	IdPay         string       `firestore:"idPay,omitempty" json:"idPay,omitempty"`
 	Uid           string       `firestore:"uid,omitempty" json:"uid,omitempty"`
 	ProductUid    string       `firestore:"productUid,omitempty" json:"productUid,omitempty"`
 	Number        int          `firestore:"number,omitempty" json:"number,omitempty"`

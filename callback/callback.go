@@ -1,5 +1,15 @@
-package broker
+package callback
 
+/**
+
+workstepFinished : when the workstep was finished
+workstepRejected : when the workstep was rejected
+workstepDelegated : whe the workstep was delegated
+workstepOpened : when the workstep was opened
+sendSignNotification : when the sign notification was sent
+envelopeExpired : when the envelope was expired
+workstepDelegatedSenderActionRequired : when an action from the sender is required because of the delegation
+*/
 import (
 	"log"
 	"net/http"
@@ -34,21 +44,6 @@ func Callback(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func Sign(w http.ResponseWriter, r *http.Request) (string, interface{}) {
-	log.Println("Sign")
-	log.Println("GET params were:", r.URL.Query())
-
-	envelope := r.URL.Query().Get("envelope")
-	action := r.URL.Query().Get("action")
-	log.Println(action)
-	log.Println(envelope)
-	if envelope != "" {
-		// ... process it, will be the first (only) if multiple were given
-		// note: if they pass in like ?param1=&param2= param1 will also be "" :|
-	}
-
-	return "", nil
-}
 func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 	return "", nil
 }

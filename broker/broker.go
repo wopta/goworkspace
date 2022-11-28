@@ -83,7 +83,6 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 
 	log.Println("Emit")
 	request := lib.ErrorByte(ioutil.ReadAll(r.Body))
-	// Unmarshal or Decode the JSON to the interface.s
 	json.Unmarshal([]byte(request), &result)
 	log.Println(result["uid"])
 	var policy models.Policy
@@ -95,7 +94,9 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 	_, res := doc.NamirialOtp(policy)
 	policy.IdSign = res.EnvelopeId
 	lib.SetFirestore("policy", result["uid"], policy)
-	return "", res
+	b, e := json.Marshal(res)
+	lib.CheckError(e)
+	return string(b), res
 }
 func GetNumberCompany(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 
