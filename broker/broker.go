@@ -146,13 +146,13 @@ func GetSequenceByProduct(name string) (string, int) {
 	log.Println("RN")
 	policy := ToListData(rn)
 	if len(policy) == 0 {
-		log.Println("e nil")
+		log.Println("len(policy) == 0")
 		numberCompany = "49999999"
 	} else {
 		log.Println("else")
 		log.Println(rn)
 		policy := ToListData(rn)
-		log.Println("policy use")
+		log.Println("policy use company")
 		log.Println(len(policy))
 		intNumberCompany, e := strconv.Atoi(policy[0].NumberCompany)
 		lib.CheckError(e)
@@ -162,8 +162,10 @@ func GetSequenceByProduct(name string) (string, int) {
 	r, e := lib.OrderLimitFirestoreErr("policy", "number", firestore.Desc, 1)
 	lib.CheckError(e)
 	if len(policy) == 0 {
+		log.Println("len(policy) == 0")
 		number = 1
 	} else {
+		log.Println("policy use number")
 		policy := ToListData(r)
 		number = policy[0].Number + 1
 	}
