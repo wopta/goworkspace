@@ -161,13 +161,14 @@ func GetSequenceByProduct(name string) (string, int) {
 	}
 	r, e := lib.OrderLimitFirestoreErr("policy", "number", firestore.Desc, 1)
 	lib.CheckError(e)
-	if len(policy) == 0 {
+	policyCompany := ToListData(r)
+	if len(policyCompany) == 0 {
 		log.Println("len(policy) == 0")
 		number = 1
 	} else {
 		log.Println("policy use number")
-		policy := ToListData(r)
-		number = policy[0].Number + 1
+
+		number = policyCompany[0].Number + 1
 	}
 	return numberCompany, number
 }
