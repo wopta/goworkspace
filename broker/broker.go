@@ -151,7 +151,6 @@ func GetSequenceByProduct(name string) (string, int) {
 	} else {
 		log.Println("else")
 		log.Println(rn)
-		policy := ToListData(rn)
 		log.Println("policy use company")
 		log.Println(len(policy))
 		intNumberCompany, e := strconv.Atoi(policy[0].NumberCompany)
