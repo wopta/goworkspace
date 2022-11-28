@@ -1,4 +1,4 @@
-rem go get ./... go run cmd/maim.go
+rem go get ./... go run cmd/main.go
 rem go mod tidy
 set FUNCTION_TARGET=Document
 set FUNCTION_TARGET=AppcheckProxy

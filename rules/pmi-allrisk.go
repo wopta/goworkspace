@@ -70,7 +70,7 @@ func PmiAllrisk(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 		"rcp2008":"` + strings.ToUpper(fil.Elem(0, 22).String()) + `",
 		"damageTheft":"` + strings.ToUpper(fil.Elem(0, 23).String()) + `",
 		"damageThing":"` + strings.ToUpper(fil.Elem(0, 24).String()) + `",
-		"rcCostruction":"` + strings.ToUpper(fil.Elem(0, 26).String()) + `",
+		"rcCostruction":"` + strings.ToUpper(fil.Elem(0, 25).String()) + `",
 		"eletronic":"` + strings.ToUpper(fil.Elem(0, 27).String()) + `",
 		"machineFaliure":"` + strings.ToUpper(fil.Elem(0, 28).String()) + `"}`)
 	} else {
