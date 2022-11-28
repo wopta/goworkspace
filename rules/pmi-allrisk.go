@@ -218,6 +218,7 @@ func initCoverage() map[string]*Coverage {
 		TypeOfSumInsured:           "firstLoss",
 		Deductible:                 "0",
 		Tax:                        22.25,
+		Taxes:                      []Tax{{Tax: 22.25, Percentage: 40.0}, {Tax: 21.25, Percentage: 60.0}},
 		SumInsuredLimitOfIndemnity: 0,
 		IsBase:                     false,
 		IsYuor:                     false,

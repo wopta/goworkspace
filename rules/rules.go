@@ -42,6 +42,7 @@ type Coverage struct {
 	Description                string
 	Deductible                 string
 	Tax                        float64
+	Taxes                      []Tax
 	SumInsuredLimitOfIndemnity float64
 	Price                      float64
 	Value                      *CoverageValue
@@ -62,7 +63,12 @@ type CoverageValue struct {
 	SumInsuredLimitOfIndemnity float64
 	SelfInsurance              string
 	Tax                        float64
+	Percentage                 float64
 	PremiumNet                 float64
 	PremiumTaxAmount           float64
 	PremiumGross               float64
+}
+type Tax struct {
+	Tax        float64
+	Percentage float64
 }

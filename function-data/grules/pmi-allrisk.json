@@ -51,6 +51,7 @@
         "salience": 97,
         "when": " data.rct ==\"X\" && in.revenue <= 75000 ",
         "then": [
+            " out[\"third-party-liability-construction-company\"].Deductible = \"1500\"",
             " out[\"machinery-breakdown\"].Deductible = \"1500\"",
             " out[\"third-party-liability\"].Deductible = \"500\"",
             "out[\"employers-liability\"].Deductible =\"2600\"",
@@ -80,7 +81,7 @@
             "out[\"power-surge\"].Deductible = \"500\"",
             "out[\"water-damage\"].Deductible = \"500\"",
             "out[\"third-party-recourse\"].Deductible = \"500\"",
-            "out[\"content\"].Deductible = \"0\"",
+            "out[\"content\"].Deductible = \"500\"",
             "out[\"valuables\"].Deductible = \"500\"",
             "out[\"theft\"].Deductible = \"500\"",
             " Retract(\"RctRevenue1\")"
@@ -92,6 +93,7 @@
         "salience": 96,
         "when": " data.rct ==\"X\" && in.revenue > 75000 && in.revenue < 150000 ",
         "then": [
+            " out[\"third-party-liability-construction-company\"].Deductible = \"1500\"",
             " out[\"machinery-breakdown\"].Deductible = \"1500\"",
             " out[\"third-party-liability\"].Deductible = \"500\"",
             "out[\"employers-liability\"].Deductible =\"2600\"",
@@ -133,6 +135,8 @@
         "salience":95,
         "when": " data.rct ==\"X\" && in.revenue > 150000 && in.revenue < 500000 ",
         "then": [
+            
+            " out[\"third-party-liability-construction-company\"].Deductible = \"1500\"",
             " out[\"machinery-breakdown\"].Deductible = \"1500\"",
             " out[\"third-party-liability\"].Deductible = \"1000\"",
             "out[\"employers-liability\"].Deductible =\"2600\"",
@@ -175,6 +179,7 @@
         "salience": 94,
         "when": " data.rct ==\"X\" && in.revenue > 1500000 && in.revenue < 1500000 ",
         "then": [
+            " out[\"third-party-liability-construction-company\"].Deductible = \"2000\"",
         " out[\"machinery-breakdown\"].Deductible = \"2000\"",
             " out[\"third-party-liability\"].Deductible = \"2000\"",
             "out[\"cyber\"].Deductible =\"2000\"",
