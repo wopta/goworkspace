@@ -51,7 +51,7 @@
         "salience": 97,
         "when": " data.rct ==\"X\" && in.revenue <= 75000 ",
         "then": [
-            " out[\"third-party-liability-construction-company\"].Deductible = \"1500\"",
+            "out[\"third-party-liability-construction-company\"].Deductible = \"1500\"",
             " out[\"machinery-breakdown\"].Deductible = \"1500\"",
             " out[\"third-party-liability\"].Deductible = \"500\"",
             "out[\"employers-liability\"].Deductible =\"2600\"",
@@ -75,7 +75,7 @@
             "out[\"earthquake\"].Deductible = \"500\"",
             "out[\"river-flood\"].Deductible = \"500\"",
             "out[\"burst-pipe\"].Deductible = \"500\"",
-            "out[\"sociopolitical-event\"].Deductible =\"0\"",
+            "out[\"sociopolitical-event\"].Deductible =\"500\"",
             "out[\"terrorism\"].Deductible =\"500\"",
             "out[\"atmospheric-event\"].Deductible =\"1500\"",
             "out[\"power-surge\"].Deductible = \"500\"",
@@ -741,6 +741,7 @@
         "when": "  out[\"third-party-liability\"].Deductible==\"0\"",
 
         "then": [
+            "out[\"third-party-liability-construction-company\"].SelfInsurance = \"0.10\"",
             "out[\"atmospheric-event\"].SelfInsurance = \"0.10\"",
             "out[\"damage-to-goods-course-of-works\"].SelfInsurance = \"0.10\"",
             "out[\"damage-to-goods-in-custody\"].SelfInsurance = \"0.10\"",
@@ -767,6 +768,8 @@
         "salience": 54,
         "when": "  out[\"third-party-liability\"].Deductible==\"500\"",
         "then": [
+            "out[\"third-party-liability-construction-company\"].SelfInsurance = \"0.10\"",
+            "out[\"third-party-liability-construction-company\"].SelfInsurance = \"0.10\"",
             "out[\"atmospheric-event\"].SelfInsurance = \"0.10\"",
             "out[\"damage-to-goods-course-of-works\"].SelfInsurance = \"0.10\"",
             "out[\"damage-to-goods-in-custody\"].SelfInsurance = \"0.10\"",
@@ -794,6 +797,7 @@
         "when": "  out[\"third-party-liability\"].Deductible==\"1000\"",
 
         "then": [
+        "out[\"third-party-liability-construction-company\"].SelfInsurance = \"0.10\"",
             "out[\"atmospheric-event\"].SelfInsurance = \"0.10\"",
             "out[\"damage-to-goods-course-of-works\"].SelfInsurance = \"0.10\"",
             "out[\"damage-to-goods-in-custody\"].SelfInsurance = \"0.10\"",
@@ -848,6 +852,7 @@
         "when": "  out[\"third-party-liability\"].Deductible==\"3000\"",
 
         "then": [
+            "out[\"third-party-liability-construction-company\"].SelfInsurance = \"0.10\"",
             "out[\"atmospheric-event\"].SelfInsurance = \"0.10\"",
             "out[\"damage-to-goods-course-of-works\"].SelfInsurance = \"0.10\"",
             "out[\"damage-to-goods-in-custody\"].SelfInsurance = \"0.10\"",
