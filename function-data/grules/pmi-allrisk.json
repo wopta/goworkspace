@@ -769,7 +769,6 @@
         "when": "  out[\"third-party-liability\"].Deductible==\"500\"",
         "then": [
             "out[\"third-party-liability-construction-company\"].SelfInsurance = \"0.10\"",
-            "out[\"third-party-liability-construction-company\"].SelfInsurance = \"0.10\"",
             "out[\"atmospheric-event\"].SelfInsurance = \"0.10\"",
             "out[\"damage-to-goods-course-of-works\"].SelfInsurance = \"0.10\"",
             "out[\"damage-to-goods-in-custody\"].SelfInsurance = \"0.10\"",
