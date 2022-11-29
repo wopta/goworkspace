@@ -16,6 +16,9 @@ func (r *Claim) Marshal() ([]byte, error) {
 }
 
 type Claim struct {
+	Name              string       `firestore:"name" json:"name,omitempty"`
+	Surname           string       `firestore:"surname" json:"surname,omitempty"`
+	Mail              string       `firestore:"mail" json:"mail,omitempty"`
 	PolicyDescription string       `firestore:"policyDescription,omitempty" json:"policyDescription,omitempty"`
 	PolicyId          string       `firestore:"policyId,omitempty" json:"policyId,omitempty"`
 	PolicyUid         string       `firestore:"policyUid,omitempty" json:"policyUid,omitempty"`

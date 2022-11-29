@@ -7,6 +7,7 @@ import (
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	lib "github.com/wopta/goworkspace/lib"
+	mail "github.com/wopta/goworkspace/mail"
 	model "github.com/wopta/goworkspace/models"
 )
 
@@ -51,7 +52,14 @@ func put(w http.ResponseWriter, r *http.Request) {
 	claims := append(user.Claims, claim)
 	user.Claims = claims
 	lib.SetFirestore("users", claim.Uid, user)
-	log.Println(user)
 
+	log.Println(user)
+	var obj mail.MailRequest
+	obj.From = "noreply@wopta.it"
+	obj.To = []string{"sinisti@wopta.it"}
+	obj.Message = `<p>ciao ` + claim.Name + ` ` + claim.Surname + `</p> <p>desidera notificare un sinistro per la polizza: ` + claim.PolicyId + ` per i seguenti motivi: ` + claim.Description + `</p> `
+	obj.Subject = "Notifica sinisto " + claim.PolicyId
+	obj.IsHtml = true
+	mail.SendMail(obj)
 	// lib.PutFirestore("users")
 }
