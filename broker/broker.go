@@ -53,15 +53,11 @@ func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 	lib.CheckError(e)
 	defer r.Body.Close()
 	//policy, e := models.UnmarshalPolicy(req)
-	policy.CreationDate = time.Now()
 	policy.Updated = time.Now()
 	policy.CreationDate = time.Now()
 	policy.Status = models.Proposal
-	log.Println("GetSequenceByProduct")
-	company, numb := GetSequenceByProduct("global")
-	log.Println(string(company))
-	policy.NumberCompany = company
-	policy.Number = numb
+	numb := GetSequenceProposal("global")
+	policy.ProposalNumber = numb
 	log.Println("save")
 	ref, _ := lib.PutFirestore("policy", policy)
 	log.Println("saved")
@@ -88,6 +84,10 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 	var policy models.Policy
 	docsnap := lib.GetFirestore("policy", string(result["uid"]))
 	docsnap.DataTo(&policy)
+	company, numb := GetSequenceByProduct("global")
+	policy.NumberCompany = company
+	policy.Number = numb
+	policy.Updated = time.Now()
 	p := <-doc.ContractObj(policy)
 	log.Println(p.LinkGcs)
 	policy.DocumentName = p.LinkGcs
@@ -138,6 +138,11 @@ func ToListData(query *firestore.DocumentIterator) []models.Policy {
 	return result
 }
 func GetSequenceByProduct(name string) (string, int) {
+	var companyDefault string
+	switch name {
+	case "global":
+		companyDefault = "49999999"
+	}
 	var numberCompany string
 	var number int
 	log.Println("GetSequenceByProduct")
@@ -147,7 +152,7 @@ func GetSequenceByProduct(name string) (string, int) {
 	policy := ToListData(rn)
 	if len(policy) == 0 {
 		log.Println("len(policy) == 0")
-		numberCompany = "49999999"
+		numberCompany = companyDefault
 	} else {
 		log.Println("else")
 		log.Println(rn)
@@ -170,4 +175,20 @@ func GetSequenceByProduct(name string) (string, int) {
 		number = policyCompany[0].Number + 1
 	}
 	return numberCompany, number
+}
+func GetSequenceProposal(name string) int {
+	var number int
+	log.Println("GetSequenceByProduct")
+	r, e := lib.OrderLimitFirestoreErr("policy", "proposalNumber", firestore.Desc, 1)
+	lib.CheckError(e)
+	policyCompany := ToListData(r)
+	if len(policyCompany) == 0 {
+		log.Println("len(policy) == 0")
+		number = 1
+	} else {
+		log.Println("policy use number")
+
+		number = policyCompany[0].Number + 1
+	}
+	return number
 }
