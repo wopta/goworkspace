@@ -101,8 +101,9 @@ func PutToStorage(bucketname string, path string, file []byte) string {
 	log.Println("write.MediaLink: " + write.MediaLink)
 
 	url, err := storage.SignedURL(bucketname, path, &storage.SignedURLOptions{
-
-		Method: method,
+		GoogleAccessID: "wopta-dev-cloudbuild-sa@positive-apex-350507.iam.gserviceaccount.com'",
+		PrivateKey:     []byte("-----BEGIN PRIVATE KEY-----\nXXXXXXXX"),
+		Method:         method,
 	})
 	CheckError(err)
 	log.Println("write.MediaLink: " + url)
