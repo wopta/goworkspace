@@ -58,7 +58,8 @@ func put(w http.ResponseWriter, r *http.Request) {
 	claim.CreationDate = time.Now().String()
 	claim.Updated = time.Now().String()
 	claims := append(user.Claims, claim)
-	claim.ClaimUid = uuid.New().String()
+	uidClaim := uuid.New().String()
+	claim.ClaimUid = uidClaim
 	user.Claims = claims
 
 	log.Println("SetFirestore")
@@ -76,7 +77,7 @@ func put(w http.ResponseWriter, r *http.Request) {
 	for _, doc := range claim.Documents {
 		byteFile, e := b64.StdEncoding.DecodeString(doc.Byte)
 		lib.CheckError(e)
-		lib.PutToStorage(os.Getenv("USER_BUCKET"), claim.UserUid, byteFile)
+		lib.PutToStorage(os.Getenv("USER_BUCKET"), claim.UserUid+"/"+uidClaim, byteFile)
 		att = append(att, mail.Attachment{Byte: doc.Byte, Name: doc.FileName})
 	}
 	obj.Attachments = att

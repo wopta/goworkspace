@@ -44,5 +44,5 @@ type Attachment struct {
 	FileName    string `firestore:"fileName,omitempty" json:"fileName,omitempty"`
 	MimeType    string `firestore:"mimeType,omitempty" json:"mimeType,omitempty"`
 	Url         string `firestore:"url,omitempty" json:"url,omitempty"`
-	ContentType string `contentType:"url,omitempty" json:"contentType,omitempty"`
+	ContentType string `firestore:"contentType,omitempty" json:"contentType,omitempty"`
 }
