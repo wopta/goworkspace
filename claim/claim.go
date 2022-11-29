@@ -58,11 +58,10 @@ func put(w http.ResponseWriter, r *http.Request) {
 	lib.CheckError(e)
 	claim.CreationDate = time.Now().String()
 	claim.Updated = time.Now().String()
-	claims := append(user.Claims, claim)
 	uidClaim := uuid.New().String()
 	claim.ClaimUid = uidClaim
+	claims := append(user.Claims, claim)
 	user.Claims = claims
-
 	log.Println("SetFirestore")
 	lib.SetFirestore("users", claim.UserUid, user)
 	log.Println(user)
