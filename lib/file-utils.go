@@ -91,14 +91,22 @@ func PutToStorage(bucketname string, path string, file []byte) string {
 	log.Println("start PutToStorage")
 	ctx := context.Background()
 	client, err := storage.NewClient(ctx)
+
 	CheckError(err)
 	bucket := client.Bucket(bucketname)
 	write := bucket.Object(path).NewWriter(ctx)
+	method := "GET"
 	defer write.Close()
 	write.Write(file)
 	log.Println("write.MediaLink: " + write.MediaLink)
-	//log.Println("write.MediaLink: " + write.)
-	return write.MediaLink
+
+	url, err := storage.SignedURL(bucketname, path, &storage.SignedURLOptions{
+
+		Method: method,
+	})
+	CheckError(err)
+	log.Println("write.MediaLink: " + url)
+	return url
 
 }
 
