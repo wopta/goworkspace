@@ -65,7 +65,6 @@ func put(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("SetFirestore")
 	lib.SetFirestore("users", claim.UserUid, user)
-
 	log.Println(user)
 	var obj mail.MailRequest
 	obj.From = "noreply@wopta.it"
