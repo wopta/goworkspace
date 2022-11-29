@@ -16,7 +16,7 @@ func init() {
 }
 
 func Claim(w http.ResponseWriter, r *http.Request) {
-	log.Println("Document")
+	log.Println("Claim")
 	lib.EnableCors(&w, r)
 
 	if r.Method == http.MethodGet {
