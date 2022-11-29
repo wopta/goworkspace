@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	lib "github.com/wopta/goworkspace/lib"
@@ -49,6 +50,8 @@ func put(w http.ResponseWriter, r *http.Request) {
 	lib.CheckError(e)
 	docsnap := lib.GetFirestore("users", claim.Uid)
 	docsnap.DataTo(&user)
+	claim.CreationDate = time.Now().String()
+	claim.Updated = time.Now().String()
 	claims := append(user.Claims, claim)
 	user.Claims = claims
 	lib.SetFirestore("users", claim.Uid, user)
@@ -56,10 +59,15 @@ func put(w http.ResponseWriter, r *http.Request) {
 	log.Println(user)
 	var obj mail.MailRequest
 	obj.From = "noreply@wopta.it"
-	obj.To = []string{"sinisti@wopta.it"}
+	obj.To = []string{"sinistri@wopta.it"}
 	obj.Message = `<p>ciao ` + claim.Name + ` ` + claim.Surname + `</p> <p>desidera notificare un sinistro per la polizza: ` + claim.PolicyId + ` per i seguenti motivi: ` + claim.Description + `</p> `
 	obj.Subject = "Notifica sinisto " + claim.PolicyId
 	obj.IsHtml = true
+	var att []mail.Attachment
+	for _, doc := range claim.Documents {
+		att = append(att, mail.Attachment{Byte: doc.Byte})
+	}
+	obj.Attachments = att
 	mail.SendMail(obj)
 	// lib.PutFirestore("users")
 }
