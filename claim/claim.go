@@ -1,9 +1,11 @@
 package claim
 
 import (
+	b64 "encoding/base64"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
@@ -51,7 +53,7 @@ func put(w http.ResponseWriter, r *http.Request) {
 	claim, e := model.UnmarshalClaim(req)
 	lib.CheckError(e)
 	log.Println("GetFirestore")
-	docsnap := lib.GetFirestore("users", claim.Uid)
+	docsnap := lib.GetFirestore("users", claim.UserUid)
 	docsnap.DataTo(&user)
 	claim.CreationDate = time.Now().String()
 	claim.Updated = time.Now().String()
@@ -60,7 +62,7 @@ func put(w http.ResponseWriter, r *http.Request) {
 	user.Claims = claims
 
 	log.Println("SetFirestore")
-	lib.SetFirestore("users", claim.Uid, user)
+	lib.SetFirestore("users", claim.UserUid, user)
 
 	log.Println(user)
 	var obj mail.MailRequest
@@ -72,7 +74,9 @@ func put(w http.ResponseWriter, r *http.Request) {
 	obj.IsAttachment = true
 	var att []mail.Attachment
 	for _, doc := range claim.Documents {
-
+		byteFile, e := b64.StdEncoding.DecodeString(doc.Byte)
+		lib.CheckError(e)
+		lib.PutToStorage(os.Getenv("USER_BUCKET"), claim.UserUid, byteFile)
 		att = append(att, mail.Attachment{Byte: doc.Byte, Name: doc.FileName})
 	}
 	obj.Attachments = att

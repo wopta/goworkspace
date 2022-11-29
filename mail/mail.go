@@ -70,9 +70,13 @@ type Data struct {
 	Content string
 }
 type Attachment struct {
-	Name        string `json:"name"`
-	Byte        string `json:"byte"`
-	ContentType string `json:"contentType,omitempty"`
+	Name        string `firestore:"name,omitempty" json:"name,omitempty"`
+	Link        string `firestore:"link,omitempty" json:"link,omitempty"`
+	Byte        string `firestore:"byte,omitempty" json:"byte,omitempty"`
+	FileName    string `firestore:"fileName,omitempty" json:"fileName,omitempty"`
+	MimeType    string `firestore:"mimeType,omitempty" json:"mimeType,omitempty"`
+	Url         string `firestore:"url,omitempty" json:"url,omitempty"`
+	ContentType string `contentType:"url,omitempty" json:"contentType,omitempty"`
 }
 type MailRequest struct {
 	From         string       `json:"from"`

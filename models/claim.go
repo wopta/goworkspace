@@ -17,6 +17,7 @@ func (r *Claim) Marshal() ([]byte, error) {
 
 type Claim struct {
 	Name              string       `firestore:"name" json:"name,omitempty"`
+	Date              string       `firestore:"date" json:"date,omitempty"`
 	Surname           string       `firestore:"surname" json:"surname,omitempty"`
 	Mail              string       `firestore:"mail" json:"mail,omitempty"`
 	PolicyDescription string       `firestore:"policyDescription,omitempty" json:"policyDescription,omitempty"`
@@ -29,7 +30,7 @@ type Claim struct {
 	Policy            string       `firestore:"policy,omitempty" json:"policy,omitempty"`
 	Description       string       `firestore:"description,omitempty" json:"description,omitempty"`
 	IdCompany         string       `firestore:"idCompany,omitempty" json:"idCompany,omitempty"`
-	Uid               string       `firestore:"uid,omitempty" json:"uid,omitempty"`
+	UserUid           string       `firestore:"userUid,omitempty" json:"userUid,omitempty"`
 	ClaimUid          string       `firestore:"claimUid,omitempty" json:"claimUid,omitempty"`
 	Status            string       `firestore:"status,omitempty" json:"status,omitempty"`
 	Documents         []Attachment `firestore:"documents,omitempty" json:"documents,omitempty"`
@@ -37,10 +38,11 @@ type Claim struct {
 }
 
 type Attachment struct {
-	Name     string `json:"name,omitempty" json:"name,omitempty"`
-	Link     string `json:"link,omitempty" json:"link,omitempty"`
-	Byte     string `json:"byte,omitempty" json:"byte,omitempty"`
-	FileName string `json:"fileName,omitempty" json:"fileName,omitempty"`
-	MimeType string `json:"mimeType,omitempty" json:"mimeType,omitempty"`
-	Url      string `json:"url,omitempty" json:"url,omitempty"`
+	Name        string `firestore:"name,omitempty" json:"name,omitempty"`
+	Link        string `firestore:"link,omitempty" json:"link,omitempty"`
+	Byte        string `firestore:"byte,omitempty" json:"byte,omitempty"`
+	FileName    string `firestore:"fileName,omitempty" json:"fileName,omitempty"`
+	MimeType    string `firestore:"mimeType,omitempty" json:"mimeType,omitempty"`
+	Url         string `firestore:"url,omitempty" json:"url,omitempty"`
+	ContentType string `contentType:"url,omitempty" json:"contentType,omitempty"`
 }
