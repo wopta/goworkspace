@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
+	"github.com/google/uuid"
 	lib "github.com/wopta/goworkspace/lib"
 	mail "github.com/wopta/goworkspace/mail"
 	model "github.com/wopta/goworkspace/models"
@@ -55,7 +56,9 @@ func put(w http.ResponseWriter, r *http.Request) {
 	claim.CreationDate = time.Now().String()
 	claim.Updated = time.Now().String()
 	claims := append(user.Claims, claim)
+	claim.ClaimUid = uuid.New().String()
 	user.Claims = claims
+
 	log.Println("SetFirestore")
 	lib.SetFirestore("users", claim.Uid, user)
 
@@ -69,6 +72,7 @@ func put(w http.ResponseWriter, r *http.Request) {
 	obj.IsAttachment = true
 	var att []mail.Attachment
 	for _, doc := range claim.Documents {
+
 		att = append(att, mail.Attachment{Byte: doc.Byte, Name: doc.FileName})
 	}
 	obj.Attachments = att
