@@ -120,7 +120,7 @@ func GetSequenceByProduct(name string) (string, int) {
 }
 func GetSequenceProposal(name string) int {
 	var number int
-	log.Println("GetSequenceByProduct")
+	log.Println("GetSequenceProposal")
 	r, e := lib.OrderLimitFirestoreErr("policy", "proposalNumber", firestore.Desc, 1)
 	lib.CheckError(e)
 	policyCompany := ToListData(r)

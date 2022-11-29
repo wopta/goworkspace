@@ -267,7 +267,7 @@ func SendMail(obj MailRequest) {
 		}
 		//message += "\r\n" + body
 		log.Println("MESSAGE:----------------------")
-		log.Println(message)
+		//log.Println(message)
 		// Connect to the SMTP Server
 		servername := "smtp.office365.com:587"
 		host, _, err := net.SplitHostPort(servername)
