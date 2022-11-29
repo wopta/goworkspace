@@ -1,19 +1,14 @@
 package broker
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
-	"time"
 
 	"cloud.google.com/go/firestore"
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
-	doc "github.com/wopta/goworkspace/document"
 	lib "github.com/wopta/goworkspace/lib"
-	mail "github.com/wopta/goworkspace/mail"
 	models "github.com/wopta/goworkspace/models"
 	"google.golang.org/api/iterator"
 )
@@ -44,60 +39,7 @@ func Broker(w http.ResponseWriter, r *http.Request) {
 	route.Router(w, r)
 
 }
-func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}) {
-	log.Println("Proposal")
-	var policy models.Policy
-	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
 
-	e := json.Unmarshal([]byte(req), &policy)
-	lib.CheckError(e)
-	defer r.Body.Close()
-	//policy, e := models.UnmarshalPolicy(req)
-	policy.Updated = time.Now()
-	policy.CreationDate = time.Now()
-	policy.Status = models.Proposal
-	numb := GetSequenceProposal("global")
-	policy.ProposalNumber = numb
-	log.Println("save")
-	ref, _ := lib.PutFirestore("policy", policy)
-	log.Println("saved")
-	var obj mail.MailRequest
-	obj.From = "noreply@wopta.it"
-	obj.To = []string{policy.Contractor.Mail}
-	obj.Message = `<p>ciao </p> `
-	obj.Subject = "Wopta Proposta e set informantivo"
-	obj.IsHtml = true
-	mail.SendMail(obj)
-	log.Println(ref.ID)
-
-	return `{"uid":"` + ref.ID + `"}`, policy
-}
-func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}) {
-	var (
-		result map[string]string
-	)
-
-	log.Println("Emit")
-	request := lib.ErrorByte(ioutil.ReadAll(r.Body))
-	json.Unmarshal([]byte(request), &result)
-	log.Println(result["uid"])
-	var policy models.Policy
-	docsnap := lib.GetFirestore("policy", string(result["uid"]))
-	docsnap.DataTo(&policy)
-	company, numb := GetSequenceByProduct("global")
-	policy.NumberCompany = company
-	policy.Number = numb
-	policy.Updated = time.Now()
-	p := <-doc.ContractObj(policy)
-	log.Println(p.LinkGcs)
-	policy.DocumentName = p.LinkGcs
-	_, res := doc.NamirialOtp(policy)
-	policy.IdSign = res.EnvelopeId
-	lib.SetFirestore("policy", result["uid"], policy)
-	b, e := json.Marshal(res)
-	lib.CheckError(e)
-	return string(b), res
-}
 func GetNumberCompany(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 
 	return "", nil
