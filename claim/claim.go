@@ -49,12 +49,14 @@ func put(w http.ResponseWriter, r *http.Request) {
 	log.Println(string(req))
 	claim, e := model.UnmarshalClaim(req)
 	lib.CheckError(e)
+	log.Println("GetFirestore")
 	docsnap := lib.GetFirestore("users", claim.Uid)
 	docsnap.DataTo(&user)
 	claim.CreationDate = time.Now().String()
 	claim.Updated = time.Now().String()
 	claims := append(user.Claims, claim)
 	user.Claims = claims
+	log.Println("SetFirestore")
 	lib.SetFirestore("users", claim.Uid, user)
 
 	log.Println(user)
