@@ -46,6 +46,7 @@ func put(w http.ResponseWriter, r *http.Request) {
 
 	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
 	defer r.Body.Close()
+	log.Println(string(req))
 	claim, e := model.UnmarshalClaim(req)
 	lib.CheckError(e)
 	docsnap := lib.GetFirestore("users", claim.Uid)
