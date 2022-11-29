@@ -28,12 +28,15 @@ type Claim struct {
 	IdCompany         string       `firestore:"idCompany,omitempty" json:"idCompany,omitempty"`
 	Uid               string       `firestore:"uid,omitempty" json:"uid,omitempty"`
 	Status            string       `firestore:"status,omitempty" json:"status,omitempty"`
-	Document          []Attachment `firestore:"attachment,omitempty" json:"attachment,omitempty"`
+	Documents         []Attachment `firestore:"documents,omitempty" json:"documents,omitempty"`
 	History           []Claim      `firestore:"history,omitempty" json:"history,omitempty"`
 }
 
 type Attachment struct {
-	Name *string `json:"name,omitempty" json:"name,omitempty"`
-	Link *string `json:"link,omitempty" json:"link,omitempty"`
-	Byte *string `json:"byte,omitempty" json:"byte,omitempty"`
+	Name     string `json:"name,omitempty" json:"name,omitempty"`
+	Link     string `json:"link,omitempty" json:"link,omitempty"`
+	Byte     string `json:"byte,omitempty" json:"byte,omitempty"`
+	FileName string `json:"fileName,omitempty" json:"fileName,omitempty"`
+	MimeType string `json:"mimeType,omitempty" json:"mimeType,omitempty"`
+	Url      string `json:"url,omitempty" json:"url,omitempty"`
 }
