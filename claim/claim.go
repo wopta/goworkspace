@@ -69,7 +69,7 @@ func put(w http.ResponseWriter, r *http.Request) {
 	obj.IsAttachment = true
 	var att []mail.Attachment
 	for _, doc := range claim.Documents {
-		att = append(att, mail.Attachment{Byte: doc.Byte})
+		att = append(att, mail.Attachment{Byte: doc.Byte, Name: doc.FileName})
 	}
 	obj.Attachments = att
 	mail.SendMail(obj)
