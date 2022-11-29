@@ -6,11 +6,13 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
-	"github.com/wopta/goworkspace/lib"
+	lib "github.com/wopta/goworkspace/lib"
+	model "github.com/wopta/goworkspace/models"
 )
 
 func init() {
@@ -39,12 +41,19 @@ func Payment(w http.ResponseWriter, r *http.Request) {
 
 }
 func FabrickPay(w http.ResponseWriter, r *http.Request) (string, interface{}) {
+	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
+	var data model.Policy
+	defer r.Body.Close()
+	err := json.Unmarshal([]byte(req), &data)
+	lib.CheckError(err)
+	FabrickPayObj(data)
 	return "", nil
 }
 func CriptoPay(w http.ResponseWriter, r *http.Request) (string, interface{}) {
+
 	return "", nil
 }
-func FabrickPayObj(id string) <-chan string {
+func FabrickPayObj(data model.Policy) <-chan string {
 	r := make(chan string)
 
 	go func() {
@@ -56,7 +65,7 @@ func FabrickPayObj(id string) <-chan string {
 		client := &http.Client{
 			Timeout: time.Second * 10,
 		}
-		req, _ := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(getFabrickPay(id)))
+		req, _ := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(getFabrickPay(data)))
 		req.Header.Set("api-key", os.Getenv("FABRICK_TOKEN_API"))
 		req.Header.Set("Auth-Schema", "S2S")
 		req.Header.Set("Content-Type", "application/json")
@@ -73,7 +82,7 @@ func FabrickPayObj(id string) <-chan string {
 			res.Body.Close()
 
 			log.Println("body:", string(body))
-			r <- result["SspFileId"]
+			r <- ""
 
 		}
 	}()
@@ -116,12 +125,17 @@ func CriptoPayObj(id string) <-chan string {
 	return r
 }
 
-func getFabrickPay(id string) string {
+func getFabrickPay(data model.Policy) string {
+	//2022-12-12T10:05:10.000Z
+	now := time.Now()
+	next := now.AddDate(0, 0, 1)
+	layout := "2006-01-02T15:04:05-0700"
+	log.Println(next.Format(layout))
 	return `{
-		"merchantId": "merchant_id",
+		"merchantId": "wop134b31-5926-4b26-1411-726bc9f0b111",
 		"externalId": "TST_{{$timestamp}}",
 		"paymentConfiguration": {
-			"expirationDate": "2022-12-12T10:05:10.000Z",
+			"expirationDate": "` + next.Format(layout) + `",
 			"allowedPaymentMethods": [
 				{
 					"role": "payer",
@@ -136,11 +150,11 @@ func getFabrickPay(id string) string {
 			"payByLink": [
 				{
 					"type": "EMAIL",
-					"recipients": "nome.cognome@fabrick.com",
+					"recipients": "` + data.Contractor.Mail + `",
 					"template": "pay-by-link"
 				}
 			],
-			"callbackUrl": "https://www.merchant.it.placeholder",
+			"callbackUrl": "https://europe-west1-positive-apex-350507.cloudfunctions.net/callback/v1/payment",
 			"paymentPageRedirectUrls": {
 				"onFailure": "https://www.merchant.it.placeholder",
 				"onSuccess": "https://www.merchant.it.placeholder"
@@ -148,43 +162,33 @@ func getFabrickPay(id string) string {
 		},
 		"bill": {
 			"externalId": "TST_{{$timestamp}}",
-			"amount": 100.00,
+			"amount": ` + strconv.FormatInt(data.PriceGross, 10) + `,
 			"currency": "EUR",
 			"description": "Checkout pagamento",
 			"items": [
 				{
 					"externalId": "TST_{{$timestamp}}",
-					"amount": 50.00,
+					"amount": ` + strconv.FormatInt(data.PriceGross, 10) + `,
 					"currency": "EUR",
 					"description": "Item 1 Description",
 					"xInfo": "{\"cod_azienda\": \"AZ45\",\"divisione\": \" 45\"}"
-				},
-				{
-					"externalId": "TST_{{$timestamp}}",
-					"amount": 50.00,
-					"currency": "EUR",
-					"description": "Item 2 Description",
-					"xInfo": "{\"cod_azienda\": \"AZ54\",\"divisione\": \" 54\"}"
 				}
 			],
 			"subjects": [
 				{
 					"role": "customer",
 					"externalId": "customer_75052100",
-					"email": "nome.cognome@fabrick.com",
-					"name": "Mario Bianchi",
+					"email": "` + data.Contractor.Mail + `",
+					"name": "` + data.Contractor.Name + ` ` + data.Contractor.Surname + `",
 					"xInfo": "{\"key2\": \"value2\"}"
-				},
-				{
-					"role": "intermediary",
-					"externalId": "AGENZIA_45",
-					"email": "age45@fabrick.com",
-					"name": "Mario Rossi",
-					"xInfo": "{\"customKey1\": \"value1\",\"customKey2\": \"value\"}"
 				}
 			]
 		}
 	}`
+}
+
+func Itoa(i int64) {
+	panic("unimplemented")
 }
 
 func getCoinqvestPay(id string) string {
