@@ -39,6 +39,7 @@ func post(w http.ResponseWriter, r *http.Request) {
 
 }
 func put(w http.ResponseWriter, r *http.Request) {
+	log.Println("Put")
 	var user model.User
 
 	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
