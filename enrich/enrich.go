@@ -1,4 +1,4 @@
-package enrichVatCode
+package enrich
 
 import (
 	"fmt"
@@ -47,7 +47,7 @@ func Enrich(w http.ResponseWriter, r *http.Request) {
 	case "works":
 		Works(w)
 	case "ateco":
-
+		Ateco(w, vat[base+1])
 	default:
 		fmt.Fprintf(w, `{"message":"missing scope in path es. vat, works, ateco"}`)
 	}

@@ -11,6 +11,8 @@ import (
 	"path/filepath"
 
 	"cloud.google.com/go/storage"
+	fireStorage "firebase.google.com/go"
+	firebase "firebase.google.com/go"
 )
 
 func Files(path string) []string {
@@ -95,22 +97,43 @@ func PutToStorage(bucketname string, path string, file []byte) string {
 	CheckError(err)
 	bucket := client.Bucket(bucketname)
 	write := bucket.Object(path).NewWriter(ctx)
-	method := "GET"
+
 	defer write.Close()
 	write.Write(file)
 	log.Println("write.MediaLink: " + write.MediaLink)
 
-	url, err := storage.SignedURL(bucketname, path, &storage.SignedURLOptions{
-		GoogleAccessID: "wopta-dev-cloudbuild-sa@positive-apex-350507.iam.gserviceaccount.com'",
-		PrivateKey:     []byte("-----BEGIN PRIVATE KEY-----\nXXXXXXXX"),
-		Method:         method,
-	})
 	CheckError(err)
-	log.Println("write.MediaLink: " + url)
-	return url
+	log.Println("write.MediaLink: ")
+	return "gs://positive-apex-350507.appspot.com/UID:0g10fVw0fdOM5Ugho1tQJcOcRVD3/image_profile/profileImage"
 
 }
+func PutToFireStorage(bucketname string, path string, file []byte) string {
+	// some process request msg, decode base64 to image byte
+	// create image file in current directory with os.create()
+	log.Println("start PutToStorage")
+	ctx := context.Background()
+	config := &firebase.Config{
+		StorageBucket: "positive-apex-350507.appspot.com",
+	}
+	app, err := fireStorage.NewApp(ctx, config, nil)
 
+	CheckError(err)
+	client, e := app.Storage(ctx)
+	CheckError(e)
+
+	bucket, e := client.DefaultBucket()
+	wc := bucket.Object(path).NewWriter(ctx)
+
+	wc.Write(file)
+
+	CheckError(e)
+	defer wc.Close()
+
+	CheckError(err)
+	log.Println("write.MediaLink: ")
+	return "gs://positive-apex-350507.appspot.com/UID:0g10fVw0fdOM5Ugho1tQJcOcRVD3/image_profile/profileImage"
+
+}
 func GetFilesByEnv(file string) []byte {
 	var res1 []byte
 	switch os.Getenv("env") {

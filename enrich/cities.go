@@ -1,4 +1,4 @@
-package enrichVatCode
+package enrich
 
 import (
 	"encoding/json"
