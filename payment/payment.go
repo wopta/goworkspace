@@ -187,10 +187,6 @@ func getFabrickPay(data model.Policy) string {
 	}`
 }
 
-func Itoa(i int64) {
-	panic("unimplemented")
-}
-
 func getCoinqvestPay(id string) string {
 	return `{
 		"charge":{
