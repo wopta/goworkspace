@@ -73,7 +73,7 @@ func put(w http.ResponseWriter, r *http.Request) {
 	for i, doc := range claim.Documents {
 		byteFile, e := b64.StdEncoding.DecodeString(doc.Byte)
 		lib.CheckError(e)
-		link := lib.PutToStorage(os.Getenv("USER_BUCKET"), "users/"+claim.UserUid+"/"+uidClaim+"/"+doc.FileName, byteFile)
+		link := lib.PutToStorage(os.Getenv("USER_BUCKET"), "users/"+claim.UserUid+"/claims/"+uidClaim+"/"+doc.FileName, byteFile)
 		att = append(att, mail.Attachment{Byte: doc.Byte, Name: doc.FileName})
 		claim.Documents[i].Byte = ""
 		claim.Documents[i].Link = link
