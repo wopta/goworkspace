@@ -2,6 +2,7 @@ package models
 
 import (
 	"encoding/json"
+	"time"
 )
 
 func UnmarshalClaim(data []byte) (Claim, error) {
@@ -24,8 +25,8 @@ type Claim struct {
 	PolicyId          string       `firestore:"policyId,omitempty" json:"policyId,omitempty"`
 	PolicyUid         string       `firestore:"policyUid,omitempty" json:"policyUid,omitempty"`
 	PolicyNumber      string       `firestore:"policyNumber,omitempty" json:"policyNumber,omitempty"`
-	CreationDate      string       `firestore:"creationDate,omitempty" json:"creationDate,omitempty"`
-	Updated           string       `firestore:"updated,omitempty" json:"updated,omitempty"`
+	CreationDate      time.Time    `firestore:"creationDate,omitempty" json:"creationDate,omitempty"`
+	Updated           time.Time    `firestore:"updated,omitempty" json:"updated,omitempty"`
 	Company           string       `firestore:"company,omitempty" json:"company,omitempty"`
 	Policy            string       `firestore:"policy,omitempty" json:"policy,omitempty"`
 	Description       string       `firestore:"description,omitempty" json:"description,omitempty"`

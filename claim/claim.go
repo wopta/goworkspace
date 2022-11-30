@@ -56,8 +56,8 @@ func put(w http.ResponseWriter, r *http.Request) {
 	docsnap := lib.GetFirestore("users", claim.UserUid)
 	e = docsnap.DataTo(&user)
 	lib.CheckError(e)
-	claim.CreationDate = time.Now().String()
-	claim.Updated = time.Now().String()
+	claim.CreationDate = time.Now()
+	claim.Updated = time.Now()
 	uidClaim := uuid.New().String()
 	claim.ClaimUid = uidClaim
 
