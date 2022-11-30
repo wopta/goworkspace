@@ -143,7 +143,7 @@ func getFabrickPay(data model.Policy) string {
 						"CREDITCARD",
 						"FBKR2P",
 						"SDD",
-						"SMARTPOS"
+						
 					]
 				}
 			],
@@ -156,8 +156,8 @@ func getFabrickPay(data model.Policy) string {
 			],
 			"callbackUrl": "https://europe-west1-positive-apex-350507.cloudfunctions.net/callback/v1/payment",
 			"paymentPageRedirectUrls": {
-				"onFailure": "https://www.merchant.it.placeholder",
-				"onSuccess": "https://www.merchant.it.placeholder"
+				"onFailure": "https://www.wopta.it",
+				"onSuccess": "https://www.wopta.it"
 			}
 		},
 		"bill": {
