@@ -104,7 +104,7 @@ func PutToStorage(bucketname string, path string, file []byte) string {
 
 	CheckError(err)
 	log.Println("write.MediaLink: ")
-	return "gs://positive-apex-350507.appspot.com/UID:0g10fVw0fdOM5Ugho1tQJcOcRVD3/image_profile/profileImage"
+	return "gs://" + bucketname + "/" + path
 
 }
 func PutToFireStorage(bucketname string, path string, file []byte) string {
