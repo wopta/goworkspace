@@ -63,7 +63,7 @@ func FabrickPayObj(data model.Policy) <-chan string {
 		//fileReader := bytes.NewReader([]byte())
 		var urlstring = os.Getenv("FABRICK_BASEURL") + "v1.0/payments"
 		client := &http.Client{
-			Timeout: time.Second * 10,
+			Timeout: time.Second * 2,
 		}
 		req, _ := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(getFabrickPay(data)))
 		req.Header.Set("api-key", os.Getenv("FABRICK_TOKEN_API"))
