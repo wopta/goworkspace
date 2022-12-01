@@ -1,6 +1,9 @@
 steps:
 
 
+- name: 'gcr.io/cloud-builders/gsutil'
+  args: ['cp', 'gs://function-data/env/prod.yaml', '.']
+
 - name: 'gcr.io/cloud-builders/gcloud'
   args:
   - '-c'
