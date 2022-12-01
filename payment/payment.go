@@ -67,7 +67,6 @@ func FabrickPayObj(data model.Policy) <-chan string {
 			Timeout: time.Second * 4,
 		}
 
-		log.Printf(getFabrickPay(data))
 		req, _ := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(getFabrickPay(data)))
 		req.Header.Set("api-key", os.Getenv("FABRICK_TOKEN_API"))
 		req.Header.Set("Auth-Schema", "S2S")
@@ -131,7 +130,7 @@ func getFabrickPay(data model.Policy) string {
 	//2022-12-12T10:05:10.000Z
 	now := time.Now()
 	next := now.AddDate(0, 0, 1)
-	layout := "2006-01-02T15:04:05-0700"
+	layout := "2006-01-02T15:04:05.000Z"
 	layout2 := "2006-01-02"
 	log.Println(next.Format(layout))
 
