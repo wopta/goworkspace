@@ -61,7 +61,7 @@ func FabrickPayObj(data model.Policy) <-chan string {
 		log.Println("FabrickPay")
 		//var b bytes.Buffer
 		//fileReader := bytes.NewReader([]byte())
-		var urlstring = os.Getenv("FABRICK_BASEURL") + "v1.0/payments"
+		var urlstring = os.Getenv("FABRICK_BASEURL") + "/api/fabrick/pace/v4.0/mods/standard-payment-apis/v1.0/payments/"
 		client := &http.Client{
 			Timeout: time.Second * 2,
 		}
@@ -142,7 +142,7 @@ func getFabrickPay(data model.Policy) string {
 					"paymentMethods": [
 						"CREDITCARD",
 						"FBKR2P",
-						"SDD",
+						
 						
 					]
 				}

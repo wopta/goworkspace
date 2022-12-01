@@ -97,7 +97,7 @@
                 "buildingMaterial": "test",
                 "buildingYear": "test",
                 "isAllarm": true,
-                "floor": 4,
+                "floor":"",
                 "costruction": "test",
                 "isHolder": true
             },
