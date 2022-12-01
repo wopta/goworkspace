@@ -21,6 +21,7 @@ func init() {
 }
 
 func Payment(w http.ResponseWriter, r *http.Request) {
+
 	log.Println("Callback")
 	lib.EnableCors(&w, r)
 	w.Header().Set("Access-Control-Allow-Methods", "POST")
@@ -65,7 +66,8 @@ func FabrickPayObj(data model.Policy) <-chan string {
 		client := &http.Client{
 			Timeout: time.Second * 4,
 		}
-		log.Println(getFabrickPay(data))
+
+		log.Printf(getFabrickPay(data))
 		req, _ := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(getFabrickPay(data)))
 		req.Header.Set("api-key", os.Getenv("FABRICK_TOKEN_API"))
 		req.Header.Set("Auth-Schema", "S2S")
@@ -164,13 +166,13 @@ func getFabrickPay(data model.Policy) string {
 		},
 		"bill": {
 			"externalId": "TST_{{$timestamp}}",
-			"amount": ` + strconv.FormatInt(data.PriceGross, 10) + `,
+			"amount": "` + strconv.FormatInt(data.PriceGross, 10) + `",
 			"currency": "EUR",
 			"description": "Checkout pagamento",
 			"items": [
 				{
 					"externalId": "TST_{{$timestamp}}",
-					"amount": ` + strconv.FormatInt(data.PriceGross, 10) + `,
+					"amount": "` + strconv.FormatInt(data.PriceGross, 10) + `",
 					"currency": "EUR",
 					"description": "Item 1 Description",
 					"xInfo": "{\"cod_azienda\": \"AZ45\",\"divisione\": \" 45\"}"
