@@ -144,8 +144,8 @@ func getFabrickPay(data model.Policy) string {
 				{
 					"role": "payer",
 					"paymentMethods": [
-						"CREDITCARD",
-						"FBKR2P",
+						"CREDITCARD"
+						
 						
 						
 					]
