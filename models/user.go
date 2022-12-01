@@ -16,6 +16,7 @@ func (r *User) Marshal() ([]byte, error) {
 type User struct {
 	EmailVerified bool     `firestore:"emailVerified" json:"emailVerified,omitempty"`
 	Uid           string   `firestore:"uid" json:"uid,omitempty"`
+	PictureUrl    string   `firestore:"pictureUrl" json:"pictureUrl,omitempty"`
 	Name          string   `firestore:"name" json:"name,omitempty"`
 	Type          string   `firestore:"type" json:"type,omitempty"`
 	Cluster       string   `firestore:"cluster" json:"cluster,omitempty"`
