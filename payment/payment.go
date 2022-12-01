@@ -63,8 +63,9 @@ func FabrickPayObj(data model.Policy) <-chan string {
 		//fileReader := bytes.NewReader([]byte())
 		var urlstring = os.Getenv("FABRICK_BASEURL") + "api/fabrick/pace/v4.0/mods/back/v1.0/payments"
 		client := &http.Client{
-			Timeout: time.Second * 2,
+			Timeout: time.Second * 4,
 		}
+		log.Println(getFabrickPay(data))
 		req, _ := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(getFabrickPay(data)))
 		req.Header.Set("api-key", os.Getenv("FABRICK_TOKEN_API"))
 		req.Header.Set("Auth-Schema", "S2S")
@@ -80,9 +81,8 @@ func FabrickPayObj(data model.Policy) <-chan string {
 			var result map[string]string
 			json.Unmarshal([]byte(body), &result)
 			res.Body.Close()
-
 			log.Println("body:", string(body))
-			r <- ""
+			r <- string(body)
 
 		}
 	}()
