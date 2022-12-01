@@ -130,7 +130,9 @@ func getFabrickPay(data model.Policy) string {
 	now := time.Now()
 	next := now.AddDate(0, 0, 1)
 	layout := "2006-01-02T15:04:05-0700"
+	layout2 := "2006-01-02"
 	log.Println(next.Format(layout))
+
 	return `{
 		"merchantId": "wop134b31-5926-4b26-1411-726bc9f0b111",
 		"externalId": "TST_{{$timestamp}}",
@@ -174,6 +176,11 @@ func getFabrickPay(data model.Policy) string {
 					"xInfo": "{\"cod_azienda\": \"AZ45\",\"divisione\": \" 45\"}"
 				}
 			],
+			"scheduleTransaction": {
+				"dueDate": "` + now.Format(layout2) + `",
+				"paymentInstrumentResolutionStrategy": "BY_PAYER"
+			},
+			"mandateCreation": "false",
 			"subjects": [
 				{
 					"role": "customer",
