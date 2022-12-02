@@ -1,264 +1,59 @@
 {
-    "Status": "InProgress",
-    "SendDate": "2022-11-24T11:28:38.64Z",
-    "ExpirationDate": "2022-12-22T11:28:38.6415943Z",
-    "ValidityFromCreationInDays": 28,
-    "ExpirationInSecondsAfterSending": 2419200,
-    "Bulks": [
-        {
-            "Status": "InProgress",
-            "Email": "",
-            "LogDocumentId": "",
-            "FinishedDocuments": [],
-            "Steps": [
-                {
-                    "Id": "f8587a55-1003-4b55-aa6e-9f570e20f5b9",
-                    "FirstName": "name",
-                    "LastName": "surname",
-                    "OrderIndex": 1,
-                    "Email": "luca.barbieri@wopta.it",
-                    "LanguageCode": "it",
-                    "Status": "NotSigned",
-                    "StatusReason": "",
-                    "RecipientType": "Signer",
-                    "WorkstepRedirectionUrl": "https://saas.esignanywhere.net/workstepredirector/sign?identifier=ESfwnUBNxSCQ7bd22750/vyePNb1BEBs1CAUqVR4D7YJnCBm1oNI2v6DF61LyxgFH23zWwyvxxRyelYa~imm7g==",
-                    "AllowAccessFinishedWorkstep": false,
-                    "Authentication": [
-                        {
-                            "Method": "Sms",
-                            "Parameter": "+393668134257",
-                            "Filters": []
-                        }
-                    ],
-                    "IsParallel": false,
-                    "WorkstepConfiguration": {
-                        "WorkstepLabel": "name surname pmi",
-                        "SmallTextZoomFactorPercent": 100,
-                        "FinishAction": {
-                            "ServerActions": [],
-                            "ClientActions": []
-                        },
-                        "ReceiverInformation": {
-                            "UserInformation": {
-                                "FirstName": "name",
-                                "LastName": "surname",
-                                "EMail": "luca.barbieri@wopta.it"
-                            },
-                            "TransactionCodePushPluginData": []
-                        },
-                        "TransactionCodeConfigurations": [],
-                        "SignatureConfigurations": [],
-                        "ViewerPreferences": {
-                            "FinishWorkstepOnOpen": false,
-                            "VisibleAreaOptions": {
-                                "AllowedDomain": "",
-                                "Enabled": false
-                            }
-                        },
-                        "Policy": {
-                            "GeneralPolicies": {
-                                "AllowSaveDocument": true,
-                                "AllowSaveAuditTrail": true,
-                                "AllowRotatingPages": false,
-                                "AllowAppendFileToWorkstep": false,
-                                "AllowAppendTaskToWorkstep": false,
-                                "AllowEmailDocument": true,
-                                "AllowPrintDocument": true,
-                                "AllowFinishWorkstep": true,
-                                "AllowRejectWorkstep": true,
-                                "AllowRejectWorkstepDelegation": true,
-                                "AllowUndoLastAction": true,
-                                "AllowColorizePdfForms": false,
-                                "AllowAdhocPdfAttachments": false,
-                                "AllowAdhocSignatures": false,
-                                "AllowAdhocStampings": false,
-                                "AllowAdhocFreeHandAnnotations": false,
-                                "AllowAdhocTypewriterAnnotations": false,
-                                "AllowAdhocPictureAnnotations": false,
-                                "AllowAdhocPdfPageAppending": false,
-                                "AllowReloadOfFinishedWorkstep": true
-                            },
-                            "WorkstepTasks": {
-                                "PictureAnnotationMinResolution": 0,
-                                "PictureAnnotationMaxResolution": 0,
-                                "PictureAnnotationColorDepth": "Color16M",
-                                "SequenceMode": "NoSequenceEnforced",
-                                "PositionUnits": "PdfUnits",
-                                "ReferenceCorner": "Lower_Left",
-                                "Tasks": [
-                                    {
-                                        "Texts": [
-                                            {
-                                                "Language": "it",
-                                                "Value": "Signature Disclosure Text"
-                                            },
-                                            {
-                                                "Language": "*",
-                                                "Value": "Signature Disclosure Text"
-                                            }
-                                        ],
-                                        "Headings": [
-                                            {
-                                                "Language": "it",
-                                                "Value": "Signature Disclosure Subject"
-                                            },
-                                            {
-                                                "Language": "*",
-                                                "Value": "Signature Disclosure Subject"
-                                            }
-                                        ],
-                                        "IsRequired": false,
-                                        "Id": "ra",
-                                        "DisplayName": "ra",
-                                        "DocRefNumber": 1,
-                                        "DiscriminatorType": "Agreements"
-                                    },
-                                    {
-                                        "PositionPage": 2,
-                                        "Position": {
-                                            "PositionX": 252.0,
-                                            "PositionY": 186.0
-                                        },
-                                        "Size": {
-                                            "Height": 80.0,
-                                            "Width": 190.0
-                                        },
-                                        "AdditionalParameters": [
-                                            {
-                                                "Key": "enabled",
-                                                "Value": "1"
-                                            },
-                                            {
-                                                "Key": "completed",
-                                                "Value": "0"
-                                            },
-                                            {
-                                                "Key": "req",
-                                                "Value": "1"
-                                            },
-                                            {
-                                                "Key": "isPhoneNumberRequired",
-                                                "Value": "0"
-                                            },
-                                            {
-                                                "Key": "trValidityInSeconds",
-                                                "Value": "60"
-                                            },
-                                            {
-                                                "Key": "fd",
-                                                "Value": ""
-                                            },
-                                            {
-                                                "Key": "fd_dateformat",
-                                                "Value": "dd-MM-yyyy HH:mm:ss"
-                                            },
-                                            {
-                                                "Key": "fd_timezone",
-                                                "Value": "datetimeutc"
-                                            }
-                                        ],
-                                        "AllowedSignatureTypes": [
-                                            {
-                                                "TrModType": "TransactionCodeSenderPlugin",
-                                                "TrModTypeId": "",
-                                                "TrValidityInSeconds": 300,
-                                                "TrConfIdIssueCertificate": "",
-                                                "TrConfId": "otpSignatureSmsText",
-                                                "IsPhoneNumberRequired": false,
-                                                "Ly": "simpleTransactionCodeSms",
-                                                "Id": "c787919a-b2fd-4849-8f97-98dee281da30",
-                                                "DiscriminatorType": "SigTypeTransactionCode",
-                                                "Preferred": false,
-                                                "StampImprintConfiguration": {
-                                                    "DisplayExtraInformation": true,
-                                                    "DisplayEmail": true,
-                                                    "DisplayIp": true,
-                                                    "DisplayName": true,
-                                                    "DisplaySignatureDate": true,
-                                                    "FontFamily": "Times New Roman",
-                                                    "FontSize": 11.0,
-                                                    "OverrideLegacyStampImprint": false,
-                                                    "DisplayTransactionId": true,
-                                                    "DisplayTransaktionToken": true,
-                                                    "DisplayPhoneNumber": true
-                                                },
-                                                "SignaturePluginConfigurationId": "ltaLevelId"
-                                            }
-                                        ],
-                                        "UseTimestamp": false,
-                                        "IsRequired": true,
-                                        "Id": "1#XyzmoDuplicateIdSeperator#Signature_e7ca3f6a-33fa-cdba-d696-1377fcad51c9",
-                                        "DisplayName": "",
-                                        "DocRefNumber": 1,
-                                        "DiscriminatorType": "Signature"
-                                    }
-                                ]
-                            },
-                            "FinalizeActions": {
-                                "FinalizeActionList": [
-                                    {
-                                        "DocRefNumbers": "*",
-                                        "SpcId": "ltaLevelId",
-                                        "DiscriminatorType": "Timestamp"
-                                    }
-                                ]
-                            }
-                        },
-                        "Navigation": {
-                            "HyperLinks": [],
-                            "Links": [],
-                            "LinkTargets": []
-                        }
-                    }
-                }
-            ]
+    "merchantId": "wop134b31-5926-4b26-1411-726bc9f0b111",
+    "externalId": "TST_{{$timestamp}}",
+    "paymentConfiguration": {
+        "expirationDate": "` + next.Format(layout) + `",
+        "allowedPaymentMethods": [
+            {
+                "role": "payer",
+                "paymentMethods": [
+                    "CREDITCARD"
+                    
+                    
+                    
+                ]
+            }
+        ],
+        "payByLink": [
+            {
+                "type": "EMAIL",
+                "recipients": "` + data.Contractor.Mail + `",
+                "template": "pay-by-link"
+            }
+        ],
+        "callbackUrl": "https://europe-west1-positive-apex-350507.cloudfunctions.net/callback/v1/payment",
+        "paymentPageRedirectUrls": {
+            "onFailure": "https://www.wopta.it",
+            "onSuccess": "https://www.wopta.it"
         }
-    ],
-    "Documents": [
-        {
-            "PageSizesInPoints": [
-                {
-                    "Height": 841.89,
-                    "Width": 595.28000000000009
-                },
-                {
-                    "Height": 841.89,
-                    "Width": 595.28000000000009
-                },
-                {
-                    "Height": 841.89,
-                    "Width": 595.28000000000009
-                },
-                {
-                    "Height": 841.89,
-                    "Width": 595.28000000000009
-                },
-                {
-                    "Height": 841.89,
-                    "Width": 595.28000000000009
-                },
-                {
-                    "Height": 841.89,
-                    "Width": 595.28000000000009
-                }
-            ],
-            "DocRefNumber": 1,
-            "FileName": "billing.pdf",
-            "FormFields": []
-        }
-    ],
-    "Id": "7cb89ed6-3aed-4675-8075-bab7b9a10cc9",
-    "Bulk": "",
-    "BasicOptions": {
-        "Name": "Test.pdf",
-        "EmailSubject": "Please sign the enclosed envelope",
-        "EmailBody": "Dear #RecipientFirstName# #RecipientLastName#\n\n#PersonalMessage#\n\nPlease sign the envelope #EnvelopeName#\n\nEnvelope will expire at #ExpirationDate#",
-        "EnableReminders": true,
-        "FirstReminderDayAmount": 5,
-        "RecurrentReminderDayAmount": 3,
-        "BeforeExpirationDayAmount": 3
     },
-    "LockFormFieldsAtEnvelopeFinish": false
-}"
-
-  https: //saas.esignanywhere.net/SawViewer/SignAnyWhere.aspx?WorkstepId=C8FD7B34FA560561CFE778181FFDFA3B575AC01AF3164D3C7AAF4826C9EB5ED4282AE91ECE18A9BEDB2CE5E293042CA0&setLng=en
+    "bill": {
+        "externalId": "TST_{{$timestamp}}",
+        "amount": "` + strconv.FormatInt(data.PriceGross, 10) + `",
+        "currency": "EUR",
+        "description": "Checkout pagamento",
+        "items": [
+            {
+                "externalId": "TST_{{$timestamp}}",
+                "amount": "` + strconv.FormatInt(data.PriceGross, 10) + `",
+                "currency": "EUR",
+                "description": "Item 1 Description",
+                "xInfo": "{\"cod_azienda\": \"AZ45\",\"divisione\": \" 45\"}"
+            }
+        ],
+        "scheduleTransaction": {
+            "dueDate": "` + now.Format(layout2) + `",
+            "paymentInstrumentResolutionStrategy": "BY_PAYER"
+        },
+        "mandateCreation": "false",
+        "subjects": [
+            {
+                "role": "customer",
+                "externalId": "customer_75052100",
+                "email": "` + data.Contractor.Mail + `",
+                "name": "` + data.Contractor.Name + ` ` + data.Contractor.Surname + `",
+                "xInfo": "{\"key2\": \"value2\"}"
+            }
+        ]
+    }
+}

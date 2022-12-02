@@ -60,15 +60,16 @@ func put(w http.ResponseWriter, r *http.Request) {
 	claim.Updated = time.Now()
 	uidClaim := uuid.New().String()
 	claim.ClaimUid = uidClaim
-
 	log.Println(user)
 	var obj mail.MailRequest
 	obj.From = "noreply@wopta.it"
 	obj.To = []string{"sinistri@wopta.it"}
-	obj.Message = `<p>ciao ` + claim.Name + ` ` + claim.Surname + `</p> <p>desidera notificare un sinistro per la polizza: ` + claim.PolicyId + ` per i seguenti motivi: ` + claim.Description + `</p> `
+	obj.Message = `<p>ciao il cliente ` + claim.Name + ` ` + claim.Surname + `</p> <p>desidera notificare un sinistro per la polizza: ` + claim.PolicyId + ` per i seguenti motivi: ` + claim.Description + `</p> `
 	obj.Subject = "Notifica sinisto " + claim.PolicyId
 	obj.IsHtml = true
-	obj.IsAttachment = true
+	if len(claim.Documents) > 0 {
+		obj.IsAttachment = true
+	}
 	var att []mail.Attachment
 	for i, doc := range claim.Documents {
 		byteFile, e := b64.StdEncoding.DecodeString(doc.Byte)
