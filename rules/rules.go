@@ -49,6 +49,7 @@ type Coverage struct {
 	Offer                      map[string]*CoverageValue
 	Slug                       string
 	SelfInsurance              string
+	SelfInsuranceDesc          string
 	IsBase                     bool
 	IsYour                     bool
 	IsPremium                  bool

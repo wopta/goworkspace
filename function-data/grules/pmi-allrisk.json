@@ -3,10 +3,20 @@
     {
         "name": "RevenueCheck",
         "desc": "check rct base ",
-        "salience": 1000,
+        "salience": 1001,
         "when": "in.revenue >500000",
         "then": [
 
+            "Log(\"revenue to much\")",
+            " Complete()"
+        ]
+    },
+    {
+        "name": "Rct",
+        "desc": "check rct base ",
+        "salience": 1000,
+        "when": " data.rct !=\"X\"  && data.fire !=\"OK\" ",
+        "then": [
             "Log(\"revenue to much\")",
             " Complete()"
         ]
@@ -212,7 +222,7 @@
             "out[\"content\"].Deductible = \"2000\"",
             "out[\"valuables\"].Deductible = \"500\"",
             "out[\"theft\"].Deductible = \"2000\"",
-            "out[\"theft\"].Deductible = \"2000\"",
+            
             " Retract(\"RctRevenue4\")"
         ]
     },
@@ -759,6 +769,28 @@
             "out[\"terrorism\"].SelfInsurance = \"0.05\"",
             "out[\"third-party-recourse\"].SelfInsurance = \"0.10\"",
             "out[\"water-damage\"].SelfInsurance = \"0.05\"",
+
+            
+            "out[\"atmospheric-event\"].SelfInsuranceDesc = \"10% - minimo € 1500\"",
+            "out[\"damage-to-goods-course-of-works\"].SelfInsuranceDesc = \"10% - minimo € 500\"",
+            "out[\"damage-to-goods-in-custody\"].SelfInsuranceDesc = \"10% - minimo € 500\"",
+            "out[\"defect-liability-12-months\"].SelfInsuranceDesc = \"10% - minimo € 1500\"",
+            "out[\"defect-liability-dm-37-2008\"].SelfInsuranceDesc = \"10% - minimo € 1500\"",
+            "out[\"defect-liability-workmanships\"].SelfInsuranceDesc = \"10% - minimo € 1500\"",
+            "out[\"employers-liability\"].SelfInsuranceDesc = \"10% - minimo € 1500\"",
+            "out[\"environmental-liability\"].SelfInsuranceDesc = \"10% - minimo € 1500\"",
+            "out[\"power-surge\"].SelfInsuranceDesc = \"10% - minimo € 500\"",
+            "out[\"earthquake\"].SelfInsuranceDesc = \"5% - minimo € 500\"",
+            "out[\"product-liability\"].SelfInsuranceDesc = \"10% - minimo € 5000\"",
+            "out[\"property-damage-due-to-theft\"].SelfInsuranceDesc = \"10% - minimo € 1500\"",
+            "out[\"theft\"].SelfInsuranceDesc = \"10% - minimo € 500\"",
+            "out[\"valuables-in-safe-strongrooms\"].SelfInsuranceDesc = \"10% - minimo € 500\"",
+            "out[\"valuables\"].SelfInsuranceDesc = \"10% - minimo € 500\"",
+            "out[\"river-flood\"].SelfInsuranceDesc = \"5% - minimo € 500\"",
+            "out[\"sociopolitical-event\"].SelfInsuranceDesc = \"5% - minimo € 500\"",
+            "out[\"terrorism\"].SelfInsuranceDesc = \"5% - minimo € 500\"",
+            "out[\"third-party-recourse\"].SelfInsuranceDesc = \"10% - minimo € 1000\"",
+            "out[\"water-damage\"].SelfInsuranceDesc = \"5% - minimo € 500\"",
             "Retract(\"SelfInsurance0\")"
         ]
     },
