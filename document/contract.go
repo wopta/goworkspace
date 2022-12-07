@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/johnfercher/maroto/pkg/consts"
+	"github.com/johnfercher/maroto/pkg/pdf"
 	"github.com/johnfercher/maroto/pkg/props"
 	lib "github.com/wopta/goworkspace/lib"
 	model "github.com/wopta/goworkspace/models"
@@ -35,14 +36,39 @@ func ContractObj(data model.Policy) <-chan DodumentResponse {
 
 	go func() {
 		skin, _, textBold, _, _ := getVar()
+		m := skin.initDefault()
+		h := []string{"Garanzie ", "Somma assicurata ", "Opzioni / Dettagli ", "Premio "}
+		var (
+			logo, name string
+			coverages  pdf.Maroto
+		)
+		if data.Name == "persona" {
+			logo = "/persona.png"
+			name = "Persona"
+			var table [][]string
+
+			for _, A := range data.Assets {
+				for _, k := range A.Guarantees {
+					r := []string{k.Name, strconv.Itoa(int(k.SumInsuredLimitOfIndemnity)), k.SelfInsurance, strconv.Itoa(int(k.Price))}
+					table = append(table, r)
+				}
+			}
+			coverages = skin.CoveragesTable(m, h, table)
+		}
+
+		if data.Name == "pmi" {
+			logo = "/pmi.png"
+			name = "Artigiani & Imprese"
+		}
+
 		log.Println(textBold)
 		log.Println("Document 1")
-		m := skin.initDefault()
+
 		m.RegisterHeader(func() {
 			m.Row(15.0, func() {
 				m.Col(2, func() {
 
-					_ = m.FileImage(lib.GetAssetPathByEnv("document")+"/logo_persona.png", props.Rect{
+					_ = m.FileImage(lib.GetAssetPathByEnv("document")+logo, props.Rect{
 						Left:    1,
 						Top:     1,
 						Center:  false,
@@ -59,7 +85,7 @@ func ContractObj(data model.Policy) <-chan DodumentResponse {
 						Extrapolate: true,
 					})
 
-					m.Text("Persona", props.Text{
+					m.Text(name, props.Text{
 						Top:         6,
 						Style:       consts.Italic,
 						Align:       consts.Left,
@@ -123,16 +149,8 @@ func ContractObj(data model.Policy) <-chan DodumentResponse {
 			m = skin.GetPmi(data, m)
 		}
 		m = skin.Space(m, 10.0)
-		var table [][]string
-		h := []string{"Garanzie ", "Somma assicurata ", "Opzioni / Dettagli ", "Premio "}
-		for _, A := range data.Assets {
-			for _, k := range A.Guarantees {
-				r := []string{k.Name, strconv.Itoa(int(k.SumInsuredLimitOfIndemnity)), k.SelfInsurance, strconv.Itoa(int(k.Price))}
-				table = append(table, r)
-			}
-		}
 
-		m = skin.CoveragesTable(m, h, table)
+		m = coverages
 
 		m.AddPage()
 		articles := []Kv{

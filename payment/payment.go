@@ -68,7 +68,7 @@ func FabrickPayObj(data model.Policy) <-chan string {
 		}
 
 		req, _ := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(getFabrickPay(data)))
-		req.Header.Set("api-key", os.Getenv("FABRICK_TOKEN_API"))
+		req.Header.Set("api-key", os.Getenv("FABRICK_TOKEN_BACK_API"))
 		req.Header.Set("Auth-Schema", "S2S")
 		req.Header.Set("Content-Type", "application/json")
 		//header('Content-Length: ' . filesize($pdf));
@@ -138,6 +138,7 @@ func getFabrickPay(data model.Policy) string {
 		"merchantId": "wop134b31-5926-4b26-1411-726bc9f0b111",
 		"externalId": "TST_{{$timestamp}}",
 		"paymentConfiguration": {
+			"driver": "string",
 			"expirationDate": "` + next.Format(layout) + `",
 			"allowedPaymentMethods": [
 				{
@@ -145,18 +146,22 @@ func getFabrickPay(data model.Policy) string {
 					"paymentMethods": [
 						"CREDITCARD"
 						
-						
-						
 					]
 				}
 			],
 			"payByLink": [
 				{
+					"params": {
+						"additionalProp1": {},
+						"additionalProp2": {},
+						"additionalProp3": {}
+					  },
 					"type": "EMAIL",
 					"recipients": "` + data.Contractor.Mail + `",
 					"template": "pay-by-link"
 				}
 			],
+			"lookAndFeel": "string",
 			"callbackUrl": "https://europe-west1-positive-apex-350507.cloudfunctions.net/callback/v1/payment",
 			"paymentPageRedirectUrls": {
 				"onFailure": "https://www.wopta.it",
