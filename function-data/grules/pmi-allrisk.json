@@ -12,7 +12,7 @@
         ]
     },
     {
-        "name": "Rct",
+        "name": "RctFire",
         "desc": "check rct base ",
         "salience": 1000,
         "when": " data.rct !=\"X\"  && data.fire !=\"OK\" ",
