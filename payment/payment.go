@@ -64,7 +64,7 @@ func FabrickPayObj(data model.Policy) <-chan string {
 		//fileReader := bytes.NewReader([]byte())
 		var urlstring = os.Getenv("FABRICK_BASEURL") + "api/fabrick/pace/v4.0/mods/back/v1.0/payments"
 		client := &http.Client{
-			Timeout: time.Second * 4,
+			Timeout: time.Second * 10,
 		}
 		log.Println(getFabrickPay(data))
 		req, _ := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(getFabrickPay(data)))
