@@ -166,13 +166,13 @@ func getFabrickPay(data model.Policy) string {
 		},
 		"bill": {
 			"externalId": "TST_{{$timestamp}}",
-			"amount": "` + strconv.FormatInt(data.PriceGross, 10) + `",
+			"amount": ` + strconv.FormatInt(data.PriceGross, 10) + `,
 			"currency": "EUR",
 			"description": "Checkout pagamento",
 			"items": [
 				{
 					"externalId": "TST_{{$timestamp}}",
-					"amount": "` + strconv.FormatInt(data.PriceGross, 10) + `",
+					"amount": ` + strconv.FormatInt(data.PriceGross, 10) + `,
 					"currency": "EUR",
 					"description": "Item 1 Description",
 					"xInfo": "{\"cod_azienda\": \"AZ45\",\"divisione\": \" 45\"}"
