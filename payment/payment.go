@@ -66,7 +66,7 @@ func FabrickPayObj(data model.Policy) <-chan string {
 		client := &http.Client{
 			Timeout: time.Second * 4,
 		}
-
+		log.Println(getFabrickPay(data))
 		req, _ := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(getFabrickPay(data)))
 		req.Header.Set("api-key", os.Getenv("FABRICK_TOKEN_BACK_API"))
 		req.Header.Set("Auth-Schema", "S2S")
