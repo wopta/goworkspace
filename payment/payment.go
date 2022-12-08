@@ -66,7 +66,7 @@ func FabrickPayObj(data model.Policy) <-chan string {
 		client := &http.Client{
 			Timeout: time.Second * 10,
 		}
-		log.Println(getFabrickPay(data))
+		//log.Println(getFabrickPay(data))
 		req, _ := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(getFabrickPay(data)))
 		req.Header.Set("api-key", os.Getenv("FABRICK_TOKEN_BACK_API"))
 		req.Header.Set("Auth-Schema", "S2S")
@@ -133,12 +133,12 @@ func getFabrickPay(data model.Policy) string {
 	layout := "2006-01-02T15:04:05.000Z"
 	layout2 := "2006-01-02"
 	log.Println(next.Format(layout))
-
+	//"expirationDate": "` + next.Format(layout) + `",
 	return `{
 		"merchantId": "wop134b31-5926-4b26-1411-726bc9f0b111",
 		"externalId": "TST_{{$timestamp}}",
 		"paymentConfiguration": {
-			"expirationDate": "` + next.Format(layout) + `",
+		
 			"allowedPaymentMethods": [
 				{
 					"role": "payer",
