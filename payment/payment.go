@@ -138,30 +138,26 @@ func getFabrickPay(data model.Policy) string {
 		"merchantId": "wop134b31-5926-4b26-1411-726bc9f0b111",
 		"externalId": "TST_{{$timestamp}}",
 		"paymentConfiguration": {
-			"driver": "string",
 			"expirationDate": "` + next.Format(layout) + `",
 			"allowedPaymentMethods": [
 				{
 					"role": "payer",
 					"paymentMethods": [
-						"CREDITCARD"
+						"CREDITCARD",
+						"SDD"
 						
 					]
 				}
 			],
 			"payByLink": [
 				{
-					"params": {
-						"additionalProp1": {},
-						"additionalProp2": {},
-						"additionalProp3": {}
-					  },
+				
 					"type": "EMAIL",
 					"recipients": "` + data.Contractor.Mail + `",
 					"template": "pay-by-link"
 				}
 			],
-			"lookAndFeel": "string",
+		
 			"callbackUrl": "https://europe-west1-positive-apex-350507.cloudfunctions.net/callback/v1/payment",
 			"paymentPageRedirectUrls": {
 				"onFailure": "https://www.wopta.it",
