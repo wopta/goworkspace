@@ -67,7 +67,7 @@ func FabrickPayObj(data model.Policy) <-chan string {
 			Timeout: time.Second * 10,
 		}
 		//log.Println(getFabrickPay(data))
-		req, _ := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(getFabrickPay(data)))
+		req, _ := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(getfabbricBase()))
 		req.Header.Set("api-key", os.Getenv("FABRICK_TOKEN_BACK_API"))
 		req.Header.Set("Auth-Schema", "S2S")
 		req.Header.Set("Content-Type", "application/json")
@@ -136,7 +136,7 @@ func getFabrickPay(data model.Policy) string {
 	//"expirationDate": "` + next.Format(layout) + `",
 	return `{
 		"merchantId": "wop134b31-5926-4b26-1411-726bc9f0b111",
-		"externalId": "TST_{{$timestamp}}",
+		"externalId": "TST",
 		"paymentConfiguration": {
 		
 			"allowedPaymentMethods": [
@@ -157,7 +157,6 @@ func getFabrickPay(data model.Policy) string {
 					"template": "pay-by-link"
 				}
 			],
-		
 			"callbackUrl": "https://europe-west1-positive-apex-350507.cloudfunctions.net/callback/v1/payment",
 			"paymentPageRedirectUrls": {
 				"onFailure": "https://www.wopta.it",
@@ -171,7 +170,7 @@ func getFabrickPay(data model.Policy) string {
 			"description": "Checkout pagamento",
 			"items": [
 				{
-					"externalId": "TST_{{$timestamp}}",
+					"externalId": "TST",
 					"amount": ` + strconv.FormatInt(data.PriceGross, 10) + `,
 					"currency": "EUR",
 					"description": "Item 1 Description",
@@ -247,4 +246,30 @@ func getCoinqvestPay(id string) string {
 		   "ETHEREUM":"ETH:GBDEVU63Y6NTHJQQZIKVTC23NWLQVP3WJ2RI2OTSJTNYOIGICST6DUXR"
 		}
 	 }`
+}
+func getfabbricBase() string {
+	return `{
+		"merchantId": "wop134b31-5926-4b26-1411-726bc9f0b111",
+		"externalId": "paymentXid_20221206",
+		"paymentConfiguration": {
+			"paymentPageRedirectUrls": {
+				"onSuccess": "https://www.google.com",
+				"onFailure": "https://www.amazon.it",
+				"onInterruption": ""
+			}
+		},
+		"bill": {
+			"externalId": "billXid_20221206",
+			"amount": 5,
+			"currency": "EUR",
+			"subjects": [
+				{
+					"role": "customer",
+					"externalId": "wopta_subject_test_20221206",
+					"name": "Emanuela Larovere",
+					"email": "emanuela.larovere@fabrick.com"
+				}
+			]
+		}
+	}`
 }
