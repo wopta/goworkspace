@@ -46,12 +46,13 @@ type Policy struct {
 	Voucher        string       `firestore:"voucher,omitempty" json:"voucher,omitempty"`
 	Channel        string       `firestore:"channel,omitempty" json:"channel,omitempty"`
 	Covenant       string       `firestore:"covenant,omitempty" json:"covenant,omitempty"`
-	TaxAmount      int64        `firestore:"taxAmount,omitempty" json:"taxAmount,omitempty"`
-	PriceNett      int64        `firestore:"priceNett,omitempty" json:"priceNett,omitempty"`
-	PriceGross     int64        `firestore:"priceGross,omitempty" json:"priceGross,omitempty"`
+	TaxAmount      float64      `firestore:"taxAmount,omitempty" json:"taxAmount,omitempty"`
+	PriceNett      float64      `firestore:"priceNett,omitempty" json:"priceNett,omitempty"`
+	PriceGross     float64      `firestore:"priceGross,omitempty" json:"priceGross,omitempty"`
 	Contractor     User         `firestore:"contractor,omitempty" json:"contractor,omitempty"`
 	DocumentName   string       `firestore:"documentName,omitempty" json:"documentName,omitempty"`
 	Statements     []Statement  `firestore:"statements,omitempty" json:"statements,omitempty"`
+	Survay         []Statement  `firestore:"survey,omitempty" json:"survey,omitempty"`
 	Attachments    []Attachment `firestore:"attachments,omitempty" json:"attachments,omitempty"`
 	Assets         []Asset      `firestore:"assets,omitempty" json:"assets,omitempty"`
 	Claim          []Claim      `firestore:"claim ,omitempty" json:"claim,omitempty"`

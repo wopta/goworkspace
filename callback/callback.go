@@ -16,6 +16,7 @@ import (
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	lib "github.com/wopta/goworkspace/lib"
+	mail "github.com/wopta/goworkspace/mail"
 )
 
 func init() {
@@ -38,6 +39,10 @@ func Callback(w http.ResponseWriter, r *http.Request) {
 				Route:   "/v1/payment",
 				Hendler: Payment,
 			},
+			{
+				Route:   "/v1/emailVerify",
+				Hendler: EmailVerify,
+			},
 		},
 	}
 	route.Router(w, r)
@@ -45,5 +50,19 @@ func Callback(w http.ResponseWriter, r *http.Request) {
 }
 
 func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}) {
+	return "", nil
+}
+func EmailVerify(w http.ResponseWriter, r *http.Request) (string, interface{}) {
+	log.Println("EmailVerify")
+	log.Println("GET params were:", r.URL.Query())
+
+	email := r.URL.Query().Get("email")
+	token := r.URL.Query().Get("token")
+	log.Println(token)
+	res := lib.WhereFirestore("mail", "email", "==", email)
+	objmail, uid := mail.ToListData(res)
+	objmail[0].IsValid = true
+	lib.SetFirestore("mail", uid[0], objmail)
+
 	return "", nil
 }

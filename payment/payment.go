@@ -2,11 +2,11 @@ package claim
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 
@@ -165,13 +165,13 @@ func getFabrickPay(data model.Policy) string {
 		},
 		"bill": {
 			"externalId": "TST_{{$timestamp}}",
-			"amount": ` + strconv.FormatInt(data.PriceGross, 10) + `,
+			"amount": ` + fmt.Sprintf("%.2f", data.PriceGross) + `,
 			"currency": "EUR",
 			"description": "Checkout pagamento",
 			"items": [
 				{
 					"externalId": "TST",
-					"amount": ` + strconv.FormatInt(data.PriceGross, 10) + `,
+					"amount": ` + fmt.Sprintf("%.2f", data.PriceGross) + `,
 					"currency": "EUR",
 					"description": "Item 1 Description",
 					"xInfo": "{\"cod_azienda\": \"AZ45\",\"divisione\": \" 45\"}"
