@@ -294,20 +294,20 @@ func getfabbricPayments(data model.Policy) string {
 
 		ExpirationDate: next.Format(layout),
 		PaymentPageRedirectUrls: PaymentPageRedirectUrls{
-			OnSuccess:      "",
-			OnFailure:      "",
-			OnInterruption: "",
+			OnSuccess:      "https://www.wopta.it",
+			OnFailure:      "https://www.wopta.it",
+			OnInterruption: "https://www.wopta.it",
 		},
 		AllowedPaymentMethods: []AllowedPaymentMethod{{Role: "payer", PaymentMethods: paymentMethods}},
-		CallbackURL:           "",
+		CallbackURL:           "https://www.wopta.it",
 	}
 	pay.Bill = Bill{
 		ExternalID:      "",
 		Amount:          100.00,
 		Currency:        "EUR",
-		Description:     "",
+		Description:     "Test pagamento",
 		MandateCreation: "false",
-		Subjects:        []Subject{{Role: "", Email: "", Name: ""}},
+		Subjects:        []Subject{{Role: "customer", Email: data.Contractor.Mail, Name: data.Contractor.Name + ` ` + data.Contractor.Surname}},
 	}
 
 	res, _ := pay.Marshal()
