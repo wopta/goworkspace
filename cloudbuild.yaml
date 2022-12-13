@@ -51,7 +51,6 @@ steps:
     --trigger-http \
     --runtime=go116 \
     --env-vars-file ${env}.yaml \
-    --service-account=wopta-dev-cloudbuild-sa@positive-apex-350507.iam.gserviceaccount.com \
     --project=${project} 
 
     

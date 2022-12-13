@@ -66,6 +66,7 @@ func FabrickPayObj(data model.Policy) <-chan string {
 		client := &http.Client{
 			Timeout: time.Second * 10,
 		}
+		log.Print(getfabbricBase())
 		//log.Println(getFabrickPay(data))
 		req, _ := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(getfabbricBase()))
 		req.Header.Set("api-key", os.Getenv("FABRICK_TOKEN_BACK_API"))
@@ -164,7 +165,7 @@ func getFabrickPay(data model.Policy) string {
 			}
 		},
 		"bill": {
-			"externalId": "TST_{{$timestamp}}",
+			"externalId": "TST",
 			"amount": ` + fmt.Sprintf("%.2f", data.PriceGross) + `,
 			"currency": "EUR",
 			"description": "Checkout pagamento",
