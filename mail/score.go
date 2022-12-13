@@ -52,7 +52,7 @@ func getFidoEmailRequest(data string) string {
 		"claims": [
 			 "email"
 		],
-		"email": ` + data + `"
+		"email": "` + data + `"
    }`
 }
 
