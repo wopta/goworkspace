@@ -23,6 +23,7 @@ func ScoreFido(data string) <-chan EmailFidoResp {
 		client := &http.Client{
 			Timeout: time.Second * 10,
 		}
+		log.Println(getFidoEmailRequest(data))
 		//log.Println(getFabrickPay(data))
 		req, _ := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(getFidoEmailRequest(data)))
 		req.Header.Set("x-api-key", os.Getenv("FIDO_TOKEN_API"))
