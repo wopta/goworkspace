@@ -1,4 +1,4 @@
-package claim
+package payment
 
 import (
 	"encoding/json"
