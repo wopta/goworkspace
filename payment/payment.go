@@ -66,9 +66,9 @@ func FabrickPayObj(data model.Policy) <-chan string {
 		client := &http.Client{
 			Timeout: time.Second * 10,
 		}
-		log.Print(getfabbricBase())
+		log.Printf(getfabbricPayments(data))
 		//log.Println(getFabrickPay(data))
-		req, _ := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(getfabbricBase()))
+		req, _ := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(getfabbricPayments(data)))
 		req.Header.Set("api-key", os.Getenv("FABRICK_TOKEN_BACK_API"))
 		req.Header.Set("Auth-Schema", "S2S")
 		req.Header.Set("Content-Type", "application/json")
@@ -273,4 +273,43 @@ func getfabbricBase() string {
 			]
 		}
 	}`
+}
+func getfabbricPayments(data model.Policy) string {
+	now := time.Now()
+	next := now.AddDate(0, 0, 1)
+	layout := "2006-01-02T15:04:05.000Z"
+	layout2 := "2006-01-02"
+	paymentMethods := []string{
+		"CREDITCARD",
+		"FBKR2P",
+		"SDD",
+		"SMARTPOS",
+	}
+	log.Println(next.Format(layout))
+	log.Println(next.Format(layout2))
+	var pay FabrickPaymentsRequest
+	pay.MerchantID = "wop134b31-5926-4b26-1411-726bc9f0b111"
+	pay.ExternalID = "paymentXid_20221206"
+	pay.PaymentConfiguration = PaymentConfiguration{
+
+		ExpirationDate: next.Format(layout),
+		PaymentPageRedirectUrls: PaymentPageRedirectUrls{
+			OnSuccess:      "",
+			OnFailure:      "",
+			OnInterruption: "",
+		},
+		AllowedPaymentMethods: []AllowedPaymentMethod{{Role: "payer", PaymentMethods: paymentMethods}},
+		CallbackURL:           "",
+	}
+	pay.Bill = Bill{
+		ExternalID:      "",
+		Amount:          100.00,
+		Currency:        "EUR",
+		Description:     "",
+		MandateCreation: "false",
+		Subjects:        []Subject{{Role: "", Email: "", Name: ""}},
+	}
+
+	res, _ := pay.Marshal()
+	return string(res)
 }

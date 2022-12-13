@@ -33,7 +33,12 @@
     "statements": [
         {
             "Question": "",
-            "Answer": ""
+            "Answer": true
+        }
+    ], "survey": [
+        {
+            "Question": "",
+            "Answer": true
         }
     ],
     "attachments": [

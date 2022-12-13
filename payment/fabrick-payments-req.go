@@ -2,76 +2,77 @@ package payment
 
 import "encoding/json"
 
-func UnmarshalWelcome(data []byte) (FabrickPymentsRequest, error) {
-	var r FabrickPymentsRequest
+func UnmarshalWelcome(data []byte) (FabrickPaymentsRequest, error) {
+	var r FabrickPaymentsRequest
 	err := json.Unmarshal(data, &r)
 	return r, err
 }
 
-func (r *FabrickPymentsRequest) Marshal() ([]byte, error) {
+func (r *FabrickPaymentsRequest) Marshal() ([]byte, error) {
 	return json.Marshal(r)
 }
 
-type FabrickPymentsRequest struct {
-	MerchantID           string               `json:"merchantId"`
-	ExternalID           string               `json:"externalId"`
-	PaymentConfiguration PaymentConfiguration `json:"paymentConfiguration"`
-	Bill                 Bill                 `json:"bill"`
+type FabrickPaymentsRequest struct {
+	MerchantID           string               `json:"merchantId,omitempty"`
+	ExternalID           string               `json:"externalId,omitempty"`
+	PaymentConfiguration PaymentConfiguration `json:"paymentConfiguration,omitempty"`
+	Bill                 Bill                 `json:"bill,omitempty"`
 }
 
 type Bill struct {
-	ExternalID          string              `json:"externalId"`
-	Amount              int64               `json:"amount"`
-	Currency            string              `json:"currency"`
-	Description         string              `json:"description"`
-	Items               []Item              `json:"items"`
-	ScheduleTransaction ScheduleTransaction `json:"scheduleTransaction"`
-	MandateCreation     string              `json:"mandateCreation"`
-	Subjects            []Subject           `json:"subjects"`
+	ExternalID          string              `json:"externalId,omitempty"`
+	Amount              int64               `json:"amount,omitempty"`
+	Currency            string              `json:"currency,omitempty"`
+	Description         string              `json:"description,omitempty"`
+	Items               []Item              `json:"items,omitempty"`
+	ScheduleTransaction ScheduleTransaction `json:"scheduleTransaction,omitempty"`
+	MandateCreation     string              `json:"mandateCreation,omitempty"`
+	Subjects            []Subject           `json:"subjects,omitempty"`
 }
 
 type Item struct {
-	ExternalID       string `json:"externalId"`
-	Amount           int64  `json:"amount"`
-	Currency         string `json:"currency"`
-	Description      string `json:"description"`
-	PagoPADocumentID string `json:"pagoPADocumentId"`
-	XInfo            string `json:"xInfo"`
+	ExternalID       string `json:"externalId,omitempty"`
+	Amount           int64  `json:"amount,omitempty"`
+	Currency         string `json:"currency,omitempty"`
+	Description      string `json:"description,omitempty"`
+	PagoPADocumentID string `json:"pagoPADocumentId,omitempty"`
+	XInfo            string `json:"xInfo,omitempty"`
 }
 
 type ScheduleTransaction struct {
-	DueDate                             string `json:"dueDate"`
-	PaymentInstrumentResolutionStrategy string `json:"paymentInstrumentResolutionStrategy"`
+	DueDate                             string `json:"dueDate,omitempty"`
+	PaymentInstrumentResolutionStrategy string `json:"paymentInstrumentResolutionStrategy,omitempty"`
 }
 
 type Subject struct {
-	Role       string  `json:"role"`
-	ExternalID string  `json:"externalId"`
-	Email      string  `json:"email"`
-	Name       string  `json:"name"`
-	XInfo      *string `json:"xInfo,omitempty"`
+	Role       string  `json:"role,omitempty"`
+	ExternalID string  `json:"externalId,omitempty"`
+	Email      string  `json:"email,omitempty"`
+	Name       string  `json:"name,omitempty"`
+	XInfo      *string `json:"xInfo,omitempty,omitempty"`
 }
 
 type PaymentConfiguration struct {
-	ExpirationDate          string                  `json:"expirationDate"`
-	AllowedPaymentMethods   []AllowedPaymentMethod  `json:"allowedPaymentMethods"`
-	PayByLink               []PayByLink             `json:"payByLink"`
-	CallbackURL             string                  `json:"callbackUrl"`
-	PaymentPageRedirectUrls PaymentPageRedirectUrls `json:"paymentPageRedirectUrls"`
+	ExpirationDate          string                  `json:"expirationDate,omitempty"`
+	AllowedPaymentMethods   []AllowedPaymentMethod  `json:"allowedPaymentMethods,omitempty"`
+	PayByLink               []PayByLink             `json:"payByLink,omitempty"`
+	CallbackURL             string                  `json:"callbackUrl,omitempty"`
+	PaymentPageRedirectUrls PaymentPageRedirectUrls `json:"paymentPageRedirectUrls,omitempty"`
 }
 
 type AllowedPaymentMethod struct {
-	Role           string   `json:"role"`
-	PaymentMethods []string `json:"paymentMethods"`
+	Role           string   `json:"role,omitempty"`
+	PaymentMethods []string `json:"paymentMethods,omitempty"`
 }
 
 type PayByLink struct {
-	Type       string `json:"type"`
-	Recipients string `json:"recipients"`
-	Template   string `json:"template"`
+	Type       string `json:"type,omitempty"`
+	Recipients string `json:"recipients,omitempty"`
+	Template   string `json:"template,omitempty"`
 }
 
 type PaymentPageRedirectUrls struct {
-	OnFailure string `json:"onFailure"`
-	OnSuccess string `json:"onSuccess"`
+	OnFailure      string `json:"onFailure,omitempty"`
+	OnSuccess      string `json:"onSuccess,omitempty"`
+	OnInterruption string `json:"onInterruption,omitempty"`
 }
