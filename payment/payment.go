@@ -69,7 +69,7 @@ func FabrickPayObj(data model.Policy) <-chan string {
 		}
 		log.Printf(getfabbricPayments(data))
 		//log.Println(getFabrickPay(data))
-		req, _ := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(getfabbricBase()))
+		req, _ := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(getfabbricPayments(data)))
 		req.Header.Set("api-key", os.Getenv("FABRICK_TOKEN_BACK_API"))
 		req.Header.Set("Auth-Schema", "S2S")
 		req.Header.Set("Content-Type", "application/json")
@@ -289,6 +289,7 @@ func getfabbricPayments(data model.Policy) string {
 		"SDD",
 		"SMARTPOS",
 	}
+	log.Println(paymentMethods)
 	log.Println(next.Format(layout))
 	log.Println(next.Format(layout2))
 	var pay FabrickPaymentsRequest
@@ -306,8 +307,8 @@ func getfabbricPayments(data model.Policy) string {
 		bill.ScheduleTransaction = &scheduleTransaction
 	}
 
-	bill.Items = []Item{{ExternalID: externalId, Amount: 100.00, Currency: "EUR"}}
-	bill.Subjects = []Subject{{ExternalID: "testcustomer01", Role: "customer", Email: data.Contractor.Mail, Name: data.Contractor.Name + ` ` + data.Contractor.Surname}}
+	//bill.Items = []Item{{ExternalID: externalId, Amount: 100.00, Currency: "EUR"}}
+	//bill.Subjects = []Subject{{ExternalID: "testcustomer01", Role: "customer", Email: data.Contractor.Mail, Name: data.Contractor.Name + ` ` + data.Contractor.Surname}}
 
 	pay.PaymentConfiguration = PaymentConfiguration{
 
@@ -317,9 +318,9 @@ func getfabbricPayments(data model.Policy) string {
 			OnFailure: "https://www.wopta.it",
 			//OnInterruption: "https://www.wopta.it",
 		},
-		AllowedPaymentMethods: []AllowedPaymentMethod{{Role: "payer", PaymentMethods: paymentMethods}},
-		CallbackURL:           "https://www.wopta.it",
-		PayByLink:             []PayByLink{{Type: "EMAIL", Recipients: data.Contractor.Mail, Template: "pay-by-link"}},
+		//AllowedPaymentMethods: []AllowedPaymentMethod{{Role: "payer", PaymentMethods: paymentMethods}},
+		//CallbackURL:           "https://www.wopta.it",
+		//PayByLink:             []PayByLink{{Type: "EMAIL", Recipients: data.Contractor.Mail, Template: "pay-by-link"}},
 	}
 	pay.Bill = bill
 

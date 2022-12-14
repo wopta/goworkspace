@@ -27,7 +27,7 @@ type Bill struct {
 	Items               []Item               `json:"items,omitempty"`
 	ScheduleTransaction *ScheduleTransaction `json:"scheduleTransaction,omitempty"`
 	MandateCreation     string               `json:"mandateCreation,omitempty"`
-	Subjects            []Subject            `json:"subjects,omitempty"`
+	Subjects            *[]Subject           `json:"subjects,omitempty"`
 }
 
 type Item struct {
@@ -54,8 +54,8 @@ type Subject struct {
 
 type PaymentConfiguration struct {
 	ExpirationDate          string                  `json:"expirationDate,omitempty"`
-	AllowedPaymentMethods   []AllowedPaymentMethod  `json:"allowedPaymentMethods,omitempty"`
-	PayByLink               []PayByLink             `json:"payByLink,omitempty"`
+	AllowedPaymentMethods   *[]AllowedPaymentMethod `json:"allowedPaymentMethods,omitempty"`
+	PayByLink               *[]PayByLink            `json:"payByLink,omitempty"`
 	CallbackURL             string                  `json:"callbackUrl,omitempty"`
 	PaymentPageRedirectUrls PaymentPageRedirectUrls `json:"paymentPageRedirectUrls,omitempty"`
 }
