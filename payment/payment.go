@@ -47,7 +47,8 @@ func FabrickPay(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 	defer r.Body.Close()
 	err := json.Unmarshal([]byte(req), &data)
 	lib.CheckError(err)
-	FabrickPayObj(data)
+	resultPay := <-FabrickPayObj(data)
+	log.Println(resultPay)
 	return "", nil
 }
 func CriptoPay(w http.ResponseWriter, r *http.Request) (string, interface{}) {
