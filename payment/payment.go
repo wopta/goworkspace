@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -282,7 +283,7 @@ func getfabbricPayments(data model.Policy) string {
 	next := now.AddDate(0, 0, 1)
 	layout := "2006-01-02T15:04:05.000Z"
 	layout2 := "2006-01-02"
-	externalId := "paymentXid_20221206" + next.Format(layout)
+	externalId := "paymentXid_20221206" + strconv.FormatInt(now.Unix(), 10)
 	paymentMethods := []string{
 		"CREDITCARD",
 		"FBKR2P",
