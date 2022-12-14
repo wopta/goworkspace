@@ -276,6 +276,7 @@ func getfabbricBase() string {
 	}`
 }
 func getfabbricPayments(data model.Policy) string {
+
 	now := time.Now()
 	next := now.AddDate(0, 0, 1)
 	layout := "2006-01-02T15:04:05.000Z"
@@ -292,6 +293,9 @@ func getfabbricPayments(data model.Policy) string {
 	var pay FabrickPaymentsRequest
 	pay.MerchantID = "wop134b31-5926-4b26-1411-726bc9f0b111"
 	pay.ExternalID = externalId
+	var scheduleTransaction ScheduleTransaction
+	//scheduleTransaction= ScheduleTransaction{DueDate: next.Format(layout2), PaymentInstrumentResolutionStrategy: "BY_PAYER"}
+
 	pay.PaymentConfiguration = PaymentConfiguration{
 
 		ExpirationDate: next.Format(layout),
@@ -305,13 +309,14 @@ func getfabbricPayments(data model.Policy) string {
 		PayByLink:             []PayByLink{{Type: "EMAIL", Recipients: data.Contractor.Mail, Template: "pay-by-link"}},
 	}
 	pay.Bill = Bill{
-		ExternalID:          externalId,
-		Amount:              100.00,
-		Currency:            "EUR",
-		Description:         "Test pagamento",
-		MandateCreation:     "false",
-		Subjects:            []Subject{{ExternalID: "testcustomer01", Role: "customer", Email: data.Contractor.Mail, Name: data.Contractor.Name + ` ` + data.Contractor.Surname}},
-		ScheduleTransaction: ScheduleTransaction{DueDate: next.Format(layout2), PaymentInstrumentResolutionStrategy: "BY_PAYER"},
+		ExternalID:      externalId,
+		Amount:          100.00,
+		Currency:        "EUR",
+		Description:     "Test pagamento",
+		MandateCreation: "false",
+		Subjects:        []Subject{{ExternalID: "testcustomer01", Role: "customer", Email: data.Contractor.Mail, Name: data.Contractor.Name + ` ` + data.Contractor.Surname}},
+
+		ScheduleTransaction: scheduleTransaction,
 		Items:               []Item{{ExternalID: externalId, Amount: 100.00, Currency: "EUR"}},
 	}
 
