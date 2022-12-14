@@ -302,12 +302,13 @@ func getfabbricPayments(data model.Policy) string {
 		CallbackURL:           "https://www.wopta.it",
 	}
 	pay.Bill = Bill{
-		ExternalID:      "",
-		Amount:          100.00,
-		Currency:        "EUR",
-		Description:     "Test pagamento",
-		MandateCreation: "false",
-		Subjects:        []Subject{{Role: "customer", Email: data.Contractor.Mail, Name: data.Contractor.Name + ` ` + data.Contractor.Surname}},
+		ExternalID:          "",
+		Amount:              100.00,
+		Currency:            "EUR",
+		Description:         "Test pagamento",
+		MandateCreation:     "false",
+		Subjects:            []Subject{{Role: "customer", Email: data.Contractor.Mail, Name: data.Contractor.Name + ` ` + data.Contractor.Surname}},
+		ScheduleTransaction: ScheduleTransaction{DueDate: next.Format(layout2), PaymentInstrumentResolutionStrategy: "BY_PAYER"},
 	}
 
 	res, _ := pay.Marshal()
