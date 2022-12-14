@@ -279,6 +279,7 @@ func getfabbricPayments(data model.Policy) string {
 	next := now.AddDate(0, 0, 1)
 	layout := "2006-01-02T15:04:05.000Z"
 	layout2 := "2006-01-02"
+	externalId := "paymentXid_20221206"
 	paymentMethods := []string{
 		"CREDITCARD",
 		"FBKR2P",
@@ -289,7 +290,7 @@ func getfabbricPayments(data model.Policy) string {
 	log.Println(next.Format(layout2))
 	var pay FabrickPaymentsRequest
 	pay.MerchantID = "wop134b31-5926-4b26-1411-726bc9f0b111"
-	pay.ExternalID = "paymentXid_20221206"
+	pay.ExternalID = externalId
 	pay.PaymentConfiguration = PaymentConfiguration{
 
 		ExpirationDate: next.Format(layout),
@@ -302,7 +303,7 @@ func getfabbricPayments(data model.Policy) string {
 		CallbackURL:           "https://www.wopta.it",
 	}
 	pay.Bill = Bill{
-		ExternalID:          "testbill01",
+		ExternalID:          externalId,
 		Amount:              100.00,
 		Currency:            "EUR",
 		Description:         "Test pagamento",
