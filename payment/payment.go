@@ -302,6 +302,7 @@ func getfabbricPayments(data model.Policy) string {
 		},
 		AllowedPaymentMethods: []AllowedPaymentMethod{{Role: "payer", PaymentMethods: paymentMethods}},
 		CallbackURL:           "https://www.wopta.it",
+		PayByLink:             []PayByLink{{Type: "EMAIL", Recipients: data.Contractor.Mail, Template: "pay-by-link"}},
 	}
 	pay.Bill = Bill{
 		ExternalID:          externalId,
