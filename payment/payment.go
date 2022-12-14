@@ -299,6 +299,7 @@ func getfabbricPayments(data model.Policy) string {
 	var scheduleTransaction ScheduleTransaction
 	scheduleTransaction = ScheduleTransaction{DueDate: next.Format(layout2), PaymentInstrumentResolutionStrategy: "BY_PAYER"}
 	var bill Bill
+
 	bill.ExternalID = externalId
 	bill.Amount = 100.00
 	bill.Currency = "EUR"
@@ -313,7 +314,7 @@ func getfabbricPayments(data model.Policy) string {
 
 	pay.PaymentConfiguration = PaymentConfiguration{
 
-		ExpirationDate: next.Format(layout),
+		//ExpirationDate: next.Format(layout),
 		PaymentPageRedirectUrls: PaymentPageRedirectUrls{
 			OnSuccess: "https://www.wopta.it",
 			OnFailure: "https://www.wopta.it",
