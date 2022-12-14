@@ -20,14 +20,14 @@ type FabrickPaymentsRequest struct {
 }
 
 type Bill struct {
-	ExternalID          string              `json:"externalId,omitempty"`
-	Amount              float64             `json:"amount,omitempty"`
-	Currency            string              `json:"currency,omitempty"`
-	Description         string              `json:"description,omitempty"`
-	Items               []Item              `json:"items,omitempty"`
-	ScheduleTransaction ScheduleTransaction `json:"scheduleTransaction,omitempty"`
-	MandateCreation     string              `json:"mandateCreation,omitempty"`
-	Subjects            []Subject           `json:"subjects,omitempty"`
+	ExternalID          string               `json:"externalId,omitempty"`
+	Amount              float64              `json:"amount,omitempty"`
+	Currency            string               `json:"currency,omitempty"`
+	Description         string               `json:"description,omitempty"`
+	Items               []Item               `json:"items,omitempty"`
+	ScheduleTransaction *ScheduleTransaction `json:"scheduleTransaction,omitempty"`
+	MandateCreation     string               `json:"mandateCreation,omitempty"`
+	Subjects            []Subject            `json:"subjects,omitempty"`
 }
 
 type Item struct {
