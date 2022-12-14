@@ -69,7 +69,7 @@ func FabrickPayObj(data model.Policy) <-chan string {
 		}
 		log.Printf(getfabbricPayments(data))
 		//log.Println(getFabrickPay(data))
-		req, _ := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(getfabbricPayments(data)))
+		req, _ := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(getfabbricBase()))
 		req.Header.Set("api-key", os.Getenv("FABRICK_TOKEN_BACK_API"))
 		req.Header.Set("Auth-Schema", "S2S")
 		req.Header.Set("Content-Type", "application/json")
@@ -250,14 +250,15 @@ func getCoinqvestPay(id string) string {
 	 }`
 }
 func getfabbricBase() string {
+	now := time.Now()
 	return `{
 		"merchantId": "wop134b31-5926-4b26-1411-726bc9f0b111",
-		"externalId": "paymentXid_20221206",
+		"externalId": "` + now.String() + `",
 		"paymentConfiguration": {
 			"paymentPageRedirectUrls": {
 				"onSuccess": "https://www.google.com",
 				"onFailure": "https://www.amazon.it",
-				"onInterruption": ""
+				"onInterruption": "https://www.amazon.it"
 			}
 		},
 		"bill": {
