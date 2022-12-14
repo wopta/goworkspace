@@ -309,12 +309,12 @@ func getfabbricPayments(data model.Policy) string {
 		PayByLink:             []PayByLink{{Type: "EMAIL", Recipients: data.Contractor.Mail, Template: "pay-by-link"}},
 	}
 	pay.Bill = Bill{
-		ExternalID:      externalId,
-		Amount:          100.00,
-		Currency:        "EUR",
-		Description:     "Test pagamento",
-		MandateCreation: "false",
-		Subjects:        []Subject{{ExternalID: "testcustomer01", Role: "customer", Email: data.Contractor.Mail, Name: data.Contractor.Name + ` ` + data.Contractor.Surname}},
+		ExternalID:  externalId,
+		Amount:      100.00,
+		Currency:    "EUR",
+		Description: "Test pagamento",
+		//MandateCreation: "false",
+		Subjects: []Subject{{ExternalID: "testcustomer01", Role: "customer", Email: data.Contractor.Mail, Name: data.Contractor.Name + ` ` + data.Contractor.Surname}},
 
 		ScheduleTransaction: scheduleTransaction,
 		Items:               []Item{{ExternalID: externalId, Amount: 100.00, Currency: "EUR"}},
