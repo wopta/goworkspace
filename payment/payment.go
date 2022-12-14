@@ -310,7 +310,7 @@ func getfabbricPayments(data model.Policy) string {
 	}
 
 	//bill.Items = []Item{{ExternalID: externalId, Amount: 100.00, Currency: "EUR"}}
-	//bill.Subjects = []Subject{{ExternalID: "testcustomer01", Role: "customer", Email: data.Contractor.Mail, Name: data.Contractor.Name + ` ` + data.Contractor.Surname}}
+	bill.Subjects = &[]Subject{{ExternalID: "testcustomer01", Role: "customer", Email: data.Contractor.Mail, Name: data.Contractor.Name + ` ` + data.Contractor.Surname}}
 
 	pay.PaymentConfiguration = PaymentConfiguration{
 
