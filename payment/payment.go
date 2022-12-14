@@ -307,7 +307,7 @@ func getfabbricPayments(data model.Policy) string {
 		Currency:            "EUR",
 		Description:         "Test pagamento",
 		MandateCreation:     "false",
-		Subjects:            []Subject{{Role: "customer", Email: data.Contractor.Mail, Name: data.Contractor.Name + ` ` + data.Contractor.Surname}},
+		Subjects:            []Subject{{ExternalID: "testcustomer", Role: "customer", Email: data.Contractor.Mail, Name: data.Contractor.Name + ` ` + data.Contractor.Surname}},
 		ScheduleTransaction: ScheduleTransaction{DueDate: next.Format(layout2), PaymentInstrumentResolutionStrategy: "BY_PAYER"},
 	}
 
