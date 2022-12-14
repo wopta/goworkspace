@@ -294,31 +294,32 @@ func getfabbricPayments(data model.Policy) string {
 	pay.MerchantID = "wop134b31-5926-4b26-1411-726bc9f0b111"
 	pay.ExternalID = externalId
 	var scheduleTransaction ScheduleTransaction
-	//scheduleTransaction= ScheduleTransaction{DueDate: next.Format(layout2), PaymentInstrumentResolutionStrategy: "BY_PAYER"}
+	scheduleTransaction = ScheduleTransaction{DueDate: next.Format(layout2), PaymentInstrumentResolutionStrategy: "BY_PAYER"}
+	var bill Bill
+	bill.ExternalID = externalId
+	bill.Amount = 100.00
+	bill.Currency = "EUR"
+	bill.Description = "Test pagamento"
+	if false {
+		bill.MandateCreation = "true"
+		bill.ScheduleTransaction = scheduleTransaction
+	}
+	bill.Items = []Item{{ExternalID: externalId, Amount: 100.00, Currency: "EUR"}}
+	bill.Subjects = []Subject{{ExternalID: "testcustomer01", Role: "customer", Email: data.Contractor.Mail, Name: data.Contractor.Name + ` ` + data.Contractor.Surname}}
 
 	pay.PaymentConfiguration = PaymentConfiguration{
 
 		ExpirationDate: next.Format(layout),
 		PaymentPageRedirectUrls: PaymentPageRedirectUrls{
-			OnSuccess:      "https://www.wopta.it",
-			OnFailure:      "https://www.wopta.it",
-			OnInterruption: "https://www.wopta.it",
+			OnSuccess: "https://www.wopta.it",
+			OnFailure: "https://www.wopta.it",
+			//OnInterruption: "https://www.wopta.it",
 		},
 		AllowedPaymentMethods: []AllowedPaymentMethod{{Role: "payer", PaymentMethods: paymentMethods}},
 		CallbackURL:           "https://www.wopta.it",
 		PayByLink:             []PayByLink{{Type: "EMAIL", Recipients: data.Contractor.Mail, Template: "pay-by-link"}},
 	}
-	pay.Bill = Bill{
-		ExternalID:  externalId,
-		Amount:      100.00,
-		Currency:    "EUR",
-		Description: "Test pagamento",
-		//MandateCreation: "false",
-		Subjects: []Subject{{ExternalID: "testcustomer01", Role: "customer", Email: data.Contractor.Mail, Name: data.Contractor.Name + ` ` + data.Contractor.Surname}},
-
-		ScheduleTransaction: scheduleTransaction,
-		Items:               []Item{{ExternalID: externalId, Amount: 100.00, Currency: "EUR"}},
-	}
+	pay.Bill = bill
 
 	res, _ := pay.Marshal()
 	return string(res)
