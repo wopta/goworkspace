@@ -262,7 +262,7 @@ func getfabbricBase() string {
 			}
 		},
 		"bill": {
-			"externalId": "billXid_20221206",
+			"externalId": "` + now.String() + `",
 			"amount": 5,
 			"currency": "EUR",
 			"subjects": [
