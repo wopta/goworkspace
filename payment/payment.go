@@ -311,6 +311,7 @@ func getfabbricPayments(data model.Policy) string {
 		MandateCreation:     "false",
 		Subjects:            []Subject{{ExternalID: "testcustomer01", Role: "customer", Email: data.Contractor.Mail, Name: data.Contractor.Name + ` ` + data.Contractor.Surname}},
 		ScheduleTransaction: ScheduleTransaction{DueDate: next.Format(layout2), PaymentInstrumentResolutionStrategy: "BY_PAYER"},
+		Items:               []Item{{ExternalID: externalId, Amount: 100.00, Currency: "EUR"}},
 	}
 
 	res, _ := pay.Marshal()
