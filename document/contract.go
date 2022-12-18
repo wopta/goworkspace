@@ -37,28 +37,24 @@ func ContractObj(data model.Policy) <-chan DodumentResponse {
 	go func() {
 		skin, _, textBold, _, _ := getVar()
 		m := skin.initDefault()
-		h := []string{"Garanzie ", "Somma assicurata ", "Opzioni / Dettagli ", "Premio "}
+
 		var (
 			logo, name string
 			coverages  pdf.Maroto
+			assets     pdf.Maroto
 		)
 		if data.Name == "persona" {
 			logo = "/persona.png"
 			name = "Persona"
-			var table [][]string
-
-			for _, A := range data.Assets {
-				for _, k := range A.Guarantees {
-					r := []string{k.Name, strconv.Itoa(int(k.SumInsuredLimitOfIndemnity)), k.SelfInsurance, strconv.Itoa(int(k.Price))}
-					table = append(table, r)
-				}
-			}
-			coverages = skin.CoveragesTable(m, h, table)
+			assets = skin.GetPersona(data, m)
+			coverages = skin.CoveragesPersonTable(m, data)
 		}
 
 		if data.Name == "pmi" {
 			logo = "/pmi.png"
 			name = "Artigiani & Imprese"
+			assets = skin.GetPmi(data, m)
+			coverages = skin.CoveragesPmiTable(m, data)
 		}
 
 		log.Println(textBold)
@@ -139,15 +135,7 @@ func ContractObj(data model.Policy) <-chan DodumentResponse {
 		})
 		log.Println("Document 3")
 		m = skin.Space(m, 10.0)
-
-		log.Println("Document 4")
-		if data.Name == "persona" {
-			m = skin.GetPersona(data, m)
-		}
-
-		if data.Name == "pmi" {
-			m = skin.GetPmi(data, m)
-		}
+		m = assets
 		m = skin.Space(m, 10.0)
 
 		m = coverages
@@ -244,7 +232,7 @@ func ContractObj(data model.Policy) <-chan DodumentResponse {
 
 		m = skin.Title(m, title, body, 25.0)
 
-		h = []string{"Premio ", "Imponibile  ", "Imposte Assicurative ", "Totale"}
+		h := []string{"Premio ", "Imponibile  ", "Imposte Assicurative ", "Totale"}
 		var tablePremium [][]string
 		tablePremium = append(tablePremium, []string{"Annuale", strconv.Itoa(int(data.PriceNett)), strconv.Itoa(int(data.TaxAmount)), strconv.Itoa(int(data.PriceGross))})
 		tablePremium = append(tablePremium, []string{"Mensile", strconv.Itoa(int(data.PriceNett)), strconv.Itoa(int(data.TaxAmount)), strconv.Itoa(int(data.PriceGross))})

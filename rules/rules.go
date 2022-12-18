@@ -34,8 +34,13 @@ func Rules(w http.ResponseWriter, r *http.Request) {
 
 type Coverage struct {
 	DailyAllowance             string
+	Name                       string
 	LegalDefence               string
 	Assistance                 string
+	Group                      string
+	CompanyCodec               string
+	CompanyName                string
+	IsExtension                bool
 	IsYuor                     bool
 	Type                       string
 	TypeOfSumInsured           string

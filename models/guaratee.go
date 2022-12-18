@@ -5,9 +5,13 @@ type Guarantee struct {
 	Beneficiary                User                      `firestore:"beneficiary,omitempty" json:"beneficiary,omitempty"`
 	TypeOfSumInsured           string                    `firestore:"typeOfSumInsured,omitempty" json:"typeOfSumInsured,omitempty"`
 	Description                string                    `firestore:"description,omitempty" json:"description,omitempty"`
+	CompanyCodec               string                    `firestore:"companyCodec,omitempty" json:"companyCodec,omitempty"`
+	CompanyName                string                    `firestore:"companyName,omitempty" json:"companyName,omitempty"`
+	Group                      string                    `firestore:"group,omitempty" json:"group,omitempty"`
 	Value                      GuaranteeValue            `firestore:"value,omitempty" json:"value,omitempty"`
 	Offer                      map[string]*CoverageValue `firestore:"offer,omitempty" json:"offer,omitempty"`
 	Slug                       string                    `firestore:"slug,omitempty" json:"slug,omitempty"`
+	IsExtension                bool                      `firestore:"isExtension,omitempty" json:"isExtensionExtension,omitempty"`
 	IsBase                     bool                      `firestore:"isBase,omitempty" json:"isBase,omitempty"`
 	IsYour                     bool                      `firestore:"isYour,omitempty" json:"isYour,omitempty"`
 	IsPremium                  bool                      `firestore:"isPremium,omitempty" json:"isPremium,omitempty"`
@@ -17,7 +21,9 @@ type Guarantee struct {
 	Name                       string                    `firestore:"name,omitempty" json:"name,omitempty"`
 	SumInsuredLimitOfIndemnity float64                   `json:"sumInsuredLimitOfIndemnity,omitempty" json:"sumInsuredLimitOfIndemnity,omitempty"`
 	Deductible                 string                    `firestore:"deductible,omitempty" json:"deductible,omitempty"`
+	DeductibleDesc             string                    `firestore:"deductibleDesc,omitempty" json:"deductibleDesc,omitempty"`
 	SelfInsurance              string                    `firestore:"selfInsurance,omitempty" json:"selfInsurance,omitempty"`
+	SelfInsuranceDesc          string                    `firestore:"selfInsuranceDesc,omitempty" json:"selfInsuranceDesc,omitempty"`
 	Tax                        float64                   `json:"tax,omitempty" json:"tax,omitempty"`
 	Price                      int64                     `firestore:"price,omitempty" json:"price,omitempty"`
 	PriceNett                  int64                     `firestore:"priceNett,omitempty" json:"priceNett,omitempty"`

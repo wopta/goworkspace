@@ -1,14 +1,113 @@
 {
-  "date": "2022-11-29T20:09:00.000",
-  "name": "IVAN",
-  "surname": "PIVIROTTO",
-  "mail": "nelson.herrera@wopta.it",
-  "policyNumber": "W00000858",
-  "policyId": "Wopta Per Te. Persone - W00000858",
-  "id": "8d7b1493-ac7b-4f91-b52c-fe2ed9a01684",
-  "description": "teste",
-  "policyDescription": "Wopta Per Te. Persone - W00000858",
-  "state": "open",
-  "creationDate": "2022-11-29T20:09:35.585025",
-  "documents": null
+  "sme": {
+    "ateco": "310200",
+    "subproductId": 35,
+    "UW_role": "Agent",
+    "company": {
+      "country": "Italy",
+      "vatnumber": {
+        "value": "03610860540"
+      },
+      "opre_eur": {
+        "value": 142092
+      },
+      "employees": {
+        "value": 2
+      }
+    },
+    "answers": {
+      "step1": [
+        {
+          "slug": "employers-liability",
+          "value": {
+            "typeOfSumInsured": "firstLoss",
+            "deductible": "2600",
+            "sumInsuredLimitOfIndemnity": 1000000
+          }
+        },
+        {
+          "slug": "third-party-liability",
+          "value": {
+            "typeOfSumInsured": "firstLoss",
+            "deductible": "500",
+            "sumInsuredLimitOfIndemnity": 1000000
+          }
+        }
+      ],
+      "step2": [
+        {
+          "buildingId": "2",
+          "value": {
+            "buildingType": "masonry",
+            "numberOfFloors": "ground_floor",
+            "constructionYear": "before1972",
+            "alarm": "yes",
+            "typeOfInsurance": "namedPerils",
+            "ateco": "310200",
+            "postcode": "15057",
+            "province": "AL",
+            "answer": [
+              {
+                "slug": "assistance",
+                "value": {
+                  "assistance": "yes"
+                }
+              },
+              {
+                "slug": "building",
+                "value": {
+                  "sumInsuredLimitOfIndemnity": 50000,
+                  "typeOfSumInsured": "firstLoss",
+                  "deductible": "0"
+                }
+              },
+              {
+                "slug": "content",
+                "value": {
+                  "sumInsuredLimitOfIndemnity": 30000,
+                  "typeOfSumInsured": "firstLoss",
+                  "deductible": "500"
+                }
+              },
+              {
+                "slug": "environmental-liability",
+                "value": {
+                  "selfInsurance": "0.10",
+                  "sumInsuredLimitOfIndemnity": 100000,
+                  "typeOfSumInsured": "firstLoss",
+                  "deductible": "5000"
+                }
+              },
+              {
+                "slug": "property-owners-liability",
+                "value": {
+                  "sumInsuredLimitOfIndemnity": 1000000,
+                  "typeOfSumInsured": "firstLoss",
+                  "deductible": "1000"
+                }
+              },
+              {
+                "slug": "third-party-recourse",
+                "value": {
+                  "selfInsurance": "0.10",
+                  "sumInsuredLimitOfIndemnity": 150000,
+                  "typeOfSumInsured": "firstLoss",
+                  "deductible": "500"
+                }
+              },
+              {
+                "slug": "water-damage",
+                "value": {
+                  "selfInsurance": "0.05",
+                  "sumInsuredLimitOfIndemnity": 0.7,
+                  "typeOfSumInsured": "replacementValue",
+                  "deductible": "500"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
 }

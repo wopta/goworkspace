@@ -1,6 +1,8 @@
 package document
 
 import (
+	"strconv"
+
 	"github.com/johnfercher/maroto/pkg/consts"
 	"github.com/johnfercher/maroto/pkg/pdf"
 	"github.com/johnfercher/maroto/pkg/props"
@@ -446,4 +448,38 @@ func (s Skin) GetPmi(data models.Policy, m pdf.Maroto) pdf.Maroto {
 	})
 	return m
 
+}
+func (s Skin) CoveragesPmiTable(m pdf.Maroto, data models.Policy) pdf.Maroto {
+	head1 := []string{"Garanzie ", "Somma assicurata ", "Opzioni / Estensioni ", "Premio €"}
+	var table [][]string
+	for _, A := range data.Assets {
+		for _, k := range A.Guarantees {
+			r := []string{k.Name, strconv.Itoa(int(k.SumInsuredLimitOfIndemnity)), k.SelfInsurance, strconv.Itoa(int(k.Price))}
+			table = append(table, r)
+		}
+	}
+	m = s.CoveragesTable(m, head1, table)
+	var table2 [][]string
+	head2 := []string{"Garanzie ", "Somma assicurata ", "Opzioni / Dettagli ", "Premio €"}
+	for _, A := range data.Assets {
+		for _, k := range A.Guarantees {
+			r := []string{k.Name, strconv.Itoa(int(k.SumInsuredLimitOfIndemnity)), k.SelfInsurance, strconv.Itoa(int(k.Price))}
+			table = append(table, r)
+		}
+	}
+	m = s.CoveragesTable(m, head2, table2)
+	return m
+}
+func (s Skin) CoveragesPersonTable(m pdf.Maroto, data models.Policy) pdf.Maroto {
+	h := []string{"Garanzie ", "Somma assicurata ", "Opzioni / Dettagli ", "Premio "}
+	var table [][]string
+	for _, A := range data.Assets {
+		for _, k := range A.Guarantees {
+			r := []string{k.Name, strconv.Itoa(int(k.SumInsuredLimitOfIndemnity)), k.SelfInsurance, strconv.Itoa(int(k.Price))}
+			table = append(table, r)
+		}
+	}
+
+	m = s.CoveragesTable(m, h, table)
+	return m
 }

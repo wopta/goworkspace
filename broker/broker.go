@@ -30,6 +30,7 @@ func Broker(w http.ResponseWriter, r *http.Request) {
 				Route:   "/v1/policy/proposal",
 				Hendler: Proposal,
 			},
+
 			{
 				Route:   "/v1/policy/emit",
 				Hendler: Emit,
