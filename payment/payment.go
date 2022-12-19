@@ -271,33 +271,6 @@ func getfabbricBase(data model.Policy) string {
 			"items": null,
 			"subjects": null
 		}
-	}
-	
-	
-	
-	{
-		"merchantId": "wop134b31-5926-4b26-1411-726bc9f0b111",
-		"externalId": "` + now.String() + `",
-		"paymentConfiguration": {
-			"paymentPageRedirectUrls": {
-				"onSuccess": "https://www.google.com",
-				"onFailure": "https://www.amazon.it",
-				"onInterruption": "https://www.amazon.it"
-			}
-		},
-		"bill": {
-			"externalId": "` + now.String() + `",
-			"amount": 5,
-			"currency": "EUR",
-			"subjects": [
-				{
-					"role": "customer",
-					"externalId": "wopta_subject_test_20221206",
-					"name": "Emanuela Larovere",
-					"email": "emanuela.larovere@fabrick.com"
-				}
-			]
-		}
 	}`
 }
 func getfabbricPayments(data model.Policy) string {
