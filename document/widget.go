@@ -6,6 +6,7 @@ import (
 	"github.com/johnfercher/maroto/pkg/consts"
 	"github.com/johnfercher/maroto/pkg/pdf"
 	"github.com/johnfercher/maroto/pkg/props"
+	lib "github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	//model "github.com/wopta/goworkspace/models"
 )
@@ -398,9 +399,10 @@ func (s Skin) GetPmi(data models.Policy, m pdf.Maroto) pdf.Maroto {
 	}
 	m.Row(20, func() {
 		m.Col(8, func() {
-			m.Text("L’assicurazione è prestata per", prop)
+			m.Text("Le coperture assicurative che hai scelto ", prop)
 		})
 	})
+
 	m.Line(1.0, linePropMagenta)
 	m.Row(20, func() {
 		m.Col(2, func() {
@@ -437,11 +439,11 @@ func (s Skin) GetPmi(data models.Policy, m pdf.Maroto) pdf.Maroto {
 	m.Line(1.0, linePropMagenta)
 	m.Row(20, func() {
 		m.Col(2, func() {
-			m.Text("Sede 1", bold)
+			m.Text("Franchigia e Scoperto  ", bold)
 
 		})
 		m.Col(8, func() {
-			m.Text("title", normal)
+			m.Text("Il livello scelto è: MINIMO. Per ogni garanzia, nella Tabella “Scoperti e Franchigie” alla voce MINIMO troverai il dettaglio di tutti gli Scoperti e Franchigie in caso di Sinistro, di cui l’importo qui indicato costituisce, in ogni caso, il minimo applicato se non diversamente specificato", normal)
 
 		})
 
@@ -450,6 +452,22 @@ func (s Skin) GetPmi(data models.Policy, m pdf.Maroto) pdf.Maroto {
 
 }
 func (s Skin) CoveragesPmiTable(m pdf.Maroto, data models.Policy) pdf.Maroto {
+
+	m.Row(25, func() {
+		m.Col(12, func() {
+			m.Text("Le coperture assicurative che hai scelto ", s.MagentaBoldtextLeft)
+
+		})
+
+	})
+	m.Row(25, func() {
+		m.Col(12, func() {
+			m.Text("(operative se indicata Somma o Massimale e secondo le Opzioni/Estensioni attivate qualora indicato) ", s.MagentaBoldtextLeft)
+
+		})
+
+	})
+
 	head1 := []string{"Garanzie ", "Somma assicurata ", "Opzioni / Estensioni ", "Premio €"}
 	var table [][]string
 	for _, A := range data.Assets {
@@ -459,6 +477,7 @@ func (s Skin) CoveragesPmiTable(m pdf.Maroto, data models.Policy) pdf.Maroto {
 		}
 	}
 	m = s.CoveragesTable(m, head1, table)
+
 	var table2 [][]string
 	head2 := []string{"Garanzie ", "Somma assicurata ", "Opzioni / Dettagli ", "Premio €"}
 	for _, A := range data.Assets {
@@ -481,5 +500,84 @@ func (s Skin) CoveragesPersonTable(m pdf.Maroto, data models.Policy) pdf.Maroto 
 	}
 
 	m = s.CoveragesTable(m, h, table)
+	return m
+}
+func (skin Skin) GetHeader(m pdf.Maroto, data models.Policy, logo string, name string) pdf.Maroto {
+	m.RegisterHeader(func() {
+		m.Row(15.0, func() {
+			m.Col(2, func() {
+
+				_ = m.FileImage(lib.GetAssetPathByEnv("document")+logo, props.Rect{
+					Left:    1,
+					Top:     1,
+					Center:  false,
+					Percent: 100,
+				})
+			})
+			m.Col(1, func() {
+				m.Text("Wopta per te", props.Text{
+					Color:       skin.LineColor,
+					Top:         1,
+					Style:       consts.Bold,
+					Align:       consts.Left,
+					Size:        skin.SizeTitle + 3,
+					Extrapolate: true,
+				})
+
+				m.Text(name, props.Text{
+					Top:         6,
+					Style:       consts.Italic,
+					Align:       consts.Left,
+					Color:       skin.TextColor,
+					Size:        skin.SizeTitle + 3,
+					Extrapolate: true,
+				})
+			})
+			m.ColSpace(6)
+			m.Col(2, func() {
+				_ = m.FileImage(lib.GetAssetPathByEnv("document")+"/ARTW_LOGO_RGB_400px.png", props.Rect{
+					Left:    1,
+					Top:     1,
+					Center:  false,
+					Percent: 100,
+				})
+			})
+		})
+		h := []string{"I dati della tua Polizza ", "I tuoi dati"}
+		var tablePremium [][]string
+		tablePremium = append(tablePremium, []string{"Numero: " + data.ID, "Contraente: " + data.Contractor.Name + " " + data.Contractor.Surname})
+		tablePremium = append(tablePremium, []string{"Decorre dal: " + data.StartDate.String() + " ore 24:00", "C.F. / P.IVA: " + data.Contractor.Surname})
+		tablePremium = append(tablePremium, []string{"Scade il: " + data.EndDate.String() + " ore 24:00", "Indirizzo: " + data.Contractor.Address})
+		tablePremium = append(tablePremium, []string{"Si rinnova a scadenza, salvo disdetta da inviare 30 giorni prima", "XXXXX  XXXXXXXXXXXXXXXXXXX (XX)"})
+		tablePremium = append(tablePremium, []string{"Prossimo pagamento il: " + data.EndDate.String(), "Mail:  " + data.Contractor.Mail})
+		tablePremium = append(tablePremium, []string{"Sostituisce la polizza: = = = = = = = =", "Telefono: " + data.Contractor.Phone})
+		m = skin.Table(m, h, tablePremium, 6, 3.0)
+	})
+
+	return m
+}
+func (skin Skin) GetFooter(m pdf.Maroto, data models.Policy, logo string, name string) pdf.Maroto {
+	m.RegisterFooter(func() {
+		m.Row(15.0, func() {
+			m.Col(8, func() {
+				m.Text("Wopta per te. Persona è un prodotto assicurativo di Global Assistance Compagnia di assicurazioni e riassicurazioni S.p.A, distribuito da Wopta Assicurazioni S.r.l", props.Text{
+					Top:         1,
+					Style:       consts.Bold,
+					Align:       consts.Left,
+					Color:       skin.LineColor,
+					Size:        skin.Size - 1,
+					Extrapolate: false,
+				})
+			})
+			m.Col(2, func() {
+				_ = m.FileImage(lib.GetAssetPathByEnv("document")+"/logo_global.png", props.Rect{
+					Left:    1,
+					Top:     1,
+					Center:  false,
+					Percent: 100,
+				})
+			})
+		})
+	})
 	return m
 }

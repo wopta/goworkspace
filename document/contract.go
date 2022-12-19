@@ -9,10 +9,10 @@ import (
 	"os"
 	"strconv"
 	"time"
+	"unicode"
 
 	"github.com/johnfercher/maroto/pkg/consts"
 	"github.com/johnfercher/maroto/pkg/pdf"
-	"github.com/johnfercher/maroto/pkg/props"
 	lib "github.com/wopta/goworkspace/lib"
 	model "github.com/wopta/goworkspace/models"
 )
@@ -24,9 +24,11 @@ func Contract(w http.ResponseWriter, r *http.Request) (string, interface{}) {
 	var data model.Policy
 	defer r.Body.Close()
 	err := json.Unmarshal([]byte(req), &data)
+	log.Println("Unmarshal")
 	lib.CheckError(err)
-	respObj := ContractObj(data)
+	respObj := <-ContractObj(data)
 	resp, err := json.Marshal(respObj)
+	log.Println(string(resp))
 	lib.CheckError(err)
 	return string(resp), respObj
 }
@@ -46,6 +48,9 @@ func ContractObj(data model.Policy) <-chan DodumentResponse {
 		if data.Name == "persona" {
 			logo = "/persona.png"
 			name = "Persona"
+			m = skin.GetHeader(m, data, logo, name)
+			m = skin.GetFooter(m, data, logo, name)
+			m = skin.Space(m, 20.0)
 			assets = skin.GetPersona(data, m)
 			coverages = skin.CoveragesPersonTable(m, data)
 		}
@@ -53,6 +58,9 @@ func ContractObj(data model.Policy) <-chan DodumentResponse {
 		if data.Name == "pmi" {
 			logo = "/pmi.png"
 			name = "Artigiani & Imprese"
+			m = skin.GetHeader(m, data, logo, name)
+			m = skin.GetFooter(m, data, logo, name)
+			m = skin.Space(m, 20.0)
 			assets = skin.GetPmi(data, m)
 			coverages = skin.CoveragesPmiTable(m, data)
 		}
@@ -60,88 +68,43 @@ func ContractObj(data model.Policy) <-chan DodumentResponse {
 		log.Println(textBold)
 		log.Println("Document 1")
 
-		m.RegisterHeader(func() {
-			m.Row(15.0, func() {
-				m.Col(2, func() {
-
-					_ = m.FileImage(lib.GetAssetPathByEnv("document")+logo, props.Rect{
-						Left:    1,
-						Top:     1,
-						Center:  false,
-						Percent: 100,
-					})
-				})
-				m.Col(1, func() {
-					m.Text("Wopta per te", props.Text{
-						Color:       skin.LineColor,
-						Top:         1,
-						Style:       consts.Bold,
-						Align:       consts.Left,
-						Size:        skin.SizeTitle + 3,
-						Extrapolate: true,
-					})
-
-					m.Text(name, props.Text{
-						Top:         6,
-						Style:       consts.Italic,
-						Align:       consts.Left,
-						Color:       skin.TextColor,
-						Size:        skin.SizeTitle + 3,
-						Extrapolate: true,
-					})
-				})
-				m.ColSpace(6)
-				m.Col(2, func() {
-					_ = m.FileImage(lib.GetAssetPathByEnv("document")+"/ARTW_LOGO_RGB_400px.png", props.Rect{
-						Left:    1,
-						Top:     1,
-						Center:  false,
-						Percent: 100,
-					})
-				})
-			})
-			h := []string{"I dati della tua Polizza ", "I tuoi dati"}
-			var tablePremium [][]string
-			tablePremium = append(tablePremium, []string{"Numero: " + data.ID, "Contraente: " + data.Contractor.Name + " " + data.Contractor.Surname})
-			tablePremium = append(tablePremium, []string{"Decorre dal: " + data.StartDate.String() + " ore 24:00", "C.F. / P.IVA: " + data.Contractor.Surname})
-			tablePremium = append(tablePremium, []string{"Scade il: " + data.EndDate.String() + " ore 24:00", "Indirizzo: " + data.Contractor.Address})
-			tablePremium = append(tablePremium, []string{"Si rinnova a scadenza, salvo disdetta da inviare 30 giorni prima", "XXXXX  XXXXXXXXXXXXXXXXXXX (XX)"})
-			tablePremium = append(tablePremium, []string{"Prossimo pagamento il: " + data.EndDate.String(), "Mail:  " + data.Contractor.Mail})
-			tablePremium = append(tablePremium, []string{"Sostituisce la polizza: = = = = = = = =", "Telefono: " + data.Contractor.Phone})
-			m = skin.Table(m, h, tablePremium, 6, 3.0)
-		})
-
-		m.RegisterFooter(func() {
-			m.Row(15.0, func() {
-				m.Col(8, func() {
-					m.Text("Wopta per te. Persona è un prodotto assicurativo di Global Assistance Compagnia di assicurazioni e riassicurazioni S.p.A, distribuito da Wopta Assicurazioni S.r.l", props.Text{
-						Top:         1,
-						Style:       consts.Bold,
-						Align:       consts.Left,
-						Color:       skin.LineColor,
-						Size:        skin.Size - 1,
-						Extrapolate: false,
-					})
-				})
-				m.Col(2, func() {
-					_ = m.FileImage(lib.GetAssetPathByEnv("document")+"/logo_global.png", props.Rect{
-						Left:    1,
-						Top:     1,
-						Center:  false,
-						Percent: 100,
-					})
-				})
-			})
-		})
 		log.Println("Document 3")
 		m = skin.Space(m, 10.0)
 		m = assets
 		m = skin.Space(m, 10.0)
 
 		m = coverages
+		var articles []Kv
+		var stantments []Kv
+		var survay []Kv
+		var stantment Kv
+		var alfabet []rune
+		for r := 'a'; r < 'z'; r++ {
+			R := unicode.ToUpper(r)
+			alfabet = append(alfabet, r)
+			log.Println(R)
+		}
+		for x, A := range data.Statements {
 
+			s1 := strconv.FormatInt(int64(x), 10)
+
+			stantment = Kv{
+				Key:   s1 + ". ",
+				Value: A.Question,
+			}
+			stantments = append(stantments, stantment)
+		}
+		for x, A := range data.Survay {
+
+			log.Println(alfabet[x])
+			stantment = Kv{
+				Key:   strconv.QuoteRune(alfabet[x]) + ") ",
+				Value: A.Question,
+			}
+			stantments = append(survay, stantment)
+		}
 		m.AddPage()
-		articles := []Kv{
+		articles = []Kv{
 			{
 				Key:   "1. ",
 				Value: "le dichiarazioni non veritiere, inesatte o reticenti, da me rese, possono compromettere il diritto alla prestazione (come da art. 1892, 1893, 1894 c.c.)"},
@@ -149,7 +112,7 @@ func ContractObj(data model.Policy) <-chan DodumentResponse {
 				Key:   "2.",
 				Value: "nel caso di coperture che richiedono di acquisire informazioni sullo stato di salute dell’assicurato, come nel presente contratto: a) prima della sottoscrizione, ho verificato l’esattezza e rispondenza a verità delle mie dichiarazioni qui riportate; b) sono a conoscenza di poter chiedere di essere sottoposto a visita medica per certificare l’effettivo mio stato di salute, con costi a mio carico; "},
 		}
-		stantments := []Kv{
+		stantments = []Kv{
 			{
 				Key:   "a) ",
 				Value: "di NON essere affetto da infermità gravi quali: alcoolismo, tossicodipendenza, sindrome da immunodeficienza acquisita (AIDS), ovvero infermità dovute a malattie del sistema nervoso o della psiche (schizofrenia, psicosi, depressione, nevrosi, insufficienza mentale, demenza, Alzheimer, Parkinson, SLA, sclerosi multipla, cerebropatie, paresi, paralisi, epilessia); "},
@@ -208,15 +171,17 @@ func ContractObj(data model.Policy) <-chan DodumentResponse {
 		sub := "In deroga a quanto riportato nelle Condizioni Generali di Assicurazione, si concorda tra le Parti che: "
 		body := "TXT libero Fermo tutto il resto non derogato da quanto precede.  "
 		m = skin.TitleSub(m, title, sub, body)
+
 		title = "Presa visione dei documenti precontrattuali e sottoscrizione Polizza "
 		body = "Ho scelto la ricezione della seguente documentazione su supporto cartaceo / via e-mail al seguente indirizzo: XXXXXXXXXX. Sono a conoscenza che, anche le future comunicazioni avverranno con questo mezzo e che qualora volessi modificare questa mia scelta potrò farlo scrivendo a Global Assistance, con le modalità previste nelle Condizioni Generali di Assicurazione.  "
 		m = skin.Title(m, title, body, 18.0)
+
 		confirmationRecepit := []string{
 			"1. degli Allegati 3, 4 e 4-ter, di cui al Regolamento IVASS n. 40/2018, relativi agli obblighi informativi e di comportamento dell’Intermediario, inclusa l’informativa privacy dell’intermediario (ai sensi dell’art. 13 del regolamento UE n. 2016/679); ",
 			"2. del Set informativo, identificato dal modello XXXXXXXX ed. 2022, contenente: 1) documento informativo per i prodotti assicurativi danni (DIP Danni) e documento informativo precontrattuale aggiuntivo per i prodotti assicurativi danni (DIP Aggiuntivo danni) cui al Regolamento IVASS n. 41/2018; 2) Condizioni di Assicurazione comprensive di Glossario, che dichiaro altresì di conoscere ed accettare. ",
 		}
-
 		m = skin.TitleList(m, "", confirmationRecepit)
+
 		m = skin.Space(m, 3.0)
 		m = skin.Sign(m, "data.Name"+" "+"data.Surname", "Global Assistance")
 		m = skin.Space(m, 3.0)

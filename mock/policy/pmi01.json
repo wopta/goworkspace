@@ -7,12 +7,12 @@
     "endDate": "2022-11-12T17:39:34.8294666+01:00",
     "creationDate": "2022-11-12T17:39:34.8294666+01:00",
     "updated": "2022-11-12T17:39:34.8294666+01:00",
-    "payment": "Payment",
-    "paymentType": "PaymentType",
-    "paymentSplit": "PaymentSplit",
+    "payment": "Fabrick",
+    "paymentType": "credit card",
+    "paymentSplit": "montly",
     "coverageType": "CoverageType",
     "voucher": "Voucher",
-    "channel": "Channel",
+    "channel": "E-Commerce",
     "covenant": "Covenant",
     "contractor": {
         "name": "name",
@@ -20,14 +20,14 @@
         "surname": "surname",
         "address": "address",
         "postalCode": "postalCode",
-        "role": "role",
+        "role": "custumer",
         "work": "work",
         "workType": "workType",
         "mail": "luca.barbieri@wopta.it",
         "phone": "+393668134257",
         "fiscalCode": "fiscalCode",
-        "vatCode": "vatCode",
-        "riskClass": "3"
+        "vatCode": "vatCode"
+      
      
     },
     "statements": [

@@ -56,6 +56,29 @@ func getVar() (Skin, props.Line, props.Text, props.Text, props.Text) {
 		DynamicHeightMin:  90,
 		DynamicHeightDiv:  20.0,
 	}
+	skin.MagentaBoldtextLeft = props.Text{
+		Top:   1,
+		Size:  skin.SizeTitle,
+		Style: consts.Bold,
+		Align: consts.Left,
+		Color: skin.LineColor,
+	}
+
+	skin.MagentaBoldtextRight = props.Text{
+		Top:   1,
+		Size:  skin.SizeTitle,
+		Style: consts.Bold,
+		Align: consts.Right,
+		Color: skin.LineColor,
+	}
+	skin.MagentaTextLeft = props.Text{
+		Top:   1,
+		Size:  skin.SizeTitle,
+		Style: consts.Bold,
+		Align: consts.Left,
+		Color: skin.LineColor,
+	}
+
 	magenta := props.Text{
 		Top:   1,
 		Size:  skin.SizeTitle,

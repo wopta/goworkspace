@@ -34,6 +34,14 @@ const (
 	Transfer PayType = "transfer"
 )
 
+type CustomerRole string
+
+const (
+	Custumer CustomerRole = "custumer"
+	Agent    CustomerRole = "agent"
+	Manager  CustomerRole = "manager"
+)
+
 func t() {
 
 }

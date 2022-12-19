@@ -108,16 +108,16 @@ func Send(resp http.ResponseWriter, r *http.Request) (string, interface{}) {
 	return `{"message":"Success send "}`, nil
 }
 func Score(resp http.ResponseWriter, r *http.Request) (string, interface{}) {
-
+	var result map[string]string
 	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
 	log.Println(string(req))
-	var obj MailRequest
+
 	// Unmarshal or Decode the JSON to the interface.
 	//json.NewDecoder(req).Decode(&send)
 	defer r.Body.Close()
 
-	json.Unmarshal([]byte(req), &obj)
-	ScoreFido("luca.barbieriç@wopta.it")
+	json.Unmarshal([]byte(req), &result)
+	ScoreFido(result["email"])
 
 	return `{"message":"Success send "}`, nil
 }
@@ -129,16 +129,16 @@ func Validate(resp http.ResponseWriter, r *http.Request) (string, interface{}) {
 
 	json.Unmarshal([]byte(req), &result)
 
-	fido := <-ScoreFido(result["email"])
+	fido := <-ScoreFido(result["mail"])
 	log.Println(fido.Email.Score)
 	resObj := MailValidate{
-		Mail:    result["email"],
+		Mail:    result["mail"],
 		IsValid: false,
 	}
-	if fido.Email.Score > 0 {
+	if fido.Email.Score > 480 {
 		resObj.IsValid = true
 	} else {
-		VerifyEmail(result["email"])
+		VerifyEmail(result["mail"])
 	}
 	res, e := json.Marshal(resObj)
 	lib.CheckError(e)

@@ -9,18 +9,23 @@ import (
 )
 
 type Skin struct {
-	LineColor         color.Color
-	TextColor         color.Color
-	TitleColor        color.Color
-	rowHeight         float64
-	rowtableHeight    float64
-	LineHeight        float64
-	Size              float64
-	SizeTitle         float64
-	TableHeight       float64
-	rowtableHeightMin float64
-	DynamicHeightMin  int
-	DynamicHeightDiv  float64
+	LineColor            color.Color
+	TextColor            color.Color
+	TitleColor           color.Color
+	rowHeight            float64
+	rowtableHeight       float64
+	LineHeight           float64
+	Size                 float64
+	SizeTitle            float64
+	TableHeight          float64
+	rowtableHeightMin    float64
+	DynamicHeightMin     int
+	DynamicHeightDiv     float64
+	MagentaTextLeft      props.Text
+	MagentaBoldtextRight props.Text
+	MagentaBoldtextLeft  props.Text
+	NormaltextLeft       props.Text
+	NormaltextRight      props.Text
 }
 
 func (s Skin) CustomerRow(m pdf.Maroto, k string, v string) pdf.Maroto {

@@ -70,7 +70,7 @@ func FabrickPayObj(data model.Policy) <-chan string {
 		}
 		log.Printf(getfabbricPayments(data))
 		//log.Println(getFabrickPay(data))
-		req, _ := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(getfabbricPayments(data)))
+		req, _ := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(getfabbricBase(data)))
 		req.Header.Set("api-key", os.Getenv("FABRICK_TOKEN_BACK_API"))
 		req.Header.Set("Auth-Schema", "S2S")
 		req.Header.Set("Content-Type", "application/json")
@@ -250,9 +250,32 @@ func getCoinqvestPay(id string) string {
 		}
 	 }`
 }
-func getfabbricBase() string {
+func getfabbricBase(data model.Policy) string {
 	now := time.Now()
+	externalId := "pay_id_" + strconv.FormatInt(now.Unix(), 10)
 	return `{
+		"merchantId": "wop134b31-5926-4b26-1411-726bc9f0b111",
+		"externalId": "` + externalId + `",
+		"paymentConfiguration": {
+			"expirationDate": null,
+			"allowedPaymentMethods": null,
+			"callbackUrl": "https://europe-west1-positive-apex-350507.cloudfunctions.net/callback/v1/payment",
+			"paymentPageRedirectUrls": null
+		},
+		"bill": {
+			"externalId": "` + externalId + `",
+			"amount": 122.0,
+			"currency": "EUR",
+			"description": null,
+			"xInfo": null,
+			"items": null,
+			"subjects": null
+		}
+	}
+	
+	
+	
+	{
 		"merchantId": "wop134b31-5926-4b26-1411-726bc9f0b111",
 		"externalId": "` + now.String() + `",
 		"paymentConfiguration": {
