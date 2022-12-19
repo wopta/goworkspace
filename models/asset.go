@@ -34,6 +34,9 @@ type Enterprise struct {
 	City       string `firestore:"city,omitempty" json:"city,omitempty"`
 	VatCode    string `firestore:"vatCode,omitempty" json:"vatCode,omitempty"`
 	Ateco      string `firestore:"ateco,omitempty" json:"ateco,omitempty"`
+	AtecoDesc  string `firestore:"atecoDesc,omitempty" json:"atecoDesc,omitempty"`
+	AtecoMacro string `firestore:"atecoMacro,omitempty" json:"atecoMacro,omitempty"`
+	AtecoSub   string `firestore:"atecoSub,omitempty" json:"atecoSub,omitempty"`
 	Class      string `firestore:"class" json:"class,omitempty"`
 	Sector     string `firestore:"sector,omitempty" json:"sector,omitempty"`
 	Revenue    string `firestore:"revenue,omitempty" json:"revenue,omitempty"`
