@@ -1,0 +1,19 @@
+{
+    "merchantId": "wop134b31-5926-4b26-1411-726bc9f0b111",
+    "externalId": "1319_001",
+    "paymentConfiguration": {
+        "expirationDate": null,
+        "allowedPaymentMethods": null,
+        "callbackUrl": "https://testfewfinewopta/...",
+        "paymentPageRedirectUrls": null
+    },
+    "bill": {
+        "externalId": "1899_001",
+        "amount": 122.0,
+        "currency": "EUR",
+        "description": null,
+        "xInfo": null,
+        "items": null,
+        "subjects": null
+    }
+}

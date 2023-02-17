@@ -1,0 +1,42 @@
+{
+    "uri": "https://fewfine-test-wopta.azurewebsites.net/api/anagrafica/nuovaAnag",
+    "idRequestFeu": "1229199149",
+    "soggetto": {
+        "listRecapiti": [],
+        "listDocAnag": [],
+        "datiAggPFisica": {},
+        "datiAggPGiuridica": {},
+        "listContoCorrenti": [],
+        "listIndirizzi": [
+            {
+                "cdTipoIndirizzo": "6",
+                "cdComuneMinisteriale": "L304",
+                "txComune": "TORTONA",
+                "txCap": "15057",
+                "txSiglaProvincia": "AL",
+                "txDescIndirizzo": "VIALE EMIO BASSI",
+                "cdNazioneUic": "086",
+                "txNazioneUic": "ITALIA",
+                "bPrincipale": true
+            }
+        ],
+        "datiPrivacy": {
+            "dtConsenso": "2022-10-03T19:54:49.444Z",
+            "bConsensoDati": true,
+            "bConsensoDatiSensibili": true,
+            "bConsensoFiniCommerciali": true
+        },
+        "cdTipoAnagrafica": "1",
+        "cdNazioneUicIdentFiscale": "086",
+        "txNazioneIdentFiscale": "ITALIA",
+        "txCodiceFiscale": "BRBLCU81H205Q",
+        "txCognome": "TEST",
+        "txNome": "TEST"
+    },
+    "cdSistema": "0",
+    "idNodo": 1,
+    "nodoSelected": true,
+    "cdLingua": "it",
+    "username": "AMMINISTRATORE",
+    "serviceState": null
+}

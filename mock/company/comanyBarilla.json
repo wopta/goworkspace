@@ -1,0 +1,2163 @@
+{
+    "bvdCompanyId": {
+        "value": "IT01654010345"
+    },
+    "vatnumber": {
+        "value": "01654010345"
+    },
+    "name_internat": {
+        "value": "Barilla G. E R. Fratelli - Societa' PER Azioni"
+    },
+    "addr_internat": {
+        "value": "Via Mantova 166"
+    },
+    "all_addresses_list_array": [
+        {
+            "value": "Via Mantova 166"
+        }
+    ],
+    "postcode": {
+        "value": "43122"
+    },
+    "city_internat": { "value": "Parma" },
+    "country": {
+        "value": "Italy"
+    },
+    "latlong": {
+        "value": "44.822944444444445,10.381194444444445"
+    },
+    "phone": {
+        "value": "+39 0521270621"
+    },
+    "website": {
+        "value":"www.barilla.it"
+    },
+    "natid_number": [
+        {
+            "value": "PR0169146"
+        },
+        {
+            "value": "01654010345"
+        },
+        {
+            "value": "01654010345"
+        },
+        {
+            "value": "IT01654010345"
+        },
+        {
+            "value": "529900HWBYCO8M2UN457"
+        },
+        {
+            "value": "01654010345"
+        }
+    ],
+    "natid_label": [
+        {
+            "value": "CCIAA number"
+        },
+        {
+            "value": "Codice fiscale"
+        },
+        {
+            "value": "Partita IVA"
+        },
+        {
+            "value": "European VAT number"
+        },
+        {
+            "value": "LEI"
+        },
+        {
+            "value": "TIN"
+        }
+    ],
+    "natid_type": [
+        {
+            "value": "Trade register number"
+        },
+        {
+            "value": "VAT/Tax number"
+        },
+        {
+            "value": "VAT/Tax number"
+        },
+        {
+            "value": "European VAT number"
+        },
+        {
+            "value": "Company ID number"
+        },
+        {
+            "value": "TIN"
+        }
+    ],
+    "traderegisternr": {
+        "value": "PR0169146"
+    },
+    "eurovat": {
+        "value": "IT01654010345"
+    },
+    "status_weekly": {
+        "value": "Active"
+    },
+    "slegalf": {
+        "value": "Public limited companies"
+    },
+    "legalfrm": {
+        "value": "One-person joint stock company - SPA"
+    },
+    "incorporation_date": {
+        "value": 1988
+    },
+    "listed": {
+        "value": "Unlisted"
+    },
+    "naicsccod2017": [
+        {
+            "value": "3118"
+        }
+    ],
+    "ussicccod": [
+        {
+            "value": "209"
+        }
+    ],
+    "nace2_main_section": [
+        {
+            "value": "C - Manufacturing"
+        }
+    ],
+    "naceccod2": [
+        {
+            "value": "1073"
+        }
+    ],
+    "nacecdes2": [
+        {
+            "value": "Manufacture of macaroni, noodles, couscous and similar farinaceous products"
+        }
+    ],
+    "natclass": [
+        {
+            "value": "ATECO 2007"
+        }
+    ],
+    "natpcod_set_array": [ {"value": "107300" }],
+    "natpdes_set_array": [
+        {
+            "value": "Manufacture of macaroni, noodles, couscous and similar farinaceous products"
+        }
+    ],
+    "employees": {
+        "value": 4186
+    },
+    "conscode": {
+        "value": "U2"
+    },
+    "toas": {
+        "value": 2710049000
+    },
+    "opre_eur": {
+        "value": 2946702000
+    },
+    "opre_type": {
+        "value": "Unconsolidated"
+    },
+    "opre_date": {
+        "value": "2020-12-31"
+    },
+    "crif_year_hist": [
+        {
+            "value": "2020"
+        }
+    ],
+    "crif_score_hist": [
+        {
+            "value": 770
+        }
+    ],
+    "crif_peer_descr_hist": [
+        {
+            "value": "Manufacture of macaroni, noodles, couscous and similar farinaceous products"
+        }
+    ],
+    "crif_peer_min_hist": [
+        {
+            "value": 238
+        }
+    ],
+    "crif_peer_max_hist": [
+        {
+            "value": 812
+        }
+    ],
+    "crif_peer_avg_hist": [
+        {
+            "value": 548
+        }
+    ],
+    "cpycontacts_header_firstnameoriginallanguagepreferred": [
+        {
+            "value": "Luca"
+        },
+        {
+            "value": "Paolo"
+        },
+        {
+            "value": "Emanuela"
+        },
+        {
+            "value": "Antonio"
+        },
+        {
+            "value": "Claudio"
+        },
+        {
+            "value": "Claudio"
+        },
+        {
+            "value": "Nicolaus"
+        },
+        {
+            "value": "Andrea"
+        },
+        {
+            "value": "Augusto"
+        },
+        {
+            "value": "Alberto"
+        },
+        {
+            "value": "Lorenzo"
+        },
+        {
+            "value": "Mario"
+        },
+        {
+            "value": "Marco"
+        },
+        {
+            "value": "Simone"
+        },
+        {
+            "value": "Barbara"
+        },
+        {
+            "value": "Gianluca"
+        },
+        {
+            "value": "Daniele"
+        },
+        {
+            "value": "Annamaria"
+        },
+        {
+            "value": "Michele"
+        },
+        {
+            "value": "Eliano"
+        },
+        {
+            "value": "Federica"
+        },
+        {
+            "value": "Alfredo"
+        },
+        {
+            "value": "Giovanni"
+        },
+        {
+            "value": "Angela"
+        },
+        {
+            "value": "Fabio"
+        },
+        {
+            "value": "Stefania"
+        },
+        {
+            "value": "Cinzia"
+        },
+        {
+            "value": "Paola"
+        },
+        {
+            "value": "Claudio"
+        },
+        {
+            "value": "Daniela"
+        },
+        {
+            "value": "Graziano"
+        },
+        {
+            "value": "Elena"
+        },
+        {
+            "value": "Marco"
+        },
+        {
+            "value": "Alessandro"
+        },
+        {
+            "value": "Giulia"
+        },
+        {
+            "value": "Domenico"
+        },
+        {
+            "value": "Federico"
+        },
+        {
+            "value": "Nicola"
+        },
+        {
+            "value": "Cristina"
+        },
+        {
+            "value": "Dennis"
+        },
+        {
+            "value": "Tiziano"
+        },
+        {
+            "value": "Oscar"
+        },
+        {
+            "value": "Guglielmo"
+        },
+        {
+            "value": "Gian Paolo"
+        },
+        {
+            "value": "Federico"
+        },
+        {
+            "value": "Roberto"
+        },
+        {
+            "value": "Enrico"
+        },
+        {
+            "value": "Stefano"
+        },
+        {
+            "value": "Chiara"
+        },
+        {
+            "value": "Sara"
+        },
+        {
+            "value": "Maria"
+        },
+        {
+            "value": "Carlo"
+        },
+        {
+            "value": "Carlo"
+        },
+        {
+            "value": "Silvia"
+        },
+        {
+            "value": "Eleonora"
+        },
+        {
+            "value": "Madilo"
+        },
+        {
+            "value": "Alessandro"
+        },
+        {
+            "value": "Roberto"
+        },
+        {
+            "value": "Francesca"
+        },
+        {
+            "value": "Giuseppe"
+        },
+        {
+            "value": "Alberto"
+        },
+        {
+            "value": "Antonio"
+        },
+        {
+            "value": "Nicola"
+        },
+        {
+            "value": "Chiara"
+        },
+        {
+            "value": "Paolo"
+        },
+        {
+            "value": "Maurizio"
+        },
+        {
+            "value": "Salvatore"
+        },
+        {
+            "value": "Eleonora"
+        },
+        {
+            "value": "Pietro"
+        },
+        {
+            "value": "Roberto"
+        },
+        {
+            "value": "Claudio Antonio"
+        },
+        {
+            "value": "Francesco"
+        },
+        {
+            "value": "Simona"
+        },
+        {
+            "value": "Fabio"
+        },
+        {
+            "value": "Pasquale"
+        },
+        {
+            "value": "Gianluca"
+        },
+        {
+            "value": "Andrea Pietro"
+        },
+        {
+            "value": "Carolina"
+        },
+        {
+            "value": "Talita Ramos"
+        },
+        {
+            "value": "Andrea"
+        },
+        {
+            "value": "Corrado"
+        },
+        {
+            "value": "Emilio"
+        },
+        {
+            "value": "Michela"
+        },
+        {
+            "value": "Bruno"
+        },
+        {
+            "value": "Massimo"
+        },
+        {
+            "value": "Bruno"
+        },
+        {
+            "value": "Paolo"
+        },
+        {
+            "value": "Elena"
+        },
+        {
+            "value": "Massimo"
+        },
+        {
+            "value": "Diego"
+        },
+        {
+            "value": "Andrea"
+        },
+        {
+            "value": "Cristina"
+        },
+        {
+            "value": "Luigi"
+        },
+        {
+            "value": "Anna"
+        },
+        {
+            "value": "Silvia"
+        },
+        {
+            "value": "Alessandra"
+        },
+        {
+            "value": "Francesca"
+        },
+        {
+            "value": "Francesco"
+        },
+        {
+            "value": "Matteo"
+        },
+        {
+            "value": "Giorgio"
+        },
+        {
+            "value": "Francesco"
+        },
+        {
+            "value": "Barbara"
+        },
+        {
+            "value": "Lucia"
+        },
+        {
+            "value": "Giorgio"
+        },
+        {
+            "value": "Alessandro"
+        },
+        {
+            "value": "Maria Luigia"
+        },
+        {
+            "value": "Alessandra"
+        },
+        {
+            "value": "Paolo"
+        },
+        {
+            "value": "Caterina Lucilla"
+        },
+        {
+            "value": "Sergio"
+        },
+        {
+            "value": "Oreste"
+        },
+        {
+            "value": "Andrea"
+        },
+        {
+            "value": "Elena"
+        },
+        {
+            "value": "Domenico"
+        },
+        {
+            "value": "Ilaria"
+        },
+        {
+            "value": "Simone"
+        },
+        {
+            "value": "Luca"
+        },
+        {
+            "value": "Rolando"
+        },
+        {
+            "value": "Roberto Angelo"
+        },
+        {
+            "value": "Paolo"
+        },
+        {
+            "value": "Marcello"
+        },
+        {
+            "value": "Angela"
+        },
+        {
+            "value": "Giorgio"
+        },
+        {
+            "value": "Nicola"
+        },
+        {
+            "value": "Cinzia"
+        },
+        {
+            "value": "Anna"
+        },
+        {
+            "value": "Manuel"
+        },
+        {
+            "value": "Roberto"
+        },
+        {
+            "value": "Giuseppe Emanuele"
+        },
+        {
+            "value": "Gianluigi"
+        },
+        {
+            "value": "Valentina"
+        },
+        {
+            "value": "Federica"
+        },
+        {
+            "value": "Paolo"
+        },
+        {
+            "value": "Barbara"
+        },
+        {
+            "value": "Claudio"
+        },
+        {
+            "value": "Marco"
+        },
+        {
+            "value": "Giancarlo"
+        },
+        {
+            "value": "Ferruccio"
+        },
+        {
+            "value": "Leonardo Giovanni"
+        },
+        {
+            "value": "Claudia"
+        },
+        {
+            "value": "Massimo"
+        },
+        {
+            "value": "Cinzia"
+        },
+        {
+            "value": "Alejandro"
+        },
+        {
+            "value": "Chiara"
+        },
+        {
+            "value": "Andrea"
+        },
+        {
+            "value": "Antonio"
+        },
+        {
+            "value": "Giovanni"
+        },
+        {
+            "value": "Francesco"
+        },
+        {
+            "value": "Filomena"
+        },
+        {
+            "value": "Matteo"
+        },
+        {
+            "value": "Fabrizio"
+        },
+        {
+            "value": "Paolo"
+        },
+        {
+            "value": "Nicola"
+        },
+        {
+            "value": "Michela"
+        },
+        {
+            "value": "Rosa Maria"
+        },
+        {
+            "value": "Francesco Enrico"
+        },
+        {
+            "value": "Stefano"
+        },
+        {
+            "value": "Andrea"
+        },
+        {
+            "value": "Chiara"
+        },
+        {
+            "value": "Enrico"
+        },
+        {
+            "value": "Giangaddo"
+        },
+        {
+            "value": "Fulvio Paolo"
+        },
+        {
+            "value": "Paola"
+        },
+        {
+            "value": "Giuseppe"
+        },
+        {
+            "value": "Vito"
+        },
+        {
+            "value": "Giovanni"
+        },
+        {
+            "value": "Ruggero"
+        },
+        {
+            "value": "Giorgio"
+        },
+        {
+            "value": "Gabriele"
+        },
+        {
+            "value": "Andrea"
+        },
+        {
+            "value": "Lucio"
+        },
+        {
+            "value": "Cesare"
+        },
+        {
+            "value": "Alessandro"
+        },
+        {
+            "value": "Ilaria Giuseppina Bice Di"
+        },
+        {
+            "value": "Alessandro"
+        },
+        {
+            "value": "Luca Fernando"
+        },
+        {
+            "value": "Mauro"
+        },
+        {
+            "value": "Mauro"
+        },
+        {
+            "value": "Edwige Claudie Emmanuelle"
+        },
+        {
+            "value": "Gustavo"
+        },
+        {
+            "value": "Julia"
+        },
+        {
+            "value": "Vincenzo"
+        },
+        {
+            "value": "Rana Farah"
+        },
+        {
+            "value": "Jose Ovidio"
+        },
+        {
+            "value": "Cinzia"
+        },
+        {
+            "value": "Nicola"
+        },
+        {
+            "value": "Roberto"
+        },
+        {
+            "value": "Alessandro"
+        },
+        {
+            "value": "Justin Emmanuel"
+        },
+        {
+            "value": "Pierpaolo"
+        },
+        {
+            "value": "Elena"
+        },
+        {
+            "value": "Gianluca"
+        },
+        {
+            "value": "Marco"
+        },
+        {
+            "value": "Alessia"
+        },
+        {
+            "value": "Valeria"
+        },
+        {
+            "value": "Roberto"
+        },
+        {
+            "value": "Giovanni"
+        },
+        {
+            "value": "Andrea"
+        },
+        {
+            "value": "Claudio"
+        },
+        {
+            "value": "Laura"
+        },
+        {
+            "value": "Maria Bianca"
+        },
+        {
+            "value": "Silvano"
+        },
+        {
+            "value": "Paola Argia"
+        },
+        {
+            "value": "Patrizia"
+        },
+        {
+            "value": "Ilenia"
+        },
+        {
+            "value": "Barbara"
+        },
+        {
+            "value": "Giovanna"
+        },
+        {
+            "value": "Massimiliano"
+        },
+        {
+            "value": "Mariapaola"
+        },
+        {
+            "value": "Marco"
+        },
+        {
+            "value": "Francesca"
+        },
+        {
+            "value": "Irina"
+        },
+        {
+            "value": "Mario"
+        },
+        {
+            "value": "Nicolai"
+        },
+        {
+            "value": "Michele"
+        },
+        {
+            "value": "Riccardo"
+        },
+        {
+            "value": "Maurizio"
+        }
+    ],
+    "cpycontacts_header_lastnameoriginallanguagepreferred": [
+        {
+            "value": "Barilla"
+        },
+        {
+            "value": "Barilla"
+        },
+        {
+            "value": "Barilla"
+        },
+        {
+            "value": "Belloni"
+        },
+        {
+            "value": "Colzani"
+        },
+        {
+            "value": "Colzani"
+        },
+        {
+            "value": "Issenmann"
+        },
+        {
+            "value": "Pontremoli"
+        },
+        {
+            "value": "Schianchi"
+        },
+        {
+            "value": "Pizzi"
+        },
+        {
+            "value": "Scarabelli"
+        },
+        {
+            "value": "Tardini"
+        },
+        {
+            "value": "Ziliotti"
+        },
+        {
+            "value": "Agostinelli"
+        },
+        {
+            "value": "Aldini"
+        },
+        {
+            "value": "Allodi"
+        },
+        {
+            "value": "Ambroset"
+        },
+        {
+            "value": "Ambrosio"
+        },
+        {
+            "value": "Amigoni"
+        },
+        {
+            "value": "Apicella"
+        },
+        {
+            "value": "Avanzini"
+        },
+        {
+            "value": "Baldassarre"
+        },
+        {
+            "value": "Ballerini"
+        },
+        {
+            "value": "Barborini"
+        },
+        {
+            "value": "Barigazzi"
+        },
+        {
+            "value": "Barone"
+        },
+        {
+            "value": "Bassi"
+        },
+        {
+            "value": "Beccaro"
+        },
+        {
+            "value": "Belli"
+        },
+        {
+            "value": "Belluscio"
+        },
+        {
+            "value": "Belmonte"
+        },
+        {
+            "value": "Bernardelli"
+        },
+        {
+            "value": "Beschi"
+        },
+        {
+            "value": "Bigliardi"
+        },
+        {
+            "value": "Bisceglie"
+        },
+        {
+            "value": "Bitondo"
+        },
+        {
+            "value": "Bocelli"
+        },
+        {
+            "value": "Bonini"
+        },
+        {
+            "value": "Bonoretti"
+        },
+        {
+            "value": "Borghetti"
+        },
+        {
+            "value": "Boselli"
+        },
+        {
+            "value": "Bottazzi"
+        },
+        {
+            "value": "Bozano"
+        },
+        {
+            "value": "Bruschetta"
+        },
+        {
+            "value": "Bucarelli"
+        },
+        {
+            "value": "Buttini"
+        },
+        {
+            "value": "Cademartiri"
+        },
+        {
+            "value": "Calvi"
+        },
+        {
+            "value": "Canedoli"
+        },
+        {
+            "value": "Cantoni"
+        },
+        {
+            "value": "Cappetta"
+        },
+        {
+            "value": "Carteri"
+        },
+        {
+            "value": "Carteri"
+        },
+        {
+            "value": "Casali"
+        },
+        {
+            "value": "Casella"
+        },
+        {
+            "value": "Castiglia"
+        },
+        {
+            "value": "Cerri"
+        },
+        {
+            "value": "Ciati"
+        },
+        {
+            "value": "Cobianchi"
+        },
+        {
+            "value": "Concari"
+        },
+        {
+            "value": "Coperchini"
+        },
+        {
+            "value": "Copercini"
+        },
+        {
+            "value": "Cornini"
+        },
+        {
+            "value": "Cramarossa"
+        },
+        {
+            "value": "Crino"
+        },
+        {
+            "value": "D'Anna"
+        },
+        {
+            "value": "Daidone"
+        },
+        {
+            "value": "Dalia"
+        },
+        {
+            "value": "De Albertis"
+        },
+        {
+            "value": "De Gennaro"
+        },
+        {
+            "value": "Deambrogio"
+        },
+        {
+            "value": "Del Porto"
+        },
+        {
+            "value": "Del Vecchio"
+        },
+        {
+            "value": "Di Gioia"
+        },
+        {
+            "value": "Di Sarno"
+        },
+        {
+            "value": "Di Tondo"
+        },
+        {
+            "value": "Dipace"
+        },
+        {
+            "value": "Diterlizzi"
+        },
+        {
+            "value": "Erickson"
+        },
+        {
+            "value": "Ferrari"
+        },
+        {
+            "value": "Ferrari"
+        },
+        {
+            "value": "Ferrari"
+        },
+        {
+            "value": "Ferrari"
+        },
+        {
+            "value": "Fiorenza"
+        },
+        {
+            "value": "Fiorini"
+        },
+        {
+            "value": "Flaiani"
+        },
+        {
+            "value": "Forlano"
+        },
+        {
+            "value": "Franchi"
+        },
+        {
+            "value": "Frau"
+        },
+        {
+            "value": "Fumagalli"
+        },
+        {
+            "value": "Furlani"
+        },
+        {
+            "value": "Gallina"
+        },
+        {
+            "value": "Ganazzoli"
+        },
+        {
+            "value": "Gandolfini"
+        },
+        {
+            "value": "Garsi"
+        },
+        {
+            "value": "Ghiretti"
+        },
+        {
+            "value": "Ghiretti"
+        },
+        {
+            "value": "Giliotti"
+        },
+        {
+            "value": "Gori"
+        },
+        {
+            "value": "Grandi"
+        },
+        {
+            "value": "Grieco"
+        },
+        {
+            "value": "Griguol"
+        },
+        {
+            "value": "Guareschi"
+        },
+        {
+            "value": "Guatteri"
+        },
+        {
+            "value": "Guglielmini"
+        },
+        {
+            "value": "Iacurso"
+        },
+        {
+            "value": "Iotti"
+        },
+        {
+            "value": "La Cava"
+        },
+        {
+            "value": "Lamanna"
+        },
+        {
+            "value": "Lambri"
+        },
+        {
+            "value": "Lanciotti"
+        },
+        {
+            "value": "Leporati"
+        },
+        {
+            "value": "Levati"
+        },
+        {
+            "value": "Liberatore"
+        },
+        {
+            "value": "Lodigiani"
+        },
+        {
+            "value": "Lonoce"
+        },
+        {
+            "value": "Maccagnani"
+        },
+        {
+            "value": "Maglione"
+        },
+        {
+            "value": "Magnani"
+        },
+        {
+            "value": "Maloberti"
+        },
+        {
+            "value": "Manici"
+        },
+        {
+            "value": "Manolli Malvestiti"
+        },
+        {
+            "value": "Marazzi"
+        },
+        {
+            "value": "Marcheselli"
+        },
+        {
+            "value": "Marchetti"
+        },
+        {
+            "value": "Margaritelli"
+        },
+        {
+            "value": "Mariani"
+        },
+        {
+            "value": "Marinozzi"
+        },
+        {
+            "value": "Marletta"
+        },
+        {
+            "value": "Mason"
+        },
+        {
+            "value": "Masotti"
+        },
+        {
+            "value": "Massari"
+        },
+        {
+            "value": "Melegari"
+        },
+        {
+            "value": "Melegari"
+        },
+        {
+            "value": "Melodia"
+        },
+        {
+            "value": "Michelotti"
+        },
+        {
+            "value": "Minervini"
+        },
+        {
+            "value": "Minzoni"
+        },
+        {
+            "value": "Mirone"
+        },
+        {
+            "value": "Moretti"
+        },
+        {
+            "value": "Moroni"
+        },
+        {
+            "value": "Mossini"
+        },
+        {
+            "value": "Murillas Moreno"
+        },
+        {
+            "value": "Nanni"
+        },
+        {
+            "value": "Napodano"
+        },
+        {
+            "value": "Nespoli"
+        },
+        {
+            "value": "Palopoli"
+        },
+        {
+            "value": "Panto"
+        },
+        {
+            "value": "Patruno"
+        },
+        {
+            "value": "Pauri"
+        },
+        {
+            "value": "Pellegrini"
+        },
+        {
+            "value": "Pellegrini"
+        },
+        {
+            "value": "Perizzolo"
+        },
+        {
+            "value": "Petronio"
+        },
+        {
+            "value": "Petrosino"
+        },
+        {
+            "value": "Piemontese"
+        },
+        {
+            "value": "Pietroni"
+        },
+        {
+            "value": "Pini"
+        },
+        {
+            "value": "Pisano"
+        },
+        {
+            "value": "Polverigiani"
+        },
+        {
+            "value": "Prati"
+        },
+        {
+            "value": "Profeta"
+        },
+        {
+            "value": "Provezza"
+        },
+        {
+            "value": "Puglia"
+        },
+        {
+            "value": "Pugliese"
+        },
+        {
+            "value": "Quarta"
+        },
+        {
+            "value": "Rabaglia"
+        },
+        {
+            "value": "Randazzo"
+        },
+        {
+            "value": "Rastelli"
+        },
+        {
+            "value": "Repetati"
+        },
+        {
+            "value": "Riva"
+        },
+        {
+            "value": "Ronchi"
+        },
+        {
+            "value": "Rossi"
+        },
+        {
+            "value": "Rossi"
+        },
+        {
+            "value": "Ruggeri"
+        },
+        {
+            "value": "Ruini"
+        },
+        {
+            "value": "Ruozi"
+        },
+        {
+            "value": "Ruozi"
+        },
+        {
+            "value": "Sausset"
+        },
+        {
+            "value": "Savino"
+        },
+        {
+            "value": "Schwoerer"
+        },
+        {
+            "value": "Sfregola"
+        },
+        {
+            "value": "Shehadeh"
+        },
+        {
+            "value": "Silva"
+        },
+        {
+            "value": "Sinisi"
+        },
+        {
+            "value": "Solfrizzi"
+        },
+        {
+            "value": "Soresini"
+        },
+        {
+            "value": "Spadini"
+        },
+        {
+            "value": "Steinbach"
+        },
+        {
+            "value": "Susani"
+        },
+        {
+            "value": "Tabellini"
+        },
+        {
+            "value": "Tagliavini"
+        },
+        {
+            "value": "Tambini"
+        },
+        {
+            "value": "Tassoni"
+        },
+        {
+            "value": "Terzi"
+        },
+        {
+            "value": "Torricelli"
+        },
+        {
+            "value": "Tortorici"
+        },
+        {
+            "value": "Tosi"
+        },
+        {
+            "value": "Tramontini"
+        },
+        {
+            "value": "Trinca Colonel"
+        },
+        {
+            "value": "Tulumello"
+        },
+        {
+            "value": "Turola"
+        },
+        {
+            "value": "Ucci"
+        },
+        {
+            "value": "Urbani"
+        },
+        {
+            "value": "Vendramet"
+        },
+        {
+            "value": "Venerucci"
+        },
+        {
+            "value": "Verani"
+        },
+        {
+            "value": "Verdelli"
+        },
+        {
+            "value": "Vetrucci"
+        },
+        {
+            "value": "Virginio"
+        },
+        {
+            "value": "Vitali"
+        },
+        {
+            "value": "Zaitseva"
+        },
+        {
+            "value": "Zanetti"
+        },
+        {
+            "value": "Zanettini"
+        },
+        {
+            "value": "Zerbini"
+        },
+        {
+            "value": "Zubani"
+        },
+        {
+            "value": "Zuelli"
+        }
+    ],
+    "cpycontacts_membership_function_dmc_current_only": [
+        {
+            "value": "Member of the Board; Deputy President of the Board of Directors"
+        },
+        {
+            "value": "Deputy President of the Board of Directors; Member of the Board"
+        },
+        {
+            "value": "Member of the Board"
+        },
+        {
+            "value": "Member of the Board"
+        },
+        {
+            "value": "Member of the Board"
+        },
+        {
+            "value": "General Manager"
+        },
+        {
+            "value": "Member of the Board"
+        },
+        {
+            "value": "Member of the Board"
+        },
+        {
+            "value": "President of the Statutory Board of Auditors"
+        },
+        {
+            "value": "Deputy Statutory Auditor"
+        },
+        {
+            "value": "Deputy Statutory Auditor"
+        },
+        {
+            "value": "Regular Statutory Auditor"
+        },
+        {
+            "value": "Regular Statutory Auditor"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Factory Director"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Technical Responsible"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        },
+        {
+            "value": "Special Representative"
+        }
+    ],
+    "cpycontacts_membership_functionoriginaloriginallanguagepreferred": [
+        {
+            "value": "CONSIGLIERE;VICE PRESIDENTE CONSIGLIO AMMINISTRAZIONE"
+        }]
+       

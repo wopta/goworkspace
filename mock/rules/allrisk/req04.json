@@ -1,0 +1,16 @@
+{
+    "vat": "01683100059",
+    "address": "Str Asti-Alba 18",
+    "revenue": "928408",
+    "ateco": "10.31.00",
+    "buildingMaterial": "masonry",
+    "buildingType": "commerciale",
+    "floor": "ground_floor",
+    "buildingYear": "1972between2009",
+    "squareMeters": 110,
+    "isBuildingOwner": true,
+    "employer": 11,
+    "isAllarm": false,
+    "isPra": false,
+    "isHolder": false
+  }

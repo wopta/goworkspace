@@ -1,0 +1,18 @@
+{
+    "vat": "03592950780",
+    "address": "Via della Spiga",
+    "postcode": "20121",
+    "province": "MI",
+    "revenue": 35148,
+    "ateco": "10.31.00",
+    "constructionMaterial": "masonry",
+    "buildingType": "industriale",
+    "floor": "ground_floor",
+    "buildingYear": "1972between2009",
+    "squareMeters": 200,
+    "isBuildingOwner": true,
+    "employer": 2,
+    "isAllarm": true,
+    "isPra": false,
+    "isHolder": true
+}

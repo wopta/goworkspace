@@ -1,0 +1,52 @@
+{
+  "policy":{
+    "id":"",
+    "company":"global",
+    "name":"persona",
+    "startDate":"",
+    "endDate":""
+  },
+  "contractor":{
+    "name": "Test",
+     "surname": "1229199149",
+     "fiscalCode": "0",
+     "work": "0",
+     "workType": "0",
+     "class": "0",
+     "coverageType": "0",
+     "price": 15000,
+     "priceNett": 15000
+   } ,
+   "coverages": [
+       {
+         "name":"test 1",
+       
+         "deductible": "2000",
+         "selfInsurance": "0.10",
+         "sumInsuredLimitOfIndemnity": 15000,
+         "price": 15000,
+         "priceNett": 15000
+       },
+       {
+        "name":"test 2",
+      
+        "deductible": "2000",
+        "selfInsurance": "0.10",
+        "sumInsuredLimitOfIndemnity": 15000,
+        "price": 15000,
+        "priceNett": 15000
+      }
+     ],
+     "statements": [
+       {
+         "a": "2000",
+         "b": "2000"
+       }
+     ],
+     "specialConditions": [
+       {
+         "a": "2000",
+         "b": "2000"
+       }
+     ]
+   }

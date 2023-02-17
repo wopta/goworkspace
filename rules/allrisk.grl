@@ -1,0 +1,818 @@
+
+/*
+type ProfileAllrisk struct {
+	Vat              int64
+	SquareMeters     int64
+	IsBuildingOwner  bool
+	Revenue          int64
+	Address          string
+	Ateco            string
+	AtecoMacro       string
+	AtecoSub         string
+	AtecoDesc        string
+	BusinessSector   string
+	BuildingType     string
+	BuildingMaterial string
+	BuildingYear     string
+	Employer         int64
+	IsAllarm         bool
+	Floor            int64
+	IsPRA            bool
+	Costruction      string
+	IsHolder         bool
+	Result           string
+	Fire             string
+	FireLow500k      string
+	FireUp500k       string
+	Theft            string
+	ThefteLow500k    string
+	TheftUp500k      string
+	Rct              string
+	Rco              string
+	RcoProd          string
+	Coverages        map[string]*Coverage
+}
+type Coverage struct {
+	TypeOfSumInsured           string
+	Deductible                 string
+	SumInsuredLimitOfIndemnity int64
+	Slug                       string
+	IsBase                     bool
+	IsYuor                     bool
+	IsPremium                  bool
+}
+0 "third-party-liability",
+	1 "damage-to-goods-in-custody",
+	2 "defect-liability-workmanships",
+	3 "defect-liability-12-months",
+	4 "defect-liability-dm-37-2008",
+	5 "property-damage-due-to-theft",
+	6 "damage-to-goods-course-of-works",
+	7 "employers-liability",
+	8 "product-liability",
+	9 "third-party-liability-construction-company",
+	10 "legal-defence",
+	11 "cyber",
+    -------------------------------------------
+	"" = "building",
+	"" = "content",
+	"" = "lease-holders-interest",
+	"" = "burst-pipe",
+	"" = "power-surge",
+	"" = "atmospheric-event",
+	"" = "sociopolitical-event",
+	"" = "terrorism",
+	"" = "earthquake",
+	"" = "river-flood",
+	"" = "water-damage",
+	"" = "glass",
+	"" = "machinery-breakdown",
+	"" = "third-party-recourse",
+	"" = "theft",
+	"" = "valuables-in-safe-strongrooms",
+	"" = "valuables",
+	"" = "electronic-equipment",
+	"" = "increased-cost-of-working",
+	"" = "restoration-of-data",
+	"" = "software-under-license",
+	"" = "business-interruption",
+	"" = "property-owners-liability",
+	"" = "environmental-liability",
+	"" = "assistance",
+	
+  }
+
+*/
+// ------------------RCT---------------------------------------------------------------
+rule CheckRct "Check Employer values" salience 1001 {
+    when 
+        In.Rct =="X" 
+    then
+	   	In.Coverages["third-party-liability"].IsBase = true;
+		In.Coverages["third-party-liability"].IsYuor = true;
+		In.Coverages["third-party-liability"].IsPremium = true;
+
+Round((out['building'].SumInsuredLimitOfIndemnity + out['content'].SumInsuredLimitOfIndemnity)* 0.7)
+
+        Max(5000.00, Min((Round((((out["building"].SumInsuredLimitOfIndemnity *0.03) + (out["content"].SumInsuredLimitOfIndemnity * 0.005 ))) + 5000)/5000) * 5000.00),50000.00)
+   Min((fx.RoundNear(((out['content'].SumInsuredLimitOfIndemnity * fx.GetMachineryvalue(data.businessSector ), 5000),100000.00))))
+     Min( (fx.RoundNear(((out['content'].SumInsuredLimitOfIndemnity * fx.GetMachineryvalue(data.businessSector )), 5000)),100000.00))    
+Max(5000.00, Min(fx.RoundNear(( out['building'].SumInsuredLimitOfIndemnity * 0.03)+(out['content'].SumInsuredLimitOfIndemnity * 0.5), 5000),50000.00))
+    Max(5000.00,Min((fx.RoundNear((out['content'].SumInsuredLimitOfIndemnity * 0.05)+(out['building'].SumInsuredLimitOfIndemnity * 0.03), 5000)),50000.00))
+Max(5000.00, Min(fx.RoundNear(( out['building'].SumInsuredLimitOfIndemnity * 0.03)+(out['content'].SumInsuredLimitOfIndemnity * 0.5)), 5000),50000.00)
+     Max(5000.00, Min((Round((((out[\"building\"].SumInsuredLimitOfIndemnity *0.03) + (out[\"content\"].SumInsuredLimitOfIndemnity * 0.05 ))) + 5000)/5000) * 5000.00),50000.00)
+ 
+ 
+ 
+ 
+  Retract("CheckRct");
+
+}
+rule CheckRctEmployer "Check Employer values" salience 990 {
+    when 
+        In.Rct =="X" &&
+        In.Employer <= 4  
+    then
+       Log("In.Employer < 4 ");
+       In.Coverages["third-party-liability"].SumInsuredLimitOfIndemnity = 1000000.00;
+       Retract("CheckRctEmployer");
+
+}
+rule CheckRctEmployer2 "Check Employer values" salience 980 {
+    when 
+        In.Rct =="X" &&
+        In.Employer > 4 
+    then
+        Log("In.Employer > 4 ");
+
+        In.Coverages["third-party-liability"].SumInsuredLimitOfIndemnity = 1500000.00;
+          Log("third-party-liability.SumInsuredLimitOfIndemnity : " +In.Coverages["third-party-liability"].SumInsuredLimitOfIndemnity);
+        Retract("CheckRctEmployer2");
+
+}
+rule CheckRctRevenue1 "Check Revenue values" salience 970 {
+    when 
+        In.Rct == "X" &&
+        In.Revenue <= 75000
+    then
+
+       In.Coverages["third-party-liability"].Deductible = "0";
+       Retract("CheckRctRevenue1");
+
+}
+rule CheckRctRevenue2 "Check Revenue values" salience 960 {
+    when 
+        In.Rct == "X" &&
+        In.Revenue > 75000 &&
+        In.Revenue < 150000
+    then
+  
+   
+       In.Coverages["third-party-liability"].Deductible = "500";
+       Retract("CheckRctRevenue2");
+
+}
+rule CheckRctRevenue3 "Check Revenue values" salience 950 {
+    when 
+        In.Rct == "X" &&
+         In.Revenue > 150000 &&
+        In.Revenue < 500000
+    then
+  
+      In.Coverages["third-party-liability"].Deductible = "1000";
+       Retract("CheckRctRevenue3");
+
+}
+rule CheckRctRevenue4 "Check Revenue values" salience 940 {
+    when 
+        In.Rct == "X" &&
+        In.Revenue > 500000 &&
+        In.Revenue < 1500000
+    then
+  
+       In.Coverages["third-party-liability"].Deductible = "2000";
+       Retract("CheckRctRevenue4");
+
+}
+rule CheckRctVehicle "Check Revenue values" salience 930 {
+    when 
+        In.RcVehicle == "X" 
+    then
+  
+         In.Coverages["damage-to-goods-in-custody"].SumInsuredLimitOfIndemnity = In.Coverages["third-party-liability"].SumInsuredLimitOfIndemnity;
+		In.Coverages["damage-to-goods-in-custody"].IsBase = false;
+		In.Coverages["damage-to-goods-in-custody"].IsYuor = true;
+		In.Coverages["damage-to-goods-in-custody"].IsPremium = true;
+       Retract("CheckRctVehicle");
+
+}
+rule CheckRctDefectLiabilityWorkmanships "Check Revenue values" salience 920 {
+    when 
+        In.Rcpo == "X" 
+    then
+  
+        In.Coverages["defect-liability-workmanships"].SumInsuredLimitOfIndemnity = In.Coverages["third-party-liability"].SumInsuredLimitOfIndemnity;
+		In.Coverages["defect-liability-workmanships"].IsBase = false;
+		In.Coverages["defect-liability-workmanships"].IsYuor = true;
+		In.Coverages["defect-liability-workmanships"].IsPremium = true;
+       Retract("CheckRctDefectLiabilityWorkmanships");
+
+}
+rule CheckRctDefectLiability12Months "Check Revenue values" salience 910{
+    when 
+        In.Rcp12 == "X" 
+    then
+  
+        In.Coverages["defect-liability-12-months"].SumInsuredLimitOfIndemnity = In.Coverages["third-party-liability"].SumInsuredLimitOfIndemnity;
+		In.Coverages["defect-liability-12-months"].IsBase = false;
+		In.Coverages["defect-liability-12-months"].IsYuor = true;
+		In.Coverages["defect-liability-12-months"].IsPremium = true;
+       Retract("CheckRctDefectLiability12Months");
+
+}
+rule CheckRctDefectliability2008 "Check Revenue values" salience 950 {
+    when 
+        In.Rcp2008 == "X" 
+    then
+  
+       In.Coverages["defect-liability-dm-37-2008"].SumInsuredLimitOfIndemnity = In.Coverages["third-party-liability"].SumInsuredLimitOfIndemnity;
+	   	  In.Coverages["defect-liability-dm-37-2008"].IsBase = false;
+		In.Coverages["defect-liability-dm-37-2008"].IsYuor = true;
+		In.Coverages["defect-liability-dm-37-2008"].IsPremium = true;
+       Retract("CheckRctDefectliability2008");
+
+}
+rule CheckRctPropertyDamageDueToTheft "Check Revenue values" salience 900 {
+    when 
+        In.DamageTheft == "X" 
+    then
+  
+        In.Coverages["property-damage-due-to-theft"].SumInsuredLimitOfIndemnity = In.Coverages["third-party-liability"].SumInsuredLimitOfIndemnity;
+		In.Coverages["property-damage-due-to-theft"].IsBase = false;
+		In.Coverages["property-damage-due-to-theft"].IsYuor = true;
+		In.Coverages["property-damage-due-to-theft"].IsPremium = true;
+       Retract("CheckRctPropertyDamageDueToTheft");
+
+}
+rule CheckRctDamageToGoodsCourseOfWorks "Check Revenue values" salience 870 {
+    when 
+        In.DamageThing == "X" 
+    then
+  
+        In.Coverages["damage-to-goods-course-of-works"].SumInsuredLimitOfIndemnity = In.Coverages["third-party-liability"].SumInsuredLimitOfIndemnity;
+		In.Coverages["damage-to-goods-course-of-works"].IsBase = false;
+		In.Coverages["damage-to-goods-course-of-works"].IsYuor = true;
+		In.Coverages["damage-to-goods-course-of-works"].IsPremium = true;
+       Retract("CheckRctDamageToGoodsCourseOfWorks");
+
+}
+rule CheckRctThirdPartyLiabilityConstructionCompany "Check Revenue values" salience 850 {
+    when 
+        In.RcCostruction == "X" 
+    then
+        Log("third-party-liability.SumInsuredLimitOfIndemnity : " + In.Coverages["third-party-liability"].SumInsuredLimitOfIndemnity);
+        In.Coverages["third-party-liability-construction-company"].SumInsuredLimitOfIndemnity = In.Coverages["third-party-liability"].SumInsuredLimitOfIndemnity;
+		In.Coverages["third-party-liability-construction-company"].IsBase = false;
+		In.Coverages["third-party-liability-construction-company"].IsYuor = true;
+		In.Coverages["third-party-liability-construction-company"].IsPremium = true;
+       Retract("CheckRctThirdPartyLiabilityConstructionCompany");
+
+}
+rule CheckEmployersLiability "Check Revenue values" salience 800 {
+    when 
+        In.Rct =="X" &&
+        In.Employer >= 2  
+    then
+        In.Coverages["employers-liability"].SumInsuredLimitOfIndemnity = In.Coverages["third-party-liability"].SumInsuredLimitOfIndemnity;
+		In.Coverages["employers-liability"].IsBase = true;
+		In.Coverages["employers-liability"].IsYuor = true;
+	    In.Coverages["employers-liability"].IsPremium = true;
+       Retract("CheckEmployersLiability");
+
+}
+rule CheckEmployersLiabilityEdili "Check Revenue values" salience 700 {
+    when 
+          In.Rct =="X" &&
+        In.Employer >= 2  &&
+        In.BusinessSector =="edili" 
+    then
+        In.Coverages["employers-liability"].SumInsuredLimitOfIndemnity = 500000.00;
+		In.Coverages["employers-liability"].IsBase = true;
+		In.Coverages["employers-liability"].IsYuor = true;
+		In.Coverages["employers-liability"].IsPremium = true;
+       Retract("CheckEmployersLiabilityEdili");
+
+}
+rule CheckProductLiability "Check Revenue values" salience 300 {
+    when 
+          In.RcoProd =="X" 
+    then
+        In.Coverages["product-liability"].SumInsuredLimitOfIndemnity = 250000.00;
+		In.Coverages["product-liability"].IsBase = false;
+		In.Coverages["product-liability"].IsYuor = false;
+		In.Coverages["product-liability"].IsPremium = true;
+       Retract("CheckProductLiability");
+
+}
+rule CheckLegalDefence "Check Revenue values" salience 250 {
+    when 
+          In.Rct =="X" 
+    then
+        In.Coverages["legal-defence"].SumInsuredLimitOfIndemnity = 500000.00;
+		In.Coverages["legal-defence"].IsBase = false;
+		In.Coverages["legal-defence"].IsYuor = false;
+		In.Coverages["legal-defence"].IsPremium = true;
+       Retract("CheckLegalDefence");
+
+}
+rule CheckCyber "Check Revenue values" salience 200 {
+    when 
+          In.Rct =="X" 
+    then
+        In.Coverages["cyber"].SumInsuredLimitOfIndemnity = 500000.00;
+		In.Coverages["cyber"].IsBase = false;
+		In.Coverages["cyber"].IsYuor = false;
+		In.Coverages["cyber"].IsPremium = true;
+       Retract("CheckCyber");
+
+}
+// ------------------Building ---------------------------------------------------------------
+rule CheckBuilding "Check Building values" salience 10000 {
+    when 
+        In.Rct == "X" 
+    then
+   		In.Coverages["building"].IsBase = true;
+		In.Coverages["building"].IsYuor = true;
+		In.Coverages["building"].IsPremium = true;
+        In.Coverages["content"].IsBase = true;
+		In.Coverages["content"].IsYuor = true;
+		In.Coverages["content"].IsPremium = true;
+        Retract("CheckBuilding");
+
+}
+rule CheckBuilding1 "Check Building values" salience 105 {
+    when 
+        In.Rct == "X" &&
+         In.BuildingType =="INDUSTRIALE"
+    then
+     
+   In.Coverages["building"].SumInsuredLimitOfIndemnity =  Max(50000.00, Min(In.SquareMeters * 600 ,1500000.00));
+       Retract("CheckBuilding1");
+
+}
+rule CheckBuilding2 "Check Building values" salience 102 {
+    when 
+        In.Rct == "X" &&
+        In.BuildingType =="COMMERCIALE"
+    then
+    Log("CheckBuilding2: " + Max(50000.00, Min((In.SquareMeters * 1000.00) ,1500000.00)));
+       In.Coverages["building"].SumInsuredLimitOfIndemnity = Max(50000.00, Min((In.SquareMeters * 1000.00) ,1500000.00));
+      //In.Coverages["building"].SumInsuredLimitOfIndemnity = 10;
+       Retract("CheckBuilding2");
+
+}
+rule CheckBuilding3 "Check Building values" salience 101 {
+    when 
+        In.Rct == "X" &&
+        In.BuildingType =="CIVILE TIPO UFFICIO"
+    then
+     
+       In.Coverages["building"].SumInsuredLimitOfIndemnity =  Max(50000.00, Min(In.SquareMeters * 1400.00 ,1500000.00));
+       Retract("CheckBuilding3");
+
+}
+// ------------------Content ---------------------------------------------------------------
+rule CheckContent1 "Check Building values" salience 84 {
+    when 
+        In.Coverages["building"].SumInsuredLimitOfIndemnity > 0 &&
+        In.BusinessSector =="SERVIZI MANUALI"
+    then
+       In.Coverages["content"].SumInsuredLimitOfIndemnity =  Max(30000.00, Min(( In.Coverages["building"].SumInsuredLimitOfIndemnity * 0.10),300000.00));
+       Retract("CheckContent1");
+
+}
+rule CheckContent2 "Check Building values" salience 83 {
+    when 
+       In.Coverages["building"].SumInsuredLimitOfIndemnity > 0 &&
+        In.BusinessSector =="COMMERCIALE"
+    then
+    Log("CheckContent2: " + Max(30000.00, Min(( In.Coverages["building"].SumInsuredLimitOfIndemnity * 0.20),300000.00)));
+       In.Coverages["content"].SumInsuredLimitOfIndemnity =  Max(30000.00, Min(( In.Coverages["building"].SumInsuredLimitOfIndemnity * 0.20),300000.00));
+       Retract("CheckContent2");
+
+}
+rule CheckContent3 "Check Building values" salience 82 {
+    when 
+        In.Coverages["building"].SumInsuredLimitOfIndemnity > 0 &&
+        In.BusinessSector =="PRODUZIONE"
+    then
+
+       In.Coverages["content"].SumInsuredLimitOfIndemnity =  Max(30000.00, Min(In.Coverages["building"].SumInsuredLimitOfIndemnity * 0.30,300000.00));
+       Retract("CheckContent3");
+
+}
+rule CheckContent4 "Check Building values" salience 81 {
+    when 
+        In.Coverages["building"].SumInsuredLimitOfIndemnity > 0 &&
+        In.BusinessSector =="EDILI"
+    then
+       In.Coverages["content"].SumInsuredLimitOfIndemnity =  Max(30000.00, Min(( In.Coverages["building"].SumInsuredLimitOfIndemnity * 0.30),300000.00));
+       Retract("CheckContent4");
+
+}
+rule CheckContent5 "Check Building values" salience 80 {
+    when 
+        In.Coverages["building"].SumInsuredLimitOfIndemnity > 0 &&
+        In.BusinessSector =="SERVIZI INTELLETTUALI"
+    then
+       In.Coverages["content"].SumInsuredLimitOfIndemnity =  Max(30000.00, Min(( In.Coverages["building"].SumInsuredLimitOfIndemnity * 0.15),300000.00));
+       Retract("CheckContent5");
+
+}
+// ------------------third-party-recourse ---------------------------------------------------------------
+rule CheckThirdPartyRecourse "Check Building values" salience 73 {
+    when 
+        In.Fire == "X" &&
+        In.Coverages["content"].SumInsuredLimitOfIndemnity > 0 &&
+        In.Coverages["building"].SumInsuredLimitOfIndemnity > 0
+    then
+        In.Coverages["third-party-recourse"].SumInsuredLimitOfIndemnity =  150000.00;
+        In.Coverages["third-party-recourse"].IsBase = true;
+		In.Coverages["third-party-recourse"].IsYuor = true;
+		In.Coverages["third-party-recourse"].IsPremium = true;
+       Retract("CheckThirdPartyRecourse");
+
+}
+// ------------------Water-damage ---------------------------------------------------------------
+rule CheckWaterDamage "Check Building values" salience 72 {
+    when 
+        In.Coverages["content"].SumInsuredLimitOfIndemnity > 0 &&
+        In.Coverages["building"].SumInsuredLimitOfIndemnity > 0
+    then
+       In.Coverages["water-damage"].SumInsuredLimitOfIndemnity =  Max(5000.00, Min(( In.Coverages["building"].SumInsuredLimitOfIndemnity * 0.05)+(In.Coverages["content"].SumInsuredLimitOfIndemnity * 0.10),10000.00),100000.00);
+         In.Coverages["water-damage"].IsBase = true;
+		In.Coverages["water-damage"].IsYuor = true;
+		In.Coverages["water-damage"].IsPremium = true;
+       Retract("CheckWaterDamage");
+
+}
+// ------------------Power-surgee ---------------------------------------------------------------
+rule CheckPowerSurge "Check Building values" salience 71 {
+    when 
+        In.Coverages["content"].SumInsuredLimitOfIndemnity > 0 &&
+        In.Coverages["building"].SumInsuredLimitOfIndemnity > 0
+    then
+       In.Coverages["power-surge"].SumInsuredLimitOfIndemnity =  Max(5000.00, Min(( In.Coverages["building"].SumInsuredLimitOfIndemnity * 0.03)+(In.Coverages["content"].SumInsuredLimitOfIndemnity * 0.05),10000.00),100000.00);
+         In.Coverages["power-surge"].IsBase = false;
+		In.Coverages["power-surge"].IsYuor = true;
+		In.Coverages["power-surge"].IsPremium = true;
+       Retract("CheckPowerSurge");
+
+}
+rule CheckAtmosphericEvent "Check Building values" salience 70 {
+    when 
+        In.Coverages["content"].SumInsuredLimitOfIndemnity > 0 &&
+        In.Coverages["building"].SumInsuredLimitOfIndemnity > 0
+    then
+       In.Coverages["atmospheric-event"].SumInsuredLimitOfIndemnity =   In.Coverages["building"].SumInsuredLimitOfIndemnity + In.Coverages["content"].SumInsuredLimitOfIndemnity;
+         In.Coverages["atmospheric-event"].IsBase = false;
+		In.Coverages["atmospheric-event"].IsYuor = true;
+		In.Coverages["atmospheric-event"].IsPremium = true;
+       Retract("CheckAtmosphericEvent");
+
+}
+rule CheckSociopoliticalEvent "Check Building values" salience 60 {
+    when 
+        In.Coverages["content"].SumInsuredLimitOfIndemnity > 0 &&
+        In.Coverages["building"].SumInsuredLimitOfIndemnity > 0
+    then
+       In.Coverages["sociopolitical-event"].SumInsuredLimitOfIndemnity =   In.Coverages["building"].SumInsuredLimitOfIndemnity + In.Coverages["content"].SumInsuredLimitOfIndemnity;
+         In.Coverages["sociopolitical-event"].IsBase = false;
+		In.Coverages["sociopolitical-event"].IsYuor = true;
+		In.Coverages["sociopolitical-event"].IsPremium = true;
+       Retract("CheckSociopoliticalEvent");
+
+}
+rule CheckTerrorism "Check Building values" salience 50 {
+    when 
+        In.Coverages["content"].SumInsuredLimitOfIndemnity > 0 &&
+        In.Coverages["building"].SumInsuredLimitOfIndemnity > 0
+    then
+        In.Coverages["terrorism"].SumInsuredLimitOfIndemnity = In.Coverages["building"].SumInsuredLimitOfIndemnity + In.Coverages["content"].SumInsuredLimitOfIndemnity;
+        In.Coverages["terrorism"].IsBase = false;
+		In.Coverages["terrorism"].IsYuor = true;
+		In.Coverages["terrorism"].IsPremium = true;
+       Retract("CheckTerrorism");
+
+}
+rule CheckBurstPipe "Check Building values" salience 40 {
+    when 
+        In.Coverages["content"].SumInsuredLimitOfIndemnity > 0 &&
+        In.Coverages["building"].SumInsuredLimitOfIndemnity > 0
+    then
+        In.Coverages["burst-pipe"].SumInsuredLimitOfIndemnity =   In.Coverages["building"].SumInsuredLimitOfIndemnity + In.Coverages["content"].SumInsuredLimitOfIndemnity;
+        In.Coverages["burst-pipe"].IsBase = false;
+		In.Coverages["burst-pipe"].IsYuor = false;
+		In.Coverages["burst-pipe"].IsPremium = true;
+       Retract("CheckBurstPipe");
+
+}
+rule CheckRiverFlood "Check Building values" salience 30 {
+    when 
+        In.Coverages["content"].SumInsuredLimitOfIndemnity > 0 &&
+        In.Coverages["building"].SumInsuredLimitOfIndemnity > 0
+    then
+        In.Coverages["river-flood"].SumInsuredLimitOfIndemnity =   In.Coverages["building"].SumInsuredLimitOfIndemnity + In.Coverages["content"].SumInsuredLimitOfIndemnity;
+        In.Coverages["river-flood"].IsBase = false;
+		In.Coverages["river-flood"].IsYuor = false;
+		In.Coverages["river-flood"].IsPremium = true;
+       Retract("CheckRiverFlood");
+
+}
+rule CheckEarthquake "Check Building values" salience 20 {
+    when 
+        In.Coverages["content"].SumInsuredLimitOfIndemnity > 0 &&
+        In.Coverages["building"].SumInsuredLimitOfIndemnity > 0
+    then
+        In.Coverages["earthquake"].SumInsuredLimitOfIndemnity =   In.Coverages["building"].SumInsuredLimitOfIndemnity + In.Coverages["content"].SumInsuredLimitOfIndemnity;
+        In.Coverages["earthquake"].IsBase = false;
+		In.Coverages["earthquake"].IsYuor = false;
+		In.Coverages["earthquake"].IsPremium = true;
+       Retract("CheckEarthquake");
+
+}
+//--------------------------------------------------------machinery-breakdown----------------------------------------------------------------------------------
+rule CheckMachineryBreakdown "Check Building values" salience 10 {
+    when 
+        In.BusinessSector =="COMMERCIALE" &&
+        In.Coverages["content"].SumInsuredLimitOfIndemnity > 0 &&
+        In.Coverages["building"].SumInsuredLimitOfIndemnity > 0
+    then
+        In.Coverages["machinery-breakdown"].SumInsuredLimitOfIndemnity = Max(5000.00, Min((Round(((In.Coverages["content"].SumInsuredLimitOfIndemnity * 0.05)+5000)/5000) * 5000),100000));
+        In.Coverages["machinery-breakdown"].IsBase = false;
+		In.Coverages["machinery-breakdown"].IsYuor = false;
+		In.Coverages["machinery-breakdown"].IsPremium = true;
+       Retract("CheckMachineryBreakdown");
+
+}
+rule CheckMachineryBreakdown1 "Check Building values" salience 10 {
+    when 
+        In.BusinessSector =="PRODUZIONE" &&
+        In.Coverages["content"].SumInsuredLimitOfIndemnity > 0 &&
+        In.Coverages["building"].SumInsuredLimitOfIndemnity > 0
+    then
+        In.Coverages["machinery-breakdown"].SumInsuredLimitOfIndemnity = Max(5000.00, Min((Round(((In.Coverages["content"].SumInsuredLimitOfIndemnity * 0.15)+5000)/5000) * 5000),100000));
+        In.Coverages["machinery-breakdown"].IsBase = false;
+		In.Coverages["machinery-breakdown"].IsYuor = false;
+		In.Coverages["machinery-breakdown"].IsPremium = true;
+       Retract("CheckMachineryBreakdown1");
+
+}
+rule CheckMachineryBreakdown2 "Check Building values" salience 10 {
+    when 
+        In.BusinessSector =="SERVIZI MANUALI" &&
+        In.Coverages["content"].SumInsuredLimitOfIndemnity > 0 &&
+        In.Coverages["building"].SumInsuredLimitOfIndemnity > 0
+    then
+        In.Coverages["machinery-breakdown"].SumInsuredLimitOfIndemnity = Max(5000.00, Min((Round(((In.Coverages["content"].SumInsuredLimitOfIndemnity * 0.10)+5000)/5000) * 5000),100000));
+        In.Coverages["machinery-breakdown"].IsBase = false;
+		In.Coverages["machinery-breakdown"].IsYuor = false;
+		In.Coverages["machinery-breakdown"].IsPremium = true;
+       Retract("CheckMachineryBreakdown2");
+
+}
+rule CheckMachineryBreakdown3 "Check Building values" salience 10 {
+    when 
+        In.MachineFaliure == "X" &&
+        In.BusinessSector =="EDILI" &&
+        In.Coverages["content"].SumInsuredLimitOfIndemnity > 0 &&
+        In.Coverages["building"].SumInsuredLimitOfIndemnity > 0
+    then
+        In.Coverages["machinery-breakdown"].SumInsuredLimitOfIndemnity = Max(5000.00, Min((Round(((In.Coverages["content"].SumInsuredLimitOfIndemnity * 0.15)+5000)/5000) * 5000),100000));
+        In.Coverages["machinery-breakdown"].IsBase = false;
+		In.Coverages["machinery-breakdown"].IsYuor = false;
+		In.Coverages["machinery-breakdown"].IsPremium = true;
+       Retract("CheckMachineryBreakdown3");
+
+}
+//--------------------------------------------------------GLASS----------------------------------------------------------------------------------
+rule CheckGlass "Check Building values" salience 40 {
+    when 
+        In.Coverages["content"].SumInsuredLimitOfIndemnity > 0 &&
+        In.Coverages["building"].SumInsuredLimitOfIndemnity > 0
+    then
+        In.Coverages["glass"].SumInsuredLimitOfIndemnity =   2500.00;
+        In.Coverages["glass"].IsBase = false;
+		In.Coverages["glass"].IsYuor = true;
+		In.Coverages["glass"].IsPremium = true;
+       Retract("CheckGlass");
+
+}
+//--------------------------------------------------------property-owners-liability----------------------------------------------------------------------------------
+rule CheckPropertyOwnersLiability "Check Building values" salience 40 {
+    when 
+        In.Coverages["content"].SumInsuredLimitOfIndemnity > 0 ||
+        In.Coverages["building"].SumInsuredLimitOfIndemnity > 0
+    then
+        In.Coverages["property-owners-liability"].SumInsuredLimitOfIndemnity =   1000000.00;
+        In.Coverages["property-owners-liability"].IsBase = true;
+		In.Coverages["property-owners-liability"].IsYuor = true;
+		In.Coverages["property-owners-liability"].IsPremium = true;
+       Retract("CheckPropertyOwnersLiability");
+
+}
+//--------------------------------------------------------environmental-liability----------------------------------------------------------------------------------
+rule CheckEnvironmentalLiability "Check Building values" salience 40 {
+    when 
+        In.Coverages["content"].SumInsuredLimitOfIndemnity > 0 ||
+        In.Coverages["building"].SumInsuredLimitOfIndemnity > 0
+    then
+        In.Coverages["environmental-liability"].SumInsuredLimitOfIndemnity =   100000.00;
+        In.Coverages["environmental-liability"].IsBase = true;
+		In.Coverages["environmental-liability"].IsYuor = true;
+		In.Coverages["environmental-liability"].IsPremium = true;
+       Retract("CheckPropertyOwnersLiability");
+
+}
+//--------------------------------------------------------theft----------------------------------------------------------------------------------
+rule CheckTheft "Check Building values" salience 10 {
+    when 
+        In.Theft == "X" &&
+        In.BusinessSector =="COMMERCIALE" &&
+        In.Coverages["content"].SumInsuredLimitOfIndemnity > 0 &&
+        In.Coverages["building"].SumInsuredLimitOfIndemnity > 0
+    then
+        In.Coverages["theft"].SumInsuredLimitOfIndemnity = Max(5000.00, Min((Round(((In.Coverages["content"].SumInsuredLimitOfIndemnity * 0.05)+5000)/5000) * 5000),100000));
+        In.Coverages["theft"].IsBase = false;
+		In.Coverages["theft"].IsYuor = true;
+		In.Coverages["theft"].IsPremium = true;
+       Retract("CheckTheft");
+
+}
+rule CheckCheckTheft1 "Check Building values" salience 10 {
+    when 
+         In.Theft == "X" &&
+        In.BusinessSector =="PRODUZIONE" &&
+        In.Coverages["content"].SumInsuredLimitOfIndemnity > 0 &&
+        In.Coverages["building"].SumInsuredLimitOfIndemnity > 0
+    then
+        In.Coverages["theft"].SumInsuredLimitOfIndemnity = Max(5000.00, Min((Round(((In.Coverages["content"].SumInsuredLimitOfIndemnity * 0.15)+5000)/5000) * 5000),100000));
+        In.Coverages["theft"].IsBase = false;
+		In.Coverages["theft"].IsYuor = true;
+		In.Coverages["theft"].IsPremium = true;
+       Retract("CheckTheft1");
+
+}
+rule CheckTheft2 "Check Building values" salience 10 {
+    when 
+     In.Theft == "X" &&
+        In.BusinessSector =="SERVIZI MANUALI" &&
+        In.Coverages["content"].SumInsuredLimitOfIndemnity > 0 &&
+        In.Coverages["building"].SumInsuredLimitOfIndemnity > 0
+    then
+        In.Coverages["theft"].SumInsuredLimitOfIndemnity = Max(5000.00, Min((Round(((In.Coverages["content"].SumInsuredLimitOfIndemnity * 0.10)+5000)/5000) * 5000),100000));
+        In.Coverages["theft"].IsBase = false;
+		In.Coverages["theft"].IsYuor = true;
+		In.Coverages["theft"].IsPremium = true;
+       Retract("CheckTheft2");
+
+}
+rule CheckTheft3 "Check Building values" salience 10 {
+    when 
+     In.Theft == "X" &&
+        In.BusinessSector =="EDILI" &&
+        In.Coverages["content"].SumInsuredLimitOfIndemnity > 0 &&
+        In.Coverages["building"].SumInsuredLimitOfIndemnity > 0
+    then
+        In.Coverages["theft"].SumInsuredLimitOfIndemnity = Max(5000.00, Min((Round(((In.Coverages["content"].SumInsuredLimitOfIndemnity * 0.15)+5000)/5000) * 5000),100000));
+        In.Coverages["theft"].IsBase = false;
+		In.Coverages["theft"].IsYuor = true;
+		In.Coverages["theft"].IsPremium = true;
+       Retract("CheckTheft3");
+
+}
+//--------------------------------------------------------valuables-in-safe-strongrooms----------------------------------------------------------------------------------
+rule CheckValuablesInSafeStrongrooms "Check Building values" salience 40 {
+    when 
+        In.Coverages["content"].SumInsuredLimitOfIndemnity > 0 ||
+        In.Coverages["building"].SumInsuredLimitOfIndemnity > 0
+    then
+        In.Coverages["valuables-in-safe-strongrooms"].SumInsuredLimitOfIndemnity =   5000.00;
+        In.Coverages["valuables-in-safe-strongrooms"].IsBase = false;
+		In.Coverages["valuables-in-safe-strongrooms"].IsYuor = false;
+		In.Coverages["valuables-in-safe-strongrooms"].IsPremium = true;
+       Retract("CheckValuablesInSafeStrongrooms");
+
+}
+//--------------------------------------------------------valuables-in-safe-strongrooms----------------------------------------------------------------------------------
+rule CheckValuables "Check Building values" salience 40 {
+    when 
+        In.Coverages["content"].SumInsuredLimitOfIndemnity > 0 ||
+        In.Coverages["building"].SumInsuredLimitOfIndemnity > 0
+    then
+        In.Coverages["valuables"].SumInsuredLimitOfIndemnity =   2500.00;
+        In.Coverages["valuables"].IsBase = false;
+		In.Coverages["valuables"].IsYuor = false;
+		In.Coverages["valuables"].IsPremium = true;
+       Retract("CheckValuables");
+
+}
+//--------------------------------------------------------electronic-equipment----------------------------------------------------------------------------------
+rule CheckElectronicEquipment "Check Building values" salience 10 {
+    when 
+        In.Eletronic == "X" &&
+        In.BusinessSector =="COMMERCIALE" &&
+        In.Coverages["content"].SumInsuredLimitOfIndemnity > 0 
+        
+    then
+        In.Coverages["electronic-equipment"].SumInsuredLimitOfIndemnity = Max(5000.00, Min((Round(((In.Coverages["content"].SumInsuredLimitOfIndemnity * 0.05)+5000)/5000) * 5000),100000));
+        In.Coverages["electronic-equipment"].IsBase = false;
+		In.Coverages["electronic-equipment"].IsYuor = true;
+		In.Coverages["electronic-equipment"].IsPremium = true;
+       Retract("CheckElectronicEquipment");
+
+}
+rule CheckElectronicEquipment1 "Check Building values" salience 10 {
+    when 
+     In.Eletronic == "X" &&
+        In.BusinessSector =="PRODUZIONE" &&
+        In.Coverages["content"].SumInsuredLimitOfIndemnity > 0 
+
+    then
+        In.Coverages["electronic-equipment"].SumInsuredLimitOfIndemnity = Max(5000.00, Min((Round(((In.Coverages["content"].SumInsuredLimitOfIndemnity * 0.15)+5000)/5000) * 5000),100000));
+        In.Coverages["electronic-equipment"].IsBase = false;
+		In.Coverages["electronic-equipment"].IsYuor = true;
+		In.Coverages["electronic-equipment"].IsPremium = true;
+       Retract("CheckElectronicEquipment1");
+
+}
+rule CheckElectronicEquipment2 "Check Building values" salience 10 {
+    when 
+     In.Eletronic == "X" &&
+        In.BusinessSector =="SERVIZI MANUALI" &&
+        In.Coverages["content"].SumInsuredLimitOfIndemnity > 0 
+       
+    then
+        In.Coverages["electronic-equipment"].SumInsuredLimitOfIndemnity = Max(5000.00, Min((Round(((In.Coverages["content"].SumInsuredLimitOfIndemnity * 0.10)+5000)/5000) * 5000),100000));
+        In.Coverages["electronic-equipment"].IsBase = false;
+		In.Coverages["electronic-equipment"].IsYuor = true;
+		In.Coverages["electronic-equipment"].IsPremium = true;
+       Retract("CheckElectronicEquipment2");
+
+}
+rule CheckElectronicEquipment3 "Check Building values" salience 10 {
+    when 
+        In.Eletronic == "X" &&
+        In.BusinessSector =="EDILI" &&
+        In.Coverages["content"].SumInsuredLimitOfIndemnity > 0 
+    then
+        In.Coverages["electronic-equipment"].SumInsuredLimitOfIndemnity = Max(5000.00, Min((Round(((In.Coverages["content"].SumInsuredLimitOfIndemnity * 0.15)+5000)/5000) * 5000),100000));
+        In.Coverages["electronic-equipment"].IsBase = false;
+		In.Coverages["electronic-equipment"].IsYuor = true;
+		In.Coverages["electronic-equipment"].IsPremium = true;
+       Retract("CheckElectronicEquipment3");
+
+}
+//--------------------------------------------------------increased-cost-of-working----------------------------------------------------------------------------------
+rule CheckincreasedCostOfWorking "Check Building values" salience 40 {
+    when 
+        In.Coverages["content"].SumInsuredLimitOfIndemnity > 0 ||
+        In.Coverages["building"].SumInsuredLimitOfIndemnity > 0
+    then
+        In.Coverages["increased-cost-of-working"].SumInsuredLimitOfIndemnity =   10000.00;
+        In.Coverages["increased-cost-of-working"].IsBase = false;
+		In.Coverages["increased-cost-of-working"].IsYuor = false;
+		In.Coverages["increased-cost-of-working"].IsPremium = true;
+       Retract("CheckincreasedCostOfWorking");
+
+}
+//--------------------------------------------------------software-under-license----------------------------------------------------------------------------------
+rule CheckSoftwareUnderLicense "Check Building values" salience 40 {
+    when 
+        In.Coverages["content"].SumInsuredLimitOfIndemnity > 0 ||
+        In.Coverages["building"].SumInsuredLimitOfIndemnity > 0
+    then
+        In.Coverages["software-under-license"].SumInsuredLimitOfIndemnity =   10000.00;
+        In.Coverages["software-under-license"].IsBase = false;
+		In.Coverages["software-under-license"].IsYuor = false;
+		In.Coverages["software-under-license"].IsPremium = true;
+       Retract("CheckSoftwareUnderLicense");
+
+}
+//--------------------------------------------------------restoration-of-data----------------------------------------------------------------------------------
+rule CheckRestorationOfData "Check Building values" salience 40 {
+    when 
+      In.Coverages["electronic-equipment"].SumInsuredLimitOfIndemnity > 0 &&
+        In.Coverages["content"].SumInsuredLimitOfIndemnity > 0 ||
+        In.Coverages["building"].SumInsuredLimitOfIndemnity > 0
+    then
+        In.Coverages["restoration-of-data"].SumInsuredLimitOfIndemnity =    (In.Coverages["electronic-equipment"].SumInsuredLimitOfIndemnity * 0.10);
+        In.Coverages["restoration-of-data"].IsBase = false;
+		In.Coverages["restoration-of-data"].IsYuor = false;
+		In.Coverages["restoration-of-data"].IsPremium = true;
+       Retract("CheckRestorationOfData");
+
+}
+rule CheckBusinessInterruption "Check Building values" salience 40 {
+    when 
+        In.Coverages["content"].SumInsuredLimitOfIndemnity > 0 ||
+        In.Coverages["building"].SumInsuredLimitOfIndemnity > 0
+    then
+        In.Coverages["business-interruption"].SumInsuredLimitOfIndemnity =   250.00;
+        In.Coverages["business-interruption"].IsBase = false;
+		In.Coverages["business-interruption"].IsYuor = true;
+		In.Coverages["business-interruption"].IsPremium = true;
+       Retract("CheckBusinessInterruption");
+
+}
+rule CheckAssistance "Check Building values" salience 40 {
+    when 
+        In.Coverages["content"].SumInsuredLimitOfIndemnity > 0 ||
+        In.Coverages["building"].SumInsuredLimitOfIndemnity > 0
+    then
+        In.Coverages["assistance"].IsBase = true;
+		In.Coverages["assistance"].IsYuor = true;
+		In.Coverages["assistance"].IsPremium = true;
+       Retract("CheckAssistance");
+
+}

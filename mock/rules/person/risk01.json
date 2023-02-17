@@ -1,0 +1,11 @@
+{
+    "age": 65,
+	"work": "select work list da elenco professioni",
+	"worktype": "dipendente" ,
+	"coverageType": "24 ore" ,
+	"childrenScool": true,
+	"issue1500": 1,
+	"riskInLifeIs":1,
+	"class":2
+
+}
