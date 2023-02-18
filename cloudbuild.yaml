@@ -1,10 +1,6 @@
 steps:
 
 - name: 'gcr.io/cloud-builders/gsutil'
-  args: ['cp',-r, '/workspace/function-data/*', 'gs://function-data']
-- name: 'gcr.io/cloud-builders/gsutil'
-  args: ['cp',-r, '/workspace/function-data/*', 'gs://core-350507-function-data']
-- name: 'gcr.io/cloud-builders/gsutil'
   args: ['cp', 'gs://function-data/env/dev.yaml', '.']
 - name: 'gcr.io/cloud-builders/gsutil'
   args: ['cp', 'gs://core-350507-function-data/env/prod.yaml', '.']

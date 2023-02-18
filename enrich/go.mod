@@ -9,6 +9,6 @@ require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
 	github.com/go-gota/gota v0.12.0
 	github.com/wopta/goworkspace/lib v0.0.0-20230218133800-746a7c429fe6
-	github.com/wopta/goworkspace/models v0.0.0-20230218133800-746a7c429fe6 // indirect
+
 
 )
