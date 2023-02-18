@@ -5,6 +5,7 @@ go 1.16
 replace github.com/wopta/goworkspace/payment => ./
 
 require (
-	github.com/wopta/goworkspace/lib v0.0.0-20230209174247-cc44270f2204
-	github.com/wopta/goworkspace/models v0.0.0-20230207110643-e018cac2446c // indirect
+	firebase.google.com/go/v4 v4.10.0 // indirect
+	github.com/wopta/goworkspace/lib v0.0.0-20230218133800-746a7c429fe6
+	github.com/wopta/goworkspace/models v0.0.0-20230218133800-746a7c429fe6 // indirect
 )
