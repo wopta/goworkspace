@@ -164,9 +164,6 @@ func SftpUpload(filePath string) {
 	lib.CheckError(e)
 	defer client.Close()
 	log.Println("Open local file for reading.:")
-	// Open local file for reading.
-	os.Open("/tmp/" + filePath)
-
 	source, e := os.Open("../tmp/" + filePath)
 	lib.CheckError(e)
 	//defer source.Close()
