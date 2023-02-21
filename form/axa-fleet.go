@@ -72,8 +72,8 @@ func GetFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 				var typeMov string
 				isError := false
 				fmt.Println("row[5]:")
-				fmt.Println(row[5])
-				if row[5] == "Inserimento" {
+				fmt.Println(row[6])
+				if row[6] == "Inserimento" {
 					typeMov = "A"
 				} else {
 					founded := false
