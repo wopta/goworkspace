@@ -36,8 +36,6 @@ func GetFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 
 	}
 	ctx := context.Background()
-
-	log.Println(string(path))
 	srv, e := sheets.NewService(ctx, option.WithCredentialsJSON(path), option.WithScopes(sheets.SpreadsheetsScope))
 	// Prints the names and majors of students in a sample spreadsheet:
 	// https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
@@ -69,6 +67,7 @@ func GetFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 			//"NUMERO POLIZZA","LOB","	TIPOLOGIA POLIZZA","CODICE CONFIGURAZIONE","IDENTIFICATIVO UNIVOCO APPLICAZIONE","	TIPO OGGETTO ASSICURATO","	CODICE FISCALE / P.IVA ASSICURATO","COGNOME / RAGIONE SOCIALE ASSICURATO","	NOME ASSICURATO","	INDIRIZZO RESIDENZA ASSICURATO","	CAP RESIDENZA ASSICURATO","	CITTA’ RESIDENZA ASSICURATO","	PROVINCIA RESIDENZA ASSICURATO","	TARGA VEICOLO","	TELAIO VEICOLO	","MARCA VEICOLO","	MODELLO VEICOLO	TIPOLOGIA VEICOLO","PESO VEICOLO","	DATA IMMATRICOLAZIONE","	DATA INIZIO VALIDITA' COPERTURA","	DATA FINE VALIDITA' COPERTURA","TIPO MOVIMENTO"
 
 			if len(row) == 7 && i != 0 {
+				fmt.Println("Enter in No EMESSO")
 				excelhead := []interface{}{"NUMERO POLIZZA", "LOB", "	TIPOLOGIA POLIZZA", "CODICE CONFIGURAZIONE", "IDENTIFICATIVO UNIVOCO APPLICAZIONE", "	TIPO OGGETTO ASSICURATO", "	CODICE FISCALE / P.IVA ASSICURATO", "COGNOME / RAGIONE SOCIALE ASSICURATO", "	NOME ASSICURATO", "	INDIRIZZO RESIDENZA ASSICURATO", "	CAP RESIDENZA ASSICURATO", "	CITTA’ RESIDENZA ASSICURATO", "	PROVINCIA RESIDENZA ASSICURATO", "	TARGA VEICOLO", "	TELAIO VEICOLO	", "MARCA VEICOLO", "	MODELLO VEICOLO	TIPOLOGIA VEICOLO", "PESO VEICOLO", "	DATA IMMATRICOLAZIONE", "	DATA INIZIO VALIDITA' COPERTURA", "	DATA FINE VALIDITA' COPERTURA", "TIPO MOVIMENTO"}
 				excel = append(excel, excelhead)
 				var typeMov string
@@ -95,6 +94,7 @@ func GetFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 					typeMov = "E"
 				}
 				if !isError {
+					fmt.Println("!isError")
 					celindex := strconv.Itoa(i + 1)
 					excelRow := []interface{}{"191222", "A", "C", "00001", progressiveFormattedpre, "2", "03682240043", "T-WAY SPA", "", "Piazza Walther Von Der Vogelweide", "39100", "Bolzano", "BZ", row[1], "", "", row[2], 3, 4, row[3], row[4], "31/12/2023", typeMov}
 					cel := &sheets.ValueRange{
