@@ -160,16 +160,14 @@ func SftpUpload(filePath string) {
 		KeyExchanges: []string{"diffie-hellman-group-exchange-sha1", "diffie-hellman-group1-sha1", "diffie-hellman-group14-sha1"}, // optional
 		Timeout:      time.Second * 30,                                                                                            // 0 for not timeout
 	}
-	client, err := lib.NewSftpclient(config)
-	if err != nil {
-		log.Fatalln(err)
-	}
+	client, e := lib.NewSftpclient(config)
+	lib.CheckError(e)
 	defer client.Close()
 	log.Println("Open local file for reading.:")
 	// Open local file for reading.
 	os.Open("/tmp/" + filePath)
 
-	source, e := os.Open("/tmp/" + filePath)
+	source, e := os.Open("../tmp/" + filePath)
 	lib.CheckError(e)
 	//defer source.Close()
 	log.Println("Create remote file for writing:")
@@ -210,10 +208,10 @@ func SftpUpload(filePath string) {
 }
 func getMailObj(msg string) mail.MailRequest {
 
-	//link := "https://storage.googleapis.com/documents-public-dev/information-set/information-sets//v1/Precontrattuale.pdf"
+	//link := "https://storage.googleapis.com/documents-public-dev/information-set/information-sets//v1/Precontrattuale.pdf "michele.lomazzi@wopta.it","
 	var obj mail.MailRequest
 	obj.From = "noreply@wopta.it"
-	obj.To = []string{"michele.lomazzi@wopta.it", "luca.barbieri@wopta.it"}
+	obj.To = []string{"luca.barbieri@wopta.it"}
 	obj.Message = msg
 	obj.Subject = " Wopta T-Way Axa Fleet"
 	obj.IsHtml = true
