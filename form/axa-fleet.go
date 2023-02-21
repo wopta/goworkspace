@@ -36,20 +36,16 @@ func GetFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 
 	}
 	ctx := context.Background()
-	log.Println("sheets.NewService")
+
 	log.Println(string(path))
 	srv, e := sheets.NewService(ctx, option.WithCredentialsJSON(path), option.WithScopes(sheets.SpreadsheetsScope))
-	log.Println("sheets.NewService")
-	lib.CheckError(e)
 	// Prints the names and majors of students in a sample spreadsheet:
 	// https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
 	spreadsheetId := "1S3ELzCRXHMT0xarthgUWof9PMhFolmj9wE0G9I9ItWw"
 	spreadsheettotId := "1UtYiPt7fJ8FAZQRpmwRZpyqGpOT26Q2-qNidLAAPFlQ"
 	tway, e := srv.Spreadsheets.Values.Get(spreadsheetId, "A:H").Do()
-	lib.CheckError(e)
-	log.Println("srv.Spreadsheets.Values.Get")
 	axa, e := srv.Spreadsheets.Values.Get(spreadsheettotId, "A:W").Do()
-	log.Println("srv.Spreadsheets.Values.Get")
+
 	if len(tway.Values) == 0 {
 		fmt.Println("No data found.")
 	} else {
@@ -172,7 +168,7 @@ func SftpUpload(filePath string) {
 	log.Println("Open local file for reading.:")
 	// Open local file for reading.
 	os.Open("/tmp/" + filePath)
-	sourcest, e := ioutil.ReadFile("/tmp/" + filePath)
+
 	source, e := os.Open("/tmp/" + filePath)
 	lib.CheckError(e)
 	//defer source.Close()
@@ -180,7 +176,7 @@ func SftpUpload(filePath string) {
 	// Create remote file for writing.
 	lib.Files("../tmp")
 	//destination, e := client.Create(filePath)
-	destination, e := client.OpenFile("./" + filePath)
+	destination, e := client.OpenFile("/" + filePath)
 	lib.CheckError(e)
 	defer destination.Close()
 	log.Println("Upload local file to a remote location as in 1MB (byte) chunks.")
@@ -189,7 +185,6 @@ func SftpUpload(filePath string) {
 	// Upload local file to a remote location as in 1MB (byte) chunks.
 	e = client.Upload(source, destination, int(info.Size()))
 
-	lib.PutToStorage("function-data", "tway-fleet-axa/"+filePath, sourcest)
 	lib.CheckError(e)
 	/*
 		// Download remote file.
