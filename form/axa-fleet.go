@@ -85,7 +85,7 @@ func GetFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 					for x, axarow := range axa.Values {
 						// var t string
 						if axarow[13] == row[2] {
-							fmt.Println("")
+							fmt.Println("axarow[13] == row[2]")
 							fmt.Println(x)
 							progressiveFormattedpre = axarow[4].(string)
 							founded = true
@@ -93,7 +93,7 @@ func GetFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 
 					}
 					if !founded {
-						mail.SendMail((getMailObj("Targa non trovata " + row[2].(string))))
+						mail.SendMail((getMailObj("<p>Opss.. qualcosa è andato storto</p><p>Il servizio di aggiornamento copertura flotte di Wopta per T-way non è stato in grado di trovare la targa: " + row[2].(string) + "</p><p>Non ti preoccupare questa operazione è stata gia annullata devi solo rieffetuare la richiesta dall' apposito form con la targa corretta</p>")))
 						isError = true
 					}
 					typeMov = "E"
@@ -119,7 +119,7 @@ func GetFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 	}
 	now := time.Now()
 	layout2 := "2006-01-02"
-	filepath := now.Format(layout2) + ".xlsx"
+	filepath := now.Format(layout2) + strconv.Itoa(time.Now().Nanosecond()) + ".xlsx"
 
 	if os.Getenv("env") != "local" {
 		//./serverless_function_source_code/
