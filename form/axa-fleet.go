@@ -70,12 +70,18 @@ func GetFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 			progressive := marks + 1
 			progressiveFormatted := fmt.Sprintf("%08d", progressive)
 			progressiveFormattedpre := "WR" + progressiveFormatted
+			//"NUMERO POLIZZA","LOB","	TIPOLOGIA POLIZZA","CODICE CONFIGURAZIONE","IDENTIFICATIVO UNIVOCO APPLICAZIONE","	TIPO OGGETTO ASSICURATO","	CODICE FISCALE / P.IVA ASSICURATO","COGNOME / RAGIONE SOCIALE ASSICURATO","	NOME ASSICURATO","	INDIRIZZO RESIDENZA ASSICURATO","	CAP RESIDENZA ASSICURATO","	CITTA’ RESIDENZA ASSICURATO","	PROVINCIA RESIDENZA ASSICURATO","	TARGA VEICOLO","	TELAIO VEICOLO	","MARCA VEICOLO","	MODELLO VEICOLO	TIPOLOGIA VEICOLO","PESO VEICOLO","	DATA IMMATRICOLAZIONE","	DATA INIZIO VALIDITA' COPERTURA","	DATA FINE VALIDITA' COPERTURA","TIPO MOVIMENTO"
+
 			if len(row) == 7 && i != 0 {
+				excelhead := []interface{}{"NUMERO POLIZZA", "LOB", "	TIPOLOGIA POLIZZA", "CODICE CONFIGURAZIONE", "IDENTIFICATIVO UNIVOCO APPLICAZIONE", "	TIPO OGGETTO ASSICURATO", "	CODICE FISCALE / P.IVA ASSICURATO", "COGNOME / RAGIONE SOCIALE ASSICURATO", "	NOME ASSICURATO", "	INDIRIZZO RESIDENZA ASSICURATO", "	CAP RESIDENZA ASSICURATO", "	CITTA’ RESIDENZA ASSICURATO", "	PROVINCIA RESIDENZA ASSICURATO", "	TARGA VEICOLO", "	TELAIO VEICOLO	", "MARCA VEICOLO", "	MODELLO VEICOLO	TIPOLOGIA VEICOLO", "PESO VEICOLO", "	DATA IMMATRICOLAZIONE", "	DATA INIZIO VALIDITA' COPERTURA", "	DATA FINE VALIDITA' COPERTURA", "TIPO MOVIMENTO"}
+				excel = append(excel, excelhead)
 				var typeMov string
+				isError := false
 				if row[5] == "Inserimento" {
 					typeMov = "A"
 				} else {
 					founded := false
+
 					for x, axarow := range axa.Values {
 						// var t string
 						if axarow[13] == row[2] {
@@ -88,23 +94,25 @@ func GetFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 					}
 					if !founded {
 						mail.SendMail((getMailObj("Targa non trovata " + row[2].(string))))
+						isError = true
 					}
 					typeMov = "E"
 				}
-				celindex := strconv.Itoa(i + 1)
-				excelRow := []interface{}{"191222", "A", "C", "00001", progressiveFormattedpre, "2", "03682240043", "T-WAY SPA", "", "Piazza Walther Von Der Vogelweide", "39100", "Bolzano", "BZ", row[1], "", "", row[2], 3, 4, row[3], row[4], "31/12/2023", typeMov}
-				cel := &sheets.ValueRange{
-					Values: [][]interface{}{{"EMESSO"}},
+				if !isError {
+					celindex := strconv.Itoa(i + 1)
+					excelRow := []interface{}{"191222", "A", "C", "00001", progressiveFormattedpre, "2", "03682240043", "T-WAY SPA", "", "Piazza Walther Von Der Vogelweide", "39100", "Bolzano", "BZ", row[1], "", "", row[2], 3, 4, row[3], row[4], "31/12/2023", typeMov}
+					cel := &sheets.ValueRange{
+						Values: [][]interface{}{{"EMESSO"}},
+					}
+					row := &sheets.ValueRange{
+						Values: [][]interface{}{{"191222", "A", "C", "00001", progressiveFormattedpre, "2", "03682240043", "T-WAY SPA", "", "Piazza Walther Von Der Vogelweide", "39100", "Bolzano", "BZ", row[1], "", "", row[2], 3, 4, row[3], row[4], "31/12/2023", typeMov}},
+					}
+					excel = append(excel, excelRow)
+					fmt.Println("first save, :")
+					_, e = srv.Spreadsheets.Values.Update(spreadsheetId, "H"+celindex+":H"+celindex, cel).ValueInputOption("USER_ENTERED").Context(ctx).Do()
+					fmt.Println("second save:")
+					_, e = srv.Spreadsheets.Values.Append(spreadsheettotId, "Foglio1", row).ValueInputOption("USER_ENTERED").InsertDataOption("INSERT_ROWS").Context(ctx).Do()
 				}
-				row := &sheets.ValueRange{
-					Values: [][]interface{}{{"191222", "A", "C", "00001", progressiveFormattedpre, "2", "03682240043", "T-WAY SPA", "", "Piazza Walther Von Der Vogelweide", "39100", "Bolzano", "BZ", row[1], "", "", row[2], 3, 4, row[3], row[4], "31/12/2023", typeMov}},
-				}
-				excel = append(excel, excelRow)
-				fmt.Println("first save, :")
-				_, e = srv.Spreadsheets.Values.Update(spreadsheetId, "H"+celindex+":H"+celindex, cel).ValueInputOption("USER_ENTERED").Context(ctx).Do()
-				fmt.Println("second save:")
-				_, e = srv.Spreadsheets.Values.Append(spreadsheettotId, "Foglio1", row).ValueInputOption("USER_ENTERED").InsertDataOption("INSERT_ROWS").Context(ctx).Do()
-
 			}
 
 		}

@@ -263,13 +263,26 @@ func (s Skin) Sign(m pdf.Maroto, name string, label string, id string, isTag boo
 		Family: consts.Arial,
 	}
 	m.Row(10, func() {
-		m.Col(8, func() {
+		m.Col(6, func() {
+
+		})
+		m.Col(6, func() {
 			if isTag {
 				m.Text("[[!sigField"+id+":signer1:signature(sigType=\"Click2Sign\"):label(\"firma qui\"):size(width=150,height=60)]]", prop)
 			}
 
 		})
+
+	})
+
+	m.Row(10, func() {
 		m.Col(4, func() {
+
+		})
+		m.Col(2, func() {
+
+		})
+		m.Col(6, func() {
 
 			m.Signature(name, props.Font{
 				Size:   12.0,
@@ -390,7 +403,7 @@ func (s Skin) Title(m pdf.Maroto, title string, body string, bodyHeight float64)
 		Align: consts.Left,
 		Color: s.TextColor,
 	}
-	m.Row(s.rowHeight+2.0, func() {
+	m.Row(s.rowHeight, func() {
 		m.Col(12, func() {
 			m.Text(title, prop)
 

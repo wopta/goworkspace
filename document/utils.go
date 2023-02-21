@@ -9,6 +9,7 @@ import (
 	"github.com/johnfercher/maroto/pkg/pdf"
 	"github.com/johnfercher/maroto/pkg/props"
 	lib "github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 )
 
 func (s Skin) lenToHeight(w string) float64 {
@@ -178,4 +179,14 @@ func (s Skin) checkPage(m pdf.Maroto) {
 		s.Space(m, 10.0)
 
 	}
+}
+func ExistGuarance(list []models.Guarantee, find string) bool {
+	var res bool
+	for _, g := range list {
+		if g.Slug == find {
+			return true
+		}
+	}
+
+	return res
 }

@@ -54,7 +54,7 @@ type Kv struct {
 	Value string `json:"value"`
 }
 
-type DodumentResponse struct {
+type DocumentResponse struct {
 	EnvelopSignId string `json:"envelopSignId"`
 	LinkGcs       string `json:"linkGcs"`
 	Bytes         string `json:"bytes"`
