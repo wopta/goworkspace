@@ -119,7 +119,7 @@ func GetFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 	}
 	now := time.Now()
 	layout2 := "2006-01-02"
-	filepath := now.Format(layout2) + strconv.Itoa(time.Now().Nanosecond()) + ".xlsx"
+	filepath := now.Format(layout2) + "-" + strconv.Itoa(time.Now().Nanosecond()) + ".xlsx"
 
 	if os.Getenv("env") != "local" {
 		//./serverless_function_source_code/
@@ -130,6 +130,8 @@ func GetFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 	//root = path.dirname(path.abspath(__file__))
 	log.Println("tempdir")
 	lib.Files("../tmp")
+	sourcest, e := ioutil.ReadFile("/tmp/" + filepath)
+	lib.PutToStorage("function-data", "tway-fleet-axa/"+filepath, sourcest)
 	SftpUpload(filepath)
 	return "", nil, e
 }
@@ -178,7 +180,7 @@ func SftpUpload(filePath string) {
 	// Create remote file for writing.
 	lib.Files("../tmp")
 	//destination, e := client.Create(filePath)
-	destination, e := client.OpenFile(filePath)
+	destination, e := client.OpenFile("./" + filePath)
 	lib.CheckError(e)
 	defer destination.Close()
 	log.Println("Upload local file to a remote location as in 1MB (byte) chunks.")
