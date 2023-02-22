@@ -108,14 +108,26 @@ func PutToStorage(bucketname string, path string, file []byte) string {
 	CheckError(err)
 	bucket := client.Bucket(bucketname)
 	write := bucket.Object(path).NewWriter(ctx)
-
 	defer write.Close()
 	write.Write(file)
-	log.Println("write.MediaLink: " + write.MediaLink)
+	CheckError(err)
+
+	return "gs://" + bucketname + "/" + path
+
+}
+func PutGoogleStorage(bucketname string, path string, file []byte, contentType string) (string, error) {
+	// some process request msg, decode base64 to image byte
+	// create image file in current directory with os.create()
+	log.Println("start PutToStorage")
+	ctx := context.Background()
+	client, err := storage.NewClient(ctx)
+	bucket := client.Bucket(bucketname)
+	write := bucket.Object(path).NewWriter(ctx)
+	write.ContentType = contentType
+	defer write.Close()
 
 	CheckError(err)
-	log.Println("write.MediaLink: ")
-	return "gs://" + bucketname + "/" + path
+	return "gs://" + bucketname + "/" + path, err
 
 }
 func PutToFireStorage(bucketname string, path string, file []byte) string {
