@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"cloud.google.com/go/storage"
 	fireStorage "firebase.google.com/go"
@@ -28,6 +29,7 @@ func Files(path string) []string {
 	for _, f := range files {
 		fmt.Println(f.Name())
 		res = append(res, f.Name())
+		res = append(res, strconv.FormatInt(f.Size(), 10))
 	}
 	return res
 }
