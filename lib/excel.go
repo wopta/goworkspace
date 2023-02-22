@@ -27,6 +27,8 @@ func CreateExcel(sheet [][]interface{}, filePath string) {
 	for x, row := range sheet {
 		for i, cel := range row {
 			alfabet := rune('A' - 1 + i)
+			fmt.Println(string(alfabet) + "" + strconv.Itoa(x))
+			fmt.Println(cel)
 			f.SetCellValue("Sheet1", string(alfabet)+""+strconv.Itoa(x), cel)
 		}
 	}

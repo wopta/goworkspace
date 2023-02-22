@@ -111,7 +111,6 @@ func PutToStorage(bucketname string, path string, file []byte) string {
 	defer write.Close()
 	write.Write(file)
 	CheckError(err)
-
 	return "gs://" + bucketname + "/" + path
 
 }
@@ -125,7 +124,6 @@ func PutGoogleStorage(bucketname string, path string, file []byte, contentType s
 	write := bucket.Object(path).NewWriter(ctx)
 	write.ContentType = contentType
 	defer write.Close()
-
 	CheckError(err)
 	return "gs://" + bucketname + "/" + path, err
 
