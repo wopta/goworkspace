@@ -20,7 +20,6 @@ func User(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("Product")
 	lib.EnableCors(&w, r)
-	w.Header().Set("Access-Control-Allow-Methods", "POST")
 	route := lib.RouteData{
 		Routes: []lib.Route{
 			{
@@ -36,18 +35,11 @@ func User(w http.ResponseWriter, r *http.Request) {
 			{
 				Route:   "/v1/authId/:authId",
 				Handler: GetUserByAuthIdFx,
-				Method:  "POST",
+				Method:  "GET",
 			},
-
 			{
 				Route:   "/v1/onboarding",
 				Handler: OnboardUserFx,
-				Method:  "POST",
-			},
-
-			{
-				Route:   "/v1/login",
-				Handler: PutFx,
 				Method:  "POST",
 			},
 		},
@@ -61,6 +53,8 @@ func OnboardUserFx(resp http.ResponseWriter, r *http.Request) (string, interface
 		onboardUserRequest OnboardUserDto
 		result             string
 	)
+	resp.Header().Set("Access-Control-Allow-Methods", "POST")
+
 	reqBytes := lib.ErrorByte(ioutil.ReadAll(r.Body))
 	json.Unmarshal(reqBytes, &onboardUserRequest)
 
@@ -80,32 +74,8 @@ func OnboardUserFx(resp http.ResponseWriter, r *http.Request) (string, interface
 	return result, result, nil
 }
 
-func GetName(name string) (models.Product, error) {
-
-	productFire := lib.WhereFirestore("pruducts", "name", "==", name)
-
-	products := models.ProductToListData(productFire)
-
-	return products[0], nil
-
-}
-func PutFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-
-	request := lib.ErrorByte(ioutil.ReadAll(r.Body))
-	pr, e := models.UnmarshalProduct([]byte(request))
-	p, e := Put(pr)
-	return "{}", p, e
-}
-func Put(p models.Product) (models.Product, error) {
-
-	r, _, e := lib.PutFirestoreErr("pruducts", p)
-	log.Println(r.ID)
-
-	return p, e
-}
-
-
 func GetUserByAuthIdFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	resp.Header().Set("Access-Control-Allow-Methods", "GET")
 	log.Println(r.Header.Get("uid"))
 	p, e := GetUserByAuthId(r.Header.Get("uid"))
 	jsonString, e := p.Marshal()
@@ -121,6 +91,7 @@ func GetUserByAuthId(uid string) (models.User, error) {
 }
 
 func GetUserByFiscalCodeFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	resp.Header().Set("Access-Control-Allow-Methods", "GET")
 	log.Println(r.Header.Get("fiscalCode"))
 	p, e := GetUserByFiscalCode(r.Header.Get("fiscalCode"))
 	jsonString, e := p.Marshal()
@@ -136,6 +107,7 @@ func GetUserByFiscalCode(fiscalCode string) (models.User, error) {
 }
 
 func GetUserByMailFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	resp.Header().Set("Access-Control-Allow-Methods", "GET")
 	log.Println(r.Header.Get("mail"))
 	p, e := GetUserByMail(r.Header.Get("mail"))
 	jsonString, e := p.Marshal()

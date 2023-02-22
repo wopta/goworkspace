@@ -50,16 +50,15 @@ type User struct {
 
 func FirestoreDocumentToUser(query *firestore.DocumentIterator) (User, error) {
 	var result User
-	userDocument, err := query.Next()
+	userDocumentSnapshot, err := query.Next()
 
-	if err != nil {
-		log.Println("error")
-		if err == iterator.Done {
-			log.Println("iterator.Done")
-			return result, err
-		}
+	if err != iterator.Done && err != nil {
+		log.Println(`error happened while trying to get user`)
+		log.Println(err)
+		return result, err
 	}
-	e := userDocument.DataTo(&result)
+
+	e := userDocumentSnapshot.DataTo(&result)
 	lib.CheckError(e)
 
 	return result, e
