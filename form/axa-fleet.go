@@ -131,7 +131,7 @@ func GetFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 	lib.Files("../tmp")
 	//sourcest, e := ioutil.ReadFile("../tmp/" + filepath)
 	lib.PutGoogleStorage("function-data", "tway-fleet-axa/"+filepath, sourcest, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-	//SftpUpload(filepath)
+	SftpUpload(filepath)
 	return "", nil, e
 }
 func SftpUpload(filePath string) {
