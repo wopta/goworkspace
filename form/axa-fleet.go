@@ -133,6 +133,7 @@ func GetFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 	_, e = lib.PutGoogleStorage("function-data", "tway-fleet-axa/"+filepath, sourcest, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 	sourcest, e = ioutil.ReadFile("../tmp/" + filepath)
 	_, e = lib.PutGoogleStorage("function-data", "tway-fleet-axa/2_"+filepath, sourcest, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+	lib.PutToStorage("function-data", "tway-fleet-axa/3_"+filepath, sourcest)
 	SftpUpload(filepath)
 	return "", nil, e
 }
@@ -232,10 +233,12 @@ func CreateExcel(sheet [][]interface{}, filePath string) ([]byte, error) {
 			fmt.Println(string(alfabet) + "" + strconv.Itoa(x+1))
 			fmt.Println(cel)
 			f.SetCellValue("Sheet1", string(alfabet)+""+strconv.Itoa(x+1), cel)
+			fmt.Println(f.GetCellValue("Sheet1", string(alfabet)+""+strconv.Itoa(x+1)))
 		}
 	}
 	//Set active sheet of the workbook.
 	f.SetActiveSheet(index)
+
 	//Save spreadsheet by the given path.
 	err = f.SaveAs(filePath)
 
