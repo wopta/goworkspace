@@ -8,6 +8,7 @@ require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
 	github.com/wopta/goworkspace/lib v0.0.0-20230222101311-e1cf88d06a88
 	github.com/wopta/goworkspace/mail v0.0.0-20230222101311-e1cf88d06a88
+	github.com/xuri/excelize/v2 v2.7.0
 	google.golang.org/api v0.103.0
 )
 
@@ -57,7 +58,6 @@ require (
 	github.com/src-d/gcfg v1.4.0 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
-	github.com/xuri/excelize/v2 v2.7.0 // indirect
 	github.com/xuri/nfp v0.0.0-20220409054826-5e722a1d9e22 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
