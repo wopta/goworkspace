@@ -36,7 +36,7 @@ func User(w http.ResponseWriter, r *http.Request) {
 			{
 				Route:   "/v1/authId/:authId",
 				Handler: GetUserByAuthIdFx,
-				Method:  "GET",
+				Method:  "POST",
 			},
 
 			{
