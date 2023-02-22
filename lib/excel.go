@@ -8,7 +8,7 @@ import (
 	"github.com/xuri/excelize/v2"
 )
 
-func CreateExcel(sheet [][]interface{}, filePath string) {
+func CreateExcel(sheet [][]interface{}, filePath string) ([]byte, error) {
 	log.Println("CreateExcel")
 	f := excelize.NewFile()
 	defer func() {
@@ -18,10 +18,7 @@ func CreateExcel(sheet [][]interface{}, filePath string) {
 	}()
 	// Create a new sheet.
 	index, err := f.NewSheet("Sheet1")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+
 	// Set value of a cell.
 
 	for x, row := range sheet {
@@ -37,8 +34,9 @@ func CreateExcel(sheet [][]interface{}, filePath string) {
 	f.SetActiveSheet(index)
 	// Save spreadsheet by the given path.
 
-	if err := f.SaveAs(filePath); err != nil {
-		fmt.Println(err)
-	}
-	Files("")
+	err = f.SaveAs(filePath)
+
+	resByte, err := f.WriteToBuffer()
+	resByte.Bytes()
+	return resByte.Bytes(), err
 }

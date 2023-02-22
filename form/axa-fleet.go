@@ -124,11 +124,11 @@ func GetFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 
 		//filepath = "../tmp/" + filepath
 	}
-	lib.CreateExcel(excel, "../tmp/"+filepath)
+	sourcest, e := lib.CreateExcel(excel, "../tmp/"+filepath)
 	//root = path.dirname(path.abspath(__file__))
 	log.Println("tempdir")
 	lib.Files("../tmp")
-	sourcest, e := ioutil.ReadFile("../tmp/" + filepath)
+	//sourcest, e := ioutil.ReadFile("../tmp/" + filepath)
 	lib.PutGoogleStorage("function-data", "tway-fleet-axa/"+filepath, sourcest, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 	SftpUpload(filepath)
 	return "", nil, e
