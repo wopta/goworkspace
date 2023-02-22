@@ -15,7 +15,6 @@ func init() {
 }
 
 func Form(w http.ResponseWriter, r *http.Request) {
-
 	log.Println("Product")
 	lib.EnableCors(&w, r)
 	w.Header().Set("Access-Control-Allow-Methods", "POST")

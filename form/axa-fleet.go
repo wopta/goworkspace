@@ -12,6 +12,7 @@ import (
 
 	lib "github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/mail"
+	"github.com/xuri/excelize/v2"
 	"google.golang.org/api/option"
 	"google.golang.org/api/sheets/v4"
 	//"google.golang.org/api/firebaseappcheck/v1"
@@ -124,13 +125,13 @@ func GetFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 
 		//filepath = "../tmp/" + filepath
 	}
-	sourcest, e := lib.CreateExcel(excel, "../tmp/"+filepath)
+	sourcest, e := CreateExcel(excel, "../tmp/"+filepath)
 	//root = path.dirname(path.abspath(__file__))
 	log.Println("tempdir")
 	lib.Files("../tmp")
 	//sourcest, e := ioutil.ReadFile("../tmp/" + filepath)
 	lib.PutGoogleStorage("function-data", "tway-fleet-axa/"+filepath, sourcest, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-	SftpUpload(filepath)
+	//SftpUpload(filepath)
 	return "", nil, e
 }
 func SftpUpload(filePath string) {
@@ -143,7 +144,6 @@ func SftpUpload(filePath string) {
 		pk = lib.ErrorByte(ioutil.ReadFile("function-data/env/twayserviceKey.ssh"))
 	case "dev":
 		pk = lib.GetFromStorage("function-data", "env/twayserviceKey.ssh", "")
-
 	case "prod":
 		pk = lib.GetFromStorage("core-350507-function-data", "env/twayserviceKey.ssh", "")
 	default:
@@ -205,8 +205,8 @@ func SftpUpload(filePath string) {
 		}
 		fmt.Printf("%+v\n", info)*/
 }
-func getMailObj(msg string) mail.MailRequest {
 
+func getMailObj(msg string) mail.MailRequest {
 	//link := "https://storage.googleapis.com/documents-public-dev/information-set/information-sets//v1/Precontrattuale.pdf "michele.lomazzi@wopta.it","
 	var obj mail.MailRequest
 	obj.From = "noreply@wopta.it"
@@ -217,4 +217,26 @@ func getMailObj(msg string) mail.MailRequest {
 	obj.IsAttachment = false
 
 	return obj
+}
+func CreateExcel(sheet [][]interface{}, filePath string) ([]byte, error) {
+	log.Println("CreateExcel")
+	f := excelize.NewFile()
+
+	// Create a new sheet.
+	index, err := f.NewSheet("Sheet1")
+	for x, row := range sheet {
+		for i, cel := range row {
+			alfabet := rune('A' - 1 + i)
+			fmt.Println(string(alfabet) + "" + strconv.Itoa(x+1))
+			fmt.Println(cel)
+			f.SetCellValue("Sheet1", string(alfabet)+""+strconv.Itoa(x+1), cel)
+		}
+	}
+	//Set active sheet of the workbook.
+	f.SetActiveSheet(index)
+	//Save spreadsheet by the given path.
+	err = f.SaveAs(filePath)
+
+	resByte, err := f.WriteToBuffer()
+	return resByte.Bytes(), err
 }
