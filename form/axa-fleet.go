@@ -238,5 +238,6 @@ func CreateExcel(sheet [][]interface{}, filePath string) ([]byte, error) {
 	err = f.SaveAs(filePath)
 
 	resByte, err := f.WriteToBuffer()
+
 	return resByte.Bytes(), err
 }
