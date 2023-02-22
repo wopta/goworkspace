@@ -30,6 +30,7 @@ func Files(path string) []string {
 		fmt.Println(f.Name())
 		res = append(res, f.Name())
 		res = append(res, strconv.FormatInt(f.Size(), 10))
+
 	}
 	return res
 }
