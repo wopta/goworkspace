@@ -25,18 +25,18 @@ func User(w http.ResponseWriter, r *http.Request) {
 		Routes: []lib.Route{
 			{
 				Route:   "/v1/fiscalcode/:fiscalcode",
-				Handler: GetFx,
+				Handler: GetUserByFiscalCodeFx,
 				Method:  "GET",
 			},
 			{
 				Route:   "/v1/mail/:mail",
-				Handler: GetFx,
+				Handler: GetUserByMailFx,
 				Method:  "GET",
 			},
 			{
-				Route:   "/v1/:uid",
-				Handler: GetFx,
-				Method:  "GET",
+				Route:   "/v1/authId/:authId",
+				Handler: GetUserByAuthIdFx,
+				Method:  "POST",
 			},
 
 			{
@@ -54,20 +54,6 @@ func User(w http.ResponseWriter, r *http.Request) {
 	}
 	route.Router(w, r)
 
-}
-
-func GetFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.Println(r.Header.Get("uid"))
-	p, e := Get(r.Header.Get("uid"))
-	jsonString, e := p.Marshal()
-	return string(jsonString), p, e
-}
-func Get(uid string) (models.Product, error) {
-	log.Println(uid)
-	productFire := lib.GetFirestore("pruducts", uid)
-	var product models.Product
-	e := productFire.DataTo(product)
-	return product, e
 }
 
 func OnboardUserFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -116,6 +102,52 @@ func Put(p models.Product) (models.Product, error) {
 	log.Println(r.ID)
 
 	return p, e
+}
+
+
+func GetUserByAuthIdFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	log.Println(r.Header.Get("uid"))
+	p, e := GetUserByAuthId(r.Header.Get("uid"))
+	jsonString, e := p.Marshal()
+	return string(jsonString), p, e
+}
+
+func GetUserByAuthId(uid string) (models.User, error) {
+	log.Println(uid)
+	userFirebase := lib.WhereLimitFirestore("users", "authId", "==", uid, 1)
+	var user models.User
+	user, err := models.FirestoreDocumentToUser(userFirebase)
+	return user, err
+}
+
+func GetUserByFiscalCodeFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	log.Println(r.Header.Get("fiscalCode"))
+	p, e := GetUserByFiscalCode(r.Header.Get("fiscalCode"))
+	jsonString, e := p.Marshal()
+	return string(jsonString), p, e
+}
+
+func GetUserByFiscalCode(fiscalCode string) (models.User, error) {
+	log.Println(fiscalCode)
+	userFirebase := lib.WhereLimitFirestore("users", "fiscalCode", "==", fiscalCode, 1)
+	var user models.User
+	user, err := models.FirestoreDocumentToUser(userFirebase)
+	return user, err
+}
+
+func GetUserByMailFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	log.Println(r.Header.Get("mail"))
+	p, e := GetUserByMail(r.Header.Get("mail"))
+	jsonString, e := p.Marshal()
+	return string(jsonString), p, e
+}
+
+func GetUserByMail(mail string) (models.User, error) {
+	log.Println(mail)
+	userFirebase := lib.WhereLimitFirestore("users", "mail", "==", mail, 1)
+	var user models.User
+	user, err := models.FirestoreDocumentToUser(userFirebase)
+	return user, err
 }
 
 type OnboardUserDto struct {

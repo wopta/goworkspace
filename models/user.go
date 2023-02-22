@@ -1,6 +1,13 @@
 package models
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"log"
+
+	"github.com/wopta/goworkspace/lib"
+	"google.golang.org/api/iterator"
+	"cloud.google.com/go/firestore"
+)
 
 func UnmarshalUser(data []byte) (Claim, error) {
 	var r Claim
@@ -39,4 +46,21 @@ type User struct {
 	PoliciesUid   []string `firestore:"policiesUid" json:"policiesUid,omitempty"`
 	Claims        []Claim  `firestore:"claims" json:"claims,omitempty"`
 	IsAgent       bool     `firestore:"isEmit,omitempty" json:"isEmit,omitempty" bigquery:"isEmit"`
+}
+
+func FirestoreDocumentToUser(query *firestore.DocumentIterator) (User, error) {
+	var result User
+	userDocument, err := query.Next()
+
+	if err != nil {
+		log.Println("error")
+		if err == iterator.Done {
+			log.Println("iterator.Done")
+			return result, err
+		}
+	}
+	e := userDocument.DataTo(&result)
+	lib.CheckError(e)
+
+	return result, e
 }
