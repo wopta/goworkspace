@@ -6,7 +6,7 @@ replace github.com/wopta/goworkspace/form => ./
 
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
-	github.com/wopta/goworkspace/lib v0.0.0-20230222090428-9b155d19f0e9
+	github.com/wopta/goworkspace/lib v0.0.0-20230222092616-5f8b89186128
 	google.golang.org/api v0.103.0
 )
 
