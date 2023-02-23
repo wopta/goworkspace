@@ -40,7 +40,7 @@
               "deductible": "",
               "description": "",
               "group": "DEATH",
-              "name": "Invalidità Totale Permanente",
+              "name": "invalidità totale permanente",
               "isExtension": false,
               "offer":{"default" :{
                 "sumInsured":50000,
@@ -62,7 +62,7 @@
               "deductible": "",
               "description": "",
               "group": "DEATH",
-              "name": "Inabilità Totale Temporanea",
+              "name": "inabilità totale temporanea",
               "isExtension": false,
               "offer":{"default" :{
                 "sumInsured":50000,
@@ -86,7 +86,7 @@
               "isExtension": false,
               "isMandatory":false,
               "group": "DEATH",
-              "name": "morte",
+              "name": "malattia grave",
               "offer":{"default" :{
                 "sumInsured":50000,
                 "duration":{"year":5}
