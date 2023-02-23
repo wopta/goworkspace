@@ -85,7 +85,7 @@ func ContractObj(data model.Policy) <-chan DocumentResponse {
 
 		m = skin.Space(m, 5.0)
 		skin.checkPage(m)
-		for x, A := range data.Survay {
+		for x, A := range *data.Survay {
 			alfa := strconv.QuoteRune(alfabet[x])
 			t := strings.Replace(alfa, "'", "", -1)
 			question := Kv{
@@ -103,7 +103,7 @@ func ContractObj(data model.Policy) <-chan DocumentResponse {
 		skin.SignDouleLine(m, data.Contractor.Name+" "+data.Contractor.Surname, "Global Assistance", "1", true)
 		m = skin.Space(m, 5.0)
 		skin.checkPage(m)
-		for _, A := range data.Statements {
+		for _, A := range *data.Statements {
 
 			skin.checkPage(m)
 			m = skin.Title(m, A.Title, A.Question, float64(getRowHeight(A.Question, 120, 6)))

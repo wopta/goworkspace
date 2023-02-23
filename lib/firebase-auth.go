@@ -4,13 +4,13 @@ import (
 	"context"
 	"log"
 
-	"firebase.google.com/go/v4"
+	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/auth"
 )
 
 func getClient() (*auth.Client, context.Context) {
 	ctx := context.Background()
-	app, err := firebase.NewApp(ctx, nil)
+	var app *firebase.App
 	client, err := app.Auth(ctx)
 	if err != nil {
 		log.Fatalf("error getting Auth client: %v\n", err)

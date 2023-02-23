@@ -66,8 +66,8 @@ type Policy struct {
 	Contractor      User                   `firestore:"contractor,omitempty" json:"contractor,omitempty" bigquery:"-"`
 	Contractors     *[]User                `firestore:"contractors,omitempty" json:"contractors,omitempty" bigquery:"-"`
 	DocumentName    string                 `firestore:"documentName,omitempty" json:"documentName,omitempty" bigquery:"-"`
-	Statements      []Statement            `firestore:"statements,omitempty" json:"statements,omitempty" bigquery:"-"`
-	Survay          []Statement            `firestore:"survey,omitempty" json:"survey,omitempty" bigquery:"-"`
+	Statements      *[]Statement           `firestore:"statements,omitempty" json:"statements,omitempty" bigquery:"-"`
+	Survay          *[]Statement           `firestore:"survey,omitempty" json:"survey,omitempty" bigquery:"-"`
 	Attachments     *[]Attachment          `firestore:"attachments,omitempty" json:"attachments,omitempty" bigquery:"-"`
 	Assets          []Asset                `firestore:"assets,omitempty" json:"assets,omitempty" bigquery:"-"`
 	Claim           *[]Claim               `firestore:"claim,omitempty" json:"claim,omitempty" bigquery:"-"`
@@ -80,9 +80,14 @@ type RenewHistory struct {
 	CreationDate time.Time `firestore:"creationDate,omitempty" json:"creationDate,omitempty"`
 }
 type Statement struct {
-	Title    string `firestore:"title ,omitempty" json:"title,omitempty"`
-	Question string `firestore:"question ,omitempty" json:"question,omitempty"`
-	Answer   bool   `firestore:"answer ,omitempty" json:"answer,omitempty"`
+	Title     string      `firestore:"title ,omitempty" json:"title,omitempty"`
+	Question  string      `firestore:"question,omitempty" json:"question,omitempty"`
+	Questions *[]Question `firestore:"questions,omitempty" json:"questions,omitempty" bigquery:"-"`
+	Answer    bool        `firestore:"answer ,omitempty" json:"answer,omitempty"`
+}
+type Question struct {
+	Question string `firestore:"question,omitempty" json:"question,omitempty"`
+	Isbold   bool   `firestore:"isbold,omitempty" json:"isbold,omitempty"`
 }
 
 func PolicyToListData(query *firestore.DocumentIterator) []Policy {
