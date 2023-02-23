@@ -124,9 +124,15 @@ func PutGoogleStorage(bucketname string, path string, file []byte, contentType s
 	ctx := context.Background()
 	client, err := storage.NewClient(ctx)
 	bucket := client.Bucket(bucketname)
+	//p:=bucket.Object(path)
+
 	write := bucket.Object(path).NewWriter(ctx)
 	write.ContentType = contentType
-	defer write.Close()
+	write.Close()
+	objAttrs, err := client.Bucket(bucketname).Object(path).Update(ctx, storage.ObjectAttrsToUpdate{
+		ContentType: contentType,
+	})
+	fmt.Println(objAttrs)
 	CheckError(err)
 	return "gs://" + bucketname + "/" + path, err
 
