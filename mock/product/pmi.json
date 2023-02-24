@@ -13,13 +13,14 @@
         "guarantees": [
             {
               "Assistance": "yes",
+              "orderAsset":9,
               "Base": null,
               "CompanyCodec": "AS",
               "CompanyName": "Assistenza al Fabbricato",
               "DailyAllowance": "",
               "Deductible": "",
               "Description": "Prestazioni di assistenza e servizio 24/7 al Fabbricato quali invio di artigiani come: idraulico, elettricista, fabbro, serrandista, vetraio, sorvegliante, nei casi indicati in polizza di necessità (la compagnia eroga direttamente la prestazione non il rimborso delle spese)",
-              "Group": "ASSSISTANCE",
+              "Group": "ASSISTANCE",
               "IsBase": true,
               "IsExtension": false,
               "IsPremium": true,
@@ -44,6 +45,7 @@
         ],
        "guaranteesMap": {
             "assistance": {
+              "orderAsset":9,
               "Assistance": "yes",
               "Base": null,
               "CompanyCodec": "AS",
@@ -74,6 +76,7 @@
               "Your": null
             },
             "atmospheric-event": {
+              "orderAsset":10,
               "Assistance": "",
               "Base": null,
               "CompanyCodec": "EA",
@@ -103,10 +106,8 @@
               "Value": null,
               "Your": null
             },
-            "auth": {
-              "content": ""
-            },
             "building": {
+              "orderAsset":1,
               "Assistance": "",
               "Base": null,
               "CompanyCodec": "IF",
@@ -137,6 +138,7 @@
               "Your": null
             },
             "burst-pipe": {
+              "orderAsset":12,
               "Assistance": "",
               "Base": null,
               "CompanyCodec": "AC",
@@ -167,6 +169,7 @@
               "Your": null
             },
             "business-interruption": {
+              "orderAsset":8,
               "Assistance": "",
               "Base": null,
               "CompanyCodec": "BI",
@@ -197,6 +200,7 @@
               "Your": null
             },
             "content": {
+              "orderAsset":2,
               "Assistance": "",
               "Base": null,
               "CompanyCodec": "IC",
@@ -227,6 +231,7 @@
               "Your": null
             },
             "cyber": {
+              "orderAsset":5,
               "Assistance": "",
               "Base": null,
               "CompanyCodec": "CR",
@@ -266,6 +271,7 @@
               "Your": null
             },
             "damage-to-goods-course-of-works": {
+              "orderAsset":6,
               "Assistance": "",
               "Base": null,
               "CompanyCodec": "DC",
@@ -296,6 +302,7 @@
               "Your": null
             },
             "damage-to-goods-in-custody": {
+              "orderAsset":11,
               "Assistance": "",
               "Base": null,
               "CompanyCodec": "DV",
@@ -326,6 +333,7 @@
               "Your": null
             },
             "defect-liability-12-months": {
+              "orderAsset":12,
               "Assistance": "",
               "Base": null,
               "CompanyCodec": "12",
@@ -356,6 +364,7 @@
               "Your": null
             },
             "defect-liability-dm-37-2008": {
+              "orderAsset":13,
               "Assistance": "",
               "Base": null,
               "CompanyCodec": "DM",
@@ -386,6 +395,7 @@
               "Your": null
             },
             "defect-liability-workmanships": {
+              "orderAsset":14,
               "Assistance": "",
               "Base": null,
               "CompanyCodec": "CP",
@@ -416,6 +426,7 @@
               "Your": null
             },
             "earthquake": {
+              "orderAsset":15,
               "Assistance": "",
               "Base": null,
               "CompanyCodec": "TR",
@@ -446,6 +457,7 @@
               "Your": null
             },
             "electronic-equipment": {
+              "orderAsset":9,
               "Assistance": "",
               "Base": null,
               "CompanyCodec": "EL",
@@ -476,6 +488,7 @@
               "Your": null
             },
             "employers-liability": {
+              "orderAsset":2,
               "Assistance": "",
               "Base": null,
               "CompanyCodec": "CO",
@@ -506,6 +519,7 @@
               "Your": null
             },
             "environmental-liability": {
+              "orderAsset":5,
               "Assistance": "",
               "Base": null,
               "CompanyCodec": "RI",
@@ -536,6 +550,7 @@
               "Your": null
             },
             "glass": {
+              "orderAsset":14,
               "Assistance": "",
               "Base": null,
               "CompanyCodec": "RO",
@@ -566,6 +581,7 @@
               "Your": null
             },
             "increased-cost-of-working": {
+              "orderAsset":15,
               "Assistance": "",
               "Base": null,
               "CompanyCodec": "MG",
@@ -596,6 +612,7 @@
               "Your": null
             },
             "lease-holders-interest": {
+              "orderAsset":3,
               "Assistance": "",
               "Base": null,
               "CompanyCodec": "RL",
@@ -626,6 +643,7 @@
               "Your": null
             },
             "legal-defence": {
+              "orderAsset":5,
               "Assistance": "",
               "Base": null,
               "CompanyCodec": "DP",
@@ -656,6 +674,7 @@
               "Your": null
             },
             "machinery-breakdown": {
+              "orderAsset":19,
               "Assistance": "",
               "Base": null,
               "CompanyCodec": "GGU",
@@ -686,6 +705,7 @@
               "Your": null
             },
             "power-surge": {
+              "orderAsset":18,
               "Assistance": "",
               "Base": null,
               "CompanyCodec": "FE",
@@ -716,6 +736,7 @@
               "Your": null
             },
             "product-liability": {
+              "orderAsset":3,
               "Assistance": "",
               "Base": null,
               "CompanyCodec": "RP",
@@ -746,6 +767,7 @@
               "Your": null
             },
             "property-damage-due-to-theft": {
+              "orderAsset":12,
               "Assistance": "",
               "Base": null,
               "CompanyCodec": "DF",
@@ -776,6 +798,7 @@
               "Your": null
             },
             "property-owners-liability": {
+              "orderAsset":5,
               "Assistance": "",
               "Base": null,
               "CompanyCodec": "RF",
@@ -806,6 +829,7 @@
               "Your": null
             },
             "restoration-of-data": {
+              "orderAsset":10,
               "Assistance": "",
               "Base": null,
               "CompanyCodec": "SD",
@@ -836,6 +860,7 @@
               "Your": null
             },
             "river-flood": {
+              "orderAsset":10,
               "Assistance": "",
               "Base": null,
               "CompanyCodec": "AL",
@@ -866,6 +891,7 @@
               "Your": null
             },
             "sociopolitical-event": {
+              "orderAsset":10,
               "Assistance": "",
               "Base": null,
               "CompanyCodec": "ES",
@@ -896,6 +922,7 @@
               "Your": null
             },
             "software-under-license": {
+              "orderAsset":10,
               "Assistance": "",
               "Base": null,
               "CompanyCodec": "LU",
@@ -926,6 +953,7 @@
               "Your": null
             },
             "terrorism": {
+              "orderAsset":10,
               "Assistance": "",
               "Base": null,
               "CompanyCodec": "AT",
@@ -956,6 +984,7 @@
               "Your": null
             },
             "theft": {
+              "orderAsset":7,
               "Assistance": "",
               "Base": null,
               "CompanyCodec": "FU",
@@ -986,6 +1015,7 @@
               "Your": null
             },
             "third-party-liability": {
+              "orderAsset":1,
               "Assistance": "",
               "Base": null,
               "CompanyCodec": "CT",
@@ -1016,10 +1046,11 @@
               "Your": null
             },
             "third-party-liability-construction-company": {
+              "orderAsset":2,
               "Assistance": "",
               "Base": null,
               "CompanyCodec": "RE",
-              "CompanyName": "RC Edile",
+              "CompanyName": "Responsabilità Civile Edile",
               "DailyAllowance": "",
               "Deductible": "1500",
               "Description": "Pacchetto di garanzie che includei danni: 1) a condutture o impianti sotterranei; 2) da cedimento e franamento del terreno; 3) da bagnamento e spargimento d'acqua",
@@ -1046,6 +1077,7 @@
               "Your": null
             },
             "third-party-recourse": {
+              "orderAsset":4,
               "Assistance": "",
               "Base": null,
               "CompanyCodec": "RT",
@@ -1076,6 +1108,7 @@
               "Your": null
             },
             "valuables": {
+              "orderAsset":10,
               "Assistance": "",
               "Base": null,
               "CompanyCodec": "FP",
@@ -1106,6 +1139,7 @@
               "Your": null
             },
             "valuables-in-safe-strongrooms": {
+              "orderAsset":10,
               "Assistance": "",
               "Base": null,
               "CompanyCodec": "FV",
@@ -1136,6 +1170,7 @@
               "Your": null
             },
             "water-damage": {
+              "orderAsset":10,
               "Assistance": "",
               "Base": null,
               "CompanyCodec": "AG",

@@ -553,7 +553,7 @@ func initCoverage() map[string]*Coverage {
 		IsExtension:                true,
 		CompanyCodec:               "AC",
 		CompanyName:                "Danni d’Acqua",
-		TypeOfSumInsured:           "replacementValue",
+		TypeOfSumInsured:           "firstLoss",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0,
 		SelfInsuranceDesc:          "",

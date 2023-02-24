@@ -2,6 +2,7 @@ package models
 
 type Guarantee struct {
 	DailyAllowance             string                     `firestore:"dailyAllowance,omitempty" json:"dailyAllowance,omitempty"`
+	OrderAsset                 int                        `firestore:"orderAsset,omitempty" json:"orderAsset,omitempty"`
 	LegalDefence               string                     `firestore:"legalDefence,omitempty" json:"legalDefence,omitempty"`
 	Assistance                 string                     `firestore:"assistance ,omitempty" json:"assistance ,omitempty"`
 	Type                       string                     `firestore:"type,omitempty" json:"type,omitempty"`

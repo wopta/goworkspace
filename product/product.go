@@ -51,6 +51,10 @@ func Product(w http.ResponseWriter, r *http.Request) {
 
 }
 
+const (
+	productCollection = "products"
+)
+
 func GetFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println(r.Header.Get("uid"))
 	p, e := Get(r.Header.Get("uid"))
@@ -59,7 +63,7 @@ func GetFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, erro
 }
 func Get(uid string) (models.Product, error) {
 	log.Println(uid)
-	productFire := lib.GetFirestore("pruducts", uid)
+	productFire := lib.GetFirestore("products", uid)
 	var product models.Product
 	e := productFire.DataTo(product)
 	return product, e
@@ -75,15 +79,16 @@ func GetNameFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, 
 }
 func GetName(name string) (models.Product, error) {
 
-	productFire := lib.WhereFirestore("pruducts", "name", "==", name)
+	productFire := lib.WhereFirestore("products", "name", "==", name)
 
 	products := models.ProductToListData(productFire)
 
 	return products[0], nil
 
 }
-func PutFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 
+func PutFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	log.Println(productCollection)
 	request := lib.ErrorByte(ioutil.ReadAll(r.Body))
 	pr, e := models.UnmarshalProduct([]byte(request))
 	p, e := Put(pr)
@@ -91,7 +96,7 @@ func PutFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, erro
 }
 func Put(p models.Product) (models.Product, error) {
 
-	r, _, e := lib.PutFirestoreErr("pruducts", p)
+	r, _, e := lib.PutFirestoreErr("products", p)
 	log.Println(r.ID)
 
 	return p, e

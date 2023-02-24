@@ -3,6 +3,7 @@ package document
 import (
 	"io/ioutil"
 	"log"
+	"sort"
 
 	"os"
 	"strconv"
@@ -361,6 +362,10 @@ func (s Skin) CoveragesPmiTable(m pdf.Maroto, data models.Policy) pdf.Maroto {
 		s.checkPage(m)
 		mapg := make(map[string][][]string)
 		mapprice := make(map[string]float64)
+		sort.Slice(A.Guarantees, func(i, j int) bool {
+
+			return product.Companies[0].GuaranteesMap[A.Guarantees[i].Slug].OrderAsset < product.Companies[0].GuaranteesMap[A.Guarantees[j].Slug].OrderAsset
+		})
 		for _, k := range A.Guarantees {
 
 			guarance := product.Companies[0].GuaranteesMap[k.Slug]
