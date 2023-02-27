@@ -17,18 +17,17 @@ import (
 
 func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		result map[string]string
+		result EmitRequest
 	)
-	uid := result["uid"]
+	uid := result.Uid
 	log.Println("Emit")
 	request := lib.ErrorByte(ioutil.ReadAll(r.Body))
 	log.Println(string(request))
 	json.Unmarshal([]byte(request), &result)
 	log.Println(uid)
-	log.Println(result["paymentSplit"])
-	log.Println(result["payment"])
+
 	var policy models.Policy
-	docsnap := lib.GetFirestore("policy", string(result["uid"]))
+	docsnap := lib.GetFirestore("policy", string(uid))
 	docsnap.DataTo(&policy)
 	company, numb := GetSequenceByProduct("global")
 	policy.NumberCompany = company
@@ -36,10 +35,11 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	policy.IsPay = false
 	policy.Number = numb
 	policy.Updated = time.Now()
-	policy.Uid = result["uid"]
+	policy.Uid = uid
 	policy.Status = models.PolicyStatusToEmit
 	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusToEmit)
-	policy.PaymentSplit = result["paymentSplit"]
+	policy.PaymentSplit = result.PaymentSplit
+	policy.Statements = result.Statements
 	p := <-doc.ContractObj(policy)
 	log.Println(p.LinkGcs)
 	policy.DocumentName = p.LinkGcs
@@ -54,7 +54,7 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 		payRes = pay.FabbrickMontlyPay(policy)
 	}
 	responseEmit := EmitResponse{UrlPay: *payRes.Payload.PaymentPageURL, UrlSign: res.Url}
-	lib.SetFirestore("policy", result["uid"], policy)
+	lib.SetFirestore("policy", uid, policy)
 	e := lib.InsertRowsBigQuery("wopta", "policy", policy)
 	mail.SendMail(getEmitMailObj(policy, responseEmit))
 	b, e := json.Marshal(responseEmit)

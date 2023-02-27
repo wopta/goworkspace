@@ -277,6 +277,8 @@ func getSendV6(id string, data model.Policy, prepare string) string {
 			 
 				"Action": {
 					"Sign": {
+						"SendEmails": false,
+						"AllowAccessAfterFinish": false,
 						"RecipientConfiguration": {
 							"ContactInformation": {
 								"Email": "` + data.Contractor.Mail + `",
