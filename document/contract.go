@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/dustin/go-humanize"
@@ -41,7 +40,7 @@ func ContractObj(data model.Policy) <-chan DocumentResponse {
 	//layout := "2006-01-02T15:04:05.000Z"
 	layout2 := "2006-01-02"
 	go func() {
-		skin, _, _, _, _ := getVar()
+		skin := getVar()
 		m := skin.initDefault()
 
 		var (
@@ -74,41 +73,27 @@ func ContractObj(data model.Policy) <-chan DocumentResponse {
 		}
 
 		//var stantments []Kv
-		var questions []Kv
-
-		var alfabet []rune
-		for r := 'a'; r < 'z'; r++ {
-			//R := unicode.ToUpper(r)
-			alfabet = append(alfabet, r)
-			//log.Println(R)
-		}
 
 		m = skin.Space(m, 5.0)
 		skin.checkPage(m)
-		for x, A := range *data.Survay {
-			alfa := strconv.QuoteRune(alfabet[x])
-			t := strings.Replace(alfa, "'", "", -1)
-			question := Kv{
-				Key:   t + ") ",
-				Value: A.Question,
-			}
-			questions = append(questions, question)
-			//m = skin.Title(m, A.Title, A.Question, 18.0)
+		for _, A := range *data.Survay {
+
+			skin.Stantement(m, A.Title, A)
 		}
 
 		skin.checkPage(m)
-		m = skin.Title(m, "Dichiarazioni da leggere con attenzione prima di firmare", "Premesso di essere a conoscenza che le dichiarazioni non veritiere, inesatte o reticenti, da me rese, possono compromettere il diritto alla prestazione (come da art. 1892, 1893, 1894 c.c.), ai fini dell’efficacia delle garanzie ", 10)
-		m = skin.Stantements(m, "DICHIARO che:", questions)
 		m = skin.Space(m, 5.0)
 		skin.SignDouleLine(m, data.Contractor.Name+" "+data.Contractor.Surname, "Global Assistance", "1", true)
 		m = skin.Space(m, 5.0)
 		skin.checkPage(m)
 		for _, A := range *data.Statements {
 
-			skin.checkPage(m)
-			m = skin.Title(m, A.Title, A.Question, float64(getRowHeight(A.Question, 120, 6)))
+			skin.Stantement(m, A.Title, A)
+
+			//m = skin.Title(m, A.Title, A.Question, float64(getRowHeight(A.Question, 120, 6)))
 		}
 		m = skin.Sign(m, data.Contractor.Name+" "+data.Contractor.Surname, "Assicurato ", "2", true)
+		skin.checkPage(m)
 		h := []string{"Premio ", "Imponibile  ", "Imposte Assicurative ", "Totale"}
 		var tablePremium [][]string
 
@@ -122,7 +107,7 @@ func ContractObj(data model.Policy) <-chan DocumentResponse {
 
 		title := "Come puoi pagare il premio "
 		body := `I mezzi di pagamento consentiti nei confronti di Wopta sono esclusivamente 
-	bonifico e strumenti di pagamento elettronico, quali ad esempio, carte di 
+	 bonifico e strumenti di pagamento elettronico, quali ad esempio, carte di 
 	credito e/o carte di debito, incluse le carte prepagate.`
 		skin.checkPage(m)
 		m = skin.Space(m, 5.0)

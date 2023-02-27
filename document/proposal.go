@@ -43,7 +43,7 @@ func Proposal(w http.ResponseWriter, r *http.Request) string {
 		},
 		Size:              6,
 		SizeTitle:         9,
-		rowHeight:         5.0,
+		RowHeight:         5.0,
 		rowtableHeight:    5.0,
 		rowtableHeightMin: 2.0,
 		LineHeight:        1.0,

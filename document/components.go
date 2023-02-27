@@ -119,8 +119,10 @@ func (s Skin) MultiRow(m pdf.Maroto, colTexts [][]string, isLine bool, colspace 
 				for a, t := range k {
 					top := a * 4
 					textS.Top = float64(top)
-					if a == 0 {
-						m.Text(t, textS)
+					if i == 0 {
+						textS.Style = consts.Bold
+					} else {
+						textS.Style = consts.Normal
 					}
 					m.Text(t, textS)
 				}
@@ -221,10 +223,10 @@ func (s Skin) Space(m pdf.Maroto, h float64) pdf.Maroto {
 
 	return m
 }
-func (s Skin) BackgroundColorRow(m pdf.Maroto, text string, colorBg color.Color, p props.Text) pdf.Maroto {
+func (s Skin) BackgroundColorRow(m pdf.Maroto, text string, colorBg color.Color, p props.Text, height float64) pdf.Maroto {
 
 	m.SetBackgroundColor(colorBg)
-	m.Row(8, func() {
+	m.Row(height, func() {
 		m.Col(12, func() {
 			m.Text(text, p)
 
@@ -236,7 +238,7 @@ func (s Skin) BackgroundColorRow(m pdf.Maroto, text string, colorBg color.Color,
 	return m
 }
 func (s Skin) Table(m pdf.Maroto, head []string, content [][]string, col uint, h float64) pdf.Maroto {
-	s.TableHeader(m, head, false, col, h+2, consts.Left, 1)
+	s.TableHeader(m, head, false, col, h, consts.Left, 1)
 	for _, v := range content {
 		s.TableRow(m, v, false, col, h, 1, consts.Left)
 
@@ -361,7 +363,7 @@ func (s Skin) TitleSub(m pdf.Maroto, title string, subtitle string, body string)
 		Align: consts.Left,
 		Color: s.TextColor,
 	}
-	m.Row(s.rowHeight, func() {
+	m.Row(s.RowHeight, func() {
 		m.Col(12, func() {
 			m.Text(title, prop)
 
@@ -369,7 +371,7 @@ func (s Skin) TitleSub(m pdf.Maroto, title string, subtitle string, body string)
 
 		//m.SetBackgroundColor(magenta)
 	})
-	m.Row(s.rowHeight, func() {
+	m.Row(s.RowHeight, func() {
 		m.Col(12, func() {
 			m.Text(subtitle, bold)
 
@@ -377,7 +379,7 @@ func (s Skin) TitleSub(m pdf.Maroto, title string, subtitle string, body string)
 
 		//m.SetBackgroundColor(magenta)
 	})
-	m.Row(s.rowHeight, func() {
+	m.Row(s.RowHeight, func() {
 		m.Col(12, func() {
 			m.Text(body, normal)
 
@@ -403,7 +405,7 @@ func (s Skin) Title(m pdf.Maroto, title string, body string, bodyHeight float64)
 		Align: consts.Left,
 		Color: s.TextColor,
 	}
-	m.Row(s.rowHeight, func() {
+	m.Row(s.RowHeight, func() {
 		m.Col(12, func() {
 			m.Text(title, prop)
 

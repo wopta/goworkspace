@@ -8,7 +8,7 @@ type Asset struct {
 	Person       *User       `firestore:"person,omitempty" json:"person,omitempty"`
 	Enterprise   *Enterprise `firestore:"enterprise,omitempty" json:"enterprise,omitempty"`
 	IsContractor bool        `firestore:"isContractor,omitempty" json:"isContractor,omitempty"`
-	Guarantees   []Guarantee `firestore:"guarantees,omitempty" json:"guarantees,omitempty"`
+	Guarantees   []Guarante  `firestore:"guarantees,omitempty" json:"guarantees,omitempty"`
 }
 type Building struct {
 	Name             string `firestore:"name,omitempty" json:"name,omitempty"`

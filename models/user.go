@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"log"
 
+	"cloud.google.com/go/firestore"
 	"github.com/wopta/goworkspace/lib"
 	"google.golang.org/api/iterator"
-	"cloud.google.com/go/firestore"
 )
 
 func UnmarshalUser(data []byte) (Claim, error) {
@@ -44,8 +44,8 @@ type User struct {
 	CreationDate  string   `firestore:"creationDate,omitempty" json:"creationDate,omitempty"`
 	UpdatedDate   string   `firestore:"updatedDate" json:"updatedDate,omitempty"`
 	PoliciesUid   []string `firestore:"policiesUid" json:"policiesUid,omitempty"`
-	Claims        []Claim  `firestore:"claims" json:"claims,omitempty"`
-	IsAgent       bool     `firestore:"isEmit,omitempty" json:"isEmit,omitempty" bigquery:"isEmit"`
+	Claims        *[]Claim `firestore:"claims" json:"claims,omitempty"`
+	IsAgent       bool     `firestore:"isAgent ,omitempty" json:"isAgent ,omitempty" bigquery:"isEmit"`
 }
 
 func FirestoreDocumentToUser(query *firestore.DocumentIterator) (User, error) {

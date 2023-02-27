@@ -42,7 +42,7 @@ func (s Skin) Stantements(m pdf.Maroto, title string, data []Kv) pdf.Maroto {
 		Color: s.TextColor,
 	}
 
-	m.Row(10, func() {
+	m.Row(s.RowTitleHeight, func() {
 		m.Col(6, func() {
 			m.Text(title, prop)
 
@@ -55,6 +55,35 @@ func (s Skin) Stantements(m pdf.Maroto, title string, data []Kv) pdf.Maroto {
 	})
 	for _, v := range data {
 		s.RowBullet(m, v.Key, v.Value, consts.Normal)
+
+	}
+	return m
+}
+func (s Skin) Stantement(m pdf.Maroto, title string, data models.Statement) pdf.Maroto {
+
+	m.Row(s.RowTitleHeight, func() {
+		m.Col(12, func() {
+			m.Text(title, s.MagentaBoldtextLeft)
+
+		})
+
+		//m.SetBackgroundColor(magenta)
+	})
+	for _, v := range *data.Questions {
+		var prop props.Text
+		if v.Isbold {
+			prop = s.BoldtextLeft
+		} else {
+			prop = s.NormaltextLeft
+		}
+		m.Row(s.getRowHeight(v.Question, 136, s.RowHeight), func() {
+			m.Col(12, func() {
+				m.Text(v.Question, prop)
+
+			})
+
+			//m.SetBackgroundColor(magenta)
+		})
 
 	}
 	return m
@@ -74,13 +103,13 @@ func (s Skin) Articles(m pdf.Maroto, data []Kv) pdf.Maroto {
 		Align: consts.Left,
 		Color: s.LineColor,
 	}
-	m.Row(s.rowHeight, func() {
+	m.Row(s.RowHeight, func() {
 		m.Col(12, func() {
 			m.Text("Dichiarazioni da leggere con attenzione prima di firmare  ", textBoldMagenta)
 		})
 		//m.SetBackgroundColor(magenta)
 	})
-	m.Row(s.rowHeight, func() {
+	m.Row(s.RowHeight, func() {
 		m.Col(12, func() {
 			m.Text("Premesso di essere a conoscenza che:  ", textBold)
 		})
@@ -102,7 +131,7 @@ func (s Skin) TitleList(m pdf.Maroto, title string, data []string) pdf.Maroto {
 		Color: s.TextColor,
 	}
 
-	m.Row(s.rowHeight, func() {
+	m.Row(s.RowHeight, func() {
 		m.Col(12, func() {
 			m.Text(title, textBold)
 		})
@@ -123,7 +152,7 @@ func (s Skin) TitleBulletList(m pdf.Maroto, title string, data []Kv) pdf.Maroto 
 		Color: s.TextColor,
 	}
 
-	m.Row(s.rowHeight, func() {
+	m.Row(s.RowHeight, func() {
 		m.Col(12, func() {
 			m.Text(title, textBold)
 		})
@@ -144,34 +173,20 @@ func (s Skin) BulletList(m pdf.Maroto, content []Kv) pdf.Maroto {
 	return m
 }
 func (s Skin) AboutUs(m pdf.Maroto, title string, sub []Kv) pdf.Maroto {
-	prop := props.Text{
-		Top:   1,
-		Size:  s.SizeTitle,
-		Style: consts.Bold,
-		Align: consts.Left,
-		Color: s.LineColor,
-	}
 
-	normal := props.Text{
-		Top:   1,
-		Size:  s.Size,
-		Style: consts.Normal,
-		Align: consts.Left,
-		Color: s.TextColor,
-	}
-	m.Row(s.rowHeight, func() {
+	m.Row(s.RowHeight, func() {
 		m.Col(12, func() {
-			m.Text(title, prop)
+			m.Text(title, s.MagentaBoldtextLeft)
 
 		})
 
 	})
 	for _, k := range sub {
 
-		m.Row(25, func() {
+		m.Row(s.RowHeight*2, func() {
 			m.Col(12, func() {
-				m.Text(k.Key, normal)
-				m.Text(k.Value, normal)
+				m.Text(k.Key, s.NormaltextLeft)
+				m.Text(k.Value, s.NormaltextLeftBlack)
 			})
 
 		})
@@ -227,31 +242,11 @@ func (s Skin) GetPersona(data models.Policy, m pdf.Maroto) pdf.Maroto {
 }
 func (s Skin) GetPmi(data models.Policy, m pdf.Maroto) pdf.Maroto {
 	var deductibleValue string
-	prop := props.Text{
-		Top:   1,
-		Size:  s.SizeTitle,
-		Style: consts.Bold,
-		Align: consts.Left,
-		Color: s.LineColor,
-	}
-	bold := props.Text{
-		Top:   1,
-		Size:  s.Size,
-		Style: consts.Bold,
-		Align: consts.Left,
-		Color: s.TextColor,
-	}
-	normal := props.Text{
-		Top:   1,
-		Size:  s.Size,
-		Style: consts.Bold,
-		Align: consts.Left,
-		Color: s.TextColor,
-	}
-
-	m.Row(8, func() {
+	var constructionYear string
+	var constructionMaterial string
+	m.Row(s.RowTitleHeight, func() {
 		m.Col(8, func() {
-			m.Text("L’assicurazione è prestata per", prop)
+			m.Text("L’assicurazione è prestata per", s.MagentaBoldtextLeft)
 		})
 	})
 	m.Line(1.0, s.Line)
@@ -268,9 +263,31 @@ func (s Skin) GetPmi(data models.Policy, m pdf.Maroto) pdf.Maroto {
 			if build.IsAllarm {
 				alarm = "con"
 			}
-			c = [][]string{{"Sede "},
+
+			switch os := build.BuildingYear; os {
+			case "before1972":
+				constructionYear = "prima dle 1972"
+			case "1972between2009":
+				constructionYear = "tra 1972 e 2009"
+			case "after2009":
+				constructionYear = "dopo il 2009"
+
+			}
+			switch os := build.BuildingMaterial; os {
+			case "masonry":
+				constructionMaterial = "muratura"
+			case "reinforcedConcrete":
+				constructionMaterial = " CA in appoggio"
+			case "antiSeismicLaminatedTimber":
+				constructionMaterial = "Legno lamellare"
+			case "steel":
+				constructionMaterial = "Acciaio"
+
+			}
+
+			c = [][]string{{"", "Sede "},
 				{build.Address,
-					"Fabbricato " + build.BuildingMaterial + "construito " + build.BuildingYear + ", " + alarm + " antifurto, " + holder,
+					"Fabbricato " + constructionMaterial + "construito " + constructionYear + ", " + alarm + " antifurto, " + holder,
 					"Attività ATECO codice: " + build.Ateco,
 					"Descrizione: " + build.AtecoDesc}}
 
@@ -278,7 +295,7 @@ func (s Skin) GetPmi(data models.Policy, m pdf.Maroto) pdf.Maroto {
 
 		if A.Enterprise != nil {
 			e := A.Enterprise
-			c = [][]string{{"Attivita"},
+			c = [][]string{{"", "", "Attivita"},
 				{"Fatturato: € " + e.Revenue,
 					"Adetti nr:" + strconv.Itoa(int(e.Employer)),
 					"Attività ATECO codice: " + e.Ateco,
@@ -307,12 +324,12 @@ func (s Skin) GetPmi(data models.Policy, m pdf.Maroto) pdf.Maroto {
 
 	m.Row(20, func() {
 		m.Col(2, func() {
-			m.Text("Franchigia e Scoperto  ", bold)
+			m.Text("Franchigia e Scoperto  ", s.BoldtextLeft)
 
 		})
 		m.Col(8, func() {
-			m.Text("Il livello scelto è: "+deductibleValue+". Per ogni garanzia, nella Tabella “Scoperti e Franchigie” alla voce "+deductibleValue+" troverai il dettaglio di tutti gli Scoperti e Franchigie in caso di Sinistro, di cui l’importo qui indicato costituisce, in ogni caso, il minimo applicato se non diversamente specificato", normal)
-
+			m.Text("Il livello scelto è: "+deductibleValue+". Per ogni garanzia, nella Tabella “Scoperti e Franchigie” alla voce "+deductibleValue+" troverai il dettaglio di tutti gli Scoperti e Franchigie in caso di Sinistro, di cui l’importo qui indicato costituisce, in ogni caso, il minimo applicato se non diversamente specificato", s.NormaltextLeft)
+			m.Text("                               "+deductibleValue+"                                                                                                                       "+deductibleValue+"                                                                                                                                                                                            ", s.NormaltextLeftBlack)
 		})
 
 	})
@@ -329,19 +346,16 @@ func (s Skin) CoveragesPmiTable(m pdf.Maroto, data models.Policy) pdf.Maroto {
 	}
 	textS := s.MagentaBoldtextLeft
 	textS.Size = textS.Size - 3
-	m.Row(7, func() {
+	m.Row(s.RowTitleHeight, func() {
 		m.Col(12, func() {
 			m.Text("Le coperture assicurative che hai scelto ", s.MagentaBoldtextLeft)
 
 		})
-
 	})
-	m.Row(7, func() {
+	m.Row(s.RowTitleHeight-1, func() {
 		m.Col(12, func() {
 			m.Text("(operative se indicata Somma o Massimale e secondo le Opzioni/Estensioni attivate qualora indicato) ", textS)
-
 		})
-
 	})
 
 	head1 := []string{"Garanzie ", "Somma assicurata ", "Opzioni / Estensioni ", "Premio "}
@@ -351,7 +365,8 @@ func (s Skin) CoveragesPmiTable(m pdf.Maroto, data models.Policy) pdf.Maroto {
 	var e error
 	if os.Getenv("env") == "local" {
 		productFile := lib.ErrorByte(ioutil.ReadFile("function-data/products/" + data.Name + ".json"))
-		product, _ = models.UnmarshalProduct(productFile)
+		product, e = models.UnmarshalProduct(productFile)
+		lib.CheckError(e)
 	} else {
 		product, e = p.GetName(data.Name)
 		lib.CheckError(e)
@@ -360,33 +375,34 @@ func (s Skin) CoveragesPmiTable(m pdf.Maroto, data models.Policy) pdf.Maroto {
 	for _, A := range data.Assets {
 		//m = s.Space(m, 10.0)
 		s.checkPage(m)
+		var isOptionShow bool
 		mapg := make(map[string][][]string)
 		mapprice := make(map[string]float64)
+
 		sort.Slice(A.Guarantees, func(i, j int) bool {
 
 			return product.Companies[0].GuaranteesMap[A.Guarantees[i].Slug].OrderAsset < product.Companies[0].GuaranteesMap[A.Guarantees[j].Slug].OrderAsset
 		})
+		log.Println("-----------------------------------------------------------------------------------------")
+
 		for _, k := range A.Guarantees {
 
 			guarance := product.Companies[0].GuaranteesMap[k.Slug]
 			group := guarance.Group
-
+			log.Println(guarance.Group)
+			log.Println(guarance.Slug)
 			if len(mapg[group]) == 0 {
 
 				mapg[group] = [][]string{{}, {}, {}, {}}
 			}
-			if !guarance.IsExtension {
 
-				mapg[group][0] = append(mapg[group][0], guarance.CompanyName)
-
-				mapg[group][1] = append(mapg[group][1], "€ "+humanize.FormatFloat("#.###,##", k.SumInsuredLimitOfIndemnity))
-
-			}
 			if group == "RCT" {
 				mapg[group][2] = make([]string, 8)
 				if !guarance.IsExtension {
 					mapg[group][0] = make([]string, 8)
+					mapg[group][1] = make([]string, 8)
 					mapg[group][0][4] = guarance.CompanyName
+					mapg[group][1][4] = "€ " + humanize.FormatFloat("#.###,##", k.SumInsuredLimitOfIndemnity)
 				}
 				mapg[group][2][0] = "Sono attive le seguenti opzioni / estensioni:"
 				mapg[group][2][1] = "Danni ai veicoli in consegna e custodia: " + existGuarance(ExistGuarance(A.Guarantees, "damage-to-goods-in-custody"))
@@ -398,8 +414,11 @@ func (s Skin) CoveragesPmiTable(m pdf.Maroto, data models.Policy) pdf.Maroto {
 				mapg[group][2][7] = "RC impresa edile: " + existGuarance(ExistGuarance(A.Guarantees, "third-party-liability-construction-company"))
 				//mapg[group][2] = append(mapg[group][2], k.CompanyName+": "+existGuarance(ExistGuarance(A.Guarantees, k.Slug)))
 			} else if group == "LEGAL" {
-				//mapg[group][3] = append([]string{""}, "")
-				mapg[group][1][0] = "€ " + humanize.FormatFloat("#.###,##", 25000)
+
+				mapg[group][0] = append(mapg[group][0], guarance.CompanyName)
+				mapg[group][1] = append(mapg[group][1], "€ "+humanize.FormatFloat("#.###,##", k.SumInsuredLimitOfIndemnity))
+
+				mapg[group][1] = append(mapg[group][1], "€ "+humanize.FormatFloat("#.###,##", k.SumInsuredLimitOfIndemnity))
 				mapg[group][2] = append(mapg[group][2], "E’ attiva la garanzia:")
 				mapg[group][2] = append(mapg[group][2], "Difesa Penale")
 
@@ -407,12 +426,23 @@ func (s Skin) CoveragesPmiTable(m pdf.Maroto, data models.Policy) pdf.Maroto {
 					mapg[group][2] = append(mapg[group][2], "Difesa Penale, Civile e Circolazione ")
 				}
 
-			} else if group == "FIRE" && guarance.IsExtension {
-				var text string
-				if len(mapg[group][2]) == 1 {
+			} else if group == "FIRE" && !guarance.IsExtension {
+				mapg[group][0] = append(mapg[group][0], guarance.CompanyName)
+				mapg[group][1] = append(mapg[group][1], "€ "+humanize.FormatFloat("#.###,##", k.SumInsuredLimitOfIndemnity))
+				if !isOptionShow {
 					mapg[group][2] = append(mapg[group][2], "Forma di Assicurazione: VALORE INTERO ")
 					mapg[group][2] = append(mapg[group][2], "Formula di copertura: RISCHI NOMINATI ")
 					mapg[group][2] = append(mapg[group][2], "Sono attive le garanzie opzionali:")
+					isOptionShow = true
+				}
+			} else if group == "FIRE" && guarance.IsExtension {
+
+				var text string
+				if !isOptionShow {
+					mapg[group][2] = append(mapg[group][2], "Forma di Assicurazione: VALORE INTERO ")
+					mapg[group][2] = append(mapg[group][2], "Formula di copertura: RISCHI NOMINATI ")
+					mapg[group][2] = append(mapg[group][2], "Sono attive le garanzie opzionali:")
+					isOptionShow = true
 				}
 				if k.SumInsuredLimitOfIndemnity <= 1 {
 					text = k.CompanyName + ": fino al  " + strconv.FormatFloat(k.SumInsuredLimitOfIndemnity*100.00, 'f', 0, 64) + "% "
@@ -420,34 +450,38 @@ func (s Skin) CoveragesPmiTable(m pdf.Maroto, data models.Policy) pdf.Maroto {
 					text = k.CompanyName + ": fino a  " + humanize.FormatFloat("#.###,##", k.SumInsuredLimitOfIndemnity) + "€ "
 				}
 				mapg[group][2] = append(mapg[group][2], text)
-			} else if group == "THEFT" && guarance.IsExtension {
+			} else if group == "THEFT" {
+				mapg[group][0] = append(mapg[group][0], guarance.CompanyName)
+				mapg[group][1] = append(mapg[group][1], "€ "+humanize.FormatFloat("#.###,##", k.SumInsuredLimitOfIndemnity))
+				if len(mapg[group][2]) == 1 {
+					mapg[group][2] = append(mapg[group][2], "Sono attive le garanzie opzionali:")
+				}
+				mapg[group][2] = append(mapg[group][2], k.CompanyName+": fino a  "+humanize.FormatFloat("#.###,##", k.SumInsuredLimitOfIndemnity)+"€ ")
+
+			} else if group == "ELETRONIC" {
+				mapg[group][0] = append(mapg[group][0], guarance.CompanyName)
+				mapg[group][1] = append(mapg[group][1], "€ "+humanize.FormatFloat("#.###,##", k.SumInsuredLimitOfIndemnity))
 				if len(mapg[group][2]) == 1 {
 					mapg[group][2] = append(mapg[group][2], "Sono attive le garanzie opzionali:")
 				}
 
 				mapg[group][2] = append(mapg[group][2], k.CompanyName+": fino a  "+humanize.FormatFloat("#.###,##", k.SumInsuredLimitOfIndemnity)+"€ ")
 
-			} else if group == "ELETRONIC" && guarance.IsExtension {
-				if len(mapg[group][2]) == 1 {
-					mapg[group][2] = append(mapg[group][2], "Sono attive le garanzie opzionali:")
-				}
+			} else if group == "BUSINESS INTERRUPTTION" {
+				mapg[group][0] = append(mapg[group][0], guarance.CompanyName)
+				mapg[group][1] = append(mapg[group][1], "€ "+humanize.FormatFloat("#.###,##", k.SumInsuredLimitOfIndemnity))
+				mapg[group][2] = append(mapg[group][2], "La garanzia opera con una franchigia di 10 giorni ")
+				mapg[group][2] = append(mapg[group][2], "ed un massimo indennizzo di 1.000 € al giorno ")
 
-				mapg[group][2] = append(mapg[group][2], k.CompanyName+": fino a  "+humanize.FormatFloat("#.###,##", k.SumInsuredLimitOfIndemnity)+"€ ")
-
-			} else if group == "BUSINESS INTERRUPTTION" && guarance.IsExtension {
-
-				mapg[group][2] = append(mapg[group][2], "La garanzia opera con una franchigia di 10 giorni ed un massimo indennizzo di 1.000 € al giorno ")
-
-			} else if group == "ASSISTANCE" && guarance.IsExtension {
-
-				mapg[group][2] = append(mapg[group][1], "Inclusa")
+			} else if group == "ASSISTANCE" {
+				mapg[group][0] = append(mapg[group][0], guarance.CompanyName)
+				mapg[group][1] = append(mapg[group][1], "Inclusa")
 				mapg[group][2] = append(mapg[group][2], "= = = = = = = = = = = = = = = =")
 
 			} else {
-				if guarance.IsExtension {
-					//mapg[group][3][0] =fmt.Sprintf("%.2f", sumStringFloat(mapg[group][3],float64(k.PriceGross)))
-					log.Println("else " + k.Slug)
-
+				if !guarance.IsExtension {
+					mapg[group][0] = append(mapg[group][0], guarance.CompanyName)
+					mapg[group][1] = append(mapg[group][1], "€ "+humanize.FormatFloat("#.###,##", k.SumInsuredLimitOfIndemnity))
 					mapg[group][2] = append(mapg[group][2], "= = = = = = = = = = = = = = = =")
 				}
 
@@ -456,23 +490,45 @@ func (s Skin) CoveragesPmiTable(m pdf.Maroto, data models.Policy) pdf.Maroto {
 			mapprice[group] = mapprice[group] + k.PriceGross
 			l := len(mapg[group][2]) / 2.0
 			p := lib.RoundFloat(float64(l), 0)
-			log.Println(l)
-			log.Println(p)
-			mapg[group][3] = make([]string, int(p)+1)
 
+			mapg[group][3] = make([]string, int(p)+1)
 			mapg[group][3][int(p)] = "€ " + humanize.FormatFloat("#.###,##", mapprice[group])
 		}
-
+		var listOrder []string
+		var mapgOrder [][][]string
 		if A.Enterprise != nil {
-			m = s.BackgroundColorRow(m, "Attività", s.SecondaryColor, s.WhiteTextCenter)
+			listOrder = []string{"RCT", "CO", "RCP", "LEGAL", "CYBER"}
+			for i, c := range listOrder {
+
+				log.Println(i)
+				log.Println(c)
+				if v, found := mapg[c]; found {
+					log.Println("found")
+					mapgOrder = append(mapgOrder, v)
+				}
+
+			}
+
+			m = s.BackgroundColorRow(m, "Attività", s.SecondaryColor, s.WhiteTextCenter, s.RowTitleHeight)
 			s.TableHeader(m, head1, true, 3, s.rowtableHeight+2, consts.Center, 0)
 		}
 		if A.Building != nil {
-			m = s.BackgroundColorRow(m, "Sede", s.SecondaryColor, s.WhiteTextCenter)
+			log.Println("Building")
+			listOrder = []string{"FIRE", "RL", "RT", "RCF", "RI", "THEFT", "ELETRONIC", "ASSISTANCE"}
+			for i, c := range listOrder {
+				log.Println(i)
+				log.Println(c)
+				if v, found := mapg[c]; found {
+					mapgOrder = append(mapgOrder, v)
+				}
+			}
+			m = s.BackgroundColorRow(m, "Sede", s.SecondaryColor, s.WhiteTextCenter, s.RowTitleHeight)
 			s.TableHeader(m, head2, true, 3, s.rowtableHeight+2, consts.Center, 0)
 		}
+		log.Println("------------------------------------------------------------------------------------")
 
-		for _, c := range mapg {
+		for i, c := range mapgOrder {
+			log.Println(i)
 
 			m = s.MultiRow(m, c, true, []uint{4, 2, 4, 2}, 40)
 		}
@@ -544,9 +600,9 @@ func (skin Skin) GetHeader(m pdf.Maroto, data models.Policy, logo string, name s
 		tablePremium = append(tablePremium, []string{"Si rinnova a scadenza, salvo disdetta da inviare 30 giorni prima", "XXXXX  XXXXXXXXXXXXXXXXXXX (XX)"})
 		tablePremium = append(tablePremium, []string{"Prossimo pagamento il: " + data.EndDate.String(), "Mail:  " + data.Contractor.Mail})
 		tablePremium = append(tablePremium, []string{"Sostituisce la polizza: = = = = = = = =", "Telefono: " + data.Contractor.Phone})
-		m = skin.Table(m, h, tablePremium, 6, 4.0)
+		m = skin.Table(m, h, tablePremium, 6, skin.RowHeight-0.5)
 		skin.Space(m, 5.0)
-		m.Line(skin.LineHeight, skin.Line)
+		//m.Line(skin.LineHeight, skin.Line)
 	})
 
 	return m
@@ -556,7 +612,7 @@ func (skin Skin) GetFooter(m pdf.Maroto, data models.Policy, logo string, name s
 		m.Row(15.0, func() {
 			m.Col(8, func() {
 				m.Text("Wopta per te. Persona è un prodotto assicurativo di Global Assistance Compagnia di assicurazioni e riassicurazioni S.p.A, distribuito da Wopta Assicurazioni S.r.l", props.Text{
-					Top:         10,
+					Top:         25,
 					Style:       consts.Bold,
 					Align:       consts.Left,
 					Color:       skin.LineColor,
@@ -566,7 +622,7 @@ func (skin Skin) GetFooter(m pdf.Maroto, data models.Policy, logo string, name s
 			})
 			m.Col(2, func() {
 				_ = m.FileImage(lib.GetAssetPathByEnv("document")+"/logo_global.png", props.Rect{
-					Left:    1,
+					Left:    5,
 					Top:     10,
 					Center:  false,
 					Percent: 100,

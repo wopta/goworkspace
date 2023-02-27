@@ -85,8 +85,8 @@ func put(w http.ResponseWriter, r *http.Request) {
 	}
 	obj.Attachments = att
 
-	claims := append(user.Claims, claim)
-	user.Claims = claims
+	claims := append(*user.Claims, claim)
+	user.Claims = &claims
 	log.Println("SetFirestore")
 	lib.SetFirestore("users", claim.UserUid, user)
 	mail.SendMail(obj)

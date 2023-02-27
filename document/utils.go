@@ -18,7 +18,7 @@ func (s Skin) lenToHeight(w string) float64 {
 		//log.Println((float64(len(w)) / 30.0))
 		return (float64(len(w)) / s.DynamicHeightDiv)
 	} else {
-		return s.rowHeight
+		return s.RowHeight
 	}
 
 }
@@ -37,7 +37,7 @@ func (s Skin) initDefault() pdf.Maroto {
 
 	return m
 }
-func getVar() (Skin, props.Line, props.Text, props.Text, props.Text) {
+func getVar() Skin {
 
 	skin := Skin{
 		PrimaryColor: color.Color{
@@ -60,9 +60,10 @@ func getVar() (Skin, props.Line, props.Text, props.Text, props.Text) {
 			Green: 90,
 			Blue:  93,
 		},
-		Size:              9,
-		SizeTitle:         12,
-		rowHeight:         7.0,
+		Size:              8,
+		SizeTitle:         10,
+		RowHeight:         4.0,
+		RowTitleHeight:    5.0,
 		rowtableHeight:    5.0,
 		rowtableHeightMin: 2.0,
 		LineHeight:        1.0,
@@ -74,87 +75,82 @@ func getVar() (Skin, props.Line, props.Text, props.Text, props.Text) {
 		Style: consts.Solid,
 		Width: 0.2,
 	}
+	skin.BoldtextLeft = props.Text{
+		Top:   0,
+		Size:  skin.Size,
+		Style: consts.Bold,
+		Align: consts.Left,
+		Color: skin.TextColor,
+	}
 	skin.MagentaBoldtextLeft = props.Text{
-		Top:   1,
+		Top:   0,
 		Size:  skin.SizeTitle,
 		Style: consts.Bold,
 		Align: consts.Left,
 		Color: skin.LineColor,
 	}
 	skin.WhiteTextCenter = props.Text{
-		Top:   1,
+		Top:   0,
 		Size:  skin.SizeTitle,
 		Style: consts.Bold,
 		Align: consts.Center,
 		Color: color.NewWhite(),
 	}
 	skin.MagentaBoldtextRight = props.Text{
-		Top:   1,
+		Top:   0,
 		Size:  skin.SizeTitle,
 		Style: consts.Bold,
 		Align: consts.Right,
 		Color: skin.LineColor,
 	}
 	skin.MagentaTextLeft = props.Text{
-		Top:   1,
+		Top:   0,
 		Size:  skin.SizeTitle,
 		Style: consts.Normal,
 		Align: consts.Left,
 		Color: skin.LineColor,
 	}
 	skin.TitletextLeft = props.Text{
-		Top:   1,
+		Top:   0,
 		Size:  skin.SizeTitle,
 		Style: consts.Normal,
 		Align: consts.Left,
 		Color: skin.TextColor,
 	}
 	skin.NormaltextLeft = props.Text{
-		Top:   1,
+		Top:   0,
 		Size:  skin.Size,
 		Style: consts.Normal,
 		Align: consts.Left,
 		Color: skin.TextColor,
 	}
+	skin.NormaltextLeftBlack = props.Text{
+		Top:   0,
+		Size:  skin.Size,
+		Style: consts.Normal,
+		Align: consts.Left,
+		Color: color.NewBlack(),
+	}
 	skin.NormaltextLeftExt = props.Text{
-		Top:         1,
+		Top:         0,
 		Size:        skin.Size,
 		Style:       consts.Normal,
 		Align:       consts.Left,
 		Color:       skin.TextColor,
 		Extrapolate: true,
 	}
-	magenta := props.Text{
-		Top:   1,
-		Size:  skin.SizeTitle,
-		Style: consts.Bold,
-		Align: consts.Left,
-		Color: skin.LineColor,
-	}
-	linePropMagenta := props.Line{
-		Color: skin.LineColor,
-		Style: consts.Solid,
-		Width: 0.2,
-	}
 
-	textBold := props.Text{
-		Top:   1,
-		Style: consts.Bold,
-		Align: consts.Center,
-	}
-	normal := props.Text{
-		Top:   1,
-		Size:  skin.Size,
-		Style: consts.Bold,
-		Align: consts.Left,
-		Color: skin.TextColor,
-	}
-	return skin, linePropMagenta, textBold, normal, magenta
+	return skin
 }
-func getRowHeight(data string, base int, lineh int) int {
+func (s Skin) getRowHeight(data string, base int, lineh float64) float64 {
 	charsNum := len(data)
-	multi := charsNum / base
-	res := multi * lineh
+	var res float64
+	if charsNum > base {
+		multi := float64(charsNum) / float64(base)
+		res = multi * lineh
+	} else {
+		res = s.RowHeight
+	}
 	return res
 }
 func sumStringFloat(data []string, price float64) float64 {
@@ -180,7 +176,18 @@ func (s Skin) checkPage(m pdf.Maroto) {
 
 	}
 }
-func ExistGuarance(list []models.Guarantee, find string) bool {
+func (s Skin) checkIfAddPage(m pdf.Maroto, perc float64) {
+	current := m.GetCurrentOffset()
+	_, sizeh := m.GetPageSize()
+
+	if current > (sizeh * perc) {
+		log.Println("Contrat add page")
+		m.AddPage()
+		s.Space(m, 10.0)
+
+	}
+}
+func ExistGuarance(list []models.Guarante, find string) bool {
 	var res bool
 	for _, g := range list {
 		if g.Slug == find {

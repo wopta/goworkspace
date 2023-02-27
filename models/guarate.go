@@ -1,13 +1,13 @@
 package models
 
-type Guarantee struct {
+type Guarante struct {
 	DailyAllowance             string                     `firestore:"dailyAllowance,omitempty" json:"dailyAllowance,omitempty"`
 	OrderAsset                 int                        `firestore:"orderAsset,omitempty" json:"orderAsset,omitempty"`
 	LegalDefence               string                     `firestore:"legalDefence,omitempty" json:"legalDefence,omitempty"`
 	Assistance                 string                     `firestore:"assistance ,omitempty" json:"assistance ,omitempty"`
 	Type                       string                     `firestore:"type,omitempty" json:"type,omitempty"`
-	Beneficiary                *User                      `firestore:"beneficiaries,omitempty" json:"beneficiaries,omitempty"`
-	Beneficiaries              *[]User                    `firestore:"beneficiary,omitempty" json:"beneficiary,omitempty"`
+	Beneficiary                *User                      `firestore:"beneficiary,omitempty" json:"beneficiary,omitempty"`
+	Beneficiaries              *[]User                    `firestore:"beneficiaries,omitempty" json:"beneficiaries,omitempty"`
 	TypeOfSumInsured           string                     `firestore:"typeOfSumInsured,omitempty" json:"typeOfSumInsured,omitempty"`
 	Description                string                     `firestore:"description,omitempty" json:"description,omitempty"`
 	ContractDetail             string                     `firestore:"contractDetail,omitempty" json:"contractDetail,omitempty"`

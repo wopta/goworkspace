@@ -85,11 +85,12 @@ type Skin struct {
 	LineColor            color.Color
 	TextColor            color.Color
 	TitleColor           color.Color
-	rowHeight            float64
+	RowHeight            float64
 	rowtableHeight       float64
 	LineHeight           float64
 	Size                 float64
 	SizeTitle            float64
+	RowTitleHeight       float64
 	TableHeight          float64
 	rowtableHeightMin    float64
 	DynamicHeightMin     int
@@ -101,6 +102,8 @@ type Skin struct {
 	MagentatextRight     props.Text
 	MagentatextLeft      props.Text
 	NormaltextLeft       props.Text
+	NormaltextLeftBlack  props.Text
+	BoldtextLeft         props.Text
 	NormaltextRight      props.Text
 	NormaltextLeftExt    props.Text
 	TitletextLeft        props.Text

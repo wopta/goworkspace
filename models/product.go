@@ -31,12 +31,12 @@ type Product struct {
 }
 
 type Company struct {
-	Name            string               `firestore:"name,omitempty" json:"name,omitempty"`
-	Code            string               `firestore:"code,omitempty" json:"code,omitempty"`
-	Commission      float64              `firestore:"commission,omitempty" json:"commission,omitempty"`
-	CommissionRenew float64              `firestore:"commissionRenew,omitempty" json:"commissionRenew,omitempty"`
-	Guarantees      []Guarantee          `firestore:"guarantees,omitempty" json:"guarantees,omitempty"`
-	GuaranteesMap   map[string]Guarantee `firestore:"guaranteesMap,omitempty" json:"guaranteesMap,omitempty"`
+	Name            string              `firestore:"name,omitempty" json:"name,omitempty"`
+	Code            string              `firestore:"code,omitempty" json:"code,omitempty"`
+	Commission      float64             `firestore:"commission,omitempty" json:"commission,omitempty"`
+	CommissionRenew float64             `firestore:"commissionRenew,omitempty" json:"commissionRenew,omitempty"`
+	Guarantees      *[]Guarante         `firestore:"guarantees,omitempty" json:"guarantees,omitempty"`
+	GuaranteesMap   map[string]Guarante `firestore:"guaranteesMap,omitempty" json:"guaranteesMap,omitempty"`
 }
 
 func ProductToListData(query *firestore.DocumentIterator) []Product {

@@ -18,7 +18,7 @@ type Document struct {
 	GcsFilename       string             `json:"gcsFilename,omitempty"`
 	Policy            *Policy            `json:"policy,omitempty"`
 	Contractor        *User              `json:"contractor,omitempty"`
-	Coverages         []Guarantee        `json:"coverages,omitempty"`
+	Coverages         []Guarante         `json:"coverages,omitempty"`
 	Statements        []SpecialCondition `json:"statements,omitempty"`
 	SpecialConditions []SpecialCondition `json:"specialConditions,omitempty"`
 }
