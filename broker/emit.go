@@ -66,6 +66,14 @@ type EmitResponse struct {
 	UrlSign string `firestore:"urlSign,omitempty" json:"urlSign,omitempty"`
 	Uid     string `firestore:"uid,omitempty" json:"uid,omitempty"`
 }
+type EmitRequest struct {
+	Uid          string              `firestore:"uid,omitempty" json:"uid,omitempty" bigquery:"uid"`
+	Payment      string              `firestore:"payment,omitempty" json:"payment,omitempty" bigquery:"payment"`
+	PaymentType  string              `firestore:"paymentType,omitempty" json:"paymentType,omitempty" bigquery:"paymentType"`
+	PaymentSplit string              `firestore:"paymentSplit,omitempty" json:"paymentSplit,omitempty" bigquery:"paymentSplit"`
+	Survay       *[]models.Statement `firestore:"survey,omitempty" json:"survey,omitempty"`
+	Statements   *[]models.Statement `firestore:"statements,omitempty" json:"statements,omitempty"`
+}
 
 func getEmitMailObj(policy models.Policy, emitResponse EmitResponse) mail.MailRequest {
 	var obj mail.MailRequest

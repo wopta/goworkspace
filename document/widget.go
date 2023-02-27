@@ -305,14 +305,16 @@ func (s Skin) GetPmi(data models.Policy, m pdf.Maroto) pdf.Maroto {
 		for _, k := range A.Guarantees {
 			if k.Slug == "third-party-liability" {
 				switch os := k.Deductible; os {
-				case "500":
+				case "0":
 					deductibleValue = "MINIMO"
+				case "500":
+					deductibleValue = "BASSO"
 				case "1000":
-					deductibleValue = "BASSA"
+					deductibleValue = "MEDIO-BASSO"
 				case "2000":
-					deductibleValue = "MEDIA"
+					deductibleValue = "MEDIO-ALTO"
 				case "3000":
-					deductibleValue = "AlTA"
+					deductibleValue = "ALTO"
 				case "5000":
 					deductibleValue = "MASSIMO"
 				}
