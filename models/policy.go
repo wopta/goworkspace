@@ -83,7 +83,7 @@ type Statement struct {
 	Title     string      `firestore:"title ,omitempty" json:"title,omitempty"`
 	Question  string      `firestore:"question,omitempty" json:"question,omitempty"`
 	Questions *[]Question `firestore:"questions,omitempty" json:"questions,omitempty" bigquery:"-"`
-	Answer    bool        `firestore:"answer ,omitempty" json:"answer,omitempty"`
+	Answer    bool        `firestore:"answer,omitempty" json:"answer,omitempty"`
 }
 type Question struct {
 	Question string `firestore:"question,omitempty" json:"question,omitempty"`

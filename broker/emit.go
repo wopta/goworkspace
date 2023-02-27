@@ -40,7 +40,9 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	policy.Status = models.PolicyStatusToEmit
 	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusToEmit)
 	policy.PaymentSplit = result.PaymentSplit
-	policy.Statements = result.Statements
+	if policy.Statements == nil {
+		policy.Statements = result.Statements
+	}
 	p := <-doc.ContractObj(policy)
 	log.Println(p.LinkGcs)
 	policy.DocumentName = p.LinkGcs
