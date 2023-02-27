@@ -19,11 +19,12 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		result EmitRequest
 	)
-	uid := result.Uid
+
 	log.Println("Emit")
 	request := lib.ErrorByte(ioutil.ReadAll(r.Body))
 	log.Println(string(request))
 	json.Unmarshal([]byte(request), &result)
+	uid := result.Uid
 	log.Println(uid)
 
 	var policy models.Policy
@@ -67,10 +68,10 @@ type EmitResponse struct {
 	Uid     string `firestore:"uid,omitempty" json:"uid,omitempty"`
 }
 type EmitRequest struct {
-	Uid          string              `firestore:"uid,omitempty" json:"uid,omitempty" bigquery:"uid"`
-	Payment      string              `firestore:"payment,omitempty" json:"payment,omitempty" bigquery:"payment"`
-	PaymentType  string              `firestore:"paymentType,omitempty" json:"paymentType,omitempty" bigquery:"paymentType"`
-	PaymentSplit string              `firestore:"paymentSplit,omitempty" json:"paymentSplit,omitempty" bigquery:"paymentSplit"`
+	Uid          string              `firestore:"uid,omitempty" json:"uid,omitempty"`
+	Payment      string              `firestore:"payment,omitempty" json:"payment,omitempty"`
+	PaymentType  string              `firestore:"paymentType,omitempty" json:"paymentType,omitempty"`
+	PaymentSplit string              `firestore:"paymentSplit,omitempty" json:"paymentSplit,omitempty"`
 	Survay       *[]models.Statement `firestore:"survey,omitempty" json:"survey,omitempty"`
 	Statements   *[]models.Statement `firestore:"statements,omitempty" json:"statements,omitempty"`
 }
