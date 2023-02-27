@@ -209,12 +209,12 @@ func postData(data []byte, host string) <-chan string {
 
 	return r
 }
-func GetFile(id string) string {
+func GetFile(id string, uid string) string {
 	r := make(chan string)
 
 	go func() {
 		defer close(r)
-		var urlstring = os.Getenv("ESIGN_BASEURL") + "v4/authorization"
+		var urlstring = os.Getenv("ESIGN_BASEURL") + "/v6/file/" + id
 		client := &http.Client{
 			Timeout: time.Second * 10,
 		}
@@ -228,8 +228,8 @@ func GetFile(id string) string {
 			body, err := ioutil.ReadAll(res.Body)
 			lib.CheckError(err)
 			res.Body.Close()
-			lib.PutToFireStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "document/contracts"+id, body)
-			log.Println("body:", string(body))
+			lib.PutToFireStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "document/contracts/"+uid, body)
+
 		}
 
 	}()

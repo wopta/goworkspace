@@ -28,7 +28,7 @@ func Sign(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 		policy.IsSign = true
 		lib.SetFirestore("policy", uid, policy)
 		e = lib.InsertRowsBigQuery("wopta", "policy", policy)
-		doc.GetFile(policy.ContractFileId)
+		doc.GetFile(policy.ContractFileId, uid)
 	}
 
 	return "", nil, e
