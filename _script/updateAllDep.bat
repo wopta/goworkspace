@@ -50,8 +50,8 @@ cd ..
 cd %location%
 go get github.com/wopta/goworkspace/lib
 go get github.com/wopta/goworkspace/models
-github.com/wopta/goworkspace/document
-github.com/wopta/goworkspace/mail
+go get github.com/wopta/goworkspace/document
+go get github.com/wopta/goworkspace/mail
 
 cd ..
 cd form

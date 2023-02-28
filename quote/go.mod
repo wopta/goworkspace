@@ -9,7 +9,7 @@ require golang.org/x/oauth2 v0.0.0-20221014153046-6fdb5e3db783
 require (
 	firebase.google.com/go/v4 v4.10.0 // indirect
 	github.com/golang/protobuf v1.5.2
-	github.com/wopta/goworkspace/lib v0.0.0-20230228164432-d7a2b9f206a6 // indirect
+	github.com/wopta/goworkspace/lib v0.0.0-20230228165650-83f07748e98c // indirect
 	github.com/wopta/goworkspace/models v0.0.0-20230207110643-e018cac2446c // indirect
 
 )
