@@ -7,6 +7,6 @@ replace github.com/wopta/goworkspace/product => ./
 require (
 	firebase.google.com/go/v4 v4.10.0 // indirect
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
-	github.com/wopta/goworkspace/lib v0.0.0-20230227234841-d86c0e31af01
-	github.com/wopta/goworkspace/models v0.0.0-20230227234841-d86c0e31af01
+	github.com/wopta/goworkspace/lib v0.0.0-20230228131731-103f22f9caed
+	github.com/wopta/goworkspace/models v0.0.0-20230228131731-103f22f9caed
 )
