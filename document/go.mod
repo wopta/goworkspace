@@ -10,7 +10,7 @@ require (
 	github.com/dustin/go-humanize v1.0.1
 	github.com/johnfercher/maroto v0.38.0
 	github.com/ruudk/golang-pdf417 v0.0.0-20201230142125-a7e3863a1245 // indirect
-	github.com/wopta/goworkspace/lib v0.0.0-20230228141246-25abd68e2f6a
-	github.com/wopta/goworkspace/models v0.0.0-20230228141246-25abd68e2f6a
-	github.com/wopta/goworkspace/product v0.0.0-20230228141246-25abd68e2f6a
+	github.com/wopta/goworkspace/lib v0.0.0-20230228164432-d7a2b9f206a6
+	github.com/wopta/goworkspace/models v0.0.0-20230228164432-d7a2b9f206a6
+	github.com/wopta/goworkspace/product v0.0.0-20230228164432-d7a2b9f206a6
 )
