@@ -76,11 +76,12 @@ func ContractObj(data model.Policy) <-chan DocumentResponse {
 
 		m = skin.Space(m, 5.0)
 		skin.checkPage(m)
-		for _, A := range *data.Survay {
+		if data.Survay != nil {
+			for _, A := range *data.Survay {
 
-			skin.Stantement(m, A.Title, A)
+				skin.Stantement(m, A.Title, A)
+			}
 		}
-
 		skin.checkPage(m)
 		m = skin.Space(m, 5.0)
 		skin.SignDouleLine(m, data.Contractor.Name+" "+data.Contractor.Surname, "Global Assistance", "1", true)
