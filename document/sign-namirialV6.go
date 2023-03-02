@@ -279,6 +279,8 @@ func getSendV6(id string, data model.Policy, prepare string) string {
 					"Sign": {
 						"SendEmails": false,
 						"AllowAccessAfterFinish": false,
+						"AllowDelegation": false,
+                        "RequireViewContentBeforeFormFilling": false,
 						"RecipientConfiguration": {
 							"ContactInformation": {
 								"Email": "` + data.Contractor.Mail + `",
@@ -287,7 +289,7 @@ func getSendV6(id string, data model.Policy, prepare string) string {
 								"PhoneNumber": "` + data.Contractor.Phone + `",
 								"LanguageCode": "IT"
 							},
-							"PersonalMessage": "string",
+							"PersonalMessage": "FIRMA LA TUA POLIZZA",
 							"AuthenticationConfiguration": {
 								` + testPin + `
 							  "SmsOneTimePassword": {
@@ -295,12 +297,25 @@ func getSendV6(id string, data model.Policy, prepare string) string {
 							  }
 						}},
 						"Elements": ` + string(elementsJson) + `,
-						"SigningGroup": "firstSigner"
+						"SigningGroup": "CONTRAENTE"
 					}
 				}
 			}
 		
 		],
+		"AgentRedirectConfiguration": {
+			"Policy": "None",
+			"Allow": true,
+			"IframeWhitelisting": [
+			  "dev.wopta.it"
+			]
+		  },
+		"ReminderConfiguration": {
+			"Enabled": true,
+			"FirstReminderInDays": 2,
+			"ReminderResendIntervalInDays": 0,
+			"BeforeExpirationInDays": 0
+		  },
 		"CallbackConfiguration": {
 			"CallbackUrl": ` + calbackurl + `,
 			"StatusUpdateCallbackUrl":` + calbackurl + ` ,

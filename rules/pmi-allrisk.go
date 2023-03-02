@@ -35,7 +35,6 @@ func PmiAllrisk(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 	switch os.Getenv("env") {
 	case "local":
 		groule = lib.ErrorByte(ioutil.ReadFile("function-data/grules/" + rulesFile))
-
 		ricAteco = lib.ErrorByte(ioutil.ReadFile("function-data/data/rules/Riclassificazione_Ateco.csv"))
 	case "dev":
 		groule = lib.GetFromStorage("function-data", "grules/"+rulesFile, "")
@@ -55,7 +54,13 @@ func PmiAllrisk(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 	var enrichByte []byte
 
 	if fil.Nrow() > 0 {
-		enrichByte = []byte(`{	"atecoMacro":"` + strings.ToUpper(fil.Elem(0, 0).String()) + `",
+		enrichByte = []byte(`{
+		"RcpRD":"` + strings.ToUpper(fil.Elem(0, 13).String()) + `",
+		"RcoRD":"` + strings.ToUpper(fil.Elem(0, 12).String()) + `",
+		"RctRD":"` + strings.ToUpper(fil.Elem(0, 11).String()) + `",
+		"theft500":"` + strings.ToUpper(fil.Elem(0, 8).String()) + `",
+		"fire500":"` + strings.ToUpper(fil.Elem(0, 6).String()) + `",
+		"atecoMacro":"` + strings.ToUpper(fil.Elem(0, 0).String()) + `",
 		"atecoSub":"` + strings.ToUpper(fil.Elem(0, 1).String()) + `",
 		"atecoDesc":"` + strings.ToUpper(fil.Elem(0, 2).String()) + `",
 		"businessSector":"` + strings.ToUpper(fil.Elem(0, 3).String()) + `",
