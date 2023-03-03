@@ -22,7 +22,6 @@ func (router RouteData) Router(w http.ResponseWriter, r *http.Request) {
 	var isFound bool
 	var route string
 	var e error
-	log.Println(r.RequestURI)
 	//reqUri := r.RequestURI
 	for _, v := range router.Routes {
 
@@ -34,8 +33,7 @@ func (router RouteData) Router(w http.ResponseWriter, r *http.Request) {
 			key := routeSplit[1]
 			reqUris := strings.Split(r.RequestURI, "/")
 			value := reqUris[len(reqUris)-1]
-			log.Println(base)
-			log.Println(value)
+
 			r.Header.Add(key, value)
 			route = base
 		}
@@ -46,14 +44,14 @@ func (router RouteData) Router(w http.ResponseWriter, r *http.Request) {
 			key := routeSplit[1]
 			reqUris := strings.Split(r.RequestURI, "/")
 			value := reqUris[len(reqUris)-1]
-			log.Println(base)
-			log.Println(value)
+
 			r.Header.Add(key, value)
 			route = base
 		}
 		if strings.Contains(r.RequestURI, route) && v.Method == r.Method {
 
 			log.Println("found")
+			log.Println(r.RequestURI)
 			result, _, e = v.Handler(w, r)
 			isFound = true
 			break
