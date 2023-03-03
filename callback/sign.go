@@ -11,6 +11,16 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
+/**
+
+workstepFinished : when the workstep was finished
+workstepRejected : when the workstep was rejected
+workstepDelegated : whe the workstep was delegated
+workstepOpened : when the workstep was opened
+sendSignNotification : when the sign notification was sent
+envelopeExpired : when the envelope was expired
+workstepDelegatedSenderActionRequired : when an action from the sender is required because of the delegation
+*/
 func Sign(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println("Sign")
 	log.Println("GET params were:", r.URL.Query())
