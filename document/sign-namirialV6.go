@@ -314,7 +314,7 @@ func getSendV6(id string, data model.Policy, prepare string) string {
 			"Enabled": true,
 			"FirstReminderInDays": 2,
 			"ReminderResendIntervalInDays": 0,
-			"BeforeExpirationInDays": 0
+			"BeforeExpirationInDays": 1
 		  },
 		"CallbackConfiguration": {
 			"CallbackUrl": ` + calbackurl + `,
