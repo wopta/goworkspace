@@ -21,6 +21,6 @@ use(
 ./product
 ./form
 ./user
-
+./partnership
 
 )
