@@ -30,8 +30,11 @@ type Policy struct {
 	ContractFileId  string                 `firestore:"contractFileId,omitempty" json:"contractFileId,omitempty" bigquery:"contractFileId"`
 	Uid             string                 `firestore:"uid,omitempty" json:"uid,omitempty" bigquery:"uid"`
 	ProductUid      string                 `firestore:"productUid,omitempty" json:"productUid,omitempty" bigquery:"productUid"`
+	PayUrl          string                 `firestore:"payUrl,omitempty" json:"payUrl,omitempty" bigquery:"-"`
+	SignUrl         string                 `firestore:"signUrl,omitempty" json:"signUrl,omitempty" bigquery:"-"`
 	ProductVersion  int                    `firestore:"productVersion,omitempty" json:"productVersion,omitempty" bigquery:"productVersion"`
 	ProposalNumber  int                    `firestore:"proposalNumber,omitempty" json:"proposalNumber,omitempty" bigquery:"proposalNumber"`
+	OfferlNumber    int                    `firestore:"offerNumber,omitempty" json:"offerNumber,omitempty" bigquery:"offerNumber"`
 	Number          int                    `firestore:"number,omitempty" json:"number,omitempty" bigquery:"number"`
 	NumberCompany   string                 `firestore:"numberCompany,omitempty" json:"numberCompany,omitempty" bigquery:"numberCompany"`
 	Status          string                 `firestore:"status,omitempty" json:"status,omitempty" bigquery:"status"`

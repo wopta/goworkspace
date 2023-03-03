@@ -6,11 +6,17 @@ type PolicyStatus string
 
 const (
 	PolicyStatusInit        = "Inizialize"
+	PolicyStatusInitData    = "InizializeData"
+	PolicyStatusInitLead    = "Lead"
 	PolicyStatusProposal    = "Proposal"
+	PolicyStatusContact     = "Contact"
 	PolicyStatusToEmit      = "ToEmit"
 	PolicyStatusEmited      = "Emited"
-	PolicyStatusSign        = "Sign"
-	PolicyStatusPay         = "Pay"
+	PolicyStatusToSign      = "ToSign"
+	PolicyStatusSign        = "Signed"
+	PolicyStatusPay         = "Paid"
+	PolicyStatusToPay       = "ToPay"
+	PolicyStatusToRenew     = "Renew"
 	PolicyStatusPS          = "Pay&Sign"
 	PolicyStatusCompanyEmit = "CompanyEmited"
 )

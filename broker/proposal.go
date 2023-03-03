@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"strconv"
 	"time"
 
 	"cloud.google.com/go/civil"
@@ -23,8 +22,8 @@ func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	defer r.Body.Close()
 	policy.Updated = time.Now()
 	policy.CreationDate = time.Now()
-	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusProposal)
-	policy.Status = models.PolicyStatusProposal
+	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusInitLead)
+	policy.Status = models.PolicyStatusInitLead
 	numb := GetSequenceProposal("")
 	policy.ProposalNumber = numb
 	policy.IsSign = false
@@ -34,7 +33,6 @@ func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	policy.BigStartDate = civil.DateTimeOf(policy.StartDate)
 	e = lib.InsertRowsBigQuery("wopta", "policy", policy)
 	log.Println(ref.ID + " Proposal sand mail")
-
 	mail.SendMail(getProposalMailObj(policy))
 	log.Println(ref.ID)
 
@@ -51,10 +49,10 @@ func getProposalMailObj(policy models.Policy) mail.MailRequest {
 	obj.From = "noreply@wopta.it"
 	obj.To = []string{policy.Contractor.Mail}
 	obj.Message = `<p>Ciao ` + policy.Contractor.Name + ` ` + policy.Contractor.Surname + ` </p>
-	<p>Proposta n° ` + strconv.Itoa(policy.ProposalNumber) + `</p> 
+
 	<p>Leggi il set informativo precontrattuale a tua disposizione nel link qui sotto </p> 
 	<p><a class="button" href='` + link + ` '>Leggi set informativo</a></p> 	<p>Grazie </p> <p></p>`
-	obj.Subject = " Wopta Proposta e set informantivo"
+	obj.Subject = " Wopta set informantivo"
 	obj.IsHtml = true
 	obj.IsAttachment = false
 	/*obj.Attachments = []mail.Attachment{

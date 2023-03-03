@@ -30,15 +30,12 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var policy models.Policy
 	docsnap := lib.GetFirestore("policy", string(uid))
 	docsnap.DataTo(&policy)
-	company, numb := GetSequenceByProduct("global")
-	policy.NumberCompany = company
 	policy.IsSign = false
 	policy.IsPay = false
-	policy.Number = numb
 	policy.Updated = time.Now()
 	policy.Uid = uid
-	policy.Status = models.PolicyStatusToEmit
-	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusToEmit)
+	policy.Status = models.PolicyStatusContact
+	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusContact)
 	policy.PaymentSplit = result.PaymentSplit
 	if policy.Statements == nil {
 		policy.Statements = result.Statements
@@ -91,8 +88,8 @@ func getEmitMailObj(policy models.Policy, emitResponse EmitResponse) mail.MailRe
 	Ti verrà richiesta l’adesione al servizio che è fornito in maniera gratuita da Wopta. 
 	Potrai prendere visione delle condizioni generali di servizio e delle caratteristiche tecniche.</p> 
 	<p><a class="button" href='` + emitResponse.UrlSign + `'>Firma la tua polizza:</a></p>
-	<p>Ultimata la procedura di firma potrai procedere al pagamento. Clicca nel link per pagare la tua polizza  </p> 
-	<p><a class="button" href='` + emitResponse.UrlPay + `'>Paga la tua polizza</a></p>
+	<p>Ultimata la procedura di firma potrai procedere al pagamento. nella prossima mail  </p> 
+
 	<p>Grazie per aver scelto Wopta </p> 
 	<p>Proteggiamo chi sei</p> 
 	`

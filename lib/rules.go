@@ -86,8 +86,11 @@ func (p *Fx) GetContentValue(buildingType string) float64 {
 	if buildingType == "COMMERCIALE" {
 		return 0.20
 	}
-	if buildingType == "EDILI" {
+	if buildingType == "PRODUZIONE" {
 		return 0.30
+	}
+	if buildingType == "EDILI" {
+		return 0.15
 	}
 	if buildingType == "SERVIZI INTELLETTUALI" {
 		return 0.15
