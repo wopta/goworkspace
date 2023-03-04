@@ -68,7 +68,7 @@ func GetSequenceByProduct(name string) (string, int) {
 	var companyDefault string
 	switch name {
 	case "global":
-		companyDefault = "49999999"
+		companyDefault = "0"
 	}
 	var numberCompany string
 	var number int

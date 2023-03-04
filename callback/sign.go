@@ -4,7 +4,6 @@ import (
 	"log"
 	"net/http"
 
-	broker "github.com/wopta/goworkspace/broker"
 	doc "github.com/wopta/goworkspace/document"
 	lib "github.com/wopta/goworkspace/lib"
 	mail "github.com/wopta/goworkspace/mail"
@@ -37,9 +36,6 @@ func Sign(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 		policyF := lib.GetFirestore("policy", uid)
 		var policy models.Policy
 		policyF.DataTo(policy)
-		company, numb := broker.GetSequenceByProduct("global")
-		policy.Number = numb
-		policy.NumberCompany = company
 		policy.IsSign = true
 		lib.SetFirestore("policy", uid, policy)
 		e = lib.InsertRowsBigQuery("wopta", "policy", policy)
@@ -63,8 +59,7 @@ func getEmitMailObj(policy models.Policy, payUrl string) mail.MailRequest {
 	Ti verrà richiesta l’adesione al servizio che è fornito in maniera gratuita da Wopta. 
 	Potrai prendere visione delle condizioni generali di servizio e delle caratteristiche tecniche.</p> 
 	<p><a class="button" href='` + payUrl + `'>Firma la tua polizza:</a></p>
-	<p>Ultimata la procedura di firma potrai procedere al pagamento.</p> 
-
+	<p>Ultimata la procedura di firma potrai procedere al pagamento.</p>
 	<p>Grazie per aver scelto Wopta </p> 
 	<p>Proteggiamo chi sei</p> 
 	`

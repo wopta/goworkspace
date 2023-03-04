@@ -223,14 +223,14 @@ func GetFile(id string, uid string) chan string {
 		log.Println("url parse:", req.Header)
 		res, err := client.Do(req)
 		lib.CheckError(err)
-
 		if res != nil {
 			body, err := ioutil.ReadAll(res.Body)
-			log.Println(body)
 			lib.CheckError(err)
+			log.Println(body)
 			res.Body.Close()
-			lib.PutToFireStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "document/contracts/"+uid, body)
-			r <- "upload done "
+			lib.PutToFireStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "/document/contracts/"+uid, body)
+			r <- "upload done"
+
 		}
 
 	}()

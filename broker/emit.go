@@ -45,6 +45,9 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	policy.DocumentName = p.LinkGcs
 	_, res, _ := doc.NamirialOtpV6(policy)
 	policy.ContractFileId = res.FileId
+	company, numb := GetSequenceByProduct("global")
+	policy.Number = numb
+	policy.NumberCompany = company
 	policy.IdSign = res.EnvelopeId
 	var payRes pay.FabrickPaymentResponse
 	if policy.PaymentSplit == string(models.PaySplitYear) {
