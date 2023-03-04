@@ -34,7 +34,7 @@ func Sign(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 		log.Println("workstepFinished")
 		policyF := lib.GetFirestore("policy", uid)
 		var policy models.Policy
-		policyF.DataTo(policy)
+		policyF.DataTo(&policy)
 		policy.IsSign = true
 		log.Println("workstepFinished")
 		lib.SetFirestore("policy", uid, policy)
