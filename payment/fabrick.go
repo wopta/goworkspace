@@ -2,12 +2,10 @@ package payment
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 
@@ -98,98 +96,7 @@ func FabbrickYearPay(data model.Policy) FabrickPaymentResponse {
 
 	return res
 }
-func getFabrickPay(data model.Policy) string {
-	//2022-12-12T10:05:10.000Z
-	now := time.Now()
-	next := now.AddDate(0, 0, 1)
-	layout := "2006-01-02T15:04:05.000Z"
-	layout2 := "2006-01-02"
-	log.Println(next.Format(layout))
-	//"expirationDate": "` + next.Format(layout) + `",
-	return `{
-		"merchantId": "wop134b31-5926-4b26-1411-726bc9f0b111",
-		"externalId": "TST",
-		"paymentConfiguration": {
-		
-			"allowedPaymentMethods": [
-				{
-					"role": "payer",
-					"paymentMethods": [
-						"CREDITCARD",
-						"SDD"
-						
-					]
-				}
-			],
-			"payByLink": [
-				{
-				
-					"type": "EMAIL",
-					"recipients": "` + data.Contractor.Mail + `",
-					"template": "pay-by-link"
-				}
-			],
-			"callbackUrl": "https://europe-west1-positive-apex-350507.cloudfunctions.net/callback/v1/payment",
-			"paymentPageRedirectUrls": {
-				"onFailure": "https://www.wopta.it",
-				"onSuccess": "https://www.wopta.it"
-			}
-		},
-		"bill": {
-			"externalId": "TST",
-			"amount": ` + fmt.Sprintf("%.2f", data.PriceGross) + `,
-			"currency": "EUR",
-			"description": "Checkout pagamento",
-			"items": [
-				{
-					"externalId": "TST",
-					"amount": ` + fmt.Sprintf("%.2f", data.PriceGross) + `,
-					"currency": "EUR",
-					"description": "Item 1 Description",
-					"xInfo": "{\"cod_azienda\": \"AZ45\",\"divisione\": \" 45\"}"
-				}
-			],
-			"scheduleTransaction": {
-				"dueDate": "` + now.Format(layout2) + `",
-				"paymentInstrumentResolutionStrategy": "BY_PAYER"
-			},
-			"mandateCreation": "false",
-			"subjects": [
-				{
-					"role": "customer",
-					"externalId": "customer_75052100",
-					"email": "` + data.Contractor.Mail + `",
-					"name": "` + data.Contractor.Name + ` ` + data.Contractor.Surname + `",
-					"xInfo": "{\"key2\": \"value2\"}"
-				}
-			]
-		}
-	}`
-}
 
-func getfabbricBase(data model.Policy) string {
-	now := time.Now()
-	externalId := "pay_id_" + strconv.FormatInt(now.Unix(), 10)
-	return `{
-		"merchantId": "wop134b31-5926-4b26-1411-726bc9f0b111",
-		"externalId": "` + externalId + `",
-		"paymentConfiguration": {
-			"expirationDate": null,
-			"allowedPaymentMethods": null,
-			"callbackUrl": "https://europe-west1-positive-apex-350507.cloudfunctions.net/callback/v1/payment",
-			"paymentPageRedirectUrls": null
-		},
-		"bill": {
-			"externalId": "` + externalId + `",
-			"amount": 122.0,
-			"currency": "EUR",
-			"description": null,
-			"xInfo": null,
-			"items": null,
-			"subjects": null
-		}
-	}`
-}
 func getfabbricPayments(data model.Policy, firstSchedule bool, scheduleDate string, customerId string, amount float64) string {
 	var mandate string
 
@@ -236,7 +143,8 @@ func getfabbricPayments(data model.Policy, firstSchedule bool, scheduleDate stri
 
 	bill.Items = []Item{{ExternalID: externalId, Amount: amount, Currency: "EUR"}}
 	bill.Subjects = &[]Subject{{ExternalID: customerId, Role: "customer", Email: data.Contractor.Mail, Name: data.Contractor.Name + ` ` + data.Contractor.Surname}}
-
+	calbackurl := "https://europe-west1-" + os.Getenv("GOOGLE_PROJECT_ID") + ".cloudfunctions.net/callback/v1/payment?uid=" + data.Uid + `&schedule=` + scheduleDate
+	calbackurl = strings.Replace(calbackurl, `\u0026`, `&`, 1)
 	pay.PaymentConfiguration = PaymentConfiguration{
 
 		//ExpirationDate: next.Format(layout),
@@ -247,7 +155,7 @@ func getfabbricPayments(data model.Policy, firstSchedule bool, scheduleDate stri
 		},
 
 		AllowedPaymentMethods: &[]AllowedPaymentMethod{{Role: "payer", PaymentMethods: paymentMethods}},
-		CallbackURL:           "https://europe-west1-" + os.Getenv("GOOGLE_PROJECT_ID") + ".cloudfunctions.net/callback/v1/payment?uid=" + data.Uid + `&schedule=` + scheduleDate,
+		CallbackURL:           calbackurl,
 		//PayByLink:             []PayByLink{{Type: "EMAIL", Recipients: data.Contractor.Mail, Template: "pay-by-link"}},
 	}
 	pay.Bill = bill
