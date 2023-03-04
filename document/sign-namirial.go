@@ -211,7 +211,7 @@ func postData(data []byte, host string) <-chan string {
 }
 func GetFile(id string, uid string) chan string {
 	r := make(chan string)
-
+	log.Println("Get file: ", id)
 	go func() {
 		defer close(r)
 		var urlstring = os.Getenv("ESIGN_BASEURL") + "v6/file/" + id
@@ -226,7 +226,8 @@ func GetFile(id string, uid string) chan string {
 		if res != nil {
 			body, err := ioutil.ReadAll(res.Body)
 			lib.CheckError(err)
-			log.Println(body)
+			log.Println("Get body: ", body)
+
 			res.Body.Close()
 			lib.PutToFireStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "/document/contracts/"+uid, body)
 			r <- "upload done"

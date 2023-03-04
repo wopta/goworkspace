@@ -11,7 +11,6 @@ import (
 )
 
 /**
-
 workstepFinished : when the workstep was finished
 workstepRejected : when the workstep was rejected
 workstepDelegated : whe the workstep was delegated
@@ -31,7 +30,6 @@ func Sign(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println(action)
 	log.Println(envelope)
 	log.Println(uid)
-
 	if action == "workstepFinished" {
 		policyF := lib.GetFirestore("policy", uid)
 		var policy models.Policy
