@@ -209,7 +209,7 @@ func getfabbricPayments(data model.Policy, firstSchedule bool, scheduleDate stri
 	paymentMethods := []string{
 		"CREDITCARD",
 		//"FBKR2P",
-		"SDD",
+		//"SDD",
 		//"SMARTPOS",
 	}
 	var scheduleTransaction ScheduleTransaction
@@ -247,7 +247,7 @@ func getfabbricPayments(data model.Policy, firstSchedule bool, scheduleDate stri
 		},
 
 		AllowedPaymentMethods: &[]AllowedPaymentMethod{{Role: "payer", PaymentMethods: paymentMethods}},
-		CallbackURL:           "https://europe-west1-" + os.Getenv("GOOGLE_PROJECT_ID") + ".cloudfunctions.net/callback/v1/payment?uid=" + data.Uid + "&schedule=" + scheduleDate,
+		CallbackURL:           "https://europe-west1-" + os.Getenv("GOOGLE_PROJECT_ID") + ".cloudfunctions.net/callback/v1/payment?uid=" + data.Uid + `&schedule=` + scheduleDate,
 		//PayByLink:             []PayByLink{{Type: "EMAIL", Recipients: data.Contractor.Mail, Template: "pay-by-link"}},
 	}
 	pay.Bill = bill
