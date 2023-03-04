@@ -31,13 +31,16 @@ func Sign(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println(envelope)
 	log.Println(uid)
 	if action == "workstepFinished" {
+		log.Println("workstepFinished")
 		policyF := lib.GetFirestore("policy", uid)
 		var policy models.Policy
 		policyF.DataTo(policy)
 		policy.IsSign = true
+		log.Println("workstepFinished")
 		lib.SetFirestore("policy", uid, policy)
 		e = lib.InsertRowsBigQuery("wopta", "policy", policy)
 		mail.SendMail(getEmitMailObj(policy, policy.PayUrl))
+		log.Println("workstepFinished")
 		s := <-doc.GetFile(policy.ContractFileId, uid)
 		log.Println(s)
 	}
