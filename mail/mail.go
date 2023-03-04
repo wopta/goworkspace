@@ -138,12 +138,15 @@ func Validate(resp http.ResponseWriter, r *http.Request) (string, interface{}, e
 		Mail:    result["mail"],
 		IsValid: false,
 	}
-	if fido.Email.Score > 480 {
+	if fido.Email.Score >= 480 {
+		log.Println("valid")
 		resObj.IsValid = true
 	} else {
+		log.Println("invalid")
 		VerifyEmail(result["mail"])
 	}
 	res, e := json.Marshal(resObj)
 	lib.CheckError(e)
+	log.Println(string(res))
 	return string(res), res, nil
 }
