@@ -132,10 +132,10 @@ func Validate(resp http.ResponseWriter, r *http.Request) (string, interface{}, e
 
 	json.Unmarshal([]byte(req), &result)
 
-	fido := <-ScoreFido(result["mail"])
+	fido := <-ScoreFido(result["email"])
 	log.Println(fido.Email.Score)
 	resObj := MailValidate{
-		Mail:    result["mail"],
+		Mail:    result["email"],
 		IsValid: false,
 	}
 	if fido.Email.Score >= 480 {
@@ -143,7 +143,7 @@ func Validate(resp http.ResponseWriter, r *http.Request) (string, interface{}, e
 		resObj.IsValid = true
 	} else {
 		log.Println("invalid")
-		VerifyEmail(result["mail"])
+		VerifyEmail(result["email"])
 	}
 	res, e := json.Marshal(resObj)
 	lib.CheckError(e)
