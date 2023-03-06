@@ -145,6 +145,7 @@ func getfabbricPayments(data model.Policy, firstSchedule bool, scheduleDate stri
 	bill.Subjects = &[]Subject{{ExternalID: customerId, Role: "customer", Email: data.Contractor.Mail, Name: data.Contractor.Name + ` ` + data.Contractor.Surname}}
 	calbackurl := "https://europe-west1-" + os.Getenv("GOOGLE_PROJECT_ID") + ".cloudfunctions.net/callback/v1/payment?uid=" + data.Uid + `&schedule=` + scheduleDate
 	calbackurl = strings.Replace(calbackurl, `\u0026`, `&`, 1)
+	log.Println(calbackurl)
 	pay.PaymentConfiguration = PaymentConfiguration{
 
 		//ExpirationDate: next.Format(layout),

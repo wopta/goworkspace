@@ -34,7 +34,7 @@ type Policy struct {
 	SignUrl         string                 `firestore:"signUrl,omitempty" json:"signUrl,omitempty" bigquery:"-"`
 	ProductVersion  int                    `firestore:"productVersion,omitempty" json:"productVersion,omitempty" bigquery:"productVersion"`
 	ProposalNumber  int                    `firestore:"proposalNumber,omitempty" json:"proposalNumber,omitempty" bigquery:"proposalNumber"`
-	OfferlNumber    int                    `firestore:"offerNumber,omitempty" json:"offerNumber,omitempty" bigquery:"offerNumber"`
+	OfferlName      string                 `firestore:"offerName,omitempty" json:"offerName,omitempty" bigquery:"offerName"`
 	Number          int                    `firestore:"number,omitempty" json:"number,omitempty" bigquery:"number"`
 	NumberCompany   string                 `firestore:"numberCompany,omitempty" json:"numberCompany,omitempty" bigquery:"numberCompany"`
 	Status          string                 `firestore:"status,omitempty" json:"status,omitempty" bigquery:"status"`

@@ -1,4 +1,4 @@
-package main
+package accounting
 
 import (
 	"bufio"
@@ -11,6 +11,9 @@ import (
 )
 
 func main() {
+	GetFx()
+}
+func csvL() {
 
 	//dfres := dataframe.NewDataFrame()
 	//dfres := lib.NewDf()
