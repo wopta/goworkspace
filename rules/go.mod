@@ -11,7 +11,7 @@ require (
 	github.com/go-gota/gota v0.12.0
 	github.com/hyperjumptech/grule-rule-engine v1.12.0 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
-	github.com/wopta/goworkspace/lib v0.0.0-20230306085301-1c04a6a66d81
-	github.com/wopta/goworkspace/models v0.0.0-20230306085301-1c04a6a66d81
-	github.com/wopta/goworkspace/quote v0.0.0-20230306085301-1c04a6a66d81
+	github.com/wopta/goworkspace/lib v0.0.0-20230306092537-03a16e007faf
+	github.com/wopta/goworkspace/models v0.0.0-20230306092537-03a16e007faf
+	github.com/wopta/goworkspace/quote v0.0.0-20230306092537-03a16e007faf
 )
