@@ -51,7 +51,7 @@ func FabrickPayObj(data model.Policy, firstSchedule bool, scheduleDate string, c
 		if res != nil {
 			log.Println("header:", res.Header)
 			body, err := ioutil.ReadAll(res.Body)
-			log.Println(data.Uid + "pay response body:", string(body))
+			log.Println(data.Uid+"pay response body:", string(body))
 			lib.CheckError(err)
 			var result FabrickPaymentResponse
 			json.Unmarshal([]byte(body), &result)
@@ -160,6 +160,6 @@ func getfabbricPayments(data model.Policy, firstSchedule bool, scheduleDate stri
 	pay.Bill = bill
 
 	res, _ := pay.Marshal()
-
-	return string(res)
+	result := strings.Replace(string(res), `\u0026`, `&`, 1)
+	return result
 }
