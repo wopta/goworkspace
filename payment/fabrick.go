@@ -45,15 +45,13 @@ func FabrickPayObj(data model.Policy, firstSchedule bool, scheduleDate string, c
 		//req.Header.Set("Host", "35.195.35.137")
 		req.Header.Set("Accept", "application/json")
 
-		log.Println(req.Header)
-
 		res, err := client.Do(req)
 		lib.CheckError(err)
 
 		if res != nil {
 			log.Println("header:", res.Header)
 			body, err := ioutil.ReadAll(res.Body)
-			log.Println("body:", string(body))
+			log.Println(data.Uid + "pay response body:", string(body))
 			lib.CheckError(err)
 			var result FabrickPaymentResponse
 			json.Unmarshal([]byte(body), &result)
@@ -162,6 +160,6 @@ func getfabbricPayments(data model.Policy, firstSchedule bool, scheduleDate stri
 	pay.Bill = bill
 
 	res, _ := pay.Marshal()
-	log.Println(data.Uid + "Request payment:" + string(res))
+
 	return string(res)
 }
