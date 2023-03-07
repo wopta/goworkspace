@@ -34,6 +34,7 @@ type User struct {
 	Address       string   `firestore:"address" json:"address,omitempty"`
 	PostalCode    string   `firestore:"postalCode" json:"postalCode,omitempty"`
 	City          string   `firestore:"city" json:"city,omitempty"`
+	StreetNumber  string   `firestore:"streetNumber,omitempty" json:"streetNumber,omitempty"`
 	CityCode      string   `firestore:"cityCode" json:"cityCode,omitempty"`
 	Role          string   `firestore:"role" json:"role,omitempty"`
 	Work          string   `firestore:"work" json:"work,omitempty"`

@@ -14,8 +14,8 @@ type Building struct {
 	Name             string `firestore:"name,omitempty" json:"name,omitempty"`
 	Address          string `firestore:"address,omitempty" json:"address,omitempty"`
 	Type             string `firestore:"type,omitempty" json:"type,omitempty"`
-	StreetNumber     int64  `firestore:"streetNumber,omitempty" json:"streetNumber,omitempty"`
-	SquareMeters     int64  `firestore:"squareMeters,omitempty" json:"squareMeters,omitempty"`
+	StreetNumber     string `firestore:"streetNumber,omitempty" json:"streetNumber,omitempty"`
+	CityCode         string `firestore:"cityCode" json:"cityCode,omitempty"`
 	PostalCode       string `firestore:"postalCode" json:"postalCode,omitempty"`
 	City             string `firestore:"city" json:"city,omitempty"`
 	BuildingType     string `firestore:"buildingType,omitempty" json:"buildingType,omitempty"`
@@ -58,4 +58,8 @@ type Ateco struct {
 	AtecoSub   string `firestore:"atecoSub,omitempty" json:"atecoSub,omitempty"`
 	Class      string `firestore:"class" json:"class,omitempty"`
 	Sector     string `firestore:"sector,omitempty" json:"sector,omitempty"`
+}
+type Location struct {
+	Lat string `firestore:"lat,omitempty" json:"lat,omitempty"`
+	Lng string `firestore:"lng,omitempty" json:"lng,omitempty"`
 }
