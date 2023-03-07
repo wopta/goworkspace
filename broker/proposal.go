@@ -18,7 +18,7 @@ func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	var policy models.Policy
 	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
 	e := json.Unmarshal([]byte(req), &policy)
-
+	log.Println(policy.Marshal())
 	defer r.Body.Close()
 	policy.Updated = time.Now()
 	policy.CreationDate = time.Now()
@@ -34,7 +34,7 @@ func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	ref, _ = lib.PutFirestore("users", policy.Contractor)
 	policy.BigStartDate = civil.DateTimeOf(policy.StartDate)
 	policy.BigEndDate = civil.DateTimeOf(policy.EndDate)
-	e = lib.InsertRowsBigQuery("wopta", "policy", policy)
+	//e = lib.InsertRowsBigQuery("wopta", "policy", policy)
 	log.Println(ref.ID + " Proposal sand mail")
 	mail.SendMail(getProposalMailObj(policy))
 	log.Println(ref.ID)
