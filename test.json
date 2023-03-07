@@ -18,9 +18,11 @@
     "answers": {
       "step1": [
         {
-          "slug": "legal-defence",
+          "slug": "third-party-liability",
           "value": {
-            "legalDefence": "basic"
+            "typeOfSumInsured": "replacementValue",
+            "deductible": "1000",
+            "sumInsuredLimitOfIndemnity": 1000000
           }
         },
         {
@@ -33,11 +35,9 @@
           }
         },
         {
-          "slug": "third-party-liability",
+          "slug": "legal-defence",
           "value": {
-            "typeOfSumInsured": "replacementValue",
-            "deductible": "1000",
-            "sumInsuredLimitOfIndemnity": 1000000
+            "legalDefence": "basic"
           }
         }
       ],
@@ -45,46 +45,35 @@
         {
           "buildingId": "2",
           "value": {
-            "buildingType": "masonry",
+            "buildingType": "reinforcedConcrete",
             "numberOfFloors": "first",
-            "constructionYear": "after2009",
-            "alarm": "no",
+            "constructionYear": "before1972",
+            "alarm": "yes",
             "typeOfInsurance": "namedPerils",
             "ateco": "107110",
-            "postcode": "20122",
+            "postcode": "20154",
             "province": "MI",
             "answer": [
+              {
+                "slug": "electronic-equipment",
+                "value": {
+                  "typeOfSumInsured": "firstLoss",
+                  "deductible": "1000",
+                  "sumInsuredLimitOfIndemnity": 25000
+                }
+              },
+              {
+                "slug": "assistance",
+                "value": {
+                  "assistance": "yes"
+                }
+              },
               {
                 "slug": "lease-holders-interest",
                 "value": {
                   "typeOfSumInsured": "replacementValue",
                   "deductible": "1000",
-                  "sumInsuredLimitOfIndemnity": 280000
-                }
-              },
-              {
-                "slug": "third-party-recourse",
-                "value": {
-                  "typeOfSumInsured": "firstLoss",
-                  "deductible": "1000",
-                  "sumInsuredLimitOfIndemnity": 150000,
-                  "selfInsurance": "0.10"
-                }
-              },
-              {
-                "slug": "theft",
-                "value": {
-                  "typeOfSumInsured": "firstLoss",
-                  "deductible": "1000",
-                  "sumInsuredLimitOfIndemnity": 10000
-                }
-              },
-              {
-                "slug": "burst-pipe",
-                "value": {
-                  "typeOfSumInsured": "firstLoss",
-                  "deductible": "1000",
-                  "sumInsuredLimitOfIndemnity": 20000
+                  "sumInsuredLimitOfIndemnity": 555000
                 }
               },
               {
@@ -97,14 +86,6 @@
                 }
               },
               {
-                "slug": "glass",
-                "value": {
-                  "typeOfSumInsured": "firstLoss",
-                  "deductible": "1000",
-                  "sumInsuredLimitOfIndemnity": 2500
-                }
-              },
-              {
                 "slug": "property-owners-liability",
                 "value": {
                   "typeOfSumInsured": "replacementValue",
@@ -113,46 +94,20 @@
                 }
               },
               {
-                "slug": "content",
-                "value": {
-                  "typeOfSumInsured": "replacementValue",
-                  "deductible": "1000",
-                  "sumInsuredLimitOfIndemnity": 84000
-                }
-              },
-              {
                 "slug": "power-surge",
                 "value": {
                   "typeOfSumInsured": "firstLoss",
                   "deductible": "1000",
-                  "sumInsuredLimitOfIndemnity": 15000,
-                  "selfInsurance": "0.10"
-                }
-              },
-              {
-                "slug": "atmospheric-event",
-                "value": {
-                  "typeOfSumInsured": "replacementValue",
-                  "deductible": "1500",
-                  "sumInsuredLimitOfIndemnity": 364000,
-                  "selfInsurance": "0.10"
-                }
-              },
-              {
-                "slug": "machinery-breakdown",
-                "value": {
-                  "typeOfSumInsured": "firstLoss",
-                  "deductible": "1500",
-                  "sumInsuredLimitOfIndemnity": 15000
-                }
-              },
-              {
-                "slug": "business-interruption",
-                "value": {
-                  "typeOfSumInsured": "firstLoss",
-                  "deductible": "5days",
                   "sumInsuredLimitOfIndemnity": 25000,
-                  "dailyAllowance": "250"
+                  "selfInsurance": "0.10"
+                }
+              },
+              {
+                "slug": "theft",
+                "value": {
+                  "typeOfSumInsured": "firstLoss",
+                  "deductible": "1000",
+                  "sumInsuredLimitOfIndemnity": 25000
                 }
               },
               {
@@ -165,20 +120,11 @@
                 }
               },
               {
-                "slug": "water-damage",
-                "value": {
-                  "typeOfSumInsured": "replacementValue",
-                  "deductible": "1000",
-                  "sumInsuredLimitOfIndemnity": 0.7,
-                  "selfInsurance": "0.05"
-                }
-              },
-              {
-                "slug": "electronic-equipment",
+                "slug": "glass",
                 "value": {
                   "typeOfSumInsured": "firstLoss",
                   "deductible": "1000",
-                  "sumInsuredLimitOfIndemnity": 15000
+                  "sumInsuredLimitOfIndemnity": 2500
                 }
               },
               {
@@ -186,14 +132,68 @@
                 "value": {
                   "typeOfSumInsured": "replacementValue",
                   "deductible": "1000",
-                  "sumInsuredLimitOfIndemnity": 291200,
+                  "sumInsuredLimitOfIndemnity": 684000,
                   "selfInsurance": "0.05"
                 }
               },
               {
-                "slug": "assistance",
+                "slug": "machinery-breakdown",
                 "value": {
-                  "assistance": "yes"
+                  "typeOfSumInsured": "firstLoss",
+                  "deductible": "1500",
+                  "sumInsuredLimitOfIndemnity": 40000
+                }
+              },
+              {
+                "slug": "atmospheric-event",
+                "value": {
+                  "typeOfSumInsured": "replacementValue",
+                  "deductible": "1500",
+                  "sumInsuredLimitOfIndemnity": 855000,
+                  "selfInsurance": "0.10"
+                }
+              },
+              {
+                "slug": "business-interruption",
+                "value": {
+                  "typeOfSumInsured": "firstLoss",
+                  "deductible": "5days",
+                  "sumInsuredLimitOfIndemnity": 25000,
+                  "dailyAllowance": "250"
+                }
+              },
+              {
+                "slug": "content",
+                "value": {
+                  "typeOfSumInsured": "replacementValue",
+                  "deductible": "1000",
+                  "sumInsuredLimitOfIndemnity": 300000
+                }
+              },
+              {
+                "slug": "burst-pipe",
+                "value": {
+                  "typeOfSumInsured": "firstLoss",
+                  "deductible": "1000",
+                  "sumInsuredLimitOfIndemnity": 50000
+                }
+              },
+              {
+                "slug": "third-party-recourse",
+                "value": {
+                  "typeOfSumInsured": "firstLoss",
+                  "deductible": "1000",
+                  "sumInsuredLimitOfIndemnity": 150000,
+                  "selfInsurance": "0.10"
+                }
+              },
+              {
+                "slug": "water-damage",
+                "value": {
+                  "typeOfSumInsured": "replacementValue",
+                  "deductible": "1000",
+                  "sumInsuredLimitOfIndemnity": 0.7,
+                  "selfInsurance": "0.05"
                 }
               }
             ]

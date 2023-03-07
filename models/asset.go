@@ -62,6 +62,6 @@ type Ateco struct {
 	Sector     string `firestore:"sector,omitempty" json:"sector,omitempty"`
 }
 type Location struct {
-	Lat string `firestore:"lat,omitempty" json:"lat,omitempty"`
-	Lng string `firestore:"lng,omitempty" json:"lng,omitempty"`
+	Lat float64 `firestore:"lat,omitempty" json:"lat,omitempty"`
+	Lng float64 `firestore:"lng,omitempty" json:"lng,omitempty"`
 }
