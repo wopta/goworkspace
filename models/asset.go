@@ -35,7 +35,7 @@ type Building struct {
 type Enterprise struct {
 	Name         string   `firestore:"name,omitempty" json:"name,omitempty"`
 	Address      string   `firestore:"address,omitempty" json:"address,omitempty"`
-	StreetNumber int64    `firestore:"streetNumber,omitempty" json:"streetNumber,omitempty"`
+	StreetNumber string   `firestore:"streetNumber,omitempty" json:"streetNumber,omitempty"`
 	Location     Location `firestore:"location" json:"location,omitempty"`
 	Type         string   `firestore:"type,omitempty" json:"type,omitempty"`
 	PostalCode   string   `firestore:"postalCode,omitempty" json:"postalCode,omitempty"`
