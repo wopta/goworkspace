@@ -3,6 +3,7 @@ package callback
 import (
 	"log"
 	"net/http"
+	"time"
 
 	doc "github.com/wopta/goworkspace/document"
 	lib "github.com/wopta/goworkspace/lib"
@@ -36,6 +37,10 @@ func Sign(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 		var policy models.Policy
 		policyF.DataTo(&policy)
 		policy.IsSign = true
+		policy.Updated = time.Now()
+		policy.Status = models.PolicyStatusToPay
+		policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusSign)
+		policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusToPay)
 		log.Println("workstepFinished")
 		lib.SetFirestore("policy", uid, policy)
 		e = lib.InsertRowsBigQuery("wopta", "policy", policy)

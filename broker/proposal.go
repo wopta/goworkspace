@@ -28,9 +28,12 @@ func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	policy.ProposalNumber = numb
 	policy.IsSign = false
 	policy.IsPay = false
+	policy.Updated = time.Now()
 	log.Println("Proposal save")
 	ref, _ := lib.PutFirestore("policy", policy)
+	ref, _ = lib.PutFirestore("users", policy.Contractor)
 	policy.BigStartDate = civil.DateTimeOf(policy.StartDate)
+	policy.BigEndDate = civil.DateTimeOf(policy.EndDate)
 	e = lib.InsertRowsBigQuery("wopta", "policy", policy)
 	log.Println(ref.ID + " Proposal sand mail")
 	mail.SendMail(getProposalMailObj(policy))

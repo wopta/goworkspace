@@ -2,6 +2,7 @@ package document
 
 import (
 	"log"
+	"math"
 	"strconv"
 
 	"github.com/johnfercher/maroto/pkg/color"
@@ -40,6 +41,7 @@ func (s Skin) initDefault() pdf.Maroto {
 func getVar() Skin {
 
 	skin := Skin{
+		CharForRow: 138,
 		PrimaryColor: color.Color{
 			Red:   229,
 			Green: 0,
@@ -62,7 +64,7 @@ func getVar() Skin {
 		},
 		Size:              8,
 		SizeTitle:         10,
-		RowHeight:         4.0,
+		RowHeight:         3.4,
 		RowTitleHeight:    5.0,
 		rowtableHeight:    5.0,
 		rowtableHeightMin: 2.0,
@@ -147,7 +149,7 @@ func (s Skin) getRowHeight(data string, base int, lineh float64) float64 {
 	var res float64
 	if charsNum > base {
 		multi := float64(charsNum) / float64(base)
-		res = multi * lineh
+		res = math.Ceil(multi) * lineh
 	} else {
 		res = s.RowHeight
 	}
@@ -170,6 +172,44 @@ func (s Skin) checkPage(m pdf.Maroto) {
 	_, sizeh := m.GetPageSize()
 
 	if current > (sizeh * 0.61) {
+		log.Println("Contrat add page")
+		m.AddPage()
+		s.Space(m, 10.0)
+
+	}
+}
+func (s Skin) checkPagePerc(m pdf.Maroto, perc float64) {
+	current := m.GetCurrentOffset()
+	_, sizeh := m.GetPageSize()
+
+	if current > (sizeh * perc) {
+		log.Println("Contrat add page")
+		m.AddPage()
+		s.Space(m, 10.0)
+
+	}
+}
+func (s Skin) checkPageNext(m pdf.Maroto, next string) {
+	len := len(next)
+	log.Println(len)
+	var perc float64
+	perc = 0.90
+	if len > 300 {
+		perc = 0.90
+	}
+	if len > 400 {
+		perc = 0.80
+	}
+	if len > 500 {
+		perc = 0.70
+	}
+	if len > 600 {
+		perc = 0.60
+	}
+	current := m.GetCurrentOffset()
+	_, sizeh := m.GetPageSize()
+
+	if current > (sizeh * perc) {
 		log.Println("Contrat add page")
 		m.AddPage()
 		s.Space(m, 10.0)

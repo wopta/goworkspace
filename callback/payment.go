@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 
 	lib "github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
@@ -28,6 +29,10 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 		var policy models.Policy
 		policyF.DataTo(policy)
 		policy.IsPay = true
+		policy.Updated = time.Now()
+		policy.Status = models.PolicyStatusPay
+		policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusPay)
+		//policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusToPay)
 		lib.SetFirestore("policy", uid, policy)
 		q := lib.Firequeries{
 			Queries: []lib.Firequery{{

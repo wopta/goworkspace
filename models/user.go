@@ -33,6 +33,8 @@ type User struct {
 	Surname       string   `firestore:"surname" json:"surname,omitempty"`
 	Address       string   `firestore:"address" json:"address,omitempty"`
 	PostalCode    string   `firestore:"postalCode" json:"postalCode,omitempty"`
+	City          string   `firestore:"city" json:"city,omitempty"`
+	CityCode      string   `firestore:"cityCode" json:"cityCode,omitempty"`
 	Role          string   `firestore:"role" json:"role,omitempty"`
 	Work          string   `firestore:"work" json:"work,omitempty"`
 	WorkType      string   `firestore:"workType" json:"workType,omitempty"`

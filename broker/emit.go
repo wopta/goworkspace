@@ -8,6 +8,7 @@ import (
 
 	"time"
 
+	"cloud.google.com/go/civil"
 	doc "github.com/wopta/goworkspace/document"
 	lib "github.com/wopta/goworkspace/lib"
 	mail "github.com/wopta/goworkspace/mail"
@@ -34,9 +35,13 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	policy.IsPay = false
 	policy.Updated = time.Now()
 	policy.Uid = uid
-	policy.Status = models.PolicyStatusContact
+	policy.Status = models.PolicyStatusToSign
 	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusContact)
+	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusToSign)
 	policy.PaymentSplit = result.PaymentSplit
+	policy.CompanyEmit = true
+	policy.EmitDate = time.Now()
+	policy.BigEmitDate = civil.DateTimeOf(policy.Updated)
 	if policy.Statements == nil {
 		policy.Statements = result.Statements
 	}

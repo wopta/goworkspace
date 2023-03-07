@@ -80,6 +80,8 @@ func ContractObj(data model.Policy) <-chan DocumentResponse {
 			for _, A := range *data.Survay {
 
 				skin.Stantement(m, A.Title, A)
+				m = skin.Space(m, 5.0)
+				skin.checkPage(m)
 			}
 		}
 		skin.checkPage(m)
@@ -90,6 +92,9 @@ func ContractObj(data model.Policy) <-chan DocumentResponse {
 		for _, A := range *data.Statements {
 
 			skin.Stantement(m, A.Title, A)
+			m = skin.Space(m, 5.0)
+
+			//skin.checkPage(m)
 
 			//m = skin.Title(m, A.Title, A.Question, float64(getRowHeight(A.Question, 120, 6)))
 		}
@@ -112,14 +117,14 @@ func ContractObj(data model.Policy) <-chan DocumentResponse {
 	credito e/o carte di debito, incluse le carte prepagate.`
 		skin.checkPage(m)
 		m = skin.Space(m, 5.0)
-		m = skin.Title(m, title, body, 25.0)
+		m = skin.Title(m, title, body, 10.0)
 		title = "Emissione polizza e pagamento della prima rata "
 		s := fmt.Sprintf("%.2f", data.PriceGross)
 		body = `Polizza emessa a Milano il ` + data.StartDate.Format(layout2) + ` 00/00/0000 per un importo di euro ` + s + ` quale prima rata alla firma,
 	 il cui pagamento a saldo è da effettuarsi con i metodi di pagamento sopra indicati. 
 	Costituisce quietanza di pagamento la mail di conferma che Wopta invierà al Contraente. `
 		skin.checkPage(m)
-		m = skin.Title(m, title, body, 25.0)
+		m = skin.Title(m, title, body, 18.0)
 		//m = skin.Sign(m, "Wopta Assicurazioni", "Wopta Assicurazioni", "2", false)
 		skin.checkPage(m)
 		m = skin.RowCol1(m, "", consts.Normal)

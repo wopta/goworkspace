@@ -46,6 +46,9 @@ type Policy struct {
 	Name            string                 `firestore:"name,omitempty" json:"name,omitempty" bigquery:"name"`
 	NameDesc        string                 `firestore:"nameDesc,omitempty" json:"nameDesc,omitempty" bigquery:"nameDesc"`
 	BigStartDate    civil.DateTime         `bigquery:"startDate"`
+	BigEndDate      civil.DateTime         `bigquery:"endDate"`
+	BigEmitDate     civil.DateTime         `bigquery:"emitDate"`
+	EmitDate        time.Time              `firestore:"emitDate,omitempty" json:"emitDate,omitempty" bigquery:"-"`
 	StartDate       time.Time              `firestore:"startDate,omitempty" json:"startDate,omitempty" bigquery:"-"`
 	EndDate         time.Time              `firestore:"endDate,omitempty" json:"endDate,omitempty" bigquery:"-"`
 	CreationDate    time.Time              `firestore:"creationDate,omitempty" json:"creationDate,omitempty" bigquery:"-"`
@@ -58,6 +61,8 @@ type Policy struct {
 	IsPay           bool                   `firestore:"isPay" json:"isPay,omitempty" bigquery:"isPay"`
 	IsAutoRenew     bool                   `firestore:"isAutoRenew,omitempty" json:"isAutoRenew,omitempty" bigquery:"isAutoRenew"`
 	IsSign          bool                   `firestore:"isSign" json:"isSign,omitempty" bigquery:"isSign"`
+	CompanyEmit     bool                   `firestore:"companyEmit" json:"companyEmit,omitempty" bigquery:"companyEmit"`
+	CompanyEmitted  bool                   `firestore:"companyEmitted" json:"companyEmitted,omitempty" bigquery:"companyEmitted"`
 	CoverageType    string                 `firestore:"coverageType,omitempty" json:"coverageType,omitempty" bigquery:"coverageType"`
 	Voucher         string                 `firestore:"voucher,omitempty" json:"voucher,omitempty" bigquery:"voucher"`
 	Channel         string                 `firestore:"channel,omitempty" json:"channel,omitempty" bigquery:"channel"`

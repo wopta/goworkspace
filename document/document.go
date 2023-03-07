@@ -94,6 +94,7 @@ type Skin struct {
 	TableHeight          float64
 	rowtableHeightMin    float64
 	DynamicHeightMin     int
+	CharForRow           int
 	DynamicHeightDiv     float64
 	MagentaTextLeft      props.Text
 	WhiteTextCenter      props.Text

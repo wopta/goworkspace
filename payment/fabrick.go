@@ -160,6 +160,6 @@ func getfabbricPayments(data model.Policy, firstSchedule bool, scheduleDate stri
 	pay.Bill = bill
 
 	res, _ := pay.Marshal()
-	result := strings.Replace(string(res), `\u0026`, `&`, 1)
+	result := strings.Replace(string(res), `\u0026`, `&`, -1)
 	return result
 }
