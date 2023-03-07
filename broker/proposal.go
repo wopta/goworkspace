@@ -18,7 +18,8 @@ func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	var policy models.Policy
 	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
 	e := json.Unmarshal([]byte(req), &policy)
-	log.Println(policy.Marshal())
+	j,e:=policy.Marshal()
+	log.Println("request p: ",string(j))
 	defer r.Body.Close()
 	policy.Updated = time.Now()
 	policy.CreationDate = time.Now()
