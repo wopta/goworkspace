@@ -5,6 +5,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
+	"strings"
+	"time"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/golang-jwt/jwt/v4"
@@ -33,9 +36,9 @@ func Partnership(w http.ResponseWriter, r *http.Request) {
 
 func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		policy             models.Policy
-		person             models.User
-		asset              models.Asset
+		policy models.Policy
+		person models.User
+		asset  models.Asset
 	)
 	resp.Header().Set("Access-Control-Allow-Methods", "GET")
 
@@ -59,11 +62,11 @@ func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, inter
 	if claims, ok := token.Claims.(*BeProfClaims); ok && token.Valid {
 		fmt.Printf("%v", claims)
 		// create policy object
-		person.BirthDate = claims.BirthDate
 		person.Name = claims.Name
 		person.Surname = claims.Surname
 		person.Mail = claims.Mail
 		person.FiscalCode = claims.FiscalCode
+		person.BirthDate = extractBirthdateFromItalianFiscalCode(claims.FiscalCode).Format(time.RFC3339)
 		policy.Contractor = person
 		asset.Person = &person
 		policy.Assets = append(policy.Assets, asset)
@@ -72,12 +75,17 @@ func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, inter
 		return "", nil, err
 	}
 
+	// verify if this user has already a policy from beprof
+
+	// catalogo e servizio
+	// proccedi e i miei servizi
+
 	// call vendibility rules
 
 	// call quoter
 
 	p, err := policy.Marshal()
-	
+
 	if err != nil {
 		return "", nil, err
 	}
@@ -85,10 +93,47 @@ func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, inter
 	return string(p), policy, err
 }
 
+func extractBirthdateFromItalianFiscalCode(fiscalCode string) time.Time {
+	year, _ := strconv.Atoi(fiscalCode[6:8])
+	month := getMonth(fiscalCode[8:9])
+	day, _ := strconv.Atoi(fiscalCode[9:11])
+
+	if day > 40 {
+		day -= 40
+	}
+
+	if year < 40 {
+		year += 2000
+	} else {
+		year += 1900
+	}
+
+	birthdate := time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.UTC)
+	return birthdate
+}
+
+func getMonth(monthCode string) int {
+	monthMap := map[string]int{
+		"A": 1,
+		"B": 2,
+		"C": 3,
+		"D": 4,
+		"E": 5,
+		"H": 6,
+		"L": 7,
+		"M": 8,
+		"P": 9,
+		"R": 10,
+		"S": 11,
+		"T": 12,
+	}
+
+	return monthMap[strings.ToUpper(monthCode)]
+}
+
 type BeProfClaims struct {
 	Name       string `json:"nome"`
 	Surname    string `json:"cognome"`
-	BirthDate  string `json:"dataDiNascita"`
 	Mail       string `json:"email"`
 	FiscalCode string `json:"codiceFiscale"`
 	VatCode    string `json:"piva"`
