@@ -43,6 +43,8 @@ func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, inter
 	resp.Header().Set("Access-Control-Allow-Methods", "GET")
 
 	jwtData := r.URL.Query().Get("jwt")
+	fmt.Println(jwtData)
+	fmt.Println(os.Getenv("BEPROF_SIGNING_KEY"))
 
 	// decode JWT
 	// Parse takes the token string and a function for looking up the key. The latter is especially
@@ -57,8 +59,11 @@ func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, inter
 
 		return []byte(os.Getenv("BEPROF_SIGNING_KEY")), nil
 	})
+	fmt.Println(token)
+	fmt.Print(err)
 
 	if claims, ok := token.Claims.(*BeProfClaims); ok && token.Valid {
+		fmt.Print()
 		person.Name = claims.Name
 		person.Surname = claims.Surname
 		person.Mail = claims.Mail
