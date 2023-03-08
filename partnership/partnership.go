@@ -43,9 +43,10 @@ func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, inter
 	resp.Header().Set("Access-Control-Allow-Methods", "GET")
 
 	jwtData := r.URL.Query().Get("jwt")
+	fmt.Println(jwtData)
+	fmt.Println(os.Getenv("BEPROF_SIGNING_KEY"))
 
 	// decode JWT
-
 	// Parse takes the token string and a function for looking up the key. The latter is especially
 	// useful if you use multiple keys for your application.  The standard is to use 'kid' in the
 	// head of the token to identify which key to use, but the parsed token (head and claims) is provided
@@ -58,10 +59,11 @@ func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, inter
 
 		return []byte(os.Getenv("BEPROF_SIGNING_KEY")), nil
 	})
+	fmt.Println(token)
+	fmt.Print(err)
 
 	if claims, ok := token.Claims.(*BeProfClaims); ok && token.Valid {
-		fmt.Printf("%v", claims)
-		// create policy object
+		fmt.Print()
 		person.Name = claims.Name
 		person.Surname = claims.Surname
 		person.Mail = claims.Mail
