@@ -45,7 +45,6 @@ func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, inter
 	jwtData := r.URL.Query().Get("jwt")
 
 	// decode JWT
-
 	// Parse takes the token string and a function for looking up the key. The latter is especially
 	// useful if you use multiple keys for your application.  The standard is to use 'kid' in the
 	// head of the token to identify which key to use, but the parsed token (head and claims) is provided
@@ -60,8 +59,6 @@ func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, inter
 	})
 
 	if claims, ok := token.Claims.(*BeProfClaims); ok && token.Valid {
-		fmt.Printf("%v", claims)
-		// create policy object
 		person.Name = claims.Name
 		person.Surname = claims.Surname
 		person.Mail = claims.Mail
