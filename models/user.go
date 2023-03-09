@@ -63,13 +63,16 @@ func FirestoreDocumentToUser(query *firestore.DocumentIterator) (User, error) {
 	var result User
 	userDocumentSnapshot, err := query.Next()
 
-	if err != iterator.Done && err != nil {
+	if (err != iterator.Done && err != nil) || userDocumentSnapshot == nil {
 		log.Println(`error happened while trying to get user`)
 		log.Println(err)
 		return result, err
 	}
 
 	e := userDocumentSnapshot.DataTo(&result)
+	if len(result.Uid) == 0 {
+		result.Uid = userDocumentSnapshot.Ref.ID
+	}
 	lib.CheckError(e)
 
 	return result, e
