@@ -44,7 +44,7 @@ func NamirialOtpV6(data model.Policy) (string, NamirialOtpResponse, error) {
 	log.Println(data.Uid+"postData:", SspFileId)
 	//prepareEnvelop(SspFileId)
 	unassigned := <-prepareEnvelopV6(SspFileId)
-	log.Println("prepare body:", unassigned)
+
 	id := <-sendEnvelopV6(SspFileId, data, unassigned)
 
 	log.Println(data.Uid+" sendEnvelop:", id)
@@ -116,7 +116,7 @@ func sendEnvelopV6(id string, data model.Policy, unassigned string) <-chan strin
 			json.Unmarshal([]byte(body), &result)
 			res.Body.Close()
 
-			log.Println(data.Uid+" body sendEnvelopV6: ", string(body))
+			log.Println(data.Uid+" body response sendEnvelopV6: ", string(body))
 			r <- result["EnvelopeId"]
 
 		}
@@ -150,7 +150,7 @@ func GetEnvelopV6(id string) <-chan string {
 			json.Unmarshal([]byte(body), &result)
 			res.Body.Close()
 
-			log.Println("body getEnvelop:", string(body))
+			log.Println("body response getEnvelop:", string(body))
 
 			r <- result.ViewerLinks[0].ViewerLink
 
@@ -204,7 +204,7 @@ func GetFileV6(id string) string {
 		}
 		req, _ := http.NewRequest(http.MethodGet, urlstring, nil)
 		req.Header.Set("apiToken", os.Getenv("ESIGN_TOKEN_API"))
-		log.Println("url parse:", req.Header)
+
 		res, err := client.Do(req)
 		lib.CheckError(err)
 
@@ -247,7 +247,6 @@ func getSendV6(id string, data model.Policy, prepare string) string {
 	}
 	unassignedJson, e := json.Marshal(unassignedElements)
 	elementsJson, e := json.Marshal(elements)
-	log.Println(string(unassignedJson))
 	lib.CheckError(e)
 	calbackurl := `"https://europe-west1-` + os.Getenv("GOOGLE_PROJECT_ID") + `.cloudfunctions.net/callback/v1/sign?envelope=##EnvelopeId##&action=##Action##&uid=` + data.Uid + `&token=` + os.Getenv("WOPTA_TOKEN_API") + `"`
 	var testPin string
