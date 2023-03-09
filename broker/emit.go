@@ -63,9 +63,13 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 		payRes = pay.FabbrickMontlyPay(policy)
 	}
 	responseEmit := EmitResponse{UrlPay: *payRes.Payload.PaymentPageURL, UrlSign: res.Url}
-	lib.SetFirestore("policy", uid, policy)
 	policyJson, e := policy.Marshal()
+	log.Println("save firestore: ", policyJson)
+
+	lib.SetFirestore("policy", uid, policy)
+
 	policy.Data = string(policyJson)
+	log.Println("save big query: ")
 	//e = lib.InsertRowsBigQuery("wopta", "policy", policy)
 	mail.SendMail(getEmitMailObj(policy, responseEmit))
 	b, e := json.Marshal(responseEmit)
