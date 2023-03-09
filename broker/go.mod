@@ -11,7 +11,7 @@ require (
 	github.com/wopta/goworkspace/document v0.0.0-20230308140313-de4e9757a0d9
 	github.com/wopta/goworkspace/lib v0.0.0-20230308140313-de4e9757a0d9
 	github.com/wopta/goworkspace/mail v0.0.0-20230308140313-de4e9757a0d9
-	github.com/wopta/goworkspace/models v0.0.0-20230309091148-c2d79fe805ce
+	github.com/wopta/goworkspace/models v0.0.0-20230309095406-9e5481c709c6
 	github.com/wopta/goworkspace/payment v0.0.0-20230308140313-de4e9757a0d9
 )
 

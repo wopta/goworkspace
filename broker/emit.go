@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-
 	"time"
 
 	"cloud.google.com/go/civil"
