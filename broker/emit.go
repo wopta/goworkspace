@@ -19,6 +19,7 @@ import (
 func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		result EmitRequest
+		e      error
 	)
 
 	log.Println("Emit")
@@ -64,7 +65,9 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	}
 	responseEmit := EmitResponse{UrlPay: *payRes.Payload.PaymentPageURL, UrlSign: res.Url}
 	lib.SetFirestore("policy", uid, policy)
-	e := lib.InsertRowsBigQuery("wopta", "policy", policy)
+	policyJson, e := policy.Marshal()
+	policy.Data = string(policyJson)
+	e = lib.InsertRowsBigQuery("wopta", "policy", policy)
 	mail.SendMail(getEmitMailObj(policy, responseEmit))
 	b, e := json.Marshal(responseEmit)
 	return string(b), responseEmit, e

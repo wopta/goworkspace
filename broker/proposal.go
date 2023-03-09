@@ -38,6 +38,8 @@ func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	policy.BigEndDate = civil.DateTimeOf(policy.EndDate)
 
 	policy.BigEmitDate = civil.DateTimeOf(policy.Updated)
+	policyJson, e := policy.Marshal()
+	policy.Data = string(policyJson)
 	e = lib.InsertRowsBigQuery("wopta", "policy", policy)
 	log.Println(ref.ID + " Proposal sand mail")
 	mail.SendMail(getProposalMailObj(policy))

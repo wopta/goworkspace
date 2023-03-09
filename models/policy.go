@@ -79,6 +79,7 @@ type Policy struct {
 	Attachments     *[]Attachment          `firestore:"attachments,omitempty" json:"attachments,omitempty" bigquery:"-"`
 	Assets          []Asset                `firestore:"assets,omitempty" json:"assets,omitempty" bigquery:"-"`
 	Claim           *[]Claim               `firestore:"claim,omitempty" json:"claim,omitempty" bigquery:"-"`
+	Data            string                 `bigquery:"data" firestore:"-"`
 }
 
 type RenewHistory struct {
