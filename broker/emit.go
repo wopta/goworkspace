@@ -27,7 +27,6 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	json.Unmarshal([]byte(request), &result)
 	uid := result.Uid
 	log.Println(uid)
-
 	var policy models.Policy
 	docsnap := lib.GetFirestore("policy", string(uid))
 	docsnap.DataTo(&policy)
@@ -65,9 +64,7 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	responseEmit := EmitResponse{UrlPay: *payRes.Payload.PaymentPageURL, UrlSign: res.Url}
 	policyJson, e := policy.Marshal()
 	log.Println("save firestore: ", string(policyJson))
-
 	lib.SetFirestore("policy", uid, policy)
-
 	policy.Data = string(policyJson)
 	log.Println("save big query: ")
 	e = lib.InsertRowsBigQuery("wopta", "policy", policy)

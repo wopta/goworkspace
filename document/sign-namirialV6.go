@@ -231,11 +231,11 @@ func GetFileV6(id string, uid string) chan string {
 		res, err := client.Do(req)
 		lib.CheckError(err)
 		if res != nil {
-			body, err := ioutil.ReadAll(res.Body)
-			if err == nil {
-				res.Body.Close()
-			}
-			log.Println("Get body: ", string(body))
+			body, _ := ioutil.ReadAll(res.Body)
+
+			defer res.Body.Close()
+
+			//log.Println("Get body: ", string(body))
 			lib.PutToFireStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "/document/contracts/"+uid, body)
 
 			r <- "upload done"

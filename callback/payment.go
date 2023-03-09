@@ -64,7 +64,7 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 			"requestPayload": ` + string(request) + `,
 			"locale": "it"
 		}`
-
+		log.Println(response)
 	}
 	return response, nil, e
 }
