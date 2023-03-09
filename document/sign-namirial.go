@@ -228,7 +228,7 @@ func GetFile(id string, uid string) chan string {
 			if err == nil {
 				res.Body.Close()
 			}
-			log.Println("Get body: ", body)
+			log.Println("Get body: ", string(body))
 			lib.PutToFireStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "/document/contracts/"+uid, body)
 
 			r <- "upload done"
