@@ -23,7 +23,7 @@ func User(w http.ResponseWriter, r *http.Request) {
 	route := lib.RouteData{
 		Routes: []lib.Route{
 			{
-				Route:   "/v1/fiscalcode/:fiscalcode",
+				Route:   "/v1/fiscalCode/:fiscalcode",
 				Handler: GetUserByFiscalCodeFx,
 				Method:  "GET",
 			},
