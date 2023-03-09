@@ -46,7 +46,7 @@ func Sign(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 		e = lib.InsertRowsBigQuery("wopta", "policy", policy)
 		mail.SendMail(getEmitMailObj(policy, policy.PayUrl))
 		log.Println("workstepFinished")
-		s := <-doc.GetFile(policy.ContractFileId, uid)
+		s := <-doc.GetFileV6(policy.ContractFileId, uid)
 		log.Println(s)
 	}
 

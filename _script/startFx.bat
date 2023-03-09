@@ -9,4 +9,5 @@ set FUNCTION_TARGET=Document
 set FUNCTION_TARGET=Enrich
 set FUNCTION_TARGET=Claim
 set FUNCTION_TARGET=Form
+set FUNCTION_TARGET=Callback
 

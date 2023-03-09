@@ -209,35 +209,7 @@ func postData(data []byte, host string) <-chan string {
 
 	return r
 }
-func GetFile(id string, uid string) chan string {
-	r := make(chan string)
-	log.Println("Get file: ", id)
-	go func() {
-		defer close(r)
-		var urlstring = os.Getenv("ESIGN_BASEURL") + "v6/file/" + id
-		client := &http.Client{
-			Timeout: time.Second * 10,
-		}
-		req, _ := http.NewRequest(http.MethodGet, urlstring, nil)
-		req.Header.Set("apiToken", os.Getenv("ESIGN_TOKEN_API"))
-		log.Println("url parse:", req.Header)
-		res, err := client.Do(req)
-		lib.CheckError(err)
-		if res != nil {
-			body, err := ioutil.ReadAll(res.Body)
-			if err == nil {
-				res.Body.Close()
-			}
-			log.Println("Get body: ", string(body))
-			lib.PutToFireStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "/document/contracts/"+uid, body)
 
-			r <- "upload done"
-
-		}
-
-	}()
-	return r
-}
 func getPrepare(id string) string {
 	return `{
 	"SspFileIds": [

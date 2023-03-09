@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"mime/multipart"
@@ -56,7 +57,26 @@ func NamirialOtpV6(data model.Policy) (string, NamirialOtpResponse, error) {
 	}
 	return "{}", resp, nil
 }
+func GetClient(method string, urlstring string, payload io.Reader) ([]byte, error) {
 
+	var (
+		r []byte
+		e error
+	)
+	client := &http.Client{
+		Timeout: time.Second * 10,
+	}
+	req, _ := http.NewRequest(method, urlstring, payload)
+	req.Header.Set("apiToken", os.Getenv("ESIGN_TOKEN_API"))
+	res, e := client.Do(req)
+
+	if res != nil {
+		r, e = ioutil.ReadAll(res.Body)
+
+	}
+
+	return r, e
+}
 func prepareEnvelopV6(id string) <-chan string {
 	r := make(chan string)
 	go func() {
@@ -193,12 +213,44 @@ func postDataV6(data []byte) <-chan string {
 
 	return r
 }
-func GetFileV6(id string) string {
+func GetFileV6(id string, uid string) chan string {
 	r := make(chan string)
+	log.Println("Get file: ", id)
+	go func() {
+
+		defer close(r)
+		files := <-GetFilesV6(id)
+
+		var urlstring = os.Getenv("ESIGN_BASEURL") + "v6/file/" + files.Documents[0].FileID
+		client := &http.Client{
+			Timeout: time.Second * 10,
+		}
+		req, _ := http.NewRequest(http.MethodGet, urlstring, nil)
+		req.Header.Set("apiToken", os.Getenv("ESIGN_TOKEN_API"))
+		log.Println("url parse:", req.Header)
+		res, err := client.Do(req)
+		lib.CheckError(err)
+		if res != nil {
+			body, err := ioutil.ReadAll(res.Body)
+			if err == nil {
+				res.Body.Close()
+			}
+			log.Println("Get body: ", string(body))
+			lib.PutToFireStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "/document/contracts/"+uid, body)
+
+			r <- "upload done"
+
+		}
+
+	}()
+	return r
+}
+func GetFilesV6(envelopeId string) chan NamirialFiles {
+	r := make(chan NamirialFiles)
 
 	go func() {
 		defer close(r)
-		var urlstring = os.Getenv("ESIGN_BASEURL") + "v4/authorization"
+		var urlstring = os.Getenv("ESIGN_BASEURL") + "v6/envelope/" + envelopeId + "/files"
 		client := &http.Client{
 			Timeout: time.Second * 10,
 		}
@@ -209,15 +261,17 @@ func GetFileV6(id string) string {
 		lib.CheckError(err)
 
 		if res != nil {
-			body, err := ioutil.ReadAll(res.Body)
-			lib.CheckError(err)
+
+			body, _ := ioutil.ReadAll(res.Body)
+			resp, _ := UnmarshalNamirialFiles(body)
 			res.Body.Close()
-			lib.PutToFireStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "document/contracts"+id, body)
+
 			log.Println("body:", string(body))
+			r <- resp
 		}
 
 	}()
-	return ``
+	return r
 }
 func getPrepareV6(id string) string {
 	return `{
@@ -439,4 +493,46 @@ type ViewerLink struct {
 	ActivityID string `json:"ActivityId"`
 	Email      string `json:"Email"`
 	ViewerLink string `json:"ViewerLink"`
+}
+
+func UnmarshalNamirialFiles(data []byte) (NamirialFiles, error) {
+	var r NamirialFiles
+	err := json.Unmarshal(data, &r)
+	return r, err
+}
+
+func (r *NamirialFiles) Marshal() ([]byte, error) {
+	return json.Marshal(r)
+}
+
+type NamirialFiles struct {
+	Documents      []Documents     `json:"Documents"`
+	AuditTrail     AuditTrail      `json:"AuditTrail"`
+	LegalDocuments []LegalDocument `json:"LegalDocuments"`
+}
+
+type AuditTrail struct {
+	FileID    string `json:"FileId"`
+	XMLFileID string `json:"XmlFileId"`
+}
+
+type Documents struct {
+	FileID           string       `json:"FileId"`
+	FileName         string       `json:"FileName"`
+	AuditTrailFileID string       `json:"AuditTrailFileId"`
+	Attachments      []Attachment `json:"Attachments"`
+	PageCount        int64        `json:"PageCount"`
+	DocumentNumber   int64        `json:"DocumentNumber"`
+}
+
+type Attachment struct {
+	FileID   string `json:"FileId"`
+	FileName string `json:"FileName"`
+}
+
+type LegalDocument struct {
+	FileID     string `json:"FileId"`
+	FileName   string `json:"FileName"`
+	ActivityID string `json:"ActivityId"`
+	Email      string `json:"Email"`
 }
