@@ -21,7 +21,6 @@ func Broker(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("Broker")
 	lib.EnableCors(&w, r)
-	w.Header().Set("Access-Control-Allow-Methods", "POST")
 	route := lib.RouteData{
 
 		Routes: []lib.Route{

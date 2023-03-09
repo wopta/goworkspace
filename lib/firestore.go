@@ -111,7 +111,7 @@ func WhereFirestore(collection string, field string, operator string, queryValue
 	client, err := firestore.NewClient(ctx, os.Getenv("GOOGLE_PROJECT_ID"))
 	CheckError(err)
 	query := client.Collection(collection).Where(field, operator, queryValue).Documents(ctx)
-	//query.GetAll()
+	query.GetAll()
 
 	return query
 }
