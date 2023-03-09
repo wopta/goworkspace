@@ -64,7 +64,7 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	}
 	responseEmit := EmitResponse{UrlPay: *payRes.Payload.PaymentPageURL, UrlSign: res.Url}
 	policyJson, e := policy.Marshal()
-	log.Println("save firestore: ", policyJson)
+	log.Println("save firestore: ", string(policyJson))
 
 	lib.SetFirestore("policy", uid, policy)
 
