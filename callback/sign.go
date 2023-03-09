@@ -54,6 +54,7 @@ func Sign(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 }
 func getEmitMailObj(policy models.Policy, payUrl string) mail.MailRequest {
 	var obj mail.MailRequest
+	log.Println(policy.Contractor.Mail)
 	obj.From = "noreply@wopta.it"
 	obj.To = []string{policy.Contractor.Mail}
 	obj.Message = `<p>Ciao ` + policy.Contractor.Name + `` + policy.Contractor.Surname + ` </p>

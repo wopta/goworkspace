@@ -70,7 +70,7 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 
 	policy.Data = string(policyJson)
 	log.Println("save big query: ")
-	//e = lib.InsertRowsBigQuery("wopta", "policy", policy)
+	e = lib.InsertRowsBigQuery("wopta", "policy", policy)
 	mail.SendMail(getEmitMailObj(policy, responseEmit))
 	b, e := json.Marshal(responseEmit)
 	return string(b), responseEmit, e
