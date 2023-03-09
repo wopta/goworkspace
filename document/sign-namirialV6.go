@@ -47,7 +47,7 @@ func NamirialOtpV6(data model.Policy) (string, NamirialOtpResponse, error) {
 	log.Println("prepare body:", unassigned)
 	id := <-sendEnvelopV6(SspFileId, data, unassigned)
 
-	log.Println(data.Uid+"sendEnvelop:", id)
+	log.Println(data.Uid+" sendEnvelop:", id)
 	url := <-GetEnvelopV6(id)
 	resp := NamirialOtpResponse{
 		EnvelopeId: id,
@@ -71,7 +71,7 @@ func prepareEnvelopV6(id string) <-chan string {
 		req.Header.Set("apiToken", os.Getenv("ESIGN_TOKEN_API"))
 		req.Header.Set("Content-Type", "application/json")
 		//header('Content-Length: ' . filesize($pdf));
-		log.Println("url parse:", req.Header)
+
 		res, err := client.Do(req)
 		lib.CheckError(err)
 

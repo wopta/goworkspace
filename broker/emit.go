@@ -66,7 +66,7 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	lib.SetFirestore("policy", uid, policy)
 	policyJson, e := policy.Marshal()
 	policy.Data = string(policyJson)
-	e = lib.InsertRowsBigQuery("wopta", "policy", policy)
+	//e = lib.InsertRowsBigQuery("wopta", "policy", policy)
 	mail.SendMail(getEmitMailObj(policy, responseEmit))
 	b, e := json.Marshal(responseEmit)
 	return string(b), responseEmit, e
