@@ -61,8 +61,8 @@ type Policy struct {
 	IsPay           bool                   `firestore:"isPay" json:"isPay,omitempty" bigquery:"isPay"`
 	IsAutoRenew     bool                   `firestore:"isAutoRenew,omitempty" json:"isAutoRenew,omitempty" bigquery:"isAutoRenew"`
 	IsSign          bool                   `firestore:"isSign" json:"isSign,omitempty" bigquery:"isSign"`
-	CompanyEmit     bool                   `firestore:"companyEmit" json:"companyEmit,omitempty" bigquery:"companyEmit"`
-	CompanyEmitted  bool                   `firestore:"companyEmitted" json:"companyEmitted,omitempty" bigquery:"companyEmitted"`
+	CompanyEmit     bool                   `firestore:"companyEmit" json:"companyEmit,omitempty" bigquery:"-"`
+	CompanyEmitted  bool                   `firestore:"companyEmitted" json:"companyEmitted,omitempty" bigquery:"-"`
 	CoverageType    string                 `firestore:"coverageType,omitempty" json:"coverageType,omitempty" bigquery:"coverageType"`
 	Voucher         string                 `firestore:"voucher,omitempty" json:"voucher,omitempty" bigquery:"voucher"`
 	Channel         string                 `firestore:"channel,omitempty" json:"channel,omitempty" bigquery:"channel"`
