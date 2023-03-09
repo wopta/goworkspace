@@ -8,11 +8,11 @@ require (
 	cloud.google.com/go v0.105.0
 	cloud.google.com/go/firestore v1.9.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
-	github.com/wopta/goworkspace/document v0.0.0-20230309195618-32ad2498755f
-	github.com/wopta/goworkspace/lib v0.0.0-20230309195618-32ad2498755f
-	github.com/wopta/goworkspace/mail v0.0.0-20230309195618-32ad2498755f
-	github.com/wopta/goworkspace/models v0.0.0-20230309195618-32ad2498755f
-	github.com/wopta/goworkspace/payment v0.0.0-20230309195618-32ad2498755f
+	github.com/wopta/goworkspace/document v0.0.0-20230309210926-ff94c83baedc
+	github.com/wopta/goworkspace/lib v0.0.0-20230309210926-ff94c83baedc
+	github.com/wopta/goworkspace/mail v0.0.0-20230309210926-ff94c83baedc
+	github.com/wopta/goworkspace/models v0.0.0-20230309210926-ff94c83baedc
+	github.com/wopta/goworkspace/payment v0.0.0-20230309210926-ff94c83baedc
 )
 
 require (
@@ -61,7 +61,7 @@ require (
 	github.com/sergi/go-diff v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
-	github.com/wopta/goworkspace/product v0.0.0-20230309140453-69e9b26826ba // indirect
+	github.com/wopta/goworkspace/product v0.0.0-20230309195618-32ad2498755f // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
 	github.com/xuri/excelize/v2 v2.7.0 // indirect
