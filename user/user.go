@@ -12,18 +12,18 @@ import (
 )
 
 func init() {
-	log.Println("INIT AppcheckProxy")
+	log.Println("INIT User")
 	functions.HTTP("User", User)
 }
 
 func User(w http.ResponseWriter, r *http.Request) {
 
-	log.Println("Product")
+	log.Println("User")
 	lib.EnableCors(&w, r)
 	route := lib.RouteData{
 		Routes: []lib.Route{
 			{
-				Route:   "/v1/fiscalcode/:fiscalcode",
+				Route:   "/v1/fiscalCode/:fiscalcode",
 				Handler: GetUserByFiscalCodeFx,
 				Method:  "GET",
 			},
@@ -58,13 +58,15 @@ func OnboardUserFx(resp http.ResponseWriter, r *http.Request) (string, interface
 	reqBytes := lib.ErrorByte(ioutil.ReadAll(r.Body))
 	json.Unmarshal(reqBytes, &onboardUserRequest)
 
-	canRegister, userId := CanUserRegisterUseCase(onboardUserRequest.FiscalCode)
+	canRegister, userId, email := CanUserRegisterUseCase(onboardUserRequest.FiscalCode)
+	log.Println(email)
 
 	if canRegister {
-		_, e := lib.CreateUserWithEmailAndPassword(onboardUserRequest.Email, onboardUserRequest.Password, userId)
+		fireUser, e := lib.CreateUserWithEmailAndPassword(onboardUserRequest.Email, onboardUserRequest.Password, userId)
 		if e != nil {
 			result = `{"success": false}`
 		} else {
+			lib.UpdateFirestoreErr("users", *userId, map[string]interface{}{"authId": fireUser.UID})
 			result = `{"success": true}`
 		}
 	} else {
@@ -76,15 +78,15 @@ func OnboardUserFx(resp http.ResponseWriter, r *http.Request) (string, interface
 
 func GetUserByAuthIdFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	resp.Header().Set("Access-Control-Allow-Methods", "GET")
-	log.Println(r.Header.Get("uid"))
-	p, e := GetUserByAuthId(r.Header.Get("uid"))
-	jsonString, e := p.Marshal()
-	return string(jsonString), p, e
+	log.Println(r.Header.Get("authId"))
+	user, e := GetUserByAuthId(r.Header.Get("authId"))
+	jsonString, e := user.Marshal()
+	return string(jsonString), user, e
 }
 
-func GetUserByAuthId(uid string) (models.User, error) {
-	log.Println(uid)
-	userFirebase := lib.WhereLimitFirestore("users", "authId", "==", uid, 1)
+func GetUserByAuthId(authId string) (models.User, error) {
+	log.Println(authId)
+	userFirebase := lib.WhereLimitFirestore("users", "authId", "==", authId, 1)
 	var user models.User
 	user, err := models.FirestoreDocumentToUser(userFirebase)
 	return user, err

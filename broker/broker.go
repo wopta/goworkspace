@@ -21,12 +21,11 @@ func Broker(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("Broker")
 	lib.EnableCors(&w, r)
-	w.Header().Set("Access-Control-Allow-Methods", "POST")
 	route := lib.RouteData{
 
 		Routes: []lib.Route{
 			{
-				Route:   "/v1/policies/fiscalcode/:fiscalcode",
+				Route:   "/v1/policies/fiscalCode/:fiscalcode",
 				Handler: PolicyFiscalcode,
 				Method:  "GET",
 			},

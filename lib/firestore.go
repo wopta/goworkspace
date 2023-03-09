@@ -87,13 +87,31 @@ func SetFirestore(collection string, doc string, value interface{}) {
 
 	//fmt.Println(dataMap)firestore.Query
 }
+func UpdateFirestoreErr(collection string, doc string, values map[string]interface{}) error {
+	ctx := context.Background()
+	client, err := firestore.NewClient(ctx, os.Getenv("GOOGLE_PROJECT_ID"))
+	CheckError(err)
+	c := client.Collection(collection)
+	col := c.Doc(doc)
+
+	var updateValues []firestore.Update
+
+	for key, val := range values {
+		updateValues = append(updateValues, firestore.Update{Path: key, Value: val})
+	}
+
+	docsnap, err := col.Update(ctx, updateValues)
+	log.Println(docsnap)
+
+	return err
+}
 func WhereFirestore(collection string, field string, operator string, queryValue string) *firestore.DocumentIterator {
 	ctx := context.Background()
 
 	client, err := firestore.NewClient(ctx, os.Getenv("GOOGLE_PROJECT_ID"))
 	CheckError(err)
 	query := client.Collection(collection).Where(field, operator, queryValue).Documents(ctx)
-	//query.GetAll()
+	query.GetAll()
 
 	return query
 }
@@ -123,8 +141,7 @@ func WhereLimitFirestore(collection string, field string, operator string, query
 
 	client, err := firestore.NewClient(ctx, os.Getenv("GOOGLE_PROJECT_ID"))
 	CheckError(err)
-	query := client.Collection(collection).Where(field, operator, queryValue).LimitToLast(limit).Documents(ctx)
-	query.GetAll()
+	query := client.Collection(collection).Where(field, operator, queryValue).Limit(limit).Documents(ctx)
 
 	return query
 }

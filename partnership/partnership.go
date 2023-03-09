@@ -1,6 +1,7 @@
 package partnership
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -39,12 +40,11 @@ func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, inter
 		policy models.Policy
 		person models.User
 		asset  models.Asset
+		response PartnershipResponse
 	)
 	resp.Header().Set("Access-Control-Allow-Methods", "GET")
 
 	jwtData := r.URL.Query().Get("jwt")
-	fmt.Println(jwtData)
-	fmt.Println(os.Getenv("BEPROF_SIGNING_KEY"))
 
 	// decode JWT
 	// Parse takes the token string and a function for looking up the key. The latter is especially
@@ -59,8 +59,6 @@ func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, inter
 
 		return []byte(os.Getenv("BEPROF_SIGNING_KEY")), nil
 	})
-	fmt.Println(token)
-	fmt.Print(err)
 
 	if claims, ok := token.Claims.(*BeProfClaims); ok && token.Valid {
 		fmt.Print()
@@ -72,6 +70,9 @@ func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, inter
 		policy.Contractor = person
 		asset.Person = &person
 		policy.Assets = append(policy.Assets, asset)
+
+		response.Policy = policy
+		response.Step = 2
 	} else {
 		fmt.Println(err)
 		return "", nil, err
@@ -86,7 +87,7 @@ func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, inter
 
 	// call quoter
 
-	p, err := policy.Marshal()
+	p, err := json.Marshal(response)
 
 	if err != nil {
 		return "", nil, err
@@ -141,4 +142,9 @@ type BeProfClaims struct {
 	VatCode    string `json:"piva"`
 	BeProfCode string `json:"codiceBeProf"`
 	jwt.RegisteredClaims
+}
+
+type PartnershipResponse struct {
+	Policy models.Policy `json:"policy"`
+	Step   int           `json:"step"`
 }
