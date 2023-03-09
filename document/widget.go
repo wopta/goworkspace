@@ -611,15 +611,18 @@ func (skin Skin) GetHeader(m pdf.Maroto, data models.Policy, logo string, name s
 		h := []string{"I dati della tua Polizza ", "I tuoi dati"}
 		var tablePremium [][]string
 		layout := "2006-01-02"
+		if data.PaymentSplit == "montly" {
+
+		}
 		tablePremium = append(tablePremium, []string{"Numero: " + data.NumberCompany, "Contraente: " + data.Contractor.Name + " " + data.Contractor.Surname})
 		tablePremium = append(tablePremium, []string{"Decorre dal: " + data.StartDate.Format(layout) + " ore 24:00", "C.F. / P.IVA: " + data.Contractor.VatCode})
 		tablePremium = append(tablePremium, []string{"Scade il: " + data.EndDate.Format(layout) + " ore 24:00", "Indirizzo: " + data.Contractor.Address})
-		tablePremium = append(tablePremium, []string{"Si rinnova a scadenza, salvo disdetta da inviare 30 giorni prima", "XXXXX  XXXXXXXXXXXXXXXXXXX (XX)"})
-		tablePremium = append(tablePremium, []string{"Prossimo pagamento il: " + data.EndDate.String(), "Mail:  " + data.Contractor.Mail})
+		tablePremium = append(tablePremium, []string{"Si rinnova a scadenza, salvo disdetta da inviare 30 giorni prima", data.Contractor.PostalCode + " " + data.Contractor.City + " (" + data.Contractor.CityCode + ")"})
+		tablePremium = append(tablePremium, []string{"Prossimo pagamento il: " + data.EndDate.Format(layout), "Mail:  " + data.Contractor.Mail})
 		tablePremium = append(tablePremium, []string{"Sostituisce la polizza: = = = = = = = =", "Telefono: " + data.Contractor.Phone})
 		m = skin.Table(m, h, tablePremium, 6, skin.RowHeight-0.5)
 		skin.Space(m, 5.0)
-		//m.Line(skin.LineHeight, skin.Line)
+		//m.Line(skin.LineHeight, skin.Lin
 	})
 
 	return m

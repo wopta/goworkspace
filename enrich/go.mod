@@ -8,6 +8,6 @@ require (
 	firebase.google.com/go/v4 v4.10.0 // indirect
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
 	github.com/go-gota/gota v0.12.0
-	github.com/wopta/goworkspace/lib v0.0.0-20230306092537-03a16e007faf
+	github.com/wopta/goworkspace/lib v0.0.0-20230308140313-de4e9757a0d9
 
 )

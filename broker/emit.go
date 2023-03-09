@@ -19,6 +19,7 @@ import (
 func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		result EmitRequest
+		e      error
 	)
 
 	log.Println("Emit")
@@ -40,6 +41,7 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusToSign)
 	policy.PaymentSplit = result.PaymentSplit
 	policy.CompanyEmit = true
+	policy.CompanyEmitted = false
 	policy.EmitDate = time.Now()
 	policy.BigEmitDate = civil.DateTimeOf(policy.Updated)
 	if policy.Statements == nil {
@@ -63,7 +65,9 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	}
 	responseEmit := EmitResponse{UrlPay: *payRes.Payload.PaymentPageURL, UrlSign: res.Url}
 	lib.SetFirestore("policy", uid, policy)
-	e := lib.InsertRowsBigQuery("wopta", "policy", policy)
+	policyJson, e := policy.Marshal()
+	policy.Data = string(policyJson)
+	e = lib.InsertRowsBigQuery("wopta", "policy", policy)
 	mail.SendMail(getEmitMailObj(policy, responseEmit))
 	b, e := json.Marshal(responseEmit)
 	return string(b), responseEmit, e
@@ -97,7 +101,6 @@ func getEmitMailObj(policy models.Policy, emitResponse EmitResponse) mail.MailRe
 	Potrai prendere visione delle condizioni generali di servizio e delle caratteristiche tecniche.</p> 
 	<p><a class="button" href='` + emitResponse.UrlSign + `'>Firma la tua polizza:</a></p>
 	<p>Ultimata la procedura di firma potrai procedere al pagamento. nella prossima mail  </p> 
-
 	<p>Grazie per aver scelto Wopta </p> 
 	<p>Proteggiamo chi sei</p> 
 	`

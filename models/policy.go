@@ -38,16 +38,16 @@ type Policy struct {
 	Number          int                    `firestore:"number,omitempty" json:"number,omitempty" bigquery:"number"`
 	NumberCompany   string                 `firestore:"numberCompany,omitempty" json:"numberCompany,omitempty" bigquery:"numberCompany"`
 	Status          string                 `firestore:"status,omitempty" json:"status,omitempty" bigquery:"status"`
-	StatusHistory   []string               `firestore:"statusHistory,omitempty" json:"statusHistory ,omitempty" bigquery:"-"`
+	StatusHistory   []string               `firestore:"statusHistory,omitempty" json:"statusHistory,omitempty" bigquery:"-"`
 	RenewHistory    *[]RenewHistory        `firestore:"renewHistory,omitempty" json:"renewHistory,omitempty" bigquery:"-"`
 	Transactions    *[]Transaction         `firestore:"transactions,omitempty" json:"transactions,omitempty" bigquery:"-"`
 	TransactionsUid *[]string              `firestore:"transactionsUid,omitempty" json:"transactionsUid ,omitempty" bigquery:"-"`
 	Company         string                 `firestore:"company,omitempty" json:"company,omitempty" bigquery:"company"`
 	Name            string                 `firestore:"name,omitempty" json:"name,omitempty" bigquery:"name"`
 	NameDesc        string                 `firestore:"nameDesc,omitempty" json:"nameDesc,omitempty" bigquery:"nameDesc"`
-	BigStartDate    civil.DateTime         `bigquery:"startDate"`
-	BigEndDate      civil.DateTime         `bigquery:"endDate"`
-	BigEmitDate     civil.DateTime         `bigquery:"emitDate"`
+	BigStartDate    civil.DateTime         `bigquery:"startDate" firestore:"-"`
+	BigEndDate      civil.DateTime         `bigquery:"endDate" firestore:"-"`
+	BigEmitDate     civil.DateTime         `bigquery:"emitDate" firestore:"-"`
 	EmitDate        time.Time              `firestore:"emitDate,omitempty" json:"emitDate,omitempty" bigquery:"-"`
 	StartDate       time.Time              `firestore:"startDate,omitempty" json:"startDate,omitempty" bigquery:"-"`
 	EndDate         time.Time              `firestore:"endDate,omitempty" json:"endDate,omitempty" bigquery:"-"`
@@ -61,8 +61,8 @@ type Policy struct {
 	IsPay           bool                   `firestore:"isPay" json:"isPay,omitempty" bigquery:"isPay"`
 	IsAutoRenew     bool                   `firestore:"isAutoRenew,omitempty" json:"isAutoRenew,omitempty" bigquery:"isAutoRenew"`
 	IsSign          bool                   `firestore:"isSign" json:"isSign,omitempty" bigquery:"isSign"`
-	CompanyEmit     bool                   `firestore:"companyEmit" json:"companyEmit,omitempty" bigquery:"companyEmit"`
-	CompanyEmitted  bool                   `firestore:"companyEmitted" json:"companyEmitted,omitempty" bigquery:"companyEmitted"`
+	CompanyEmit     bool                   `firestore:"companyEmit" json:"companyEmit,omitempty" bigquery:"-"`
+	CompanyEmitted  bool                   `firestore:"companyEmitted" json:"companyEmitted,omitempty" bigquery:"-"`
 	CoverageType    string                 `firestore:"coverageType,omitempty" json:"coverageType,omitempty" bigquery:"coverageType"`
 	Voucher         string                 `firestore:"voucher,omitempty" json:"voucher,omitempty" bigquery:"voucher"`
 	Channel         string                 `firestore:"channel,omitempty" json:"channel,omitempty" bigquery:"channel"`
@@ -79,6 +79,7 @@ type Policy struct {
 	Attachments     *[]Attachment          `firestore:"attachments,omitempty" json:"attachments,omitempty" bigquery:"-"`
 	Assets          []Asset                `firestore:"assets,omitempty" json:"assets,omitempty" bigquery:"-"`
 	Claim           *[]Claim               `firestore:"claim,omitempty" json:"claim,omitempty" bigquery:"-"`
+	Data            string                 `bigquery:"data" firestore:"-"`
 }
 
 type RenewHistory struct {

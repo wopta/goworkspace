@@ -185,5 +185,7 @@ func (p *Fx) ReplaceAt(input string, replacement string, index int64) string {
 }
 
 func (p *Fx) RoundNear(value float64, nearest int64) float64 {
-	return math.Round(float64(value)/float64(nearest)) * float64(nearest)
+	log.Println((math.Round(float64(value)/float64(nearest)) * float64(nearest)) - float64(nearest))
+
+	return (math.Round(float64(value)/float64(nearest)) * float64(nearest)) - float64(nearest)
 }

@@ -6,6 +6,6 @@ replace github.com/wopta/goworkspace/payment => ./
 
 require (
 	firebase.google.com/go/v4 v4.10.0 // indirect
-	github.com/wopta/goworkspace/lib v0.0.0-20230306092537-03a16e007faf
-	github.com/wopta/goworkspace/models v0.0.0-20230306092537-03a16e007faf // indirect
+	github.com/wopta/goworkspace/lib v0.0.0-20230308140313-de4e9757a0d9
+	github.com/wopta/goworkspace/models v0.0.0-20230308140313-de4e9757a0d9 // indirect
 )

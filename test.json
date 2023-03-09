@@ -1,112 +1,205 @@
-"statements": [
-  {
-    "Title": "1) Scelta firma elettronica",
-    "Answer": false,
-    "Questions": [
-      {
-        "Question": "Si prende e si dà atto tra le Parti che, il contratto viene sottoscritto con Firma Elettronica Avanzata, redatto in un unico esemplare. Pertanto:",
-        "Isbold": true
+{
+  "sme": {
+    "ateco": "107110",
+    "subproductId": 35,
+    "UW_role": "Agent",
+    "company": {
+      "country": "Italy",
+      "vatnumber": {
+        "value": "01319960199"
       },
-      {
-        "Question": "dichiaro di aver ricevuto, preso visione, conoscere ed accettare le \"Condizioni Generali di Servizio per l'utilizzazione della Firma Elettronica Avanzata” prevista da Wopta e l’annessa “Scheda Tecnica Illustrativa”",
-        "Isbold": false
+      "opre_eur": {
+        "value": 270383
       },
-      {
-        "Question": "confermo la veridicità dei dati forniti, la titolarità del numero di cellulare e dell’indirizzo mail, acconsentendo al trattamento di tali dati per questa specifica finalità;",
-        "Isbold": false
-      },
-      {
-        "Question": "dichiaro altresì di avere titolo a richiedere l'attivazione e l’uso del Servizio per la sottoscrizione del presente contratto",
-        "Isbold": false
+      "employees": {
+        "value": 2
       }
-    ]
-  },
-  {
-    "Title": "2) Dichiarazioni sul rischio ",
-    "Answer": false,
-    "Questions": [
-      {
-        "Question": "Premesso di essere a conoscenza che le dichiarazioni non veritiere, inesatte o reticenti, da me rese, possono compromettere il diritto alla prestazione (come da art. 1892, 1893, 1894 c.c.), ai fini dell’efficacia delle garanzie ",
-        "Isbold": false
-      },
-      {
-        "Question": "dichiaro che:",
-        "Isbold": false
-      },
-      {
-        "Question": "l’azienda assicurata e/o gli immobili assicurati, rispondono ai requisiti indicati all’art. 9 – “requisiti di assicurabilità” delle condizioni di assicurazione;",
-        "Isbold": false
-      },
-      {
-        "Question": "che, sui medesimi rischi assicurati con la presente Polizza, nel triennio precedente:",
-        "Isbold": false
-      },
-      {
-        "Question": "NON vi sono state coperture assicurative annullate dall’assicuratore;",
-        "Isbold": false
-      },
-      {
-        "Question": "NON si sono verificati eventi dannosi di importo liquidato superiore a 1.000 €",
-        "Isbold": false
-      },
-      {
-        "Question": "al momento della stipula di questa Polizza NON ha ricevuto comunicazioni, richieste e notifiche che possano configurare un sinistro relativo alle garanzie assicurate e di non essere a conoscenza di eventi o circostanze che possano dare origine ad una richiesta di risarcimento.",
-        "Isbold": false
-      }
-    ]
-  },
-  {
-    "Title": "3) SCELTA COMUNICAZIONI VIA MAIL E ACCETTAZIONE POLIZZA",
-    "Answer": false,
-    "Questions": [
-      {
-        "Question": "Ho scelto la ricezione della seguente documentazione via e-mail al seguente indirizzo: luca.barbieri@wopta.it. Sono a conoscenza che, anche le future comunicazioni avverranno con questo mezzo e che qualora volessi modificare questa mia scelta potrò farlo scrivendo a Global Assistance, con le modalità previste nelle Condizioni di Assicurazione.",
-        "Isbold": false
-      },
-      {
-        "Question": "Confermo quindi di aver ricevuto e preso visione, prima della conclusione del contratto:",
-        "Isbold": false
-      },
-      {
-        "Question": "degli Allegati 3, 4 e 4-ter, di cui al Regolamento IVASS n. 40/2018, relativi agli obblighi informativi e di comportamento dell’Intermediario, inclusa l’informativa privacy dell’intermediario (ai sensi dell’art. 13 del regolamento UE n. 2016/679);",
-        "Isbold": false
-      },
-      {
-        "Question": "del Set informativo, identificato dal modello GA02.0922, contenente: 1) documento informativo per i prodotti assicurativi danni (DIP Danni) e documento informativo precontrattuale aggiuntivo per i prodotti assicurativi danni (DIP Aggiuntivo danni) cui al Regolamento IVASS n. 41/2018; 2) Condizioni di Assicurazione comprensive di Glossario, che dichiaro altresì di conoscere ed accettare.",
-        "Isbold": false
-      }
-    ]
-  },
-  {
-    "Title": "4) CLAUSOLE DA APPROVARE IN MODO SPECIFICO",
-    "Answer": false,
-    "Questions": [
-      {
-        "Question": "Ai sensi degli artt. 1341 e 1342 Codice Civile, dichiaro di approvare in modo specifico, le disposizioni indicate nelleCondizioni di Assicurazione con particolare riguardo agli articoli dei seguenti capitoli:",
-        "Isbold": false
-      },
-      {
-        "Question": "Art. 1.3 Revisione del Premio e/o condizioni; Art. 4 Foro competente – Arbitrato;- Art. 15.1 Recesso in caso di sinistro; Art. 64 Garanzia “Difesa Penale” – Cosa è assicurato; Art. 70 Garanzia “Difesa Penale, Civile e Circolazione” – Cosa è assicurato; Art. 73.3 Estorsione Cyber; Art. 73.9 Cyber-Crime; Art. 95.3 Procedura per la valutazione del danno; Art. 95.4 Mandato dei Periti; Art. 95.5 Determinazione del danno e valore dei beni assicurati; Art. 95.13 Titolarità dei diritti nascenti dalla Polizza; Art. 97.4 Procedura per la valutazione del danno; Art. 97.6 Operazioni peritali; Art. 97.7 determinazione del danno e valore dei beni assicurati; Art. 97.14 Titolarità dei diritti nascenti dalla Polizza; Art. 98.1 Cosa fare al momento del sinistro; Art. 100 Sezione F – Cyber-Risk; Art. 100.2 Gestione delle richieste di Risarcimento; Art. 100.4 Titolarità dei diritti nascenti dalla Polizza; Art. 102.4 Procedura per la valutazione del danno; Art. 102.6 Operazioni peritali; Art. 102.7 Determinazione del danno; Art. 102.10 Titolarità dei diritti nascenti dalla Polizza.",
-        "Isbold": false
-      }
-    ]
-  },
-  {
-    "Title": "5) PER NOI QUESTA POLIZZA FA AL CASO TUO",
-    "Answer": false,
-    "Questions": [
-      {
-        "Question": "Hai effettuato dichiarazioni relative al rischio da assicurare e scelto prestazioni e garanzie tra quelle proposte. Sulla base di tali dichiarazioni, delle tue esigenze e richieste, le soluzioni assicurative individuate e assolte dalle coperture assicurative risultano le seguenti:prestazioni di assistenza e servizio 24/7 al Fabbricato quali invio di artigiani come: idraulico, elettricista, fabbro, serrandista, vetraio, sorvegliante, nei casi indicati in polizza di necessità (la compagnia eroga direttamente la prestazione non il rimborso delle spese);  Indennizzare le spese, a seguito di un attacco informatico, per: Ripristino dei dati; Violazione della privacy e violazione di dati confidenziali; Estorsione cyber; Cyber crime; Danno reputazionale; Danni su carte di pagamento/credito (PCI-DSS), nonché danni a terzi da: Violazioni della sicurezza della rete; Danni da interruzione di attività; Danni da responsabilità multimediale;  perdite pecuniarie per il periodo di documentata inattività forzata, a seguito di un sinistro avvenuto nel Fabbricato, che abbia danneggiato i locali e/o i macchinari e/o le apparecchiature elettroniche funzionali all’Attività, indennizzabile ai sensi degli eventi garantiti alla lettera a) che precede;  Assicurare gli asset relativi alla Sede dell’Attività indicata in Polizza, in Galleria del Corso per rischi relativi a:  Danni diretti a fabbricato, causati da eventi quali: incendio, esplosione, scoppio, fulmine, conseguenti fumi, gas e vapori; eventi atmosferici quali uragano, bufera, tempesta, grandine, vento e cose trascinate da esso, tromba d’aria, gelo, sovraccarico di neve, allagamento, rottura di lastre, scariche, correnti, corto circuito ed altri fenomeni elettrici, eventi sociopolitici, quali tumulti popolari, scioperi, sommosse, atti vandalici o dolosi e atti di sabotaggio atti di terrorismo; danni da fuoriuscita di acqua condotta, e, se assicurato il fabbricato, ricerca ripristino e riparazione del danno danni a persone o cose, verificatosi in relazione alla proprietà e conduzione del Fabbricato e delle eventuali parti comuni a esso riferite/collegate  responsabilità per: la rivalsa INAIL per gli infortuni sul lavoro subiti dai prestatori di lavoro;  morte; e lesioni personali dalle quali sia derivata un'invalidità permanente ai sensi del codice civile, incluse le malattie professionali  Danni involontariamente causati a terzi per danni a cose o persone di cui sia responsabile a termini di legge (R.C.T.). La garanzia include, ma non si limita a questi, i  danni: a veicoli di terzi e prestatori di lavoro; a cose in consegna e custodia; a cose nell'ambito di esecuzione dei lavori; a cose di terzi sollevate, caricate, scaricate, movimentate, trasportate o rimorchiate; a mezzi di trasporto sotto carico e scarico; da interruzione o sospensione di attività di terzi; da smercio; da committenza autoveicoli; da responsabilità civile personale addetti; da attività di commercio ambulante; da lavori presso terzi responsabilità per danni materiali e diretti arrecati alle cose di terzi in seguito a Incendio, Esplosione o Scoppio del Fabbricato e/o Contenuto, qualora assicurati, anche quando il Fabbricato lo è nella forma di Rischio Locativo; \nLa Polizza prevede, in relazione a tutte le garanzie che precedono, l’applicazione di Scoperti, Franchigie, Limiti di indennizzo ed esclusioni, meglio riportate nelle Condizioni Generali di Assicurazione.",
-        "Isbold": true
-      },
-      {
-        "Question": "Al livello di Franchigia scelto, MEDIO-BASSO (1000€) corrisponde per ogni garanzia, nella Tabella “Scoperti e Franchigie”, il dettaglio di tutti gli Scoperti e Franchigie applicabili in caso di Sinistro, di cui l’importo qui indicato, costituisce il minimo se non diversamente specificato. Tali importi sono stati da te valutati in linea con la capacità finanziaria di sostenere in proprio tale livello di danno e rischio.",
-        "Isbold": false
-      },
-      {
-        "Question": "Con la seguente sottoscrizione dichiari che quanto precede corrisponde alle informazioni ottenute dall’intermediario, sia attraverso i documenti resi disponibili e/o inviati che nelle pagine web del sito wopta.it.",
-        "Isbold": false
-      }
-    ]
+    },
+    "answers": {
+      "step1": [
+        {
+          "slug": "third-party-liability",
+          "value": {
+            "typeOfSumInsured": "replacementValue",
+            "deductible": "1000",
+            "sumInsuredLimitOfIndemnity": 1000000
+          }
+        },
+        {
+          "slug": "employers-liability",
+          "value": {
+            "typeOfSumInsured": "replacementValue",
+            "deductible": "2600",
+            "sumInsuredLimitOfIndemnity": 1000000,
+            "selfInsurance": "0.10"
+          }
+        },
+        {
+          "slug": "legal-defence",
+          "value": {
+            "legalDefence": "basic"
+          }
+        }
+      ],
+      "step2": [
+        {
+          "buildingId": "2",
+          "value": {
+            "buildingType": "reinforcedConcrete",
+            "numberOfFloors": "first",
+            "constructionYear": "before1972",
+            "alarm": "yes",
+            "typeOfInsurance": "namedPerils",
+            "ateco": "107110",
+            "postcode": "20154",
+            "province": "MI",
+            "answer": [
+              {
+                "slug": "electronic-equipment",
+                "value": {
+                  "typeOfSumInsured": "firstLoss",
+                  "deductible": "1000",
+                  "sumInsuredLimitOfIndemnity": 25000
+                }
+              },
+              {
+                "slug": "assistance",
+                "value": {
+                  "assistance": "yes"
+                }
+              },
+              {
+                "slug": "lease-holders-interest",
+                "value": {
+                  "typeOfSumInsured": "replacementValue",
+                  "deductible": "1000",
+                  "sumInsuredLimitOfIndemnity": 555000
+                }
+              },
+              {
+                "slug": "terrorism",
+                "value": {
+                  "typeOfSumInsured": "replacementValue",
+                  "deductible": "1000",
+                  "sumInsuredLimitOfIndemnity": 0.5,
+                  "selfInsurance": "0.05"
+                }
+              },
+              {
+                "slug": "property-owners-liability",
+                "value": {
+                  "typeOfSumInsured": "replacementValue",
+                  "deductible": "1000",
+                  "sumInsuredLimitOfIndemnity": 1000000
+                }
+              },
+              {
+                "slug": "power-surge",
+                "value": {
+                  "typeOfSumInsured": "firstLoss",
+                  "deductible": "1000",
+                  "sumInsuredLimitOfIndemnity": 25000,
+                  "selfInsurance": "0.10"
+                }
+              },
+              {
+                "slug": "theft",
+                "value": {
+                  "typeOfSumInsured": "firstLoss",
+                  "deductible": "1000",
+                  "sumInsuredLimitOfIndemnity": 25000
+                }
+              },
+              {
+                "slug": "earthquake",
+                "value": {
+                  "typeOfSumInsured": "replacementValue",
+                  "deductible": "1000",
+                  "sumInsuredLimitOfIndemnity": 0.7,
+                  "selfInsurance": "0.05"
+                }
+              },
+              {
+                "slug": "glass",
+                "value": {
+                  "typeOfSumInsured": "firstLoss",
+                  "deductible": "1000",
+                  "sumInsuredLimitOfIndemnity": 2500
+                }
+              },
+              {
+                "slug": "sociopolitical-event",
+                "value": {
+                  "typeOfSumInsured": "replacementValue",
+                  "deductible": "1000",
+                  "sumInsuredLimitOfIndemnity": 684000,
+                  "selfInsurance": "0.05"
+                }
+              },
+              {
+                "slug": "machinery-breakdown",
+                "value": {
+                  "typeOfSumInsured": "firstLoss",
+                  "deductible": "1500",
+                  "sumInsuredLimitOfIndemnity": 40000
+                }
+              },
+              {
+                "slug": "atmospheric-event",
+                "value": {
+                  "typeOfSumInsured": "replacementValue",
+                  "deductible": "1500",
+                  "sumInsuredLimitOfIndemnity": 855000,
+                  "selfInsurance": "0.10"
+                }
+              },
+              {
+                "slug": "business-interruption",
+                "value": {
+                  "typeOfSumInsured": "firstLoss",
+                  "deductible": "5days",
+                  "sumInsuredLimitOfIndemnity": 25000,
+                  "dailyAllowance": "250"
+                }
+              },
+              {
+                "slug": "content",
+                "value": {
+                  "typeOfSumInsured": "replacementValue",
+                  "deductible": "1000",
+                  "sumInsuredLimitOfIndemnity": 300000
+                }
+              },
+              {
+                "slug": "burst-pipe",
+                "value": {
+                  "typeOfSumInsured": "firstLoss",
+                  "deductible": "1000",
+                  "sumInsuredLimitOfIndemnity": 50000
+                }
+              },
+              {
+                "slug": "third-party-recourse",
+                "value": {
+                  "typeOfSumInsured": "firstLoss",
+                  "deductible": "1000",
+                  "sumInsuredLimitOfIndemnity": 150000,
+                  "selfInsurance": "0.10"
+                }
+              },
+              {
+                "slug": "water-damage",
+                "value": {
+                  "typeOfSumInsured": "replacementValue",
+                  "deductible": "1000",
+                  "sumInsuredLimitOfIndemnity": 0.7,
+                  "selfInsurance": "0.05"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
   }
-]
+}

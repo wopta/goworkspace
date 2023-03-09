@@ -34,7 +34,7 @@ func Document(w http.ResponseWriter, r *http.Request) {
 				Method:  "POST",
 			},
 			{
-				Route:   "/v1/sign",
+				Route:   "/v1/sign/",
 				Handler: SignNamirial,
 				Method:  "POST",
 			},
