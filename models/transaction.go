@@ -22,8 +22,6 @@ type Transaction struct {
 	CreationDate       time.Time      `firestore:"creationDate,omitempty" json:"creationDate,omitempty" bigquery:"-"`
 	BigPayDate         civil.DateTime `bigquery:"payDate"`
 	BigCreationDate    civil.DateTime `bigquery:"creationDate"`
-	CompanyEmit        bool           `firestore:"companyEmit" json:"companyEmit,omitempty" bigquery:"companyEmit"`
-	CompanyEmitted     bool           `firestore:"companyEmitted" json:"companyEmitted,omitempty" bigquery:"companyEmitted"`
 	Uid                string         `firestore:"uid,omitempty" json:"uid,omitempty" bigquery:"uid"`
 	PolicyUid          string         `firestore:"policyUid,omitempty" json:"policyUid,omitempty" bigquery:"policyUid"`
 	Company            string         `firestore:"company,omitempty" json:"company,omitempty" bigquery:"company"`
