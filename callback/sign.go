@@ -1,11 +1,15 @@
 package callback
 
 import (
+	"context"
+	"encoding/json"
+	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
-	doc "github.com/wopta/goworkspace/document"
+	"cloud.google.com/go/storage"
 	lib "github.com/wopta/goworkspace/lib"
 	mail "github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
@@ -46,7 +50,7 @@ func Sign(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 		e = lib.InsertRowsBigQuery("wopta", "policy", policy)
 		mail.SendMail(getEmitMailObj(policy, policy.PayUrl))
 		log.Println("workstepFinished")
-		s := <-doc.GetFileV6(policy.IdSign, uid)
+		s := <-GetFileV6(policy.IdSign, uid)
 		log.Println(s)
 	}
 
@@ -75,4 +79,117 @@ func getEmitMailObj(policy models.Policy, payUrl string) mail.MailRequest {
 	obj.IsAttachment = false
 
 	return obj
+}
+func PutToStorage(bucketname string, path string, file []byte) (string, error) {
+
+	log.Println("start PutToStorage")
+	ctx := context.Background()
+	client, e := storage.NewClient(ctx)
+	bucket := client.Bucket(bucketname)
+	write := bucket.Object(path).NewWriter(ctx)
+	defer write.Close()
+	write.Write(file)
+
+	return "gs://" + bucketname + "/" + path, e
+
+}
+func GetFileV6(id string, uid string) chan string {
+	r := make(chan string)
+	log.Println("Get file: ", id)
+	go func() {
+
+		defer close(r)
+		files := <-GetFilesV6(id)
+
+		var urlstring = os.Getenv("ESIGN_BASEURL") + "v6/file/" + files.Documents[0].FileID
+		client := &http.Client{
+			Timeout: time.Second * 10,
+		}
+		req, _ := http.NewRequest(http.MethodGet, urlstring, nil)
+		req.Header.Set("apiToken", os.Getenv("ESIGN_TOKEN_API"))
+		log.Println("url parse:", req.Header)
+		res, err := client.Do(req)
+		lib.CheckError(err)
+		if res != nil {
+			body, _ := ioutil.ReadAll(res.Body)
+
+			//log.Println("Get body: ", string(body))
+			_, e := PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "document/contracts/"+uid, body)
+			lib.CheckError(e)
+			defer res.Body.Close()
+			r <- "upload done"
+
+		}
+
+	}()
+	return r
+}
+func GetFilesV6(envelopeId string) chan NamirialFiles {
+	r := make(chan NamirialFiles)
+
+	go func() {
+		defer close(r)
+		var urlstring = os.Getenv("ESIGN_BASEURL") + "v6/envelope/" + envelopeId + "/files"
+		client := &http.Client{
+			Timeout: time.Second * 10,
+		}
+		req, _ := http.NewRequest(http.MethodGet, urlstring, nil)
+		req.Header.Set("apiToken", os.Getenv("ESIGN_TOKEN_API"))
+
+		res, err := client.Do(req)
+		lib.CheckError(err)
+
+		if res != nil {
+
+			body, _ := ioutil.ReadAll(res.Body)
+			resp, _ := UnmarshalNamirialFiles(body)
+			res.Body.Close()
+
+			log.Println("body:", string(body))
+			r <- resp
+		}
+
+	}()
+	return r
+}
+func UnmarshalNamirialFiles(data []byte) (NamirialFiles, error) {
+	var r NamirialFiles
+	err := json.Unmarshal(data, &r)
+	return r, err
+}
+
+func (r *NamirialFiles) Marshal() ([]byte, error) {
+	return json.Marshal(r)
+}
+
+type NamirialFiles struct {
+	Documents      []Documents     `json:"Documents"`
+	AuditTrail     AuditTrail      `json:"AuditTrail"`
+	LegalDocuments []LegalDocument `json:"LegalDocuments"`
+}
+
+type AuditTrail struct {
+	FileID    string `json:"FileId"`
+	XMLFileID string `json:"XmlFileId"`
+}
+
+type Documents struct {
+	FileID           string       `json:"FileId"`
+	FileName         string       `json:"FileName"`
+	AuditTrailFileID string       `json:"AuditTrailFileId"`
+	Attachments      []Attachment `json:"Attachments"`
+	PageCount        int64        `json:"PageCount"`
+	DocumentNumber   int64        `json:"DocumentNumber"`
+}
+
+type Attachment struct {
+	FileID   string `json:"FileId"`
+	FileName string `json:"FileName"`
+}
+
+type LegalDocument struct {
+	FileID     string `json:"FileId"`
+	FileName   string `json:"FileName"`
+	ActivityID string `json:"ActivityId"`
+	Email      string `json:"Email"`
 }

@@ -102,13 +102,10 @@ func deleteFiles() {
 
 }
 func PutToStorage(bucketname string, path string, file []byte) string {
-	// some process request msg, decode base64 to image byte
-	// create image file in current directory with os.create()
+
 	log.Println("start PutToStorage")
 	ctx := context.Background()
 	client, err := storage.NewClient(ctx)
-
-	CheckError(err)
 	bucket := client.Bucket(bucketname)
 	write := bucket.Object(path).NewWriter(ctx)
 	defer write.Close()
@@ -124,8 +121,6 @@ func PutGoogleStorage(bucketname string, path string, file []byte, contentType s
 	ctx := context.Background()
 	client, err := storage.NewClient(ctx)
 	bucket := client.Bucket(bucketname)
-	//p:=bucket.Object(path)
-
 	write := bucket.Object(path).NewWriter(ctx)
 	write.ContentType = contentType
 	write.Close()
