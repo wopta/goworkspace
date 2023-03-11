@@ -58,7 +58,7 @@ func getSignMailObj(policy models.Policy, payUrl string) mail.MailRequest {
 	obj.From = "noreply@wopta.it"
 	obj.To = []string{policy.Contractor.Mail}
 	obj.Message = `<p>Ciao ` + policy.Contractor.Name + `` + policy.Contractor.Surname + ` </p>
-	<p>Polizza n° ` + policy.NumberCompany + `</p> 
+	<p>Polizza n° ` + policy.CodeCompany + `</p> 
 	<p>Grazie per aver scelto uno dei nostri prodotti Wopta per te</p> 
 	<p>Puoi ora procedere al pagamento della polizza in oggetto. Qui trovi il link per
 	 accedere alla procedura semplice e guidata 

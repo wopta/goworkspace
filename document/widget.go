@@ -614,7 +614,7 @@ func (skin Skin) GetHeader(m pdf.Maroto, data models.Policy, logo string, name s
 		if data.PaymentSplit == "montly" {
 
 		}
-		tablePremium = append(tablePremium, []string{"Numero: " + data.NumberCompany, "Contraente: " + data.Contractor.Name + " " + data.Contractor.Surname})
+		tablePremium = append(tablePremium, []string{"Numero: " + data.CodeCompany, "Contraente: " + data.Contractor.Name + " " + data.Contractor.Surname})
 		tablePremium = append(tablePremium, []string{"Decorre dal: " + data.StartDate.Format(layout) + " ore 24:00", "C.F. / P.IVA: " + data.Contractor.VatCode})
 		tablePremium = append(tablePremium, []string{"Scade il: " + data.EndDate.Format(layout) + " ore 24:00", "Indirizzo: " + data.Contractor.Address})
 		tablePremium = append(tablePremium, []string{"Si rinnova a scadenza, salvo disdetta da inviare 30 giorni prima", data.Contractor.PostalCode + " " + data.Contractor.City + " (" + data.Contractor.CityCode + ")"})

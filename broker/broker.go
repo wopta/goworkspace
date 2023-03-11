@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strconv"
 
 	"cloud.google.com/go/firestore"
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
@@ -63,15 +62,20 @@ type BrokerResponse struct {
 	Bytes         string `json:"bytes"`
 }
 
-func GetSequenceByProduct(name string) (string, int) {
-	var companyDefault string
+func GetSequenceByCompany(name string) (string, int, int) {
+	var (
+		codeCompany    string
+		companyDefault int
+		companyPrefix  string
+		numberCompany  int
+		number         int
+	)
 	switch name {
 	case "global":
-		companyDefault = "0"
+		companyDefault = 0
+		companyPrefix = "WB"
 	}
 
-	var numberCompany string
-	var number int
 	rn, e := lib.OrderWhereLimitFirestoreErr("policy", "company", "numberCompany", "==", name, firestore.Desc, 1)
 	lib.CheckError(e)
 	policy := models.PolicyToListData(rn)
@@ -80,9 +84,8 @@ func GetSequenceByProduct(name string) (string, int) {
 		//WE0000001
 		numberCompany = companyDefault
 	} else {
-		intNumberCompany, e := strconv.Atoi(policy[0].NumberCompany)
-		lib.CheckError(e)
-		numberCompany = fmt.Sprintf("%07d", intNumberCompany+1)
+		numberCompany = policy[0].NumberCompany + 1
+		codeCompany = companyPrefix + fmt.Sprintf("%07d", numberCompany)
 		number = policy[0].Number + 1
 	}
 	r, e := lib.OrderLimitFirestoreErr("policy", "number", firestore.Desc, 1)
@@ -94,9 +97,9 @@ func GetSequenceByProduct(name string) (string, int) {
 
 		number = policyCompany[0].Number + 1
 	}
-	log.Println("GetSequenceByProduct: ", number)
+	log.Println("GetSequenceByCompany: ", number)
 
-	return numberCompany, number
+	return codeCompany, numberCompany, number
 }
 func GetSequenceProposal(name string) int {
 	var number int

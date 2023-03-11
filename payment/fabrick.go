@@ -135,7 +135,7 @@ func getfabbricPayments(data model.Policy, firstSchedule bool, scheduleDate stri
 	bill.ExternalID = externalId
 	bill.Amount = amount
 	bill.Currency = "EUR"
-	bill.Description = "Pagamento polizza n° " + data.NumberCompany
+	bill.Description = "Pagamento polizza n° " + data.CodeCompany
 
 	bill.MandateCreation = mandate
 

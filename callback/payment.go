@@ -135,7 +135,7 @@ func getPayMailObj(policy models.Policy, payUrl string, at string) mail.MailRequ
 	obj.From = "noreply@wopta.it"
 	obj.To = []string{policy.Contractor.Mail}
 	obj.Message = `<p>Ciao ` + policy.Contractor.Name + `` + policy.Contractor.Surname + ` </p>
-	<p>Polizza n° ` + policy.NumberCompany + `</p> 
+	<p>Polizza n° ` + policy.CodeCompany + `</p> 
 	<p>la tua tua polizza è attiva</p> 
 	
 	<p>A seguito.</p>

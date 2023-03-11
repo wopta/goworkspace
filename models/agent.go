@@ -67,7 +67,7 @@ func SetAgentPolicy(policy Policy, amount float64, schedule string) Transaction 
 		Status:        TransactionStatusToPay,
 		StatusHistory: []string{TransactionStatusToPay},
 		ScheduleDate:  schedule,
-		NumberCompany: policy.NumberCompany,
+		NumberCompany: policy.CodeCompany,
 		IsPay:         false,
 		Name:          policy.Contractor.Name + " " + policy.Contractor.Surname,
 	}

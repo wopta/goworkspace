@@ -36,7 +36,8 @@ type Policy struct {
 	ProposalNumber  int                    `firestore:"proposalNumber,omitempty" json:"proposalNumber,omitempty" bigquery:"proposalNumber"`
 	OfferlName      string                 `firestore:"offerName,omitempty" json:"offerName,omitempty" bigquery:"offerName"`
 	Number          int                    `firestore:"number,omitempty" json:"number,omitempty" bigquery:"number"`
-	NumberCompany   string                 `firestore:"numberCompany,omitempty" json:"numberCompany,omitempty" bigquery:"numberCompany"`
+	NumberCompany   int                    `firestore:"numberCompany,omitempty" json:"numberCompany,omitempty" bigquery:"numberCompany"`
+	CodeCompany     string                 `firestore:"codeCompany,omitempty" json:"codeCompany,omitempty" bigquery:"codeCompany"`
 	Status          string                 `firestore:"status,omitempty" json:"status,omitempty" bigquery:"status"`
 	StatusHistory   []string               `firestore:"statusHistory,omitempty" json:"statusHistory,omitempty" bigquery:"-"`
 	RenewHistory    *[]RenewHistory        `firestore:"renewHistory,omitempty" json:"renewHistory,omitempty" bigquery:"-"`

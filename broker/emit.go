@@ -50,9 +50,10 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	policy.DocumentName = p.LinkGcs
 	_, res, _ := doc.NamirialOtpV6(policy)
 	policy.ContractFileId = res.FileId
-	company, numb := GetSequenceByProduct("global")
-	policy.Number = numb
-	policy.NumberCompany = company
+	company, numb, tot := GetSequenceByCompany("global")
+	policy.Number = tot
+	policy.NumberCompany = numb
+	policy.CodeCompany = company
 	policy.IdSign = res.EnvelopeId
 	var payRes pay.FabrickPaymentResponse
 	if policy.PaymentSplit == string(models.PaySplitYear) {
@@ -92,7 +93,7 @@ func getEmitMailObj(policy models.Policy, emitResponse EmitResponse) mail.MailRe
 	obj.From = "noreply@wopta.it"
 	obj.To = []string{policy.Contractor.Mail}
 	obj.Message = `<p>Ciao ` + policy.Contractor.Name + `` + policy.Contractor.Surname + ` </p>
-	<p>Polizza n° ` + policy.NumberCompany + `</p> 
+	<p>Polizza n° ` + policy.CodeCompany + `</p> 
 	<p>Grazie per aver scelto uno dei nostri prodotti Wopta per te</p> 
 	<p>Puoi ora procedere alla firma della polizza in oggetto. Qui trovi il link per
 	 accedere alla procedura semplice e guidata di firma elettronica avanzata tramite utilizzo di
