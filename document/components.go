@@ -5,6 +5,7 @@ import (
 	"github.com/johnfercher/maroto/pkg/consts"
 	"github.com/johnfercher/maroto/pkg/pdf"
 	"github.com/johnfercher/maroto/pkg/props"
+	lib "github.com/wopta/goworkspace/lib"
 	//model "github.com/wopta/goworkspace/models"
 )
 
@@ -315,12 +316,20 @@ func (s Skin) SignDouleLine(m pdf.Maroto, name string, name2 string, id string, 
 		Family: consts.Courier,
 		Color:  s.TextColor,
 	}
+
 	m.Row(15, func() {
 		m.Col(6, func() {
 			m.Signature(name, signProps)
 
 		})
 		m.Col(6, func() {
+
+			_ = m.FileImage(lib.GetAssetPathByEnv("document")+"/firma_global.png", props.Rect{
+				Left:    20,
+				Top:     -20,
+				Center:  false,
+				Percent: 100,
+			})
 
 			m.Signature(name2, signProps)
 		})

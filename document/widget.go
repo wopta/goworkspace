@@ -72,6 +72,7 @@ func (s Skin) Stantement(m pdf.Maroto, title string, data models.Statement) pdf.
 	for i, v := range *data.Questions {
 		qlen := len(*data.Questions)
 		nextI := 1
+		s.checkPageNext(m, (*d)[nextI].Question)
 		if qlen == i-1 {
 			nextI = i - 1
 		} else {
@@ -95,7 +96,6 @@ func (s Skin) Stantement(m pdf.Maroto, title string, data models.Statement) pdf.
 			//m.SetBackgroundColor(magenta)
 		})
 		m = s.Space(m, 0.3)
-		s.checkPageNext(m, (*d)[nextI].Question)
 
 	}
 	return m
@@ -392,7 +392,7 @@ func (s Skin) CoveragesPmiTable(m pdf.Maroto, data models.Policy) pdf.Maroto {
 		var isOptionShow bool
 		mapg := make(map[string][][]string)
 		mapprice := make(map[string]float64)
-
+		var firecount int
 		sort.Slice(A.Guarantees, func(i, j int) bool {
 
 			return product.Companies[0].GuaranteesMap[A.Guarantees[i].Slug].OrderAsset < product.Companies[0].GuaranteesMap[A.Guarantees[j].Slug].OrderAsset
@@ -415,7 +415,7 @@ func (s Skin) CoveragesPmiTable(m pdf.Maroto, data models.Policy) pdf.Maroto {
 					mapg[group][0] = make([]string, 8)
 					mapg[group][1] = make([]string, 8)
 					mapg[group][0][4] = guarance.CompanyName
-					mapg[group][1][4] = "€ " + humanize.FormatFloat("#.###,##", k.SumInsuredLimitOfIndemnity)
+					mapg[group][1][4] = "€ " + humanize.FormatInteger("#.###,", int(k.SumInsuredLimitOfIndemnity))
 				}
 				mapg[group][2][0] = "Sono attive le seguenti opzioni / estensioni:"
 				mapg[group][2][1] = "Danni ai veicoli in consegna e custodia: " + existGuarance(ExistGuarance(A.Guarantees, "damage-to-goods-in-custody"))
@@ -438,7 +438,7 @@ func (s Skin) CoveragesPmiTable(m pdf.Maroto, data models.Policy) pdf.Maroto {
 				}
 
 				mapg[group][0] = append(mapg[group][0], guarance.CompanyName)
-				mapg[group][1] = append(mapg[group][1], "€ "+humanize.FormatFloat("#.###,##", SumInsuredLimitOfIndemnity))
+				mapg[group][1] = append(mapg[group][1], "€ "+humanize.FormatInteger("#.###,", int(SumInsuredLimitOfIndemnity)))
 
 				mapg[group][2] = append(mapg[group][2], "E’ attiva la garanzia:")
 				mapg[group][2] = append(mapg[group][2], detail)
@@ -448,8 +448,22 @@ func (s Skin) CoveragesPmiTable(m pdf.Maroto, data models.Policy) pdf.Maroto {
 				}
 
 			} else if group == "FIRE" && !guarance.IsExtension {
+				if firecount == 0 {
+					mapg[group][0] = append(mapg[group][0], "")
+					mapg[group][1] = append(mapg[group][1], "")
+					mapg[group][0] = append(mapg[group][0], "")
+					mapg[group][1] = append(mapg[group][1], "")
+					mapg[group][0] = append(mapg[group][0], "")
+					mapg[group][1] = append(mapg[group][1], "")
+					mapg[group][0] = append(mapg[group][0], "")
+					mapg[group][1] = append(mapg[group][1], "")
+					mapg[group][0] = append(mapg[group][0], "")
+					mapg[group][1] = append(mapg[group][1], "")
+					firecount++
+				}
 				mapg[group][0] = append(mapg[group][0], guarance.CompanyName)
-				mapg[group][1] = append(mapg[group][1], "€ "+humanize.FormatFloat("#.###,##", k.SumInsuredLimitOfIndemnity))
+				mapg[group][1] = append(mapg[group][1], "€ "+humanize.FormatInteger("#.###,", int(k.SumInsuredLimitOfIndemnity)))
+
 				if !isOptionShow {
 					mapg[group][2] = append(mapg[group][2], "Forma di Assicurazione: VALORE INTERO ")
 					mapg[group][2] = append(mapg[group][2], "Formula di copertura: RISCHI NOMINATI ")
@@ -473,24 +487,24 @@ func (s Skin) CoveragesPmiTable(m pdf.Maroto, data models.Policy) pdf.Maroto {
 				mapg[group][2] = append(mapg[group][2], text)
 			} else if group == "THEFT" {
 				mapg[group][0] = append(mapg[group][0], guarance.CompanyName)
-				mapg[group][1] = append(mapg[group][1], "€ "+humanize.FormatFloat("#.###,##", k.SumInsuredLimitOfIndemnity))
+				mapg[group][1] = append(mapg[group][1], "€ "+humanize.FormatInteger("#.###,", int(k.SumInsuredLimitOfIndemnity)))
 				if len(mapg[group][2]) == 1 {
 					mapg[group][2] = append(mapg[group][2], "Sono attive le garanzie opzionali:")
 				}
-				mapg[group][2] = append(mapg[group][2], k.CompanyName+": fino a  "+humanize.FormatFloat("#.###,##", k.SumInsuredLimitOfIndemnity)+"€ ")
+				mapg[group][2] = append(mapg[group][2], k.CompanyName+": fino a  "+humanize.FormatInteger("#.###,", int(k.SumInsuredLimitOfIndemnity))+"€ ")
 
 			} else if group == "ELETRONIC" {
 				mapg[group][0] = append(mapg[group][0], guarance.CompanyName)
-				mapg[group][1] = append(mapg[group][1], "€ "+humanize.FormatFloat("#.###,##", k.SumInsuredLimitOfIndemnity))
+				mapg[group][1] = append(mapg[group][1], "€ "+humanize.FormatInteger("#.###,", int(k.SumInsuredLimitOfIndemnity)))
 				if len(mapg[group][2]) == 1 {
 					mapg[group][2] = append(mapg[group][2], "Sono attive le garanzie opzionali:")
 				}
 
-				mapg[group][2] = append(mapg[group][2], k.CompanyName+": fino a  "+humanize.FormatFloat("#.###,##", k.SumInsuredLimitOfIndemnity)+"€ ")
+				mapg[group][2] = append(mapg[group][2], k.CompanyName+": fino a  "+humanize.FormatInteger("#.###,", int(k.SumInsuredLimitOfIndemnity))+"€ ")
 
 			} else if group == "BUSINESS INTERRUPTTION" {
 				mapg[group][0] = append(mapg[group][0], guarance.CompanyName)
-				mapg[group][1] = append(mapg[group][1], "€ "+humanize.FormatFloat("#.###,##", k.SumInsuredLimitOfIndemnity))
+				mapg[group][1] = append(mapg[group][1], "€ "+humanize.FormatInteger("#.###,", int(k.SumInsuredLimitOfIndemnity)))
 				mapg[group][2] = append(mapg[group][2], "La garanzia opera con una franchigia di 10 giorni ")
 				mapg[group][2] = append(mapg[group][2], "ed un massimo indennizzo di 1.000 € al giorno ")
 
@@ -502,7 +516,7 @@ func (s Skin) CoveragesPmiTable(m pdf.Maroto, data models.Policy) pdf.Maroto {
 			} else {
 				if !guarance.IsExtension {
 					mapg[group][0] = append(mapg[group][0], guarance.CompanyName)
-					mapg[group][1] = append(mapg[group][1], "€ "+humanize.FormatFloat("#.###,##", k.SumInsuredLimitOfIndemnity))
+					mapg[group][1] = append(mapg[group][1], "€ "+humanize.FormatInteger("#.###,", int(k.SumInsuredLimitOfIndemnity)))
 					mapg[group][2] = append(mapg[group][2], "= = = = = = = = = = = = = = = =")
 				}
 
@@ -610,7 +624,7 @@ func (skin Skin) GetHeader(m pdf.Maroto, data models.Policy, logo string, name s
 		skin.Space(m, 5.0)
 		h := []string{"I dati della tua Polizza ", "I tuoi dati"}
 		var tablePremium [][]string
-		layout := "2006-01-02"
+		layout := "02/01/2006"
 		if data.PaymentSplit == "montly" {
 
 		}

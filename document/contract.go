@@ -68,7 +68,6 @@ func ContractObj(data model.Policy) <-chan DocumentResponse {
 			m = skin.GetPmi(data, m)
 			m = skin.Space(m, 5.0)
 			m = skin.CoveragesPmiTable(m, data)
-			skin.checkPage(m)
 
 		}
 
