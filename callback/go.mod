@@ -6,10 +6,8 @@ replace github.com/wopta/goworkspace/callback => ./
 
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
-	github.com/wopta/goworkspace/document v0.1.0  
-	github.com/wopta/goworkspace/lib v0.1.0
-	github.com/wopta/goworkspace/mail v0.1.0
-	github.com/wopta/goworkspace/models v0.1.0
+	github.com/wopta/goworkspace v0.1.1
+
 
 )
 
