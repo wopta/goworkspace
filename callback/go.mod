@@ -6,10 +6,10 @@ replace github.com/wopta/goworkspace/callback => ./
 
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
-	github.com/wopta/goworkspace/document v0.0.0-20230312183740-9af999172def
-	github.com/wopta/goworkspace/lib v0.0.0-20230312183740-9af999172def
-	github.com/wopta/goworkspace/mail v0.0.0-20230312183740-9af999172def
-	github.com/wopta/goworkspace/models v0.0.0-20230312183740-9af999172def
+	github.com/wopta/goworkspace/document v0.0.0-20230313084004-075b5bc94c61
+	github.com/wopta/goworkspace/lib v0.0.0-20230313084004-075b5bc94c61
+	github.com/wopta/goworkspace/mail v0.0.0-20230313084004-075b5bc94c61
+	github.com/wopta/goworkspace/models v0.0.0-20230313084004-075b5bc94c61
 
 )
 
@@ -61,7 +61,7 @@ require (
 	github.com/sergi/go-diff v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
-	github.com/wopta/goworkspace/product v0.0.0-20230312183525-add3244c515e // indirect
+	github.com/wopta/goworkspace/product v0.0.0-20230312183740-9af999172def // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
 	github.com/xuri/excelize/v2 v2.7.0 // indirect
