@@ -2,20 +2,14 @@ package lib
 
 import (
 	"bytes"
-	"context"
-	"encoding/csv"
 	"io"
 	"log"
 	"os"
 
 	"github.com/go-gota/gota/dataframe"
-	dfgo "github.com/rocketlaunchr/dataframe-go"
 )
 
 //import "github.com/go-gota/gota/series"
-func NewDf() *dfgo.DataFrame {
-	return dfgo.NewDataFrame()
-}
 
 func CsvToDataframe(data []byte) dataframe.DataFrame {
 	reader := bytes.NewReader(data)
@@ -56,26 +50,8 @@ func FilesToDf(filenames []string) dataframe.DataFrame {
 	return df
 }
 
-type CSVExportOptions struct {
-
-	// NullString is used to set what nil values should be encoded to.
-	// Common options are NULL, \N, NaN, NA.
-	NullString *string
-
-	// Range is used to export a subset of rows from the dataframe.
-	Range dfgo.Range
-
-	// Separator is the field delimiter. A common option is ',', which is
-	// the default if CSVExportOptions is not provided.
-	Separator rune
-
-	// UseCRLF determines the line terminator.
-	// When true, it is set to \r\n.
-	UseCRLF bool
-}
-
 // ExportToCSV exports a Dataframe to a CSV file.
-func ExportToCSV(ctx context.Context, w io.Writer, df *dfgo.DataFrame, options ...CSVExportOptions) error {
+/*func ExportToCSV(ctx context.Context, w io.Writer, df *dfgo.DataFrame, options ...CSVExportOptions) error {
 
 	df.Lock()
 	defer df.Unlock()
@@ -155,4 +131,4 @@ func ExportToCSV(ctx context.Context, w io.Writer, df *dfgo.DataFrame, options .
 	}
 
 	return nil
-}
+}*/
