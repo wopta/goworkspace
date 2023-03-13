@@ -8,9 +8,9 @@ require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
 	github.com/dustin/go-humanize v1.0.1
 	github.com/johnfercher/maroto v0.38.0
-	github.com/wopta/goworkspace/lib v0.0.0-20230313084004-075b5bc94c61
-	github.com/wopta/goworkspace/models v0.0.0-20230313084004-075b5bc94c61
-	github.com/wopta/goworkspace/product v0.0.0-20230313084004-075b5bc94c61
+	github.com/wopta/goworkspace/lib v1.0.0
+	github.com/wopta/goworkspace/models v1.0.0
+	github.com/wopta/goworkspace/product v1.0.0
 )
 
 require (

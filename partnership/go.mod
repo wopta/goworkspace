@@ -7,8 +7,8 @@ replace github.com/wopta/goworkspace/partnership => ./
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
 	github.com/golang-jwt/jwt/v4 v4.4.2
-	github.com/wopta/goworkspace/lib v0.0.0-20230228170918-f199439435a2
-	github.com/wopta/goworkspace/models v0.0.0-20230228170918-f199439435a2
+	github.com/wopta/goworkspace/lib v1.0.0
+	github.com/wopta/goworkspace/models v1.0.1
 )
 
 require (
@@ -35,22 +35,18 @@ require (
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.2.0 // indirect
 	github.com/googleapis/gax-go/v2 v2.7.0 // indirect
-	github.com/guptarohit/asciigraph v0.5.1 // indirect
 	github.com/hyperjumptech/grule-rule-engine v1.12.0 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
 	github.com/json-iterator/go v1.1.10 // indirect
 	github.com/kevinburke/ssh_config v0.0.0-20190725054713-01f96b0aa0cd // indirect
 	github.com/kr/fs v0.1.0 // indirect
-	github.com/mattn/go-runewidth v0.0.7 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180228061459-e0a39a4cb421 // indirect
 	github.com/modern-go/reflect2 v0.0.0-20180701023420-4b7aa43c6742 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
-	github.com/olekukonko/tablewriter v0.0.4 // indirect
 	github.com/pkg/sftp v1.13.5 // indirect
 	github.com/richardlehane/mscfb v1.0.4 // indirect
 	github.com/richardlehane/msoleps v1.0.3 // indirect
-
 	github.com/sergi/go-diff v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
@@ -63,7 +59,6 @@ require (
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.21.0 // indirect
 	golang.org/x/crypto v0.5.0 // indirect
-	golang.org/x/exp v0.0.0-20200331195152-e8c3332aa8e5 // indirect
 	golang.org/x/net v0.5.0 // indirect
 	golang.org/x/oauth2 v0.0.0-20221014153046-6fdb5e3db783 // indirect
 	golang.org/x/sync v0.1.0 // indirect
