@@ -8,12 +8,11 @@ require (
 	cloud.google.com/go v0.105.0
 	cloud.google.com/go/firestore v1.9.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
-		github.com/wopta/goworkspace/document v1.0.1
+	github.com/wopta/goworkspace/document v1.0.1
 	github.com/wopta/goworkspace/lib v1.0.0
 	github.com/wopta/goworkspace/mail v1.0.1
 	github.com/wopta/goworkspace/models v1.0.1
-
-	github.com/wopta/goworkspace/payment v1.0.0
+	github.com/wopta/goworkspace/payment v1.0.1
 )
 
 require (
