@@ -61,7 +61,6 @@ func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, inter
 	})
 
 	if claims, ok := token.Claims.(*BeProfClaims); ok && token.Valid {
-		fmt.Print()
 		person.Name = claims.Name
 		person.Surname = claims.Surname
 		person.Mail = claims.Mail
@@ -72,7 +71,7 @@ func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, inter
 		policy.Assets = append(policy.Assets, asset)
 
 		response.Policy = policy
-		response.Step = 2
+		response.Step = 1
 	} else {
 		fmt.Println(err)
 		return "", nil, err
@@ -105,7 +104,7 @@ func extractBirthdateFromItalianFiscalCode(fiscalCode string) time.Time {
 		day -= 40
 	}
 
-	if year < 40 {
+	if year < time.Now().Year() - 2000 {
 		year += 2000
 	} else {
 		year += 1900
