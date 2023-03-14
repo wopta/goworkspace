@@ -30,7 +30,7 @@ type Guarante struct {
 	Your                       *GuaranteValue             `firestore:"your,omitempty" json:"your,omitempty"`
 	Premium                    *GuaranteValue             `firestore:"premium,omitempty" json:"premium,omitempty"`
 	Name                       string                     `firestore:"name,omitempty" json:"name,omitempty"`
-	SumInsuredLimitOfIndemnity float64                    `json:"sumInsuredLimitOfIndemnity,omitempty" json:"sumInsuredLimitOfIndemnity,omitempty"`
+	SumInsuredLimitOfIndemnity float64                    `json:"sumInsuredLimitOfIndemnity" json:"sumInsuredLimitOfIndemnity,omitempty"`
 	Deductible                 string                     `firestore:"deductible" json:"deductible,omitempty"`
 	DeductibleDesc             string                     `firestore:"deductibleDesc" json:"deductibleDesc,omitempty"`
 	SelfInsurance              string                     `firestore:"selfInsurance" json:"selfInsurance,omitempty"`
