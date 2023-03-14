@@ -1,14 +1,14 @@
 package models
 
 type Guarante struct {
-	DailyAllowance             string                     `firestore:"dailyAllowance,omitempty" json:"dailyAllowance,omitempty"`
+	DailyAllowance             string                     `firestore:"dailyAllowance" json:"dailyAllowance,omitempty"`
 	OrderAsset                 int                        `firestore:"orderAsset,omitempty" json:"orderAsset,omitempty"`
-	LegalDefence               string                     `firestore:"legalDefence,omitempty" json:"legalDefence,omitempty"`
-	Assistance                 string                     `firestore:"assistance ,omitempty" json:"assistance ,omitempty"`
+	LegalDefence               string                     `firestore:"legalDefence" json:"legalDefence,omitempty"`
+	Assistance                 string                     `firestore:"assistance " json:"assistance ,omitempty"`
 	Type                       string                     `firestore:"type,omitempty" json:"type,omitempty"`
 	Beneficiary                *User                      `firestore:"beneficiary,omitempty" json:"beneficiary,omitempty"`
 	Beneficiaries              *[]User                    `firestore:"beneficiaries,omitempty" json:"beneficiaries,omitempty"`
-	TypeOfSumInsured           string                     `firestore:"typeOfSumInsured,omitempty" json:"typeOfSumInsured,omitempty"`
+	TypeOfSumInsured           string                     `firestore:"typeOfSumInsured" json:"typeOfSumInsured,omitempty"`
 	Description                string                     `firestore:"description,omitempty" json:"description,omitempty"`
 	ContractDetail             string                     `firestore:"contractDetail,omitempty" json:"contractDetail,omitempty"`
 	CompanyCodec               string                     `firestore:"companyCodec,omitempty" json:"companyCodec,omitempty"`
@@ -19,7 +19,7 @@ type Guarante struct {
 	ExtraValue                 string                     `firestore:"extraValue,omitempty" json:"extraValue,omitempty"`
 	ValueDesc                  string                     `firestore:"valueDesc,omitempty" json:"valueDesc,omitempty"`
 	Offer                      *map[string]*GuaranteValue `firestore:"offer,omitempty" json:"offer,omitempty"`
-	Slug                       string                     `firestore:"slug,omitempty" json:"slug,omitempty"`
+	Slug                       string                     `firestore:"slug" json:"slug,omitempty"`
 	IsMandatory                bool                       `firestore:"isMandatory ,omitempty" json:"isMandatory ,omitempty"`
 	IsExtension                bool                       `firestore:"isExtension,omitempty" json:"isExtension,omitempty"`
 	IsBase                     bool                       `firestore:"isBase,omitempty" json:"isBase,omitempty"`
@@ -31,10 +31,10 @@ type Guarante struct {
 	Premium                    *GuaranteValue             `firestore:"premium,omitempty" json:"premium,omitempty"`
 	Name                       string                     `firestore:"name,omitempty" json:"name,omitempty"`
 	SumInsuredLimitOfIndemnity float64                    `json:"sumInsuredLimitOfIndemnity,omitempty" json:"sumInsuredLimitOfIndemnity,omitempty"`
-	Deductible                 string                     `firestore:"deductible,omitempty" json:"deductible,omitempty"`
-	DeductibleDesc             string                     `firestore:"deductibleDesc,omitempty" json:"deductibleDesc,omitempty"`
-	SelfInsurance              string                     `firestore:"selfInsurance,omitempty" json:"selfInsurance,omitempty"`
-	SelfInsuranceDesc          string                     `firestore:"selfInsuranceDesc,omitempty" json:"selfInsuranceDesc,omitempty"`
+	Deductible                 string                     `firestore:"deductible" json:"deductible,omitempty"`
+	DeductibleDesc             string                     `firestore:"deductibleDesc" json:"deductibleDesc,omitempty"`
+	SelfInsurance              string                     `firestore:"selfInsurance" json:"selfInsurance,omitempty"`
+	SelfInsuranceDesc          string                     `firestore:"selfInsuranceDesc" json:"selfInsuranceDesc,omitempty"`
 	Tax                        float64                    `json:"tax,omitempty" json:"tax,omitempty"`
 	Taxs                       []Tax                      `json:"taxs,omitempty" json:"taxs,omitempty"`
 	Price                      float64                    `firestore:"price,omitempty" json:"price,omitempty"`
