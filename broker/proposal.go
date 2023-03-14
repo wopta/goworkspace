@@ -15,11 +15,12 @@ import (
 
 func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println("Proposal")
+	log.Println("--------------------------Proposal-------------------------------------------")
 	var policy models.Policy
 	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
 	e := json.Unmarshal([]byte(req), &policy)
 	j, e := policy.Marshal()
-	log.Println("request proposal: ", string(j))
+	log.Println("Proposal request proposal: ", string(j))
 	defer r.Body.Close()
 	policy.Updated = time.Now()
 	policy.CreationDate = time.Now()
@@ -33,7 +34,7 @@ func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	log.Println("Proposal save")
 	ref, _ := lib.PutFirestore("policy", policy)
 	ref2, _ := lib.PutFirestore("users", policy.Contractor)
-	log.Println("User uid", ref2)
+	log.Println("Proposal User uid", ref2)
 	policy.BigStartDate = civil.DateTimeOf(policy.StartDate)
 	policy.BigEndDate = civil.DateTimeOf(policy.EndDate)
 
@@ -43,7 +44,7 @@ func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	e = lib.InsertRowsBigQuery("wopta", "policy", policy)
 	log.Println(ref.ID + " Proposal sand mail")
 	mail.SendMail(getProposalMailObj(policy))
-	log.Println(ref.ID)
+	log.Println("Proposal ", ref.ID)
 
 	return `{"uid":"` + ref.ID + `"}`, policy, e
 }

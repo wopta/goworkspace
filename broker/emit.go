@@ -21,15 +21,17 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 		e      error
 	)
 
-	log.Println("Emit")
+	log.Println("--------------------------Emit-------------------------------------------")
 	request := lib.ErrorByte(ioutil.ReadAll(r.Body))
-	log.Println(string(request))
+	log.Println("Emit", string(request))
 	json.Unmarshal([]byte(request), &result)
 	uid := result.Uid
-	log.Println(uid)
+	log.Println("Emit", uid)
 	var policy models.Policy
 	docsnap := lib.GetFirestore("policy", string(uid))
 	docsnap.DataTo(&policy)
+	policyJsonLog, e := policy.Marshal()
+	log.Println("Emit get policy "+uid, string(policyJsonLog))
 	policy.IsSign = false
 	policy.IsPay = false
 	policy.Updated = time.Now()
@@ -46,7 +48,7 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 		policy.Statements = result.Statements
 	}
 	p := <-doc.ContractObj(policy)
-	log.Println(p.LinkGcs)
+
 	policy.DocumentName = p.LinkGcs
 	_, res, _ := doc.NamirialOtpV6(policy)
 	policy.ContractFileId = res.FileId
@@ -64,10 +66,10 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	}
 	responseEmit := EmitResponse{UrlPay: *payRes.Payload.PaymentPageURL, UrlSign: res.Url}
 	policyJson, e := policy.Marshal()
-	log.Println("save firestore: ", string(policyJson))
+	log.Println("Emit policy "+uid, string(policyJson))
 	lib.SetFirestore("policy", uid, policy)
 	policy.Data = string(policyJson)
-	log.Println("save big query: ")
+	log.Println("Emit policy save big query: " + uid)
 	e = lib.InsertRowsBigQuery("wopta", "policy", policy)
 	mail.SendMail(getEmitMailObj(policy, responseEmit))
 	b, e := json.Marshal(responseEmit)
