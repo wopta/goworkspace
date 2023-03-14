@@ -115,6 +115,13 @@ func WhereFirestore(collection string, field string, operator string, queryValue
 
 	return query
 }
+func QueryWhereFirestore(collection string, field string, operator string, queryValue string) (*firestore.DocumentIterator, error) {
+	ctx := context.Background()
+	client, err := firestore.NewClient(ctx, os.Getenv("GOOGLE_PROJECT_ID"))
+	query := client.Collection(collection).Where(field, operator, queryValue).Documents(ctx)
+
+	return query, err
+}
 func (queries *Firequeries) FirestoreWherefields(collection string) *firestore.DocumentIterator {
 	ctx := context.Background()
 	var query firestore.Query

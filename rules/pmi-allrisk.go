@@ -716,7 +716,7 @@ func initCoverage() map[string]*Coverage {
 		Type:                       "building",
 		Group:                      "FIRE",
 		IsExtension:                true,
-		CompanyCodec:               "GGU",
+		CompanyCodec:               "GU",
 		CompanyName:                "Guasti Macchine",
 		TypeOfSumInsured:           "firstLoss",
 		Deductible:                 "0",

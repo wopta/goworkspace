@@ -79,11 +79,11 @@ func GetNameFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, 
 }
 func GetName(name string) (models.Product, error) {
 
-	productFire := lib.WhereFirestore("products", "name", "==", name)
+	productFire, e := lib.QueryWhereFirestore("products", "name", "==", name)
 
 	products := models.ProductToListData(productFire)
 
-	return products[0], nil
+	return products[0], e
 
 }
 

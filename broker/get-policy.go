@@ -15,6 +15,7 @@ func GetPolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	var (
 		result map[string]string
 	)
+
 	log.Println("GetPolicy")
 	log.Println(r.RequestURI)
 	log.Println(r.Header.Get("uid"))

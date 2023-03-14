@@ -1,205 +1,423 @@
 {
-  "sme": {
-    "ateco": "107110",
-    "subproductId": 35,
-    "UW_role": "Agent",
-    "company": {
-      "country": "Italy",
-      "vatnumber": {
-        "value": "01319960199"
-      },
-      "opre_eur": {
-        "value": 270383
-      },
-      "employees": {
-        "value": 2
-      }
+  "proposalNumber": 173,
+  "offerName": "Completa",
+  "status": "Lead",
+  "statusHistory": [
+    "Lead"
+  ],
+  "transactions": null,
+  "company": "global",
+  "name": "pmi",
+  "BigStartDate": "0000-00-00T00:00:00",
+  "BigEndDate": "0000-00-00T00:00:00",
+  "BigEmitDate": "0000-00-00T00:00:00",
+  "emitDate": "0001-01-01T00:00:00Z",
+  "startDate": "2023-03-14T10:38:26.78Z",
+  "endDate": "2024-03-14T10:38:26.78Z",
+  "creationDate": "2023-03-14T10:49:47.34273Z",
+  "updated": "2023-03-14T10:49:47.523284Z",
+  "nextPay": "0001-01-01T00:00:00Z",
+  "paymentType": "creditCard",
+  "priceNett": 1082.64,
+  "priceGross": 1315.85,
+  "contractor": {
+    "birthDate": "2005-03-01T23:00:00.000Z",
+    "birthCity": "Milano",
+    "birthProvince": "MI",
+    "location": {
+      "lat": 45.4648158,
+      "lng": 9.1949345
     },
-    "answers": {
-      "step1": [
-        {
-          "slug": "third-party-liability",
-          "value": {
-            "typeOfSumInsured": "replacementValue",
-            "deductible": "1000",
-            "sumInsuredLimitOfIndemnity": 1000000
-          }
+    "name": "Beatrice",
+    "surname": "Sala",
+    "address": "Galleria del Corso",
+    "postalCode": "20122",
+    "city": "Milano",
+    "streetNumber": "1",
+    "cityCode": "MI",
+    "mail": "luca.barbieri@wopta.it",
+    "phone": "+393668134257",
+    "fiscalCode": "brblcu81h03f205q",
+    "vatCode": "01319960199",
+    "consens": [
+      {
+        "title": "Privacy",
+        "consens": "Il sottoscritto, letta e compresa l'informativa sul trattamento dei dati personali, ACCONSENTE al trattamento dei propri dati personali da parte di Wopta Assicurazioni per l’invio di comunicazioni e proposte commerciali e di marketing, incluso l’invio di newsletter e ricerche di mercato, attraverso strumenti automatizzati (sms, mms, e-mail, ecc.) e non (posta cartacea e telefono con operatore).",
+        "key": 1,
+        "answer": true
+      }
+    ]
+  },
+  "attachments": [
+    {}
+  ],
+  "assets": [
+    {
+      "enterprise": {
+        "name": "Beatrice",
+        "address": "Galleria del Corso",
+        "streetNumber": "1",
+        "location": {
+          "lat": 45.4648158,
+          "lng": 9.1949345
         },
+        "postalCode": "20122",
+        "city": "Milano",
+        "vatCode": "01319960199",
+        "ateco": "10.71.10",
+        "atecoDesc": "PRODUZIONE DI PRODOTTI DI PANETTERIA FRESCHI",
+        "atecoMacro": "ATTIVITA MANIFATTURIERE",
+        "atecoSub": "INDUSTRIE ALIMENTARI",
+        "sector": "PRODUZIONE",
+        "revenue": "270383",
+        "employer": 2
+      },
+      "guarantees": [
         {
-          "slug": "employers-liability",
-          "value": {
-            "typeOfSumInsured": "replacementValue",
-            "deductible": "2600",
-            "sumInsuredLimitOfIndemnity": 1000000,
-            "selfInsurance": "0.10"
-          }
-        },
-        {
+          "legalDefence": "basic",
+          "type": "company",
+          "description": "Difesa penale per reati di natura colposa o contravvenzionale, inclusi i casi di sicurezza aziendale da D. Lgs. 81/08 e D. Lgs. 106/09, D. Lgs. 193/07, D. Lgs. 152/06, D. Lgs. 101/18, D. Lgs. 231/01",
+          "companyCodec": "DP",
+          "companyName": "Tutela Legale",
+          "group": "LEGAL",
           "slug": "legal-defence",
-          "value": {
-            "legalDefence": "basic"
-          }
-        }
-      ],
-      "step2": [
+          "isPremium": true,
+          "tax": 21.25,
+          "priceNett": 41.24,
+          "priceGross": 50.0035
+        },
         {
-          "buildingId": "2",
-          "value": {
-            "buildingType": "reinforcedConcrete",
-            "numberOfFloors": "first",
-            "constructionYear": "before1972",
-            "alarm": "yes",
-            "typeOfInsurance": "namedPerils",
-            "ateco": "107110",
-            "postcode": "20154",
-            "province": "MI",
-            "answer": [
-              {
-                "slug": "electronic-equipment",
-                "value": {
-                  "typeOfSumInsured": "firstLoss",
-                  "deductible": "1000",
-                  "sumInsuredLimitOfIndemnity": 25000
-                }
-              },
-              {
-                "slug": "assistance",
-                "value": {
-                  "assistance": "yes"
-                }
-              },
-              {
-                "slug": "lease-holders-interest",
-                "value": {
-                  "typeOfSumInsured": "replacementValue",
-                  "deductible": "1000",
-                  "sumInsuredLimitOfIndemnity": 555000
-                }
-              },
-              {
-                "slug": "terrorism",
-                "value": {
-                  "typeOfSumInsured": "replacementValue",
-                  "deductible": "1000",
-                  "sumInsuredLimitOfIndemnity": 0.5,
-                  "selfInsurance": "0.05"
-                }
-              },
-              {
-                "slug": "property-owners-liability",
-                "value": {
-                  "typeOfSumInsured": "replacementValue",
-                  "deductible": "1000",
-                  "sumInsuredLimitOfIndemnity": 1000000
-                }
-              },
-              {
-                "slug": "power-surge",
-                "value": {
-                  "typeOfSumInsured": "firstLoss",
-                  "deductible": "1000",
-                  "sumInsuredLimitOfIndemnity": 25000,
-                  "selfInsurance": "0.10"
-                }
-              },
-              {
-                "slug": "theft",
-                "value": {
-                  "typeOfSumInsured": "firstLoss",
-                  "deductible": "1000",
-                  "sumInsuredLimitOfIndemnity": 25000
-                }
-              },
-              {
-                "slug": "earthquake",
-                "value": {
-                  "typeOfSumInsured": "replacementValue",
-                  "deductible": "1000",
-                  "sumInsuredLimitOfIndemnity": 0.7,
-                  "selfInsurance": "0.05"
-                }
-              },
-              {
-                "slug": "glass",
-                "value": {
-                  "typeOfSumInsured": "firstLoss",
-                  "deductible": "1000",
-                  "sumInsuredLimitOfIndemnity": 2500
-                }
-              },
-              {
-                "slug": "sociopolitical-event",
-                "value": {
-                  "typeOfSumInsured": "replacementValue",
-                  "deductible": "1000",
-                  "sumInsuredLimitOfIndemnity": 684000,
-                  "selfInsurance": "0.05"
-                }
-              },
-              {
-                "slug": "machinery-breakdown",
-                "value": {
-                  "typeOfSumInsured": "firstLoss",
-                  "deductible": "1500",
-                  "sumInsuredLimitOfIndemnity": 40000
-                }
-              },
-              {
-                "slug": "atmospheric-event",
-                "value": {
-                  "typeOfSumInsured": "replacementValue",
-                  "deductible": "1500",
-                  "sumInsuredLimitOfIndemnity": 855000,
-                  "selfInsurance": "0.10"
-                }
-              },
-              {
-                "slug": "business-interruption",
-                "value": {
-                  "typeOfSumInsured": "firstLoss",
-                  "deductible": "5days",
-                  "sumInsuredLimitOfIndemnity": 25000,
-                  "dailyAllowance": "250"
-                }
-              },
-              {
-                "slug": "content",
-                "value": {
-                  "typeOfSumInsured": "replacementValue",
-                  "deductible": "1000",
-                  "sumInsuredLimitOfIndemnity": 300000
-                }
-              },
-              {
-                "slug": "burst-pipe",
-                "value": {
-                  "typeOfSumInsured": "firstLoss",
-                  "deductible": "1000",
-                  "sumInsuredLimitOfIndemnity": 50000
-                }
-              },
-              {
-                "slug": "third-party-recourse",
-                "value": {
-                  "typeOfSumInsured": "firstLoss",
-                  "deductible": "1000",
-                  "sumInsuredLimitOfIndemnity": 150000,
-                  "selfInsurance": "0.10"
-                }
-              },
-              {
-                "slug": "water-damage",
-                "value": {
-                  "typeOfSumInsured": "replacementValue",
-                  "deductible": "1000",
-                  "sumInsuredLimitOfIndemnity": 0.7,
-                  "selfInsurance": "0.05"
-                }
-              }
-            ]
-          }
+          "type": "company",
+          "description": "Danni involontariamente causati a terzi per danni a cose o persone di cui sia responsabile a termini di legge (R.C.T.). La garanzia include, ma non si limita a questi, i danni: a veicoli di terzi e prestatori di lavoro; a cose in consegna e custodia; a cose nell'ambito di esecuzione dei lavori; a cose di terzi sollevate, caricate, scaricate, movimentate, trasportate o rimorchiate; a mezzi di trasporto sotto carico e scarico; da interruzione o sospensione di attività di terzi; da smercio; da committenza autoveicoli; da responsabilità civile personale addetti; da attività di commercio ambulante; da lavori presso terzi",
+          "companyCodec": "CT",
+          "companyName": "Responsabilità Civile Terzi",
+          "group": "RCT",
+          "slug": "third-party-liability",
+          "isBase": true,
+          "isPremium": true,
+          "sumInsuredLimitOfIndemnity": 1000000,
+          "deductible": "1000",
+          "tax": 22.25,
+          "priceNett": 83.83,
+          "priceGross": 102.482175
+        },
+        {
+          "type": "company",
+          "description": "Responsabilità per: la rivalsa INAIL per gli infortuni sul lavoro subiti dai prestatori di lavoro; morte; e lesioni personali dalle quali sia derivata un'invalidità permanente ai sensi del codice civile, incluse le malattie professionali",
+          "companyCodec": "CO",
+          "companyName": "Resp. Civile verso Prestatori di Lavoro",
+          "group": "RCT",
+          "slug": "employers-liability",
+          "isBase": true,
+          "isPremium": true,
+          "sumInsuredLimitOfIndemnity": 1000000,
+          "deductible": "2600",
+          "selfInsurance": "0.10",
+          "selfInsuranceDesc": "10% - minimo € 1500",
+          "tax": 22.25,
+          "priceNett": 63.67,
+          "priceGross": 77.836575
+        }
+      ]
+    },
+    {
+      "building": {
+        "name": "Wopta",
+        "address": "Galleria del Corso",
+        "streetNumber": "1",
+        "cityCode": "MI",
+        "postalCode": "20122",
+        "city": "Milano",
+        "location": {
+          "lat": 45.4648158,
+          "lng": 9.1949345
+        },
+        "buildingType": "industriale",
+        "buildingMaterial": "reinforcedConcrete",
+        "buildingYear": "before1972",
+        "isAllarm": true,
+        "floor": "ground_floor",
+        "isHolder": true
+      },
+      "guarantees": [
+        {
+          "type": "building",
+          "description": "Prestazioni di assistenza e servizio 24/7 al Fabbricato quali invio di artigiani come: idraulico, elettricista, fabbro, serrandista, vetraio, sorvegliante, nei casi indicati in polizza di necessità (la compagnia eroga direttamente la prestazione non il rimborso delle spese)",
+          "companyCodec": "AS",
+          "companyName": "Assistenza al Fabbricato",
+          "group": "ASSSISTANCE",
+          "slug": "assistance",
+          "isBase": true,
+          "isPremium": true,
+          "tax": 10,
+          "priceNett": 35.76,
+          "priceGross": 39.336
+        },
+        {
+          "dailyAllowance": "250",
+          "type": "building",
+          "typeOfSumInsured": "firstLoss",
+          "description": "Indennizzo per il periodo di documentata inattività forzata, a seguito di un Sinistro avvenuto nel Fabbricato, che abbia danneggiato i locali e/o i Macchinar e/o le Apparecchiature Elettroniche funzionali all’attività",
+          "companyCodec": "BI",
+          "companyName": "Business Interruption",
+          "group": "BUSINESS INTERRUPTTION",
+          "slug": "business-interruption",
+          "isPremium": true,
+          "sumInsuredLimitOfIndemnity": 25000,
+          "deductible": "5days",
+          "tax": 21.25,
+          "priceNett": 84.09,
+          "priceGross": 101.959125
+        },
+        {
+          "type": "building",
+          "typeOfSumInsured": "firstLoss",
+          "description": "Danni materiali e diretti ad apparecchiature elettroniche fisse e ad impiego mobile, causati da qualsiasi evento accidentale",
+          "companyCodec": "EL",
+          "companyName": "Garanzia Apparecchiature Elettroniche",
+          "group": "ELETRONIC",
+          "slug": "electronic-equipment",
+          "isPremium": true,
+          "sumInsuredLimitOfIndemnity": 10000,
+          "deductible": "1000",
+          "tax": 21.25,
+          "priceNett": 204.32,
+          "priceGross": 247.738
+        },
+        {
+          "type": "building",
+          "description": "Danni diretti a Contenuto (Merci, macchinari, attrezzature, arredamento), causati da eventi quali: incendio, esplosione, scoppio, fulmine, conseguenti fumi, gas e vapori",
+          "companyCodec": "IC",
+          "companyName": "Incendio Contenuto",
+          "group": "FIRE",
+          "slug": "content",
+          "isBase": true,
+          "isPremium": true,
+          "sumInsuredLimitOfIndemnity": 50000,
+          "deductible": "1000",
+          "tax": 22.25,
+          "priceNett": 31.43,
+          "priceGross": 38.423175
+        },
+        {
+          "type": "building",
+          "description": "Danni diretti a Fabbricato, causati da eventi quali: incendio, esplosione, scoppio, fulmine, conseguenti fumi, gas e vapori",
+          "companyCodec": "IF",
+          "companyName": "Incendio Fabbricato",
+          "group": "FIRE",
+          "slug": "building",
+          "isBase": true,
+          "isPremium": true,
+          "sumInsuredLimitOfIndemnity": 120000,
+          "deductible": "1000",
+          "tax": 22.25,
+          "priceNett": 60.45,
+          "priceGross": 73.900125
+        },
+        {
+          "type": "building",
+          "typeOfSumInsured": "replacementValue",
+          "description": "Danni da eventi atmosferici quali uragano, bufera, tempesta, grandine, vento e cose trascinate da esso, tromba d’aria, gelo, sovraccarico di neve",
+          "companyCodec": "EA",
+          "companyName": "Eventi Atmosferici",
+          "group": "FIRE",
+          "slug": "atmospheric-event",
+          "isExtension": true,
+          "isPremium": true,
+          "sumInsuredLimitOfIndemnity": 170000,
+          "deductible": "1500",
+          "selfInsurance": "0.10",
+          "selfInsuranceDesc": "10% - minimo € 1500",
+          "tax": 22.25,
+          "priceNett": 40.42,
+          "priceGross": 49.413450000000005
+        },
+        {
+          "type": "building",
+          "typeOfSumInsured": "firstLoss",
+          "description": "Danni da allagamento (eccesso o accumulo d’acqua in luogo normalmente asciutto) verificatosi all'interno del Fabbricato a seguito di formazione di ruscelli o accumulo esterno di acqua",
+          "companyCodec": "AC",
+          "companyName": "Danni d’Acqua",
+          "group": "FIRE",
+          "slug": "burst-pipe",
+          "isExtension": true,
+          "isBase": true,
+          "isPremium": true,
+          "sumInsuredLimitOfIndemnity": 5000,
+          "deductible": "1000",
+          "tax": 22.25,
+          "priceNett": 12.13,
+          "priceGross": 14.828925000000002
+        },
+        {
+          "type": "building",
+          "typeOfSumInsured": "replacementValue",
+          "description": "Danni da terremoto ai beni assicurati compresi quelli di Incendio, Esplosione, Scoppio",
+          "companyCodec": "TR",
+          "companyName": "Terremoto",
+          "group": "FIRE",
+          "slug": "earthquake",
+          "isExtension": true,
+          "isPremium": true,
+          "sumInsuredLimitOfIndemnity": 0.7,
+          "deductible": "1000",
+          "selfInsurance": "0.05",
+          "selfInsuranceDesc": "5% - minimo € 1000",
+          "tax": 22.25,
+          "priceNett": 14.25,
+          "priceGross": 17.420625
+        },
+        {
+          "type": "building",
+          "typeOfSumInsured": "firstLoss",
+          "description": "Spese sostenute per la sostituzione di Lastre e insegne con altre nuove eguali o equivalenti per caratteristiche, compresi i costi di trasporto ed installazione, la cui rottura sia avvenuta per cause Accidentali o imputabili a fatti di terzi.",
+          "companyCodec": "RO",
+          "companyName": "Rottura Lastre",
+          "group": "FIRE",
+          "slug": "glass",
+          "isExtension": true,
+          "isPremium": true,
+          "sumInsuredLimitOfIndemnity": 2500,
+          "deductible": "1000",
+          "tax": 22.25,
+          "priceNett": 21.61,
+          "priceGross": 26.418225
+        },
+        {
+          "type": "building",
+          "typeOfSumInsured": "firstLoss",
+          "description": "Danni materiali e diretti, al Macchinario causati o dovuti a guasti Accidentali meccanici in genere.",
+          "companyCodec": "GGU",
+          "companyName": "Guasti Macchine",
+          "group": "FIRE",
+          "slug": "machinery-breakdown",
+          "isExtension": true,
+          "isPremium": true,
+          "sumInsuredLimitOfIndemnity": 5000,
+          "deductible": "1500",
+          "tax": 22.25,
+          "priceNett": 58.19,
+          "priceGross": 71.137275
+        },
+        {
+          "type": "building",
+          "typeOfSumInsured": "firstLoss",
+          "description": "Danni originati da scariche, correnti, corto circuito ed altri fenomeni elettrici",
+          "companyCodec": "FE",
+          "companyName": "Fenomeno Elettrico",
+          "group": "FIRE",
+          "slug": "power-surge",
+          "isExtension": true,
+          "isPremium": true,
+          "sumInsuredLimitOfIndemnity": 5000,
+          "deductible": "1000",
+          "selfInsurance": "0.10",
+          "selfInsuranceDesc": "10% - minimo € 1000",
+          "tax": 22.25,
+          "priceNett": 66.59,
+          "priceGross": 81.40627500000001
+        },
+        {
+          "type": "building",
+          "description": "Danni da eventi sociopolitici, quali tumulti popolari, scioperi, sommosse, atti vandalici o dolosi e atti di sabotaggio",
+          "companyCodec": "ES",
+          "companyName": "Eventi Sociopolitici",
+          "group": "FIRE",
+          "slug": "sociopolitical-event",
+          "isExtension": true,
+          "isPremium": true,
+          "sumInsuredLimitOfIndemnity": 136000,
+          "deductible": "1000",
+          "selfInsurance": "0.05",
+          "selfInsuranceDesc": "5% - minimo € 1000",
+          "tax": 22.25,
+          "priceNett": 5.01,
+          "priceGross": 6.124725
+        },
+        {
+          "type": "building",
+          "description": "Danni da atti di terrorismo",
+          "companyCodec": "AT",
+          "companyName": "Atti di Terrorismo",
+          "group": "FIRE",
+          "slug": "terrorism",
+          "isExtension": true,
+          "isPremium": true,
+          "sumInsuredLimitOfIndemnity": 0.5,
+          "deductible": "1000",
+          "selfInsurance": "0.05",
+          "selfInsuranceDesc": "5% - minimo € 1000",
+          "tax": 22.25
+        },
+        {
+          "type": "building",
+          "typeOfSumInsured": "replacementValue",
+          "description": "Danni da fuoriuscita di acqua condotta (ingorghi, trabocchi, rotture accedentali), e, se assicurato il fabbricato, ricerca ripristino e riparazione del danno",
+          "companyCodec": "AG",
+          "companyName": "Allagamento",
+          "group": "FIRE",
+          "slug": "water-damage",
+          "isExtension": true,
+          "isPremium": true,
+          "sumInsuredLimitOfIndemnity": 0.7,
+          "deductible": "1000",
+          "selfInsurance": "0.05",
+          "selfInsuranceDesc": "5% - minimo € 1000",
+          "tax": 22.25,
+          "priceNett": 12.41,
+          "priceGross": 15.171225
+        },
+        {
+          "type": "building",
+          "description": "Danni a persone o cose, verificatosi in relazione alla proprietà e conduzione del Fabbricato e delle eventuali parti comuni a esso riferite/collegate",
+          "companyCodec": "RF",
+          "companyName": "RC Fabbricato",
+          "group": "RCF",
+          "slug": "property-owners-liability",
+          "isBase": true,
+          "isPremium": true,
+          "sumInsuredLimitOfIndemnity": 1000000,
+          "deductible": "1000",
+          "tax": 22.25,
+          "priceNett": 101.1,
+          "priceGross": 123.59474999999999
+        },
+        {
+          "type": "building",
+          "typeOfSumInsured": "firstLoss",
+          "description": "Responsabilità per danni materiali e diretti arrecati alle cose di terzi in seguito a Incendio, Esplosione o Scoppio del Fabbricato e/o Contenuto, qualora assicurati, anche quando il Fabbricato lo è nella forma di Rischio Locativo",
+          "companyCodec": "RT",
+          "companyName": "Ricorso Terzi da Incendio",
+          "group": "RT",
+          "slug": "third-party-recourse",
+          "isBase": true,
+          "isPremium": true,
+          "sumInsuredLimitOfIndemnity": 150000,
+          "deductible": "1000",
+          "selfInsurance": "0.10",
+          "selfInsuranceDesc": "10% - minimo € 1000",
+          "tax": 22.25,
+          "priceNett": 91.44,
+          "priceGross": 111.7854
+        },
+        {
+          "type": "building",
+          "typeOfSumInsured": "firstLoss",
+          "description": "Danni subiti da furto, rapina o estorsione, inclusi i guasti e gli atti vandalici commessi dai ladri",
+          "companyCodec": "FU",
+          "companyName": "Garanzia Furto, Rapina ed Estorsione",
+          "group": "THEFT",
+          "slug": "theft",
+          "isPremium": true,
+          "sumInsuredLimitOfIndemnity": 5000,
+          "deductible": "1000",
+          "selfInsuranceDesc": "10% - minimo € 1000",
+          "tax": 22.25,
+          "priceNett": 54.7,
+          "priceGross": 66.87075
         }
       ]
     }
-  }
+  ],
+  "Data": ""
 }
