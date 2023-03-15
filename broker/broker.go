@@ -84,7 +84,7 @@ func GetSequenceByCompany(name string) (string, int, int) {
 		//WE0000001
 		numberCompany = companyDefault
 		codeCompany = companyPrefix + fmt.Sprintf("%07d", numberCompany)
-		number = policy[0].Number + 1
+		number = 1
 	} else {
 		numberCompany = policy[0].NumberCompany + 1
 		codeCompany = companyPrefix + fmt.Sprintf("%07d", numberCompany)
