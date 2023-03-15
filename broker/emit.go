@@ -52,7 +52,10 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	policy.DocumentName = p.LinkGcs
 	_, res, _ := doc.NamirialOtpV6(policy)
 	policy.ContractFileId = res.FileId
-	company, numb, tot := GetSequenceByCompany("global")
+	company, numb, tot := GetSequenceByCompany(policy.Company)
+	log.Println("Emit code "+uid+" ", company)
+	log.Println("Emit code "+uid+" ", numb)
+	log.Println("Emit code "+uid+" ", tot)
 	policy.Number = tot
 	policy.NumberCompany = numb
 	policy.CodeCompany = company

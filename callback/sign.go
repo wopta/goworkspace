@@ -11,7 +11,8 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
-/**
+/*
+*
 workstepFinished : when the workstep was finished
 workstepRejected : when the workstep was rejected
 workstepDelegated : whe the workstep was delegated
@@ -27,13 +28,15 @@ func Sign(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	uid := r.URL.Query().Get("uid")
 	envelope := r.URL.Query().Get("envelope")
 	action := r.URL.Query().Get("action")
-	log.Println(action)
-	log.Println(envelope)
-	log.Println(uid)
+	log.Println("Sign "+uid+" ", action)
+	log.Println("Sign "+uid+" ", envelope)
+
 	if action == "workstepFinished" {
 		policyF := lib.GetFirestore("policy", uid)
+
 		var policy models.Policy
 		policyF.DataTo(&policy)
+		log.Println("Sign "+uid+" policy.Status:", policy.Status)
 		if !policy.IsSign && policy.Status == models.PolicyStatusToSign {
 			policy.IsSign = true
 			policy.Updated = time.Now()
