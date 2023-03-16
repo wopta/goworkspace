@@ -20,13 +20,15 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 	var e error
 	var fabrickCallback FabrickCallback
 	request := lib.ErrorByte(ioutil.ReadAll(r.Body))
-	log.Println(request)
+	log.Println(string(request))
+	log.Println(string(r.RequestURI))
 	json.Unmarshal([]byte(request), &fabrickCallback)
 	// Unmarshal or Decode the JSON to the interface.
 	if fabrickCallback.Bill.Status == "PAID" {
 
 		uid := r.URL.Query().Get("uid")
 		schedule := r.URL.Query().Get("schedule")
+		log.Println(uid)
 		log.Println(schedule)
 		policyF := lib.GetFirestore("policy", uid)
 		var policy models.Policy

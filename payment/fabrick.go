@@ -14,6 +14,7 @@ import (
 	lib "github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	model "github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/product"
 )
 
 func FabrickPayObj(data model.Policy, firstSchedule bool, scheduleDate string, customerId string, amount float64) <-chan FabrickPaymentResponse {
@@ -56,7 +57,19 @@ func FabrickPayObj(data model.Policy, firstSchedule bool, scheduleDate string, c
 			var result FabrickPaymentResponse
 			json.Unmarshal([]byte(body), &result)
 			res.Body.Close()
-			tr := models.SetTransactionPolicy(data, amount, scheduleDate)
+			prod, err := product.GetName(data.Name)
+			var commission float64
+			for _, x := range prod.Companies {
+				if x.Name == data.Company {
+					if data.IsRenew {
+						commission = x.CommissionRenew
+					} else {
+						commission = x.Commission
+					}
+				}
+
+			}
+			tr := models.SetTransactionPolicy(data, amount, scheduleDate, amount*commission)
 			ref, _ := lib.PutFirestore("transactions", tr)
 			tr.Uid = ref.ID
 			tr.BigPayDate = civil.DateTimeOf(time.Now())

@@ -56,6 +56,7 @@ func Person(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	rulesFile = getRulesFile(rulesFile, rulesFileName)
 	coveragesJson, coverages := lib.RulesFromJson(rulesFile, initCoverageP(), quotingInputData, []byte(getQuotingData()))
+
 	return coveragesJson, coverages, nil
 }
 
@@ -98,7 +99,11 @@ func calculateAge(birthDateIsoString string) (int, error) {
 	}
 	return age, e
 }
-
+func getpolicy() Policy {
+	return Policy{
+		GuaranceMap: initCoverageP(),
+	}
+}
 func initCoverageP() map[string]*Coverage {
 
 	var res = make(map[string]*Coverage)
