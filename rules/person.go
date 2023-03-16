@@ -32,6 +32,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"log"
+	"math"
 	"net/http"
 	"os"
 	"time"
@@ -56,7 +57,7 @@ func Person(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	rulesFile = getRulesFile(rulesFile, rulesFileName)
 	_, coverages := lib.RulesFromJson(rulesFile, initCoverageP(), quotingInputData, []byte(getQuotingData()))
-	outJson, out := getOfferPrices(coverages)
+	outJson, out := roundPrices(getOfferPrices(coverages))
 	w.Header().Set("Content-Type", "Application/json")
 	return outJson, out, nil
 }
@@ -399,48 +400,54 @@ func getQuotingData() string {
 	return string(lib.GetByteByEnv("quote/persona-tassi.json", false))
 }
 
-func getOfferPrices(coverage interface{}) (string, Out) {
+func getOfferPrices(coverage interface{}) Out {
 	offerPrice := make(map[string]map[string]*Price)
 
 	offerPrice["Base"] = map[string]*Price{
-		"Mese": {
+		"Monthly": {
 			Net:      0,
 			Tax:      0,
 			Gross:    0,
+			Delta:    0,
 			Discount: 0,
 		},
-		"Anno": {
+		"Yearly": {
 			Net:      0,
 			Tax:      0,
 			Gross:    0,
+			Delta:    0,
 			Discount: 0,
 		},
 	}
 	offerPrice["Your"] = map[string]*Price{
-		"Mese": {
+		"Monthly": {
 			Net:      0,
 			Tax:      0,
 			Gross:    0,
+			Delta:    0,
 			Discount: 0,
 		},
-		"Anno": {
+		"Yearly": {
 			Net:      0,
 			Tax:      0,
 			Gross:    0,
+			Delta:    0,
 			Discount: 0,
 		},
 	}
 	offerPrice["Premium"] = map[string]*Price{
-		"Mese": {
+		"Monthly": {
 			Net:      0,
 			Tax:      0,
 			Gross:    0,
+			Delta:    0,
 			Discount: 0,
 		},
-		"Anno": {
+		"Yearly": {
 			Net:      0,
 			Tax:      0,
 			Gross:    0,
+			Delta:    0,
 			Discount: 0,
 		},
 	}
@@ -448,14 +455,14 @@ func getOfferPrices(coverage interface{}) (string, Out) {
 	if m, ok := coverage.(map[string]*Coverage); ok {
 		for _, c := range m {
 			for k, coverageValue := range c.Offer {
-				offerPrice[k]["Anno"].Net += coverageValue.PremiumNet
-				offerPrice[k]["Anno"].Tax = coverageValue.Tax
-				offerPrice[k]["Anno"].Gross += coverageValue.PremiumGross
-				//offerPrice[k].Prices["Anno"].Discount += coverageValue.
-				offerPrice[k]["Mese"].Net += coverageValue.PremiumNet / 12
-				offerPrice[k]["Mese"].Tax = coverageValue.Tax
-				offerPrice[k]["Mese"].Gross += coverageValue.PremiumGross / 12
-				//offerPrice[k].Prices["Mese"].Discount += coverageValue.
+				offerPrice[k]["Yearly"].Net += coverageValue.PremiumNet
+				offerPrice[k]["Yearly"].Tax += coverageValue.PremiumTaxAmount
+				offerPrice[k]["Yearly"].Gross += coverageValue.PremiumGross
+				//offerPrice[k]["Yearly"].Discount += coverageValue.
+				offerPrice[k]["Monthly"].Net += coverageValue.PremiumNet / 12
+				offerPrice[k]["Monthly"].Tax += coverageValue.PremiumTaxAmount / 12
+				offerPrice[k]["Monthly"].Gross += coverageValue.PremiumGross / 12
+				//offerPrice[k]["Monthly"].Discount += coverageValue.
 			}
 		}
 	}
@@ -465,7 +472,21 @@ func getOfferPrices(coverage interface{}) (string, Out) {
 		OfferPrice: offerPrice,
 	}
 
-	outJson, _ := json.Marshal(out)
+	return out
+}
 
+func roundPrices(out Out) (string, Out) {
+	for typePayment, priceStruct := range out.OfferPrice {
+		ceilPriceGrossYear := math.Ceil(priceStruct["Yearly"].Gross)
+		priceStruct["Yearly"].Delta = ceilPriceGrossYear - priceStruct["Yearly"].Gross
+		priceStruct["Yearly"].Gross = ceilPriceGrossYear
+		out.Coverages["IPI"].Offer[typePayment].PremiumGross += priceStruct["Yearly"].Delta
+
+		roundPriceGrossMonth := math.Round(priceStruct["Monthly"].Gross)
+		priceStruct["Monthly"].Delta = roundPriceGrossMonth - priceStruct["Monthly"].Gross
+		priceStruct["Monthly"].Gross = roundPriceGrossMonth
+	}
+
+	outJson, _ := json.Marshal(out)
 	return string(outJson), out
 }

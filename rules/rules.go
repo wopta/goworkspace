@@ -44,6 +44,7 @@ type Price struct {
 	Net      float64
 	Tax      float64
 	Gross    float64
+	Delta    float64
 	Discount float64
 }
 
