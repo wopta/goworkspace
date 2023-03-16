@@ -40,6 +40,18 @@ func Rules(w http.ResponseWriter, r *http.Request) {
 
 }
 
+type Price struct {
+	Net      float64
+	Tax      float64
+	Gross    float64
+	Discount float64
+}
+
+type Out struct {
+	Coverages  map[string]*Coverage
+	OfferPrice map[string]map[string]*Price
+}
+
 type Coverage struct {
 	DailyAllowance             string
 	Name                       string

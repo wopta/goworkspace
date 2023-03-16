@@ -55,8 +55,10 @@ func Person(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	quotingInputData := getRulesInputData(policy, e, req)
 
 	rulesFile = getRulesFile(rulesFile, rulesFileName)
-	coveragesJson, coverages := lib.RulesFromJson(rulesFile, initCoverageP(), quotingInputData, []byte(getQuotingData()))
-	return coveragesJson, coverages, nil
+	_, coverages := lib.RulesFromJson(rulesFile, initCoverageP(), quotingInputData, []byte(getQuotingData()))
+	outJson, out := getOfferPrices(coverages)
+	w.Header().Set("Content-Type", "Application/json")
+	return outJson, out, nil
 }
 
 func getRulesFile(rulesFile []byte, rulesFileName string) []byte {
@@ -101,10 +103,11 @@ func calculateAge(birthDateIsoString string) (int, error) {
 
 func initCoverageP() map[string]*Coverage {
 
-	var res = make(map[string]*Coverage)
-	res["IPI"] = &Coverage{
+	var coverages = make(map[string]*Coverage)
+	coverages["IPI"] = &Coverage{
 		Slug:                       "Invalidità Permanente Infortunio",
 		Deductible:                 "0",
+		Tax:                        2.5,
 		SumInsuredLimitOfIndemnity: 0.0,
 		Offer: map[string]*CoverageValue{
 			"Base": {
@@ -133,9 +136,10 @@ func initCoverageP() map[string]*Coverage {
 		IsYour:    false,
 		IsPremium: false,
 	}
-	res["D"] = &Coverage{
+	coverages["D"] = &Coverage{
 		Slug:                       "Decesso Infortunio",
 		Deductible:                 "0",
+		Tax:                        2.5,
 		SumInsuredLimitOfIndemnity: 0.0,
 		Offer: map[string]*CoverageValue{
 			"Base": {
@@ -164,10 +168,10 @@ func initCoverageP() map[string]*Coverage {
 		IsYour:    false,
 		IsPremium: false,
 	}
-	res["ITI"] = &Coverage{
-		Slug: "Inabilità Totale Infortunio",
-
+	coverages["ITI"] = &Coverage{
+		Slug:                       "Inabilità Totale Infortunio",
 		Deductible:                 "0",
+		Tax:                        2.5,
 		SumInsuredLimitOfIndemnity: 0.0,
 		Offer: map[string]*CoverageValue{
 			"Base": {
@@ -196,10 +200,10 @@ func initCoverageP() map[string]*Coverage {
 		IsYour:    false,
 		IsPremium: false,
 	}
-	res["DRG"] = &Coverage{
-		Slug: "Diaria Ricovero / Gessatura Infortunio",
-
+	coverages["DRG"] = &Coverage{
+		Slug:                       "Diaria Ricovero / Gessatura Infortunio",
 		Deductible:                 "0",
+		Tax:                        2.5,
 		SumInsuredLimitOfIndemnity: 0.0,
 		Offer: map[string]*CoverageValue{
 			"Base": {
@@ -228,9 +232,10 @@ func initCoverageP() map[string]*Coverage {
 		IsYour:    false,
 		IsPremium: false,
 	}
-	res["DC"] = &Coverage{
+	coverages["DC"] = &Coverage{
 		Slug:                       "Diaria Convalescenza Infortunio",
 		Deductible:                 "0",
+		Tax:                        2.5,
 		SumInsuredLimitOfIndemnity: 0.0,
 		Offer: map[string]*CoverageValue{
 			"Base": {
@@ -259,9 +264,10 @@ func initCoverageP() map[string]*Coverage {
 		IsYour:    false,
 		IsPremium: false,
 	}
-	res["RSC"] = &Coverage{
+	coverages["RSC"] = &Coverage{
 		Slug:                       "Rimborso spese di cura Infortunio",
 		Deductible:                 "0",
+		Tax:                        2.5,
 		SumInsuredLimitOfIndemnity: 0.0,
 		Offer: map[string]*CoverageValue{
 			"Base": {
@@ -290,9 +296,10 @@ func initCoverageP() map[string]*Coverage {
 		IsYour:    false,
 		IsPremium: false,
 	}
-	res["IPM"] = &Coverage{
+	coverages["IPM"] = &Coverage{
 		Slug:                       "Invalidità Permanente Malattia IPM",
 		Deductible:                 "0",
+		Tax:                        2.5,
 		SumInsuredLimitOfIndemnity: 0.0,
 		Offer: map[string]*CoverageValue{
 			"Base": {
@@ -321,9 +328,10 @@ func initCoverageP() map[string]*Coverage {
 		IsYour:    false,
 		IsPremium: false,
 	}
-	res["ASS"] = &Coverage{
+	coverages["ASS"] = &Coverage{
 		Slug:                       "Assistenza",
 		Deductible:                 "0",
+		Tax:                        10,
 		SumInsuredLimitOfIndemnity: 0.0,
 		Offer: map[string]*CoverageValue{
 			"Base": {
@@ -352,9 +360,10 @@ func initCoverageP() map[string]*Coverage {
 		IsYour:    false,
 		IsPremium: false,
 	}
-	res["TL"] = &Coverage{
+	coverages["TL"] = &Coverage{
 		Slug:                       "Tutela Legale",
 		Deductible:                 "0",
+		Tax:                        21.25,
 		SumInsuredLimitOfIndemnity: 0.0,
 		Offer: map[string]*CoverageValue{
 			"Base": {
@@ -384,9 +393,79 @@ func initCoverageP() map[string]*Coverage {
 		IsPremium: false,
 	}
 
-	return res
+	return coverages
 }
 func getQuotingData() string {
-
 	return string(lib.GetByteByEnv("quote/persona-tassi.json", false))
+}
+
+func getOfferPrices(coverage interface{}) (string, Out) {
+	offerPrice := make(map[string]map[string]*Price)
+
+	offerPrice["Base"] = map[string]*Price{
+		"Mese": {
+			Net:      0,
+			Tax:      0,
+			Gross:    0,
+			Discount: 0,
+		},
+		"Anno": {
+			Net:      0,
+			Tax:      0,
+			Gross:    0,
+			Discount: 0,
+		},
+	}
+	offerPrice["Your"] = map[string]*Price{
+		"Mese": {
+			Net:      0,
+			Tax:      0,
+			Gross:    0,
+			Discount: 0,
+		},
+		"Anno": {
+			Net:      0,
+			Tax:      0,
+			Gross:    0,
+			Discount: 0,
+		},
+	}
+	offerPrice["Premium"] = map[string]*Price{
+		"Mese": {
+			Net:      0,
+			Tax:      0,
+			Gross:    0,
+			Discount: 0,
+		},
+		"Anno": {
+			Net:      0,
+			Tax:      0,
+			Gross:    0,
+			Discount: 0,
+		},
+	}
+
+	if m, ok := coverage.(map[string]*Coverage); ok {
+		for _, c := range m {
+			for k, coverageValue := range c.Offer {
+				offerPrice[k]["Anno"].Net += coverageValue.PremiumNet
+				offerPrice[k]["Anno"].Tax = coverageValue.Tax
+				offerPrice[k]["Anno"].Gross += coverageValue.PremiumGross
+				//offerPrice[k].Prices["Anno"].Discount += coverageValue.
+				offerPrice[k]["Mese"].Net += coverageValue.PremiumNet / 12
+				offerPrice[k]["Mese"].Tax = coverageValue.Tax
+				offerPrice[k]["Mese"].Gross += coverageValue.PremiumGross / 12
+				//offerPrice[k].Prices["Mese"].Discount += coverageValue.
+			}
+		}
+	}
+
+	out := Out{
+		Coverages:  coverage.(map[string]*Coverage),
+		OfferPrice: offerPrice,
+	}
+
+	outJson, _ := json.Marshal(out)
+
+	return string(outJson), out
 }
