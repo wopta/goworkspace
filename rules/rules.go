@@ -70,9 +70,6 @@ type Coverage struct {
 	IsBase                     bool
 	IsYour                     bool
 	IsPremium                  bool
-	Base                       *CoverageValue
-	Your                       *CoverageValue
-	Premium                    *CoverageValue
 }
 type GuaranteValue struct {
 	TypeOfSumInsured           string             `firestore:"typeOfSumInsured,omitempty" json:"typeOfSumInsured,omitempty"`

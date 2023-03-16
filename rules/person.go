@@ -62,7 +62,7 @@ func Person(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 func getRulesFile(rulesFile []byte, rulesFileName string) []byte {
 	switch os.Getenv("env") {
 	case "local":
-		rulesFile = lib.ErrorByte(ioutil.ReadFile("../function-data/grules/" + rulesFileName))
+		rulesFile = lib.ErrorByte(os.ReadFile("../function-data/dev/grules/" + rulesFileName))
 	case "dev":
 		rulesFile = lib.GetFromStorage("function-data", "grules/"+rulesFileName, "")
 	case "prod":
@@ -106,24 +106,29 @@ func initCoverageP() map[string]*Coverage {
 		Slug:                       "Invalidità Permanente Infortunio",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0.0,
-		Base: &CoverageValue{
-			Deductible:                 "0",
-			DeductibleType:             "",
-			SumInsuredLimitOfIndemnity: 0.0,
-			PremiumNet:                 0.0,
-			SelfInsurance:              "0"},
-		Your: &CoverageValue{
-			Deductible:                 "0",
-			DeductibleType:             "",
-			SumInsuredLimitOfIndemnity: 0.0,
-			PremiumNet:                 0.0,
-			SelfInsurance:              "0"},
-		Premium: &CoverageValue{
-			Deductible:                 "0",
-			DeductibleType:             "",
-			SumInsuredLimitOfIndemnity: 0.0,
-			PremiumNet:                 0.0,
-			SelfInsurance:              "0"},
+		Offer: map[string]*CoverageValue{
+			"Base": {
+				Deductible:                 "0",
+				DeductibleType:             "",
+				SumInsuredLimitOfIndemnity: 0.0,
+				PremiumNet:                 0.0,
+				SelfInsurance:              "0",
+			},
+			"Your": {
+				Deductible:                 "0",
+				DeductibleType:             "",
+				SumInsuredLimitOfIndemnity: 0.0,
+				PremiumNet:                 0.0,
+				SelfInsurance:              "0",
+			},
+			"Premium": {
+				Deductible:                 "0",
+				DeductibleType:             "",
+				SumInsuredLimitOfIndemnity: 0.0,
+				PremiumNet:                 0.0,
+				SelfInsurance:              "0",
+			},
+		},
 		IsBase:    false,
 		IsYour:    false,
 		IsPremium: false,
@@ -132,24 +137,29 @@ func initCoverageP() map[string]*Coverage {
 		Slug:                       "Decesso Infortunio",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0.0,
-		Base: &CoverageValue{
-			Deductible:                 "0",
-			DeductibleType:             "",
-			SumInsuredLimitOfIndemnity: 0.0,
-			PremiumNet:                 0.0,
-			SelfInsurance:              "0"},
-		Your: &CoverageValue{
-			Deductible:                 "0",
-			DeductibleType:             "",
-			SumInsuredLimitOfIndemnity: 0.0,
-			PremiumNet:                 0.0,
-			SelfInsurance:              "0"},
-		Premium: &CoverageValue{
-			Deductible:                 "0",
-			DeductibleType:             "",
-			SumInsuredLimitOfIndemnity: 0.0,
-			PremiumNet:                 0.0,
-			SelfInsurance:              "0"},
+		Offer: map[string]*CoverageValue{
+			"Base": {
+				Deductible:                 "0",
+				DeductibleType:             "",
+				SumInsuredLimitOfIndemnity: 0.0,
+				PremiumNet:                 0.0,
+				SelfInsurance:              "0",
+			},
+			"Your": {
+				Deductible:                 "0",
+				DeductibleType:             "",
+				SumInsuredLimitOfIndemnity: 0.0,
+				PremiumNet:                 0.0,
+				SelfInsurance:              "0",
+			},
+			"Premium": {
+				Deductible:                 "0",
+				DeductibleType:             "",
+				SumInsuredLimitOfIndemnity: 0.0,
+				PremiumNet:                 0.0,
+				SelfInsurance:              "0",
+			},
+		},
 		IsBase:    false,
 		IsYour:    false,
 		IsPremium: false,
@@ -159,24 +169,29 @@ func initCoverageP() map[string]*Coverage {
 
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0.0,
-		Base: &CoverageValue{
-			Deductible:                 "7",
-			DeductibleType:             "",
-			SumInsuredLimitOfIndemnity: 0.0,
-			PremiumNet:                 0.0,
-			SelfInsurance:              "0"},
-		Your: &CoverageValue{
-			Deductible:                 "0",
-			DeductibleType:             "",
-			SumInsuredLimitOfIndemnity: 0.0,
-			PremiumNet:                 0.0,
-			SelfInsurance:              "0"},
-		Premium: &CoverageValue{
-			Deductible:                 "0",
-			DeductibleType:             "",
-			SumInsuredLimitOfIndemnity: 0.0,
-			PremiumNet:                 0.0,
-			SelfInsurance:              "0"},
+		Offer: map[string]*CoverageValue{
+			"Base": {
+				Deductible:                 "0",
+				DeductibleType:             "",
+				SumInsuredLimitOfIndemnity: 0.0,
+				PremiumNet:                 0.0,
+				SelfInsurance:              "0",
+			},
+			"Your": {
+				Deductible:                 "0",
+				DeductibleType:             "",
+				SumInsuredLimitOfIndemnity: 0.0,
+				PremiumNet:                 0.0,
+				SelfInsurance:              "0",
+			},
+			"Premium": {
+				Deductible:                 "0",
+				DeductibleType:             "",
+				SumInsuredLimitOfIndemnity: 0.0,
+				PremiumNet:                 0.0,
+				SelfInsurance:              "0",
+			},
+		},
 		IsBase:    false,
 		IsYour:    false,
 		IsPremium: false,
@@ -186,24 +201,29 @@ func initCoverageP() map[string]*Coverage {
 
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0.0,
-		Base: &CoverageValue{
-			Deductible:                 "0",
-			DeductibleType:             "",
-			SumInsuredLimitOfIndemnity: 0.0,
-			PremiumNet:                 0.0,
-			SelfInsurance:              "0"},
-		Your: &CoverageValue{
-			Deductible:                 "0",
-			DeductibleType:             "",
-			SumInsuredLimitOfIndemnity: 0.0,
-			PremiumNet:                 0.0,
-			SelfInsurance:              "0"},
-		Premium: &CoverageValue{
-			Deductible:                 "0",
-			DeductibleType:             "",
-			SumInsuredLimitOfIndemnity: 0.0,
-			PremiumNet:                 0.0,
-			SelfInsurance:              "0"},
+		Offer: map[string]*CoverageValue{
+			"Base": {
+				Deductible:                 "0",
+				DeductibleType:             "",
+				SumInsuredLimitOfIndemnity: 0.0,
+				PremiumNet:                 0.0,
+				SelfInsurance:              "0",
+			},
+			"Your": {
+				Deductible:                 "0",
+				DeductibleType:             "",
+				SumInsuredLimitOfIndemnity: 0.0,
+				PremiumNet:                 0.0,
+				SelfInsurance:              "0",
+			},
+			"Premium": {
+				Deductible:                 "0",
+				DeductibleType:             "",
+				SumInsuredLimitOfIndemnity: 0.0,
+				PremiumNet:                 0.0,
+				SelfInsurance:              "0",
+			},
+		},
 		IsBase:    false,
 		IsYour:    false,
 		IsPremium: false,
@@ -212,23 +232,29 @@ func initCoverageP() map[string]*Coverage {
 		Slug:                       "Diaria Convalescenza Infortunio",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0.0,
-		Base: &CoverageValue{
-			Deductible:                 "0",
-			DeductibleType:             "",
-			SumInsuredLimitOfIndemnity: 0.0,
-			PremiumNet:                 0.0,
-			SelfInsurance:              "0"},
-		Your: &CoverageValue{
-			Deductible:                 "0",
-			DeductibleType:             "",
-			SumInsuredLimitOfIndemnity: 0.0,
-			SelfInsurance:              "0"},
-		Premium: &CoverageValue{
-			Deductible:                 "0",
-			DeductibleType:             "",
-			SumInsuredLimitOfIndemnity: 0.0,
-			PremiumNet:                 0.0,
-			SelfInsurance:              "0"},
+		Offer: map[string]*CoverageValue{
+			"Base": {
+				Deductible:                 "0",
+				DeductibleType:             "",
+				SumInsuredLimitOfIndemnity: 0.0,
+				PremiumNet:                 0.0,
+				SelfInsurance:              "0",
+			},
+			"Your": {
+				Deductible:                 "0",
+				DeductibleType:             "",
+				SumInsuredLimitOfIndemnity: 0.0,
+				PremiumNet:                 0.0,
+				SelfInsurance:              "0",
+			},
+			"Premium": {
+				Deductible:                 "0",
+				DeductibleType:             "",
+				SumInsuredLimitOfIndemnity: 0.0,
+				PremiumNet:                 0.0,
+				SelfInsurance:              "0",
+			},
+		},
 		IsBase:    false,
 		IsYour:    false,
 		IsPremium: false,
@@ -237,103 +263,122 @@ func initCoverageP() map[string]*Coverage {
 		Slug:                       "Rimborso spese di cura Infortunio",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0.0,
-		Base: &CoverageValue{
-			Deductible:                 "0",
-			DeductibleType:             "",
-			SumInsuredLimitOfIndemnity: 0.0,
-			PremiumNet:                 0.0,
-			SelfInsurance:              "0"},
-		Your: &CoverageValue{
-			Deductible:                 "0",
-			DeductibleType:             "",
-			SumInsuredLimitOfIndemnity: 0.0,
-			PremiumNet:                 0.0,
-			SelfInsurance:              "0"},
-		Premium: &CoverageValue{
-			Deductible:                 "0",
-			DeductibleType:             "",
-			SumInsuredLimitOfIndemnity: 0.0,
-			PremiumNet:                 0.0,
-			SelfInsurance:              "0"},
+		Offer: map[string]*CoverageValue{
+			"Base": {
+				Deductible:                 "0",
+				DeductibleType:             "",
+				SumInsuredLimitOfIndemnity: 0.0,
+				PremiumNet:                 0.0,
+				SelfInsurance:              "0",
+			},
+			"Your": {
+				Deductible:                 "0",
+				DeductibleType:             "",
+				SumInsuredLimitOfIndemnity: 0.0,
+				PremiumNet:                 0.0,
+				SelfInsurance:              "0",
+			},
+			"Premium": {
+				Deductible:                 "0",
+				DeductibleType:             "",
+				SumInsuredLimitOfIndemnity: 0.0,
+				PremiumNet:                 0.0,
+				SelfInsurance:              "0",
+			},
+		},
 		IsBase:    false,
 		IsYour:    false,
 		IsPremium: false,
 	}
 	res["IPM"] = &Coverage{
-		Slug: "Invalidità Permanente Malattia IPM",
-
+		Slug:                       "Invalidità Permanente Malattia IPM",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0.0,
-		Base: &CoverageValue{
-			Deductible:                 "0",
-			DeductibleType:             "",
-			SumInsuredLimitOfIndemnity: 0.0,
-			SelfInsurance:              "0"},
-		Your: &CoverageValue{
-			Deductible:                 "0",
-			DeductibleType:             "",
-			SumInsuredLimitOfIndemnity: 0.0,
-			PremiumNet:                 0.0,
-			SelfInsurance:              "0"},
-		Premium: &CoverageValue{
-			Deductible:                 "0",
-			DeductibleType:             "",
-			SumInsuredLimitOfIndemnity: 0.0,
-			SelfInsurance:              "0"},
+		Offer: map[string]*CoverageValue{
+			"Base": {
+				Deductible:                 "0",
+				DeductibleType:             "",
+				SumInsuredLimitOfIndemnity: 0.0,
+				PremiumNet:                 0.0,
+				SelfInsurance:              "0",
+			},
+			"Your": {
+				Deductible:                 "0",
+				DeductibleType:             "",
+				SumInsuredLimitOfIndemnity: 0.0,
+				PremiumNet:                 0.0,
+				SelfInsurance:              "0",
+			},
+			"Premium": {
+				Deductible:                 "0",
+				DeductibleType:             "",
+				SumInsuredLimitOfIndemnity: 0.0,
+				PremiumNet:                 0.0,
+				SelfInsurance:              "0",
+			},
+		},
 		IsBase:    false,
 		IsYour:    false,
 		IsPremium: false,
 	}
 	res["ASS"] = &Coverage{
-		Slug: "Assistenza",
-
+		Slug:                       "Assistenza",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0.0,
-		Base: &CoverageValue{
-			Deductible:                 "0",
-			DeductibleType:             "",
-			SumInsuredLimitOfIndemnity: 0.0,
-			PremiumNet:                 0.0,
-			SelfInsurance:              "0"},
-		Your: &CoverageValue{
-			Deductible:                 "0",
-			DeductibleType:             "",
-			SumInsuredLimitOfIndemnity: 0.0,
-			PremiumNet:                 0.0,
-			SelfInsurance:              "0"},
-		Premium: &CoverageValue{
-			Deductible:                 "0",
-			DeductibleType:             "",
-			SumInsuredLimitOfIndemnity: 0.0,
-			PremiumNet:                 0.0,
-			SelfInsurance:              "0"},
+		Offer: map[string]*CoverageValue{
+			"Base": {
+				Deductible:                 "0",
+				DeductibleType:             "",
+				SumInsuredLimitOfIndemnity: 0.0,
+				PremiumNet:                 0.0,
+				SelfInsurance:              "0",
+			},
+			"Your": {
+				Deductible:                 "0",
+				DeductibleType:             "",
+				SumInsuredLimitOfIndemnity: 0.0,
+				PremiumNet:                 0.0,
+				SelfInsurance:              "0",
+			},
+			"Premium": {
+				Deductible:                 "0",
+				DeductibleType:             "",
+				SumInsuredLimitOfIndemnity: 0.0,
+				PremiumNet:                 0.0,
+				SelfInsurance:              "0",
+			},
+		},
 		IsBase:    false,
 		IsYour:    false,
 		IsPremium: false,
 	}
 	res["TL"] = &Coverage{
-		Slug: "Tutela Legale",
-
+		Slug:                       "Tutela Legale",
 		Deductible:                 "0",
 		SumInsuredLimitOfIndemnity: 0.0,
-		Base: &CoverageValue{
-			Deductible:                 "0",
-			DeductibleType:             "",
-			SumInsuredLimitOfIndemnity: 0.0,
-			PremiumNet:                 0.0,
-			SelfInsurance:              "0"},
-		Your: &CoverageValue{
-			Deductible:                 "0",
-			DeductibleType:             "",
-			SumInsuredLimitOfIndemnity: 0.0,
-			PremiumNet:                 0.0,
-			SelfInsurance:              "0"},
-		Premium: &CoverageValue{
-			Deductible:                 "0",
-			DeductibleType:             "",
-			SumInsuredLimitOfIndemnity: 0.0,
-			PremiumNet:                 0.0,
-			SelfInsurance:              "0"},
+		Offer: map[string]*CoverageValue{
+			"Base": {
+				Deductible:                 "0",
+				DeductibleType:             "",
+				SumInsuredLimitOfIndemnity: 0.0,
+				PremiumNet:                 0.0,
+				SelfInsurance:              "0",
+			},
+			"Your": {
+				Deductible:                 "0",
+				DeductibleType:             "",
+				SumInsuredLimitOfIndemnity: 0.0,
+				PremiumNet:                 0.0,
+				SelfInsurance:              "0",
+			},
+			"Premium": {
+				Deductible:                 "0",
+				DeductibleType:             "",
+				SumInsuredLimitOfIndemnity: 0.0,
+				PremiumNet:                 0.0,
+				SelfInsurance:              "0",
+			},
+		},
 		IsBase:    false,
 		IsYour:    false,
 		IsPremium: false,
