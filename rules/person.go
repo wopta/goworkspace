@@ -35,6 +35,7 @@ import (
 	"math"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	lib "github.com/wopta/goworkspace/lib"
@@ -57,7 +58,7 @@ func Person(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	rulesFile = getRulesFile(rulesFile, rulesFileName)
 	_, coverages := lib.RulesFromJson(rulesFile, initCoverageP(), quotingInputData, []byte(getQuotingData()))
-	outJson, out := roundPrices(getOfferPrices(coverages))
+	outJson, out := filterOffers(roundPrices(getOfferPrices(coverages)))
 	w.Header().Set("Content-Type", "Application/json")
 	return outJson, out, nil
 }
@@ -400,7 +401,7 @@ func getQuotingData() string {
 	return string(lib.GetByteByEnv("quote/persona-tassi.json", false))
 }
 
-func getOfferPrices(coverage interface{}) Out {
+func getOfferPrices(coverage interface{}) *Out {
 	offerPrice := make(map[string]map[string]*Price)
 
 	offerPrice["Base"] = map[string]*Price{
@@ -472,21 +473,65 @@ func getOfferPrices(coverage interface{}) Out {
 		OfferPrice: offerPrice,
 	}
 
-	return out
+	return &out
 }
 
-func roundPrices(out Out) (string, Out) {
-	for typePayment, priceStruct := range out.OfferPrice {
+func roundPrices(out *Out) *Out {
+	for offerType, priceStruct := range out.OfferPrice {
+		log.Println("Offer type: " + offerType)
+		log.Println("Initial IPI Price Gross: " + strconv.FormatFloat(out.Coverages["IPI"].Offer[offerType].PremiumGross, 'f', -1, 64))
+		log.Println("PT: " + strconv.FormatFloat(priceStruct["Yearly"].Gross, 'f', -1, 64))
+		log.Println("Pm: " + strconv.FormatFloat(priceStruct["Monthly"].Gross, 'f', -1, 64))
 		ceilPriceGrossYear := math.Ceil(priceStruct["Yearly"].Gross)
 		priceStruct["Yearly"].Delta = ceilPriceGrossYear - priceStruct["Yearly"].Gross
 		priceStruct["Yearly"].Gross = ceilPriceGrossYear
-		out.Coverages["IPI"].Offer[typePayment].PremiumGross += priceStruct["Yearly"].Delta
+		out.Coverages["IPI"].Offer[offerType].PremiumGross += priceStruct["Yearly"].Delta
 
+		/*log.Println("*** Yearly After Round and Ceil ***")
+		log.Println("PriceGrossYearly: " + strconv.FormatFloat(priceStruct["Yearly"].Gross, 'f', -1, 64))
+		log.Println("IPI Price Gross: " + strconv.FormatFloat(out.Coverages["IPI"].Offer[typePayment].PremiumGross, 'f', -1, 64))
+		log.Println("Delta: " + strconv.FormatFloat(priceStruct["Yearly"].Delta, 'f', -1, 64))
+		log.Println()
+		log.Println("*** Monthly Before Round ***")*/
+		//log.Println("Delta: " + strconv.FormatFloat(priceStruct["Monthly"].Delta, 'f', -1, 64))
 		roundPriceGrossMonth := math.Round(priceStruct["Monthly"].Gross)
 		priceStruct["Monthly"].Delta = roundPriceGrossMonth - priceStruct["Monthly"].Gross
 		priceStruct["Monthly"].Gross = roundPriceGrossMonth
+		//log.Println("*** Monthly After Round ***")
+
+		log.Println("PGa: " + strconv.FormatFloat(priceStruct["Yearly"].Gross, 'f', -1, 64))
+		log.Println("PGm: " + strconv.FormatFloat(priceStruct["Monthly"].Gross, 'f', -1, 64))
+		log.Println("Monthly Delta: " + strconv.FormatFloat(priceStruct["Monthly"].Delta, 'f', -1, 64))
+		log.Println("Yearly Delta: " + strconv.FormatFloat(priceStruct["Yearly"].Delta, 'f', -1, 64))
+		log.Println("Final IPI Price Gross: " + strconv.FormatFloat(out.Coverages["IPI"].Offer[offerType].PremiumGross, 'f', -1, 64))
+		log.Println()
+	}
+
+	return out
+}
+
+func filterOffers(out *Out) (string, Out) {
+	coveragesKey := make([]string, 0)
+	for key, _ := range out.Coverages {
+		coveragesKey = append(coveragesKey, key)
+	}
+	toBeDeleted := make([]string, 0)
+	for offerType, priceStruct := range out.OfferPrice {
+		if priceStruct["Yearly"].Gross < 120 || priceStruct["Monthly"].Gross < 50 {
+			toBeDeleted = append(toBeDeleted, offerType)
+		}
+	}
+
+	log.Println("Offers to be deleted: ", toBeDeleted)
+	log.Println("Coverage kes: ", coveragesKey)
+
+	for _, offerType := range toBeDeleted {
+		delete(out.OfferPrice, offerType)
+		for _, coverage := range coveragesKey {
+			delete(out.Coverages[coverage].Offer, offerType)
+		}
 	}
 
 	outJson, _ := json.Marshal(out)
-	return string(outJson), out
+	return string(outJson), *out
 }
