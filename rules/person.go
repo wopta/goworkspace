@@ -43,11 +43,13 @@ import (
 )
 
 const (
-	base    = "base"
-	your    = "your"
-	premium = "premium"
-	monthly = "monthly"
-	yearly  = "yearly"
+	base                = "base"
+	your                = "your"
+	premium             = "premium"
+	monthly             = "monthly"
+	yearly              = "yearly"
+	yearlyPriceMinimum  = 120
+	monthlyPriceMinimum = 50
 )
 
 func Person(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -112,8 +114,8 @@ func calculateAge(birthDateIsoString string) (int, error) {
 }
 
 func initCoverageP() map[string]*Coverage {
-
 	var coverages = make(map[string]*Coverage)
+
 	coverages["IPI"] = &Coverage{
 		Slug:                       "Invalidità Permanente Infortunio",
 		Deductible:                 "0",
@@ -486,6 +488,7 @@ func roundPrices(out *Out) *Out {
 	for offerType, priceStruct := range out.OfferPrice {
 		log.Println("Offer type: " + offerType)
 		log.Println("Initial IPI Price Gross: " + strconv.FormatFloat(out.Coverages["IPI"].Offer[offerType].PremiumGross, 'f', -1, 64))
+		log.Println("Initial DRG Price Gross: " + strconv.FormatFloat(out.Coverages["DRG"].Offer[offerType].PremiumGross, 'f', -1, 64))
 		log.Println("PT: " + strconv.FormatFloat(priceStruct[yearly].Gross, 'f', -1, 64))
 		log.Println("Pm: " + strconv.FormatFloat(priceStruct[monthly].Gross, 'f', -1, 64))
 		ceilPriceGrossYear := math.Ceil(priceStruct[yearly].Gross)
@@ -506,6 +509,7 @@ func roundPrices(out *Out) *Out {
 		log.Println("Monthly Delta: " + strconv.FormatFloat(priceStruct[monthly].Delta, 'f', -1, 64))
 		log.Println("Yearly Delta: " + strconv.FormatFloat(priceStruct[yearly].Delta, 'f', -1, 64))
 		log.Println("Final IPI Price Gross: " + strconv.FormatFloat(out.Coverages["IPI"].Offer[offerType].PremiumGross, 'f', -1, 64))
+		log.Println("Final DRG Price Gross: " + strconv.FormatFloat(out.Coverages["DRG"].Offer[offerType].PremiumGross, 'f', -1, 64))
 		log.Println()
 	}
 
@@ -515,7 +519,7 @@ func roundPrices(out *Out) *Out {
 func filterOffers(out *Out) (string, *Out) {
 	toBeDeleted := make([]string, 0)
 	for offerType, priceStruct := range out.OfferPrice {
-		if priceStruct[yearly].Gross < 120 || priceStruct[monthly].Gross < 50 {
+		if priceStruct[yearly].Gross < yearlyPriceMinimum || priceStruct[monthly].Gross < monthlyPriceMinimum {
 			toBeDeleted = append(toBeDeleted, offerType)
 		}
 	}
