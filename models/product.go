@@ -25,7 +25,7 @@ type Product struct {
 	Companies      []Company `firestore:"companies,omitempty" json:"companies,omitempty"`
 	ProductUid     string    `firestore:"productUid,omitempty" json:"productUid,omitempty"`
 	ProductVersion int       `firestore:"productVersion,omitempty" json:"productVersion,omitempty"`
-	ProposalNumber int       `firestore:"proposalNumber,omitempty" json:"proposalNumber,omitempty"`
+	Version        string    `firestore:"version,omitempty" json:"version,omitempty"`
 	Number         int       `firestore:"number,omitempty" json:"number,omitempty"`
 	Name           string    `firestore:"name,omitempty" json:"name,omitempty"`
 	Steps          []Step    `firestore:"steps,omitempty" json:"steps" `

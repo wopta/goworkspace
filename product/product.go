@@ -43,35 +43,33 @@ const (
 	productCollection = "products"
 )
 
-func GetFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.Println(r.Header.Get("uid"))
-	p, e := Get(r.Header.Get("uid"))
-	jsonString, e := p.Marshal()
-	return string(jsonString), p, e
-}
-func Get(uid string) (models.Product, error) {
-	log.Println(uid)
-	productFire := lib.GetFirestore("products", uid)
-	var product models.Product
-	e := productFire.DataTo(product)
-	return product, e
-}
-
 func GetNameFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	name := r.Header.Get("name")
-	log.Println(name)
-	product, e := GetName(name)
+	version := r.RequestURI[1:3]
+	log.Println(version)
+	product, e := GetName(name, version)
 	jsonString, e := product.Marshal()
 	return string(jsonString), product, e
 
 }
-func GetName(name string) (models.Product, error) {
+func GetName(name string, version string) (models.Product, error) {
+	q := lib.Firequeries{
+		Queries: []lib.Firequery{{
+			Field:      "name",
+			Operator:   "==",
+			QueryValue: name,
+		},
+			{
+				Field:      "version",
+				Operator:   "==",
+				QueryValue: version,
+			},
+		},
+	}
+	query := q.FirestoreWherefields("product")
+	products := models.ProductToListData(query)
 
-	productFire, e := lib.QueryWhereFirestore("products", "name", "==", name)
-
-	products := models.ProductToListData(productFire)
-
-	return products[0], e
+	return products[0], nil
 
 }
 

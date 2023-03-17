@@ -1,6 +1,7 @@
 package document
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"sort"
@@ -381,8 +382,9 @@ func (s Skin) CoveragesPmiTable(m pdf.Maroto, data models.Policy) pdf.Maroto {
 		productFile := lib.ErrorByte(ioutil.ReadFile("function-data/products/" + data.Name + ".json"))
 		product, e = models.UnmarshalProduct(productFile)
 		lib.CheckError(e)
+
 	} else {
-		product, e = p.GetName(data.Name)
+		product, e = p.GetName(data.Name, "v"+fmt.Sprint(data.ProductVersion))
 		lib.CheckError(e)
 	}
 
