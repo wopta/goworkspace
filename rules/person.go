@@ -401,7 +401,7 @@ func getQuotingData() string {
 	return string(lib.GetByteByEnv("quote/persona-tassi.json", false))
 }
 
-func getOfferPrices(coverage interface{}) *Out {
+func getOfferPrices(coverages interface{}) *Out {
 	offerPrice := make(map[string]map[string]*Price)
 
 	offerPrice["Base"] = map[string]*Price{
@@ -453,27 +453,25 @@ func getOfferPrices(coverage interface{}) *Out {
 		},
 	}
 
-	if m, ok := coverage.(map[string]*Coverage); ok {
-		for _, c := range m {
-			for k, coverageValue := range c.Offer {
-				offerPrice[k]["Yearly"].Net += coverageValue.PremiumNet
-				offerPrice[k]["Yearly"].Tax += coverageValue.PremiumTaxAmount
-				offerPrice[k]["Yearly"].Gross += coverageValue.PremiumGross
-				//offerPrice[k]["Yearly"].Discount += coverageValue.
-				offerPrice[k]["Monthly"].Net += coverageValue.PremiumNet / 12
-				offerPrice[k]["Monthly"].Tax += coverageValue.PremiumTaxAmount / 12
-				offerPrice[k]["Monthly"].Gross += coverageValue.PremiumGross / 12
-				//offerPrice[k]["Monthly"].Discount += coverageValue.
+	if coveragesStruct, ok := coverages.(map[string]*Coverage); ok {
+		for _, coverage := range coveragesStruct {
+			for offerKey, offerValue := range coverage.Offer {
+				offerPrice[offerKey]["Yearly"].Net += offerValue.PremiumNet
+				offerPrice[offerKey]["Yearly"].Tax += offerValue.PremiumTaxAmount
+				offerPrice[offerKey]["Yearly"].Gross += offerValue.PremiumGross
+				offerPrice[offerKey]["Monthly"].Net += offerValue.PremiumNet / 12
+				offerPrice[offerKey]["Monthly"].Tax += offerValue.PremiumTaxAmount / 12
+				offerPrice[offerKey]["Monthly"].Gross += offerValue.PremiumGross / 12
 			}
 		}
 	}
 
-	out := Out{
-		Coverages:  coverage.(map[string]*Coverage),
+	out := &Out{
+		Coverages:  coverages.(map[string]*Coverage),
 		OfferPrice: offerPrice,
 	}
 
-	return &out
+	return out
 }
 
 func roundPrices(out *Out) *Out {
@@ -485,19 +483,15 @@ func roundPrices(out *Out) *Out {
 		ceilPriceGrossYear := math.Ceil(priceStruct["Yearly"].Gross)
 		priceStruct["Yearly"].Delta = ceilPriceGrossYear - priceStruct["Yearly"].Gross
 		priceStruct["Yearly"].Gross = ceilPriceGrossYear
-		out.Coverages["IPI"].Offer[offerType].PremiumGross += priceStruct["Yearly"].Delta
+		if out.Coverages["IPI"].Offer[offerType].PremiumGross > 0 {
+			out.Coverages["IPI"].Offer[offerType].PremiumGross += priceStruct["Yearly"].Delta
+		} else {
+			out.Coverages["DRG"].Offer[offerType].PremiumGross += priceStruct["Yearly"].Delta
+		}
 
-		/*log.Println("*** Yearly After Round and Ceil ***")
-		log.Println("PriceGrossYearly: " + strconv.FormatFloat(priceStruct["Yearly"].Gross, 'f', -1, 64))
-		log.Println("IPI Price Gross: " + strconv.FormatFloat(out.Coverages["IPI"].Offer[typePayment].PremiumGross, 'f', -1, 64))
-		log.Println("Delta: " + strconv.FormatFloat(priceStruct["Yearly"].Delta, 'f', -1, 64))
-		log.Println()
-		log.Println("*** Monthly Before Round ***")*/
-		//log.Println("Delta: " + strconv.FormatFloat(priceStruct["Monthly"].Delta, 'f', -1, 64))
 		roundPriceGrossMonth := math.Round(priceStruct["Monthly"].Gross)
 		priceStruct["Monthly"].Delta = roundPriceGrossMonth - priceStruct["Monthly"].Gross
 		priceStruct["Monthly"].Gross = roundPriceGrossMonth
-		//log.Println("*** Monthly After Round ***")
 
 		log.Println("PGa: " + strconv.FormatFloat(priceStruct["Yearly"].Gross, 'f', -1, 64))
 		log.Println("PGm: " + strconv.FormatFloat(priceStruct["Monthly"].Gross, 'f', -1, 64))
@@ -510,11 +504,7 @@ func roundPrices(out *Out) *Out {
 	return out
 }
 
-func filterOffers(out *Out) (string, Out) {
-	coveragesKey := make([]string, 0)
-	for key, _ := range out.Coverages {
-		coveragesKey = append(coveragesKey, key)
-	}
+func filterOffers(out *Out) (string, *Out) {
 	toBeDeleted := make([]string, 0)
 	for offerType, priceStruct := range out.OfferPrice {
 		if priceStruct["Yearly"].Gross < 120 || priceStruct["Monthly"].Gross < 50 {
@@ -523,15 +513,14 @@ func filterOffers(out *Out) (string, Out) {
 	}
 
 	log.Println("Offers to be deleted: ", toBeDeleted)
-	log.Println("Coverage kes: ", coveragesKey)
 
 	for _, offerType := range toBeDeleted {
 		delete(out.OfferPrice, offerType)
-		for _, coverage := range coveragesKey {
-			delete(out.Coverages[coverage].Offer, offerType)
+		for _, coverage := range out.Coverages {
+			delete(coverage.Offer, offerType)
 		}
 	}
 
 	outJson, _ := json.Marshal(out)
-	return string(outJson), *out
+	return string(outJson), out
 }
