@@ -41,16 +41,16 @@ func Rules(w http.ResponseWriter, r *http.Request) {
 }
 
 type Price struct {
-	Net      float64
-	Tax      float64
-	Gross    float64
-	Delta    float64
-	Discount float64
+	Net      float64 `json:"net"`
+	Tax      float64 `json:"tax"`
+	Gross    float64 `json:"gross"`
+	Delta    float64 `json:"delta"`
+	Discount float64 `json:"discount"`
 }
 
 type Out struct {
-	Coverages  map[string]*Coverage
-	OfferPrice map[string]map[string]*Price
+	Coverages  map[string]*Coverage         `json:"coverages"`
+	OfferPrice map[string]map[string]*Price `json:"offerPrice"`
 }
 
 type Coverage struct {

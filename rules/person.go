@@ -30,7 +30,7 @@ INPUT:
 */
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"log"
 	"math"
 	"net/http"
@@ -40,6 +40,14 @@ import (
 
 	lib "github.com/wopta/goworkspace/lib"
 	models "github.com/wopta/goworkspace/models"
+)
+
+const (
+	base    = "base"
+	your    = "your"
+	premium = "premium"
+	monthly = "monthly"
+	yearly  = "yearly"
 )
 
 func Person(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -53,7 +61,7 @@ func Person(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	)
 
 	log.Println("Person")
-	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
+	req := lib.ErrorByte(io.ReadAll(r.Body))
 	quotingInputData := getRulesInputData(policy, e, req)
 
 	rulesFile = getRulesFile(rulesFile, rulesFileName)
@@ -112,21 +120,21 @@ func initCoverageP() map[string]*Coverage {
 		Tax:                        2.5,
 		SumInsuredLimitOfIndemnity: 0.0,
 		Offer: map[string]*CoverageValue{
-			"Base": {
+			base: {
 				Deductible:                 "0",
 				DeductibleType:             "",
 				SumInsuredLimitOfIndemnity: 0.0,
 				PremiumNet:                 0.0,
 				SelfInsurance:              "0",
 			},
-			"Your": {
+			your: {
 				Deductible:                 "0",
 				DeductibleType:             "",
 				SumInsuredLimitOfIndemnity: 0.0,
 				PremiumNet:                 0.0,
 				SelfInsurance:              "0",
 			},
-			"Premium": {
+			premium: {
 				Deductible:                 "0",
 				DeductibleType:             "",
 				SumInsuredLimitOfIndemnity: 0.0,
@@ -144,21 +152,21 @@ func initCoverageP() map[string]*Coverage {
 		Tax:                        2.5,
 		SumInsuredLimitOfIndemnity: 0.0,
 		Offer: map[string]*CoverageValue{
-			"Base": {
+			base: {
 				Deductible:                 "0",
 				DeductibleType:             "",
 				SumInsuredLimitOfIndemnity: 0.0,
 				PremiumNet:                 0.0,
 				SelfInsurance:              "0",
 			},
-			"Your": {
+			your: {
 				Deductible:                 "0",
 				DeductibleType:             "",
 				SumInsuredLimitOfIndemnity: 0.0,
 				PremiumNet:                 0.0,
 				SelfInsurance:              "0",
 			},
-			"Premium": {
+			premium: {
 				Deductible:                 "0",
 				DeductibleType:             "",
 				SumInsuredLimitOfIndemnity: 0.0,
@@ -176,21 +184,21 @@ func initCoverageP() map[string]*Coverage {
 		Tax:                        2.5,
 		SumInsuredLimitOfIndemnity: 0.0,
 		Offer: map[string]*CoverageValue{
-			"Base": {
+			base: {
 				Deductible:                 "0",
 				DeductibleType:             "",
 				SumInsuredLimitOfIndemnity: 0.0,
 				PremiumNet:                 0.0,
 				SelfInsurance:              "0",
 			},
-			"Your": {
+			your: {
 				Deductible:                 "0",
 				DeductibleType:             "",
 				SumInsuredLimitOfIndemnity: 0.0,
 				PremiumNet:                 0.0,
 				SelfInsurance:              "0",
 			},
-			"Premium": {
+			premium: {
 				Deductible:                 "0",
 				DeductibleType:             "",
 				SumInsuredLimitOfIndemnity: 0.0,
@@ -208,21 +216,21 @@ func initCoverageP() map[string]*Coverage {
 		Tax:                        2.5,
 		SumInsuredLimitOfIndemnity: 0.0,
 		Offer: map[string]*CoverageValue{
-			"Base": {
+			base: {
 				Deductible:                 "0",
 				DeductibleType:             "",
 				SumInsuredLimitOfIndemnity: 0.0,
 				PremiumNet:                 0.0,
 				SelfInsurance:              "0",
 			},
-			"Your": {
+			your: {
 				Deductible:                 "0",
 				DeductibleType:             "",
 				SumInsuredLimitOfIndemnity: 0.0,
 				PremiumNet:                 0.0,
 				SelfInsurance:              "0",
 			},
-			"Premium": {
+			premium: {
 				Deductible:                 "0",
 				DeductibleType:             "",
 				SumInsuredLimitOfIndemnity: 0.0,
@@ -240,21 +248,21 @@ func initCoverageP() map[string]*Coverage {
 		Tax:                        2.5,
 		SumInsuredLimitOfIndemnity: 0.0,
 		Offer: map[string]*CoverageValue{
-			"Base": {
+			base: {
 				Deductible:                 "0",
 				DeductibleType:             "",
 				SumInsuredLimitOfIndemnity: 0.0,
 				PremiumNet:                 0.0,
 				SelfInsurance:              "0",
 			},
-			"Your": {
+			your: {
 				Deductible:                 "0",
 				DeductibleType:             "",
 				SumInsuredLimitOfIndemnity: 0.0,
 				PremiumNet:                 0.0,
 				SelfInsurance:              "0",
 			},
-			"Premium": {
+			premium: {
 				Deductible:                 "0",
 				DeductibleType:             "",
 				SumInsuredLimitOfIndemnity: 0.0,
@@ -272,21 +280,21 @@ func initCoverageP() map[string]*Coverage {
 		Tax:                        2.5,
 		SumInsuredLimitOfIndemnity: 0.0,
 		Offer: map[string]*CoverageValue{
-			"Base": {
+			base: {
 				Deductible:                 "0",
 				DeductibleType:             "",
 				SumInsuredLimitOfIndemnity: 0.0,
 				PremiumNet:                 0.0,
 				SelfInsurance:              "0",
 			},
-			"Your": {
+			your: {
 				Deductible:                 "0",
 				DeductibleType:             "",
 				SumInsuredLimitOfIndemnity: 0.0,
 				PremiumNet:                 0.0,
 				SelfInsurance:              "0",
 			},
-			"Premium": {
+			premium: {
 				Deductible:                 "0",
 				DeductibleType:             "",
 				SumInsuredLimitOfIndemnity: 0.0,
@@ -304,21 +312,21 @@ func initCoverageP() map[string]*Coverage {
 		Tax:                        2.5,
 		SumInsuredLimitOfIndemnity: 0.0,
 		Offer: map[string]*CoverageValue{
-			"Base": {
+			base: {
 				Deductible:                 "0",
 				DeductibleType:             "",
 				SumInsuredLimitOfIndemnity: 0.0,
 				PremiumNet:                 0.0,
 				SelfInsurance:              "0",
 			},
-			"Your": {
+			your: {
 				Deductible:                 "0",
 				DeductibleType:             "",
 				SumInsuredLimitOfIndemnity: 0.0,
 				PremiumNet:                 0.0,
 				SelfInsurance:              "0",
 			},
-			"Premium": {
+			premium: {
 				Deductible:                 "0",
 				DeductibleType:             "",
 				SumInsuredLimitOfIndemnity: 0.0,
@@ -336,21 +344,21 @@ func initCoverageP() map[string]*Coverage {
 		Tax:                        10,
 		SumInsuredLimitOfIndemnity: 0.0,
 		Offer: map[string]*CoverageValue{
-			"Base": {
+			base: {
 				Deductible:                 "0",
 				DeductibleType:             "",
 				SumInsuredLimitOfIndemnity: 0.0,
 				PremiumNet:                 0.0,
 				SelfInsurance:              "0",
 			},
-			"Your": {
+			your: {
 				Deductible:                 "0",
 				DeductibleType:             "",
 				SumInsuredLimitOfIndemnity: 0.0,
 				PremiumNet:                 0.0,
 				SelfInsurance:              "0",
 			},
-			"Premium": {
+			premium: {
 				Deductible:                 "0",
 				DeductibleType:             "",
 				SumInsuredLimitOfIndemnity: 0.0,
@@ -368,21 +376,21 @@ func initCoverageP() map[string]*Coverage {
 		Tax:                        21.25,
 		SumInsuredLimitOfIndemnity: 0.0,
 		Offer: map[string]*CoverageValue{
-			"Base": {
+			base: {
 				Deductible:                 "0",
 				DeductibleType:             "",
 				SumInsuredLimitOfIndemnity: 0.0,
 				PremiumNet:                 0.0,
 				SelfInsurance:              "0",
 			},
-			"Your": {
+			your: {
 				Deductible:                 "0",
 				DeductibleType:             "",
 				SumInsuredLimitOfIndemnity: 0.0,
 				PremiumNet:                 0.0,
 				SelfInsurance:              "0",
 			},
-			"Premium": {
+			premium: {
 				Deductible:                 "0",
 				DeductibleType:             "",
 				SumInsuredLimitOfIndemnity: 0.0,
@@ -404,31 +412,15 @@ func getQuotingData() string {
 func getOfferPrices(coverages interface{}) *Out {
 	offerPrice := make(map[string]map[string]*Price)
 
-	offerPrice["Base"] = map[string]*Price{
-		"Monthly": {
+	offerPrice[base] = map[string]*Price{
+		monthly: {
 			Net:      0,
 			Tax:      0,
 			Gross:    0,
 			Delta:    0,
 			Discount: 0,
 		},
-		"Yearly": {
-			Net:      0,
-			Tax:      0,
-			Gross:    0,
-			Delta:    0,
-			Discount: 0,
-		},
-	}
-	offerPrice["Your"] = map[string]*Price{
-		"Monthly": {
-			Net:      0,
-			Tax:      0,
-			Gross:    0,
-			Delta:    0,
-			Discount: 0,
-		},
-		"Yearly": {
+		yearly: {
 			Net:      0,
 			Tax:      0,
 			Gross:    0,
@@ -436,15 +428,31 @@ func getOfferPrices(coverages interface{}) *Out {
 			Discount: 0,
 		},
 	}
-	offerPrice["Premium"] = map[string]*Price{
-		"Monthly": {
+	offerPrice[your] = map[string]*Price{
+		monthly: {
 			Net:      0,
 			Tax:      0,
 			Gross:    0,
 			Delta:    0,
 			Discount: 0,
 		},
-		"Yearly": {
+		yearly: {
+			Net:      0,
+			Tax:      0,
+			Gross:    0,
+			Delta:    0,
+			Discount: 0,
+		},
+	}
+	offerPrice[premium] = map[string]*Price{
+		monthly: {
+			Net:      0,
+			Tax:      0,
+			Gross:    0,
+			Delta:    0,
+			Discount: 0,
+		},
+		yearly: {
 			Net:      0,
 			Tax:      0,
 			Gross:    0,
@@ -456,12 +464,12 @@ func getOfferPrices(coverages interface{}) *Out {
 	if coveragesStruct, ok := coverages.(map[string]*Coverage); ok {
 		for _, coverage := range coveragesStruct {
 			for offerKey, offerValue := range coverage.Offer {
-				offerPrice[offerKey]["Yearly"].Net += offerValue.PremiumNet
-				offerPrice[offerKey]["Yearly"].Tax += offerValue.PremiumTaxAmount
-				offerPrice[offerKey]["Yearly"].Gross += offerValue.PremiumGross
-				offerPrice[offerKey]["Monthly"].Net += offerValue.PremiumNet / 12
-				offerPrice[offerKey]["Monthly"].Tax += offerValue.PremiumTaxAmount / 12
-				offerPrice[offerKey]["Monthly"].Gross += offerValue.PremiumGross / 12
+				offerPrice[offerKey][yearly].Net += offerValue.PremiumNet
+				offerPrice[offerKey][yearly].Tax += offerValue.PremiumTaxAmount
+				offerPrice[offerKey][yearly].Gross += offerValue.PremiumGross
+				offerPrice[offerKey][monthly].Net += offerValue.PremiumNet / 12
+				offerPrice[offerKey][monthly].Tax += offerValue.PremiumTaxAmount / 12
+				offerPrice[offerKey][monthly].Gross += offerValue.PremiumGross / 12
 			}
 		}
 	}
@@ -478,25 +486,25 @@ func roundPrices(out *Out) *Out {
 	for offerType, priceStruct := range out.OfferPrice {
 		log.Println("Offer type: " + offerType)
 		log.Println("Initial IPI Price Gross: " + strconv.FormatFloat(out.Coverages["IPI"].Offer[offerType].PremiumGross, 'f', -1, 64))
-		log.Println("PT: " + strconv.FormatFloat(priceStruct["Yearly"].Gross, 'f', -1, 64))
-		log.Println("Pm: " + strconv.FormatFloat(priceStruct["Monthly"].Gross, 'f', -1, 64))
-		ceilPriceGrossYear := math.Ceil(priceStruct["Yearly"].Gross)
-		priceStruct["Yearly"].Delta = ceilPriceGrossYear - priceStruct["Yearly"].Gross
-		priceStruct["Yearly"].Gross = ceilPriceGrossYear
+		log.Println("PT: " + strconv.FormatFloat(priceStruct[yearly].Gross, 'f', -1, 64))
+		log.Println("Pm: " + strconv.FormatFloat(priceStruct[monthly].Gross, 'f', -1, 64))
+		ceilPriceGrossYear := math.Ceil(priceStruct[yearly].Gross)
+		priceStruct[yearly].Delta = ceilPriceGrossYear - priceStruct[yearly].Gross
+		priceStruct[yearly].Gross = ceilPriceGrossYear
 		if out.Coverages["IPI"].Offer[offerType].PremiumGross > 0 {
-			out.Coverages["IPI"].Offer[offerType].PremiumGross += priceStruct["Yearly"].Delta
+			out.Coverages["IPI"].Offer[offerType].PremiumGross += priceStruct[yearly].Delta
 		} else {
-			out.Coverages["DRG"].Offer[offerType].PremiumGross += priceStruct["Yearly"].Delta
+			out.Coverages["DRG"].Offer[offerType].PremiumGross += priceStruct[yearly].Delta
 		}
 
-		roundPriceGrossMonth := math.Round(priceStruct["Monthly"].Gross)
-		priceStruct["Monthly"].Delta = roundPriceGrossMonth - priceStruct["Monthly"].Gross
-		priceStruct["Monthly"].Gross = roundPriceGrossMonth
+		roundPriceGrossMonth := math.Round(priceStruct[monthly].Gross)
+		priceStruct[monthly].Delta = roundPriceGrossMonth - priceStruct[monthly].Gross
+		priceStruct[monthly].Gross = roundPriceGrossMonth
 
-		log.Println("PGa: " + strconv.FormatFloat(priceStruct["Yearly"].Gross, 'f', -1, 64))
-		log.Println("PGm: " + strconv.FormatFloat(priceStruct["Monthly"].Gross, 'f', -1, 64))
-		log.Println("Monthly Delta: " + strconv.FormatFloat(priceStruct["Monthly"].Delta, 'f', -1, 64))
-		log.Println("Yearly Delta: " + strconv.FormatFloat(priceStruct["Yearly"].Delta, 'f', -1, 64))
+		log.Println("PGa: " + strconv.FormatFloat(priceStruct[yearly].Gross, 'f', -1, 64))
+		log.Println("PGm: " + strconv.FormatFloat(priceStruct[monthly].Gross, 'f', -1, 64))
+		log.Println("Monthly Delta: " + strconv.FormatFloat(priceStruct[monthly].Delta, 'f', -1, 64))
+		log.Println("Yearly Delta: " + strconv.FormatFloat(priceStruct[yearly].Delta, 'f', -1, 64))
 		log.Println("Final IPI Price Gross: " + strconv.FormatFloat(out.Coverages["IPI"].Offer[offerType].PremiumGross, 'f', -1, 64))
 		log.Println()
 	}
@@ -507,7 +515,7 @@ func roundPrices(out *Out) *Out {
 func filterOffers(out *Out) (string, *Out) {
 	toBeDeleted := make([]string, 0)
 	for offerType, priceStruct := range out.OfferPrice {
-		if priceStruct["Yearly"].Gross < 120 || priceStruct["Monthly"].Gross < 50 {
+		if priceStruct[yearly].Gross < 120 || priceStruct[monthly].Gross < 50 {
 			toBeDeleted = append(toBeDeleted, offerType)
 		}
 	}
