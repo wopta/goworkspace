@@ -28,6 +28,7 @@ type Product struct {
 	ProposalNumber int       `firestore:"proposalNumber,omitempty" json:"proposalNumber,omitempty"`
 	Number         int       `firestore:"number,omitempty" json:"number,omitempty"`
 	Name           string    `firestore:"name,omitempty" json:"name,omitempty"`
+	Steps          []Step    `firestore:"steps,omitempty" json:"steps" `
 }
 
 type Company struct {
@@ -37,6 +38,16 @@ type Company struct {
 	CommissionRenew float64             `firestore:"commissionRenew,omitempty" json:"commissionRenew,omitempty"`
 	Guarantees      *[]Guarante         `firestore:"guarantees,omitempty" json:"guarantees,omitempty"`
 	GuaranteesMap   map[string]Guarante `firestore:"guaranteesMap,omitempty" json:"guaranteesMap,omitempty"`
+}
+type Step struct {
+	Widget     string      `firestore:"widget,omitempty" json:"widget"`
+	Attributes interface{} `firestore:"attributes,omitempty" json:"attributes"`
+	Children   []Child     `firestore:"children,omitempty" json:"children,omitempty"`
+}
+
+type Child struct {
+	Widget     string      `firestore:"widget,omitempty" json:"widget"`
+	Attributes interface{} `firestore:"attributes,omitempty" json:"attributes"`
 }
 
 func ProductToListData(query *firestore.DocumentIterator) []Product {

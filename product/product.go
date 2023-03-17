@@ -29,18 +29,6 @@ func Product(w http.ResponseWriter, r *http.Request) {
 				Method:  "GET",
 			},
 			{
-				Route:   "/v1/:uid",
-				Handler: GetFx,
-				Method:  "GET",
-			},
-
-			{
-				Route:   "/v1",
-				Handler: GetNameFx,
-				Method:  "POST",
-			},
-
-			{
 				Route:   "/v1",
 				Handler: PutFx,
 				Method:  "PUT",

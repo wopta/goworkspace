@@ -99,11 +99,7 @@ func calculateAge(birthDateIsoString string) (int, error) {
 	}
 	return age, e
 }
-func getpolicy() Policy {
-	return Policy{
-		GuaranceMap: initCoverageP(),
-	}
-}
+
 func initCoverageP() map[string]*Coverage {
 
 	var res = make(map[string]*Coverage)

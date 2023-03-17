@@ -40,12 +40,6 @@ func Rules(w http.ResponseWriter, r *http.Request) {
 
 }
 
-type Rules struct {
-	PriceNett   float64
-	PriceGross  float64
-	OfferMap    map[string]Coverage
-	GuaranceMap map[string]Coverage
-}
 type Coverage struct {
 	DailyAllowance             string
 	Name                       string
