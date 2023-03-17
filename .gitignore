@@ -9,3 +9,4 @@ main.go
 sa_key_frontend.json
 .vscode/
 function-data/
+.idea
