@@ -103,14 +103,14 @@ func getWork() []byte {
 	Ballerino;S.E.;;x;
 	Barbiere;1;x;x;
 	Barista;2;x;x;
-	Benestante;1;;;x
+	Benestante;1;;x;
 	Biologo (senza uso e/o contatto con sostanze radioattive/nucleari o pericolose in genere e con esclusione trattamento sangue, organi ed emoderivati);2;x;x;
 	Calzolaio;3;x;x;
 	Cancelliere;1;x;x;
 	Carpentiere;4;x;x;
 	Carrozziere/Garagista;3;x;x;
 	Cartolaio;2;x;x;
-	Casalinga/o;2;;;x
+	Casalinga/o;2;;x;
 	Casaro;2;x;x;
 	Cavatori con uso di esplosivi e lavoro manuale;S.E.;;x;
 	Ceramista;3;x;x;
@@ -226,7 +226,7 @@ func getWork() []byte {
 	Noleggiatore (non veicoli);2;x;x;
 	Noleggiatore Veicoli;2;x;x;
 	Notaio;1;x;x;
-	Nullafacente/Disoccupato;4;;;x
+	Nullafacente/Disoccupato;4;;x;
 	Operaio (con uso di macchine con accesso a cantieri);4;;x;
 	Operaio (con uso di macchine senza accesso a cantieri);4;;x;
 	Operatore dello spettacolo (musicista, attore, presentatore);2;x;x;
@@ -242,7 +242,7 @@ func getWork() []byte {
 	Pasticciere;2;x;x;
 	Pastore;3;x;x;
 	Pellicciaio;2;x;x;
-	Pensionato;3;;;x
+	Pensionato;3;;x;
 	Perito commerciale;2;x;x;
 	Perito elettronico, industriale, tessile, agrario, calligrafo, assicurativo;2;x;x;
 	Pescatore;4;x;x;
@@ -265,8 +265,8 @@ func getWork() []byte {
 	Servizi Vari;2;x;x;
 	Speleologo;N.A.;x;x;
 	Sportivo Professionista;N.A.;x;x;
-	Studente;2;;;x
-	Studente di scuole tecniche/professionali;2;;;x
+	Studente;2;;x;
+	Studente di scuole tecniche/professionali;2;;x;
 	Stunt-men/Acrobati/Operatori su corda dell'edilizia acrobatica;S.E.;;x;
 	Tabaccaio;2;x;x;
 	Tapparellista;4;x;x;
