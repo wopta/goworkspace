@@ -30,6 +30,11 @@ func Product(w http.ResponseWriter, r *http.Request) {
 				Method:  "GET",
 			},
 			{
+				Route:   "/v1/name/:name",
+				Handler: GetNameFx,
+				Method:  "GET",
+			},
+			{
 				Route:   "/v1",
 				Handler: PutFx,
 				Method:  "PUT",
