@@ -35,7 +35,6 @@ import (
 	"math"
 	"net/http"
 	"os"
-	"strconv"
 	"time"
 
 	lib "github.com/wopta/goworkspace/lib"
@@ -485,11 +484,6 @@ func getOfferPrices(coverages interface{}) *Out {
 
 func roundPrices(out *Out) *Out {
 	for offerType, priceStruct := range out.OfferPrice {
-		log.Println("Offer type: " + offerType)
-		log.Println("Initial IPI Price Gross: " + strconv.FormatFloat(out.Coverages["IPI"].Offer[offerType].PremiumGross, 'f', -1, 64))
-		log.Println("Initial DRG Price Gross: " + strconv.FormatFloat(out.Coverages["DRG"].Offer[offerType].PremiumGross, 'f', -1, 64))
-		log.Println("PT: " + strconv.FormatFloat(priceStruct[yearly].Gross, 'f', -1, 64))
-		log.Println("Pm: " + strconv.FormatFloat(priceStruct[monthly].Gross, 'f', -1, 64))
 		ceilPriceGrossYear := math.Ceil(priceStruct[yearly].Gross)
 		priceStruct[yearly].Delta = ceilPriceGrossYear - priceStruct[yearly].Gross
 		priceStruct[yearly].Gross = ceilPriceGrossYear
@@ -503,14 +497,6 @@ func roundPrices(out *Out) *Out {
 		roundPriceGrossMonth := math.Round(priceStruct[monthly].Gross)
 		priceStruct[monthly].Delta = roundPriceGrossMonth - priceStruct[monthly].Gross
 		priceStruct[monthly].Gross = roundPriceGrossMonth
-
-		log.Println("PGa: " + strconv.FormatFloat(priceStruct[yearly].Gross, 'f', -1, 64))
-		log.Println("PGm: " + strconv.FormatFloat(priceStruct[monthly].Gross, 'f', -1, 64))
-		log.Println("Monthly Delta: " + strconv.FormatFloat(priceStruct[monthly].Delta, 'f', -1, 64))
-		log.Println("Yearly Delta: " + strconv.FormatFloat(priceStruct[yearly].Delta, 'f', -1, 64))
-		log.Println("Final IPI Price Gross: " + strconv.FormatFloat(out.Coverages["IPI"].Offer[offerType].PremiumGross, 'f', -1, 64))
-		log.Println("Final DRG Price Gross: " + strconv.FormatFloat(out.Coverages["DRG"].Offer[offerType].PremiumGross, 'f', -1, 64))
-		log.Println()
 	}
 
 	return out
@@ -525,8 +511,6 @@ func filterOffers(out *Out) (string, *Out) {
 			toBeDeleted = append(toBeDeleted, offerType)
 		}
 	}
-
-	log.Println("Offers to be deleted: ", toBeDeleted)
 
 	for _, offerType := range toBeDeleted {
 		delete(out.OfferPrice, offerType)
