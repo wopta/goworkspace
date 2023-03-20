@@ -1,26 +1,42 @@
 package quote
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"time"
 
 	lib "github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 )
 
 func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	jsonData, err := ioutil.ReadAll(r.Body)
-
-	res := <-Life(jsonData)
-	return res, nil, err
+	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
+	var data models.Policy
+	defer r.Body.Close()
+	e := json.Unmarshal([]byte(req), &data)
+	res := <-Life(data)
+	s, e := json.Marshal(res)
+	return string(s), nil, e
 
 }
-func Life(r []byte) <-chan string {
-	ch := make(chan string)
+func Life(data models.Policy) <-chan models.Policy {
+	ch := make(chan models.Policy)
 	go func() {
 		defer close(ch)
-		lib.GetFilesByEnv("life_matrix.csv")
+		birthDate, e := time.Parse("DD-MM-YYYY", data.Contractor.BirthDate)
+		lib.CheckError(e)
+		year := time.Now().Year() - birthDate.Year()
 
-		ch <- ""
+		b := lib.GetFilesByEnv("quote/life_matrix.csv")
+		df := lib.CsvToDataframe(b)
+		for _, row := range df.Records() {
+			if row[0] == string(year) {
+
+			}
+		}
+
+		ch <- data
 	}()
 	return ch
 }
