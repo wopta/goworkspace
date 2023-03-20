@@ -49,40 +49,72 @@ type Price struct {
 }
 
 type Out struct {
-	Coverages  map[string]*Coverage         `json:"coverages"`
+	Coverages  map[string]*CoverageOut      `json:"coverages"`
 	OfferPrice map[string]map[string]*Price `json:"offerPrice"`
 }
 
+type CoverageOut struct {
+	DailyAllowance             string                       `json:"dailyAllowance"`
+	Name                       string                       `json:"name"`
+	LegalDefence               string                       `json:"legalDefence"`
+	Assistance                 string                       `json:"assistance"`
+	Group                      string                       `json:"group"`
+	CompanyCodec               string                       `json:"companyCodec"`
+	CompanyName                string                       `json:"companyName"`
+	IsExtension                bool                         `json:"isExtension"`
+	IsSellable                 bool                         `json:"isSellable"`
+	IsYuor                     bool                         `json:"isYuor"`
+	Type                       string                       `json:"type"`
+	TypeOfSumInsured           string                       `json:"typeOfSumInsured"`
+	Description                string                       `json:"description"`
+	Deductible                 string                       `json:"deductible"`
+	Tax                        float64                      `json:"tax"`
+	Taxes                      []TaxOut                     `json:"taxes"`
+	SumInsuredLimitOfIndemnity float64                      `json:"sumInsuredLimitOfIndemnity"`
+	Price                      float64                      `json:"price"`
+	PriceNett                  float64                      `json:"priceNett"`
+	PriceGross                 float64                      `json:"priceGross"`
+	Value                      *CoverageValueOut            `json:"value"`
+	Offer                      map[string]*CoverageValueOut `json:"offer"`
+	Slug                       string                       `json:"slug"`
+	SelfInsurance              string                       `json:"selfInsurance"`
+	SelfInsuranceDesc          string                       `json:"selfInsuranceDesc"`
+	Config                     *GuaranteValue               `json:"config"`
+	IsBase                     bool                         `json:"isBase"`
+	IsYour                     bool                         `json:"isYour"`
+	IsPremium                  bool                         `json:"isPremium"`
+}
+
 type Coverage struct {
-	DailyAllowance             string                    `json:"dailyAllowance"`
-	Name                       string                    `json:"name"`
-	LegalDefence               string                    `json:"legalDefence"`
-	Assistance                 string                    `json:"assistance"`
-	Group                      string                    `json:"group"`
-	CompanyCodec               string                    `json:"companyCodec"`
-	CompanyName                string                    `json:"companyName"`
-	IsExtension                bool                      `json:"isExtension"`
-	IsSellable                 bool                      `json:"isSellable"`
-	IsYuor                     bool                      `json:"isYuor"`
-	Type                       string                    `json:"type"`
-	TypeOfSumInsured           string                    `json:"typeOfSumInsured"`
-	Description                string                    `json:"description"`
-	Deductible                 string                    `json:"deductible"`
-	Tax                        float64                   `json:"tax"`
-	Taxes                      []Tax                     `json:"taxes"`
-	SumInsuredLimitOfIndemnity float64                   `json:"sumInsuredLimitOfIndemnity"`
-	Price                      float64                   `json:"price"`
-	PriceNett                  float64                   `json:"priceNett"`
-	PriceGross                 float64                   `json:"priceGross"`
-	Value                      *CoverageValue            `json:"value"`
-	Offer                      map[string]*CoverageValue `json:"offer"`
-	Slug                       string                    `json:"slug"`
-	SelfInsurance              string                    `json:"selfInsurance"`
-	SelfInsuranceDesc          string                    `json:"selfInsuranceDesc"`
-	Config                     *GuaranteValue            `json:"config"`
-	IsBase                     bool                      `json:"isBase"`
-	IsYour                     bool                      `json:"isYour"`
-	IsPremium                  bool                      `json:"isPremium"`
+	DailyAllowance             string
+	Name                       string
+	LegalDefence               string
+	Assistance                 string
+	Group                      string
+	CompanyCodec               string
+	CompanyName                string
+	IsExtension                bool
+	IsSellable                 bool
+	IsYuor                     bool
+	Type                       string
+	TypeOfSumInsured           string
+	Description                string
+	Deductible                 string
+	Tax                        float64
+	Taxes                      []Tax
+	SumInsuredLimitOfIndemnity float64
+	Price                      float64
+	PriceNett                  float64
+	PriceGross                 float64
+	Value                      *CoverageValue
+	Offer                      map[string]*CoverageValue
+	Slug                       string
+	SelfInsurance              string
+	SelfInsuranceDesc          string
+	Config                     *GuaranteValue
+	IsBase                     bool
+	IsYour                     bool
+	IsPremium                  bool
 }
 
 type GuaranteValue struct {
@@ -100,7 +132,7 @@ type GuaranteValue struct {
 	SelfInsuranceDesc          string             `firestore:"selfInsuranceDesc,omitempty" json:"selfInsuranceDesc,omitempty"`
 	Duration                   GuaranteFieldValue `firestore:"duration,omitempty" json:"duration,omitempty"`
 }
-type CoverageValue struct {
+type CoverageValueOut struct {
 	TypeOfSumInsured           string  `json:"typeOfSumInsured"`
 	Deductible                 string  `json:"deductible"`
 	DeductibleType             string  `json:"deductibleType"`
@@ -113,6 +145,19 @@ type CoverageValue struct {
 	PremiumGross               float64 `json:"premiumGross"`
 }
 
+type CoverageValue struct {
+	TypeOfSumInsured           string
+	Deductible                 string
+	DeductibleType             string
+	SumInsuredLimitOfIndemnity float64
+	SelfInsurance              string
+	Tax                        float64
+	Percentage                 float64
+	PremiumNet                 float64
+	PremiumTaxAmount           float64
+	PremiumGross               float64
+}
+
 type GuaranteFieldValue struct {
 	Min    float64   `firestore:"min,omitempty" json:"min,omitempty"`
 	Max    float64   `firestore:"max,omitempty" json:"max,omitempty"`
@@ -122,4 +167,9 @@ type GuaranteFieldValue struct {
 type Tax struct {
 	Tax        float64
 	Percentage float64
+}
+
+type TaxOut struct {
+	Tax        float64 `json:"tax"`
+	Percentage float64 `json:"percentage"`
 }

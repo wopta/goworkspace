@@ -112,15 +112,15 @@ func calculateAge(birthDateIsoString string) (int, error) {
 	return age, e
 }
 
-func initCoverageP() map[string]*Coverage {
-	var coverages = make(map[string]*Coverage)
+func initCoverageP() map[string]*CoverageOut {
+	var coverages = make(map[string]*CoverageOut)
 
-	coverages["IPI"] = &Coverage{
+	coverages["IPI"] = &CoverageOut{
 		Slug:                       "Invalidità Permanente Infortunio",
 		Deductible:                 "0",
 		Tax:                        2.5,
 		SumInsuredLimitOfIndemnity: 0.0,
-		Offer: map[string]*CoverageValue{
+		Offer: map[string]*CoverageValueOut{
 			base: {
 				Deductible:                 "0",
 				DeductibleType:             "",
@@ -147,12 +147,12 @@ func initCoverageP() map[string]*Coverage {
 		IsYour:    false,
 		IsPremium: false,
 	}
-	coverages["D"] = &Coverage{
+	coverages["D"] = &CoverageOut{
 		Slug:                       "Decesso Infortunio",
 		Deductible:                 "0",
 		Tax:                        2.5,
 		SumInsuredLimitOfIndemnity: 0.0,
-		Offer: map[string]*CoverageValue{
+		Offer: map[string]*CoverageValueOut{
 			base: {
 				Deductible:                 "0",
 				DeductibleType:             "",
@@ -179,12 +179,12 @@ func initCoverageP() map[string]*Coverage {
 		IsYour:    false,
 		IsPremium: false,
 	}
-	coverages["ITI"] = &Coverage{
+	coverages["ITI"] = &CoverageOut{
 		Slug:                       "Inabilità Totale Infortunio",
 		Deductible:                 "0",
 		Tax:                        2.5,
 		SumInsuredLimitOfIndemnity: 0.0,
-		Offer: map[string]*CoverageValue{
+		Offer: map[string]*CoverageValueOut{
 			base: {
 				Deductible:                 "0",
 				DeductibleType:             "",
@@ -211,12 +211,12 @@ func initCoverageP() map[string]*Coverage {
 		IsYour:    false,
 		IsPremium: false,
 	}
-	coverages["DRG"] = &Coverage{
+	coverages["DRG"] = &CoverageOut{
 		Slug:                       "Diaria Ricovero / Gessatura Infortunio",
 		Deductible:                 "0",
 		Tax:                        2.5,
 		SumInsuredLimitOfIndemnity: 0.0,
-		Offer: map[string]*CoverageValue{
+		Offer: map[string]*CoverageValueOut{
 			base: {
 				Deductible:                 "0",
 				DeductibleType:             "",
@@ -243,12 +243,12 @@ func initCoverageP() map[string]*Coverage {
 		IsYour:    false,
 		IsPremium: false,
 	}
-	coverages["DC"] = &Coverage{
+	coverages["DC"] = &CoverageOut{
 		Slug:                       "Diaria Convalescenza Infortunio",
 		Deductible:                 "0",
 		Tax:                        2.5,
 		SumInsuredLimitOfIndemnity: 0.0,
-		Offer: map[string]*CoverageValue{
+		Offer: map[string]*CoverageValueOut{
 			base: {
 				Deductible:                 "0",
 				DeductibleType:             "",
@@ -275,12 +275,12 @@ func initCoverageP() map[string]*Coverage {
 		IsYour:    false,
 		IsPremium: false,
 	}
-	coverages["RSC"] = &Coverage{
+	coverages["RSC"] = &CoverageOut{
 		Slug:                       "Rimborso spese di cura Infortunio",
 		Deductible:                 "0",
 		Tax:                        2.5,
 		SumInsuredLimitOfIndemnity: 0.0,
-		Offer: map[string]*CoverageValue{
+		Offer: map[string]*CoverageValueOut{
 			base: {
 				Deductible:                 "0",
 				DeductibleType:             "",
@@ -307,12 +307,12 @@ func initCoverageP() map[string]*Coverage {
 		IsYour:    false,
 		IsPremium: false,
 	}
-	coverages["IPM"] = &Coverage{
+	coverages["IPM"] = &CoverageOut{
 		Slug:                       "Invalidità Permanente Malattia IPM",
 		Deductible:                 "0",
 		Tax:                        2.5,
 		SumInsuredLimitOfIndemnity: 0.0,
-		Offer: map[string]*CoverageValue{
+		Offer: map[string]*CoverageValueOut{
 			base: {
 				Deductible:                 "0",
 				DeductibleType:             "",
@@ -339,12 +339,12 @@ func initCoverageP() map[string]*Coverage {
 		IsYour:    false,
 		IsPremium: false,
 	}
-	coverages["ASS"] = &Coverage{
+	coverages["ASS"] = &CoverageOut{
 		Slug:                       "Assistenza",
 		Deductible:                 "0",
 		Tax:                        10,
 		SumInsuredLimitOfIndemnity: 0.0,
-		Offer: map[string]*CoverageValue{
+		Offer: map[string]*CoverageValueOut{
 			base: {
 				Deductible:                 "0",
 				DeductibleType:             "",
@@ -371,12 +371,12 @@ func initCoverageP() map[string]*Coverage {
 		IsYour:    false,
 		IsPremium: false,
 	}
-	coverages["TL"] = &Coverage{
+	coverages["TL"] = &CoverageOut{
 		Slug:                       "Tutela Legale",
 		Deductible:                 "0",
 		Tax:                        21.25,
 		SumInsuredLimitOfIndemnity: 0.0,
-		Offer: map[string]*CoverageValue{
+		Offer: map[string]*CoverageValueOut{
 			base: {
 				Deductible:                 "0",
 				DeductibleType:             "",
@@ -462,7 +462,7 @@ func getOfferPrices(coverages interface{}) *Out {
 		},
 	}
 
-	if coveragesStruct, ok := coverages.(map[string]*Coverage); ok {
+	if coveragesStruct, ok := coverages.(map[string]*CoverageOut); ok {
 		for _, coverage := range coveragesStruct {
 			for offerKey, offerValue := range coverage.Offer {
 				offerPrice[offerKey][yearly].Net += offerValue.PremiumNet
@@ -476,7 +476,7 @@ func getOfferPrices(coverages interface{}) *Out {
 	}
 
 	out := &Out{
-		Coverages:  coverages.(map[string]*Coverage),
+		Coverages:  coverages.(map[string]*CoverageOut),
 		OfferPrice: offerPrice,
 	}
 
@@ -493,7 +493,8 @@ func roundPrices(out *Out) *Out {
 		ceilPriceGrossYear := math.Ceil(priceStruct[yearly].Gross)
 		priceStruct[yearly].Delta = ceilPriceGrossYear - priceStruct[yearly].Gross
 		priceStruct[yearly].Gross = ceilPriceGrossYear
-		if out.Coverages["IPI"].Offer[offerType].PremiumGross > 0 {
+		hasIPIGuarantee := out.Coverages["IPI"].Offer[offerType].PremiumGross > 0
+		if hasIPIGuarantee {
 			out.Coverages["IPI"].Offer[offerType].PremiumGross += priceStruct[yearly].Delta
 		} else {
 			out.Coverages["DRG"].Offer[offerType].PremiumGross += priceStruct[yearly].Delta
@@ -518,7 +519,9 @@ func roundPrices(out *Out) *Out {
 func filterOffers(out *Out) (string, *Out) {
 	toBeDeleted := make([]string, 0)
 	for offerType, priceStruct := range out.OfferPrice {
-		if priceStruct[yearly].Gross < yearlyPriceMinimum || priceStruct[monthly].Gross < monthlyPriceMinimum {
+		hasNotOfferMinimumYearlyPrice := priceStruct[yearly].Gross < yearlyPriceMinimum
+		hasNotOfferMinimumMonthlyPrice := priceStruct[monthly].Gross < monthlyPriceMinimum
+		if hasNotOfferMinimumYearlyPrice || hasNotOfferMinimumMonthlyPrice {
 			toBeDeleted = append(toBeDeleted, offerType)
 		}
 	}
