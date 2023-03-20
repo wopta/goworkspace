@@ -218,6 +218,7 @@ func (s Skin) checkPageNext(m pdf.Maroto, next string) {
 
 	}
 }
+
 func (s Skin) checkIfAddPage(m pdf.Maroto, perc float64) {
 	current := m.GetCurrentOffset()
 	_, sizeh := m.GetPageSize()
