@@ -3,7 +3,9 @@ package document
 import (
 	"log"
 	"math"
+	"os"
 	"strconv"
+	"time"
 
 	"github.com/johnfercher/maroto/pkg/color"
 	"github.com/johnfercher/maroto/pkg/consts"
@@ -216,6 +218,7 @@ func (s Skin) checkPageNext(m pdf.Maroto, next string) {
 
 	}
 }
+
 func (s Skin) checkIfAddPage(m pdf.Maroto, perc float64) {
 	current := m.GetCurrentOffset()
 	_, sizeh := m.GetPageSize()
@@ -236,4 +239,25 @@ func ExistGuarance(list []models.Guarante, find string) bool {
 	}
 
 	return res
+}
+func (s Skin) Save(m pdf.Maroto, data models.Policy) string {
+	//-----------Save file
+	var filename string
+	if os.Getenv("env") == "local" {
+		err := m.OutputFileAndClose("document/contract.pdf")
+		lib.CheckError(err)
+	} else {
+		out, err := m.Output()
+		lib.CheckError(err)
+		now := time.Now()
+		timestamp := strconv.FormatInt(now.Unix(), 10)
+		filename = "temp/" + data.Contractor.Name + "_" + data.Contractor.Surname + "_" + timestamp + "_contract.pdf"
+		lib.PutToStorage("function-data", filename, out.Bytes())
+		lib.CheckError(err)
+
+		data.DocumentName = filename
+
+	}
+	log.Println(data.Uid + " ContractObj end")
+	return filename
 }

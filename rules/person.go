@@ -56,6 +56,7 @@ func Person(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	rulesFile = getRulesFile(rulesFile, rulesFileName)
 	coveragesJson, coverages := lib.RulesFromJson(rulesFile, initCoverageP(), quotingInputData, []byte(getQuotingData()))
+
 	return coveragesJson, coverages, nil
 }
 

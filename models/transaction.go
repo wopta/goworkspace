@@ -17,6 +17,7 @@ type Transaction struct {
 	Status             string         `firestore:"status ,omitempty" json:"status ,omitempty" bigquery:"status"`
 	PolicyName         string         `firestore:"policyName,omitempty" json:"policName,omitempty" bigquery:"policyName"`
 	Name               string         `firestore:"name,omitempty" json:"name,omitempty" bigquery:"name"`
+	Commission         float64        `firestore:"commission,omitempty" json:"commission,omitempty" bigquery:"commission"`
 	ScheduleDate       string         `firestore:"scheduleDate,omitempty" json:"scheduleDate,omitempty" bigquery:"scheduleDate"`
 	PayDate            time.Time      `firestore:"payDate,omitempty" json:"payDate,omitempty" bigquery:"-"`
 	CreationDate       time.Time      `firestore:"creationDate,omitempty" json:"creationDate,omitempty" bigquery:"-"`
@@ -58,7 +59,7 @@ func TransactionToListData(query *firestore.DocumentIterator) []Transaction {
 	return result
 }
 
-func SetTransactionPolicy(policy Policy, amount float64, schedule string) Transaction {
+func SetTransactionPolicy(policy Policy, amount float64, schedule string, Commissions float64) Transaction {
 
 	return Transaction{
 		Amount:        amount,
@@ -69,6 +70,7 @@ func SetTransactionPolicy(policy Policy, amount float64, schedule string) Transa
 		StatusHistory: []string{TransactionStatusToPay},
 		ScheduleDate:  schedule,
 		NumberCompany: policy.CodeCompany,
+		Commissions:   Commissions,
 		IsPay:         false,
 		Name:          policy.Contractor.Name + " " + policy.Contractor.Surname,
 	}

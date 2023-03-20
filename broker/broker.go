@@ -72,7 +72,7 @@ func GetSequenceByCompany(name string) (string, int, int) {
 	)
 	switch name {
 	case "global":
-		companyDefault = 0
+		companyDefault = 1
 		companyPrefix = "WB"
 	}
 
@@ -83,6 +83,8 @@ func GetSequenceByCompany(name string) (string, int, int) {
 	if len(policy) == 0 {
 		//WE0000001
 		numberCompany = companyDefault
+		codeCompany = companyPrefix + fmt.Sprintf("%07d", numberCompany)
+		number = 1
 	} else {
 		numberCompany = policy[0].NumberCompany + 1
 		codeCompany = companyPrefix + fmt.Sprintf("%07d", numberCompany)
@@ -97,7 +99,7 @@ func GetSequenceByCompany(name string) (string, int, int) {
 
 		number = policyCompany[0].Number + 1
 	}
-	log.Println("GetSequenceByCompany: ", number)
+	log.Println("GetSequenceByCompany: ", codeCompany)
 
 	return codeCompany, numberCompany, number
 }

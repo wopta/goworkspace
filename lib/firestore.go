@@ -12,7 +12,7 @@ import (
 type Firequery struct {
 	Field      string
 	Operator   string
-	QueryValue string
+	QueryValue interface{}
 }
 type Firequeries struct {
 	Queries []Firequery
