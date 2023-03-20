@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	lib "github.com/wopta/goworkspace/lib"
@@ -24,7 +25,7 @@ func Product(w http.ResponseWriter, r *http.Request) {
 	route := lib.RouteData{
 		Routes: []lib.Route{
 			{
-				Route:   "/v1/name/:name",
+				Route:   "/v1/:name",
 				Handler: GetNameFx,
 				Method:  "GET",
 			},
@@ -45,8 +46,9 @@ const (
 
 func GetNameFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	name := r.Header.Get("name")
-	version := r.RequestURI[1:3]
-	log.Println(version)
+	v := strings.Split(r.RequestURI, "/")
+	version := v[0]
+	log.Println(v[0])
 	product, e := GetName(name, version)
 	jsonString, e := product.Marshal()
 	return string(jsonString), product, e
