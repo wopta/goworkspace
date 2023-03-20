@@ -75,7 +75,7 @@ func GetName(name string, version string) (models.Product, error) {
 			},
 		},
 	}
-	query := q.FirestoreWherefields("product")
+	query := q.FirestoreWherefields("products")
 	products := models.ProductToListData(query)
 
 	return products[0], nil
