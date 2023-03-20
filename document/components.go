@@ -258,14 +258,14 @@ func (s Skin) Sign(m pdf.Maroto, name string, label string, id string, isTag boo
 
 	prop := props.Text{
 
-		Top:    2,
+		Top:    5,
 		Size:   6,
 		Style:  consts.Normal,
 		Align:  consts.Center,
 		Color:  color.NewBlack(),
 		Family: consts.Arial,
 	}
-	m.Row(10, func() {
+	m.Row(4, func() {
 		m.Col(6, func() {
 
 		})
@@ -278,7 +278,7 @@ func (s Skin) Sign(m pdf.Maroto, name string, label string, id string, isTag boo
 
 	})
 
-	m.Row(10, func() {
+	m.Row(12, func() {
 		m.Col(4, func() {
 
 		})
@@ -405,6 +405,38 @@ func (s Skin) Title(m pdf.Maroto, title string, body string, bodyHeight float64)
 		Style: consts.Bold,
 		Align: consts.Left,
 		Color: s.LineColor,
+	}
+
+	normal := props.Text{
+		Top:   1.5,
+		Size:  s.Size,
+		Style: consts.Normal,
+		Align: consts.Left,
+		Color: s.TextColor,
+	}
+	m.Row(s.RowHeight, func() {
+		m.Col(12, func() {
+			m.Text(title, prop)
+
+		})
+
+	})
+	m.Row(bodyHeight, func() {
+		m.Col(10, func() {
+			m.Text(body, normal)
+
+		})
+
+	})
+	return m
+}
+func (s Skin) TitleBlack(m pdf.Maroto, title string, body string, bodyHeight float64) pdf.Maroto {
+	prop := props.Text{
+		Top:   1.5,
+		Size:  s.SizeTitle,
+		Style: consts.Bold,
+		Align: consts.Left,
+		Color: s.TextColor,
 	}
 
 	normal := props.Text{

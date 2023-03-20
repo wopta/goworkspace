@@ -68,6 +68,8 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 		payRes = pay.FabbrickMontlyPay(policy)
 	}
 	responseEmit := EmitResponse{UrlPay: *payRes.Payload.PaymentPageURL, UrlSign: res.Url}
+	policy.SignUrl = res.Url
+	policy.PayUrl = *payRes.Payload.PaymentPageURL
 	policyJson, e := policy.Marshal()
 	log.Println("Emit policy "+uid, string(policyJson))
 	lib.SetFirestore("policy", uid, policy)

@@ -69,7 +69,6 @@ func Person(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	rulesFile = getRulesFile(rulesFile, rulesFileName)
 	_, coverages := lib.RulesFromJson(rulesFile, initCoverageP(), quotingInputData, []byte(getQuotingData()))
 	outJson, out := filterOffers(roundPrices(getOfferPrices(coverages)))
-	w.Header().Set("Content-Type", "Application/json")
 	return outJson, out, nil
 }
 

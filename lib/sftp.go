@@ -16,7 +16,7 @@ import (
 )
 
 // Config represents SSH connection parameters.
-type Config struct {
+type SftpConfig struct {
 	Username     string
 	Password     string
 	PrivateKey   string
@@ -28,13 +28,13 @@ type Config struct {
 
 // Client provides basic functionality to interact with a SFTP server.
 type Client struct {
-	config     Config
+	config     SftpConfig
 	sshClient  *ssh.Client
 	sftpClient *sftp.Client
 }
 
 // New initialises SSH and SFTP clients and returns Client type to use.
-func NewSftpclient(config Config) (*Client, error) {
+func NewSftpclient(config SftpConfig) (*Client, error) {
 	c := &Client{
 		config: config,
 	}

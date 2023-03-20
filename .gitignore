@@ -10,3 +10,4 @@ sa_key_frontend.json
 .vscode/
 function-data/
 .idea
+.DS_Store

@@ -242,7 +242,7 @@ func SftpUpload(filePath string) {
 
 	//ssh: handshake failed: ssh: no common algorithm for key exchange; client offered: [diffie-hellman-group-exchange-sha256 diffie-hellman-group14-sha256 ext-info-c], server offered: [diffie-hellman-group-exchange-sha1 diffie-hellman-group1-sha1 diffie-hellman-group14-sha1]
 	//diffie-hellman-group-exchange-sha1 diffie-hellman-group1-sha1 diffie-hellman-group14-sha1
-	config := lib.Config{
+	config := lib.SftpConfig{
 		Username:     os.Getenv("AXA_SFTP_USER"),
 		Password:     os.Getenv("AXA_SFTP_PSW"), // required only if password authentication is to be used
 		PrivateKey:   string(pk),                // required only if private key authentication is to be used
