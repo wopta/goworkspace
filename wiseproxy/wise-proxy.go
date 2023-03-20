@@ -5,6 +5,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -38,7 +39,7 @@ func WiseProxy(w http.ResponseWriter, r *http.Request) {
 }
 func WiseProxyObj(path string, request []byte, method string) io.ReadCloser {
 
-	client := http.Client{Timeout: time.Duration(5) * time.Second}
+	client := http.Client{Timeout: time.Duration(100) * time.Second}
 	//value := r.RequestURI
 	log.Println("len(r.RequestURI): ", len(path))
 	substring := path
@@ -71,6 +72,34 @@ func WiseProxyObj(path string, request []byte, method string) io.ReadCloser {
 	return nil
 
 }
+
+func WiseBatch(path string, request []byte, method string, token *string) (io.ReadCloser, *string) {
+	client := http.Client{Timeout: time.Duration(100) * time.Second}
+
+	var urlstring = os.Getenv("wiseBaseUrl") + path
+	var req *http.Request
+
+	if token == nil {
+		var isFewfine = !strings.Contains(path, "WebApiProduct")
+		newToken := GetToken(isFewfine)
+		token = &newToken
+	}
+
+	req, _ = http.NewRequest(method, urlstring, bytes.NewBuffer(request))
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", *token))
+
+	req.Header.Set("Content-Type", "application/json")
+	log.Printf("call: %s", request)
+	res, err := client.Do(req)
+	lib.CheckError(err)
+	if res != nil {
+		lib.CheckError(err)
+		return res.Body, token
+	}
+	return nil, nil
+
+}
+
 func GetMD5Hash(text string) string {
 	hash := md5.Sum([]byte(text))
 	return hex.EncodeToString(hash[:])
