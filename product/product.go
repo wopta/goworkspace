@@ -52,10 +52,10 @@ const (
 func GetNameFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	name := r.Header.Get("name")
 	v := strings.Split(r.RequestURI, "/")
-	version := v[0]
+	version := v[1]
 	log.Println(r.RequestURI)
 	log.Println(v)
-	log.Println(v[0])
+	log.Println(v[1])
 	product, e := GetName(name, version)
 	jsonString, e := product.Marshal()
 	return string(jsonString), product, e
