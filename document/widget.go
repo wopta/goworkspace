@@ -207,6 +207,21 @@ func (s Skin) AboutUs(m pdf.Maroto, title string, sub []Kv) pdf.Maroto {
 
 	return m
 }
+func (s Skin) OverBold(m pdf.Maroto, sub []Kv, prop props.Text) pdf.Maroto {
+
+	for _, k := range sub {
+
+		m.Row(10, func() {
+			m.Col(12, func() {
+				m.Text(k.Key, s.NormaltextLeft)
+				m.Text(k.Value, s.NormaltextLeftBlack)
+			})
+
+		})
+	}
+
+	return m
+}
 func (s Skin) GetPersona(data models.Policy, m pdf.Maroto) pdf.Maroto {
 	linePropMagenta := props.Line{
 		Color: s.LineColor,
@@ -647,7 +662,7 @@ func (skin Skin) GetFooter(m pdf.Maroto, data models.Policy, logo string, name s
 	m.RegisterFooter(func() {
 		m.Row(15.0, func() {
 			m.Col(8, func() {
-				m.Text("Wopta per te. Persona è un prodotto assicurativo di Global Assistance Compagnia di assicurazioni e riassicurazioni S.p.A, distribuito da Wopta Assicurazioni S.r.l", props.Text{
+				m.Text(name+" è un prodotto assicurativo di Global Assistance Compagnia di assicurazioni e riassicurazioni S.p.A, distribuito da Wopta Assicurazioni S.r.l", props.Text{
 					Top:         25,
 					Style:       consts.Bold,
 					Align:       consts.Left,

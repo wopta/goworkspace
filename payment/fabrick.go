@@ -2,6 +2,7 @@ package payment
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -57,7 +58,7 @@ func FabrickPayObj(data model.Policy, firstSchedule bool, scheduleDate string, c
 			var result FabrickPaymentResponse
 			json.Unmarshal([]byte(body), &result)
 			res.Body.Close()
-			prod, err := product.GetName(data.Name)
+			prod, err := product.GetName(data.Name, "v"+fmt.Sprint(data.ProductVersion))
 			var commission float64
 			for _, x := range prod.Companies {
 				if x.Name == data.Company {
