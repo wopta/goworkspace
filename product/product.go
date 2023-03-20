@@ -53,6 +53,8 @@ func GetNameFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, 
 	name := r.Header.Get("name")
 	v := strings.Split(r.RequestURI, "/")
 	version := v[0]
+	log.Println(r.RequestURI)
+	log.Println(v)
 	log.Println(v[0])
 	product, e := GetName(name, version)
 	jsonString, e := product.Marshal()
