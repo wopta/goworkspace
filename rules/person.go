@@ -32,7 +32,6 @@ import (
 	"encoding/json"
 	"io"
 	"log"
-	"math"
 	"net/http"
 	"os"
 	"time"
@@ -42,13 +41,11 @@ import (
 )
 
 const (
-	base                = "base"
-	your                = "your"
-	premium             = "premium"
-	monthly             = "monthly"
-	yearly              = "yearly"
-	yearlyPriceMinimum  = 120
-	monthlyPriceMinimum = 50
+	base    = "base"
+	your    = "your"
+	premium = "premium"
+	monthly = "monthly"
+	yearly  = "yearly"
 )
 
 func Person(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -66,9 +63,9 @@ func Person(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	quotingInputData := getRulesInputData(policy, e, req)
 
 	rulesFile = getRulesFile(rulesFile, rulesFileName)
-	_, coverages := lib.RulesFromJson(rulesFile, initCoverageP(), quotingInputData, []byte(getQuotingData()))
-	outJson, out := filterOffers(roundPrices(getOfferPrices(coverages)))
-	return outJson, out, nil
+	coveragesJson, coverages := rulesFromJson(rulesFile, initCoverageP(), quotingInputData, []byte(getQuotingData()))
+
+	return coveragesJson, coverages, nil
 }
 
 func getRulesFile(rulesFile []byte, rulesFileName string) []byte {
@@ -111,15 +108,16 @@ func calculateAge(birthDateIsoString string) (int, error) {
 	return age, e
 }
 
-func initCoverageP() map[string]*CoverageOut {
-	var coverages = make(map[string]*CoverageOut)
+func initCoverageP() *models.RuleOut {
+	var coverages = make(map[string]*models.CoverageOut)
+	offerPrice := make(map[string]map[string]*models.Price)
 
-	coverages["IPI"] = &CoverageOut{
+	coverages["IPI"] = &models.CoverageOut{
 		Slug:                       "Invalidità Permanente Infortunio",
 		Deductible:                 "0",
 		Tax:                        2.5,
 		SumInsuredLimitOfIndemnity: 0.0,
-		Offer: map[string]*CoverageValueOut{
+		Offer: map[string]*models.CoverageValueOut{
 			base: {
 				Deductible:                 "0",
 				DeductibleType:             "",
@@ -146,12 +144,12 @@ func initCoverageP() map[string]*CoverageOut {
 		IsYour:    false,
 		IsPremium: false,
 	}
-	coverages["D"] = &CoverageOut{
+	coverages["D"] = &models.CoverageOut{
 		Slug:                       "Decesso Infortunio",
 		Deductible:                 "0",
 		Tax:                        2.5,
 		SumInsuredLimitOfIndemnity: 0.0,
-		Offer: map[string]*CoverageValueOut{
+		Offer: map[string]*models.CoverageValueOut{
 			base: {
 				Deductible:                 "0",
 				DeductibleType:             "",
@@ -178,12 +176,12 @@ func initCoverageP() map[string]*CoverageOut {
 		IsYour:    false,
 		IsPremium: false,
 	}
-	coverages["ITI"] = &CoverageOut{
+	coverages["ITI"] = &models.CoverageOut{
 		Slug:                       "Inabilità Totale Infortunio",
 		Deductible:                 "0",
 		Tax:                        2.5,
 		SumInsuredLimitOfIndemnity: 0.0,
-		Offer: map[string]*CoverageValueOut{
+		Offer: map[string]*models.CoverageValueOut{
 			base: {
 				Deductible:                 "0",
 				DeductibleType:             "",
@@ -210,12 +208,12 @@ func initCoverageP() map[string]*CoverageOut {
 		IsYour:    false,
 		IsPremium: false,
 	}
-	coverages["DRG"] = &CoverageOut{
+	coverages["DRG"] = &models.CoverageOut{
 		Slug:                       "Diaria Ricovero / Gessatura Infortunio",
 		Deductible:                 "0",
 		Tax:                        2.5,
 		SumInsuredLimitOfIndemnity: 0.0,
-		Offer: map[string]*CoverageValueOut{
+		Offer: map[string]*models.CoverageValueOut{
 			base: {
 				Deductible:                 "0",
 				DeductibleType:             "",
@@ -242,12 +240,12 @@ func initCoverageP() map[string]*CoverageOut {
 		IsYour:    false,
 		IsPremium: false,
 	}
-	coverages["DC"] = &CoverageOut{
+	coverages["DC"] = &models.CoverageOut{
 		Slug:                       "Diaria Convalescenza Infortunio",
 		Deductible:                 "0",
 		Tax:                        2.5,
 		SumInsuredLimitOfIndemnity: 0.0,
-		Offer: map[string]*CoverageValueOut{
+		Offer: map[string]*models.CoverageValueOut{
 			base: {
 				Deductible:                 "0",
 				DeductibleType:             "",
@@ -274,12 +272,12 @@ func initCoverageP() map[string]*CoverageOut {
 		IsYour:    false,
 		IsPremium: false,
 	}
-	coverages["RSC"] = &CoverageOut{
+	coverages["RSC"] = &models.CoverageOut{
 		Slug:                       "Rimborso spese di cura Infortunio",
 		Deductible:                 "0",
 		Tax:                        2.5,
 		SumInsuredLimitOfIndemnity: 0.0,
-		Offer: map[string]*CoverageValueOut{
+		Offer: map[string]*models.CoverageValueOut{
 			base: {
 				Deductible:                 "0",
 				DeductibleType:             "",
@@ -306,12 +304,12 @@ func initCoverageP() map[string]*CoverageOut {
 		IsYour:    false,
 		IsPremium: false,
 	}
-	coverages["IPM"] = &CoverageOut{
+	coverages["IPM"] = &models.CoverageOut{
 		Slug:                       "Invalidità Permanente Malattia IPM",
 		Deductible:                 "0",
 		Tax:                        2.5,
 		SumInsuredLimitOfIndemnity: 0.0,
-		Offer: map[string]*CoverageValueOut{
+		Offer: map[string]*models.CoverageValueOut{
 			base: {
 				Deductible:                 "0",
 				DeductibleType:             "",
@@ -338,12 +336,12 @@ func initCoverageP() map[string]*CoverageOut {
 		IsYour:    false,
 		IsPremium: false,
 	}
-	coverages["ASS"] = &CoverageOut{
+	coverages["ASS"] = &models.CoverageOut{
 		Slug:                       "Assistenza",
 		Deductible:                 "0",
 		Tax:                        10,
 		SumInsuredLimitOfIndemnity: 0.0,
-		Offer: map[string]*CoverageValueOut{
+		Offer: map[string]*models.CoverageValueOut{
 			base: {
 				Deductible:                 "0",
 				DeductibleType:             "",
@@ -370,12 +368,12 @@ func initCoverageP() map[string]*CoverageOut {
 		IsYour:    false,
 		IsPremium: false,
 	}
-	coverages["TL"] = &CoverageOut{
+	coverages["TL"] = &models.CoverageOut{
 		Slug:                       "Tutela Legale",
 		Deductible:                 "0",
 		Tax:                        21.25,
 		SumInsuredLimitOfIndemnity: 0.0,
-		Offer: map[string]*CoverageValueOut{
+		Offer: map[string]*models.CoverageValueOut{
 			base: {
 				Deductible:                 "0",
 				DeductibleType:             "",
@@ -403,122 +401,60 @@ func initCoverageP() map[string]*CoverageOut {
 		IsPremium: false,
 	}
 
-	return coverages
+	offerPrice[base] = map[string]*models.Price{
+		monthly: {
+			Net:      0,
+			Tax:      0,
+			Gross:    0,
+			Delta:    0,
+			Discount: 0,
+		},
+		yearly: {
+			Net:      0,
+			Tax:      0,
+			Gross:    0,
+			Delta:    0,
+			Discount: 0,
+		},
+	}
+	offerPrice[your] = map[string]*models.Price{
+		monthly: {
+			Net:      0,
+			Tax:      0,
+			Gross:    0,
+			Delta:    0,
+			Discount: 0,
+		},
+		yearly: {
+			Net:      0,
+			Tax:      0,
+			Gross:    0,
+			Delta:    0,
+			Discount: 0,
+		},
+	}
+	offerPrice[premium] = map[string]*models.Price{
+		monthly: {
+			Net:      0,
+			Tax:      0,
+			Gross:    0,
+			Delta:    0,
+			Discount: 0,
+		},
+		yearly: {
+			Net:      0,
+			Tax:      0,
+			Gross:    0,
+			Delta:    0,
+			Discount: 0,
+		},
+	}
+
+	return &models.RuleOut{
+		Coverages:  coverages,
+		OfferPrice: offerPrice,
+	}
 }
 func getQuotingData() string {
 	return string(lib.GetByteByEnv("quote/persona-tassi.json", false))
-}
-
-func getOfferPrices(coverages interface{}) *Out {
-	offerPrice := make(map[string]map[string]*Price)
-
-	offerPrice[base] = map[string]*Price{
-		monthly: {
-			Net:      0,
-			Tax:      0,
-			Gross:    0,
-			Delta:    0,
-			Discount: 0,
-		},
-		yearly: {
-			Net:      0,
-			Tax:      0,
-			Gross:    0,
-			Delta:    0,
-			Discount: 0,
-		},
-	}
-	offerPrice[your] = map[string]*Price{
-		monthly: {
-			Net:      0,
-			Tax:      0,
-			Gross:    0,
-			Delta:    0,
-			Discount: 0,
-		},
-		yearly: {
-			Net:      0,
-			Tax:      0,
-			Gross:    0,
-			Delta:    0,
-			Discount: 0,
-		},
-	}
-	offerPrice[premium] = map[string]*Price{
-		monthly: {
-			Net:      0,
-			Tax:      0,
-			Gross:    0,
-			Delta:    0,
-			Discount: 0,
-		},
-		yearly: {
-			Net:      0,
-			Tax:      0,
-			Gross:    0,
-			Delta:    0,
-			Discount: 0,
-		},
-	}
-
-	if coveragesStruct, ok := coverages.(map[string]*CoverageOut); ok {
-		for _, coverage := range coveragesStruct {
-			for offerKey, offerValue := range coverage.Offer {
-				offerPrice[offerKey][yearly].Net += offerValue.PremiumNet
-				offerPrice[offerKey][yearly].Tax += offerValue.PremiumTaxAmount
-				offerPrice[offerKey][yearly].Gross += offerValue.PremiumGross
-				offerPrice[offerKey][monthly].Net += offerValue.PremiumNet / 12
-				offerPrice[offerKey][monthly].Tax += offerValue.PremiumTaxAmount / 12
-				offerPrice[offerKey][monthly].Gross += offerValue.PremiumGross / 12
-			}
-		}
-	}
-
-	out := &Out{
-		Coverages:  coverages.(map[string]*CoverageOut),
-		OfferPrice: offerPrice,
-	}
-
-	return out
-}
-
-func roundPrices(out *Out) *Out {
-	for offerType, priceStruct := range out.OfferPrice {
-		ceilPriceGrossYear := math.Ceil(priceStruct[yearly].Gross)
-		priceStruct[yearly].Delta = ceilPriceGrossYear - priceStruct[yearly].Gross
-		priceStruct[yearly].Gross = ceilPriceGrossYear
-		hasIPIGuarantee := out.Coverages["IPI"].Offer[offerType].PremiumGross > 0
-		if hasIPIGuarantee {
-			out.Coverages["IPI"].Offer[offerType].PremiumGross += priceStruct[yearly].Delta
-		} else {
-			out.Coverages["DRG"].Offer[offerType].PremiumGross += priceStruct[yearly].Delta
-		}
-
-		roundPriceGrossMonth := math.Round(priceStruct[monthly].Gross)
-		priceStruct[monthly].Delta = roundPriceGrossMonth - priceStruct[monthly].Gross
-		priceStruct[monthly].Gross = roundPriceGrossMonth
-	}
-
-	return out
-}
-
-func filterOffers(out *Out) (string, *Out) {
-	toBeDeleted := make([]string, 0)
-	for offerType, priceStruct := range out.OfferPrice {
-		hasNotOfferMinimumYearlyPrice := priceStruct[yearly].Gross < yearlyPriceMinimum
-		hasNotOfferMinimumMonthlyPrice := priceStruct[monthly].Gross < monthlyPriceMinimum
-		if hasNotOfferMinimumYearlyPrice || hasNotOfferMinimumMonthlyPrice {
-			toBeDeleted = append(toBeDeleted, offerType)
-		}
-	}
-
-	for _, offerType := range toBeDeleted {
-		delete(out.OfferPrice, offerType)
-		for _, coverage := range out.Coverages {
-			delete(coverage.Offer, offerType)
-		}
-	}
-
-	outJson, _ := json.Marshal(out)
-	return string(outJson), out
 }
