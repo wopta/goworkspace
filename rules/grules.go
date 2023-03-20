@@ -15,11 +15,6 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
-const (
-	yearlyPriceMinimum  = 120
-	monthlyPriceMinimum = 50
-)
-
 func rulesFromJson(groule []byte, out interface{}, in []byte, data []byte) (string, interface{}) {
 
 	log.Println("RulesFromJson")
@@ -228,7 +223,7 @@ func (p *Fx) RoundPrices(out *models.RuleOut) {
 	}
 }
 
-func (p *Fx) FilterOffers(out *models.RuleOut) {
+func (p *Fx) FilterOffers(out *models.RuleOut, yearlyPriceMinimum float64, monthlyPriceMinimum float64) {
 	toBeDeleted := make([]string, 0)
 	for offerType, priceStruct := range out.OfferPrice {
 		hasNotOfferMinimumYearlyPrice := priceStruct[yearly].Gross < yearlyPriceMinimum
