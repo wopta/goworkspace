@@ -96,25 +96,35 @@ type EmitRequest struct {
 }
 
 func getEmitMailObj(policy models.Policy, emitResponse EmitResponse) mail.MailRequest {
+	var name string
+	//var linkForm string
+	if policy.Name == "pmi" {
+		name = "Artigiani & Imprese"
+		//linkForm = "https://www.wopta.it/it/multi-rischio/"
+	}
 	var obj mail.MailRequest
 	obj.From = "noreply@wopta.it"
 	obj.To = []string{policy.Contractor.Mail}
-	obj.Message = `<p>Ciao ` + policy.Contractor.Name + `` + policy.Contractor.Surname + ` </p>
-	<p>Polizza n° ` + policy.CodeCompany + `</p> 
-	<p>Grazie per aver scelto uno dei nostri prodotti Wopta per te</p> 
-	<p>Puoi ora procedere alla firma della polizza in oggetto. Qui trovi il link per
-	 accedere alla procedura semplice e guidata di firma elettronica avanzata tramite utilizzo di
-	  un codice usa e getta che verrà inviato via sms sul tuo cellulare a noi comunicato. 
-	Ti verrà richiesta l’adesione al servizio che è fornito in maniera gratuita da Wopta. 
-	Potrai prendere visione delle condizioni generali di servizio e delle caratteristiche tecniche.</p> 
-	<p><a class="button" href='` + emitResponse.UrlSign + `'>Firma la tua polizza:</a></p>
+	obj.Message = `<p></p> <p>Gentile ` + policy.Contractor.Name + ` ` + policy.Contractor.Surname + ` </p>
+	<p></p>
+	<p>Puoi ora completare la sottoscrizione della tua polizza.</p> 
+	<p>Qui trovi il link per accedere alla procedura semplice e guidata di firma elettronica avanzata tramite utilizzo di un codice usa e getta che verrà inviato via sms sul tuo cellulare a noi comunicato.</p> 
+	<p><a class="button" href='` + emitResponse.UrlSign + `'>Firma Documento</a></p>
 	<p>Ultimata la procedura di firma potrai procedere al pagamento. nella prossima mail  </p> 
-	<p>Grazie per aver scelto Wopta </p> 
-	<p>Proteggiamo chi sei</p> 
+	<p>Ultimata la procedura di firma potrai procedere al pagamento</p> 
+	<p>Grazie per aver scelto Wopta</p> 
 	`
-	obj.Subject = " Wopta Contratto e pagamento"
+	obj.Subject = " Wopta per te. " + name + " firma la tua polizza n° " + policy.CodeCompany
 	obj.IsHtml = true
 	obj.IsAttachment = false
 
 	return obj
 }
+
+/*Gentile Nome Cognome,
+Puoi ora completare la sottoscrizione della tua polizza.
+Qui trovi il link per accedere alla procedura semplice e guidata di firma elettronica avanzata tramite utilizzo di un codice usa e getta che verrà inviato via sms sul tuo cellulare a noi comunicato.
+Ti verrà richiesta l’adesione al servizio che è fornito in maniera gratuita da Wopta. Potrai prendere visione delle condizioni generali di servizio e delle caratteristiche tecniche.
+FIRMA DOCUMENTO
+Ultimata la procedura di firma potrai procedere al pagamento.
+Grazie per aver scelto Wopta*/

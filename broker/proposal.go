@@ -50,19 +50,31 @@ func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 }
 
 func getProposalMailObj(policy models.Policy) mail.MailRequest {
-	//att1 := lib.GetFromStorage("function-data", "information-sets/"+policy.Name+"/v1/CGA.pdf", "")
-	//att2 := lib.GetFromStorage("function-data", "information-sets/"+policy.Name+"/v1/DIP.pdf", "")
+	var name string
+	var linkForm string
+	if policy.Name == "pmi" {
+		name = "Artigiani & Imprese"
+		linkForm = "https://www.wopta.it/it/multi-rischio/"
+	}
+
 	link := "https://storage.googleapis.com/documents-public-dev/information-set/information-sets/" + policy.Name + "/v1/Precontrattuale.pdf"
 	var obj mail.MailRequest
-	//att1bs64 := b64.StdEncoding.EncodeToString([]byte(att1))
-	//att2bs64 := b64.StdEncoding.EncodeToString([]byte(att2))
+
 	obj.From = "noreply@wopta.it"
 	obj.To = []string{policy.Contractor.Mail}
-	obj.Message = `<p>Ciao ` + policy.Contractor.Name + ` ` + policy.Contractor.Surname + ` </p>
-
-	<p>Leggi il set informativo precontrattuale a tua disposizione nel link qui sotto </p> 
-	<p><a class="button" href='` + link + ` '>Leggi set informativo</a></p> 	<p>Grazie </p> <p></p>`
-	obj.Subject = " Wopta set informantivo"
+	obj.Message = `<p></p><p>Gentile ` + policy.Contractor.Name + ` ` + policy.Contractor.Surname + ` </p>
+	<p></p>
+	<p>richiedendo un preventivo per la soluzione assicurativa Wopta per Te ` + name + ` , dimostri interesse nel proteggere la tua Attività. </p> 
+	<p>Per poter valutare completamente la soluzione che sceglierai, ti alleghiamo tutti i documenti che ti consentiranno di prendere una decisione pienamente consapevole ed informata.</p>
+	<p>Prima della sottoscrizione, leggi quanto trovi in questo <a class="button" href='` + link + ` '>Link</a></p>
+	<p>Un saluto.</p>
+	<p>ll Team Wopta. Proteggiamo chi sei</p> 	
+	<p></p>
+	<p></p>
+	<p>Se hai bisogno di ulteriore supporto, non scrivere a questo indirizzo email, puoi compilare il <a class="button" href='` + linkForm + ` '>Form</a> oppure scrivere alla mail e verrai contattato da un nostro esperto.</p>
+	<p></p>
+	`
+	obj.Subject = "Wopta per Te " + name + " Documenti informativi precontrattuali"
 	obj.IsHtml = true
 	obj.IsAttachment = false
 	/*obj.Attachments = []mail.Attachment{
