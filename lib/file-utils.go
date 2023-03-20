@@ -164,7 +164,11 @@ func GetFilesByEnv(file string) []byte {
 	switch os.Getenv("env") {
 
 	case "local":
+<<<<<<< HEAD
 		res1 = ErrorByte(ioutil.ReadFile("../function-data/" + file))
+=======
+		res1 = ErrorByte(os.ReadFile("../function-data/dev/" + file))
+>>>>>>> edb27ff36bf5f977222802a5ac7e1df2ba57433f
 
 	case "dev":
 
@@ -183,7 +187,7 @@ func GetByteByEnv(file string, isLocal bool) []byte {
 	switch os.Getenv("env") {
 
 	case "local":
-		res1 = ErrorByte(ioutil.ReadFile("function-data/" + file))
+		res1 = ErrorByte(os.ReadFile("../function-data/dev/" + file))
 
 	case "dev":
 		if isLocal {
