@@ -13,7 +13,7 @@ import (
 )
 
 func init() {
-	log.Println("INIT AppcheckProxy")
+	log.Println("INIT Product")
 	functions.HTTP("Product", Product)
 }
 

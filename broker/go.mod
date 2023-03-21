@@ -8,10 +8,10 @@ require (
 	cloud.google.com/go v0.110.0
 	cloud.google.com/go/firestore v1.9.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
-	github.com/wopta/goworkspace/document v1.0.4
+	github.com/wopta/goworkspace/document v1.0.8
 	github.com/wopta/goworkspace/lib v1.0.3
 	github.com/wopta/goworkspace/mail v1.0.2
-	github.com/wopta/goworkspace/models v1.0.4
+	github.com/wopta/goworkspace/models v1.0.7
 	github.com/wopta/goworkspace/payment v1.0.1
 )
 
@@ -69,7 +69,7 @@ require (
 	github.com/sergi/go-diff v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
-	github.com/wopta/goworkspace/product v1.0.4 // indirect
+	github.com/wopta/goworkspace/product v1.0.7 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
 	github.com/xuri/excelize/v2 v2.7.0 // indirect

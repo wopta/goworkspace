@@ -70,10 +70,8 @@ type Coverage struct {
 	IsBase                     bool
 	IsYour                     bool
 	IsPremium                  bool
-	Base                       *CoverageValue
-	Your                       *CoverageValue
-	Premium                    *CoverageValue
 }
+
 type GuaranteValue struct {
 	TypeOfSumInsured           string             `firestore:"typeOfSumInsured,omitempty" json:"typeOfSumInsured,omitempty"`
 	Deductible                 string             `firestore:"deductible,omitempty" json:"deductible,omitempty"`
@@ -89,6 +87,7 @@ type GuaranteValue struct {
 	SelfInsuranceDesc          string             `firestore:"selfInsuranceDesc,omitempty" json:"selfInsuranceDesc,omitempty"`
 	Duration                   GuaranteFieldValue `firestore:"duration,omitempty" json:"duration,omitempty"`
 }
+
 type CoverageValue struct {
 	TypeOfSumInsured           string
 	Deductible                 string
@@ -101,6 +100,7 @@ type CoverageValue struct {
 	PremiumTaxAmount           float64
 	PremiumGross               float64
 }
+
 type GuaranteFieldValue struct {
 	Min    float64   `firestore:"min,omitempty" json:"min,omitempty"`
 	Max    float64   `firestore:"max,omitempty" json:"max,omitempty"`

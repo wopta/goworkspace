@@ -1,47 +1,42 @@
 package quote
 
 import (
-	"bytes"
+	"encoding/json"
 	"io/ioutil"
-	"log"
 	"net/http"
-	"os"
+	"time"
 
 	lib "github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 )
 
 func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	jsonData, err := ioutil.ReadAll(r.Body)
-	res := <-Life(jsonData)
-	return res, nil, err
+	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
+	var data models.Policy
+	defer r.Body.Close()
+	e := json.Unmarshal([]byte(req), &data)
+	res := <-Life(data)
+	s, e := json.Marshal(res)
+	return string(s), nil, e
 
 }
-func Life(r []byte) <-chan string {
-	ch := make(chan string)
+func Life(data models.Policy) <-chan models.Policy {
+	ch := make(chan models.Policy)
 	go func() {
 		defer close(ch)
-		var urlstring = os.Getenv("MUNICHREBASEURL") + "/api/quote/rate/"
-		client := lib.ClientCredentials(os.Getenv("MUNICHRECLIENTID"),
-			os.Getenv("MUNICHRECLIENTSECRET"), os.Getenv("MUNICHRESCOPE"), os.Getenv("MUNICHRETOKENENDPOINT"))
-		req, _ := http.NewRequest(http.MethodPost, urlstring, bytes.NewBuffer(r))
-		req.Header.Set("Ocp-Apim-Subscription-Key", os.Getenv("MUNICHRESUBSCRIPTIONKEY"))
-		req.Header.Set("Content-Type", "application/json")
-		res, err := client.Do(req)
-		lib.CheckError(err)
+		birthDate, e := time.Parse("DD-MM-YYYY", data.Contractor.BirthDate)
+		lib.CheckError(e)
+		year := time.Now().Year() - birthDate.Year()
 
-		if res != nil {
-			body, err := ioutil.ReadAll(res.Body)
-			lib.CheckError(err)
-			res.Body.Close()
-			log.Println("quote res")
-			ch <- string(body)
-			if res.StatusCode == 500 {
-				log.Println("StatusCode == 500")
+		b := lib.GetFilesByEnv("quote/life_matrix.csv")
+		df := lib.CsvToDataframe(b)
+		for _, row := range df.Records() {
+			if row[0] == string(year) {
 
 			}
-
 		}
 
+		ch <- data
 	}()
 	return ch
 }
