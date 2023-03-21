@@ -70,7 +70,7 @@ func FabrickPayObj(data model.Policy, firstSchedule bool, scheduleDate string, c
 				}
 
 			}
-			tr := models.SetTransactionPolicy(data, amount, scheduleDate, amount*commission)
+			tr := models.SetTransactionPolicy(data, data.Uid+"_"+scheduleDate, amount, scheduleDate, data.PriceNett*commission)
 			ref, _ := lib.PutFirestore("transactions", tr)
 			tr.Uid = ref.ID
 			tr.BigPayDate = civil.DateTimeOf(time.Now())

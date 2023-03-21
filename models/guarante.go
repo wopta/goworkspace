@@ -27,7 +27,7 @@ type Guarante struct {
 	IsPremium                  bool                       `firestore:"isPremium,omitempty" json:"isPremium,omitempty"`
 	Base                       *GuaranteValue             `firestore:"base,omitempty" json:"base,omitempty"`
 	Discount                   float64                    `json:"discount,omitempty" json:"discount,omitempty"`
-	Your                       *GuaranteValue             `firestore:"your,omitempty" json:"your,omitempty"`
+	Your                       *GuaranteValue             `firestore:"your,omitempty" json:"your,omitempty"` //DEPRECATED
 	Premium                    *GuaranteValue             `firestore:"premium,omitempty" json:"premium,omitempty"`
 	Name                       string                     `firestore:"name,omitempty" json:"name,omitempty"`
 	SumInsuredLimitOfIndemnity float64                    `json:"sumInsuredLimitOfIndemnity" json:"sumInsuredLimitOfIndemnity,omitempty"`
@@ -54,7 +54,7 @@ type GuaranteValue struct {
 	DeductibleDesc             string             `firestore:"deductibleDesc,omitempty" json:"deductibleDesc,omitempty"`
 	SelfInsuranceValues        GuaranteFieldValue `firestore:"selfInsuranceValues,omitempty" json:"selfInsuranceValues,omitempty"`
 	SelfInsuranceDesc          string             `firestore:"selfInsuranceDesc,omitempty" json:"selfInsuranceDesc,omitempty"`
-	Duration                   GuaranteFieldValue `firestore:"duration,omitempty" json:"duration,omitempty"`
+	Duration                   Duration           `firestore:"duration,omitempty" json:"duration,omitempty"`
 }
 type GuaranteFieldValue struct {
 	Min    float64   `firestore:"min,omitempty" json:"min,omitempty"`
