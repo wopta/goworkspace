@@ -94,11 +94,3 @@ type EmitRequest struct {
 	Survay       *[]models.Statement `firestore:"survey,omitempty" json:"survey,omitempty"`
 	Statements   *[]models.Statement `firestore:"statements,omitempty" json:"statements,omitempty"`
 }
-
-/*Gentile Nome Cognome,
-Puoi ora completare la sottoscrizione della tua polizza.
-Qui trovi il link per accedere alla procedura semplice e guidata di firma elettronica avanzata tramite utilizzo di un codice usa e getta che verrà inviato via sms sul tuo cellulare a noi comunicato.
-Ti verrà richiesta l’adesione al servizio che è fornito in maniera gratuita da Wopta. Potrai prendere visione delle condizioni generali di servizio e delle caratteristiche tecniche.
-FIRMA DOCUMENTO
-Ultimata la procedura di firma potrai procedere al pagamento.
-Grazie per aver scelto Wopta*/

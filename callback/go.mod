@@ -6,10 +6,10 @@ replace github.com/wopta/goworkspace/callback => ./
 
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
+	github.com/wopta/goworkspace/document v1.0.8
 	github.com/wopta/goworkspace/lib v1.0.4
 	github.com/wopta/goworkspace/mail v1.0.2
 	github.com/wopta/goworkspace/models v1.0.8
-    github.com/wopta/goworkspace/document v1.0.8
 )
 
 require github.com/googleapis/gax-go/v2 v2.7.0 // indirect
@@ -70,7 +70,6 @@ require (
 	github.com/sergi/go-diff v1.3.1 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
-	github.com/wopta/goworkspace/document v1.0.8
 	github.com/wopta/goworkspace/product v1.0.7 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
