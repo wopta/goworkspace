@@ -8,7 +8,7 @@ require (
 	cloud.google.com/go v0.110.0
 	cloud.google.com/go/firestore v1.9.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
-	github.com/wopta/goworkspace/document v1.0.8
+	github.com/wopta/goworkspace/document v1.0.9
 	github.com/wopta/goworkspace/lib v1.0.3
 	github.com/wopta/goworkspace/mail v1.0.2
 	github.com/wopta/goworkspace/models v1.0.7
