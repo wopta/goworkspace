@@ -76,7 +76,7 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	policy.Data = string(policyJson)
 	log.Println("Emit policy save big query: " + uid)
 	e = lib.InsertRowsBigQuery("wopta", "policy", policy)
-	mail.SendMail(getEmitMailObj(policy, responseEmit))
+	mail.SendMailSign(policy)
 	b, e := json.Marshal(responseEmit)
 	return string(b), responseEmit, e
 }
@@ -93,32 +93,6 @@ type EmitRequest struct {
 	PaymentSplit string              `firestore:"paymentSplit,omitempty" json:"paymentSplit,omitempty"`
 	Survay       *[]models.Statement `firestore:"survey,omitempty" json:"survey,omitempty"`
 	Statements   *[]models.Statement `firestore:"statements,omitempty" json:"statements,omitempty"`
-}
-
-func getEmitMailObj(policy models.Policy, emitResponse EmitResponse) mail.MailRequest {
-	var name string
-	//var linkForm string
-	if policy.Name == "pmi" {
-		name = "Artigiani & Imprese"
-		//linkForm = "https://www.wopta.it/it/multi-rischio/"
-	}
-	var obj mail.MailRequest
-	obj.From = "noreply@wopta.it"
-	obj.To = []string{policy.Contractor.Mail}
-	obj.Message = `<p></p> <p>Gentile ` + policy.Contractor.Name + ` ` + policy.Contractor.Surname + ` </p>
-	<p></p>
-	<p>Puoi ora completare la sottoscrizione della tua polizza.</p> 
-	<p>Qui trovi il link per accedere alla procedura semplice e guidata di firma elettronica avanzata tramite utilizzo di un codice usa e getta che verrà inviato via sms sul tuo cellulare a noi comunicato.</p> 
-	<p><a class="button" href='` + emitResponse.UrlSign + `'>Firma Documento</a></p>
-	<p>Ultimata la procedura di firma potrai procedere al pagamento. nella prossima mail  </p> 
-	<p>Ultimata la procedura di firma potrai procedere al pagamento</p> 
-	<p>Grazie per aver scelto Wopta</p> 
-	`
-	obj.Subject = " Wopta per te. " + name + " firma la tua polizza n° " + policy.CodeCompany
-	obj.IsHtml = true
-	obj.IsAttachment = false
-
-	return obj
 }
 
 /*Gentile Nome Cognome,

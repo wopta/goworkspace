@@ -153,10 +153,10 @@ func getPayMailObj(policy models.Policy, payUrl string, at string) mail.MailRequ
 	obj.Subject = "Wopta per te. " + name + " paga la tua polizza n° " + policy.CodeCompany
 	obj.IsHtml = true
 	obj.IsAttachment = true
-	obj.Attachments = append(obj.Attachments, mail.Attachment{
+	obj.Attachments = &[]mail.Attachment{{
 		Byte:        at,
 		ContentType: "application/pdf",
-	})
+	}}
 
 	return obj
 }
