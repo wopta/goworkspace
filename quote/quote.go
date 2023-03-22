@@ -35,6 +35,11 @@ func Quote(w http.ResponseWriter, r *http.Request) {
 				Handler: PmiMunichFx,
 				Method:  http.MethodPost,
 			},
+			{
+				Route:   "/life",
+				Handler: LifeFx,
+				Method:  http.MethodPost,
+			},
 		},
 	}
 	route.Router(w, r)

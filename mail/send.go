@@ -167,10 +167,10 @@ func SendMail(obj MailRequest) {
 		}
 
 		if obj.IsAttachment {
-			for k, v := range obj.Attachments {
+			for k, v := range *obj.Attachments {
 
 				var close bool
-				if k == len(obj.Attachments)-1 {
+				if k == len(*obj.Attachments)-1 {
 					close = true
 				}
 				message = addAttachment(message, v.Name, v.ContentType, []byte(v.Byte), close)

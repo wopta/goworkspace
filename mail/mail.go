@@ -81,15 +81,15 @@ type Attachment struct {
 	ContentType string `firestore:"contentType,omitempty" json:"contentType,omitempty"`
 }
 type MailRequest struct {
-	From         string       `json:"from"`
-	To           []string     `json:"to"`
-	Message      string       `json:"message"`
-	Subject      string       `json:"subject"`
-	IsHtml       bool         `json:"isHtml,omitempty"`
-	IsAttachment bool         `json:"isAttachment,omitempty"`
-	Attachments  []Attachment `json:"attachments,omitempty"`
-	Cc           string       `json:"cc,omitempty"`
-	TemplateName string       `json:"templateName,omitempty"`
+	From         string        `json:"from"`
+	To           []string      `json:"to"`
+	Message      string        `json:"message"`
+	Subject      string        `json:"subject"`
+	IsHtml       bool          `json:"isHtml,omitempty"`
+	IsAttachment bool          `json:"isAttachment,omitempty"`
+	Attachments  *[]Attachment `json:"attachments,omitempty"`
+	Cc           string        `json:"cc,omitempty"`
+	TemplateName string        `json:"templateName,omitempty"`
 }
 type MailValidate struct {
 	Mail    string `firestore:"mail,omitempty" json:"mail,omitempty"`
