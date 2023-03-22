@@ -216,81 +216,85 @@ func (p *Fx) CalculateOfferPrices(out *models.RuleOut) {
 	}
 }
 
-func (p *Fx) RoundYearlyOfferPrices(out *models.RuleOut) {
-	for offerType, priceStruct := range out.OfferPrice {
-		ceilGrossPrice := math.Ceil(priceStruct[yearly].Gross)
-		priceStruct[yearly].Delta = ceilGrossPrice - priceStruct[yearly].Gross
-		priceStruct[yearly].Gross = ceilGrossPrice
-		hasIPIGuarantee := out.Coverages["IPI"].Offer[offerType].PremiumGrossYearly > 0
-		if hasIPIGuarantee {
-			out.Coverages["IPI"].Offer[offerType].PremiumGrossYearly += priceStruct[yearly].Delta
-			newNetPrice := out.Coverages["IPI"].Offer[offerType].PremiumGrossYearly / (1 + (out.Coverages["IPI"].Tax / 100))
-			newTax := out.Coverages["IPI"].Offer[offerType].PremiumGrossYearly - newNetPrice
-			out.OfferPrice[offerType][yearly].Net += newNetPrice - out.Coverages["IPI"].Offer[offerType].PremiumNetYearly
-			out.OfferPrice[offerType][yearly].Tax += newTax - out.Coverages["IPI"].Offer[offerType].PremiumTaxAmountYearly
-			out.Coverages["IPI"].Offer[offerType].PremiumNetYearly = newNetPrice
-			out.Coverages["IPI"].Offer[offerType].PremiumTaxAmountYearly = newTax
-		} else {
-			out.Coverages["DRG"].Offer[offerType].PremiumGrossYearly += priceStruct[yearly].Delta
-			newNetPrice := out.Coverages["DRG"].Offer[offerType].PremiumGrossYearly / (1 + (out.Coverages["DRG"].Tax / 100))
-			newTax := out.Coverages["DRG"].Offer[offerType].PremiumGrossYearly - newNetPrice
-			out.OfferPrice[offerType][yearly].Net += newNetPrice - out.Coverages["DRG"].Offer[offerType].PremiumNetYearly
-			out.OfferPrice[offerType][yearly].Tax += newTax - out.Coverages["DRG"].Offer[offerType].PremiumTaxAmountYearly
-			out.Coverages["DRG"].Offer[offerType].PremiumNetYearly = newNetPrice
-			out.Coverages["DRG"].Offer[offerType].PremiumTaxAmountYearly = newTax
-		}
+func (p *Fx) RoundMonthlyOfferPrices(out *models.RuleOut, roundingCoverages ...string) {
+	updatePrices := func(coverage string, offerType string, priceStruct map[string]*models.Price) {
+		out.Coverages[coverage].Offer[offerType].PremiumGrossMonthly += priceStruct[monthly].Delta
+		newNetPrice := out.Coverages[coverage].Offer[offerType].PremiumGrossMonthly / (1 + (out.Coverages[coverage].Tax / 100))
+		newTax := out.Coverages[coverage].Offer[offerType].PremiumGrossMonthly - newNetPrice
+		out.OfferPrice[offerType][monthly].Net += newNetPrice - out.Coverages[coverage].Offer[offerType].PremiumNetMonthly
+		out.OfferPrice[offerType][monthly].Tax += newTax - out.Coverages[coverage].Offer[offerType].PremiumTaxAmountMonthly
+		out.Coverages[coverage].Offer[offerType].PremiumNetMonthly = newNetPrice
+		out.Coverages[coverage].Offer[offerType].PremiumTaxAmountMonthly = newTax
 	}
-}
 
-func (p *Fx) RoundMonthlyOfferPrices(out *models.RuleOut) {
 	for offerType, priceStruct := range out.OfferPrice {
 		nonRoundedGrossPrice := priceStruct[yearly].Gross
 		roundedMonthlyGrossPrice := math.Round(priceStruct[monthly].Gross)
 		yearlyGrossPrice := roundedMonthlyGrossPrice * 12
 		priceStruct[monthly].Delta = (yearlyGrossPrice - nonRoundedGrossPrice) / 12
 		priceStruct[monthly].Gross = roundedMonthlyGrossPrice
-		hasIPIGuarantee := out.Coverages["IPI"].Offer[offerType].PremiumNetMonthly > 0
-		if hasIPIGuarantee {
-			out.Coverages["IPI"].Offer[offerType].PremiumGrossMonthly += priceStruct[monthly].Delta
-			newNetPrice := out.Coverages["IPI"].Offer[offerType].PremiumGrossMonthly / (1 + (out.Coverages["IPI"].Tax / 100))
-			newTax := out.Coverages["IPI"].Offer[offerType].PremiumGrossMonthly - newNetPrice
-			out.OfferPrice[offerType][monthly].Net += newNetPrice - out.Coverages["IPI"].Offer[offerType].PremiumNetMonthly
-			out.OfferPrice[offerType][monthly].Tax += newTax - out.Coverages["IPI"].Offer[offerType].PremiumTaxAmountMonthly
-			out.Coverages["IPI"].Offer[offerType].PremiumNetMonthly = newNetPrice
-			out.Coverages["IPI"].Offer[offerType].PremiumTaxAmountMonthly = newTax
-		} else {
-			out.Coverages["DRG"].Offer[offerType].PremiumGrossMonthly += priceStruct[monthly].Delta
-			newNetPrice := out.Coverages["DRG"].Offer[offerType].PremiumGrossMonthly / (1 + (out.Coverages["DRG"].Tax / 100))
-			newTax := out.Coverages["DRG"].Offer[offerType].PremiumGrossMonthly - newNetPrice
-			out.OfferPrice[offerType][monthly].Net += newNetPrice - out.Coverages["DRG"].Offer[offerType].PremiumNetMonthly
-			out.OfferPrice[offerType][monthly].Tax += newTax - out.Coverages["DRG"].Offer[offerType].PremiumTaxAmountMonthly
-			out.Coverages["DRG"].Offer[offerType].PremiumNetMonthly = newNetPrice
-			out.Coverages["DRG"].Offer[offerType].PremiumTaxAmountMonthly = newTax
+
+		for _, roundingCoverage := range roundingCoverages {
+			hasGuarantee := out.Coverages[roundingCoverage].Offer[offerType].PremiumNetMonthly > 0
+			if hasGuarantee {
+				updatePrices(roundingCoverage, offerType, priceStruct)
+				break
+			}
+		}
+	}
+}
+
+func (p *Fx) RoundYearlyOfferPrices(out *models.RuleOut, roundingCoverages ...string) {
+	updatePrices := func(coverage string, offerType string, priceStruct map[string]*models.Price) {
+		out.Coverages[coverage].Offer[offerType].PremiumGrossYearly += priceStruct[yearly].Delta
+		newNetPrice := out.Coverages[coverage].Offer[offerType].PremiumGrossYearly / (1 + (out.Coverages[coverage].Tax / 100))
+		newTax := out.Coverages[coverage].Offer[offerType].PremiumGrossYearly - newNetPrice
+		out.OfferPrice[offerType][yearly].Net += newNetPrice - out.Coverages[coverage].Offer[offerType].PremiumNetYearly
+		out.OfferPrice[offerType][yearly].Tax += newTax - out.Coverages[coverage].Offer[offerType].PremiumTaxAmountYearly
+		out.Coverages[coverage].Offer[offerType].PremiumNetYearly = newNetPrice
+		out.Coverages[coverage].Offer[offerType].PremiumTaxAmountYearly = newTax
+	}
+
+	for offerType, priceStruct := range out.OfferPrice {
+		ceilGrossPrice := math.Ceil(priceStruct[yearly].Gross)
+		priceStruct[yearly].Delta = ceilGrossPrice - priceStruct[yearly].Gross
+		priceStruct[yearly].Gross = ceilGrossPrice
+		for _, roundingCoverage := range roundingCoverages {
+			hasGuarantee := out.Coverages[roundingCoverage].Offer[offerType].PremiumNetMonthly > 0
+			if hasGuarantee {
+				updatePrices(roundingCoverage, offerType, priceStruct)
+				break
+			}
 		}
 	}
 }
 
 func (p *Fx) RoundToTwoDecimalPlaces(out *models.RuleOut) {
+	roundFloatTwoDecimals := func(in float64) float64 {
+		res, _ := strconv.ParseFloat(fmt.Sprintf("%.2f", in), 64)
+		return res
+	}
+
 	for _, coverage := range out.Coverages {
 		for _, offerType := range coverage.Offer {
-			offerType.PremiumNetMonthly, _ = strconv.ParseFloat(fmt.Sprintf("%.2f", offerType.PremiumNetMonthly), 64)
-			offerType.PremiumTaxAmountMonthly, _ = strconv.ParseFloat(fmt.Sprintf("%.2f", offerType.PremiumTaxAmountMonthly), 64)
-			offerType.PremiumGrossMonthly, _ = strconv.ParseFloat(fmt.Sprintf("%.2f", offerType.PremiumGrossMonthly), 64)
+			offerType.PremiumNetMonthly = roundFloatTwoDecimals(offerType.PremiumNetMonthly)
+			offerType.PremiumTaxAmountMonthly = roundFloatTwoDecimals(offerType.PremiumTaxAmountMonthly)
+			offerType.PremiumGrossMonthly = roundFloatTwoDecimals(offerType.PremiumGrossMonthly)
 
-			offerType.PremiumNetYearly, _ = strconv.ParseFloat(fmt.Sprintf("%.2f", offerType.PremiumNetYearly), 64)
-			offerType.PremiumTaxAmountYearly, _ = strconv.ParseFloat(fmt.Sprintf("%.2f", offerType.PremiumTaxAmountYearly), 64)
-			offerType.PremiumGrossYearly, _ = strconv.ParseFloat(fmt.Sprintf("%.2f", offerType.PremiumGrossYearly), 64)
+			offerType.PremiumNetYearly = roundFloatTwoDecimals(offerType.PremiumNetYearly)
+			offerType.PremiumTaxAmountYearly = roundFloatTwoDecimals(offerType.PremiumTaxAmountYearly)
+			offerType.PremiumGrossYearly = roundFloatTwoDecimals(offerType.PremiumGrossYearly)
 		}
 	}
 
 	for _, offerType := range out.OfferPrice {
-		offerType[monthly].Net, _ = strconv.ParseFloat(fmt.Sprintf("%.2f", offerType[monthly].Net), 64)
-		offerType[monthly].Tax, _ = strconv.ParseFloat(fmt.Sprintf("%.2f", offerType[monthly].Tax), 64)
-		offerType[monthly].Delta, _ = strconv.ParseFloat(fmt.Sprintf("%.2f", offerType[monthly].Delta), 64)
+		offerType[monthly].Net = roundFloatTwoDecimals(offerType[monthly].Net)
+		offerType[monthly].Tax = roundFloatTwoDecimals(offerType[monthly].Tax)
+		offerType[monthly].Delta = roundFloatTwoDecimals(offerType[monthly].Delta)
 
-		offerType[yearly].Net, _ = strconv.ParseFloat(fmt.Sprintf("%.2f", offerType[yearly].Net), 64)
-		offerType[yearly].Tax, _ = strconv.ParseFloat(fmt.Sprintf("%.2f", offerType[yearly].Tax), 64)
-		offerType[yearly].Delta, _ = strconv.ParseFloat(fmt.Sprintf("%.2f", offerType[yearly].Delta), 64)
+		offerType[yearly].Net = roundFloatTwoDecimals(offerType[yearly].Net)
+		offerType[yearly].Tax = roundFloatTwoDecimals(offerType[yearly].Tax)
+		offerType[yearly].Delta = roundFloatTwoDecimals(offerType[yearly].Delta)
 	}
 }
 
@@ -300,7 +304,6 @@ func (p *Fx) FilterOffersByMinimumPrice(out *models.RuleOut, yearlyPriceMinimum 
 		hasNotOfferMinimumYearlyPrice := priceStruct[yearly].Gross < yearlyPriceMinimum
 		hasNotOfferMinimumMonthlyPrice := priceStruct[monthly].Gross < monthlyPriceMinimum
 		if hasNotOfferMinimumYearlyPrice || hasNotOfferMinimumMonthlyPrice {
-			log.Println(offerType)
 			toBeDeleted = append(toBeDeleted, offerType)
 		}
 	}
