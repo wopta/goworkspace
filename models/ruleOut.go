@@ -1,16 +1,18 @@
 package models
 
+import "github.com/shopspring/decimal"
+
 type RuleOut struct {
-	Coverages  map[string]*CoverageOut      `json:"coverages"`
-	OfferPrice map[string]map[string]*Price `json:"offerPrice"`
+	Coverages  map[string]map[string]*CoverageOut `json:"coverages"`
+	OfferPrice map[string]map[string]*Price       `json:"offerPrice"`
 }
 
 type Price struct {
-	Net      float64 `json:"net"`
-	Tax      float64 `json:"tax"`
-	Gross    float64 `json:"gross"`
-	Delta    float64 `json:"delta"`
-	Discount float64 `json:"discount"`
+	Net      decimal.Decimal `json:"net"`
+	Tax      decimal.Decimal `json:"tax"`
+	Gross    decimal.Decimal `json:"gross"`
+	Delta    decimal.Decimal `json:"delta"`
+	Discount decimal.Decimal `json:"discount"`
 }
 
 type CoverageOut struct {
@@ -28,12 +30,12 @@ type CoverageOut struct {
 	TypeOfSumInsured           string                       `json:"typeOfSumInsured"`
 	Description                string                       `json:"description"`
 	Deductible                 string                       `json:"deductible"`
-	Tax                        float64                      `json:"tax"`
+	Tax                        decimal.Decimal              `json:"tax"`
 	Taxes                      []TaxOut                     `json:"taxes"`
-	SumInsuredLimitOfIndemnity float64                      `json:"sumInsuredLimitOfIndemnity"`
-	Price                      float64                      `json:"price"`
-	PriceNett                  float64                      `json:"priceNett"`
-	PriceGross                 float64                      `json:"priceGross"`
+	SumInsuredLimitOfIndemnity decimal.Decimal              `json:"sumInsuredLimitOfIndemnity"`
+	Price                      decimal.Decimal              `json:"price"`
+	PriceNett                  decimal.Decimal              `json:"priceNett"`
+	PriceGross                 decimal.Decimal              `json:"priceGross"`
 	Value                      *CoverageValueOut            `json:"value"`
 	Offer                      map[string]*CoverageValueOut `json:"offer"`
 	Slug                       string                       `json:"slug"`
@@ -46,19 +48,19 @@ type CoverageOut struct {
 }
 
 type CoverageValueOut struct {
-	TypeOfSumInsured           string  `json:"typeOfSumInsured"`
-	Deductible                 string  `json:"deductible"`
-	DeductibleType             string  `json:"deductibleType"`
-	SumInsuredLimitOfIndemnity float64 `json:"sumInsuredLimitOfIndemnity"`
-	SelfInsurance              string  `json:"selfInsurance"`
-	Tax                        float64 `json:"tax"`
-	Percentage                 float64 `json:"percentage"`
-	PremiumNet                 float64 `json:"premiumNet"`
-	PremiumTaxAmount           float64 `json:"premiumTaxAmount"`
-	PremiumGross               float64 `json:"premiumGross"`
+	TypeOfSumInsured           string          `json:"typeOfSumInsured"`
+	Deductible                 string          `json:"deductible"`
+	DeductibleType             string          `json:"deductibleType"`
+	SumInsuredLimitOfIndemnity decimal.Decimal `json:"sumInsuredLimitOfIndemnity"`
+	SelfInsurance              string          `json:"selfInsurance"`
+	Tax                        decimal.Decimal `json:"tax"`
+	Percentage                 decimal.Decimal `json:"percentage"`
+	PremiumNet                 decimal.Decimal `json:"premiumNet"`
+	PremiumTaxAmount           decimal.Decimal `json:"premiumTaxAmount"`
+	PremiumGross               decimal.Decimal `json:"premiumGross"`
 }
 
 type TaxOut struct {
-	Tax        float64 `json:"tax"`
-	Percentage float64 `json:"percentage"`
+	Tax        decimal.Decimal `json:"tax"`
+	Percentage decimal.Decimal `json:"percentage"`
 }
