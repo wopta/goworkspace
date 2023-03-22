@@ -19,11 +19,10 @@ func PolicyFiscalcode(w http.ResponseWriter, r *http.Request) (string, interface
 	w.Header().Set("Access-Control-Allow-Methods", "GET")
 
 	var (
-		policies                 []models.Policy
-		wiseSimplePolicyResponse WiseSimplePolicyResponse
-		wiseToken                *string = nil
-		e                        error
-		jsonData                 []byte
+		policies           []models.Policy
+		wiseToken          *string = nil
+		e                  error
+		wiseSimplePolicies *[]WiseSimplePolicy
 	)
 
 	log.Println("GetPolicyByFiscalCode")
@@ -36,22 +35,15 @@ func PolicyFiscalcode(w http.ResponseWriter, r *http.Request) (string, interface
 		return `{}`, nil, nil
 	}
 
-	// get all policies from firestore
 	policies = GetPoliciesFromFirebase(fiscalCode)
 
-	wiseToken, jsonData, e = getAllSimplePoliciesForUserFromWise(fiscalCode, wiseToken)
+	wiseToken, wiseSimplePolicies, e = getAllSimplePoliciesForUserFromWise(fiscalCode)
 
 	if e != nil {
-		return "", false, e
+		return "{}", nil, nil
 	}
 
-	e = json.Unmarshal(jsonData, &wiseSimplePolicyResponse)
-
-	livePolicies := filter(wiseSimplePolicyResponse.Policies, func(pol WiseSimplePolicy) bool {
-		return strings.ToUpper(pol.State) == "POLIZZA IN VITA"
-	})
-
-	wisePolicies := getCompletePoliciesFromWise(livePolicies, wiseToken)
+	wisePolicies := getCompletePoliciesFromWise(*wiseSimplePolicies, wiseToken)
 	policies = append(policies, wisePolicies...)
 
 	res, _ := json.Marshal(policies)
@@ -87,8 +79,12 @@ func getCompletePoliciesFromWise(simplePolicies []WiseSimplePolicy, wiseToken *s
 	)
 }
 
-func getAllSimplePoliciesForUserFromWise(fiscalCode string, wiseToken *string) (*string, []byte, error) {
-	var responseReader io.ReadCloser
+func getAllSimplePoliciesForUserFromWise(fiscalCode string) (*string, *[]WiseSimplePolicy, error) {
+	var (
+		wiseToken                *string
+		responseReader           io.ReadCloser
+		wiseSimplePolicyResponse WiseSimplePolicyResponse
+	)
 
 	request := []byte(`{
 		"idNodo": "1",
@@ -96,9 +92,20 @@ func getAllSimplePoliciesForUserFromWise(fiscalCode string, wiseToken *string) (
 		"cdLingua": "it"
 	}`)
 
-	responseReader, wiseToken = wiseProxy.WiseBatch("WebApiProduct/Api/RicercaPolizzaCliente", request, "POST", wiseToken)
+	responseReader, wiseToken = wiseProxy.WiseBatch("WebApiProduct/Api/RicercaPolizzaCliente", request, "POST", nil)
 	jsonData, e := ioutil.ReadAll(responseReader)
-	return wiseToken, jsonData, e
+
+	if e != nil {
+		return nil, nil, e
+	}
+
+	e = json.Unmarshal(jsonData, &wiseSimplePolicyResponse)
+
+	livePolicies := filter(wiseSimplePolicyResponse.Policies, func(pol WiseSimplePolicy) bool {
+		return strings.ToUpper(pol.State) == "POLIZZA IN VITA"
+	})
+
+	return wiseToken, &livePolicies, e
 }
 
 func filter[T any](ss []T, test func(T) bool) (ret []T) {
