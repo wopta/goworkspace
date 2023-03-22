@@ -3,8 +3,8 @@ package models
 import "github.com/shopspring/decimal"
 
 type RuleOut struct {
-	Coverages  map[string]map[string]*CoverageOut `json:"coverages"`
-	OfferPrice map[string]map[string]*Price       `json:"offerPrice"`
+	Coverages  map[string]*CoverageOut      `json:"coverages"`
+	OfferPrice map[string]map[string]*Price `json:"offerPrice"`
 }
 
 type Price struct {
@@ -55,9 +55,12 @@ type CoverageValueOut struct {
 	SelfInsurance              string          `json:"selfInsurance"`
 	Tax                        decimal.Decimal `json:"tax"`
 	Percentage                 decimal.Decimal `json:"percentage"`
-	PremiumNet                 decimal.Decimal `json:"premiumNet"`
-	PremiumTaxAmount           decimal.Decimal `json:"premiumTaxAmount"`
-	PremiumGross               decimal.Decimal `json:"premiumGross"`
+	PremiumNetYearly           decimal.Decimal `json:"premiumNetYearly"`
+	PremiumTaxAmountYearly     decimal.Decimal `json:"premiumTaxAmountYearly"`
+	PremiumGrossYearly         decimal.Decimal `json:"premiumGrossYearly"`
+	PremiumNetMonthly          decimal.Decimal `json:"premiumNetMonthly"`
+	PremiumTaxAmountMonthly    decimal.Decimal `json:"premiumTaxAmountMonthly"`
+	PremiumGrossMonthly        decimal.Decimal `json:"premiumGrossMonthly"`
 }
 
 type TaxOut struct {
