@@ -46,8 +46,8 @@ func Sign(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 
 			lib.SetFirestore("policy", uid, policy)
 			e = lib.InsertRowsBigQuery("wopta", "policy", policy)
-			mail.SendMail(getSignMailObj(policy, policy.PayUrl))
 
+			mail.SendMailPay(policy)
 			s := <-document.GetFileV6(policy.IdSign, uid)
 			log.Println(s)
 		}
@@ -55,24 +55,12 @@ func Sign(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 
 	return "", nil, e
 }
-func getSignMailObj(policy models.Policy, payUrl string) mail.MailRequest {
-	var obj mail.MailRequest
-	log.Println(policy.Contractor.Mail)
-	obj.From = "noreply@wopta.it"
-	obj.To = []string{policy.Contractor.Mail}
-	obj.Message = `<p>Ciao ` + policy.Contractor.Name + `` + policy.Contractor.Surname + ` </p>
-	<p>Polizza n° ` + policy.CodeCompany + `</p> 
-	<p>Grazie per aver scelto uno dei nostri prodotti Wopta per te</p> 
-	<p>Puoi ora procedere al pagamento della polizza in oggetto. Qui trovi il link per
-	 accedere alla procedura semplice e guidata 
-	Potrai prendere visione delle condizioni generali di servizio e delle caratteristiche tecniche.</p> 
-	<p><a class="button" href='` + payUrl + `'>Paga la tua polizza:</a></p>
-	<p>A seguito.</p>
-	<p>Grazie per aver scelto Wopta </p> 
-	<p>Proteggiamo chi sei</p>`
-	obj.Subject = " Wopta Paga la tua polizza"
-	obj.IsHtml = true
-	obj.IsAttachment = false
 
-	return obj
-}
+/*"Gentile Nome Cognome, Spett.le ragione sociale,
+hai firmato correttamente la polizza. Sei più vicino a sentirti più protetto.
+Ti invitiamo ora ad accedere a questo link per perfezionare il pagamento.
+Infatti senza pagamento la polizza non è attiva e, solo a pagamento avvenuto, ti invieremo una mail in cui trovi tutti i documenti contrattuali completi.
+Qualora tu abbia già provveduto, ignora questa comunicazione.
+Un saluto.
+ll Team Wopta. Proteggiamo chi sei"
+*/

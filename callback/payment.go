@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	lib "github.com/wopta/goworkspace/lib"
@@ -25,9 +26,9 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 	json.Unmarshal([]byte(request), &fabrickCallback)
 	// Unmarshal or Decode the JSON to the interface.
 	if fabrickCallback.Bill.Status == "PAID" {
-
-		uid := r.URL.Query().Get("uid")
-		schedule := r.URL.Query().Get("schedule")
+		ext := strings.Split(fabrickCallback.ExternalID, "_")
+		uid := ext[0]
+		schedule := ext[1]
 		log.Println(uid)
 		log.Println(schedule)
 		policyF := lib.GetFirestore("policy", uid)
@@ -89,7 +90,7 @@ func (r *FabrickCallback) Marshal() ([]byte, error) {
 }
 
 type FabrickCallback struct {
-	ExternalID *string `json:"externalId,omitempty"`
+	ExternalID string  `json:"externalId,omitempty"`
 	PaymentID  *string `json:"paymentId,omitempty"`
 	Bill       *Bill   `json:"bill,omitempty"`
 }
@@ -132,24 +133,37 @@ type Transaction struct {
 }
 
 func getPayMailObj(policy models.Policy, payUrl string, at string) mail.MailRequest {
+	var name string
+	//var linkForm string
+	if policy.Name == "pmi" {
+		name = "Artigiani & Imprese"
+		//linkForm = "https://www.wopta.it/it/multi-rischio/"
+	}
 	var obj mail.MailRequest
 	log.Println(policy.Contractor.Mail)
 	obj.From = "noreply@wopta.it"
 	obj.To = []string{policy.Contractor.Mail}
-	obj.Message = `<p>Ciao ` + policy.Contractor.Name + `` + policy.Contractor.Surname + ` </p>
-	<p>Polizza n° ` + policy.CodeCompany + `</p> 
-	<p>la tua tua polizza è attiva</p> 
+	obj.Message = `<p>Gentile ` + policy.Contractor.Name + ` ` + policy.Contractor.Surname + ` </p>
+
+	<p>in allegato trovi i documenti da te firmati tramite l’utilizzo della Firma Elettronica Avanzata e l’intera documentazione relativa alla polizza in oggetto</p> 
 	
 	<p>A seguito.</p>
 	<p>Grazie per aver scelto Wopta </p> 
 	<p>Proteggiamo chi sei</p>`
-	obj.Subject = " Wopta Paga la tua polizza"
+	obj.Subject = "Wopta per te. " + name + " paga la tua polizza n° " + policy.CodeCompany
 	obj.IsHtml = true
 	obj.IsAttachment = true
-	obj.Attachments = append(obj.Attachments, mail.Attachment{
+	obj.Attachments = &[]mail.Attachment{{
 		Byte:        at,
 		ContentType: "application/pdf",
-	})
+	}}
 
 	return obj
 }
+
+/*Gentile Nome Cognome,
+
+in allegato trovi i documenti da te firmati tramite l’utilizzo della Firma Elettronica Avanzata e l’intera documentazione relativa alla polizza in oggetto.
+A conferma del pagamento ricevuto da Wopta, ti invieremo una mail.
+Qualora non avessi ancora provveduto, affrettati, in quanto il pagamento è essenziale per l’attivazione della copertura
+ll Team Wopta*/

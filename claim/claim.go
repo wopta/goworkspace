@@ -83,7 +83,7 @@ func put(w http.ResponseWriter, r *http.Request) {
 		claim.Documents[i].Byte = ""
 		claim.Documents[i].Link = link
 	}
-	obj.Attachments = att
+	obj.Attachments = &att
 
 	claims := append(*user.Claims, claim)
 	user.Claims = &claims

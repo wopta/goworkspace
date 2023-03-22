@@ -162,7 +162,7 @@ func ContractObj(data model.Policy) <-chan DocumentResponse {
 		m.AddPage()
 		m = skin.Space(m, 5.0)
 		skin.TitleBlack(m, "DICHIARAZIONI E CONSENSI", "Io Sottoscritto, dichiaro di avere perso visione dell’Informativa Privacy ai sensi dell’art. 13 del GDPR (informativa resa all’interno del set documentale contenente anche la Documentazione Informativa Precontrattuale, il Glossario e le Condizioni di Assicurazione) e di averne compreso i contenuti:", 14.0)
-		m = skin.Sign(m, data.Contractor.Name+" "+data.Contractor.Surname, "Assicurato ", "2", true)
+		m = skin.Sign(m, data.Contractor.Name+" "+data.Contractor.Surname, "Assicurato ", "3", true)
 		m = skin.Space(m, 5.0)
 		m.Row(skin.RowHeight*2, func() {
 			m.Col(12, func() {
@@ -185,7 +185,7 @@ func ContractObj(data model.Policy) <-chan DocumentResponse {
 			})
 
 		})
-		m = skin.Sign(m, data.Contractor.Name+" "+data.Contractor.Surname, "Assicurato ", "2", true)
+		m = skin.Sign(m, data.Contractor.Name+" "+data.Contractor.Surname, "Assicurato ", "4", true)
 		m.RegisterFooter(func() {
 			t := props.Text{
 				Top:   16,

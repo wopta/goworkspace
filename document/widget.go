@@ -88,14 +88,27 @@ func (s Skin) Stantement(m pdf.Maroto, title string, data models.Statement) pdf.
 			prop = s.NormaltextLeft
 			rh = s.RowHeight
 		}
-		m.Row(s.getRowHeight(v.Question, s.CharForRow, rh), func() {
-			m.Col(12, func() {
-				m.Text(v.Question, prop)
+		if v.Indent {
+			m.Row(s.getRowHeight(v.Question, s.CharForRow, rh), func() {
+				m.ColSpace(1)
+				m.Col(11, func() {
+					m.Text(v.Question, prop)
 
+				})
+
+				//m.SetBackgroundColor(magenta)
 			})
+		} else {
+			m.Row(s.getRowHeight(v.Question, s.CharForRow, rh), func() {
+				m.Col(12, func() {
+					m.Text(v.Question, prop)
 
-			//m.SetBackgroundColor(magenta)
-		})
+				})
+
+				//m.SetBackgroundColor(magenta)
+			})
+		}
+
 		m = s.Space(m, 0.3)
 
 	}

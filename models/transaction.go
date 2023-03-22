@@ -11,6 +11,7 @@ import (
 )
 
 type Transaction struct {
+	Id                 string         `firestore:"id,omitempty" json:"id,omitempty" bigquery:"-"`
 	Amount             float64        `firestore:"amount,omitempty" json:"amount,omitempty" bigquery:"amount" `
 	Commissions        float64        `firestore:"commissions,omitempty" json:"commissions,omitempty" bigquery:"commissions"`
 	CommissionsCompany float64        `firestore:"commissionsCompany,omitempty" json:"commissionsCompany,omitempty" bigquery:"commissionsCompany"`
@@ -59,10 +60,11 @@ func TransactionToListData(query *firestore.DocumentIterator) []Transaction {
 	return result
 }
 
-func SetTransactionPolicy(policy Policy, amount float64, schedule string, Commissions float64) Transaction {
+func SetTransactionPolicy(policy Policy, id string, amount float64, schedule string, Commissions float64) Transaction {
 
 	return Transaction{
 		Amount:        amount,
+		Id:            id,
 		PolicyName:    policy.Name,
 		PolicyUid:     policy.Uid,
 		CreationDate:  time.Now(),

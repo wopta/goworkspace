@@ -99,6 +99,7 @@ type Statement struct {
 type Question struct {
 	Question string `firestore:"question,omitempty" json:"question,omitempty"`
 	Isbold   bool   `firestore:"isbold,omitempty" json:"isbold,omitempty"`
+	Indent   bool   `firestore:"indent,omitempty" json:"indent,omitempty"`
 }
 
 func PolicyToListData(query *firestore.DocumentIterator) []Policy {
