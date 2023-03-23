@@ -1,10 +1,12 @@
 package product
 
 import (
-	"io/ioutil"
+	"encoding/json"
+	"io"
 	"log"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	lib "github.com/wopta/goworkspace/lib"
@@ -49,7 +51,7 @@ const (
 	productCollection = "products"
 )
 
-func GetNameFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func GetNameFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	name := r.Header.Get("name")
 	v := strings.Split(r.RequestURI, "/")
 	version := v[1]
@@ -58,7 +60,19 @@ func GetNameFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, 
 	log.Println(v[1])
 	product, e := GetName(name, version)
 	jsonString, e := product.Marshal()
-	return string(jsonString), product, e
+	out := string(jsonString)
+	if name == "persona" {
+		initialDate := time.Now().AddDate(-18, 0, 0)
+		minDate := time.Now().AddDate(-74, 0, 1)
+		out = strings.Replace(out, "{{INITIAL_DATE}}", initialDate.Format(time.DateOnly), 2)
+		out = strings.Replace(out, "{{MIN_DATE}}", minDate.Format(time.DateOnly), 1)
+
+		err := json.Unmarshal([]byte(out), &product)
+		if err != nil {
+			return "", nil, err
+		}
+	}
+	return out, product, e
 
 }
 func GetName(name string, version string) (models.Product, error) {
@@ -84,7 +98,7 @@ func GetName(name string, version string) (models.Product, error) {
 
 func PutFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println(productCollection)
-	request := lib.ErrorByte(ioutil.ReadAll(r.Body))
+	request := lib.ErrorByte(io.ReadAll(r.Body))
 	pr, e := models.UnmarshalProduct([]byte(request))
 	p, e := Put(pr)
 	return "{}", p, e
