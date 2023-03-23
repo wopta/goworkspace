@@ -63,21 +63,22 @@ func GetNameFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	jsonString, e := product.Marshal()
 	out := string(jsonString)
 	if name == "persona" {
-		initialDate := time.Now().AddDate(-18, 0, 0).Format(time.DateOnly)
-		minDate := time.Now().AddDate(-74, 0, 1).Format(time.DateOnly)
-
-		regexInitialDate := regexp.MustCompile("{{INITIAL_DATE}}")
-		regexMinDate := regexp.MustCompile("{{MIN_DATE}}")
-
-		out = regexInitialDate.ReplaceAllString(out, initialDate)
-		out = regexMinDate.ReplaceAllString(out, minDate)
-
-		err := json.Unmarshal([]byte(out), &product)
-		if err != nil {
-			return "", nil, err
-		}
+		replaceDatesForPersonaProduct(&out, &product)
 	}
 	return out, product, e
+}
+
+func replaceDatesForPersonaProduct(out *string, product *models.Product) {
+	initialDate := time.Now().AddDate(-18, 0, 0).Format(time.DateOnly)
+	minDate := time.Now().AddDate(-74, 0, 1).Format(time.DateOnly)
+
+	regexInitialDate := regexp.MustCompile("{{INITIAL_DATE}}")
+	regexMinDate := regexp.MustCompile("{{MIN_DATE}}")
+
+	*out = regexInitialDate.ReplaceAllString(*out, initialDate)
+	*out = regexMinDate.ReplaceAllString(*out, minDate)
+
+	json.Unmarshal([]byte(*out), product)
 }
 
 func GetName(name string, version string) (models.Product, error) {
