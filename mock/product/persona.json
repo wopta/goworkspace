@@ -4,48 +4,126 @@
   "version": "v1",
   "steps": [
     {
-      "name": "inputData",
-      "label": "First Name",
-      "number": 1,
-      "initialActionEndpoint": "",
-      "submitActionEndpoint": "",
-      "components": [
+      "widget": "quoterhome",
+      "attributes": {
+        "logoUrl": "assets/icons/personal-insurance.svg",
+        "logoTitle": "Wopta Per Te",
+        "logoSubtitle": "Persona"
+      },
+      "children": [
         {
-          "type": "date",
+          "widget": "datepicker",
           "attributes": {
-            "name": "first_name",
-            "value": "Ray",
-            "label": "First Name",
-            "maxLength": 30,
-            "startDate": "Ray",
-            "maxDate": "Ray",
-            "currentDate": "Ray"
+            "name": "contractor->birthDate",
+            "value": null,
+            "label": "Seleziona data di nascita",
+            "initialDate": "{{INITIAL_DATE}}",
+            "minDate": "{{MIN_DATE}}",
+            "maxDate": "{{INITIAL_DATE}}",
+            "infoText": "Questa soluzione è dedicata ai maggiorenni e a chi ha meno di 75 anni"
           }
         }
       ]
     },
     {
-      "name": "inputData",
-      "label": "First Name",
-      "number": 2,
-      "initialActionEndpoint": "",
-      "submitActionEndpoint": "",
-      "components": [
+      "widget": "quoterdata",
+      "children": [
         {
-          "type": "autocomlete",
+          "widget": "profession",
           "attributes": {
-            "name": "first_name",
-            "value": "Ray",
-            "url": "",
-            "displayKey": "name",
-            "label": "First Name",
-            "maxLength": 30,
-            "startDate": "Ray",
-            "maxDate": "Ray",
-            "currentDate": "Ray"
+            "optionsUrl": "https://api.dev.wopta.it/enrich/works",
+            "displayKey": "work",
+            "jsonDataKey": "works",
+            "label": "Professione"
+          }
+        },
+        {
+          "widget": "radiogroup",
+          "attributes": {
+            "name": "quoteQuestions->hasDependants",
+            "title": "Hai famigliari a carico?",
+            "mobileConstraintsMaxWidth": 220,
+            "options": [
+              {
+                "key": "Si",
+                "value": true
+              },
+              {
+                "key": "No",
+                "value": false
+              }
+            ]
+          }
+        },
+        {
+          "widget": "radiogroup",
+          "attributes": {
+            "name": "quoteQuestions->lifeRisk",
+            "title": "Il rischio nella tua vita è da:",
+            "mobileConstraintsMaxWidth": 220,
+            "options": [
+              {
+                "key": "Da evitare",
+                "value": 1
+              },
+              {
+                "key": "Da accettare",
+                "value": 2
+              },
+              {
+                "key": "Da gestire",
+                "value": 3
+              }
+            ]
+          }
+        },
+        {
+          "widget": "radiogroup",
+          "attributes": {
+            "name": "quoteQuestions->financialRisk",
+            "title": "Riusciresti ad affrontare una spesa di 1.500 euro?",
+            "mobileConstraintsMaxWidth": 220,
+            "options": [
+              {
+                "key": "Si, senza problemi",
+                "value": 1
+              },
+              {
+                "key": "Si, ma dovrei rinunciare a qualcosa",
+                "value": 2
+              },
+              {
+                "key": "No, non ci riuscirei facilmente",
+                "value": 3
+              }
+            ]
           }
         }
       ]
+    },
+    {
+      "widget": "quoteroffer",
+      "attributes": {
+        "offersEndpoint": "rules/risk/person"
+      }
+    },
+    {
+      "widget": "quotercontractordata",
+      "attributes": {}
+    },
+    {
+      "widget": "quoterstatements",
+      "attributes": {
+        "statementsEndpoint": "rules/survey/person"
+      }
+    },
+    {
+      "widget": "quoterrecap",
+      "attributes": {}
+    },
+    {
+      "widget": "quotersignpay",
+      "attributes": {}
     }
   ],
   "companies": [
