@@ -1,18 +1,5 @@
 package models
 
-type RuleOut struct {
-	Coverages  map[string]*CoverageOut      `json:"coverages"`
-	OfferPrice map[string]map[string]*Price `json:"offerPrice"`
-}
-
-type Price struct {
-	Net      float64 `json:"net"`
-	Tax      float64 `json:"tax"`
-	Gross    float64 `json:"gross"`
-	Delta    float64 `json:"delta"`
-	Discount float64 `json:"discount"`
-}
-
 type CoverageOut struct {
 	DailyAllowance             string                       `json:"dailyAllowance"`
 	Name                       string                       `json:"name"`

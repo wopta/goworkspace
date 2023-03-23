@@ -108,17 +108,17 @@ func calculateAge(birthDateIsoString string) (int, error) {
 	return age, e
 }
 
-func initCoverageP() *models.RuleOut {
-	var coverages = make(map[string]*models.CoverageOut)
-	offerPrice := make(map[string]map[string]*models.Price)
+func initCoverageP() *RuleOut {
+	var guarantees = make(map[string]*models.Guarante)
+	offerPrice := make(map[string]map[string]*Price)
 
-	coverages = map[string]*models.CoverageOut{
+	guarantees = map[string]*models.Guarante{
 		"IPI": {
 			Slug:                       "Invalidità Permanente Infortunio",
 			Deductible:                 "0",
 			Tax:                        2.5,
 			SumInsuredLimitOfIndemnity: 0.0,
-			Offer: map[string]*models.CoverageValueOut{
+			Offer: map[string]*models.GuaranteValue{
 				base: {
 					Deductible:                 "0",
 					DeductibleType:             "",
@@ -165,7 +165,7 @@ func initCoverageP() *models.RuleOut {
 			Deductible:                 "0",
 			Tax:                        2.5,
 			SumInsuredLimitOfIndemnity: 0.0,
-			Offer: map[string]*models.CoverageValueOut{
+			Offer: map[string]*models.GuaranteValue{
 				base: {
 					Deductible:                 "0",
 					DeductibleType:             "",
@@ -212,7 +212,7 @@ func initCoverageP() *models.RuleOut {
 			Deductible:                 "0",
 			Tax:                        2.5,
 			SumInsuredLimitOfIndemnity: 0.0,
-			Offer: map[string]*models.CoverageValueOut{
+			Offer: map[string]*models.GuaranteValue{
 				base: {
 					Deductible:                 "0",
 					DeductibleType:             "",
@@ -259,7 +259,7 @@ func initCoverageP() *models.RuleOut {
 			Deductible:                 "0",
 			Tax:                        2.5,
 			SumInsuredLimitOfIndemnity: 0.0,
-			Offer: map[string]*models.CoverageValueOut{
+			Offer: map[string]*models.GuaranteValue{
 				base: {
 					Deductible:                 "0",
 					DeductibleType:             "",
@@ -306,7 +306,7 @@ func initCoverageP() *models.RuleOut {
 			Deductible:                 "0",
 			Tax:                        2.5,
 			SumInsuredLimitOfIndemnity: 0.0,
-			Offer: map[string]*models.CoverageValueOut{
+			Offer: map[string]*models.GuaranteValue{
 				base: {
 					Deductible:                 "0",
 					DeductibleType:             "",
@@ -353,7 +353,7 @@ func initCoverageP() *models.RuleOut {
 			Deductible:                 "0",
 			Tax:                        2.5,
 			SumInsuredLimitOfIndemnity: 0.0,
-			Offer: map[string]*models.CoverageValueOut{
+			Offer: map[string]*models.GuaranteValue{
 				base: {
 					Deductible:                 "0",
 					DeductibleType:             "",
@@ -400,7 +400,7 @@ func initCoverageP() *models.RuleOut {
 			Deductible:                 "0",
 			Tax:                        2.5,
 			SumInsuredLimitOfIndemnity: 0.0,
-			Offer: map[string]*models.CoverageValueOut{
+			Offer: map[string]*models.GuaranteValue{
 				base: {
 					Deductible:                 "0",
 					DeductibleType:             "",
@@ -447,7 +447,7 @@ func initCoverageP() *models.RuleOut {
 			Deductible:                 "0",
 			Tax:                        10.0,
 			SumInsuredLimitOfIndemnity: 0.0,
-			Offer: map[string]*models.CoverageValueOut{
+			Offer: map[string]*models.GuaranteValue{
 				base: {
 					Deductible:                 "0",
 					DeductibleType:             "",
@@ -494,7 +494,7 @@ func initCoverageP() *models.RuleOut {
 			Deductible:                 "0",
 			Tax:                        21.25,
 			SumInsuredLimitOfIndemnity: 0.0,
-			Offer: map[string]*models.CoverageValueOut{
+			Offer: map[string]*models.GuaranteValue{
 				base: {
 					Deductible:                 "0",
 					DeductibleType:             "",
@@ -538,7 +538,7 @@ func initCoverageP() *models.RuleOut {
 		},
 	}
 
-	offerPrice[base] = map[string]*models.Price{
+	offerPrice[base] = map[string]*Price{
 		monthly: {
 			Net:      0.0,
 			Tax:      0.0,
@@ -554,7 +554,7 @@ func initCoverageP() *models.RuleOut {
 			Discount: 0.0,
 		},
 	}
-	offerPrice[your] = map[string]*models.Price{
+	offerPrice[your] = map[string]*Price{
 		monthly: {
 			Net:      0.0,
 			Tax:      0.0,
@@ -570,7 +570,7 @@ func initCoverageP() *models.RuleOut {
 			Discount: 0.0,
 		},
 	}
-	offerPrice[premium] = map[string]*models.Price{
+	offerPrice[premium] = map[string]*Price{
 		monthly: {
 			Net:      0.0,
 			Tax:      0.0,
@@ -587,8 +587,8 @@ func initCoverageP() *models.RuleOut {
 		},
 	}
 
-	return &models.RuleOut{
-		Coverages:  coverages,
+	return &RuleOut{
+		Guarantees: guarantees,
 		OfferPrice: offerPrice,
 	}
 }
