@@ -3,6 +3,7 @@ package rules
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/wopta/goworkspace/models"
 	"log"
 	"math"
 	"strconv"
@@ -216,7 +217,7 @@ func (p *Fx) CalculateOfferPrices(out *RuleOut) {
 }
 
 func (p *Fx) RoundMonthlyOfferPrices(out *RuleOut, roundingCoverages ...string) {
-	updatePrices := func(coverage string, offerType string, priceStruct map[string]*Price) {
+	updatePrices := func(coverage string, offerType string, priceStruct map[string]*models.Price) {
 		out.Guarantees[coverage].Offer[offerType].PremiumGrossMonthly += priceStruct[monthly].Delta
 		newNetPrice := out.Guarantees[coverage].Offer[offerType].PremiumGrossMonthly / (1 + (out.Guarantees[coverage].Tax / 100))
 		newTax := out.Guarantees[coverage].Offer[offerType].PremiumGrossMonthly - newNetPrice
@@ -244,7 +245,7 @@ func (p *Fx) RoundMonthlyOfferPrices(out *RuleOut, roundingCoverages ...string) 
 }
 
 func (p *Fx) RoundYearlyOfferPrices(out *RuleOut, roundingCoverages ...string) {
-	updatePrices := func(coverage string, offerType string, priceStruct map[string]*Price) {
+	updatePrices := func(coverage string, offerType string, priceStruct map[string]*models.Price) {
 		out.Guarantees[coverage].Offer[offerType].PremiumGrossYearly += priceStruct[yearly].Delta
 		newNetPrice := out.Guarantees[coverage].Offer[offerType].PremiumGrossYearly / (1 + (out.Guarantees[coverage].Tax / 100))
 		newTax := out.Guarantees[coverage].Offer[offerType].PremiumGrossYearly - newNetPrice

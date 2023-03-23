@@ -60,12 +60,22 @@ func Person(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	log.Println("Person")
 	req := lib.ErrorByte(io.ReadAll(r.Body))
-	quotingInputData := getRulesInputData(policy, e, req)
+	quotingInputData := getRulesInputData(&policy, e, req)
 
 	rulesFile = getRulesFile(rulesFile, rulesFileName)
-	coveragesJson, coverages := rulesFromJson(rulesFile, initCoverageP(), quotingInputData, []byte(getQuotingData()))
+	_, rule := rulesFromJson(rulesFile, initCoverageP(), quotingInputData, []byte(getQuotingData()))
 
-	return coveragesJson, coverages, nil
+	ruleOut := rule.(*RuleOut)
+	policy.OffersPrices = ruleOut.OfferPrice
+	guarantees := make([]models.Guarante, 0)
+	for _, guarantee := range ruleOut.Guarantees {
+		guarantees = append(guarantees, *guarantee)
+	}
+	policy.Assets[0].Guarantees = guarantees
+
+	policyJson, _ := policy.Marshal()
+
+	return string(policyJson), policy, nil
 }
 
 func getRulesFile(rulesFile []byte, rulesFileName string) []byte {
@@ -82,8 +92,8 @@ func getRulesFile(rulesFile []byte, rulesFileName string) []byte {
 	return rulesFile
 }
 
-func getRulesInputData(policy models.Policy, e error, req []byte) []byte {
-	policy, e = models.UnmarshalPolicy(req)
+func getRulesInputData(policy *models.Policy, e error, req []byte) []byte {
+	*policy, e = models.UnmarshalPolicy(req)
 	lib.CheckError(e)
 
 	age, e := calculateAge(policy.Contractor.BirthDate)
@@ -110,7 +120,7 @@ func calculateAge(birthDateIsoString string) (int, error) {
 
 func initCoverageP() *RuleOut {
 	var guarantees = make(map[string]*models.Guarante)
-	offerPrice := make(map[string]map[string]*Price)
+	offerPrice := make(map[string]map[string]*models.Price)
 
 	guarantees = map[string]*models.Guarante{
 		"IPI": {
@@ -538,7 +548,7 @@ func initCoverageP() *RuleOut {
 		},
 	}
 
-	offerPrice[base] = map[string]*Price{
+	offerPrice[base] = map[string]*models.Price{
 		monthly: {
 			Net:      0.0,
 			Tax:      0.0,
@@ -554,7 +564,7 @@ func initCoverageP() *RuleOut {
 			Discount: 0.0,
 		},
 	}
-	offerPrice[your] = map[string]*Price{
+	offerPrice[your] = map[string]*models.Price{
 		monthly: {
 			Net:      0.0,
 			Tax:      0.0,
@@ -570,7 +580,7 @@ func initCoverageP() *RuleOut {
 			Discount: 0.0,
 		},
 	}
-	offerPrice[premium] = map[string]*Price{
+	offerPrice[premium] = map[string]*models.Price{
 		monthly: {
 			Net:      0.0,
 			Tax:      0.0,

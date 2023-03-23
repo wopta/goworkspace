@@ -42,16 +42,8 @@ func Rules(w http.ResponseWriter, r *http.Request) {
 }
 
 type RuleOut struct {
-	Guarantees map[string]*models.Guarante  `json:"guarantees"`
-	OfferPrice map[string]map[string]*Price `json:"offerPrice"`
-}
-
-type Price struct {
-	Net      float64 `json:"net"`
-	Tax      float64 `json:"tax"`
-	Gross    float64 `json:"gross"`
-	Delta    float64 `json:"delta"`
-	Discount float64 `json:"discount"`
+	Guarantees map[string]*models.Guarante         `json:"guarantees"`
+	OfferPrice map[string]map[string]*models.Price `json:"offerPrice"`
 }
 
 type Coverage struct {
