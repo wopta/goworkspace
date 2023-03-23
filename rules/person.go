@@ -63,17 +63,12 @@ func Person(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	quotingInputData := getRulesInputData(&policy, e, req)
 
 	rulesFile = getRulesFile(rulesFile, rulesFileName)
-	_, rule := rulesFromJson(rulesFile, initCoverageP(), quotingInputData, []byte(getQuotingData()))
+	_, ruleOut := rulesFromJson(rulesFile, initCoverageP(), quotingInputData, []byte(getQuotingData()))
 
-	ruleOut := rule.(*RuleOut)
-	policy.OffersPrices = ruleOut.OfferPrice
-	guarantees := make([]models.Guarante, 0)
-	for _, guarantee := range ruleOut.Guarantees {
-		guarantees = append(guarantees, *guarantee)
-	}
-	policy.Assets[0].Guarantees = guarantees
+	ruleOut.(*RuleOut).ToPolicy(&policy)
 
-	policyJson, _ := policy.Marshal()
+	policyJson, err := policy.Marshal()
+	lib.CheckError(err)
 
 	return string(policyJson), policy, nil
 }

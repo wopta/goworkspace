@@ -46,6 +46,15 @@ type RuleOut struct {
 	OfferPrice map[string]map[string]*models.Price `json:"offerPrice"`
 }
 
+func (r *RuleOut) ToPolicy(policy *models.Policy) {
+	policy.OffersPrices = r.OfferPrice
+	guarantees := make([]models.Guarante, 0)
+	for _, guarantee := range r.Guarantees {
+		guarantees = append(guarantees, *guarantee)
+	}
+	policy.Assets[0].Guarantees = guarantees
+}
+
 type Coverage struct {
 	DailyAllowance             string
 	Name                       string
