@@ -23,10 +23,11 @@ func Works(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 
 	for k, v := range df.Records() {
 		var (
-			self     bool
-			emp      bool
-			unself   bool
-			workType string
+			selfEmployed bool
+			employed     bool
+			unemployed   bool
+			workType     string
+			class        string
 		)
 
 		log.Println(v)
@@ -35,24 +36,29 @@ func Works(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 
 			if v[2] == "x" {
 				workType = "autonomo"
-				self = true
+				selfEmployed = true
 			}
 			if v[3] == "x" {
 				workType = "dipendente"
-				emp = true
+				employed = true
 			}
 			if v[4] == "x" {
 				workType = "disoccupato"
-				unself = true
+				unemployed = true
+			}
+
+			class = v[1]
+			if class == "S.E." {
+				class = "x"
 			}
 
 			sub := Work{
 				Work:           v[0],
-				Class:          v[1],
+				Class:          class,
 				WorkType:       workType,
-				IsSelfEmployed: self,
-				IsEmployed:     emp,
-				IsUnemployed:   unself,
+				IsSelfEmployed: selfEmployed,
+				IsEmployed:     employed,
+				IsUnemployed:   unemployed,
 			}
 			result = append(result, sub)
 		}
