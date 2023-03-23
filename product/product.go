@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"regexp"
 	"strings"
 	"time"
 
@@ -62,10 +63,14 @@ func GetNameFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	jsonString, e := product.Marshal()
 	out := string(jsonString)
 	if name == "persona" {
-		initialDate := time.Now().AddDate(-18, 0, 0)
-		minDate := time.Now().AddDate(-74, 0, 1)
-		out = strings.Replace(out, "{{INITIAL_DATE}}", initialDate.Format(time.DateOnly), 2)
-		out = strings.Replace(out, "{{MIN_DATE}}", minDate.Format(time.DateOnly), 1)
+		initialDate := time.Now().AddDate(-18, 0, 0).Format(time.DateOnly)
+		minDate := time.Now().AddDate(-74, 0, 1).Format(time.DateOnly)
+
+		regexInitialDate := regexp.MustCompile("{{INITIAL_DATE}}")
+		regexMinDate := regexp.MustCompile("{{MIN_DATE}}")
+
+		out = regexInitialDate.ReplaceAllString(out, initialDate)
+		out = regexMinDate.ReplaceAllString(out, minDate)
 
 		err := json.Unmarshal([]byte(out), &product)
 		if err != nil {
@@ -73,8 +78,8 @@ func GetNameFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 		}
 	}
 	return out, product, e
-
 }
+
 func GetName(name string, version string) (models.Product, error) {
 	q := lib.Firequeries{
 		Queries: []lib.Firequery{{
