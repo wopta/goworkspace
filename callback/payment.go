@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	lib "github.com/wopta/goworkspace/lib"
@@ -27,9 +28,12 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 	json.Unmarshal([]byte(request), &fabrickCallback)
 	// Unmarshal or Decode the JSON to the interface.
 	if fabrickCallback.Bill.Status == "PAID" {
-		//ext := strings.Split(fabrickCallback.ExternalID, "_")
-		//uid := ext[0]
-		//schedule := ext[1]
+		if uid == "" {
+			ext := strings.Split(fabrickCallback.ExternalID, "_")
+			uid = ext[0]
+			schedule = ext[1]
+		}
+
 		log.Println(uid)
 		log.Println(schedule)
 		policyF := lib.GetFirestore("policy", uid)
