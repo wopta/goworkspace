@@ -34,34 +34,41 @@ func (s Skin) CoveragesTable(m pdf.Maroto, head []string, content [][]string) pd
 	return m
 }
 
-func (s Skin) Stantements(m pdf.Maroto, title string, data []Kv) pdf.Maroto {
-	prop := props.Text{
-		Top:   1.5,
-		Size:  s.Size,
-		Style: consts.Bold,
-		Align: consts.Left,
-		Color: s.TextColor,
+func (s Skin) Question(m pdf.Maroto, data models.Question) {
+	var prop props.Text
+	var rh float64
+	if data.Isbold {
+		prop = s.BoldtextLeft
+		rh = s.RowHeight + 0.0
+	} else {
+		prop = s.NormaltextLeft
+		rh = s.RowHeight
 	}
+	if data.Indent {
+		m.Row(s.getRowHeight(data.Question, s.CharForRow, rh), func() {
+			m.ColSpace(1)
+			m.Col(11, func() {
+				m.Text(data.Question, prop)
 
-	m.Row(s.RowTitleHeight, func() {
-		m.Col(6, func() {
-			m.Text(title, prop)
+			})
 
 		})
-		m.Col(4, func() {
+	} else {
+		m.Row(s.getRowHeight(data.Question, s.CharForRow, rh), func() {
+			m.Col(12, func() {
+				m.Text(data.Question, prop)
 
+			})
 		})
 
-		//m.SetBackgroundColor(magenta)
-	})
-	for _, v := range data {
-		s.RowBullet(m, v.Key, v.Value, consts.Normal)
+		m = s.Space(m, 0.3)
 
 	}
-	return m
+
 }
-func (s Skin) Stantement(m pdf.Maroto, title string, data models.Statement) pdf.Maroto {
-	d := data.Questions
+
+func (s Skin) Stantement(m pdf.Maroto, title string, data models.Statement) {
+	//d := data.Questions
 	m.Row(s.RowTitleHeight, func() {
 		m.Col(12, func() {
 			m.Text(title, s.MagentaBoldtextLeft)
@@ -70,49 +77,14 @@ func (s Skin) Stantement(m pdf.Maroto, title string, data models.Statement) pdf.
 
 		//m.SetBackgroundColor(magenta)
 	})
-	for i, v := range *data.Questions {
-		qlen := len(*data.Questions)
-		nextI := 1
-		s.checkPageNext(m, (*d)[nextI].Question)
-		if qlen == i-1 {
-			nextI = i - 1
-		} else {
-			nextI = i
-		}
-		var prop props.Text
-		var rh float64
-		if v.Isbold {
-			prop = s.BoldtextLeft
-			rh = s.RowHeight + 0.0
-		} else {
-			prop = s.NormaltextLeft
-			rh = s.RowHeight
-		}
-		if v.Indent {
-			m.Row(s.getRowHeight(v.Question, s.CharForRow, rh), func() {
-				m.ColSpace(1)
-				m.Col(11, func() {
-					m.Text(v.Question, prop)
-
-				})
-
-				//m.SetBackgroundColor(magenta)
-			})
-		} else {
-			m.Row(s.getRowHeight(v.Question, s.CharForRow, rh), func() {
-				m.Col(12, func() {
-					m.Text(v.Question, prop)
-
-				})
-
-				//m.SetBackgroundColor(magenta)
-			})
-		}
-
-		m = s.Space(m, 0.3)
+	for _, v := range *data.Questions {
+		//qlen := len(*data.Questions)
+		//nextI := 1
+		//s.checkPageNext(m, (*d)[nextI].Question)
+		s.Question(m, v)
 
 	}
-	return m
+
 }
 func (s Skin) Articles(m pdf.Maroto, data []Kv) pdf.Maroto {
 	textBold := props.Text{
@@ -292,9 +264,17 @@ func (s Skin) GetPmi(data models.Policy, m pdf.Maroto) pdf.Maroto {
 	})
 	m.Line(1.0, s.Line)
 	//buildingcount := 0
+	enterprise := GetEnterprise(data.Assets)
+	ateco := enterprise.Ateco
+	atecodesc := enterprise.AtecoDesc
+
 	for _, A := range data.Assets {
-		c := [][]string{{""}, {""}, {""}, {""}}
+		var (
+			c [][]string
+			d []string
+		)
 		if A.Building != nil {
+
 			alarm := "senza"
 			holder := "in affitto"
 			build := A.Building
@@ -303,6 +283,8 @@ func (s Skin) GetPmi(data models.Policy, m pdf.Maroto) pdf.Maroto {
 			}
 			if build.IsAllarm {
 				alarm = "con"
+			} else {
+				alarm = "senza"
 			}
 
 			switch os := build.BuildingYear; os {
@@ -314,35 +296,61 @@ func (s Skin) GetPmi(data models.Policy, m pdf.Maroto) pdf.Maroto {
 				constructionYear = "dopo il 2009"
 
 			}
+
 			switch os := build.BuildingMaterial; os {
 			case "masonry":
-				constructionMaterial = "muratura"
+				constructionMaterial = "muratura o CA in appoggio"
 			case "reinforcedConcrete":
-				constructionMaterial = " CA in appoggio"
+				constructionMaterial = "Cemento armato legato"
 			case "antiSeismicLaminatedTimber":
 				constructionMaterial = "Legno lamellare"
 			case "steel":
 				constructionMaterial = "Acciaio"
 
 			}
+			c = append(c, []string{"", "", "Sede "})
+			d = append(d, build.Address+" "+build.StreetNumber+" - "+build.PostalCode+" "+build.City+" ("+build.CityCode+")")
+			d = append(d, "Fabbricato "+constructionMaterial+" construito "+constructionYear+", "+alarm+" antifurto, "+holder)
+			d = append(d, "Attività ATECO codice: "+ateco)
+			d = append(d, "Fabbricato "+constructionMaterial+" construito "+constructionYear+", "+alarm+" antifurto, "+holder)
 
-			c = [][]string{{"", "Sede "},
-				{build.Address,
-					"Fabbricato " + constructionMaterial + "construito " + constructionYear + ", " + alarm + " antifurto, " + holder,
-					"Attività ATECO codice: " + build.Ateco,
-					"Descrizione: " + build.AtecoDesc}}
+			if len(atecodesc) > 100 {
+				d = append(d, "Descrizione: "+atecodesc[:100])
+				d = append(d, atecodesc[100:])
+			} else if len(atecodesc) > 200 {
+				d = append(d, "Descrizione: "+atecodesc[:100])
+				d = append(d, atecodesc[100:200])
+				d = append(d, atecodesc[200:])
+			} else {
+				d = append(d, "Descrizione: "+atecodesc)
+			}
+			c = append(c, d)
 
 		}
-
 		if A.Enterprise != nil {
+
 			e := A.Enterprise
-			c = [][]string{{"", "", "Attivita"},
-				{"Fatturato: € " + e.Revenue,
-					"Adetti nr:" + strconv.Itoa(int(e.Employer)),
-					"Attività ATECO codice: " + e.Ateco,
-					"Descrizione: " + e.AtecoDesc,
-					"Ubicazione Attività: : " + e.Address}}
+			rev, err := strconv.Atoi(e.Revenue)
+			lib.CheckError(err)
+			c = append(c, []string{"", "", "Attività"})
+			d = append(d, "Fatturato: € "+humanize.FormatInteger("#.###,", int(rev)))
+			d = append(d, "Addetti nr: "+strconv.Itoa(int(e.Employer)))
+			d = append(d, "Attività ATECO codice: "+ateco)
+			if len(atecodesc) > 100 {
+				d = append(d, "Descrizione: "+atecodesc[:100])
+				d = append(d, atecodesc[100:])
+			} else if len(atecodesc) > 200 {
+				d = append(d, "Descrizione: "+atecodesc[:100])
+				d = append(d, atecodesc[100:200])
+				d = append(d, atecodesc[200:])
+
+			} else {
+				d = append(d, "Descrizione: "+atecodesc)
+			}
+			d = append(d, "Ubicazione Attività: Ogni sede sede assicurata indicata in polizza")
+			c = append(c, d)
 		}
+
 		for _, k := range A.Guarantees {
 			if k.Slug == "third-party-liability" {
 				switch os := k.Deductible; os {
@@ -379,6 +387,8 @@ func (s Skin) GetPmi(data models.Policy, m pdf.Maroto) pdf.Maroto {
 	return m
 
 }
+
+// ----------------------------------------------------------------------------------
 func (s Skin) CoveragesPmiTable(m pdf.Maroto, data models.Policy) pdf.Maroto {
 	existGuarance := func(str bool) string {
 		res := "NO"
@@ -655,15 +665,29 @@ func (skin Skin) GetHeader(m pdf.Maroto, data models.Policy, logo string, name s
 		h := []string{"I dati della tua Polizza ", "I tuoi dati"}
 		var tablePremium [][]string
 		layout := "02/01/2006"
+		var nextpay string
 		if data.PaymentSplit == "montly" {
-
+			nextpay = data.StartDate.AddDate(0, 1, 0).Format(layout)
+		} else {
+			nextpay = data.EndDate.Format(layout)
 		}
-		tablePremium = append(tablePremium, []string{"Numero: " + data.CodeCompany, "Contraente: " + data.Contractor.Name + " " + data.Contractor.Surname})
+		var name string
+		if data.Name == "pmi" {
+			for _, as := range data.Assets {
+				if as.Enterprise != nil {
+					name = as.Enterprise.Name
+				} else {
+					name = data.Contractor.Name + " " + data.Contractor.Surname
+				}
+			}
+		}
+		tablePremium = append(tablePremium, []string{"Numero: " + data.CodeCompany, "Contraente: " + name})
 		tablePremium = append(tablePremium, []string{"Decorre dal: " + data.StartDate.Format(layout) + " ore 24:00", "C.F. / P.IVA: " + data.Contractor.VatCode})
-		tablePremium = append(tablePremium, []string{"Scade il: " + data.EndDate.Format(layout) + " ore 24:00", "Indirizzo: " + data.Contractor.Address})
+		tablePremium = append(tablePremium, []string{"Scade il: " + data.EndDate.Format(layout) + " ore 24:00", "Indirizzo: " + data.Contractor.Address + " " + data.Contractor.StreetNumber})
 		tablePremium = append(tablePremium, []string{"Si rinnova a scadenza, salvo disdetta da inviare 30 giorni prima", data.Contractor.PostalCode + " " + data.Contractor.City + " (" + data.Contractor.CityCode + ")"})
-		tablePremium = append(tablePremium, []string{"Prossimo pagamento il: " + data.EndDate.Format(layout), "Mail:  " + data.Contractor.Mail})
+		tablePremium = append(tablePremium, []string{"Prossimo pagamento il: " + nextpay, "Mail:  " + data.Contractor.Mail})
 		tablePremium = append(tablePremium, []string{"Sostituisce la polizza: = = = = = = = =", "Telefono: " + data.Contractor.Phone})
+		tablePremium = append(tablePremium, []string{"Presenza Vincolo: SI  - Convenzione: NO", ""})
 		m = skin.Table(m, h, tablePremium, 6, skin.RowHeight-0.5)
 		skin.Space(m, 5.0)
 		//m.Line(skin.LineHeight, skin.Lin

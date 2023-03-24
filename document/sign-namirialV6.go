@@ -358,7 +358,7 @@ func getSendV6(id string, data model.Policy, prepare string) string {
 			"Policy": "None",
 			"Allow": true,
 			"IframeWhitelisting": [
-			  "dev.wopta.it"
+			  "dev.wopta.it", "wopta.it"
 			]
 		  },
 		"ReminderConfiguration": {
