@@ -1,6 +1,7 @@
 package document
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"io/ioutil"
 	"log"
@@ -40,9 +41,13 @@ func ContractObj(data model.Policy) <-chan DocumentResponse {
 			skin.GlobalContract(m, data)
 		}
 		//-----------Save file
-		Save(m, data)
-
+		filename, out := Save(m, data)
+		data.DocumentName = filename
 		log.Println(data.Uid + " ContractObj end")
+		r <- DocumentResponse{
+			LinkGcs: filename,
+			Bytes:   base64.StdEncoding.EncodeToString(out),
+		}
 	}()
 	return r
 }

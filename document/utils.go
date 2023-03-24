@@ -331,7 +331,7 @@ func GetEnterprise(list []models.Asset) *models.Enterprise {
 	}
 	return res
 }
-func Save(m pdf.Maroto, data models.Policy) string {
+func Save(m pdf.Maroto, data models.Policy) (string, []byte) {
 	//-----------Save file
 	var filename string
 	if os.Getenv("env") == "local" {
@@ -345,12 +345,10 @@ func Save(m pdf.Maroto, data models.Policy) string {
 		filename = "temp/" + data.Contractor.Name + "_" + data.Contractor.Surname + "_" + timestamp + "_contract.pdf"
 		lib.PutToStorage("function-data", filename, out.Bytes())
 		lib.CheckError(err)
-
-		data.DocumentName = filename
-
+		return filename, out.Bytes()
 	}
 
-	return filename
+	return filename, nil
 }
 func IfString(str bool, t string, f string) string {
 	res := f
