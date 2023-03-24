@@ -75,8 +75,13 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println("Emit policy "+uid, string(policyJson))
 	lib.SetFirestore("policy", uid, policy)
 	policy.Data = string(policyJson)
+	policy.BigStartDate = civil.DateTimeOf(policy.StartDate)
+	policy.BigEndDate = civil.DateTimeOf(policy.EndDate)
+
+	policy.BigEmitDate = civil.DateTimeOf(policy.Updated)
 	log.Println("Emit policy save big query: " + uid)
 	e = lib.InsertRowsBigQuery("wopta", "policy", policy)
+	log.Println("Emit policy save big query error: ", e)
 	mail.SendMailSign(policy)
 	b, e := json.Marshal(responseEmit)
 	return string(b), responseEmit, e
