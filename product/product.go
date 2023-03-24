@@ -70,7 +70,7 @@ func GetNameFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 
 func replaceDatesForPersonaProduct(productJson *string, product *models.Product) {
 	initialDate := time.Now().AddDate(-18, 0, 0).Format("2006-01-02")
-	minDate := time.Now().AddDate(-74, 0, 1).Format("2006-01-02")
+	minDate := time.Now().AddDate(-75, 0, 1).Format("2006-01-02")
 
 	regexInitialDate := regexp.MustCompile("{{INITIAL_DATE}}")
 	regexMinDate := regexp.MustCompile("{{MIN_DATE}}")
