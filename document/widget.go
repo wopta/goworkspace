@@ -312,7 +312,6 @@ func (s Skin) GetPmi(data models.Policy, m pdf.Maroto) pdf.Maroto {
 			d = append(d, build.Address+" "+build.StreetNumber+" - "+build.PostalCode+" "+build.City+" ("+build.CityCode+")")
 			d = append(d, "Fabbricato "+constructionMaterial+" construito "+constructionYear+", "+alarm+" antifurto, "+holder)
 			d = append(d, "Attività ATECO codice: "+ateco)
-			d = append(d, "Fabbricato "+constructionMaterial+" construito "+constructionYear+", "+alarm+" antifurto, "+holder)
 
 			if len(atecodesc) > 100 {
 				d = append(d, "Descrizione: "+atecodesc[:100])

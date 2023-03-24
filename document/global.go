@@ -162,16 +162,18 @@ Costituisce quietanza di pagamento la mail di conferma che Wopta invierà al Con
 	m = skin.Space(m, 5.0)
 	m = skin.Sign(m, data.Contractor.Name+" "+data.Contractor.Surname, "Assicurato ", "4", true)
 	m.RegisterFooter(func() {
+		topv := 10.0
 		t := props.Text{
-			Top:   25,
+			Top: topv,
+
 			Size:  6,
 			Style: consts.Normal,
 			Align: consts.Left,
 			Color: skin.TextColor}
 		t1 := props.Text{
-			Top: 25, Size: 6, Color: skin.SecondaryColor}
+			Top: topv, Size: 6, Color: skin.SecondaryColor}
 
-		m.Row(10, func() {
+		m.Row(5, func() {
 			m.Col(12, func() {
 				m.Text("Global Assistance Compagnia di assicurazioni e riassicurazioni S.p.A. a Socio Unico", t)
 				m.Text("Global Assistance Compagnia di assicurazioni e riassicurazioni S.p.A. a Socio Unico - Capitale Sociale: Euro 5.000.000 i.v. Codice Fiscale, Partita IVA e Registro Imprese di Milano n. 10086540159 R.E.A. n. 1345012 della C.C.I.A.A. di Milano. Sede e Direzione Generale Piazza Diaz 6 – 20123 Milano – ItaliaE-mail: global.assistance@globalassistance.it PEC: globalassistancespa@legalmail.it. Società soggetta all’attività di direzione e coordinamento di Ri-Fin S.r.l., iscritta all’Albo dei gruppi assicurativi presso l’IVASS al n. 014. La Società è autorizzata all’esercizio delle Assicurazioni e Riassicurazioni con D.M. del 2/8/93 n. 19619 (G.U. 7/8/93 n. 184) e successive autorizzazioni ed è iscritta all’Albo Imprese presso l’Ivass al n. 1.00111. La Società è soggetta alla vigilanza dell’IVASS; è possibile verificare la veridicità e la regolarità delle autorizzazioni mediante l'accesso al sito www.ivass.it", t1)
