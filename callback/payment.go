@@ -48,6 +48,7 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 			policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusPay)
 			//policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusToPay)
 			lib.SetFirestore("policy", uid, policy)
+			policy.BigquerySave()
 			q := lib.Firequeries{
 				Queries: []lib.Firequery{{
 					Field:      "uid",

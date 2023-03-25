@@ -45,7 +45,7 @@ func Sign(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 			policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusToPay)
 
 			lib.SetFirestore("policy", uid, policy)
-			e = lib.InsertRowsBigQuery("wopta", "policy", policy)
+			policy.BigquerySave()
 
 			mail.SendMailPay(policy)
 			s := <-document.GetFileV6(policy.IdSign, uid)
