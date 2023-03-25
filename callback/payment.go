@@ -39,6 +39,8 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 		policyF := lib.GetFirestore("policy", uid)
 		var policy models.Policy
 		policyF.DataTo(policy)
+		policyM, _ := policy.Marshal()
+		log.Println(uid+" payment ", policyM)
 		if !policy.IsPay && policy.Status == models.PolicyStatusToPay {
 			policy.IsPay = true
 			policy.Updated = time.Now()

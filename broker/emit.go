@@ -77,8 +77,7 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	policy.Data = string(policyJson)
 	policy.BigStartDate = civil.DateTimeOf(policy.StartDate)
 	policy.BigEndDate = civil.DateTimeOf(policy.EndDate)
-
-	policy.BigEmitDate = civil.DateTimeOf(policy.Updated)
+	policy.BigEmitDate = civil.DateTimeOf(time.Now())
 	log.Println("Emit policy save big query: " + uid)
 	e = lib.InsertRowsBigQuery("wopta", "policy", policy)
 	log.Println("Emit policy save big query error: ", e)
