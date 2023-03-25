@@ -51,7 +51,7 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 			policy.BigquerySave()
 			q := lib.Firequeries{
 				Queries: []lib.Firequery{{
-					Field:      "uid",
+					Field:      "policyUid",
 					Operator:   "==",
 					QueryValue: uid,
 				},
