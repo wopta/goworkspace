@@ -9,7 +9,7 @@ require (
 	github.com/wopta/goworkspace/document v1.0.8
 	github.com/wopta/goworkspace/lib v1.0.4
 	github.com/wopta/goworkspace/mail v1.0.3
-	github.com/wopta/goworkspace/models v1.0.8
+	github.com/wopta/goworkspace/models v1.0.14
 )
 
 require github.com/googleapis/gax-go/v2 v2.7.0 // indirect
