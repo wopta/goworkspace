@@ -234,7 +234,7 @@ func GetFileV6(id string, uid string) chan string {
 			body, _ := ioutil.ReadAll(res.Body)
 			defer res.Body.Close()
 			//log.Println("Get body: ", string(body))
-			lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "contracts/"+uid, body)
+			lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "contracts/"+uid+".pdf", body)
 
 			r <- "upload done"
 
