@@ -30,7 +30,7 @@ type Transaction struct {
 	NumberCompany      string         `firestore:"numberCompany,omitempty" json:"numberCompany,omitempty" bigquery:"numberCompany"`
 	StatusHistory      []string       `firestore:"statusHistory,omitempty" json:"statusHistory ,omitempty" bigquery:"-"`
 	BigStatusHistory   string         `firestore:"-" json:"-" bigquery:"statusHistory"`
-	IsPay              bool           `firestore:"isPay,omitempty" json:"isPay,omitempty" bigquery:"isPay"`
+	IsPay              bool           `firestore:"isPay" json:"isPay,omitempty" bigquery:"isPay"`
 	IsEmit             bool           `firestore:"isEmit" json:"isEmit,omitempty" bigquery:"isEmit"`
 }
 
