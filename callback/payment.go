@@ -75,9 +75,6 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 			var contractbyte []byte
 			contractbyte, e = lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "contracts/"+policy.Uid)
 			mail.SendMail(getPayMailObj(policy, policy.PayUrl, base64.StdEncoding.EncodeToString([]byte(contractbyte))))
-
-			//log.Println(token)
-			log.Println(q)
 			response = `{
 			"result": true,
 			"requestPayload": ` + string(request) + `,

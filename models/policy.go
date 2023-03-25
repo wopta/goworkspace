@@ -118,7 +118,7 @@ func (policy *Policy) BigquerySave() {
 	policy.Data = string(policyJson)
 	policy.BigStartDate = civil.DateTimeOf(policy.StartDate)
 	policy.BigEndDate = civil.DateTimeOf(policy.EndDate)
-	policy.BigEmitDate = civil.DateTimeOf(time.Now())
+	policy.BigEmitDate = civil.DateTimeOf(policy.EmitDate)
 	log.Println(" policy save big query: " + policy.Uid)
 	e = lib.InsertRowsBigQuery("wopta", "policy", policy)
 	log.Println(" policy save big query error: ", e)
