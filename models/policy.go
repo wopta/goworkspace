@@ -111,6 +111,18 @@ type Price struct {
 	Discount float64 `firestore:"discount" json:"discount" bigquery:"-"`
 }
 
+func (policy *Policy) BigquerySave() {
+
+	policyJson, e := policy.Marshal()
+	log.Println(" policy "+policy.Uid, string(policyJson))
+	policy.Data = string(policyJson)
+	policy.BigStartDate = civil.DateTimeOf(policy.StartDate)
+	policy.BigEndDate = civil.DateTimeOf(policy.EndDate)
+	policy.BigEmitDate = civil.DateTimeOf(time.Now())
+	log.Println(" policy save big query: " + policy.Uid)
+	e = lib.InsertRowsBigQuery("wopta", "policy", policy)
+	log.Println(" policy save big query error: ", e)
+}
 func PolicyToListData(query *firestore.DocumentIterator) []Policy {
 	var result []Policy
 	for {

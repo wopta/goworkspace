@@ -40,7 +40,7 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 		var policy models.Policy
 		policyF.DataTo(policy)
 		policyM, _ := policy.Marshal()
-		log.Println(uid+" payment ", policyM)
+		log.Println(uid+" payment ", string(policyM))
 		if !policy.IsPay && policy.Status == models.PolicyStatusToPay {
 			policy.IsPay = true
 			policy.Updated = time.Now()
@@ -64,12 +64,14 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 			query := q.FirestoreWherefields("transactions")
 			transactions := models.TransactionToListData(query)
 			transaction := transactions[0]
+			tr, _ := json.Marshal(transaction)
+			log.Println(uid+" payment ", string(tr))
 			transaction.IsPay = true
 			transaction.Status = models.TransactionStatusPay
 			transaction.StatusHistory = append(transaction.StatusHistory, models.TransactionStatusPay)
 			lib.SetFirestore("transactions", transaction.Uid, transaction)
 			e = lib.InsertRowsBigQuery("wopta", "transactions-day", transaction)
-
+			log.Println(uid + " payment sendMail ")
 			var contractbyte []byte
 			contractbyte, e = lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "contracts/"+policy.Uid)
 			mail.SendMail(getPayMailObj(policy, policy.PayUrl, base64.StdEncoding.EncodeToString([]byte(contractbyte))))
