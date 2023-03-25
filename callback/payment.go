@@ -74,8 +74,9 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 			e = lib.InsertRowsBigQuery("wopta", "transactions-day", transaction)
 			log.Println(uid + " payment sendMail ")
 			var contractbyte []byte
-			contractbyte, e = lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "contracts/"+policy.Uid)
-			mail.SendMail(getPayMailObj(policy, policy.PayUrl, base64.StdEncoding.EncodeToString([]byte(contractbyte))))
+			name := policy.Uid + ".pdf"
+			contractbyte, e = lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "contracts/"+name)
+			mail.SendMail(getPayMailObj(policy, policy.PayUrl, name, base64.StdEncoding.EncodeToString([]byte(contractbyte))))
 			response = `{
 			"result": true,
 			"requestPayload": ` + string(request) + `,
@@ -139,7 +140,7 @@ type Transaction struct {
 	PaymentMethod       *string     `json:"paymentMethod,omitempty"`
 }
 
-func getPayMailObj(policy models.Policy, payUrl string, at string) mail.MailRequest {
+func getPayMailObj(policy models.Policy, payUrl string, namefile string, at string) mail.MailRequest {
 	var name string
 	//var linkForm string
 	if policy.Name == "pmi" {
@@ -163,6 +164,7 @@ func getPayMailObj(policy models.Policy, payUrl string, at string) mail.MailRequ
 	obj.Attachments = &[]mail.Attachment{{
 		Byte:        at,
 		ContentType: "application/pdf",
+		Name:        namefile,
 	}}
 
 	return obj
