@@ -56,7 +56,7 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 					QueryValue: uid,
 				},
 					{
-						Field:      "schedule",
+						Field:      "scheduleDate",
 						Operator:   "==",
 						QueryValue: schedule,
 					},
