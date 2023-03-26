@@ -1,7 +1,7 @@
 
 Rem .\push.bat  v0.0.2 init_rules
 set location=callback
-set v="1.0.0.dev"
+set v=1.0.0.dev
 set m="major allineament"
 
 
