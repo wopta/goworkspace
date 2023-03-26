@@ -46,7 +46,7 @@ func FabrickPayObj(data model.Policy, firstSchedule bool, scheduleDate string, c
 		//req.Header.Set("Content-Length", strconv.Itoa(len(string(marshal))))
 		//req.Header.Set("Host", "35.195.35.137")
 		req.Header.Set("Accept", "application/json")
-
+		log.Printf(data.Uid+" ", req.Header)
 		res, err := client.Do(req)
 		lib.CheckError(err)
 

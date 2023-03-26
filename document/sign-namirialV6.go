@@ -105,7 +105,7 @@ func prepareEnvelopV6(id string) <-chan string {
 			//lib.CheckError(e)
 			r <- string(body)
 
-			log.Println("body prepareEnvelopV6:", string(body))
+			//log.Println("body prepareEnvelopV6:", string(body))
 		}
 	}()
 	return r
