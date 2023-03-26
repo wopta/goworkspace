@@ -42,7 +42,7 @@ func (a *loginAuth) Next(fromServer []byte, more bool) ([]byte, error) {
 	}
 	return nil, nil
 }
-func addAttachment(message string, name string, contentType string, data []byte, close bool) string {
+func addAttachment(message string, name string, contentType string, data string, close bool) string {
 
 	const (
 		boundary = "my-boundary-779"
@@ -59,11 +59,11 @@ func addAttachment(message string, name string, contentType string, data []byte,
 
 	//message += fmt.Sprintf("Content-Type: multipart/mixed; boundary=%s\n", boundary)
 	message += fmt.Sprintf("\r\n")
-	message += fmt.Sprintf("Content-Type: " + ct + "; charset=\"utf-8\"\r\n")
+	message += fmt.Sprintf("Content-Type: " + ct + ";\r\n")
 	message += fmt.Sprintf("Content-Transfer-Encoding: base64\r\n")
-	message += fmt.Sprintf("Content-Disposition: attachment; filename=" + name + "\r\n")
-	message += fmt.Sprintf("Content-ID: <" + name + ">\r\n")
-	message += fmt.Sprintf(string(data))
+	message += fmt.Sprintf("Content-Disposition: attachment; filename=\"" + name + "\"\r\n")
+
+	message += fmt.Sprintf("\r\n" + string(data) + "\r\n")
 	message += fmt.Sprintf("\r\n--%s", boundary)
 	if close {
 		message += fmt.Sprintf("--")
@@ -173,7 +173,7 @@ func SendMail(obj MailRequest) {
 				if k == len(*obj.Attachments)-1 {
 					close = true
 				}
-				message = addAttachment(message, v.Name, v.ContentType, []byte(v.Byte), close)
+				message = addAttachment(message, v.Name, v.ContentType, v.Byte, close)
 			}
 
 		}
@@ -219,6 +219,7 @@ func SendMail(obj MailRequest) {
 		lib.CheckError(err)
 		//log.Println("start write massage:----------------------")
 		_, err = w.Write([]byte(message))
+		log.Println(message)
 		log.Println("end write massage:----------------------")
 		//log.Println(message)
 		lib.CheckError(err)

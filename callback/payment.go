@@ -169,10 +169,3 @@ func getPayMailObj(policy models.Policy, payUrl string, namefile string, at stri
 
 	return obj
 }
-
-/*Gentile Nome Cognome,
-
-in allegato trovi i documenti da te firmati tramite l’utilizzo della Firma Elettronica Avanzata e l’intera documentazione relativa alla polizza in oggetto.
-A conferma del pagamento ricevuto da Wopta, ti invieremo una mail.
-Qualora non avessi ancora provveduto, affrettati, in quanto il pagamento è essenziale per l’attivazione della copertura
-ll Team Wopta*/
