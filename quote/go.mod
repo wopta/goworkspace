@@ -7,6 +7,8 @@ replace github.com/wopta/goworkspace/quote => ./
 require (
 	cloud.google.com/go v0.105.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
+	github.com/wopta/goworkspace/lib v1.0.5
+	github.com/wopta/goworkspace/models v1.0.14
 	golang.org/x/oauth2 v0.0.0-20221014153046-6fdb5e3db783 // indirect
 )
 
@@ -72,12 +74,7 @@ require (
 	gopkg.in/src-d/go-billy.v4 v4.3.2 // indirect
 	gopkg.in/src-d/go-git.v4 v4.13.1 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
-)
-
-require (
 	firebase.google.com/go/v4 v4.10.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
-	github.com/wopta/goworkspace/lib v1.0.3
-	github.com/wopta/goworkspace/models v1.0.6
-
 )
+
