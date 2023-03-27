@@ -18,6 +18,7 @@ type Building struct {
 	CityCode         string   `firestore:"cityCode" json:"cityCode,omitempty"`
 	PostalCode       string   `firestore:"postalCode" json:"postalCode,omitempty"`
 	City             string   `firestore:"city" json:"city,omitempty"`
+	Locality         string   `firestore:"locality" json:"locality,omitempty"`
 	Location         Location `firestore:"location" json:"location,omitempty"`
 	BuildingType     string   `firestore:"buildingType,omitempty" json:"buildingType,omitempty"`
 	BuildingMaterial string   `firestore:"buildingMaterial,omitempty" json:"buildingMaterial,omitempty"`
@@ -40,6 +41,7 @@ type Enterprise struct {
 	Type         string   `firestore:"type,omitempty" json:"type,omitempty"`
 	PostalCode   string   `firestore:"postalCode,omitempty" json:"postalCode,omitempty"`
 	City         string   `firestore:"city,omitempty" json:"city,omitempty"`
+	Locality     string   `firestore:"locality" json:"locality,omitempty"`
 	VatCode      string   `firestore:"vatCode,omitempty" json:"vatCode,omitempty"`
 	Ateco        string   `firestore:"ateco,omitempty" json:"ateco,omitempty"`
 	AtecoDesc    string   `firestore:"atecoDesc,omitempty" json:"atecoDesc,omitempty"`
