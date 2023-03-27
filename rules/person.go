@@ -42,9 +42,6 @@ import (
 )
 
 const (
-	base    = "base"
-	your    = "your"
-	premium = "premium"
 	monthly = "monthly"
 	yearly  = "yearly"
 )
