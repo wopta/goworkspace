@@ -133,7 +133,7 @@ func PolicyToListData(query *firestore.DocumentIterator) []Policy {
 				log.Println("iterator.Done")
 				break
 			}
-
+			break
 		} else {
 			var value Policy
 			e := d.DataTo(&value)
