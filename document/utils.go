@@ -343,7 +343,7 @@ func Save(m pdf.Maroto, data models.Policy) (string, []byte) {
 		now := time.Now()
 		timestamp := strconv.FormatInt(now.Unix(), 10)
 		filename = "temp/" + data.Contractor.Name + "_" + data.Contractor.Surname + "_" + timestamp + "_contract.pdf"
-		lib.PutToStorage("function-data", filename, out.Bytes())
+		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, out.Bytes())
 		lib.CheckError(err)
 		return filename, out.Bytes()
 	}
