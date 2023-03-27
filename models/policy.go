@@ -127,24 +127,22 @@ func PolicyToListData(query *firestore.DocumentIterator) []Policy {
 	var result []Policy
 	for {
 		d, err := query.Next()
-
 		if err != nil {
 			log.Println("error")
-		}
-		if err != nil {
 			if err == iterator.Done {
 				log.Println("iterator.Done")
 				break
 			}
 
-		}
-		var value Policy
-		e := d.DataTo(&value)
-		log.Println("todata")
-		lib.CheckError(e)
-		result = append(result, value)
+		} else {
+			var value Policy
+			e := d.DataTo(&value)
+			log.Println("todata")
+			lib.CheckError(e)
+			result = append(result, value)
 
-		log.Println(len(result))
+			log.Println(len(result))
+		}
 	}
 	return result
 }
