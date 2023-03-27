@@ -1,0 +1,98 @@
+{
+
+    "company": "global",
+    "name": "person",
+    "startDate": "2022-11-12T17:39:34.8294666+01:00",
+    "endDate": "2022-11-12T17:39:34.8294666+01:00",
+    "creationDate": "2022-11-12T17:39:34.8294666+01:00",
+    "updated": "2022-11-12T17:39:34.8294666+01:00",
+    "payment": "Payment",
+    "paymentType": "PaymentType",
+    "paymentSplit": "PaymentSplit",
+    "coverageType": "CoverageType",
+    "voucher": "Voucher",
+    "channel": "Channel",
+    "covenant": "Covenant",
+    "price": 100000,
+    "priceNett": 100000,
+    "priceGross": 100000.00,
+    "contractor": {
+        "name": "name",
+        "type": "type",
+        "surname": "surname",
+        "address": "address",
+        "postalCode": "postalCode",
+        "role": "role",
+        "work": "work",
+        "workType": "workType",
+        "mail": "luca.barbieri@wopta.it",
+        "phone": "+393668134257",
+        "fiscalCode": "fiscalCode",
+        "vatCode": "vatCode",
+        "riskClass": "3"
+     
+    },
+    "statements": [
+        {
+            "Question": "",
+            "Answer": true
+        }
+    ], "survey": [
+        {
+            "Question": "",
+            "Answer": true
+        }
+    ],
+    "attachments": [
+        {}
+    ],
+    "assets": [
+        {
+            "name": "test",
+            "address": "test",
+            "type": "test",
+            "person":  {
+                "name": "name",
+                "type": "type",
+                "surname": "surname",
+                "address": "address",
+                "postalCode": "postalCode",
+                "role": "role",
+                "work": "work",
+                "workType": "workType",
+                "mail": "luca.barbieri@wopta.it",
+                "phone": "+393668134257",
+                "fiscalCode": "fiscalCode",
+                "vatCode": "vatCode",
+                "riskClass": "3"
+             
+            },
+            "enterprise": {},
+            "isContractor": false,
+            "guarantees": [
+                {
+                    "type": "test",
+                    "beneficiary": {},
+                    "typeOfSumInsured": "test",
+                    "description": "test",
+                    "value": {},
+                    "slug": "test",
+                    "isBase": true,
+                    "isYour": true,
+                    "isPremium": true,
+                    "base": {},
+                    "your": {},
+                    "premium": {},
+                    "name": "test",
+                    "sumInsuredLimitOfIndemnity": 100000,
+                    "tax": 10.3,
+                    "price": 100000,
+                    "priceNett": 100000,
+                    "priceGross   ": 100000
+                }
+            ]
+        }
+        
+    ]
+   
+}

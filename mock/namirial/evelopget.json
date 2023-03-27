@@ -1,0 +1,472 @@
+{
+    "Status": "Draft",
+    "SendDate": "2022-11-17T15:19:26.031Z",
+    "ExpirationDate": "2022-11-17T15:19:26.031Z",
+    "ValidityFromCreationInDays": 0,
+    "ExpirationInSecondsAfterSending": 0,
+    "Bulks": [
+      {
+        "Status": "Draft",
+        "Email": "string",
+        "Id": "string",
+        "LogDocumentId": "string",
+        "LogXmlDocumentId": "string",
+        "FinishedDocuments": [
+          {
+            "FlowDocumentId": "string",
+            "LogDocumentId": "string",
+            "Attachments": [
+              {
+                "Name": "string",
+                "DocumentId": "string"
+              }
+            ],
+            "SignedSignatureFields": [
+              {
+                "Name": "string"
+              }
+            ],
+            "DocRefNumber": 0,
+            "FileName": "string",
+            "FormFields": [
+              {
+                "Name": "string",
+                "Values": [
+                  {
+                    "Key": "string",
+                    "Value": "string"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "Steps": [
+          {
+            "Id": "string",
+            "FirstName": "string",
+            "LastName": "string",
+            "OrderIndex": 0,
+            "Email": "string",
+            "LanguageCode": "string",
+            "Status": "NotSigned",
+            "StatusReason": "string",
+            "RecipientType": "Signer",
+            "SignedDate": "2022-11-17T15:19:26.031Z",
+            "OpenedDate": "2022-11-17T15:19:26.031Z",
+            "WorkstepRedirectionUrl": "string",
+            "AllowAccessFinishedWorkstep": true,
+            "Warnings": [
+              {
+                "Type": "None",
+                "ContentXmlList": [
+                  "string"
+                ]
+              }
+            ],
+            "Authentication": [
+              {
+                "Method": "Pin",
+                "Parameter": "string",
+                "Filters": [
+                  {
+                    "CompareOperation": "Equals",
+                    "FilterId": "string",
+                    "FilterValue": "string"
+                  }
+                ]
+              }
+            ],
+            "Identifications": [
+              {
+                "Method": "OAuth",
+                "Parameter": "string",
+                "Filters": [
+                  {
+                    "CompareOperation": "Equals",
+                    "FilterId": "string",
+                    "FilterValue": "string"
+                  }
+                ]
+              }
+            ],
+            "IsParallel": true,
+            "WorkstepConfiguration": {
+              "WorkstepLabel": "string",
+              "SmallTextZoomFactorPercent": 0,
+              "FinishAction": {
+                "ServerActions": [
+                  {
+                    "CallSynchronous": true,
+                    "Action": "string"
+                  }
+                ],
+                "ClientActions": [
+                  {
+                    "RemoveDocumentFromRecentDocumentList": true,
+                    "CallClientActionOnlyAfterSuccessfulSync": true,
+                    "ClientName": "string",
+                    "CloseApp": true,
+                    "Action": "string"
+                  }
+                ]
+              },
+              "IntroTexts": {
+                "Texts": [
+                  {
+                    "Language": "string",
+                    "Value": "string"
+                  }
+                ]
+              },
+              "ReceiverInformation": {
+                "UserInformation": {
+                  "FirstName": "string",
+                  "LastName": "string",
+                  "EMail": "string"
+                },
+                "HolderInformation": "string",
+                "DisposableCertificateDisclaimerTexts": {
+                  "Texts": [
+                    {
+                      "Language": "string",
+                      "Value": "string"
+                    }
+                  ]
+                },
+                "TransactionCodePushPluginData": [
+                  {
+                    "Key": "string",
+                    "Value": "string"
+                  }
+                ],
+                "ATrustCertificateData": {
+                  "PhoneNumber": "string"
+                },
+                "BankIdPluginData": {
+                  "TrBiPersonalNumber": "string",
+                  "TrBiAllowAnyPersonalNumber": true
+                },
+                "GenericSigningPluginDataList": [
+                  {
+                    "PluginId": "string",
+                    "SenderDataFields": {
+                      "Fields": [
+                        {
+                          "Key": "string",
+                          "Value": "string"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "SenderInformation": {
+                "UserInformation": {
+                  "FirstName": "string",
+                  "LastName": "string",
+                  "EMail": "string"
+                }
+              },
+              "TransactionCodeConfigurations": [
+                {
+                  "Id": "string",
+                  "HashAlgorithmIdentifier": "Sha1",
+                  "Texts": [
+                    {
+                      "Language": "string",
+                      "Value": "string"
+                    }
+                  ]
+                }
+              ],
+              "SignatureConfigurations": [
+                {
+                  "SpcId": "string",
+                  "PdfSignatureProperties": {
+                    "PdfAConformant": true,
+                    "PAdESPart4Compliant": true,
+                    "IncludeSigningCertificateChain": true,
+                    "SigningCertificateRevocationInformationIncludeMode": "DoNotInclude",
+                    "SignatureTimestampData": {
+                      "Uri": "string",
+                      "Username": "string",
+                      "Password": "string",
+                      "SignatureHashAlgorithm": "Sha1",
+                      "AuthenticationCertifiateDescriptor": {
+                        "Identifier": "string",
+                        "Type": "string"
+                      }
+                    },
+                    "EnableEutlVerification": true,
+                    "EnableValidateSigningCertificateName": true,
+                    "SigningCertificateNameRegex": "string"
+                  },
+                  "PdfSignatureCryptographicData": {
+                    "SignatureHashAlgorithm": "Sha1",
+                    "SigningCertificateDescriptor": {
+                      "Identifier": "string",
+                      "Type": "Sha1Thumbprint",
+                      "Csp": "Default"
+                    }
+                  },
+                  "CertificateFilter": {
+                    "KeyUsages": [
+                      "string"
+                    ],
+                    "ThumbPrints": [
+                      "string"
+                    ],
+                    "RootThumbPrints": [
+                      "string"
+                    ]
+                  }
+                }
+              ],
+              "ViewerPreferences": {
+                "ShowPageNavigationBar": true,
+                "ShowThumbnails": true,
+                "SkipFinishConfirmDialog": true,
+                "SkipDocumentDialog": true,
+                "ShowImagesInFullWidth": true,
+                "DisableGeolocation": true,
+                "ShowDocumentDownloadDialogAfterAutomaticFinish": true,
+                "AttachmentsMaxFileSize": 0,
+                "SkipPreviewImageOnDisposableCertificate": true,
+                "LoadCustomJs": true,
+                "AllowCustomButtons": true,
+                "GuidingBehavior": "GuideOnlyRequiredTasks",
+                "FormFieldsGuidingBehavior": "AllowSubmitAlways",
+                "ShowVersionNumber": true,
+                "EnableWarningPopupOnLeave": true,
+                "WarningPopupDisplayAfter": "FillOrSignField",
+                "FinishWorkstepOnOpen": true,
+                "AutoFinishAfterRequiredTasksDone": true,
+                "GuidingBehaviorOnFinishedTask": "NoMove",
+                "SkipThankYouDialog": true,
+                "NativeAppsUrlScheme": "string",
+                "DocumentViewingMode": "EndlessPaperAllDocuments",
+                "ThumbnailMode": "ShowAllPages",
+                "ShowTopBar": true,
+                "DisplayRejectButtonInTopBar": true,
+                "MultipleSignatureTypesAndBatchSigningSettings": {
+                  "IsUseBatchSigningCheckedByDefault": true,
+                  "IsRememberSignatureTypeCheckedByDefault": true,
+                  "IsRememberBatchSigningDecisionCheckedByDefault": true,
+                  "SkipMultipleSignatureTypesAndBatchSigningDialogIfBatchSigningPossible": true
+                },
+                "VisibleAreaOptions": {
+                  "AllowedDomain": "string",
+                  "Enabled": true
+                },
+                "ShowStartGuidingHint": true,
+                "ShowStatusBar": true,
+                "ShowZoomButtons": true,
+                "ShowNoGeolocationWarning": true,
+                "AutoStartGuiding": true,
+                "ShowPageGap": true,
+                "ShowPageNavigationButtons": true,
+                "ShowFinishPossibleHint": true,
+                "SkipRejectConfirmDialog": true,
+                "BatchSigningType": "Basic",
+                "BatchSigningDisableNextButtonUntilDialogScrolledToBottom": true,
+                "AcceptAgreementDisabledUntilRequiredActionsDone": true,
+                "MessageForwardingDialogBehaviour": "Show"
+              },
+              "ResourceUris": {
+                "DelegationUri": "string",
+                "SignatureImagesUri": "string"
+              },
+              "AuthenticationMethods": {
+                "AuthenticationMethodList": [
+                  {
+                    "DiscriminatorType": "string"
+                  }
+                ]
+              },
+              "AdditionalClientWorkstepInformation": "string",
+              "AuditingToolsConfiguration": {
+                "WriteAuditTrail": true,
+                "IdStampConfiguration": {
+                  "ReferenceCorner": "Upper_Right",
+                  "Color": "string",
+                  "Location": {
+                    "Size": {
+                      "Height": 0,
+                      "Width": 0
+                    },
+                    "MarginLeft": 0,
+                    "MarginTop": 0
+                  }
+                },
+                "NotificationConfiguration": {
+                  "NotificationEventsToSend": {
+                    "NotificationEvents": [
+                      "ConfirmTransactionCode"
+                    ]
+                  },
+                  "NotificationUrl": "string"
+                }
+              },
+              "Policy": {
+                "GeneralPolicies": {
+                  "AllowSaveDocument": true,
+                  "AllowSaveAuditTrail": true,
+                  "AllowRotatingPages": true,
+                  "AllowAppendFileToWorkstep": true,
+                  "AllowAppendTaskToWorkstep": true,
+                  "AllowEmailDocument": true,
+                  "AllowPrintDocument": true,
+                  "AllowFinishWorkstep": true,
+                  "AllowRejectWorkstep": true,
+                  "AllowRejectWorkstepDelegation": true,
+                  "AllowUndoLastAction": true,
+                  "AllowColorizePdfForms": true,
+                  "AllowAdhocPdfAttachments": true,
+                  "AllowAdhocSignatures": true,
+                  "AllowAdhocStampings": true,
+                  "AllowAdhocFreeHandAnnotations": true,
+                  "AllowAdhocTypewriterAnnotations": true,
+                  "AllowAdhocPictureAnnotations": true,
+                  "AllowAdhocPdfPageAppending": true,
+                  "AllowReloadOfFinishedWorkstep": true
+                },
+                "WorkstepTasks": {
+                  "PictureAnnotationMinResolution": 0,
+                  "PictureAnnotationMaxResolution": 0,
+                  "PictureAnnotationColorDepth": "Color16M",
+                  "SetFormFieldsToReadOnlyAfterTask": "string",
+                  "SequenceMode": "NoSequenceEnforced",
+                  "PositionUnits": "PdfUnits",
+                  "ReferenceCorner": "Upper_Right",
+                  "Tasks": [
+                    {
+                      "IsRequired": true,
+                      "Id": "string",
+                      "DisplayName": "string",
+                      "DocRefNumber": 0,
+                      "AdditionalInformation": "string",
+                      "BatchId": "string",
+                      "DiscriminatorType": "string"
+                    }
+                  ]
+                },
+                "FinalizeActions": {
+                  "FinalizeActionList": [
+                    {
+                      "DiscriminatorType": "string"
+                    }
+                  ]
+                }
+              },
+              "Navigation": {
+                "HyperLinks": [
+                  {
+                    "Id": "string",
+                    "DocRefNumber": 0,
+                    "PositionPage": 0,
+                    "Uri": "string",
+                    "Position": {
+                      "PositionX": 0,
+                      "PositionY": 0
+                    },
+                    "Size": {
+                      "Height": 0,
+                      "Width": 0
+                    }
+                  }
+                ],
+                "Links": [
+                  {
+                    "Id": "string",
+                    "DocRefNumber": 0,
+                    "PositionPage": 0,
+                    "TargetId": "string",
+                    "Position": {
+                      "PositionX": 0,
+                      "PositionY": 0
+                    },
+                    "Size": {
+                      "Height": 0,
+                      "Width": 0
+                    }
+                  }
+                ],
+                "LinkTargets": [
+                  {
+                    "Id": "string",
+                    "DocRefNumber": 0,
+                    "PositionPage": 0,
+                    "Position": {
+                      "PositionX": 0,
+                      "PositionY": 0
+                    },
+                    "Size": {
+                      "Height": 0,
+                      "Width": 0
+                    }
+                  }
+                ]
+              }
+            },
+            "DisclaimerDocuments": [
+              {
+                "DocumentId": "string",
+                "DisclaimerType": "DisposableDisclaimer"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "Documents": [
+      {
+        "PageSizesInPoints": [
+          {
+            "Height": 0,
+            "Width": 0
+          }
+        ],
+        "DocRefNumber": 0,
+        "FileName": "string",
+        "FormFields": [
+          {
+            "Name": "string",
+            "Values": [
+              {
+                "Key": "string",
+                "Value": "string"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "Id": "string",
+    "Bulk": "string",
+    "BasicOptions": {
+      "Name": "string",
+      "EmailSubject": "string",
+      "EmailBody": "string",
+      "EnableReminders": true,
+      "FirstReminderDayAmount": 0,
+      "RecurrentReminderDayAmount": 0,
+      "BeforeExpirationDayAmount": 0,
+      "DaysUntilExpire": 0,
+      "ExpirationDate": "2022-11-17T15:19:26.032Z",
+      "ExpirationInSecondsAfterSending": 0,
+      "CallbackUrl": "string",
+      "StatusUpdateCallbackUrl": "string",
+      "WorkstepEventCallback": {
+        "Url": "string",
+        "Blacklist": [
+          "string"
+        ],
+        "WhiteList": [
+          "string"
+        ]
+      },
+      "MetaDataXml": "string"
+    },
+    "LockFormFieldsAtEnvelopeFinish": true
+  }

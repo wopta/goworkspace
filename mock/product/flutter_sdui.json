@@ -1,0 +1,134 @@
+{
+    "steps": [
+        {
+            "name": "Data di nascita",
+            "type": "initialPage",
+            "attributes": {
+                "logoUrl": "https://storage.googleapis.com/wopta-dev-strapi-bucket/Wopta_All_Risk_Insurance_Icon_Fill_def3cb5ec9/Wopta_All_Risk_Insurance_Icon_Fill_def3cb5ec9.svg?w=384",
+                "logoText": "Wopta\nPer te Persona",
+                "privacyText": "Ho letto e accetto l'informativa sulla",
+                "privacyLink": "https://www.wopta.it/it/privacy-policy/",
+                "submitButtonText": "Calcola preventivo"
+            },
+            "child": {
+                "widget": "form",
+                "children": [
+                    {
+                        "widget": "autocomplete",
+                        "attributes": {
+                            "optionsUrl": "https://api.dev.wopta.it/enrich/works",
+                            "displayKey": "work",
+                            "jsonDataKey": "works",
+                            "label": "Professione"
+                        }
+                    },
+                    {
+                        "widget": "dropdown",
+                        "attributes": {
+                            "name": "Country Code",
+                            "hint": "Select the country code"
+                        },
+                        "children": [
+                            {
+                                "widget": "dropdownMenuItem",
+                                "attributes": {
+                                    "value": "1",
+                                    "caption": "dipendente",
+                                    "enabled": true
+                                }
+                            },
+                            {
+                                "widget": "dropdownMenuItem",
+                                "attributes": {
+                                    "value": "2",
+                                    "caption": "autonomo"
+                                }
+                            },
+                            {
+                                "widget": "dropdownMenuItem",
+                                "attributes": {
+                                    "value": "3",
+                                    "caption": "non lavoratore"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "widget": "text",
+                        "attributes": {
+                            "value": "Il rischio nella tua vita è da:"
+                        }
+                    },
+                    {
+                        "widget": "radiogroup",
+                        "attributes": {
+                            "options": [
+                                "Da gestire",
+                                "Da accetare",
+                                "Da evitare"
+                            ],
+                            "name": "lifeRisk",
+                            "hint": "Select the country code"
+                        }
+                    },
+                    {
+                        "widget": "text",
+                        "attributes": {
+                            "value": "Riusciresti ad affrontare una spesa di 1.500 euro?"
+                        }
+                    },
+                    {
+                        "widget": "radiogroup",
+                        "attributes": {
+                            "options": [
+                                "Si, senza problemi",
+                                "Si, ma dovrei rinunciare a qualcosa",
+                                "No, non ci riuscirei facilmente"
+                            ],
+                            "name": "financialRisk",
+                            "hint": "Select the country code"
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}
+
+curl 'https://api.dev.wopta.it/WebApiProduct/Api/RicercaAnagSemplice' \
+  -H 'authority: api.dev.wopta.it' \
+  -H 'accept: */*' \
+  -H 'accept-language: it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7' \
+  -H 'authorization: Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6ImQwNTU5YzU5MDgzZDc3YWI2NDUxOThiNTIxZmM4ZmVmZmVlZmJkNjIiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vcG9zaXRpdmUtYXBleC0zNTA1MDciLCJhdWQiOiJwb3NpdGl2ZS1hcGV4LTM1MDUwNyIsImF1dGhfdGltZSI6MTY3NDQ3MDA3NCwidXNlcl9pZCI6IklxNDB4YVJ0SXlWaUlKN0FaaEx1a2loT3d0cTEiLCJzdWIiOiJJcTQweGFSdEl5VmlJSjdBWmhMdWtpaE93dHExIiwiaWF0IjoxNjc0NDcwMDc0LCJleHAiOjE2NzQ0NzM2NzQsImVtYWlsIjoibmVsc29uLmhlcnJlcmFAd29wdGEuaXQiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyZWJhc2UiOnsiaWRlbnRpdGllcyI6eyJlbWFpbCI6WyJuZWxzb24uaGVycmVyYUB3b3B0YS5pdCJdfSwic2lnbl9pbl9wcm92aWRlciI6InBhc3N3b3JkIn19.AZ2z1Evdl7X62KkeVLX6dpTkn-ZBLygcxFVv5ro2Bjv_2DCQW8wUuqW9yZ-H2MSWANg2CXwThpX1_SUcqIqZGvCvw1ZlgrVIJPV-7FDq0pXbYZLWsEBU9t6NjANsBkfmqHnEyTpm0wi5auOd15qbZmi2AhKkRI5WSCRCY8RUEC6euE5gt73UEHbAH1N8TR9jsjSxsg6gU_LKZi5jVspkahg2SwFFOyhplEZcEY7XyuZSa8UCnGmz6jrxWOTHuqijQCKg0b5ykWHyOswNtlMkMSDAFYfIGoEpv-Qa8uCXzDpwlRt4Lbl_E8CRUCs4Z-WAZveKqsx9YHbOnlJkjo8p_A' \
+  -H 'content-type: application/json; charset=UTF-8' \
+  -H 'origin: http://localhost:60700' \
+  -H 'referer: http://localhost:60700/' \
+  -H 'sec-ch-ua: "Not_A Brand";v="99", "Google Chrome";v="109", "Chromium";v="109"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "macOS"' \
+  -H 'sec-fetch-dest: empty' \
+  -H 'sec-fetch-mode: cors' \
+  -H 'sec-fetch-site: cross-site' \
+  -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36' \
+  -H 'x-firebase-appcheck: eyJraWQiOiJsWUJXVmciLCJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIxOjE0Njg1MjQwNDc0NTp3ZWI6ZmU5ZWU0MWYxODlmYmI3MzA1YTJkOCIsImF1ZCI6WyJwcm9qZWN0c1wvMTQ2ODUyNDA0NzQ1IiwicHJvamVjdHNcL3Bvc2l0aXZlLWFwZXgtMzUwNTA3Il0sImlzcyI6Imh0dHBzOlwvXC9maXJlYmFzZWFwcGNoZWNrLmdvb2dsZWFwaXMuY29tXC8xNDY4NTI0MDQ3NDUiLCJleHAiOjE2NzQ0NzM2NzQsImlhdCI6MTY3NDQ3MDA3NH0.goDa3MlvsGp0Wc45bCwQQJmtozZpW2zRDrUrfGaB5Cly58gee__VoMZuBGN3a70YheOeV_C1i51kGLsQVprZ3-Pr82vzudMe2TQ1c-TKJBDNqRSvnW4YrAdh-ua854aL-YWGXKay27Xa8vFbei5gKH8qiKkVw2MbUyrdkJ2NPrGnHLSChBkS1Egm-q3HmWEOtd2zVgrXCmqYQ8FevL2LOLMuBRLVkknvJ64N3iVf1NqlAu7wkA5Acn_aQ7nlVi3pgm-ga0qprJdrtInJ0WGUj2av-GvEGeiZtesFuB50ZaodszkkmwIYRXmw8Te7KYpntTL4HqYaQN38P8dLixB-pAWsVcm2jLFOgBWykcljXZRP358acVkjnaeG61q9OauDr-3dQjKfEXwPJk2_jrJXNyqPKfkxG1R37Ll-Cv0SIKz0vUU4tTQ-viG787TLRy79sGgxRInxF9UHRX8El6Xw7MW_VYXXR7sIY9C_BSvhg86I5jkmSElsE4wUDZHsfExA' \
+  --data-raw '{"idNodo":"1","cdFiscale":"PVRVNI77M30G642B","cdLingua":"it"}' \
+  --compressed
+
+  curl 'https://api.dev.wopta.it/WebApiProduct/Api/RicercaAnagSemplice' \
+  -H 'authority: api.dev.wopta.it' \
+  -H 'accept: */*' \
+  -H 'accept-language: it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7' \
+  -H 'authorization: Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6ImQwNTU5YzU5MDgzZDc3YWI2NDUxOThiNTIxZmM4ZmVmZmVlZmJkNjIiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vcG9zaXRpdmUtYXBleC0zNTA1MDciLCJhdWQiOiJwb3NpdGl2ZS1hcGV4LTM1MDUwNyIsImF1dGhfdGltZSI6MTY3NDQ3MTA4OCwidXNlcl9pZCI6IklxNDB4YVJ0SXlWaUlKN0FaaEx1a2loT3d0cTEiLCJzdWIiOiJJcTQweGFSdEl5VmlJSjdBWmhMdWtpaE93dHExIiwiaWF0IjoxNjc0NDcxMDg4LCJleHAiOjE2NzQ0NzQ2ODgsImVtYWlsIjoibmVsc29uLmhlcnJlcmFAd29wdGEuaXQiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyZWJhc2UiOnsiaWRlbnRpdGllcyI6eyJlbWFpbCI6WyJuZWxzb24uaGVycmVyYUB3b3B0YS5pdCJdfSwic2lnbl9pbl9wcm92aWRlciI6InBhc3N3b3JkIn19.VPDPXHeuGVlFjWJW0rZcjtw7OtUzdwCBADr3hT7MTjORj2nRNY8hul-fGo6VnqQGk9xNUk8-ucibIDA__Vvg6beYMJOwkNhYPsVAQWMfCB5EVGwFdXxN_B0_8oLlEQjC7dT38rg1SPgpR5HL1RFZSBtkzKJbWVYp7cEbJ2NOxklviIfzsjIWKho6uJYe0wRzNmARBsNpjecPfuSI8OxyENJ6oYV6iHN4LTA0bAabanss6efHwead_i-oNmGI44g5ThEbC1z_Gmccfa2cEgpBbX7jKYZhtEJo6SV-qwWYHTsVmcE1-l8n_jTcUrQ3HCE9AWbR-ky0HDXUb35zDPGHsQ' \
+  -H 'content-type: application/json; charset=UTF-8' \
+  -H 'origin: http://localhost:65182' \
+  -H 'referer: http://localhost:65182/' \
+  -H 'sec-ch-ua: "Not_A Brand";v="99", "Google Chrome";v="109", "Chromium";v="109"' \
+  -H 'sec-ch-ua-mobile: ?0' \
+  -H 'sec-ch-ua-platform: "macOS"' \
+  -H 'sec-fetch-dest: empty' \
+  -H 'sec-fetch-mode: cors' \
+  -H 'sec-fetch-site: cross-site' \
+  -H 'user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36' \
+  -H 'x-firebase-appcheck: eyJraWQiOiJsWUJXVmciLCJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIxOjE0Njg1MjQwNDc0NTp3ZWI6ZmU5ZWU0MWYxODlmYmI3MzA1YTJkOCIsImF1ZCI6WyJwcm9qZWN0c1wvMTQ2ODUyNDA0NzQ1IiwicHJvamVjdHNcL3Bvc2l0aXZlLWFwZXgtMzUwNTA3Il0sImlzcyI6Imh0dHBzOlwvXC9maXJlYmFzZWFwcGNoZWNrLmdvb2dsZWFwaXMuY29tXC8xNDY4NTI0MDQ3NDUiLCJleHAiOjE2NzQ0NzQ2ODgsImlhdCI6MTY3NDQ3MTA4OH0.wSo8EBvD_fHk_mVPqFFjIsXTg3zs6ZRVmHtIGBEb9WC8MQ4B5qPP_wijIR1w1iZg3cFCFbGwHnWEOwITt5PzcOHAeV2wCXmZ5CNGiVqQgHahNkJHDRogfa1dBfu6Mjm8lZWsoyu22l-vigow_OaXfI9s1kUyNy7d9bL5to9PznJVXNpZRe1wBReY_9U1hhWpdkrpHTFG_QB2OJyQsafApaO8JSnz0hEN-xep6pbkKheTZeD0jrzMPXcLXmeTjMQRA9NRWlQrWn6-coG-tfqLmLl27nIKZ20hrvFzuR2aiva4lkS6WnkRvgWFmYwTeGlSL1zntjA8tNQoOgQYj_A1xGKbqV5TX9q6Umls7nebdLiGLebcD6nNBiO5xA-HebcV3uSD--y3nW6Qj1KbE7kDivAEqi0DP2R6cYR_nRpO2BylU0eEOnureHZjp-7Q-J_AkhRzYOeEI4zdZEGRgC9WU0bQ3fj1A3gO2p-Kvz2xrhbyAx17E23kOJ1M0NLcPpJ-' \
+  --data-raw '{"idNodo":"1","cdFiscale":"PVRVNI77M30G642B","cdLingua":"it"}' \
+  --compressed

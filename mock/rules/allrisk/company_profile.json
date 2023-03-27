@@ -1,0 +1,19 @@
+{
+  "vat": 123,
+  "squareMeters": 30,
+  "isBuildingOwner": true,
+  "revenue": 123,
+  "address": "test",
+  "ateco": "test",
+  "businessSector": "test",
+  "buildingType": "test",
+  "buildingMaterial": "test",
+  "buildingYear": "test",
+  "employer": 3,
+  "isAllarm": true,
+  "floor": 4,
+  "isPra": true,
+  "costruction": "test",
+  "isHolder": true,
+  "whatToSay": "test"
+}

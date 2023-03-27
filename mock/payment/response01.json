@@ -1,0 +1,13 @@
+{
+    "status": "OK",
+    "errors": [],
+    "payload": {
+        "externalId": "1319_003",
+        "paymentId": "2c6507dc-bf87-49f9-957f-3a2ab5682289",
+        "merchantId": "wop134b31-5926-4b26-1411-726bc9f0b111",
+        "paymentPageUrl": "https://pre.fabrick.com/payments/landingpage-web/pay-by-link/2c6507dc-bf87-49f9-957f-3a2ab5682289/modalita-addebito",
+        "paymentPageUrlB2B": "https://pre.fabrick.com/payments/landingpage-web/pay/2c6507dc-bf87-49f9-957f-3a2ab5682289/modalita-addebito",
+        "tokenB2B": "0dc46aed-1542-4136-af26-003aff7dafa4",
+        "coupon": null
+    }
+}

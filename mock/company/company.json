@@ -1,0 +1,695 @@
+{
+    "directorsAndOfficers": {
+      "UW_role": "string",
+      "subproductId": 0.0,
+      "company": {
+        "bvdCompanyId": {
+          "value": "string"
+        },
+        "vatnumber": {
+          "value": "string"
+        },
+        "name_internat": {
+          "value": "string"
+        },
+        "addr_internat": {
+          "value": "string"
+        },
+        "all_addresses_list_array": [
+          {
+            "value": "string"
+          }
+        ],
+        "postcode": {
+          "value": "string"
+        },
+        "city_internat": {
+          "value": "string"
+        },
+        "country": {
+          "value": "string"
+        },
+        "latlong": {
+          "value": "string"
+        },
+        "phone": {
+          "value": "string"
+        },
+        "website": {
+          "value": "string"
+        },
+        "natid_number": [
+          {
+            "value": "string"
+          }
+        ],
+        "natid_label": [
+          {
+            "value": "string"
+          }
+        ],
+        "natid_type": [
+          {
+            "value": "string"
+          }
+        ],
+        "traderegisternr": {
+          "value": "string"
+        },
+        "eurovat": {
+          "value": "string"
+        },
+        "status_weekly": {
+          "value": "string"
+        },
+        "slegalf": {
+          "value": "string"
+        },
+        "legalfrm": {
+          "value": "string"
+        },
+        "incorporation_date": {
+          "value": 0.0
+        },
+        "listed": {
+          "value": "string"
+        },
+        "naicsccod2017": [
+          {
+            "value": "string"
+          }
+        ],
+        "ussicccod": [
+          {
+            "value": "string"
+          }
+        ],
+        "nace2_main_section": [
+          {
+            "value": "string"
+          }
+        ],
+        "naceccod2": [
+          {
+            "value": "string"
+          }
+        ],
+        "nacecdes2": [
+          {
+            "value": "string"
+          }
+        ],
+        "natclass": [
+          {
+            "value": "string"
+          }
+        ],
+        "natpcod_set_array": [
+          {
+            "value": "string"
+          }
+        ],
+        "natpdes_set_array": [
+          {
+            "value": "string"
+          }
+        ],
+        "employees": {
+          "value": 0.0
+        },
+        "conscode": {
+          "value": "string"
+        },
+        "toas": {
+          "value": 0.0
+        },
+        "opre_eur": {
+          "value": 0.0
+        },
+        "opre_type": {
+          "value": "string"
+        },
+        "opre_date": {
+          "value": "string"
+        },
+        "crif_year_hist": [
+          {
+            "value": "string"
+          }
+        ],
+        "crif_score_hist": [
+          {
+            "value": 0.0
+          }
+        ],
+        "crif_peer_descr_hist": [
+          {
+            "value": "string"
+          }
+        ],
+        "crif_peer_min_hist": [
+          {
+            "value": 0.0
+          }
+        ],
+        "crif_peer_max_hist": [
+          {
+            "value": 0.0
+          }
+        ],
+        "crif_peer_avg_hist": [
+          {
+            "value": 0.0
+          }
+        ],
+        "cpycontacts_header_firstnameoriginallanguagepreferred": [
+          {
+            "value": "string"
+          }
+        ],
+        "cpycontacts_header_lastnameoriginallanguagepreferred": [
+          {
+            "value": "string"
+          }
+        ],
+        "cpycontacts_membership_function_dmc_current_only": [
+          {
+            "value": "string"
+          }
+        ],
+        "cpycontacts_membership_functionoriginaloriginallanguagepreferred": [
+          {
+            "value": "string"
+          }
+        ],
+        "cpycontacts_membership_departmentfromhiercodefall2009": [
+          {
+            "value": "string"
+          }
+        ],
+        "cpycontacts_membership_isashareholderformatted": [
+          {
+            "value": "string"
+          }
+        ],
+        "cpycontacts_header_birthdate": [
+          {
+            "value": "string"
+          }
+        ],
+        "cpycontacts_header_iddirector": [
+          {
+            "value": "string"
+          }
+        ],
+        "cpycontacts_membership_beginningnominationdate": [
+          {
+            "value": "string"
+          }
+        ],
+        "cpycontacts_header_fullnameoriginallanguagepreferred": [
+          {
+            "value": "string"
+          }
+        ],
+        "cpycontacts_membership_function_auditors_current": [
+          {
+            "value": "string"
+          }
+        ],
+        "sub_name": [
+          {
+            "value": "string"
+          }
+        ],
+        "sub_country_iso_code": [
+          {
+            "value": "string"
+          }
+        ],
+        "sub_city": [
+          {
+            "value": "string"
+          }
+        ],
+        "sub_direct_pct": [
+          {
+            "value": "string"
+          }
+        ],
+        "sub_total_pct": [
+          {
+            "value": "string"
+          }
+        ],
+        "pl": [
+          {
+            "value": 0.0
+          }
+        ],
+        "cuas": [
+          {
+            "value": 0.0
+          }
+        ],
+        "ebta": [
+          {
+            "value": 0.0
+          }
+        ],
+        "culi": [
+          {
+            "value": 0.0
+          }
+        ],
+        "closdate": [
+          {
+            "value": 0.0
+          }
+        ],
+        "shfd": [
+          {
+            "value": 0.0
+          }
+        ],
+        "curr": [
+          {
+            "value": 0.0
+          }
+        ],
+        "fias": [
+          {
+            "value": 0.0
+          }
+        ],
+        "ncli": [
+          {
+            "value": 0.0
+          }
+        ],
+        "plbt": [
+          {
+            "value": 0.0
+          }
+        ],
+        "cash": [
+          {
+            "value": 0.0
+          }
+        ],
+        "cf": [
+          {
+            "value": 0.0
+          }
+        ],
+        "stok": [
+          {
+            "value": 0.0
+          }
+        ],
+        "fiex": [
+          {
+            "value": 0.0
+          }
+        ],
+        "oppl": [
+          {
+            "value": 0.0
+          }
+        ],
+        "ifas": [
+          {
+            "value": 0.0
+          }
+        ],
+        "tfas": [
+          {
+            "value": 0.0
+          }
+        ],
+        "ofas": [
+          {
+            "value": 0.0
+          }
+        ],
+        "debt": [
+          {
+            "value": 0.0
+          }
+        ],
+        "ocas": [
+          {
+            "value": 0.0
+          }
+        ],
+        "ltdb": [
+          {
+            "value": 0.0
+          }
+        ],
+        "oncl": [
+          {
+            "value": 0.0
+          }
+        ],
+        "loan": [
+          {
+            "value": 0.0
+          }
+        ],
+        "cred": [
+          {
+            "value": 0.0
+          }
+        ],
+        "ocli": [
+          {
+            "value": 0.0
+          }
+        ],
+        "turn": [
+          {
+            "value": 0.0
+          }
+        ],
+        "fire": [
+          {
+            "value": 0.0
+          }
+        ],
+        "mate": [
+          {
+            "value": 0.0
+          }
+        ],
+        "staf": [
+          {
+            "value": 0.0
+          }
+        ],
+        "pl_previous": [
+          {
+            "value": 0.0
+          }
+        ],
+        "cuas_previous": [
+          {
+            "value": 0.0
+          }
+        ],
+        "ebta_previous": [
+          {
+            "value": 0.0
+          }
+        ],
+        "culi_previous": [
+          {
+            "value": 0.0
+          }
+        ],
+        "closdate_previous": [
+          {
+            "value": 0.0
+          }
+        ],
+        "shfd_previous": [
+          {
+            "value": 0.0
+          }
+        ],
+        "curr_previous": [
+          {
+            "value": 0.0
+          }
+        ],
+        "fias_previous": [
+          {
+            "value": 0.0
+          }
+        ],
+        "ncli_previous": [
+          {
+            "value": 0.0
+          }
+        ],
+        "plbt_previous": [
+          {
+            "value": 0.0
+          }
+        ],
+        "cash_previous": [
+          {
+            "value": 0.0
+          }
+        ],
+        "cf_previous": [
+          {
+            "value": 0.0
+          }
+        ],
+        "stok_previous": [
+          {
+            "value": 0.0
+          }
+        ],
+        "fiex_previous": [
+          {
+            "value": 0.0
+          }
+        ],
+        "oppl_previous": [
+          {
+            "value": 0.0
+          }
+        ],
+        "ifas_previous": [
+          {
+            "value": 0.0
+          }
+        ],
+        "tfas_previous": [
+          {
+            "value": 0.0
+          }
+        ],
+        "ofas_previous": [
+          {
+            "value": 0.0
+          }
+        ],
+        "debt_previous": [
+          {
+            "value": 0.0
+          }
+        ],
+        "ocas_previous": [
+          {
+            "value": 0.0
+          }
+        ],
+        "ltdb_previous": [
+          {
+            "value": 0.0
+          }
+        ],
+        "oncl_previous": [
+          {
+            "value": 0.0
+          }
+        ],
+        "loan_previous": [
+          {
+            "value": 0.0
+          }
+        ],
+        "cred_previous": [
+          {
+            "value": 0.0
+          }
+        ],
+        "ocli_previous": [
+          {
+            "value": 0.0
+          }
+        ],
+        "turn_previous": [
+          {
+            "value": 0.0
+          }
+        ],
+        "fire_previous": [
+          {
+            "value": 0.0
+          }
+        ],
+        "mate_previous": [
+          {
+            "value": 0.0
+          }
+        ],
+        "staf_previous": [
+          {
+            "value": 0.0
+          }
+        ],
+        "opre_eur_previous": [
+          {
+            "value": 0.0
+          }
+        ],
+        "ultimate_parent_company_bvdid": {
+          "value": "string"
+        },
+        "ultimate_parent_company_name": {
+          "value": "string"
+        },
+        "ultimate_parent_company_ctryiso": {
+          "value": "string"
+        },
+        "ultimate_parent_company_opre_eur": {
+          "value": 0.0
+        }
+      },
+      "config": {
+        "losslimit": 0.0,
+        "deductible": 0.0,
+        "extension": [
+          {
+            "id1": 0.0,
+            "id2": 0.0,
+            "id3": 0.0,
+            "id4": 0.0,
+            "id5": 0.0,
+            "id6": 0.0,
+            "id7": 0.0,
+            "id8": 0.0,
+            "id9": 0.0,
+            "id10": 0.0,
+            "id11": 0.0,
+            "id12": 0.0,
+            "id13": 0.0,
+            "id14": 0.0,
+            "id15": 0.0,
+            "id16": 0.0,
+            "id17": 0.0,
+            "id18": 0.0,
+            "id19": 0.0,
+            "id20": 0.0,
+            "id21": 0.0,
+            "id22": 0.0,
+            "id23": 0.0,
+            "id24": 0.0,
+            "id25": 0.0,
+            "id26": 0.0,
+            "id27": 0.0,
+            "id28": 0.0,
+            "id29": 0.0,
+            "id30": 0.0,
+            "id31": 0.0,
+            "id32": 0.0,
+            "id33": 0.0,
+            "id34": 0.0,
+            "id35": 0.0,
+            "id36": 0.0,
+            "id37": 0.0,
+            "id38": 0.0,
+            "id39": 0.0,
+            "id40": 0.0,
+            "id41": 0.0,
+            "id42": 0.0,
+            "id43": 0.0,
+            "id44": 0.0,
+            "id45": 0.0,
+            "id46": 0.0,
+            "id47": 0.0,
+            "id48": 0.0,
+            "id49": 0.0,
+            "id50": 0.0
+          }
+        ],
+        "statement": [
+          {
+            "id1": 0.0,
+            "id2": 0.0,
+            "id3": 0.0,
+            "id4": 0.0,
+            "id5": 0.0,
+            "id6": 0.0,
+            "id7": 0.0,
+            "id8": 0.0,
+            "id9": 0.0,
+            "id10": 0.0,
+            "id11": 0.0,
+            "id12": 0.0,
+            "id13": 0.0,
+            "id14": 0.0,
+            "id15": 0.0,
+            "id16": 0.0,
+            "id17": 0.0,
+            "id18": 0.0,
+            "id19": 0.0,
+            "id20": 0.0,
+            "id21": 0.0,
+            "id22": 0.0,
+            "id23": 0.0,
+            "id24": 0.0,
+            "id25": 0.0,
+            "id26": 0.0,
+            "id27": 0.0,
+            "id28": 0.0,
+            "id29": 0.0,
+            "id30": 0.0,
+            "id31": 0.0,
+            "id32": 0.0,
+            "id33": 0.0,
+            "id34": 0.0,
+            "id35": 0.0,
+            "id36": 0.0,
+            "id37": 0.0,
+            "id38": 0.0,
+            "id39": 0.0,
+            "id40": 0.0,
+            "id41": 0.0,
+            "id42": 0.0,
+            "id43": 0.0,
+            "id44": 0.0,
+            "id45": 0.0,
+            "id46": 0.0,
+            "id47": 0.0,
+            "id48": 0.0,
+            "id49": 0.0,
+            "id50": 0.0
+          }
+        ]
+      },
+      "premiumProposed": 0.0,
+      "inceptionDate": "string",
+      "expiryDate": "string"
+    },
+    "cyber": {
+      "UW_role": "string",
+      "language_selection": "string",
+      "questionnaire_type": "string",
+      "company_name": "string",
+      "company_country": "string",
+      "company_industry": "string",
+      "answers": {},
+      "premiumProposed": 0.0,
+      "inceptionDate": "string",
+      "expiryDate": "string"
+    },
+    "property": {
+      "UW_role": "string",
+      "language_selection": "string",
+      "companyStatus": "string",
+      "subproductId": 0.0,
+      "companyName": "string",
+      "bvdCompanyId": "string",
+      "naceCode": "string",
+      "answers": {},
+      "premiumProposed": 0.0,
+      "inceptionDate": "string",
+      "expiryDate": "string"
+    }
+  }
+ 

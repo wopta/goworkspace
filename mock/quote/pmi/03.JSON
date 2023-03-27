@@ -1,0 +1,93 @@
+{
+    "sme": {
+        "ateco": "",
+        "subproductId": 35.0,
+        "UW_role": "Agent",
+        "company": {
+            "country": {
+                "value": "Italy"
+            },
+            "vatnumber": {
+                "value": "01299930196"
+            },
+            "opre_eur": {
+                "value": 1978726.0
+            },
+            "employees": {
+                "value": 17.0
+            }
+        },
+        "answers": {
+            "step1": [],
+            "step2": [
+                {
+                    "buildingId": "2",
+                    "value": {
+                        "buildingType": "masonry",
+                        "numberOfFloors": "ground_floor",
+                        "constructionYear": "before1972",
+                        "alarm": "yes",
+                        "typeOfInsurance": "allRisks",
+                        "ateco": "620100",
+                        "postcode": "26010",
+                        "province": "CR",
+                        "answer": [
+                            {
+                                "slug": "building",
+                                "value": {
+                                    "typeOfSumInsured": "replacementValue",
+                                    "deductible": "500",
+                                    "sumInsuredLimitOfIndemnity": 100000.0
+                                }
+                            },
+                            {
+                                "slug": "burst-pipe",
+                                "value": {
+                                    "typeOfSumInsured": "firstLoss",
+                                    "deductible": "250",
+                                    "sumInsuredLimitOfIndemnity": 0.0
+                                }
+                            },
+                            {
+                                "slug": "power-surge",
+                                "value": {
+                                    "typeOfSumInsured": "firstLoss",
+                                    "deductible": "500",
+                                    "selfInsurance": "0.10",
+                                    "sumInsuredLimitOfIndemnity": 0.0
+                                }
+                            },
+                            {
+                                "slug": "atmospheric-event",
+                                "value": {
+                                    "typeOfSumInsured": "replacementValue",
+                                    "deductible": "1500",
+                                    "selfInsurance": "0.10",
+                                    "sumInsuredLimitOfIndemnity": 100000.000000
+                                }
+                            },
+                            {
+                                "slug": "sociopolitical-event",
+                                "value": {
+                                    "typeOfSumInsured": "replacementValue",
+                                    "deductible": "500",
+                                    "selfInsurance": "0.05",
+                                    "sumInsuredLimitOfIndemnity": 80000.000000
+                                }
+                            },
+                            {
+                                "slug": "terrorism",
+                                "value": {
+                                    "typeOfSumInsured": "replacementValue",
+                                    "deductible": "500",
+                                    "selfInsurance": "0.05",
+                                    "sumInsuredLimitOfIndemnity": 50000.000000
+                                }
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+}

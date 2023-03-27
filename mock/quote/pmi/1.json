@@ -1,0 +1,41 @@
+{
+    "sme": {
+        "ateco": "103100",
+        "subproductId": 35.0,
+        "UW_role": "Agent",
+        "company": {
+            "country": {
+                "value": "Italy"
+            },
+            "vatnumber": {
+                "value": "01299930196"
+            },
+            "opre_eur": {
+                "value": 1978726.0
+            },
+            "employees": {
+                "value": 17.0
+            }
+        },
+        "answers": {
+            "step1": [
+                {
+                    "slug": "third-party-liability",
+                    "value": {
+                        "deductible": "2000",
+                        "sumInsuredLimitOfIndemnity": 1000000.00
+                    }
+                },
+                {
+                    "slug": "damage-to-goods-course-of-works",
+                    "value": {
+                        "deductible": "2000",
+                        "selfInsurance": "0.10",
+                        "sumInsuredLimitOfIndemnity": 15000.00
+                    }
+                }
+            ],
+            "step2": []
+        }
+    }
+}

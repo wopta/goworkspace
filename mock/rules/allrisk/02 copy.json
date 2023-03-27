@@ -1,0 +1,18 @@
+{
+    "vat": "03592950780",
+    "address": "Viale Monza",
+    "postcode": "15057",
+    "province": "MI",
+    "revenue": 35148,
+    "ateco": "10.31.00",
+    "constructionMaterial": "masonry",
+    "buildingType": "industriale",
+    "floor": "ground_floor",
+    "buildingYear": "before1972",
+    "squareMeters": 200,
+    "isBuildingOwner": false,
+    "employer": 2,
+    "isAllarm": true,
+    "isPra": false,
+    "isHolder": false
+}

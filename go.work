@@ -1,0 +1,27 @@
+go 1.19
+
+use(
+./enrich
+./lib
+./cmd
+./rules
+./quote
+./models
+./wiseproxy
+./blockchain
+./accounting
+./document
+./appcheck-proxy
+./mail
+./wise-broker
+./claim
+./broker
+./callback
+./payment
+./product
+./form
+./user
+./partnership
+./companydata
+
+)

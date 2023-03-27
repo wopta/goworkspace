@@ -1,0 +1,255 @@
+{
+  
+    "SspFileIds": [
+      " ` + id + `"
+    ],
+    "SendEnvelopeDescription":{
+        "Name": "` + id + `.pdf",
+        "EmailSubject": "Please sign the enclosed envelope",
+        "EmailBody": "Dear #RecipientFirstName# #RecipientLastName#\n\n#PersonalMessage#\n\nPlease sign the envelope #EnvelopeName#\n\nEnvelope will expire at #ExpirationDate#",
+        "DisplayedEmailSender": "",
+        "EnableReminders": true,
+        "FirstReminderDayAmount": 5,
+        "RecurrentReminderDayAmount": 3,
+        "BeforeExpirationDayAmount": 3,
+        "ExpirationInSecondsAfterSending": 2419200,
+        "CallbackUrl": "",
+        "StatusUpdateCallbackUrl": "https://europe-west1-positive-apex-350507.cloudfunctions.net/callback/v1/sign?envelope=##EnvelopeId##&action=##Action##&uid=` + data.Uid + `&token=` + os.Getenv("WOPTA_TOKEN_API") + `",
+        "LockFormFieldsAtEnvelopeFinish": false,
+        "Steps": [
+          {
+            "OrderIndex": 1,
+            "Recipients": [
+              {
+                "Email": "` + data.Contractor.Mail + `",
+                "FirstName": "` + data.Contractor.Name + `",
+                "LastName": "` + data.Contractor.Surname + `",
+                "LanguageCode": "it",
+                "EmailBodyExtra": "",
+                "DisableEmail": false,
+                "AddAndroidAppLink": false,
+                "AddIosAppLink": false,
+                "AddWindowsAppLink": false,
+                "AllowDelegation": true,
+                "AllowAccessFinishedWorkstep": false,
+                "SkipExternalDataValidation": false,
+                "AuthenticationMethods": [{
+                    "Method": "Sms",
+                    "Parameter": "` + data.Contractor.Phone + `"
+       }],
+                "IdentificationMethods": [],
+                "OtpData": {
+                  "PhoneMobile": "` + data.Contractor.Phone + `"
+                }
+              }
+            ],
+            "EmailBodyExtra": "",
+            "RecipientType": "Signer",
+            "WorkstepConfiguration": {
+              "WorkstepLabel": "` + data.Contractor.Name + " " + data.Contractor.Surname + " " + data.Name + `",
+              "SmallTextZoomFactorPercent": 100,
+              "FinishAction": {
+                "ServerActions": [],
+                "ClientActions": []
+              },
+              "ReceiverInformation": {
+                "UserInformation": {
+                  "FirstName": "` + data.Contractor.Name + `",
+                  "LastName": "` + data.Contractor.Surname + `",
+                  "EMail": "` + data.Contractor.Mail + `"
+                },
+                "TransactionCodePushPluginData": []
+              },
+              "SenderInformation": {
+                "UserInformation": {
+                  "FirstName": "Wopta",
+                  "LastName": "Assicurazzioni",
+                  "EMail": "info@wopta.it"
+                }
+              },
+              "TransactionCodeConfigurations": [],
+              "SignatureConfigurations": [],
+              "ViewerPreferences": {
+                "FinishWorkstepOnOpen": false,
+                "VisibleAreaOptions": {
+                  "AllowedDomain": "",
+                  "Enabled": false
+                }
+              },
+              "ResourceUris": {
+                "DelegationUri": ""
+              },
+              "AuditingToolsConfiguration": {
+                "WriteAuditTrail": true
+              },
+              "Policy": {
+                "GeneralPolicies": {
+                  "AllowSaveDocument": true,
+                  "AllowSaveAuditTrail": true,
+                  "AllowRotatingPages": false,
+                  "AllowAppendFileToWorkstep": false,
+                  "AllowAppendTaskToWorkstep": false,
+                  "AllowEmailDocument": true,
+                  "AllowPrintDocument": true,
+                  "AllowFinishWorkstep": true,
+                  "AllowRejectWorkstep": true,
+                  "AllowRejectWorkstepDelegation": true,
+                  "AllowUndoLastAction": true,
+                  "AllowColorizePdfForms": false,
+                  "AllowAdhocPdfAttachments": false,
+                  "AllowAdhocSignatures": false,
+                  "AllowAdhocStampings": false,
+                  "AllowAdhocFreeHandAnnotations": false,
+                  "AllowAdhocTypewriterAnnotations": false,
+                  "AllowAdhocPictureAnnotations": false,
+                  "AllowAdhocPdfPageAppending": false,
+                  "AllowReloadOfFinishedWorkstep": true
+                },
+                "WorkstepTasks": {
+                  "PictureAnnotationMinResolution": 0,
+                  "PictureAnnotationMaxResolution": 0,
+                  "PictureAnnotationColorDepth": "Color16M",
+                  "SequenceMode": "NoSequenceEnforced",
+                  "PositionUnits": "PdfUnits",
+                  "ReferenceCorner": "Lower_Left",
+                  "Tasks": [
+                    {
+                      "Texts": [
+                        {
+                          "Language": "it",
+                          "Value": "Signature Disclosure Text"
+                        },
+                        {
+                          "Language": "*",
+                          "Value": "Signature Disclosure Text"
+                        }
+                      ],
+                      "Headings": [
+                        {
+                          "Language": "it",
+                          "Value": "Signature Disclosure Subject"
+                        },
+                        {
+                          "Language": "*",
+                          "Value": "Signature Disclosure Subject"
+                        }
+                      ],
+                      "IsRequired": false,
+                      "Id": "ra",
+                      "DisplayName": "ra",
+                      "DocRefNumber": 1,
+                      "DiscriminatorType": "Agreements"
+                    },
+                    {
+                      "PositionPage": 2,
+                      "Position": {
+                        "PositionX": 252.0,
+                        "PositionY": 186.0
+                      },
+                      "Size": {
+                        "Height": 80.0,
+                        "Width": 190.0
+                      },
+                      "AdditionalParameters": [
+                        {
+                          "Key": "enabled",
+                          "Value": "1"
+                        },
+                        {
+                          "Key": "completed",
+                          "Value": "0"
+                        },
+                        {
+                          "Key": "req",
+                          "Value": "1"
+                        },
+                        {
+                          "Key": "isPhoneNumberRequired",
+                          "Value": "0"
+                        },
+                        {
+                          "Key": "trValidityInSeconds",
+                          "Value": "60"
+                        },
+                        {
+                          "Key": "fd",
+                          "Value": ""
+                        },
+                        {
+                          "Key": "fd_dateformat",
+                          "Value": "dd-MM-yyyy HH:mm:ss"
+                        },
+                        {
+                          "Key": "fd_timezone",
+                          "Value": "datetimeutc"
+                        }
+                      ],
+                      "AllowedSignatureTypes": [
+                        {
+                          "TrModType": "TransactionCodeSenderPlugin",
+                          "TrValidityInSeconds": 300,
+                          "TrConfId": "otpSignatureSmsText",
+                          "IsPhoneNumberRequired": true,
+                          "Ly": "simpleTransactionCodeSms",
+                          "Id": "c787919a-b2fd-4849-8f97-98dee281da30",
+                          "DiscriminatorType": "SigTypeTransactionCode",
+                          "Preferred": false,
+                          "StampImprintConfiguration": {
+                            "DisplayExtraInformation": true,
+                            "DisplayEmail": true,
+                            "DisplayIp": true,
+                            "DisplayName": true,
+                            "DisplaySignatureDate": true,
+                            "FontFamily": "Times New Roman",
+                            "FontSize": 11.0,
+                            "OverrideLegacyStampImprint": false,
+                            "DisplayTransactionId": true,
+                            "DisplayTransaktionToken": true,
+                            "DisplayPhoneNumber": true
+                          },
+                          "SignaturePluginConfigurationId": "ltaLevelId"
+                        }
+                      ],
+                      "UseTimestamp": false,
+                      "IsRequired": true,
+                      "Id": "1#XyzmoDuplicateIdSeperator#Signature_e7ca3f6a-33fa-cdba-d696-1377fcad51c9",
+                      "DisplayName": "",
+                      "DocRefNumber": 1,
+                      "DiscriminatorType": "Signature"
+                    }
+                  ]
+                },
+                "FinalizeActions": {
+                  "FinalizeActionList": [
+                    {
+                      "DocRefNumbers": "*",
+                      "SpcId": "ltaLevelId",
+                      "DiscriminatorType": "Timestamp"
+                    }
+                  ]
+                }
+              },
+              "Navigation": {
+                "HyperLinks": [],
+                "Links": [],
+                "LinkTargets": []
+              }
+            },
+            "DocumentOptions": [
+              {
+                "DocumentReference": "1",
+                "IsHidden": false
+              }
+            ],
+            "UseDefaultAgreements": true
+          }
+        ],
+        "AddFormFields": {
+          "Forms": {}
+        },
+        "OverrideFormFieldValues": {
+          "Forms": {}
+        },
+        "AttachSignedDocumentsToEnvelopeLog": false
+      }
+  }

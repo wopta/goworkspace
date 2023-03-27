@@ -1,0 +1,109 @@
+{
+  "name": "life",
+  "nameDesc": "Wopta per te Vita",
+  "productVersion": "v1",
+
+  "companies": [
+    {
+      "name": "axa",
+      "code": "2",
+      "commission": 0.3,
+      "commissionRenew": 0.18,
+      "guaranteesMap": {
+        "death": {
+          "companyCodec": "",
+          "companyName": "Decesso",
+          "description": "",
+          "group": "DEATH",
+          "name": "morte",
+          "isExtension": false,
+          "isMandatory": true,
+          "offer": {
+            "default": {
+              "sumInsured": 50000,
+              "duration": { "year": 5 }
+            }
+          },
+          "slug": "death",
+          "tax": 10,
+          "taxes": null,
+          "type": "person",
+          "config": {
+            "sumInsuredValues": { "min": 50000, "max": 200000, "step": 25000 },
+            "durationValues": { "min": 5, "max": 20, "step": 5 }
+          }
+        },
+        "permanent-disability": {
+          "companyCodec": "",
+          "companyName": "Invalidità Totale Permanente",
+          "deductible": "",
+          "description": "",
+          "group": "DEATH",
+          "name": "invalidità totale permanente",
+          "isExtension": false,
+          "offer": {
+            "default": {
+              "sumInsured": 50000,
+              "duration": { "year": 5 }
+            }
+          },
+          "slug": "permanent-disability",
+          "tax": 10,
+          "taxes": null,
+          "type": "person",
+          "config": {
+            "sumInsuredValues": { "min": 50000, "max": 200000, "step": 25000 },
+            "durationValues": { "min": 5, "max": 20, "step": 5 }
+          }
+        },
+        "temporary-disability": {
+          "companyCodec": "",
+          "companyName": "Inabilità Totale Temporanea",
+          "deductible": "",
+          "description": "",
+          "group": "DEATH",
+          "name": "inabilità totale temporanea",
+          "isExtension": false,
+          "offer": {
+            "default": {
+              "sumInsured": 50000,
+              "duration": { "year": 5 }
+            }
+          },
+          "slug": "temporary-disability",
+          "tax": 10,
+          "taxes": null,
+          "type": "person",
+          "config": {
+            "sumInsuredValues": { "min": 50000, "max": 200000, "step": 25000 },
+            "durationValues": { "min": 5, "max": 20, "step": 5 }
+          }
+        },
+        "serious-ill": {
+          "companyCodec": "",
+          "companyName": "Malattia Grave",
+          "deductible": "",
+          "description": "",
+          "isExtension": false,
+          "isMandatory": false,
+          "group": "DEATH",
+          "name": "malattia grave",
+          "offer": {
+            "default": {
+              "sumInsured": 50000,
+              "duration": { "year": 5 }
+            }
+          },
+          "slug": "serious-ill",
+          "tax": 10,
+          "taxes": null,
+          "type": "person",
+          "config": {
+            "sumInsuredValues": { "min": 50000, "max": 200000, "step": 25000 },
+            "durationValues": { "min": 5, "max": 20, "step": 5 }
+          }
+        }
+      }
+    }
+  ]
+}

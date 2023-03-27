@@ -1,0 +1,14 @@
+cmd/
+sa/
+env/
+/main.go
+./main.go
+main.go
+*.sum
+*.ppk
+sa_key_frontend.json
+.vscode/
+function-data/
+.idea
+.DS_Store
+*.code-workspace
