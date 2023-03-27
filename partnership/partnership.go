@@ -1,6 +1,7 @@
 package partnership
 
 import (
+	b64 "encoding/base64"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -37,9 +38,9 @@ func Partnership(w http.ResponseWriter, r *http.Request) {
 
 func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		policy models.Policy
-		person models.User
-		asset  models.Asset
+		policy   models.Policy
+		person   models.User
+		asset    models.Asset
 		response PartnershipResponse
 	)
 	resp.Header().Set("Access-Control-Allow-Methods", "GET")
@@ -57,7 +58,9 @@ func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, inter
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
 
-		return []byte(os.Getenv("BEPROF_SIGNING_KEY")), nil
+		key, e := b64.StdEncoding.DecodeString(os.Getenv("BEPROF_SIGNING_KEY"))
+
+		return []byte(key), e
 	})
 
 	if claims, ok := token.Claims.(*BeprofClaims); ok && token.Valid {
@@ -112,7 +115,7 @@ func extractBirthdateFromItalianFiscalCode(fiscalCode string) time.Time {
 		day -= 40
 	}
 
-	if year < time.Now().Year() - 2000 {
+	if year < time.Now().Year()-2000 {
 		year += 2000
 	} else {
 		year += 1900
@@ -142,22 +145,22 @@ func getMonth(monthCode string) int {
 }
 
 type BeprofClaims struct {
-	UserBeprofid            int         `json:"user.beprofid"`
-	UserFirstname           string      `json:"user.firstname"`
-	UserLastname            string      `json:"user.lastname"`
-	UserEmail               string      `json:"user.email"`
-	UserMobile              string      `json:"user.mobile"`
-	UserFiscalcode          string      `json:"user.fiscalcode"`
-	UserPiva                string      `json:"user.piva"`
-	UserProvince            string      `json:"user.province"`
-	UserCity                string      `json:"user.city"`
-	UserPostalcode          string      `json:"user.postalcode"`
-	UserAddress             string      `json:"user.address"`
-	UserMunicipalityCode    string      `json:"user.municipality_code"`
-	UserEmploymentSector    string      `json:"user.employment_sector"`
-	ProductCode             string      `json:"product.code"`
-	ProductPurchaseid       string      `json:"product.purchaseid"`
-	Price                   string      `json:"price"`
+	UserBeprofid         int    `json:"user.beprofid"`
+	UserFirstname        string `json:"user.firstname"`
+	UserLastname         string `json:"user.lastname"`
+	UserEmail            string `json:"user.email"`
+	UserMobile           string `json:"user.mobile"`
+	UserFiscalcode       string `json:"user.fiscalcode"`
+	UserPiva             string `json:"user.piva"`
+	UserProvince         string `json:"user.province"`
+	UserCity             string `json:"user.city"`
+	UserPostalcode       string `json:"user.postalcode"`
+	UserAddress          string `json:"user.address"`
+	UserMunicipalityCode string `json:"user.municipality_code"`
+	UserEmploymentSector string `json:"user.employment_sector"`
+	ProductCode          string `json:"product.code"`
+	ProductPurchaseid    string `json:"product.purchaseid"`
+	Price                string `json:"price"`
 	jwt.RegisteredClaims
 }
 
