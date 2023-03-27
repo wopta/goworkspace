@@ -1,423 +1,1202 @@
 {
-  "proposalNumber": 173,
-  "offerName": "Completa",
-  "status": "Lead",
-  "statusHistory": [
-    "Lead"
+  "Documents": [
+    {
+      "FileId": "string",
+      "DocumentNumber": 0
+    }
   ],
-  "transactions": null,
-  "company": "global",
-  "name": "pmi",
-  "BigStartDate": "0000-00-00T00:00:00",
-  "BigEndDate": "0000-00-00T00:00:00",
-  "BigEmitDate": "0000-00-00T00:00:00",
-  "emitDate": "0001-01-01T00:00:00Z",
-  "startDate": "2023-03-14T10:38:26.78Z",
-  "endDate": "2024-03-14T10:38:26.78Z",
-  "creationDate": "2023-03-14T10:49:47.34273Z",
-  "updated": "2023-03-14T10:49:47.523284Z",
-  "nextPay": "0001-01-01T00:00:00Z",
-  "paymentType": "creditCard",
-  "priceNett": 1082.64,
-  "priceGross": 1315.85,
-  "contractor": {
-    "birthDate": "2005-03-01T23:00:00.000Z",
-    "birthCity": "Milano",
-    "birthProvince": "MI",
-    "location": {
-      "lat": 45.4648158,
-      "lng": 9.1949345
-    },
-    "name": "Beatrice",
-    "surname": "Sala",
-    "address": "Galleria del Corso",
-    "postalCode": "20122",
-    "city": "Milano",
-    "streetNumber": "1",
-    "cityCode": "MI",
-    "mail": "luca.barbieri@wopta.it",
-    "phone": "+393668134257",
-    "fiscalCode": "brblcu81h03f205q",
-    "vatCode": "01319960199",
-    "consens": [
+  "Name": "string",
+  "MetaData": "string",
+  "AddDocumentTimestamp": true,
+  "ShareWithTeam": true,
+  "LockFormFieldsOnFinish": true,
+  "UnassignedElements": {
+    "TextBoxes": [
       {
-        "title": "Privacy",
-        "consens": "Il sottoscritto, letta e compresa l'informativa sul trattamento dei dati personali, ACCONSENTE al trattamento dei propri dati personali da parte di Wopta Assicurazioni per l’invio di comunicazioni e proposte commerciali e di marketing, incluso l’invio di newsletter e ricerche di mercato, attraverso strumenti automatizzati (sms, mms, e-mail, ecc.) e non (posta cartacea e telefono con operatore).",
-        "key": 1,
-        "answer": true
+        "ElementId": "string",
+        "Required": true,
+        "Value": "string",
+        "DocumentNumber": 0,
+        "GuidingOrder": 0,
+        "Validation": {
+          "Type": "None",
+          "DateValidationConfiguration": {
+            "DateFormat": "string",
+            "Range": {
+              "From": "string",
+              "To": "string"
+            }
+          },
+          "NumberValidationConfiguration": {
+            "DecimalDigits": 0,
+            "Symbol": "string",
+            "SymbolLocation": "Start",
+            "GroupSeparator": "Comma",
+            "DecimalSeparator": "Comma",
+            "Range": {
+              "From": "string",
+              "To": "string"
+            }
+          },
+          "PhoneValidationConfiguration": {
+            "Type": "International"
+          },
+          "TimeValidationConfiguration": {
+            "TimeFormat": "string",
+            "Range": {
+              "From": "string",
+              "To": "string"
+            }
+          }
+        },
+        "FieldDefinition": {
+          "ReadOnly": true,
+          "MaxLength": 0,
+          "IsMultiline": true,
+          "IsPassword": true,
+          "TextFormat": {
+            "TextColor": "string",
+            "FontSizeInPt": 0,
+            "FontName": "string",
+            "Bold": true,
+            "Italic": true,
+            "TextAlign": "Left"
+          },
+          "Position": {
+            "PageNumber": 0,
+            "X": 0,
+            "Y": 0
+          },
+          "Size": {
+            "Width": 0,
+            "Height": 0
+          }
+        }
+      }
+    ],
+    "CheckBoxes": [
+      {
+        "ElementId": "string",
+        "DocumentNumber": 0,
+        "Required": true,
+        "IsChecked": true,
+        "GuidingOrder": 0,
+        "FieldDefinition": {
+          "ExportValue": "string",
+          "Position": {
+            "PageNumber": 0,
+            "X": 0,
+            "Y": 0
+          },
+          "Size": {
+            "Width": 0,
+            "Height": 0
+          },
+          "ReadOnly": true
+        }
+      }
+    ],
+    "ComboBoxes": [
+      {
+        "ElementId": "string",
+        "DocumentNumber": 0,
+        "Required": true,
+        "Value": "string",
+        "GuidingOrder": 0,
+        "FieldDefinition": {
+          "TextFormat": {
+            "TextColor": "string",
+            "FontSizeInPt": 0,
+            "FontName": "string",
+            "Bold": true,
+            "Italic": true,
+            "TextAlign": "Left"
+          },
+          "Items": [
+            {
+              "ExportValue": "string",
+              "DisplayValue": "string"
+            }
+          ],
+          "IsEditable": true,
+          "ReadOnly": true,
+          "Position": {
+            "PageNumber": 0,
+            "X": 0,
+            "Y": 0
+          },
+          "Size": {
+            "Width": 0,
+            "Height": 0
+          }
+        }
+      }
+    ],
+    "RadioButtons": [
+      {
+        "GroupName": "string",
+        "DocumentNumber": 0,
+        "Required": true,
+        "SelectedItem": "string",
+        "GuidingOrder": 0,
+        "FieldDefinition": {
+          "IsSelectUnison": true,
+          "Items": [
+            {
+              "ExportValue": "string",
+              "IsChecked": true,
+              "ReadOnly": true,
+              "Position": {
+                "PageNumber": 0,
+                "X": 0,
+                "Y": 0
+              },
+              "Size": {
+                "Width": 0,
+                "Height": 0
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "ListBoxes": [
+      {
+        "ElementId": "string",
+        "DocumentNumber": 0,
+        "Required": true,
+        "PreSelectedItems": [
+          "string"
+        ],
+        "GuidingOrder": 0,
+        "FieldDefinition": {
+          "TextFormat": {
+            "TextColor": "string",
+            "FontSizeInPt": 0,
+            "FontName": "string",
+            "Bold": true,
+            "Italic": true,
+            "TextAlign": "Left"
+          },
+          "Items": [
+            {
+              "ExportValue": "string",
+              "DisplayValue": "string"
+            }
+          ],
+          "IsMultiSelect": true,
+          "ReadOnly": true,
+          "Position": {
+            "PageNumber": 0,
+            "X": 0,
+            "Y": 0
+          },
+          "Size": {
+            "Width": 0,
+            "Height": 0
+          }
+        }
       }
     ]
   },
-  "attachments": [
-    {}
-  ],
-  "assets": [
+  "Activities": [
     {
-      "enterprise": {
-        "name": "Beatrice",
-        "address": "Galleria del Corso",
-        "streetNumber": "1",
-        "location": {
-          "lat": 45.4648158,
-          "lng": 9.1949345
+      "Action": {
+        "SendCopy": {
+          "RecipientConfiguration": {
+            "ContactInformation": {
+              "Email": "string",
+              "GivenName": "string",
+              "Surname": "string",
+              "PhoneNumber": "string",
+              "LanguageCode": "AF"
+            },
+            "PersonalMessage": "string"
+          },
+          "CopyingGroup": "string"
         },
-        "postalCode": "20122",
-        "city": "Milano",
-        "vatCode": "01319960199",
-        "ateco": "10.71.10",
-        "atecoDesc": "PRODUZIONE DI PRODOTTI DI PANETTERIA FRESCHI",
-        "atecoMacro": "ATTIVITA MANIFATTURIERE",
-        "atecoSub": "INDUSTRIE ALIMENTARI",
-        "sector": "PRODUZIONE",
-        "revenue": "270383",
-        "employer": 2
-      },
-      "guarantees": [
-        {
-          "legalDefence": "basic",
-          "type": "company",
-          "description": "Difesa penale per reati di natura colposa o contravvenzionale, inclusi i casi di sicurezza aziendale da D. Lgs. 81/08 e D. Lgs. 106/09, D. Lgs. 193/07, D. Lgs. 152/06, D. Lgs. 101/18, D. Lgs. 231/01",
-          "companyCodec": "DP",
-          "companyName": "Tutela Legale",
-          "group": "LEGAL",
-          "slug": "legal-defence",
-          "isPremium": true,
-          "tax": 21.25,
-          "priceNett": 41.24,
-          "priceGross": 50.0035
+        "SignAutomatic": {
+          "ProfileId": "string",
+          "RenderingLanguageCode": "AF",
+          "VisibleSignatures": [
+            {
+              "DocumentNumber": 0,
+              "UseExternalTimestampServer": true,
+              "FieldDefinition": {
+                "Position": {
+                  "PageNumber": 0,
+                  "X": 0,
+                  "Y": 0
+                },
+                "Size": {
+                  "Width": 0,
+                  "Height": 0
+                }
+              }
+            }
+          ]
         },
-        {
-          "type": "company",
-          "description": "Danni involontariamente causati a terzi per danni a cose o persone di cui sia responsabile a termini di legge (R.C.T.). La garanzia include, ma non si limita a questi, i danni: a veicoli di terzi e prestatori di lavoro; a cose in consegna e custodia; a cose nell'ambito di esecuzione dei lavori; a cose di terzi sollevate, caricate, scaricate, movimentate, trasportate o rimorchiate; a mezzi di trasporto sotto carico e scarico; da interruzione o sospensione di attività di terzi; da smercio; da committenza autoveicoli; da responsabilità civile personale addetti; da attività di commercio ambulante; da lavori presso terzi",
-          "companyCodec": "CT",
-          "companyName": "Responsabilità Civile Terzi",
-          "group": "RCT",
-          "slug": "third-party-liability",
-          "isBase": true,
-          "isPremium": true,
-          "sumInsuredLimitOfIndemnity": 1000000,
-          "deductible": "1000",
-          "tax": 22.25,
-          "priceNett": 83.83,
-          "priceGross": 102.482175
+        "Sign": {
+          "RecipientConfiguration": {
+            "ContactInformation": {
+              "Email": "string",
+              "GivenName": "string",
+              "Surname": "string",
+              "PhoneNumber": "string",
+              "LanguageCode": "AF"
+            },
+            "PersonalMessage": "string",
+            "AuthenticationConfiguration": {
+              "AccessCode": {
+                "Code": "string"
+              },
+              "SmsOneTimePassword": {
+                "PhoneNumber": "string"
+              },
+              "SwedishBankId": {
+                "PersonalNumber": "string",
+                "AllowAnyPersonalNumber": true
+              },
+              "OAuthAuthentications": [
+                {
+                  "ProviderName": "string",
+                  "Validations": [
+                    {
+                      "FieldReferenceId": "string",
+                      "ExpectedValue": "string"
+                    }
+                  ]
+                }
+              ],
+              "SamlAuthentications": [
+                {
+                  "ProviderName": "string",
+                  "Validations": [
+                    {
+                      "FieldReferenceId": "string",
+                      "ExpectedValue": "string"
+                    }
+                  ]
+                }
+              ]
+            },
+            "SendEmails": true,
+            "AllowAccessAfterFinish": true,
+            "IncludedEmailAppLinks": {
+              "Android": true,
+              "iOS": true,
+              "Windows": true
+            },
+            "AllowDelegation": true,
+            "RequireViewContentBeforeFormFilling": true
+          },
+          "SequenceMode": "NoSequenceEnforced",
+          "Elements": {
+            "TextBoxes": [
+              {
+                "ElementId": "string",
+                "Required": true,
+                "Value": "string",
+                "DocumentNumber": 0,
+                "GuidingOrder": 0,
+                "Validation": {
+                  "Type": "None",
+                  "DateValidationConfiguration": {
+                    "DateFormat": "string",
+                    "Range": {
+                      "From": "string",
+                      "To": "string"
+                    }
+                  },
+                  "NumberValidationConfiguration": {
+                    "DecimalDigits": 0,
+                    "Symbol": "string",
+                    "SymbolLocation": "Start",
+                    "GroupSeparator": "Comma",
+                    "DecimalSeparator": "Comma",
+                    "Range": {
+                      "From": "string",
+                      "To": "string"
+                    }
+                  },
+                  "PhoneValidationConfiguration": {
+                    "Type": "International"
+                  },
+                  "TimeValidationConfiguration": {
+                    "TimeFormat": "string",
+                    "Range": {
+                      "From": "string",
+                      "To": "string"
+                    }
+                  }
+                },
+                "FieldDefinition": {
+                  "ReadOnly": true,
+                  "MaxLength": 0,
+                  "IsMultiline": true,
+                  "IsPassword": true,
+                  "TextFormat": {
+                    "TextColor": "string",
+                    "FontSizeInPt": 0,
+                    "FontName": "string",
+                    "Bold": true,
+                    "Italic": true,
+                    "TextAlign": "Left"
+                  },
+                  "Position": {
+                    "PageNumber": 0,
+                    "X": 0,
+                    "Y": 0
+                  },
+                  "Size": {
+                    "Width": 0,
+                    "Height": 0
+                  }
+                }
+              }
+            ],
+            "CheckBoxes": [
+              {
+                "ElementId": "string",
+                "DocumentNumber": 0,
+                "Required": true,
+                "IsChecked": true,
+                "GuidingOrder": 0,
+                "FieldDefinition": {
+                  "ExportValue": "string",
+                  "Position": {
+                    "PageNumber": 0,
+                    "X": 0,
+                    "Y": 0
+                  },
+                  "Size": {
+                    "Width": 0,
+                    "Height": 0
+                  },
+                  "ReadOnly": true
+                }
+              }
+            ],
+            "ComboBoxes": [
+              {
+                "ElementId": "string",
+                "DocumentNumber": 0,
+                "Required": true,
+                "Value": "string",
+                "GuidingOrder": 0,
+                "FieldDefinition": {
+                  "TextFormat": {
+                    "TextColor": "string",
+                    "FontSizeInPt": 0,
+                    "FontName": "string",
+                    "Bold": true,
+                    "Italic": true,
+                    "TextAlign": "Left"
+                  },
+                  "Items": [
+                    {
+                      "ExportValue": "string",
+                      "DisplayValue": "string"
+                    }
+                  ],
+                  "IsEditable": true,
+                  "ReadOnly": true,
+                  "Position": {
+                    "PageNumber": 0,
+                    "X": 0,
+                    "Y": 0
+                  },
+                  "Size": {
+                    "Width": 0,
+                    "Height": 0
+                  }
+                }
+              }
+            ],
+            "RadioButtons": [
+              {
+                "GroupName": "string",
+                "DocumentNumber": 0,
+                "Required": true,
+                "SelectedItem": "string",
+                "GuidingOrder": 0,
+                "FieldDefinition": {
+                  "IsSelectUnison": true,
+                  "Items": [
+                    {
+                      "ExportValue": "string",
+                      "IsChecked": true,
+                      "ReadOnly": true,
+                      "Position": {
+                        "PageNumber": 0,
+                        "X": 0,
+                        "Y": 0
+                      },
+                      "Size": {
+                        "Width": 0,
+                        "Height": 0
+                      }
+                    }
+                  ]
+                }
+              }
+            ],
+            "ListBoxes": [
+              {
+                "ElementId": "string",
+                "DocumentNumber": 0,
+                "Required": true,
+                "PreSelectedItems": [
+                  "string"
+                ],
+                "GuidingOrder": 0,
+                "FieldDefinition": {
+                  "TextFormat": {
+                    "TextColor": "string",
+                    "FontSizeInPt": 0,
+                    "FontName": "string",
+                    "Bold": true,
+                    "Italic": true,
+                    "TextAlign": "Left"
+                  },
+                  "Items": [
+                    {
+                      "ExportValue": "string",
+                      "DisplayValue": "string"
+                    }
+                  ],
+                  "IsMultiSelect": true,
+                  "ReadOnly": true,
+                  "Position": {
+                    "PageNumber": 0,
+                    "X": 0,
+                    "Y": 0
+                  },
+                  "Size": {
+                    "Width": 0,
+                    "Height": 0
+                  }
+                }
+              }
+            ],
+            "Signatures": [
+              {
+                "ElementId": "string",
+                "Required": true,
+                "DocumentNumber": 0,
+                "DisplayName": "string",
+                "FieldDescription": "string",
+                "UseExternalTimestampServer": true,
+                "GuidingOrder": 0,
+                "AllowedSignatureTypes": {
+                  "ClickToSign": {
+                    "UseExternalSignatureImage": "Optional",
+                    "Preferred": true,
+                    "StampImprintConfiguration": {
+                      "DisplayExtraInformation": true,
+                      "FontName": "string",
+                      "FontSizeInPt": 0,
+                      "DisplayEmail": true,
+                      "DisplayIp": true,
+                      "DisplayName": true,
+                      "DisplaySignatureDate": true
+                    }
+                  },
+                  "DrawToSign": {
+                    "UseExternalSignatureImage": "Optional",
+                    "Preferred": true,
+                    "StampImprintConfiguration": {
+                      "DisplayExtraInformation": true,
+                      "FontName": "string",
+                      "FontSizeInPt": 0,
+                      "DisplayEmail": true,
+                      "DisplayIp": true,
+                      "DisplayName": true,
+                      "DisplaySignatureDate": true
+                    }
+                  },
+                  "TypeToSign": {
+                    "UseExternalSignatureImage": "Optional",
+                    "Preferred": true,
+                    "StampImprintConfiguration": {
+                      "DisplayExtraInformation": true,
+                      "FontName": "string",
+                      "FontSizeInPt": 0,
+                      "DisplayEmail": true,
+                      "DisplayIp": true,
+                      "DisplayName": true,
+                      "DisplaySignatureDate": true
+                    }
+                  },
+                  "LocalCertificate": {
+                    "EnforcePreferredHashAlgorithm": true,
+                    "PreferredHashAlgorithm": "Sha256",
+                    "UseExternalSignatureImage": "Optional",
+                    "Preferred": true,
+                    "StampImprintConfiguration": {
+                      "DisplayExtraInformation": true,
+                      "FontName": "string",
+                      "FontSizeInPt": 0,
+                      "DisplayIp": true,
+                      "DisplayName": true,
+                      "DisplaySignatureDate": true
+                    }
+                  },
+                  "DisposableCertificate": {
+                    "IsLongLived": true,
+                    "ValidityInSeconds": 0,
+                    "UseExternalSignatureImage": "Optional",
+                    "Preferred": true,
+                    "StampImprintConfiguration": {
+                      "DisplayExtraInformation": true,
+                      "FontName": "string",
+                      "FontSizeInPt": 0,
+                      "DisplayIp": true,
+                      "DisplayName": true,
+                      "DisplaySignatureDate": true
+                    }
+                  },
+                  "SwissComOnDemand": {
+                    "ValidityInSeconds": 0,
+                    "Preferred": true,
+                    "StampImprintConfiguration": {
+                      "DisplayExtraInformation": true,
+                      "FontName": "string",
+                      "FontSizeInPt": 0,
+                      "DisplayIp": true,
+                      "DisplayName": true,
+                      "DisplaySignatureDate": true
+                    }
+                  },
+                  "ATrustCertificate": {
+                    "TemplateId": "string",
+                    "Preferred": true
+                  },
+                  "Biometric": {
+                    "BiometricVerification": true,
+                    "AllowBiometricStoringOnly": true,
+                    "StoreSignedResponseWithoutBioData": true,
+                    "BiometricServerUserId": "string",
+                    "SignaturePositioning": "WithinField",
+                    "Preferred": true
+                  },
+                  "RemoteCertificate": {
+                    "ValidityInSeconds": 0,
+                    "UseExternalSignatureImage": "Optional",
+                    "Preferred": true,
+                    "StampImprintConfiguration": {
+                      "DisplayExtraInformation": true,
+                      "FontName": "string",
+                      "FontSizeInPt": 0,
+                      "DisplayIp": true,
+                      "DisplayName": true,
+                      "DisplaySignatureDate": true
+                    }
+                  },
+                  "OneTimePassword": {
+                    "ValidityInSeconds": 0,
+                    "UseExternalSignatureImage": "Optional",
+                    "Preferred": true,
+                    "StampImprintConfiguration": {
+                      "DisplayExtraInformation": true,
+                      "FontName": "string",
+                      "FontSizeInPt": 0,
+                      "DisplayTransactionId": true,
+                      "DisplayTransactionToken": true,
+                      "DisplayPhoneNumber": true,
+                      "DisplayIp": true,
+                      "DisplayName": true,
+                      "DisplaySignatureDate": true
+                    }
+                  },
+                  "SwedishBankId": {
+                    "Preferred": true,
+                    "StampImprintConfiguration": {
+                      "DisplayExtraInformation": true,
+                      "FontName": "string",
+                      "FontSizeInPt": 0,
+                      "DisplayTransactionId": true,
+                      "DisplayName": true,
+                      "DisplaySignatureDate": true
+                    }
+                  },
+                  "SignaturePlugins": [
+                    {
+                      "PluginId": "string",
+                      "Preferred": true,
+                      "StampImprintConfiguration": {
+                        "DisplayExtraInformation": true,
+                        "FontName": "string",
+                        "FontSizeInPt": 0,
+                        "DisplayEmail": true,
+                        "DisplayIp": true,
+                        "DisplayName": true,
+                        "DisplaySignatureDate": true
+                      }
+                    }
+                  ]
+                },
+                "FieldDefinition": {
+                  "Position": {
+                    "PageNumber": 0,
+                    "X": 0,
+                    "Y": 0
+                  },
+                  "Size": {
+                    "Width": 0,
+                    "Height": 0
+                  }
+                },
+                "TaskConfiguration": {
+                  "StampImprintDateConfiguration": {
+                    "UseLocalTimezone": true,
+                    "DateTimeFormat": "string"
+                  },
+                  "BatchGroup": "string"
+                }
+              }
+            ],
+            "Attachments": [
+              {
+                "ElementId": "string",
+                "DocumentNumber": 0,
+                "Required": true,
+                "DisplayName": "string",
+                "DisplayIconType": "Paperclip",
+                "GuidingOrder": 0,
+                "FieldDefinition": {
+                  "Position": {
+                    "PageNumber": 0,
+                    "X": 0,
+                    "Y": 0
+                  },
+                  "Size": {
+                    "Width": 0,
+                    "Height": 0
+                  }
+                }
+              }
+            ],
+            "PredefinedFieldElements": {
+              "TextFields": [
+                {
+                  "ElementId": "string",
+                  "DocumentNumber": 0,
+                  "Value": "string",
+                  "FieldDefinition": {
+                    "TextFormat": {
+                      "TextColor": "string",
+                      "FontSizeInPt": 0,
+                      "FontName": "string",
+                      "Bold": true,
+                      "Italic": true,
+                      "TextAlign": "Left"
+                    },
+                    "Position": {
+                      "PageNumber": 0,
+                      "X": 0,
+                      "Y": 0
+                    },
+                    "Size": {
+                      "Width": 0,
+                      "Height": 0
+                    }
+                  }
+                }
+              ],
+              "EmailFields": [
+                {
+                  "ElementId": "string",
+                  "DocumentNumber": 0,
+                  "FieldDefinition": {
+                    "TextFormat": {
+                      "TextColor": "string",
+                      "FontSizeInPt": 0,
+                      "FontName": "string",
+                      "Bold": true,
+                      "Italic": true,
+                      "TextAlign": "Left"
+                    },
+                    "Position": {
+                      "PageNumber": 0,
+                      "X": 0,
+                      "Y": 0
+                    },
+                    "Size": {
+                      "Width": 0,
+                      "Height": 0
+                    }
+                  }
+                }
+              ],
+              "InitialsFields": [
+                {
+                  "ElementId": "string",
+                  "DocumentNumber": 0,
+                  "IncludeMiddleNameInitials": true,
+                  "FieldDefinition": {
+                    "TextFormat": {
+                      "TextColor": "string",
+                      "FontSizeInPt": 0,
+                      "FontName": "string",
+                      "Bold": true,
+                      "Italic": true,
+                      "TextAlign": "Left"
+                    },
+                    "Position": {
+                      "PageNumber": 0,
+                      "X": 0,
+                      "Y": 0
+                    },
+                    "Size": {
+                      "Width": 0,
+                      "Height": 0
+                    }
+                  }
+                }
+              ],
+              "GivenNameFields": [
+                {
+                  "ElementId": "string",
+                  "DocumentNumber": 0,
+                  "FieldDefinition": {
+                    "TextFormat": {
+                      "TextColor": "string",
+                      "FontSizeInPt": 0,
+                      "FontName": "string",
+                      "Bold": true,
+                      "Italic": true,
+                      "TextAlign": "Left"
+                    },
+                    "Position": {
+                      "PageNumber": 0,
+                      "X": 0,
+                      "Y": 0
+                    },
+                    "Size": {
+                      "Width": 0,
+                      "Height": 0
+                    }
+                  }
+                }
+              ],
+              "SurnameFields": [
+                {
+                  "ElementId": "string",
+                  "DocumentNumber": 0,
+                  "FieldDefinition": {
+                    "TextFormat": {
+                      "TextColor": "string",
+                      "FontSizeInPt": 0,
+                      "FontName": "string",
+                      "Bold": true,
+                      "Italic": true,
+                      "TextAlign": "Left"
+                    },
+                    "Position": {
+                      "PageNumber": 0,
+                      "X": 0,
+                      "Y": 0
+                    },
+                    "Size": {
+                      "Width": 0,
+                      "Height": 0
+                    }
+                  }
+                }
+              ],
+              "FullNameFields": [
+                {
+                  "ElementId": "string",
+                  "DocumentNumber": 0,
+                  "FieldDefinition": {
+                    "TextFormat": {
+                      "TextColor": "string",
+                      "FontSizeInPt": 0,
+                      "FontName": "string",
+                      "Bold": true,
+                      "Italic": true,
+                      "TextAlign": "Left"
+                    },
+                    "Position": {
+                      "PageNumber": 0,
+                      "X": 0,
+                      "Y": 0
+                    },
+                    "Size": {
+                      "Width": 0,
+                      "Height": 0
+                    }
+                  }
+                }
+              ],
+              "DateFields": [
+                {
+                  "ElementId": "string",
+                  "DocumentNumber": 0,
+                  "DateFormat": "string",
+                  "FieldDefinition": {
+                    "TextFormat": {
+                      "TextColor": "string",
+                      "FontSizeInPt": 0,
+                      "FontName": "string",
+                      "Bold": true,
+                      "Italic": true,
+                      "TextAlign": "Left"
+                    },
+                    "Position": {
+                      "PageNumber": 0,
+                      "X": 0,
+                      "Y": 0
+                    },
+                    "Size": {
+                      "Width": 0,
+                      "Height": 0
+                    }
+                  }
+                }
+              ]
+            },
+            "LinkConfiguration": {
+              "HyperLinks": [
+                {
+                  "ElementId": "string",
+                  "Uri": "string",
+                  "DocumentNumber": 0,
+                  "FieldDefinition": {
+                    "Position": {
+                      "PageNumber": 0,
+                      "X": 0,
+                      "Y": 0
+                    },
+                    "Size": {
+                      "Width": 0,
+                      "Height": 0
+                    }
+                  }
+                }
+              ]
+            },
+            "AreaReadConfirmations": [
+              {
+                "ElementId": "string",
+                "Required": true,
+                "DocumentNumber": 0,
+                "DisplayName": "string",
+                "GuidingOrder": 0,
+                "Definition": {
+                  "Position": {
+                    "PageNumber": 0,
+                    "X": 0,
+                    "Y": 0
+                  },
+                  "Size": {
+                    "Width": 0,
+                    "Height": 0
+                  }
+                }
+              }
+            ],
+            "PageReadConfirmations": [
+              {
+                "ElementId": "string",
+                "Required": true,
+                "DocumentNumber": 0,
+                "DisplayName": "string",
+                "PageNumber": 0,
+                "GuidingOrder": 0
+              }
+            ]
+          },
+          "FinishActionConfiguration": {
+            "SignAnyWhereViewer": {
+              "RedirectUri": "string"
+            },
+            "SignificantClientSignatureCaptureForIos": {
+              "RemoveDocumentFromRecentDocumentList": true,
+              "CallClientActionOnlyAfterSuccessfulSync": true,
+              "CloseApp": true,
+              "RedirectUri": "string"
+            },
+            "SignificantClientSignatureCaptureForAndroid": {
+              "RemoveDocumentFromRecentDocumentList": true,
+              "CallClientActionOnlyAfterSuccessfulSync": true,
+              "CloseApp": true,
+              "RedirectUri": "string"
+            },
+            "SignificantClientSignatureCaptureForWindows": {
+              "RemoveDocumentFromRecentDocumentList": true,
+              "CallClientActionOnlyAfterSuccessfulSync": true,
+              "CloseApp": true,
+              "RedirectUri": "string"
+            },
+            "KioskSdk": {
+              "RedirectUri": "string"
+            }
+          },
+          "SignatureDataConfiguration": {
+            "DisposableCertificate": {
+              "DocumentIssuingCountry": "string",
+              "IdentificationIssuingCountry": "string",
+              "IdentificationType": "None",
+              "PhoneNumber": "string",
+              "DocumentType": "IdentityCard",
+              "DocumentIssuedBy": "string",
+              "DocumentIssuedOn": "2023-03-22",
+              "DocumentExpiryDate": "2023-03-22",
+              "SerialNumber": "string",
+              "DocumentNumber": "string"
+            },
+            "RemoteCertificate": {
+              "UserId": "string",
+              "DeviceId": "string"
+            },
+            "SwissComOnDemand": {
+              "PhoneNumber": "string",
+              "CommonName": "string",
+              "Country": "string",
+              "Locality": "string",
+              "OrganizationUnits": [
+                "string"
+              ],
+              "Organization": "string",
+              "SerialNumber": "string",
+              "StateOrProvince": "string",
+              "Pseudonym": "string"
+            },
+            "SmsOneTimePassword": {
+              "PhoneNumber": "string"
+            },
+            "ATrustCertificate": {
+              "PhoneNumber": "string"
+            },
+            "SwedishBankId": {
+              "PersonalNumber": "string",
+              "AllowAnyPersonalNumber": true
+            },
+            "SignaturePluginData": [
+              {
+                "PluginId": "string",
+                "Fields": [
+                  {
+                    "Key": "string",
+                    "Value": "string"
+                  }
+                ]
+              }
+            ]
+          },
+          "BatchConfiguration": {
+            "Mode": "Basic",
+            "RequireScrollingOverAllSignaturesBeforeSigning": true
+          },
+          "SigningGroup": "string"
         },
-        {
-          "type": "company",
-          "description": "Responsabilità per: la rivalsa INAIL per gli infortuni sul lavoro subiti dai prestatori di lavoro; morte; e lesioni personali dalle quali sia derivata un'invalidità permanente ai sensi del codice civile, incluse le malattie professionali",
-          "companyCodec": "CO",
-          "companyName": "Resp. Civile verso Prestatori di Lavoro",
-          "group": "RCT",
-          "slug": "employers-liability",
-          "isBase": true,
-          "isPremium": true,
-          "sumInsuredLimitOfIndemnity": 1000000,
-          "deductible": "2600",
-          "selfInsurance": "0.10",
-          "selfInsuranceDesc": "10% - minimo € 1500",
-          "tax": 22.25,
-          "priceNett": 63.67,
-          "priceGross": 77.836575
+        "View": {
+          "RecipientConfiguration": {
+            "ContactInformation": {
+              "Email": "string",
+              "GivenName": "string",
+              "Surname": "string",
+              "PhoneNumber": "string",
+              "LanguageCode": "AF"
+            },
+            "PersonalMessage": "string",
+            "AuthenticationConfiguration": {
+              "AccessCode": {
+                "Code": "string"
+              },
+              "SmsOneTimePassword": {
+                "PhoneNumber": "string"
+              },
+              "SwedishBankId": {
+                "PersonalNumber": "string",
+                "AllowAnyPersonalNumber": true
+              },
+              "OAuthAuthentications": [
+                {
+                  "ProviderName": "string",
+                  "Validations": [
+                    {
+                      "FieldReferenceId": "string",
+                      "ExpectedValue": "string"
+                    }
+                  ]
+                }
+              ],
+              "SamlAuthentications": [
+                {
+                  "ProviderName": "string",
+                  "Validations": [
+                    {
+                      "FieldReferenceId": "string",
+                      "ExpectedValue": "string"
+                    }
+                  ]
+                }
+              ]
+            },
+            "SendEmails": true,
+            "AllowAccessAfterFinish": true
+          },
+          "ViewingGroup": "string"
+        },
+        "SignAsP7M": {
+          "RecipientConfiguration": {
+            "ContactInformation": {
+              "Email": "string",
+              "GivenName": "string",
+              "Surname": "string",
+              "PhoneNumber": "string",
+              "LanguageCode": "AF"
+            },
+            "PersonalMessage": "string",
+            "AuthenticationConfiguration": {
+              "AccessCode": {
+                "Code": "string"
+              },
+              "SmsOneTimePassword": {
+                "PhoneNumber": "string"
+              },
+              "SwedishBankId": {
+                "PersonalNumber": "string",
+                "AllowAnyPersonalNumber": true
+              },
+              "OAuthAuthentications": [
+                {
+                  "ProviderName": "string",
+                  "Validations": [
+                    {
+                      "FieldReferenceId": "string",
+                      "ExpectedValue": "string"
+                    }
+                  ]
+                }
+              ],
+              "SamlAuthentications": [
+                {
+                  "ProviderName": "string",
+                  "Validations": [
+                    {
+                      "FieldReferenceId": "string",
+                      "ExpectedValue": "string"
+                    }
+                  ]
+                }
+              ]
+            },
+            "SendEmails": true,
+            "AllowAccessAfterFinish": true,
+            "IncludedEmailAppLinks": {
+              "Android": true,
+              "iOS": true,
+              "Windows": true
+            },
+            "AllowDelegation": true,
+            "RequireViewContentBeforeFormFilling": true
+          },
+          "SignatureMethods": {
+            "LocalCertificate": true,
+            "DisposableCertificate": {
+              "DocumentIssuingCountry": "string",
+              "IdentificationIssuingCountry": "string",
+              "IdentificationType": "None",
+              "PhoneNumber": "string",
+              "DocumentType": "IdentityCard",
+              "DocumentIssuedBy": "string",
+              "DocumentIssuedOn": "2023-03-22",
+              "DocumentExpiryDate": "2023-03-22",
+              "SerialNumber": "string",
+              "DocumentNumber": "string"
+            },
+            "RemoteCertificate": {
+              "UserId": "string",
+              "DeviceId": "string"
+            },
+            "SignaturePluginData": [
+              {
+                "PluginId": "string",
+                "Fields": [
+                  {
+                    "Key": "string",
+                    "Value": "string"
+                  }
+                ]
+              }
+            ]
+          },
+          "SignAsP7MGroup": "string"
         }
-      ]
-    },
-    {
-      "building": {
-        "name": "Wopta",
-        "address": "Galleria del Corso",
-        "streetNumber": "1",
-        "cityCode": "MI",
-        "postalCode": "20122",
-        "city": "Milano",
-        "location": {
-          "lat": 45.4648158,
-          "lng": 9.1949345
-        },
-        "buildingType": "industriale",
-        "buildingMaterial": "reinforcedConcrete",
-        "buildingYear": "before1972",
-        "isAllarm": true,
-        "floor": "ground_floor",
-        "isHolder": true
       },
-      "guarantees": [
+      "VisibilityOptions": [
         {
-          "type": "building",
-          "description": "Prestazioni di assistenza e servizio 24/7 al Fabbricato quali invio di artigiani come: idraulico, elettricista, fabbro, serrandista, vetraio, sorvegliante, nei casi indicati in polizza di necessità (la compagnia eroga direttamente la prestazione non il rimborso delle spese)",
-          "companyCodec": "AS",
-          "companyName": "Assistenza al Fabbricato",
-          "group": "ASSSISTANCE",
-          "slug": "assistance",
-          "isBase": true,
-          "isPremium": true,
-          "tax": 10,
-          "priceNett": 35.76,
-          "priceGross": 39.336
-        },
-        {
-          "dailyAllowance": "250",
-          "type": "building",
-          "typeOfSumInsured": "firstLoss",
-          "description": "Indennizzo per il periodo di documentata inattività forzata, a seguito di un Sinistro avvenuto nel Fabbricato, che abbia danneggiato i locali e/o i Macchinar e/o le Apparecchiature Elettroniche funzionali all’attività",
-          "companyCodec": "BI",
-          "companyName": "Business Interruption",
-          "group": "BUSINESS INTERRUPTTION",
-          "slug": "business-interruption",
-          "isPremium": true,
-          "sumInsuredLimitOfIndemnity": 25000,
-          "deductible": "5days",
-          "tax": 21.25,
-          "priceNett": 84.09,
-          "priceGross": 101.959125
-        },
-        {
-          "type": "building",
-          "typeOfSumInsured": "firstLoss",
-          "description": "Danni materiali e diretti ad apparecchiature elettroniche fisse e ad impiego mobile, causati da qualsiasi evento accidentale",
-          "companyCodec": "EL",
-          "companyName": "Garanzia Apparecchiature Elettroniche",
-          "group": "ELETRONIC",
-          "slug": "electronic-equipment",
-          "isPremium": true,
-          "sumInsuredLimitOfIndemnity": 10000,
-          "deductible": "1000",
-          "tax": 21.25,
-          "priceNett": 204.32,
-          "priceGross": 247.738
-        },
-        {
-          "type": "building",
-          "description": "Danni diretti a Contenuto (Merci, macchinari, attrezzature, arredamento), causati da eventi quali: incendio, esplosione, scoppio, fulmine, conseguenti fumi, gas e vapori",
-          "companyCodec": "IC",
-          "companyName": "Incendio Contenuto",
-          "group": "FIRE",
-          "slug": "content",
-          "isBase": true,
-          "isPremium": true,
-          "sumInsuredLimitOfIndemnity": 50000,
-          "deductible": "1000",
-          "tax": 22.25,
-          "priceNett": 31.43,
-          "priceGross": 38.423175
-        },
-        {
-          "type": "building",
-          "description": "Danni diretti a Fabbricato, causati da eventi quali: incendio, esplosione, scoppio, fulmine, conseguenti fumi, gas e vapori",
-          "companyCodec": "IF",
-          "companyName": "Incendio Fabbricato",
-          "group": "FIRE",
-          "slug": "building",
-          "isBase": true,
-          "isPremium": true,
-          "sumInsuredLimitOfIndemnity": 120000,
-          "deductible": "1000",
-          "tax": 22.25,
-          "priceNett": 60.45,
-          "priceGross": 73.900125
-        },
-        {
-          "type": "building",
-          "typeOfSumInsured": "replacementValue",
-          "description": "Danni da eventi atmosferici quali uragano, bufera, tempesta, grandine, vento e cose trascinate da esso, tromba d’aria, gelo, sovraccarico di neve",
-          "companyCodec": "EA",
-          "companyName": "Eventi Atmosferici",
-          "group": "FIRE",
-          "slug": "atmospheric-event",
-          "isExtension": true,
-          "isPremium": true,
-          "sumInsuredLimitOfIndemnity": 170000,
-          "deductible": "1500",
-          "selfInsurance": "0.10",
-          "selfInsuranceDesc": "10% - minimo € 1500",
-          "tax": 22.25,
-          "priceNett": 40.42,
-          "priceGross": 49.413450000000005
-        },
-        {
-          "type": "building",
-          "typeOfSumInsured": "firstLoss",
-          "description": "Danni da allagamento (eccesso o accumulo d’acqua in luogo normalmente asciutto) verificatosi all'interno del Fabbricato a seguito di formazione di ruscelli o accumulo esterno di acqua",
-          "companyCodec": "AC",
-          "companyName": "Danni d’Acqua",
-          "group": "FIRE",
-          "slug": "burst-pipe",
-          "isExtension": true,
-          "isBase": true,
-          "isPremium": true,
-          "sumInsuredLimitOfIndemnity": 5000,
-          "deductible": "1000",
-          "tax": 22.25,
-          "priceNett": 12.13,
-          "priceGross": 14.828925000000002
-        },
-        {
-          "type": "building",
-          "typeOfSumInsured": "replacementValue",
-          "description": "Danni da terremoto ai beni assicurati compresi quelli di Incendio, Esplosione, Scoppio",
-          "companyCodec": "TR",
-          "companyName": "Terremoto",
-          "group": "FIRE",
-          "slug": "earthquake",
-          "isExtension": true,
-          "isPremium": true,
-          "sumInsuredLimitOfIndemnity": 0.7,
-          "deductible": "1000",
-          "selfInsurance": "0.05",
-          "selfInsuranceDesc": "5% - minimo € 1000",
-          "tax": 22.25,
-          "priceNett": 14.25,
-          "priceGross": 17.420625
-        },
-        {
-          "type": "building",
-          "typeOfSumInsured": "firstLoss",
-          "description": "Spese sostenute per la sostituzione di Lastre e insegne con altre nuove eguali o equivalenti per caratteristiche, compresi i costi di trasporto ed installazione, la cui rottura sia avvenuta per cause Accidentali o imputabili a fatti di terzi.",
-          "companyCodec": "RO",
-          "companyName": "Rottura Lastre",
-          "group": "FIRE",
-          "slug": "glass",
-          "isExtension": true,
-          "isPremium": true,
-          "sumInsuredLimitOfIndemnity": 2500,
-          "deductible": "1000",
-          "tax": 22.25,
-          "priceNett": 21.61,
-          "priceGross": 26.418225
-        },
-        {
-          "type": "building",
-          "typeOfSumInsured": "firstLoss",
-          "description": "Danni materiali e diretti, al Macchinario causati o dovuti a guasti Accidentali meccanici in genere.",
-          "companyCodec": "GGU",
-          "companyName": "Guasti Macchine",
-          "group": "FIRE",
-          "slug": "machinery-breakdown",
-          "isExtension": true,
-          "isPremium": true,
-          "sumInsuredLimitOfIndemnity": 5000,
-          "deductible": "1500",
-          "tax": 22.25,
-          "priceNett": 58.19,
-          "priceGross": 71.137275
-        },
-        {
-          "type": "building",
-          "typeOfSumInsured": "firstLoss",
-          "description": "Danni originati da scariche, correnti, corto circuito ed altri fenomeni elettrici",
-          "companyCodec": "FE",
-          "companyName": "Fenomeno Elettrico",
-          "group": "FIRE",
-          "slug": "power-surge",
-          "isExtension": true,
-          "isPremium": true,
-          "sumInsuredLimitOfIndemnity": 5000,
-          "deductible": "1000",
-          "selfInsurance": "0.10",
-          "selfInsuranceDesc": "10% - minimo € 1000",
-          "tax": 22.25,
-          "priceNett": 66.59,
-          "priceGross": 81.40627500000001
-        },
-        {
-          "type": "building",
-          "description": "Danni da eventi sociopolitici, quali tumulti popolari, scioperi, sommosse, atti vandalici o dolosi e atti di sabotaggio",
-          "companyCodec": "ES",
-          "companyName": "Eventi Sociopolitici",
-          "group": "FIRE",
-          "slug": "sociopolitical-event",
-          "isExtension": true,
-          "isPremium": true,
-          "sumInsuredLimitOfIndemnity": 136000,
-          "deductible": "1000",
-          "selfInsurance": "0.05",
-          "selfInsuranceDesc": "5% - minimo € 1000",
-          "tax": 22.25,
-          "priceNett": 5.01,
-          "priceGross": 6.124725
-        },
-        {
-          "type": "building",
-          "description": "Danni da atti di terrorismo",
-          "companyCodec": "AT",
-          "companyName": "Atti di Terrorismo",
-          "group": "FIRE",
-          "slug": "terrorism",
-          "isExtension": true,
-          "isPremium": true,
-          "sumInsuredLimitOfIndemnity": 0.5,
-          "deductible": "1000",
-          "selfInsurance": "0.05",
-          "selfInsuranceDesc": "5% - minimo € 1000",
-          "tax": 22.25
-        },
-        {
-          "type": "building",
-          "typeOfSumInsured": "replacementValue",
-          "description": "Danni da fuoriuscita di acqua condotta (ingorghi, trabocchi, rotture accedentali), e, se assicurato il fabbricato, ricerca ripristino e riparazione del danno",
-          "companyCodec": "AG",
-          "companyName": "Allagamento",
-          "group": "FIRE",
-          "slug": "water-damage",
-          "isExtension": true,
-          "isPremium": true,
-          "sumInsuredLimitOfIndemnity": 0.7,
-          "deductible": "1000",
-          "selfInsurance": "0.05",
-          "selfInsuranceDesc": "5% - minimo € 1000",
-          "tax": 22.25,
-          "priceNett": 12.41,
-          "priceGross": 15.171225
-        },
-        {
-          "type": "building",
-          "description": "Danni a persone o cose, verificatosi in relazione alla proprietà e conduzione del Fabbricato e delle eventuali parti comuni a esso riferite/collegate",
-          "companyCodec": "RF",
-          "companyName": "RC Fabbricato",
-          "group": "RCF",
-          "slug": "property-owners-liability",
-          "isBase": true,
-          "isPremium": true,
-          "sumInsuredLimitOfIndemnity": 1000000,
-          "deductible": "1000",
-          "tax": 22.25,
-          "priceNett": 101.1,
-          "priceGross": 123.59474999999999
-        },
-        {
-          "type": "building",
-          "typeOfSumInsured": "firstLoss",
-          "description": "Responsabilità per danni materiali e diretti arrecati alle cose di terzi in seguito a Incendio, Esplosione o Scoppio del Fabbricato e/o Contenuto, qualora assicurati, anche quando il Fabbricato lo è nella forma di Rischio Locativo",
-          "companyCodec": "RT",
-          "companyName": "Ricorso Terzi da Incendio",
-          "group": "RT",
-          "slug": "third-party-recourse",
-          "isBase": true,
-          "isPremium": true,
-          "sumInsuredLimitOfIndemnity": 150000,
-          "deductible": "1000",
-          "selfInsurance": "0.10",
-          "selfInsuranceDesc": "10% - minimo € 1000",
-          "tax": 22.25,
-          "priceNett": 91.44,
-          "priceGross": 111.7854
-        },
-        {
-          "type": "building",
-          "typeOfSumInsured": "firstLoss",
-          "description": "Danni subiti da furto, rapina o estorsione, inclusi i guasti e gli atti vandalici commessi dai ladri",
-          "companyCodec": "FU",
-          "companyName": "Garanzia Furto, Rapina ed Estorsione",
-          "group": "THEFT",
-          "slug": "theft",
-          "isPremium": true,
-          "sumInsuredLimitOfIndemnity": 5000,
-          "deductible": "1000",
-          "selfInsuranceDesc": "10% - minimo € 1000",
-          "tax": 22.25,
-          "priceNett": 54.7,
-          "priceGross": 66.87075
+          "DocumentNumber": 0,
+          "IsHidden": true
         }
       ]
     }
   ],
-  "Data": ""
+  "EmailConfiguration": {
+    "Subject": "string",
+    "Message": "string",
+    "SenderDisplayName": "string"
+  },
+  "ReminderConfiguration": {
+    "Enabled": true,
+    "FirstReminderInDays": 0,
+    "ReminderResendIntervalInDays": 0,
+    "BeforeExpirationInDays": 0
+  },
+  "ExpirationConfiguration": {
+    "ExpirationInSecondsAfterSending": 0,
+    "ExpirationDate": "2023-03-22T12:47:52.589Z"
+  },
+  "CallbackConfiguration": {
+    "CallbackUrl": "string",
+    "StatusUpdateCallbackUrl": "string",
+    "ActivityActionCallbackConfiguration": {
+      "Url": "string",
+      "ActionCallbackSelection": {
+        "ConfirmTransactionCode": true,
+        "AgreementAccepted": true,
+        "AgreementRejected": true,
+        "PrepareAuthenticationSuccess": true,
+        "AuthenticationFailed": true,
+        "AuthenticationSuccess": true,
+        "AuditTrailRequested": true,
+        "AuditTrailXmlRequested": true,
+        "CalledPage": true,
+        "DocumentDownloaded": true,
+        "FlattenedDocumentDownloaded": true,
+        "AddedAnnotation": true,
+        "AddedAttachment": true,
+        "AppendedDocument": true,
+        "FormsFilled": true,
+        "ConfirmReading": true,
+        "SendTransactionCode": true,
+        "PrepareSignWorkstepDocument": true,
+        "SignWorkstepDocument": true,
+        "UndoAction": true,
+        "WorkstepCreated": true,
+        "WorkstepFinished": true,
+        "WorkstepRejected": true,
+        "DisablePolicyAndValidityChecks": true,
+        "EnablePolicyAndValidityChecks": true,
+        "AppendFileToWorkstep": true,
+        "AppendTasksToWorkstep": true,
+        "SetOptionalDocumentState": true,
+        "PreparePayloadForBatch": true
+      }
+    }
+  },
+  "AgreementConfiguration": {
+    "Translations": [
+      {
+        "LanguageCode": "AF",
+        "Text": "string",
+        "Header": "string",
+        "IsDefault": true
+      }
+    ]
+  }
 }

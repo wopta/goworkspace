@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"time"
 
-	"cloud.google.com/go/civil"
 	lib "github.com/wopta/goworkspace/lib"
 	mail "github.com/wopta/goworkspace/mail"
 	models "github.com/wopta/goworkspace/models"
@@ -16,7 +15,10 @@ import (
 func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println("Proposal")
 	log.Println("--------------------------Proposal-------------------------------------------")
-	var policy models.Policy
+	var (
+		policy  models.Policy
+		useruid string
+	)
 	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
 	e := json.Unmarshal([]byte(req), &policy)
 	j, e := policy.Marshal()
@@ -31,17 +33,21 @@ func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	policy.IsSign = false
 	policy.IsPay = false
 	policy.Updated = time.Now()
+	docsnap := lib.WhereFirestore("users", "fiscalCode", "==", policy.Contractor.FiscalCode)
+	user, _ := models.FirestoreDocumentToUser(docsnap)
+
+	if len(user.Uid) == 0 {
+		ref2, _ := lib.PutFirestore("users", policy.Contractor)
+		log.Println("Proposal User uid", ref2)
+		useruid = ref2.ID
+	} else {
+		useruid = user.Uid
+	}
+	log.Println("Proposal User uid ", useruid)
+	policy.Contractor.Uid = useruid
 	log.Println("Proposal save")
 	ref, _ := lib.PutFirestore("policy", policy)
-	ref2, _ := lib.PutFirestore("users", policy.Contractor)
-	log.Println("Proposal User uid", ref2)
-	policy.BigStartDate = civil.DateTimeOf(policy.StartDate)
-	policy.BigEndDate = civil.DateTimeOf(policy.EndDate)
-
-	policy.BigEmitDate = civil.DateTimeOf(policy.Updated)
-	policyJson, e := policy.Marshal()
-	policy.Data = string(policyJson)
-	e = lib.InsertRowsBigQuery("wopta", "policy", policy)
+	policy.BigquerySave()
 	log.Println(ref.ID + " Proposal sand mail")
 	mail.SendMail(getProposalMailObj(policy))
 	log.Println("Proposal ", ref.ID)

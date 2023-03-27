@@ -105,7 +105,7 @@ func prepareEnvelopV6(id string) <-chan string {
 			//lib.CheckError(e)
 			r <- string(body)
 
-			log.Println("body prepareEnvelopV6:", string(body))
+			//log.Println("body prepareEnvelopV6:", string(body))
 		}
 	}()
 	return r
@@ -234,8 +234,7 @@ func GetFileV6(id string, uid string) chan string {
 			body, _ := ioutil.ReadAll(res.Body)
 			defer res.Body.Close()
 			//log.Println("Get body: ", string(body))
-			lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "contracts/"+uid, body)
-
+			lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "contracts/"+uid+".pdf", body)
 			r <- "upload done"
 
 		}
@@ -358,7 +357,7 @@ func getSendV6(id string, data model.Policy, prepare string) string {
 			"Policy": "None",
 			"Allow": true,
 			"IframeWhitelisting": [
-			  "dev.wopta.it"
+			  "dev.wopta.it", "wopta.it"
 			]
 		  },
 		"ReminderConfiguration": {

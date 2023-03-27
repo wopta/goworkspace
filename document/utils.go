@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/dustin/go-humanize"
 	"github.com/johnfercher/maroto/pkg/color"
 	"github.com/johnfercher/maroto/pkg/consts"
 	"github.com/johnfercher/maroto/pkg/pdf"
@@ -28,7 +29,7 @@ func (s Skin) lenToHeight(w string) float64 {
 
 func (s Skin) initDefault() pdf.Maroto {
 	m := pdf.NewMaroto(consts.Portrait, consts.A4)
-	log.Println("initDefault()")
+
 	m.SetPageMargins(10, 15, 10)
 	m.SetBackgroundColor(color.NewWhite())
 
@@ -174,7 +175,7 @@ func (s Skin) checkPage(m pdf.Maroto) {
 	_, sizeh := m.GetPageSize()
 
 	if current > (sizeh * 0.61) {
-		log.Println("Contrat add page")
+
 		m.AddPage()
 		s.Space(m, 10.0)
 
@@ -185,7 +186,7 @@ func (s Skin) checkPagePerc(m pdf.Maroto, perc float64) {
 	_, sizeh := m.GetPageSize()
 
 	if current > (sizeh * perc) {
-		log.Println("Contrat add page")
+
 		m.AddPage()
 		s.Space(m, 10.0)
 
@@ -193,7 +194,7 @@ func (s Skin) checkPagePerc(m pdf.Maroto, perc float64) {
 }
 func (s Skin) checkPageNext(m pdf.Maroto, next string) {
 	len := len(next)
-	log.Println(len)
+
 	var perc float64
 	perc = 0.90
 	if len > 300 {
@@ -212,7 +213,7 @@ func (s Skin) checkPageNext(m pdf.Maroto, next string) {
 	_, sizeh := m.GetPageSize()
 
 	if current > (sizeh * perc) {
-		log.Println("Contrat add page")
+
 		m.AddPage()
 		s.Space(m, 10.0)
 
@@ -224,7 +225,7 @@ func (s Skin) checkIfAddPage(m pdf.Maroto, perc float64) {
 	_, sizeh := m.GetPageSize()
 
 	if current > (sizeh * perc) {
-		log.Println("Contrat add page")
+
 		m.AddPage()
 		s.Space(m, 10.0)
 
@@ -240,7 +241,97 @@ func ExistGuarance(list []models.Guarante, find string) bool {
 
 	return res
 }
-func (s Skin) Save(m pdf.Maroto, data models.Policy) string {
+func ExistAsset(list []models.Asset, find string) bool {
+	var res bool
+	for _, a := range list {
+		for _, g := range a.Guarantees {
+			if g.Slug == find {
+				return true
+			}
+		}
+	}
+
+	return res
+}
+func GetSumIndenity(list []models.Asset, find string) string {
+	var (
+		found bool
+		res   string
+	)
+
+	for _, a := range list {
+		for _, g := range a.Guarantees {
+			if g.Slug == find {
+				found = true
+				res = "€ " + humanize.FormatInteger("#.###,", int(g.SumInsuredLimitOfIndemnity))
+			}
+		}
+	}
+	if !found {
+		res = "= ="
+	}
+	return res
+}
+func GetPrice(list []models.Asset, find ...string) string {
+	var (
+		found bool
+		res   string
+		sum   float64
+	)
+	for _, f := range find {
+		for _, a := range list {
+			for _, g := range a.Guarantees {
+				if g.Slug == f {
+					found = true
+					sum = sum + g.PriceGross
+				}
+			}
+		}
+	}
+	if !found {
+		res = "= ="
+	} else {
+		res = "€ " + humanize.FormatFloat("#.###,##", sum)
+	}
+	return res
+}
+func GetGuarante(list []models.Asset, find string) models.Guarante {
+	var (
+		res models.Guarante
+	)
+
+	for _, a := range list {
+		for _, g := range a.Guarantees {
+			if g.Slug == find {
+				log.Println(g.LegalDefence)
+
+				res = g
+			}
+		}
+	}
+
+	return res
+}
+func GetEnterprise(list []models.Asset) *models.Enterprise {
+	var (
+		found bool
+		res   *models.Enterprise
+	)
+
+	for _, a := range list {
+		if a.Enterprise != nil {
+			found = true
+			res = a.Enterprise
+		}
+
+	}
+
+	if !found {
+		res = nil
+	}
+	return res
+}
+func Save(m pdf.Maroto, data models.Policy) (string, []byte) {
 	//-----------Save file
 	var filename string
 	if os.Getenv("env") == "local" {
@@ -252,12 +343,17 @@ func (s Skin) Save(m pdf.Maroto, data models.Policy) string {
 		now := time.Now()
 		timestamp := strconv.FormatInt(now.Unix(), 10)
 		filename = "temp/" + data.Contractor.Name + "_" + data.Contractor.Surname + "_" + timestamp + "_contract.pdf"
-		lib.PutToStorage("function-data", filename, out.Bytes())
+		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, out.Bytes())
 		lib.CheckError(err)
-
-		data.DocumentName = filename
-
+		return filename, out.Bytes()
 	}
-	log.Println(data.Uid + " ContractObj end")
-	return filename
+
+	return filename, nil
+}
+func IfString(str bool, t string, f string) string {
+	res := f
+	if str {
+		res = t
+	}
+	return res
 }

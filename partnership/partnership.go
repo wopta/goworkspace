@@ -1,6 +1,7 @@
 package partnership
 
 import (
+	b64 "encoding/base64"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -37,9 +38,9 @@ func Partnership(w http.ResponseWriter, r *http.Request) {
 
 func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		policy models.Policy
-		person models.User
-		asset  models.Asset
+		policy   models.Policy
+		person   models.User
+		asset    models.Asset
 		response PartnershipResponse
 	)
 	resp.Header().Set("Access-Control-Allow-Methods", "GET")
@@ -51,21 +52,31 @@ func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, inter
 	// useful if you use multiple keys for your application.  The standard is to use 'kid' in the
 	// head of the token to identify which key to use, but the parsed token (head and claims) is provided
 	// to the callback, providing flexibility.
-	token, err := jwt.ParseWithClaims(jwtData, &BeProfClaims{}, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(jwtData, &BeprofClaims{}, func(token *jwt.Token) (interface{}, error) {
 		// Don't forget to validate the alg is what you expect:
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
 
-		return []byte(os.Getenv("BEPROF_SIGNING_KEY")), nil
+		key, e := b64.StdEncoding.DecodeString(os.Getenv("BEPROF_SIGNING_KEY"))
+
+		return []byte(key), e
 	})
 
-	if claims, ok := token.Claims.(*BeProfClaims); ok && token.Valid {
-		person.Name = claims.Name
-		person.Surname = claims.Surname
-		person.Mail = claims.Mail
-		person.FiscalCode = claims.FiscalCode
-		person.BirthDate = extractBirthdateFromItalianFiscalCode(claims.FiscalCode).Format(time.RFC3339)
+	if claims, ok := token.Claims.(*BeprofClaims); ok && token.Valid {
+		person.Name = claims.UserFirstname
+		person.Surname = claims.UserLastname
+		person.Mail = claims.UserEmail
+		person.FiscalCode = claims.UserFiscalcode
+		person.BirthDate = extractBirthdateFromItalianFiscalCode(claims.UserFiscalcode).Format(time.RFC3339)
+		person.Phone = claims.UserMobile
+		person.Address = claims.UserAddress
+		person.PostalCode = claims.UserPostalcode
+		person.City = claims.UserCity
+		person.CityCode = claims.UserMunicipalityCode
+		person.Work = claims.UserEmploymentSector
+		person.VatCode = claims.UserPiva
+
 		policy.Contractor = person
 		asset.Person = &person
 		policy.Assets = append(policy.Assets, asset)
@@ -74,7 +85,7 @@ func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, inter
 		response.Step = 1
 	} else {
 		fmt.Println(err)
-		return "", nil, err
+		return "{}", nil, nil
 	}
 
 	// verify if this user has already a policy from beprof
@@ -104,7 +115,7 @@ func extractBirthdateFromItalianFiscalCode(fiscalCode string) time.Time {
 		day -= 40
 	}
 
-	if year < time.Now().Year() - 2000 {
+	if year < time.Now().Year()-2000 {
 		year += 2000
 	} else {
 		year += 1900
@@ -133,13 +144,23 @@ func getMonth(monthCode string) int {
 	return monthMap[strings.ToUpper(monthCode)]
 }
 
-type BeProfClaims struct {
-	Name       string `json:"nome"`
-	Surname    string `json:"cognome"`
-	Mail       string `json:"email"`
-	FiscalCode string `json:"codiceFiscale"`
-	VatCode    string `json:"piva"`
-	BeProfCode string `json:"codiceBeProf"`
+type BeprofClaims struct {
+	UserBeprofid         int    `json:"user.beprofid"`
+	UserFirstname        string `json:"user.firstname"`
+	UserLastname         string `json:"user.lastname"`
+	UserEmail            string `json:"user.email"`
+	UserMobile           string `json:"user.mobile"`
+	UserFiscalcode       string `json:"user.fiscalcode"`
+	UserPiva             string `json:"user.piva"`
+	UserProvince         string `json:"user.province"`
+	UserCity             string `json:"user.city"`
+	UserPostalcode       string `json:"user.postalcode"`
+	UserAddress          string `json:"user.address"`
+	UserMunicipalityCode string `json:"user.municipality_code"`
+	UserEmploymentSector string `json:"user.employment_sector"`
+	ProductCode          string `json:"product.code"`
+	ProductPurchaseid    string `json:"product.purchaseid"`
+	Price                string `json:"price"`
 	jwt.RegisteredClaims
 }
 

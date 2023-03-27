@@ -26,11 +26,11 @@ func Document(w http.ResponseWriter, r *http.Request) {
 	route := lib.RouteData{
 		Routes: []lib.Route{{
 			Route:   "/v1/proposal",
-			Handler: Contract,
+			Handler: ContractFx,
 		},
 			{
 				Route:   "/v1/contract",
-				Handler: Contract,
+				Handler: ContractFx,
 				Method:  "POST",
 			},
 			{

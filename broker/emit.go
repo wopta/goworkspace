@@ -47,11 +47,7 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	if policy.Statements == nil {
 		policy.Statements = result.Statements
 	}
-	p := <-doc.ContractObj(policy)
 
-	policy.DocumentName = p.LinkGcs
-	_, res, _ := doc.NamirialOtpV6(policy)
-	policy.ContractFileId = res.FileId
 	company, numb, tot := GetSequenceByCompany(policy.Company)
 	log.Println("Emit code "+uid+" ", company)
 	log.Println("Emit code "+uid+" ", numb)
@@ -59,6 +55,11 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	policy.Number = tot
 	policy.NumberCompany = numb
 	policy.CodeCompany = company
+	p := <-doc.ContractObj(policy)
+
+	policy.DocumentName = p.LinkGcs
+	_, res, _ := doc.NamirialOtpV6(policy)
+	policy.ContractFileId = res.FileId
 	policy.IdSign = res.EnvelopeId
 	var payRes pay.FabrickPaymentResponse
 	if policy.PaymentSplit == string(models.PaySplitYear) {
@@ -73,9 +74,7 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	policyJson, e := policy.Marshal()
 	log.Println("Emit policy "+uid, string(policyJson))
 	lib.SetFirestore("policy", uid, policy)
-	policy.Data = string(policyJson)
-	log.Println("Emit policy save big query: " + uid)
-	e = lib.InsertRowsBigQuery("wopta", "policy", policy)
+	policy.BigquerySave()
 	mail.SendMailSign(policy)
 	b, e := json.Marshal(responseEmit)
 	return string(b), responseEmit, e

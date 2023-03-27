@@ -20,20 +20,27 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 	var response string
 	var e error
 	var fabrickCallback FabrickCallback
+	uid := r.URL.Query().Get("uid")
+	schedule := r.URL.Query().Get("schedule")
 	request := lib.ErrorByte(ioutil.ReadAll(r.Body))
 	log.Println(string(request))
 	log.Println(string(r.RequestURI))
 	json.Unmarshal([]byte(request), &fabrickCallback)
 	// Unmarshal or Decode the JSON to the interface.
 	if fabrickCallback.Bill.Status == "PAID" {
-		ext := strings.Split(fabrickCallback.ExternalID, "_")
-		uid := ext[0]
-		schedule := ext[1]
+		if uid == "" {
+			ext := strings.Split(fabrickCallback.ExternalID, "_")
+			uid = ext[0]
+			schedule = ext[1]
+		}
+
 		log.Println(uid)
 		log.Println(schedule)
 		policyF := lib.GetFirestore("policy", uid)
 		var policy models.Policy
-		policyF.DataTo(policy)
+		policyF.DataTo(&policy)
+		policyM, _ := policy.Marshal()
+		log.Println(uid+" payment ", string(policyM))
 		if !policy.IsPay && policy.Status == models.PolicyStatusToPay {
 			policy.IsPay = true
 			policy.Updated = time.Now()
@@ -41,14 +48,15 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 			policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusPay)
 			//policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusToPay)
 			lib.SetFirestore("policy", uid, policy)
+			policy.BigquerySave()
 			q := lib.Firequeries{
 				Queries: []lib.Firequery{{
-					Field:      "uid",
+					Field:      "policyUid",
 					Operator:   "==",
 					QueryValue: uid,
 				},
 					{
-						Field:      "schedule",
+						Field:      "scheduleDate",
 						Operator:   "==",
 						QueryValue: schedule,
 					},
@@ -57,18 +65,18 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 			query := q.FirestoreWherefields("transactions")
 			transactions := models.TransactionToListData(query)
 			transaction := transactions[0]
+			tr, _ := json.Marshal(transaction)
+			log.Println(uid+" payment ", string(tr))
 			transaction.IsPay = true
 			transaction.Status = models.TransactionStatusPay
 			transaction.StatusHistory = append(transaction.StatusHistory, models.TransactionStatusPay)
 			lib.SetFirestore("transactions", transaction.Uid, transaction)
 			e = lib.InsertRowsBigQuery("wopta", "transactions-day", transaction)
-
+			log.Println(uid + " payment sendMail ")
 			var contractbyte []byte
-			contractbyte, e = lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "contracts/"+policy.Uid)
-			mail.SendMail(getPayMailObj(policy, policy.PayUrl, base64.StdEncoding.EncodeToString([]byte(contractbyte))))
-
-			//log.Println(token)
-			log.Println(q)
+			name := policy.Uid + ".pdf"
+			contractbyte, e = lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "contracts/"+name)
+			mail.SendMail(getPayMailObj(policy, policy.PayUrl, name, base64.StdEncoding.EncodeToString(contractbyte)))
 			response = `{
 			"result": true,
 			"requestPayload": ` + string(request) + `,
@@ -132,7 +140,7 @@ type Transaction struct {
 	PaymentMethod       *string     `json:"paymentMethod,omitempty"`
 }
 
-func getPayMailObj(policy models.Policy, payUrl string, at string) mail.MailRequest {
+func getPayMailObj(policy models.Policy, payUrl string, namefile string, at string) mail.MailRequest {
 	var name string
 	//var linkForm string
 	if policy.Name == "pmi" {
@@ -156,14 +164,8 @@ func getPayMailObj(policy models.Policy, payUrl string, at string) mail.MailRequ
 	obj.Attachments = &[]mail.Attachment{{
 		Byte:        at,
 		ContentType: "application/pdf",
+		Name:        namefile,
 	}}
 
 	return obj
 }
-
-/*Gentile Nome Cognome,
-
-in allegato trovi i documenti da te firmati tramite l’utilizzo della Firma Elettronica Avanzata e l’intera documentazione relativa alla polizza in oggetto.
-A conferma del pagamento ricevuto da Wopta, ti invieremo una mail.
-Qualora non avessi ancora provveduto, affrettati, in quanto il pagamento è essenziale per l’attivazione della copertura
-ll Team Wopta*/

@@ -1,10 +1,13 @@
 package product
 
 import (
-	"io/ioutil"
+	"encoding/json"
+	"io"
 	"log"
 	"net/http"
+	"regexp"
 	"strings"
+	"time"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	lib "github.com/wopta/goworkspace/lib"
@@ -49,7 +52,7 @@ const (
 	productCollection = "products"
 )
 
-func GetNameFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func GetNameFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	name := r.Header.Get("name")
 	v := strings.Split(r.RequestURI, "/")
 	version := v[1]
@@ -58,9 +61,26 @@ func GetNameFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, 
 	log.Println(v[1])
 	product, e := GetName(name, version)
 	jsonString, e := product.Marshal()
-	return string(jsonString), product, e
-
+	out := string(jsonString)
+	if name == "persona" {
+		replaceDatesForPersonaProduct(&out, &product)
+	}
+	return out, product, e
 }
+
+func replaceDatesForPersonaProduct(productJson *string, product *models.Product) {
+	initialDate := time.Now().AddDate(-18, 0, 0).Format("2006-01-02")
+	minDate := time.Now().AddDate(-75, 0, 1).Format("2006-01-02")
+
+	regexInitialDate := regexp.MustCompile("{{INITIAL_DATE}}")
+	regexMinDate := regexp.MustCompile("{{MIN_DATE}}")
+
+	*productJson = regexInitialDate.ReplaceAllString(*productJson, initialDate)
+	*productJson = regexMinDate.ReplaceAllString(*productJson, minDate)
+
+	json.Unmarshal([]byte(*productJson), product)
+}
+
 func GetName(name string, version string) (models.Product, error) {
 	q := lib.Firequeries{
 		Queries: []lib.Firequery{{
@@ -84,7 +104,7 @@ func GetName(name string, version string) (models.Product, error) {
 
 func PutFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println(productCollection)
-	request := lib.ErrorByte(ioutil.ReadAll(r.Body))
+	request := lib.ErrorByte(io.ReadAll(r.Body))
 	pr, e := models.UnmarshalProduct([]byte(request))
 	p, e := Put(pr)
 	return "{}", p, e

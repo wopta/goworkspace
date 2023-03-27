@@ -258,25 +258,13 @@ func (s Skin) Sign(m pdf.Maroto, name string, label string, id string, isTag boo
 
 	prop := props.Text{
 
-		Top:    5,
+		Top:    6,
 		Size:   6,
 		Style:  consts.Normal,
 		Align:  consts.Center,
 		Color:  color.NewBlack(),
 		Family: consts.Arial,
 	}
-	m.Row(4, func() {
-		m.Col(6, func() {
-
-		})
-		m.Col(6, func() {
-			if isTag {
-				m.Text("[[!sigField"+id+":signer1:signature(sigType=\"Click2Sign\"):label(\"firma qui\"):size(width=150,height=60)]]", prop)
-			}
-
-		})
-
-	})
 
 	m.Row(12, func() {
 		m.Col(4, func() {
@@ -293,6 +281,18 @@ func (s Skin) Sign(m pdf.Maroto, name string, label string, id string, isTag boo
 				Family: consts.Courier,
 				Color:  s.TextColor,
 			})
+		})
+
+	})
+	m.Row(4, func() {
+		m.Col(6, func() {
+
+		})
+		m.Col(6, func() {
+			if isTag {
+				m.Text("[[!sigField"+id+":signer1:signature(sigType=\"Click2Sign\"):label(\"firma qui\"):size(width=150,height=60)]]", prop)
+			}
+
 		})
 
 	})

@@ -11,3 +11,4 @@ sa_key_frontend.json
 function-data/
 .idea
 .DS_Store
+*.code-workspace
