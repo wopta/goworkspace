@@ -2,6 +2,7 @@ package rules
 
 import (
 	"encoding/json"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -17,24 +18,24 @@ import (
 
 func PersonSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		policy     models.Policy
-		groule     []byte
-		e          error
-		questions  []*Statement
+		policy    models.Policy
+		groule    []byte
+		e         error
+		questions []*Statement
 	)
 	const (
 		rulesFileName = "person_survey.json"
 	)
 
 	log.Println("Person Survey")
-	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
+	req := lib.ErrorByte(io.ReadAll(r.Body))
 	policy, e = models.UnmarshalPolicy(req)
 	lib.CheckError(e)
-	statements := &Statements{Questions: questions}
+	statements := &Statements{Statements: questions}
 
 	switch os.Getenv("env") {
 	case "local":
-		groule = lib.ErrorByte(ioutil.ReadFile("../function-data/grules/" + rulesFileName))
+		groule = lib.ErrorByte(ioutil.ReadFile("../function-data/dev/grules/" + rulesFileName))
 	case "dev":
 		groule = lib.GetFromStorage("function-data", "grules/"+rulesFileName, "")
 	case "prod":
@@ -86,10 +87,28 @@ func PersonSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	return string(b), statements, nil
 }
 
-type FxSurvey struct {}
+type FxSurvey struct{}
 
-func (fx *FxSurvey) AppendStatement(statements []*Statement, title string, question string) []*Statement {
+/*func (fx *FxSurvey) AppendStatement(statements []*Statement, title string, question string) []*Statement {
 	return append(statements, &Statement{Title: title, Question: question})
+}*/
+
+func (fx *FxSurvey) AppendStatement(statements []*Statement, title string, hasMultipleAnswers bool, answer bool) []*Statement {
+	return append(statements, &Statement{
+		Title:              title,
+		HasMultipleAnswers: hasMultipleAnswers,
+		Questions:          make([]*Question, 0),
+		Answer:             &answer,
+	})
+}
+
+func (fx *FxSurvey) AppendQuestion(questions []*Question, title string, isBold bool, indent bool, answer bool) []*Question {
+	return append(questions, &Question{
+		Title:  title,
+		IsBold: isBold,
+		Indent: indent,
+		Answer: &answer,
+	})
 }
 
 func (fx *FxSurvey) HasGuaranteePolicy(policy models.Policy, guaranteeName string) bool {
@@ -111,13 +130,21 @@ func (fx *FxSurvey) GetGuaranteeIndex(policy models.Policy, guaranteeName string
 }
 
 type Statements struct {
-	Questions []*Statement `json:"statements"`
+	Statements []*Statement `json:"statements"`
 }
 
 type Statement struct {
-	Title    string `json:"title"`
-	Question string `json:"question"`
-	Answer   *bool  `json:"answer"`
+	Title              string      `json:"title"`
+	HasMultipleAnswers bool        `json:"hasMultipleAnswers"`
+	Questions          []*Question `json:"questions"`
+	Answer             *bool       `json:"answer,omitempty"`
+}
+
+type Question struct {
+	Title  string `json:"title"`
+	IsBold bool   `json:"isBold"`
+	Indent bool   `json:"indent"`
+	Answer *bool  `json:"answer,omitempty"`
 }
 
 func getCoerenceData() string {
@@ -150,4 +177,3 @@ func getCoerenceData() string {
 		"LL": "in caso di malattia, infine, consente di disporre di un capitale, a integrazione del reddito, qualora all'Assicurato derivi dalla malattia stessa una riduzione della capacità lavorativa (invalidità permanente) oltre il 24%"
 	}`
 }
-
