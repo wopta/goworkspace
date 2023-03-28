@@ -35,3 +35,14 @@ func CreateUserWithEmailAndPassword(email string, password string, id *string) (
 	}
 	return u, err
 }
+
+func GetUserIdFromIdToken(idToken string) (string, error) {
+	client, ctx := getClient()
+
+	token, err := client.VerifyIDToken(ctx, idToken)
+	if err != nil {
+		return "", err
+	}
+
+	return token.Claims["user_id"].(string), err
+}
