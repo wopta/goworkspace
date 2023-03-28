@@ -79,10 +79,7 @@ func replaceDatesForPersonaProduct(productJson *string, product *models.Product)
 	*productJson = regexMinDate.ReplaceAllString(*productJson, minDate)
 
 	err := json.Unmarshal([]byte(*productJson), product)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 func GetName(name string, version string) (models.Product, error) {
