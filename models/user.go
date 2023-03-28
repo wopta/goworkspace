@@ -52,6 +52,8 @@ type User struct {
 	Claims        *[]Claim   `firestore:"claims" json:"claims,omitempty"`
 	Consens       *[]Consens `firestore:"consens" json:"consens,omitempty"`
 	IsAgent       bool       `firestore:"isAgent ,omitempty" json:"isAgent ,omitempty" bigquery:"isEmit"`
+	Height        int        `firestore:"height" json:"height" bigquery:"height"`
+	Weight        int        `firestore:"weight" json:"weight" bigquery:"weight"`
 }
 type Consens struct {
 	Title   string `firestore:"title ,omitempty" json:"title,omitempty"`

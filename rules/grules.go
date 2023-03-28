@@ -175,8 +175,8 @@ func (p *Fx) Log(any interface{}) {
 
 }
 
-func (p *Fx) FormatString(stringToFormat string, params ...string) string {
-	return fmt.Sprintf(stringToFormat, params)
+func (p *Fx) FormatString(stringToFormat string, params ...interface{}) string {
+	return fmt.Sprintf(stringToFormat, params...)
 }
 
 func (p *Fx) AppendString(aString, subString string) string {

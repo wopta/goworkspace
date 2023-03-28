@@ -2,46 +2,47 @@ package rules
 
 import (
 	"encoding/json"
-	"io/ioutil"
-	"log"
-	"net/http"
-	"os"
-
 	"github.com/hyperjumptech/grule-rule-engine/ast"
 	"github.com/hyperjumptech/grule-rule-engine/builder"
 	"github.com/hyperjumptech/grule-rule-engine/engine"
 	"github.com/hyperjumptech/grule-rule-engine/pkg"
-	lib "github.com/wopta/goworkspace/lib"
-	models "github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
+	"io"
+	"log"
+	"net/http"
+	"os"
 )
 
 func PersonSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		policy     models.Policy
-		groule     []byte
-		e          error
-		questions  []*Statement
+		policy    models.Policy
+		groule    []byte
+		e         error
+		questions []*Statement
 	)
 	const (
 		rulesFileName = "person_survey.json"
 	)
 
 	log.Println("Person Survey")
-	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
+	req := lib.ErrorByte(io.ReadAll(r.Body))
 	policy, e = models.UnmarshalPolicy(req)
 	lib.CheckError(e)
-	statements := &Statements{Questions: questions}
+
+	statements := &Statements{Statements: questions}
+	dynamicTitle := &DynamicTitle{Text: ""}
 
 	switch os.Getenv("env") {
 	case "local":
-		groule = lib.ErrorByte(ioutil.ReadFile("../function-data/grules/" + rulesFileName))
+		groule = lib.ErrorByte(os.ReadFile("../function-data/dev/grules/" + rulesFileName))
 	case "dev":
 		groule = lib.GetFromStorage("function-data", "grules/"+rulesFileName, "")
 	case "prod":
 		groule = lib.GetFromStorage("core-350507-function-data", "grules/"+rulesFileName, "")
 	}
 
-	fx := &lib.Fx{}
+	fx := &Fx{}
 	fxSurvey := &FxSurvey{}
 	// create new instance of DataContext
 	dataContext := ast.NewDataContext()
@@ -49,12 +50,16 @@ func PersonSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	err := dataContext.Add("in", policy)
 	log.Println("RulesFromJson in")
 	lib.CheckError(err)
-	err = dataContext.Add("out", statements)
 
+	err = dataContext.Add("title", dynamicTitle)
+	log.Println("RulesFromJson title")
+	lib.CheckError(err)
+
+	err = dataContext.Add("out", statements)
 	log.Println("RulesFromJson out")
 	lib.CheckError(err)
 
-	err = dataContext.AddJSON("data", []byte(getCoerenceData()))
+	err = dataContext.AddJSON("data", []byte(getCoherenceData()))
 	log.Println("RulesFromJson data loaded")
 	lib.CheckError(err)
 
@@ -86,10 +91,58 @@ func PersonSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	return string(b), statements, nil
 }
 
-type FxSurvey struct {}
+type Statements struct {
+	Statements []*Statement `json:"statements"`
+}
 
-func (fx *FxSurvey) AppendStatement(statements []*Statement, title string, question string) []*Statement {
-	return append(statements, &Statement{Title: title, Question: question})
+type Statement struct {
+	Title              string      `json:"title"`
+	HasMultipleAnswers *bool       `json:"hasMultipleAnswers,omitempty"`
+	Questions          []*Question `json:"questions"`
+	Answer             *bool       `json:"answer,omitempty"`
+}
+
+type Question struct {
+	Question string `json:"question"`
+	IsBold   bool   `json:"isBold"`
+	Indent   bool   `json:"indent"`
+	Answer   *bool  `json:"answer,omitempty"`
+}
+
+type DynamicTitle struct {
+	Text string
+}
+
+type FxSurvey struct{}
+
+func (fx *FxSurvey) AppendStatement(statements []*Statement, title string, hasMultipleAnswers bool, answer bool) []*Statement {
+	statement := &Statement{
+		Title:              title,
+		HasMultipleAnswers: nil,
+		Questions:          make([]*Question, 0),
+		Answer:             nil,
+	}
+	if answer {
+		statement.Answer = &answer
+	}
+	if hasMultipleAnswers {
+		statement.HasMultipleAnswers = &hasMultipleAnswers
+	}
+
+	return append(statements, statement)
+}
+
+func (fx *FxSurvey) AppendQuestion(questions []*Question, text string, isBold bool, indent bool, answer bool) []*Question {
+	question := &Question{
+		Question: text,
+		IsBold:   isBold,
+		Indent:   indent,
+		Answer:   nil,
+	}
+	if answer {
+		question.Answer = &answer
+	}
+	return append(questions, question)
 }
 
 func (fx *FxSurvey) HasGuaranteePolicy(policy models.Policy, guaranteeName string) bool {
@@ -110,17 +163,7 @@ func (fx *FxSurvey) GetGuaranteeIndex(policy models.Policy, guaranteeName string
 	return -1
 }
 
-type Statements struct {
-	Questions []*Statement `json:"statements"`
-}
-
-type Statement struct {
-	Title    string `json:"title"`
-	Question string `json:"question"`
-	Answer   *bool  `json:"answer"`
-}
-
-func getCoerenceData() string {
+func getCoherenceData() string {
 	return `{
 		"AA": {
 			"extra": "nel tempo libero,",
@@ -150,4 +193,3 @@ func getCoerenceData() string {
 		"LL": "in caso di malattia, infine, consente di disporre di un capitale, a integrazione del reddito, qualora all'Assicurato derivi dalla malattia stessa una riduzione della capacità lavorativa (invalidità permanente) oltre il 24%"
 	}`
 }
-
