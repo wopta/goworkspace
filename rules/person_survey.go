@@ -2,7 +2,6 @@ package rules
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/hyperjumptech/grule-rule-engine/ast"
 	"github.com/hyperjumptech/grule-rule-engine/builder"
 	"github.com/hyperjumptech/grule-rule-engine/engine"
@@ -43,7 +42,7 @@ func PersonSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		groule = lib.GetFromStorage("core-350507-function-data", "grules/"+rulesFileName, "")
 	}
 
-	fx := &lib.Fx{}
+	fx := &Fx{}
 	fxSurvey := &FxSurvey{}
 	// create new instance of DataContext
 	dataContext := ast.NewDataContext()
@@ -98,7 +97,7 @@ type Statements struct {
 
 type Statement struct {
 	Title              string      `json:"title"`
-	HasMultipleAnswers bool        `json:"hasMultipleAnswers"`
+	HasMultipleAnswers *bool       `json:"hasMultipleAnswers,omitempty"`
 	Questions          []*Question `json:"questions"`
 	Answer             *bool       `json:"answer,omitempty"`
 }
@@ -116,31 +115,34 @@ type DynamicTitle struct {
 
 type FxSurvey struct{}
 
-func (fx *FxSurvey) NewQuestion() *Question {
-	return &Question{
-		Question: "",
-		IsBold:   false,
-		Indent:   false,
-		Answer:   nil,
-	}
-}
-
 func (fx *FxSurvey) AppendStatement(statements []*Statement, title string, hasMultipleAnswers bool, answer bool) []*Statement {
-	return append(statements, &Statement{
+	statement := &Statement{
 		Title:              title,
-		HasMultipleAnswers: hasMultipleAnswers,
+		HasMultipleAnswers: nil,
 		Questions:          make([]*Question, 0),
-		Answer:             &answer,
-	})
+		Answer:             nil,
+	}
+	if answer {
+		statement.Answer = &answer
+	}
+	if hasMultipleAnswers {
+		statement.HasMultipleAnswers = &hasMultipleAnswers
+	}
+
+	return append(statements, statement)
 }
 
 func (fx *FxSurvey) AppendQuestion(questions []*Question, text string, isBold bool, indent bool, answer bool) []*Question {
-	return append(questions, &Question{
+	question := &Question{
 		Question: text,
 		IsBold:   isBold,
 		Indent:   indent,
-		Answer:   &answer,
-	})
+		Answer:   nil,
+	}
+	if answer {
+		question.Answer = &answer
+	}
+	return append(questions, question)
 }
 
 func (fx *FxSurvey) HasGuaranteePolicy(policy models.Policy, guaranteeName string) bool {
@@ -159,10 +161,6 @@ func (fx *FxSurvey) GetGuaranteeIndex(policy models.Policy, guaranteeName string
 		}
 	}
 	return -1
-}
-
-func (fx *FxSurvey) FormatString(s string, i ...interface{}) string {
-	return fmt.Sprintf(s, i...)
 }
 
 func getCoherenceData() string {
