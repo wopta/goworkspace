@@ -419,7 +419,7 @@ func initCoverage() map[string]*Coverage {
 	res["employers-liability"] = &Coverage{
 		Slug:                       "employers-liability",
 		Type:                       "company",
-		Group:                      "RCT",
+		Group:                      "CO",
 		IsExtension:                false,
 		CompanyCodec:               "CO",
 		CompanyName:                "Resp. Civile verso Prestatori di Lavoro",
