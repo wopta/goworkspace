@@ -2,18 +2,17 @@ package rules
 
 import (
 	"encoding/json"
-	"io"
-	"io/ioutil"
-	"log"
-	"net/http"
-	"os"
-
+	"fmt"
 	"github.com/hyperjumptech/grule-rule-engine/ast"
 	"github.com/hyperjumptech/grule-rule-engine/builder"
 	"github.com/hyperjumptech/grule-rule-engine/engine"
 	"github.com/hyperjumptech/grule-rule-engine/pkg"
 	lib "github.com/wopta/goworkspace/lib"
 	models "github.com/wopta/goworkspace/models"
+	"io"
+	"log"
+	"net/http"
+	"os"
 )
 
 func PersonSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -31,11 +30,13 @@ func PersonSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	req := lib.ErrorByte(io.ReadAll(r.Body))
 	policy, e = models.UnmarshalPolicy(req)
 	lib.CheckError(e)
+
 	statements := &Statements{Statements: questions}
+	dynamicTitle := &DynamicTitle{Text: ""}
 
 	switch os.Getenv("env") {
 	case "local":
-		groule = lib.ErrorByte(ioutil.ReadFile("../function-data/dev/grules/" + rulesFileName))
+		groule = lib.ErrorByte(os.ReadFile("../function-data/dev/grules/" + rulesFileName))
 	case "dev":
 		groule = lib.GetFromStorage("function-data", "grules/"+rulesFileName, "")
 	case "prod":
@@ -50,12 +51,16 @@ func PersonSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	err := dataContext.Add("in", policy)
 	log.Println("RulesFromJson in")
 	lib.CheckError(err)
-	err = dataContext.Add("out", statements)
 
+	err = dataContext.Add("title", dynamicTitle)
+	log.Println("RulesFromJson title")
+	lib.CheckError(err)
+
+	err = dataContext.Add("out", statements)
 	log.Println("RulesFromJson out")
 	lib.CheckError(err)
 
-	err = dataContext.AddJSON("data", []byte(getCoerenceData()))
+	err = dataContext.AddJSON("data", []byte(getCoherenceData()))
 	log.Println("RulesFromJson data loaded")
 	lib.CheckError(err)
 
@@ -87,11 +92,38 @@ func PersonSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	return string(b), statements, nil
 }
 
+type Statements struct {
+	Statements []*Statement `json:"statements"`
+}
+
+type Statement struct {
+	Title              string      `json:"title"`
+	HasMultipleAnswers bool        `json:"hasMultipleAnswers"`
+	Questions          []*Question `json:"questions"`
+	Answer             *bool       `json:"answer,omitempty"`
+}
+
+type Question struct {
+	Question string `json:"question"`
+	IsBold   bool   `json:"isBold"`
+	Indent   bool   `json:"indent"`
+	Answer   *bool  `json:"answer,omitempty"`
+}
+
+type DynamicTitle struct {
+	Text string
+}
+
 type FxSurvey struct{}
 
-/*func (fx *FxSurvey) AppendStatement(statements []*Statement, title string, question string) []*Statement {
-	return append(statements, &Statement{Title: title, Question: question})
-}*/
+func (fx *FxSurvey) NewQuestion() *Question {
+	return &Question{
+		Question: "",
+		IsBold:   false,
+		Indent:   false,
+		Answer:   nil,
+	}
+}
 
 func (fx *FxSurvey) AppendStatement(statements []*Statement, title string, hasMultipleAnswers bool, answer bool) []*Statement {
 	return append(statements, &Statement{
@@ -102,12 +134,12 @@ func (fx *FxSurvey) AppendStatement(statements []*Statement, title string, hasMu
 	})
 }
 
-func (fx *FxSurvey) AppendQuestion(questions []*Question, title string, isBold bool, indent bool, answer bool) []*Question {
+func (fx *FxSurvey) AppendQuestion(questions []*Question, text string, isBold bool, indent bool, answer bool) []*Question {
 	return append(questions, &Question{
-		Title:  title,
-		IsBold: isBold,
-		Indent: indent,
-		Answer: &answer,
+		Question: text,
+		IsBold:   isBold,
+		Indent:   indent,
+		Answer:   &answer,
 	})
 }
 
@@ -129,25 +161,11 @@ func (fx *FxSurvey) GetGuaranteeIndex(policy models.Policy, guaranteeName string
 	return -1
 }
 
-type Statements struct {
-	Statements []*Statement `json:"statements"`
+func (fx *FxSurvey) FormatString(s string, i ...interface{}) string {
+	return fmt.Sprintf(s, i...)
 }
 
-type Statement struct {
-	Title              string      `json:"title"`
-	HasMultipleAnswers bool        `json:"hasMultipleAnswers"`
-	Questions          []*Question `json:"questions"`
-	Answer             *bool       `json:"answer,omitempty"`
-}
-
-type Question struct {
-	Title  string `json:"title"`
-	IsBold bool   `json:"isBold"`
-	Indent bool   `json:"indent"`
-	Answer *bool  `json:"answer,omitempty"`
-}
-
-func getCoerenceData() string {
+func getCoherenceData() string {
 	return `{
 		"AA": {
 			"extra": "nel tempo libero,",
