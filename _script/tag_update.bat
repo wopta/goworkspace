@@ -11,7 +11,7 @@ cd %1
 cd ..
 git add .
 git commit -m %3
-rem git push origin master 
-rem git push google master  
+ git push origin master 
+git push google master  
 git tag -a %1/%2 -m %3
 git push google %1/%2

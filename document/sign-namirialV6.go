@@ -38,7 +38,8 @@ func NamirialOtpV6(data model.Policy) (string, NamirialOtpResponse, error) {
 		file = lib.ErrorByte(ioutil.ReadFile("document/contract.pdf"))
 
 	} else {
-		file = lib.GetFromStorage("function-data", data.DocumentName, "")
+
+		file = lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), data.DocumentName, "")
 	}
 
 	SspFileId := <-postDataV6(file)
