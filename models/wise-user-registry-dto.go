@@ -17,7 +17,6 @@ type WiseUserRegistryDto struct {
 	LastUpdatedAt           time.Time                   `json:"dtUltimaVariazione,omitempty"`
 	Id                      int                         `json:"id,omitempty"`
 	Address                 *WiseUserAddressRegistryDto `json:"indirizzo,omitempty"`
-	ContactDetails          []interface{}               `json:"listRecapiti,omitempty"`
 	FiscalCode              string                      `json:"txCodiceFiscale,omitempty"`
 	Surname                 string                      `json:"txCognome,omitempty"`
 	PlaceOfBirth            string                      `json:"txComuneNascita,omitempty"`
@@ -26,4 +25,43 @@ type WiseUserRegistryDto struct {
 	VatNumber               string                      `json:"txPartitaIva,omitempty"`
 	BusinessName            string                      `json:"txRagioneSociale,omitempty"`
 	Gender                  string                      `json:"txSesso,omitempty"`
+	Contacts                []WiseContactInfo           `json:"listRecapiti"`
+}
+
+type WiseContactInfo struct {
+	TypeCode string `json:"cdTipoRecapito"`
+	Type     string `json:"txTipoRecapito"`
+	Contact  string `json:"txRecapito"`
+}
+
+const WISE_PHONE_CONTACT_TYPE_CODE = "4"
+const WISE_EMAIL_CONTACT_TYPE_CODE = "5"
+
+func (registry *WiseUserRegistryDto) ToDomain() *User {
+	var person User
+
+	person.Name = registry.Name
+	person.Surname = registry.Surname
+	person.FiscalCode = registry.FiscalCode
+	if len(registry.Address.TxToponimo) > 0 {
+		person.Address += registry.Address.TxToponimo
+	}
+	if len(registry.Address.AddressDescription) > 0 {
+		person.Address += registry.Address.AddressDescription
+	}
+	person.StreetNumber = registry.Address.HouseNumber
+	person.PostalCode = registry.Address.PostalCode
+	person.City = registry.Address.Municipality
+	person.BirthDate = registry.BirthDate.Format("02/01/2006")
+
+	for _, contact := range registry.Contacts {
+		switch contact.TypeCode {
+		case WISE_PHONE_CONTACT_TYPE_CODE:
+			person.Phone = contact.Contact
+		case WISE_EMAIL_CONTACT_TYPE_CODE:
+			person.Mail = contact.Contact
+		}
+	}
+
+	return &person
 }
