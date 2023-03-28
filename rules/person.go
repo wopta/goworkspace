@@ -38,12 +38,10 @@ import (
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	prd "github.com/wopta/goworkspace/product"
 )
 
 const (
-	base    = "base"
-	your    = "your"
-	premium = "premium"
 	monthly = "monthly"
 	yearly  = "yearly"
 )
@@ -63,7 +61,7 @@ func Person(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	quotingInputData := getRulesInputData(&policy, e, req)
 
 	rulesFile = getRulesFile(rulesFile, rulesFileName)
-	_, ruleOut := rulesFromJson(rulesFile, initCoverageP(), quotingInputData, []byte(getQuotingData()))
+	_, ruleOut := rulesFromJson(rulesFile, initRuleOut(), quotingInputData, []byte(getQuotingData()))
 
 	ruleOut.(*RuleOut).ToPolicy(&policy)
 
@@ -113,483 +111,45 @@ func calculateAge(birthDateIsoString string) (int, error) {
 	return age, e
 }
 
-func initCoverageP() *RuleOut {
+func getPersonProduct() (models.Product, error) {
+	product, err := prd.GetName("persona", "v1")
+	return product, err
+}
+
+func initRuleOut() *RuleOut {
 	var guarantees = make(map[string]*models.Guarante)
 	offerPrice := make(map[string]map[string]*models.Price)
 
-	guarantees = map[string]*models.Guarante{
-		"IPI": {
-			Slug:                       "Invalidità Permanente Infortunio",
-			Deductible:                 "0",
-			Tax:                        2.5,
-			SumInsuredLimitOfIndemnity: 0.0,
-			Offer: map[string]*models.GuaranteValue{
-				base: {
-					Deductible:                 "0",
-					DeductibleType:             "",
-					SumInsuredLimitOfIndemnity: 0.0,
-					PremiumNetYearly:           0.0,
-					PremiumTaxAmountYearly:     0.0,
-					PremiumGrossYearly:         0.0,
-					PremiumNetMonthly:          0.0,
-					PremiumTaxAmountMonthly:    0.0,
-					PremiumGrossMonthly:        0.0,
-					SelfInsurance:              "0",
-				},
-				your: {
-					Deductible:                 "0",
-					DeductibleType:             "",
-					SumInsuredLimitOfIndemnity: 0.0,
-					PremiumNetYearly:           0.0,
-					PremiumTaxAmountYearly:     0.0,
-					PremiumGrossYearly:         0.0,
-					PremiumNetMonthly:          0.0,
-					PremiumTaxAmountMonthly:    0.0,
-					PremiumGrossMonthly:        0.0,
-					SelfInsurance:              "0",
-				},
-				premium: {
-					Deductible:                 "0",
-					DeductibleType:             "",
-					SumInsuredLimitOfIndemnity: 0.0,
-					PremiumNetYearly:           0.0,
-					PremiumTaxAmountYearly:     0.0,
-					PremiumGrossYearly:         0.0,
-					PremiumNetMonthly:          0.0,
-					PremiumTaxAmountMonthly:    0.0,
-					PremiumGrossMonthly:        0.0,
-					SelfInsurance:              "0",
-				},
-			},
-			IsBase:    false,
-			IsYour:    false,
-			IsPremium: false,
-		},
-		"D": {
-			Slug:                       "Decesso Infortunio",
-			Deductible:                 "0",
-			Tax:                        2.5,
-			SumInsuredLimitOfIndemnity: 0.0,
-			Offer: map[string]*models.GuaranteValue{
-				base: {
-					Deductible:                 "0",
-					DeductibleType:             "",
-					SumInsuredLimitOfIndemnity: 0.0,
-					PremiumNetYearly:           0.0,
-					PremiumTaxAmountYearly:     0.0,
-					PremiumGrossYearly:         0.0,
-					PremiumNetMonthly:          0.0,
-					PremiumTaxAmountMonthly:    0.0,
-					PremiumGrossMonthly:        0.0,
-					SelfInsurance:              "0",
-				},
-				your: {
-					Deductible:                 "0",
-					DeductibleType:             "",
-					SumInsuredLimitOfIndemnity: 0.0,
-					PremiumNetYearly:           0.0,
-					PremiumTaxAmountYearly:     0.0,
-					PremiumGrossYearly:         0.0,
-					PremiumNetMonthly:          0.0,
-					PremiumTaxAmountMonthly:    0.0,
-					PremiumGrossMonthly:        0.0,
-					SelfInsurance:              "0",
-				},
-				premium: {
-					Deductible:                 "0",
-					DeductibleType:             "",
-					SumInsuredLimitOfIndemnity: 0.0,
-					PremiumNetYearly:           0.0,
-					PremiumTaxAmountYearly:     0.0,
-					PremiumGrossYearly:         0.0,
-					PremiumNetMonthly:          0.0,
-					PremiumTaxAmountMonthly:    0.0,
-					PremiumGrossMonthly:        0.0,
-					SelfInsurance:              "0",
-				},
-			},
-			IsBase:    false,
-			IsYour:    false,
-			IsPremium: false,
-		},
-		"ITI": {
-			Slug:                       "Inabilità Totale Infortunio",
-			Deductible:                 "0",
-			Tax:                        2.5,
-			SumInsuredLimitOfIndemnity: 0.0,
-			Offer: map[string]*models.GuaranteValue{
-				base: {
-					Deductible:                 "0",
-					DeductibleType:             "",
-					SumInsuredLimitOfIndemnity: 0.0,
-					PremiumNetYearly:           0.0,
-					PremiumTaxAmountYearly:     0.0,
-					PremiumGrossYearly:         0.0,
-					PremiumNetMonthly:          0.0,
-					PremiumTaxAmountMonthly:    0.0,
-					PremiumGrossMonthly:        0.0,
-					SelfInsurance:              "0",
-				},
-				your: {
-					Deductible:                 "0",
-					DeductibleType:             "",
-					SumInsuredLimitOfIndemnity: 0.0,
-					PremiumNetYearly:           0.0,
-					PremiumTaxAmountYearly:     0.0,
-					PremiumGrossYearly:         0.0,
-					PremiumNetMonthly:          0.0,
-					PremiumTaxAmountMonthly:    0.0,
-					PremiumGrossMonthly:        0.0,
-					SelfInsurance:              "0",
-				},
-				premium: {
-					Deductible:                 "0",
-					DeductibleType:             "",
-					SumInsuredLimitOfIndemnity: 0.0,
-					PremiumNetYearly:           0.0,
-					PremiumTaxAmountYearly:     0.0,
-					PremiumGrossYearly:         0.0,
-					PremiumNetMonthly:          0.0,
-					PremiumTaxAmountMonthly:    0.0,
-					PremiumGrossMonthly:        0.0,
-					SelfInsurance:              "0",
-				},
-			},
-			IsBase:    false,
-			IsYour:    false,
-			IsPremium: false,
-		},
-		"DRG": {
-			Slug:                       "Diaria Ricovero / Gessatura Infortunio",
-			Deductible:                 "0",
-			Tax:                        2.5,
-			SumInsuredLimitOfIndemnity: 0.0,
-			Offer: map[string]*models.GuaranteValue{
-				base: {
-					Deductible:                 "0",
-					DeductibleType:             "",
-					SumInsuredLimitOfIndemnity: 0.0,
-					PremiumNetYearly:           0.0,
-					PremiumTaxAmountYearly:     0.0,
-					PremiumGrossYearly:         0.0,
-					PremiumNetMonthly:          0.0,
-					PremiumTaxAmountMonthly:    0.0,
-					PremiumGrossMonthly:        0.0,
-					SelfInsurance:              "0",
-				},
-				your: {
-					Deductible:                 "0",
-					DeductibleType:             "",
-					SumInsuredLimitOfIndemnity: 0.0,
-					PremiumNetYearly:           0.0,
-					PremiumTaxAmountYearly:     0.0,
-					PremiumGrossYearly:         0.0,
-					PremiumNetMonthly:          0.0,
-					PremiumTaxAmountMonthly:    0.0,
-					PremiumGrossMonthly:        0.0,
-					SelfInsurance:              "0",
-				},
-				premium: {
-					Deductible:                 "0",
-					DeductibleType:             "",
-					SumInsuredLimitOfIndemnity: 0.0,
-					PremiumNetYearly:           0.0,
-					PremiumTaxAmountYearly:     0.0,
-					PremiumGrossYearly:         0.0,
-					PremiumNetMonthly:          0.0,
-					PremiumTaxAmountMonthly:    0.0,
-					PremiumGrossMonthly:        0.0,
-					SelfInsurance:              "0",
-				},
-			},
-			IsBase:    false,
-			IsYour:    false,
-			IsPremium: false,
-		},
-		"DC": {
-			Slug:                       "Diaria Convalescenza Infortunio",
-			Deductible:                 "0",
-			Tax:                        2.5,
-			SumInsuredLimitOfIndemnity: 0.0,
-			Offer: map[string]*models.GuaranteValue{
-				base: {
-					Deductible:                 "0",
-					DeductibleType:             "",
-					SumInsuredLimitOfIndemnity: 0.0,
-					PremiumNetYearly:           0.0,
-					PremiumTaxAmountYearly:     0.0,
-					PremiumGrossYearly:         0.0,
-					PremiumNetMonthly:          0.0,
-					PremiumTaxAmountMonthly:    0.0,
-					PremiumGrossMonthly:        0.0,
-					SelfInsurance:              "0",
-				},
-				your: {
-					Deductible:                 "0",
-					DeductibleType:             "",
-					SumInsuredLimitOfIndemnity: 0.0,
-					PremiumNetYearly:           0.0,
-					PremiumTaxAmountYearly:     0.0,
-					PremiumGrossYearly:         0.0,
-					PremiumNetMonthly:          0.0,
-					PremiumTaxAmountMonthly:    0.0,
-					PremiumGrossMonthly:        0.0,
-					SelfInsurance:              "0",
-				},
-				premium: {
-					Deductible:                 "0",
-					DeductibleType:             "",
-					SumInsuredLimitOfIndemnity: 0.0,
-					PremiumNetYearly:           0.0,
-					PremiumTaxAmountYearly:     0.0,
-					PremiumGrossYearly:         0.0,
-					PremiumNetMonthly:          0.0,
-					PremiumTaxAmountMonthly:    0.0,
-					PremiumGrossMonthly:        0.0,
-					SelfInsurance:              "0",
-				},
-			},
-			IsBase:    false,
-			IsYour:    false,
-			IsPremium: false,
-		},
-		"RSC": {
-			Slug:                       "Rimborso spese di cura Infortunio",
-			Deductible:                 "0",
-			Tax:                        2.5,
-			SumInsuredLimitOfIndemnity: 0.0,
-			Offer: map[string]*models.GuaranteValue{
-				base: {
-					Deductible:                 "0",
-					DeductibleType:             "",
-					SumInsuredLimitOfIndemnity: 0.0,
-					PremiumNetYearly:           0.0,
-					PremiumTaxAmountYearly:     0.0,
-					PremiumGrossYearly:         0.0,
-					PremiumNetMonthly:          0.0,
-					PremiumTaxAmountMonthly:    0.0,
-					PremiumGrossMonthly:        0.0,
-					SelfInsurance:              "0",
-				},
-				your: {
-					Deductible:                 "0",
-					DeductibleType:             "",
-					SumInsuredLimitOfIndemnity: 0.0,
-					PremiumNetYearly:           0.0,
-					PremiumTaxAmountYearly:     0.0,
-					PremiumGrossYearly:         0.0,
-					PremiumNetMonthly:          0.0,
-					PremiumTaxAmountMonthly:    0.0,
-					PremiumGrossMonthly:        0.0,
-					SelfInsurance:              "0",
-				},
-				premium: {
-					Deductible:                 "0",
-					DeductibleType:             "",
-					SumInsuredLimitOfIndemnity: 0.0,
-					PremiumNetYearly:           0.0,
-					PremiumTaxAmountYearly:     0.0,
-					PremiumGrossYearly:         0.0,
-					PremiumNetMonthly:          0.0,
-					PremiumTaxAmountMonthly:    0.0,
-					PremiumGrossMonthly:        0.0,
-					SelfInsurance:              "0",
-				},
-			},
-			IsBase:    false,
-			IsYour:    false,
-			IsPremium: false,
-		},
-		"IPM": {
-			Slug:                       "Invalidità Permanente Malattia IPM",
-			Deductible:                 "0",
-			Tax:                        2.5,
-			SumInsuredLimitOfIndemnity: 0.0,
-			Offer: map[string]*models.GuaranteValue{
-				base: {
-					Deductible:                 "0",
-					DeductibleType:             "",
-					SumInsuredLimitOfIndemnity: 0.0,
-					PremiumNetYearly:           0.0,
-					PremiumTaxAmountYearly:     0.0,
-					PremiumGrossYearly:         0.0,
-					PremiumNetMonthly:          0.0,
-					PremiumTaxAmountMonthly:    0.0,
-					PremiumGrossMonthly:        0.0,
-					SelfInsurance:              "0",
-				},
-				your: {
-					Deductible:                 "0",
-					DeductibleType:             "",
-					SumInsuredLimitOfIndemnity: 0.0,
-					PremiumNetYearly:           0.0,
-					PremiumTaxAmountYearly:     0.0,
-					PremiumGrossYearly:         0.0,
-					PremiumNetMonthly:          0.0,
-					PremiumTaxAmountMonthly:    0.0,
-					PremiumGrossMonthly:        0.0,
-					SelfInsurance:              "0",
-				},
-				premium: {
-					Deductible:                 "0",
-					DeductibleType:             "",
-					SumInsuredLimitOfIndemnity: 0.0,
-					PremiumNetYearly:           0.0,
-					PremiumTaxAmountYearly:     0.0,
-					PremiumGrossYearly:         0.0,
-					PremiumNetMonthly:          0.0,
-					PremiumTaxAmountMonthly:    0.0,
-					PremiumGrossMonthly:        0.0,
-					SelfInsurance:              "0",
-				},
-			},
-			IsBase:    false,
-			IsYour:    false,
-			IsPremium: false,
-		},
-		"ASS": {
-			Slug:                       "Assistenza",
-			Deductible:                 "0",
-			Tax:                        10.0,
-			SumInsuredLimitOfIndemnity: 0.0,
-			Offer: map[string]*models.GuaranteValue{
-				base: {
-					Deductible:                 "0",
-					DeductibleType:             "",
-					SumInsuredLimitOfIndemnity: 0.0,
-					PremiumNetYearly:           0.0,
-					PremiumTaxAmountYearly:     0.0,
-					PremiumGrossYearly:         0.0,
-					PremiumNetMonthly:          0.0,
-					PremiumTaxAmountMonthly:    0.0,
-					PremiumGrossMonthly:        0.0,
-					SelfInsurance:              "0",
-				},
-				your: {
-					Deductible:                 "0",
-					DeductibleType:             "",
-					SumInsuredLimitOfIndemnity: 0.0,
-					PremiumNetYearly:           0.0,
-					PremiumTaxAmountYearly:     0.0,
-					PremiumGrossYearly:         0.0,
-					PremiumNetMonthly:          0.0,
-					PremiumTaxAmountMonthly:    0.0,
-					PremiumGrossMonthly:        0.0,
-					SelfInsurance:              "0",
-				},
-				premium: {
-					Deductible:                 "0",
-					DeductibleType:             "",
-					SumInsuredLimitOfIndemnity: 0.0,
-					PremiumNetYearly:           0.0,
-					PremiumTaxAmountYearly:     0.0,
-					PremiumGrossYearly:         0.0,
-					PremiumNetMonthly:          0.0,
-					PremiumTaxAmountMonthly:    0.0,
-					PremiumGrossMonthly:        0.0,
-					SelfInsurance:              "0",
-				},
-			},
-			IsBase:    false,
-			IsYour:    false,
-			IsPremium: false,
-		},
-		"TL": {
-			Slug:                       "Tutela Legale",
-			Deductible:                 "0",
-			Tax:                        21.25,
-			SumInsuredLimitOfIndemnity: 0.0,
-			Offer: map[string]*models.GuaranteValue{
-				base: {
-					Deductible:                 "0",
-					DeductibleType:             "",
-					SumInsuredLimitOfIndemnity: 0.0,
-					PremiumNetYearly:           0.0,
-					PremiumTaxAmountYearly:     0.0,
-					PremiumGrossYearly:         0.0,
-					PremiumNetMonthly:          0.0,
-					PremiumTaxAmountMonthly:    0.0,
-					PremiumGrossMonthly:        0.0,
-					SelfInsurance:              "0",
-				},
-				your: {
-					Deductible:                 "0",
-					DeductibleType:             "",
-					SumInsuredLimitOfIndemnity: 0.0,
-					PremiumNetYearly:           0.0,
-					PremiumTaxAmountYearly:     0.0,
-					PremiumGrossYearly:         0.0,
-					PremiumNetMonthly:          0.0,
-					PremiumTaxAmountMonthly:    0.0,
-					PremiumGrossMonthly:        0.0,
-					SelfInsurance:              "0",
-				},
-				premium: {
-					Deductible:                 "0",
-					DeductibleType:             "",
-					SumInsuredLimitOfIndemnity: 0.0,
-					PremiumNetYearly:           0.0,
-					PremiumTaxAmountYearly:     0.0,
-					PremiumGrossYearly:         0.0,
-					PremiumNetMonthly:          0.0,
-					PremiumTaxAmountMonthly:    0.0,
-					PremiumGrossMonthly:        0.0,
-					SelfInsurance:              "0",
-				},
-			},
-			IsBase:    false,
-			IsYour:    false,
-			IsPremium: false,
-		},
+	product, err := getPersonProduct()
+	lib.CheckError(err)
+
+	for guaranteeKey, guarantee := range product.Companies[0].GuaranteesMap {
+		guarantees[guaranteeKey] = &models.Guarante{
+			Slug:                       guarantee.Slug,
+			Deductible:                 guarantee.Deductible,
+			Tax:                        guarantee.Tax,
+			SumInsuredLimitOfIndemnity: guarantee.SumInsuredLimitOfIndemnity,
+			Offer:                      guarantee.Offer,
+		}
 	}
 
-	offerPrice[base] = map[string]*models.Price{
-		monthly: {
-			Net:      0.0,
-			Tax:      0.0,
-			Gross:    0.0,
-			Delta:    0.0,
-			Discount: 0.0,
-		},
-		yearly: {
-			Net:      0.0,
-			Tax:      0.0,
-			Gross:    0.0,
-			Delta:    0.0,
-			Discount: 0.0,
-		},
-	}
-	offerPrice[your] = map[string]*models.Price{
-		monthly: {
-			Net:      0.0,
-			Tax:      0.0,
-			Gross:    0.0,
-			Delta:    0.0,
-			Discount: 0.0,
-		},
-		yearly: {
-			Net:      0.0,
-			Tax:      0.0,
-			Gross:    0.0,
-			Delta:    0.0,
-			Discount: 0.0,
-		},
-	}
-	offerPrice[premium] = map[string]*models.Price{
-		monthly: {
-			Net:      0.0,
-			Tax:      0.0,
-			Gross:    0.0,
-			Delta:    0.0,
-			Discount: 0.0,
-		},
-		yearly: {
-			Net:      0.0,
-			Tax:      0.0,
-			Gross:    0.0,
-			Delta:    0.0,
-			Discount: 0.0,
-		},
+	for offerKey, _ := range product.Offers {
+		offerPrice[offerKey] = map[string]*models.Price{
+			monthly: {
+				Net:      0.0,
+				Tax:      0.0,
+				Gross:    0.0,
+				Delta:    0.0,
+				Discount: 0.0,
+			},
+			yearly: {
+				Net:      0.0,
+				Tax:      0.0,
+				Gross:    0.0,
+				Delta:    0.0,
+				Discount: 0.0,
+			},
+		}
 	}
 
 	return &RuleOut{
@@ -597,6 +157,7 @@ func initCoverageP() *RuleOut {
 		OfferPrice: offerPrice,
 	}
 }
+
 func getQuotingData() string {
 	return string(lib.GetByteByEnv("quote/persona-tassi.json", false))
 }
