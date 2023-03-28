@@ -296,7 +296,7 @@ func SftpUpload(filePath string) {
 	// Create remote file for writing.
 	lib.Files("../tmp")
 	//destination, e := client.Create(filePath)
-	destination, e := client.Create(filePath)
+	destination, e := client.Create("IN/" + filePath)
 	lib.CheckError(e)
 	defer destination.Close()
 	log.Println("Upload local file to a remote location as in 1MB (byte) chunks.")
