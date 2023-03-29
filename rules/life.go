@@ -24,7 +24,7 @@ func Life(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	quotingInputData := getRulesInputData(&policy, err, req)
 
 	rulesFile = getRulesFile(rulesFile, rulesFileName)
-	product, err := getLifeProduct()
+	product, err := prd.GetName("life", "v2")
 	lib.CheckError(err)
 	_, ruleOutput := rulesFromJson(rulesFile, product, quotingInputData, nil)
 
@@ -32,9 +32,4 @@ func Life(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	lib.CheckError(err)
 
 	return productJson, product, err
-}
-
-func getLifeProduct() (models.Product, error) {
-	product, err := prd.GetName("life", "v2")
-	return product, err
 }
