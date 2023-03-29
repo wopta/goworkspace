@@ -37,7 +37,7 @@ func (s Skin) CoveragesTable(m pdf.Maroto, head []string, content [][]string) pd
 func (s Skin) Question(m pdf.Maroto, data models.Question) {
 	var prop props.Text
 	var rh float64
-	if data.Isbold {
+	if data.IsBold {
 		prop = s.BoldtextLeft
 		rh = s.RowHeight + 0.0
 	} else {
@@ -77,11 +77,11 @@ func (s Skin) Stantement(m pdf.Maroto, title string, data models.Statement) {
 
 		//m.SetBackgroundColor(magenta)
 	})
-	for _, v := range *data.Questions {
+	for _, v := range data.Questions {
 		//qlen := len(*data.Questions)
 		//nextI := 1
 		//s.checkPageNext(m, (*d)[nextI].Question)
-		s.Question(m, v)
+		s.Question(m, *v)
 
 	}
 
