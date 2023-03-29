@@ -1,27 +1,59 @@
 {
   "name": "life",
   "nameDesc": "Wopta per te Vita",
-  "productVersion": "v1",
-
+  "version": "v2",
+  "steps": [
+    {
+      "widget": "quoterhome",
+      "attributes": {
+        "logoUrl": "assets/images/wopta-logo-vita-magenta.png",
+        "logoTitle": "Wopta Per Te",
+        "logoSubtitle": "Vita"
+      },
+      "children": [
+        {
+          "widget": "datepicker",
+          "attributes": {
+            "name": "contractor->birthDate",
+            "value": null,
+            "label": "Seleziona data di nascita",
+            "initialDate": "{{INITIAL_DATE}}",
+            "minDate": "{{MIN_DATE}}",
+            "maxDate": "{{INITIAL_DATE}}"
+          }
+        }
+      ]
+    },
+    {
+      "widget": "guaranteeconfigurationstep",
+      "attributes": {}
+    }
+  ],
   "companies": [
     {
       "name": "axa",
       "code": "2",
-      "commission": 0.3,
+      "commission": 0.30,
       "commissionRenew": 0.18,
+      "minimumMonthlyPrice": 20,
+      "minimumYearlyPrice": 0,
       "guaranteesMap": {
         "death": {
           "companyCodec": "",
           "companyName": "Decesso",
-          "description": "",
+          "title": "Per qualsiasi causa",
+          "description": "Cosa significa amare le persone a te più care? Scegli il sostegno di un capitale, a disposizione di chi resta, per affrontare «il dopo» di un drammatico imprevisto, con una certezza economica in più.",
           "group": "DEATH",
           "name": "morte",
           "isExtension": false,
           "isMandatory": true,
+          "isSellable": false,
           "offer": {
             "default": {
-              "sumInsured": 50000,
-              "duration": { "year": 5 }
+              "sumInsured": 100000,
+              "duration": {
+                "year": 10
+              }
             }
           },
           "slug": "death",
@@ -29,22 +61,36 @@
           "taxes": null,
           "type": "person",
           "config": {
-            "sumInsuredValues": { "min": 50000, "max": 200000, "step": 25000 },
-            "durationValues": { "min": 5, "max": 20, "step": 5 }
+            "sumInsuredValues": {
+              "min": 50000,
+              "max": 200000,
+              "step": 25000
+            },
+            "durationValues": {
+              "min": 5,
+              "max": 20,
+              "step": 5
+            },
+            "minimumGrossYearly": 10
           }
         },
         "permanent-disability": {
           "companyCodec": "",
           "companyName": "Invalidità Totale Permanente",
           "deductible": "",
-          "description": "",
+          "title": "",
+          "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
           "group": "DEATH",
           "name": "invalidità totale permanente",
           "isExtension": false,
+          "isMandatory": false,
+          "isSellable": false,
           "offer": {
             "default": {
               "sumInsured": 50000,
-              "duration": { "year": 5 }
+              "duration": {
+                "year": 5
+              }
             }
           },
           "slug": "permanent-disability",
@@ -52,22 +98,36 @@
           "taxes": null,
           "type": "person",
           "config": {
-            "sumInsuredValues": { "min": 50000, "max": 200000, "step": 25000 },
-            "durationValues": { "min": 5, "max": 20, "step": 5 }
+            "sumInsuredValues": {
+              "min": 50000,
+              "max": 200000,
+              "step": 25000
+            },
+            "durationValues": {
+              "min": 5,
+              "max": 20,
+              "step": 5
+            },
+            "minimumGrossYearly": 10
           }
         },
         "temporary-disability": {
           "companyCodec": "",
           "companyName": "Inabilità Totale Temporanea",
           "deductible": "",
-          "description": "",
+          "title": "",
+          "description": "Un banale infortunio o malattia possono anche impedirti di lavorare per un certo periodo. Una somma mensile in sostituzione del tuo reddito aiuterebbe?",
           "group": "DEATH",
           "name": "inabilità totale temporanea",
           "isExtension": false,
+          "isMandatory": false,
+          "isSellable": false,
           "offer": {
             "default": {
               "sumInsured": 50000,
-              "duration": { "year": 5 }
+              "duration": {
+                "year": 5
+              }
             }
           },
           "slug": "temporary-disability",
@@ -75,23 +135,36 @@
           "taxes": null,
           "type": "person",
           "config": {
-            "sumInsuredValues": { "min": 50000, "max": 200000, "step": 25000 },
-            "durationValues": { "min": 5, "max": 20, "step": 5 }
+            "sumInsuredValues": {
+              "min": 500,
+              "max": 2000,
+              "step": 250
+            },
+            "durationValues": {
+              "min": 5,
+              "max": 20,
+              "step": 5
+            },
+            "minimumGrossYearly": 10
           }
         },
         "serious-ill": {
           "companyCodec": "",
           "companyName": "Malattia Grave",
           "deductible": "",
-          "description": "",
+          "title": "",
+          "description": "Cancro, Ictus, Infarto, Chirurgia aorto-coronarica, Insufficienza renale, Trapianto di organi principali. Parole che spaventano, ma con il giusto capitale in tasca si affrontano . . . e si superano.",
           "isExtension": false,
           "isMandatory": false,
+          "isSellable": false,
           "group": "DEATH",
           "name": "malattia grave",
           "offer": {
             "default": {
               "sumInsured": 50000,
-              "duration": { "year": 5 }
+              "duration": {
+                "year": 5
+              }
             }
           },
           "slug": "serious-ill",
@@ -99,8 +172,44 @@
           "taxes": null,
           "type": "person",
           "config": {
-            "sumInsuredValues": { "min": 50000, "max": 200000, "step": 25000 },
-            "durationValues": { "min": 5, "max": 20, "step": 5 }
+            "values": [
+              5000,
+              10000,
+              15000,
+              20000,
+              25000,
+              30000,
+              35000,
+              40000,
+              45000,
+              50000,
+              55000,
+              60000,
+              65000,
+              70000,
+              75000,
+              80000,
+              85000,
+              90000,
+              95000,
+              100000,
+              110000,
+              120000,
+              130000,
+              140000,
+              150000,
+              160000,
+              170000,
+              180000,
+              190000,
+              200000
+            ],
+            "durationValues": {
+              "min": 5,
+              "max": 20,
+              "step": 5
+            },
+            "minimumGrossYearly": 10
           }
         }
       }
