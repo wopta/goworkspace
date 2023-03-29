@@ -1,14 +1,14 @@
 {
-  "name": "life",
-  "nameDesc": "Wopta per te Vita",
-  "version": "v2",
+  "name": "persona",
+  "nameDesc": "Wopta per te Persona",
+  "version": "v1",
   "steps": [
     {
       "widget": "quoterhome",
       "attributes": {
-        "logoUrl": "assets/images/wopta-logo-vita-magenta.png",
+        "logoUrl": "assets/icons/personal-insurance.svg",
         "logoTitle": "Wopta Per Te",
-        "logoSubtitle": "Vita"
+        "logoSubtitle": "Persona"
       },
       "children": [
         {
@@ -19,200 +19,680 @@
             "label": "Seleziona data di nascita",
             "initialDate": "{{INITIAL_DATE}}",
             "minDate": "{{MIN_DATE}}",
-            "maxDate": "{{INITIAL_DATE}}"
+            "maxDate": "{{INITIAL_DATE}}",
+            "infoText": "Questa soluzione è dedicata ai maggiorenni e a chi ha meno di 75 anni"
           }
         }
       ]
     },
     {
-      "widget": "guaranteeconfigurationstep",
+      "widget": "quoterdata",
+      "children": [
+        {
+          "widget": "profession",
+          "attributes": {
+            "optionsUrl": "https://api.dev.wopta.it/enrich/works",
+            "displayKey": "work",
+            "jsonDataKey": "works",
+            "label": "Professione"
+          }
+        },
+        {
+          "widget": "radiogroup",
+          "attributes": {
+            "name": "quoteQuestions->hasDependants",
+            "title": "Hai famigliari a carico?",
+            "mobileConstraintsMaxWidth": 220,
+            "options": [
+              {
+                "key": "Si",
+                "value": true
+              },
+              {
+                "key": "No",
+                "value": false
+              }
+            ]
+          }
+        },
+        {
+          "widget": "radiogroup",
+          "attributes": {
+            "name": "quoteQuestions->lifeRisk",
+            "title": "Il rischio nella tua vita è da:",
+            "mobileConstraintsMaxWidth": 220,
+            "options": [
+              {
+                "key": "Da evitare",
+                "value": 1
+              },
+              {
+                "key": "Da accettare",
+                "value": 2
+              },
+              {
+                "key": "Da gestire",
+                "value": 3
+              }
+            ]
+          }
+        },
+        {
+          "widget": "radiogroup",
+          "attributes": {
+            "name": "quoteQuestions->financialRisk",
+            "title": "Riusciresti ad affrontare una spesa di 1.500 euro?",
+            "mobileConstraintsMaxWidth": 220,
+            "options": [
+              {
+                "key": "Si, senza problemi",
+                "value": 1
+              },
+              {
+                "key": "Si, ma dovrei rinunciare a qualcosa",
+                "value": 2
+              },
+              {
+                "key": "No, non ci riuscirei facilmente",
+                "value": 3
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "widget": "quoteroffer",
+      "attributes": {
+        "offersEndpoint": "rules/risk/person"
+      }
+    },
+    {
+      "widget": "quotercontractordata",
+      "attributes": {}
+    },
+    {
+      "widget": "quoterstatements",
+      "attributes": {
+        "statementsEndpoint": "rules/survey/person"
+      }
+    },
+    {
+      "widget": "quoterrecap",
+      "attributes": {}
+    },
+    {
+      "widget": "quotersignpay",
       "attributes": {}
     }
   ],
   "companies": [
     {
-      "name": "axa",
-      "code": "2",
-      "commission": 0.30,
+      "name": "Global",
+      "code": "1",
+      "commission": 0.3,
       "commissionRenew": 0.18,
-      "minimumMonthlyPrice": 20,
-      "minimumYearlyPrice": 0,
+      "minimumMonthlyPrice": 50,
+      "minimumYearlyPrice": 120,
       "guaranteesMap": {
-        "death": {
+        "ASS": {
+          "assistance": "",
           "companyCodec": "",
-          "companyName": "Decesso",
-          "title": "Per qualsiasi causa",
-          "description": "Cosa significa amare le persone a te più care? Scegli il sostegno di un capitale, a disposizione di chi resta, per affrontare «il dopo» di un drammatico imprevisto, con una certezza economica in più.",
-          "group": "DEATH",
-          "name": "morte",
+          "companyName": "",
+          "dailyAllowance": "",
+          "deductible": "0",
+          "description": "",
+          "group": "",
           "isExtension": false,
-          "isMandatory": true,
-          "isSellable": false,
+          "legalDefence": "",
+          "name": "",
           "offer": {
-            "default": {
-              "sumInsured": 100000,
-              "duration": {
-                "year": 10
-              }
+            "base": {
+              "deductible": "0",
+              "deductibleType": "",
+              "sumInsuredLimitOfIndemnity": 0.0,
+              "premiumNetYearly": 0.0,
+              "premiumTaxAmountYearly": 0.0,
+              "premiumGrossYearly": 0.0,
+              "premiumNetMonthly": 0.0,
+              "premiumTaxAmountMonthly": 0.0,
+              "premiumGrossMonthly": 0.0,
+              "selfInsurance": "0"
+            },
+            "your": {
+              "deductible": "0",
+              "deductibleType": "",
+              "sumInsuredLimitOfIndemnity": 0.0,
+              "premiumNetYearly": 0.0,
+              "premiumTaxAmountYearly": 0.0,
+              "premiumGrossYearly": 0.0,
+              "premiumNetMonthly": 0.0,
+              "premiumTaxAmountMonthly": 0.0,
+              "premiumGrossMonthly": 0.0,
+              "selfInsurance": "0"
+            },
+            "premium": {
+              "deductible": "0",
+              "deductibleType": "",
+              "sumInsuredLimitOfIndemnity": 0.0,
+              "premiumNetYearly": 0.0,
+              "premiumTaxAmountYearly": 0.0,
+              "premiumGrossYearly": 0.0,
+              "premiumNetMonthly": 0.0,
+              "premiumTaxAmountMonthly": 0.0,
+              "premiumGrossMonthly": 0.0,
+              "selfInsurance": "0"
             }
           },
-          "slug": "death",
-          "tax": 10,
+          "price": 0,
+          "selfInsurance": "",
+          "selfInsuranceDesc": "",
+          "slug": "Assistenza",
+          "sumInsuredLimitOfIndemnity": 0,
+          "tax": 10.0,
           "taxes": null,
-          "type": "person",
-          "config": {
-            "sumInsuredValues": {
-              "min": 50000,
-              "max": 200000,
-              "step": 25000
-            },
-            "durationValues": {
-              "min": 5,
-              "max": 20,
-              "step": 5
-            },
-            "minimumGrossYearly": 10
-          }
+          "type": "",
+          "typeOfSumInsured": "",
+          "value": null
         },
-        "permanent-disability": {
+        "D": {
+          "assistance": "",
           "companyCodec": "",
-          "companyName": "Invalidità Totale Permanente",
-          "deductible": "",
-          "title": "",
-          "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
-          "group": "DEATH",
-          "name": "invalidità totale permanente",
+          "companyName": "",
+          "dailyAllowance": "",
+          "deductible": "0",
+          "description": "Il sostegno di un capitale, a disposizione di chi resta, per affrontare «il dopo» di un drammatico infortunio imprevisto, con una certezza economica in più. Puoi scelgere tu a chi destinare tale capitale: eredi legittimi o testamentari o chi ti sta più a cuore, da te nominato in polizza.",
+          "group": "",
           "isExtension": false,
-          "isMandatory": false,
-          "isSellable": false,
+          "legalDefence": "",
+          "name": "",
           "offer": {
-            "default": {
-              "sumInsured": 50000,
-              "duration": {
-                "year": 5
-              }
+            "base": {
+              "deductible": "0",
+              "deductibleType": "",
+              "sumInsuredLimitOfIndemnity": 0.0,
+              "premiumNetYearly": 0.0,
+              "premiumTaxAmountYearly": 0.0,
+              "premiumGrossYearly": 0.0,
+              "premiumNetMonthly": 0.0,
+              "premiumTaxAmountMonthly": 0.0,
+              "premiumGrossMonthly": 0.0,
+              "selfInsurance": "0"
+            },
+            "your": {
+              "deductible": "0",
+              "deductibleType": "",
+              "sumInsuredLimitOfIndemnity": 0.0,
+              "premiumNetYearly": 0.0,
+              "premiumTaxAmountYearly": 0.0,
+              "premiumGrossYearly": 0.0,
+              "premiumNetMonthly": 0.0,
+              "premiumTaxAmountMonthly": 0.0,
+              "premiumGrossMonthly": 0.0,
+              "selfInsurance": "0"
+            },
+            "premium": {
+              "deductible": "0",
+              "deductibleType": "",
+              "sumInsuredLimitOfIndemnity": 0.0,
+              "premiumNetYearly": 0.0,
+              "premiumTaxAmountYearly": 0.0,
+              "premiumGrossYearly": 0.0,
+              "premiumNetMonthly": 0.0,
+              "premiumTaxAmountMonthly": 0.0,
+              "premiumGrossMonthly": 0.0,
+              "selfInsurance": "0"
             }
           },
-          "slug": "permanent-disability",
-          "tax": 10,
+          "price": 0,
+          "selfInsurance": "",
+          "selfInsuranceDesc": "",
+          "slug": "Decesso Infortunio",
+          "sumInsuredLimitOfIndemnity": 0,
+          "tax": 2.5,
           "taxes": null,
-          "type": "person",
-          "config": {
-            "sumInsuredValues": {
-              "min": 50000,
-              "max": 200000,
-              "step": 25000
-            },
-            "durationValues": {
-              "min": 5,
-              "max": 20,
-              "step": 5
-            },
-            "minimumGrossYearly": 10
-          }
+          "type": "extra",
+          "typeOfSumInsured": "",
+          "value": null
         },
-        "temporary-disability": {
+        "DC": {
+          "assistance": "",
           "companyCodec": "",
-          "companyName": "Inabilità Totale Temporanea",
-          "deductible": "",
-          "title": "",
-          "description": "Un banale infortunio o malattia possono anche impedirti di lavorare per un certo periodo. Una somma mensile in sostituzione del tuo reddito aiuterebbe?",
-          "group": "DEATH",
-          "name": "inabilità totale temporanea",
+          "companyName": "",
+          "dailyAllowance": "",
+          "deductible": "0",
+          "description": "Una diaria, ad integrazione del proprio reddito, per ogni giorno di convalescenza post ricovero, senza alcuna franchigia, a causa di un infortunio. Fino ad un massimo di 30 giorni.",
+          "group": "",
           "isExtension": false,
-          "isMandatory": false,
-          "isSellable": false,
+          "legalDefence": "",
+          "name": "",
           "offer": {
-            "default": {
-              "sumInsured": 50000,
-              "duration": {
-                "year": 5
-              }
+            "base": {
+              "deductible": "0",
+              "deductibleType": "",
+              "sumInsuredLimitOfIndemnity": 0.0,
+              "premiumNetYearly": 0.0,
+              "premiumTaxAmountYearly": 0.0,
+              "premiumGrossYearly": 0.0,
+              "premiumNetMonthly": 0.0,
+              "premiumTaxAmountMonthly": 0.0,
+              "premiumGrossMonthly": 0.0,
+              "selfInsurance": "0"
+            },
+            "your": {
+              "deductible": "0",
+              "deductibleType": "",
+              "sumInsuredLimitOfIndemnity": 0.0,
+              "premiumNetYearly": 0.0,
+              "premiumTaxAmountYearly": 0.0,
+              "premiumGrossYearly": 0.0,
+              "premiumNetMonthly": 0.0,
+              "premiumTaxAmountMonthly": 0.0,
+              "premiumGrossMonthly": 0.0,
+              "selfInsurance": "0"
+            },
+            "premium": {
+              "deductible": "0",
+              "deductibleType": "",
+              "sumInsuredLimitOfIndemnity": 0.0,
+              "premiumNetYearly": 0.0,
+              "premiumTaxAmountYearly": 0.0,
+              "premiumGrossYearly": 0.0,
+              "premiumNetMonthly": 0.0,
+              "premiumTaxAmountMonthly": 0.0,
+              "premiumGrossMonthly": 0.0,
+              "selfInsurance": "0"
             }
           },
-          "slug": "temporary-disability",
-          "tax": 10,
+          "price": 0,
+          "selfInsurance": "",
+          "selfInsuranceDesc": "",
+          "slug": "Diaria Convalescenza Infortunio",
+          "sumInsuredLimitOfIndemnity": 0,
+          "tax": 2.5,
           "taxes": null,
-          "type": "person",
-          "config": {
-            "sumInsuredValues": {
-              "min": 500,
-              "max": 2000,
-              "step": 250
-            },
-            "durationValues": {
-              "min": 5,
-              "max": 20,
-              "step": 5
-            },
-            "minimumGrossYearly": 10
-          }
+          "type": "extra",
+          "typeOfSumInsured": "",
+          "value": null
         },
-        "serious-ill": {
+        "DRG": {
+          "assistance": "",
           "companyCodec": "",
-          "companyName": "Malattia Grave",
-          "deductible": "",
-          "title": "",
-          "description": "Cancro, Ictus, Infarto, Chirurgia aorto-coronarica, Insufficienza renale, Trapianto di organi principali. Parole che spaventano, ma con il giusto capitale in tasca si affrontano . . . e si superano.",
+          "companyName": "",
+          "dailyAllowance": "",
+          "deductible": "0",
+          "description": "Una diaria, ad integrazione del proprio reddito, per ogni giorno di ricovero o di immobilizzazione, senza alcuna franchigia, a causa di un infortunio. Fino ad un massimo di 365 giorni.",
+          "group": "",
           "isExtension": false,
-          "isMandatory": false,
-          "isSellable": false,
-          "group": "DEATH",
-          "name": "malattia grave",
+          "legalDefence": "",
+          "name": "",
           "offer": {
-            "default": {
-              "sumInsured": 50000,
-              "duration": {
-                "year": 5
-              }
+            "base": {
+              "deductible": "0",
+              "deductibleType": "",
+              "sumInsuredLimitOfIndemnity": 0.0,
+              "premiumNetYearly": 0.0,
+              "premiumTaxAmountYearly": 0.0,
+              "premiumGrossYearly": 0.0,
+              "premiumNetMonthly": 0.0,
+              "premiumTaxAmountMonthly": 0.0,
+              "premiumGrossMonthly": 0.0,
+              "selfInsurance": "0"
+            },
+            "your": {
+              "deductible": "0",
+              "deductibleType": "",
+              "sumInsuredLimitOfIndemnity": 0.0,
+              "premiumNetYearly": 0.0,
+              "premiumTaxAmountYearly": 0.0,
+              "premiumGrossYearly": 0.0,
+              "premiumNetMonthly": 0.0,
+              "premiumTaxAmountMonthly": 0.0,
+              "premiumGrossMonthly": 0.0,
+              "selfInsurance": "0"
+            },
+            "premium": {
+              "deductible": "0",
+              "deductibleType": "",
+              "sumInsuredLimitOfIndemnity": 0.0,
+              "premiumNetYearly": 0.0,
+              "premiumTaxAmountYearly": 0.0,
+              "premiumGrossYearly": 0.0,
+              "premiumNetMonthly": 0.0,
+              "premiumTaxAmountMonthly": 0.0,
+              "premiumGrossMonthly": 0.0,
+              "selfInsurance": "0"
             }
           },
-          "slug": "serious-ill",
-          "tax": 10,
+          "price": 0,
+          "selfInsurance": "",
+          "selfInsuranceDesc": "",
+          "slug": "Diaria Ricovero / Gessatura Infortunio",
+          "sumInsuredLimitOfIndemnity": 0,
+          "tax": 2.5,
           "taxes": null,
-          "type": "person",
-          "config": {
-            "values": [
-              5000,
-              10000,
-              15000,
-              20000,
-              25000,
-              30000,
-              35000,
-              40000,
-              45000,
-              50000,
-              55000,
-              60000,
-              65000,
-              70000,
-              75000,
-              80000,
-              85000,
-              90000,
-              95000,
-              100000,
-              110000,
-              120000,
-              130000,
-              140000,
-              150000,
-              160000,
-              170000,
-              180000,
-              190000,
-              200000
-            ],
-            "durationValues": {
-              "min": 5,
-              "max": 20,
-              "step": 5
+          "type": "extra",
+          "typeOfSumInsured": "",
+          "value": null
+        },
+        "IPI": {
+          "assistance": "",
+          "companyCodec": "",
+          "companyName": "",
+          "dailyAllowance": "",
+          "deductible": "0",
+          "description": "A seguito di infortunio, una percentuale del capitale assicurato viene liquidato in relazione al grado di Invalidità accertato. Piccole invalidità prevedono l’applicazione di una piccola franchigia, che si riduce fino a scomparire per invalidità più importanti. L’intero capitale è corrisposto dal 65% di invalidità.\n\n",
+          "group": "",
+          "isExtension": false,
+          "legalDefence": "",
+          "name": "",
+          "offer": {
+            "base": {
+              "deductible": "0",
+              "deductibleType": "",
+              "sumInsuredLimitOfIndemnity": 0.0,
+              "premiumNetYearly": 0.0,
+              "premiumTaxAmountYearly": 0.0,
+              "premiumGrossYearly": 0.0,
+              "premiumNetMonthly": 0.0,
+              "premiumTaxAmountMonthly": 0.0,
+              "premiumGrossMonthly": 0.0,
+              "selfInsurance": "0"
             },
-            "minimumGrossYearly": 10
-          }
+            "your": {
+              "deductible": "0",
+              "deductibleType": "",
+              "sumInsuredLimitOfIndemnity": 0.0,
+              "premiumNetYearly": 0.0,
+              "premiumTaxAmountYearly": 0.0,
+              "premiumGrossYearly": 0.0,
+              "premiumNetMonthly": 0.0,
+              "premiumTaxAmountMonthly": 0.0,
+              "premiumGrossMonthly": 0.0,
+              "selfInsurance": "0"
+            },
+            "premium": {
+              "deductible": "0",
+              "deductibleType": "",
+              "sumInsuredLimitOfIndemnity": 0.0,
+              "premiumNetYearly": 0.0,
+              "premiumTaxAmountYearly": 0.0,
+              "premiumGrossYearly": 0.0,
+              "premiumNetMonthly": 0.0,
+              "premiumTaxAmountMonthly": 0.0,
+              "premiumGrossMonthly": 0.0,
+              "selfInsurance": "0"
+            }
+          },
+          "price": 0,
+          "selfInsurance": "",
+          "selfInsuranceDesc": "",
+          "slug": "Invalidità Permanente Infortunio",
+          "sumInsuredLimitOfIndemnity": 0,
+          "tax": 2.5,
+          "taxes": null,
+          "type": "extra",
+          "typeOfSumInsured": "",
+          "value": null
+        },
+        "IPM": {
+          "assistance": "",
+          "companyCodec": "",
+          "companyName": "",
+          "dailyAllowance": "",
+          "deductible": "0",
+          "description": "A seguito di malattia, una percentuale del capitale assicurato viene liquidato, in relazione al grado di Invalidità accertato, a partire dal 25%. L’intero capitale è corrisposto dal 66% di invalidità",
+          "group": "",
+          "isExtension": false,
+          "legalDefence": "",
+          "name": "",
+          "offer": {
+            "base": {
+              "deductible": "0",
+              "deductibleType": "",
+              "sumInsuredLimitOfIndemnity": 0.0,
+              "premiumNetYearly": 0.0,
+              "premiumTaxAmountYearly": 0.0,
+              "premiumGrossYearly": 0.0,
+              "premiumNetMonthly": 0.0,
+              "premiumTaxAmountMonthly": 0.0,
+              "premiumGrossMonthly": 0.0,
+              "selfInsurance": "0"
+            },
+            "your": {
+              "deductible": "0",
+              "deductibleType": "",
+              "sumInsuredLimitOfIndemnity": 0.0,
+              "premiumNetYearly": 0.0,
+              "premiumTaxAmountYearly": 0.0,
+              "premiumGrossYearly": 0.0,
+              "premiumNetMonthly": 0.0,
+              "premiumTaxAmountMonthly": 0.0,
+              "premiumGrossMonthly": 0.0,
+              "selfInsurance": "0"
+            },
+            "premium": {
+              "deductible": "0",
+              "deductibleType": "",
+              "sumInsuredLimitOfIndemnity": 0.0,
+              "premiumNetYearly": 0.0,
+              "premiumTaxAmountYearly": 0.0,
+              "premiumGrossYearly": 0.0,
+              "premiumNetMonthly": 0.0,
+              "premiumTaxAmountMonthly": 0.0,
+              "premiumGrossMonthly": 0.0,
+              "selfInsurance": "0"
+            }
+          },
+          "price": 0,
+          "selfInsurance": "",
+          "selfInsuranceDesc": "",
+          "slug": "Invalidità Permanente Malattia IPM",
+          "sumInsuredLimitOfIndemnity": 0,
+          "tax": 2.5,
+          "taxes": null,
+          "type": "extra",
+          "typeOfSumInsured": "",
+          "value": null
+        },
+        "ITI": {
+          "assistance": "",
+          "companyCodec": "",
+          "companyName": "",
+          "dailyAllowance": "",
+          "deductible": "0",
+          "description": "Una diaria, ad integrazione del proprio reddito, per ogni giorno di impossibilità ad attendere, in tutto o in parte, alle proprie attività professionali, trascorsi alcuni giorni di franchigia, a causa di un infortunio. Fino ad un massimo di 365 giorni.",
+          "group": "",
+          "isExtension": false,
+          "legalDefence": "",
+          "name": "",
+          "offer": {
+            "base": {
+              "deductible": "7",
+              "deductibleType": "",
+              "sumInsuredLimitOfIndemnity": 0.0,
+              "premiumNetYearly": 0.0,
+              "premiumTaxAmountYearly": 0.0,
+              "premiumGrossYearly": 0.0,
+              "premiumNetMonthly": 0.0,
+              "premiumTaxAmountMonthly": 0.0,
+              "premiumGrossMonthly": 0.0,
+              "selfInsurance": "0"
+            },
+            "your": {
+              "deductible": "0",
+              "deductibleType": "",
+              "sumInsuredLimitOfIndemnity": 0.0,
+              "premiumNetYearly": 0.0,
+              "premiumTaxAmountYearly": 0.0,
+              "premiumGrossYearly": 0.0,
+              "premiumNetMonthly": 0.0,
+              "premiumTaxAmountMonthly": 0.0,
+              "premiumGrossMonthly": 0.0,
+              "selfInsurance": "0"
+            },
+            "premium": {
+              "deductible": "0",
+              "deductibleType": "",
+              "sumInsuredLimitOfIndemnity": 0.0,
+              "premiumNetYearly": 0.0,
+              "premiumTaxAmountYearly": 0.0,
+              "premiumGrossYearly": 0.0,
+              "premiumNetMonthly": 0.0,
+              "premiumTaxAmountMonthly": 0.0,
+              "premiumGrossMonthly": 0.0,
+              "selfInsurance": "0"
+            }
+          },
+          "price": 0,
+          "selfInsurance": "",
+          "selfInsuranceDesc": "",
+          "slug": "Inabilità Totale Infortunio",
+          "sumInsuredLimitOfIndemnity": 0,
+          "tax": 2.5,
+          "taxes": null,
+          "type": "extra",
+          "typeOfSumInsured": "",
+          "value": null
+        },
+        "RSC": {
+          "assistance": "",
+          "companyCodec": "",
+          "companyName": "",
+          "dailyAllowance": "",
+          "deductible": "0",
+          "description": "Rimborso delle spese mediche, sostenute nei 120 giorni successivi ad un infortunio, in caso di ricovero, day hospital, intervento chirurgico, anche ambulatoriale, comprese cure e protesi dentarie o danno estetico, trattamenti fisioterapici, rieducativi, cure termali, accertamenti diagnostici e spese anche non connesse a ricovero.",
+          "group": "",
+          "isExtension": false,
+          "legalDefence": "",
+          "name": "",
+          "offer": {
+            "base": {
+              "deductible": "0",
+              "deductibleType": "",
+              "sumInsuredLimitOfIndemnity": 0.0,
+              "premiumNetYearly": 0.0,
+              "premiumTaxAmountYearly": 0.0,
+              "premiumGrossYearly": 0.0,
+              "premiumNetMonthly": 0.0,
+              "premiumTaxAmountMonthly": 0.0,
+              "premiumGrossMonthly": 0.0,
+              "selfInsurance": "0"
+            },
+            "your": {
+              "deductible": "0",
+              "deductibleType": "",
+              "sumInsuredLimitOfIndemnity": 0.0,
+              "premiumNetYearly": 0.0,
+              "premiumTaxAmountYearly": 0.0,
+              "premiumGrossYearly": 0.0,
+              "premiumNetMonthly": 0.0,
+              "premiumTaxAmountMonthly": 0.0,
+              "premiumGrossMonthly": 0.0,
+              "selfInsurance": "0"
+            },
+            "premium": {
+              "deductible": "0",
+              "deductibleType": "",
+              "sumInsuredLimitOfIndemnity": 0.0,
+              "premiumNetYearly": 0.0,
+              "premiumTaxAmountYearly": 0.0,
+              "premiumGrossYearly": 0.0,
+              "premiumNetMonthly": 0.0,
+              "premiumTaxAmountMonthly": 0.0,
+              "premiumGrossMonthly": 0.0,
+              "selfInsurance": "0"
+            }
+          },
+          "price": 0,
+          "selfInsurance": "",
+          "selfInsuranceDesc": "",
+          "slug": "Rimborso spese di cura Infortunio",
+          "sumInsuredLimitOfIndemnity": 0,
+          "tax": 2.5,
+          "taxes": null,
+          "type": "extra",
+          "typeOfSumInsured": "",
+          "value": null
+        },
+        "TL": {
+          "assistance": "",
+          "companyCodec": "",
+          "companyName": "",
+          "dailyAllowance": "",
+          "deductible": "0",
+          "description": "",
+          "group": "",
+          "isExtension": false,
+          "legalDefence": "",
+          "name": "",
+          "offer": {
+            "base": {
+              "deductible": "0",
+              "deductibleType": "",
+              "sumInsuredLimitOfIndemnity": 0.0,
+              "premiumNetYearly": 0.0,
+              "premiumTaxAmountYearly": 0.0,
+              "premiumGrossYearly": 0.0,
+              "premiumNetMonthly": 0.0,
+              "premiumTaxAmountMonthly": 0.0,
+              "premiumGrossMonthly": 0.0,
+              "selfInsurance": "0"
+            },
+            "your": {
+              "deductible": "0",
+              "deductibleType": "",
+              "sumInsuredLimitOfIndemnity": 0.0,
+              "premiumNetYearly": 0.0,
+              "premiumTaxAmountYearly": 0.0,
+              "premiumGrossYearly": 0.0,
+              "premiumNetMonthly": 0.0,
+              "premiumTaxAmountMonthly": 0.0,
+              "premiumGrossMonthly": 0.0,
+              "selfInsurance": "0"
+            },
+            "premium": {
+              "deductible": "0",
+              "deductibleType": "",
+              "sumInsuredLimitOfIndemnity": 0.0,
+              "premiumNetYearly": 0.0,
+              "premiumTaxAmountYearly": 0.0,
+              "premiumGrossYearly": 0.0,
+              "premiumNetMonthly": 0.0,
+              "premiumTaxAmountMonthly": 0.0,
+              "premiumGrossMonthly": 0.0,
+              "selfInsurance": "0"
+            }
+          },
+          "price": 0,
+          "selfInsurance": "",
+          "selfInsuranceDesc": "",
+          "slug": "Tutela Legale",
+          "sumInsuredLimitOfIndemnity": 0,
+          "tax": 21.25,
+          "taxes": null,
+          "type": "",
+          "typeOfSumInsured": "",
+          "value": null
         }
       }
     }
-  ]
+  ],
+  "offers": {
+    "premium": {
+      "name": "Completa",
+      "description": "La proposta con più protezione, per contare su un aiuto quando serve",
+      "order": 3
+    },
+    "your": {
+      "name": "Scelta per te",
+      "description": "Il mix adeguato di protezione, sia dai rischi importanti che da quelli di tutti i giorni",
+      "order": 2
+    },
+    "base": {
+      "name": "Base",
+      "description": "La protezione assicurativa indispensabile per la tua persona, quella che dovresti sempre avere",
+      "order": 1
+    }
+  }
 }
