@@ -130,7 +130,7 @@ func (queries *Firequeries) FirestoreWherefields(collection string) *firestore.D
 	col := client.Collection(collection)
 	query = col.Where(queries.Queries[0].Field, queries.Queries[0].Operator, queries.Queries[0].QueryValue)
 	for i := 1; i < len(queries.Queries)-1; i++ {
-		query = col.Where(queries.Queries[i].Field, queries.Queries[i].Operator, queries.Queries[i].QueryValue)
+		query = query.Where(queries.Queries[i].Field, queries.Queries[i].Operator, queries.Queries[i].QueryValue)
 	}
 
 	return query.Documents(ctx)

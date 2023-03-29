@@ -6,7 +6,7 @@ replace github.com/wopta/goworkspace/wiseproxy => ./
 
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
-	github.com/wopta/goworkspace/lib v1.0.5
+	github.com/wopta/goworkspace/lib v1.0.6
 )
 
 require (

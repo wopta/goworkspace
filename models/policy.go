@@ -32,7 +32,7 @@ type Policy struct {
 	ProductUid      string                       `firestore:"productUid,omitempty" json:"productUid,omitempty" bigquery:"productUid"`
 	PayUrl          string                       `firestore:"payUrl,omitempty" json:"payUrl,omitempty" bigquery:"-"`
 	SignUrl         string                       `firestore:"signUrl,omitempty" json:"signUrl,omitempty" bigquery:"-"`
-	ProductVersion  int                          `firestore:"productVersion,omitempty" json:"productVersion,omitempty" bigquery:"productVersion"`
+	ProductVersion  string                       `firestore:"productVersion,omitempty" json:"productVersion,omitempty" bigquery:"productVersion"`
 	ProposalNumber  int                          `firestore:"proposalNumber,omitempty" json:"proposalNumber,omitempty" bigquery:"proposalNumber"`
 	OfferlName      string                       `firestore:"offerName,omitempty" json:"offerName,omitempty" bigquery:"offerName"`
 	Number          int                          `firestore:"number,omitempty" json:"number,omitempty" bigquery:"number"`

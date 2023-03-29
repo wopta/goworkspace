@@ -140,9 +140,13 @@ func GetFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 func AxaFleetTway() (string, interface{}, error) {
 	log.Println("AxaFleetEmit")
 	log.Println(os.Getenv("env"))
-	var path []byte
-	var excel [][]interface{}
-	var e error
+	var (
+		path     []byte
+		excel    [][]interface{}
+		e        error
+		toEmit   bool
+		sourcest []byte
+	)
 
 	switch os.Getenv("env") {
 	case "local":
@@ -165,6 +169,7 @@ func AxaFleetTway() (string, interface{}, error) {
 	axa, e := srv.Spreadsheets.Values.Get(spreadsheettotId, "A:W").Do()
 	excelhead := []interface{}{"NUMERO POLIZZA", "LOB", "	TIPOLOGIA POLIZZA", "CODICE CONFIGURAZIONE", "IDENTIFICATIVO UNIVOCO APPLICAZIONE", "	TIPO OGGETTO ASSICURATO", "	CODICE FISCALE / P.IVA ASSICURATO", "COGNOME / RAGIONE SOCIALE ASSICURATO", "	NOME ASSICURATO", "	INDIRIZZO RESIDENZA ASSICURATO", "	CAP RESIDENZA ASSICURATO", "	CITTA’ RESIDENZA ASSICURATO", "	PROVINCIA RESIDENZA ASSICURATO", "	TARGA VEICOLO", "	TELAIO VEICOLO	", "MARCA VEICOLO", "	MODELLO VEICOLO	TIPOLOGIA VEICOLO", "PESO VEICOLO", "	DATA IMMATRICOLAZIONE", "	DATA INIZIO VALIDITA' COPERTURA", "	DATA FINE VALIDITA' COPERTURA", "TIPO MOVIMENTO"}
 	excel = append(excel, excelhead)
+
 	if len(tway.Values) == 0 {
 		fmt.Println("No data found.")
 	} else {
@@ -186,31 +191,55 @@ func AxaFleetTway() (string, interface{}, error) {
 			progressiveFormatted := fmt.Sprintf("%08d", progressive)
 			progressiveFormattedpre := "WR" + progressiveFormatted
 
-			if len(row) == 7 && i != 0 {
+			if len(row) < 9 && i != 0 {
+				toEmit = true
 				fmt.Println("Enter in No EMESSO")
 
-				var typeMov string
+				var (
+					typeMov               string
+					DATAIMMATRICOLAZIONE  string
+					MODELLO               string
+					TARGA                 string
+					DATAVALIDITACOPERTURA string
+					DATAFINECOPERTURA     string
+				)
 				isError := false
-				fmt.Println("row[5]:")
-				fmt.Println(row[6])
 				fmt.Println(row)
 				if row[6] == "Inserimento" {
 					typeMov = "A"
+					DATAVALIDITACOPERTURA = row[4].(string)
+					DATAIMMATRICOLAZIONE = row[3].(string)
+					TARGA = row[1].(string)
+					MODELLO = row[2].(string)
+					DATAFINECOPERTURA = "31/12/2023"
+
 				} else {
 					founded := false
 
 					for x, axarow := range axa.Values {
 						// var t string
-						if axarow[13] == row[2] {
+						if axarow[13] == row[7].(string) {
 							fmt.Println("axarow[13] == row[2]")
 							fmt.Println(x)
 							progressiveFormattedpre = axarow[4].(string)
 							founded = true
+							DATAVALIDITACOPERTURA = axarow[20].(string)
+							DATAIMMATRICOLAZIONE = axarow[19].(string)
+							TARGA = axarow[13].(string)
+							MODELLO = axarow[16].(string)
+							DATAFINECOPERTURA = row[8].(string)
+
 						}
 
 					}
 					if !founded {
 						mail.SendMail((getMailObj("<p>Opss.. qualcosa è andato storto</p><p>Il servizio di aggiornamento copertura flotte di Wopta per T-way non è stato in grado di trovare la targa: " + row[2].(string) + "</p><p>Non ti preoccupare questa operazione è stata gia annullata devi solo rieffetuare la richiesta dall' apposito form con la targa corretta</p>")))
+						fmt.Println("ERROR save, :")
+						celindex := strconv.Itoa(i + 1)
+						cel := &sheets.ValueRange{
+							Values: [][]interface{}{{"ERRATO"}},
+						}
+						_, e = srv.Spreadsheets.Values.Update(spreadsheetId, "I"+celindex+":I"+celindex, cel).ValueInputOption("USER_ENTERED").Context(ctx).Do()
 						isError = true
 					}
 					typeMov = "E"
@@ -218,43 +247,48 @@ func AxaFleetTway() (string, interface{}, error) {
 				if !isError {
 					fmt.Println("!isError")
 					celindex := strconv.Itoa(i + 1)
-					excelRow := []interface{}{"191222", "A", "C", "00001", progressiveFormattedpre, "2", "03682240043", "T-WAY SPA", "", "Piazza Walther Von Der Vogelweide", "39100", "Bolzano", "BZ", row[1], "", "", row[2], 3, 4, row[3], row[4], "31/12/2023", typeMov}
+					excelRow := []interface{}{"191222", "A", "C", "00001", progressiveFormattedpre, "2", "03682240043", "T-WAY SPA", "", "Piazza Walther Von Der Vogelweide", "39100", "Bolzano", "BZ", TARGA, "", "", MODELLO, 3, 4, DATAIMMATRICOLAZIONE, DATAVALIDITACOPERTURA, DATAFINECOPERTURA, typeMov}
 					cel := &sheets.ValueRange{
 						Values: [][]interface{}{{"EMESSO"}},
 					}
 					row := &sheets.ValueRange{
-						Values: [][]interface{}{{"191222", "A", "C", "00001", progressiveFormattedpre, "2", "03682240043", "T-WAY SPA", "", "Piazza Walther Von Der Vogelweide", "39100", "Bolzano", "BZ", row[1], "", "", row[2], 3, 4, row[3], row[4], "31/12/2023", typeMov}},
+						Values: [][]interface{}{{"191222", "A", "C", "00001", progressiveFormattedpre, "2", "03682240043", "T-WAY SPA", "", "Piazza Walther Von Der Vogelweide", "39100", "Bolzano", "BZ", TARGA, "", "", MODELLO, 3, 4, DATAIMMATRICOLAZIONE, DATAVALIDITACOPERTURA, DATAFINECOPERTURA, typeMov}},
 					}
 					excel = append(excel, excelRow)
 					fmt.Println("first save, :")
-					_, e = srv.Spreadsheets.Values.Update(spreadsheetId, "H"+celindex+":H"+celindex, cel).ValueInputOption("USER_ENTERED").Context(ctx).Do()
+					_, e = srv.Spreadsheets.Values.Update(spreadsheetId, "I"+celindex+":I"+celindex, cel).ValueInputOption("USER_ENTERED").Context(ctx).Do()
 					fmt.Println("second save:")
 					_, e = srv.Spreadsheets.Values.Append(spreadsheettotId, "Foglio1", row).ValueInputOption("USER_ENTERED").InsertDataOption("INSERT_ROWS").Context(ctx).Do()
 				}
+			} else {
+				toEmit = false
 			}
 
 		}
 	}
-	now := time.Now()
-	layout2 := "2006-01-02"
-	filepath := now.Format(layout2) + "-" + strconv.Itoa(time.Now().Nanosecond()) + ".xlsx"
+	if toEmit {
+		now := time.Now()
+		layout2 := "2006-01-02"
+		filepath := now.Format(layout2) + "-" + strconv.Itoa(time.Now().Nanosecond()) + ".xlsx"
 
-	if os.Getenv("env") != "local" {
-		//./serverless_function_source_code/
+		if os.Getenv("env") != "local" {
+			//./serverless_function_source_code/
 
-		//filepath = "../tmp/" + filepath
+			//filepath = "../tmp/" + filepath
+		}
+		sourcest, e = CreateExcel(excel, "../tmp/"+filepath)
+		//root = path.dirname(path.abspath(__file__))
+		log.Println("tempdir")
+		lib.Files("../tmp")
+		//sourcest, e := ioutil.ReadFile("../tmp/" + filepath)
+		_, e = lib.PutGoogleStorage("function-data", "tway-fleet-axa/"+filepath, sourcest, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+		sourcest, e = ioutil.ReadFile("../tmp/" + filepath)
+		_, e = lib.PutGoogleStorage("function-data", "tway-fleet-axa/2_"+filepath, sourcest, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+		lib.PutToStorage("function-data", "tway-fleet-axa/3_"+filepath, sourcest)
+		//SftpUpload(filepath)
 	}
-	sourcest, e := CreateExcel(excel, "../tmp/"+filepath)
-	//root = path.dirname(path.abspath(__file__))
-	log.Println("tempdir")
-	lib.Files("../tmp")
-	//sourcest, e := ioutil.ReadFile("../tmp/" + filepath)
-	_, e = lib.PutGoogleStorage("function-data", "tway-fleet-axa/"+filepath, sourcest, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-	sourcest, e = ioutil.ReadFile("../tmp/" + filepath)
-	_, e = lib.PutGoogleStorage("function-data", "tway-fleet-axa/2_"+filepath, sourcest, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-	lib.PutToStorage("function-data", "tway-fleet-axa/3_"+filepath, sourcest)
-	SftpUpload(filepath)
 	return "", nil, e
+
 }
 
 func SftpUpload(filePath string) {

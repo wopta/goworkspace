@@ -3,6 +3,7 @@ package callback
 import (
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/wopta/goworkspace/document"
@@ -33,7 +34,6 @@ func Sign(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 
 	if action == "workstepFinished" {
 		policyF := lib.GetFirestore("policy", uid)
-
 		var policy models.Policy
 		policyF.DataTo(&policy)
 		log.Println("Sign "+uid+" policy.Status:", policy.Status)
@@ -44,11 +44,12 @@ func Sign(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 			policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusSign)
 			policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusToPay)
 
+			*policy.Attachments = append(*policy.Attachments, models.Attachment{Name: "Contratto", Link: "gs://" + os.Getenv("GOOGLE_STORAGE_BUCKET") + "/contracts/" + policy.Uid + ".pdf"})
 			lib.SetFirestore("policy", uid, policy)
 			policy.BigquerySave()
-
 			mail.SendMailPay(policy)
 			s := <-document.GetFileV6(policy.IdSign, uid)
+
 			log.Println(s)
 		}
 	}
