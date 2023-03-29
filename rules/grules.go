@@ -32,9 +32,11 @@ func rulesFromJson(groule []byte, out interface{}, in []byte, data []byte) (stri
 	//err = dataContext.AddJSON("out", out)
 	log.Println("RulesFromJson out")
 	lib.CheckError(err)
-	err = dataContext.AddJSON("data", data)
-	log.Println("RulesFromJson data loaded")
-	lib.CheckError(err)
+	if data != nil {
+		err = dataContext.AddJSON("data", data)
+		log.Println("RulesFromJson data loaded")
+		lib.CheckError(err)
+	}
 	err = dataContext.Add("fx", fx)
 	log.Println("RulesFromJson fx loaded")
 	lib.CheckError(err)
