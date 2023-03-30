@@ -118,7 +118,8 @@ func AxaFleetTway(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 
 					}
 					if !founded {
-						mail.SendMail((getMailObj("<p>Opss.. qualcosa è andato storto</p><p>Il servizio di aggiornamento copertura flotte di Wopta per T-way non è stato in grado di trovare la targa: " + row[2].(string) + "</p><p>Non ti preoccupare questa operazione è stata gia annullata devi solo rieffetuare la richiesta dall' apposito form con la targa corretta</p>")))
+						mail.SendMail((getMailObj("<p>Opss.. qualcosa è andato storto</p><p>Il servizio di aggiornamento copertura flotte di Wopta per T-way non è stato in grado di trovare la targa: "+row[2].(string)+"</p><p>Non ti preoccupare questa operazione è stata gia annullata devi solo rieffetuare la richiesta dall' apposito form con la targa corretta</p>",
+							row[1].(string))))
 						fmt.Println("ERROR save, :")
 						celindex := strconv.Itoa(i + 1)
 						cel := &sheets.ValueRange{
@@ -220,7 +221,6 @@ func SftpUpload(filePath string) {
 	log.Println(info.Size())
 	// Upload local file to a remote location as in 1MB (byte) chunks.
 	e = client.Upload(source, destination, int(info.Size()))
-
 	lib.CheckError(e)
 	/*
 		// Download remote file.
@@ -269,11 +269,11 @@ func CreateExcel(sheet [][]interface{}, filePath string) ([]byte, error) {
 	return resByte.Bytes(), err
 }
 
-func getMailObj(msg string) mail.MailRequest {
+func getMailObj(msg string, mailsource string) mail.MailRequest {
 	//link := "https://storage.googleapis.com/documents-public-dev/information-set/information-sets//v1/Precontrattuale.pdf "michele.lomazzi@wopta.it","
 	var obj mail.MailRequest
 	obj.From = "noreply@wopta.it"
-	obj.To = []string{"luca.barbieri@wopta.it"}
+	obj.To = []string{"fabrizia.colombo@wopta.it", "michele.lomazzi@wopta.it", "luca.barbieri@wopta.it", mailsource}
 	obj.Message = msg
 	obj.Subject = " Wopta T-Way Axa Fleet"
 	obj.IsHtml = true

@@ -132,7 +132,7 @@ func GetPoliciesFromFirebase(fiscalCode string) []models.Policy {
 			},
 		},
 	}
-	docsnap := q.FirestoreWherefields("policy")
+	docsnap, _ := q.FirestoreWherefields("policy")
 	return models.PolicyToListData(docsnap)
 }
 

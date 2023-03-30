@@ -122,18 +122,18 @@ func QueryWhereFirestore(collection string, field string, operator string, query
 
 	return query, err
 }
-func (queries *Firequeries) FirestoreWherefields(collection string) *firestore.DocumentIterator {
+func (queries *Firequeries) FirestoreWherefields(collection string) (*firestore.DocumentIterator, error) {
 	ctx := context.Background()
 	var query firestore.Query
 	client, err := firestore.NewClient(ctx, os.Getenv("GOOGLE_PROJECT_ID"))
-	CheckError(err)
+
 	col := client.Collection(collection)
 	query = col.Where(queries.Queries[0].Field, queries.Queries[0].Operator, queries.Queries[0].QueryValue)
-	for i := 1; i < len(queries.Queries)-1; i++ {
+	for i := 1; i <= len(queries.Queries)-1; i++ {
 		query = query.Where(queries.Queries[i].Field, queries.Queries[i].Operator, queries.Queries[i].QueryValue)
 	}
 
-	return query.Documents(ctx)
+	return query.Documents(ctx), err
 }
 func OrderFirestore(collection string, field string, value firestore.Direction) *firestore.DocumentIterator {
 	ctx := context.Background()
