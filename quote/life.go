@@ -41,7 +41,7 @@ func Life(data models.Policy) (models.Policy, error) {
 
 	data.OffersPrices = map[string]map[string]*models.Price{
 		"default": {
-			"yearly": &models.Price{},
+			"yearly":  &models.Price{},
 			"monthly": &models.Price{},
 		},
 	}
@@ -84,7 +84,7 @@ func Life(data models.Policy) (models.Policy, error) {
 			taxfloat, _ := strconv.ParseFloat(strings.Replace(strings.Replace(selectRow[baseTax], "%", "", 1), ",", ".", 1), 64)
 			basefloat = basefloat / 100
 			taxfloat = taxfloat / 100
-			
+
 			guarance.Offer["default"].PremiumNetYearly = guarance.Value.SumInsuredLimitOfIndemnity * basefloat
 			guarance.Offer["default"].PremiumGrossYearly = guarance.Value.SumInsuredLimitOfIndemnity * taxfloat
 			guarance.Offer["default"].PremiumNetMonthly = guarance.Value.SumInsuredLimitOfIndemnity * basefloat / 12
@@ -93,7 +93,7 @@ func Life(data models.Policy) (models.Policy, error) {
 			data.OffersPrices["default"]["yearly"].Gross = data.OffersPrices["default"]["yearly"].Gross + guarance.Offer["default"].PremiumGrossYearly
 			data.OffersPrices["default"]["yearly"].Net = data.OffersPrices["default"]["yearly"].Net + guarance.Offer["default"].PremiumNetYearly
 			data.OffersPrices["default"]["monthly"].Gross = data.OffersPrices["default"]["monthly"].Gross + guarance.Offer["default"].PremiumGrossMonthly
-			data.OffersPrices["default"]["yearly"].Net = data.OffersPrices["default"]["yearly"].Net + guarance.Offer["default"].PremiumNetYearly
+			data.OffersPrices["default"]["monthly"].Net = data.OffersPrices["default"]["monthly"].Net + guarance.Offer["default"].PremiumNetMonthly
 
 		}
 
