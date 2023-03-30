@@ -119,7 +119,7 @@ func GetName(name string, version string) (models.Product, error) {
 			},
 		},
 	}
-	query := q.FirestoreWherefields("products")
+	query, _ := q.FirestoreWherefields("products")
 	products := models.ProductToListData(query)
 	if len(products) == 0 {
 		return models.Product{}, fmt.Errorf("no product json file found for %s %s", name, version)
