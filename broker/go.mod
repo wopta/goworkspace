@@ -13,6 +13,7 @@ require (
 	github.com/wopta/goworkspace/mail v1.0.4
 	github.com/wopta/goworkspace/models v1.0.19
 	github.com/wopta/goworkspace/payment v1.0.5
+	github.com/wopta/goworkspace/user v0.0.0-20230330080822-acd51ca6882d
 	github.com/wopta/goworkspace/wiseproxy v1.0.3
 )
 
@@ -81,6 +82,7 @@ require (
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.21.0 // indirect
 	golang.org/x/crypto v0.5.0 // indirect
+	golang.org/x/exp v0.0.0-20230310171629-522b1b587ee0 // indirect
 	golang.org/x/mod v0.8.0 // indirect
 	golang.org/x/net v0.8.0 // indirect
 	golang.org/x/oauth2 v0.6.0 // indirect
