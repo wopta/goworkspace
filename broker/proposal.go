@@ -45,11 +45,17 @@ func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	}
 	log.Println("Proposal User uid ", useruid)
 	policy.Contractor.Uid = useruid
+	//Precontrattuale.pdf
+	if policy.ProductVersion == "" {
+		policy.ProductVersion = "v1"
+	}
+	policy.Attachments = &[]models.Attachment{{Name: "Precontrattuale", Link: "gs://documents-public-dev/information-sets/" + policy.Name + "/" + policy.ProductVersion + "v1/Precontrattuale.pdf"}}
 	log.Println("Proposal save")
 	ref, _ := lib.PutFirestore("policy", policy)
 	policy.BigquerySave()
 	log.Println(ref.ID + " Proposal sand mail")
 	mail.SendMail(getProposalMailObj(policy))
+
 	log.Println("Proposal ", ref.ID)
 
 	return `{"uid":"` + ref.ID + `"}`, policy, e
@@ -63,7 +69,7 @@ func getProposalMailObj(policy models.Policy) mail.MailRequest {
 		linkForm = "https://www.wopta.it/it/multi-rischio/"
 	}
 
-	link := "https://storage.googleapis.com/documents-public-dev/information-set/information-sets/" + policy.Name + "/v1/Precontrattuale.pdf"
+	link := "gs://documents-public-dev/information-sets/" + policy.Name + "/" + policy.ProductVersion + "v1/Precontrattuale.pdf"
 	var obj mail.MailRequest
 
 	obj.From = "noreply@wopta.it"
