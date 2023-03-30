@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
-	lib "github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	//"google.golang.org/api/firebaseappcheck/v1"
 )
