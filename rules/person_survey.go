@@ -2,10 +2,6 @@ package rules
 
 import (
 	"encoding/json"
-	"github.com/hyperjumptech/grule-rule-engine/ast"
-	"github.com/hyperjumptech/grule-rule-engine/builder"
-	"github.com/hyperjumptech/grule-rule-engine/engine"
-	"github.com/hyperjumptech/grule-rule-engine/pkg"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"io"
@@ -16,9 +12,9 @@ import (
 
 func PersonSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		policy    models.Policy
-		groule    []byte
-		e         error
+		//policy    models.Policy
+		groule []byte
+		//e         error
 		questions []*models.Statement
 	)
 	const (
@@ -26,12 +22,10 @@ func PersonSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	)
 
 	log.Println("Person Survey")
-	req := lib.ErrorByte(io.ReadAll(r.Body))
-	policy, e = models.UnmarshalPolicy(req)
-	lib.CheckError(e)
+	policyJson := lib.ErrorByte(io.ReadAll(r.Body))
 
-	statements := &Statements{Statements: questions}
-	dynamicTitle := &DynamicTitle{Text: ""}
+	statements := &Statements{Statements: questions, Text: nil}
+	//dynamicTitle := &DynamicTitle{Text: ""}
 
 	switch os.Getenv("env") {
 	case "local":
@@ -42,57 +36,16 @@ func PersonSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		groule = lib.GetFromStorage("core-350507-function-data", "grules/"+rulesFileName, "")
 	}
 
-	fx := &Fx{}
-	fxSurvey := &FxSurvey{}
-	// create new instance of DataContext
-	dataContext := ast.NewDataContext()
-	// add your JSON Fact into data context using AddJSON() function.
-	err := dataContext.Add("in", policy)
-	log.Println("RulesFromJson in")
-	lib.CheckError(err)
+	_, statementsOut := rulesFromJson(groule, statements, policyJson, []byte(getCoherenceData()))
 
-	err = dataContext.Add("title", dynamicTitle)
-	log.Println("RulesFromJson title")
-	lib.CheckError(err)
+	b, err := json.Marshal(statementsOut.(models.Policy))
 
-	err = dataContext.Add("out", statements)
-	log.Println("RulesFromJson out")
-	lib.CheckError(err)
-
-	err = dataContext.AddJSON("data", []byte(getCoherenceData()))
-	log.Println("RulesFromJson data loaded")
-	lib.CheckError(err)
-
-	err = dataContext.Add("fx", fx)
-	log.Println("RulesFromJson fx loaded")
-	lib.CheckError(err)
-
-	err = dataContext.Add("fxSurvey", fxSurvey)
-	log.Println("RulesFromJson fx loaded")
-	lib.CheckError(err)
-
-	underlying := pkg.NewBytesResource(groule)
-	resource := pkg.NewJSONResourceFromResource(underlying)
-	// Add the rule definition above into the library and name it 'TutorialRules'  version '0.0.1'
-	knowledgeLibrary := ast.NewKnowledgeLibrary()
-	ruleBuilder := builder.NewRuleBuilder(knowledgeLibrary)
-	//bs := pkg.NewBytesResource([]byte(fileRes))
-
-	err = ruleBuilder.BuildRuleFromResource("rules", "0.0.1", resource)
-	lib.CheckError(err)
-	knowledgeBase := knowledgeLibrary.NewKnowledgeBaseInstance("rules", "0.0.1")
-	eng := engine.NewGruleEngine()
-	err = eng.Execute(dataContext, knowledgeBase)
-	lib.CheckError(err)
-
-	b, err := json.Marshal(statements)
-	lib.CheckError(err)
-
-	return string(b), statements, nil
+	return string(b), statementsOut, err
 }
 
 type Statements struct {
 	Statements []*models.Statement `json:"statements"`
+	Text       *string             `json:"text,omitempty"`
 }
 
 type DynamicTitle struct {
@@ -131,7 +84,10 @@ func (fx *FxSurvey) AppendQuestion(questions []*models.Question, text string, is
 	return append(questions, question)
 }
 
-func (fx *FxSurvey) HasGuaranteePolicy(policy models.Policy, guaranteeName string) bool {
+func (fx *FxSurvey) HasGuaranteePolicy(input []byte, guaranteeName string) bool {
+	var policy models.Policy
+	err := json.Unmarshal(input, &policy)
+	lib.CheckError(err)
 	for _, guarantee := range policy.Assets[0].Guarantees {
 		if guarantee.Name == guaranteeName {
 			return true
@@ -140,7 +96,10 @@ func (fx *FxSurvey) HasGuaranteePolicy(policy models.Policy, guaranteeName strin
 	return false
 }
 
-func (fx *FxSurvey) GetGuaranteeIndex(policy models.Policy, guaranteeName string) int {
+func (fx *FxSurvey) GetGuaranteeIndex(input []byte, guaranteeName string) int {
+	var policy models.Policy
+	err := json.Unmarshal(input, &policy)
+	lib.CheckError(err)
 	for i, guarantee := range policy.Assets[0].Guarantees {
 		if guarantee.Name == guaranteeName {
 			return i
