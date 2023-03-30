@@ -174,9 +174,8 @@ func AxaFleetTway(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 			//filepath = "../tmp/" + filepath
 		}
 		sourcest, e = CreateExcel(excel, "../tmp/"+filepath)
-
-		lib.PutToStorage("function-data", "tway-fleet-axa/3_"+filepath, sourcest)
-		//SftpUpload(filepath)
+		lib.PutToStorage("function-data", "tway-fleet-axa/"+filepath, sourcest)
+		SftpUpload(filepath)
 		mail.SendMail((getMailObj("<p>inserite in copertura:</p><p>"+strings.Join(insertList, ", ")+"</p><p>escluse dalla copertura:</p><p>"+strings.Join(deleteList, ", ")+"</p>",
 			mailsource)))
 	}
