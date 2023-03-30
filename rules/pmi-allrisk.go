@@ -399,7 +399,8 @@ func initCoverage() map[string]*Coverage {
 		IsPremium:                  false,
 	}
 	res["damage-to-goods-course-of-works"] = &Coverage{
-		Slug:                       "damage-to-goods-course-of-works",
+		Slug: "damage-to-goods-course-of-works",
+
 		Type:                       "company",
 		Group:                      "RCT",
 		IsExtension:                true,
