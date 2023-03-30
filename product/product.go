@@ -61,9 +61,15 @@ func GetNameFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	log.Println(v)
 	log.Println(v[1])
 	product, err := GetName(name, version)
-	lib.CheckError(err)
+	if err != nil {
+
+		return "", nil, err
+	}
 	jsonOut, err := product.Marshal()
-	lib.CheckError(err)
+	if err != nil {
+		return "", nil, err
+	}
+
 	jsonString := string(jsonOut)
 	switch name {
 	case "persona":
@@ -71,7 +77,6 @@ func GetNameFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	case "life":
 		jsonString, product, err = ReplaceDatesInProduct(product, 69)
 	}
-	lib.CheckError(err)
 
 	return jsonString, product, err
 }
