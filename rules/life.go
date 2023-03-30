@@ -1,6 +1,7 @@
 package rules
 
 import (
+	"encoding/json"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	prd "github.com/wopta/goworkspace/product"
@@ -21,7 +22,7 @@ func Life(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 
 	log.Println("Life")
 	req := lib.ErrorByte(io.ReadAll(r.Body))
-	quotingInputData := getRulesInputData(&policy, err, req)
+	quotingInputData := getInputData(&policy, err, req)
 
 	rulesFile = getRulesFile(rulesFile, rulesFileName)
 	product, err := prd.GetName("life", "v1")
@@ -34,4 +35,19 @@ func Life(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	productJson, product, err := prd.ReplaceDatesInProduct(ruleOutput.(models.Product), 69)
 
 	return productJson, product, err
+}
+
+func getInputData(policy *models.Policy, e error, req []byte) []byte {
+	*policy, e = models.UnmarshalPolicy(req)
+	lib.CheckError(e)
+
+	age, e := calculateAge(policy.Contractor.BirthDate)
+	lib.CheckError(e)
+	tmpMap := make(map[string]int)
+
+	tmpMap["age"] = age
+
+	request, e := json.Marshal(tmpMap)
+	lib.CheckError(e)
+	return request
 }
