@@ -20,8 +20,8 @@ type Guarante struct {
 	ValueDesc                  string                    `firestore:"valueDesc,omitempty" json:"valueDesc,omitempty"`
 	Offer                      map[string]*GuaranteValue `firestore:"offer,omitempty" json:"offer,omitempty"`
 	Slug                       string                    `firestore:"slug" json:"slug,omitempty"`
-	IsMandatory                bool                      `firestore:"isMandatory ,omitempty" json:"isMandatory ,omitempty"`
-	IsExtension                bool                      `firestore:"isExtension,omitempty" json:"isExtension,omitempty"`
+	IsMandatory                bool                      `firestore:"isMandatory" json:"isMandatory"`
+	IsExtension                bool                      `firestore:"isExtension" json:"isExtension"`
 	Discount                   float64                   `json:"discount,omitempty" json:"discount,omitempty"`
 	Name                       string                    `firestore:"name,omitempty" json:"name,omitempty"`
 	SumInsuredLimitOfIndemnity float64                   `json:"sumInsuredLimitOfIndemnity" json:"sumInsuredLimitOfIndemnity,omitempty"`
@@ -35,29 +35,33 @@ type Guarante struct {
 	PriceNett                  float64                   `firestore:"priceNett,omitempty" json:"priceNett,omitempty"`
 	PriceGross                 float64                   `firestore:"priceGross,omitempty" json:"priceGross,omitempty"`
 	IsSellable                 bool                      `firestore:"isSellable" json:"isSellable"`
+	IsConfigurable             bool                      `firestore:"isConfigurable" json:"isConfigurable"`
 }
 type GuaranteValue struct {
-	TypeOfSumInsured           string             `firestore:"typeOfSumInsured,omitempty" json:"typeOfSumInsured,omitempty"`
-	Deductible                 string             `firestore:"deductible,omitempty" json:"deductible,omitempty"`
-	DeductibleValues           GuaranteFieldValue `firestore:"deductibleValues,omitempty" json:"deductibleValues,omitempty"`
-	DeductibleType             string             `firestore:"deductibleType,omitempty" json:"deductibleType,omitempty"`
-	SumInsuredLimitOfIndemnity float64            `json:"sumInsuredLimitOfIndemnity,omitempty" json:"sumInsuredLimitOfIndemnity,omitempty"`
-	SumInsured                 float64            `json:"sumInsured,omitempty" json:"sumInsured,omitempty"`
-	LimitOfIndemnity           float64            `json:"limitOfIndemnity,omitempty" json:"limitOfIndemnity,omitempty"`
-	SelfInsurance              string             `firestore:"selfInsurance,omitempty" json:"selfInsurance,omitempty"`
-	SumInsuredValues           GuaranteFieldValue `firestore:"sumInsuredValues,omitempty" json:"sumInsuredValues,omitempty"`
-	DeductibleDesc             string             `firestore:"deductibleDesc,omitempty" json:"deductibleDesc,omitempty"`
-	SelfInsuranceValues        GuaranteFieldValue `firestore:"selfInsuranceValues,omitempty" json:"selfInsuranceValues,omitempty"`
-	SelfInsuranceDesc          string             `firestore:"selfInsuranceDesc,omitempty" json:"selfInsuranceDesc,omitempty"`
-	Duration                   Duration           `firestore:"duration,omitempty" json:"duration,omitempty"`
-	Tax                        float64            `firestore:"tax" json:"tax"`
-	Percentage                 float64            `firestore:"percentage" json:"percentage"`
-	PremiumNetYearly           float64            `firestore:"premiumNetYearly" json:"premiumNetYearly"`
-	PremiumTaxAmountYearly     float64            `firestore:"premiumTaxAmountYearly" json:"premiumTaxAmountYearly"`
-	PremiumGrossYearly         float64            `firestore:"premiumGrossYearly" json:"premiumGrossYearly"`
-	PremiumNetMonthly          float64            `firestore:"premiumNetMonthly" json:"premiumNetMonthly"`
-	PremiumTaxAmountMonthly    float64            `firestore:"premiumTaxAmountMonthly" json:"premiumTaxAmountMonthly"`
-	PremiumGrossMonthly        float64            `firestore:"premiumGrossMonthly" json:"premiumGrossMonthly"`
+	TypeOfSumInsured           string              `firestore:"typeOfSumInsured,omitempty" json:"typeOfSumInsured,omitempty"`
+	Deductible                 string              `firestore:"deductible,omitempty" json:"deductible,omitempty"`
+	DeductibleValues           GuaranteFieldValue  `firestore:"deductibleValues,omitempty" json:"deductibleValues,omitempty"`
+	DeductibleType             string              `firestore:"deductibleType,omitempty" json:"deductibleType,omitempty"`
+	SumInsuredLimitOfIndemnity float64             `json:"sumInsuredLimitOfIndemnity,omitempty" json:"sumInsuredLimitOfIndemnity,omitempty"`
+	SumInsured                 float64             `json:"sumInsured,omitempty" json:"sumInsured,omitempty"`
+	LimitOfIndemnity           float64             `json:"limitOfIndemnity,omitempty" json:"limitOfIndemnity,omitempty"`
+	SelfInsurance              string              `firestore:"selfInsurance,omitempty" json:"selfInsurance,omitempty"`
+	SumInsuredValues           GuaranteFieldValue  `firestore:"sumInsuredValues,omitempty" json:"sumInsuredValues,omitempty"`
+	DeductibleDesc             string              `firestore:"deductibleDesc,omitempty" json:"deductibleDesc,omitempty"`
+	SelfInsuranceValues        GuaranteFieldValue  `firestore:"selfInsuranceValues,omitempty" json:"selfInsuranceValues,omitempty"`
+	SelfInsuranceDesc          string              `firestore:"selfInsuranceDesc,omitempty" json:"selfInsuranceDesc,omitempty"`
+	Duration                   Duration            `firestore:"duration,omitempty" json:"duration,omitempty"`
+	DurationValues             *DurationFieldValue `firestore:"durationValues,omitempty" json:"durationValues,omitempty"`
+	Tax                        float64             `firestore:"tax" json:"tax"`
+	Percentage                 float64             `firestore:"percentage" json:"percentage"`
+	PremiumNetYearly           float64             `firestore:"premiumNetYearly" json:"premiumNetYearly"`
+	PremiumTaxAmountYearly     float64             `firestore:"premiumTaxAmountYearly" json:"premiumTaxAmountYearly"`
+	PremiumGrossYearly         float64             `firestore:"premiumGrossYearly" json:"premiumGrossYearly"`
+	PremiumNetMonthly          float64             `firestore:"premiumNetMonthly" json:"premiumNetMonthly"`
+	PremiumTaxAmountMonthly    float64             `firestore:"premiumTaxAmountMonthly" json:"premiumTaxAmountMonthly"`
+	PremiumGrossMonthly        float64             `firestore:"premiumGrossMonthly" json:"premiumGrossMonthly"`
+	MinimumGrossMonthly        float64             `firestore:"minimumGrossMonthly,omitempty" json:"minimumGrossMonthly,omitempty"`
+	MinimumGrossYearly         float64             `firestore:"minimumGrossYearly,omitempty" json:"minimumGrossYearly,omitempty"`
 }
 type GuaranteFieldValue struct {
 	Min    float64   `firestore:"min,omitempty" json:"min,omitempty"`
@@ -65,6 +69,13 @@ type GuaranteFieldValue struct {
 	Step   float64   `firestore:"step,omitempty" json:"step,omitempty"`
 	Values []float64 `firestore:"values,omitempty" json:"values,omitempty"`
 }
+
+type DurationFieldValue struct {
+	Min  int `firestore:"min,omitempty" json:"min,omitempty"`
+	Max  int `firestore:"max,omitempty" json:"max,omitempty"`
+	Step int `firestore:"step,omitempty" json:"step,omitempty"`
+}
+
 type Tax struct {
 	Tax        float64 `firestore:"tax,omitempty" json:"tax,omitempty"`
 	Percentage float64 `firestore:"percentage,omitempty" json:"percentage,omitempty"`

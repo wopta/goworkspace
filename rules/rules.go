@@ -23,17 +23,22 @@ func Rules(w http.ResponseWriter, r *http.Request) {
 			{
 				Route:   "/risk/person",
 				Handler: Person,
-				Method:  "POST",
+				Method:  http.MethodPost,
 			},
 			{
 				Route:   "/survey/person",
 				Handler: PersonSurvey,
-				Method:  "POST",
+				Method:  http.MethodPost,
 			},
 			{
 				Route:   "/risk/pmi",
 				Handler: PmiAllrisk,
-				Method:  "POST",
+				Method:  http.MethodPost,
+			},
+			{
+				Route:   "/sales/life",
+				Handler: Life,
+				Method:  http.MethodPost,
 			},
 		},
 	}
