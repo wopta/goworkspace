@@ -1,7 +1,7 @@
 {
   "name": "life",
   "nameDesc": "Wopta per te Vita",
-  "version": "v2",
+  "version": "v1",
   "steps": [
     {
       "widget": "quoterhome",
