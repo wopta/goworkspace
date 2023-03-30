@@ -2,6 +2,7 @@ package product
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -59,27 +60,49 @@ func GetNameFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	log.Println(r.RequestURI)
 	log.Println(v)
 	log.Println(v[1])
-	product, e := GetName(name, version)
-	jsonString, e := product.Marshal()
-	out := string(jsonString)
-	if name == "persona" {
-		e = replaceDatesForPersonaProduct(&out, &product)
+	product, err := GetName(name, version)
+	if err != nil {
+
+		return "", nil, err
 	}
-	return out, product, e
+	jsonOut, err := product.Marshal()
+	if err != nil {
+		return "", nil, err
+	}
+
+	jsonString := string(jsonOut)
+	switch name {
+	case "persona":
+		jsonString, product, err = ReplaceDatesInProduct(product, 75)
+	case "life":
+		jsonString, product, err = ReplaceDatesInProduct(product, 69)
+	}
+
+	return jsonString, product, err
 }
 
-func replaceDatesForPersonaProduct(productJson *string, product *models.Product) error {
+func ReplaceDatesInProduct(product models.Product, minYear int) (string, models.Product, error) {
+	jsonOut, err := product.Marshal()
+	if err != nil {
+		return "", models.Product{}, err
+	}
+
+	productJson := string(jsonOut)
+
 	initialDate := time.Now().AddDate(-18, 0, 0).Format("2006-01-02")
-	minDate := time.Now().AddDate(-75, 0, 1).Format("2006-01-02")
+	minDate := time.Now().AddDate(-minYear, 0, 1).Format("2006-01-02")
 
 	regexInitialDate := regexp.MustCompile("{{INITIAL_DATE}}")
 	regexMinDate := regexp.MustCompile("{{MIN_DATE}}")
 
-	*productJson = regexInitialDate.ReplaceAllString(*productJson, initialDate)
-	*productJson = regexMinDate.ReplaceAllString(*productJson, minDate)
+	productJson = regexInitialDate.ReplaceAllString(productJson, initialDate)
+	productJson = regexMinDate.ReplaceAllString(productJson, minDate)
 
-	err := json.Unmarshal([]byte(*productJson), product)
-	return err
+	err = json.Unmarshal(jsonOut, &product)
+	if err != nil {
+		return "", models.Product{}, err
+	}
+	return productJson, models.Product{}, err
 }
 
 func GetName(name string, version string) (models.Product, error) {
@@ -98,9 +121,11 @@ func GetName(name string, version string) (models.Product, error) {
 	}
 	query := q.FirestoreWherefields("products")
 	products := models.ProductToListData(query)
+	if len(products) == 0 {
+		return models.Product{}, fmt.Errorf("no product json file found for %s %s", name, version)
+	}
 
 	return products[0], nil
-
 }
 
 func PutFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
