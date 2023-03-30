@@ -44,7 +44,7 @@ type User struct {
 	Mail          string     `firestore:"mail" json:"mail,omitempty"`
 	Phone         string     `firestore:"phone" json:"phone,omitempty"`
 	FiscalCode    string     `firestore:"fiscalCode" json:"fiscalCode,omitempty"`
-	VatCode       string     `firestore:"vatCode" json:"vatCode,omitempty"`
+	VatCode       string     `firestore:"vatCode" json:"vatCode"`
 	RiskClass     string     `firestore:"riskClass" json:"riskClass,omitempty"`
 	CreationDate  string     `firestore:"creationDate,omitempty" json:"creationDate,omitempty"`
 	UpdatedDate   string     `firestore:"updatedDate" json:"updatedDate,omitempty"`

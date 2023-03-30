@@ -24,7 +24,7 @@ func PersonSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	log.Println("Person Survey")
 	policyJson := lib.ErrorByte(io.ReadAll(r.Body))
 
-	statements := &Statements{Statements: questions, Text: nil}
+	statements := &Statements{Statements: questions, Text: ""}
 	//dynamicTitle := &DynamicTitle{Text: ""}
 
 	switch os.Getenv("env") {
@@ -38,14 +38,14 @@ func PersonSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 
 	_, statementsOut := rulesFromJson(groule, statements, policyJson, []byte(getCoherenceData()))
 
-	b, err := json.Marshal(statementsOut.(models.Policy))
+	b, err := json.Marshal(statementsOut)
 
 	return string(b), statementsOut, err
 }
 
 type Statements struct {
 	Statements []*models.Statement `json:"statements"`
-	Text       *string             `json:"text,omitempty"`
+	Text       string              `json:"text,omitempty"`
 }
 
 type DynamicTitle struct {
@@ -84,25 +84,29 @@ func (fx *FxSurvey) AppendQuestion(questions []*models.Question, text string, is
 	return append(questions, question)
 }
 
-func (fx *FxSurvey) HasGuaranteePolicy(input []byte, guaranteeName string) bool {
+func (fx *FxSurvey) HasGuaranteePolicy(input map[string]interface{}, guaranteeName string) bool {
+	j, _ := json.Marshal(input)
 	var policy models.Policy
-	err := json.Unmarshal(input, &policy)
-	lib.CheckError(err)
-	for _, guarantee := range policy.Assets[0].Guarantees {
-		if guarantee.Name == guaranteeName {
-			return true
+	_ = json.Unmarshal(j, &policy)
+	for _, asset := range policy.Assets {
+		for _, guarantee := range asset.Guarantees {
+			if guarantee.Name == guaranteeName {
+				return true
+			}
 		}
 	}
 	return false
 }
 
-func (fx *FxSurvey) GetGuaranteeIndex(input []byte, guaranteeName string) int {
+func (fx *FxSurvey) GetGuaranteeIndex(input map[string]interface{}, guaranteeName string) int {
+	j, _ := json.Marshal(input)
 	var policy models.Policy
-	err := json.Unmarshal(input, &policy)
-	lib.CheckError(err)
-	for i, guarantee := range policy.Assets[0].Guarantees {
-		if guarantee.Name == guaranteeName {
-			return i
+	_ = json.Unmarshal(j, &policy)
+	for _, asset := range policy.Assets {
+		for i, guarantee := range asset.Guarantees {
+			if guarantee.Name == guaranteeName {
+				return i
+			}
 		}
 	}
 	return -1
