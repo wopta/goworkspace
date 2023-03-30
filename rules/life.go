@@ -12,7 +12,6 @@ import (
 
 func Life(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		policy    models.Policy
 		rulesFile []byte
 		err       error
 	)
@@ -21,8 +20,7 @@ func Life(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	)
 
 	log.Println("Life")
-	req := lib.ErrorByte(io.ReadAll(r.Body))
-	quotingInputData := getInputData(&policy, err, req)
+	policyJson := lib.ErrorByte(io.ReadAll(r.Body))
 
 	rulesFile = getRulesFile(rulesFile, rulesFileName)
 	product, err := prd.GetName("life", "v1")
@@ -30,7 +28,7 @@ func Life(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 		return "", nil, err
 	}
 
-	_, ruleOutput := rulesFromJson(rulesFile, product, quotingInputData, nil)
+	_, ruleOutput := rulesFromJson(rulesFile, product, policyJson, nil)
 
 	productJson, product, err := prd.ReplaceDatesInProduct(ruleOutput.(models.Product), 69)
 
