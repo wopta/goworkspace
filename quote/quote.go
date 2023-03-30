@@ -36,7 +36,7 @@ func Quote(w http.ResponseWriter, r *http.Request) {
 				Method:  http.MethodPost,
 			},
 			{
-				Route:   "/life",
+				Route:   "/v1/life",
 				Handler: LifeFx,
 				Method:  http.MethodPost,
 			},

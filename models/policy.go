@@ -92,15 +92,17 @@ type RenewHistory struct {
 	CreationDate time.Time `firestore:"creationDate,omitempty" json:"creationDate,omitempty"`
 }
 type Statement struct {
-	Title     string      `firestore:"title ,omitempty" json:"title,omitempty"`
-	Question  string      `firestore:"question,omitempty" json:"question,omitempty"`
-	Questions *[]Question `firestore:"questions,omitempty" json:"questions,omitempty" bigquery:"-"`
-	Answer    bool        `firestore:"answer,omitempty" json:"answer,omitempty"`
+	Title              string      `firestore:"title,omitempty" json:"title,omitempty"`
+	HasMultipleAnswers *bool       `firestore:"hasMultipleAnswers,omitempty" json:"hasMultipleAnswers,omitempty"`
+	Questions          []*Question `firestore:"questions,omitempty" json:"questions,omitempty"`
+	Answer             *bool       `firestore:"answer,omitempty" json:"answer,omitempty"`
 }
+
 type Question struct {
 	Question string `firestore:"question,omitempty" json:"question,omitempty"`
-	Isbold   bool   `firestore:"isbold,omitempty" json:"isbold,omitempty"`
+	IsBold   bool   `firestore:"isBold,omitempty" json:"isBold,omitempty"`
 	Indent   bool   `firestore:"indent,omitempty" json:"indent,omitempty"`
+	Answer   *bool  `firestore:"answer,omitempty" json:"answer,omitempty"`
 }
 
 type Price struct {

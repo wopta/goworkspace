@@ -19,7 +19,7 @@ func PersonSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		policy    models.Policy
 		groule    []byte
 		e         error
-		questions []*Statement
+		questions []*models.Statement
 	)
 	const (
 		rulesFileName = "person_survey.json"
@@ -92,21 +92,7 @@ func PersonSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 }
 
 type Statements struct {
-	Statements []*Statement `json:"statements"`
-}
-
-type Statement struct {
-	Title              string      `json:"title"`
-	HasMultipleAnswers *bool       `json:"hasMultipleAnswers,omitempty"`
-	Questions          []*Question `json:"questions"`
-	Answer             *bool       `json:"answer,omitempty"`
-}
-
-type Question struct {
-	Question string `json:"question"`
-	IsBold   bool   `json:"isBold"`
-	Indent   bool   `json:"indent"`
-	Answer   *bool  `json:"answer,omitempty"`
+	Statements []*models.Statement `json:"statements"`
 }
 
 type DynamicTitle struct {
@@ -115,11 +101,11 @@ type DynamicTitle struct {
 
 type FxSurvey struct{}
 
-func (fx *FxSurvey) AppendStatement(statements []*Statement, title string, hasMultipleAnswers bool, answer bool) []*Statement {
-	statement := &Statement{
+func (fx *FxSurvey) AppendStatement(statements []*models.Statement, title string, hasMultipleAnswers bool, answer bool) []*models.Statement {
+	statement := &models.Statement{
 		Title:              title,
 		HasMultipleAnswers: nil,
-		Questions:          make([]*Question, 0),
+		Questions:          make([]*models.Question, 0),
 		Answer:             nil,
 	}
 	if answer {
@@ -132,8 +118,8 @@ func (fx *FxSurvey) AppendStatement(statements []*Statement, title string, hasMu
 	return append(statements, statement)
 }
 
-func (fx *FxSurvey) AppendQuestion(questions []*Question, text string, isBold bool, indent bool, answer bool) []*Question {
-	question := &Question{
+func (fx *FxSurvey) AppendQuestion(questions []*models.Question, text string, isBold bool, indent bool, answer bool) []*models.Question {
+	question := &models.Question{
 		Question: text,
 		IsBold:   isBold,
 		Indent:   indent,

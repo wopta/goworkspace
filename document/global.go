@@ -50,13 +50,13 @@ func (skin Skin) GlobalContract(m pdf.Maroto, data models.Policy) {
 	m = skin.Space(m, 5.0)
 	skin.checkPage(m)
 	skin.Stantement(m, "Dichiarazioni da leggere con attenzione prima di firmare", models.Statement{
-		Questions: &[]models.Question{
-			{Question: "Premesso di essere a conoscenza che le dichiarazioni non veritiere, inesatte o reticenti, da me rese, possono compromettere il diritto alla prestazione (come da art. 1892, 1893, 1894 c.c.), ai fini dell’efficacia delle garanzie DICHIARO che:", Isbold: true, Indent: false},
-			{Question: "1.	l’azienda assicurata e/o gli immobili assicurati, NON rispondono ai requisiti indicati all’art. 9 – “requisiti di assicurabilità” delle condizioni di assicurazione;:", Isbold: true, Indent: false},
-			{Question: "2.	che, sui medesimi rischi assicurati con la presente Polizza, nel triennio precedente:", Isbold: true, Indent: false},
-			{Question: "2.1 NON vi sono state coperture assicurative annullate dall’assicuratore;", Isbold: true, Indent: true},
-			{Question: "2.2 NON si sono verificati eventi dannosi di importo liquidato superiore a 1.000 €", Isbold: true, Indent: true},
-			{Question: "3.	al momento della stipula di questa Polizza NON ha ricevuto comunicazioni, richieste e notifiche che possano configurare un sinistro relativo alle garanzie assicurate e di non essere a conoscenza di eventi o circostanze che possano dare origine ad una richiesta di risarcimento. ", Isbold: true, Indent: false},
+		Questions: []*models.Question{
+			{Question: "Premesso di essere a conoscenza che le dichiarazioni non veritiere, inesatte o reticenti, da me rese, possono compromettere il diritto alla prestazione (come da art. 1892, 1893, 1894 c.c.), ai fini dell’efficacia delle garanzie DICHIARO che:", IsBold: true, Indent: false},
+			{Question: "1.	l’azienda assicurata e/o gli immobili assicurati, NON rispondono ai requisiti indicati all’art. 9 – “requisiti di assicurabilità” delle condizioni di assicurazione;:", IsBold: true, Indent: false},
+			{Question: "2.	che, sui medesimi rischi assicurati con la presente Polizza, nel triennio precedente:", IsBold: true, Indent: false},
+			{Question: "2.1 NON vi sono state coperture assicurative annullate dall’assicuratore;", IsBold: true, Indent: true},
+			{Question: "2.2 NON si sono verificati eventi dannosi di importo liquidato superiore a 1.000 €", IsBold: true, Indent: true},
+			{Question: "3.	al momento della stipula di questa Polizza NON ha ricevuto comunicazioni, richieste e notifiche che possano configurare un sinistro relativo alle garanzie assicurate e di non essere a conoscenza di eventi o circostanze che possano dare origine ad una richiesta di risarcimento. ", IsBold: true, Indent: false},
 		}})
 	m = skin.Space(m, 5.0)
 	skin.SignDouleLine(m, data.Contractor.Name+" "+data.Contractor.Surname, "Global Assistance", "1", true)

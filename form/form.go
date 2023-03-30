@@ -22,7 +22,7 @@ func Form(w http.ResponseWriter, r *http.Request) {
 		Routes: []lib.Route{
 			{
 				Route:   "/axafleet",
-				Handler: GetFx,
+				Handler: AxaFleetTway,
 				Method:  "GET",
 			},
 			{
