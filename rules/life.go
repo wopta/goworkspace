@@ -25,11 +25,13 @@ func Life(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 
 	rulesFile = getRulesFile(rulesFile, rulesFileName)
 	product, err := prd.GetName("life", "v1")
-	lib.CheckError(err)
+	if err != nil {
+		return "", nil, err
+	}
+
 	_, ruleOutput := rulesFromJson(rulesFile, product, quotingInputData, nil)
 
 	productJson, product, err := prd.ReplaceDatesInProduct(ruleOutput.(models.Product), 69)
-	lib.CheckError(err)
 
 	return productJson, product, err
 }
