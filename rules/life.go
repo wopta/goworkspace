@@ -20,7 +20,10 @@ func Life(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	)
 
 	log.Println("Life")
-	policyJson := lib.ErrorByte(io.ReadAll(r.Body))
+	policyJson, err := getContractorAge(lib.ErrorByte(io.ReadAll(r.Body)))
+	if err != nil {
+		return "", nil, err
+	}
 
 	rulesFile = getRulesFile(rulesFile, rulesFileName)
 	product, err := prd.GetName("life", "v1")
@@ -35,17 +38,22 @@ func Life(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	return productJson, product, err
 }
 
-func getInputData(policy *models.Policy, e error, req []byte) []byte {
-	*policy, e = models.UnmarshalPolicy(req)
-	lib.CheckError(e)
+func getContractorAge(b []byte) ([]byte, error) {
+	var policy models.Policy
+	err := json.Unmarshal(b, &policy)
+	if err != nil {
+		return nil, err
+	}
 
-	age, e := calculateAge(policy.Contractor.BirthDate)
-	lib.CheckError(e)
-	tmpMap := make(map[string]int)
+	age, err := calculateAge(policy.Contractor.BirthDate)
+	if err != nil {
+		return nil, err
+	}
 
-	tmpMap["age"] = age
+	ageMap := make(map[string]int)
+	ageMap["age"] = age
 
-	request, e := json.Marshal(tmpMap)
-	lib.CheckError(e)
-	return request
+	output, err := json.Marshal(ageMap)
+
+	return output, err
 }
