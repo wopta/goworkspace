@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	lib "github.com/wopta/goworkspace/lib"
@@ -32,11 +33,19 @@ func Life(data models.Policy) (models.Policy, error) {
 	var selectRow []string
 
 	for _, row := range df.Records() {
-		if row[0] == string(year) {
+		if row[0] == strconv.Itoa(year) {
 			selectRow = row
-
+			break
 		}
 	}
+
+	data.OffersPrices = map[string]map[string]*models.Price{
+		"default": {
+			"yearly":  &models.Price{},
+			"monthly": &models.Price{},
+		},
+	}
+
 	for _, asset := range data.Assets {
 		for _, guarance := range asset.Guarantees {
 			var base int
@@ -71,10 +80,20 @@ func Life(data models.Policy) (models.Policy, error) {
 				base = base * 4
 				baseTax = baseTax * 4
 			}
-			basefloat, _ := strconv.ParseFloat(selectRow[base], 64)
-			taxfloat, _ := strconv.ParseFloat(selectRow[base], 64)
-			guarance.PriceNett = guarance.Value.LimitOfIndemnity * basefloat
-			guarance.PriceGross = guarance.Value.LimitOfIndemnity * taxfloat
+			basefloat, _ := strconv.ParseFloat(strings.Replace(strings.Replace(selectRow[base], "%", "", 1), ",", ".", 1), 64)
+			taxfloat, _ := strconv.ParseFloat(strings.Replace(strings.Replace(selectRow[baseTax], "%", "", 1), ",", ".", 1), 64)
+			basefloat = basefloat / 100
+			taxfloat = taxfloat / 100
+
+			guarance.Offer["default"].PremiumNetYearly = guarance.Value.SumInsuredLimitOfIndemnity * basefloat
+			guarance.Offer["default"].PremiumGrossYearly = guarance.Value.SumInsuredLimitOfIndemnity * taxfloat
+			guarance.Offer["default"].PremiumNetMonthly = guarance.Value.SumInsuredLimitOfIndemnity * basefloat / 12
+			guarance.Offer["default"].PremiumGrossMonthly = guarance.Value.SumInsuredLimitOfIndemnity * taxfloat / 12
+
+			data.OffersPrices["default"]["yearly"].Gross = data.OffersPrices["default"]["yearly"].Gross + guarance.Offer["default"].PremiumGrossYearly
+			data.OffersPrices["default"]["yearly"].Net = data.OffersPrices["default"]["yearly"].Net + guarance.Offer["default"].PremiumNetYearly
+			data.OffersPrices["default"]["monthly"].Gross = data.OffersPrices["default"]["monthly"].Gross + guarance.Offer["default"].PremiumGrossMonthly
+			data.OffersPrices["default"]["monthly"].Net = data.OffersPrices["default"]["monthly"].Net + guarance.Offer["default"].PremiumNetMonthly
 
 		}
 
