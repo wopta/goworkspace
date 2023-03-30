@@ -219,7 +219,7 @@ func SendMail(obj MailRequest) {
 		lib.CheckError(err)
 		//log.Println("start write massage:----------------------")
 		_, err = w.Write([]byte(message))
-		log.Println(message)
+		//log.Println(message)
 		log.Println("end write massage:----------------------")
 		//log.Println(message)
 		lib.CheckError(err)

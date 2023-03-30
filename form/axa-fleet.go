@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	lib "github.com/wopta/goworkspace/lib"
@@ -32,11 +33,14 @@ func AxaFleetTway(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		toEmit                bool
 		sourcest              []byte
 		typeMov               string
+		mailsource            string
 		DATAIMMATRICOLAZIONE  string
 		MODELLO               string
 		TARGA                 string
 		DATAVALIDITACOPERTURA string
 		DATAFINECOPERTURA     string
+		deleteList            []string
+		insertList            []string
 	)
 	const (
 		satusCol = "J"
@@ -63,12 +67,14 @@ func AxaFleetTway(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	axa, e := srv.Spreadsheets.Values.Get(spreadsheettotId, "A:W").Do()
 	excelhead := []interface{}{"NUMERO POLIZZA", "LOB", "	TIPOLOGIA POLIZZA", "CODICE CONFIGURAZIONE", "IDENTIFICATIVO UNIVOCO APPLICAZIONE", "	TIPO OGGETTO ASSICURATO", "	CODICE FISCALE / P.IVA ASSICURATO", "COGNOME / RAGIONE SOCIALE ASSICURATO", "	NOME ASSICURATO", "	INDIRIZZO RESIDENZA ASSICURATO", "	CAP RESIDENZA ASSICURATO", "	CITTA’ RESIDENZA ASSICURATO", "	PROVINCIA RESIDENZA ASSICURATO", "	TARGA VEICOLO", "	TELAIO VEICOLO	", "MARCA VEICOLO", "	MODELLO VEICOLO	TIPOLOGIA VEICOLO", "PESO VEICOLO", "	DATA IMMATRICOLAZIONE", "	DATA INIZIO VALIDITA' COPERTURA", "	DATA FINE VALIDITA' COPERTURA", "TIPO MOVIMENTO"}
 	excel = append(excel, excelhead)
-
+	toEmit = false
 	if len(tway.Values) == 0 {
 		fmt.Println("No data found.")
 	} else {
 
 		for i, row := range tway.Values {
+			isError := false
+			founded := false
 
 			fmt.Println(axa.Values[len(axa.Values)-1][4])
 			fmt.Println(axa.Values[len(axa.Values)-1][21])
@@ -87,8 +93,9 @@ func AxaFleetTway(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 
 			if len(row) <= 9 && i != 0 {
 				toEmit = true
+				mailsource = row[1].(string)
 				fmt.Println("Enter in No EMESSO")
-				isError := false
+
 				fmt.Println(row)
 				if row[6] == "Inserimento" {
 					typeMov = "A"
@@ -99,7 +106,6 @@ func AxaFleetTway(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 					DATAFINECOPERTURA = "31/12/2023"
 
 				} else {
-					founded := false
 
 					for x, axarow := range axa.Values {
 						// var t string
@@ -118,7 +124,8 @@ func AxaFleetTway(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 
 					}
 					if !founded {
-						mail.SendMail((getMailObj("<p>Opss.. qualcosa è andato storto</p><p>Il servizio di aggiornamento copertura flotte di Wopta per T-way non è stato in grado di trovare la targa: " + row[2].(string) + "</p><p>Non ti preoccupare questa operazione è stata gia annullata devi solo rieffetuare la richiesta dall' apposito form con la targa corretta</p>")))
+						mail.SendMail((getMailObj("<p>Opss.. qualcosa è andato storto</p><p>Il servizio di aggiornamento copertura flotte di Wopta per T-way non è stato in grado di trovare la targa: "+row[2].(string)+"</p><p>Non ti preoccupare questa operazione è stata gia annullata devi solo rieffetuare la richiesta dall' apposito form con la targa corretta</p>",
+							row[1].(string))))
 						fmt.Println("ERROR save, :")
 						celindex := strconv.Itoa(i + 1)
 						cel := &sheets.ValueRange{
@@ -130,6 +137,12 @@ func AxaFleetTway(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 					typeMov = "E"
 				}
 				if !isError {
+					if founded {
+						deleteList = append(deleteList, TARGA)
+					} else {
+
+						insertList = append(insertList, TARGA)
+					}
 					fmt.Println("!isError")
 					celindex := strconv.Itoa(i + 1)
 					excelRow := []interface{}{"191222", "A", "C", "00001", progressiveFormattedpre, "2", "03682240043", "T-WAY SPA", "", "Piazza Walther Von Der Vogelweide", "39100", "Bolzano", "BZ", TARGA, "", "", MODELLO, 3, 4, DATAIMMATRICOLAZIONE, DATAVALIDITACOPERTURA, DATAFINECOPERTURA, typeMov}
@@ -145,13 +158,12 @@ func AxaFleetTway(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 					fmt.Println("second save:")
 					_, e = srv.Spreadsheets.Values.Append(spreadsheettotId, "Foglio1", row).ValueInputOption("USER_ENTERED").InsertDataOption("INSERT_ROWS").Context(ctx).Do()
 				}
-			} else {
-				toEmit = false
 			}
 
 		}
 	}
 	if toEmit {
+
 		now := time.Now()
 		layout2 := "2006-01-02"
 		filepath := now.Format(layout2) + "-" + strconv.Itoa(time.Now().Nanosecond()) + ".xlsx"
@@ -168,7 +180,10 @@ func AxaFleetTway(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		_, e = lib.PutGoogleStorage("function-data", "tway-fleet-axa/2_"+filepath, sourcest, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 		lib.PutToStorage("function-data", "tway-fleet-axa/3_"+filepath, sourcest)
 		//SftpUpload(filepath)
+		mail.SendMail((getMailObj("<p>inserite in copertura:</p><p>"+strings.Join(insertList, ", ")+"</p><p>escluse dalla copertura:</p><p>"+strings.Join(deleteList, ", ")+"</p>",
+			mailsource)))
 	}
+
 	return "", nil, e
 
 }
@@ -220,7 +235,6 @@ func SftpUpload(filePath string) {
 	log.Println(info.Size())
 	// Upload local file to a remote location as in 1MB (byte) chunks.
 	e = client.Upload(source, destination, int(info.Size()))
-
 	lib.CheckError(e)
 	/*
 		// Download remote file.
@@ -269,11 +283,16 @@ func CreateExcel(sheet [][]interface{}, filePath string) ([]byte, error) {
 	return resByte.Bytes(), err
 }
 
-func getMailObj(msg string) mail.MailRequest {
+func getMailObj(msg string, mailsource string) mail.MailRequest {
 	//link := "https://storage.googleapis.com/documents-public-dev/information-set/information-sets//v1/Precontrattuale.pdf "michele.lomazzi@wopta.it","
 	var obj mail.MailRequest
 	obj.From = "noreply@wopta.it"
-	obj.To = []string{"luca.barbieri@wopta.it"}
+	obj.To = []string{
+		//"fabrizia.colombo@wopta.it",
+		//"michele.lomazzi@wopta.it",
+		"luca.barbieri@wopta.it",
+		//mailsource
+	}
 	obj.Message = msg
 	obj.Subject = " Wopta T-Way Axa Fleet"
 	obj.IsHtml = true

@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"cloud.google.com/go/firestore"
 	lib "github.com/wopta/goworkspace/lib"
 	mail "github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
@@ -19,6 +20,7 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 	log.Println("Payment")
 	var response string
 	var e error
+	var query *firestore.DocumentIterator
 	var fabrickCallback FabrickCallback
 	uid := r.URL.Query().Get("uid")
 	schedule := r.URL.Query().Get("schedule")
@@ -62,7 +64,7 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 					},
 				},
 			}
-			query := q.FirestoreWherefields("transactions")
+			query, e = q.FirestoreWherefields("transactions")
 			transactions := models.TransactionToListData(query)
 			transaction := transactions[0]
 			tr, _ := json.Marshal(transaction)
