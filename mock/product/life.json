@@ -48,9 +48,10 @@
           "isExtension": false,
           "isMandatory": true,
           "isSellable": false,
+          "isConfigurable": true,
           "offer": {
             "default": {
-              "sumInsured": 100000,
+              "sumInsuredLimitOfIndemnity": 100000,
               "duration": {
                 "year": 10
               }
@@ -85,9 +86,10 @@
           "isExtension": false,
           "isMandatory": false,
           "isSellable": false,
+          "isConfigurable": false,
           "offer": {
             "default": {
-              "sumInsured": 50000,
+              "sumInsuredLimitOfIndemnity": 50000,
               "duration": {
                 "year": 5
               }
@@ -122,9 +124,10 @@
           "isExtension": false,
           "isMandatory": false,
           "isSellable": false,
+          "isConfigurable": false,
           "offer": {
             "default": {
-              "sumInsured": 50000,
+              "sumInsuredLimitOfIndemnity": 50000,
               "duration": {
                 "year": 5
               }
@@ -157,11 +160,12 @@
           "isExtension": false,
           "isMandatory": false,
           "isSellable": false,
+          "isConfigurable": false,
           "group": "DEATH",
           "name": "malattia grave",
           "offer": {
             "default": {
-              "sumInsured": 50000,
+              "sumInsuredLimitOfIndemnity": 50000,
               "duration": {
                 "year": 5
               }

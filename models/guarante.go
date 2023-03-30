@@ -20,8 +20,8 @@ type Guarante struct {
 	ValueDesc                  string                    `firestore:"valueDesc,omitempty" json:"valueDesc,omitempty"`
 	Offer                      map[string]*GuaranteValue `firestore:"offer,omitempty" json:"offer,omitempty"`
 	Slug                       string                    `firestore:"slug" json:"slug,omitempty"`
-	IsMandatory                bool                      `firestore:"isMandatory,omitempty" json:"isMandatory,omitempty"`
-	IsExtension                bool                      `firestore:"isExtension,omitempty" json:"isExtension,omitempty"`
+	IsMandatory                bool                      `firestore:"isMandatory" json:"isMandatory"`
+	IsExtension                bool                      `firestore:"isExtension" json:"isExtension"`
 	Discount                   float64                   `json:"discount,omitempty" json:"discount,omitempty"`
 	Name                       string                    `firestore:"name,omitempty" json:"name,omitempty"`
 	SumInsuredLimitOfIndemnity float64                   `json:"sumInsuredLimitOfIndemnity" json:"sumInsuredLimitOfIndemnity,omitempty"`
@@ -35,6 +35,7 @@ type Guarante struct {
 	PriceNett                  float64                   `firestore:"priceNett,omitempty" json:"priceNett,omitempty"`
 	PriceGross                 float64                   `firestore:"priceGross,omitempty" json:"priceGross,omitempty"`
 	IsSellable                 bool                      `firestore:"isSellable" json:"isSellable"`
+	IsConfigurable             bool                      `firestore:"isConfigurable" json:"isConfigurable"`
 }
 type GuaranteValue struct {
 	TypeOfSumInsured           string              `firestore:"typeOfSumInsured,omitempty" json:"typeOfSumInsured,omitempty"`
