@@ -2,6 +2,7 @@ package product
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -114,10 +115,12 @@ func GetName(name string, version string) (models.Product, error) {
 		},
 	}
 	query := q.FirestoreWherefields("products")
-	products := models.ProductToListData(query)
+	products, err := models.ProductToListData(query)
+	if err != nil {
+		return models.Product{}, fmt.Errorf("no product found for %s version %s", name, version)
+	}
 
 	return products[0], nil
-
 }
 
 func PutFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {

@@ -59,14 +59,14 @@ type Offer struct {
 	Order       int    `firestore:"order,omitempty" json:"order,omitempty"`
 }
 
-func ProductToListData(query *firestore.DocumentIterator) []Product {
+func ProductToListData(query *firestore.DocumentIterator) ([]Product, error) {
 	var result []Product
 	for {
 		d, err := query.Next()
 		if err != nil {
 			if err == iterator.Done {
 
-				break
+				return []Product{}, err
 			}
 		}
 		var value Product
@@ -76,5 +76,5 @@ func ProductToListData(query *firestore.DocumentIterator) []Product {
 
 		log.Println(len(result))
 	}
-	return result
+	return result, nil
 }
