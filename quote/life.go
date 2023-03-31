@@ -2,7 +2,7 @@ package quote
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
@@ -13,7 +13,7 @@ import (
 )
 
 func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
+	req := lib.ErrorByte(io.ReadAll(r.Body))
 	var data models.Policy
 	defer r.Body.Close()
 	e := json.Unmarshal([]byte(req), &data)
@@ -23,14 +23,23 @@ func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 }
 func Life(data models.Policy) (models.Policy, error) {
-	var e error
-	birthDate, e := time.Parse("2006-01-02T15:04:05Z", data.Contractor.BirthDate)
-	lib.CheckError(e)
+	var err error
+	birthDate, err := time.Parse("2006-01-02T15:04:05Z", data.Contractor.BirthDate)
+	lib.CheckError(err)
 	year := time.Now().Year() - birthDate.Year()
 
 	b := lib.GetFilesByEnv("quote/life_matrix.csv")
 	df := lib.CsvToDataframe(b)
 	var selectRow []string
+
+	deathSumInsuredLimitOfIndemnity := 0.0
+	for _, asset := range data.Assets {
+		for _, guarantee := range asset.Guarantees {
+			if guarantee.Slug == "death" {
+				deathSumInsuredLimitOfIndemnity = guarantee.SumInsuredLimitOfIndemnity
+			}
+		}
+	}
 
 	for _, row := range df.Records() {
 		if row[0] == strconv.Itoa(year) {
@@ -47,57 +56,61 @@ func Life(data models.Policy) (models.Policy, error) {
 	}
 
 	for _, asset := range data.Assets {
-		for _, guarance := range asset.Guarantees {
+		for _, guarantee := range asset.Guarantees {
 			var base int
 			var baseTax int
+			var offset int
 
-			switch guarance.Slug {
+			switch guarantee.Slug {
 			case "death":
 				base = 1
 				baseTax = 2
 			case "permanent-disability":
 				base = 3
 				baseTax = 4
+				guarantee.SumInsuredLimitOfIndemnity = deathSumInsuredLimitOfIndemnity
 			case "temporary-disability":
 				base = 5
 				baseTax = 6
+				guarantee.SumInsuredLimitOfIndemnity = (deathSumInsuredLimitOfIndemnity / 100) * 1
 			case "serious-ill":
 				base = 7
 				baseTax = 8
+				if deathSumInsuredLimitOfIndemnity > 100000 {
+					guarantee.SumInsuredLimitOfIndemnity = 10000
+				} else {
+					guarantee.SumInsuredLimitOfIndemnity = 5000
+				}
 			}
-			switch guarance.Value.Duration.Year {
+
+			switch guarantee.Value.Duration.Year {
 			case 5:
-				base = base * 1
-				baseTax = baseTax * 1
-
+				offset = 8 * 0
 			case 10:
-				base = base * 2
-				baseTax = baseTax * 2
+				offset = 8 * 1
 			case 15:
-				base = base * 3
-				baseTax = baseTax * 3
+				offset = 8 * 2
 			case 20:
-				base = base * 4
-				baseTax = baseTax * 4
+				offset = 8 * 3
 			}
-			basefloat, _ := strconv.ParseFloat(strings.Replace(strings.Replace(selectRow[base], "%", "", 1), ",", ".", 1), 64)
-			taxfloat, _ := strconv.ParseFloat(strings.Replace(strings.Replace(selectRow[baseTax], "%", "", 1), ",", ".", 1), 64)
-			basefloat = basefloat / 100
-			taxfloat = taxfloat / 100
 
-			guarance.Offer["default"].PremiumNetYearly = guarance.Value.SumInsuredLimitOfIndemnity * basefloat
-			guarance.Offer["default"].PremiumGrossYearly = guarance.Value.SumInsuredLimitOfIndemnity * taxfloat
-			guarance.Offer["default"].PremiumNetMonthly = guarance.Value.SumInsuredLimitOfIndemnity * basefloat / 12
-			guarance.Offer["default"].PremiumGrossMonthly = guarance.Value.SumInsuredLimitOfIndemnity * taxfloat / 12
+			baseFloat, _ := strconv.ParseFloat(strings.Replace(strings.Replace(selectRow[base+offset], "%", "", 1), ",", ".", 1), 64)
+			taxFloat, _ := strconv.ParseFloat(strings.Replace(strings.Replace(selectRow[baseTax+offset], "%", "", 1), ",", ".", 1), 64)
+			baseFloat = baseFloat / 100
+			taxFloat = taxFloat / 100
 
-			data.OffersPrices["default"]["yearly"].Gross = data.OffersPrices["default"]["yearly"].Gross + guarance.Offer["default"].PremiumGrossYearly
-			data.OffersPrices["default"]["yearly"].Net = data.OffersPrices["default"]["yearly"].Net + guarance.Offer["default"].PremiumNetYearly
-			data.OffersPrices["default"]["monthly"].Gross = data.OffersPrices["default"]["monthly"].Gross + guarance.Offer["default"].PremiumGrossMonthly
-			data.OffersPrices["default"]["monthly"].Net = data.OffersPrices["default"]["monthly"].Net + guarance.Offer["default"].PremiumNetMonthly
+			guarantee.Offer["default"].PremiumNetYearly = guarantee.Value.SumInsuredLimitOfIndemnity * baseFloat
+			guarantee.Offer["default"].PremiumGrossYearly = guarantee.Value.SumInsuredLimitOfIndemnity * taxFloat
+			guarantee.Offer["default"].PremiumNetMonthly = guarantee.Value.SumInsuredLimitOfIndemnity * baseFloat / 12
+			guarantee.Offer["default"].PremiumGrossMonthly = guarantee.Value.SumInsuredLimitOfIndemnity * taxFloat / 12
 
+			data.OffersPrices["default"]["yearly"].Gross += guarantee.Offer["default"].PremiumGrossYearly
+			data.OffersPrices["default"]["yearly"].Net += guarantee.Offer["default"].PremiumNetYearly
+			data.OffersPrices["default"]["monthly"].Gross += guarantee.Offer["default"].PremiumGrossMonthly
+			data.OffersPrices["default"]["monthly"].Net += guarantee.Offer["default"].PremiumNetMonthly
 		}
 
 	}
 
-	return data, e
+	return data, err
 }
