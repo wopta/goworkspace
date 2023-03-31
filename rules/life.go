@@ -20,14 +20,14 @@ func Life(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	)
 
 	log.Println("Life")
-	policyJson, err := getContractorAge(lib.ErrorByte(io.ReadAll(r.Body)))
+	in, err := getContractorAge(lib.ErrorByte(io.ReadAll(r.Body)))
 	lib.CheckError(err)
 
 	rulesFile = getRulesFile(rulesFile, rulesFileName)
 	product, err := prd.GetName("life", "v1")
 	lib.CheckError(err)
 
-	_, ruleOutput := rulesFromJson(rulesFile, product, policyJson, nil)
+	_, ruleOutput := rulesFromJson(rulesFile, product, in, nil)
 
 	productJson, product, err := prd.ReplaceDatesInProduct(ruleOutput.(models.Product), 69)
 
