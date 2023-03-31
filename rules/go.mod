@@ -11,7 +11,7 @@ require (
 	github.com/hyperjumptech/grule-rule-engine v1.12.0
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/wopta/goworkspace/lib v1.0.8
-	github.com/wopta/goworkspace/models v1.0.21
+	github.com/wopta/goworkspace/models v1.0.22
 	github.com/wopta/goworkspace/product v1.0.8
 	github.com/wopta/goworkspace/quote v1.0.1
 )
