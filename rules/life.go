@@ -21,21 +21,17 @@ func Life(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 
 	log.Println("Life")
 	policyJson, err := getContractorAge(lib.ErrorByte(io.ReadAll(r.Body)))
-	if err != nil {
-		return "", nil, err
-	}
+	lib.CheckError(err)
 
 	rulesFile = getRulesFile(rulesFile, rulesFileName)
 	product, err := prd.GetName("life", "v1")
-	if err != nil {
-		return "", nil, err
-	}
+	lib.CheckError(err)
 
 	_, ruleOutput := rulesFromJson(rulesFile, product, policyJson, nil)
 
 	productJson, product, err := prd.ReplaceDatesInProduct(ruleOutput.(models.Product), 69)
 
-	return productJson, product, err
+	return productJson, product, nil
 }
 
 func getContractorAge(b []byte) ([]byte, error) {

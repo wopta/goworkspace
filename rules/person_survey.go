@@ -25,7 +25,6 @@ func PersonSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	policyJson := lib.ErrorByte(io.ReadAll(r.Body))
 
 	statements := &Statements{Statements: questions, Text: ""}
-	//dynamicTitle := &DynamicTitle{Text: ""}
 
 	switch os.Getenv("env") {
 	case "local":
@@ -36,11 +35,12 @@ func PersonSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		groule = lib.GetFromStorage("core-350507-function-data", "grules/"+rulesFileName, "")
 	}
 
-	_, statementsOut := rulesFromJson(groule, statements, policyJson, []byte(getCoherenceData()))
+	_, ruleOutput := rulesFromJson(groule, statements, policyJson, []byte(getCoherenceData()))
 
-	b, err := json.Marshal(statementsOut)
+	ruleOutputJson, err := json.Marshal(ruleOutput)
+	lib.CheckError(err)
 
-	return string(b), statementsOut, err
+	return string(ruleOutputJson), ruleOutput, nil
 }
 
 type Statements struct {

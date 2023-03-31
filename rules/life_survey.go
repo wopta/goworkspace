@@ -2,6 +2,7 @@ package rules
 
 import (
 	"encoding/json"
+	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"log"
 	"net/http"
@@ -24,9 +25,10 @@ func LifeSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 
 	rulesFile := getRulesFile(grule, rulesFileName)
 
-	_, statementsOut := rulesFromJson(rulesFile, statements, nil, nil)
+	_, ruleOutput := rulesFromJson(rulesFile, statements, nil, nil)
 
-	statementsJson, err := json.Marshal(statementsOut)
+	ruleOutputJson, err := json.Marshal(ruleOutput)
+	lib.CheckError(err)
 
-	return string(statementsJson), statementsOut, err
+	return string(ruleOutputJson), ruleOutput, nil
 }
