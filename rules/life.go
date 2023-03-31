@@ -46,10 +46,10 @@ func getContractorAge(b []byte) ([]byte, error) {
 		return nil, err
 	}
 
-	ageMap := make(map[string]int)
-	ageMap["age"] = age
+	out := make(map[string]int)
+	out["age"] = age
 
-	output, err := json.Marshal(ageMap)
+	output, err := json.Marshal(out)
 
 	return output, err
 }
