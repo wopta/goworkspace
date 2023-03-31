@@ -32,8 +32,9 @@ func life(data models.Policy) (models.Policy, error) {
 	df := lib.CsvToDataframe(b)
 	var selectRow []string
 
+	//TODO: this should not be here, only for version 1
 	deathSumInsuredLimitOfIndemnity := getDeathSumInsuredLimitOfIndemnity(data.Assets)
-
+	//TODO: this should not be here, only for version 1
 	calculateSumInsuredLimitOfIndemnity(data.Assets, deathSumInsuredLimitOfIndemnity)
 
 	for _, row := range df.Records() {
@@ -73,17 +74,17 @@ func life(data models.Policy) (models.Policy, error) {
 }
 
 func calculateOfferPrices(data models.Policy, guarantee models.Guarante) {
-	data.OffersPrices["default"]["yearly"].Gross += guarantee.Offer["default"].PremiumGrossYearly
-	data.OffersPrices["default"]["yearly"].Net += guarantee.Offer["default"].PremiumNetYearly
-	data.OffersPrices["default"]["monthly"].Gross += guarantee.Offer["default"].PremiumGrossMonthly
-	data.OffersPrices["default"]["monthly"].Net += guarantee.Offer["default"].PremiumNetMonthly
+	data.OffersPrices["default"]["yearly"].Gross += guarantee.Value.PremiumGrossYearly
+	data.OffersPrices["default"]["yearly"].Net += guarantee.Value.PremiumNetYearly
+	data.OffersPrices["default"]["monthly"].Gross += guarantee.Value.PremiumGrossMonthly
+	data.OffersPrices["default"]["monthly"].Net += guarantee.Value.PremiumNetMonthly
 }
 
 func calculateGuaranteePrices(guarantee models.Guarante, baseFloat float64, taxFloat float64) {
-	guarantee.Offer["default"].PremiumNetYearly = guarantee.Value.SumInsuredLimitOfIndemnity * baseFloat
-	guarantee.Offer["default"].PremiumGrossYearly = guarantee.Value.SumInsuredLimitOfIndemnity * taxFloat
-	guarantee.Offer["default"].PremiumNetMonthly = guarantee.Value.SumInsuredLimitOfIndemnity * baseFloat / 12
-	guarantee.Offer["default"].PremiumGrossMonthly = guarantee.Value.SumInsuredLimitOfIndemnity * taxFloat / 12
+	guarantee.Value.PremiumNetYearly = guarantee.Value.SumInsuredLimitOfIndemnity * baseFloat
+	guarantee.Value.PremiumGrossYearly = guarantee.Value.SumInsuredLimitOfIndemnity * taxFloat
+	guarantee.Value.PremiumNetMonthly = guarantee.Value.SumInsuredLimitOfIndemnity * baseFloat / 12
+	guarantee.Value.PremiumGrossMonthly = guarantee.Value.SumInsuredLimitOfIndemnity * taxFloat / 12
 }
 
 func getMultipliers(selectRow []string, offset int, base int, baseTax int) (float64, float64) {
