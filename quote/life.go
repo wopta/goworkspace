@@ -16,13 +16,13 @@ func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	req := lib.ErrorByte(io.ReadAll(r.Body))
 	var data models.Policy
 	defer r.Body.Close()
-	e := json.Unmarshal([]byte(req), &data)
-	res, e := Life(data)
+	e := json.Unmarshal(req, &data)
+	res, e := life(data)
 	s, e := json.Marshal(res)
 	return string(s), nil, e
 
 }
-func Life(data models.Policy) (models.Policy, error) {
+func life(data models.Policy) (models.Policy, error) {
 	var err error
 	birthDate, err := time.Parse("2006-01-02T15:04:05Z", data.Contractor.BirthDate)
 	lib.CheckError(err)
@@ -32,9 +32,9 @@ func Life(data models.Policy) (models.Policy, error) {
 	df := lib.CsvToDataframe(b)
 	var selectRow []string
 
-	deathSumInsuredLimitOfIndemnity := getDeathSumInsuredLimitOfIndemnity(data)
+	deathSumInsuredLimitOfIndemnity := getDeathSumInsuredLimitOfIndemnity(data.Assets)
 
-	calculateSumInsuredLimitOfIndemnity(data, deathSumInsuredLimitOfIndemnity)
+	calculateSumInsuredLimitOfIndemnity(data.Assets, deathSumInsuredLimitOfIndemnity)
 
 	for _, row := range df.Records() {
 		if row[0] == strconv.Itoa(year) {
@@ -58,9 +58,9 @@ func Life(data models.Policy) (models.Policy, error) {
 
 			base, baseTax = getMultipliersIndex(guarantee.Slug, base, baseTax)
 
-			offset = getOffset(guarantee, offset)
+			offset = getOffset(guarantee.Value.Duration.Year, offset)
 
-			baseFloat, taxFloat := getMultipliers(selectRow, base, offset, baseTax)
+			baseFloat, taxFloat := getMultipliers(selectRow, offset, base, baseTax)
 
 			calculateGuaranteePrices(guarantee, baseFloat, taxFloat)
 
@@ -86,7 +86,7 @@ func calculateGuaranteePrices(guarantee models.Guarante, baseFloat float64, taxF
 	guarantee.Offer["default"].PremiumGrossMonthly = guarantee.Value.SumInsuredLimitOfIndemnity * taxFloat / 12
 }
 
-func getMultipliers(selectRow []string, base int, offset int, baseTax int) (float64, float64) {
+func getMultipliers(selectRow []string, offset int, base int, baseTax int) (float64, float64) {
 	baseFloat, _ := strconv.ParseFloat(strings.Replace(strings.Replace(selectRow[base+offset], "%", "", 1), ",", ".", 1), 64)
 	taxFloat, _ := strconv.ParseFloat(strings.Replace(strings.Replace(selectRow[baseTax+offset], "%", "", 1), ",", ".", 1), 64)
 	baseFloat = baseFloat / 100
@@ -112,8 +112,8 @@ func getMultipliersIndex(guaranteeSlug string, base int, baseTax int) (int, int)
 	return base, baseTax
 }
 
-func getOffset(guarantee models.Guarante, offset int) int {
-	switch guarantee.Value.Duration.Year {
+func getOffset(duration int, offset int) int {
+	switch duration {
 	case 5:
 		offset = 8 * 0
 	case 10:
@@ -126,9 +126,9 @@ func getOffset(guarantee models.Guarante, offset int) int {
 	return offset
 }
 
-func getDeathSumInsuredLimitOfIndemnity(data models.Policy) float64 {
+func getDeathSumInsuredLimitOfIndemnity(assets []models.Asset) float64 {
 	deathSumInsuredLimitOfIndemnity := 0.0
-	for _, asset := range data.Assets {
+	for _, asset := range assets {
 		for _, guarantee := range asset.Guarantees {
 			if guarantee.Slug == "death" {
 				deathSumInsuredLimitOfIndemnity = guarantee.Value.SumInsuredLimitOfIndemnity
@@ -139,8 +139,8 @@ func getDeathSumInsuredLimitOfIndemnity(data models.Policy) float64 {
 	return deathSumInsuredLimitOfIndemnity
 }
 
-func calculateSumInsuredLimitOfIndemnity(data models.Policy, deathSumInsuredLimitOfIndemnity float64) {
-	for _, asset := range data.Assets {
+func calculateSumInsuredLimitOfIndemnity(assets []models.Asset, deathSumInsuredLimitOfIndemnity float64) {
+	for _, asset := range assets {
 		for _, guarantee := range asset.Guarantees {
 			switch guarantee.Slug {
 			case "permanent-disability":
