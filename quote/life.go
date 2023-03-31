@@ -32,7 +32,7 @@ func Life(data models.Policy) (models.Policy, error) {
 	df := lib.CsvToDataframe(b)
 	var selectRow []string
 
-	deathSumInsuredLimitOfIndemnity := getDeathSumInsuredLimitOfIndemnty(data)
+	deathSumInsuredLimitOfIndemnity := getDeathSumInsuredLimitOfIndemnity(data)
 
 	calculateSumInsuredLimitOfIndemnity(data, deathSumInsuredLimitOfIndemnity)
 
@@ -126,12 +126,12 @@ func getOffset(guarantee models.Guarante, offset int) int {
 	return offset
 }
 
-func getDeathSumInsuredLimitOfIndemnty(data models.Policy) float64 {
+func getDeathSumInsuredLimitOfIndemnity(data models.Policy) float64 {
 	deathSumInsuredLimitOfIndemnity := 0.0
 	for _, asset := range data.Assets {
 		for _, guarantee := range asset.Guarantees {
 			if guarantee.Slug == "death" {
-				deathSumInsuredLimitOfIndemnity = guarantee.SumInsuredLimitOfIndemnity
+				deathSumInsuredLimitOfIndemnity = guarantee.Value.SumInsuredLimitOfIndemnity
 				break
 			}
 		}
@@ -144,14 +144,14 @@ func calculateSumInsuredLimitOfIndemnity(data models.Policy, deathSumInsuredLimi
 		for _, guarantee := range asset.Guarantees {
 			switch guarantee.Slug {
 			case "permanent-disability":
-				guarantee.SumInsuredLimitOfIndemnity = deathSumInsuredLimitOfIndemnity
+				guarantee.Value.SumInsuredLimitOfIndemnity = deathSumInsuredLimitOfIndemnity
 			case "temporary-disability":
-				guarantee.SumInsuredLimitOfIndemnity = (deathSumInsuredLimitOfIndemnity / 100) * 1
+				guarantee.Value.SumInsuredLimitOfIndemnity = (deathSumInsuredLimitOfIndemnity / 100) * 1
 			case "serious-ill":
 				if deathSumInsuredLimitOfIndemnity > 100000 {
-					guarantee.SumInsuredLimitOfIndemnity = 10000
+					guarantee.Value.SumInsuredLimitOfIndemnity = 10000
 				} else {
-					guarantee.SumInsuredLimitOfIndemnity = 5000
+					guarantee.Value.SumInsuredLimitOfIndemnity = 5000
 				}
 			}
 		}
