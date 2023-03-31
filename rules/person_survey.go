@@ -12,9 +12,7 @@ import (
 
 func PersonSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		//policy    models.Policy
-		groule []byte
-		//e         error
+		groule    []byte
 		questions []*models.Statement
 	)
 	const (

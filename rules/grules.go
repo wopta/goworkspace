@@ -35,7 +35,6 @@ func rulesFromJson(groule []byte, out interface{}, in []byte, data []byte) (stri
 
 	if out != nil {
 		err = dataContext.Add("out", out)
-		//err = dataContext.AddJSON("out", out)
 		log.Println("RulesFromJson out")
 		lib.CheckError(err)
 	}
