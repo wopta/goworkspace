@@ -70,7 +70,24 @@ func FabrickPayObj(data model.Policy, firstSchedule bool, scheduleDate string, c
 				}
 
 			}
-			tr := models.SetTransactionPolicy(data, data.Uid+"_"+scheduleDate, amount, scheduleDate, data.PriceNett*commission)
+			log.Println(data.Uid+"pay commission: ", commission)
+			//tr := models.SetTransactionPolicy(data, data.Uid+"_"+scheduleDate, amount, scheduleDate, data.PriceNett * commission)
+			tr := models.Transaction{
+				Amount:             amount,
+				Id:                 "",
+				PolicyName:         data.Name,
+				PolicyUid:          data.Uid,
+				CreationDate:       time.Now(),
+				Status:             models.TransactionStatusToPay,
+				StatusHistory:      []string{models.TransactionStatusToPay},
+				ScheduleDate:       scheduleDate,
+				NumberCompany:      data.CodeCompany,
+				Commissions:        data.PriceNett * commission,
+				IsPay:              false,
+				Name:               data.Contractor.Name + " " + data.Contractor.Surname,
+				Company:            data.Company,
+				CommissionsCompany: commission,
+			}
 			ref, _ := lib.PutFirestore("transactions", tr)
 			tr.Uid = ref.ID
 			tr.BigPayDate = civil.DateTimeOf(time.Now())

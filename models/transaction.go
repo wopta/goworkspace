@@ -60,7 +60,7 @@ func TransactionToListData(query *firestore.DocumentIterator) []Transaction {
 	return result
 }
 
-func SetTransactionPolicy(policy Policy, id string, amount float64, schedule string, Commissions float64) Transaction {
+func SetTransactionPolicy(policy Policy, id string, amount float64, schedule string, Commissions float64, company string) Transaction {
 
 	return Transaction{
 		Amount:        amount,
@@ -75,5 +75,6 @@ func SetTransactionPolicy(policy Policy, id string, amount float64, schedule str
 		Commissions:   Commissions,
 		IsPay:         false,
 		Name:          policy.Contractor.Name + " " + policy.Contractor.Surname,
+		Company:       company,
 	}
 }
