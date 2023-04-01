@@ -12,7 +12,6 @@ import (
 
 func Life(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		policy    models.Policy
 		rulesFile []byte
 		err       error
 	)
@@ -21,33 +20,36 @@ func Life(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	)
 
 	log.Println("Life")
-	req := lib.ErrorByte(io.ReadAll(r.Body))
-	quotingInputData := getInputData(&policy, err, req)
+	in, err := getContractorAge(lib.ErrorByte(io.ReadAll(r.Body)))
+	lib.CheckError(err)
 
 	rulesFile = getRulesFile(rulesFile, rulesFileName)
 	product, err := prd.GetName("life", "v1")
-	if err != nil {
-		return "", nil, err
-	}
+	lib.CheckError(err)
 
-	_, ruleOutput := rulesFromJson(rulesFile, product, quotingInputData, nil)
+	_, ruleOutput := rulesFromJson(rulesFile, product, in, nil)
 
 	productJson, product, err := prd.ReplaceDatesInProduct(ruleOutput.(models.Product), 69)
 
-	return productJson, product, err
+	return productJson, product, nil
 }
 
-func getInputData(policy *models.Policy, e error, req []byte) []byte {
-	*policy, e = models.UnmarshalPolicy(req)
-	lib.CheckError(e)
+func getContractorAge(b []byte) ([]byte, error) {
+	var policy models.Policy
+	err := json.Unmarshal(b, &policy)
+	if err != nil {
+		return nil, err
+	}
 
-	age, e := calculateAge(policy.Contractor.BirthDate)
-	lib.CheckError(e)
-	tmpMap := make(map[string]int)
+	age, err := calculateAge(policy.Contractor.BirthDate)
+	if err != nil {
+		return nil, err
+	}
 
-	tmpMap["age"] = age
+	out := make(map[string]int)
+	out["age"] = age
 
-	request, e := json.Marshal(tmpMap)
-	lib.CheckError(e)
-	return request
+	output, err := json.Marshal(out)
+
+	return output, err
 }

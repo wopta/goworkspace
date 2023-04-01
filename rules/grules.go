@@ -22,27 +22,40 @@ func rulesFromJson(groule []byte, out interface{}, in []byte, data []byte) (stri
 	//rules := lib.CheckEbyte(ioutil.ReadFile("pmi-allrisk.json"))
 
 	fx := &Fx{}
+	fxSurvey := &FxSurvey{}
+	var err error
 	// create new instance of DataContext
 	dataContext := ast.NewDataContext()
 	// add your JSON Fact into data context using AddJSON() function.
-	err := dataContext.AddJSON("in", in)
-	log.Println("RulesFromJson in")
-	lib.CheckError(err)
-	err = dataContext.Add("out", out)
-	//err = dataContext.AddJSON("out", out)
-	log.Println("RulesFromJson out")
-	lib.CheckError(err)
+	if in != nil {
+		err = dataContext.AddJSON("in", in)
+		log.Println("RulesFromJson in")
+		lib.CheckError(err)
+	}
+
+	if out != nil {
+		err = dataContext.Add("out", out)
+		log.Println("RulesFromJson out")
+		lib.CheckError(err)
+	}
+
 	if data != nil {
 		err = dataContext.AddJSON("data", data)
 		log.Println("RulesFromJson data loaded")
 		lib.CheckError(err)
 	}
+
 	err = dataContext.Add("fx", fx)
 	log.Println("RulesFromJson fx loaded")
 	lib.CheckError(err)
-	underlying := pkg.NewBytesResource(groule)
 
+	err = dataContext.Add("fxSurvey", fxSurvey)
+	log.Println("RulesFromJson fxSurvey loaded")
 	lib.CheckError(err)
+
+	underlying := pkg.NewBytesResource(groule)
+	lib.CheckError(err)
+
 	resource := pkg.NewJSONResourceFromResource(underlying)
 	lib.CheckError(err)
 	// Add the rule definition above into the library and name it 'TutorialRules'  version '0.0.1'

@@ -40,6 +40,11 @@ func Rules(w http.ResponseWriter, r *http.Request) {
 				Handler: Life,
 				Method:  http.MethodPost,
 			},
+			{
+				Route:   "survey/life",
+				Handler: LifeSurvey,
+				Method:  http.MethodPost,
+			},
 		},
 	}
 	route.Router(w, r)
