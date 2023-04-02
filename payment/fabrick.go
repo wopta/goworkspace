@@ -52,7 +52,7 @@ func FabrickPayObj(data model.Policy, firstSchedule bool, scheduleDate string, c
 			json.Unmarshal([]byte(body), &result)
 			res.Body.Close()
 			//prod, err := product.GetName(data.Name, "v"+fmt.Sprint(data.ProductVersion))
-			prodb, err := lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "products/"+data.Name+data.ProductVersion+".json")
+			prodb, err := lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "products/"+data.Name+"-"+data.ProductVersion+".json")
 			//var prod models.Product
 			prod, err := models.UnmarshalProduct(prodb)
 			var commission float64
