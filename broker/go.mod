@@ -13,9 +13,9 @@ require (
 	github.com/wopta/goworkspace/mail v1.0.6
 	github.com/wopta/goworkspace/models v1.0.22
 	github.com/wopta/goworkspace/payment v1.0.7
-	github.com/wopta/goworkspace/user v0.0.0-20230330080822-acd51ca6882d
+	github.com/wopta/goworkspace/user v1.0.0
 	github.com/wopta/goworkspace/wiseproxy v1.0.3
-	github.com/wopta/goworkspace/product v1.0.9
+	github.com/wopta/goworkspace/product v1.0.9 // indirect
 )
 
 require (

@@ -2,7 +2,6 @@ package payment
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -15,7 +14,6 @@ import (
 	lib "github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	model "github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/product"
 )
 
 func FabrickPayObj(data model.Policy, firstSchedule bool, scheduleDate string, customerId string, amount float64) <-chan FabrickPaymentResponse {
@@ -38,13 +36,8 @@ func FabrickPayObj(data model.Policy, firstSchedule bool, scheduleDate string, c
 		req, _ := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(string(marshal)))
 		req.Header.Set("api-key", os.Getenv("FABRICK_TOKEN_BACK_API"))
 		req.Header.Set("Auth-Schema", "S2S")
-
-		//req.Header.Set("Accept-Encoding", "gzip, deflate, br")
 		req.Header.Set("Content-Type", "application/json")
 		req.Header.Set("x-auth-token", os.Getenv("FABRICK_TOKEN_BACK_API"))
-		//req.Header.Set("User-Agent", "Go-http-client/1.1")
-		//req.Header.Set("Content-Length", strconv.Itoa(len(string(marshal))))
-		//req.Header.Set("Host", "35.195.35.137")
 		req.Header.Set("Accept", "application/json")
 		log.Printf(data.Uid+" ", req.Header)
 		res, err := client.Do(req)
@@ -58,7 +51,10 @@ func FabrickPayObj(data model.Policy, firstSchedule bool, scheduleDate string, c
 			var result FabrickPaymentResponse
 			json.Unmarshal([]byte(body), &result)
 			res.Body.Close()
-			prod, err := product.GetName(data.Name, "v"+fmt.Sprint(data.ProductVersion))
+			//prod, err := product.GetName(data.Name, "v"+fmt.Sprint(data.ProductVersion))
+			prodb, err := lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "products/"+data.Name+data.ProductVersion+".json")
+			//var prod models.Product
+			prod, err := models.UnmarshalProduct(prodb)
 			var commission float64
 			for _, x := range prod.Companies {
 				if x.Name == data.Company {

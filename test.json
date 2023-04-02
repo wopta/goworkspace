@@ -1,1202 +1,205 @@
 {
-  "Documents": [
-    {
-      "FileId": "string",
-      "DocumentNumber": 0
-    }
-  ],
-  "Name": "string",
-  "MetaData": "string",
-  "AddDocumentTimestamp": true,
-  "ShareWithTeam": true,
-  "LockFormFieldsOnFinish": true,
-  "UnassignedElements": {
-    "TextBoxes": [
-      {
-        "ElementId": "string",
-        "Required": true,
-        "Value": "string",
-        "DocumentNumber": 0,
-        "GuidingOrder": 0,
-        "Validation": {
-          "Type": "None",
-          "DateValidationConfiguration": {
-            "DateFormat": "string",
-            "Range": {
-              "From": "string",
-              "To": "string"
-            }
-          },
-          "NumberValidationConfiguration": {
-            "DecimalDigits": 0,
-            "Symbol": "string",
-            "SymbolLocation": "Start",
-            "GroupSeparator": "Comma",
-            "DecimalSeparator": "Comma",
-            "Range": {
-              "From": "string",
-              "To": "string"
-            }
-          },
-          "PhoneValidationConfiguration": {
-            "Type": "International"
-          },
-          "TimeValidationConfiguration": {
-            "TimeFormat": "string",
-            "Range": {
-              "From": "string",
-              "To": "string"
-            }
-          }
-        },
-        "FieldDefinition": {
-          "ReadOnly": true,
-          "MaxLength": 0,
-          "IsMultiline": true,
-          "IsPassword": true,
-          "TextFormat": {
-            "TextColor": "string",
-            "FontSizeInPt": 0,
-            "FontName": "string",
-            "Bold": true,
-            "Italic": true,
-            "TextAlign": "Left"
-          },
-          "Position": {
-            "PageNumber": 0,
-            "X": 0,
-            "Y": 0
-          },
-          "Size": {
-            "Width": 0,
-            "Height": 0
-          }
-        }
-      }
-    ],
-    "CheckBoxes": [
-      {
-        "ElementId": "string",
-        "DocumentNumber": 0,
-        "Required": true,
-        "IsChecked": true,
-        "GuidingOrder": 0,
-        "FieldDefinition": {
-          "ExportValue": "string",
-          "Position": {
-            "PageNumber": 0,
-            "X": 0,
-            "Y": 0
-          },
-          "Size": {
-            "Width": 0,
-            "Height": 0
-          },
-          "ReadOnly": true
-        }
-      }
-    ],
-    "ComboBoxes": [
-      {
-        "ElementId": "string",
-        "DocumentNumber": 0,
-        "Required": true,
-        "Value": "string",
-        "GuidingOrder": 0,
-        "FieldDefinition": {
-          "TextFormat": {
-            "TextColor": "string",
-            "FontSizeInPt": 0,
-            "FontName": "string",
-            "Bold": true,
-            "Italic": true,
-            "TextAlign": "Left"
-          },
-          "Items": [
-            {
-              "ExportValue": "string",
-              "DisplayValue": "string"
-            }
-          ],
-          "IsEditable": true,
-          "ReadOnly": true,
-          "Position": {
-            "PageNumber": 0,
-            "X": 0,
-            "Y": 0
-          },
-          "Size": {
-            "Width": 0,
-            "Height": 0
-          }
-        }
-      }
-    ],
-    "RadioButtons": [
-      {
-        "GroupName": "string",
-        "DocumentNumber": 0,
-        "Required": true,
-        "SelectedItem": "string",
-        "GuidingOrder": 0,
-        "FieldDefinition": {
-          "IsSelectUnison": true,
-          "Items": [
-            {
-              "ExportValue": "string",
-              "IsChecked": true,
-              "ReadOnly": true,
-              "Position": {
-                "PageNumber": 0,
-                "X": 0,
-                "Y": 0
-              },
-              "Size": {
-                "Width": 0,
-                "Height": 0
-              }
-            }
-          ]
-        }
-      }
-    ],
-    "ListBoxes": [
-      {
-        "ElementId": "string",
-        "DocumentNumber": 0,
-        "Required": true,
-        "PreSelectedItems": [
-          "string"
-        ],
-        "GuidingOrder": 0,
-        "FieldDefinition": {
-          "TextFormat": {
-            "TextColor": "string",
-            "FontSizeInPt": 0,
-            "FontName": "string",
-            "Bold": true,
-            "Italic": true,
-            "TextAlign": "Left"
-          },
-          "Items": [
-            {
-              "ExportValue": "string",
-              "DisplayValue": "string"
-            }
-          ],
-          "IsMultiSelect": true,
-          "ReadOnly": true,
-          "Position": {
-            "PageNumber": 0,
-            "X": 0,
-            "Y": 0
-          },
-          "Size": {
-            "Width": 0,
-            "Height": 0
-          }
-        }
-      }
-    ]
-  },
-  "Activities": [
-    {
-      "Action": {
-        "SendCopy": {
-          "RecipientConfiguration": {
-            "ContactInformation": {
-              "Email": "string",
-              "GivenName": "string",
-              "Surname": "string",
-              "PhoneNumber": "string",
-              "LanguageCode": "AF"
-            },
-            "PersonalMessage": "string"
-          },
-          "CopyingGroup": "string"
-        },
-        "SignAutomatic": {
-          "ProfileId": "string",
-          "RenderingLanguageCode": "AF",
-          "VisibleSignatures": [
-            {
-              "DocumentNumber": 0,
-              "UseExternalTimestampServer": true,
-              "FieldDefinition": {
-                "Position": {
-                  "PageNumber": 0,
-                  "X": 0,
-                  "Y": 0
-                },
-                "Size": {
-                  "Width": 0,
-                  "Height": 0
-                }
-              }
-            }
-          ]
-        },
-        "Sign": {
-          "RecipientConfiguration": {
-            "ContactInformation": {
-              "Email": "string",
-              "GivenName": "string",
-              "Surname": "string",
-              "PhoneNumber": "string",
-              "LanguageCode": "AF"
-            },
-            "PersonalMessage": "string",
-            "AuthenticationConfiguration": {
-              "AccessCode": {
-                "Code": "string"
-              },
-              "SmsOneTimePassword": {
-                "PhoneNumber": "string"
-              },
-              "SwedishBankId": {
-                "PersonalNumber": "string",
-                "AllowAnyPersonalNumber": true
-              },
-              "OAuthAuthentications": [
-                {
-                  "ProviderName": "string",
-                  "Validations": [
-                    {
-                      "FieldReferenceId": "string",
-                      "ExpectedValue": "string"
-                    }
-                  ]
-                }
-              ],
-              "SamlAuthentications": [
-                {
-                  "ProviderName": "string",
-                  "Validations": [
-                    {
-                      "FieldReferenceId": "string",
-                      "ExpectedValue": "string"
-                    }
-                  ]
-                }
-              ]
-            },
-            "SendEmails": true,
-            "AllowAccessAfterFinish": true,
-            "IncludedEmailAppLinks": {
-              "Android": true,
-              "iOS": true,
-              "Windows": true
-            },
-            "AllowDelegation": true,
-            "RequireViewContentBeforeFormFilling": true
-          },
-          "SequenceMode": "NoSequenceEnforced",
-          "Elements": {
-            "TextBoxes": [
-              {
-                "ElementId": "string",
-                "Required": true,
-                "Value": "string",
-                "DocumentNumber": 0,
-                "GuidingOrder": 0,
-                "Validation": {
-                  "Type": "None",
-                  "DateValidationConfiguration": {
-                    "DateFormat": "string",
-                    "Range": {
-                      "From": "string",
-                      "To": "string"
-                    }
-                  },
-                  "NumberValidationConfiguration": {
-                    "DecimalDigits": 0,
-                    "Symbol": "string",
-                    "SymbolLocation": "Start",
-                    "GroupSeparator": "Comma",
-                    "DecimalSeparator": "Comma",
-                    "Range": {
-                      "From": "string",
-                      "To": "string"
-                    }
-                  },
-                  "PhoneValidationConfiguration": {
-                    "Type": "International"
-                  },
-                  "TimeValidationConfiguration": {
-                    "TimeFormat": "string",
-                    "Range": {
-                      "From": "string",
-                      "To": "string"
-                    }
-                  }
-                },
-                "FieldDefinition": {
-                  "ReadOnly": true,
-                  "MaxLength": 0,
-                  "IsMultiline": true,
-                  "IsPassword": true,
-                  "TextFormat": {
-                    "TextColor": "string",
-                    "FontSizeInPt": 0,
-                    "FontName": "string",
-                    "Bold": true,
-                    "Italic": true,
-                    "TextAlign": "Left"
-                  },
-                  "Position": {
-                    "PageNumber": 0,
-                    "X": 0,
-                    "Y": 0
-                  },
-                  "Size": {
-                    "Width": 0,
-                    "Height": 0
-                  }
-                }
-              }
-            ],
-            "CheckBoxes": [
-              {
-                "ElementId": "string",
-                "DocumentNumber": 0,
-                "Required": true,
-                "IsChecked": true,
-                "GuidingOrder": 0,
-                "FieldDefinition": {
-                  "ExportValue": "string",
-                  "Position": {
-                    "PageNumber": 0,
-                    "X": 0,
-                    "Y": 0
-                  },
-                  "Size": {
-                    "Width": 0,
-                    "Height": 0
-                  },
-                  "ReadOnly": true
-                }
-              }
-            ],
-            "ComboBoxes": [
-              {
-                "ElementId": "string",
-                "DocumentNumber": 0,
-                "Required": true,
-                "Value": "string",
-                "GuidingOrder": 0,
-                "FieldDefinition": {
-                  "TextFormat": {
-                    "TextColor": "string",
-                    "FontSizeInPt": 0,
-                    "FontName": "string",
-                    "Bold": true,
-                    "Italic": true,
-                    "TextAlign": "Left"
-                  },
-                  "Items": [
-                    {
-                      "ExportValue": "string",
-                      "DisplayValue": "string"
-                    }
-                  ],
-                  "IsEditable": true,
-                  "ReadOnly": true,
-                  "Position": {
-                    "PageNumber": 0,
-                    "X": 0,
-                    "Y": 0
-                  },
-                  "Size": {
-                    "Width": 0,
-                    "Height": 0
-                  }
-                }
-              }
-            ],
-            "RadioButtons": [
-              {
-                "GroupName": "string",
-                "DocumentNumber": 0,
-                "Required": true,
-                "SelectedItem": "string",
-                "GuidingOrder": 0,
-                "FieldDefinition": {
-                  "IsSelectUnison": true,
-                  "Items": [
-                    {
-                      "ExportValue": "string",
-                      "IsChecked": true,
-                      "ReadOnly": true,
-                      "Position": {
-                        "PageNumber": 0,
-                        "X": 0,
-                        "Y": 0
-                      },
-                      "Size": {
-                        "Width": 0,
-                        "Height": 0
-                      }
-                    }
-                  ]
-                }
-              }
-            ],
-            "ListBoxes": [
-              {
-                "ElementId": "string",
-                "DocumentNumber": 0,
-                "Required": true,
-                "PreSelectedItems": [
-                  "string"
-                ],
-                "GuidingOrder": 0,
-                "FieldDefinition": {
-                  "TextFormat": {
-                    "TextColor": "string",
-                    "FontSizeInPt": 0,
-                    "FontName": "string",
-                    "Bold": true,
-                    "Italic": true,
-                    "TextAlign": "Left"
-                  },
-                  "Items": [
-                    {
-                      "ExportValue": "string",
-                      "DisplayValue": "string"
-                    }
-                  ],
-                  "IsMultiSelect": true,
-                  "ReadOnly": true,
-                  "Position": {
-                    "PageNumber": 0,
-                    "X": 0,
-                    "Y": 0
-                  },
-                  "Size": {
-                    "Width": 0,
-                    "Height": 0
-                  }
-                }
-              }
-            ],
-            "Signatures": [
-              {
-                "ElementId": "string",
-                "Required": true,
-                "DocumentNumber": 0,
-                "DisplayName": "string",
-                "FieldDescription": "string",
-                "UseExternalTimestampServer": true,
-                "GuidingOrder": 0,
-                "AllowedSignatureTypes": {
-                  "ClickToSign": {
-                    "UseExternalSignatureImage": "Optional",
-                    "Preferred": true,
-                    "StampImprintConfiguration": {
-                      "DisplayExtraInformation": true,
-                      "FontName": "string",
-                      "FontSizeInPt": 0,
-                      "DisplayEmail": true,
-                      "DisplayIp": true,
-                      "DisplayName": true,
-                      "DisplaySignatureDate": true
-                    }
-                  },
-                  "DrawToSign": {
-                    "UseExternalSignatureImage": "Optional",
-                    "Preferred": true,
-                    "StampImprintConfiguration": {
-                      "DisplayExtraInformation": true,
-                      "FontName": "string",
-                      "FontSizeInPt": 0,
-                      "DisplayEmail": true,
-                      "DisplayIp": true,
-                      "DisplayName": true,
-                      "DisplaySignatureDate": true
-                    }
-                  },
-                  "TypeToSign": {
-                    "UseExternalSignatureImage": "Optional",
-                    "Preferred": true,
-                    "StampImprintConfiguration": {
-                      "DisplayExtraInformation": true,
-                      "FontName": "string",
-                      "FontSizeInPt": 0,
-                      "DisplayEmail": true,
-                      "DisplayIp": true,
-                      "DisplayName": true,
-                      "DisplaySignatureDate": true
-                    }
-                  },
-                  "LocalCertificate": {
-                    "EnforcePreferredHashAlgorithm": true,
-                    "PreferredHashAlgorithm": "Sha256",
-                    "UseExternalSignatureImage": "Optional",
-                    "Preferred": true,
-                    "StampImprintConfiguration": {
-                      "DisplayExtraInformation": true,
-                      "FontName": "string",
-                      "FontSizeInPt": 0,
-                      "DisplayIp": true,
-                      "DisplayName": true,
-                      "DisplaySignatureDate": true
-                    }
-                  },
-                  "DisposableCertificate": {
-                    "IsLongLived": true,
-                    "ValidityInSeconds": 0,
-                    "UseExternalSignatureImage": "Optional",
-                    "Preferred": true,
-                    "StampImprintConfiguration": {
-                      "DisplayExtraInformation": true,
-                      "FontName": "string",
-                      "FontSizeInPt": 0,
-                      "DisplayIp": true,
-                      "DisplayName": true,
-                      "DisplaySignatureDate": true
-                    }
-                  },
-                  "SwissComOnDemand": {
-                    "ValidityInSeconds": 0,
-                    "Preferred": true,
-                    "StampImprintConfiguration": {
-                      "DisplayExtraInformation": true,
-                      "FontName": "string",
-                      "FontSizeInPt": 0,
-                      "DisplayIp": true,
-                      "DisplayName": true,
-                      "DisplaySignatureDate": true
-                    }
-                  },
-                  "ATrustCertificate": {
-                    "TemplateId": "string",
-                    "Preferred": true
-                  },
-                  "Biometric": {
-                    "BiometricVerification": true,
-                    "AllowBiometricStoringOnly": true,
-                    "StoreSignedResponseWithoutBioData": true,
-                    "BiometricServerUserId": "string",
-                    "SignaturePositioning": "WithinField",
-                    "Preferred": true
-                  },
-                  "RemoteCertificate": {
-                    "ValidityInSeconds": 0,
-                    "UseExternalSignatureImage": "Optional",
-                    "Preferred": true,
-                    "StampImprintConfiguration": {
-                      "DisplayExtraInformation": true,
-                      "FontName": "string",
-                      "FontSizeInPt": 0,
-                      "DisplayIp": true,
-                      "DisplayName": true,
-                      "DisplaySignatureDate": true
-                    }
-                  },
-                  "OneTimePassword": {
-                    "ValidityInSeconds": 0,
-                    "UseExternalSignatureImage": "Optional",
-                    "Preferred": true,
-                    "StampImprintConfiguration": {
-                      "DisplayExtraInformation": true,
-                      "FontName": "string",
-                      "FontSizeInPt": 0,
-                      "DisplayTransactionId": true,
-                      "DisplayTransactionToken": true,
-                      "DisplayPhoneNumber": true,
-                      "DisplayIp": true,
-                      "DisplayName": true,
-                      "DisplaySignatureDate": true
-                    }
-                  },
-                  "SwedishBankId": {
-                    "Preferred": true,
-                    "StampImprintConfiguration": {
-                      "DisplayExtraInformation": true,
-                      "FontName": "string",
-                      "FontSizeInPt": 0,
-                      "DisplayTransactionId": true,
-                      "DisplayName": true,
-                      "DisplaySignatureDate": true
-                    }
-                  },
-                  "SignaturePlugins": [
-                    {
-                      "PluginId": "string",
-                      "Preferred": true,
-                      "StampImprintConfiguration": {
-                        "DisplayExtraInformation": true,
-                        "FontName": "string",
-                        "FontSizeInPt": 0,
-                        "DisplayEmail": true,
-                        "DisplayIp": true,
-                        "DisplayName": true,
-                        "DisplaySignatureDate": true
-                      }
-                    }
-                  ]
-                },
-                "FieldDefinition": {
-                  "Position": {
-                    "PageNumber": 0,
-                    "X": 0,
-                    "Y": 0
-                  },
-                  "Size": {
-                    "Width": 0,
-                    "Height": 0
-                  }
-                },
-                "TaskConfiguration": {
-                  "StampImprintDateConfiguration": {
-                    "UseLocalTimezone": true,
-                    "DateTimeFormat": "string"
-                  },
-                  "BatchGroup": "string"
-                }
-              }
-            ],
-            "Attachments": [
-              {
-                "ElementId": "string",
-                "DocumentNumber": 0,
-                "Required": true,
-                "DisplayName": "string",
-                "DisplayIconType": "Paperclip",
-                "GuidingOrder": 0,
-                "FieldDefinition": {
-                  "Position": {
-                    "PageNumber": 0,
-                    "X": 0,
-                    "Y": 0
-                  },
-                  "Size": {
-                    "Width": 0,
-                    "Height": 0
-                  }
-                }
-              }
-            ],
-            "PredefinedFieldElements": {
-              "TextFields": [
-                {
-                  "ElementId": "string",
-                  "DocumentNumber": 0,
-                  "Value": "string",
-                  "FieldDefinition": {
-                    "TextFormat": {
-                      "TextColor": "string",
-                      "FontSizeInPt": 0,
-                      "FontName": "string",
-                      "Bold": true,
-                      "Italic": true,
-                      "TextAlign": "Left"
-                    },
-                    "Position": {
-                      "PageNumber": 0,
-                      "X": 0,
-                      "Y": 0
-                    },
-                    "Size": {
-                      "Width": 0,
-                      "Height": 0
-                    }
-                  }
-                }
-              ],
-              "EmailFields": [
-                {
-                  "ElementId": "string",
-                  "DocumentNumber": 0,
-                  "FieldDefinition": {
-                    "TextFormat": {
-                      "TextColor": "string",
-                      "FontSizeInPt": 0,
-                      "FontName": "string",
-                      "Bold": true,
-                      "Italic": true,
-                      "TextAlign": "Left"
-                    },
-                    "Position": {
-                      "PageNumber": 0,
-                      "X": 0,
-                      "Y": 0
-                    },
-                    "Size": {
-                      "Width": 0,
-                      "Height": 0
-                    }
-                  }
-                }
-              ],
-              "InitialsFields": [
-                {
-                  "ElementId": "string",
-                  "DocumentNumber": 0,
-                  "IncludeMiddleNameInitials": true,
-                  "FieldDefinition": {
-                    "TextFormat": {
-                      "TextColor": "string",
-                      "FontSizeInPt": 0,
-                      "FontName": "string",
-                      "Bold": true,
-                      "Italic": true,
-                      "TextAlign": "Left"
-                    },
-                    "Position": {
-                      "PageNumber": 0,
-                      "X": 0,
-                      "Y": 0
-                    },
-                    "Size": {
-                      "Width": 0,
-                      "Height": 0
-                    }
-                  }
-                }
-              ],
-              "GivenNameFields": [
-                {
-                  "ElementId": "string",
-                  "DocumentNumber": 0,
-                  "FieldDefinition": {
-                    "TextFormat": {
-                      "TextColor": "string",
-                      "FontSizeInPt": 0,
-                      "FontName": "string",
-                      "Bold": true,
-                      "Italic": true,
-                      "TextAlign": "Left"
-                    },
-                    "Position": {
-                      "PageNumber": 0,
-                      "X": 0,
-                      "Y": 0
-                    },
-                    "Size": {
-                      "Width": 0,
-                      "Height": 0
-                    }
-                  }
-                }
-              ],
-              "SurnameFields": [
-                {
-                  "ElementId": "string",
-                  "DocumentNumber": 0,
-                  "FieldDefinition": {
-                    "TextFormat": {
-                      "TextColor": "string",
-                      "FontSizeInPt": 0,
-                      "FontName": "string",
-                      "Bold": true,
-                      "Italic": true,
-                      "TextAlign": "Left"
-                    },
-                    "Position": {
-                      "PageNumber": 0,
-                      "X": 0,
-                      "Y": 0
-                    },
-                    "Size": {
-                      "Width": 0,
-                      "Height": 0
-                    }
-                  }
-                }
-              ],
-              "FullNameFields": [
-                {
-                  "ElementId": "string",
-                  "DocumentNumber": 0,
-                  "FieldDefinition": {
-                    "TextFormat": {
-                      "TextColor": "string",
-                      "FontSizeInPt": 0,
-                      "FontName": "string",
-                      "Bold": true,
-                      "Italic": true,
-                      "TextAlign": "Left"
-                    },
-                    "Position": {
-                      "PageNumber": 0,
-                      "X": 0,
-                      "Y": 0
-                    },
-                    "Size": {
-                      "Width": 0,
-                      "Height": 0
-                    }
-                  }
-                }
-              ],
-              "DateFields": [
-                {
-                  "ElementId": "string",
-                  "DocumentNumber": 0,
-                  "DateFormat": "string",
-                  "FieldDefinition": {
-                    "TextFormat": {
-                      "TextColor": "string",
-                      "FontSizeInPt": 0,
-                      "FontName": "string",
-                      "Bold": true,
-                      "Italic": true,
-                      "TextAlign": "Left"
-                    },
-                    "Position": {
-                      "PageNumber": 0,
-                      "X": 0,
-                      "Y": 0
-                    },
-                    "Size": {
-                      "Width": 0,
-                      "Height": 0
-                    }
-                  }
-                }
-              ]
-            },
-            "LinkConfiguration": {
-              "HyperLinks": [
-                {
-                  "ElementId": "string",
-                  "Uri": "string",
-                  "DocumentNumber": 0,
-                  "FieldDefinition": {
-                    "Position": {
-                      "PageNumber": 0,
-                      "X": 0,
-                      "Y": 0
-                    },
-                    "Size": {
-                      "Width": 0,
-                      "Height": 0
-                    }
-                  }
-                }
-              ]
-            },
-            "AreaReadConfirmations": [
-              {
-                "ElementId": "string",
-                "Required": true,
-                "DocumentNumber": 0,
-                "DisplayName": "string",
-                "GuidingOrder": 0,
-                "Definition": {
-                  "Position": {
-                    "PageNumber": 0,
-                    "X": 0,
-                    "Y": 0
-                  },
-                  "Size": {
-                    "Width": 0,
-                    "Height": 0
-                  }
-                }
-              }
-            ],
-            "PageReadConfirmations": [
-              {
-                "ElementId": "string",
-                "Required": true,
-                "DocumentNumber": 0,
-                "DisplayName": "string",
-                "PageNumber": 0,
-                "GuidingOrder": 0
-              }
-            ]
-          },
-          "FinishActionConfiguration": {
-            "SignAnyWhereViewer": {
-              "RedirectUri": "string"
-            },
-            "SignificantClientSignatureCaptureForIos": {
-              "RemoveDocumentFromRecentDocumentList": true,
-              "CallClientActionOnlyAfterSuccessfulSync": true,
-              "CloseApp": true,
-              "RedirectUri": "string"
-            },
-            "SignificantClientSignatureCaptureForAndroid": {
-              "RemoveDocumentFromRecentDocumentList": true,
-              "CallClientActionOnlyAfterSuccessfulSync": true,
-              "CloseApp": true,
-              "RedirectUri": "string"
-            },
-            "SignificantClientSignatureCaptureForWindows": {
-              "RemoveDocumentFromRecentDocumentList": true,
-              "CallClientActionOnlyAfterSuccessfulSync": true,
-              "CloseApp": true,
-              "RedirectUri": "string"
-            },
-            "KioskSdk": {
-              "RedirectUri": "string"
-            }
-          },
-          "SignatureDataConfiguration": {
-            "DisposableCertificate": {
-              "DocumentIssuingCountry": "string",
-              "IdentificationIssuingCountry": "string",
-              "IdentificationType": "None",
-              "PhoneNumber": "string",
-              "DocumentType": "IdentityCard",
-              "DocumentIssuedBy": "string",
-              "DocumentIssuedOn": "2023-03-22",
-              "DocumentExpiryDate": "2023-03-22",
-              "SerialNumber": "string",
-              "DocumentNumber": "string"
-            },
-            "RemoteCertificate": {
-              "UserId": "string",
-              "DeviceId": "string"
-            },
-            "SwissComOnDemand": {
-              "PhoneNumber": "string",
-              "CommonName": "string",
-              "Country": "string",
-              "Locality": "string",
-              "OrganizationUnits": [
-                "string"
-              ],
-              "Organization": "string",
-              "SerialNumber": "string",
-              "StateOrProvince": "string",
-              "Pseudonym": "string"
-            },
-            "SmsOneTimePassword": {
-              "PhoneNumber": "string"
-            },
-            "ATrustCertificate": {
-              "PhoneNumber": "string"
-            },
-            "SwedishBankId": {
-              "PersonalNumber": "string",
-              "AllowAnyPersonalNumber": true
-            },
-            "SignaturePluginData": [
-              {
-                "PluginId": "string",
-                "Fields": [
-                  {
-                    "Key": "string",
-                    "Value": "string"
-                  }
-                ]
-              }
-            ]
-          },
-          "BatchConfiguration": {
-            "Mode": "Basic",
-            "RequireScrollingOverAllSignaturesBeforeSigning": true
-          },
-          "SigningGroup": "string"
-        },
-        "View": {
-          "RecipientConfiguration": {
-            "ContactInformation": {
-              "Email": "string",
-              "GivenName": "string",
-              "Surname": "string",
-              "PhoneNumber": "string",
-              "LanguageCode": "AF"
-            },
-            "PersonalMessage": "string",
-            "AuthenticationConfiguration": {
-              "AccessCode": {
-                "Code": "string"
-              },
-              "SmsOneTimePassword": {
-                "PhoneNumber": "string"
-              },
-              "SwedishBankId": {
-                "PersonalNumber": "string",
-                "AllowAnyPersonalNumber": true
-              },
-              "OAuthAuthentications": [
-                {
-                  "ProviderName": "string",
-                  "Validations": [
-                    {
-                      "FieldReferenceId": "string",
-                      "ExpectedValue": "string"
-                    }
-                  ]
-                }
-              ],
-              "SamlAuthentications": [
-                {
-                  "ProviderName": "string",
-                  "Validations": [
-                    {
-                      "FieldReferenceId": "string",
-                      "ExpectedValue": "string"
-                    }
-                  ]
-                }
-              ]
-            },
-            "SendEmails": true,
-            "AllowAccessAfterFinish": true
-          },
-          "ViewingGroup": "string"
-        },
-        "SignAsP7M": {
-          "RecipientConfiguration": {
-            "ContactInformation": {
-              "Email": "string",
-              "GivenName": "string",
-              "Surname": "string",
-              "PhoneNumber": "string",
-              "LanguageCode": "AF"
-            },
-            "PersonalMessage": "string",
-            "AuthenticationConfiguration": {
-              "AccessCode": {
-                "Code": "string"
-              },
-              "SmsOneTimePassword": {
-                "PhoneNumber": "string"
-              },
-              "SwedishBankId": {
-                "PersonalNumber": "string",
-                "AllowAnyPersonalNumber": true
-              },
-              "OAuthAuthentications": [
-                {
-                  "ProviderName": "string",
-                  "Validations": [
-                    {
-                      "FieldReferenceId": "string",
-                      "ExpectedValue": "string"
-                    }
-                  ]
-                }
-              ],
-              "SamlAuthentications": [
-                {
-                  "ProviderName": "string",
-                  "Validations": [
-                    {
-                      "FieldReferenceId": "string",
-                      "ExpectedValue": "string"
-                    }
-                  ]
-                }
-              ]
-            },
-            "SendEmails": true,
-            "AllowAccessAfterFinish": true,
-            "IncludedEmailAppLinks": {
-              "Android": true,
-              "iOS": true,
-              "Windows": true
-            },
-            "AllowDelegation": true,
-            "RequireViewContentBeforeFormFilling": true
-          },
-          "SignatureMethods": {
-            "LocalCertificate": true,
-            "DisposableCertificate": {
-              "DocumentIssuingCountry": "string",
-              "IdentificationIssuingCountry": "string",
-              "IdentificationType": "None",
-              "PhoneNumber": "string",
-              "DocumentType": "IdentityCard",
-              "DocumentIssuedBy": "string",
-              "DocumentIssuedOn": "2023-03-22",
-              "DocumentExpiryDate": "2023-03-22",
-              "SerialNumber": "string",
-              "DocumentNumber": "string"
-            },
-            "RemoteCertificate": {
-              "UserId": "string",
-              "DeviceId": "string"
-            },
-            "SignaturePluginData": [
-              {
-                "PluginId": "string",
-                "Fields": [
-                  {
-                    "Key": "string",
-                    "Value": "string"
-                  }
-                ]
-              }
-            ]
-          },
-          "SignAsP7MGroup": "string"
-        }
+  "sme": {
+    "ateco": "107110",
+    "subproductId": 35,
+    "UW_role": "Agent",
+    "company": {
+      "country": "Italy",
+      "vatnumber": {
+        "value": "01319960199"
       },
-      "VisibilityOptions": [
+      "opre_eur": {
+        "value": 270383
+      },
+      "employees": {
+        "value": 2
+      }
+    },
+    "answers": {
+      "step1": [
         {
-          "DocumentNumber": 0,
-          "IsHidden": true
+          "slug": "third-party-liability",
+          "value": {
+            "typeOfSumInsured": "replacementValue",
+            "deductible": "1000",
+            "sumInsuredLimitOfIndemnity": 1000000
+          }
+        },
+        {
+          "slug": "legal-defence",
+          "value": {
+            "legalDefence": "basic"
+          }
+        },
+        {
+          "slug": "employers-liability",
+          "value": {
+            "typeOfSumInsured": "replacementValue",
+            "deductible": "2600",
+            "sumInsuredLimitOfIndemnity": 1000000,
+            "selfInsurance": "0.10"
+          }
+        }
+      ],
+      "step2": [
+        {
+          "buildingId": "2",
+          "value": {
+            "buildingType": "masonry",
+            "numberOfFloors": "ground_floor",
+            "constructionYear": "before1972",
+            "alarm": "yes",
+            "typeOfInsurance": "namedPerils",
+            "ateco": "107110",
+            "postcode": "20122",
+            "province": "MI",
+            "answer": [
+              {
+                "slug": "electronic-equipment",
+                "value": {
+                  "typeOfSumInsured": "firstLoss",
+                  "deductible": "1000",
+                  "sumInsuredLimitOfIndemnity": 10000
+                }
+              },
+              {
+                "slug": "building",
+                "value": {
+                  "typeOfSumInsured": "replacementValue",
+                  "deductible": "1000",
+                  "sumInsuredLimitOfIndemnity": 50000
+                }
+              },
+              {
+                "slug": "sociopolitical-event",
+                "value": {
+                  "typeOfSumInsured": "replacementValue",
+                  "deductible": "1000",
+                  "sumInsuredLimitOfIndemnity": 80000,
+                  "selfInsurance": "0.05"
+                }
+              },
+              {
+                "slug": "theft",
+                "value": {
+                  "typeOfSumInsured": "firstLoss",
+                  "deductible": "1000",
+                  "sumInsuredLimitOfIndemnity": 5000
+                }
+              },
+              {
+                "slug": "content",
+                "value": {
+                  "typeOfSumInsured": "replacementValue",
+                  "deductible": "1000",
+                  "sumInsuredLimitOfIndemnity": 50000
+                }
+              },
+              {
+                "slug": "glass",
+                "value": {
+                  "typeOfSumInsured": "firstLoss",
+                  "deductible": "1000",
+                  "sumInsuredLimitOfIndemnity": 2500
+                }
+              },
+              {
+                "slug": "third-party-recourse",
+                "value": {
+                  "typeOfSumInsured": "firstLoss",
+                  "deductible": "1000",
+                  "sumInsuredLimitOfIndemnity": 150000,
+                  "selfInsurance": "0.10"
+                }
+              },
+              {
+                "slug": "burst-pipe",
+                "value": {
+                  "typeOfSumInsured": "firstLoss",
+                  "deductible": "1000",
+                  "sumInsuredLimitOfIndemnity": 5000
+                }
+              },
+              {
+                "slug": "atmospheric-event",
+                "value": {
+                  "typeOfSumInsured": "replacementValue",
+                  "deductible": "1500",
+                  "sumInsuredLimitOfIndemnity": 100000,
+                  "selfInsurance": "0.10"
+                }
+              },
+              {
+                "slug": "terrorism",
+                "value": {
+                  "typeOfSumInsured": "replacementValue",
+                  "deductible": "1000",
+                  "sumInsuredLimitOfIndemnity": 0.5,
+                  "selfInsurance": "0.05"
+                }
+              },
+              {
+                "slug": "machinery-breakdown",
+                "value": {
+                  "typeOfSumInsured": "firstLoss",
+                  "deductible": "1500",
+                  "sumInsuredLimitOfIndemnity": 5000
+                }
+              },
+              {
+                "slug": "business-interruption",
+                "value": {
+                  "typeOfSumInsured": "firstLoss",
+                  "deductible": "5days",
+                  "sumInsuredLimitOfIndemnity": 25000,
+                  "dailyAllowance": "250"
+                }
+              },
+              {
+                "slug": "earthquake",
+                "value": {
+                  "typeOfSumInsured": "replacementValue",
+                  "deductible": "1000",
+                  "sumInsuredLimitOfIndemnity": 0.7,
+                  "selfInsurance": "0.05"
+                }
+              },
+              {
+                "slug": "assistance",
+                "value": {
+                  "assistance": "yes"
+                }
+              },
+              {
+                "slug": "property-owners-liability",
+                "value": {
+                  "typeOfSumInsured": "replacementValue",
+                  "deductible": "1000",
+                  "sumInsuredLimitOfIndemnity": 1000000
+                }
+              },
+              {
+                "slug": "power-surge",
+                "value": {
+                  "typeOfSumInsured": "firstLoss",
+                  "deductible": "1000",
+                  "sumInsuredLimitOfIndemnity": 5000,
+                  "selfInsurance": "0.10"
+                }
+              },
+              {
+                "slug": "water-damage",
+                "value": {
+                  "typeOfSumInsured": "replacementValue",
+                  "deductible": "1000",
+                  "sumInsuredLimitOfIndemnity": 0.7,
+                  "selfInsurance": "0.05"
+                }
+              }
+            ]
+          }
         }
       ]
     }
-  ],
-  "EmailConfiguration": {
-    "Subject": "string",
-    "Message": "string",
-    "SenderDisplayName": "string"
-  },
-  "ReminderConfiguration": {
-    "Enabled": true,
-    "FirstReminderInDays": 0,
-    "ReminderResendIntervalInDays": 0,
-    "BeforeExpirationInDays": 0
-  },
-  "ExpirationConfiguration": {
-    "ExpirationInSecondsAfterSending": 0,
-    "ExpirationDate": "2023-03-22T12:47:52.589Z"
-  },
-  "CallbackConfiguration": {
-    "CallbackUrl": "string",
-    "StatusUpdateCallbackUrl": "string",
-    "ActivityActionCallbackConfiguration": {
-      "Url": "string",
-      "ActionCallbackSelection": {
-        "ConfirmTransactionCode": true,
-        "AgreementAccepted": true,
-        "AgreementRejected": true,
-        "PrepareAuthenticationSuccess": true,
-        "AuthenticationFailed": true,
-        "AuthenticationSuccess": true,
-        "AuditTrailRequested": true,
-        "AuditTrailXmlRequested": true,
-        "CalledPage": true,
-        "DocumentDownloaded": true,
-        "FlattenedDocumentDownloaded": true,
-        "AddedAnnotation": true,
-        "AddedAttachment": true,
-        "AppendedDocument": true,
-        "FormsFilled": true,
-        "ConfirmReading": true,
-        "SendTransactionCode": true,
-        "PrepareSignWorkstepDocument": true,
-        "SignWorkstepDocument": true,
-        "UndoAction": true,
-        "WorkstepCreated": true,
-        "WorkstepFinished": true,
-        "WorkstepRejected": true,
-        "DisablePolicyAndValidityChecks": true,
-        "EnablePolicyAndValidityChecks": true,
-        "AppendFileToWorkstep": true,
-        "AppendTasksToWorkstep": true,
-        "SetOptionalDocumentState": true,
-        "PreparePayloadForBatch": true
-      }
-    }
-  },
-  "AgreementConfiguration": {
-    "Translations": [
-      {
-        "LanguageCode": "AF",
-        "Text": "string",
-        "Header": "string",
-        "IsDefault": true
-      }
-    ]
   }
 }
