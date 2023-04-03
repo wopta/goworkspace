@@ -8,7 +8,7 @@ require (
 	cloud.google.com/go v0.105.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
 	github.com/wopta/goworkspace/lib v1.0.5
-	github.com/wopta/goworkspace/models v1.0.14
+	github.com/wopta/goworkspace/models v1.0.22
 	golang.org/x/oauth2 v0.0.0-20221014153046-6fdb5e3db783 // indirect
 )
 
