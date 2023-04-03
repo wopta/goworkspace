@@ -198,6 +198,10 @@ func (p *Fx) AppendString(aString, subString string) string {
 	return fmt.Sprintf("%s%s", aString, subString)
 }
 
+func (p *Fx) Replace(input string, old string, new string) string {
+	return strings.Replace(input, old, new, 1)
+}
+
 func (p *Fx) ReplaceAt(input string, replacement string, index int64) string {
 	return input[:index] + string(replacement) + input[index+1:]
 }
