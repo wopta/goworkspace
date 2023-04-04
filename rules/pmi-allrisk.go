@@ -455,7 +455,7 @@ func initCoverage() map[string]*Coverage {
 		Slug:                       "third-party-liability-construction-company",
 		Type:                       "company",
 		Group:                      "RCT",
-		IsExtension:                false,
+		IsExtension:                true,
 		CompanyCodec:               "RE",
 		CompanyName:                "RC Edile",
 		TypeOfSumInsured:           "",
