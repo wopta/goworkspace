@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/dustin/go-humanize"
+	prd "github.com/wopta/goworkspace/product"
 	"io"
 	"net/http"
 	"strconv"
@@ -57,13 +58,9 @@ func life(data models.Policy) (models.Policy, error) {
 
 	for _, asset := range data.Assets {
 		for _, guarantee := range asset.Guarantees {
-			var base int
-			var baseTax int
-			var offset int
+			base, baseTax := getMultipliersIndex(guarantee.Slug)
 
-			base, baseTax = getMultipliersIndex(guarantee.Slug, base, baseTax)
-
-			offset = getOffset(guarantee.Value.Duration.Year, offset)
+			offset := getOffset(guarantee.Value.Duration.Year)
 
 			baseFloat, taxFloat := getMultipliers(selectRow, offset, base, baseTax)
 
@@ -74,7 +71,34 @@ func life(data models.Policy) (models.Policy, error) {
 
 	}
 
+	filterByMinimumPrice(data.Assets, data.OffersPrices)
+
 	return data, err
+}
+
+func filterByMinimumPrice(assets []models.Asset, offersPrices map[string]map[string]*models.Price) {
+	product, err := prd.GetName("life", "v1")
+	lib.CheckError(err)
+
+	for assetIndex, asset := range assets {
+		for guaranteeIndex, guarantee := range asset.Guarantees {
+			hasNotMinimumYearlyPrice := guarantee.Value.PremiumGrossYearly < product.Companies[0].GuaranteesMap[guarantee.Slug].Config.MinimumGrossYearly
+			if hasNotMinimumYearlyPrice {
+				assets[assetIndex].Guarantees[guaranteeIndex].IsSellable = false
+				offersPrices["default"]["monthly"].Net -= guarantee.Value.PremiumNetMonthly
+				offersPrices["default"]["monthly"].Gross -= guarantee.Value.PremiumGrossMonthly
+				offersPrices["default"]["monthly"].Tax -= guarantee.Value.PremiumGrossMonthly - guarantee.Value.PremiumNetMonthly
+				offersPrices["default"]["yearly"].Net -= guarantee.Value.PremiumNetYearly
+				offersPrices["default"]["yearly"].Gross -= guarantee.Value.PremiumGrossYearly
+				offersPrices["default"]["yearly"].Tax -= guarantee.Value.PremiumGrossYearly - guarantee.Value.PremiumNetYearly
+			}
+		}
+	}
+
+	if offersPrices["default"]["monthly"].Gross < product.Companies[0].MinimumMonthlyPrice {
+		delete(offersPrices["default"], "monthly")
+	}
+
 }
 
 func getGuaranteeSubtitle(assets []models.Asset) {
@@ -89,15 +113,30 @@ func getGuaranteeSubtitle(assets []models.Asset) {
 func calculateOfferPrices(data models.Policy, guarantee models.Guarante) {
 	data.OffersPrices["default"]["yearly"].Gross += guarantee.Value.PremiumGrossYearly
 	data.OffersPrices["default"]["yearly"].Net += guarantee.Value.PremiumNetYearly
+	data.OffersPrices["default"]["yearly"].Tax += guarantee.Value.PremiumGrossYearly - guarantee.Value.PremiumNetYearly
 	data.OffersPrices["default"]["monthly"].Gross += guarantee.Value.PremiumGrossMonthly
 	data.OffersPrices["default"]["monthly"].Net += guarantee.Value.PremiumNetMonthly
+	data.OffersPrices["default"]["monthly"].Tax += guarantee.Value.PremiumGrossMonthly - guarantee.Value.PremiumNetMonthly
 }
 
 func calculateGuaranteePrices(guarantee models.Guarante, baseFloat float64, taxFloat float64) {
-	guarantee.Value.PremiumNetYearly = guarantee.Value.SumInsuredLimitOfIndemnity * baseFloat
-	guarantee.Value.PremiumGrossYearly = guarantee.Value.SumInsuredLimitOfIndemnity * taxFloat
-	guarantee.Value.PremiumNetMonthly = guarantee.Value.SumInsuredLimitOfIndemnity * baseFloat / 12
-	guarantee.Value.PremiumGrossMonthly = guarantee.Value.SumInsuredLimitOfIndemnity * taxFloat / 12
+	if guarantee.Slug != "temporary-disability" {
+		guarantee.Value.PremiumNetYearly = guarantee.Value.SumInsuredLimitOfIndemnity * baseFloat
+		guarantee.Value.PremiumGrossYearly = guarantee.Value.SumInsuredLimitOfIndemnity * taxFloat
+		guarantee.Value.PremiumTaxAmountYearly = guarantee.Value.PremiumGrossYearly - guarantee.Value.PremiumNetYearly
+
+		guarantee.Value.PremiumNetMonthly = guarantee.Value.SumInsuredLimitOfIndemnity * baseFloat / 12
+		guarantee.Value.PremiumGrossMonthly = guarantee.Value.SumInsuredLimitOfIndemnity * taxFloat / 12
+		guarantee.Value.PremiumTaxAmountMonthly = guarantee.Value.PremiumGrossMonthly - guarantee.Value.PremiumNetMonthly
+	} else {
+		guarantee.Value.PremiumNetYearly = guarantee.Value.SumInsuredLimitOfIndemnity * baseFloat * 12
+		guarantee.Value.PremiumGrossYearly = guarantee.Value.SumInsuredLimitOfIndemnity * taxFloat * 12
+		guarantee.Value.PremiumTaxAmountYearly = guarantee.Value.PremiumGrossYearly - guarantee.Value.PremiumNetYearly
+
+		guarantee.Value.PremiumNetMonthly = guarantee.Value.SumInsuredLimitOfIndemnity * baseFloat
+		guarantee.Value.PremiumGrossMonthly = guarantee.Value.SumInsuredLimitOfIndemnity * taxFloat
+		guarantee.Value.PremiumTaxAmountMonthly = guarantee.Value.PremiumGrossMonthly - guarantee.Value.PremiumNetMonthly
+	}
 }
 
 func getMultipliers(selectRow []string, offset int, base int, baseTax int) (float64, float64) {
@@ -108,7 +147,8 @@ func getMultipliers(selectRow []string, offset int, base int, baseTax int) (floa
 	return baseFloat, taxFloat
 }
 
-func getMultipliersIndex(guaranteeSlug string, base int, baseTax int) (int, int) {
+func getMultipliersIndex(guaranteeSlug string) (int, int) {
+	var base, baseTax int
 	switch guaranteeSlug {
 	case "death":
 		base = 1
@@ -126,16 +166,17 @@ func getMultipliersIndex(guaranteeSlug string, base int, baseTax int) (int, int)
 	return base, baseTax
 }
 
-func getOffset(duration int, offset int) int {
+func getOffset(duration int) int {
+	var offset int
 	switch duration {
 	case 5:
-		offset = 8 * 0
-	case 10:
 		offset = 8 * 1
-	case 15:
+	case 10:
 		offset = 8 * 2
-	case 20:
+	case 15:
 		offset = 8 * 3
+	case 20:
+		offset = 8*3 + 4
 	}
 	return offset
 }
