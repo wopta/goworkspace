@@ -2,6 +2,8 @@ package quote
 
 import (
 	"encoding/json"
+	"fmt"
+	"github.com/dustin/go-humanize"
 	"io"
 	"net/http"
 	"strconv"
@@ -37,6 +39,8 @@ func life(data models.Policy) (models.Policy, error) {
 	//TODO: this should not be here, only for version 1
 	calculateSumInsuredLimitOfIndemnity(data.Assets, deathSumInsuredLimitOfIndemnity)
 
+	getGuaranteeSubtitle(data)
+
 	for _, row := range df.Records() {
 		if row[0] == strconv.Itoa(year) {
 			selectRow = row
@@ -71,6 +75,15 @@ func life(data models.Policy) (models.Policy, error) {
 	}
 
 	return data, err
+}
+
+func getGuaranteeSubtitle(data models.Policy) {
+	for assetIndex, asset := range data.Assets {
+		for guaranteeIndex, guarantee := range asset.Guarantees {
+			data.Assets[assetIndex].Guarantees[guaranteeIndex].Subtitle = fmt.Sprintf("Durata: %d - Capitale: %s€",
+				guarantee.Value.Duration.Year, humanize.FormatFloat("#.###,##", guarantee.Value.SumInsuredLimitOfIndemnity))
+		}
+	}
 }
 
 func calculateOfferPrices(data models.Policy, guarantee models.Guarante) {
