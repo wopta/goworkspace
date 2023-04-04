@@ -71,9 +71,21 @@ func life(data models.Policy) (models.Policy, error) {
 
 	}
 
+	roundOfferPrices(data.OffersPrices)
+
 	filterByMinimumPrice(data.Assets, data.OffersPrices)
 
 	return data, err
+}
+
+func roundOfferPrices(offersPrices map[string]map[string]*models.Price) {
+	for offerKey, offerValue := range offersPrices {
+		for paymentKey, _ := range offerValue {
+			offersPrices[offerKey][paymentKey].Net = lib.RoundFloatTwoDecimals(offersPrices[offerKey][paymentKey].Net)
+			offersPrices[offerKey][paymentKey].Tax = lib.RoundFloatTwoDecimals(offersPrices[offerKey][paymentKey].Tax)
+			offersPrices[offerKey][paymentKey].Gross = lib.RoundFloatTwoDecimals(offersPrices[offerKey][paymentKey].Gross)
+		}
+	}
 }
 
 func filterByMinimumPrice(assets []models.Asset, offersPrices map[string]map[string]*models.Price) {
@@ -121,22 +133,21 @@ func calculateOfferPrices(data models.Policy, guarantee models.Guarante) {
 
 func calculateGuaranteePrices(guarantee models.Guarante, baseFloat float64, taxFloat float64) {
 	if guarantee.Slug != "temporary-disability" {
-		guarantee.Value.PremiumNetYearly = guarantee.Value.SumInsuredLimitOfIndemnity * baseFloat
-		guarantee.Value.PremiumGrossYearly = guarantee.Value.SumInsuredLimitOfIndemnity * taxFloat
-		guarantee.Value.PremiumTaxAmountYearly = guarantee.Value.PremiumGrossYearly - guarantee.Value.PremiumNetYearly
+		guarantee.Value.PremiumNetYearly = lib.RoundFloatTwoDecimals(guarantee.Value.SumInsuredLimitOfIndemnity * baseFloat)
+		guarantee.Value.PremiumGrossYearly = lib.RoundFloatTwoDecimals(guarantee.Value.SumInsuredLimitOfIndemnity * taxFloat)
 
-		guarantee.Value.PremiumNetMonthly = guarantee.Value.SumInsuredLimitOfIndemnity * baseFloat / 12
-		guarantee.Value.PremiumGrossMonthly = guarantee.Value.SumInsuredLimitOfIndemnity * taxFloat / 12
-		guarantee.Value.PremiumTaxAmountMonthly = guarantee.Value.PremiumGrossMonthly - guarantee.Value.PremiumNetMonthly
+		guarantee.Value.PremiumNetMonthly = lib.RoundFloatTwoDecimals(guarantee.Value.SumInsuredLimitOfIndemnity * baseFloat / 12)
+		guarantee.Value.PremiumGrossMonthly = lib.RoundFloatTwoDecimals(guarantee.Value.SumInsuredLimitOfIndemnity * taxFloat / 12)
 	} else {
-		guarantee.Value.PremiumNetYearly = guarantee.Value.SumInsuredLimitOfIndemnity * baseFloat * 12
-		guarantee.Value.PremiumGrossYearly = guarantee.Value.SumInsuredLimitOfIndemnity * taxFloat * 12
-		guarantee.Value.PremiumTaxAmountYearly = guarantee.Value.PremiumGrossYearly - guarantee.Value.PremiumNetYearly
+		guarantee.Value.PremiumNetYearly = lib.RoundFloatTwoDecimals(guarantee.Value.SumInsuredLimitOfIndemnity * baseFloat * 12)
+		guarantee.Value.PremiumGrossYearly = lib.RoundFloatTwoDecimals(guarantee.Value.SumInsuredLimitOfIndemnity * taxFloat * 12)
 
-		guarantee.Value.PremiumNetMonthly = guarantee.Value.SumInsuredLimitOfIndemnity * baseFloat
-		guarantee.Value.PremiumGrossMonthly = guarantee.Value.SumInsuredLimitOfIndemnity * taxFloat
-		guarantee.Value.PremiumTaxAmountMonthly = guarantee.Value.PremiumGrossMonthly - guarantee.Value.PremiumNetMonthly
+		guarantee.Value.PremiumNetMonthly = lib.RoundFloatTwoDecimals(guarantee.Value.SumInsuredLimitOfIndemnity * baseFloat)
+		guarantee.Value.PremiumGrossMonthly = lib.RoundFloatTwoDecimals(guarantee.Value.SumInsuredLimitOfIndemnity * taxFloat)
 	}
+
+	guarantee.Value.PremiumTaxAmountYearly = lib.RoundFloatTwoDecimals(guarantee.Value.PremiumGrossYearly - guarantee.Value.PremiumNetYearly)
+	guarantee.Value.PremiumTaxAmountMonthly = lib.RoundFloatTwoDecimals(guarantee.Value.PremiumGrossMonthly - guarantee.Value.PremiumNetMonthly)
 }
 
 func getMultipliers(selectRow []string, offset int, base int, baseTax int) (float64, float64) {
