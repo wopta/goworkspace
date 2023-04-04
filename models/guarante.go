@@ -36,6 +36,7 @@ type Guarante struct {
 	PriceGross                 float64                   `firestore:"priceGross,omitempty" json:"priceGross,omitempty"`
 	IsSellable                 bool                      `firestore:"isSellable" json:"isSellable"`
 	IsConfigurable             bool                      `firestore:"isConfigurable" json:"isConfigurable"`
+	Subtitle                   string                    `firestore:"subtitle" json:"subtitle"`
 }
 type GuaranteValue struct {
 	TypeOfSumInsured           string              `firestore:"typeOfSumInsured,omitempty" json:"typeOfSumInsured,omitempty"`
