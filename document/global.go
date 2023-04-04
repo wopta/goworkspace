@@ -16,15 +16,14 @@ import (
 func (skin Skin) GlobalContract(m pdf.Maroto, data models.Policy) {
 	layout2 := "2006-01-02"
 	var (
-		logo, name string
+		logo string
 		//coverages  pdf.Maroto
 		//assets     pdf.Maroto
 	)
 	if data.Name == "persona" {
 		logo = "/persona.png"
-		name = "Persona"
-		m = skin.GetHeader(m, data, logo, name)
-		m = skin.GetFooter(m, data, logo, "Wopta per te. Persona")
+		m = skin.GetHeader(m, data, logo)
+		m = skin.GetFooter(m, "/logo_global.png", "Wopta per te. Persona è un prodotto assicurativo di Global Assistance Compagnia di assicurazioni e riassicurazioni S.p.A, distribuito da Wopta Assicurazioni S.r.l")
 		m = skin.Space(m, 5.0)
 		m = skin.GetPersona(data, m)
 		m = skin.CoveragesPersonTable(m, data)
@@ -33,9 +32,8 @@ func (skin Skin) GlobalContract(m pdf.Maroto, data models.Policy) {
 
 	if data.Name == "pmi" {
 		logo = "/pmi.png"
-		name = "Artigiani & Imprese"
-		m = skin.GetHeader(m, data, logo, name)
-		m = skin.GetFooter(m, data, logo, "Wopta per te. Artigiani & Imprese")
+		m = skin.GetHeader(m, data, logo)
+		m = skin.GetFooter(m, "/logo_global.png", "Wopta per te. Artigiani & Imprese è un prodotto assicurativo di Global Assistance Compagnia di assicurazioni e riassicurazioni S.p.A, distribuito da Wopta Assicurazioni S.r.l")
 		m = skin.Space(m, 5.0)
 		m = skin.GetPmi(data, m)
 		m = skin.Space(m, 5.0)
@@ -73,21 +71,7 @@ func (skin Skin) GlobalContract(m pdf.Maroto, data models.Policy) {
 	}
 	m = skin.Sign(m, data.Contractor.Name+" "+data.Contractor.Surname, "Assicurato ", "2", true)
 	skin.checkPage(m)
-	h := []string{"Premio ", "Imponibile  ", "Imposte Assicurative ", "Totale"}
-	var tablePremium [][]string
-
-	if data.PaymentSplit == "monthly" {
-		tablePremium = append(tablePremium, []string{"Rata Mensile", "€ " + humanize.FormatFloat("#.###,##", (data.PriceNett/12)), "€ " + humanize.FormatFloat("#.###,##", ((data.PriceGross-data.PriceNett)/12)), "€ " + humanize.FormatFloat("#.###,##", (data.PriceGross/12))})
-		tablePremium = append(tablePremium, []string{"Rata alla firma della polizza", "€ " + humanize.FormatFloat("#.###,##", (data.PriceNett/12)), "€ " + humanize.FormatFloat("#.###,##", ((data.PriceGross-data.PriceNett)/12)), "€ " + humanize.FormatFloat("#.###,##", (data.PriceGross/12))})
-
-	}
-	if data.PaymentSplit == "year" {
-		tablePremium = append(tablePremium, []string{"Annuale", "€ " + humanize.FormatFloat("#.###,##", data.PriceNett), "€ " + humanize.FormatFloat("#.###,##", data.PriceGross-data.PriceNett), "€ " + humanize.FormatFloat("#.###,##", data.PriceGross)})
-		tablePremium = append(tablePremium, []string{"Rata alla firma della polizza", "€ " + humanize.FormatFloat("#.###,##", data.PriceNett), "€ " + humanize.FormatFloat("#.###,##", data.PriceGross-data.PriceNett), "€ " + humanize.FormatFloat("#.###,##", data.PriceGross)})
-
-	}
-	m = skin.Space(m, 10.0)
-	m = skin.TableLine(m, h, tablePremium)
+	skin.PriceTable(m, data)
 
 	title := "Come puoi pagare il premio "
 	body := `I mezzi di pagamento consentiti nei confronti di Wopta sono esclusivamente 
