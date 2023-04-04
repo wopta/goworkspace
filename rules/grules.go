@@ -6,7 +6,6 @@ import (
 	"github.com/wopta/goworkspace/models"
 	"log"
 	"math"
-	"strconv"
 	"strings"
 
 	"github.com/hyperjumptech/grule-rule-engine/ast"
@@ -285,31 +284,26 @@ func (p *Fx) RoundYearlyOfferPrices(out *RuleOut, roundingCoverages ...string) {
 }
 
 func (p *Fx) RoundToTwoDecimalPlaces(out *RuleOut) {
-	roundFloatTwoDecimals := func(in float64) float64 {
-		res, _ := strconv.ParseFloat(fmt.Sprintf("%.2f", in), 64)
-		return res
-	}
-
 	for _, coverage := range out.Guarantees {
 		for _, offerType := range coverage.Offer {
-			offerType.PremiumNetMonthly = roundFloatTwoDecimals(offerType.PremiumNetMonthly)
-			offerType.PremiumTaxAmountMonthly = roundFloatTwoDecimals(offerType.PremiumTaxAmountMonthly)
-			offerType.PremiumGrossMonthly = roundFloatTwoDecimals(offerType.PremiumGrossMonthly)
+			offerType.PremiumNetMonthly = lib.RoundFloatTwoDecimals(offerType.PremiumNetMonthly)
+			offerType.PremiumTaxAmountMonthly = lib.RoundFloatTwoDecimals(offerType.PremiumTaxAmountMonthly)
+			offerType.PremiumGrossMonthly = lib.RoundFloatTwoDecimals(offerType.PremiumGrossMonthly)
 
-			offerType.PremiumNetYearly = roundFloatTwoDecimals(offerType.PremiumNetYearly)
-			offerType.PremiumTaxAmountYearly = roundFloatTwoDecimals(offerType.PremiumTaxAmountYearly)
-			offerType.PremiumGrossYearly = roundFloatTwoDecimals(offerType.PremiumGrossYearly)
+			offerType.PremiumNetYearly = lib.RoundFloatTwoDecimals(offerType.PremiumNetYearly)
+			offerType.PremiumTaxAmountYearly = lib.RoundFloatTwoDecimals(offerType.PremiumTaxAmountYearly)
+			offerType.PremiumGrossYearly = lib.RoundFloatTwoDecimals(offerType.PremiumGrossYearly)
 		}
 	}
 
 	for _, offerType := range out.OfferPrice {
-		offerType[monthly].Net = roundFloatTwoDecimals(offerType[monthly].Net)
-		offerType[monthly].Tax = roundFloatTwoDecimals(offerType[monthly].Tax)
-		offerType[monthly].Delta = roundFloatTwoDecimals(offerType[monthly].Delta)
+		offerType[monthly].Net = lib.RoundFloatTwoDecimals(offerType[monthly].Net)
+		offerType[monthly].Tax = lib.RoundFloatTwoDecimals(offerType[monthly].Tax)
+		offerType[monthly].Delta = lib.RoundFloatTwoDecimals(offerType[monthly].Delta)
 
-		offerType[yearly].Net = roundFloatTwoDecimals(offerType[yearly].Net)
-		offerType[yearly].Tax = roundFloatTwoDecimals(offerType[yearly].Tax)
-		offerType[yearly].Delta = roundFloatTwoDecimals(offerType[yearly].Delta)
+		offerType[yearly].Net = lib.RoundFloatTwoDecimals(offerType[yearly].Net)
+		offerType[yearly].Tax = lib.RoundFloatTwoDecimals(offerType[yearly].Tax)
+		offerType[yearly].Delta = lib.RoundFloatTwoDecimals(offerType[yearly].Delta)
 	}
 }
 

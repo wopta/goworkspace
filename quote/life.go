@@ -71,9 +71,9 @@ func life(data models.Policy) (models.Policy, error) {
 
 	}
 
-	roundOfferPrices(data.OffersPrices)
-
 	filterByMinimumPrice(data.Assets, data.OffersPrices)
+
+	roundOfferPrices(data.OffersPrices)
 
 	return data, err
 }
@@ -117,7 +117,7 @@ func getGuaranteeSubtitle(assets []models.Asset) {
 	for assetIndex, asset := range assets {
 		for guaranteeIndex, guarantee := range asset.Guarantees {
 			assets[assetIndex].Guarantees[guaranteeIndex].Subtitle = fmt.Sprintf("Durata: %d anni - Capitale: %s€",
-				guarantee.Value.Duration.Year, humanize.FormatFloat("#.###,##", guarantee.Value.SumInsuredLimitOfIndemnity))
+				guarantee.Value.Duration.Year, humanize.FormatFloat("#.###,", guarantee.Value.SumInsuredLimitOfIndemnity))
 		}
 	}
 }
