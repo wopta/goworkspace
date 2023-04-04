@@ -39,7 +39,7 @@ func life(data models.Policy) (models.Policy, error) {
 	//TODO: this should not be here, only for version 1
 	calculateSumInsuredLimitOfIndemnity(data.Assets, deathSumInsuredLimitOfIndemnity)
 
-	getGuaranteeSubtitle(data)
+	getGuaranteeSubtitle(data.Assets)
 
 	for _, row := range df.Records() {
 		if row[0] == strconv.Itoa(year) {
@@ -77,10 +77,10 @@ func life(data models.Policy) (models.Policy, error) {
 	return data, err
 }
 
-func getGuaranteeSubtitle(data models.Policy) {
-	for assetIndex, asset := range data.Assets {
+func getGuaranteeSubtitle(assets []models.Asset) {
+	for assetIndex, asset := range assets {
 		for guaranteeIndex, guarantee := range asset.Guarantees {
-			data.Assets[assetIndex].Guarantees[guaranteeIndex].Subtitle = fmt.Sprintf("Durata: %d - Capitale: %s€",
+			assets[assetIndex].Guarantees[guaranteeIndex].Subtitle = fmt.Sprintf("Durata: %d anni - Capitale: %s€",
 				guarantee.Value.Duration.Year, humanize.FormatFloat("#.###,##", guarantee.Value.SumInsuredLimitOfIndemnity))
 		}
 	}
