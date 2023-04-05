@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 	"regexp"
-	"strings"
 	"time"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
@@ -55,12 +54,12 @@ const (
 
 func GetNameFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	name := r.Header.Get("name")
-	v := strings.Split(r.RequestURI, "/")
-	version := v[1]
+	/*v := strings.Split(r.RequestURI, "/")
+	version := v[1]*/
 	log.Println(r.RequestURI)
-	log.Println(v)
-	log.Println(v[1])
-	product, err := GetName(name, version)
+	/*log.Println(v)
+	log.Println(v[1])*/
+	product, err := GetName(name, "v1")
 	if err != nil {
 
 		return "", nil, err
