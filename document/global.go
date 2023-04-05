@@ -54,7 +54,7 @@ func (skin Skin) GlobalContract(m pdf.Maroto, data models.Policy) {
 			name = data.Contractor.Name + " " + data.Contractor.Surname
 		}
 	}
-	//var stantments []Kv
+
 	skin.checkPage(m)
 	for i, A := range *data.Statements {
 
@@ -67,14 +67,20 @@ func (skin Skin) GlobalContract(m pdf.Maroto, data models.Policy) {
 		skin.checkPage(m)
 		m = skin.Space(m, 5.0)
 
-		//skin.checkPage(m)
-
-		//m = skin.Title(m, A.Title, A.Question, float64(getRowHeight(A.Question, 120, 6)))
 	}
 
 	skin.checkPage(m)
 	skin.PriceTable(m, data)
+	m = skin.Space(m, 5.0)
+	m.Row(skin.RowHeight, func() {
+		m.Col(12, func() {
+			m.Text("In caso di sostituzione,il premio alla firma è al netto dell’ eventuale rimborso dei premi non goduti sulla polizza sostituita e tiene conto dell’ eventuale diversa durata rispetto alle rate successive. ", skin.NormaltextLeft)
 
+		})
+
+	})
+
+	m = skin.Space(m, 5.0)
 	title := "Come puoi pagare il premio "
 	body := `I mezzi di pagamento consentiti nei confronti di Wopta sono esclusivamente 
  bonifico e strumenti di pagamento elettronico, quali ad esempio, carte di 
@@ -176,6 +182,7 @@ func (s Skin) GlobalEnterpriseTable(m pdf.Maroto, data models.Policy) {
 
 		})
 	})
+
 	m.Row(s.RowTitleHeight-1, func() {
 		m.Col(12, func() {
 			m.Text("(operative se indicata Somma o Massimale e secondo le Opzioni/Estensioni attivate qualora indicato) ", textS)
