@@ -93,16 +93,21 @@ type RenewHistory struct {
 }
 type Statement struct {
 	Title              string      `firestore:"title,omitempty" json:"title,omitempty"`
+	Subtitle           string      `firestore:"subtitle,omitempty" json:"subtitle,omitempty"`
 	HasMultipleAnswers *bool       `firestore:"hasMultipleAnswers,omitempty" json:"hasMultipleAnswers,omitempty"`
 	Questions          []*Question `firestore:"questions,omitempty" json:"questions,omitempty"`
 	Answer             *bool       `firestore:"answer,omitempty" json:"answer,omitempty"`
+	HasAnswer          bool        `firestore:"hasAnswer" json:"hasAnswer"`
+	ExpectedAnswer     *bool       `firestore:"expectedAnswer,omitempty" json:"expectedAnswer,omitempty"`
 }
 
 type Question struct {
-	Question string `firestore:"question,omitempty" json:"question,omitempty"`
-	IsBold   bool   `firestore:"isBold,omitempty" json:"isBold,omitempty"`
-	Indent   bool   `firestore:"indent,omitempty" json:"indent,omitempty"`
-	Answer   *bool  `firestore:"answer,omitempty" json:"answer,omitempty"`
+	Question       string `firestore:"question,omitempty" json:"question,omitempty"`
+	IsBold         bool   `firestore:"isBold,omitempty" json:"isBold,omitempty"`
+	Indent         bool   `firestore:"indent,omitempty" json:"indent,omitempty"`
+	Answer         *bool  `firestore:"answer,omitempty" json:"answer,omitempty"`
+	HasAnswer      bool   `firestore:"hasAnswer" json:"hasAnswer"`
+	ExpectedAnswer *bool  `firestore:"expectedAnswer,omitempty" json:"expectedAnswer,omitempty"`
 }
 
 type Price struct {

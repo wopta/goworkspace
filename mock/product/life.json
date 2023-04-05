@@ -145,7 +145,7 @@
             },
             "durationValues": {
               "min": 5,
-              "max": 20,
+              "max": 10,
               "step": 5
             },
             "minimumGrossYearly": 10
@@ -183,7 +183,7 @@
             },
             "durationValues": {
               "min": 5,
-              "max": 20,
+              "max": 10,
               "step": 5
             },
             "minimumGrossYearly": 10
