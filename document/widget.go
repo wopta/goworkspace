@@ -409,7 +409,7 @@ func (s Skin) CoveragesPersonTable(m pdf.Maroto, data models.Policy) pdf.Maroto 
 	m = s.CoveragesTable(m, h, table)
 	return m
 }
-func (skin Skin) GetHeader(m pdf.Maroto, data models.Policy, logo string) pdf.Maroto {
+func (skin Skin) GetHeader(m pdf.Maroto, data models.Policy, logo string, nameProd string) pdf.Maroto {
 
 	h := []string{"I dati della tua Polizza ", "I tuoi dati"}
 	layout := "02/01/2006"
@@ -441,7 +441,7 @@ func (skin Skin) GetHeader(m pdf.Maroto, data models.Policy, logo string) pdf.Ma
 					Extrapolate: true,
 				})
 
-				m.Text(name, props.Text{
+				m.Text(nameProd, props.Text{
 					Top:         6,
 					Style:       consts.Italic,
 					Align:       consts.Left,
@@ -481,7 +481,9 @@ func (skin Skin) GetHeader(m pdf.Maroto, data models.Policy, logo string) pdf.Ma
 
 			for _, as := range data.Assets {
 				if as.Enterprise != nil {
+
 					name = as.Enterprise.Name
+					break
 				} else {
 					name = data.Contractor.Name + " " + data.Contractor.Surname
 				}
