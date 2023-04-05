@@ -52,15 +52,18 @@ type DynamicTitle struct {
 
 type FxSurvey struct{}
 
-func (fx *FxSurvey) AppendStatement(statements []*models.Statement, title string, hasMultipleAnswers bool, answer bool) []*models.Statement {
+func (fx *FxSurvey) AppendStatement(statements []*models.Statement, title string, subtitle string, hasMultipleAnswers bool, hasAnswer bool, expectedAnswer bool) []*models.Statement {
 	statement := &models.Statement{
 		Title:              title,
+		Subtitle:           subtitle,
 		HasMultipleAnswers: nil,
 		Questions:          make([]*models.Question, 0),
 		Answer:             nil,
+		HasAnswer:          hasAnswer,
+		ExpectedAnswer:     nil,
 	}
-	if answer {
-		statement.Answer = &answer
+	if hasAnswer {
+		statement.ExpectedAnswer = &expectedAnswer
 	}
 	if hasMultipleAnswers {
 		statement.HasMultipleAnswers = &hasMultipleAnswers
@@ -69,16 +72,19 @@ func (fx *FxSurvey) AppendStatement(statements []*models.Statement, title string
 	return append(statements, statement)
 }
 
-func (fx *FxSurvey) AppendQuestion(questions []*models.Question, text string, isBold bool, indent bool, answer bool) []*models.Question {
+func (fx *FxSurvey) AppendQuestion(questions []*models.Question, text string, isBold bool, indent bool, hasAnswer bool, expectedAnswer bool) []*models.Question {
 	question := &models.Question{
-		Question: text,
-		IsBold:   isBold,
-		Indent:   indent,
-		Answer:   nil,
+		Question:       text,
+		IsBold:         isBold,
+		Indent:         indent,
+		Answer:         nil,
+		HasAnswer:      hasAnswer,
+		ExpectedAnswer: nil,
 	}
-	if answer {
-		question.Answer = &answer
+	if hasAnswer {
+		question.ExpectedAnswer = &expectedAnswer
 	}
+
 	return append(questions, question)
 }
 

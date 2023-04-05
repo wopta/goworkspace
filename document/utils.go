@@ -174,7 +174,7 @@ func (s Skin) checkPage(m pdf.Maroto) {
 	current := m.GetCurrentOffset()
 	_, sizeh := m.GetPageSize()
 
-	if current > (sizeh * 0.61) {
+	if current > (sizeh * 0.80) {
 
 		m.AddPage()
 		s.Space(m, 10.0)

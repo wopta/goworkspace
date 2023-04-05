@@ -3,6 +3,7 @@ package document
 import (
 	"fmt"
 	"log"
+	"strconv"
 	"time"
 
 	"github.com/dustin/go-humanize"
@@ -16,13 +17,14 @@ import (
 func (skin Skin) GlobalContract(m pdf.Maroto, data models.Policy) {
 	layout2 := "2006-01-02"
 	var (
-		logo string
-		//coverages  pdf.Maroto
-		//assets     pdf.Maroto
+		logo     string
+		name     string
+		nameSign string
 	)
 	if data.Name == "persona" {
 		logo = "/persona.png"
-		m = skin.GetHeader(m, data, logo)
+		name = "Persona"
+		m = skin.GetHeader(m, data, logo, name)
 		m = skin.GetFooter(m, "/logo_global.png", "Wopta per te. Persona è un prodotto assicurativo di Global Assistance Compagnia di assicurazioni e riassicurazioni S.p.A, distribuito da Wopta Assicurazioni S.r.l")
 		m = skin.Space(m, 5.0)
 		m = skin.GetPersona(data, m)
@@ -32,7 +34,8 @@ func (skin Skin) GlobalContract(m pdf.Maroto, data models.Policy) {
 
 	if data.Name == "pmi" {
 		logo = "/pmi.png"
-		m = skin.GetHeader(m, data, logo)
+		name = "Artigiani & Imprese"
+		m = skin.GetHeader(m, data, logo, name)
 		m = skin.GetFooter(m, "/logo_global.png", "Wopta per te. Artigiani & Imprese è un prodotto assicurativo di Global Assistance Compagnia di assicurazioni e riassicurazioni S.p.A, distribuito da Wopta Assicurazioni S.r.l")
 		m = skin.Space(m, 5.0)
 		m = skin.GetPmi(data, m)
@@ -42,34 +45,33 @@ func (skin Skin) GlobalContract(m pdf.Maroto, data models.Policy) {
 		skin.GlobalBuildingTable(m, data)
 
 	}
+	for _, as := range data.Assets {
+		if as.Enterprise != nil {
 
+			nameSign = as.Enterprise.Name
+			break
+		} else {
+			name = data.Contractor.Name + " " + data.Contractor.Surname
+		}
+	}
 	//var stantments []Kv
-
-	m = skin.Space(m, 5.0)
 	skin.checkPage(m)
-	skin.Stantement(m, "Dichiarazioni da leggere con attenzione prima di firmare", models.Statement{
-		Questions: []*models.Question{
-			{Question: "Premesso di essere a conoscenza che le dichiarazioni non veritiere, inesatte o reticenti, da me rese, possono compromettere il diritto alla prestazione (come da art. 1892, 1893, 1894 c.c.), ai fini dell’efficacia delle garanzie DICHIARO che:", IsBold: true, Indent: false},
-			{Question: "1.	l’azienda assicurata e/o gli immobili assicurati, NON rispondono ai requisiti indicati all’art. 9 – “requisiti di assicurabilità” delle condizioni di assicurazione;:", IsBold: true, Indent: false},
-			{Question: "2.	che, sui medesimi rischi assicurati con la presente Polizza, nel triennio precedente:", IsBold: true, Indent: false},
-			{Question: "2.1 NON vi sono state coperture assicurative annullate dall’assicuratore;", IsBold: true, Indent: true},
-			{Question: "2.2 NON si sono verificati eventi dannosi di importo liquidato superiore a 1.000 €", IsBold: true, Indent: true},
-			{Question: "3.	al momento della stipula di questa Polizza NON ha ricevuto comunicazioni, richieste e notifiche che possano configurare un sinistro relativo alle garanzie assicurate e di non essere a conoscenza di eventi o circostanze che possano dare origine ad una richiesta di risarcimento. ", IsBold: true, Indent: false},
-		}})
-	m = skin.Space(m, 5.0)
-	skin.SignDouleLine(m, data.Contractor.Name+" "+data.Contractor.Surname, "Global Assistance", "1", true)
-	m = skin.Space(m, 5.0)
-	skin.checkPage(m)
-	for _, A := range *data.Statements {
+	for i, A := range *data.Statements {
 
 		skin.Stantement(m, A.Title, A)
+		if i == 2 {
+			skin.SignDouleLine(m, data.Contractor.Name+" "+nameSign, "Global Assistance", strconv.Itoa(i+1), true)
+		} else {
+			skin.Sign(m, data.Contractor.Name+" "+nameSign, "Assicurato ", strconv.Itoa(i+1), true)
+		}
+		skin.checkPage(m)
 		m = skin.Space(m, 5.0)
 
 		//skin.checkPage(m)
 
 		//m = skin.Title(m, A.Title, A.Question, float64(getRowHeight(A.Question, 120, 6)))
 	}
-	m = skin.Sign(m, data.Contractor.Name+" "+data.Contractor.Surname, "Assicurato ", "2", true)
+
 	skin.checkPage(m)
 	skin.PriceTable(m, data)
 
@@ -87,8 +89,6 @@ credito e/o carte di debito, incluse le carte prepagate.`
 Costituisce quietanza di pagamento la mail di conferma che Wopta invierà al Contraente. `
 	skin.checkPage(m)
 	m = skin.Title(m, title, body, 18.0)
-	//m = skin.Sign(m, "Wopta Assicurazioni", "Wopta Assicurazioni", "2", false)
-
 	m = skin.RowCol1(m, "", consts.Normal)
 
 	skin.checkPage(m)
@@ -120,7 +120,7 @@ Costituisce quietanza di pagamento la mail di conferma che Wopta invierà al Con
 	m = skin.Space(m, 5.0)
 	skin.TitleBlack(m, "DICHIARAZIONI E CONSENSI", "Io Sottoscritto, dichiaro di avere perso visione dell’Informativa Privacy ai sensi dell’art. 13 del GDPR (informativa resa all’interno del set documentale contenente anche la Documentazione Informativa Precontrattuale, il Glossario e le Condizioni di Assicurazione) e di averne compreso i contenuti:", 14.0)
 	m = skin.Space(m, 5.0)
-	m = skin.Sign(m, data.Contractor.Name+" "+data.Contractor.Surname, "Assicurato ", "3", true)
+	m = skin.Sign(m, data.Contractor.Name+" "+nameSign, "Assicurato ", "100", true)
 	m = skin.Space(m, 5.0)
 	m.Row(skin.RowHeight*2, func() {
 		m.Col(12, func() {
@@ -144,7 +144,7 @@ Costituisce quietanza di pagamento la mail di conferma che Wopta invierà al Con
 
 	})
 	m = skin.Space(m, 5.0)
-	m = skin.Sign(m, data.Contractor.Name+" "+data.Contractor.Surname, "Assicurato ", "4", true)
+	m = skin.Sign(m, data.Contractor.Name+" "+nameSign, "Assicurato ", "101", true)
 	m.RegisterFooter(func() {
 		topv := 10.0
 		t := props.Text{
