@@ -212,6 +212,10 @@ func (p *Fx) RoundNear(value float64, nearest int64) float64 {
 	return (math.Round(float64(value)/float64(nearest)) * float64(nearest)) - float64(nearest)
 }
 
+func (p *Fx) DeleteOfferFromGuarantee(m map[string]*models.GuaranteValue, key string) {
+	delete(m, key)
+}
+
 func (p *Fx) CalculateMonthlyCoveragePrices(guarantees map[string]*models.Guarante) {
 	for _, guarantee := range guarantees {
 		for _, offer := range guarantee.Offer {
@@ -318,19 +322,88 @@ func (p *Fx) RoundToTwoDecimalPlaces(guarantees map[string]*models.Guarante, off
 }
 
 func (p *Fx) FilterOffersByMinimumPrice(guarantees map[string]*models.Guarante, offersPrices map[string]map[string]*models.Price, yearlyPriceMinimum float64, monthlyPriceMinimum float64) {
-	toBeDeleted := make([]string, 0)
-	for offerType, priceStruct := range offersPrices {
-		hasNotOfferMinimumYearlyPrice := priceStruct[yearly].Gross < yearlyPriceMinimum
-		hasNotOfferMinimumMonthlyPrice := priceStruct[monthly].Gross < monthlyPriceMinimum
-		if hasNotOfferMinimumYearlyPrice || hasNotOfferMinimumMonthlyPrice {
-			toBeDeleted = append(toBeDeleted, offerType)
+	for offerKey, offer := range offersPrices {
+		hasNotOfferMinimumYearlyPrice := offer[yearly].Gross < yearlyPriceMinimum
+		hasNotOfferMinimumMonthlyPrice := offer[monthly].Gross < monthlyPriceMinimum
+		if hasNotOfferMinimumMonthlyPrice && hasNotOfferMinimumYearlyPrice {
+			delete(offersPrices, offerKey)
+			for _, guarantee := range guarantees {
+				delete(guarantee.Offer, offerKey)
+			}
+			return
+		}
+		if hasNotOfferMinimumMonthlyPrice {
+			delete(offersPrices[offerKey], monthly)
+			for _, guarantee := range guarantees {
+				if p.HasGuaranteePerOffer(guarantees, offerKey, guarantee.Slug) {
+					guarantee.Offer[offerKey].PremiumNetMonthly = 0.0
+					guarantee.Offer[offerKey].PremiumTaxAmountMonthly = 0.0
+					guarantee.Offer[offerKey].PremiumGrossMonthly = 0.0
+				}
+			}
+		}
+		if hasNotOfferMinimumYearlyPrice {
+			delete(offersPrices[offerKey], yearly)
+			for _, guarantee := range guarantees {
+				if p.HasGuaranteePerOffer(guarantees, offerKey, guarantee.Slug) {
+					guarantee.Offer[offerKey].PremiumNetYearly = 0.0
+					guarantee.Offer[offerKey].PremiumTaxAmountYearly = 0.0
+					guarantee.Offer[offerKey].PremiumGrossYearly = 0.0
+				}
+			}
+		}
+
+	}
+}
+
+func (p *Fx) HasGuarantee(guarantees map[string]*models.Guarante, guaranteeKey string) bool {
+	for _, guarantee := range guarantees {
+		if guarantee.Slug == guaranteeKey {
+			return true
 		}
 	}
+	return false
+}
 
-	for _, offerType := range toBeDeleted {
-		delete(offersPrices, offerType)
-		for _, guarantee := range guarantees {
-			delete(guarantee.Offer, offerType)
+func (p *Fx) HasGuaranteePerOffer(guarantees map[string]*models.Guarante, offerSlug string, guaranteeKey string) bool {
+	for _, guarantee := range guarantees {
+		if guarantee.Slug == guaranteeKey {
+			for offerKey, _ := range guarantee.Offer {
+				if offerKey == offerSlug {
+					return true
+				}
+			}
+		}
+	}
+	return false
+}
+
+func (p *Fx) RemoveGuaranteeIfCondition(guarantees map[string]*models.Guarante, guaranteeKey string, condition bool) {
+	if condition {
+		p.RemoveGuarantee(guarantees, guaranteeKey)
+	}
+}
+
+func (p *Fx) RemoveOfferFromGuaranteeIfCondition(guaranteeOffer map[string]*models.GuaranteValue, offerKey string, condition bool) {
+	if condition {
+		p.DeleteOfferFromGuarantee(guaranteeOffer, offerKey)
+	}
+}
+
+func (p *Fx) RemoveGuarantee(guarantees map[string]*models.Guarante, guaranteeKey string) {
+	delete(guarantees, guaranteeKey)
+}
+
+func (p *Fx) RemoveOfferFromGuarantee(guaranteeOffer map[string]*models.GuaranteValue, offerKey string) {
+	delete(guaranteeOffer, offerKey)
+}
+
+func (p *Fx) RemoveGuaranteesPriceZero(guarantees map[string]*models.Guarante) {
+	for _, guarantee := range guarantees {
+		for offerKey, _ := range guarantee.Offer {
+			if guarantee.Offer[offerKey].PremiumGrossYearly == 0.0 {
+				delete(guarantee.Offer, offerKey)
+			}
 		}
 	}
 }

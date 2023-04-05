@@ -125,6 +125,7 @@ func initRuleOut() *RuleOut {
 
 	for guaranteeKey, guarantee := range product.Companies[0].GuaranteesMap {
 		guarantees[guaranteeKey] = &models.Guarante{
+			CompanyName:                guarantee.CompanyName,
 			Slug:                       guarantee.Slug,
 			Deductible:                 guarantee.Deductible,
 			Tax:                        guarantee.Tax,
