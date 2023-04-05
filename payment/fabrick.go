@@ -55,8 +55,11 @@ func FabrickPayObj(data model.Policy, firstSchedule bool, scheduleDate string, c
 			prodb, err := lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "products/"+data.Name+"-"+data.ProductVersion+".json")
 			//var prod models.Product
 			prod, err := models.UnmarshalProduct(prodb)
+			log.Println(data.Uid+" pay error marsh product:", err)
 			var commission float64
 			for _, x := range prod.Companies {
+				log.Println(data.Uid+" pay product name:", x.Name)
+				log.Println(data.Uid+" pay product name:", data.Company)
 				if x.Name == data.Company {
 					if data.IsRenew {
 						commission = x.CommissionRenew

@@ -7,6 +7,7 @@ type Guarante struct {
 	Assistance                 string                    `firestore:"assistance " json:"assistance ,omitempty"`
 	Type                       string                    `firestore:"type,omitempty" json:"type,omitempty"`
 	Beneficiary                *User                     `firestore:"beneficiary,omitempty" json:"beneficiary,omitempty"`
+	BeneficiaryReferance       *User                     `firestore:"beneficiaryReferance,omitempty" json:"beneficiaryReferance,omitempty"`
 	Beneficiaries              *[]User                   `firestore:"beneficiaries,omitempty" json:"beneficiaries,omitempty"`
 	TypeOfSumInsured           string                    `firestore:"typeOfSumInsured" json:"typeOfSumInsured,omitempty"`
 	Description                string                    `firestore:"description,omitempty" json:"description,omitempty"`
