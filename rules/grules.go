@@ -300,9 +300,9 @@ func (p *Fx) RoundToTwoDecimalPlaces(guarantees map[string]*models.Guarante, off
 			offerType.PremiumTaxAmountMonthly = roundFloatTwoDecimals(offerType.PremiumTaxAmountMonthly)
 			offerType.PremiumGrossMonthly = roundFloatTwoDecimals(offerType.PremiumGrossMonthly)
 
-			offerType.PremiumNetYearly = roundFloatTwoDecimals(offerType.PremiumNetYearly)
-			offerType.PremiumTaxAmountYearly = roundFloatTwoDecimals(offerType.PremiumTaxAmountYearly)
-			offerType.PremiumGrossYearly = roundFloatTwoDecimals(offerType.PremiumGrossYearly)
+			offerType.PremiumNetYearly = lib.RoundFloatTwoDecimals(offerType.PremiumNetYearly)
+			offerType.PremiumTaxAmountYearly = lib.RoundFloatTwoDecimals(offerType.PremiumTaxAmountYearly)
+			offerType.PremiumGrossYearly = lib.RoundFloatTwoDecimals(offerType.PremiumGrossYearly)
 		}
 	}
 
@@ -311,9 +311,9 @@ func (p *Fx) RoundToTwoDecimalPlaces(guarantees map[string]*models.Guarante, off
 		offerType[monthly].Tax = roundFloatTwoDecimals(offerType[monthly].Tax)
 		offerType[monthly].Delta = roundFloatTwoDecimals(offerType[monthly].Delta)
 
-		offerType[yearly].Net = roundFloatTwoDecimals(offerType[yearly].Net)
-		offerType[yearly].Tax = roundFloatTwoDecimals(offerType[yearly].Tax)
-		offerType[yearly].Delta = roundFloatTwoDecimals(offerType[yearly].Delta)
+		offerType[yearly].Net = lib.RoundFloatTwoDecimals(offerType[yearly].Net)
+		offerType[yearly].Tax = lib.RoundFloatTwoDecimals(offerType[yearly].Tax)
+		offerType[yearly].Delta = lib.RoundFloatTwoDecimals(offerType[yearly].Delta)
 	}
 }
 
