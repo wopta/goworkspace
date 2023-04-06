@@ -65,9 +65,9 @@ func ProductToListData(query *firestore.DocumentIterator) []Product {
 		d, err := query.Next()
 		if err != nil {
 			if err == iterator.Done {
-
 				break
 			}
+			log.Println(err)
 		}
 		var value Product
 		e := d.DataTo(&value)
