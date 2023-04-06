@@ -78,7 +78,13 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 			var contractbyte []byte
 			name := policy.Uid + ".pdf"
 			contractbyte, e = lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "contracts/"+name)
-			mail.SendMail(getPayMailObj(policy, policy.PayUrl, name, base64.StdEncoding.EncodeToString(contractbyte)))
+
+			mail.SendMailContract(policy, &[]mail.Attachment{{
+				Byte:        base64.StdEncoding.EncodeToString(contractbyte),
+				ContentType: "application/pdf",
+				Name:        name,
+			}})
+
 			response = `{
 			"result": true,
 			"requestPayload": ` + string(request) + `,
@@ -143,6 +149,7 @@ type Transaction struct {
 }
 
 func getPayMailObj(policy models.Policy, payUrl string, namefile string, at string) mail.MailRequest {
+
 	var name string
 	//var linkForm string
 	if policy.Name == "pmi" {

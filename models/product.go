@@ -21,15 +21,17 @@ func (r *Product) Marshal() ([]byte, error) {
 }
 
 type Product struct {
-	NameDesc       *string          `firestore:"nameDesc,omitempty" json:"nameDesc,omitempty"`
-	Companies      []Company        `firestore:"companies,omitempty" json:"companies,omitempty"`
-	ProductUid     string           `firestore:"productUid,omitempty" json:"productUid,omitempty"`
-	ProductVersion int              `firestore:"productVersion,omitempty" json:"productVersion,omitempty"`
-	Version        string           `firestore:"version,omitempty" json:"version,omitempty"`
-	Number         int              `firestore:"number,omitempty" json:"number,omitempty"`
-	Name           string           `firestore:"name,omitempty" json:"name,omitempty"`
-	Steps          []Step           `firestore:"steps,omitempty" json:"steps"`
-	Offers         map[string]Offer `firestore:"offers,omitempty" json:"offers,omitempty"`
+	NameDesc        *string          `firestore:"nameDesc,omitempty" json:"nameDesc,omitempty"`
+	Companies       []Company        `firestore:"companies,omitempty" json:"companies,omitempty"`
+	ProductUid      string           `firestore:"productUid,omitempty" json:"productUid,omitempty"`
+	ProductVersion  int              `firestore:"productVersion,omitempty" json:"productVersion,omitempty"`
+	Version         string           `firestore:"version,omitempty" json:"version,omitempty"`
+	Number          int              `firestore:"number,omitempty" json:"number,omitempty"`
+	Name            string           `firestore:"name,omitempty" json:"name,omitempty"`
+	Commission      float64          `firestore:"commission,omitempty" json:"commission,omitempty"`
+	CommissionRenew float64          `firestore:"commissionRenew,omitempty" json:"commissionRenew,omitempty"`
+	Steps           []Step           `firestore:"steps,omitempty" json:"steps"`
+	Offers          map[string]Offer `firestore:"offers,omitempty" json:"offers,omitempty"`
 }
 
 type Company struct {

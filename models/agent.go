@@ -24,12 +24,10 @@ type Agent struct {
 	BigCreationDate    civil.DateTime `bigquery:"creationDate"`
 	Uid                string         `firestore:"uid,omitempty" json:"uid,omitempty" bigquery:"uid"`
 	PolicyUid          []string       `firestore:"policyUid,omitempty" json:"policyUid,omitempty" bigquery:"policyUid"`
+	UserUid            []string       `firestore:"policyUid,omitempty" json:"policyUid,omitempty" bigquery:"policyUid"`
 	Agency             string         `firestore:"company,omitempty" json:"company,omitempty" bigquery:"company"`
 	NumberCompany      string         `firestore:"numberCompany,omitempty" json:"numberCompany,omitempty" bigquery:"numberCompany"`
 	Products           []Product      `firestore:"statusHistory,omitempty" json:"statusHistory ,omitempty" bigquery:"-"`
-	BigProducts        string         `bigquery:"statusHistory"`
-	IsPay              bool           `firestore:"isPay,omitempty" json:"isPay,omitempty" bigquery:"isPay"`
-	IsEmit             bool           `firestore:"isEmit,omitempty" json:"isEmit,omitempty" bigquery:"isEmit"`
 }
 
 func AgentToListData(query *firestore.DocumentIterator) []Transaction {
