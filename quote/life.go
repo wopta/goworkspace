@@ -6,6 +6,7 @@ import (
 	"github.com/dustin/go-humanize"
 	prd "github.com/wopta/goworkspace/product"
 	"io"
+	"modernc.org/mathutil"
 	"net/http"
 	"strconv"
 	"strings"
@@ -36,11 +37,14 @@ func Life(data models.Policy) (models.Policy, error) {
 	var selectRow []string
 
 	//TODO: this should not be here, only for version 1
-	deathSumInsuredLimitOfIndemnity := getDeathSumInsuredLimitOfIndemnity(data.Assets)
+	deathGuarantee, err := getDeathGuarantee(data.Assets)
+	lib.CheckError(err)
 	//TODO: this should not be here, only for version 1
-	calculateSumInsuredLimitOfIndemnity(data.Assets, deathSumInsuredLimitOfIndemnity)
+	calculateSumInsuredLimitOfIndemnity(data.Assets, deathGuarantee.Value.SumInsuredLimitOfIndemnity)
 
 	getGuaranteeSubtitle(data.Assets)
+
+	calculateGuaranteeDuration(data.Assets, deathGuarantee.Value.Duration.Year)
 
 	for _, row := range df.Records() {
 		if row[0] == strconv.Itoa(year) {
@@ -76,6 +80,19 @@ func Life(data models.Policy) (models.Policy, error) {
 	roundOfferPrices(data.OffersPrices)
 
 	return data, err
+}
+
+func calculateGuaranteeDuration(assets []models.Asset, deathDuration int) {
+	for assetIndex, asset := range assets {
+		for guaranteeIndex, guarantee := range asset.Guarantees {
+			switch guarantee.Slug {
+			case "permanent-disability":
+				assets[assetIndex].Guarantees[guaranteeIndex].Value.Duration.Year = deathDuration
+			case "temporary-disability", "serious-ill":
+				assets[assetIndex].Guarantees[guaranteeIndex].Value.Duration.Year = mathutil.Min(deathDuration, 10)
+			}
+		}
+	}
 }
 
 func roundOfferPrices(offersPrices map[string]map[string]*models.Price) {
@@ -196,17 +213,15 @@ func getOffset(duration int) int {
 	return offset
 }
 
-func getDeathSumInsuredLimitOfIndemnity(assets []models.Asset) float64 {
-	deathSumInsuredLimitOfIndemnity := 0.0
+func getDeathGuarantee(assets []models.Asset) (models.Guarante, error) {
 	for _, asset := range assets {
 		for _, guarantee := range asset.Guarantees {
 			if guarantee.Slug == "death" {
-				deathSumInsuredLimitOfIndemnity = guarantee.Value.SumInsuredLimitOfIndemnity
-				break
+				return guarantee, nil
 			}
 		}
 	}
-	return deathSumInsuredLimitOfIndemnity
+	return models.Guarante{}, fmt.Errorf("death guarantee not found")
 }
 
 func calculateSumInsuredLimitOfIndemnity(assets []models.Asset, deathSumInsuredLimitOfIndemnity float64) {
