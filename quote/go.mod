@@ -10,7 +10,7 @@ require (
 	github.com/dustin/go-humanize v1.0.1
 	github.com/wopta/goworkspace/lib v1.0.10
 	github.com/wopta/goworkspace/models v1.0.25
-	github.com/wopta/goworkspace/product v1.0.12
+	github.com/wopta/goworkspace/product v1.0.13
 )
 
 require (
