@@ -4,9 +4,7 @@ cd ..
 echo %1
 echo %2
 echo %3
-
 cd %1
-
 cd ..
 git add .
 git commit -m %3

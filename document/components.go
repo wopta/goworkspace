@@ -247,9 +247,9 @@ func (s Skin) Table(m pdf.Maroto, head []string, content [][]string, col uint, h
 	return m
 }
 func (s Skin) TableLine(m pdf.Maroto, head []string, content [][]string) pdf.Maroto {
-	s.TableHeader(m, head, true, 4, s.rowtableHeight+2, consts.Center, 0)
+	s.TableHeader(m, head, true, 3, s.rowtableHeight+2, consts.Center, 0)
 	for _, v := range content {
-		s.TableRow(m, v, true, 4, s.rowtableHeight, 0, consts.Center)
+		s.TableRow(m, v, true, 3, s.rowtableHeight, 0, consts.Center)
 
 	}
 	return m
