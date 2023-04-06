@@ -20,12 +20,12 @@ func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	var data models.Policy
 	defer r.Body.Close()
 	e := json.Unmarshal(req, &data)
-	res, e := life(data)
+	res, e := Life(data)
 	s, e := json.Marshal(res)
 	return string(s), nil, e
 
 }
-func life(data models.Policy) (models.Policy, error) {
+func Life(data models.Policy) (models.Policy, error) {
 	var err error
 	birthDate, err := time.Parse("2006-01-02T15:04:05Z", data.Contractor.BirthDate)
 	lib.CheckError(err)
@@ -89,7 +89,7 @@ func roundOfferPrices(offersPrices map[string]map[string]*models.Price) {
 }
 
 func filterByMinimumPrice(assets []models.Asset, offersPrices map[string]map[string]*models.Price) {
-	product, err := prd.GetName("life", "v1")
+	product, err := prd.GetProduct("life", "V1")
 	lib.CheckError(err)
 
 	for assetIndex, asset := range assets {
@@ -116,8 +116,12 @@ func filterByMinimumPrice(assets []models.Asset, offersPrices map[string]map[str
 func getGuaranteeSubtitle(assets []models.Asset) {
 	for assetIndex, asset := range assets {
 		for guaranteeIndex, guarantee := range asset.Guarantees {
-			assets[assetIndex].Guarantees[guaranteeIndex].Subtitle = fmt.Sprintf("Durata: %d anni - Capitale: %s€",
-				guarantee.Value.Duration.Year, humanize.FormatFloat("#.###,", guarantee.Value.SumInsuredLimitOfIndemnity))
+			if guarantee.Slug != "death" {
+				assets[assetIndex].Guarantees[guaranteeIndex].Subtitle = fmt.Sprintf("Durata: %d anni - Capitale: %s€",
+					guarantee.Value.Duration.Year, humanize.FormatFloat("#.###,", guarantee.Value.SumInsuredLimitOfIndemnity))
+			} else {
+				assets[assetIndex].Guarantees[guaranteeIndex].Subtitle = "per qualsiasi causa"
+			}
 		}
 	}
 }

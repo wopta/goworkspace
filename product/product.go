@@ -127,6 +127,13 @@ func GetName(name string, version string) (models.Product, error) {
 	return products[0], nil
 }
 
+func GetProduct(name string, version string) (models.Product, error) {
+	jsonFile := lib.GetFilesByEnv("products/" + name + version + ".json")
+	var product models.Product
+	err := json.Unmarshal(jsonFile, &product)
+	return product, err
+}
+
 func PutFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println(productCollection)
 	request := lib.ErrorByte(io.ReadAll(r.Body))
