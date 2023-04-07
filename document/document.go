@@ -24,10 +24,11 @@ func Document(w http.ResponseWriter, r *http.Request) {
 	lib.EnableCors(&w, r)
 	w.Header().Set("Access-Control-Allow-Methods", "POST")
 	route := lib.RouteData{
-		Routes: []lib.Route{{
-			Route:   "/v1/proposal",
-			Handler: ContractFx,
-		},
+		Routes: []lib.Route{
+			{
+				Route:   "/v1/proposal",
+				Handler: ContractFx,
+			},
 			{
 				Route:   "/v1/contract",
 				Handler: ContractFx,
@@ -42,6 +43,11 @@ func Document(w http.ResponseWriter, r *http.Request) {
 				Route:   "/v2/sign",
 				Handler: SignNamirialV6,
 				Method:  "POST",
+			},
+			{
+				Route:   "/v1/fpdf",
+				Handler: FpdfHandler,
+				Method:  http.MethodPost,
 			},
 		},
 	}
