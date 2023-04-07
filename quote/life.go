@@ -42,9 +42,9 @@ func Life(data models.Policy) (models.Policy, error) {
 	//TODO: this should not be here, only for version 1
 	calculateSumInsuredLimitOfIndemnity(data.Assets, deathGuarantee.Value.SumInsuredLimitOfIndemnity)
 
-	getGuaranteeSubtitle(data.Assets)
-
 	calculateGuaranteeDuration(data.Assets, deathGuarantee.Value.Duration.Year)
+
+	getGuaranteeSubtitle(data.Assets)
 
 	for _, row := range df.Records() {
 		if row[0] == strconv.Itoa(year) {
