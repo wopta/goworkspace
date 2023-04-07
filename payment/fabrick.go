@@ -70,6 +70,13 @@ func FabrickPayObj(data model.Policy, firstSchedule bool, scheduleDate string, c
 
 			}
 			log.Println(data.Uid+"pay commission: ", commission)
+			layout2 := "2006-01-02"
+			var sd string
+			if scheduleDate == "" {
+				sd = time.Now().Format(layout2)
+			} else {
+				sd = scheduleDate
+			}
 			//tr := models.SetTransactionPolicy(data, data.Uid+"_"+scheduleDate, amount, scheduleDate, data.PriceNett * commission)
 			tr := models.Transaction{
 				Amount:             amount,
@@ -79,7 +86,7 @@ func FabrickPayObj(data model.Policy, firstSchedule bool, scheduleDate string, c
 				CreationDate:       time.Now(),
 				Status:             models.TransactionStatusToPay,
 				StatusHistory:      []string{models.TransactionStatusToPay},
-				ScheduleDate:       scheduleDate,
+				ScheduleDate:       sd,
 				NumberCompany:      data.CodeCompany,
 				Commissions:        data.PriceNett * commission,
 				IsPay:              false,
