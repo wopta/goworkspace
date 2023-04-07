@@ -5,6 +5,7 @@ go 1.19
 replace github.com/wopta/goworkspace/callback => ./
 
 require (
+	cloud.google.com/go/firestore v1.9.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
 	github.com/wopta/goworkspace/document v1.0.18
 	github.com/wopta/goworkspace/lib v1.0.10
@@ -19,7 +20,6 @@ require (
 	cloud.google.com/go/bigquery v1.48.0 // indirect
 	cloud.google.com/go/compute v1.18.0 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
-	cloud.google.com/go/firestore v1.9.0 // indirect
 	cloud.google.com/go/iam v0.12.0 // indirect
 	cloud.google.com/go/longrunning v0.4.1 // indirect
 	cloud.google.com/go/storage v1.29.0 // indirect
@@ -71,6 +71,7 @@ require (
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
 	github.com/wopta/goworkspace/product v1.0.7 // indirect
+	github.com/wopta/goworkspace/wiseproxy v1.0.2 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
 	github.com/xuri/excelize/v2 v2.7.0 // indirect
