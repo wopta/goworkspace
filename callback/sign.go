@@ -56,12 +56,3 @@ func Sign(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 
 	return "", nil, e
 }
-
-/*"Gentile Nome Cognome, Spett.le ragione sociale,
-hai firmato correttamente la polizza. Sei più vicino a sentirti più protetto.
-Ti invitiamo ora ad accedere a questo link per perfezionare il pagamento.
-Infatti senza pagamento la polizza non è attiva e, solo a pagamento avvenuto, ti invieremo una mail in cui trovi tutti i documenti contrattuali completi.
-Qualora tu abbia già provveduto, ignora questa comunicazione.
-Un saluto.
-ll Team Wopta. Proteggiamo chi sei"
-*/
