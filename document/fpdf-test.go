@@ -11,6 +11,7 @@ func FpdfHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	pdf := initFpdf()
 
 	GetHeader(pdf, "life")
+	GetFooter(pdf)
 
 	pdf.AddPage()
 	pdf.AddPage()
@@ -71,5 +72,18 @@ func GetHeader(pdf *fpdf.Fpdf, name string) {
 		pdf.SetFont("Montserrat", "", 8)
 		pdf.SetXY(-90, pdf.GetY()+3)
 		pdf.MultiCell(0, 3, "Contraente: HAMMAR YOUSEF\nC.F./P.IVA: HMMYSF94R07D912M\nIndirizzo: Via Unicef, 4\n20033 SOLARO (MI)\nMail: yousef.hammar@wopta.it\nTelefono: +393451031004", "", "", false)
+	})
+}
+
+func GetFooter(pdf *fpdf.Fpdf) {
+	var opt fpdf.ImageOptions
+
+	pdf.SetFooterFunc(func() {
+		pdf.SetXY(10, -13)
+		pdf.SetTextColor(229, 0, 117)
+		pdf.SetFont("Montserrat", "B", 6)
+		pdf.MultiCell(0, 3, "Wopta per te. Vita è un prodotto assicurativo di AXA France Vie S.A. – Rappresentanza Generale per l’Italia\ndistribuito da Wopta Assicurazioni S.r.l.", "", "", false)
+		opt.ImageType = "png"
+		pdf.ImageOptions("document/assets/logo_axa.png", 190, 283, 8, 8, false, opt, 0, "")
 	})
 }
