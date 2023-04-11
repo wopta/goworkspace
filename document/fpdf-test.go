@@ -639,22 +639,23 @@ func FpdfHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 		pdf.Ln(25)
 	})
 
+	pdf.AddPage()
+
 	pdf.SetFooterFunc(func() {
-		pdf.SetXY(10, -25)
-		pdf.SetFont("Arial", "", 8)
+		pdf.SetXY(10, -30)
+		pdf.SetFont("Montserrat", "", 8)
 		pdf.SetTextColor(0, 0, 0)
 		pdf.MultiCell(0, 3, "AXA France Vie (compagnia assicurativa del gruppo AXA). Indirizzo sede "+
 			"legale in Francia: 313 Terrasses de l'Arche, 92727 NANTERRE CEDEX. Numero Iscrizione Registro delle "+
-			"Imprese di Nanterre: 310499959. Autorizzata in Francia (Stato di origine) all’esercizio delle "+
+			"Imprese di Nanterre: 310499959. Autorizzata in Francia (Stato di origine) all'esercizio delle "+
 			"assicurazioni, vigilata in Francia dalla Autorité de Contrôle Prudentiel et de Résolution (ACPR). "+
-			"Numero Matricola Registre des organismes d’assurance: 5020051. // Indirizzo Rappresentanza Generale "+
-			"per l’Italia: Corso Como n. 17, 20154 Milano - CF, P.IVA e N.Iscr. Reg. Imprese 08875230016 - "+
-			"REA MI-2525395 - Telefono: 02-87103548 - Fax: 02-23331247 - PEC: axafrancevie@legalmail.it – sito "+
+			"Numero Matricola Registre des organismes d'assurance: 5020051. // Indirizzo Rappresentanza Generale "+
+			"per l'Italia: Corso Como n. 17, 20154 Milano - CF, P.IVA e N.Iscr. Reg. Imprese 08875230016 - "+
+			"REA MI-2525395 - Telefono: 02-87103548 - Fax: 02-23331247 - PEC: axafrancevie@legalmail.it - sito "+
 			"internet: www.clp.partners.axa/it. Ammessa ad operare in Italia in regime di stabilimento. Iscritta "+
-			"all’Albo delle imprese di assicurazione tenuto dall’IVASS, in appendice Elenco I, nr. I.00149.", "", "", false)
+			"all'Albo delle imprese di assicurazione tenuto dall'IVASS, in appendice Elenco I, nr. I.00149.", "", "", false)
 	})
 
-	pdf.AddPage()
 	pdf.SetFont("Montserrat", "B", 9)
 	pdf.SetTextColor(0, 0, 0)
 	pdf.Cell(0, 3, "DICHIARAZIONI E CONSENSI")
@@ -683,6 +684,17 @@ func FpdfHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	pdf.SetDrawColor(0, 0, 0)
 	pdf.SetLineWidth(0.4)
 	pdf.Line(130, pdf.GetY(), 190, pdf.GetY())
+
+	pdf.AddPage()
+
+	pdf.SetFont("Montserrat", "B", 12)
+	pdf.SetTextColor(255, 255, 255)
+	pdf.SetFillColor(229, 0, 117)
+	pdf.MultiCell(0, 6, "MODULO PER L’IDENTIFICAZIONE E L’ADEGUATA VERIFICA DELLA CLIENTELA", "LTR", "CM", true)
+	pdf.SetFont("Montserrat", "B", 8)
+	pdf.MultiCell(0, 4, "POLIZZA DI RAMO VITA I  - Polizza “Wopta per te. Vita”", "LR", "CM", true)
+	pdf.SetFont("Montserrat", "I", 6)
+	pdf.MultiCell(0, 3, "(da compilarsi in caso di scelta da parte del Contraente/Assicurato della garanzia Decesso)", "LBR", "CM", true)
 
 	err = pdf.OutputFileAndClose("document/test.pdf")
 	log.Println(err)
