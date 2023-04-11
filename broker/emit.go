@@ -44,6 +44,7 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	policy.CompanyEmitted = false
 	policy.EmitDate = time.Now()
 	policy.BigEmitDate = civil.DateTimeOf(policy.Updated)
+
 	if policy.Statements == nil {
 		policy.Statements = result.Statements
 	}
@@ -85,6 +86,7 @@ type EmitResponse struct {
 	UrlSign string `firestore:"urlSign,omitempty" json:"urlSign,omitempty"`
 	Uid     string `firestore:"uid,omitempty" json:"uid,omitempty"`
 }
+
 type EmitRequest struct {
 	Uid          string              `firestore:"uid,omitempty" json:"uid,omitempty"`
 	Payment      string              `firestore:"payment,omitempty" json:"payment,omitempty"`

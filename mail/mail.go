@@ -68,8 +68,13 @@ func Mail(w http.ResponseWriter, r *http.Request) {
 }
 
 type Data struct {
-	Title   string
-	Content string
+	Title     string
+	SubTitle  string
+	Content   string
+	Link      string
+	LinkLabel string
+	IsLink    bool
+	IsApp     bool
 }
 type Attachment struct {
 	Name        string `firestore:"name,omitempty" json:"name,omitempty"`
@@ -90,6 +95,13 @@ type MailRequest struct {
 	Attachments  *[]Attachment `json:"attachments,omitempty"`
 	Cc           string        `json:"cc,omitempty"`
 	TemplateName string        `json:"templateName,omitempty"`
+	Title        string        `json:"title,omitempty"`
+	SubTitle     string        `json:"subTitle,omitempty"`
+	Content      string        `json:"content,omitempty"`
+	Link         string        `json:"link,omitempty"`
+	LinkLabel    string        `json:"linkLabel,omitempty"`
+	IsLink       bool          `json:"isLink,omitempty"`
+	IsApp        bool          `json:"isApp,omitempty"`
 }
 type MailValidate struct {
 	Mail    string `firestore:"mail,omitempty" json:"mail,omitempty"`

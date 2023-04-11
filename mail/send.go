@@ -108,7 +108,7 @@ func SendMail(obj MailRequest) {
 
 	switch os.Getenv("env") {
 	case "local":
-		file = lib.ErrorByte(ioutil.ReadFile("function-data/mail/mail_template.html"))
+		file = lib.ErrorByte(ioutil.ReadFile("../function-data/dev/mail/template_03.html"))
 
 	case "dev":
 		file = lib.GetFromStorage("function-data", "mail/mail_template.html", "")
@@ -124,7 +124,9 @@ func SendMail(obj MailRequest) {
 
 	tmplt, err := tmplt.Parse(string(file))
 	lib.CheckError(err)
-	data := Data{Title: obj.Subject, Content: obj.Message}
+	data := Data{Title: obj.Subject,
+		Content: obj.Message,
+	}
 	tmplt.Execute(&tpl, data)
 	for _, _to := range obj.To {
 
