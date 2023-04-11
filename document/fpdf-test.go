@@ -784,14 +784,14 @@ func GetParagraphTitle(pdf *fpdf.Fpdf, title string) {
 func PrintStatement(pdf *fpdf.Fpdf, statement *models.Statement) {
 	pdf.SetTextColor(0, 0, 0)
 	pdf.SetFont("Montserrat", "B", 9)
-	pdf.MultiCell(0, 4, statement.Title, "", "", false)
+	pdf.MultiCell(0, 3.5, statement.Title, "", "", false)
 	for _, question := range statement.Questions {
 		if question.IsBold {
-			pdf.SetFont("Montserrat", "B", 6)
+			pdf.SetFont("Montserrat", "B", 9)
 		}
 		if question.Indent {
 			pdf.SetX(15)
 		}
-		pdf.MultiCell(0, 4, question.Question, "", "", false)
+		pdf.MultiCell(0, 3.5, question.Question, "", "", false)
 	}
 }
