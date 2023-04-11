@@ -51,7 +51,8 @@ func GetMailPolicy(policy models.Policy, subject string, islink bool, link strin
 	return obj
 }
 
-func SendMailProposal(policy models.Policy, name string, link string) {
+func SendMailProposal(policy models.Policy) {
+	var link, name string
 	if policy.Name == "pmi" {
 
 		link = "https://storage.googleapis.com/documents-public-dev/information-sets/pmi/v1/Precontrattuale.pdf"
