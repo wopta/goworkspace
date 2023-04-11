@@ -1,10 +1,18 @@
 package document
 
 import (
+	"encoding/json"
 	"github.com/go-pdf/fpdf"
+	"github.com/wopta/goworkspace/models"
 	"log"
 	"net/http"
+	"os"
 )
+
+type Statements struct {
+	Statements []*models.Statement `json:"statements"`
+	Text       string              `json:"text,omitempty"`
+}
 
 func FpdfHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 
@@ -288,13 +296,37 @@ func FpdfHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	pdf.Line(11, pdf.GetY(), 200, pdf.GetY())
 	pdf.Ln(2)
 
-	GetParagraphTitle(pdf, "Dichiarazioni da leggere con attenzione prima di firmare")
+	var statements Statements
+	b, err := os.ReadFile("document/response.json")
+	if err != nil {
+		log.Println(err)
+	}
+	err = json.Unmarshal(b, &statements)
+	if err != nil {
+		log.Println(err)
+	}
 
+	GetParagraphTitle(pdf, "Dichiarazioni da leggere con attenzione prima di firmare")
+	pdf.Ln(8)
+	PrintStatement(pdf, statements.Statements[0])
+	pdf.Ln(5)
+	GetParagraphTitle(pdf, "Questionario Medico")
+	pdf.Ln(8)
+	for _, statement := range statements.Statements[1:] {
+		PrintStatement(pdf, statement)
+	}
+	pdf.Ln(8)
+	pdf.SetX(-80)
+	pdf.Cell(0, 3, "Firma del Contraente/Assicurato")
+	pdf.Ln(15)
+	pdf.SetDrawColor(0, 0, 0)
+	pdf.SetLineWidth(0.4)
+	pdf.Line(130, pdf.GetY(), 190, pdf.GetY())
 	//GetFooter(pdf)
 
 	//pdf.AddPage()
 
-	err := pdf.OutputFileAndClose("document/test.pdf")
+	err = pdf.OutputFileAndClose("document/test.pdf")
 	log.Println(err)
 	return "", nil, err
 }
@@ -350,6 +382,7 @@ func GetHeader(pdf *fpdf.Fpdf, name string) {
 		pdf.SetFont("Montserrat", "", 8)
 		pdf.SetXY(-90, pdf.GetY()+3)
 		pdf.MultiCell(0, 3, "Contraente: HAMMAR YOUSEF\nC.F./P.IVA: HMMYSF94R07D912M\nIndirizzo: Via Unicef, 4\n20033 SOLARO (MI)\nMail: yousef.hammar@wopta.it\nTelefono: +393451031004", "", "", false)
+		pdf.Ln(10)
 	})
 }
 
@@ -370,4 +403,19 @@ func GetParagraphTitle(pdf *fpdf.Fpdf, title string) {
 	pdf.SetTextColor(229, 0, 117)
 	pdf.SetFont("Montserrat", "B", 10)
 	pdf.Cell(0, 10, title)
+}
+
+func PrintStatement(pdf *fpdf.Fpdf, statement *models.Statement) {
+	pdf.SetTextColor(0, 0, 0)
+	pdf.SetFont("Montserrat", "B", 9)
+	pdf.MultiCell(0, 3, statement.Title, "", "", false)
+	for _, question := range statement.Questions {
+		if question.IsBold {
+			pdf.SetFont("Montserrat", "B", 9)
+		}
+		if question.Indent {
+			pdf.SetX(15)
+		}
+		pdf.MultiCell(0, 3, question.Question, "", "", false)
+	}
 }
