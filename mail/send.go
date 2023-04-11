@@ -108,7 +108,7 @@ func SendMail(obj MailRequest) {
 
 	switch os.Getenv("env") {
 	case "local":
-		file = lib.ErrorByte(ioutil.ReadFile("../function-data/dev/mail/template_03.html"))
+		file = lib.ErrorByte(ioutil.ReadFile("../function-data/dev/mail/template.html"))
 
 	case "dev":
 		file = lib.GetFromStorage("function-data", "mail/mail_template.html", "")
@@ -124,10 +124,17 @@ func SendMail(obj MailRequest) {
 
 	tmplt, err := tmplt.Parse(string(file))
 	lib.CheckError(err)
-	data := Data{Title: obj.Subject,
-		Content: obj.Message,
+	data := Data{
+		Title:     obj.Subject,
+		SubTitle:  obj.SubTitle,
+		IsLink:    obj.IsLink,
+		Link:      obj.Link,
+		LinkLabel: obj.LinkLabel,
+		IsApp:     obj.IsApp,
+		Content:   obj.Message,
 	}
 	tmplt.Execute(&tpl, data)
+	log.Println()
 	for _, _to := range obj.To {
 
 		from := mail.Address{Name: "Wopta assicurazioni", Address: obj.From}

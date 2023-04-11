@@ -1,6 +1,8 @@
 package mail
 
-import "github.com/wopta/goworkspace/models"
+import (
+	"github.com/wopta/goworkspace/models"
+)
 
 func GetMailPolicy(policy models.Policy, subject string, islink bool, link string, linkLabel string, lines []string, isAttachment bool, at *[]Attachment) MailRequest {
 	var name string
