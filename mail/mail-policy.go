@@ -34,7 +34,8 @@ func GetMailPolicy(policy models.Policy, subject string, islink bool, link strin
 	<p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:17px;color:#000000;font-size:14px">Se hai bisogno di ulteriore supporto, non scrivere a questo indirizzo email, puoi compilare il <a class="button" href='` + linkForm + ` '>Form </a> oppure scrivere alla mail e verrai contattato da un nostro esperto.</p>
 	<p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:17px;color:#000000;font-size:14px"><br></p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:17px;color:#000000;font-size:14px">A presto,</p>
 	<p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:17px;color:#e50075;font-size:14px"><strong>Anna</strong> di Wopta Assicurazioni</p> `
-	obj.Subject = "Wopta per te. " + name + " " + subject
+	obj.Subject = "Wopta per te. " + name + " "
+	obj.SubTitle = subject
 	obj.IsHtml = true
 	obj.IsAttachment = isAttachment
 	obj.IsLink = islink
@@ -59,10 +60,10 @@ func SendMailProposal(policy models.Policy) {
 
 	}
 	if policy.Name == "persona" {
-		link = "https://storage.googleapis.com/documents-public-dev/information-sets/pmi/v1/Precontrattuale.pdf"
+		link = "https://storage.googleapis.com/documents-public-dev/information-sets/persona/v1/Precontrattuale.pdf"
 	}
 	if policy.Name == "life" {
-		link = "https://storage.googleapis.com/documents-public-dev/information-sets/pmi/v1/Precontrattuale.pdf"
+		link = "https://storage.googleapis.com/documents-public-dev/information-sets/life/v1/Precontrattuale.pdf"
 
 	}
 	var message []string
@@ -97,7 +98,7 @@ func SendMailContract(policy models.Policy, at *[]Attachment) {
 	message = append(message, `<p>La tua polizza in oggetto è ora attiva. 
 	in allegato trovi i documenti da te firmati tramite l’utilizzo della Firma Elettronica Avanzata. Salva e conserva i documenti con cura, ti serviranno in caso di sinistro.
 	In ogni caso ti consigliamo di scaricare l’App di Wopta per accedere alla tua area riservata nella quale troverai i tuoi documenti di polizza e altri servizi a te riservati.</p>
-	<p><img  height="100" alt="instagram" src="https://storage.googleapis.com/documents-public-dev/mail/qr-app.png" style="-ms-interpolation-mode: bicubic;border: none;"></p>
+	
 	`)
 	SendMail(GetMailPolicy(policy, "contratto"+" n° "+policy.CodeCompany, false, "", "", message, true, at))
 
