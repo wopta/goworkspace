@@ -23,7 +23,7 @@ func GetMailPolicy(policy models.Policy, subject string, islink bool, link strin
 	}
 	var obj MailRequest
 
-	obj.From = "noreply@wopta.it"
+	obj.From = "anna@wopta.it"
 	obj.To = []string{policy.Contractor.Mail}
 	obj.Message = `<p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:17px;color:#000000;font-size:14px">Ciao <strong>` + policy.Contractor.Name + " " + policy.Contractor.Surname + `</strong>,</p> `
 	for _, line := range lines {
