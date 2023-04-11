@@ -695,6 +695,114 @@ func FpdfHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	pdf.MultiCell(0, 4, "POLIZZA DI RAMO VITA I  - Polizza “Wopta per te. Vita”", "LR", "CM", true)
 	pdf.SetFont("Montserrat", "I", 6)
 	pdf.MultiCell(0, 3, "(da compilarsi in caso di scelta da parte del Contraente/Assicurato della garanzia Decesso)", "LBR", "CM", true)
+	pdf.SetTextColor(0, 0, 0)
+	pdf.SetFont("Montserrat", "", 8)
+	pdf.MultiCell(0, 3, "AVVERTENZA PRELIMINARE - Al fine di adempiere agli obblighi previsti dal "+
+		"Decreto Legislativo 21 novembre 2007 n. 231 (di seguito il “Decreto”), in materia di prevenzione "+
+		"del fenomeno del riciclaggio e del finanziamento del terrorismo, il Cliente (il soggetto Contraente/Assicurato "+
+		"alla polizza “Wopta per te. Vita”) è tenuto a compilare e sottoscrivere il presente Modulo. Le "+
+		"disposizioni del Decreto richiedono infatti, per una completa identificazione ed una adeguata conoscenza del "+
+		"cliente e dell’eventuale titolare effettivo, la raccolta di informazioni ulteriori rispetto a quelle "+
+		"anagrafiche già raccolte. La menzionata normativa impone al cliente di fornire, sotto la propria "+
+		"responsabilità, tutte le informazioni necessarie ed aggiornate per consentire all’Intermediario di adempiere "+
+		"agli obblighi di adeguata verifica e prevede specifiche sanzioni nel caso in cui le informazioni non "+
+		"vengano fornite o risultino false.", "LR", "", false)
+	pdf.MultiCell(0, 3, "", "LR", "", false)
+	pdf.MultiCell(0, 3, "Il conferimento dei dati e delle informazioni personali per l’identificazione "+
+		"del Cliente e per la compilazione della presente sezione è obbligatorio per legge e, in caso di loro mancato "+
+		"rilascio, la Compagnia Assicurativa non potrà procedere ad instaurare il rapporto (c.d. obbligo di "+
+		"astensione), e dovrà valutare se effettuare una segnalazione alle autorità competenti (Unità di "+
+		"Informazione Finanziaria presso Banca d’Italia e Guardia di Finanza). I dati saranno trattati per le "+
+		"finalità di assolvimento degli obblighi previsti dalla normativa antiriciclaggio e, pertanto, tale "+
+		"trattamento non richiede il consenso dell’interessato.", "LR", "", false)
+	pdf.MultiCell(0, 3, "", "LR", "", false)
+	pdf.MultiCell(0, 3, "Io sottoscritto DALLA VALLE FABRIZIO (Contraente/Assicurato), letta l’Avvertenza "+
+		"Preliminare di cui sopra e l’Informativa sui Riferimenti Normativi Antiriciclaggio (in calce al presente "+
+		"modulo), al fine di permettere all’Intermediario di assolvere agli obblighi di adeguata verifica di cui al "+
+		"D.Lgs. n. 231/2007 in materia di prevenzione dei fenomeni di riciclaggio e di finanziamento del terrorismo, "+
+		"in relazione all’instaurazione del rapporto assicurativo di cui al contratto di assicurazione “Wopta per te. "+
+		"Vita” - che prevede una garanzia di ramo vita emessa dall’impresa AXA France VIE S.A. (Rappresentanza "+
+		"Generale per l’Italia):", "LR", "", false)
+	pdf.MultiCell(0, 4, "", "LR", "", false)
+	pdf.MultiCell(0, 4, "A. dichiaro che i seguenti dati riportati relativi alla mia persona "+
+		"corrispondono al vero ", "LR", "", false)
+	pdf.CellFormat(5, 4, "", "LR", 0, "", false, 0, "")
+	pdf.SetFont("Montserrat", "B", 9)
+	pdf.SetTextColor(255, 255, 255)
+	pdf.CellFormat(180, 4, "DATI IDENTIFICATIVI DEL CLIENTE (CONTRAENTE/ASSICURATO)", "TLR",
+		0, "CM", true, 0, "")
+	pdf.CellFormat(5, 4, "", "LR", 1, "", false, 0, "")
+	pdf.CellFormat(5, 4, "", "LR", 0, "", false, 0, "")
+	pdf.SetFont("Montserrat", "B", 8)
+	pdf.SetTextColor(0, 0, 0)
+	pdf.CellFormat(90, 4, "Nome: YOUSEF", "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(90, 4, "Cognome: HAMMAR", "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(5, 4, "", "LR", 1, "", false, 0, "")
+	pdf.CellFormat(5, 4, "", "LR", 0, "", false, 0, "")
+	pdf.CellFormat(90, 4, "Data di nascita: 07/10/1994", "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(90, 4, "Codice Fiscale: HMMYSF94R07D912M", "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(5, 4, "", "LR", 1, "", false, 0, "")
+	pdf.CellFormat(5, 4, "", "LR", 0, "", false, 0, "")
+	pdf.CellFormat(90, 4, "Comune di nascita: GARBAGNATE MILANESE", "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(45, 4, "CAP: 20333", "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(45, 4, "Prov.: MI", "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(5, 4, "", "LR", 1, "", false, 0, "")
+	pdf.CellFormat(5, 4, "", "LR", 0, "", false, 0, "")
+	pdf.CellFormat(90, 4, "Comune di residenza: SOLARO", "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(45, 4, "CAP: 20333", "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(45, 4, "Prov.: MI", "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(5, 4, "", "LR", 1, "", false, 0, "")
+	pdf.CellFormat(5, 4, "", "LR", 0, "", false, 0, "")
+	pdf.CellFormat(180, 4, "Indirizzo di residenza: VIa Unicef, 4", "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(5, 4, "", "LR", 1, "", false, 0, "")
+	pdf.CellFormat(5, 4, "", "LR", 0, "", false, 0, "")
+	pdf.CellFormat(180, 4, "Comune di domicilio (se diverso dalla residenza:", "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(5, 4, "", "LR", 1, "", false, 0, "")
+	pdf.CellFormat(5, 4, "", "LR", 0, "", false, 0, "")
+	pdf.CellFormat(180, 4, "Indirizzo di domicilio (se diverso dalla residenza:", "LR", 0, "", false, 0, "")
+	pdf.CellFormat(5, 4, "", "LR", 1, "", false, 0, "")
+	pdf.CellFormat(5, 4, "", "LR", 0, "", false, 0, "")
+	pdf.CellFormat(180, 4, "Status occupazinale: Lavoratore/dipendente", "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(5, 4, "", "LR", 1, "", false, 0, "")
+	pdf.CellFormat(5, 4, "", "LR", 0, "", false, 0, "")
+	pdf.CellFormat(180, 4, "Se Altro (specificare):", "BLR", 0, "", false, 0, "")
+	pdf.CellFormat(5, 4, "", "LR", 1, "", false, 0, "")
+	pdf.SetFont("Montserrat", "", 8)
+	pdf.MultiCell(0, 1, "", "LR", "", false)
+	pdf.MultiCell(0, 4, "B. allego una fotocopia fronte/retro del mio documento di identità non scaduto "+
+		"avente i seguenti estremi, confermando la veridicità dei dati sotto riportati: ", "LR", "", false)
+	pdf.CellFormat(5, 4, "", "LR", 0, "", false, 0, "")
+	pdf.CellFormat(90, 4, "Tipo documento: 01 = Carta di identità", "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(90, 4, "Nr. Documento: AT9045321", "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(5, 4, "", "LR", 1, "", false, 0, "")
+	pdf.CellFormat(5, 4, "", "LR", 0, "", false, 0, "")
+	pdf.CellFormat(90, 4, "Ente di rilascio: Comune", "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(90, 4, "Data di rilascio: 20/10/2013", "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(5, 4, "", "LR", 1, "", false, 0, "")
+	pdf.CellFormat(5, 4, "", "LR", 0, "", false, 0, "")
+	pdf.CellFormat(90, 4, "Località di rilascio: SOLARO", "1", 0, "", false, 0, "")
+	pdf.CellFormat(90, 4, "Data di scadenza: 07/10/2023", "1", 0, "", false, 0, "")
+	pdf.CellFormat(5, 4, "", "LR", 1, "", false, 0, "")
+	pdf.MultiCell(0, 1, "", "LR", "", false)
+	pdf.MultiCell(0, 4, "C. dichiaro di NON essere una Persona Politicamente Esposta", "LR", "", false)
+	pdf.CellFormat(4, 4, "", "L", 0, "", false, 0, "")
+	pdf.CellFormat(0, 4, "In caso di risposta affermativa indicare la tipologia:", "R", 1, "", false, 0, "")
+	pdf.MultiCell(0, 4, "D. dichiaro di NON essere destinatario di misure di congelamento dei fondi e risorse economiche", "LR", "", false)
+	pdf.CellFormat(4, 4, "", "L", 0, "", false, 0, "")
+	pdf.CellFormat(0, 4, "In caso di risposta affermativa indicare il motivo:", "R", 1, "", false, 0, "")
+	pdf.MultiCell(0, 4, "E. dichiaro di NON essere sottoposto a procedimenti o di NON aver subito condanne "+
+		"per reati in materia economica/ finanziaria/tributaria/societaria", "LR", "", false)
+	pdf.CellFormat(4, 4, "", "L", 0, "", false, 0, "")
+	pdf.CellFormat(0, 4, "In caso di risposta affermativa indicare il motivo:", "R", 1, "", false, 0, "")
+	pdf.MultiCell(0, 4, "F. dichiaro ai fini dell'identificazione del Titolare Effettivo, di essere una "+
+		"persona fisica che agisce in nome e per conto proprio, di essere il soggetto Contraente/Assicurato, e "+
+		"quindi che non esiste il titolare effettivo", "LR", "", false)
+	pdf.MultiCell(0, 4, "G. fornisco, con riferimento allo scopo e alla natura prevista del rapporto "+
+		"continuativo, le seguenti informazioni", "LR", "", false)
+	pdf.CellFormat(4, 8, "", "LB", 0, "", false, 0, "")
+	pdf.MultiCell(0, 4, "i. Tipologia di rapporto continuativo (informazione immediatamente desunta dal "+
+		"rapporto): Stipula di un contratto di assicurazione di puro rischio che prevede garanzia di ramo vita "+
+		"(caso morte Assicurato)", "BR", "", false)
 
 	err = pdf.OutputFileAndClose("document/test.pdf")
 	log.Println(err)
