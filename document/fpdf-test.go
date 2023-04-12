@@ -636,7 +636,7 @@ func FpdfHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 		pdf.SetXY(-30, 7)
 		opt.ImageType = "png"
 		pdf.ImageOptions("document/assets/logo_axa.png", 190, 7, 8, 8, false, opt, 0, "")
-		pdf.Ln(25)
+		pdf.Ln(15)
 	})
 
 	pdf.AddPage()
@@ -697,6 +697,7 @@ func FpdfHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	pdf.MultiCell(0, 3, "(da compilarsi in caso di scelta da parte del Contraente/Assicurato della garanzia Decesso)", "LBR", "CM", true)
 	pdf.SetTextColor(0, 0, 0)
 	pdf.SetFont("Montserrat", "", 8)
+	pdf.MultiCell(0, 2, "", "LR", "", false)
 	pdf.MultiCell(0, 3, "AVVERTENZA PRELIMINARE - Al fine di adempiere agli obblighi previsti dal "+
 		"Decreto Legislativo 21 novembre 2007 n. 231 (di seguito il “Decreto”), in materia di prevenzione "+
 		"del fenomeno del riciclaggio e del finanziamento del terrorismo, il Cliente (il soggetto Contraente/Assicurato "+
@@ -799,10 +800,147 @@ func FpdfHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 		"quindi che non esiste il titolare effettivo", "LR", "", false)
 	pdf.MultiCell(0, 4, "G. fornisco, con riferimento allo scopo e alla natura prevista del rapporto "+
 		"continuativo, le seguenti informazioni", "LR", "", false)
-	pdf.CellFormat(4, 8, "", "LB", 0, "", false, 0, "")
+	pdf.CellFormat(4, 8, "", "L", 0, "", false, 0, "")
 	pdf.MultiCell(0, 4, "i. Tipologia di rapporto continuativo (informazione immediatamente desunta dal "+
 		"rapporto): Stipula di un contratto di assicurazione di puro rischio che prevede garanzia di ramo vita "+
-		"(caso morte Assicurato)", "BR", "", false)
+		"(caso morte Assicurato)", "R", "", false)
+	pdf.CellFormat(4, 8, "", "L", 0, "", false, 0, "")
+	pdf.MultiCell(0, 4, "ii. Scopo prevalente del rapporto continuativo in riferimento alle garanzie vita"+
+		" (informazione immediatamente desunta dal rapporto):Protezione assicurativa al fine di garantire ai "+
+		"beneficiari un capitale qualora si verifichi l’evento oggetto di copertura", "R", "", false)
+	pdf.CellFormat(4, 4, "", "L", 0, "", false, 0, "")
+	pdf.MultiCell(0, 4, "iii.  Origine dei fondi utilizzati per il pagamento dei premi assicurativi: "+
+		"Proprie risorse economiche", "R", "", false)
+	pdf.CellFormat(0, 2, "", "BLR", 1, "", false, 0, "")
+
+	pdf.AddPage()
+
+	pdf.CellFormat(0, 2, "", "TLR", 1, "", false, 0, "")
+	pdf.MultiCell(0, 4, "Il sottoscritto, ai sensi degli artt. 22 e 55 comma 3 del d.lgs. 231/2007, "+
+		"consapevole della responsabilità penale derivante da omesse e/o mendaci affermazioni, dichiara che tutte le "+
+		"informazioni fornite (anche in riferimento al titolare effettivo), le dichiarazioni rilasciate il documento "+
+		"di identità che allego, ed i dati riprodotti negli appositi campi del Modulo di Polizza corrispondono al "+
+		"vero. Il sottoscritto si assume tutte le responsabilità di natura civile, amministrativa e penale per "+
+		"dichiarazioni non veritiere. Il sottoscritto si impegna a comunicare senza ritardo a AXA France VIE S.A. "+
+		"(Rappresentanza Generale per l’Italia) ogni eventuale integrazione o variazione che si dovesse verificare "+
+		"in relazione ai dati ed alle informazioni forniti con il presente modulo.", "LR", "", false)
+	pdf.SetFont("Montserrat", "B", 8)
+	pdf.CellFormat(0, 4, "", "LR", 1, "", false, 0, "")
+	pdf.CellFormat(30, 4, "Data 03/04/2023", "L", 0, "CM", false, 0, "")
+	pdf.CellFormat(100, 4, "", "", 0, "", false, 0, "")
+	pdf.CellFormat(60, 4, "Firma del contraente/Assicurato", "R", 1, "CM", false, 0, "")
+	pdf.CellFormat(0, 20, "", "BLR", 1, "", false, 0, "")
+	pdf.SetDrawColor(0, 0, 0)
+	pdf.SetLineWidth(0.4)
+	pdf.Line(147, pdf.GetY()-10, 195, pdf.GetY()-10)
+
+	pdf.Ln(15)
+
+	pdf.SetFont("Montserrat", "B", 10)
+
+	pdf.MultiCell(0, 2, "", "TLR", "", false)
+	pdf.MultiCell(0, 4, "Informativa antiriciclaggio (articoli di riferimento) - "+
+		"(Decreto legislativo n. 231/2007)", "LR", "CM", false)
+	pdf.MultiCell(0, 3, "", "LR", "", false)
+	pdf.SetFont("Montserrat", "B", 6)
+	pdf.MultiCell(0, 2, "Obbligo di astensione – art. 42", "LR", "", false)
+	pdf.SetFont("Montserrat", "", 6)
+	pdf.MultiCell(0, 2, "1. I soggetti obbligati che si trovano nell’impossibilità oggettiva di "+
+		"effettuare l'adeguata verifica della clientela, ai sensi delle disposizioni di cui all'articolo 19, "+
+		"comma 1, lettere a), b) e c), si astengono dall'instaurare, eseguire ovvero proseguire il rapporto, la "+
+		"prestazione professionale e le operazioni e valutano se effettuare una segnalazione di operazione sospetta "+
+		"alla UIF a norma dell'articolo 35.", "LR", "", false)
+	pdf.SetFont("Montserrat", "", 6)
+	pdf.MultiCell(0, 2, "2. I soggetti obbligati si astengono dall'instaurare il rapporto continuativo, "+
+		"eseguire operazioni o prestazioni professionali e pongono fine al rapporto continuativo o alla prestazione "+
+		"professionale già in essere di cui siano, direttamente o indirettamente, parte società fiduciarie, trust, "+
+		"società anonime o controllate attraverso azioni al portatore aventi sede in Paesi terzi ad alto rischio. "+
+		"Tali misure si applicano anche nei confronti delle ulteriori entità giuridiche, altrimenti denominate, "+
+		"aventi sede nei suddetti Paesi, di cui non è possibile identificare il titolare effettivo ne' verificarne "+
+		"l’identità.", "LR", "", false)
+	pdf.MultiCell(0, 2, "3. (…).", "LR", "", false)
+	pdf.MultiCell(0, 2, "4. È fatta in ogni caso salva l'applicazione dell'articolo 35, comma 2, nei "+
+		"casi in cui l'operazione debba essere eseguita in quanto sussiste un obbligo di legge di ricevere "+
+		"l'atto.", "LR", "", false)
+	pdf.SetFont("Montserrat", "B", 6)
+	pdf.MultiCell(0, 2, "Obblighi del cliente / sanzioni", "LR", "", false)
+	pdf.SetFont("Montserrat", "", 6)
+	pdf.MultiCell(0, 2, "Art. 22, comma 1 - I clienti forniscono per iscritto, sotto la propria "+
+		"responsabilità, tutte le informazioni necessarie e aggiornate per consentire ai soggetti obbligati di "+
+		"adempiere agli obblighi di adeguata verifica.", "LR", "", false)
+	pdf.MultiCell(0, 2, "Art. 55, comma 3 - Salvo che il fatto costituisca più grave reato, chiunque "+
+		"essendo obbligato, ai sensi del presente decreto, a fornire i dati e le informazioni necessarie ai fini "+
+		"dell'adeguata verifica della clientela, fornisce dati falsi o informazioni non veritiere, e' punito con la "+
+		"reclusione da sei mesi a tre anni e con la multa da 10.000 euro a 30.000 "+
+		"euro", "LR", "", false)
+	pdf.SetFont("Montserrat", "B", 6)
+	pdf.MultiCell(0, 2, "Nozione di titolare effettivo", "LR", "", false)
+	pdf.MultiCell(0, 2, "Art.1, comma 2, lett. pp) del D. Lgs. n.231/2007 ", "LR", "", false)
+	pdf.SetFont("Montserrat", "", 6)
+	pdf.MultiCell(0, 2, "la persona fisica o le persone fisiche, diverse dal cliente, nell'interesse "+
+		"della quale  o  delle  quali,  in ultima istanza, il rapporto continuativo è istaurato, la prestazione "+
+		"professionale è resa o l'operazione è eseguita.", "LR", "", false)
+	pdf.SetFont("Montserrat", "B", 6)
+	pdf.MultiCell(0, 2, "Nozione di persona politicamente esposta", "LR", "", false)
+	pdf.MultiCell(0, 2, "Art. 1, comma 1, lettera dd) D. Lgs. 231/2007 così come modificato dal D. Lgs. 125/2019", "LR", "", false)
+	pdf.SetFont("Montserrat", "", 6)
+	pdf.MultiCell(0, 2, "Persone politicamente esposte: le persone fisiche che occupano o hanno "+
+		"cessato di occupare da meno di un anno importanti cariche pubbliche, nonché i loro familiari e coloro "+
+		"che con i predetti soggetti intrattengono notoriamente stretti legami, come di "+
+		"seguito elencate:", "LR", "", false)
+	pdf.MultiCell(0, 2, "1) sono persone fisiche che occupano o hanno occupato importanti cariche "+
+		"pubbliche coloro che ricoprono o hanno ricoperto la carica di:", "LR", "", false)
+	pdf.CellFormat(5, 4, "", "L", 0, "", false, 0, "")
+	pdf.MultiCell(0, 2, "1.1 Presidente della Repubblica, Presidente del Consiglio, Ministro, "+
+		"Vice-Ministro e Sottosegretario, Presidente di Regione, assessore regionale, Sindaco di capoluogo di "+
+		"provincia o città metropolitana, Sindaco di comune con popolazione non inferiore a 15.000 abitanti "+
+		"nonché cariche analoghe in Stati esteri;", "R", "", false)
+	pdf.CellFormat(5, 2, "", "L", 0, "", false, 0, "")
+	pdf.MultiCell(0, 2, "1.2 deputato, senatore, parlamentare europeo, consigliere regionale "+
+		"nonché cariche analoghe in Stati esteri;", "R", "", false)
+	pdf.CellFormat(5, 2, "", "L", 0, "", false, 0, "")
+	pdf.MultiCell(0, 2, "1.3 membro degli organi direttivi centrali di partiti politici;", "R", "", false)
+	pdf.CellFormat(5, 4, "", "L", 0, "", false, 0, "")
+	pdf.MultiCell(0, 2, "1.4 giudice della Corte Costituzionale, magistrato della Corte di Cassazione "+
+		"o della Corte dei conti, consigliere di Stato e altri componenti del Consiglio di Giustizia Amministrativa "+
+		"per la Regione siciliana nonché cariche analoghe in Stati esteri;", "R", "", false)
+	pdf.CellFormat(5, 2, "", "L", 0, "", false, 0, "")
+	pdf.MultiCell(0, 2, "1.5 membro degli organi direttivi delle banche centrali e delle autorità "+
+		"indipendenti;", "R", "", false)
+	pdf.CellFormat(5, 2, "", "L", 0, "", false, 0, "")
+	pdf.MultiCell(0, 2, "1.6 ambasciatore, incaricato d’affari ovvero cariche equivalenti in Stati "+
+		"esteri, ufficiale di grado apicale delle forze armate ovvero cariche analoghe in "+
+		"Stati esteri;", "R", "", false)
+	pdf.CellFormat(5, 8, "", "L", 0, "", false, 0, "")
+	pdf.MultiCell(0, 2, "1.7 componente degli organi di amministrazione, direzione o controllo delle "+
+		"imprese controllate, anche indirettamente, dallo Stato italiano o da uno Stato estero ovvero partecipate, "+
+		"in misura prevalente o totalitaria, dalle Regioni, da comuni capoluoghi di provincia e città metropolitane "+
+		"e da comuni con popolazione complessivamente non inferiore a 15.000 "+
+		"abitanti;", "R", "", false)
+	pdf.CellFormat(5, 2, "", "L", 0, "", false, 0, "")
+	pdf.MultiCell(0, 2, "1.8 direttore generale di ASL e di azienda ospedaliera, di azienda ospedaliera "+
+		"universitaria e degli altri enti del servizio sanitario nazionale.", "R", "", false)
+	pdf.CellFormat(5, 2, "", "L", 0, "", false, 0, "")
+	pdf.MultiCell(0, 2, "1.9 direttore, vicedirettore e membro dell’organo di gestione o soggetto "+
+		"svolgenti funzioni equivalenti in organizzazioni internazionali;", "R", "", false)
+	pdf.MultiCell(0, 2, "2) sono familiari di persone politicamente esposte: i genitori, il coniuge o "+
+		"la persona legata in unione civile o convivenza di fatto o istituti assimilabili alla persona politicamente "+
+		"esposta, i figli e i loro coniugi nonché le persone legate ai figli in unione civile o convivenza di fatto "+
+		"o istituti assimilabili;", "LR", "", false)
+	pdf.MultiCell(0, 2, "3) sono soggetti con i quali le persone politicamente esposte intrattengono "+
+		"notoriamente stretti legami:", "LR", "", false)
+	pdf.CellFormat(5, 4, "", "L", 0, "", false, 0, "")
+	pdf.MultiCell(0, 2, "3.1 le persone fisiche che ai sensi del presente decreto detengono, "+
+		"congiuntamente alla persona politicamente esposta, la titolarità effettiva di enti giuridici, trust  e "+
+		"istituti giuridici affini ovvero che intrattengono con la persona politicamente esposta stretti rapporti "+
+		"di affari;", "R", "", false)
+	pdf.CellFormat(5, 4, "", "L", 0, "", false, 0, "")
+	pdf.MultiCell(0, 2, "3.2 le persone fisiche che detengono solo formalmente il controllo totalitario "+
+		"di un’entità notoriamente costituita, di fatto, nell’interesse e a beneficio di una persona politicamente "+
+		"esposta.", "R", "", false)
+	pdf.MultiCell(0, 2, "", "BLR", "", false)
+
+	pdf.AddPage()
 
 	err = pdf.OutputFileAndClose("document/test.pdf")
 	log.Println(err)
