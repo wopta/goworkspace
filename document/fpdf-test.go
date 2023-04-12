@@ -988,6 +988,132 @@ func FpdfHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 			"https://servizi.ivass.it/RuirPubblica/", "", "", false)
 	})
 
+	pdf.SetFont("Montserrat", "B", 11)
+	pdf.MultiCell(0, 3, "ALLEGATO 4 - INFORMAZIONI SULLA DISTRIBUZIONE\nDEL PRODOTTO ASSICURATIVO NON IBIP",
+		"", "CM", false)
+	pdf.Ln(3)
+	pdf.SetFont("Montserrat", "", 9)
+	pdf.MultiCell(0, 3, "Il distributore ha l’obbligo di consegnare o trasmettere al contraente, prima "+
+		"della sottoscrizione di ciascuna proposta o, qualora non prevista, di ciascun contratto assicurativo, il "+
+		"presente documento, che contiene notizie sul modello e l’attività di distribuzione, sulla consulenza fornita "+
+		"e sulle remunerazioni percepite.", "", "", false)
+	pdf.Ln(1)
+	DrawPinkLine(pdf, 0.1)
+	pdf.Ln(0.5)
+	pdf.SetFont("Montserrat", "", 6)
+	pdf.MultiCell(0, 3, "DATI DELLA PERSONA FISICA CHE ENTRA IN CONTATTO CON IL "+
+		"CONTRAENTE", "", "", false)
+	pdf.Ln(1)
+	pdf.SetFont("Montserrat", "", 9)
+	pdf.MultiCell(0, 3, "LOMAZZI MICHELE iscritto alla Sezione A del RUI con numero "+
+		"A000703480 in data 02.03.2022", "", "", false)
+	pdf.Ln(0.5)
+	DrawPinkLine(pdf, 0.1)
+	pdf.Ln(0.5)
+	pdf.SetFont("Montserrat", "", 6)
+	pdf.MultiCell(0, 3, "QUALIFICA", "", "", false)
+	pdf.Ln(1)
+	pdf.SetFont("Montserrat", "", 9)
+	pdf.MultiCell(0, 3, "Responsabile dell’attività di intermediazione assicurativa di Wopta "+
+		"Assicurazioni Srl, Società iscritta alla Sezione A del RUI con numero A000701923 in data "+
+		"14.02.2022", "", "", false)
+	pdf.Ln(0.5)
+	DrawPinkLine(pdf, 0.1)
+	pdf.Ln(0.5)
+	pdf.SetFont("Montserrat", "", 6)
+	pdf.MultiCell(0, 3, "SEDE LEGALE", "", "", false)
+	pdf.Ln(1)
+	pdf.SetFont("Montserrat", "", 9)
+	pdf.MultiCell(0, 3, "Galleria del Corso, 1 – 20122 MILANO (MI)", "", "", false)
+	pdf.Ln(0.5)
+	DrawPinkLine(pdf, 0.1)
+	pdf.Ln(0.5)
+	pdf.SetFont("Montserrat", "", 6)
+	pdf.Cell(50, 3, "RECAPITI TELEFONICI")
+	pdf.Cell(40, 3, "")
+	pdf.MultiCell(50, 3, "E-MAIL", "", "1", false)
+	pdf.Ln(1)
+	pdf.SetFont("Montserrat", "", 9)
+	pdf.Cell(50, 3, "02.91.24.03.46")
+	pdf.Cell(40, 3, "")
+	pdf.MultiCell(50, 3, "info@wopta.it", "", "1", false)
+	pdf.Ln(0.5)
+	DrawPinkLine(pdf, 0.1)
+	pdf.Ln(0.5)
+	pdf.SetFont("Montserrat", "", 6)
+	pdf.Cell(50, 3, "PEC ")
+	pdf.Cell(40, 3, "")
+	pdf.MultiCell(50, 3, "SITO INTERNET", "", "1", false)
+	pdf.Ln(1)
+	pdf.SetFont("Montserrat", "", 9)
+	pdf.Cell(50, 3, "woptaassicurazioni@legalmail.it")
+	pdf.Cell(40, 3, "")
+	pdf.MultiCell(50, 3, "wopta.it", "", "1", false)
+	pdf.Ln(0.5)
+	DrawPinkLine(pdf, 0.1)
+	pdf.Ln(0.5)
+	pdf.SetFont("Montserrat", "", 6)
+	pdf.MultiCell(0, 3, "AUTORITÀ COMPETENTE ALLA VIGILANZA DELL’ATTIVITÀ SVOLTA",
+		"", "", false)
+	pdf.Ln(1)
+	pdf.SetFont("Montserrat", "", 9)
+	pdf.MultiCell(0, 3, "IVASS – Istituto per la Vigilanza sulle Assicurazioni - Via del Quirinale, "+
+		"21 - 00187 Roma", "", "", false)
+	pdf.Ln(0.5)
+	DrawPinkLine(pdf, 0.1)
+	pdf.Ln(3)
+	pdf.SetFont("Montserrat", "B", 10)
+	pdf.MultiCell(0, 3, "SEZIONE I - Informazioni sul modello di distribuzione", "", "", false)
+	pdf.Ln(1)
+	pdf.SetFont("Montserrat", "", 9)
+	pdf.MultiCell(0, 3, "Secondo quanto indicato nel modulo di proposta/polizza e documentazione "+
+		"precontrattuale ricevuta, la distribuzione relativamente a questa proposta/contratto è svolta per conto "+
+		"della seguente impresa di assicurazione: AXA FRANCE VIE S.A.", "", "", false)
+	pdf.Ln(3)
+	pdf.SetFont("Montserrat", "B", 10)
+	pdf.MultiCell(0, 3, "SEZIONE II: Informazioni sull’attività di distribuzione e consulenza", "", "", false)
+	pdf.Ln(1)
+	pdf.SetFont("Montserrat", "", 9)
+	pdf.MultiCell(0, 3, "Nello svolgimento dell’attività di distribuzione, l’intermediario non presta "+
+		"attività di consulenza prima della conclusione del contratto né fornisce al contraente una raccomandazione "+
+		"personalizzata ai sensi dell’art. 119-ter, comma 3, del decreto legislativo n. 209/2005 "+
+		"(Codice delle Assicurazioni Private)", "", "", false)
+	pdf.Ln(1)
+	pdf.MultiCell(0, 3, "L'attività di distribuzione assicurativa è svolta in assenza di obblighi "+
+		"contrattuali che impongano di offrire esclusivamente i contratti di una o più imprese di "+
+		"assicurazioni.", "", "", false)
+	pdf.Ln(3)
+	pdf.SetFont("Montserrat", "B", 10)
+	pdf.MultiCell(0, 3, "SEZIONE III - Informazioni relative alle remunerazioni", "", "", false)
+	pdf.Ln(1)
+	pdf.SetFont("Montserrat", "", 9)
+	pdf.MultiCell(0, 3, "Per il prodotto intermediato, è corrisposto all’intermediario, da parte "+
+		"dell’impresa di assicurazione, un compenso sotto forma di commissione inclusa nel premio "+
+		"assicurativo.", "", "", false)
+	pdf.Ln(1)
+	pdf.MultiCell(0, 3, "L’informazione sopra resa riguarda i compensi complessivamente percepiti da tutti "+
+		"gli intermediari coinvolti nella distribuzione del prodotto.", "", "", false)
+	pdf.Ln(3)
+	pdf.SetFont("Montserrat", "B", 10)
+	pdf.MultiCell(0, 3, "SEZIONE IV – Informazioni sul pagamento dei premi", "", "", false)
+	pdf.Ln(1)
+	pdf.SetFont("Montserrat", "", 9)
+	pdf.MultiCell(0, 3, "Relativamente a questo contratto i premi pagati dal Contraente "+
+		"all’intermediario e le somme destinate ai risarcimenti o ai pagamenti dovuti dalle Imprese di Assicurazione, "+
+		"se regolati per il tramite dell’intermediario costituiscono patrimonio autonomo e separato dal patrimonio "+
+		"dello stesso.", "", "", false)
+	pdf.Ln(3)
+	pdf.SetFont("Montserrat", "B", 10)
+	pdf.MultiCell(0, 3, "Indicare le modalità di pagamento ammesse ", "", "", false)
+	pdf.Ln(1)
+	pdf.SetFont("Montserrat", "", 9)
+	pdf.MultiCell(0, 3, "Sono consentiti, nei confronti di Wopta, esclusivamente bonifico e strumenti di "+
+		"pagamento elettronico, quali ad esempio, carte di credito e/o carte di debito, incluse le carte "+
+		"prepagate.", "", "", false)
+	pdf.Ln(3)
+
+	pdf.AddPage()
+
 	/*tpl := new(fpdf.FpdfTpl)
 
 	fb, err := os.ReadFile("document/assets/template.pdf")
