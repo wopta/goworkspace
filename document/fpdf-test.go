@@ -845,21 +845,21 @@ func FpdfHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	pdf.SetFont("Montserrat", "B", 6)
 	pdf.MultiCell(0, 2, "Obbligo di astensione – art. 42", "LR", "", false)
 	pdf.SetFont("Montserrat", "", 6)
-	pdf.MultiCell(0, 2, "1. I soggetti obbligati che si trovano nell’impossibilità oggettiva di "+
+	pdf.MultiCell(0, 2, "1.\tI soggetti obbligati che si trovano nell’impossibilità oggettiva di "+
 		"effettuare l'adeguata verifica della clientela, ai sensi delle disposizioni di cui all'articolo 19, "+
 		"comma 1, lettere a), b) e c), si astengono dall'instaurare, eseguire ovvero proseguire il rapporto, la "+
 		"prestazione professionale e le operazioni e valutano se effettuare una segnalazione di operazione sospetta "+
 		"alla UIF a norma dell'articolo 35.", "LR", "", false)
 	pdf.SetFont("Montserrat", "", 6)
-	pdf.MultiCell(0, 2, "2. I soggetti obbligati si astengono dall'instaurare il rapporto continuativo, "+
+	pdf.MultiCell(0, 2, "2.\tI soggetti obbligati si astengono dall'instaurare il rapporto continuativo, "+
 		"eseguire operazioni o prestazioni professionali e pongono fine al rapporto continuativo o alla prestazione "+
 		"professionale già in essere di cui siano, direttamente o indirettamente, parte società fiduciarie, trust, "+
 		"società anonime o controllate attraverso azioni al portatore aventi sede in Paesi terzi ad alto rischio. "+
 		"Tali misure si applicano anche nei confronti delle ulteriori entità giuridiche, altrimenti denominate, "+
 		"aventi sede nei suddetti Paesi, di cui non è possibile identificare il titolare effettivo ne' verificarne "+
 		"l’identità.", "LR", "", false)
-	pdf.MultiCell(0, 2, "3. (…).", "LR", "", false)
-	pdf.MultiCell(0, 2, "4. È fatta in ogni caso salva l'applicazione dell'articolo 35, comma 2, nei "+
+	pdf.MultiCell(0, 2, "3.\t(…).", "LR", "", false)
+	pdf.MultiCell(0, 2, "4.\tÈ fatta in ogni caso salva l'applicazione dell'articolo 35, comma 2, nei "+
 		"casi in cui l'operazione debba essere eseguita in quanto sussiste un obbligo di legge di ricevere "+
 		"l'atto.", "LR", "", false)
 	pdf.SetFont("Montserrat", "B", 6)
@@ -888,54 +888,54 @@ func FpdfHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 		"cessato di occupare da meno di un anno importanti cariche pubbliche, nonché i loro familiari e coloro "+
 		"che con i predetti soggetti intrattengono notoriamente stretti legami, come di "+
 		"seguito elencate:", "LR", "", false)
-	pdf.MultiCell(0, 2, "1) sono persone fisiche che occupano o hanno occupato importanti cariche "+
+	pdf.MultiCell(0, 2, "1)\tsono persone fisiche che occupano o hanno occupato importanti cariche "+
 		"pubbliche coloro che ricoprono o hanno ricoperto la carica di:", "LR", "", false)
 	pdf.CellFormat(5, 4, "", "L", 0, "", false, 0, "")
-	pdf.MultiCell(0, 2, "1.1 Presidente della Repubblica, Presidente del Consiglio, Ministro, "+
+	pdf.MultiCell(0, 2, "1.1\t\tPresidente della Repubblica, Presidente del Consiglio, Ministro, "+
 		"Vice-Ministro e Sottosegretario, Presidente di Regione, assessore regionale, Sindaco di capoluogo di "+
 		"provincia o città metropolitana, Sindaco di comune con popolazione non inferiore a 15.000 abitanti "+
 		"nonché cariche analoghe in Stati esteri;", "R", "", false)
 	pdf.CellFormat(5, 2, "", "L", 0, "", false, 0, "")
-	pdf.MultiCell(0, 2, "1.2 deputato, senatore, parlamentare europeo, consigliere regionale "+
+	pdf.MultiCell(0, 2, "1.2\t\tdeputato, senatore, parlamentare europeo, consigliere regionale "+
 		"nonché cariche analoghe in Stati esteri;", "R", "", false)
 	pdf.CellFormat(5, 2, "", "L", 0, "", false, 0, "")
-	pdf.MultiCell(0, 2, "1.3 membro degli organi direttivi centrali di partiti politici;", "R", "", false)
+	pdf.MultiCell(0, 2, "1.3\t\tmembro degli organi direttivi centrali di partiti politici;", "R", "", false)
 	pdf.CellFormat(5, 4, "", "L", 0, "", false, 0, "")
-	pdf.MultiCell(0, 2, "1.4 giudice della Corte Costituzionale, magistrato della Corte di Cassazione "+
+	pdf.MultiCell(0, 2, "1.4\t\tgiudice della Corte Costituzionale, magistrato della Corte di Cassazione "+
 		"o della Corte dei conti, consigliere di Stato e altri componenti del Consiglio di Giustizia Amministrativa "+
 		"per la Regione siciliana nonché cariche analoghe in Stati esteri;", "R", "", false)
 	pdf.CellFormat(5, 2, "", "L", 0, "", false, 0, "")
-	pdf.MultiCell(0, 2, "1.5 membro degli organi direttivi delle banche centrali e delle autorità "+
+	pdf.MultiCell(0, 2, "1.5\t\tmembro degli organi direttivi delle banche centrali e delle autorità "+
 		"indipendenti;", "R", "", false)
 	pdf.CellFormat(5, 2, "", "L", 0, "", false, 0, "")
-	pdf.MultiCell(0, 2, "1.6 ambasciatore, incaricato d’affari ovvero cariche equivalenti in Stati "+
+	pdf.MultiCell(0, 2, "1.6\t\tambasciatore, incaricato d’affari ovvero cariche equivalenti in Stati "+
 		"esteri, ufficiale di grado apicale delle forze armate ovvero cariche analoghe in "+
 		"Stati esteri;", "R", "", false)
 	pdf.CellFormat(5, 8, "", "L", 0, "", false, 0, "")
-	pdf.MultiCell(0, 2, "1.7 componente degli organi di amministrazione, direzione o controllo delle "+
+	pdf.MultiCell(0, 2, "1.7\t\tcomponente degli organi di amministrazione, direzione o controllo delle "+
 		"imprese controllate, anche indirettamente, dallo Stato italiano o da uno Stato estero ovvero partecipate, "+
 		"in misura prevalente o totalitaria, dalle Regioni, da comuni capoluoghi di provincia e città metropolitane "+
 		"e da comuni con popolazione complessivamente non inferiore a 15.000 "+
 		"abitanti;", "R", "", false)
 	pdf.CellFormat(5, 2, "", "L", 0, "", false, 0, "")
-	pdf.MultiCell(0, 2, "1.8 direttore generale di ASL e di azienda ospedaliera, di azienda ospedaliera "+
+	pdf.MultiCell(0, 2, "1.8\t\tdirettore generale di ASL e di azienda ospedaliera, di azienda ospedaliera "+
 		"universitaria e degli altri enti del servizio sanitario nazionale.", "R", "", false)
 	pdf.CellFormat(5, 2, "", "L", 0, "", false, 0, "")
-	pdf.MultiCell(0, 2, "1.9 direttore, vicedirettore e membro dell’organo di gestione o soggetto "+
+	pdf.MultiCell(0, 2, "1.9\t\tdirettore, vicedirettore e membro dell’organo di gestione o soggetto "+
 		"svolgenti funzioni equivalenti in organizzazioni internazionali;", "R", "", false)
-	pdf.MultiCell(0, 2, "2) sono familiari di persone politicamente esposte: i genitori, il coniuge o "+
+	pdf.MultiCell(0, 2, "2)\tsono familiari di persone politicamente esposte: i genitori, il coniuge o "+
 		"la persona legata in unione civile o convivenza di fatto o istituti assimilabili alla persona politicamente "+
 		"esposta, i figli e i loro coniugi nonché le persone legate ai figli in unione civile o convivenza di fatto "+
 		"o istituti assimilabili;", "LR", "", false)
-	pdf.MultiCell(0, 2, "3) sono soggetti con i quali le persone politicamente esposte intrattengono "+
+	pdf.MultiCell(0, 2, "3)\tsono soggetti con i quali le persone politicamente esposte intrattengono "+
 		"notoriamente stretti legami:", "LR", "", false)
 	pdf.CellFormat(5, 4, "", "L", 0, "", false, 0, "")
-	pdf.MultiCell(0, 2, "3.1 le persone fisiche che ai sensi del presente decreto detengono, "+
+	pdf.MultiCell(0, 2, "3.1\t\tle persone fisiche che ai sensi del presente decreto detengono, "+
 		"congiuntamente alla persona politicamente esposta, la titolarità effettiva di enti giuridici, trust  e "+
 		"istituti giuridici affini ovvero che intrattengono con la persona politicamente esposta stretti rapporti "+
 		"di affari;", "R", "", false)
 	pdf.CellFormat(5, 4, "", "L", 0, "", false, 0, "")
-	pdf.MultiCell(0, 2, "3.2 le persone fisiche che detengono solo formalmente il controllo totalitario "+
+	pdf.MultiCell(0, 2, "3.2\t\tle persone fisiche che detengono solo formalmente il controllo totalitario "+
 		"di un’entità notoriamente costituita, di fatto, nell’interesse e a beneficio di una persona politicamente "+
 		"esposta.", "R", "", false)
 	pdf.MultiCell(0, 2, "", "BLR", "", false)
