@@ -21,6 +21,7 @@ const (
 	thinLineWidth    = 0.1
 	smallTextSize    = 6
 	standardTextSize = 9
+	tabDimension     = 15
 )
 
 func LifeSimploHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -48,80 +49,19 @@ func LifeSimploHandler(w http.ResponseWriter, r *http.Request) (string, interfac
 
 	pdf.AddPage()
 
-	GetParagraphTitle(pdf, "Presa visione dei documenti precontrattuali e sottoscrizione Polizza")
-	pdf.Ln(8)
-	pdf.SetFont("Montserrat", "", 8)
-	pdf.SetTextColor(0, 0, 0)
-	email := "biciodallavalle86@gmail.com"
-	pdf.MultiCell(0, 3, "Ho scelto la ricezione della seguente documentazione via e-mail al seguente indirizzo "+
-		"indirizzo"+email+", nonché all’utilizzo della stessa per l’invio delle comunicazioni in corso di contratto da "+
-		"parte di Wopta e della Compagnia. Sono a conoscenza che, qualora volessi modificare questa mia scelta potrò "+
-		"farlo scrivendo alla Compagnia, con le modalità previste "+
-		"nelle Condizioni di Assicurazione.", "", "", false)
-	pdf.SetFont("Montserrat", "B", 8)
-	pdf.MultiCell(0, 3, "Confermo di aver ricevuto e preso visione, prima della conclusione del contratto:", "", "", false)
-	pdf.SetX(15)
-	pdf.MultiCell(0, 3, "1. degli Allegati 3, 4 e 4-ter, di cui al Regolamento IVASS n. 40/2018, relativi "+
-		"agli obblighi informativi e di comportamento dell’Intermediario, inclusa l’informativa privacy "+
-		"dell’intermediario (ai sensi dell’art. 13 del regolamento UE n. 2016/679);", "", "", false)
-	pdf.SetX(15)
-	pdf.MultiCell(0, 3, "2.	del Set informativo, identificato dal modello AX01.0323, contenente: "+
-		"1) Documento informativo precontrattuale per i prodotti assicurativi vita diversi dai prodotti "+
-		"d’investimento assicurativi (DIP Vita), Documento informativo per i prodotti assicurativi danni (DIP Danni), "+
-		"Documento informativo precontrattuale aggiuntivo per i prodotti assicurativi multirischi "+
-		"(DIP aggiuntivo Multirischi), di cui al Regolamento IVASS n. 41/2018; 2) Condizioni di Assicurazione "+
-		"comprensive di Glossario, che dichiaro altresì di conoscere ed accettare.", "", "", false)
-	pdf.SetX(40)
-	pdf.Cell(30, 3, "AXA France Vie")
-	pdf.SetX(-75)
-	pdf.Cell(40, 3, "Firma del Contraente/Assicurato")
-	pdf.Ln(2)
-	pdf.SetX(25)
-	pdf.Cell(20, 3, "(Rappresentanza Generale per l'Italia)")
-	var opt fpdf.ImageOptions
-	opt.ImageType = "png"
-	pdf.ImageOptions(lib.GetAssetPathByEnv("test")+"/firma_axa.png", 35, pdf.GetY()+5, 30, 8, false, opt, 0, "")
-	pdf.Ln(10)
-	pdf.SetDrawColor(0, 0, 0)
-	pdf.SetLineWidth(0.3)
-	pdf.Line(130, pdf.GetY(), 190, pdf.GetY())
-	pdf.Ln(5)
+	GetVisioneDocumentiSection(pdf)
 
-	GetParagraphTitle(pdf, "Il premio per tutte le coperture assicurative attivate sulla polizza – Frazionamento: ANNUALE")
-	pdf.Ln(8)
-	pdf.SetFont("Montserrat", "", 7)
-	pdf.SetTextColor(0, 0, 0)
-	pdf.CellFormat(40, 2, "Premio", "", 0, "", false, 0, "")
-	pdf.SetX(pdf.GetX() + 20)
-	pdf.CellFormat(40, 2, "Imponibile", "", 0, "", false, 0, "")
-	pdf.SetX(pdf.GetX() + 15)
-	pdf.CellFormat(40, 2, "Imposte Assicurative", "", 0, "", false, 0, "")
-	pdf.SetX(pdf.GetX() + 15)
-	pdf.CellFormat(40, 2, "Totale", "RM", 0, "", false, 0, "")
-	pdf.Ln(3)
-	DrawPinkLine(pdf, 0.1)
-	pdf.Ln(1)
-	pdf.CellFormat(40, 2, "Annuale firma del contratto", "", 0, "", false, 0, "")
-	pdf.SetX(pdf.GetX() + 20)
-	pdf.CellFormat(40, 2, "€ 173,30", "", 0, "", false, 0, "")
-	pdf.SetX(pdf.GetX() + 15)
-	pdf.CellFormat(40, 2, "€ 1,88", "", 0, "", false, 0, "")
-	pdf.SetX(pdf.GetX() + 15)
-	pdf.CellFormat(40, 2, "€ 175,18", "RM", 0, "", false, 0, "")
-	pdf.Ln(3)
-	DrawPinkLine(pdf, 0.1)
-	pdf.Ln(5)
+	GetOfferResumeSection(pdf)
 
 	GetParagraphTitle(pdf, "Pagamento dei premi successivi al primo")
 	pdf.Ln(8)
-	pdf.SetFont("Montserrat", "", 9)
-	pdf.SetTextColor(0, 0, 0)
+	SetBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "Il Contraente è tenuto a pagare i Premi entro 30 giorni dalle relative scadenze. "+
 		"In caso di mancato pagamento del premio entro 30 giorni dalla scadenza (c.d. termine di tolleranza) "+
 		"l’assicurazione è sospesa. Il contratto è risolto automaticamente in caso di mancato pagamento "+
 		"del Premio entro 90 giorni dalla scadenza.", "", "", false)
 	pdf.Ln(3)
-	DrawPinkLine(pdf, 0.4)
+	DrawPinkHorizontalLine(pdf, 0.4)
 	pdf.Ln(1)
 	pdf.SetFont("Montserrat", "B", 9)
 	pdf.CellFormat(pdf.GetStringWidth("Tipologia di premio"), 3, "Tipologia di premio:", "", 0, "", false, 0, "")
@@ -141,12 +81,12 @@ func LifeSimploHandler(w http.ResponseWriter, r *http.Request) (string, interfac
 	pdf.SetX(pdf.GetX() + 3)
 	pdf.CellFormat(pdf.GetStringWidth("ANNUALE"), 3, "ANNUALE", "", 0, "", false, 0, "")
 	pdf.Ln(4)
-	DrawPinkLine(pdf, 0.1)
+	DrawPinkHorizontalLine(pdf, 0.1)
 	pdf.Ln(1)
 	pdf.SetFont("Montserrat", "", 9)
 	pdf.Cell(0, 3, "Il Premio è dovuto alle diverse annualità di Polizza, alle date qui sotto indicate:")
 	pdf.Ln(4)
-	DrawPinkLine(pdf, 0.1)
+	DrawPinkHorizontalLine(pdf, 0.1)
 	pdf.Ln(1)
 	pdf.SetX(pdf.GetX() + 12)
 	pdf.CellFormat(pdf.GetStringWidth("04/03/2030:"), 3, "Alla firma:", "", 0, "RM", false, 0, "")
@@ -166,7 +106,7 @@ func LifeSimploHandler(w http.ResponseWriter, r *http.Request) (string, interfac
 	pdf.CellFormat(pdf.GetStringWidth("€ 175,18"), 3, "€ 175,18", "", 0, "RM", false, 0, "")
 	pdf.SetX(pdf.GetX() + 12)
 	pdf.Ln(4)
-	DrawPinkLine(pdf, 0.1)
+	DrawPinkHorizontalLine(pdf, 0.1)
 	pdf.Ln(1)
 	pdf.SetX(pdf.GetX() + 12)
 	pdf.CellFormat(pdf.GetStringWidth("04/03/2030:"), 3, "03/04/2024", "", 0, "RM", false, 0, "")
@@ -186,7 +126,7 @@ func LifeSimploHandler(w http.ResponseWriter, r *http.Request) (string, interfac
 	pdf.CellFormat(pdf.GetStringWidth("€ 175,18"), 3, "€ 175,18", "", 0, "RM", false, 0, "")
 	pdf.SetX(pdf.GetX() + 12)
 	pdf.Ln(4)
-	DrawPinkLine(pdf, 0.1)
+	DrawPinkHorizontalLine(pdf, 0.1)
 	pdf.Ln(1)
 	pdf.SetX(pdf.GetX() + 12)
 	pdf.CellFormat(pdf.GetStringWidth("04/03/2030:"), 3, "03/04/2025", "", 0, "RM", false, 0, "")
@@ -206,7 +146,7 @@ func LifeSimploHandler(w http.ResponseWriter, r *http.Request) (string, interfac
 	pdf.CellFormat(pdf.GetStringWidth("€ 175,18"), 3, "€ 175,18", "", 0, "RM", false, 0, "")
 	pdf.SetX(pdf.GetX() + 12)
 	pdf.Ln(4)
-	DrawPinkLine(pdf, 0.1)
+	DrawPinkHorizontalLine(pdf, 0.1)
 	pdf.Ln(1)
 	pdf.SetX(pdf.GetX() + 12)
 	pdf.CellFormat(pdf.GetStringWidth("04/03/2030:"), 3, "03/04/2026", "", 0, "RM", false, 0, "")
@@ -226,7 +166,7 @@ func LifeSimploHandler(w http.ResponseWriter, r *http.Request) (string, interfac
 	pdf.CellFormat(pdf.GetStringWidth("€ 175,18"), 3, "€ 175,18", "", 0, "RM", false, 0, "")
 	pdf.SetX(pdf.GetX() + 12)
 	pdf.Ln(4)
-	DrawPinkLine(pdf, 0.1)
+	DrawPinkHorizontalLine(pdf, 0.1)
 	pdf.Ln(1)
 	pdf.SetX(pdf.GetX() + 12)
 	pdf.CellFormat(pdf.GetStringWidth("04/03/2030:"), 3, "03/04/2027", "", 0, "RM", false, 0, "")
@@ -246,7 +186,7 @@ func LifeSimploHandler(w http.ResponseWriter, r *http.Request) (string, interfac
 	pdf.CellFormat(pdf.GetStringWidth("€ 175,18"), 3, "€ 175,18", "", 0, "RM", false, 0, "")
 	pdf.SetX(pdf.GetX() + 12)
 	pdf.Ln(4)
-	DrawPinkLine(pdf, 0.1)
+	DrawPinkHorizontalLine(pdf, 0.1)
 	pdf.Ln(1)
 	pdf.MultiCell(0, 3, "In caso di frazionamento mensile i Premi sopra riportati sono dovuti, alle date "+
 		"indicate e con successiva frequenza mensile, in misura di 1/12 per ogni mensilità. Non sono previsti oneri "+
@@ -367,6 +307,7 @@ func LifeSimploHandler(w http.ResponseWriter, r *http.Request) (string, interfac
 		"dall’IVASS, in appendice Elenco I, nr. I.00149.", "", "", false)
 
 	pdf.SetHeaderFunc(func() {
+		var opt fpdf.ImageOptions
 		pdf.SetXY(-30, 7)
 		opt.ImageType = "png"
 		pdf.ImageOptions(lib.GetAssetPathByEnv("test")+"/logo_axa.png", 190, 7, 8, 8, false, opt, 0, "")
@@ -685,7 +626,7 @@ func LifeSimploHandler(w http.ResponseWriter, r *http.Request) (string, interfac
 
 	pdf.SetFooterFunc(func() {
 		pdf.SetY(-30)
-		DrawPinkLine(pdf, 0.4)
+		DrawPinkHorizontalLine(pdf, 0.4)
 		pdf.Ln(5)
 		pdf.SetFont("Montserrat", "B", 7)
 		pdf.SetTextColor(229, 0, 117)
@@ -732,7 +673,7 @@ func LifeSimploHandler(w http.ResponseWriter, r *http.Request) (string, interfac
 		"presente documento, che contiene notizie sul modello e l’attività di distribuzione, sulla consulenza fornita "+
 		"e sulle remunerazioni percepite.", "", "", false)
 	pdf.Ln(1)
-	DrawPinkLine(pdf, 0.1)
+	DrawPinkHorizontalLine(pdf, 0.1)
 	pdf.Ln(0.5)
 	pdf.SetFont("Montserrat", "", 6)
 	pdf.MultiCell(0, 3, "DATI DELLA PERSONA FISICA CHE ENTRA IN CONTATTO CON IL "+
@@ -742,7 +683,7 @@ func LifeSimploHandler(w http.ResponseWriter, r *http.Request) (string, interfac
 	pdf.MultiCell(0, 3, "LOMAZZI MICHELE iscritto alla Sezione A del RUI con numero "+
 		"A000703480 in data 02.03.2022", "", "", false)
 	pdf.Ln(0.5)
-	DrawPinkLine(pdf, 0.1)
+	DrawPinkHorizontalLine(pdf, 0.1)
 	pdf.Ln(0.5)
 	pdf.SetFont("Montserrat", "", 6)
 	pdf.MultiCell(0, 3, "QUALIFICA", "", "", false)
@@ -752,7 +693,7 @@ func LifeSimploHandler(w http.ResponseWriter, r *http.Request) (string, interfac
 		"Assicurazioni Srl, Società iscritta alla Sezione A del RUI con numero A000701923 in data "+
 		"14.02.2022", "", "", false)
 	pdf.Ln(0.5)
-	DrawPinkLine(pdf, 0.1)
+	DrawPinkHorizontalLine(pdf, 0.1)
 	pdf.Ln(0.5)
 	pdf.SetFont("Montserrat", "", 6)
 	pdf.MultiCell(0, 3, "SEDE LEGALE", "", "", false)
@@ -760,7 +701,7 @@ func LifeSimploHandler(w http.ResponseWriter, r *http.Request) (string, interfac
 	pdf.SetFont("Montserrat", "", 9)
 	pdf.MultiCell(0, 3, "Galleria del Corso, 1 – 20122 MILANO (VI)", "", "", false)
 	pdf.Ln(0.5)
-	DrawPinkLine(pdf, 0.1)
+	DrawPinkHorizontalLine(pdf, 0.1)
 	pdf.Ln(0.5)
 	pdf.SetFont("Montserrat", "", 6)
 	pdf.Cell(50, 3, "RECAPITI TELEFONICI")
@@ -772,7 +713,7 @@ func LifeSimploHandler(w http.ResponseWriter, r *http.Request) (string, interfac
 	pdf.Cell(40, 3, "")
 	pdf.MultiCell(50, 3, "info@wopta.it", "", "1", false)
 	pdf.Ln(0.5)
-	DrawPinkLine(pdf, 0.1)
+	DrawPinkHorizontalLine(pdf, 0.1)
 	pdf.Ln(0.5)
 	pdf.SetFont("Montserrat", "", 6)
 	pdf.Cell(50, 3, "PEC ")
@@ -784,7 +725,7 @@ func LifeSimploHandler(w http.ResponseWriter, r *http.Request) (string, interfac
 	pdf.Cell(40, 3, "")
 	pdf.MultiCell(50, 3, "wopta.it", "", "1", false)
 	pdf.Ln(0.5)
-	DrawPinkLine(pdf, 0.1)
+	DrawPinkHorizontalLine(pdf, 0.1)
 	pdf.Ln(0.5)
 	pdf.SetFont("Montserrat", "", 6)
 	pdf.MultiCell(0, 3, "AUTORITÀ COMPETENTE ALLA VIGILANZA DELL’ATTIVITÀ SVOLTA",
@@ -794,7 +735,7 @@ func LifeSimploHandler(w http.ResponseWriter, r *http.Request) (string, interfac
 	pdf.MultiCell(0, 3, "IVASS – Istituto per la Vigilanza sulle Assicurazioni - Via del Quirinale, "+
 		"21 - 00187 Roma", "", "", false)
 	pdf.Ln(0.5)
-	DrawPinkLine(pdf, 0.1)
+	DrawPinkHorizontalLine(pdf, 0.1)
 	pdf.Ln(3)
 	pdf.SetFont("Montserrat", "B", 10)
 	pdf.MultiCell(0, 3, "SEZIONE I - Informazioni sul modello di distribuzione", "", "", false)
@@ -861,7 +802,7 @@ func LifeSimploHandler(w http.ResponseWriter, r *http.Request) (string, interfac
 		"trasmette al contraente il presente documento prima della sottoscrizione della proposta o, qualora non "+
 		"prevista, del contratto di assicurazione.", "", "", false)
 	pdf.Ln(1)
-	DrawPinkLine(pdf, 0.1)
+	DrawPinkHorizontalLine(pdf, 0.1)
 	pdf.Ln(0.5)
 	pdf.SetFont("Montserrat", "", 6)
 	pdf.MultiCell(0, 3, "DATI DELLA PERSONA FISICA CHE ENTRA IN CONTATTO CON IL "+
@@ -871,7 +812,7 @@ func LifeSimploHandler(w http.ResponseWriter, r *http.Request) (string, interfac
 	pdf.MultiCell(0, 3, "LOMAZZI MICHELE iscritto alla Sezione A del RUI con numero "+
 		"A000703480 in data 02.03.2022", "", "", false)
 	pdf.Ln(0.5)
-	DrawPinkLine(pdf, 0.1)
+	DrawPinkHorizontalLine(pdf, 0.1)
 	pdf.Ln(0.5)
 	pdf.SetFont("Montserrat", "", 6)
 	pdf.MultiCell(0, 3, "QUALIFICA", "", "", false)
@@ -881,7 +822,7 @@ func LifeSimploHandler(w http.ResponseWriter, r *http.Request) (string, interfac
 		"Assicurazioni Srl, Società iscritta alla Sezione A del RUI con numero A000701923 in data "+
 		"14.02.2022", "", "", false)
 	pdf.Ln(0.5)
-	DrawPinkLine(pdf, 0.1)
+	DrawPinkHorizontalLine(pdf, 0.1)
 	pdf.Ln(0.5)
 	pdf.SetFont("Montserrat", "", 6)
 	pdf.MultiCell(0, 3, "SEDE LEGALE", "", "", false)
@@ -889,7 +830,7 @@ func LifeSimploHandler(w http.ResponseWriter, r *http.Request) (string, interfac
 	pdf.SetFont("Montserrat", "", 9)
 	pdf.MultiCell(0, 3, "Galleria del Corso, 1 – 20122 MILANO (VI)", "", "", false)
 	pdf.Ln(0.5)
-	DrawPinkLine(pdf, 0.1)
+	DrawPinkHorizontalLine(pdf, 0.1)
 	pdf.Ln(0.5)
 	pdf.SetFont("Montserrat", "", 6)
 	pdf.Cell(50, 3, "RECAPITI TELEFONICI")
@@ -901,7 +842,7 @@ func LifeSimploHandler(w http.ResponseWriter, r *http.Request) (string, interfac
 	pdf.Cell(40, 3, "")
 	pdf.MultiCell(50, 3, "info@wopta.it", "", "1", false)
 	pdf.Ln(0.5)
-	DrawPinkLine(pdf, 0.1)
+	DrawPinkHorizontalLine(pdf, 0.1)
 	pdf.Ln(0.5)
 	pdf.SetFont("Montserrat", "", 6)
 	pdf.Cell(50, 3, "PEC ")
@@ -913,7 +854,7 @@ func LifeSimploHandler(w http.ResponseWriter, r *http.Request) (string, interfac
 	pdf.Cell(40, 3, "")
 	pdf.MultiCell(50, 3, "wopta.it", "", "1", false)
 	pdf.Ln(0.5)
-	DrawPinkLine(pdf, 0.1)
+	DrawPinkHorizontalLine(pdf, 0.1)
 	pdf.Ln(0.5)
 	pdf.SetFont("Montserrat", "", 6)
 	pdf.MultiCell(0, 3, "AUTORITÀ COMPETENTE ALLA VIGILANZA DELL’ATTIVITÀ SVOLTA",
@@ -923,7 +864,7 @@ func LifeSimploHandler(w http.ResponseWriter, r *http.Request) (string, interfac
 	pdf.MultiCell(0, 3, "IVASS – Istituto per la Vigilanza sulle Assicurazioni - Via del Quirinale, "+
 		"21 - 00187 Roma", "", "", false)
 	pdf.Ln(0.5)
-	DrawPinkLine(pdf, 0.1)
+	DrawPinkHorizontalLine(pdf, 0.1)
 	pdf.Ln(3)
 	pdf.SetFont("Montserrat", "B", 10)
 	pdf.MultiCell(0, 3, "Sezione I - Regole generali per la distribuzione di prodotti assicurativi",
@@ -1198,16 +1139,80 @@ func LifeSimploHandler(w http.ResponseWriter, r *http.Request) (string, interfac
 	return "", nil, err
 }
 
+func GetOfferResumeSection(pdf *fpdf.Fpdf) {
+	GetParagraphTitle(pdf, "Il premio per tutte le coperture assicurative attivate sulla polizza – Frazionamento: ANNUALE")
+	pdf.Ln(8)
+	SetBlackRegularFont(pdf, standardTextSize)
+	pdf.SetTextColor(0, 0, 0)
+	pdf.CellFormat(40, 2, "Premio", "", 0, "", false, 0, "")
+	pdf.SetX(pdf.GetX() + 20)
+	pdf.CellFormat(40, 2, "Imponibile", "", 0, "", false, 0, "")
+	pdf.SetX(pdf.GetX() + 15)
+	pdf.CellFormat(40, 2, "Imposte Assicurative", "", 0, "", false, 0, "")
+	pdf.SetX(pdf.GetX() + 15)
+	pdf.CellFormat(40, 2, "Totale", "RM", 0, "", false, 0, "")
+	pdf.Ln(3)
+	DrawPinkHorizontalLine(pdf, 0.1)
+	pdf.Ln(1)
+	pdf.CellFormat(40, 2, "Annuale firma del contratto", "", 0, "", false, 0, "")
+	pdf.SetX(pdf.GetX() + 20)
+	pdf.CellFormat(40, 2, "€ 173,30", "", 0, "", false, 0, "")
+	pdf.SetX(pdf.GetX() + 15)
+	pdf.CellFormat(40, 2, "€ 1,88", "", 0, "", false, 0, "")
+	pdf.SetX(pdf.GetX() + 15)
+	pdf.CellFormat(40, 2, "€ 175,18", "RM", 0, "", false, 0, "")
+	pdf.Ln(3)
+	DrawPinkHorizontalLine(pdf, 0.1)
+	pdf.Ln(3)
+}
+
+func GetVisioneDocumentiSection(pdf *fpdf.Fpdf) {
+	GetParagraphTitle(pdf, "Presa visione dei documenti precontrattuali e sottoscrizione Polizza")
+	pdf.Ln(8)
+	SetBlackRegularFont(pdf, standardTextSize)
+	email := "biciodallavalle86@gmail.com"
+	pdf.MultiCell(0, 3, "Ho scelto la ricezione della seguente documentazione via e-mail al seguente indirizzo "+
+		"indirizzo"+email+", nonché all’utilizzo della stessa per l’invio delle comunicazioni in corso di contratto da "+
+		"parte di Wopta e della Compagnia. Sono a conoscenza che, qualora volessi modificare questa mia scelta potrò "+
+		"farlo scrivendo alla Compagnia, con le modalità previste "+
+		"nelle Condizioni di Assicurazione.", "", "", false)
+	SetBlackBoldFont(pdf, standardTextSize)
+	pdf.MultiCell(0, 3, "Confermo di aver ricevuto e preso visione, prima della conclusione del contratto:", "", "", false)
+	IndentedText(pdf, "1. degli Allegati 3, 4 e 4-ter, di cui al Regolamento IVASS n. 40/2018, relativi "+
+		"agli obblighi informativi e di comportamento dell’Intermediario, inclusa l’informativa privacy "+
+		"dell’intermediario (ai sensi dell’art. 13 del regolamento UE n. 2016/679);")
+	IndentedText(pdf, "2. del Set informativo, identificato dal modello AX01.0323, contenente: "+
+		"1) Documento informativo precontrattuale per i prodotti assicurativi vita diversi dai prodotti "+
+		"d’investimento assicurativi (DIP Vita), Documento informativo per i prodotti assicurativi danni (DIP Danni), "+
+		"Documento informativo precontrattuale aggiuntivo per i prodotti assicurativi multirischi "+
+		"(DIP aggiuntivo Multirischi), di cui al Regolamento IVASS n. 41/2018; 2) Condizioni di Assicurazione "+
+		"comprensive di Glossario, che dichiaro altresì di conoscere ed accettare.")
+	pdf.Ln(2)
+	pdf.SetX(40)
+	pdf.Cell(30, 3, "AXA France Vie")
+	pdf.SetX(-75)
+	pdf.Cell(40, 3, "Firma del Contraente/Assicurato")
+	pdf.Ln(2)
+	pdf.SetX(25)
+	pdf.Cell(20, 3, "(Rappresentanza Generale per l'Italia)")
+	var opt fpdf.ImageOptions
+	opt.ImageType = "png"
+	pdf.ImageOptions(lib.GetAssetPathByEnv("test")+"/firma_axa.png", 35, pdf.GetY()+5, 30, 8, false, opt, 0, "")
+	pdf.Ln(10)
+	DrawBlackLine(pdf, thickLineWidth)
+	pdf.Ln(5)
+}
+
 func DrawSignatureForm(pdf *fpdf.Fpdf) {
 	pdf.SetX(-80)
 	pdf.Cell(0, 3, "Firma del Contraente/Assicurato")
 	pdf.Ln(15)
-	DrawBlackLine(pdf)
+	DrawBlackLine(pdf, thickLineWidth)
 }
 
-func DrawBlackLine(pdf *fpdf.Fpdf) {
+func DrawBlackLine(pdf *fpdf.Fpdf, width float64) {
 	pdf.SetDrawColor(0, 0, 0)
-	pdf.SetLineWidth(0.4)
+	pdf.SetLineWidth(width)
 	pdf.Line(130, pdf.GetY(), 190, pdf.GetY())
 }
 
@@ -1242,7 +1247,7 @@ func GetReferenteTerzoSection(pdf *fpdf.Fpdf) {
 }
 
 func GetReferenteTerzoTable(pdf *fpdf.Fpdf) {
-	DrawPinkLine(pdf, thickLineWidth)
+	DrawPinkHorizontalLine(pdf, thickLineWidth)
 	pdf.Ln(1)
 	SetBlackBoldFont(pdf, standardTextSize)
 	pdf.Cell(50, 2, "Cognome e nome")
@@ -1254,7 +1259,7 @@ func GetReferenteTerzoTable(pdf *fpdf.Fpdf) {
 	SetBlackRegularFont(pdf, standardTextSize)
 	pdf.Cell(20, 2, "=====")
 	pdf.Ln(3)
-	DrawPinkLine(pdf, thinLineWidth)
+	DrawPinkHorizontalLine(pdf, thinLineWidth)
 	pdf.Ln(2)
 	SetBlackBoldFont(pdf, standardTextSize)
 	pdf.Cell(50, 2, "Indirizzo")
@@ -1263,7 +1268,7 @@ func GetReferenteTerzoTable(pdf *fpdf.Fpdf) {
 	pdf.SetX(pdf.GetX() + 60)
 	SetBlackBoldFont(pdf, standardTextSize)
 	pdf.Ln(3)
-	DrawPinkLine(pdf, thinLineWidth)
+	DrawPinkHorizontalLine(pdf, thinLineWidth)
 	pdf.Ln(2)
 	SetBlackBoldFont(pdf, standardTextSize)
 	pdf.Cell(50, 2, "Mail")
@@ -1275,7 +1280,7 @@ func GetReferenteTerzoTable(pdf *fpdf.Fpdf) {
 	SetBlackRegularFont(pdf, standardTextSize)
 	pdf.Cell(20, 2, "=====")
 	pdf.Ln(3)
-	DrawPinkLine(pdf, thinLineWidth)
+	DrawPinkHorizontalLine(pdf, thinLineWidth)
 }
 
 func GetContractorInfoSection(pdf *fpdf.Fpdf) {
@@ -1285,7 +1290,7 @@ func GetContractorInfoSection(pdf *fpdf.Fpdf) {
 }
 
 func GetContractorInfoTable(pdf *fpdf.Fpdf) {
-	DrawPinkLine(pdf, thickLineWidth)
+	DrawPinkHorizontalLine(pdf, thickLineWidth)
 	pdf.Ln(2)
 	SetBlackBoldFont(pdf, standardTextSize)
 	pdf.Cell(20, 2, "Cognome e Nome")
@@ -1299,7 +1304,7 @@ func GetContractorInfoTable(pdf *fpdf.Fpdf) {
 	SetBlackRegularFont(pdf, standardTextSize)
 	pdf.Cell(20, 2, "DLLFRZ86T09E970X")
 	pdf.Ln(2.5)
-	DrawPinkLine(pdf, thinLineWidth)
+	DrawPinkHorizontalLine(pdf, thinLineWidth)
 	pdf.Ln(2)
 	SetBlackBoldFont(pdf, standardTextSize)
 	pdf.Cell(20, 2, "Residente in")
@@ -1307,7 +1312,7 @@ func GetContractorInfoTable(pdf *fpdf.Fpdf) {
 	pdf.SetX(pdf.GetX() + 24)
 	pdf.Cell(20, 2, "VIA TEZZE, 45/A - 36060 PIANEZZE (VI)")
 	pdf.Ln(2.5)
-	DrawPinkLine(pdf, thinLineWidth)
+	DrawPinkHorizontalLine(pdf, thinLineWidth)
 	pdf.Ln(2)
 	SetBlackBoldFont(pdf, standardTextSize)
 	pdf.Cell(20, 2, "Mail")
@@ -1321,7 +1326,7 @@ func GetContractorInfoTable(pdf *fpdf.Fpdf) {
 	SetBlackRegularFont(pdf, 9)
 	pdf.Cell(20, 2, "3494948711")
 	pdf.Ln(3)
-	DrawPinkLine(pdf, thickLineWidth)
+	DrawPinkHorizontalLine(pdf, thickLineWidth)
 	pdf.Ln(1)
 }
 
@@ -1346,7 +1351,7 @@ func GetGuaranteesTable(pdf *fpdf.Fpdf) {
 
 	*/
 	pdf.Ln(1)
-	DrawPinkLine(pdf, thinLineWidth)
+	DrawPinkHorizontalLine(pdf, thinLineWidth)
 	pdf.CellFormat(90, 6, "Decesso", "", 0, "", false, 0, "")
 	SetBlackRegularFont(pdf, standardTextSize)
 	pdf.CellFormat(25, 6, "100.000 €", "", 0, "RM", false, 0, "")
@@ -1354,7 +1359,7 @@ func GetGuaranteesTable(pdf *fpdf.Fpdf) {
 	pdf.CellFormat(25, 6, "04/03/2023", "", 0, "CM", false, 0, "")
 	pdf.CellFormat(25, 6, "97,74 €     ", "", 0, "RM", false, 0, "")
 	pdf.Ln(5)
-	DrawPinkLine(pdf, thinLineWidth)
+	DrawPinkHorizontalLine(pdf, thinLineWidth)
 	SetBlackBoldFont(pdf, standardTextSize)
 	pdf.CellFormat(90, 6, "Invalidità Totale Permanente da Infortunio o Malattia", "", 0, "", false, 0, "")
 	SetBlackRegularFont(pdf, standardTextSize)
@@ -1363,7 +1368,7 @@ func GetGuaranteesTable(pdf *fpdf.Fpdf) {
 	pdf.CellFormat(25, 6, "04/03/2023", "", 0, "CM", false, 0, "")
 	pdf.CellFormat(21, 6, "12,02 € (*)", "", 0, "RM", false, 0, "")
 	pdf.Ln(5)
-	DrawPinkLine(pdf, thinLineWidth)
+	DrawPinkHorizontalLine(pdf, thinLineWidth)
 	SetBlackBoldFont(pdf, standardTextSize)
 	pdf.CellFormat(90, 6, "Inabilità Temporanea da Infortunio o Malattia", "", 0, "", false, 0, "")
 	SetBlackRegularFont(pdf, standardTextSize)
@@ -1372,7 +1377,7 @@ func GetGuaranteesTable(pdf *fpdf.Fpdf) {
 	pdf.CellFormat(25, 6, "04/03/2023", "", 0, "CM", false, 0, "")
 	pdf.CellFormat(21, 6, "10,00 € (*)", "", 0, "RM", false, 0, "")
 	pdf.Ln(5)
-	DrawPinkLine(pdf, thinLineWidth)
+	DrawPinkHorizontalLine(pdf, thinLineWidth)
 	SetBlackBoldFont(pdf, standardTextSize)
 	pdf.CellFormat(90, 6, "Malattie Gravi", "", 0, "", false, 0, "")
 	SetBlackRegularFont(pdf, standardTextSize)
@@ -1381,7 +1386,7 @@ func GetGuaranteesTable(pdf *fpdf.Fpdf) {
 	pdf.CellFormat(25, 6, "04/03/2023", "", 0, "CM", false, 0, "")
 	pdf.CellFormat(21, 6, "55,42 € (*)", "", 0, "RM", false, 0, "")
 	pdf.Ln(5)
-	DrawPinkLine(pdf, thinLineWidth)
+	DrawPinkHorizontalLine(pdf, thinLineWidth)
 	pdf.Ln(0.5)
 	SetBlackRegularFont(pdf, smallTextSize)
 	pdf.Cell(80, 3, "(*) imposte assicurative di legge incluse nella misura del 2,50% del premio imponibile")
@@ -1423,7 +1428,7 @@ func GetBeneficiariSection(pdf *fpdf.Fpdf) {
 
 func GetBeneficiariTable(pdf *fpdf.Fpdf) {
 	pdf.Ln(5)
-	DrawPinkLine(pdf, thickLineWidth)
+	DrawPinkHorizontalLine(pdf, thickLineWidth)
 	pdf.Ln(1)
 	SetBlackBoldFont(pdf, standardTextSize)
 	pdf.Cell(50, 2, "Cognome e nome")
@@ -1435,7 +1440,7 @@ func GetBeneficiariTable(pdf *fpdf.Fpdf) {
 	SetBlackRegularFont(pdf, standardTextSize)
 	pdf.Cell(20, 2, "=====")
 	pdf.Ln(3)
-	DrawPinkLine(pdf, thinLineWidth)
+	DrawPinkHorizontalLine(pdf, thinLineWidth)
 	pdf.Ln(2)
 	SetBlackBoldFont(pdf, standardTextSize)
 	pdf.Cell(50, 2, "Indirizzo")
@@ -1444,7 +1449,7 @@ func GetBeneficiariTable(pdf *fpdf.Fpdf) {
 	pdf.SetX(pdf.GetX() + 60)
 	SetBlackBoldFont(pdf, standardTextSize)
 	pdf.Ln(3)
-	DrawPinkLine(pdf, thinLineWidth)
+	DrawPinkHorizontalLine(pdf, thinLineWidth)
 	pdf.Ln(2)
 	SetBlackBoldFont(pdf, standardTextSize)
 	pdf.Cell(50, 2, "Mail")
@@ -1456,22 +1461,22 @@ func GetBeneficiariTable(pdf *fpdf.Fpdf) {
 	SetBlackRegularFont(pdf, standardTextSize)
 	pdf.Cell(20, 2, "=====")
 	pdf.Ln(3)
-	DrawPinkLine(pdf, thinLineWidth)
+	DrawPinkHorizontalLine(pdf, thinLineWidth)
 	pdf.Ln(2)
 	SetBlackBoldFont(pdf, standardTextSize)
 	pdf.Cell(50, 2, "Relazione con Assicurato")
 	SetBlackRegularFont(pdf, standardTextSize)
 	pdf.Cell(20, 2, "=====")
 	pdf.Ln(3)
-	DrawPinkLine(pdf, thinLineWidth)
+	DrawPinkHorizontalLine(pdf, thinLineWidth)
 	pdf.Ln(2)
 	pdf.Cell(165, 2, "Consenso ad invio comunicazioni da parte della Compagnia al beneficiario, prima "+
 		"dell'evento Decesso:")
 	pdf.Cell(20, 2, "=====")
 	pdf.Ln(3)
-	DrawPinkLine(pdf, thinLineWidth)
+	DrawPinkHorizontalLine(pdf, thinLineWidth)
 	pdf.Ln(2)
-	DrawPinkLine(pdf, thickLineWidth)
+	DrawPinkHorizontalLine(pdf, thickLineWidth)
 	pdf.Ln(1)
 	SetBlackBoldFont(pdf, standardTextSize)
 	pdf.Cell(50, 2, "Cognome e nome")
@@ -1483,7 +1488,7 @@ func GetBeneficiariTable(pdf *fpdf.Fpdf) {
 	SetBlackRegularFont(pdf, standardTextSize)
 	pdf.Cell(20, 2, "=====")
 	pdf.Ln(3)
-	DrawPinkLine(pdf, thinLineWidth)
+	DrawPinkHorizontalLine(pdf, thinLineWidth)
 	pdf.Ln(2)
 	SetBlackBoldFont(pdf, standardTextSize)
 	pdf.Cell(50, 2, "Indirizzo")
@@ -1492,7 +1497,7 @@ func GetBeneficiariTable(pdf *fpdf.Fpdf) {
 	pdf.SetX(pdf.GetX() + 60)
 	SetBlackBoldFont(pdf, standardTextSize)
 	pdf.Ln(3)
-	DrawPinkLine(pdf, thinLineWidth)
+	DrawPinkHorizontalLine(pdf, thinLineWidth)
 	pdf.Ln(2)
 	SetBlackBoldFont(pdf, standardTextSize)
 	pdf.Cell(50, 2, "Mail")
@@ -1504,20 +1509,20 @@ func GetBeneficiariTable(pdf *fpdf.Fpdf) {
 	SetBlackRegularFont(pdf, standardTextSize)
 	pdf.Cell(20, 2, "=====")
 	pdf.Ln(3)
-	DrawPinkLine(pdf, thinLineWidth)
+	DrawPinkHorizontalLine(pdf, thinLineWidth)
 	pdf.Ln(2)
 	SetBlackBoldFont(pdf, standardTextSize)
 	pdf.Cell(50, 2, "Relazione con Assicurato")
 	SetBlackRegularFont(pdf, standardTextSize)
 	pdf.Cell(20, 2, "=====")
 	pdf.Ln(3)
-	DrawPinkLine(pdf, thinLineWidth)
+	DrawPinkHorizontalLine(pdf, thinLineWidth)
 	pdf.Ln(2)
 	pdf.Cell(165, 2, "Consenso ad invio comunicazioni da parte della Compagnia al beneficiario, prima "+
 		"dell'evento Decesso:")
 	pdf.Cell(20, 2, "=====")
 	pdf.Ln(3)
-	DrawPinkLine(pdf, thinLineWidth)
+	DrawPinkHorizontalLine(pdf, thinLineWidth)
 	pdf.Ln(1)
 }
 
@@ -1625,7 +1630,7 @@ func SetBlackRegularFont(pdf *fpdf.Fpdf, fontSize float64) {
 	pdf.SetFont("Montserrat", "", fontSize)
 }
 
-func DrawPinkLine(pdf *fpdf.Fpdf, lineWidth float64) {
+func DrawPinkHorizontalLine(pdf *fpdf.Fpdf, lineWidth float64) {
 	pdf.SetDrawColor(229, 0, 117)
 	pdf.SetLineWidth(lineWidth)
 	pdf.Line(11, pdf.GetY(), 200, pdf.GetY())
@@ -1651,4 +1656,9 @@ func PrintStatement(pdf *fpdf.Fpdf, statement *models.Statement) {
 		}
 		pdf.MultiCell(0, 3.5, question.Question, "", "", false)
 	}
+}
+
+func IndentedText(pdf *fpdf.Fpdf, content string) {
+	pdf.SetX(tabDimension)
+	pdf.MultiCell(0, 3, content, "", fpdf.BorderLeft, false)
 }
