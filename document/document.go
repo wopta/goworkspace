@@ -44,11 +44,6 @@ func Document(w http.ResponseWriter, r *http.Request) {
 				Handler: SignNamirialV6,
 				Method:  "POST",
 			},
-			{
-				Route:   "/v1/fpdf",
-				Handler: FpdfHandler,
-				Method:  http.MethodPost,
-			},
 		},
 	}
 	route.Router(w, r)
