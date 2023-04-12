@@ -1590,9 +1590,9 @@ func initFpdf() *fpdf.Fpdf {
 }
 
 func loadCustomFonts(pdf *fpdf.Fpdf) {
-	pdf.AddUTF8Font("Montserrat", "", "test/assets/montserrat_light.ttf")
-	pdf.AddUTF8Font("Montserrat", "B", "test/assets/montserrat_bold.ttf")
-	pdf.AddUTF8Font("Montserrat", "I", "test/assets/montserrat_italic.ttf")
+	pdf.AddUTF8Font("Montserrat", "", lib.GetAssetPathByEnv("test")+"/montserrat_light.ttf")
+	pdf.AddUTF8Font("Montserrat", "B", lib.GetAssetPathByEnv("test")+"/montserrat_bold.ttf")
+	pdf.AddUTF8Font("Montserrat", "I", lib.GetAssetPathByEnv("test")+"/montserrat_italic.ttf")
 }
 
 func Save(pdf *fpdf.Fpdf) (string, error) {
