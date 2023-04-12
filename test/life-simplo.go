@@ -80,7 +80,7 @@ func LifeSimploHandler(w http.ResponseWriter, r *http.Request) (string, interfac
 	pdf.Cell(20, 3, "(Rappresentanza Generale per l'Italia)")
 	var opt fpdf.ImageOptions
 	opt.ImageType = "png"
-	pdf.ImageOptions("document/assets/firma_axa.png", 35, pdf.GetY()+5, 30, 8, false, opt, 0, "")
+	pdf.ImageOptions(lib.GetAssetPathByEnv("test")+"/firma_axa.png", 35, pdf.GetY()+5, 30, 8, false, opt, 0, "")
 	pdf.Ln(10)
 	pdf.SetDrawColor(0, 0, 0)
 	pdf.SetLineWidth(0.3)
@@ -369,7 +369,7 @@ func LifeSimploHandler(w http.ResponseWriter, r *http.Request) (string, interfac
 	pdf.SetHeaderFunc(func() {
 		pdf.SetXY(-30, 7)
 		opt.ImageType = "png"
-		pdf.ImageOptions("document/assets/logo_axa.png", 190, 7, 8, 8, false, opt, 0, "")
+		pdf.ImageOptions(lib.GetAssetPathByEnv("test")+"/logo_axa.png", 190, 7, 8, 8, false, opt, 0, "")
 		pdf.Ln(15)
 	})
 
@@ -677,7 +677,7 @@ func LifeSimploHandler(w http.ResponseWriter, r *http.Request) (string, interfac
 	pdf.SetHeaderFunc(func() {
 		var opt fpdf.ImageOptions
 		opt.ImageType = "png"
-		pdf.ImageOptions("document/assets/ARTW_LOGO_RGB_400px.png", 10, 6, 0, 15, false, opt, 0, "")
+		pdf.ImageOptions(lib.GetAssetPathByEnv("test")+"/ARTW_LOGO_RGB_400px.png", 10, 6, 0, 15, false, opt, 0, "")
 		pdf.Ln(10)
 	})
 
@@ -1213,7 +1213,7 @@ func DrawBlackLine(pdf *fpdf.Fpdf) {
 
 func GetStatementsSection(pdf *fpdf.Fpdf) {
 	var statements Statements
-	b, err := os.ReadFile("test/response.json")
+	b, err := os.ReadFile(lib.GetAssetPathByEnv("test") + "/response.json")
 	if err != nil {
 		lib.CheckError(err)
 	}
@@ -1524,7 +1524,7 @@ func GetBeneficiariTable(pdf *fpdf.Fpdf) {
 func GetHeader(pdf *fpdf.Fpdf, name string) {
 	var opt fpdf.ImageOptions
 	var product, logoPath string
-	pathPrefix := "document/assets/logo_"
+	pathPrefix := lib.GetAssetPathByEnv("test") + "/logo_"
 
 	switch name {
 	case "life":
@@ -1543,7 +1543,7 @@ func GetHeader(pdf *fpdf.Fpdf, name string) {
 		pdf.SetXY(23, 13)
 		pdf.SetTextColor(92, 89, 92)
 		pdf.Cell(10, 6, product)
-		pdf.ImageOptions("document/assets/ARTW_LOGO_RGB_400px.png", 158, 6, 0, 10, false, opt, 0, "")
+		pdf.ImageOptions(lib.GetAssetPathByEnv("test")+"/ARTW_LOGO_RGB_400px.png", 158, 6, 0, 10, false, opt, 0, "")
 
 		pdf.SetTextColor(0, 0, 0)
 		pdf.SetFont("Montserrat", "B", 8)
@@ -1572,7 +1572,7 @@ func GetFooter(pdf *fpdf.Fpdf) {
 		pdf.SetFont("Montserrat", "B", 6)
 		pdf.MultiCell(0, 3, "Wopta per te. Vita è un prodotto assicurativo di AXA France Vie S.A. – Rappresentanza Generale per l’Italia\ndistribuito da Wopta Assicurazioni S.r.l.", "", "", false)
 		opt.ImageType = "png"
-		pdf.ImageOptions("document/assets/logo_axa.png", 190, 283, 8, 8, false, opt, 0, "")
+		pdf.ImageOptions(lib.GetAssetPathByEnv("test")+"/logo_axa.png", 190, 283, 8, 8, false, opt, 0, "")
 	})
 }
 
