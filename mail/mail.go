@@ -105,7 +105,7 @@ type MailRequest struct {
 }
 type MailValidate struct {
 	Mail    string `firestore:"mail,omitempty" json:"mail,omitempty"`
-	IsValid bool   `firestore:"isValid ,omitempty" json:"isValid ,omitempty"`
+	IsValid bool   `firestore:"isValid " json:"isValid "`
 }
 
 func Send(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
