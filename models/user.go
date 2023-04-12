@@ -50,7 +50,7 @@ type User struct {
 	VatCode        string        `firestore:"vatCode" json:"vatCode" bigquery:"vatCode"`
 	RiskClass      string        `firestore:"riskClass" json:"riskClass,omitempty" bigquery:"riskClass"`
 	CreationDate   time.Time     `firestore:"creationDate,omitempty" json:"creationDate,omitempty" bigquery:"-"`
-	UpdatedDate    time.Time     `firestore:"updatedDate" json:"updatedDate,omitempty" bigquery:"-"`
+	UpdatedDate    time.Time     `firestore:"updatedDate,omitempty " json:"updatedDate,omitempty" bigquery:"-"`
 	PoliciesUid    []string      `firestore:"policiesUid" json:"policiesUid,omitempty" bigquery:"-"`
 	BigPoliciesUid string        `firestore:"-" json:"-" bigquery:"policiesUid"`
 	Claims         *[]Claim      `firestore:"claims" json:"claims,omitempty" bigquery:"-"`
