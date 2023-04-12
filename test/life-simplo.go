@@ -1213,7 +1213,7 @@ func DrawBlackLine(pdf *fpdf.Fpdf) {
 
 func GetStatementsSection(pdf *fpdf.Fpdf) {
 	var statements Statements
-	b, err := os.ReadFile("document/response.json")
+	b, err := os.ReadFile("test/response.json")
 	if err != nil {
 		lib.CheckError(err)
 	}
@@ -1316,7 +1316,7 @@ func GetContractorInfoTable(pdf *fpdf.Fpdf) {
 	pdf.Cell(20, 2, "biciodallavalle86@gmail.com")
 	pdf.SetX(pdf.GetX() + 60)
 	SetBlackBoldFont(pdf, standardTextSize)
-	pdf.Cell(10, 2, "Telefono")
+	pdf.Cell(10, 2, "Telefono:")
 	pdf.SetX(pdf.GetX() + 20)
 	SetBlackRegularFont(pdf, 9)
 	pdf.Cell(20, 2, "3494948711")
