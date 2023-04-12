@@ -1,6 +1,7 @@
-package document
+package test
 
 import (
+	"bytes"
 	"encoding/json"
 	"github.com/go-pdf/fpdf"
 	"github.com/wopta/goworkspace/lib"
@@ -22,7 +23,7 @@ const (
 	standardTextSize = 9
 )
 
-func FpdfHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func LifeSimploHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 
 	pdf := initFpdf()
 
@@ -51,7 +52,7 @@ func FpdfHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	pdf.Ln(8)
 	pdf.SetFont("Montserrat", "", 8)
 	pdf.SetTextColor(0, 0, 0)
-	email := "yousef.hammar@wopta.it"
+	email := "biciodallavalle86@gmail.com"
 	pdf.MultiCell(0, 3, "Ho scelto la ricezione della seguente documentazione via e-mail al seguente indirizzo "+
 		"indirizzo"+email+", nonché all’utilizzo della stessa per l’invio delle comunicazioni in corso di contratto da "+
 		"parte di Wopta e della Compagnia. Sono a conoscenza che, qualora volessi modificare questa mia scelta potrò "+
@@ -311,15 +312,15 @@ func FpdfHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 		"durata della copertura, attraverso un sostegno economico indennizzato ai Beneficiari, che "+
 		"sono stati indicati dal Contraente;", "", "", false)
 	pdf.SetX(15)
-	pdf.MultiCell(0, 3, "-	difendere il proprio reddito, potendo beneficiare di un capitale in caso di "+
+	pdf.MultiCell(0, 3, "- difendere il proprio reddito, potendo beneficiare di un capitale in caso di "+
 		"perdita, da parte dell’Assicurato, definitiva ed irrimediabile, da Infortunio o Malattia, della capacità di "+
 		"attendere a un qualsiasi lavoro proficuo, in misura totale (almeno del 60%);", "", "", false)
 	pdf.SetX(15)
-	pdf.MultiCell(0, 3, "-	difendere il proprio reddito attraverso una indennità mensile, in caso di "+
+	pdf.MultiCell(0, 3, "- difendere il proprio reddito attraverso una indennità mensile, in caso di "+
 		"perdita totale, ma in via temporanea, delle capacità dell’Assicurato di attendere alla propria professione o "+
 		"attività lavorativa a seguito di Infortunio o Malattia", "", "", false)
 	pdf.SetX(15)
-	pdf.MultiCell(0, 3, "-	tutelare la propria salute attraverso una indennità in caso di diagnosi, in "+
+	pdf.MultiCell(0, 3, "- tutelare la propria salute attraverso una indennità in caso di diagnosi, in "+
 		"capo all’Assicurato, di una delle seguenti malattie: cancro, attacco cardiaco (infarto del miocardio), "+
 		"chirurgia aorto-coronarica (bypass), ictus, insufficienza renale (fase finale di malattia renale), trapianto "+
 		"di organi principali (cuore, polmone, fegato, pancreas, rene o midollo osseo);", "", "", false)
@@ -469,25 +470,25 @@ func FpdfHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	pdf.CellFormat(5, 4, "", "LR", 0, "", false, 0, "")
 	pdf.SetFont("Montserrat", "B", 8)
 	pdf.SetTextColor(0, 0, 0)
-	pdf.CellFormat(90, 4, "Nome: YOUSEF", "TLR", 0, "", false, 0, "")
-	pdf.CellFormat(90, 4, "Cognome: HAMMAR", "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(90, 4, "Nome: FABRIZIO", "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(90, 4, "Cognome:  DALLA VALLE", "TLR", 0, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 0, "", false, 0, "")
 	pdf.CellFormat(90, 4, "Data di nascita: 07/10/1994", "TLR", 0, "", false, 0, "")
-	pdf.CellFormat(90, 4, "Codice Fiscale: HMMYSF94R07D912M", "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(90, 4, "Codice Fiscale: DLLFRZ86T09E970X", "TLR", 0, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 0, "", false, 0, "")
-	pdf.CellFormat(90, 4, "Comune di nascita: GARBAGNATE MILANESE", "TLR", 0, "", false, 0, "")
-	pdf.CellFormat(45, 4, "CAP: 20333", "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(90, 4, "Comune di nascita: PIANEZZE", "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(45, 4, "CAP: 36060", "TLR", 0, "", false, 0, "")
 	pdf.CellFormat(45, 4, "Prov.: MI", "TLR", 0, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 0, "", false, 0, "")
-	pdf.CellFormat(90, 4, "Comune di residenza: SOLARO", "TLR", 0, "", false, 0, "")
-	pdf.CellFormat(45, 4, "CAP: 20333", "TLR", 0, "", false, 0, "")
-	pdf.CellFormat(45, 4, "Prov.: MI", "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(90, 4, "Comune di residenza: PIANEZZE", "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(45, 4, "CAP: 36060", "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(45, 4, "Prov.: VI", "TLR", 0, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 0, "", false, 0, "")
-	pdf.CellFormat(180, 4, "Indirizzo di residenza: VIa Unicef, 4", "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(180, 4, "Indirizzo di residenza: VIA TEZZE, 45/A", "TLR", 0, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 0, "", false, 0, "")
 	pdf.CellFormat(180, 4, "Comune di domicilio (se diverso dalla residenza:", "TLR", 0, "", false, 0, "")
@@ -514,7 +515,7 @@ func FpdfHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	pdf.CellFormat(90, 4, "Data di rilascio: 20/10/2013", "TLR", 0, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 0, "", false, 0, "")
-	pdf.CellFormat(90, 4, "Località di rilascio: SOLARO", "1", 0, "", false, 0, "")
+	pdf.CellFormat(90, 4, "Località di rilascio: PIANEZZE", "1", 0, "", false, 0, "")
 	pdf.CellFormat(90, 4, "Data di scadenza: 07/10/2023", "1", 0, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 1, "", false, 0, "")
 	pdf.MultiCell(0, 1, "", "LR", "", false)
@@ -578,21 +579,21 @@ func FpdfHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	pdf.SetFont("Montserrat", "B", 6)
 	pdf.MultiCell(0, 2.5, "Obbligo di astensione – art. 42", "LR", "", false)
 	pdf.SetFont("Montserrat", "", 6)
-	pdf.MultiCell(0, 2.5, "1.\tI soggetti obbligati che si trovano nell’impossibilità oggettiva di "+
+	pdf.MultiCell(0, 2.5, "1. I soggetti obbligati che si trovano nell’impossibilità oggettiva di "+
 		"effettuare l'adeguata verifica della clientela, ai sensi delle disposizioni di cui all'articolo 19, "+
 		"comma 1, lettere a), b) e c), si astengono dall'instaurare, eseguire ovvero proseguire il rapporto, la "+
 		"prestazione professionale e le operazioni e valutano se effettuare una segnalazione di operazione sospetta "+
 		"alla UIF a norma dell'articolo 35.", "LR", "", false)
 	pdf.SetFont("Montserrat", "", 6)
-	pdf.MultiCell(0, 2.5, "2.\tI soggetti obbligati si astengono dall'instaurare il rapporto continuativo, "+
+	pdf.MultiCell(0, 2.5, "2. I soggetti obbligati si astengono dall'instaurare il rapporto continuativo, "+
 		"eseguire operazioni o prestazioni professionali e pongono fine al rapporto continuativo o alla prestazione "+
 		"professionale già in essere di cui siano, direttamente o indirettamente, parte società fiduciarie, trust, "+
 		"società anonime o controllate attraverso azioni al portatore aventi sede in Paesi terzi ad alto rischio. "+
 		"Tali misure si applicano anche nei confronti delle ulteriori entità giuridiche, altrimenti denominate, "+
 		"aventi sede nei suddetti Paesi, di cui non è possibile identificare il titolare effettivo ne' verificarne "+
 		"l’identità.", "LR", "", false)
-	pdf.MultiCell(0, 2.5, "3.\t(…).", "LR", "", false)
-	pdf.MultiCell(0, 2.5, "4.\tÈ fatta in ogni caso salva l'applicazione dell'articolo 35, comma 2, nei "+
+	pdf.MultiCell(0, 2.5, "3. (…).", "LR", "", false)
+	pdf.MultiCell(0, 2.5, "4. È fatta in ogni caso salva l'applicazione dell'articolo 35, comma 2, nei "+
 		"casi in cui l'operazione debba essere eseguita in quanto sussiste un obbligo di legge di ricevere "+
 		"l'atto.", "LR", "", false)
 	pdf.SetFont("Montserrat", "B", 6)
@@ -621,54 +622,54 @@ func FpdfHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 		"cessato di occupare da meno di un anno importanti cariche pubbliche, nonché i loro familiari e coloro "+
 		"che con i predetti soggetti intrattengono notoriamente stretti legami, come di "+
 		"seguito elencate:", "LR", "", false)
-	pdf.MultiCell(0, 2.5, "1)\tsono persone fisiche che occupano o hanno occupato importanti cariche "+
+	pdf.MultiCell(0, 2.5, "1) sono persone fisiche che occupano o hanno occupato importanti cariche "+
 		"pubbliche coloro che ricoprono o hanno ricoperto la carica di:", "LR", "", false)
 	pdf.CellFormat(5, 5, "", "L", 0, "", false, 0, "")
-	pdf.MultiCell(0, 2.5, "1.1\t\tPresidente della Repubblica, Presidente del Consiglio, Ministro, "+
+	pdf.MultiCell(0, 2.5, "1.1 Presidente della Repubblica, Presidente del Consiglio, Ministro, "+
 		"Vice-Ministro e Sottosegretario, Presidente di Regione, assessore regionale, Sindaco di capoluogo di "+
 		"provincia o città metropolitana, Sindaco di comune con popolazione non inferiore a 15.000 abitanti "+
 		"nonché cariche analoghe in Stati esteri;", "R", "", false)
 	pdf.CellFormat(5, 2.5, "", "L", 0, "", false, 0, "")
-	pdf.MultiCell(0, 2.5, "1.2\t\tdeputato, senatore, parlamentare europeo, consigliere regionale "+
+	pdf.MultiCell(0, 2.5, "1.2 deputato, senatore, parlamentare europeo, consigliere regionale "+
 		"nonché cariche analoghe in Stati esteri;", "R", "", false)
 	pdf.CellFormat(5, 2.5, "", "L", 0, "", false, 0, "")
-	pdf.MultiCell(0, 2.5, "1.3\t\tmembro degli organi direttivi centrali di partiti politici;", "R", "", false)
+	pdf.MultiCell(0, 2.5, "1.3 membro degli organi direttivi centrali di partiti politici;", "R", "", false)
 	pdf.CellFormat(5, 5, "", "L", 0, "", false, 0, "")
-	pdf.MultiCell(0, 2.5, "1.4\t\tgiudice della Corte Costituzionale, magistrato della Corte di Cassazione "+
+	pdf.MultiCell(0, 2.5, "1.4 giudice della Corte Costituzionale, magistrato della Corte di Cassazione "+
 		"o della Corte dei conti, consigliere di Stato e altri componenti del Consiglio di Giustizia Amministrativa "+
 		"per la Regione siciliana nonché cariche analoghe in Stati esteri;", "R", "", false)
 	pdf.CellFormat(5, 2.5, "", "L", 0, "", false, 0, "")
-	pdf.MultiCell(0, 2.5, "1.5\t\tmembro degli organi direttivi delle banche centrali e delle autorità "+
+	pdf.MultiCell(0, 2.5, "1.5 membro degli organi direttivi delle banche centrali e delle autorità "+
 		"indipendenti;", "R", "", false)
 	pdf.CellFormat(5, 2.5, "", "L", 0, "", false, 0, "")
-	pdf.MultiCell(0, 2.5, "1.6\t\tambasciatore, incaricato d’affari ovvero cariche equivalenti in Stati "+
+	pdf.MultiCell(0, 2.5, "1.6 ambasciatore, incaricato d’affari ovvero cariche equivalenti in Stati "+
 		"esteri, ufficiale di grado apicale delle forze armate ovvero cariche analoghe in "+
 		"Stati esteri;", "R", "", false)
 	pdf.CellFormat(5, 7.5, "", "L", 0, "", false, 0, "")
-	pdf.MultiCell(0, 2.5, "1.7\t\tcomponente degli organi di amministrazione, direzione o controllo delle "+
+	pdf.MultiCell(0, 2.5, "1.7 componente degli organi di amministrazione, direzione o controllo delle "+
 		"imprese controllate, anche indirettamente, dallo Stato italiano o da uno Stato estero ovvero partecipate, "+
 		"in misura prevalente o totalitaria, dalle Regioni, da comuni capoluoghi di provincia e città metropolitane "+
 		"e da comuni con popolazione complessivamente non inferiore a 15.000 "+
 		"abitanti;", "R", "", false)
 	pdf.CellFormat(5, 2.5, "", "L", 0, "", false, 0, "")
-	pdf.MultiCell(0, 2.5, "1.8\t\tdirettore generale di ASL e di azienda ospedaliera, di azienda ospedaliera "+
+	pdf.MultiCell(0, 2.5, "1.8 direttore generale di ASL e di azienda ospedaliera, di azienda ospedaliera "+
 		"universitaria e degli altri enti del servizio sanitario nazionale.", "R", "", false)
 	pdf.CellFormat(5, 2.5, "", "L", 0, "", false, 0, "")
-	pdf.MultiCell(0, 2.5, "1.9\t\tdirettore, vicedirettore e membro dell’organo di gestione o soggetto "+
+	pdf.MultiCell(0, 2.5, "1.9 direttore, vicedirettore e membro dell’organo di gestione o soggetto "+
 		"svolgenti funzioni equivalenti in organizzazioni internazionali;", "R", "", false)
-	pdf.MultiCell(0, 2.5, "2)\tsono familiari di persone politicamente esposte: i genitori, il coniuge o "+
+	pdf.MultiCell(0, 2.5, "2) sono familiari di persone politicamente esposte: i genitori, il coniuge o "+
 		"la persona legata in unione civile o convivenza di fatto o istituti assimilabili alla persona politicamente "+
 		"esposta, i figli e i loro coniugi nonché le persone legate ai figli in unione civile o convivenza di fatto "+
 		"o istituti assimilabili;", "LR", "", false)
-	pdf.MultiCell(0, 2.5, "3)\tsono soggetti con i quali le persone politicamente esposte intrattengono "+
+	pdf.MultiCell(0, 2.5, "3) sono soggetti con i quali le persone politicamente esposte intrattengono "+
 		"notoriamente stretti legami:", "LR", "", false)
 	pdf.CellFormat(5, 5, "", "L", 0, "", false, 0, "")
-	pdf.MultiCell(0, 2.5, "3.1\t\tle persone fisiche che ai sensi del presente decreto detengono, "+
+	pdf.MultiCell(0, 2.5, "3.1 le persone fisiche che ai sensi del presente decreto detengono, "+
 		"congiuntamente alla persona politicamente esposta, la titolarità effettiva di enti giuridici, trust  e "+
 		"istituti giuridici affini ovvero che intrattengono con la persona politicamente esposta stretti rapporti "+
 		"di affari;", "R", "", false)
 	pdf.CellFormat(5, 5, "", "L", 0, "", false, 0, "")
-	pdf.MultiCell(0, 2.5, "3.2\t\tle persone fisiche che detengono solo formalmente il controllo totalitario "+
+	pdf.MultiCell(0, 2.5, "3.2 le persone fisiche che detengono solo formalmente il controllo totalitario "+
 		"di un’entità notoriamente costituita, di fatto, nell’interesse e a beneficio di una persona politicamente "+
 		"esposta.", "R", "", false)
 	pdf.MultiCell(0, 2, "", "BLR", "", false)
@@ -702,17 +703,17 @@ func FpdfHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 		pdf.CellFormat(20, 3, "", "", 0, "", false, 0, "")
 		pdf.CellFormat(pdf.GetStringWidth("CF | P.IVA | n. iscr. Registro Imprese:"), 3,
 			"CF | P.IVA | n. iscr. Registro Imprese:", "", 0, "", false, 0, "")
-		pdf.CellFormat(10, 3, "", "", 0, "", false, 0, "")
+		pdf.CellFormat(13, 3, "", "", 0, "", false, 0, "")
 		pdf.CellFormat(30, 3, "info@wopta.it", "", 1, "", false, 0, "")
 		pdf.CellFormat(pdf.GetStringWidth("Galleria del Corso, 1"), 3,
-			"20143 - Milano (MI)", "", 0, "", false, 0, "")
+			"20143 - Milano (VI)", "", 0, "", false, 0, "")
 		pdf.CellFormat(20, 3, "", "", 0, "", false, 0, "")
 		pdf.CellFormat(pdf.GetStringWidth("Numero REA: MI 2638708"), 3,
 			"Capitale Sociale: €120.000,00", "", 0, "", false, 0, "")
 		pdf.CellFormat(20, 3, "", "", 0, "", false, 0, "")
 		pdf.CellFormat(pdf.GetStringWidth("CF | P.IVA | n. iscr. Registro Imprese:"), 3,
 			"12072020964", "", 0, "", false, 0, "")
-		pdf.CellFormat(10, 3, "", "", 0, "", false, 0, "")
+		pdf.CellFormat(13, 3, "", "", 0, "", false, 0, "")
 		pdf.CellFormat(30, 3, "(+39) 02 91240346", "", 1, "", false, 0, "")
 		pdf.Ln(3)
 		pdf.MultiCell(0, 3, "Wopta Assicurazioni s.r.l. è un intermediario assicurativo soggetto alla "+
@@ -757,7 +758,7 @@ func FpdfHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	pdf.MultiCell(0, 3, "SEDE LEGALE", "", "", false)
 	pdf.Ln(1)
 	pdf.SetFont("Montserrat", "", 9)
-	pdf.MultiCell(0, 3, "Galleria del Corso, 1 – 20122 MILANO (MI)", "", "", false)
+	pdf.MultiCell(0, 3, "Galleria del Corso, 1 – 20122 MILANO (VI)", "", "", false)
 	pdf.Ln(0.5)
 	DrawPinkLine(pdf, 0.1)
 	pdf.Ln(0.5)
@@ -886,7 +887,7 @@ func FpdfHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	pdf.MultiCell(0, 3, "SEDE LEGALE", "", "", false)
 	pdf.Ln(1)
 	pdf.SetFont("Montserrat", "", 9)
-	pdf.MultiCell(0, 3, "Galleria del Corso, 1 – 20122 MILANO (MI)", "", "", false)
+	pdf.MultiCell(0, 3, "Galleria del Corso, 1 – 20122 MILANO (VI)", "", "", false)
 	pdf.Ln(0.5)
 	DrawPinkLine(pdf, 0.1)
 	pdf.Ln(0.5)
@@ -929,26 +930,26 @@ func FpdfHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 		"", "", false)
 	pdf.Ln(1)
 	pdf.SetFont("Montserrat", "", 9)
-	pdf.MultiCell(0, 3, "a.\tobbligo di consegna al contraente dell’allegato 3 al Regolamento IVASS "+
+	pdf.MultiCell(0, 3, "a. obbligo di consegna al contraente dell’allegato 3 al Regolamento IVASS "+
 		"n. 40 del 2 agosto 2018, prima della sottoscrizione della prima proposta o, qualora non prevista, del primo "+
 		"contratto di assicurazione, di metterlo a disposizione del pubblico nei locali del distributore, anche "+
 		"mediante apparecchiature tecnologiche, e di pubblicarlo sul sito internet, ove esistente",
 		"", "", false)
-	pdf.MultiCell(0, 3, "b.\tobbligo di consegna dell’allegato 4 al Regolamento IVASS n. 40 del 2 agosto "+
+	pdf.MultiCell(0, 3, "b. obbligo di consegna dell’allegato 4 al Regolamento IVASS n. 40 del 2 agosto "+
 		"2018, prima della sottoscrizione di ciascuna proposta di assicurazione o, qualora non prevista, del contratto "+
 		"di assicurazione", "", "", false)
-	pdf.MultiCell(0, 3, "c.\tobbligo di consegnare copia della documentazione precontrattuale e "+
+	pdf.MultiCell(0, 3, "c. obbligo di consegnare copia della documentazione precontrattuale e "+
 		"contrattuale prevista dalle vigenti disposizioni, copia della polizza e di ogni altro atto o documento "+
 		"sottoscritto dal contraente", "", "", false)
-	pdf.MultiCell(0, 3, "d.\tobbligo di proporre o raccomandare contratti coerenti con le richieste e le "+
+	pdf.MultiCell(0, 3, "d. obbligo di proporre o raccomandare contratti coerenti con le richieste e le "+
 		"esigenze di copertura assicurativa e previdenziale del contraente o dell’assicurato, acquisendo a tal fine, "+
 		"ogni utile informazione", "", "", false)
-	pdf.MultiCell(0, 3, "e.\tobbligo di valutare se il contraente rientra nel mercato di riferimento "+
+	pdf.MultiCell(0, 3, "e. obbligo di valutare se il contraente rientra nel mercato di riferimento "+
 		"identificato per il contratto di assicurazione proposto e non appartiene alle categorie di clienti per i quali "+
 		"il prodotto non è compatibile, nonché l’obbligo di adottare opportune disposizioni per ottenere dai produttori"+
 		" le informazioni di cui all’articolo 30-decies comma 5 del Codice e per comprendere le caratteristiche e il "+
 		"mercato di riferimento individuato per ciascun prodotto", "", "", false)
-	pdf.MultiCell(0, 3, "f.\tobbligo di fornire in forma chiara e comprensibile le informazioni "+
+	pdf.MultiCell(0, 3, "f. obbligo di fornire in forma chiara e comprensibile le informazioni "+
 		"oggettive sul prodotto, illustrandone le caratteristiche, la durata, i costi e i limiti della copertura ed "+
 		"ogni altro elemento utile a consentire al contraente di prendere una decisione informata",
 		"", "", false)
@@ -968,7 +969,7 @@ func FpdfHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 		"convenzione / assicurato / beneficiario / loro aventi causa) di quanto segue.", "", "", false)
 	pdf.Ln(3)
 	pdf.SetFont("Montserrat", "B", 10)
-	pdf.MultiCell(0, 3, "1.\tTITOLARE DEL TRATTAMENTO", "", "", false)
+	pdf.MultiCell(0, 3, "1. TITOLARE DEL TRATTAMENTO", "", "", false)
 	pdf.Ln(1)
 	pdf.SetFont("Montserrat", "", 9)
 	pdf.MultiCell(0, 3, "Titolare del trattamento è Wopta Assicurazioni, con sede legale in Milano, "+
@@ -976,11 +977,11 @@ func FpdfHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 		"privacy@wopta.it", "", "", false)
 	pdf.Ln(3)
 	pdf.SetFont("Montserrat", "B", 10)
-	pdf.MultiCell(0, 3, "2.\tI DATI PERSONALI OGGETTO DI TRATTAMENTO, FINALITÀ E BASE "+
+	pdf.MultiCell(0, 3, "2. I DATI PERSONALI OGGETTO DI TRATTAMENTO, FINALITÀ E BASE "+
 		"GIURIDICA", "", "", false)
 	pdf.Ln(1)
 	pdf.SetFont("Montserrat", "B", 9)
-	pdf.MultiCell(0, 3, "a)\tFinalità Contrattuali, normative, amministrative e giudiziali", "", "", false)
+	pdf.MultiCell(0, 3, "a) Finalità Contrattuali, normative, amministrative e giudiziali", "", "", false)
 	pdf.Ln(1)
 	pdf.SetFont("Montserrat", "", 9)
 	pdf.MultiCell(0, 3, "Fermo restando quanto previsto dalla Privacy & Cookie Policy del Sito, ove "+
@@ -999,7 +1000,7 @@ func FpdfHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 		"contrattuali.", "", "", false)
 	pdf.Ln(1)
 	pdf.SetFont("Montserrat", "B", 9)
-	pdf.MultiCell(0, 3, "b)\tFinalità commerciali", "", "", false)
+	pdf.MultiCell(0, 3, "b) Finalità commerciali", "", "", false)
 	pdf.Ln(1)
 	pdf.SetFont("Montserrat", "", 9)
 	pdf.MultiCell(0, 3, "Inoltre, i Suoi dati personali potranno essere trattati al fine di inviarLe "+
@@ -1024,32 +1025,32 @@ func FpdfHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 		"sezione \"Contatti\" di questa informativa.", "", "", false)
 	pdf.Ln(3)
 	pdf.SetFont("Montserrat", "B", 11)
-	pdf.MultiCell(0, 3, "3.\tDESTINATARI DEI DATI PERSONALI", "", "", false)
+	pdf.MultiCell(0, 3, "3. DESTINATARI DEI DATI PERSONALI", "", "", false)
 	pdf.Ln(1)
 	pdf.SetFont("Montserrat", "", 9)
 	pdf.MultiCell(0, 3, "I Suoi dati personali potranno essere condivisi, per le finalità di cui alla "+
 		"sezione 2 della presente Policy, con:", "", "", false)
 	pdf.Ln(1)
-	pdf.MultiCell(0, 3, "-\tSoggetti che agiscono tipicamente in qualità di Responsabili del trattamento "+
+	pdf.MultiCell(0, 3, "- Soggetti che agiscono tipicamente in qualità di Responsabili del trattamento "+
 		"ex art. 28 del Regolamento per conto del Titolare, incaricati dell'erogazione dei Servizi (a titolo "+
 		"esemplificativo: servizi tecnologici, servizi di assistenza e consulenza in materia contabile, amministrativa, "+
 		"legale, tributaria e finanziaria, manutenzione tecnica). Il Titolare conserva una lista aggiornata dei "+
 		"responsabili del trattamento nominati e ne garantisce la presa visione all’interessato presso la sede sopra "+
 		"indicata o previa richiesta indirizzata ai recapiti sopra indicati;", "", "", false)
 	pdf.Ln(1)
-	pdf.MultiCell(0, 3, "-\tPersone autorizzate dal Titolare al trattamento dei dati personali ai sensi "+
+	pdf.MultiCell(0, 3, "- Persone autorizzate dal Titolare al trattamento dei dati personali ai sensi "+
 		"degli artt. 29 e 2-quaterdecies del D.lgs. n. 196/2003 (“Codice “Privacy”) (ad es. il personale dipendente "+
 		"addetto alla manutenzione del Sito, alla gestione del CRM, alla gestione dei sistemi informativi ecc.); ",
 		"", "", false)
 	pdf.Ln(1)
-	pdf.MultiCell(0, 3, "-\tSoggetti terzi, autonomi titolari del trattamento, a cui i dati potrebbero "+
+	pdf.MultiCell(0, 3, "- Soggetti terzi, autonomi titolari del trattamento, a cui i dati potrebbero "+
 		"essere trasmessi al fine di dare seguito a specifici servizi da Lei richiesti e/o  per dare esecuzione alle "+
 		"attività di cui alla presente informativa, e con i quali il Titolare abbia stipulato accordi commerciali; "+
 		"soggetti, quali le imprese di assicurazione, che assumono il rischio di sottoscrizione della polizza, ai "+
 		"quali sia obbligatorio comunicare i tuoi Dati personali in forza di obblighi contrattuali e di disposizioni "+
 		"di legge e regolamentari sulla distribuzione di prodotti assicurativi;", "", "", false)
 	pdf.Ln(1)
-	pdf.MultiCell(0, 3, "-\tSoggetti, enti od autorità a cui sia obbligatorio comunicare i Suoi dati "+
+	pdf.MultiCell(0, 3, "- Soggetti, enti od autorità a cui sia obbligatorio comunicare i Suoi dati "+
 		"personali in forza di disposizioni di legge o di ordini delle autorità.", "", "", false)
 	pdf.Ln(1)
 	pdf.MultiCell(0, 3, "Tali soggetti sono, di seguito, collettivamente definiti come “Destinatari”. "+
@@ -1057,7 +1058,7 @@ func FpdfHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 		"ai recapiti indicati nella sezione \"Contatti\" di questa informativa.", "", "", false)
 	pdf.Ln(3)
 	pdf.SetFont("Montserrat", "B", 11)
-	pdf.MultiCell(0, 3, "4.\tTRASFERIMENTI DEI DATI PERSONALI", "", "", false)
+	pdf.MultiCell(0, 3, "4. TRASFERIMENTI DEI DATI PERSONALI", "", "", false)
 	pdf.Ln(1)
 	pdf.SetFont("Montserrat", "", 9)
 	pdf.MultiCell(0, 3, "Alcuni dei Suoi dati personali sono condivisi con Destinatari che si potrebbero "+
@@ -1077,7 +1078,7 @@ func FpdfHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	pdf.AddPage()
 
 	pdf.SetFont("Montserrat", "B", 11)
-	pdf.MultiCell(0, 3, "5.\tCONSERVAZIONE DEI DATI PERSONALI", "", "", false)
+	pdf.MultiCell(0, 3, "5. CONSERVAZIONE DEI DATI PERSONALI", "", "", false)
 	pdf.Ln(1)
 	pdf.SetFont("Montserrat", "", 9)
 	pdf.MultiCell(0, 3, "I Suoi dati personali saranno inseriti e conservati, in conformità ai principi "+
@@ -1108,7 +1109,7 @@ func FpdfHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 		"", "", false)
 	pdf.Ln(3)
 	pdf.SetFont("Montserrat", "B", 11)
-	pdf.MultiCell(0, 3, "6.\tDIRITTI DELL’INTERESSATO", "", "", false)
+	pdf.MultiCell(0, 3, "6. DIRITTI DELL’INTERESSATO", "", "", false)
 	pdf.Ln(1)
 	pdf.SetFont("Montserrat", "", 9)
 	pdf.MultiCell(0, 3, "Lei ha il diritto di accedere in qualunque momento ai Dati Personali che La "+
@@ -1136,7 +1137,7 @@ func FpdfHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 		"(art. 79 del GDPR).", "", "", false)
 	pdf.Ln(3)
 	pdf.SetFont("Montserrat", "B", 11)
-	pdf.MultiCell(0, 3, "7.\tCONTATTI", "", "", false)
+	pdf.MultiCell(0, 3, "7. CONTATTI", "", "", false)
 	pdf.Ln(1)
 	pdf.SetFont("Montserrat", "", 9)
 	pdf.MultiCell(0, 3, "Per esercitare i diritti di cui sopra o per qualunque altra richiesta può "+
@@ -1190,8 +1191,10 @@ func FpdfHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 
 	pdf.UseTemplate(template)*/
 
-	err := pdf.OutputFileAndClose("document/test.pdf")
-	log.Println(err)
+	filename, err := Save(pdf)
+	log.Println(filename + " wrote successfully")
+	/*err := pdf.OutputFileAndClose("test/test.pdf")
+	log.Println(err)*/
 	return "", nil, err
 }
 
@@ -1288,13 +1291,13 @@ func GetContractorInfoTable(pdf *fpdf.Fpdf) {
 	pdf.Cell(20, 2, "Cognome e Nome")
 	SetBlackRegularFont(pdf, standardTextSize)
 	pdf.SetX(pdf.GetX() + 24)
-	pdf.Cell(20, 2, "HAMMAR YOUSEF")
+	pdf.Cell(20, 2, "DALLA VALLE FABRIZIO")
 	pdf.SetX(pdf.GetX() + 60)
 	SetBlackBoldFont(pdf, standardTextSize)
 	pdf.Cell(10, 2, "Codice fiscale:")
 	pdf.SetX(pdf.GetX() + 20)
 	SetBlackRegularFont(pdf, standardTextSize)
-	pdf.Cell(20, 2, "HMMYSF94R07D912M")
+	pdf.Cell(20, 2, "DLLFRZ86T09E970X")
 	pdf.Ln(2.5)
 	DrawPinkLine(pdf, thinLineWidth)
 	pdf.Ln(2)
@@ -1302,7 +1305,7 @@ func GetContractorInfoTable(pdf *fpdf.Fpdf) {
 	pdf.Cell(20, 2, "Residente in")
 	SetBlackRegularFont(pdf, standardTextSize)
 	pdf.SetX(pdf.GetX() + 24)
-	pdf.Cell(20, 2, "Via Unicef 4 - 20033 Solaro (MI)")
+	pdf.Cell(20, 2, "VIA TEZZE, 45/A - 36060 PIANEZZE (VI)")
 	pdf.Ln(2.5)
 	DrawPinkLine(pdf, thinLineWidth)
 	pdf.Ln(2)
@@ -1310,13 +1313,13 @@ func GetContractorInfoTable(pdf *fpdf.Fpdf) {
 	pdf.Cell(20, 2, "Mail")
 	SetBlackRegularFont(pdf, standardTextSize)
 	pdf.SetX(pdf.GetX() + 24)
-	pdf.Cell(20, 2, "yousef.hammar@wopta.it")
+	pdf.Cell(20, 2, "biciodallavalle86@gmail.com")
 	pdf.SetX(pdf.GetX() + 60)
 	SetBlackBoldFont(pdf, standardTextSize)
 	pdf.Cell(10, 2, "Telefono")
 	pdf.SetX(pdf.GetX() + 20)
 	SetBlackRegularFont(pdf, 9)
-	pdf.Cell(20, 2, "+393451021004")
+	pdf.Cell(20, 2, "3494948711")
 	pdf.Ln(3)
 	DrawPinkLine(pdf, thickLineWidth)
 	pdf.Ln(1)
@@ -1555,7 +1558,7 @@ func GetHeader(pdf *fpdf.Fpdf, name string) {
 		pdf.Cell(0, 3, "I tuoi dati")
 		pdf.SetFont("Montserrat", "", 8)
 		pdf.SetXY(-90, pdf.GetY()+3)
-		pdf.MultiCell(0, 3, "Contraente: HAMMAR YOUSEF\nC.F./P.IVA: HMMYSF94R07D912M\nIndirizzo: Via Unicef, 4\n20033 SOLARO (MI)\nMail: yousef.hammar@wopta.it\nTelefono: +393451031004", "", "", false)
+		pdf.MultiCell(0, 3, "Contraente:  DALLA VALLE FABRIZIO\nC.F./P.IVA: DLLFRZ86T09E970X\nIndirizzo: VIA TEZZE, 45/A\n36060 PIANEZZE (VI)\nMail: biciodallavalle86@gmail.com\nTelefono: 3494948711", "", "", false)
 		pdf.Ln(10)
 	})
 }
@@ -1587,9 +1590,25 @@ func initFpdf() *fpdf.Fpdf {
 }
 
 func loadCustomFonts(pdf *fpdf.Fpdf) {
-	pdf.AddUTF8Font("Montserrat", "", "document/assets/montserrat_regular.ttf")
-	pdf.AddUTF8Font("Montserrat", "B", "document/assets/montserrat_bold.ttf")
-	pdf.AddUTF8Font("Montserrat", "I", "document/assets/montserrat_italic.ttf")
+	pdf.AddUTF8Font("Montserrat", "", "test/assets/montserrat_light.ttf")
+	pdf.AddUTF8Font("Montserrat", "B", "test/assets/montserrat_bold.ttf")
+	pdf.AddUTF8Font("Montserrat", "I", "test/assets/montserrat_italic.ttf")
+}
+
+func Save(pdf *fpdf.Fpdf) (string, error) {
+	filename := "test/contract.pdf"
+	if os.Getenv("env") == "local" {
+		err := pdf.OutputFileAndClose(filename)
+		lib.CheckError(err)
+	} else {
+		var buf bytes.Buffer
+		err := pdf.Output(&buf)
+		lib.CheckError(err)
+		filename := "temp/test_contract.pdf"
+		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, buf.Bytes())
+		lib.CheckError(err)
+	}
+	return filename, nil
 }
 
 func SetBlackDrawColor(pdf *fpdf.Fpdf) {
