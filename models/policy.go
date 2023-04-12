@@ -82,6 +82,7 @@ type Policy struct {
 	Assets          []Asset                      `firestore:"assets,omitempty" json:"assets,omitempty" bigquery:"-"`
 	Claim           *[]Claim                     `firestore:"claim,omitempty" json:"claim,omitempty" bigquery:"-"`
 	Data            string                       `bigquery:"data" firestore:"-"`
+	Json            string                       `bigquery:"json" firestore:"-"`
 	OffersPrices    map[string]map[string]*Price `firestore:"offersPrices,omitempty" json:"offersPrices,omitempty" bigquery:"-"`
 }
 
@@ -122,7 +123,7 @@ func (policy *Policy) BigquerySave() {
 
 	policyJson, e := policy.Marshal()
 	log.Println(" policy "+policy.Uid, string(policyJson))
-	policy.Data = string(policyJson)
+	policy.Json = string(policyJson)
 	policy.BigStartDate = civil.DateTimeOf(policy.StartDate)
 	policy.BigEndDate = civil.DateTimeOf(policy.EndDate)
 	policy.BigEmitDate = civil.DateTimeOf(policy.EmitDate)

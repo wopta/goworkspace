@@ -82,10 +82,22 @@ func SetFirestore(collection string, doc string, value interface{}) {
 	c := client.Collection(collection)
 	col := c.Doc(doc)
 	docsnap, err := col.Set(ctx, value)
+
 	CheckError(err)
 	log.Println(docsnap)
 
 	//fmt.Println(dataMap)firestore.Query
+}
+func FireUpdate(collection string, doc string, value interface{}) (*firestore.WriteResult, error) {
+	ctx := context.Background()
+	client, err := firestore.NewClient(ctx, os.Getenv("GOOGLE_PROJECT_ID"))
+	CheckError(err)
+	c := client.Collection(collection)
+	col := c.Doc(doc)
+	docsnap, err := col.Set(ctx, value, firestore.MergeAll)
+
+	return docsnap, err
+
 }
 func UpdateFirestoreErr(collection string, doc string, values map[string]interface{}) error {
 	ctx := context.Background()

@@ -9,13 +9,13 @@ require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
 	github.com/wopta/goworkspace/document v1.0.24
 	github.com/wopta/goworkspace/lib v1.0.10
-	github.com/wopta/goworkspace/mail v1.0.11
+	github.com/wopta/goworkspace/mail v1.0.12
 	github.com/wopta/goworkspace/models v1.0.25
 )
 
-require github.com/googleapis/gax-go/v2 v2.7.0 // indirect
 
 require (
+    github.com/googleapis/gax-go/v2 v2.7.0 // indirect
 	cloud.google.com/go v0.110.0 // indirect
 	cloud.google.com/go/bigquery v1.48.0 // indirect
 	cloud.google.com/go/compute v1.18.0 // indirect

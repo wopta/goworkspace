@@ -90,7 +90,7 @@ func SendMailSign(policy models.Policy) {
 	message = append(message, `<br>Clicca sul bottone sotto per accedere alla procedura semplice e guidata di firma elettronica avanzata tramite utilizzo di un codice usa e getta che verrà inviato via sms sul tuo cellulare a noi comunicato.`)
 	message = append(message, `<br>Ultimata la procedura di firma potrai procedere al pagamento.<br>`)
 	message = append(message, `Qualora tu abbia già provveduto, ignora questa comunicazione </br> `)
-	SendMail(GetMailPolicy(policy, "firma la tua polizza"+" n° "+policy.CodeCompany, true, policy.SignUrl, "Paga la tua polizza", message, false, nil))
+	SendMail(GetMailPolicy(policy, "firma la tua polizza"+" n° "+policy.CodeCompany, true, policy.SignUrl, "Firma la tua polizza", message, false, nil))
 }
 
 func SendMailContract(policy models.Policy, at *[]Attachment) {
