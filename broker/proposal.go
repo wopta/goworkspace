@@ -24,7 +24,6 @@ func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	j, e := policy.Marshal()
 	log.Println("Proposal request proposal: ", string(j))
 	defer r.Body.Close()
-	policy.Updated = time.Now()
 	policy.CreationDate = time.Now()
 	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusInitLead)
 	policy.Status = models.PolicyStatusInitLead

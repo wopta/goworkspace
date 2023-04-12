@@ -55,7 +55,7 @@ type Policy struct {
 	CreationDate    time.Time                    `firestore:"creationDate,omitempty" json:"creationDate,omitempty" bigquery:"-"`
 	Updated         time.Time                    `firestore:"updated,omitempty" json:"updated,omitempty" bigquery:"-"`
 	NextPay         time.Time                    `firestore:"nextPay,omitempty" json:"nextPay,omitempty" bigquery:"-"`
-	NextPayString   string                       `firestore:"nextPayString,omitempty" json:"nextPayString,omitempty"  bigquery:"nextPayString"`
+	NextPayString   string                       `firestore:"nextPayString,omitempty" json:"nextPayString,omitempty" bigquery:"nextPayString"`
 	Payment         string                       `firestore:"payment,omitempty" json:"payment,omitempty" bigquery:"payment"`
 	PaymentType     string                       `firestore:"paymentType,omitempty" json:"paymentType,omitempty" bigquery:"paymentType"`
 	PaymentSplit    string                       `firestore:"paymentSplit,omitempty" json:"paymentSplit,omitempty" bigquery:"paymentSplit"`

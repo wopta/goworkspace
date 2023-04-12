@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"cloud.google.com/go/firestore"
-	"github.com/wopta/goworkspace/lib"
 	"google.golang.org/api/iterator"
 	latlng "google.golang.org/genproto/googleapis/type/latlng"
 )
@@ -50,7 +49,7 @@ type User struct {
 	VatCode        string        `firestore:"vatCode" json:"vatCode" bigquery:"vatCode"`
 	RiskClass      string        `firestore:"riskClass" json:"riskClass,omitempty" bigquery:"riskClass"`
 	CreationDate   time.Time     `firestore:"creationDate,omitempty" json:"creationDate,omitempty" bigquery:"-"`
-	UpdatedDate    time.Time     `firestore:"updatedDate,omitempty" json:"updatedDate,omitempty" bigquery:"-"`
+	UpdatedDate    string        `firestore:"updatedDate,omitempty" json:"updatedDate,omitempty" bigquery:"-"`
 	PoliciesUid    []string      `firestore:"policiesUid" json:"policiesUid,omitempty" bigquery:"-"`
 	BigPoliciesUid string        `firestore:"-" json:"-" bigquery:"policiesUid"`
 	Claims         *[]Claim      `firestore:"claims" json:"claims,omitempty" bigquery:"-"`
@@ -75,7 +74,6 @@ func FirestoreDocumentToUser(query *firestore.DocumentIterator) (User, error) {
 
 	if (err != iterator.Done && err != nil) || userDocumentSnapshot == nil {
 		log.Println(`error happened while trying to get user`)
-		log.Println(err)
 		return result, err
 	}
 
@@ -83,7 +81,6 @@ func FirestoreDocumentToUser(query *firestore.DocumentIterator) (User, error) {
 	if len(result.Uid) == 0 {
 		result.Uid = userDocumentSnapshot.Ref.ID
 	}
-	lib.CheckError(e)
 
 	return result, e
 }
