@@ -1114,6 +1114,112 @@ func FpdfHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 
 	pdf.AddPage()
 
+	pdf.SetFont("Montserrat", "B", 11)
+	pdf.MultiCell(0, 3, "ALLEGATO 4 TER - ELENCO DELLE REGOLE DI COMPORTAMENTO DEL DISTRIBUTORE",
+		"", "", false)
+	pdf.Ln(3)
+	pdf.SetFont("Montserrat", "", 9)
+	pdf.MultiCell(0, 3, "Il distributore ha l’obbligo di mettere a disposizione del pubblico il "+
+		"presente documento nei propri locali, anche mediante apparecchiature tecnologiche, oppure pubblicarlo su "+
+		"un sito internet ove utilizzato per la promozione e il collocamento di prodotti assicurativi, dando avviso "+
+		"della pubblicazione nei propri locali. Nel caso di offerta fuori sede o nel caso in cui la fase "+
+		"precontrattuale si svolga mediante tecniche di comunicazione a distanza, il distributore consegna o "+
+		"trasmette al contraente il presente documento prima della sottoscrizione della proposta o, qualora non "+
+		"prevista, del contratto di assicurazione.", "", "", false)
+	pdf.Ln(1)
+	DrawPinkLine(pdf, 0.1)
+	pdf.Ln(0.5)
+	pdf.SetFont("Montserrat", "", 6)
+	pdf.MultiCell(0, 3, "DATI DELLA PERSONA FISICA CHE ENTRA IN CONTATTO CON IL "+
+		"CONTRAENTE", "", "", false)
+	pdf.Ln(1)
+	pdf.SetFont("Montserrat", "", 9)
+	pdf.MultiCell(0, 3, "LOMAZZI MICHELE iscritto alla Sezione A del RUI con numero "+
+		"A000703480 in data 02.03.2022", "", "", false)
+	pdf.Ln(0.5)
+	DrawPinkLine(pdf, 0.1)
+	pdf.Ln(0.5)
+	pdf.SetFont("Montserrat", "", 6)
+	pdf.MultiCell(0, 3, "QUALIFICA", "", "", false)
+	pdf.Ln(1)
+	pdf.SetFont("Montserrat", "", 9)
+	pdf.MultiCell(0, 3, "Responsabile dell’attività di intermediazione assicurativa di Wopta "+
+		"Assicurazioni Srl, Società iscritta alla Sezione A del RUI con numero A000701923 in data "+
+		"14.02.2022", "", "", false)
+	pdf.Ln(0.5)
+	DrawPinkLine(pdf, 0.1)
+	pdf.Ln(0.5)
+	pdf.SetFont("Montserrat", "", 6)
+	pdf.MultiCell(0, 3, "SEDE LEGALE", "", "", false)
+	pdf.Ln(1)
+	pdf.SetFont("Montserrat", "", 9)
+	pdf.MultiCell(0, 3, "Galleria del Corso, 1 – 20122 MILANO (MI)", "", "", false)
+	pdf.Ln(0.5)
+	DrawPinkLine(pdf, 0.1)
+	pdf.Ln(0.5)
+	pdf.SetFont("Montserrat", "", 6)
+	pdf.Cell(50, 3, "RECAPITI TELEFONICI")
+	pdf.Cell(40, 3, "")
+	pdf.MultiCell(50, 3, "E-MAIL", "", "1", false)
+	pdf.Ln(1)
+	pdf.SetFont("Montserrat", "", 9)
+	pdf.Cell(50, 3, "02.91.24.03.46")
+	pdf.Cell(40, 3, "")
+	pdf.MultiCell(50, 3, "info@wopta.it", "", "1", false)
+	pdf.Ln(0.5)
+	DrawPinkLine(pdf, 0.1)
+	pdf.Ln(0.5)
+	pdf.SetFont("Montserrat", "", 6)
+	pdf.Cell(50, 3, "PEC ")
+	pdf.Cell(40, 3, "")
+	pdf.MultiCell(50, 3, "SITO INTERNET", "", "1", false)
+	pdf.Ln(1)
+	pdf.SetFont("Montserrat", "", 9)
+	pdf.Cell(50, 3, "woptaassicurazioni@legalmail.it")
+	pdf.Cell(40, 3, "")
+	pdf.MultiCell(50, 3, "wopta.it", "", "1", false)
+	pdf.Ln(0.5)
+	DrawPinkLine(pdf, 0.1)
+	pdf.Ln(0.5)
+	pdf.SetFont("Montserrat", "", 6)
+	pdf.MultiCell(0, 3, "AUTORITÀ COMPETENTE ALLA VIGILANZA DELL’ATTIVITÀ SVOLTA",
+		"", "", false)
+	pdf.Ln(1)
+	pdf.SetFont("Montserrat", "", 9)
+	pdf.MultiCell(0, 3, "IVASS – Istituto per la Vigilanza sulle Assicurazioni - Via del Quirinale, "+
+		"21 - 00187 Roma", "", "", false)
+	pdf.Ln(0.5)
+	DrawPinkLine(pdf, 0.1)
+	pdf.Ln(3)
+	pdf.SetFont("Montserrat", "B", 10)
+	pdf.MultiCell(0, 3, "Sezione I - Regole generali per la distribuzione di prodotti assicurativi",
+		"", "", false)
+	pdf.Ln(1)
+	pdf.SetFont("Montserrat", "", 9)
+	pdf.MultiCell(0, 3, "a.\tobbligo di consegna al contraente dell’allegato 3 al Regolamento IVASS "+
+		"n. 40 del 2 agosto 2018, prima della sottoscrizione della prima proposta o, qualora non prevista, del primo "+
+		"contratto di assicurazione, di metterlo a disposizione del pubblico nei locali del distributore, anche "+
+		"mediante apparecchiature tecnologiche, e di pubblicarlo sul sito internet, ove esistente",
+		"", "", false)
+	pdf.MultiCell(0, 3, "b.\tobbligo di consegna dell’allegato 4 al Regolamento IVASS n. 40 del 2 agosto "+
+		"2018, prima della sottoscrizione di ciascuna proposta di assicurazione o, qualora non prevista, del contratto "+
+		"di assicurazione", "", "", false)
+	pdf.MultiCell(0, 3, "c.\tobbligo di consegnare copia della documentazione precontrattuale e "+
+		"contrattuale prevista dalle vigenti disposizioni, copia della polizza e di ogni altro atto o documento "+
+		"sottoscritto dal contraente", "", "", false)
+	pdf.MultiCell(0, 3, "d.\tobbligo di proporre o raccomandare contratti coerenti con le richieste e le "+
+		"esigenze di copertura assicurativa e previdenziale del contraente o dell’assicurato, acquisendo a tal fine, "+
+		"ogni utile informazione", "", "", false)
+	pdf.MultiCell(0, 3, "e.\tobbligo di valutare se il contraente rientra nel mercato di riferimento "+
+		"identificato per il contratto di assicurazione proposto e non appartiene alle categorie di clienti per i quali "+
+		"il prodotto non è compatibile, nonché l’obbligo di adottare opportune disposizioni per ottenere dai produttori"+
+		" le informazioni di cui all’articolo 30-decies comma 5 del Codice e per comprendere le caratteristiche e il "+
+		"mercato di riferimento individuato per ciascun prodotto", "", "", false)
+	pdf.MultiCell(0, 3, "f.	obbligo di fornire in forma chiara e comprensibile le informazioni "+
+		"oggettive sul prodotto, illustrandone le caratteristiche, la durata, i costi e i limiti della copertura ed "+
+		"ogni altro elemento utile a consentire al contraente di prendere una decisione informata",
+		"", "", false)
+
 	/*tpl := new(fpdf.FpdfTpl)
 
 	fb, err := os.ReadFile("document/assets/template.pdf")
