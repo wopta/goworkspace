@@ -32,16 +32,9 @@ func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	policy.IsSign = false
 	policy.IsPay = false
 	policy.Updated = time.Now()
-	docsnap := lib.WhereFirestore("users", "fiscalCode", "==", policy.Contractor.FiscalCode)
-	user, _ := models.FirestoreDocumentToUser(docsnap)
 
-	if len(user.Uid) == 0 {
-		ref2, _ := lib.PutFirestore("users", policy.Contractor)
-		log.Println("Proposal User uid", ref2)
-		useruid = ref2.ID
-	} else {
-		useruid = user.Uid
-	}
+	//------------------------------------------
+	useruid, e = models.UserUpdateByFiscalcode(policy.Contractor)
 	log.Println("Proposal User uid ", useruid)
 	policy.Contractor.Uid = useruid
 	//Precontrattuale.pdf

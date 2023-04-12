@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/firestore"
+	"github.com/wopta/goworkspace/lib"
 	"google.golang.org/api/iterator"
 	latlng "google.golang.org/genproto/googleapis/type/latlng"
 )
@@ -24,6 +25,8 @@ func (r *User) Marshal() ([]byte, error) {
 type User struct {
 	EmailVerified  bool          `firestore:"emailVerified" json:"emailVerified,omitempty" bigquery:"emailVerified"`
 	Uid            string        `firestore:"uid" json:"uid,omitempty" bigquery:"uid" `
+	Status         string        `firestore:"status,omitempty" json:"status,omitempty" bigquery:"status"`
+	StatusHistory  []string      `firestore:"statusHistory,omitempty" json:"statusHistory,omitempty" bigquery:"-"`
 	BirthDate      string        `firestore:"birthDate" json:"birthDate,omitempty" bigquery:"birthDate"`
 	BirthCity      string        `firestore:"birthCity" json:"birthCity,omitempty" bigquery:"birthCity"`
 	BirthProvince  string        `firestore:"birthProvince" json:"birthProvince,omitempty" bigquery:"birthProvince"`
@@ -83,4 +86,23 @@ func FirestoreDocumentToUser(query *firestore.DocumentIterator) (User, error) {
 	}
 
 	return result, e
+}
+func UserUpdateByFiscalcode(user User) (string, error) {
+	var (
+		useruid string
+		e       error
+	)
+	docsnap := lib.WhereFirestore("users", "fiscalCode", "==", user.FiscalCode)
+	userL, e := FirestoreDocumentToUser(docsnap)
+	if len(user.Uid) == 0 {
+		user.CreationDate = time.Now()
+		ref2, _ := lib.PutFirestore("users", user)
+		log.Println("Proposal User uid", ref2)
+		useruid = ref2.ID
+	} else {
+		useruid = user.Uid
+		userL.UpdatedDate = time.Now().GoString()
+		_, e = lib.FireUpdate("users", useruid, userL)
+	}
+	return useruid, e
 }
