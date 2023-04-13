@@ -45,7 +45,7 @@ func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	policy.Attachments = &[]models.Attachment{{Name: "Precontrattuale", Link: "gs://documents-public-dev/information-sets/" + policy.Name + "/" + policy.ProductVersion + "v1/Precontrattuale.pdf"}}
 	log.Println("Proposal save")
 	ref, _ := lib.PutFirestore(policyFire, policy)
-	policy.BigquerySave()
+	//policy.BigquerySave()
 	log.Println(ref.ID + " Proposal sand mail")
 	mail.SendMailProposal(policy)
 
