@@ -45,7 +45,6 @@ func Callback(w http.ResponseWriter, r *http.Request) {
 func EmailVerify(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println("EmailVerify")
 	log.Println("GET params were:", r.URL.Query())
-
 	email := r.URL.Query().Get("email")
 	token := r.URL.Query().Get("token")
 	log.Println(token)
