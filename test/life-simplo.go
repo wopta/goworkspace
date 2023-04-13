@@ -7,8 +7,10 @@ import (
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"log"
+	"math"
 	"net/http"
 	"os"
+	"strings"
 )
 
 type Statements struct {
@@ -1643,22 +1645,60 @@ func GetParagraphTitle(pdf *fpdf.Fpdf, title string) {
 }
 
 func PrintStatement(pdf *fpdf.Fpdf, statement *models.Statement) {
+
+	//yesWidth := pdf.GetStringWidth("YES")
+	leftMargin, _, rightMargin, _ := pdf.GetMargins()
+	pageWidth, _ := pdf.GetPageSize()
+	availableWidth := pageWidth - leftMargin - rightMargin - 2
+	rowWidth := pageWidth - leftMargin - rightMargin
+
 	SetBlackBoldFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3.5, statement.Title, "", "", false)
+	if statement.HasAnswer {
+		noWidth := pdf.GetStringWidth("NO")
+		dotWidth := pdf.GetStringWidth(".")
+
+		var statementWidth, paddingWidth float64
+		lines := pdf.SplitText(statement.Title, rowWidth)
+
+		statementWidth = pdf.GetStringWidth(lines[len(lines)-1])
+		paddingWidth = availableWidth - statementWidth - noWidth
+
+		statement.Title += strings.Repeat(".", int(math.Floor(paddingWidth/dotWidth)))
+		statement.Title += "NO"
+	}
+	pdf.MultiCell(rowWidth, 3.5, statement.Title, "", fpdf.AlignLeft, false)
+
 	for _, question := range statement.Questions {
+		availableWidth = pageWidth - leftMargin - rightMargin - 2
+
 		if question.IsBold {
 			SetBlackBoldFont(pdf, standardTextSize)
 		} else {
 			SetBlackRegularFont(pdf, standardTextSize)
 		}
 		if question.Indent {
-			pdf.SetX(15)
+			pdf.SetX(tabDimension)
+			availableWidth -= tabDimension / 2
 		}
-		pdf.MultiCell(0, 3.5, question.Question, "", "", false)
+
+		noWidth := pdf.GetStringWidth("NO")
+		dotWidth := pdf.GetStringWidth(".")
+
+		if question.HasAnswer {
+			var questionWidth, paddingWidth float64
+			lines := pdf.SplitText(question.Question, rowWidth)
+
+			questionWidth = pdf.GetStringWidth(lines[len(lines)-1])
+			paddingWidth = availableWidth - questionWidth - noWidth
+
+			question.Question += strings.Repeat(".", int(math.Ceil(paddingWidth/dotWidth))+1)
+			question.Question += "NO"
+		}
+		pdf.MultiCell(rowWidth, 3.5, question.Question, "", fpdf.AlignLeft, false)
 	}
 }
 
 func IndentedText(pdf *fpdf.Fpdf, content string) {
 	pdf.SetX(tabDimension)
-	pdf.MultiCell(0, 3, content, "", fpdf.BorderLeft, false)
+	pdf.MultiCell(0, 3, content, "", fpdf.AlignLeft, false)
 }
