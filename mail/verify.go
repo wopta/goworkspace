@@ -22,14 +22,18 @@ func VerifyEmail(data string) <-chan MailValidate {
 			}
 		} else {
 			lib.PutFirestore("mail", m)
-			log.Println("saved")
+			log.Println("saved mail")
 			var obj MailRequest
-			obj.From = "noreply@wopta.it"
+			obj.From = "anna@wopta.it"
 			obj.To = []string{data}
 			obj.Message = `<p>ciao </p><p>verifica la tua mail clicando il link quii sotto </p></p><p>verifica la tua mail clicando il link qui sotto </p>
 			<p><a class="button" href='` + os.Getenv("WOPTA_BASEURL") + `callback/v1/emailVerify?email=` + data + `&token=` + os.Getenv("WOPTA_TOKEN_API") + `'>Veriifica la tua mail</a> </p>`
 			obj.Subject = "Wopta Verifica mail"
 			obj.IsHtml = true
+			obj.IsLink = true
+
+			obj.IsApp = false
+
 			SendMail(obj)
 			r <- m
 		}

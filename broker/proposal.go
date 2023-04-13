@@ -35,7 +35,7 @@ func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	policy.Updated = time.Now()
 
 	//------------------------------------------
-	//useruid, e = models.UserUpdateByFiscalcode(policy.Contractor)
+	useruid, e = models.UserUpdateByFiscalcode(policy.Contractor)
 	log.Println("Proposal User uid ", useruid)
 	policy.Contractor.Uid = useruid
 	//Precontrattuale.pdf
