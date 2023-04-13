@@ -7,7 +7,6 @@ import (
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"log"
-	"math"
 	"net/http"
 	"os"
 	"strings"
@@ -1650,7 +1649,7 @@ func PrintStatement(pdf *fpdf.Fpdf, statement *models.Statement) {
 	leftMargin, _, rightMargin, _ := pdf.GetMargins()
 	pageWidth, _ := pdf.GetPageSize()
 	availableWidth := pageWidth - leftMargin - rightMargin - 2
-	rowWidth := pageWidth - leftMargin - rightMargin
+	rowWidth := pageWidth - leftMargin - rightMargin - 1
 
 	SetBlackBoldFont(pdf, standardTextSize)
 	if statement.HasAnswer {
@@ -1668,7 +1667,7 @@ func PrintStatement(pdf *fpdf.Fpdf, statement *models.Statement) {
 		statementWidth = pdf.GetStringWidth(lines[len(lines)-1])
 		paddingWidth = availableWidth - statementWidth - answerWidth
 
-		statement.Title += strings.Repeat(".", int(math.Floor(paddingWidth/dotWidth)))
+		statement.Title += strings.Repeat(".", int(paddingWidth/dotWidth)-1)
 		statement.Title += answer
 	}
 	pdf.MultiCell(rowWidth, 3.5, statement.Title, "", fpdf.AlignLeft, false)
@@ -1702,7 +1701,7 @@ func PrintStatement(pdf *fpdf.Fpdf, statement *models.Statement) {
 			questionWidth = pdf.GetStringWidth(lines[len(lines)-1])
 			paddingWidth = availableWidth - questionWidth - answerWidth
 
-			question.Question += strings.Repeat(".", int(math.Ceil(paddingWidth/dotWidth))+1)
+			question.Question += strings.Repeat(".", int(paddingWidth/dotWidth)+1)
 			question.Question += answer
 		}
 		pdf.MultiCell(rowWidth, 3.5, question.Question, "", fpdf.AlignLeft, false)
