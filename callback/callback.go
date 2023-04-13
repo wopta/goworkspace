@@ -50,9 +50,13 @@ func EmailVerify(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	token := r.URL.Query().Get("token")
 	log.Println(token)
 	res := lib.WhereFirestore("mail", "mail", "==", email)
+
 	objmail, uid := mail.ToListData(res)
-	objmail[0].IsValid = true
-	lib.SetFirestore("mail", uid[0], objmail[0])
+	log.Println(objmail)
+	if len(objmail) > 0 {
+		objmail[0].IsValid = true
+		lib.SetFirestore("mail", uid[0], objmail[0])
+	}
 
 	return getResponse("<p>Grazie la tua mail è stata validata poi continuare l'acquisto</p>"), nil, nil
 }
