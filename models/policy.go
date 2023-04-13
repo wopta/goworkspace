@@ -120,7 +120,7 @@ type Price struct {
 }
 
 func (policy *Policy) BigquerySave() {
-
+	policyBig := lib.GetDatasetByContractorName(policy.Contractor.Name, "policy")
 	policyJson, e := policy.Marshal()
 	log.Println(" policy "+policy.Uid, string(policyJson))
 	policy.Data = string(policyJson)
@@ -128,7 +128,7 @@ func (policy *Policy) BigquerySave() {
 	policy.BigEndDate = civil.DateTimeOf(policy.EndDate)
 	policy.BigEmitDate = civil.DateTimeOf(policy.EmitDate)
 	log.Println(" policy save big query: " + policy.Uid)
-	e = lib.InsertRowsBigQuery("wopta", "policy", policy)
+	e = lib.InsertRowsBigQuery("wopta", policyBig, policy)
 	log.Println(" policy save big query error: ", e)
 }
 func PolicyToListData(query *firestore.DocumentIterator) []Policy {
