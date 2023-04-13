@@ -33,9 +33,11 @@ func Sign(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println("Sign "+uid+" ", envelope)
 
 	if action == "workstepFinished" {
+		//policyFire=lib.GetDatasetByContractorName(policy.Contractor.Name,"policy")
 		policyF := lib.GetFirestore("policy", uid)
 		var policy models.Policy
 		policyF.DataTo(&policy)
+
 		log.Println("Sign "+uid+" policy.Status:", policy.Status)
 		if !policy.IsSign && policy.Status == models.PolicyStatusToSign {
 			policy.IsSign = true
