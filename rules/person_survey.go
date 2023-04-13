@@ -26,7 +26,7 @@ func PersonSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 
 	switch os.Getenv("env") {
 	case "local":
-		groule = lib.ErrorByte(os.ReadFile("../function-data/dev/grules/" + rulesFileName))
+		groule = lib.ErrorByte(os.ReadFile("../../function-data/dev/grules/" + rulesFileName))
 	case "dev":
 		groule = lib.GetFromStorage("function-data", "grules/"+rulesFileName, "")
 	case "prod":

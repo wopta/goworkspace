@@ -24,7 +24,7 @@ func Broker(w http.ResponseWriter, r *http.Request) {
 
 		Routes: []lib.Route{
 			{
-				Route:   "/v1/policies/fiscalCode/:fiscalCode",
+				Route:   "/v1/policies/fiscalcode/:fiscalcode",
 				Handler: PolicyFiscalcode,
 				Method:  "GET",
 			},
