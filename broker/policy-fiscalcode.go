@@ -23,6 +23,7 @@ func PolicyFiscalcode(w http.ResponseWriter, r *http.Request) (string, interface
 		wiseToken          *string = nil
 		e                  error
 		wiseSimplePolicies *[]WiseSimplePolicy
+		response           GetPolicesByFiscalCodeResponse
 	)
 
 	log.Println("GetPolicyByFiscalCode")
@@ -46,11 +47,12 @@ func PolicyFiscalcode(w http.ResponseWriter, r *http.Request) (string, interface
 	wisePolicies := getCompletePoliciesFromWise(*wiseSimplePolicies, wiseToken)
 	policies = append(policies, wisePolicies...)
 
-	res, _ := json.Marshal(policies)
+	response.Policies = policies
+	res, _ := json.Marshal(response)
 
 	fmt.Printf("Found %d policies for this fiscal code: %s", len(policies), fiscalCode)
 
-	return string(res), policies, nil
+	return string(res), response, nil
 }
 
 func getCompletePoliciesFromWise(simplePolicies []WiseSimplePolicy, wiseToken *string) []models.Policy {
@@ -134,6 +136,10 @@ func GetPoliciesFromFirebase(fiscalCode string) []models.Policy {
 	}
 	docsnap, _ := q.FirestoreWherefields("policy")
 	return models.PolicyToListData(docsnap)
+}
+
+type GetPolicesByFiscalCodeResponse struct {
+	Policies []models.Policy `json:"policies"`
 }
 
 type WiseSimplePolicyResponse struct {
