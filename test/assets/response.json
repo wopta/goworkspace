@@ -1,1 +1,154 @@
-{"statements":[{"title":"INFORMAZIONI SULLO STATO DI SALUTE - AVVERTENZE SULLA COMPILAZIONE DEL QUESTIONARIO MEDICO","questions":[{"question":"L’Assicurato è tenuto a rispondere alle domande di un Questionario Medico. Si avverte l’Assicurato che:","isBold":true,"hasAnswer":false},{"question":"a) le dichiarazioni non veritiere, inesatte o reticenti compromettono il diritto alla prestazione;","isBold":true,"indent":true,"hasAnswer":false},{"question":"b) è necessario verificare l’esattezza e la rispondenza a verità delle risposte al Questionario Medico prima della sua sottoscrizione;","isBold":true,"indent":true,"hasAnswer":false},{"question":"c) anche nei casi non previsti dalla Compagnia, l’Aderente/Assicurato può chiedere di essere sottoposto a visita medica, per certificare lo stato di salute. Il costo di tale visita medica sarà a suo carico.","isBold":true,"indent":true,"hasAnswer":false},{"question":"Sono assicurabili solo i soggetti che rispondono “NO” a tutte le domande incluse nel Questionario Medico. La Compagnia pertanto, anche ai fini dell’art. 1893 2° comma del codice civile, dichiara espressamente che non intende assumere il rischio (nemmeno a diverse condizioni) qualora fosse a conoscenza che l’Assicurato sia affetto anche da una sola delle patologie incluse nel Questionario Medico.","isBold":true,"hasAnswer":false}],"hasAnswer":false},{"title":"A. Ha ricevuto, negli ultimi 5 anni, una diagnosi o prescrizione di esami, trattamenti, subito interventi chirurgici o assunto farmaci in merito alle seguenti patologie?","hasMultipleAnswers":true,"questions":[{"question":"1. Ipertensione arteriosa (pressione superiore a 145/90 o trattamento con 2 o più medicinali)","indent":true,"hasAnswer":true,"expectedAnswer":false},{"question":"2. Ictus, attacco ischemico transitorio (mini-ictus), emorragia cerebrale","indent":true,"hasAnswer":true,"expectedAnswer":false},{"question":"3. Infarto, cardiopatia ischemica/coronarica, arteriosclerosi","indent":true,"hasAnswer":true,"expectedAnswer":false},{"question":"4. Aritmia cardiaca tale da richiedere un trattamento farmacologico e/o controlli periodici","indent":true,"hasAnswer":true,"expectedAnswer":false},{"question":"5. Qualsiasi forma di neoplasia maligna, inclusi cancro alla pelle (melanoma), leucemie, linfomi, mieloma, tumore del midollo osseo ed inoltre meningioma, nonché cisti o crescita benigna delle meningi all’interno del cervello o della spina dorsale","indent":true,"hasAnswer":true,"expectedAnswer":false},{"question":"6. Immunodeficienza acquisita (AIDS) e qualsiasi altra immunopatologia","indent":true,"hasAnswer":true,"expectedAnswer":false},{"question":"7. Sclerosi laterale amiotrofica, sclerosi multipla, morbo di Alzheimer, morbo di Parkinson e tutte le malattie neurogenerative","indent":true,"hasAnswer":true,"expectedAnswer":false},{"question":"8. Discopatia osteoartrite o artrite infiammatoria estesa ad una o più articolazioni","indent":true,"hasAnswer":true,"expectedAnswer":false},{"question":"9. Broncopneumopatia cronica ostruttiva, l’asma moderato/severo, la sarcoidosi e l’enfisema","indent":true,"hasAnswer":true,"expectedAnswer":false},{"question":"10. Insufficienza renale acuta o cronica, malattie infiammatorie croniche intestinali, pancreatite cronica","indent":true,"hasAnswer":true,"expectedAnswer":false},{"question":"11. Diabete","indent":true,"hasAnswer":true,"expectedAnswer":false},{"question":"12. Cirrosi da qualsiasi causa, epatite B e C e steatosi epatica o qualsiasi epatopatia","indent":true,"hasAnswer":true,"expectedAnswer":false},{"question":"13. Le seguenti Malattie o malformazioni congenite/ereditarie: idrocefalo, pneumopatia fibrocistica, cardiopatie congenite, spina bifida, atresie di organi addominali, trisomie, agenesie renali, malformazioni vascolari endocraniche, malformazioni dell’apparato urinario non corrette chirurgicamente, malformazioni dei grossi vasi","indent":true,"hasAnswer":true,"expectedAnswer":false}],"hasAnswer":false},{"title":"B. È a conoscenza di essere affetto da una delle malattie di cui al punto A, o di una loro possibile insorgenza, di essere in attesa di risultati di consulti medici, esami medici o ricoveri ospedalieri (o in istituti di cura) sempre in riferimento alle patologie elencate al punto A?","hasAnswer":true,"expectedAnswer":false},{"title":"C. Per ragioni di lavoro è esposto a pericoli di qualsiavoglia natura che possano attentare alla sua salute o intende intraprendere una delle seguenti attività: Aviazione, paracadutismo, deltaplano, sport motoristici, immersioni, arrampicata, speleologia o qualsiasi altro sport estremo?","hasAnswer":true,"expectedAnswer":false},{"title":"D. È titolare di una pensione di invalidità o inabilità (parziale o totale) o ha in corso pratiche per il relativo riconoscimento?","hasAnswer":true,"expectedAnswer":false}]}
+{
+  "statements": [
+    {
+      "title": "INFORMAZIONI SULLO STATO DI SALUTE - AVVERTENZE SULLA COMPILAZIONE DEL QUESTIONARIO MEDICO",
+      "questions": [
+        {
+          "question": "L’Assicurato è tenuto a rispondere alle domande di un Questionario Medico. Si avverte l’Assicurato che:",
+          "isBold": true,
+          "hasAnswer": false
+        },
+        {
+          "question": "a) le dichiarazioni non veritiere, inesatte o reticenti compromettono il diritto alla prestazione;",
+          "isBold": true,
+          "indent": true,
+          "hasAnswer": false
+        },
+        {
+          "question": "b) è necessario verificare l’esattezza e la rispondenza a verità delle risposte al Questionario Medico prima della sua sottoscrizione;",
+          "isBold": true,
+          "indent": true,
+          "hasAnswer": false
+        },
+        {
+          "question": "c) anche nei casi non previsti dalla Compagnia, l’Aderente/Assicurato può chiedere di essere sottoposto a visita medica, per certificare lo stato di salute. Il costo di tale visita medica sarà a suo carico.",
+          "isBold": true,
+          "indent": true,
+          "hasAnswer": false
+        },
+        {
+          "question": "Sono assicurabili solo i soggetti che rispondono “NO” a tutte le domande incluse nel Questionario Medico. La Compagnia pertanto, anche ai fini dell’art. 1893 2° comma del codice civile, dichiara espressamente che non intende assumere il rischio (nemmeno a diverse condizioni) qualora fosse a conoscenza che l’Assicurato sia affetto anche da una sola delle patologie incluse nel Questionario Medico.",
+          "isBold": true,
+          "hasAnswer": false
+        }
+      ],
+      "hasAnswer": false
+    },
+    {
+      "title": "A. Ha ricevuto, negli ultimi 5 anni, una diagnosi o prescrizione di esami, trattamenti, subito interventi chirurgici o assunto farmaci in merito alle seguenti patologie?",
+      "hasMultipleAnswers": true,
+      "questions": [
+        {
+          "question": "1. Ipertensione arteriosa (pressione superiore a 145/90 o trattamento con 2 o più medicinali)",
+          "indent": true,
+          "hasAnswer": true,
+          "expectedAnswer": false,
+          "answer": false
+        },
+        {
+          "question": "2. Ictus, attacco ischemico transitorio (mini-ictus), emorragia cerebrale",
+          "indent": true,
+          "hasAnswer": true,
+          "expectedAnswer": false,
+          "answer": false
+        },
+        {
+          "question": "3. Infarto, cardiopatia ischemica/coronarica, arteriosclerosi",
+          "indent": true,
+          "hasAnswer": true,
+          "expectedAnswer": false,
+          "answer": false
+        },
+        {
+          "question": "4. Aritmia cardiaca tale da richiedere un trattamento farmacologico e/o controlli periodici",
+          "indent": true,
+          "hasAnswer": true,
+          "expectedAnswer": false,
+          "answer": false
+        },
+        {
+          "question": "5. Qualsiasi forma di neoplasia maligna, inclusi cancro alla pelle (melanoma), leucemie, linfomi, mieloma, tumore del midollo osseo ed inoltre meningioma, nonché cisti o crescita benigna delle meningi all’interno del cervello o della spina dorsale",
+          "indent": true,
+          "hasAnswer": true,
+          "expectedAnswer": false,
+          "answer": false
+        },
+        {
+          "question": "6. Immunodeficienza acquisita (AIDS) e qualsiasi altra immunopatologia",
+          "indent": true,
+          "hasAnswer": true,
+          "expectedAnswer": false,
+          "answer": false
+        },
+        {
+          "question": "7. Sclerosi laterale amiotrofica, sclerosi multipla, morbo di Alzheimer, morbo di Parkinson e tutte le malattie neurogenerative",
+          "indent": true,
+          "hasAnswer": true,
+          "expectedAnswer": false,
+          "answer": false
+        },
+        {
+          "question": "8. Discopatia osteoartrite o artrite infiammatoria estesa ad una o più articolazioni",
+          "indent": true,
+          "hasAnswer": true,
+          "expectedAnswer": false,
+          "answer": false
+        },
+        {
+          "question": "9. Broncopneumopatia cronica ostruttiva, l’asma moderato/severo, la sarcoidosi e l’enfisema",
+          "indent": true,
+          "hasAnswer": true,
+          "expectedAnswer": false,
+          "answer": false
+        },
+        {
+          "question": "10. Insufficienza renale acuta o cronica, malattie infiammatorie croniche intestinali, pancreatite cronica",
+          "indent": true,
+          "hasAnswer": true,
+          "expectedAnswer": false,
+          "answer": false
+        },
+        {
+          "question": "11. Diabete",
+          "indent": true,
+          "hasAnswer": true,
+          "expectedAnswer": false,
+          "answer": false
+        },
+        {
+          "question": "12. Cirrosi da qualsiasi causa, epatite B e C e steatosi epatica o qualsiasi epatopatia",
+          "indent": true,
+          "hasAnswer": true,
+          "expectedAnswer": false,
+          "answer": false
+        },
+        {
+          "question": "13. Le seguenti Malattie o malformazioni congenite/ereditarie: idrocefalo, pneumopatia fibrocistica, cardiopatie congenite, spina bifida, atresie di organi addominali, trisomie, agenesie renali, malformazioni vascolari endocraniche, malformazioni dell’apparato urinario non corrette chirurgicamente, malformazioni dei grossi vasi",
+          "indent": true,
+          "hasAnswer": true,
+          "expectedAnswer": false,
+          "answer": false
+        }
+      ],
+      "hasAnswer": false
+    },
+    {
+      "title": "B. È a conoscenza di essere affetto da una delle malattie di cui al punto A, o di una loro possibile insorgenza, di essere in attesa di risultati di consulti medici, esami medici o ricoveri ospedalieri (o in istituti di cura) sempre in riferimento alle patologie elencate al punto A?",
+      "hasAnswer": true,
+      "expectedAnswer": false,
+      "answer": false
+    },
+    {
+      "title": "C. Per ragioni di lavoro è esposto a pericoli di qualsiavoglia natura che possano attentare alla sua salute o intende intraprendere una delle seguenti attività: Aviazione, paracadutismo, deltaplano, sport motoristici, immersioni, arrampicata, speleologia o qualsiasi altro sport estremo?",
+      "hasAnswer": true,
+      "expectedAnswer": false,
+      "answer": false
+    },
+    {
+      "title": "D. È titolare di una pensione di invalidità o inabilità (parziale o totale) o ha in corso pratiche per il relativo riconoscimento?",
+      "hasAnswer": true,
+      "expectedAnswer": false,
+      "answer": false
+    }
+  ]
+}

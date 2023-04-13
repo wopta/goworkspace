@@ -1654,17 +1654,22 @@ func PrintStatement(pdf *fpdf.Fpdf, statement *models.Statement) {
 
 	SetBlackBoldFont(pdf, standardTextSize)
 	if statement.HasAnswer {
-		noWidth := pdf.GetStringWidth("NO")
+		answer := "NO"
+		if *statement.Answer {
+			answer = "SI"
+		}
+
+		answerWidth := pdf.GetStringWidth(answer)
 		dotWidth := pdf.GetStringWidth(".")
 
 		var statementWidth, paddingWidth float64
 		lines := pdf.SplitText(statement.Title, rowWidth)
 
 		statementWidth = pdf.GetStringWidth(lines[len(lines)-1])
-		paddingWidth = availableWidth - statementWidth - noWidth
+		paddingWidth = availableWidth - statementWidth - answerWidth
 
 		statement.Title += strings.Repeat(".", int(math.Floor(paddingWidth/dotWidth)))
-		statement.Title += "NO"
+		statement.Title += answer
 	}
 	pdf.MultiCell(rowWidth, 3.5, statement.Title, "", fpdf.AlignLeft, false)
 
@@ -1681,18 +1686,24 @@ func PrintStatement(pdf *fpdf.Fpdf, statement *models.Statement) {
 			availableWidth -= tabDimension / 2
 		}
 
-		noWidth := pdf.GetStringWidth("NO")
-		dotWidth := pdf.GetStringWidth(".")
-
 		if question.HasAnswer {
 			var questionWidth, paddingWidth float64
+
+			answer := "NO"
+			if *question.Answer {
+				answer = "SI"
+			}
+
+			answerWidth := pdf.GetStringWidth(answer)
+			dotWidth := pdf.GetStringWidth(".")
+
 			lines := pdf.SplitText(question.Question, rowWidth)
 
 			questionWidth = pdf.GetStringWidth(lines[len(lines)-1])
-			paddingWidth = availableWidth - questionWidth - noWidth
+			paddingWidth = availableWidth - questionWidth - answerWidth
 
 			question.Question += strings.Repeat(".", int(math.Ceil(paddingWidth/dotWidth))+1)
-			question.Question += "NO"
+			question.Question += answer
 		}
 		pdf.MultiCell(rowWidth, 3.5, question.Question, "", fpdf.AlignLeft, false)
 	}
