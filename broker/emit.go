@@ -25,6 +25,7 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	request := lib.ErrorByte(ioutil.ReadAll(r.Body))
 	log.Println("Emit", string(request))
 	json.Unmarshal([]byte(request), &result)
+
 	uid := result.Uid
 	log.Println("Emit", uid)
 	var policy models.Policy

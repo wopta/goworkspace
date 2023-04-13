@@ -5,6 +5,7 @@ import (
 	"log"
 	"time"
 
+	"cloud.google.com/go/civil"
 	"cloud.google.com/go/firestore"
 	"github.com/wopta/goworkspace/lib"
 	"google.golang.org/api/iterator"
@@ -52,7 +53,7 @@ type User struct {
 	VatCode        string        `firestore:"vatCode" json:"vatCode" bigquery:"vatCode"`
 	RiskClass      string        `firestore:"riskClass" json:"riskClass,omitempty" bigquery:"riskClass"`
 	CreationDate   time.Time     `firestore:"creationDate,omitempty" json:"creationDate,omitempty" bigquery:"-"`
-	UpdatedDate    string        `firestore:"updatedDate,omitempty" json:"updatedDate,omitempty" bigquery:"-"`
+	UpdatedDate    time.Time     `firestore:"updatedDate,omitempty" json:"updatedDate,omitempty" bigquery:"-"`
 	PoliciesUid    []string      `firestore:"policiesUid" json:"policiesUid,omitempty" bigquery:"-"`
 	BigPoliciesUid string        `firestore:"-" json:"-" bigquery:"policiesUid"`
 	Claims         *[]Claim      `firestore:"claims" json:"claims,omitempty" bigquery:"-"`
@@ -63,12 +64,14 @@ type User struct {
 	Json           string        `firestore:"-" json:"-" bigquery:"json"`
 }
 type Consens struct {
-	UserUid      string    `firestore:"useruid" json:"useruid,omitempty" bigquery:"useruid" `
-	Title        string    `firestore:"title ,omitempty" json:"title,omitempty"`
-	Consens      string    `firestore:"consens,omitempty" json:"consens,omitempty"`
-	Key          int64     `firestore:"key,omitempty" json:"key,omitempty"`
-	Answer       bool      `firestore:"answer,omitempty" json:"answer,omitempty"`
-	CreationDate time.Time `firestore:"creationDate,omitempty" json:"creationDate,omitempty" bigquery:"-"`
+	UserUid         string         `firestore:"useruid" json:"useruid,omitempty" bigquery:"useruid" `
+	Title           string         `firestore:"title ,omitempty" json:"title,omitempty" bigquery:"title"`
+	Consens         string         `firestore:"consens,omitempty" json:"consens,omitempty" bigquery:"consens"`
+	Key             int64          `firestore:"key,omitempty" json:"key,omitempty" bigquery:"key"`
+	Answer          bool           `firestore:"answer,omitempty" json:"answer,omitempty" bigquery:"answer"`
+	CreationDate    time.Time      `firestore:"creationDate,omitempty" json:"creationDate,omitempty" bigquery:"-" bigquery:"-"`
+	BigCreationDate civil.DateTime `bigquery:"creationDate" firestore:"-"`
+	Mail            string         `firestore:"-" json:"-" bigquery:"mail"`
 }
 
 func FirestoreDocumentToUser(query *firestore.DocumentIterator) (User, error) {
@@ -96,12 +99,13 @@ func UserUpdateByFiscalcode(user User) (string, error) {
 	userL, e := FirestoreDocumentToUser(docsnap)
 	if len(user.Uid) == 0 {
 		user.CreationDate = time.Now()
+		user.UpdatedDate = time.Now()
 		ref2, _ := lib.PutFirestore("users", user)
 		log.Println("Proposal User uid", ref2)
 		useruid = ref2.ID
 	} else {
 		useruid = user.Uid
-		userL.UpdatedDate = time.Now().GoString()
+		userL.UpdatedDate = time.Now()
 		_, e = lib.FireUpdate("users", useruid, userL)
 	}
 	return useruid, e

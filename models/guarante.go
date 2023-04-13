@@ -1,7 +1,7 @@
 package models
 
 type Guarante struct {
-	DailyAllowance             string                    `firestore:"dailyAllowance" json:"dailyAllowance,omitempty"`
+	DailyAllowance             string                    `firestore:"dailyAllowance" json:"dailyAllowance,omitempty"  bigquery:"-"`
 	OrderAsset                 int                       `firestore:"orderAsset,omitempty" json:"orderAsset,omitempty"`
 	LegalDefence               string                    `firestore:"legalDefence" json:"legalDefence,omitempty"`
 	Assistance                 string                    `firestore:"assistance " json:"assistance ,omitempty"`
@@ -23,15 +23,15 @@ type Guarante struct {
 	Slug                       string                    `firestore:"slug" json:"slug,omitempty"`
 	IsMandatory                bool                      `firestore:"isMandatory" json:"isMandatory"`
 	IsExtension                bool                      `firestore:"isExtension" json:"isExtension"`
-	Discount                   float64                   `json:"discount,omitempty" json:"discount,omitempty"`
+	Discount                   float64                   `firestore:"discount,omitempty" json:"discount,omitempty"`
 	Name                       string                    `firestore:"name,omitempty" json:"name,omitempty"`
-	SumInsuredLimitOfIndemnity float64                   `json:"sumInsuredLimitOfIndemnity" json:"sumInsuredLimitOfIndemnity,omitempty"`
+	SumInsuredLimitOfIndemnity float64                   `firestore:"sumInsuredLimitOfIndemnity" json:"sumInsuredLimitOfIndemnity,omitempty"`
 	Deductible                 string                    `firestore:"deductible" json:"deductible,omitempty"`
 	DeductibleDesc             string                    `firestore:"deductibleDesc" json:"deductibleDesc,omitempty"`
 	SelfInsurance              string                    `firestore:"selfInsurance" json:"selfInsurance,omitempty"`
 	SelfInsuranceDesc          string                    `firestore:"selfInsuranceDesc" json:"selfInsuranceDesc,omitempty"`
-	Tax                        float64                   `json:"tax,omitempty" json:"tax,omitempty"`
-	Taxs                       []Tax                     `json:"taxs,omitempty" json:"taxs,omitempty"`
+	Tax                        float64                   `firestore:"tax,omitempty" json:"tax,omitempty"`
+	Taxs                       []Tax                     `firestore:"taxs,omitempty" json:"taxs,omitempty"`
 	Price                      float64                   `firestore:"price,omitempty" json:"price,omitempty"`
 	PriceNett                  float64                   `firestore:"priceNett,omitempty" json:"priceNett,omitempty"`
 	PriceGross                 float64                   `firestore:"priceGross,omitempty" json:"priceGross,omitempty"`
