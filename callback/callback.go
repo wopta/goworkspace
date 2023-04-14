@@ -163,7 +163,7 @@ func getResponse(content string) string {
 					  <td align="center" valign="top" style="padding:0;Margin:0;width:520px">
 					   <table cellpadding="0" cellspacing="0" width="100%" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
 						 <tr>
-						  <td align="left" bgcolor="#ffffff" style="padding:10px;Margin:0"><h3 style="Margin:0;line-height:19px;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-size:16px;font-style:normal;font-weight:bold;color:#e50075"><strong>{{.Title}}</strong></h3><h3 style="Margin:0;line-height:19px;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-size:16px;font-style:normal;font-weight:bold;color:#e50075">{{.SubTitle}}</h3></td>
+						  <td align="left" bgcolor="#ffffff" style="padding:10px;Margin:0"><h3 style="Margin:0;line-height:19px;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-size:16px;font-style:normal;font-weight:bold;color:#e50075"><strong>Validazione Mail</strong></h3><h3 style="Margin:0;line-height:19px;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-size:16px;font-style:normal;font-weight:bold;color:#e50075"></h3></td>
 						 </tr>
 					   </table></td>
 					 </tr>
