@@ -57,10 +57,10 @@ func EmailVerify(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 		lib.SetFirestore("mail", uid[0], objmail[0])
 	}
 
-	return getResponse("<p>Grazie la tua mail è stata validata poi continuare l'acquisto</p>"), nil, nil
+	return getResponse("<p>Grazie la tua mail è stata validata poi continuare l'acquisto</p>", "Validazione Mail", email), nil, nil
 }
 
-func getResponse(content string) string {
+func getResponse(content string, title string, sub string) string {
 	return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 	<html xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office" style="font-family:arial, 'helvetica neue', helvetica, sans-serif">
 	 <head>
@@ -163,7 +163,7 @@ func getResponse(content string) string {
 					  <td align="center" valign="top" style="padding:0;Margin:0;width:520px">
 					   <table cellpadding="0" cellspacing="0" width="100%" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
 						 <tr>
-						  <td align="left" bgcolor="#ffffff" style="padding:10px;Margin:0"><h3 style="Margin:0;line-height:19px;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-size:16px;font-style:normal;font-weight:bold;color:#e50075"><strong>Validazione Mail</strong></h3><h3 style="Margin:0;line-height:19px;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-size:16px;font-style:normal;font-weight:bold;color:#e50075"></h3></td>
+						  <td align="left" bgcolor="#ffffff" style="padding:10px;Margin:0"><h3 style="Margin:0;line-height:19px;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-size:16px;font-style:normal;font-weight:bold;color:#e50075"><strong>` + title + `</strong></h3><h3 style="Margin:0;line-height:19px;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-size:16px;font-style:normal;font-weight:bold;color:#e50075">` + sub + `</h3></td>
 						 </tr>
 					   </table></td>
 					 </tr>
