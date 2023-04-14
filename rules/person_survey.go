@@ -14,19 +14,25 @@ func PersonSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	var (
 		groule    []byte
 		questions []*models.Statement
+		policy    models.Policy
 	)
 	const (
 		rulesFileName = "person_survey.json"
 	)
 
 	log.Println("Person Survey")
-	policyJson := lib.ErrorByte(io.ReadAll(r.Body))
+
+	b, err := io.ReadAll(r.Body)
+	lib.CheckError(err)
+	err = json.Unmarshal(b, &policy)
+
+	policyJson, err := policy.Marshal()
 
 	statements := &Statements{Statements: questions, Text: ""}
 
 	switch os.Getenv("env") {
 	case "local":
-		groule = lib.ErrorByte(os.ReadFile("../../function-data/dev/grules/" + rulesFileName))
+		groule = lib.ErrorByte(os.ReadFile("../function-data/dev/grules/" + rulesFileName))
 	case "dev":
 		groule = lib.GetFromStorage("function-data", "grules/"+rulesFileName, "")
 	case "prod":
@@ -44,10 +50,6 @@ func PersonSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 type Statements struct {
 	Statements []*models.Statement `json:"statements"`
 	Text       string              `json:"text,omitempty"`
-}
-
-type DynamicTitle struct {
-	Text string
 }
 
 type FxSurvey struct{}
