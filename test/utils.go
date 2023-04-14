@@ -78,9 +78,7 @@ func GetParagraphTitle(pdf *fpdf.Fpdf, title string) {
 	pdf.Cell(0, 10, title)
 }
 
-func PrintStatement(pdf *fpdf.Fpdf, statement *models.Statement) {
-
-	//yesWidth := pdf.GetStringWidth("YES")
+func PrintStatement(pdf *fpdf.Fpdf, statement models.Statement) {
 	leftMargin, _, rightMargin, _ := pdf.GetMargins()
 	pageWidth, _ := pdf.GetPageSize()
 	availableWidth := pageWidth - leftMargin - rightMargin - 2

@@ -62,7 +62,7 @@ func Life(policy models.Policy) string {
 
 	GetReferenteTerzoSection(pdf)
 
-	GetStatementsSection(pdf)
+	GetStatementsSection(pdf, policy)
 
 	DrawSignatureForm(pdf)
 

@@ -1,12 +1,10 @@
 package test
 
 import (
-	"encoding/json"
 	"github.com/dustin/go-humanize"
 	"github.com/go-pdf/fpdf"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	"os"
 	"strconv"
 	"strings"
 )
@@ -41,8 +39,8 @@ func GetMainHeader(pdf *fpdf.Fpdf, policy models.Policy) {
 		"Prima scadenza annuale il: " + nextpay + "\n" +
 		"Non si rinnova a scadenza."
 
-	contractorInfo := "Contraente: " + strings.ToUpper(contractor.Surname) + " " + strings.ToUpper(contractor.Name) +
-		"\nC.F./P.IVA: " + strings.ToUpper(cfpi) + "\n" +
+	contractorInfo := "Contraente: " + strings.ToUpper(contractor.Surname) + " " + strings.ToUpper(contractor.Name) + "\n" +
+		"C.F./P.IVA: " + strings.ToUpper(cfpi) + "\n" +
 		"Indirizzo: " + strings.ToUpper(contractor.Address) + ", " + strings.ToUpper(contractor.StreetNumber) + "\n" +
 		strings.ToUpper(contractor.PostalCode) + " " + strings.ToUpper(contractor.City) + " (" +
 		strings.ToUpper(contractor.Province) + ")\n" + "Mail: " + contractor.Mail + "\n" +
@@ -478,24 +476,16 @@ func GetReferenteTerzoTable(pdf *fpdf.Fpdf) {
 	DrawPinkHorizontalLine(pdf, thinLineWidth)
 }
 
-func GetStatementsSection(pdf *fpdf.Fpdf) {
-	var statements Statements
-	b, err := os.ReadFile(lib.GetAssetPathByEnv("test") + "/response.json")
-	if err != nil {
-		lib.CheckError(err)
-	}
-	err = json.Unmarshal(b, &statements)
-	if err != nil {
-		lib.CheckError(err)
-	}
-
+func GetStatementsSection(pdf *fpdf.Fpdf, policy models.Policy) {
+	statements := *policy.Statements
+	
 	GetParagraphTitle(pdf, "Dichiarazioni da leggere con attenzione prima di firmare")
 	pdf.Ln(8)
-	PrintStatement(pdf, statements.Statements[0])
+	PrintStatement(pdf, statements[0])
 	pdf.Ln(5)
 	GetParagraphTitle(pdf, "Questionario Medico")
 	pdf.Ln(8)
-	for _, statement := range statements.Statements[1:] {
+	for _, statement := range statements[1:] {
 		PrintStatement(pdf, statement)
 	}
 	pdf.Ln(8)
