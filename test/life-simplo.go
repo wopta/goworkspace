@@ -54,7 +54,7 @@ func Life(policy models.Policy) string {
 
 	GetContractorInfoSection(pdf, policy.Contractor)
 
-	GetGuaranteesTable(pdf)
+	GetGuaranteesTable(pdf, policy)
 
 	GetAvvertenzeBeneficiariSection(pdf)
 

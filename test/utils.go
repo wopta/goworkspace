@@ -15,6 +15,7 @@ const (
 	smallTextSize    = 6
 	standardTextSize = 9
 	tabDimension     = 15
+	layout           = "02/01/2006"
 )
 
 func Save(pdf *fpdf.Fpdf) (string, error) {
@@ -145,4 +146,12 @@ func PrintStatement(pdf *fpdf.Fpdf, statement *models.Statement) {
 func IndentedText(pdf *fpdf.Fpdf, content string) {
 	pdf.SetX(tabDimension)
 	pdf.MultiCell(0, 3, content, "", fpdf.AlignLeft, false)
+}
+
+func GuaranteesToMap(guarantees []models.Guarante) map[string]models.Guarante {
+	m := make(map[string]models.Guarante, 0)
+	for _, guarantee := range guarantees {
+		m[guarantee.Slug] = guarantee
+	}
+	return m
 }

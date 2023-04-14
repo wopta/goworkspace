@@ -2,10 +2,12 @@ package test
 
 import (
 	"encoding/json"
+	"github.com/dustin/go-humanize"
 	"github.com/go-pdf/fpdf"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -17,7 +19,6 @@ func GetMainHeader(pdf *fpdf.Fpdf, policy models.Policy) {
 		cfpi     string
 		nextpay  string
 	)
-	layout := "02/01/2006"
 	pathPrefix := lib.GetAssetPathByEnv("test") + "/logo_"
 	logoPath = pathPrefix + "vita.png"
 
@@ -217,7 +218,57 @@ func GetContractorInfoTable(pdf *fpdf.Fpdf, contractor models.User) {
 	pdf.Ln(1)
 }
 
-func GetGuaranteesTable(pdf *fpdf.Fpdf) {
+func GetGuaranteesTable(pdf *fpdf.Fpdf, policy models.Policy) {
+	const (
+		death               = "death"
+		permanentDisability = "permanent-disability"
+		temporaryDisability = "temporary-disability"
+		seriousIll          = "serious-ill"
+	)
+
+	slugs := []string{death, permanentDisability, temporaryDisability, seriousIll}
+
+	guarantees := map[string]map[string]string{
+		death: {
+			"name":                       "Decesso",
+			"sumInsuredLimitOfIndemnity": "======",
+			"duration":                   "==",
+			"endDate":                    "====",
+			"price":                      "====",
+		},
+		permanentDisability: {
+			"name":                       "Invalidità Totale Permanente da Infortunio o Malattia",
+			"sumInsuredLimitOfIndemnity": "======",
+			"duration":                   "==",
+			"endDate":                    "====",
+			"price":                      "====",
+		},
+		temporaryDisability: {
+			"name":                       "Inabilità Temporanea da Infortunio o Malattia",
+			"sumInsuredLimitOfIndemnity": "======",
+			"duration":                   "==",
+			"endDate":                    "====",
+			"price":                      "====",
+		},
+		seriousIll: {
+			"name":                       "Malattie Gravi",
+			"sumInsuredLimitOfIndemnity": "======",
+			"duration":                   "==",
+			"endDate":                    "====",
+			"price":                      "====",
+		},
+	}
+
+	for _, guarantee := range GuaranteesToMap(policy.Assets[0].Guarantees) {
+		guarantees[guarantee.Slug]["sumInsuredLimitOfIndemnity"] = humanize.FormatFloat("#.###,", guarantee.Value.SumInsuredLimitOfIndemnity) + " €"
+		guarantees[guarantee.Slug]["duration"] = strconv.Itoa(guarantee.Value.Duration.Year)
+		guarantees[guarantee.Slug]["endDate"] = policy.StartDate.AddDate(guarantee.Value.Duration.Year, 0, 0).Format(layout)
+		guarantees[guarantee.Slug]["price"] = humanize.FormatFloat("#.###,##", guarantee.Value.PremiumGrossYearly) + " €"
+		if guarantee.Slug != death {
+			guarantees[guarantee.Slug]["price"] += " (*)"
+		}
+	}
+
 	SetBlackBoldFont(pdf, standardTextSize)
 	pdf.MultiCell(90, 3, "Garanzie", "", "CM", false)
 	pdf.SetXY(pdf.GetX()+90, pdf.GetY()-3)
@@ -228,52 +279,23 @@ func GetGuaranteesTable(pdf *fpdf.Fpdf) {
 	pdf.MultiCell(25, 3, "Scade il", "", "CM", false)
 	pdf.SetXY(pdf.GetX()+169, pdf.GetY()-3)
 	pdf.MultiCell(0, 3, "Premio annuale €", "", "CM", false)
-
-	/*
-		pdf.CellFormat(80, 6, "Garanzie", "", 0, "CM", false, 0, "")
-		pdf.CellFormat(25, 6, "Somma\nassicurata €", "", 0, "CM", false, 0, "")
-		pdf.CellFormat(30, 6, "Durata anni", "", 0, "CM", false, 0, "")
-		pdf.CellFormat(25, 6, "Scade il", "", 0, "CM", false, 0, "")
-		pdf.CellFormat(25, 6, "Premio annuale €", "", 0, "CM", false, 0, "")
-
-	*/
 	pdf.Ln(1)
 	DrawPinkHorizontalLine(pdf, thinLineWidth)
-	pdf.CellFormat(90, 6, "Decesso", "", 0, "", false, 0, "")
-	SetBlackRegularFont(pdf, standardTextSize)
-	pdf.CellFormat(25, 6, "100.000 €", "", 0, "RM", false, 0, "")
-	pdf.CellFormat(25, 6, "20", "", 0, "CM", false, 0, "")
-	pdf.CellFormat(25, 6, "04/03/2023", "", 0, "CM", false, 0, "")
-	pdf.CellFormat(0, 6, "97,74 €", "", 0, "RM", false, 0, "")
-	pdf.Ln(5)
-	DrawPinkHorizontalLine(pdf, thinLineWidth)
-	SetBlackBoldFont(pdf, standardTextSize)
-	pdf.CellFormat(90, 6, "Invalidità Totale Permanente da Infortunio o Malattia", "", 0, "", false, 0, "")
-	SetBlackRegularFont(pdf, standardTextSize)
-	pdf.CellFormat(25, 6, "100.000 €", "", 0, "RM", false, 0, "")
-	pdf.CellFormat(25, 6, "20", "", 0, "CM", false, 0, "")
-	pdf.CellFormat(25, 6, "04/03/2023", "", 0, "CM", false, 0, "")
-	pdf.CellFormat(0, 6, "12,02 € (*)", "", 0, "RM", false, 0, "")
-	pdf.Ln(5)
-	DrawPinkHorizontalLine(pdf, thinLineWidth)
-	SetBlackBoldFont(pdf, standardTextSize)
-	pdf.CellFormat(90, 6, "Inabilità Temporanea da Infortunio o Malattia", "", 0, "", false, 0, "")
-	SetBlackRegularFont(pdf, standardTextSize)
-	pdf.CellFormat(25, 6, "500 €", "", 0, "RM", false, 0, "")
-	pdf.CellFormat(25, 6, "10", "", 0, "CM", false, 0, "")
-	pdf.CellFormat(25, 6, "04/03/2023", "", 0, "CM", false, 0, "")
-	pdf.CellFormat(0, 6, "10,00 € (*)", "", 0, "RM", false, 0, "")
-	pdf.Ln(5)
-	DrawPinkHorizontalLine(pdf, thinLineWidth)
-	SetBlackBoldFont(pdf, standardTextSize)
-	pdf.CellFormat(90, 6, "Malattie Gravi", "", 0, "", false, 0, "")
-	SetBlackRegularFont(pdf, standardTextSize)
-	pdf.CellFormat(25, 6, "10.000 €", "", 0, "RM", false, 0, "")
-	pdf.CellFormat(25, 6, "10", "", 0, "CM", false, 0, "")
-	pdf.CellFormat(25, 6, "04/03/2023", "", 0, "CM", false, 0, "")
-	pdf.CellFormat(0, 6, "55,42 € (*)", "", 0, "RM", false, 0, "")
-	pdf.Ln(5)
-	DrawPinkHorizontalLine(pdf, thinLineWidth)
+
+	for _, slug := range slugs {
+		SetBlackBoldFont(pdf, standardTextSize)
+		pdf.CellFormat(90, 6, guarantees[slug]["name"], "", 0, "", false, 0, "")
+		SetBlackRegularFont(pdf, standardTextSize)
+		pdf.CellFormat(25, 6, guarantees[slug]["sumInsuredLimitOfIndemnity"],
+			"", 0, "RM", false, 0, "")
+		pdf.CellFormat(25, 6, guarantees[slug]["duration"], "", 0, "CM",
+			false, 0, "")
+		pdf.CellFormat(25, 6, guarantees[slug]["endDate"], "", 0, "CM", false, 0, "")
+		pdf.CellFormat(0, 6, guarantees[slug]["price"], "",
+			0, "RM", false, 0, "")
+		pdf.Ln(5)
+		DrawPinkHorizontalLine(pdf, thinLineWidth)
+	}
 	pdf.Ln(0.5)
 	SetBlackRegularFont(pdf, smallTextSize)
 	pdf.Cell(80, 3, "(*) imposte assicurative di legge incluse nella misura del 2,50% del premio imponibile")
@@ -289,7 +311,7 @@ func GetAvvertenzeBeneficiariSection(pdf *fpdf.Fpdf) {
 		"designazione nominativa, la Compagnia potrà incontrare, al decesso dell’Assicurato, maggiori difficoltà "+
 		"nell’identificazione e nella ricerca dei beneficiari. La modifica o revoca del/i beneficiario/i deve essere "+
 		"comunicata alla Compagnia in forma scritta.\nIn caso di specifiche esigenze di riservatezza, la Compagnia "+
-		"potrà rivolgersi ad un soggetto terzo (diverso dal Beneficiario)\nIn caso di Decesso al fine di contattare "+
+		"potrà rivolgersi ad un soggetto terzo (diverso dal Beneficiario) in caso di Decesso al fine di contattare "+
 		"il Beneficiario designato.", "", "", false)
 }
 
