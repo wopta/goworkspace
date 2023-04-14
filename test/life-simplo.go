@@ -102,8 +102,6 @@ func Life(policy models.Policy) string {
 
 	pdf.Ln(15)
 
-	pdf.SetFont("Montserrat", "B", 10)
-
 	GetAxaTablePart3Section(pdf)
 
 	GetWoptaHeader(pdf)
@@ -111,6 +109,10 @@ func Life(policy models.Policy) string {
 	pdf.AddPage()
 
 	GetWoptaFooter(pdf)
+
+	GetAllegato3Section(pdf)
+
+	pdf.AddPage()
 
 	GetAllegato4Section(pdf)
 

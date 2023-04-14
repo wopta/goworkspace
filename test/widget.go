@@ -478,7 +478,7 @@ func GetReferenteTerzoTable(pdf *fpdf.Fpdf) {
 
 func GetStatementsSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	statements := *policy.Statements
-	
+
 	GetParagraphTitle(pdf, "Dichiarazioni da leggere con attenzione prima di firmare")
 	pdf.Ln(8)
 	PrintStatement(pdf, statements[0])
@@ -1001,6 +1001,7 @@ func GetAxaTablePart2Section(pdf *fpdf.Fpdf) {
 }
 
 func GetAxaTablePart3Section(pdf *fpdf.Fpdf) {
+	SetBlackBoldFont(pdf, 10)
 	pdf.MultiCell(0, 2, "", "TLR", "", false)
 	pdf.MultiCell(0, 4, "Informativa antiriciclaggio (articoli di riferimento) - "+
 		"(Decreto legislativo n. 231/2007)", "LR", "CM", false)
@@ -1104,17 +1105,7 @@ func GetAxaTablePart3Section(pdf *fpdf.Fpdf) {
 	pdf.MultiCell(0, 2, "", "BLR", "", false)
 }
 
-func GetAllegato4Section(pdf *fpdf.Fpdf) {
-	pdf.SetFont("Montserrat", "B", 11)
-	pdf.MultiCell(0, 3, "ALLEGATO 4 - INFORMAZIONI SULLA DISTRIBUZIONE\nDEL PRODOTTO ASSICURATIVO NON IBIP",
-		"", "CM", false)
-	pdf.Ln(3)
-	pdf.SetFont("Montserrat", "", 9)
-	pdf.MultiCell(0, 3, "Il distributore ha l’obbligo di consegnare o trasmettere al contraente, prima "+
-		"della sottoscrizione di ciascuna proposta o, qualora non prevista, di ciascun contratto assicurativo, il "+
-		"presente documento, che contiene notizie sul modello e l’attività di distribuzione, sulla consulenza fornita "+
-		"e sulle remunerazioni percepite.", "", "", false)
-	pdf.Ln(1)
+func GetWoptaInfoTable(pdf *fpdf.Fpdf) {
 	DrawPinkHorizontalLine(pdf, 0.1)
 	pdf.Ln(0.5)
 	pdf.SetFont("Montserrat", "", 6)
@@ -1178,7 +1169,103 @@ func GetAllegato4Section(pdf *fpdf.Fpdf) {
 		"21 - 00187 Roma", "", "", false)
 	pdf.Ln(0.5)
 	DrawPinkHorizontalLine(pdf, 0.1)
+}
+
+func GetAllegato3Section(pdf *fpdf.Fpdf) {
+	pdf.SetFont("Montserrat", "B", 11)
+	pdf.MultiCell(0, 3, "ALLEGATO 3 - INFORMATIVA SUL DISTRIBUTORE", "", "CM", false)
 	pdf.Ln(3)
+	pdf.SetFont("Montserrat", "", 9)
+	pdf.MultiCell(0, 3, "Il distributore ha l’obbligo di consegnare/trasmettere al contraente il presente"+
+		" documento, prima della sottoscrizione della prima proposta o, qualora non prevista, del primo contratto di "+
+		"assicurazione, di metterlo a disposizione del pubblico nei propri locali, anche mediante apparecchiature "+
+		"tecnologiche, oppure di pubblicarlo sul proprio sito internet ove utilizzato per la promozione e collocamento "+
+		"di prodotti assicurativi, dando avviso della pubblicazione nei propri locali. In occasione di rinnovo o "+
+		"stipula di un nuovo contratto o di qualsiasi operazione avente ad oggetto un prodotto di investimento "+
+		"assicurativo il distributore consegna o trasmette le informazioni di cui all’Allegato 3 solo in caso di "+
+		"successive modifiche di rilievo delle stesse.", "", "", false)
+	pdf.Ln(3)
+
+	pdf.SetFont("Montserrat", "B", 10)
+	pdf.MultiCell(0, 3, "SEZIONE I - Informazioni generali sull’intermediario che entra in contatto con "+
+		"il contraente", "", "", false)
+	pdf.Ln(1)
+
+	GetWoptaInfoTable(pdf)
+	pdf.Ln(1)
+
+	SetBlackRegularFont(pdf, standardTextSize)
+	pdf.MultiCell(0, 3, "Gli estremi identificativi e di iscrizione dell’Intermediario e dei soggetti che "+
+		"operano per lo stesso possono essere verificati consultando il Registro Unico degli Intermediari assicurativi "+
+		"e riassicurativi sul sito internet dell’IVASS (www.ivass.it)", "", fpdf.AlignLeft, false)
+	pdf.Ln(3)
+	SetBlackBoldFont(pdf, 10)
+	pdf.MultiCell(0, 3, "SEZIONE II - Informazioni sull’attività svolta dall’intermediario assicurativo ",
+		"", fpdf.AlignLeft, false)
+	pdf.Ln(1)
+
+	SetBlackRegularFont(pdf, standardTextSize)
+	pdf.MultiCell(0, 3, "La Wopta Assicurazioni Srl comunica di aver messo a disposizione nei propri "+
+		"locali l’elenco degli obblighi di comportamento cui adempie, come indicati nell’allegato 4-ter del Regolamento"+
+		" IVASS n. 40/2018.", "", "", false)
+	pdf.Ln(1)
+	pdf.MultiCell(0, 3, "Si comunica che nel caso di offerta fuori sede o nel caso in cui la fase "+
+		"precontrattuale si svolga mediante tecniche di comunicazione a distanza il contraente riceve l’elenco "+
+		"degli obblighi.", "", "", false)
+	pdf.Ln(3)
+	SetBlackBoldFont(pdf, 10)
+	pdf.MultiCell(0, 3, "SEZIONE III - Informazioni relative a potenziali situazioni di conflitto "+
+		"d’interessi", "", "", false)
+	pdf.Ln(1)
+	SetBlackRegularFont(pdf, standardTextSize)
+	pdf.MultiCell(0, 3, "Wopta Assicurazioni Srl ed i soggetti che operano per la stessa non sono "+
+		"detentori di una partecipazione, diretta o indiretta, pari o superiore al 10% del capitale sociale o dei "+
+		"diritti di voto di alcuna Impresa di assicurazione.", "", "", false)
+	pdf.Ln(1)
+	pdf.MultiCell(0, 3, "Le Imprese di assicurazione o Imprese controllanti un’Impresa di assicurazione "+
+		"non sono detentrici di una partecipazione, diretta o indiretta, pari o superiore al 10% del capitale sociale "+
+		"o dei diritti di voto dell’Intermediario.", "", "", false)
+	pdf.Ln(3)
+	SetBlackBoldFont(pdf, 10)
+	pdf.MultiCell(0, 3, "SEZIONE IV - Informazioni sugli strumenti di tutela del contraente",
+		"", "", false)
+	pdf.Ln(1)
+	SetBlackRegularFont(pdf, standardTextSize)
+	pdf.SetFont("Montserrat", "", 9)
+	pdf.MultiCell(0, 3, "L’attività di distribuzione è garantita da un contratto di assicurazione della "+
+		"responsabilità civile che copre i danni arrecati ai contraenti da negligenze ed errori professionali "+
+		"dell’intermediario o da negligenze, errori professionali ed infedeltà dei dipendenti, dei collaboratori o "+
+		"delle persone del cui operato l’intermediario deve rispondere a norma di legge.",
+		"", "", false)
+	pdf.Ln(1)
+	pdf.MultiCell(0, 3, "Il contraente ha la facoltà, ferma restando la possibilità di rivolgersi "+
+		"all’Autorità Giudiziaria, di inoltrare reclamo per iscritto all’intermediario, via posta all’indirizzo di "+
+		"sede legale o a mezzo mail alla PEC sopra indicati, oppure all’Impresa secondo le modalità e presso i "+
+		"recapiti indicati nel DIP aggiuntivo nella relativa sezione, nonché la possibilità, qualora non dovesse "+
+		"ritenersi soddisfatto dall’esito del reclamo o in caso di assenza di riscontro da parte dell’intermediario "+
+		"o dell’impresa entro il termine di legge, di rivolgersi all’IVASS secondo quanto indicato nei DIP aggiuntivi.",
+		"", "", false)
+	pdf.Ln(1)
+	pdf.MultiCell(0, 3, "Il contraente ha la facoltà di avvalersi di altri eventuali sistemi alternativi "+
+		"di risoluzione delle controversie previsti dalla normativa vigente nonché quelli indicati nei DIP aggiuntivi.",
+		"", "", false)
+}
+
+func GetAllegato4Section(pdf *fpdf.Fpdf) {
+	pdf.SetFont("Montserrat", "B", 11)
+	pdf.MultiCell(0, 3, "ALLEGATO 4 - INFORMAZIONI SULLA DISTRIBUZIONE\nDEL PRODOTTO ASSICURATIVO NON IBIP",
+		"", "CM", false)
+	pdf.Ln(3)
+	pdf.SetFont("Montserrat", "", 9)
+	pdf.MultiCell(0, 3, "Il distributore ha l’obbligo di consegnare o trasmettere al contraente, prima "+
+		"della sottoscrizione di ciascuna proposta o, qualora non prevista, di ciascun contratto assicurativo, il "+
+		"presente documento, che contiene notizie sul modello e l’attività di distribuzione, sulla consulenza fornita "+
+		"e sulle remunerazioni percepite.", "", "", false)
+	pdf.Ln(1)
+
+	GetWoptaInfoTable(pdf)
+	pdf.Ln(3)
+
 	pdf.SetFont("Montserrat", "B", 10)
 	pdf.MultiCell(0, 3, "SEZIONE I - Informazioni sul modello di distribuzione", "", "", false)
 	pdf.Ln(1)
@@ -1457,9 +1544,6 @@ func GetWoptaPrivacySection(pdf *fpdf.Fpdf) {
 	pdf.MultiCell(0, 3, "Maggiori informazioni sono disponibili inviando una richiesta scritta al "+
 		"Titolare ai recapiti indicati nella sezione \"Contatti\" di questa informativa.",
 		"", "", false)
-}
-
-func GetPersonalDataHandlingSection(pdf *fpdf.Fpdf) {
 	pdf.SetFont("Montserrat", "B", 11)
 	pdf.MultiCell(0, 3, "5. CONSERVAZIONE DEI DATI PERSONALI", "", "", false)
 	pdf.Ln(1)
@@ -1526,7 +1610,9 @@ func GetPersonalDataHandlingSection(pdf *fpdf.Fpdf) {
 	pdf.MultiCell(0, 3, "Per esercitare i diritti di cui sopra o per qualunque altra richiesta può "+
 		"scrivere al Titolare del trattamento all’indirizzo: privacy@wopta.it.", "", "", false)
 	pdf.Ln(3)
+}
 
+func GetPersonalDataHandlingSection(pdf *fpdf.Fpdf) {
 	pdf.SetTextColor(229, 0, 117)
 	pdf.SetFont("Montserrat", "B", 10)
 	pdf.MultiCell(0, 3, "Consenso per finalità commerciali.", "", "", false)
