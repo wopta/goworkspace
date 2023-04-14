@@ -59,7 +59,7 @@ func GetMainHeader(pdf *fpdf.Fpdf, policy models.Policy) {
 		pdf.SetXY(23, 13)
 		pdf.SetTextColor(92, 89, 92)
 		pdf.Cell(10, 6, product)
-		pdf.ImageOptions(lib.GetAssetPathByEnv("test")+"/ARTW_LOGO_RGB_400px.png", 158, 6, 0, 10, false, opt, 0, "")
+		pdf.ImageOptions(lib.GetAssetPathByEnv("test")+"/ARTW_LOGO_RGB_400px.png", 170, 6, 0, 8, false, opt, 0, "")
 
 		pdf.SetTextColor(0, 0, 0)
 		pdf.SetFont("Montserrat", "B", 8)
@@ -70,10 +70,10 @@ func GetMainHeader(pdf *fpdf.Fpdf, policy models.Policy) {
 		pdf.MultiCell(0, 3, policyInfo, "", "", false)
 
 		pdf.SetFont("Montserrat", "B", 8)
-		pdf.SetXY(-90, 20)
+		pdf.SetXY(-95, 20)
 		pdf.Cell(0, 3, "I tuoi dati")
 		pdf.SetFont("Montserrat", "", 8)
-		pdf.SetXY(-90, pdf.GetY()+3)
+		pdf.SetXY(-95, pdf.GetY()+3)
 		pdf.MultiCell(0, 3, contractorInfo, "", "", false)
 		pdf.Ln(10)
 	})
