@@ -27,7 +27,7 @@ func VerifyEmail(data string) <-chan MailValidate {
 			obj.From = "anna@wopta.it"
 			obj.To = []string{data}
 			obj.Message = `<p>Ciao </p>
-			<p>Verifica la tua mail clicando il link quii sotto </p></p><p>verifica la tua mail clicando il link qui sotto </p>`
+			<p>Verifica la tua mail clicando nel bottone sottostante al termine di questo processo potrai continuare l'acquisto </p>`
 			obj.Subject = "Wopta Verifica mail"
 			obj.IsHtml = true
 			obj.IsLink = true
@@ -49,12 +49,14 @@ func ToListData(query *firestore.DocumentIterator) ([]MailValidate, []string) {
 		d, err := query.Next()
 
 		if err != nil {
+			log.Println("error")
 			if err == iterator.Done {
 				log.Println("MailValidate ToListData iterator.Done")
 				break
 			}
 
 		} else {
+			log.Println("else")
 			var value MailValidate
 			e := d.DataTo(&value)
 			lib.CheckError(e)
