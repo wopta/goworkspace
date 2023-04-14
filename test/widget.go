@@ -169,26 +169,26 @@ func GetWoptaFooter(pdf *fpdf.Fpdf) {
 	})
 }
 
-func GetContractorInfoSection(pdf *fpdf.Fpdf) {
+func GetContractorInfoSection(pdf *fpdf.Fpdf, contractor models.User) {
 	GetParagraphTitle(pdf, "La tua assicurazione è operante per il seguente Assicurato e Garanzie")
 	pdf.Ln(8)
-	GetContractorInfoTable(pdf)
+	GetContractorInfoTable(pdf, contractor)
 }
 
-func GetContractorInfoTable(pdf *fpdf.Fpdf) {
+func GetContractorInfoTable(pdf *fpdf.Fpdf, contractor models.User) {
 	DrawPinkHorizontalLine(pdf, thickLineWidth)
 	pdf.Ln(2)
 	SetBlackBoldFont(pdf, standardTextSize)
 	pdf.Cell(20, 2, "Cognome e Nome")
 	SetBlackRegularFont(pdf, standardTextSize)
 	pdf.SetX(pdf.GetX() + 24)
-	pdf.Cell(20, 2, "DALLA VALLE FABRIZIO")
+	pdf.Cell(20, 2, strings.ToUpper(contractor.Surname+" "+contractor.Name))
 	pdf.SetX(pdf.GetX() + 60)
 	SetBlackBoldFont(pdf, standardTextSize)
 	pdf.Cell(10, 2, "Codice fiscale:")
 	pdf.SetX(pdf.GetX() + 20)
 	SetBlackRegularFont(pdf, standardTextSize)
-	pdf.Cell(20, 2, "DLLFRZ86T09E970X")
+	pdf.Cell(20, 2, strings.ToUpper(contractor.FiscalCode))
 	pdf.Ln(2.5)
 	DrawPinkHorizontalLine(pdf, thinLineWidth)
 	pdf.Ln(2)
@@ -196,7 +196,8 @@ func GetContractorInfoTable(pdf *fpdf.Fpdf) {
 	pdf.Cell(20, 2, "Residente in")
 	SetBlackRegularFont(pdf, standardTextSize)
 	pdf.SetX(pdf.GetX() + 24)
-	pdf.Cell(20, 2, "VIA TEZZE, 45/A - 36060 PIANEZZE (VI)")
+	pdf.Cell(20, 2, strings.ToUpper(contractor.Address+", "+contractor.StreetNumber+" - "+
+		contractor.PostalCode+" "+contractor.City+" ("+contractor.Province+")"))
 	pdf.Ln(2.5)
 	DrawPinkHorizontalLine(pdf, thinLineWidth)
 	pdf.Ln(2)
@@ -204,13 +205,13 @@ func GetContractorInfoTable(pdf *fpdf.Fpdf) {
 	pdf.Cell(20, 2, "Mail")
 	SetBlackRegularFont(pdf, standardTextSize)
 	pdf.SetX(pdf.GetX() + 24)
-	pdf.Cell(20, 2, "biciodallavalle86@gmail.com")
+	pdf.Cell(20, 2, contractor.Mail)
 	pdf.SetX(pdf.GetX() + 60)
 	SetBlackBoldFont(pdf, standardTextSize)
 	pdf.Cell(10, 2, "Telefono:")
 	pdf.SetX(pdf.GetX() + 20)
 	SetBlackRegularFont(pdf, 9)
-	pdf.Cell(20, 2, "3494948711")
+	pdf.Cell(20, 2, contractor.Phone)
 	pdf.Ln(3)
 	DrawPinkHorizontalLine(pdf, thickLineWidth)
 	pdf.Ln(1)
