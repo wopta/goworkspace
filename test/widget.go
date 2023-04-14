@@ -4,14 +4,49 @@ import (
 	"encoding/json"
 	"github.com/go-pdf/fpdf"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 	"os"
+	"strings"
 )
 
-func GetMainHeader(pdf *fpdf.Fpdf) {
-	var opt fpdf.ImageOptions
-	var product, logoPath string
+func GetMainHeader(pdf *fpdf.Fpdf, policy models.Policy) {
+	var (
+		opt      fpdf.ImageOptions
+		product  string
+		logoPath string
+		cfpi     string
+		nextpay  string
+	)
+	layout := "02/01/2006"
 	pathPrefix := lib.GetAssetPathByEnv("test") + "/logo_"
 	logoPath = pathPrefix + "vita.png"
+
+	contractor := policy.Contractor
+
+	if contractor.VatCode == "" {
+		cfpi = contractor.FiscalCode
+	} else {
+		cfpi = contractor.VatCode
+	}
+
+	if policy.PaymentSplit == "monthly" {
+		nextpay = policy.StartDate.AddDate(0, 1, 0).Format(layout)
+	} else {
+		nextpay = policy.StartDate.AddDate(1, 0, 0).Format(layout)
+	}
+
+	policyInfo := "Numero: " + policy.CodeCompany + "\n" +
+		"Decorre dal: " + policy.StartDate.Format(layout) + " ore 24:00\n" +
+		"Scade il: " + policy.EndDate.Format(layout) + " ore 24:00\n" +
+		"Prima scadenza annuale il: " + nextpay + "\n" +
+		"Non si rinnova a scadenza."
+
+	contractorInfo := "Contraente: " + strings.ToUpper(contractor.Surname) + " " + strings.ToUpper(contractor.Name) +
+		"\nC.F./P.IVA: " + strings.ToUpper(cfpi) + "\n" +
+		"Indirizzo: " + strings.ToUpper(contractor.Address) + ", " + strings.ToUpper(contractor.StreetNumber) + "\n" +
+		strings.ToUpper(contractor.PostalCode) + " " + strings.ToUpper(contractor.City) + " (" +
+		strings.ToUpper(contractor.Province) + ")\n" + "Mail: " + contractor.Mail + "\n" +
+		"Telefono: " + contractor.Phone
 
 	pdf.SetHeaderFunc(func() {
 		opt.ImageType = "png"
@@ -32,14 +67,14 @@ func GetMainHeader(pdf *fpdf.Fpdf) {
 		pdf.Cell(0, 3, "I dati della tua polizza")
 		pdf.SetFont("Montserrat", "", 8)
 		pdf.SetXY(11, pdf.GetY()+3)
-		pdf.MultiCell(0, 3, "Numero: 12345\nDecorre dal: 03/04/2023 ore 24:00\nScade il: 03/04/2043 ore 24:00\nPrima scadenza annuale il: 04/04/2024\nNon si rinnova a scadenza.", "", "", false)
+		pdf.MultiCell(0, 3, policyInfo, "", "", false)
 
 		pdf.SetFont("Montserrat", "B", 8)
 		pdf.SetXY(-90, 20)
 		pdf.Cell(0, 3, "I tuoi dati")
 		pdf.SetFont("Montserrat", "", 8)
 		pdf.SetXY(-90, pdf.GetY()+3)
-		pdf.MultiCell(0, 3, "Contraente:  DALLA VALLE FABRIZIO\nC.F./P.IVA: DLLFRZ86T09E970X\nIndirizzo: VIA TEZZE, 45/A\n36060 PIANEZZE (VI)\nMail: biciodallavalle86@gmail.com\nTelefono: 3494948711", "", "", false)
+		pdf.MultiCell(0, 3, contractorInfo, "", "", false)
 		pdf.Ln(10)
 	})
 }

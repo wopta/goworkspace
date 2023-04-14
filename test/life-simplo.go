@@ -1,9 +1,11 @@
 package test
 
 import (
+	"encoding/json"
 	"github.com/go-pdf/fpdf"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"io"
 	"log"
 	"net/http"
 )
@@ -13,17 +15,16 @@ type Statements struct {
 	Text       string              `json:"text,omitempty"`
 }
 
-const (
-	thickLineWidth   = 0.4
-	thinLineWidth    = 0.1
-	smallTextSize    = 6
-	standardTextSize = 9
-	tabDimension     = 15
-)
-
 func LifeSimploHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	var (
+		policy models.Policy
+	)
 
-	filename := Life()
+	b := lib.ErrorByte(io.ReadAll(r.Body))
+	err := json.Unmarshal(b, &policy)
+	lib.CheckError(err)
+
+	filename := Life(policy)
 	log.Println(filename)
 
 	return "", nil, nil
@@ -43,10 +44,10 @@ func loadCustomFonts(pdf *fpdf.Fpdf) {
 	pdf.AddUTF8Font("Noto", "", lib.GetAssetPathByEnv("test")+"/notosansmono.ttf")
 }
 
-func Life() string {
+func Life(policy models.Policy) string {
 	pdf := initFpdf()
 
-	GetMainHeader(pdf)
+	GetMainHeader(pdf, policy)
 	GetMainFooter(pdf)
 
 	pdf.AddPage()

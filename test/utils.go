@@ -9,6 +9,14 @@ import (
 	"strings"
 )
 
+const (
+	thickLineWidth   = 0.4
+	thinLineWidth    = 0.1
+	smallTextSize    = 6
+	standardTextSize = 9
+	tabDimension     = 15
+)
+
 func Save(pdf *fpdf.Fpdf) (string, error) {
 	filename := "test/contract.pdf"
 	if os.Getenv("env") == "local" {
