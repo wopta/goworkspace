@@ -185,26 +185,26 @@ func OrderWhereLimitFirestoreErr(collection string, field string, fieldOrder str
 
 	return query, err
 }
-func ToListData(query *firestore.DocumentIterator, v interface{}) []interface{} {
-	var result []interface{}
+func FireToListData[T interface{}](query *firestore.DocumentIterator) []T {
+	var result []T
+	var _struct T
 	for {
 		d, err := query.Next()
 		log.Println("for")
 		if err != nil {
 			log.Println("error")
-		}
-		if err != nil {
 			if err == iterator.Done {
 				log.Println("iterator.Done")
 				break
 			}
 
+		} else {
 		}
-		e := d.DataTo(&v)
+		e := d.DataTo(&_struct)
 
 		log.Println("todata")
 		CheckError(e)
-		result = append(result, v)
+		result = append(result, _struct)
 
 		log.Println(len(result))
 	}

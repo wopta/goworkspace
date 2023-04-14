@@ -14,7 +14,7 @@ func VerifyEmail(data string) <-chan MailValidate {
 	go func() {
 		defer close(r)
 		m := MailValidate{Mail: data, IsValid: false}
-		res := lib.WhereFirestore("mail", "email", "==", data)
+		res := lib.WhereFirestore("mail", "mail", "==", data)
 		objmail, _ := ToListData(res)
 		if len(objmail) > 0 {
 			if objmail[0].IsValid {
