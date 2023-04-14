@@ -124,8 +124,6 @@ func Life(policy models.Policy) string {
 
 	GetWoptaPrivacySection(pdf)
 
-	pdf.AddPage()
-
 	GetPersonalDataHandlingSection(pdf)
 
 	/*tpl := new(fpdf.FpdfTpl)

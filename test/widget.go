@@ -1545,6 +1545,7 @@ func GetWoptaPrivacySection(pdf *fpdf.Fpdf) {
 		"Titolare ai recapiti indicati nella sezione \"Contatti\" di questa informativa.",
 		"", "", false)
 	pdf.SetFont("Montserrat", "B", 11)
+	pdf.AddPage()
 	pdf.MultiCell(0, 3, "5. CONSERVAZIONE DEI DATI PERSONALI", "", "", false)
 	pdf.Ln(1)
 	pdf.SetFont("Montserrat", "", 9)
