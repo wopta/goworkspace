@@ -14,7 +14,6 @@ import (
 func GetMainHeader(pdf *fpdf.Fpdf, policy models.Policy) {
 	var (
 		opt      fpdf.ImageOptions
-		product  string
 		logoPath string
 		cfpi     string
 		nextpay  string
@@ -59,7 +58,7 @@ func GetMainHeader(pdf *fpdf.Fpdf, policy models.Policy) {
 		pdf.SetFont("Montserrat", "I", 18)
 		pdf.SetXY(23, 13)
 		pdf.SetTextColor(92, 89, 92)
-		pdf.Cell(10, 6, product)
+		pdf.Cell(10, 6, "Vita")
 		pdf.ImageOptions(lib.GetAssetPathByEnv("test")+"/ARTW_LOGO_RGB_400px.png", 170, 6, 0, 8, false, opt, 0, "")
 
 		pdf.SetTextColor(0, 0, 0)
