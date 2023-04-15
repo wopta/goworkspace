@@ -18,7 +18,21 @@ const (
 	layout           = "02/01/2006"
 )
 
-func Save(pdf *fpdf.Fpdf) (string, error) {
+func initFpdf() *fpdf.Fpdf {
+	pdf := fpdf.New(fpdf.OrientationPortrait, fpdf.UnitMillimeter, fpdf.PageSizeA4, "")
+	pdf.SetMargins(10, 15, 10)
+	loadCustomFonts(pdf)
+	return pdf
+}
+
+func loadCustomFonts(pdf *fpdf.Fpdf) {
+	pdf.AddUTF8Font("Montserrat", "", lib.GetAssetPathByEnv("test")+"/montserrat_light.ttf")
+	pdf.AddUTF8Font("Montserrat", "B", lib.GetAssetPathByEnv("test")+"/montserrat_bold.ttf")
+	pdf.AddUTF8Font("Montserrat", "I", lib.GetAssetPathByEnv("test")+"/montserrat_italic.ttf")
+	pdf.AddUTF8Font("Noto", "", lib.GetAssetPathByEnv("test")+"/notosansmono.ttf")
+}
+
+func save(pdf *fpdf.Fpdf) (string, error) {
 	filename := "test/contract.pdf"
 	if os.Getenv("env") == "local" {
 		err := pdf.OutputFileAndClose(filename)
@@ -34,57 +48,57 @@ func Save(pdf *fpdf.Fpdf) (string, error) {
 	return filename, nil
 }
 
-func SetBlackDrawColor(pdf *fpdf.Fpdf) {
+func setBlackDrawColor(pdf *fpdf.Fpdf) {
 	pdf.SetDrawColor(0, 0, 0)
 }
 
-func SetBlackBoldFont(pdf *fpdf.Fpdf, fontSize float64) {
+func setBlackBoldFont(pdf *fpdf.Fpdf, fontSize float64) {
 	pdf.SetTextColor(0, 0, 0)
 	pdf.SetFont("Montserrat", "B", fontSize)
 }
 
-func SetBlackRegularFont(pdf *fpdf.Fpdf, fontSize float64) {
+func setBlackRegularFont(pdf *fpdf.Fpdf, fontSize float64) {
 	pdf.SetTextColor(0, 0, 0)
 	pdf.SetFont("Montserrat", "", fontSize)
 }
 
-func SetBlackMonospaceFont(pdf *fpdf.Fpdf, fontSize float64) {
+func setBlackMonospaceFont(pdf *fpdf.Fpdf, fontSize float64) {
 	pdf.SetTextColor(0, 0, 0)
 	pdf.SetFont("Noto", "", fontSize)
 }
 
-func DrawBlackLine(pdf *fpdf.Fpdf, width float64) {
+func drawBlackHorizontalLine(pdf *fpdf.Fpdf, width float64) {
 	pdf.SetDrawColor(0, 0, 0)
 	pdf.SetLineWidth(width)
 	pdf.Line(130, pdf.GetY(), 190, pdf.GetY())
 }
 
-func DrawPinkHorizontalLine(pdf *fpdf.Fpdf, lineWidth float64) {
+func drawPinkHorizontalLine(pdf *fpdf.Fpdf, lineWidth float64) {
 	pdf.SetDrawColor(229, 0, 117)
 	pdf.SetLineWidth(lineWidth)
 	pdf.Line(11, pdf.GetY(), 200, pdf.GetY())
 }
 
-func DrawSignatureForm(pdf *fpdf.Fpdf) {
+func drawSignatureForm(pdf *fpdf.Fpdf) {
 	pdf.SetX(-80)
 	pdf.Cell(0, 3, "Firma del Contraente/Assicurato")
 	pdf.Ln(15)
-	DrawBlackLine(pdf, thickLineWidth)
+	drawBlackHorizontalLine(pdf, thickLineWidth)
 }
 
-func GetParagraphTitle(pdf *fpdf.Fpdf, title string) {
+func getParagraphTitle(pdf *fpdf.Fpdf, title string) {
 	pdf.SetTextColor(229, 0, 117)
 	pdf.SetFont("Montserrat", "B", 10)
 	pdf.Cell(0, 10, title)
 }
 
-func PrintStatement(pdf *fpdf.Fpdf, statement models.Statement) {
+func printStatement(pdf *fpdf.Fpdf, statement models.Statement) {
 	leftMargin, _, rightMargin, _ := pdf.GetMargins()
 	pageWidth, _ := pdf.GetPageSize()
 	availableWidth := pageWidth - leftMargin - rightMargin - 2
 	rowWidth := pageWidth - leftMargin - rightMargin - 1
 
-	SetBlackBoldFont(pdf, standardTextSize)
+	setBlackBoldFont(pdf, standardTextSize)
 	if statement.HasAnswer {
 		answer := "NO"
 		if *statement.Answer {
@@ -109,9 +123,9 @@ func PrintStatement(pdf *fpdf.Fpdf, statement models.Statement) {
 		availableWidth = pageWidth - leftMargin - rightMargin - 2
 
 		if question.IsBold {
-			SetBlackBoldFont(pdf, standardTextSize)
+			setBlackBoldFont(pdf, standardTextSize)
 		} else {
-			SetBlackRegularFont(pdf, standardTextSize)
+			setBlackRegularFont(pdf, standardTextSize)
 		}
 		if question.Indent {
 			pdf.SetX(tabDimension)
@@ -141,12 +155,12 @@ func PrintStatement(pdf *fpdf.Fpdf, statement models.Statement) {
 	}
 }
 
-func IndentedText(pdf *fpdf.Fpdf, content string) {
+func indentedText(pdf *fpdf.Fpdf, content string) {
 	pdf.SetX(tabDimension)
 	pdf.MultiCell(0, 3, content, "", fpdf.AlignLeft, false)
 }
 
-func GuaranteesToMap(guarantees []models.Guarante) map[string]models.Guarante {
+func guaranteesToMap(guarantees []models.Guarante) map[string]models.Guarante {
 	m := make(map[string]models.Guarante, 0)
 	for _, guarantee := range guarantees {
 		m[guarantee.Slug] = guarantee

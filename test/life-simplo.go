@@ -2,7 +2,6 @@ package test
 
 import (
 	"encoding/json"
-	"github.com/go-pdf/fpdf"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"io"
@@ -30,20 +29,6 @@ func LifeSimploHandler(w http.ResponseWriter, r *http.Request) (string, interfac
 	return "", nil, nil
 }
 
-func initFpdf() *fpdf.Fpdf {
-	pdf := fpdf.New(fpdf.OrientationPortrait, fpdf.UnitMillimeter, fpdf.PageSizeA4, "")
-	pdf.SetMargins(10, 15, 10)
-	loadCustomFonts(pdf)
-	return pdf
-}
-
-func loadCustomFonts(pdf *fpdf.Fpdf) {
-	pdf.AddUTF8Font("Montserrat", "", lib.GetAssetPathByEnv("test")+"/montserrat_light.ttf")
-	pdf.AddUTF8Font("Montserrat", "B", lib.GetAssetPathByEnv("test")+"/montserrat_bold.ttf")
-	pdf.AddUTF8Font("Montserrat", "I", lib.GetAssetPathByEnv("test")+"/montserrat_italic.ttf")
-	pdf.AddUTF8Font("Noto", "", lib.GetAssetPathByEnv("test")+"/notosansmono.ttf")
-}
-
 func Life(policy models.Policy) string {
 	pdf := initFpdf()
 
@@ -64,7 +49,7 @@ func Life(policy models.Policy) string {
 
 	GetStatementsSection(pdf, policy)
 
-	DrawSignatureForm(pdf)
+	drawSignatureForm(pdf)
 
 	pdf.AddPage()
 
@@ -142,7 +127,7 @@ func Life(policy models.Policy) string {
 
 	pdf.UseTemplate(template)*/
 
-	filename, err := Save(pdf)
+	filename, err := save(pdf)
 	lib.CheckError(err)
 	log.Println(filename + " wrote successfully")
 	/*err := pdf.OutputFileAndClose("test/test.pdf")
