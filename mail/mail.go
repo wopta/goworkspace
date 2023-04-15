@@ -104,8 +104,9 @@ type MailRequest struct {
 	IsApp        bool          `json:"isApp,omitempty"`
 }
 type MailValidate struct {
-	Mail    string `firestore:"mail,omitempty" json:"mail,omitempty"`
-	IsValid bool   `firestore:"isValid " json:"isValid "`
+	Mail      string `firestore:"mail,omitempty" json:"mail,omitempty"`
+	IsValid   bool   `firestore:"isValid" json:"isValid"`
+	FidoScore int64  `firestore:"fidoScore" json:"fidoScore"`
 }
 
 func Send(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -138,25 +139,41 @@ func Score(resp http.ResponseWriter, r *http.Request) (string, interface{}, erro
 }
 func Validate(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var result map[string]string
+
 	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
 	log.Println(string(req))
-	defer r.Body.Close()
-
 	json.Unmarshal([]byte(req), &result)
-
-	fido := <-ScoreFido(result["email"])
-	log.Println(fido.Email.Score)
+	defer r.Body.Close()
 	resObj := MailValidate{
 		Mail:    result["email"],
 		IsValid: false,
 	}
-	if fido.Email.Score >= 480 {
-		log.Println("valid")
-		resObj.IsValid = true
+
+	resfire := lib.WhereFirestore("mail", "mail", "==", result["email"])
+	objmail, _ := ToListData(resfire)
+	if len(objmail) > 0 {
+		if objmail[0].IsValid {
+			res, _ := json.Marshal(resObj)
+			return string(res), res, nil
+		}
+
 	} else {
-		log.Println("invalid")
-		VerifyEmail(result["email"])
+		fido := <-ScoreFido(result["email"])
+		log.Println(fido.Email.Score)
+
+		if fido.Email.Score >= 480 {
+			log.Println("valid")
+			resObj.IsValid = true
+			res, _ := json.Marshal(resObj)
+			return string(res), res, nil
+		} else {
+			log.Println("invalid")
+			lib.PutFirestore("mail", resObj)
+			VerifyEmail(result["email"])
+		}
+
 	}
+
 	res, e := json.Marshal(resObj)
 	lib.CheckError(e)
 	log.Println(string(res))
