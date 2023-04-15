@@ -83,10 +83,10 @@ func GetMainFooter(pdf *fpdf.Fpdf) {
 	pdf.SetFooterFunc(func() {
 		pdf.SetXY(10, -13)
 		pdf.SetTextColor(229, 0, 117)
-		pdf.SetFont("Montserrat", "B", 6)
+		pdf.SetFont("Montserrat", "", smallTextSize)
 		pdf.MultiCell(0, 3, "Wopta per te. Vita è un prodotto assicurativo di AXA France Vie S.A. – Rappresentanza Generale per l’Italia\ndistribuito da Wopta Assicurazioni S.r.l.", "", "", false)
 		opt.ImageType = "png"
-		pdf.ImageOptions(lib.GetAssetPathByEnv("test")+"/logo_axa.png", 190, 283, 8, 8, false, opt, 0, "")
+		pdf.ImageOptions(lib.GetAssetPathByEnv("test")+"/logo_axa.png", 190, 283, 0, 8, false, opt, 0, "")
 	})
 }
 
@@ -95,7 +95,7 @@ func GetAxaHeader(pdf *fpdf.Fpdf) {
 		var opt fpdf.ImageOptions
 		pdf.SetXY(-30, 7)
 		opt.ImageType = "png"
-		pdf.ImageOptions(lib.GetAssetPathByEnv("test")+"/logo_axa.png", 190, 7, 8, 8, false, opt, 0, "")
+		pdf.ImageOptions(lib.GetAssetPathByEnv("test")+"/logo_axa.png", 190, 7, 0, 8, false, opt, 0, "")
 		pdf.Ln(15)
 	})
 }
