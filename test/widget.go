@@ -497,7 +497,8 @@ func GetVisioneDocumentiSection(pdf *fpdf.Fpdf) {
 		"farlo scrivendo alla Compagnia, con le modalità previste "+
 		"nelle Condizioni di Assicurazione.", "", "", false)
 	setBlackBoldFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3, "Confermo di aver ricevuto e preso visione, prima della conclusione del contratto:", "", "", false)
+	pdf.MultiCell(0, 3, "Confermo di aver ricevuto e preso visione, prima della conclusione del contratto:",
+		"", "", false)
 	indentedText(pdf, "1. degli Allegati 3, 4 e 4-ter, di cui al Regolamento IVASS n. 40/2018, relativi "+
 		"agli obblighi informativi e di comportamento dell’Intermediario, inclusa l’informativa privacy "+
 		"dell’intermediario (ai sensi dell’art. 13 del regolamento UE n. 2016/679);")
@@ -508,19 +509,15 @@ func GetVisioneDocumentiSection(pdf *fpdf.Fpdf) {
 		"(DIP aggiuntivo Multirischi), di cui al Regolamento IVASS n. 41/2018; 2) Condizioni di Assicurazione "+
 		"comprensive di Glossario, che dichiaro altresì di conoscere ed accettare.")
 	pdf.Ln(2)
-	pdf.SetX(40)
-	pdf.Cell(30, 3, "AXA France Vie")
-	pdf.SetX(-75)
-	pdf.Cell(40, 3, "Firma del Contraente/Assicurato")
-	pdf.Ln(2)
-	pdf.SetX(25)
-	pdf.Cell(20, 3, "(Rappresentanza Generale per l'Italia)")
+	drawSignatureForm(pdf)
+	pdf.SetY(pdf.GetY() - 15)
+	pdf.MultiCell(70, 3, "AXA France Vie\n(Rappresentanza Generale per l'Italia)", "",
+		fpdf.AlignCenter, false)
 	var opt fpdf.ImageOptions
 	opt.ImageType = "png"
-	pdf.ImageOptions(lib.GetAssetPathByEnv("test")+"/firma_axa.png", 35, pdf.GetY()+5, 30, 8, false, opt, 0, "")
-	pdf.Ln(10)
-	drawBlackHorizontalLine(pdf, thickLineWidth)
-	pdf.Ln(5)
+	pdf.ImageOptions(lib.GetAssetPathByEnv("test")+"/firma_axa.png", 35, pdf.GetY()+3, 30, 8,
+		false, opt, 0, "")
+	pdf.Ln(15)
 }
 
 func GetOfferResumeSection(pdf *fpdf.Fpdf) {
@@ -733,14 +730,15 @@ func GetPaymentMethodSection(pdf *fpdf.Fpdf) {
 	pdf.Ln(5)
 }
 
-func GetEmitResumeSection(pdf *fpdf.Fpdf) {
+func GetEmitResumeSection(pdf *fpdf.Fpdf, policy models.Policy) {
+	emitDate := policy.EmitDate.Format(layout)
 	getParagraphTitle(pdf, "Emissione polizza e pagamento della prima rata")
 	pdf.Ln(8)
-	pdf.SetTextColor(0, 0, 0)
-	pdf.SetFont("Montserrat", "", 9)
-	pdf.MultiCell(0, 3, "Polizza emessa a Milano il 03/04/2023 per un importo di €  175,18 quale prima "+
-		"rata alla firma, il cui pagamento a saldo è da effettuarsi con i metodi di pagamento sopra indicati. "+
-		"Wopta conferma avvenuto incasso e copertura della polizza dal 03/04/2023.", "", "", false)
+	setBlackRegularFont(pdf, standardTextSize)
+	pdf.MultiCell(0, 3, "Polizza emessa a Milano il "+emitDate+" per un importo di €  175,18 quale "+
+		"prima rata alla firma, il cui pagamento a saldo è da effettuarsi con i metodi di pagamento sopra indicati. "+
+		"Wopta conferma avvenuto incasso e copertura della polizza dal "+emitDate+".",
+		"", "", false)
 	pdf.Ln(5)
 }
 
@@ -784,12 +782,7 @@ func GetPolicyDescriptionSection(pdf *fpdf.Fpdf) {
 		"illustrato dall’Intermediario, il quale ha fornito ogni altro elemento utile a consentirti di prendere una "+
 		"decisione informata e coerente con le esigenze espresse.", "", "", false)
 	pdf.Ln(5)
-	pdf.SetX(-80)
-	pdf.Cell(0, 3, "Firma del Contraente/Assicurato")
-	pdf.Ln(15)
-	pdf.SetDrawColor(0, 0, 0)
-	pdf.SetLineWidth(0.4)
-	pdf.Line(130, pdf.GetY(), 190, pdf.GetY())
+	drawSignatureForm(pdf)
 	pdf.Ln(5)
 }
 
@@ -815,12 +808,11 @@ func GetWoptaAxaCompanyDescriptionSection(pdf *fpdf.Fpdf) {
 		"dall’IVASS, in appendice Elenco I, nr. I.00149.", "", "", false)
 }
 
-func GetAxaDeclarationsConsentSection(pdf *fpdf.Fpdf) {
-	pdf.SetFont("Montserrat", "B", 9)
-	pdf.SetTextColor(0, 0, 0)
+func GetAxaDeclarationsConsentSection(pdf *fpdf.Fpdf, policy models.Policy) {
+	setBlackBoldFont(pdf, standardTextSize)
 	pdf.Cell(0, 3, "DICHIARAZIONI E CONSENSI")
 	pdf.Ln(3)
-	pdf.SetFont("Montserrat", "", 9)
+	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "Io sottoscritto, dopo aver letto l’Informativa Privacy della compagnia titolare "+
 		"del trattamento redatta ai sensi del Regolamento (UE) 2016/679 (relativo alla protezione delle persone "+
 		"fisiche con riguardo al trattamento dei dati personali), della quale confermo ricezione, PRESTO IL CONSENSO "+
@@ -828,35 +820,27 @@ func GetAxaDeclarationsConsentSection(pdf *fpdf.Fpdf) {
 		"mio stato di salute, per le finalità indicate nell’informativa, nonché alla loro comunicazione, per "+
 		"successivo trattamento, da parte dei soggetti indicati nella informativa predetta.", "", "", false)
 	pdf.Ln(3)
-	pdf.SetFont("Montserrat", "B", 8)
+	setBlackBoldFont(pdf, standardTextSize)
 	pdf.Cell(0, 3, "Resta inteso che in caso di negazione del consenso non sarà possibile "+
 		"finalizzare il rapporto contrattuale assicurativo.")
 	pdf.Ln(3)
-	pdf.SetDrawColor(0, 0, 0)
+	setBlackDrawColor(pdf)
 	pdf.SetLineWidth(0.1)
 	pdf.Line(11, pdf.GetY(), 180, pdf.GetY())
 	pdf.Ln(5)
-	pdf.Cell(0, 3, "03/04/2023")
-	pdf.Ln(8)
-	pdf.SetX(-80)
-	pdf.Cell(0, 3, "Firma del Contraente/Assicurato")
-	pdf.Ln(15)
-	pdf.SetDrawColor(0, 0, 0)
-	pdf.SetLineWidth(0.4)
-	pdf.Line(130, pdf.GetY(), 190, pdf.GetY())
+	pdf.Cell(0, 3, policy.EmitDate.Format(layout))
+	drawSignatureForm(pdf)
 }
 
 func GetAxaTableSection(pdf *fpdf.Fpdf) {
-	pdf.SetFont("Montserrat", "B", 12)
-	pdf.SetTextColor(255, 255, 255)
+	setWhiteBoldFont(pdf, 12)
 	pdf.SetFillColor(229, 0, 117)
 	pdf.MultiCell(0, 6, "MODULO PER L’IDENTIFICAZIONE E L’ADEGUATA VERIFICA DELLA CLIENTELA", "LTR", "CM", true)
-	pdf.SetFont("Montserrat", "B", 8)
+	setWhiteBoldFont(pdf, 8)
 	pdf.MultiCell(0, 4, "POLIZZA DI RAMO VITA I  - Polizza “Wopta per te. Vita”", "LR", "CM", true)
 	pdf.SetFont("Montserrat", "I", 6)
 	pdf.MultiCell(0, 3, "(da compilarsi in caso di scelta da parte del Contraente/Assicurato della garanzia Decesso)", "LBR", "CM", true)
-	pdf.SetTextColor(0, 0, 0)
-	pdf.SetFont("Montserrat", "", 8)
+	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 2, "", "LR", "", false)
 	pdf.MultiCell(0, 3, "AVVERTENZA PRELIMINARE - Al fine di adempiere agli obblighi previsti dal "+
 		"Decreto Legislativo 21 novembre 2007 n. 231 (di seguito il “Decreto”), in materia di prevenzione "+
@@ -888,14 +872,12 @@ func GetAxaTableSection(pdf *fpdf.Fpdf) {
 	pdf.MultiCell(0, 4, "A. dichiaro che i seguenti dati riportati relativi alla mia persona "+
 		"corrispondono al vero ", "LR", "", false)
 	pdf.CellFormat(5, 4, "", "LR", 0, "", false, 0, "")
-	pdf.SetFont("Montserrat", "B", 9)
-	pdf.SetTextColor(255, 255, 255)
+	setWhiteBoldFont(pdf, standardTextSize)
 	pdf.CellFormat(180, 4, "DATI IDENTIFICATIVI DEL CLIENTE (CONTRAENTE/ASSICURATO)", "TLR",
 		0, "CM", true, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 0, "", false, 0, "")
-	pdf.SetFont("Montserrat", "B", 8)
-	pdf.SetTextColor(0, 0, 0)
+	setBlackBoldFont(pdf, standardTextSize)
 	pdf.CellFormat(90, 4, "Nome: FABRIZIO", "TLR", 0, "", false, 0, "")
 	pdf.CellFormat(90, 4, "Cognome:  DALLA VALLE", "TLR", 0, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 1, "", false, 0, "")
@@ -928,7 +910,7 @@ func GetAxaTableSection(pdf *fpdf.Fpdf) {
 	pdf.CellFormat(5, 4, "", "LR", 0, "", false, 0, "")
 	pdf.CellFormat(180, 4, "Se Altro (specificare):", "BLR", 0, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 1, "", false, 0, "")
-	pdf.SetFont("Montserrat", "", 8)
+	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 1, "", "LR", "", false)
 	pdf.MultiCell(0, 4, "B. allego una fotocopia fronte/retro del mio documento di identità non scaduto "+
 		"avente i seguenti estremi, confermando la veridicità dei dati sotto riportati: ", "LR", "", false)
@@ -964,7 +946,7 @@ func GetAxaTableSection(pdf *fpdf.Fpdf) {
 	pdf.MultiCell(0, 4, "i. Tipologia di rapporto continuativo (informazione immediatamente desunta dal "+
 		"rapporto): Stipula di un contratto di assicurazione di puro rischio che prevede garanzia di ramo vita "+
 		"(caso morte Assicurato)", "R", "", false)
-	pdf.CellFormat(4, 8, "", "L", 0, "", false, 0, "")
+	pdf.CellFormat(4, 12, "", "L", 0, "", false, 0, "")
 	pdf.MultiCell(0, 4, "ii. Scopo prevalente del rapporto continuativo in riferimento alle garanzie vita"+
 		" (informazione immediatamente desunta dal rapporto):Protezione assicurativa al fine di garantire ai "+
 		"beneficiari un capitale qualora si verifichi l’evento oggetto di copertura", "R", "", false)
@@ -974,7 +956,7 @@ func GetAxaTableSection(pdf *fpdf.Fpdf) {
 	pdf.CellFormat(0, 2, "", "BLR", 1, "", false, 0, "")
 }
 
-func GetAxaTablePart2Section(pdf *fpdf.Fpdf) {
+func GetAxaTablePart2Section(pdf *fpdf.Fpdf, policy models.Policy) {
 	pdf.CellFormat(0, 2, "", "TLR", 1, "", false, 0, "")
 	pdf.MultiCell(0, 4, "Il sottoscritto, ai sensi degli artt. 22 e 55 comma 3 del d.lgs. 231/2007, "+
 		"consapevole della responsabilità penale derivante da omesse e/o mendaci affermazioni, dichiara che tutte le "+
@@ -986,9 +968,11 @@ func GetAxaTablePart2Section(pdf *fpdf.Fpdf) {
 		"in relazione ai dati ed alle informazioni forniti con il presente modulo.", "LR", "", false)
 	pdf.SetFont("Montserrat", "B", 8)
 	pdf.CellFormat(0, 4, "", "LR", 1, "", false, 0, "")
-	pdf.CellFormat(30, 4, "Data 03/04/2023", "L", 0, "CM", false, 0, "")
+	pdf.CellFormat(30, 4, "Data "+policy.EmitDate.Format(layout), "L", 0, "CM",
+		false, 0, "")
 	pdf.CellFormat(100, 4, "", "", 0, "", false, 0, "")
-	pdf.CellFormat(60, 4, "Firma del contraente/Assicurato", "R", 1, "CM", false, 0, "")
+	pdf.CellFormat(60, 4, "Firma del contraente/Assicurato", "R", 1, "CM",
+		false, 0, "")
 	pdf.CellFormat(0, 30, "", "BLR", 1, "", false, 0, "")
 	pdf.SetDrawColor(0, 0, 0)
 	pdf.SetLineWidth(0.4)
@@ -1608,17 +1592,16 @@ func GetWoptaPrivacySection(pdf *fpdf.Fpdf) {
 	pdf.Ln(3)
 }
 
-func GetPersonalDataHandlingSection(pdf *fpdf.Fpdf) {
+func GetPersonalDataHandlingSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	pdf.SetTextColor(229, 0, 117)
 	pdf.SetFont("Montserrat", "B", 10)
 	pdf.MultiCell(0, 3, "Consenso per finalità commerciali.", "", "", false)
 	pdf.Ln(1)
-	pdf.SetTextColor(0, 0, 0)
-	pdf.SetFont("Montserrat", "", 9)
+	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "Il sottoscritto, letta e compresa l’informativa sul trattamento dei dati personali",
 		"", "", false)
 	pdf.Ln(1)
-	pdf.SetDrawColor(0, 0, 0)
+	setBlackDrawColor(pdf)
 	pdf.Cell(5, 3, "")
 	pdf.CellFormat(3, 3, "X", "1", 0, "CM", false, 0, "")
 	pdf.CellFormat(20, 3, "ACCONSENTE", "", 0, "", false, 0, "")
@@ -1631,12 +1614,6 @@ func GetPersonalDataHandlingSection(pdf *fpdf.Fpdf) {
 		"mercato, attraverso strumenti automatizzati (sms, mms, e-mail, ecc.) e non (posta cartacea e telefono "+
 		"con operatore).", "", "", false)
 	pdf.Ln(3)
-	pdf.Cell(0, 3, "03/04/2023")
-	pdf.Ln(3)
-	pdf.SetX(-80)
-	pdf.Cell(0, 3, "Firma del Contraente/Assicurato")
-	pdf.Ln(15)
-	pdf.SetDrawColor(0, 0, 0)
-	pdf.SetLineWidth(0.4)
-	pdf.Line(130, pdf.GetY(), 190, pdf.GetY())
+	pdf.Cell(0, 3, policy.EmitDate.Format(layout))
+	drawSignatureForm(pdf)
 }

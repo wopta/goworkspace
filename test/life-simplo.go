@@ -63,7 +63,7 @@ func Life(policy models.Policy) string {
 
 	GetPaymentMethodSection(pdf)
 
-	GetEmitResumeSection(pdf)
+	GetEmitResumeSection(pdf, policy)
 
 	GetPolicyDescriptionSection(pdf)
 
@@ -75,7 +75,7 @@ func Life(policy models.Policy) string {
 
 	GetAxaFooter(pdf)
 
-	GetAxaDeclarationsConsentSection(pdf)
+	GetAxaDeclarationsConsentSection(pdf, policy)
 
 	pdf.AddPage()
 
@@ -83,7 +83,7 @@ func Life(policy models.Policy) string {
 
 	pdf.AddPage()
 
-	GetAxaTablePart2Section(pdf)
+	GetAxaTablePart2Section(pdf, policy)
 
 	pdf.Ln(15)
 
@@ -109,7 +109,7 @@ func Life(policy models.Policy) string {
 
 	GetWoptaPrivacySection(pdf)
 
-	GetPersonalDataHandlingSection(pdf)
+	GetPersonalDataHandlingSection(pdf, policy)
 
 	/*tpl := new(fpdf.FpdfTpl)
 

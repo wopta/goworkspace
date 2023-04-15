@@ -68,6 +68,16 @@ func setBlackMonospaceFont(pdf *fpdf.Fpdf, fontSize float64) {
 	pdf.SetFont("Noto", "", fontSize)
 }
 
+func setWhiteBoldFont(pdf *fpdf.Fpdf, fontSize float64) {
+	pdf.SetTextColor(255, 255, 255)
+	pdf.SetFont("Montserrat", "B", fontSize)
+}
+
+func setWhiteRegularFont(pdf *fpdf.Fpdf, fontSize float64) {
+	pdf.SetTextColor(255, 255, 255)
+	pdf.SetFont("Montserrat", "", fontSize)
+}
+
 func drawBlackHorizontalLine(pdf *fpdf.Fpdf, width float64) {
 	pdf.SetDrawColor(0, 0, 0)
 	pdf.SetLineWidth(width)
