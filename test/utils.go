@@ -2,6 +2,7 @@ package test
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/go-pdf/fpdf"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
@@ -166,4 +167,13 @@ func guaranteesToMap(guarantees []models.Guarante) map[string]models.Guarante {
 		m[guarantee.Slug] = guarantee
 	}
 	return m
+}
+
+func extractGuarantee(guarantees []models.Guarante, guaranteeSlug string) (models.Guarante, error) {
+	for _, guarantee := range guarantees {
+		if guarantee.Slug == guaranteeSlug {
+			return guarantee, nil
+		}
+	}
+	return models.Guarante{}, fmt.Errorf("no %s guarantee found", guaranteeSlug)
 }

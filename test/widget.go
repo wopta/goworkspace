@@ -312,7 +312,48 @@ func GetAvvertenzeBeneficiariSection(pdf *fpdf.Fpdf) {
 		"il Beneficiario designato.", "", "", false)
 }
 
-func GetBeneficiariSection(pdf *fpdf.Fpdf) {
+func GetBeneficiariSection(pdf *fpdf.Fpdf, policy models.Policy) {
+	legitimateHeirsChoice := "X"
+	designatedHeirsChoice := ""
+	beneficiaries := [2]map[string]string{
+		{
+			"name":     "=====",
+			"codFisc":  "=====",
+			"address":  "=====",
+			"mail":     "=====",
+			"phone":    "=====",
+			"relation": "=====",
+			"consent":  "=====",
+		},
+		{
+			"name":     "=====",
+			"codFisc":  "=====",
+			"address":  "=====",
+			"mail":     "=====",
+			"phone":    "=====",
+			"relation": "=====",
+			"consent":  "=====",
+		},
+	}
+
+	deathGuarantee, err := extractGuarantee(policy.Assets[0].Guarantees, "death")
+	lib.CheckError(err)
+
+	if len(*deathGuarantee.Beneficiaries) > 0 {
+		legitimateHeirsChoice = ""
+		designatedHeirsChoice = "X"
+	}
+
+	for index, beneficiary := range *deathGuarantee.Beneficiaries {
+		beneficiaries[index]["name"] = strings.ToUpper(beneficiary.Surname + " " + beneficiary.Name)
+		beneficiaries[index]["codFisc"] = strings.ToUpper(beneficiary.FiscalCode)
+		beneficiaries[index]["address"] = strings.ToUpper(beneficiary.Address + ", " + beneficiary.StreetNumber + " - " +
+			beneficiary.PostalCode + " " + beneficiary.City + " (" + beneficiary.Province + ")")
+		beneficiaries[index]["mail"] = beneficiary.Mail
+		beneficiaries[index]["phone"] = beneficiary.Phone
+		// TODO: missing relation and consent field setting from request body
+	}
+
 	getParagraphTitle(pdf, "Beneficiario")
 	pdf.Ln(8)
 	setBlackRegularFont(pdf, standardTextSize)
@@ -321,115 +362,69 @@ func GetBeneficiariSection(pdf *fpdf.Fpdf) {
 	pdf.Ln(4)
 	setBlackDrawColor(pdf)
 	pdf.SetX(11)
-	pdf.CellFormat(3, 3, "X", "1", 0, "CM", false, 0, "")
+	pdf.CellFormat(3, 3, legitimateHeirsChoice, "1", 0, "CM", false, 0, "")
 	pdf.CellFormat(0, 3, "Designo genericamente quali beneficiari della prestazione i miei eredi "+
 		"(legittimi e/o testamentari)", "", 0, "", false, 0, "")
 	pdf.Ln(4)
 	pdf.SetX(11)
-	pdf.CellFormat(3, 3, "", "1", 0, "CM", false, 0, "")
+	pdf.CellFormat(3, 3, designatedHeirsChoice, "1", 0, "CM", false, 0, "")
 	pdf.CellFormat(0, 3, "Designo nominativamente il/i seguente/i soggetto/i quale beneficiario/i della "+
 		"prestazione", "", 0, "", false, 0, "")
-	GetBeneficiariTable(pdf)
+	pdf.Ln(5)
+	GetBeneficiariTable(pdf, beneficiaries)
 }
 
-func GetBeneficiariTable(pdf *fpdf.Fpdf) {
-	pdf.Ln(5)
-	drawPinkHorizontalLine(pdf, thickLineWidth)
-	pdf.Ln(1)
-	setBlackBoldFont(pdf, standardTextSize)
-	pdf.Cell(50, 2, "Cognome e nome")
-	setBlackRegularFont(pdf, standardTextSize)
-	pdf.Cell(20, 2, "=====")
-	pdf.SetX(pdf.GetX() + 60)
-	setBlackBoldFont(pdf, standardTextSize)
-	pdf.Cell(20, 2, "Cod. Fisc.: ")
-	setBlackRegularFont(pdf, standardTextSize)
-	pdf.Cell(20, 2, "=====")
-	pdf.Ln(3)
-	drawPinkHorizontalLine(pdf, thinLineWidth)
-	pdf.Ln(2)
-	setBlackBoldFont(pdf, standardTextSize)
-	pdf.Cell(50, 2, "Indirizzo")
-	setBlackRegularFont(pdf, standardTextSize)
-	pdf.Cell(20, 2, "=====")
-	pdf.SetX(pdf.GetX() + 60)
-	setBlackBoldFont(pdf, standardTextSize)
-	pdf.Ln(3)
-	drawPinkHorizontalLine(pdf, thinLineWidth)
-	pdf.Ln(2)
-	setBlackBoldFont(pdf, standardTextSize)
-	pdf.Cell(50, 2, "Mail")
-	setBlackRegularFont(pdf, standardTextSize)
-	pdf.Cell(20, 2, "=====")
-	pdf.SetX(pdf.GetX() + 60)
-	setBlackBoldFont(pdf, standardTextSize)
-	pdf.Cell(20, 2, "Telefono: ")
-	setBlackRegularFont(pdf, standardTextSize)
-	pdf.Cell(20, 2, "=====")
-	pdf.Ln(3)
-	drawPinkHorizontalLine(pdf, thinLineWidth)
-	pdf.Ln(2)
-	setBlackBoldFont(pdf, standardTextSize)
-	pdf.Cell(50, 2, "Relazione con Assicurato")
-	setBlackRegularFont(pdf, standardTextSize)
-	pdf.Cell(20, 2, "=====")
-	pdf.Ln(3)
-	drawPinkHorizontalLine(pdf, thinLineWidth)
-	pdf.Ln(2)
-	pdf.Cell(165, 2, "Consenso ad invio comunicazioni da parte della Compagnia al beneficiario, prima "+
-		"dell'evento Decesso:")
-	pdf.Cell(20, 2, "=====")
-	pdf.Ln(3)
-	drawPinkHorizontalLine(pdf, thinLineWidth)
-	pdf.Ln(2)
-	drawPinkHorizontalLine(pdf, thickLineWidth)
-	pdf.Ln(1)
-	setBlackBoldFont(pdf, standardTextSize)
-	pdf.Cell(50, 2, "Cognome e nome")
-	setBlackRegularFont(pdf, standardTextSize)
-	pdf.Cell(20, 2, "=====")
-	pdf.SetX(pdf.GetX() + 60)
-	setBlackBoldFont(pdf, standardTextSize)
-	pdf.Cell(20, 2, "Cod. Fisc.: ")
-	setBlackRegularFont(pdf, standardTextSize)
-	pdf.Cell(20, 2, "=====")
-	pdf.Ln(3)
-	drawPinkHorizontalLine(pdf, thinLineWidth)
-	pdf.Ln(2)
-	setBlackBoldFont(pdf, standardTextSize)
-	pdf.Cell(50, 2, "Indirizzo")
-	setBlackRegularFont(pdf, standardTextSize)
-	pdf.Cell(20, 2, "=====")
-	pdf.SetX(pdf.GetX() + 60)
-	setBlackBoldFont(pdf, standardTextSize)
-	pdf.Ln(3)
-	drawPinkHorizontalLine(pdf, thinLineWidth)
-	pdf.Ln(2)
-	setBlackBoldFont(pdf, standardTextSize)
-	pdf.Cell(50, 2, "Mail")
-	setBlackRegularFont(pdf, standardTextSize)
-	pdf.Cell(20, 2, "=====")
-	pdf.SetX(pdf.GetX() + 60)
-	setBlackBoldFont(pdf, standardTextSize)
-	pdf.Cell(20, 2, "Telefono: ")
-	setBlackRegularFont(pdf, standardTextSize)
-	pdf.Cell(20, 2, "=====")
-	pdf.Ln(3)
-	drawPinkHorizontalLine(pdf, thinLineWidth)
-	pdf.Ln(2)
-	setBlackBoldFont(pdf, standardTextSize)
-	pdf.Cell(50, 2, "Relazione con Assicurato")
-	setBlackRegularFont(pdf, standardTextSize)
-	pdf.Cell(20, 2, "=====")
-	pdf.Ln(3)
-	drawPinkHorizontalLine(pdf, thinLineWidth)
-	pdf.Ln(2)
-	pdf.Cell(165, 2, "Consenso ad invio comunicazioni da parte della Compagnia al beneficiario, prima "+
-		"dell'evento Decesso:")
-	pdf.Cell(20, 2, "=====")
-	pdf.Ln(3)
-	drawPinkHorizontalLine(pdf, thinLineWidth)
-	pdf.Ln(1)
+func GetBeneficiariTable(pdf *fpdf.Fpdf, beneficiaries [2]map[string]string) {
+	for _, beneficiary := range beneficiaries {
+		drawPinkHorizontalLine(pdf, thickLineWidth)
+		pdf.Ln(1.5)
+		setBlackBoldFont(pdf, standardTextSize)
+		pdf.Cell(50, 2, "Cognome e nome")
+		setBlackRegularFont(pdf, standardTextSize)
+		pdf.Cell(20, 2, beneficiary["name"])
+		pdf.SetX(pdf.GetX() + 60)
+		setBlackBoldFont(pdf, standardTextSize)
+		pdf.Cell(20, 2, "Cod. Fisc.: ")
+		setBlackRegularFont(pdf, standardTextSize)
+		pdf.Cell(20, 2, beneficiary["codFisc"])
+		pdf.Ln(3)
+		drawPinkHorizontalLine(pdf, thinLineWidth)
+		pdf.Ln(2)
+		setBlackBoldFont(pdf, standardTextSize)
+		pdf.Cell(50, 2, "Indirizzo")
+		setBlackRegularFont(pdf, standardTextSize)
+		pdf.Cell(20, 2, beneficiary["address"])
+		pdf.SetX(pdf.GetX() + 60)
+		setBlackBoldFont(pdf, standardTextSize)
+		pdf.Ln(3)
+		drawPinkHorizontalLine(pdf, thinLineWidth)
+		pdf.Ln(2)
+		setBlackBoldFont(pdf, standardTextSize)
+		pdf.Cell(50, 2, "Mail")
+		setBlackRegularFont(pdf, standardTextSize)
+		pdf.Cell(20, 2, beneficiary["mail"])
+		pdf.SetX(pdf.GetX() + 60)
+		setBlackBoldFont(pdf, standardTextSize)
+		pdf.Cell(20, 2, "Telefono: ")
+		setBlackRegularFont(pdf, standardTextSize)
+		pdf.Cell(20, 2, beneficiary["phone"])
+		pdf.Ln(3)
+		drawPinkHorizontalLine(pdf, thinLineWidth)
+		pdf.Ln(2)
+		setBlackBoldFont(pdf, standardTextSize)
+		pdf.Cell(50, 2, "Relazione con Assicurato")
+		setBlackRegularFont(pdf, standardTextSize)
+		pdf.Cell(20, 2, beneficiary["relation"])
+		pdf.Ln(3)
+		drawPinkHorizontalLine(pdf, thinLineWidth)
+		pdf.Ln(2)
+		pdf.Cell(165, 2, "Consenso ad invio comunicazioni da parte della Compagnia al beneficiario, prima "+
+			"dell'evento Decesso:")
+		pdf.Cell(20, 2, beneficiary["consent"])
+		pdf.Ln(3)
+		drawPinkHorizontalLine(pdf, thinLineWidth)
+		pdf.Ln(2)
+	}
 }
 
 func GetReferenteTerzoSection(pdf *fpdf.Fpdf) {
@@ -441,7 +436,7 @@ func GetReferenteTerzoSection(pdf *fpdf.Fpdf) {
 
 func GetReferenteTerzoTable(pdf *fpdf.Fpdf) {
 	drawPinkHorizontalLine(pdf, thickLineWidth)
-	pdf.Ln(1)
+	pdf.Ln(1.5)
 	setBlackBoldFont(pdf, standardTextSize)
 	pdf.Cell(50, 2, "Cognome e nome")
 	setBlackRegularFont(pdf, standardTextSize)
