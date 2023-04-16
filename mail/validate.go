@@ -16,7 +16,7 @@ func Validate(resp http.ResponseWriter, r *http.Request) (string, interface{}, e
 	var result map[string]string
 
 	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
-	log.Println(string(req))
+	log.Println("request: ", string(req))
 	json.Unmarshal([]byte(req), &result)
 	defer r.Body.Close()
 	resObj := MailValidate{
@@ -29,7 +29,8 @@ func Validate(resp http.ResponseWriter, r *http.Request) (string, interface{}, e
 	objmail, _ := ToListData(resfire)
 	if len(objmail) > 0 {
 		if objmail[0].IsValid {
-			res, _ := json.Marshal(objmail)
+			log.Println("isValid ", objmail[0])
+			res, _ := json.Marshal(objmail[0])
 			return string(res), res, nil
 		}
 
