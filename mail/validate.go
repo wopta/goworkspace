@@ -27,6 +27,7 @@ func Validate(resp http.ResponseWriter, r *http.Request) (string, interface{}, e
 
 	resfire := lib.WhereFirestore("mail", "mail", "==", result["email"])
 	objmail, _ := ToListData(resfire)
+	log.Println(" ", objmail[0])
 	if len(objmail) > 0 {
 		if objmail[0].IsValid {
 			log.Println("isValid ", objmail[0])
