@@ -1,43 +1,44 @@
 package models
 
 type Guarante struct {
+	PolicyUid                  string                    `firestore:"-" json:"-"  bigquery:"policyUid"`
 	DailyAllowance             string                    `firestore:"dailyAllowance" json:"dailyAllowance,omitempty"  bigquery:"-"`
-	OrderAsset                 int                       `firestore:"orderAsset,omitempty" json:"orderAsset,omitempty"`
-	LegalDefence               string                    `firestore:"legalDefence" json:"legalDefence,omitempty"`
-	Assistance                 string                    `firestore:"assistance " json:"assistance ,omitempty"`
-	Type                       string                    `firestore:"type,omitempty" json:"type,omitempty"`
-	Beneficiary                *User                     `firestore:"beneficiary,omitempty" json:"beneficiary,omitempty"`
-	BeneficiaryReferance       *User                     `firestore:"beneficiaryReferance,omitempty" json:"beneficiaryReferance,omitempty"`
-	Beneficiaries              *[]User                   `firestore:"beneficiaries,omitempty" json:"beneficiaries,omitempty"`
-	TypeOfSumInsured           string                    `firestore:"typeOfSumInsured" json:"typeOfSumInsured,omitempty"`
-	Description                string                    `firestore:"description,omitempty" json:"description,omitempty"`
-	ContractDetail             string                    `firestore:"contractDetail,omitempty" json:"contractDetail,omitempty"`
-	CompanyCodec               string                    `firestore:"companyCodec,omitempty" json:"companyCodec,omitempty"`
-	CompanyName                string                    `firestore:"companyName,omitempty" json:"companyName,omitempty"`
-	Group                      string                    `firestore:"group,omitempty" json:"group,omitempty"`
-	Value                      *GuaranteValue            `firestore:"value,omitempty" json:"value,omitempty"`
-	Config                     *GuaranteValue            `firestore:"config,omitempty" json:"config,omitempty"`
-	ExtraValue                 string                    `firestore:"extraValue,omitempty" json:"extraValue,omitempty"`
-	ValueDesc                  string                    `firestore:"valueDesc,omitempty" json:"valueDesc,omitempty"`
-	Offer                      map[string]*GuaranteValue `firestore:"offer,omitempty" json:"offer,omitempty"`
-	Slug                       string                    `firestore:"slug" json:"slug,omitempty"`
-	IsMandatory                bool                      `firestore:"isMandatory" json:"isMandatory"`
-	IsExtension                bool                      `firestore:"isExtension" json:"isExtension"`
-	Discount                   float64                   `firestore:"discount,omitempty" json:"discount,omitempty"`
-	Name                       string                    `firestore:"name,omitempty" json:"name,omitempty"`
-	SumInsuredLimitOfIndemnity float64                   `firestore:"sumInsuredLimitOfIndemnity" json:"sumInsuredLimitOfIndemnity,omitempty"`
-	Deductible                 string                    `firestore:"deductible" json:"deductible,omitempty"`
-	DeductibleDesc             string                    `firestore:"deductibleDesc" json:"deductibleDesc,omitempty"`
-	SelfInsurance              string                    `firestore:"selfInsurance" json:"selfInsurance,omitempty"`
-	SelfInsuranceDesc          string                    `firestore:"selfInsuranceDesc" json:"selfInsuranceDesc,omitempty"`
-	Tax                        float64                   `firestore:"tax,omitempty" json:"tax,omitempty"`
-	Taxs                       []Tax                     `firestore:"taxs,omitempty" json:"taxs,omitempty"`
-	Price                      float64                   `firestore:"price,omitempty" json:"price,omitempty"`
-	PriceNett                  float64                   `firestore:"priceNett,omitempty" json:"priceNett,omitempty"`
-	PriceGross                 float64                   `firestore:"priceGross,omitempty" json:"priceGross,omitempty"`
-	IsSellable                 bool                      `firestore:"isSellable" json:"isSellable"`
-	IsConfigurable             bool                      `firestore:"isConfigurable" json:"isConfigurable"`
-	Subtitle                   string                    `firestore:"subtitle" json:"subtitle"`
+	OrderAsset                 int                       `firestore:"orderAsset,omitempty" json:"orderAsset,omitempty"  bigquery:"-"`
+	LegalDefence               string                    `firestore:"legalDefence" json:"legalDefence,omitempty"  bigquery:"legalDefence"`
+	Assistance                 string                    `firestore:"assistance " json:"assistance,omitempty"  bigquery:"-"`
+	Type                       string                    `firestore:"type,omitempty" json:"type,omitempty"  bigquery:"-"`
+	Beneficiary                *User                     `firestore:"beneficiary,omitempty" json:"beneficiary,omitempty"  bigquery:"-"`
+	BeneficiaryReferance       *User                     `firestore:"beneficiaryReferance,omitempty" json:"beneficiaryReferance,omitempty"  bigquery:"-"`
+	Beneficiaries              *[]User                   `firestore:"beneficiaries,omitempty" json:"beneficiaries,omitempty"  bigquery:"-"`
+	TypeOfSumInsured           string                    `firestore:"typeOfSumInsured" json:"typeOfSumInsured,omitempty"  bigquery:"-"`
+	Description                string                    `firestore:"description,omitempty" json:"description,omitempty"  bigquery:"-"`
+	ContractDetail             string                    `firestore:"contractDetail,omitempty" json:"contractDetail,omitempty"  bigquery:"-"`
+	CompanyCodec               string                    `firestore:"companyCodec,omitempty" json:"companyCodec,omitempty"  bigquery:"-"`
+	CompanyName                string                    `firestore:"companyName,omitempty" json:"companyName,omitempty"  bigquery:"companyName"`
+	Group                      string                    `firestore:"group,omitempty" json:"group,omitempty"  bigquery:"group"`
+	Value                      *GuaranteValue            `firestore:"value,omitempty" json:"value,omitempty"  bigquery:"-"`
+	Config                     *GuaranteValue            `firestore:"config,omitempty" json:"config,omitempty"  bigquery:"-"`
+	ExtraValue                 string                    `firestore:"extraValue,omitempty" json:"extraValue,omitempty"  bigquery:"-"`
+	ValueDesc                  string                    `firestore:"valueDesc,omitempty" json:"valueDesc,omitempty"  bigquery:"-"`
+	Offer                      map[string]*GuaranteValue `firestore:"offer,omitempty" json:"offer,omitempty"  bigquery:"-"`
+	Slug                       string                    `firestore:"slug" json:"slug,omitempty"  bigquery:"slug"`
+	IsMandatory                bool                      `firestore:"isMandatory" json:"isMandatory"  bigquery:"-"`
+	IsExtension                bool                      `firestore:"isExtension" json:"isExtension"  bigquery:"-"`
+	Discount                   float64                   `firestore:"discount,omitempty" json:"discount,omitempty"  bigquery:"-"`
+	Name                       string                    `firestore:"name,omitempty" json:"name,omitempty"  bigquery:"name"`
+	SumInsuredLimitOfIndemnity float64                   `firestore:"sumInsuredLimitOfIndemnity" json:"sumInsuredLimitOfIndemnity,omitempty"  bigquery:"sumInsuredLimitOfIndemnity"`
+	Deductible                 string                    `firestore:"deductible" json:"deductible,omitempty"  bigquery:"deductible"`
+	DeductibleDesc             string                    `firestore:"deductibleDesc" json:"deductibleDesc,omitempty"  bigquery:"-"`
+	SelfInsurance              string                    `firestore:"selfInsurance" json:"selfInsurance,omitempty"  bigquery:"selfInsurance"`
+	SelfInsuranceDesc          string                    `firestore:"selfInsuranceDesc" json:"selfInsuranceDesc,omitempty"  bigquery:"-"`
+	Tax                        float64                   `firestore:"tax,omitempty" json:"tax,omitempty"  bigquery:"tax"`
+	Taxs                       []Tax                     `firestore:"taxs,omitempty" json:"taxs,omitempty"  bigquery:"-"`
+	Price                      float64                   `firestore:"price,omitempty" json:"price,omitempty"  bigquery:"-"`
+	PriceNett                  float64                   `firestore:"priceNett,omitempty" json:"priceNett,omitempty"  bigquery:"priceNett"`
+	PriceGross                 float64                   `firestore:"priceGross,omitempty" json:"priceGross,omitempty"  bigquery:"priceGross"`
+	IsSellable                 bool                      `firestore:"isSellable" json:"isSellable"  bigquery:"-"`
+	IsConfigurable             bool                      `firestore:"isConfigurable" json:"isConfigurable"  bigquery:"-"`
+	Subtitle                   string                    `firestore:"subtitle" json:"subtitle"  bigquery:"-"`
 }
 type GuaranteValue struct {
 	TypeOfSumInsured           string              `firestore:"typeOfSumInsured,omitempty" json:"typeOfSumInsured,omitempty"`

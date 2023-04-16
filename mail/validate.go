@@ -20,15 +20,16 @@ func Validate(resp http.ResponseWriter, r *http.Request) (string, interface{}, e
 	json.Unmarshal([]byte(req), &result)
 	defer r.Body.Close()
 	resObj := MailValidate{
-		Mail:    result["email"],
-		IsValid: false,
+		Mail:      result["email"],
+		FidoScore: 0,
+		IsValid:   false,
 	}
 
 	resfire := lib.WhereFirestore("mail", "mail", "==", result["email"])
 	objmail, _ := ToListData(resfire)
 	if len(objmail) > 0 {
 		if objmail[0].IsValid {
-			res, _ := json.Marshal(resObj)
+			res, _ := json.Marshal(objmail)
 			return string(res), res, nil
 		}
 
