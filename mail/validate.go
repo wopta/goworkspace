@@ -2,6 +2,7 @@ package mail
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -100,6 +101,7 @@ func ToListData(query *firestore.DocumentIterator) ([]MailValidate, []string) {
 		} else {
 			log.Println("else")
 			var value MailValidate
+			fmt.Printf("d: %v\n", d)
 			e := d.DataTo(&value)
 			lib.CheckError(e)
 			result = append(result, value)
