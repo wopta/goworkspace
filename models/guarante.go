@@ -5,12 +5,12 @@ type Guarante struct {
 	DailyAllowance             string                    `firestore:"dailyAllowance" json:"dailyAllowance,omitempty"  bigquery:"-"`
 	OrderAsset                 int                       `firestore:"orderAsset,omitempty" json:"orderAsset,omitempty"  bigquery:"-"`
 	LegalDefence               string                    `firestore:"legalDefence" json:"legalDefence,omitempty"  bigquery:"legalDefence"`
-	Assistance                 string                    `firestore:"assistance " json:"assistance,omitempty"  bigquery:"-"`
-	Type                       string                    `firestore:"type,omitempty" json:"type,omitempty"  bigquery:"-"`
+	Assistance                 string                    `firestore:"assistance" json:"assistance,omitempty"  bigquery:"-"`
+	Type                       string                    `firestore:"type,omitempty" json:"type,omitempty"  bigquery:"type"`
 	Beneficiary                *User                     `firestore:"beneficiary,omitempty" json:"beneficiary,omitempty"  bigquery:"-"`
 	BeneficiaryReferance       *User                     `firestore:"beneficiaryReferance,omitempty" json:"beneficiaryReferance,omitempty"  bigquery:"-"`
 	Beneficiaries              *[]User                   `firestore:"beneficiaries,omitempty" json:"beneficiaries,omitempty"  bigquery:"-"`
-	TypeOfSumInsured           string                    `firestore:"typeOfSumInsured" json:"typeOfSumInsured,omitempty"  bigquery:"-"`
+	TypeOfSumInsured           string                    `firestore:"typeOfSumInsured" json:"typeOfSumInsured,omitempty"  bigquery:"typeOfSumInsured"`
 	Description                string                    `firestore:"description,omitempty" json:"description,omitempty"  bigquery:"-"`
 	ContractDetail             string                    `firestore:"contractDetail,omitempty" json:"contractDetail,omitempty"  bigquery:"-"`
 	CompanyCodec               string                    `firestore:"companyCodec,omitempty" json:"companyCodec,omitempty"  bigquery:"-"`
