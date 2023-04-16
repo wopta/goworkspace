@@ -24,6 +24,7 @@ func Validate(resp http.ResponseWriter, r *http.Request) (string, interface{}, e
 		Mail:      result["email"],
 		FidoScore: 0,
 		IsValid:   false,
+		IsValidS:  false,
 	}
 
 	resfire := lib.WhereFirestore("mail", "mail", "==", result["email"])
@@ -31,7 +32,8 @@ func Validate(resp http.ResponseWriter, r *http.Request) (string, interface{}, e
 
 	if len(objmail) > 0 {
 		if objmail[0].IsValid {
-			log.Println("isValid ", objmail[0])
+			log.Println("isValid: ", objmail[0])
+			objmail[0].IsValidS = true
 			res, _ := json.Marshal(objmail[0])
 			return string(res), res, nil
 		}
@@ -44,9 +46,9 @@ func Validate(resp http.ResponseWriter, r *http.Request) (string, interface{}, e
 		if fido.Email.Score >= 480 {
 			log.Println("valid")
 			resObj.IsValid = true
-			res, _ := json.Marshal(resObj)
+			res1, _ := json.Marshal(resObj)
 			lib.PutFirestore("mail", resObj)
-			return string(res), res, nil
+			return string(res1), res1, nil
 		} else {
 			log.Println("invalid")
 			resObj.IsValid = false

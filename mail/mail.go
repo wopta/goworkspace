@@ -106,6 +106,7 @@ type MailRequest struct {
 type MailValidate struct {
 	Mail      string `firestore:"mail,omitempty" json:"mail,omitempty"`
 	IsValid   bool   `firestore:"isValid" json:"isValid"`
+	IsValidS  bool   `firestore:"-" json:"isValid "`
 	FidoScore int64  `firestore:"fidoScore" json:"fidoScore"`
 }
 
