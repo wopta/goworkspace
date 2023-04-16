@@ -9,7 +9,7 @@ require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
 	github.com/wopta/goworkspace/document v1.0.24
 	github.com/wopta/goworkspace/lib v1.0.14
-	github.com/wopta/goworkspace/mail v1.0.15
+	github.com/wopta/goworkspace/mail v1.0.16
 	github.com/wopta/goworkspace/models v1.0.33
 )
 
