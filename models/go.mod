@@ -7,7 +7,7 @@ replace github.com/wopta/goworkspace/models => ./
 require (
 	cloud.google.com/go v0.105.0
 	cloud.google.com/go/firestore v1.9.0
-	github.com/wopta/goworkspace/lib v1.0.11
+	github.com/wopta/goworkspace/lib v1.0.15
 	github.com/wopta/goworkspace/wiseproxy v1.0.2
 	google.golang.org/api v0.103.0
 )
