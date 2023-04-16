@@ -94,12 +94,14 @@ func FabrickPayObj(data model.Policy, firstSchedule bool, scheduleDate string, c
 				Company:            data.Company,
 				CommissionsCompany: commission,
 			}
-			ref, _ := lib.PutFirestore("transactions", tr)
+			transactionsFire := lib.GetDatasetByContractorName(data.Contractor.Name, "transactions")
+
+			ref, _ := lib.PutFirestore(transactionsFire, tr)
 			tr.Uid = ref.ID
 			tr.BigPayDate = civil.DateTimeOf(time.Now())
 			tr.BigCreationDate = civil.DateTimeOf(time.Now())
 			tr.BigStatusHistory = strings.Join(tr.StatusHistory, ",")
-			err = lib.InsertRowsBigQuery("wopta", "transactions-day", tr)
+			err = lib.InsertRowsBigQuery("wopta", transactionsFire, tr)
 			lib.CheckError(err)
 			r <- result
 
