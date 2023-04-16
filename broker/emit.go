@@ -22,12 +22,14 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	)
 
 	log.Println("--------------------------Emit-------------------------------------------")
+	log.Println(r.Header.Get(":authority"))
 	request := lib.ErrorByte(ioutil.ReadAll(r.Body))
 	log.Println("Emit", string(request))
 	json.Unmarshal([]byte(request), &result)
 
 	uid := result.Uid
 	log.Println("Emit", uid)
+	//policyFire = lib.GetDatasetByContractorName(policy.Contractor.Name, "policy")
 	var policy models.Policy
 	docsnap := lib.GetFirestore("policy", string(uid))
 	docsnap.DataTo(&policy)
