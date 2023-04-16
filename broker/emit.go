@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"cloud.google.com/go/civil"
@@ -17,21 +18,28 @@ import (
 
 func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		result EmitRequest
-		e      error
+		result     EmitRequest
+		e          error
+		firePolicy string
 	)
 
 	log.Println("--------------------------Emit-------------------------------------------")
-	log.Println(r.Header.Get(":authority"))
+	log.Println(r.Header.Get("origin"))
+	origin := r.Header.Get("origin")
+	if strings.Contains(origin, "uat") || strings.Contains(origin, "dev") {
+		firePolicy = "uat_policy"
+	} else {
+		firePolicy = "policy"
+	}
 	request := lib.ErrorByte(ioutil.ReadAll(r.Body))
 	log.Println("Emit", string(request))
 	json.Unmarshal([]byte(request), &result)
 
 	uid := result.Uid
 	log.Println("Emit", uid)
-	//policyFire = lib.GetDatasetByContractorName(policy.Contractor.Name, "policy")
+	//
 	var policy models.Policy
-	docsnap := lib.GetFirestore("policy", string(uid))
+	docsnap := lib.GetFirestore(firePolicy, string(uid))
 	docsnap.DataTo(&policy)
 	policyJsonLog, e := policy.Marshal()
 	log.Println("Emit get policy "+uid, string(policyJsonLog))
@@ -76,8 +84,9 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	policy.SignUrl = res.Url
 	policy.PayUrl = *payRes.Payload.PaymentPageURL
 	policyJson, e := policy.Marshal()
+	policyFire := lib.GetDatasetByContractorName(policy.Contractor.Name, "policy")
 	log.Println("Emit policy "+uid, string(policyJson))
-	lib.SetFirestore("policy", uid, policy)
+	lib.SetFirestore(policyFire, uid, policy)
 	policy.BigquerySave()
 	mail.SendMailSign(policy)
 	b, e := json.Marshal(responseEmit)
