@@ -486,16 +486,16 @@ func GetStatementsSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	pdf.Ln(8)
 }
 
-func GetVisioneDocumentiSection(pdf *fpdf.Fpdf) {
+func GetVisioneDocumentiSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	getParagraphTitle(pdf, "Presa visione dei documenti precontrattuali e sottoscrizione Polizza")
 	pdf.Ln(8)
 	setBlackRegularFont(pdf, standardTextSize)
-	email := "biciodallavalle86@gmail.com"
+	email := policy.Contractor.Mail
 	pdf.MultiCell(0, 3, "Ho scelto la ricezione della seguente documentazione via e-mail al seguente indirizzo "+
-		"indirizzo"+email+", nonché all’utilizzo della stessa per l’invio delle comunicazioni in corso di contratto da "+
+		" "+email+", nonché all’utilizzo della stessa per l’invio delle comunicazioni in corso di contratto da "+
 		"parte di Wopta e della Compagnia. Sono a conoscenza che, qualora volessi modificare questa mia scelta potrò "+
 		"farlo scrivendo alla Compagnia, con le modalità previste "+
-		"nelle Condizioni di Assicurazione.", "", "", false)
+		"nelle Condizioni di Assicurazione.", "", fpdf.AlignLeft, false)
 	setBlackBoldFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "Confermo di aver ricevuto e preso visione, prima della conclusione del contratto:",
 		"", "", false)
@@ -520,7 +520,7 @@ func GetVisioneDocumentiSection(pdf *fpdf.Fpdf) {
 	pdf.Ln(15)
 }
 
-func GetOfferResumeSection(pdf *fpdf.Fpdf) {
+func GetOfferResumeSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	getParagraphTitle(pdf, "Il premio per tutte le coperture assicurative attivate sulla polizza – Frazionamento: ANNUALE")
 	pdf.Ln(8)
 	setBlackRegularFont(pdf, standardTextSize)
@@ -531,17 +531,21 @@ func GetOfferResumeSection(pdf *fpdf.Fpdf) {
 	pdf.SetX(pdf.GetX() + 15)
 	pdf.CellFormat(40, 2, "Imposte Assicurative", "", 0, "", false, 0, "")
 	pdf.SetX(pdf.GetX() + 15)
-	pdf.CellFormat(40, 2, "Totale", "RM", 0, "", false, 0, "")
+	pdf.CellFormat(40, 2, "Totale", "", 0, "", false, 0, "")
 	pdf.Ln(3)
 	drawPinkHorizontalLine(pdf, 0.1)
 	pdf.Ln(1)
-	pdf.CellFormat(40, 2, "Annuale firma del contratto", "", 0, "", false, 0, "")
+	pdf.CellFormat(40, 2, "Annuale firma del contratto", "", 0, "", false, 0,
+		"")
+	pdf.SetX(pdf.GetX() + 8)
+	pdf.CellFormat(40, 2, lib.HumanaizePriceEuro(policy.OffersPrices["default"]["yearly"].Net), "", 0,
+		"CM", false, 0, "")
 	pdf.SetX(pdf.GetX() + 20)
-	pdf.CellFormat(40, 2, "€ 173,30", "", 0, "", false, 0, "")
-	pdf.SetX(pdf.GetX() + 15)
-	pdf.CellFormat(40, 2, "€ 1,88", "", 0, "", false, 0, "")
-	pdf.SetX(pdf.GetX() + 15)
-	pdf.CellFormat(40, 2, "€ 175,18", "RM", 0, "", false, 0, "")
+	pdf.CellFormat(40, 2, lib.HumanaizePriceEuro(policy.OffersPrices["default"]["yearly"].Tax), "", 0,
+		"CM", false, 0, "")
+	pdf.SetX(pdf.GetX() + 18)
+	pdf.CellFormat(20, 2, lib.HumanaizePriceEuro(policy.OffersPrices["default"]["yearly"].Gross), "",
+		0, "CM", false, 0, "")
 	pdf.Ln(3)
 	drawPinkHorizontalLine(pdf, 0.1)
 	pdf.Ln(3)
@@ -731,15 +735,22 @@ func GetPaymentMethodSection(pdf *fpdf.Fpdf) {
 }
 
 func GetEmitResumeSection(pdf *fpdf.Fpdf, policy models.Policy) {
+	var offerPrice string
 	emitDate := policy.EmitDate.Format(layout)
+	startDate := policy.StartDate.Format(layout)
+	if policy.OffersPrices["default"]["monthly"] != nil {
+		offerPrice = humanize.FormatFloat("#.###,##", policy.OffersPrices["default"]["monthly"].Gross*12)
+	} else {
+		offerPrice = humanize.FormatFloat("#.###,##", policy.OffersPrices["default"]["yearly"].Gross)
+	}
+	text := "Polizza emessa a Milano il " + emitDate + " per un importo di € " + offerPrice + " quale " +
+		"prima rata alla firma, il cui pagamento a saldo è da effettuarsi con i metodi di pagamento sopra indicati. " +
+		"Wopta conferma avvenuto incasso e copertura della polizza dal " + startDate + "."
 	getParagraphTitle(pdf, "Emissione polizza e pagamento della prima rata")
 	pdf.Ln(8)
 	setBlackRegularFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3, "Polizza emessa a Milano il "+emitDate+" per un importo di €  175,18 quale "+
-		"prima rata alla firma, il cui pagamento a saldo è da effettuarsi con i metodi di pagamento sopra indicati. "+
-		"Wopta conferma avvenuto incasso e copertura della polizza dal "+emitDate+".",
-		"", "", false)
-	pdf.Ln(5)
+	pdf.MultiCell(0, 3, text, "", "", false)
+	pdf.Ln(3)
 }
 
 func GetPolicyDescriptionSection(pdf *fpdf.Fpdf) {

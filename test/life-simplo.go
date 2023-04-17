@@ -53,9 +53,9 @@ func Life(policy models.Policy) string {
 
 	pdf.AddPage()
 
-	GetVisioneDocumentiSection(pdf)
+	GetVisioneDocumentiSection(pdf, policy)
 
-	GetOfferResumeSection(pdf)
+	GetOfferResumeSection(pdf, policy)
 
 	GetPaymentResumeSection(pdf)
 
