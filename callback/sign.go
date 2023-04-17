@@ -48,7 +48,7 @@ func Sign(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 
 			*policy.Attachments = append(*policy.Attachments, models.Attachment{Name: "Contratto", Link: "gs://" + os.Getenv("GOOGLE_STORAGE_BUCKET") + "/contracts/" + policy.Uid + ".pdf"})
 			lib.SetFirestore("policy", uid, policy)
-			policy.BigquerySave()
+			policy.BigquerySave(r.Header.Get("origin"))
 			mail.SendMailPay(policy)
 			s := <-document.GetFileV6(policy.IdSign, uid)
 

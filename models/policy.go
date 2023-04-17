@@ -119,8 +119,8 @@ type Price struct {
 	Discount float64 `firestore:"discount" json:"discount" bigquery:"-"`
 }
 
-func (policy *Policy) BigquerySave() {
-	policyBig := lib.GetDatasetByContractorName(policy.Contractor.Name, "policy")
+func (policy *Policy) BigquerySave(origin string) {
+	policyBig := lib.GetDatasetByEnv(origin, "policy")
 	policyJson, e := policy.Marshal()
 	log.Println(" policy "+policy.Uid, string(policyJson))
 	policy.Data = string(policyJson)

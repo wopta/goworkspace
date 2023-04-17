@@ -16,7 +16,7 @@ import (
 	model "github.com/wopta/goworkspace/models"
 )
 
-func FabrickPayObj(data model.Policy, firstSchedule bool, scheduleDate string, customerId string, amount float64) <-chan FabrickPaymentResponse {
+func FabrickPayObj(data model.Policy, firstSchedule bool, scheduleDate string, customerId string, amount float64, origin string) <-chan FabrickPaymentResponse {
 	r := make(chan FabrickPaymentResponse)
 
 	go func() {
@@ -94,7 +94,8 @@ func FabrickPayObj(data model.Policy, firstSchedule bool, scheduleDate string, c
 				Company:            data.Company,
 				CommissionsCompany: commission,
 			}
-			transactionsFire := lib.GetDatasetByContractorName(data.Contractor.Name, "transactions")
+
+			transactionsFire := lib.GetDatasetByEnv(origin, "transactions")
 
 			ref, _ := lib.PutFirestore(transactionsFire, tr)
 			tr.Uid = ref.ID
@@ -109,27 +110,27 @@ func FabrickPayObj(data model.Policy, firstSchedule bool, scheduleDate string, c
 	}()
 	return r
 }
-func FabbrickMontlyPay(data model.Policy) FabrickPaymentResponse {
+func FabbrickMontlyPay(data model.Policy, origin string) FabrickPaymentResponse {
 
 	installment := data.PriceGross / 12
 	customerId := uuid.New().String()
 	log.Println(data.Uid + " FabbrickMontlyPay")
 	layout := "2006-01-02"
-	firstres := <-FabrickPayObj(data, true, data.StartDate.Format(layout), customerId, installment)
+	firstres := <-FabrickPayObj(data, true, data.StartDate.Format(layout), customerId, installment, origin)
 	time.Sleep(100)
 	for i := 1; i <= 11; i++ {
 		date := data.StartDate.AddDate(0, i, 0)
-		res := <-FabrickPayObj(data, false, date.Format(layout), customerId, installment)
+		res := <-FabrickPayObj(data, false, date.Format(layout), customerId, installment, origin)
 		log.Println(data.Uid+" FabbrickMontlyPay res:", res)
 		time.Sleep(500)
 	}
 	return firstres
 }
-func FabbrickYearPay(data model.Policy) FabrickPaymentResponse {
+func FabbrickYearPay(data model.Policy, origin string) FabrickPaymentResponse {
 
 	customerId := uuid.New().String()
 	log.Println(data.Uid + " FabbrickYearPay")
-	res := <-FabrickPayObj(data, false, "", customerId, data.PriceGross)
+	res := <-FabrickPayObj(data, false, "", customerId, data.PriceGross, origin)
 
 	return res
 }

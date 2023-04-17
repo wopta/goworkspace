@@ -24,7 +24,7 @@ func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	j, e := policy.Marshal()
 	log.Println("Proposal request proposal: ", string(j))
 	defer r.Body.Close()
-	policyFire = lib.GetDatasetByContractorName(policy.Contractor.Name, "policy")
+	policyFire = lib.GetDatasetByEnv(r.Header.Get("origin"), "policy")
 	policy.CreationDate = time.Now()
 	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusInitLead)
 	policy.Status = models.PolicyStatusInitLead
@@ -45,7 +45,7 @@ func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	policy.Attachments = &[]models.Attachment{{Name: "Precontrattuale", Link: "gs://documents-public-dev/information-sets/" + policy.Name + "/" + policy.ProductVersion + "v1/Precontrattuale.pdf"}}
 	log.Println("Proposal save")
 	ref, _ := lib.PutFirestore(policyFire, policy)
-	policy.BigquerySave()
+	policy.BigquerySave(r.Header.Get("origin"))
 	log.Println(ref.ID + " Proposal sand mail")
 	mail.SendMailProposal(policy)
 

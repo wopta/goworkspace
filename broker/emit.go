@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"strings"
 	"time"
 
 	"cloud.google.com/go/civil"
@@ -25,12 +24,9 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 
 	log.Println("--------------------------Emit-------------------------------------------")
 	log.Println(r.Header.Get("origin"))
-	origin := r.Header.Get("origin")
-	if strings.Contains(origin, "uat") || strings.Contains(origin, "dev") {
-		firePolicy = "uat_policy"
-	} else {
-		firePolicy = "policy"
-	}
+
+	firePolicy = lib.GetDatasetByEnv(r.Header.Get("origin"), "policy")
+
 	request := lib.ErrorByte(ioutil.ReadAll(r.Body))
 	log.Println("Emit", string(request))
 	json.Unmarshal([]byte(request), &result)
@@ -84,10 +80,9 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	policy.SignUrl = res.Url
 	policy.PayUrl = *payRes.Payload.PaymentPageURL
 	policyJson, e := policy.Marshal()
-	policyFire := lib.GetDatasetByContractorName(policy.Contractor.Name, "policy")
 	log.Println("Emit policy "+uid, string(policyJson))
-	lib.SetFirestore(policyFire, uid, policy)
-	policy.BigquerySave()
+	lib.SetFirestore(firePolicy, uid, policy)
+	policy.BigquerySave(r.Header.Get("origin"))
 	mail.SendMailSign(policy)
 	b, e := json.Marshal(responseEmit)
 	return string(b), responseEmit, e
