@@ -50,7 +50,7 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 			policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusPay)
 			//policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusToPay)
 			lib.SetFirestore("policy", uid, policy)
-			policy.BigquerySave()
+			policy.BigquerySave(r.Header.Get("origin"))
 			q := lib.Firequeries{
 				Queries: []lib.Firequery{{
 					Field:      "policyUid",
@@ -64,6 +64,7 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 					},
 				},
 			}
+
 			query, e = q.FirestoreWherefields("transactions")
 			transactions := models.TransactionToListData(query)
 			transaction := transactions[0]

@@ -71,10 +71,10 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	policy.IdSign = res.EnvelopeId
 	var payRes pay.FabrickPaymentResponse
 	if policy.PaymentSplit == string(models.PaySplitYear) {
-		payRes = pay.FabbrickYearPay(policy)
+		payRes = pay.FabbrickYearPay(policy, r.Header.Get("origin"))
 	}
 	if policy.PaymentSplit == string(models.PaySplitMonthly) {
-		payRes = pay.FabbrickMontlyPay(policy)
+		payRes = pay.FabbrickMontlyPay(policy, r.Header.Get("origin"))
 	}
 	responseEmit := EmitResponse{UrlPay: *payRes.Payload.PaymentPageURL, UrlSign: res.Url}
 	policy.SignUrl = res.Url
