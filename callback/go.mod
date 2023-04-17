@@ -10,7 +10,7 @@ require (
 	github.com/wopta/goworkspace/document v1.0.24
 	github.com/wopta/goworkspace/lib v1.0.17
 	github.com/wopta/goworkspace/mail v1.0.16
-	github.com/wopta/goworkspace/models v1.0.33
+	github.com/wopta/goworkspace/models v1.0.37
 )
 
 
