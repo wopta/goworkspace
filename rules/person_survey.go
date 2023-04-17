@@ -108,13 +108,15 @@ func (fx *FxSurvey) AppendQuestion(questions []*models.Question, text string, is
 	return append(questions, question)
 }
 
-func (fx *FxSurvey) HasGuaranteePolicy(input map[string]interface{}, guaranteeName string) bool {
-	j, _ := json.Marshal(input)
+func (fx *FxSurvey) HasGuaranteePolicy(input map[string]interface{}, guaranteeSlug string) bool {
+	j, err := json.Marshal(input)
+	lib.CheckError(err)
 	var policy models.Policy
-	_ = json.Unmarshal(j, &policy)
+	err = json.Unmarshal(j, &policy)
+	lib.CheckError(err)
 	for _, asset := range policy.Assets {
 		for _, guarantee := range asset.Guarantees {
-			if guarantee.Name == guaranteeName {
+			if guarantee.Slug == guaranteeSlug {
 				return true
 			}
 		}
@@ -122,13 +124,13 @@ func (fx *FxSurvey) HasGuaranteePolicy(input map[string]interface{}, guaranteeNa
 	return false
 }
 
-func (fx *FxSurvey) GetGuaranteeIndex(input map[string]interface{}, guaranteeName string) int {
+func (fx *FxSurvey) GetGuaranteeIndex(input map[string]interface{}, guranteeSlug string) int {
 	j, _ := json.Marshal(input)
 	var policy models.Policy
 	_ = json.Unmarshal(j, &policy)
 	for _, asset := range policy.Assets {
 		for i, guarantee := range asset.Guarantees {
-			if guarantee.Name == guaranteeName {
+			if guarantee.Slug == guranteeSlug {
 				return i
 			}
 		}
