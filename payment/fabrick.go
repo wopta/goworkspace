@@ -30,7 +30,7 @@ func FabrickPayObj(data model.Policy, firstSchedule bool, scheduleDate string, c
 			Timeout: time.Second * 15,
 		}
 
-		marshal := getfabbricPayments(data, firstSchedule, scheduleDate, customerId, amount)
+		marshal := getfabbricPayments(data, firstSchedule, scheduleDate, customerId, amount, origin)
 		log.Printf(data.Uid + " " + string(marshal))
 		//log.Println(getFabrickPay(data))
 		req, _ := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(string(marshal)))
@@ -135,7 +135,7 @@ func FabbrickYearPay(data model.Policy, origin string) FabrickPaymentResponse {
 	return res
 }
 
-func getfabbricPayments(data model.Policy, firstSchedule bool, scheduleDate string, customerId string, amount float64) string {
+func getfabbricPayments(data model.Policy, firstSchedule bool, scheduleDate string, customerId string, amount float64, origin string) string {
 	var mandate string
 
 	if firstSchedule {
@@ -181,7 +181,7 @@ func getfabbricPayments(data model.Policy, firstSchedule bool, scheduleDate stri
 
 	bill.Items = []Item{{ExternalID: externalId, Amount: amount, Currency: "EUR"}}
 	bill.Subjects = &[]Subject{{ExternalID: customerId, Role: "customer", Email: data.Contractor.Mail, Name: data.Contractor.Name + ` ` + data.Contractor.Surname}}
-	calbackurl := "https://europe-west1-" + os.Getenv("GOOGLE_PROJECT_ID") + ".cloudfunctions.net/callback/v1/payment?uid=" + data.Uid + `&schedule=` + scheduleDate
+	calbackurl := "https://europe-west1-" + os.Getenv("GOOGLE_PROJECT_ID") + ".cloudfunctions.net/callback/v1/payment?uid=" + data.Uid + `&schedule=` + scheduleDate + `&token=` + os.Getenv("WOPTA_TOKEN_API") + `&origin=` + origin
 	calbackurl = strings.Replace(calbackurl, `\u0026`, `&`, 1)
 	log.Println(calbackurl)
 	pay.PaymentConfiguration = PaymentConfiguration{
