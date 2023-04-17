@@ -46,9 +46,9 @@ type Policy struct {
 	Company         string                       `firestore:"company,omitempty" json:"company,omitempty" bigquery:"company"`
 	Name            string                       `firestore:"name,omitempty" json:"name,omitempty" bigquery:"name"`
 	NameDesc        string                       `firestore:"nameDesc,omitempty" json:"nameDesc,omitempty" bigquery:"nameDesc"`
-	BigStartDate    civil.DateTime               `bigquery:"startDate" firestore:"-"`
-	BigEndDate      civil.DateTime               `bigquery:"endDate" firestore:"-"`
-	BigEmitDate     civil.DateTime               `bigquery:"emitDate" firestore:"-"`
+	BigStartDate    civil.DateTime               `bigquery:"startDate" firestore:"-" json:"-"`
+	BigEndDate      civil.DateTime               `bigquery:"endDate" firestore:"-" json:"-"`
+	BigEmitDate     civil.DateTime               `bigquery:"emitDate" firestore:"-" json:"-"`
 	EmitDate        time.Time                    `firestore:"emitDate,omitempty" json:"emitDate,omitempty" bigquery:"-"`
 	StartDate       time.Time                    `firestore:"startDate,omitempty" json:"startDate,omitempty" bigquery:"-"`
 	EndDate         time.Time                    `firestore:"endDate,omitempty" json:"endDate,omitempty" bigquery:"-"`
