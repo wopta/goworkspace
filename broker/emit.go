@@ -66,7 +66,7 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	p := <-doc.ContractObj(policy)
 
 	policy.DocumentName = p.LinkGcs
-	_, res, _ := doc.NamirialOtpV6(policy)
+	_, res, _ := doc.NamirialOtpV6(policy, r.Header.Get("origin"))
 	policy.ContractFileId = res.FileId
 	policy.IdSign = res.EnvelopeId
 	var payRes pay.FabrickPaymentResponse
