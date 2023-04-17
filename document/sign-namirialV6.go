@@ -28,11 +28,11 @@ func SignNamirialV6(w http.ResponseWriter, r *http.Request) (string, interface{}
 	lib.CheckError(err)
 	//file, _ := os.Open("document/billing.pdf")
 
-	return NamirialOtpV6(data)
+	return NamirialOtpV6(data, r.Header.Get("origin"))
 
 }
 
-func NamirialOtpV6(data model.Policy) (string, NamirialOtpResponse, error) {
+func NamirialOtpV6(data model.Policy, origin string) (string, NamirialOtpResponse, error) {
 	var file []byte
 	if os.Getenv("env") == "local" {
 		file = lib.ErrorByte(ioutil.ReadFile("document/contract.pdf"))
@@ -47,7 +47,7 @@ func NamirialOtpV6(data model.Policy) (string, NamirialOtpResponse, error) {
 	//prepareEnvelop(SspFileId)
 	unassigned := <-prepareEnvelopV6(SspFileId)
 
-	id := <-sendEnvelopV6(SspFileId, data, unassigned)
+	id := <-sendEnvelopV6(SspFileId, data, unassigned, origin)
 
 	log.Println(data.Uid+" sendEnvelop:", id)
 	url := <-GetEnvelopV6(id)
@@ -111,7 +111,7 @@ func prepareEnvelopV6(id string) <-chan string {
 	}()
 	return r
 }
-func sendEnvelopV6(id string, data model.Policy, unassigned string) <-chan string {
+func sendEnvelopV6(id string, data model.Policy, unassigned string, origin string) <-chan string {
 	r := make(chan string)
 
 	go func() {
@@ -121,8 +121,8 @@ func sendEnvelopV6(id string, data model.Policy, unassigned string) <-chan strin
 		client := &http.Client{
 			Timeout: time.Second * 10,
 		}
-		log.Println(data.Uid+" body:", string(getSendV6(id, data, unassigned)))
-		req, _ := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(getSendV6(id, data, unassigned)))
+		//log.Println(data.Uid+" body:", string(getSendV6(id, data, unassigned,)))
+		req, _ := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(getSendV6(id, data, unassigned, origin)))
 		req.Header.Set("apiToken", os.Getenv("ESIGN_TOKEN_API"))
 		req.Header.Set("Content-Type", "application/json")
 		//header('Content-Length: ' . filesize($pdf));
@@ -287,7 +287,7 @@ func getPrepareV6(id string) string {
 		]
 	  }`
 }
-func getSendV6(id string, data model.Policy, prepare string) string {
+func getSendV6(id string, data model.Policy, prepare string, origin string) string {
 	var preparePointer PrepareResponse
 	json.Unmarshal([]byte(prepare), &preparePointer)
 	unassignedElements := preparePointer.UnassignedElements
@@ -300,7 +300,7 @@ func getSendV6(id string, data model.Policy, prepare string) string {
 	unassignedJson, e := json.Marshal(unassignedElements)
 	elementsJson, e := json.Marshal(elements)
 	lib.CheckError(e)
-	calbackurl := `"https://europe-west1-` + os.Getenv("GOOGLE_PROJECT_ID") + `.cloudfunctions.net/callback/v1/sign?envelope=##EnvelopeId##&action=##Action##&uid=` + data.Uid + `&token=` + os.Getenv("WOPTA_TOKEN_API") + `"`
+	calbackurl := `"https://europe-west1-` + os.Getenv("GOOGLE_PROJECT_ID") + `.cloudfunctions.net/callback/v1/sign?envelope=##EnvelopeId##&action=##Action##&uid=` + data.Uid + `&token=` + os.Getenv("WOPTA_TOKEN_API") + `&origin=` + origin + `"`
 	var testPin string
 	if os.Getenv("env") == "local" || os.Getenv("env") == "dev" {
 		testPin = `
