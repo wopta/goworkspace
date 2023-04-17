@@ -15,7 +15,7 @@ func GetPolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	var (
 		result map[string]string
 	)
-
+	firePolicy := lib.GetDatasetByEnv(r.Header.Get("origin"), "policy")
 	log.Println("GetPolicy")
 	log.Println(r.RequestURI)
 	log.Println(r.Header.Get("uid"))
@@ -24,7 +24,7 @@ func GetPolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	json.Unmarshal([]byte(request), &result)
 	log.Println(requestPath[2])
 	var policy models.Policy
-	docsnap := lib.GetFirestore("policy", r.Header.Get("uid"))
+	docsnap := lib.GetFirestore(firePolicy, r.Header.Get("uid"))
 	log.Println("to data")
 	docsnap.DataTo(&policy)
 	res, _ := json.Marshal(policy)
