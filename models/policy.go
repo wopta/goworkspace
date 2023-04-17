@@ -77,7 +77,7 @@ type Policy struct {
 	Contractors     *[]User                      `firestore:"contractors,omitempty" json:"contractors,omitempty" bigquery:"-"`
 	DocumentName    string                       `firestore:"documentName,omitempty" json:"documentName,omitempty" bigquery:"-"`
 	Statements      *[]Statement                 `firestore:"statements,omitempty" json:"statements,omitempty" bigquery:"-"`
-	Survay          *[]Statement                 `firestore:"survey,omitempty" json:"survey,omitempty" bigquery:"-"`
+	Surveys         *[]Survey                    `firestore:"surveys,omitempty" json:"surveys,omitempty" bigquery:"-"`
 	Attachments     *[]Attachment                `firestore:"attachments,omitempty" json:"attachments,omitempty" bigquery:"-"`
 	Assets          []Asset                      `firestore:"assets,omitempty" json:"assets,omitempty" bigquery:"-"`
 	Claim           *[]Claim                     `firestore:"claim,omitempty" json:"claim,omitempty" bigquery:"-"`
@@ -92,6 +92,17 @@ type RenewHistory struct {
 	EndDate      time.Time `firestore:"endDate,omitempty" json:"endDate,omitempty"`
 	CreationDate time.Time `firestore:"creationDate,omitempty" json:"creationDate,omitempty"`
 }
+
+type Survey struct {
+	Title              string      `firestore:"title,omitempty" json:"title,omitempty"`
+	Subtitle           string      `firestore:"subtitle,omitempty" json:"subtitle,omitempty"`
+	HasMultipleAnswers *bool       `firestore:"hasMultipleAnswers,omitempty" json:"hasMultipleAnswers,omitempty"`
+	Questions          []*Question `firestore:"questions,omitempty" json:"questions,omitempty"`
+	Answer             *bool       `firestore:"answer,omitempty" json:"answer,omitempty"`
+	HasAnswer          bool        `firestore:"hasAnswer" json:"hasAnswer"`
+	ExpectedAnswer     *bool       `firestore:"expectedAnswer,omitempty" json:"expectedAnswer,omitempty"`
+}
+
 type Statement struct {
 	Title              string      `firestore:"title,omitempty" json:"title,omitempty"`
 	Subtitle           string      `firestore:"subtitle,omitempty" json:"subtitle,omitempty"`
