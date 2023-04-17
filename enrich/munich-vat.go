@@ -32,6 +32,7 @@ func MunichVat(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 		body, err = ioutil.ReadAll(res.Body)
 		lib.CheckError(err)
 		res.Body.Close()
+		log.Println("response body: ", string(body))
 
 	}
 	log.Println("Header", w.Header())
