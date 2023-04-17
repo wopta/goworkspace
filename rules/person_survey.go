@@ -12,9 +12,8 @@ import (
 
 func PersonSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		groule    []byte
-		questions []*models.Statement
-		policy    models.Policy
+		groule []byte
+		policy models.Policy
 	)
 	const (
 		rulesFileName = "person_survey.json"
@@ -27,8 +26,9 @@ func PersonSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	err = json.Unmarshal(b, &policy)
 
 	policyJson, err := policy.Marshal()
+	lib.CheckError(err)
 
-	statements := &Statements{Statements: questions, Text: ""}
+	surveys := &Surveys{Surveys: make([]*models.Survey, 0), Text: ""}
 
 	switch os.Getenv("env") {
 	case "local":
@@ -39,7 +39,7 @@ func PersonSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		groule = lib.GetFromStorage("core-350507-function-data", "grules/"+rulesFileName, "")
 	}
 
-	_, ruleOutput := rulesFromJson(groule, statements, policyJson, []byte(getCoherenceData()))
+	_, ruleOutput := rulesFromJson(groule, surveys, policyJson, []byte(getCoherenceData()))
 
 	ruleOutputJson, err := json.Marshal(ruleOutput)
 	lib.CheckError(err)
@@ -47,9 +47,9 @@ func PersonSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	return string(ruleOutputJson), ruleOutput, nil
 }
 
-type Statements struct {
-	Statements []*models.Statement `json:"statements"`
-	Text       string              `json:"text,omitempty"`
+type Surveys struct {
+	Surveys []*models.Survey `json:"surveys"`
+	Text    string           `json:"text,omitempty"`
 }
 
 type FxSurvey struct{}
@@ -70,8 +70,26 @@ func (fx *FxSurvey) AppendStatement(statements []*models.Statement, title string
 	if hasMultipleAnswers {
 		statement.HasMultipleAnswers = &hasMultipleAnswers
 	}
-
 	return append(statements, statement)
+}
+
+func (fx *FxSurvey) AppendSurvey(surveys []*models.Survey, title string, subtitle string, hasMultipleAnswers bool, hasAnswer bool, expectedAnswer bool) []*models.Survey {
+	survey := &models.Survey{
+		Title:              title,
+		Subtitle:           subtitle,
+		HasMultipleAnswers: nil,
+		Questions:          make([]*models.Question, 0),
+		Answer:             nil,
+		HasAnswer:          hasAnswer,
+		ExpectedAnswer:     nil,
+	}
+	if hasAnswer {
+		survey.ExpectedAnswer = &expectedAnswer
+	}
+	if hasMultipleAnswers {
+		survey.HasMultipleAnswers = &hasMultipleAnswers
+	}
+	return append(surveys, survey)
 }
 
 func (fx *FxSurvey) AppendQuestion(questions []*models.Question, text string, isBold bool, indent bool, hasAnswer bool, expectedAnswer bool) []*models.Question {
