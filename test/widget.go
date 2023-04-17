@@ -7,6 +7,7 @@ import (
 	"github.com/wopta/goworkspace/models"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func GetMainHeader(pdf *fpdf.Fpdf, policy models.Policy) {
@@ -843,7 +844,12 @@ func GetAxaDeclarationsConsentSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	drawSignatureForm(pdf)
 }
 
-func GetAxaTableSection(pdf *fpdf.Fpdf) {
+func GetAxaTableSection(pdf *fpdf.Fpdf, policy models.Policy) {
+	contractor := policy.Contractor
+
+	birthDate, err := time.Parse(time.RFC3339, contractor.BirthDate)
+	lib.CheckError(err)
+
 	setWhiteBoldFont(pdf, 12)
 	pdf.SetFillColor(229, 0, 117)
 	pdf.MultiCell(0, 6, "MODULO PER L’IDENTIFICAZIONE E L’ADEGUATA VERIFICA DELLA CLIENTELA", "LTR", "CM", true)
@@ -889,34 +895,46 @@ func GetAxaTableSection(pdf *fpdf.Fpdf) {
 	pdf.CellFormat(5, 4, "", "LR", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 0, "", false, 0, "")
 	setBlackBoldFont(pdf, standardTextSize)
-	pdf.CellFormat(90, 4, "Nome: FABRIZIO", "TLR", 0, "", false, 0, "")
-	pdf.CellFormat(90, 4, "Cognome:  DALLA VALLE", "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(90, 4, "Nome: "+strings.ToUpper(contractor.Name), "TLR", 0, "",
+		false, 0, "")
+	pdf.CellFormat(90, 4, "Cognome:  "+strings.ToUpper(contractor.Surname), "TLR", 0, "",
+		false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 0, "", false, 0, "")
-	pdf.CellFormat(90, 4, "Data di nascita: 07/10/1994", "TLR", 0, "", false, 0, "")
-	pdf.CellFormat(90, 4, "Codice Fiscale: DLLFRZ86T09E970X", "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(90, 4, "Data di nascita: "+birthDate.Format(layout), "TLR", 0, "",
+		false, 0, "")
+	pdf.CellFormat(90, 4, "Codice Fiscale: "+strings.ToUpper(contractor.FiscalCode), "TLR", 0,
+		"", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 0, "", false, 0, "")
-	pdf.CellFormat(90, 4, "Comune di nascita: PIANEZZE", "TLR", 0, "", false, 0, "")
-	pdf.CellFormat(45, 4, "CAP: 36060", "TLR", 0, "", false, 0, "")
-	pdf.CellFormat(45, 4, "Prov.: MI", "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(90, 4, "Comune di nascita: "+strings.ToUpper(contractor.BirthCity), "TLR", 0,
+		"", false, 0, "")
+	pdf.CellFormat(45, 4, "CAP: "+contractor.PostalCode, "TLR", 0, "", false,
+		0, "")
+	pdf.CellFormat(45, 4, "Prov.: "+contractor.BirthProvince, "TLR", 0, "", false,
+		0, "")
 	pdf.CellFormat(5, 4, "", "LR", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 0, "", false, 0, "")
-	pdf.CellFormat(90, 4, "Comune di residenza: PIANEZZE", "TLR", 0, "", false, 0, "")
-	pdf.CellFormat(45, 4, "CAP: 36060", "TLR", 0, "", false, 0, "")
-	pdf.CellFormat(45, 4, "Prov.: VI", "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(90, 4, "Comune di residenza: "+strings.ToUpper(contractor.City), "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(45, 4, "CAP: "+contractor.PostalCode, "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(45, 4, "Prov.: "+strings.ToUpper(contractor.Province),
+		"TLR", 0, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 0, "", false, 0, "")
-	pdf.CellFormat(180, 4, "Indirizzo di residenza: VIA TEZZE, 45/A", "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(180, 4, "Indirizzo di residenza: "+strings.ToUpper(contractor.Address+" "+
+		contractor.StreetNumber), "TLR", 0, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 0, "", false, 0, "")
-	pdf.CellFormat(180, 4, "Comune di domicilio (se diverso dalla residenza:", "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(180, 4, "Comune di domicilio (se diverso dalla residenza):", "TLR", 0,
+		"", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 0, "", false, 0, "")
-	pdf.CellFormat(180, 4, "Indirizzo di domicilio (se diverso dalla residenza:", "LR", 0, "", false, 0, "")
+	pdf.CellFormat(180, 4, "Indirizzo di domicilio (se diverso dalla residenza):", "LR", 0,
+		"", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 0, "", false, 0, "")
-	pdf.CellFormat(180, 4, "Status occupazinale: Lavoratore/dipendente", "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(180, 4, "Status occupazinale: "+contractor.WorkType, "TLR", 0, "",
+		false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 0, "", false, 0, "")
 	pdf.CellFormat(180, 4, "Se Altro (specificare):", "BLR", 0, "", false, 0, "")

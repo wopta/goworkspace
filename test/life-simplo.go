@@ -79,7 +79,7 @@ func Life(policy models.Policy) string {
 
 	pdf.AddPage()
 
-	GetAxaTableSection(pdf)
+	GetAxaTableSection(pdf, policy)
 
 	pdf.AddPage()
 
