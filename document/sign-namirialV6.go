@@ -328,11 +328,12 @@ func getSendV6(id string, data model.Policy, prepare string, origin string) stri
 			 
 				"Action": {
 					"Sign": {
-						"SendEmails": false,
-						"AllowAccessAfterFinish": false,
-						"AllowDelegation": false,
+					
                         "RequireViewContentBeforeFormFilling": false,
 						"RecipientConfiguration": {
+							"SendEmails": false,
+						    "AllowAccessAfterFinish": false,
+						    "AllowDelegation": false,
 							"ContactInformation": {
 								"Email": "` + data.Contractor.Mail + `",
 								"GivenName": "` + data.Contractor.Name + `",
