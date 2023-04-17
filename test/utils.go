@@ -81,7 +81,7 @@ func setWhiteRegularFont(pdf *fpdf.Fpdf, fontSize float64) {
 func drawBlackHorizontalLine(pdf *fpdf.Fpdf, width float64) {
 	pdf.SetDrawColor(0, 0, 0)
 	pdf.SetLineWidth(width)
-	pdf.Line(130, pdf.GetY(), 190, pdf.GetY())
+	pdf.Line(11, pdf.GetY(), 200, pdf.GetY())
 }
 
 func drawPinkHorizontalLine(pdf *fpdf.Fpdf, lineWidth float64) {
@@ -91,10 +91,12 @@ func drawPinkHorizontalLine(pdf *fpdf.Fpdf, lineWidth float64) {
 }
 
 func drawSignatureForm(pdf *fpdf.Fpdf) {
+	pdf.SetDrawColor(0, 0, 0)
 	pdf.SetX(-80)
 	pdf.Cell(0, 3, "Firma del Contraente/Assicurato")
 	pdf.Ln(15)
-	drawBlackHorizontalLine(pdf, thickLineWidth)
+	pdf.SetLineWidth(thickLineWidth)
+	pdf.Line(130, pdf.GetY(), 190, pdf.GetY())
 }
 
 func getParagraphTitle(pdf *fpdf.Fpdf, title string) {
