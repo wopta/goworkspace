@@ -459,7 +459,7 @@ func GetBeneficiaryReferenceSection(pdf *fpdf.Fpdf, policy models.Policy) {
 			" - " + beneficiary.Residence.PostalCode + " " + beneficiary.Residence.City +
 			" (" + beneficiary.Residence.CityCode + ")")
 		beneficiaryReference["name"] = strings.ToUpper(beneficiary.Surname + " " + beneficiary.Name)
-		beneficiaryReference["fiscCod"] = strings.ToUpper(beneficiary.FiscalCode)
+		beneficiaryReference["fiscCode"] = strings.ToUpper(beneficiary.FiscalCode)
 		beneficiaryReference["address"] = address
 		beneficiaryReference["mail"] = beneficiary.Mail
 		beneficiaryReference["phone"] = beneficiary.Phone
@@ -482,7 +482,7 @@ func GetBeneficiaryReferenceTable(pdf *fpdf.Fpdf, beneficiaryReference map[strin
 	setBlackBoldFont(pdf, standardTextSize)
 	pdf.Cell(20, 2, "Cod. Fisc.: ")
 	setBlackRegularFont(pdf, standardTextSize)
-	pdf.Cell(20, 2, beneficiaryReference["fiscCod"])
+	pdf.Cell(20, 2, beneficiaryReference["fiscCode"])
 	pdf.Ln(3)
 	drawPinkHorizontalLine(pdf, thinLineWidth)
 	pdf.Ln(2)
