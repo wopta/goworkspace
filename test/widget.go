@@ -321,7 +321,7 @@ func GetBeneficiariSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	beneficiaries := [2]map[string]string{
 		{
 			"name":     "=====",
-			"codFisc":  "=====",
+			"fiscCode": "=====",
 			"address":  "=====",
 			"mail":     "=====",
 			"phone":    "=====",
@@ -330,7 +330,7 @@ func GetBeneficiariSection(pdf *fpdf.Fpdf, policy models.Policy) {
 		},
 		{
 			"name":           "=====",
-			"codFisc":        "=====",
+			"fiscCode":       "=====",
 			"address":        "=====",
 			"mail":           "=====",
 			"phone":          "=====",
@@ -351,7 +351,7 @@ func GetBeneficiariSection(pdf *fpdf.Fpdf, policy models.Policy) {
 				" - " + beneficiary.Residence.PostalCode + " " + beneficiary.Residence.City +
 				" (" + beneficiary.Residence.CityCode + ")")
 			beneficiaries[index]["name"] = strings.ToUpper(beneficiary.Surname + " " + beneficiary.Name)
-			beneficiaries[index]["codFisc"] = strings.ToUpper(beneficiary.FiscalCode)
+			beneficiaries[index]["fiscCode"] = strings.ToUpper(beneficiary.FiscalCode)
 			beneficiaries[index]["address"] = address
 			beneficiaries[index]["mail"] = beneficiary.Mail
 			beneficiaries[index]["phone"] = beneficiary.Phone
@@ -400,7 +400,7 @@ func GetBeneficiariTable(pdf *fpdf.Fpdf, beneficiaries [2]map[string]string) {
 		setBlackBoldFont(pdf, standardTextSize)
 		pdf.Cell(20, 2, "Cod. Fisc.: ")
 		setBlackRegularFont(pdf, standardTextSize)
-		pdf.Cell(20, 2, beneficiary["codFisc"])
+		pdf.Cell(20, 2, beneficiary["fiscCode"])
 		pdf.Ln(3)
 		drawPinkHorizontalLine(pdf, thinLineWidth)
 		pdf.Ln(2)
@@ -441,32 +441,55 @@ func GetBeneficiariTable(pdf *fpdf.Fpdf, beneficiaries [2]map[string]string) {
 	}
 }
 
-func GetReferenteTerzoSection(pdf *fpdf.Fpdf) {
+func GetBeneficiaryReferenceSection(pdf *fpdf.Fpdf, policy models.Policy) {
+	beneficiaryReference := map[string]string{
+		"name":     "=====",
+		"fiscCode": "=====",
+		"address":  "=====",
+		"mail":     "=====",
+		"phone":    "=====",
+	}
+
+	deathGuarantee, err := extractGuarantee(policy.Assets[0].Guarantees, "death")
+	lib.CheckError(err)
+
+	if deathGuarantee.BeneficiaryReferance != nil {
+		beneficiary := deathGuarantee.BeneficiaryReferance
+		address := strings.ToUpper(beneficiary.Residence.StreetName + ", " + beneficiary.Residence.StreetNumber +
+			" - " + beneficiary.Residence.PostalCode + " " + beneficiary.Residence.City +
+			" (" + beneficiary.Residence.CityCode + ")")
+		beneficiaryReference["name"] = strings.ToUpper(beneficiary.Surname + " " + beneficiary.Name)
+		beneficiaryReference["fiscCod"] = strings.ToUpper(beneficiary.FiscalCode)
+		beneficiaryReference["address"] = address
+		beneficiaryReference["mail"] = beneficiary.Mail
+		beneficiaryReference["phone"] = beneficiary.Phone
+	}
+
 	getParagraphTitle(pdf, "Referente terzo")
 	pdf.Ln(8)
-	GetReferenteTerzoTable(pdf)
+	GetBeneficiaryReferenceTable(pdf, beneficiaryReference)
 	pdf.Ln(2)
 }
 
-func GetReferenteTerzoTable(pdf *fpdf.Fpdf) {
+func GetBeneficiaryReferenceTable(pdf *fpdf.Fpdf, beneficiaryReference map[string]string) {
 	drawPinkHorizontalLine(pdf, thickLineWidth)
 	pdf.Ln(1.5)
 	setBlackBoldFont(pdf, standardTextSize)
 	pdf.Cell(50, 2, "Cognome e nome")
 	setBlackRegularFont(pdf, standardTextSize)
-	pdf.Cell(20, 2, "=====")
+	pdf.Cell(20, 2, beneficiaryReference["name"])
 	pdf.SetX(pdf.GetX() + 60)
 	setBlackBoldFont(pdf, standardTextSize)
 	pdf.Cell(20, 2, "Cod. Fisc.: ")
 	setBlackRegularFont(pdf, standardTextSize)
-	pdf.Cell(20, 2, "=====")
+	pdf.Cell(20, 2, beneficiaryReference["fiscCod"])
 	pdf.Ln(3)
 	drawPinkHorizontalLine(pdf, thinLineWidth)
 	pdf.Ln(2)
 	setBlackBoldFont(pdf, standardTextSize)
 	pdf.Cell(50, 2, "Indirizzo")
 	setBlackRegularFont(pdf, standardTextSize)
-	pdf.Cell(20, 2, "=====")
+	pdf.Cell(20, 2, beneficiaryReference["address"])
 	pdf.SetX(pdf.GetX() + 60)
 	setBlackBoldFont(pdf, standardTextSize)
 	pdf.Ln(3)
@@ -475,12 +498,12 @@ func GetReferenteTerzoTable(pdf *fpdf.Fpdf) {
 	setBlackBoldFont(pdf, standardTextSize)
 	pdf.Cell(50, 2, "Mail")
 	setBlackRegularFont(pdf, standardTextSize)
-	pdf.Cell(20, 2, "=====")
+	pdf.Cell(20, 2, beneficiaryReference["mail"])
 	pdf.SetX(pdf.GetX() + 60)
 	setBlackBoldFont(pdf, standardTextSize)
 	pdf.Cell(20, 2, "Telefono: ")
 	setBlackRegularFont(pdf, standardTextSize)
-	pdf.Cell(20, 2, "=====")
+	pdf.Cell(20, 2, beneficiaryReference["phone"])
 	pdf.Ln(3)
 	drawPinkHorizontalLine(pdf, thinLineWidth)
 }

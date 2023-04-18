@@ -45,7 +45,7 @@ func Life(policy models.Policy) string {
 
 	GetBeneficiariSection(pdf, policy)
 
-	GetReferenteTerzoSection(pdf)
+	GetBeneficiaryReferenceSection(pdf, policy)
 
 	GetStatementsSection(pdf, policy)
 
