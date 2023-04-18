@@ -9,7 +9,7 @@ type Guarante struct {
 	Type                       string                    `firestore:"type,omitempty" json:"type,omitempty"  bigquery:"type"`
 	Beneficiary                *User                     `firestore:"beneficiary,omitempty" json:"beneficiary,omitempty"  bigquery:"-"`
 	BeneficiaryReferance       *User                     `firestore:"beneficiaryReferance,omitempty" json:"beneficiaryReferance,omitempty"  bigquery:"-"`
-	Beneficiaries              *[]User                   `firestore:"beneficiaries,omitempty" json:"beneficiaries,omitempty"  bigquery:"-"`
+	Beneficiaries              *[]Beneficiary            `firestore:"beneficiaries,omitempty" json:"beneficiaries,omitempty"  bigquery:"-"`
 	TypeOfSumInsured           string                    `firestore:"typeOfSumInsured" json:"typeOfSumInsured,omitempty"  bigquery:"typeOfSumInsured"`
 	Description                string                    `firestore:"description,omitempty" json:"description,omitempty"  bigquery:"-"`
 	ContractDetail             string                    `firestore:"contractDetail,omitempty" json:"contractDetail,omitempty"  bigquery:"-"`
