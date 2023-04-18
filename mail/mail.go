@@ -68,8 +68,13 @@ func Mail(w http.ResponseWriter, r *http.Request) {
 }
 
 type Data struct {
-	Title   string
-	Content string
+	Title     string
+	SubTitle  string
+	Content   string
+	Link      string
+	LinkLabel string
+	IsLink    bool
+	IsApp     bool
 }
 type Attachment struct {
 	Name        string `firestore:"name,omitempty" json:"name,omitempty"`
@@ -90,10 +95,19 @@ type MailRequest struct {
 	Attachments  *[]Attachment `json:"attachments,omitempty"`
 	Cc           string        `json:"cc,omitempty"`
 	TemplateName string        `json:"templateName,omitempty"`
+	Title        string        `json:"title,omitempty"`
+	SubTitle     string        `json:"subTitle,omitempty"`
+	Content      string        `json:"content,omitempty"`
+	Link         string        `json:"link,omitempty"`
+	LinkLabel    string        `json:"linkLabel,omitempty"`
+	IsLink       bool          `json:"isLink,omitempty"`
+	IsApp        bool          `json:"isApp,omitempty"`
 }
 type MailValidate struct {
-	Mail    string `firestore:"mail,omitempty" json:"mail,omitempty"`
-	IsValid bool   `firestore:"isValid ,omitempty" json:"isValid ,omitempty"`
+	Mail      string `firestore:"mail,omitempty" json:"mail,omitempty"`
+	IsValid   bool   `firestore:"isValid" json:"isValid"`
+	IsValidS  bool   `firestore:"-" json:"isValid "`
+	FidoScore int64  `firestore:"fidoScore" json:"fidoScore"`
 }
 
 func Send(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -123,30 +137,4 @@ func Score(resp http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	ScoreFido(result["email"])
 
 	return `{"message":"Success send "}`, nil, nil
-}
-func Validate(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	var result map[string]string
-	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
-	log.Println(string(req))
-	defer r.Body.Close()
-
-	json.Unmarshal([]byte(req), &result)
-
-	fido := <-ScoreFido(result["email"])
-	log.Println(fido.Email.Score)
-	resObj := MailValidate{
-		Mail:    result["email"],
-		IsValid: false,
-	}
-	if fido.Email.Score >= 480 {
-		log.Println("valid")
-		resObj.IsValid = true
-	} else {
-		log.Println("invalid")
-		VerifyEmail(result["email"])
-	}
-	res, e := json.Marshal(resObj)
-	lib.CheckError(e)
-	log.Println(string(res))
-	return string(res), res, nil
 }

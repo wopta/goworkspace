@@ -25,6 +25,8 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 	uid := r.URL.Query().Get("uid")
 	schedule := r.URL.Query().Get("schedule")
 	request := lib.ErrorByte(ioutil.ReadAll(r.Body))
+	origin := r.URL.Query().Get("origin")
+	firePolicy := lib.GetDatasetByEnv(origin, "policy")
 	log.Println(string(request))
 	log.Println(string(r.RequestURI))
 	json.Unmarshal([]byte(request), &fabrickCallback)
@@ -38,7 +40,7 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 
 		log.Println(uid)
 		log.Println(schedule)
-		policyF := lib.GetFirestore("policy", uid)
+		policyF := lib.GetFirestore(firePolicy, uid)
 		var policy models.Policy
 		policyF.DataTo(&policy)
 		policyM, _ := policy.Marshal()
@@ -49,8 +51,8 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 			policy.Status = models.PolicyStatusPay
 			policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusPay)
 			//policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusToPay)
-			lib.SetFirestore("policy", uid, policy)
-			policy.BigquerySave()
+			lib.SetFirestore(firePolicy, uid, policy)
+			policy.BigquerySave(r.Header.Get("origin"))
 			q := lib.Firequeries{
 				Queries: []lib.Firequery{{
 					Field:      "policyUid",
@@ -64,7 +66,8 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 					},
 				},
 			}
-			query, e = q.FirestoreWherefields("transactions")
+			fireTransactions := lib.GetDatasetByEnv(origin, "transactions")
+			query, e = q.FirestoreWherefields(fireTransactions)
 			transactions := models.TransactionToListData(query)
 			transaction := transactions[0]
 			tr, _ := json.Marshal(transaction)
@@ -72,8 +75,8 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 			transaction.IsPay = true
 			transaction.Status = models.TransactionStatusPay
 			transaction.StatusHistory = append(transaction.StatusHistory, models.TransactionStatusPay)
-			lib.SetFirestore("transactions", transaction.Uid, transaction)
-			e = lib.InsertRowsBigQuery("wopta", "transactions-day", transaction)
+			lib.SetFirestore(fireTransactions, transaction.Uid, transaction)
+			e = lib.InsertRowsBigQuery("wopta", fireTransactions, transaction)
 			log.Println(uid + " payment sendMail ")
 			var contractbyte []byte
 			name := policy.Uid + ".pdf"

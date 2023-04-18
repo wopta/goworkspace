@@ -1,1195 +1,1202 @@
 {
-    "assistance": {
-        "DailyAllowance": "",
-        "Name": "",
-        "LegalDefence": "",
-        "Assistance": "yes",
-        "Group": "ASSSISTANCE",
-        "CompanyCodec": "AS",
-        "CompanyName": "Assistenza al Fabbricato",
-        "IsExtension": false,
-        "IsYuor": true,
-        "Type": "building",
-        "TypeOfSumInsured": "",
-        "Description": "Prestazioni di assistenza e servizio 24/7 al Fabbricato quali invio di artigiani come: idraulico, elettricista, fabbro, serrandista, vetraio, sorvegliante, nei casi indicati in polizza di necessità (la compagnia eroga direttamente la prestazione non il rimborso delle spese)",
-        "Deductible": "",
-        "Tax": 10,
-        "Taxes": null,
-        "SumInsuredLimitOfIndemnity": 0,
-        "Price": 0,
-        "PriceNett": 0,
-        "PriceGross": 0,
-        "Value": null,
-        "Offer": null,
-        "Slug": "assistance",
-        "SelfInsurance": "",
-        "SelfInsuranceDesc": "",
-        "IsBase": true,
-        "IsYour": false,
-        "IsPremium": true,
-        "Base": null,
-        "Your": null,
-        "Premium": null
-    },
-    "atmospheric-event": {
-        "DailyAllowance": "",
-        "Name": "",
-        "LegalDefence": "",
-        "Assistance": "",
-        "Group": "FIRE",
-        "CompanyCodec": "EA",
-        "CompanyName": "Eventi Atmosferici",
-        "IsExtension": true,
-        "IsYuor": true,
-        "Type": "building",
-        "TypeOfSumInsured": "replacementValue",
-        "Description": "Danni da eventi atmosferici quali uragano, bufera, tempesta, grandine, vento e cose trascinate da esso, tromba d’aria, gelo, sovraccarico di neve",
-        "Deductible": "1500",
-        "Tax": 22.25,
-        "Taxes": null,
-        "SumInsuredLimitOfIndemnity": 80000,
-        "Price": 0,
-        "PriceNett": 0,
-        "PriceGross": 0,
-        "Value": null,
-        "Offer": null,
-        "Slug": "atmospheric-event",
-        "SelfInsurance": "0.10",
-        "SelfInsuranceDesc": "10% - minimo € 1500",
-        "IsBase": false,
-        "IsYour": false,
-        "IsPremium": true,
-        "Base": null,
-        "Your": null,
-        "Premium": null
-    },
-    "building": {
-        "DailyAllowance": "",
-        "Name": "",
-        "LegalDefence": "",
-        "Assistance": "",
-        "Group": "FIRE",
-        "CompanyCodec": "IF",
-        "CompanyName": "Incendio Fabbricato",
-        "IsExtension": false,
-        "IsYuor": true,
-        "Type": "building",
-        "TypeOfSumInsured": "firstLoss",
-        "Description": "Danni diretti a Fabbricato, causati da eventi quali: incendio, esplosione, scoppio, fulmine, conseguenti fumi, gas e vapori",
-        "Deductible": "0",
-        "Tax": 22.25,
-        "Taxes": null,
-        "SumInsuredLimitOfIndemnity": 50000,
-        "Price": 0,
-        "PriceNett": 0,
-        "PriceGross": 0,
-        "Value": null,
-        "Offer": null,
-        "Slug": "building",
-        "SelfInsurance": "",
-        "SelfInsuranceDesc": "",
-        "IsBase": true,
-        "IsYour": false,
-        "IsPremium": true,
-        "Base": null,
-        "Your": null,
-        "Premium": null
-    },
-    "burst-pipe": {
-        "DailyAllowance": "",
-        "Name": "",
-        "LegalDefence": "",
-        "Assistance": "",
-        "Group": "FIRE",
-        "CompanyCodec": "AC",
-        "CompanyName": "Danni d’Acqua",
-        "IsExtension": true,
-        "IsYuor": false,
-        "Type": "building",
-        "TypeOfSumInsured": "firstLoss",
-        "Description": "Danni da allagamento (eccesso o accumulo d’acqua in luogo normalmente asciutto) verificatosi all'interno del Fabbricato a seguito di formazione di ruscelli o accumulo esterno di acqua",
-        "Deductible": "1000",
-        "Tax": 22.25,
-        "Taxes": null,
-        "SumInsuredLimitOfIndemnity": 80000,
-        "Price": 0,
-        "PriceNett": 0,
-        "PriceGross": 0,
-        "Value": null,
-        "Offer": null,
-        "Slug": "burst-pipe",
-        "SelfInsurance": "",
-        "SelfInsuranceDesc": "",
-        "IsBase": false,
-        "IsYour": false,
-        "IsPremium": true,
-        "Base": null,
-        "Your": null,
-        "Premium": null
-    },
-    "business-interruption": {
-        "DailyAllowance": "250",
-        "Name": "",
-        "LegalDefence": "",
-        "Assistance": "",
-        "Group": "BUSINESS INTERRUPTTION",
-        "CompanyCodec": "BI",
-        "CompanyName": "Business Interruption",
-        "IsExtension": false,
-        "IsYuor": true,
-        "Type": "building",
-        "TypeOfSumInsured": "firstLoss",
-        "Description": "Indennizzo per il periodo di documentata inattività forzata, a seguito di un Sinistro avvenuto nel Fabbricato, che abbia danneggiato i locali e/o i Macchinar e/o le Apparecchiature Elettroniche funzionali all’attività",
-        "Deductible": "5days",
-        "Tax": 21.25,
-        "Taxes": null,
-        "SumInsuredLimitOfIndemnity": 25000,
-        "Price": 0,
-        "PriceNett": 0,
-        "PriceGross": 0,
-        "Value": null,
-        "Offer": null,
-        "Slug": "business-interruption",
-        "SelfInsurance": "",
-        "SelfInsuranceDesc": "",
-        "IsBase": false,
-        "IsYour": false,
-        "IsPremium": true,
-        "Base": null,
-        "Your": null,
-        "Premium": null
-    },
-    "content": {
-        "DailyAllowance": "",
-        "Name": "",
-        "LegalDefence": "",
-        "Assistance": "",
-        "Group": "FIRE",
-        "CompanyCodec": "IC",
-        "CompanyName": "Incendio Contenuto",
-        "IsExtension": false,
-        "IsYuor": true,
-        "Type": "building",
-        "TypeOfSumInsured": "firstLoss",
-        "Description": "Danni diretti a Contenuto (Merci, macchinari, attrezzature, arredamento), causati da eventi quali: incendio, esplosione, scoppio, fulmine, conseguenti fumi, gas e vapori",
-        "Deductible": "1000",
-        "Tax": 22.25,
-        "Taxes": null,
-        "SumInsuredLimitOfIndemnity": 30000,
-        "Price": 0,
-        "PriceNett": 0,
-        "PriceGross": 0,
-        "Value": null,
-        "Offer": null,
-        "Slug": "content",
-        "SelfInsurance": "",
-        "SelfInsuranceDesc": "",
-        "IsBase": true,
-        "IsYour": false,
-        "IsPremium": true,
-        "Base": null,
-        "Your": null,
-        "Premium": null
-    },
-    "cyber": {
-        "DailyAllowance": "",
-        "Name": "",
-        "LegalDefence": "",
-        "Assistance": "",
-        "Group": "CYBER",
-        "CompanyCodec": "CR",
-        "CompanyName": "Cyber Risk",
-        "IsExtension": false,
-        "IsYuor": false,
-        "Type": "company",
-        "TypeOfSumInsured": "firstLoss",
-        "Description": "Indennizzo delle spese, a seguito di un attacco informatico, per: Ripristino dei dati; Violazione della privacy e violazione di dati confidenziali; Estorsione cyber; Cyber crime; Danno reputazionale; Danni su carte di pagamento/credito (PCI-DSS), nonché danni a terzi da: Violazioni della sicurezza della rete; Danni da interruzione di attività; Danni da responsabilità multimediale",
-        "Deductible": "1000",
-        "Tax": 0,
-        "Taxes": [
-            {
-                "Tax": 22.25,
-                "Percentage": 40
+    "Documents": [
+      {
+        "FileId": "string",
+        "DocumentNumber": 0
+      }
+    ],
+    "Name": "string",
+    "MetaData": "string",
+    "AddDocumentTimestamp": true,
+    "ShareWithTeam": true,
+    "LockFormFieldsOnFinish": true,
+    "UnassignedElements": {
+      "TextBoxes": [
+        {
+          "ElementId": "string",
+          "Required": true,
+          "Value": "string",
+          "DocumentNumber": 0,
+          "GuidingOrder": 0,
+          "Validation": {
+            "Type": "None",
+            "DateValidationConfiguration": {
+              "DateFormat": "string",
+              "Range": {
+                "From": "string",
+                "To": "string"
+              }
             },
-            {
-                "Tax": 21.25,
-                "Percentage": 60
+            "NumberValidationConfiguration": {
+              "DecimalDigits": 0,
+              "Symbol": "string",
+              "SymbolLocation": "Start",
+              "GroupSeparator": "Comma",
+              "DecimalSeparator": "Comma",
+              "Range": {
+                "From": "string",
+                "To": "string"
+              }
+            },
+            "PhoneValidationConfiguration": {
+              "Type": "International"
+            },
+            "TimeValidationConfiguration": {
+              "TimeFormat": "string",
+              "Range": {
+                "From": "string",
+                "To": "string"
+              }
             }
-        ],
-        "SumInsuredLimitOfIndemnity": 20000,
-        "Price": 0,
-        "PriceNett": 331.2,
-        "PriceGross": 71.7048,
-        "Value": null,
-        "Offer": null,
-        "Slug": "cyber",
-        "SelfInsurance": "",
-        "SelfInsuranceDesc": "",
-        "IsBase": false,
-        "IsYour": false,
-        "IsPremium": true,
-        "Base": null,
-        "Your": null,
-        "Premium": null
+          },
+          "FieldDefinition": {
+            "ReadOnly": true,
+            "MaxLength": 0,
+            "IsMultiline": true,
+            "IsPassword": true,
+            "TextFormat": {
+              "TextColor": "string",
+              "FontSizeInPt": 0,
+              "FontName": "string",
+              "Bold": true,
+              "Italic": true,
+              "TextAlign": "Left"
+            },
+            "Position": {
+              "PageNumber": 0,
+              "X": 0,
+              "Y": 0
+            },
+            "Size": {
+              "Width": 0,
+              "Height": 0
+            }
+          }
+        }
+      ],
+      "CheckBoxes": [
+        {
+          "ElementId": "string",
+          "DocumentNumber": 0,
+          "Required": true,
+          "IsChecked": true,
+          "GuidingOrder": 0,
+          "FieldDefinition": {
+            "ExportValue": "string",
+            "Position": {
+              "PageNumber": 0,
+              "X": 0,
+              "Y": 0
+            },
+            "Size": {
+              "Width": 0,
+              "Height": 0
+            },
+            "ReadOnly": true
+          }
+        }
+      ],
+      "ComboBoxes": [
+        {
+          "ElementId": "string",
+          "DocumentNumber": 0,
+          "Required": true,
+          "Value": "string",
+          "GuidingOrder": 0,
+          "FieldDefinition": {
+            "TextFormat": {
+              "TextColor": "string",
+              "FontSizeInPt": 0,
+              "FontName": "string",
+              "Bold": true,
+              "Italic": true,
+              "TextAlign": "Left"
+            },
+            "Items": [
+              {
+                "ExportValue": "string",
+                "DisplayValue": "string"
+              }
+            ],
+            "IsEditable": true,
+            "ReadOnly": true,
+            "Position": {
+              "PageNumber": 0,
+              "X": 0,
+              "Y": 0
+            },
+            "Size": {
+              "Width": 0,
+              "Height": 0
+            }
+          }
+        }
+      ],
+      "RadioButtons": [
+        {
+          "GroupName": "string",
+          "DocumentNumber": 0,
+          "Required": true,
+          "SelectedItem": "string",
+          "GuidingOrder": 0,
+          "FieldDefinition": {
+            "IsSelectUnison": true,
+            "Items": [
+              {
+                "ExportValue": "string",
+                "IsChecked": true,
+                "ReadOnly": true,
+                "Position": {
+                  "PageNumber": 0,
+                  "X": 0,
+                  "Y": 0
+                },
+                "Size": {
+                  "Width": 0,
+                  "Height": 0
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "ListBoxes": [
+        {
+          "ElementId": "string",
+          "DocumentNumber": 0,
+          "Required": true,
+          "PreSelectedItems": [
+            "string"
+          ],
+          "GuidingOrder": 0,
+          "FieldDefinition": {
+            "TextFormat": {
+              "TextColor": "string",
+              "FontSizeInPt": 0,
+              "FontName": "string",
+              "Bold": true,
+              "Italic": true,
+              "TextAlign": "Left"
+            },
+            "Items": [
+              {
+                "ExportValue": "string",
+                "DisplayValue": "string"
+              }
+            ],
+            "IsMultiSelect": true,
+            "ReadOnly": true,
+            "Position": {
+              "PageNumber": 0,
+              "X": 0,
+              "Y": 0
+            },
+            "Size": {
+              "Width": 0,
+              "Height": 0
+            }
+          }
+        }
+      ]
     },
-    "damage-to-goods-course-of-works": {
-        "DailyAllowance": "",
-        "Name": "",
-        "LegalDefence": "",
-        "Assistance": "",
-        "Group": "RCT",
-        "CompanyCodec": "DC",
-        "CompanyName": "Danni alle cose su cui si eseguono lavori",
-        "IsExtension": true,
-        "IsYuor": false,
-        "Type": "company",
-        "TypeOfSumInsured": "firstLoss",
-        "Description": "Per danni alle cose di terzi sulle quali si eseguono i lavori",
-        "Deductible": "1000",
-        "Tax": 22.25,
-        "Taxes": null,
-        "SumInsuredLimitOfIndemnity": 0,
-        "Price": 0,
-        "PriceNett": 0,
-        "PriceGross": 0,
-        "Value": null,
-        "Offer": null,
-        "Slug": "damage-to-goods-course-of-works",
-        "SelfInsurance": "0.10",
-        "SelfInsuranceDesc": "10% - minimo € 1000",
-        "IsBase": false,
-        "IsYour": false,
-        "IsPremium": false,
-        "Base": null,
-        "Your": null,
-        "Premium": null
+    "Activities": [
+      {
+        "Action": {
+          "SendCopy": {
+            "RecipientConfiguration": {
+              "ContactInformation": {
+                "Email": "string",
+                "GivenName": "string",
+                "Surname": "string",
+                "PhoneNumber": "string",
+                "LanguageCode": "AF"
+              },
+              "PersonalMessage": "string"
+            },
+            "CopyingGroup": "string"
+          },
+          "SignAutomatic": {
+            "ProfileId": "string",
+            "RenderingLanguageCode": "AF",
+            "VisibleSignatures": [
+              {
+                "DocumentNumber": 0,
+                "UseExternalTimestampServer": true,
+                "FieldDefinition": {
+                  "Position": {
+                    "PageNumber": 0,
+                    "X": 0,
+                    "Y": 0
+                  },
+                  "Size": {
+                    "Width": 0,
+                    "Height": 0
+                  }
+                }
+              }
+            ]
+          },
+          "Sign": {
+            "RecipientConfiguration": {
+              "ContactInformation": {
+                "Email": "string",
+                "GivenName": "string",
+                "Surname": "string",
+                "PhoneNumber": "string",
+                "LanguageCode": "AF"
+              },
+              "PersonalMessage": "string",
+              "AuthenticationConfiguration": {
+                "AccessCode": {
+                  "Code": "string"
+                },
+                "SmsOneTimePassword": {
+                  "PhoneNumber": "string"
+                },
+                "SwedishBankId": {
+                  "PersonalNumber": "string",
+                  "AllowAnyPersonalNumber": true
+                },
+                "OAuthAuthentications": [
+                  {
+                    "ProviderName": "string",
+                    "Validations": [
+                      {
+                        "FieldReferenceId": "string",
+                        "ExpectedValue": "string"
+                      }
+                    ]
+                  }
+                ],
+                "SamlAuthentications": [
+                  {
+                    "ProviderName": "string",
+                    "Validations": [
+                      {
+                        "FieldReferenceId": "string",
+                        "ExpectedValue": "string"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "SendEmails": true,
+              "AllowAccessAfterFinish": true,
+              "IncludedEmailAppLinks": {
+                "Android": true,
+                "iOS": true,
+                "Windows": true
+              },
+              "AllowDelegation": true,
+              "RequireViewContentBeforeFormFilling": true
+            },
+            "SequenceMode": "NoSequenceEnforced",
+            "Elements": {
+              "TextBoxes": [
+                {
+                  "ElementId": "string",
+                  "Required": true,
+                  "Value": "string",
+                  "DocumentNumber": 0,
+                  "GuidingOrder": 0,
+                  "Validation": {
+                    "Type": "None",
+                    "DateValidationConfiguration": {
+                      "DateFormat": "string",
+                      "Range": {
+                        "From": "string",
+                        "To": "string"
+                      }
+                    },
+                    "NumberValidationConfiguration": {
+                      "DecimalDigits": 0,
+                      "Symbol": "string",
+                      "SymbolLocation": "Start",
+                      "GroupSeparator": "Comma",
+                      "DecimalSeparator": "Comma",
+                      "Range": {
+                        "From": "string",
+                        "To": "string"
+                      }
+                    },
+                    "PhoneValidationConfiguration": {
+                      "Type": "International"
+                    },
+                    "TimeValidationConfiguration": {
+                      "TimeFormat": "string",
+                      "Range": {
+                        "From": "string",
+                        "To": "string"
+                      }
+                    }
+                  },
+                  "FieldDefinition": {
+                    "ReadOnly": true,
+                    "MaxLength": 0,
+                    "IsMultiline": true,
+                    "IsPassword": true,
+                    "TextFormat": {
+                      "TextColor": "string",
+                      "FontSizeInPt": 0,
+                      "FontName": "string",
+                      "Bold": true,
+                      "Italic": true,
+                      "TextAlign": "Left"
+                    },
+                    "Position": {
+                      "PageNumber": 0,
+                      "X": 0,
+                      "Y": 0
+                    },
+                    "Size": {
+                      "Width": 0,
+                      "Height": 0
+                    }
+                  }
+                }
+              ],
+              "CheckBoxes": [
+                {
+                  "ElementId": "string",
+                  "DocumentNumber": 0,
+                  "Required": true,
+                  "IsChecked": true,
+                  "GuidingOrder": 0,
+                  "FieldDefinition": {
+                    "ExportValue": "string",
+                    "Position": {
+                      "PageNumber": 0,
+                      "X": 0,
+                      "Y": 0
+                    },
+                    "Size": {
+                      "Width": 0,
+                      "Height": 0
+                    },
+                    "ReadOnly": true
+                  }
+                }
+              ],
+              "ComboBoxes": [
+                {
+                  "ElementId": "string",
+                  "DocumentNumber": 0,
+                  "Required": true,
+                  "Value": "string",
+                  "GuidingOrder": 0,
+                  "FieldDefinition": {
+                    "TextFormat": {
+                      "TextColor": "string",
+                      "FontSizeInPt": 0,
+                      "FontName": "string",
+                      "Bold": true,
+                      "Italic": true,
+                      "TextAlign": "Left"
+                    },
+                    "Items": [
+                      {
+                        "ExportValue": "string",
+                        "DisplayValue": "string"
+                      }
+                    ],
+                    "IsEditable": true,
+                    "ReadOnly": true,
+                    "Position": {
+                      "PageNumber": 0,
+                      "X": 0,
+                      "Y": 0
+                    },
+                    "Size": {
+                      "Width": 0,
+                      "Height": 0
+                    }
+                  }
+                }
+              ],
+              "RadioButtons": [
+                {
+                  "GroupName": "string",
+                  "DocumentNumber": 0,
+                  "Required": true,
+                  "SelectedItem": "string",
+                  "GuidingOrder": 0,
+                  "FieldDefinition": {
+                    "IsSelectUnison": true,
+                    "Items": [
+                      {
+                        "ExportValue": "string",
+                        "IsChecked": true,
+                        "ReadOnly": true,
+                        "Position": {
+                          "PageNumber": 0,
+                          "X": 0,
+                          "Y": 0
+                        },
+                        "Size": {
+                          "Width": 0,
+                          "Height": 0
+                        }
+                      }
+                    ]
+                  }
+                }
+              ],
+              "ListBoxes": [
+                {
+                  "ElementId": "string",
+                  "DocumentNumber": 0,
+                  "Required": true,
+                  "PreSelectedItems": [
+                    "string"
+                  ],
+                  "GuidingOrder": 0,
+                  "FieldDefinition": {
+                    "TextFormat": {
+                      "TextColor": "string",
+                      "FontSizeInPt": 0,
+                      "FontName": "string",
+                      "Bold": true,
+                      "Italic": true,
+                      "TextAlign": "Left"
+                    },
+                    "Items": [
+                      {
+                        "ExportValue": "string",
+                        "DisplayValue": "string"
+                      }
+                    ],
+                    "IsMultiSelect": true,
+                    "ReadOnly": true,
+                    "Position": {
+                      "PageNumber": 0,
+                      "X": 0,
+                      "Y": 0
+                    },
+                    "Size": {
+                      "Width": 0,
+                      "Height": 0
+                    }
+                  }
+                }
+              ],
+              "Signatures": [
+                {
+                  "ElementId": "string",
+                  "Required": true,
+                  "DocumentNumber": 0,
+                  "DisplayName": "string",
+                  "FieldDescription": "string",
+                  "UseExternalTimestampServer": true,
+                  "GuidingOrder": 0,
+                  "AllowedSignatureTypes": {
+                    "ClickToSign": {
+                      "UseExternalSignatureImage": "Optional",
+                      "Preferred": true,
+                      "StampImprintConfiguration": {
+                        "DisplayExtraInformation": true,
+                        "FontName": "string",
+                        "FontSizeInPt": 0,
+                        "DisplayEmail": true,
+                        "DisplayIp": true,
+                        "DisplayName": true,
+                        "DisplaySignatureDate": true
+                      }
+                    },
+                    "DrawToSign": {
+                      "UseExternalSignatureImage": "Optional",
+                      "Preferred": true,
+                      "StampImprintConfiguration": {
+                        "DisplayExtraInformation": true,
+                        "FontName": "string",
+                        "FontSizeInPt": 0,
+                        "DisplayEmail": true,
+                        "DisplayIp": true,
+                        "DisplayName": true,
+                        "DisplaySignatureDate": true
+                      }
+                    },
+                    "TypeToSign": {
+                      "UseExternalSignatureImage": "Optional",
+                      "Preferred": true,
+                      "StampImprintConfiguration": {
+                        "DisplayExtraInformation": true,
+                        "FontName": "string",
+                        "FontSizeInPt": 0,
+                        "DisplayEmail": true,
+                        "DisplayIp": true,
+                        "DisplayName": true,
+                        "DisplaySignatureDate": true
+                      }
+                    },
+                    "LocalCertificate": {
+                      "EnforcePreferredHashAlgorithm": true,
+                      "PreferredHashAlgorithm": "Sha256",
+                      "UseExternalSignatureImage": "Optional",
+                      "Preferred": true,
+                      "StampImprintConfiguration": {
+                        "DisplayExtraInformation": true,
+                        "FontName": "string",
+                        "FontSizeInPt": 0,
+                        "DisplayIp": true,
+                        "DisplayName": true,
+                        "DisplaySignatureDate": true
+                      }
+                    },
+                    "DisposableCertificate": {
+                      "IsLongLived": true,
+                      "ValidityInSeconds": 0,
+                      "UseExternalSignatureImage": "Optional",
+                      "Preferred": true,
+                      "StampImprintConfiguration": {
+                        "DisplayExtraInformation": true,
+                        "FontName": "string",
+                        "FontSizeInPt": 0,
+                        "DisplayIp": true,
+                        "DisplayName": true,
+                        "DisplaySignatureDate": true
+                      }
+                    },
+                    "SwissComOnDemand": {
+                      "ValidityInSeconds": 0,
+                      "Preferred": true,
+                      "StampImprintConfiguration": {
+                        "DisplayExtraInformation": true,
+                        "FontName": "string",
+                        "FontSizeInPt": 0,
+                        "DisplayIp": true,
+                        "DisplayName": true,
+                        "DisplaySignatureDate": true
+                      }
+                    },
+                    "ATrustCertificate": {
+                      "TemplateId": "string",
+                      "Preferred": true
+                    },
+                    "Biometric": {
+                      "BiometricVerification": true,
+                      "AllowBiometricStoringOnly": true,
+                      "StoreSignedResponseWithoutBioData": true,
+                      "BiometricServerUserId": "string",
+                      "SignaturePositioning": "WithinField",
+                      "Preferred": true
+                    },
+                    "RemoteCertificate": {
+                      "ValidityInSeconds": 0,
+                      "UseExternalSignatureImage": "Optional",
+                      "Preferred": true,
+                      "StampImprintConfiguration": {
+                        "DisplayExtraInformation": true,
+                        "FontName": "string",
+                        "FontSizeInPt": 0,
+                        "DisplayIp": true,
+                        "DisplayName": true,
+                        "DisplaySignatureDate": true
+                      }
+                    },
+                    "OneTimePassword": {
+                      "ValidityInSeconds": 0,
+                      "UseExternalSignatureImage": "Optional",
+                      "Preferred": true,
+                      "StampImprintConfiguration": {
+                        "DisplayExtraInformation": true,
+                        "FontName": "string",
+                        "FontSizeInPt": 0,
+                        "DisplayTransactionId": true,
+                        "DisplayTransactionToken": true,
+                        "DisplayPhoneNumber": true,
+                        "DisplayIp": true,
+                        "DisplayName": true,
+                        "DisplaySignatureDate": true
+                      }
+                    },
+                    "SwedishBankId": {
+                      "Preferred": true,
+                      "StampImprintConfiguration": {
+                        "DisplayExtraInformation": true,
+                        "FontName": "string",
+                        "FontSizeInPt": 0,
+                        "DisplayTransactionId": true,
+                        "DisplayName": true,
+                        "DisplaySignatureDate": true
+                      }
+                    },
+                    "SignaturePlugins": [
+                      {
+                        "PluginId": "string",
+                        "Preferred": true,
+                        "StampImprintConfiguration": {
+                          "DisplayExtraInformation": true,
+                          "FontName": "string",
+                          "FontSizeInPt": 0,
+                          "DisplayEmail": true,
+                          "DisplayIp": true,
+                          "DisplayName": true,
+                          "DisplaySignatureDate": true
+                        }
+                      }
+                    ]
+                  },
+                  "FieldDefinition": {
+                    "Position": {
+                      "PageNumber": 0,
+                      "X": 0,
+                      "Y": 0
+                    },
+                    "Size": {
+                      "Width": 0,
+                      "Height": 0
+                    }
+                  },
+                  "TaskConfiguration": {
+                    "StampImprintDateConfiguration": {
+                      "UseLocalTimezone": true,
+                      "DateTimeFormat": "string"
+                    },
+                    "BatchGroup": "string"
+                  }
+                }
+              ],
+              "Attachments": [
+                {
+                  "ElementId": "string",
+                  "DocumentNumber": 0,
+                  "Required": true,
+                  "DisplayName": "string",
+                  "DisplayIconType": "Paperclip",
+                  "GuidingOrder": 0,
+                  "FieldDefinition": {
+                    "Position": {
+                      "PageNumber": 0,
+                      "X": 0,
+                      "Y": 0
+                    },
+                    "Size": {
+                      "Width": 0,
+                      "Height": 0
+                    }
+                  }
+                }
+              ],
+              "PredefinedFieldElements": {
+                "TextFields": [
+                  {
+                    "ElementId": "string",
+                    "DocumentNumber": 0,
+                    "Value": "string",
+                    "FieldDefinition": {
+                      "TextFormat": {
+                        "TextColor": "string",
+                        "FontSizeInPt": 0,
+                        "FontName": "string",
+                        "Bold": true,
+                        "Italic": true,
+                        "TextAlign": "Left"
+                      },
+                      "Position": {
+                        "PageNumber": 0,
+                        "X": 0,
+                        "Y": 0
+                      },
+                      "Size": {
+                        "Width": 0,
+                        "Height": 0
+                      }
+                    }
+                  }
+                ],
+                "EmailFields": [
+                  {
+                    "ElementId": "string",
+                    "DocumentNumber": 0,
+                    "FieldDefinition": {
+                      "TextFormat": {
+                        "TextColor": "string",
+                        "FontSizeInPt": 0,
+                        "FontName": "string",
+                        "Bold": true,
+                        "Italic": true,
+                        "TextAlign": "Left"
+                      },
+                      "Position": {
+                        "PageNumber": 0,
+                        "X": 0,
+                        "Y": 0
+                      },
+                      "Size": {
+                        "Width": 0,
+                        "Height": 0
+                      }
+                    }
+                  }
+                ],
+                "InitialsFields": [
+                  {
+                    "ElementId": "string",
+                    "DocumentNumber": 0,
+                    "IncludeMiddleNameInitials": true,
+                    "FieldDefinition": {
+                      "TextFormat": {
+                        "TextColor": "string",
+                        "FontSizeInPt": 0,
+                        "FontName": "string",
+                        "Bold": true,
+                        "Italic": true,
+                        "TextAlign": "Left"
+                      },
+                      "Position": {
+                        "PageNumber": 0,
+                        "X": 0,
+                        "Y": 0
+                      },
+                      "Size": {
+                        "Width": 0,
+                        "Height": 0
+                      }
+                    }
+                  }
+                ],
+                "GivenNameFields": [
+                  {
+                    "ElementId": "string",
+                    "DocumentNumber": 0,
+                    "FieldDefinition": {
+                      "TextFormat": {
+                        "TextColor": "string",
+                        "FontSizeInPt": 0,
+                        "FontName": "string",
+                        "Bold": true,
+                        "Italic": true,
+                        "TextAlign": "Left"
+                      },
+                      "Position": {
+                        "PageNumber": 0,
+                        "X": 0,
+                        "Y": 0
+                      },
+                      "Size": {
+                        "Width": 0,
+                        "Height": 0
+                      }
+                    }
+                  }
+                ],
+                "SurnameFields": [
+                  {
+                    "ElementId": "string",
+                    "DocumentNumber": 0,
+                    "FieldDefinition": {
+                      "TextFormat": {
+                        "TextColor": "string",
+                        "FontSizeInPt": 0,
+                        "FontName": "string",
+                        "Bold": true,
+                        "Italic": true,
+                        "TextAlign": "Left"
+                      },
+                      "Position": {
+                        "PageNumber": 0,
+                        "X": 0,
+                        "Y": 0
+                      },
+                      "Size": {
+                        "Width": 0,
+                        "Height": 0
+                      }
+                    }
+                  }
+                ],
+                "FullNameFields": [
+                  {
+                    "ElementId": "string",
+                    "DocumentNumber": 0,
+                    "FieldDefinition": {
+                      "TextFormat": {
+                        "TextColor": "string",
+                        "FontSizeInPt": 0,
+                        "FontName": "string",
+                        "Bold": true,
+                        "Italic": true,
+                        "TextAlign": "Left"
+                      },
+                      "Position": {
+                        "PageNumber": 0,
+                        "X": 0,
+                        "Y": 0
+                      },
+                      "Size": {
+                        "Width": 0,
+                        "Height": 0
+                      }
+                    }
+                  }
+                ],
+                "DateFields": [
+                  {
+                    "ElementId": "string",
+                    "DocumentNumber": 0,
+                    "DateFormat": "string",
+                    "FieldDefinition": {
+                      "TextFormat": {
+                        "TextColor": "string",
+                        "FontSizeInPt": 0,
+                        "FontName": "string",
+                        "Bold": true,
+                        "Italic": true,
+                        "TextAlign": "Left"
+                      },
+                      "Position": {
+                        "PageNumber": 0,
+                        "X": 0,
+                        "Y": 0
+                      },
+                      "Size": {
+                        "Width": 0,
+                        "Height": 0
+                      }
+                    }
+                  }
+                ]
+              },
+              "LinkConfiguration": {
+                "HyperLinks": [
+                  {
+                    "ElementId": "string",
+                    "Uri": "string",
+                    "DocumentNumber": 0,
+                    "FieldDefinition": {
+                      "Position": {
+                        "PageNumber": 0,
+                        "X": 0,
+                        "Y": 0
+                      },
+                      "Size": {
+                        "Width": 0,
+                        "Height": 0
+                      }
+                    }
+                  }
+                ]
+              },
+              "AreaReadConfirmations": [
+                {
+                  "ElementId": "string",
+                  "Required": true,
+                  "DocumentNumber": 0,
+                  "DisplayName": "string",
+                  "GuidingOrder": 0,
+                  "Definition": {
+                    "Position": {
+                      "PageNumber": 0,
+                      "X": 0,
+                      "Y": 0
+                    },
+                    "Size": {
+                      "Width": 0,
+                      "Height": 0
+                    }
+                  }
+                }
+              ],
+              "PageReadConfirmations": [
+                {
+                  "ElementId": "string",
+                  "Required": true,
+                  "DocumentNumber": 0,
+                  "DisplayName": "string",
+                  "PageNumber": 0,
+                  "GuidingOrder": 0
+                }
+              ]
+            },
+            "FinishActionConfiguration": {
+              "SignAnyWhereViewer": {
+                "RedirectUri": "string"
+              },
+              "SignificantClientSignatureCaptureForIos": {
+                "RemoveDocumentFromRecentDocumentList": true,
+                "CallClientActionOnlyAfterSuccessfulSync": true,
+                "CloseApp": true,
+                "RedirectUri": "string"
+              },
+              "SignificantClientSignatureCaptureForAndroid": {
+                "RemoveDocumentFromRecentDocumentList": true,
+                "CallClientActionOnlyAfterSuccessfulSync": true,
+                "CloseApp": true,
+                "RedirectUri": "string"
+              },
+              "SignificantClientSignatureCaptureForWindows": {
+                "RemoveDocumentFromRecentDocumentList": true,
+                "CallClientActionOnlyAfterSuccessfulSync": true,
+                "CloseApp": true,
+                "RedirectUri": "string"
+              },
+              "KioskSdk": {
+                "RedirectUri": "string"
+              }
+            },
+            "SignatureDataConfiguration": {
+              "DisposableCertificate": {
+                "DocumentIssuingCountry": "string",
+                "IdentificationIssuingCountry": "string",
+                "IdentificationType": "None",
+                "PhoneNumber": "string",
+                "DocumentType": "IdentityCard",
+                "DocumentIssuedBy": "string",
+                "DocumentIssuedOn": "2023-04-17",
+                "DocumentExpiryDate": "2023-04-17",
+                "SerialNumber": "string",
+                "DocumentNumber": "string"
+              },
+              "RemoteCertificate": {
+                "UserId": "string",
+                "DeviceId": "string"
+              },
+              "SwissComOnDemand": {
+                "PhoneNumber": "string",
+                "CommonName": "string",
+                "Country": "string",
+                "Locality": "string",
+                "OrganizationUnits": [
+                  "string"
+                ],
+                "Organization": "string",
+                "SerialNumber": "string",
+                "StateOrProvince": "string",
+                "Pseudonym": "string"
+              },
+              "SmsOneTimePassword": {
+                "PhoneNumber": "string"
+              },
+              "ATrustCertificate": {
+                "PhoneNumber": "string"
+              },
+              "SwedishBankId": {
+                "PersonalNumber": "string",
+                "AllowAnyPersonalNumber": true
+              },
+              "SignaturePluginData": [
+                {
+                  "PluginId": "string",
+                  "Fields": [
+                    {
+                      "Key": "string",
+                      "Value": "string"
+                    }
+                  ]
+                }
+              ]
+            },
+            "BatchConfiguration": {
+              "Mode": "Basic",
+              "RequireScrollingOverAllSignaturesBeforeSigning": true
+            },
+            "SigningGroup": "string"
+          },
+          "View": {
+            "RecipientConfiguration": {
+              "ContactInformation": {
+                "Email": "string",
+                "GivenName": "string",
+                "Surname": "string",
+                "PhoneNumber": "string",
+                "LanguageCode": "AF"
+              },
+              "PersonalMessage": "string",
+              "AuthenticationConfiguration": {
+                "AccessCode": {
+                  "Code": "string"
+                },
+                "SmsOneTimePassword": {
+                  "PhoneNumber": "string"
+                },
+                "SwedishBankId": {
+                  "PersonalNumber": "string",
+                  "AllowAnyPersonalNumber": true
+                },
+                "OAuthAuthentications": [
+                  {
+                    "ProviderName": "string",
+                    "Validations": [
+                      {
+                        "FieldReferenceId": "string",
+                        "ExpectedValue": "string"
+                      }
+                    ]
+                  }
+                ],
+                "SamlAuthentications": [
+                  {
+                    "ProviderName": "string",
+                    "Validations": [
+                      {
+                        "FieldReferenceId": "string",
+                        "ExpectedValue": "string"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "SendEmails": true,
+              "AllowAccessAfterFinish": true
+            },
+            "ViewingGroup": "string"
+          },
+          "SignAsP7M": {
+            "RecipientConfiguration": {
+              "ContactInformation": {
+                "Email": "string",
+                "GivenName": "string",
+                "Surname": "string",
+                "PhoneNumber": "string",
+                "LanguageCode": "AF"
+              },
+              "PersonalMessage": "string",
+              "AuthenticationConfiguration": {
+                "AccessCode": {
+                  "Code": "string"
+                },
+                "SmsOneTimePassword": {
+                  "PhoneNumber": "string"
+                },
+                "SwedishBankId": {
+                  "PersonalNumber": "string",
+                  "AllowAnyPersonalNumber": true
+                },
+                "OAuthAuthentications": [
+                  {
+                    "ProviderName": "string",
+                    "Validations": [
+                      {
+                        "FieldReferenceId": "string",
+                        "ExpectedValue": "string"
+                      }
+                    ]
+                  }
+                ],
+                "SamlAuthentications": [
+                  {
+                    "ProviderName": "string",
+                    "Validations": [
+                      {
+                        "FieldReferenceId": "string",
+                        "ExpectedValue": "string"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "SendEmails": true,
+              "AllowAccessAfterFinish": true,
+              "IncludedEmailAppLinks": {
+                "Android": true,
+                "iOS": true,
+                "Windows": true
+              },
+              "AllowDelegation": true,
+              "RequireViewContentBeforeFormFilling": true
+            },
+            "SignatureMethods": {
+              "LocalCertificate": true,
+              "DisposableCertificate": {
+                "DocumentIssuingCountry": "string",
+                "IdentificationIssuingCountry": "string",
+                "IdentificationType": "None",
+                "PhoneNumber": "string",
+                "DocumentType": "IdentityCard",
+                "DocumentIssuedBy": "string",
+                "DocumentIssuedOn": "2023-04-17",
+                "DocumentExpiryDate": "2023-04-17",
+                "SerialNumber": "string",
+                "DocumentNumber": "string"
+              },
+              "RemoteCertificate": {
+                "UserId": "string",
+                "DeviceId": "string"
+              },
+              "SignaturePluginData": [
+                {
+                  "PluginId": "string",
+                  "Fields": [
+                    {
+                      "Key": "string",
+                      "Value": "string"
+                    }
+                  ]
+                }
+              ]
+            },
+            "SignAsP7MGroup": "string"
+          }
+        },
+        "VisibilityOptions": [
+          {
+            "DocumentNumber": 0,
+            "IsHidden": true
+          }
+        ]
+      }
+    ],
+    "EmailConfiguration": {
+      "Subject": "string",
+      "Message": "string",
+      "SenderDisplayName": "string"
     },
-    "damage-to-goods-in-custody": {
-        "DailyAllowance": "",
-        "Name": "",
-        "LegalDefence": "",
-        "Assistance": "",
-        "Group": "RCT",
-        "CompanyCodec": "DV",
-        "CompanyName": "Danni ai Veicoli in consegna e custodia",
-        "IsExtension": true,
-        "IsYuor": false,
-        "Type": "company",
-        "TypeOfSumInsured": "firstLoss",
-        "Description": "Per responsabilità relative a danni a veicoli in consegna, custodia o comunque detenuti, compresa errata erogazione di carburante, riparazione e manutenzione o movimentazione/caduta ponte sollevamento",
-        "Deductible": "1000",
-        "Tax": 22.25,
-        "Taxes": null,
-        "SumInsuredLimitOfIndemnity": 0,
-        "Price": 0,
-        "PriceNett": 0,
-        "PriceGross": 0,
-        "Value": null,
-        "Offer": null,
-        "Slug": "damage-to-goods-in-custody",
-        "SelfInsurance": "0.10",
-        "SelfInsuranceDesc": "10% - minimo € 1000",
-        "IsBase": false,
-        "IsYour": false,
-        "IsPremium": false,
-        "Base": null,
-        "Your": null,
-        "Premium": null
+    "ReminderConfiguration": {
+      "Enabled": true,
+      "FirstReminderInDays": 0,
+      "ReminderResendIntervalInDays": 0,
+      "BeforeExpirationInDays": 0
     },
-    "defect-liability-12-months": {
-        "DailyAllowance": "",
-        "Name": "",
-        "LegalDefence": "",
-        "Assistance": "",
-        "Group": "RCT",
-        "CompanyCodec": "12",
-        "CompanyName": "Responsabilità civile postuma 12 mesi",
-        "IsExtension": true,
-        "IsYuor": false,
-        "Type": "company",
-        "TypeOfSumInsured": "firstLoss",
-        "Description": "Per danni  in qualità di installatore, manutentore o riparatore, causati dopo ultimazione lavori dalle cose installate, riparate o manutenute (NO Ateco Edili 41. 42. 43.)",
-        "Deductible": "1000",
-        "Tax": 22.25,
-        "Taxes": null,
-        "SumInsuredLimitOfIndemnity": 0,
-        "Price": 0,
-        "PriceNett": 0,
-        "PriceGross": 0,
-        "Value": null,
-        "Offer": null,
-        "Slug": "defect-liability-12-months",
-        "SelfInsurance": "0.10",
-        "SelfInsuranceDesc": "10% - minimo € 1500",
-        "IsBase": false,
-        "IsYour": false,
-        "IsPremium": false,
-        "Base": null,
-        "Your": null,
-        "Premium": null
+    "ExpirationConfiguration": {
+      "ExpirationInSecondsAfterSending": 0,
+      "ExpirationDate": "2023-04-17T12:52:40.458Z"
     },
-    "defect-liability-dm-37-2008": {
-        "DailyAllowance": "",
-        "Name": "",
-        "LegalDefence": "",
-        "Assistance": "",
-        "Group": "RCT",
-        "CompanyCodec": "DM",
-        "CompanyName": "Responsabilità civile D.M.37/2008",
-        "IsExtension": true,
-        "IsYuor": false,
-        "Type": "company",
-        "TypeOfSumInsured": "firstLoss",
-        "Description": "Per danni  in qualità di installatore, manutentore o riparatore, causati dopo ultimazione lavori dalle cose installate, riparate o manutenute (Solo per Ateco Edili e attività soggette a DM 37/2008)",
-        "Deductible": "1000",
-        "Tax": 22.25,
-        "Taxes": null,
-        "SumInsuredLimitOfIndemnity": 0,
-        "Price": 0,
-        "PriceNett": 0,
-        "PriceGross": 0,
-        "Value": null,
-        "Offer": null,
-        "Slug": "defect-liability-dm-37-2008",
-        "SelfInsurance": "0.10",
-        "SelfInsuranceDesc": "10% - minimo € 1500",
-        "IsBase": false,
-        "IsYour": false,
-        "IsPremium": false,
-        "Base": null,
-        "Your": null,
-        "Premium": null
+    "CallbackConfiguration": {
+      "CallbackUrl": "string",
+      "StatusUpdateCallbackUrl": "string",
+      "ActivityActionCallbackConfiguration": {
+        "Url": "string",
+        "ActionCallbackSelection": {
+          "ConfirmTransactionCode": true,
+          "AgreementAccepted": true,
+          "AgreementRejected": true,
+          "PrepareAuthenticationSuccess": true,
+          "AuthenticationFailed": true,
+          "AuthenticationSuccess": true,
+          "AuditTrailRequested": true,
+          "AuditTrailXmlRequested": true,
+          "CalledPage": true,
+          "DocumentDownloaded": true,
+          "FlattenedDocumentDownloaded": true,
+          "AddedAnnotation": true,
+          "AddedAttachment": true,
+          "AppendedDocument": true,
+          "FormsFilled": true,
+          "ConfirmReading": true,
+          "SendTransactionCode": true,
+          "PrepareSignWorkstepDocument": true,
+          "SignWorkstepDocument": true,
+          "UndoAction": true,
+          "WorkstepCreated": true,
+          "WorkstepFinished": true,
+          "WorkstepRejected": true,
+          "DisablePolicyAndValidityChecks": true,
+          "EnablePolicyAndValidityChecks": true,
+          "AppendFileToWorkstep": true,
+          "AppendTasksToWorkstep": true,
+          "SetOptionalDocumentState": true,
+          "PreparePayloadForBatch": true
+        }
+      }
     },
-    "defect-liability-workmanships": {
-        "DailyAllowance": "",
-        "Name": "",
-        "LegalDefence": "",
-        "Assistance": "",
-        "Group": "RCT",
-        "CompanyCodec": "CP",
-        "CompanyName": "Responsabilità civile postuma officine",
-        "IsExtension": true,
-        "IsYuor": false,
-        "Type": "company",
-        "TypeOfSumInsured": "firstLoss",
-        "Description": "Per danni dopo l'ultimazione dei lavori, subiti o causati da veicoli a motore riparati, revisionati o manutenuti, compresi interventi su pneumatici",
-        "Deductible": "1000",
-        "Tax": 22.25,
-        "Taxes": null,
-        "SumInsuredLimitOfIndemnity": 0,
-        "Price": 0,
-        "PriceNett": 0,
-        "PriceGross": 0,
-        "Value": null,
-        "Offer": null,
-        "Slug": "defect-liability-workmanships",
-        "SelfInsurance": "0.10",
-        "SelfInsuranceDesc": "10% - minimo € 1500",
-        "IsBase": false,
-        "IsYour": false,
-        "IsPremium": false,
-        "Base": null,
-        "Your": null,
-        "Premium": null
-    },
-    "earthquake": {
-        "DailyAllowance": "",
-        "Name": "",
-        "LegalDefence": "",
-        "Assistance": "",
-        "Group": "FIRE",
-        "CompanyCodec": "TR",
-        "CompanyName": "Terremoto",
-        "IsExtension": true,
-        "IsYuor": false,
-        "Type": "building",
-        "TypeOfSumInsured": "replacementValue",
-        "Description": "Danni da terremoto ai beni assicurati  compresi quelli di Incendio, Esplosione, Scoppio",
-        "Deductible": "1000",
-        "Tax": 22.25,
-        "Taxes": null,
-        "SumInsuredLimitOfIndemnity": 0.7,
-        "Price": 0,
-        "PriceNett": 0,
-        "PriceGross": 0,
-        "Value": null,
-        "Offer": null,
-        "Slug": "earthquake",
-        "SelfInsurance": "0.05",
-        "SelfInsuranceDesc": "5% - minimo € 1000",
-        "IsBase": false,
-        "IsYour": false,
-        "IsPremium": true,
-        "Base": null,
-        "Your": null,
-        "Premium": null
-    },
-    "electronic-equipment": {
-        "DailyAllowance": "",
-        "Name": "",
-        "LegalDefence": "",
-        "Assistance": "",
-        "Group": "ELETRONIC",
-        "CompanyCodec": "EL",
-        "CompanyName": "Garanzia Apparecchiature Elettroniche",
-        "IsExtension": false,
-        "IsYuor": true,
-        "Type": "building",
-        "TypeOfSumInsured": "firstLoss",
-        "Description": "Danni materiali e diretti ad apparecchiature elettroniche fisse e ad impiego mobile, causati da qualsiasi evento accidentale",
-        "Deductible": "1000",
-        "Tax": 22.25,
-        "Taxes": null,
-        "SumInsuredLimitOfIndemnity": 10000,
-        "Price": 0,
-        "PriceNett": 0,
-        "PriceGross": 0,
-        "Value": null,
-        "Offer": null,
-        "Slug": "electronic-equipment",
-        "SelfInsurance": "",
-        "SelfInsuranceDesc": "",
-        "IsBase": false,
-        "IsYour": false,
-        "IsPremium": true,
-        "Base": null,
-        "Your": null,
-        "Premium": null
-    },
-    "employers-liability": {
-        "DailyAllowance": "",
-        "Name": "",
-        "LegalDefence": "",
-        "Assistance": "",
-        "Group": "RCT",
-        "CompanyCodec": "CO",
-        "CompanyName": "Resp. Civile verso Prestatori di Lavoro",
-        "IsExtension": false,
-        "IsYuor": true,
-        "Type": "company",
-        "TypeOfSumInsured": "firstLoss",
-        "Description": "Responsabilità per: la rivalsa INAIL per gli infortuni sul lavoro subiti dai prestatori di lavoro;  morte; e lesioni personali dalle quali sia derivata un'invalidità permanente ai sensi del codice civile, incluse le malattie professionali",
-        "Deductible": "2600",
-        "Tax": 22.25,
-        "Taxes": null,
-        "SumInsuredLimitOfIndemnity": 1000000,
-        "Price": 0,
-        "PriceNett": 63.67,
-        "PriceGross": 77.836575,
-        "Value": null,
-        "Offer": null,
-        "Slug": "employers-liability",
-        "SelfInsurance": "0.10",
-        "SelfInsuranceDesc": "10% - minimo € 1500",
-        "IsBase": true,
-        "IsYour": false,
-        "IsPremium": true,
-        "Base": null,
-        "Your": null,
-        "Premium": null
-    },
-    "environmental-liability": {
-        "DailyAllowance": "",
-        "Name": "",
-        "LegalDefence": "",
-        "Assistance": "",
-        "Group": "RCT",
-        "CompanyCodec": "RI",
-        "CompanyName": "RC Inquinamento",
-        "IsExtension": false,
-        "IsYuor": true,
-        "Type": "building",
-        "TypeOfSumInsured": "firstLoss",
-        "Description": "Danni a persone o cose in conseguenza di contaminazione dell’acqua, dell’aria o del suolo, provocati dalla fuoriuscita di sostanze di qualunque natura a seguito di fatto improvviso, imprevedibile e dovuto a rottura accidentale di impianti, macchinari e condutture",
-        "Deductible": "5000",
-        "Tax": 22.25,
-        "Taxes": null,
-        "SumInsuredLimitOfIndemnity": 100000,
-        "Price": 0,
-        "PriceNett": 0,
-        "PriceGross": 0,
-        "Value": null,
-        "Offer": null,
-        "Slug": "environmental-liability",
-        "SelfInsurance": "0.10",
-        "SelfInsuranceDesc": "10% - minimo € 1500",
-        "IsBase": true,
-        "IsYour": false,
-        "IsPremium": true,
-        "Base": null,
-        "Your": null,
-        "Premium": null
-    },
-    "glass": {
-        "DailyAllowance": "",
-        "Name": "",
-        "LegalDefence": "",
-        "Assistance": "",
-        "Group": "FIRE",
-        "CompanyCodec": "RO",
-        "CompanyName": "Rottura Lastre",
-        "IsExtension": true,
-        "IsYuor": true,
-        "Type": "building",
-        "TypeOfSumInsured": "firstLoss",
-        "Description": "Spese sostenute per la sostituzione di Lastre e insegne con altre nuove eguali o equivalenti per caratteristiche, compresi i costi di trasporto ed installazione, la cui rottura sia avvenuta per cause Accidentali o imputabili a fatti di terzi.",
-        "Deductible": "1000",
-        "Tax": 22.25,
-        "Taxes": null,
-        "SumInsuredLimitOfIndemnity": 2500,
-        "Price": 0,
-        "PriceNett": 0,
-        "PriceGross": 0,
-        "Value": null,
-        "Offer": null,
-        "Slug": "glass",
-        "SelfInsurance": "",
-        "SelfInsuranceDesc": "",
-        "IsBase": false,
-        "IsYour": false,
-        "IsPremium": true,
-        "Base": null,
-        "Your": null,
-        "Premium": null
-    },
-    "increased-cost-of-working": {
-        "DailyAllowance": "",
-        "Name": "",
-        "LegalDefence": "",
-        "Assistance": "",
-        "Group": "ELETRONIC",
-        "CompanyCodec": "MG",
-        "CompanyName": "Maggiori Costi",
-        "IsExtension": false,
-        "IsYuor": false,
-        "Type": "building",
-        "TypeOfSumInsured": "firstLoss",
-        "Description": "In caso di sinistro indennizzabile con garanzia Elettronica, che provochi l’interruzione parziale o totale del funzionamento dei beni assicurati, si indennizzano i maggiori costi necessari alla prosecuzione delle funzioni svolte dall’apparecchio danneggiato o distrutto",
-        "Deductible": "3days",
-        "Tax": 22.25,
-        "Taxes": null,
-        "SumInsuredLimitOfIndemnity": 10000,
-        "Price": 0,
-        "PriceNett": 0,
-        "PriceGross": 0,
-        "Value": null,
-        "Offer": null,
-        "Slug": "increased-cost-of-working",
-        "SelfInsurance": "",
-        "SelfInsuranceDesc": "",
-        "IsBase": false,
-        "IsYour": false,
-        "IsPremium": true,
-        "Base": null,
-        "Your": null,
-        "Premium": null
-    },
-    "lease-holders-interest": {
-        "DailyAllowance": "",
-        "Name": "",
-        "LegalDefence": "",
-        "Assistance": "",
-        "Group": "FIRE",
-        "CompanyCodec": "RL",
-        "CompanyName": "Rischio Locativo",
-        "IsExtension": false,
-        "IsYuor": false,
-        "Type": "building",
-        "TypeOfSumInsured": "firstLoss",
-        "Description": "Danni materiali e diretti, cagionati ai locali tenuti in locazione, da Incendio, esplosio, scoppio, fumo nei casi di responsabilità ai termini degli artt. 1588, 1589 e 1611 del Codice Civile",
-        "Deductible": "1000",
-        "Tax": 22.25,
-        "Taxes": null,
-        "SumInsuredLimitOfIndemnity": 50000,
-        "Price": 0,
-        "PriceNett": 0,
-        "PriceGross": 0,
-        "Value": null,
-        "Offer": null,
-        "Slug": "lease-holders-interest",
-        "SelfInsurance": "",
-        "SelfInsuranceDesc": "",
-        "IsBase": false,
-        "IsYour": false,
-        "IsPremium": false,
-        "Base": null,
-        "Your": null,
-        "Premium": null
-    },
-    "legal-defence": {
-        "DailyAllowance": "",
-        "Name": "",
-        "LegalDefence": "extended",
-        "Assistance": "",
-        "Group": "LEGAL",
-        "CompanyCodec": "DP",
-        "CompanyName": "Tutela Legale",
-        "IsExtension": false,
-        "IsYuor": false,
-        "Type": "company",
-        "TypeOfSumInsured": "",
-        "Description": "Difesa penale per reati di natura colposa o contravvenzionale, inclusi i casi di sicurezza aziendale da D. Lgs. 81/08 e D. Lgs. 106/09, D. Lgs. 193/07, D. Lgs. 152/06, D. Lgs. 101/18, D. Lgs. 231/01",
-        "Deductible": "",
-        "Tax": 21.25,
-        "Taxes": null,
-        "SumInsuredLimitOfIndemnity": 0,
-        "Price": 0,
-        "PriceNett": 103.09,
-        "PriceGross": 124.996625,
-        "Value": null,
-        "Offer": null,
-        "Slug": "legal-defence",
-        "SelfInsurance": "",
-        "SelfInsuranceDesc": "",
-        "IsBase": false,
-        "IsYour": false,
-        "IsPremium": true,
-        "Base": null,
-        "Your": null,
-        "Premium": null
-    },
-    "machinery-breakdown": {
-        "DailyAllowance": "",
-        "Name": "",
-        "LegalDefence": "",
-        "Assistance": "",
-        "Group": "FIRE",
-        "CompanyCodec": "GGU",
-        "CompanyName": "Guasti Macchine",
-        "IsExtension": true,
-        "IsYuor": false,
-        "Type": "building",
-        "TypeOfSumInsured": "firstLoss",
-        "Description": "Danni materiali e diretti, al Macchinario causati o dovuti a guasti Accidentali meccanici in genere.",
-        "Deductible": "1500",
-        "Tax": 22.25,
-        "Taxes": null,
-        "SumInsuredLimitOfIndemnity": 10000,
-        "Price": 0,
-        "PriceNett": 0,
-        "PriceGross": 0,
-        "Value": null,
-        "Offer": null,
-        "Slug": "machinery-breakdown",
-        "SelfInsurance": "",
-        "SelfInsuranceDesc": "",
-        "IsBase": false,
-        "IsYour": false,
-        "IsPremium": true,
-        "Base": null,
-        "Your": null,
-        "Premium": null
-    },
-    "power-surge": {
-        "DailyAllowance": "",
-        "Name": "",
-        "LegalDefence": "",
-        "Assistance": "",
-        "Group": "FIRE",
-        "CompanyCodec": "FE",
-        "CompanyName": "Fenomeno Elettrico",
-        "IsExtension": true,
-        "IsYuor": true,
-        "Type": "building",
-        "TypeOfSumInsured": "firstLoss",
-        "Description": "Danni originati da scariche, correnti, corto circuito ed altri fenomeni elettrici",
-        "Deductible": "1000",
-        "Tax": 22.25,
-        "Taxes": null,
-        "SumInsuredLimitOfIndemnity": 50000,
-        "Price": 0,
-        "PriceNett": 0,
-        "PriceGross": 0,
-        "Value": null,
-        "Offer": null,
-        "Slug": "power-surge",
-        "SelfInsurance": "0.10",
-        "SelfInsuranceDesc": "10% - minimo € 1000",
-        "IsBase": false,
-        "IsYour": false,
-        "IsPremium": true,
-        "Base": null,
-        "Your": null,
-        "Premium": null
-    },
-    "product-liability": {
-        "DailyAllowance": "",
-        "Name": "",
-        "LegalDefence": "",
-        "Assistance": "",
-        "Group": "RCT",
-        "CompanyCodec": "RP",
-        "CompanyName": "RC Prodotti",
-        "IsExtension": false,
-        "IsYuor": false,
-        "Type": "company",
-        "TypeOfSumInsured": "firstLoss",
-        "Description": "Danni involontariamente cagionati a terzi da difetto dei prodotti, venduti o distribuiti, per i quali rivesta in Italia la qualifica di produttore dopo la loro consegna a terzi, per danni a persone o cose",
-        "Deductible": "0",
-        "Tax": 22.25,
-        "Taxes": null,
-        "SumInsuredLimitOfIndemnity": 0,
-        "Price": 0,
-        "PriceNett": 0,
-        "PriceGross": 0,
-        "Value": null,
-        "Offer": null,
-        "Slug": "product-liability",
-        "SelfInsurance": "0.10",
-        "SelfInsuranceDesc": "10% - minimo € 5000",
-        "IsBase": false,
-        "IsYour": false,
-        "IsPremium": false,
-        "Base": null,
-        "Your": null,
-        "Premium": null
-    },
-    "property-damage-due-to-theft": {
-        "DailyAllowance": "",
-        "Name": "",
-        "LegalDefence": "",
-        "Assistance": "",
-        "Group": "RCT",
-        "CompanyCodec": "DF",
-        "CompanyName": "Danni da furto",
-        "IsExtension": true,
-        "IsYuor": false,
-        "Type": "company",
-        "TypeOfSumInsured": "firstLoss",
-        "Description": "Per danni da furto commesso da soggetti che abbiano utilizzato impalcature, attrezzature fisse o ponteggi eretti o fatti erigere dall'assicurato",
-        "Deductible": "1000",
-        "Tax": 22.25,
-        "Taxes": null,
-        "SumInsuredLimitOfIndemnity": 0,
-        "Price": 0,
-        "PriceNett": 0,
-        "PriceGross": 0,
-        "Value": null,
-        "Offer": null,
-        "Slug": "property-damage-due-to-theft",
-        "SelfInsurance": "0.10",
-        "SelfInsuranceDesc": "10% - minimo € 1500",
-        "IsBase": false,
-        "IsYour": false,
-        "IsPremium": false,
-        "Base": null,
-        "Your": null,
-        "Premium": null
-    },
-    "property-owners-liability": {
-        "DailyAllowance": "",
-        "Name": "",
-        "LegalDefence": "",
-        "Assistance": "",
-        "Group": "RCT",
-        "CompanyCodec": "RF",
-        "CompanyName": "RC Fabbricato",
-        "IsExtension": false,
-        "IsYuor": true,
-        "Type": "building",
-        "TypeOfSumInsured": "firstLoss",
-        "Description": "Danni a persone o cose, verificatosi in relazione alla proprietà e conduzione del Fabbricato e delle eventuali parti comuni a esso riferite/collegate",
-        "Deductible": "1000",
-        "Tax": 22.25,
-        "Taxes": null,
-        "SumInsuredLimitOfIndemnity": 1000000,
-        "Price": 0,
-        "PriceNett": 0,
-        "PriceGross": 0,
-        "Value": null,
-        "Offer": null,
-        "Slug": "property-owners-liability",
-        "SelfInsurance": "",
-        "SelfInsuranceDesc": "",
-        "IsBase": true,
-        "IsYour": false,
-        "IsPremium": true,
-        "Base": null,
-        "Your": null,
-        "Premium": null
-    },
-    "restoration-of-data": {
-        "DailyAllowance": "",
-        "Name": "",
-        "LegalDefence": "",
-        "Assistance": "",
-        "Group": "ELETRONIC",
-        "CompanyCodec": "SD",
-        "CompanyName": "",
-        "IsExtension": false,
-        "IsYuor": false,
-        "Type": "building",
-        "TypeOfSumInsured": "firstLoss",
-        "Description": "In caso di danno indennizzabile, i costi necessari ed effettivamente sostenuti per il riacquisto dei supporti di Dati distrutti, danneggiati o sottratti.",
-        "Deductible": "1000",
-        "Tax": 22.25,
-        "Taxes": null,
-        "SumInsuredLimitOfIndemnity": 1000,
-        "Price": 0,
-        "PriceNett": 0,
-        "PriceGross": 0,
-        "Value": null,
-        "Offer": null,
-        "Slug": "restoration-of-data",
-        "SelfInsurance": "",
-        "SelfInsuranceDesc": "",
-        "IsBase": false,
-        "IsYour": false,
-        "IsPremium": true,
-        "Base": null,
-        "Your": null,
-        "Premium": null
-    },
-    "river-flood": {
-        "DailyAllowance": "",
-        "Name": "",
-        "LegalDefence": "",
-        "Assistance": "",
-        "Group": "FIRE",
-        "CompanyCodec": "AL",
-        "CompanyName": "Alluvione/Inondazione",
-        "IsExtension": true,
-        "IsYuor": false,
-        "Type": "building",
-        "TypeOfSumInsured": "replacementValue",
-        "Description": "Danni da alluvione/inondazione (allagamento di un territorio causato da straripamento, esondazione, tracimazione o fuoriuscita dagli argini di corsi d’acqua, da laghi e bacini, sia naturali sia artificiali, anche se derivanti da eventi atmosferici.",
-        "Deductible": "1000",
-        "Tax": 22.25,
-        "Taxes": null,
-        "SumInsuredLimitOfIndemnity": 0.7,
-        "Price": 0,
-        "PriceNett": 0,
-        "PriceGross": 0,
-        "Value": null,
-        "Offer": null,
-        "Slug": "river-flood",
-        "SelfInsurance": "0.05",
-        "SelfInsuranceDesc": "5% - minimo € 1000",
-        "IsBase": false,
-        "IsYour": false,
-        "IsPremium": true,
-        "Base": null,
-        "Your": null,
-        "Premium": null
-    },
-    "sociopolitical-event": {
-        "DailyAllowance": "",
-        "Name": "",
-        "LegalDefence": "",
-        "Assistance": "",
-        "Group": "FIRE",
-        "CompanyCodec": "ES",
-        "CompanyName": "Eventi Sociopolitici",
-        "IsExtension": true,
-        "IsYuor": true,
-        "Type": "building",
-        "TypeOfSumInsured": "firstLoss",
-        "Description": "Danni da eventi sociopolitici, quali tumulti popolari, scioperi, sommosse, atti vandalici o dolosi e atti di sabotaggio",
-        "Deductible": "1000",
-        "Tax": 22.25,
-        "Taxes": null,
-        "SumInsuredLimitOfIndemnity": 80000,
-        "Price": 0,
-        "PriceNett": 0,
-        "PriceGross": 0,
-        "Value": null,
-        "Offer": null,
-        "Slug": "sociopolitical-event",
-        "SelfInsurance": "0.05",
-        "SelfInsuranceDesc": "5% - minimo € 1000",
-        "IsBase": false,
-        "IsYour": false,
-        "IsPremium": true,
-        "Base": null,
-        "Your": null,
-        "Premium": null
-    },
-    "software-under-license": {
-        "DailyAllowance": "",
-        "Name": "",
-        "LegalDefence": "",
-        "Assistance": "",
-        "Group": "ELETRONIC",
-        "CompanyCodec": "LU",
-        "CompanyName": "Programmi in licenza d'uso",
-        "IsExtension": false,
-        "IsYuor": false,
-        "Type": "building",
-        "TypeOfSumInsured": "firstLoss",
-        "Description": "In caso di danno indennizzabile, i costi necessari ed effettivamente sostenuti per la duplicazione o per il riacquisto dei programmi in licenza d'uso distrutti, danneggiati o sottratti",
-        "Deductible": "1000",
-        "Tax": 22.25,
-        "Taxes": null,
-        "SumInsuredLimitOfIndemnity": 10000,
-        "Price": 0,
-        "PriceNett": 0,
-        "PriceGross": 0,
-        "Value": null,
-        "Offer": null,
-        "Slug": "software-under-license",
-        "SelfInsurance": "",
-        "SelfInsuranceDesc": "",
-        "IsBase": false,
-        "IsYour": false,
-        "IsPremium": true,
-        "Base": null,
-        "Your": null,
-        "Premium": null
-    },
-    "terrorism": {
-        "DailyAllowance": "",
-        "Name": "",
-        "LegalDefence": "",
-        "Assistance": "",
-        "Group": "FIRE",
-        "CompanyCodec": "AT",
-        "CompanyName": "Atti di Terrorismo",
-        "IsExtension": true,
-        "IsYuor": true,
-        "Type": "building",
-        "TypeOfSumInsured": "firstLoss",
-        "Description": "Danni da atti di terrorismo",
-        "Deductible": "1000",
-        "Tax": 22.25,
-        "Taxes": null,
-        "SumInsuredLimitOfIndemnity": 80000,
-        "Price": 0,
-        "PriceNett": 0,
-        "PriceGross": 0,
-        "Value": null,
-        "Offer": null,
-        "Slug": "terrorism",
-        "SelfInsurance": "0.05",
-        "SelfInsuranceDesc": "5% - minimo € 1000",
-        "IsBase": false,
-        "IsYour": false,
-        "IsPremium": true,
-        "Base": null,
-        "Your": null,
-        "Premium": null
-    },
-    "theft": {
-        "DailyAllowance": "",
-        "Name": "",
-        "LegalDefence": "",
-        "Assistance": "",
-        "Group": "THEFT",
-        "CompanyCodec": "FU",
-        "CompanyName": "Garanzia Furto, Rapina ed Estorsione",
-        "IsExtension": false,
-        "IsYuor": true,
-        "Type": "building",
-        "TypeOfSumInsured": "firstLoss",
-        "Description": "Danni subiti da furto, rapina o estorsione, inclusi i guasti e gli atti vandalici commessi dai ladri",
-        "Deductible": "1000",
-        "Tax": 22.25,
-        "Taxes": null,
-        "SumInsuredLimitOfIndemnity": 10000,
-        "Price": 0,
-        "PriceNett": 0,
-        "PriceGross": 0,
-        "Value": null,
-        "Offer": null,
-        "Slug": "theft",
-        "SelfInsurance": "",
-        "SelfInsuranceDesc": "10% - minimo € 1000",
-        "IsBase": false,
-        "IsYour": false,
-        "IsPremium": true,
-        "Base": null,
-        "Your": null,
-        "Premium": null
-    },
-    "third-party-liability": {
-        "DailyAllowance": "",
-        "Name": "",
-        "LegalDefence": "",
-        "Assistance": "",
-        "Group": "RCT",
-        "CompanyCodec": "CT",
-        "CompanyName": "Responsabilità Civile Terzi",
-        "IsExtension": false,
-        "IsYuor": true,
-        "Type": "company",
-        "TypeOfSumInsured": "firstLoss",
-        "Description": "Danni involontariamente causati a terzi per danni a cose o persone di cui sia responsabile a termini di legge (R.C.T.). La garanzia include, ma non si limita a questi, i  danni: a veicoli di terzi e prestatori di lavoro; a cose in consegna e custodia; a cose nell'ambito di esecuzione dei lavori; a cose di terzi sollevate, caricate, scaricate, movimentate, trasportate o rimorchiate; a mezzi di trasporto sotto carico e scarico; da interruzione o sospensione di attività di terzi; da smercio; da committenza autoveicoli; da responsabilità civile personale addetti; da attività di commercio ambulante; da lavori presso terzi",
-        "Deductible": "1000",
-        "Tax": 22.25,
-        "Taxes": null,
-        "SumInsuredLimitOfIndemnity": 1000000,
-        "Price": 0,
-        "PriceNett": 83.83,
-        "PriceGross": 102.482175,
-        "Value": null,
-        "Offer": null,
-        "Slug": "third-party-liability",
-        "SelfInsurance": "",
-        "SelfInsuranceDesc": "",
-        "IsBase": true,
-        "IsYour": false,
-        "IsPremium": true,
-        "Base": null,
-        "Your": null,
-        "Premium": null
-    },
-    "third-party-liability-construction-company": {
-        "DailyAllowance": "",
-        "Name": "",
-        "LegalDefence": "",
-        "Assistance": "",
-        "Group": "RCT",
-        "CompanyCodec": "RE",
-        "CompanyName": "RC Edile",
-        "IsExtension": false,
-        "IsYuor": false,
-        "Type": "company",
-        "TypeOfSumInsured": "firstLoss",
-        "Description": "Pacchetto di garanzie che includei danni: 1) a condutture o impianti sotterranei; 2) da cedimento e franamento del terreno; 3) da bagnamento e spargimento d'acqua",
-        "Deductible": "1500",
-        "Tax": 22.25,
-        "Taxes": null,
-        "SumInsuredLimitOfIndemnity": 0,
-        "Price": 0,
-        "PriceNett": 0,
-        "PriceGross": 0,
-        "Value": null,
-        "Offer": null,
-        "Slug": "third-party-liability-construction-company",
-        "SelfInsurance": "",
-        "SelfInsuranceDesc": "",
-        "IsBase": false,
-        "IsYour": false,
-        "IsPremium": false,
-        "Base": null,
-        "Your": null,
-        "Premium": null
-    },
-    "third-party-recourse": {
-        "DailyAllowance": "",
-        "Name": "",
-        "LegalDefence": "",
-        "Assistance": "",
-        "Group": "FIRE",
-        "CompanyCodec": "RT",
-        "CompanyName": "Ricorso Terzi da Incendio",
-        "IsExtension": true,
-        "IsYuor": true,
-        "Type": "building",
-        "TypeOfSumInsured": "firstLoss",
-        "Description": "Responsabilità per danni materiali e diretti arrecati alle cose di terzi in seguito a Incendio, Esplosione o Scoppio del Fabbricato e/o Contenuto, qualora assicurati, anche quando il Fabbricato lo è nella forma di Rischio Locativo",
-        "Deductible": "1000",
-        "Tax": 22.25,
-        "Taxes": null,
-        "SumInsuredLimitOfIndemnity": 150000,
-        "Price": 0,
-        "PriceNett": 0,
-        "PriceGross": 0,
-        "Value": null,
-        "Offer": null,
-        "Slug": "third-party-recourse",
-        "SelfInsurance": "0.10",
-        "SelfInsuranceDesc": "10% - minimo € 1000",
-        "IsBase": true,
-        "IsYour": false,
-        "IsPremium": true,
-        "Base": null,
-        "Your": null,
-        "Premium": null
-    },
-    "valuables": {
-        "DailyAllowance": "",
-        "Name": "",
-        "LegalDefence": "",
-        "Assistance": "",
-        "Group": "THEFT",
-        "CompanyCodec": "FP",
-        "CompanyName": "Portavalori",
-        "IsExtension": false,
-        "IsYuor": true,
-        "Type": "building",
-        "TypeOfSumInsured": "firstLoss",
-        "Description": "Perdita di valori a seguito di Furto o di Rapina commessi nel corso del loro trasporto al di fuori dei locali dell’Attività, compiuti nei confronti dell’Assicurato, dei soci o familiari coadiuvanti o dei prestatori di lavoro.",
-        "Deductible": "500",
-        "Tax": 22.25,
-        "Taxes": null,
-        "SumInsuredLimitOfIndemnity": 2500,
-        "Price": 0,
-        "PriceNett": 0,
-        "PriceGross": 0,
-        "Value": null,
-        "Offer": null,
-        "Slug": "valuables",
-        "SelfInsurance": "",
-        "SelfInsuranceDesc": "10% - minimo € 1000",
-        "IsBase": false,
-        "IsYour": false,
-        "IsPremium": true,
-        "Base": null,
-        "Your": null,
-        "Premium": null
-    },
-    "valuables-in-safe-strongrooms": {
-        "DailyAllowance": "",
-        "Name": "",
-        "LegalDefence": "",
-        "Assistance": "",
-        "Group": "THEFT",
-        "CompanyCodec": "FV",
-        "CompanyName": "Furto Valori e Preziosi in Cassaforte",
-        "IsExtension": false,
-        "IsYuor": false,
-        "Type": "building",
-        "TypeOfSumInsured": "firstLoss",
-        "Description": "Furto di valori e preziosi inerenti l’Attività assicurata riposti in cassforte a muro o di peso non inferiore a 200Kg",
-        "Deductible": "1000",
-        "Tax": 22.25,
-        "Taxes": null,
-        "SumInsuredLimitOfIndemnity": 5000,
-        "Price": 0,
-        "PriceNett": 0,
-        "PriceGross": 0,
-        "Value": null,
-        "Offer": null,
-        "Slug": "valuables-in-safe-strongrooms",
-        "SelfInsurance": "",
-        "SelfInsuranceDesc": "10% - minimo € 1000",
-        "IsBase": false,
-        "IsYour": false,
-        "IsPremium": true,
-        "Base": null,
-        "Your": null,
-        "Premium": null
-    },
-    "water-damage": {
-        "DailyAllowance": "",
-        "Name": "",
-        "LegalDefence": "",
-        "Assistance": "",
-        "Group": "FIRE",
-        "CompanyCodec": "AG",
-        "CompanyName": "Allagamento",
-        "IsExtension": true,
-        "IsYuor": true,
-        "Type": "building",
-        "TypeOfSumInsured": "replacementValue",
-        "Description": "Danni da fuoriuscita di acqua condotta (ingorghi, trabocchi, rotture accedentali), e, se assicurato il fabbricato, ricerca ripristino e riparazione del danno",
-        "Deductible": "1000",
-        "Tax": 22.25,
-        "Taxes": null,
-        "SumInsuredLimitOfIndemnity": 0.7,
-        "Price": 0,
-        "PriceNett": 0,
-        "PriceGross": 0,
-        "Value": null,
-        "Offer": null,
-        "Slug": "water-damage",
-        "SelfInsurance": "0.05",
-        "SelfInsuranceDesc": "5% - minimo € 1000",
-        "IsBase": true,
-        "IsYour": false,
-        "IsPremium": true,
-        "Base": null,
-        "Your": null,
-        "Premium": null
+    "AgreementConfiguration": {
+      "Translations": [
+        {
+          "LanguageCode": "AF",
+          "Text": "string",
+          "Header": "string",
+          "IsDefault": true
+        }
+      ]
     }
-}
+  }

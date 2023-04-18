@@ -31,11 +31,14 @@ func Sign(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	action := r.URL.Query().Get("action")
 	log.Println("Sign "+uid+" ", action)
 	log.Println("Sign "+uid+" ", envelope)
-
+	origin := r.URL.Query().Get("origin")
+	firePolicy := lib.GetDatasetByEnv(origin, "policy")
 	if action == "workstepFinished" {
-		policyF := lib.GetFirestore("policy", uid)
+		//policyFire=lib.GetDatasetByContractorName(policy.Contractor.Name,"policy")
+		policyF := lib.GetFirestore(firePolicy, uid)
 		var policy models.Policy
 		policyF.DataTo(&policy)
+
 		log.Println("Sign "+uid+" policy.Status:", policy.Status)
 		if !policy.IsSign && policy.Status == models.PolicyStatusToSign {
 			policy.IsSign = true
@@ -45,8 +48,8 @@ func Sign(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 			policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusToPay)
 
 			*policy.Attachments = append(*policy.Attachments, models.Attachment{Name: "Contratto", Link: "gs://" + os.Getenv("GOOGLE_STORAGE_BUCKET") + "/contracts/" + policy.Uid + ".pdf"})
-			lib.SetFirestore("policy", uid, policy)
-			policy.BigquerySave()
+			lib.SetFirestore(firePolicy, uid, policy)
+			policy.BigquerySave(r.Header.Get("origin"))
 			mail.SendMailPay(policy)
 			s := <-document.GetFileV6(policy.IdSign, uid)
 

@@ -212,6 +212,10 @@ func (p *Fx) RoundNear(value float64, nearest int64) float64 {
 	return (math.Round(float64(value)/float64(nearest)) * float64(nearest)) - float64(nearest)
 }
 
+func (p *Fx) FloatToString(in float64, decimal int64) string {
+	return fmt.Sprintf("%.*f", decimal, in)
+}
+
 func (p *Fx) DeleteOfferFromGuarantee(m map[string]*models.GuaranteValue, key string) {
 	delete(m, key)
 }

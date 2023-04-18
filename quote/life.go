@@ -42,9 +42,11 @@ func Life(data models.Policy) (models.Policy, error) {
 	//TODO: this should not be here, only for version 1
 	calculateSumInsuredLimitOfIndemnity(data.Assets, deathGuarantee.Value.SumInsuredLimitOfIndemnity)
 
-	getGuaranteeSubtitle(data.Assets)
-
 	calculateGuaranteeDuration(data.Assets, deathGuarantee.Value.Duration.Year)
+
+	updatePolicyStartEndDate(&data)
+
+	getGuaranteeSubtitle(data.Assets)
 
 	for _, row := range df.Records() {
 		if row[0] == strconv.Itoa(year) {
@@ -93,6 +95,17 @@ func calculateGuaranteeDuration(assets []models.Asset, deathDuration int) {
 			}
 		}
 	}
+}
+
+func updatePolicyStartEndDate(policy *models.Policy) {
+	policy.StartDate = time.Now().UTC()
+	maxDuration := 0
+	for _, guarantee := range policy.Assets[0].Guarantees {
+		if guarantee.Value.Duration.Year > maxDuration {
+			maxDuration = guarantee.Value.Duration.Year
+		}
+	}
+	policy.EndDate = policy.StartDate.AddDate(maxDuration, 0, 0)
 }
 
 func roundOfferPrices(offersPrices map[string]map[string]*models.Price) {

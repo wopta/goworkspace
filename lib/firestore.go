@@ -82,10 +82,22 @@ func SetFirestore(collection string, doc string, value interface{}) {
 	c := client.Collection(collection)
 	col := c.Doc(doc)
 	docsnap, err := col.Set(ctx, value)
+
 	CheckError(err)
 	log.Println(docsnap)
 
 	//fmt.Println(dataMap)firestore.Query
+}
+func FireUpdate(collection string, doc string, value interface{}) (*firestore.WriteResult, error) {
+	ctx := context.Background()
+	client, err := firestore.NewClient(ctx, os.Getenv("GOOGLE_PROJECT_ID"))
+	CheckError(err)
+	c := client.Collection(collection)
+	col := c.Doc(doc)
+	docsnap, err := col.Set(ctx, value, firestore.MergeAll)
+
+	return docsnap, err
+
 }
 func UpdateFirestoreErr(collection string, doc string, values map[string]interface{}) error {
 	ctx := context.Background()
@@ -111,7 +123,6 @@ func WhereFirestore(collection string, field string, operator string, queryValue
 	client, err := firestore.NewClient(ctx, os.Getenv("GOOGLE_PROJECT_ID"))
 	CheckError(err)
 	query := client.Collection(collection).Where(field, operator, queryValue).Documents(ctx)
-	query.GetAll()
 
 	return query
 }
@@ -173,26 +184,26 @@ func OrderWhereLimitFirestoreErr(collection string, field string, fieldOrder str
 
 	return query, err
 }
-func ToListData(query *firestore.DocumentIterator, v interface{}) []interface{} {
-	var result []interface{}
+func FireToListData[T interface{}](query *firestore.DocumentIterator) []T {
+	var result []T
+	var _struct T
 	for {
 		d, err := query.Next()
 		log.Println("for")
 		if err != nil {
 			log.Println("error")
-		}
-		if err != nil {
 			if err == iterator.Done {
 				log.Println("iterator.Done")
 				break
 			}
 
+		} else {
 		}
-		e := d.DataTo(&v)
+		e := d.DataTo(&_struct)
 
 		log.Println("todata")
 		CheckError(e)
-		result = append(result, v)
+		result = append(result, _struct)
 
 		log.Println(len(result))
 	}

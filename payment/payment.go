@@ -52,7 +52,7 @@ func FabrickPay(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 	err := json.Unmarshal([]byte(req), &data)
 	log.Println(data.PriceGross)
 	lib.CheckError(err)
-	resultPay := <-FabrickPayObj(data, false, "", "", data.PriceGross)
+	resultPay := <-FabrickPayObj(data, false, "", "", data.PriceGross, r.Header.Get("origin"))
 
 	log.Println(resultPay)
 	return "", nil, err
@@ -65,7 +65,7 @@ func FabrickPayMontly(w http.ResponseWriter, r *http.Request) (string, interface
 	err := json.Unmarshal([]byte(req), &data)
 	log.Println(data.PriceGross)
 	lib.CheckError(err)
-	resultPay := FabbrickMontlyPay(data)
+	resultPay := FabbrickMontlyPay(data, r.Header.Get("origin"))
 	b, err := json.Marshal(resultPay)
 	log.Println(resultPay)
 	return string(b), resultPay, err

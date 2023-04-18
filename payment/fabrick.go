@@ -16,7 +16,7 @@ import (
 	model "github.com/wopta/goworkspace/models"
 )
 
-func FabrickPayObj(data model.Policy, firstSchedule bool, scheduleDate string, customerId string, amount float64) <-chan FabrickPaymentResponse {
+func FabrickPayObj(data model.Policy, firstSchedule bool, scheduleDate string, customerId string, amount float64, origin string) <-chan FabrickPaymentResponse {
 	r := make(chan FabrickPaymentResponse)
 
 	go func() {
@@ -30,7 +30,7 @@ func FabrickPayObj(data model.Policy, firstSchedule bool, scheduleDate string, c
 			Timeout: time.Second * 15,
 		}
 
-		marshal := getfabbricPayments(data, firstSchedule, scheduleDate, customerId, amount)
+		marshal := getfabbricPayments(data, firstSchedule, scheduleDate, customerId, amount, origin)
 		log.Printf(data.Uid + " " + string(marshal))
 		//log.Println(getFabrickPay(data))
 		req, _ := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(string(marshal)))
@@ -70,6 +70,13 @@ func FabrickPayObj(data model.Policy, firstSchedule bool, scheduleDate string, c
 
 			}
 			log.Println(data.Uid+"pay commission: ", commission)
+			layout2 := "2006-01-02"
+			var sd string
+			if scheduleDate == "" {
+				sd = time.Now().Format(layout2)
+			} else {
+				sd = scheduleDate
+			}
 			//tr := models.SetTransactionPolicy(data, data.Uid+"_"+scheduleDate, amount, scheduleDate, data.PriceNett * commission)
 			tr := models.Transaction{
 				Amount:             amount,
@@ -79,7 +86,7 @@ func FabrickPayObj(data model.Policy, firstSchedule bool, scheduleDate string, c
 				CreationDate:       time.Now(),
 				Status:             models.TransactionStatusToPay,
 				StatusHistory:      []string{models.TransactionStatusToPay},
-				ScheduleDate:       scheduleDate,
+				ScheduleDate:       sd,
 				NumberCompany:      data.CodeCompany,
 				Commissions:        data.PriceNett * commission,
 				IsPay:              false,
@@ -87,12 +94,15 @@ func FabrickPayObj(data model.Policy, firstSchedule bool, scheduleDate string, c
 				Company:            data.Company,
 				CommissionsCompany: commission,
 			}
-			ref, _ := lib.PutFirestore("transactions", tr)
+
+			transactionsFire := lib.GetDatasetByEnv(origin, "transactions")
+
+			ref, _ := lib.PutFirestore(transactionsFire, tr)
 			tr.Uid = ref.ID
 			tr.BigPayDate = civil.DateTimeOf(time.Now())
 			tr.BigCreationDate = civil.DateTimeOf(time.Now())
 			tr.BigStatusHistory = strings.Join(tr.StatusHistory, ",")
-			err = lib.InsertRowsBigQuery("wopta", "transactions-day", tr)
+			err = lib.InsertRowsBigQuery("wopta", transactionsFire, tr)
 			lib.CheckError(err)
 			r <- result
 
@@ -100,32 +110,32 @@ func FabrickPayObj(data model.Policy, firstSchedule bool, scheduleDate string, c
 	}()
 	return r
 }
-func FabbrickMontlyPay(data model.Policy) FabrickPaymentResponse {
+func FabbrickMontlyPay(data model.Policy, origin string) FabrickPaymentResponse {
 
 	installment := data.PriceGross / 12
 	customerId := uuid.New().String()
 	log.Println(data.Uid + " FabbrickMontlyPay")
 	layout := "2006-01-02"
-	firstres := <-FabrickPayObj(data, true, data.StartDate.Format(layout), customerId, installment)
+	firstres := <-FabrickPayObj(data, true, "", customerId, installment, origin)
 	time.Sleep(100)
 	for i := 1; i <= 11; i++ {
 		date := data.StartDate.AddDate(0, i, 0)
-		res := <-FabrickPayObj(data, false, date.Format(layout), customerId, installment)
+		res := <-FabrickPayObj(data, false, date.Format(layout), customerId, installment, origin)
 		log.Println(data.Uid+" FabbrickMontlyPay res:", res)
-		time.Sleep(500)
+		time.Sleep(100)
 	}
 	return firstres
 }
-func FabbrickYearPay(data model.Policy) FabrickPaymentResponse {
+func FabbrickYearPay(data model.Policy, origin string) FabrickPaymentResponse {
 
 	customerId := uuid.New().String()
 	log.Println(data.Uid + " FabbrickYearPay")
-	res := <-FabrickPayObj(data, false, "", customerId, data.PriceGross)
+	res := <-FabrickPayObj(data, false, "", customerId, data.PriceGross, origin)
 
 	return res
 }
 
-func getfabbricPayments(data model.Policy, firstSchedule bool, scheduleDate string, customerId string, amount float64) string {
+func getfabbricPayments(data model.Policy, firstSchedule bool, scheduleDate string, customerId string, amount float64, origin string) string {
 	var mandate string
 
 	if firstSchedule {
@@ -171,7 +181,7 @@ func getfabbricPayments(data model.Policy, firstSchedule bool, scheduleDate stri
 
 	bill.Items = []Item{{ExternalID: externalId, Amount: amount, Currency: "EUR"}}
 	bill.Subjects = &[]Subject{{ExternalID: customerId, Role: "customer", Email: data.Contractor.Mail, Name: data.Contractor.Name + ` ` + data.Contractor.Surname}}
-	calbackurl := "https://europe-west1-" + os.Getenv("GOOGLE_PROJECT_ID") + ".cloudfunctions.net/callback/v1/payment?uid=" + data.Uid + `&schedule=` + scheduleDate
+	calbackurl := "https://europe-west1-" + os.Getenv("GOOGLE_PROJECT_ID") + ".cloudfunctions.net/callback/v1/payment?uid=" + data.Uid + `&schedule=` + scheduleDate + `&token=` + os.Getenv("WOPTA_TOKEN_API") + `&origin=` + origin
 	calbackurl = strings.Replace(calbackurl, `\u0026`, `&`, 1)
 	log.Println(calbackurl)
 	pay.PaymentConfiguration = PaymentConfiguration{

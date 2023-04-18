@@ -46,16 +46,16 @@ type Policy struct {
 	Company         string                       `firestore:"company,omitempty" json:"company,omitempty" bigquery:"company"`
 	Name            string                       `firestore:"name,omitempty" json:"name,omitempty" bigquery:"name"`
 	NameDesc        string                       `firestore:"nameDesc,omitempty" json:"nameDesc,omitempty" bigquery:"nameDesc"`
-	BigStartDate    civil.DateTime               `bigquery:"startDate" firestore:"-"`
-	BigEndDate      civil.DateTime               `bigquery:"endDate" firestore:"-"`
-	BigEmitDate     civil.DateTime               `bigquery:"emitDate" firestore:"-"`
+	BigStartDate    civil.DateTime               `bigquery:"startDate" firestore:"-" json:"-"`
+	BigEndDate      civil.DateTime               `bigquery:"endDate" firestore:"-" json:"-"`
+	BigEmitDate     civil.DateTime               `bigquery:"emitDate" firestore:"-" json:"-"`
 	EmitDate        time.Time                    `firestore:"emitDate,omitempty" json:"emitDate,omitempty" bigquery:"-"`
 	StartDate       time.Time                    `firestore:"startDate,omitempty" json:"startDate,omitempty" bigquery:"-"`
 	EndDate         time.Time                    `firestore:"endDate,omitempty" json:"endDate,omitempty" bigquery:"-"`
 	CreationDate    time.Time                    `firestore:"creationDate,omitempty" json:"creationDate,omitempty" bigquery:"-"`
 	Updated         time.Time                    `firestore:"updated,omitempty" json:"updated,omitempty" bigquery:"-"`
 	NextPay         time.Time                    `firestore:"nextPay,omitempty" json:"nextPay,omitempty" bigquery:"-"`
-	NextPayString   string                       `firestore:"nextPayString,omitempty" json:"nextPayString,omitempty"  bigquery:"nextPayString"`
+	NextPayString   string                       `firestore:"nextPayString,omitempty" json:"nextPayString,omitempty" bigquery:"nextPayString"`
 	Payment         string                       `firestore:"payment,omitempty" json:"payment,omitempty" bigquery:"payment"`
 	PaymentType     string                       `firestore:"paymentType,omitempty" json:"paymentType,omitempty" bigquery:"paymentType"`
 	PaymentSplit    string                       `firestore:"paymentSplit,omitempty" json:"paymentSplit,omitempty" bigquery:"paymentSplit"`
@@ -63,6 +63,7 @@ type Policy struct {
 	IsAutoRenew     bool                         `firestore:"isAutoRenew,omitempty" json:"isAutoRenew,omitempty" bigquery:"isAutoRenew"`
 	IsRenew         bool                         `firestore:"isRenew" json:"isRenew,omitempty" bigquery:"isRenew"`
 	IsSign          bool                         `firestore:"isSign" json:"isSign,omitempty" bigquery:"isSign"`
+	IsDeleted       bool                         `firestore:"isDeleted" json:"isDeleted,omitempty" bigquery:"-"`
 	CompanyEmit     bool                         `firestore:"companyEmit" json:"companyEmit,omitempty" bigquery:"-"`
 	CompanyEmitted  bool                         `firestore:"companyEmitted" json:"companyEmitted,omitempty" bigquery:"-"`
 	CoverageType    string                       `firestore:"coverageType,omitempty" json:"coverageType,omitempty" bigquery:"coverageType"`
@@ -77,11 +78,12 @@ type Policy struct {
 	Contractors     *[]User                      `firestore:"contractors,omitempty" json:"contractors,omitempty" bigquery:"-"`
 	DocumentName    string                       `firestore:"documentName,omitempty" json:"documentName,omitempty" bigquery:"-"`
 	Statements      *[]Statement                 `firestore:"statements,omitempty" json:"statements,omitempty" bigquery:"-"`
-	Survay          *[]Statement                 `firestore:"survey,omitempty" json:"survey,omitempty" bigquery:"-"`
+	Surveys         *[]Survey                    `firestore:"surveys,omitempty" json:"surveys,omitempty" bigquery:"-"`
 	Attachments     *[]Attachment                `firestore:"attachments,omitempty" json:"attachments,omitempty" bigquery:"-"`
 	Assets          []Asset                      `firestore:"assets,omitempty" json:"assets,omitempty" bigquery:"-"`
 	Claim           *[]Claim                     `firestore:"claim,omitempty" json:"claim,omitempty" bigquery:"-"`
 	Data            string                       `bigquery:"data" firestore:"-"`
+	Json            string                       `bigquery:"json" firestore:"-"`
 	OffersPrices    map[string]map[string]*Price `firestore:"offersPrices,omitempty" json:"offersPrices,omitempty" bigquery:"-"`
 }
 
@@ -91,6 +93,17 @@ type RenewHistory struct {
 	EndDate      time.Time `firestore:"endDate,omitempty" json:"endDate,omitempty"`
 	CreationDate time.Time `firestore:"creationDate,omitempty" json:"creationDate,omitempty"`
 }
+
+type Survey struct {
+	Title              string      `firestore:"title,omitempty" json:"title,omitempty"`
+	Subtitle           string      `firestore:"subtitle,omitempty" json:"subtitle,omitempty"`
+	HasMultipleAnswers *bool       `firestore:"hasMultipleAnswers,omitempty" json:"hasMultipleAnswers,omitempty"`
+	Questions          []*Question `firestore:"questions,omitempty" json:"questions,omitempty"`
+	Answer             *bool       `firestore:"answer,omitempty" json:"answer,omitempty"`
+	HasAnswer          bool        `firestore:"hasAnswer" json:"hasAnswer"`
+	ExpectedAnswer     *bool       `firestore:"expectedAnswer,omitempty" json:"expectedAnswer,omitempty"`
+}
+
 type Statement struct {
 	Title              string      `firestore:"title,omitempty" json:"title,omitempty"`
 	Subtitle           string      `firestore:"subtitle,omitempty" json:"subtitle,omitempty"`
@@ -118,8 +131,8 @@ type Price struct {
 	Discount float64 `firestore:"discount" json:"discount" bigquery:"-"`
 }
 
-func (policy *Policy) BigquerySave() {
-
+func (policy *Policy) BigquerySave(origin string) {
+	policyBig := lib.GetDatasetByEnv(origin, "policy")
 	policyJson, e := policy.Marshal()
 	log.Println(" policy "+policy.Uid, string(policyJson))
 	policy.Data = string(policyJson)
@@ -127,7 +140,7 @@ func (policy *Policy) BigquerySave() {
 	policy.BigEndDate = civil.DateTimeOf(policy.EndDate)
 	policy.BigEmitDate = civil.DateTimeOf(policy.EmitDate)
 	log.Println(" policy save big query: " + policy.Uid)
-	e = lib.InsertRowsBigQuery("wopta", "policy", policy)
+	e = lib.InsertRowsBigQuery("wopta", policyBig, policy)
 	log.Println(" policy save big query error: ", e)
 }
 func PolicyToListData(query *firestore.DocumentIterator) []Policy {

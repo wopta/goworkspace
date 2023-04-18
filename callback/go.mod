@@ -7,15 +7,15 @@ replace github.com/wopta/goworkspace/callback => ./
 require (
 	cloud.google.com/go/firestore v1.9.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
-	github.com/wopta/goworkspace/document v1.0.18
-	github.com/wopta/goworkspace/lib v1.0.10
-	github.com/wopta/goworkspace/mail v1.0.5
-	github.com/wopta/goworkspace/models v1.0.25
+	github.com/wopta/goworkspace/document v1.0.25
+	github.com/wopta/goworkspace/lib v1.0.17
+	github.com/wopta/goworkspace/mail v1.0.16
+	github.com/wopta/goworkspace/models v1.0.38
 )
 
-require github.com/googleapis/gax-go/v2 v2.7.0 // indirect
 
 require (
+    github.com/googleapis/gax-go/v2 v2.7.0 // indirect
 	cloud.google.com/go v0.110.0 // indirect
 	cloud.google.com/go/bigquery v1.48.0 // indirect
 	cloud.google.com/go/compute v1.18.0 // indirect
@@ -70,7 +70,7 @@ require (
 	github.com/sergi/go-diff v1.3.1 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
-	github.com/wopta/goworkspace/product v1.0.13 // indirect
+
 	github.com/wopta/goworkspace/wiseproxy v1.0.2 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
