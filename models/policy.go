@@ -46,9 +46,9 @@ type Policy struct {
 	Company         string                       `firestore:"company,omitempty" json:"company,omitempty" bigquery:"company"`
 	Name            string                       `firestore:"name,omitempty" json:"name,omitempty" bigquery:"name"`
 	NameDesc        string                       `firestore:"nameDesc,omitempty" json:"nameDesc,omitempty" bigquery:"nameDesc"`
-	BigStartDate    civil.DateTime               `bigquery:"startDate" firestore:"-"`
-	BigEndDate      civil.DateTime               `bigquery:"endDate" firestore:"-"`
-	BigEmitDate     civil.DateTime               `bigquery:"emitDate" firestore:"-"`
+	BigStartDate    civil.DateTime               `bigquery:"startDate" firestore:"-" json:"-"`
+	BigEndDate      civil.DateTime               `bigquery:"endDate" firestore:"-" json:"-"`
+	BigEmitDate     civil.DateTime               `bigquery:"emitDate" firestore:"-" json:"-"`
 	EmitDate        time.Time                    `firestore:"emitDate,omitempty" json:"emitDate,omitempty" bigquery:"-"`
 	StartDate       time.Time                    `firestore:"startDate,omitempty" json:"startDate,omitempty" bigquery:"-"`
 	EndDate         time.Time                    `firestore:"endDate,omitempty" json:"endDate,omitempty" bigquery:"-"`
@@ -77,7 +77,7 @@ type Policy struct {
 	Contractors     *[]User                      `firestore:"contractors,omitempty" json:"contractors,omitempty" bigquery:"-"`
 	DocumentName    string                       `firestore:"documentName,omitempty" json:"documentName,omitempty" bigquery:"-"`
 	Statements      *[]Statement                 `firestore:"statements,omitempty" json:"statements,omitempty" bigquery:"-"`
-	Survay          *[]Statement                 `firestore:"survey,omitempty" json:"survey,omitempty" bigquery:"-"`
+	Surveys         *[]Survey                    `firestore:"surveys,omitempty" json:"surveys,omitempty" bigquery:"-"`
 	Attachments     *[]Attachment                `firestore:"attachments,omitempty" json:"attachments,omitempty" bigquery:"-"`
 	Assets          []Asset                      `firestore:"assets,omitempty" json:"assets,omitempty" bigquery:"-"`
 	Claim           *[]Claim                     `firestore:"claim,omitempty" json:"claim,omitempty" bigquery:"-"`
@@ -92,6 +92,17 @@ type RenewHistory struct {
 	EndDate      time.Time `firestore:"endDate,omitempty" json:"endDate,omitempty"`
 	CreationDate time.Time `firestore:"creationDate,omitempty" json:"creationDate,omitempty"`
 }
+
+type Survey struct {
+	Title              string      `firestore:"title,omitempty" json:"title,omitempty"`
+	Subtitle           string      `firestore:"subtitle,omitempty" json:"subtitle,omitempty"`
+	HasMultipleAnswers *bool       `firestore:"hasMultipleAnswers,omitempty" json:"hasMultipleAnswers,omitempty"`
+	Questions          []*Question `firestore:"questions,omitempty" json:"questions,omitempty"`
+	Answer             *bool       `firestore:"answer,omitempty" json:"answer,omitempty"`
+	HasAnswer          bool        `firestore:"hasAnswer" json:"hasAnswer"`
+	ExpectedAnswer     *bool       `firestore:"expectedAnswer,omitempty" json:"expectedAnswer,omitempty"`
+}
+
 type Statement struct {
 	Title              string      `firestore:"title,omitempty" json:"title,omitempty"`
 	Subtitle           string      `firestore:"subtitle,omitempty" json:"subtitle,omitempty"`

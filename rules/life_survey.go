@@ -10,8 +10,7 @@ import (
 
 func LifeSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		grule     []byte
-		questions []*models.Statement
+		grule []byte
 	)
 	const (
 		rulesFileName = "life_survey.json"
@@ -19,13 +18,13 @@ func LifeSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 
 	log.Println("Life Survey")
 
-	statements := &Statements{
-		Statements: questions,
+	surveys := &Surveys{
+		Surveys: make([]*models.Survey, 0),
 	}
 
 	rulesFile := getRulesFile(grule, rulesFileName)
 
-	_, ruleOutput := rulesFromJson(rulesFile, statements, nil, nil)
+	_, ruleOutput := rulesFromJson(rulesFile, surveys, nil, nil)
 
 	ruleOutputJson, err := json.Marshal(ruleOutput)
 	lib.CheckError(err)
