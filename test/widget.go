@@ -509,16 +509,16 @@ func GetBeneficiaryReferenceTable(pdf *fpdf.Fpdf, beneficiaryReference map[strin
 }
 
 func GetStatementsSection(pdf *fpdf.Fpdf, policy models.Policy) {
-	statements := *policy.Statements
+	surveys := *policy.Surveys
 
 	getParagraphTitle(pdf, "Dichiarazioni da leggere con attenzione prima di firmare")
 	pdf.Ln(8)
-	printStatement(pdf, statements[0])
+	printSurvey(pdf, surveys[0])
 	pdf.Ln(5)
 	getParagraphTitle(pdf, "Questionario Medico")
 	pdf.Ln(8)
-	for _, statement := range statements[1:] {
-		printStatement(pdf, statement)
+	for _, survey := range surveys[1:] {
+		printSurvey(pdf, survey)
 	}
 	pdf.Ln(8)
 }
