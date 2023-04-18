@@ -21,6 +21,8 @@ func GetMainHeader(pdf *fpdf.Fpdf, policy models.Policy) {
 	logoPath = pathPrefix + "vita.png"
 
 	contractor := policy.Contractor
+	address := strings.ToUpper(contractor.Residence.StreetName+", "+contractor.Residence.StreetNumber+"\n"+
+		contractor.Residence.PostalCode+" "+contractor.Residence.City+" ("+contractor.Residence.CityCode) + "\n"
 
 	if contractor.VatCode == "" {
 		cfpi = contractor.FiscalCode
@@ -42,9 +44,7 @@ func GetMainHeader(pdf *fpdf.Fpdf, policy models.Policy) {
 
 	contractorInfo := "Contraente: " + strings.ToUpper(contractor.Surname) + " " + strings.ToUpper(contractor.Name) + "\n" +
 		"C.F./P.IVA: " + strings.ToUpper(cfpi) + "\n" +
-		"Indirizzo: " + strings.ToUpper(contractor.Address) + ", " + strings.ToUpper(contractor.StreetNumber) + "\n" +
-		strings.ToUpper(contractor.PostalCode) + " " + strings.ToUpper(contractor.City) + " (" +
-		strings.ToUpper(contractor.Province) + ")\n" + "Mail: " + contractor.Mail + "\n" +
+		"Indirizzo: " + strings.ToUpper(address) + "Mail: " + contractor.Mail + "\n" +
 		"Telefono: " + contractor.Phone
 
 	pdf.SetHeaderFunc(func() {
@@ -175,6 +175,9 @@ func GetContractorInfoSection(pdf *fpdf.Fpdf, contractor models.User) {
 }
 
 func GetContractorInfoTable(pdf *fpdf.Fpdf, contractor models.User) {
+	residenceAddress := strings.ToUpper(contractor.Residence.StreetName + ", " + contractor.Residence.StreetNumber +
+		" - " + contractor.Residence.PostalCode + " " + contractor.Residence.City + " (" + contractor.Residence.CityCode + ")")
+
 	drawPinkHorizontalLine(pdf, thickLineWidth)
 	pdf.Ln(2)
 	setBlackBoldFont(pdf, standardTextSize)
@@ -195,8 +198,7 @@ func GetContractorInfoTable(pdf *fpdf.Fpdf, contractor models.User) {
 	pdf.Cell(20, 2, "Residente in")
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.SetX(pdf.GetX() + 24)
-	pdf.Cell(20, 2, strings.ToUpper(contractor.Address+", "+contractor.StreetNumber+" - "+
-		contractor.PostalCode+" "+contractor.City+" ("+contractor.Province+")"))
+	pdf.Cell(20, 2, residenceAddress)
 	pdf.Ln(2.5)
 	drawPinkHorizontalLine(pdf, thinLineWidth)
 	pdf.Ln(2)
@@ -314,8 +316,8 @@ func GetAvvertenzeBeneficiariSection(pdf *fpdf.Fpdf) {
 }
 
 func GetBeneficiariSection(pdf *fpdf.Fpdf, policy models.Policy) {
-	legitimateHeirsChoice := "X"
-	designatedHeirsChoice := ""
+	legitimateSuccessorsChoice := "X"
+	designatedSuccessorsChoice := ""
 	beneficiaries := [2]map[string]string{
 		{
 			"name":     "=====",
@@ -327,32 +329,43 @@ func GetBeneficiariSection(pdf *fpdf.Fpdf, policy models.Policy) {
 			"consent":  "=====",
 		},
 		{
-			"name":     "=====",
-			"codFisc":  "=====",
-			"address":  "=====",
-			"mail":     "=====",
-			"phone":    "=====",
-			"relation": "=====",
-			"consent":  "=====",
+			"name":           "=====",
+			"codFisc":        "=====",
+			"address":        "=====",
+			"mail":           "=====",
+			"phone":          "=====",
+			"relation":       "=====",
+			"contactConsent": "=====",
 		},
 	}
 
 	deathGuarantee, err := extractGuarantee(policy.Assets[0].Guarantees, "death")
 	lib.CheckError(err)
 
-	if len(*deathGuarantee.Beneficiaries) > 0 {
-		legitimateHeirsChoice = ""
-		designatedHeirsChoice = "X"
-	}
+	if deathGuarantee.Beneficiaries != nil && !(*deathGuarantee.Beneficiaries)[0].IsLegitimateSuccessors {
+		legitimateSuccessorsChoice = ""
+		designatedSuccessorsChoice = "X"
 
-	for index, beneficiary := range *deathGuarantee.Beneficiaries {
-		beneficiaries[index]["name"] = strings.ToUpper(beneficiary.Surname + " " + beneficiary.Name)
-		beneficiaries[index]["codFisc"] = strings.ToUpper(beneficiary.FiscalCode)
-		beneficiaries[index]["address"] = strings.ToUpper(beneficiary.Address + ", " + beneficiary.StreetNumber + " - " +
-			beneficiary.PostalCode + " " + beneficiary.City + " (" + beneficiary.Province + ")")
-		beneficiaries[index]["mail"] = beneficiary.Mail
-		beneficiaries[index]["phone"] = beneficiary.Phone
-		// TODO: missing relation and consent field setting from request body
+		for index, beneficiary := range *deathGuarantee.Beneficiaries {
+			address := strings.ToUpper(beneficiary.Residence.StreetName + ", " + beneficiary.Residence.StreetNumber +
+				" - " + beneficiary.Residence.PostalCode + " " + beneficiary.Residence.City +
+				" (" + beneficiary.Residence.CityCode + ")")
+			beneficiaries[index]["name"] = strings.ToUpper(beneficiary.Surname + " " + beneficiary.Name)
+			beneficiaries[index]["codFisc"] = strings.ToUpper(beneficiary.FiscalCode)
+			beneficiaries[index]["address"] = address
+			beneficiaries[index]["mail"] = beneficiary.Mail
+			beneficiaries[index]["phone"] = beneficiary.Phone
+			if beneficiary.IsFamilyMember {
+				beneficiaries[index]["relation"] = "Nucleo familiare (rapporto di parentela, coniuge, unione civile, convivenza more uxorio)"
+			} else {
+				beneficiaries[index]["relation"] = "Altro (no rapporto parentela)"
+			}
+			if beneficiary.IsContactable {
+				beneficiaries[index]["contactConsent"] = "SI"
+			} else {
+				beneficiaries[index]["contactConsent"] = "NO"
+			}
+		}
 	}
 
 	getParagraphTitle(pdf, "Beneficiario")
@@ -363,12 +376,12 @@ func GetBeneficiariSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	pdf.Ln(4)
 	setBlackDrawColor(pdf)
 	pdf.SetX(11)
-	pdf.CellFormat(3, 3, legitimateHeirsChoice, "1", 0, "CM", false, 0, "")
+	pdf.CellFormat(3, 3, legitimateSuccessorsChoice, "1", 0, "CM", false, 0, "")
 	pdf.CellFormat(0, 3, "Designo genericamente quali beneficiari della prestazione i miei eredi "+
 		"(legittimi e/o testamentari)", "", 0, "", false, 0, "")
 	pdf.Ln(4)
 	pdf.SetX(11)
-	pdf.CellFormat(3, 3, designatedHeirsChoice, "1", 0, "CM", false, 0, "")
+	pdf.CellFormat(3, 3, designatedSuccessorsChoice, "1", 0, "CM", false, 0, "")
 	pdf.CellFormat(0, 3, "Designo nominativamente il/i seguente/i soggetto/i quale beneficiario/i della "+
 		"prestazione", "", 0, "", false, 0, "")
 	pdf.Ln(5)
@@ -421,7 +434,7 @@ func GetBeneficiariTable(pdf *fpdf.Fpdf, beneficiaries [2]map[string]string) {
 		pdf.Ln(2)
 		pdf.Cell(165, 2, "Consenso ad invio comunicazioni da parte della Compagnia al beneficiario, prima "+
 			"dell'evento Decesso:")
-		pdf.Cell(20, 2, beneficiary["consent"])
+		pdf.Cell(20, 2, beneficiary["contactConsent"])
 		pdf.Ln(3)
 		drawPinkHorizontalLine(pdf, thinLineWidth)
 		pdf.Ln(2)
@@ -914,9 +927,11 @@ func GetAxaTableSection(pdf *fpdf.Fpdf, policy models.Policy) {
 		0, "")
 	pdf.CellFormat(5, 4, "", "LR", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 0, "", false, 0, "")
-	pdf.CellFormat(90, 4, "Comune di residenza: "+strings.ToUpper(contractor.City), "TLR", 0, "", false, 0, "")
-	pdf.CellFormat(45, 4, "CAP: "+contractor.PostalCode, "TLR", 0, "", false, 0, "")
-	pdf.CellFormat(45, 4, "Prov.: "+strings.ToUpper(contractor.Province),
+	pdf.CellFormat(90, 4, "Comune di residenza: "+strings.ToUpper(contractor.Residence.City), "TLR",
+		0, "", false, 0, "")
+	pdf.CellFormat(45, 4, "CAP: "+contractor.Residence.PostalCode, "TLR", 0,
+		"", false, 0, "")
+	pdf.CellFormat(45, 4, "Prov.: "+strings.ToUpper(contractor.Residence.CityCode),
 		"TLR", 0, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 0, "", false, 0, "")
