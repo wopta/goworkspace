@@ -105,16 +105,16 @@ func getParagraphTitle(pdf *fpdf.Fpdf, title string) {
 	pdf.Cell(0, 10, title)
 }
 
-func printStatement(pdf *fpdf.Fpdf, statement models.Statement) {
+func printSurvey(pdf *fpdf.Fpdf, survey models.Survey) {
 	leftMargin, _, rightMargin, _ := pdf.GetMargins()
 	pageWidth, _ := pdf.GetPageSize()
 	availableWidth := pageWidth - leftMargin - rightMargin - 2
 	rowWidth := pageWidth - leftMargin - rightMargin - 1
 
 	setBlackBoldFont(pdf, standardTextSize)
-	if statement.HasAnswer {
+	if survey.HasAnswer {
 		answer := "NO"
-		if *statement.Answer {
+		if *survey.Answer {
 			answer = "SI"
 		}
 
@@ -122,17 +122,17 @@ func printStatement(pdf *fpdf.Fpdf, statement models.Statement) {
 		dotWidth := pdf.GetStringWidth(".")
 
 		var statementWidth, paddingWidth float64
-		lines := pdf.SplitText(statement.Title, rowWidth)
+		lines := pdf.SplitText(survey.Title, rowWidth)
 
 		statementWidth = pdf.GetStringWidth(lines[len(lines)-1])
 		paddingWidth = availableWidth - statementWidth - answerWidth
 
-		statement.Title += strings.Repeat(".", int(paddingWidth/dotWidth)-1)
-		statement.Title += answer
+		survey.Title += strings.Repeat(".", int(paddingWidth/dotWidth)-1)
+		survey.Title += answer
 	}
-	pdf.MultiCell(rowWidth, 3.5, statement.Title, "", fpdf.AlignLeft, false)
+	pdf.MultiCell(rowWidth, 3.5, survey.Title, "", fpdf.AlignLeft, false)
 
-	for _, question := range statement.Questions {
+	for _, question := range survey.Questions {
 		availableWidth = pageWidth - leftMargin - rightMargin - 2
 
 		if question.IsBold {
