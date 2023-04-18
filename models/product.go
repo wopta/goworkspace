@@ -37,6 +37,10 @@ type Product struct {
 type Company struct {
 	Name                string               `firestore:"name,omitempty" json:"name,omitempty"`
 	Code                string               `firestore:"code,omitempty" json:"code,omitempty"`
+	SequencePrefix      string               `firestore:"sequencePrefix,omitempty" json:"sequencePrefix,omitempty"`
+	SequenceStart       int                  `firestore:"sequenceStart,omitempty" json:"sequenceStart,omitempty"`
+	SequenceFormat      string               `firestore:"sequenceFormat,omitempty" json:"sequenceFormat,omitempty"`
+	EmitTrack           Track                `firestore:"emitTrack,omitempty" json:"emitTrack,omitempty"`
 	Commission          float64              `firestore:"commission,omitempty" json:"commission,omitempty"`
 	CommissionRenew     float64              `firestore:"commissionRenew,omitempty" json:"commissionRenew,omitempty"`
 	MinimumMonthlyPrice float64              `firestore:"minimumMonthlyPrice,omitempty" json:"minimumMonthlyPrice,omitempty"`
@@ -59,6 +63,17 @@ type Offer struct {
 	Name        string `firestore:"name,omitempty" json:"name,omitempty"`
 	Description string `firestore:"description,omitempty" json:"description,omitempty"`
 	Order       int    `firestore:"order,omitempty" json:"order,omitempty"`
+}
+type Track struct {
+	ColumnMap map[string]Column `firestore:"columnMap,omitempty" json:"columnMap"`
+	Name      string            `firestore:"name,omitempty" json:"name,omitempty"`
+	Type      string            `firestore:"type,omitempty" json:"type"`
+	Format    string            `firestore:"format,omitempty" json:"format,omitempty"`
+}
+type Column struct {
+	Value  string `firestore:"value,omitempty" json:"value"`
+	Type   string `firestore:"type,omitempty" json:"type"`
+	Format string `firestore:"format,omitempty" json:"format,omitempty"`
 }
 
 func ProductToListData(query *firestore.DocumentIterator) []Product {

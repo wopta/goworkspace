@@ -116,13 +116,13 @@ func FabbrickMontlyPay(data model.Policy, origin string) FabrickPaymentResponse 
 	customerId := uuid.New().String()
 	log.Println(data.Uid + " FabbrickMontlyPay")
 	layout := "2006-01-02"
-	firstres := <-FabrickPayObj(data, true, data.StartDate.Format(layout), customerId, installment, origin)
+	firstres := <-FabrickPayObj(data, true, "", customerId, installment, origin)
 	time.Sleep(100)
 	for i := 1; i <= 11; i++ {
 		date := data.StartDate.AddDate(0, i, 0)
 		res := <-FabrickPayObj(data, false, date.Format(layout), customerId, installment, origin)
 		log.Println(data.Uid+" FabbrickMontlyPay res:", res)
-		time.Sleep(500)
+		time.Sleep(100)
 	}
 	return firstres
 }

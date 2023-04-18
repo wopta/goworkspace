@@ -64,16 +64,22 @@ type BrokerResponse struct {
 
 func GetSequenceByCompany(name string) (string, int, int) {
 	var (
-		codeCompany    string
-		companyDefault int
-		companyPrefix  string
-		numberCompany  int
-		number         int
+		codeCompany         string
+		companyDefault      int
+		companyPrefix       string
+		companyPrefixLenght string
+		numberCompany       int
+		number              int
 	)
 	switch name {
 	case "global":
 		companyDefault = 1
 		companyPrefix = "WB"
+		companyPrefixLenght = "%07d"
+	case "axa":
+		companyDefault = 1
+		companyPrefix = "WB"
+		companyPrefixLenght = "%07d"
 	}
 
 	rn, e := lib.OrderWhereLimitFirestoreErr("policy", "company", "numberCompany", "==", name, firestore.Desc, 1)
@@ -83,11 +89,11 @@ func GetSequenceByCompany(name string) (string, int, int) {
 	if len(policy) == 0 {
 		//WE0000001
 		numberCompany = companyDefault
-		codeCompany = companyPrefix + fmt.Sprintf("%07d", numberCompany)
+		codeCompany = companyPrefix + fmt.Sprintf(companyPrefixLenght, numberCompany)
 		number = 1
 	} else {
 		numberCompany = policy[0].NumberCompany + 1
-		codeCompany = companyPrefix + fmt.Sprintf("%07d", numberCompany)
+		codeCompany = companyPrefix + fmt.Sprintf(companyPrefixLenght, numberCompany)
 		number = policy[0].Number + 1
 	}
 	r, e := lib.OrderLimitFirestoreErr("policy", "number", firestore.Desc, 1)
