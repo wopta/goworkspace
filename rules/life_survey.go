@@ -11,7 +11,6 @@ import (
 func LifeSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		grule []byte
-		//questions []*models.Statement
 	)
 	const (
 		rulesFileName = "life_survey.json"
