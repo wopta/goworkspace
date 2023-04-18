@@ -7,7 +7,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"os"
 )
 
 func PersonSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -30,16 +29,9 @@ func PersonSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 
 	surveys := &Surveys{Surveys: make([]*models.Survey, 0), Text: ""}
 
-	switch os.Getenv("env") {
-	case "local":
-		groule = lib.ErrorByte(os.ReadFile("../function-data/dev/grules/" + rulesFileName))
-	case "dev":
-		groule = lib.GetFromStorage("function-data", "grules/"+rulesFileName, "")
-	case "prod":
-		groule = lib.GetFromStorage("core-350507-function-data", "grules/"+rulesFileName, "")
-	}
+	rulesFile := getRulesFile(groule, rulesFileName)
 
-	_, ruleOutput := rulesFromJson(groule, surveys, policyJson, []byte(getCoherenceData()))
+	_, ruleOutput := rulesFromJson(rulesFile, surveys, policyJson, []byte(getCoherenceData()))
 
 	ruleOutputJson, err := json.Marshal(ruleOutput)
 	lib.CheckError(err)
