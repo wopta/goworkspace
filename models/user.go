@@ -62,7 +62,10 @@ type User struct {
 	Height         int           `firestore:"height" json:"height" bigquery:"height"`
 	Weight         int           `firestore:"weight" json:"weight" bigquery:"weight"`
 	Json           string        `firestore:"-" json:"-" bigquery:"json"`
+	Residence      *Address      `json:"residence,omitempty" firestore:"residence,omitempty" bigquery:"-"`
+	Domicile       *Address      `json:"domicile,omitempty" firestore:"domicile,omitempty" bigquery:"-"`
 }
+
 type Consens struct {
 	UserUid         string         `firestore:"useruid" json:"useruid,omitempty" bigquery:"useruid" `
 	Title           string         `firestore:"title ,omitempty" json:"title,omitempty" bigquery:"title"`
@@ -72,6 +75,15 @@ type Consens struct {
 	CreationDate    time.Time      `firestore:"creationDate,omitempty" json:"creationDate,omitempty" bigquery:"-" bigquery:"-"`
 	BigCreationDate civil.DateTime `bigquery:"creationDate" firestore:"-"`
 	Mail            string         `firestore:"-" json:"-" bigquery:"mail"`
+}
+
+type Address struct {
+	StreetName   string `firestore:"streetName" json:"streetName,omitempty" bigquery:"streetName"`
+	StreetNumber string `firestore:"streetNumber,omitempty" json:"streetNumber,omitempty" bigquery:"streetNumber"`
+	City         string `firestore:"city" json:"city,omitempty" bigquery:"city"`
+	PostalCode   string `firestore:"postalCode" json:"postalCode,omitempty" bigquery:"postalCode"`
+	Locality     string `firestore:"locality" json:"locality,omitempty" bigquery:"locality"`
+	CityCode     string `firestore:"cityCode" json:"cityCode,omitempty" bigquery:"cityCode"`
 }
 
 func FirestoreDocumentToUser(query *firestore.DocumentIterator) (User, error) {
@@ -90,6 +102,7 @@ func FirestoreDocumentToUser(query *firestore.DocumentIterator) (User, error) {
 
 	return result, e
 }
+
 func UserUpdateByFiscalcode(user User) (string, error) {
 	var (
 		useruid string
