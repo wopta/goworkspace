@@ -7,14 +7,12 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"os"
 )
 
 func PersonSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		groule    []byte
-		questions []*models.Statement
-		policy    models.Policy
+		groule []byte
+		policy models.Policy
 	)
 	const (
 		rulesFileName = "person_survey.json"
@@ -27,19 +25,13 @@ func PersonSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	err = json.Unmarshal(b, &policy)
 
 	policyJson, err := policy.Marshal()
+	lib.CheckError(err)
 
-	statements := &Statements{Statements: questions, Text: ""}
+	surveys := &Surveys{Surveys: make([]*models.Survey, 0), Text: ""}
 
-	switch os.Getenv("env") {
-	case "local":
-		groule = lib.ErrorByte(os.ReadFile("../function-data/dev/grules/" + rulesFileName))
-	case "dev":
-		groule = lib.GetFromStorage("function-data", "grules/"+rulesFileName, "")
-	case "prod":
-		groule = lib.GetFromStorage("core-350507-function-data", "grules/"+rulesFileName, "")
-	}
+	rulesFile := getRulesFile(groule, rulesFileName)
 
-	_, ruleOutput := rulesFromJson(groule, statements, policyJson, []byte(getCoherenceData()))
+	_, ruleOutput := rulesFromJson(rulesFile, surveys, policyJson, []byte(getCoherenceData()))
 
 	ruleOutputJson, err := json.Marshal(ruleOutput)
 	lib.CheckError(err)
@@ -47,9 +39,9 @@ func PersonSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	return string(ruleOutputJson), ruleOutput, nil
 }
 
-type Statements struct {
-	Statements []*models.Statement `json:"statements"`
-	Text       string              `json:"text,omitempty"`
+type Surveys struct {
+	Surveys []*models.Survey `json:"surveys"`
+	Text    string           `json:"text,omitempty"`
 }
 
 type FxSurvey struct{}
@@ -70,8 +62,26 @@ func (fx *FxSurvey) AppendStatement(statements []*models.Statement, title string
 	if hasMultipleAnswers {
 		statement.HasMultipleAnswers = &hasMultipleAnswers
 	}
-
 	return append(statements, statement)
+}
+
+func (fx *FxSurvey) AppendSurvey(surveys []*models.Survey, title string, subtitle string, hasMultipleAnswers bool, hasAnswer bool, expectedAnswer bool) []*models.Survey {
+	survey := &models.Survey{
+		Title:              title,
+		Subtitle:           subtitle,
+		HasMultipleAnswers: nil,
+		Questions:          make([]*models.Question, 0),
+		Answer:             nil,
+		HasAnswer:          hasAnswer,
+		ExpectedAnswer:     nil,
+	}
+	if hasAnswer {
+		survey.ExpectedAnswer = &expectedAnswer
+	}
+	if hasMultipleAnswers {
+		survey.HasMultipleAnswers = &hasMultipleAnswers
+	}
+	return append(surveys, survey)
 }
 
 func (fx *FxSurvey) AppendQuestion(questions []*models.Question, text string, isBold bool, indent bool, hasAnswer bool, expectedAnswer bool) []*models.Question {
@@ -90,13 +100,15 @@ func (fx *FxSurvey) AppendQuestion(questions []*models.Question, text string, is
 	return append(questions, question)
 }
 
-func (fx *FxSurvey) HasGuaranteePolicy(input map[string]interface{}, guaranteeName string) bool {
-	j, _ := json.Marshal(input)
+func (fx *FxSurvey) HasGuaranteePolicy(input map[string]interface{}, guaranteeSlug string) bool {
+	j, err := json.Marshal(input)
+	lib.CheckError(err)
 	var policy models.Policy
-	_ = json.Unmarshal(j, &policy)
+	err = json.Unmarshal(j, &policy)
+	lib.CheckError(err)
 	for _, asset := range policy.Assets {
 		for _, guarantee := range asset.Guarantees {
-			if guarantee.Name == guaranteeName {
+			if guarantee.Slug == guaranteeSlug {
 				return true
 			}
 		}
@@ -104,13 +116,13 @@ func (fx *FxSurvey) HasGuaranteePolicy(input map[string]interface{}, guaranteeNa
 	return false
 }
 
-func (fx *FxSurvey) GetGuaranteeIndex(input map[string]interface{}, guaranteeName string) int {
+func (fx *FxSurvey) GetGuaranteeIndex(input map[string]interface{}, guranteeSlug string) int {
 	j, _ := json.Marshal(input)
 	var policy models.Policy
 	_ = json.Unmarshal(j, &policy)
 	for _, asset := range policy.Assets {
 		for i, guarantee := range asset.Guarantees {
-			if guarantee.Name == guaranteeName {
+			if guarantee.Slug == guranteeSlug {
 				return i
 			}
 		}
