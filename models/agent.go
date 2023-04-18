@@ -11,7 +11,7 @@ import (
 )
 
 type Agent struct {
-	User               `firestore:"user,omitempty" json:"amount,omitempty" bigquery:"-" `
+	User               User           `firestore:"user,omitempty" json:"amount,omitempty" bigquery:"-" `
 	Portfolio          []User         `firestore:"portfolio,omitempty" json:"portfolio,omitempty" bigquery:"-" `
 	BigPortfolio       string         `bigquery:"portfolio"`
 	Commissions        float64        `firestore:"commissions,omitempty" json:"commissions,omitempty" bigquery:"commissions"`

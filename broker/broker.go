@@ -77,7 +77,7 @@ func GetSequenceByCompany(name string) (string, int, int) {
 		companyPrefix = "WB"
 		companyPrefixLenght = "%07d"
 	case "axa":
-		companyDefault = 1
+		companyDefault = 100001
 		companyPrefix = "WB"
 		companyPrefixLenght = "%07d"
 	}
