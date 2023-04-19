@@ -588,7 +588,18 @@ func GetOfferResumeSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	pdf.Ln(3)
 }
 
-func GetPaymentResumeSection(pdf *fpdf.Fpdf) {
+func GetPaymentResumeSection(pdf *fpdf.Fpdf, policy models.Policy) {
+	payments := make([]float64, 20)
+	policyStartDate := policy.StartDate
+
+	cellWidth := pdf.GetStringWidth("00/00/0000:") + pdf.GetStringWidth("€ ###.###,##")
+
+	for _, guarantee := range policy.Assets[0].Guarantees {
+		for i := 0; i < guarantee.Value.Duration.Year; i++ {
+			payments[i] += guarantee.Value.PremiumGrossYearly
+		}
+	}
+
 	getParagraphTitle(pdf, "Pagamento dei premi successivi al primo")
 	pdf.Ln(8)
 	setBlackRegularFont(pdf, standardTextSize)
@@ -599,130 +610,63 @@ func GetPaymentResumeSection(pdf *fpdf.Fpdf) {
 	pdf.Ln(3)
 	drawPinkHorizontalLine(pdf, 0.4)
 	pdf.Ln(1)
-	pdf.SetFont("Montserrat", "B", 9)
-	pdf.CellFormat(pdf.GetStringWidth("Tipologia di premio"), 3, "Tipologia di premio:", "", 0, "", false, 0, "")
+	setBlackBoldFont(pdf, standardTextSize)
+	pdf.CellFormat(pdf.GetStringWidth("Tipologia di premio"), 3, "Tipologia di premio:", "",
+		0, "", false, 0, "")
 	pdf.SetX(pdf.GetX() + 5)
-	pdf.SetFont("Montserrat", "", 9)
-	pdf.SetDrawColor(0, 0, 0)
+	setBlackRegularFont(pdf, standardTextSize)
+	setBlackDrawColor(pdf)
 	pdf.CellFormat(3, 3, "", "1", 0, "", false, 0, "")
 	pdf.SetX(pdf.GetX() + 1)
-	pdf.CellFormat(pdf.GetStringWidth("naturale variabile annualmente"), 3, "naturale variabile annualmente", "", 0, "", false, 0, "")
+	pdf.CellFormat(pdf.GetStringWidth("naturale variabile annualmente"), 3, "naturale variabile annualmente",
+		"", 0, "", false, 0, "")
 	pdf.SetX(pdf.GetX() + 5)
 	pdf.CellFormat(3, 3, "X", "1", 0, "CM", false, 0, "")
 	pdf.SetX(pdf.GetX() + 1)
-	pdf.CellFormat(pdf.GetStringWidth("fisso"), 3, "fisso", "", 0, "", false, 0, "")
+	pdf.CellFormat(pdf.GetStringWidth("fisso"), 3, "fisso", "", 0, "", false, 0,
+		"")
 	pdf.SetX(pdf.GetX() + 40)
-	pdf.SetFont("Montserrat", "B", 9)
-	pdf.CellFormat(pdf.GetStringWidth("Frazionamento"), 3, "Frazionamento:", "", 0, "", false, 0, "")
+	setBlackBoldFont(pdf, standardTextSize)
+	pdf.CellFormat(pdf.GetStringWidth("Frazionamento"), 3, "Frazionamento:", "", 0, "",
+		false, 0, "")
 	pdf.SetX(pdf.GetX() + 3)
-	pdf.CellFormat(pdf.GetStringWidth("ANNUALE"), 3, "ANNUALE", "", 0, "", false, 0, "")
+	pdf.CellFormat(pdf.GetStringWidth("ANNUALE"), 3, "ANNUALE", "", 0, "", false,
+		0, "")
 	pdf.Ln(4)
 	drawPinkHorizontalLine(pdf, 0.1)
 	pdf.Ln(1)
-	pdf.SetFont("Montserrat", "", 9)
+	setBlackRegularFont(pdf, standardTextSize)
 	pdf.Cell(0, 3, "Il Premio è dovuto alle diverse annualità di Polizza, alle date qui sotto indicate:")
 	pdf.Ln(4)
 	drawPinkHorizontalLine(pdf, 0.1)
-	pdf.Ln(1)
-	pdf.SetX(pdf.GetX() + 12)
-	pdf.CellFormat(pdf.GetStringWidth("04/03/2030:"), 3, "Alla firma:", "", 0, "RM", false, 0, "")
-	pdf.SetX(pdf.GetX() + 1)
-	pdf.CellFormat(pdf.GetStringWidth("€ 175,18"), 3, "€ 175,18", "", 0, "RM", false, 0, "")
-	pdf.SetX(pdf.GetX() + 12)
-	pdf.CellFormat(pdf.GetStringWidth("04/03/2030:"), 3, "04/03/2028:", "", 0, "RM", false, 0, "")
-	pdf.SetX(pdf.GetX() + 1)
-	pdf.CellFormat(pdf.GetStringWidth("€ 175,18"), 3, "€ 175,18", "", 0, "RM", false, 0, "")
-	pdf.SetX(pdf.GetX() + 12)
-	pdf.CellFormat(pdf.GetStringWidth("04/03/2030:"), 3, "04/03/2033:", "", 0, "RM", false, 0, "")
-	pdf.SetX(pdf.GetX() + 1)
-	pdf.CellFormat(pdf.GetStringWidth("€ 175,18"), 3, "€ 175,18", "", 0, "RM", false, 0, "")
-	pdf.SetX(pdf.GetX() + 12)
-	pdf.CellFormat(pdf.GetStringWidth("04/03/2030:"), 3, "04/03/2038:", "", 0, "RM", false, 0, "")
-	pdf.SetX(pdf.GetX() + 1)
-	pdf.CellFormat(pdf.GetStringWidth("€ 175,18"), 3, "€ 175,18", "", 0, "RM", false, 0, "")
-	pdf.SetX(pdf.GetX() + 12)
-	pdf.Ln(4)
-	drawPinkHorizontalLine(pdf, 0.1)
-	pdf.Ln(1)
-	pdf.SetX(pdf.GetX() + 12)
-	pdf.CellFormat(pdf.GetStringWidth("04/03/2030:"), 3, "03/04/2024", "", 0, "RM", false, 0, "")
-	pdf.SetX(pdf.GetX() + 1)
-	pdf.CellFormat(pdf.GetStringWidth("€ 175,18"), 3, "€ 175,18", "", 0, "RM", false, 0, "")
-	pdf.SetX(pdf.GetX() + 12)
-	pdf.CellFormat(pdf.GetStringWidth("04/03/2030:"), 3, "04/03/2029:", "", 0, "RM", false, 0, "")
-	pdf.SetX(pdf.GetX() + 1)
-	pdf.CellFormat(pdf.GetStringWidth("€ 175,18"), 3, "€ 175,18", "", 0, "RM", false, 0, "")
-	pdf.SetX(pdf.GetX() + 12)
-	pdf.CellFormat(pdf.GetStringWidth("04/03/2030:"), 3, "04/03/2034:", "", 0, "RM", false, 0, "")
-	pdf.SetX(pdf.GetX() + 1)
-	pdf.CellFormat(pdf.GetStringWidth("€ 175,18"), 3, "€ 175,18", "", 0, "RM", false, 0, "")
-	pdf.SetX(pdf.GetX() + 12)
-	pdf.CellFormat(pdf.GetStringWidth("04/03/2030:"), 3, "04/03/2039:", "", 0, "RM", false, 0, "")
-	pdf.SetX(pdf.GetX() + 1)
-	pdf.CellFormat(pdf.GetStringWidth("€ 175,18"), 3, "€ 175,18", "", 0, "RM", false, 0, "")
-	pdf.SetX(pdf.GetX() + 12)
-	pdf.Ln(4)
-	drawPinkHorizontalLine(pdf, 0.1)
-	pdf.Ln(1)
-	pdf.SetX(pdf.GetX() + 12)
-	pdf.CellFormat(pdf.GetStringWidth("04/03/2030:"), 3, "03/04/2025", "", 0, "RM", false, 0, "")
-	pdf.SetX(pdf.GetX() + 1)
-	pdf.CellFormat(pdf.GetStringWidth("€ 175,18"), 3, "€ 175,18", "", 0, "RM", false, 0, "")
-	pdf.SetX(pdf.GetX() + 12)
-	pdf.CellFormat(pdf.GetStringWidth("04/03/2030:"), 3, "04/03/2030:", "", 0, "RM", false, 0, "")
-	pdf.SetX(pdf.GetX() + 1)
-	pdf.CellFormat(pdf.GetStringWidth("€ 175,18"), 3, "€ 175,18", "", 0, "RM", false, 0, "")
-	pdf.SetX(pdf.GetX() + 12)
-	pdf.CellFormat(pdf.GetStringWidth("04/03/2030:"), 3, "04/03/2035:", "", 0, "RM", false, 0, "")
-	pdf.SetX(pdf.GetX() + 1)
-	pdf.CellFormat(pdf.GetStringWidth("€ 175,18"), 3, "€ 175,18", "", 0, "RM", false, 0, "")
-	pdf.SetX(pdf.GetX() + 12)
-	pdf.CellFormat(pdf.GetStringWidth("04/03/2030:"), 3, "04/03/2040:", "", 0, "RM", false, 0, "")
-	pdf.SetX(pdf.GetX() + 1)
-	pdf.CellFormat(pdf.GetStringWidth("€ 175,18"), 3, "€ 175,18", "", 0, "RM", false, 0, "")
-	pdf.SetX(pdf.GetX() + 12)
-	pdf.Ln(4)
-	drawPinkHorizontalLine(pdf, 0.1)
-	pdf.Ln(1)
-	pdf.SetX(pdf.GetX() + 12)
-	pdf.CellFormat(pdf.GetStringWidth("04/03/2030:"), 3, "03/04/2026", "", 0, "RM", false, 0, "")
-	pdf.SetX(pdf.GetX() + 1)
-	pdf.CellFormat(pdf.GetStringWidth("€ 175,18"), 3, "€ 175,18", "", 0, "RM", false, 0, "")
-	pdf.SetX(pdf.GetX() + 12)
-	pdf.CellFormat(pdf.GetStringWidth("04/03/2030:"), 3, "04/03/2031:", "", 0, "RM", false, 0, "")
-	pdf.SetX(pdf.GetX() + 1)
-	pdf.CellFormat(pdf.GetStringWidth("€ 175,18"), 3, "€ 175,18", "", 0, "RM", false, 0, "")
-	pdf.SetX(pdf.GetX() + 12)
-	pdf.CellFormat(pdf.GetStringWidth("04/03/2030:"), 3, "04/03/2036:", "", 0, "RM", false, 0, "")
-	pdf.SetX(pdf.GetX() + 1)
-	pdf.CellFormat(pdf.GetStringWidth("€ 175,18"), 3, "€ 175,18", "", 0, "RM", false, 0, "")
-	pdf.SetX(pdf.GetX() + 12)
-	pdf.CellFormat(pdf.GetStringWidth("04/03/2030:"), 3, "04/03/2041:", "", 0, "RM", false, 0, "")
-	pdf.SetX(pdf.GetX() + 1)
-	pdf.CellFormat(pdf.GetStringWidth("€ 175,18"), 3, "€ 175,18", "", 0, "RM", false, 0, "")
-	pdf.SetX(pdf.GetX() + 12)
-	pdf.Ln(4)
-	drawPinkHorizontalLine(pdf, 0.1)
-	pdf.Ln(1)
-	pdf.SetX(pdf.GetX() + 12)
-	pdf.CellFormat(pdf.GetStringWidth("04/03/2030:"), 3, "03/04/2027", "", 0, "RM", false, 0, "")
-	pdf.SetX(pdf.GetX() + 1)
-	pdf.CellFormat(pdf.GetStringWidth("€ 175,18"), 3, "€ 175,18", "", 0, "RM", false, 0, "")
-	pdf.SetX(pdf.GetX() + 12)
-	pdf.CellFormat(pdf.GetStringWidth("04/03/2030:"), 3, "04/03/2032:", "", 0, "RM", false, 0, "")
-	pdf.SetX(pdf.GetX() + 1)
-	pdf.CellFormat(pdf.GetStringWidth("€ 175,18"), 3, "€ 175,18", "", 0, "RM", false, 0, "")
-	pdf.SetX(pdf.GetX() + 12)
-	pdf.CellFormat(pdf.GetStringWidth("04/03/2030:"), 3, "04/03/2037:", "", 0, "RM", false, 0, "")
-	pdf.SetX(pdf.GetX() + 1)
-	pdf.CellFormat(pdf.GetStringWidth("€ 175,18"), 3, "€ 175,18", "", 0, "RM", false, 0, "")
-	pdf.SetX(pdf.GetX() + 12)
-	pdf.CellFormat(pdf.GetStringWidth("04/03/2030:"), 3, "04/03/2042:", "", 0, "RM", false, 0, "")
-	pdf.SetX(pdf.GetX() + 1)
-	pdf.CellFormat(pdf.GetStringWidth("€ 175,18"), 3, "€ 175,18", "", 0, "RM", false, 0, "")
-	pdf.SetX(pdf.GetX() + 12)
-	pdf.Ln(4)
-	drawPinkHorizontalLine(pdf, 0.1)
+
+	for x := 0; x < len(payments)/4; x++ {
+		pdf.Ln(1)
+		for y := 0; y < 4; y++ {
+			pdf.SetX(pdf.GetX() + 4)
+
+			if payments[x+(5*y)] != 0 {
+				var date string
+				if x == 0 && y == 0 {
+					date = "Alla firma:"
+				} else {
+					date = policyStartDate.AddDate(x+(5*y), 0, 0).Format(layout) + ":"
+				}
+				price := lib.HumanaizePriceEuro(payments[x+(5*y)])
+
+				pdf.CellFormat(cellWidth, 3, date+" "+price, "", 0, fpdf.AlignRight, false,
+					0, "")
+
+			} else {
+				pdf.CellFormat(cellWidth, 3, "===========", "", 0, fpdf.AlignRight, false,
+					0, "")
+			}
+
+		}
+		pdf.Ln(4)
+		drawPinkHorizontalLine(pdf, 0.1)
+	}
+
 	pdf.Ln(1)
 	pdf.MultiCell(0, 3, "In caso di frazionamento mensile i Premi sopra riportati sono dovuti, alle date "+
 		"indicate e con successiva frequenza mensile, in misura di 1/12 per ogni mensilità. Non sono previsti oneri "+

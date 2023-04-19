@@ -57,7 +57,7 @@ func Life(policy models.Policy) string {
 
 	GetOfferResumeSection(pdf, policy)
 
-	GetPaymentResumeSection(pdf)
+	GetPaymentResumeSection(pdf, policy)
 
 	GetContractWithdrawlSection(pdf)
 
