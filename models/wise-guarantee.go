@@ -39,6 +39,7 @@ func (wiseGuarantee *WiseGuarantee) ToDomain() Guarante {
 	guarantee.PriceGross = wiseGuarantee.PriceGross
 	guarantee.PriceNett = wiseGuarantee.PriceNet
 	guarantee.Name = wiseGuarantee.Name
+	guarantee.CompanyName = wiseGuarantee.Name
 	guarantee.Tax = wiseGuarantee.Tax
 	guarantee.Deductible = strconv.FormatFloat(wiseGuarantee.Deductible, 'f', 2, 64)
 	guarantee.SumInsuredLimitOfIndemnity = wiseGuarantee.SumInsuredLimitOfIndemnity

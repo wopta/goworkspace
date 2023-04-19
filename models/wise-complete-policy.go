@@ -27,6 +27,11 @@ func (wisePolicy *WiseCompletePolicy) ToDomain() Policy {
 	}
 	policy.Contractor = *wisePolicy.Contractors[0].Registry.ToDomain()
 	policy.EndDate = wisePolicy.Contract.PolicyExpirationDate
+	policy.CodeCompany = wisePolicy.PolicyNumber
+	policy.Company = "global"
+	policy.PriceGross = wisePolicy.Contract.GrossAmount
+	policy.PriceNett = wisePolicy.Contract.NetAmount
+	policy.TaxAmount = wisePolicy.Contract.TaxesAmount
 
 	policy.Attachments = &[]Attachment{}
 	for _, wiseAttachment := range wisePolicy.Attachments {

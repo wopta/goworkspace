@@ -90,7 +90,12 @@ func FirestoreDocumentToUser(query *firestore.DocumentIterator) (User, error) {
 	var result User
 	userDocumentSnapshot, err := query.Next()
 
-	if (err != iterator.Done && err != nil) || userDocumentSnapshot == nil {
+	if err == iterator.Done && userDocumentSnapshot == nil {
+		log.Println("user not found in firebase DB")
+		return result, err
+	}
+
+	if err != iterator.Done && err != nil {
 		log.Println(`error happened while trying to get user`)
 		return result, err
 	}
