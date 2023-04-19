@@ -73,7 +73,7 @@ func GetMainHeader(pdf *fpdf.Fpdf, policy models.Policy) {
 		setBlackRegularFont(pdf, standardTextSize)
 		pdf.SetXY(-95, pdf.GetY()+3)
 		pdf.MultiCell(0, 3.5, contractorInfo, "", "", false)
-		pdf.Ln(10)
+		pdf.Ln(8)
 	})
 }
 
