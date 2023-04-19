@@ -46,7 +46,7 @@ func Rules(w http.ResponseWriter, r *http.Request) {
 				Method:  http.MethodPost,
 			},
 			{
-				Route:   "statements/life",
+				Route:   "/v1/statements/life",
 				Handler: LifeStatements,
 				Method:  http.MethodPost,
 			},
