@@ -37,7 +37,7 @@ func Life(policy models.Policy) string {
 
 	pdf.AddPage()
 
-	GetContractorInfoSection(pdf, policy.Contractor)
+	GetContractorInfoSection(pdf, policy)
 
 	GetGuaranteesTable(pdf, policy)
 

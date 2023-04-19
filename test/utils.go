@@ -11,12 +11,14 @@ import (
 )
 
 const (
+	basePath         = "test"
 	thickLineWidth   = 0.4
 	thinLineWidth    = 0.1
 	smallTextSize    = 6
 	standardTextSize = 9
+	titleTextSize    = 10
 	tabDimension     = 15
-	layout           = "02/01/2006"
+	dateLayout       = "02/01/2006"
 )
 
 func initFpdf() *fpdf.Fpdf {
@@ -65,6 +67,21 @@ func setBlackRegularFont(pdf *fpdf.Fpdf, fontSize float64) {
 
 func setBlackMonospaceFont(pdf *fpdf.Fpdf, fontSize float64) {
 	pdf.SetTextColor(0, 0, 0)
+	pdf.SetFont("Noto", "", fontSize)
+}
+
+func setPinkBoldFont(pdf *fpdf.Fpdf, fontSize float64) {
+	pdf.SetTextColor(229, 0, 117)
+	pdf.SetFont("Montserrat", "B", fontSize)
+}
+
+func setPinkRegularFont(pdf *fpdf.Fpdf, fontSize float64) {
+	pdf.SetTextColor(229, 0, 117)
+	pdf.SetFont("Montserrat", "", fontSize)
+}
+
+func setPinkMonospaceFont(pdf *fpdf.Fpdf, fontSize float64) {
+	pdf.SetTextColor(229, 0, 117)
 	pdf.SetFont("Noto", "", fontSize)
 }
 
@@ -188,4 +205,13 @@ func extractGuarantee(guarantees []models.Guarante, guaranteeSlug string) (model
 		}
 	}
 	return models.Guarante{}, fmt.Errorf("no %s guarantee found", guaranteeSlug)
+}
+
+func extractConsens(consens []models.Consens, consentKey int64) (models.Consens, error) {
+	for _, consent := range consens {
+		if consent.Key == consentKey {
+			return consent, nil
+		}
+	}
+	return models.Consens{}, fmt.Errorf("no consent found with key %d", consentKey)
 }

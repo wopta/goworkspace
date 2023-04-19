@@ -17,7 +17,7 @@ func GetMainHeader(pdf *fpdf.Fpdf, policy models.Policy) {
 		cfpi     string
 		nextpay  string
 	)
-	pathPrefix := lib.GetAssetPathByEnv("test") + "/logo_"
+	pathPrefix := lib.GetAssetPathByEnv(basePath) + "/logo_"
 	logoPath = pathPrefix + "vita.png"
 
 	contractor := policy.Contractor
@@ -31,19 +31,19 @@ func GetMainHeader(pdf *fpdf.Fpdf, policy models.Policy) {
 	}
 
 	if policy.PaymentSplit == "monthly" {
-		nextpay = policy.StartDate.AddDate(0, 1, 0).Format(layout)
+		nextpay = policy.StartDate.AddDate(0, 1, 0).Format(dateLayout)
 	} else {
-		nextpay = policy.StartDate.AddDate(1, 0, 0).Format(layout)
+		nextpay = policy.StartDate.AddDate(1, 0, 0).Format(dateLayout)
 	}
 
 	policyInfo := "Numero: " + policy.CodeCompany + "\n" +
-		"Decorre dal: " + policy.StartDate.Format(layout) + " ore 24:00\n" +
-		"Scade il: " + policy.EndDate.Format(layout) + " ore 24:00\n" +
+		"Decorre dal: " + policy.StartDate.Format(dateLayout) + " ore 24:00\n" +
+		"Scade il: " + policy.EndDate.Format(dateLayout) + " ore 24:00\n" +
 		"Prima scadenza annuale il: " + nextpay + "\n" +
 		"Non si rinnova a scadenza."
 
-	contractorInfo := "Contraente: " + strings.ToUpper(contractor.Surname) + " " + strings.ToUpper(contractor.Name) + "\n" +
-		"C.F./P.IVA: " + strings.ToUpper(cfpi) + "\n" +
+	contractorInfo := "Contraente: " + strings.ToUpper(contractor.Surname+" "+contractor.Name+"\n"+
+		"C.F./P.IVA: "+cfpi) + "\n" +
 		"Indirizzo: " + strings.ToUpper(address) + "Mail: " + contractor.Mail + "\n" +
 		"Telefono: " + contractor.Phone
 
@@ -58,22 +58,21 @@ func GetMainHeader(pdf *fpdf.Fpdf, policy models.Policy) {
 		pdf.SetXY(23, 13)
 		pdf.SetTextColor(92, 89, 92)
 		pdf.Cell(10, 6, "Vita")
-		pdf.ImageOptions(lib.GetAssetPathByEnv("test")+"/ARTW_LOGO_RGB_400px.png", 170, 6, 0, 8, false, opt, 0, "")
+		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/ARTW_LOGO_RGB_400px.png", 170, 6, 0, 8, false, opt, 0, "")
 
-		pdf.SetTextColor(0, 0, 0)
-		pdf.SetFont("Montserrat", "B", 8)
+		setBlackBoldFont(pdf, standardTextSize)
 		pdf.SetXY(11, 20)
 		pdf.Cell(0, 3, "I dati della tua polizza")
-		pdf.SetFont("Montserrat", "", 8)
+		setBlackRegularFont(pdf, standardTextSize)
 		pdf.SetXY(11, pdf.GetY()+3)
-		pdf.MultiCell(0, 3, policyInfo, "", "", false)
+		pdf.MultiCell(0, 3.5, policyInfo, "", "", false)
 
-		pdf.SetFont("Montserrat", "B", 8)
+		setBlackBoldFont(pdf, standardTextSize)
 		pdf.SetXY(-95, 20)
 		pdf.Cell(0, 3, "I tuoi dati")
-		pdf.SetFont("Montserrat", "", 8)
+		setBlackRegularFont(pdf, standardTextSize)
 		pdf.SetXY(-95, pdf.GetY()+3)
-		pdf.MultiCell(0, 3, contractorInfo, "", "", false)
+		pdf.MultiCell(0, 3.5, contractorInfo, "", "", false)
 		pdf.Ln(10)
 	})
 }
@@ -87,7 +86,7 @@ func GetMainFooter(pdf *fpdf.Fpdf) {
 		pdf.SetFont("Montserrat", "", smallTextSize)
 		pdf.MultiCell(0, 3, "Wopta per te. Vita è un prodotto assicurativo di AXA France Vie S.A. – Rappresentanza Generale per l’Italia\ndistribuito da Wopta Assicurazioni S.r.l.", "", "", false)
 		opt.ImageType = "png"
-		pdf.ImageOptions(lib.GetAssetPathByEnv("test")+"/logo_axa.png", 190, 283, 0, 8, false, opt, 0, "")
+		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/logo_axa.png", 190, 283, 0, 8, false, opt, 0, "")
 	})
 }
 
@@ -96,7 +95,7 @@ func GetAxaHeader(pdf *fpdf.Fpdf) {
 		var opt fpdf.ImageOptions
 		pdf.SetXY(-30, 7)
 		opt.ImageType = "png"
-		pdf.ImageOptions(lib.GetAssetPathByEnv("test")+"/logo_axa.png", 190, 7, 0, 8, false, opt, 0, "")
+		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/logo_axa.png", 190, 7, 0, 8, false, opt, 0, "")
 		pdf.Ln(15)
 	})
 }
@@ -122,7 +121,7 @@ func GetWoptaHeader(pdf *fpdf.Fpdf) {
 	pdf.SetHeaderFunc(func() {
 		var opt fpdf.ImageOptions
 		opt.ImageType = "png"
-		pdf.ImageOptions(lib.GetAssetPathByEnv("test")+"/ARTW_LOGO_RGB_400px.png", 10, 6, 0, 15, false, opt, 0, "")
+		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/ARTW_LOGO_RGB_400px.png", 10, 6, 0, 15, false, opt, 0, "")
 		pdf.Ln(10)
 	})
 }
@@ -168,10 +167,10 @@ func GetWoptaFooter(pdf *fpdf.Fpdf) {
 	})
 }
 
-func GetContractorInfoSection(pdf *fpdf.Fpdf, contractor models.User) {
+func GetContractorInfoSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	getParagraphTitle(pdf, "La tua assicurazione è operante per il seguente Assicurato e Garanzie")
 	pdf.Ln(8)
-	GetContractorInfoTable(pdf, contractor)
+	GetContractorInfoTable(pdf, policy.Contractor)
 }
 
 func GetContractorInfoTable(pdf *fpdf.Fpdf, contractor models.User) {
@@ -262,7 +261,7 @@ func GetGuaranteesTable(pdf *fpdf.Fpdf, policy models.Policy) {
 	for _, guarantee := range guaranteesToMap(policy.Assets[0].Guarantees) {
 		guarantees[guarantee.Slug]["sumInsuredLimitOfIndemnity"] = humanize.FormatFloat("#.###,", guarantee.Value.SumInsuredLimitOfIndemnity) + " €"
 		guarantees[guarantee.Slug]["duration"] = strconv.Itoa(guarantee.Value.Duration.Year)
-		guarantees[guarantee.Slug]["endDate"] = policy.StartDate.AddDate(guarantee.Value.Duration.Year, 0, 0).Format(layout)
+		guarantees[guarantee.Slug]["endDate"] = policy.StartDate.AddDate(guarantee.Value.Duration.Year, 0, 0).Format(dateLayout)
 		guarantees[guarantee.Slug]["price"] = humanize.FormatFloat("#.###,##", guarantee.Value.PremiumGrossYearly) + " €"
 		if guarantee.Slug != death {
 			guarantees[guarantee.Slug]["price"] += " (*)"
@@ -303,7 +302,8 @@ func GetGuaranteesTable(pdf *fpdf.Fpdf, policy models.Policy) {
 }
 
 func GetAvvertenzeBeneficiariSection(pdf *fpdf.Fpdf) {
-	getParagraphTitle(pdf, "Nomina dei Beneficiari e Referente terzo, per il caso di garanzia Decesso (qualora sottoscritta)")
+	getParagraphTitle(pdf, "Nomina dei Beneficiari e Referente terzo, per il caso di garanzia Decesso "+
+		"(qualora sottoscritta)")
 	pdf.Ln(8)
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "AVVERTENZE: Può scegliere se designare nominativamente i beneficiari o se "+
@@ -356,7 +356,8 @@ func GetBeneficiariSection(pdf *fpdf.Fpdf, policy models.Policy) {
 			beneficiaries[index]["mail"] = beneficiary.Mail
 			beneficiaries[index]["phone"] = beneficiary.Phone
 			if beneficiary.IsFamilyMember {
-				beneficiaries[index]["relation"] = "Nucleo familiare (rapporto di parentela, coniuge, unione civile, convivenza more uxorio)"
+				beneficiaries[index]["relation"] = "Nucleo familiare (rapporto di parentela, coniuge, unione civile, " +
+					"convivenza more uxorio)"
 			} else {
 				beneficiaries[index]["relation"] = "Altro (no rapporto parentela)"
 			}
@@ -552,7 +553,7 @@ func GetVisioneDocumentiSection(pdf *fpdf.Fpdf, policy models.Policy) {
 		fpdf.AlignCenter, false)
 	var opt fpdf.ImageOptions
 	opt.ImageType = "png"
-	pdf.ImageOptions(lib.GetAssetPathByEnv("test")+"/firma_axa.png", 35, pdf.GetY()+3, 30, 8,
+	pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/firma_axa.png", 35, pdf.GetY()+3, 30, 8,
 		false, opt, 0, "")
 	pdf.Ln(15)
 }
@@ -650,7 +651,7 @@ func GetPaymentResumeSection(pdf *fpdf.Fpdf, policy models.Policy) {
 				if x == 0 && y == 0 {
 					date = "Alla firma:"
 				} else {
-					date = policyStartDate.AddDate(x+(5*y), 0, 0).Format(layout) + ":"
+					date = policyStartDate.AddDate(x+(5*y), 0, 0).Format(dateLayout) + ":"
 				}
 				price := lib.HumanaizePriceEuro(payments[x+(5*y)])
 
@@ -677,25 +678,25 @@ func GetPaymentResumeSection(pdf *fpdf.Fpdf, policy models.Policy) {
 func GetContractWithdrawlSection(pdf *fpdf.Fpdf) {
 	getParagraphTitle(pdf, "Informativa sul diritto di recesso")
 	pdf.Ln(8)
-	pdf.SetTextColor(0, 0, 0)
-	pdf.SetFont("Montserrat", "B", 9)
+	setBlackBoldFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "Diritto di recesso entro i primi 30 giorni dalla stipula ("+
 		"diritto di ripensamento)", "", "", false)
-	pdf.SetFont("Montserrat", "", 9)
+	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "Il Contraente può recedere dal contratto entro il termine di 30 giorni dalla "+
 		"decorrenza dell’assicurazione (diritto di ripensamento). In tal caso, l’assicurazione si intende come mai "+
 		"entrata in vigore e la Compagnia, per il tramite dell’intermediario, provvederà a rimborsare al Contraente "+
 		"l’importo di Premio già versato (al netto delle imposte).", "", "", false)
-	pdf.SetFont("Montserrat", "B", 9)
-	pdf.MultiCell(0, 3, "Diritto di recesso annuale (disdetta alla annualità)", "", "", false)
-	pdf.SetFont("Montserrat", "", 9)
+	setBlackBoldFont(pdf, standardTextSize)
+	pdf.MultiCell(0, 3, "Diritto di recesso annuale (disdetta alla annualità)", "", "",
+		false)
+	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "Il Contraente può recedere dal contratto annualmente, entro il termine di 30 "+
 		"giorni dalla scadenza annuale della polizza (disdetta alla annualità). In tal caso, l’assicurazione cessa alle "+
 		"ore 24:00 dell’ultimo giorno della annualità in corso. È possibile disdettare singolarmente una o più delle "+
 		"coperture attivate in fase di sottoscrizione.", "", "", false)
-	pdf.SetFont("Montserrat", "B", 9)
+	setBlackBoldFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "Modalità per l’esercizio del diritto di recesso", "", "", false)
-	pdf.SetFont("Montserrat", "", 9)
+	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "Il Contraente è tenuto ad esercitare il diritto di recesso mediante invio di una "+
 		"lettera raccomandata a.r. al seguente indirizzo: Wopta Assicurazioni srl – Gestione Portafoglio – Galleria del "+
 		"Corso, 1 – 201212 Milano (MI) oppure via posta elettronica certificata (PEC) all’indirizzo "+
@@ -706,8 +707,7 @@ func GetContractWithdrawlSection(pdf *fpdf.Fpdf) {
 func GetPaymentMethodSection(pdf *fpdf.Fpdf) {
 	getParagraphTitle(pdf, "Come puoi pagare il premio")
 	pdf.Ln(8)
-	pdf.SetTextColor(0, 0, 0)
-	pdf.SetFont("Montserrat", "", 9)
+	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "I mezzi di pagamento consentiti, nei confronti di Wopta, sono esclusivamente "+
 		"bonifico e strumenti di pagamento elettronico, quali ad esempio, carte di credito e/o carte di debito, "+
 		"incluse le carte prepagate. Oppure può essere pagato direttamente alla Compagnia alla "+
@@ -717,8 +717,8 @@ func GetPaymentMethodSection(pdf *fpdf.Fpdf) {
 
 func GetEmitResumeSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	var offerPrice string
-	emitDate := policy.EmitDate.Format(layout)
-	startDate := policy.StartDate.Format(layout)
+	emitDate := policy.EmitDate.Format(dateLayout)
+	startDate := policy.StartDate.Format(dateLayout)
 	if policy.OffersPrices["default"]["monthly"] != nil {
 		offerPrice = humanize.FormatFloat("#.###,##", policy.OffersPrices["default"]["monthly"].Gross*12)
 	} else {
@@ -737,12 +737,13 @@ func GetEmitResumeSection(pdf *fpdf.Fpdf, policy models.Policy) {
 func GetPolicyDescriptionSection(pdf *fpdf.Fpdf) {
 	getParagraphTitle(pdf, "Per noi questa polizza fa al caso tuo")
 	pdf.Ln(8)
-	pdf.SetTextColor(0, 0, 0)
-	pdf.SetFont("Montserrat", "B", 9)
-	pdf.MultiCell(0, 3, "Richieste ed esigenze di copertura assicurativa del contraente", "", "", false)
-	pdf.SetFont("Montserrat", "", 9)
+	setBlackBoldFont(pdf, standardTextSize)
+	pdf.MultiCell(0, 3, "Richieste ed esigenze di copertura assicurativa del contraente", "",
+		"", false)
+	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "In Polizza sono riportate le tue dichiarazioni relative al rischio. Sulla base di "+
-		"tali dichiarazioni, esigenze e richieste, le soluzioni assicurative individuate in coerenza con esse, sono:", "", "", false)
+		"tali dichiarazioni, esigenze e richieste, le soluzioni assicurative individuate in coerenza con esse, sono:",
+		"", "", false)
 	pdf.SetX(15)
 	pdf.MultiCell(0, 3, "- tutelare dei soggetti cari, in caso di decesso dell’Assicurato nel corso della "+
 		"durata della copertura, attraverso un sostegno economico indennizzato ai Beneficiari, che "+
@@ -781,8 +782,7 @@ func GetPolicyDescriptionSection(pdf *fpdf.Fpdf) {
 func GetWoptaAxaCompanyDescriptionSection(pdf *fpdf.Fpdf) {
 	getParagraphTitle(pdf, "Chi siamo")
 	pdf.Ln(8)
-	pdf.SetTextColor(0, 0, 0)
-	pdf.SetFont("Montserrat", "", 8)
+	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "Wopta Assicurazioni S.r.l. - intermediario assicurativo, soggetto al controllo "+
 		"dell’IVASS ed iscritto dal 14.02.2022 al Registro Unico degli Intermediari, in Sezione A nr. A000701923, "+
 		"avente sede legale in Galleria del Corso, 1 – 20122 Milano (MI). Capitale sociale Euro 120.000 - "+
@@ -819,7 +819,7 @@ func GetAxaDeclarationsConsentSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	setBlackDrawColor(pdf)
 	drawBlackHorizontalLine(pdf, thinLineWidth)
 	pdf.Ln(5)
-	pdf.Cell(0, 3, policy.EmitDate.Format(layout))
+	pdf.Cell(0, 3, policy.EmitDate.Format(dateLayout))
 	drawSignatureForm(pdf)
 }
 
@@ -887,7 +887,7 @@ func GetAxaTableSection(pdf *fpdf.Fpdf, policy models.Policy) {
 		false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 0, "", false, 0, "")
-	pdf.CellFormat(90, 4, "Data di nascita: "+birthDate.Format(layout), "TLR", 0, "",
+	pdf.CellFormat(90, 4, "Data di nascita: "+birthDate.Format(dateLayout), "TLR", 0, "",
 		false, 0, "")
 	pdf.CellFormat(90, 4, "Codice Fiscale: "+strings.ToUpper(contractor.FiscalCode), "TLR", 0,
 		"", false, 0, "")
@@ -983,9 +983,9 @@ func GetAxaTablePart2Section(pdf *fpdf.Fpdf, policy models.Policy) {
 		"dichiarazioni non veritiere. Il sottoscritto si impegna a comunicare senza ritardo a AXA France VIE S.A. "+
 		"(Rappresentanza Generale per l’Italia) ogni eventuale integrazione o variazione che si dovesse verificare "+
 		"in relazione ai dati ed alle informazioni forniti con il presente modulo.", "LR", "", false)
-	pdf.SetFont("Montserrat", "B", 8)
+	setBlackBoldFont(pdf, standardTextSize)
 	pdf.CellFormat(0, 4, "", "LR", 1, "", false, 0, "")
-	pdf.CellFormat(30, 4, "Data "+policy.EmitDate.Format(layout), "L", 0, "CM",
+	pdf.CellFormat(30, 4, "Data "+policy.EmitDate.Format(dateLayout), "L", 0, "CM",
 		false, 0, "")
 	pdf.CellFormat(100, 4, "", "", 0, "", false, 0, "")
 	pdf.CellFormat(60, 4, "Firma del contraente/Assicurato", "R", 1, "CM",
@@ -997,20 +997,19 @@ func GetAxaTablePart2Section(pdf *fpdf.Fpdf, policy models.Policy) {
 }
 
 func GetAxaTablePart3Section(pdf *fpdf.Fpdf) {
-	setBlackBoldFont(pdf, 10)
+	setBlackBoldFont(pdf, titleTextSize)
 	pdf.MultiCell(0, 2, "", "TLR", "", false)
 	pdf.MultiCell(0, 4, "Informativa antiriciclaggio (articoli di riferimento) - "+
 		"(Decreto legislativo n. 231/2007)", "LR", "CM", false)
 	pdf.MultiCell(0, 3, "", "LR", "", false)
-	pdf.SetFont("Montserrat", "B", 6)
+	setBlackBoldFont(pdf, smallTextSize)
 	pdf.MultiCell(0, 2.5, "Obbligo di astensione – art. 42", "LR", "", false)
-	pdf.SetFont("Montserrat", "", 6)
+	setBlackRegularFont(pdf, smallTextSize)
 	pdf.MultiCell(0, 2.5, "1. I soggetti obbligati che si trovano nell’impossibilità oggettiva di "+
 		"effettuare l'adeguata verifica della clientela, ai sensi delle disposizioni di cui all'articolo 19, "+
 		"comma 1, lettere a), b) e c), si astengono dall'instaurare, eseguire ovvero proseguire il rapporto, la "+
 		"prestazione professionale e le operazioni e valutano se effettuare una segnalazione di operazione sospetta "+
 		"alla UIF a norma dell'articolo 35.", "LR", "", false)
-	pdf.SetFont("Montserrat", "", 6)
 	pdf.MultiCell(0, 2.5, "2. I soggetti obbligati si astengono dall'instaurare il rapporto continuativo, "+
 		"eseguire operazioni o prestazioni professionali e pongono fine al rapporto continuativo o alla prestazione "+
 		"professionale già in essere di cui siano, direttamente o indirettamente, parte società fiduciarie, trust, "+
@@ -1022,9 +1021,9 @@ func GetAxaTablePart3Section(pdf *fpdf.Fpdf) {
 	pdf.MultiCell(0, 2.5, "4. È fatta in ogni caso salva l'applicazione dell'articolo 35, comma 2, nei "+
 		"casi in cui l'operazione debba essere eseguita in quanto sussiste un obbligo di legge di ricevere "+
 		"l'atto.", "LR", "", false)
-	pdf.SetFont("Montserrat", "B", 6)
+	setBlackBoldFont(pdf, smallTextSize)
 	pdf.MultiCell(0, 2.5, "Obblighi del cliente / sanzioni", "LR", "", false)
-	pdf.SetFont("Montserrat", "", 6)
+	setBlackRegularFont(pdf, smallTextSize)
 	pdf.MultiCell(0, 2.5, "Art. 22, comma 1 - I clienti forniscono per iscritto, sotto la propria "+
 		"responsabilità, tutte le informazioni necessarie e aggiornate per consentire ai soggetti obbligati di "+
 		"adempiere agli obblighi di adeguata verifica.", "LR", "", false)
@@ -1033,17 +1032,19 @@ func GetAxaTablePart3Section(pdf *fpdf.Fpdf) {
 		"dell'adeguata verifica della clientela, fornisce dati falsi o informazioni non veritiere, e' punito con la "+
 		"reclusione da sei mesi a tre anni e con la multa da 10.000 euro a 30.000 "+
 		"euro", "LR", "", false)
-	pdf.SetFont("Montserrat", "B", 6)
+	setBlackBoldFont(pdf, smallTextSize)
 	pdf.MultiCell(0, 2.5, "Nozione di titolare effettivo", "LR", "", false)
-	pdf.MultiCell(0, 2.5, "Art.1, comma 2, lett. pp) del D. Lgs. n.231/2007 ", "LR", "", false)
-	pdf.SetFont("Montserrat", "", 6)
+	pdf.MultiCell(0, 2.5, "Art.1, comma 2, lett. pp) del D. Lgs. n.231/2007 ", "LR", "",
+		false)
+	setBlackRegularFont(pdf, smallTextSize)
 	pdf.MultiCell(0, 2.5, "la persona fisica o le persone fisiche, diverse dal cliente, nell'interesse "+
 		"della quale  o  delle  quali,  in ultima istanza, il rapporto continuativo è istaurato, la prestazione "+
 		"professionale è resa o l'operazione è eseguita.", "LR", "", false)
-	pdf.SetFont("Montserrat", "B", 6)
+	setBlackBoldFont(pdf, smallTextSize)
 	pdf.MultiCell(0, 2.5, "Nozione di persona politicamente esposta", "LR", "", false)
-	pdf.MultiCell(0, 2.5, "Art. 1, comma 1, lettera dd) D. Lgs. 231/2007 così come modificato dal D. Lgs. 125/2019", "LR", "", false)
-	pdf.SetFont("Montserrat", "", 6)
+	pdf.MultiCell(0, 2.5, "Art. 1, comma 1, lettera dd) D. Lgs. 231/2007 così come modificato dal D. Lgs."+
+		" 125/2019", "LR", "", false)
+	setBlackRegularFont(pdf, smallTextSize)
 	pdf.MultiCell(0, 2.5, "Persone politicamente esposte: le persone fisiche che occupano o hanno "+
 		"cessato di occupare da meno di un anno importanti cariche pubbliche, nonché i loro familiari e coloro "+
 		"che con i predetti soggetti intrattengono notoriamente stretti legami, come di "+
@@ -1104,63 +1105,63 @@ func GetAxaTablePart3Section(pdf *fpdf.Fpdf) {
 func GetWoptaInfoTable(pdf *fpdf.Fpdf) {
 	drawPinkHorizontalLine(pdf, 0.1)
 	pdf.Ln(0.5)
-	pdf.SetFont("Montserrat", "", 6)
+	setBlackRegularFont(pdf, smallTextSize)
 	pdf.MultiCell(0, 3, "DATI DELLA PERSONA FISICA CHE ENTRA IN CONTATTO CON IL "+
 		"CONTRAENTE", "", "", false)
 	pdf.Ln(1)
-	pdf.SetFont("Montserrat", "", 9)
+	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "LOMAZZI MICHELE iscritto alla Sezione A del RUI con numero "+
 		"A000703480 in data 02.03.2022", "", "", false)
 	pdf.Ln(0.5)
 	drawPinkHorizontalLine(pdf, 0.1)
 	pdf.Ln(0.5)
-	pdf.SetFont("Montserrat", "", 6)
+	setBlackRegularFont(pdf, smallTextSize)
 	pdf.MultiCell(0, 3, "QUALIFICA", "", "", false)
 	pdf.Ln(1)
-	pdf.SetFont("Montserrat", "", 9)
+	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "Responsabile dell’attività di intermediazione assicurativa di Wopta "+
 		"Assicurazioni Srl, Società iscritta alla Sezione A del RUI con numero A000701923 in data "+
 		"14.02.2022", "", "", false)
 	pdf.Ln(0.5)
 	drawPinkHorizontalLine(pdf, 0.1)
 	pdf.Ln(0.5)
-	pdf.SetFont("Montserrat", "", 6)
+	setBlackRegularFont(pdf, smallTextSize)
 	pdf.MultiCell(0, 3, "SEDE LEGALE", "", "", false)
 	pdf.Ln(1)
-	pdf.SetFont("Montserrat", "", 9)
+	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "Galleria del Corso, 1 – 20122 MILANO (VI)", "", "", false)
 	pdf.Ln(0.5)
 	drawPinkHorizontalLine(pdf, 0.1)
 	pdf.Ln(0.5)
-	pdf.SetFont("Montserrat", "", 6)
+	setBlackRegularFont(pdf, smallTextSize)
 	pdf.Cell(50, 3, "RECAPITI TELEFONICI")
 	pdf.Cell(40, 3, "")
 	pdf.MultiCell(50, 3, "E-MAIL", "", "1", false)
 	pdf.Ln(1)
-	pdf.SetFont("Montserrat", "", 9)
+	setBlackRegularFont(pdf, standardTextSize)
 	pdf.Cell(50, 3, "02.91.24.03.46")
 	pdf.Cell(40, 3, "")
 	pdf.MultiCell(50, 3, "info@wopta.it", "", "1", false)
 	pdf.Ln(0.5)
 	drawPinkHorizontalLine(pdf, 0.1)
 	pdf.Ln(0.5)
-	pdf.SetFont("Montserrat", "", 6)
+	setBlackRegularFont(pdf, smallTextSize)
 	pdf.Cell(50, 3, "PEC ")
 	pdf.Cell(40, 3, "")
 	pdf.MultiCell(50, 3, "SITO INTERNET", "", "1", false)
 	pdf.Ln(1)
-	pdf.SetFont("Montserrat", "", 9)
+	setBlackRegularFont(pdf, standardTextSize)
 	pdf.Cell(50, 3, "woptaassicurazioni@legalmail.it")
 	pdf.Cell(40, 3, "")
 	pdf.MultiCell(50, 3, "wopta.it", "", "1", false)
 	pdf.Ln(0.5)
 	drawPinkHorizontalLine(pdf, 0.1)
 	pdf.Ln(0.5)
-	pdf.SetFont("Montserrat", "", 6)
+	setBlackRegularFont(pdf, smallTextSize)
 	pdf.MultiCell(0, 3, "AUTORITÀ COMPETENTE ALLA VIGILANZA DELL’ATTIVITÀ SVOLTA",
 		"", "", false)
 	pdf.Ln(1)
-	pdf.SetFont("Montserrat", "", 9)
+	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "IVASS – Istituto per la Vigilanza sulle Assicurazioni - Via del Quirinale, "+
 		"21 - 00187 Roma", "", "", false)
 	pdf.Ln(0.5)
@@ -1168,10 +1169,10 @@ func GetWoptaInfoTable(pdf *fpdf.Fpdf) {
 }
 
 func GetAllegato3Section(pdf *fpdf.Fpdf) {
-	pdf.SetFont("Montserrat", "B", 11)
+	setBlackBoldFont(pdf, titleTextSize)
 	pdf.MultiCell(0, 3, "ALLEGATO 3 - INFORMATIVA SUL DISTRIBUTORE", "", "CM", false)
 	pdf.Ln(3)
-	pdf.SetFont("Montserrat", "", 9)
+	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "Il distributore ha l’obbligo di consegnare/trasmettere al contraente il presente"+
 		" documento, prima della sottoscrizione della prima proposta o, qualora non prevista, del primo contratto di "+
 		"assicurazione, di metterlo a disposizione del pubblico nei propri locali, anche mediante apparecchiature "+
@@ -1182,7 +1183,7 @@ func GetAllegato3Section(pdf *fpdf.Fpdf) {
 		"successive modifiche di rilievo delle stesse.", "", "", false)
 	pdf.Ln(3)
 
-	pdf.SetFont("Montserrat", "B", 10)
+	setBlackBoldFont(pdf, titleTextSize)
 	pdf.MultiCell(0, 3, "SEZIONE I - Informazioni generali sull’intermediario che entra in contatto con "+
 		"il contraente", "", "", false)
 	pdf.Ln(1)
@@ -1195,7 +1196,7 @@ func GetAllegato3Section(pdf *fpdf.Fpdf) {
 		"operano per lo stesso possono essere verificati consultando il Registro Unico degli Intermediari assicurativi "+
 		"e riassicurativi sul sito internet dell’IVASS (www.ivass.it)", "", fpdf.AlignLeft, false)
 	pdf.Ln(3)
-	setBlackBoldFont(pdf, 10)
+	setBlackBoldFont(pdf, titleTextSize)
 	pdf.MultiCell(0, 3, "SEZIONE II - Informazioni sull’attività svolta dall’intermediario assicurativo ",
 		"", fpdf.AlignLeft, false)
 	pdf.Ln(1)
@@ -1209,7 +1210,7 @@ func GetAllegato3Section(pdf *fpdf.Fpdf) {
 		"precontrattuale si svolga mediante tecniche di comunicazione a distanza il contraente riceve l’elenco "+
 		"degli obblighi.", "", "", false)
 	pdf.Ln(3)
-	setBlackBoldFont(pdf, 10)
+	setBlackBoldFont(pdf, titleTextSize)
 	pdf.MultiCell(0, 3, "SEZIONE III - Informazioni relative a potenziali situazioni di conflitto "+
 		"d’interessi", "", "", false)
 	pdf.Ln(1)
@@ -1222,12 +1223,11 @@ func GetAllegato3Section(pdf *fpdf.Fpdf) {
 		"non sono detentrici di una partecipazione, diretta o indiretta, pari o superiore al 10% del capitale sociale "+
 		"o dei diritti di voto dell’Intermediario.", "", "", false)
 	pdf.Ln(3)
-	setBlackBoldFont(pdf, 10)
+	setBlackBoldFont(pdf, titleTextSize)
 	pdf.MultiCell(0, 3, "SEZIONE IV - Informazioni sugli strumenti di tutela del contraente",
 		"", "", false)
 	pdf.Ln(1)
 	setBlackRegularFont(pdf, standardTextSize)
-	pdf.SetFont("Montserrat", "", 9)
 	pdf.MultiCell(0, 3, "L’attività di distribuzione è garantita da un contratto di assicurazione della "+
 		"responsabilità civile che copre i danni arrecati ai contraenti da negligenze ed errori professionali "+
 		"dell’intermediario o da negligenze, errori professionali ed infedeltà dei dipendenti, dei collaboratori o "+
@@ -1248,11 +1248,11 @@ func GetAllegato3Section(pdf *fpdf.Fpdf) {
 }
 
 func GetAllegato4Section(pdf *fpdf.Fpdf) {
-	pdf.SetFont("Montserrat", "B", 11)
+	setBlackBoldFont(pdf, titleTextSize)
 	pdf.MultiCell(0, 3, "ALLEGATO 4 - INFORMAZIONI SULLA DISTRIBUZIONE\nDEL PRODOTTO ASSICURATIVO NON IBIP",
 		"", "CM", false)
 	pdf.Ln(3)
-	pdf.SetFont("Montserrat", "", 9)
+	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "Il distributore ha l’obbligo di consegnare o trasmettere al contraente, prima "+
 		"della sottoscrizione di ciascuna proposta o, qualora non prevista, di ciascun contratto assicurativo, il "+
 		"presente documento, che contiene notizie sul modello e l’attività di distribuzione, sulla consulenza fornita "+
@@ -1262,18 +1262,20 @@ func GetAllegato4Section(pdf *fpdf.Fpdf) {
 	GetWoptaInfoTable(pdf)
 	pdf.Ln(3)
 
-	pdf.SetFont("Montserrat", "B", 10)
-	pdf.MultiCell(0, 3, "SEZIONE I - Informazioni sul modello di distribuzione", "", "", false)
+	setBlackBoldFont(pdf, titleTextSize)
+	pdf.MultiCell(0, 3, "SEZIONE I - Informazioni sul modello di distribuzione", "",
+		"", false)
 	pdf.Ln(1)
-	pdf.SetFont("Montserrat", "", 9)
+	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "Secondo quanto indicato nel modulo di proposta/polizza e documentazione "+
 		"precontrattuale ricevuta, la distribuzione relativamente a questa proposta/contratto è svolta per conto "+
 		"della seguente impresa di assicurazione: AXA FRANCE VIE S.A.", "", "", false)
 	pdf.Ln(3)
-	pdf.SetFont("Montserrat", "B", 10)
-	pdf.MultiCell(0, 3, "SEZIONE II: Informazioni sull’attività di distribuzione e consulenza", "", "", false)
+	setBlackBoldFont(pdf, titleTextSize)
+	pdf.MultiCell(0, 3, "SEZIONE II: Informazioni sull’attività di distribuzione e consulenza",
+		"", "", false)
 	pdf.Ln(1)
-	pdf.SetFont("Montserrat", "", 9)
+	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "Nello svolgimento dell’attività di distribuzione, l’intermediario non presta "+
 		"attività di consulenza prima della conclusione del contratto né fornisce al contraente una raccomandazione "+
 		"personalizzata ai sensi dell’art. 119-ter, comma 3, del decreto legislativo n. 209/2005 "+
@@ -1283,10 +1285,10 @@ func GetAllegato4Section(pdf *fpdf.Fpdf) {
 		"contrattuali che impongano di offrire esclusivamente i contratti di una o più imprese di "+
 		"assicurazioni.", "", "", false)
 	pdf.Ln(3)
-	pdf.SetFont("Montserrat", "B", 10)
+	setBlackBoldFont(pdf, titleTextSize)
 	pdf.MultiCell(0, 3, "SEZIONE III - Informazioni relative alle remunerazioni", "", "", false)
 	pdf.Ln(1)
-	pdf.SetFont("Montserrat", "", 9)
+	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "Per il prodotto intermediato, è corrisposto all’intermediario, da parte "+
 		"dell’impresa di assicurazione, un compenso sotto forma di commissione inclusa nel premio "+
 		"assicurativo.", "", "", false)
@@ -1294,19 +1296,19 @@ func GetAllegato4Section(pdf *fpdf.Fpdf) {
 	pdf.MultiCell(0, 3, "L’informazione sopra resa riguarda i compensi complessivamente percepiti da tutti "+
 		"gli intermediari coinvolti nella distribuzione del prodotto.", "", "", false)
 	pdf.Ln(3)
-	pdf.SetFont("Montserrat", "B", 10)
+	setBlackBoldFont(pdf, titleTextSize)
 	pdf.MultiCell(0, 3, "SEZIONE IV – Informazioni sul pagamento dei premi", "", "", false)
 	pdf.Ln(1)
-	pdf.SetFont("Montserrat", "", 9)
+	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "Relativamente a questo contratto i premi pagati dal Contraente "+
 		"all’intermediario e le somme destinate ai risarcimenti o ai pagamenti dovuti dalle Imprese di Assicurazione, "+
 		"se regolati per il tramite dell’intermediario costituiscono patrimonio autonomo e separato dal patrimonio "+
 		"dello stesso.", "", "", false)
 	pdf.Ln(3)
-	pdf.SetFont("Montserrat", "B", 10)
+	setBlackBoldFont(pdf, titleTextSize)
 	pdf.MultiCell(0, 3, "Indicare le modalità di pagamento ammesse ", "", "", false)
 	pdf.Ln(1)
-	pdf.SetFont("Montserrat", "", 9)
+	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "Sono consentiti, nei confronti di Wopta, esclusivamente bonifico e strumenti di "+
 		"pagamento elettronico, quali ad esempio, carte di credito e/o carte di debito, incluse le carte "+
 		"prepagate.", "", "", false)
@@ -1314,11 +1316,11 @@ func GetAllegato4Section(pdf *fpdf.Fpdf) {
 }
 
 func GetAllegato4TerSection(pdf *fpdf.Fpdf) {
-	pdf.SetFont("Montserrat", "B", 11)
+	setBlackBoldFont(pdf, titleTextSize)
 	pdf.MultiCell(0, 3, "ALLEGATO 4 TER - ELENCO DELLE REGOLE DI COMPORTAMENTO DEL DISTRIBUTORE",
 		"", "", false)
 	pdf.Ln(3)
-	pdf.SetFont("Montserrat", "", 9)
+	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "Il distributore ha l’obbligo di mettere a disposizione del pubblico il "+
 		"presente documento nei propri locali, anche mediante apparecchiature tecnologiche, oppure pubblicarlo su "+
 		"un sito internet ove utilizzato per la promozione e il collocamento di prodotti assicurativi, dando avviso "+
@@ -1327,75 +1329,15 @@ func GetAllegato4TerSection(pdf *fpdf.Fpdf) {
 		"trasmette al contraente il presente documento prima della sottoscrizione della proposta o, qualora non "+
 		"prevista, del contratto di assicurazione.", "", "", false)
 	pdf.Ln(1)
-	drawPinkHorizontalLine(pdf, 0.1)
-	pdf.Ln(0.5)
-	pdf.SetFont("Montserrat", "", 6)
-	pdf.MultiCell(0, 3, "DATI DELLA PERSONA FISICA CHE ENTRA IN CONTATTO CON IL "+
-		"CONTRAENTE", "", "", false)
-	pdf.Ln(1)
-	pdf.SetFont("Montserrat", "", 9)
-	pdf.MultiCell(0, 3, "LOMAZZI MICHELE iscritto alla Sezione A del RUI con numero "+
-		"A000703480 in data 02.03.2022", "", "", false)
-	pdf.Ln(0.5)
-	drawPinkHorizontalLine(pdf, 0.1)
-	pdf.Ln(0.5)
-	pdf.SetFont("Montserrat", "", 6)
-	pdf.MultiCell(0, 3, "QUALIFICA", "", "", false)
-	pdf.Ln(1)
-	pdf.SetFont("Montserrat", "", 9)
-	pdf.MultiCell(0, 3, "Responsabile dell’attività di intermediazione assicurativa di Wopta "+
-		"Assicurazioni Srl, Società iscritta alla Sezione A del RUI con numero A000701923 in data "+
-		"14.02.2022", "", "", false)
-	pdf.Ln(0.5)
-	drawPinkHorizontalLine(pdf, 0.1)
-	pdf.Ln(0.5)
-	pdf.SetFont("Montserrat", "", 6)
-	pdf.MultiCell(0, 3, "SEDE LEGALE", "", "", false)
-	pdf.Ln(1)
-	pdf.SetFont("Montserrat", "", 9)
-	pdf.MultiCell(0, 3, "Galleria del Corso, 1 – 20122 MILANO (VI)", "", "", false)
-	pdf.Ln(0.5)
-	drawPinkHorizontalLine(pdf, 0.1)
-	pdf.Ln(0.5)
-	pdf.SetFont("Montserrat", "", 6)
-	pdf.Cell(50, 3, "RECAPITI TELEFONICI")
-	pdf.Cell(40, 3, "")
-	pdf.MultiCell(50, 3, "E-MAIL", "", "1", false)
-	pdf.Ln(1)
-	pdf.SetFont("Montserrat", "", 9)
-	pdf.Cell(50, 3, "02.91.24.03.46")
-	pdf.Cell(40, 3, "")
-	pdf.MultiCell(50, 3, "info@wopta.it", "", "1", false)
-	pdf.Ln(0.5)
-	drawPinkHorizontalLine(pdf, 0.1)
-	pdf.Ln(0.5)
-	pdf.SetFont("Montserrat", "", 6)
-	pdf.Cell(50, 3, "PEC ")
-	pdf.Cell(40, 3, "")
-	pdf.MultiCell(50, 3, "SITO INTERNET", "", "1", false)
-	pdf.Ln(1)
-	pdf.SetFont("Montserrat", "", 9)
-	pdf.Cell(50, 3, "woptaassicurazioni@legalmail.it")
-	pdf.Cell(40, 3, "")
-	pdf.MultiCell(50, 3, "wopta.it", "", "1", false)
-	pdf.Ln(0.5)
-	drawPinkHorizontalLine(pdf, 0.1)
-	pdf.Ln(0.5)
-	pdf.SetFont("Montserrat", "", 6)
-	pdf.MultiCell(0, 3, "AUTORITÀ COMPETENTE ALLA VIGILANZA DELL’ATTIVITÀ SVOLTA",
-		"", "", false)
-	pdf.Ln(1)
-	pdf.SetFont("Montserrat", "", 9)
-	pdf.MultiCell(0, 3, "IVASS – Istituto per la Vigilanza sulle Assicurazioni - Via del Quirinale, "+
-		"21 - 00187 Roma", "", "", false)
-	pdf.Ln(0.5)
-	drawPinkHorizontalLine(pdf, 0.1)
+
+	GetWoptaInfoTable(pdf)
 	pdf.Ln(3)
-	pdf.SetFont("Montserrat", "B", 10)
+
+	setBlackBoldFont(pdf, titleTextSize)
 	pdf.MultiCell(0, 3, "Sezione I - Regole generali per la distribuzione di prodotti assicurativi",
 		"", "", false)
 	pdf.Ln(1)
-	pdf.SetFont("Montserrat", "", 9)
+	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "a. obbligo di consegna al contraente dell’allegato 3 al Regolamento IVASS "+
 		"n. 40 del 2 agosto 2018, prima della sottoscrizione della prima proposta o, qualora non prevista, del primo "+
 		"contratto di assicurazione, di metterlo a disposizione del pubblico nei locali del distributore, anche "+
@@ -1422,34 +1364,34 @@ func GetAllegato4TerSection(pdf *fpdf.Fpdf) {
 }
 
 func GetWoptaPrivacySection(pdf *fpdf.Fpdf) {
-	pdf.SetFont("Montserrat", "B", 11)
+	setBlackBoldFont(pdf, titleTextSize)
 	pdf.MultiCell(0, 3, "COME RISPETTIAMO LA TUA PRIVACY", "", "CM", false)
 	pdf.Ln(3)
-	pdf.SetFont("Montserrat", "", 9)
+	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "Informativa sul trattamento dei dati personali", "", "", false)
 	pdf.Ln(1)
-	pdf.SetFont("Montserrat", "B", 9)
+	setBlackBoldFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "Ai sensi del REGOLAMENTO (UE) 2016/679 "+
 		"(relativo alla protezione delle persone fisiche con riguardo al trattamento dei dati personali, nonché alla "+
 		"libera circolazione di tali dati) si informa l’ “Interessato” (contraente / aderente alla polizza collettiva o "+
 		"convenzione / assicurato / beneficiario / loro aventi causa) di quanto segue.", "", "", false)
 	pdf.Ln(3)
-	pdf.SetFont("Montserrat", "B", 10)
+	setBlackBoldFont(pdf, titleTextSize)
 	pdf.MultiCell(0, 3, "1. TITOLARE DEL TRATTAMENTO", "", "", false)
 	pdf.Ln(1)
-	pdf.SetFont("Montserrat", "", 9)
+	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "Titolare del trattamento è Wopta Assicurazioni, con sede legale in Milano, "+
 		"Galleria del Corso, 1 (di seguito “Titolare”), raggiungibile all’indirizzo e-mail: "+
 		"privacy@wopta.it", "", "", false)
 	pdf.Ln(3)
-	pdf.SetFont("Montserrat", "B", 10)
+	setBlackBoldFont(pdf, titleTextSize)
 	pdf.MultiCell(0, 3, "2. I DATI PERSONALI OGGETTO DI TRATTAMENTO, FINALITÀ E BASE "+
 		"GIURIDICA", "", "", false)
 	pdf.Ln(1)
-	pdf.SetFont("Montserrat", "B", 9)
+	setBlackBoldFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "a) Finalità Contrattuali, normative, amministrative e giudiziali", "", "", false)
 	pdf.Ln(1)
-	pdf.SetFont("Montserrat", "", 9)
+	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "Fermo restando quanto previsto dalla Privacy & Cookie Policy del Sito, ove "+
 		"applicabile, i dati così conferiti potranno essere trattati, anche con strumenti elettronici, da parte del "+
 		"Titolare per eseguire le prestazioni contrattuali, in qualità di intermediario, richieste dall’interessato, "+
@@ -1465,10 +1407,10 @@ func GetWoptaPrivacySection(pdf *fpdf.Fpdf) {
 		"mancato conferimento comporterebbe l'impossibilità per l’intermediario di eseguire le proprie obbligazioni "+
 		"contrattuali.", "", "", false)
 	pdf.Ln(1)
-	pdf.SetFont("Montserrat", "B", 9)
+	setBlackBoldFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "b) Finalità commerciali", "", "", false)
 	pdf.Ln(1)
-	pdf.SetFont("Montserrat", "", 9)
+	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "Inoltre, i Suoi dati personali potranno essere trattati al fine di inviarLe "+
 		"comunicazioni e proposte commerciali, incluso l’invio di newsletter e ricerche di mercato, attraverso "+
 		"strumenti automatizzati (sms, mms, email, messaggistica istantanea e chat) e non (posta cartacea, telefono); "+
@@ -1490,10 +1432,10 @@ func GetWoptaPrivacySection(pdf *fpdf.Fpdf) {
 		"finalità di marketing, potrà in qualunque momento farlo contattando il Titolare ai recapiti indicati nella "+
 		"sezione \"Contatti\" di questa informativa.", "", "", false)
 	pdf.Ln(3)
-	pdf.SetFont("Montserrat", "B", 11)
+	setBlackBoldFont(pdf, titleTextSize)
 	pdf.MultiCell(0, 3, "3. DESTINATARI DEI DATI PERSONALI", "", "", false)
 	pdf.Ln(1)
-	pdf.SetFont("Montserrat", "", 9)
+	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "I Suoi dati personali potranno essere condivisi, per le finalità di cui alla "+
 		"sezione 2 della presente Policy, con:", "", "", false)
 	pdf.Ln(1)
@@ -1523,10 +1465,10 @@ func GetWoptaPrivacySection(pdf *fpdf.Fpdf) {
 		"L'elenco completo dei responsabili del trattamento è disponibile inviando una richiesta scritta al Titolare "+
 		"ai recapiti indicati nella sezione \"Contatti\" di questa informativa.", "", "", false)
 	pdf.Ln(3)
-	pdf.SetFont("Montserrat", "B", 11)
+	setBlackBoldFont(pdf, titleTextSize)
 	pdf.MultiCell(0, 3, "4. TRASFERIMENTI DEI DATI PERSONALI", "", "", false)
 	pdf.Ln(1)
-	pdf.SetFont("Montserrat", "", 9)
+	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "Alcuni dei Suoi dati personali sono condivisi con Destinatari che si potrebbero "+
 		"trovare al di fuori dello Spazio Economico Europeo. Il Titolare assicura che il trattamento Suoi dati "+
 		"personali da parte di questi Destinatari avviene nel rispetto degli artt. 44 - 49 del Regolamento. Invero, "+
@@ -1540,11 +1482,11 @@ func GetWoptaPrivacySection(pdf *fpdf.Fpdf) {
 	pdf.MultiCell(0, 3, "Maggiori informazioni sono disponibili inviando una richiesta scritta al "+
 		"Titolare ai recapiti indicati nella sezione \"Contatti\" di questa informativa.",
 		"", "", false)
-	pdf.SetFont("Montserrat", "B", 11)
+	setBlackBoldFont(pdf, titleTextSize)
 	pdf.AddPage()
 	pdf.MultiCell(0, 3, "5. CONSERVAZIONE DEI DATI PERSONALI", "", "", false)
 	pdf.Ln(1)
-	pdf.SetFont("Montserrat", "", 9)
+	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "I Suoi dati personali saranno inseriti e conservati, in conformità ai principi "+
 		"di minimizzazione e limitazione della conservazione di cui all’art. 5.1.c) ed e) del Regolamento, nei "+
 		"sistemi informativi del Titolare, i cui server sono situati all’interno dello Spazio Economico Europeo.",
@@ -1572,10 +1514,10 @@ func GetWoptaPrivacySection(pdf *fpdf.Fpdf) {
 		"Titolare ai recapiti indicati nella sezione \"Contatti\" di questa informativa. ",
 		"", "", false)
 	pdf.Ln(3)
-	pdf.SetFont("Montserrat", "B", 11)
+	setBlackBoldFont(pdf, titleTextSize)
 	pdf.MultiCell(0, 3, "6. DIRITTI DELL’INTERESSATO", "", "", false)
 	pdf.Ln(1)
-	pdf.SetFont("Montserrat", "", 9)
+	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "Lei ha il diritto di accedere in qualunque momento ai Dati Personali che La "+
 		"riguardano, ai sensi degli artt. 15-22 del Regolamento. In particolare, potrà chiedere la rettifica "+
 		"(ex art. 16), la cancellazione (ex art. 17), la limitazione (ex art. 18) e la portabilità dei dati "+
@@ -1600,18 +1542,30 @@ func GetWoptaPrivacySection(pdf *fpdf.Fpdf) {
 		"Privacy, come previsto dall'art. 77 del GDPR stesso, o di adire le opportune sedi giudiziarie "+
 		"(art. 79 del GDPR).", "", "", false)
 	pdf.Ln(3)
-	pdf.SetFont("Montserrat", "B", 11)
+	setBlackBoldFont(pdf, titleTextSize)
 	pdf.MultiCell(0, 3, "7. CONTATTI", "", "", false)
 	pdf.Ln(1)
-	pdf.SetFont("Montserrat", "", 9)
+	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "Per esercitare i diritti di cui sopra o per qualunque altra richiesta può "+
 		"scrivere al Titolare del trattamento all’indirizzo: privacy@wopta.it.", "", "", false)
 	pdf.Ln(3)
 }
 
 func GetPersonalDataHandlingSection(pdf *fpdf.Fpdf, policy models.Policy) {
-	pdf.SetTextColor(229, 0, 117)
-	pdf.SetFont("Montserrat", "B", 10)
+	consentText := "X"
+	notConsentText := ""
+
+	if policy.Contractor.Consens != nil {
+		consent, err := extractConsens(*policy.Contractor.Consens, 1)
+		lib.CheckError(err)
+
+		if !consent.Answer {
+			consentText = ""
+			notConsentText = "X"
+		}
+	}
+
+	setPinkBoldFont(pdf, titleTextSize)
 	pdf.MultiCell(0, 3, "Consenso per finalità commerciali.", "", "", false)
 	pdf.Ln(1)
 	setBlackRegularFont(pdf, standardTextSize)
@@ -1620,10 +1574,10 @@ func GetPersonalDataHandlingSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	pdf.Ln(1)
 	setBlackDrawColor(pdf)
 	pdf.Cell(5, 3, "")
-	pdf.CellFormat(3, 3, "X", "1", 0, "CM", false, 0, "")
+	pdf.CellFormat(3, 3, consentText, "1", 0, "CM", false, 0, "")
 	pdf.CellFormat(20, 3, "ACCONSENTE", "", 0, "", false, 0, "")
 	pdf.Cell(20, 3, "")
-	pdf.CellFormat(3, 3, "", "1", 0, "CM", false, 0, "")
+	pdf.CellFormat(3, 3, notConsentText, "1", 0, "CM", false, 0, "")
 	pdf.CellFormat(20, 3, "NON ACCONSENTE", "", 1, "", false, 0, "")
 	pdf.Ln(1)
 	pdf.MultiCell(0, 3, "al trattamento dei propri dati personali da parte di Wopta Assicurazioni per "+
@@ -1631,6 +1585,6 @@ func GetPersonalDataHandlingSection(pdf *fpdf.Fpdf, policy models.Policy) {
 		"mercato, attraverso strumenti automatizzati (sms, mms, e-mail, ecc.) e non (posta cartacea e telefono "+
 		"con operatore).", "", "", false)
 	pdf.Ln(3)
-	pdf.Cell(0, 3, policy.EmitDate.Format(layout))
+	pdf.Cell(0, 3, policy.EmitDate.Format(dateLayout))
 	drawSignatureForm(pdf)
 }
