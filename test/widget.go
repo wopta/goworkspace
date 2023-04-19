@@ -825,6 +825,12 @@ func GetAxaDeclarationsConsentSection(pdf *fpdf.Fpdf, policy models.Policy) {
 
 func GetAxaTableSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	contractor := policy.Contractor
+	domicileCity := ""
+	domicileAddress := ""
+	if contractor.Domicile != nil {
+		domicileCity = strings.ToUpper(contractor.Domicile.City + " (" + contractor.Domicile.CityCode + ")")
+		domicileAddress = strings.ToUpper(contractor.Domicile.StreetName + " " + contractor.Domicile.StreetNumber)
+	}
 
 	birthDate, err := time.Parse(time.RFC3339, contractor.BirthDate)
 	lib.CheckError(err)
@@ -857,8 +863,9 @@ func GetAxaTableSection(pdf *fpdf.Fpdf, policy models.Policy) {
 		"finalità di assolvimento degli obblighi previsti dalla normativa antiriciclaggio e, pertanto, tale "+
 		"trattamento non richiede il consenso dell’interessato.", "LR", "", false)
 	pdf.MultiCell(0, 3, "", "LR", "", false)
-	pdf.MultiCell(0, 3, "Io sottoscritto DALLA VALLE FABRIZIO (Contraente/Assicurato), letta l’Avvertenza "+
-		"Preliminare di cui sopra e l’Informativa sui Riferimenti Normativi Antiriciclaggio (in calce al presente "+
+	pdf.MultiCell(0, 3, "Io sottoscritto "+strings.ToUpper(contractor.Surname+" "+contractor.Name)+
+		" (Contraente/Assicurato), letta l’Avvertenza Preliminare di cui sopra e l’Informativa sui Riferimenti Normativi"+
+		" Antiriciclaggio (in calce al presente "+
 		"modulo), al fine di permettere all’Intermediario di assolvere agli obblighi di adeguata verifica di cui al "+
 		"D.Lgs. n. 231/2007 in materia di prevenzione dei fenomeni di riciclaggio e di finanziamento del terrorismo, "+
 		"in relazione all’instaurazione del rapporto assicurativo di cui al contratto di assicurazione “Wopta per te. "+
@@ -906,15 +913,15 @@ func GetAxaTableSection(pdf *fpdf.Fpdf, policy models.Policy) {
 		contractor.StreetNumber), "TLR", 0, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 0, "", false, 0, "")
-	pdf.CellFormat(180, 4, "Comune di domicilio (se diverso dalla residenza):", "TLR", 0,
-		"", false, 0, "")
+	pdf.CellFormat(180, 4, "Comune di domicilio (se diverso dalla residenza): "+domicileCity,
+		"TLR", 0, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 0, "", false, 0, "")
-	pdf.CellFormat(180, 4, "Indirizzo di domicilio (se diverso dalla residenza):", "LR", 0,
-		"", false, 0, "")
+	pdf.CellFormat(180, 4, "Indirizzo di domicilio (se diverso dalla residenza): "+domicileAddress,
+		"LR", 0, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 0, "", false, 0, "")
-	pdf.CellFormat(180, 4, "Status occupazinale: "+contractor.WorkType, "TLR", 0, "",
+	pdf.CellFormat(180, 4, "Status occupazionale: "+contractor.WorkType, "TLR", 0, "",
 		false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 0, "", false, 0, "")
