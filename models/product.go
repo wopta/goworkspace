@@ -47,6 +47,7 @@ type Company struct {
 	MinimumYearlyPrice  float64              `firestore:"minimumYearlyPrice,omitempty" json:"minimumYearlyPrice,omitempty"`
 	Guarantees          *[]Guarante          `firestore:"guarantees,omitempty" json:"guarantees,omitempty"`
 	GuaranteesMap       map[string]*Guarante `firestore:"guaranteesMap,omitempty" json:"guaranteesMap,omitempty"`
+	InformationSetLink  string               `firestore:"informationSetLink,omitempty" json:"informationSetLink,omitempty"`
 }
 type Step struct {
 	Widget     string      `firestore:"widget,omitempty" json:"widget"`
