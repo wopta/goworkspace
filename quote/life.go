@@ -81,12 +81,12 @@ func Life(data models.Policy) (models.Policy, error) {
 
 	roundOfferPrices(data.OffersPrices)
 
-	addDefaultGuarantees(data)
+	//addDefaultGuarantees(data)
 
 	return data, err
 }
 
-func addDefaultGuarantees(data models.Policy) {
+/*func addDefaultGuarantees(data models.Policy) {
 	product, err := prd.GetProduct("life", "v1")
 	lib.CheckError(err)
 
@@ -98,7 +98,7 @@ func addDefaultGuarantees(data models.Policy) {
 			data.Assets[0].Guarantees = append(data.Assets[0].Guarantees, *guarantee)
 		}
 	}
-}
+}*/
 
 func calculateGuaranteeDuration(assets []models.Asset, deathDuration int) {
 	for assetIndex, asset := range assets {
