@@ -94,6 +94,7 @@ func addDefaultGuarantees(data models.Policy) {
 		_, err = extractGuarantee(data.Assets[0].Guarantees, guarantee.Slug)
 		if err != nil {
 			guarantee.IsSellable = false
+			guarantee.Value = guarantee.Offer["default"]
 			data.Assets[0].Guarantees = append(data.Assets[0].Guarantees, *guarantee)
 		}
 	}
