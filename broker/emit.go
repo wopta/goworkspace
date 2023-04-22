@@ -56,7 +56,7 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 		policy.Statements = result.Statements
 	}
 
-	company, numb, tot := GetSequenceByCompany(policy.Company)
+	company, numb, tot := GetSequenceByCompany(policy.Company, firePolicy)
 	log.Println("Emit code "+uid+" ", company)
 	log.Println("Emit code "+uid+" ", numb)
 	log.Println("Emit code "+uid+" ", tot)

@@ -62,7 +62,7 @@ type BrokerResponse struct {
 	Bytes         string `json:"bytes"`
 }
 
-func GetSequenceByCompany(name string) (string, int, int) {
+func GetSequenceByCompany(name string, firePolicy string) (string, int, int) {
 	var (
 		codeCompany         string
 		companyDefault      int
@@ -82,7 +82,7 @@ func GetSequenceByCompany(name string) (string, int, int) {
 		companyPrefixLenght = "%07d"
 	}
 
-	rn, e := lib.OrderWhereLimitFirestoreErr("policy", "company", "numberCompany", "==", name, firestore.Desc, 1)
+	rn, e := lib.OrderWhereLimitFirestoreErr(firePolicy, "company", "numberCompany", "==", name, firestore.Desc, 1)
 	lib.CheckError(e)
 	policy := models.PolicyToListData(rn)
 
@@ -96,7 +96,7 @@ func GetSequenceByCompany(name string) (string, int, int) {
 		codeCompany = companyPrefix + fmt.Sprintf(companyPrefixLenght, numberCompany)
 		number = policy[0].Number + 1
 	}
-	r, e := lib.OrderLimitFirestoreErr("policy", "number", firestore.Desc, 1)
+	r, e := lib.OrderLimitFirestoreErr(firePolicy, "number", firestore.Desc, 1)
 	lib.CheckError(e)
 	policyCompany := models.PolicyToListData(r)
 	if len(policyCompany) == 0 {
@@ -109,9 +109,9 @@ func GetSequenceByCompany(name string) (string, int, int) {
 
 	return codeCompany, numberCompany, number
 }
-func GetSequenceProposal(name string) int {
+func GetSequenceProposal(name string, firePolicy string) int {
 	var number int
-	r, e := lib.OrderLimitFirestoreErr("policy", "proposalNumber", firestore.Desc, 1)
+	r, e := lib.OrderLimitFirestoreErr(firePolicy, "proposalNumber", firestore.Desc, 1)
 	lib.CheckError(e)
 	policyCompany := models.PolicyToListData(r)
 	if len(policyCompany) == 0 {

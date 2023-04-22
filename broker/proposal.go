@@ -28,7 +28,7 @@ func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	policy.CreationDate = time.Now()
 	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusInitLead)
 	policy.Status = models.PolicyStatusInitLead
-	numb := GetSequenceProposal("")
+	numb := GetSequenceProposal("", policyFire)
 	policy.ProposalNumber = numb
 	policy.IsSign = false
 	policy.IsPay = false
