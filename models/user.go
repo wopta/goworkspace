@@ -35,6 +35,7 @@ type User struct {
 	Location       Location      `firestore:"location" json:"location,omitempty" bigquery:"-"`
 	Geo            latlng.LatLng `firestore:"geo" json:"-" bigquery:"-"`
 	Name           string        `firestore:"name" json:"name,omitempty" bigquery:"name"`
+	Gender         string        `firestore:"gender" json:"gender,omitempty" bigquery:"gender"`
 	Type           string        `firestore:"type" json:"type,omitempty" bigquery:"type"`
 	Cluster        string        `firestore:"cluster" json:"cluster,omitempty" bigquery:"cluster"`
 	Surname        string        `firestore:"surname" json:"surname,omitempty" bigquery:"surname"`

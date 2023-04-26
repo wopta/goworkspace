@@ -36,6 +36,7 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 			ext := strings.Split(fabrickCallback.ExternalID, "_")
 			uid = ext[0]
 			schedule = ext[1]
+			origin = ext[2]
 		}
 
 		log.Println(uid)
@@ -149,35 +150,4 @@ type Transaction struct {
 	AcquirerID          interface{} `json:"acquirerId"`
 	Status              *string     `json:"status,omitempty"`
 	PaymentMethod       *string     `json:"paymentMethod,omitempty"`
-}
-
-func getPayMailObj(policy models.Policy, payUrl string, namefile string, at string) mail.MailRequest {
-
-	var name string
-	//var linkForm string
-	if policy.Name == "pmi" {
-		name = "Artigiani & Imprese"
-		//linkForm = "https://www.wopta.it/it/multi-rischio/"
-	}
-	var obj mail.MailRequest
-	log.Println(policy.Contractor.Mail)
-	obj.From = "noreply@wopta.it"
-	obj.To = []string{policy.Contractor.Mail}
-	obj.Message = `<p>Gentile ` + policy.Contractor.Name + ` ` + policy.Contractor.Surname + ` </p>
-
-	<p>in allegato trovi i documenti da te firmati tramite l’utilizzo della Firma Elettronica Avanzata e l’intera documentazione relativa alla polizza in oggetto</p> 
-	
-	<p>A seguito.</p>
-	<p>Grazie per aver scelto Wopta </p> 
-	<p>Proteggiamo chi sei</p>`
-	obj.Subject = "Wopta per te. " + name + " paga la tua polizza n° " + policy.CodeCompany
-	obj.IsHtml = true
-	obj.IsAttachment = true
-	obj.Attachments = &[]mail.Attachment{{
-		Byte:        at,
-		ContentType: "application/pdf",
-		Name:        namefile,
-	}}
-
-	return obj
 }

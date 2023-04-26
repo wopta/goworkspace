@@ -40,37 +40,37 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 
 	for _, policy := range policies {
 		var (
-			result         [][]string
-			enterpriseName string
-			employer       string
-			revenue        string
+			result [][]string
+			//enterpriseName string
+			//employer       string
+			//revenue        string
 		)
 
-		startDate := lib.Dateformat(policy.StartDate)
-		endDate := lib.Dateformat(policy.EndDate)
-		crationDate := lib.Dateformat(policy.CreationDate)
-		companyCode := policy.CodeCompany
-		cityCode := policy.Contractor.CityCode
-		city := policy.Contractor.City
-		streetNumber := policy.Contractor.StreetNumber
-		postalCode := policy.Contractor.PostalCode
-		pi := policy.Contractor.VatCode
-		fc := policy.Contractor.FiscalCode
+		//startDate := lib.Dateformat(policy.StartDate)
+		//endDate := lib.Dateformat(policy.EndDate)
+		//crationDate := lib.Dateformat(policy.CreationDate)
+		//companyCode := policy.CodeCompany
+		//cityCode := policy.Contractor.CityCode
+		//city := policy.Contractor.City
+		//streetNumber := policy.Contractor.StreetNumber
+		//postalCode := policy.Contractor.PostalCode
+		//pi := policy.Contractor.VatCode
+		//fc := policy.Contractor.FiscalCode
 		for _, asset := range policy.Assets {
 			if asset.Building != nil {
 
 			}
 			if asset.Enterprise != nil {
-				enterpriseName = asset.Enterprise.Name
-				employer = fmt.Sprint(asset.Enterprise.Employer)
-				revenue = fmt.Sprint(asset.Enterprise.Revenue)
+				//enterpriseName = asset.Enterprise.Name
+				//employer = fmt.Sprint(asset.Enterprise.Employer)
+				//revenue = fmt.Sprint(asset.Enterprise.Revenue)
 			}
 		}
 		for _, asset := range policy.Assets {
 
 			if asset.Building != nil {
 				for _, g := range asset.Guarantees {
-
+					fmt.Println(g)
 					row := []string{
 						"Codice schema",                                //Codice schema
 						"N° adesione individuale univoco",              //N° adesione individuale univoco

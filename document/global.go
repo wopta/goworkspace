@@ -60,9 +60,9 @@ func (skin Skin) GlobalContract(m pdf.Maroto, data models.Policy) {
 
 		skin.Stantement(m, A.Title, A)
 		if i == 2 {
-			skin.SignDouleLine(m, data.Contractor.Name+" "+nameSign, "Global Assistance", strconv.Itoa(i+1), true)
+			skin.SignDouleLine(m, nameSign, "Global Assistance", strconv.Itoa(i+1), true)
 		} else {
-			skin.Sign(m, data.Contractor.Name+" "+nameSign, "Assicurato ", strconv.Itoa(i+1), true)
+			skin.Sign(m, nameSign, "Assicurato ", strconv.Itoa(i+1), true)
 		}
 		skin.checkPage(m)
 		m = skin.Space(m, 5.0)
@@ -104,7 +104,19 @@ Costituisce quietanza di pagamento la mail di conferma che Wopta invierà al Con
 	}, {Key: "Global Assistance Compagnia di assicurazioni e riassicurazioni S.p.A. a Socio Unico",
 		Value: "Global Assistance Compagnia di assicurazioni e riassicurazioni S.p.A. a Socio Unico - Capitale Sociale: Euro 5.000.000 i.v. Codice Fiscale, Partita IVA e Registro Imprese di Milano n. 10086540159 R.E.A. n. 1345012 della C.C.I.A.A. di Milano. Sede e Direzione Generale Piazza Diaz 6 – 20123 Milano – Italia E-mail: global.assistance@globalassistance.it PEC: globalassistancespa@legalmail.it. Società soggetta all’attività di direzione e coordinamento di Ri-Fin S.r.l., iscritta all’Albo dei gruppi assicurativi presso l’Ivass al n. 014. La Società è autorizzata all’esercizio delle Assicurazioni e Riassicurazioni con D.M. del 2/8/93 n. 19619 (G.U. 7/8/93 n. 184) e successive autorizzazioni ed è iscritta all’Albo Imprese presso l’IVASS al n. 1.00111. La Società è soggetta alla vigilanza dell’IVASS; è possibile verificare la veridicità e la regolarità delle autorizzazioni mediante l'accesso al sito www.ivass.it"}}
 	m = skin.AboutUs(m, "Chi siamo ", aboutUs)
+	var consens string
+	consens = "NON ACCONSENTO"
+	if (*data.Contractor.Consens)[0].Answer {
 
+		consens = "ACCONSENTO"
+	}
+	body = `Consenso per finalità commerciali. 
+Il sottoscritto, letta e compresa l’informativa sul trattamento dei dati personali ` + consens + ` al trattamento dei propri dati personali da parte di Wopta Assicurazioni per l’invio di comunicazioni e proposte 
+commerciali e di marketing, incluso l’invio di newsletter e ricerche di mercato, attraverso strumenti automatizzati 
+(sms, mms, e-mail, ecc.) e non (posta cartacea e telefono con operatore)`
+	m = skin.Space(m, 5.0)
+	m = skin.Title(m, "Consenso per finalità commerciali. ", body, 10.0)
+	skin.Sign(m, nameSign, "Assicurato ", "100", true)
 	skin.Space(m, 5.0)
 	m.RegisterHeader(func() {
 		m.Row(15.0, func() {
@@ -126,7 +138,7 @@ Costituisce quietanza di pagamento la mail di conferma che Wopta invierà al Con
 	m = skin.Space(m, 5.0)
 	skin.TitleBlack(m, "DICHIARAZIONI E CONSENSI", "Io Sottoscritto, dichiaro di avere perso visione dell’Informativa Privacy ai sensi dell’art. 13 del GDPR (informativa resa all’interno del set documentale contenente anche la Documentazione Informativa Precontrattuale, il Glossario e le Condizioni di Assicurazione) e di averne compreso i contenuti:", 14.0)
 	m = skin.Space(m, 5.0)
-	m = skin.Sign(m, data.Contractor.Name+" "+nameSign, "Assicurato ", "100", true)
+	m = skin.Sign(m, nameSign, "Assicurato ", "101", true)
 	m = skin.Space(m, 5.0)
 	m.Row(skin.RowHeight*2, func() {
 		m.Col(12, func() {
@@ -150,7 +162,7 @@ Costituisce quietanza di pagamento la mail di conferma che Wopta invierà al Con
 
 	})
 	m = skin.Space(m, 5.0)
-	m = skin.Sign(m, data.Contractor.Name+" "+nameSign, "Assicurato ", "101", true)
+	m = skin.Sign(m, nameSign, "Assicurato ", "101", true)
 	m.RegisterFooter(func() {
 		topv := 10.0
 		t := props.Text{

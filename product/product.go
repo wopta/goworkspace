@@ -142,6 +142,7 @@ func PutFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	p, e := Put(pr)
 	return "{}", p, e
 }
+
 func Put(p models.Product) (models.Product, error) {
 
 	r, _, e := lib.PutFirestoreErr("products", p)
