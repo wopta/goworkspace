@@ -26,7 +26,7 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println(r.Header.Get("origin"))
 
 	firePolicy = lib.GetDatasetByEnv(r.Header.Get("origin"), "policy")
-
+	guaranteFire := lib.GetDatasetByEnv(r.Header.Get("origin"), "guarante")
 	request := lib.ErrorByte(ioutil.ReadAll(r.Body))
 	log.Println("Emit", string(request))
 	json.Unmarshal([]byte(request), &result)
@@ -83,6 +83,7 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println("Emit policy "+uid, string(policyJson))
 	lib.SetFirestore(firePolicy, uid, policy)
 	policy.BigquerySave(r.Header.Get("origin"))
+	models.SetGuaranteBigquery(policy, "emit", guaranteFire)
 	mail.SendMailSign(policy)
 	b, e := json.Marshal(responseEmit)
 	return string(b), responseEmit, e

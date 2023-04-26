@@ -30,6 +30,11 @@ func Callback(w http.ResponseWriter, r *http.Request) {
 				Handler: PmiGlobalEmit,
 				Method:  http.MethodPost,
 			},
+			{
+				Route:   "/v1/emit",
+				Handler: Emit,
+				Method:  http.MethodPost,
+			},
 		},
 	}
 	route.Router(w, r)
