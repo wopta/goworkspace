@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
@@ -128,7 +129,7 @@ func GetName(name string, version string) (models.Product, error) {
 }
 
 func GetProduct(name string, version string) (models.Product, error) {
-	jsonFile := lib.GetFilesByEnv("products/" + name + version + ".json")
+	jsonFile := lib.GetFilesByEnv("products/" + name + strings.ToUpper(version) + ".json")
 	var product models.Product
 	err := json.Unmarshal(jsonFile, &product)
 	return product, err

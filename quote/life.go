@@ -37,7 +37,7 @@ func Life(data models.Policy) (models.Policy, error) {
 	var selectRow []string
 
 	//TODO: this should not be here, only for version 1
-	deathGuarantee, err := getDeathGuarantee(data.Assets)
+	deathGuarantee, err := extractGuarantee(data.Assets[0].Guarantees, "death")
 	lib.CheckError(err)
 	//TODO: this should not be here, only for version 1
 	calculateSumInsuredLimitOfIndemnity(data.Assets, deathGuarantee.Value.SumInsuredLimitOfIndemnity)
@@ -81,8 +81,24 @@ func Life(data models.Policy) (models.Policy, error) {
 
 	roundOfferPrices(data.OffersPrices)
 
+	//addDefaultGuarantees(data)
+
 	return data, err
 }
+
+/*func addDefaultGuarantees(data models.Policy) {
+	product, err := prd.GetProduct("life", "v1")
+	lib.CheckError(err)
+
+	for _, guarantee := range product.Companies[0].GuaranteesMap {
+		_, err = extractGuarantee(data.Assets[0].Guarantees, guarantee.Slug)
+		if err != nil {
+			guarantee.IsSellable = false
+			guarantee.Value = guarantee.Offer["default"]
+			data.Assets[0].Guarantees = append(data.Assets[0].Guarantees, *guarantee)
+		}
+	}
+}*/
 
 func calculateGuaranteeDuration(assets []models.Asset, deathDuration int) {
 	for assetIndex, asset := range assets {
@@ -226,15 +242,13 @@ func getOffset(duration int) int {
 	return offset
 }
 
-func getDeathGuarantee(assets []models.Asset) (models.Guarante, error) {
-	for _, asset := range assets {
-		for _, guarantee := range asset.Guarantees {
-			if guarantee.Slug == "death" {
-				return guarantee, nil
-			}
+func extractGuarantee(guarantees []models.Guarante, guaranteeSlug string) (models.Guarante, error) {
+	for _, guarantee := range guarantees {
+		if guarantee.Slug == guaranteeSlug {
+			return guarantee, nil
 		}
 	}
-	return models.Guarante{}, fmt.Errorf("death guarantee not found")
+	return models.Guarante{}, fmt.Errorf("%s guarantee not found", guaranteeSlug)
 }
 
 func calculateSumInsuredLimitOfIndemnity(assets []models.Asset, deathSumInsuredLimitOfIndemnity float64) {

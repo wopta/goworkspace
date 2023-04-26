@@ -1,9 +1,10 @@
 package rules
 
 import (
-	"github.com/wopta/goworkspace/models"
 	"log"
 	"net/http"
+
+	"github.com/wopta/goworkspace/models"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	lib "github.com/wopta/goworkspace/lib"

@@ -167,7 +167,7 @@ func getfabbricPayments(data model.Policy, firstSchedule bool, scheduleDate stri
 		scheduleDate = now.Format(layout2)
 	}
 	log.Println(next.Format(layout))
-	externalId := data.Uid + "_" + scheduleDate
+	externalId := data.Uid + "_" + scheduleDate + "_" + origin
 	var pay FabrickPaymentsRequest
 	pay.MerchantID = "wop134b31-5926-4b26-1411-726bc9f0b111"
 	pay.ExternalID = externalId

@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	lib "github.com/wopta/goworkspace/lib"
@@ -52,7 +53,7 @@ func FabrickPay(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 	err := json.Unmarshal([]byte(req), &data)
 	log.Println(data.PriceGross)
 	lib.CheckError(err)
-	resultPay := <-FabrickPayObj(data, false, "", "", data.PriceGross, r.Header.Get("origin"))
+	resultPay := <-FabrickPayObj(data, false, "", "", data.PriceGross, getOrigin(r.Header.Get("origin")))
 
 	log.Println(resultPay)
 	return "", nil, err
@@ -65,7 +66,7 @@ func FabrickPayMontly(w http.ResponseWriter, r *http.Request) (string, interface
 	err := json.Unmarshal([]byte(req), &data)
 	log.Println(data.PriceGross)
 	lib.CheckError(err)
-	resultPay := FabbrickMontlyPay(data, r.Header.Get("origin"))
+	resultPay := FabbrickMontlyPay(data, getOrigin(r.Header.Get("origin")))
 	b, err := json.Marshal(resultPay)
 	log.Println(resultPay)
 	return string(b), resultPay, err
@@ -73,4 +74,15 @@ func FabrickPayMontly(w http.ResponseWriter, r *http.Request) (string, interface
 func CriptoPay(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 
 	return "", nil, nil
+}
+func getOrigin(origin string) string {
+	var result string
+	if strings.Contains(origin, "uat") || strings.Contains(origin, "dev") {
+		result = "uat"
+	} else {
+		result = ""
+	}
+	log.Println(" getOrigin: name:", origin)
+	log.Println(" getOrigin result: ", result)
+	return result
 }
