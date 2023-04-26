@@ -24,7 +24,7 @@ func Life(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	lib.CheckError(err)
 
 	rulesFile = getRulesFile(rulesFile, rulesFileName)
-	product, err := prd.GetName("life", "v1")
+	product, err := prd.GetProduct("life", "v1")
 	lib.CheckError(err)
 
 	_, ruleOutput := rulesFromJson(rulesFile, product, in, nil)

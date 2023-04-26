@@ -60,7 +60,7 @@ func GetNameFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	log.Println(r.RequestURI)
 	/*log.Println(v)
 	log.Println(v[1])*/
-	product, err := GetName(name, "v1")
+	product, err := GetProduct(name, "v1")
 	if err != nil {
 
 		return "", nil, err
@@ -142,6 +142,7 @@ func PutFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	p, e := Put(pr)
 	return "{}", p, e
 }
+
 func Put(p models.Product) (models.Product, error) {
 
 	r, _, e := lib.PutFirestoreErr("products", p)

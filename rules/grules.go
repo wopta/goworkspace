@@ -411,3 +411,7 @@ func (p *Fx) RemoveGuaranteesPriceZero(guarantees map[string]*models.Guarante) {
 		}
 	}
 }
+
+func (p *Fx) RemoveOfferPrice(offerPrice map[string]map[string]*models.Price, offerKey string) {
+	delete(offerPrice, offerKey)
+}
