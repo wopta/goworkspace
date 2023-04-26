@@ -1,6 +1,9 @@
 package models
 
+import "github.com/wopta/goworkspace/lib"
+
 type Guarante struct {
+	Status                     string                    `firestore:"status,omitempty" json:"status,omitempty" bigquery:"status"`
 	PolicyUid                  string                    `firestore:"-" json:"-"  bigquery:"policyUid"`
 	DailyAllowance             string                    `firestore:"dailyAllowance" json:"dailyAllowance,omitempty"  bigquery:"-"`
 	OrderAsset                 int                       `firestore:"orderAsset,omitempty" json:"orderAsset,omitempty"  bigquery:"-"`
@@ -85,4 +88,16 @@ type Tax struct {
 }
 type Duration struct {
 	Year int `firestore:"year,omitempty" json:"year,omitempty"`
+}
+
+func SetGuaranteBigquery(policy Policy, status string, origin string) {
+	for _, asset := range policy.Assets {
+		for _, g := range asset.Guarantees {
+			g.Status = status
+			g.PolicyUid = policy.Uid
+			lib.InsertRowsBigQuery("wopta", origin, g)
+		}
+
+	}
+
 }

@@ -25,6 +25,7 @@ func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	log.Println("Proposal request proposal: ", string(j))
 	defer r.Body.Close()
 	policyFire = lib.GetDatasetByEnv(r.Header.Get("origin"), "policy")
+	guaranteFire := lib.GetDatasetByEnv(r.Header.Get("origin"), "guarante")
 	policy.CreationDate = time.Now()
 	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusInitLead)
 	policy.Status = models.PolicyStatusInitLead
@@ -46,6 +47,7 @@ func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	log.Println("Proposal save")
 	ref, _ := lib.PutFirestore(policyFire, policy)
 	policy.BigquerySave(r.Header.Get("origin"))
+	models.SetGuaranteBigquery(policy, "proposal", guaranteFire)
 	log.Println(ref.ID + " Proposal sand mail")
 	mail.SendMailProposal(policy)
 
