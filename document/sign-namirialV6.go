@@ -104,9 +104,9 @@ func prepareEnvelopV6(id string) <-chan string {
 			res.Body.Close()
 			//res, e := json.Marshal(result)
 			//lib.CheckError(e)
+			log.Println("resp  prepareEnvelopV6:", string(body))
 			r <- string(body)
 
-			//log.Println("body prepareEnvelopV6:", string(body))
 		}
 	}()
 	return r

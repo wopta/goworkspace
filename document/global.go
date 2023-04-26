@@ -162,7 +162,7 @@ commerciali e di marketing, incluso l’invio di newsletter e ricerche di mercat
 
 	})
 	m = skin.Space(m, 5.0)
-	m = skin.Sign(m, nameSign, "Assicurato ", "101", true)
+	m = skin.Sign(m, nameSign, "Assicurato ", "102", true)
 	m.RegisterFooter(func() {
 		topv := 10.0
 		t := props.Text{
