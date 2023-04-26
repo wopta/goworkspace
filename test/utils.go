@@ -185,6 +185,69 @@ func printSurvey(pdf *fpdf.Fpdf, survey models.Survey) {
 	}
 }
 
+func printStatement(pdf *fpdf.Fpdf, statement models.Statement) {
+	leftMargin, _, rightMargin, _ := pdf.GetMargins()
+	pageWidth, _ := pdf.GetPageSize()
+	//availableWidth := pageWidth - leftMargin - rightMargin - 2
+	rowWidth := pageWidth - leftMargin - rightMargin
+
+	setBlackBoldFont(pdf, standardTextSize)
+	/*if statement.HasAnswer {
+		answer := "NO"
+		if *statement.Answer {
+			answer = "SI"
+		}
+
+		answerWidth := pdf.GetStringWidth(answer)
+		dotWidth := pdf.GetStringWidth(".")
+
+		var statementWidth, paddingWidth float64
+		lines := pdf.SplitText(statement.Title, rowWidth)
+
+		statementWidth = pdf.GetStringWidth(lines[len(lines)-1])
+		paddingWidth = availableWidth - statementWidth - answerWidth
+
+		statement.Title += strings.Repeat(".", int(paddingWidth/dotWidth)-1)
+		statement.Title += answer
+	}*/
+	pdf.MultiCell(rowWidth, 3.5, statement.Title, "", fpdf.AlignLeft, false)
+
+	for _, question := range statement.Questions {
+		//availableWidth = pageWidth - leftMargin - rightMargin - 2
+
+		if question.IsBold {
+			setBlackBoldFont(pdf, standardTextSize)
+		} else {
+			setBlackRegularFont(pdf, standardTextSize)
+		}
+		if question.Indent {
+			pdf.SetX(tabDimension)
+			//availableWidth -= tabDimension / 2
+		}
+
+		/*if question.HasAnswer {
+			var questionWidth, paddingWidth float64
+
+			answer := "NO"
+			if *question.Answer {
+				answer = "SI"
+			}
+
+			answerWidth := pdf.GetStringWidth(answer)
+			dotWidth := pdf.GetStringWidth(".")
+
+			lines := pdf.SplitText(question.Question, rowWidth)
+
+			questionWidth = pdf.GetStringWidth(lines[len(lines)-1])
+			paddingWidth = availableWidth - questionWidth - answerWidth
+
+			question.Question += strings.Repeat(".", int(paddingWidth/dotWidth)+1)
+			question.Question += answer
+		}*/
+		pdf.MultiCell(rowWidth, 3.5, question.Question, "", fpdf.AlignLeft, false)
+	}
+}
+
 func indentedText(pdf *fpdf.Fpdf, content string) {
 	pdf.SetX(tabDimension)
 	pdf.MultiCell(0, 3, content, "", fpdf.AlignLeft, false)

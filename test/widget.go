@@ -240,21 +240,21 @@ func GetGuaranteesTable(pdf *fpdf.Fpdf, policy models.Policy) {
 			"sumInsuredLimitOfIndemnity": "======",
 			"duration":                   "==",
 			"endDate":                    "====",
-			"price":                      "====",
+			"price":                      "==== (*)",
 		},
 		temporaryDisability: {
 			"name":                       "Inabilità Temporanea da Infortunio o Malattia",
 			"sumInsuredLimitOfIndemnity": "======",
 			"duration":                   "==",
 			"endDate":                    "====",
-			"price":                      "====",
+			"price":                      "==== (*)",
 		},
 		seriousIll: {
 			"name":                       "Malattie Gravi",
 			"sumInsuredLimitOfIndemnity": "======",
 			"duration":                   "==",
 			"endDate":                    "====",
-			"price":                      "====",
+			"price":                      "==== (*)",
 		},
 	}
 
