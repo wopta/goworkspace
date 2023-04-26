@@ -26,7 +26,7 @@ func Callback(w http.ResponseWriter, r *http.Request) {
 				Method:  "GET",
 			},
 			{
-				Route:   "/v1/payment",
+				Route:   "/v1/axa/emit",
 				Handler: PmiGlobalEmit,
 				Method:  http.MethodPost,
 			},
