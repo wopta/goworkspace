@@ -147,7 +147,12 @@ func printSurvey(pdf *fpdf.Fpdf, survey models.Survey) {
 		survey.Title += strings.Repeat(".", int(paddingWidth/dotWidth)-1)
 		survey.Title += answer
 	}
-	pdf.MultiCell(rowWidth, 3.5, survey.Title, "", fpdf.AlignLeft, false)
+	if survey.Title != "" {
+		pdf.MultiCell(rowWidth, 3.5, survey.Title, "", fpdf.AlignLeft, false)
+	}
+	if survey.Subtitle != "" {
+		pdf.MultiCell(rowWidth, 3.5, survey.Subtitle, "", fpdf.AlignLeft, false)
+	}
 
 	for _, question := range survey.Questions {
 		availableWidth = pageWidth - leftMargin - rightMargin - 2
@@ -210,7 +215,12 @@ func printStatement(pdf *fpdf.Fpdf, statement models.Statement) {
 		statement.Title += strings.Repeat(".", int(paddingWidth/dotWidth)-1)
 		statement.Title += answer
 	}*/
-	pdf.MultiCell(rowWidth, 3.5, statement.Title, "", fpdf.AlignLeft, false)
+	if statement.Title != "" {
+		pdf.MultiCell(rowWidth, 3.5, statement.Title, "", fpdf.AlignLeft, false)
+	}
+	if statement.Subtitle != "" {
+		pdf.MultiCell(rowWidth, 3.5, statement.Subtitle, "", fpdf.AlignLeft, false)
+	}
 
 	for _, question := range statement.Questions {
 		//availableWidth = pageWidth - leftMargin - rightMargin - 2
