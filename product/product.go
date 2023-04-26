@@ -60,7 +60,7 @@ func GetNameFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	log.Println(r.RequestURI)
 	/*log.Println(v)
 	log.Println(v[1])*/
-	product, err := GetProduct(name, "v1")
+	product, err := GetName(name, "v1")
 	if err != nil {
 
 		return "", nil, err
