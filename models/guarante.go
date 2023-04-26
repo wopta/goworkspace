@@ -53,7 +53,7 @@ type GuaranteValue struct {
 	DeductibleDesc             string              `firestore:"deductibleDesc,omitempty" json:"deductibleDesc,omitempty"`
 	SelfInsuranceValues        GuaranteFieldValue  `firestore:"selfInsuranceValues,omitempty" json:"selfInsuranceValues,omitempty"`
 	SelfInsuranceDesc          string              `firestore:"selfInsuranceDesc,omitempty" json:"selfInsuranceDesc,omitempty"`
-	Duration                   Duration            `firestore:"duration,omitempty" json:"duration,omitempty"`
+	Duration                   *Duration           `firestore:"duration,omitempty" json:"duration,omitempty"`
 	DurationValues             *DurationFieldValue `firestore:"durationValues,omitempty" json:"durationValues,omitempty"`
 	Tax                        float64             `firestore:"tax" json:"tax"`
 	Percentage                 float64             `firestore:"percentage" json:"percentage"`
