@@ -26,7 +26,7 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 	schedule := r.URL.Query().Get("schedule")
 	request := lib.ErrorByte(ioutil.ReadAll(r.Body))
 	origin := r.URL.Query().Get("origin")
-	firePolicy := lib.GetDatasetByEnv(origin, "policy")
+
 	log.Println(string(request))
 	log.Println(string(r.RequestURI))
 	json.Unmarshal([]byte(request), &fabrickCallback)
@@ -38,7 +38,7 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 			schedule = ext[1]
 			origin = ext[2]
 		}
-
+		firePolicy := lib.GetDatasetByEnv(origin, "policy")
 		log.Println(uid)
 		log.Println(schedule)
 		policyF := lib.GetFirestore(firePolicy, uid)
