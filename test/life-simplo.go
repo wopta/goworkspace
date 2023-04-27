@@ -47,13 +47,16 @@ func Life(policy models.Policy) string {
 
 	GetBeneficiaryReferenceSection(pdf, policy)
 
-	GetStatementsSection(pdf, policy)
+	GetSurveysSection(pdf, policy)
 
 	drawSignatureForm(pdf)
+	pdf.Ln(5)
+
+	GetStatementsSection(pdf, policy)
 
 	pdf.AddPage()
 
-	GetVisioneDocumentiSection(pdf, policy)
+	//GetVisioneDocumentiSection(pdf, policy)
 
 	GetOfferResumeSection(pdf, policy)
 
@@ -65,7 +68,7 @@ func Life(policy models.Policy) string {
 
 	GetEmitResumeSection(pdf, policy)
 
-	GetPolicyDescriptionSection(pdf)
+	//GetPolicyDescriptionSection(pdf)
 
 	GetWoptaAxaCompanyDescriptionSection(pdf)
 

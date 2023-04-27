@@ -509,7 +509,7 @@ func GetBeneficiaryReferenceTable(pdf *fpdf.Fpdf, beneficiaryReference map[strin
 	drawPinkHorizontalLine(pdf, thinLineWidth)
 }
 
-func GetStatementsSection(pdf *fpdf.Fpdf, policy models.Policy) {
+func GetSurveysSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	surveys := *policy.Surveys
 
 	getParagraphTitle(pdf, "Dichiarazioni da leggere con attenzione prima di firmare")
@@ -522,6 +522,24 @@ func GetStatementsSection(pdf *fpdf.Fpdf, policy models.Policy) {
 		printSurvey(pdf, survey)
 	}
 	pdf.Ln(8)
+}
+
+func GetStatementsSection(pdf *fpdf.Fpdf, policy models.Policy) {
+	statements := *policy.Statements
+	//getParagraphTitle(pdf, "Firme e dichiarazioni")
+	pdf.Ln(8)
+	for _, statement := range statements {
+		printStatement(pdf, statement)
+	}
+	pdf.SetY(pdf.GetY() - 26)
+	pdf.MultiCell(70, 3, "AXA France Vie\n(Rappresentanza Generale per l'Italia)", "",
+		fpdf.AlignCenter, false)
+	var opt fpdf.ImageOptions
+	opt.ImageType = "png"
+	pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/firma_axa.png", 35, pdf.GetY()+3, 30, 8,
+		false, opt, 0, "")
+	pdf.Ln(15)
+
 }
 
 func GetVisioneDocumentiSection(pdf *fpdf.Fpdf, policy models.Policy) {
@@ -672,7 +690,7 @@ func GetPaymentResumeSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	pdf.MultiCell(0, 3, "In caso di frazionamento mensile i Premi sopra riportati sono dovuti, alle date "+
 		"indicate e con successiva frequenza mensile, in misura di 1/12 per ogni mensilità. Non sono previsti oneri "+
 		"o interessi di frazionamento.", "", "", false)
-	pdf.Ln(5)
+	pdf.Ln(3)
 }
 
 func GetContractWithdrawlSection(pdf *fpdf.Fpdf) {
@@ -712,7 +730,7 @@ func GetPaymentMethodSection(pdf *fpdf.Fpdf) {
 		"bonifico e strumenti di pagamento elettronico, quali ad esempio, carte di credito e/o carte di debito, "+
 		"incluse le carte prepagate. Oppure può essere pagato direttamente alla Compagnia alla "+
 		"stipula del contratto, via bonifico o carta di credito.", "", "", false)
-	pdf.Ln(5)
+	pdf.Ln(3)
 }
 
 func GetEmitResumeSection(pdf *fpdf.Fpdf, policy models.Policy) {
@@ -932,16 +950,16 @@ func GetAxaTableSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	pdf.MultiCell(0, 4, "B. allego una fotocopia fronte/retro del mio documento di identità non scaduto "+
 		"avente i seguenti estremi, confermando la veridicità dei dati sotto riportati: ", "LR", "", false)
 	pdf.CellFormat(5, 4, "", "LR", 0, "", false, 0, "")
-	pdf.CellFormat(90, 4, "Tipo documento: 01 = Carta di identità", "TLR", 0, "", false, 0, "")
-	pdf.CellFormat(90, 4, "Nr. Documento: AT9045321", "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(90, 4, "Tipo documento: ========", "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(90, 4, "Nr. Documento: ========", "TLR", 0, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 0, "", false, 0, "")
-	pdf.CellFormat(90, 4, "Ente di rilascio: Comune", "TLR", 0, "", false, 0, "")
-	pdf.CellFormat(90, 4, "Data di rilascio: 20/10/2013", "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(90, 4, "Ente di rilascio: =======", "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(90, 4, "Data di rilascio: =======", "TLR", 0, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 0, "", false, 0, "")
-	pdf.CellFormat(90, 4, "Località di rilascio: PIANEZZE", "1", 0, "", false, 0, "")
-	pdf.CellFormat(90, 4, "Data di scadenza: 07/10/2023", "1", 0, "", false, 0, "")
+	pdf.CellFormat(90, 4, "Località di rilascio: =======", "1", 0, "", false, 0, "")
+	pdf.CellFormat(90, 4, "Data di scadenza: =======", "1", 0, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "LR", 1, "", false, 0, "")
 	pdf.MultiCell(0, 1, "", "LR", "", false)
 	pdf.MultiCell(0, 4, "C. dichiaro di NON essere una Persona Politicamente Esposta", "LR", "", false)
@@ -1318,7 +1336,7 @@ func GetAllegato4Section(pdf *fpdf.Fpdf) {
 func GetAllegato4TerSection(pdf *fpdf.Fpdf) {
 	setBlackBoldFont(pdf, titleTextSize)
 	pdf.MultiCell(0, 3, "ALLEGATO 4 TER - ELENCO DELLE REGOLE DI COMPORTAMENTO DEL DISTRIBUTORE",
-		"", "", false)
+		"", fpdf.AlignCenter, false)
 	pdf.Ln(3)
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "Il distributore ha l’obbligo di mettere a disposizione del pubblico il "+
