@@ -86,9 +86,10 @@ func GetSequenceByCompany(name string, firePolicy string) (string, int, int) {
 	log.Println(e)
 
 	policy := models.PolicyToListData(rn)
-
+	log.Println("len(policy):", len(policy))
 	if len(policy) == 0 {
 		//WE0000001
+
 		numberCompany = companyDefault
 		codeCompany = companyPrefix + fmt.Sprintf(companyPrefixLenght, numberCompany)
 		number = 1
@@ -99,7 +100,7 @@ func GetSequenceByCompany(name string, firePolicy string) (string, int, int) {
 		number = policy[0].Number + 1
 	}
 	r, e := lib.OrderLimitFirestoreErr(firePolicy, "number", firestore.Desc, 1)
-	lib.CheckError(e)
+	log.Println(e)
 	policyCompany := models.PolicyToListData(r)
 	if len(policyCompany) == 0 {
 		number = 1
