@@ -75,15 +75,16 @@ func GetSequenceByCompany(name string, firePolicy string) (string, int, int) {
 	case "global":
 		companyDefault = 1
 		companyPrefix = "WB"
-		companyPrefixLenght = "%07d"
+		companyPrefixLenght = `%07d`
 	case "axa":
 		companyDefault = 100001
 		companyPrefix = "WB"
-		companyPrefixLenght = "%07d"
+		companyPrefixLenght = `%07d`
 	}
 
 	rn, e := lib.OrderWhereLimitFirestoreErr(firePolicy, "company", "numberCompany", "==", name, firestore.Desc, 1)
-	lib.CheckError(e)
+	log.Println(e)
+
 	policy := models.PolicyToListData(rn)
 
 	if len(policy) == 0 {
@@ -93,6 +94,7 @@ func GetSequenceByCompany(name string, firePolicy string) (string, int, int) {
 		number = 1
 	} else {
 		numberCompany = policy[0].NumberCompany + 1
+		log.Println("numberCompany:", numberCompany)
 		codeCompany = companyPrefix + fmt.Sprintf(companyPrefixLenght, numberCompany)
 		number = policy[0].Number + 1
 	}

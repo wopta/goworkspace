@@ -114,7 +114,7 @@ Costituisce quietanza di pagamento la mail di conferma che Wopta invierà al Con
 Il sottoscritto, letta e compresa l’informativa sul trattamento dei dati personali ` + consens + ` al trattamento dei propri dati personali da parte di Wopta Assicurazioni per l’invio di comunicazioni e proposte 
 commerciali e di marketing, incluso l’invio di newsletter e ricerche di mercato, attraverso strumenti automatizzati 
 (sms, mms, e-mail, ecc.) e non (posta cartacea e telefono con operatore)`
-	m = skin.Space(m, 5.0)
+	m = skin.Space(m, 15.0)
 	m = skin.Title(m, "Consenso per finalità commerciali. ", body, 10.0)
 	skin.Sign(m, nameSign, "Assicurato ", "100", true)
 	skin.Space(m, 5.0)
