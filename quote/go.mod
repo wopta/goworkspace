@@ -2,7 +2,10 @@ module github.com/wopta/goworkspace/quote
 
 go 1.19
 
-replace github.com/wopta/goworkspace/quote => ./
+replace (
+	github.com/wopta/goworkspace/quote => ./
+	github.com/wopta/goworkspace/sellable v0.0.0 => ../sellable
+)
 
 require (
 	cloud.google.com/go v0.110.0
@@ -11,6 +14,7 @@ require (
 	github.com/wopta/goworkspace/lib v1.0.10
 	github.com/wopta/goworkspace/models v1.0.39
 	github.com/wopta/goworkspace/product v1.0.15
+	github.com/wopta/goworkspace/sellable v0.0.0
 )
 
 require (

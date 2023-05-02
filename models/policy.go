@@ -2,6 +2,7 @@ package models
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"time"
 
@@ -131,7 +132,7 @@ type Price struct {
 	Discount float64 `firestore:"discount" json:"discount" bigquery:"-"`
 }
 
-func (policy *Policy) CalculateAge() (int, error) {
+func (policy *Policy) CalculateContractorAge() (int, error) {
 	birthdate, e := time.Parse(time.RFC3339, policy.Contractor.BirthDate)
 	now := time.Now()
 	age := now.Year() - birthdate.Year()
@@ -139,6 +140,15 @@ func (policy *Policy) CalculateAge() (int, error) {
 		age--
 	}
 	return age, e
+}
+
+func (policy *Policy) ExtractGuarantee(guaranteeSlug string) (Guarante, error) {
+	for _, guarantee := range policy.Assets[0].Guarantees {
+		if guarantee.Slug == guaranteeSlug {
+			return guarantee, nil
+		}
+	}
+	return Guarante{}, fmt.Errorf("no %s guarantee found", guaranteeSlug)
 }
 
 func (policy *Policy) BigquerySave(origin string) {

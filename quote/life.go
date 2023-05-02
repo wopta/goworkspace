@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/dustin/go-humanize"
 	prd "github.com/wopta/goworkspace/product"
+	"github.com/wopta/goworkspace/sellable"
 	"io"
 	"modernc.org/mathutil"
 	"net/http"
@@ -28,13 +29,17 @@ func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 }
 func Life(data models.Policy) (models.Policy, error) {
 	var err error
-	birthDate, err := time.Parse("2006-01-02T15:04:05Z", data.Contractor.BirthDate)
-	lib.CheckError(err)
-	year := time.Now().Year() - birthDate.Year()
+	contractorAge, err := data.CalculateContractorAge()
 
 	b := lib.GetFilesByEnv("quote/life_matrix.csv")
 	df := lib.CsvToDataframe(b)
 	var selectRow []string
+
+	ruleProduct, _, err := sellable.Life(data)
+	lib.CheckError(err)
+
+	originalPolicy := data
+	addDefaultGuarantees(data, ruleProduct)
 
 	//TODO: this should not be here, only for version 1
 	deathGuarantee, err := extractGuarantee(data.Assets[0].Guarantees, "death")
@@ -42,14 +47,14 @@ func Life(data models.Policy) (models.Policy, error) {
 	//TODO: this should not be here, only for version 1
 	calculateSumInsuredLimitOfIndemnity(data.Assets, deathGuarantee.Value.SumInsuredLimitOfIndemnity)
 
-	calculateGuaranteeDuration(data.Assets, deathGuarantee.Value.Duration.Year)
+	calculateGuaranteeDuration(data.Assets, contractorAge, deathGuarantee.Value.Duration.Year)
 
 	updatePolicyStartEndDate(&data)
 
 	getGuaranteeSubtitle(data.Assets)
 
 	for _, row := range df.Records() {
-		if row[0] == strconv.Itoa(year) {
+		if row[0] == strconv.Itoa(contractorAge) {
 			selectRow = row
 			break
 		}
@@ -72,7 +77,10 @@ func Life(data models.Policy) (models.Policy, error) {
 
 			calculateGuaranteePrices(guarantee, baseFloat, taxFloat)
 
-			calculateOfferPrices(data, guarantee)
+			_, err = originalPolicy.ExtractGuarantee(guarantee.Slug)
+			if err != nil && guarantee.IsSellable {
+				calculateOfferPrices(data, guarantee)
+			}
 		}
 
 	}
@@ -81,33 +89,35 @@ func Life(data models.Policy) (models.Policy, error) {
 
 	roundOfferPrices(data.OffersPrices)
 
-	//addDefaultGuarantees(data)
-
 	return data, err
 }
 
-/*func addDefaultGuarantees(data models.Policy) {
-	product, err := prd.GetProduct("life", "v1")
-	lib.CheckError(err)
+func addDefaultGuarantees(data models.Policy, product models.Product) {
+	guaranteeList := make([]models.Guarante, 0)
+
+	for _, guarantee := range data.Assets[0].Guarantees {
+		product.Companies[0].GuaranteesMap[guarantee.Slug].Value = guarantee.Value
+	}
 
 	for _, guarantee := range product.Companies[0].GuaranteesMap {
-		_, err = extractGuarantee(data.Assets[0].Guarantees, guarantee.Slug)
-		if err != nil {
-			guarantee.IsSellable = false
-			guarantee.Value = guarantee.Offer["default"]
-			data.Assets[0].Guarantees = append(data.Assets[0].Guarantees, *guarantee)
-		}
+		guaranteeList = append(guaranteeList, *guarantee)
 	}
-}*/
 
-func calculateGuaranteeDuration(assets []models.Asset, deathDuration int) {
+	data.Assets[0].Guarantees = guaranteeList
+}
+
+func calculateGuaranteeDuration(assets []models.Asset, contractorAge int, deathDuration int) {
 	for assetIndex, asset := range assets {
 		for guaranteeIndex, guarantee := range asset.Guarantees {
 			switch guarantee.Slug {
 			case "permanent-disability":
 				assets[assetIndex].Guarantees[guaranteeIndex].Value.Duration.Year = deathDuration
 			case "temporary-disability", "serious-ill":
-				assets[assetIndex].Guarantees[guaranteeIndex].Value.Duration.Year = mathutil.Min(deathDuration, 10)
+				if 64-contractorAge >= 10 {
+					assets[assetIndex].Guarantees[guaranteeIndex].Value.Duration.Year = 10
+				} else {
+					assets[assetIndex].Guarantees[guaranteeIndex].Value.Duration.Year = mathutil.Min(deathDuration, guarantee.Value.Duration.Year)
+				}
 			}
 		}
 	}

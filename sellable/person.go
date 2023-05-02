@@ -75,7 +75,7 @@ func getRulesInputData(policy *models.Policy, e error, req []byte) []byte {
 	*policy, e = models.UnmarshalPolicy(req)
 	lib.CheckError(e)
 
-	age, e := policy.CalculateAge()
+	age, e := policy.CalculateContractorAge()
 	lib.CheckError(e)
 	policy.QuoteQuestions["age"] = age
 	policy.QuoteQuestions["work"] = policy.Contractor.Work

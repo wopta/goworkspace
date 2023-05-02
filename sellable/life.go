@@ -12,7 +12,24 @@ import (
 
 func LifeHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		policy    models.Policy
+		policy models.Policy
+		err    error
+	)
+
+	log.Println("Life")
+
+	err = json.Unmarshal(lib.ErrorByte(io.ReadAll(r.Body)), &policy)
+	if err != nil {
+		return "", nil, err
+	}
+
+	product, productJson, err := Life(policy)
+
+	return productJson, product, err
+}
+
+func Life(policy models.Policy) (models.Product, string, error) {
+	var (
 		rulesFile []byte
 		err       error
 	)
@@ -20,21 +37,6 @@ func LifeHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 		rulesFileName = "life.json"
 	)
 
-	log.Println("Life")
-
-	fx := new(models.Fx)
-
-	err = json.Unmarshal(lib.ErrorByte(io.ReadAll(r.Body)), &policy)
-	if err != nil {
-		return "", nil, err
-	}
-
-	product, productJson, err := Life(err, policy, rulesFile, rulesFileName, fx)
-
-	return productJson, product, err
-}
-
-func Life(err error, policy models.Policy, rulesFile []byte, rulesFileName string, fx *models.Fx) (models.Product, string, error) {
 	in, err := getInputData(policy)
 	if err != nil {
 		return models.Product{}, "", err
@@ -45,14 +47,16 @@ func Life(err error, policy models.Policy, rulesFile []byte, rulesFileName strin
 		return models.Product{}, "", err
 	}
 
+	fx := new(models.Fx)
+
 	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, product, in, nil)
 
-	productJson, product, err := prd.ReplaceDatesInProduct(ruleOutput.(models.Product), 69)
+	productJson, product, err := prd.ReplaceDatesInProduct(ruleOutput.(models.Product), 54)
 	return product, productJson, err
 }
 
 func getInputData(policy models.Policy) ([]byte, error) {
-	age, err := policy.CalculateAge()
+	age, err := policy.CalculateContractorAge()
 	if err != nil {
 		return nil, err
 	}
