@@ -78,7 +78,7 @@ func Life(data models.Policy) (models.Policy, error) {
 			calculateGuaranteePrices(guarantee, baseFloat, taxFloat)
 
 			_, err = originalPolicy.ExtractGuarantee(guarantee.Slug)
-			if err != nil && guarantee.IsSellable {
+			if err == nil && guarantee.IsSellable {
 				calculateOfferPrices(data, guarantee)
 			}
 		}
@@ -100,6 +100,9 @@ func addDefaultGuarantees(data models.Policy, product models.Product) {
 	}
 
 	for _, guarantee := range product.Companies[0].GuaranteesMap {
+		if guarantee.Value == nil {
+			guarantee.Value = guarantee.Offer["default"]
+		}
 		guaranteeList = append(guaranteeList, *guarantee)
 	}
 
