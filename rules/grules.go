@@ -414,3 +414,89 @@ func (p *Fx) RemoveGuaranteesPriceZero(guarantees map[string]*models.Guarante) {
 func (p *Fx) RemoveOfferPrice(offerPrice map[string]map[string]*models.Price, offerKey string) {
 	delete(offerPrice, offerKey)
 }
+
+type FxSurvey struct{}
+
+func (fx *FxSurvey) AppendStatement(statements []*models.Statement, title string, subtitle string, hasMultipleAnswers bool, hasAnswer bool, expectedAnswer bool) []*models.Statement {
+	statement := &models.Statement{
+		Title:              title,
+		Subtitle:           subtitle,
+		HasMultipleAnswers: nil,
+		Questions:          make([]*models.Question, 0),
+		Answer:             nil,
+		HasAnswer:          hasAnswer,
+		ExpectedAnswer:     nil,
+	}
+	if hasAnswer {
+		statement.ExpectedAnswer = &expectedAnswer
+	}
+	if hasMultipleAnswers {
+		statement.HasMultipleAnswers = &hasMultipleAnswers
+	}
+	return append(statements, statement)
+}
+
+func (fx *FxSurvey) AppendSurvey(surveys []*models.Survey, title string, subtitle string, hasMultipleAnswers bool, hasAnswer bool, expectedAnswer bool) []*models.Survey {
+	survey := &models.Survey{
+		Title:              title,
+		Subtitle:           subtitle,
+		HasMultipleAnswers: nil,
+		Questions:          make([]*models.Question, 0),
+		Answer:             nil,
+		HasAnswer:          hasAnswer,
+		ExpectedAnswer:     nil,
+	}
+	if hasAnswer {
+		survey.ExpectedAnswer = &expectedAnswer
+	}
+	if hasMultipleAnswers {
+		survey.HasMultipleAnswers = &hasMultipleAnswers
+	}
+	return append(surveys, survey)
+}
+
+func (fx *FxSurvey) AppendQuestion(questions []*models.Question, text string, isBold bool, indent bool, hasAnswer bool, expectedAnswer bool) []*models.Question {
+	question := &models.Question{
+		Question:       text,
+		IsBold:         isBold,
+		Indent:         indent,
+		Answer:         nil,
+		HasAnswer:      hasAnswer,
+		ExpectedAnswer: nil,
+	}
+	if hasAnswer {
+		question.ExpectedAnswer = &expectedAnswer
+	}
+
+	return append(questions, question)
+}
+
+func (fx *FxSurvey) HasGuaranteePolicy(input map[string]interface{}, guaranteeSlug string) bool {
+	j, err := json.Marshal(input)
+	lib.CheckError(err)
+	var policy models.Policy
+	err = json.Unmarshal(j, &policy)
+	lib.CheckError(err)
+	for _, asset := range policy.Assets {
+		for _, guarantee := range asset.Guarantees {
+			if guarantee.Slug == guaranteeSlug {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func (fx *FxSurvey) GetGuaranteeIndex(input map[string]interface{}, guranteeSlug string) int {
+	j, _ := json.Marshal(input)
+	var policy models.Policy
+	_ = json.Unmarshal(j, &policy)
+	for _, asset := range policy.Assets {
+		for i, guarantee := range asset.Guarantees {
+			if guarantee.Slug == guranteeSlug {
+				return i
+			}
+		}
+	}
+	return -1
+}
