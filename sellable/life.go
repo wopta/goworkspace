@@ -10,8 +10,9 @@ import (
 	"net/http"
 )
 
-func Life(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func LifeHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
+		policy    models.Policy
 		rulesFile []byte
 		err       error
 	)
@@ -23,27 +24,34 @@ func Life(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 
 	fx := new(models.Fx)
 
-	in, err := getInputData(lib.ErrorByte(io.ReadAll(r.Body)))
-	lib.CheckError(err)
+	err = json.Unmarshal(lib.ErrorByte(io.ReadAll(r.Body)), &policy)
+	if err != nil {
+		return "", nil, err
+	}
 
+	product, productJson, err := Life(err, policy, rulesFile, rulesFileName, fx)
+
+	return productJson, product, err
+}
+
+func Life(err error, policy models.Policy, rulesFile []byte, rulesFileName string, fx *models.Fx) (models.Product, string, error) {
+	in, err := getInputData(policy)
+	if err != nil {
+		return models.Product{}, "", err
+	}
 	rulesFile = lib.GetRulesFile(rulesFile, rulesFileName)
 	product, err := prd.GetProduct("life", "v1")
-	lib.CheckError(err)
+	if err != nil {
+		return models.Product{}, "", err
+	}
 
 	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, product, in, nil)
 
 	productJson, product, err := prd.ReplaceDatesInProduct(ruleOutput.(models.Product), 69)
-
-	return productJson, product, nil
+	return product, productJson, err
 }
 
-func getInputData(b []byte) ([]byte, error) {
-	var policy models.Policy
-	err := json.Unmarshal(b, &policy)
-	if err != nil {
-		return nil, err
-	}
-
+func getInputData(policy models.Policy) ([]byte, error) {
 	age, err := policy.CalculateAge()
 	if err != nil {
 		return nil, err

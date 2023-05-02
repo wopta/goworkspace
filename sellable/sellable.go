@@ -20,7 +20,7 @@ func Sellable(w http.ResponseWriter, r *http.Request) {
 		Routes: []lib.Route{
 			{
 				Route:   "/v1/sales/life",
-				Handler: Life,
+				Handler: LifeHandler,
 				Method:  http.MethodPost,
 			},
 			{
