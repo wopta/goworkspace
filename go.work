@@ -23,5 +23,5 @@ use(
 ./user
 ./partnership
 ./companydata
-
+./question
 )
