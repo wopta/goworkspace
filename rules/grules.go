@@ -8,10 +8,8 @@ import (
 	"github.com/hyperjumptech/grule-rule-engine/engine"
 	"github.com/hyperjumptech/grule-rule-engine/pkg"
 	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
 	"log"
 	"math"
-	"strconv"
 	"strings"
 )
 
@@ -21,7 +19,7 @@ func rulesFromJson(groule []byte, out interface{}, in []byte, data []byte) (stri
 	//rules := lib.CheckEbyte(ioutil.ReadFile("pmi-allrisk.json"))
 
 	fx := &Fx{}
-	fxSurvey := &FxSurvey{}
+	//fxSurvey := &FxSurvey{}
 	var err error
 	// create new instance of DataContext
 	dataContext := ast.NewDataContext()
@@ -48,9 +46,9 @@ func rulesFromJson(groule []byte, out interface{}, in []byte, data []byte) (stri
 	log.Println("RulesFromJson fx loaded")
 	lib.CheckError(err)
 
-	err = dataContext.Add("fxSurvey", fxSurvey)
+	/*err = dataContext.Add("fxSurvey", fxSurvey)
 	log.Println("RulesFromJson fxSurvey loaded")
-	lib.CheckError(err)
+	lib.CheckError(err)*/
 
 	underlying := pkg.NewBytesResource(groule)
 	lib.CheckError(err)
@@ -215,7 +213,7 @@ func (p *Fx) FloatToString(in float64, decimal int64) string {
 	return fmt.Sprintf("%.*f", decimal, in)
 }
 
-func (p *Fx) DeleteOfferFromGuarantee(m map[string]*models.GuaranteValue, key string) {
+/*func (p *Fx) DeleteOfferFromGuarantee(m map[string]*models.GuaranteValue, key string) {
 	delete(m, key)
 }
 
@@ -232,33 +230,33 @@ func (p *Fx) CalculateMonthlyCoveragePrices(guarantees map[string]*models.Guaran
 func (p *Fx) CalculateOfferPrices(guarantees map[string]*models.Guarante, offersPrices map[string]map[string]*models.Price) {
 	for _, guarantee := range guarantees {
 		for offerKey, offerValue := range guarantee.Offer {
-			offersPrices[offerKey][yearly].Net += offerValue.PremiumNetYearly
-			offersPrices[offerKey][yearly].Tax += offerValue.PremiumTaxAmountYearly
-			offersPrices[offerKey][yearly].Gross += offerValue.PremiumGrossYearly
-			offersPrices[offerKey][monthly].Net += offerValue.PremiumNetYearly / 12
-			offersPrices[offerKey][monthly].Tax += offerValue.PremiumTaxAmountYearly / 12
-			offersPrices[offerKey][monthly].Gross += offerValue.PremiumGrossYearly / 12
+			offersPrices[offerKey][sellable.yearly].Net += offerValue.PremiumNetYearly
+			offersPrices[offerKey][sellable.yearly].Tax += offerValue.PremiumTaxAmountYearly
+			offersPrices[offerKey][sellable.yearly].Gross += offerValue.PremiumGrossYearly
+			offersPrices[offerKey][sellable.monthly].Net += offerValue.PremiumNetYearly / 12
+			offersPrices[offerKey][sellable.monthly].Tax += offerValue.PremiumTaxAmountYearly / 12
+			offersPrices[offerKey][sellable.monthly].Gross += offerValue.PremiumGrossYearly / 12
 		}
 	}
 }
 
 func (p *Fx) RoundMonthlyOfferPrices(out *RuleOut, roundingCoverages ...string) {
 	updatePrices := func(coverage string, offerType string, priceStruct map[string]*models.Price) {
-		out.Guarantees[coverage].Offer[offerType].PremiumGrossMonthly += priceStruct[monthly].Delta
+		out.Guarantees[coverage].Offer[offerType].PremiumGrossMonthly += priceStruct[sellable.monthly].Delta
 		newNetPrice := out.Guarantees[coverage].Offer[offerType].PremiumGrossMonthly / (1 + (out.Guarantees[coverage].Tax / 100))
 		newTax := out.Guarantees[coverage].Offer[offerType].PremiumGrossMonthly - newNetPrice
-		out.OfferPrice[offerType][monthly].Net += newNetPrice - out.Guarantees[coverage].Offer[offerType].PremiumNetMonthly
-		out.OfferPrice[offerType][monthly].Tax += newTax - out.Guarantees[coverage].Offer[offerType].PremiumTaxAmountMonthly
+		out.OfferPrice[offerType][sellable.monthly].Net += newNetPrice - out.Guarantees[coverage].Offer[offerType].PremiumNetMonthly
+		out.OfferPrice[offerType][sellable.monthly].Tax += newTax - out.Guarantees[coverage].Offer[offerType].PremiumTaxAmountMonthly
 		out.Guarantees[coverage].Offer[offerType].PremiumNetMonthly = newNetPrice
 		out.Guarantees[coverage].Offer[offerType].PremiumTaxAmountMonthly = newTax
 	}
 
 	for offerType, priceStruct := range out.OfferPrice {
-		nonRoundedGrossPrice := priceStruct[yearly].Gross
-		roundedMonthlyGrossPrice := math.Round(priceStruct[monthly].Gross)
+		nonRoundedGrossPrice := priceStruct[sellable.yearly].Gross
+		roundedMonthlyGrossPrice := math.Round(priceStruct[sellable.monthly].Gross)
 		yearlyGrossPrice := roundedMonthlyGrossPrice * 12
-		priceStruct[monthly].Delta = (yearlyGrossPrice - nonRoundedGrossPrice) / 12
-		priceStruct[monthly].Gross = roundedMonthlyGrossPrice
+		priceStruct[sellable.monthly].Delta = (yearlyGrossPrice - nonRoundedGrossPrice) / 12
+		priceStruct[sellable.monthly].Gross = roundedMonthlyGrossPrice
 
 		for _, roundingCoverage := range roundingCoverages {
 			hasGuarantee := out.Guarantees[roundingCoverage].Offer[offerType].PremiumNetMonthly > 0
@@ -272,19 +270,19 @@ func (p *Fx) RoundMonthlyOfferPrices(out *RuleOut, roundingCoverages ...string) 
 
 func (p *Fx) RoundYearlyOfferPrices(out *RuleOut, roundingCoverages ...string) {
 	updatePrices := func(coverage string, offerType string, priceStruct map[string]*models.Price) {
-		out.Guarantees[coverage].Offer[offerType].PremiumGrossYearly += priceStruct[yearly].Delta
+		out.Guarantees[coverage].Offer[offerType].PremiumGrossYearly += priceStruct[sellable.yearly].Delta
 		newNetPrice := out.Guarantees[coverage].Offer[offerType].PremiumGrossYearly / (1 + (out.Guarantees[coverage].Tax / 100))
 		newTax := out.Guarantees[coverage].Offer[offerType].PremiumGrossYearly - newNetPrice
-		out.OfferPrice[offerType][yearly].Net += newNetPrice - out.Guarantees[coverage].Offer[offerType].PremiumNetYearly
-		out.OfferPrice[offerType][yearly].Tax += newTax - out.Guarantees[coverage].Offer[offerType].PremiumTaxAmountYearly
+		out.OfferPrice[offerType][sellable.yearly].Net += newNetPrice - out.Guarantees[coverage].Offer[offerType].PremiumNetYearly
+		out.OfferPrice[offerType][sellable.yearly].Tax += newTax - out.Guarantees[coverage].Offer[offerType].PremiumTaxAmountYearly
 		out.Guarantees[coverage].Offer[offerType].PremiumNetYearly = newNetPrice
 		out.Guarantees[coverage].Offer[offerType].PremiumTaxAmountYearly = newTax
 	}
 
 	for offerType, priceStruct := range out.OfferPrice {
-		ceilGrossPrice := math.Ceil(priceStruct[yearly].Gross)
-		priceStruct[yearly].Delta = ceilGrossPrice - priceStruct[yearly].Gross
-		priceStruct[yearly].Gross = ceilGrossPrice
+		ceilGrossPrice := math.Ceil(priceStruct[sellable.yearly].Gross)
+		priceStruct[sellable.yearly].Delta = ceilGrossPrice - priceStruct[sellable.yearly].Gross
+		priceStruct[sellable.yearly].Gross = ceilGrossPrice
 		for _, roundingCoverage := range roundingCoverages {
 			hasGuarantee := out.Guarantees[roundingCoverage].Offer[offerType].PremiumNetMonthly > 0
 			if hasGuarantee {
@@ -314,20 +312,20 @@ func (p *Fx) RoundToTwoDecimalPlaces(guarantees map[string]*models.Guarante, off
 	}
 
 	for _, offerType := range offersPrices {
-		offerType[monthly].Net = roundFloatTwoDecimals(offerType[monthly].Net)
-		offerType[monthly].Tax = roundFloatTwoDecimals(offerType[monthly].Tax)
-		offerType[monthly].Delta = roundFloatTwoDecimals(offerType[monthly].Delta)
+		offerType[sellable.monthly].Net = roundFloatTwoDecimals(offerType[sellable.monthly].Net)
+		offerType[sellable.monthly].Tax = roundFloatTwoDecimals(offerType[sellable.monthly].Tax)
+		offerType[sellable.monthly].Delta = roundFloatTwoDecimals(offerType[sellable.monthly].Delta)
 
-		offerType[yearly].Net = lib.RoundFloatTwoDecimals(offerType[yearly].Net)
-		offerType[yearly].Tax = lib.RoundFloatTwoDecimals(offerType[yearly].Tax)
-		offerType[yearly].Delta = lib.RoundFloatTwoDecimals(offerType[yearly].Delta)
+		offerType[sellable.yearly].Net = lib.RoundFloatTwoDecimals(offerType[sellable.yearly].Net)
+		offerType[sellable.yearly].Tax = lib.RoundFloatTwoDecimals(offerType[sellable.yearly].Tax)
+		offerType[sellable.yearly].Delta = lib.RoundFloatTwoDecimals(offerType[sellable.yearly].Delta)
 	}
 }
 
 func (p *Fx) FilterOffersByMinimumPrice(guarantees map[string]*models.Guarante, offersPrices map[string]map[string]*models.Price, yearlyPriceMinimum float64, monthlyPriceMinimum float64) {
 	for offerKey, offer := range offersPrices {
-		hasNotOfferMinimumYearlyPrice := offer[yearly].Gross < yearlyPriceMinimum
-		hasNotOfferMinimumMonthlyPrice := offer[monthly].Gross < monthlyPriceMinimum
+		hasNotOfferMinimumYearlyPrice := offer[sellable.yearly].Gross < yearlyPriceMinimum
+		hasNotOfferMinimumMonthlyPrice := offer[sellable.monthly].Gross < monthlyPriceMinimum
 		if hasNotOfferMinimumMonthlyPrice && hasNotOfferMinimumYearlyPrice {
 			delete(offersPrices, offerKey)
 			for _, guarantee := range guarantees {
@@ -336,7 +334,7 @@ func (p *Fx) FilterOffersByMinimumPrice(guarantees map[string]*models.Guarante, 
 			return
 		}
 		if hasNotOfferMinimumMonthlyPrice {
-			delete(offersPrices[offerKey], monthly)
+			delete(offersPrices[offerKey], sellable.monthly)
 			for _, guarantee := range guarantees {
 				if p.HasGuaranteePerOffer(guarantees, offerKey, guarantee.Slug) {
 					guarantee.Offer[offerKey].PremiumNetMonthly = 0.0
@@ -346,7 +344,7 @@ func (p *Fx) FilterOffersByMinimumPrice(guarantees map[string]*models.Guarante, 
 			}
 		}
 		if hasNotOfferMinimumYearlyPrice {
-			delete(offersPrices[offerKey], yearly)
+			delete(offersPrices[offerKey], sellable.yearly)
 			for _, guarantee := range guarantees {
 				if p.HasGuaranteePerOffer(guarantees, offerKey, guarantee.Slug) {
 					guarantee.Offer[offerKey].PremiumNetYearly = 0.0
@@ -499,4 +497,4 @@ func (fx *FxSurvey) GetGuaranteeIndex(input map[string]interface{}, guranteeSlug
 		}
 	}
 	return -1
-}
+}*/
