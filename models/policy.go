@@ -131,6 +131,16 @@ type Price struct {
 	Discount float64 `firestore:"discount" json:"discount" bigquery:"-"`
 }
 
+func (policy *Policy) CalculateAge() (int, error) {
+	birthdate, e := time.Parse(time.RFC3339, policy.Contractor.BirthDate)
+	now := time.Now()
+	age := now.Year() - birthdate.Year()
+	if now.YearDay() < birthdate.YearDay() {
+		age--
+	}
+	return age, e
+}
+
 func (policy *Policy) BigquerySave(origin string) {
 	policyBig := lib.GetDatasetByEnv(origin, "policy")
 	policyJson, e := policy.Marshal()
@@ -143,6 +153,7 @@ func (policy *Policy) BigquerySave(origin string) {
 	e = lib.InsertRowsBigQuery("wopta", policyBig, policy)
 	log.Println(" policy save big query error: ", e)
 }
+
 func PolicyToListData(query *firestore.DocumentIterator) []Policy {
 	var result []Policy
 	for {
