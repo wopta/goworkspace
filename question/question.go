@@ -19,26 +19,22 @@ func Question(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Methods", "POST")
 	route := lib.RouteData{
 		Routes: []lib.Route{
-			/*{
-				Route:   "/risk/person",
-				Handler: Person,
-				Method:  http.MethodPost,
-			},
+			/*
+				{
+					Route:   "/risk/pmi",
+					Handler: PmiAllrisk,
+					Method:  http.MethodPost,
+				},
+				{
+					Route:   "/sales/life",
+					Handler: Life,
+					Method:  http.MethodPost,
+				},*/
 			{
-				Route:   "/survey/person",
+				Route:   "/v1/survey/person",
 				Handler: PersonSurvey,
 				Method:  http.MethodPost,
 			},
-			{
-				Route:   "/risk/pmi",
-				Handler: PmiAllrisk,
-				Method:  http.MethodPost,
-			},
-			{
-				Route:   "/sales/life",
-				Handler: Life,
-				Method:  http.MethodPost,
-			},*/
 			{
 				Route:   "/v1/survey/life",
 				Handler: LifeSurvey,

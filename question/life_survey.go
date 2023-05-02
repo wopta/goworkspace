@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/rules"
 	"log"
 	"net/http"
 )
@@ -21,7 +20,7 @@ func LifeSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 
 	fx := new(models.Fx)
 
-	surveys := &rules.Surveys{
+	surveys := &Surveys{
 		Surveys: make([]*models.Survey, 0),
 	}
 

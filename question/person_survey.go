@@ -1,4 +1,4 @@
-package rules
+package question
 
 import (
 	"encoding/json"
@@ -27,107 +27,18 @@ func PersonSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	policyJson, err := policy.Marshal()
 	lib.CheckError(err)
 
+	fx := new(models.Fx)
+
 	surveys := &Surveys{Surveys: make([]*models.Survey, 0), Text: ""}
 
-	rulesFile := getRulesFile(groule, rulesFileName)
+	rulesFile := lib.GetRulesFile(groule, rulesFileName)
 
-	_, ruleOutput := rulesFromJson(rulesFile, surveys, policyJson, []byte(getCoherenceData()))
+	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, surveys, policyJson, []byte(getCoherenceData()))
 
 	ruleOutputJson, err := json.Marshal(ruleOutput)
 	lib.CheckError(err)
 
 	return string(ruleOutputJson), ruleOutput, nil
-}
-
-type Surveys struct {
-	Surveys []*models.Survey `json:"surveys"`
-	Text    string           `json:"text,omitempty"`
-}
-
-type FxSurvey struct{}
-
-func (fx *FxSurvey) AppendStatement(statements []*models.Statement, title string, subtitle string, hasMultipleAnswers bool, hasAnswer bool, expectedAnswer bool) []*models.Statement {
-	statement := &models.Statement{
-		Title:              title,
-		Subtitle:           subtitle,
-		HasMultipleAnswers: nil,
-		Questions:          make([]*models.Question, 0),
-		Answer:             nil,
-		HasAnswer:          hasAnswer,
-		ExpectedAnswer:     nil,
-	}
-	if hasAnswer {
-		statement.ExpectedAnswer = &expectedAnswer
-	}
-	if hasMultipleAnswers {
-		statement.HasMultipleAnswers = &hasMultipleAnswers
-	}
-	return append(statements, statement)
-}
-
-func (fx *FxSurvey) AppendSurvey(surveys []*models.Survey, title string, subtitle string, hasMultipleAnswers bool, hasAnswer bool, expectedAnswer bool) []*models.Survey {
-	survey := &models.Survey{
-		Title:              title,
-		Subtitle:           subtitle,
-		HasMultipleAnswers: nil,
-		Questions:          make([]*models.Question, 0),
-		Answer:             nil,
-		HasAnswer:          hasAnswer,
-		ExpectedAnswer:     nil,
-	}
-	if hasAnswer {
-		survey.ExpectedAnswer = &expectedAnswer
-	}
-	if hasMultipleAnswers {
-		survey.HasMultipleAnswers = &hasMultipleAnswers
-	}
-	return append(surveys, survey)
-}
-
-func (fx *FxSurvey) AppendQuestion(questions []*models.Question, text string, isBold bool, indent bool, hasAnswer bool, expectedAnswer bool) []*models.Question {
-	question := &models.Question{
-		Question:       text,
-		IsBold:         isBold,
-		Indent:         indent,
-		Answer:         nil,
-		HasAnswer:      hasAnswer,
-		ExpectedAnswer: nil,
-	}
-	if hasAnswer {
-		question.ExpectedAnswer = &expectedAnswer
-	}
-
-	return append(questions, question)
-}
-
-func (fx *FxSurvey) HasGuaranteePolicy(input map[string]interface{}, guaranteeSlug string) bool {
-	j, err := json.Marshal(input)
-	lib.CheckError(err)
-	var policy models.Policy
-	err = json.Unmarshal(j, &policy)
-	lib.CheckError(err)
-	for _, asset := range policy.Assets {
-		for _, guarantee := range asset.Guarantees {
-			if guarantee.Slug == guaranteeSlug {
-				return true
-			}
-		}
-	}
-	return false
-}
-
-func (fx *FxSurvey) GetGuaranteeIndex(input map[string]interface{}, guranteeSlug string) int {
-	j, _ := json.Marshal(input)
-	var policy models.Policy
-	_ = json.Unmarshal(j, &policy)
-	for _, asset := range policy.Assets {
-		for i, guarantee := range asset.Guarantees {
-			if guarantee.Slug == guranteeSlug {
-				return i
-			}
-		}
-	}
-	return -1
 }
 
 func getCoherenceData() string {
