@@ -23,6 +23,11 @@ func Sellable(w http.ResponseWriter, r *http.Request) {
 				Handler: Life,
 				Method:  http.MethodPost,
 			},
+			{
+				Route:   "/v1/risk/person",
+				Handler: Person,
+				Method:  http.MethodPost,
+			},
 		},
 	}
 	route.Router(w, r)
