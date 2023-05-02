@@ -51,7 +51,7 @@ func Life(policy models.Policy) (models.Product, string, error) {
 
 	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, product, in, nil)
 
-	productJson, product, err := prd.ReplaceDatesInProduct(ruleOutput.(models.Product), 54)
+	productJson, product, err := prd.ReplaceDatesInProduct(ruleOutput.(models.Product), 55)
 	return product, productJson, err
 }
 

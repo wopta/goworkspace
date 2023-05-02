@@ -73,7 +73,7 @@ func GetNameFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	case "persona":
 		jsonString, product, err = ReplaceDatesInProduct(product, 75)
 	case "life":
-		jsonString, product, err = ReplaceDatesInProduct(product, 54)
+		jsonString, product, err = ReplaceDatesInProduct(product, 55)
 	}
 
 	return jsonString, product, err
