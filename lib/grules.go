@@ -10,12 +10,8 @@ import (
 )
 
 func RulesFromJsonV2(fx interface{}, groule []byte, out interface{}, in []byte, data []byte) (string, interface{}) {
-
 	log.Println("RulesFromJson")
-	//rules := CheckEbyte(ioutil.ReadFile("pmi-allrisk.json"))
 
-	//fx := &Fx{}
-	//fxSurvey := &FxSurvey{}
 	var err error
 	// create new instance of DataContext
 	dataContext := ast.NewDataContext()
@@ -41,10 +37,6 @@ func RulesFromJsonV2(fx interface{}, groule []byte, out interface{}, in []byte, 
 	err = dataContext.Add("fx", fx)
 	log.Println("RulesFromJson fx loaded")
 	CheckError(err)
-
-	/*err = dataContext.Add("fxSurvey", fxSurvey)
-	log.Println("RulesFromJson fxSurvey loaded")
-	CheckError(err)*/
 
 	underlying := pkg.NewBytesResource(groule)
 	CheckError(err)
