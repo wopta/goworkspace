@@ -17,23 +17,23 @@ const (
 
 type Fx struct{}
 
-func (p *Fx) ToString(value float64) string {
+func (fx *Fx) ToString(value float64) string {
 	var r int
 	r = int(math.Round(value))
 	log.Println(r)
 
 	return fmt.Sprint(r)
 }
-func (p *Fx) SetCoverage(value float64) string {
+func (fx *Fx) SetCoverage(value float64) string {
 
 	return fmt.Sprintf("%f", value)
 }
 
-func (p *Fx) Tax(value float64) string {
+func (fx *Fx) Tax(value float64) string {
 
 	return fmt.Sprintf("%f", value)
 }
-func (p *Fx) GetContentValue(buildingType string) float64 {
+func (fx *Fx) GetContentValue(buildingType string) float64 {
 	buildingType = strings.ToUpper(buildingType)
 	if buildingType == "SERVIZI MANUALI" {
 		return 0.10
@@ -52,7 +52,7 @@ func (p *Fx) GetContentValue(buildingType string) float64 {
 	}
 	return 0
 }
-func (p *Fx) GetMachineryvalue(buildingType string) float64 {
+func (fx *Fx) GetMachineryvalue(buildingType string) float64 {
 	buildingType = strings.ToUpper(buildingType)
 	if buildingType == "SERVIZI MANUALI" {
 		return 0.10
@@ -71,7 +71,7 @@ func (p *Fx) GetMachineryvalue(buildingType string) float64 {
 	}
 	return 0
 }
-func (p *Fx) GetTheftValue(buildingType string) float64 {
+func (fx *Fx) GetTheftValue(buildingType string) float64 {
 	buildingType = strings.ToUpper(buildingType)
 	if buildingType == "SERVIZI MANUALI" {
 		return 0.10
@@ -90,7 +90,7 @@ func (p *Fx) GetTheftValue(buildingType string) float64 {
 	}
 	return 0
 }
-func (p *Fx) GetElectronicValue(buildingType string) float64 {
+func (fx *Fx) GetElectronicValue(buildingType string) float64 {
 	buildingType = strings.ToUpper(buildingType)
 	if buildingType == "SERVIZI MANUALI" {
 		return 0.10
@@ -109,7 +109,7 @@ func (p *Fx) GetElectronicValue(buildingType string) float64 {
 	}
 	return 0
 }
-func (p *Fx) GetBuildigValue(buildingType string) int {
+func (fx *Fx) GetBuildigValue(buildingType string) int {
 	buildingType = strings.ToUpper(buildingType)
 	if buildingType == "INDUSTRIALE" {
 		return 600
@@ -122,34 +122,34 @@ func (p *Fx) GetBuildigValue(buildingType string) int {
 	}
 	return 0
 }
-func (p *Fx) Log(any interface{}) {
+func (fx *Fx) Log(any interface{}) {
 	log.Println(any)
 
 }
 
-func (p *Fx) FormatString(stringToFormat string, params ...interface{}) string {
+func (fx *Fx) FormatString(stringToFormat string, params ...interface{}) string {
 	return fmt.Sprintf(stringToFormat, params...)
 }
 
-func (p *Fx) AppendString(aString, subString string) string {
+func (fx *Fx) AppendString(aString, subString string) string {
 	return fmt.Sprintf("%s%s", aString, subString)
 }
 
-func (p *Fx) Replace(input string, old string, new string) string {
+func (fx *Fx) Replace(input string, old string, new string) string {
 	return strings.Replace(input, old, new, 1)
 }
 
-func (p *Fx) ReplaceAt(input string, replacement string, index int64) string {
+func (fx *Fx) ReplaceAt(input string, replacement string, index int64) string {
 	return input[:index] + string(replacement) + input[index+1:]
 }
 
-func (p *Fx) RoundNear(value float64, nearest int64) float64 {
+func (fx *Fx) RoundNear(value float64, nearest int64) float64 {
 	log.Println((math.Round(float64(value)/float64(nearest)) * float64(nearest)) - float64(nearest))
 
 	return (math.Round(float64(value)/float64(nearest)) * float64(nearest)) - float64(nearest)
 }
 
-func (p *Fx) FloatToString(in float64, decimal int64) string {
+func (fx *Fx) FloatToString(in float64, decimal int64) string {
 	return fmt.Sprintf("%.*f", decimal, in)
 }
 
@@ -241,15 +241,11 @@ func (fx *Fx) GetGuaranteeIndex(input map[string]interface{}, guranteeSlug strin
 	return -1
 }
 
-/*
-
- */
-
-func (p *Fx) DeleteOfferFromGuarantee(m map[string]*GuaranteValue, key string) {
+func (fx *Fx) DeleteOfferFromGuarantee(m map[string]*GuaranteValue, key string) {
 	delete(m, key)
 }
 
-func (p *Fx) CalculateMonthlyCoveragePrices(guarantees map[string]*Guarante) {
+func (fx *Fx) CalculateMonthlyCoveragePrices(guarantees map[string]*Guarante) {
 	for _, guarantee := range guarantees {
 		for _, offer := range guarantee.Offer {
 			offer.PremiumGrossMonthly = offer.PremiumGrossYearly / 12
@@ -259,7 +255,7 @@ func (p *Fx) CalculateMonthlyCoveragePrices(guarantees map[string]*Guarante) {
 	}
 }
 
-func (p *Fx) CalculateOfferPrices(guarantees map[string]*Guarante, offersPrices map[string]map[string]*Price) {
+func (fx *Fx) CalculateOfferPrices(guarantees map[string]*Guarante, offersPrices map[string]map[string]*Price) {
 	for _, guarantee := range guarantees {
 		for offerKey, offerValue := range guarantee.Offer {
 			offersPrices[offerKey][yearly].Net += offerValue.PremiumNetYearly
@@ -272,7 +268,7 @@ func (p *Fx) CalculateOfferPrices(guarantees map[string]*Guarante, offersPrices 
 	}
 }
 
-func (p *Fx) RoundMonthlyOfferPrices(guarantees map[string]*Guarante, offerPrice map[string]map[string]*Price, roundingGuarantees ...string) {
+func (fx *Fx) RoundMonthlyOfferPrices(guarantees map[string]*Guarante, offerPrice map[string]map[string]*Price, roundingGuarantees ...string) {
 	updatePrices := func(coverage string, offerType string, priceStruct map[string]*Price) {
 		guarantees[coverage].Offer[offerType].PremiumGrossMonthly += priceStruct[monthly].Delta
 		newNetPrice := guarantees[coverage].Offer[offerType].PremiumGrossMonthly / (1 + (guarantees[coverage].Tax / 100))
@@ -300,7 +296,7 @@ func (p *Fx) RoundMonthlyOfferPrices(guarantees map[string]*Guarante, offerPrice
 	}
 }
 
-func (p *Fx) RoundYearlyOfferPrices(guarantees map[string]*Guarante, offerPrice map[string]map[string]*Price, roundingGuarantees ...string) {
+func (fx *Fx) RoundYearlyOfferPrices(guarantees map[string]*Guarante, offerPrice map[string]map[string]*Price, roundingGuarantees ...string) {
 	updatePrices := func(coverage string, offerType string, priceStruct map[string]*Price) {
 		guarantees[coverage].Offer[offerType].PremiumGrossYearly += priceStruct[yearly].Delta
 		newNetPrice := guarantees[coverage].Offer[offerType].PremiumGrossYearly / (1 + (guarantees[coverage].Tax / 100))
@@ -325,7 +321,7 @@ func (p *Fx) RoundYearlyOfferPrices(guarantees map[string]*Guarante, offerPrice 
 	}
 }
 
-func (p *Fx) RoundToTwoDecimalPlaces(guarantees map[string]*Guarante, offersPrices map[string]map[string]*Price) {
+func (fx *Fx) RoundToTwoDecimalPlaces(guarantees map[string]*Guarante, offersPrices map[string]map[string]*Price) {
 	roundFloatTwoDecimals := func(in float64) float64 {
 		res, _ := strconv.ParseFloat(fmt.Sprintf("%.2f", in), 64)
 		return res
@@ -354,7 +350,7 @@ func (p *Fx) RoundToTwoDecimalPlaces(guarantees map[string]*Guarante, offersPric
 	}
 }
 
-func (p *Fx) FilterOffersByMinimumPrice(guarantees map[string]*Guarante, offersPrices map[string]map[string]*Price, yearlyPriceMinimum float64, monthlyPriceMinimum float64) {
+func (fx *Fx) FilterOffersByMinimumPrice(guarantees map[string]*Guarante, offersPrices map[string]map[string]*Price, yearlyPriceMinimum float64, monthlyPriceMinimum float64) {
 	for offerKey, offer := range offersPrices {
 		hasNotOfferMinimumYearlyPrice := offer[yearly].Gross < yearlyPriceMinimum
 		hasNotOfferMinimumMonthlyPrice := offer[monthly].Gross < monthlyPriceMinimum
@@ -368,7 +364,7 @@ func (p *Fx) FilterOffersByMinimumPrice(guarantees map[string]*Guarante, offersP
 		if hasNotOfferMinimumMonthlyPrice {
 			delete(offersPrices[offerKey], monthly)
 			for _, guarantee := range guarantees {
-				if p.HasGuaranteePerOffer(guarantees, offerKey, guarantee.Slug) {
+				if fx.HasGuaranteePerOffer(guarantees, offerKey, guarantee.Slug) {
 					guarantee.Offer[offerKey].PremiumNetMonthly = 0.0
 					guarantee.Offer[offerKey].PremiumTaxAmountMonthly = 0.0
 					guarantee.Offer[offerKey].PremiumGrossMonthly = 0.0
@@ -378,7 +374,7 @@ func (p *Fx) FilterOffersByMinimumPrice(guarantees map[string]*Guarante, offersP
 		if hasNotOfferMinimumYearlyPrice {
 			delete(offersPrices[offerKey], yearly)
 			for _, guarantee := range guarantees {
-				if p.HasGuaranteePerOffer(guarantees, offerKey, guarantee.Slug) {
+				if fx.HasGuaranteePerOffer(guarantees, offerKey, guarantee.Slug) {
 					guarantee.Offer[offerKey].PremiumNetYearly = 0.0
 					guarantee.Offer[offerKey].PremiumTaxAmountYearly = 0.0
 					guarantee.Offer[offerKey].PremiumGrossYearly = 0.0
@@ -389,7 +385,7 @@ func (p *Fx) FilterOffersByMinimumPrice(guarantees map[string]*Guarante, offersP
 	}
 }
 
-func (p *Fx) HasGuarantee(guarantees map[string]*Guarante, guaranteeKey string) bool {
+func (fx *Fx) HasGuarantee(guarantees map[string]*Guarante, guaranteeKey string) bool {
 	for _, guarantee := range guarantees {
 		if guarantee.Slug == guaranteeKey {
 			return true
@@ -398,7 +394,7 @@ func (p *Fx) HasGuarantee(guarantees map[string]*Guarante, guaranteeKey string) 
 	return false
 }
 
-func (p *Fx) HasGuaranteePerOffer(guarantees map[string]*Guarante, offerSlug string, guaranteeKey string) bool {
+func (fx *Fx) HasGuaranteePerOffer(guarantees map[string]*Guarante, offerSlug string, guaranteeKey string) bool {
 	for _, guarantee := range guarantees {
 		if guarantee.Slug == guaranteeKey {
 			for offerKey, _ := range guarantee.Offer {
@@ -411,27 +407,27 @@ func (p *Fx) HasGuaranteePerOffer(guarantees map[string]*Guarante, offerSlug str
 	return false
 }
 
-func (p *Fx) RemoveGuaranteeIfCondition(guarantees map[string]*Guarante, guaranteeKey string, condition bool) {
+func (fx *Fx) RemoveGuaranteeIfCondition(guarantees map[string]*Guarante, guaranteeKey string, condition bool) {
 	if condition {
-		p.RemoveGuarantee(guarantees, guaranteeKey)
+		fx.RemoveGuarantee(guarantees, guaranteeKey)
 	}
 }
 
-func (p *Fx) RemoveOfferFromGuaranteeIfCondition(guaranteeOffer map[string]*GuaranteValue, offerKey string, condition bool) {
+func (fx *Fx) RemoveOfferFromGuaranteeIfCondition(guaranteeOffer map[string]*GuaranteValue, offerKey string, condition bool) {
 	if condition {
-		p.DeleteOfferFromGuarantee(guaranteeOffer, offerKey)
+		fx.DeleteOfferFromGuarantee(guaranteeOffer, offerKey)
 	}
 }
 
-func (p *Fx) RemoveGuarantee(guarantees map[string]*Guarante, guaranteeKey string) {
+func (fx *Fx) RemoveGuarantee(guarantees map[string]*Guarante, guaranteeKey string) {
 	delete(guarantees, guaranteeKey)
 }
 
-func (p *Fx) RemoveOfferFromGuarantee(guaranteeOffer map[string]*GuaranteValue, offerKey string) {
+func (fx *Fx) RemoveOfferFromGuarantee(guaranteeOffer map[string]*GuaranteValue, offerKey string) {
 	delete(guaranteeOffer, offerKey)
 }
 
-func (p *Fx) RemoveGuaranteesPriceZero(guarantees map[string]*Guarante) {
+func (fx *Fx) RemoveGuaranteesPriceZero(guarantees map[string]*Guarante) {
 	for _, guarantee := range guarantees {
 		for offerKey, _ := range guarantee.Offer {
 			if guarantee.Offer[offerKey].PremiumGrossYearly == 0.0 {
@@ -441,6 +437,6 @@ func (p *Fx) RemoveGuaranteesPriceZero(guarantees map[string]*Guarante) {
 	}
 }
 
-func (p *Fx) RemoveOfferPrice(offerPrice map[string]map[string]*Price, offerKey string) {
+func (fx *Fx) RemoveOfferPrice(offerPrice map[string]map[string]*Price, offerKey string) {
 	delete(offerPrice, offerKey)
 }
