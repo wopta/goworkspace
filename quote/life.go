@@ -38,7 +38,8 @@ func Life(data models.Policy) (models.Policy, error) {
 	ruleProduct, _, err := sellable.Life(data)
 	lib.CheckError(err)
 
-	originalPolicy := data
+	originalPolicy := copyPolicy(data)
+
 	addDefaultGuarantees(data, ruleProduct)
 
 	//TODO: this should not be here, only for version 1
@@ -90,6 +91,13 @@ func Life(data models.Policy) (models.Policy, error) {
 	roundOfferPrices(data.OffersPrices)
 
 	return data, err
+}
+
+func copyPolicy(data models.Policy) models.Policy {
+	var originalPolicy models.Policy
+	originalPolicyBytes, _ := json.Marshal(data)
+	json.Unmarshal(originalPolicyBytes, &originalPolicy)
+	return originalPolicy
 }
 
 func addDefaultGuarantees(data models.Policy, product models.Product) {
