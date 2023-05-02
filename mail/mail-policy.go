@@ -70,7 +70,8 @@ func SendMailProposal(policy models.Policy) {
 	message = append(message, `	<br>Grazie per aver compilato, la richiesta di preventivo per una polizza <b>`+name+`</b>.
 	<br><br>Per poter valutare completamente la soluzione che sceglierai, ti alleghiamo tutti i documenti che ti consentiranno di prendere una decisione pienamente consapevole ed informata.<br> `)
 	message = append(message, `<br>Se ci fosse la necessità di richiederti alcune informazioni aggiuntive, ti contatteremo ai recapiti da te forniti.`)
-	message = append(message, `<br>Prima della sottoscrizione, leggi quanto trovi in questa mail, la <b>documentazione precontrattuale</b> che, per trasparenza e tua adeguata informazione, trovi sempre disponibile al link sotto.`)
+	message = append(message, `<br>Prima della sottoscrizione, leggi quanto trovi in questa mail, la <b>documentazione precontrattuale</b> che,
+	 per trasparenza e tua adeguata informazione, trovi sempre disponibile cliccando sul bottone sottostante.`)
 
 	SendMail(GetMailPolicy(policy, "", true, link, "Leggi documentazione", message, false, nil))
 
@@ -79,7 +80,7 @@ func SendMailProposal(policy models.Policy) {
 func SendMailPay(policy models.Policy) {
 	var message []string
 	message = append(message, `<p>hai firmato correttamente la polizza. Sei più vicino a sentirti più protetto.</br> `)
-	message = append(message, `Ti invitiamo ora ad accedere a questo link per perfezionare il pagamento.</p> `)
+	message = append(message, `Ti invitiamo ora ad accedere a cliccare sul bottone sottostante per perfezionare il pagamento.</p> `)
 	message = append(message, `<p>Infatti senza pagamento la polizza non è attiva e, solo a pagamento avvenuto, ti invieremo una mail in cui trovi tutti i documenti contrattuali completi.</br> `)
 	message = append(message, `Qualora tu abbia già provveduto, ignora questa comunicazione </p> `)
 	SendMail(GetMailPolicy(policy, "paga la tua polizza"+" n° "+policy.CodeCompany, true, policy.PayUrl, "Paga la tua polizza", message, false, nil))
@@ -88,7 +89,7 @@ func SendMailPay(policy models.Policy) {
 func SendMailSign(policy models.Policy) {
 	var message []string
 	message = append(message, `Puoi ora completare la sottoscrizione della tua polizza.`)
-	message = append(message, `<br>Clicca sul bottone sotto per accedere alla procedura semplice e guidata di firma elettronica avanzata tramite 
+	message = append(message, `<br>Clicca sul bottone sottostante per accedere alla procedura semplice e guidata di firma elettronica avanzata tramite 
 	utilizzo di un codice usa e getta che verrà inviato via sms sul tuo cellulare a noi comunicato.`)
 	message = append(message, `<br>Ti verrà richiesta l’adesione al servizio che è fornito in maniera gratuita da Wopta. Potrai prendere visione delle condizioni generali di servizio e delle caratteristiche tecniche.`)
 	message = append(message, `<br>Ultimata la procedura di firma potrai procedere al pagamento.<br>`)
