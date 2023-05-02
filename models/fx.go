@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/wopta/goworkspace/lib"
 	"log"
@@ -151,6 +152,98 @@ func (p *Fx) RoundNear(value float64, nearest int64) float64 {
 func (p *Fx) FloatToString(in float64, decimal int64) string {
 	return fmt.Sprintf("%.*f", decimal, in)
 }
+
+/*
+	SURVEY CUSTOM FUNCTIONS
+*/
+
+func (fx *Fx) AppendStatement(statements []*Statement, title string, subtitle string, hasMultipleAnswers bool, hasAnswer bool, expectedAnswer bool) []*Statement {
+	statement := &Statement{
+		Title:              title,
+		Subtitle:           subtitle,
+		HasMultipleAnswers: nil,
+		Questions:          make([]*Question, 0),
+		Answer:             nil,
+		HasAnswer:          hasAnswer,
+		ExpectedAnswer:     nil,
+	}
+	if hasAnswer {
+		statement.ExpectedAnswer = &expectedAnswer
+	}
+	if hasMultipleAnswers {
+		statement.HasMultipleAnswers = &hasMultipleAnswers
+	}
+	return append(statements, statement)
+}
+
+func (fx *Fx) AppendSurvey(surveys []*Survey, title string, subtitle string, hasMultipleAnswers bool, hasAnswer bool, expectedAnswer bool) []*Survey {
+	survey := &Survey{
+		Title:              title,
+		Subtitle:           subtitle,
+		HasMultipleAnswers: nil,
+		Questions:          make([]*Question, 0),
+		Answer:             nil,
+		HasAnswer:          hasAnswer,
+		ExpectedAnswer:     nil,
+	}
+	if hasAnswer {
+		survey.ExpectedAnswer = &expectedAnswer
+	}
+	if hasMultipleAnswers {
+		survey.HasMultipleAnswers = &hasMultipleAnswers
+	}
+	return append(surveys, survey)
+}
+
+func (fx *Fx) AppendQuestion(questions []*Question, text string, isBold bool, indent bool, hasAnswer bool, expectedAnswer bool) []*Question {
+	question := &Question{
+		Question:       text,
+		IsBold:         isBold,
+		Indent:         indent,
+		Answer:         nil,
+		HasAnswer:      hasAnswer,
+		ExpectedAnswer: nil,
+	}
+	if hasAnswer {
+		question.ExpectedAnswer = &expectedAnswer
+	}
+
+	return append(questions, question)
+}
+
+func (fx *Fx) HasGuaranteePolicy(input map[string]interface{}, guaranteeSlug string) bool {
+	j, err := json.Marshal(input)
+	lib.CheckError(err)
+	var policy Policy
+	err = json.Unmarshal(j, &policy)
+	lib.CheckError(err)
+	for _, asset := range policy.Assets {
+		for _, guarantee := range asset.Guarantees {
+			if guarantee.Slug == guaranteeSlug {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func (fx *Fx) GetGuaranteeIndex(input map[string]interface{}, guranteeSlug string) int {
+	j, _ := json.Marshal(input)
+	var policy Policy
+	_ = json.Unmarshal(j, &policy)
+	for _, asset := range policy.Assets {
+		for i, guarantee := range asset.Guarantees {
+			if guarantee.Slug == guranteeSlug {
+				return i
+			}
+		}
+	}
+	return -1
+}
+
+/*
+
+ */
 
 func (p *Fx) DeleteOfferFromGuarantee(m map[string]*GuaranteValue, key string) {
 	delete(m, key)
