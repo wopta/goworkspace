@@ -1,4 +1,4 @@
-package rules
+package sellable
 
 import (
 	"encoding/json"
@@ -20,28 +20,31 @@ func Life(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	)
 
 	log.Println("Life")
-	in, err := getContractorAge(lib.ErrorByte(io.ReadAll(r.Body)))
+
+	fx := new(models.Fx)
+
+	in, err := getInputData(lib.ErrorByte(io.ReadAll(r.Body)))
 	lib.CheckError(err)
 
-	rulesFile = getRulesFile(rulesFile, rulesFileName)
+	rulesFile = lib.GetRulesFile(rulesFile, rulesFileName)
 	product, err := prd.GetProduct("life", "v1")
 	lib.CheckError(err)
 
-	_, ruleOutput := rulesFromJson(rulesFile, product, in, nil)
+	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, product, in, nil)
 
 	productJson, product, err := prd.ReplaceDatesInProduct(ruleOutput.(models.Product), 69)
 
 	return productJson, product, nil
 }
 
-func getContractorAge(b []byte) ([]byte, error) {
+func getInputData(b []byte) ([]byte, error) {
 	var policy models.Policy
 	err := json.Unmarshal(b, &policy)
 	if err != nil {
 		return nil, err
 	}
 
-	age, err := calculateAge(policy.Contractor.BirthDate)
+	age, err := policy.CalculateAge()
 	if err != nil {
 		return nil, err
 	}

@@ -31,11 +31,6 @@ func Rules(w http.ResponseWriter, r *http.Request) {
 				Handler: PmiAllrisk,
 				Method:  http.MethodPost,
 			},
-			{
-				Route:   "/sales/life",
-				Handler: Life,
-				Method:  http.MethodPost,
-			},
 		},
 	}
 	route.Router(w, r)

@@ -18,11 +18,11 @@ func Sellable(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Methods", "POST")
 	route := lib.RouteData{
 		Routes: []lib.Route{
-			/*{
+			{
 				Route:   "/v1/sales/life",
 				Handler: Life,
 				Method:  http.MethodPost,
-			},*/
+			},
 		},
 	}
 	route.Router(w, r)
