@@ -108,12 +108,18 @@ func drawPinkHorizontalLine(pdf *fpdf.Fpdf, lineWidth float64) {
 }
 
 func drawSignatureForm(pdf *fpdf.Fpdf) {
+	signatureID++
+	text := fmt.Sprintf("\"[[!sigField\"%d\":signer1:signature(sigType=\\\"Click2Sign\\\"):label"+
+		"(\\\"firma qui\\\"):size(width=150,height=60)]]\"", signatureID)
 	pdf.SetDrawColor(0, 0, 0)
-	pdf.SetX(-80)
+	pdf.SetX(-90)
 	pdf.Cell(0, 3, "Firma del Contraente/Assicurato")
 	pdf.Ln(15)
-	pdf.SetLineWidth(thickLineWidth)
-	pdf.Line(130, pdf.GetY(), 190, pdf.GetY())
+	pdf.SetLineWidth(thinLineWidth)
+	pdf.Line(100, pdf.GetY(), 190, pdf.GetY())
+	pdf.Ln(2)
+	setBlackRegularFont(pdf, smallTextSize)
+	pdf.CellFormat(0, 3, text, "", 0, fpdf.AlignRight, false, 0, "")
 }
 
 func getParagraphTitle(pdf *fpdf.Fpdf, title string) {

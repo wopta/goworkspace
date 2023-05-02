@@ -1,6 +1,7 @@
 package test
 
 import (
+	"fmt"
 	"github.com/dustin/go-humanize"
 	"github.com/go-pdf/fpdf"
 	"github.com/wopta/goworkspace/lib"
@@ -1005,13 +1006,21 @@ func GetAxaTablePart2Section(pdf *fpdf.Fpdf, policy models.Policy) {
 	pdf.CellFormat(0, 4, "", "LR", 1, "", false, 0, "")
 	pdf.CellFormat(30, 4, "Data "+policy.EmitDate.Format(dateLayout), "L", 0, "CM",
 		false, 0, "")
-	pdf.CellFormat(100, 4, "", "", 0, "", false, 0, "")
-	pdf.CellFormat(60, 4, "Firma del contraente/Assicurato", "R", 1, "CM",
+	pdf.CellFormat(62, 4, "", "", 0, "", false, 0, "")
+	pdf.CellFormat(0, 4, "Firma del contraente/Assicurato", "R", 1, "CM",
 		false, 0, "")
 	pdf.CellFormat(0, 30, "", "BLR", 1, "", false, 0, "")
 	pdf.SetDrawColor(0, 0, 0)
 	pdf.SetLineWidth(0.4)
-	pdf.Line(147, pdf.GetY()-20, 195, pdf.GetY()-20)
+	pdf.Line(100, pdf.GetY()-20, 195, pdf.GetY()-20)
+	pdf.SetY(pdf.GetY() - 18)
+	signatureID++
+	text := fmt.Sprintf("\"[[!sigField\"%d\":signer1:signature(sigType=\\\"Click2Sign\\\"):label"+
+		"(\\\"firma qui\\\"):size(width=150,height=60)]]\"", signatureID)
+	setBlackRegularFont(pdf, smallTextSize)
+	pdf.CellFormat(0, 3, text, "", 1, fpdf.AlignRight, false, 0, "")
+	pdf.Ln(5)
+
 }
 
 func GetAxaTablePart3Section(pdf *fpdf.Fpdf) {

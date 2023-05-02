@@ -11,6 +11,10 @@ import (
 	"github.com/wopta/goworkspace/lib"
 )
 
+var (
+	signatureID = 0
+)
+
 func init() {
 	log.Println("INIT Test")
 	functions.HTTP("Test", Test)
