@@ -19,17 +19,6 @@ func Question(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Methods", "POST")
 	route := lib.RouteData{
 		Routes: []lib.Route{
-			/*
-				{
-					Route:   "/risk/pmi",
-					Handler: PmiAllrisk,
-					Method:  http.MethodPost,
-				},
-				{
-					Route:   "/sales/life",
-					Handler: Life,
-					Method:  http.MethodPost,
-				},*/
 			{
 				Route:   "/v1/survey/person",
 				Handler: PersonSurvey,
@@ -40,15 +29,20 @@ func Question(w http.ResponseWriter, r *http.Request) {
 				Handler: LifeSurvey,
 				Method:  http.MethodPost,
 			},
-			/*{
+			{
 				Route:   "/v1/statements/life",
 				Handler: LifeStatements,
 				Method:  http.MethodPost,
-			},*/
+			},
 		},
 	}
 	route.Router(w, r)
 
+}
+
+type Statements struct {
+	Statements []*models.Statement `json:"statements"`
+	Text       string              `json:"text,omitempty"`
 }
 
 type Surveys struct {
