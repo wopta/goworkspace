@@ -2,20 +2,25 @@ package rules
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/hyperjumptech/grule-rule-engine/ast"
 	"github.com/hyperjumptech/grule-rule-engine/builder"
 	"github.com/hyperjumptech/grule-rule-engine/engine"
 	"github.com/hyperjumptech/grule-rule-engine/pkg"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 	"log"
+	"math"
+	"strconv"
+	"strings"
 )
 
-func RulesFromJsonV2(fx interface{}, groule []byte, out interface{}, in []byte, data []byte) (string, interface{}) {
+func rulesFromJson(groule []byte, out interface{}, in []byte, data []byte) (string, interface{}) {
 
 	log.Println("RulesFromJson")
 	//rules := lib.CheckEbyte(ioutil.ReadFile("pmi-allrisk.json"))
 
-	//fx := &Fx{}
+	fx := &Fx{}
 	fxSurvey := &FxSurvey{}
 	var err error
 	// create new instance of DataContext
@@ -71,7 +76,7 @@ func RulesFromJsonV2(fx interface{}, groule []byte, out interface{}, in []byte, 
 	return string(b), out
 }
 
-/*type Fx struct {
+type Fx struct {
 }
 
 func (p *Fx) ToString(value float64) string {
@@ -408,4 +413,4 @@ func (p *Fx) RemoveGuaranteesPriceZero(guarantees map[string]*models.Guarante) {
 
 func (p *Fx) RemoveOfferPrice(offerPrice map[string]map[string]*models.Price, offerKey string) {
 	delete(offerPrice, offerKey)
-}*/
+}
