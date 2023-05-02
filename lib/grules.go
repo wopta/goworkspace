@@ -7,6 +7,7 @@ import (
 	"github.com/hyperjumptech/grule-rule-engine/engine"
 	"github.com/hyperjumptech/grule-rule-engine/pkg"
 	"log"
+	"os"
 )
 
 func RulesFromJsonV2(fx interface{}, groule []byte, out interface{}, in []byte, data []byte) (string, interface{}) {
@@ -68,6 +69,20 @@ func RulesFromJsonV2(fx interface{}, groule []byte, out interface{}, in []byte, 
 	CheckError(err)
 
 	return string(b), out
+}
+
+func GetRulesFile(rulesFile []byte, rulesFileName string) []byte {
+	switch os.Getenv("env") {
+	case "local":
+		rulesFile = ErrorByte(os.ReadFile("../function-data/dev/grules/" + rulesFileName))
+	case "dev":
+		rulesFile = GetFromStorage("function-data", "grules/"+rulesFileName, "")
+	case "prod":
+		rulesFile = GetFromStorage("core-350507-function-data", "grules/"+rulesFileName, "")
+	default:
+
+	}
+	return rulesFile
 }
 
 /*type Fx struct {
