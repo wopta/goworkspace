@@ -9,12 +9,12 @@ import (
 )
 
 func init() {
-	log.Println("INIT Callback")
-	functions.HTTP("Callback", Callback)
+	log.Println("INIT companydata")
+	functions.HTTP("Companydata", Callback)
 }
 
 func Callback(w http.ResponseWriter, r *http.Request) {
-	log.Println("Callback")
+	log.Println("companydata")
 	lib.EnableCors(&w, r)
 	w.Header().Set("Access-Control-Allow-Methods", "POST")
 	route := lib.RouteData{

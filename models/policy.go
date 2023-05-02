@@ -63,7 +63,8 @@ type Policy struct {
 	IsAutoRenew     bool                         `firestore:"isAutoRenew,omitempty" json:"isAutoRenew,omitempty" bigquery:"isAutoRenew"`
 	IsRenew         bool                         `firestore:"isRenew" json:"isRenew,omitempty" bigquery:"isRenew"`
 	IsSign          bool                         `firestore:"isSign" json:"isSign,omitempty" bigquery:"isSign"`
-	IsDeleted       bool                         `firestore:"isDeleted" json:"isDeleted,omitempty" bigquery:"-"`
+	IsDeleted       bool                         `firestore:"isDeleted" json:"isDeleted,omitempty" bigquery:"isDeleted"`
+	DeleteEmited    bool                         `firestore:"deleteEmited" json:"deleteEmited,omitempty" bigquery:"deleteEmited"`
 	CompanyEmit     bool                         `firestore:"companyEmit" json:"companyEmit,omitempty" bigquery:"-"`
 	CompanyEmitted  bool                         `firestore:"companyEmitted" json:"companyEmitted,omitempty" bigquery:"-"`
 	CoverageType    string                       `firestore:"coverageType,omitempty" json:"coverageType,omitempty" bigquery:"coverageType"`
@@ -160,7 +161,6 @@ func PolicyToListData(query *firestore.DocumentIterator) []Policy {
 			log.Println("todata")
 			lib.CheckError(e)
 			result = append(result, value)
-
 			log.Println(len(result))
 		}
 	}

@@ -66,13 +66,14 @@ type Offer struct {
 	Order       int    `firestore:"order,omitempty" json:"order,omitempty"`
 }
 type Track struct {
-	ColumnMap map[string]Column `firestore:"columnMap,omitempty" json:"columnMap"`
-	Name      string            `firestore:"name,omitempty" json:"name,omitempty"`
-	Type      string            `firestore:"type,omitempty" json:"type"`
-	Format    string            `firestore:"format,omitempty" json:"format,omitempty"`
+	ColumnMap []Column `firestore:"columnMap,omitempty" json:"columnMap"`
+	Name      string   `firestore:"name,omitempty" json:"name,omitempty"`
+	Type      string   `firestore:"type,omitempty" json:"type"`
+	Format    string   `firestore:"format,omitempty" json:"format,omitempty"`
 }
 type Column struct {
 	Value  string `firestore:"value,omitempty" json:"value"`
+	Name   string `firestore:"name,omitempty" json:"name,omitempty"`
 	Type   string `firestore:"type,omitempty" json:"type"`
 	Format string `firestore:"format,omitempty" json:"format,omitempty"`
 }

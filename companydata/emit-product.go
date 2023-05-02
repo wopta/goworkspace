@@ -12,26 +12,26 @@ import (
 
 func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		policy              models.Policy
-	
+		policy models.Policy
 	)
 
 	e := json.Unmarshal([]byte(getpolicymock()), &policy)
-	m := make(map[string]struct{})
-	collectFieldNames(reflect.TypeOf((*policy)(nil)), m)
-	for name := range m {
+	m := make(map[string]interface{})
+	FieldNames(policy, m)
+	for name, v := range m {
 		fmt.Println(name)
+		fmt.Println(v)
 	}
-
-		val := reflect.ValueOf(policy)
-		val.
-
-
-	
 
 	return "", nil, e
 }
+func getFieldValue(v interface{}, field string) string {
+	r := reflect.ValueOf(v)
 
+	f := reflect.Indirect(r).FieldByName(field)
+
+	return f.String()
+}
 func GetStructFieldName(Struct interface{}, StructField ...interface{}) (fields map[int]string) {
 	fields = make(map[int]string)
 	s := reflect.ValueOf(Struct).Elem()
@@ -48,8 +48,27 @@ func GetStructFieldName(Struct interface{}, StructField ...interface{}) (fields 
 	}
 	return fields
 }
-func collectFieldNames(t reflect.Type, m map[string]struct{}) {
+func FieldNames(Struct interface{}, m map[string]interface{}) {
+	v := reflect.ValueOf((Struct))
+	t := reflect.TypeOf((Struct))
+	//element:=v.Elem()
+	if t.Kind() == reflect.Struct {
+		for i := 0; i < t.NumField(); i++ {
+			fieldValue := v.Field(i)
+			typeValue := t.Field(i)
+			fmt.Println(typeValue.Name)
+			fmt.Println(typeValue.Type)
+			fmt.Println(fieldValue.Interface())
+			if typeValue.Type.Kind() == reflect.Struct {
+				FieldNames(fieldValue.Interface(), m)
+
+			}
+		}
+	}
+}
+func collectFieldNames(t reflect.Type, m map[string]interface{}) {
 	if t.Kind() == reflect.Ptr {
+
 		t = t.Elem()
 	}
 	if t.Kind() != reflect.Struct {
@@ -57,7 +76,7 @@ func collectFieldNames(t reflect.Type, m map[string]struct{}) {
 	}
 	for i := 0; i < t.NumField(); i++ {
 		sf := t.Field(i)
-		m[sf.Name] = struct{}{}
+		m[sf.Name] = t.Field(i)
 		if sf.Anonymous {
 			collectFieldNames(sf.Type, m)
 		}
@@ -102,10 +121,9 @@ func getPolicy() []models.Policy {
 	return policies
 }
 
+func getpolicymock() string {
 
-func getpolicymock()string{
-
-return `{
+	return `{
     "startDate": "2023-03-23T21:16:35.982Z",
     "endDate": "2024-03-23T21:16:35.982Z",
     "offerName": "Completa",
