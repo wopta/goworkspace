@@ -109,7 +109,7 @@ func AxaFleetTway(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 
 					for x, axarow := range axa.Values {
 						// var t string
-						if axarow[13] == row[7].(string) {
+						if strings.ToUpper(axarow[13].(string)) == strings.ToUpper(row[7].(string)) {
 							fmt.Println("axarow[13] == row[2]")
 							fmt.Println(x)
 							progressiveFormattedpre = axarow[4].(string)

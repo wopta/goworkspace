@@ -11,6 +11,7 @@ import (
 )
 
 func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	layout := "2006-01-02"
 	config := lib.SftpConfig{
 		Username:     os.Getenv("AXA_LIFE_SFTP_USER"),
 		Password:     "",                                                                                                          // required only if password authentication is to be used
@@ -72,51 +73,51 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 				for _, g := range asset.Guarantees {
 					fmt.Println(g)
 					row := []string{
-						"Codice schema",                                //Codice schema
-						"N° adesione individuale univoco",              //N° adesione individuale univoco
-						"Tipo di Transazione",                          //Tipo di Transazione
-						"Data di decorrenza",                           //Data di decorrenza
-						"Data di rinnovo",                              //"Data di rinnovo"
-						"Durata copertura assicurativa",                //"Durata copertura assicurativa"
-						"Durata complessiva",                           //"Durata complessiva"
-						"Premio assicurativo lordo",                    //
-						"Importo Assicurato",                           //"Importo Assicurato"
-						"indennizzo mensile",                           //indennizzo mensile
-						"campo disponibile",                            //campo disponibile
-						"% di sovrappremio da applicare alla garanzia", //% di sovrappremio da applicare alla garanzia
-						"Codice Concessionario /dipendenti (iscr.E)",   //Codice Concessionario /dipendenti (iscr.E)
-						"Codice Banca",                                 //Codice Banca
-						"Codice Campagna",                              //Codice Campagna
-						"Copertura Assicurativa: Totale o Pro quota",   //Copertura Assicurativa: Totale o Pro quota
-						"% assicurata dell'assicurato ",                //% assicurata dell'assicurato
-						"campo disponibile",                            //campo disponibile
-						"Maxi rata finale/Valore riscatto",             //Maxi rata finale/Valore riscatto
-						"Stato occupazionale dell'Assicurato",          //Stato occupazionale dell'Assicurato
-						"Tasso di Interesse",                           //Tasso di Interesse
-						"Canale di vendita ",                           //Canale di vendita
-						"Tipo contraente / Contraente",                 //Tipo contraente / Contraente
-						"Denominazione Sociale o Cognome",              //Denominazione Sociale o Cognome
-						"campo vuoto o nome",                           //campo vuoto o nome
-						"Sesso",                                        //Sesso
-						"Data di nascita",                              //Data di nascita
-						"Codice Fiscale ",                              //Codice Fiscale
-						"Indirizzo di residenza",                       //Indirizzo di residenza
-						"C.A.P. Di residenza",                          //C.A.P. Di residenza
-						"Comune di residenza",                          //Comune di residenza
-						"Provincia di residenza",                       //Provincia di residenza
-						"Indirizzo e-mail",                             //Indirizzo e-mail
-						"Numero di Cellulare",                          //Numero di Cellulare
-						"Cognome Assicurato ",                          //Cognome Assicurato
-						"Nome",                                         //Nome
-						"Sesso ",                                       //Sesso
-						"Data di nascita ",                             //Data di nascita
-						"Codice Fiscale ",                              //Codice Fiscale
-						"Codice Fiscale Beneficiario 1",                //Codice Fiscale Beneficiario
-						"Codice Fiscale Beneficiario 2",                //Codice Fiscale Beneficiario 2
-						"Codice Fiscale Beneficiario 3",                //Codice Fiscale Beneficiario 3
-						"AML DATA",                                     //AML DATA
-						"Natura del rapporto ",                         //Natura del rapporto
-						"Scopo del rapporto ",                          //Scopo del rapporto
+						g.CompanyCodec,                    //Codice schema
+						policy.CodeCompany,                //N° adesione individuale univoco
+						"A",                               //Tipo di Transazione
+						policy.StartDate.Format(layout),   //Data di decorrenza
+						policy.EndDate.Format(layout),     //"Data di rinnovo"
+						"012",                             //"Durata copertura assicurativa"
+						"Durata complessiva",              //"Durata complessiva"
+						fmt.Sprintf("%.2f", g.PriceGross), //"Premio assicurativo lordo"
+						fmt.Sprintf("%.0f", g.SumInsuredLimitOfIndemnity), //"Importo Assicurato"
+						"0",                                   //indennizzo mensile
+						"",                                    //campo disponibile
+						"",                                    //% di sovrappremio da applicare alla garanzia
+						"W1.42",                               //Codice Concessionario /dipendenti (iscr.E)
+						"",                                    //Codice Banca
+						"",                                    //Codice Campagna
+						"T",                                   //Copertura Assicurativa: Totale o Pro quota
+						"% assicurata dell'assicurato ",       //% assicurata dell'assicurato
+						"campo disponibile",                   //campo disponibile
+						"Maxi rata finale/Valore riscatto",    //Maxi rata finale/Valore riscatto
+						"Stato occupazionale dell'Assicurato", //Stato occupazionale dell'Assicurato
+						"Tasso di Interesse",                  //Tasso di Interesse
+						"ONLINE",                              //Canale di vendita
+						"PF",                                  //Tipo contraente / Contraente
+						"Denominazione Sociale o Cognome",     //Denominazione Sociale o Cognome
+						"campo vuoto o nome",                  //campo vuoto o nome
+						"Sesso",                               //Sesso
+						"Data di nascita",                     //Data di nascita
+						"Codice Fiscale ",                     //Codice Fiscale
+						"Indirizzo di residenza",              //Indirizzo di residenza
+						"C.A.P. Di residenza",                 //C.A.P. Di residenza
+						"Comune di residenza",                 //Comune di residenza
+						"Provincia di residenza",              //Provincia di residenza
+						"Indirizzo e-mail",                    //Indirizzo e-mail
+						"Numero di Cellulare",                 //Numero di Cellulare
+						"Cognome Assicurato ",                 //Cognome Assicurato
+						"Nome",                                //Nome
+						"Sesso ",                              //Sesso
+						"Data di nascita ",                    //Data di nascita
+						"Codice Fiscale ",                     //Codice Fiscale
+						"Codice Fiscale Beneficiario 1",       //Codice Fiscale Beneficiario
+						"Codice Fiscale Beneficiario 2",       //Codice Fiscale Beneficiario 2
+						"Codice Fiscale Beneficiario 3",       //Codice Fiscale Beneficiario 3
+						"AML DATA",                            //AML DATA
+						"Natura del rapporto ",                //Natura del rapporto
+						"Scopo del rapporto ",                 //Scopo del rapporto
 						"Modalità di pagamento del premio assicurativo (all'intermediario) ", //Modalità di pagamento del premio assicurativo (all'intermediario)
 						"contraente = Assicurato?",                                        //contraente = Assicurato?
 						"Indirizzo di domicilio",                                          //Indirizzo di domicilio
