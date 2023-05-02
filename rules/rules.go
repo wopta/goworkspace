@@ -1,7 +1,6 @@
 package rules
 
 import (
-	"github.com/wopta/goworkspace/question"
 	"log"
 	"net/http"
 
@@ -28,11 +27,6 @@ func Rules(w http.ResponseWriter, r *http.Request) {
 				Method:  http.MethodPost,
 			},
 			{
-				Route:   "/survey/person",
-				Handler: question.PersonSurvey,
-				Method:  http.MethodPost,
-			},
-			{
 				Route:   "/risk/pmi",
 				Handler: PmiAllrisk,
 				Method:  http.MethodPost,
@@ -40,11 +34,6 @@ func Rules(w http.ResponseWriter, r *http.Request) {
 			{
 				Route:   "/sales/life",
 				Handler: Life,
-				Method:  http.MethodPost,
-			},
-			{
-				Route:   "/v1/statements/life",
-				Handler: LifeStatements,
 				Method:  http.MethodPost,
 			},
 		},
