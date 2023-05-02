@@ -1,4 +1,4 @@
-package rules
+package lib
 
 import (
 	"encoding/json"
@@ -6,17 +6,16 @@ import (
 	"github.com/hyperjumptech/grule-rule-engine/builder"
 	"github.com/hyperjumptech/grule-rule-engine/engine"
 	"github.com/hyperjumptech/grule-rule-engine/pkg"
-	"github.com/wopta/goworkspace/lib"
 	"log"
 )
 
 func RulesFromJsonV2(fx interface{}, groule []byte, out interface{}, in []byte, data []byte) (string, interface{}) {
 
 	log.Println("RulesFromJson")
-	//rules := lib.CheckEbyte(ioutil.ReadFile("pmi-allrisk.json"))
+	//rules := CheckEbyte(ioutil.ReadFile("pmi-allrisk.json"))
 
 	//fx := &Fx{}
-	fxSurvey := &FxSurvey{}
+	//fxSurvey := &FxSurvey{}
 	var err error
 	// create new instance of DataContext
 	dataContext := ast.NewDataContext()
@@ -24,49 +23,49 @@ func RulesFromJsonV2(fx interface{}, groule []byte, out interface{}, in []byte, 
 	if in != nil {
 		err = dataContext.AddJSON("in", in)
 		log.Println("RulesFromJson in")
-		lib.CheckError(err)
+		CheckError(err)
 	}
 
 	if out != nil {
 		err = dataContext.Add("out", out)
 		log.Println("RulesFromJson out")
-		lib.CheckError(err)
+		CheckError(err)
 	}
 
 	if data != nil {
 		err = dataContext.AddJSON("data", data)
 		log.Println("RulesFromJson data loaded")
-		lib.CheckError(err)
+		CheckError(err)
 	}
 
 	err = dataContext.Add("fx", fx)
 	log.Println("RulesFromJson fx loaded")
-	lib.CheckError(err)
+	CheckError(err)
 
-	err = dataContext.Add("fxSurvey", fxSurvey)
+	/*err = dataContext.Add("fxSurvey", fxSurvey)
 	log.Println("RulesFromJson fxSurvey loaded")
-	lib.CheckError(err)
+	CheckError(err)*/
 
 	underlying := pkg.NewBytesResource(groule)
-	lib.CheckError(err)
+	CheckError(err)
 
 	resource := pkg.NewJSONResourceFromResource(underlying)
-	lib.CheckError(err)
+	CheckError(err)
 	// Add the rule definition above into the library and name it 'TutorialRules'  version '0.0.1'
 	knowledgeLibrary := ast.NewKnowledgeLibrary()
 	ruleBuilder := builder.NewRuleBuilder(knowledgeLibrary)
 	//bs := pkg.NewBytesResource([]byte(fileRes))
 
 	err = ruleBuilder.BuildRuleFromResource("rules", "0.0.1", resource)
-	lib.CheckError(err)
+	CheckError(err)
 	knowledgeBase := knowledgeLibrary.NewKnowledgeBaseInstance("rules", "0.0.1")
 	eng := engine.NewGruleEngine()
 	err = eng.Execute(dataContext, knowledgeBase)
-	lib.CheckError(err)
+	CheckError(err)
 
 	//resp := "execute"
 	b, err := json.Marshal(out)
-	lib.CheckError(err)
+	CheckError(err)
 
 	return string(b), out
 }
@@ -302,9 +301,9 @@ func (p *Fx) RoundToTwoDecimalPlaces(guarantees map[string]*models.Guarante, off
 			offerType.PremiumTaxAmountMonthly = roundFloatTwoDecimals(offerType.PremiumTaxAmountMonthly)
 			offerType.PremiumGrossMonthly = roundFloatTwoDecimals(offerType.PremiumGrossMonthly)
 
-			offerType.PremiumNetYearly = lib.RoundFloatTwoDecimals(offerType.PremiumNetYearly)
-			offerType.PremiumTaxAmountYearly = lib.RoundFloatTwoDecimals(offerType.PremiumTaxAmountYearly)
-			offerType.PremiumGrossYearly = lib.RoundFloatTwoDecimals(offerType.PremiumGrossYearly)
+			offerType.PremiumNetYearly = RoundFloatTwoDecimals(offerType.PremiumNetYearly)
+			offerType.PremiumTaxAmountYearly = RoundFloatTwoDecimals(offerType.PremiumTaxAmountYearly)
+			offerType.PremiumGrossYearly = RoundFloatTwoDecimals(offerType.PremiumGrossYearly)
 		}
 	}
 
@@ -313,9 +312,9 @@ func (p *Fx) RoundToTwoDecimalPlaces(guarantees map[string]*models.Guarante, off
 		offerType[monthly].Tax = roundFloatTwoDecimals(offerType[monthly].Tax)
 		offerType[monthly].Delta = roundFloatTwoDecimals(offerType[monthly].Delta)
 
-		offerType[yearly].Net = lib.RoundFloatTwoDecimals(offerType[yearly].Net)
-		offerType[yearly].Tax = lib.RoundFloatTwoDecimals(offerType[yearly].Tax)
-		offerType[yearly].Delta = lib.RoundFloatTwoDecimals(offerType[yearly].Delta)
+		offerType[yearly].Net = RoundFloatTwoDecimals(offerType[yearly].Net)
+		offerType[yearly].Tax = RoundFloatTwoDecimals(offerType[yearly].Tax)
+		offerType[yearly].Delta = RoundFloatTwoDecimals(offerType[yearly].Delta)
 	}
 }
 
