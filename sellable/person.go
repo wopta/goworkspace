@@ -45,9 +45,8 @@ const (
 
 func Person(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		policy    models.Policy
-		rulesFile []byte
-		e         error
+		policy models.Policy
+		err    error
 	)
 	const (
 		rulesFileName = "person.json"
@@ -56,11 +55,11 @@ func Person(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	log.Println("Person")
 
 	req := lib.ErrorByte(io.ReadAll(r.Body))
-	quotingInputData := getRulesInputData(&policy, e, req)
+	quotingInputData := getRulesInputData(&policy, err, req)
 
 	fx := new(models.Fx)
 
-	rulesFile = lib.GetRulesFile(rulesFile, rulesFileName)
+	rulesFile := lib.GetRulesFile(rulesFileName)
 	_, ruleOut := lib.RulesFromJsonV2(fx, rulesFile, initRuleOut(), quotingInputData, []byte(getQuotingData()))
 
 	ruleOut.(*RuleOut).ToPolicy(&policy)

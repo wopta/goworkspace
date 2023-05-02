@@ -11,7 +11,6 @@ import (
 
 func PersonSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		groule []byte
 		policy models.Policy
 	)
 	const (
@@ -31,7 +30,7 @@ func PersonSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 
 	surveys := &Surveys{Surveys: make([]*models.Survey, 0), Text: ""}
 
-	rulesFile := lib.GetRulesFile(groule, rulesFileName)
+	rulesFile := lib.GetRulesFile(rulesFileName)
 
 	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, surveys, policyJson, []byte(getCoherenceData()))
 

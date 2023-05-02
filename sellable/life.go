@@ -30,8 +30,7 @@ func LifeHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 
 func Life(policy models.Policy) (models.Product, string, error) {
 	var (
-		rulesFile []byte
-		err       error
+		err error
 	)
 	const (
 		rulesFileName = "life.json"
@@ -41,7 +40,7 @@ func Life(policy models.Policy) (models.Product, string, error) {
 	if err != nil {
 		return models.Product{}, "", err
 	}
-	rulesFile = lib.GetRulesFile(rulesFile, rulesFileName)
+	rulesFile := lib.GetRulesFile(rulesFileName)
 	product, err := prd.GetProduct("life", "v1")
 	if err != nil {
 		return models.Product{}, "", err

@@ -12,7 +12,6 @@ import (
 func LifeStatements(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		policy    models.Policy
-		grule     []byte
 		rulesFile []byte
 	)
 	const (
@@ -35,7 +34,7 @@ func LifeStatements(w http.ResponseWriter, r *http.Request) (string, interface{}
 		Text:       "",
 	}
 
-	rulesFile = lib.GetRulesFile(grule, rulesFilename)
+	rulesFile = lib.GetRulesFile(rulesFilename)
 
 	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, statements, policyJson, nil)
 

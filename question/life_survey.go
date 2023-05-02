@@ -9,9 +9,6 @@ import (
 )
 
 func LifeSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	var (
-		grule []byte
-	)
 	const (
 		rulesFileName = "life_survey.json"
 	)
@@ -24,7 +21,7 @@ func LifeSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 		Surveys: make([]*models.Survey, 0),
 	}
 
-	rulesFile := lib.GetRulesFile(grule, rulesFileName)
+	rulesFile := lib.GetRulesFile(rulesFileName)
 
 	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, surveys, nil, nil)
 
