@@ -8,11 +8,8 @@ require (
 	cloud.google.com/go v0.110.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
 	github.com/go-gota/gota v0.12.0
-	github.com/hyperjumptech/grule-rule-engine v1.13.0
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
-	github.com/wopta/goworkspace/lib v1.0.10
-	github.com/wopta/goworkspace/models v1.0.39
-	github.com/wopta/goworkspace/product v1.0.16
+	github.com/wopta/goworkspace/lib v1.0.18
 	github.com/wopta/goworkspace/quote v1.0.1
 )
 
