@@ -7,7 +7,9 @@ import (
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"os"
+	"strconv"
 	"strings"
+	"time"
 )
 
 var (
@@ -39,16 +41,18 @@ func loadCustomFonts(pdf *fpdf.Fpdf) {
 	pdf.AddUTF8Font("Noto", "", lib.GetAssetPathByEnv("test")+"/notosansmono.ttf")
 }
 
-func save(pdf *fpdf.Fpdf) (string, []byte) {
-	filename := "document/contract.pdf"
+func save(pdf *fpdf.Fpdf, policy models.Policy) (string, []byte) {
+	var filename string
 	if os.Getenv("env") == "local" {
-		err := pdf.OutputFileAndClose(filename)
+		err := pdf.OutputFileAndClose("document/contract.pdf")
 		lib.CheckError(err)
 	} else {
 		var out bytes.Buffer
 		err := pdf.Output(&out)
 		lib.CheckError(err)
-		filename := "temp/test_contract.pdf"
+		now := time.Now()
+		timestamp := strconv.FormatInt(now.Unix(), 10)
+		filename = "temp/" + policy.Contractor.Name + "_" + policy.Contractor.Surname + "_" + timestamp + "_contract.pdf"
 		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, out.Bytes())
 		lib.CheckError(err)
 		return filename, out.Bytes()
