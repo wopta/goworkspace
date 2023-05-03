@@ -339,7 +339,7 @@ func GetBeneficiariSection(pdf *fpdf.Fpdf, policy models.Policy) {
 		},
 	}
 
-	deathGuarantee, err := extractGuarantee(policy.Assets[0].Guarantees, "death")
+	deathGuarantee, err := policy.ExtractGuarantee("death")
 	lib.CheckError(err)
 
 	if deathGuarantee.Beneficiaries != nil && !(*deathGuarantee.Beneficiaries)[0].IsLegitimateSuccessors {
@@ -451,7 +451,7 @@ func GetBeneficiaryReferenceSection(pdf *fpdf.Fpdf, policy models.Policy) {
 		"phone":    "=====",
 	}
 
-	deathGuarantee, err := extractGuarantee(policy.Assets[0].Guarantees, "death")
+	deathGuarantee, err := policy.ExtractGuarantee("death")
 	lib.CheckError(err)
 
 	if deathGuarantee.BeneficiaryReferance != nil {
@@ -1580,7 +1580,7 @@ func GetPersonalDataHandlingSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	notConsentText := ""
 
 	if policy.Contractor.Consens != nil {
-		consent, err := extractConsens(*policy.Contractor.Consens, 1)
+		consent, err := policy.ExtractConsens(1)
 		lib.CheckError(err)
 
 		if !consent.Answer {

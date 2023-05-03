@@ -245,21 +245,3 @@ func guaranteesToMap(guarantees []models.Guarante) map[string]models.Guarante {
 	}
 	return m
 }
-
-func extractGuarantee(guarantees []models.Guarante, guaranteeSlug string) (models.Guarante, error) {
-	for _, guarantee := range guarantees {
-		if guarantee.Slug == guaranteeSlug {
-			return guarantee, nil
-		}
-	}
-	return models.Guarante{}, fmt.Errorf("no %s guarantee found", guaranteeSlug)
-}
-
-func extractConsens(consens []models.Consens, consentKey int64) (models.Consens, error) {
-	for _, consent := range consens {
-		if consent.Key == consentKey {
-			return consent, nil
-		}
-	}
-	return models.Consens{}, fmt.Errorf("no consent found with key %d", consentKey)
-}
