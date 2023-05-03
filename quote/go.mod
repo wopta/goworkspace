@@ -2,19 +2,17 @@ module github.com/wopta/goworkspace/quote
 
 go 1.19
 
-replace (
-	github.com/wopta/goworkspace/quote => ./
-	github.com/wopta/goworkspace/sellable v0.0.0 => ../sellable
-)
+replace github.com/wopta/goworkspace/quote => ./
 
 require (
 	cloud.google.com/go v0.110.0
-	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
+	github.com/GoogleCloudPlatform/functions-framework-go v1.7.1
 	github.com/dustin/go-humanize v1.0.1
-	github.com/wopta/goworkspace/lib v1.0.10
-	github.com/wopta/goworkspace/models v1.0.39
-	github.com/wopta/goworkspace/product v1.0.15
-	github.com/wopta/goworkspace/sellable v0.0.0
+	github.com/wopta/goworkspace/lib v1.0.18
+	github.com/wopta/goworkspace/models v1.0.46
+	github.com/wopta/goworkspace/product v1.0.17
+	github.com/wopta/goworkspace/sellable v1.0.0
+	modernc.org/mathutil v1.5.0
 )
 
 require (
@@ -50,6 +48,7 @@ require (
 	github.com/modern-go/reflect2 v0.0.0-20180701023420-4b7aa43c6742 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/pkg/sftp v1.13.5 // indirect
+	github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 // indirect
 	github.com/richardlehane/mscfb v1.0.4 // indirect
 	github.com/richardlehane/msoleps v1.0.3 // indirect
 	github.com/sergi/go-diff v1.0.0 // indirect
