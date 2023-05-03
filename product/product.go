@@ -55,12 +55,10 @@ const (
 
 func GetNameFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	name := r.Header.Get("name")
-	/*v := strings.Split(r.RequestURI, "/")
-	version := v[1]*/
+
 	log.Println(r.RequestURI)
-	/*log.Println(v)
-	log.Println(v[1])*/
-	product, err := GetProduct(name, "v1")
+
+	product, err := GetName(name, "v1")
 	if err != nil {
 
 		return "", nil, err
@@ -75,7 +73,7 @@ func GetNameFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	case "persona":
 		jsonString, product, err = ReplaceDatesInProduct(product, 75)
 	case "life":
-		jsonString, product, err = ReplaceDatesInProduct(product, 69)
+		jsonString, product, err = ReplaceDatesInProduct(product, 55)
 	}
 
 	return jsonString, product, err
@@ -99,10 +97,7 @@ func ReplaceDatesInProduct(product models.Product, minYear int) (string, models.
 	productJson = regexMinDate.ReplaceAllString(productJson, minDate)
 
 	err = json.Unmarshal(jsonOut, &product)
-	if err != nil {
-		return "", models.Product{}, err
-	}
-	return productJson, models.Product{}, err
+	return productJson, product, err
 }
 
 func GetName(name string, version string) (models.Product, error) {

@@ -1,4 +1,4 @@
-package rules
+package question
 
 import (
 	"encoding/json"
@@ -9,22 +9,21 @@ import (
 )
 
 func LifeSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	var (
-		grule []byte
-	)
 	const (
 		rulesFileName = "life_survey.json"
 	)
 
 	log.Println("Life Survey")
 
+	fx := new(models.Fx)
+
 	surveys := &Surveys{
 		Surveys: make([]*models.Survey, 0),
 	}
 
-	rulesFile := getRulesFile(grule, rulesFileName)
+	rulesFile := lib.GetRulesFile(rulesFileName)
 
-	_, ruleOutput := rulesFromJson(rulesFile, surveys, nil, nil)
+	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, surveys, nil, nil)
 
 	ruleOutputJson, err := json.Marshal(ruleOutput)
 	lib.CheckError(err)
