@@ -161,6 +161,14 @@ func (policy *Policy) ExtractConsens(consentKey int64) (Consens, error) {
 	return Consens{}, fmt.Errorf("no consent found with key %d", consentKey)
 }
 
+func (policy *Policy) GuaranteesToMap() map[string]Guarante {
+	m := make(map[string]Guarante, 0)
+	for _, guarantee := range policy.Assets[0].Guarantees {
+		m[guarantee.Slug] = guarantee
+	}
+	return m
+}
+
 func (policy *Policy) BigquerySave(origin string) {
 	policyBig := lib.GetDatasetByEnv(origin, "policy")
 	policyJson, e := policy.Marshal()
