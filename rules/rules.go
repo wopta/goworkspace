@@ -4,8 +4,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/wopta/goworkspace/models"
-
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	lib "github.com/wopta/goworkspace/lib"
 )
@@ -22,53 +20,14 @@ func Rules(w http.ResponseWriter, r *http.Request) {
 	route := lib.RouteData{
 		Routes: []lib.Route{
 			{
-				Route:   "/risk/person",
-				Handler: Person,
-				Method:  http.MethodPost,
-			},
-			{
-				Route:   "/survey/person",
-				Handler: PersonSurvey,
-				Method:  http.MethodPost,
-			},
-			{
 				Route:   "/risk/pmi",
 				Handler: PmiAllrisk,
-				Method:  http.MethodPost,
-			},
-			{
-				Route:   "/sales/life",
-				Handler: Life,
-				Method:  http.MethodPost,
-			},
-			{
-				Route:   "survey/life",
-				Handler: LifeSurvey,
-				Method:  http.MethodPost,
-			},
-			{
-				Route:   "/v1/statements/life",
-				Handler: LifeStatements,
 				Method:  http.MethodPost,
 			},
 		},
 	}
 	route.Router(w, r)
 
-}
-
-type RuleOut struct {
-	Guarantees map[string]*models.Guarante         `json:"guarantees"`
-	OfferPrice map[string]map[string]*models.Price `json:"offerPrice"`
-}
-
-func (r *RuleOut) ToPolicy(policy *models.Policy) {
-	policy.OffersPrices = r.OfferPrice
-	guarantees := make([]models.Guarante, 0)
-	for _, guarantee := range r.Guarantees {
-		guarantees = append(guarantees, *guarantee)
-	}
-	policy.Assets[0].Guarantees = guarantees
 }
 
 type Coverage struct {

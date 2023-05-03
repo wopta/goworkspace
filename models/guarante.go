@@ -1,6 +1,10 @@
 package models
 
-import "github.com/wopta/goworkspace/lib"
+import (
+	"log"
+
+	"github.com/wopta/goworkspace/lib"
+)
 
 type Guarante struct {
 	Status                     string                    `firestore:"status,omitempty" json:"status,omitempty" bigquery:"status"`
@@ -90,14 +94,16 @@ type Duration struct {
 	Year int `firestore:"year,omitempty" json:"year,omitempty"`
 }
 
-func SetGuaranteBigquery(policy Policy, status string, origin string) {
+func SetGuaranteBigquery(policy Policy, status string, origin string) error {
+	var e error
 	for _, asset := range policy.Assets {
 		for _, g := range asset.Guarantees {
 			g.Status = status
 			g.PolicyUid = policy.Uid
-			lib.InsertRowsBigQuery("wopta", origin, g)
+			e = lib.InsertRowsBigQuery("wopta", origin, g)
+			log.Println(e)
 		}
 
 	}
-
+	return e
 }

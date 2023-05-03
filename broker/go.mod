@@ -8,10 +8,10 @@ require (
 	cloud.google.com/go v0.110.0
 	cloud.google.com/go/firestore v1.9.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
-	github.com/wopta/goworkspace/document v1.0.28
+	github.com/wopta/goworkspace/document v1.0.30
 	github.com/wopta/goworkspace/lib v1.0.17
-	github.com/wopta/goworkspace/mail v1.0.16
-	github.com/wopta/goworkspace/models v1.0.42
+	github.com/wopta/goworkspace/mail v1.0.18
+	github.com/wopta/goworkspace/models v1.0.45
 	github.com/wopta/goworkspace/payment v1.0.23
 	github.com/wopta/goworkspace/user v1.0.0
 	github.com/wopta/goworkspace/wiseproxy v1.0.3
@@ -35,7 +35,7 @@ require (
 	github.com/boombuler/barcode v1.0.1 // indirect
 	github.com/cloudevents/sdk-go/v2 v2.6.1 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
-	github.com/emirpasic/gods v1.12.0 // indirect
+	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/go-gota/gota v0.12.0 // indirect
 	github.com/goccy/go-json v0.9.11 // indirect
 	github.com/golang-jwt/jwt/v4 v4.4.2 // indirect
@@ -47,6 +47,7 @@ require (
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.2.3 // indirect
 	github.com/googleapis/gax-go/v2 v2.7.0 // indirect
+	github.com/heimdalr/dag v1.2.1
 	github.com/hyperjumptech/grule-rule-engine v1.12.0 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
 	github.com/johnfercher/maroto v0.38.0 // indirect

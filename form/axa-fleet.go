@@ -109,7 +109,7 @@ func AxaFleetTway(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 
 					for x, axarow := range axa.Values {
 						// var t string
-						if axarow[13] == row[7].(string) {
+						if strings.ToUpper(axarow[13].(string)) == strings.ToUpper(row[7].(string)) {
 							fmt.Println("axarow[13] == row[2]")
 							fmt.Println(x)
 							progressiveFormattedpre = axarow[4].(string)
@@ -174,7 +174,7 @@ func AxaFleetTway(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 			//filepath = "../tmp/" + filepath
 		}
 		sourcest, e = CreateExcel(excel, "../tmp/"+filepath)
-		lib.PutToStorage("function-data", "tway-fleet-axa/"+filepath, sourcest)
+		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "tway-fleet-axa/"+filepath, sourcest)
 		SftpUpload(filepath)
 		mail.SendMail((getMailObj("<p>inserite in copertura: </p><p>"+strings.Join(insertList, ", ")+"</p><p>escluse dalla copertura: </p><p>"+strings.Join(deleteList, ", ")+"</p>",
 			mailsource)))
@@ -293,6 +293,11 @@ func getMailObj(msg string, mailsource string) mail.MailRequest {
 	obj.Subject = " Wopta T-Way Axa Fleet"
 	obj.IsHtml = true
 	obj.IsAttachment = false
+	obj.IsLink = true
+	obj.Link = ""
+	obj.LinkLabel = ""
+	obj.Title = ""
+	obj.SubTitle = ""
 
 	return obj
 }

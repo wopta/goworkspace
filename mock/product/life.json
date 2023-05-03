@@ -4,29 +4,71 @@
   "version": "v1",
   "steps": [
     {
-      "widget": "quoterhome",
       "attributes": {
-        "logoUrl": "assets/images/wopta-logo-vita-magenta.png",
+        "logoSubtitle": "Vita",
         "logoTitle": "Wopta Per Te",
-        "logoSubtitle": "Vita"
+        "logoUrl": "assets/images/wopta-logo-vita-magenta.png"
       },
       "children": [
         {
-          "widget": "datepicker",
           "attributes": {
-            "name": "contractor->birthDate",
-            "value": null,
             "label": "Seleziona data di nascita",
+            "name": "contractor->birthDate",
             "initialDate": "{{INITIAL_DATE}}",
             "minDate": "{{MIN_DATE}}",
-            "maxDate": "{{INITIAL_DATE}}"
-          }
+            "maxDate": "{{INITIAL_DATE}}",
+            "value": null
+          },
+          "widget": "datepicker"
         }
-      ]
+      ],
+      "widget": "quoterhome"
     },
     {
-      "widget": "guaranteeconfigurationstep",
-      "attributes": {}
+      "attributes": {},
+      "children": [
+        {
+          "attributes": {
+            "consens": "Il sottoscritto, letta e compresa l'informativa sul trattamento dei dati personali, ACCONSENTE al trattamento dei propri dati personali da parte di Wopta Assicurazioni per l'invio di comunicazioni e proposte commerciali e di marketing, incluso l'invio di newsletter e ricerche di mercato, attraverso strumenti automatizzati (sms, mms, e-mail, ecc.) e non (posta cartacea e telefono con operatore).",
+            "key": 1,
+            "title": "Privacy"
+          },
+          "widget": "privacyConsent"
+        }
+      ],
+      "widget": "guaranteeconfigurationstep"
+    },
+    {
+      "attributes": {
+        "companyPrivacy": "PRESTO IL CONSENSO al trattamento dei miei dati personali ad AXA Partners, ivi inclusi quelli eventualmente da me conferiti in riferimento al mio stato di salute, per le finalità indicate nell’informativa consultabile all’interno dei documenti precontrattuali ricevuti via mail o consultabili LINK, nonché alla loro comunicazione, per successivo trattamento, da parte dei soggetti indicati nella informativa predetta.",
+        "companyPrivacyTitle": "Privacy Assicurativa",
+        "statementsEndpoint": "question/v1/survey/life"
+      },
+      "widget": "quotersurvey"
+    },
+    {
+      "attributes": {
+        "statementsEndpoint": "question/v1/statements/life"
+      },
+      "widget": "quoterstatements"
+    },
+
+    {
+      "attributes": {
+        "beneficiaryText": "Per procedere indicare chi sono i beneficiari della polizza in caso di decesso dell'assicurato.\\nPuoi indicare genericamente i tuoi eredi legittimi e/o testamentari. Oppure inserire in maniera puntuale i nomi dei Beneficiari (Massimo due).",
+        "guaranteeSlug": "death",
+        "maximumNumberOfBeneficiaries": 2,
+        "thirdPartyReferenceText": "In caso di specifiche esigenze di riservatezza, potrai indicare il nominativo ed i dati di recapito (inluso email e/o telefono) di un soggetto terno (diverso dal Beneficiario) a cui l'impresa di Assicurazione potrà rivolgersi in caso di decesso dell'Assicurato al fine di contattare il Beneficiario."
+      },
+      "widget": "quoterbeneficiary"
+    },
+    {
+      "attributes": null,
+      "widget": "quotercontractordata"
+    },
+    {
+      "attributes": null,
+      "widget": "quoterrecap"
     }
   ],
   "companies": [

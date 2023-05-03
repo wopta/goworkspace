@@ -5,10 +5,9 @@ import (
 	"log"
 	"net/http"
 
-	"cloud.google.com/go/firestore"
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
+	dag "github.com/heimdalr/dag"
 	lib "github.com/wopta/goworkspace/lib"
-	models "github.com/wopta/goworkspace/models"
 )
 
 func init() {
@@ -45,6 +44,11 @@ func Broker(w http.ResponseWriter, r *http.Request) {
 				Handler: Emit,
 				Method:  "POST",
 			},
+			{
+				Route:   "/v1/policy/reserved",
+				Handler: reserved,
+				Method:  "POST",
+			},
 		},
 	}
 	route.Router(w, r)
@@ -62,64 +66,24 @@ type BrokerResponse struct {
 	Bytes         string `json:"bytes"`
 }
 
-func GetSequenceByCompany(name string, firePolicy string) (string, int, int) {
-	var (
-		codeCompany         string
-		companyDefault      int
-		companyPrefix       string
-		companyPrefixLenght string
-		numberCompany       int
-		number              int
-	)
-	switch name {
-	case "global":
-		companyDefault = 1
-		companyPrefix = "WB"
-		companyPrefixLenght = "%07d"
-	case "axa":
-		companyDefault = 100001
-		companyPrefix = "WB"
-		companyPrefixLenght = "%07d"
-	}
+func reserved(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	// initialize a new graph
+	d := dag.NewDAG()
 
-	rn, e := lib.OrderWhereLimitFirestoreErr(firePolicy, "company", "numberCompany", "==", name, firestore.Desc, 1)
-	lib.CheckError(e)
-	policy := models.PolicyToListData(rn)
+	// init three vertices
+	v1, _ := d.AddVertex(1)
+	v2, _ := d.AddVertex(2)
+	v3, _ := d.AddVertex(struct {
+		a string
+		b string
+	}{a: "foo", b: "bar"})
 
-	if len(policy) == 0 {
-		//WE0000001
-		numberCompany = companyDefault
-		codeCompany = companyPrefix + fmt.Sprintf(companyPrefixLenght, numberCompany)
-		number = 1
-	} else {
-		numberCompany = policy[0].NumberCompany + 1
-		codeCompany = companyPrefix + fmt.Sprintf(companyPrefixLenght, numberCompany)
-		number = policy[0].Number + 1
-	}
-	r, e := lib.OrderLimitFirestoreErr(firePolicy, "number", firestore.Desc, 1)
-	lib.CheckError(e)
-	policyCompany := models.PolicyToListData(r)
-	if len(policyCompany) == 0 {
-		number = 1
-	} else {
+	// add the above vertices and connect them with two edges
+	_ = d.AddEdge(v1, v2)
+	_ = d.AddEdge(v1, v3)
 
-		number = policyCompany[0].Number + 1
-	}
-	log.Println("GetSequenceByCompany: ", codeCompany)
+	// describe the graph
+	fmt.Print(d.String())
 
-	return codeCompany, numberCompany, number
-}
-func GetSequenceProposal(name string, firePolicy string) int {
-	var number int
-	r, e := lib.OrderLimitFirestoreErr(firePolicy, "proposalNumber", firestore.Desc, 1)
-	lib.CheckError(e)
-	policyCompany := models.PolicyToListData(r)
-	if len(policyCompany) == 0 {
-		number = 1
-	} else {
-
-		number = policyCompany[0].ProposalNumber + 1
-	}
-	log.Println("GetSequenceProposal: ", number)
-	return number
+	return "", nil, nil
 }

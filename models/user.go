@@ -116,7 +116,7 @@ func UserUpdateByFiscalcode(user User) (string, error) {
 	)
 	docsnap := lib.WhereFirestore("users", "fiscalCode", "==", user.FiscalCode)
 	userL, e := FirestoreDocumentToUser(docsnap)
-	usersFire := lib.GetDatasetByContractorName(user.Name, "users")
+	usersFire := lib.GetDatasetByEnv(user.Name, "users")
 	if len(user.Uid) == 0 {
 		user.CreationDate = time.Now()
 		user.UpdatedDate = time.Now()

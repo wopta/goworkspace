@@ -2,6 +2,7 @@ package models
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"time"
 
@@ -63,7 +64,8 @@ type Policy struct {
 	IsAutoRenew     bool                         `firestore:"isAutoRenew,omitempty" json:"isAutoRenew,omitempty" bigquery:"isAutoRenew"`
 	IsRenew         bool                         `firestore:"isRenew" json:"isRenew,omitempty" bigquery:"isRenew"`
 	IsSign          bool                         `firestore:"isSign" json:"isSign,omitempty" bigquery:"isSign"`
-	IsDeleted       bool                         `firestore:"isDeleted" json:"isDeleted,omitempty" bigquery:"-"`
+	IsDeleted       bool                         `firestore:"isDeleted" json:"isDeleted,omitempty" bigquery:"isDeleted"`
+	DeleteEmited    bool                         `firestore:"deleteEmited" json:"deleteEmited,omitempty" bigquery:"deleteEmited"`
 	CompanyEmit     bool                         `firestore:"companyEmit" json:"companyEmit,omitempty" bigquery:"-"`
 	CompanyEmitted  bool                         `firestore:"companyEmitted" json:"companyEmitted,omitempty" bigquery:"-"`
 	CoverageType    string                       `firestore:"coverageType,omitempty" json:"coverageType,omitempty" bigquery:"coverageType"`
@@ -131,6 +133,25 @@ type Price struct {
 	Discount float64 `firestore:"discount" json:"discount" bigquery:"-"`
 }
 
+func (policy *Policy) CalculateContractorAge() (int, error) {
+	birthdate, e := time.Parse(time.RFC3339, policy.Contractor.BirthDate)
+	now := time.Now()
+	age := now.Year() - birthdate.Year()
+	if now.YearDay() < birthdate.YearDay() {
+		age--
+	}
+	return age, e
+}
+
+func (policy *Policy) ExtractGuarantee(guaranteeSlug string) (Guarante, error) {
+	for _, guarantee := range policy.Assets[0].Guarantees {
+		if guarantee.Slug == guaranteeSlug {
+			return guarantee, nil
+		}
+	}
+	return Guarante{}, fmt.Errorf("no %s guarantee found", guaranteeSlug)
+}
+
 func (policy *Policy) BigquerySave(origin string) {
 	policyBig := lib.GetDatasetByEnv(origin, "policy")
 	policyJson, e := policy.Marshal()
@@ -143,6 +164,7 @@ func (policy *Policy) BigquerySave(origin string) {
 	e = lib.InsertRowsBigQuery("wopta", policyBig, policy)
 	log.Println(" policy save big query error: ", e)
 }
+
 func PolicyToListData(query *firestore.DocumentIterator) []Policy {
 	var result []Policy
 	for {
@@ -160,7 +182,6 @@ func PolicyToListData(query *firestore.DocumentIterator) []Policy {
 			log.Println("todata")
 			lib.CheckError(e)
 			result = append(result, value)
-
 			log.Println(len(result))
 		}
 	}

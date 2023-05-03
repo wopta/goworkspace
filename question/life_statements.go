@@ -1,4 +1,4 @@
-package rules
+package question
 
 import (
 	"encoding/json"
@@ -12,7 +12,6 @@ import (
 func LifeStatements(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		policy    models.Policy
-		grule     []byte
 		rulesFile []byte
 	)
 	const (
@@ -28,22 +27,19 @@ func LifeStatements(w http.ResponseWriter, r *http.Request) (string, interface{}
 	policyJson, err := policy.Marshal()
 	lib.CheckError(err)
 
+	fx := new(models.Fx)
+
 	statements := &Statements{
 		Statements: make([]*models.Statement, 0),
 		Text:       "",
 	}
 
-	rulesFile = getRulesFile(grule, rulesFilename)
+	rulesFile = lib.GetRulesFile(rulesFilename)
 
-	_, ruleOutput := rulesFromJson(rulesFile, statements, policyJson, nil)
+	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, statements, policyJson, nil)
 
 	ruleOutputJson, err := json.Marshal(ruleOutput)
 	lib.CheckError(err)
 
 	return string(ruleOutputJson), ruleOutput, nil
-}
-
-type Statements struct {
-	Statements []*models.Statement `json:"statements"`
-	Text       string              `json:"text,omitempty"`
 }

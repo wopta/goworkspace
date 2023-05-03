@@ -24,4 +24,7 @@ use(
 ./partnership
 ./companydata
 ./test
+./question
+./sellable
 )
+

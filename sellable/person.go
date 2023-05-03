@@ -1,4 +1,4 @@
-package rules
+package sellable
 
 /*
 
@@ -30,15 +30,12 @@ INPUT:
 */
 import (
 	"encoding/json"
-	"io"
-	"log"
-	"net/http"
-	"os"
-	"time"
-
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	prd "github.com/wopta/goworkspace/product"
+	"io"
+	"log"
+	"net/http"
 )
 
 const (
@@ -48,20 +45,22 @@ const (
 
 func Person(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		policy    models.Policy
-		rulesFile []byte
-		e         error
+		policy models.Policy
+		err    error
 	)
 	const (
 		rulesFileName = "person.json"
 	)
 
 	log.Println("Person")
-	req := lib.ErrorByte(io.ReadAll(r.Body))
-	quotingInputData := getRulesInputData(&policy, e, req)
 
-	rulesFile = getRulesFile(rulesFile, rulesFileName)
-	_, ruleOut := rulesFromJson(rulesFile, initRuleOut(), quotingInputData, []byte(getQuotingData()))
+	req := lib.ErrorByte(io.ReadAll(r.Body))
+	quotingInputData := getRulesInputData(&policy, err, req)
+
+	fx := new(models.Fx)
+
+	rulesFile := lib.GetRulesFile(rulesFileName)
+	_, ruleOut := lib.RulesFromJsonV2(fx, rulesFile, initRuleOut(), quotingInputData, []byte(getQuotingData()))
 
 	ruleOut.(*RuleOut).ToPolicy(&policy)
 
@@ -71,25 +70,11 @@ func Person(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	return string(policyJson), policy, nil
 }
 
-func getRulesFile(rulesFile []byte, rulesFileName string) []byte {
-	switch os.Getenv("env") {
-	case "local":
-		rulesFile = lib.ErrorByte(os.ReadFile("../function-data/dev/grules/" + rulesFileName))
-	case "dev":
-		rulesFile = lib.GetFromStorage("function-data", "grules/"+rulesFileName, "")
-	case "prod":
-		rulesFile = lib.GetFromStorage("core-350507-function-data", "grules/"+rulesFileName, "")
-	default:
-
-	}
-	return rulesFile
-}
-
 func getRulesInputData(policy *models.Policy, e error, req []byte) []byte {
 	*policy, e = models.UnmarshalPolicy(req)
 	lib.CheckError(e)
 
-	age, e := calculateAge(policy.Contractor.BirthDate)
+	age, e := policy.CalculateContractorAge()
 	lib.CheckError(e)
 	policy.QuoteQuestions["age"] = age
 	policy.QuoteQuestions["work"] = policy.Contractor.Work
@@ -101,19 +86,23 @@ func getRulesInputData(policy *models.Policy, e error, req []byte) []byte {
 	return request
 }
 
-func calculateAge(birthDateIsoString string) (int, error) {
-	birthdate, e := time.Parse(time.RFC3339, birthDateIsoString)
-	now := time.Now()
-	age := now.Year() - birthdate.Year()
-	if now.YearDay() < birthdate.YearDay() {
-		age--
-	}
-	return age, e
-}
-
 func getPersonProduct() (models.Product, error) {
 	product, err := prd.GetName("persona", "v1")
 	return product, err
+}
+
+type RuleOut struct {
+	Guarantees map[string]*models.Guarante         `json:"guarantees"`
+	OfferPrice map[string]map[string]*models.Price `json:"offerPrice"`
+}
+
+func (r *RuleOut) ToPolicy(policy *models.Policy) {
+	policy.OffersPrices = r.OfferPrice
+	guarantees := make([]models.Guarante, 0)
+	for _, guarantee := range r.Guarantees {
+		guarantees = append(guarantees, *guarantee)
+	}
+	policy.Assets[0].Guarantees = guarantees
 }
 
 func initRuleOut() *RuleOut {

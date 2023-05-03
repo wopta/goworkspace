@@ -6,8 +6,8 @@ replace github.com/wopta/goworkspace/form => ./
 
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
-	github.com/wopta/goworkspace/lib v1.0.7
-	github.com/wopta/goworkspace/mail v1.0.6
+	github.com/wopta/goworkspace/lib v1.0.17
+	github.com/wopta/goworkspace/mail v1.0.18
 	github.com/xuri/excelize/v2 v2.7.0
 	google.golang.org/api v0.112.0
 )
@@ -64,7 +64,8 @@ require (
 	github.com/sergi/go-diff v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
-	github.com/wopta/goworkspace/models v1.0.6 // indirect
+	github.com/wopta/goworkspace/models v1.0.45 // indirect
+	github.com/wopta/goworkspace/wiseproxy v1.0.2 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
 	github.com/xuri/nfp v0.0.0-20220409054826-5e722a1d9e22 // indirect
