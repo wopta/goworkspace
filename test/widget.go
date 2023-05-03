@@ -895,7 +895,7 @@ func GetAxaTableSection(pdf *fpdf.Fpdf, policy models.Policy) {
 
 	pdf.MultiCell(0, 3, "A. dichiaro che i seguenti dati riportati relativi alla mia persona "+
 		"corrispondono al vero ", "", "", false)
-	pdf.CellFormat(5, 4, "", "", 0, "", false, 0, "")
+	pdf.CellFormat(5, 3, "", "", 0, "", false, 0, "")
 	setWhiteBoldFont(pdf, standardTextSize)
 	pdf.CellFormat(180, 4, "DATI IDENTIFICATIVI DEL CLIENTE (CONTRAENTE/ASSICURATO)", "TLR",
 		0, "CM", true, 0, "")
@@ -949,8 +949,8 @@ func GetAxaTableSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	pdf.CellFormat(180, 4, "Se Altro (specificare):", "BLR", 0, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "L", 1, "", false, 0, "")
 	pdf.Ln(1)
-	setBlackRegularFont(pdf, standardTextSize)
 
+	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "B. allego una fotocopia fronte/retro del mio documento di identità non scaduto "+
 		"avente i seguenti estremi, confermando la veridicità dei dati sotto riportati: ", "", "", false)
 	pdf.CellFormat(5, 4, "", "", 0, "", false, 0, "")
@@ -963,50 +963,49 @@ func GetAxaTableSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	pdf.CellFormat(5, 4, "", "", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "", 0, "", false, 0, "")
 	pdf.CellFormat(90, 4, "Località di rilascio: =======", "1", 0, "", false, 0, "")
-	pdf.CellFormat(90, 4, "Data di scadenza: =======", "1", 0, "", false, 0, "")
-	pdf.CellFormat(5, 4, "", "", 1, "", false, 0, "")
-	pdf.MultiCell(0, 1, "", "", "", false)
+	pdf.CellFormat(90, 4, "Data di scadenza: =======", "1", 1, "", false, 0, "")
+	pdf.Ln(1)
 
-	pdf.MultiCell(0, 4, "C. dichiaro di NON essere una Persona Politicamente Esposta", "",
+	pdf.MultiCell(0, 3, "C. dichiaro di NON essere una Persona Politicamente Esposta", "",
 		"", false)
-	pdf.CellFormat(4, 4, "", "", 0, "", false, 0, "")
-	pdf.CellFormat(0, 4, "In caso di risposta affermativa indicare la tipologia:", "", 1,
+	pdf.CellFormat(4, 3, "", "", 0, "", false, 0, "")
+	pdf.CellFormat(0, 3, "In caso di risposta affermativa indicare la tipologia:", "", 1,
 		"", false, 0, "")
 
-	pdf.MultiCell(0, 4, "D. dichiaro di NON essere destinatario di misure di congelamento dei fondi e "+
+	pdf.MultiCell(0, 3, "D. dichiaro di NON essere destinatario di misure di congelamento dei fondi e "+
 		"risorse economiche", "", "", false)
-	pdf.CellFormat(4, 4, "", "", 0, "", false, 0, "")
-	pdf.CellFormat(0, 4, "In caso di risposta affermativa indicare il motivo:", "", 1,
+	pdf.CellFormat(4, 3, "", "", 0, "", false, 0, "")
+	pdf.CellFormat(0, 3, "In caso di risposta affermativa indicare il motivo:", "", 1,
 		"", false, 0, "")
 
-	pdf.MultiCell(0, 4, "E. dichiaro di NON essere sottoposto a procedimenti o di NON aver subito condanne "+
+	pdf.MultiCell(0, 3, "E. dichiaro di NON essere sottoposto a procedimenti o di NON aver subito condanne "+
 		"per reati in materia economica/ finanziaria/tributaria/societaria", "", "", false)
-	pdf.CellFormat(4, 4, "", "", 0, "", false, 0, "")
-	pdf.CellFormat(0, 4, "In caso di risposta affermativa indicare il motivo:", "", 1,
+	pdf.CellFormat(4, 3, "", "", 0, "", false, 0, "")
+	pdf.CellFormat(0, 3, "In caso di risposta affermativa indicare il motivo:", "", 1,
 		"", false, 0, "")
 
-	pdf.MultiCell(0, 4, "F. dichiaro ai fini dell'identificazione del Titolare Effettivo, di essere una "+
+	pdf.MultiCell(0, 3, "F. dichiaro ai fini dell'identificazione del Titolare Effettivo, di essere una "+
 		"persona fisica che agisce in nome e per conto proprio, di essere il soggetto Contraente/Assicurato, e "+
 		"quindi che non esiste il titolare effettivo", "", "", false)
 
-	pdf.MultiCell(0, 4, "G. fornisco, con riferimento allo scopo e alla natura prevista del rapporto "+
+	pdf.MultiCell(0, 3, "G. fornisco, con riferimento allo scopo e alla natura prevista del rapporto "+
 		"continuativo, le seguenti informazioni", "", "", false)
 	pdf.CellFormat(4, 8, "", "", 0, "", false, 0, "")
-	pdf.MultiCell(0, 4, "i. Tipologia di rapporto continuativo (informazione immediatamente desunta dal "+
+	pdf.MultiCell(0, 3, "i. Tipologia di rapporto continuativo (informazione immediatamente desunta dal "+
 		"rapporto): Stipula di un contratto di assicurazione di puro rischio che prevede garanzia di ramo vita "+
 		"(caso morte Assicurato)", "", "", false)
 	pdf.CellFormat(4, 12, "", "", 0, "", false, 0, "")
-	pdf.MultiCell(0, 4, "ii. Scopo prevalente del rapporto continuativo in riferimento alle garanzie vita"+
+	pdf.MultiCell(0, 3, "ii. Scopo prevalente del rapporto continuativo in riferimento alle garanzie vita"+
 		" (informazione immediatamente desunta dal rapporto):Protezione assicurativa al fine di garantire ai "+
 		"beneficiari un capitale qualora si verifichi l’evento oggetto di copertura", "", "", false)
-	pdf.CellFormat(4, 4, "", "", 0, "", false, 0, "")
-	pdf.MultiCell(0, 4, "iii.  Origine dei fondi utilizzati per il pagamento dei premi assicurativi: "+
+	pdf.CellFormat(4, 3, "", "", 0, "", false, 0, "")
+	pdf.MultiCell(0, 3, "iii.  Origine dei fondi utilizzati per il pagamento dei premi assicurativi: "+
 		"Proprie risorse economiche", "", "", false)
 	pdf.CellFormat(0, 2, "", "", 1, "", false, 0, "")
 }
 
 func GetAxaTablePart2Section(pdf *fpdf.Fpdf, policy models.Policy) {
-	pdf.MultiCell(0, 4, "Il sottoscritto, ai sensi degli artt. 22 e 55 comma 3 del d.lgs. 231/2007, "+
+	pdf.MultiCell(0, 3, "Il sottoscritto, ai sensi degli artt. 22 e 55 comma 3 del d.lgs. 231/2007, "+
 		"consapevole della responsabilità penale derivante da omesse e/o mendaci affermazioni, dichiara che tutte le "+
 		"informazioni fornite (anche in riferimento al titolare effettivo), le dichiarazioni rilasciate il documento "+
 		"di identità che allego, ed i dati riprodotti negli appositi campi del Modulo di Polizza corrispondono al "+
@@ -1017,7 +1016,7 @@ func GetAxaTablePart2Section(pdf *fpdf.Fpdf, policy models.Policy) {
 	pdf.Ln(4)
 
 	setBlackBoldFont(pdf, standardTextSize)
-	pdf.CellFormat(30, 4, "Data "+policy.EmitDate.Format(dateLayout), "", 0, "CM",
+	pdf.CellFormat(30, 3, "Data "+policy.EmitDate.Format(dateLayout), "", 0, "CM",
 		false, 0, "")
 	drawSignatureForm(pdf)
 }
