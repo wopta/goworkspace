@@ -80,6 +80,7 @@ type DodumentData struct {
 		SumInsuredLimitOfIndemnity int64  `json:"sumInsuredLimitOfIndemnity"`
 	} `json:"coverages"`
 }
+
 type Skin struct {
 	PrimaryColor         color.Color
 	SecondaryColor       color.Color
