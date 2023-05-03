@@ -124,11 +124,7 @@ func calculateGuaranteeDuration(assets []models.Asset, contractorAge int, deathD
 			case "permanent-disability":
 				assets[assetIndex].Guarantees[guaranteeIndex].Value.Duration.Year = deathDuration
 			case "temporary-disability", "serious-ill":
-				if 64-contractorAge >= 10 {
-					assets[assetIndex].Guarantees[guaranteeIndex].Value.Duration.Year = 10
-				} else {
-					assets[assetIndex].Guarantees[guaranteeIndex].Value.Duration.Year = mathutil.Min(deathDuration, guarantee.Value.Duration.Year)
-				}
+				assets[assetIndex].Guarantees[guaranteeIndex].Value.Duration.Year = mathutil.Min(deathDuration, 10)
 			}
 		}
 	}
