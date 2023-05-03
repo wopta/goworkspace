@@ -34,9 +34,6 @@ func Life(pdf *fpdf.Fpdf, policy models.Policy) (string, []byte) {
 
 	GetSurveysSection(pdf, policy)
 
-	drawSignatureForm(pdf)
-	pdf.Ln(5)
-
 	GetStatementsSection(pdf, policy)
 
 	pdf.AddPage()
@@ -607,9 +604,12 @@ func GetSurveysSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	getParagraphTitle(pdf, "Questionario Medico")
 	pdf.Ln(8)
 	for _, survey := range surveys[1:] {
-		printSurvey(pdf, survey)
+		err := printSurvey(pdf, survey)
+		lib.CheckError(err)
 	}
 	pdf.Ln(8)
+	drawSignatureForm(pdf)
+	pdf.Ln(5)
 }
 
 func GetStatementsSection(pdf *fpdf.Fpdf, policy models.Policy) {

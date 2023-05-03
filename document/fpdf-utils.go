@@ -133,7 +133,7 @@ func getParagraphTitle(pdf *fpdf.Fpdf, title string) {
 	pdf.Cell(0, 10, title)
 }
 
-func printSurvey(pdf *fpdf.Fpdf, survey models.Survey) {
+func printSurvey(pdf *fpdf.Fpdf, survey models.Survey) error {
 	leftMargin, _, rightMargin, _ := pdf.GetMargins()
 	pageWidth, _ := pdf.GetPageSize()
 	availableWidth := pageWidth - leftMargin - rightMargin - 2
@@ -141,6 +141,9 @@ func printSurvey(pdf *fpdf.Fpdf, survey models.Survey) {
 
 	setBlackBoldFont(pdf, standardTextSize)
 	if survey.HasAnswer {
+		if *survey.Answer != *survey.ExpectedAnswer {
+			return fmt.Errorf("%s: answer not equal expected answer", survey.Title)
+		}
 		answer := "NO"
 		if *survey.Answer {
 			answer = "SI"
@@ -181,6 +184,10 @@ func printSurvey(pdf *fpdf.Fpdf, survey models.Survey) {
 		if question.HasAnswer {
 			var questionWidth, paddingWidth float64
 
+			if *question.Answer != *question.ExpectedAnswer {
+				return fmt.Errorf("%s: answer not equal expected answer", question.Question)
+			}
+
 			answer := "NO"
 			if *question.Answer {
 				answer = "SI"
@@ -199,6 +206,7 @@ func printSurvey(pdf *fpdf.Fpdf, survey models.Survey) {
 		}
 		pdf.MultiCell(rowWidth, 3.5, question.Question, "", fpdf.AlignLeft, false)
 	}
+	return nil
 }
 
 func printStatement(pdf *fpdf.Fpdf, statement models.Statement) {
