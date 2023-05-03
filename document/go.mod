@@ -10,6 +10,7 @@ require (
 	github.com/johnfercher/maroto v0.38.0
 	github.com/wopta/goworkspace/lib v1.0.9
 	github.com/wopta/goworkspace/models v1.0.22
+	github.com/go-pdf/fpdf v0.7.0
 )
 
 require (
