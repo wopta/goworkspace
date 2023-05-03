@@ -112,9 +112,9 @@
       "attributes": {}
     },
     {
-      "widget": "quoterstatements",
+      "widget": "quotersurvey",
       "attributes": {
-        "statementsEndpoint": "rules/survey/person"
+        "statementsEndpoint": "question/v1/survey/person"
       }
     },
     {
