@@ -194,7 +194,7 @@ func GetAxaHeader(pdf *fpdf.Fpdf) {
 func GetAxaFooter(pdf *fpdf.Fpdf) {
 	pdf.SetFooterFunc(func() {
 		pdf.SetXY(10, -30)
-		setBlackRegularFont(pdf, standardTextSize)
+		setBlackRegularFont(pdf, smallTextSize)
 		pdf.MultiCell(0, 3, "AXA France Vie (compagnia assicurativa del gruppo AXA). Indirizzo sede "+
 			"legale in Francia: 313 Terrasses de l'Arche, 92727 NANTERRE CEDEX. Numero Iscrizione Registro delle "+
 			"Imprese di Nanterre: 310499959. Autorizzata in Francia (Stato di origine) all'esercizio delle "+
