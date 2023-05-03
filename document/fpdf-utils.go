@@ -12,10 +12,6 @@ import (
 	"time"
 )
 
-var (
-	signatureID = 0
-)
-
 const (
 	basePath         = "document"
 	thickLineWidth   = 0.4
@@ -209,7 +205,6 @@ func printStatement(pdf *fpdf.Fpdf, statement models.Statement) {
 	leftMargin, _, rightMargin, _ := pdf.GetMargins()
 	pageWidth, _ := pdf.GetPageSize()
 	rowWidth := pageWidth - leftMargin - rightMargin
-	hasAnswer := false
 
 	setPinkBoldFont(pdf, titleTextSize)
 	if statement.Title != "" {
@@ -230,13 +225,10 @@ func printStatement(pdf *fpdf.Fpdf, statement models.Statement) {
 		if question.Indent {
 			pdf.SetX(tabDimension)
 		}
-		if question.HasAnswer {
-			hasAnswer = true
-		}
 		pdf.MultiCell(rowWidth, 3.5, question.Question, "", fpdf.AlignLeft, false)
 	}
 	pdf.Ln(5)
-	if hasAnswer {
+	if statement.HasAnswer {
 		drawSignatureForm(pdf)
 		pdf.Ln(10)
 	}

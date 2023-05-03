@@ -10,7 +10,13 @@ import (
 	"time"
 )
 
+var (
+	signatureID int
+)
+
 func Life(pdf *fpdf.Fpdf, policy models.Policy) (string, []byte) {
+	signatureID = 0
+
 	GetMainHeader(pdf, policy)
 	GetMainFooter(pdf)
 
@@ -93,7 +99,7 @@ func Life(pdf *fpdf.Fpdf, policy models.Policy) (string, []byte) {
 
 	GetPersonalDataHandlingSection(pdf, policy)
 
-	filename, out := save(pdf)
+	filename, out := save(pdf, policy)
 	return filename, out
 }
 
@@ -613,7 +619,8 @@ func GetStatementsSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	for _, statement := range statements {
 		printStatement(pdf, statement)
 	}
-	pdf.SetY(pdf.GetY() - 26)
+	pdf.SetY(pdf.GetY() - 28)
+	setBlackBoldFont(pdf, standardTextSize)
 	pdf.MultiCell(70, 3, "AXA France Vie\n(Rappresentanza Generale per l'Italia)", "",
 		fpdf.AlignCenter, false)
 	var opt fpdf.ImageOptions
