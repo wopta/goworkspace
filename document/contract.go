@@ -46,7 +46,8 @@ func ContractObj(data model.Policy) <-chan DocumentResponse {
 			//-----------Save file
 			filename, out = Save(m, data)
 		case "axa":
-			filename, out = AxaContract(data)
+			pdf := initFpdf()
+			filename, out = AxaContract(pdf, data)
 		}
 
 		data.DocumentName = filename
