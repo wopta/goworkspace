@@ -34,13 +34,6 @@ func Life(data models.Policy) (models.Policy, error) {
 	df := lib.CsvToDataframe(b)
 	var selectRow []string
 
-	/*ruleProduct, _, err := sellable.Life(data)
-	lib.CheckError(err)
-
-	originalPolicy := copyPolicy(data)
-
-	addDefaultGuarantees(data, ruleProduct)*/
-
 	//TODO: this should not be here, only for version 1
 	deathGuarantee, err := extractGuarantee(data.Assets[0].Guarantees, "death")
 	lib.CheckError(err)
@@ -77,43 +70,13 @@ func Life(data models.Policy) (models.Policy, error) {
 		calculateGuaranteePrices(guarantee, baseFloat, taxFloat)
 
 		calculateOfferPrices(data, guarantee)
-
-		/*selectedGuarantee, _ := originalPolicy.ExtractGuarantee(guarantee.Slug)
-		if !reflect.ValueOf(selectedGuarantee).IsZero() && guarantee.IsSellable {
-			calculateOfferPrices(data, guarantee)
-		}*/
 	}
 
-	//filterByMinimumPrice(data, originalPolicy)
 	filterByMinimumPrice(data)
 
 	roundOfferPrices(data)
 
 	return data, err
-}
-
-func copyPolicy(data models.Policy) models.Policy {
-	var originalPolicy models.Policy
-	originalPolicyBytes, _ := json.Marshal(data)
-	json.Unmarshal(originalPolicyBytes, &originalPolicy)
-	return originalPolicy
-}
-
-func addDefaultGuarantees(data models.Policy, product models.Product) {
-	guaranteeList := make([]models.Guarante, 0)
-
-	for _, guarantee := range data.Assets[0].Guarantees {
-		product.Companies[0].GuaranteesMap[guarantee.Slug].Value = guarantee.Value
-	}
-
-	for _, guarantee := range product.Companies[0].GuaranteesMap {
-		if guarantee.Value == nil {
-			guarantee.Value = guarantee.Offer["default"]
-		}
-		guaranteeList = append(guaranteeList, *guarantee)
-	}
-
-	data.Assets[0].Guarantees = guaranteeList
 }
 
 func calculateGuaranteeDuration(assets []models.Asset, contractorAge int, deathDuration int) {
@@ -155,19 +118,15 @@ func filterByMinimumPrice(policy models.Policy) {
 	lib.CheckError(err)
 
 	for guaranteeIndex, guarantee := range policy.Assets[0].Guarantees {
-		//selectedGuarantee, _ := originalPolicy.ExtractGuarantee(guarantee.Slug)
 		hasNotMinimumYearlyPrice := guarantee.Value.PremiumGrossYearly < product.Companies[0].GuaranteesMap[guarantee.Slug].Config.MinimumGrossYearly
-		//isSelected := !reflect.ValueOf(selectedGuarantee).IsZero()
 		if hasNotMinimumYearlyPrice {
 			policy.Assets[0].Guarantees[guaranteeIndex].IsSellable = false
-			//if isSelected {
 			policy.OffersPrices["default"]["monthly"].Net -= guarantee.Value.PremiumNetMonthly
 			policy.OffersPrices["default"]["monthly"].Gross -= guarantee.Value.PremiumGrossMonthly
 			policy.OffersPrices["default"]["monthly"].Tax -= guarantee.Value.PremiumGrossMonthly - guarantee.Value.PremiumNetMonthly
 			policy.OffersPrices["default"]["yearly"].Net -= guarantee.Value.PremiumNetYearly
 			policy.OffersPrices["default"]["yearly"].Gross -= guarantee.Value.PremiumGrossYearly
 			policy.OffersPrices["default"]["yearly"].Tax -= guarantee.Value.PremiumGrossYearly - guarantee.Value.PremiumNetYearly
-			//}
 		}
 	}
 

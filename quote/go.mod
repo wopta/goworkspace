@@ -11,7 +11,6 @@ require (
 	github.com/wopta/goworkspace/lib v1.0.18
 	github.com/wopta/goworkspace/models v1.0.46
 	github.com/wopta/goworkspace/product v1.0.17
-	github.com/wopta/goworkspace/sellable v1.0.0
 	modernc.org/mathutil v1.5.0
 )
 
