@@ -26,6 +26,7 @@ const (
 func initFpdf() *fpdf.Fpdf {
 	pdf := fpdf.New(fpdf.OrientationPortrait, fpdf.UnitMillimeter, fpdf.PageSizeA4, "")
 	pdf.SetMargins(10, 15, 10)
+	pdf.SetAuthor("Wopta Assicurazioni s.r.l", true)
 	loadCustomFonts(pdf)
 	return pdf
 }
@@ -54,6 +55,12 @@ func save(pdf *fpdf.Fpdf, policy models.Policy) (string, []byte) {
 		return filename, out.Bytes()
 	}
 	return filename, nil
+}
+
+func pageNumber(pdf *fpdf.Fpdf) {
+	setBlackRegularFont(pdf, smallTextSize)
+	pdf.MultiCell(0, 3, fmt.Sprintf("pagina %d di %d", pdf.PageNo(), pdf.PageCount()), "", fpdf.AlignRight, false)
+	pdf.Ln(3)
 }
 
 func setBlackDrawColor(pdf *fpdf.Fpdf) {

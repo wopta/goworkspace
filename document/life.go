@@ -105,7 +105,6 @@ func GetMainHeader(pdf *fpdf.Fpdf, policy models.Policy) {
 		opt      fpdf.ImageOptions
 		logoPath string
 		cfpi     string
-		nextpay  string
 	)
 	logoPath = lib.GetAssetPathByEnv(basePath) + "/logo_vita.png"
 
@@ -119,16 +118,10 @@ func GetMainHeader(pdf *fpdf.Fpdf, policy models.Policy) {
 		cfpi = contractor.VatCode
 	}
 
-	if policy.PaymentSplit == "monthly" {
-		nextpay = policy.StartDate.AddDate(0, 1, 0).Format(dateLayout)
-	} else {
-		nextpay = policy.StartDate.AddDate(1, 0, 0).Format(dateLayout)
-	}
-
 	policyInfo := "Numero: " + policy.CodeCompany + "\n" +
 		"Decorre dal: " + policy.StartDate.Format(dateLayout) + " ore 24:00\n" +
 		"Scade il: " + policy.EndDate.Format(dateLayout) + " ore 24:00\n" +
-		"Prima scadenza annuale il: " + nextpay + "\n" +
+		"Prima scadenza annuale il: " + policy.StartDate.AddDate(1, 0, 0).Format(dateLayout) + "\n" +
 		"Non si rinnova a scadenza."
 
 	contractorInfo := "Contraente: " + strings.ToUpper(contractor.Surname+" "+contractor.Name+"\n"+
@@ -309,6 +302,9 @@ func GetGuaranteesTable(pdf *fpdf.Fpdf, policy models.Policy) {
 		temporaryDisability = "temporary-disability"
 		seriousIll          = "serious-ill"
 	)
+	var (
+		price float64
+	)
 
 	slugs := []string{death, permanentDisability, temporaryDisability, seriousIll}
 
@@ -347,7 +343,12 @@ func GetGuaranteesTable(pdf *fpdf.Fpdf, policy models.Policy) {
 		guarantees[guarantee.Slug]["sumInsuredLimitOfIndemnity"] = humanize.FormatFloat("#.###,", guarantee.Value.SumInsuredLimitOfIndemnity) + " €"
 		guarantees[guarantee.Slug]["duration"] = strconv.Itoa(guarantee.Value.Duration.Year)
 		guarantees[guarantee.Slug]["endDate"] = policy.StartDate.AddDate(guarantee.Value.Duration.Year, 0, 0).Format(dateLayout)
-		guarantees[guarantee.Slug]["price"] = humanize.FormatFloat("#.###,##", guarantee.Value.PremiumGrossYearly) + " €"
+		if policy.PaymentSplit == "monthly" {
+			price = guarantee.Value.PremiumGrossMonthly * 12
+		} else {
+			price = guarantee.Value.PremiumGrossYearly
+		}
+		guarantees[guarantee.Slug]["price"] = humanize.FormatFloat("#.###,##", price) + " €"
 		if guarantee.Slug != death {
 			guarantees[guarantee.Slug]["price"] += " (*)"
 		}
@@ -628,7 +629,6 @@ func GetStatementsSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/firma_axa.png", 35, pdf.GetY()+3, 30, 8,
 		false, opt, 0, "")
 	pdf.Ln(15)
-
 }
 
 func GetVisioneDocumentiSection(pdf *fpdf.Fpdf, policy models.Policy) {
@@ -693,7 +693,6 @@ func GetOfferResumeSection(pdf *fpdf.Fpdf, policy models.Policy) {
 		0, "CM", false, 0, "")
 	pdf.Ln(3)
 	drawPinkHorizontalLine(pdf, 0.1)
-	pdf.Ln(3)
 }
 
 func GetPaymentResumeSection(pdf *fpdf.Fpdf, policy models.Policy) {
@@ -702,9 +701,19 @@ func GetPaymentResumeSection(pdf *fpdf.Fpdf, policy models.Policy) {
 
 	cellWidth := pdf.GetStringWidth("00/00/0000:") + pdf.GetStringWidth("€ ###.###,##")
 
-	for _, guarantee := range policy.Assets[0].Guarantees {
-		for i := 0; i < guarantee.Value.Duration.Year; i++ {
-			payments[i] += guarantee.Value.PremiumGrossYearly
+	if policy.PaymentSplit == "yearly" {
+		for _, guarantee := range policy.Assets[0].Guarantees {
+			for i := 0; i < guarantee.Value.Duration.Year; i++ {
+				payments[i] += guarantee.Value.PremiumGrossYearly
+			}
+		}
+	} else if policy.PaymentSplit == "monthly" {
+		for _, guarantee := range policy.Assets[0].Guarantees {
+			for i := 0; i < guarantee.Value.Duration.Year; i++ {
+				for y := 0; y < 12; y++ {
+					payments[i] += guarantee.Value.PremiumGrossMonthly
+				}
+			}
 		}
 	}
 
@@ -776,10 +785,10 @@ func GetPaymentResumeSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	}
 
 	pdf.Ln(1)
+	setBlackRegularFont(pdf, smallTextSize)
 	pdf.MultiCell(0, 3, "In caso di frazionamento mensile i Premi sopra riportati sono dovuti, alle date "+
 		"indicate e con successiva frequenza mensile, in misura di 1/12 per ogni mensilità. Non sono previsti oneri "+
 		"o interessi di frazionamento.", "", "", false)
-	pdf.Ln(3)
 }
 
 func GetContractWithdrawlSection(pdf *fpdf.Fpdf) {
@@ -808,7 +817,6 @@ func GetContractWithdrawlSection(pdf *fpdf.Fpdf) {
 		"lettera raccomandata a.r. al seguente indirizzo: Wopta Assicurazioni srl – Gestione Portafoglio – Galleria del "+
 		"Corso, 1 – 201212 Milano (MI) oppure via posta elettronica certificata (PEC) all’indirizzo "+
 		"email: woptaassicurazioni@legalmail.it", "", "", false)
-	pdf.Ln(5)
 }
 
 func GetPaymentMethodSection(pdf *fpdf.Fpdf) {
@@ -819,7 +827,6 @@ func GetPaymentMethodSection(pdf *fpdf.Fpdf) {
 		"bonifico e strumenti di pagamento elettronico, quali ad esempio, carte di credito e/o carte di debito, "+
 		"incluse le carte prepagate. Oppure può essere pagato direttamente alla Compagnia alla "+
 		"stipula del contratto, via bonifico o carta di credito.", "", "", false)
-	pdf.Ln(3)
 }
 
 func GetEmitResumeSection(pdf *fpdf.Fpdf, policy models.Policy) {
@@ -838,7 +845,6 @@ func GetEmitResumeSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	pdf.Ln(8)
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, text, "", "", false)
-	pdf.Ln(3)
 }
 
 func GetPolicyDescriptionSection(pdf *fpdf.Fpdf) {
