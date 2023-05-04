@@ -76,6 +76,11 @@ func setBlackRegularFont(pdf *fpdf.Fpdf, fontSize float64) {
 	pdf.SetFont("Montserrat", "", fontSize)
 }
 
+func setBlackItalicFont(pdf *fpdf.Fpdf, fontSize float64) {
+	pdf.SetTextColor(0, 0, 0)
+	pdf.SetFont("Montserrat", "I", fontSize)
+}
+
 func setBlackMonospaceFont(pdf *fpdf.Fpdf, fontSize float64) {
 	pdf.SetTextColor(0, 0, 0)
 	pdf.SetFont("Noto", "", fontSize)
@@ -91,6 +96,11 @@ func setPinkRegularFont(pdf *fpdf.Fpdf, fontSize float64) {
 	pdf.SetFont("Montserrat", "", fontSize)
 }
 
+func setPinkItalicFont(pdf *fpdf.Fpdf, fontSize float64) {
+	pdf.SetTextColor(229, 0, 117)
+	pdf.SetFont("Montserrat", "I", fontSize)
+}
+
 func setPinkMonospaceFont(pdf *fpdf.Fpdf, fontSize float64) {
 	pdf.SetTextColor(229, 0, 117)
 	pdf.SetFont("Noto", "", fontSize)
@@ -104,6 +114,11 @@ func setWhiteBoldFont(pdf *fpdf.Fpdf, fontSize float64) {
 func setWhiteRegularFont(pdf *fpdf.Fpdf, fontSize float64) {
 	pdf.SetTextColor(255, 255, 255)
 	pdf.SetFont("Montserrat", "", fontSize)
+}
+
+func setWhiteItalicFont(pdf *fpdf.Fpdf, fontSize float64) {
+	pdf.SetTextColor(255, 255, 255)
+	pdf.SetFont("Montserrat", "I", fontSize)
 }
 
 func drawBlackHorizontalLine(pdf *fpdf.Fpdf, width float64) {
