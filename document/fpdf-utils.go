@@ -231,18 +231,14 @@ func printSurvey(pdf *fpdf.Fpdf, survey models.Survey) error {
 }
 
 func printStatement(pdf *fpdf.Fpdf, statement models.Statement) {
-	leftMargin, _, rightMargin, _ := pdf.GetMargins()
-	pageWidth, _ := pdf.GetPageSize()
-	rowWidth := pageWidth - leftMargin - rightMargin
-
 	setPinkBoldFont(pdf, titleTextSize)
 	if statement.Title != "" {
-		pdf.MultiCell(rowWidth, 3.5, statement.Title, "", fpdf.AlignLeft, false)
+		pdf.MultiCell(0, 3.5, statement.Title, "", fpdf.AlignLeft, false)
 		pdf.Ln(3)
 	}
 	setBlackBoldFont(pdf, standardTextSize)
 	if statement.Subtitle != "" {
-		pdf.MultiCell(rowWidth, 3.5, statement.Subtitle, "", fpdf.AlignLeft, false)
+		pdf.MultiCell(0, 3.5, statement.Subtitle, "", fpdf.AlignLeft, false)
 	}
 	setBlackRegularFont(pdf, standardTextSize)
 	for _, question := range statement.Questions {
@@ -254,7 +250,7 @@ func printStatement(pdf *fpdf.Fpdf, statement models.Statement) {
 		if question.Indent {
 			pdf.SetX(tabDimension)
 		}
-		pdf.MultiCell(rowWidth, 3.5, question.Question, "", fpdf.AlignLeft, false)
+		pdf.MultiCell(0, 3.5, question.Question, "", fpdf.AlignLeft, false)
 	}
 	pdf.Ln(5)
 	if statement.HasAnswer {
