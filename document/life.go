@@ -163,11 +163,13 @@ func GetMainFooter(pdf *fpdf.Fpdf) {
 	var opt fpdf.ImageOptions
 
 	pdf.SetFooterFunc(func() {
-		pdf.SetXY(10, -13)
+		pdf.SetXY(10, -15)
 		setPinkRegularFont(pdf, smallTextSize)
 		pdf.MultiCell(0, 3, "Wopta per te. Vita è un prodotto assicurativo di AXA France Vie S.A. – Rappresentanza Generale per l’Italia\ndistribuito da Wopta Assicurazioni S.r.l.", "", "", false)
 		opt.ImageType = "png"
-		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/axa/logo.png", 190, 283, 0, 8, false, opt, 0, "")
+		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/axa/logo.png", 190, 281, 0, 8, false, opt, 0, "")
+		pdf.SetY(-7)
+		pageNumber(pdf)
 	})
 }
 
@@ -183,7 +185,7 @@ func GetAxaHeader(pdf *fpdf.Fpdf) {
 
 func GetAxaFooter(pdf *fpdf.Fpdf) {
 	pdf.SetFooterFunc(func() {
-		pdf.SetXY(10, -30)
+		pdf.SetXY(10, -25)
 		setBlackRegularFont(pdf, smallTextSize)
 		pdf.MultiCell(0, 3, "AXA France Vie (compagnia assicurativa del gruppo AXA). Indirizzo sede "+
 			"legale in Francia: 313 Terrasses de l'Arche, 92727 NANTERRE CEDEX. Numero Iscrizione Registro delle "+
@@ -194,6 +196,8 @@ func GetAxaFooter(pdf *fpdf.Fpdf) {
 			"REA MI-2525395 - Telefono: 02-87103548 - Fax: 02-23331247 - PEC: axafrancevie@legalmail.it - sito "+
 			"internet: www.clp.partners.axa/it. Ammessa ad operare in Italia in regime di stabilimento. Iscritta "+
 			"all'Albo delle imprese di assicurazione tenuto dall'IVASS, in appendice Elenco I, nr. I.00149.", "", "", false)
+		pdf.SetY(-7)
+		pageNumber(pdf)
 	})
 }
 
@@ -242,6 +246,8 @@ func GetWoptaFooter(pdf *fpdf.Fpdf) {
 			"vigilanza dell’IVASS ed iscritto alla Sezione A del Registro Unico degli Intermediari Assicurativi "+
 			"con numero A000701923. Consulta gli estremi dell’iscrizione al sito "+
 			"https://servizi.ivass.it/RuirPubblica/", "", "", false)
+		pdf.SetY(-7)
+		pageNumber(pdf)
 	})
 }
 

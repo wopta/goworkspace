@@ -59,8 +59,7 @@ func save(pdf *fpdf.Fpdf, policy models.Policy) (string, []byte) {
 
 func pageNumber(pdf *fpdf.Fpdf) {
 	setBlackRegularFont(pdf, smallTextSize)
-	pdf.MultiCell(0, 3, fmt.Sprintf("pagina %d di %d", pdf.PageNo(), pdf.PageCount()), "", fpdf.AlignRight, false)
-	pdf.Ln(3)
+	pdf.MultiCell(0, 3, fmt.Sprintf("pagina %d", pdf.PageNo()), "", fpdf.AlignRight, false)
 }
 
 func setBlackDrawColor(pdf *fpdf.Fpdf) {
