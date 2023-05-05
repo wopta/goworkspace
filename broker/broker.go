@@ -50,7 +50,7 @@ func Broker(w http.ResponseWriter, r *http.Request) {
 				Method:  "POST",
 			},
 			{
-				Route:   "/v1/policy",
+				Route:   "policy/v1/:uid",
 				Handler: UpdatePolicy,
 				Method:  http.MethodPatch,
 			},

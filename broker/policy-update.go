@@ -6,22 +6,32 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"time"
 )
 
 func UpdatePolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err          error
+		policyUID    string
 		updateValues map[string]interface{}
 	)
 	log.Println("UpdatePolicy")
 
 	firePolicy := lib.GetDatasetByEnv(r.Header.Get("origin"), "policy")
+	policyUID = r.Header.Get("uid")
 
 	b := lib.ErrorByte(io.ReadAll(r.Body))
 	err = json.Unmarshal(b, &updateValues)
-	lib.CheckError(err)
+	if err != nil {
+		return `{"uid":"` + policyUID + `", "success":"false"}`, `{"uid":"` + policyUID + `", "success":"false"}`, err
+	}
 
-	err = lib.UpdateFirestoreErr(firePolicy, updateValues["uid"].(string), updateValues)
+	updateValues["updated"] = time.Now().UTC()
 
-	return `{"uid":"` + updateValues["uid"].(string) + `"}`, `{"uid":"` + updateValues["uid"].(string) + `"}`, err
+	err = lib.UpdateFirestoreErr(firePolicy, policyUID, updateValues)
+	if err != nil {
+		return `{"uid":"` + policyUID + `", "success":"false"}`, `{"uid":"` + policyUID + `", "success":"false"}`, err
+	}
+
+	return `{"uid":"` + policyUID + `", "success":"true"}`, `{"uid":"` + policyUID + `", "success":"true"}`, err
 }
