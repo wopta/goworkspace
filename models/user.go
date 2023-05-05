@@ -65,6 +65,7 @@ type User struct {
 	Json           string        `firestore:"-" json:"-" bigquery:"json"`
 	Residence      *Address      `json:"residence,omitempty" firestore:"residence,omitempty" bigquery:"-"`
 	Domicile       *Address      `json:"domicile,omitempty" firestore:"domicile,omitempty" bigquery:"-"`
+	DocumentIDs    []*DocumentID `json:"documentIDs,omitempty" firestore:"documentIDs,omitempty" bigquery:"-"`
 }
 
 type Consens struct {
@@ -85,6 +86,19 @@ type Address struct {
 	PostalCode   string `firestore:"postalCode" json:"postalCode,omitempty" bigquery:"postalCode"`
 	Locality     string `firestore:"locality" json:"locality,omitempty" bigquery:"locality"`
 	CityCode     string `firestore:"cityCode" json:"cityCode,omitempty" bigquery:"cityCode"`
+}
+
+type DocumentID struct {
+	DocumentIDCode   int       `json:"documentIDCode" firestore:"documentIDCode" bigquery:"-"`
+	DocumentIDType   string    `json:"documentIDType" firestore:"documentIDType" bigquery:"-"`
+	DocumentIDNumber string    `json:"documentIDNumber" firestore:"documentIDNumber" bigquery:"-"`
+	IssuingAuthority string    `json:"issuingAuthority" firestore:"issuingAuthority" bigquery:"-"`
+	PlaceOfIssue     string    `json:"placeOfIssue" firestore:"placeOfIssue" bigquery:"-"`
+	DateOfIssue      time.Time `json:"dateOfIssue" firestore:"dateOfIssue" bigquery:"-"`
+	ExpiryDate       time.Time `json:"expiryDate" firestore:"expiryDate" bigquery:"-"`
+	GsFilename       string    `json:"gsFilename,omitempty" firestore:"gsFilename,omitempty" bigquery:"-"`
+	MimeType         string    `json:"mimeType,omitempty" firestore:"mimeType,omitempty" bigquery:"-"`
+	Base64Encoding   string    `json:"encoding,omitempty" firestore:"-" bigquery:"-"`
 }
 
 func FirestoreDocumentToUser(query *firestore.DocumentIterator) (User, error) {
