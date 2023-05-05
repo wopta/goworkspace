@@ -702,17 +702,20 @@ func GetOfferResumeSection(pdf *fpdf.Fpdf, policy models.Policy) {
 
 func GetPaymentResumeSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	payments := make([]float64, 20)
+	var paymentSplit string
 	policyStartDate := policy.StartDate
 
 	cellWidth := pdf.GetStringWidth("00/00/0000:") + pdf.GetStringWidth("€ ###.###,##")
 
 	if policy.PaymentSplit == "yearly" {
+		paymentSplit = "ANNUALE"
 		for _, guarantee := range policy.Assets[0].Guarantees {
 			for i := 0; i < guarantee.Value.Duration.Year; i++ {
 				payments[i] += guarantee.Value.PremiumGrossYearly
 			}
 		}
 	} else if policy.PaymentSplit == "monthly" {
+		paymentSplit = "MENSILE"
 		for _, guarantee := range policy.Assets[0].Guarantees {
 			for i := 0; i < guarantee.Value.Duration.Year; i++ {
 				for y := 0; y < 12; y++ {
@@ -752,7 +755,7 @@ func GetPaymentResumeSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	pdf.CellFormat(pdf.GetStringWidth("Frazionamento"), 3, "Frazionamento:", "", 0, "",
 		false, 0, "")
 	pdf.SetX(pdf.GetX() + 3)
-	pdf.CellFormat(pdf.GetStringWidth("ANNUALE"), 3, "ANNUALE", "", 0, "", false,
+	pdf.CellFormat(pdf.GetStringWidth(paymentSplit), 3, paymentSplit, "", 0, "", false,
 		0, "")
 	pdf.Ln(4)
 	drawPinkHorizontalLine(pdf, 0.1)
