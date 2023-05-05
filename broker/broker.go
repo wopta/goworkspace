@@ -51,7 +51,7 @@ func Broker(w http.ResponseWriter, r *http.Request) {
 			},
 			{
 				Route:   "/v1/policy",
-				Handler: Update,
+				Handler: UpdatePolicy,
 				Method:  http.MethodPatch,
 			},
 		},

@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-func Update(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func UpdatePolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err          error
 		updateValues map[string]interface{}
