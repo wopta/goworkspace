@@ -24,5 +24,5 @@ func UpdatePolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 
 	err = lib.UpdateFirestoreErr(firePolicy, updateValues["uid"].(string), updateValues)
 
-	return `{"uid":"` + updateValues["uid"].(string) + `"}`, updateValues, err
+	return `{"uid":"` + updateValues["uid"].(string) + `"}`, `{"uid":"` + updateValues["uid"].(string) + `"}`, err
 }
