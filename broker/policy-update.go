@@ -14,7 +14,6 @@ func UpdatePolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		updateValues map[string]interface{}
 	)
 	log.Println("UpdatePolicy")
-	log.Println(r.RequestURI)
 
 	firePolicy := lib.GetDatasetByEnv(r.Header.Get("origin"), "policy")
 
