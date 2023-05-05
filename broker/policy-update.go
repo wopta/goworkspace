@@ -3,6 +3,7 @@ package broker
 import (
 	"encoding/json"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 	"io"
 	"log"
 	"net/http"
@@ -10,6 +11,29 @@ import (
 )
 
 func UpdatePolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	var (
+		err       error
+		policy    models.Policy
+		policyUID string
+	)
+	log.Println("UpdatePolicy")
+
+	firePolicy := lib.GetDatasetByEnv(r.Header.Get("origin"), "policy")
+	policyUID = r.Header.Get("uid")
+
+	b := lib.ErrorByte(io.ReadAll(r.Body))
+	err = json.Unmarshal(b, &policy)
+	if err != nil {
+		return `{"uid":"` + policyUID + `", "success":"false"}`, `{"uid":"` + policyUID + `", "success":"false"}`, err
+	}
+	policy.Updated = time.Now().UTC()
+
+	lib.SetFirestore(firePolicy, policyUID, policy)
+
+	return `{"uid":"` + policyUID + `", "success":"true"}`, `{"uid":"` + policyUID + `", "success":"true"}`, err
+}
+
+func PatchPolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err          error
 		policyUID    string
