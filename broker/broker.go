@@ -49,6 +49,11 @@ func Broker(w http.ResponseWriter, r *http.Request) {
 				Handler: reserved,
 				Method:  "POST",
 			},
+			{
+				Route:   "/v1/policy",
+				Handler: Update,
+				Method:  http.MethodPatch,
+			},
 		},
 	}
 	route.Router(w, r)
