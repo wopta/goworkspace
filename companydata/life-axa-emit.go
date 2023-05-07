@@ -2,12 +2,15 @@ package companydata
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
 	"time"
 
+	"github.com/go-gota/gota/dataframe"
+	"github.com/go-gota/gota/series"
 	lib "github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/xuri/excelize/v2"
@@ -15,7 +18,10 @@ import (
 
 func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	layout := "20060102"
-
+	var (
+		cabCsv []byte
+		result [][]string
+	)
 	q := lib.Firequeries{
 		Queries: []lib.Firequery{{
 			Field:      "companyEmit", //
@@ -27,37 +33,46 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 				Operator:   "==",             //
 				QueryValue: false,
 			},
+			{
+				Field:      "company", //
+				Operator:   "==",      //
+				QueryValue: "axa",
+			},
+			{
+				Field:      "name", //
+				Operator:   "==",   //
+				QueryValue: "life",
+			},
 		},
 	}
 	query, e := q.FirestoreWherefields("policy")
 	policies := models.PolicyToListData(query)
+	switch os.Getenv("env") {
+	case "local":
+		cabCsv = lib.ErrorByte(ioutil.ReadFile("function-data/data/rules/Riclassificazione_Ateco.csv"))
+
+	default:
+		cabCsv = lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "data/cab-cap-istat.csv", "")
+	}
+	df := lib.CsvToDataframe(cabCsv)
 
 	for _, policy := range policies {
-		var (
-			result [][]string
-			//enterpriseName string
-			//employer       string
-			//revenue        string
+		fil := df.Filter(
+			dataframe.F{Colidx: 4, Colname: "CAP", Comparator: series.Eq, Comparando: policy.Contractor.Residence.PostalCode},
 		)
-		for _, asset := range policy.Assets {
-			if asset.Building != nil {
-
-			}
-			if asset.Enterprise != nil {
-				//enterpriseName = asset.Enterprise.Name
-				//employer = fmt.Sprint(asset.Enterprise.Employer)
-				//revenue = fmt.Sprint(asset.Enterprise.Revenue)
-			}
-		}
+		residenceCab := fil.Records()[0][5]
+		log.Println("residenceCab", residenceCab)
+		log.Println("filtered col", fil.Ncol())
 		for _, asset := range policy.Assets {
 
 			if asset.Building != nil {
 				for _, g := range asset.Guarantees {
 					var (
-						beneficiary1, beneficiary2 string
+						beneficiary1, beneficiary2   string
+						beneficiary1S, beneficiary2S models.Beneficiary
 					)
-					beneficiary1, _ = mapBeneficiary(g, 0) //Codice Fiscale Beneficiario
-					beneficiary2, _ = mapBeneficiary(g, 1)
+					beneficiary1, beneficiary1S = mapBeneficiary(g, 0) //Codice Fiscale Beneficiario
+					beneficiary2, beneficiary2S = mapBeneficiary(g, 1)
 					fmt.Println(g)
 					row := []string{
 						mapCodecCompany(policy, g.CompanyCodec), //Codice schema
@@ -69,253 +84,253 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 						fmt.Sprint(g.Value.Duration.Year * 12),  //"Durata complessiva"
 						fmt.Sprintf("%.2f", g.PriceGross),       //"Premio assicurativo lordo"
 						fmt.Sprintf("%.0f", g.SumInsuredLimitOfIndemnity), //"Importo Assicurato"
-						"0",                                   //indennizzo mensile
-						"",                                    //campo disponibile
-						"",                                    //% di sovrappremio da applicare alla garanzia
-						"W1.42",                               //Codice Concessionario /dipendenti (iscr.E)
-						"",                                    //Codice Banca
-						"",                                    //Codice Campagna
-						"T",                                   //Copertura Assicurativa: Totale o Pro quota
-						"% assicurata dell'assicurato ",       //% assicurata dell'assicurato
-						"campo disponibile",                   //campo disponibile
-						"Maxi rata finale/Valore riscatto",    //Maxi rata finale/Valore riscatto
-						"Stato occupazionale dell'Assicurato", //Stato occupazionale dell'Assicurato
-						"Tasso di Interesse",                  //Tasso di Interesse
-						"ONLINE",                              //Canale di vendita
-						"PF",                                  //Tipo contraente / Contraente
-						policy.Contractor.Surname,             //Denominazione Sociale o Cognome contraente
-						policy.Contractor.Name,                //campo vuoto o nome
-						policy.Contractor.Gender,              //Sesso
-						policy.Contractor.BirthDate,           //Data di nascita
-						policy.Contractor.FiscalCode,          //Codice Fiscale
-						policy.Contractor.Address,             //Indirizzo di residenza
-						policy.Contractor.PostalCode,          //C.A.P. Di residenza
-						policy.Contractor.Locality,            //Comune di residenza
-						policy.Contractor.City,                //Provincia di residenza
-						policy.Contractor.Mail,                //Indirizzo e-mail
-						policy.Contractor.Phone,               //Numero di Cellulare
-						"",                                    //Cognome Assicurato
-						"",                                    //Nome
-						"",                                    //Sesso
-						"",                                    //Data di nascita
-						"",                                    //Codice Fiscale
-						beneficiary1,                          //Codice Fiscale Beneficiario
-						beneficiary2,                          //Codice Fiscale Beneficiario 2
-						"",                                    //Codice Fiscale Beneficiario 3
-						"VIT",                                 //Natura del rapporto
-						"PAS ",                                //Scopo del rapporto
-						"BO",                                  //Modalità di pagamento del premio assicurativo (all'intermediario)
-						"SI",                                  //contraente = Assicurato?
-						"",                                    //Indirizzo di domicilio
-						"",                                    //C.A.P. Di domicilio
-						"",                                    //Comune di domicilio
-						"",                                    //Provincia di domicilio
-						policy.Contractor.BirthCity,           //Luogo di nascita dell’contraente persona fisica
-						policy.Contractor.BirthCity,           //Provincia di nascita dell’contraente persona fisica
-						"086",                                 //Stato di residenza dell’contraente
-						"Cab della città di residenza dell’contraente",            //Cab della città di residenza dell’contraente
-						"Sottogruppo attività economica",                          //Sottogruppo attività economica
-						"Ramo gruppo attività economica",                          //Ramo gruppo attività economica
-						"Tipo documento dell'contraente persona fisica ",          //Tipo documento dell'contraente persona fisica
+						"0",                          //indennizzo mensile
+						"",                           //campo disponibile
+						"",                           //% di sovrappremio da applicare alla garanzia
+						"W1.42",                      //Codice Concessionario /dipendenti (iscr.E)
+						"",                           //Codice Banca
+						"",                           //Codice Campagna
+						"T",                          //Copertura Assicurativa: Totale o Pro quota
+						"",                           //% assicurata dell'assicurato
+						"",                           //campo disponibile
+						"",                           //Maxi rata finale/Valore riscatto
+						"",                           //Stato occupazionale dell'Assicurato
+						"2",                          //Tipo aderente
+						"WEB",                        //Canale di vendita
+						"PF",                         //Tipo contraente / Contraente
+						policy.Contractor.Surname,    //Denominazione Sociale o Cognome contraente
+						policy.Contractor.Name,       //campo vuoto o nome
+						policy.Contractor.Gender,     //Sesso
+						policy.Contractor.BirthDate,  //Data di nascita
+						policy.Contractor.FiscalCode, //Codice Fiscale
+						policy.Contractor.Address,    //Indirizzo di residenza
+						policy.Contractor.PostalCode, //C.A.P. Di residenza
+						policy.Contractor.Locality,   //Comune di residenza
+						policy.Contractor.City,       //Provincia di residenza
+						policy.Contractor.Mail,       //Indirizzo e-mail
+						policy.Contractor.Phone,      //Numero di Cellulare
+						"",                           //Cognome Assicurato
+						"",                           //Nome
+						"",                           //Sesso
+						"",                           //Data di nascita
+						"",                           //Codice Fiscale
+						beneficiary1,                 //Codice Fiscale Beneficiario
+						beneficiary2,                 //Codice Fiscale Beneficiario 2
+						"",                           //Codice Fiscale Beneficiario 3
+						"VIT",                        //Natura del rapporto
+						"PAS ",                       //Scopo del rapporto
+						"BO",                         //Modalità di pagamento del premio assicurativo (all'intermediario)
+						"SI",                         //contraente = Assicurato?
+						"",                           //Indirizzo di domicilio
+						"",                           //C.A.P. Di domicilio
+						"",                           //Comune di domicilio
+						"",                           //Provincia di domicilio
+						policy.Contractor.BirthCity,  //Luogo di nascita dell’contraente persona fisica
+						policy.Contractor.BirthCity,  //Provincia di nascita dell’contraente persona fisica
+						"086",                        //Stato di residenza dell’contraente
+						residenceCab,                 //Cab della città di residenza dell’contraente
+						"600",                        //Sottogruppo attività economica
+						"600",                        //Ramo gruppo attività economica
+						strconv.Itoa(policy.Contractor.IdentityDocuments[0].Code), //Tipo documento dell'contraente persona fisica
 						"Numero documento dell'contraente persona fisica ",        //Numero documento dell'contraente persona fisica
 						"Data rilascio documento dell'contraente persona fisica ", //Data rilascio documento dell'contraente persona fisica
 						"Ente rilascio documento dell'contraente persona fisica ", //Ente rilascio documento dell'contraente persona fisica
-						"NO",                                  //PEP - Persona Politicamente Esposta
-						"",                                    //Tipologia di PEP
-						"E",                                   //Modalità di comunicazione prescelta tra Compagnia ed contraente
-						"Indirizzo di residenza ",             //Indirizzo di residenza
-						"C.A.P. Residenza ",                   //C.A.P. Residenza
-						"Comune Residenza ",                   //Comune Residenza
-						"Provincia Residenza ",                //Provincia Residenza
-						"Indirizzo di domicilio",              //Indirizzo di domicilio
-						"C.A.P. Domicilio",                    //C.A.P. Domicilio
-						"Comune Domicilio",                    //Comune Domicilio
-						"Provincia Domicilio",                 //Provincia Domicilio
-						"Indirizzo e-mail ",                   //Indirizzo e-mail
-						"Numero di cellulare ",                //Numero di cellulare
-						"Luogo di nascita ",                   //Luogo di nascita
-						"Provincia di nascita ",               //Provincia di nascita
-						"Stato di residenza",                  //Stato di residenza
-						"Tipo documento",                      //Tipo documento
-						"Numero documento",                    //Numero documento
-						"Data rilascio documento",             //Data rilascio documento
-						"Ente rilascio documento",             //Ente rilascio documento
-						"PEP - Persona Politicamente Esposta", //PEP - Persona Politicamente Esposta
-						"Tipologia di PEP",                    //Tipologia di PEP
+						"NO",                      //PEP - Persona Politicamente Esposta
+						"",                        //Tipologia di PEP
+						"E",                       //Modalità di comunicazione prescelta tra Compagnia ed contraente
+						"Indirizzo di residenza ", //Indirizzo di residenza
+						"C.A.P. Residenza ",       //C.A.P. Residenza
+						"Comune Residenza ",       //Comune Residenza
+						"Provincia Residenza ",    //Provincia Residenza
+						"Indirizzo di domicilio",  //Indirizzo di domicilio
+						"C.A.P. Domicilio",        //C.A.P. Domicilio
+						"Comune Domicilio",        //Comune Domicilio
+						"Provincia Domicilio",     //Provincia Domicilio
+						"Indirizzo e-mail ",       //Indirizzo e-mail
+						"Numero di cellulare ",    //Numero di cellulare
+						"Luogo di nascita ",       //Luogo di nascita
+						"Provincia di nascita ",   //Provincia di nascita
+						"Stato di residenza",      //Stato di residenza
+						"Tipo documento",          //Tipo documento
+						"Numero documento",        //Numero documento
+						"Data rilascio documento", //Data rilascio documento
+						"Ente rilascio documento", //Ente rilascio documento
+						"NO",                      //PEP - Persona Politicamente Esposta
+						"",                        //Tipologia di PEP
 						"Eredi designati nominativamente o genericamente?", //Eredi designati nominativamente o genericamente?
-						"Cognome Beneficiario 1",                           //Cognome Beneficiario 1
-						"Nome",                                             //Nome
-						"Codice Fiscale ",                                  //Codice Fiscale
-						"Numero di Telefono del Beneficiario",              //Numero di Telefono del Beneficiario
-						"Indirizzo di residenza ",                          //Indirizzo di residenza
-						"Città /Comune di Residenza",                       //Città /Comune di Residenza
-						"CAP",                                              //CAP
-						"Provincia",                                        //CAP
-						"Email ",                                           //Email
+						beneficiary1S.Surname,                              //Cognome Beneficiario 1
+						beneficiary1S.Name,                                 //Nome
+						beneficiary1S.FiscalCode,                           //Codice Fiscale
+						beneficiary1S.Phone,                                //Numero di Telefono del Beneficiario
+						beneficiary1S.Residence.StreetName,                 //Indirizzo di residenza
+						beneficiary1S.Residence.City,                       //Città /Comune di Residenza
+						beneficiary1S.Residence.PostalCode,                 //CAP
+						beneficiary1S.Residence.CityCode,                   //Provincia
+						beneficiary1S.Mail,                                 //Email
 						"Legame del Cliente col Beneficiario",              //Legame del Cliente col Beneficiario
 						"NUCLEO FAMILIARE",                                 //NUCLEO FAMILIARE
 						"Lcontraente ha escluso l invio di comunicazioni da parte dell Impresa al Beneficiario?", //Lcontraente ha escluso l invio di comunicazioni da parte dell Impresa al Beneficiario?
-						"Cognome Beneficiario 2",              //Cognome Beneficiario 2
-						"Nome",                                //Nome
-						"Codice Fiscale ",                     //Codice Fiscale
-						"Numero di Telefono del Beneficiario", //Numero di Telefono del Beneficiario
-						"Indirizzo di residenza ",             //Indirizzo di residenza
-						"Città /Comune di Residenza",          //Città /Comune di Residenza
-						"CAP",                                 //CAP
-						"Provincia",                           //Provincia
-						"Email ",                              //Email
-						"Legame del Cliente col Beneficiario", //Legame del Cliente col Beneficiario
-						"NUCLEO FAMILIARE",                    //NUCLEO FAMILIARE
-						"L contraente ha escluso l invio di comunicazioni da parte dell Impresa al Beneficiario?", //L contraente ha escluso l invio di comunicazioni da parte dell Impresa al Beneficiario?
-						"Cognome Beneficiario 3",              //Cognome Beneficiario 3
-						"Nome",                                //Nome
-						"Codice Fiscale ",                     //Codice Fiscale
-						"Numero di Telefono del Beneficiario", //Numero di Telefono del Beneficiario
-						"Indirizzo di residenza ",             //Indirizzo di residenza
-						"Città /Comune di Residenza",          //Città /Comune di Residenza
-						"CAP",                                 //CAP
-						"Provincia",                           //Provincia
-						"Email ",                              //Email
-						"Legame del Cliente col Beneficiario", //Legame del Cliente col Beneficiario
-						"NUCLEO FAMILIARE",                    //NUCLEO FAMILIARE
-						"L'contraente ha escluso l'invio di comunicazioni da parte dell Impresa al Beneficiario?", //L'contraente ha escluso l'invio di comunicazioni da parte dell Impresa al Beneficiario?
-						"Esistenza Titolare effettivo",        //Esistenza Titolare effettiv
-						"Cognome ",                            //Cognome
-						"Nome",                                //Nome
-						"Sesso ",                              //Sesso
-						"Data di nascita ",                    //Data di nascita
-						"Codice Fiscale ",                     //Codice Fiscale
-						"Indirizzo di residenza ",             //Indirizzo di residenza
-						"C.A.P. Residenza ",                   //C.A.P. Residenza
-						"Comune Residenza ",                   //Comune Residenza
-						"Provincia Residenza ",                //Provincia Residenza
-						"Indirizzo di domicilio",              //Indirizzo di domicilio
-						"C.A.P. Domicilio",                    //C.A.P. Domicilio
-						"Comune Domicilio",                    //Comune Domicilio
-						"Provincia Domicilio",                 //Provincia Domicilio
-						"Stato occupazionale ",                //Stato occupazionale
-						"Indirizzo e-mail ",                   //Indirizzo e-mail
-						"Numero di cellulare ",                //Numero di cellulare
-						"Luogo di nascita ",                   //Luogo di nascita
-						"Provincia di nascita ",               //Provincia di nascita
-						"Stato di residenza",                  //Stato di residenza
-						"Tipo documento",                      //Tipo documento
-						"Numero documento",                    //Numero documento
-						"Data rilascio documento",             //Data rilascio documento
-						"Ente rilascio documento",             //Ente rilascio documento
-						"PEP - Persona Politicamente Esposta", //PEP - Persona Politicamente Esposta
-						"Tipologia di PEP",                    //Tipologia di PEP
-						"Esistenza Titolare effettivo",        //Esistenza Titolare effettivo
-						"Cognome ",                            //Cognome
-						"Nome",                                //Nome
-						"Sesso ",                              //Sesso
-						"Data di nascita ",                    //Data di nascita
-						"Codice Fiscale ",                     //Codice Fiscale
-						"Indirizzo di residenza ",             //Indirizzo di residenza
-						"C.A.P. Residenza ",                   //C.A.P. Residenza
-						"Comune Residenza ",                   //Comune Residenza
-						"Provincia Residenza ",                //Provincia Residenza
-						"Indirizzo di domicilio",              //Indirizzo di domicilio
-						"C.A.P. Domicilio",                    //C.A.P. Domicilio
-						"Comune Domicilio",                    //Comune Domicilio
-						"Provincia Domicilio",                 //Provincia Domicilio
-						"Stato occupazionale ",                //Stato occupazionale
-						"Indirizzo e-mail ",                   //Indirizzo e-mail
-						"Numero di cellulare ",                //Numero di cellulare
-						"Luogo di nascita ",                   //Luogo di nascita
-						"Provincia di nascita ",               //Provincia di nascita
-						"Stato di residenza",                  //Stato di residenza
-						"Tipo documento",                      //Tipo documento
-						"Numero documento",                    //Numero documento
-						"Data rilascio documento",             //Data rilascio documento
-						"Ente rilascio documento",             //Ente rilascio documento
-						"PEP - Persona Politicamente Esposta", //PEP - Persona Politicamente Esposta
-						"Tipologia di PEP",                    //Tipologia di PEP
-						"Esistenza Titolare effettivo",        //Esistenza Titolare effettivo
-						"Cognome ",                            //Cognome
-						"Nome",                                //Nome
-						"Sesso ",                              //Sesso
-						"Data di nascita ",                    //Data di nascita
-						"Codice Fiscale ",                     //Codice Fiscale
-						"Indirizzo di residenza ",             //Indirizzo di residenza
-						"C.A.P. Residenza ",                   //C.A.P. Residenza
-						"Comune Residenza ",                   //Comune Residenza
-						"Provincia Residenza ",                //Provincia Residenza
-						"Indirizzo di domicilio",              //Indirizzo di domicilio
-						"C.A.P. Domicilio",                    //C.A.P. Domicilio
-						"Comune Domicilio",                    //Comune Domicilio
-						"Provincia Domicilio",                 //Provincia Domicilio
-						"Stato occupazionale ",                //Stato occupazionale
-						"Indirizzo e-mail ",                   //Indirizzo e-mail
-						"Numero di cellulare ",                //Numero di cellulare
-						"Luogo di nascita ",                   //Luogo di nascita
-						"Provincia di nascita ",               //Provincia di nascita
-						"Stato di residenza",                  //Stato di residenza
-						"Tipo documento",                      //Tipo documento
-						"Numero documento",                    //Numero documento
-						"Data rilascio documento",             //Data rilascio documento
-						"Ente rilascio documento",             //Ente rilascio documento
-						"PEP - Persona Politicamente Esposta", //PEP - Persona Politicamente Esposta
-						"Tipologia di PEP",                    //Tipologia di PEP
-						"Esistenza Titolare effettivo",        //Esistenza Titolare effettivo
-						"Cognome ",                            //Cognome
-						"Nome",                                //Nome
-						"Sesso ",                              //Sesso
-						"Data di nascita ",                    //Data di nascita
-						"Codice Fiscale ",                     //Codice Fiscale
-						"Indirizzo di residenza ",             //Indirizzo di residenza
-						"C.A.P. Residenza ",                   //C.A.P. Residenza
-						"Comune Residenza ",                   //Comune Residenza
-						"Provincia Residenza ",                //Provincia Residenza
-						"Indirizzo di domicilio",              //Indirizzo di domicilio
-						"C.A.P. Domicilio",                    //C.A.P. Domicilio
-						"Comune Domicilio",                    //Comune Domicilio
-						"Provincia Domicilio",                 //Provincia Domicilio
-						"Stato occupazionale ",                //Stato occupazionale
-						"Indirizzo e-mail ",                   //Indirizzo e-mail
-						"Numero di cellulare ",                //umero di cellulare
-						"Luogo di nascita ",                   //Luogo di nascita
-						"Provincia di nascita ",               //Provincia di nascita
-						"Stato di residenza",                  //Stato di residenza
-						"Tipo documento",                      //Tipo documento"
-						"Numero documento",                    //Numero documento
-						"Data rilascio documento",             //Data rilascio documento
-						"Ente rilascio documento",             //Ente rilascio documento
-						"PEP - Persona Politicamente Esposta", //PEP - Persona Politicamente Esposta
-						"Tipologia di PEP",                    //Tipologia di PEP
-						"Cognome ",                            //Cognome
-						"Nome",                                //Nome
-						"Sesso",                               //Sesso
-						"Data di nascita",                     //Data di nascita
-						"Codice Fiscale ",                     //Codice Fiscale
-						"Indirizzo di residenza",              //Indirizzo di residenza
-						"C.A.P. Di residenza",                 //C.A.P. Di residenza
-						"Comune di residenza",                 //Comune di residenza
-						"Provincia di residenza",              //Provincia di residenza
-						"Indirizzo di domicilio",              //Indirizzo di domicilio
-						"C.A.P. Di domicilio",                 //C.A.P. Di domicilio
-						"Comune di domicilio",                 //Comune di domicilio
-						"Provincia di domicilio",              //Provincia di domicilio
-						"Indirizzo e-mail",                    //Indirizzo e-mail
-						"Numero di Cellulare",                 //Numero di Cellulare
-						"Luogo di nascita dell’esecutore",     //Luogo di nascita dell’esecutore
-						"Provincia di nascita dell’esecutore", //Provincia di nascita dell’esecutore
-						"Stato di residenza dell’esecutore",   //Stato di residenza dell’esecutore
-						"Tipo documento",                      //Tipo documento
-						"Numero documento",                    //Numero documento
-						"Data rilascio documento",             //Data rilascio documento"
-						"Ente rilascio documento",             //
-						"PEP - Persona Politicamente Esposta", //
-						"Tipologia di PEP",                    //Tipologia di PEP
-						"",                                    //Carica ricoperta dell'esecutore
-						"",                                    //Cognome
+						beneficiary2S.Surname,                 //Cognome Beneficiario 2
+						beneficiary2S.Name,                    //Nome
+						beneficiary2S.FiscalCode,              //Codice Fiscale
+						beneficiary2S.Phone,                   //Numero di Telefono del Beneficiario
+						beneficiary2S.Residence.StreetName,    //Indirizzo di residenza
+						beneficiary2S.Residence.City,          //Città /Comune di Residenza
+						beneficiary2S.Residence.PostalCode,    //CAP
+						beneficiary2S.Residence.CityCode,      //Provincia
+						beneficiary2S.Mail,                    //Email
+						"",                                    //Legame del Cliente col Beneficiario
+						"",                                    //NUCLEO FAMILIARE
+						"",                                    //L contraente ha escluso l invio di comunicazioni da parte dell Impresa al Beneficiario?
+						"",                                    //Cognome Beneficiario 3
 						"",                                    //Nome
+						"",                                    //Codice Fiscale
+						"",                                    //Numero di Telefono del Beneficiario
 						"",                                    //Indirizzo di residenza
 						"",                                    //Città /Comune di Residenza
 						"",                                    //CAP
-						"",                                    //Codice Fiscale
-						"",                                    //Numero di Telefono
+						"",                                    //Provincia
 						"",                                    //Email
+						"Legame del Cliente col Beneficiario", //Legame del Cliente col Beneficiario
+						"NUCLEO FAMILIARE",                    //NUCLEO FAMILIARE
+						"L'contraente ha escluso l'invio di comunicazioni da parte dell Impresa al Beneficiario?", //L'contraente ha escluso l'invio di comunicazioni da parte dell Impresa al Beneficiario?
+						"NO", //Esistenza Titolare effettiv
+						"",   //Cognome
+						"",   //Nome
+						"",   //Sesso
+						"",   //Data di nascita
+						"",   //Codice Fiscale
+						"",   //Indirizzo di residenza
+						"",   //C.A.P. Residenza
+						"",   //Comune Residenza
+						"",   //Provincia Residenza
+						"",   //Indirizzo di domicilio
+						"",   //C.A.P. Domicilio
+						"",   //Comune Domicilio
+						"",   //Provincia Domicilio
+						"",   //Stato occupazionale
+						"",   //Indirizzo e-mail
+						"",   //Numero di cellulare
+						"",   //Luogo di nascita
+						"",   //Provincia di nascita
+						"",   //Stato di residenza
+						"",   //Tipo documento
+						"",   //Numero documento
+						"",   //Data rilascio documento
+						"",   //Ente rilascio documento
+						"",   //PEP - Persona Politicamente Esposta
+						"",   //Tipologia di PEP
+						"NO", //Esistenza Titolare effettivo
+						"",   //Cognome
+						"",   //Nome
+						"",   //Sesso
+						"",   //Data di nascita
+						"",   //Codice Fiscale
+						"",   //Indirizzo di residenza
+						"",   //C.A.P. Residenza
+						"",   //Comune Residenza
+						"",   //Provincia Residenza
+						"",   //Indirizzo di domicilio
+						"",   //C.A.P. Domicilio
+						"",   //Comune Domicilio
+						"",   //Provincia Domicilio
+						"",   //Stato occupazionale
+						"",   //Indirizzo e-mail
+						"",   //Numero di cellulare
+						"",   //Luogo di nascita
+						"",   //Provincia di nascita
+						"",   //Stato di residenza
+						"",   //Tipo documento
+						"",   //Numero documento
+						"",   //Data rilascio documento
+						"",   //Ente rilascio documento
+						"",   //PEP - Persona Politicamente Esposta
+						"",   //Tipologia di PEP
+						"NO", //Esistenza Titolare effettivo
+						"",   //Cognome
+						"",   //Nome
+						"",   //Sesso
+						"",   //Data di nascita
+						"",   //Codice Fiscale
+						"",   //Indirizzo di residenza
+						"",   //C.A.P. Residenza
+						"",   //Comune Residenza
+						"",   //Provincia Residenza
+						"",   //Indirizzo di domicilio
+						"",   //C.A.P. Domicilio
+						"",   //Comune Domicilio
+						"",   //Provincia Domicilio
+						"",   //Stato occupazionale
+						"",   //Indirizzo e-mail
+						"",   //Numero di cellulare
+						"",   //Luogo di nascita
+						"",   //Provincia di nascita
+						"",   //Stato di residenza
+						"",   //Tipo documento
+						"",   //Numero documento
+						"",   //Data rilascio documento
+						"",   //Ente rilascio documento
+						"",   //PEP - Persona Politicamente Esposta
+						"",   //Tipologia di PEP
+						"NO", //Esistenza Titolare effettivo
+						"",   //Cognome
+						"",   //Nome
+						"",   //Sesso
+						"",   //Data di nascita
+						"",   //Codice Fiscale
+						"",   //Indirizzo di residenza
+						"",   //C.A.P. Residenza
+						"",   //Comune Residenza
+						"",   //Provincia Residenza
+						"",   //Indirizzo di domicilio
+						"",   //C.A.P. Domicilio
+						"",   //Comune Domicilio
+						"",   //Provincia Domicilio
+						"",   //Stato occupazionale
+						"",   //Indirizzo e-mail
+						"",   //umero di cellulare
+						"",   //Luogo di nascita
+						"",   //Provincia di nascita
+						"",   //Stato di residenza
+						"",   //Tipo documento"
+						"",   //Numero documento
+						"",   //Data rilascio documento
+						"",   //Ente rilascio documento
+						"",   //PEP - Persona Politicamente Esposta
+						"",   //Tipologia di PEP
+						"",   //Cognome
+						"",   //Nome
+						"",   //Sesso
+						"",   //Data di nascita
+						"",   //Codice Fiscale
+						"",   //Indirizzo di residenza
+						"",   //C.A.P. Di residenza
+						"",   //Comune di residenza
+						"",   //Provincia di residenza
+						"",   //Indirizzo di domicilio
+						"",   //C.A.P. Di domicilio
+						"",   //Comune di domicilio
+						"",   //Provincia di domicilio
+						"",   //Indirizzo e-mail
+						"",   //Numero di Cellulare
+						"",   //Luogo di nascita dell’esecutore
+						"",   //Provincia di nascita dell’esecutore
+						"",   //Stato di residenza dell’esecutore
+						"",   //Tipo documento
+						"",   //Numero documento
+						"",   //Data rilascio documento"
+						"",   //
+						"",   //
+						"",   //Tipologia di PEP
+						"",   //Carica ricoperta dell'esecutore
+						"",   //Cognome
+						"",   //Nome
+						"",   //Indirizzo di residenza
+						"",   //Città /Comune di Residenza
+						"",   //CAP
+						"",   //Codice Fiscale
+						"",   //Numero di Telefono
+						"",   //Email
 					}
 
 					result = append(result, row)
@@ -327,16 +342,18 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		}
 
 		now := time.Now()
-		layout2 := "2006-01-02"
-		filepath := now.Format(layout2) + "-" + strconv.Itoa(time.Now().Nanosecond()) + ".xlsx"
+		refMontly := now.AddDate(0, -1, 0)
+		filepath := "WOPTAKEY_NBM_" + strconv.Itoa(refMontly.Year()) + refMontly.Month().String() + "_" + strconv.Itoa(now.Day()) + now.Month().String() + ".txt"
 
 		if os.Getenv("env") != "local" {
 			//./serverless_function_source_code/
 
 			//filepath = "../tmp/" + filepath
 		}
-		sourcest, e = CreateExcel(excel, "../tmp/"+filepath)
-		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "tway-fleet-axa/"+filepath, sourcest)
+
+		lib.WriteCsv("../tmp/"+filepath, result)
+		source, _ := ioutil.ReadFile("../tmp/" + filepath)
+		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "axa/life/"+filepath, source)
 		SftpUpload(filepath)
 	}
 	return "", nil, e
@@ -369,6 +386,7 @@ func mapBeneficiary(g models.Guarante, b int) (string, models.Beneficiary) {
 		result      string
 		resulStruct models.Beneficiary
 	)
+	resulStruct = models.Beneficiary{}
 	if len(*g.Beneficiaries) > 0 && len(*g.Beneficiaries) >= b {
 		result = ""
 		if (*g.Beneficiaries)[b].IsLegitimateSuccessors || (*g.Beneficiaries)[b].IsFamilyMember {
@@ -659,8 +677,7 @@ func SftpUpload(filePath string) {
 	log.Println("Create remote file for writing:")
 	// Create remote file for writing.
 	lib.Files("../tmp")
-	//destination, e := client.Create(filePath)
-	destination, e := client.Create("IN/" + filePath)
+	destination, e := client.Create("To_CLP/" + filePath)
 	lib.CheckError(e)
 	defer destination.Close()
 	log.Println("Upload local file to a remote location as in 1MB (byte) chunks.")
