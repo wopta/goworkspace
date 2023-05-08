@@ -38,8 +38,6 @@ func Life(pdf *fpdf.Fpdf, policy models.Policy) (string, []byte) {
 
 	pdf.AddPage()
 
-	//GetVisioneDocumentiSection(pdf, policy)
-
 	offerResumeSection(pdf, policy)
 
 	paymentResumeSection(pdf, policy)
@@ -49,8 +47,6 @@ func Life(pdf *fpdf.Fpdf, policy models.Policy) (string, []byte) {
 	paymentMethodSection(pdf)
 
 	emitResumeSection(pdf, policy)
-
-	//GetPolicyDescriptionSection(pdf)
 
 	woptaAxaCompanyDescriptionSection(pdf)
 
@@ -628,7 +624,6 @@ func surveysSection(pdf *fpdf.Fpdf, policy models.Policy) {
 
 func statementsSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	statements := *policy.Statements
-	//getParagraphTitle(pdf, "Firme e dichiarazioni")
 	pdf.Ln(8)
 	for _, statement := range statements {
 		printStatement(pdf, statement)
@@ -1198,19 +1193,10 @@ func GetAxaTablePart3Section(pdf *fpdf.Fpdf) {
 
 	pdf.MultiCell(0, 3, "3) sono soggetti con i quali le persone politicamente esposte intrattengono "+
 		"notoriamente stretti legami:", "", "", false)
-	/*pdf.CellFormat(5, 5, "", "", 0, "", false, 0, "")
-	pdf.MultiCell(0, 2.5, "3.1 le persone fisiche che ai sensi del presente decreto detengono, "+
-		"congiuntamente alla persona politicamente esposta, la titolarità effettiva di enti giuridici, trust  e "+
-		"istituti giuridici affini ovvero che intrattengono con la persona politicamente esposta stretti rapporti "+
-		"di affari;", "", "", false)*/
 	indentedText(pdf, "3.1 le persone fisiche che ai sensi del presente decreto detengono, "+
 		"congiuntamente alla persona politicamente esposta, la titolarità effettiva di enti giuridici, trust  e "+
 		"istituti giuridici affini ovvero che intrattengono con la persona politicamente esposta stretti rapporti "+
 		"di affari;")
-	/*pdf.CellFormat(5, 5, "", "", 0, "", false, 0, "")
-	pdf.MultiCell(0, 2.5, "3.2 le persone fisiche che detengono solo formalmente il controllo totalitario "+
-		"di un’entità notoriamente costituita, di fatto, nell’interesse e a beneficio di una persona politicamente "+
-		"esposta.", "", "", false)*/
 	indentedText(pdf, "3.2 le persone fisiche che detengono solo formalmente il controllo totalitario "+
 		"di un’entità notoriamente costituita, di fatto, nell’interesse e a beneficio di una persona politicamente "+
 		"esposta.")
