@@ -102,9 +102,10 @@ func Life(pdf *fpdf.Fpdf, policy models.Policy) (string, []byte) {
 
 func GetMainHeader(pdf *fpdf.Fpdf, policy models.Policy) {
 	var (
-		opt      fpdf.ImageOptions
-		logoPath string
-		cfpi     string
+		opt        fpdf.ImageOptions
+		logoPath   string
+		cfpi       string
+		expiryInfo string
 	)
 	logoPath = lib.GetAssetPathByEnv(basePath) + "/logo_vita.png"
 
@@ -118,11 +119,18 @@ func GetMainHeader(pdf *fpdf.Fpdf, policy models.Policy) {
 		cfpi = contractor.VatCode
 	}
 
+	if policy.PaymentSplit == "monthly" {
+		expiryInfo = "Prima scandenza mensile il: " +
+			policy.StartDate.AddDate(0, 1, 0).Format(dateLayout) + "\n"
+	} else if policy.PaymentSplit == "yearly" {
+		expiryInfo = "Prima scadenza annuale il: " +
+			policy.StartDate.AddDate(1, 0, 0).Format(dateLayout) + "\n"
+	}
+
 	policyInfo := "Numero: " + policy.CodeCompany + "\n" +
 		"Decorre dal: " + policy.StartDate.Format(dateLayout) + " ore 24:00\n" +
 		"Scade il: " + policy.EndDate.Format(dateLayout) + " ore 24:00\n" +
-		"Prima scadenza annuale il: " + policy.StartDate.AddDate(1, 0, 0).Format(dateLayout) + "\n" +
-		"Non si rinnova a scadenza."
+		expiryInfo + "Non si rinnova a scadenza."
 
 	contractorInfo := "Contraente: " + strings.ToUpper(contractor.Surname+" "+contractor.Name+"\n"+
 		"C.F./P.IVA: "+cfpi) + "\n" +
