@@ -25,13 +25,7 @@ func Test(w http.ResponseWriter, r *http.Request) {
 	lib.EnableCors(&w, r)
 	w.Header().Set("Access-Control-Allow-Methods", "POST")
 	route := lib.RouteData{
-		Routes: []lib.Route{
-			{
-				Route:   "/v1/life_simplo",
-				Handler: LifeSimploHandler,
-				Method:  http.MethodPost,
-			},
-		},
+		Routes: []lib.Route{},
 	}
 	route.Router(w, r)
 
