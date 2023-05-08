@@ -17,54 +17,54 @@ var (
 func Life(pdf *fpdf.Fpdf, policy models.Policy) (string, []byte) {
 	signatureID = 0
 
-	GetMainHeader(pdf, policy)
-	GetMainFooter(pdf)
+	mainHeader(pdf, policy)
+	mainFooter(pdf)
 
 	pdf.AddPage()
 
-	GetContractorInfoSection(pdf, policy)
+	insuredInfoSection(pdf, policy)
 
-	GetGuaranteesTable(pdf, policy)
+	guaranteesTable(pdf, policy)
 
-	GetAvvertenzeBeneficiariSection(pdf)
+	avvertenzeBeneficiariSection(pdf)
 
-	GetBeneficiariSection(pdf, policy)
+	beneficiariesSection(pdf, policy)
 
-	GetBeneficiaryReferenceSection(pdf, policy)
+	beneficiaryReferenceSection(pdf, policy)
 
-	GetSurveysSection(pdf, policy)
+	surveysSection(pdf, policy)
 
-	GetStatementsSection(pdf, policy)
+	statementsSection(pdf, policy)
 
 	pdf.AddPage()
 
 	//GetVisioneDocumentiSection(pdf, policy)
 
-	GetOfferResumeSection(pdf, policy)
+	offerResumeSection(pdf, policy)
 
-	GetPaymentResumeSection(pdf, policy)
+	paymentResumeSection(pdf, policy)
 
-	GetContractWithdrawlSection(pdf)
+	contractWithdrawlSection(pdf)
 
-	GetPaymentMethodSection(pdf)
+	paymentMethodSection(pdf)
 
-	GetEmitResumeSection(pdf, policy)
+	emitResumeSection(pdf, policy)
 
 	//GetPolicyDescriptionSection(pdf)
 
-	GetWoptaAxaCompanyDescriptionSection(pdf)
+	woptaAxaCompanyDescriptionSection(pdf)
 
-	GetAxaHeader(pdf)
-
-	pdf.AddPage()
-
-	GetAxaFooter(pdf)
-
-	GetAxaDeclarationsConsentSection(pdf, policy)
+	axaHeader(pdf)
 
 	pdf.AddPage()
 
-	GetAxaTableSection(pdf, policy)
+	axaFooter(pdf)
+
+	axaDeclarationsConsentSection(pdf, policy)
+
+	pdf.AddPage()
+
+	axaTableSection(pdf, policy)
 
 	pdf.AddPage()
 
@@ -74,11 +74,11 @@ func Life(pdf *fpdf.Fpdf, policy models.Policy) (string, []byte) {
 
 	GetAxaTablePart3Section(pdf)
 
-	GetWoptaHeader(pdf)
+	woptaHeader(pdf)
 
 	pdf.AddPage()
 
-	GetWoptaFooter(pdf)
+	woptaFooter(pdf)
 
 	GetAllegato3Section(pdf)
 
@@ -100,7 +100,7 @@ func Life(pdf *fpdf.Fpdf, policy models.Policy) (string, []byte) {
 	return filename, out
 }
 
-func GetMainHeader(pdf *fpdf.Fpdf, policy models.Policy) {
+func mainHeader(pdf *fpdf.Fpdf, policy models.Policy) {
 	var (
 		opt        fpdf.ImageOptions
 		logoPath   string
@@ -166,7 +166,7 @@ func GetMainHeader(pdf *fpdf.Fpdf, policy models.Policy) {
 	})
 }
 
-func GetMainFooter(pdf *fpdf.Fpdf) {
+func mainFooter(pdf *fpdf.Fpdf) {
 	var opt fpdf.ImageOptions
 
 	pdf.SetFooterFunc(func() {
@@ -180,7 +180,7 @@ func GetMainFooter(pdf *fpdf.Fpdf) {
 	})
 }
 
-func GetAxaHeader(pdf *fpdf.Fpdf) {
+func axaHeader(pdf *fpdf.Fpdf) {
 	pdf.SetHeaderFunc(func() {
 		var opt fpdf.ImageOptions
 		pdf.SetXY(-30, 7)
@@ -190,7 +190,7 @@ func GetAxaHeader(pdf *fpdf.Fpdf) {
 	})
 }
 
-func GetAxaFooter(pdf *fpdf.Fpdf) {
+func axaFooter(pdf *fpdf.Fpdf) {
 	pdf.SetFooterFunc(func() {
 		pdf.SetXY(10, -25)
 		setBlackRegularFont(pdf, smallTextSize)
@@ -208,7 +208,7 @@ func GetAxaFooter(pdf *fpdf.Fpdf) {
 	})
 }
 
-func GetWoptaHeader(pdf *fpdf.Fpdf) {
+func woptaHeader(pdf *fpdf.Fpdf) {
 	pdf.SetHeaderFunc(func() {
 		var opt fpdf.ImageOptions
 		opt.ImageType = "png"
@@ -217,7 +217,7 @@ func GetWoptaHeader(pdf *fpdf.Fpdf) {
 	})
 }
 
-func GetWoptaFooter(pdf *fpdf.Fpdf) {
+func woptaFooter(pdf *fpdf.Fpdf) {
 	pdf.SetFooterFunc(func() {
 		pdf.SetY(-30)
 		drawPinkHorizontalLine(pdf, 0.4)
@@ -258,15 +258,15 @@ func GetWoptaFooter(pdf *fpdf.Fpdf) {
 	})
 }
 
-func GetContractorInfoSection(pdf *fpdf.Fpdf, policy models.Policy) {
+func insuredInfoSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	getParagraphTitle(pdf, "La tua assicurazione è operante per il seguente Assicurato e Garanzie")
 	pdf.Ln(8)
-	GetContractorInfoTable(pdf, policy.Contractor)
+	insuredInfoTable(pdf, policy.Assets[0].Person)
 }
 
-func GetContractorInfoTable(pdf *fpdf.Fpdf, contractor models.User) {
-	residenceAddress := strings.ToUpper(contractor.Residence.StreetName + ", " + contractor.Residence.StreetNumber +
-		" - " + contractor.Residence.PostalCode + " " + contractor.Residence.City + " (" + contractor.Residence.CityCode + ")")
+func insuredInfoTable(pdf *fpdf.Fpdf, insured *models.User) {
+	residenceAddress := strings.ToUpper(insured.Residence.StreetName + ", " + insured.Residence.StreetNumber +
+		" - " + insured.Residence.PostalCode + " " + insured.Residence.City + " (" + insured.Residence.CityCode + ")")
 
 	drawPinkHorizontalLine(pdf, thickLineWidth)
 	pdf.Ln(2)
@@ -274,13 +274,13 @@ func GetContractorInfoTable(pdf *fpdf.Fpdf, contractor models.User) {
 	pdf.Cell(20, 2, "Cognome e Nome")
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.SetX(pdf.GetX() + 24)
-	pdf.Cell(20, 2, strings.ToUpper(contractor.Surname+" "+contractor.Name))
+	pdf.Cell(20, 2, strings.ToUpper(insured.Surname+" "+insured.Name))
 	pdf.SetX(pdf.GetX() + 60)
 	setBlackBoldFont(pdf, standardTextSize)
 	pdf.Cell(10, 2, "Codice fiscale:")
 	pdf.SetX(pdf.GetX() + 20)
 	setBlackRegularFont(pdf, standardTextSize)
-	pdf.Cell(20, 2, strings.ToUpper(contractor.FiscalCode))
+	pdf.Cell(20, 2, strings.ToUpper(insured.FiscalCode))
 	pdf.Ln(2.5)
 	drawPinkHorizontalLine(pdf, thinLineWidth)
 	pdf.Ln(2)
@@ -296,19 +296,19 @@ func GetContractorInfoTable(pdf *fpdf.Fpdf, contractor models.User) {
 	pdf.Cell(20, 2, "Mail")
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.SetX(pdf.GetX() + 24)
-	pdf.Cell(20, 2, contractor.Mail)
+	pdf.Cell(20, 2, insured.Mail)
 	pdf.SetX(pdf.GetX() + 60)
 	setBlackBoldFont(pdf, standardTextSize)
 	pdf.Cell(10, 2, "Telefono:")
 	pdf.SetX(pdf.GetX() + 20)
 	setBlackRegularFont(pdf, 9)
-	pdf.Cell(20, 2, contractor.Phone)
+	pdf.Cell(20, 2, insured.Phone)
 	pdf.Ln(3)
 	drawPinkHorizontalLine(pdf, thickLineWidth)
 	pdf.Ln(1)
 }
 
-func GetGuaranteesTable(pdf *fpdf.Fpdf, policy models.Policy) {
+func guaranteesTable(pdf *fpdf.Fpdf, policy models.Policy) {
 	const (
 		death               = "death"
 		permanentDisability = "permanent-disability"
@@ -400,7 +400,7 @@ func GetGuaranteesTable(pdf *fpdf.Fpdf, policy models.Policy) {
 	pdf.Ln(3)
 }
 
-func GetAvvertenzeBeneficiariSection(pdf *fpdf.Fpdf) {
+func avvertenzeBeneficiariSection(pdf *fpdf.Fpdf) {
 	getParagraphTitle(pdf, "Nomina dei Beneficiari e Referente terzo, per il caso di garanzia Decesso "+
 		"(qualora sottoscritta)")
 	pdf.Ln(8)
@@ -414,7 +414,7 @@ func GetAvvertenzeBeneficiariSection(pdf *fpdf.Fpdf) {
 		"il Beneficiario designato.", "", "", false)
 }
 
-func GetBeneficiariSection(pdf *fpdf.Fpdf, policy models.Policy) {
+func beneficiariesSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	legitimateSuccessorsChoice := "X"
 	designatedSuccessorsChoice := ""
 	beneficiaries := [2]map[string]string{
@@ -485,10 +485,10 @@ func GetBeneficiariSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	pdf.CellFormat(0, 3, "Designo nominativamente il/i seguente/i soggetto/i quale beneficiario/i della "+
 		"prestazione", "", 0, "", false, 0, "")
 	pdf.Ln(5)
-	GetBeneficiariTable(pdf, beneficiaries)
+	beneficiariesTable(pdf, beneficiaries)
 }
 
-func GetBeneficiariTable(pdf *fpdf.Fpdf, beneficiaries [2]map[string]string) {
+func beneficiariesTable(pdf *fpdf.Fpdf, beneficiaries [2]map[string]string) {
 	for _, beneficiary := range beneficiaries {
 		drawPinkHorizontalLine(pdf, thickLineWidth)
 		pdf.Ln(1.5)
@@ -541,7 +541,7 @@ func GetBeneficiariTable(pdf *fpdf.Fpdf, beneficiaries [2]map[string]string) {
 	}
 }
 
-func GetBeneficiaryReferenceSection(pdf *fpdf.Fpdf, policy models.Policy) {
+func beneficiaryReferenceSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	beneficiaryReference := map[string]string{
 		"name":     "=====",
 		"fiscCode": "=====",
@@ -567,11 +567,11 @@ func GetBeneficiaryReferenceSection(pdf *fpdf.Fpdf, policy models.Policy) {
 
 	getParagraphTitle(pdf, "Referente terzo")
 	pdf.Ln(8)
-	GetBeneficiaryReferenceTable(pdf, beneficiaryReference)
+	beneficiaryReferenceTable(pdf, beneficiaryReference)
 	pdf.Ln(2)
 }
 
-func GetBeneficiaryReferenceTable(pdf *fpdf.Fpdf, beneficiaryReference map[string]string) {
+func beneficiaryReferenceTable(pdf *fpdf.Fpdf, beneficiaryReference map[string]string) {
 	drawPinkHorizontalLine(pdf, thickLineWidth)
 	pdf.Ln(1.5)
 	setBlackBoldFont(pdf, standardTextSize)
@@ -608,7 +608,7 @@ func GetBeneficiaryReferenceTable(pdf *fpdf.Fpdf, beneficiaryReference map[strin
 	drawPinkHorizontalLine(pdf, thinLineWidth)
 }
 
-func GetSurveysSection(pdf *fpdf.Fpdf, policy models.Policy) {
+func surveysSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	surveys := *policy.Surveys
 
 	getParagraphTitle(pdf, "Dichiarazioni da leggere con attenzione prima di firmare")
@@ -626,7 +626,7 @@ func GetSurveysSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	pdf.Ln(5)
 }
 
-func GetStatementsSection(pdf *fpdf.Fpdf, policy models.Policy) {
+func statementsSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	statements := *policy.Statements
 	//getParagraphTitle(pdf, "Firme e dichiarazioni")
 	pdf.Ln(8)
@@ -644,41 +644,7 @@ func GetStatementsSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	pdf.Ln(15)
 }
 
-func GetVisioneDocumentiSection(pdf *fpdf.Fpdf, policy models.Policy) {
-	getParagraphTitle(pdf, "Presa visione dei documenti precontrattuali e sottoscrizione Polizza")
-	pdf.Ln(8)
-	setBlackRegularFont(pdf, standardTextSize)
-	email := policy.Contractor.Mail
-	pdf.MultiCell(0, 3, "Ho scelto la ricezione della seguente documentazione via e-mail al seguente indirizzo "+
-		" "+email+", nonché all’utilizzo della stessa per l’invio delle comunicazioni in corso di contratto da "+
-		"parte di Wopta e della Compagnia. Sono a conoscenza che, qualora volessi modificare questa mia scelta potrò "+
-		"farlo scrivendo alla Compagnia, con le modalità previste "+
-		"nelle Condizioni di Assicurazione.", "", fpdf.AlignLeft, false)
-	setBlackBoldFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3, "Confermo di aver ricevuto e preso visione, prima della conclusione del contratto:",
-		"", "", false)
-	indentedText(pdf, "1. degli Allegati 3, 4 e 4-ter, di cui al Regolamento IVASS n. 40/2018, relativi "+
-		"agli obblighi informativi e di comportamento dell’Intermediario, inclusa l’informativa privacy "+
-		"dell’intermediario (ai sensi dell’art. 13 del regolamento UE n. 2016/679);")
-	indentedText(pdf, "2. del Set informativo, identificato dal modello AX01.0323, contenente: "+
-		"1) Documento informativo precontrattuale per i prodotti assicurativi vita diversi dai prodotti "+
-		"d’investimento assicurativi (DIP Vita), Documento informativo per i prodotti assicurativi danni (DIP Danni), "+
-		"Documento informativo precontrattuale aggiuntivo per i prodotti assicurativi multirischi "+
-		"(DIP aggiuntivo Multirischi), di cui al Regolamento IVASS n. 41/2018; 2) Condizioni di Assicurazione "+
-		"comprensive di Glossario, che dichiaro altresì di conoscere ed accettare.")
-	pdf.Ln(2)
-	drawSignatureForm(pdf)
-	pdf.SetY(pdf.GetY() - 15)
-	pdf.MultiCell(70, 3, "AXA France Vie\n(Rappresentanza Generale per l'Italia)", "",
-		fpdf.AlignCenter, false)
-	var opt fpdf.ImageOptions
-	opt.ImageType = "png"
-	pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/firma_axa.png", 35, pdf.GetY()+3, 30, 8,
-		false, opt, 0, "")
-	pdf.Ln(15)
-}
-
-func GetOfferResumeSection(pdf *fpdf.Fpdf, policy models.Policy) {
+func offerResumeSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	var (
 		paymentSplit string
 		tableInfo    [][]string
@@ -746,7 +712,7 @@ func GetOfferResumeSection(pdf *fpdf.Fpdf, policy models.Policy) {
 
 }
 
-func GetPaymentResumeSection(pdf *fpdf.Fpdf, policy models.Policy) {
+func paymentResumeSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	payments := make([]float64, 20)
 	var paymentSplit string
 	policyStartDate := policy.StartDate
@@ -845,7 +811,7 @@ func GetPaymentResumeSection(pdf *fpdf.Fpdf, policy models.Policy) {
 		"o interessi di frazionamento.", "", "", false)
 }
 
-func GetContractWithdrawlSection(pdf *fpdf.Fpdf) {
+func contractWithdrawlSection(pdf *fpdf.Fpdf) {
 	getParagraphTitle(pdf, "Informativa sul diritto di recesso")
 	pdf.Ln(8)
 	setBlackBoldFont(pdf, standardTextSize)
@@ -873,7 +839,7 @@ func GetContractWithdrawlSection(pdf *fpdf.Fpdf) {
 		"email: woptaassicurazioni@legalmail.it", "", "", false)
 }
 
-func GetPaymentMethodSection(pdf *fpdf.Fpdf) {
+func paymentMethodSection(pdf *fpdf.Fpdf) {
 	getParagraphTitle(pdf, "Come puoi pagare il premio")
 	pdf.Ln(8)
 	setBlackRegularFont(pdf, standardTextSize)
@@ -883,7 +849,7 @@ func GetPaymentMethodSection(pdf *fpdf.Fpdf) {
 		"stipula del contratto, via bonifico o carta di credito.", "", "", false)
 }
 
-func GetEmitResumeSection(pdf *fpdf.Fpdf, policy models.Policy) {
+func emitResumeSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	var offerPrice string
 	emitDate := policy.EmitDate.Format(dateLayout)
 	startDate := policy.StartDate.Format(dateLayout)
@@ -901,52 +867,7 @@ func GetEmitResumeSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	pdf.MultiCell(0, 3, text, "", "", false)
 }
 
-func GetPolicyDescriptionSection(pdf *fpdf.Fpdf) {
-	getParagraphTitle(pdf, "Per noi questa polizza fa al caso tuo")
-	pdf.Ln(8)
-	setBlackBoldFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3, "Richieste ed esigenze di copertura assicurativa del contraente", "",
-		"", false)
-	setBlackRegularFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3, "In Polizza sono riportate le tue dichiarazioni relative al rischio. Sulla base di "+
-		"tali dichiarazioni, esigenze e richieste, le soluzioni assicurative individuate in coerenza con esse, sono:",
-		"", "", false)
-	pdf.SetX(15)
-	pdf.MultiCell(0, 3, "- tutelare dei soggetti cari, in caso di decesso dell’Assicurato nel corso della "+
-		"durata della copertura, attraverso un sostegno economico indennizzato ai Beneficiari, che "+
-		"sono stati indicati dal Contraente;", "", "", false)
-	pdf.SetX(15)
-	pdf.MultiCell(0, 3, "- difendere il proprio reddito, potendo beneficiare di un capitale in caso di "+
-		"perdita, da parte dell’Assicurato, definitiva ed irrimediabile, da Infortunio o Malattia, della capacità di "+
-		"attendere a un qualsiasi lavoro proficuo, in misura totale (almeno del 60%);", "", "", false)
-	pdf.SetX(15)
-	pdf.MultiCell(0, 3, "- difendere il proprio reddito attraverso una indennità mensile, in caso di "+
-		"perdita totale, ma in via temporanea, delle capacità dell’Assicurato di attendere alla propria professione o "+
-		"attività lavorativa a seguito di Infortunio o Malattia", "", "", false)
-	pdf.SetX(15)
-	pdf.MultiCell(0, 3, "- tutelare la propria salute attraverso una indennità in caso di diagnosi, in "+
-		"capo all’Assicurato, di una delle seguenti malattie: cancro, attacco cardiaco (infarto del miocardio), "+
-		"chirurgia aorto-coronarica (bypass), ictus, insufficienza renale (fase finale di malattia renale), trapianto "+
-		"di organi principali (cuore, polmone, fegato, pancreas, rene o midollo osseo);", "", "", false)
-	pdf.SetX(15)
-	pdf.MultiCell(0, 3, "- le coperture operano con un orizzonte l’orizzonte temporale di protezione "+
-		"indicato a pagina 1 per ogni garanzia sottoscritta e tale durata viene valutata congrua "+
-		"con le esigenze di protezione;", "", "", false)
-	pdf.MultiCell(0, 3, "non rilevando interesse per altre eventuali coperture previste dal prodotto, ma "+
-		"non incluse in questa Polizza. Il Contraente è stato informato che la Polizza può prevedere, in relazione "+
-		"alle garanzie che precedono, l’applicazione di Scoperti, Franchigie, Limiti di indennizzo ed esclusioni, "+
-		"meglio riportate nelle Condizioni Generali di Assicurazione, e che sono stati da te valutati in linea con la "+
-		"capacità finanziaria di sostenere in proprio tale livello di danno e rischio.", "", "", false)
-	pdf.SetFont("Montserrat", "B", 9)
-	pdf.MultiCell(0, 3, "Con la seguente sottoscrizione dichiari che quanto sopra corrisponde a quanto "+
-		"illustrato dall’Intermediario, il quale ha fornito ogni altro elemento utile a consentirti di prendere una "+
-		"decisione informata e coerente con le esigenze espresse.", "", "", false)
-	pdf.Ln(5)
-	drawSignatureForm(pdf)
-	pdf.Ln(5)
-}
-
-func GetWoptaAxaCompanyDescriptionSection(pdf *fpdf.Fpdf) {
+func woptaAxaCompanyDescriptionSection(pdf *fpdf.Fpdf) {
 	getParagraphTitle(pdf, "Chi siamo")
 	pdf.Ln(8)
 	setBlackRegularFont(pdf, standardTextSize)
@@ -967,7 +888,7 @@ func GetWoptaAxaCompanyDescriptionSection(pdf *fpdf.Fpdf) {
 		"dall’IVASS, in appendice Elenco I, nr. I.00149.", "", "", false)
 }
 
-func GetAxaDeclarationsConsentSection(pdf *fpdf.Fpdf, policy models.Policy) {
+func axaDeclarationsConsentSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	setBlackBoldFont(pdf, standardTextSize)
 	pdf.Cell(0, 3, "DICHIARAZIONI E CONSENSI")
 	pdf.Ln(3)
@@ -990,16 +911,36 @@ func GetAxaDeclarationsConsentSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	drawSignatureForm(pdf)
 }
 
-func GetAxaTableSection(pdf *fpdf.Fpdf, policy models.Policy) {
+func axaTableSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	contractor := policy.Contractor
-	domicileCity := ""
-	domicileAddress := ""
-	if contractor.Domicile != nil {
-		domicileCity = strings.ToUpper(contractor.Domicile.City + " (" + contractor.Domicile.CityCode + ")")
-		domicileAddress = strings.ToUpper(contractor.Domicile.StreetName + " " + contractor.Domicile.StreetNumber)
+
+	identityDocumentInfo := map[string]string{
+		"type":             "=====",
+		"number":           "=====",
+		"issuingAuthority": "=====",
+		"dateOfIssue":      "=====",
+		"placeOfIssue":     "=====",
+		"expiryDate":       "=====",
+	}
+	identityDocument := contractor.GetIdentityDocument()
+	if identityDocument != nil {
+		identityDocumentInfo["type"] = identityDocument.Type
+		identityDocumentInfo["number"] = identityDocument.Number
+		identityDocumentInfo["issuingAuthority"] = identityDocument.IssuingAuthority
+		identityDocumentInfo["dateOfIssue"] = identityDocument.DateOfIssue.Format(dateLayout)
+		identityDocumentInfo["placeOfIssue"] = identityDocument.PlaceOfIssue
+		identityDocumentInfo["expiryDate"] = identityDocument.ExpiryDate.Format(dateLayout)
 	}
 
-	birthDate, err := time.Parse(time.RFC3339, contractor.BirthDate)
+	insured := policy.Assets[0].Person
+	domicileCity := ""
+	domicileAddress := ""
+	if insured.Domicile != nil {
+		domicileCity = strings.ToUpper(insured.Domicile.City + " (" + insured.Domicile.CityCode + ")")
+		domicileAddress = strings.ToUpper(insured.Domicile.StreetName + " " + insured.Domicile.StreetNumber)
+	}
+
+	birthDate, err := time.Parse(time.RFC3339, insured.BirthDate)
 	lib.CheckError(err)
 
 	setWhiteBoldFont(pdf, 12)
@@ -1032,7 +973,7 @@ func GetAxaTableSection(pdf *fpdf.Fpdf, policy models.Policy) {
 		"trattamento non richiede il consenso dell’interessato.", "", "", false)
 	pdf.Ln(3)
 
-	pdf.MultiCell(0, 3, "Io sottoscritto "+strings.ToUpper(contractor.Surname+" "+contractor.Name)+
+	pdf.MultiCell(0, 3, "Io sottoscritto "+strings.ToUpper(insured.Surname+" "+insured.Name)+
 		" (Contraente/Assicurato), letta l’Avvertenza Preliminare di cui sopra e l’Informativa sui Riferimenti Normativi"+
 		" Antiriciclaggio (in calce al presente "+
 		"modulo), al fine di permettere all’Intermediario di assolvere agli obblighi di adeguata verifica di cui al "+
@@ -1051,36 +992,36 @@ func GetAxaTableSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	pdf.CellFormat(5, 4, "", "", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "", 0, "", false, 0, "")
 	setBlackBoldFont(pdf, standardTextSize)
-	pdf.CellFormat(90, 4, "Nome: "+strings.ToUpper(contractor.Name), "TLR", 0, "",
+	pdf.CellFormat(90, 4, "Nome: "+strings.ToUpper(insured.Name), "TLR", 0, "",
 		false, 0, "")
-	pdf.CellFormat(90, 4, "Cognome:  "+strings.ToUpper(contractor.Surname), "TLR", 0, "",
+	pdf.CellFormat(90, 4, "Cognome:  "+strings.ToUpper(insured.Surname), "TLR", 0, "",
 		false, 0, "")
 	pdf.CellFormat(5, 4, "", "", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "", 0, "", false, 0, "")
 	pdf.CellFormat(90, 4, "Data di nascita: "+birthDate.Format(dateLayout), "TLR", 0, "",
 		false, 0, "")
-	pdf.CellFormat(90, 4, "Codice Fiscale: "+strings.ToUpper(contractor.FiscalCode), "TLR", 0,
+	pdf.CellFormat(90, 4, "Codice Fiscale: "+strings.ToUpper(insured.FiscalCode), "TLR", 0,
 		"", false, 0, "")
 	pdf.CellFormat(5, 4, "", "", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "", 0, "", false, 0, "")
-	pdf.CellFormat(90, 4, "Comune di nascita: "+strings.ToUpper(contractor.BirthCity), "TLR", 0,
+	pdf.CellFormat(90, 4, "Comune di nascita: "+strings.ToUpper(insured.BirthCity), "TLR", 0,
 		"", false, 0, "")
-	pdf.CellFormat(45, 4, "CAP: "+contractor.PostalCode, "TLR", 0, "", false,
+	pdf.CellFormat(45, 4, "CAP: "+insured.PostalCode, "TLR", 0, "", false,
 		0, "")
-	pdf.CellFormat(45, 4, "Prov.: "+contractor.BirthProvince, "TLR", 0, "", false,
+	pdf.CellFormat(45, 4, "Prov.: "+insured.BirthProvince, "TLR", 0, "", false,
 		0, "")
 	pdf.CellFormat(5, 4, "", "", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "", 0, "", false, 0, "")
-	pdf.CellFormat(90, 4, "Comune di residenza: "+strings.ToUpper(contractor.Residence.City), "TLR",
+	pdf.CellFormat(90, 4, "Comune di residenza: "+strings.ToUpper(insured.Residence.City), "TLR",
 		0, "", false, 0, "")
-	pdf.CellFormat(45, 4, "CAP: "+contractor.Residence.PostalCode, "TLR", 0,
+	pdf.CellFormat(45, 4, "CAP: "+insured.Residence.PostalCode, "TLR", 0,
 		"", false, 0, "")
-	pdf.CellFormat(45, 4, "Prov.: "+strings.ToUpper(contractor.Residence.CityCode),
+	pdf.CellFormat(45, 4, "Prov.: "+strings.ToUpper(insured.Residence.CityCode),
 		"TLR", 0, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "", 0, "", false, 0, "")
-	pdf.CellFormat(180, 4, "Indirizzo di residenza: "+strings.ToUpper(contractor.Address+" "+
-		contractor.StreetNumber), "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(180, 4, "Indirizzo di residenza: "+strings.ToUpper(insured.Address+" "+
+		insured.StreetNumber), "TLR", 0, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "", 0, "", false, 0, "")
 	pdf.CellFormat(180, 4, "Comune di domicilio (se diverso dalla residenza): "+domicileCity,
@@ -1091,7 +1032,7 @@ func GetAxaTableSection(pdf *fpdf.Fpdf, policy models.Policy) {
 		"LR", 0, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "", 0, "", false, 0, "")
-	pdf.CellFormat(180, 4, "Status occupazionale: "+contractor.WorkType, "TLR", 0, "",
+	pdf.CellFormat(180, 4, "Status occupazionale: "+insured.WorkType, "TLR", 0, "",
 		false, 0, "")
 	pdf.CellFormat(5, 4, "", "", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "", 0, "", false, 0, "")
@@ -1103,16 +1044,16 @@ func GetAxaTableSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	pdf.MultiCell(0, 3, "B. allego una fotocopia fronte/retro del mio documento di identità non scaduto "+
 		"avente i seguenti estremi, confermando la veridicità dei dati sotto riportati: ", "", "", false)
 	pdf.CellFormat(5, 4, "", "", 0, "", false, 0, "")
-	pdf.CellFormat(90, 4, "Tipo documento: ========", "TLR", 0, "", false, 0, "")
-	pdf.CellFormat(90, 4, "Nr. Documento: ========", "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(90, 4, "Tipo documento: "+identityDocumentInfo["type"], "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(90, 4, "Nr. Documento: "+identityDocumentInfo["number"], "TLR", 0, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "", 0, "", false, 0, "")
-	pdf.CellFormat(90, 4, "Ente di rilascio: =======", "TLR", 0, "", false, 0, "")
-	pdf.CellFormat(90, 4, "Data di rilascio: =======", "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(90, 4, "Ente di rilascio: "+identityDocumentInfo["issuingAuthority"], "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(90, 4, "Data di rilascio: "+identityDocumentInfo["dateOfIssue"], "TLR", 0, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "", 0, "", false, 0, "")
-	pdf.CellFormat(90, 4, "Località di rilascio: =======", "1", 0, "", false, 0, "")
-	pdf.CellFormat(90, 4, "Data di scadenza: =======", "1", 1, "", false, 0, "")
+	pdf.CellFormat(90, 4, "Località di rilascio: "+identityDocumentInfo["placeOfIssue"], "1", 0, "", false, 0, "")
+	pdf.CellFormat(90, 4, "Data di scadenza: "+identityDocumentInfo["expiryDate"], "1", 1, "", false, 0, "")
 	pdf.Ln(1)
 
 	pdf.MultiCell(0, 3, "C. dichiaro di NON essere una Persona Politicamente Esposta", "",
