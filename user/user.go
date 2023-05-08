@@ -42,6 +42,11 @@ func User(w http.ResponseWriter, r *http.Request) {
 				Handler: OnboardUserFx,
 				Method:  "POST",
 			},
+			{
+				Route:   "/v1/document",
+				Handler: UploadDocument,
+				Method:  http.MethodPost,
+			},
 		},
 	}
 	route.Router(w, r)
