@@ -24,10 +24,11 @@ func Document(w http.ResponseWriter, r *http.Request) {
 	lib.EnableCors(&w, r)
 	w.Header().Set("Access-Control-Allow-Methods", "POST")
 	route := lib.RouteData{
-		Routes: []lib.Route{{
-			Route:   "/v1/proposal",
-			Handler: ContractFx,
-		},
+		Routes: []lib.Route{
+			{
+				Route:   "/v1/proposal",
+				Handler: ContractFx,
+			},
 			{
 				Route:   "/v1/contract",
 				Handler: ContractFx,
@@ -79,6 +80,7 @@ type DodumentData struct {
 		SumInsuredLimitOfIndemnity int64  `json:"sumInsuredLimitOfIndemnity"`
 	} `json:"coverages"`
 }
+
 type Skin struct {
 	PrimaryColor         color.Color
 	SecondaryColor       color.Color

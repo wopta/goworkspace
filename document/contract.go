@@ -3,7 +3,7 @@ package document
 import (
 	"encoding/base64"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 
@@ -14,7 +14,7 @@ import (
 func ContractFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println("Contract")
 	//lib.Files("./serverless_function_source_code")
-	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
+	req := lib.ErrorByte(io.ReadAll(r.Body))
 	var data model.Policy
 	defer r.Body.Close()
 	err := json.Unmarshal([]byte(req), &data)
@@ -34,14 +34,22 @@ func ContractObj(data model.Policy) <-chan DocumentResponse {
 	//layout := "2006-01-02T15:04:05.000Z"
 
 	go func() {
-		skin := getVar()
-		m := skin.initDefault()
+		var (
+			filename string
+			out      []byte
+		)
 		switch data.Company {
 		case "global":
+			skin := getVar()
+			m := skin.initDefault()
 			skin.GlobalContract(m, data)
+			//-----------Save file
+			filename, out = Save(m, data)
+		case "axa":
+			pdf := initFpdf()
+			filename, out = AxaContract(pdf, data)
 		}
-		//-----------Save file
-		filename, out := Save(m, data)
+
 		data.DocumentName = filename
 		log.Println(data.Uid + " ContractObj end")
 		r <- DocumentResponse{

@@ -153,6 +153,23 @@ func (policy *Policy) ExtractGuarantee(guaranteeSlug string) (Guarante, error) {
 	return Guarante{}, fmt.Errorf("no %s guarantee found", guaranteeSlug)
 }
 
+func (policy *Policy) ExtractConsens(consentKey int64) (Consens, error) {
+	for _, consent := range *policy.Contractor.Consens {
+		if consent.Key == consentKey {
+			return consent, nil
+		}
+	}
+	return Consens{}, fmt.Errorf("no consent found with key %d", consentKey)
+}
+
+func (policy *Policy) GuaranteesToMap() map[string]Guarante {
+	m := make(map[string]Guarante, 0)
+	for _, guarantee := range policy.Assets[0].Guarantees {
+		m[guarantee.Slug] = guarantee
+	}
+	return m
+}
+
 func (policy *Policy) BigquerySave(origin string) {
 	policyBig := lib.GetDatasetByEnv(origin, "policy")
 	policyJson, e := policy.Marshal()

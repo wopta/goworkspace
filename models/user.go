@@ -89,16 +89,40 @@ type Address struct {
 }
 
 type IdentityDocument struct {
-	Code             int       `json:"code" firestore:"code" bigquery:"-"`
+	Code             string    `json:"code" firestore:"code" bigquery:"-"`
 	Type             string    `json:"type" firestore:"type" bigquery:"-"`
 	Number           string    `json:"number" firestore:"number" bigquery:"-"`
 	IssuingAuthority string    `json:"issuingAuthority" firestore:"issuingAuthority" bigquery:"-"`
 	PlaceOfIssue     string    `json:"placeOfIssue" firestore:"placeOfIssue" bigquery:"-"`
 	DateOfIssue      time.Time `json:"dateOfIssue" firestore:"dateOfIssue" bigquery:"-"`
 	ExpiryDate       time.Time `json:"expiryDate" firestore:"expiryDate" bigquery:"-"`
-	Link             string    `json:"link,omitempty" firestore:"link,omitempty" bigquery:"-"`
-	MimeType         string    `json:"mimeType,omitempty" firestore:"mimeType,omitempty" bigquery:"-"`
-	Base64Encoding   string    `json:"base64Encoding,omitempty" firestore:"-" bigquery:"-"`
+	FrontMedia       *Media    `json:"frontMedia" firestore:"frontMedia" bigquery:"-"`
+	BackMedia        *Media    `json:"backMedia,omitempty" firestore:"backMedia" bigquery:"-"`
+	LastUpdate       time.Time `json:"lastUpdate" firestore:"lastUpdate" bigquery:"-"`
+}
+
+type Media struct {
+	Filename       string `json:"filename" firestore:"filename" bigquery:"-"`
+	Link           string `json:"link,omitempty" firestore:"link,omitempty" bigquery:"-"`
+	MimeType       string `json:"mimeType,omitempty" firestore:"mimeType,omitempty" bigquery:"-"`
+	Base64Encoding string `json:"base64Encoding,omitempty" firestore:"-" bigquery:"-"`
+}
+
+func (u *User) GetIdentityDocument() *IdentityDocument {
+	var (
+		lastUpdate       time.Time
+		selectedDocument *IdentityDocument
+	)
+	now := time.Now()
+	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
+
+	for _, identityDocument := range u.IdentityDocuments {
+		if identityDocument.LastUpdate.After(lastUpdate) && identityDocument.ExpiryDate.After(today) {
+			selectedDocument = identityDocument
+			lastUpdate = identityDocument.LastUpdate
+		}
+	}
+	return selectedDocument
 }
 
 func FirestoreDocumentToUser(query *firestore.DocumentIterator) (User, error) {
