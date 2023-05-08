@@ -32,7 +32,7 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 	json.Unmarshal([]byte(request), &fabrickCallback)
 	// Unmarshal or Decode the JSON to the interface.
 	if fabrickCallback.Bill.Status == "PAID" {
-		if uid == "" {
+		if uid == "" || origin == "" {
 			ext := strings.Split(fabrickCallback.ExternalID, "_")
 			uid = ext[0]
 			schedule = ext[1]

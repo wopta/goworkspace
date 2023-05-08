@@ -5,7 +5,7 @@ import (
 	"github.com/wopta/goworkspace/user"
 )
 
-func HasUserAccessToPolicy(idToken string, policyID string) (bool, error) {
+func HasUserAccessToPolicy(idToken string, policyID string, origin string) (bool, error) {
 
 	authID, err := lib.GetUserIdFromIdToken(idToken)
 	lib.CheckError(err)
@@ -13,7 +13,7 @@ func HasUserAccessToPolicy(idToken string, policyID string) (bool, error) {
 	usr, err := user.GetUserByAuthId(authID)
 	lib.CheckError(err)
 
-	policies := GetPoliciesFromFirebase(usr.FiscalCode)
+	policies := GetPoliciesFromFirebase(usr.FiscalCode, origin)
 
 	for _, policy := range policies {
 		if policy.Uid == policyID {

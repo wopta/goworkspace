@@ -16,7 +16,7 @@ func init() {
 func Callback(w http.ResponseWriter, r *http.Request) {
 	log.Println("companydata")
 	lib.EnableCors(&w, r)
-	w.Header().Set("Access-Control-Allow-Methods", "POST")
+	//w.Header().Set("Access-Control-Allow-Methods", "POST")
 	route := lib.RouteData{
 		Routes: []lib.Route{
 
@@ -27,7 +27,7 @@ func Callback(w http.ResponseWriter, r *http.Request) {
 			},
 			{
 				Route:   "/v1/axa/emit",
-				Handler: PmiGlobalEmit,
+				Handler: LifeAxalEmit,
 				Method:  http.MethodPost,
 			},
 			{
