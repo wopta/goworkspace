@@ -115,10 +115,10 @@ func mainHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 		cfpi = contractor.VatCode
 	}
 
-	if policy.PaymentSplit == "monthly" {
+	if policy.PaymentSplit == string(models.PaySplitMonthly) {
 		expiryInfo = "Prima scandenza mensile il: " +
 			policy.StartDate.AddDate(0, 1, 0).Format(dateLayout) + "\n"
-	} else if policy.PaymentSplit == "yearly" {
+	} else if policy.PaymentSplit == string(models.PaySplitYear) {
 		expiryInfo = "Prima scadenza annuale il: " +
 			policy.StartDate.AddDate(1, 0, 0).Format(dateLayout) + "\n"
 	}
@@ -352,7 +352,7 @@ func guaranteesTable(pdf *fpdf.Fpdf, policy *models.Policy) {
 		guarantees[guarantee.Slug]["sumInsuredLimitOfIndemnity"] = humanize.FormatFloat("#.###,", guarantee.Value.SumInsuredLimitOfIndemnity) + " €"
 		guarantees[guarantee.Slug]["duration"] = strconv.Itoa(guarantee.Value.Duration.Year)
 		guarantees[guarantee.Slug]["endDate"] = policy.StartDate.AddDate(guarantee.Value.Duration.Year, 0, 0).Format(dateLayout)
-		if policy.PaymentSplit == "monthly" {
+		if policy.PaymentSplit == string(models.PaySplitMonthly) {
 			price = guarantee.Value.PremiumGrossMonthly * 12
 		} else {
 			price = guarantee.Value.PremiumGrossYearly
@@ -646,7 +646,7 @@ func offerResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	)
 
 	switch policy.PaymentSplit {
-	case "monthly":
+	case string(models.PaySplitMonthly):
 		paymentSplit = "MENSILE"
 		tableInfo = [][]string{
 			{
@@ -662,7 +662,7 @@ func offerResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 				lib.HumanaizePriceEuro(policy.OffersPrices["default"]["monthly"].Gross * 12),
 			},
 		}
-	case "yearly":
+	case string(models.PaySplitYear):
 		paymentSplit = "ANNUALE"
 		tableInfo = [][]string{
 			{
@@ -714,14 +714,14 @@ func paymentResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 
 	cellWidth := pdf.GetStringWidth("00/00/0000:") + pdf.GetStringWidth("€ ###.###,##")
 
-	if policy.PaymentSplit == "yearly" {
+	if policy.PaymentSplit == string(models.PaySplitYear) {
 		paymentSplit = "ANNUALE"
 		for _, guarantee := range policy.Assets[0].Guarantees {
 			for i := 0; i < guarantee.Value.Duration.Year; i++ {
 				payments[i] += guarantee.Value.PremiumGrossYearly
 			}
 		}
-	} else if policy.PaymentSplit == "monthly" {
+	} else if policy.PaymentSplit == string(models.PaySplitMonthly) {
 		paymentSplit = "MENSILE"
 		for _, guarantee := range policy.Assets[0].Guarantees {
 			for i := 0; i < guarantee.Value.Duration.Year; i++ {
