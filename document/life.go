@@ -679,7 +679,41 @@ func GetVisioneDocumentiSection(pdf *fpdf.Fpdf, policy models.Policy) {
 }
 
 func GetOfferResumeSection(pdf *fpdf.Fpdf, policy models.Policy) {
-	getParagraphTitle(pdf, "Il premio per tutte le coperture assicurative attivate sulla polizza – Frazionamento: ANNUALE")
+	var (
+		paymentSplit string
+		tableInfo    [][]string
+	)
+
+	switch policy.PaymentSplit {
+	case "monthly":
+		paymentSplit = "MENSILE"
+		tableInfo = [][]string{
+			{
+				"Mensile firma del contratto",
+				lib.HumanaizePriceEuro(policy.OffersPrices["default"]["monthly"].Net),
+				lib.HumanaizePriceEuro(policy.OffersPrices["default"]["monthly"].Tax),
+				lib.HumanaizePriceEuro(policy.OffersPrices["default"]["monthly"].Gross),
+			},
+			{
+				"Pari ad un premio Annuale",
+				lib.HumanaizePriceEuro(policy.OffersPrices["default"]["monthly"].Net * 12),
+				lib.HumanaizePriceEuro(policy.OffersPrices["default"]["monthly"].Tax * 12),
+				lib.HumanaizePriceEuro(policy.OffersPrices["default"]["monthly"].Gross * 12),
+			},
+		}
+	case "yearly":
+		paymentSplit = "ANNUALE"
+		tableInfo = [][]string{
+			{
+				"Annuale firma del contratto",
+				lib.HumanaizePriceEuro(policy.OffersPrices["default"]["yearly"].Net),
+				lib.HumanaizePriceEuro(policy.OffersPrices["default"]["yearly"].Tax),
+				lib.HumanaizePriceEuro(policy.OffersPrices["default"]["yearly"].Gross),
+			},
+		}
+	}
+
+	getParagraphTitle(pdf, "Il premio per tutte le coperture assicurative attivate sulla polizza – Frazionamento: "+paymentSplit)
 	pdf.Ln(8)
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.SetTextColor(0, 0, 0)
@@ -691,21 +725,25 @@ func GetOfferResumeSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	pdf.SetX(pdf.GetX() + 15)
 	pdf.CellFormat(40, 2, "Totale", "", 0, "", false, 0, "")
 	pdf.Ln(3)
-	drawPinkHorizontalLine(pdf, 0.1)
+	drawPinkHorizontalLine(pdf, thinLineWidth)
 	pdf.Ln(1)
-	pdf.CellFormat(40, 2, "Annuale firma del contratto", "", 0, "", false, 0,
-		"")
-	pdf.SetX(pdf.GetX() + 8)
-	pdf.CellFormat(40, 2, lib.HumanaizePriceEuro(policy.OffersPrices["default"]["yearly"].Net), "", 0,
-		"CM", false, 0, "")
-	pdf.SetX(pdf.GetX() + 20)
-	pdf.CellFormat(40, 2, lib.HumanaizePriceEuro(policy.OffersPrices["default"]["yearly"].Tax), "", 0,
-		"CM", false, 0, "")
-	pdf.SetX(pdf.GetX() + 18)
-	pdf.CellFormat(20, 2, lib.HumanaizePriceEuro(policy.OffersPrices["default"]["yearly"].Gross), "",
-		0, "CM", false, 0, "")
-	pdf.Ln(3)
-	drawPinkHorizontalLine(pdf, 0.1)
+	for _, info := range tableInfo {
+		pdf.CellFormat(40, 2, info[0], "", 0, "", false, 0,
+			"")
+		pdf.SetX(pdf.GetX() + 8)
+		pdf.CellFormat(40, 2, info[1], "", 0,
+			"CM", false, 0, "")
+		pdf.SetX(pdf.GetX() + 20)
+		pdf.CellFormat(40, 2, info[2], "", 0,
+			"CM", false, 0, "")
+		pdf.SetX(pdf.GetX() + 18)
+		pdf.CellFormat(20, 2, info[3], "",
+			0, "CM", false, 0, "")
+		pdf.Ln(3)
+		drawPinkHorizontalLine(pdf, thinLineWidth)
+		pdf.Ln(1)
+	}
+
 }
 
 func GetPaymentResumeSection(pdf *fpdf.Fpdf, policy models.Policy) {
