@@ -8,7 +8,7 @@ require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.1
 	github.com/go-gota/gota v0.12.0
 	github.com/wopta/goworkspace/lib v1.0.18
-	github.com/wopta/goworkspace/models v1.0.46
+	github.com/wopta/goworkspace/models v1.0.47
 	github.com/xuri/excelize/v2 v2.7.1
 )
 
