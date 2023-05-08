@@ -30,10 +30,20 @@ func UploadDocument(w http.ResponseWriter, r *http.Request) (string, interface{}
 func saveDocument(userUID string, identityDocument *models.IdentityDocument) string {
 	var filename, link string
 
-	bytes, err := base64.StdEncoding.DecodeString(identityDocument.Base64Encoding)
+	bytes, err := base64.StdEncoding.DecodeString(identityDocument.FrontMedia.Base64Encoding)
 	lib.CheckError(err)
 
-	filename = "asset/" + userUID + "_" + identityDocument.Type + "." + identityDocument.MimeType
+	gsLink, err := lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "asset/"+userUID+"/"+
+		identityDocument.Type+"_front."+identityDocument.FrontMedia.MimeType, bytes)
+	lib.CheckError(err)
+	identityDocument.FrontMedia.Link = gsLink
+
+	gsLink, err = lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "asset/"+userUID+"/"+
+		identityDocument.Type+"_back."+identityDocument.FrontMedia.MimeType, bytes)
+	lib.CheckError(err)
+	identityDocument.BackMedia.Link = gsLink
+	/*
+		filename = "asset/" + userUID + "_" + identityDocument.Type + "." + identityDocument.MimeType*/
 	link = lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, bytes)
 	return link
 }
