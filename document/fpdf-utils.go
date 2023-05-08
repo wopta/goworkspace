@@ -38,7 +38,7 @@ func loadCustomFonts(pdf *fpdf.Fpdf) {
 	pdf.AddUTF8Font("Montserrat", "I", lib.GetAssetPathByEnv(basePath)+"/montserrat_italic.ttf")
 }
 
-func save(pdf *fpdf.Fpdf, policy models.Policy) (string, []byte) {
+func save(pdf *fpdf.Fpdf, contractor *models.User) (string, []byte) {
 	var filename string
 	if os.Getenv("env") == "local" {
 		err := pdf.OutputFileAndClose(basePath + "/contract.pdf")
@@ -49,7 +49,7 @@ func save(pdf *fpdf.Fpdf, policy models.Policy) (string, []byte) {
 		lib.CheckError(err)
 		now := time.Now()
 		timestamp := strconv.FormatInt(now.Unix(), 10)
-		filename = "temp/" + policy.Contractor.Name + "_" + policy.Contractor.Surname + "_" + timestamp + "_contract.pdf"
+		filename = "temp/" + contractor.Name + "_" + contractor.Surname + "_" + timestamp + "_contract.pdf"
 		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, out.Bytes())
 		lib.CheckError(err)
 		return filename, out.Bytes()

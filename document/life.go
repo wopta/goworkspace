@@ -14,7 +14,7 @@ var (
 	signatureID int
 )
 
-func Life(pdf *fpdf.Fpdf, policy models.Policy) (string, []byte) {
+func Life(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 	signatureID = 0
 
 	mainHeader(pdf, policy)
@@ -92,11 +92,11 @@ func Life(pdf *fpdf.Fpdf, policy models.Policy) (string, []byte) {
 
 	GetPersonalDataHandlingSection(pdf, policy)
 
-	filename, out := save(pdf, policy)
+	filename, out := save(pdf, &policy.Contractor)
 	return filename, out
 }
 
-func mainHeader(pdf *fpdf.Fpdf, policy models.Policy) {
+func mainHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 	var (
 		opt        fpdf.ImageOptions
 		logoPath   string
@@ -254,7 +254,7 @@ func woptaFooter(pdf *fpdf.Fpdf) {
 	})
 }
 
-func insuredInfoSection(pdf *fpdf.Fpdf, policy models.Policy) {
+func insuredInfoSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	getParagraphTitle(pdf, "La tua assicurazione è operante per il seguente Assicurato e Garanzie")
 	pdf.Ln(8)
 	insuredInfoTable(pdf, policy.Assets[0].Person)
@@ -304,7 +304,7 @@ func insuredInfoTable(pdf *fpdf.Fpdf, insured *models.User) {
 	pdf.Ln(1)
 }
 
-func guaranteesTable(pdf *fpdf.Fpdf, policy models.Policy) {
+func guaranteesTable(pdf *fpdf.Fpdf, policy *models.Policy) {
 	const (
 		death               = "death"
 		permanentDisability = "permanent-disability"
@@ -410,7 +410,7 @@ func avvertenzeBeneficiariSection(pdf *fpdf.Fpdf) {
 		"il Beneficiario designato.", "", "", false)
 }
 
-func beneficiariesSection(pdf *fpdf.Fpdf, policy models.Policy) {
+func beneficiariesSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	legitimateSuccessorsChoice := "X"
 	designatedSuccessorsChoice := ""
 	beneficiaries := [2]map[string]string{
@@ -537,7 +537,7 @@ func beneficiariesTable(pdf *fpdf.Fpdf, beneficiaries [2]map[string]string) {
 	}
 }
 
-func beneficiaryReferenceSection(pdf *fpdf.Fpdf, policy models.Policy) {
+func beneficiaryReferenceSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	beneficiaryReference := map[string]string{
 		"name":     "=====",
 		"fiscCode": "=====",
@@ -604,7 +604,7 @@ func beneficiaryReferenceTable(pdf *fpdf.Fpdf, beneficiaryReference map[string]s
 	drawPinkHorizontalLine(pdf, thinLineWidth)
 }
 
-func surveysSection(pdf *fpdf.Fpdf, policy models.Policy) {
+func surveysSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	surveys := *policy.Surveys
 
 	getParagraphTitle(pdf, "Dichiarazioni da leggere con attenzione prima di firmare")
@@ -622,7 +622,7 @@ func surveysSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	pdf.Ln(5)
 }
 
-func statementsSection(pdf *fpdf.Fpdf, policy models.Policy) {
+func statementsSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	statements := *policy.Statements
 	pdf.Ln(8)
 	for _, statement := range statements {
@@ -639,7 +639,7 @@ func statementsSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	pdf.Ln(15)
 }
 
-func offerResumeSection(pdf *fpdf.Fpdf, policy models.Policy) {
+func offerResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	var (
 		paymentSplit string
 		tableInfo    [][]string
@@ -707,7 +707,7 @@ func offerResumeSection(pdf *fpdf.Fpdf, policy models.Policy) {
 
 }
 
-func paymentResumeSection(pdf *fpdf.Fpdf, policy models.Policy) {
+func paymentResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	payments := make([]float64, 20)
 	var paymentSplit string
 	policyStartDate := policy.StartDate
@@ -844,7 +844,7 @@ func paymentMethodSection(pdf *fpdf.Fpdf) {
 		"stipula del contratto, via bonifico o carta di credito.", "", "", false)
 }
 
-func emitResumeSection(pdf *fpdf.Fpdf, policy models.Policy) {
+func emitResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	var offerPrice string
 	emitDate := policy.EmitDate.Format(dateLayout)
 	startDate := policy.StartDate.Format(dateLayout)
@@ -883,7 +883,7 @@ func woptaAxaCompanyDescriptionSection(pdf *fpdf.Fpdf) {
 		"dall’IVASS, in appendice Elenco I, nr. I.00149.", "", "", false)
 }
 
-func axaDeclarationsConsentSection(pdf *fpdf.Fpdf, policy models.Policy) {
+func axaDeclarationsConsentSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	setBlackBoldFont(pdf, standardTextSize)
 	pdf.Cell(0, 3, "DICHIARAZIONI E CONSENSI")
 	pdf.Ln(3)
@@ -906,7 +906,7 @@ func axaDeclarationsConsentSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	drawSignatureForm(pdf)
 }
 
-func axaTableSection(pdf *fpdf.Fpdf, policy models.Policy) {
+func axaTableSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	contractor := policy.Contractor
 
 	identityDocumentInfo := map[string]string{
@@ -1089,7 +1089,7 @@ func axaTableSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	pdf.CellFormat(0, 2, "", "", 1, "", false, 0, "")
 }
 
-func GetAxaTablePart2Section(pdf *fpdf.Fpdf, policy models.Policy) {
+func GetAxaTablePart2Section(pdf *fpdf.Fpdf, policy *models.Policy) {
 	pdf.MultiCell(0, 3, "Il sottoscritto, ai sensi degli artt. 22 e 55 comma 3 del d.lgs. 231/2007, "+
 		"consapevole della responsabilità penale derivante da omesse e/o mendaci affermazioni, dichiara che tutte le "+
 		"informazioni fornite (anche in riferimento al titolare effettivo), le dichiarazioni rilasciate il documento "+
@@ -1651,7 +1651,7 @@ func GetWoptaPrivacySection(pdf *fpdf.Fpdf) {
 	pdf.Ln(3)
 }
 
-func GetPersonalDataHandlingSection(pdf *fpdf.Fpdf, policy models.Policy) {
+func GetPersonalDataHandlingSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	consentText := "X"
 	notConsentText := ""
 

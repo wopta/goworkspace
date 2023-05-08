@@ -5,7 +5,7 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
-func AxaContract(pdf *fpdf.Fpdf, policy models.Policy) (string, []byte) {
+func AxaContract(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 	var (
 		filename string
 		out      []byte
