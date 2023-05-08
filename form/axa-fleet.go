@@ -284,18 +284,17 @@ func getMailObj(msg string, mailsource string) mail.MailRequest {
 	var obj mail.MailRequest
 	obj.From = "noreply@wopta.it"
 	obj.To = []string{
-		//"fabrizia.colombo@wopta.it",
-		//"michele.lomazzi@wopta.it",
+		"assunzione@wopta.it",
 		"luca.barbieri@wopta.it",
-		//mailsource
+		mailsource,
 	}
 	obj.Message = msg
 	obj.Subject = " Wopta T-Way Axa Fleet"
 	obj.IsHtml = true
 	obj.IsAttachment = false
 	obj.IsLink = true
-	obj.Link = ""
-	obj.LinkLabel = ""
+	obj.Link = "https://docs.google.com/spreadsheets/d/1UtYiPt7fJ8FAZQRpmwRZpyqGpOT26Q2-qNidLAAPFlQ/edit#gid=0"
+	obj.LinkLabel = "Archivio completo"
 	obj.Title = ""
 	obj.SubTitle = ""
 
