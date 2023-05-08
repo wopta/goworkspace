@@ -9,7 +9,7 @@ require (
 	github.com/dustin/go-humanize v1.0.1
 	github.com/johnfercher/maroto v0.38.0
 	github.com/wopta/goworkspace/lib v1.0.9
-	github.com/wopta/goworkspace/models v1.0.22
+	github.com/wopta/goworkspace/models v1.0.48
 	github.com/go-pdf/fpdf v0.7.0
 )
 
