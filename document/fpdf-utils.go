@@ -27,21 +27,21 @@ func initFpdf() *fpdf.Fpdf {
 	pdf := fpdf.New(fpdf.OrientationPortrait, fpdf.UnitMillimeter, fpdf.PageSizeA4, "")
 	pdf.SetMargins(10, 15, 10)
 	pdf.SetAuthor("Wopta Assicurazioni s.r.l", true)
+	pdf.SetCreationDate(time.Now().UTC())
 	loadCustomFonts(pdf)
 	return pdf
 }
 
 func loadCustomFonts(pdf *fpdf.Fpdf) {
-	pdf.AddUTF8Font("Montserrat", "", lib.GetAssetPathByEnv("test")+"/montserrat_light.ttf")
-	pdf.AddUTF8Font("Montserrat", "B", lib.GetAssetPathByEnv("test")+"/montserrat_bold.ttf")
-	pdf.AddUTF8Font("Montserrat", "I", lib.GetAssetPathByEnv("test")+"/montserrat_italic.ttf")
-	pdf.AddUTF8Font("Noto", "", lib.GetAssetPathByEnv("test")+"/notosansmono.ttf")
+	pdf.AddUTF8Font("Montserrat", "", lib.GetAssetPathByEnv(basePath)+"/montserrat_light.ttf")
+	pdf.AddUTF8Font("Montserrat", "B", lib.GetAssetPathByEnv(basePath)+"/montserrat_bold.ttf")
+	pdf.AddUTF8Font("Montserrat", "I", lib.GetAssetPathByEnv(basePath)+"/montserrat_italic.ttf")
 }
 
 func save(pdf *fpdf.Fpdf, policy models.Policy) (string, []byte) {
 	var filename string
 	if os.Getenv("env") == "local" {
-		err := pdf.OutputFileAndClose("document/contract.pdf")
+		err := pdf.OutputFileAndClose(basePath + "/contract.pdf")
 		lib.CheckError(err)
 	} else {
 		var out bytes.Buffer
