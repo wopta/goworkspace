@@ -356,28 +356,28 @@ func (fx *Fx) FilterOffersByMinimumPrice(guarantees map[string]*Guarante, offers
 		hasNotOfferMinimumMonthlyPrice := offer[monthly].Gross < monthlyPriceMinimum
 		if hasNotOfferMinimumMonthlyPrice && hasNotOfferMinimumYearlyPrice {
 			delete(offersPrices, offerKey)
-			for _, guarantee := range guarantees {
-				delete(guarantee.Offer, offerKey)
+			for guaranteeSlug, _ := range guarantees {
+				delete(guarantees[guaranteeSlug].Offer, offerKey)
 			}
-			return
+			continue
 		}
 		if hasNotOfferMinimumMonthlyPrice {
 			delete(offersPrices[offerKey], monthly)
-			for _, guarantee := range guarantees {
-				if fx.HasGuaranteePerOffer(guarantees, offerKey, guarantee.Slug) {
-					guarantee.Offer[offerKey].PremiumNetMonthly = 0.0
-					guarantee.Offer[offerKey].PremiumTaxAmountMonthly = 0.0
-					guarantee.Offer[offerKey].PremiumGrossMonthly = 0.0
+			for guaranteeSlug, _ := range guarantees {
+				if fx.HasGuaranteePerOffer(guarantees, offerKey, guaranteeSlug) {
+					guarantees[guaranteeSlug].Offer[offerKey].PremiumNetMonthly = 0.0
+					guarantees[guaranteeSlug].Offer[offerKey].PremiumTaxAmountMonthly = 0.0
+					guarantees[guaranteeSlug].Offer[offerKey].PremiumGrossMonthly = 0.0
 				}
 			}
 		}
 		if hasNotOfferMinimumYearlyPrice {
 			delete(offersPrices[offerKey], yearly)
-			for _, guarantee := range guarantees {
-				if fx.HasGuaranteePerOffer(guarantees, offerKey, guarantee.Slug) {
-					guarantee.Offer[offerKey].PremiumNetYearly = 0.0
-					guarantee.Offer[offerKey].PremiumTaxAmountYearly = 0.0
-					guarantee.Offer[offerKey].PremiumGrossYearly = 0.0
+			for guaranteeSlug, _ := range guarantees {
+				if fx.HasGuaranteePerOffer(guarantees, offerKey, guaranteeSlug) {
+					guarantees[guaranteeSlug].Offer[offerKey].PremiumNetYearly = 0.0
+					guarantees[guaranteeSlug].Offer[offerKey].PremiumTaxAmountYearly = 0.0
+					guarantees[guaranteeSlug].Offer[offerKey].PremiumGrossYearly = 0.0
 				}
 			}
 		}
