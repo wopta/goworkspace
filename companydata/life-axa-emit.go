@@ -13,7 +13,6 @@ import (
 	"github.com/go-gota/gota/series"
 	lib "github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	"github.com/xuri/excelize/v2"
 )
 
 func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -68,11 +67,11 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 			if asset.Building != nil {
 				for _, g := range asset.Guarantees {
 					var (
-						beneficiary1, beneficiary2   string
-						beneficiary1S, beneficiary2S models.Beneficiary
+						beneficiary1, beneficiary2, beneficiary1T string
+						beneficiary1S, beneficiary2S              models.Beneficiary
 					)
-					beneficiary1, beneficiary1S = mapBeneficiary(g, 0) //Codice Fiscale Beneficiario
-					beneficiary2, beneficiary2S = mapBeneficiary(g, 1)
+					beneficiary1, beneficiary1S, beneficiary1T = mapBeneficiary(g, 0) //Codice Fiscale Beneficiario
+					beneficiary2, beneficiary2S, _ = mapBeneficiary(g, 1)
 					fmt.Println(g)
 					row := []string{
 						mapCodecCompany(policy, g.CompanyCodec), //Codice schema
@@ -84,92 +83,92 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 						fmt.Sprint(g.Value.Duration.Year * 12),  //"Durata complessiva"
 						fmt.Sprintf("%.2f", g.PriceGross),       //"Premio assicurativo lordo"
 						fmt.Sprintf("%.0f", g.SumInsuredLimitOfIndemnity), //"Importo Assicurato"
-						"0",                          //indennizzo mensile
-						"",                           //campo disponibile
-						"",                           //% di sovrappremio da applicare alla garanzia
-						"W1.42",                      //Codice Concessionario /dipendenti (iscr.E)
-						"",                           //Codice Banca
-						"",                           //Codice Campagna
-						"T",                          //Copertura Assicurativa: Totale o Pro quota
-						"",                           //% assicurata dell'assicurato
-						"",                           //campo disponibile
-						"",                           //Maxi rata finale/Valore riscatto
-						"",                           //Stato occupazionale dell'Assicurato
-						"2",                          //Tipo aderente
-						"WEB",                        //Canale di vendita
-						"PF",                         //Tipo contraente / Contraente
-						policy.Contractor.Surname,    //Denominazione Sociale o Cognome contraente
-						policy.Contractor.Name,       //campo vuoto o nome
-						policy.Contractor.Gender,     //Sesso
-						policy.Contractor.BirthDate,  //Data di nascita
-						policy.Contractor.FiscalCode, //Codice Fiscale
-						policy.Contractor.Address,    //Indirizzo di residenza
-						policy.Contractor.PostalCode, //C.A.P. Di residenza
-						policy.Contractor.Locality,   //Comune di residenza
-						policy.Contractor.City,       //Provincia di residenza
-						policy.Contractor.Mail,       //Indirizzo e-mail
-						policy.Contractor.Phone,      //Numero di Cellulare
-						"",                           //Cognome Assicurato
-						"",                           //Nome
-						"",                           //Sesso
-						"",                           //Data di nascita
-						"",                           //Codice Fiscale
-						beneficiary1,                 //Codice Fiscale Beneficiario
-						beneficiary2,                 //Codice Fiscale Beneficiario 2
-						"",                           //Codice Fiscale Beneficiario 3
-						"VIT",                        //Natura del rapporto
-						"PAS ",                       //Scopo del rapporto
-						"BO",                         //Modalità di pagamento del premio assicurativo (all'intermediario)
-						"SI",                         //contraente = Assicurato?
-						"",                           //Indirizzo di domicilio
-						"",                           //C.A.P. Di domicilio
-						"",                           //Comune di domicilio
-						"",                           //Provincia di domicilio
-						policy.Contractor.BirthCity,  //Luogo di nascita dell’contraente persona fisica
-						policy.Contractor.BirthCity,  //Provincia di nascita dell’contraente persona fisica
-						"086",                        //Stato di residenza dell’contraente
-						residenceCab,                 //Cab della città di residenza dell’contraente
-						"600",                        //Sottogruppo attività economica
-						"600",                        //Ramo gruppo attività economica
-						strconv.Itoa(policy.Contractor.IdentityDocuments[0].Code), //Tipo documento dell'contraente persona fisica
-						"Numero documento dell'contraente persona fisica ",        //Numero documento dell'contraente persona fisica
-						"Data rilascio documento dell'contraente persona fisica ", //Data rilascio documento dell'contraente persona fisica
-						"Ente rilascio documento dell'contraente persona fisica ", //Ente rilascio documento dell'contraente persona fisica
-						"NO",                      //PEP - Persona Politicamente Esposta
-						"",                        //Tipologia di PEP
-						"E",                       //Modalità di comunicazione prescelta tra Compagnia ed contraente
-						"Indirizzo di residenza ", //Indirizzo di residenza
-						"C.A.P. Residenza ",       //C.A.P. Residenza
-						"Comune Residenza ",       //Comune Residenza
-						"Provincia Residenza ",    //Provincia Residenza
-						"Indirizzo di domicilio",  //Indirizzo di domicilio
-						"C.A.P. Domicilio",        //C.A.P. Domicilio
-						"Comune Domicilio",        //Comune Domicilio
-						"Provincia Domicilio",     //Provincia Domicilio
-						"Indirizzo e-mail ",       //Indirizzo e-mail
-						"Numero di cellulare ",    //Numero di cellulare
-						"Luogo di nascita ",       //Luogo di nascita
-						"Provincia di nascita ",   //Provincia di nascita
-						"Stato di residenza",      //Stato di residenza
-						"Tipo documento",          //Tipo documento
-						"Numero documento",        //Numero documento
-						"Data rilascio documento", //Data rilascio documento
-						"Ente rilascio documento", //Ente rilascio documento
-						"NO",                      //PEP - Persona Politicamente Esposta
-						"",                        //Tipologia di PEP
-						"Eredi designati nominativamente o genericamente?", //Eredi designati nominativamente o genericamente?
-						beneficiary1S.Surname,                              //Cognome Beneficiario 1
-						beneficiary1S.Name,                                 //Nome
-						beneficiary1S.FiscalCode,                           //Codice Fiscale
-						beneficiary1S.Phone,                                //Numero di Telefono del Beneficiario
-						beneficiary1S.Residence.StreetName,                 //Indirizzo di residenza
-						beneficiary1S.Residence.City,                       //Città /Comune di Residenza
-						beneficiary1S.Residence.PostalCode,                 //CAP
-						beneficiary1S.Residence.CityCode,                   //Provincia
-						beneficiary1S.Mail,                                 //Email
-						"Legame del Cliente col Beneficiario",              //Legame del Cliente col Beneficiario
-						"NUCLEO FAMILIARE",                                 //NUCLEO FAMILIARE
-						"Lcontraente ha escluso l invio di comunicazioni da parte dell Impresa al Beneficiario?", //Lcontraente ha escluso l invio di comunicazioni da parte dell Impresa al Beneficiario?
+						"0",                                   //indennizzo mensile
+						"",                                    //campo disponibile
+						"",                                    //% di sovrappremio da applicare alla garanzia
+						"W1",                                  //Codice Concessionario /dipendenti (iscr.E)
+						"",                                    //Codice Banca
+						"",                                    //Codice Campagna
+						"T",                                   //Copertura Assicurativa: Totale o Pro quota
+						"",                                    //% assicurata dell'assicurato
+						"",                                    //campo disponibile
+						"",                                    //Maxi rata finale/Valore riscatto
+						"",                                    //Stato occupazionale dell'Assicurato
+						"2",                                   //Tipo aderente
+						"WEB",                                 //Canale di vendita
+						"PF",                                  //Tipo contraente / Contraente
+						policy.Contractor.Surname,             //Denominazione Sociale o Cognome contraente
+						policy.Contractor.Name,                //campo vuoto o nome
+						policy.Contractor.Gender,              //Sesso
+						policy.Contractor.BirthDate,           //Data di nascita
+						policy.Contractor.FiscalCode,          //Codice Fiscale
+						policy.Contractor.Address,             //Indirizzo di residenza
+						policy.Contractor.PostalCode,          //C.A.P. Di residenza
+						policy.Contractor.Locality,            //Comune di residenza
+						policy.Contractor.City,                //Provincia di residenza
+						policy.Contractor.Mail,                //Indirizzo e-mail
+						policy.Contractor.Phone,               //Numero di Cellulare
+						policy.Assets[0].Person.Surname,       //Cognome Assicurato
+						policy.Assets[0].Person.Name,          //Nome
+						policy.Assets[0].Person.Gender,        //Sesso
+						policy.Assets[0].Person.BirthDate,     //Data di nascita
+						policy.Assets[0].Person.FiscalCode,    //Codice Fiscale
+						beneficiary1,                          //Codice Fiscale Beneficiario
+						beneficiary2,                          //Codice Fiscale Beneficiario 2
+						"",                                    //Codice Fiscale Beneficiario 3
+						"VIT",                                 //Natura del rapporto
+						"PAS ",                                //Scopo del rapporto
+						"BO",                                  //Modalità di pagamento del premio assicurativo (all'intermediario)
+						"SI",                                  //contraente = Assicurato?
+						policy.Contractor.Domicile.StreetName, //Indirizzo di domicilio contraente
+						policy.Contractor.Domicile.PostalCode, //C.A.P. Di domicilio
+						policy.Contractor.Domicile.Locality,   //Comune di domicilio
+						policy.Contractor.Domicile.CityCode,   //Provincia di domicilio
+						policy.Contractor.BirthCity,           //Luogo di nascita dell’contraente persona fisica
+						policy.Contractor.BirthCity,           //Provincia di nascita dell’contraente persona fisica
+						"086",                                 //Stato di residenza dell’contraente
+						residenceCab,                          //Cab della città di residenza dell’contraente
+						"600",                                 //Sottogruppo attività economica
+						"600",                                 //Ramo gruppo attività economica
+						strconv.Itoa(policy.Contractor.IdentityDocuments[0].Code),         //Tipo documento dell'contraente persona fisica
+						policy.Contractor.IdentityDocuments[0].Number,                     //Numero documento dell'contraente persona fisica
+						policy.Contractor.IdentityDocuments[0].DateOfIssue.Format(layout), //Data rilascio documento dell'contraente persona fisica
+						policy.Contractor.IdentityDocuments[0].IssuingAuthority,           //Ente rilascio documento dell'contraente persona fisica
+						"NO", //PEP - Persona Politicamente Esposta
+						"",   //Tipologia di PEP
+						"E",  //Modalità di comunicazione prescelta tra Compagnia ed contraente
+						policy.Assets[0].Person.Residence.StreetName, //Indirizzo di residenza Assicurato
+						policy.Assets[0].Person.Residence.PostalCode, //C.A.P. Residenza
+						policy.Assets[0].Person.Residence.Locality,   //Comune Residenza
+						policy.Assets[0].Person.Residence.CityCode,   //Provincia Residenza
+						policy.Assets[0].Person.Domicile.StreetName,  //Indirizzo di domicilio
+						policy.Assets[0].Person.Domicile.PostalCode,  //C.A.P. Domicilio
+						policy.Assets[0].Person.Domicile.Locality,    //Comune Domicilio
+						policy.Assets[0].Person.Domicile.CityCode,    //Provincia Domicilio
+						policy.Assets[0].Person.Mail,                 //Indirizzo e-mail
+						policy.Assets[0].Person.Phone,                //Numero di cellulare
+						policy.Assets[0].Person.BirthCity,            //Luogo di nascita
+						policy.Assets[0].Person.BirthCity,            //Provincia di nascita
+						"ITA",                                        //Stato di residenza
+						"Tipo documento",                             //Tipo documento
+						"Numero documento",                           //Numero documento
+						"Data rilascio documento",                    //Data rilascio documento
+						"Ente rilascio documento",                    //Ente rilascio documento
+						"NO",                                         //PEP - Persona Politicamente Esposta
+						"",                                           //Tipologia di PEP
+						beneficiary1T,                                //Eredi designati nominativamente o genericamente?
+						beneficiary1S.Surname,                        //Cognome Beneficiario 1
+						beneficiary1S.Name,                           //Nome
+						beneficiary1S.FiscalCode,                     //Codice Fiscale
+						beneficiary1S.Phone,                          //Numero di Telefono del Beneficiario
+						beneficiary1S.Residence.StreetName,           //Indirizzo di residenza
+						beneficiary1S.Residence.City,                 //Città /Comune di Residenza
+						beneficiary1S.Residence.PostalCode,           //CAP
+						beneficiary1S.Residence.CityCode,             //Provincia
+						beneficiary1S.Mail,                           //Email
+						MapBool(beneficiary1S.IsFamilyMember),        //Legame del Cliente col Beneficiario
+
+						MapBool(beneficiary1S.IsContactable),  //Lcontraente ha escluso l invio di comunicazioni da parte dell Impresa al Beneficiario?
 						beneficiary2S.Surname,                 //Cognome Beneficiario 2
 						beneficiary2S.Name,                    //Nome
 						beneficiary2S.FiscalCode,              //Codice Fiscale
@@ -192,7 +191,6 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 						"",                                    //Provincia
 						"",                                    //Email
 						"Legame del Cliente col Beneficiario", //Legame del Cliente col Beneficiario
-						"NUCLEO FAMILIARE",                    //NUCLEO FAMILIARE
 						"L'contraente ha escluso l'invio di comunicazioni da parte dell Impresa al Beneficiario?", //L'contraente ha escluso l'invio di comunicazioni da parte dell Impresa al Beneficiario?
 						"NO", //Esistenza Titolare effettiv
 						"",   //Cognome
@@ -319,8 +317,8 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 						"",   //Tipo documento
 						"",   //Numero documento
 						"",   //Data rilascio documento"
-						"",   //
-						"",   //
+						"",   //Ente rilascio documento
+						"",   //PEP - Persona Politicamente Esposta
 						"",   //Tipologia di PEP
 						"",   //Carica ricoperta dell'esecutore
 						"",   //Cognome
@@ -381,9 +379,10 @@ func mapCodecCompany(p models.Policy, g string) string {
 	}
 	return result
 }
-func mapBeneficiary(g models.Guarante, b int) (string, models.Beneficiary) {
+func mapBeneficiary(g models.Guarante, b int) (string, models.Beneficiary, string) {
 	var (
 		result      string
+		result2     string
 		resulStruct models.Beneficiary
 	)
 	resulStruct = models.Beneficiary{}
@@ -391,15 +390,26 @@ func mapBeneficiary(g models.Guarante, b int) (string, models.Beneficiary) {
 		result = ""
 		if (*g.Beneficiaries)[b].IsLegitimateSuccessors || (*g.Beneficiaries)[b].IsFamilyMember {
 			result = "GE"
+			result2 = "GE"
 		} else {
 			result = (*g.Beneficiaries)[b].FiscalCode
+			result2 = "NM"
 			resulStruct = (*g.Beneficiaries)[b]
 		}
 
 	}
 
-	return result, resulStruct
+	return result, resulStruct, result2
 }
+func MapBool(s bool) string {
+	var res string
+	res = "NO"
+	if s {
+		res = "SI"
+	}
+	return res
+}
+
 func getHeader() []string {
 	return []string{"Codice schema",
 		"N° adesione individuale univoco",
@@ -494,7 +504,6 @@ func getHeader() []string {
 		"Provincia",
 		"Email ",
 		"Legame del Cliente col Beneficiario",
-		"NUCLEO FAMILIARE",
 		"L contraente ha escluso l invio di comunicazioni da parte dell Impresa al Beneficiario?",
 		"Cognome Beneficiario 2",
 		"Nome",
@@ -506,7 +515,6 @@ func getHeader() []string {
 		"Provincia",
 		"Email ",
 		"Legame del Cliente col Beneficiario",
-		"NUCLEO FAMILIARE",
 		"L contraente ha escluso l invio di comunicazioni da parte dell Impresa al Beneficiario?",
 		"Cognome Beneficiario 3",
 		"Nome",
@@ -518,7 +526,6 @@ func getHeader() []string {
 		"Provincia",
 		"Email ",
 		"Legame del Cliente col Beneficiario",
-		"NUCLEO FAMILIARE",
 		"L contraente ha escluso l invio di comunicazioni da parte dell Impresa al Beneficiario?",
 		"Esistenza Titolare effettivo",
 		"Cognome ",
@@ -707,28 +714,4 @@ func SftpUpload(filePath string) {
 			log.Fatalln(err)
 		}
 		fmt.Printf("%+v\n", info)*/
-}
-
-func CreateExcel(sheet [][]interface{}, filePath string) ([]byte, error) {
-	log.Println("CreateExcel")
-	f := excelize.NewFile()
-	alfabet := []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"}
-	// Create a new sheet.
-	index, err := f.NewSheet("Sheet1")
-	for x, row := range sheet {
-		for i, cel := range row {
-
-			fmt.Println(cel)
-			f.SetCellValue("Sheet1", alfabet[i]+""+strconv.Itoa(x+1), cel)
-		}
-	}
-	//Set active sheet of the workbook.
-	f.SetActiveSheet(index)
-
-	//Save spreadsheet by the given path.
-	err = f.SaveAs(filePath)
-
-	resByte, err := f.WriteToBuffer()
-
-	return resByte.Bytes(), err
 }
