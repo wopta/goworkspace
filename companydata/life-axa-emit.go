@@ -385,7 +385,7 @@ func mapBeneficiary(g models.Guarante, b int) (string, models.Beneficiary, strin
 		resulStruct models.Beneficiary
 	)
 	resulStruct = models.Beneficiary{}
-	if len(*g.Beneficiaries) > 0 && len(*g.Beneficiaries) >= b {
+	if len(*g.Beneficiaries) > 0 && len(*g.Beneficiaries) > b {
 		result = ""
 		if (*g.Beneficiaries)[b].IsLegitimateSuccessors || (*g.Beneficiaries)[b].IsFamilyMember {
 			result = "GE"
