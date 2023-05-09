@@ -157,6 +157,7 @@ func getParagraphTitle(pdf *fpdf.Fpdf, title string) {
 }
 
 func printSurvey(pdf *fpdf.Fpdf, survey models.Survey) error {
+	var text string
 	leftMargin, _, rightMargin, _ := pdf.GetMargins()
 	pageWidth, _ := pdf.GetPageSize()
 	availableWidth := pageWidth - leftMargin - rightMargin - 2
@@ -181,17 +182,17 @@ func printSurvey(pdf *fpdf.Fpdf, survey models.Survey) error {
 		surveyWidth = pdf.GetStringWidth(lines[len(lines)-1])
 		paddingWidth = availableWidth - surveyWidth - answerWidth
 
-		survey.Title += strings.Repeat(".", int(paddingWidth/dotWidth)-1)
-		survey.Title += answer
+		text = strings.Repeat(".", int(paddingWidth/dotWidth)-1) + answer
 	}
 	if survey.Title != "" {
-		pdf.MultiCell(rowWidth, 3.5, survey.Title, "", fpdf.AlignLeft, false)
+		pdf.MultiCell(rowWidth, 3.5, survey.Title+text, "", fpdf.AlignLeft, false)
 	}
 	if survey.Subtitle != "" {
-		pdf.MultiCell(rowWidth, 3.5, survey.Subtitle, "", fpdf.AlignLeft, false)
+		pdf.MultiCell(rowWidth, 3.5, survey.Subtitle+text, "", fpdf.AlignLeft, false)
 	}
 
 	for _, question := range survey.Questions {
+		text = ""
 		availableWidth = pageWidth - leftMargin - rightMargin - 2
 
 		if question.IsBold {
@@ -224,10 +225,9 @@ func printSurvey(pdf *fpdf.Fpdf, survey models.Survey) error {
 			questionWidth = pdf.GetStringWidth(lines[len(lines)-1])
 			paddingWidth = availableWidth - questionWidth - answerWidth
 
-			question.Question += strings.Repeat(".", int(paddingWidth/dotWidth)+1)
-			question.Question += answer
+			text = strings.Repeat(".", int(paddingWidth/dotWidth)+1) + answer
 		}
-		pdf.MultiCell(rowWidth, 3.5, question.Question, "", fpdf.AlignLeft, false)
+		pdf.MultiCell(rowWidth, 3.5, question.Question+text, "", fpdf.AlignLeft, false)
 	}
 	return nil
 }
