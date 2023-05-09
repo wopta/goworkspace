@@ -149,7 +149,7 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 					policy.Assets[0].Person.BirthCity,                                       //Luogo di nascita
 					policy.Assets[0].Person.BirthCity,                                       //Provincia di nascita
 					"ITA",                                                                   //Stato di residenza
-					policy.Assets[0].Person.IdentityDocuments[0].Code,                       //Tipo documento
+					ExistIdentityDocument(policy.Assets[0].Person.IdentityDocuments).Code,   //Tipo documento
 					policy.Assets[0].Person.IdentityDocuments[0].Number,                     //Numero documento
 					policy.Assets[0].Person.IdentityDocuments[0].DateOfIssue.Format(layout), //Data rilascio documento
 					policy.Assets[0].Person.IdentityDocuments[0].IssuingAuthority,           //Ente rilascio documento
@@ -407,6 +407,21 @@ func MapBool(s bool) string {
 		res = "SI"
 	}
 	return res
+}
+func ExistIdentityDocument(docs []*models.IdentityDocument) models.IdentityDocument {
+	var (
+		result models.IdentityDocument
+	)
+	result = models.IdentityDocument{}
+	if len(docs) > 0 {
+		for _, doc := range docs {
+			log.Println(doc)
+			//doc.DateOfIssue
+
+		}
+
+	}
+	return result
 }
 
 func getHeader() []string {
