@@ -47,7 +47,7 @@ func Sign(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 			policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusSign)
 			policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusToPay)
 			if policy.Attachments == nil {
-				*policy.Attachments = make([]models.Attachment, 0)
+				policy.Attachments = new([]models.Attachment)
 			}
 			*policy.Attachments = append(*policy.Attachments, models.Attachment{Name: "Contratto", Link: "gs://" + os.Getenv("GOOGLE_STORAGE_BUCKET") + "/contracts/" + policy.Uid + ".pdf"})
 			lib.SetFirestore(firePolicy, uid, policy)
