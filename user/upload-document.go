@@ -9,27 +9,45 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 )
 
+type UploadDocumentRequest struct {
+	UserUID          string                   `json:"userUID"`
+	IdentityDocument *models.IdentityDocument `json:"identityDocument"`
+}
+
 func UploadDocument(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	var identityDocument models.IdentityDocument
+	var (
+		request UploadDocumentRequest
+		user    models.User
+	)
 
 	log.Println("Update Document")
 
-	b := lib.ErrorByte(io.ReadAll(r.Body))
-	err := json.Unmarshal(b, identityDocument)
+	body := lib.ErrorByte(io.ReadAll(r.Body))
+	err := json.Unmarshal(body, &request)
 	if err != nil {
-		return `{"link":"", "success":"false"}`, `{"link":"", "success":"false"}`, err
+		return "", nil, err
 	}
 
-	link := saveDocument("1234", &identityDocument)
+	saveDocument(request.UserUID, request.IdentityDocument)
 
-	return `{"link":"` + link + `", "success":"true"}`, `{"link":"` + link + `", "success":"true"}`, err
+	updateUser(lib.GetDatasetByEnv(r.Header.Get("origin"), "users"), &request, &user)
+
+	outJson, err := json.Marshal(request.IdentityDocument)
+
+	return string(outJson), request.IdentityDocument, err
 }
 
-func saveDocument(userUID string, identityDocument *models.IdentityDocument) string {
-	var filename, link string
+func updateUser(fireUsers string, request *UploadDocumentRequest, user *models.User) {
+	docsnap := lib.GetFirestore(fireUsers, request.UserUID)
+	docsnap.DataTo(&user)
+	user.IdentityDocuments = append(user.IdentityDocuments, request.IdentityDocument)
+	lib.SetFirestore(fireUsers, request.UserUID, user)
+}
 
+func saveDocument(userUID string, identityDocument *models.IdentityDocument) {
 	bytes, err := base64.StdEncoding.DecodeString(identityDocument.FrontMedia.Base64Encoding)
 	lib.CheckError(err)
 
@@ -42,8 +60,6 @@ func saveDocument(userUID string, identityDocument *models.IdentityDocument) str
 		identityDocument.Type+"_back."+identityDocument.FrontMedia.MimeType, bytes)
 	lib.CheckError(err)
 	identityDocument.BackMedia.Link = gsLink
-	/*
-		filename = "asset/" + userUID + "_" + identityDocument.Type + "." + identityDocument.MimeType*/
-	link = lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, bytes)
-	return link
+
+	identityDocument.LastUpdate = time.Now().UTC()
 }
