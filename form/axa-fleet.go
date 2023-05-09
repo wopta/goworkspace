@@ -210,7 +210,8 @@ func SftpUpload(filePath string) {
 		PrivateKey:   string(pk),                // required only if private key authentication is to be used
 		Server:       "ftp.ip-assistance.it:22",
 		KeyExchanges: []string{"diffie-hellman-group-exchange-sha1", "diffie-hellman-group1-sha1", "diffie-hellman-group14-sha1"}, // optional
-		Timeout:      time.Second * 30,                                                                                            // 0 for not timeout
+		Timeout:      time.Second * 30,
+		KeyPsw:       os.Getenv("AXA_SFTP_PSW"), // 0 for not timeout
 	}
 	client, e := lib.NewSftpclient(config)
 	lib.CheckError(e)
