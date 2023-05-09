@@ -9,7 +9,7 @@ require (
 	github.com/go-gota/gota v0.12.0
 	github.com/wopta/goworkspace/lib v1.0.19
 	github.com/wopta/goworkspace/models v1.0.48
-
+	github.com/xuri/excelize/v2 v2.7.1
 )
 
 require (

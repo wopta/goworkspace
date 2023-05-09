@@ -666,6 +666,7 @@ func getHeader() []string {
 		"Email"}
 }
 func SftpUpload(filePath string) {
+	log.Println(os.Getenv("AXA_LIFE_SFTP_PSW"))
 	config := lib.SftpConfig{
 		Username:     os.Getenv("AXA_LIFE_SFTP_USER"),
 		Password:     "",                                                                                                          // required only if password authentication is to be used
