@@ -672,7 +672,7 @@ func SftpUpload(filePath string) {
 		Username:     os.Getenv("AXA_LIFE_SFTP_USER"),
 		Password:     "",                                                                                                          // required only if password authentication is to be used
 		PrivateKey:   string(pk),                                                                                                  //                           // required only if private key authentication is to be used
-		Server:       os.Getenv("AXA_LIFE_SFTP_HOST"),                                                                             //
+		Server:       os.Getenv("AXA_LIFE_SFTP_HOST") + ":10026",                                                                  //
 		KeyExchanges: []string{"diffie-hellman-group-exchange-sha1", "diffie-hellman-group1-sha1", "diffie-hellman-group14-sha1"}, // optional
 		Timeout:      time.Second * 30,
 		KeyPsw:       "", // 0 for not timeout
