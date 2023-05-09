@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/go-pdf/fpdf"
+	"github.com/johnfercher/maroto/pkg/consts"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"os"
@@ -145,6 +146,7 @@ func drawSignatureForm(pdf *fpdf.Fpdf) {
 	pdf.Line(100, pdf.GetY(), 190, pdf.GetY())
 	pdf.Ln(2)
 	setBlackRegularFont(pdf, smallTextSize)
+	pdf.SetFont(consts.Arial, "", 6)
 	pdf.CellFormat(0, 3, text, "", 0, fpdf.AlignRight, false, 0, "")
 }
 
