@@ -1015,8 +1015,8 @@ func axaTableSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 		"TLR", 0, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "", 0, "", false, 0, "")
-	pdf.CellFormat(180, 4, "Indirizzo di residenza: "+strings.ToUpper(insured.Address+" "+
-		insured.StreetNumber), "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(180, 4, "Indirizzo di residenza: "+strings.ToUpper(insured.Residence.StreetName+", "+
+		insured.Residence.StreetNumber), "TLR", 0, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "", 0, "", false, 0, "")
 	pdf.CellFormat(180, 4, "Comune di domicilio (se diverso dalla residenza): "+domicileCity,

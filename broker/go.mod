@@ -9,7 +9,7 @@ require (
 	cloud.google.com/go/firestore v1.9.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.2
 	github.com/heimdalr/dag v1.2.1
-	github.com/wopta/goworkspace/document v1.0.33
+	github.com/wopta/goworkspace/document v1.0.34
 	github.com/wopta/goworkspace/lib v1.0.19
 	github.com/wopta/goworkspace/mail v1.0.18
 	github.com/wopta/goworkspace/models v1.0.48
@@ -38,7 +38,7 @@ require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/go-gota/gota v0.12.0 // indirect
-	github.com/go-pdf/fpdf v0.7.0 // indirect
+	github.com/go-pdf/fpdf v0.8.0 // indirect
 	github.com/goccy/go-json v0.9.11 // indirect
 	github.com/golang-jwt/jwt/v4 v4.4.2 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
@@ -52,7 +52,7 @@ require (
 	github.com/googleapis/gax-go/v2 v2.8.0 // indirect
 	github.com/hyperjumptech/grule-rule-engine v1.12.0 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
-	github.com/johnfercher/maroto v0.38.0 // indirect
+	github.com/johnfercher/maroto v0.41.0 // indirect
 	github.com/json-iterator/go v1.1.10 // indirect
 	github.com/jung-kurt/gofpdf v1.16.2 // indirect
 	github.com/kevinburke/ssh_config v0.0.0-20190725054713-01f96b0aa0cd // indirect
