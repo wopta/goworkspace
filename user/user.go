@@ -43,7 +43,7 @@ func User(w http.ResponseWriter, r *http.Request) {
 				Method:  "POST",
 			},
 			{
-				Route:   "/v1/document",
+				Route:   "/document/v1/:userUid",
 				Handler: UploadDocument,
 				Method:  http.MethodPost,
 			},

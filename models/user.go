@@ -98,14 +98,14 @@ type IdentityDocument struct {
 	ExpiryDate       time.Time `json:"expiryDate" firestore:"expiryDate" bigquery:"-"`
 	FrontMedia       *Media    `json:"frontMedia" firestore:"frontMedia" bigquery:"-"`
 	BackMedia        *Media    `json:"backMedia,omitempty" firestore:"backMedia" bigquery:"-"`
-	LastUpdate       time.Time `json:"lastUpdate" firestore:"lastUpdate" bigquery:"-"`
+	LastUpdate       time.Time `json:"lastUpdate,omitempty" firestore:"lastUpdate,omitempty" bigquery:"-"`
 }
 
 type Media struct {
-	Filename       string `json:"filename" firestore:"filename" bigquery:"-"`
-	Link           string `json:"link,omitempty" firestore:"link,omitempty" bigquery:"-"`
-	MimeType       string `json:"mimeType,omitempty" firestore:"mimeType,omitempty" bigquery:"-"`
-	Base64Encoding string `json:"base64Encoding,omitempty" firestore:"-" bigquery:"-"`
+	Filename    string `json:"filename" firestore:"filename" bigquery:"-"`
+	Link        string `json:"link,omitempty" firestore:"link,omitempty" bigquery:"-"`
+	MimeType    string `json:"mimeType,omitempty" firestore:"mimeType,omitempty" bigquery:"-"`
+	Base64Bytes string `json:"base64Bytes,omitempty" firestore:"-" bigquery:"-"`
 }
 
 func (u *User) GetIdentityDocument() *IdentityDocument {

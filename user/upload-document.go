@@ -3,6 +3,7 @@ package user
 import (
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"io"
@@ -14,70 +15,81 @@ import (
 	"time"
 )
 
-type UploadDocumentRequest struct {
-	UserUID          string                   `json:"userUID"`
-	IdentityDocument *models.IdentityDocument `json:"identityDocument"`
-}
-
 func UploadDocument(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	var request *UploadDocumentRequest
+	var identityDocument models.IdentityDocument
 
 	log.Println("Update Document")
 
+	userUID := r.Header.Get("userUid")
+
 	body := lib.ErrorByte(io.ReadAll(r.Body))
-	err := json.Unmarshal(body, request)
+	err := json.Unmarshal(body, &identityDocument)
 	if err != nil {
 		return "", nil, err
 	}
 
-	saveDocument(request.UserUID, request.IdentityDocument)
+	saveDocument(userUID, &identityDocument)
 
-	updateUser(lib.GetDatasetByEnv(r.Header.Get("origin"), "users"), request)
+	updateUser(lib.GetDatasetByEnv(r.Header.Get("origin"), "users"), userUID, &identityDocument)
 
-	request.IdentityDocument.FrontMedia.Base64Encoding = ""
-	if request.IdentityDocument.BackMedia != nil {
-		request.IdentityDocument.BackMedia.Base64Encoding = ""
+	identityDocument.FrontMedia.Base64Bytes = ""
+	if identityDocument.BackMedia != nil {
+		identityDocument.BackMedia.Base64Bytes = ""
 	}
 
-	outJson, err := json.Marshal(request.IdentityDocument)
+	outJson, err := json.Marshal(identityDocument)
 
-	return string(outJson), request.IdentityDocument, err
+	return string(outJson), identityDocument, err
 }
 
-func updateUser(fireUsers string, request *UploadDocumentRequest) {
+func updateUser(fireUsers string, userUID string, identityDocument *models.IdentityDocument) {
 	var user models.User
-
-	docsnap := lib.GetFirestore(fireUsers, request.UserUID)
+	docsnap := lib.GetFirestore(fireUsers, userUID)
 	docsnap.DataTo(&user)
-	user.IdentityDocuments = append(user.IdentityDocuments, request.IdentityDocument)
-	lib.SetFirestore(fireUsers, request.UserUID, user)
+	user.IdentityDocuments = append(user.IdentityDocuments, identityDocument)
+	lib.SetFirestore(fireUsers, userUID, user)
 }
 
 func saveDocument(userUID string, identityDocument *models.IdentityDocument) {
 	now := time.Now()
 	timestamp := strconv.FormatInt(now.Unix(), 10)
 
-	bytes, err := base64.StdEncoding.DecodeString(identityDocument.FrontMedia.Base64Encoding)
+	documentType, err := getDocumentType(identityDocument)
+	lib.CheckError(err)
+
+	bytes, err := base64.StdEncoding.DecodeString(identityDocument.FrontMedia.Base64Bytes)
 	lib.CheckError(err)
 
 	fileExtensions, err := mime.ExtensionsByType(identityDocument.FrontMedia.MimeType)
 	lib.CheckError(err)
-	gsLink, err := lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "asset/"+userUID+"/"+
-		identityDocument.Type+timestamp+"_front."+fileExtensions[0], bytes)
+	gsLink, err := lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "assets/users/"+userUID+"/"+
+		documentType+"_front_"+timestamp+fileExtensions[0], bytes)
 	lib.CheckError(err)
-	identityDocument.FrontMedia.Link = "gs://" + os.Getenv("GOOGLE_STORAGE_BUCKET") + gsLink
+	identityDocument.FrontMedia.Link = gsLink
 
 	if identityDocument.BackMedia != nil {
-		bytes, err = base64.StdEncoding.DecodeString(identityDocument.BackMedia.Base64Encoding)
+		bytes, err = base64.StdEncoding.DecodeString(identityDocument.BackMedia.Base64Bytes)
 		lib.CheckError(err)
 
 		fileExtensions, err = mime.ExtensionsByType(identityDocument.BackMedia.MimeType)
 		lib.CheckError(err)
-		gsLink, err = lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "asset/"+userUID+"/"+
-			identityDocument.Type+timestamp+"_back."+fileExtensions[0], bytes)
+		gsLink, err = lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "assets/users/"+userUID+"/"+
+			documentType+"_back_"+timestamp+fileExtensions[0], bytes)
 		lib.CheckError(err)
-		identityDocument.BackMedia.Link = "gs://" + os.Getenv("GOOGLE_STORAGE_BUCKET") + gsLink
+		identityDocument.BackMedia.Link = gsLink
 	}
 
 	identityDocument.LastUpdate = time.Now().UTC()
+}
+
+func getDocumentType(identityDocument *models.IdentityDocument) (string, error) {
+	switch identityDocument.Code {
+	case "01":
+		return "identity_document", nil
+	case "02":
+		return "license", nil
+	case "03":
+		return "passport", nil
+	}
+	return "", fmt.Errorf("invalid identity document code")
 }
