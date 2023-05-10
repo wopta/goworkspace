@@ -402,7 +402,7 @@ func mapBeneficiary(g models.Guarante, b int) (string, models.Beneficiary, strin
 		result2     string
 		resulStruct models.Beneficiary
 	)
-	resulStruct = models.Beneficiary{}
+	resulStruct = models.Beneficiary{User: models.User{Residence: &models.Address{}}}
 	if g.Beneficiaries != nil {
 		if len(*g.Beneficiaries) > 0 && len(*g.Beneficiaries) > b {
 			result = ""
