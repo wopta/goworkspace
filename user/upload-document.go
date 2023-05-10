@@ -8,7 +8,6 @@ import (
 	"github.com/wopta/goworkspace/models"
 	"io"
 	"log"
-	"mime"
 	"net/http"
 	"os"
 	"strconv"
@@ -60,10 +59,12 @@ func saveDocument(userUID string, identityDocument *models.IdentityDocument) {
 	bytes, err := base64.StdEncoding.DecodeString(identityDocument.FrontMedia.Base64Bytes)
 	lib.CheckError(err)
 
-	fileExtensions, err := mime.ExtensionsByType(identityDocument.FrontMedia.MimeType)
+	fileExtension, err := getFileExtension(identityDocument.FrontMedia.MimeType)
 	lib.CheckError(err)
+
+	identityDocument.FrontMedia.Filename = documentType + "_front_" + timestamp + fileExtension
 	gsLink, err := lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "assets/users/"+userUID+"/"+
-		documentType+"_front_"+timestamp+fileExtensions[0], bytes)
+		identityDocument.FrontMedia.Filename, bytes)
 	lib.CheckError(err)
 	identityDocument.FrontMedia.Link = gsLink
 
@@ -71,10 +72,12 @@ func saveDocument(userUID string, identityDocument *models.IdentityDocument) {
 		bytes, err = base64.StdEncoding.DecodeString(identityDocument.BackMedia.Base64Bytes)
 		lib.CheckError(err)
 
-		fileExtensions, err = mime.ExtensionsByType(identityDocument.BackMedia.MimeType)
+		fileExtension, err = getFileExtension(identityDocument.BackMedia.MimeType)
 		lib.CheckError(err)
+
+		identityDocument.BackMedia.Filename = documentType + "_back" + timestamp + fileExtension
 		gsLink, err = lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "assets/users/"+userUID+"/"+
-			documentType+"_back_"+timestamp+fileExtensions[0], bytes)
+			identityDocument.BackMedia.Filename, bytes)
 		lib.CheckError(err)
 		identityDocument.BackMedia.Link = gsLink
 	}
@@ -92,4 +95,20 @@ func getDocumentType(identityDocument *models.IdentityDocument) (string, error) 
 		return "passport", nil
 	}
 	return "", fmt.Errorf("invalid identity document code")
+}
+
+func getFileExtension(mimeType string) (string, error) {
+	extensions := map[string]string{
+		"application/pdf": ".pdf",
+		"image/jpeg":      ".jpeg",
+		"image/jpg":       ".jpg",
+		"image/png":       ".png",
+	}
+
+	for mime, extension := range extensions {
+		if mime == mimeType {
+			return extension, nil
+		}
+	}
+	return "", fmt.Errorf("invalid mime type")
 }
