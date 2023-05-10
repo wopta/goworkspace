@@ -27,6 +27,13 @@ func UploadDocument(w http.ResponseWriter, r *http.Request) (string, interface{}
 		return "", nil, err
 	}
 
+	if identityDocument.DateOfIssue.After(identityDocument.ExpiryDate) {
+		return "", nil, fmt.Errorf("date of issue cannot be after expiration date")
+	}
+	if identityDocument.IsExpired() {
+		return "", nil, fmt.Errorf("identity document expired")
+	}
+
 	saveDocument(userUID, &identityDocument)
 
 	updateUser(lib.GetDatasetByEnv(r.Header.Get("origin"), "users"), userUID, &identityDocument)
