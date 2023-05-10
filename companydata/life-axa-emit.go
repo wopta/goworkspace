@@ -140,21 +140,21 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 					"NO", //PEP - Persona Politicamente Esposta
 					"",   //Tipologia di PEP
 					"E",  //Modalità di comunicazione prescelta tra Compagnia ed contraente
-					policy.Assets[0].Person.Residence.StreetName,                            //Indirizzo di residenza Assicurato
-					policy.Assets[0].Person.Residence.PostalCode,                            //C.A.P. Residenza
-					policy.Assets[0].Person.Residence.Locality,                              //Comune Residenza
-					policy.Assets[0].Person.Residence.CityCode,                              //Provincia Residenza
-					policy.Assets[0].Person.Domicile.StreetName,                             //Indirizzo di domicilio
-					policy.Assets[0].Person.Domicile.PostalCode,                             //C.A.P. Domicilio
-					policy.Assets[0].Person.Domicile.Locality,                               //Comune Domicilio
-					policy.Assets[0].Person.Domicile.CityCode,                               //Provincia Domicilio
-					policy.Assets[0].Person.Mail,                                            //Indirizzo e-mail
-					policy.Assets[0].Person.Phone,                                           //Numero di cellulare
-					policy.Assets[0].Person.BirthCity,                                       //Luogo di nascita
-					policy.Assets[0].Person.BirthCity,                                       //Provincia di nascita
-					"ITA",                                                                   //Stato di residenza
-					ExistIdentityDocument(policy.Assets[0].Person.IdentityDocuments).Code,   //Tipo documento
-					ExistIdentityDocument(policy.Assets[0].Person.IdentityDocuments).Number, //Numero documento
+					policy.Assets[0].Person.Residence.StreetName,                                                //Indirizzo di residenza Assicurato
+					policy.Assets[0].Person.Residence.PostalCode,                                                //C.A.P. Residenza
+					policy.Assets[0].Person.Residence.Locality,                                                  //Comune Residenza
+					policy.Assets[0].Person.Residence.CityCode,                                                  //Provincia Residenza
+					ChekDomicilie(*policy.Assets[0].Person).StreetName,                                          //Indirizzo di domicilio
+					ChekDomicilie(*policy.Assets[0].Person).PostalCode,                                          //C.A.P. Domicilio
+					ChekDomicilie(*policy.Assets[0].Person).Locality,                                            //Comune Domicilio
+					ChekDomicilie(*policy.Assets[0].Person).CityCode,                                            //Provincia Domicilio
+					policy.Assets[0].Person.Mail,                                                                //Indirizzo e-mail
+					policy.Assets[0].Person.Phone,                                                               //Numero di cellulare
+					policy.Assets[0].Person.BirthCity,                                                           //Luogo di nascita
+					policy.Assets[0].Person.BirthCity,                                                           //Provincia di nascita
+					"ITA",                                                                                       //Stato di residenza
+					ExistIdentityDocument(policy.Assets[0].Person.IdentityDocuments).Code,                       //Tipo documento
+					ExistIdentityDocument(policy.Assets[0].Person.IdentityDocuments).Number,                     //Numero documento
 					ExistIdentityDocument(policy.Assets[0].Person.IdentityDocuments).DateOfIssue.Format(layout), //Data rilascio documento
 					ExistIdentityDocument(policy.Assets[0].Person.IdentityDocuments).IssuingAuthority,           //Ente rilascio documento
 					"NO",                                  //PEP - Persona Politicamente Esposta
