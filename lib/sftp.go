@@ -22,8 +22,8 @@ type SftpConfig struct {
 	PrivateKey   string
 	Server       string
 	KeyExchanges []string
-
-	Timeout time.Duration
+	KeyPsw       string
+	Timeout      time.Duration
 }
 
 // Client provides basic functionality to interact with a SFTP server.
@@ -138,6 +138,10 @@ func (c *Client) Close() {
 // initialised before at all and, they were initialised but the SSH
 // connection was lost for any reason.
 func (c *Client) connect() error {
+	var (
+		signer ssh.Signer
+		err    error
+	)
 	if c.sshClient != nil {
 		_, _, err := c.sshClient.SendRequest("keepalive", false, nil)
 		if err == nil {
@@ -147,7 +151,12 @@ func (c *Client) connect() error {
 
 	auth := ssh.Password(c.config.Password)
 	if c.config.PrivateKey != "" {
-		signer, err := ssh.ParsePrivateKeyWithPassphrase([]byte(c.config.PrivateKey), []byte(os.Getenv("AXA_SFTP_PSW")))
+		if c.config.KeyPsw != "" {
+			signer, err = ssh.ParsePrivateKeyWithPassphrase([]byte(c.config.PrivateKey), []byte(c.config.KeyPsw))
+		} else {
+			signer, err = ssh.ParsePrivateKey([]byte(c.config.PrivateKey))
+		}
+
 		if err != nil {
 			return fmt.Errorf("ssh parse private key: %w", err)
 		}
