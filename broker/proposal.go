@@ -20,8 +20,8 @@ func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 		useruid, policyFire string
 	)
 	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
-	err := json.Unmarshal([]byte(req), &policy)
-	j, err := policy.Marshal()
+	e := json.Unmarshal([]byte(req), &policy)
+	j, e := policy.Marshal()
 	log.Println("Proposal request proposal: ", string(j))
 	defer r.Body.Close()
 	policyFire = lib.GetDatasetByEnv(r.Header.Get("origin"), "policy")
@@ -53,7 +53,9 @@ func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 
 	log.Println("Proposal ", ref.ID)
 
-	resp, err := policy.Marshal()
+	policy.Uid = ref.ID
 
-	return string(resp), policy, err
+	resp, e := policy.Marshal()
+
+	return string(resp), policy, e
 }
