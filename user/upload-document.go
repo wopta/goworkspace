@@ -103,6 +103,7 @@ func getFileExtension(mimeType string) (string, error) {
 		"image/jpeg":      ".jpeg",
 		"image/jpg":       ".jpg",
 		"image/png":       ".png",
+		"image/webp":      ".webp",
 	}
 
 	for mime, extension := range extensions {
