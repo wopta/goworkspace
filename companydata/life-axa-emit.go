@@ -54,12 +54,14 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		cabCsv = lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "data/cab-cap-istat.csv", "")
 	}
 	df := lib.CsvToDataframe(cabCsv)
+	log.Println("df.Describe(): ", df.Describe())
 	result = append(result, getHeader())
 	for _, policy := range policies {
 		fil := df.Filter(
 			dataframe.F{Colidx: 4, Colname: "CAP", Comparator: series.Eq, Comparando: policy.Contractor.Residence.PostalCode},
 		)
 		residenceCab := fil.Records()[0][5]
+		log.Println("policy.Uid: ", policy.Uid)
 		log.Println("residenceCab", residenceCab)
 		log.Println("filtered col", fil.Ncol())
 		for _, asset := range policy.Assets {
@@ -384,6 +386,7 @@ func CheckStructNil[T interface{}](s interface{}) T {
 		log.Println("is not nill")
 		result = s.(T)
 	}
+	log.Println(s)
 	log.Println(result)
 	return result
 }
