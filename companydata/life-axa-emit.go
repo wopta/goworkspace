@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"reflect"
 	"strconv"
 	"time"
 
@@ -343,13 +344,6 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		//year, month, day := time.Now().Date()
 		//year2, month2, day2 := time.Now().AddDate(0, -1, 0).Date()
 		filepath := "WOPTAKEY_NBM_" + strconv.Itoa(refMontly.Year()) + strconv.Itoa(int(refMontly.Month())) + "_" + strconv.Itoa(now.Day()) + strconv.Itoa(int(now.Month())) + ".txt"
-
-		if os.Getenv("env") != "local" {
-			//./serverless_function_source_code/
-
-			//filepath = "../tmp/" + filepath
-		}
-
 		lib.WriteCsv("../tmp/"+filepath, result)
 		source, _ := ioutil.ReadFile("../tmp/" + filepath)
 		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "axa/life/"+filepath, source)
@@ -382,7 +376,10 @@ func mapCodecCompany(p models.Policy, g string) string {
 }
 func CheckStructNil[T interface{}](s interface{}) T {
 	var result T
-	if s != nil {
+	result1 := new(T)
+	result = *result1
+	log.Println(reflect.TypeOf(s))
+	if reflect.TypeOf(s) != nil {
 		log.Println("is not nill")
 		result = s.(T)
 	}
