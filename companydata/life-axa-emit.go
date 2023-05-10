@@ -385,19 +385,20 @@ func mapBeneficiary(g models.Guarante, b int) (string, models.Beneficiary, strin
 		resulStruct models.Beneficiary
 	)
 	resulStruct = models.Beneficiary{}
-	if len(*g.Beneficiaries) > 0 && len(*g.Beneficiaries) > b {
-		result = ""
-		if (*g.Beneficiaries)[b].IsLegitimateSuccessors || (*g.Beneficiaries)[b].IsFamilyMember {
-			result = "GE"
-			result2 = "GE"
-		} else {
-			result = (*g.Beneficiaries)[b].FiscalCode
-			result2 = "NM"
-			resulStruct = (*g.Beneficiaries)[b]
+	if *g.Beneficiaries != nil {
+		if len(*g.Beneficiaries) > 0 && len(*g.Beneficiaries) > b {
+			result = ""
+			if (*g.Beneficiaries)[b].IsLegitimateSuccessors || (*g.Beneficiaries)[b].IsFamilyMember {
+				result = "GE"
+				result2 = "GE"
+			} else {
+				result = (*g.Beneficiaries)[b].FiscalCode
+				result2 = "NM"
+				resulStruct = (*g.Beneficiaries)[b]
+			}
+
 		}
-
 	}
-
 	return result, resulStruct, result2
 }
 func MapBool(s bool) string {
