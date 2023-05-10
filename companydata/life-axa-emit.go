@@ -82,53 +82,53 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 					fmt.Sprint(g.Value.Duration.Year * 12),  //"Durata complessiva"
 					fmt.Sprintf("%.2f", g.PriceGross),       //"Premio assicurativo lordo"
 					fmt.Sprintf("%.0f", g.SumInsuredLimitOfIndemnity), //"Importo Assicurato"
-					"0",                                   //indennizzo mensile
-					"",                                    //campo disponibile
-					"",                                    //% di sovrappremio da applicare alla garanzia
-					"W1",                                  //Codice Concessionario /dipendenti (iscr.E)
-					"",                                    //Codice Banca
-					"",                                    //Codice Campagna
-					"T",                                   //Copertura Assicurativa: Totale o Pro quota
-					"",                                    //% assicurata dell'assicurato
-					"",                                    //campo disponibile
-					"",                                    //Maxi rata finale/Valore riscatto
-					"",                                    //Stato occupazionale dell'Assicurato
-					"2",                                   //Tipo aderente
-					"WEB",                                 //Canale di vendita
-					"PF",                                  //Tipo contraente / Contraente
-					policy.Contractor.Surname,             //Denominazione Sociale o Cognome contraente
-					policy.Contractor.Name,                //campo vuoto o nome
-					policy.Contractor.Gender,              //Sesso
-					policy.Contractor.BirthDate,           //Data di nascita
-					policy.Contractor.FiscalCode,          //Codice Fiscale
-					policy.Contractor.Address,             //Indirizzo di residenza
-					policy.Contractor.PostalCode,          //C.A.P. Di residenza
-					policy.Contractor.Locality,            //Comune di residenza
-					policy.Contractor.City,                //Provincia di residenza
-					policy.Contractor.Mail,                //Indirizzo e-mail
-					policy.Contractor.Phone,               //Numero di Cellulare
-					policy.Assets[0].Person.Surname,       //Cognome Assicurato
-					policy.Assets[0].Person.Name,          //Nome
-					policy.Assets[0].Person.Gender,        //Sesso
-					policy.Assets[0].Person.BirthDate,     //Data di nascita
-					policy.Assets[0].Person.FiscalCode,    //Codice Fiscale
-					beneficiary1,                          //Codice Fiscale Beneficiario
-					beneficiary2,                          //Codice Fiscale Beneficiario 2
-					"",                                    //Codice Fiscale Beneficiario 3
-					"VIT",                                 //Natura del rapporto
-					"PAS ",                                //Scopo del rapporto
-					"BO",                                  //Modalità di pagamento del premio assicurativo (all'intermediario)
-					"SI",                                  //contraente = Assicurato?
-					policy.Contractor.Domicile.StreetName, //Indirizzo di domicilio contraente
-					policy.Contractor.Domicile.PostalCode, //C.A.P. Di domicilio
-					policy.Contractor.Domicile.Locality,   //Comune di domicilio
-					policy.Contractor.Domicile.CityCode,   //Provincia di domicilio
-					policy.Contractor.BirthCity,           //Luogo di nascita dell’contraente persona fisica
-					policy.Contractor.BirthCity,           //Provincia di nascita dell’contraente persona fisica
-					"086",                                 //Stato di residenza dell’contraente
-					residenceCab,                          //Cab della città di residenza dell’contraente
-					"600",                                 //Sottogruppo attività economica
-					"600",                                 //Ramo gruppo attività economica
+					"0",                                //indennizzo mensile
+					"",                                 //campo disponibile
+					"",                                 //% di sovrappremio da applicare alla garanzia
+					"W1",                               //Codice Concessionario /dipendenti (iscr.E)
+					"",                                 //Codice Banca
+					"",                                 //Codice Campagna
+					"T",                                //Copertura Assicurativa: Totale o Pro quota
+					"",                                 //% assicurata dell'assicurato
+					"",                                 //campo disponibile
+					"",                                 //Maxi rata finale/Valore riscatto
+					"",                                 //Stato occupazionale dell'Assicurato
+					"2",                                //Tipo aderente
+					"WEB",                              //Canale di vendita
+					"PF",                               //Tipo contraente / Contraente
+					policy.Contractor.Surname,          //Denominazione Sociale o Cognome contraente
+					policy.Contractor.Name,             //campo vuoto o nome
+					policy.Contractor.Gender,           //Sesso
+					policy.Contractor.BirthDate,        //Data di nascita
+					policy.Contractor.FiscalCode,       //Codice Fiscale
+					policy.Contractor.Address,          //Indirizzo di residenza
+					policy.Contractor.PostalCode,       //C.A.P. Di residenza
+					policy.Contractor.Locality,         //Comune di residenza
+					policy.Contractor.City,             //Provincia di residenza
+					policy.Contractor.Mail,             //Indirizzo e-mail
+					policy.Contractor.Phone,            //Numero di Cellulare
+					policy.Assets[0].Person.Surname,    //Cognome Assicurato
+					policy.Assets[0].Person.Name,       //Nome
+					policy.Assets[0].Person.Gender,     //Sesso
+					policy.Assets[0].Person.BirthDate,  //Data di nascita
+					policy.Assets[0].Person.FiscalCode, //Codice Fiscale
+					beneficiary1,                       //Codice Fiscale Beneficiario
+					beneficiary2,                       //Codice Fiscale Beneficiario 2
+					"",                                 //Codice Fiscale Beneficiario 3
+					"VIT",                              //Natura del rapporto
+					"PAS ",                             //Scopo del rapporto
+					"BO",                               //Modalità di pagamento del premio assicurativo (all'intermediario)
+					"SI",                               //contraente = Assicurato?
+					CheckStructNil[models.Address](policy.Contractor.Domicile).StreetName, //Indirizzo di domicilio contraente
+					policy.Contractor.Domicile.PostalCode,                                 //C.A.P. Di domicilio
+					policy.Contractor.Domicile.Locality,                                   //Comune di domicilio
+					policy.Contractor.Domicile.CityCode,                                   //Provincia di domicilio
+					policy.Contractor.BirthCity,                                           //Luogo di nascita dell’contraente persona fisica
+					policy.Contractor.BirthCity,                                           //Provincia di nascita dell’contraente persona fisica
+					"086",                                                                 //Stato di residenza dell’contraente
+					residenceCab,                                                          //Cab della città di residenza dell’contraente
+					"600",                                                                 //Sottogruppo attività economica
+					"600",                                                                 //Ramo gruppo attività economica
 					ExistIdentityDocument(policy.Contractor.IdentityDocuments).Code,                       //Tipo documento dell'contraente persona fisica
 					ExistIdentityDocument(policy.Contractor.IdentityDocuments).Number,                     //Numero documento dell'contraente persona fisica
 					ExistIdentityDocument(policy.Contractor.IdentityDocuments).DateOfIssue.Format(layout), //Data rilascio documento dell'contraente persona fisica
@@ -375,6 +375,13 @@ func mapCodecCompany(p models.Policy, g string) string {
 	}
 	if g == "CI" {
 		result = "1" + pay + "8"
+	}
+	return result
+}
+func CheckStructNil[T interface{}](s interface{}) T {
+	var result T
+	if s != nil {
+		result = s.(T)
 	}
 	return result
 }
