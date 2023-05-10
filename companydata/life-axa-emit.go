@@ -129,10 +129,10 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 					residenceCab,                          //Cab della città di residenza dell’contraente
 					"600",                                 //Sottogruppo attività economica
 					"600",                                 //Ramo gruppo attività economica
-					policy.Contractor.IdentityDocuments[0].Code,                       //Tipo documento dell'contraente persona fisica
-					policy.Contractor.IdentityDocuments[0].Number,                     //Numero documento dell'contraente persona fisica
-					policy.Contractor.IdentityDocuments[0].DateOfIssue.Format(layout), //Data rilascio documento dell'contraente persona fisica
-					policy.Contractor.IdentityDocuments[0].IssuingAuthority,           //Ente rilascio documento dell'contraente persona fisica
+					ExistIdentityDocument(policy.Contractor.IdentityDocuments).Code,                       //Tipo documento dell'contraente persona fisica
+					ExistIdentityDocument(policy.Contractor.IdentityDocuments).Number,                     //Numero documento dell'contraente persona fisica
+					ExistIdentityDocument(policy.Contractor.IdentityDocuments).DateOfIssue.Format(layout), //Data rilascio documento dell'contraente persona fisica
+					ExistIdentityDocument(policy.Contractor.IdentityDocuments).IssuingAuthority,           //Ente rilascio documento dell'contraente persona fisica
 					"NO", //PEP - Persona Politicamente Esposta
 					"",   //Tipologia di PEP
 					"E",  //Modalità di comunicazione prescelta tra Compagnia ed contraente
@@ -150,9 +150,9 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 					policy.Assets[0].Person.BirthCity,                                       //Provincia di nascita
 					"ITA",                                                                   //Stato di residenza
 					ExistIdentityDocument(policy.Assets[0].Person.IdentityDocuments).Code,   //Tipo documento
-					policy.Assets[0].Person.IdentityDocuments[0].Number,                     //Numero documento
-					policy.Assets[0].Person.IdentityDocuments[0].DateOfIssue.Format(layout), //Data rilascio documento
-					policy.Assets[0].Person.IdentityDocuments[0].IssuingAuthority,           //Ente rilascio documento
+					ExistIdentityDocument(policy.Assets[0].Person.IdentityDocuments).Number, //Numero documento
+					ExistIdentityDocument(policy.Assets[0].Person.IdentityDocuments).DateOfIssue.Format(layout), //Data rilascio documento
+					ExistIdentityDocument(policy.Assets[0].Person.IdentityDocuments).IssuingAuthority,           //Ente rilascio documento
 					"NO",                                  //PEP - Persona Politicamente Esposta
 					"",                                    //Tipologia di PEP
 					beneficiary1T,                         //Eredi designati nominativamente o genericamente?
@@ -385,19 +385,20 @@ func mapBeneficiary(g models.Guarante, b int) (string, models.Beneficiary, strin
 		resulStruct models.Beneficiary
 	)
 	resulStruct = models.Beneficiary{}
-	if len(*g.Beneficiaries) > 0 && len(*g.Beneficiaries) > b {
-		result = ""
-		if (*g.Beneficiaries)[b].IsLegitimateSuccessors || (*g.Beneficiaries)[b].IsFamilyMember {
-			result = "GE"
-			result2 = "GE"
-		} else {
-			result = (*g.Beneficiaries)[b].FiscalCode
-			result2 = "NM"
-			resulStruct = (*g.Beneficiaries)[b]
+	if g.Beneficiaries != nil {
+		if len(*g.Beneficiaries) > 0 && len(*g.Beneficiaries) > b {
+			result = ""
+			if (*g.Beneficiaries)[b].IsLegitimateSuccessors || (*g.Beneficiaries)[b].IsFamilyMember {
+				result = "GE"
+				result2 = "GE"
+			} else {
+				result = (*g.Beneficiaries)[b].FiscalCode
+				result2 = "NM"
+				resulStruct = (*g.Beneficiaries)[b]
+			}
+
 		}
-
 	}
-
 	return result, resulStruct, result2
 }
 func MapBool(s bool) string {
