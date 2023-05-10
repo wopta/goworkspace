@@ -106,8 +106,8 @@ func mainHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 	logoPath = lib.GetAssetPathByEnv(basePath) + "/logo_vita.png"
 
 	contractor := policy.Contractor
-	address := strings.ToUpper(contractor.Residence.StreetName+", "+contractor.Residence.StreetNumber+"\n"+
-		contractor.Residence.PostalCode+" "+contractor.Residence.City+" ("+contractor.Residence.CityCode) + "\n"
+	address := strings.ToUpper(contractor.Residence.StreetName + ", " + contractor.Residence.StreetNumber + "\n" +
+		contractor.Residence.PostalCode + " " + contractor.Residence.City + " (" + contractor.Residence.CityCode + ")\n")
 
 	if contractor.VatCode == "" {
 		cfpi = contractor.FiscalCode
