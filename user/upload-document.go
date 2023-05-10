@@ -31,14 +31,46 @@ func UploadDocument(w http.ResponseWriter, r *http.Request) (string, interface{}
 
 	updateUser(lib.GetDatasetByEnv(r.Header.Get("origin"), "users"), userUID, &identityDocument)
 
-	identityDocument.FrontMedia.Base64Bytes = ""
-	if identityDocument.BackMedia != nil {
-		identityDocument.BackMedia.Base64Bytes = ""
-	}
-
 	outJson, err := json.Marshal(identityDocument)
 
 	return string(outJson), identityDocument, err
+}
+
+func saveDocument(userUID string, identityDocument *models.IdentityDocument) {
+	saveToStorage := func(userUID string, documentSide, documentType string, media *models.Media) error {
+		now := time.Now()
+		timestamp := strconv.FormatInt(now.Unix(), 10)
+
+		bytes, err := base64.StdEncoding.DecodeString(media.Base64Bytes)
+		if err != nil {
+			return err
+		}
+		media.Base64Bytes = ""
+
+		fileExtension, err := getFileExtension(media.MimeType)
+		if err != nil {
+			return err
+		}
+
+		media.Filename = documentType + "_" + documentSide + "_" + timestamp + fileExtension
+		gsLink, err := lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "assets/users/"+userUID+"/"+
+			media.Filename, bytes)
+		media.Link = gsLink
+		return err
+	}
+
+	documentType, err := getDocumentType(identityDocument)
+	lib.CheckError(err)
+
+	err = saveToStorage(userUID, "front", documentType, identityDocument.FrontMedia)
+	lib.CheckError(err)
+
+	if identityDocument.BackMedia != nil {
+		err = saveToStorage(userUID, "back", documentType, identityDocument.BackMedia)
+		lib.CheckError(err)
+	}
+
+	identityDocument.LastUpdate = time.Now().UTC()
 }
 
 func updateUser(fireUsers string, userUID string, identityDocument *models.IdentityDocument) {
@@ -46,43 +78,8 @@ func updateUser(fireUsers string, userUID string, identityDocument *models.Ident
 	docsnap := lib.GetFirestore(fireUsers, userUID)
 	docsnap.DataTo(&user)
 	user.IdentityDocuments = append(user.IdentityDocuments, identityDocument)
+	user.UpdatedDate = time.Now().UTC()
 	lib.SetFirestore(fireUsers, userUID, user)
-}
-
-func saveDocument(userUID string, identityDocument *models.IdentityDocument) {
-	now := time.Now()
-	timestamp := strconv.FormatInt(now.Unix(), 10)
-
-	documentType, err := getDocumentType(identityDocument)
-	lib.CheckError(err)
-
-	bytes, err := base64.StdEncoding.DecodeString(identityDocument.FrontMedia.Base64Bytes)
-	lib.CheckError(err)
-
-	fileExtension, err := getFileExtension(identityDocument.FrontMedia.MimeType)
-	lib.CheckError(err)
-
-	identityDocument.FrontMedia.Filename = documentType + "_front_" + timestamp + fileExtension
-	gsLink, err := lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "assets/users/"+userUID+"/"+
-		identityDocument.FrontMedia.Filename, bytes)
-	lib.CheckError(err)
-	identityDocument.FrontMedia.Link = gsLink
-
-	if identityDocument.BackMedia != nil {
-		bytes, err = base64.StdEncoding.DecodeString(identityDocument.BackMedia.Base64Bytes)
-		lib.CheckError(err)
-
-		fileExtension, err = getFileExtension(identityDocument.BackMedia.MimeType)
-		lib.CheckError(err)
-
-		identityDocument.BackMedia.Filename = documentType + "_back" + timestamp + fileExtension
-		gsLink, err = lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "assets/users/"+userUID+"/"+
-			identityDocument.BackMedia.Filename, bytes)
-		lib.CheckError(err)
-		identityDocument.BackMedia.Link = gsLink
-	}
-
-	identityDocument.LastUpdate = time.Now().UTC()
 }
 
 func getDocumentType(identityDocument *models.IdentityDocument) (string, error) {
