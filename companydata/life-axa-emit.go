@@ -376,8 +376,8 @@ func mapCodecCompany(p models.Policy, g string) string {
 }
 func ChekDomicilie(u models.User) models.Address {
 	var res models.Address
-	log.Println(reflect.TypeOf(u.Domicile))
-	if reflect.TypeOf(u.Domicile) == nil {
+	log.Println(reflect.ValueOf(u.Domicile))
+	if reflect.ValueOf(u.Domicile).IsNil() {
 		res = *u.Residence
 	}
 	return res
