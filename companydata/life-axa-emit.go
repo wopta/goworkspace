@@ -54,7 +54,7 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		cabCsv = lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "data/cab-cap-istat.csv", "")
 	}
 	df := lib.CsvToDataframe(cabCsv)
-
+	result = append(result, getHeader())
 	for _, policy := range policies {
 		fil := df.Filter(
 			dataframe.F{Colidx: 4, Colname: "CAP", Comparator: series.Eq, Comparando: policy.Contractor.Residence.PostalCode},
@@ -381,8 +381,10 @@ func mapCodecCompany(p models.Policy, g string) string {
 func CheckStructNil[T interface{}](s interface{}) T {
 	var result T
 	if s != nil {
+		log.Println("is not nill")
 		result = s.(T)
 	}
+	log.Println(result)
 	return result
 }
 func mapBeneficiary(g models.Guarante, b int) (string, models.Beneficiary, string) {
