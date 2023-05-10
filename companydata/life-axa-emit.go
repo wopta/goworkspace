@@ -122,16 +122,16 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 					"PAS ",                             //Scopo del rapporto
 					"BO",                               //Modalità di pagamento del premio assicurativo (all'intermediario)
 					"SI",                               //contraente = Assicurato?
-					CheckStructNil[*models.Address](policy.Contractor.Domicile).StreetName, //Indirizzo di domicilio contraente
-					policy.Contractor.Domicile.PostalCode,                                  //C.A.P. Di domicilio
-					policy.Contractor.Domicile.Locality,                                    //Comune di domicilio
-					policy.Contractor.Domicile.CityCode,                                    //Provincia di domicilio
-					policy.Contractor.BirthCity,                                            //Luogo di nascita dell’contraente persona fisica
-					policy.Contractor.BirthCity,                                            //Provincia di nascita dell’contraente persona fisica
-					"086",                                                                  //Stato di residenza dell’contraente
-					residenceCab,                                                           //Cab della città di residenza dell’contraente
-					"600",                                                                  //Sottogruppo attività economica
-					"600",                                                                  //Ramo gruppo attività economica
+					ChekDomicilie(policy.Contractor).StreetName, //Indirizzo di domicilio contraente
+					policy.Contractor.Domicile.PostalCode,       //C.A.P. Di domicilio
+					policy.Contractor.Domicile.Locality,         //Comune di domicilio
+					policy.Contractor.Domicile.CityCode,         //Provincia di domicilio
+					policy.Contractor.BirthCity,                 //Luogo di nascita dell’contraente persona fisica
+					policy.Contractor.BirthCity,                 //Provincia di nascita dell’contraente persona fisica
+					"086",                                       //Stato di residenza dell’contraente
+					residenceCab,                                //Cab della città di residenza dell’contraente
+					"600",                                       //Sottogruppo attività economica
+					"600",                                       //Ramo gruppo attività economica
 					ExistIdentityDocument(policy.Contractor.IdentityDocuments).Code,                       //Tipo documento dell'contraente persona fisica
 					ExistIdentityDocument(policy.Contractor.IdentityDocuments).Number,                     //Numero documento dell'contraente persona fisica
 					ExistIdentityDocument(policy.Contractor.IdentityDocuments).DateOfIssue.Format(layout), //Data rilascio documento dell'contraente persona fisica
@@ -373,6 +373,14 @@ func mapCodecCompany(p models.Policy, g string) string {
 		result = "1" + pay + "8"
 	}
 	return result
+}
+func ChekDomicilie(u models.User) models.Address {
+	var res models.Address
+	log.Println(reflect.TypeOf(u.Domicile))
+	if reflect.TypeOf(u.Domicile) == nil {
+		res = *u.Residence
+	}
+	return res
 }
 func CheckStructNil[T interface{}](s interface{}) T {
 	var result T
