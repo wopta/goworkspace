@@ -65,6 +65,7 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		log.Println("policy.Uid: ", policy.Uid)
 		log.Println("residenceCab", residenceCab)
 		log.Println("filtered col", fil.Ncol())
+		log.Println("filtered row", fil.Nrow())
 		for _, asset := range policy.Assets {
 
 			for _, g := range asset.Guarantees {
@@ -123,9 +124,9 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 					"BO",                               //Modalità di pagamento del premio assicurativo (all'intermediario)
 					"SI",                               //contraente = Assicurato?
 					ChekDomicilie(policy.Contractor).StreetName, //Indirizzo di domicilio contraente
-					policy.Contractor.Domicile.PostalCode,       //C.A.P. Di domicilio
-					policy.Contractor.Domicile.Locality,         //Comune di domicilio
-					policy.Contractor.Domicile.CityCode,         //Provincia di domicilio
+					ChekDomicilie(policy.Contractor).PostalCode, //C.A.P. Di domicilio
+					ChekDomicilie(policy.Contractor).Locality,   //Comune di domicilio
+					ChekDomicilie(policy.Contractor).CityCode,   //Provincia di domicilio
 					policy.Contractor.BirthCity,                 //Luogo di nascita dell’contraente persona fisica
 					policy.Contractor.BirthCity,                 //Provincia di nascita dell’contraente persona fisica
 					"086",                                       //Stato di residenza dell’contraente
