@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"reflect"
 	"strconv"
 	"time"
 
@@ -64,6 +65,7 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		log.Println("policy.Uid: ", policy.Uid)
 		log.Println("residenceCab", residenceCab)
 		log.Println("filtered col", fil.Ncol())
+		log.Println("filtered row", fil.Nrow())
 		for _, asset := range policy.Assets {
 
 			for _, g := range asset.Guarantees {
@@ -121,16 +123,16 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 					"PAS ",                             //Scopo del rapporto
 					"BO",                               //Modalità di pagamento del premio assicurativo (all'intermediario)
 					"SI",                               //contraente = Assicurato?
-					CheckStructNil[*models.Address](policy.Contractor.Domicile).StreetName, //Indirizzo di domicilio contraente
-					policy.Contractor.Domicile.PostalCode,                                  //C.A.P. Di domicilio
-					policy.Contractor.Domicile.Locality,                                    //Comune di domicilio
-					policy.Contractor.Domicile.CityCode,                                    //Provincia di domicilio
-					policy.Contractor.BirthCity,                                            //Luogo di nascita dell’contraente persona fisica
-					policy.Contractor.BirthCity,                                            //Provincia di nascita dell’contraente persona fisica
-					"086",                                                                  //Stato di residenza dell’contraente
-					residenceCab,                                                           //Cab della città di residenza dell’contraente
-					"600",                                                                  //Sottogruppo attività economica
-					"600",                                                                  //Ramo gruppo attività economica
+					ChekDomicilie(policy.Contractor).StreetName, //Indirizzo di domicilio contraente
+					ChekDomicilie(policy.Contractor).PostalCode, //C.A.P. Di domicilio
+					ChekDomicilie(policy.Contractor).Locality,   //Comune di domicilio
+					ChekDomicilie(policy.Contractor).CityCode,   //Provincia di domicilio
+					policy.Contractor.BirthCity,                 //Luogo di nascita dell’contraente persona fisica
+					policy.Contractor.BirthCity,                 //Provincia di nascita dell’contraente persona fisica
+					"086",                                       //Stato di residenza dell’contraente
+					residenceCab,                                //Cab della città di residenza dell’contraente
+					"600",                                       //Sottogruppo attività economica
+					"600",                                       //Ramo gruppo attività economica
 					ExistIdentityDocument(policy.Contractor.IdentityDocuments).Code,                       //Tipo documento dell'contraente persona fisica
 					ExistIdentityDocument(policy.Contractor.IdentityDocuments).Number,                     //Numero documento dell'contraente persona fisica
 					ExistIdentityDocument(policy.Contractor.IdentityDocuments).DateOfIssue.Format(layout), //Data rilascio documento dell'contraente persona fisica
@@ -138,21 +140,21 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 					"NO", //PEP - Persona Politicamente Esposta
 					"",   //Tipologia di PEP
 					"E",  //Modalità di comunicazione prescelta tra Compagnia ed contraente
-					policy.Assets[0].Person.Residence.StreetName,                            //Indirizzo di residenza Assicurato
-					policy.Assets[0].Person.Residence.PostalCode,                            //C.A.P. Residenza
-					policy.Assets[0].Person.Residence.Locality,                              //Comune Residenza
-					policy.Assets[0].Person.Residence.CityCode,                              //Provincia Residenza
-					policy.Assets[0].Person.Domicile.StreetName,                             //Indirizzo di domicilio
-					policy.Assets[0].Person.Domicile.PostalCode,                             //C.A.P. Domicilio
-					policy.Assets[0].Person.Domicile.Locality,                               //Comune Domicilio
-					policy.Assets[0].Person.Domicile.CityCode,                               //Provincia Domicilio
-					policy.Assets[0].Person.Mail,                                            //Indirizzo e-mail
-					policy.Assets[0].Person.Phone,                                           //Numero di cellulare
-					policy.Assets[0].Person.BirthCity,                                       //Luogo di nascita
-					policy.Assets[0].Person.BirthCity,                                       //Provincia di nascita
-					"ITA",                                                                   //Stato di residenza
-					ExistIdentityDocument(policy.Assets[0].Person.IdentityDocuments).Code,   //Tipo documento
-					ExistIdentityDocument(policy.Assets[0].Person.IdentityDocuments).Number, //Numero documento
+					policy.Assets[0].Person.Residence.StreetName,                                                //Indirizzo di residenza Assicurato
+					policy.Assets[0].Person.Residence.PostalCode,                                                //C.A.P. Residenza
+					policy.Assets[0].Person.Residence.Locality,                                                  //Comune Residenza
+					policy.Assets[0].Person.Residence.CityCode,                                                  //Provincia Residenza
+					ChekDomicilie(*policy.Assets[0].Person).StreetName,                                          //Indirizzo di domicilio
+					ChekDomicilie(*policy.Assets[0].Person).PostalCode,                                          //C.A.P. Domicilio
+					ChekDomicilie(*policy.Assets[0].Person).Locality,                                            //Comune Domicilio
+					ChekDomicilie(*policy.Assets[0].Person).CityCode,                                            //Provincia Domicilio
+					policy.Assets[0].Person.Mail,                                                                //Indirizzo e-mail
+					policy.Assets[0].Person.Phone,                                                               //Numero di cellulare
+					policy.Assets[0].Person.BirthCity,                                                           //Luogo di nascita
+					policy.Assets[0].Person.BirthCity,                                                           //Provincia di nascita
+					"ITA",                                                                                       //Stato di residenza
+					ExistIdentityDocument(policy.Assets[0].Person.IdentityDocuments).Code,                       //Tipo documento
+					ExistIdentityDocument(policy.Assets[0].Person.IdentityDocuments).Number,                     //Numero documento
 					ExistIdentityDocument(policy.Assets[0].Person.IdentityDocuments).DateOfIssue.Format(layout), //Data rilascio documento
 					ExistIdentityDocument(policy.Assets[0].Person.IdentityDocuments).IssuingAuthority,           //Ente rilascio documento
 					"NO",                                  //PEP - Persona Politicamente Esposta
@@ -343,13 +345,6 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		//year, month, day := time.Now().Date()
 		//year2, month2, day2 := time.Now().AddDate(0, -1, 0).Date()
 		filepath := "WOPTAKEY_NBM_" + strconv.Itoa(refMontly.Year()) + strconv.Itoa(int(refMontly.Month())) + "_" + strconv.Itoa(now.Day()) + strconv.Itoa(int(now.Month())) + ".txt"
-
-		if os.Getenv("env") != "local" {
-			//./serverless_function_source_code/
-
-			//filepath = "../tmp/" + filepath
-		}
-
 		lib.WriteCsv("../tmp/"+filepath, result)
 		source, _ := ioutil.ReadFile("../tmp/" + filepath)
 		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "axa/life/"+filepath, source)
@@ -380,9 +375,20 @@ func mapCodecCompany(p models.Policy, g string) string {
 	}
 	return result
 }
+func ChekDomicilie(u models.User) models.Address {
+	var res models.Address
+	log.Println(reflect.ValueOf(u.Domicile))
+	if reflect.ValueOf(u.Domicile).IsNil() {
+		res = *u.Residence
+	}
+	return res
+}
 func CheckStructNil[T interface{}](s interface{}) T {
 	var result T
-	if s != nil {
+	result1 := new(T)
+	result = *result1
+	log.Println(reflect.TypeOf(s))
+	if reflect.TypeOf(s) != nil {
 		log.Println("is not nill")
 		result = s.(T)
 	}
@@ -396,7 +402,7 @@ func mapBeneficiary(g models.Guarante, b int) (string, models.Beneficiary, strin
 		result2     string
 		resulStruct models.Beneficiary
 	)
-	resulStruct = models.Beneficiary{}
+	resulStruct = models.Beneficiary{User: models.User{Residence: &models.Address{}}}
 	if g.Beneficiaries != nil {
 		if len(*g.Beneficiaries) > 0 && len(*g.Beneficiaries) > b {
 			result = ""
