@@ -19,6 +19,7 @@ func GetPolicyAttachmentFx(w http.ResponseWriter, r *http.Request) (string, inte
 	w.Header().Set("Access-Control-Allow-Methods", "GET")
 
 	var (
+		response GetPolicyAttachmentsResponse
 		e error
 	)
 
@@ -32,12 +33,13 @@ func GetPolicyAttachmentFx(w http.ResponseWriter, r *http.Request) (string, inte
 		return "{}", nil, nil
 	}
 
-	response, err := json.Marshal(attachments)
+	response.Attachments = attachments
+	res, err := json.Marshal(response)
 	if err != nil {
 		log.Println("AttachmentsMarshal Error: " + err.Error())
 	}
 
-	return string(response), nil, err
+	return string(res), nil, nil
 }
 
 func GetPolicyAttachments(policyUid string, origin string) ([]models.Attachment, error) {
