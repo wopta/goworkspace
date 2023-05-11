@@ -43,7 +43,7 @@ func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	if policy.ProductVersion == "" {
 		policy.ProductVersion = "v1"
 	}
-	policy.Attachments = &[]models.Attachment{{Name: "Precontrattuale", Link: "gs://documents-public-dev/information-sets/" + policy.Name + "/" + policy.ProductVersion + "/Precontrattuale.pdf"}}
+	policy.Attachments = &[]models.Attachment{{Name: "Precontrattuale", FileName: "Precontrattuale", Link: "gs://documents-public-dev/information-sets/" + policy.Name + "/" + policy.ProductVersion + "/Precontrattuale.pdf"}}
 	log.Println("Proposal save")
 	ref, _ := lib.PutFirestore(policyFire, policy)
 	policy.BigquerySave(r.Header.Get("origin"))
