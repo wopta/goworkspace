@@ -108,7 +108,7 @@ func SendMail(obj MailRequest) {
 
 	switch os.Getenv("env") {
 	case "local":
-		file = lib.ErrorByte(ioutil.ReadFile("../function-data/dev/mail/template.html"))
+		file = lib.ErrorByte(ioutil.ReadFile("../function-data/dev/mail/mail_template.html"))
 
 	case "dev":
 		file = lib.GetFromStorage("function-data", "mail/mail_template.html", "")
