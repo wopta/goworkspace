@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 type WiseCompletePolicy struct {
 	Id              int              `json:"idPolizza"`
@@ -25,6 +28,7 @@ func (wisePolicy *WiseCompletePolicy) ToDomain() Policy {
 	for _, wiseAsset := range *wisePolicy.Assets {
 		policy.Assets = append(policy.Assets, wiseAsset.ToDomain())
 	}
+	policy.Uid = fmt.Sprintf("wise:%d", wisePolicy.Id)
 	policy.Contractor = *wisePolicy.Contractors[0].Registry.ToDomain()
 	policy.EndDate = wisePolicy.Contract.PolicyExpirationDate
 	policy.CodeCompany = wisePolicy.PolicyNumber

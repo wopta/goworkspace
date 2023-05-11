@@ -29,7 +29,7 @@ func Broker(w http.ResponseWriter, r *http.Request) {
 			},
 			{
 				Route:   "/v1/policy/:uid",
-				Handler: GetPolicy,
+				Handler: GetPolicyFx,
 				Method:  "GET",
 			},
 
@@ -53,6 +53,11 @@ func Broker(w http.ResponseWriter, r *http.Request) {
 				Route:   "policy/v1/:uid",
 				Handler: UpdatePolicy,
 				Method:  http.MethodPatch,
+			},
+			{
+				Route:   "attachment/v1/:policyUid",
+				Handler: GetPolicyAttachmentFx,
+				Method:  http.MethodGet,
 			},
 		},
 	}
