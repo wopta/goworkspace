@@ -11,7 +11,7 @@ import (
 	models "github.com/wopta/goworkspace/models"
 )
 
-func GetPolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func GetPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		result map[string]string
 	)
@@ -23,10 +23,21 @@ func GetPolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	request := lib.ErrorByte(ioutil.ReadAll(r.Body))
 	json.Unmarshal([]byte(request), &result)
 	log.Println(requestPath[2])
-	var policy models.Policy
-	docsnap := lib.GetFirestore(firePolicy, r.Header.Get("uid"))
-	log.Println("to data")
-	docsnap.DataTo(&policy)
+	policy, _ := GetPolicy(r.Header.Get("uid"), firePolicy)
 	res, _ := json.Marshal(policy)
 	return string(res), policy, nil
+}
+
+func GetPolicy(uid string, origin string) (models.Policy, error) {
+	var (
+		policy models.Policy
+		err    error
+	)
+	firePolicy := lib.GetDatasetByEnv(origin, "policy")
+	docsnap, err := lib.GetFirestoreErr(firePolicy, uid)
+	if err != nil {
+		return policy, err
+	}
+	err = docsnap.DataTo(&policy)
+	return policy, err
 }

@@ -1,0 +1,123 @@
+package broker
+
+import (
+	"encoding/base64"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+	"regexp"
+	"strings"
+
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/wiseproxy"
+)
+
+func GetPolicyAttachmentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	w.Header().Set("Access-Control-Allow-Methods", "GET")
+
+	var (
+		e error
+	)
+
+	if e != nil {
+		return "{}", nil, nil
+	}
+
+	attachments, err := GetPolicyAttachments(r.Header.Get("policyUid"), r.Header.Get("origin"))
+
+	if err != nil {
+		return "{}", nil, nil
+	}
+
+	response, _ := json.Marshal(attachments)
+
+	return string(response), nil, nil
+}
+
+func GetPolicyAttachments(policyUid string, origin string) ([]models.Attachment, error) {
+	var (
+		err         error
+		wiseToken   *string = nil
+		attachments []models.Attachment
+	)
+	if strings.HasPrefix(policyUid, "wise:") {
+		// get attachment from wise
+		var (
+			wisePolicy         WiseCompletePolicyResponse
+			attachmentResponse WiseAttachmentResponse
+			wiseResponseData   []byte
+		)
+		wiseAttachmentId := strings.Split(policyUid, ":")[1]
+		request := []byte(fmt.Sprintf(`{"idPolizza": "%s", "cdLingua": "it"}`, wiseAttachmentId))
+		ioReader := wiseproxy.WiseProxyObj("WebApiProduct/Api/GetPolizzaCompleta", request, http.MethodPost)
+
+		defer ioReader.Close()
+		wiseResponseData, err = io.ReadAll(ioReader)
+
+		if err != nil {
+			return make([]models.Attachment, 0), err
+		}
+		err = json.Unmarshal(wiseResponseData, &wisePolicy)
+
+		for _, wiseAttachment := range wisePolicy.Policy.Attachments {
+			var attachment models.Attachment
+
+			request := []byte(fmt.Sprintf(`{"txRifAllegato": "%s", "cdLingua": "it"}`, wiseAttachment.Id))
+			ioReader, wiseToken = wiseproxy.WiseBatch("WebApiProduct/Api/recuperaAllegato", request, http.MethodPost, wiseToken)
+
+			defer ioReader.Close()
+			wiseResponseData, err = io.ReadAll(ioReader)
+
+			if err != nil {
+				return make([]models.Attachment, 0), err
+			}
+			err = json.Unmarshal(wiseResponseData, &attachmentResponse)
+			attachment.Byte = attachmentResponse.Base64Attachment
+			attachment.Name = wiseAttachment.Name
+			attachment.FileName = wiseAttachment.Name
+			attachments = append(attachments, attachment)
+		}
+		return attachments, err
+	}
+
+	policy, err := GetPolicy(policyUid, origin)
+
+	expr, err := regexp.Compile("gs://(?P<bucketName>(?:[^/])*)/(?P<fileName>((?:[^/]*/)*)(.*))")
+	for _, attachment := range *policy.Attachments {
+		var responseAttachment models.Attachment
+		if (len(attachment.Link) == 0) {
+			continue
+		}
+		matches := findNamedMatches(expr, attachment.Link)
+		fileData, _ := lib.GetFromStorageErr(matches["bucketName"], matches["fileName"], "")
+		responseAttachment.FileName = attachment.FileName
+		responseAttachment.ContentType = attachment.ContentType
+		responseAttachment.Name = attachment.Name
+		responseAttachment.Byte = base64.StdEncoding.EncodeToString(fileData)
+
+		attachments = append(attachments, responseAttachment)
+	}
+	
+
+	return attachments, err
+}
+
+func findNamedMatches(regex *regexp.Regexp, str string) map[string]string {
+	match := regex.FindStringSubmatch(str)
+
+	results := map[string]string{}
+	for i, name := range match {
+		results[regex.SubexpNames()[i]] = name
+	}
+	return results
+}
+
+type WiseAttachmentResponse struct {
+	Base64Attachment string `json:"fileAllegato"`
+}
+
+type GetPolicyAttachmentsResponse struct {
+	Attachments []models.Attachment `json:"attachments"`
+}
