@@ -5,21 +5,21 @@ go 1.19
 replace github.com/wopta/goworkspace/broker => ./
 
 require (
-	cloud.google.com/go v0.110.1
+	cloud.google.com/go v0.110.2
 	cloud.google.com/go/firestore v1.9.0
-	github.com/GoogleCloudPlatform/functions-framework-go v1.7.2
+	github.com/GoogleCloudPlatform/functions-framework-go v1.7.3
 	github.com/heimdalr/dag v1.2.1
 	github.com/wopta/goworkspace/document v1.0.37
-	github.com/wopta/goworkspace/lib v1.0.19
+	github.com/wopta/goworkspace/lib v1.0.20
 	github.com/wopta/goworkspace/mail v1.0.18
-	github.com/wopta/goworkspace/models v1.0.49
+	github.com/wopta/goworkspace/models v1.0.52
 	github.com/wopta/goworkspace/payment v1.0.23
 	github.com/wopta/goworkspace/user v1.0.0
 	github.com/wopta/goworkspace/wiseproxy v1.0.3
 )
 
 require (
-	cloud.google.com/go/bigquery v1.50.0 // indirect
+	cloud.google.com/go/bigquery v1.51.1 // indirect
 	cloud.google.com/go/compute v1.19.0 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
 	cloud.google.com/go/iam v0.13.0 // indirect
@@ -30,7 +30,7 @@ require (
 	github.com/MicahParks/keyfunc v1.5.1 // indirect
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/antlr/antlr4/runtime/Go/antlr v0.0.0-20220527190237-ee62e23da966 // indirect
-	github.com/apache/arrow/go/v11 v11.0.0 // indirect
+	github.com/apache/arrow/go/v12 v12.0.0 // indirect
 	github.com/apache/thrift v0.16.0 // indirect
 	github.com/bmatcuk/doublestar v1.3.2 // indirect
 	github.com/boombuler/barcode v1.0.1 // indirect
@@ -99,7 +99,7 @@ require (
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/appengine/v2 v2.0.2 // indirect
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1 // indirect
-	google.golang.org/grpc v1.54.0 // indirect
+	google.golang.org/grpc v1.55.0 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
 	gopkg.in/src-d/go-billy.v4 v4.3.2 // indirect
 	gopkg.in/src-d/go-git.v4 v4.13.1 // indirect
