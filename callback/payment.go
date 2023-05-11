@@ -32,7 +32,7 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 	json.Unmarshal([]byte(request), &fabrickCallback)
 	// Unmarshal or Decode the JSON to the interface.
 	if fabrickCallback.Bill.Status == "PAID" {
-		if uid == "" {
+		if uid == "" || origin == "" {
 			ext := strings.Split(fabrickCallback.ExternalID, "_")
 			uid = ext[0]
 			schedule = ext[1]
@@ -86,7 +86,8 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 			mail.SendMailContract(policy, &[]mail.Attachment{{
 				Byte:        base64.StdEncoding.EncodeToString(contractbyte),
 				ContentType: "application/pdf",
-				Name:        name,
+				Name: policy.Contractor.Name + "_" + policy.Contractor.Surname + "_" + policy.NameDesc +
+					"_contratto.pdf",
 			}})
 
 			response = `{

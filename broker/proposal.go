@@ -53,5 +53,9 @@ func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 
 	log.Println("Proposal ", ref.ID)
 
-	return `{"uid":"` + ref.ID + `"}`, policy, e
+	policy.Uid = ref.ID
+
+	resp, e := policy.Marshal()
+
+	return string(resp), policy, e
 }

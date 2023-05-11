@@ -23,6 +23,8 @@ use(
 ./user
 ./partnership
 ./companydata
+./test
 ./question
 ./sellable
 )
+

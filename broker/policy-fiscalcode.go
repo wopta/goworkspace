@@ -28,7 +28,7 @@ func PolicyFiscalcode(w http.ResponseWriter, r *http.Request) (string, interface
 
 	log.Println("GetPolicyByFiscalCode")
 	log.Println(r.RequestURI)
-
+	policyFire := lib.GetDatasetByEnv(r.Header.Get("origin"), "policy")
 	fiscalCode := r.Header.Get("fiscalcode")
 	fiscalCodeRegex, _ := regexp.Compile("^(?:[A-Z][AEIOU][AEIOUX]|[AEIOU]X{2}|[B-DF-HJ-NP-TV-Z]{2}[A-Z]){2}(?:[\\dLMNP-V]{2}(?:[A-EHLMPR-T](?:[04LQ][1-9MNP-V]|[15MR][\\dLMNP-V]|[26NS][0-8LMNP-U])|[DHPS][37PT][0L]|[ACELMRT][37PT][01LM]|[AC-EHLMPR-T][26NS][9V])|(?:[02468LNQSU][048LQU]|[13579MPRTV][26NS])B[26NS][9V])(?:[A-MZ][1-9MNP-V][\\dLMNP-V]{2}|[A-M][0L](?:[1-9MNP-V][\\dLMNP-V]|[0L][1-9MNP-V]))[A-Z]$")
 
@@ -36,7 +36,7 @@ func PolicyFiscalcode(w http.ResponseWriter, r *http.Request) (string, interface
 		return `{}`, nil, nil
 	}
 
-	policies = GetPoliciesFromFirebase(fiscalCode)
+	policies = GetPoliciesFromFirebase(fiscalCode, policyFire)
 
 	wiseToken, wiseSimplePolicies, e = getAllSimplePoliciesForUserFromWise(fiscalCode)
 
@@ -119,7 +119,7 @@ func filter[T any](ss []T, test func(T) bool) (ret []T) {
 	return
 }
 
-func GetPoliciesFromFirebase(fiscalCode string) []models.Policy {
+func GetPoliciesFromFirebase(fiscalCode string, policyFire string) []models.Policy {
 	q := lib.Firequeries{
 		Queries: []lib.Firequery{
 			{
@@ -134,7 +134,7 @@ func GetPoliciesFromFirebase(fiscalCode string) []models.Policy {
 			},
 		},
 	}
-	docsnap, _ := q.FirestoreWherefields("policy")
+	docsnap, _ := q.FirestoreWherefields(policyFire)
 	return models.PolicyToListData(docsnap)
 }
 
