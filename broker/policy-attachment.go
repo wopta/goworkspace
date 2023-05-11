@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"regexp"
 	"strings"
@@ -82,15 +83,24 @@ func GetPolicyAttachments(policyUid string, origin string) ([]models.Attachment,
 		return attachments, err
 	}
 
-	policy, err := GetPolicy(policyUid, origin)
+	var policy models.Policy
+
+	log.Println("Getting attachments for policy saved in Wopta")
+	if policy, err = GetPolicy(policyUid, origin); err != nil {
+		log.Println("Error when getting policy: " + err.Error())
+		return make([]models.Attachment, 0), err
+	}
 
 	expr, err := regexp.Compile("gs://(?P<bucketName>(?:[^/])*)/(?P<fileName>((?:[^/]*/)*)(.*))")
+	log.Printf("Found %d attachment(s) for policy %s", len(*policy.Attachments), policy.Uid)
 	for _, attachment := range *policy.Attachments {
 		var responseAttachment models.Attachment
 		if (len(attachment.Link) == 0) {
+			log.Printf("Attachment %s has empty link, skipping", attachment.FileName)
 			continue
 		}
 		matches := findNamedMatches(expr, attachment.Link)
+		log.Printf("Found %s with bucketName=%s and fileName=%s", attachment.FileName, matches["bucketName"], matches["fileName"])
 		fileData, _ := lib.GetFromStorageErr(matches["bucketName"], matches["fileName"], "")
 		responseAttachment.FileName = attachment.FileName
 		responseAttachment.ContentType = attachment.ContentType
@@ -100,7 +110,7 @@ func GetPolicyAttachments(policyUid string, origin string) ([]models.Attachment,
 		attachments = append(attachments, responseAttachment)
 	}
 	
-
+	log.Printf("Sending %d attachment(s)", len(attachments))
 	return attachments, err
 }
 
