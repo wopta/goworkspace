@@ -27,14 +27,15 @@ func GetPolicyAttachmentFx(w http.ResponseWriter, r *http.Request) (string, inte
 	}
 
 	attachments, err := GetPolicyAttachments(r.Header.Get("policyUid"), r.Header.Get("origin"))
-
 	if err != nil {
+		log.Println("GetPolicyAttachments Error: " + err.Error())
 		return "{}", nil, nil
 	}
 
-	response, _ := json.Marshal(attachments)
+	response, err := json.Marshal(attachments)
+	log.Println("AttachmentsMarshal Error: " + err.Error())
 
-	return string(response), nil, nil
+	return string(response), nil, err
 }
 
 func GetPolicyAttachments(policyUid string, origin string) ([]models.Attachment, error) {
@@ -95,7 +96,7 @@ func GetPolicyAttachments(policyUid string, origin string) ([]models.Attachment,
 	log.Printf("Found %d attachment(s) for policy %s", len(*policy.Attachments), policy.Uid)
 	for _, attachment := range *policy.Attachments {
 		var responseAttachment models.Attachment
-		if (len(attachment.Link) == 0) {
+		if len(attachment.Link) == 0 {
 			log.Printf("Attachment %s has empty link, skipping", attachment.FileName)
 			continue
 		}
@@ -109,7 +110,7 @@ func GetPolicyAttachments(policyUid string, origin string) ([]models.Attachment,
 
 		attachments = append(attachments, responseAttachment)
 	}
-	
+
 	log.Printf("Sending %d attachment(s)", len(attachments))
 	return attachments, err
 }
