@@ -33,7 +33,9 @@ func GetPolicyAttachmentFx(w http.ResponseWriter, r *http.Request) (string, inte
 	}
 
 	response, err := json.Marshal(attachments)
-	log.Println("AttachmentsMarshal Error: " + err.Error())
+	if err != nil {
+		log.Println("AttachmentsMarshal Error: " + err.Error())
+	}
 
 	return string(response), nil, err
 }
