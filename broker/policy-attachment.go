@@ -20,7 +20,7 @@ func GetPolicyAttachmentFx(w http.ResponseWriter, r *http.Request) (string, inte
 
 	var (
 		response GetPolicyAttachmentsResponse
-		e error
+		e        error
 	)
 
 	if e != nil {
@@ -107,11 +107,8 @@ func GetPolicyAttachments(policyUid string, origin string) ([]models.Attachment,
 		matches := findNamedMatches(expr, attachment.Link)
 		log.Printf("Found %s with bucketName=%s and fileName=%s", attachment.FileName, matches["bucketName"], matches["fileName"])
 		fileData, _ := lib.GetFromStorageErr(matches["bucketName"], matches["fileName"], "")
-		
-		splittedFileName := strings.Split(matches["fileName"], ".")
-		fileExtension := splittedFileName[len(splittedFileName) - 1]
 
-		responseAttachment.FileName = fmt.Sprintf("%s.%s", attachment.Name, fileExtension)
+		responseAttachment.FileName = attachment.FileName
 		responseAttachment.ContentType = attachment.ContentType
 		responseAttachment.Name = attachment.Name
 		responseAttachment.Byte = base64.StdEncoding.EncodeToString(fileData)
