@@ -88,6 +88,8 @@ type Policy struct {
 	Data            string                       `bigquery:"data" firestore:"-"`
 	Json            string                       `bigquery:"json" firestore:"-"`
 	OffersPrices    map[string]map[string]*Price `firestore:"offersPrices,omitempty" json:"offersPrices,omitempty" bigquery:"-"`
+	PartnershipName string                       `json:"partnershipName" firestore:"partnershipName" bigquery:"-"`
+	PartnershipData map[string]interface{}       `json:"partnershipData" firestore:"partnershipData" bigquery:"-"`
 }
 
 type RenewHistory struct {

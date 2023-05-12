@@ -4,14 +4,15 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
 	"io"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 )
 
 func UploadDocument(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -59,9 +60,9 @@ func saveDocument(userUID string, identityDocument *models.IdentityDocument) {
 			return err
 		}
 
-		media.Filename = documentType + "_" + documentSide + "_" + timestamp + fileExtension
+		media.FileName = documentType + "_" + documentSide + "_" + timestamp + fileExtension
 		gsLink, err := lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "assets/users/"+userUID+"/"+
-			media.Filename, bytes)
+			media.FileName, bytes)
 		media.Link = gsLink
 		return err
 	}
