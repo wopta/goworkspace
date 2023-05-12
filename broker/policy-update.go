@@ -15,6 +15,7 @@ func UpdatePolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		err       error
 		policy    models.Policy
 		policyUID string
+		input     map[string]interface{}
 	)
 	log.Println("UpdatePolicy")
 
@@ -26,9 +27,18 @@ func UpdatePolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	if err != nil {
 		return `{"uid":"` + policyUID + `", "success":"false"}`, `{"uid":"` + policyUID + `", "success":"false"}`, err
 	}
-	policy.Updated = time.Now().UTC()
 
-	lib.SetFirestore(firePolicy, policyUID, policy)
+	input["assets"] = policy.Assets
+	input["contractor"] = policy.Contractor
+	if policy.Surveys != nil {
+		input["surveys"] = policy.Surveys
+	}
+	if policy.Statements != nil {
+		input["statements"] = policy.Statements
+	}
+	input["updated"] = time.Now().UTC()
+
+	lib.FireUpdate(firePolicy, policyUID, input)
 
 	return `{"uid":"` + policyUID + `", "success":"true"}`, `{"uid":"` + policyUID + `", "success":"true"}`, err
 }
