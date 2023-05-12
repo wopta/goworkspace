@@ -28,6 +28,7 @@ func UpdatePolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		return `{"uid":"` + policyUID + `", "success":"false"}`, `{"uid":"` + policyUID + `", "success":"false"}`, err
 	}
 
+	input = make(map[string]interface{}, 0)
 	input["assets"] = policy.Assets
 	input["contractor"] = policy.Contractor
 	if policy.Surveys != nil {
