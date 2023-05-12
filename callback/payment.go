@@ -81,7 +81,8 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 			log.Println(uid + " payment sendMail ")
 			var contractbyte []byte
 			name := policy.Uid + ".pdf"
-			contractbyte, e = lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "contracts/"+name)
+			contractbyte, e = lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "assets/users/"+
+				policy.Contractor.Uid+"/contract_"+name)
 
 			mail.SendMailContract(policy, &[]mail.Attachment{{
 				Byte:        base64.StdEncoding.EncodeToString(contractbyte),
