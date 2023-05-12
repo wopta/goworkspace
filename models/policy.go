@@ -146,6 +146,15 @@ func (policy *Policy) CalculateContractorAge() (int, error) {
 	return age, e
 }
 
+func (policy *Policy) HasGuarantee(guaranteeSlug string) bool {
+	for _, guarantee := range policy.Assets[0].Guarantees {
+		if guarantee.Slug == guaranteeSlug {
+			return true
+		}
+	}
+	return false
+}
+
 func (policy *Policy) ExtractGuarantee(guaranteeSlug string) (Guarante, error) {
 	for _, guarantee := range policy.Assets[0].Guarantees {
 		if guarantee.Slug == guaranteeSlug {
