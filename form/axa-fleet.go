@@ -41,6 +41,7 @@ func AxaFleetTway(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		DATAFINECOPERTURA     string
 		deleteList            []string
 		insertList            []string
+		sequence              int
 	)
 	const (
 		satusCol = "J"
@@ -68,6 +69,7 @@ func AxaFleetTway(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	excelhead := []interface{}{"NUMERO POLIZZA", "LOB", "	TIPOLOGIA POLIZZA", "CODICE CONFIGURAZIONE", "IDENTIFICATIVO UNIVOCO APPLICAZIONE", "	TIPO OGGETTO ASSICURATO", "	CODICE FISCALE / P.IVA ASSICURATO", "COGNOME / RAGIONE SOCIALE ASSICURATO", "	NOME ASSICURATO", "	INDIRIZZO RESIDENZA ASSICURATO", "	CAP RESIDENZA ASSICURATO", "	CITTA’ RESIDENZA ASSICURATO", "	PROVINCIA RESIDENZA ASSICURATO", "	TARGA VEICOLO", "	TELAIO VEICOLO	", "MARCA VEICOLO", "	MODELLO VEICOLO	TIPOLOGIA VEICOLO", "PESO VEICOLO", "	DATA IMMATRICOLAZIONE", "	DATA INIZIO VALIDITA' COPERTURA", "	DATA FINE VALIDITA' COPERTURA", "TIPO MOVIMENTO"}
 	excel = append(excel, excelhead)
 	toEmit = false
+	sequence = 0
 	if len(tway.Values) == 0 {
 		fmt.Println("No data found.")
 	} else {
@@ -75,7 +77,6 @@ func AxaFleetTway(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		for i, row := range tway.Values {
 			isError := false
 			founded := false
-
 			fmt.Println(axa.Values[len(axa.Values)-1][4])
 			fmt.Println(axa.Values[len(axa.Values)-1][21])
 			lenTableDelta := 1
@@ -87,7 +88,8 @@ func AxaFleetTway(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 				}
 			}
 			marks, _ := strconv.Atoi(axa.Values[len(axa.Values)-lenTableDelta][4].(string)[2:10])
-			progressive := marks + 1
+			progressive := marks + 1 + sequence
+			sequence++
 			progressiveFormatted := fmt.Sprintf("%08d", progressive)
 			progressiveFormattedpre := "WR" + progressiveFormatted
 
@@ -210,7 +212,8 @@ func SftpUpload(filePath string) {
 		PrivateKey:   string(pk),                // required only if private key authentication is to be used
 		Server:       "ftp.ip-assistance.it:22",
 		KeyExchanges: []string{"diffie-hellman-group-exchange-sha1", "diffie-hellman-group1-sha1", "diffie-hellman-group14-sha1"}, // optional
-		Timeout:      time.Second * 30,                                                                                            // 0 for not timeout
+		Timeout:      time.Second * 30,
+		KeyPsw:       os.Getenv("AXA_SFTP_PSW"), // 0 for not timeout
 	}
 	client, e := lib.NewSftpclient(config)
 	lib.CheckError(e)

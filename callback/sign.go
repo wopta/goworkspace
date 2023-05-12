@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/wopta/goworkspace/document"
@@ -49,7 +50,10 @@ func Sign(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 			if policy.Attachments == nil {
 				policy.Attachments = new([]models.Attachment)
 			}
-			*policy.Attachments = append(*policy.Attachments, models.Attachment{Name: "Contratto", Link: "gs://" + os.Getenv("GOOGLE_STORAGE_BUCKET") + "/contracts/" + policy.Uid + ".pdf"})
+			productName := strings.ReplaceAll(policy.NameDesc, " ", "_")
+			*policy.Attachments = append(*policy.Attachments, models.Attachment{Name: "Contratto",
+				FileName: "Contratto_" + productName + "_" + policy.CodeCompany + ".pdf", Link: "gs://" +
+					os.Getenv("GOOGLE_STORAGE_BUCKET") + "/contracts/" + policy.Uid + ".pdf"})
 			lib.SetFirestore(firePolicy, uid, policy)
 			policy.BigquerySave(r.Header.Get("origin"))
 			mail.SendMailPay(policy)

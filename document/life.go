@@ -106,8 +106,8 @@ func mainHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 	logoPath = lib.GetAssetPathByEnv(basePath) + "/logo_vita.png"
 
 	contractor := policy.Contractor
-	address := strings.ToUpper(contractor.Residence.StreetName+", "+contractor.Residence.StreetNumber+"\n"+
-		contractor.Residence.PostalCode+" "+contractor.Residence.City+" ("+contractor.Residence.CityCode) + "\n"
+	address := strings.ToUpper(contractor.Residence.StreetName + ", " + contractor.Residence.StreetNumber + "\n" +
+		contractor.Residence.PostalCode + " " + contractor.Residence.City + " (" + contractor.Residence.CityCode + ")\n")
 
 	if contractor.VatCode == "" {
 		cfpi = contractor.FiscalCode
@@ -549,8 +549,8 @@ func beneficiaryReferenceSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	deathGuarantee, err := policy.ExtractGuarantee("death")
 	lib.CheckError(err)
 
-	if deathGuarantee.BeneficiaryReferance != nil {
-		beneficiary := deathGuarantee.BeneficiaryReferance
+	if deathGuarantee.BeneficiaryReference != nil {
+		beneficiary := deathGuarantee.BeneficiaryReference
 		address := strings.ToUpper(beneficiary.Residence.StreetName + ", " + beneficiary.Residence.StreetNumber +
 			" - " + beneficiary.Residence.PostalCode + " " + beneficiary.Residence.City +
 			" (" + beneficiary.Residence.CityCode + ")")

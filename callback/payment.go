@@ -86,7 +86,8 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 			mail.SendMailContract(policy, &[]mail.Attachment{{
 				Byte:        base64.StdEncoding.EncodeToString(contractbyte),
 				ContentType: "application/pdf",
-				Name:        name,
+				Name: policy.Contractor.Name + "_" + policy.Contractor.Surname + "_" + policy.NameDesc +
+					"_contratto.pdf",
 			}})
 
 			response = `{
