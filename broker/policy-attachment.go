@@ -19,7 +19,8 @@ func GetPolicyAttachmentFx(w http.ResponseWriter, r *http.Request) (string, inte
 	w.Header().Set("Access-Control-Allow-Methods", "GET")
 
 	var (
-		e error
+		response GetPolicyAttachmentsResponse
+		e        error
 	)
 
 	if e != nil {
@@ -32,12 +33,13 @@ func GetPolicyAttachmentFx(w http.ResponseWriter, r *http.Request) (string, inte
 		return "{}", nil, nil
 	}
 
-	response, err := json.Marshal(attachments)
+	response.Attachments = attachments
+	res, err := json.Marshal(response)
 	if err != nil {
 		log.Println("AttachmentsMarshal Error: " + err.Error())
 	}
 
-	return string(response), nil, err
+	return string(res), nil, nil
 }
 
 func GetPolicyAttachments(policyUid string, origin string) ([]models.Attachment, error) {
@@ -105,6 +107,7 @@ func GetPolicyAttachments(policyUid string, origin string) ([]models.Attachment,
 		matches := findNamedMatches(expr, attachment.Link)
 		log.Printf("Found %s with bucketName=%s and fileName=%s", attachment.FileName, matches["bucketName"], matches["fileName"])
 		fileData, _ := lib.GetFromStorageErr(matches["bucketName"], matches["fileName"], "")
+
 		responseAttachment.FileName = attachment.FileName
 		responseAttachment.ContentType = attachment.ContentType
 		responseAttachment.Name = attachment.Name
