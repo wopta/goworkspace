@@ -151,7 +151,7 @@ func roundOfferPrices(offersPrices map[string]map[string]*models.Price) {
 }
 
 func filterByMinimumPrice(assets []models.Asset, offersPrices map[string]map[string]*models.Price, originalPolicy models.Policy) {
-	product, err := prd.GetProduct("life", "V1")
+	product, err := prd.GetProduct("life", "v1")
 	lib.CheckError(err)
 
 	for assetIndex, asset := range assets {
