@@ -340,16 +340,17 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 
 		}
 
-		now := time.Now()
-		refMontly := now.AddDate(0, -1, 0)
-		//year, month, day := time.Now().Date()
-		//year2, month2, day2 := time.Now().AddDate(0, -1, 0).Date()
-		filepath := "WOPTAKEY_NBM_" + strconv.Itoa(refMontly.Year()) + strconv.Itoa(int(refMontly.Month())) + "_" + strconv.Itoa(now.Day()) + strconv.Itoa(int(now.Month())) + ".txt"
-		lib.WriteCsv("../tmp/"+filepath, result)
-		source, _ := ioutil.ReadFile("../tmp/" + filepath)
-		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "axa/life/"+filepath, source)
-		SftpUpload(filepath)
 	}
+	now := time.Now()
+
+	refMontly := now.AddDate(0, -1, 0)
+	//year, month, day := time.Now().Date()
+	//year2, month2, day2 := time.Now().AddDate(0, -1, 0).Date()
+	filepath := "WOPTAKEY_NBM_" + strconv.Itoa(refMontly.Year()) + fmt.Sprintf("%02d", int(refMontly.Month())) + "_" + fmt.Sprintf("%02d", now.Day()) + fmt.Sprintf("%02d", int(now.Month())) + ".txt"
+	lib.WriteCsv("../tmp/"+filepath, result)
+	source, _ := ioutil.ReadFile("../tmp/" + filepath)
+	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "axa/life/"+filepath, source)
+	SftpUpload(filepath)
 	return "", nil, e
 }
 func mapCodecCompany(p models.Policy, g string) string {
