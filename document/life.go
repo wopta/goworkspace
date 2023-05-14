@@ -617,6 +617,16 @@ func surveysSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 		err := printSurvey(pdf, survey)
 		lib.CheckError(err)
 	}
+	// TODO: added when RVM will be implemented
+	/*
+		if rvm == true {
+		pdf.Ln(3)
+		pdf.MultiCell(0, 3, "Nota  bene:  Ai  fini  della  valutazione  del  rischio,  l’Assicurato  ha  " +
+			"inviato  alla  compagnia  un  Rapporto  di  Visita  Medica,  sottoscritto  dal medico curante, che  " +
+			"costituisce  parte  integrante della  presente  Polizza  e  la Compagnia, valutato il  rischio,  ha  " +
+			"accettato  il rischio  alle condizioni indicate nella presente Polizza", "", fpdf.AlignLeft, false)
+		}
+	*/
 	pdf.Ln(8)
 	drawSignatureForm(pdf)
 	pdf.Ln(5)
