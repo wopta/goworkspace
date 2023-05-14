@@ -43,7 +43,7 @@ func Life(data models.Policy) (models.Policy, error) {
 	addDefaultGuarantees(data, ruleProduct)
 
 	//TODO: this should not be here, only for version 1
-	deathGuarantee, err := extractGuarantee(data.Assets[0].Guarantees, "death")
+	deathGuarantee, err := data.ExtractGuarantee("death")
 	lib.CheckError(err)
 	//TODO: this should not be here, only for version 1
 	calculateSumInsuredLimitOfIndemnity(data.Assets, deathGuarantee.Value.SumInsuredLimitOfIndemnity)
@@ -78,15 +78,14 @@ func Life(data models.Policy) (models.Policy, error) {
 
 			calculateGuaranteePrices(guarantee, baseFloat, taxFloat)
 
-			_, err = originalPolicy.ExtractGuarantee(guarantee.Slug)
-			if err == nil && guarantee.IsSellable {
+			if originalPolicy.HasGuarantee(guarantee.Slug) && guarantee.IsSellable {
 				calculateOfferPrices(data, guarantee)
 			}
 		}
 
 	}
 
-	filterByMinimumPrice(data.Assets, data.OffersPrices)
+	filterByMinimumPrice(data.Assets, data.OffersPrices, originalPolicy)
 
 	roundOfferPrices(data.OffersPrices)
 
@@ -151,21 +150,24 @@ func roundOfferPrices(offersPrices map[string]map[string]*models.Price) {
 	}
 }
 
-func filterByMinimumPrice(assets []models.Asset, offersPrices map[string]map[string]*models.Price) {
-	product, err := prd.GetProduct("life", "V1")
+func filterByMinimumPrice(assets []models.Asset, offersPrices map[string]map[string]*models.Price, originalPolicy models.Policy) {
+	product, err := prd.GetProduct("life", "v1")
 	lib.CheckError(err)
 
 	for assetIndex, asset := range assets {
 		for guaranteeIndex, guarantee := range asset.Guarantees {
+
 			hasNotMinimumYearlyPrice := guarantee.Value.PremiumGrossYearly < product.Companies[0].GuaranteesMap[guarantee.Slug].Config.MinimumGrossYearly
 			if hasNotMinimumYearlyPrice {
 				assets[assetIndex].Guarantees[guaranteeIndex].IsSellable = false
-				offersPrices["default"]["monthly"].Net -= guarantee.Value.PremiumNetMonthly
-				offersPrices["default"]["monthly"].Gross -= guarantee.Value.PremiumGrossMonthly
-				offersPrices["default"]["monthly"].Tax -= guarantee.Value.PremiumGrossMonthly - guarantee.Value.PremiumNetMonthly
-				offersPrices["default"]["yearly"].Net -= guarantee.Value.PremiumNetYearly
-				offersPrices["default"]["yearly"].Gross -= guarantee.Value.PremiumGrossYearly
-				offersPrices["default"]["yearly"].Tax -= guarantee.Value.PremiumGrossYearly - guarantee.Value.PremiumNetYearly
+				if originalPolicy.HasGuarantee(guarantee.Slug) {
+					offersPrices["default"]["monthly"].Net -= guarantee.Value.PremiumNetMonthly
+					offersPrices["default"]["monthly"].Gross -= guarantee.Value.PremiumGrossMonthly
+					offersPrices["default"]["monthly"].Tax -= guarantee.Value.PremiumGrossMonthly - guarantee.Value.PremiumNetMonthly
+					offersPrices["default"]["yearly"].Net -= guarantee.Value.PremiumNetYearly
+					offersPrices["default"]["yearly"].Gross -= guarantee.Value.PremiumGrossYearly
+					offersPrices["default"]["yearly"].Tax -= guarantee.Value.PremiumGrossYearly - guarantee.Value.PremiumNetYearly
+				}
 			}
 		}
 	}

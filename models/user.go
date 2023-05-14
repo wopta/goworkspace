@@ -73,7 +73,7 @@ type Consens struct {
 	Title           string         `firestore:"title ,omitempty" json:"title,omitempty" bigquery:"title"`
 	Consens         string         `firestore:"consens,omitempty" json:"consens,omitempty" bigquery:"consens"`
 	Key             int64          `firestore:"key,omitempty" json:"key,omitempty" bigquery:"key"`
-	Answer          bool           `firestore:"answer,omitempty" json:"answer,omitempty" bigquery:"answer"`
+	Answer          bool           `firestore:"answer" json:"answer" bigquery:"answer"`
 	CreationDate    time.Time      `firestore:"creationDate,omitempty" json:"creationDate,omitempty" bigquery:"-" bigquery:"-"`
 	BigCreationDate civil.DateTime `bigquery:"creationDate" firestore:"-" json:"-"`
 	Mail            string         `firestore:"-" json:"-" bigquery:"mail"`

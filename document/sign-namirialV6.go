@@ -202,7 +202,7 @@ func postDataV6(data []byte) <-chan string {
 		res, err := client.Do(req)
 		var result map[string]string
 		if res != nil {
-			resByte, err := ioutil.ReadAll(res.Body)
+			resByte, err := io.ReadAll(res.Body)
 			lib.CheckError(err)
 			json.Unmarshal(resByte, &result)
 			res.Body.Close()
@@ -214,13 +214,13 @@ func postDataV6(data []byte) <-chan string {
 
 	return r
 }
-func GetFileV6(id string, uid string) chan string {
+func GetFileV6(policy *model.Policy, uid string) chan string {
 	r := make(chan string)
-	log.Println("Get file: ", id)
+	log.Println("Get file: ", policy.IdSign)
 	go func() {
 
 		defer close(r)
-		files := <-GetFilesV6(id)
+		files := <-GetFilesV6(policy.IdSign)
 
 		var urlstring = os.Getenv("ESIGN_BASEURL") + "v6/file/" + files.Documents[0].FileID
 		client := &http.Client{
@@ -232,10 +232,11 @@ func GetFileV6(id string, uid string) chan string {
 		res, err := client.Do(req)
 		lib.CheckError(err)
 		if res != nil {
-			body, _ := ioutil.ReadAll(res.Body)
+			body, _ := io.ReadAll(res.Body)
 			defer res.Body.Close()
 			//log.Println("Get body: ", string(body))
-			lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "contracts/"+uid+".pdf", body)
+			lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "assets/users/"+
+				policy.Contractor.Uid+"/contract_"+uid+".pdf", body)
 			r <- "upload done"
 
 		}
@@ -260,7 +261,7 @@ func GetFilesV6(envelopeId string) chan NamirialFiles {
 
 		if res != nil {
 
-			body, _ := ioutil.ReadAll(res.Body)
+			body, _ := io.ReadAll(res.Body)
 			resp, _ := UnmarshalNamirialFiles(body)
 			res.Body.Close()
 
