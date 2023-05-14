@@ -235,7 +235,7 @@ func woptaFooter(pdf *fpdf.Fpdf) {
 		pdf.CellFormat(13, 3, "", "", 0, "", false, 0, "")
 		pdf.CellFormat(30, 3, "info@wopta.it", "", 1, "", false, 0, "")
 		pdf.CellFormat(pdf.GetStringWidth("Galleria del Corso, 1"), 3,
-			"20122 - Milano (VI)", "", 0, "", false, 0, "")
+			"20122 - Milano (MI)", "", 0, "", false, 0, "")
 		pdf.CellFormat(20, 3, "", "", 0, "", false, 0, "")
 		pdf.CellFormat(pdf.GetStringWidth("Numero REA: MI 2638708"), 3,
 			"Capitale Sociale: €120.000,00", "", 0, "", false, 0, "")
