@@ -920,6 +920,7 @@ func axaTableSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	contractor := policy.Contractor
 
 	identityDocumentInfo := map[string]string{
+		"code":             "==",
 		"type":             "=====",
 		"number":           "=====",
 		"issuingAuthority": "=====",
@@ -929,6 +930,7 @@ func axaTableSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	}
 	identityDocument := contractor.GetIdentityDocument()
 	if identityDocument != nil {
+		identityDocumentInfo["code"] = identityDocument.Code
 		identityDocumentInfo["type"] = identityDocument.Type
 		identityDocumentInfo["number"] = identityDocument.Number
 		identityDocumentInfo["issuingAuthority"] = identityDocument.IssuingAuthority
@@ -1047,20 +1049,29 @@ func axaTableSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "B. allego una fotocopia fronte/retro del mio documento di identità non scaduto "+
-		"avente i seguenti estremi, confermando la veridicità dei dati sotto riportati: ", "", "", false)
+		"avente i seguenti estremi, confermando la veridicità dei dati sotto riportati: ", "", "",
+		false)
+	setBlackBoldFont(pdf, standardTextSize)
 	pdf.CellFormat(5, 4, "", "", 0, "", false, 0, "")
-	pdf.CellFormat(90, 4, "Tipo documento: "+identityDocumentInfo["type"], "TLR", 0, "", false, 0, "")
-	pdf.CellFormat(90, 4, "Nr. Documento: "+identityDocumentInfo["number"], "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(90, 4, "Tipo documento: "+identityDocumentInfo["code"]+" = "+identityDocumentInfo["type"],
+		"TLR", 0, "", false, 0, "")
+	pdf.CellFormat(90, 4, "Nr. Documento: "+identityDocumentInfo["number"], "TLR", 0, "",
+		false, 0, "")
 	pdf.CellFormat(5, 4, "", "", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "", 0, "", false, 0, "")
-	pdf.CellFormat(90, 4, "Ente di rilascio: "+identityDocumentInfo["issuingAuthority"], "TLR", 0, "", false, 0, "")
-	pdf.CellFormat(90, 4, "Data di rilascio: "+identityDocumentInfo["dateOfIssue"], "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(90, 4, "Ente di rilascio: "+identityDocumentInfo["issuingAuthority"], "TLR", 0,
+		"", false, 0, "")
+	pdf.CellFormat(90, 4, "Data di rilascio: "+identityDocumentInfo["dateOfIssue"], "TLR", 0,
+		"", false, 0, "")
 	pdf.CellFormat(5, 4, "", "", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "", 0, "", false, 0, "")
-	pdf.CellFormat(90, 4, "Località di rilascio: "+identityDocumentInfo["placeOfIssue"], "1", 0, "", false, 0, "")
-	pdf.CellFormat(90, 4, "Data di scadenza: "+identityDocumentInfo["expiryDate"], "1", 1, "", false, 0, "")
+	pdf.CellFormat(90, 4, "Località di rilascio: "+identityDocumentInfo["placeOfIssue"], "1", 0,
+		"", false, 0, "")
+	pdf.CellFormat(90, 4, "Data di scadenza: "+identityDocumentInfo["expiryDate"], "1", 1,
+		"", false, 0, "")
 	pdf.Ln(1)
 
+	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "C. dichiaro di NON essere una Persona Politicamente Esposta", "",
 		"", false)
 	pdf.CellFormat(4, 3, "", "", 0, "", false, 0, "")
