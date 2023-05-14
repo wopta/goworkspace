@@ -89,7 +89,7 @@ func AxaFleetTway(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 			}
 			marks, _ := strconv.Atoi(axa.Values[len(axa.Values)-lenTableDelta][4].(string)[2:10])
 			progressive := marks + 1 + sequence
-			sequence++
+
 			progressiveFormatted := fmt.Sprintf("%08d", progressive)
 			progressiveFormattedpre := "WR" + progressiveFormatted
 
@@ -106,6 +106,7 @@ func AxaFleetTway(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 					TARGA = row[2].(string)
 					MODELLO = row[3].(string)
 					DATAFINECOPERTURA = "31/12/2023"
+					sequence++
 
 				} else {
 
