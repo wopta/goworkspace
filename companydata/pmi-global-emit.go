@@ -76,8 +76,8 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 				enterpriseName = asset.Enterprise.Name
 				employer = fmt.Sprint(asset.Enterprise.Employer)
 				revenue, _ = strconv.Atoi(asset.Enterprise.Revenue)
-				//atecoMacro = asset.Enterprise.AtecoMacro
-				//atecoSub = asset.Enterprise.AtecoSub
+				sector = asset.Enterprise.AtecoMacro
+				class = asset.Enterprise.AtecoSub
 				atecoDesc = asset.Enterprise.AtecoDesc
 				ateco = asset.Enterprise.Ateco
 			}
@@ -99,11 +99,11 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 						policy.Contractor.FiscalCode,        //CODICE FISCALE CONTRAENTE
 						"",                                  //NATURA GIURIDICA CONTRAENTE
 						enterpriseName,                      //RAGIONE SOCIALE CONTRAENTE
-						policy.Contractor.Name,              //COGNOME CONTRANTE
-						policy.Contractor.Surname,           //NOME CONTRANTE
-						policy.Contractor.City,              //PROVINCIA CONTRAENTE
+						policy.Contractor.Surname,           //COGNOME CONTRANTE
+						policy.Contractor.Name,              //NOME CONTRANTE
+						policy.Contractor.CityCode,          //PROVINCIA CONTRAENTE
 						policy.Contractor.Locality,          //COMUNE CONTRAENTE
-						policy.Contractor.CityCode,          //CAP CONTRAENTE
+						policy.Contractor.PostalCode,        //CAP CONTRAENTE
 						"",                                  //TOPONIMO CONTRAENTE
 						policy.Contractor.Address,           //INDIRIZZO CONTRAENTE
 						policy.Contractor.StreetNumber,      //NUMERO CIVICO CONTRAENTE
@@ -119,13 +119,13 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 						"1",                                 //DOMANDA 2
 						"1",                                 //DOMANDA 3
 						getMapRevenue(revenue),              //FATTURATO
-						"",                                  //FORMA DI COPERTURA ------------------------------------------bENI
-						"",                                  //FORMULA INCENDIO
-						"",                                  //BENE -----------------------------------------------------BENI 1 FABBRICATO
+						"1",                                 //FORMA DI COPERTURA ------------------------------------------bENI
+						"2",                                 //FORMULA INCENDIO
+						"1",                                 //BENE -----------------------------------------------------BENI 1 FABBRICATO
 						getMapBuildingYear(asset.Building.BuildingYear),         //ANNO DI COSTRUZIONE FABBRICATO
 						getMapBuildingMaterial(asset.Building.BuildingMaterial), //MATERIALE COSTRUZIONE
 						getMapBuildingFloor(asset.Building.Floor),               //NUMERO PIANI
-						getYesNo(asset.Building.IsAllarm),                       //PRESENZA ALLARME
+						getOneTwo(asset.Building.IsAllarm),                      //PRESENZA ALLARME
 						"",                                                      //PRESENZA POLIZZA CONDOMINIALE
 						getOneTwo(asset.Building.IsHolder),                      //TIPOLOGIA FABBRICATO
 						asset.Building.CityCode,                                 //PROVINCIA UBICAZIONE
@@ -210,9 +210,9 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 						"1",                                      //DOMANDA 2
 						"1",                                      //DOMANDA 3
 						getMapRevenue(revenue),                   //FATTURATO
-						"",                                       //FORMA DI COPERTURA ------------------------------------------bENI
-						"",                                       //FORMULA INCENDIO
-						"",                                       //BENE -----------------------------------------------------BENI 1 FABBRICATO
+						"1",                                      //FORMA DI COPERTURA ------------------------------------------bENI
+						"2",                                      //FORMULA INCENDIO
+						"2",                                      //BENE -----------------------------------------------------BENI 1 FABBRICATO
 						"",                                       //ANNO DI COSTRUZIONE FABBRICATO
 						"",                                       //MATERIALE COSTRUZIONE
 						"",                                       //NUMERO PIANI
@@ -241,10 +241,10 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 						"",                                       //% SOMMA ASSICURATA INCENDIO FABBRICATO E CONTENUTO – BENI
 						"",                                       //MASSIMALE - BENI
 						"",                                       //DIARIA – BENI
-						"",                                       //CODICE ATTIVITA' - ATTIVITA' -------------------------------------------------ATTIVITA 2 ATTIVITA
-						"",                                       //CLASSE - ATTIVITA'
-						"",                                       //SETTORE - ATTIVITA'
-						"",                                       //TIPO - ATTIVITA'
+						ateco,                                    //CODICE ATTIVITA' - ATTIVITA' -------------------------------------------------ATTIVITA 2 ATTIVITA
+						class,                                    //CLASSE - SOLO BENI
+						sector,                                   //SETTORE – BENI
+						atecoDesc,                                //TIPO - ATTIVITA'
 						g.CompanyCodec,                           //GARANZIE/PACCHETTI - ATTIVITA'
 						"",                                       //CLAUSOLA ATTIVITA' - BENE
 						"",                                       //CLAUSOLA ATTIVITA' - GARANZIE
