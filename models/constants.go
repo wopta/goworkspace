@@ -56,3 +56,7 @@ const (
 func t() {
 
 }
+
+const (
+	PartnershipBeProf string = "beprof"
+)

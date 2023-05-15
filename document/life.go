@@ -609,7 +609,33 @@ func surveysSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 
 	getParagraphTitle(pdf, "Dichiarazioni da leggere con attenzione prima di firmare")
 	pdf.Ln(8)
-	printSurvey(pdf, surveys[0])
+	setBlackBoldFont(pdf, standardTextSize)
+	pdf.MultiCell(0, 3, "INFORMAZIONI SULLO STATO DI SALUTE - AVVERTENZE SULLA COMPILAZIONE DEL "+
+		"QUESTIONARIO MEDICO", "", fpdf.AlignLeft, false)
+	setBlackRegularFont(pdf, standardTextSize)
+	pdf.MultiCell(0, 3, "L’Assicurato è tenuto a rispondere alle domande di un Questionario Medico. Si"+
+		" avverte l’Assicurato che:", "", fpdf.AlignLeft, false)
+	setBlackBoldFont(pdf, standardTextSize)
+	indentedText(pdf, "a) le dichiarazioni non veritiere, inesatte o reticenti compromettono il diritto alla "+
+		"prestazione;")
+	indentedText(pdf, "b) è necessario verificare l’esattezza e la rispondenza a verità delle risposte al "+
+		"Questionario Medico prima della sua sottoscrizione;")
+	setBlackRegularFont(pdf, standardTextSize)
+	indentedText(pdf, "c) anche nei casi non previsti dalla Compagnia, l’Aderente/Assicurato può chiedere di"+
+		" essere sottoposto a visita medica, per certificare lo stato di salute. Il costo di tale visita medica sarà a suo carico.")
+	pdf.MultiCell(0, 3, "Sono assicurabili solo i soggetti che rispondono “NO” a tutte le domande incluse"+
+		" nel Questionario Medico.", "", fpdf.AlignLeft, false)
+	if policy.PartnershipName == models.PartnershipBeProf {
+		pdf.MultiCell(0, 3, "In caso anche di una sola risposta positiva, ovvero in caso di somme"+
+			" assicurate per le garanzie Decesso e/o Invalidità Totale Permanente da Infortunio o Malattia superiori"+
+			" a 200.000 €, è richiesto che l’Assicurato si sottoponga a visita medica come indicato al punto c)"+
+			" che precede.", "", fpdf.AlignLeft, false)
+	} else {
+		pdf.MultiCell(0, 3, "La Compagnia pertanto, anche ai fini dell’art. 1893 2° comma del codice"+
+			" civile, dichiara espressamente che non intende assumere il rischio (nemmeno a diverse condizioni)"+
+			" qualora fosse a conoscenza che l’Assicurato sia affetto anche da una sola delle patologie incluse"+
+			" nel Questionario Medico.", "", fpdf.AlignLeft, false)
+	}
 	pdf.Ln(5)
 	getParagraphTitle(pdf, "Questionario Medico")
 	pdf.Ln(8)
@@ -630,9 +656,9 @@ func surveysSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 			setBlackBoldFont(pdf, standardTextSize)
 		}
 	*/
-	pdf.Ln(3)
+	pdf.Ln(5)
 	drawSignatureForm(pdf)
-	pdf.Ln(3)
+	pdf.Ln(5)
 }
 
 func statementsSection(pdf *fpdf.Fpdf, policy *models.Policy) {
