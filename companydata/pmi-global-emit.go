@@ -13,6 +13,13 @@ import (
 )
 
 func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	var (
+		result                                    [][]string
+		enterpriseName                            string
+		employer, class, sector, atecoDesc, ateco string
+		revenue                                   int
+		//err                                       error
+	)
 	/**config := lib.SftpConfig{
 		Username:     os.Getenv("GLOBAL_SFTP_USER"),
 		Password:     os.Getenv("GLOBAL_SFTP_PSW"), // required only if password authentication is to be used
@@ -60,13 +67,6 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 	policies := models.PolicyToListData(query)
 
 	for _, policy := range policies {
-		var (
-			result                                    [][]string
-			enterpriseName                            string
-			employer, class, sector, atecoDesc, ateco string
-			revenue                                   int
-			//err                                       error
-		)
 
 		for _, asset := range policy.Assets {
 			if asset.Building != nil {
@@ -268,18 +268,19 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 
 		}
 
-		filepath := now.Format(layoutFilename) + filename
-		lib.WriteCsv("../tmp/"+filepath, result)
-		lib.CreateExcel(result, "../tmp/"+filepath, "Risultato")
-		source, _ := ioutil.ReadFile("../tmp/" + filepath)
-
-		//lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/global/pmi/emit/"+filepath, source)
-		lib.PutGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/global/pmi/emit/"+filepath, source, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 		if e == nil {
 			policy.CompanyEmitted = true
 			//lib.SetFirestore("policy", policy.Agent.Uid, policy)
 		}
 	}
+	filepath := now.Format(layoutFilename) + filename
+	lib.WriteCsv("../tmp/"+filepath, result)
+	lib.CreateExcel(result, "../tmp/"+filepath, "Risultato")
+	source, _ := ioutil.ReadFile("../tmp/" + filepath)
+
+	//lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/global/pmi/emit/"+filepath, source)
+	lib.PutGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/global/pmi/emit/"+filepath, source, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
 	return "", nil, e
 }
 
@@ -289,6 +290,7 @@ func getInstallamentDate(p models.Policy, layout string) string {
 	if p.PaymentSplit == "monthly" {
 		res = p.StartDate.AddDate(0, 1, 0).Format(layout)
 	}
+
 	return res
 }
 func getInstallament(key string, price float64) float64 {
