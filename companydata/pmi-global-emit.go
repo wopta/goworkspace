@@ -22,7 +22,7 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 		Timeout:      time.Second * 30,                                                                                            // 0 for not timeout
 	}**/
 	layout := "10/06/2022"
-	layoutFilename := "20230512"
+	layoutFilename := "20220610"
 	//client, e := lib.NewSftpclient(config)
 	now := time.Now().AddDate(0, 0, -1)
 	filename := now.Format(layoutFilename) + "_EM_PMIW.xlsx"
@@ -56,7 +56,7 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 			},
 		},
 	}
-	query, e := q.FirestoreWherefields("policy")
+	query, e := q.FirestoreWherefields("uat_policy")
 	policies := models.PolicyToListData(query)
 
 	for _, policy := range policies {
