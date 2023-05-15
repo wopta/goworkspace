@@ -2,7 +2,6 @@ package companydata
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"strconv"
@@ -28,7 +27,7 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 		KeyExchanges: []string{"diffie-hellman-group-exchange-sha1", "diffie-hellman-group1-sha1", "diffie-hellman-group14-sha1"}, // optional
 		Timeout:      time.Second * 30,                                                                                            // 0 for not timeout
 	}**/
-	layout := "10/06/2022"
+	layout := "02/01/2006"
 	layoutFilename := "20060102"
 	//client, e := lib.NewSftpclient(config)
 	now := time.Now().AddDate(0, 0, -1)
@@ -273,13 +272,12 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 			//lib.SetFirestore("policy", policy.Agent.Uid, policy)
 		}
 	}
-	filepath := now.Format(layoutFilename) + filename
-	lib.WriteCsv("../tmp/"+filepath, result)
+	filepath := filename
 	excel, e := lib.CreateExcel(result, "../tmp/"+filepath, "Risultato")
-	source, _ := ioutil.ReadFile("../tmp/" + filepath)
+	//source, _ := ioutil.ReadFile("../tmp/" + filepath)
 
 	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/global/pmi/emit/0_"+filepath, <-excel)
-	lib.PutGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/global/pmi/emit/"+filepath, source, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+	//lib.PutGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/global/pmi/emit/"+filepath, source, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
 	return "", nil, e
 }
