@@ -20,14 +20,7 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 		revenue                                   int
 		//err                                       error
 	)
-	/**config := lib.SftpConfig{
-		Username:     os.Getenv("GLOBAL_SFTP_USER"),
-		Password:     os.Getenv("GLOBAL_SFTP_PSW"), // required only if password authentication is to be used
-		PrivateKey:   "",                           // required only if private key authentication is to be used
-		Server:       "ftps.globalassistance.it:222",
-		KeyExchanges: []string{"diffie-hellman-group-exchange-sha1", "diffie-hellman-group1-sha1", "diffie-hellman-group14-sha1"}, // optional
-		Timeout:      time.Second * 30,                                                                                            // 0 for not timeout
-	}**/
+
 	layout := "02/01/2006"
 	layoutFilename := "20060102"
 	//client, e := lib.NewSftpclient(config)
@@ -35,11 +28,12 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 	filename := now.Format(layoutFilename) + "_EM_PMIW.xlsx"
 	//println(config)
 	println("filename: ", filename)
-	//reader, e := client.Download("wopta/" + filename)
-	//buf := new(bytes.Buffer)
-	//buf.ReadFrom(reader)
-	//lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/global/emit/"+filename, []byte(buf.String()))
-	//lib.ExcelRead(reader)
+	_, reader, e := GlobalSftpDownload(filename, "track/in/global/emit/", "wopta/")
+	excelsource, e := lib.ExcelRead(reader)
+	for k, v := range excelsource {
+		println("key shhet name: ", k)
+		result = v
+	}
 	q := lib.Firequeries{
 		Queries: []lib.Firequery{{
 			Field:      "companyEmit",

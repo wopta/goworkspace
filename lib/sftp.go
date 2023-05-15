@@ -109,6 +109,13 @@ func (c *Client) Download(filePath string) (io.ReadCloser, error) {
 
 	return c.sftpClient.Open(filePath)
 }
+func (c *Client) Remove(filePath string) error {
+	if err := c.connect(); err != nil {
+		return fmt.Errorf("connect: %w", err)
+	}
+
+	return c.sftpClient.Remove(filePath)
+}
 
 // Info gets the details of a file. If the file was not found, an error is returned.
 func (c *Client) Info(filePath string) (os.FileInfo, error) {
