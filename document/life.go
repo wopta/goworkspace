@@ -606,41 +606,86 @@ func beneficiaryReferenceTable(pdf *fpdf.Fpdf, beneficiaryReference map[string]s
 
 func surveysSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	surveys := *policy.Surveys
+	falseValue := false
+	intro := models.Survey{
+		Title: "",
+		Subtitle: "INFORMAZIONI SULLO STATO DI SALUTE - AVVERTENZE SULLA COMPILAZIONE DEL " +
+			"QUESTIONARIO MEDICO",
+		HasMultipleAnswers: &falseValue,
+		Questions: []*models.Question{
+			{
+				Question: "L’Assicurato è tenuto a rispondere alle domande di un Questionario Medico. Si" +
+					" avverte l’Assicurato che:",
+				IsBold:         false,
+				Indent:         false,
+				Answer:         nil,
+				HasAnswer:      false,
+				ExpectedAnswer: nil,
+			},
+			{
+				Question: "a) le dichiarazioni non veritiere, inesatte o reticenti compromettono il diritto alla " +
+					"prestazione;",
+				IsBold:         true,
+				Indent:         true,
+				Answer:         nil,
+				HasAnswer:      false,
+				ExpectedAnswer: nil,
+			},
+			{
+				Question: "b) è necessario verificare l’esattezza e la rispondenza a verità delle risposte al " +
+					"Questionario Medico prima della sua sottoscrizione;",
+				IsBold:         true,
+				Indent:         true,
+				Answer:         nil,
+				HasAnswer:      false,
+				ExpectedAnswer: nil,
+			},
+			{
+				Question: "c) anche nei casi non previsti dalla Compagnia, l’Aderente/Assicurato può chiedere di" +
+					" essere sottoposto a visita medica, per certificare lo stato di salute. Il costo di tale visita " +
+					"medica sarà a suo carico.",
+				IsBold:         false,
+				Indent:         true,
+				Answer:         nil,
+				HasAnswer:      false,
+				ExpectedAnswer: nil,
+			},
+			{
+				Question: "Sono assicurabili solo i soggetti che rispondono “NO” a tutte le domande incluse nel" +
+					" Questionario Medico.",
+				IsBold:         false,
+				Indent:         false,
+				Answer:         nil,
+				HasAnswer:      false,
+				ExpectedAnswer: nil,
+			},
+		},
+		Answer:         nil,
+		HasAnswer:      false,
+		ExpectedAnswer: &falseValue,
+	}
+
+	if policy.PartnershipName == models.PartnershipBeProf {
+		intro.Questions[len(intro.Questions)-1].Question += "In caso anche di una sola risposta positiva, ovvero in caso di somme" +
+			" assicurate per le garanzie Decesso e/o Invalidità Totale Permanente da Infortunio o Malattia superiori" +
+			" a 200.000 €, è richiesto che l’Assicurato si sottoponga a visita medica come indicato al punto c)" +
+			" che precede."
+	} else {
+		intro.Questions[len(intro.Questions)-1].Question += "La Compagnia pertanto, anche ai fini dell’art. 1893 2° comma del codice" +
+			" civile, dichiara espressamente che non intende assumere il rischio (nemmeno a diverse condizioni)" +
+			" qualora fosse a conoscenza che l’Assicurato sia affetto anche da una sola delle patologie incluse" +
+			" nel Questionario Medico."
+	}
 
 	getParagraphTitle(pdf, "Dichiarazioni da leggere con attenzione prima di firmare")
 	pdf.Ln(8)
-	setBlackBoldFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3, "INFORMAZIONI SULLO STATO DI SALUTE - AVVERTENZE SULLA COMPILAZIONE DEL "+
-		"QUESTIONARIO MEDICO", "", fpdf.AlignLeft, false)
-	setBlackRegularFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3, "L’Assicurato è tenuto a rispondere alle domande di un Questionario Medico. Si"+
-		" avverte l’Assicurato che:", "", fpdf.AlignLeft, false)
-	setBlackBoldFont(pdf, standardTextSize)
-	indentedText(pdf, "a) le dichiarazioni non veritiere, inesatte o reticenti compromettono il diritto alla "+
-		"prestazione;")
-	indentedText(pdf, "b) è necessario verificare l’esattezza e la rispondenza a verità delle risposte al "+
-		"Questionario Medico prima della sua sottoscrizione;")
-	setBlackRegularFont(pdf, standardTextSize)
-	indentedText(pdf, "c) anche nei casi non previsti dalla Compagnia, l’Aderente/Assicurato può chiedere di"+
-		" essere sottoposto a visita medica, per certificare lo stato di salute. Il costo di tale visita medica sarà a suo carico.")
-	pdf.MultiCell(0, 3, "Sono assicurabili solo i soggetti che rispondono “NO” a tutte le domande incluse"+
-		" nel Questionario Medico.", "", fpdf.AlignLeft, false)
-	if policy.PartnershipName == models.PartnershipBeProf {
-		pdf.MultiCell(0, 3, "In caso anche di una sola risposta positiva, ovvero in caso di somme"+
-			" assicurate per le garanzie Decesso e/o Invalidità Totale Permanente da Infortunio o Malattia superiori"+
-			" a 200.000 €, è richiesto che l’Assicurato si sottoponga a visita medica come indicato al punto c)"+
-			" che precede.", "", fpdf.AlignLeft, false)
-	} else {
-		pdf.MultiCell(0, 3, "La Compagnia pertanto, anche ai fini dell’art. 1893 2° comma del codice"+
-			" civile, dichiara espressamente che non intende assumere il rischio (nemmeno a diverse condizioni)"+
-			" qualora fosse a conoscenza che l’Assicurato sia affetto anche da una sola delle patologie incluse"+
-			" nel Questionario Medico.", "", fpdf.AlignLeft, false)
-	}
+	err := printSurvey(pdf, intro)
+	lib.CheckError(err)
 	pdf.Ln(5)
 	getParagraphTitle(pdf, "Questionario Medico")
 	pdf.Ln(8)
 	for _, survey := range surveys[1:] {
-		err := printSurvey(pdf, survey)
+		err = printSurvey(pdf, survey)
 		lib.CheckError(err)
 	}
 	// TODO: added when RVM will be implemented
