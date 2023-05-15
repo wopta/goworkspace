@@ -272,7 +272,9 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 		lib.WriteCsv("../tmp/"+filepath, result)
 		lib.CreateExcel(result, "../tmp/"+filepath, "Risultato")
 		source, _ := ioutil.ReadFile("../tmp/" + filepath)
-		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/global/pmi/emit/"+filepath, source)
+
+		//lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/global/pmi/emit/"+filepath, source)
+		lib.PutGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/global/pmi/emit/"+filepath, source, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 		if e == nil {
 			policy.CompanyEmitted = true
 			//lib.SetFirestore("policy", policy.Agent.Uid, policy)
