@@ -18,6 +18,9 @@ import (
 
 func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	layout := "20060102"
+	now := time.Now()
+	fromM := time.Now().AddDate(0, -1, 0)
+
 	var (
 		cabCsv []byte
 		result [][]string
@@ -42,6 +45,15 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 				Field:      "name", //
 				Operator:   "==",   //
 				QueryValue: "life",
+			}, {
+				Field:      "startSate", //
+				Operator:   ">",         //
+				QueryValue: strconv.Itoa(int(fromM.Unix())),
+			},
+			{
+				Field:      "startSate", //
+				Operator:   "<",         //
+				QueryValue: strconv.Itoa(int(now.Unix())),
 			},
 		},
 	}
@@ -341,7 +353,6 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		}
 
 	}
-	now := time.Now()
 
 	refMontly := now.AddDate(0, -1, 0)
 	//year, month, day := time.Now().Date()
