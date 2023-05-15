@@ -63,7 +63,7 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 			},
 		},
 	}
-	query, e := q.FirestoreWherefields("uat_policy")
+	query, e := q.FirestoreWherefields("policy")
 	policies := models.PolicyToListData(query)
 	log.Println("len(policies):", len(policies))
 	for _, policy := range policies {
