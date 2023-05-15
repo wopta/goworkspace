@@ -9,29 +9,6 @@ import (
 	"github.com/xuri/excelize/v2"
 )
 
-func CreateExcel(sheet [][]interface{}, filePath string, sheetName string) ([]byte, error) {
-	log.Println("CreateExcel")
-	f := excelize.NewFile()
-	alfabet := []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"}
-	// Create a new sheet.
-	index, err := f.NewSheet(sheetName)
-	for x, row := range sheet {
-		for i, cel := range row {
-
-			fmt.Println(cel)
-			err = f.SetCellValue(sheetName, alfabet[i]+""+strconv.Itoa(x+1), cel)
-		}
-	}
-	//Set active sheet of the workbook.
-	f.SetActiveSheet(index)
-	//Save spreadsheet by the given path.
-	err = f.SaveAs(filePath)
-
-	resByte, err := f.WriteToBuffer()
-
-	return resByte.Bytes(), err
-}
-
 func ExcelRead(r io.Reader) (map[string][][]string, error) {
 	// f, err := excelize.OpenFile("Book1.xlsx")
 	var res map[string][][]string
@@ -54,4 +31,29 @@ func ExcelRead(r io.Reader) (map[string][][]string, error) {
 		fmt.Println()
 	}
 	return res, err
+}
+func CreateExcel(sheet [][]interface{}, filePath string, sheetName string) ([]byte, error) {
+	log.Println("CreateExcel")
+	f := excelize.NewFile()
+	alfabet := []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+		"AA", "AB", "AC", "AD", "AE", "AF", "AG", "AH", "AI", "AJ", "AK", "AL", "AM", "AN", "AO", "AP", "AQ", "AR", "AS", "AT", "AU", "AV", "AW", "AX", "AY", "AZ",
+		"BA", "BB", "BC", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BK", "BL", "BM", "BN", "BO", "BP", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BX", "BY", "BZ"}
+	// Create a new sheet.
+	index, err := f.NewSheet(sheetName)
+	for x, row := range sheet {
+		for i, cel := range row {
+
+			fmt.Println(cel)
+			f.SetCellValue(sheetName, alfabet[i]+""+strconv.Itoa(x+1), cel)
+		}
+	}
+	//Set active sheet of the workbook.
+	f.SetActiveSheet(index)
+
+	//Save spreadsheet by the given path.
+	err = f.SaveAs(filePath)
+
+	resByte, err := f.WriteToBuffer()
+
+	return resByte.Bytes(), err
 }
