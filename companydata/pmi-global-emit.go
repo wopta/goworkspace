@@ -150,24 +150,24 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 						getMapSelfInsurance(g.SelfInsuranceDesc), //SCOPERTO – BENI
 						"",                                       //% SOMMA ASSICURATA INCENDIO FABBRICATO E CONTENUTO – BENI
 						strconv.Itoa(int(g.SumInsuredLimitOfIndemnity)), //MASSIMALE - BENI
-						"",                 //DIARIA – BENI
-						"",                 //CODICE ATTIVITA' - ATTIVITA' -------------------------------------------------ATTIVITA 2 ATTIVITA
-						"",                 //CLASSE - ATTIVITA'
-						"",                 //SETTORE - ATTIVITA'
-						"",                 //TIPO - ATTIVITA'
-						"",                 //GARANZIE/PACCHETTI - ATTIVITA'
-						"",                 //CLAUSOLA ATTIVITA' - BENE
-						"",                 //CLAUSOLA ATTIVITA' - GARANZIE
-						"",                 //FRANCHIGIA - ATTIVITA'
-						"",                 //SCOPERTO - ATTIVITA'
-						"",                 //MASSIMALE - ATTIVITA'
-						"",                 //MASSIMALE PER EVENTO - ATTIVITA'
-						"",                 //PREMIO ANNUO LORDO DI GARANZIA
-						"0",                //SCONTO %
-						"",                 //RATA ALLA FIRMA
-						"",                 //RATA SUCCESSIVA
-						"",                 //DATA SCADENZA I RATA
-						policy.CodeCompany, //NUMERO POLIZZA
+						"",                                //DIARIA – BENI
+						"",                                //CODICE ATTIVITA' - ATTIVITA' -------------------------------------------------ATTIVITA 2 ATTIVITA
+						"",                                //CLASSE - ATTIVITA'
+						"",                                //SETTORE - ATTIVITA'
+						"",                                //TIPO - ATTIVITA'
+						"",                                //GARANZIE/PACCHETTI - ATTIVITA'
+						"",                                //CLAUSOLA ATTIVITA' - BENE
+						"",                                //CLAUSOLA ATTIVITA' - GARANZIE
+						"",                                //FRANCHIGIA - ATTIVITA'
+						"",                                //SCOPERTO - ATTIVITA'
+						"",                                //MASSIMALE - ATTIVITA'
+						"",                                //MASSIMALE PER EVENTO - ATTIVITA'
+						fmt.Sprintf("%.2f", g.PriceGross), //PREMIO ANNUO LORDO DI GARANZIA
+						"0",                               //SCONTO %
+						fmt.Sprintf("%.2f", getInstallament(policy.PaymentSplit, g.PriceGross)), //RATA ALLA FIRMA
+						fmt.Sprintf("%.2f", getInstallament(policy.PaymentSplit, g.PriceGross)), //RATA SUCCESSIVA
+						getInstallamentDate(policy, layout),                                     //DATA SCADENZA I RATA
+						policy.CodeCompany,
 					}
 					result = append(result, row)
 

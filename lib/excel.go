@@ -47,6 +47,7 @@ func CreateExcel(sheet [][]string, filePath string, sheetName string) (<-chan []
 		// Create a new sheet.
 		index, err = f.NewSheet(sheetName)
 		for x, row := range sheet {
+
 			for i, cel := range row {
 
 				f.SetCellValue(sheetName, alfabet[i]+""+strconv.Itoa(x+1), cel)
