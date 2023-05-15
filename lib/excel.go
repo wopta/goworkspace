@@ -45,6 +45,7 @@ func CreateExcel(sheet [][]string, filePath string, sheetName string) (<-chan []
 			"AA", "AB", "AC", "AD", "AE", "AF", "AG", "AH", "AI", "AJ", "AK", "AL", "AM", "AN", "AO", "AP", "AQ", "AR", "AS", "AT", "AU", "AV", "AW", "AX", "AY", "AZ",
 			"BA", "BB", "BC", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BK", "BL", "BM", "BN", "BO", "BP", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BX", "BY", "BZ"}
 		// Create a new sheet.
+		f.SetSheetName("Sheet1", sheetName)
 		index, err = f.NewSheet(sheetName)
 		for x, row := range sheet {
 

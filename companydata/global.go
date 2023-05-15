@@ -2,6 +2,7 @@ package companydata
 
 import (
 	"bytes"
+	"io"
 	"log"
 	"os"
 	"time"
@@ -18,14 +19,14 @@ var config = lib.SftpConfig{
 	Timeout:      time.Second * 30,                                                                                            // 0 for not timeout
 }
 
-func GlobalSftpDownload(filename string, bucket string, folder string) ([]byte, error) {
+func GlobalSftpDownload(filename string, bucket string, folder string) ([]byte, io.ReadCloser, error) {
 	client, e := lib.NewSftpclient(config)
 	println("filename: ", filename)
 	reader, e := client.Download(folder + filename)
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(reader)
 	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), bucket+filename, []byte(buf.String()))
-	return buf.Bytes(), e
+	return buf.Bytes(), reader, e
 }
 func GlobalSftpUpload(filename string, folder string) error {
 	client, e := lib.NewSftpclient(config)
