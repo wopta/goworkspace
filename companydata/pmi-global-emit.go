@@ -270,7 +270,7 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 
 		filepath := now.Format(layoutFilename) + filename
 		lib.WriteCsv("../tmp/"+filepath, result)
-		lib.CreateExcel(result, filepath, "Risultato")
+		lib.CreateExcel(result, "../tmp/"+filepath, "Risultato")
 		source, _ := ioutil.ReadFile("../tmp/" + filepath)
 		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/global/pmi/emit/"+filepath, source)
 		if e == nil {
