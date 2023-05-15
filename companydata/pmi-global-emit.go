@@ -24,14 +24,16 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 	}
 	layout := "10/06/2022"
 	layoutFilename := "20230512"
-	client, e := lib.NewSftpclient(config)
+	//client, e := lib.NewSftpclient(config)
 	now := time.Now().AddDate(0, 0, -1)
 	filename := now.Format(layoutFilename) + "_EM_PMIW.xlsx"
-	reader, e := client.Download("wopta/" + filename)
+	println("config: ", config)
+	println("filename: ", filename)
+	//reader, e := client.Download("wopta/" + filename)
 	buf := new(bytes.Buffer)
-	buf.ReadFrom(reader)
+	//buf.ReadFrom(reader)
 	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/global/emit/"+filename, []byte(buf.String()))
-	lib.ExcelRead(reader)
+	//lib.ExcelRead(reader)
 	q := lib.Firequeries{
 		Queries: []lib.Firequery{{
 			Field:      "companyEmit",
