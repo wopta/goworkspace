@@ -1,7 +1,6 @@
 package companydata
 
 import (
-	"bytes"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -30,9 +29,9 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 	println("config: ", config)
 	println("filename: ", filename)
 	//reader, e := client.Download("wopta/" + filename)
-	buf := new(bytes.Buffer)
+	//buf := new(bytes.Buffer)
 	//buf.ReadFrom(reader)
-	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/global/emit/"+filename, []byte(buf.String()))
+	//lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/global/emit/"+filename, []byte(buf.String()))
 	//lib.ExcelRead(reader)
 	q := lib.Firequeries{
 		Queries: []lib.Firequery{{
