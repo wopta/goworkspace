@@ -278,7 +278,7 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 	excel, e := lib.CreateExcel(result, "../tmp/"+filepath, "Risultato")
 	source, _ := ioutil.ReadFile("../tmp/" + filepath)
 
-	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/global/pmi/emit/"+filepath, excel)
+	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/global/pmi/emit/0_"+filepath, <-excel)
 	lib.PutGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/global/pmi/emit/"+filepath, source, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
 	return "", nil, e
