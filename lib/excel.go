@@ -32,7 +32,7 @@ func ExcelRead(r io.Reader) (map[string][][]string, error) {
 	}
 	return res, err
 }
-func CreateExcel(sheet [][]interface{}, filePath string, sheetName string) ([]byte, error) {
+func CreateExcel(sheet [][]string, filePath string, sheetName string) ([]byte, error) {
 	log.Println("CreateExcel")
 	f := excelize.NewFile()
 	alfabet := []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
