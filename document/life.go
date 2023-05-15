@@ -235,7 +235,7 @@ func woptaFooter(pdf *fpdf.Fpdf) {
 		pdf.CellFormat(13, 3, "", "", 0, "", false, 0, "")
 		pdf.CellFormat(30, 3, "info@wopta.it", "", 1, "", false, 0, "")
 		pdf.CellFormat(pdf.GetStringWidth("Galleria del Corso, 1"), 3,
-			"20143 - Milano (VI)", "", 0, "", false, 0, "")
+			"20122 - Milano (MI)", "", 0, "", false, 0, "")
 		pdf.CellFormat(20, 3, "", "", 0, "", false, 0, "")
 		pdf.CellFormat(pdf.GetStringWidth("Numero REA: MI 2638708"), 3,
 			"Capitale Sociale: €120.000,00", "", 0, "", false, 0, "")
@@ -607,17 +607,37 @@ func beneficiaryReferenceTable(pdf *fpdf.Fpdf, beneficiaryReference map[string]s
 func surveysSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	surveys := *policy.Surveys
 
+	if policy.PartnershipName == models.PartnershipBeProf {
+		surveys[0].Questions[len(surveys[0].Questions)-1].Question += " In caso anche di una sola risposta positiva, ovvero in caso di somme" +
+			" assicurate per le garanzie Decesso e/o Invalidità Totale Permanente da Infortunio o Malattia superiori" +
+			" a 200.000 €, è richiesto che l’Assicurato si sottoponga a visita medica come indicato al punto c)" +
+			" che precede."
+	}
+
 	getParagraphTitle(pdf, "Dichiarazioni da leggere con attenzione prima di firmare")
 	pdf.Ln(8)
-	printSurvey(pdf, surveys[0])
-	pdf.Ln(5)
+	err := printSurvey(pdf, surveys[0])
+	lib.CheckError(err)
 	getParagraphTitle(pdf, "Questionario Medico")
 	pdf.Ln(8)
 	for _, survey := range surveys[1:] {
 		err := printSurvey(pdf, survey)
 		lib.CheckError(err)
 	}
-	pdf.Ln(8)
+	// TODO: added when RVM will be implemented
+	/*
+		if rvm == true {
+			pdf.Ln(3)
+			setBlackRegularFont(pdf, standardTextSize)
+			pdf.MultiCell(0, 3, "Nota  bene:  Ai  fini  della  valutazione  del  rischio,  l’Assicurato  ha  "+
+				"inviato  alla  compagnia  un  Rapporto  di  Visita  Medica,  sottoscritto  dal medico curante, che  "+
+				"costituisce  parte  integrante della  presente  Polizza  e  la Compagnia, valutato il  rischio,  ha  "+
+				"accettato  il rischio  alle condizioni indicate nella presente Polizza", "", fpdf.AlignLeft, false)
+
+			setBlackBoldFont(pdf, standardTextSize)
+		}
+	*/
+	pdf.Ln(5)
 	drawSignatureForm(pdf)
 	pdf.Ln(5)
 }
@@ -910,6 +930,7 @@ func axaTableSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	contractor := policy.Contractor
 
 	identityDocumentInfo := map[string]string{
+		"code":             "==",
 		"type":             "=====",
 		"number":           "=====",
 		"issuingAuthority": "=====",
@@ -919,6 +940,7 @@ func axaTableSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	}
 	identityDocument := contractor.GetIdentityDocument()
 	if identityDocument != nil {
+		identityDocumentInfo["code"] = identityDocument.Code
 		identityDocumentInfo["type"] = identityDocument.Type
 		identityDocumentInfo["number"] = identityDocument.Number
 		identityDocumentInfo["issuingAuthority"] = identityDocument.IssuingAuthority
@@ -1037,20 +1059,29 @@ func axaTableSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "B. allego una fotocopia fronte/retro del mio documento di identità non scaduto "+
-		"avente i seguenti estremi, confermando la veridicità dei dati sotto riportati: ", "", "", false)
+		"avente i seguenti estremi, confermando la veridicità dei dati sotto riportati: ", "", "",
+		false)
+	setBlackBoldFont(pdf, standardTextSize)
 	pdf.CellFormat(5, 4, "", "", 0, "", false, 0, "")
-	pdf.CellFormat(90, 4, "Tipo documento: "+identityDocumentInfo["type"], "TLR", 0, "", false, 0, "")
-	pdf.CellFormat(90, 4, "Nr. Documento: "+identityDocumentInfo["number"], "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(90, 4, "Tipo documento: "+identityDocumentInfo["code"]+" = "+identityDocumentInfo["type"],
+		"TLR", 0, "", false, 0, "")
+	pdf.CellFormat(90, 4, "Nr. Documento: "+identityDocumentInfo["number"], "TLR", 0, "",
+		false, 0, "")
 	pdf.CellFormat(5, 4, "", "", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "", 0, "", false, 0, "")
-	pdf.CellFormat(90, 4, "Ente di rilascio: "+identityDocumentInfo["issuingAuthority"], "TLR", 0, "", false, 0, "")
-	pdf.CellFormat(90, 4, "Data di rilascio: "+identityDocumentInfo["dateOfIssue"], "TLR", 0, "", false, 0, "")
+	pdf.CellFormat(90, 4, "Ente di rilascio: "+identityDocumentInfo["issuingAuthority"], "TLR", 0,
+		"", false, 0, "")
+	pdf.CellFormat(90, 4, "Data di rilascio: "+identityDocumentInfo["dateOfIssue"], "TLR", 0,
+		"", false, 0, "")
 	pdf.CellFormat(5, 4, "", "", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "", 0, "", false, 0, "")
-	pdf.CellFormat(90, 4, "Località di rilascio: "+identityDocumentInfo["placeOfIssue"], "1", 0, "", false, 0, "")
-	pdf.CellFormat(90, 4, "Data di scadenza: "+identityDocumentInfo["expiryDate"], "1", 1, "", false, 0, "")
+	pdf.CellFormat(90, 4, "Località di rilascio: "+identityDocumentInfo["placeOfIssue"], "1", 0,
+		"", false, 0, "")
+	pdf.CellFormat(90, 4, "Data di scadenza: "+identityDocumentInfo["expiryDate"], "1", 1,
+		"", false, 0, "")
 	pdf.Ln(1)
 
+	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "C. dichiaro di NON essere una Persona Politicamente Esposta", "",
 		"", false)
 	pdf.CellFormat(4, 3, "", "", 0, "", false, 0, "")

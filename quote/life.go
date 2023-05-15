@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/dustin/go-humanize"
-	prd "github.com/wopta/goworkspace/product"
 	"github.com/wopta/goworkspace/sellable"
 	"io"
 	"modernc.org/mathutil"
@@ -43,7 +42,7 @@ func Life(data models.Policy) (models.Policy, error) {
 	addDefaultGuarantees(data, ruleProduct)
 
 	//TODO: this should not be here, only for version 1
-	deathGuarantee, err := extractGuarantee(data.Assets[0].Guarantees, "death")
+	deathGuarantee, err := data.ExtractGuarantee("death")
 	lib.CheckError(err)
 	//TODO: this should not be here, only for version 1
 	calculateSumInsuredLimitOfIndemnity(data.Assets, deathGuarantee.Value.SumInsuredLimitOfIndemnity)
@@ -76,17 +75,18 @@ func Life(data models.Policy) (models.Policy, error) {
 
 			baseFloat, taxFloat := getMultipliers(selectRow, offset, base, baseTax)
 
-			calculateGuaranteePrices(guarantee, baseFloat, taxFloat)
+			calculateGuaranteePrices(guarantee, baseFloat, taxFloat, ruleProduct)
 
-			_, err = originalPolicy.ExtractGuarantee(guarantee.Slug)
-			if err == nil && guarantee.IsSellable {
+			if originalPolicy.HasGuarantee(guarantee.Slug) && guarantee.IsSellable {
 				calculateOfferPrices(data, guarantee)
 			}
 		}
 
 	}
 
-	filterByMinimumPrice(data.Assets, data.OffersPrices)
+	if data.OffersPrices["default"]["monthly"].Gross < ruleProduct.Companies[0].MinimumMonthlyPrice {
+		delete(data.OffersPrices["default"], "monthly")
+	}
 
 	roundOfferPrices(data.OffersPrices)
 
@@ -117,6 +117,25 @@ func addDefaultGuarantees(data models.Policy, product models.Product) {
 	data.Assets[0].Guarantees = guaranteeList
 }
 
+func calculateSumInsuredLimitOfIndemnity(assets []models.Asset, deathSumInsuredLimitOfIndemnity float64) {
+	for _, asset := range assets {
+		for _, guarantee := range asset.Guarantees {
+			switch guarantee.Slug {
+			case "permanent-disability":
+				guarantee.Value.SumInsuredLimitOfIndemnity = deathSumInsuredLimitOfIndemnity
+			case "temporary-disability":
+				guarantee.Value.SumInsuredLimitOfIndemnity = (deathSumInsuredLimitOfIndemnity / 100) * 1
+			case "serious-ill":
+				if deathSumInsuredLimitOfIndemnity > 100000 {
+					guarantee.Value.SumInsuredLimitOfIndemnity = 10000
+				} else {
+					guarantee.Value.SumInsuredLimitOfIndemnity = 5000
+				}
+			}
+		}
+	}
+}
+
 func calculateGuaranteeDuration(assets []models.Asset, contractorAge int, deathDuration int) {
 	for assetIndex, asset := range assets {
 		for guaranteeIndex, guarantee := range asset.Guarantees {
@@ -141,41 +160,6 @@ func updatePolicyStartEndDate(policy *models.Policy) {
 	policy.EndDate = policy.StartDate.AddDate(maxDuration, 0, 0)
 }
 
-func roundOfferPrices(offersPrices map[string]map[string]*models.Price) {
-	for offerKey, offerValue := range offersPrices {
-		for paymentKey, _ := range offerValue {
-			offersPrices[offerKey][paymentKey].Net = lib.RoundFloatTwoDecimals(offersPrices[offerKey][paymentKey].Net)
-			offersPrices[offerKey][paymentKey].Tax = lib.RoundFloatTwoDecimals(offersPrices[offerKey][paymentKey].Tax)
-			offersPrices[offerKey][paymentKey].Gross = lib.RoundFloatTwoDecimals(offersPrices[offerKey][paymentKey].Gross)
-		}
-	}
-}
-
-func filterByMinimumPrice(assets []models.Asset, offersPrices map[string]map[string]*models.Price) {
-	product, err := prd.GetProduct("life", "V1")
-	lib.CheckError(err)
-
-	for assetIndex, asset := range assets {
-		for guaranteeIndex, guarantee := range asset.Guarantees {
-			hasNotMinimumYearlyPrice := guarantee.Value.PremiumGrossYearly < product.Companies[0].GuaranteesMap[guarantee.Slug].Config.MinimumGrossYearly
-			if hasNotMinimumYearlyPrice {
-				assets[assetIndex].Guarantees[guaranteeIndex].IsSellable = false
-				offersPrices["default"]["monthly"].Net -= guarantee.Value.PremiumNetMonthly
-				offersPrices["default"]["monthly"].Gross -= guarantee.Value.PremiumGrossMonthly
-				offersPrices["default"]["monthly"].Tax -= guarantee.Value.PremiumGrossMonthly - guarantee.Value.PremiumNetMonthly
-				offersPrices["default"]["yearly"].Net -= guarantee.Value.PremiumNetYearly
-				offersPrices["default"]["yearly"].Gross -= guarantee.Value.PremiumGrossYearly
-				offersPrices["default"]["yearly"].Tax -= guarantee.Value.PremiumGrossYearly - guarantee.Value.PremiumNetYearly
-			}
-		}
-	}
-
-	if offersPrices["default"]["monthly"].Gross < product.Companies[0].MinimumMonthlyPrice {
-		delete(offersPrices["default"], "monthly")
-	}
-
-}
-
 func getGuaranteeSubtitle(assets []models.Asset) {
 	for assetIndex, asset := range assets {
 		for guaranteeIndex, guarantee := range asset.Guarantees {
@@ -187,42 +171,6 @@ func getGuaranteeSubtitle(assets []models.Asset) {
 			}
 		}
 	}
-}
-
-func calculateOfferPrices(data models.Policy, guarantee models.Guarante) {
-	data.OffersPrices["default"]["yearly"].Gross += guarantee.Value.PremiumGrossYearly
-	data.OffersPrices["default"]["yearly"].Net += guarantee.Value.PremiumNetYearly
-	data.OffersPrices["default"]["yearly"].Tax += guarantee.Value.PremiumGrossYearly - guarantee.Value.PremiumNetYearly
-	data.OffersPrices["default"]["monthly"].Gross += guarantee.Value.PremiumGrossMonthly
-	data.OffersPrices["default"]["monthly"].Net += guarantee.Value.PremiumNetMonthly
-	data.OffersPrices["default"]["monthly"].Tax += guarantee.Value.PremiumGrossMonthly - guarantee.Value.PremiumNetMonthly
-}
-
-func calculateGuaranteePrices(guarantee models.Guarante, baseFloat float64, taxFloat float64) {
-	if guarantee.Slug != "temporary-disability" {
-		guarantee.Value.PremiumNetYearly = lib.RoundFloatTwoDecimals(guarantee.Value.SumInsuredLimitOfIndemnity * baseFloat)
-		guarantee.Value.PremiumGrossYearly = lib.RoundFloatTwoDecimals(guarantee.Value.SumInsuredLimitOfIndemnity * taxFloat)
-
-		guarantee.Value.PremiumNetMonthly = lib.RoundFloatTwoDecimals(guarantee.Value.SumInsuredLimitOfIndemnity * baseFloat / 12)
-		guarantee.Value.PremiumGrossMonthly = lib.RoundFloatTwoDecimals(guarantee.Value.SumInsuredLimitOfIndemnity * taxFloat / 12)
-	} else {
-		guarantee.Value.PremiumNetYearly = lib.RoundFloatTwoDecimals(guarantee.Value.SumInsuredLimitOfIndemnity * baseFloat * 12)
-		guarantee.Value.PremiumGrossYearly = lib.RoundFloatTwoDecimals(guarantee.Value.SumInsuredLimitOfIndemnity * taxFloat * 12)
-
-		guarantee.Value.PremiumNetMonthly = lib.RoundFloatTwoDecimals(guarantee.Value.SumInsuredLimitOfIndemnity * baseFloat)
-		guarantee.Value.PremiumGrossMonthly = lib.RoundFloatTwoDecimals(guarantee.Value.SumInsuredLimitOfIndemnity * taxFloat)
-	}
-
-	guarantee.Value.PremiumTaxAmountYearly = lib.RoundFloatTwoDecimals(guarantee.Value.PremiumGrossYearly - guarantee.Value.PremiumNetYearly)
-	guarantee.Value.PremiumTaxAmountMonthly = lib.RoundFloatTwoDecimals(guarantee.Value.PremiumGrossMonthly - guarantee.Value.PremiumNetMonthly)
-}
-
-func getMultipliers(selectRow []string, offset int, base int, baseTax int) (float64, float64) {
-	baseFloat, _ := strconv.ParseFloat(strings.Replace(strings.Replace(selectRow[base+offset], "%", "", 1), ",", ".", 1), 64)
-	taxFloat, _ := strconv.ParseFloat(strings.Replace(strings.Replace(selectRow[baseTax+offset], "%", "", 1), ",", ".", 1), 64)
-	baseFloat = baseFloat / 100
-	taxFloat = taxFloat / 100
-	return baseFloat, taxFloat
 }
 
 func getMultipliersIndex(guaranteeSlug string) (int, int) {
@@ -259,30 +207,61 @@ func getOffset(duration int) int {
 	return offset
 }
 
-func extractGuarantee(guarantees []models.Guarante, guaranteeSlug string) (models.Guarante, error) {
-	for _, guarantee := range guarantees {
-		if guarantee.Slug == guaranteeSlug {
-			return guarantee, nil
-		}
-	}
-	return models.Guarante{}, fmt.Errorf("%s guarantee not found", guaranteeSlug)
+func getMultipliers(selectRow []string, offset int, base int, baseTax int) (float64, float64) {
+	baseFloat, _ := strconv.ParseFloat(strings.Replace(strings.Replace(selectRow[base+offset], "%", "", 1), ",", ".", 1), 64)
+	taxFloat, _ := strconv.ParseFloat(strings.Replace(strings.Replace(selectRow[baseTax+offset], "%", "", 1), ",", ".", 1), 64)
+	baseFloat = baseFloat / 100
+	taxFloat = taxFloat / 100
+	return baseFloat, taxFloat
 }
 
-func calculateSumInsuredLimitOfIndemnity(assets []models.Asset, deathSumInsuredLimitOfIndemnity float64) {
-	for _, asset := range assets {
-		for _, guarantee := range asset.Guarantees {
-			switch guarantee.Slug {
-			case "permanent-disability":
-				guarantee.Value.SumInsuredLimitOfIndemnity = deathSumInsuredLimitOfIndemnity
-			case "temporary-disability":
-				guarantee.Value.SumInsuredLimitOfIndemnity = (deathSumInsuredLimitOfIndemnity / 100) * 1
-			case "serious-ill":
-				if deathSumInsuredLimitOfIndemnity > 100000 {
-					guarantee.Value.SumInsuredLimitOfIndemnity = 10000
-				} else {
-					guarantee.Value.SumInsuredLimitOfIndemnity = 5000
-				}
-			}
+func calculateGuaranteePrices(guarantee models.Guarante, baseFloat, taxFloat float64, product models.Product) {
+	if guarantee.Slug != "temporary-disability" {
+		guarantee.Value.PremiumNetYearly = lib.RoundFloat(guarantee.Value.SumInsuredLimitOfIndemnity*baseFloat, 2)
+		guarantee.Value.PremiumGrossYearly = lib.RoundFloat(guarantee.Value.SumInsuredLimitOfIndemnity*taxFloat, 2)
+
+		guarantee.Value.PremiumNetMonthly = lib.RoundFloat(guarantee.Value.SumInsuredLimitOfIndemnity*baseFloat/12, 2)
+		guarantee.Value.PremiumGrossMonthly = lib.RoundFloat(guarantee.Value.SumInsuredLimitOfIndemnity*taxFloat/12, 2)
+	} else {
+		guarantee.Value.PremiumNetYearly = lib.RoundFloat(guarantee.Value.SumInsuredLimitOfIndemnity*baseFloat*12, 2)
+		guarantee.Value.PremiumGrossYearly = lib.RoundFloat(guarantee.Value.SumInsuredLimitOfIndemnity*taxFloat*12, 2)
+
+		guarantee.Value.PremiumNetMonthly = lib.RoundFloat(guarantee.Value.SumInsuredLimitOfIndemnity*baseFloat, 2)
+		guarantee.Value.PremiumGrossMonthly = lib.RoundFloat(guarantee.Value.SumInsuredLimitOfIndemnity*taxFloat, 2)
+	}
+
+	hasNotMinimumYearlyPrice := guarantee.Value.PremiumGrossYearly < product.Companies[0].GuaranteesMap[guarantee.Slug].Config.MinimumGrossYearly
+	if hasNotMinimumYearlyPrice {
+		guarantee.Value.PremiumGrossYearly = 10
+		if guarantee.Slug == "death" {
+			guarantee.Value.PremiumNetYearly = 10
+		} else {
+			guarantee.Value.PremiumNetYearly = lib.RoundFloat(guarantee.Value.PremiumGrossYearly/(1+(2.5/100)), 2)
+		}
+
+		guarantee.Value.PremiumGrossMonthly = lib.RoundFloat(guarantee.Value.PremiumGrossYearly/12, 2)
+		guarantee.Value.PremiumNetMonthly = lib.RoundFloat(guarantee.Value.PremiumNetYearly/12, 2)
+	}
+
+	guarantee.Value.PremiumTaxAmountYearly = lib.RoundFloat(guarantee.Value.PremiumGrossYearly-guarantee.Value.PremiumNetYearly, 2)
+	guarantee.Value.PremiumTaxAmountMonthly = lib.RoundFloat(guarantee.Value.PremiumGrossMonthly-guarantee.Value.PremiumNetMonthly, 2)
+}
+
+func calculateOfferPrices(data models.Policy, guarantee models.Guarante) {
+	data.OffersPrices["default"]["yearly"].Gross += guarantee.Value.PremiumGrossYearly
+	data.OffersPrices["default"]["yearly"].Net += guarantee.Value.PremiumNetYearly
+	data.OffersPrices["default"]["yearly"].Tax += guarantee.Value.PremiumGrossYearly - guarantee.Value.PremiumNetYearly
+	data.OffersPrices["default"]["monthly"].Gross += guarantee.Value.PremiumGrossMonthly
+	data.OffersPrices["default"]["monthly"].Net += guarantee.Value.PremiumNetMonthly
+	data.OffersPrices["default"]["monthly"].Tax += guarantee.Value.PremiumGrossMonthly - guarantee.Value.PremiumNetMonthly
+}
+
+func roundOfferPrices(offersPrices map[string]map[string]*models.Price) {
+	for offerKey, offerValue := range offersPrices {
+		for paymentKey, _ := range offerValue {
+			offersPrices[offerKey][paymentKey].Net = lib.RoundFloat(offersPrices[offerKey][paymentKey].Net, 2)
+			offersPrices[offerKey][paymentKey].Tax = lib.RoundFloat(offersPrices[offerKey][paymentKey].Tax, 2)
+			offersPrices[offerKey][paymentKey].Gross = lib.RoundFloat(offersPrices[offerKey][paymentKey].Gross, 2)
 		}
 	}
 }

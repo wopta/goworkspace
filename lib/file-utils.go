@@ -64,12 +64,13 @@ func ReadDir() {
 func GetFromStorage(bucket string, file string, keyPath string) []byte {
 	//var credential models.Credential
 	log.Println("start GetFromStorage")
+	log.Println("File: " + file)
 	ctx := context.Background()
 	client, err := storage.NewClient(ctx)
 	CheckError(err)
 	rc, err := client.Bucket(bucket).Object(file).NewReader(ctx)
 	CheckError(err)
-	slurp, err := ioutil.ReadAll(rc)
+	slurp, err := io.ReadAll(rc)
 	rc.Close()
 	CheckError(err)
 	return slurp

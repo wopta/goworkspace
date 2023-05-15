@@ -2,8 +2,10 @@ package companydata
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	lib "github.com/wopta/goworkspace/lib"
@@ -11,17 +13,33 @@ import (
 )
 
 func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	config := lib.SftpConfig{
+	var (
+		result                                    [][]string
+		enterpriseName                            string
+		employer, class, sector, atecoDesc, ateco string
+		revenue                                   int
+		//err                                       error
+	)
+	/**config := lib.SftpConfig{
 		Username:     os.Getenv("GLOBAL_SFTP_USER"),
 		Password:     os.Getenv("GLOBAL_SFTP_PSW"), // required only if password authentication is to be used
 		PrivateKey:   "",                           // required only if private key authentication is to be used
 		Server:       "ftps.globalassistance.it:222",
 		KeyExchanges: []string{"diffie-hellman-group-exchange-sha1", "diffie-hellman-group1-sha1", "diffie-hellman-group14-sha1"}, // optional
 		Timeout:      time.Second * 30,                                                                                            // 0 for not timeout
-	}
-	client, e := lib.NewSftpclient(config)
-	reader, e := client.Download("wopta/")
-	lib.ExcelRead(reader)
+	}**/
+	layout := "02/01/2006"
+	layoutFilename := "20060102"
+	//client, e := lib.NewSftpclient(config)
+	now := time.Now().AddDate(0, 0, -1)
+	filename := now.Format(layoutFilename) + "_EM_PMIW.xlsx"
+	//println(config)
+	println("filename: ", filename)
+	//reader, e := client.Download("wopta/" + filename)
+	//buf := new(bytes.Buffer)
+	//buf.ReadFrom(reader)
+	//lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/global/emit/"+filename, []byte(buf.String()))
+	//lib.ExcelRead(reader)
 	q := lib.Firequeries{
 		Queries: []lib.Firequery{{
 			Field:      "companyEmit",
@@ -33,37 +51,35 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 				Operator:   "==",
 				QueryValue: false,
 			},
+			{
+				Field:      "company", //
+				Operator:   "==",      //
+				QueryValue: "global",
+			},
+			{
+				Field:      "name", //
+				Operator:   "==",   //
+				QueryValue: "pmi",
+			},
 		},
 	}
 	query, e := q.FirestoreWherefields("policy")
 	policies := models.PolicyToListData(query)
-
+	log.Println("len(policies):", len(policies))
 	for _, policy := range policies {
-		var (
-			result [][]string
-			//enterpriseName string
-			//employer       string
-			//revenue        string
-		)
 
-		//startDate := lib.Dateformat(policy.StartDate)
-		//endDate := lib.Dateformat(policy.EndDate)
-		//crationDate := lib.Dateformat(policy.CreationDate)
-		//companyCode := policy.CodeCompany
-		//cityCode := policy.Contractor.CityCode
-		//city := policy.Contractor.City
-		//streetNumber := policy.Contractor.StreetNumber
-		//postalCode := policy.Contractor.PostalCode
-		pi := policy.Contractor.VatCode
-		fc := policy.Contractor.FiscalCode
 		for _, asset := range policy.Assets {
 			if asset.Building != nil {
 
 			}
 			if asset.Enterprise != nil {
-				//enterpriseName = asset.Enterprise.Name
-				//employer = fmt.Sprint(asset.Enterprise.Employer)
-				//revenue = fmt.Sprint(asset.Enterprise.Revenue)
+				enterpriseName = asset.Enterprise.Name
+				employer = fmt.Sprint(asset.Enterprise.Employer)
+				revenue, _ = strconv.Atoi(asset.Enterprise.Revenue)
+				//atecoMacro = asset.Enterprise.AtecoMacro
+				//atecoSub = asset.Enterprise.AtecoSub
+				atecoDesc = asset.Enterprise.AtecoDesc
+				ateco = asset.Enterprise.Ateco
 			}
 		}
 		for _, asset := range policy.Assets {
@@ -73,11 +89,86 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 					fmt.Println(g)
 					//row := []string{"TIPO OPERAZIONE", "N. POLIZZA SOSTITUITA", "DENOMINAZIONE PRODOTTO", "NODO DI GESTIONE", "DATA EMISSIONE", "DATA EFFETTO", "PARTITA IVA CONTRAENTE", "CODICE FISCALE CONTRAENTE", "NATURA GIURIDICA CONTRAENTE", "RAGIONE SOCIALE CONTRAENTE", "PROVINCIA CONTRAENTE", "COMUNE CONTRAENTE", "CAP CONTRAENTE", "TOPONIMO CONTRAENTE", "INDIRIZZO CONTRAENTE", "NUMERO CIVICO CONTRAENTE", "DATA SCADENZA", "FRAZIONAMENTO", "VINCOLO", "NUMERO ADDETTI", "COSA SI VUOLE ASSICURARE", "DOMANDA 1", "DOMANDA 2", "DOMANDA 3", "FATTURATO", "FORMA DI COPERTURA", "FORMULA INCENDIO", "BENE", "ANNO DI COSTRUZIONE FABBRICATO", "MATERIALE COSTRUZIONE", "NUMERO PIANI", "PRESENZA ALLARME", "PRESENZA POLIZZA CONDOMINIALE", "TIPOLOGIA FABBRICATO", "PROVINCIA UBICAZIONE", "COMUNE UBICAZIONE", "CAP UBICAZIONE", "TOPONIMO UBICAZIONE", "INDIRIZZO UBICAZIONE", "NUMERO CIVICO UBICAZIONE", "CODICE ATTIVITA' - BENI", "CLASSE - SOLO BENI", "SETTORE - BENI", "TIPO - BENI", "CLAUSOLA VINCOLO", "TESTO CLAUSOLA VINCOLO", "GARANZIE/PACCHETTI - BENI", "FRANCHIGIA - BENI", "SOMMA ASSICURATA - BENI", "SCOPERTO - BENI", "% SOMMA ASSICURATA INCENDIO FABBRICATO E CONTENUTO - BENI", "MASSIMALE - BENI", "DIARIA - BENI", "CODICE ATTIVITA' - ATTIVITA'", "CLASSE - ATTIVITA'", "SETTORE - ATTIVITA'", "TIPO - ATTIVITA'", "GARANZIE/PACCHETTI - ATTIVITA'", "FRANCHIGIA - ATTIVITA'", "SCOPERTO - ATTIVITA'", "MASSIMALE - ATTIVITA'", "MASSIMALE PER EVENTO - ATTIVITA'", "PREMIO ANNUO LORDO DI GARANZIA", "SCONTO %", "RATA ALLA FIRMA", "RATA SUCCESSIVA", "DATA SCADENZA I RATA", "NUMERO POLIZZA"}
 					row := []string{
-						"Nuova emissione", "", "WOPTA PER TE. ARTIGIANI & IMPRESE", "0920", "crationDate", "startDate", pi, fc, "", "RAGIONE SOCIALE CONTRAENTE", "PROVINCIA CONTRAENTE", "COMUNE CONTRAENTE", "CAP CONTRAENTE", "TOPONIMO CONTRAENTE", "INDIRIZZO CONTRAENTE", "NUMERO CIVICO CONTRAENTE", "DATA SCADENZA", "FRAZIONAMENTO", "VINCOLO", "NUMERO ADDETTI", "COSA SI VUOLE ASSICURARE", "DOMANDA 1", "DOMANDA 2", "DOMANDA 3", "FATTURATO", "FORMA DI COPERTURA", "FORMULA INCENDIO", "BENE",
-						"ANNO DI COSTRUZIONE FABBRICATO", "MATERIALE COSTRUZIONE", "NUMERO PIANI", "PRESENZA ALLARME", "PRESENZA POLIZZA CONDOMINIALE", "TIPOLOGIA FABBRICATO", "PROVINCIA UBICAZIONE", "COMUNE UBICAZIONE", "CAP UBICAZIONE", "TOPONIMO UBICAZIONE", "INDIRIZZO UBICAZIONE", "NUMERO CIVICO UBICAZIONE", "CODICE ATTIVITA' - BENI", "CLASSE - SOLO BENI", "SETTORE - BENI", "TIPO - BENI", "CLAUSOLA VINCOLO", "TESTO CLAUSOLA VINCOLO", "GARANZIE/PACCHETTI - BENI", "FRANCHIGIA - BENI", "SOMMA ASSICURATA - BENI", "SCOPERTO - BENI", "% SOMMA ASSICURATA INCENDIO FABBRICATO E CONTENUTO - BENI", "MASSIMALE - BENI", "DIARIA - BENI",
-						"CODICE ATTIVITA' - ATTIVITA'", "CLASSE - ATTIVITA'", "SETTORE - ATTIVITA'", "TIPO - ATTIVITA'", "GARANZIE/PACCHETTI - ATTIVITA'", "FRANCHIGIA - ATTIVITA'", "SCOPERTO - ATTIVITA'", "MASSIMALE - ATTIVITA'", "MASSIMALE PER EVENTO - ATTIVITA'",
-						"PREMIO ANNUO LORDO DI GARANZIA", "SCONTO %", "RATA ALLA FIRMA", "RATA SUCCESSIVA", "DATA SCADENZA I RATA", "NUMERO POLIZZA"}
+						"Nuova emissione",                   //TIPO OPERAZIONE
+						"",                                  //N. POLIZZA SOSTITUITA
+						"WOPTA PER TE. ARTIGIANI & IMPRESE", //DENOMINAZIONE PRODOTTO
+						"0920",                              //NODO DI GESTIONE
+						policy.CreationDate.Format(layout),  //DATA EMISSIONE
+						policy.StartDate.Format(layout),     //DATA EFFETTO
+						policy.Contractor.VatCode,           //PARTITA IVA CONTRAENTE
+						policy.Contractor.FiscalCode,        //CODICE FISCALE CONTRAENTE
+						"",                                  //NATURA GIURIDICA CONTRAENTE
+						enterpriseName,                      //RAGIONE SOCIALE CONTRAENTE
+						policy.Contractor.Name,              //COGNOME CONTRANTE
+						policy.Contractor.Surname,           //NOME CONTRANTE
+						policy.Contractor.City,              //PROVINCIA CONTRAENTE
+						policy.Contractor.Locality,          //COMUNE CONTRAENTE
+						policy.Contractor.CityCode,          //CAP CONTRAENTE
+						"",                                  //TOPONIMO CONTRAENTE
+						policy.Contractor.Address,           //INDIRIZZO CONTRAENTE
+						policy.Contractor.StreetNumber,      //NUMERO CIVICO CONTRAENTE
+						policy.EndDate.Format(layout),       //DATA SCADENZA
+						getMapSplit(policy.PaymentSplit),    //FRAZIONAMENTO
+						"NO",                                //VINCOLO
+						"",                                  //CONVENZIONE
+						"Diretto online",                    //CANALE
+						"",                                  //DEROGA
+						employer,                            //NUMERO ADDETTI
+						"3",                                 //COSA SI VUOLE ASSICURARE
+						"1",                                 //DOMANDA 1
+						"1",                                 //DOMANDA 2
+						"1",                                 //DOMANDA 3
+						getMapRevenue(revenue),              //FATTURATO
+						"",                                  //FORMA DI COPERTURA ------------------------------------------bENI
+						"",                                  //FORMULA INCENDIO
+						"",                                  //BENE -----------------------------------------------------BENI 1 FABBRICATO
+						getMapBuildingYear(asset.Building.BuildingYear),         //ANNO DI COSTRUZIONE FABBRICATO
+						getMapBuildingMaterial(asset.Building.BuildingMaterial), //MATERIALE COSTRUZIONE
+						getMapBuildingFloor(asset.Building.Floor),               //NUMERO PIANI
+						getYesNo(asset.Building.IsAllarm),                       //PRESENZA ALLARME
+						"",                                                      //PRESENZA POLIZZA CONDOMINIALE
+						getOneTwo(asset.Building.IsHolder),                      //TIPOLOGIA FABBRICATO
+						asset.Building.CityCode,                                 //PROVINCIA UBICAZIONE
+						asset.Building.Locality,                                 //COMUNE UBICAZIONE
+						asset.Building.PostalCode,                               //CAP UBICAZIONE
+						"",                                                      //TOPONIMO UBICAZIONE
+						asset.Building.Address,                                  //INDIRIZZO UBICAZIONE
+						asset.Building.StreetNumber,                             //NUMERO CIVICO UBICAZIONE
+						ateco,                                                   //CODICE ATTIVITA' – BENI
+						class,                                                   //CLASSE - SOLO BENI
+						sector,                                                  //SETTORE – BENI
+						atecoDesc,                                               //TIPO – BENI
+						"",                                                      //CLAUSOLA VINCOLO
+						"",                                                      //TESTO CLAUSOLA VINCOLO
+						g.CompanyCodec,                                          //GARANZIE/PACCHETTI – BENI
+						"",                                                      //ESTENSIONE RC DM 37/2008
+						"",                                                      //CLAUSOLA BENI - BENE
+						"",                                                      //CLAUSOLA BENI - GARANZIE
+						g.Deductible,                                            //FRANCHIGIA – BENI
+						strconv.Itoa(int(g.SumInsuredLimitOfIndemnity)), //SOMMA ASSICURATA – BENI
 
+						getMapSelfInsurance(g.SelfInsuranceDesc), //SCOPERTO – BENI
+						"",                                       //% SOMMA ASSICURATA INCENDIO FABBRICATO E CONTENUTO – BENI
+						strconv.Itoa(int(g.SumInsuredLimitOfIndemnity)), //MASSIMALE - BENI
+						"",                 //DIARIA – BENI
+						"",                 //CODICE ATTIVITA' - ATTIVITA' -------------------------------------------------ATTIVITA 2 ATTIVITA
+						"",                 //CLASSE - ATTIVITA'
+						"",                 //SETTORE - ATTIVITA'
+						"",                 //TIPO - ATTIVITA'
+						"",                 //GARANZIE/PACCHETTI - ATTIVITA'
+						"",                 //CLAUSOLA ATTIVITA' - BENE
+						"",                 //CLAUSOLA ATTIVITA' - GARANZIE
+						"",                 //FRANCHIGIA - ATTIVITA'
+						"",                 //SCOPERTO - ATTIVITA'
+						"",                 //MASSIMALE - ATTIVITA'
+						"",                 //MASSIMALE PER EVENTO - ATTIVITA'
+						"",                 //PREMIO ANNUO LORDO DI GARANZIA
+						"0",                //SCONTO %
+						"",                 //RATA ALLA FIRMA
+						"",                 //RATA SUCCESSIVA
+						"",                 //DATA SCADENZA I RATA
+						policy.CodeCompany, //NUMERO POLIZZA
+					}
 					result = append(result, row)
 
 				}
@@ -88,10 +179,86 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 					fmt.Println(g)
 					//TIPO OPERAZIONE	N. POLIZZA SOSTITUITA	DENOMINAZIONE PRODOTTO	NODO DI GESTIONE	DATA EMISSIONE	DATA EFFETTO	PARTITA IVA CONTRAENTE	CODICE FISCALE CONTRAENTE	NATURA GIURIDICA CONTRAENTE	RAGIONE SOCIALE CONTRAENTE	PROVINCIA CONTRAENTE	COMUNE CONTRAENTE	CAP CONTRAENTE	TOPONIMO CONTRAENTE	INDIRIZZO CONTRAENTE	NUMERO CIVICO CONTRAENTE	DATA SCADENZA	FRAZIONAMENTO	VINCOLO	NUMERO ADDETTI	COSA SI VUOLE ASSICURARE	DOMANDA 1	DOMANDA 2	DOMANDA 3	FATTURATO	FORMA DI COPERTURA	FORMULA INCENDIO	BENE	ANNO DI COSTRUZIONE FABBRICATO	MATERIALE COSTRUZIONE	NUMERO PIANI	PRESENZA ALLARME	PRESENZA POLIZZA CONDOMINIALE	TIPOLOGIA FABBRICATO	PROVINCIA UBICAZIONE	COMUNE UBICAZIONE	CAP UBICAZIONE	TOPONIMO UBICAZIONE	INDIRIZZO UBICAZIONE	NUMERO CIVICO UBICAZIONE	CODICE ATTIVITA' - BENI	CLASSE - SOLO BENI	SETTORE - BENI	TIPO - BENI	CLAUSOLA VINCOLO	TESTO CLAUSOLA VINCOLO	GARANZIE/PACCHETTI - BENI	FRANCHIGIA - BENI	SOMMA ASSICURATA - BENI	SCOPERTO - BENI	% SOMMA ASSICURATA INCENDIO FABBRICATO E CONTENUTO - BENI	MASSIMALE - BENI	DIARIA - BENI	CODICE ATTIVITA' - ATTIVITA'	CLASSE - ATTIVITA'	SETTORE - ATTIVITA'	TIPO - ATTIVITA'	GARANZIE/PACCHETTI - ATTIVITA'	FRANCHIGIA - ATTIVITA'	SCOPERTO - ATTIVITA'	MASSIMALE - ATTIVITA'	MASSIMALE PER EVENTO - ATTIVITA'	PREMIO ANNUO LORDO DI GARANZIA	SCONTO %	RATA ALLA FIRMA	RATA SUCCESSIVA	DATA SCADENZA I RATA	NUMERO POLIZZA
 					//row := []string{"TIPO OPERAZIONE", "N. POLIZZA SOSTITUITA", "DENOMINAZIONE PRODOTTO", "NODO DI GESTIONE", "DATA EMISSIONE", "DATA EFFETTO", "PARTITA IVA CONTRAENTE", "CODICE FISCALE CONTRAENTE", "NATURA GIURIDICA CONTRAENTE", "RAGIONE SOCIALE CONTRAENTE", "PROVINCIA CONTRAENTE", "COMUNE CONTRAENTE", "CAP CONTRAENTE", "TOPONIMO CONTRAENTE", "INDIRIZZO CONTRAENTE", "NUMERO CIVICO CONTRAENTE", "DATA SCADENZA", "FRAZIONAMENTO", "VINCOLO", "NUMERO ADDETTI", "COSA SI VUOLE ASSICURARE", "DOMANDA 1", "DOMANDA 2", "DOMANDA 3", "FATTURATO", "FORMA DI COPERTURA", "FORMULA INCENDIO", "BENE", "ANNO DI COSTRUZIONE FABBRICATO", "MATERIALE COSTRUZIONE", "NUMERO PIANI", "PRESENZA ALLARME", "PRESENZA POLIZZA CONDOMINIALE", "TIPOLOGIA FABBRICATO", "PROVINCIA UBICAZIONE", "COMUNE UBICAZIONE", "CAP UBICAZIONE", "TOPONIMO UBICAZIONE", "INDIRIZZO UBICAZIONE", "NUMERO CIVICO UBICAZIONE", "CODICE ATTIVITA' - BENI", "CLASSE - SOLO BENI", "SETTORE - BENI", "TIPO - BENI", "CLAUSOLA VINCOLO", "TESTO CLAUSOLA VINCOLO", "GARANZIE/PACCHETTI - BENI", "FRANCHIGIA - BENI", "SOMMA ASSICURATA - BENI", "SCOPERTO - BENI", "% SOMMA ASSICURATA INCENDIO FABBRICATO E CONTENUTO - BENI", "MASSIMALE - BENI", "DIARIA - BENI", "CODICE ATTIVITA' - ATTIVITA'", "CLASSE - ATTIVITA'", "SETTORE - ATTIVITA'", "TIPO - ATTIVITA'", "GARANZIE/PACCHETTI - ATTIVITA'", "FRANCHIGIA - ATTIVITA'", "SCOPERTO - ATTIVITA'", "MASSIMALE - ATTIVITA'", "MASSIMALE PER EVENTO - ATTIVITA'", "PREMIO ANNUO LORDO DI GARANZIA", "SCONTO %", "RATA ALLA FIRMA", "RATA SUCCESSIVA", "DATA SCADENZA I RATA", "NUMERO POLIZZA"}
-					row := []string{"Nuova emissione", "", "WOPTA PER TE. ARTIGIANI & IMPRESE", "0920", "crationDate", "startDate", pi, fc, "", "RAGIONE SOCIALE CONTRAENTE", "PROVINCIA CONTRAENTE", "COMUNE CONTRAENTE", "CAP CONTRAENTE", "TOPONIMO CONTRAENTE", "INDIRIZZO CONTRAENTE", "NUMERO CIVICO CONTRAENTE", "DATA SCADENZA", "FRAZIONAMENTO", "VINCOLO", "NUMERO ADDETTI", "COSA SI VUOLE ASSICURARE", "DOMANDA 1", "DOMANDA 2", "DOMANDA 3", "FATTURATO", "FORMA DI COPERTURA", "FORMULA INCENDIO", "BENE",
-						"ANNO DI COSTRUZIONE FABBRICATO", "MATERIALE COSTRUZIONE", "NUMERO PIANI", "PRESENZA ALLARME", "PRESENZA POLIZZA CONDOMINIALE", "TIPOLOGIA FABBRICATO", "PROVINCIA UBICAZIONE", "COMUNE UBICAZIONE", "CAP UBICAZIONE", "TOPONIMO UBICAZIONE", "INDIRIZZO UBICAZIONE", "NUMERO CIVICO UBICAZIONE", "CODICE ATTIVITA' - BENI", "CLASSE - SOLO BENI", "SETTORE - BENI", "TIPO - BENI", "CLAUSOLA VINCOLO", "TESTO CLAUSOLA VINCOLO", "GARANZIE/PACCHETTI - BENI", "FRANCHIGIA - BENI", "SOMMA ASSICURATA - BENI", "SCOPERTO - BENI", "% SOMMA ASSICURATA INCENDIO FABBRICATO E CONTENUTO - BENI", "MASSIMALE - BENI", "DIARIA - BENI",
-						"CODICE ATTIVITA' - ATTIVITA'", "CLASSE - ATTIVITA'", "SETTORE - ATTIVITA'", "TIPO - ATTIVITA'", "GARANZIE/PACCHETTI - ATTIVITA'", "FRANCHIGIA - ATTIVITA'", "SCOPERTO - ATTIVITA'", "MASSIMALE - ATTIVITA'", "MASSIMALE PER EVENTO - ATTIVITA'",
-						"PREMIO ANNUO LORDO DI GARANZIA", "SCONTO %", "RATA ALLA FIRMA", "RATA SUCCESSIVA", "DATA SCADENZA I RATA", "NUMERO POLIZZA"}
+					row := []string{
+						"Nuova emissione",                        //TIPO OPERAZIONE
+						"",                                       //N. POLIZZA SOSTITUITA
+						"WOPTA PER TE. ARTIGIANI & IMPRESE",      //DENOMINAZIONE PRODOTTO
+						"0920",                                   //NODO DI GESTIONE
+						policy.CreationDate.Format(layout),       //DATA EMISSIONE
+						policy.StartDate.Format(layout),          //DATA EFFETTO
+						policy.Contractor.VatCode,                //PARTITA IVA CONTRAENTE
+						policy.Contractor.FiscalCode,             //CODICE FISCALE CONTRAENTE
+						"",                                       //NATURA GIURIDICA CONTRAENTE
+						enterpriseName,                           //RAGIONE SOCIALE CONTRAENTE
+						policy.Contractor.Name,                   //COGNOME CONTRANTE
+						policy.Contractor.Surname,                //NOME CONTRANTE
+						policy.Contractor.City,                   //PROVINCIA CONTRAENTE
+						policy.Contractor.Locality,               //COMUNE CONTRAENTE
+						policy.Contractor.CityCode,               //CAP CONTRAENTE
+						"",                                       //TOPONIMO CONTRAENTE
+						policy.Contractor.Address,                //INDIRIZZO CONTRAENTE
+						policy.Contractor.StreetNumber,           //NUMERO CIVICO CONTRAENTE
+						policy.EndDate.Format(layout),            //DATA SCADENZA
+						getMapSplit(policy.PaymentSplit),         //FRAZIONAMENTO
+						"NO",                                     //VINCOLO
+						"",                                       //CONVENZIONE
+						"Diretto online",                         //CANALE
+						"",                                       //DEROGA
+						employer,                                 //NUMERO ADDETTI
+						"3",                                      //COSA SI VUOLE ASSICURARE
+						"1",                                      //DOMANDA 1
+						"1",                                      //DOMANDA 2
+						"1",                                      //DOMANDA 3
+						getMapRevenue(revenue),                   //FATTURATO
+						"",                                       //FORMA DI COPERTURA ------------------------------------------bENI
+						"",                                       //FORMULA INCENDIO
+						"",                                       //BENE -----------------------------------------------------BENI 1 FABBRICATO
+						"",                                       //ANNO DI COSTRUZIONE FABBRICATO
+						"",                                       //MATERIALE COSTRUZIONE
+						"",                                       //NUMERO PIANI
+						"",                                       //PRESENZA ALLARME
+						"",                                       //PRESENZA POLIZZA CONDOMINIALE
+						"",                                       //TIPOLOGIA FABBRICATO
+						"",                                       //PROVINCIA UBICAZIONE
+						"",                                       //COMUNE UBICAZIONE
+						"",                                       //CAP UBICAZIONE
+						"",                                       //TOPONIMO UBICAZIONE
+						"",                                       //INDIRIZZO UBICAZIONE
+						"",                                       //NUMERO CIVICO UBICAZIONE
+						"",                                       //CODICE ATTIVITA' – BENI
+						"",                                       //CLASSE - SOLO BENI
+						"",                                       //SETTORE – BENI
+						"",                                       //TIPO – BENI
+						"",                                       //CLAUSOLA VINCOLO
+						"",                                       //TESTO CLAUSOLA VINCOLO
+						"",                                       //GARANZIE/PACCHETTI – BENI
+						"",                                       //ESTENSIONE RC DM 37/2008
+						"",                                       //CLAUSOLA BENI - BENE
+						"",                                       //CLAUSOLA BENI - GARANZIE
+						"",                                       //FRANCHIGIA – BENI
+						"",                                       //SOMMA ASSICURATA – BENI
+						"",                                       //SCOPERTO – BENI
+						"",                                       //% SOMMA ASSICURATA INCENDIO FABBRICATO E CONTENUTO – BENI
+						"",                                       //MASSIMALE - BENI
+						"",                                       //DIARIA – BENI
+						"",                                       //CODICE ATTIVITA' - ATTIVITA' -------------------------------------------------ATTIVITA 2 ATTIVITA
+						"",                                       //CLASSE - ATTIVITA'
+						"",                                       //SETTORE - ATTIVITA'
+						"",                                       //TIPO - ATTIVITA'
+						g.CompanyCodec,                           //GARANZIE/PACCHETTI - ATTIVITA'
+						"",                                       //CLAUSOLA ATTIVITA' - BENE
+						"",                                       //CLAUSOLA ATTIVITA' - GARANZIE
+						g.Deductible,                             //FRANCHIGIA - ATTIVITA'
+						getMapSelfInsurance(g.SelfInsuranceDesc), //SCOPERTO - ATTIVITA'
+						strconv.Itoa(int(g.SumInsuredLimitOfIndemnity)), //MASSIMALE - ATTIVITA'
+						"",                                //MASSIMALE PER EVENTO - ATTIVITA'
+						fmt.Sprintf("%.2f", g.PriceGross), //PREMIO ANNUO LORDO DI GARANZIA
+						"0",                               //SCONTO %
+						fmt.Sprintf("%.2f", getInstallament(policy.PaymentSplit, g.PriceGross)), //RATA ALLA FIRMA
+						fmt.Sprintf("%.2f", getInstallament(policy.PaymentSplit, g.PriceGross)), //RATA SUCCESSIVA
+						getInstallamentDate(policy, layout),                                     //DATA SCADENZA I RATA
+						policy.CodeCompany,                                                      //NUMERO POLIZZA
+					}
 
 					result = append(result, row)
 
@@ -101,12 +268,51 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 
 		}
 
+		if e == nil {
+			policy.CompanyEmitted = true
+			//lib.SetFirestore("policy", policy.Agent.Uid, policy)
+		}
 	}
+	log.Println("len(result):", len(result))
+	filepath := filename
+	excel, e := lib.CreateExcel(result, "../tmp/"+filepath, "Risultato")
+	//source, _ := ioutil.ReadFile("../tmp/" + filepath)
+
+	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/global/pmi/emit/0_"+filepath, <-excel)
+	//lib.PutGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/global/pmi/emit/"+filepath, source, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
 	return "", nil, e
+}
+
+func getInstallamentDate(p models.Policy, layout string) string {
+	var res string
+	res = p.EndDate.Format(layout)
+	if p.PaymentSplit == "monthly" {
+		res = p.StartDate.AddDate(0, 1, 0).Format(layout)
+	}
+
+	return res
+}
+func getInstallament(key string, price float64) float64 {
+	var res float64
+	res = price
+	if key == "monthly" {
+		res = price / 12
+	}
+	return res
 }
 func getYesNo(key bool) string {
 	var res string
 	mapGarante := map[bool]string{true: "SI", false: "NO"}
+
+	if seconds, ok := mapGarante[key]; ok { // will be false if person is not in the map
+		res = seconds
+	}
+	return res
+}
+func getOneTwo(key bool) string {
+	var res string
+	mapGarante := map[bool]string{true: "1", false: "2"}
 
 	if seconds, ok := mapGarante[key]; ok { // will be false if person is not in the map
 		res = seconds
@@ -140,7 +346,23 @@ func getMapBuildingMaterial(key string) string {
 	}
 	return res
 }
-func getMapRevenue(key int) int {
+func getMapSplit(key string) string {
+	var res string
+	res = "1"
+	if key == "monthly" {
+		res = "12"
+	}
+	return res
+}
+func getBuildingType(key string) string {
+	var res string
+	res = "1"
+	if key == "montly" {
+		res = "12"
+	}
+	return res
+}
+func getMapRevenue(key int) string {
 	var res int
 
 	if key <= 200000 { // will be false if person is not in the map
@@ -164,5 +386,53 @@ func getMapRevenue(key int) int {
 	if key > 7500000 && key <= 10000000 { // will be false if person is not in the map
 		res = 7
 	}
-	return res
+	return strconv.Itoa(res)
+}
+func getMapSelfInsurance(key string) string {
+	var res int
+
+	if key == "5% - minimo € 500" { // will be false if person is not in the map
+		res = 1
+	}
+	if key == "5% - minimo € 1.000" { // will be false if person is not in the map
+		res = 2
+	}
+	if key == "5% - minimo € 1.500" { // will be false if person is not in the map
+		res = 3
+	}
+	if key == "10% - minimo € 500" { // will be false if person is not in the map
+		res = 4
+	}
+	if key == "10% - minimo € 1.000" { // will be false if person is not in the map
+		res = 5
+	}
+	if key == "10% - minimo € 1.500" { // will be false if person is not in the map
+		res = 6
+	}
+	if key == "10% - minimo € 2.000" { // will be false if person is not in the map
+		res = 7
+	}
+	if key == "10% - minimo € 3.000" { // will be false if person is not in the map
+		res = 8
+	}
+	if key == "10% - minimo € 5.000" { // will be false if person is not in the map
+		res = 9
+	}
+	if key == "15% - minimo € 5.000" { // will be false if person is not in the map
+		res = 10
+	}
+	if key == "10% - minimo € 10.000" { // will be false if person is not in the map
+		res = 11
+	}
+	if key == "10% - minimo € 20.000" { // will be false if person is not in the map
+		res = 12
+	}
+	if key == "10% - minimo € 25.000" { // will be false if person is not in the map
+		res = 13
+	}
+	if key == "10% - minimo € 30.000" { // will be false if person is not in the map
+		res = 14
+	}
+
+	return strconv.Itoa(res)
 }

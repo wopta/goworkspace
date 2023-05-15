@@ -88,6 +88,8 @@ type Policy struct {
 	Data            string                       `bigquery:"data" firestore:"-"`
 	Json            string                       `bigquery:"json" firestore:"-"`
 	OffersPrices    map[string]map[string]*Price `firestore:"offersPrices,omitempty" json:"offersPrices,omitempty" bigquery:"-"`
+	PartnershipName string                       `json:"partnershipName" firestore:"partnershipName" bigquery:"-"`
+	PartnershipData map[string]interface{}       `json:"partnershipData" firestore:"partnershipData" bigquery:"-"`
 }
 
 type RenewHistory struct {
@@ -142,6 +144,15 @@ func (policy *Policy) CalculateContractorAge() (int, error) {
 		age--
 	}
 	return age, e
+}
+
+func (policy *Policy) HasGuarantee(guaranteeSlug string) bool {
+	for _, guarantee := range policy.Assets[0].Guarantees {
+		if guarantee.Slug == guaranteeSlug {
+			return true
+		}
+	}
+	return false
 }
 
 func (policy *Policy) ExtractGuarantee(guaranteeSlug string) (Guarante, error) {
