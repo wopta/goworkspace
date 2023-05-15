@@ -80,6 +80,8 @@ func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, inter
 		policy.Contractor = person
 		asset.Person = &person
 		policy.Assets = append(policy.Assets, asset)
+		policy.PartnershipName = models.PartnershipBeProf
+		policy.PartnershipData = claims.ToMap()
 
 		response.Policy = policy
 		response.Step = 1
@@ -162,6 +164,19 @@ type BeprofClaims struct {
 	ProductPurchaseid    string `json:"product.purchaseid"`
 	Price                string `json:"price"`
 	jwt.RegisteredClaims
+}
+
+func (bpc BeprofClaims) ToMap() map[string]interface{} {
+	m := make(map[string]interface{})
+
+	b, err := json.Marshal(bpc)
+	lib.CheckError(err)
+
+	err = json.Unmarshal(b, &m)
+	lib.CheckError(err)
+
+	return m
+
 }
 
 type PartnershipResponse struct {
