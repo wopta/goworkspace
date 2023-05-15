@@ -13,20 +13,20 @@ import (
 )
 
 func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	config := lib.SftpConfig{
+	/**config := lib.SftpConfig{
 		Username:     os.Getenv("GLOBAL_SFTP_USER"),
 		Password:     os.Getenv("GLOBAL_SFTP_PSW"), // required only if password authentication is to be used
 		PrivateKey:   "",                           // required only if private key authentication is to be used
 		Server:       "ftps.globalassistance.it:222",
 		KeyExchanges: []string{"diffie-hellman-group-exchange-sha1", "diffie-hellman-group1-sha1", "diffie-hellman-group14-sha1"}, // optional
 		Timeout:      time.Second * 30,                                                                                            // 0 for not timeout
-	}
+	}**/
 	layout := "10/06/2022"
 	layoutFilename := "20230512"
 	//client, e := lib.NewSftpclient(config)
 	now := time.Now().AddDate(0, 0, -1)
 	filename := now.Format(layoutFilename) + "_EM_PMIW.xlsx"
-	println(config)
+	//println(config)
 	println("filename: ", filename)
 	//reader, e := client.Download("wopta/" + filename)
 	//buf := new(bytes.Buffer)
