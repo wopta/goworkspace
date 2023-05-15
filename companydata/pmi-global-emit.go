@@ -26,7 +26,7 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 	//client, e := lib.NewSftpclient(config)
 	now := time.Now().AddDate(0, 0, -1)
 	filename := now.Format(layoutFilename) + "_EM_PMIW.xlsx"
-	println("config: ", config)
+	println(config)
 	println("filename: ", filename)
 	//reader, e := client.Download("wopta/" + filename)
 	//buf := new(bytes.Buffer)
