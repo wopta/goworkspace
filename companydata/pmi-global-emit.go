@@ -29,7 +29,7 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 		Timeout:      time.Second * 30,                                                                                            // 0 for not timeout
 	}**/
 	layout := "10/06/2022"
-	layoutFilename := "20220610"
+	layoutFilename := "20060102"
 	//client, e := lib.NewSftpclient(config)
 	now := time.Now().AddDate(0, 0, -1)
 	filename := now.Format(layoutFilename) + "_EM_PMIW.xlsx"
@@ -275,10 +275,10 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 	}
 	filepath := now.Format(layoutFilename) + filename
 	lib.WriteCsv("../tmp/"+filepath, result)
-	lib.CreateExcel(result, "../tmp/"+filepath, "Risultato")
+	excel, e := lib.CreateExcel(result, "../tmp/"+filepath, "Risultato")
 	source, _ := ioutil.ReadFile("../tmp/" + filepath)
 
-	//lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/global/pmi/emit/"+filepath, source)
+	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/global/pmi/emit/"+filepath, excel)
 	lib.PutGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/global/pmi/emit/"+filepath, source, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
 	return "", nil, e
