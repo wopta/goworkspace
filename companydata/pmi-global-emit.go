@@ -2,6 +2,7 @@ package companydata
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -64,7 +65,7 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 	}
 	query, e := q.FirestoreWherefields("uat_policy")
 	policies := models.PolicyToListData(query)
-
+	log.Println("len(policies):", len(policies))
 	for _, policy := range policies {
 
 		for _, asset := range policy.Assets {
@@ -272,6 +273,7 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 			//lib.SetFirestore("policy", policy.Agent.Uid, policy)
 		}
 	}
+	log.Println("len(result):", len(result))
 	filepath := filename
 	excel, e := lib.CreateExcel(result, "../tmp/"+filepath, "Risultato")
 	//source, _ := ioutil.ReadFile("../tmp/" + filepath)
