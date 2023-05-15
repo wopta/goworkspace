@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/dustin/go-humanize"
-	prd "github.com/wopta/goworkspace/product"
 	"github.com/wopta/goworkspace/sellable"
 	"io"
 	"modernc.org/mathutil"
@@ -85,7 +84,7 @@ func Life(data models.Policy) (models.Policy, error) {
 
 	}
 
-	filterByMinimumPrice(data.Assets, data.OffersPrices, originalPolicy)
+	updateGuaranteeByMinimumPrice(data.Assets, data.OffersPrices, originalPolicy, ruleProduct)
 
 	roundOfferPrices(data.OffersPrices)
 
@@ -143,30 +142,40 @@ func updatePolicyStartEndDate(policy *models.Policy) {
 func roundOfferPrices(offersPrices map[string]map[string]*models.Price) {
 	for offerKey, offerValue := range offersPrices {
 		for paymentKey, _ := range offerValue {
-			offersPrices[offerKey][paymentKey].Net = lib.RoundFloatTwoDecimals(offersPrices[offerKey][paymentKey].Net)
-			offersPrices[offerKey][paymentKey].Tax = lib.RoundFloatTwoDecimals(offersPrices[offerKey][paymentKey].Tax)
-			offersPrices[offerKey][paymentKey].Gross = lib.RoundFloatTwoDecimals(offersPrices[offerKey][paymentKey].Gross)
+			offersPrices[offerKey][paymentKey].Net = lib.RoundFloat(offersPrices[offerKey][paymentKey].Net, 2)
+			offersPrices[offerKey][paymentKey].Tax = lib.RoundFloat(offersPrices[offerKey][paymentKey].Tax, 2)
+			offersPrices[offerKey][paymentKey].Gross = lib.RoundFloat(offersPrices[offerKey][paymentKey].Gross, 2)
 		}
 	}
 }
 
-func filterByMinimumPrice(assets []models.Asset, offersPrices map[string]map[string]*models.Price, originalPolicy models.Policy) {
-	product, err := prd.GetProduct("life", "v1")
-	lib.CheckError(err)
-
+func updateGuaranteeByMinimumPrice(assets []models.Asset, offersPrices map[string]map[string]*models.Price, originalPolicy models.Policy, product models.Product) {
 	for assetIndex, asset := range assets {
 		for guaranteeIndex, guarantee := range asset.Guarantees {
-
 			hasNotMinimumYearlyPrice := guarantee.Value.PremiumGrossYearly < product.Companies[0].GuaranteesMap[guarantee.Slug].Config.MinimumGrossYearly
 			if hasNotMinimumYearlyPrice {
-				assets[assetIndex].Guarantees[guaranteeIndex].IsSellable = false
+				oldGuaranteeValue := *guarantee.Value
+				guaranteeValue := assets[assetIndex].Guarantees[guaranteeIndex]
+
+				guaranteeValue.Value.PremiumGrossYearly = 10
+				if guarantee.Slug == "death" {
+					guaranteeValue.Value.PremiumNetYearly = 10
+				} else {
+					guaranteeValue.Value.PremiumNetYearly = lib.RoundFloat(guaranteeValue.Value.PremiumGrossYearly/(1+(2.5/100)), 2)
+				}
+				guaranteeValue.Value.PremiumTaxAmountYearly = lib.RoundFloat(guaranteeValue.Value.PremiumGrossYearly-guaranteeValue.Value.PremiumNetYearly, 2)
+
+				guaranteeValue.Value.PremiumGrossMonthly = lib.RoundFloat(guaranteeValue.Value.PremiumGrossYearly/12, 2)
+				guaranteeValue.Value.PremiumNetMonthly = lib.RoundFloat(guaranteeValue.Value.PremiumNetYearly/12, 2)
+				guaranteeValue.Value.PremiumTaxAmountMonthly = lib.RoundFloat(guaranteeValue.Value.PremiumGrossMonthly-guaranteeValue.Value.PremiumGrossMonthly, 2)
+
 				if originalPolicy.HasGuarantee(guarantee.Slug) {
-					offersPrices["default"]["monthly"].Net -= guarantee.Value.PremiumNetMonthly
-					offersPrices["default"]["monthly"].Gross -= guarantee.Value.PremiumGrossMonthly
-					offersPrices["default"]["monthly"].Tax -= guarantee.Value.PremiumGrossMonthly - guarantee.Value.PremiumNetMonthly
-					offersPrices["default"]["yearly"].Net -= guarantee.Value.PremiumNetYearly
-					offersPrices["default"]["yearly"].Gross -= guarantee.Value.PremiumGrossYearly
-					offersPrices["default"]["yearly"].Tax -= guarantee.Value.PremiumGrossYearly - guarantee.Value.PremiumNetYearly
+					offersPrices["default"]["yearly"].Net += lib.RoundFloat(guaranteeValue.Value.PremiumNetYearly-oldGuaranteeValue.PremiumNetYearly, 2)
+					offersPrices["default"]["yearly"].Gross += lib.RoundFloat(guaranteeValue.Value.PremiumGrossYearly-oldGuaranteeValue.PremiumGrossYearly, 2)
+					offersPrices["default"]["yearly"].Tax += lib.RoundFloat(guaranteeValue.Value.PremiumTaxAmountYearly-oldGuaranteeValue.PremiumTaxAmountYearly, 2)
+					offersPrices["default"]["monthly"].Net += lib.RoundFloat(guaranteeValue.Value.PremiumNetMonthly-oldGuaranteeValue.PremiumNetMonthly, 2)
+					offersPrices["default"]["monthly"].Gross += lib.RoundFloat(guaranteeValue.Value.PremiumGrossMonthly-oldGuaranteeValue.PremiumGrossMonthly, 2)
+					offersPrices["default"]["monthly"].Tax += lib.RoundFloat(guaranteeValue.Value.PremiumTaxAmountMonthly-oldGuaranteeValue.PremiumTaxAmountMonthly, 2)
 				}
 			}
 		}
