@@ -666,12 +666,12 @@ func surveysSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	}
 
 	if policy.PartnershipName == models.PartnershipBeProf {
-		intro.Questions[len(intro.Questions)-1].Question += "In caso anche di una sola risposta positiva, ovvero in caso di somme" +
+		intro.Questions[len(intro.Questions)-1].Question += " In caso anche di una sola risposta positiva, ovvero in caso di somme" +
 			" assicurate per le garanzie Decesso e/o Invalidità Totale Permanente da Infortunio o Malattia superiori" +
 			" a 200.000 €, è richiesto che l’Assicurato si sottoponga a visita medica come indicato al punto c)" +
 			" che precede."
 	} else {
-		intro.Questions[len(intro.Questions)-1].Question += "La Compagnia pertanto, anche ai fini dell’art. 1893 2° comma del codice" +
+		intro.Questions[len(intro.Questions)-1].Question += " La Compagnia pertanto, anche ai fini dell’art. 1893 2° comma del codice" +
 			" civile, dichiara espressamente che non intende assumere il rischio (nemmeno a diverse condizioni)" +
 			" qualora fosse a conoscenza che l’Assicurato sia affetto anche da una sola delle patologie incluse" +
 			" nel Questionario Medico."
