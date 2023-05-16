@@ -27,7 +27,7 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 	location, e := time.LoadLocation("Europe/Rome")
 	fmt.Println(time.Now().In(location))
 	now := time.Now().In(location).AddDate(0, 0, -1)
-	filename := now.Format(layoutFilename) + "_EM_PMIW.xlsx"
+	filename := now.Format(layoutFilename) + "_EM_PMIW.XLSX"
 	//println(config)
 	println("filename: ", filename)
 	_, reader, e := GlobalSftpDownload(filename, "track/in/global/emit/", "")

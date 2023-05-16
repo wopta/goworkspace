@@ -22,7 +22,9 @@ var config = lib.SftpConfig{
 func GlobalSftpDownload(filename string, bucket string, folder string) ([]byte, io.ReadCloser, error) {
 	client, e := lib.NewSftpclient(config)
 	println("filename: ", filename)
+	println("GlobalSftpDownload error: ", e)
 	reader, e := client.Download(folder + filename)
+	println("GlobalSftpDownload error: ", e)
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(reader)
 	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), bucket+filename, []byte(buf.String()))
