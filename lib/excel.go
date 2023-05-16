@@ -14,6 +14,7 @@ func ExcelRead(r io.Reader) (map[string][][]string, error) {
 	var res map[string][][]string
 	var rows [][]string
 	var err error
+	res = make(map[string][][]string)
 	f, err := excelize.OpenReader(r, excelize.Options{})
 	for _, sheet := range f.GetSheetList() {
 		rows, err = f.GetRows(sheet)
@@ -27,9 +28,11 @@ func ExcelRead(r io.Reader) (map[string][][]string, error) {
 }
 func ExcelReadFile(filePath string) (map[string][][]string, error) {
 	// f, err := excelize.OpenFile("Book1.xlsx")
+
 	var res map[string][][]string
 	var rows [][]string
 	var err error
+	res = make(map[string][][]string)
 	f, err := excelize.OpenFile(filePath)
 	for _, sheet := range f.GetSheetList() {
 		rows, err = f.GetRows(sheet)
