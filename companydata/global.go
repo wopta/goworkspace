@@ -23,6 +23,7 @@ func GlobalSftpDownload(filename string, bucket string, folder string) ([]byte, 
 	client, e := lib.NewSftpclient(config)
 	println("filename: ", filename)
 	println("GlobalSftpDownload error: ", e)
+
 	reader, e := client.Download(folder + filename)
 	println("GlobalSftpDownload error: ", e)
 	buf := new(bytes.Buffer)

@@ -30,7 +30,7 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 	filename := now.Format(layoutFilename) + "_EM_PMIW.XLSX"
 	//println(config)
 	println("filename: ", filename)
-	_, reader, e := GlobalSftpDownload(filename, "track/in/global/emit/", "")
+	_, reader, e := GlobalSftpDownload("./"+filename, "track/in/global/emit/", "")
 	excelsource, e := lib.ExcelRead(reader)
 	for k, v := range excelsource {
 		println("key shhet name: ", k)
