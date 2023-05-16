@@ -21,6 +21,7 @@ var config = lib.SftpConfig{
 
 func GlobalSftpDownload(filename string, bucket string, folder string) ([]byte, io.ReadCloser, error) {
 	client, e := lib.NewSftpclient(config)
+	client.ListFiles("./")
 	println("folder +filename: ", folder+filename)
 	println("GlobalSftpDownload error: ", e)
 	reader, e := client.Download(folder + filename)
