@@ -24,7 +24,7 @@ func CreateUserWithEmailAndPassword(email string, password string, id *string) (
 	params := (&auth.UserToCreate{}).
 		Email(email).
 		Password(password)
-	if id != nil {
+	if id != nil && len(*id) > 0 {
 		params.UID(*id)
 	}
 	u, err := client.CreateUser(ctx, params)
