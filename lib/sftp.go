@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"log"
 	"net"
 	"os"
 	"path/filepath"
@@ -107,7 +108,33 @@ func (c *Client) Download(filePath string) (io.ReadCloser, error) {
 		return nil, fmt.Errorf("connect: %w", err)
 	}
 
-	return c.sftpClient.Open(filePath)
+	return c.sftpClient.OpenFile(filePath, (os.O_RDONLY))
+}
+func (sc *Client) ListFiles(remoteDir string) (err error) {
+	fmt.Fprintf(os.Stdout, "Listing [%s] ...\n\n", remoteDir)
+
+	files, err := sc.sftpClient.ReadDir(remoteDir)
+	if err != nil {
+		log.Printf("Unable to list remote dir: %v\n", err)
+		return
+	}
+
+	for _, f := range files {
+		var name, modTime, size string
+		name = f.Name()
+		modTime = f.ModTime().Format("2006-01-02 15:04:05")
+		size = fmt.Sprintf("%12d", f.Size())
+
+		if f.IsDir() {
+			name = name + "/"
+			modTime = ""
+			size = "PRE"
+		}
+		// Output each file name and size in bytes
+		fmt.Fprintf(os.Stdout, "%19s %12s %s\n", modTime, size, name)
+	}
+
+	return
 }
 func (c *Client) Remove(filePath string) error {
 	if err := c.connect(); err != nil {
