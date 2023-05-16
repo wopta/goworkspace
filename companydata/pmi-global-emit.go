@@ -37,8 +37,11 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 	//println(config)
 	println("filename: ", filename)
 	if executiondate.After(from) && executiondate.Before(to) {
-		_, reader, _ := GlobalSftpDownload(""+filename, "track/in/global/emit/", "/Wopta/")
-		excelsource, _ := lib.ExcelRead(reader)
+		GlobalSftpDownload(""+filename, "track/in/global/emit/", "/Wopta/")
+
+		//source, _ := ioutil.ReadFile("../tmp/" + filename)
+		//excelsource, _ := lib.ExcelRead(reader)
+		excelsource, _ := lib.ExcelReadFile("../tmp/" + filename)
 		for k, v := range excelsource {
 			println("key shhet name: ", k)
 			result = v

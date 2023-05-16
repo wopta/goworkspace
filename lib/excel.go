@@ -32,6 +32,22 @@ func ExcelRead(r io.Reader) (map[string][][]string, error) {
 	}
 	return res, err
 }
+func ExcelReadFile(filePath string) (map[string][][]string, error) {
+	// f, err := excelize.OpenFile("Book1.xlsx")
+	var res map[string][][]string
+	var rows [][]string
+	var err error
+	f, err := excelize.OpenFile(filePath)
+	for _, sheet := range f.GetSheetList() {
+		rows, err = f.GetRows(sheet)
+		res[sheet] = rows
+		for _, colCell := range rows {
+			fmt.Print(colCell, "\t")
+		}
+		fmt.Println()
+	}
+	return res, err
+}
 func CreateExcel(sheet [][]string, filePath string, sheetName string) (<-chan []byte, error) {
 	ch := make(chan []byte)
 	var err error
