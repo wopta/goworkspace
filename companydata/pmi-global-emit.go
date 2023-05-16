@@ -18,17 +18,19 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 		enterpriseName                            string
 		employer, class, sector, atecoDesc, ateco string
 		revenue                                   int
-		//err                                       error
+		e                                         error
 	)
 
 	layout := "02/01/2006"
 	layoutFilename := "20060102"
 	//client, e := lib.NewSftpclient(config)
-	now := time.Now().AddDate(0, 0, -1)
+	location, e := time.LoadLocation("Europe/Rome")
+	fmt.Println(time.Now().In(location))
+	now := time.Now().In(location).AddDate(0, 0, -1)
 	filename := now.Format(layoutFilename) + "_EM_PMIW.xlsx"
 	//println(config)
 	println("filename: ", filename)
-	_, reader, e := GlobalSftpDownload(filename, "track/in/global/emit/", "wopta/")
+	_, reader, e := GlobalSftpDownload(filename, "track/in/global/emit/", "")
 	excelsource, e := lib.ExcelRead(reader)
 	for k, v := range excelsource {
 		println("key shhet name: ", k)
