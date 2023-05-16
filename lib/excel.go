@@ -18,9 +18,8 @@ func ExcelRead(r io.Reader) (map[string][][]string, error) {
 	f, err := excelize.OpenReader(r, excelize.Options{})
 
 	// Get value from cell by given worksheet name and cell reference.
-	cell, err := f.GetCellValue("Sheet1", "B2")
-
-	fmt.Println(cell)
+	//cell, err := f.GetCellValue("Sheet1", "B2")
+	//fmt.Println(cell)
 	// Get all the rows in the Sheet1.
 
 	for _, sheet := range f.GetSheetList() {
