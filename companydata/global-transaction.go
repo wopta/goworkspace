@@ -11,14 +11,14 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
-func PersonGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func GlobalTransaction(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		result [][]string
 
 		e error
 	)
 
-	layout := "02/01/2006"
+	//layout := "02/01/2006"
 	layoutFilename := "20060102"
 	//client, e := lib.NewSftpclient(config)
 	location, e := time.LoadLocation("Europe/Rome")
