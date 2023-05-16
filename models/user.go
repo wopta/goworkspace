@@ -66,6 +66,7 @@ type User struct {
 	Residence         *Address            `json:"residence,omitempty" firestore:"residence,omitempty" bigquery:"-"`
 	Domicile          *Address            `json:"domicile,omitempty" firestore:"domicile,omitempty" bigquery:"-"`
 	IdentityDocuments []*IdentityDocument `json:"identityDocuments,omitempty" firestore:"identityDocuments,omitempty" bigquery:"-"`
+	AuthId            string              `json:"authId,omitempty" firestore:"authId,omitempty" bigquery:"-"`
 }
 
 type Consens struct {
