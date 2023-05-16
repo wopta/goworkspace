@@ -1,8 +1,8 @@
 package companydata
 
 import (
-	"bytes"
 	"io"
+	"io/ioutil"
 	"log"
 	"os"
 	"time"
@@ -21,15 +21,16 @@ var config = lib.SftpConfig{
 
 func GlobalSftpDownload(filename string, bucket string, folder string) ([]byte, io.ReadCloser, error) {
 	client, e := lib.NewSftpclient(config)
-	client.ListFiles("./")
+	client.ListFiles(".")
 	println("folder +filename: ", folder+filename)
 	println("GlobalSftpDownload error: ", e)
 	reader, e := client.Download(folder + filename)
 	println("GlobalSftpDownload error: ", e)
-	buf := new(bytes.Buffer)
-	_, e = buf.ReadFrom(reader)
-	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), bucket+filename, []byte(buf.String()))
-	return nil, reader, e
+	sourceByte, e := ioutil.ReadAll(reader)
+	//buf := new(bytes.Buffer)
+	//_, e = buf.ReadFrom(reader)
+	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), bucket+filename, sourceByte)
+	return sourceByte, reader, e
 }
 func GlobalSftpUpload(filename string, folder string) error {
 	client, e := lib.NewSftpclient(config)
