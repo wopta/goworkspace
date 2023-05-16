@@ -2,6 +2,7 @@ package companydata
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -38,9 +39,9 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 	println("filename: ", filename)
 	if executiondate.After(from) && executiondate.Before(to) {
 		GlobalSftpDownload(""+filename, "track/in/global/emit/", "/Wopta/")
-
-		//source, _ := ioutil.ReadFile("../tmp/" + filename)
+		sourceByte, _ := ioutil.ReadFile("../tmp/" + filename)
 		//excelsource, _ := lib.ExcelRead(reader)
+		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/global/emit/"+filename, sourceByte)
 		excelsource, _ := lib.ExcelReadFile("../tmp/" + filename)
 		for k, v := range excelsource {
 			println("key shhet name: ", k)

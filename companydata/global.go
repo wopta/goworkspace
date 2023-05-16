@@ -47,7 +47,7 @@ func GlobalSftpDownload(filename string, bucket string, folder string) ([]byte, 
 	log.Println(e)
 	//buf := new(bytes.Buffer)
 	//_, e = buf.ReadFrom(reader)
-	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), bucket+filename, sourceByte)
+
 	return sourceByte, srcFile, e
 }
 func GlobalSftpUpload(filename string, folder string) error {
