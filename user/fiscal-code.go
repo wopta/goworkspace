@@ -38,7 +38,7 @@ func FiscalCode(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 		outJson, user = extractUserDataFromFiscalCode(user)
 	}
 
-	return outJson, outJson, err
+	return outJson, user, err
 }
 
 func calculateFiscalCode(user models.User) (string, models.User) {
