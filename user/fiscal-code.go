@@ -297,6 +297,14 @@ func extractUserDataFromFiscalCode(user models.User) (string, models.User, error
 	err = json.Unmarshal(b, &codes)
 	lib.CheckError(err)
 
+	day, _ := strconv.Atoi(user.FiscalCode[9:11])
+
+	if day > 40 {
+		user.Gender = "F"
+	} else {
+		user.Gender = "M"
+	}
+
 	birthPlaceCode := user.FiscalCode[11:15]
 	if birthPlaceCode == "" {
 		return "", models.User{}, fmt.Errorf("invalid birth place code")
