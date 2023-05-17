@@ -33,15 +33,15 @@ func FiscalCode(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 
 	switch operation {
 	case "encode":
-		outJson, user = calculateFiscalCode(user)
+		outJson, user, err = calculateFiscalCode(user)
 	case "decode":
-		outJson, user = extractUserDataFromFiscalCode(user)
+		outJson, user, err = extractUserDataFromFiscalCode(user)
 	}
 
 	return outJson, user, err
 }
 
-func calculateFiscalCode(user models.User) (string, models.User) {
+func calculateFiscalCode(user models.User) (string, models.User, error) {
 	log.Println("Encode")
 	name := strings.ToUpper(strings.ReplaceAll(user.Name, " ", ""))
 	surname := strings.ToUpper(strings.ReplaceAll(user.Surname, " ", ""))
@@ -55,25 +55,40 @@ func calculateFiscalCode(user models.User) (string, models.User) {
 		'N': {}, 'P': {}, 'Q': {}, 'R': {}, 'S': {}, 'T': {}, 'V': {}, 'W': {}, 'X': {}, 'Y': {}, 'Z': {},
 	}
 
-	surnameCode := calculateSurnameCode(surname, consonants, vowels)
+	surnameCode, err := calculateSurnameCode(surname, consonants, vowels)
+	if err != nil {
+		return "", models.User{}, err
+	}
 
-	nameCode := calculateNameCode(name, consonants, vowels)
+	nameCode, err := calculateNameCode(name, consonants, vowels)
+	if err != nil {
+		return "", models.User{}, err
+	}
 
-	birthDateCode := calculateBirthDateCode(dateOfBirth, user.Gender)
+	birthDateCode, err := calculateBirthDateCode(dateOfBirth, user.Gender)
+	if err != nil {
+		return "", models.User{}, err
+	}
 
-	birthPlaceCode := calculateBirthPlaceCode(user.BirthCity, user.BirthProvince)
+	birthPlaceCode, err := calculateBirthPlaceCode(user.BirthCity, user.BirthProvince)
+	if err != nil {
+		return "", models.User{}, err
+	}
 
-	controlCharacter := calculateControlCharacter(surnameCode, nameCode, birthDateCode, birthPlaceCode)
+	controlCharacter, err := calculateControlCharacter(surnameCode, nameCode, birthDateCode, birthPlaceCode)
+	if err != nil {
+		return "", models.User{}, err
+	}
 
 	user.FiscalCode = fmt.Sprintf("%s%s%s%s%s", surnameCode, nameCode, birthDateCode, birthPlaceCode, controlCharacter)
 
 	outJson, err := json.Marshal(&user)
 	lib.CheckError(err)
 
-	return string(outJson), user
+	return string(outJson), user, err
 }
 
-func calculateSurnameCode(surname string, consonantsMap, vowelsMap map[rune]struct{}) string {
+func calculateSurnameCode(surname string, consonantsMap, vowelsMap map[rune]struct{}) (string, error) {
 	var surnameCode, consonants, vowels string
 
 	consonantCount := 0
@@ -99,12 +114,14 @@ func calculateSurnameCode(surname string, consonantsMap, vowelsMap map[rune]stru
 		surnameCode = consonants[:1] + vowels[:1] + "X"
 	} else if consonantCount == 0 && vowelsCount == 2 {
 		surnameCode = vowels + "X"
+	} else {
+		return "", fmt.Errorf("invalid surname")
 	}
 
-	return surnameCode
+	return surnameCode, nil
 }
 
-func calculateNameCode(name string, consonantsMap, vowelsMap map[rune]struct{}) string {
+func calculateNameCode(name string, consonantsMap, vowelsMap map[rune]struct{}) (string, error) {
 	var nameCode, consonants, vowels string
 
 	consonantCount := 0
@@ -132,12 +149,27 @@ func calculateNameCode(name string, consonantsMap, vowelsMap map[rune]struct{}) 
 		nameCode = consonants[:1] + vowels[:1] + "X"
 	} else if consonantCount == 0 && vowelsCount == 2 {
 		nameCode = vowels[:2] + "X"
+	} else {
+		return "", fmt.Errorf("invalid name")
 	}
 
-	return nameCode
+	return nameCode, nil
 }
 
-func calculateBirthDateCode(dateOfBirth, gender string) string {
+func calculateBirthDateCode(dateOfBirth, gender string) (string, error) {
+	isValidDate := func(dateString string) bool {
+		_, err := time.Parse("2006-01-02", dateString)
+		return err == nil
+	}
+
+	if !isValidDate(dateOfBirth) {
+		return "", fmt.Errorf("invalid date of birth")
+	}
+
+	if gender != "M" && gender != "F" {
+		return "", fmt.Errorf("invalid gender")
+	}
+
 	birthCodeMap := map[string]string{
 		"01": "A",
 		"02": "B",
@@ -160,10 +192,10 @@ func calculateBirthDateCode(dateOfBirth, gender string) string {
 		day += 40
 	}
 
-	return fmt.Sprintf("%s%s%02d", year, birthCodeMap[month], day)
+	return fmt.Sprintf("%s%s%02d", year, birthCodeMap[month], day), nil
 }
 
-func calculateBirthPlaceCode(cityOfBirth, provinceOfBirth string) string {
+func calculateBirthPlaceCode(cityOfBirth, provinceOfBirth string) (string, error) {
 	var codes map[string]map[string]string
 
 	prefix := "italian"
@@ -178,10 +210,15 @@ func calculateBirthPlaceCode(cityOfBirth, provinceOfBirth string) string {
 	err = json.Unmarshal(b, &codes)
 	lib.CheckError(err)
 
-	return codes[strings.ToLower(cityOfBirth)]["codFisc"]
+	birthPlaceCode := codes[strings.ToLower(cityOfBirth)]["codFisc"]
+	if birthPlaceCode == "" {
+		return "", fmt.Errorf("invalid birth city")
+	}
+
+	return birthPlaceCode, nil
 }
 
-func calculateControlCharacter(surnameCode, nameCode, birthDateCode, birthPlaceCode string) string {
+func calculateControlCharacter(surnameCode, nameCode, birthDateCode, birthPlaceCode string) (string, error) {
 	oddTable := map[string]int{
 		"A": 1,
 		"B": 0,
@@ -223,6 +260,10 @@ func calculateControlCharacter(surnameCode, nameCode, birthDateCode, birthPlaceC
 
 	characters := surnameCode + nameCode + birthDateCode + birthPlaceCode
 
+	if len(characters) < 14 {
+		return "", fmt.Errorf("invalid fiscal code")
+	}
+
 	sum := 0
 	for index, ch := range characters {
 		if (index+1)%2 == 0 {
@@ -236,15 +277,19 @@ func calculateControlCharacter(surnameCode, nameCode, birthDateCode, birthPlaceC
 		}
 	}
 
-	return string('A' + rune(sum%26))
+	return string('A' + rune(sum%26)), nil
 }
 
-func extractUserDataFromFiscalCode(user models.User) (string, models.User) {
+func extractUserDataFromFiscalCode(user models.User) (string, models.User, error) {
 	var (
 		codes map[string]map[string]string
 	)
 
 	log.Println("Decode")
+
+	if len(user.FiscalCode) < 15 {
+		return "", models.User{}, fmt.Errorf("invalid fiscal code")
+	}
 
 	b, err := os.ReadFile(lib.GetAssetPathByEnv("user") + "/reverse-codes.json")
 	lib.CheckError(err)
@@ -253,6 +298,9 @@ func extractUserDataFromFiscalCode(user models.User) (string, models.User) {
 	lib.CheckError(err)
 
 	birthPlaceCode := user.FiscalCode[11:15]
+	if birthPlaceCode == "" {
+		return "", models.User{}, fmt.Errorf("invalid birth place code")
+	}
 	user.BirthCity = codes[birthPlaceCode]["city"]
 	user.BirthProvince = codes[birthPlaceCode]["province"]
 
@@ -261,5 +309,5 @@ func extractUserDataFromFiscalCode(user models.User) (string, models.User) {
 	outJson, err := json.Marshal(&user)
 	lib.CheckError(err)
 
-	return string(outJson), user
+	return string(outJson), user, nil
 }
