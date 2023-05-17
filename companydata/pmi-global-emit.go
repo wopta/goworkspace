@@ -2,7 +2,6 @@ package companydata
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -33,20 +32,17 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 
 	from := time.Date(executiondate.Year(), executiondate.Month(), executiondate.Day(), 0, 0, 0, 0, location)
 	to := time.Date(executiondate.Year(), executiondate.Month(), executiondate.Day(), 8, 0, 0, 0, location)
+	if executiondate.After(from) && executiondate.Before(to) && os.Getenv("env") == "prod" {
 
+	}
 	filename := now.Format(layoutFilename) + "_EM_PMIW.XLSX"
 	//println(config)
 	println("filename: ", filename)
-	if executiondate.After(from) && executiondate.Before(to) {
-		GlobalSftpDownload(""+filename, "track/in/global/emit/", "/Wopta/")
-		sourceByte, _ := ioutil.ReadFile("../tmp/" + filename)
-		//excelsource, _ := lib.ExcelRead(reader)
-		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/global/emit/"+filename, sourceByte)
-		excelsource, _ := lib.ExcelReadFile("../tmp/" + filename)
-		for k, v := range excelsource {
-			println("key shhet name: ", k)
-			result = v
-		}
+	GlobalSftpDownload(""+filename, "track/in/global/emit/", "/Wopta/")
+	excelsource, _ := lib.ExcelReadFile("../tmp/" + filename)
+	for k, v := range excelsource {
+		println("key shhet name: ", k)
+		result = v
 	}
 	q := lib.Firequeries{
 		Queries: []lib.Firequery{{
@@ -289,9 +285,7 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 
 	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/global/pmi/emit/"+filepath, <-excel)
 	//lib.PutGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/global/pmi/emit/"+filepath, source, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-	if executiondate.After(from) && executiondate.Before(to) && os.Getenv("env") == "prod" {
 
-	}
 	return "", nil, e
 }
 
