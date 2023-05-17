@@ -21,7 +21,7 @@ func FiscalCode(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 		outJson string
 	)
 
-	log.Println("Calculate User Fiscal Code")
+	log.Println("Fiscal Code")
 
 	operation := r.Header.Get("operation")
 
@@ -42,6 +42,7 @@ func FiscalCode(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 }
 
 func calculateFiscalCode(user models.User) (string, models.User) {
+	log.Println("Encode")
 	// Remove spaces and convert to uppercase
 	name := strings.ToUpper(strings.ReplaceAll(user.Name, " ", ""))
 	surname := strings.ToUpper(strings.ReplaceAll(user.Surname, " ", ""))
@@ -257,6 +258,8 @@ func extractUserDataFromFiscalCode(user models.User) (string, models.User) {
 	var (
 		codes map[string]map[string]string
 	)
+
+	log.Println("Decode")
 
 	b, err := os.ReadFile(lib.GetAssetPathByEnv("user") + "/reverse-codes.json")
 	lib.CheckError(err)
