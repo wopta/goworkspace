@@ -47,6 +47,11 @@ func User(w http.ResponseWriter, r *http.Request) {
 				Handler: UploadDocument,
 				Method:  http.MethodPost,
 			},
+			{
+				Route:   "/fiscalCode/v1",
+				Handler: FiscalCode,
+				Method:  http.MethodPost,
+			},
 		},
 	}
 	route.Router(w, r)
