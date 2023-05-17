@@ -14,9 +14,14 @@ import (
 )
 
 func FiscalCode(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	var user models.User
+	var (
+		user    models.User
+		outJson string
+	)
 
 	log.Println("Calculate User Fiscal Code")
+
+	operation := r.Header.Get("operation")
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	err := json.Unmarshal(body, &user)
@@ -24,9 +29,15 @@ func FiscalCode(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 		return "", nil, err
 	}
 
-	fiscalCode := calculateFiscalCode(user.Name, user.Surname, user.BirthCity, user.BirthProvince, user.BirthDate, user.Gender)
+	switch operation {
+	case "encode":
+		fiscalCode := calculateFiscalCode(user.Name, user.Surname, user.BirthCity, user.BirthProvince, user.BirthDate, user.Gender)
+		outJson = `{"fiscalCode": "` + fiscalCode + `"}`
+	case "decode":
 
-	return `{"fiscalCode": "` + fiscalCode + `"}`, `{"fiscalCode": "` + fiscalCode + `"}`, err
+	}
+
+	return outJson, outJson, err
 }
 
 func calculateFiscalCode(name, surname, cityOfBirth, provinceOfBirth, inputDate, gender string) string {

@@ -48,7 +48,7 @@ func User(w http.ResponseWriter, r *http.Request) {
 				Method:  http.MethodPost,
 			},
 			{
-				Route:   "/fiscalCode/v1",
+				Route:   "/fiscalCode/v1/it/:operation",
 				Handler: FiscalCode,
 				Method:  http.MethodPost,
 			},
