@@ -8201,7 +8201,7 @@ func getCity() []byte {
 	513;Costa Rica;EE;;;;Z503;;
 	250;Croazia;EE;;;;Z149;;
 	514;Cuba;EE;;;;Z504;;
-	966;Cura�ao;EE;;;;Z126;;
+	966;Curaçao;EE;;;;Z126;;
 	212;Danimarca;EE;;;;Z107;;
 	515;Dominica;EE;;;;Z526;;
 	609;Ecuador;EE;;;;Z605;;
@@ -8248,7 +8248,7 @@ func getCity() []byte {
 	911;Isole Cayman;EE;;;;Z530;;
 	909;Isole Cook (NZ);EE;;;;Z703;;
 	958;Isole Falkland (Malvine);EE;;;;Z609;;
-	924;Isole F�r �er;EE;;;;Z108;;
+	924;Isole Fær Øer;EE;;;;Z108;;
 	712;Isole Marshall;EE;;;;Z711;;
 	972;Isole Pitcairn;EE;;;;Z722;;
 	725;Isole Salomone;EE;;;;Z724;;
@@ -8306,7 +8306,7 @@ func getCity() []byte {
 	530;Panama;EE;;;;Z516;;
 	721;Papua Nuova Guinea;EE;;;;Z730;;
 	614;Paraguay;EE;;;;Z610;;
-	615;Per�;EE;;;;Z611;;
+	615;Perù;EE;;;;Z611;;
 	920;Polinesia francese;EE;;;;Z723;;
 	233;Polonia;EE;;;;Z127;;
 	234;Portogallo;EE;;;;Z128;;
@@ -8321,13 +8321,13 @@ func getCity() []byte {
 	534;Saint Kitts e Nevis;EE;;;;Z533;;
 	980;Saint Pierre e Miquelon;EE;;;;Z403;;
 	533;Saint Vincent e Grenadine;EE;;;;Z528;;
-	906;Saint-Barth�lemy;EE;;;;Z110;;
+	906;Saint-Barthélemy;EE;;;;Z110;;
 	904;Saint-Martin (FR);EE;;;;Z110;;
 	727;Samoa;EE;;;;Z726;;
 	236;San Marino;EE;;;;Z130;;
 	983;Sant'Elena;EE;;;;Z340;;
 	532;Santa Lucia;EE;;;;Z527;;
-	448;Sao Tom� e Principe;EE;;;;Z341;;
+	448;Sao Tomé e Principe;EE;;;;Z341;;
 	939;Sark;EE;;;;Z114;;
 	450;Senegal;EE;;;;Z343;;
 	271;Serbia;EE;;;;Z158;;
@@ -8343,7 +8343,7 @@ func getCity() []byte {
 	311;Sri Lanka;EE;;;;Z209;;
 	713;Stati Federati di Micronesia;EE;;;;Z735;;
 	536;Stati Uniti d'America;EE;;;;Z404;;
-	246;Stato della Citt� del Vaticano;EE;;;;Z106;;
+	246;Stato della Città del Vaticano;EE;;;;Z106;;
 	467;Sud Sudan;EE;;;;Z907;;
 	454;Sudafrica;EE;;;;Z347;;
 	455;Sudan;EE;;;;Z348;;
