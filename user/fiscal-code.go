@@ -31,20 +31,19 @@ func FiscalCode(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 
 	switch operation {
 	case "encode":
-		fiscalCode := calculateFiscalCode(user.Name, user.Surname, user.BirthCity, user.BirthProvince, user.BirthDate, user.Gender)
-		outJson = `{"fiscalCode": "` + fiscalCode + `"}`
+		outJson, user = calculateFiscalCode(user)
 	case "decode":
-
+		outJson, user = extractUserDataFromFiscalCode(user)
 	}
 
 	return outJson, outJson, err
 }
 
-func calculateFiscalCode(name, surname, cityOfBirth, provinceOfBirth, inputDate, gender string) string {
+func calculateFiscalCode(user models.User) (string, models.User) {
 	// Remove spaces and convert to uppercase
-	name = strings.ToUpper(strings.ReplaceAll(name, " ", ""))
-	surname = strings.ToUpper(strings.ReplaceAll(surname, " ", ""))
-	dateOfBirth := strings.Split(inputDate, "T")[0]
+	name := strings.ToUpper(strings.ReplaceAll(user.Name, " ", ""))
+	surname := strings.ToUpper(strings.ReplaceAll(user.Surname, " ", ""))
+	dateOfBirth := strings.Split(user.BirthDate, "T")[0]
 	//cityOfBirth = strings.ToUpper(strings.ReplaceAll(cityOfBirth, " ", ""))
 	//provinceOfBirth = strings.ToUpper(strings.ReplaceAll(provinceOfBirth, " ", ""))
 
@@ -64,18 +63,21 @@ func calculateFiscalCode(name, surname, cityOfBirth, provinceOfBirth, inputDate,
 	nameCode := calculateNameCode(name, consonants, vowels)
 
 	// Calculate birth date foreignCountries
-	birthDateCode := calculateBirthDateCode(dateOfBirth, gender)
+	birthDateCode := calculateBirthDateCode(dateOfBirth, user.Gender)
 
 	// Calculate birth place foreignCountries
-	birthPlaceCode := calculateBirthPlaceCode(cityOfBirth, provinceOfBirth)
+	birthPlaceCode := calculateBirthPlaceCode(user.BirthCity, user.BirthProvince)
 
 	// Calculate control character
 	controlCharacter := calculateControlCharacter(surnameCode, nameCode, birthDateCode, birthPlaceCode)
 
 	// Concatenate all codes
-	fiscalCode := fmt.Sprintf("%s%s%s%s%s", surnameCode, nameCode, birthDateCode, birthPlaceCode, controlCharacter)
+	user.FiscalCode = fmt.Sprintf("%s%s%s%s%s", surnameCode, nameCode, birthDateCode, birthPlaceCode, controlCharacter)
 
-	return fiscalCode
+	outJson, err := json.Marshal(&user)
+	lib.CheckError(err)
+
+	return string(outJson), user
 }
 
 func calculateSurnameCode(surname string, consonantsMap, vowelsMap map[rune]struct{}) string {
