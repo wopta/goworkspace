@@ -8,8 +8,10 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
+	"time"
 	"unicode"
 )
 
@@ -175,10 +177,21 @@ func calculateBirthDateCode(dateOfBirth, gender string) string {
 }
 
 func calculateBirthPlaceCode(cityOfBirth, provinceOfBirth string) string {
+	var codes map[string]map[string]string
+
+	prefix := "italian"
+
 	if provinceOfBirth == "EE" {
-		return foreignCountries[strings.ToLower(cityOfBirth)]["codFisc"]
+		prefix = "foreign"
 	}
-	return italianCities[strings.ToLower(cityOfBirth)]["codFisc"]
+
+	b, err := os.ReadFile(lib.GetAssetPathByEnv("user") + "/" + prefix + "-codes.json")
+	lib.CheckError(err)
+
+	err = json.Unmarshal(b, &codes)
+	lib.CheckError(err)
+
+	return codes[strings.ToLower(cityOfBirth)]["codFisc"]
 }
 
 func calculateControlCharacter(surnameCode, nameCode, birthDateCode, birthPlaceCode string) string {
@@ -238,4 +251,27 @@ func calculateControlCharacter(surnameCode, nameCode, birthDateCode, birthPlaceC
 	}
 
 	return string('A' + rune(sum%26))
+}
+
+func extractUserDataFromFiscalCode(user models.User) (string, models.User) {
+	var (
+		codes map[string]map[string]string
+	)
+
+	b, err := os.ReadFile(lib.GetAssetPathByEnv("user") + "/reverse-codes.json")
+	lib.CheckError(err)
+
+	err = json.Unmarshal(b, &codes)
+	lib.CheckError(err)
+
+	birthPlaceCode := user.FiscalCode[11:15]
+	user.BirthCity = codes[birthPlaceCode]["city"]
+	user.BirthProvince = codes[birthPlaceCode]["province"]
+
+	user.BirthDate = lib.ExtractBirthdateFromItalianFiscalCode(user.FiscalCode).Format(time.RFC3339)
+
+	outJson, err := json.Marshal(&user)
+	lib.CheckError(err)
+
+	return string(outJson), user
 }
