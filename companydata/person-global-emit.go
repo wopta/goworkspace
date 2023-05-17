@@ -33,13 +33,11 @@ func PersonGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface
 	filename := now.Format(layoutFilename) + "_EM_PMIW.XLSX"
 	//println(config)
 	println("filename: ", filename)
-	if executiondate.After(from) && executiondate.Before(to) {
-		_, reader, _ := GlobalSftpDownload(""+filename, "track/in/global/emit/", "/Wopta/")
-		excelsource, _ := lib.ExcelRead(reader)
-		for k, v := range excelsource {
-			println("key shhet name: ", k)
-			result = v
-		}
+	GlobalSftpDownload(""+filename, "track/in/global/emit/", "/Wopta/")
+	excelsource, _ := lib.ExcelReadFile("../tmp/" + filename)
+	for k, v := range excelsource {
+		println("key shhet name: ", k)
+		result = v
 	}
 	q := lib.Firequeries{
 		Queries: []lib.Firequery{{

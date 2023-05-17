@@ -741,25 +741,5 @@ func SftpUpload(filePath string) {
 	// Upload local file to a remote location as in 1MB (byte) chunks.
 	e = client.Upload(source, destination, int(info.Size()))
 	lib.CheckError(e)
-	/*
-		// Download remote file.
-		file, err := client.Download("tmp/file.txt")
-		if err != nil {
-			log.Fatalln(err)
-		}
-		defer file.Close()
 
-		// Read downloaded file.
-		data, err := ioutil.ReadAll(file)
-		if err != nil {
-			log.Fatalln(err)
-		}
-		fmt.Println(string(data))
-
-		// Get remote file stats.
-		info, err := client.Info("tmp/file.txt")
-		if err != nil {
-			log.Fatalln(err)
-		}
-		fmt.Printf("%+v\n", info)*/
 }

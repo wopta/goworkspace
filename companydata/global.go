@@ -23,7 +23,7 @@ var config = lib.SftpConfig{
 func GlobalSftpDownload(filename string, bucket string, folder string) ([]byte, io.ReadCloser, error) {
 	location, e := time.LoadLocation("Europe/Rome")
 	executiondate := time.Now().In(location)
-	from := time.Date(executiondate.Year(), executiondate.Month(), executiondate.Day(), 0, 0, 0, 0, location)
+	from := time.Date(executiondate.Year(), executiondate.Month(), executiondate.Day()-1, 0, 0, 0, 0, location)
 	to := time.Date(executiondate.Year(), executiondate.Month(), executiondate.Day(), 8, 0, 0, 0, location)
 	if executiondate.After(from) && executiondate.Before(to) {
 
