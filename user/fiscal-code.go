@@ -43,14 +43,10 @@ func FiscalCode(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 
 func calculateFiscalCode(user models.User) (string, models.User) {
 	log.Println("Encode")
-	// Remove spaces and convert to uppercase
 	name := strings.ToUpper(strings.ReplaceAll(user.Name, " ", ""))
 	surname := strings.ToUpper(strings.ReplaceAll(user.Surname, " ", ""))
 	dateOfBirth := strings.Split(user.BirthDate, "T")[0]
-	//cityOfBirth = strings.ToUpper(strings.ReplaceAll(cityOfBirth, " ", ""))
-	//provinceOfBirth = strings.ToUpper(strings.ReplaceAll(provinceOfBirth, " ", ""))
 
-	// Define vowels and consonants maps
 	vowels := map[rune]struct{}{
 		'A': {}, 'E': {}, 'I': {}, 'O': {}, 'U': {},
 	}
@@ -59,22 +55,16 @@ func calculateFiscalCode(user models.User) (string, models.User) {
 		'N': {}, 'P': {}, 'Q': {}, 'R': {}, 'S': {}, 'T': {}, 'V': {}, 'W': {}, 'X': {}, 'Y': {}, 'Z': {},
 	}
 
-	// Calculate surname foreignCountries
 	surnameCode := calculateSurnameCode(surname, consonants, vowels)
 
-	// Calculate name foreignCountries
 	nameCode := calculateNameCode(name, consonants, vowels)
 
-	// Calculate birth date foreignCountries
 	birthDateCode := calculateBirthDateCode(dateOfBirth, user.Gender)
 
-	// Calculate birth place foreignCountries
 	birthPlaceCode := calculateBirthPlaceCode(user.BirthCity, user.BirthProvince)
 
-	// Calculate control character
 	controlCharacter := calculateControlCharacter(surnameCode, nameCode, birthDateCode, birthPlaceCode)
 
-	// Concatenate all codes
 	user.FiscalCode = fmt.Sprintf("%s%s%s%s%s", surnameCode, nameCode, birthDateCode, birthPlaceCode, controlCharacter)
 
 	outJson, err := json.Marshal(&user)
@@ -86,12 +76,10 @@ func calculateFiscalCode(user models.User) (string, models.User) {
 func calculateSurnameCode(surname string, consonantsMap, vowelsMap map[rune]struct{}) string {
 	var surnameCode, consonants, vowels string
 
-	// Collect consonantsMap from the surname
 	consonantCount := 0
 	vowelsCount := 0
 	for _, ch := range surname {
 		if _, ok := consonantsMap[ch]; ok {
-			//surnameCode += string(ch)
 			consonants += string(ch)
 			consonantCount++
 		}
@@ -119,12 +107,10 @@ func calculateSurnameCode(surname string, consonantsMap, vowelsMap map[rune]stru
 func calculateNameCode(name string, consonantsMap, vowelsMap map[rune]struct{}) string {
 	var nameCode, consonants, vowels string
 
-	// Collect consonantsMap from the name
 	consonantCount := 0
 	vowelsCount := 0
 	for _, ch := range name {
 		if _, ok := consonantsMap[ch]; ok {
-			//surnameCode += string(ch)
 			consonants += string(ch)
 			consonantCount++
 		}
@@ -236,7 +222,6 @@ func calculateControlCharacter(surnameCode, nameCode, birthDateCode, birthPlaceC
 	}
 
 	characters := surnameCode + nameCode + birthDateCode + birthPlaceCode
-	// Calculate sum of character values
 
 	sum := 0
 	for index, ch := range characters {
