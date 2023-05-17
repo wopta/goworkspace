@@ -1,6 +1,7 @@
 package partnership
 
 import (
+	"github.com/wopta/goworkspace/lib"
 	"testing"
 	"time"
 )
@@ -19,7 +20,7 @@ func TestExtractBirthdate(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.fiscalCode, func(t *testing.T) {
 			expected, _ := time.Parse("02/01/2006", tt.birthdate)
-			actual := extractBirthdateFromItalianFiscalCode(tt.fiscalCode)
+			actual := lib.ExtractBirthdateFromItalianFiscalCode(tt.fiscalCode)
 			if actual != expected {
 				t.Errorf("expected %v, but got %v", expected, actual)
 			}
