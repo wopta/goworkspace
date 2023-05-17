@@ -618,6 +618,8 @@ func surveysSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	pdf.Ln(8)
 	err := printSurvey(pdf, surveys[0])
 	lib.CheckError(err)
+
+	pdf.AddPage()
 	getParagraphTitle(pdf, "Questionario Medico")
 	pdf.Ln(8)
 	for _, survey := range surveys[1:] {

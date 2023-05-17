@@ -13,38 +13,39 @@ import (
 	wiseProxy "github.com/wopta/goworkspace/wiseproxy"
 )
 
-func CanUserRegisterUseCase(fiscalCode string) (bool, *string, *string) {
+func CanUserRegisterUseCase(fiscalCode string) (bool, *models.User, *string, *string) {
 	var (
 		wiseResponse models.WiseUserRegistryResponseDto
-		e            error
-		userId       string
+		err          error
+		userId       *string = nil
+		email        *string = nil
 		canRegister  bool
 		hasWiseData  bool
-		email        string
+		woptaUser    models.User
+		wiseUser     *models.User = nil
 	)
 
-	hasWiseData, e = userHasDataInWise(fiscalCode, &wiseResponse)
+	wiseUser, hasWiseData, err = userHasDataInWise(fiscalCode, &wiseResponse)
 	if hasWiseData {
 		log.Println("Found a register in wise for the user")
 		canRegister = true
 	}
 
 	// Check for policies in Firestore
-	woptaUser, e := GetUserByFiscalCode(fiscalCode)
 
-	if e == nil {
-		userId = woptaUser.Uid
-		email = woptaUser.Mail
-		log.Println(`Found user in Wopta DB for the user ` + userId)
+	if woptaUser, err = GetUserByFiscalCode(fiscalCode); err == nil {
+		userId = &woptaUser.Uid
+		email = &woptaUser.Mail
+		log.Println(`Found user in Wopta DB for the user ` + *userId)
 		canRegister = true
+		return canRegister, &woptaUser, userId, email
 	} else {
-		log.Printf(`Error trying to find user in Firebase %v\n`, e)
+		log.Printf(`Error trying to find user in Firebase %v\n`, err)
+		return canRegister, wiseUser, userId, &wiseUser.Mail
 	}
-
-	return canRegister, &userId, &email
 }
 
-func userHasDataInWise(fiscalCode string, wiseResponse *models.WiseUserRegistryResponseDto) (bool, error) {
+func userHasDataInWise(fiscalCode string, wiseResponse *models.WiseUserRegistryResponseDto) (*models.User, bool, error) {
 	request := []byte(`{
 		"idNodo": "1",
 		"cdFiscale": "` + fiscalCode + `",
@@ -53,16 +54,16 @@ func userHasDataInWise(fiscalCode string, wiseResponse *models.WiseUserRegistryR
 
 	responseReader := wiseProxy.WiseProxyObj("WebApiProduct/Api/RicercaAnagSemplice", request, "POST")
 	jsonData, e := ioutil.ReadAll(responseReader)
-	
+
 	if e != nil {
-		return false, e
+		return nil, false, e
 	}
-	
+
 	log.Printf("%s", jsonData)
 	e = json.Unmarshal(jsonData, &wiseResponse)
-	
+
 	if wiseResponse == nil || len(*wiseResponse.UserRegistries) == 0 {
-		return false, e
+		return nil, false, e
 	}
 
 	idx := slices.IndexFunc((*wiseResponse.UserRegistries), func(registry models.WiseUserRegistryDto) bool { return registry.RegistryType == "PERSONA FISICA" })
@@ -75,8 +76,13 @@ func userHasDataInWise(fiscalCode string, wiseResponse *models.WiseUserRegistryR
 	}`)
 	responseReader = wiseProxy.WiseProxyObj("WebApiProduct/Api/RicercaAnagCompleta", request, "POST")
 	jsonData, e = ioutil.ReadAll(responseReader)
-	log.Printf("%s", jsonData)
+	e = json.Unmarshal(jsonData, &wiseResponse)
 	lib.CheckError(e)
 
-	return len(*wiseResponse.UserRegistries) > 0, e
+	if len(*wiseResponse.UserRegistries) > 0 {
+		idx := slices.IndexFunc((*wiseResponse.UserRegistries), func(registry models.WiseUserRegistryDto) bool { return registry.RegistryType == "PERSONA FISICA" })
+		return (*wiseResponse.UserRegistries)[idx].ToDomain(), true, e
+	}
+
+	return nil, false, e
 }

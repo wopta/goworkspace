@@ -11,18 +11,29 @@ import (
 )
 
 func ExcelRead(r io.Reader) (map[string][][]string, error) {
-	// f, err := excelize.OpenFile("Book1.xlsx")
 	var res map[string][][]string
 	var rows [][]string
 	var err error
+	res = make(map[string][][]string)
 	f, err := excelize.OpenReader(r, excelize.Options{})
+	for _, sheet := range f.GetSheetList() {
+		rows, err = f.GetRows(sheet)
+		res[sheet] = rows
+		for _, colCell := range rows {
+			fmt.Print(colCell, "\t")
+		}
+		fmt.Println()
+	}
+	return res, err
+}
+func ExcelReadFile(filePath string) (map[string][][]string, error) {
+	// f, err := excelize.OpenFile("Book1.xlsx")
 
-	// Get value from cell by given worksheet name and cell reference.
-	cell, err := f.GetCellValue("Sheet1", "B2")
-
-	fmt.Println(cell)
-	// Get all the rows in the Sheet1.
-
+	var res map[string][][]string
+	var rows [][]string
+	var err error
+	res = make(map[string][][]string)
+	f, err := excelize.OpenFile(filePath)
 	for _, sheet := range f.GetSheetList() {
 		rows, err = f.GetRows(sheet)
 		res[sheet] = rows
@@ -45,8 +56,10 @@ func CreateExcel(sheet [][]string, filePath string, sheetName string) (<-chan []
 			"AA", "AB", "AC", "AD", "AE", "AF", "AG", "AH", "AI", "AJ", "AK", "AL", "AM", "AN", "AO", "AP", "AQ", "AR", "AS", "AT", "AU", "AV", "AW", "AX", "AY", "AZ",
 			"BA", "BB", "BC", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BK", "BL", "BM", "BN", "BO", "BP", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BX", "BY", "BZ"}
 		// Create a new sheet.
+		f.SetSheetName("Sheet1", sheetName)
 		index, err = f.NewSheet(sheetName)
 		for x, row := range sheet {
+
 			for i, cel := range row {
 
 				f.SetCellValue(sheetName, alfabet[i]+""+strconv.Itoa(x+1), cel)
