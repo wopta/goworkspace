@@ -32367,8 +32367,6 @@
     "city": "Gravedona ed Uniti",
     "province": "CO"
   },
-
-
   "Z100": {
     "city": "Albania",
     "province": "EE"
@@ -33232,5 +33230,23 @@
   "Z907": {
     "city": "Sud Sudan",
     "province": "EE"
+  },
+  "Z105": {
+    "city": "Cecoslovacchia"
+  },
+  "Z111": {
+    "city": "Repubblica Democratica Tedesca"
+  },
+  "Z118": {
+    "city": "Repubblica Socialista Federale di Jugoslavia"
+  },
+  "Z135": {
+    "city": "Unione Sovietica"
+  },
+  "Z157": {
+    "city": "Serbia e Montenegro"
+  },
+  "Z250": {
+    "city": "Yemen del Sud"
   }
 }
