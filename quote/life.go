@@ -84,7 +84,9 @@ func Life(data models.Policy) (models.Policy, error) {
 
 	}
 
-	if data.OffersPrices["default"]["monthly"].Gross < ruleProduct.Companies[0].MinimumMonthlyPrice {
+	monthlyToBeRemoved := !ruleProduct.Companies[0].IsMonthlyPaymentAvailable ||
+		data.OffersPrices["default"]["monthly"].Gross < ruleProduct.Companies[0].MinimumMonthlyPrice
+	if monthlyToBeRemoved {
 		delete(data.OffersPrices["default"], "monthly")
 	}
 
