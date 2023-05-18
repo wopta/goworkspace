@@ -25,7 +25,7 @@ func Sellable(w http.ResponseWriter, r *http.Request) {
 			},
 			{
 				Route:   "/v1/risk/person",
-				Handler: Person,
+				Handler: PersonHandler,
 				Method:  http.MethodPost,
 			},
 		},
