@@ -8,7 +8,7 @@ require (
 	cloud.google.com/go v0.110.2
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.3
 	github.com/dustin/go-humanize v1.0.1
-	github.com/wopta/goworkspace/lib v1.0.28
+	github.com/wopta/goworkspace/lib v1.0.36
 	github.com/wopta/goworkspace/models v1.0.62
 	github.com/wopta/goworkspace/sellable v1.0.3
 	modernc.org/mathutil v1.5.0
