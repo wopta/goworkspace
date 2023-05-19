@@ -193,7 +193,7 @@ func calculateIPMPrices(contractorAge int, guarantee *models.Guarante, personaTa
 	age := strconv.Itoa(contractorAge)
 
 	for offerKey, _ := range guarantee.Offer {
-		guarantee.Offer[offerKey].PremiumNetYearly = (guarantee.Offer[offerKey].SumInsuredLimitOfIndemnity / 100) * tassi[age]
+		guarantee.Offer[offerKey].PremiumNetYearly = (guarantee.Offer[offerKey].SumInsuredLimitOfIndemnity / 1000) * tassi[age]
 		guarantee.Offer[offerKey].PremiumTaxAmountYearly = (guarantee.Tax * guarantee.Offer[offerKey].PremiumNetYearly) / 100
 		guarantee.Offer[offerKey].PremiumGrossYearly = guarantee.Offer[offerKey].PremiumTaxAmountYearly + guarantee.Offer[offerKey].PremiumNetYearly
 
@@ -223,11 +223,11 @@ func roundMonthlyOfferPrices(policy *models.Policy, roundingGuarantees ...string
 	guarantees := policy.GuaranteesToMap()
 
 	for offerKey, offer := range policy.OffersPrices {
-		nonRoundedGrossPrice := offer["monthly"].Gross
-		roundedGrossPrice := math.Round(offer["monthly"].Gross)
-		//yearlyGrossPrice := roundedGrossPrice * 12
-		offer["monthly"].Delta = roundedGrossPrice - nonRoundedGrossPrice
-		offer["monthly"].Gross = roundedGrossPrice
+		nonRoundedGrossPrice := offer["yearly"].Gross
+		roundedMonthlyGrossPrice := math.Round(offer["monthly"].Gross)
+		yearlyGrossPrice := roundedMonthlyGrossPrice * 12
+		offer["monthly"].Delta = (yearlyGrossPrice - nonRoundedGrossPrice) / 12
+		offer["monthly"].Gross = roundedMonthlyGrossPrice
 
 		for _, roundingGuarantee := range roundingGuarantees {
 			hasGuarantee := guarantees[roundingGuarantee].Offer[offerKey].PremiumNetMonthly > 0
