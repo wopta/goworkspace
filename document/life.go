@@ -618,6 +618,8 @@ func surveysSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	pdf.Ln(8)
 	err := printSurvey(pdf, surveys[0])
 	lib.CheckError(err)
+
+	pdf.AddPage()
 	getParagraphTitle(pdf, "Questionario Medico")
 	pdf.Ln(8)
 	for _, survey := range surveys[1:] {
@@ -1260,7 +1262,7 @@ func GetWoptaInfoTable(pdf *fpdf.Fpdf) {
 	pdf.MultiCell(0, 3, "SEDE LEGALE", "", "", false)
 	pdf.Ln(1)
 	setBlackRegularFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3, "Galleria del Corso, 1 – 20122 MILANO (VI)", "", "", false)
+	pdf.MultiCell(0, 3, "Galleria del Corso, 1 – 20122 MILANO (MI)", "", "", false)
 	pdf.Ln(0.5)
 	drawPinkHorizontalLine(pdf, 0.1)
 	pdf.Ln(0.5)

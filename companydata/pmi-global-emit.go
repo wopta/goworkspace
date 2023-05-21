@@ -18,28 +18,32 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 		enterpriseName                            string
 		employer, class, sector, atecoDesc, ateco string
 		revenue                                   int
-		//err                                       error
+		e                                         error
 	)
-	/**config := lib.SftpConfig{
-		Username:     os.Getenv("GLOBAL_SFTP_USER"),
-		Password:     os.Getenv("GLOBAL_SFTP_PSW"), // required only if password authentication is to be used
-		PrivateKey:   "",                           // required only if private key authentication is to be used
-		Server:       "ftps.globalassistance.it:222",
-		KeyExchanges: []string{"diffie-hellman-group-exchange-sha1", "diffie-hellman-group1-sha1", "diffie-hellman-group14-sha1"}, // optional
-		Timeout:      time.Second * 30,                                                                                            // 0 for not timeout
-	}**/
+
 	layout := "02/01/2006"
 	layoutFilename := "20060102"
 	//client, e := lib.NewSftpclient(config)
-	now := time.Now().AddDate(0, 0, -1)
-	filename := now.Format(layoutFilename) + "_EM_PMIW.xlsx"
+	location, e := time.LoadLocation("Europe/Rome")
+
+	fmt.Println(time.Now().In(location))
+	executiondate := time.Now().In(location)
+	now := time.Now().In(location).AddDate(0, 0, -1)
+
+	from := time.Date(executiondate.Year(), executiondate.Month(), executiondate.Day(), 0, 0, 0, 0, location)
+	to := time.Date(executiondate.Year(), executiondate.Month(), executiondate.Day(), 8, 0, 0, 0, location)
+	if executiondate.After(from) && executiondate.Before(to) && os.Getenv("env") == "prod" {
+
+	}
+	filename := now.Format(layoutFilename) + "_EM_PMIW.XLSX"
 	//println(config)
 	println("filename: ", filename)
-	//reader, e := client.Download("wopta/" + filename)
-	//buf := new(bytes.Buffer)
-	//buf.ReadFrom(reader)
-	//lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/global/emit/"+filename, []byte(buf.String()))
-	//lib.ExcelRead(reader)
+	GlobalSftpDownload(""+filename, "track/in/global/emit/", "/Wopta/")
+	excelsource, _ := lib.ExcelReadFile("../tmp/" + filename)
+	for k, v := range excelsource {
+		println("key shhet name: ", k)
+		result = v
+	}
 	q := lib.Firequeries{
 		Queries: []lib.Firequery{{
 			Field:      "companyEmit",
@@ -76,8 +80,8 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 				enterpriseName = asset.Enterprise.Name
 				employer = fmt.Sprint(asset.Enterprise.Employer)
 				revenue, _ = strconv.Atoi(asset.Enterprise.Revenue)
-				//atecoMacro = asset.Enterprise.AtecoMacro
-				//atecoSub = asset.Enterprise.AtecoSub
+				sector = asset.Enterprise.AtecoMacro
+				class = asset.Enterprise.AtecoSub
 				atecoDesc = asset.Enterprise.AtecoDesc
 				ateco = asset.Enterprise.Ateco
 			}
@@ -99,11 +103,11 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 						policy.Contractor.FiscalCode,        //CODICE FISCALE CONTRAENTE
 						"",                                  //NATURA GIURIDICA CONTRAENTE
 						enterpriseName,                      //RAGIONE SOCIALE CONTRAENTE
-						policy.Contractor.Name,              //COGNOME CONTRANTE
-						policy.Contractor.Surname,           //NOME CONTRANTE
-						policy.Contractor.City,              //PROVINCIA CONTRAENTE
+						policy.Contractor.Surname,           //COGNOME CONTRANTE
+						policy.Contractor.Name,              //NOME CONTRANTE
+						policy.Contractor.CityCode,          //PROVINCIA CONTRAENTE
 						policy.Contractor.Locality,          //COMUNE CONTRAENTE
-						policy.Contractor.CityCode,          //CAP CONTRAENTE
+						policy.Contractor.PostalCode,        //CAP CONTRAENTE
 						"",                                  //TOPONIMO CONTRAENTE
 						policy.Contractor.Address,           //INDIRIZZO CONTRAENTE
 						policy.Contractor.StreetNumber,      //NUMERO CIVICO CONTRAENTE
@@ -119,13 +123,13 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 						"1",                                 //DOMANDA 2
 						"1",                                 //DOMANDA 3
 						getMapRevenue(revenue),              //FATTURATO
-						"",                                  //FORMA DI COPERTURA ------------------------------------------bENI
-						"",                                  //FORMULA INCENDIO
-						"",                                  //BENE -----------------------------------------------------BENI 1 FABBRICATO
+						"1",                                 //FORMA DI COPERTURA ------------------------------------------bENI
+						"2",                                 //FORMULA INCENDIO
+						"1",                                 //BENE -----------------------------------------------------BENI 1 FABBRICATO
 						getMapBuildingYear(asset.Building.BuildingYear),         //ANNO DI COSTRUZIONE FABBRICATO
 						getMapBuildingMaterial(asset.Building.BuildingMaterial), //MATERIALE COSTRUZIONE
 						getMapBuildingFloor(asset.Building.Floor),               //NUMERO PIANI
-						getYesNo(asset.Building.IsAllarm),                       //PRESENZA ALLARME
+						getOneTwo(asset.Building.IsAllarm),                      //PRESENZA ALLARME
 						"",                                                      //PRESENZA POLIZZA CONDOMINIALE
 						getOneTwo(asset.Building.IsHolder),                      //TIPOLOGIA FABBRICATO
 						asset.Building.CityCode,                                 //PROVINCIA UBICAZIONE
@@ -150,24 +154,24 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 						getMapSelfInsurance(g.SelfInsuranceDesc), //SCOPERTO – BENI
 						"",                                       //% SOMMA ASSICURATA INCENDIO FABBRICATO E CONTENUTO – BENI
 						strconv.Itoa(int(g.SumInsuredLimitOfIndemnity)), //MASSIMALE - BENI
-						"",                 //DIARIA – BENI
-						"",                 //CODICE ATTIVITA' - ATTIVITA' -------------------------------------------------ATTIVITA 2 ATTIVITA
-						"",                 //CLASSE - ATTIVITA'
-						"",                 //SETTORE - ATTIVITA'
-						"",                 //TIPO - ATTIVITA'
-						"",                 //GARANZIE/PACCHETTI - ATTIVITA'
-						"",                 //CLAUSOLA ATTIVITA' - BENE
-						"",                 //CLAUSOLA ATTIVITA' - GARANZIE
-						"",                 //FRANCHIGIA - ATTIVITA'
-						"",                 //SCOPERTO - ATTIVITA'
-						"",                 //MASSIMALE - ATTIVITA'
-						"",                 //MASSIMALE PER EVENTO - ATTIVITA'
-						"",                 //PREMIO ANNUO LORDO DI GARANZIA
-						"0",                //SCONTO %
-						"",                 //RATA ALLA FIRMA
-						"",                 //RATA SUCCESSIVA
-						"",                 //DATA SCADENZA I RATA
-						policy.CodeCompany, //NUMERO POLIZZA
+						"",                                //DIARIA – BENI
+						"",                                //CODICE ATTIVITA' - ATTIVITA' -------------------------------------------------ATTIVITA 2 ATTIVITA
+						"",                                //CLASSE - ATTIVITA'
+						"",                                //SETTORE - ATTIVITA'
+						"",                                //TIPO - ATTIVITA'
+						"",                                //GARANZIE/PACCHETTI - ATTIVITA'
+						"",                                //CLAUSOLA ATTIVITA' - BENE
+						"",                                //CLAUSOLA ATTIVITA' - GARANZIE
+						"",                                //FRANCHIGIA - ATTIVITA'
+						"",                                //SCOPERTO - ATTIVITA'
+						"",                                //MASSIMALE - ATTIVITA'
+						"",                                //MASSIMALE PER EVENTO - ATTIVITA'
+						fmt.Sprintf("%.2f", g.PriceGross), //PREMIO ANNUO LORDO DI GARANZIA
+						"0",                               //SCONTO %
+						fmt.Sprintf("%.2f", getInstallament(policy.PaymentSplit, g.PriceGross)), //RATA ALLA FIRMA
+						fmt.Sprintf("%.2f", getInstallament(policy.PaymentSplit, g.PriceGross)), //RATA SUCCESSIVA
+						getInstallamentDate(policy, layout),                                     //DATA SCADENZA I RATA
+						policy.CodeCompany,
 					}
 					result = append(result, row)
 
@@ -210,9 +214,9 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 						"1",                                      //DOMANDA 2
 						"1",                                      //DOMANDA 3
 						getMapRevenue(revenue),                   //FATTURATO
-						"",                                       //FORMA DI COPERTURA ------------------------------------------bENI
-						"",                                       //FORMULA INCENDIO
-						"",                                       //BENE -----------------------------------------------------BENI 1 FABBRICATO
+						"1",                                      //FORMA DI COPERTURA ------------------------------------------bENI
+						"2",                                      //FORMULA INCENDIO
+						"2",                                      //BENE -----------------------------------------------------BENI 1 FABBRICATO
 						"",                                       //ANNO DI COSTRUZIONE FABBRICATO
 						"",                                       //MATERIALE COSTRUZIONE
 						"",                                       //NUMERO PIANI
@@ -241,10 +245,10 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 						"",                                       //% SOMMA ASSICURATA INCENDIO FABBRICATO E CONTENUTO – BENI
 						"",                                       //MASSIMALE - BENI
 						"",                                       //DIARIA – BENI
-						"",                                       //CODICE ATTIVITA' - ATTIVITA' -------------------------------------------------ATTIVITA 2 ATTIVITA
-						"",                                       //CLASSE - ATTIVITA'
-						"",                                       //SETTORE - ATTIVITA'
-						"",                                       //TIPO - ATTIVITA'
+						ateco,                                    //CODICE ATTIVITA' - ATTIVITA' -------------------------------------------------ATTIVITA 2 ATTIVITA
+						class,                                    //CLASSE - SOLO BENI
+						sector,                                   //SETTORE – BENI
+						atecoDesc,                                //TIPO - ATTIVITA'
 						g.CompanyCodec,                           //GARANZIE/PACCHETTI - ATTIVITA'
 						"",                                       //CLAUSOLA ATTIVITA' - BENE
 						"",                                       //CLAUSOLA ATTIVITA' - GARANZIE
@@ -275,10 +279,11 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 	}
 	log.Println("len(result):", len(result))
 	filepath := filename
+
 	excel, e := lib.CreateExcel(result, "../tmp/"+filepath, "Risultato")
 	//source, _ := ioutil.ReadFile("../tmp/" + filepath)
 
-	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/global/pmi/emit/0_"+filepath, <-excel)
+	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/global/pmi/emit/"+filepath, <-excel)
 	//lib.PutGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/global/pmi/emit/"+filepath, source, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
 	return "", nil, e

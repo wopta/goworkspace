@@ -52,7 +52,6 @@
       },
       "widget": "quoterstatements"
     },
-
     {
       "attributes": {
         "beneficiaryText": "Per procedere indicare chi sono i beneficiari della polizza in caso di decesso dell'assicurato.\\nPuoi indicare genericamente i tuoi eredi legittimi e/o testamentari. Oppure inserire in maniera puntuale i nomi dei Beneficiari (Massimo due).",
@@ -68,7 +67,21 @@
     },
     {
       "attributes": null,
+      "widget": "quoteruploaddocuments"
+    },
+    {
+      "attributes": null,
       "widget": "quoterrecap"
+    },
+    {
+      "attributes": null,
+      "widget": "quotersignpay"
+    },
+    {
+      "attributes": {
+        "productLogo": "assets/images/wopta-logo-vita-magenta.png"
+      },
+      "widget": "quoterthankyou"
     }
   ],
   "companies": [
@@ -77,11 +90,25 @@
       "code": "2",
       "commission": 0.30,
       "commissionRenew": 0.18,
+      "isMonthlyPaymentAvailable": "false",
       "minimumMonthlyPrice": 20,
       "minimumYearlyPrice": 0,
+      "informationSetLink": "https://storage.googleapis.com/documents-public-dev/information-sets/life/v1/Precontrattuale.pdf",
+      "emitTrack": {
+        "name": "axa",
+        "type": "csv",
+        "format": ".csv",
+        "columns": [
+          {
+            "name": "axa",
+            "value": "csv",
+            "format": ".csv"
+          }
+        ]
+      },
       "guaranteesMap": {
         "death": {
-          "companyCodec": "",
+          "companyCodec": "D",
           "companyName": "Decesso",
           "title": "Per qualsiasi causa",
           "description": "Cosa significa amare le persone a te più care? Scegli il sostegno di un capitale, a disposizione di chi resta, per affrontare «il dopo» di un drammatico imprevisto, con una certezza economica in più.",
@@ -118,7 +145,7 @@
           }
         },
         "permanent-disability": {
-          "companyCodec": "",
+          "companyCodec": "PTD",
           "companyName": "Invalidità Totale Permanente",
           "deductible": "",
           "title": "",
@@ -156,7 +183,7 @@
           }
         },
         "temporary-disability": {
-          "companyCodec": "",
+          "companyCodec": "TTD",
           "companyName": "Inabilità Totale Temporanea",
           "deductible": "",
           "title": "",
@@ -194,7 +221,7 @@
           }
         },
         "serious-ill": {
-          "companyCodec": "",
+          "companyCodec": "CI",
           "companyName": "Malattia Grave",
           "deductible": "",
           "title": "",

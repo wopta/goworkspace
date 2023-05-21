@@ -11,7 +11,7 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
-func PersonGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func GlobalTransaction(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		result [][]string
 

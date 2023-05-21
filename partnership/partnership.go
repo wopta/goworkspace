@@ -7,8 +7,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strconv"
-	"strings"
 	"time"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
@@ -68,7 +66,7 @@ func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, inter
 		person.Surname = claims.UserLastname
 		person.Mail = claims.UserEmail
 		person.FiscalCode = claims.UserFiscalcode
-		person.BirthDate = extractBirthdateFromItalianFiscalCode(claims.UserFiscalcode).Format(time.RFC3339)
+		person.BirthDate = lib.ExtractBirthdateFromItalianFiscalCode(claims.UserFiscalcode).Format(time.RFC3339)
 		person.Phone = claims.UserMobile
 		person.Address = claims.UserAddress
 		person.PostalCode = claims.UserPostalcode
@@ -108,7 +106,7 @@ func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, inter
 	return string(p), policy, err
 }
 
-func extractBirthdateFromItalianFiscalCode(fiscalCode string) time.Time {
+/*func extractBirthdateFromItalianFiscalCode(fiscalCode string) time.Time {
 	year, _ := strconv.Atoi(fiscalCode[6:8])
 	month := getMonth(fiscalCode[8:9])
 	day, _ := strconv.Atoi(fiscalCode[9:11])
@@ -144,7 +142,7 @@ func getMonth(monthCode string) int {
 	}
 
 	return monthMap[strings.ToUpper(monthCode)]
-}
+}*/
 
 type BeprofClaims struct {
 	UserBeprofid         int    `json:"user.beprofid"`

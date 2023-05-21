@@ -70,7 +70,7 @@ func getCompletePoliciesFromWise(simplePolicies []WiseSimplePolicy, wiseToken *s
 
 	return lib.ExecuteInBatches(
 		wiseProxyInputs,
-		1,
+		2,
 		func(input WiseProxyInput) models.Policy {
 			responseReader, wiseToken = wiseProxy.WiseBatch(input.Endpoint, input.Request, input.Method, wiseToken)
 			jsonData, _ := ioutil.ReadAll(responseReader)
@@ -128,7 +128,17 @@ func GetPoliciesFromFirebase(fiscalCode string, policyFire string) []models.Poli
 				QueryValue: fiscalCode,
 			},
 			{
-				Field:      "companyEmitted",
+				Field:      "companyEmit",
+				Operator:   "==",
+				QueryValue: true,
+			},
+			{
+				Field:      "isPay",
+				Operator:   "==",
+				QueryValue: true,
+			},
+			{
+				Field:      "isSign",
 				Operator:   "==",
 				QueryValue: true,
 			},
