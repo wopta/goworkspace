@@ -258,14 +258,15 @@ func getMapSelfInsurance(key string) string {
 
 	return strconv.Itoa(res)
 }
-func getSumLimit(sumlimitContentBuilding float64, sumlimit float64) (string, string) {
+func getSumLimit(sumlimitContentBuilding float64, g models.Guarante) (string, string) {
 	var (
 		sum, perc string
 	)
-	sum = strconv.Itoa(int(sumlimit))
-	if sumlimit <= 1 {
-		percF := sumlimit * 100
-		sumF := sumlimitContentBuilding * sumlimit
+	sum = strconv.Itoa(int(g.SumInsuredLimitOfIndemnity))
+
+	if g.SumInsuredLimitOfIndemnity <= 1 {
+		percF := g.SumInsuredLimitOfIndemnity * 100
+		sumF := sumlimitContentBuilding * g.SumInsuredLimitOfIndemnity
 		perc = strconv.Itoa(int(percF))
 		sum = strconv.Itoa(int(sumF))
 	}
