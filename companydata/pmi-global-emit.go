@@ -14,29 +14,17 @@ import (
 
 func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		result                                    [][]string
-		enterpriseName                            string
-		employer, class, sector, atecoDesc, ateco string
-		revenue                                   int
-		e                                         error
+		result [][]string
+
+		e error
 	)
 
-	layout := "02/01/2006"
 	layoutFilename := "20060102"
-	//client, e := lib.NewSftpclient(config)
 	location, e := time.LoadLocation("Europe/Rome")
-
+	collection := "policy"
 	fmt.Println(time.Now().In(location))
-	executiondate := time.Now().In(location)
 	now := time.Now().In(location).AddDate(0, 0, -1)
-
-	from := time.Date(executiondate.Year(), executiondate.Month(), executiondate.Day(), 0, 0, 0, 0, location)
-	to := time.Date(executiondate.Year(), executiondate.Month(), executiondate.Day(), 8, 0, 0, 0, location)
-	if executiondate.After(from) && executiondate.Before(to) && os.Getenv("env") == "prod" {
-
-	}
 	filename := now.Format(layoutFilename) + "_EM_PMIW.XLSX"
-	//println(config)
 	println("filename: ", filename)
 	GlobalSftpDownload(""+filename, "track/in/global/emit/", "/Wopta/")
 	excelsource, _ := lib.ExcelReadFile("../tmp/" + filename)
@@ -44,6 +32,7 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 		println("key shhet name: ", k)
 		result = v
 	}
+
 	q := lib.Firequeries{
 		Queries: []lib.Firequery{{
 			Field:      "companyEmit",
@@ -67,14 +56,42 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 			},
 		},
 	}
-	query, e := q.FirestoreWherefields("policy")
+	query, e := q.FirestoreWherefields(collection)
 	policies := models.PolicyToListData(query)
 	log.Println("len(policies):", len(policies))
+
+	result = append(result, getPmiData(policies)...)
+	log.Println("len(result):", len(result))
+	filepath := "../tmp/" + filename
+	excel, e := lib.CreateExcel(result, filepath, "Risultato")
+	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/global/pmi/emit/"+filepath, <-excel)
+	//lib.PutGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/global/pmi/emit/"+filepath, source, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+	if len(policies) > 0 {
+		GlobalSftpDelete("/Wopta/" + filename)
+		GlobalSftpUpload(filename, "/Wopta/")
+	}
+	return "", nil, e
+}
+
+func getPmiData(policies []models.Policy) [][]string {
+	var (
+		result                                    [][]string
+		enterpriseName                            string
+		employer, class, sector, atecoDesc, ateco string
+		revenue                                   int
+		sumlimitContentBuilding                   float64
+		e                                         error
+	)
+	layout := "02/01/2006"
 	for _, policy := range policies {
 
 		for _, asset := range policy.Assets {
 			if asset.Building != nil {
-
+				for _, g := range asset.Guarantees {
+					if g.Slug == "content" || g.Slug == "property-owners-liability" || g.Slug == "building" {
+						sumlimitContentBuilding = sumlimitContentBuilding + g.SumInsuredLimitOfIndemnity
+					}
+				}
 			}
 			if asset.Enterprise != nil {
 				enterpriseName = asset.Enterprise.Name
@@ -89,6 +106,8 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 		for _, asset := range policy.Assets {
 			if asset.Building != nil {
 				for _, g := range asset.Guarantees {
+
+					sum, perc := getSumLimit(sumlimitContentBuilding, g)
 					//"TIPO OPERAZIONE",N. POLIZZA SOSTITUITA,	DENOMINAZIONE PRODOTTO,	NODO DI GESTIONE,	DATA EMISSIONE,	DATA EFFETTO,	PARTITA IVA CONTRAENTE,	CODICE FISCALE CONTRAENTE	NATURA GIURIDICA CONTRAENTE	RAGIONE SOCIALE CONTRAENTE	PROVINCIA CONTRAENTE	COMUNE CONTRAENTE	CAP CONTRAENTE	TOPONIMO CONTRAENTE	INDIRIZZO CONTRAENTE	NUMERO CIVICO CONTRAENTE	DATA SCADENZA	FRAZIONAMENTO	VINCOLO	NUMERO ADDETTI	COSA SI VUOLE ASSICURARE	DOMANDA 1	DOMANDA 2	DOMANDA 3	FATTURATO	FORMA DI COPERTURA	FORMULA INCENDIO	BENE	ANNO DI COSTRUZIONE FABBRICATO	MATERIALE COSTRUZIONE	NUMERO PIANI	PRESENZA ALLARME	PRESENZA POLIZZA CONDOMINIALE	TIPOLOGIA FABBRICATO	PROVINCIA UBICAZIONE	COMUNE UBICAZIONE	CAP UBICAZIONE	TOPONIMO UBICAZIONE	INDIRIZZO UBICAZIONE	NUMERO CIVICO UBICAZIONE	CODICE ATTIVITA' - BENI	CLASSE - SOLO BENI	SETTORE - BENI	TIPO - BENI	CLAUSOLA VINCOLO	TESTO CLAUSOLA VINCOLO	GARANZIE/PACCHETTI - BENI	FRANCHIGIA - BENI	SOMMA ASSICURATA - BENI	SCOPERTO - BENI	% SOMMA ASSICURATA INCENDIO FABBRICATO E CONTENUTO - BENI	MASSIMALE - BENI	DIARIA - BENI	CODICE ATTIVITA' - ATTIVITA'	CLASSE - ATTIVITA'	SETTORE - ATTIVITA'	TIPO - ATTIVITA'	GARANZIE/PACCHETTI - ATTIVITA'	FRANCHIGIA - ATTIVITA'	SCOPERTO - ATTIVITA'	MASSIMALE - ATTIVITA'	MASSIMALE PER EVENTO - ATTIVITA'	PREMIO ANNUO LORDO DI GARANZIA	SCONTO %	RATA ALLA FIRMA	RATA SUCCESSIVA	DATA SCADENZA I RATA	NUMERO POLIZZA
 					fmt.Println(g)
 					//row := []string{"TIPO OPERAZIONE", "N. POLIZZA SOSTITUITA", "DENOMINAZIONE PRODOTTO", "NODO DI GESTIONE", "DATA EMISSIONE", "DATA EFFETTO", "PARTITA IVA CONTRAENTE", "CODICE FISCALE CONTRAENTE", "NATURA GIURIDICA CONTRAENTE", "RAGIONE SOCIALE CONTRAENTE", "PROVINCIA CONTRAENTE", "COMUNE CONTRAENTE", "CAP CONTRAENTE", "TOPONIMO CONTRAENTE", "INDIRIZZO CONTRAENTE", "NUMERO CIVICO CONTRAENTE", "DATA SCADENZA", "FRAZIONAMENTO", "VINCOLO", "NUMERO ADDETTI", "COSA SI VUOLE ASSICURARE", "DOMANDA 1", "DOMANDA 2", "DOMANDA 3", "FATTURATO", "FORMA DI COPERTURA", "FORMULA INCENDIO", "BENE", "ANNO DI COSTRUZIONE FABBRICATO", "MATERIALE COSTRUZIONE", "NUMERO PIANI", "PRESENZA ALLARME", "PRESENZA POLIZZA CONDOMINIALE", "TIPOLOGIA FABBRICATO", "PROVINCIA UBICAZIONE", "COMUNE UBICAZIONE", "CAP UBICAZIONE", "TOPONIMO UBICAZIONE", "INDIRIZZO UBICAZIONE", "NUMERO CIVICO UBICAZIONE", "CODICE ATTIVITA' - BENI", "CLASSE - SOLO BENI", "SETTORE - BENI", "TIPO - BENI", "CLAUSOLA VINCOLO", "TESTO CLAUSOLA VINCOLO", "GARANZIE/PACCHETTI - BENI", "FRANCHIGIA - BENI", "SOMMA ASSICURATA - BENI", "SCOPERTO - BENI", "% SOMMA ASSICURATA INCENDIO FABBRICATO E CONTENUTO - BENI", "MASSIMALE - BENI", "DIARIA - BENI", "CODICE ATTIVITA' - ATTIVITA'", "CLASSE - ATTIVITA'", "SETTORE - ATTIVITA'", "TIPO - ATTIVITA'", "GARANZIE/PACCHETTI - ATTIVITA'", "FRANCHIGIA - ATTIVITA'", "SCOPERTO - ATTIVITA'", "MASSIMALE - ATTIVITA'", "MASSIMALE PER EVENTO - ATTIVITA'", "PREMIO ANNUO LORDO DI GARANZIA", "SCONTO %", "RATA ALLA FIRMA", "RATA SUCCESSIVA", "DATA SCADENZA I RATA", "NUMERO POLIZZA"}
@@ -149,10 +168,10 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 						"",                                                      //CLAUSOLA BENI - BENE
 						"",                                                      //CLAUSOLA BENI - GARANZIE
 						g.Deductible,                                            //FRANCHIGIA – BENI
-						strconv.Itoa(int(g.SumInsuredLimitOfIndemnity)), //SOMMA ASSICURATA – BENI
+						sum,                                                     //SOMMA ASSICURATA – BENI
 
 						getMapSelfInsurance(g.SelfInsuranceDesc), //SCOPERTO – BENI
-						"",                                       //% SOMMA ASSICURATA INCENDIO FABBRICATO E CONTENUTO – BENI
+						perc,                                     //% SOMMA ASSICURATA INCENDIO FABBRICATO E CONTENUTO – BENI
 						strconv.Itoa(int(g.SumInsuredLimitOfIndemnity)), //MASSIMALE - BENI
 						"",                                //DIARIA – BENI
 						"",                                //CODICE ATTIVITA' - ATTIVITA' -------------------------------------------------ATTIVITA 2 ATTIVITA
@@ -274,170 +293,8 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 
 		if e == nil {
 			policy.CompanyEmitted = true
-			//lib.SetFirestore("policy", policy.Agent.Uid, policy)
+			lib.SetFirestore(collection, policy.Uid, policy)
 		}
 	}
-	log.Println("len(result):", len(result))
-	filepath := filename
-
-	excel, e := lib.CreateExcel(result, "../tmp/"+filepath, "Risultato")
-	//source, _ := ioutil.ReadFile("../tmp/" + filepath)
-
-	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/global/pmi/emit/"+filepath, <-excel)
-	//lib.PutGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/global/pmi/emit/"+filepath, source, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-
-	return "", nil, e
-}
-
-func getInstallamentDate(p models.Policy, layout string) string {
-	var res string
-	res = p.EndDate.Format(layout)
-	if p.PaymentSplit == "monthly" {
-		res = p.StartDate.AddDate(0, 1, 0).Format(layout)
-	}
-
-	return res
-}
-func getInstallament(key string, price float64) float64 {
-	var res float64
-	res = price
-	if key == "monthly" {
-		res = price / 12
-	}
-	return res
-}
-func getYesNo(key bool) string {
-	var res string
-	mapGarante := map[bool]string{true: "SI", false: "NO"}
-
-	if seconds, ok := mapGarante[key]; ok { // will be false if person is not in the map
-		res = seconds
-	}
-	return res
-}
-func getOneTwo(key bool) string {
-	var res string
-	mapGarante := map[bool]string{true: "1", false: "2"}
-
-	if seconds, ok := mapGarante[key]; ok { // will be false if person is not in the map
-		res = seconds
-	}
-	return res
-}
-func getMapBuildingYear(key string) string {
-	var res string
-	mapGarante := map[string]string{"before1972": "1", "1972between2009": "2", "after2009": "3"}
-
-	if seconds, ok := mapGarante[key]; ok { // will be false if person is not in the map
-		res = seconds
-	}
-	return res
-}
-func getMapBuildingFloor(key string) string {
-	var res string
-	mapGarante := map[string]string{"ground_floor": "1", "first": "2", "second": "3", "greater_than_second": "4"}
-
-	if seconds, ok := mapGarante[key]; ok { // will be false if person is not in the map
-		res = seconds
-	}
-	return res
-}
-func getMapBuildingMaterial(key string) string {
-	var res string
-	mapGarante := map[string]string{"masonry": "1", "reinforcedConcrete": "2", "antiSeismicLaminatedTimber": "3", "steel": "4"}
-
-	if seconds, ok := mapGarante[key]; ok { // will be false if person is not in the map
-		res = seconds
-	}
-	return res
-}
-func getMapSplit(key string) string {
-	var res string
-	res = "1"
-	if key == "monthly" {
-		res = "12"
-	}
-	return res
-}
-func getBuildingType(key string) string {
-	var res string
-	res = "1"
-	if key == "montly" {
-		res = "12"
-	}
-	return res
-}
-func getMapRevenue(key int) string {
-	var res int
-
-	if key <= 200000 { // will be false if person is not in the map
-		res = 1
-	}
-	if key > 200000 && key <= 500000 { // will be false if person is not in the map
-		res = 2
-	}
-	if key > 500000 && key <= 1000000 { // will be false if person is not in the map
-		res = 3
-	}
-	if key > 1000000 && key <= 1500000 { // will be false if person is not in the map
-		res = 4
-	}
-	if key > 1500000 && key <= 5000000 { // will be false if person is not in the map
-		res = 5
-	}
-	if key > 5000000 && key <= 7500000 { // will be false if person is not in the map
-		res = 6
-	}
-	if key > 7500000 && key <= 10000000 { // will be false if person is not in the map
-		res = 7
-	}
-	return strconv.Itoa(res)
-}
-func getMapSelfInsurance(key string) string {
-	var res int
-
-	if key == "5% - minimo € 500" { // will be false if person is not in the map
-		res = 1
-	}
-	if key == "5% - minimo € 1.000" { // will be false if person is not in the map
-		res = 2
-	}
-	if key == "5% - minimo € 1.500" { // will be false if person is not in the map
-		res = 3
-	}
-	if key == "10% - minimo € 500" { // will be false if person is not in the map
-		res = 4
-	}
-	if key == "10% - minimo € 1.000" { // will be false if person is not in the map
-		res = 5
-	}
-	if key == "10% - minimo € 1.500" { // will be false if person is not in the map
-		res = 6
-	}
-	if key == "10% - minimo € 2.000" { // will be false if person is not in the map
-		res = 7
-	}
-	if key == "10% - minimo € 3.000" { // will be false if person is not in the map
-		res = 8
-	}
-	if key == "10% - minimo € 5.000" { // will be false if person is not in the map
-		res = 9
-	}
-	if key == "15% - minimo € 5.000" { // will be false if person is not in the map
-		res = 10
-	}
-	if key == "10% - minimo € 10.000" { // will be false if person is not in the map
-		res = 11
-	}
-	if key == "10% - minimo € 20.000" { // will be false if person is not in the map
-		res = 12
-	}
-	if key == "10% - minimo € 25.000" { // will be false if person is not in the map
-		res = 13
-	}
-	if key == "10% - minimo € 30.000" { // will be false if person is not in the map
-		res = 14
-	}
-
-	return strconv.Itoa(res)
+	return result
 }

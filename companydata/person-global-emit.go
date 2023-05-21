@@ -22,13 +22,10 @@ func PersonGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface
 	layoutFilename := "20060102"
 	//client, e := lib.NewSftpclient(config)
 	location, e := time.LoadLocation("Europe/Rome")
-
+	collection := "policy"
 	fmt.Println(time.Now().In(location))
-	executiondate := time.Now().In(location)
-	now := time.Now().In(location).AddDate(0, 0, -1)
 
-	from := time.Date(executiondate.Year(), executiondate.Month(), executiondate.Day(), 0, 0, 0, 0, location)
-	to := time.Date(executiondate.Year(), executiondate.Month(), executiondate.Day(), 8, 0, 0, 0, location)
+	now := time.Now().In(location).AddDate(0, 0, -1)
 
 	filename := now.Format(layoutFilename) + "_EM_PMIW.XLSX"
 	//println(config)
@@ -139,19 +136,17 @@ func PersonGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface
 
 		if e == nil {
 			policy.CompanyEmitted = true
-			//lib.SetFirestore("policy", policy.Agent.Uid, policy)
+			lib.SetFirestore(collection, policy.Uid, policy)
 		}
 	}
 	log.Println("len(result):", len(result))
-	filepath := filename
-
-	excel, e := lib.CreateExcel(result, "../tmp/"+filepath, "Risultato")
-	//source, _ := ioutil.ReadFile("../tmp/" + filepath)
-
-	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/global/pmi/emit/"+filepath, <-excel)
+	filepath := "../tmp/" + filename
+	excel, e := lib.CreateExcel(result, filepath, "Risultato")
+	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/global/person/emit/"+filepath, <-excel)
 	//lib.PutGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/global/pmi/emit/"+filepath, source, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-	if executiondate.After(from) && executiondate.Before(to) && os.Getenv("env") == "prod" {
-
+	if len(policies) > 0 {
+		GlobalSftpDelete("/Wopta/" + filename)
+		GlobalSftpUpload(filename, "/Wopta/")
 	}
 	return "", nil, e
 }
