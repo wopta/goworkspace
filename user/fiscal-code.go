@@ -106,9 +106,9 @@ func calculateSurnameCode(surname string, consonantsMap, vowelsMap map[rune]stru
 
 	if consonantCount >= 3 {
 		surnameCode = consonants[:3]
-	} else if consonantCount == 2 {
+	} else if consonantCount == 2 && vowelsCount > 0 {
 		surnameCode = consonants[:2] + vowels[:1]
-	} else if consonantCount == 1 && vowelsCount == 2 {
+	} else if consonantCount == 1 && vowelsCount >= 2 {
 		surnameCode = consonants[:1] + vowels[:2]
 	} else if consonantCount == 1 && vowelsCount == 1 {
 		surnameCode = consonants[:1] + vowels[:1] + "X"
@@ -143,7 +143,7 @@ func calculateNameCode(name string, consonantsMap, vowelsMap map[rune]struct{}) 
 		nameCode = consonants[:3]
 	} else if consonantCount == 2 {
 		nameCode = consonants[:2] + vowels[:1]
-	} else if consonantCount == 1 && vowelsCount == 2 {
+	} else if consonantCount == 1 && vowelsCount >= 2 {
 		nameCode = consonants[:1] + vowels[:2]
 	} else if consonantCount == 1 && vowelsCount == 1 {
 		nameCode = consonants[:1] + vowels[:1] + "X"

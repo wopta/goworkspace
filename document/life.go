@@ -1262,7 +1262,7 @@ func GetWoptaInfoTable(pdf *fpdf.Fpdf) {
 	pdf.MultiCell(0, 3, "SEDE LEGALE", "", "", false)
 	pdf.Ln(1)
 	setBlackRegularFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3, "Galleria del Corso, 1 – 20122 MILANO (VI)", "", "", false)
+	pdf.MultiCell(0, 3, "Galleria del Corso, 1 – 20122 MILANO (MI)", "", "", false)
 	pdf.Ln(0.5)
 	drawPinkHorizontalLine(pdf, 0.1)
 	pdf.Ln(0.5)

@@ -35,19 +35,20 @@ type Product struct {
 }
 
 type Company struct {
-	Name                string               `firestore:"name,omitempty" json:"name,omitempty"`
-	Code                string               `firestore:"code,omitempty" json:"code,omitempty"`
-	SequencePrefix      string               `firestore:"sequencePrefix,omitempty" json:"sequencePrefix,omitempty"`
-	SequenceStart       int                  `firestore:"sequenceStart,omitempty" json:"sequenceStart,omitempty"`
-	SequenceFormat      string               `firestore:"sequenceFormat,omitempty" json:"sequenceFormat,omitempty"`
-	EmitTrack           Track                `firestore:"emitTrack,omitempty" json:"emitTrack,omitempty"`
-	Commission          float64              `firestore:"commission,omitempty" json:"commission,omitempty"`
-	CommissionRenew     float64              `firestore:"commissionRenew,omitempty" json:"commissionRenew,omitempty"`
-	MinimumMonthlyPrice float64              `firestore:"minimumMonthlyPrice,omitempty" json:"minimumMonthlyPrice,omitempty"`
-	MinimumYearlyPrice  float64              `firestore:"minimumYearlyPrice,omitempty" json:"minimumYearlyPrice,omitempty"`
-	Guarantees          *[]Guarante          `firestore:"guarantees,omitempty" json:"guarantees,omitempty"`
-	GuaranteesMap       map[string]*Guarante `firestore:"guaranteesMap,omitempty" json:"guaranteesMap,omitempty"`
-	InformationSetLink  string               `firestore:"informationSetLink,omitempty" json:"informationSetLink,omitempty"`
+	Name                      string               `firestore:"name,omitempty" json:"name,omitempty"`
+	Code                      string               `firestore:"code,omitempty" json:"code,omitempty"`
+	SequencePrefix            string               `firestore:"sequencePrefix,omitempty" json:"sequencePrefix,omitempty"`
+	SequenceStart             int                  `firestore:"sequenceStart,omitempty" json:"sequenceStart,omitempty"`
+	SequenceFormat            string               `firestore:"sequenceFormat,omitempty" json:"sequenceFormat,omitempty"`
+	EmitTrack                 Track                `firestore:"emitTrack,omitempty" json:"emitTrack,omitempty"`
+	Commission                float64              `firestore:"commission,omitempty" json:"commission,omitempty"`
+	CommissionRenew           float64              `firestore:"commissionRenew,omitempty" json:"commissionRenew,omitempty"`
+	MinimumMonthlyPrice       float64              `firestore:"minimumMonthlyPrice,omitempty" json:"minimumMonthlyPrice,omitempty"`
+	MinimumYearlyPrice        float64              `firestore:"minimumYearlyPrice,omitempty" json:"minimumYearlyPrice,omitempty"`
+	Guarantees                *[]Guarante          `firestore:"guarantees,omitempty" json:"guarantees,omitempty"`
+	GuaranteesMap             map[string]*Guarante `firestore:"guaranteesMap,omitempty" json:"guaranteesMap,omitempty"`
+	InformationSetLink        string               `firestore:"informationSetLink,omitempty" json:"informationSetLink,omitempty"`
+	IsMonthlyPaymentAvailable bool                 `firestore:"isMonthlyPaymentAvailable" json:"isMonthlyPaymentAvailable"`
 }
 type Step struct {
 	Widget     string      `firestore:"widget,omitempty" json:"widget"`
