@@ -54,10 +54,11 @@ const (
 
 func GetNameFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	name := r.Header.Get("name")
+	origin := r.Header.Get("origin")
 
 	log.Println(r.RequestURI)
 
-	product, err := GetName(name, "v1")
+	product, err := GetName(origin, name, "v1")
 	if err != nil {
 
 		return "", nil, err
@@ -99,7 +100,7 @@ func ReplaceDatesInProduct(product models.Product, minYear int) (string, models.
 	return productJson, product, err
 }
 
-func GetName(name string, version string) (models.Product, error) {
+func GetName(origin string, name string, version string) (models.Product, error) {
 	q := lib.Firequeries{
 		Queries: []lib.Firequery{{
 			Field:      "name",
@@ -113,7 +114,9 @@ func GetName(name string, version string) (models.Product, error) {
 			},
 		},
 	}
-	query, _ := q.FirestoreWherefields("products")
+
+	fireProduct := lib.GetDatasetByEnv(origin, "products")
+	query, _ := q.FirestoreWherefields(fireProduct)
 	products := models.ProductToListData(query)
 	if len(products) == 0 {
 		return models.Product{}, fmt.Errorf("no product json file found for %s %s", name, version)
@@ -138,7 +141,6 @@ func PutFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, erro
 }
 
 func Put(p models.Product) (models.Product, error) {
-
 	r, _, e := lib.PutFirestoreErr("products", p)
 	log.Println(r.ID)
 
