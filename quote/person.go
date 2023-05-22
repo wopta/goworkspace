@@ -45,6 +45,9 @@ func PersonFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 			}
 		}
 	}
+
+	applyDiscounts(&policy)
+
 	offerPrices(&policy)
 
 	roundMonthlyOfferPrices(&policy, "IPI", "DRG")
@@ -200,6 +203,47 @@ func calculateIPMPrices(contractorAge int, guarantee *models.Guarante, personaTa
 		guarantee.Offer[offerKey].PremiumNetMonthly = guarantee.Offer[offerKey].PremiumNetYearly / 12
 		guarantee.Offer[offerKey].PremiumTaxAmountMonthly = guarantee.Offer[offerKey].PremiumTaxAmountYearly / 12
 		guarantee.Offer[offerKey].PremiumGrossMonthly = guarantee.Offer[offerKey].PremiumGrossYearly / 12
+	}
+
+}
+
+func applyDiscounts(policy *models.Policy) {
+	numberOfGuarantees := map[string]int{
+		"base": 0, "your": 0, "premium": 0,
+	}
+	numberOfInsured := len(policy.Assets)
+
+	guaranteesDiscount := map[int]float64{
+		0: 1.0, 1: 1.0, 2: 1.0, 3: 0.97, 4: 0.95, 5: 0.91, 6: 0.90,
+	}
+
+	insuredDiscount := map[int]float64{
+		1: 1.0, 2: 0.97, 3: 0.92, 4: 0.88, 5: 0.85, 6: 0.80, 7: 0.80, 8: 0.80, 9: 0.80, 10: 0.80,
+	}
+
+	for _, asset := range policy.Assets {
+		for _, guarantee := range asset.Guarantees {
+			for offerKey, offer := range guarantee.Offer {
+				if offer.PremiumGrossYearly > 0.0 {
+					numberOfGuarantees[offerKey]++
+				}
+			}
+		}
+	}
+
+	for assetIndex, _ := range policy.Assets {
+		for guaranteeIndex, guarantee := range policy.Assets[assetIndex].Guarantees {
+			for offerKey, offer := range guarantee.Offer {
+				policy.Assets[assetIndex].Guarantees[guaranteeIndex].Offer[offerKey].PremiumGrossYearly = offer.PremiumGrossYearly * insuredDiscount[numberOfInsured] * guaranteesDiscount[numberOfGuarantees[offerKey]]
+				policy.Assets[assetIndex].Guarantees[guaranteeIndex].Offer[offerKey].PremiumTaxAmountYearly = policy.Assets[assetIndex].Guarantees[guaranteeIndex].Offer[offerKey].PremiumGrossYearly * (guarantee.Tax / 100)
+				policy.Assets[assetIndex].Guarantees[guaranteeIndex].Offer[offerKey].PremiumNetYearly = policy.Assets[assetIndex].Guarantees[guaranteeIndex].Offer[offerKey].PremiumGrossYearly - policy.Assets[assetIndex].Guarantees[guaranteeIndex].Offer[offerKey].PremiumTaxAmountYearly
+
+				policy.Assets[assetIndex].Guarantees[guaranteeIndex].Offer[offerKey].PremiumGrossMonthly = policy.Assets[assetIndex].Guarantees[guaranteeIndex].Offer[offerKey].PremiumGrossYearly / 12
+				policy.Assets[assetIndex].Guarantees[guaranteeIndex].Offer[offerKey].PremiumTaxAmountMonthly = policy.Assets[assetIndex].Guarantees[guaranteeIndex].Offer[offerKey].PremiumTaxAmountYearly / 12
+				policy.Assets[assetIndex].Guarantees[guaranteeIndex].Offer[offerKey].PremiumNetMonthly = policy.Assets[assetIndex].Guarantees[guaranteeIndex].Offer[offerKey].PremiumNetYearly / 12
+			}
+
+		}
 	}
 
 }
