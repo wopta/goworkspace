@@ -23,8 +23,10 @@ func PersonHandler(w http.ResponseWriter, r *http.Request) (string, interface{},
 
 	log.Println("Person Sellable")
 
+	origin := r.Header.Get("origin")
+
 	req := lib.ErrorByte(io.ReadAll(r.Body))
-	policy = Person(req)
+	policy = Person(origin, req)
 
 	policyJson, err := policy.Marshal()
 	lib.CheckError(err)
@@ -32,7 +34,7 @@ func PersonHandler(w http.ResponseWriter, r *http.Request) (string, interface{},
 	return string(policyJson), policy, nil
 }
 
-func Person(body []byte) models.Policy {
+func Person(origin string, body []byte) models.Policy {
 	var (
 		policy models.Policy
 		err    error
@@ -46,7 +48,7 @@ func Person(body []byte) models.Policy {
 	fx := new(models.Fx)
 
 	rulesFile := lib.GetRulesFile(rulesFileName)
-	_, ruleOut := lib.RulesFromJsonV2(fx, rulesFile, initRuleOut(), quotingInputData, []byte(getQuotingData()))
+	_, ruleOut := lib.RulesFromJsonV2(fx, rulesFile, initRuleOut(origin), quotingInputData, []byte(getQuotingData()))
 
 	ruleOut.(*RuleOut).ToPolicy(&policy)
 
@@ -69,8 +71,8 @@ func getRulesInputData(policy *models.Policy, e error, req []byte) []byte {
 	return request
 }
 
-func getPersonProduct() (models.Product, error) {
-	product, err := prd.GetName("persona", "v1")
+func getPersonProduct(origin string) (models.Product, error) {
+	product, err := prd.GetName(origin, "persona", "v1")
 	return product, err
 }
 
@@ -88,11 +90,11 @@ func (r *RuleOut) ToPolicy(policy *models.Policy) {
 	policy.Assets[0].Guarantees = guarantees
 }
 
-func initRuleOut() *RuleOut {
+func initRuleOut(origin string) *RuleOut {
 	var guarantees = make(map[string]*models.Guarante)
 	offerPrice := make(map[string]map[string]*models.Price)
 
-	product, err := getPersonProduct()
+	product, err := getPersonProduct(origin)
 	lib.CheckError(err)
 
 	for guaranteeKey, guarantee := range product.Companies[0].GuaranteesMap {
