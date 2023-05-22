@@ -57,6 +57,11 @@ func PersonGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface
 				Operator:   "==",   //
 				QueryValue: "pmi",
 			},
+			{
+				Field:      "IsDeleted", //
+				Operator:   "==",        //
+				QueryValue: false,
+			},
 		},
 	}
 	query, e := q.FirestoreWherefields("policy")

@@ -184,6 +184,17 @@ func getBuildingType(key string) string {
 	}
 	return res
 }
+func getDeductableMap(key string) string {
+	var res string
+	res = key
+	if key == "3days" {
+		res = "3"
+	}
+	if key == "5days" {
+		res = "5"
+	}
+	return res
+}
 func getMapRevenue(key int) string {
 	var res int
 

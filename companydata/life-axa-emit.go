@@ -20,7 +20,8 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	layout := "20060102"
 	now := time.Now()
 	fromM := time.Now().AddDate(0, -1, 0)
-
+	fromQ := time.Now().AddDate(0, 0, -15)
+	log.Println(fromQ)
 	var (
 		cabCsv []byte
 		result [][]string
@@ -34,6 +35,11 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 			{
 				Field:      "companyEmitted", //
 				Operator:   "==",             //
+				QueryValue: false,
+			},
+			{
+				Field:      "IsDeleted", //
+				Operator:   "==",        //
 				QueryValue: false,
 			},
 			{
@@ -67,7 +73,9 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		cabCsv = lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "data/cab-cap-istat.csv", "")
 	}
 	df := lib.CsvToDataframe(cabCsv)
+
 	log.Println("df.Describe(): ", df.Describe())
+	log.Println(" len(policies): ", len(policies))
 	result = append(result, getHeader())
 	for _, policy := range policies {
 		fil := df.Filter(
@@ -360,7 +368,7 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	filepath := "WOPTAKEY_NBM_" + strconv.Itoa(refMontly.Year()) + fmt.Sprintf("%02d", int(refMontly.Month())) + "_" + fmt.Sprintf("%02d", now.Day()) + fmt.Sprintf("%02d", int(now.Month())) + ".txt"
 	lib.WriteCsv("../tmp/"+filepath, result)
 	source, _ := ioutil.ReadFile("../tmp/" + filepath)
-	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "axa/life/"+filepath, source)
+	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/axa/life/"+filepath, source)
 	SftpUpload(filepath)
 	return "", nil, e
 }

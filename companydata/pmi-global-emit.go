@@ -50,6 +50,11 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 				QueryValue: "global",
 			},
 			{
+				Field:      "IsDeleted", //
+				Operator:   "==",        //
+				QueryValue: false,
+			},
+			{
 				Field:      "name", //
 				Operator:   "==",   //
 				QueryValue: "pmi",
@@ -167,7 +172,7 @@ func getPmiData(policies []models.Policy) [][]string {
 						"",                                                      //ESTENSIONE RC DM 37/2008
 						"",                                                      //CLAUSOLA BENI - BENE
 						"",                                                      //CLAUSOLA BENI - GARANZIE
-						g.Deductible,                                            //FRANCHIGIA – BENI
+						getDeductableMap(g.Deductible),                          //FRANCHIGIA – BENI
 						sum,                                                     //SOMMA ASSICURATA – BENI
 
 						getMapSelfInsurance(g.SelfInsuranceDesc), //SCOPERTO – BENI
@@ -271,7 +276,7 @@ func getPmiData(policies []models.Policy) [][]string {
 						g.CompanyCodec,                           //GARANZIE/PACCHETTI - ATTIVITA'
 						"",                                       //CLAUSOLA ATTIVITA' - BENE
 						"",                                       //CLAUSOLA ATTIVITA' - GARANZIE
-						g.Deductible,                             //FRANCHIGIA - ATTIVITA'
+						getDeductableMap(g.Deductible),           //FRANCHIGIA - ATTIVITA'
 						getMapSelfInsurance(g.SelfInsuranceDesc), //SCOPERTO - ATTIVITA'
 						strconv.Itoa(int(g.SumInsuredLimitOfIndemnity)), //MASSIMALE - ATTIVITA'
 						"",                                //MASSIMALE PER EVENTO - ATTIVITA'
