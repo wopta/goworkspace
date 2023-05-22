@@ -21,12 +21,17 @@ func Callback(w http.ResponseWriter, r *http.Request) {
 		Routes: []lib.Route{
 
 			{
-				Route:   "/v1/pmi/global/transactions",
+				Route:   "/v1/global/transactions",
 				Handler: GlobalTransaction,
 				Method:  "GET",
 			}, {
-				Route:   "/v1/pmi/global/emit",
+				Route:   "/v1/global/pmi/emit",
 				Handler: PmiGlobalEmit,
+				Method:  "GET",
+			},
+			{
+				Route:   "/v1/global/person/emit",
+				Handler: PersonGlobalEmit,
 				Method:  "GET",
 			},
 			{
