@@ -71,7 +71,7 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	}
 	df := lib.CsvToDataframe(cabCsv)
 
-	log.Println("df.Describe(): ", df.Describe())
+	//log.Println("df.Describe(): ", df.Describe())
 	log.Println(" len(policies): ", len(policies))
 	result = append(result, getHeader())
 	for _, policy := range policies {
