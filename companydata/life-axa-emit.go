@@ -73,13 +73,15 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 
 	//log.Println("df.Describe(): ", df.Describe())
 	log.Println(" len(policies): ", len(policies))
+
 	result = append(result, getHeader())
 	for _, policy := range policies {
+		log.Println("policy.Uid: ", policy.Uid)
 		fil := df.Filter(
 			dataframe.F{Colidx: 4, Colname: "CAP", Comparator: series.Eq, Comparando: policy.Contractor.Residence.PostalCode},
 		)
 		residenceCab := fil.Records()[0][5]
-		log.Println("policy.Uid: ", policy.Uid)
+
 		log.Println("residenceCab", residenceCab)
 		log.Println("filtered col", fil.Ncol())
 		log.Println("filtered row", fil.Nrow())
