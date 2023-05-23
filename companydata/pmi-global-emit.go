@@ -39,7 +39,11 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 			Operator:   "==",
 			QueryValue: true,
 		},
-
+			{
+				Field:      "companyEmitted",
+				Operator:   "==",
+				QueryValue: false,
+			},
 			{
 				Field:      "company", //
 				Operator:   "==",      //
