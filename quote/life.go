@@ -219,17 +219,17 @@ func getMultipliers(selectRow []string, offset int, base int, baseTax int) (floa
 
 func calculateGuaranteePrices(guarantee models.Guarante, baseFloat, taxFloat float64, product models.Product) {
 	if guarantee.Slug != "temporary-disability" {
-		guarantee.Value.PremiumNetYearly = lib.RoundFloatTwoDecimals(guarantee.Value.SumInsuredLimitOfIndemnity * baseFloat)
-		guarantee.Value.PremiumGrossYearly = lib.RoundFloatTwoDecimals(guarantee.Value.SumInsuredLimitOfIndemnity * taxFloat)
+		guarantee.Value.PremiumNetYearly = lib.RoundFloat(guarantee.Value.SumInsuredLimitOfIndemnity*baseFloat, 2)
+		guarantee.Value.PremiumGrossYearly = lib.RoundFloat(guarantee.Value.SumInsuredLimitOfIndemnity*taxFloat, 2)
 
-		guarantee.Value.PremiumNetMonthly = lib.RoundFloatTwoDecimals(guarantee.Value.SumInsuredLimitOfIndemnity * baseFloat / 12)
-		guarantee.Value.PremiumGrossMonthly = lib.RoundFloatTwoDecimals(guarantee.Value.SumInsuredLimitOfIndemnity * taxFloat / 12)
+		guarantee.Value.PremiumNetMonthly = lib.RoundFloat(guarantee.Value.SumInsuredLimitOfIndemnity*baseFloat/12, 2)
+		guarantee.Value.PremiumGrossMonthly = lib.RoundFloat(guarantee.Value.SumInsuredLimitOfIndemnity*taxFloat/12, 2)
 	} else {
-		guarantee.Value.PremiumNetYearly = lib.RoundFloatTwoDecimals(guarantee.Value.SumInsuredLimitOfIndemnity * baseFloat * 12)
-		guarantee.Value.PremiumGrossYearly = lib.RoundFloatTwoDecimals(guarantee.Value.SumInsuredLimitOfIndemnity * taxFloat * 12)
+		guarantee.Value.PremiumNetYearly = lib.RoundFloat(guarantee.Value.SumInsuredLimitOfIndemnity*baseFloat*12, 2)
+		guarantee.Value.PremiumGrossYearly = lib.RoundFloat(guarantee.Value.SumInsuredLimitOfIndemnity*taxFloat*12, 2)
 
-		guarantee.Value.PremiumNetMonthly = lib.RoundFloatTwoDecimals(guarantee.Value.SumInsuredLimitOfIndemnity * baseFloat)
-		guarantee.Value.PremiumGrossMonthly = lib.RoundFloatTwoDecimals(guarantee.Value.SumInsuredLimitOfIndemnity * taxFloat)
+		guarantee.Value.PremiumNetMonthly = lib.RoundFloat(guarantee.Value.SumInsuredLimitOfIndemnity*baseFloat, 2)
+		guarantee.Value.PremiumGrossMonthly = lib.RoundFloat(guarantee.Value.SumInsuredLimitOfIndemnity*taxFloat, 2)
 	}
 
 	hasNotMinimumYearlyPrice := guarantee.Value.PremiumGrossYearly < product.Companies[0].GuaranteesMap[guarantee.Slug].Config.MinimumGrossYearly
@@ -238,15 +238,15 @@ func calculateGuaranteePrices(guarantee models.Guarante, baseFloat, taxFloat flo
 		if guarantee.Slug == "death" {
 			guarantee.Value.PremiumNetYearly = 10
 		} else {
-			guarantee.Value.PremiumNetYearly = lib.RoundFloatTwoDecimals(guarantee.Value.PremiumGrossYearly / (1 + (2.5 / 100)))
+			guarantee.Value.PremiumNetYearly = lib.RoundFloat(guarantee.Value.PremiumGrossYearly/(1+(2.5/100)), 2)
 		}
 
-		guarantee.Value.PremiumGrossMonthly = lib.RoundFloatTwoDecimals(guarantee.Value.PremiumGrossYearly / 12)
-		guarantee.Value.PremiumNetMonthly = lib.RoundFloatTwoDecimals(guarantee.Value.PremiumNetYearly / 12)
+		guarantee.Value.PremiumGrossMonthly = lib.RoundFloat(guarantee.Value.PremiumGrossYearly/12, 2)
+		guarantee.Value.PremiumNetMonthly = lib.RoundFloat(guarantee.Value.PremiumNetYearly/12, 2)
 	}
 
-	guarantee.Value.PremiumTaxAmountYearly = lib.RoundFloatTwoDecimals(guarantee.Value.PremiumGrossYearly - guarantee.Value.PremiumNetYearly)
-	guarantee.Value.PremiumTaxAmountMonthly = lib.RoundFloatTwoDecimals(guarantee.Value.PremiumGrossMonthly - guarantee.Value.PremiumNetMonthly)
+	guarantee.Value.PremiumTaxAmountYearly = lib.RoundFloat(guarantee.Value.PremiumGrossYearly-guarantee.Value.PremiumNetYearly, 2)
+	guarantee.Value.PremiumTaxAmountMonthly = lib.RoundFloat(guarantee.Value.PremiumGrossMonthly-guarantee.Value.PremiumNetMonthly, 2)
 }
 
 func calculateOfferPrices(data models.Policy, guarantee models.Guarante) {
@@ -261,9 +261,9 @@ func calculateOfferPrices(data models.Policy, guarantee models.Guarante) {
 func roundOfferPrices(offersPrices map[string]map[string]*models.Price) {
 	for offerKey, offerValue := range offersPrices {
 		for paymentKey, _ := range offerValue {
-			offersPrices[offerKey][paymentKey].Net = lib.RoundFloatTwoDecimals(offersPrices[offerKey][paymentKey].Net)
-			offersPrices[offerKey][paymentKey].Tax = lib.RoundFloatTwoDecimals(offersPrices[offerKey][paymentKey].Tax)
-			offersPrices[offerKey][paymentKey].Gross = lib.RoundFloatTwoDecimals(offersPrices[offerKey][paymentKey].Gross)
+			offersPrices[offerKey][paymentKey].Net = lib.RoundFloat(offersPrices[offerKey][paymentKey].Net, 2)
+			offersPrices[offerKey][paymentKey].Tax = lib.RoundFloat(offersPrices[offerKey][paymentKey].Tax, 2)
+			offersPrices[offerKey][paymentKey].Gross = lib.RoundFloat(offersPrices[offerKey][paymentKey].Gross, 2)
 		}
 	}
 }
