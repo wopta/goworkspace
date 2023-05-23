@@ -50,12 +50,7 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 			}, {
 				Field:      "startDate", //
 				Operator:   ">",         //
-				QueryValue: fromM.Unix(),
-			},
-			{
-				Field:      "startDate", //
-				Operator:   "<",         //
-				QueryValue: now.Unix(),
+				QueryValue: fromM,
 			},
 		},
 	}
