@@ -19,7 +19,7 @@ import (
 func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	layout := "20060102"
 	now := time.Now()
-	fromM := time.Now().AddDate(0, -1, 0)
+	//fromM := time.Now().AddDate(0, -1, 0)
 	fromQ := time.Now().AddDate(0, 0, -15)
 	log.Println(fromQ)
 	var (
@@ -47,15 +47,6 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 				Field:      "name", //
 				Operator:   "==",   //
 				QueryValue: "life",
-			}, {
-				Field:      "startDate", //
-				Operator:   ">",         //
-				QueryValue: fromM,
-			},
-			{
-				Field:      "startDate", //
-				Operator:   "<",         //
-				QueryValue: now,
 			},
 		},
 	}
@@ -71,7 +62,7 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	}
 	df := lib.CsvToDataframe(cabCsv)
 
-	log.Println("df.Describe(): ", df.Describe())
+	//log.Println("df.Describe(): ", df.Describe())
 	log.Println(" len(policies): ", len(policies))
 	result = append(result, getHeader())
 	for _, policy := range policies {
