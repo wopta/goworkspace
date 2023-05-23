@@ -1689,7 +1689,7 @@ func GetPersonalDataHandlingSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	notConsentText := ""
 
 	if policy.Contractor.Consens != nil {
-		consent, err := policy.ExtractConsens(1)
+		consent, err := policy.ExtractConsens(2)
 		lib.CheckError(err)
 
 		if !consent.Answer {
