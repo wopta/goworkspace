@@ -40,6 +40,11 @@ func Quote(w http.ResponseWriter, r *http.Request) {
 				Handler: LifeFx,
 				Method:  http.MethodPost,
 			},
+			{
+				Route:   "/v1/person",
+				Handler: PersonFx,
+				Method:  http.MethodPost,
+			},
 		},
 	}
 	route.Router(w, r)

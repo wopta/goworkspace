@@ -1,33 +1,5 @@
 package sellable
 
-/*
-
-
-
-INPUT:
-{
-	"age": 74,
-	"work": "select work list da elenco professioni",
-	"workType": "dipendente" ,
-	"coverageType": "24 ore" ,
-	"childrenScool":true,
-	"issue1500": 1,
-	"riskInLifeIs":1,
-	"class":2
-
-}
-{
-	age:75
-	work: "select work list da elenco professioni"
-	worktype: dipendente / autonomo / non lavoratore
-	coverageType 24 ore / tempo libero / professionale
-	childrenScool:true
-	issue1500:"si, senza problemi 1 || si, ma dovrei rinunciare a qualcosa 2|| no, non ci riscirei facilmente 3"
-	riskInLifeIs:da evitare; 1 da accettare; 2 da gestire 3
-	class
-
-}
-*/
 import (
 	"encoding/json"
 	"github.com/wopta/goworkspace/lib"
@@ -43,7 +15,26 @@ const (
 	yearly  = "yearly"
 )
 
-func Person(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func PersonHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	var (
+		policy models.Policy
+		err    error
+	)
+
+	log.Println("Person Sellable")
+
+	origin := r.Header.Get("origin")
+
+	req := lib.ErrorByte(io.ReadAll(r.Body))
+	policy = Person(origin, req)
+
+	policyJson, err := policy.Marshal()
+	lib.CheckError(err)
+
+	return string(policyJson), policy, nil
+}
+
+func Person(origin string, body []byte) models.Policy {
 	var (
 		policy models.Policy
 		err    error
@@ -52,12 +43,7 @@ func Person(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		rulesFileName = "person.json"
 	)
 
-	log.Println("Person")
-
-	origin := r.Header.Get("origin")
-
-	req := lib.ErrorByte(io.ReadAll(r.Body))
-	quotingInputData := getRulesInputData(&policy, err, req)
+	quotingInputData := getRulesInputData(&policy, err, body)
 
 	fx := new(models.Fx)
 
@@ -66,10 +52,7 @@ func Person(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	ruleOut.(*RuleOut).ToPolicy(&policy)
 
-	policyJson, err := policy.Marshal()
-	lib.CheckError(err)
-
-	return string(policyJson), policy, nil
+	return policy
 }
 
 func getRulesInputData(policy *models.Policy, e error, req []byte) []byte {
