@@ -25,7 +25,6 @@ func GetSequenceByCompany(name string, firePolicy string) (string, int, int) {
 		companyPrefixLenght = `%07d`
 	case "axa":
 		companyDefault = 100001
-		companyPrefix = "WB"
 		companyPrefixLenght = `%07d`
 	}
 
