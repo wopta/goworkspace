@@ -1670,6 +1670,10 @@ func GetWoptaPrivacySection(pdf *fpdf.Fpdf) {
 		"in parte, ossia, in tal caso, opponendosi, ad esempio, al solo invio di comunicazioni promozionali "+
 		"effettuato tramite strumenti automatizzati.", "", "", false)
 	pdf.Ln(1)
+	pdf.MultiCell(0, 3, "Le richieste vanno rivolte per iscritto al"+
+		" Titolare ai recapiti indicati nella sezione \"Contatti\" di questa informativa.", "", "",
+		false)
+	pdf.Ln(1)
 	pdf.MultiCell(0, 3, "Qualora Lei ritenga che il trattamento dei Suoi Dati personali effettuato dal "+
 		"Titolare avvenga in violazione di quanto previsto dal GDPR, ha il diritto di proporre reclamo al Garante "+
 		"Privacy, come previsto dall'art. 77 del GDPR stesso, o di adire le opportune sedi giudiziarie "+
