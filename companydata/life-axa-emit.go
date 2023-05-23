@@ -60,6 +60,7 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		},
 	}
 	query, e := q.FirestoreWherefields("policy")
+	log.Println(e)
 	policies := models.PolicyToListData(query)
 	switch os.Getenv("env") {
 	case "local":
