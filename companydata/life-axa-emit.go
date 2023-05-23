@@ -54,12 +54,12 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 			}, {
 				Field:      "startSate", //
 				Operator:   ">",         //
-				QueryValue: strconv.Itoa(int(fromM.Unix())),
+				QueryValue: fromM,
 			},
 			{
 				Field:      "startSate", //
 				Operator:   "<",         //
-				QueryValue: strconv.Itoa(int(now.Unix())),
+				QueryValue: now,
 			},
 		},
 	}
