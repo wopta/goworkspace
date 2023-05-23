@@ -32,11 +32,7 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 			Operator:   "==",          //
 			QueryValue: true,
 		},
-			{
-				Field:      "companyEmitted", //
-				Operator:   "==",             //
-				QueryValue: false,
-			},
+
 			{
 				Field:      "IsDeleted", //
 				Operator:   "==",        //
@@ -52,12 +48,12 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 				Operator:   "==",   //
 				QueryValue: "life",
 			}, {
-				Field:      "startSate", //
+				Field:      "startDate", //
 				Operator:   ">",         //
 				QueryValue: fromM,
 			},
 			{
-				Field:      "startSate", //
+				Field:      "startDate", //
 				Operator:   "<",         //
 				QueryValue: now,
 			},
