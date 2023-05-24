@@ -16,10 +16,11 @@ type IdentityDocument struct {
 }
 
 type Media struct {
-	FileName    string `json:"fileName" firestore:"fileName" bigquery:"-"`
-	Link        string `json:"link,omitempty" firestore:"link,omitempty" bigquery:"-"`
-	MimeType    string `json:"mimeType,omitempty" firestore:"mimeType,omitempty" bigquery:"-"`
-	Base64Bytes string `json:"base64Bytes,omitempty" firestore:"-" bigquery:"-"`
+	SourceFileName string `json:"sourceFileName" firestore:"sourceFileName" bigquery:"-"`
+	FileName       string `json:"fileName" firestore:"fileName" bigquery:"-"`
+	Link           string `json:"link,omitempty" firestore:"link,omitempty" bigquery:"-"`
+	MimeType       string `json:"mimeType,omitempty" firestore:"mimeType,omitempty" bigquery:"-"`
+	Base64Bytes    string `json:"base64Bytes,omitempty" firestore:"-" bigquery:"-"`
 }
 
 func (id *IdentityDocument) IsExpired() bool {
