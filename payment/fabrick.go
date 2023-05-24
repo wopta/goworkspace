@@ -2,7 +2,7 @@ package payment
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -45,7 +45,7 @@ func FabrickPayObj(data model.Policy, firstSchedule bool, scheduleDate string, c
 
 		if res != nil {
 			log.Println("header:", res.Header)
-			body, err := ioutil.ReadAll(res.Body)
+			body, err := io.ReadAll(res.Body)
 			log.Println(data.Uid+"pay response body:", string(body))
 			lib.CheckError(err)
 			var result FabrickPaymentResponse
@@ -93,6 +93,9 @@ func FabrickPayObj(data model.Policy, firstSchedule bool, scheduleDate string, c
 				Name:               data.Contractor.Name + " " + data.Contractor.Surname,
 				Company:            data.Company,
 				CommissionsCompany: commission,
+				IsDelete:           false,
+				ProviderId:         *result.Payload.PaymentID,
+				UserToken:          customerId,
 			}
 
 			transactionsFire := lib.GetDatasetByEnv(origin, "transactions")
