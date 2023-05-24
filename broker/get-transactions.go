@@ -6,11 +6,12 @@ import (
 	"github.com/wopta/goworkspace/models"
 	"log"
 	"net/http"
+	"sort"
 )
 
 func GetPolicyTransactions(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		transactions []models.Transaction
+		transactions Transactions
 	)
 
 	log.Println("GetPolicyTransactions")
@@ -18,11 +19,19 @@ func GetPolicyTransactions(w http.ResponseWriter, r *http.Request) (string, inte
 	fireTransactions := lib.GetDatasetByEnv(r.Header.Get("origin"), "transactions")
 	policyUID := r.Header.Get("policyUid")
 
-	res := lib.WhereFirestore(fireTransactions, "policyUid", "==", policyUID)
+	res := lib.WhereLimitFirestore(fireTransactions, "policyUid", "==", policyUID, 20)
 
 	transactions = models.TransactionToListData(res)
+
+	sort.Sort(transactions)
 
 	jsonOut, err := json.Marshal(transactions)
 
 	return string(jsonOut), transactions, err
 }
+
+type Transactions []models.Transaction
+
+func (t Transactions) Len() int           { return len(t) }
+func (t Transactions) Swap(i, j int)      { t[i], t[j] = t[j], t[i] }
+func (t Transactions) Less(i, j int) bool { return t[i].CreationDate.Before(t[j].CreationDate) }
