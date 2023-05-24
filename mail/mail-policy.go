@@ -34,7 +34,7 @@ func GetMailPolicy(policy models.Policy, subject string, islink bool, link strin
 	<p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:17px;color:#000000;font-size:14px">Se hai bisogno di ulteriore supporto, non scrivere a questo indirizzo email, puoi compilare il <a class="button" href='` + linkForm + ` '>Form </a> oppure scrivere alla mail e verrai contattato da un nostro esperto.</p>
 	<p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:17px;color:#000000;font-size:14px"><br></p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:17px;color:#000000;font-size:14px">A presto,</p>
 	<p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:17px;color:#e50075;font-size:14px"><strong>Anna</strong> di Wopta Assicurazioni</p> `
-	obj.Subject = "Wopta per te. " + name + " "
+	obj.Subject = "Wopta per te. " + name + " " + subject
 	obj.SubTitle = subject
 	obj.IsHtml = true
 	obj.IsAttachment = isAttachment
@@ -73,7 +73,7 @@ func SendMailProposal(policy models.Policy) {
 	message = append(message, `<br>Prima della sottoscrizione, leggi quanto trovi in questa mail, la <b>documentazione precontrattuale</b> che,
 	 per trasparenza e tua adeguata informazione, trovi sempre disponibile cliccando sul bottone sottostante.`)
 
-	SendMail(GetMailPolicy(policy, "", true, link, "Leggi documentazione", message, false, nil))
+	SendMail(GetMailPolicy(policy, "Documenti precontrattuali", true, link, "Leggi documentazione", message, false, nil))
 
 }
 
@@ -83,7 +83,7 @@ func SendMailPay(policy models.Policy) {
 	message = append(message, `Ti invitiamo ora ad accedere a cliccare sul bottone sottostante per perfezionare il pagamento.</p> `)
 	message = append(message, `<p>Infatti senza pagamento la polizza non è attiva e, solo a pagamento avvenuto, ti invieremo una mail in cui trovi tutti i documenti contrattuali completi.</br> `)
 	message = append(message, `Qualora tu abbia già provveduto, ignora questa comunicazione </p> `)
-	SendMail(GetMailPolicy(policy, "paga la tua polizza"+" n° "+policy.CodeCompany, true, policy.PayUrl, "Paga la tua polizza", message, false, nil))
+	SendMail(GetMailPolicy(policy, "Paga la tua polizza"+" n° "+policy.CodeCompany, true, policy.PayUrl, "Paga la tua polizza", message, false, nil))
 
 }
 func SendMailSign(policy models.Policy) {
@@ -94,7 +94,7 @@ func SendMailSign(policy models.Policy) {
 	message = append(message, `<br>Ti verrà richiesta l’adesione al servizio che è fornito in maniera gratuita da Wopta. Potrai prendere visione delle condizioni generali di servizio e delle caratteristiche tecniche.`)
 	message = append(message, `<br>Ultimata la procedura di firma potrai procedere al pagamento.<br>`)
 	message = append(message, `Qualora tu abbia già provveduto, ignora questa comunicazione </br> `)
-	SendMail(GetMailPolicy(policy, "firma la tua polizza"+" n° "+policy.CodeCompany, true, policy.SignUrl, "Firma la tua polizza", message, false, nil))
+	SendMail(GetMailPolicy(policy, "Firma la tua polizza"+" n° "+policy.CodeCompany, true, policy.SignUrl, "Firma la tua polizza", message, false, nil))
 }
 
 func SendMailContract(policy models.Policy, at *[]Attachment) {
@@ -106,6 +106,6 @@ func SendMailContract(policy models.Policy, at *[]Attachment) {
 	Puoi usare anche questi canali per effettuare una denuncia di sinistro e verificare lo stato delle tue polizze e dei pagamenti.
 Seguici su nostri canali social o sul sito e scopri le iniziative a te riservate.
 	`)
-	SendMail(GetMailPolicy(policy, "contratto"+" n° "+policy.CodeCompany, false, "", "", message, true, at))
+	SendMail(GetMailPolicy(policy, "Contratto"+" n° "+policy.CodeCompany, false, "", "", message, true, at))
 
 }
