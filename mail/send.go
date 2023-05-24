@@ -137,7 +137,7 @@ func SendMail(obj MailRequest) {
 	log.Println()
 	for _, _to := range obj.To {
 
-		from := mail.Address{Name: "Wopta assicurazioni", Address: obj.From}
+		from := mail.Address{Name: "Anna di Wopta assicurazioni", Address: obj.From}
 		to := mail.Address{Name: _to, Address: _to}
 		subj := obj.Subject
 		body := obj.Message

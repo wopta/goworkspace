@@ -34,7 +34,7 @@ func GetMailPolicy(policy models.Policy, subject string, islink bool, link strin
 	<p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:17px;color:#000000;font-size:14px">Se hai bisogno di ulteriore supporto, non scrivere a questo indirizzo email, puoi compilare il <a class="button" href='` + linkForm + ` '>Form </a> oppure scrivere alla mail e verrai contattato da un nostro esperto.</p>
 	<p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:17px;color:#000000;font-size:14px"><br></p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:17px;color:#000000;font-size:14px">A presto,</p>
 	<p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:17px;color:#e50075;font-size:14px"><strong>Anna</strong> di Wopta Assicurazioni</p> `
-	obj.Subject = "Wopta per te. " + name + " " + subject
+	obj.Subject = "Wopta per te " + name + " - " + subject
 	obj.SubTitle = subject
 	obj.IsHtml = true
 	obj.IsAttachment = isAttachment
@@ -55,9 +55,7 @@ func GetMailPolicy(policy models.Policy, subject string, islink bool, link strin
 func SendMailProposal(policy models.Policy) {
 	var link, name string
 	if policy.Name == "pmi" {
-
 		link = "https://storage.googleapis.com/documents-public-dev/information-sets/pmi/v1/Precontrattuale.pdf"
-
 	}
 	if policy.Name == "persona" {
 		link = "https://storage.googleapis.com/documents-public-dev/information-sets/persona/v1/Precontrattuale.pdf"
