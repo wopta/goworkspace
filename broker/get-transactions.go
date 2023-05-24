@@ -19,7 +19,7 @@ func GetPolicyTransactions(w http.ResponseWriter, r *http.Request) (string, inte
 	fireTransactions := lib.GetDatasetByEnv(r.Header.Get("origin"), "transactions")
 	policyUID := r.Header.Get("policyUid")
 
-	res := lib.WhereLimitFirestore(fireTransactions, "policyUid", "==", policyUID, 20)
+	res := lib.WhereFirestore(fireTransactions, "policyUid", "==", policyUID)
 
 	transactions = models.TransactionToListData(res)
 
