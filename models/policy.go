@@ -141,7 +141,9 @@ func (policy *Policy) CalculateContractorAge() (int, error) {
 	birthdate, e := time.Parse(time.RFC3339, policy.Contractor.BirthDate)
 	now := time.Now()
 	age := now.Year() - birthdate.Year()
-	if now.YearDay() < birthdate.YearDay() {
+	log.Println(now.YearDay(), birthdate.YearDay())
+	birthdate.Day()
+	if now.YearDay() < birthdate.YearDay() && !(now.Month() == birthdate.Month() && now.Day() == birthdate.Day()) {
 		age--
 	}
 	return age, e
