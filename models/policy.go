@@ -90,6 +90,7 @@ type Policy struct {
 	OffersPrices    map[string]map[string]*Price `firestore:"offersPrices,omitempty" json:"offersPrices,omitempty" bigquery:"-"`
 	PartnershipName string                       `json:"partnershipName" firestore:"partnershipName" bigquery:"partnershipName"`
 	PartnershipData map[string]interface{}       `json:"partnershipData" firestore:"partnershipData" bigquery:"-"`
+	Reserved        bool                         `json:"reserved" firestore:"reserved" bigquery:"-"`
 }
 
 type RenewHistory struct {
