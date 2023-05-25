@@ -17,8 +17,8 @@ const (
 
 func PersonHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		policy models.Policy
-		err    error
+		product *models.Product
+		err     error
 	)
 
 	log.Println("Person Sellable")
@@ -26,15 +26,15 @@ func PersonHandler(w http.ResponseWriter, r *http.Request) (string, interface{},
 	origin := r.Header.Get("origin")
 
 	req := lib.ErrorByte(io.ReadAll(r.Body))
-	policy = Person(origin, req)
+	product = Person(origin, req)
 
-	policyJson, err := policy.Marshal()
+	productJson, err := json.Marshal(product)
 	lib.CheckError(err)
 
-	return string(policyJson), policy, nil
+	return string(productJson), product, nil
 }
 
-func Person(origin string, body []byte) models.Policy {
+func Person(origin string, body []byte) *models.Product {
 	var (
 		policy models.Policy
 		err    error
@@ -44,15 +44,15 @@ func Person(origin string, body []byte) models.Policy {
 	)
 
 	quotingInputData := getRulesInputData(&policy, err, body)
+	product, err := getPersonProduct(origin)
+	lib.CheckError(err)
 
 	fx := new(models.Fx)
 
 	rulesFile := lib.GetRulesFile(rulesFileName)
-	_, ruleOut := lib.RulesFromJsonV2(fx, rulesFile, initRuleOut(origin), quotingInputData, []byte(getQuotingData()))
+	_, ruleOut := lib.RulesFromJsonV2(fx, rulesFile, &product, quotingInputData, []byte(getQuotingData()))
 
-	ruleOut.(*RuleOut).ToPolicy(&policy)
-
-	return policy
+	return ruleOut.(*models.Product)
 }
 
 func getRulesInputData(policy *models.Policy, e error, req []byte) []byte {
@@ -74,63 +74,6 @@ func getRulesInputData(policy *models.Policy, e error, req []byte) []byte {
 func getPersonProduct(origin string) (models.Product, error) {
 	product, err := prd.GetName(origin, "persona", "v1")
 	return product, err
-}
-
-type RuleOut struct {
-	Guarantees map[string]*models.Guarante         `json:"guarantees"`
-	OfferPrice map[string]map[string]*models.Price `json:"offerPrice"`
-}
-
-func (r *RuleOut) ToPolicy(policy *models.Policy) {
-	policy.OffersPrices = r.OfferPrice
-	guarantees := make([]models.Guarante, 0)
-	for _, guarantee := range r.Guarantees {
-		guarantees = append(guarantees, *guarantee)
-	}
-	policy.Assets[0].Guarantees = guarantees
-}
-
-func initRuleOut(origin string) *RuleOut {
-	var guarantees = make(map[string]*models.Guarante)
-	offerPrice := make(map[string]map[string]*models.Price)
-
-	product, err := getPersonProduct(origin)
-	lib.CheckError(err)
-
-	for guaranteeKey, guarantee := range product.Companies[0].GuaranteesMap {
-		guarantees[guaranteeKey] = &models.Guarante{
-			CompanyName:                guarantee.CompanyName,
-			Slug:                       guarantee.Slug,
-			Deductible:                 guarantee.Deductible,
-			Tax:                        guarantee.Tax,
-			SumInsuredLimitOfIndemnity: guarantee.SumInsuredLimitOfIndemnity,
-			Offer:                      guarantee.Offer,
-		}
-	}
-
-	for offerKey, _ := range product.Offers {
-		offerPrice[offerKey] = map[string]*models.Price{
-			monthly: {
-				Net:      0.0,
-				Tax:      0.0,
-				Gross:    0.0,
-				Delta:    0.0,
-				Discount: 0.0,
-			},
-			yearly: {
-				Net:      0.0,
-				Tax:      0.0,
-				Gross:    0.0,
-				Delta:    0.0,
-				Discount: 0.0,
-			},
-		}
-	}
-
-	return &RuleOut{
-		Guarantees: guarantees,
-		OfferPrice: offerPrice,
-	}
 }
 
 func getQuotingData() string {
