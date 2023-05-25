@@ -9,6 +9,7 @@ import (
 	"math"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 func PersonFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -22,6 +23,9 @@ func PersonFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	b := lib.GetByteByEnv("quote/persona-tassi.json", false)
 	err := json.Unmarshal(b, &personaRates)
 	lib.CheckError(err)
+
+	policy.StartDate = time.Now().UTC()
+	policy.EndDate = policy.StartDate.AddDate(1, 0, 0)
 
 	for _, guarantee := range policy.Assets[0].Guarantees {
 		switch guarantee.Slug {
