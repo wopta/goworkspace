@@ -20,7 +20,7 @@ func PersonFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	err := json.Unmarshal(body, &policy)
-	personProduct := sellable.Person(r.Header.Get("origin"), body)
+	personProduct := sellable.Person(body)
 
 	b := lib.GetByteByEnv("quote/persona-tassi.json", false)
 	err = json.Unmarshal(b, &personaRates)

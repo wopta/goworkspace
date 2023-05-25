@@ -10,11 +10,6 @@ import (
 	"net/http"
 )
 
-const (
-	monthly = "monthly"
-	yearly  = "yearly"
-)
-
 func PersonHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		product *models.Product
@@ -23,10 +18,8 @@ func PersonHandler(w http.ResponseWriter, r *http.Request) (string, interface{},
 
 	log.Println("Person Sellable")
 
-	origin := r.Header.Get("origin")
-
-	req := lib.ErrorByte(io.ReadAll(r.Body))
-	product = Person(origin, req)
+	body := lib.ErrorByte(io.ReadAll(r.Body))
+	product = Person(body)
 
 	productJson, err := json.Marshal(product)
 	lib.CheckError(err)
@@ -34,7 +27,7 @@ func PersonHandler(w http.ResponseWriter, r *http.Request) (string, interface{},
 	return string(productJson), product, nil
 }
 
-func Person(origin string, body []byte) *models.Product {
+func Person(body []byte) *models.Product {
 	var (
 		policy models.Policy
 		err    error
@@ -44,7 +37,7 @@ func Person(origin string, body []byte) *models.Product {
 	)
 
 	quotingInputData := getRulesInputData(&policy, err, body)
-	product, err := getPersonProduct(origin)
+	product, err := prd.GetProduct("persona", "v1")
 	lib.CheckError(err)
 
 	fx := new(models.Fx)
@@ -69,11 +62,6 @@ func getRulesInputData(policy *models.Policy, e error, req []byte) []byte {
 	request, e := json.Marshal(policy.QuoteQuestions)
 	lib.CheckError(e)
 	return request
-}
-
-func getPersonProduct(origin string) (models.Product, error) {
-	product, err := prd.GetName(origin, "persona", "v1")
-	return product, err
 }
 
 func getQuotingData() string {
