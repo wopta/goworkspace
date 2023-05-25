@@ -14,18 +14,47 @@ import (
 
 func PersonFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
+		policy       models.Policy
 		personaRates map[string]json.RawMessage
 	)
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
-	policy := sellable.Person(r.Header.Get("origin"), body)
+	err := json.Unmarshal(body, &policy)
+	personProduct := sellable.Person(body)
 
 	b := lib.GetByteByEnv("quote/persona-tassi.json", false)
-	err := json.Unmarshal(b, &personaRates)
+	err = json.Unmarshal(b, &personaRates)
 	lib.CheckError(err)
 
 	policy.StartDate = time.Now().UTC()
 	policy.EndDate = policy.StartDate.AddDate(1, 0, 0)
+
+	guaranteesList := make([]models.Guarante, 0)
+	for _, guarantee := range personProduct.Companies[0].GuaranteesMap {
+		guaranteesList = append(guaranteesList, *guarantee)
+	}
+
+	policy.Assets[0].Guarantees = guaranteesList
+	policy.OffersPrices = make(map[string]map[string]*models.Price)
+
+	for offerKey, _ := range personProduct.Offers {
+		policy.OffersPrices[offerKey] = map[string]*models.Price{
+			"monthly": {
+				Net:      0.0,
+				Tax:      0.0,
+				Gross:    0.0,
+				Delta:    0.0,
+				Discount: 0.0,
+			},
+			"yearly": {
+				Net:      0.0,
+				Tax:      0.0,
+				Gross:    0.0,
+				Delta:    0.0,
+				Discount: 0.0,
+			},
+		}
+	}
 
 	for _, guarantee := range policy.Assets[0].Guarantees {
 		switch guarantee.Slug {
