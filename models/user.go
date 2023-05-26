@@ -128,24 +128,42 @@ func FirestoreDocumentToUser(query *firestore.DocumentIterator) (User, error) {
 	return result, e
 }
 
-func UserUpdateByFiscalcode(origin string, user User) (string, error) {
+func UserCreateByFiscalCode(origin string, user User) (string, error) {
 	var (
-		useruid string
-		e       error
+		userUID string
+		err     error
 	)
 	usersFire := lib.GetDatasetByEnv(origin, "users")
 	docsnap := lib.WhereFirestore(usersFire, "fiscalCode", "==", user.FiscalCode)
-	userL, e := FirestoreDocumentToUser(docsnap)
+	userL, err := FirestoreDocumentToUser(docsnap)
 	if len(userL.Uid) == 0 {
-		user.CreationDate = time.Now()
-		user.UpdatedDate = time.Now()
+		user.CreationDate = time.Now().UTC()
+		user.UpdatedDate = time.Now().UTC()
 		ref2, _ := lib.PutFirestore(usersFire, user)
-		log.Println("Proposal User uid", ref2)
-		useruid = ref2.ID
+		log.Println("Proposal User uid", ref2.ID)
+		userUID = ref2.ID
 	} else {
-		useruid = userL.Uid
-		userL.UpdatedDate = time.Now()
-		_, e = lib.FireUpdate(usersFire, useruid, userL)
+		userUID = userL.Uid
 	}
-	return useruid, e
+	return userUID, err
+}
+
+func UserUpdateByFiscalCode(origin string, user User) error {
+	usersFire := lib.GetDatasetByEnv(origin, "users")
+
+	updatedUser := map[string]interface{}{
+		"address":      user.Address,
+		"postalCode":   user.PostalCode,
+		"city":         user.City,
+		"locality":     user.Locality,
+		"cityCode":     user.CityCode,
+		"streetNumber": user.StreetNumber,
+		"location":     user.Location,
+		"consens":      user.Consens,
+		"residence":    user.Residence,
+		"domicile":     user.Domicile,
+		"updatedDate":  time.Now().UTC(),
+	}
+	_, err := lib.FireUpdate(usersFire, user.Uid, updatedUser)
+	return err
 }
