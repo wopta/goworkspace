@@ -38,6 +38,12 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 				Operator:   "==",        //
 				QueryValue: false,
 			},
+
+			{
+				Field:      "ispay", //
+				Operator:   "==",    //
+				QueryValue: true,
+			},
 			{
 				Field:      "company", //
 				Operator:   "==",      //
@@ -94,7 +100,7 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 				)
 				beneficiary1, beneficiary1S, beneficiary1T = mapBeneficiary(g, 0) //Codice Fiscale Beneficiario
 				beneficiary2, beneficiary2S, _ = mapBeneficiary(g, 1)
-				fmt.Println(g)
+				//fmt.Println(g)
 				row := []string{
 					mapCodecCompany(policy, g.CompanyCodec), //Codice schema
 					policy.CodeCompany,                      //N° adesione individuale univoco
@@ -139,7 +145,7 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 					beneficiary2,                       //Codice Fiscale Beneficiario 2
 					"",                                 //Codice Fiscale Beneficiario 3
 					"VIT",                              //Natura del rapporto
-					"PAS ",                             //Scopo del rapporto
+					"PAS",                              //Scopo del rapporto
 					"BO",                               //Modalità di pagamento del premio assicurativo (all'intermediario)
 					"SI",                               //contraente = Assicurato?
 					ChekDomicilie(policy.Contractor).StreetName, //Indirizzo di domicilio contraente
@@ -396,7 +402,7 @@ func mapCodecCompany(p models.Policy, g string) string {
 }
 func ChekDomicilie(u models.User) models.Address {
 	var res models.Address
-	log.Println(reflect.ValueOf(u.Domicile))
+	//log.Println(reflect.ValueOf(u.Domicile))
 	if reflect.ValueOf(u.Domicile).IsNil() {
 		res = *u.Residence
 	}
@@ -406,7 +412,7 @@ func CheckStructNil[T interface{}](s interface{}) T {
 	var result T
 	result1 := new(T)
 	result = *result1
-	log.Println(reflect.TypeOf(s))
+	//log.Println(reflect.TypeOf(s))
 	if reflect.TypeOf(s) != nil {
 		log.Println("is not nill")
 		result = s.(T)
