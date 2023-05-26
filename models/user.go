@@ -128,13 +128,13 @@ func FirestoreDocumentToUser(query *firestore.DocumentIterator) (User, error) {
 	return result, e
 }
 
-func UserCreateByFiscalCode(origin string, user User) (string, error) {
+func UserCreateByMail(origin string, user User) (string, error) {
 	var (
 		userUID string
 		err     error
 	)
 	usersFire := lib.GetDatasetByEnv(origin, "users")
-	docsnap := lib.WhereFirestore(usersFire, "fiscalCode", "==", user.FiscalCode)
+	docsnap := lib.WhereFirestore(usersFire, "mail", "==", user.Mail)
 	userL, err := FirestoreDocumentToUser(docsnap)
 	if len(userL.Uid) == 0 {
 		user.CreationDate = time.Now().UTC()
@@ -148,7 +148,7 @@ func UserCreateByFiscalCode(origin string, user User) (string, error) {
 	return userUID, err
 }
 
-func UserUpdateByFiscalCode(origin string, user User) error {
+func UserUpdate(origin string, user User) error {
 	usersFire := lib.GetDatasetByEnv(origin, "users")
 
 	updatedUser := map[string]interface{}{
