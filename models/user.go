@@ -143,7 +143,7 @@ func UserUpdateByFiscalcode(origin string, user User) (string, error) {
 		log.Println("Proposal User uid", ref2)
 		useruid = ref2.ID
 	} else {
-		useruid = user.Uid
+		useruid = userL.Uid
 		userL.UpdatedDate = time.Now()
 		_, e = lib.FireUpdate(usersFire, useruid, userL)
 	}
