@@ -136,14 +136,14 @@ func UserUpdateByFiscalcode(origin string, user User) (string, error) {
 	usersFire := lib.GetDatasetByEnv(origin, "users")
 	docsnap := lib.WhereFirestore(usersFire, "fiscalCode", "==", user.FiscalCode)
 	userL, e := FirestoreDocumentToUser(docsnap)
-	if len(user.Uid) == 0 {
+	if len(userL.Uid) == 0 {
 		user.CreationDate = time.Now()
 		user.UpdatedDate = time.Now()
 		ref2, _ := lib.PutFirestore(usersFire, user)
 		log.Println("Proposal User uid", ref2)
 		useruid = ref2.ID
 	} else {
-		useruid = user.Uid
+		useruid = userL.Uid
 		userL.UpdatedDate = time.Now()
 		_, e = lib.FireUpdate(usersFire, useruid, userL)
 	}

@@ -67,7 +67,6 @@ func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, inter
 		person.Mail = claims.UserEmail
 		person.FiscalCode = claims.UserFiscalcode
 		person.BirthDate = lib.ExtractBirthdateFromItalianFiscalCode(claims.UserFiscalcode).Format(time.RFC3339)
-		person.Phone = claims.UserMobile
 		person.Address = claims.UserAddress
 		person.PostalCode = claims.UserPostalcode
 		person.City = claims.UserCity

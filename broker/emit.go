@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"cloud.google.com/go/civil"
@@ -56,7 +57,7 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 		policy.Statements = result.Statements
 	}
 
-	company, numb, tot := GetSequenceByCompany(policy.Company, firePolicy)
+	company, numb, tot := GetSequenceByCompany(strings.ToLower(policy.Company), firePolicy)
 	log.Println("Emit code "+uid+" ", company)
 	log.Println("Emit code "+uid+" ", numb)
 	log.Println("Emit code "+uid+" ", tot)
