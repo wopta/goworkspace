@@ -53,7 +53,7 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 			policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusPay)
 			//policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusToPay)
 			lib.SetFirestore(firePolicy, uid, policy)
-			e = models.UserUpdateByFiscalCode(r.Header.Get("origin"), policy.Contractor)
+			e = models.UserUpdate(r.Header.Get("origin"), policy.Contractor)
 			policy.BigquerySave(r.Header.Get("origin"))
 			q := lib.Firequeries{
 				Queries: []lib.Firequery{{
