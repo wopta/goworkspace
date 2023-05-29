@@ -7,7 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/wopta/goworkspace/document"
 	lib "github.com/wopta/goworkspace/lib"
 	mail "github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
@@ -58,9 +57,9 @@ func Sign(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 			lib.SetFirestore(firePolicy, uid, policy)
 			policy.BigquerySave(r.Header.Get("origin"))
 			mail.SendMailPay(policy)
-			s := <-document.GetFileV6(&policy, uid)
+			//s := <-document.GetFileV6(&policy, uid)
 
-			log.Println(s)
+			//log.Println(s)
 		}
 	}
 
