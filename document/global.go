@@ -31,6 +31,13 @@ func (skin Skin) GlobalContract(m pdf.Maroto, data models.Policy) {
 			data.Contractor.City = data.Contractor.Residence.City
 			data.Contractor.CityCode = data.Contractor.Residence.CityCode
 		}
+		if data.PaymentSplit == "year" {
+			data.PriceNett = data.OffersPrices[data.OfferlName]["yearly"].Net
+			data.PriceGross = data.OffersPrices[data.OfferlName]["yearly"].Gross
+		} else if data.PaymentSplit == "monthly" {
+			data.PriceNett = data.OffersPrices[data.OfferlName]["monthly"].Net
+			data.PriceGross = data.OffersPrices[data.OfferlName]["monthly"].Gross
+		}
 		m = skin.GetHeader(m, data, logo, name)
 		m = skin.GetFooter(m, "/logo_global.png", "Wopta per te. Persona è un prodotto assicurativo di Global Assistance Compagnia di assicurazioni e riassicurazioni S.p.A, distribuito da Wopta Assicurazioni S.r.l")
 		m = skin.Space(m, 5.0)
@@ -42,6 +49,10 @@ func (skin Skin) GlobalContract(m pdf.Maroto, data models.Policy) {
 	if data.Name == "pmi" {
 		logo = "/pmi.png"
 		name = "Artigiani & Imprese"
+		if data.PaymentSplit == "monthly" {
+			data.PriceNett = data.PriceNett / 12
+			data.PriceGross = data.PriceNett / 12
+		}
 		m = skin.GetHeader(m, data, logo, name)
 		m = skin.GetFooter(m, "/logo_global.png", "Wopta per te. Artigiani & Imprese è un prodotto assicurativo di Global Assistance Compagnia di assicurazioni e riassicurazioni S.p.A, distribuito da Wopta Assicurazioni S.r.l")
 		m = skin.Space(m, 5.0)
