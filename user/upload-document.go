@@ -20,7 +20,7 @@ func UploadDocument(w http.ResponseWriter, r *http.Request) (string, interface{}
 
 	log.Println("Upload User IdentityDocument")
 
-	userUID := r.Header.Get("userUid")
+	policyUID := r.Header.Get("policyUid")
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	err := json.Unmarshal(body, &identityDocument)
@@ -35,15 +35,15 @@ func UploadDocument(w http.ResponseWriter, r *http.Request) (string, interface{}
 		return "", nil, fmt.Errorf("identity document expired")
 	}
 
-	saveDocument(userUID, &identityDocument)
+	saveDocument(policyUID, &identityDocument)
 
 	outJson, err := json.Marshal(identityDocument)
 
 	return string(outJson), identityDocument, err
 }
 
-func saveDocument(userUID string, identityDocument *models.IdentityDocument) {
-	saveToStorage := func(userUID string, documentSide, documentType string, media *models.Media) error {
+func saveDocument(policyUID string, identityDocument *models.IdentityDocument) {
+	saveToStorage := func(policyUID string, documentSide, documentType string, media *models.Media) error {
 		now := time.Now()
 		timestamp := strconv.FormatInt(now.Unix(), 10)
 
@@ -59,7 +59,7 @@ func saveDocument(userUID string, identityDocument *models.IdentityDocument) {
 		}
 
 		media.FileName = documentType + "_" + documentSide + "_" + timestamp + fileExtension
-		gsLink, err := lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "assets/users/"+userUID+"/"+
+		gsLink, err := lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "temp/"+policyUID+"/"+
 			media.FileName, bytes)
 		media.Link = gsLink
 		return err
@@ -68,11 +68,11 @@ func saveDocument(userUID string, identityDocument *models.IdentityDocument) {
 	documentType, err := getDocumentType(identityDocument)
 	lib.CheckError(err)
 
-	err = saveToStorage(userUID, "front", documentType, identityDocument.FrontMedia)
+	err = saveToStorage(policyUID, "front", documentType, identityDocument.FrontMedia)
 	lib.CheckError(err)
 
 	if identityDocument.BackMedia != nil {
-		err = saveToStorage(userUID, "back", documentType, identityDocument.BackMedia)
+		err = saveToStorage(policyUID, "back", documentType, identityDocument.BackMedia)
 		lib.CheckError(err)
 	}
 
