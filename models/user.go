@@ -137,18 +137,37 @@ func UpdateUserByFiscalCode(origin string, user User) (string, error) {
 	docSnap := lib.WhereFirestore(usersFire, "fiscalCode", "==", user.FiscalCode)
 	retrievedUser, err := FirestoreDocumentToUser(docSnap)
 	if retrievedUser.Uid != "" {
+		for _, identityDocument := range user.IdentityDocuments {
+			retrievedUser.IdentityDocuments = append(retrievedUser.IdentityDocuments, identityDocument)
+		}
+
+		for _, consens := range *user.Consens {
+			found := false
+			for _, savedConsens := range *retrievedUser.Consens {
+				if consens.Key == savedConsens.Key {
+					savedConsens.Answer = consens.Answer
+					savedConsens.Title = consens.Title
+					found = true
+				}
+			}
+			if !found {
+				*retrievedUser.Consens = append(*retrievedUser.Consens, consens)
+			}
+		}
+
 		updatedUser := map[string]interface{}{
-			"address":      user.Address,
-			"postalCode":   user.PostalCode,
-			"city":         user.City,
-			"locality":     user.Locality,
-			"cityCode":     user.CityCode,
-			"streetNumber": user.StreetNumber,
-			"location":     user.Location,
-			"consens":      user.Consens,
-			"residence":    user.Residence,
-			"domicile":     user.Domicile,
-			"updatedDate":  time.Now().UTC(),
+			"address":           user.Address,
+			"postalCode":        user.PostalCode,
+			"city":              user.City,
+			"locality":          user.Locality,
+			"cityCode":          user.CityCode,
+			"streetNumber":      user.StreetNumber,
+			"location":          user.Location,
+			"identityDocuments": retrievedUser.IdentityDocuments,
+			"consens":           retrievedUser.Consens,
+			"residence":         user.Residence,
+			"domicile":          user.Domicile,
+			"updatedDate":       time.Now().UTC(),
 		}
 		if user.Height != 0 {
 			updatedUser["height"] = user.Height
