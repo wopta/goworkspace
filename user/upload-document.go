@@ -18,7 +18,7 @@ import (
 func UploadDocument(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var identityDocument models.IdentityDocument
 
-	log.Println("Update Document")
+	log.Println("Upload User IdentityDocument")
 
 	userUID := r.Header.Get("userUid")
 
@@ -36,8 +36,6 @@ func UploadDocument(w http.ResponseWriter, r *http.Request) (string, interface{}
 	}
 
 	saveDocument(userUID, &identityDocument)
-
-	updateUser(lib.GetDatasetByEnv(r.Header.Get("origin"), "users"), userUID, &identityDocument)
 
 	outJson, err := json.Marshal(identityDocument)
 
@@ -79,15 +77,6 @@ func saveDocument(userUID string, identityDocument *models.IdentityDocument) {
 	}
 
 	identityDocument.LastUpdate = time.Now().UTC()
-}
-
-func updateUser(fireUsers string, userUID string, identityDocument *models.IdentityDocument) {
-	var user models.User
-	docsnap := lib.GetFirestore(fireUsers, userUID)
-	docsnap.DataTo(&user)
-	user.IdentityDocuments = append(user.IdentityDocuments, identityDocument)
-	user.UpdatedDate = time.Now().UTC()
-	lib.SetFirestore(fireUsers, userUID, user)
 }
 
 func getDocumentType(identityDocument *models.IdentityDocument) (string, error) {
