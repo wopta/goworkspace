@@ -55,11 +55,12 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 			policy.Contractor.Uid = userUID
 
 			gsLink := <-document.GetFileV6(&policy, uid)
+			timestamp := strconv.FormatInt(time.Now().UTC().Unix(), 10)
 			*policy.Attachments = append(*policy.Attachments, models.Attachment{
 				Name: "Contratto",
 				Link: gsLink,
 				FileName: "Contratto_" + strings.ReplaceAll(policy.NameDesc, " ", "_") +
-					"_" + strconv.Itoa(int(time.Now().UTC().Unix())) + ".pdf",
+					"_" + timestamp + ".pdf",
 			})
 
 			// Move user identity documents to user folder on Google Storage
