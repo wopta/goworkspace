@@ -92,7 +92,7 @@ func Life(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 
 	GetPersonalDataHandlingSection(pdf, policy)
 
-	filename, out := save(pdf, &policy.Contractor)
+	filename, out := save(pdf, policy)
 	return filename, out
 }
 

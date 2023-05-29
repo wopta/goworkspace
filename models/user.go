@@ -128,42 +128,60 @@ func FirestoreDocumentToUser(query *firestore.DocumentIterator) (User, error) {
 	return result, e
 }
 
-func UserCreateByMail(origin string, user User) (string, error) {
+func UpdateUserByFiscalCode(origin string, user User) (string, error) {
 	var (
-		userUID string
-		err     error
+		err error
 	)
-	usersFire := lib.GetDatasetByEnv(origin, "users")
-	docsnap := lib.WhereFirestore(usersFire, "mail", "==", user.Mail)
-	userL, err := FirestoreDocumentToUser(docsnap)
-	if len(userL.Uid) == 0 {
-		user.CreationDate = time.Now().UTC()
-		user.UpdatedDate = time.Now().UTC()
-		ref2, _ := lib.PutFirestore(usersFire, user)
-		log.Println("Proposal User uid", ref2.ID)
-		userUID = ref2.ID
-	} else {
-		userUID = userL.Uid
-	}
-	return userUID, err
-}
 
-func UserUpdate(origin string, user User) error {
 	usersFire := lib.GetDatasetByEnv(origin, "users")
+	docSnap := lib.WhereFirestore(usersFire, "fiscalCode", "==", user.FiscalCode)
+	retrievedUser, err := FirestoreDocumentToUser(docSnap)
+	if retrievedUser.Uid != "" {
+		for _, identityDocument := range user.IdentityDocuments {
+			retrievedUser.IdentityDocuments = append(retrievedUser.IdentityDocuments, identityDocument)
+		}
 
-	updatedUser := map[string]interface{}{
-		"address":      user.Address,
-		"postalCode":   user.PostalCode,
-		"city":         user.City,
-		"locality":     user.Locality,
-		"cityCode":     user.CityCode,
-		"streetNumber": user.StreetNumber,
-		"location":     user.Location,
-		"consens":      user.Consens,
-		"residence":    user.Residence,
-		"domicile":     user.Domicile,
-		"updatedDate":  time.Now().UTC(),
+		for _, consens := range *user.Consens {
+			found := false
+			for _, savedConsens := range *retrievedUser.Consens {
+				if consens.Key == savedConsens.Key {
+					savedConsens.Answer = consens.Answer
+					savedConsens.Title = consens.Title
+					found = true
+				}
+			}
+			if !found {
+				*retrievedUser.Consens = append(*retrievedUser.Consens, consens)
+			}
+		}
+
+		updatedUser := map[string]interface{}{
+			"address":           user.Address,
+			"postalCode":        user.PostalCode,
+			"city":              user.City,
+			"locality":          user.Locality,
+			"cityCode":          user.CityCode,
+			"streetNumber":      user.StreetNumber,
+			"location":          user.Location,
+			"identityDocuments": retrievedUser.IdentityDocuments,
+			"consens":           retrievedUser.Consens,
+			"residence":         user.Residence,
+			"domicile":          user.Domicile,
+			"updatedDate":       time.Now().UTC(),
+		}
+		if user.Height != 0 {
+			updatedUser["height"] = user.Height
+		}
+		if user.Weight != 0 {
+			updatedUser["weight"] = user.Weight
+		}
+
+		_, err = lib.FireUpdate(usersFire, retrievedUser.Uid, updatedUser)
+		return retrievedUser.Uid, err
 	}
-	_, err := lib.FireUpdate(usersFire, user.Uid, updatedUser)
-	return err
+
+	user.CreationDate = time.Now().UTC()
+	user.UpdatedDate = time.Now().UTC()
+	ref, _ := lib.PutFirestore(usersFire, user)
+	return ref.ID, err
 }

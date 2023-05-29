@@ -44,7 +44,7 @@ func User(w http.ResponseWriter, r *http.Request) {
 				Method:  "POST",
 			},
 			{
-				Route:   "/document/v1/:userUid",
+				Route:   "/document/v1/:policyUid",
 				Handler: UploadDocument,
 				Method:  http.MethodPost,
 			},
