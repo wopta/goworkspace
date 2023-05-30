@@ -60,7 +60,7 @@ func Broker(w http.ResponseWriter, r *http.Request) {
 				Method:  http.MethodGet,
 			},
 			{
-				Route:   "policy/v1/transactions/:policyUid",
+				Route:   "policy/transactions/v1/:policyUid",
 				Handler: GetPolicyTransactions,
 				Method:  http.MethodGet,
 			},
