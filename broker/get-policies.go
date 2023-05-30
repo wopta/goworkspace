@@ -7,7 +7,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"sort"
 )
 
 func GetPoliciesFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -41,8 +40,6 @@ func GetPoliciesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 
 	policies := models.PolicyToListData(docsnap)
 
-	sort.Sort(ByCreationDate(policies))
-
 	jsonOut, err := json.Marshal(policies)
 	return string(jsonOut), policies, err
 }
@@ -56,9 +53,3 @@ type GetPoliciesReq struct {
 	Limit int `json:"limit"`
 	Page  int `json:"page"`
 }
-
-type ByCreationDate []models.Policy
-
-func (p ByCreationDate) Len() int           { return len(p) }
-func (p ByCreationDate) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
-func (p ByCreationDate) Less(i, j int) bool { return p[i].CreationDate.After(p[j].CreationDate) } // Changed to ">" for descending order
