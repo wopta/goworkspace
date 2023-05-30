@@ -133,7 +133,9 @@ func GetUserUIDByFiscalCode(origin string, fiscalCode string) (string, bool, err
 	usersFire := lib.GetDatasetByEnv(origin, "users")
 	docSnap := lib.WhereFirestore(usersFire, "fiscalCode", "==", fiscalCode)
 	retrievedUser, err := FirestoreDocumentToUser(docSnap)
-	lib.CheckError(err)
+	if err != iterator.Done {
+		return "", false, err
+	}
 	if retrievedUser.Uid != "" {
 		return retrievedUser.Uid, false, nil
 	}
