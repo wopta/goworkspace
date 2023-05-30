@@ -153,17 +153,19 @@ func UpdateUserByFiscalCode(origin string, user User) (string, error) {
 			retrievedUser.IdentityDocuments = append(retrievedUser.IdentityDocuments, identityDocument)
 		}
 
-		for _, consens := range *user.Consens {
-			found := false
-			for _, savedConsens := range *retrievedUser.Consens {
-				if consens.Key == savedConsens.Key {
-					savedConsens.Answer = consens.Answer
-					savedConsens.Title = consens.Title
-					found = true
+		if user.Consens != nil {
+			for _, consens := range *user.Consens {
+				found := false
+				for _, savedConsens := range *retrievedUser.Consens {
+					if consens.Key == savedConsens.Key {
+						savedConsens.Answer = consens.Answer
+						savedConsens.Title = consens.Title
+						found = true
+					}
 				}
-			}
-			if !found {
-				*retrievedUser.Consens = append(*retrievedUser.Consens, consens)
+				if !found {
+					*retrievedUser.Consens = append(*retrievedUser.Consens, consens)
+				}
 			}
 		}
 

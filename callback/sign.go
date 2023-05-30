@@ -3,8 +3,6 @@ package callback
 import (
 	"log"
 	"net/http"
-	"os"
-	"strings"
 	"time"
 
 	lib "github.com/wopta/goworkspace/lib"
@@ -49,11 +47,6 @@ func Sign(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 			if policy.Attachments == nil {
 				policy.Attachments = new([]models.Attachment)
 			}
-			productName := strings.ReplaceAll(policy.NameDesc, " ", "_")
-			*policy.Attachments = append(*policy.Attachments, models.Attachment{Name: "Contratto",
-				FileName: "Contratto_" + productName + "_" + policy.CodeCompany + ".pdf", Link: "gs://" +
-					os.Getenv("GOOGLE_STORAGE_BUCKET") + "/assets/users/" + policy.Contractor.Uid + "/contract_" +
-					policy.Uid + ".pdf"})
 			lib.SetFirestore(firePolicy, uid, policy)
 			policy.BigquerySave(r.Header.Get("origin"))
 			mail.SendMailPay(policy)
