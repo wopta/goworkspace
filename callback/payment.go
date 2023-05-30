@@ -55,9 +55,6 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 			policy.Contractor.Uid = userUID
 			log.Println("Contractor UID: ", userUID)
 			log.Println("Policy Contractor UID: ", policy.Contractor.Uid)
-			if newUser {
-				policy.Contractor.CreationDate = time.Now().UTC()
-			}
 
 			gsLink := <-document.GetFileV6(policy, uid)
 			log.Println("contractGsLink: ", gsLink)
@@ -90,8 +87,14 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 				}
 			}
 
-			_, err = models.UpdateUserByFiscalCode(r.Header.Get("origin"), policy.Contractor)
-			lib.CheckError(err)
+			if newUser {
+				policy.Contractor.CreationDate = time.Now().UTC()
+				fireUsers := lib.GetDatasetByEnv(r.Header.Get("origin"), "users")
+				lib.SetFirestore(fireUsers, userUID, policy.Contractor)
+			} else {
+				_, err = models.UpdateUserByFiscalCode(r.Header.Get("origin"), policy.Contractor)
+				lib.CheckError(err)
+			}
 
 			policy.IsPay = true
 			policy.Updated = time.Now().UTC()
