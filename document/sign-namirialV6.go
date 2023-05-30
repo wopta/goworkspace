@@ -214,7 +214,7 @@ func postDataV6(data []byte) <-chan string {
 
 	return r
 }
-func GetFileV6(policy *model.Policy, uid string) chan string {
+func GetFileV6(policy model.Policy, uid string) chan string {
 	r := make(chan string)
 	log.Println("Get file: ", policy.IdSign)
 	go func() {
@@ -235,6 +235,7 @@ func GetFileV6(policy *model.Policy, uid string) chan string {
 			body, _ := io.ReadAll(res.Body)
 			defer res.Body.Close()
 			//log.Println("Get body: ", string(body))
+			log.Println("Policy Contractor UID: ", policy.Contractor.Uid)
 			lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "assets/users/"+
 				policy.Contractor.Uid+"/contract_"+uid+".pdf", body)
 			r <- "upload done"

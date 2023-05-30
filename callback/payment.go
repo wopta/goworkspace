@@ -53,11 +53,13 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 			userUID, newUser, err := models.GetUserUIDByFiscalCode(r.Header.Get("origin"), policy.Contractor.FiscalCode)
 			lib.CheckError(err)
 			policy.Contractor.Uid = userUID
+			log.Println("Contractor UID: ", userUID)
+			log.Println("Policy Contractor UID: ", policy.Contractor.Uid)
 			if newUser {
 				policy.Contractor.CreationDate = time.Now().UTC()
 			}
 
-			gsLink := <-document.GetFileV6(&policy, uid)
+			gsLink := <-document.GetFileV6(policy, uid)
 			timestamp := strconv.FormatInt(time.Now().UTC().Unix(), 10)
 			*policy.Attachments = append(*policy.Attachments, models.Attachment{
 				Name: "Contratto",
