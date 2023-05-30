@@ -60,6 +60,7 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 			}
 
 			gsLink := <-document.GetFileV6(policy, uid)
+			log.Println("contractGsLink: ", gsLink)
 			timestamp := strconv.FormatInt(time.Now().UTC().Unix(), 10)
 			*policy.Attachments = append(*policy.Attachments, models.Attachment{
 				Name: "Contratto",
@@ -73,17 +74,19 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 				frontMediaBytes, e := lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"),
 					"temp/"+policy.Uid+"/"+identityDocument.FrontMedia.FileName)
 				lib.CheckError(e)
-				gsLink, e := lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "assets/users/"+
+				frontGsLink, e := lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "assets/users/"+
 					userUID+"/"+identityDocument.FrontMedia.FileName, frontMediaBytes)
-				identityDocument.FrontMedia.Link = gsLink
+				log.Println("frontGsLink: ", frontGsLink)
+				identityDocument.FrontMedia.Link = frontGsLink
 
 				if identityDocument.BackMedia != nil {
 					backMediaBytes, e := lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"),
 						"temp/"+policy.Uid+"/"+identityDocument.BackMedia.FileName)
 					lib.CheckError(e)
-					gsLink, e = lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "assets/users/"+
+					backGsLink, e := lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "assets/users/"+
 						userUID+"/"+identityDocument.FrontMedia.FileName, backMediaBytes)
-					identityDocument.BackMedia.Link = gsLink
+					log.Println("backGsLink: ", backGsLink)
+					identityDocument.BackMedia.Link = backGsLink
 				}
 			}
 
