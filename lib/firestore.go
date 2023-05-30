@@ -24,6 +24,15 @@ func getFireClient() *firestore.Client {
 	CheckError(err)
 	return client
 }
+
+func NewDoc(collection string) string {
+	ctx := context.Background()
+	client, err := firestore.NewClient(ctx, os.Getenv("GOOGLE_PROJECT_ID"))
+	CheckError(err)
+	ref := client.Collection("cities").NewDoc()
+	return ref.ID
+}
+
 func GetFirestore(collection string, doc string) *firestore.DocumentSnapshot {
 	ctx := context.Background()
 	client, err := firestore.NewClient(ctx, os.Getenv("GOOGLE_PROJECT_ID"))

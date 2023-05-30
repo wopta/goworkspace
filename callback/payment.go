@@ -49,10 +49,13 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 		policyM, _ := policy.Marshal()
 		log.Println(uid+" payment ", string(policyM))
 		if !policy.IsPay && policy.Status == models.PolicyStatusToPay {
-			// Create user if doesn't exists
-			userUID, err := models.UpdateUserByFiscalCode(r.Header.Get("origin"), policy.Contractor)
+			// Get User UID by fiscal code
+			userUID, newUser, err := models.GetUserUIDByFiscalCode(r.Header.Get("origin"), policy.Contractor.FiscalCode)
 			lib.CheckError(err)
 			policy.Contractor.Uid = userUID
+			if newUser {
+				policy.Contractor.CreationDate = time.Now().UTC()
+			}
 
 			gsLink := <-document.GetFileV6(&policy, uid)
 			timestamp := strconv.FormatInt(time.Now().UTC().Unix(), 10)
@@ -81,6 +84,9 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 					identityDocument.BackMedia.Link = gsLink
 				}
 			}
+
+			_, err = models.UpdateUserByFiscalCode(r.Header.Get("origin"), policy.Contractor)
+			lib.CheckError(err)
 
 			policy.IsPay = true
 			policy.Updated = time.Now().UTC()

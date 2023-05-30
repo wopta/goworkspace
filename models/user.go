@@ -2,6 +2,7 @@ package models
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"time"
 
@@ -128,6 +129,17 @@ func FirestoreDocumentToUser(query *firestore.DocumentIterator) (User, error) {
 	return result, e
 }
 
+func GetUserUIDByFiscalCode(origin string, fiscalCode string) (string, bool, error) {
+	usersFire := lib.GetDatasetByEnv(origin, "users")
+	docSnap := lib.WhereFirestore(usersFire, "fiscalCode", "==", fiscalCode)
+	retrievedUser, err := FirestoreDocumentToUser(docSnap)
+	lib.CheckError(err)
+	if retrievedUser.Uid != "" {
+		return retrievedUser.Uid, false, nil
+	}
+	return lib.NewDoc(usersFire), true, nil
+}
+
 func UpdateUserByFiscalCode(origin string, user User) (string, error) {
 	var (
 		err error
@@ -180,8 +192,5 @@ func UpdateUserByFiscalCode(origin string, user User) (string, error) {
 		return retrievedUser.Uid, err
 	}
 
-	user.CreationDate = time.Now().UTC()
-	user.UpdatedDate = time.Now().UTC()
-	ref, _ := lib.PutFirestore(usersFire, user)
-	return ref.ID, err
+	return "", fmt.Errorf("no user found with this fiscal code")
 }
