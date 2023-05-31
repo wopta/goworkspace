@@ -155,21 +155,7 @@ func UpdateUserByFiscalCode(origin string, user User) (string, error) {
 			retrievedUser.IdentityDocuments = append(retrievedUser.IdentityDocuments, identityDocument)
 		}
 
-		if user.Consens != nil {
-			for _, consens := range *user.Consens {
-				found := false
-				for _, savedConsens := range *retrievedUser.Consens {
-					if consens.Key == savedConsens.Key {
-						savedConsens.Answer = consens.Answer
-						savedConsens.Title = consens.Title
-						found = true
-					}
-				}
-				if !found {
-					*retrievedUser.Consens = append(*retrievedUser.Consens, consens)
-				}
-			}
-		}
+		retrievedUser.Consens = updateUserConsens(retrievedUser.Consens, user.Consens)
 
 		updatedUser := map[string]interface{}{
 			"address":           user.Address,
@@ -197,4 +183,27 @@ func UpdateUserByFiscalCode(origin string, user User) (string, error) {
 	}
 
 	return "", fmt.Errorf("no user found with this fiscal code")
+}
+
+func updateUserConsens(oldConsens *[]Consens, newConsens *[]Consens) *[]Consens {
+	if newConsens == nil {
+		return oldConsens
+	}
+	if oldConsens == nil {
+		return newConsens
+	}
+	for _, consens := range *newConsens {
+		found := false
+		for index, savedConsens := range *oldConsens {
+			if consens.Key == savedConsens.Key {
+				(*oldConsens)[index].Answer = consens.Answer
+				(*oldConsens)[index].Title = consens.Title
+				found = true
+			}
+		}
+		if !found {
+			*oldConsens = append(*oldConsens, consens)
+		}
+	}
+	return oldConsens
 }
