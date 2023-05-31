@@ -11,7 +11,7 @@ import (
 
 func GetPolicyTransactions(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		transactions Transactions
+		response GetPolicyTransactionsResp
 	)
 
 	log.Println("GetPolicyTransactions")
@@ -21,13 +21,17 @@ func GetPolicyTransactions(w http.ResponseWriter, r *http.Request) (string, inte
 
 	res := lib.WhereFirestore(fireTransactions, "policyUid", "==", policyUID)
 
-	transactions = models.TransactionToListData(res)
+	response.Transactions = models.TransactionToListData(res)
 
-	sort.Sort(transactions)
+	sort.Sort(response.Transactions)
 
-	jsonOut, err := json.Marshal(transactions)
+	jsonOut, err := json.Marshal(response)
 
-	return string(jsonOut), transactions, err
+	return string(jsonOut), response, err
+}
+
+type GetPolicyTransactionsResp struct {
+	Transactions Transactions `json:"transactions"`
 }
 
 type Transactions []models.Transaction

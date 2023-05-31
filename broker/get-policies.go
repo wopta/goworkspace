@@ -11,7 +11,8 @@ import (
 
 func GetPoliciesFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		req GetPoliciesReq
+		req      GetPoliciesReq
+		response GetPoliciesResp
 	)
 	log.Println("GetPolicies")
 
@@ -38,10 +39,14 @@ func GetPoliciesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		return "", nil, err
 	}
 
-	policies := models.PolicyToListData(docsnap)
+	response.Policies = models.PolicyToListData(docsnap)
 
-	jsonOut, err := json.Marshal(policies)
-	return string(jsonOut), policies, err
+	jsonOut, err := json.Marshal(response)
+	return string(jsonOut), response, err
+}
+
+type GetPoliciesResp struct {
+	Policies []models.Policy `json:"policies"`
 }
 
 type GetPoliciesReq struct {
