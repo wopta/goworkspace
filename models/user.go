@@ -113,7 +113,7 @@ func FirestoreDocumentToUser(query *firestore.DocumentIterator) (User, error) {
 
 	if err == iterator.Done && userDocumentSnapshot == nil {
 		log.Println("user not found in firebase DB")
-		return result, err
+		return result, fmt.Errorf("no user found")
 	}
 
 	if err != iterator.Done && err != nil {
@@ -133,7 +133,7 @@ func GetUserUIDByFiscalCode(origin string, fiscalCode string) (string, bool, err
 	usersFire := lib.GetDatasetByEnv(origin, "users")
 	docSnap := lib.WhereFirestore(usersFire, "fiscalCode", "==", fiscalCode)
 	retrievedUser, err := FirestoreDocumentToUser(docSnap)
-	if err != iterator.Done {
+	if err != nil && err.Error() != "no user found" {
 		return "", false, err
 	}
 	if retrievedUser.Uid != "" {
