@@ -1051,7 +1051,7 @@ func axaTableSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 		"LR", 0, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "", 0, "", false, 0, "")
-	pdf.CellFormat(180, 4, "Status occupazionale: "+insured.WorkType, "TLR", 0, "",
+	pdf.CellFormat(180, 4, "Status occupazionale: "+insured.WorkStatus, "TLR", 0, "",
 		false, 0, "")
 	pdf.CellFormat(5, 4, "", "", 1, "", false, 0, "")
 	pdf.CellFormat(5, 4, "", "", 0, "", false, 0, "")
@@ -1118,7 +1118,7 @@ func axaTableSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 		"beneficiari un capitale qualora si verifichi l’evento oggetto di copertura", "", "", false)
 	pdf.CellFormat(4, 3, "", "", 0, "", false, 0, "")
 	pdf.MultiCell(0, 3, "iii.  Origine dei fondi utilizzati per il pagamento dei premi assicurativi: "+
-		"Proprie risorse economiche", "", "", false)
+		policy.FundsOrigin, "", "", false)
 	pdf.CellFormat(0, 2, "", "", 1, "", false, 0, "")
 }
 

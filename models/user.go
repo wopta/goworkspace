@@ -49,6 +49,7 @@ type User struct {
 	Role              string              `firestore:"role" json:"role,omitempty" bigquery:"role"`
 	Work              string              `firestore:"work" json:"work,omitempty" bigquery:"work"`
 	WorkType          string              `firestore:"workType" json:"workType,omitempty" bigquery:"workType"`
+	WorkStatus        string              `json:"workStatus,omitempty" firestore:"workStatus,omitempty" bigquery:"-"`
 	Mail              string              `firestore:"mail" json:"mail,omitempty" bigquery:"mail"`
 	Phone             string              `firestore:"phone" json:"phone,omitempty" bigquery:"phone"`
 	FiscalCode        string              `firestore:"fiscalCode" json:"fiscalCode,omitempty" bigquery:"fiscalCode"`
@@ -68,6 +69,7 @@ type User struct {
 	Domicile          *Address            `json:"domicile,omitempty" firestore:"domicile,omitempty" bigquery:"-"`
 	IdentityDocuments []*IdentityDocument `json:"identityDocuments,omitempty" firestore:"identityDocuments,omitempty" bigquery:"-"`
 	AuthId            string              `json:"authId,omitempty" firestore:"authId,omitempty" bigquery:"-"`
+	Statements        []*Statement        `json:"statements,omitempty" firestore:"statements,omitempty" bigquery:"-"`
 }
 
 type Consens struct {
