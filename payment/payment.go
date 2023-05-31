@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
@@ -39,6 +40,16 @@ func Payment(w http.ResponseWriter, r *http.Request) {
 				Route:   "/v1/cripto",
 				Handler: CriptoPay,
 				Method:  "POST",
+			},
+			{
+				Route:   "/v1/cripto",
+				Handler: CriptoPay,
+				Method:  "POST",
+			},
+			{
+				Route:   "/v1/:uid",
+				Handler: CriptoPay,
+				Method:  http.MethodDelete,
 			},
 		},
 	}
@@ -85,4 +96,21 @@ func getOrigin(origin string) string {
 	log.Println(" getOrigin: name:", origin)
 	log.Println(" getOrigin result: ", result)
 	return result
+}
+func FabrickExpireBill(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	var urlstring = os.Getenv("FABRICK_BASEURL") + "api/fabrick/pace/v4.0/mods/back/v1.0/transactions/change-expiration"
+
+	req, _ := http.NewRequest(http.MethodPut, urlstring, strings.NewReader(`{
+		"id": "string",
+		"newExpirationDate": "string"
+	  }`))
+	var data model.Policy
+	defer r.Body.Close()
+	err := json.Unmarshal([]byte(req), &data)
+	log.Println(data.PriceGross)
+	lib.CheckError(err)
+	resultPay := <-FabrickPayObj(data, false, "", "", data.PriceGross, getOrigin(r.Header.Get("origin")))
+
+	log.Println(resultPay)
+	return "", nil, err
 }

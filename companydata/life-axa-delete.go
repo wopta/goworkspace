@@ -13,10 +13,9 @@ import (
 )
 
 func LifeAxaDelete(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	layout := "20060102"
+
 	now := time.Now()
 	fromM := time.Now().AddDate(0, -1, 0)
-
 	var (
 		result [][]string
 	)
@@ -67,7 +66,7 @@ func LifeAxaDelete(w http.ResponseWriter, r *http.Request) (string, interface{},
 					policy.CodeCompany,                      //Tipo Rimborso
 					"A",                                     //Motivo Transazione
 					policy.CodeCompany,                      //N° adesione
-					policy.StartDate.Format(layout),         //"Inizio copertura"
+					getFormatdate(policy.StartDate),         //"Inizio copertura"
 					"012",                                   //"Data estinzione"
 					fmt.Sprintf("%.2f", g.PriceGross),       //"Importo di rimborso"
 					policy.Contractor.Surname,               //"Cognome "

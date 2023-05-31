@@ -2,12 +2,14 @@ package broker
 
 import (
 	"encoding/json"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 )
 
 func UpdatePolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -69,4 +71,30 @@ func PatchPolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	}
 
 	return `{"uid":"` + policyUID + `", "success":"true"}`, `{"uid":"` + policyUID + `", "success":"true"}`, err
+}
+func DeletePolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	var (
+		err       error
+		policy    models.Policy
+		policyUID string
+		request   PolicyDeleteReq
+	)
+	log.Println("DeletePolicy")
+	guaranteFire := lib.GetDatasetByEnv(r.Header.Get("origin"), "guarante")
+	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
+	json.Unmarshal(req, &request)
+	firePolicy := lib.GetDatasetByEnv(r.Header.Get("origin"), "policy")
+	policyUID = r.Header.Get("uid")
+	docsnap := lib.GetFirestore(firePolicy, string(policyUID))
+	docsnap.DataTo(&policy)
+	policy.IsDeleted = true
+	policy.DeleteDesc = request.DeleteDesc
+	lib.SetFirestore(firePolicy, policyUID, policy)
+	policy.BigquerySave(r.Header.Get("origin"))
+	models.SetGuaranteBigquery(policy, "delete", guaranteFire)
+	return `{"uid":"` + policyUID + `", "success":"true"}`, `{"uid":"` + policyUID + `", "success":"true"}`, err
+}
+
+type PolicyDeleteReq struct {
+	DeleteDesc string `json:"deleteDesc,omitempty"`
 }

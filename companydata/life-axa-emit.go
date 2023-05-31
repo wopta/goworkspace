@@ -8,6 +8,7 @@ import (
 	"os"
 	"reflect"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/go-gota/gota/dataframe"
@@ -17,10 +18,22 @@ import (
 )
 
 func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	var (
+		from          time.Time
+		filenamesplit string
+	)
 	layout := "20060102"
 	now := time.Now()
+
 	fromM := time.Now().AddDate(0, -1, 0)
 	fromQ := time.Now().AddDate(0, 0, -15)
+	if now.Day() == 15 {
+		from = fromQ
+		filenamesplit = "Q"
+	} else {
+		from = fromM
+		filenamesplit = "M"
+	}
 	log.Println(fromQ)
 	var (
 		cabCsv []byte
@@ -40,7 +53,7 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 			},
 
 			{
-				Field:      "ispay", //
+				Field:      "isPay", //
 				Operator:   "==",    //
 				QueryValue: true,
 			},
@@ -56,7 +69,7 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 			}, {
 				Field:      "startDate", //
 				Operator:   ">",         //
-				QueryValue: fromM,
+				QueryValue: from,
 			},
 			{
 				Field:      "startDate", //
@@ -105,49 +118,49 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 					mapCodecCompany(policy, g.CompanyCodec), //Codice schema
 					policy.CodeCompany,                      //N° adesione individuale univoco
 					"A",                                     //Tipo di Transazione
-					policy.StartDate.Format(layout),         //Data di decorrenza
-					policy.EndDate.Format(layout),           //"Data di rinnovo"
+					getFormatdate(policy.StartDate),         //Data di decorrenza
+					getFormatdate(policy.EndDate),           //"Data di rinnovo"
 					"012",                                   //"Durata copertura assicurativa"
 					fmt.Sprint(g.Value.Duration.Year * 12),  //"Durata complessiva"
 					fmt.Sprintf("%.2f", g.PriceGross),       //"Premio assicurativo lordo"
 					fmt.Sprintf("%.0f", g.SumInsuredLimitOfIndemnity), //"Importo Assicurato"
-					"0",                                //indennizzo mensile
-					"",                                 //campo disponibile
-					"",                                 //% di sovrappremio da applicare alla garanzia
-					"W1",                               //Codice Concessionario /dipendenti (iscr.E)
-					"",                                 //Codice Banca
-					"",                                 //Codice Campagna
-					"T",                                //Copertura Assicurativa: Totale o Pro quota
-					"",                                 //% assicurata dell'assicurato
-					"",                                 //campo disponibile
-					"",                                 //Maxi rata finale/Valore riscatto
-					"",                                 //Stato occupazionale dell'Assicurato
-					"2",                                //Tipo aderente
-					"WEB",                              //Canale di vendita
-					"PF",                               //Tipo contraente / Contraente
-					policy.Contractor.Surname,          //Denominazione Sociale o Cognome contraente
-					policy.Contractor.Name,             //campo vuoto o nome
-					policy.Contractor.Gender,           //Sesso
-					policy.Contractor.BirthDate,        //Data di nascita
-					policy.Contractor.FiscalCode,       //Codice Fiscale
-					policy.Contractor.Address,          //Indirizzo di residenza
-					policy.Contractor.PostalCode,       //C.A.P. Di residenza
-					policy.Contractor.Locality,         //Comune di residenza
-					policy.Contractor.City,             //Provincia di residenza
-					policy.Contractor.Mail,             //Indirizzo e-mail
-					policy.Contractor.Phone,            //Numero di Cellulare
-					policy.Assets[0].Person.Surname,    //Cognome Assicurato
-					policy.Assets[0].Person.Name,       //Nome
-					policy.Assets[0].Person.Gender,     //Sesso
-					policy.Assets[0].Person.BirthDate,  //Data di nascita
-					policy.Assets[0].Person.FiscalCode, //Codice Fiscale
-					beneficiary1,                       //Codice Fiscale Beneficiario
-					beneficiary2,                       //Codice Fiscale Beneficiario 2
-					"",                                 //Codice Fiscale Beneficiario 3
-					"VIT",                              //Natura del rapporto
-					"PAS",                              //Scopo del rapporto
-					"BO",                               //Modalità di pagamento del premio assicurativo (all'intermediario)
-					"SI",                               //contraente = Assicurato?
+					"0",                       //indennizzo mensile
+					"",                        //campo disponibile
+					"",                        //% di sovrappremio da applicare alla garanzia
+					"W1",                      //Codice Concessionario /dipendenti (iscr.E)
+					"",                        //Codice Banca
+					"",                        //Codice Campagna
+					"T",                       //Copertura Assicurativa: Totale o Pro quota
+					"",                        //% assicurata dell'assicurato
+					"",                        //campo disponibile
+					"",                        //Maxi rata finale/Valore riscatto
+					"",                        //Stato occupazionale dell'Assicurato
+					"2",                       //Tipo aderente
+					"WEB",                     //Canale di vendita
+					"PF",                      //Tipo contraente / Contraente
+					policy.Contractor.Surname, //Denominazione Sociale o Cognome contraente
+					policy.Contractor.Name,    //campo vuoto o nome
+					policy.Contractor.Gender,  //Sesso
+					getFormatBithdate(policy.Contractor.BirthDate),       //Data di nascita
+					policy.Contractor.FiscalCode,                         //Codice Fiscale
+					policy.Contractor.Address,                            //Indirizzo di residenza
+					policy.Contractor.PostalCode,                         //C.A.P. Di residenza
+					policy.Contractor.Locality,                           //Comune di residenza
+					policy.Contractor.City,                               //Provincia di residenza
+					policy.Contractor.Mail,                               //Indirizzo e-mail
+					policy.Contractor.Phone,                              //Numero di Cellulare
+					policy.Assets[0].Person.Surname,                      //Cognome Assicurato
+					policy.Assets[0].Person.Name,                         //Nome
+					policy.Assets[0].Person.Gender,                       //Sesso
+					getFormatBithdate(policy.Assets[0].Person.BirthDate), //Data di nascita
+					policy.Assets[0].Person.FiscalCode,                   //Codice Fiscale
+					beneficiary1,                                         //Codice Fiscale Beneficiario
+					beneficiary2,                                         //Codice Fiscale Beneficiario 2
+					"",                                                   //Codice Fiscale Beneficiario 3
+					"VIT",                                                //Natura del rapporto
+					"PAS",                                                //Scopo del rapporto
+					"BO",                                                 //Modalità di pagamento del premio assicurativo (all'intermediario)
+					"SI",                                                 //contraente = Assicurato?
 					ChekDomicilie(policy.Contractor).StreetName, //Indirizzo di domicilio contraente
 					ChekDomicilie(policy.Contractor).PostalCode, //C.A.P. Di domicilio
 					ChekDomicilie(policy.Contractor).Locality,   //Comune di domicilio
@@ -370,12 +383,28 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	refMontly := now.AddDate(0, -1, 0)
 	//year, month, day := time.Now().Date()
 	//year2, month2, day2 := time.Now().AddDate(0, -1, 0).Date()
-	filepath := "WOPTAKEY_NBM_" + strconv.Itoa(refMontly.Year()) + fmt.Sprintf("%02d", int(refMontly.Month())) + "_" + fmt.Sprintf("%02d", now.Day()) + fmt.Sprintf("%02d", int(now.Month())) + ".txt"
+	filepath := "WOPTAKEY_NB" + filenamesplit + "_" + strconv.Itoa(refMontly.Year()) + fmt.Sprintf("%02d", int(refMontly.Month())) + "_" + fmt.Sprintf("%02d", now.Day()) + fmt.Sprintf("%02d", int(now.Month())) + ".txt"
 	lib.WriteCsv("../tmp/"+filepath, result)
 	source, _ := ioutil.ReadFile("../tmp/" + filepath)
 	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/axa/life/"+filepath, source)
 	SftpUpload(filepath)
 	return "", nil, e
+}
+func getFormatdate(d time.Time) string {
+	var res string
+	res = strconv.Itoa(d.Year()) + fmt.Sprintf("%02d", int(d.Month())) + "_" + fmt.Sprintf("%02d", d.Day())
+	return res
+
+}
+func getFormatBithdate(d string) string {
+	var res string
+	if d != "" {
+		splitD := strings.Split(d, "-")
+		split2 := strings.Split(splitD[2], "T")
+		res = splitD[0] + splitD[1] + split2[0]
+	}
+	return res
+
 }
 func mapCodecCompany(p models.Policy, g string) string {
 	var result, pay string
@@ -469,7 +498,8 @@ func ExistIdentityDocument(docs []*models.IdentityDocument) models.IdentityDocum
 }
 
 func getHeader() []string {
-	return []string{"Codice schema",
+	return []string{
+		"Codice schema",
 		"N° adesione individuale univoco",
 		"Tipo di Transazione",
 		"Data di decorrenza",
@@ -489,7 +519,7 @@ func getHeader() []string {
 		"campo disponibile",
 		"Maxi rata finale/Valore riscatto",
 		"Stato occupazionale dell Assicurato",
-		"Tasso di Interesse",
+		"Tipo aderente",
 		"Canale di vendita ",
 		"Tipo contraente / Contraente",
 		"Denominazione Sociale o Cognome",

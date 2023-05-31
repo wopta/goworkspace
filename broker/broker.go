@@ -55,6 +55,11 @@ func Broker(w http.ResponseWriter, r *http.Request) {
 				Method:  http.MethodPatch,
 			},
 			{
+				Route:   "policy/v1/:uid",
+				Handler: DeletePolicy,
+				Method:  http.MethodDelete,
+			},
+			{
 				Route:   "attachment/v1/:policyUid",
 				Handler: GetPolicyAttachmentFx,
 				Method:  http.MethodGet,
