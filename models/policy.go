@@ -91,6 +91,7 @@ type Policy struct {
 	PartnershipName string                       `json:"partnershipName" firestore:"partnershipName" bigquery:"partnershipName"`
 	PartnershipData map[string]interface{}       `json:"partnershipData" firestore:"partnershipData" bigquery:"-"`
 	Reserved        bool                         `json:"reserved" firestore:"reserved" bigquery:"-"`
+	FundsOrigin     string                       `json:"fundsOrigin" firestore:"fundsOrigin" bigquery:"-"`
 }
 
 type RenewHistory struct {
