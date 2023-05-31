@@ -3,10 +3,12 @@ package callback
 import (
 	"encoding/base64"
 	"encoding/json"
-	"io/ioutil"
+	"github.com/wopta/goworkspace/document"
+	"io"
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -24,7 +26,7 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 	var fabrickCallback FabrickCallback
 	uid := r.URL.Query().Get("uid")
 	schedule := r.URL.Query().Get("schedule")
-	request := lib.ErrorByte(ioutil.ReadAll(r.Body))
+	request := lib.ErrorByte(io.ReadAll(r.Body))
 	origin := r.URL.Query().Get("origin")
 
 	log.Println(string(request))
@@ -47,19 +49,67 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 		policyM, _ := policy.Marshal()
 		log.Println(uid+" payment ", string(policyM))
 		if !policy.IsPay && policy.Status == models.PolicyStatusToPay {
+			// Get User UID by fiscal code
+			userUID, newUser, err := models.GetUserUIDByFiscalCode(r.Header.Get("origin"), policy.Contractor.FiscalCode)
+			lib.CheckError(err)
+			policy.Contractor.Uid = userUID
+			log.Println("Contractor UID: ", userUID)
+			log.Println("Policy Contractor UID: ", policy.Contractor.Uid)
+
+			gsLink := <-document.GetFileV6(policy, uid)
+			log.Println("contractGsLink: ", gsLink)
+			timestamp := strconv.FormatInt(time.Now().UTC().Unix(), 10)
+			*policy.Attachments = append(*policy.Attachments, models.Attachment{
+				Name: "Contratto",
+				Link: gsLink,
+				FileName: "Contratto_" + strings.ReplaceAll(policy.NameDesc, " ", "_") +
+					"_" + timestamp + ".pdf",
+			})
+
+			// Move user identity documents to user folder on Google Storage
+			for _, identityDocument := range policy.Contractor.IdentityDocuments {
+				frontMediaBytes, e := lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"),
+					"temp/"+policy.Uid+"/"+identityDocument.FrontMedia.FileName)
+				lib.CheckError(e)
+				frontGsLink, e := lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "assets/users/"+
+					userUID+"/"+identityDocument.FrontMedia.FileName, frontMediaBytes)
+				log.Println("frontGsLink: ", frontGsLink)
+				identityDocument.FrontMedia.Link = frontGsLink
+
+				if identityDocument.BackMedia != nil {
+					backMediaBytes, e := lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"),
+						"temp/"+policy.Uid+"/"+identityDocument.BackMedia.FileName)
+					lib.CheckError(e)
+					backGsLink, e := lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "assets/users/"+
+						userUID+"/"+identityDocument.FrontMedia.FileName, backMediaBytes)
+					log.Println("backGsLink: ", backGsLink)
+					identityDocument.BackMedia.Link = backGsLink
+				}
+			}
+
+			if newUser {
+				policy.Contractor.CreationDate = time.Now().UTC()
+				fireUsers := lib.GetDatasetByEnv(r.Header.Get("origin"), "users")
+				lib.SetFirestore(fireUsers, userUID, policy.Contractor)
+			} else {
+				_, err = models.UpdateUserByFiscalCode(r.Header.Get("origin"), policy.Contractor)
+				lib.CheckError(err)
+			}
+
 			policy.IsPay = true
-			policy.Updated = time.Now()
+			policy.Updated = time.Now().UTC()
 			policy.Status = models.PolicyStatusPay
 			policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusPay)
 			//policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusToPay)
 			lib.SetFirestore(firePolicy, uid, policy)
 			policy.BigquerySave(r.Header.Get("origin"))
 			q := lib.Firequeries{
-				Queries: []lib.Firequery{{
-					Field:      "policyUid",
-					Operator:   "==",
-					QueryValue: uid,
-				},
+				Queries: []lib.Firequery{
+					{
+						Field:      "policyUid",
+						Operator:   "==",
+						QueryValue: uid,
+					},
 					{
 						Field:      "scheduleDate",
 						Operator:   "==",
@@ -87,8 +137,8 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 			mail.SendMailContract(policy, &[]mail.Attachment{{
 				Byte:        base64.StdEncoding.EncodeToString(contractbyte),
 				ContentType: "application/pdf",
-				Name: policy.Contractor.Name + "_" + policy.Contractor.Surname + "_" + policy.NameDesc +
-					"_contratto.pdf",
+				Name: policy.Contractor.Name + "_" + policy.Contractor.Surname + "_" +
+					strings.ReplaceAll(policy.NameDesc, " ", "_") + "_contratto.pdf",
 			}})
 
 			response = `{

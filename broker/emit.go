@@ -2,9 +2,10 @@ package broker
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"cloud.google.com/go/civil"
@@ -27,7 +28,7 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 
 	firePolicy = lib.GetDatasetByEnv(r.Header.Get("origin"), "policy")
 	guaranteFire := lib.GetDatasetByEnv(r.Header.Get("origin"), "guarante")
-	request := lib.ErrorByte(ioutil.ReadAll(r.Body))
+	request := lib.ErrorByte(io.ReadAll(r.Body))
 	log.Println("Emit", string(request))
 	json.Unmarshal([]byte(request), &result)
 
@@ -56,7 +57,7 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 		policy.Statements = result.Statements
 	}
 
-	company, numb, tot := GetSequenceByCompany(policy.Company, firePolicy)
+	company, numb, tot := GetSequenceByCompany(strings.ToLower(policy.Company), firePolicy)
 	log.Println("Emit code "+uid+" ", company)
 	log.Println("Emit code "+uid+" ", numb)
 	log.Println("Emit code "+uid+" ", tot)

@@ -24,6 +24,20 @@ func (skin Skin) GlobalContract(m pdf.Maroto, data models.Policy) {
 	if data.Name == "persona" {
 		logo = "/persona.png"
 		name = "Persona"
+		if data.Contractor.Residence != nil {
+			data.Contractor.Address = data.Contractor.Residence.StreetName
+			data.Contractor.StreetNumber = data.Contractor.Residence.StreetNumber
+			data.Contractor.PostalCode = data.Contractor.Residence.PostalCode
+			data.Contractor.City = data.Contractor.Residence.City
+			data.Contractor.CityCode = data.Contractor.Residence.CityCode
+		}
+		if data.PaymentSplit == "year" {
+			data.PriceNett = data.OffersPrices[data.OfferlName]["yearly"].Net
+			data.PriceGross = data.OffersPrices[data.OfferlName]["yearly"].Gross
+		} else if data.PaymentSplit == "monthly" {
+			data.PriceNett = data.OffersPrices[data.OfferlName]["monthly"].Net
+			data.PriceGross = data.OffersPrices[data.OfferlName]["monthly"].Gross
+		}
 		m = skin.GetHeader(m, data, logo, name)
 		m = skin.GetFooter(m, "/logo_global.png", "Wopta per te. Persona è un prodotto assicurativo di Global Assistance Compagnia di assicurazioni e riassicurazioni S.p.A, distribuito da Wopta Assicurazioni S.r.l")
 		m = skin.Space(m, 5.0)
@@ -35,6 +49,10 @@ func (skin Skin) GlobalContract(m pdf.Maroto, data models.Policy) {
 	if data.Name == "pmi" {
 		logo = "/pmi.png"
 		name = "Artigiani & Imprese"
+		if data.PaymentSplit == "monthly" {
+			data.PriceNett = data.PriceNett / 12
+			data.PriceGross = data.PriceNett / 12
+		}
 		m = skin.GetHeader(m, data, logo, name)
 		m = skin.GetFooter(m, "/logo_global.png", "Wopta per te. Artigiani & Imprese è un prodotto assicurativo di Global Assistance Compagnia di assicurazioni e riassicurazioni S.p.A, distribuito da Wopta Assicurazioni S.r.l")
 		m = skin.Space(m, 5.0)
@@ -106,8 +124,7 @@ Costituisce quietanza di pagamento la mail di conferma che Wopta invierà al Con
 	m = skin.AboutUs(m, "Chi siamo ", aboutUs)
 	var consens string
 	consens = "NON ACCONSENTO"
-	if (*data.Contractor.Consens)[0].Answer {
-
+	if data.Contractor.Consens != nil && (*data.Contractor.Consens)[0].Answer {
 		consens = "ACCONSENTO"
 	}
 	body = `Consenso per finalità commerciali. 

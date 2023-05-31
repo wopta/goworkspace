@@ -20,8 +20,8 @@ func Question(w http.ResponseWriter, r *http.Request) {
 	route := lib.RouteData{
 		Routes: []lib.Route{
 			{
-				Route:   "/v1/survey/person",
-				Handler: PersonSurvey,
+				Route:   "/v1/statements/person",
+				Handler: PersonStatements,
 				Method:  http.MethodPost,
 			},
 			{

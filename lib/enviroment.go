@@ -16,9 +16,10 @@ func GetDatasetByContractorName(name string, dataset string) string {
 	log.Println("GetDatasetByContractorName result: ", result)
 	return result
 }
+
 func GetDatasetByEnv(origin string, dataset string) string {
 	var result string
-	if strings.Contains(origin, "uat") || strings.Contains(origin, "dev") {
+	if strings.Contains(origin, "uat") {
 		result = "uat_" + dataset
 	} else {
 		result = dataset

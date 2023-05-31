@@ -3,6 +3,7 @@ package document
 import (
 	"github.com/dustin/go-humanize"
 	"github.com/johnfercher/maroto/pkg/pdf"
+	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -20,15 +21,14 @@ func (skin Skin) PriceTable(m pdf.Maroto, data models.Policy) {
 	var tablePremium [][]string
 
 	if data.PaymentSplit == "monthly" {
-		tablePremium = append(tablePremium, []string{"Rata Mensile", "€ " + humanize.FormatFloat("#.###,##", (data.PriceNett/12)), "€ " + humanize.FormatFloat("#.###,##", ((data.PriceGross-data.PriceNett)/12)), "€ " + humanize.FormatFloat("#.###,##", (data.PriceGross/12))})
-		tablePremium = append(tablePremium, []string{"Rata alla firma della polizza", "€ " + humanize.FormatFloat("#.###,##", (data.PriceNett/12)), "€ " + humanize.FormatFloat("#.###,##", ((data.PriceGross-data.PriceNett)/12)), "€ " + humanize.FormatFloat("#.###,##", (data.PriceGross/12))})
-
+		tablePremium = append(tablePremium, []string{"Rata Mensile", lib.HumanaizePriceEuro(data.PriceNett),
+			lib.HumanaizePriceEuro(data.PriceGross - data.PriceNett), lib.HumanaizePriceEuro(data.PriceGross)})
 	}
 	if data.PaymentSplit == "year" {
-		tablePremium = append(tablePremium, []string{"Annuale", "€ " + humanize.FormatFloat("#.###,##", data.PriceNett), "€ " + humanize.FormatFloat("#.###,##", data.PriceGross-data.PriceNett), "€ " + humanize.FormatFloat("#.###,##", data.PriceGross)})
-		tablePremium = append(tablePremium, []string{"Rata alla firma della polizza", "€ " + humanize.FormatFloat("#.###,##", data.PriceNett), "€ " + humanize.FormatFloat("#.###,##", data.PriceGross-data.PriceNett), "€ " + humanize.FormatFloat("#.###,##", data.PriceGross)})
-
+		tablePremium = append(tablePremium, []string{"Annuale", lib.HumanaizePriceEuro(data.PriceNett), "€ " + humanize.FormatFloat("#.###,##", data.PriceGross-data.PriceNett), lib.HumanaizePriceEuro(data.PriceGross)})
 	}
+	tablePremium = append(tablePremium, []string{"Rata alla firma della polizza", lib.HumanaizePriceEuro(data.PriceNett), lib.HumanaizePriceEuro(data.PriceGross - data.PriceNett), lib.HumanaizePriceEuro(data.PriceGross)})
+
 	skin.Space(m, 10.0)
 	skin.TableLine(m, h, tablePremium)
 

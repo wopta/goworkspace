@@ -2,6 +2,7 @@ package models
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"time"
 
@@ -128,24 +129,72 @@ func FirestoreDocumentToUser(query *firestore.DocumentIterator) (User, error) {
 	return result, e
 }
 
-func UserUpdateByFiscalcode(origin string, user User) (string, error) {
-	var (
-		useruid string
-		e       error
-	)
+func GetUserUIDByFiscalCode(origin string, fiscalCode string) (string, bool, error) {
 	usersFire := lib.GetDatasetByEnv(origin, "users")
-	docsnap := lib.WhereFirestore(usersFire, "fiscalCode", "==", user.FiscalCode)
-	userL, e := FirestoreDocumentToUser(docsnap)
-	if len(user.Uid) == 0 {
-		user.CreationDate = time.Now()
-		user.UpdatedDate = time.Now()
-		ref2, _ := lib.PutFirestore(usersFire, user)
-		log.Println("Proposal User uid", ref2)
-		useruid = ref2.ID
-	} else {
-		useruid = user.Uid
-		userL.UpdatedDate = time.Now()
-		_, e = lib.FireUpdate(usersFire, useruid, userL)
+	docSnap := lib.WhereFirestore(usersFire, "fiscalCode", "==", fiscalCode)
+	retrievedUser, err := FirestoreDocumentToUser(docSnap)
+	if err != iterator.Done {
+		return "", false, err
 	}
-	return useruid, e
+	if retrievedUser.Uid != "" {
+		return retrievedUser.Uid, false, nil
+	}
+	return lib.NewDoc(usersFire), true, nil
+}
+
+func UpdateUserByFiscalCode(origin string, user User) (string, error) {
+	var (
+		err error
+	)
+
+	usersFire := lib.GetDatasetByEnv(origin, "users")
+	docSnap := lib.WhereFirestore(usersFire, "fiscalCode", "==", user.FiscalCode)
+	retrievedUser, err := FirestoreDocumentToUser(docSnap)
+	if retrievedUser.Uid != "" {
+		for _, identityDocument := range user.IdentityDocuments {
+			retrievedUser.IdentityDocuments = append(retrievedUser.IdentityDocuments, identityDocument)
+		}
+
+		if user.Consens != nil {
+			for _, consens := range *user.Consens {
+				found := false
+				for _, savedConsens := range *retrievedUser.Consens {
+					if consens.Key == savedConsens.Key {
+						savedConsens.Answer = consens.Answer
+						savedConsens.Title = consens.Title
+						found = true
+					}
+				}
+				if !found {
+					*retrievedUser.Consens = append(*retrievedUser.Consens, consens)
+				}
+			}
+		}
+
+		updatedUser := map[string]interface{}{
+			"address":           user.Address,
+			"postalCode":        user.PostalCode,
+			"city":              user.City,
+			"locality":          user.Locality,
+			"cityCode":          user.CityCode,
+			"streetNumber":      user.StreetNumber,
+			"location":          user.Location,
+			"identityDocuments": retrievedUser.IdentityDocuments,
+			"consens":           retrievedUser.Consens,
+			"residence":         user.Residence,
+			"domicile":          user.Domicile,
+			"updatedDate":       time.Now().UTC(),
+		}
+		if user.Height != 0 {
+			updatedUser["height"] = user.Height
+		}
+		if user.Weight != 0 {
+			updatedUser["weight"] = user.Weight
+		}
+
+		_, err = lib.FireUpdate(usersFire, retrievedUser.Uid, updatedUser)
+		return retrievedUser.Uid, err
+	}
+
+	return "", fmt.Errorf("no user found with this fiscal code")
 }

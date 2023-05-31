@@ -9,12 +9,12 @@ import (
 	"net/http"
 )
 
-func PersonSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func PersonStatements(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		policy models.Policy
 	)
 	const (
-		rulesFileName = "person_survey.json"
+		rulesFileName = "person_statements.json"
 	)
 
 	log.Println("Person Survey")
@@ -28,7 +28,7 @@ func PersonSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 
 	fx := new(models.Fx)
 
-	surveys := &Surveys{Surveys: make([]*models.Survey, 0), Text: ""}
+	surveys := &Statements{Statements: make([]*models.Statement, 0), Text: ""}
 
 	rulesFile := lib.GetRulesFile(rulesFileName)
 

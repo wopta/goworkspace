@@ -8,8 +8,8 @@ require (
 	cloud.google.com/go v0.110.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
 	github.com/google/uuid v1.3.0
-	github.com/wopta/goworkspace/lib v1.0.17
-	github.com/wopta/goworkspace/models v1.0.38
+	github.com/wopta/goworkspace/lib v1.0.38
+	github.com/wopta/goworkspace/models v1.0.72
 )
 
 require (
