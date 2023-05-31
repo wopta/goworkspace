@@ -2,6 +2,7 @@ package models
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"time"
 
@@ -48,6 +49,7 @@ type User struct {
 	Role              string              `firestore:"role" json:"role,omitempty" bigquery:"role"`
 	Work              string              `firestore:"work" json:"work,omitempty" bigquery:"work"`
 	WorkType          string              `firestore:"workType" json:"workType,omitempty" bigquery:"workType"`
+	WorkStatus        string              `json:"workStatus,omitempty" firestore:"workStatus,omitempty" bigquery:"-"`
 	Mail              string              `firestore:"mail" json:"mail,omitempty" bigquery:"mail"`
 	Phone             string              `firestore:"phone" json:"phone,omitempty" bigquery:"phone"`
 	FiscalCode        string              `firestore:"fiscalCode" json:"fiscalCode,omitempty" bigquery:"fiscalCode"`
@@ -67,6 +69,7 @@ type User struct {
 	Domicile          *Address            `json:"domicile,omitempty" firestore:"domicile,omitempty" bigquery:"-"`
 	IdentityDocuments []*IdentityDocument `json:"identityDocuments,omitempty" firestore:"identityDocuments,omitempty" bigquery:"-"`
 	AuthId            string              `json:"authId,omitempty" firestore:"authId,omitempty" bigquery:"-"`
+	Statements        []*Statement        `json:"statements,omitempty" firestore:"statements,omitempty" bigquery:"-"`
 }
 
 type Consens struct {
@@ -112,7 +115,7 @@ func FirestoreDocumentToUser(query *firestore.DocumentIterator) (User, error) {
 
 	if err == iterator.Done && userDocumentSnapshot == nil {
 		log.Println("user not found in firebase DB")
-		return result, err
+		return result, fmt.Errorf("no user found")
 	}
 
 	if err != iterator.Done && err != nil {
@@ -128,24 +131,81 @@ func FirestoreDocumentToUser(query *firestore.DocumentIterator) (User, error) {
 	return result, e
 }
 
-func UserUpdateByFiscalcode(origin string, user User) (string, error) {
-	var (
-		useruid string
-		e       error
-	)
+func GetUserUIDByFiscalCode(origin string, fiscalCode string) (string, bool, error) {
 	usersFire := lib.GetDatasetByEnv(origin, "users")
-	docsnap := lib.WhereFirestore(usersFire, "fiscalCode", "==", user.FiscalCode)
-	userL, e := FirestoreDocumentToUser(docsnap)
-	if len(userL.Uid) == 0 {
-		user.CreationDate = time.Now()
-		user.UpdatedDate = time.Now()
-		ref2, _ := lib.PutFirestore(usersFire, user)
-		log.Println("Proposal User uid", ref2)
-		useruid = ref2.ID
-	} else {
-		useruid = userL.Uid
-		userL.UpdatedDate = time.Now()
-		_, e = lib.FireUpdate(usersFire, useruid, userL)
+	docSnap := lib.WhereFirestore(usersFire, "fiscalCode", "==", fiscalCode)
+	retrievedUser, err := FirestoreDocumentToUser(docSnap)
+	if err != nil && err.Error() != "no user found" {
+		return "", false, err
 	}
-	return useruid, e
+	if retrievedUser.Uid != "" {
+		return retrievedUser.Uid, false, nil
+	}
+	return lib.NewDoc(usersFire), true, nil
+}
+
+func UpdateUserByFiscalCode(origin string, user User) (string, error) {
+	var (
+		err error
+	)
+
+	usersFire := lib.GetDatasetByEnv(origin, "users")
+	docSnap := lib.WhereFirestore(usersFire, "fiscalCode", "==", user.FiscalCode)
+	retrievedUser, err := FirestoreDocumentToUser(docSnap)
+	if retrievedUser.Uid != "" {
+		for _, identityDocument := range user.IdentityDocuments {
+			retrievedUser.IdentityDocuments = append(retrievedUser.IdentityDocuments, identityDocument)
+		}
+
+		retrievedUser.Consens = updateUserConsens(retrievedUser.Consens, user.Consens)
+
+		updatedUser := map[string]interface{}{
+			"address":           user.Address,
+			"postalCode":        user.PostalCode,
+			"city":              user.City,
+			"locality":          user.Locality,
+			"cityCode":          user.CityCode,
+			"streetNumber":      user.StreetNumber,
+			"location":          user.Location,
+			"identityDocuments": retrievedUser.IdentityDocuments,
+			"consens":           retrievedUser.Consens,
+			"residence":         user.Residence,
+			"domicile":          user.Domicile,
+			"updatedDate":       time.Now().UTC(),
+		}
+		if user.Height != 0 {
+			updatedUser["height"] = user.Height
+		}
+		if user.Weight != 0 {
+			updatedUser["weight"] = user.Weight
+		}
+
+		_, err = lib.FireUpdate(usersFire, retrievedUser.Uid, updatedUser)
+		return retrievedUser.Uid, err
+	}
+
+	return "", fmt.Errorf("no user found with this fiscal code")
+}
+
+func updateUserConsens(oldConsens *[]Consens, newConsens *[]Consens) *[]Consens {
+	if newConsens == nil {
+		return oldConsens
+	}
+	if oldConsens == nil {
+		return newConsens
+	}
+	for _, consens := range *newConsens {
+		found := false
+		for index, savedConsens := range *oldConsens {
+			if consens.Key == savedConsens.Key {
+				(*oldConsens)[index].Answer = consens.Answer
+				(*oldConsens)[index].Title = consens.Title
+				found = true
+			}
+		}
+		if !found {
+			*oldConsens = append(*oldConsens, consens)
+		}
+	}
+	return oldConsens
 }

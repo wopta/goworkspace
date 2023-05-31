@@ -2,7 +2,7 @@ package broker
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"strings"
@@ -28,7 +28,7 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 
 	firePolicy = lib.GetDatasetByEnv(r.Header.Get("origin"), "policy")
 	guaranteFire := lib.GetDatasetByEnv(r.Header.Get("origin"), "guarante")
-	request := lib.ErrorByte(ioutil.ReadAll(r.Body))
+	request := lib.ErrorByte(io.ReadAll(r.Body))
 	log.Println("Emit", string(request))
 	json.Unmarshal([]byte(request), &result)
 

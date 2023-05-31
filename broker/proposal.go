@@ -16,8 +16,8 @@ func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	log.Println("Proposal")
 	log.Println("--------------------------Proposal-------------------------------------------")
 	var (
-		policy              models.Policy
-		useruid, policyFire string
+		policy     models.Policy
+		policyFire string
 	)
 	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
 	e := json.Unmarshal([]byte(req), &policy)
@@ -36,9 +36,6 @@ func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	policy.Updated = time.Now()
 
 	//------------------------------------------
-	useruid, _ = models.UserUpdateByFiscalcode(r.Header.Get("origin"), policy.Contractor)
-	log.Println("Proposal User uid ", useruid)
-	policy.Contractor.Uid = useruid
 	//Precontrattuale.pdf
 	if policy.ProductVersion == "" {
 		policy.ProductVersion = "v1"

@@ -64,6 +64,16 @@ func Broker(w http.ResponseWriter, r *http.Request) {
 				Handler: GetPolicyAttachmentFx,
 				Method:  http.MethodGet,
 			},
+			{
+				Route:   "policies/v1",
+				Handler: GetPoliciesFx,
+				Method:  http.MethodPost,
+			},
+			{
+				Route:   "policy/transactions/v1/:policyUid",
+				Handler: GetPolicyTransactions,
+				Method:  http.MethodGet,
+			},
 		},
 	}
 	route.Router(w, r)
