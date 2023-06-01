@@ -31,7 +31,7 @@ func UpdatePolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	input = make(map[string]interface{}, 0)
 	input["assets"] = policy.Assets
 	input["contractor"] = policy.Contractor
-	input["fundOrigin"] = policy.FundsOrigin
+	input["fundsOrigin"] = policy.FundsOrigin
 	if policy.Surveys != nil {
 		input["surveys"] = policy.Surveys
 	}
