@@ -14,21 +14,40 @@ import (
 
 func LifeAxaDelete(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 
-	now := time.Now()
-	fromM := time.Now().AddDate(0, -1, 0)
 	var (
-		result [][]string
+		from          time.Time
+		filenamesplit string
+		result        [][]string
 	)
+
+	now := time.Now()
+
+	fromM := time.Now().AddDate(0, -1, 0)
+	fromQ := time.Now().AddDate(0, 0, -15)
+	if now.Day() == 15 {
+		from = fromQ
+		filenamesplit = "Q"
+	} else {
+		from = fromM
+		filenamesplit = "M"
+	}
+
 	q := lib.Firequeries{
-		Queries: []lib.Firequery{{
-			Field:      "companyEmit", //
-			Operator:   "==",          //
-			QueryValue: true,
-		},
+		Queries: []lib.Firequery{
+			{
+				Field:      "isDeleted", //
+				Operator:   "==",        //
+				QueryValue: true,
+			},
+			{
+				Field:      "companyEmit", //
+				Operator:   "==",          //
+				QueryValue: true,
+			},
 			{
 				Field:      "companyEmitted", //
 				Operator:   "==",             //
-				QueryValue: false,
+				QueryValue: true,
 			},
 			{
 				Field:      "company", //
@@ -42,12 +61,12 @@ func LifeAxaDelete(w http.ResponseWriter, r *http.Request) (string, interface{},
 			}, {
 				Field:      "startSate", //
 				Operator:   ">",         //
-				QueryValue: strconv.Itoa(int(fromM.Unix())),
+				QueryValue: from,
 			},
 			{
 				Field:      "startSate", //
 				Operator:   "<",         //
-				QueryValue: strconv.Itoa(int(now.Unix())),
+				QueryValue: now,
 			},
 		},
 	}
@@ -85,7 +104,7 @@ func LifeAxaDelete(w http.ResponseWriter, r *http.Request) (string, interface{},
 	refMontly := now.AddDate(0, -1, 0)
 	//year, month, day := time.Now().Date()
 	//year2, month2, day2 := time.Now().AddDate(0, -1, 0).Date()
-	filepath := "WOPTAKEY_CANM_" + strconv.Itoa(refMontly.Year()) + fmt.Sprintf("%02d", int(refMontly.Month())) + "_" + fmt.Sprintf("%02d", now.Day()) + fmt.Sprintf("%02d", int(now.Month())) + ".txt"
+	filepath := "WOPTAKEYweb_CAN" + filenamesplit + "_" + strconv.Itoa(refMontly.Year()) + fmt.Sprintf("%02d", int(refMontly.Month())) + "_" + fmt.Sprintf("%02d", now.Day()) + fmt.Sprintf("%02d", int(now.Month())) + ".txt"
 	lib.WriteCsv("../tmp/"+filepath, result)
 	source, _ := ioutil.ReadFile("../tmp/" + filepath)
 	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "axa/life/"+filepath, source)

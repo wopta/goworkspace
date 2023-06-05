@@ -21,8 +21,10 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	var (
 		from          time.Time
 		filenamesplit string
+		cabCsv        []byte
+		result        [][]string
 	)
-	layout := "20060102"
+
 	now := time.Now()
 
 	fromM := time.Now().AddDate(0, -1, 0)
@@ -34,11 +36,6 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		from = fromM
 		filenamesplit = "M"
 	}
-	log.Println(fromQ)
-	var (
-		cabCsv []byte
-		result [][]string
-	)
 	q := lib.Firequeries{
 		Queries: []lib.Firequery{{
 			Field:      "companyEmit", //
@@ -173,7 +170,7 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 					"600",                                       //Ramo gruppo attività economica
 					ExistIdentityDocument(policy.Contractor.IdentityDocuments).Code,                       //Tipo documento dell'contraente persona fisica
 					ExistIdentityDocument(policy.Contractor.IdentityDocuments).Number,                     //Numero documento dell'contraente persona fisica
-					ExistIdentityDocument(policy.Contractor.IdentityDocuments).DateOfIssue.Format(layout), //Data rilascio documento dell'contraente persona fisica
+					getFormatdate(ExistIdentityDocument(policy.Contractor.IdentityDocuments).DateOfIssue), //Data rilascio documento dell'contraente persona fisica
 					ExistIdentityDocument(policy.Contractor.IdentityDocuments).IssuingAuthority,           //Ente rilascio documento dell'contraente persona fisica
 					"NO", //PEP - Persona Politicamente Esposta
 					"",   //Tipologia di PEP
@@ -193,7 +190,7 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 					"ITA",                                                                                       //Stato di residenza
 					ExistIdentityDocument(policy.Assets[0].Person.IdentityDocuments).Code,                       //Tipo documento
 					ExistIdentityDocument(policy.Assets[0].Person.IdentityDocuments).Number,                     //Numero documento
-					ExistIdentityDocument(policy.Assets[0].Person.IdentityDocuments).DateOfIssue.Format(layout), //Data rilascio documento
+					getFormatdate(ExistIdentityDocument(policy.Assets[0].Person.IdentityDocuments).DateOfIssue), //Data rilascio documento
 					ExistIdentityDocument(policy.Assets[0].Person.IdentityDocuments).IssuingAuthority,           //Ente rilascio documento
 					"NO",                                  //PEP - Persona Politicamente Esposta
 					"",                                    //Tipologia di PEP
@@ -383,7 +380,7 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	refMontly := now.AddDate(0, -1, 0)
 	//year, month, day := time.Now().Date()
 	//year2, month2, day2 := time.Now().AddDate(0, -1, 0).Date()
-	filepath := "WOPTAKEY_NB" + filenamesplit + "_" + strconv.Itoa(refMontly.Year()) + fmt.Sprintf("%02d", int(refMontly.Month())) + "_" + fmt.Sprintf("%02d", now.Day()) + fmt.Sprintf("%02d", int(now.Month())) + ".txt"
+	filepath := "WOPTAKEYweb_NB" + filenamesplit + "_" + strconv.Itoa(refMontly.Year()) + fmt.Sprintf("%02d", int(refMontly.Month())) + "_" + fmt.Sprintf("%02d", now.Day()) + fmt.Sprintf("%02d", int(now.Month())) + ".txt"
 	lib.WriteCsv("../tmp/"+filepath, result)
 	source, _ := ioutil.ReadFile("../tmp/" + filepath)
 	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/axa/life/"+filepath, source)

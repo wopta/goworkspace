@@ -35,8 +35,12 @@ func Callback(w http.ResponseWriter, r *http.Request) {
 				Method:  "GET",
 			},
 			{
-				Route:   "/v1/axa/emit",
+				Route:   "/v1/axa/life/emit",
 				Handler: LifeAxalEmit,
+				Method:  http.MethodPost,
+			}, {
+				Route:   "/v1/axa/life/delete",
+				Handler: LifeAxaDelete,
 				Method:  http.MethodPost,
 			},
 			{

@@ -7,9 +7,11 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	lib "github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 	model "github.com/wopta/goworkspace/models"
 )
 
@@ -98,19 +100,28 @@ func getOrigin(origin string) string {
 	return result
 }
 func FabrickExpireBill(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	var transaction models.Transaction
+	//layout := "2006-01-02T15:04:05.000Z"
+	layout2 := "2006-01-02"
+	now := time.Now().AddDate(0, 0, -1)
+	log.Println(r.Header.Get("uid"))
+	uid := r.Header.Get("uid")
+	fireTransactions := lib.GetDatasetByEnv(r.Header.Get("origin"), "transactions")
+	docsnap, e := lib.GetFirestoreErr(fireTransactions, uid)
+	docsnap.DataTo(&transaction)
+
 	var urlstring = os.Getenv("FABRICK_BASEURL") + "api/fabrick/pace/v4.0/mods/back/v1.0/transactions/change-expiration"
 
 	req, _ := http.NewRequest(http.MethodPut, urlstring, strings.NewReader(`{
-		"id": "string",
-		"newExpirationDate": "string"
+		"id": `+transaction.ProviderId+`,
+		"newExpirationDate": `+now.Format(layout2)+`
 	  }`))
-	var data model.Policy
-	defer r.Body.Close()
-	err := json.Unmarshal([]byte(req), &data)
-	log.Println(data.PriceGross)
-	lib.CheckError(err)
-	resultPay := <-FabrickPayObj(data, false, "", "", data.PriceGross, getOrigin(r.Header.Get("origin")))
+	getFabrickClient(urlstring, req)
+	transaction.Status = "Delete"
+	transaction.StatusHistory = append(transaction.StatusHistory, "Delete")
+	transaction.IsDelete = true
+	lib.SetFirestore(fireTransactions, uid, transaction)
+	e = lib.InsertRowsBigQuery("wopta", fireTransactions, transaction)
 
-	log.Println(resultPay)
-	return "", nil, err
+	return "", nil, e
 }
