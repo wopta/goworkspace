@@ -16,7 +16,7 @@ func PersonSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 
 	log.Println("Person Survey")
 
-	body, err := io.ReadAll(r.Body)
+	policyJson, err := io.ReadAll(r.Body)
 	lib.CheckError(err)
 
 	fx := new(models.Fx)
@@ -27,7 +27,7 @@ func PersonSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 
 	rulesFile := lib.GetRulesFile(rulesFileName)
 
-	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, surveys, body, nil)
+	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, surveys, policyJson, nil)
 
 	ruleOutputJson, err := json.Marshal(ruleOutput)
 
