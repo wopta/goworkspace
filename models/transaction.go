@@ -35,6 +35,7 @@ type Transaction struct {
 	IsDelete           bool           `json:"isDelete" firestore:"isDelete" bigquery:"-"`
 	ProviderId         string         `json:"providerId" firestore:"providerId" bigquery:"-"`
 	UserToken          string         `json:"userToken" firestore:"userToken" bigquery:"-"`
+	ProviderName       string         `json:"providerName" firestore:"providerName" bigquery:"-"`
 }
 
 func TransactionToListData(query *firestore.DocumentIterator) []Transaction {

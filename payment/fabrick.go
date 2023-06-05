@@ -96,6 +96,7 @@ func FabrickPayObj(data model.Policy, firstSchedule bool, scheduleDate string, c
 				IsDelete:           false,
 				ProviderId:         *result.Payload.PaymentID,
 				UserToken:          customerId,
+				ProviderName:       "fabrick",
 			}
 
 			transactionsFire := lib.GetDatasetByEnv(origin, "transactions")
