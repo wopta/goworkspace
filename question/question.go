@@ -34,6 +34,11 @@ func Question(w http.ResponseWriter, r *http.Request) {
 				Handler: LifeStatements,
 				Method:  http.MethodPost,
 			},
+			{
+				Route:   "/v1/survey/person",
+				Handler: PersonSurvey,
+				Method:  http.MethodPost,
+			},
 		},
 	}
 	route.Router(w, r)
