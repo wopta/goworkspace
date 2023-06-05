@@ -10,9 +10,6 @@ import (
 )
 
 func PersonSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	/*var (
-		policy models.Policy
-	)*/
 	const (
 		rulesFileName = "person_survey.json"
 	)
@@ -21,7 +18,6 @@ func PersonSurvey(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 
 	body, err := io.ReadAll(r.Body)
 	lib.CheckError(err)
-	//err = json.Unmarshal(body, &policy)
 
 	fx := new(models.Fx)
 
