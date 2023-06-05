@@ -24,6 +24,15 @@ func getFireClient() *firestore.Client {
 	CheckError(err)
 	return client
 }
+
+func NewDoc(collection string) string {
+	ctx := context.Background()
+	client, err := firestore.NewClient(ctx, os.Getenv("GOOGLE_PROJECT_ID"))
+	CheckError(err)
+	ref := client.Collection("cities").NewDoc()
+	return ref.ID
+}
+
 func GetFirestore(collection string, doc string) *firestore.DocumentSnapshot {
 	ctx := context.Background()
 	client, err := firestore.NewClient(ctx, os.Getenv("GOOGLE_PROJECT_ID"))
@@ -145,6 +154,20 @@ func (queries *Firequeries) FirestoreWherefields(collection string) (*firestore.
 
 	return query.Documents(ctx), err
 }
+
+func (queries *Firequeries) FirestoreWhereLimitFields(collection string, limit int) (*firestore.DocumentIterator, error) {
+	ctx := context.Background()
+	var query firestore.Query
+	client, err := firestore.NewClient(ctx, os.Getenv("GOOGLE_PROJECT_ID"))
+	col := client.Collection(collection)
+	query = col.Where(queries.Queries[0].Field, queries.Queries[0].Operator, queries.Queries[0].QueryValue)
+	for i := 1; i <= len(queries.Queries)-1; i++ {
+		query = query.Where(queries.Queries[i].Field, queries.Queries[i].Operator, queries.Queries[i].QueryValue)
+	}
+
+	return query.Limit(limit).Documents(ctx), err
+}
+
 func OrderFirestore(collection string, field string, value firestore.Direction) *firestore.DocumentIterator {
 	ctx := context.Background()
 	client, err := firestore.NewClient(ctx, os.Getenv("GOOGLE_PROJECT_ID"))

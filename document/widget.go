@@ -1,13 +1,14 @@
 package document
 
 import (
-	"strconv"
-
 	"github.com/dustin/go-humanize"
+	"github.com/wopta/goworkspace/lib"
+	"strconv"
+	"strings"
+
 	"github.com/johnfercher/maroto/pkg/consts"
 	"github.com/johnfercher/maroto/pkg/pdf"
 	"github.com/johnfercher/maroto/pkg/props"
-	lib "github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	//model "github.com/wopta/goworkspace/models"
 )
@@ -201,6 +202,12 @@ func (s Skin) OverBold(m pdf.Maroto, sub []Kv, prop props.Text) pdf.Maroto {
 	return m
 }
 func (s Skin) GetPersona(data models.Policy, m pdf.Maroto) pdf.Maroto {
+	coverageTypeMap := map[string]string{
+		"24h":   "Professionale ed Extraprofessionale",
+		"prof":  "Professionale",
+		"extra": "Extraprofessionale",
+	}
+
 	linePropMagenta := props.Line{
 		Color: s.LineColor,
 		Style: consts.Solid,
@@ -222,30 +229,36 @@ func (s Skin) GetPersona(data models.Policy, m pdf.Maroto) pdf.Maroto {
 	customer := []Kv{
 		{
 			Key:   "Assicurato: ",
-			Value: "1"},
+			Value: "1",
+		},
 		{
 			Key:   "Cognome e Nome: ",
-			Value: data.Contractor.Name + " " + data.Contractor.Surname},
+			Value: data.Contractor.Surname + " " + data.Contractor.Name,
+		},
 		{
 			Key:   "Codice Fiscale: ",
-			Value: data.Contractor.FiscalCode},
+			Value: data.Contractor.FiscalCode,
+		},
 		{
 			Key:   "Professione: ",
 			Value: data.Contractor.Work},
 		{
 			Key:   "Tipo professione: ",
-			Value: data.Contractor.WorkType},
+			Value: strings.ToUpper(data.Contractor.WorkType[:1]) + data.Contractor.WorkType[1:],
+		},
 		{
 			Key:   "Classe rischio: ",
-			Value: data.Contractor.RiskClass},
+			Value: "Classe " + data.Contractor.RiskClass,
+		},
 		{
 			Key:   "Forma di copertura: ",
-			Value: data.CoverageType},
+			Value: coverageTypeMap[data.Assets[0].Guarantees[0].Type], //coverageTypeMap[data.CoverageType]},
+		},
 	}
 	m = s.Customer(m, customer)
 	return m
-
 }
+
 func (s Skin) GetPmi(data models.Policy, m pdf.Maroto) pdf.Maroto {
 	var (
 		deductibleValue      string
@@ -290,7 +303,6 @@ func (s Skin) GetPmi(data models.Policy, m pdf.Maroto) pdf.Maroto {
 				constructionYear = "tra 1972 e 2009"
 			case "after2009":
 				constructionYear = "dopo il 2009"
-
 			}
 			switch os := build.Floor; os {
 			case "ground_floor":
@@ -301,7 +313,6 @@ func (s Skin) GetPmi(data models.Policy, m pdf.Maroto) pdf.Maroto {
 				floor = "di 2 piani"
 			case "greater_than_second":
 				floor = "di oltre 2 piani"
-
 			}
 
 			switch os := build.BuildingMaterial; os {
@@ -313,7 +324,6 @@ func (s Skin) GetPmi(data models.Policy, m pdf.Maroto) pdf.Maroto {
 				constructionMaterial = "Legno lamellare"
 			case "steel":
 				constructionMaterial = "Acciaio"
-
 			}
 			c = append(c, []string{"", "", "Sede "})
 			d = append(d, build.Address+" "+build.StreetNumber+" - "+build.PostalCode+" "+build.City+" ("+build.CityCode+")")
@@ -331,7 +341,6 @@ func (s Skin) GetPmi(data models.Policy, m pdf.Maroto) pdf.Maroto {
 				d = append(d, "Descrizione: "+atecodesc)
 			}
 			c = append(c, d)
-
 		}
 		if A.Enterprise != nil {
 
@@ -349,7 +358,6 @@ func (s Skin) GetPmi(data models.Policy, m pdf.Maroto) pdf.Maroto {
 				d = append(d, "Descrizione: "+atecodesc[:100])
 				d = append(d, atecodesc[100:200])
 				d = append(d, atecodesc[200:])
-
 			} else {
 				d = append(d, "Descrizione: "+atecodesc)
 			}
@@ -376,7 +384,6 @@ func (s Skin) GetPmi(data models.Policy, m pdf.Maroto) pdf.Maroto {
 					deductibleValue = "MASSIMO"
 				}
 			}
-
 		}
 		m = s.MultiRow(m, c, true, []uint{2, 10}, 30)
 	}
@@ -391,17 +398,18 @@ func (s Skin) GetPmi(data models.Policy, m pdf.Maroto) pdf.Maroto {
 		})
 	})
 	return m
-
 }
 
 // ----------------------------------------------------------------------------------
 
 func (s Skin) CoveragesPersonTable(m pdf.Maroto, data models.Policy) pdf.Maroto {
+	offerName := data.OfferlName
 	h := []string{"Garanzie ", "Somma assicurata ", "Opzioni / Dettagli ", "Premio "}
 	var table [][]string
 	for _, A := range data.Assets {
 		for _, k := range A.Guarantees {
-			r := []string{k.Name, strconv.Itoa(int(k.SumInsuredLimitOfIndemnity)), k.SelfInsurance, strconv.Itoa(int(k.PriceGross))}
+			r := []string{k.CompanyName, humanize.FormatFloat("#.###,", k.Offer[offerName].SumInsuredLimitOfIndemnity),
+				k.Offer[offerName].SelfInsurance, lib.HumanaizePriceEuro(k.Offer[offerName].PremiumGrossYearly)}
 			table = append(table, r)
 		}
 	}
@@ -488,6 +496,8 @@ func (skin Skin) GetHeader(m pdf.Maroto, data models.Policy, logo string, namePr
 					name = data.Contractor.Name + " " + data.Contractor.Surname
 				}
 			}
+		} else if data.Name == "persona" {
+			name = data.Contractor.Name + " " + data.Contractor.Surname
 		}
 		tablePremium = append(tablePremium, []string{"Numero: " + data.CodeCompany, "Contraente: " + name})
 		tablePremium = append(tablePremium, []string{"Decorre dal: " + data.StartDate.Format(layout) + " ore 24:00", "C.F. / P.IVA: " + cfpi})
@@ -495,7 +505,9 @@ func (skin Skin) GetHeader(m pdf.Maroto, data models.Policy, logo string, namePr
 		tablePremium = append(tablePremium, []string{"Si rinnova a scadenza, salvo disdetta da inviare 30 giorni prima", data.Contractor.PostalCode + " " + data.Contractor.City + " (" + data.Contractor.CityCode + ")"})
 		tablePremium = append(tablePremium, []string{"Prossimo pagamento il: " + nextpay, "Mail:  " + data.Contractor.Mail})
 		tablePremium = append(tablePremium, []string{"Sostituisce la polizza: = = = = = = = =", "Telefono: " + data.Contractor.Phone})
-		tie()
+		if tie != nil {
+			tie()
+		}
 		//tablePremium = append(tablePremium, []string{"Presenza Vincolo: NO  - Convenzione: NO", ""})
 		skin.Table(m, h, tablePremium, 6, skin.RowHeight-0.5)
 		skin.Space(m, 5.0)

@@ -196,7 +196,8 @@ func (c *Client) connect() error {
 		}
 		auth = ssh.PublicKeys(signer)
 	}
-
+	log.Println(signer.PublicKey())
+	log.Println(auth)
 	cfg := &ssh.ClientConfig{
 		User: c.config.Username,
 		Auth: []ssh.AuthMethod{

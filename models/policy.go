@@ -90,6 +90,8 @@ type Policy struct {
 	OffersPrices    map[string]map[string]*Price `firestore:"offersPrices,omitempty" json:"offersPrices,omitempty" bigquery:"-"`
 	PartnershipName string                       `json:"partnershipName" firestore:"partnershipName" bigquery:"partnershipName"`
 	PartnershipData map[string]interface{}       `json:"partnershipData" firestore:"partnershipData" bigquery:"-"`
+	Reserved        bool                         `json:"reserved" firestore:"reserved" bigquery:"-"`
+	FundsOrigin     string                       `json:"fundsOrigin,omitempty" firestore:"fundsOrigin,omitempty" bigquery:"-"`
 }
 
 type RenewHistory struct {
@@ -140,7 +142,9 @@ func (policy *Policy) CalculateContractorAge() (int, error) {
 	birthdate, e := time.Parse(time.RFC3339, policy.Contractor.BirthDate)
 	now := time.Now()
 	age := now.Year() - birthdate.Year()
-	if now.YearDay() < birthdate.YearDay() {
+	log.Println(now.YearDay(), birthdate.YearDay())
+	birthdate.Day()
+	if now.YearDay() < birthdate.YearDay() && !(now.Month() == birthdate.Month() && now.Day() == birthdate.Day()) {
 		age--
 	}
 	return age, e
