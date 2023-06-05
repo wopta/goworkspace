@@ -2,6 +2,7 @@ package broker
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"io"
@@ -11,14 +12,23 @@ import (
 
 func GetPoliciesFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		req      GetPoliciesReq
-		response GetPoliciesResp
+		req        GetPoliciesReq
+		response   GetPoliciesResp
+		limitValue = 10
 	)
 	log.Println("GetPolicies")
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	err := json.Unmarshal(body, &req)
 	lib.CheckError(err)
+
+	if len(req.Queries) == 0 {
+		return "", nil, fmt.Errorf("no query specified")
+	}
+
+	if req.Limit != 0 {
+		limitValue = req.Limit
+	}
 
 	firePolicy := lib.GetDatasetByEnv(r.Header.Get("origin"), "policy")
 
@@ -34,7 +44,7 @@ func GetPoliciesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		})
 	}
 
-	docsnap, err := fireQueries.FirestoreWhereLimitFields(firePolicy, req.Limit)
+	docsnap, err := fireQueries.FirestoreWhereLimitFields(firePolicy, limitValue)
 	if err != nil {
 		return "", nil, err
 	}
