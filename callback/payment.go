@@ -3,7 +3,6 @@ package callback
 import (
 	"encoding/base64"
 	"encoding/json"
-	"github.com/wopta/goworkspace/document"
 	"io"
 	"log"
 	"net/http"
@@ -11,6 +10,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/wopta/goworkspace/document"
 
 	"cloud.google.com/go/firestore"
 	lib "github.com/wopta/goworkspace/lib"
@@ -126,6 +127,7 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 			transaction.IsPay = true
 			transaction.Status = models.TransactionStatusPay
 			transaction.StatusHistory = append(transaction.StatusHistory, models.TransactionStatusPay)
+			transaction.PayDate = time.Now()
 			lib.SetFirestore(fireTransactions, transaction.Uid, transaction)
 			e = lib.InsertRowsBigQuery("wopta", fireTransactions, transaction)
 			log.Println(uid + " payment sendMail ")

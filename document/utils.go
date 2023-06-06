@@ -29,10 +29,8 @@ func (s Skin) lenToHeight(w string) float64 {
 
 func (s Skin) initDefault() pdf.Maroto {
 	m := pdf.NewMaroto(consts.Portrait, consts.A4)
-
 	m.SetPageMargins(10, 15, 10)
 	m.SetBackgroundColor(color.NewWhite())
-
 	m.SetFontLocation(lib.GetAssetPathByEnv("document"))
 	m.AddUTF8Font("Montserrat", consts.Normal, "montserrat_regular.ttf")
 	m.AddUTF8Font("Montserrat", consts.Bold, "montserrat_bold.ttf")
