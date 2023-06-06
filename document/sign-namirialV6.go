@@ -318,7 +318,7 @@ func getSendV6(id string, data model.Policy, prepare string, origin string) stri
 				"DocumentNumber": 1
 			}
 		],
-		"Name": ` + data.CodeCompany + `,
+		"Name": "` + data.CodeCompany + `",
 		"MetaData": "string",
 		"AddDocumentTimestamp": true,
 		"ShareWithTeam": true,
