@@ -130,7 +130,7 @@ func sendEnvelopV6(id string, data model.Policy, unassigned string, origin strin
 		lib.CheckError(err)
 
 		if res != nil {
-			body, err := ioutil.ReadAll(res.Body)
+			body, err := io.ReadAll(res.Body)
 			lib.CheckError(err)
 			var result map[string]string
 			json.Unmarshal([]byte(body), &result)
@@ -318,7 +318,7 @@ func getSendV6(id string, data model.Policy, prepare string, origin string) stri
 				"DocumentNumber": 1
 			}
 		],
-		"Name": "Test",
+		"Name": ` + data.CodeCompany + `,
 		"MetaData": "string",
 		"AddDocumentTimestamp": true,
 		"ShareWithTeam": true,
