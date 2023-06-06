@@ -12,7 +12,6 @@ import (
 	"strings"
 
 	"os"
-	"path/filepath"
 	"time"
 
 	lib "github.com/wopta/goworkspace/lib"
@@ -42,7 +41,7 @@ func NamirialOtpV6(data model.Policy, origin string) (string, NamirialOtpRespons
 		file = lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), data.DocumentName, "")
 	}
 
-	SspFileId := <-postDataV6(file)
+	SspFileId := <-postDataV6(file, data.NameDesc)
 	log.Println(data.Uid+"postData:", SspFileId)
 	//prepareEnvelop(SspFileId)
 	unassigned := <-prepareEnvelopV6(SspFileId)
@@ -179,7 +178,7 @@ func GetEnvelopV6(id string) <-chan string {
 	}()
 	return r
 }
-func postDataV6(data []byte) <-chan string {
+func postDataV6(data []byte, productNameDesc string) <-chan string {
 	r := make(chan string)
 	var urlstring = os.Getenv("ESIGN_BASEURL") + "v6/file/upload"
 	go func() {
@@ -187,7 +186,7 @@ func postDataV6(data []byte) <-chan string {
 		var b bytes.Buffer
 		w := multipart.NewWriter(&b)
 		// Add the field
-		fw, err := w.CreateFormFile("file", filepath.Base("contract.pdf"))
+		fw, err := w.CreateFormFile("file", productNameDesc+" Polizza.pdf")
 		lib.CheckError(err)
 		fw.Write((data)[:])
 		w.Close()
