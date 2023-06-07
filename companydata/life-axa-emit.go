@@ -26,9 +26,11 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	)
 
 	now := time.Now()
-
 	fromM := time.Now().AddDate(0, -1, 0)
 	fromQ := time.Now().AddDate(0, 0, -15)
+	dateString := "2021-11-22"
+	date, _ := time.Parse("2006-01-02", dateString)
+	log.Println(date)
 	if now.Day() == 15 {
 		from = fromQ
 		filenamesplit = "Q"
@@ -89,11 +91,9 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		)
 		docsnap := lib.GetFirestore("policy", transaction.PolicyUid)
 		docsnap.DataTo(&policy)
-		result = append(result, setRow(policy, df)...)
+		result = append(result, setRow(policy, df, transaction)...)
 
 	}
-
-	//log.Println("df.Describe(): ", df.Describe())
 
 	refMontly := now.AddDate(0, -1, 0)
 	//year, month, day := time.Now().Date()
@@ -105,7 +105,7 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	SftpUpload(filepath)
 	return "", nil, e
 }
-func setRow(policy models.Policy, df dataframe.DataFrame) [][]string {
+func setRow(policy models.Policy, df dataframe.DataFrame, trans models.Transaction) [][]string {
 	var result [][]string
 
 	log.Println("policy.Uid: ", policy.Uid)
@@ -113,8 +113,8 @@ func setRow(policy models.Policy, df dataframe.DataFrame) [][]string {
 		dataframe.F{Colidx: 4, Colname: "CAP", Comparator: series.Eq, Comparando: policy.Contractor.Residence.PostalCode},
 	)
 	residenceCab := fil.Records()[0][5]
-
-	log.Println("residenceCab", residenceCab)
+	log.Println("residenceCab:", residenceCab)
+	log.Println("fil.Records()[0]:", fil.Records()[0])
 	log.Println("filtered col", fil.Ncol())
 	log.Println("filtered row", fil.Nrow())
 	for _, asset := range policy.Assets {
@@ -126,16 +126,18 @@ func setRow(policy models.Policy, df dataframe.DataFrame) [][]string {
 			)
 			beneficiary1, beneficiary1S, beneficiary1T = mapBeneficiary(g, 0) //Codice Fiscale Beneficiario
 			beneficiary2, beneficiary2S, _ = mapBeneficiary(g, 1)
-			//fmt.Println(g)
+			pricegrossround := fmt.Sprintf("%.2f", g.PriceGross)
+			pricegrossflat, _ := fmt.Println(strings.Replace(pricegrossround, ",", "", -1))
+			priceGrossFormat := fmt.Sprintf("%012d", pricegrossflat) // 000000001220
 			row := []string{
-				mapCodecCompany(policy, g.CompanyCodec), //Codice schema
-				policy.CodeCompany,                      //N° adesione individuale univoco
-				"A",                                     //Tipo di Transazione
-				getFormatdate(policy.StartDate),         //Data di decorrenza
-				getFormatdate(policy.EndDate),           //"Data di rinnovo"
-				"012",                                   //"Durata copertura assicurativa"
-				fmt.Sprint(g.Value.Duration.Year * 12),  //"Durata complessiva"
-				fmt.Sprintf("%.2f", g.PriceGross),       //"Premio assicurativo lordo"
+				mapCodecCompany(policy, g.CompanyCodec),           //Codice schema
+				policy.CodeCompany,                                //N° adesione individuale univoco
+				getRenew(policy),                                  //Tipo di Transazione
+				getFormatdate(policy.StartDate),                   //Data di decorrenza
+				getFormatdate(getRenewDate(policy, trans)),        //"Data di rinnovo"
+				mapCoverageDuration(policy),                       //"Durata copertura assicurativa"
+				fmt.Sprint(g.Value.Duration.Year * 12),            //"Durata complessiva"
+				priceGrossFormat,                                  //"Premio assicurativo lordo"
 				fmt.Sprintf("%.0f", g.SumInsuredLimitOfIndemnity), //"Importo Assicurato"
 				"0",                       //indennizzo mensile
 				"",                        //campo disponibile
@@ -408,6 +410,49 @@ func getFormatBithdate(d string) string {
 	}
 	return res
 
+}
+func getRenew(p models.Policy) string {
+	var result string
+	now := time.Now()
+	addMonth := p.StartDate.AddDate(0, 1, 0)
+	if p.PaymentSplit == "year" {
+		result = "A"
+	}
+	if p.PaymentSplit == "montly" {
+		if addMonth.Before(now) {
+			result = "A"
+		} else {
+			result = "R"
+		}
+	}
+	return result
+}
+func getRenewDate(p models.Policy, trans models.Transaction) time.Time {
+	var result time.Time
+	now := time.Now()
+	addMonth := p.StartDate.AddDate(0, 1, 0)
+	if p.PaymentSplit == "year" {
+		result = p.StartDate
+	}
+	if p.PaymentSplit == "montly" {
+
+		if addMonth.Before(now) {
+			result = p.StartDate
+		} else {
+			result = trans.PayDate
+		}
+	}
+	return result
+}
+func mapCoverageDuration(p models.Policy) string {
+	var result string
+	if p.PaymentSplit == "year" {
+		result = "012"
+	}
+	if p.PaymentSplit == "montly" {
+		result = "001"
+	}
+	return result
 }
 func mapCodecCompany(p models.Policy, g string) string {
 	var result, pay string
