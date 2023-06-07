@@ -34,6 +34,8 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 	log.Println(string(request))
 	log.Println(string(r.RequestURI))
 	json.Unmarshal([]byte(request), &fabrickCallback)
+
+	now := time.Now().UTC()
 	// Unmarshal or Decode the JSON to the interface.
 	if fabrickCallback.Bill.Status == "PAID" {
 		if uid == "" || origin == "" {
@@ -60,7 +62,7 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 
 			gsLink := <-document.GetFileV6(policy, uid)
 			log.Println("contractGsLink: ", gsLink)
-			timestamp := strconv.FormatInt(time.Now().UTC().Unix(), 10)
+			timestamp := strconv.FormatInt(now.Unix(), 10)
 			*policy.Attachments = append(*policy.Attachments, models.Attachment{
 				Name: "Contratto",
 				Link: gsLink,
@@ -90,7 +92,7 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 			}
 
 			if newUser {
-				policy.Contractor.CreationDate = time.Now().UTC()
+				policy.Contractor.CreationDate = now
 				fireUsers := lib.GetDatasetByEnv(r.Header.Get("origin"), "users")
 				lib.SetFirestore(fireUsers, userUID, policy.Contractor)
 			} else {
@@ -99,7 +101,7 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 			}
 
 			policy.IsPay = true
-			policy.Updated = time.Now().UTC()
+			policy.Updated = now
 			policy.Status = models.PolicyStatusPay
 			policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusPay)
 			//policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusToPay)
@@ -128,8 +130,9 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 			transaction.IsPay = true
 			transaction.Status = models.TransactionStatusPay
 			transaction.StatusHistory = append(transaction.StatusHistory, models.TransactionStatusPay)
-			transaction.PayDate = time.Now().UTC()
+			transaction.PayDate = now
 			transaction.BigPayDate = civil.DateTimeOf(transaction.PayDate)
+			transaction.BigCreationDate = civil.DateTimeOf(transaction.CreationDate)
 			lib.SetFirestore(fireTransactions, transaction.Uid, transaction)
 			e = lib.InsertRowsBigQuery("wopta", fireTransactions, transaction)
 			log.Println(uid + " payment sendMail ")
