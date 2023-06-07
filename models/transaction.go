@@ -39,7 +39,7 @@ type Transaction struct {
 }
 
 func TransactionToListData(query *firestore.DocumentIterator) []Transaction {
-	var result []Transaction
+	result := make([]Transaction, 0)
 	for {
 		d, err := query.Next()
 

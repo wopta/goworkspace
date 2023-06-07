@@ -1,6 +1,7 @@
 package callback
 
 import (
+	"cloud.google.com/go/civil"
 	"encoding/base64"
 	"encoding/json"
 	"io"
@@ -127,7 +128,8 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 			transaction.IsPay = true
 			transaction.Status = models.TransactionStatusPay
 			transaction.StatusHistory = append(transaction.StatusHistory, models.TransactionStatusPay)
-			transaction.PayDate = time.Now()
+			transaction.PayDate = time.Now().UTC()
+			transaction.BigPayDate = civil.DateTimeOf(transaction.PayDate)
 			lib.SetFirestore(fireTransactions, transaction.Uid, transaction)
 			e = lib.InsertRowsBigQuery("wopta", fireTransactions, transaction)
 			log.Println(uid + " payment sendMail ")
