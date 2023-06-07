@@ -25,17 +25,29 @@ func (wisePolicy *WiseCompletePolicy) ToDomain() Policy {
 		attachment Attachment
 	)
 
-	for _, wiseAsset := range *wisePolicy.Assets {
-		policy.Assets = append(policy.Assets, wiseAsset.ToDomain())
-	}
 	policy.Uid = fmt.Sprintf("wise:%d", wisePolicy.Id)
 	policy.Contractor = *wisePolicy.Contractors[0].Registry.ToDomain()
 	policy.EndDate = wisePolicy.Contract.PolicyExpirationDate
 	policy.CodeCompany = wisePolicy.PolicyNumber
-	policy.Company = "global"
 	policy.PriceGross = wisePolicy.Contract.GrossAmount
 	policy.PriceNett = wisePolicy.Contract.NetAmount
 	policy.TaxAmount = wisePolicy.Contract.TaxesAmount
+
+	switch wisePolicy.ProductTypeCode {
+	case "PMIW":
+		policy.Name = "pmi"
+		policy.NameDesc = "Wopta per Artigiani & Imprese"
+		policy.Company = "global"
+	case "WPIN":
+		policy.Name = "persona"
+		policy.NameDesc = "Wopta per te Persona"
+		policy.Company = "global"
+	default:
+	}
+	
+	for _, wiseAsset := range *wisePolicy.Assets {
+		policy.Assets = append(policy.Assets, wiseAsset.ToDomain(wisePolicy))
+	}
 
 	policy.Attachments = &[]Attachment{}
 	for _, wiseAttachment := range wisePolicy.Attachments {
