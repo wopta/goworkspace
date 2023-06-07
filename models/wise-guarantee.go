@@ -2,6 +2,7 @@ package models
 
 import (
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -41,8 +42,24 @@ func (wiseGuarantee *WiseGuarantee) ToDomain() Guarante {
 	guarantee.Name = wiseGuarantee.Name
 	guarantee.CompanyName = wiseGuarantee.Name
 	guarantee.Tax = wiseGuarantee.Tax
-	guarantee.Deductible = strconv.FormatFloat(wiseGuarantee.Deductible, 'f', 2, 64)
+
+	if wiseGuarantee.Deductible > 0.001 {
+		guarantee.Deductible = strconv.FormatFloat(wiseGuarantee.Deductible, 'f', 2, 64)
+	}
 	guarantee.SumInsuredLimitOfIndemnity = wiseGuarantee.SumInsuredLimitOfIndemnity
+
+	for _, parameter := range wiseGuarantee.Parameters {
+		var guaranteeValue GuaranteValue
+		if strings.EqualFold(parameter.Name, "FRANCHIGIA") {
+			guaranteeValue.Deductible = parameter.Value
+		}
+		if strings.EqualFold(parameter.Name, "MASSIMALE") || strings.EqualFold(parameter.Name, "somma assicurata") {
+			if value, err := strconv.ParseFloat(strings.ReplaceAll(parameter.Value, ".", ""), 64); err == nil {
+				guaranteeValue.SumInsuredLimitOfIndemnity = value
+			}
+		}
+		guarantee.Value = &guaranteeValue
+	}
 
 	return guarantee
 }
