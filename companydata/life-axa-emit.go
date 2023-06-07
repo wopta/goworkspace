@@ -41,7 +41,6 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	switch os.Getenv("env") {
 	case "local":
 		cabCsv = lib.ErrorByte(ioutil.ReadFile("function-data/data/rules/Riclassificazione_Ateco.csv"))
-
 	default:
 		cabCsv = lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "data/cab-cap-istat.csv", "")
 	}
