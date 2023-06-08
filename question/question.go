@@ -23,21 +23,25 @@ func Question(w http.ResponseWriter, r *http.Request) {
 				Route:   "/v1/statements/person",
 				Handler: PersonStatements,
 				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAll},
 			},
 			{
 				Route:   "/v1/survey/life",
 				Handler: LifeSurvey,
 				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAll},
 			},
 			{
 				Route:   "/v1/statements/life",
 				Handler: LifeStatements,
 				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAll},
 			},
 			{
 				Route:   "/v1/survey/person",
 				Handler: PersonSurvey,
 				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAll},
 			},
 		},
 	}
