@@ -31,7 +31,7 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	dateString := "2021-11-22"
 	date, _ := time.Parse("2006-01-02", dateString)
 	log.Println(date)
-	if now.Day() == 15 {
+	if now.Day() == 15 || now.Day() == 15 {
 		from = fromQ
 		filenamesplit = "Q"
 	} else {
