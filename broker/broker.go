@@ -2,6 +2,7 @@ package broker
 
 import (
 	"fmt"
+	"github.com/wopta/goworkspace/models"
 	"log"
 	"net/http"
 
@@ -20,59 +21,68 @@ func Broker(w http.ResponseWriter, r *http.Request) {
 	log.Println("Broker")
 	lib.EnableCors(&w, r)
 	route := lib.RouteData{
-
 		Routes: []lib.Route{
 			{
 				Route:   "/v1/policies/fiscalcode/:fiscalcode",
 				Handler: PolicyFiscalcode,
 				Method:  "GET",
+				Roles:   []string{models.UserRoleAll},
 			},
 			{
 				Route:   "/v1/policy/:uid",
 				Handler: GetPolicyFx,
 				Method:  "GET",
+				Roles:   []string{models.UserRoleAll},
 			},
 
 			{
 				Route:   "/v1/policy/proposal",
 				Handler: Proposal,
 				Method:  "POST",
+				Roles:   []string{models.UserRoleAll},
 			},
 
 			{
 				Route:   "/v1/policy/emit",
 				Handler: Emit,
 				Method:  "POST",
+				Roles:   []string{models.UserRoleAll},
 			},
 			{
 				Route:   "/v1/policy/reserved",
 				Handler: reserved,
 				Method:  "POST",
+				Roles:   []string{models.UserRoleAll},
 			},
 			{
 				Route:   "policy/v1/:uid",
 				Handler: UpdatePolicy,
 				Method:  http.MethodPatch,
+				Roles:   []string{models.UserRoleAll},
 			},
 			{
 				Route:   "policy/v1/:uid",
 				Handler: DeletePolicy,
 				Method:  http.MethodDelete,
+				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},
 			{
 				Route:   "attachment/v1/:policyUid",
 				Handler: GetPolicyAttachmentFx,
 				Method:  http.MethodGet,
+				Roles:   []string{models.UserRoleAll},
 			},
 			{
 				Route:   "policies/v1",
 				Handler: GetPoliciesFx,
 				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},
 			{
 				Route:   "policy/transactions/v1/:policyUid",
 				Handler: GetPolicyTransactions,
 				Method:  http.MethodGet,
+				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},
 		},
 	}
@@ -81,7 +91,6 @@ func Broker(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetNumberCompany(w http.ResponseWriter, r *http.Request) (string, interface{}) {
-
 	return "", nil
 }
 
