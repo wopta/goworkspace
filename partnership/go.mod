@@ -7,8 +7,8 @@ replace github.com/wopta/goworkspace/partnership => ./
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
 	github.com/golang-jwt/jwt/v4 v4.4.2
-	github.com/wopta/goworkspace/lib v1.0.35
-	github.com/wopta/goworkspace/models v1.0.57
+	github.com/wopta/goworkspace/lib v1.0.44
+	github.com/wopta/goworkspace/models v1.0.85
 )
 
 require (
