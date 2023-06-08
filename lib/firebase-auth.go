@@ -85,9 +85,20 @@ func VerifyAuthorization(handler func(w http.ResponseWriter, r *http.Request) (s
 		if SliceContains(roles, userRole) {
 			return handler(w, r)
 		}
-
+    
 		return errorHandler(w)
+    
 	}
-
+  
 	return wrappedHandler
+  
+}
+
+func SetCustomClaimForUser(uid string, claims map[string]interface{}) {
+	client, ctx := getClient()
+
+	err := client.SetCustomUserClaims(ctx, uid, claims)
+	if err != nil {
+		log.Fatalf("error setting custom claims %v\n", err)
+	}
 }

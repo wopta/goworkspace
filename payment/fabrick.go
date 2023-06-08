@@ -92,9 +92,13 @@ func FabrickPayObj(data model.Policy, firstSchedule bool, scheduleDate string, c
 				sd = scheduleDate
 			}
 			//tr := models.SetTransactionPolicy(data, data.Uid+"_"+scheduleDate, amount, scheduleDate, data.PriceNett * commission)
+			transactionsFire := lib.GetDatasetByEnv(origin, "transactions")
+			transactionUid := lib.NewDoc(transactionsFire)
+
 			tr := models.Transaction{
 				Amount:             amount,
 				Id:                 "",
+				Uid:                transactionUid,
 				PolicyName:         data.Name,
 				PolicyUid:          data.Uid,
 				CreationDate:       time.Now(),
@@ -113,10 +117,7 @@ func FabrickPayObj(data model.Policy, firstSchedule bool, scheduleDate string, c
 				ProviderName:       "fabrick",
 			}
 
-			transactionsFire := lib.GetDatasetByEnv(origin, "transactions")
-
-			ref, _ := lib.PutFirestore(transactionsFire, tr)
-			tr.Uid = ref.ID
+			lib.SetFirestore(transactionsFire, transactionUid, tr)
 			tr.BigPayDate = civil.DateTimeOf(time.Now())
 			tr.BigCreationDate = civil.DateTimeOf(time.Now())
 			tr.BigStatusHistory = strings.Join(tr.StatusHistory, ",")
