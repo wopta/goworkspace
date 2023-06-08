@@ -1,7 +1,9 @@
 package models
 
 import (
+	"encoding/json"
 	"log"
+	"strings"
 	"time"
 
 	"cloud.google.com/go/civil"
@@ -81,4 +83,26 @@ func SetTransactionPolicy(policy Policy, id string, amount float64, schedule str
 		Name:          policy.Contractor.Name + " " + policy.Contractor.Surname,
 		Company:       company,
 	}
+}
+
+func (transaction *Transaction) BigQuerySave(origin string) {
+	fireTransactions := lib.GetDatasetByEnv(origin, "transactions")
+	transactionJson, err := json.Marshal(transaction)
+	if err != nil {
+		log.Println("ERROR Transaction "+transaction.Uid+" Marshal: ", err)
+		return
+	}
+	log.Println("Transaction: "+transaction.Uid, string(transactionJson))
+
+	transaction.BigPayDate = civil.DateTimeOf(transaction.PayDate)
+	transaction.BigCreationDate = civil.DateTimeOf(transaction.CreationDate)
+	transaction.BigStatusHistory = strings.Join(transaction.StatusHistory, ",")
+	log.Println("Transaction save BigQuery: " + transaction.Uid)
+
+	err = lib.InsertRowsBigQuery("wopta", fireTransactions, transaction)
+	if err != nil {
+		log.Println("ERROR Transaction "+transaction.Uid+" save BigQuery: ", err)
+		return
+	}
+	log.Println("Transaction BigQuery saved!")
 }
