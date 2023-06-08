@@ -48,7 +48,6 @@ func GetUserIdFromIdToken(idToken string) (string, error) {
 }
 
 func SetCustomClaimForUser(uid string, claims map[string]interface{}) {
-	// Get an auth client from the firebase.App
 	client, ctx := getClient()
 
 	err := client.SetCustomUserClaims(ctx, uid, claims)
