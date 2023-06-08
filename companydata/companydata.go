@@ -1,6 +1,7 @@
 package companydata
 
 import (
+	"github.com/wopta/goworkspace/models"
 	"log"
 	"net/http"
 
@@ -24,29 +25,35 @@ func Callback(w http.ResponseWriter, r *http.Request) {
 				Route:   "/v1/global/transactions",
 				Handler: GlobalTransaction,
 				Method:  "GET",
+				Roles:   []string{models.UserRoleAll},
 			}, {
 				Route:   "/v1/global/pmi/emit",
 				Handler: PmiGlobalEmit,
 				Method:  "GET",
+				Roles:   []string{models.UserRoleAll},
 			},
 			{
 				Route:   "/v1/global/person/emit",
 				Handler: PersonGlobalEmit,
 				Method:  "GET",
+				Roles:   []string{models.UserRoleAll},
 			},
 			{
 				Route:   "/v1/axa/life/emit",
 				Handler: LifeAxalEmit,
 				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAll},
 			}, {
 				Route:   "/v1/axa/life/delete",
 				Handler: LifeAxaDelete,
 				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAll},
 			},
 			{
 				Route:   "/v1/emit",
 				Handler: Emit,
 				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAll},
 			},
 		},
 	}
