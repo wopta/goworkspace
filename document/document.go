@@ -4,6 +4,7 @@ package document
 
  */
 import (
+	"github.com/wopta/goworkspace/models"
 	"log"
 	"net/http"
 
@@ -28,21 +29,25 @@ func Document(w http.ResponseWriter, r *http.Request) {
 			{
 				Route:   "/v1/proposal",
 				Handler: ContractFx,
+				Roles:   []string{models.UserRoleAll},
 			},
 			{
 				Route:   "/v1/contract",
 				Handler: ContractFx,
 				Method:  "POST",
+				Roles:   []string{models.UserRoleAll},
 			},
 			{
 				Route:   "/v1/sign/",
 				Handler: SignNamirial,
 				Method:  "POST",
+				Roles:   []string{models.UserRoleAll},
 			},
 			{
 				Route:   "/v2/sign",
 				Handler: SignNamirialV6,
 				Method:  "POST",
+				Roles:   []string{models.UserRoleAll},
 			},
 		},
 	}
