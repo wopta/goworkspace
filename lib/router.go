@@ -14,6 +14,7 @@ type Route struct {
 	Route   string
 	Method  string
 	Handler func(http.ResponseWriter, *http.Request) (string, interface{}, error)
+	Roles   []string
 }
 
 func (router RouteData) Router(w http.ResponseWriter, r *http.Request) {
@@ -52,7 +53,7 @@ func (router RouteData) Router(w http.ResponseWriter, r *http.Request) {
 
 			log.Println("found")
 			log.Println(r.RequestURI)
-			result, _, e = v.Handler(w, r)
+			result, _, e = VerifyAuthorization(v.Handler, v.Roles...)(w, r)
 			isFound = true
 			break
 		}

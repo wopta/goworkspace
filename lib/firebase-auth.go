@@ -2,8 +2,12 @@ package lib
 
 import (
 	"context"
+	"fmt"
+	"github.com/wopta/goworkspace/models"
 	"log"
+	"net/http"
 	"os"
+	"strings"
 
 	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/auth"
@@ -51,4 +55,29 @@ func GetUserIdFromIdToken(idToken string) (string, error) {
 	}
 
 	return token.Claims["user_id"].(string), err
+}
+
+func VerifyAuthorization(handler func(w http.ResponseWriter, r *http.Request) (string, interface{}, error), roles ...string) func(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	wrappedHandler := func(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+		errorHandler := func(w http.ResponseWriter, err error) (string, interface{}, error) {
+			w.WriteHeader(http.StatusNotFound)
+			w.Write([]byte("Not Found"))
+			return "", nil, err
+		}
+
+		idToken := strings.ReplaceAll(r.Header.Get("Authorization"), "Bearer ", "")
+		token, err := VerifyUserIdToken(idToken)
+		if err != nil {
+			return errorHandler(w, err)
+		}
+
+		userRole := token.Claims["role"].(string)
+		if len(roles) == 1 && roles[0] == models.UserRoleAll || SliceContains(roles, userRole) {
+			return handler(w, r)
+		}
+
+		return errorHandler(w, fmt.Errorf("not found"))
+	}
+
+	return wrappedHandler
 }
