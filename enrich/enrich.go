@@ -1,6 +1,7 @@
 package enrich
 
 import (
+	"github.com/wopta/goworkspace/models"
 	"log"
 	"net/http"
 	"strings"
@@ -30,23 +31,27 @@ func Enrich(w http.ResponseWriter, r *http.Request) {
 				Route:   "/vat/munichre/:vat",
 				Handler: MunichVat,
 				Method:  "GET",
+				Roles:   []string{models.UserRoleAll},
 			},
 			{
 				Route:   "/ateco/:ateco",
 				Handler: Ateco,
 				Method:  "GET",
+				Roles:   []string{models.UserRoleAll},
 			},
 
 			{
 				Route:   "/cities",
 				Handler: Cities,
 				Method:  "GET",
+				Roles:   []string{models.UserRoleAll},
 			},
 
 			{
 				Route:   "/works",
 				Handler: Works,
 				Method:  "GET",
+				Roles:   []string{models.UserRoleAll},
 			},
 		},
 	}
