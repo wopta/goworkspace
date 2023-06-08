@@ -1,6 +1,7 @@
 package rules
 
 import (
+	"github.com/wopta/goworkspace/models"
 	"log"
 	"net/http"
 
@@ -23,6 +24,7 @@ func Rules(w http.ResponseWriter, r *http.Request) {
 				Route:   "/risk/pmi",
 				Handler: PmiAllrisk,
 				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAll},
 			},
 		},
 	}
