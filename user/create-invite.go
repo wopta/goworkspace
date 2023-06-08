@@ -18,7 +18,7 @@ func CreateInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	reqBytes := lib.ErrorByte(ioutil.ReadAll(r.Body))
 	json.Unmarshal(reqBytes, &createInviteRequest)
 
-	creatorUid, err := lib.GetUserIdFromIdToken(strings.ReplaceAll(r.Header.Get("Authorization"), "Bearer ", ""))
+	creatorUid, err := lib.GetUserIdFromIdToken(r.Header.Get("Authorization"))
 	if err != nil {
 		log.Println("[CreateInvite] Invalid auth token")
 		return `{"success": false}`, `{"success": false}`, nil
