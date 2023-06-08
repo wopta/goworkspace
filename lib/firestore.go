@@ -29,7 +29,7 @@ func NewDoc(collection string) string {
 	ctx := context.Background()
 	client, err := firestore.NewClient(ctx, os.Getenv("GOOGLE_PROJECT_ID"))
 	CheckError(err)
-	ref := client.Collection("cities").NewDoc()
+	ref := client.Collection(collection).NewDoc()
 	return ref.ID
 }
 
