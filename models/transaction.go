@@ -38,6 +38,8 @@ type Transaction struct {
 	ProviderId         string         `json:"providerId" firestore:"providerId" bigquery:"-"`
 	UserToken          string         `json:"userToken" firestore:"userToken" bigquery:"-"`
 	ProviderName       string         `json:"providerName" firestore:"providerName" bigquery:"-"`
+	PaymentMethod      string         `firestore:"paymentMethod,omitempty" json:"paymentMethod,omitempty" bigquery:"paymentMethod"`
+	PaymentNote        string         `firestore:"paymentNote,omitempty" json:"paymentNote,omitempty" bigquery:"paymentNote"`
 }
 
 func TransactionToListData(query *firestore.DocumentIterator) []Transaction {
