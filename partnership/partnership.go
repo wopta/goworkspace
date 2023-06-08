@@ -28,6 +28,7 @@ func Partnership(w http.ResponseWriter, r *http.Request) {
 				Route:   "/v1/life",
 				Handler: LifePartnershipFx,
 				Method:  "GET",
+				Roles:   []string{models.UserRoleAll},
 			},
 		},
 	}

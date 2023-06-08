@@ -32,26 +32,31 @@ func Payment(w http.ResponseWriter, r *http.Request) {
 				Route:   "/v1/fabrick",
 				Handler: FabrickPay,
 				Method:  "POST",
+				Roles:   []string{models.UserRoleAll},
 			},
 			{
 				Route:   "/v1/fabrick/montly",
 				Handler: FabrickPayMontly,
 				Method:  "POST",
+				Roles:   []string{models.UserRoleAll},
 			},
 			{
 				Route:   "/v1/cripto",
 				Handler: CriptoPay,
 				Method:  "POST",
+				Roles:   []string{models.UserRoleAll},
 			},
 			{
 				Route:   "/v1/cripto",
 				Handler: CriptoPay,
 				Method:  "POST",
+				Roles:   []string{models.UserRoleAll},
 			},
 			{
 				Route:   "/v1/:uid",
 				Handler: CriptoPay,
 				Method:  http.MethodDelete,
+				Roles:   []string{models.UserRoleAll},
 			},
 		},
 	}

@@ -103,20 +103,11 @@ func getAllSimplePoliciesForUserFromWise(fiscalCode string) (*string, *[]WiseSim
 
 	e = json.Unmarshal(jsonData, &wiseSimplePolicyResponse)
 
-	livePolicies := filter(wiseSimplePolicyResponse.Policies, func(pol WiseSimplePolicy) bool {
+	livePolicies := lib.SliceFilter(wiseSimplePolicyResponse.Policies, func(pol WiseSimplePolicy) bool {
 		return strings.ToUpper(pol.State) == "POLIZZA IN VITA"
 	})
 
 	return wiseToken, &livePolicies, e
-}
-
-func filter[T any](ss []T, test func(T) bool) (ret []T) {
-	for _, s := range ss {
-		if test(s) {
-			ret = append(ret, s)
-		}
-	}
-	return
 }
 
 func GetPoliciesFromFirebase(fiscalCode string, policyFire string) []models.Policy {
