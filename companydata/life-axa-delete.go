@@ -24,7 +24,7 @@ func LifeAxaDelete(w http.ResponseWriter, r *http.Request) (string, interface{},
 
 	fromM := time.Now().AddDate(0, -1, 0)
 	fromQ := time.Now().AddDate(0, 0, -15)
-	if now.Day() == 15 {
+	if now.Day() == 15 || now.Day() == 8 {
 		from = fromQ
 		filenamesplit = "Q"
 	} else {
