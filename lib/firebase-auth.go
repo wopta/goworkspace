@@ -3,7 +3,6 @@ package lib
 import (
 	"context"
 	"fmt"
-	"github.com/wopta/goworkspace/models"
 	"log"
 	"net/http"
 	"os"
@@ -65,7 +64,7 @@ func VerifyAuthorization(handler func(w http.ResponseWriter, r *http.Request) (s
 			return "", nil, fmt.Errorf("not found")
 		}
 
-		if len(roles) == 0 || SliceContains(roles, models.UserRoleAll) {
+		if len(roles) == 0 || SliceContains(roles, "all") {
 			return handler(w, r)
 		}
 
@@ -85,13 +84,13 @@ func VerifyAuthorization(handler func(w http.ResponseWriter, r *http.Request) (s
 		if SliceContains(roles, userRole) {
 			return handler(w, r)
 		}
-    
+
 		return errorHandler(w)
-    
+
 	}
-  
+
 	return wrappedHandler
-  
+
 }
 
 func SetCustomClaimForUser(uid string, claims map[string]interface{}) {
