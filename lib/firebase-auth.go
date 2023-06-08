@@ -59,24 +59,34 @@ func GetUserIdFromIdToken(idToken string) (string, error) {
 
 func VerifyAuthorization(handler func(w http.ResponseWriter, r *http.Request) (string, interface{}, error), roles ...string) func(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	wrappedHandler := func(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-		errorHandler := func(w http.ResponseWriter, err error) (string, interface{}, error) {
+		errorHandler := func(w http.ResponseWriter) (string, interface{}, error) {
 			w.WriteHeader(http.StatusNotFound)
 			w.Write([]byte("Not Found"))
-			return "", nil, err
+			return "", nil, fmt.Errorf("not found")
 		}
 
-		idToken := strings.ReplaceAll(r.Header.Get("Authorization"), "Bearer ", "")
-		token, err := VerifyUserIdToken(idToken)
-		if err != nil {
-			return errorHandler(w, err)
-		}
-
-		userRole := token.Claims["role"].(string)
-		if len(roles) == 1 && roles[0] == models.UserRoleAll || SliceContains(roles, userRole) {
+		if SliceContains(roles, models.UserRoleAll) {
 			return handler(w, r)
 		}
 
-		return errorHandler(w, fmt.Errorf("not found"))
+		idToken := strings.ReplaceAll(r.Header.Get("Authorization"), "Bearer ", "")
+		if idToken == "" {
+			return errorHandler(w)
+		}
+
+		token, err := VerifyUserIdToken(idToken)
+		if err != nil {
+			log.Println("verify id token error: ", err)
+			return errorHandler(w)
+		}
+
+		userRole := token.Claims["role"].(string)
+
+		if SliceContains(roles, userRole) {
+			return handler(w, r)
+		}
+
+		return errorHandler(w)
 	}
 
 	return wrappedHandler
