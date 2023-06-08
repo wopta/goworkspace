@@ -46,13 +46,7 @@ func ConsumeInvite(inviteUid, password, origin string) (bool, error) {
 		return false, errors.New("Invite consumed or expired")
 	}
 
-	// check if the user exists
 	usersCollectionName := lib.GetDatasetByEnv(origin, usersCollection)
-	docSnapshot, err = lib.GetFirestoreErr(usersCollectionName, inviteUid)
-	
-	if err != nil {
-		return false, err
-	}
 
 	// Create the user in auth with the invite data
 	userRecord, err := lib.CreateUserWithEmailAndPassword(invite.Email, password, nil)
