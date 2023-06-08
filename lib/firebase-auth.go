@@ -65,7 +65,7 @@ func VerifyAuthorization(handler func(w http.ResponseWriter, r *http.Request) (s
 			return "", nil, fmt.Errorf("not found")
 		}
 
-		if SliceContains(roles, models.UserRoleAll) {
+		if len(roles) == 0 || SliceContains(roles, models.UserRoleAll) {
 			return handler(w, r)
 		}
 
