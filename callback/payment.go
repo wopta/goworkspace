@@ -133,6 +133,7 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 			transaction.PayDate = now
 			transaction.BigPayDate = civil.DateTimeOf(transaction.PayDate)
 			transaction.BigCreationDate = civil.DateTimeOf(transaction.CreationDate)
+			transaction.BigStatusHistory = strings.Join(transaction.StatusHistory, ",")
 			lib.SetFirestore(fireTransactions, transaction.Uid, transaction)
 			e = lib.InsertRowsBigQuery("wopta", fireTransactions, transaction)
 			log.Println(uid + " payment sendMail ")
