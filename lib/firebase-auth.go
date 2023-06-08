@@ -42,7 +42,7 @@ func CreateUserWithEmailAndPassword(email string, password string, id *string) (
 func VerifyUserIdToken(idToken string) (*auth.Token, error) {
 	client, ctx := getClient()
 
-	token, err := client.VerifyIDToken(ctx, idToken)
+	token, err := client.VerifyIDToken(ctx, strings.ReplaceAll(idToken, "Bearer ", ""))
 
 	return token, err
 }
