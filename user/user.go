@@ -27,31 +27,37 @@ func User(w http.ResponseWriter, r *http.Request) {
 				Route:   "/v1/fiscalCode/:fiscalcode",
 				Handler: GetUserByFiscalCodeFx,
 				Method:  "GET",
+				Roles:   []string{models.UserRoleAll},
 			},
 			{
 				Route:   "/v1/mail/:mail",
 				Handler: GetUserByMailFx,
 				Method:  "GET",
+				Roles:   []string{models.UserRoleAll},
 			},
 			{
 				Route:   "/v1/authId/:authId",
 				Handler: GetUserByAuthIdFx,
 				Method:  "GET",
+				Roles:   []string{models.UserRoleAll},
 			},
 			{
 				Route:   "/v1/onboarding",
 				Handler: OnboardUserFx,
 				Method:  "POST",
+				Roles:   []string{models.UserRoleAll},
 			},
 			{
 				Route:   "/document/v1/:policyUid",
 				Handler: UploadDocument,
 				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAll},
 			},
 			{
 				Route:   "/fiscalcode/v1/it/:operation",
 				Handler: FiscalCode,
 				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAll},
 			},
 		},
 	}
