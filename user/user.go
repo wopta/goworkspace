@@ -65,11 +65,13 @@ func User(w http.ResponseWriter, r *http.Request) {
 				Route:   "/invite/v1/create",
 				Handler: CreateInviteFx,
 				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAdmin},
 			},
 			{
 				Route:   "/invite/v1/consume",
 				Handler: ConsumeInviteFx,
 				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAll},
 			},
 		},
 	}
