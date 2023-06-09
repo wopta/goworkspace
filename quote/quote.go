@@ -1,6 +1,7 @@
 package quote
 
 import (
+	"github.com/wopta/goworkspace/models"
 	"log"
 	"net/http"
 	"strings"
@@ -29,21 +30,25 @@ func Quote(w http.ResponseWriter, r *http.Request) {
 				Route:   "/pmi/munichre",
 				Handler: PmiMunichFx,
 				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAll},
 			},
 			{
 				Route:   "/incident",
 				Handler: PmiMunichFx,
 				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAll},
 			},
 			{
 				Route:   "/v1/life",
 				Handler: LifeFx,
 				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAll},
 			},
 			{
 				Route:   "/v1/person",
 				Handler: PersonFx,
 				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAll},
 			},
 		},
 	}

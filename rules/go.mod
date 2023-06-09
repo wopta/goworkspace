@@ -9,7 +9,8 @@ require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
 	github.com/go-gota/gota v0.12.0
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
-	github.com/wopta/goworkspace/lib v1.0.18
+	github.com/wopta/goworkspace/lib v1.0.44
+	github.com/wopta/goworkspace/models v1.0.85
 	github.com/wopta/goworkspace/quote v1.0.1
 )
 

@@ -23,3 +23,21 @@ func Make2D[T any](n, m int) [][]T {
 	}
 	return matrix
 }
+
+func SliceContains[T comparable](slice []T, value T) bool {
+	for _, item := range slice {
+		if item == value {
+			return true
+		}
+	}
+	return false
+}
+
+func SliceFilter[T any](ss []T, test func(T) bool) (ret []T) {
+	for _, s := range ss {
+		if test(s) {
+			ret = append(ret, s)
+		}
+	}
+	return
+}

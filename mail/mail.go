@@ -21,6 +21,7 @@ REQUEST EXAMPLE:
 */
 import (
 	"encoding/json"
+	"github.com/wopta/goworkspace/models"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -43,21 +44,25 @@ func Mail(w http.ResponseWriter, r *http.Request) {
 	log.Println(r.RequestURI)
 	lib.EnableCors(&w, r)
 	route := lib.RouteData{
-		Routes: []lib.Route{{
-			Route:   "/v1/send",
-			Handler: Send,
-			Method:  "POST",
-		},
+		Routes: []lib.Route{
+			{
+				Route:   "/v1/send",
+				Handler: Send,
+				Method:  "POST",
+				Roles:   []string{models.UserRoleAll},
+			},
 			{
 				Route:   "/v1/score",
 				Handler: Score,
 				Method:  "POST",
+				Roles:   []string{models.UserRoleAll},
 			},
 
 			{
 				Route:   "/v1/validate",
 				Handler: Validate,
 				Method:  "POST",
+				Roles:   []string{models.UserRoleAll},
 			},
 		},
 	}

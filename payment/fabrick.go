@@ -92,9 +92,13 @@ func FabrickPayObj(data model.Policy, firstSchedule bool, scheduleDate string, c
 				sd = scheduleDate
 			}
 			//tr := models.SetTransactionPolicy(data, data.Uid+"_"+scheduleDate, amount, scheduleDate, data.PriceNett * commission)
+			transactionsFire := lib.GetDatasetByEnv(origin, "transactions")
+			transactionUid := lib.NewDoc(transactionsFire)
+
 			tr := models.Transaction{
 				Amount:             amount,
 				Id:                 "",
+				Uid:                transactionUid,
 				PolicyName:         data.Name,
 				PolicyUid:          data.Uid,
 				CreationDate:       time.Now(),
@@ -113,10 +117,7 @@ func FabrickPayObj(data model.Policy, firstSchedule bool, scheduleDate string, c
 				ProviderName:       "fabrick",
 			}
 
-			transactionsFire := lib.GetDatasetByEnv(origin, "transactions")
-
-			ref, _ := lib.PutFirestore(transactionsFire, tr)
-			tr.Uid = ref.ID
+			lib.SetFirestore(transactionsFire, transactionUid, tr)
 			tr.BigPayDate = civil.DateTimeOf(time.Now())
 			tr.BigCreationDate = civil.DateTimeOf(time.Now())
 			tr.BigStatusHistory = strings.Join(tr.StatusHistory, ",")
@@ -185,7 +186,7 @@ func getfabbricPayments(data model.Policy, firstSchedule bool, scheduleDate stri
 		scheduleDate = now.Format(layout2)
 	}
 	log.Println(next.Format(layout))
-	externalId := data.Uid + "_" + scheduleDate + "_" + strings.ReplaceAll(origin, "https://", "")
+	externalId := data.Uid + "_" + scheduleDate + "_" + data.CodeCompany + "_" + strings.ReplaceAll(origin, "https://", "")
 	var pay FabrickPaymentsRequest
 	pay.MerchantID = "wop134b31-5926-4b26-1411-726bc9f0b111"
 	pay.ExternalID = externalId

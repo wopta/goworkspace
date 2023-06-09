@@ -31,16 +31,19 @@ func Product(w http.ResponseWriter, r *http.Request) {
 				Route:   "/v1/:name",
 				Handler: GetNameFx,
 				Method:  "GET",
+				Roles:   []string{models.UserRoleAll},
 			},
 			{
 				Route:   "/v1/name/:name",
 				Handler: GetNameFx,
 				Method:  "GET",
+				Roles:   []string{models.UserRoleAll},
 			},
 			{
 				Route:   "/v1",
 				Handler: PutFx,
 				Method:  "PUT",
+				Roles:   []string{models.UserRoleAll},
 			},
 		},
 	}

@@ -2,8 +2,11 @@ package lib
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"net/http"
 	"os"
+	"strings"
 
 	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/auth"
@@ -36,13 +39,65 @@ func CreateUserWithEmailAndPassword(email string, password string, id *string) (
 	return u, err
 }
 
-func GetUserIdFromIdToken(idToken string) (string, error) {
+func VerifyUserIdToken(idToken string) (*auth.Token, error) {
 	client, ctx := getClient()
 
-	token, err := client.VerifyIDToken(ctx, idToken)
+	token, err := client.VerifyIDToken(ctx, strings.ReplaceAll(idToken, "Bearer ", ""))
+
+	return token, err
+}
+
+func GetUserIdFromIdToken(idToken string) (string, error) {
+	token, err := VerifyUserIdToken(idToken)
 	if err != nil {
 		return "", err
 	}
 
 	return token.Claims["user_id"].(string), err
+}
+
+func VerifyAuthorization(handler func(w http.ResponseWriter, r *http.Request) (string, interface{}, error), roles ...string) func(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	wrappedHandler := func(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+		errorHandler := func(w http.ResponseWriter) (string, interface{}, error) {
+			w.WriteHeader(http.StatusNotFound)
+			w.Write([]byte("Not Found"))
+			return "", nil, fmt.Errorf("not found")
+		}
+
+		if len(roles) == 0 || SliceContains(roles, "all") {
+			return handler(w, r)
+		}
+
+		idToken := strings.ReplaceAll(r.Header.Get("Authorization"), "Bearer ", "")
+		if idToken == "" {
+			return errorHandler(w)
+		}
+
+		token, err := VerifyUserIdToken(idToken)
+		if err != nil {
+			log.Println("verify id token error: ", err)
+			return errorHandler(w)
+		}
+
+		userRole := token.Claims["role"].(string)
+
+		if SliceContains(roles, userRole) {
+			return handler(w, r)
+		}
+
+		return errorHandler(w)
+
+	}
+
+	return wrappedHandler
+
+}
+
+func SetCustomClaimForUser(uid string, claims map[string]interface{}) {
+	client, ctx := getClient()
+
+	err := client.SetCustomUserClaims(ctx, uid, claims)
+	if err != nil {
+		log.Fatalf("error setting custom claims %v\n", err)
+	}
 }

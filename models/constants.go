@@ -45,18 +45,15 @@ const (
 	PayTypeTransfer PayType = "transfer"
 )
 
-type CustomerRole string
-
-const (
-	UserRolesCustumer CustomerRole = "custumer"
-	UserRolesAgent    CustomerRole = "agent"
-	UserRolesManager  CustomerRole = "manager"
-)
-
-func t() {
-
-}
-
 const (
 	PartnershipBeProf string = "beprof"
+)
+
+const (
+	UserRoleAll      string = "all"
+	UserRoleCustomer string = "customer"
+	UserRoleAdmin    string = "admin"
+	UserRoleManager  string = "manager"
+	UserRoleAgent    string = "agent"
+	UserRoleAgency   string = "agency"
 )

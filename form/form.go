@@ -1,6 +1,7 @@
 package form
 
 import (
+	"github.com/wopta/goworkspace/models"
 	"log"
 	"net/http"
 
@@ -24,11 +25,13 @@ func Form(w http.ResponseWriter, r *http.Request) {
 				Route:   "/axafleet",
 				Handler: AxaFleetTway,
 				Method:  "GET",
+				Roles:   []string{models.UserRoleAll},
 			},
 			{
 				Route:   "/v1/:uid",
 				Handler: GetFx,
 				Method:  "GET",
+				Roles:   []string{models.UserRoleAll},
 			},
 		},
 	}
