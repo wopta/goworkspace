@@ -53,6 +53,14 @@ func Persona(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 
 	personalDataHandlingSection(pdf, policy)
 
+	globalHeader(pdf)
+
+	pdf.AddPage()
+
+	globalFooter(pdf)
+
+	globalStamentsAndConsens(pdf)
+
 	filename, out := save(pdf, policy)
 	return filename, out
 }
@@ -201,4 +209,31 @@ func personaStatementsSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	for _, statement := range statements {
 		printStatement(pdf, statement)
 	}
+}
+
+func globalStamentsAndConsens(pdf *fpdf.Fpdf) {
+	setBlackBoldFont(pdf, titleTextSize)
+	pdf.MultiCell(0, 3, "DICHIARAZIONI E CONSENSI", "", fpdf.AlignLeft, false)
+	pdf.Ln(3)
+	setBlackRegularFont(pdf, standardTextSize)
+	pdf.MultiCell(0, 3, "Io Sottoscritto, dichiaro di avere perso visione dell’Informativa Privacy ai "+
+		"sensi dell’art. 13 del GDPR (informativa resa all’interno del set documentale contenente anche la "+
+		"Documentazione Informativa Precontrattuale, il Glossario e le Condizioni di Assicurazione) e di averne "+
+		"compreso i contenuti", "", fpdf.AlignLeft, false)
+	pdf.Ln(3)
+	drawSignatureForm(pdf)
+	pdf.Ln(9)
+
+	setBlackRegularFont(pdf, standardTextSize)
+	pdf.MultiCell(0, 3, "Qui di seguito esprimo il mio consenso al trattamento dei dati personali "+
+		"particolari per le finalità sopra indicate, in conformità con quanto previsto all’interno "+
+		"dell’informativa", "", fpdf.AlignLeft, false)
+	pdf.Ln(1)
+	setBlackBoldFont(pdf, standardTextSize)
+	pdf.MultiCell(0, 3, "1. Consenso al trattamento dei miei dati al fine di perfezionamento "+
+		"dell’offerta assicurativa e riassicurativa di cui alle lettere b) ed f) della presente "+
+		"informativa", "", fpdf.AlignLeft, false)
+	pdf.Ln(3)
+	drawSignatureForm(pdf)
+
 }
