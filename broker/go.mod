@@ -12,8 +12,8 @@ require (
 	github.com/wopta/goworkspace/document v1.0.57
 	github.com/wopta/goworkspace/lib v1.0.45
 	github.com/wopta/goworkspace/mail v1.0.21
-	github.com/wopta/goworkspace/models v1.0.86
-	github.com/wopta/goworkspace/payment v1.0.31
+	github.com/wopta/goworkspace/models v1.0.87
+	github.com/wopta/goworkspace/payment v1.0.32
 	github.com/wopta/goworkspace/user v1.0.6
 	github.com/wopta/goworkspace/wiseproxy v1.0.3
 )
