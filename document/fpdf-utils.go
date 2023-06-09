@@ -161,7 +161,7 @@ func printSurvey(pdf *fpdf.Fpdf, survey models.Survey) error {
 	leftMargin, _, rightMargin, _ := pdf.GetMargins()
 	pageWidth, _ := pdf.GetPageSize()
 	availableWidth := pageWidth - leftMargin - rightMargin - 2
-	rowWidth := pageWidth - leftMargin - rightMargin - 1
+	rowWidth := pageWidth - leftMargin - rightMargin - 2
 
 	setBlackBoldFont(pdf, standardTextSize)
 	if survey.HasAnswer {

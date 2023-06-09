@@ -60,7 +60,7 @@ func Life(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 
 	emitResumeSection(pdf, policy)
 
-	woptaAxaCompanyDescriptionSection(pdf)
+	companiesDescriptionSection(pdf, policy.Company)
 
 	axaHeader(pdf)
 
@@ -699,52 +699,6 @@ func contractWithdrawlSection(pdf *fpdf.Fpdf) {
 		"lettera raccomandata a.r. al seguente indirizzo: Wopta Assicurazioni srl – Gestione Portafoglio – Galleria del "+
 		"Corso, 1 – 201212 Milano (MI) oppure via posta elettronica certificata (PEC) all’indirizzo "+
 		"email: woptaassicurazioni@legalmail.it", "", "", false)
-}
-
-func paymentMethodSection(pdf *fpdf.Fpdf) {
-	getParagraphTitle(pdf, "Come puoi pagare il premio")
-	setBlackRegularFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3, "I mezzi di pagamento consentiti, nei confronti di Wopta, sono esclusivamente "+
-		"bonifico e strumenti di pagamento elettronico, quali ad esempio, carte di credito e/o carte di debito, "+
-		"incluse le carte prepagate. Oppure può essere pagato direttamente alla Compagnia alla "+
-		"stipula del contratto, via bonifico o carta di credito.", "", "", false)
-}
-
-func emitResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
-	var offerPrice string
-	emitDate := policy.EmitDate.Format(dateLayout)
-	startDate := policy.StartDate.Format(dateLayout)
-	if policy.OffersPrices["default"]["monthly"] != nil {
-		offerPrice = humanize.FormatFloat("#.###,##", policy.OffersPrices["default"]["monthly"].Gross*12)
-	} else {
-		offerPrice = humanize.FormatFloat("#.###,##", policy.OffersPrices["default"]["yearly"].Gross)
-	}
-	text := "Polizza emessa a Milano il " + emitDate + " per un importo di € " + offerPrice + " quale " +
-		"prima rata alla firma, il cui pagamento a saldo è da effettuarsi con i metodi di pagamento sopra indicati. " +
-		"Wopta conferma avvenuto incasso e copertura della polizza dal " + startDate + "."
-	getParagraphTitle(pdf, "Emissione polizza e pagamento della prima rata")
-	setBlackRegularFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3, text, "", "", false)
-}
-
-func woptaAxaCompanyDescriptionSection(pdf *fpdf.Fpdf) {
-	getParagraphTitle(pdf, "Chi siamo")
-	setBlackRegularFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3, "Wopta Assicurazioni S.r.l. - intermediario assicurativo, soggetto al controllo "+
-		"dell’IVASS ed iscritto dal 14.02.2022 al Registro Unico degli Intermediari, in Sezione A nr. A000701923, "+
-		"avente sede legale in Galleria del Corso, 1 – 20122 Milano (MI). Capitale sociale Euro 120.000 - "+
-		"Codice Fiscale, Reg. Imprese e Partita IVA: 12072020964 - Iscritta al Registro delle imprese di Milano – "+
-		"REA MI 2638708", "", "", false)
-	pdf.Ln(5)
-	pdf.MultiCell(0, 3, "AXA France Vie (compagnia assicurativa del gruppo AXA). Indirizzo sede legale in "+
-		"Francia: 313 Terrasses de l'Arche, 92727 NANTERRE CEDEX. Numero Iscrizione Registro delle Imprese di "+
-		"Nanterre: 310499959. Autorizzata in Francia (Stato di origine) all’esercizio delle assicurazioni, vigilata "+
-		"in Francia dalla Autorité de Contrôle Prudentiel et de Résolution (ACPR). Numero Matricola Registre des "+
-		"organismes d’assurance: 5020051. // Indirizzo Rappresentanza Generale per l’Italia: Corso Como n. 17, 20154 "+
-		"Milano - CF, P.IVA e N.Iscr. Reg. Imprese 08875230016 - REA MI-2525395 - Telefono: 02-87103548 - "+
-		"Fax: 02-23331247 - PEC: axafrancevie@legalmail.it – sito internet: www.clp.partners.axa/it. Ammessa ad "+
-		"operare in Italia in regime di stabilimento. Iscritta all’Albo delle imprese di assicurazione tenuto "+
-		"dall’IVASS, in appendice Elenco I, nr. I.00149.", "", "", false)
 }
 
 func axaDeclarationsConsentSection(pdf *fpdf.Fpdf, policy *models.Policy) {
@@ -1528,42 +1482,4 @@ func woptaPrivacySection(pdf *fpdf.Fpdf) {
 	pdf.MultiCell(0, 3, "Per esercitare i diritti di cui sopra o per qualunque altra richiesta può "+
 		"scrivere al Titolare del trattamento all’indirizzo: privacy@wopta.it.", "", "", false)
 	pdf.Ln(3)
-}
-
-func personalDataHandlingSection(pdf *fpdf.Fpdf, policy *models.Policy) {
-	consentText := "X"
-	notConsentText := ""
-
-	if policy.Contractor.Consens != nil {
-		consent, err := policy.ExtractConsens(2)
-		lib.CheckError(err)
-
-		if !consent.Answer {
-			consentText = ""
-			notConsentText = "X"
-		}
-	}
-
-	setPinkBoldFont(pdf, titleTextSize)
-	pdf.MultiCell(0, 3, "Consenso per finalità commerciali.", "", "", false)
-	pdf.Ln(1)
-	setBlackRegularFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3, "Il sottoscritto, letta e compresa l’informativa sul trattamento dei dati personali",
-		"", "", false)
-	pdf.Ln(1)
-	setBlackDrawColor(pdf)
-	pdf.Cell(5, 3, "")
-	pdf.CellFormat(3, 3, consentText, "1", 0, "CM", false, 0, "")
-	pdf.CellFormat(20, 3, "ACCONSENTE", "", 0, "", false, 0, "")
-	pdf.Cell(20, 3, "")
-	pdf.CellFormat(3, 3, notConsentText, "1", 0, "CM", false, 0, "")
-	pdf.CellFormat(20, 3, "NON ACCONSENTE", "", 1, "", false, 0, "")
-	pdf.Ln(1)
-	pdf.MultiCell(0, 3, "al trattamento dei propri dati personali da parte di Wopta Assicurazioni per "+
-		"l’invio di comunicazioni e proposte commerciali e di marketing, incluso l’invio di newsletter e ricerche di "+
-		"mercato, attraverso strumenti automatizzati (sms, mms, e-mail, ecc.) e non (posta cartacea e telefono "+
-		"con operatore).", "", "", false)
-	pdf.Ln(3)
-	pdf.Cell(0, 3, policy.EmitDate.Format(dateLayout))
-	drawSignatureForm(pdf)
 }

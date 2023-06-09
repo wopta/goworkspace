@@ -39,6 +39,20 @@ func Persona(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 
 	personaGuaranteesTable(pdf, policy)
 
+	personaSurveySection(pdf, policy)
+
+	pdf.AddPage()
+
+	personaStatementsSection(pdf, policy)
+
+	paymentMethodSection(pdf)
+
+	emitResumeSection(pdf, policy)
+
+	companiesDescriptionSection(pdf, policy.Company)
+
+	personalDataHandlingSection(pdf, policy)
+
 	filename, out := save(pdf, policy)
 	return filename, out
 }
@@ -90,7 +104,6 @@ func personaGuaranteesTable(pdf *fpdf.Fpdf, policy *models.Policy) {
 	offerName := policy.OfferlName
 	prod, err := product.GetProduct("persona", "v1")
 	lib.CheckError(err)
-	//h := []string{"Garanzie ", "Somma assicurata ", "Opzioni / Dettagli ", "Premio "}
 
 	guaranteesMap := map[string]map[string]string{}
 	var slugs []slugStruct
@@ -159,7 +172,7 @@ func personaGuaranteesTable(pdf *fpdf.Fpdf, policy *models.Policy) {
 	pdf.CellFormat(30, titleTextSize, "Somma Assicurata", "B", 0, fpdf.AlignCenter, false, 0, "")
 	pdf.CellFormat(5, titleTextSize, "", "B", 0, fpdf.AlignCenter, false, 0, "")
 	pdf.CellFormat(60, titleTextSize, "Opzioni/Dettagli", "B", 0, fpdf.AlignLeft, false, 0, "")
-	pdf.CellFormat(20, titleTextSize, "Premio", "B", 1, fpdf.AlignRight, false, 0, "")
+	pdf.CellFormat(15, titleTextSize, "Premio", "B", 1, fpdf.AlignRight, false, 0, "")
 	for _, slug := range slugs {
 		setBlackBoldFont(pdf, standardTextSize)
 		pdf.CellFormat(80, 6, guaranteesMap[slug.name]["name"], "B", 0, fpdf.AlignLeft, false, 0, "")
@@ -167,6 +180,25 @@ func personaGuaranteesTable(pdf *fpdf.Fpdf, policy *models.Policy) {
 		pdf.CellFormat(30, 6, guaranteesMap[slug.name]["sumInsuredLimitOfIndemnity"]+" €", "B", 0, fpdf.AlignRight, false, 0, "")
 		pdf.CellFormat(5, 6, "", "B", 0, fpdf.AlignRight, false, 0, "")
 		pdf.CellFormat(60, 6, guaranteesMap[slug.name]["details"], "B", 0, fpdf.AlignLeft, false, 0, "")
-		pdf.CellFormat(20, 6, guaranteesMap[slug.name]["price"], "B", 1, fpdf.AlignRight, false, 0, "")
+		pdf.CellFormat(15, 6, guaranteesMap[slug.name]["price"], "B", 1, fpdf.AlignRight, false, 0, "")
+	}
+}
+
+func personaSurveySection(pdf *fpdf.Fpdf, policy *models.Policy) {
+	surveys := *policy.Surveys
+
+	getParagraphTitle(pdf, "Dichiarazioni da leggere con attenzione prima di firmare")
+
+	for _, survey := range surveys {
+		err := printSurvey(pdf, survey)
+		lib.CheckError(err)
+	}
+}
+
+func personaStatementsSection(pdf *fpdf.Fpdf, policy *models.Policy) {
+	statements := *policy.Statements
+
+	for _, statement := range statements {
+		printStatement(pdf, statement)
 	}
 }
