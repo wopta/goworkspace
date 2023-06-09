@@ -14,6 +14,17 @@ var (
 	signatureID int
 )
 
+func LifeContract(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
+	var (
+		filename string
+		out      []byte
+	)
+
+	filename, out = Life(pdf, policy)
+
+	return filename, out
+}
+
 func Life(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 	signatureID = 0
 
