@@ -195,14 +195,14 @@ func globalHeader(pdf *fpdf.Fpdf) {
 		var opt fpdf.ImageOptions
 		pdf.SetXY(-30, 7)
 		opt.ImageType = "png"
-		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/logo_global_02.png", 190, 7, 0, 8, false, opt, 0, "")
+		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/logo_global_02.png", 180, 7, 0, 15, false, opt, 0, "")
 		pdf.Ln(15)
 	})
 }
 
 func globalFooter(pdf *fpdf.Fpdf) {
 	pdf.SetFooterFunc(func() {
-		pdf.SetXY(10, -25)
+		pdf.SetXY(10, -35)
 		setBlackRegularFont(pdf, smallTextSize)
 		pdf.MultiCell(0, 3, "Global Assistance Compagnia di assicurazioni e riassicurazioni S.p.A. a "+
 			"Socio Unico - Capitale Sociale: Euro 5.000.000 i.v. Codice Fiscale, Partita IVA e Registro Imprese di "+
