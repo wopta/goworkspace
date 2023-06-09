@@ -1,7 +1,6 @@
 package callback
 
 import (
-	"cloud.google.com/go/civil"
 	"encoding/base64"
 	"encoding/json"
 	"io"
@@ -12,11 +11,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/wopta/goworkspace/document"
-
 	"cloud.google.com/go/firestore"
-	lib "github.com/wopta/goworkspace/lib"
-	mail "github.com/wopta/goworkspace/mail"
+
+	"github.com/wopta/goworkspace/document"
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -104,7 +103,6 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 			policy.Updated = now
 			policy.Status = models.PolicyStatusPay
 			policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusPay)
-			//policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusToPay)
 			lib.SetFirestore(firePolicy, uid, policy)
 			policy.BigquerySave(r.Header.Get("origin"))
 			q := lib.Firequeries{
@@ -131,11 +129,8 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 			transaction.Status = models.TransactionStatusPay
 			transaction.StatusHistory = append(transaction.StatusHistory, models.TransactionStatusPay)
 			transaction.PayDate = now
-			transaction.BigPayDate = civil.DateTimeOf(transaction.PayDate)
-			transaction.BigCreationDate = civil.DateTimeOf(transaction.CreationDate)
-			transaction.BigStatusHistory = strings.Join(transaction.StatusHistory, ",")
 			lib.SetFirestore(fireTransactions, transaction.Uid, transaction)
-			e = lib.InsertRowsBigQuery("wopta", fireTransactions, transaction)
+			transaction.BigQuerySave(origin)
 			log.Println(uid + " payment sendMail ")
 			var contractbyte []byte
 			name := policy.Uid + ".pdf"

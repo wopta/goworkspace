@@ -1,6 +1,8 @@
 package lib
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
 	"net"
 	"net/http"
@@ -40,4 +42,23 @@ func getIP(req *http.Request) net.IP {
 
 	userIP := net.ParseIP(ip)
 	return userIP
+}
+
+func CheckPayload[T any](body []byte, payload *T, fields []string) error {
+	if len(body) == 0 {
+		return fmt.Errorf("Missing payload")
+	}
+
+	var bodyJson map[string]interface{}
+
+	err := json.Unmarshal(body, &bodyJson)
+	CheckError(err)
+
+	for _, param := range fields {
+		if _, ok := bodyJson[param]; !ok {
+			return fmt.Errorf("Missing paramenter %s", param)
+		}
+	}
+
+	return json.Unmarshal(body, payload)
 }
