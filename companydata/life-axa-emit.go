@@ -31,7 +31,7 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	dateString := "2021-11-22"
 	date, _ := time.Parse("2006-01-02", dateString)
 	log.Println(date)
-	if now.Day() == 15 || now.Day() == 8 {
+	if now.Day() == 15 || now.Day() == 1 {
 		from = fromQ
 		filenamesplit = "Q"
 	} else {
@@ -97,7 +97,7 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 
 	refMontly := now.AddDate(0, -1, 0)
 	filepath := "WOPTAKEYweb_NB" + filenamesplit + "_" + strconv.Itoa(refMontly.Year()) + fmt.Sprintf("%02d", int(refMontly.Month())) + "_" + fmt.Sprintf("%02d", now.Day()) + fmt.Sprintf("%02d", int(now.Month())) + ".txt"
-	lib.WriteCsv("../tmp/"+filepath, result)
+	lib.WriteCsv("../tmp/"+filepath, result, ';')
 	source, _ := ioutil.ReadFile("../tmp/" + filepath)
 	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/axa/life/"+filepath, source)
 	SftpUpload(filepath)
@@ -124,9 +124,11 @@ func setRow(policy models.Policy, df dataframe.DataFrame, trans models.Transacti
 			)
 			beneficiary1, beneficiary1S, beneficiary1T = mapBeneficiary(g, 0) //Codice Fiscale Beneficiario
 			beneficiary2, beneficiary2S, _ = mapBeneficiary(g, 1)
+			log.Println(g.PriceGross)
 			pricegrossround := fmt.Sprintf("%.2f", g.PriceGross)
 			pricegrossflat, _ := fmt.Println(strings.Replace(pricegrossround, ",", "", -1))
 			priceGrossFormat := fmt.Sprintf("%012d", pricegrossflat) // 000000001220
+			log.Println(priceGrossFormat)
 			row := []string{
 				mapCodecCompany(policy, g.CompanyCodec),           //Codice schema
 				policy.CodeCompany,                                //N° adesione individuale univoco
@@ -395,7 +397,7 @@ func setRow(policy models.Policy, df dataframe.DataFrame, trans models.Transacti
 }
 func getFormatdate(d time.Time) string {
 	var res string
-	res = strconv.Itoa(d.Year()) + fmt.Sprintf("%02d", int(d.Month())) + "_" + fmt.Sprintf("%02d", d.Day())
+	res = strconv.Itoa(d.Year()) + fmt.Sprintf("%02d", int(d.Month())) + fmt.Sprintf("%02d", d.Day())
 	return res
 
 }
