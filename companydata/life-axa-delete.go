@@ -24,7 +24,7 @@ func LifeAxaDelete(w http.ResponseWriter, r *http.Request) (string, interface{},
 
 	fromM := time.Now().AddDate(0, -1, 0)
 	fromQ := time.Now().AddDate(0, 0, -15)
-	if now.Day() == 15 || now.Day() == 8 {
+	if now.Day() == 15 || now.Day() == 1 {
 		from = fromQ
 		filenamesplit = "Q"
 	} else {
@@ -105,7 +105,7 @@ func LifeAxaDelete(w http.ResponseWriter, r *http.Request) (string, interface{},
 	//year, month, day := time.Now().Date()
 	//year2, month2, day2 := time.Now().AddDate(0, -1, 0).Date()
 	filepath := "WOPTAKEYweb_CAN" + filenamesplit + "_" + strconv.Itoa(refMontly.Year()) + fmt.Sprintf("%02d", int(refMontly.Month())) + "_" + fmt.Sprintf("%02d", now.Day()) + fmt.Sprintf("%02d", int(now.Month())) + ".txt"
-	lib.WriteCsv("../tmp/"+filepath, result)
+	lib.WriteCsv("../tmp/"+filepath, result, ';')
 	source, _ := ioutil.ReadFile("../tmp/" + filepath)
 	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "axa/life/"+filepath, source)
 	SftpUpload(filepath)
