@@ -61,6 +61,7 @@ func Payment(w http.ResponseWriter, r *http.Request) {
 				Route:   "/manual/v1/:transactionUid",
 				Handler: ManualPay,
 				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},
 		},
 	}
