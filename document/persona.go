@@ -1,8 +1,12 @@
 package document
 
 import (
+	"github.com/dustin/go-humanize"
 	"github.com/go-pdf/fpdf"
+	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/product"
+	"sort"
 	"strings"
 )
 
@@ -32,6 +36,8 @@ func Persona(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 	pdf.AddPage()
 
 	personaInsuredInfoSection(pdf, policy)
+
+	personaGuaranteesTable(pdf, policy)
 
 	filename, out := save(pdf, policy)
 	return filename, out
@@ -75,5 +81,92 @@ func personaInsuredInfoSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 }
 
 func personaGuaranteesTable(pdf *fpdf.Fpdf, policy *models.Policy) {
+	type slugStruct struct {
+		name  string
+		order int64
+	}
 
+	var table [][]string
+	offerName := policy.OfferlName
+	prod, err := product.GetProduct("persona", "v1")
+	lib.CheckError(err)
+	//h := []string{"Garanzie ", "Somma assicurata ", "Opzioni / Dettagli ", "Premio "}
+
+	guaranteesMap := map[string]map[string]string{}
+	var slugs []slugStruct
+
+	for guaranteeSlug, guarantee := range prod.Companies[0].GuaranteesMap {
+		guaranteesMap[guaranteeSlug] = make(map[string]string, 0)
+
+		guaranteesMap[guaranteeSlug]["name"] = guarantee.CompanyName
+		guaranteesMap[guaranteeSlug]["sumInsuredLimitOfIndemnity"] = "====="
+		guaranteesMap[guaranteeSlug]["details"] = "====="
+		guaranteesMap[guaranteeSlug]["price"] = "====="
+		slugs = append(slugs, slugStruct{name: guaranteeSlug, order: guarantee.Order})
+	}
+
+	sort.Slice(slugs, func(i, j int) bool {
+		return slugs[i].order < slugs[j].order
+	})
+
+	for _, asset := range policy.Assets {
+		for _, guarantee := range asset.Guarantees {
+			var price float64
+			var details string
+
+			guaranteesMap[guarantee.Slug]["sumInsuredLimitOfIndemnity"] = humanize.FormatFloat("#.###,", guarantee.Offer[offerName].SumInsuredLimitOfIndemnity)
+			if policy.PaymentSplit == string(models.PaySplitMonthly) {
+				price = guarantee.Value.PremiumGrossMonthly * 12
+			} else {
+				price = guarantee.Value.PremiumGrossYearly
+			}
+			guaranteesMap[guarantee.Slug]["price"] = humanize.FormatFloat("#.###,##", price) + " €"
+
+			switch guarantee.Slug {
+			case "IPI":
+				details = "Franchigia " + guarantee.Value.Deductible + guarantee.Value.DeductibleUnit
+				if guarantee.Value.DeductibleType == "absolute" {
+					details += " Assoluta"
+				} else {
+					details += " Assorbibile"
+				}
+			case "D":
+				if guarantee.Beneficiaries != nil {
+					details = "Beneficiari\n"
+					for _, beneficiary := range *guarantee.Beneficiaries {
+						details += beneficiary.Name + " " + beneficiary.Surname + "\n"
+					}
+				} else {
+					details = "===="
+				}
+			case "ITI":
+				details = "Franchigia " + guarantee.Value.Deductible + " " + guarantee.Offer[offerName].DeductibleUnit
+			default:
+				details = "====="
+			}
+			guaranteesMap[guarantee.Slug]["details"] = details
+		}
+	}
+
+	for _, slug := range slugs {
+		r := []string{guaranteesMap[slug.name]["name"], guaranteesMap[slug.name]["sumInsuredLimitOfIndemnity"],
+			guaranteesMap[slug.name]["details"], guaranteesMap[slug.name]["price"]}
+		table = append(table, r)
+	}
+
+	setBlackBoldFont(pdf, titleTextSize)
+	pdf.CellFormat(80, titleTextSize, "Garanzie", "B", 0, fpdf.AlignCenter, false, 0, "")
+	pdf.CellFormat(30, titleTextSize, "Somma Assicurata", "B", 0, fpdf.AlignCenter, false, 0, "")
+	pdf.CellFormat(5, titleTextSize, "", "B", 0, fpdf.AlignCenter, false, 0, "")
+	pdf.CellFormat(60, titleTextSize, "Opzioni/Dettagli", "B", 0, fpdf.AlignLeft, false, 0, "")
+	pdf.CellFormat(20, titleTextSize, "Premio", "B", 1, fpdf.AlignRight, false, 0, "")
+	for _, slug := range slugs {
+		setBlackBoldFont(pdf, standardTextSize)
+		pdf.CellFormat(80, 6, guaranteesMap[slug.name]["name"], "B", 0, fpdf.AlignLeft, false, 0, "")
+		setBlackRegularFont(pdf, standardTextSize)
+		pdf.CellFormat(30, 6, guaranteesMap[slug.name]["sumInsuredLimitOfIndemnity"]+" €", "B", 0, fpdf.AlignRight, false, 0, "")
+		pdf.CellFormat(5, 6, "", "B", 0, fpdf.AlignRight, false, 0, "")
+		pdf.CellFormat(60, 6, guaranteesMap[slug.name]["details"], "B", 0, fpdf.AlignLeft, false, 0, "")
+		pdf.CellFormat(20, 6, guaranteesMap[slug.name]["price"], "B", 1, fpdf.AlignRight, false, 0, "")
+	}
 }
