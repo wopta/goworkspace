@@ -21,6 +21,9 @@ func ManualPay(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	var payload ManualPayPayload
 
 	err := lib.CheckPayload[ManualPayPayload](body, &payload, []string{"paymentMethod"})
+	if err != nil {
+		return "", nil, err
+	}
 
 	origin := r.Header.Get("origin")
 	transactionUid := r.Header.Get("transactionUid")
