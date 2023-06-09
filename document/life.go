@@ -110,7 +110,6 @@ func Life(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 
 func insuredInfoSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	getParagraphTitle(pdf, "La tua assicurazione è operante per il seguente Assicurato e Garanzie")
-	pdf.Ln(8)
 	insuredInfoTable(pdf, policy.Assets[0].Person)
 }
 
@@ -253,7 +252,6 @@ func lifeGuaranteesTable(pdf *fpdf.Fpdf, policy *models.Policy) {
 func avvertenzeBeneficiariSection(pdf *fpdf.Fpdf) {
 	getParagraphTitle(pdf, "Nomina dei Beneficiari e Referente terzo, per il caso di garanzia Decesso "+
 		"(qualora sottoscritta)")
-	pdf.Ln(8)
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "AVVERTENZE: Può scegliere se designare nominativamente i beneficiari o se "+
 		"designare genericamente come beneficiari i suoi eredi legittimi e/o testamentari. In caso di mancata "+
@@ -319,7 +317,6 @@ func beneficiariesSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	}
 
 	getParagraphTitle(pdf, "Beneficiario")
-	pdf.Ln(8)
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.CellFormat(0, 3, "Io sottoscritto Assicurato, con la sottoscrizione della presente polizza, in "+
 		"riferimento alla garanzia Decesso:", "", 0, "", false, 0, "")
@@ -416,7 +413,6 @@ func beneficiaryReferenceSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	}
 
 	getParagraphTitle(pdf, "Referente terzo")
-	pdf.Ln(8)
 	beneficiaryReferenceTable(pdf, beneficiaryReference)
 	pdf.Ln(2)
 }
@@ -469,13 +465,11 @@ func surveysSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	}
 
 	getParagraphTitle(pdf, "Dichiarazioni da leggere con attenzione prima di firmare")
-	pdf.Ln(8)
 	err := printSurvey(pdf, surveys[0])
 	lib.CheckError(err)
 
 	pdf.AddPage()
 	getParagraphTitle(pdf, "Questionario Medico")
-	pdf.Ln(8)
 	for _, survey := range surveys[1:] {
 		err := printSurvey(pdf, survey)
 		lib.CheckError(err)
@@ -551,7 +545,6 @@ func offerResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	}
 
 	getParagraphTitle(pdf, "Il premio per tutte le coperture assicurative attivate sulla polizza – Frazionamento: "+paymentSplit)
-	pdf.Ln(8)
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.SetTextColor(0, 0, 0)
 	pdf.CellFormat(40, 2, "Premio", "", 0, "", false, 0, "")
@@ -609,7 +602,6 @@ func paymentResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	}
 
 	getParagraphTitle(pdf, "Pagamento dei premi successivi al primo")
-	pdf.Ln(8)
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "Il Contraente è tenuto a pagare i Premi entro 30 giorni dalle relative scadenze. "+
 		"In caso di mancato pagamento del premio entro 30 giorni dalla scadenza (c.d. termine di tolleranza) "+
@@ -684,7 +676,6 @@ func paymentResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 
 func contractWithdrawlSection(pdf *fpdf.Fpdf) {
 	getParagraphTitle(pdf, "Informativa sul diritto di recesso")
-	pdf.Ln(8)
 	setBlackBoldFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "Diritto di recesso entro i primi 30 giorni dalla stipula ("+
 		"diritto di ripensamento)", "", "", false)
@@ -712,7 +703,6 @@ func contractWithdrawlSection(pdf *fpdf.Fpdf) {
 
 func paymentMethodSection(pdf *fpdf.Fpdf) {
 	getParagraphTitle(pdf, "Come puoi pagare il premio")
-	pdf.Ln(8)
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "I mezzi di pagamento consentiti, nei confronti di Wopta, sono esclusivamente "+
 		"bonifico e strumenti di pagamento elettronico, quali ad esempio, carte di credito e/o carte di debito, "+
@@ -733,14 +723,12 @@ func emitResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 		"prima rata alla firma, il cui pagamento a saldo è da effettuarsi con i metodi di pagamento sopra indicati. " +
 		"Wopta conferma avvenuto incasso e copertura della polizza dal " + startDate + "."
 	getParagraphTitle(pdf, "Emissione polizza e pagamento della prima rata")
-	pdf.Ln(8)
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, text, "", "", false)
 }
 
 func woptaAxaCompanyDescriptionSection(pdf *fpdf.Fpdf) {
 	getParagraphTitle(pdf, "Chi siamo")
-	pdf.Ln(8)
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "Wopta Assicurazioni S.r.l. - intermediario assicurativo, soggetto al controllo "+
 		"dell’IVASS ed iscritto dal 14.02.2022 al Registro Unico degli Intermediari, in Sezione A nr. A000701923, "+
