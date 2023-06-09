@@ -25,7 +25,7 @@ type Transaction struct {
 	ScheduleDate       string                `firestore:"scheduleDate,omitempty" json:"scheduleDate,omitempty" bigquery:"scheduleDate"`
 	PayDate            time.Time             `firestore:"payDate,omitempty" json:"payDate,omitempty" bigquery:"-"`
 	CreationDate       time.Time             `firestore:"creationDate,omitempty" json:"creationDate,omitempty" bigquery:"-"`
-	BigPayDate         bigquery.NullDateTime `firestore:"-" json:"-" bigquery:"payDate,nullable"`
+	BigPayDate         bigquery.NullDateTime `firestore:"-" json:"-" bigquery:"payDate"`
 	BigCreationDate    civil.DateTime        `firestore:"-" json:"-" bigquery:"creationDate"`
 	Uid                string                `firestore:"uid,omitempty" json:"uid,omitempty" bigquery:"uid"`
 	PolicyUid          string                `firestore:"policyUid,omitempty" json:"policyUid,omitempty" bigquery:"policyUid"`
