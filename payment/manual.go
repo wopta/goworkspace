@@ -11,8 +11,8 @@ import (
 )
 
 type ManualPayPayload struct {
-	PaymentMethod string
-	Note          string
+	PaymentMethod string `json:"paymentMethod"`
+	Note          string `json:"note"`
 }
 
 func ManualPay(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
