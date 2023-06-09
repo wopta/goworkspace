@@ -127,7 +127,7 @@ func personaGuaranteesTable(pdf *fpdf.Fpdf, policy *models.Policy) {
 			var price float64
 			var details string
 
-			guaranteesMap[guarantee.Slug]["sumInsuredLimitOfIndemnity"] = humanize.FormatFloat("#.###,", guarantee.Offer[offerName].SumInsuredLimitOfIndemnity)
+			guaranteesMap[guarantee.Slug]["sumInsuredLimitOfIndemnity"] = humanize.FormatFloat("#.###,", guarantee.Offer[offerName].SumInsuredLimitOfIndemnity) + " €"
 			if policy.PaymentSplit == string(models.PaySplitMonthly) {
 				price = guarantee.Value.PremiumGrossMonthly * 12
 			} else {
@@ -177,7 +177,7 @@ func personaGuaranteesTable(pdf *fpdf.Fpdf, policy *models.Policy) {
 		setBlackBoldFont(pdf, standardTextSize)
 		pdf.CellFormat(80, 6, guaranteesMap[slug.name]["name"], "B", 0, fpdf.AlignLeft, false, 0, "")
 		setBlackRegularFont(pdf, standardTextSize)
-		pdf.CellFormat(30, 6, guaranteesMap[slug.name]["sumInsuredLimitOfIndemnity"]+" €", "B", 0, fpdf.AlignRight, false, 0, "")
+		pdf.CellFormat(30, 6, guaranteesMap[slug.name]["sumInsuredLimitOfIndemnity"], "B", 0, fpdf.AlignRight, false, 0, "")
 		pdf.CellFormat(5, 6, "", "B", 0, fpdf.AlignRight, false, 0, "")
 		pdf.CellFormat(60, 6, guaranteesMap[slug.name]["details"], "B", 0, fpdf.AlignLeft, false, 0, "")
 		pdf.CellFormat(15, 6, guaranteesMap[slug.name]["price"], "B", 1, fpdf.AlignRight, false, 0, "")
