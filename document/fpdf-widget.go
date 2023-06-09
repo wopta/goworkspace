@@ -21,7 +21,7 @@ func mainHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 		logoPath = lib.GetAssetPathByEnv(basePath) + "/pmi.png"
 		productName = "Artigiani & Imprese"
 	case "persona":
-		logoPath = lib.GetAssetPathByEnv(basePath) + "persona.png"
+		logoPath = lib.GetAssetPathByEnv(basePath) + "/persona.png"
 		productName = "Persona"
 	}
 
