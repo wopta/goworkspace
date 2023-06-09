@@ -48,6 +48,7 @@ type Guarante struct {
 	Subtitle                   string                     `firestore:"subtitle" json:"subtitle"  bigquery:"-"`
 	Reserved                   bool                       `json:"reserved" firestore:"reserved" bigquery:"-"`
 	ReservedConfig             map[string]*ReservedLimits `json:"reservedConfig,omitempty" firestore:"reservedConfig,omitempty" bigquery:"-"`
+	Order                      int64                      `json:"order,omitempty" firestore:"order,omitempty" bigquery:"-"`
 }
 
 type GuaranteValue struct {
@@ -55,6 +56,7 @@ type GuaranteValue struct {
 	Deductible                 string              `firestore:"deductible,omitempty" json:"deductible,omitempty"`
 	DeductibleValues           GuaranteFieldValue  `firestore:"deductibleValues,omitempty" json:"deductibleValues,omitempty"`
 	DeductibleType             string              `firestore:"deductibleType,omitempty" json:"deductibleType,omitempty"`
+	DeductibleUnit             string              `firestore:"deductibleUnit,omitempty" json:"deductibleUnit,omitempty"`
 	SumInsuredLimitOfIndemnity float64             `json:"sumInsuredLimitOfIndemnity,omitempty" json:"sumInsuredLimitOfIndemnity,omitempty"`
 	SumInsured                 float64             `json:"sumInsured,omitempty" json:"sumInsured,omitempty"`
 	LimitOfIndemnity           float64             `json:"limitOfIndemnity,omitempty" json:"limitOfIndemnity,omitempty"`
