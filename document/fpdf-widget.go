@@ -209,7 +209,7 @@ func globalHeader(pdf *fpdf.Fpdf) {
 
 func globalFooter(pdf *fpdf.Fpdf) {
 	pdf.SetFooterFunc(func() {
-		pdf.SetXY(10, -35)
+		pdf.SetXY(10, -25)
 		setBlackRegularFont(pdf, smallTextSize)
 		pdf.MultiCell(0, 3, "Global Assistance Compagnia di assicurazioni e riassicurazioni S.p.A. a "+
 			"Socio Unico - Capitale Sociale: Euro 5.000.000 i.v. Codice Fiscale, Partita IVA e Registro Imprese di "+
