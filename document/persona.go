@@ -227,6 +227,15 @@ func personaStatementsSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	for _, statement := range statements {
 		printStatement(pdf, statement)
 	}
+	pdf.SetY(pdf.GetY() - 28)
+	setBlackBoldFont(pdf, standardTextSize)
+	pdf.MultiCell(70, 3, "Global Assistance", "",
+		fpdf.AlignCenter, false)
+	var opt fpdf.ImageOptions
+	opt.ImageType = "png"
+	pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/firma_global.png", 30, pdf.GetY()+3, 40, 12,
+		false, opt, 0, "")
+	pdf.Ln(20)
 }
 
 func globalStamentsAndConsens(pdf *fpdf.Fpdf) {
