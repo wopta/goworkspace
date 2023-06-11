@@ -183,12 +183,13 @@ func personaGuaranteesTable(pdf *fpdf.Fpdf, policy *models.Policy) {
 	pdf.CellFormat(15, titleTextSize, "Premio", "B", 1, fpdf.AlignRight, false, 0, "")
 	for _, slug := range slugs {
 		setBlackBoldFont(pdf, standardTextSize)
-		pdf.CellFormat(80, 6, guaranteesMap[slug.name]["name"], "B", 0, fpdf.AlignLeft, false, 0, "")
+		pdf.CellFormat(80, 6, guaranteesMap[slug.name]["name"], "", 0, fpdf.AlignLeft, false, 0, "")
 		setBlackRegularFont(pdf, standardTextSize)
-		pdf.CellFormat(30, 6, guaranteesMap[slug.name]["sumInsuredLimitOfIndemnity"], "B", 0, fpdf.AlignRight, false, 0, "")
-		pdf.CellFormat(5, 6, "", "B", 0, fpdf.AlignRight, false, 0, "")
-		pdf.CellFormat(60, 6, guaranteesMap[slug.name]["details"], "B", 0, fpdf.AlignLeft, false, 0, "")
-		pdf.CellFormat(15, 6, guaranteesMap[slug.name]["price"], "B", 1, fpdf.AlignRight, false, 0, "")
+		pdf.CellFormat(30, 6, guaranteesMap[slug.name]["sumInsuredLimitOfIndemnity"], "", 0, fpdf.AlignRight, false, 0, "")
+		pdf.CellFormat(5, 6, "", "", 0, fpdf.AlignRight, false, 0, "")
+		pdf.CellFormat(60, 6, guaranteesMap[slug.name]["details"], "", 0, fpdf.AlignLeft, false, 0, "")
+		pdf.CellFormat(15, 6, guaranteesMap[slug.name]["price"], "", 1, fpdf.AlignRight, false, 0, "")
+		drawPinkHorizontalLine(pdf, thinLineWidth)
 	}
 }
 
@@ -235,7 +236,7 @@ func personaStatementsSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 		fpdf.AlignCenter, false)
 	var opt fpdf.ImageOptions
 	opt.ImageType = "png"
-	pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/firma_global.png", 30, pdf.GetY()+3, 40, 12,
+	pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/firma_global.png", 25, pdf.GetY()+3, 40, 12,
 		false, opt, 0, "")
 	pdf.Ln(20)
 }
