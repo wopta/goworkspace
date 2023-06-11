@@ -161,7 +161,7 @@ func printSurvey(pdf *fpdf.Fpdf, survey models.Survey) error {
 	leftMargin, _, rightMargin, _ := pdf.GetMargins()
 	pageWidth, _ := pdf.GetPageSize()
 	availableWidth := pageWidth - leftMargin - rightMargin - 2
-	rowWidth := pageWidth - leftMargin - rightMargin - 2
+	rowWidth := pageWidth - leftMargin - rightMargin - 1
 
 	setBlackBoldFont(pdf, standardTextSize)
 	if survey.HasAnswer {
@@ -177,7 +177,7 @@ func printSurvey(pdf *fpdf.Fpdf, survey models.Survey) error {
 		dotWidth := pdf.GetStringWidth(".")
 
 		var surveyWidth, paddingWidth float64
-		lines := pdf.SplitText(survey.Title, rowWidth)
+		lines := pdf.SplitText(survey.Title+answer, rowWidth)
 
 		surveyWidth = pdf.GetStringWidth(lines[len(lines)-1])
 		paddingWidth = availableWidth - surveyWidth - answerWidth
@@ -220,7 +220,7 @@ func printSurvey(pdf *fpdf.Fpdf, survey models.Survey) error {
 			answerWidth := pdf.GetStringWidth(answer)
 			dotWidth := pdf.GetStringWidth(".")
 
-			lines := pdf.SplitText(question.Question, rowWidth)
+			lines := pdf.SplitText(question.Question+answer, rowWidth)
 
 			questionWidth = pdf.GetStringWidth(lines[len(lines)-1])
 			paddingWidth = availableWidth - questionWidth - answerWidth
