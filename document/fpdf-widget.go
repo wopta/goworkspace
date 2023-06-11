@@ -87,18 +87,25 @@ func mainFooter(pdf *fpdf.Fpdf, productName string) {
 	var (
 		opt                  fpdf.ImageOptions
 		footerText, logoPath string
+		x, y, height         float64
 	)
 
 	switch productName {
 	case "life":
 		footerText = "Wopta per te. Vita è un prodotto assicurativo di AXA France Vie S.A. – Rappresentanza Generale per l’Italia\ndistribuito da Wopta Assicurazioni S.r.l."
 		logoPath = lib.GetAssetPathByEnv(basePath) + "/axa/logo.png"
+		x = 190
+		y = 281
+		height = 8
 	case "pmi":
 		footerText = ""
 		logoPath = ""
 	case "persona":
 		footerText = "Wopta per te. Persona è un prodotto assicurativo di Global Assistance Compagnia di assicurazioni e riassicurazioni S.p.A, distribuito da Wopta Assicurazioni S.r.l"
 		logoPath = lib.GetAssetPathByEnv(basePath) + "/logo_global.png"
+		x = 180
+		y = 280
+		height = 10
 	}
 
 	pdf.SetFooterFunc(func() {
@@ -106,7 +113,7 @@ func mainFooter(pdf *fpdf.Fpdf, productName string) {
 		setPinkRegularFont(pdf, smallTextSize)
 		pdf.MultiCell(0, 3, footerText, "", "", false)
 		opt.ImageType = "png"
-		pdf.ImageOptions(logoPath, 190, 281, 0, 8, false, opt, 0, "")
+		pdf.ImageOptions(logoPath, x, y, 0, height, false, opt, 0, "")
 		pdf.SetY(-7)
 		pageNumber(pdf)
 	})
