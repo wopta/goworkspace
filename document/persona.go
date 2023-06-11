@@ -43,6 +43,8 @@ func Persona(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 
 	personaStatementsSection(pdf, policy)
 
+	personaOfferResumeSection(pdf, policy)
+
 	paymentMethodSection(pdf)
 
 	emitResumeSection(pdf, policy)
@@ -236,6 +238,70 @@ func personaStatementsSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/firma_global.png", 30, pdf.GetY()+3, 40, 12,
 		false, opt, 0, "")
 	pdf.Ln(20)
+}
+
+func personaOfferResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
+	var (
+		tableInfo [][]string
+	)
+
+	switch policy.PaymentSplit {
+	case string(models.PaySplitMonthly):
+		tableInfo = [][]string{
+			{
+				"Mensile firma del contratto",
+				lib.HumanaizePriceEuro(policy.PriceNett),
+				lib.HumanaizePriceEuro(policy.PriceGross - policy.PriceNett),
+				lib.HumanaizePriceEuro(policy.PriceGross),
+			},
+			{
+				"Pari ad un premio Annuale",
+				lib.HumanaizePriceEuro(policy.PriceNett * 12),
+				lib.HumanaizePriceEuro(policy.PriceGross - policy.PriceNett*12),
+				lib.HumanaizePriceEuro(policy.PriceGross * 12),
+			},
+		}
+	case string(models.PaySplitYear):
+		tableInfo = [][]string{
+			{
+				"Annuale firma del contratto",
+				lib.HumanaizePriceEuro(policy.PriceNett),
+				lib.HumanaizePriceEuro(policy.PriceGross - policy.PriceNett),
+				lib.HumanaizePriceEuro(policy.PriceGross),
+			},
+		}
+	}
+
+	getParagraphTitle(pdf, "Il premio per tutte le coperture assicurative attivate sulla polizza")
+	setBlackRegularFont(pdf, standardTextSize)
+	pdf.SetTextColor(0, 0, 0)
+	pdf.CellFormat(40, 2, "Premio", "", 0, "", false, 0, "")
+	pdf.SetX(pdf.GetX() + 20)
+	pdf.CellFormat(40, 2, "Imponibile", "", 0, "", false, 0, "")
+	pdf.SetX(pdf.GetX() + 15)
+	pdf.CellFormat(40, 2, "Imposte Assicurative", "", 0, "", false, 0, "")
+	pdf.SetX(pdf.GetX() + 15)
+	pdf.CellFormat(40, 2, "Totale", "", 0, "", false, 0, "")
+	pdf.Ln(3)
+	drawPinkHorizontalLine(pdf, thinLineWidth)
+	pdf.Ln(1)
+	for _, info := range tableInfo {
+		pdf.CellFormat(40, 2, info[0], "", 0, "", false, 0,
+			"")
+		pdf.SetX(pdf.GetX() + 8)
+		pdf.CellFormat(40, 2, info[1], "", 0,
+			"CM", false, 0, "")
+		pdf.SetX(pdf.GetX() + 20)
+		pdf.CellFormat(40, 2, info[2], "", 0,
+			"CM", false, 0, "")
+		pdf.SetX(pdf.GetX() + 18)
+		pdf.CellFormat(20, 2, info[3], "",
+			0, "CM", false, 0, "")
+		pdf.Ln(3)
+		drawPinkHorizontalLine(pdf, thinLineWidth)
+		pdf.Ln(1)
+	}
+
 }
 
 func globalStamentsAndConsens(pdf *fpdf.Fpdf) {
