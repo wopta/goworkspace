@@ -41,8 +41,6 @@ func Persona(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 
 	personaSurveySection(pdf, policy)
 
-	pdf.AddPage()
-
 	personaStatementsSection(pdf, policy)
 
 	paymentMethodSection(pdf)
@@ -196,11 +194,31 @@ func personaSurveySection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	surveys := *policy.Surveys
 
 	getParagraphTitle(pdf, "Dichiarazioni da leggere con attenzione prima di firmare")
+	err := printSurvey(pdf, surveys[0])
+	lib.CheckError(err)
 
-	for _, survey := range surveys {
-		err := printSurvey(pdf, survey)
-		lib.CheckError(err)
+	getParagraphTitle(pdf, "Questionario Medico")
+	if len(surveys) == 3 {
+		for _, survey := range surveys[1:2] {
+			err = printSurvey(pdf, survey)
+			lib.CheckError(err)
+		}
+		pdf.AddPage()
+	} else {
+		for _, survey := range surveys[1:3] {
+			err = printSurvey(pdf, survey)
+			lib.CheckError(err)
+		}
 	}
+
+	surveys[len(surveys)-1].Title = ""
+	getParagraphTitle(pdf, "Tutela Privacy")
+	err = printSurvey(pdf, surveys[len(surveys)-1])
+	lib.CheckError(err)
+
+	pdf.Ln(5)
+	drawSignatureForm(pdf)
+	pdf.Ln(10)
 }
 
 func personaStatementsSection(pdf *fpdf.Fpdf, policy *models.Policy) {
