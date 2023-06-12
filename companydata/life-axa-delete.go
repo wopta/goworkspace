@@ -72,7 +72,7 @@ func LifeAxaDelete(w http.ResponseWriter, r *http.Request) (string, interface{},
 	}
 	query, e := q.FirestoreWherefields("policy")
 	policies := models.PolicyToListData(query)
-	result = append(result, getHeader())
+	//result = append(result, getHeader())
 	for _, policy := range policies {
 
 		for _, asset := range policy.Assets {

@@ -53,7 +53,7 @@ func Payment(w http.ResponseWriter, r *http.Request) {
 			},
 			{
 				Route:   "/v1/:uid",
-				Handler: CriptoPay,
+				Handler: FabrickExpireBill,
 				Method:  http.MethodDelete,
 				Roles:   []string{models.UserRoleAll},
 			},

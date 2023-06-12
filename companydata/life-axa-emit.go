@@ -84,7 +84,7 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	log.Println("transaction")
 	log.Println(e)
 	transactions := models.TransactionToListData(query)
-	result = append(result, getHeader())
+	//result = append(result, getHeader())
 	for _, transaction := range transactions {
 		var (
 			policy models.Policy
@@ -119,13 +119,20 @@ func setRow(policy models.Policy, df dataframe.DataFrame, trans models.Transacti
 
 		for _, g := range asset.Guarantees {
 			var (
+				price                                     float64
 				beneficiary1, beneficiary2, beneficiary1T string
 				beneficiary1S, beneficiary2S              models.Beneficiary
 			)
 			beneficiary1, beneficiary1S, beneficiary1T = mapBeneficiary(g, 0) //Codice Fiscale Beneficiario
 			beneficiary2, beneficiary2S, _ = mapBeneficiary(g, 1)
-			log.Println(g.PriceGross)
-			var intNum = int(g.PriceGross * 100)
+			if policy.PaymentSplit == "monthly" {
+				price = g.Value.PremiumGrossMonthly
+			} else {
+				price = g.Value.PremiumGrossYearly
+			}
+
+			log.Println(price)
+			var intNum = int(price * 100)
 			priceGrossFormat := fmt.Sprintf("%012d", intNum) // 000000001220
 			log.Println(priceGrossFormat)
 			row := []string{
