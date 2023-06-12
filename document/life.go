@@ -20,12 +20,12 @@ func LifeContract(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 		out      []byte
 	)
 
-	filename, out = Life(pdf, policy)
+	filename, out = LifeAxa(pdf, policy)
 
 	return filename, out
 }
 
-func Life(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
+func LifeAxa(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 	signatureID = 0
 
 	mainHeader(pdf, policy)
@@ -880,7 +880,7 @@ func axaTableSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	pdf.Ln(1)
 
 	setBlackRegularFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3, "C. dichiaro di NON essere una Persona Politicamente Esposta", "",
+	pdf.MultiCell(0, 3, "C. dichiaro di NON essere una PersonaGlobal Politicamente Esposta", "",
 		"", false)
 	pdf.CellFormat(4, 3, "", "", 0, "", false, 0, "")
 	pdf.CellFormat(0, 3, "In caso di risposta affermativa indicare la tipologia:", "", 1,

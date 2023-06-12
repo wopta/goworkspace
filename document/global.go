@@ -23,7 +23,7 @@ func (skin Skin) GlobalContract(m pdf.Maroto, data models.Policy) {
 	)
 	if data.Name == "persona" {
 		logo = "/persona.png"
-		name = "Persona"
+		name = "PersonaGlobal"
 		if data.Contractor.Residence != nil {
 			data.Contractor.Address = data.Contractor.Residence.StreetName
 			data.Contractor.StreetNumber = data.Contractor.Residence.StreetNumber
@@ -39,7 +39,7 @@ func (skin Skin) GlobalContract(m pdf.Maroto, data models.Policy) {
 			data.PriceGross = data.OffersPrices[data.OfferlName]["monthly"].Gross
 		}
 		m = skin.GetHeader(m, data, logo, name)
-		m = skin.GetFooter(m, "/logo_global.png", "Wopta per te. Persona è un prodotto assicurativo di Global Assistance Compagnia di assicurazioni e riassicurazioni S.p.A, distribuito da Wopta Assicurazioni S.r.l")
+		m = skin.GetFooter(m, "/logo_global.png", "Wopta per te. PersonaGlobal è un prodotto assicurativo di Global Assistance Compagnia di assicurazioni e riassicurazioni S.p.A, distribuito da Wopta Assicurazioni S.r.l")
 		m = skin.Space(m, 5.0)
 		m = skin.GetPersona(data, m)
 		m = skin.CoveragesPersonTable(m, data)

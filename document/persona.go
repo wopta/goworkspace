@@ -21,12 +21,12 @@ func PersonaContract(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 		out      []byte
 	)
 
-	filename, out = Persona(pdf, policy)
+	filename, out = PersonaGlobal(pdf, policy)
 
 	return filename, out
 }
 
-func Persona(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
+func PersonaGlobal(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 	signatureID = 0
 
 	mainHeader(pdf, policy)
@@ -52,14 +52,6 @@ func Persona(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 	companiesDescriptionSection(pdf, policy.Company)
 
 	personalDataHandlingSection(pdf, policy)
-
-	globalHeader(pdf)
-
-	pdf.AddPage()
-
-	globalFooter(pdf)
-
-	globalStamentsAndConsens(pdf)
 
 	filename, out := save(pdf, policy)
 	return filename, out
@@ -302,6 +294,10 @@ func personaOfferResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 		drawPinkHorizontalLine(pdf, thinLineWidth)
 		pdf.Ln(1)
 	}
+	setBlackRegularFont(pdf, smallTextSize)
+	pdf.MultiCell(0, 3, "In caso di sostituzione, il premio alla firma è al netto dell’eventuale rimborso"+
+		" dei premi non goduti sulla polizza sostituita e tiene conto dell’eventuale diversa durata rispetto alle"+
+		" rate successive.", "", fpdf.AlignLeft, false)
 
 }
 
