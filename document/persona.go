@@ -192,17 +192,16 @@ func personaSurveySection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	err := printSurvey(pdf, surveys[0])
 	lib.CheckError(err)
 
-	getParagraphTitle(pdf, "Questionario Medico")
+	pdf.Ln(5)
 	if len(surveys) == 3 {
-		for _, survey := range surveys[1:2] {
-			err = printSurvey(pdf, survey)
-			lib.CheckError(err)
-		}
+		err = printSurvey(pdf, surveys[1])
+		lib.CheckError(err)
 		pdf.AddPage()
 	} else {
 		for _, survey := range surveys[1:3] {
 			err = printSurvey(pdf, survey)
 			lib.CheckError(err)
+			pdf.Ln(5)
 		}
 	}
 
