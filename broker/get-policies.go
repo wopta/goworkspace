@@ -36,7 +36,8 @@ func GetPoliciesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		Queries: make([]lib.Firequery, 0),
 	}
 
-	for _, q := range req.Queries {
+	for index, q := range req.Queries {
+		log.Printf("query %d/%d field: \"%s\" op: \"%s\" value: \"%v\"", index+1, len(req.Queries), q.Field, q.Op, q.Value)
 		fireQueries.Queries = append(fireQueries.Queries, lib.Firequery{
 			Field:      q.Field,
 			Operator:   q.Op,
@@ -50,6 +51,7 @@ func GetPoliciesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	}
 
 	response.Policies = models.PolicyToListData(docsnap)
+	log.Printf("GetPolicies: found %d policies", len(response.Policies))
 
 	jsonOut, err := json.Marshal(response)
 	return string(jsonOut), response, err
