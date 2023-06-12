@@ -136,15 +136,15 @@ func setRow(policy models.Policy, df dataframe.DataFrame, trans models.Transacti
 			priceGrossFormat := fmt.Sprintf("%012d", intNum) // 000000001220
 			log.Println(priceGrossFormat)
 			row := []string{
-				mapCodecCompany(policy, g.CompanyCodec),           //Codice schema
-				policy.CodeCompany,                                //N° adesione individuale univoco
-				getRenew(policy),                                  //Tipo di Transazione
-				getFormatdate(policy.StartDate),                   //Data di decorrenza
-				getFormatdate(getRenewDate(policy, trans)),        //"Data di rinnovo"
-				mapCoverageDuration(policy),                       //"Durata copertura assicurativa"
-				fmt.Sprint(g.Value.Duration.Year * 12),            //"Durata complessiva"
-				priceGrossFormat,                                  //"Premio assicurativo lordo"
-				fmt.Sprintf("%.0f", g.SumInsuredLimitOfIndemnity), //"Importo Assicurato"
+				mapCodecCompany(policy, g.CompanyCodec),                 //Codice schema
+				policy.CodeCompany,                                      //N° adesione individuale univoco
+				getRenew(policy),                                        //Tipo di Transazione
+				getFormatdate(policy.StartDate),                         //Data di decorrenza
+				getFormatdate(getRenewDate(policy, trans)),              //"Data di rinnovo"
+				mapCoverageDuration(policy),                             //"Durata copertura assicurativa"
+				fmt.Sprint(g.Value.Duration.Year * 12),                  //"Durata complessiva"
+				priceGrossFormat,                                        //"Premio assicurativo lordo"
+				fmt.Sprintf("%.0f", g.Value.SumInsuredLimitOfIndemnity), //"Importo Assicurato"
 				"0",                       //indennizzo mensile
 				"",                        //campo disponibile
 				"",                        //% di sovrappremio da applicare alla garanzia
