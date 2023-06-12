@@ -46,16 +46,10 @@ func Payment(w http.ResponseWriter, r *http.Request) {
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
-				Route:   "/v1/cripto",
-				Handler: CriptoPay,
-				Method:  "POST",
-				Roles:   []string{models.UserRoleAll},
-			},
-			{
 				Route:   "/v1/:uid",
 				Handler: FabrickExpireBill,
 				Method:  http.MethodDelete,
-				Roles:   []string{models.UserRoleAll},
+				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},
 			{
 				Route:   "/manual/v1/:transactionUid",

@@ -45,7 +45,7 @@ func getCoherenceData() string {
 		"AA": {
 			"extra": "nel tempo libero,",
 			"professionale": "nello svolgimento dell'attivtà lavorativa,",
-			"24ore": "sia al lavoro che nel tempo libero,"
+			"24h": "sia al lavoro che nel tempo libero,"
 		},
 		"BB": {
 			"dipendente": "lavoratore dipendente",

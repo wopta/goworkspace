@@ -20,7 +20,9 @@ const (
 	PolicyStatusToRenew     = "Renew"
 	PolicyStatusPS          = "Pay&Sign"
 	PolicyStatusCompanyEmit = "CompanyEmited"
+	PolicyStatusDeleted     = "Deleted"
 )
+
 const (
 	TransactionStatusInit        = "Inizialize"
 	TransactionStatusToEmit      = "ToEmit"
