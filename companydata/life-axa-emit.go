@@ -125,9 +125,8 @@ func setRow(policy models.Policy, df dataframe.DataFrame, trans models.Transacti
 			beneficiary1, beneficiary1S, beneficiary1T = mapBeneficiary(g, 0) //Codice Fiscale Beneficiario
 			beneficiary2, beneficiary2S, _ = mapBeneficiary(g, 1)
 			log.Println(g.PriceGross)
-			pricegrossround := fmt.Sprintf("%.2f", g.PriceGross)
-			pricegrossflat, _ := fmt.Println(strings.Replace(pricegrossround, ",", "", -1))
-			priceGrossFormat := fmt.Sprintf("%012d", pricegrossflat) // 000000001220
+			var intNum = int(g.PriceGross * 100)
+			priceGrossFormat := fmt.Sprintf("%012d", intNum) // 000000001220
 			log.Println(priceGrossFormat)
 			row := []string{
 				mapCodecCompany(policy, g.CompanyCodec),           //Codice schema

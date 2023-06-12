@@ -9,11 +9,11 @@ import (
 	"strings"
 	"time"
 
+	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/civil"
 	"github.com/google/uuid"
-	lib "github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	model "github.com/wopta/goworkspace/models"
 )
 
 func getFabrickClient(urlstring string, req *http.Request) *http.Response {
@@ -30,7 +30,7 @@ func getFabrickClient(urlstring string, req *http.Request) *http.Response {
 	lib.CheckError(err)
 	return res
 }
-func FabrickPayObj(data model.Policy, firstSchedule bool, scheduleDate string, customerId string, amount float64, origin string) <-chan FabrickPaymentResponse {
+func FabrickPayObj(data models.Policy, firstSchedule bool, scheduleDate string, customerId string, amount float64, origin string) <-chan FabrickPaymentResponse {
 	r := make(chan FabrickPaymentResponse)
 
 	go func() {
@@ -118,7 +118,7 @@ func FabrickPayObj(data model.Policy, firstSchedule bool, scheduleDate string, c
 			}
 
 			lib.SetFirestore(transactionsFire, transactionUid, tr)
-			tr.BigPayDate = civil.DateTimeOf(time.Now())
+			tr.BigPayDate = bigquery.NullDateTime{}
 			tr.BigCreationDate = civil.DateTimeOf(time.Now())
 			tr.BigStatusHistory = strings.Join(tr.StatusHistory, ",")
 			err = lib.InsertRowsBigQuery("wopta", transactionsFire, tr)
@@ -129,7 +129,7 @@ func FabrickPayObj(data model.Policy, firstSchedule bool, scheduleDate string, c
 	}()
 	return r
 }
-func FabbrickMontlyPay(data model.Policy, origin string) FabrickPaymentResponse {
+func FabbrickMontlyPay(data models.Policy, origin string) FabrickPaymentResponse {
 
 	installment := data.PriceGross / 12
 	customerId := uuid.New().String()
@@ -145,7 +145,7 @@ func FabbrickMontlyPay(data model.Policy, origin string) FabrickPaymentResponse 
 	}
 	return firstres
 }
-func FabbrickYearPay(data model.Policy, origin string) FabrickPaymentResponse {
+func FabbrickYearPay(data models.Policy, origin string) FabrickPaymentResponse {
 
 	customerId := uuid.New().String()
 	log.Println(data.Uid + " FabbrickYearPay")
@@ -154,7 +154,7 @@ func FabbrickYearPay(data model.Policy, origin string) FabrickPaymentResponse {
 	return res
 }
 
-func getfabbricPayments(data model.Policy, firstSchedule bool, scheduleDate string, customerId string, amount float64, origin string) string {
+func getfabbricPayments(data models.Policy, firstSchedule bool, scheduleDate string, customerId string, amount float64, origin string) string {
 	var mandate string
 
 	if firstSchedule {

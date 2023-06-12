@@ -59,8 +59,6 @@ func GetUserIdFromIdToken(idToken string) (string, error) {
 func VerifyAuthorization(handler func(w http.ResponseWriter, r *http.Request) (string, interface{}, error), roles ...string) func(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	wrappedHandler := func(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 		errorHandler := func(w http.ResponseWriter) (string, interface{}, error) {
-			w.WriteHeader(http.StatusNotFound)
-			w.Write([]byte("Not Found"))
 			return "", nil, fmt.Errorf("not found")
 		}
 
@@ -75,7 +73,10 @@ func VerifyAuthorization(handler func(w http.ResponseWriter, r *http.Request) (s
 
 		token, err := VerifyUserIdToken(idToken)
 		if err != nil {
-			log.Println("verify id token error: ", err)
+			log.Println("VerifyAuthorization: verify id token error: ", err)
+			return errorHandler(w)
+		} else if token.Claims["role"] == nil {
+			log.Println("VerifyAuthorization: user role not set")
 			return errorHandler(w)
 		}
 

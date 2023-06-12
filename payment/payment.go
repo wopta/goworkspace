@@ -10,9 +10,8 @@ import (
 	"time"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
-	lib "github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	model "github.com/wopta/goworkspace/models"
 )
 
 func init() {
@@ -47,16 +46,16 @@ func Payment(w http.ResponseWriter, r *http.Request) {
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
-				Route:   "/v1/cripto",
-				Handler: CriptoPay,
-				Method:  "POST",
-				Roles:   []string{models.UserRoleAll},
+				Route:   "/v1/:uid",
+				Handler: FabrickExpireBill,
+				Method:  http.MethodDelete,
+				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},
 			{
-				Route:   "/v1/:uid",
-				Handler: CriptoPay,
-				Method:  http.MethodDelete,
-				Roles:   []string{models.UserRoleAll},
+				Route:   "/manual/v1/:transactionUid",
+				Handler: ManualPay,
+				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},
 		},
 	}
@@ -66,7 +65,7 @@ func Payment(w http.ResponseWriter, r *http.Request) {
 func FabrickPay(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
 
-	var data model.Policy
+	var data models.Policy
 	defer r.Body.Close()
 	err := json.Unmarshal([]byte(req), &data)
 	log.Println(data.PriceGross)
@@ -79,7 +78,7 @@ func FabrickPay(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 func FabrickPayMontly(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
 
-	var data model.Policy
+	var data models.Policy
 	defer r.Body.Close()
 	err := json.Unmarshal([]byte(req), &data)
 	log.Println(data.PriceGross)

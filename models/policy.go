@@ -199,7 +199,7 @@ func (policy *Policy) BigquerySave(origin string) {
 }
 
 func PolicyToListData(query *firestore.DocumentIterator) []Policy {
-	var result []Policy
+	result := make([]Policy, 0)
 	for {
 		d, err := query.Next()
 		if err != nil {
