@@ -3,7 +3,6 @@ package broker
 import (
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"time"
@@ -82,7 +81,7 @@ func DeletePolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	)
 	log.Println("DeletePolicy")
 	guaranteFire := lib.GetDatasetByEnv(r.Header.Get("origin"), "guarante")
-	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
+	req := lib.ErrorByte(io.ReadAll(r.Body))
 	json.Unmarshal(req, &request)
 	firePolicy := lib.GetDatasetByEnv(r.Header.Get("origin"), "policy")
 	policyUID = r.Header.Get("uid")
@@ -90,6 +89,8 @@ func DeletePolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	docsnap.DataTo(&policy)
 	policy.IsDeleted = true
 	policy.DeleteDesc = request.DeleteDesc
+	policy.Status = models.PolicyStatusDeleted
+	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusDeleted)
 	lib.SetFirestore(firePolicy, policyUID, policy)
 	policy.BigquerySave(r.Header.Get("origin"))
 	models.SetGuaranteBigquery(policy, "delete", guaranteFire)
