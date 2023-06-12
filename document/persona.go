@@ -47,6 +47,8 @@ func PersonaGlobal(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 
 	paymentMethodSection(pdf)
 
+	pdf.AddPage()
+
 	emitResumeSection(pdf, policy)
 
 	companiesDescriptionSection(pdf, policy.Company)
