@@ -3,6 +3,7 @@ package models
 import (
 	"encoding/json"
 	"log"
+	"time"
 
 	"cloud.google.com/go/firestore"
 	"github.com/wopta/goworkspace/lib"
@@ -21,17 +22,19 @@ func (r *Product) Marshal() ([]byte, error) {
 }
 
 type Product struct {
-	NameDesc        *string          `firestore:"nameDesc,omitempty" json:"nameDesc,omitempty"`
-	Companies       []Company        `firestore:"companies,omitempty" json:"companies,omitempty"`
-	ProductUid      string           `firestore:"productUid,omitempty" json:"productUid,omitempty"`
-	ProductVersion  int              `firestore:"productVersion,omitempty" json:"productVersion,omitempty"`
-	Version         string           `firestore:"version,omitempty" json:"version,omitempty"`
-	Number          int              `firestore:"number,omitempty" json:"number,omitempty"`
-	Name            string           `firestore:"name,omitempty" json:"name,omitempty"`
-	Commission      float64          `firestore:"commission,omitempty" json:"commission,omitempty"`
-	CommissionRenew float64          `firestore:"commissionRenew,omitempty" json:"commissionRenew,omitempty"`
-	Steps           []Step           `firestore:"steps,omitempty" json:"steps"`
-	Offers          map[string]Offer `firestore:"offers,omitempty" json:"offers,omitempty"`
+	NameDesc          *string          `firestore:"nameDesc,omitempty" json:"nameDesc,omitempty"`
+	Companies         []Company        `firestore:"companies,omitempty" json:"companies,omitempty"`
+	ProductUid        string           `firestore:"productUid,omitempty" json:"productUid,omitempty"`
+	ProductVersion    int              `firestore:"productVersion,omitempty" json:"productVersion,omitempty"`
+	Version           string           `firestore:"version,omitempty" json:"version,omitempty"`
+	Number            int              `firestore:"number,omitempty" json:"number,omitempty"`
+	Name              string           `firestore:"name,omitempty" json:"name,omitempty"`
+	Commission        float64          `firestore:"commission,omitempty" json:"commission,omitempty"`
+	CommissionRenew   float64          `firestore:"commissionRenew,omitempty" json:"commissionRenew,omitempty"`
+	Steps             []Step           `firestore:"steps,omitempty" json:"steps"`
+	Offers            map[string]Offer `firestore:"offers,omitempty" json:"offers,omitempty"`
+	IsEcommerceActive bool             `json:"isEcommerceActive" firestore:"isEcommerceActive"`
+	IsAgencyActive    bool             `json:"isAgencyActive" firestore:"isAgencyActive"`
 }
 
 type Company struct {
@@ -49,7 +52,17 @@ type Company struct {
 	GuaranteesMap             map[string]*Guarante `firestore:"guaranteesMap,omitempty" json:"guaranteesMap,omitempty"`
 	InformationSetLink        string               `firestore:"informationSetLink,omitempty" json:"informationSetLink,omitempty"`
 	IsMonthlyPaymentAvailable bool                 `firestore:"isMonthlyPaymentAvailable" json:"isMonthlyPaymentAvailable"`
+	Mandate                   Mandate              `json:"mandate" firestore:"mandate" bigquery:"-"`
 }
+
+type Mandate struct {
+	Commission      float64   `json:"commission" firestore:"commission"`
+	CommissionRenew float64   `json:"commissionRenew" firestore:"commissionRenew"`
+	StartDate       time.Time `json:"startDate" firestore:"startDate"`
+	ExpireDate      time.Time `json:"expireDate" firestore:"expireDate"`
+	//Bonus TBD
+}
+
 type Step struct {
 	Widget     string      `firestore:"widget,omitempty" json:"widget"`
 	Attributes interface{} `firestore:"attributes,omitempty" json:"attributes"`
@@ -66,12 +79,14 @@ type Offer struct {
 	Description string `firestore:"description,omitempty" json:"description,omitempty"`
 	Order       int    `firestore:"order,omitempty" json:"order,omitempty"`
 }
+
 type Track struct {
 	Columns []Column `firestore:"columns,omitempty" json:"columns"`
 	Name    string   `firestore:"name,omitempty" json:"name,omitempty"`
 	Type    string   `firestore:"type,omitempty" json:"type"`
 	Format  string   `firestore:"format,omitempty" json:"format,omitempty"`
 }
+
 type Column struct {
 	Value  string `firestore:"value,omitempty" json:"value"`
 	Name   string `firestore:"name,omitempty" json:"name,omitempty"`
