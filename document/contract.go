@@ -38,16 +38,20 @@ func ContractObj(data model.Policy) <-chan DocumentResponse {
 			filename string
 			out      []byte
 		)
-		switch data.Company {
-		case "global":
+
+		switch data.Name {
+		case "pmi":
 			skin := getVar()
 			m := skin.initDefault()
 			skin.GlobalContract(m, data)
 			//-----------Save file
 			filename, out = Save(m, data)
-		case "axa":
+		case "life":
 			pdf := initFpdf()
-			filename, out = AxaContract(pdf, &data)
+			filename, out = LifeContract(pdf, &data)
+		case "persona":
+			pdf := initFpdf()
+			filename, out = PersonaContract(pdf, &data)
 		}
 
 		data.DocumentName = filename

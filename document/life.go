@@ -14,17 +14,29 @@ var (
 	signatureID int
 )
 
-func Life(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
+func LifeContract(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
+	var (
+		filename string
+		out      []byte
+	)
+
+	filename, out = LifeAxa(pdf, policy)
+
+	return filename, out
+}
+
+func LifeAxa(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 	signatureID = 0
 
 	mainHeader(pdf, policy)
-	mainFooter(pdf)
+
+	mainFooter(pdf, policy.Name)
 
 	pdf.AddPage()
 
 	insuredInfoSection(pdf, policy)
 
-	guaranteesTable(pdf, policy)
+	lifeGuaranteesTable(pdf, policy)
 
 	avvertenzeBeneficiariSection(pdf)
 
@@ -48,7 +60,7 @@ func Life(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 
 	emitResumeSection(pdf, policy)
 
-	woptaAxaCompanyDescriptionSection(pdf)
+	companiesDescriptionSection(pdf, policy.Company)
 
 	axaHeader(pdf)
 
@@ -64,11 +76,11 @@ func Life(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 
 	pdf.AddPage()
 
-	GetAxaTablePart2Section(pdf, policy)
+	axaTablePart2Section(pdf, policy)
 
 	pdf.Ln(15)
 
-	GetAxaTablePart3Section(pdf)
+	axaTablePart3Section(pdf)
 
 	woptaHeader(pdf)
 
@@ -76,187 +88,28 @@ func Life(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 
 	woptaFooter(pdf)
 
-	GetAllegato3Section(pdf)
+	allegato3Section(pdf)
 
 	pdf.AddPage()
 
-	GetAllegato4Section(pdf)
+	allegato4Section(pdf)
 
 	pdf.AddPage()
 
-	GetAllegato4TerSection(pdf)
+	allegato4TerSection(pdf)
 
 	pdf.AddPage()
 
-	GetWoptaPrivacySection(pdf)
+	woptaPrivacySection(pdf)
 
-	GetPersonalDataHandlingSection(pdf, policy)
+	personalDataHandlingSection(pdf, policy)
 
 	filename, out := save(pdf, policy)
 	return filename, out
 }
 
-func mainHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
-	var (
-		opt        fpdf.ImageOptions
-		logoPath   string
-		cfpi       string
-		expiryInfo string
-	)
-	logoPath = lib.GetAssetPathByEnv(basePath) + "/logo_vita.png"
-
-	contractor := policy.Contractor
-	address := strings.ToUpper(contractor.Residence.StreetName + ", " + contractor.Residence.StreetNumber + "\n" +
-		contractor.Residence.PostalCode + " " + contractor.Residence.City + " (" + contractor.Residence.CityCode + ")\n")
-
-	if contractor.VatCode == "" {
-		cfpi = contractor.FiscalCode
-	} else {
-		cfpi = contractor.VatCode
-	}
-
-	if policy.PaymentSplit == string(models.PaySplitMonthly) {
-		expiryInfo = "Prima scandenza mensile il: " +
-			policy.StartDate.AddDate(0, 1, 0).Format(dateLayout) + "\n"
-	} else if policy.PaymentSplit == string(models.PaySplitYear) {
-		expiryInfo = "Prima scadenza annuale il: " +
-			policy.StartDate.AddDate(1, 0, 0).Format(dateLayout) + "\n"
-	}
-
-	policyInfo := "Numero: " + policy.CodeCompany + "\n" +
-		"Decorre dal: " + policy.StartDate.Format(dateLayout) + " ore 24:00\n" +
-		"Scade il: " + policy.EndDate.Format(dateLayout) + " ore 24:00\n" +
-		expiryInfo + "Non si rinnova a scadenza."
-
-	contractorInfo := "Contraente: " + strings.ToUpper(contractor.Surname+" "+contractor.Name+"\n"+
-		"C.F./P.IVA: "+cfpi) + "\n" +
-		"Indirizzo: " + strings.ToUpper(address) + "Mail: " + contractor.Mail + "\n" +
-		"Telefono: " + contractor.Phone
-
-	pdf.SetHeaderFunc(func() {
-		opt.ImageType = "png"
-		pdf.ImageOptions(logoPath, 10, 6, 13, 13, false, opt, 0, "")
-		pdf.SetXY(23, 7)
-		setPinkBoldFont(pdf, 18)
-		pdf.Cell(10, 6, "Wopta per te")
-		setPinkItalicFont(pdf, 18)
-		pdf.SetXY(23, 13)
-		pdf.SetTextColor(92, 89, 92)
-		pdf.Cell(10, 6, "Vita")
-		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/ARTW_LOGO_RGB_400px.png", 170, 6, 0, 8, false, opt, 0, "")
-
-		setBlackBoldFont(pdf, standardTextSize)
-		pdf.SetXY(11, 20)
-		pdf.Cell(0, 3, "I dati della tua polizza")
-		setBlackRegularFont(pdf, standardTextSize)
-		pdf.SetXY(11, pdf.GetY()+3)
-		pdf.MultiCell(0, 3.5, policyInfo, "", "", false)
-
-		setBlackBoldFont(pdf, standardTextSize)
-		pdf.SetXY(-95, 20)
-		pdf.Cell(0, 3, "I tuoi dati")
-		setBlackRegularFont(pdf, standardTextSize)
-		pdf.SetXY(-95, pdf.GetY()+3)
-		pdf.MultiCell(0, 3.5, contractorInfo, "", "", false)
-		pdf.Ln(8)
-	})
-}
-
-func mainFooter(pdf *fpdf.Fpdf) {
-	var opt fpdf.ImageOptions
-
-	pdf.SetFooterFunc(func() {
-		pdf.SetXY(10, -15)
-		setPinkRegularFont(pdf, smallTextSize)
-		pdf.MultiCell(0, 3, "Wopta per te. Vita è un prodotto assicurativo di AXA France Vie S.A. – Rappresentanza Generale per l’Italia\ndistribuito da Wopta Assicurazioni S.r.l.", "", "", false)
-		opt.ImageType = "png"
-		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/axa/logo.png", 190, 281, 0, 8, false, opt, 0, "")
-		pdf.SetY(-7)
-		pageNumber(pdf)
-	})
-}
-
-func axaHeader(pdf *fpdf.Fpdf) {
-	pdf.SetHeaderFunc(func() {
-		var opt fpdf.ImageOptions
-		pdf.SetXY(-30, 7)
-		opt.ImageType = "png"
-		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/axa/logo.png", 190, 7, 0, 8, false, opt, 0, "")
-		pdf.Ln(15)
-	})
-}
-
-func axaFooter(pdf *fpdf.Fpdf) {
-	pdf.SetFooterFunc(func() {
-		pdf.SetXY(10, -25)
-		setBlackRegularFont(pdf, smallTextSize)
-		pdf.MultiCell(0, 3, "AXA France Vie (compagnia assicurativa del gruppo AXA). Indirizzo sede "+
-			"legale in Francia: 313 Terrasses de l'Arche, 92727 NANTERRE CEDEX. Numero Iscrizione Registro delle "+
-			"Imprese di Nanterre: 310499959. Autorizzata in Francia (Stato di origine) all'esercizio delle "+
-			"assicurazioni, vigilata in Francia dalla Autorité de Contrôle Prudentiel et de Résolution (ACPR). "+
-			"Numero Matricola Registre des organismes d'assurance: 5020051. // Indirizzo Rappresentanza Generale "+
-			"per l'Italia: Corso Como n. 17, 20154 Milano - CF, P.IVA e N.Iscr. Reg. Imprese 08875230016 - "+
-			"REA MI-2525395 - Telefono: 02-87103548 - Fax: 02-23331247 - PEC: axafrancevie@legalmail.it - sito "+
-			"internet: www.clp.partners.axa/it. Ammessa ad operare in Italia in regime di stabilimento. Iscritta "+
-			"all'Albo delle imprese di assicurazione tenuto dall'IVASS, in appendice Elenco I, nr. I.00149.", "", "", false)
-		pdf.SetY(-7)
-		pageNumber(pdf)
-	})
-}
-
-func woptaHeader(pdf *fpdf.Fpdf) {
-	pdf.SetHeaderFunc(func() {
-		var opt fpdf.ImageOptions
-		opt.ImageType = "png"
-		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/ARTW_LOGO_RGB_400px.png", 10, 6, 0, 15, false, opt, 0, "")
-		pdf.Ln(10)
-	})
-}
-
-func woptaFooter(pdf *fpdf.Fpdf) {
-	pdf.SetFooterFunc(func() {
-		pdf.SetY(-30)
-		drawPinkHorizontalLine(pdf, 0.4)
-		pdf.Ln(5)
-		setPinkRegularFont(pdf, smallTextSize)
-		pdf.Cell(pdf.GetStringWidth("Wopta Assicurazioni s.r.l"), 3, "Wopta Assicurazioni s.r.l")
-		pdf.Cell(120, 3, "")
-		pdf.Cell(pdf.GetStringWidth("www.wopta.it"), 3, "www.wopta.it")
-		pdf.Ln(3)
-		setBlackRegularFont(pdf, smallTextSize)
-		pdf.CellFormat(pdf.GetStringWidth("Galleria del Corso, 1"), 3,
-			"Galleria del Corso, 1", "", 0, "", false, 0, "")
-		pdf.CellFormat(20, 3, "", "", 0, "", false, 0, "")
-		pdf.CellFormat(pdf.GetStringWidth("Numero REA: MI 2638708"), 3,
-			"Numero REA: MI 2638708", "", 0, "", false, 0, "")
-		pdf.CellFormat(20, 3, "", "", 0, "", false, 0, "")
-		pdf.CellFormat(pdf.GetStringWidth("CF | P.IVA | n. iscr. Registro Imprese:"), 3,
-			"CF | P.IVA | n. iscr. Registro Imprese:", "", 0, "", false, 0, "")
-		pdf.CellFormat(13, 3, "", "", 0, "", false, 0, "")
-		pdf.CellFormat(30, 3, "info@wopta.it", "", 1, "", false, 0, "")
-		pdf.CellFormat(pdf.GetStringWidth("Galleria del Corso, 1"), 3,
-			"20122 - Milano (MI)", "", 0, "", false, 0, "")
-		pdf.CellFormat(20, 3, "", "", 0, "", false, 0, "")
-		pdf.CellFormat(pdf.GetStringWidth("Numero REA: MI 2638708"), 3,
-			"Capitale Sociale: €120.000,00", "", 0, "", false, 0, "")
-		pdf.CellFormat(20, 3, "", "", 0, "", false, 0, "")
-		pdf.CellFormat(pdf.GetStringWidth("CF | P.IVA | n. iscr. Registro Imprese:"), 3,
-			"12072020964", "", 0, "", false, 0, "")
-		pdf.CellFormat(13, 3, "", "", 0, "", false, 0, "")
-		pdf.CellFormat(30, 3, "(+39) 02 91240346", "", 1, "", false, 0, "")
-		pdf.Ln(3)
-		pdf.MultiCell(0, 3, "Wopta Assicurazioni s.r.l. è un intermediario assicurativo soggetto alla "+
-			"vigilanza dell’IVASS ed iscritto alla Sezione A del Registro Unico degli Intermediari Assicurativi "+
-			"con numero A000701923. Consulta gli estremi dell’iscrizione al sito "+
-			"https://servizi.ivass.it/RuirPubblica/", "", "", false)
-		pdf.SetY(-7)
-		pageNumber(pdf)
-	})
-}
-
 func insuredInfoSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	getParagraphTitle(pdf, "La tua assicurazione è operante per il seguente Assicurato e Garanzie")
-	pdf.Ln(8)
 	insuredInfoTable(pdf, policy.Assets[0].Person)
 }
 
@@ -304,7 +157,7 @@ func insuredInfoTable(pdf *fpdf.Fpdf, insured *models.User) {
 	pdf.Ln(1)
 }
 
-func guaranteesTable(pdf *fpdf.Fpdf, policy *models.Policy) {
+func lifeGuaranteesTable(pdf *fpdf.Fpdf, policy *models.Policy) {
 	const (
 		death               = "death"
 		permanentDisability = "permanent-disability"
@@ -399,7 +252,6 @@ func guaranteesTable(pdf *fpdf.Fpdf, policy *models.Policy) {
 func avvertenzeBeneficiariSection(pdf *fpdf.Fpdf) {
 	getParagraphTitle(pdf, "Nomina dei Beneficiari e Referente terzo, per il caso di garanzia Decesso "+
 		"(qualora sottoscritta)")
-	pdf.Ln(8)
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "AVVERTENZE: Può scegliere se designare nominativamente i beneficiari o se "+
 		"designare genericamente come beneficiari i suoi eredi legittimi e/o testamentari. In caso di mancata "+
@@ -465,7 +317,6 @@ func beneficiariesSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	}
 
 	getParagraphTitle(pdf, "Beneficiario")
-	pdf.Ln(8)
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.CellFormat(0, 3, "Io sottoscritto Assicurato, con la sottoscrizione della presente polizza, in "+
 		"riferimento alla garanzia Decesso:", "", 0, "", false, 0, "")
@@ -562,7 +413,6 @@ func beneficiaryReferenceSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	}
 
 	getParagraphTitle(pdf, "Referente terzo")
-	pdf.Ln(8)
 	beneficiaryReferenceTable(pdf, beneficiaryReference)
 	pdf.Ln(2)
 }
@@ -615,13 +465,11 @@ func surveysSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	}
 
 	getParagraphTitle(pdf, "Dichiarazioni da leggere con attenzione prima di firmare")
-	pdf.Ln(8)
 	err := printSurvey(pdf, surveys[0])
 	lib.CheckError(err)
 
 	pdf.AddPage()
 	getParagraphTitle(pdf, "Questionario Medico")
-	pdf.Ln(8)
 	for _, survey := range surveys[1:] {
 		err := printSurvey(pdf, survey)
 		lib.CheckError(err)
@@ -697,7 +545,6 @@ func offerResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	}
 
 	getParagraphTitle(pdf, "Il premio per tutte le coperture assicurative attivate sulla polizza – Frazionamento: "+paymentSplit)
-	pdf.Ln(8)
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.SetTextColor(0, 0, 0)
 	pdf.CellFormat(40, 2, "Premio", "", 0, "", false, 0, "")
@@ -755,7 +602,6 @@ func paymentResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	}
 
 	getParagraphTitle(pdf, "Pagamento dei premi successivi al primo")
-	pdf.Ln(8)
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "Il Contraente è tenuto a pagare i Premi entro 30 giorni dalle relative scadenze. "+
 		"In caso di mancato pagamento del premio entro 30 giorni dalla scadenza (c.d. termine di tolleranza) "+
@@ -830,7 +676,6 @@ func paymentResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 
 func contractWithdrawlSection(pdf *fpdf.Fpdf) {
 	getParagraphTitle(pdf, "Informativa sul diritto di recesso")
-	pdf.Ln(8)
 	setBlackBoldFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "Diritto di recesso entro i primi 30 giorni dalla stipula ("+
 		"diritto di ripensamento)", "", "", false)
@@ -854,55 +699,6 @@ func contractWithdrawlSection(pdf *fpdf.Fpdf) {
 		"lettera raccomandata a.r. al seguente indirizzo: Wopta Assicurazioni srl – Gestione Portafoglio – Galleria del "+
 		"Corso, 1 – 201212 Milano (MI) oppure via posta elettronica certificata (PEC) all’indirizzo "+
 		"email: woptaassicurazioni@legalmail.it", "", "", false)
-}
-
-func paymentMethodSection(pdf *fpdf.Fpdf) {
-	getParagraphTitle(pdf, "Come puoi pagare il premio")
-	pdf.Ln(8)
-	setBlackRegularFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3, "I mezzi di pagamento consentiti, nei confronti di Wopta, sono esclusivamente "+
-		"bonifico e strumenti di pagamento elettronico, quali ad esempio, carte di credito e/o carte di debito, "+
-		"incluse le carte prepagate. Oppure può essere pagato direttamente alla Compagnia alla "+
-		"stipula del contratto, via bonifico o carta di credito.", "", "", false)
-}
-
-func emitResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
-	var offerPrice string
-	emitDate := policy.EmitDate.Format(dateLayout)
-	startDate := policy.StartDate.Format(dateLayout)
-	if policy.OffersPrices["default"]["monthly"] != nil {
-		offerPrice = humanize.FormatFloat("#.###,##", policy.OffersPrices["default"]["monthly"].Gross*12)
-	} else {
-		offerPrice = humanize.FormatFloat("#.###,##", policy.OffersPrices["default"]["yearly"].Gross)
-	}
-	text := "Polizza emessa a Milano il " + emitDate + " per un importo di € " + offerPrice + " quale " +
-		"prima rata alla firma, il cui pagamento a saldo è da effettuarsi con i metodi di pagamento sopra indicati. " +
-		"Wopta conferma avvenuto incasso e copertura della polizza dal " + startDate + "."
-	getParagraphTitle(pdf, "Emissione polizza e pagamento della prima rata")
-	pdf.Ln(8)
-	setBlackRegularFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3, text, "", "", false)
-}
-
-func woptaAxaCompanyDescriptionSection(pdf *fpdf.Fpdf) {
-	getParagraphTitle(pdf, "Chi siamo")
-	pdf.Ln(8)
-	setBlackRegularFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3, "Wopta Assicurazioni S.r.l. - intermediario assicurativo, soggetto al controllo "+
-		"dell’IVASS ed iscritto dal 14.02.2022 al Registro Unico degli Intermediari, in Sezione A nr. A000701923, "+
-		"avente sede legale in Galleria del Corso, 1 – 20122 Milano (MI). Capitale sociale Euro 120.000 - "+
-		"Codice Fiscale, Reg. Imprese e Partita IVA: 12072020964 - Iscritta al Registro delle imprese di Milano – "+
-		"REA MI 2638708", "", "", false)
-	pdf.Ln(5)
-	pdf.MultiCell(0, 3, "AXA France Vie (compagnia assicurativa del gruppo AXA). Indirizzo sede legale in "+
-		"Francia: 313 Terrasses de l'Arche, 92727 NANTERRE CEDEX. Numero Iscrizione Registro delle Imprese di "+
-		"Nanterre: 310499959. Autorizzata in Francia (Stato di origine) all’esercizio delle assicurazioni, vigilata "+
-		"in Francia dalla Autorité de Contrôle Prudentiel et de Résolution (ACPR). Numero Matricola Registre des "+
-		"organismes d’assurance: 5020051. // Indirizzo Rappresentanza Generale per l’Italia: Corso Como n. 17, 20154 "+
-		"Milano - CF, P.IVA e N.Iscr. Reg. Imprese 08875230016 - REA MI-2525395 - Telefono: 02-87103548 - "+
-		"Fax: 02-23331247 - PEC: axafrancevie@legalmail.it – sito internet: www.clp.partners.axa/it. Ammessa ad "+
-		"operare in Italia in regime di stabilimento. Iscritta all’Albo delle imprese di assicurazione tenuto "+
-		"dall’IVASS, in appendice Elenco I, nr. I.00149.", "", "", false)
 }
 
 func axaDeclarationsConsentSection(pdf *fpdf.Fpdf, policy *models.Policy) {
@@ -1084,7 +880,7 @@ func axaTableSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	pdf.Ln(1)
 
 	setBlackRegularFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3, "C. dichiaro di NON essere una Persona Politicamente Esposta", "",
+	pdf.MultiCell(0, 3, "C. dichiaro di NON essere una PersonaGlobal Politicamente Esposta", "",
 		"", false)
 	pdf.CellFormat(4, 3, "", "", 0, "", false, 0, "")
 	pdf.CellFormat(0, 3, "In caso di risposta affermativa indicare la tipologia:", "", 1,
@@ -1122,7 +918,7 @@ func axaTableSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	pdf.CellFormat(0, 2, "", "", 1, "", false, 0, "")
 }
 
-func GetAxaTablePart2Section(pdf *fpdf.Fpdf, policy *models.Policy) {
+func axaTablePart2Section(pdf *fpdf.Fpdf, policy *models.Policy) {
 	pdf.MultiCell(0, 3, "Il sottoscritto, ai sensi degli artt. 22 e 55 comma 3 del d.lgs. 231/2007, "+
 		"consapevole della responsabilità penale derivante da omesse e/o mendaci affermazioni, dichiara che tutte le "+
 		"informazioni fornite (anche in riferimento al titolare effettivo), le dichiarazioni rilasciate il documento "+
@@ -1139,7 +935,7 @@ func GetAxaTablePart2Section(pdf *fpdf.Fpdf, policy *models.Policy) {
 	drawSignatureForm(pdf)
 }
 
-func GetAxaTablePart3Section(pdf *fpdf.Fpdf) {
+func axaTablePart3Section(pdf *fpdf.Fpdf) {
 	setBlackBoldFont(pdf, titleTextSize)
 	pdf.MultiCell(0, 4, "Informativa antiriciclaggio (articoli di riferimento) - "+
 		"(Decreto legislativo n. 231/2007)", "", "CM", false)
@@ -1301,7 +1097,7 @@ func GetWoptaInfoTable(pdf *fpdf.Fpdf) {
 	drawPinkHorizontalLine(pdf, 0.1)
 }
 
-func GetAllegato3Section(pdf *fpdf.Fpdf) {
+func allegato3Section(pdf *fpdf.Fpdf) {
 	setBlackBoldFont(pdf, titleTextSize)
 	pdf.MultiCell(0, 3, "ALLEGATO 3 - INFORMATIVA SUL DISTRIBUTORE", "", "CM", false)
 	pdf.Ln(3)
@@ -1380,7 +1176,7 @@ func GetAllegato3Section(pdf *fpdf.Fpdf) {
 		"", "", false)
 }
 
-func GetAllegato4Section(pdf *fpdf.Fpdf) {
+func allegato4Section(pdf *fpdf.Fpdf) {
 	setBlackBoldFont(pdf, titleTextSize)
 	pdf.MultiCell(0, 3, "ALLEGATO 4 - INFORMAZIONI SULLA DISTRIBUZIONE\nDEL PRODOTTO ASSICURATIVO NON IBIP",
 		"", "CM", false)
@@ -1448,7 +1244,7 @@ func GetAllegato4Section(pdf *fpdf.Fpdf) {
 	pdf.Ln(3)
 }
 
-func GetAllegato4TerSection(pdf *fpdf.Fpdf) {
+func allegato4TerSection(pdf *fpdf.Fpdf) {
 	setBlackBoldFont(pdf, titleTextSize)
 	pdf.MultiCell(0, 3, "ALLEGATO 4 TER - ELENCO DELLE REGOLE DI COMPORTAMENTO DEL DISTRIBUTORE",
 		"", fpdf.AlignCenter, false)
@@ -1496,7 +1292,7 @@ func GetAllegato4TerSection(pdf *fpdf.Fpdf) {
 		"", "", false)
 }
 
-func GetWoptaPrivacySection(pdf *fpdf.Fpdf) {
+func woptaPrivacySection(pdf *fpdf.Fpdf) {
 	setBlackBoldFont(pdf, titleTextSize)
 	pdf.MultiCell(0, 3, "COME RISPETTIAMO LA TUA PRIVACY", "", "CM", false)
 	pdf.Ln(3)
@@ -1686,42 +1482,4 @@ func GetWoptaPrivacySection(pdf *fpdf.Fpdf) {
 	pdf.MultiCell(0, 3, "Per esercitare i diritti di cui sopra o per qualunque altra richiesta può "+
 		"scrivere al Titolare del trattamento all’indirizzo: privacy@wopta.it.", "", "", false)
 	pdf.Ln(3)
-}
-
-func GetPersonalDataHandlingSection(pdf *fpdf.Fpdf, policy *models.Policy) {
-	consentText := "X"
-	notConsentText := ""
-
-	if policy.Contractor.Consens != nil {
-		consent, err := policy.ExtractConsens(2)
-		lib.CheckError(err)
-
-		if !consent.Answer {
-			consentText = ""
-			notConsentText = "X"
-		}
-	}
-
-	setPinkBoldFont(pdf, titleTextSize)
-	pdf.MultiCell(0, 3, "Consenso per finalità commerciali.", "", "", false)
-	pdf.Ln(1)
-	setBlackRegularFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3, "Il sottoscritto, letta e compresa l’informativa sul trattamento dei dati personali",
-		"", "", false)
-	pdf.Ln(1)
-	setBlackDrawColor(pdf)
-	pdf.Cell(5, 3, "")
-	pdf.CellFormat(3, 3, consentText, "1", 0, "CM", false, 0, "")
-	pdf.CellFormat(20, 3, "ACCONSENTE", "", 0, "", false, 0, "")
-	pdf.Cell(20, 3, "")
-	pdf.CellFormat(3, 3, notConsentText, "1", 0, "CM", false, 0, "")
-	pdf.CellFormat(20, 3, "NON ACCONSENTE", "", 1, "", false, 0, "")
-	pdf.Ln(1)
-	pdf.MultiCell(0, 3, "al trattamento dei propri dati personali da parte di Wopta Assicurazioni per "+
-		"l’invio di comunicazioni e proposte commerciali e di marketing, incluso l’invio di newsletter e ricerche di "+
-		"mercato, attraverso strumenti automatizzati (sms, mms, e-mail, ecc.) e non (posta cartacea e telefono "+
-		"con operatore).", "", "", false)
-	pdf.Ln(3)
-	pdf.Cell(0, 3, policy.EmitDate.Format(dateLayout))
-	drawSignatureForm(pdf)
 }

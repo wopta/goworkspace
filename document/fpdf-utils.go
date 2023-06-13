@@ -152,8 +152,8 @@ func drawSignatureForm(pdf *fpdf.Fpdf) {
 
 func getParagraphTitle(pdf *fpdf.Fpdf, title string) {
 	pdf.SetTextColor(229, 0, 117)
-	pdf.SetFont("Montserrat", "B", 10)
-	pdf.Cell(0, 10, title)
+	pdf.SetFont("Montserrat", "B", titleTextSize)
+	pdf.MultiCell(0, titleTextSize, title, "", "", false)
 }
 
 func printSurvey(pdf *fpdf.Fpdf, survey models.Survey) error {
@@ -161,7 +161,6 @@ func printSurvey(pdf *fpdf.Fpdf, survey models.Survey) error {
 	leftMargin, _, rightMargin, _ := pdf.GetMargins()
 	pageWidth, _ := pdf.GetPageSize()
 	availableWidth := pageWidth - leftMargin - rightMargin - 2
-	rowWidth := pageWidth - leftMargin - rightMargin - 1
 
 	setBlackBoldFont(pdf, standardTextSize)
 	if survey.HasAnswer {
@@ -177,18 +176,18 @@ func printSurvey(pdf *fpdf.Fpdf, survey models.Survey) error {
 		dotWidth := pdf.GetStringWidth(".")
 
 		var surveyWidth, paddingWidth float64
-		lines := pdf.SplitText(survey.Title, rowWidth)
+		lines := pdf.SplitText(survey.Title+answer, availableWidth)
 
 		surveyWidth = pdf.GetStringWidth(lines[len(lines)-1])
 		paddingWidth = availableWidth - surveyWidth - answerWidth
 
-		text = strings.Repeat(".", int(paddingWidth/dotWidth)-1) + answer
+		text = strings.Repeat(".", int(paddingWidth/dotWidth)-2) + answer
 	}
 	if survey.Title != "" {
-		pdf.MultiCell(rowWidth, 3.5, survey.Title+text, "", fpdf.AlignLeft, false)
+		pdf.MultiCell(availableWidth, 3.5, survey.Title+text, "", fpdf.AlignLeft, false)
 	}
 	if survey.Subtitle != "" {
-		pdf.MultiCell(rowWidth, 3.5, survey.Subtitle+text, "", fpdf.AlignLeft, false)
+		pdf.MultiCell(availableWidth, 3.5, survey.Subtitle+text, "", fpdf.AlignLeft, false)
 	}
 
 	for _, question := range survey.Questions {
@@ -207,7 +206,6 @@ func printSurvey(pdf *fpdf.Fpdf, survey models.Survey) error {
 
 		if question.HasAnswer {
 			var questionWidth, paddingWidth float64
-
 			if *question.Answer != *question.ExpectedAnswer {
 				return fmt.Errorf("%s: answer not equal expected answer", question.Question)
 			}
@@ -220,14 +218,14 @@ func printSurvey(pdf *fpdf.Fpdf, survey models.Survey) error {
 			answerWidth := pdf.GetStringWidth(answer)
 			dotWidth := pdf.GetStringWidth(".")
 
-			lines := pdf.SplitText(question.Question, rowWidth)
+			lines := pdf.SplitText(question.Question+answer, availableWidth)
 
 			questionWidth = pdf.GetStringWidth(lines[len(lines)-1])
 			paddingWidth = availableWidth - questionWidth - answerWidth
 
-			text = strings.Repeat(".", int(paddingWidth/dotWidth)+1) + answer
+			text = strings.Repeat(".", int(paddingWidth/dotWidth)-2) + answer
 		}
-		pdf.MultiCell(rowWidth, 3.5, question.Question+text, "", fpdf.AlignLeft, false)
+		pdf.MultiCell(availableWidth, 3.5, question.Question+text, "", fpdf.AlignLeft, false)
 	}
 	return nil
 }
@@ -259,9 +257,17 @@ func printStatement(pdf *fpdf.Fpdf, statement models.Statement) {
 		drawSignatureForm(pdf)
 		pdf.Ln(10)
 	}
+	checkPage(pdf)
 }
 
 func indentedText(pdf *fpdf.Fpdf, content string) {
 	pdf.SetX(tabDimension)
 	pdf.MultiCell(0, 3, content, "", fpdf.AlignLeft, false)
+}
+
+func checkPage(pdf *fpdf.Fpdf) {
+	_, pageHeight := pdf.GetPageSize()
+	if pageHeight-pdf.GetY() < 30 {
+		pdf.AddPage()
+	}
 }
