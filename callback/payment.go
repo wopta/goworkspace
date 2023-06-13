@@ -46,20 +46,25 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 		firePolicy := lib.GetDatasetByEnv(origin, "policy")
 		log.Println(uid)
 		log.Println(schedule)
+		//--------------------------------------POLICY
 		policyF := lib.GetFirestore(firePolicy, uid)
 		var policy models.Policy
 		policyF.DataTo(&policy)
 		policyM, _ := policy.Marshal()
 		log.Println(uid+" payment ", string(policyM))
+		//--------------------------------------POLICY
 		if !policy.IsPay && policy.Status == models.PolicyStatusToPay {
 			// Get User UID by fiscal code
+			//--------------------------------------USER
 			userUID, newUser, err := models.GetUserUIDByFiscalCode(r.Header.Get("origin"), policy.Contractor.FiscalCode)
+
 			lib.CheckError(err)
 			policy.Contractor.Uid = userUID
 			log.Println("Contractor UID: ", userUID)
 			log.Println("Policy Contractor UID: ", policy.Contractor.Uid)
-
+			//--------------------------------------USER
 			gsLink := <-document.GetFileV6(policy, uid)
+			//--------------------------------------POLICY
 			log.Println("contractGsLink: ", gsLink)
 			timestamp := strconv.FormatInt(now.Unix(), 10)
 			*policy.Attachments = append(*policy.Attachments, models.Attachment{
@@ -68,7 +73,8 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 				FileName: "Contratto_" + strings.ReplaceAll(policy.NameDesc, " ", "_") +
 					"_" + timestamp + ".pdf",
 			})
-
+			//--------------------------------------POLICY
+			//--------------------------------------USER
 			// Move user identity documents to user folder on Google Storage
 			for _, identityDocument := range policy.Contractor.IdentityDocuments {
 				frontMediaBytes, e := lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"),
@@ -98,13 +104,16 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 				_, err = models.UpdateUserByFiscalCode(r.Header.Get("origin"), policy.Contractor)
 				lib.CheckError(err)
 			}
-
+			//--------------------------------------USER
+			//--------------------------------------POLICY
 			policy.IsPay = true
 			policy.Updated = now
 			policy.Status = models.PolicyStatusPay
 			policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusPay)
 			lib.SetFirestore(firePolicy, uid, policy)
 			policy.BigquerySave(r.Header.Get("origin"))
+			//--------------------------------------POLICY
+			//--------------------------------------Transactions
 			q := lib.Firequeries{
 				Queries: []lib.Firequery{
 					{
@@ -131,6 +140,7 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 			transaction.PayDate = now
 			lib.SetFirestore(fireTransactions, transaction.Uid, transaction)
 			transaction.BigQuerySave(origin)
+			//--------------------------------------Transactions
 			log.Println(uid + " payment sendMail ")
 			var contractbyte []byte
 			name := policy.Uid + ".pdf"

@@ -107,20 +107,22 @@ func FabrickExpireBill(w http.ResponseWriter, r *http.Request) (string, interfac
 	var transaction models.Transaction
 	//layout := "2006-01-02T15:04:05.000Z"
 	layout2 := "2006-01-02"
-	now := time.Now().AddDate(0, 0, -1)
+
 	log.Println(r.Header.Get("uid"))
 	uid := r.Header.Get("uid")
 	fireTransactions := lib.GetDatasetByEnv(r.Header.Get("origin"), "transactions")
 	docsnap, e := lib.GetFirestoreErr(fireTransactions, uid)
 	docsnap.DataTo(&transaction)
-
+	date, e := time.Parse(layout2, transaction.ScheduleDate)
+	now := date.AddDate(0, 0, -1)
 	var urlstring = os.Getenv("FABRICK_BASEURL") + "api/fabrick/pace/v4.0/mods/back/v1.0/transactions/change-expiration"
 
 	req, _ := http.NewRequest(http.MethodPut, urlstring, strings.NewReader(`{
 		"id": `+transaction.ProviderId+`,
 		"newExpirationDate": `+now.Format(layout2)+`
 	  }`))
-	getFabrickClient(urlstring, req)
+	res, e := getFabrickClient(urlstring, req)
+	log.Println(res.Body)
 	transaction.Status = "Delete"
 	transaction.StatusHistory = append(transaction.StatusHistory, "Delete")
 	transaction.IsDelete = true

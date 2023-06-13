@@ -104,13 +104,18 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	return "", nil, e
 }
 func setRow(policy models.Policy, df dataframe.DataFrame, trans models.Transaction) [][]string {
-	var result [][]string
-
+	var (
+		result       [][]string
+		residenceCab string
+	)
 	log.Println("policy.Uid: ", policy.Uid)
 	fil := df.Filter(
 		dataframe.F{Colidx: 4, Colname: "CAP", Comparator: series.Eq, Comparando: policy.Contractor.Residence.PostalCode},
 	)
-	residenceCab := fil.Records()[0][5]
+	if fil.Nrow() > 0 {
+		residenceCab = fil.Records()[1][5]
+	}
+
 	log.Println("residenceCab:", residenceCab)
 	log.Println("fil.Records()[0]:", fil.Records()[0])
 	log.Println("filtered col", fil.Ncol())

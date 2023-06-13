@@ -16,7 +16,7 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
-func getFabrickClient(urlstring string, req *http.Request) *http.Response {
+func getFabrickClient(urlstring string, req *http.Request) (*http.Response, error) {
 	client := &http.Client{
 		Timeout: time.Second * 15,
 	}
@@ -27,8 +27,8 @@ func getFabrickClient(urlstring string, req *http.Request) *http.Response {
 	req.Header.Set("x-auth-token", os.Getenv("FABRICK_TOKEN_BACK_API"))
 	req.Header.Set("Accept", "application/json")
 	res, err := client.Do(req)
-	lib.CheckError(err)
-	return res
+
+	return res, err
 }
 func FabrickPayObj(data models.Policy, firstSchedule bool, scheduleDate string, customerId string, amount float64, origin string) <-chan FabrickPaymentResponse {
 	r := make(chan FabrickPaymentResponse)
