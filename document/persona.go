@@ -152,7 +152,7 @@ func personaGuaranteesTable(pdf *fpdf.Fpdf, policy *models.Policy) {
 						details += beneficiary.Name + " " + beneficiary.Surname + "\n"
 					}
 				} else {
-					details = "===="
+					details = "====="
 				}
 			case "ITI":
 				details = "Franchigia " + guarantee.Value.Deductible + " " + guarantee.Offer[offerName].DeductibleUnit
