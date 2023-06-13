@@ -146,17 +146,13 @@ func personaGuaranteesTable(pdf *fpdf.Fpdf, policy *models.Policy) {
 					details += " Assorbibile"
 				}
 			case "D":
-				if guarantee.Beneficiaries != nil {
-					details = "Beneficiari:\n"
-					if (*guarantee.Beneficiaries)[0].IsLegitimateSuccessors {
-						details += "Eredi leggitimi e/o testamentari"
-					} else {
-						for _, beneficiary := range *guarantee.Beneficiaries {
-							details += beneficiary.Name + " " + beneficiary.Surname + "\n"
-						}
-					}
+				details = "Beneficiari:\n"
+				if guarantee.Beneficiaries == nil || (*guarantee.Beneficiaries)[0].IsLegitimateSuccessors {
+					details += "Eredi leggitimi e/o testamentari"
 				} else {
-					details = "====="
+					for _, beneficiary := range *guarantee.Beneficiaries {
+						details += beneficiary.Name + " " + beneficiary.Surname + "\n"
+					}
 				}
 			case "ITI":
 				details = "Franchigia " + guarantee.Value.Deductible + " " + guarantee.Offer[offerName].DeductibleUnit
