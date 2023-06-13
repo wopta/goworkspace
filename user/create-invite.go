@@ -57,7 +57,6 @@ func SendInviteMail(inviteUid, email string) {
 
 	mailRequest.From = "anna@wopta.it"
 	mailRequest.To = []string{email}
-	mailRequest.Content = `<p>` + inviteUid + `</p>`
 	mailRequest.Subject = "Benvenuto in Wopta!"
 	mailRequest.IsHtml = true
 
@@ -71,13 +70,13 @@ func SendInviteMail(inviteUid, email string) {
 	}
 
 	mailRequest.Message = mailRequest.Message + ` 
-	<p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:17px;color:#000000;font-size:14px">Non scrivere a questo indirizzo email</p>
 	<p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:17px;color:#000000;font-size:14px"><br></p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:17px;color:#000000;font-size:14px">A presto,</p>
 	<p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:17px;color:#e50075;font-size:14px"><strong>Anna</strong> di Wopta Assicurazioni</p> `
 	mailRequest.Title = "Invito a wopta.it"
 	mailRequest.IsHtml = true
 	mailRequest.IsLink = true
 	mailRequest.Link = os.Getenv("WOPTA_CUSTOMER_AREA_BASE_URL") + "/login/inviteregistration?inviteUid=" + inviteUid
+	mailRequest.LinkLabel = "Crea la tua password"
 
 	mail.SendMail(mailRequest)
 }
