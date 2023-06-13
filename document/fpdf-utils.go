@@ -257,9 +257,17 @@ func printStatement(pdf *fpdf.Fpdf, statement models.Statement) {
 		drawSignatureForm(pdf)
 		pdf.Ln(10)
 	}
+	checkPage(pdf)
 }
 
 func indentedText(pdf *fpdf.Fpdf, content string) {
 	pdf.SetX(tabDimension)
 	pdf.MultiCell(0, 3, content, "", fpdf.AlignLeft, false)
+}
+
+func checkPage(pdf *fpdf.Fpdf) {
+	_, pageHeight := pdf.GetPageSize()
+	if pageHeight-pdf.GetY() < 30 {
+		pdf.AddPage()
+	}
 }

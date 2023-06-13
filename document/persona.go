@@ -147,9 +147,13 @@ func personaGuaranteesTable(pdf *fpdf.Fpdf, policy *models.Policy) {
 				}
 			case "D":
 				if guarantee.Beneficiaries != nil {
-					details = "Beneficiari\n"
-					for _, beneficiary := range *guarantee.Beneficiaries {
-						details += beneficiary.Name + " " + beneficiary.Surname + "\n"
+					details = "Beneficiari:\n"
+					if (*guarantee.Beneficiaries)[0].IsLegitimateSuccessors {
+						details += "Eredi leggitimi e/o testamentari"
+					} else {
+						for _, beneficiary := range *guarantee.Beneficiaries {
+							details += beneficiary.Name + " " + beneficiary.Surname + "\n"
+						}
 					}
 				} else {
 					details = "====="
@@ -175,14 +179,23 @@ func personaGuaranteesTable(pdf *fpdf.Fpdf, policy *models.Policy) {
 	pdf.CellFormat(5, titleTextSize, "", "B", 0, fpdf.AlignCenter, false, 0, "")
 	pdf.CellFormat(60, titleTextSize, "Opzioni/Dettagli", "B", 0, fpdf.AlignLeft, false, 0, "")
 	pdf.CellFormat(15, titleTextSize, "Premio", "B", 1, fpdf.AlignRight, false, 0, "")
+
 	for _, slug := range slugs {
+		numLines := float64(len(pdf.SplitText(guaranteesMap[slug.name]["details"], 60)))
+
 		setBlackBoldFont(pdf, standardTextSize)
-		pdf.CellFormat(80, 6, guaranteesMap[slug.name]["name"], "", 0, fpdf.AlignLeft, false, 0, "")
+		pdf.CellFormat(80, 6*numLines, guaranteesMap[slug.name]["name"], "", 0, fpdf.AlignMiddle+fpdf.AlignLeft, false, 0, "")
 		setBlackRegularFont(pdf, standardTextSize)
-		pdf.CellFormat(30, 6, guaranteesMap[slug.name]["sumInsuredLimitOfIndemnity"], "", 0, fpdf.AlignRight, false, 0, "")
-		pdf.CellFormat(5, 6, "", "", 0, fpdf.AlignRight, false, 0, "")
-		pdf.CellFormat(60, 6, guaranteesMap[slug.name]["details"], "", 0, fpdf.AlignLeft, false, 0, "")
-		pdf.CellFormat(15, 6, guaranteesMap[slug.name]["price"], "", 1, fpdf.AlignRight, false, 0, "")
+		pdf.CellFormat(30, 6*numLines, guaranteesMap[slug.name]["sumInsuredLimitOfIndemnity"], "", 0, fpdf.AlignMiddle+fpdf.AlignRight, false, 0, "")
+		pdf.CellFormat(5, 6*numLines, "", "", 0, fpdf.AlignMiddle+fpdf.AlignRight, false, 0, "")
+		if numLines > 1 {
+			pdf.MultiCell(60, 6, guaranteesMap[slug.name]["details"], "", fpdf.AlignMiddle+fpdf.AlignLeft, false)
+			pdf.SetXY(pdf.GetX()+175, pdf.GetY()-6*numLines)
+			pdf.CellFormat(15, 6*numLines, guaranteesMap[slug.name]["price"], "", 1, fpdf.AlignMiddle+fpdf.AlignRight, false, 0, "")
+		} else {
+			pdf.CellFormat(60, 6, guaranteesMap[slug.name]["details"], "", 0, fpdf.AlignMiddle+fpdf.AlignLeft, false, 0, "")
+			pdf.CellFormat(15, 6, guaranteesMap[slug.name]["price"], "", 1, fpdf.AlignMiddle+fpdf.AlignRight, false, 0, "")
+		}
 		drawPinkHorizontalLine(pdf, thinLineWidth)
 	}
 }
