@@ -49,7 +49,7 @@ func Works(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 
 			class = v[1]
 			if class == "S.E." {
-				class = "x"
+				class = "1"
 			}
 
 			sub := Work{
