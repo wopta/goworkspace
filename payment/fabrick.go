@@ -30,7 +30,7 @@ func getFabrickClient(urlstring string, req *http.Request) (*http.Response, erro
 
 	return res, err
 }
-func FabrickPayObj(data models.Policy, firstSchedule bool, scheduleDate string, customerId string, amount float64, origin string) <-chan FabrickPaymentResponse {
+func FabrickPayObj(data models.Policy, firstSchedule bool, scheduleDate string, expireDate string, customerId string, amount float64, origin string) <-chan FabrickPaymentResponse {
 	r := make(chan FabrickPaymentResponse)
 
 	go func() {
@@ -44,7 +44,7 @@ func FabrickPayObj(data models.Policy, firstSchedule bool, scheduleDate string, 
 			Timeout: time.Second * 15,
 		}
 
-		marshal := getfabbricPayments(data, firstSchedule, scheduleDate, customerId, amount, origin)
+		marshal := getfabbricPayments(data, firstSchedule, scheduleDate, expireDate, customerId, amount, origin)
 		log.Printf(data.Uid + " " + string(marshal))
 		//log.Println(getFabrickPay(data))
 		req, _ := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(string(marshal)))
@@ -135,11 +135,12 @@ func FabbrickMontlyPay(data models.Policy, origin string) FabrickPaymentResponse
 	customerId := uuid.New().String()
 	log.Println(data.Uid + " FabbrickMontlyPay")
 	layout := "2006-01-02"
-	firstres := <-FabrickPayObj(data, true, "", customerId, installment, origin)
+	firstres := <-FabrickPayObj(data, true, "", "", customerId, installment, origin)
 	time.Sleep(100)
 	for i := 1; i <= 11; i++ {
 		date := data.StartDate.AddDate(0, i, 0)
-		res := <-FabrickPayObj(data, false, date.Format(layout), customerId, installment, origin)
+		expireDate := date.AddDate(0, 0, 4)
+		res := <-FabrickPayObj(data, false, date.Format(layout), expireDate.Format(layout), customerId, installment, origin)
 		log.Println(data.Uid+" FabbrickMontlyPay res:", res)
 		time.Sleep(100)
 	}
@@ -149,12 +150,12 @@ func FabbrickYearPay(data models.Policy, origin string) FabrickPaymentResponse {
 
 	customerId := uuid.New().String()
 	log.Println(data.Uid + " FabbrickYearPay")
-	res := <-FabrickPayObj(data, false, "", customerId, data.PriceGross, origin)
+	res := <-FabrickPayObj(data, false, "", "", customerId, data.PriceGross, origin)
 
 	return res
 }
 
-func getfabbricPayments(data models.Policy, firstSchedule bool, scheduleDate string, customerId string, amount float64, origin string) string {
+func getfabbricPayments(data models.Policy, firstSchedule bool, scheduleDate string, expireDate string, customerId string, amount float64, origin string) string {
 	var mandate string
 
 	if firstSchedule {
@@ -166,8 +167,6 @@ func getfabbricPayments(data models.Policy, firstSchedule bool, scheduleDate str
 		customerId = uuid.New().String()
 	}
 	now := time.Now()
-	next := now.AddDate(0, 0, 4)
-	layout := "2006-01-02T15:04:05.000Z"
 	layout2 := "2006-01-02"
 
 	paymentMethods := []string{
@@ -185,7 +184,6 @@ func getfabbricPayments(data models.Policy, firstSchedule bool, scheduleDate str
 	} else {
 		scheduleDate = now.Format(layout2)
 	}
-	log.Println(next.Format(layout))
 	externalId := data.Uid + "_" + scheduleDate + "_" + data.CodeCompany + "_" + strings.ReplaceAll(origin, "https://", "")
 	var pay FabrickPaymentsRequest
 	pay.MerchantID = "wop134b31-5926-4b26-1411-726bc9f0b111"
@@ -205,7 +203,6 @@ func getfabbricPayments(data models.Policy, firstSchedule bool, scheduleDate str
 	log.Println(calbackurl)
 	pay.PaymentConfiguration = PaymentConfiguration{
 
-		//ExpirationDate: next.Format(layout),
 		PaymentPageRedirectUrls: PaymentPageRedirectUrls{
 			OnSuccess: "https://www.wopta.it",
 			OnFailure: "https://www.wopta.it",
@@ -216,6 +213,10 @@ func getfabbricPayments(data models.Policy, firstSchedule bool, scheduleDate str
 		CallbackURL:           calbackurl,
 		//PayByLink:             []PayByLink{{Type: "EMAIL", Recipients: data.Contractor.Mail, Template: "pay-by-link"}},
 	}
+	if expireDate != "" {
+		pay.PaymentConfiguration.ExpirationDate = expireDate
+	}
+
 	pay.Bill = bill
 
 	res, _ := pay.Marshal()

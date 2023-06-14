@@ -2,7 +2,7 @@ package payment
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -63,20 +63,20 @@ func Payment(w http.ResponseWriter, r *http.Request) {
 
 }
 func FabrickPay(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
+	req := lib.ErrorByte(io.ReadAll(r.Body))
 
 	var data models.Policy
 	defer r.Body.Close()
 	err := json.Unmarshal([]byte(req), &data)
 	log.Println(data.PriceGross)
 	lib.CheckError(err)
-	resultPay := <-FabrickPayObj(data, false, "", "", data.PriceGross, getOrigin(r.Header.Get("origin")))
+	resultPay := <-FabrickPayObj(data, false, "", "", "", data.PriceGross, getOrigin(r.Header.Get("origin")))
 
 	log.Println(resultPay)
 	return "", nil, err
 }
 func FabrickPayMontly(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
+	req := lib.ErrorByte(io.ReadAll(r.Body))
 
 	var data models.Policy
 	defer r.Body.Close()
@@ -118,13 +118,13 @@ func FabrickExpireBill(w http.ResponseWriter, r *http.Request) (string, interfac
 	var urlstring = os.Getenv("FABRICK_BASEURL") + "api/fabrick/pace/v4.0/mods/back/v1.0/transactions/change-expiration"
 
 	req, _ := http.NewRequest(http.MethodPut, urlstring, strings.NewReader(`{
-		"id": `+transaction.ProviderId+`,
-		"newExpirationDate": `+now.Format(layout2)+`
+		"id": "`+transaction.ProviderId+`",
+		"newExpirationDate": "`+now.Format(layout2)+`"
 	  }`))
 	res, e := getFabrickClient(urlstring, req)
 	log.Println(res.Body)
-	transaction.Status = "Delete"
-	transaction.StatusHistory = append(transaction.StatusHistory, "Delete")
+	transaction.Status = models.PolicyStatusDeleted
+	transaction.StatusHistory = append(transaction.StatusHistory, models.PolicyStatusDeleted)
 	transaction.IsDelete = true
 	lib.SetFirestore(fireTransactions, uid, transaction)
 	e = lib.InsertRowsBigQuery("wopta", fireTransactions, transaction)
