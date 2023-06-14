@@ -87,7 +87,7 @@ func FabrickPayObj(data models.Policy, firstSchedule bool, scheduleDate string, 
 			layout2 := "2006-01-02"
 			var sd string
 			if scheduleDate == "" {
-				sd = time.Now().Format(layout2)
+				sd = time.Now().UTC().Format(layout2)
 			} else {
 				sd = scheduleDate
 			}
@@ -105,6 +105,7 @@ func FabrickPayObj(data models.Policy, firstSchedule bool, scheduleDate string, 
 				Status:             models.TransactionStatusToPay,
 				StatusHistory:      []string{models.TransactionStatusToPay},
 				ScheduleDate:       sd,
+				ExpirationDate:     expireDate,
 				NumberCompany:      data.CodeCompany,
 				Commissions:        data.PriceNett * commission,
 				IsPay:              false,
@@ -213,9 +214,9 @@ func getfabbricPayments(data models.Policy, firstSchedule bool, scheduleDate str
 		CallbackURL:           calbackurl,
 		//PayByLink:             []PayByLink{{Type: "EMAIL", Recipients: data.Contractor.Mail, Template: "pay-by-link"}},
 	}
-	if expireDate != "" {
+	/*if expireDate != "" {
 		pay.PaymentConfiguration.ExpirationDate = expireDate
-	}
+	}*/
 
 	pay.Bill = bill
 
