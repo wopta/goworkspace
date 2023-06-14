@@ -48,10 +48,12 @@ type Policy struct {
 	Name            string                       `firestore:"name,omitempty" json:"name,omitempty" bigquery:"name"`
 	NameDesc        string                       `firestore:"nameDesc,omitempty" json:"nameDesc,omitempty" bigquery:"nameDesc"`
 	BigStartDate    civil.DateTime               `bigquery:"startDate" firestore:"-" json:"-"`
+	BigRenewDate    civil.DateTime               `json:"-" firestore:"-" bigquery:"renewDate"`
 	BigEndDate      civil.DateTime               `bigquery:"endDate" firestore:"-" json:"-"`
 	BigEmitDate     civil.DateTime               `bigquery:"emitDate" firestore:"-" json:"-"`
 	EmitDate        time.Time                    `firestore:"emitDate,omitempty" json:"emitDate,omitempty" bigquery:"-"`
 	StartDate       time.Time                    `firestore:"startDate,omitempty" json:"startDate,omitempty" bigquery:"-"`
+	RenewDate       time.Time                    `json:"renewDate" firestore:"renewDate" bigquery:"-"`
 	EndDate         time.Time                    `firestore:"endDate,omitempty" json:"endDate,omitempty" bigquery:"-"`
 	CreationDate    time.Time                    `firestore:"creationDate,omitempty" json:"creationDate,omitempty" bigquery:"-"`
 	Updated         time.Time                    `firestore:"updated,omitempty" json:"updated,omitempty" bigquery:"-"`
@@ -193,6 +195,7 @@ func (policy *Policy) BigquerySave(origin string) {
 	log.Println(" policy "+policy.Uid, string(policyJson))
 	policy.Data = string(policyJson)
 	policy.BigStartDate = civil.DateTimeOf(policy.StartDate)
+	policy.BigRenewDate = civil.DateTimeOf(policy.RenewDate)
 	policy.BigEndDate = civil.DateTimeOf(policy.EndDate)
 	policy.BigEmitDate = civil.DateTimeOf(policy.EmitDate)
 	log.Println(" policy save big query: " + policy.Uid)
