@@ -16,22 +16,14 @@ type Agency struct {
 	Products     []Product `json:"products" firestore:"products" bigquery:"-"`
 	Policies     []string  `json:"policies" firestore:"policies" bigquery:"-"` // will contain policies UIDs
 	Steps        []Step    `json:"steps" firestore:"steps" bigquery:"-"`
+	Skin         Skin      `json:"skin" firestore:"skin" bigquery:"-"`
+	RuiCode      string    `json:"ruiCode" firestore:"ruiCode" bigquery:"-"`
 	CreationDate time.Time `json:"creationDate" firestore:"creationDate" bigquery:"-"`
 	UpdateDate   time.Time `json:"updateDate" firestore:"updateDate" bigquery:"-"`
 }
 
-func SetAgencyPolicy(policy Policy, amount float64, schedule string) Transaction {
-
-	return Transaction{
-		Amount:        amount,
-		PolicyName:    policy.Name,
-		PolicyUid:     policy.Uid,
-		CreationDate:  time.Now(),
-		Status:        TransactionStatusToPay,
-		StatusHistory: []string{TransactionStatusToPay},
-		ScheduleDate:  schedule,
-		NumberCompany: policy.CodeCompany,
-		IsPay:         false,
-		Name:          policy.Contractor.Name + " " + policy.Contractor.Surname,
-	}
+type Skin struct {
+	PrimaryColor   string `json:"primaryColor" firestore:"primaryColor" bigquery:"-"`
+	SecondaryColor string `json:"secondaryColor" firestore:"secondaryColor" bigquery:"-"`
+	LogoUrl        string `json:"logoUrl" firestore:"logoUrl" bigquery:"-"`
 }

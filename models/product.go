@@ -53,6 +53,8 @@ type Company struct {
 	InformationSetLink        string               `firestore:"informationSetLink,omitempty" json:"informationSetLink,omitempty"`
 	IsMonthlyPaymentAvailable bool                 `firestore:"isMonthlyPaymentAvailable" json:"isMonthlyPaymentAvailable"`
 	Mandate                   Mandate              `json:"mandate" firestore:"mandate" bigquery:"-"`
+	DiscountLimit             float64              `json:"discountLimit" firestore:"discountLimit" bigquery:"-"`
+	AgentCode                 string               `json:"agentCode" firestore:"agentCode" bigquery:"-"`
 }
 
 type Mandate struct {

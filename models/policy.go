@@ -85,18 +85,19 @@ type Policy struct {
 	Attachments     *[]Attachment                `firestore:"attachments,omitempty" json:"attachments,omitempty" bigquery:"-"`
 	Assets          []Asset                      `firestore:"assets,omitempty" json:"assets,omitempty" bigquery:"-"`
 	Claim           *[]Claim                     `firestore:"claim,omitempty" json:"claim,omitempty" bigquery:"-"`
-	Data            string                       `bigquery:"data" firestore:"-"`
-	Json            string                       `bigquery:"json" firestore:"-"`
+	Data            string                       `bigquery:"data" json:"-" firestore:"-"`
+	Json            string                       `bigquery:"json" json:"-" firestore:"-"`
 	OffersPrices    map[string]map[string]*Price `firestore:"offersPrices,omitempty" json:"offersPrices,omitempty" bigquery:"-"`
 	PartnershipName string                       `json:"partnershipName" firestore:"partnershipName" bigquery:"partnershipName"`
 	PartnershipData map[string]interface{}       `json:"partnershipData" firestore:"partnershipData" bigquery:"-"`
 	Reserved        bool                         `json:"reserved" firestore:"reserved" bigquery:"-"`
 	FundsOrigin     string                       `json:"fundsOrigin,omitempty" firestore:"fundsOrigin,omitempty" bigquery:"-"`
-	//AgentUid
+	AgentUid        string                       `json:"agentUid,omitempty" firestore:"agentUid,omitempty" bigquery:"agentUid"`
+	AgencyUid       string                       `json:"agencyUid,omitempty" firestore:"agencyUid,omitempty" bigquery:"agencyUid"`
 }
 
 type RenewHistory struct {
-	Amount       float64   `firestore:"amount ,omitempty" json:"amount,omitempty"`
+	Amount       float64   `firestore:"amount,omitempty" json:"amount,omitempty"`
 	StartDate    time.Time `firestore:"startDate,omitempty" json:"startDate,omitempty"`
 	EndDate      time.Time `firestore:"endDate,omitempty" json:"endDate,omitempty"`
 	CreationDate time.Time `firestore:"creationDate,omitempty" json:"creationDate,omitempty"`
