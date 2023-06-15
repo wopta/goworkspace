@@ -3,6 +3,7 @@ package payment
 import (
 	"cloud.google.com/go/civil"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -121,13 +122,16 @@ func FabrickExpireBill(w http.ResponseWriter, r *http.Request) (string, interfac
 	expirationDate := time.Now().UTC()
 	var urlstring = os.Getenv("FABRICK_BASEURL") + "api/fabrick/pace/v4.0/mods/back/v1.0/payments/change-expiration"
 
-	req, _ := http.NewRequest(http.MethodPut, urlstring, strings.NewReader(`{
+	req, _ := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(`{
 		"id": "`+transaction.ProviderId+`",
 		"newExpirationDate": "`+expirationDate.String()+`"
 	  }`))
 	res, e := getFabrickClient(urlstring, req)
 	respBody, e := io.ReadAll(res.Body)
-	log.Println("Fabrick res body: ", string(respBody), res.Status)
+	log.Println("Fabrick res body: ", string(respBody))
+	if res.StatusCode != http.StatusOK {
+		return "", nil, fmt.Errorf("ExpireBill: fabrick error response status code: ", res.StatusCode)
+	}
 	transaction.ExpirationDate = expirationDate.Format(layout2)
 	transaction.Status = models.PolicyStatusDeleted
 	transaction.StatusHistory = append(transaction.StatusHistory, models.PolicyStatusDeleted)
