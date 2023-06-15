@@ -130,7 +130,7 @@ func FabrickExpireBill(w http.ResponseWriter, r *http.Request) (string, interfac
 	respBody, e := io.ReadAll(res.Body)
 	log.Println("Fabrick res body: ", string(respBody))
 	if res.StatusCode != http.StatusOK {
-		return `{"success":false}`, nil, fmt.Errorf("ExpireBill: fabrick error response status code: ", res.Status)
+		return `{"success":false}`, `{"success":false}`, fmt.Errorf("ExpireBill: fabrick error response status code: ", res.Status)
 	}
 	transaction.ExpirationDate = expirationDate.Format(layout2)
 	transaction.Status = models.PolicyStatusDeleted
@@ -141,5 +141,5 @@ func FabrickExpireBill(w http.ResponseWriter, r *http.Request) (string, interfac
 	lib.SetFirestore(fireTransactions, uid, transaction)
 	e = lib.InsertRowsBigQuery("wopta", fireTransactions, transaction)
 
-	return `{"success":true}`, nil, e
+	return `{"success":true}`, `{"success":true}`, e
 }
