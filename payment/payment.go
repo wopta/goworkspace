@@ -127,7 +127,7 @@ func FabrickExpireBill(w http.ResponseWriter, r *http.Request) (string, interfac
 	  }`))
 	res, e := getFabrickClient(urlstring, req)
 	respBody, e := io.ReadAll(res.Body)
-	log.Println("Fabrick res body: ", string(respBody))
+	log.Println("Fabrick res body: ", string(respBody), res.Status)
 	transaction.ExpirationDate = expirationDate.Format(layout2)
 	transaction.Status = models.PolicyStatusDeleted
 	transaction.StatusHistory = append(transaction.StatusHistory, models.PolicyStatusDeleted)
