@@ -89,10 +89,12 @@ func FabrickPayMontly(w http.ResponseWriter, r *http.Request) (string, interface
 	log.Println(resultPay)
 	return string(b), resultPay, err
 }
+
 func CriptoPay(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 
 	return "", nil, nil
 }
+
 func getOrigin(origin string) string {
 	var result string
 	if strings.Contains(origin, "uat") || strings.Contains(origin, "dev") {
@@ -104,6 +106,7 @@ func getOrigin(origin string) string {
 	log.Println(" getOrigin result: ", result)
 	return result
 }
+
 func FabrickExpireBill(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var transaction models.Transaction
 	layout := "2006-01-02T15:04:05.000Z"
@@ -120,7 +123,7 @@ func FabrickExpireBill(w http.ResponseWriter, r *http.Request) (string, interfac
 
 	req, _ := http.NewRequest(http.MethodPut, urlstring, strings.NewReader(`{
 		"id": "`+transaction.ProviderId+`",
-		"newExpirationDate": "`+expirationDate+`"
+		"expirationDate": "`+expirationDate+`"
 	  }`))
 	res, e := getFabrickClient(urlstring, req)
 	log.Println(res.Body)
