@@ -14,16 +14,28 @@ func mainHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 		logoPath, cfpi, expiryInfo, productName string
 	)
 
+	policyInfo := "Numero: " + policy.CodeCompany + "\n" +
+		"Decorre dal: " + policy.StartDate.Format(dateLayout) + " ore 24:00\n" +
+		"Scade il: " + policy.EndDate.Format(dateLayout) + " ore 24:00\n"
+
 	switch policy.Name {
 	case "life":
 		logoPath = lib.GetAssetPathByEnv(basePath) + "/logo_vita.png"
 		productName = "Vita"
+		policyInfo += expiryInfo + "Non si rinnova a scadenza."
 	case "pmi":
 		logoPath = lib.GetAssetPathByEnv(basePath) + "/pmi.png"
 		productName = "Artigiani & Imprese"
 	case "persona":
 		logoPath = lib.GetAssetPathByEnv(basePath) + "/persona.png"
 		productName = "Persona"
+		policyInfo += "Si rinnova a scadenza salvo disdetta da inviare 30 giorni prima\n" + "Prossimo pagamento "
+		if policy.PaymentSplit == string(models.PaySplitMonthly) {
+			policyInfo += policy.StartDate.AddDate(0, 1, 0).Format(dateLayout) + "\n"
+		} else if policy.PaymentSplit == string(models.PaySplitYear) {
+			policyInfo += policy.StartDate.AddDate(1, 0, 0).Format(dateLayout) + "\n"
+		}
+		policyInfo += "Sostituisce la polizza ========"
 	}
 
 	contractor := policy.Contractor
@@ -43,11 +55,6 @@ func mainHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 		expiryInfo = "Prima scadenza annuale il: " +
 			policy.StartDate.AddDate(1, 0, 0).Format(dateLayout) + "\n"
 	}
-
-	policyInfo := "Numero: " + policy.CodeCompany + "\n" +
-		"Decorre dal: " + policy.StartDate.Format(dateLayout) + " ore 24:00\n" +
-		"Scade il: " + policy.EndDate.Format(dateLayout) + " ore 24:00\n" +
-		expiryInfo + "Non si rinnova a scadenza."
 
 	contractorInfo := "Contraente: " + strings.ToUpper(contractor.Surname+" "+contractor.Name+"\n"+
 		"C.F./P.IVA: "+cfpi) + "\n" +
@@ -79,7 +86,7 @@ func mainHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 		setBlackRegularFont(pdf, standardTextSize)
 		pdf.SetXY(-95, pdf.GetY()+3)
 		pdf.MultiCell(0, 3.5, contractorInfo, "", "", false)
-		pdf.Ln(8)
+		pdf.Ln(5)
 	})
 }
 
