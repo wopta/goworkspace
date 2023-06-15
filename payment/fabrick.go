@@ -84,10 +84,6 @@ func FabrickPayObj(data models.Policy, firstSchedule bool, scheduleDate string, 
 
 			}
 
-			if data.PaymentSplit == "monthly" {
-				commission /= 12
-			}
-
 			log.Println(data.Uid+"pay commission: ", commission)
 			layout2 := "2006-01-02"
 			var sd string
