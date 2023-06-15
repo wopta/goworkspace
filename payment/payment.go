@@ -1,6 +1,7 @@
 package payment
 
 import (
+	"cloud.google.com/go/civil"
 	"encoding/json"
 	"io"
 	"log"
@@ -127,6 +128,7 @@ func FabrickExpireBill(w http.ResponseWriter, r *http.Request) (string, interfac
 	transaction.Status = models.PolicyStatusDeleted
 	transaction.StatusHistory = append(transaction.StatusHistory, models.PolicyStatusDeleted)
 	transaction.IsDelete = true
+	transaction.BigCreationDate = civil.DateTimeOf(transaction.CreationDate)
 	lib.SetFirestore(fireTransactions, uid, transaction)
 	e = lib.InsertRowsBigQuery("wopta", fireTransactions, transaction)
 

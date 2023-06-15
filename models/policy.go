@@ -78,6 +78,7 @@ type Policy struct {
 	TaxAmount         float64                      `firestore:"taxAmount,omitempty" json:"taxAmount,omitempty" bigquery:"taxAmount"`
 	PriceNett         float64                      `firestore:"priceNett,omitempty" json:"priceNett,omitempty" bigquery:"priceNett"`
 	PriceGross        float64                      `firestore:"priceGross,omitempty" json:"priceGross,omitempty" bigquery:"priceGross"`
+	TaxAmountMonthly  float64                      `json:"taxAmountMonthly,omitempty" firestore:"taxAmountMonthly,omitempty" bigquery:"taxAmountMonthly"`
 	PriceNettMonthly  float64                      `json:"priceNettMonthly,omitempty" firestore:"priceNettMonthly,omitempty" bigquery:"priceNettMonthly"`
 	PriceGrossMonthly float64                      `json:"priceGrossMonthly,omitempty" firestore:"priceGrossMonthly,omitempty" bigquery:"priceGrossMonthly"`
 	Agent             *User                        `firestore:"agent,omitempty" json:"agent,omitempty" bigquery:"-"`
