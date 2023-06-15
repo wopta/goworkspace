@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"time"
 )
 
 func GetPoliciesFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -38,10 +39,14 @@ func GetPoliciesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 
 	for index, q := range req.Queries {
 		log.Printf("query %d/%d field: \"%s\" op: \"%s\" value: \"%v\"", index+1, len(req.Queries), q.Field, q.Op, q.Value)
+		value := q.Value
+		if q.Type == "dateTime" {
+			value, _ = time.Parse(time.RFC3339, value.(string))
+		}
 		fireQueries.Queries = append(fireQueries.Queries, lib.Firequery{
 			Field:      q.Field,
 			Operator:   q.Op,
-			QueryValue: q.Value,
+			QueryValue: value,
 		})
 	}
 
@@ -66,6 +71,7 @@ type GetPoliciesReq struct {
 		Field string      `json:"field"`
 		Op    string      `json:"op"`
 		Value interface{} `json:"value"`
+		Type  string      `json:"type"`
 	} `json:"queries,omitempty"`
 	Limit int `json:"limit"`
 	Page  int `json:"page"`
