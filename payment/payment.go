@@ -118,20 +118,21 @@ func FabrickExpireBill(w http.ResponseWriter, r *http.Request) (string, interfac
 	docsnap, e := lib.GetFirestoreErr(fireTransactions, uid)
 	docsnap.DataTo(&transaction)
 	date, e := time.Parse(layout2, transaction.ScheduleDate)
-	expirationDate := date.AddDate(0, 0, -1).Format(layout)
+	expirationDate := date.AddDate(0, 0, -1)
 	var urlstring = os.Getenv("FABRICK_BASEURL") + "api/fabrick/pace/v4.0/mods/back/v1.0/transactions/change-expiration"
 
 	req, _ := http.NewRequest(http.MethodPut, urlstring, strings.NewReader(`{
 		"id": "`+transaction.ProviderId+`",
-		"expirationDate": "`+expirationDate+`"
+		"expirationDate": "`+expirationDate.Format(layout)+`"
 	  }`))
 	res, e := getFabrickClient(urlstring, req)
 	log.Println(res.Body)
-	transaction.ExpirationDate = expirationDate
+	transaction.ExpirationDate = expirationDate.Format(layout2)
 	transaction.Status = models.PolicyStatusDeleted
 	transaction.StatusHistory = append(transaction.StatusHistory, models.PolicyStatusDeleted)
 	transaction.IsDelete = true
 	transaction.BigCreationDate = civil.DateTimeOf(transaction.CreationDate)
+	transaction.BigStatusHistory = strings.Join(transaction.StatusHistory, ",")
 	lib.SetFirestore(fireTransactions, uid, transaction)
 	e = lib.InsertRowsBigQuery("wopta", fireTransactions, transaction)
 
