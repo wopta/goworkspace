@@ -83,6 +83,11 @@ func FabrickPayObj(data models.Policy, firstSchedule bool, scheduleDate string, 
 				}
 
 			}
+
+			if data.PaymentSplit == "monthly" {
+				commission /= 12
+			}
+
 			log.Println(data.Uid+"pay commission: ", commission)
 			layout2 := "2006-01-02"
 			var sd string
@@ -97,11 +102,12 @@ func FabrickPayObj(data models.Policy, firstSchedule bool, scheduleDate string, 
 
 			tr := models.Transaction{
 				Amount:             amount,
+				AmountNet:          data.PriceNett,
 				Id:                 "",
 				Uid:                transactionUid,
 				PolicyName:         data.Name,
 				PolicyUid:          data.Uid,
-				CreationDate:       time.Now(),
+				CreationDate:       time.Now().UTC(),
 				Status:             models.TransactionStatusToPay,
 				StatusHistory:      []string{models.TransactionStatusToPay},
 				ScheduleDate:       sd,
@@ -120,7 +126,7 @@ func FabrickPayObj(data models.Policy, firstSchedule bool, scheduleDate string, 
 
 			lib.SetFirestore(transactionsFire, transactionUid, tr)
 			tr.BigPayDate = bigquery.NullDateTime{}
-			tr.BigCreationDate = civil.DateTimeOf(time.Now())
+			tr.BigCreationDate = civil.DateTimeOf(time.Now().UTC())
 			tr.BigStatusHistory = strings.Join(tr.StatusHistory, ",")
 			err = lib.InsertRowsBigQuery("wopta", transactionsFire, tr)
 			lib.CheckError(err)
