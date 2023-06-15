@@ -70,7 +70,7 @@ func FabrickPay(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 	err := json.Unmarshal([]byte(req), &data)
 	log.Println(data.PriceGross)
 	lib.CheckError(err)
-	resultPay := <-FabrickPayObj(data, false, "", "", "", data.PriceGross, getOrigin(r.Header.Get("origin")))
+	resultPay := <-FabrickPayObj(data, false, "", "", "", data.PriceGross, data.PriceNett, getOrigin(r.Header.Get("origin")))
 
 	log.Println(resultPay)
 	return "", nil, err
