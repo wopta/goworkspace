@@ -30,7 +30,7 @@ func getFabrickClient(urlstring string, req *http.Request) (*http.Response, erro
 
 	return res, err
 }
-func FabrickPayObj(data models.Policy, firstSchedule bool, scheduleDate string, expireDate string, customerId string, amount float64, origin string) <-chan FabrickPaymentResponse {
+func FabrickPayObj(data models.Policy, firstSchedule bool, scheduleDate string, expireDate string, customerId string, amount float64, amountNet float64, origin string) <-chan FabrickPaymentResponse {
 	r := make(chan FabrickPaymentResponse)
 
 	go func() {
@@ -84,10 +84,6 @@ func FabrickPayObj(data models.Policy, firstSchedule bool, scheduleDate string, 
 
 			}
 
-			if data.PaymentSplit == "monthly" {
-				commission /= 12
-			}
-
 			log.Println(data.Uid+"pay commission: ", commission)
 			layout2 := "2006-01-02"
 			var sd string
@@ -102,7 +98,7 @@ func FabrickPayObj(data models.Policy, firstSchedule bool, scheduleDate string, 
 
 			tr := models.Transaction{
 				Amount:             amount,
-				AmountNet:          data.PriceNett,
+				AmountNet:          amountNet,
 				Id:                 "",
 				Uid:                transactionUid,
 				PolicyName:         data.Name,
@@ -113,7 +109,7 @@ func FabrickPayObj(data models.Policy, firstSchedule bool, scheduleDate string, 
 				ScheduleDate:       sd,
 				ExpirationDate:     expireDate,
 				NumberCompany:      data.CodeCompany,
-				Commissions:        data.PriceNett * commission,
+				Commissions:        amountNet * commission,
 				IsPay:              false,
 				Name:               data.Contractor.Name + " " + data.Contractor.Surname,
 				Company:            data.Company,
@@ -137,17 +133,15 @@ func FabrickPayObj(data models.Policy, firstSchedule bool, scheduleDate string, 
 	return r
 }
 func FabbrickMontlyPay(data models.Policy, origin string) FabrickPaymentResponse {
-
-	installment := data.PriceGross / 12
 	customerId := uuid.New().String()
 	log.Println(data.Uid + " FabbrickMontlyPay")
 	layout := "2006-01-02"
-	firstres := <-FabrickPayObj(data, true, "", "", customerId, installment, origin)
+	firstres := <-FabrickPayObj(data, true, "", "", customerId, data.PriceGrossMonthly, data.PriceNettMonthly, origin)
 	time.Sleep(100)
 	for i := 1; i <= 11; i++ {
 		date := data.StartDate.AddDate(0, i, 0)
 		expireDate := date.AddDate(0, 0, 4)
-		res := <-FabrickPayObj(data, false, date.Format(layout), expireDate.Format(layout), customerId, installment, origin)
+		res := <-FabrickPayObj(data, false, date.Format(layout), expireDate.Format(layout), customerId, data.PriceGrossMonthly, data.PriceNettMonthly, origin)
 		log.Println(data.Uid+" FabbrickMontlyPay res:", res)
 		time.Sleep(100)
 	}
@@ -157,7 +151,7 @@ func FabbrickYearPay(data models.Policy, origin string) FabrickPaymentResponse {
 
 	customerId := uuid.New().String()
 	log.Println(data.Uid + " FabbrickYearPay")
-	res := <-FabrickPayObj(data, false, "", "", customerId, data.PriceGross, origin)
+	res := <-FabrickPayObj(data, false, "", "", customerId, data.PriceGross, data.PriceNett, origin)
 
 	return res
 }

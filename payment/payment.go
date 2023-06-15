@@ -1,6 +1,7 @@
 package payment
 
 import (
+	"cloud.google.com/go/civil"
 	"encoding/json"
 	"io"
 	"log"
@@ -70,7 +71,7 @@ func FabrickPay(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 	err := json.Unmarshal([]byte(req), &data)
 	log.Println(data.PriceGross)
 	lib.CheckError(err)
-	resultPay := <-FabrickPayObj(data, false, "", "", "", data.PriceGross, getOrigin(r.Header.Get("origin")))
+	resultPay := <-FabrickPayObj(data, false, "", "", "", data.PriceGross, data.PriceNett, getOrigin(r.Header.Get("origin")))
 
 	log.Println(resultPay)
 	return "", nil, err
@@ -127,6 +128,7 @@ func FabrickExpireBill(w http.ResponseWriter, r *http.Request) (string, interfac
 	transaction.Status = models.PolicyStatusDeleted
 	transaction.StatusHistory = append(transaction.StatusHistory, models.PolicyStatusDeleted)
 	transaction.IsDelete = true
+	transaction.BigCreationDate = civil.DateTimeOf(transaction.CreationDate)
 	lib.SetFirestore(fireTransactions, uid, transaction)
 	e = lib.InsertRowsBigQuery("wopta", fireTransactions, transaction)
 
