@@ -23,7 +23,7 @@ type Transaction struct {
 	Name               string                `firestore:"name,omitempty" json:"name,omitempty" bigquery:"name"`
 	Commission         float64               `firestore:"commission,omitempty" json:"commission,omitempty" bigquery:"commission"`
 	ScheduleDate       string                `firestore:"scheduleDate,omitempty" json:"scheduleDate,omitempty" bigquery:"scheduleDate"`
-	ExpirationDate     string                `json:"expirationDate,omitempty" firestore:"expirationDate,omitempty" bigquery:"-"`
+	ExpirationDate     string                `json:"expirationDate,omitempty" firestore:"expirationDate,omitempty" bigquery:"expirationDate"`
 	PayDate            time.Time             `firestore:"payDate,omitempty" json:"payDate,omitempty" bigquery:"-"`
 	CreationDate       time.Time             `firestore:"creationDate,omitempty" json:"creationDate,omitempty" bigquery:"-"`
 	BigPayDate         bigquery.NullDateTime `firestore:"-" json:"-" bigquery:"payDate"`
