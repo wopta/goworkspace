@@ -66,7 +66,7 @@ func personaInsuredInfoSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 		"extra": "Extraprofessionale",
 	}
 
-	getParagraphTitle(pdf, "La tua assicurazione per il seguente Assicurato e Garanzie")
+	getParagraphTitle(pdf, "La tua assicurazione è operante per il seguente Assicurato e Garanzie")
 	drawPinkHorizontalLine(pdf, thickLineWidth)
 	pdf.Ln(2)
 	contractorInfo := []keyValue{
@@ -267,7 +267,7 @@ func personaOfferResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	case string(models.PaySplitYear):
 		tableInfo = [][]string{
 			{
-				"Annuale firma del contratto",
+				"Annuale firma della polizza",
 				lib.HumanaizePriceEuro(policy.PriceNett),
 				lib.HumanaizePriceEuro(policy.PriceGross - policy.PriceNett),
 				lib.HumanaizePriceEuro(policy.PriceGross),
