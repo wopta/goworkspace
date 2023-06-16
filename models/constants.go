@@ -30,6 +30,7 @@ const (
 	TransactionStatusToPay       = "ToPay"
 	TransactionStatusPay         = "Paid"
 	TransactionStatusCompanyEmit = "CompanyEmited"
+	TransactionStatusDeleted     = "Deleted"
 )
 
 type PaySplit string

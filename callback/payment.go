@@ -7,23 +7,21 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strconv"
 	"strings"
-	"time"
-
-	"cloud.google.com/go/firestore"
 
 	"github.com/wopta/goworkspace/document"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/policy"
+	"github.com/wopta/goworkspace/transaction"
+	"github.com/wopta/goworkspace/user"
 )
 
 func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println("Payment")
 	var response string
 	var e error
-	var query *firestore.DocumentIterator
 	var fabrickCallback FabrickCallback
 	uid := r.URL.Query().Get("uid")
 	schedule := r.URL.Query().Get("schedule")
@@ -34,7 +32,6 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 	log.Println(string(r.RequestURI))
 	json.Unmarshal([]byte(request), &fabrickCallback)
 
-	now := time.Now().UTC()
 	// Unmarshal or Decode the JSON to the interface.
 	if fabrickCallback.Bill.Status == "PAID" {
 		if uid == "" || origin == "" {
@@ -43,127 +40,49 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 			schedule = ext[1]
 			origin = ext[2]
 		}
-		firePolicy := lib.GetDatasetByEnv(origin, "policy")
-		log.Println(uid)
-		log.Println(schedule)
-		//--------------------------------------POLICY
-		policyF := lib.GetFirestore(firePolicy, uid)
-		var policy models.Policy
-		policyF.DataTo(&policy)
-		policyM, _ := policy.Marshal()
-		log.Println(uid+" payment ", string(policyM))
-		//--------------------------------------POLICY
-		if !policy.IsPay && policy.Status == models.PolicyStatusToPay {
-			// Get User UID by fiscal code
-			//--------------------------------------USER
-			userUID, newUser, err := models.GetUserUIDByFiscalCode(r.Header.Get("origin"), policy.Contractor.FiscalCode)
+		log.Println("Payment::uid: " + uid)
+		log.Println("Payment::schedule: " + schedule)
 
-			lib.CheckError(err)
-			policy.Contractor.Uid = userUID
-			log.Println("Contractor UID: ", userUID)
-			log.Println("Policy Contractor UID: ", policy.Contractor.Uid)
-			//--------------------------------------USER
-			gsLink := <-document.GetFileV6(policy, uid)
-			//--------------------------------------POLICY
-			log.Println("contractGsLink: ", gsLink)
-			timestamp := strconv.FormatInt(now.Unix(), 10)
-			*policy.Attachments = append(*policy.Attachments, models.Attachment{
-				Name: "Contratto",
-				Link: gsLink,
-				FileName: "Contratto_" + strings.ReplaceAll(policy.NameDesc, " ", "_") +
-					"_" + timestamp + ".pdf",
-			})
-			//--------------------------------------POLICY
-			//--------------------------------------USER
-			// Move user identity documents to user folder on Google Storage
-			for _, identityDocument := range policy.Contractor.IdentityDocuments {
-				frontMediaBytes, e := lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"),
-					"temp/"+policy.Uid+"/"+identityDocument.FrontMedia.FileName)
-				lib.CheckError(e)
-				frontGsLink, e := lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "assets/users/"+
-					userUID+"/"+identityDocument.FrontMedia.FileName, frontMediaBytes)
-				log.Println("frontGsLink: ", frontGsLink)
-				identityDocument.FrontMedia.Link = frontGsLink
+		p := policy.GetPolicyByUid(uid, origin)
+		if !p.IsPay && p.Status == models.PolicyStatusToPay {
+			// Create/Update document on user collection based on contractor fiscalCode
+			user.SetUserIntoPolicyContractor(&p, origin)
 
-				if identityDocument.BackMedia != nil {
-					backMediaBytes, e := lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"),
-						"temp/"+policy.Uid+"/"+identityDocument.BackMedia.FileName)
-					lib.CheckError(e)
-					backGsLink, e := lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "assets/users/"+
-						userUID+"/"+identityDocument.FrontMedia.FileName, backMediaBytes)
-					log.Println("backGsLink: ", backGsLink)
-					identityDocument.BackMedia.Link = backGsLink
-				}
-			}
+			// Get Policy contract
+			gsLink := <-document.GetFileV6(p, uid)
+			log.Println("Payment::contractGsLink: ", gsLink)
 
-			if newUser {
-				policy.Contractor.CreationDate = now
-				fireUsers := lib.GetDatasetByEnv(r.Header.Get("origin"), "users")
-				lib.SetFirestore(fireUsers, userUID, policy.Contractor)
-			} else {
-				_, err = models.UpdateUserByFiscalCode(r.Header.Get("origin"), policy.Contractor)
-				lib.CheckError(err)
-			}
-			//--------------------------------------USER
-			//--------------------------------------POLICY
-			policy.IsPay = true
-			policy.Updated = now
-			policy.Status = models.PolicyStatusPay
-			policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusPay)
-			lib.SetFirestore(firePolicy, uid, policy)
-			policy.BigquerySave(r.Header.Get("origin"))
-			//--------------------------------------POLICY
-			//--------------------------------------Transactions
-			q := lib.Firequeries{
-				Queries: []lib.Firequery{
-					{
-						Field:      "policyUid",
-						Operator:   "==",
-						QueryValue: uid,
-					},
-					{
-						Field:      "scheduleDate",
-						Operator:   "==",
-						QueryValue: schedule,
-					},
-				},
-			}
-			fireTransactions := lib.GetDatasetByEnv(origin, "transactions")
-			query, e = q.FirestoreWherefields(fireTransactions)
-			transactions := models.TransactionToListData(query)
-			transaction := transactions[0]
-			tr, _ := json.Marshal(transaction)
-			log.Println(uid+" payment ", string(tr))
-			transaction.IsPay = true
-			transaction.Status = models.TransactionStatusPay
-			transaction.StatusHistory = append(transaction.StatusHistory, models.TransactionStatusPay)
-			transaction.PayDate = now
-			lib.SetFirestore(fireTransactions, transaction.Uid, transaction)
-			transaction.BigQuerySave(origin)
-			//--------------------------------------Transactions
-			log.Println(uid + " payment sendMail ")
+			// Update Policy as paid
+			policy.SetPolicyPaid(&p, gsLink, origin)
+
+			// Update the first transaction in policy as paid
+			transaction.SetPolicyFirstTransactionPaid(uid, schedule, origin)
+
+			// Send mail with the contract to the user
+			log.Println("Payment: " + uid + " sendMail ")
 			var contractbyte []byte
-			name := policy.Uid + ".pdf"
+			name := p.Uid + ".pdf"
 			contractbyte, e = lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "assets/users/"+
-				policy.Contractor.Uid+"/contract_"+name)
+				p.Contractor.Uid+"/contract_"+name)
 
-			mail.SendMailContract(policy, &[]mail.Attachment{{
+			mail.SendMailContract(p, &[]mail.Attachment{{
 				Byte:        base64.StdEncoding.EncodeToString(contractbyte),
 				ContentType: "application/pdf",
-				Name: policy.Contractor.Name + "_" + policy.Contractor.Surname + "_" +
-					strings.ReplaceAll(policy.NameDesc, " ", "_") + "_contratto.pdf",
+				Name: p.Contractor.Name + "_" + p.Contractor.Surname + "_" +
+					strings.ReplaceAll(p.NameDesc, " ", "_") + "_contratto.pdf",
 			}})
 
 			response = `{
-			"result": true,
-			"requestPayload": ` + string(request) + `,
-			"locale": "it"
-		}`
+				"result": true,
+				"requestPayload": ` + string(request) + `,
+				"locale": "it"
+			}`
 			log.Println(response)
 		}
 	}
 	return response, nil, e
 }
+
 func UnmarshalFabrickCallback(data []byte) (FabrickCallback, error) {
 	var r FabrickCallback
 	err := json.Unmarshal(data, &r)

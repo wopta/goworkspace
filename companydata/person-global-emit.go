@@ -55,7 +55,7 @@ func PersonGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface
 			{
 				Field:      "name", //
 				Operator:   "==",   //
-				QueryValue: "pmi",
+				QueryValue: "person",
 			},
 			{
 				Field:      "IsDeleted", //

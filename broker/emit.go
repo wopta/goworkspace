@@ -42,7 +42,7 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println("Emit get policy "+uid, string(policyJsonLog))
 	policy.IsSign = false
 	policy.IsPay = false
-	policy.Updated = time.Now()
+	policy.Updated = time.Now().UTC()
 	policy.Uid = uid
 	policy.Status = models.PolicyStatusToSign
 	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusContact)
@@ -50,7 +50,7 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	policy.PaymentSplit = result.PaymentSplit
 	policy.CompanyEmit = true
 	policy.CompanyEmitted = false
-	policy.EmitDate = time.Now()
+	policy.EmitDate = time.Now().UTC()
 	policy.BigEmitDate = civil.DateTimeOf(policy.Updated)
 
 	if policy.Statements == nil {

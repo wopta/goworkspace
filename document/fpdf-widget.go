@@ -289,16 +289,16 @@ func companiesDescriptionSection(pdf *fpdf.Fpdf, companyName string) {
 }
 
 func personalDataHandlingSection(pdf *fpdf.Fpdf, policy *models.Policy) {
-	consentText := "X"
-	notConsentText := ""
+	consentText := ""
+	notConsentText := "X"
 
 	if policy.Contractor.Consens != nil {
 		consent, err := policy.ExtractConsens(2)
 		lib.CheckError(err)
 
-		if !consent.Answer {
-			consentText = ""
-			notConsentText = "X"
+		if consent.Answer {
+			consentText = "X"
+			notConsentText = ""
 		}
 	}
 

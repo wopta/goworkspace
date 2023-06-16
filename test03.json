@@ -1,122 +1,46 @@
 {
-  "emitDate": "0001-01-01T00:00:00Z",
-  "startDate": "2023-05-02T14:59:25.039Z",
-  "endDate": "2043-05-02T14:59:25.039Z",
-  "creationDate": "0001-01-01T00:00:00Z",
-  "updated": "0001-01-01T00:00:00Z",
-  "nextPay": "0001-01-01T00:00:00Z",
-  "contractor": {
-    "birthDate": "1993-05-13T00:00:00.000Z",
-    "location": {},
-    "name": "Luca",
-    "surname": "Melissari",
-    "mail": "luca@mail",
-    "vatCode": "",
-    "creationDate": "0001-01-01T00:00:00Z",
-    "updatedDate": "0001-01-01T00:00:00Z",
-    "consens": [
+  "merchantId": "wop134b31-5926-4b26-1411-726bc9f0b111",
+  "externalId": "S9ZbrqcD06C5ZniRNq0z_2023-07-14_100142_wopta-quoter.web.app",
+  "paymentConfiguration": {
+    "expirationDate": "2023-07-18",
+    "allowedPaymentMethods": [
       {
-        "title": "Privacy",
-        "consens": "Il sottoscritto, letta e compresa l'informativa sul trattamento dei dati personali, ACCONSENTE al trattamento dei propri dati personali da parte di Wopta Assicurazioni per l'invio di comunicazioni e proposte commerciali e di marketing, incluso l'invio di newsletter e ricerche di mercato, attraverso strumenti automatizzati (sms, mms, e-mail, ecc.) e non (posta cartacea e telefono con operatore).",
-        "key": 1,
-        "creationDate": "0001-01-01T00:00:00Z"
+        "role": "payer",
+        "paymentMethods": [
+          "CREDITCARD"
+        ]
       }
     ],
-    "height": 0,
-    "weight": 0
+    "callbackUrl": "https://europe-west1-positive-apex-350507.cloudfunctions.net/callback/v1/payment?uid=S9ZbrqcD06C5ZniRNq0z&schedule=2023-07-14&token=vzx8fn3v9qi6x53zmfkgvg5cxmneoskpnj6fpk1qa092fgped8tfr5imbkev6zu9&origin=https://wopta-quoter.web.app",
+    "paymentPageRedirectUrls": {
+      "onFailure": "https://www.wopta.it",
+      "onSuccess": "https://www.wopta.it"
+    }
   },
-  "statements": [],
-  "attachments": [],
-  "assets": [
-    {
-      "guarantees": [
-        {
-          "type": "person",
-          "beneficiaries": [
-            {
-              "location": {},
-              "vatCode": "",
-              "creationDate": "0001-01-01T00:00:00Z",
-              "updatedDate": "0001-01-01T00:00:00Z",
-              "height": 0,
-              "weight": 0,
-              "isFamilyMember": false,
-              "isContactable": false,
-              "isLegitimateSuccessors": true
-            }
-          ],
-          "description": "Cosa significa amare le persone a te più care? Scegli il sostegno di un capitale, a disposizione di chi resta, per affrontare «il dopo» di un drammatico imprevisto, con una certezza economica in più.",
-          "companyName": "Decesso",
-          "group": "DEATH",
-          "value": {
-            "deductibleValues": {},
-            "sumInsuredLimitOfIndemnity": 200000,
-            "sumInsuredValues": {},
-            "selfInsuranceValues": {},
-            "duration": {
-              "year": 20
-            },
-            "tax": 0,
-            "percentage": 0,
-            "premiumNetYearly": 115.84,
-            "premiumGrossYearly": 115.84,
-            "premiumNetMonthly": 9.65,
-            "premiumGrossMonthly": 9.65
-          },
-          "config": {
-            "deductibleValues": {},
-            "sumInsuredValues": {
-              "min": 50000,
-              "max": 200000,
-              "step": 25000
-            },
-            "selfInsuranceValues": {},
-            "durationValues": {
-              "min": 5,
-              "max": 20,
-              "step": 5
-            },
-            "tax": 0,
-            "percentage": 0,
-            "premiumNetYearly": 0
-          },
-          "offer": {
-            "default": {
-              "deductibleValues": {},
-              "sumInsuredLimitOfIndemnity": 100000,
-              "sumInsuredValues": {},
-              "selfInsuranceValues": {},
-              "duration": {
-                "year": 10
-              },
-              "tax": 0,
-              "percentage": 0,
-              "premiumNetYearly": 0
-            }
-          },
-          "slug": "death",
-          "isMandatory": true,
-          "isExtension": false,
-          "name": "morte",
-          "tax": 10,
-          "isSellable": true,
-          "isConfigurable": true,
-          "subtitle": "per qualsiasi causa"
-        }
-      ]
-    }
-  ],
-  "Data": "",
-  "Json": "",
-  "offersPrices": {
-    "default": {
-      "yearly": {
-        "net": 115.84,
-        "tax": 0,
-        "gross": 115.84,
-        "delta": 0,
-        "discount": 0
+  "bill": {
+    "externalId": "S9ZbrqcD06C5ZniRNq0z_2023-07-14_100142_wopta-quoter.web.app",
+    "amount": 119.16916666666667,
+    "currency": "EUR",
+    "description": "Pagamento polizza n° 100142",
+    "items": [
+      {
+        "externalId": "S9ZbrqcD06C5ZniRNq0z_2023-07-14_100142_wopta-quoter.web.app",
+        "amount": 119.16916666666667,
+        "currency": "EUR"
       }
-    }
+    ],
+    "scheduleTransaction": {
+      "dueDate": "2023-07-14",
+      "paymentInstrumentResolutionStrategy": "BY_PAYER"
+    },
+    "mandateCreation": "false",
+    "subjects": [
+      {
+        "role": "customer",
+        "externalId": "896be223-8117-4e74-bfcc-5feebc1e41a0",
+        "email": "yousef.hammar@wopta.it",
+        "name": "Yousef Hammar"
+      }
+    ]
   }
 }

@@ -151,7 +151,7 @@ func personaGuaranteesTable(pdf *fpdf.Fpdf, policy *models.Policy) {
 					details += "Eredi leggitimi e/o testamentari"
 				} else {
 					for _, beneficiary := range *guarantee.Beneficiaries {
-						details += beneficiary.Name + " " + beneficiary.Surname + "\n"
+						details += beneficiary.Name + " " + beneficiary.Surname + " " + beneficiary.FiscalCode + "\n"
 					}
 				}
 			case "ITI":

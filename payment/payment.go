@@ -2,12 +2,15 @@ package payment
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
 	"strings"
 	"time"
+
+	"cloud.google.com/go/civil"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/wopta/goworkspace/lib"
@@ -63,20 +66,20 @@ func Payment(w http.ResponseWriter, r *http.Request) {
 
 }
 func FabrickPay(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
+	req := lib.ErrorByte(io.ReadAll(r.Body))
 
 	var data models.Policy
 	defer r.Body.Close()
 	err := json.Unmarshal([]byte(req), &data)
 	log.Println(data.PriceGross)
 	lib.CheckError(err)
-	resultPay := <-FabrickPayObj(data, false, "", "", data.PriceGross, getOrigin(r.Header.Get("origin")))
+	resultPay := <-FabrickPayObj(data, false, "", "", "", data.PriceGross, data.PriceNett, getOrigin(r.Header.Get("origin")))
 
 	log.Println(resultPay)
 	return "", nil, err
 }
 func FabrickPayMontly(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
+	req := lib.ErrorByte(io.ReadAll(r.Body))
 
 	var data models.Policy
 	defer r.Body.Close()
@@ -88,10 +91,12 @@ func FabrickPayMontly(w http.ResponseWriter, r *http.Request) (string, interface
 	log.Println(resultPay)
 	return string(b), resultPay, err
 }
+
 func CriptoPay(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 
 	return "", nil, nil
 }
+
 func getOrigin(origin string) string {
 	var result string
 	if strings.Contains(origin, "uat") || strings.Contains(origin, "dev") {
@@ -103,6 +108,7 @@ func getOrigin(origin string) string {
 	log.Println(" getOrigin result: ", result)
 	return result
 }
+
 func FabrickExpireBill(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var transaction models.Transaction
 	//layout := "2006-01-02T15:04:05.000Z"
@@ -113,22 +119,28 @@ func FabrickExpireBill(w http.ResponseWriter, r *http.Request) (string, interfac
 	fireTransactions := lib.GetDatasetByEnv(r.Header.Get("origin"), "transactions")
 	docsnap, e := lib.GetFirestoreErr(fireTransactions, uid)
 	docsnap.DataTo(&transaction)
-	date, e := time.Parse(layout2, transaction.ScheduleDate)
-	now := date.AddDate(0, 0, -1)
-	var urlstring = os.Getenv("FABRICK_BASEURL") + "api/fabrick/pace/v4.0/mods/back/v1.0/transactions/change-expiration"
+	//date, e := time.Parse(layout2, transaction.ScheduleDate)
+	expirationDate := time.Now().UTC()
+	var urlstring = os.Getenv("FABRICK_BASEURL") + "api/fabrick/pace/v4.0/mods/back/v1.0/payments/change-expiration"
 
-	req, _ := http.NewRequest(http.MethodPut, urlstring, strings.NewReader(
-		`{
+	req, _ := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(`{
 		"id": "`+transaction.ProviderId+`",
-		"newExpirationDate": "`+now.Format(layout2)+`"
+		"newExpirationDate": "`+expirationDate.String()+`"
 	  }`))
 	res, e := getFabrickClient(urlstring, req)
-	log.Println(res.Body)
-	transaction.Status = "Delete"
-	transaction.StatusHistory = append(transaction.StatusHistory, "Delete")
+	respBody, e := io.ReadAll(res.Body)
+	log.Println("Fabrick res body: ", string(respBody))
+	if res.StatusCode != http.StatusOK {
+		return `{"success":false}`, `{"success":false}`, fmt.Errorf("ExpireBill: fabrick error response status code: ", res.Status)
+	}
+	transaction.ExpirationDate = expirationDate.Format(layout2)
+	transaction.Status = models.PolicyStatusDeleted
+	transaction.StatusHistory = append(transaction.StatusHistory, models.PolicyStatusDeleted)
 	transaction.IsDelete = true
+	transaction.BigCreationDate = civil.DateTimeOf(transaction.CreationDate)
+	transaction.BigStatusHistory = strings.Join(transaction.StatusHistory, ",")
 	lib.SetFirestore(fireTransactions, uid, transaction)
 	e = lib.InsertRowsBigQuery("wopta", fireTransactions, transaction)
 
-	return "", nil, e
+	return `{"success":true}`, `{"success":true}`, e
 }

@@ -26,7 +26,8 @@ func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	defer r.Body.Close()
 	policyFire = lib.GetDatasetByEnv(r.Header.Get("origin"), "policy")
 	guaranteFire := lib.GetDatasetByEnv(r.Header.Get("origin"), "guarante")
-	policy.CreationDate = time.Now()
+	policy.CreationDate = time.Now().UTC()
+	policy.RenewDate = policy.CreationDate.AddDate(1, 0, 0)
 	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusInitLead)
 	policy.Status = models.PolicyStatusInitLead
 	numb := GetSequenceProposal("", policyFire)

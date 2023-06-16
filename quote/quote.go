@@ -1,18 +1,18 @@
 package quote
 
 import (
-	"github.com/wopta/goworkspace/models"
 	"log"
 	"net/http"
 	"strings"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 
-	lib "github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 )
 
 func init() {
-	log.Println("INIT Rules")
+	log.Println("INIT Quote")
 	functions.HTTP("Quote", Quote)
 }
 
