@@ -117,9 +117,10 @@ func FabrickExpireBill(w http.ResponseWriter, r *http.Request) (string, interfac
 	now := date.AddDate(0, 0, -1)
 	var urlstring = os.Getenv("FABRICK_BASEURL") + "api/fabrick/pace/v4.0/mods/back/v1.0/transactions/change-expiration"
 
-	req, _ := http.NewRequest(http.MethodPut, urlstring, strings.NewReader(`{
-		"id": `+transaction.ProviderId+`,
-		"newExpirationDate": `+now.Format(layout2)+`
+	req, _ := http.NewRequest(http.MethodPut, urlstring, strings.NewReader(
+		`{
+		"id": "`+transaction.ProviderId+`",
+		"newExpirationDate": "`+now.Format(layout2)+`"
 	  }`))
 	res, e := getFabrickClient(urlstring, req)
 	log.Println(res.Body)

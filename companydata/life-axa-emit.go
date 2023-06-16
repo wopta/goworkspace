@@ -20,22 +20,30 @@ import (
 func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		from          time.Time
+		to            time.Time
 		filenamesplit string
 		cabCsv        []byte
 		result        [][]string
 	)
 
 	now := time.Now()
-	fromM := time.Now().AddDate(0, -1, 0)
-	fromQ := time.Now().AddDate(0, 0, -15)
+	M := time.Now().AddDate(0, 0, -2)
+	Q2 := time.Now().AddDate(0, 0, -1)
 	dateString := "2021-11-22"
 	date, _ := time.Parse("2006-01-02", dateString)
 	log.Println(date)
-	if now.Day() == 15 || now.Day() == 1 {
-		from = fromQ
+	if now.Day() == 16 {
+		from, e = time.Parse("2006-01-02", strconv.Itoa(now.Year())+"-"+fmt.Sprintf("%02d", int(now.Month()))+"-"+fmt.Sprintf("%02d", 1))
+		to, e = time.Parse("2006-01-02", strconv.Itoa(now.Year())+"-"+fmt.Sprintf("%02d", int(now.Month()))+"-"+fmt.Sprintf("%02d", 16))
 		filenamesplit = "Q"
-	} else {
-		from = fromM
+	} else if now.Day() == 1 {
+
+		from, e = time.Parse("2006-01-02", strconv.Itoa(Q2.Year())+"-"+fmt.Sprintf("%02d", int(Q2.Month()))+"-"+fmt.Sprintf("%02d", 16))
+		to, e = time.Parse("2006-01-02", strconv.Itoa(Q2.Year())+"-"+fmt.Sprintf("%02d", int(Q2.Month()))+"-"+fmt.Sprintf("%02d", Q2.Day()))
+		filenamesplit = "Q"
+	} else if now.Day() == 2 {
+		from, e = time.Parse("2006-01-02", strconv.Itoa(M.Year())+"-"+fmt.Sprintf("%02d", int(M.Month()))+"-"+fmt.Sprintf("%02d", 1))
+		to, e = time.Parse("2006-01-02", strconv.Itoa(M.Year())+"-"+fmt.Sprintf("%02d", int(M.Month()))+"-"+fmt.Sprintf("%02d", M.Day()))
 		filenamesplit = "M"
 	}
 	switch os.Getenv("env") {
@@ -44,6 +52,8 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	default:
 		cabCsv = lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "data/cab-cap-istat.csv", "")
 	}
+	log.Println(from)
+	log.Println(to)
 	df := lib.CsvToDataframe(cabCsv)
 	q := lib.Firequeries{
 		Queries: []lib.Firequery{
@@ -75,7 +85,7 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 			{
 				Field:      "payDate", //
 				Operator:   "<",       //
-				QueryValue: now,
+				QueryValue: to,
 			},
 		},
 	}
@@ -92,6 +102,8 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		docsnap := lib.GetFirestore("policy", transaction.PolicyUid)
 		docsnap.DataTo(&policy)
 		result = append(result, setRow(policy, df, transaction)...)
+		transaction.IsEmit = true
+		lib.SetFirestore("transactions", transaction.Uid, transaction)
 
 	}
 
@@ -408,7 +420,7 @@ func setRow(policy models.Policy, df dataframe.DataFrame, trans models.Transacti
 }
 func getFormatdate(d time.Time) string {
 	var res string
-	res = strconv.Itoa(d.Year()) + fmt.Sprintf("%02d", int(d.Month())) + fmt.Sprintf("%02d", d.Day())
+	res = fmt.Sprintf("%02d", d.Day()) + fmt.Sprintf("%02d", int(d.Month())) + strconv.Itoa(d.Year())
 	return res
 
 }
