@@ -61,11 +61,11 @@ func (router RouteData) Router(w http.ResponseWriter, r *http.Request) {
 	}
 	if e != nil {
 		log.Println("Router error")
+		log.Println(e.Error())
 		// Temporary work-around while test-function is not rewritten
 		reader := strings.NewReader(`{"message":"` + e.Error() + `"}`)
 		io.Copy(w, reader)
 
-		// log.Println(e.Error())
 		// http.Error(w, e.Error(), 500)
 	}
 	if !isFound {
