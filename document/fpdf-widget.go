@@ -252,8 +252,15 @@ func emitResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 		offerPrice = humanize.FormatFloat("#.###,##", policy.PriceGross)
 	}
 	text := "Polizza emessa a Milano il " + emitDate + " per un importo di € " + offerPrice + " quale " +
-		"prima rata alla firma, il cui pagamento a saldo è da effettuarsi con i metodi di pagamento sopra indicati. " +
-		"Wopta conferma avvenuto incasso e copertura della polizza dal " + startDate + "."
+		"prima rata alla firma, il cui pagamento a saldo è da effettuarsi con i metodi di pagamento sopra indicati."
+	switch policy.Name {
+	case "life":
+		text += " Wopta conferma avvenuto incasso e copertura della polizza dal " + startDate + "."
+	case "persona":
+		text += "\nCostituisce quietanza di pagamento la mail di conferma che Wopta invierà al Contraente."
+
+	}
+
 	getParagraphTitle(pdf, "Emissione polizza e pagamento della prima rata")
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, text, "", "", false)
