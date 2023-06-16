@@ -24,7 +24,7 @@ func init() {
 
 func Payment(w http.ResponseWriter, r *http.Request) {
 
-	log.Println("Callback")
+	log.Println("Payment")
 	lib.EnableCors(&w, r)
 	w.Header().Set("Access-Control-Allow-Methods", "POST")
 	route := lib.RouteData{
@@ -56,7 +56,7 @@ func Payment(w http.ResponseWriter, r *http.Request) {
 			},
 			{
 				Route:   "/manual/v1/:transactionUid",
-				Handler: ManualPay,
+				Handler: ManualPaymentFx,
 				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},
