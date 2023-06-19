@@ -2,6 +2,7 @@ package user
 
 import (
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -24,19 +25,21 @@ func CreateInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 		return `{"success": false}`, `{"success": false}`, nil
 	}
 
-	if inviteUid, ok := CreateInvite(createInviteRequest.Email, createInviteRequest.Role, r.Header.Get("Origin"), creatorUid); ok {
+	if inviteUid, err := CreateInvite(createInviteRequest.Email, createInviteRequest.Role, r.Header.Get("Origin"), creatorUid); err != nil {
 		SendInviteMail(inviteUid, createInviteRequest.Email)
 	}
 
 	return `{"success": true}`, `{"success": true}`, nil
 }
 
-func CreateInvite(mail, role, origin, creatorUid string) (string, bool) {
+func CreateInvite(mail, role, origin, creatorUid string) (string, error) {
 	log.Printf("[CreateInvite] Creating invite for user %s with role %s", mail, role)
 
 	collectionName := lib.GetDatasetByEnv(origin, invitesCollection)
 	inviteUid := lib.NewDoc(collectionName)
-	inviteExpiration := time.Now().UTC().Add(time.Hour * 168)
+
+	oneWeek := time.Hour * 168
+	inviteExpiration := time.Now().UTC().Add(oneWeek)
 
 	invite := UserInvite{
 		Email:      mail,
@@ -46,10 +49,19 @@ func CreateInvite(mail, role, origin, creatorUid string) (string, bool) {
 		CreatorUid: creatorUid,
 	}
 
-	lib.SetFirestore(collectionName, invite.Uid, invite)
+	// check if user exists
+	_, err := GetAuthUserByMail(mail)
+	if err == nil {
+		return "", errors.New("user already exists")
+	}
+
+	err = lib.SetFirestoreErr(collectionName, invite.Uid, invite)
+	if err != nil {
+		return "", errors.New("could not create user")
+	}
 
 	log.Printf("[CreateInvite] Created invite with uid %s", invite.Uid)
-	return invite.Uid, true
+	return invite.Uid, nil
 }
 
 func SendInviteMail(inviteUid, email string) {
@@ -87,6 +99,7 @@ type CreateInviteRequest struct {
 }
 
 type UserInvite struct {
+	UserUid    string    `json:"userUid,omitempty" firestore:"userUid,omitempty"`
 	Role       string    `json:"role,omitempty" firestore:"role,omitempty"`
 	Email      string    `json:"email,omitempty" firestore:"email,omitempty"`
 	Uid        string    `json:"uid,omitempty" firestore:"uid,omitempty"`
