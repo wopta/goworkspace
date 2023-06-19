@@ -5,7 +5,7 @@ go 1.19
 replace github.com/wopta/goworkspace/transaction => ./
 
 require (
-	github.com/wopta/goworkspace/lib v1.0.47
+	github.com/wopta/goworkspace/lib v1.0.48
 	github.com/wopta/goworkspace/models v1.0.95
 )
 
