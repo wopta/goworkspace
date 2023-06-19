@@ -27,15 +27,15 @@ func CreateInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 		return `{"success": false}`, `{"success": false}`, nil
 	}
 
-	if inviteUid, err := CreateInvite(createInviteRequest.Name, createInviteRequest.Surname, createInviteRequest.FiscalCode, createInviteRequest.Email, createInviteRequest.Role, r.Header.Get("Origin"), creatorUid); err != nil {
+	if inviteUid, err := CreateInvite(createInviteRequest, r.Header.Get("Origin"), creatorUid); err != nil {
 		SendInviteMail(inviteUid, createInviteRequest.Email)
 	}
 
 	return `{"success": true}`, `{"success": true}`, nil
 }
 
-func CreateInvite(name, surname, fiscalCode, mail, role, origin, creatorUid string) (string, error) {
-	log.Printf("[CreateInvite] Creating invite for user %s with role %s", mail, role)
+func CreateInvite(inviteRequest CreateInviteRequest, origin, creatorUid string) (string, error) {
+	log.Printf("[CreateInvite] Creating invite for user %s with role %s", inviteRequest.Email, inviteRequest.Role)
 
 	collectionName := lib.GetDatasetByEnv(origin, invitesCollection)
 	inviteUid := lib.NewDoc(collectionName)
@@ -45,8 +45,8 @@ func CreateInvite(name, surname, fiscalCode, mail, role, origin, creatorUid stri
 
 	roles := models.GetAllRoles()
 	var userRole *string = nil
-	for _, availableRole := range roles {
-		if (strings.EqualFold(role, availableRole)) {
+	for _, role := range roles {
+		if (strings.EqualFold(inviteRequest.Role, role)) {
 			userRole = &role
 		}
 	}
@@ -56,10 +56,10 @@ func CreateInvite(name, surname, fiscalCode, mail, role, origin, creatorUid stri
 	}
 
 	invite := UserInvite{
-		Name:       name,
-		Surname:    surname,
-		FiscalCode: fiscalCode,
-		Email:      mail,
+		Name:       inviteRequest.Name,
+		Surname:    inviteRequest.Surname,
+		FiscalCode: inviteRequest.FiscalCode,
+		Email:      inviteRequest.Email,
 		Role:       *userRole,
 		Expiration: inviteExpiration,
 		Uid:        inviteUid,
@@ -67,7 +67,7 @@ func CreateInvite(name, surname, fiscalCode, mail, role, origin, creatorUid stri
 	}
 
 	// check if user exists
-	_, err := GetAuthUserByMail(mail)
+	_, err := GetAuthUserByMail(inviteRequest.Email)
 	if err == nil {
 		return "", errors.New("user already exists")
 	}
