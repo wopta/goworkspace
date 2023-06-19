@@ -7,18 +7,19 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
 )
 
-type UpdateUserReq struct {
+type updateUserReq struct {
 	Role string `json:"role"`
 }
 
 func UpdateUserRoleFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		userUid string
-		user    models.User
-		request UpdateUserReq
-		err     error
+		userUid, userRole string
+		user              models.User
+		request           updateUserReq
+		err               error
 	)
 
 	log.Println("Update User Role")
@@ -30,6 +31,17 @@ func UpdateUserRoleFx(w http.ResponseWriter, r *http.Request) (string, interface
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	err = json.Unmarshal(body, &request)
 	lib.CheckError(err)
+
+	roles := models.GetAllRoles()
+	for _, role := range roles {
+		if strings.EqualFold(request.Role, role) {
+			userRole = role
+		}
+	}
+	if userRole == "" {
+		log.Printf("UpdateUserRole: %s invalid user role", request.Role)
+		return `{"success":false}`, `{"success":false}`, nil
+	}
 
 	log.Println("UpdateUserRole: get user from firestore")
 	fireUser := lib.GetDatasetByEnv(r.Header.Get("origin"), "users")
