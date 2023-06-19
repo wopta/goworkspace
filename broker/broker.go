@@ -2,13 +2,14 @@ package broker
 
 import (
 	"fmt"
-	"github.com/wopta/goworkspace/models"
 	"log"
 	"net/http"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	dag "github.com/heimdalr/dag"
+	sp "github.com/scipipe/scipipe"
 	lib "github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 )
 
 func init() {
@@ -120,4 +121,22 @@ func reserved(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	fmt.Print(d.String())
 
 	return "", nil, nil
+}
+func test() string {
+	// Init workflow with a name, and max concurrent tasks
+	wf := sp.NewWorkflow("hello_world", 4)
+
+	// Initialize processes and set output file paths
+	hello := wf.NewProc("hello", "echo 'Hello ' > {o:out}")
+	hello.SetOut("out", "hello.txt")
+
+	world := wf.NewProc("world", "echo $(cat {i:in}) World >> {o:out}")
+	world.SetOut("out", "{i:in|%.txt}_world.txt")
+
+	// Connect network
+	world.In("in").From(hello.Out("out"))
+
+	// Run workflow
+	wf.Run()
+	return ""
 }
