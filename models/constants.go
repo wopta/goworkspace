@@ -60,3 +60,7 @@ const (
 	UserRoleAgent    string = "agent"
 	UserRoleAgency   string = "agency"
 )
+
+const (
+	TimeDateOnly string = "2006-01-02"
+)

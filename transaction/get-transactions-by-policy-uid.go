@@ -50,8 +50,8 @@ func GetPolicyTransactions(origin string, policyUid string) []models.Transaction
 func (t Transactions) Len() int      { return len(t) }
 func (t Transactions) Swap(i, j int) { t[i], t[j] = t[j], t[i] }
 func (t Transactions) Less(i, j int) bool {
-	firstDate, _ := time.Parse(time.DateOnly, t[i].ScheduleDate)
-	secondDate, _ := time.Parse(time.DateOnly, t[j].ScheduleDate)
+	firstDate, _ := time.Parse(models.TimeDateOnly, t[i].ScheduleDate)
+	secondDate, _ := time.Parse(models.TimeDateOnly, t[j].ScheduleDate)
 
 	return firstDate.Before(secondDate)
 }
