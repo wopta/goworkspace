@@ -156,15 +156,19 @@ func (fx *Fx) FloatToString(in float64, decimal int64) string {
 	SURVEY AND STATEMENT CUSTOM FUNCTIONS
 */
 
-func (fx *Fx) AppendStatement(statements []*Statement, title string, subtitle string, hasMultipleAnswers bool, hasAnswer bool, expectedAnswer bool) []*Statement {
+func (fx *Fx) AppendStatement(statements []*Statement, title, simploTitle, subtitle, simploSubtitle string, hasMultipleAnswers, hasAnswer, expectedAnswer, companySign, contractorSign bool) []*Statement {
 	statement := &Statement{
 		Title:              title,
+		SimploTitle:        simploTitle,
 		Subtitle:           subtitle,
+		SimploSubtitle:     simploSubtitle,
 		HasMultipleAnswers: nil,
 		Questions:          make([]*Question, 0),
 		Answer:             nil,
 		HasAnswer:          hasAnswer,
 		ExpectedAnswer:     nil,
+		ContractorSign:     contractorSign,
+		CompanySign:        companySign,
 	}
 	if hasAnswer {
 		statement.ExpectedAnswer = &expectedAnswer
@@ -175,7 +179,7 @@ func (fx *Fx) AppendStatement(statements []*Statement, title string, subtitle st
 	return append(statements, statement)
 }
 
-func (fx *Fx) AppendSurvey(surveys []*Survey, title string, subtitle string, hasMultipleAnswers bool, hasAnswer bool, expectedAnswer bool) []*Survey {
+func (fx *Fx) AppendSurvey(surveys []*Survey, title, simploTitle, subtitle, simploSubtitle string, hasMultipleAnswers, hasAnswer, expectedAnswer, companySign, contractorSign bool) []*Survey {
 	survey := &Survey{
 		Title:              title,
 		Subtitle:           subtitle,
@@ -194,9 +198,10 @@ func (fx *Fx) AppendSurvey(surveys []*Survey, title string, subtitle string, has
 	return append(surveys, survey)
 }
 
-func (fx *Fx) AppendQuestion(questions []*Question, text string, isBold bool, indent bool, hasAnswer bool, expectedAnswer bool) []*Question {
+func (fx *Fx) AppendQuestion(questions []*Question, text, simploText string, isBold, indent, hasAnswer, expectedAnswer bool) []*Question {
 	question := &Question{
 		Question:       text,
+		SimploText:     simploText,
 		IsBold:         isBold,
 		Indent:         indent,
 		Answer:         nil,
