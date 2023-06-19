@@ -7,7 +7,7 @@ replace github.com/wopta/goworkspace/transaction => ./
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.4
 	github.com/wopta/goworkspace/lib v1.0.48
-	github.com/wopta/goworkspace/models v1.0.95
+	github.com/wopta/goworkspace/models v1.0.96
 )
 
 require (
