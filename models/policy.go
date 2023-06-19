@@ -62,7 +62,10 @@ type Policy struct {
 	Payment           string                       `firestore:"payment,omitempty" json:"payment,omitempty" bigquery:"payment"`
 	PaymentType       string                       `firestore:"paymentType,omitempty" json:"paymentType,omitempty" bigquery:"paymentType"`
 	PaymentSplit      string                       `firestore:"paymentSplit,omitempty" json:"paymentSplit,omitempty" bigquery:"paymentSplit"`
+	DeleteCode        string                       `json:"deleteCode,omitempty" firestore:"deleteCode,omitempty" bigquery:"-"`
 	DeleteDesc        string                       `firestore:"deleteDesc,omitempty" json:"deleteDesc,omitempty" bigquery:"-"`
+	DeleteDate        time.Time                    `json:"deleteDate,omitempty" firestore:"deleteDate,omitempty" bigquery:"-"`
+	RefundType        string                       `json:"refundType,omitempty" firestore:"refundType,omitempty" bigquery:"-"`
 	IsPay             bool                         `firestore:"isPay" json:"isPay,omitempty" bigquery:"isPay"`
 	IsAutoRenew       bool                         `firestore:"isAutoRenew,omitempty" json:"isAutoRenew,omitempty" bigquery:"isAutoRenew"`
 	IsRenew           bool                         `firestore:"isRenew" json:"isRenew,omitempty" bigquery:"isRenew"`
