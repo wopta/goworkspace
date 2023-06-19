@@ -102,3 +102,10 @@ func SetCustomClaimForUser(uid string, claims map[string]interface{}) {
 		log.Fatalf("error setting custom claims %v\n", err)
 	}
 }
+
+func GetAuthUserIdByEmail(mail string) (string, error) {
+	client, ctx := getClient()
+	
+	user, err := client.GetUserByEmail(ctx, mail)
+	return user.UID, err
+}
