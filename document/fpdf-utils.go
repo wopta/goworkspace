@@ -253,7 +253,16 @@ func printStatement(pdf *fpdf.Fpdf, statement models.Statement) {
 		pdf.MultiCell(0, 3.5, question.Question, "", fpdf.AlignLeft, false)
 	}
 	pdf.Ln(5)
-	if statement.HasAnswer {
+	if statement.CompanySign {
+		setBlackBoldFont(pdf, standardTextSize)
+		pdf.CellFormat(70, 3, "Global Assistance", "", 0,
+			fpdf.AlignCenter, false, 0, "")
+		var opt fpdf.ImageOptions
+		opt.ImageType = "png"
+		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/firma_global.png", 25, pdf.GetY()+3, 40, 12,
+			false, opt, 0, "")
+	}
+	if statement.ContractorSign {
 		drawSignatureForm(pdf)
 		pdf.Ln(10)
 	}
