@@ -50,8 +50,8 @@ func (skin Skin) GlobalContract(m pdf.Maroto, data models.Policy) {
 		logo = "/pmi.png"
 		name = "Artigiani & Imprese"
 		if data.PaymentSplit == "monthly" {
-			data.PriceNett = data.PriceNett / 12
-			data.PriceGross = data.PriceNett / 12
+			data.PriceNett = data.PriceNettMonthly
+			data.PriceGross = data.PriceGrossMonthly
 		}
 		m = skin.GetHeader(m, data, logo, name)
 		m = skin.GetFooter(m, "/logo_global.png", "Wopta per te. Artigiani & Imprese è un prodotto assicurativo di Global Assistance Compagnia di assicurazioni e riassicurazioni S.p.A, distribuito da Wopta Assicurazioni S.r.l")
