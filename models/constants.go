@@ -61,6 +61,10 @@ const (
 	UserRoleAgency   string = "agency"
 )
 
+func GetAllRoles() []string {
+	return []string{UserRoleAll, UserRoleCustomer, UserRoleAdmin, UserRoleManager, UserRoleAgent, UserRoleAgency}
+}
+
 const (
 	TimeDateOnly string = "2006-01-02"
 )

@@ -113,7 +113,7 @@ func GetUserByFiscalCodeFx(resp http.ResponseWriter, r *http.Request) (string, i
 
 func GetUserByFiscalCode(fiscalCode string) (models.User, error) {
 	log.Println(fiscalCode)
-	userFirebase := lib.WhereLimitFirestore("users", "fiscalCode", "==", fiscalCode, 1)
+	userFirebase := lib.WhereLimitFirestore(usersCollection, "fiscalCode", "==", fiscalCode, 1)
 	var user models.User
 	user, err := models.FirestoreDocumentToUser(userFirebase)
 	return user, err
@@ -129,7 +129,7 @@ func GetUserByMailFx(resp http.ResponseWriter, r *http.Request) (string, interfa
 
 func GetUserByMail(mail string) (models.User, error) {
 	log.Println(mail)
-	userFirebase := lib.WhereLimitFirestore("users", "mail", "==", mail, 1)
+	userFirebase := lib.WhereLimitFirestore(usersCollection, "mail", "==", mail, 1)
 	var user models.User
 	user, err := models.FirestoreDocumentToUser(userFirebase)
 	return user, err
@@ -174,4 +174,15 @@ func SetUserIntoPolicyContractor(policy *models.Policy, origin string) {
 		_, err = models.UpdateUserByFiscalCode(origin, policy.Contractor)
 		lib.CheckError(err)
 	}
+}
+
+func GetAuthUserByMail(mail string) (models.User, error) {
+	var user models.User
+
+	authId, err := lib.GetAuthUserIdByEmail(mail)
+	if err != nil {
+		return user, err
+	}
+
+	return GetUserByAuthId(authId)
 }
