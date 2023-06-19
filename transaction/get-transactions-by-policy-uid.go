@@ -2,33 +2,14 @@ package transaction
 
 import (
 	"encoding/json"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
 	"log"
 	"net/http"
 	"sort"
+	"time"
+
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 )
-
-func GetTransactionsByPolicyUidFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	var (
-		response GetPolicyTransactionsResp
-	)
-
-	log.Println("GetPolicyTransactions")
-
-	fireTransactions := lib.GetDatasetByEnv(r.Header.Get("origin"), "transactions")
-	policyUID := r.Header.Get("policyUid")
-
-	res := lib.WhereFirestore(fireTransactions, "policyUid", "==", policyUID)
-
-	response.Transactions = models.TransactionToListData(res)
-
-	sort.Sort(response.Transactions)
-
-	jsonOut, err := json.Marshal(response)
-
-	return string(jsonOut), response, err
-}
 
 type GetPolicyTransactionsResp struct {
 	Transactions Transactions `json:"transactions"`
@@ -36,6 +17,41 @@ type GetPolicyTransactionsResp struct {
 
 type Transactions []models.Transaction
 
-func (t Transactions) Len() int           { return len(t) }
-func (t Transactions) Swap(i, j int)      { t[i], t[j] = t[j], t[i] }
-func (t Transactions) Less(i, j int) bool { return t[i].CreationDate.Before(t[j].CreationDate) }
+func GetTransactionsByPolicyUidFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	var response GetPolicyTransactionsResp
+
+	policyUid := r.Header.Get("policyUid")
+
+	log.Printf("GetPolicyTransactionsFx: %s", policyUid)
+
+	res := GetPolicyTransactions(r.Header.Get("origin"), policyUid)
+
+	response.Transactions = res
+
+	jsonOut, err := json.Marshal(response)
+
+	return string(jsonOut), response, err
+}
+
+func GetPolicyTransactions(origin string, policyUid string) []models.Transaction {
+	var transactions Transactions
+
+	fireTransactions := lib.GetDatasetByEnv(origin, "transactions")
+
+	res := lib.WhereFirestore(fireTransactions, "policyUid", "==", policyUid)
+
+	transactions = models.TransactionToListData(res)
+
+	sort.Sort(transactions)
+
+	return transactions
+}
+
+func (t Transactions) Len() int      { return len(t) }
+func (t Transactions) Swap(i, j int) { t[i], t[j] = t[j], t[i] }
+func (t Transactions) Less(i, j int) bool {
+	firstDate, _ := time.Parse(time.DateOnly, t[i].ScheduleDate)
+	secondDate, _ := time.Parse(time.DateOnly, t[j].ScheduleDate)
+
+	return firstDate.Before(secondDate)
+}
