@@ -7,14 +7,14 @@ replace github.com/wopta/goworkspace/payment => ./
 require (
 	cloud.google.com/go v0.110.2
 	cloud.google.com/go/bigquery v1.51.1
-	github.com/GoogleCloudPlatform/functions-framework-go v1.7.3
+	github.com/GoogleCloudPlatform/functions-framework-go v1.7.4
 	github.com/google/uuid v1.3.0
 	github.com/wopta/goworkspace/document v1.0.59
 	github.com/wopta/goworkspace/lib v1.0.48
 	github.com/wopta/goworkspace/mail v1.0.21
-	github.com/wopta/goworkspace/models v1.0.95
+	github.com/wopta/goworkspace/models v1.0.96
 	github.com/wopta/goworkspace/policy v1.0.0
-	github.com/wopta/goworkspace/transaction v1.0.1
+	github.com/wopta/goworkspace/transaction v1.0.3
 	github.com/wopta/goworkspace/user v1.0.8
 )
 
