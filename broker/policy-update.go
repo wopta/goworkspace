@@ -107,7 +107,7 @@ func DeletePolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	lib.SetFirestore(firePolicy, policyUID, policy)
 	policy.BigquerySave(r.Header.Get("origin"))
 	models.SetGuaranteBigquery(policy, "delete", guaranteFire)
-	return `{"uid":"` + policyUID + `", "success":"true"}`, `{"uid":"` + policyUID + `", "success":"true"}`, err
+	return `{"uid":"` + policyUID + `", "success":true}`, `{"uid":"` + policyUID + `", "success":true}`, err
 }
 
 type PolicyDeleteReq struct {
