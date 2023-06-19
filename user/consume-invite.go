@@ -65,7 +65,10 @@ func ConsumeInvite(inviteUid, password, origin string) (bool, error) {
 		Surname:    invite.Surname,
 	}
 
-	lib.SetFirestore(usersCollectionName, user.Uid, user)
+	err = lib.SetFirestoreErr(usersCollectionName, user.Uid, user)
+	if err != nil {
+		return false, err
+	}
 
 	// update the user custom claim
 	lib.SetCustomClaimForUser(user.AuthId, map[string]interface{}{
