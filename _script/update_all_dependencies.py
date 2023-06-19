@@ -171,8 +171,6 @@ def updateDependencies(dependency_map, modules):
 
     updated_dependency_map = {}
     for dependency_to_update in dependencies_to_update:
-        if dependency_to_update.module_version is None:
-            continue
         print(f"Updating module {dependency_to_update.module}...")
 
         incremented_version = increment_version(dependency_to_update.module_version, increment_version_key)
@@ -197,11 +195,41 @@ def updateDependencies(dependency_map, modules):
     new_dependency_map = {k: v for k, v in updated_dependency_map.items() if (len(v)) > 0}
     updateDependencies(new_dependency_map, modules)
 
+def updateFunctions(modules):
+    if len(modules) == 0:
+        return
+    
+    dependencies_to_update: list[Dependecy] = []
+    for module in modules:
+        if module.function_version is not None:
+            dependencies_to_update.append(module)
 
-dependencies_to_update: list[Dependecy] = []
-for module in changed_modules:
-    module_version = retrieve_tag_info(module, environment, "module")
-    module_function_version = retrieve_tag_info(module, environment, "function")
-    dependencies_to_update.append(Dependecy(module=module, module_version=module_version, function_version=module_function_version))
-dependencies_to_update = [dep for dep in dependencies_to_update if dep.module_version is not None]
+    updated_dependency_map = {}
+    for dependency_to_update in dependencies_to_update:
+        print(f"Updating module {dependency_to_update.module}...")
+
+        incremented_version = increment_version(dependency_to_update.function_version, increment_version_key)
+        print(
+            f"Incrementing version of {dependency_to_update.module} from {dependency_to_update.function_version} to {incremented_version}")
+
+        # TODO: update
+        print(
+            f"git tag -a {dependency_to_update.module}/{incremented_version}.{environment} -m \"Updating {dependency_to_update.module}\"")
+
+
+def initialize_modules(changed_modules, environment):
+    dependencies_to_update: list[Dependecy] = []
+    for module in changed_modules:
+        module_version = retrieve_tag_info(module, environment, "module")
+        module_function_version = retrieve_tag_info(module, environment, "function")
+        dependencies_to_update.append(Dependecy(module=module, module_version=module_version, function_version=module_function_version))
+    dependencies_to_update = [dep for dep in dependencies_to_update if dep.module_version is not None]
+    return dependencies_to_update
+
+dependencies_to_update = initialize_modules(changed_modules, environment)
+
+print("Creating update for modules")
 updateDependencies(deps, dependencies_to_update)
+
+print("Creating update for functions")
+updateFunctions(dependencies_to_update)
