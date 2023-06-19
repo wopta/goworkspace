@@ -43,7 +43,7 @@ func ConsumeInvite(inviteUid, password, origin string) (bool, error) {
 
 	// Check if invite is not consumed nor expired
 	if invite.Consumed || time.Now().UTC().After(invite.Expiration) {
-		return false, errors.New("Invite consumed or expired")
+		return false, errors.New("invite consumed or expired")
 	}
 
 	usersCollectionName := lib.GetDatasetByEnv(origin, usersCollection)
@@ -56,12 +56,15 @@ func ConsumeInvite(inviteUid, password, origin string) (bool, error) {
 
 	// create user in DB
 	user := models.User{
-		Mail:   invite.Email,
-		Uid:    userRecord.UID,
-		AuthId: userRecord.UID,
-		Role:   invite.Role,
+		Mail:       invite.Email,
+		Uid:        userRecord.UID,
+		AuthId:     userRecord.UID,
+		Role:       invite.Role,
+		FiscalCode: invite.FiscalCode,
+		Name:       invite.Name,
+		Surname:    invite.Surname,
 	}
-	
+
 	lib.SetFirestore(usersCollectionName, user.Uid, user)
 
 	// update the user custom claim

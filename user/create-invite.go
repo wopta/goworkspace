@@ -7,10 +7,12 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/mail"
+	"github.com/wopta/goworkspace/models"
 )
 
 func CreateInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -25,14 +27,14 @@ func CreateInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 		return `{"success": false}`, `{"success": false}`, nil
 	}
 
-	if inviteUid, err := CreateInvite(createInviteRequest.Email, createInviteRequest.Role, r.Header.Get("Origin"), creatorUid); err != nil {
+	if inviteUid, err := CreateInvite(createInviteRequest.Name, createInviteRequest.Surname, createInviteRequest.FiscalCode, createInviteRequest.Email, createInviteRequest.Role, r.Header.Get("Origin"), creatorUid); err != nil {
 		SendInviteMail(inviteUid, createInviteRequest.Email)
 	}
 
 	return `{"success": true}`, `{"success": true}`, nil
 }
 
-func CreateInvite(mail, role, origin, creatorUid string) (string, error) {
+func CreateInvite(name, surname, fiscalCode, mail, role, origin, creatorUid string) (string, error) {
 	log.Printf("[CreateInvite] Creating invite for user %s with role %s", mail, role)
 
 	collectionName := lib.GetDatasetByEnv(origin, invitesCollection)
@@ -41,9 +43,24 @@ func CreateInvite(mail, role, origin, creatorUid string) (string, error) {
 	oneWeek := time.Hour * 168
 	inviteExpiration := time.Now().UTC().Add(oneWeek)
 
+	roles := models.GetAllRoles()
+	var userRole *string = nil
+	for _, availableRole := range roles {
+		if (strings.EqualFold(role, availableRole)) {
+			userRole = &role
+		}
+	}
+
+	if userRole == nil {
+		return "", errors.New("forbidden role")
+	}
+
 	invite := UserInvite{
+		Name:       name,
+		Surname:    surname,
+		FiscalCode: fiscalCode,
 		Email:      mail,
-		Role:       role,
+		Role:       *userRole,
 		Expiration: inviteExpiration,
 		Uid:        inviteUid,
 		CreatorUid: creatorUid,
@@ -94,12 +111,17 @@ func SendInviteMail(inviteUid, email string) {
 }
 
 type CreateInviteRequest struct {
-	Role  string `json:"role"`
-	Email string `json:"email"`
+	Role       string `json:"role"`
+	Email      string `json:"email"`
+	FiscalCode string `json:"fiscalCode,omitempty" firestore:"fiscalCode,omitempty"`
+	Name       string `json:"name,omitempty" firestore:"name,omitempty"`
+	Surname    string `json:"Surname,omitempty" firestore:"Surname,omitempty"`
 }
 
 type UserInvite struct {
-	UserUid    string    `json:"userUid,omitempty" firestore:"userUid,omitempty"`
+	FiscalCode string    `json:"fiscalCode,omitempty" firestore:"fiscalCode,omitempty"`
+	Name       string    `json:"name,omitempty" firestore:"name,omitempty"`
+	Surname    string    `json:"Surname,omitempty" firestore:"Surname,omitempty"`
 	Role       string    `json:"role,omitempty" firestore:"role,omitempty"`
 	Email      string    `json:"email,omitempty" firestore:"email,omitempty"`
 	Uid        string    `json:"uid,omitempty" firestore:"uid,omitempty"`
