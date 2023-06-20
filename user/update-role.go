@@ -36,6 +36,7 @@ func UpdateUserRoleFx(w http.ResponseWriter, r *http.Request) (string, interface
 	for _, role := range roles {
 		if strings.EqualFold(request.Role, role) {
 			userRole = role
+			break
 		}
 	}
 	if userRole == "" {
@@ -44,7 +45,7 @@ func UpdateUserRoleFx(w http.ResponseWriter, r *http.Request) (string, interface
 	}
 
 	log.Println("UpdateUserRole: get user from firestore")
-	fireUser := lib.GetDatasetByEnv(r.Header.Get("origin"), "users")
+	fireUser := lib.GetDatasetByEnv(r.Header.Get("origin"), usersCollection)
 	docsnap, err := lib.GetFirestoreErr(fireUser, userUid)
 	lib.CheckError(err)
 	err = docsnap.DataTo(&user)
@@ -57,7 +58,7 @@ func UpdateUserRoleFx(w http.ResponseWriter, r *http.Request) (string, interface
 
 	log.Println("UpdateUserRole: updating user role in DB")
 	user.Role = request.Role
-	lib.SetFirestore(fireUser, userUid, user)
+	err = lib.SetFirestoreErr(fireUser, userUid, user)
 
 	return `{"success":true}`, `{"success":true}`, err
 }
