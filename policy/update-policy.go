@@ -61,7 +61,7 @@ func PatchPolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	b := lib.ErrorByte(io.ReadAll(r.Body))
 	err = json.Unmarshal(b, &updateValues)
 	if err != nil {
-		log.Println("PathPolicy: unable to unmarshal request body")
+		log.Println("PatchPolicy: unable to unmarshal request body")
 		return `{"uid":"` + policyUID + `", "success":false}`, `{"uid":"` + policyUID + `", "success":false}`, nil
 	}
 
@@ -69,7 +69,7 @@ func PatchPolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 
 	err = lib.UpdateFirestoreErr(firePolicy, policyUID, updateValues)
 	if err != nil {
-		log.Println("PathPolicy: error during update policy in firestore ")
+		log.Println("PatchPolicy: error during update policy in firestore ")
 		return `{"uid":"` + policyUID + `", "success":false}`, `{"uid":"` + policyUID + `", "success":false}`, nil
 	}
 
