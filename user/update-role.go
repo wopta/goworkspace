@@ -2,6 +2,7 @@ package user
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"io"
@@ -40,7 +41,7 @@ func UpdateUserRoleFx(w http.ResponseWriter, r *http.Request) (string, interface
 	}
 	if userRole == "" {
 		log.Printf("UpdateUserRole: %s invalid user role", request.Role)
-		return `{"success":false}`, `{"success":false}`, nil
+		return `{"success":false}`, `{"success":false}`, fmt.Errorf("invalid user role")
 	}
 
 	log.Println("UpdateUserRole: get user from firestore")
