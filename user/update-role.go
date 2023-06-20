@@ -16,10 +16,10 @@ type updateUserReq struct {
 
 func UpdateUserRoleFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
+		err               error
 		userUid, userRole string
 		user              models.User
 		request           updateUserReq
-		err               error
 	)
 
 	log.Println("Update User Role")
