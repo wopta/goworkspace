@@ -26,7 +26,8 @@ func UpdatePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	b := lib.ErrorByte(io.ReadAll(r.Body))
 	err = json.Unmarshal(b, &policy)
 	if err != nil {
-		return `{"uid":"` + policyUID + `", "success":"false"}`, `{"uid":"` + policyUID + `", "success":"false"}`, err
+		log.Println("UpdatePolicy: unable to unmarshal request body")
+		return `{"uid":"` + policyUID + `", "success":false}`, `{"uid":"` + policyUID + `", "success":false}`, err
 	}
 
 	input = make(map[string]interface{}, 0)
@@ -43,7 +44,7 @@ func UpdatePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 
 	lib.FireUpdate(firePolicy, policyUID, input)
 
-	return `{"uid":"` + policyUID + `", "success":"true"}`, `{"uid":"` + policyUID + `", "success":"true"}`, err
+	return `{"uid":"` + policyUID + `", "success":true}`, `{"uid":"` + policyUID + `", "success":true}`, err
 }
 
 func PatchPolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -60,17 +61,19 @@ func PatchPolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	b := lib.ErrorByte(io.ReadAll(r.Body))
 	err = json.Unmarshal(b, &updateValues)
 	if err != nil {
-		return `{"uid":"` + policyUID + `", "success":"false"}`, `{"uid":"` + policyUID + `", "success":"false"}`, err
+		log.Println("PathPolicy: unable to unmarshal request body")
+		return `{"uid":"` + policyUID + `", "success":false}`, `{"uid":"` + policyUID + `", "success":false}`, nil
 	}
 
 	updateValues["updated"] = time.Now().UTC()
 
 	err = lib.UpdateFirestoreErr(firePolicy, policyUID, updateValues)
 	if err != nil {
-		return `{"uid":"` + policyUID + `", "success":"false"}`, `{"uid":"` + policyUID + `", "success":"false"}`, err
+		log.Println("PathPolicy: error during update policy in firestore ")
+		return `{"uid":"` + policyUID + `", "success":false}`, `{"uid":"` + policyUID + `", "success":false}`, nil
 	}
 
-	return `{"uid":"` + policyUID + `", "success":"true"}`, `{"uid":"` + policyUID + `", "success":"true"}`, err
+	return `{"uid":"` + policyUID + `", "success":true}`, `{"uid":"` + policyUID + `", "success":true}`, err
 }
 func DeletePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
@@ -94,7 +97,7 @@ func DeletePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	lib.SetFirestore(firePolicy, policyUID, policy)
 	policy.BigquerySave(r.Header.Get("origin"))
 	models.SetGuaranteBigquery(policy, "delete", guaranteFire)
-	return `{"uid":"` + policyUID + `", "success":"true"}`, `{"uid":"` + policyUID + `", "success":"true"}`, err
+	return `{"uid":"` + policyUID + `", "success":true}`, `{"uid":"` + policyUID + `", "success":true}`, err
 }
 
 type PolicyDeleteReq struct {
