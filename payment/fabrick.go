@@ -122,6 +122,7 @@ func FabrickPayObj(data models.Policy, firstSchedule bool, scheduleDate string, 
 
 			lib.SetFirestore(transactionsFire, transactionUid, tr)
 			tr.BigPayDate = bigquery.NullDateTime{}
+			tr.BigTransactionDate = bigquery.NullDateTime{}
 			tr.BigCreationDate = civil.DateTimeOf(time.Now().UTC())
 			tr.BigStatusHistory = strings.Join(tr.StatusHistory, ",")
 			err = lib.InsertRowsBigQuery("wopta", transactionsFire, tr)

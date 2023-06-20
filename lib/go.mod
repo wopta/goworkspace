@@ -5,6 +5,7 @@ go 1.19
 replace github.com/wopta/goworkspace/lib => ./
 
 require (
+	cloud.google.com/go v0.110.0
 	cloud.google.com/go/bigquery v1.51.1
 	cloud.google.com/go/firestore v1.9.0
 	cloud.google.com/go/storage v1.29.0
@@ -21,7 +22,6 @@ require (
 )
 
 require (
-	cloud.google.com/go v0.110.0 // indirect
 	cloud.google.com/go/compute v1.19.0 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
 	cloud.google.com/go/iam v0.13.0 // indirect

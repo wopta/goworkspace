@@ -28,8 +28,10 @@ type Transaction struct {
 	ExpirationDate     string                `json:"expirationDate,omitempty" firestore:"expirationDate,omitempty" bigquery:"expirationDate"`
 	PayDate            time.Time             `firestore:"payDate,omitempty" json:"payDate,omitempty" bigquery:"-"`
 	CreationDate       time.Time             `firestore:"creationDate,omitempty" json:"creationDate,omitempty" bigquery:"-"`
+	TransactionDate    time.Time             `firestore:"transactionDate,omitempty" json:"transactionDate,omitempty" bigquery:"-"`
 	BigPayDate         bigquery.NullDateTime `firestore:"-" json:"-" bigquery:"payDate"`
 	BigCreationDate    civil.DateTime        `firestore:"-" json:"-" bigquery:"creationDate"`
+	BigTransactionDate bigquery.NullDateTime `firestore:"-" json:"-" bigquery:"transactionDate"`
 	Uid                string                `firestore:"uid,omitempty" json:"uid,omitempty" bigquery:"uid"`
 	PolicyUid          string                `firestore:"policyUid,omitempty" json:"policyUid,omitempty" bigquery:"policyUid"`
 	Company            string                `firestore:"company,omitempty" json:"company,omitempty" bigquery:"company"`
@@ -100,7 +102,8 @@ func (transaction *Transaction) BigQuerySave(origin string) {
 		return
 	}
 	log.Println("Transaction: "+transaction.Uid, string(transactionJson))
-	transaction.BigPayDate = bigquery.NullDateTime{DateTime: civil.DateTimeOf(transaction.PayDate)}
+	transaction.BigPayDate = lib.GetBigQueryNullDateTime(transaction.PayDate)
+	transaction.BigTransactionDate = lib.GetBigQueryNullDateTime(transaction.TransactionDate)
 	transaction.BigCreationDate = civil.DateTimeOf(transaction.CreationDate)
 	transaction.BigStatusHistory = strings.Join(transaction.StatusHistory, ",")
 	log.Println("Transaction save BigQuery: " + transaction.Uid)
