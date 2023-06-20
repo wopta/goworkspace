@@ -2,7 +2,6 @@ package payment
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -131,7 +130,8 @@ func FabrickExpireBill(w http.ResponseWriter, r *http.Request) (string, interfac
 	respBody, e := io.ReadAll(res.Body)
 	log.Println("Fabrick res body: ", string(respBody))
 	if res.StatusCode != http.StatusOK {
-		return `{"success":false}`, `{"success":false}`, fmt.Errorf("ExpireBill: fabrick error response status code: ", res.Status)
+		log.Printf("ExpireBill: fabrick error response status code: %s", res.Status)
+		return `{"success":false}`, `{"success":false}`, nil
 	}
 	transaction.ExpirationDate = expirationDate.Format(layout2)
 	transaction.Status = models.PolicyStatusDeleted
