@@ -240,7 +240,7 @@ func emitResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	emitDate := policy.EmitDate.Format(dateLayout)
 	startDate := policy.StartDate.Format(dateLayout)
 	if policy.PaymentSplit == "monthly" {
-		offerPrice = humanize.FormatFloat("#.###,##", policy.PriceGross*12)
+		offerPrice = humanize.FormatFloat("#.###,##", policy.PriceGrossMonthly)
 	} else {
 		offerPrice = humanize.FormatFloat("#.###,##", policy.PriceGross)
 	}
