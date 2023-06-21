@@ -48,7 +48,7 @@ func Sign(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 				policy.Attachments = new([]models.Attachment)
 			}
 			lib.SetFirestore(firePolicy, uid, policy)
-			policy.BigquerySave(r.Header.Get("origin"))
+			policy.BigquerySave(r.URL.Query().Get("origin"))
 			mail.SendMailPay(policy)
 			//s := <-document.GetFileV6(&policy, uid)
 
