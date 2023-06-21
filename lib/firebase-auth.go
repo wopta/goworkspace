@@ -107,5 +107,9 @@ func GetAuthUserIdByEmail(mail string) (string, error) {
 	client, ctx := getClient()
 	
 	user, err := client.GetUserByEmail(ctx, mail)
-	return user.UID, err
+	
+	if err != nil {
+		return "", err
+	}
+	return user.UID, nil
 }
