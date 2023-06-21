@@ -6,7 +6,7 @@ replace github.com/wopta/goworkspace/user => ./
 
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.3
-	github.com/wopta/goworkspace/lib v1.0.49
+	github.com/wopta/goworkspace/lib v1.0.50
 	github.com/wopta/goworkspace/models v1.0.98
 	github.com/wopta/goworkspace/wiseproxy v1.0.3
 	golang.org/x/exp v0.0.0-20230515195305-f3d0a9c9a5cc
