@@ -37,6 +37,14 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		return "", nil, err
 	}
 
+	methods := GetAllPaymentMethods()
+	isMethodAllowed := lib.SliceContains[string](methods, payload.PaymentMethod)
+
+	if !isMethodAllowed {
+		log.Printf("ManualPaymentFx ERROR: %s", errPaymentMethodNotAllowed)
+		return "", nil, errors.New(errPaymentMethodNotAllowed)
+	}
+
 	origin := r.Header.Get("origin")
 	transactionUid := r.Header.Get("transactionUid")
 	fireTransactions := lib.GetDatasetByEnv(origin, "transactions")
@@ -53,8 +61,8 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 	lib.CheckError(err)
 
 	if t.IsPay {
-		log.Printf("ManualPaymentFx ERROR: %s", ERR_TR_PAID)
-		return "", nil, errors.New(ERR_TR_PAID)
+		log.Printf("ManualPaymentFx ERROR: %s", errTransactionPaid)
+		return "", nil, errors.New(errTransactionPaid)
 	}
 
 	firePolicyTransactions := transaction.GetPolicyTransactions(origin, t.PolicyUid)
@@ -73,8 +81,8 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 	}
 
 	if !canPayTransaction {
-		log.Printf("ManualPaymentFx ERROR: %s", ERR_TR_OUT_OF_ORDER)
-		return "", nil, errors.New(ERR_TR_OUT_OF_ORDER)
+		log.Printf("ManualPaymentFx ERROR: %s", errTransactionOutOfOrder)
+		return "", nil, errors.New(errTransactionOutOfOrder)
 	}
 
 	docsnap, err = lib.GetFirestoreErr(firePolicies, t.PolicyUid)
@@ -85,8 +93,8 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 	lib.CheckError(err)
 
 	if !p.IsSign {
-		log.Printf("ManualPaymentFx ERROR: %s", ERR_PL_NOT_SIGNED)
-		return "", nil, errors.New(ERR_PL_NOT_SIGNED)
+		log.Printf("ManualPaymentFx ERROR: %s", errPolicyNotSigned)
+		return "", nil, errors.New(errPolicyNotSigned)
 	}
 
 	ManualPayment(&t, origin, &payload)
