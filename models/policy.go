@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"cloud.google.com/go/civil"
@@ -41,6 +42,7 @@ type Policy struct {
 	CodeCompany       string                       `firestore:"codeCompany,omitempty" json:"codeCompany,omitempty" bigquery:"codeCompany"`
 	Status            string                       `firestore:"status,omitempty" json:"status,omitempty" bigquery:"status"`
 	StatusHistory     []string                     `firestore:"statusHistory,omitempty" json:"statusHistory,omitempty" bigquery:"-"`
+	BigStatusHistory  string                       `firestore:"-" json:"-" bigquery:"statusHistory"`
 	RenewHistory      *[]RenewHistory              `firestore:"renewHistory,omitempty" json:"renewHistory,omitempty" bigquery:"-"`
 	Transactions      *[]Transaction               `firestore:"transactions,omitempty" json:"transactions,omitempty" bigquery:"-"`
 	TransactionsUid   *[]string                    `firestore:"transactionsUid,omitempty" json:"transactionsUid ,omitempty" bigquery:"-"`
@@ -204,6 +206,7 @@ func (policy *Policy) BigquerySave(origin string) {
 	policy.BigRenewDate = civil.DateTimeOf(policy.RenewDate)
 	policy.BigEndDate = civil.DateTimeOf(policy.EndDate)
 	policy.BigEmitDate = civil.DateTimeOf(policy.EmitDate)
+	policy.BigStatusHistory = strings.Join(policy.StatusHistory, ",")
 	log.Println(" policy save big query: " + policy.Uid)
 	e = lib.InsertRowsBigQuery("wopta", policyBig, policy)
 	log.Println(" policy save big query error: ", e)
