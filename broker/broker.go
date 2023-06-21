@@ -7,7 +7,6 @@ import (
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	dag "github.com/heimdalr/dag"
-	sp "github.com/scipipe/scipipe"
 	lib "github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
@@ -124,19 +123,18 @@ func reserved(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 }
 func test() string {
 	// Init workflow with a name, and max concurrent tasks
-	wf := sp.NewWorkflow("hello_world", 4)
-
-	// Initialize processes and set output file paths
-	hello := wf.NewProc("hello", "echo 'Hello ' > {o:out}")
-	hello.SetOut("out", "hello.txt")
-
-	world := wf.NewProc("world", "echo $(cat {i:in}) World >> {o:out}")
-	world.SetOut("out", "{i:in|%.txt}_world.txt")
-
-	// Connect network
-	world.In("in").From(hello.Out("out"))
-
-	// Run workflow
-	wf.Run()
+	bpmnEngine := bpmn_engine.New("a name")
+	// basic example loading a BPMN from file,
+	process, err := bpmnEngine.LoadFromFile("simple_task.bpmn")
+	if err != nil {
+		panic("file \"simple_task.bpmn\" can't be read.")
+	}
+	// register a handler for a service task by defined task type
+	bpmnEngine.AddTaskHandler("hello-world", printContextHandler)
+	// setup some variables
+	variables := map[string]interface{}{}
+	variables["foo"] = "bar"
+	// and execute the process
+	bpmnEngine.CreateAndRunInstance(process.ProcessKey, variables)
 	return ""
 }
