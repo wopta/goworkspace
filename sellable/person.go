@@ -37,7 +37,7 @@ func Person(body []byte) *models.Product {
 	)
 
 	quotingInputData := getRulesInputData(&policy, err, body)
-	product, err := prd.GetProduct("persona", "v1")
+	product, err := prd.GetProduct("persona", "v1", "")
 	lib.CheckError(err)
 
 	fx := new(models.Fx)
