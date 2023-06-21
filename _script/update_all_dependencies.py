@@ -3,12 +3,32 @@ import re
 from os import path
 from collections import defaultdict
 
-go_modules = ["broker", "callback", "claim", "companydata", "document", "enrich", "form", "lib", "mail",
-              "models", "partnership", "payment", "product", "question", "quote", "rules", "sellable", "user", "sellable"]
-changed_modules = ["models", "lib", "broker"]
+go_modules = [
+    "broker",
+    "callback",
+    "claim",
+    "companydata",
+    "document",
+    "enrich",
+    "form",
+    "lib",
+    "mail",
+    "models",
+    "partnership",
+    "payment",
+    "product",
+    "question",
+    "quote",
+    "rules",
+    "sellable",
+    "user",
+    "sellable"]
+changed_modules = ["lib"]
+updateable_modules = ["lib", "quote", "question"]
 
 increment_version_key = "patch"
 environment = 'dev'  # Replace with your desired environment
+
 
 class Dependecy(object):
     def __init__(self, module, function_version, module_version):
@@ -44,8 +64,9 @@ for module in go_modules:
     for dependency in dependencies:
         add_to_map(dependency, module)
 
-internal_deps = {dependency: dependencies for dependency,
-                 dependencies in dependency_adjacency_list.items() if dependency in changed_modules}
+internal_deps = {
+    dependency: dependencies for dependency,
+    dependencies in dependency_adjacency_list.items() if dependency in changed_modules}
 
 deps = defaultdict(set)
 for module, dependants in internal_deps.items():
@@ -104,7 +125,8 @@ def retrieve_tag_info(function_name, environment, type):
     # Extract function name, version, and environment from the tags
     tags = output.strip().split('\n')
     if type == "function":
-        pattern = r'({})/(\d+\.\d+\.\d+)\.({})'.format(function_name_pattern, environment_pattern)
+        pattern = r'({})/(\d+\.\d+\.\d+)\.({})'.format(
+            function_name_pattern, environment_pattern)
     elif type == "module":
         pattern = r'({})/v(\d+\.\d+\.\d+)'.format(function_name_pattern)
     else:
@@ -131,49 +153,16 @@ def retrieve_tag_info(function_name, environment, type):
     else:
         return None
 
-# def updateDependencies(dependency_map, modules):
-#     if len(modules) == 0:
-#         return
-    
-#     dependecies_to_update = [module for module in modules if module not in dependency_map and retrieve_tag_info(module, environment) is not None]
 
-#     for dependency_to_update in dependecies_to_update:
-#         version = retrieve_tag_info(dependency_to_update, environment)
-#         if version is None:
-#             continue
-#         print(f"Updating module {dependency_to_update}...")
-        
-#         incremented_version = increment_version(version, increment_version_key) 
-#         print(f"Incrementing version of {dependency_to_update} from {version} to {incremented_version}")
-
-#         # TODO: update
-#         print(f"git tag -a {dependency_to_update}/v{incremented_version} -m \"Updating {dependency_to_update}\"")
-
-#         # this should go at the end
-#         for dependant, dependencies in dependency_map.items():
-#             if dependency_to_update in dependencies:
-#                 print(f"Updating module {dependency_to_update} in {dependant}")
-
-#             # clean module in other dependencies    
-#             dependencies.remove(dependency_to_update)
-
-#     updateDependencies({k: v for k, v in dependency_map.items() if (len(v)) > 0}, [
-#                        module for module in modules if module not in dependecies_to_update and retrieve_tag_info(module, environment) is not None])
-
-def updateDependencies(dependency_map, modules):
+def updateDependencies(dependency_map, updateable_modules, modules):
+    modules = [module for module in modules if module.module not in dependency_map and module.module_version is not None and module.module in updateable_modules]
     if len(modules) == 0:
         return
-    
-    dependencies_to_update: list[Dependecy] = []
-    for module in modules:
-        if module.module not in dependency_map and module.module_version is not None:
-            dependencies_to_update.append(module)
 
     updated_dependency_map = {}
-    for dependency_to_update in dependencies_to_update:
-        print(f"Updating module {dependency_to_update.module}...")
-
-        incremented_version = increment_version(dependency_to_update.module_version, increment_version_key)
+    for dependency_to_update in modules:
+        incremented_version = increment_version(
+            dependency_to_update.module_version, increment_version_key)
         print(
             f"Incrementing version of {dependency_to_update.module} from {dependency_to_update.module_version} to {incremented_version}")
 
@@ -183,53 +172,62 @@ def updateDependencies(dependency_map, modules):
 
         # this should go at the end
         for dependant, dependencies in dependency_map.items():
-            if dependency_to_update.module in dependencies:
-                print(f"Updating module {dependency_to_update.module} in {dependant}")
+            if dependency_to_update.module in dependencies and dependant in updateable_modules:
+                print(
+                    f"Updating module {dependency_to_update.module} in {dependant}")
+                print(
+                    f"(cd {dependant} && exec go get github.com/wopta/goworkspace/{dependency_to_update.module})")
 
             # clean module in other dependencies
             dependencies.remove(dependency_to_update.module)
             if (len(dependencies) > 0):
                 updated_dependency_map[dependant] = dependencies
-        modules = [module for module in modules if module.module != dependency_to_update.module]
+        modules = [module for module in modules if module.module !=
+                   dependency_to_update.module and module in updateable_modules]
 
-    new_dependency_map = {k: v for k, v in updated_dependency_map.items() if (len(v)) > 0}
-    updateDependencies(new_dependency_map, modules)
+    new_dependency_map = {k: v for k,
+                          v in updated_dependency_map.items() if (len(v)) > 0}
+    updateDependencies(new_dependency_map, updateable_modules, modules)
 
-def updateFunctions(modules):
+
+def updateFunctions(modules, updateable_modules):
+    modules = [
+        module for module in modules if module.function_version is not None and module.module in updateable_modules]
     if len(modules) == 0:
         return
-    
-    dependencies_to_update: list[Dependecy] = []
-    for module in modules:
-        if module.function_version is not None:
-            dependencies_to_update.append(module)
 
-    updated_dependency_map = {}
-    for dependency_to_update in dependencies_to_update:
-        print(f"Updating module {dependency_to_update.module}...")
-
-        incremented_version = increment_version(dependency_to_update.function_version, increment_version_key)
+    for dependency_to_update in modules:
+        incremented_version = increment_version(
+            dependency_to_update.function_version, increment_version_key)
         print(
-            f"Incrementing version of {dependency_to_update.module} from {dependency_to_update.function_version} to {incremented_version}")
+            f"Incrementing version of function {dependency_to_update.module} from {dependency_to_update.function_version} to {incremented_version}")
 
         # TODO: update
         print(
             f"git tag -a {dependency_to_update.module}/{incremented_version}.{environment} -m \"Updating {dependency_to_update.module}\"")
 
 
-def initialize_modules(changed_modules, environment):
+def initialize_modules(changed_modules, updateable_modules, environment):
+    if len(updateable_modules) == 0:
+        updateable_modules = changed_modules
     dependencies_to_update: list[Dependecy] = []
     for module in changed_modules:
         module_version = retrieve_tag_info(module, environment, "module")
-        module_function_version = retrieve_tag_info(module, environment, "function")
-        dependencies_to_update.append(Dependecy(module=module, module_version=module_version, function_version=module_function_version))
-    dependencies_to_update = [dep for dep in dependencies_to_update if dep.module_version is not None]
-    return dependencies_to_update
+        module_function_version = retrieve_tag_info(
+            module, environment, "function")
+        dependencies_to_update.append(
+            Dependecy(
+                module=module,
+                module_version=module_version,
+                function_version=module_function_version))
+    return dependencies_to_update, updateable_modules
 
-dependencies_to_update = initialize_modules(changed_modules, environment)
+
+dependencies_to_update, updateable_modules = initialize_modules(
+    changed_modules, updateable_modules, environment)
 
 print("Creating update for modules")
-updateDependencies(deps, dependencies_to_update)
+updateDependencies(deps, updateable_modules, dependencies_to_update)
 
 print("Creating update for functions")
-updateFunctions(dependencies_to_update)
+updateFunctions(dependencies_to_update, updateable_modules)
