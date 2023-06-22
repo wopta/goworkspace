@@ -12,6 +12,21 @@ import (
 	models "github.com/wopta/goworkspace/models"
 )
 
+type GetUsersResp struct {
+	Users []models.User `json:"users"`
+}
+
+type GetUsersReq struct {
+	Queries []struct {
+		Field string      `json:"field"`
+		Op    string      `json:"op"`
+		Value interface{} `json:"value"`
+		Type  string      `json:"type"`
+	} `json:"queries,omitempty"`
+	Limit int `json:"limit"`
+	Page  int `json:"page"`
+}
+
 func GetUsersFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		req        GetUsersReq
@@ -61,19 +76,4 @@ func GetUsersFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 
 	jsonOut, err := json.Marshal(response)
 	return string(jsonOut), response, err
-}
-
-type GetUsersResp struct {
-	Users []models.User `json:"users"`
-}
-
-type GetUsersReq struct {
-	Queries []struct {
-		Field string      `json:"field"`
-		Op    string      `json:"op"`
-		Value interface{} `json:"value"`
-		Type  string      `json:"type"`
-	} `json:"queries,omitempty"`
-	Limit int `json:"limit"`
-	Page  int `json:"page"`
 }
