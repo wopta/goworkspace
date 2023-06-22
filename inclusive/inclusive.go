@@ -48,7 +48,7 @@ func BankAccountFx(resp http.ResponseWriter, r *http.Request) (string, interface
 		eResp ErrorResponse
 		b     []byte
 	)
-	apikey := os.Getenv("MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDvjY7XXFnwLC49EC2GL1VAIisJ")
+	apikey := os.Getenv("HYPE_APIKEY")
 	apikeyReq := r.Header.Get("api_key")
 	if apikey != apikeyReq {
 		eResp = ErrorResponse{Code: 1, Type: "bad request", Message: "Name miss"}
