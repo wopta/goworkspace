@@ -12,4 +12,3 @@ function-data/
 .idea
 .DS_Store
 *.code-workspace
-lib/file-utils.go
