@@ -34,6 +34,7 @@ func Files(path string) []string {
 	}
 	return res
 }
+
 func readCsvFile(filePath string) [][]string {
 	f, err := os.Open(filePath)
 	if err != nil {
@@ -49,6 +50,7 @@ func readCsvFile(filePath string) [][]string {
 
 	return records
 }
+
 func ReadDir() {
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {
@@ -61,6 +63,7 @@ func ReadDir() {
 	}
 	fmt.Println(dir)
 }
+
 func GetFromStorage(bucket string, file string, keyPath string) []byte {
 	//var credential models.Credential
 	log.Println("start GetFromStorage")
@@ -75,6 +78,7 @@ func GetFromStorage(bucket string, file string, keyPath string) []byte {
 	CheckError(err)
 	return slurp
 }
+
 func GetFromStorageErr(bucket string, file string, keyPath string) ([]byte, error) {
 	//var credential models.Credential
 	log.Println("start GetFromStorage")
@@ -99,9 +103,11 @@ func GetReaderGCS(bucket string, file string, keyPath string) io.Reader {
 	CheckError(err)
 	return slurp
 }
+
 func deleteFiles() {
 
 }
+
 func PutToStorage(bucketname string, path string, file []byte) string {
 
 	log.Println("start PutToStorage")
@@ -115,6 +121,7 @@ func PutToStorage(bucketname string, path string, file []byte) string {
 	return "gs://" + bucketname + "/" + path
 
 }
+
 func PutGoogleStorage(bucketname string, path string, file []byte, contentType string) (string, error) {
 	// some process request msg, decode base64 to image byte
 	// create image file in current directory with os.create()
@@ -160,6 +167,7 @@ func PutToFireStorage(bucketname string, path string, file []byte) string {
 	return "gs://positive-apex-350507.appspot.com/UID:0g10fVw0fdOM5Ugho1tQJcOcRVD3/image_profile/profileImage"
 
 }
+
 func GetFilesByEnv(file string) []byte {
 	var res1 []byte
 	switch os.Getenv("env") {
@@ -176,6 +184,29 @@ func GetFilesByEnv(file string) []byte {
 	}
 	return res1
 }
+
+func GetFolderContentByEnv(folderName string) [][]byte {
+	var res [][]byte
+
+	switch os.Getenv("env") {
+	case "local":
+		path := "../function-data/dev/" + folderName
+		dir, err := os.ReadDir(path)
+		CheckError(err)
+		for _, contentDir := range dir {
+			if !contentDir.IsDir() {
+				fileByte := ErrorByte(os.ReadFile(path + "/" + contentDir.Name()))
+				res = append(res, fileByte)
+			}
+		}
+	case "dev":
+	case "prod":
+
+	}
+
+	return res
+}
+
 func GetByteByEnv(file string, isLocal bool) []byte {
 	var res1 []byte
 	switch os.Getenv("env") {
