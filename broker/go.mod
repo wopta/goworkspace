@@ -7,8 +7,9 @@ replace github.com/wopta/goworkspace/broker => ./
 require (
 	cloud.google.com/go v0.110.2
 	cloud.google.com/go/firestore v1.9.0
-	github.com/GoogleCloudPlatform/functions-framework-go v1.7.3
+	github.com/GoogleCloudPlatform/functions-framework-go v1.7.4
 	github.com/heimdalr/dag v1.2.1
+	github.com/nitram509/lib-bpmn-engine v0.2.4
 	github.com/wopta/goworkspace/document v1.0.61
 	github.com/wopta/goworkspace/lib v1.0.49
 	github.com/wopta/goworkspace/mail v1.0.21
@@ -16,7 +17,6 @@ require (
 	github.com/wopta/goworkspace/payment v1.0.43
 	github.com/wopta/goworkspace/user v1.0.10
 	github.com/wopta/goworkspace/wiseproxy v1.0.3
-	github.com/nitram509/lib-bpmn-engine/pkg/bpmn_engine v0.2.4
 )
 
 require (

@@ -1,18 +1,18 @@
 package inclusive
 
 import (
-	"context"
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"cloud.google.com/go/civil"
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	lib "github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	"google.golang.org/api/apikeys/v2"
 )
 
 func init() {
@@ -43,20 +43,32 @@ func InclusiveFx(w http.ResponseWriter, r *http.Request) {
 
 // TO DO security,payload,error,fasature
 func BankAccountFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	ctx := context.Background()
-	apikeysService, err := apikeys.NewService(ctx)
+	var (
+		e     error
+		eResp ErrorResponse
+		b     []byte
+	)
+	apikey := os.Getenv("MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDvjY7XXFnwLC49EC2GL1VAIisJ")
+	apikeyReq := r.Header.Get("api_key")
+	if apikey != apikeyReq {
+		eResp = ErrorResponse{Code: 1, Type: "bad request", Message: "Name miss"}
 
+	}
 	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
+	eResp = ErrorResponse{Code: 1, Type: "bad request", Message: "Name miss"}
 	log.Println(string(req))
 	var obj BankAccountMovement
-	// Unmarshal or Decode the JSON to the interface.
-	//json.NewDecoder(req).Decode(&send)
 	defer r.Body.Close()
-
 	json.Unmarshal([]byte(req), &obj)
-	//obj.
+	if obj.Name == "" {
+		eResp.Message = "field name miss"
+		b, e = json.Marshal(eResp)
+		e = errors.New(string(b))
+		return "", nil, e
+	}
+	e = lib.InsertRowsBigQuery("wopta", "inclusive-axa-bank-account", obj)
 
-	return "", nil, nil
+	return "", nil, e
 }
 
 type BankAccountMovement struct {
@@ -73,4 +85,10 @@ type BankAccountMovement struct {
 	PolicyType     string         `firestore:"-" json:"policyType,omitempty" bigquery:"policyType"`         //TIPOLOGIA POLIZZA
 	GuaranteesCode string         `firestore:"-" json:"guaranteesCode,omitempty" bigquery:"guaranteesCode"` //CODICE CONFIGURAZIONE pacchetti
 	AssetType      string         `firestore:"-" json:"assetType,omitempty" bigquery:"assetType"`           //TIPO OGGETTO ASSICURATO
+}
+type ErrorResponse struct {
+	Code    int    `firestore:"-" json:"code,omitempty" bigquery:"name"`          //h-Nome
+	Type    string `firestore:"-" json:"type,omitempty" bigquery:"surname"`       //Cognome
+	Message string `firestore:"-" json:"message,omitempty" bigquery:"fiscalCode"` //Codice fiscale
+
 }
