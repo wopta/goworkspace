@@ -22,8 +22,8 @@ func Mga(w http.ResponseWriter, r *http.Request) {
 	route := lib.RouteData{
 		Routes: []lib.Route{
 			{
-				Route:   "/v1/products",
-				Handler: func(w http.ResponseWriter, r *http.Request) (string, interface{}, error) { return "", nil, nil },
+				Route:   "/products/v1",
+				Handler: GetProductsListByEntitlementFx,
 				Method:  http.MethodGet,
 				Roles:   []string{models.UserRoleAll},
 			},
