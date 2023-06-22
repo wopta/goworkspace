@@ -52,7 +52,6 @@ func GetUsersFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 	}
 
 	docsnap, err := fireQueries.FirestoreWhereLimitFields(fireUser, limitValue)
-	fmt.Println("printline after FirestoreWhereLimitFields")
 	if err != nil {
 		return "", nil, err
 	}
