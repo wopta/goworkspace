@@ -56,6 +56,7 @@ func BankAccountFx(resp http.ResponseWriter, r *http.Request) (string, interface
 	}
 	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
 	eResp = ErrorResponse{Code: 1, Type: "bad request", Message: "Name miss"}
+	log.Println(string(r.Header))
 	log.Println(string(req))
 	var obj BankAccountMovement
 	defer r.Body.Close()
