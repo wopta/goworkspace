@@ -35,6 +35,7 @@ type Product struct {
 	Offers            map[string]Offer `firestore:"offers,omitempty" json:"offers,omitempty"`
 	IsEcommerceActive bool             `json:"isEcommerceActive" firestore:"isEcommerceActive"`
 	IsAgencyActive    bool             `json:"isAgencyActive" firestore:"isAgencyActive"`
+	IsAgentActive     bool             `json:"isAgentActive" firestore:"isAgentActive"`
 }
 
 type Company struct {
@@ -55,6 +56,9 @@ type Company struct {
 	Mandate                   Mandate              `json:"mandate" firestore:"mandate" bigquery:"-"`
 	DiscountLimit             float64              `json:"discountLimit" firestore:"discountLimit" bigquery:"-"`
 	AgentCode                 string               `json:"agentCode" firestore:"agentCode" bigquery:"-"`
+	IsEcommerceActive         bool                 `json:"isEcommerceActive" firestore:"isEcommerceActive" bigquery:"-"`
+	IsAgencyActive            bool                 `json:"isAgencyActive" firestore:"isAgencyActive" bigquery:"-"`
+	IsAgentActive             bool                 `json:"isAgentActive" firestore:"isAgentActive" bigquery:"-"`
 }
 
 type Mandate struct {

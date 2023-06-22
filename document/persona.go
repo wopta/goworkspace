@@ -104,7 +104,7 @@ func personaGuaranteesTable(pdf *fpdf.Fpdf, policy *models.Policy) {
 
 	var table [][]string
 	offerName := policy.OfferlName
-	prod, err := product.GetProduct("persona", "v1")
+	prod, err := product.GetProduct("persona", "v1", "")
 	lib.CheckError(err)
 
 	guaranteesMap := map[string]map[string]string{}

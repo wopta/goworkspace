@@ -128,10 +128,34 @@ func GetName(origin string, name string, version string) (models.Product, error)
 	return products[0], nil
 }
 
-func GetProduct(name string, version string) (models.Product, error) {
-	jsonFile := lib.GetFilesByEnv("products/" + name + "-" + version + ".json")
-	var product models.Product
+func GetProduct(name, version, entitlement string) (models.Product, error) {
+	var (
+		product  models.Product
+		filePath string = "products/"
+	)
+
+	switch entitlement {
+	case models.UserRoleAgency:
+	case models.UserRoleAgent:
+		filePath += entitlement + "/" + name + "-" + version + ".json"
+	case "":
+		filePath += "e-commerce/" + name + "-" + version + ".json"
+	}
+
+	jsonFile := lib.GetFilesByEnv(filePath)
 	err := json.Unmarshal(jsonFile, &product)
+
+	return product, err
+}
+
+func GetMgaProduct(name, version string) (models.Product, error) {
+	var (
+		product models.Product
+	)
+
+	jsonFile := lib.GetFilesByEnv("products/mga/" + name + "-" + version + ".json")
+	err := json.Unmarshal(jsonFile, &product)
+
 	return product, err
 }
 

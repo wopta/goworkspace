@@ -41,7 +41,7 @@ func Life(policy models.Policy) (models.Product, string, error) {
 		return models.Product{}, "", err
 	}
 	rulesFile := lib.GetRulesFile(rulesFileName)
-	product, err := prd.GetProduct("life", "v1")
+	product, err := prd.GetProduct("life", "v1", "")
 	if err != nil {
 		return models.Product{}, "", err
 	}
