@@ -211,7 +211,7 @@ func updateUserConsens(oldConsens *[]Consens, newConsens *[]Consens) *[]Consens 
 }
 
 func UsersToListData(query *firestore.DocumentIterator) []User {
-	result := make([]User, 0, 10)
+	result := make([]User, 0)
 	for {
 		d, err := query.Next()
 		if err != nil {
