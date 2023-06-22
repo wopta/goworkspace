@@ -81,6 +81,12 @@ func User(w http.ResponseWriter, r *http.Request) {
 				Method:  http.MethodPatch,
 				Roles:   []string{models.UserRoleAdmin},
 			},
+			{
+				Route:   "/user/v1",
+				Handler: GetUsersFx,
+				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAll},
+			},
 		},
 	}
 	route.Router(w, r)
