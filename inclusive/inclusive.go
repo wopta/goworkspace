@@ -48,10 +48,14 @@ func BankAccountFx(resp http.ResponseWriter, r *http.Request) (string, interface
 		obj BankAccountMovement
 	)
 	e = CheckApikey(r)
-
+	if e != nil {
+		return "", nil, e
+	}
 	obj, e = CheckData(r)
-
-	e = lib.InsertRowsBigQuery("wopta", "inclusive-axa-bank-account", obj)
+	if e != nil {
+		return "", nil, e
+	}
+	e = lib.InsertRowsBigQuery("wopta", "inclusive_axa_bank_account", obj)
 
 	return "", nil, e
 }
