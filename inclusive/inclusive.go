@@ -133,5 +133,9 @@ func CheckData(r *http.Request) (BankAccountMovement, error) {
 }
 func SetData(obj *BankAccountMovement) error {
 
+	obj.BigStartDate = civil.DateTimeOf(obj.StartDate)
+	obj.BigEndDate = civil.DateTimeOf(obj.EndDate)
+	obj.PolicyNumber = ""
+
 	return nil
 }

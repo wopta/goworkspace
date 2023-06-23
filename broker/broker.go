@@ -6,9 +6,8 @@ import (
 	"net/http"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
-	dag "github.com/heimdalr/dag"
-	"github.com/nitram509/lib-bpmn-engine/pkg/bpmn_engine"
-	lib "github.com/wopta/goworkspace/lib"
+	"github.com/heimdalr/dag"
+	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -121,21 +120,4 @@ func reserved(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	fmt.Print(d.String())
 
 	return "", nil, nil
-}
-func test() string {
-	// Init workflow with a name, and max concurrent tasks
-	bpmnEngine := bpmn_engine.New("a name")
-	// basic example loading a BPMN from file,
-	process, err := bpmnEngine.LoadFromFile("bpm1.bpmn")
-	if err != nil {
-		panic("file \"simple_task.bpmn\" can't be read.")
-	}
-	// register a handler for a service task by defined task type
-	bpmnEngine.AddTaskHandler("hello-world", printContextHandler)
-	// setup some variables
-	variables := map[string]interface{}{}
-	variables["foo"] = "bar"
-	// and execute the process
-	bpmnEngine.CreateAndRunInstance(process.ProcessKey, variables)
-	return ""
 }
