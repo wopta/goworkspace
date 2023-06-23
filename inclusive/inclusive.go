@@ -57,7 +57,7 @@ func BankAccountFx(resp http.ResponseWriter, r *http.Request) (string, interface
 	}
 	e = lib.InsertRowsBigQuery("wopta", "inclusive_axa_bank_account", obj)
 
-	return "", nil, e
+	return `{"woptaUid":""}`, nil, e
 }
 
 type BankAccountMovement struct {
