@@ -21,15 +21,15 @@ func Mga(w http.ResponseWriter, r *http.Request) {
 	route := lib.RouteData{
 		Routes: []lib.Route{
 			{
-				Route:   "/v1/products",
+				Route:   "/products/v1",
 				Handler: func(w http.ResponseWriter, r *http.Request) (string, interface{}, error) { return "", nil, nil },
 				Method:  http.MethodGet,
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
-				Route:   "/v1/products/:product",
+				Route:   "/products/v1",
 				Handler: GetProductByRoleFx,
-				Method:  http.MethodGet,
+				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAll},
 			},
 		},

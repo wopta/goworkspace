@@ -3,6 +3,7 @@ package mga
 import (
 	"encoding/json"
 	"errors"
+	"io"
 	"log"
 	"net/http"
 	"strings"
@@ -12,20 +13,29 @@ import (
 	"github.com/wopta/goworkspace/product"
 )
 
+type GetProductByRoleRequest struct {
+	Name    string `json:"name"`
+	Version string `json:"version"`
+	Company string `json:"company"`
+}
+
 func GetProductByRoleFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println("GetProductByRoleFx")
 	var (
 		response models.Product
+		request  GetProductByRoleRequest
 		err      error
 	)
 
-	productName := r.Header.Get("product")
+	body := lib.ErrorByte(io.ReadAll(r.Body))
+	err = json.Unmarshal(body, &request)
+	lib.CheckError(err)
+
 	idToken := strings.ReplaceAll(r.Header.Get("Authorization"), "Bearer ", "")
 	authToken, err := models.GetAuthTokenFromIdToken(idToken)
 	lib.CheckError(err)
 
-	// how to handle version ?
-	response, err = GetProductByRole(productName, "v1", authToken)
+	response, err = GetProductByRole(request.Name, request.Version, request.Company, authToken)
 	if err != nil {
 		return "", response, err
 	}
@@ -34,7 +44,7 @@ func GetProductByRoleFx(w http.ResponseWriter, r *http.Request) (string, interfa
 	return string(jsonOut), response, err
 }
 
-func GetProductByRole(productName, version string, authToken models.AuthToken) (models.Product, error) {
+func GetProductByRole(productName, version, company string, authToken models.AuthToken) (models.Product, error) {
 	log.Println("GetProductByRole")
 	var (
 		responseProduct *models.Product
@@ -43,13 +53,13 @@ func GetProductByRole(productName, version string, authToken models.AuthToken) (
 
 	switch authToken.Role {
 	case models.UserRoleAdmin, models.UserRoleManager:
-		responseProduct, err = getMgaProduct(productName)
-	case models.UserRoleAll:
-		responseProduct, err = getEcommerceProduct(productName)
+		responseProduct, err = getMgaProduct(productName, version, company)
+	case models.UserRoleAll, models.UserRoleCustomer:
+		responseProduct, err = getEcommerceProduct(productName, version, company)
 	case models.UserRoleAgency:
-		responseProduct, err = getAgencyProduct(productName, authToken.UserID)
+		responseProduct, err = getAgencyProduct(productName, version, company, authToken.UserID)
 	case models.UserRoleAgent:
-		responseProduct, err = getAgentProduct(productName, authToken.UserID)
+		responseProduct, err = getAgentProduct(productName, version, company, authToken.UserID)
 	default:
 		responseProduct, err = productNotFound()
 	}
@@ -76,15 +86,15 @@ func productNotFound() (*models.Product, error) {
 	return nil, errors.New("product not found")
 }
 
-func getMgaProduct(productName string) (*models.Product, error) {
-	mgaProduct, err := product.GetMgaProduct(productName, "v1")
+func getMgaProduct(productName, version, company string) (*models.Product, error) {
+	mgaProduct, err := product.GetMgaProduct(productName, version)
 	lib.CheckError(err)
 
 	return &mgaProduct, nil
 }
 
-func getEcommerceProduct(productName string) (*models.Product, error) {
-	ecomProduct, err := product.GetProduct(productName, "v1", "")
+func getEcommerceProduct(productName, version, company string) (*models.Product, error) {
+	ecomProduct, err := product.GetProduct(productName, version, "")
 
 	if !ecomProduct.IsEcommerceActive {
 		return productNotActive()
@@ -93,8 +103,8 @@ func getEcommerceProduct(productName string) (*models.Product, error) {
 	return &ecomProduct, err
 }
 
-func getAgencyProduct(productName, agencyUid string) (*models.Product, error) {
-	agencyDefaultProduct, err := product.GetProduct(productName, "v1", models.UserRoleAgency)
+func getAgencyProduct(productName, version, company, agencyUid string) (*models.Product, error) {
+	agencyDefaultProduct, err := product.GetProduct(productName, version, models.UserRoleAgency)
 	lib.CheckError(err)
 
 	if !agencyDefaultProduct.IsAgencyActive {
@@ -121,8 +131,8 @@ func getAgencyProduct(productName, agencyUid string) (*models.Product, error) {
 	return responseProduct, nil
 }
 
-func getAgentProduct(productName, agentUid string) (*models.Product, error) {
-	agentDefaultProduct, err := product.GetProduct(productName, "v1", models.UserRoleAgent)
+func getAgentProduct(productName, version, company, agentUid string) (*models.Product, error) {
+	agentDefaultProduct, err := product.GetProduct(productName, version, models.UserRoleAgent)
 	lib.CheckError(err)
 
 	if !agentDefaultProduct.IsAgentActive {
