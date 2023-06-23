@@ -98,7 +98,9 @@ func getAgencyProduct(mgaProduct *models.Product, productName, agencyUid string)
 		return productNotActive()
 	}
 
-	responseProduct := mgaProduct
+	agencyDefaultProduct, err := product.GetProduct(productName, "v1", models.UserRoleAgency)
+	lib.CheckError(err)
+	responseProduct := &agencyDefaultProduct
 	log.Printf("Agency Product Start: %v", responseProduct)
 	agency, err := models.GetAgencyByAuthId(agencyUid)
 	lib.CheckError(err)
@@ -128,13 +130,16 @@ func getAgentProduct(mgaProduct *models.Product, productName, agentUid string) (
 		return productNotActive()
 	}
 
-	responseProduct := mgaProduct
+	agentDefaultProduct, err := product.GetProduct(productName, "v1", models.UserRoleAgent)
+	lib.CheckError(err)
+	responseProduct := &agentDefaultProduct
 	log.Printf("Agent Product Start: %v", responseProduct)
 	agent, err := models.GetAgentByAuthId(agentUid)
 	lib.CheckError(err)
 	agency, err := models.GetAgencyByAuthId(agent.AgencyUid)
 	lib.CheckError(err)
 
+	// TODO: traverse network
 	agencyProduct := getProductByName(agency.Products, productName)
 	if agencyProduct != nil {
 		if len(agencyProduct.Steps) > 0 {
