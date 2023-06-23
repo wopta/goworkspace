@@ -22,21 +22,21 @@ VALORE VEICOLO
 */
 
 type Vehicle struct {
-	Plate                   string    `firestore:"plate,omitempty" json:"plate,omitempty" bigquery:"-"`
-	Model                   string    `firestore:"model,omitempty" json:"model,omitempty" bigquery:"-"`
-	Manufacturer            string    `firestore:"manufacturer,omitempty" json:"manufacturer,omitempty" bigquery:"-"`
-	Year                    string    `firestore:"year,omitempty" json:"year,omitempty" bigquery:"-"`
-	RegistrationDate        time.Time `firestore:"registrationDate,omitempty" json:"registrationDate,omitempty" bigquery:"-"`
-	Vin                     string    `firestore:"vin,omitempty" json:"vin,omitempty" bigquery:"-"`
-	BodyType                string    `firestore:"bodyType,omitempty" json:"bodyType,omitempty" bigquery:"-"`
-	Setup                   string    `firestore:"setup,omitempty" json:"setup,omitempty" bigquery:"-"`
-	VehicleOwnerType        string    `firestore:"vehicleOwnerType,omitempty" json:"vehicleOwnerType,omitempty" bigquery:"-"`
-	HasTowHook              bool      `firestore:"hasTowHook,omitempty" json:"hasTowHook,omitempty" bigquery:"-"`
-	KmPerYear               int64     `firestore:"kmPerYear,omitempty" json:"kmPerYear,omitempty" bigquery:"-"`
-	OvernightVehicleShelter string    `firestore:"overnightVehicleShelter,omitempty" json:"overnightVehicleShelter,omitempty" bigquery:"-"`
-	MainUse                 string    `firestore:"mainUse,omitempty" json:"mainUse,omitempty" bigquery:"-"`
-	AlarmTypeInstalled      string    `firestore:"alarmTypeInstalled,omitempty" json:"alarmTypeInstalled,omitempty" bigquery:"-"`
-	OwnershipStatus         string    `firestore:"ownershipStatus,omitempty" json:"ownershipStatus,omitempty" bigquery:"-"`
-	NumberOfOwners          int64     `firestore:"numberOfOwners,omitempty" json:"numberOfOwners,omitempty" bigquery:"-"`
-	VehicleValue            int64     `firestore:"vehicleValue,omitempty" json:"vehicleValue,omitempty" bigquery:"-"`
+	Plate              string    `firestore:"plate,omitempty" json:"plate,omitempty" bigquery:"-"`
+	Model              string    `firestore:"model,omitempty" json:"model,omitempty" bigquery:"-"`
+	Manufacturer       string    `firestore:"manufacturer,omitempty" json:"manufacturer,omitempty" bigquery:"-"`
+	Year               string    `firestore:"year,omitempty" json:"year,omitempty" bigquery:"-"`
+	RegistrationDate   time.Time `firestore:"registrationDate,omitempty" json:"registrationDate,omitempty" bigquery:"-"`
+	Vin                string    `firestore:"vin,omitempty" json:"vin,omitempty" bigquery:"-"`
+	BodyType           string    `firestore:"bodyType,omitempty" json:"bodyType,omitempty" bigquery:"-"`
+	Setup              string    `firestore:"setup,omitempty" json:"setup,omitempty" bigquery:"-"`
+	VehicleOwnerType   string    `firestore:"vehicleOwnerType,omitempty" json:"vehicleOwnerType,omitempty" bigquery:"-"`
+	HasTowHook         bool      `firestore:"hasTowHook,omitempty" json:"hasTowHook,omitempty" bigquery:"-"`
+	KmPerYear          int64     `firestore:"kmPerYear,omitempty" json:"kmPerYear,omitempty" bigquery:"-"`
+	OvernightShelter   string    `firestore:"overnightShelter,omitempty" json:"overnightShelter,omitempty" bigquery:"-"`
+	MainUse            string    `firestore:"mainUse,omitempty" json:"mainUse,omitempty" bigquery:"-"`
+	AlarmTypeInstalled string    `firestore:"alarmTypeInstalled,omitempty" json:"alarmTypeInstalled,omitempty" bigquery:"-"`
+	OwnershipStatus    string    `firestore:"ownershipStatus,omitempty" json:"ownershipStatus,omitempty" bigquery:"-"`
+	NumberOfOwners     int64     `firestore:"numberOfOwners,omitempty" json:"numberOfOwners,omitempty" bigquery:"-"`
+	VehicleValue       int64     `firestore:"vehicleValue,omitempty" json:"vehicleValue,omitempty" bigquery:"-"`
 }
