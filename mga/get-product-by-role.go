@@ -22,7 +22,7 @@ type GetProductByRoleRequest struct {
 func GetProductByRoleFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println("GetProductByRoleFx")
 	var (
-		response models.Product
+		response *models.Product
 		request  GetProductByRoleRequest
 		err      error
 	)
@@ -30,10 +30,12 @@ func GetProductByRoleFx(w http.ResponseWriter, r *http.Request) (string, interfa
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	err = json.Unmarshal(body, &request)
 	lib.CheckError(err)
+	log.Printf("GetProductByRoleFx body: %s", string(body))
 
 	idToken := strings.ReplaceAll(r.Header.Get("Authorization"), "Bearer ", "")
 	authToken, err := models.GetAuthTokenFromIdToken(idToken)
 	lib.CheckError(err)
+	log.Printf("GetProductByRoleFx authToken: %s", authToken)
 
 	response, err = GetProductByRole(request.Name, request.Version, request.Company, authToken)
 	if err != nil {
@@ -41,10 +43,11 @@ func GetProductByRoleFx(w http.ResponseWriter, r *http.Request) (string, interfa
 	}
 	jsonOut, err := json.Marshal(response)
 
+	log.Printf("GetProductByRoleFx response: %s", string(jsonOut))
 	return string(jsonOut), response, err
 }
 
-func GetProductByRole(productName, version, company string, authToken models.AuthToken) (models.Product, error) {
+func GetProductByRole(productName, version, company string, authToken models.AuthToken) (*models.Product, error) {
 	log.Println("GetProductByRole")
 	var (
 		responseProduct *models.Product
@@ -64,10 +67,11 @@ func GetProductByRole(productName, version, company string, authToken models.Aut
 		responseProduct, err = productNotFound()
 	}
 
-	return *responseProduct, err
+	return responseProduct, err
 }
 
 func getProductByName(products []models.Product, productName string) *models.Product {
+	log.Println("getProductByName")
 	mapProduct := map[string]models.Product{}
 	for _, p := range products {
 		mapProduct[p.Name] = p
@@ -87,6 +91,7 @@ func productNotFound() (*models.Product, error) {
 }
 
 func getMgaProduct(productName, version, company string) (*models.Product, error) {
+	log.Println("getMgaProduct")
 	mgaProduct, err := product.GetMgaProduct(productName, version)
 	lib.CheckError(err)
 
@@ -94,6 +99,7 @@ func getMgaProduct(productName, version, company string) (*models.Product, error
 }
 
 func getEcommerceProduct(productName, version, company string) (*models.Product, error) {
+	log.Println("getEcommerceProduct")
 	ecomProduct, err := product.GetProduct(productName, version, "")
 
 	if !ecomProduct.IsEcommerceActive {
@@ -104,6 +110,7 @@ func getEcommerceProduct(productName, version, company string) (*models.Product,
 }
 
 func getAgencyProduct(productName, version, company, agencyUid string) (*models.Product, error) {
+	log.Println("getAgencyProduct")
 	agencyDefaultProduct, err := product.GetProduct(productName, version, models.UserRoleAgency)
 	lib.CheckError(err)
 
@@ -132,6 +139,7 @@ func getAgencyProduct(productName, version, company, agencyUid string) (*models.
 }
 
 func getAgentProduct(productName, version, company, agentUid string) (*models.Product, error) {
+	log.Println("getAgentProduct")
 	agentDefaultProduct, err := product.GetProduct(productName, version, models.UserRoleAgent)
 	lib.CheckError(err)
 
@@ -170,6 +178,7 @@ func getAgentProduct(productName, version, company, agentUid string) (*models.Pr
 }
 
 func overrideProduct(baseProduct *models.Product, insertedProduct *models.Product) {
+	log.Println("overrideProduct")
 	if len(insertedProduct.Steps) > 0 {
 		baseProduct.Steps = insertedProduct.Steps
 	}
