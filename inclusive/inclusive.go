@@ -118,7 +118,7 @@ func CheckData(r *http.Request) (BankAccountMovement, error) {
 	if obj.Surname == "" {
 		return obj, GetErrorJson(400, "Bad request", "field name miss")
 	}
-	if obj.MovementType != "inclusive" || obj.MovementType != "delete" {
+	if obj.MovementType != "inclusive" && obj.MovementType != "delete" {
 		return obj, GetErrorJson(400, "Bad request", "field MovementType out of enum")
 	}
 	if obj.StartDate.IsZero() {
@@ -130,7 +130,7 @@ func CheckData(r *http.Request) (BankAccountMovement, error) {
 	if obj.HypeId == "" {
 		return obj, GetErrorJson(400, "Bad request", "field HypeId miss")
 	}
-	if obj.GuaranteesCode != "next" || obj.GuaranteesCode != "premium" {
+	if obj.GuaranteesCode != "next" && obj.GuaranteesCode != "premium" {
 		return obj, GetErrorJson(400, "Bad request", "field GuaranteesCode out of enum")
 	}
 	return obj, nil
