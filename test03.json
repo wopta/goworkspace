@@ -1,46 +1,1689 @@
 {
-  "merchantId": "wop134b31-5926-4b26-1411-726bc9f0b111",
-  "externalId": "S9ZbrqcD06C5ZniRNq0z_2023-07-14_100142_wopta-quoter.web.app",
-  "paymentConfiguration": {
-    "expirationDate": "2023-07-18",
-    "allowedPaymentMethods": [
-      {
-        "role": "payer",
-        "paymentMethods": [
-          "CREDITCARD"
-        ]
-      }
-    ],
-    "callbackUrl": "https://europe-west1-positive-apex-350507.cloudfunctions.net/callback/v1/payment?uid=S9ZbrqcD06C5ZniRNq0z&schedule=2023-07-14&token=vzx8fn3v9qi6x53zmfkgvg5cxmneoskpnj6fpk1qa092fgped8tfr5imbkev6zu9&origin=https://wopta-quoter.web.app",
-    "paymentPageRedirectUrls": {
-      "onFailure": "https://www.wopta.it",
-      "onSuccess": "https://www.wopta.it"
-    }
+  "version": 3,
+  "name": "KrakenD - API Gateway",
+  "port": 8080,
+  "timeout": "70000ms",
+  "extra_config": {
+      "telemetry/logging": {
+        "level": "DEBUG",
+        "prefix": "[KRAKEND]",
+        "syslog": false,
+        "stdout": true,
+        "format": "custom",
+        "custom_format": "%{time} %{color:bold} [%{level}] %{color:reset} - %{message} - %{callpath:3}"
+      },
+      "security/cors": {
+           "allow_origins": [
+              "*"
+          ],
+          "allow_methods": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+          ],
+          "expose_headers": [
+              "Authorization",
+              "Content-type",
+              "X-Firebase-Appcheck",
+              "Origin",
+              "x-device-architecture",
+              "x-device-model",
+              "x-device-platform",
+              "x-device-brand"
+
+          ],
+          "allow_headers": [
+             "Authorization",
+             "Content-type",
+             "X-Firebase-Appcheck",
+             "Origin",
+             "x-device-architecture",
+             "x-device-model",
+             "x-device-platform",
+             "x-device-brand"
+          ],
+          "allow_credentials": true,
+          "max_age": "600s",
+          "debug": true
+      }  
   },
-  "bill": {
-    "externalId": "S9ZbrqcD06C5ZniRNq0z_2023-07-14_100142_wopta-quoter.web.app",
-    "amount": 119.16916666666667,
-    "currency": "EUR",
-    "description": "Pagamento polizza n° 100142",
-    "items": [
+  "endpoints": [
+  {
+      "endpoint": "/ip",
+      "method": "GET",
+      "backend": [
       {
-        "externalId": "S9ZbrqcD06C5ZniRNq0z_2023-07-14_100142_wopta-quoter.web.app",
-        "amount": 119.16916666666667,
-        "currency": "EUR"
+          "url_pattern": "/ip",
+          "host": [
+              "http://httpbin.org/"
+          ]
       }
-    ],
-    "scheduleTransaction": {
-      "dueDate": "2023-07-14",
-      "paymentInstrumentResolutionStrategy": "BY_PAYER"
-    },
-    "mandateCreation": "false",
-    "subjects": [
+      ]
+  },
+  {
+      "endpoint": "/WebApiProduct/Api/{ApiNameGET}",
+      "input_headers": ["*"],
+      "output_encoding": "negotiate",
+      "method": "GET",
+      "backend": [
       {
-        "role": "customer",
-        "externalId": "896be223-8117-4e74-bfcc-5feebc1e41a0",
-        "email": "yousef.hammar@wopta.it",
-        "name": "Yousef Hammar"
+          "url_pattern": "/test-function/",
+          "encoding": "string",
+          "method": "GET",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ],
+          "group": "auth",
+          "extra_config": {
+              "validation/cel": [
+                  {
+                      "check_expr": "resp_metadata_status == '200'"
+                  }
+              ],
+              "modifier/martian": {
+                  "body.Modifier" : {
+                      "scope": ["request"],
+                      "body": ""
+                  }
+              }
+              
+          }
+      },     
+      {
+          "url_pattern": "/wise-proxy/WebApiProduct/Api/{ApiNameGET}",
+          "encoding": "json",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ]
       }
-    ]
+      ],
+      "extra_config": {
+          "proxy": {
+              "sequential": true
+          }
+      }
+  },
+  {
+      "endpoint": "/WebApiProduct/Api/{ApiNamePOST}",
+      "input_headers": ["*"],
+      "output_encoding": "negotiate",
+      "method": "POST",
+      "backend": [
+      {
+          "url_pattern": "/test-function/",
+          "encoding": "string",
+          "method": "GET",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ],
+          "group": "auth",
+          "extra_config": {
+              "validation/cel": [
+                  {
+                      "check_expr": "resp_metadata_status == '200'"
+                  }
+              ],
+              "modifier/martian": {
+                  "body.Modifier" : {
+                      "scope": ["request"],
+                      "body": ""
+                  }
+              }
+              
+          }
+      },     
+      {
+          "url_pattern": "/wise-proxy/WebApiProduct/Api/{ApiNamePOST}",
+          "encoding": "json",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ]
+      }
+      ],
+      "extra_config": {
+          "proxy": {
+              "sequential": true
+          }
+      }
+  },
+  {
+      "endpoint": "/claim",
+      "input_headers": ["*"],
+      "method": "PUT",
+      "output_encoding": "negotiate",
+      "backend": [
+      {
+         "url_pattern": "/test-function",
+         "encoding": "string",
+         "method": "GET",
+         "host": [
+              "https://europe-west1-core-350507.cloudfunctions.net"
+         ],
+         "group": "auth",
+         "extra_config": {
+             "validation/cel": [
+                 {
+                     "check_expr": "resp_metadata_status == '200'"
+                 }
+             ],
+             "modifier/martian": {
+                 "body.Modifier" : {
+                     "scope": ["request"],
+                     "body": ""
+              }
+          }
+      }
+      },
+      {
+          "url_pattern": "/claim",
+          "encoding": "no-op",
+          "host": [
+              "https://europe-west1-core-350507.cloudfunctions.net"
+          ]
+      }
+      ],
+      "extra_config": {
+          "proxy": {
+              "sequential": true
+          }
+      }
+  },
+  {
+      "endpoint": "/rules/{name}/{param2}",
+      "input_headers": ["*"],
+      "output_encoding": "negotiate",
+      "method": "POST",
+      "backend": [
+      {
+          "url_pattern": "/test-function/{name}/{param2}",
+          "encoding": "string",
+          "method": "GET",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ],
+          "group": "auth",
+          "extra_config": {
+              "validation/cel": [
+                  {
+                      "check_expr": "resp_metadata_status == '200'"
+                  }
+              ],
+              "modifier/martian": {
+                  "body.Modifier" : {
+                      "scope": ["request"],
+                      "body": ""
+                  }
+              }
+              
+          }
+      },
+      {
+          "url_pattern": "/rules/{name}/{param2}",
+          "encoding": "json",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ]
+      }
+      ],
+      "extra_config": {
+          "proxy": {
+              "sequential": true
+          }
+      }
+  },
+  {
+      "endpoint": "/enrich/vat/{param1}/{param2}",
+      "input_headers": [
+        "*"
+      ],
+      "output_encoding": "negotiate",
+      "method": "GET",
+      "backend": [
+      {
+          "url_pattern": "/test-function/vat/{param1}/{param2}",
+          "encoding": "string",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ],
+          "group": "auth",
+          "extra_config": {
+              "validation/cel": [
+                  {
+                      "check_expr": "resp_metadata_status == '200'"
+                  }
+              ]
+          }
+
+      },
+      {
+          "url_pattern": "/enrich/vat/{param1}/{param2}",
+          "encoding": "json",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ]
+      }
+
+      ],
+      "extra_config": {
+          "proxy": {
+              "sequential": true
+          }
+      }
+  },
+  {
+      "endpoint": "/enrich/{paramVat}",
+      "input_headers": [
+        "*"
+      ],
+      "output_encoding": "negotiate",
+      "method": "GET",
+      "backend": [
+      {
+          "url_pattern": "/test-function/{paramVat}",
+          "encoding": "string",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ],
+          "group": "auth",
+          "extra_config": {
+              "validation/cel": [
+                  {
+                      "check_expr": "resp_metadata_status == '200'"
+                  }
+              ]
+          }
+
+      },
+      {
+          "url_pattern": "/enrich/{paramVat}",
+          "encoding": "json",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ]
+      }
+
+      ],
+      "extra_config": {
+          "proxy": {
+              "sequential": true
+          }
+      }
+  },
+  {
+      "endpoint": "/enrich/ateco/{paramAteco}",
+      "input_headers": [
+        "*"
+      ],
+      "output_encoding": "negotiate",
+      "method": "GET",
+      "backend": [
+      {
+          "url_pattern": "/test-function/ateco/{paramAteco}",
+          "encoding": "string",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ],
+          "group": "auth",
+          "extra_config": {
+              "validation/cel": [
+                  {
+                      "check_expr": "resp_metadata_status == '200'"
+                  }
+              ]
+          }
+
+      },
+      {
+          "url_pattern": "/enrich/ateco/{paramAteco}",
+          "encoding": "json",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ]
+      }
+
+      ],
+      "extra_config": {
+          "proxy": {
+              "sequential": true
+          }
+      }
+  },
+  {
+      "endpoint": "/mail/{paramMail}",
+      "input_headers": ["*"],
+      "output_encoding": "negotiate",
+      "method": "POST",
+      "backend": [
+      {
+          "url_pattern": "/test-function/mail/{paramMail}",
+          "encoding": "string",
+          "method": "GET",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ],
+         "group": "auth",
+          "extra_config": {
+              "validation/cel": [
+                  {
+                      "check_expr": "resp_metadata_status == '200'"
+                  }
+              ],
+              "modifier/martian": {
+                  "body.Modifier" : {
+                      "scope": ["request"],
+                      "body": ""
+                  }
+              }
+              
+          }
+      },
+      {
+          "url_pattern": "/mail/{paramMail}",
+          "encoding": "json",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ]
+      }
+
+      ],
+      "extra_config": {
+          "proxy": {
+              "sequential": true
+          }
+      }
+  },
+  {
+      "endpoint": "/mail/v1/{validate}",
+      "input_headers": ["*"],
+      "output_encoding": "negotiate",
+      "method": "POST",
+      "backend": [
+      {
+          "url_pattern": "/test-function/mail/v1/{validate}",
+          "encoding": "string",
+          "method": "GET",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ],
+         "group": "auth",
+          "extra_config": {
+              "validation/cel": [
+                  {
+                      "check_expr": "resp_metadata_status == '200'"
+                  }
+              ],
+              "modifier/martian": {
+                  "body.Modifier" : {
+                      "scope": ["request"],
+                      "body": ""
+                  }
+              }
+              
+          }
+      },
+      {
+          "url_pattern": "/mail/v1/{validate}",
+          "encoding": "json",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ]
+      }
+      ],
+      "extra_config": {
+          "proxy": {
+              "sequential": true
+          }
+      }
+  },
+  {
+      "endpoint": "/quote/pmi/{paramPmi}",
+      "input_headers": ["*"],
+      "output_encoding": "negotiate",
+      "method": "POST",
+      "backend": [
+      {
+          "url_pattern": "/test-function/quote/pmi/{paramPmi}",
+          "encoding": "string",
+          "method": "GET",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ],
+         "group": "auth",
+          "extra_config": {
+              "validation/cel": [
+                  {
+                      "check_expr": "resp_metadata_status == '200'"
+                  }
+              ],
+              "modifier/martian": {
+                  "body.Modifier" : {
+                      "scope": ["request"],
+                      "body": ""
+                  }
+              }
+              
+          }
+      },
+      {
+          "url_pattern": "/quote/pmi/{paramPmi}",
+          "encoding": "json",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ]
+      }
+
+      ],
+      "extra_config": {
+          "proxy": {
+              "sequential": true
+          },
+          "backend/http": {
+              "return_error_details": "backend_b"
+          }
+      }
+  },
+  {
+      "endpoint": "/broker/v1/policy/{paramBroker}",
+      "input_headers": ["*"],
+      "output_encoding": "negotiate",
+      "method": "POST",
+      "backend": [
+      {
+          "url_pattern": "/test-function/broker/v1/policy/{paramBroker}",
+          "encoding": "string",
+          "method": "GET",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ],
+         "group": "auth",
+          "extra_config": {
+              "validation/cel": [
+                  {
+                      "check_expr": "resp_metadata_status == '200'"
+                  }
+              ],
+              "modifier/martian": {
+                  "body.Modifier" : {
+                      "scope": ["request"],
+                      "body": ""
+                  }
+              }
+              
+          }
+      },
+      {
+          "url_pattern": "/broker/v1/policy/{paramBroker}",
+          "encoding": "json",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ]
+      }
+      ],
+      "extra_config": {
+          "proxy": {
+              "sequential": true
+          }
+      }
+  },
+  {
+      "endpoint": "/broker/v1/policy/{UID}",
+      "input_headers": ["*"],
+      "output_encoding": "negotiate",
+      "method": "GET",
+      "backend": [
+      {
+          "url_pattern": "/test-function/broker/v1/policy/{UID}",
+          "encoding": "string",
+          "method": "GET",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ],
+         "group": "auth",
+          "extra_config": {
+              "validation/cel": [
+                  {
+                      "check_expr": "resp_metadata_status == '200'"
+                  }
+              ],
+              "modifier/martian": {
+                  "body.Modifier" : {
+                      "scope": ["request"],
+                      "body": ""
+                  }
+              }
+              
+          }
+      },
+      {
+          "url_pattern": "/broker/v1/policy/{UID}",
+          "encoding": "json",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ]
+      }
+      ],
+      "extra_config": {
+          "proxy": {
+              "sequential": true
+          }
+      }
+  },
+  {
+      "endpoint": "/document/v1/{paramDocument}",
+      "input_headers": ["*"],
+      "output_encoding": "negotiate",
+      "method": "POST",
+      "backend": [
+      {
+          "url_pattern": "/test-function/document/v1/{paramDocument}",
+          "encoding": "string",
+          "method": "GET",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ],
+         "group": "auth",
+          "extra_config": {
+              "validation/cel": [
+                  {
+                      "check_expr": "resp_metadata_status == '200'"
+                  }
+              ],
+              "modifier/martian": {
+                  "body.Modifier" : {
+                      "scope": ["request"],
+                      "body": ""
+                  }
+              }
+              
+          }
+      },
+      {
+          "url_pattern": "/document/v1/{paramDocument}",
+          "encoding": "json",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ]
+      }
+      ],
+      "extra_config": {
+          "proxy": {
+              "sequential": true
+          }
+      }
+  },
+  {
+      "endpoint": "/callback/v1/{paramCallback}",
+      "input_headers": [
+        "*"
+      ],
+      "output_encoding": "negotiate",
+      "method": "GET",
+      "backend": [
+      {
+          "url_pattern": "/test-function/v1/{paramCallback}",
+          "encoding": "string",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ],
+          "group": "auth",
+          "extra_config": {
+              "validation/cel": [
+                  {
+                      "check_expr": "resp_metadata_status == '200'"
+                  }
+              ]
+          }
+      },
+      {
+          "url_pattern": "/callback/v1/{paramCallback}",
+          "encoding": "json",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ]
+      }
+      ],
+      "extra_config": {
+          "proxy": {
+              "sequential": true
+          }
+      }
+  },
+  {
+      "endpoint": "/user/v1/onboarding",
+      "input_headers": [
+        "*"
+      ],
+      "output_encoding": "negotiate",
+      "method": "POST",
+      "backend": [
+      {
+          "url_pattern": "/test-function/user/v1/onboarding",
+          "method": "GET",
+          "encoding": "string",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ],
+          "group": "auth",
+          "extra_config": {
+              "validation/cel": [
+                  {
+                      "check_expr": "resp_metadata_status == '200'"
+                  }
+              ],
+              "modifier/martian": {
+                  "body.Modifier" : {
+                      "scope": ["request"],
+                      "body": ""
+                  }
+              }
+          }
+      },
+      {
+          "url_pattern": "/user/v1/onboarding",
+          "encoding": "json",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ]
+      }
+      ],
+      "extra_config": {
+          "proxy": {
+              "sequential": true
+          }
+      }
+  },
+  {
+      "endpoint": "/user/v1/authId/{authId}",
+      "input_headers": ["*"],
+      "output_encoding": "negotiate",
+      "method": "GET",
+      "backend": [
+      {
+          "url_pattern": "/test-function/user/v1/authId/{authId}",
+          "encoding": "string",
+          "method": "GET",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ],
+          "group": "auth",
+          "extra_config": {
+              "validation/cel": [
+                  {
+                      "check_expr": "resp_metadata_status == '200'"
+                  }
+              ],
+              "modifier/martian": {
+                  "body.Modifier" : {
+                      "scope": ["request"],
+                      "body": ""
+                  }
+              }
+          }
+      },
+      {
+          "url_pattern": "/user/v1/authId/{authId}",
+          "encoding": "json",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ]
+      }
+      ],
+      "extra_config": {
+          "proxy": {
+              "sequential": true
+          }
+      }
+  },
+  {
+      "endpoint": "/user/v1/mail/{mail}",
+      "input_headers": [
+        "*"
+      ],
+      "output_encoding": "negotiate",
+      "method": "GET",
+      "backend": [
+      {
+          "url_pattern": "/test-function/user/v1/mail/{mail}",
+          "encoding": "string",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ],
+          "group": "auth",
+          "extra_config": {
+              "validation/cel": [
+                  {
+                      "check_expr": "resp_metadata_status == '200'"
+                  }
+              ]
+          }
+      },
+      {
+          "url_pattern": "/user/v1/mail/{mail}",
+          "encoding": "json",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ]
+      }
+      ],
+      "extra_config": {
+          "proxy": {
+              "sequential": true
+          }
+      }
+  },
+  {
+      "endpoint": "/user/v1/fiscalCode/{fiscalCode}",
+      "input_headers": [
+        "*"
+      ],
+      "output_encoding": "negotiate",
+      "method": "GET",
+      "backend": [
+      {
+          "url_pattern": "/test-function/user/v1/fiscalCode/{fiscalCode}",
+          "encoding": "string",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ],
+          "group": "auth",
+          "extra_config": {
+              "validation/cel": [
+                  {
+                      "check_expr": "resp_metadata_status == '200'"
+                  }
+              ]
+          }
+      },
+      {
+          "url_pattern": "/user/v1/fiscalCode/{fiscalCode}",
+          "encoding": "json",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ]
+      }
+      ],
+      "extra_config": {
+          "proxy": {
+              "sequential": true
+          }
+      }
+  },
+  {
+      "endpoint": "/partnership/v1/life",
+      "input_headers": ["*"],
+      "output_encoding": "negotiate",
+      "method": "GET",
+      "input_query_strings": ["jwt"],
+      "backend": [
+      {
+          "url_pattern": "/test-function/partnership/v1/life",
+          "encoding": "string",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ],
+          "group": "auth",
+          "extra_config": {
+              "validation/cel": [
+                  {
+                      "check_expr": "resp_metadata_status == '200'"
+                  }
+              ],
+              "modifier/martian": {
+                  "body.Modifier" : {
+                      "scope": ["request"],
+                      "body": ""
+                  }
+              }
+          }
+      },
+      {
+          "url_pattern": "/partnership/v1/life",
+          "encoding": "json",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ]
+      }
+      ],
+      "extra_config": {
+          "proxy": {
+              "sequential": true
+          }
+      }
+  },
+  {
+      "endpoint": "/product/v1/name/{name}",
+      "input_headers": [
+        "*"
+      ],
+      "output_encoding": "negotiate",
+      "method": "GET",
+      "backend": [
+      {
+          "url_pattern": "/test-function/product/v1/name/{name}",
+          "encoding": "string",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ],
+          "group": "auth",
+          "extra_config": {
+              "validation/cel": [
+                  {
+                      "check_expr": "resp_metadata_status == '200'"
+                  }
+              ],
+              "modifier/martian": {
+                  "body.Modifier" : {
+                      "scope": ["request"],
+                      "body": ""
+                  }
+              }
+          }
+      },
+      {
+          "url_pattern": "/product/v1/name/{name}",
+          "encoding": "json",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ]
+      }
+      ],
+      "extra_config": {
+          "proxy": {
+              "sequential": true
+          }
+      }
+  },
+  {
+      "endpoint": "/quote/v1/life",
+      "input_headers": [
+        "*"
+      ],
+      "output_encoding": "negotiate",
+      "method": "POST",
+      "backend": [
+      {
+          "url_pattern": "/test-function/quote/v1/life",
+          "encoding": "string",
+          "method": "GET",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ],
+          "group": "auth",
+          "extra_config": {
+              "validation/cel": [
+                  {
+                      "check_expr": "resp_metadata_status == '200'"
+                  }
+              ],
+              "modifier/martian": {
+                  "body.Modifier" : {
+                      "scope": ["request"],
+                      "body": ""
+                  }
+              }
+          }
+      },
+      {
+          "url_pattern": "/quote/v1/life",
+          "encoding": "json",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ]
+      }
+      ],
+      "extra_config": {
+          "proxy": {
+              "sequential": true
+          }
+      }
+  },
+  {
+      "endpoint": "/quote/{product}/{company}",
+      "input_headers": [
+        "*"
+      ],
+      "output_encoding": "negotiate",
+      "method": "POST",
+      "backend": [
+      {
+          "url_pattern": "/test-function/quote/{product}/{company}",
+          "encoding": "string",
+          "method": "GET",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ],
+          "group": "auth",
+          "extra_config": {
+              "validation/cel": [
+                  {
+                      "check_expr": "resp_metadata_status == '200'"
+                  }
+              ],
+              "modifier/martian": {
+                  "body.Modifier" : {
+                      "scope": ["request"],
+                      "body": ""
+                  }
+              }
+          }
+      },
+      {
+          "url_pattern": "/quote/{product}/{company}",
+          "encoding": "json",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ]
+      }
+      ],
+      "extra_config": {
+          "proxy": {
+              "sequential": true
+          }
+      }
+  },
+  {
+      "endpoint": "/rules/sales/life",
+      "input_headers": [
+        "*"
+      ],
+      "output_encoding": "negotiate",
+      "method": "POST",
+      "backend": [
+      {
+          "url_pattern": "/test-function/rules/sales/life",
+          "encoding": "string",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ],
+          "group": "auth",
+          "extra_config": {
+              "validation/cel": [
+                  {
+                      "check_expr": "resp_metadata_status == '200'"
+                  }
+              ],
+              "modifier/martian": {
+                  "body.Modifier" : {
+                      "scope": ["request"],
+                      "body": ""
+                  }
+              }
+          }
+      },
+      {
+          "url_pattern": "/rules/sales/life",
+          "encoding": "json",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ]
+      }
+      ],
+      "extra_config": {
+          "proxy": {
+              "sequential": true
+          }
+      }
+  },
+  {
+      "endpoint": "/broker/v1/policies/fiscalcode/{fiscalcode}",
+      "input_headers": [
+        "*"
+      ],
+      "output_encoding": "negotiate",
+      "method": "GET",
+      "backend": [
+      {
+          "url_pattern": "/test-function/broker/v1/policies/fiscalcode/{fiscalcode}",
+          "encoding": "string",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ],
+          "group": "auth",
+          "extra_config": {
+              "validation/cel": [
+                  {
+                      "check_expr": "resp_metadata_status == '200'"
+                  }
+              ],
+              "modifier/martian": {
+                  "body.Modifier" : {
+                      "scope": ["request"],
+                      "body": ""
+                  }
+              }
+          }
+      },
+      {
+          "url_pattern": "/broker/v1/policies/fiscalcode/{fiscalcode}",
+          "encoding": "json",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ]
+      }
+      ],
+      "extra_config": {
+          "proxy": {
+              "sequential": true
+          }
+      }
+  },
+  {
+      "endpoint": "/rules/v1/statements/{product}",
+      "input_headers": [
+        "*"
+      ],
+      "output_encoding": "negotiate",
+      "method": "POST",
+      "backend": [
+      {
+          "url_pattern": "/test-function/rules/v1/statements/{product}",
+          "encoding": "string",
+          "method": "GET",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ],
+          "group": "auth",
+          "extra_config": {
+              "validation/cel": [
+                  {
+                      "check_expr": "resp_metadata_status == '200'"
+                  }
+              ],
+              "modifier/martian": {
+                  "body.Modifier" : {
+                      "scope": ["request"],
+                      "body": ""
+                  }
+              }
+          }
+      },
+      {
+          "url_pattern": "/rules/v1/statements/{product}",
+          "encoding": "json",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ]
+      }
+      ],
+      "extra_config": {
+          "proxy": {
+              "sequential": true
+          }
+      }
+  },
+  {
+      "endpoint": "/rules/v2/statements/{product}",
+      "input_headers": [
+        "*"
+      ],
+      "output_encoding": "negotiate",
+      "method": "POST",
+      "backend": [
+      {
+          "url_pattern": "/test-function/rules/v2/statements/{product}",
+          "encoding": "string",
+          "method": "GET",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ],
+          "group": "auth",
+          "extra_config": {
+              "validation/cel": [
+                  {
+                      "check_expr": "resp_metadata_status == '200'"
+                  }
+              ],
+              "modifier/martian": {
+                  "body.Modifier" : {
+                      "scope": ["request"],
+                      "body": ""
+                  }
+              }
+          }
+      },
+      {
+          "url_pattern": "/rules/v2/statements/{product}",
+          "encoding": "json",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ]
+      }
+      ],
+      "extra_config": {
+          "proxy": {
+              "sequential": true
+          }
+      }
+  },
+  {
+      "endpoint": "/question/v1/statements/{name}",
+      "input_headers": [
+        "*"
+      ],
+      "output_encoding": "negotiate",
+      "method": "POST",
+      "backend": [
+      {
+          "url_pattern": "/test-function/question/v1/statements/{name}",
+          "encoding": "string",
+          "method": "GET",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ],
+          "group": "auth",
+          "extra_config": {
+              "validation/cel": [
+                  {
+                      "check_expr": "resp_metadata_status == '200'"
+                  }
+              ],
+              "modifier/martian": {
+                  "body.Modifier" : {
+                      "scope": ["request"],
+                      "body": ""
+                  }
+              }
+          }
+      },
+      {
+          "url_pattern": "/question/v1/statements/{name}",
+          "encoding": "json",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ]
+      }
+      ],
+      "extra_config": {
+          "proxy": {
+              "sequential": true
+          }
+      }
+  },
+  {
+      "endpoint": "/question/v2/statements/{name}",
+      "input_headers": [
+        "*"
+      ],
+      "output_encoding": "negotiate",
+      "method": "POST",
+      "backend": [
+      {
+          "url_pattern": "/test-function/question/v2/statements/{name}",
+          "encoding": "string",
+          "method": "GET",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ],
+          "group": "auth",
+          "extra_config": {
+              "validation/cel": [
+                  {
+                      "check_expr": "resp_metadata_status == '200'"
+                  }
+              ],
+              "modifier/martian": {
+                  "body.Modifier" : {
+                      "scope": ["request"],
+                      "body": ""
+                  }
+              }
+          }
+      },
+      {
+          "url_pattern": "/question/v2/statements/{name}",
+          "encoding": "json",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ]
+      }
+      ],
+      "extra_config": {
+          "proxy": {
+              "sequential": true
+          }
+      }
+  },
+  {
+      "endpoint": "/question/v1/survey/{name}",
+      "input_headers": [
+        "*"
+      ],
+      "output_encoding": "negotiate",
+      "method": "POST",
+      "backend": [
+      {
+          "url_pattern": "/test-function/question/v1/survey/{name}",
+          "encoding": "string",
+          "method": "GET",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ],
+          "group": "auth",
+          "extra_config": {
+              "validation/cel": [
+                  {
+                      "check_expr": "resp_metadata_status == '200'"
+                  }
+              ],
+              "modifier/martian": {
+                  "body.Modifier" : {
+                      "scope": ["request"],
+                      "body": ""
+                  }
+              }
+          }
+      },
+      {
+          "url_pattern": "/question/v1/survey/{name}",
+          "encoding": "json",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ]
+      }
+      ],
+      "extra_config": {
+          "proxy": {
+              "sequential": true
+          }
+      }
+  },
+  {
+      "endpoint": "/question/v2/survey/{name}",
+      "input_headers": [
+        "*"
+      ],
+      "output_encoding": "negotiate",
+      "method": "POST",
+      "backend": [
+      {
+          "url_pattern": "/test-function/question/v2/survey/{name}",
+          "encoding": "string",
+          "method": "GET",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ],
+          "group": "auth",
+          "extra_config": {
+              "validation/cel": [
+                  {
+                      "check_expr": "resp_metadata_status == '200'"
+                  }
+              ],
+              "modifier/martian": {
+                  "body.Modifier" : {
+                      "scope": ["request"],
+                      "body": ""
+                  }
+              }
+          }
+      },
+      {
+          "url_pattern": "/question/v2/survey/{name}",
+          "encoding": "json",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ]
+      }
+      ],
+      "extra_config": {
+          "proxy": {
+              "sequential": true
+          }
+      }
+  },
+  {
+      "endpoint": "/sellable/v1/sales/{name}",
+      "input_headers": [
+        "*"
+      ],
+      "output_encoding": "negotiate",
+      "method": "POST",
+      "backend": [
+      {
+          "url_pattern": "/test-function/sellable/v1/sales/{name}",
+          "encoding": "string",
+          "method": "GET",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ],
+          "group": "auth",
+          "extra_config": {
+              "validation/cel": [
+                  {
+                      "check_expr": "resp_metadata_status == '200'"
+                  }
+              ],
+              "modifier/martian": {
+                  "body.Modifier" : {
+                      "scope": ["request"],
+                      "body": ""
+                  }
+              }
+          }
+      },
+      {
+          "url_pattern": "/sellable/v1/sales/{name}",
+          "encoding": "json",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ]
+      }
+      ],
+      "extra_config": {
+          "proxy": {
+              "sequential": true
+          }
+      }
+  },
+  {
+      "endpoint": "/sellable/v2/sales/{name}",
+      "input_headers": [
+        "*"
+      ],
+      "output_encoding": "negotiate",
+      "method": "POST",
+      "backend": [
+      {
+          "url_pattern": "/test-function/sellable/v2/sales/{name}",
+          "encoding": "string",
+          "method": "GET",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ],
+          "group": "auth",
+          "extra_config": {
+              "validation/cel": [
+                  {
+                      "check_expr": "resp_metadata_status == '200'"
+                  }
+              ],
+              "modifier/martian": {
+                  "body.Modifier" : {
+                      "scope": ["request"],
+                      "body": ""
+                  }
+              }
+          }
+      },
+      {
+          "url_pattern": "/sellable/v2/sales/{name}",
+          "encoding": "json",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ]
+      }
+      ],
+      "extra_config": {
+          "proxy": {
+              "sequential": true
+          }
+      }
+  },
+  {
+      "endpoint": "/sellable/v1/risk/{name}",
+      "input_headers": [
+        "*"
+      ],
+      "output_encoding": "negotiate",
+      "method": "POST",
+      "backend": [
+      {
+          "url_pattern": "/test-function/sellable/v1/risk/{name}",
+          "encoding": "string",
+          "method": "GET",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ],
+          "group": "auth",
+          "extra_config": {
+              "validation/cel": [
+                  {
+                      "check_expr": "resp_metadata_status == '200'"
+                  }
+              ],
+              "modifier/martian": {
+                  "body.Modifier" : {
+                      "scope": ["request"],
+                      "body": ""
+                  }
+              }
+          }
+      },
+      {
+          "url_pattern": "/sellable/v1/risk/{name}",
+          "encoding": "json",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ]
+      }
+      ],
+      "extra_config": {
+          "proxy": {
+              "sequential": true
+          }
+      }
+  },
+  {
+      "endpoint": "/sellable/v2/risk/{name}",
+      "input_headers": [
+        "*"
+      ],
+      "output_encoding": "negotiate",
+      "method": "POST",
+      "backend": [
+      {
+          "url_pattern": "/test-function/sellable/v2/risk/{name}",
+          "encoding": "string",
+          "method": "GET",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ],
+          "group": "auth",
+          "extra_config": {
+              "validation/cel": [
+                  {
+                      "check_expr": "resp_metadata_status == '200'"
+                  }
+              ],
+              "modifier/martian": {
+                  "body.Modifier" : {
+                      "scope": ["request"],
+                      "body": ""
+                  }
+              }
+          }
+      },
+      {
+          "url_pattern": "/sellable/v2/risk/{name}",
+          "encoding": "json",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ]
+      }
+      ],
+      "extra_config": {
+          "proxy": {
+              "sequential": true
+          }
+      }
+  },
+  {
+      "endpoint": "/broker/policy/{version}/{uid}",
+      "input_headers": [
+        "*"
+      ],
+      "output_encoding": "negotiate",
+      "method": "PATCH",
+      "backend": [
+      {
+          "url_pattern": "/test-function/broker/policy/{version}/{uid}",
+          "encoding": "string",
+          "method": "GET",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ],
+          "group": "auth",
+          "extra_config": {
+              "validation/cel": [
+                  {
+                      "check_expr": "resp_metadata_status == '200'"
+                  }
+              ],
+              "modifier/martian": {
+                  "body.Modifier" : {
+                      "scope": ["request"],
+                      "body": ""
+                  }
+              }
+          }
+      },
+      {
+          "url_pattern": "/broker/policy/{version}/{uid}",
+          "encoding": "json",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ]
+      }
+      ],
+      "extra_config": {
+          "proxy": {
+              "sequential": true
+          }
+      }
+  },
+  {
+      "endpoint": "/user/document/{version}/{userUid}",
+      "input_headers": [
+        "*"
+      ],
+      "output_encoding": "negotiate",
+      "method": "POST",
+      "backend": [
+      {
+          "url_pattern": "/test-function/user/document/{version}/{userUid}",
+          "encoding": "string",
+          "method": "GET",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ],
+          "group": "auth",
+          "extra_config": {
+              "validation/cel": [
+                  {
+                      "check_expr": "resp_metadata_status == '200'"
+                  }
+              ],
+              "modifier/martian": {
+                  "body.Modifier" : {
+                      "scope": ["request"],
+                      "body": ""
+                  }
+              }
+          }
+      },
+      {
+          "url_pattern": "/user/document/{version}/{userUid}",
+          "encoding": "json",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ]
+      }
+      ],
+      "extra_config": {
+          "proxy": {
+              "sequential": true
+          }
+      }
+  },
+  {
+      "endpoint": "/broker/attachment/{version}/{policyUid}",
+      "input_headers": [
+        "*"
+      ],
+      "output_encoding": "negotiate",
+      "method": "GET",
+      "backend": [
+      {
+          "url_pattern": "/test-function/broker/attachment/{version}/{policyUid}",
+          "encoding": "string",
+          "method": "GET",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ],
+          "group": "auth",
+          "extra_config": {
+              "validation/cel": [
+                  {
+                      "check_expr": "resp_metadata_status == '200'"
+                  }
+              ],
+              "modifier/martian": {
+                  "body.Modifier" : {
+                      "scope": ["request"],
+                      "body": ""
+                  }
+              }
+          }
+      },
+      {
+          "url_pattern": "/broker/attachment/{version}/{policyUid}",
+          "encoding": "json",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ]
+      }
+      ],
+      "extra_config": {
+          "proxy": {
+              "sequential": true
+          }
+      }
+  },
+  {
+      "endpoint": "/user/fiscalcode/{version}/{nation}/{operation}",
+      "input_headers": [
+        "*"
+      ],
+      "output_encoding": "negotiate",
+      "method": "POST",
+      "backend": [
+      {
+          "url_pattern": "/test-function/user/fiscalcode/{version}/{nation}/{operation}",
+          "encoding": "string",
+          "method": "GET",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ],
+          "group": "auth",
+          "extra_config": {
+              "validation/cel": [
+                  {
+                      "check_expr": "resp_metadata_status == '200'"
+                  }
+              ],
+              "modifier/martian": {
+                  "body.Modifier" : {
+                      "scope": ["request"],
+                      "body": ""
+                  }
+              }
+          }
+      },
+      {
+          "url_pattern": "/user/fiscalcode/{version}/{nation}/{operation}",
+          "encoding": "json",
+          "host": [
+               "https://europe-west1-core-350507.cloudfunctions.net"
+          ]
+      }
+      ],
+      "extra_config": {
+          "proxy": {
+              "sequential": true
+          }
+      }
   }
-}
+  ]
+  }

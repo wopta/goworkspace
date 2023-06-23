@@ -9,6 +9,7 @@ type Asset struct {
 	Enterprise   *Enterprise `firestore:"enterprise,omitempty" json:"enterprise,omitempty"`
 	IsContractor bool        `firestore:"isContractor,omitempty" json:"isContractor,omitempty"`
 	Guarantees   []Guarante  `firestore:"guarantees,omitempty" json:"guarantees,omitempty"`
+	Vehicle      *Vehicle    `firestore:"vehicle,omitempty" json:"vehicle,omitempty"`
 }
 type Building struct {
 	Name             string   `firestore:"name,omitempty" json:"name,omitempty"`
