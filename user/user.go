@@ -28,25 +28,25 @@ func User(w http.ResponseWriter, r *http.Request) {
 	route := lib.RouteData{
 		Routes: []lib.Route{
 			{
-				Route:   "/v1/fiscalCode/:fiscalcode",
+				Route:   "/fiscalCode/v1/:fiscalcode",
 				Handler: GetUserByFiscalCodeFx,
 				Method:  "GET",
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
-				Route:   "/v1/mail/:mail",
+				Route:   "/mail/v1/:mail",
 				Handler: GetUserByMailFx,
 				Method:  "GET",
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
-				Route:   "/v1/authId/:authId",
+				Route:   "/authId/v1/:authId",
 				Handler: GetUserByAuthIdFx,
 				Method:  "GET",
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
-				Route:   "/v1/onboarding",
+				Route:   "/onboarding/v1",
 				Handler: OnboardUserFx,
 				Method:  "POST",
 				Roles:   []string{models.UserRoleAll},
