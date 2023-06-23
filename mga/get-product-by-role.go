@@ -3,14 +3,12 @@ package mga
 import (
 	"encoding/json"
 	"errors"
-	"io"
-	"log"
-	"net/http"
-	"strings"
-
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/product"
+	"io"
+	"log"
+	"net/http"
 )
 
 type GetProductByRoleRequest struct {
@@ -22,9 +20,9 @@ type GetProductByRoleRequest struct {
 func GetProductByRoleFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println("GetProductByRoleFx")
 	var (
-		response *models.Product
-		request  GetProductByRoleRequest
-		err      error
+		resp    *models.Product
+		request GetProductByRoleRequest
+		err     error
 	)
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
@@ -32,19 +30,18 @@ func GetProductByRoleFx(w http.ResponseWriter, r *http.Request) (string, interfa
 	lib.CheckError(err)
 	log.Printf("GetProductByRoleFx body: %s", string(body))
 
-	idToken := strings.ReplaceAll(r.Header.Get("Authorization"), "Bearer ", "")
-	authToken, err := models.GetAuthTokenFromIdToken(idToken)
+	authToken, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
 	lib.CheckError(err)
 	log.Printf("GetProductByRoleFx authToken: %s", authToken)
 
-	response, err = GetProductByRole(request.Name, request.Version, request.Company, authToken)
+	resp, err = GetProductByRole(request.Name, request.Version, request.Company, authToken)
 	if err != nil {
-		return "", response, err
+		return "", resp, err
 	}
-	jsonOut, err := json.Marshal(response)
+	jsonResp, err := json.Marshal(resp)
 
-	log.Printf("GetProductByRoleFx response: %s", string(jsonOut))
-	return string(jsonOut), response, err
+	log.Printf("GetProductByRoleFx response: %s", string(jsonResp))
+	return string(jsonResp), resp, err
 }
 
 func GetProductByRole(productName, version, company string, authToken models.AuthToken) (*models.Product, error) {

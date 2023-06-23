@@ -13,6 +13,10 @@ const (
 )
 
 type GetProductListResp struct {
+	Products []ProductInfo `json:"products"`
+}
+
+type ProductInfo struct {
 	Name     string `json:"name"`
 	NameDesc string `json:"nameDesc"`
 	Version  string `json:"version"`
@@ -33,6 +37,7 @@ func GetProductsListByEntitlementFx(w http.ResponseWriter, r *http.Request) (str
 	authToken, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
 	lib.CheckError(err)
 
+	log.Println("GetProductsListByEntitlement: loading products list")
 	switch authToken.Role {
 	case models.UserRoleAdmin, models.UserRoleManager:
 		roleProducts = getMgaProductsList()
@@ -40,14 +45,15 @@ func GetProductsListByEntitlementFx(w http.ResponseWriter, r *http.Request) (str
 		roleProducts = getAgencyProductsList(authToken.UserID, origin)
 	case models.UserRoleAgent:
 		roleProducts = getAgentProductsList(authToken.UserID, origin)
-	case models.UserRoleCustomer:
+	case models.UserRoleCustomer, models.UserRoleAll:
 		roleProducts = getEcommerceProductsList()
 	}
+	log.Printf("GetProductsListByEntitlement: found %d products for %s", len(roleProducts), authToken.Role)
 
-	productsList := make([]GetProductListResp, 0)
+	resp := GetProductListResp{Products: make([]ProductInfo, 0)}
 	for _, product := range roleProducts {
 		for _, company := range product.Companies {
-			productsList = append(productsList, GetProductListResp{
+			resp.Products = append(resp.Products, ProductInfo{
 				Name:     product.Name,
 				NameDesc: *product.NameDesc,
 				Version:  product.Version,
@@ -57,9 +63,9 @@ func GetProductsListByEntitlementFx(w http.ResponseWriter, r *http.Request) (str
 		}
 	}
 
-	jsonOut, err := json.Marshal(productsList)
+	jsonResp, err := json.Marshal(resp)
 
-	return string(jsonOut), productsList, err
+	return string(jsonResp), resp, err
 }
 
 func getMgaProductsList() []models.Product {
