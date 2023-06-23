@@ -34,9 +34,22 @@ func GetProductsListByEntitlementFx(w http.ResponseWriter, r *http.Request) (str
 
 	if idToken == "" {
 		productsList = getEcommerceProductsList()
-		output, err := json.Marshal(productsList)
-		lib.CheckError(err)
-		return string(output), productsList, err
+		list := make([]GetProductListResp, 0)
+		for _, product := range productsList {
+			for _, company := range product.Companies {
+				list = append(list, GetProductListResp{
+					Name:     product.Name,
+					NameDesc: *product.NameDesc,
+					Version:  product.Version,
+					Company:  company.Name,
+					Logo:     product.Logo,
+				})
+			}
+		}
+
+		jsonOut, err := json.Marshal(list)
+
+		return string(jsonOut), list, err
 	}
 
 	userRole, err = lib.GetUserRoleFromIdToken(idToken)
@@ -63,7 +76,7 @@ func GetProductsListByEntitlementFx(w http.ResponseWriter, r *http.Request) (str
 				NameDesc: *product.NameDesc,
 				Version:  product.Version,
 				Company:  company.Name,
-				Logo:     "",
+				Logo:     product.Logo,
 			})
 		}
 	}
@@ -80,6 +93,9 @@ func getMgaProductsList() []models.Product {
 		var product models.Product
 		err := json.Unmarshal(file, &product)
 		lib.CheckError(err)
+		if product.Name == "pmi" {
+			continue
+		}
 		productsList = append(productsList, product)
 	}
 	return productsList
@@ -92,9 +108,10 @@ func getEcommerceProductsList() []models.Product {
 		var product models.Product
 		err := json.Unmarshal(file, &product)
 		lib.CheckError(err)
-		if product.IsEcommerceActive {
-			productsList = append(productsList, product)
+		if product.Name == "pmi" || !product.IsEcommerceActive {
+			continue
 		}
+		productsList = append(productsList, product)
 	}
 	return productsList
 }

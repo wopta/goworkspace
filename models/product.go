@@ -36,6 +36,7 @@ type Product struct {
 	IsEcommerceActive bool             `json:"isEcommerceActive" firestore:"isEcommerceActive"`
 	IsAgencyActive    bool             `json:"isAgencyActive" firestore:"isAgencyActive"`
 	IsAgentActive     bool             `json:"isAgentActive" firestore:"isAgentActive"`
+	Logo              string           `json:"logo,omitempty" firestore:"logo,omitempty" bigquery:"-"`
 }
 
 type Company struct {
