@@ -1,33 +1,34 @@
-package broker
+package user
 
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
 	"io"
 	"log"
 	"net/http"
 	"time"
+
+	lib "github.com/wopta/goworkspace/lib"
+	models "github.com/wopta/goworkspace/models"
 )
 
-type GetPoliciesReq struct {
+type GetUsersReq struct {
 	Queries []models.Query `json:"queries,omitempty"`
 	Limit   int            `json:"limit"`
 	Page    int            `json:"page"`
 }
 
-type GetPoliciesResp struct {
-	Policies []models.Policy `json:"policies"`
+type GetUsersResp struct {
+	Users []models.User `json:"users"`
 }
 
-func GetPoliciesFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func GetUsersFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		req        GetPoliciesReq
-		response   GetPoliciesResp
+		req        GetUsersReq
+		response   GetUsersResp
 		limitValue = 10
 	)
-	log.Println("GetPolicies")
+	log.Println("GetUsers")
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	err := json.Unmarshal(body, &req)
@@ -41,14 +42,14 @@ func GetPoliciesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		limitValue = req.Limit
 	}
 
-	firePolicy := lib.GetDatasetByEnv(r.Header.Get("origin"), "policy")
+	fireUser := lib.GetDatasetByEnv(r.Header.Get("origin"), usersCollection)
 
 	fireQueries := lib.Firequeries{
 		Queries: make([]lib.Firequery, 0),
 	}
 
 	for index, q := range req.Queries {
-		log.Printf("query %d/%d field: \"%s\" op: \"%s\" value: \"%v\"", index+1, len(req.Queries), q.Field, q.Op, q.Value)
+		log.Printf("query %d/%d field: \"%s\" op: \"%s\" value: \"%v\"\n", index+1, len(req.Queries), q.Field, q.Op, q.Value)
 		value := q.Value
 		if q.Type == "dateTime" {
 			value, _ = time.Parse(time.RFC3339, value.(string))
@@ -60,13 +61,13 @@ func GetPoliciesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		})
 	}
 
-	docsnap, err := fireQueries.FirestoreWhereLimitFields(firePolicy, limitValue)
+	docsnap, err := fireQueries.FirestoreWhereLimitFields(fireUser, limitValue)
 	if err != nil {
 		return "", nil, err
 	}
 
-	response.Policies = models.PolicyToListData(docsnap)
-	log.Printf("GetPolicies: found %d policies", len(response.Policies))
+	response.Users = models.UsersToListData(docsnap)
+	log.Printf("GetUsers: found %d users\n", len(response.Users))
 
 	jsonOut, err := json.Marshal(response)
 	return string(jsonOut), response, err

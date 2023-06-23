@@ -17,7 +17,6 @@ func init() {
 func Mga(w http.ResponseWriter, r *http.Request) {
 	log.Println("Mga")
 	lib.EnableCors(&w, r)
-	w.Header().Set("Access-Control-Allow-Methods", "POST")
 
 	route := lib.RouteData{
 		Routes: []lib.Route{
@@ -28,9 +27,9 @@ func Mga(w http.ResponseWriter, r *http.Request) {
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
-				Route:   "/v1/journey/:product",
-				Handler: func(w http.ResponseWriter, r *http.Request) (string, interface{}, error) { return "", nil, nil },
-				Method:  http.MethodGet,
+				Route:   "/products/v1",
+				Handler: GetProductByRoleFx,
+				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAll},
 			},
 		},

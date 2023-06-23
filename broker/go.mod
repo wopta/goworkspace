@@ -12,9 +12,9 @@ require (
 	github.com/wopta/goworkspace/document v1.0.62
 	github.com/wopta/goworkspace/lib v1.0.50
 	github.com/wopta/goworkspace/mail v1.0.21
-	github.com/wopta/goworkspace/models v1.1.0
+	github.com/wopta/goworkspace/models v1.1.1
 	github.com/wopta/goworkspace/payment v1.0.43
-	github.com/wopta/goworkspace/user v1.0.10
+	github.com/wopta/goworkspace/user v1.0.11
 	github.com/wopta/goworkspace/wiseproxy v1.0.3
 )
 
@@ -71,6 +71,7 @@ require (
 	github.com/richardlehane/mscfb v1.0.4 // indirect
 	github.com/richardlehane/msoleps v1.0.3 // indirect
 	github.com/ruudk/golang-pdf417 v0.0.0-20201230142125-a7e3863a1245 // indirect
+	github.com/scipipe/scipipe v0.12.0
 	github.com/sergi/go-diff v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect

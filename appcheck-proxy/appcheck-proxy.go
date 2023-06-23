@@ -5,10 +5,11 @@ import (
 	"log"
 	"net/http"
 
-	firebase "firebase.google.com/go/v4"
+	firebaseAdmin "firebase.google.com/go/v4"
+	"firebase.google.com/go/v4/appcheck"
+
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	lib "github.com/wopta/goworkspace/lib"
-	//"google.golang.org/api/firebaseappcheck/v1"
 )
 
 func init() {
@@ -18,22 +19,33 @@ func init() {
 
 func AppcheckProxy(w http.ResponseWriter, r *http.Request) {
 	var (
-		idToken string
+		//idToken  string
+		appCheck *appcheck.Client
 	)
-	ctx := context.Background()
-	//firebaseappcheckService, err := firebaseappcheck.NewService(ctx)
-	app, err := firebase.NewApp(context.Background(), nil)
-	client, err := app.Auth(ctx)
+	app, err := firebaseAdmin.NewApp(context.Background(), nil)
 	if err != nil {
-		log.Fatalf("error getting Auth client: %v\n", err)
+		log.Fatalf("error initializing app: %v\n", err)
 	}
 
-	token, err := client.VerifyIDToken(ctx, idToken)
+	appCheck, err = app.AppCheck(context.Background())
 	if err != nil {
-		log.Fatalf("error verifying ID token: %v\n", err)
+		log.Fatalf("error initializing app: %v\n", err)
+	}
+	appCheckToken, ok := r.Header[http.CanonicalHeaderKey("X-Firebase-AppCheck")]
+	if !ok {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte("Unauthorized."))
+		return
 	}
 
-	log.Printf("Verified ID token: %v\n", token)
+	_, err = appCheck.VerifyToken(appCheckToken[0])
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte("Unauthorized."))
+		return
+	}
+
+	// If VerifyToken() succeeds, continue with the provided handler.
 
 	lib.CheckError(err)
 
