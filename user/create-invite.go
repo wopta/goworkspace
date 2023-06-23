@@ -3,7 +3,7 @@ package user
 import (
 	"encoding/json"
 	"errors"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -18,8 +18,9 @@ import (
 func CreateInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var createInviteRequest CreateInviteRequest
 
-	reqBytes := lib.ErrorByte(ioutil.ReadAll(r.Body))
-	json.Unmarshal(reqBytes, &createInviteRequest)
+	reqBytes := lib.ErrorByte(io.ReadAll(r.Body))
+	err := json.Unmarshal(reqBytes, &createInviteRequest)
+	lib.CheckError(err)
 
 	creatorUid, err := lib.GetUserIdFromIdToken(r.Header.Get("Authorization"))
 	if err != nil {
@@ -27,10 +28,13 @@ func CreateInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 		return `{"success": false}`, `{"success": false}`, nil
 	}
 
-	if inviteUid, err := CreateInvite(createInviteRequest, r.Header.Get("Origin"), creatorUid); err != nil {
-		SendInviteMail(inviteUid, createInviteRequest.Email)
+	inviteUid, err := CreateInvite(createInviteRequest, r.Header.Get("Origin"), creatorUid)
+	if err != nil {
+		log.Printf("[CreateInvite]: %s", err.Error())
+		return `{"success": false}`, `{"success": false}`, err
 	}
 
+	SendInviteMail(inviteUid, createInviteRequest.Email)
 	return `{"success": true}`, `{"success": true}`, nil
 }
 
@@ -44,14 +48,16 @@ func CreateInvite(inviteRequest CreateInviteRequest, origin, creatorUid string) 
 	inviteExpiration := time.Now().UTC().Add(oneWeek)
 
 	roles := models.GetAllRoles()
-	var userRole *string = nil
+	var userRole string
 	for _, role := range roles {
-		if (strings.EqualFold(inviteRequest.Role, role)) {
-			userRole = &role
+		if strings.EqualFold(inviteRequest.Role, role) {
+			userRole = role
+			break
 		}
 	}
 
-	if userRole == nil {
+	if userRole == "" {
+		log.Println("[CreateInvite]: forbidden role")
 		return "", errors.New("forbidden role")
 	}
 
@@ -60,7 +66,7 @@ func CreateInvite(inviteRequest CreateInviteRequest, origin, creatorUid string) 
 		Surname:    inviteRequest.Surname,
 		FiscalCode: inviteRequest.FiscalCode,
 		Email:      inviteRequest.Email,
-		Role:       *userRole,
+		Role:       userRole,
 		Expiration: inviteExpiration,
 		Uid:        inviteUid,
 		CreatorUid: creatorUid,
@@ -69,11 +75,13 @@ func CreateInvite(inviteRequest CreateInviteRequest, origin, creatorUid string) 
 	// check if user exists
 	_, err := GetAuthUserByMail(inviteRequest.Email)
 	if err == nil {
+		log.Printf("[CreateInvite]: user %s already exists", inviteRequest.Email)
 		return "", errors.New("user already exists")
 	}
 
 	err = lib.SetFirestoreErr(collectionName, invite.Uid, invite)
 	if err != nil {
+		log.Printf("[CreateInvite]: could not create user %s", inviteRequest.Email)
 		return "", errors.New("could not create user")
 	}
 
@@ -121,7 +129,7 @@ type CreateInviteRequest struct {
 type UserInvite struct {
 	FiscalCode string    `json:"fiscalCode,omitempty" firestore:"fiscalCode,omitempty"`
 	Name       string    `json:"name,omitempty" firestore:"name,omitempty"`
-	Surname    string    `json:"Surname,omitempty" firestore:"Surname,omitempty"`
+	Surname    string    `json:"surname,omitempty" firestore:"surname,omitempty"`
 	Role       string    `json:"role,omitempty" firestore:"role,omitempty"`
 	Email      string    `json:"email,omitempty" firestore:"email,omitempty"`
 	Uid        string    `json:"uid,omitempty" firestore:"uid,omitempty"`

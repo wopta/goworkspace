@@ -12,8 +12,13 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
+type ConsumeInviteReq struct {
+	InviteUid string `json:"inviteUid"`
+	Password  string `json:"password"`
+}
+
 func ConsumeInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	var ConsumeInviteRequest ConsumeInviteRequest
+	var ConsumeInviteRequest ConsumeInviteReq
 
 	reqBytes := lib.ErrorByte(ioutil.ReadAll(r.Body))
 	json.Unmarshal(reqBytes, &ConsumeInviteRequest)
@@ -46,7 +51,16 @@ func ConsumeInvite(inviteUid, password, origin string) (bool, error) {
 		return false, errors.New("invite consumed or expired")
 	}
 
-	usersCollectionName := lib.GetDatasetByEnv(origin, usersCollection)
+	collection = ""
+	switch invite.Role {
+	case models.UserRoleAgent:
+		collection = lib.GetDatasetByEnv(origin, models.UserRoleAgent)
+	case models.UserRoleAgency:
+		collection = lib.GetDatasetByEnv(origin, models.UserRoleAgency)
+	default:
+		collection = lib.GetDatasetByEnv(origin, usersCollection)
+	}
+	//usersCollectionName := lib.GetDatasetByEnv(origin, usersCollection)
 
 	// Create the user in auth with the invite data
 	userRecord, err := lib.CreateUserWithEmailAndPassword(invite.Email, password, nil)
@@ -65,7 +79,7 @@ func ConsumeInvite(inviteUid, password, origin string) (bool, error) {
 		Surname:    invite.Surname,
 	}
 
-	err = lib.SetFirestoreErr(usersCollectionName, user.Uid, user)
+	err = lib.SetFirestoreErr(collection, user.Uid, user)
 	if err != nil {
 		return false, err
 	}
@@ -82,9 +96,4 @@ func ConsumeInvite(inviteUid, password, origin string) (bool, error) {
 
 	log.Printf("[ConsumeInvite] Consumed invite with uid %s", invite.Uid)
 	return true, nil
-}
-
-type ConsumeInviteRequest struct {
-	InviteUid string `json:"inviteUid"`
-	Password  string `json:"password"`
 }
