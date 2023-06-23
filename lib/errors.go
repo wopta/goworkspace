@@ -27,3 +27,20 @@ func CheckErrorResp(w http.ResponseWriter, e error) {
 
 	}
 }
+type ErrorResponse struct {
+	Code    int    `firestore:"-" json:"code,omitempty" bigquery:"name"`          //h-Nome
+	Type    string `firestore:"-" json:"type,omitempty" bigquery:"surname"`       //Cognome
+	Message string `firestore:"-" json:"message,omitempty" bigquery:"fiscalCode"` //Codice fiscale
+
+}
+func GetErrorJson(code int , type string, message string)error{
+	var (
+		e     error
+		eResp ErrorResponse
+		b     []byte
+	)
+	eResp = ErrorResponse{Code: code, Type: type, Message: message}
+	b, e = json.Marshal(eResp)
+	e = errors.New(string(b))
+	return e
+}
