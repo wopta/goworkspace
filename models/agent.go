@@ -22,7 +22,7 @@ type Agent struct {
 }
 
 func GetAgentByAuthId(authId string) (*Agent, error) {
-	agentFirebase := lib.WhereLimitFirestore(AgentCollection, "user.authId", "==", authId, 1)
+	agentFirebase := lib.WhereLimitFirestore(AgentCollection, "authId", "==", authId, 1)
 	agent, err := FirestoreDocumentToAgent(agentFirebase)
 
 	return agent, err
