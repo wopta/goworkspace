@@ -48,14 +48,15 @@ func CreateInvite(inviteRequest CreateInviteRequest, origin, creatorUid string) 
 	inviteExpiration := time.Now().UTC().Add(oneWeek)
 
 	roles := models.GetAllRoles()
-	var userRole *string = nil
+	var userRole string
 	for _, role := range roles {
 		if strings.EqualFold(inviteRequest.Role, role) {
-			userRole = &role
+			userRole = role
+			break
 		}
 	}
 
-	if userRole == nil {
+	if userRole == "" {
 		log.Println("[CreateInvite]: forbidden role")
 		return "", errors.New("forbidden role")
 	}
@@ -65,7 +66,7 @@ func CreateInvite(inviteRequest CreateInviteRequest, origin, creatorUid string) 
 		Surname:    inviteRequest.Surname,
 		FiscalCode: inviteRequest.FiscalCode,
 		Email:      inviteRequest.Email,
-		Role:       *userRole,
+		Role:       userRole,
 		Expiration: inviteExpiration,
 		Uid:        inviteUid,
 		CreatorUid: creatorUid,
