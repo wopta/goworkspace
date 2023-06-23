@@ -19,7 +19,7 @@ func init() {
 
 func AppcheckProxy(w http.ResponseWriter, r *http.Request) {
 	var (
-		idToken  string
+		//idToken  string
 		appCheck *appcheck.Client
 	)
 	app, err := firebaseAdmin.NewApp(context.Background(), nil)
