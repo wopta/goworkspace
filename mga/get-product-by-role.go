@@ -41,18 +41,15 @@ func GetProductByRole(productName, version string, authToken models.AuthToken) (
 		err             error
 	)
 
-	mgaProduct, err := product.GetMgaProduct(productName, "v1")
-	lib.CheckError(err)
-
 	switch authToken.Role {
 	case models.UserRoleAdmin, models.UserRoleManager:
-		responseProduct, err = getMgaProduct(&mgaProduct)
+		responseProduct, err = getMgaProduct(productName)
 	case models.UserRoleAll:
-		responseProduct, err = getEcommerceProduct(&mgaProduct, productName)
+		responseProduct, err = getEcommerceProduct(productName)
 	case models.UserRoleAgency:
-		responseProduct, err = getAgencyProduct(&mgaProduct, productName, authToken.UserID)
+		responseProduct, err = getAgencyProduct(productName, authToken.UserID)
 	case models.UserRoleAgent:
-		responseProduct, err = getAgentProduct(&mgaProduct, productName, authToken.UserID)
+		responseProduct, err = getAgentProduct(productName, authToken.UserID)
 	default:
 		responseProduct, err = productNotFound()
 	}
@@ -79,59 +76,59 @@ func productNotFound() (*models.Product, error) {
 	return nil, errors.New("product not found")
 }
 
-func getMgaProduct(mgaProduct *models.Product) (*models.Product, error) {
-	return mgaProduct, nil
+func getMgaProduct(productName string) (*models.Product, error) {
+	mgaProduct, err := product.GetMgaProduct(productName, "v1")
+	lib.CheckError(err)
+
+	return &mgaProduct, nil
 }
 
-func getEcommerceProduct(mgaProduct *models.Product, productName string) (*models.Product, error) {
-	if !mgaProduct.IsEcommerceActive {
+func getEcommerceProduct(productName string) (*models.Product, error) {
+	ecomProduct, err := product.GetProduct(productName, "v1", "")
+
+	if !ecomProduct.IsEcommerceActive {
 		return productNotActive()
 	}
-
-	ecomProduct, err := product.GetProduct(productName, "v1", "")
 
 	return &ecomProduct, err
 }
 
-func getAgencyProduct(mgaProduct *models.Product, productName, agencyUid string) (*models.Product, error) {
-	if !mgaProduct.IsAgencyActive {
+func getAgencyProduct(productName, agencyUid string) (*models.Product, error) {
+	agencyDefaultProduct, err := product.GetProduct(productName, "v1", models.UserRoleAgency)
+	lib.CheckError(err)
+
+	if !agencyDefaultProduct.IsAgencyActive {
 		return productNotActive()
 	}
 
-	agencyDefaultProduct, err := product.GetProduct(productName, "v1", models.UserRoleAgency)
-	lib.CheckError(err)
 	responseProduct := &agencyDefaultProduct
 	log.Printf("Agency Product Start: %v", responseProduct)
 	agency, err := models.GetAgencyByAuthId(agencyUid)
 	lib.CheckError(err)
 
 	agencyProduct := getProductByName(agency.Products, productName)
-	if agencyProduct != nil {
-		if len(agencyProduct.Steps) > 0 {
-			responseProduct.Steps = agencyProduct.Steps
-		}
-
-		for _, c := range agencyProduct.Companies {
-			for _, c2 := range responseProduct.Companies {
-				if c2.Name == c.Name {
-					c2.Mandate = c.Mandate
-				}
-			}
-		}
-		log.Printf("Agency Product Modified: %v", responseProduct)
+	if agencyProduct == nil {
+		return nil, errors.New("agency does not have product")
 	}
+
+	if !agencyProduct.IsAgencyActive {
+		return productNotActive()
+	}
+
+	overrideProduct(responseProduct, agencyProduct)
 
 	log.Printf("Agency Product Response: %v", responseProduct)
 	return responseProduct, nil
 }
 
-func getAgentProduct(mgaProduct *models.Product, productName, agentUid string) (*models.Product, error) {
-	if !mgaProduct.IsAgentActive {
+func getAgentProduct(productName, agentUid string) (*models.Product, error) {
+	agentDefaultProduct, err := product.GetProduct(productName, "v1", models.UserRoleAgent)
+	lib.CheckError(err)
+
+	if !agentDefaultProduct.IsAgentActive {
 		return productNotActive()
 	}
 
-	agentDefaultProduct, err := product.GetProduct(productName, "v1", models.UserRoleAgent)
-	lib.CheckError(err)
 	responseProduct := &agentDefaultProduct
 	log.Printf("Agent Product Start: %v", responseProduct)
 	agent, err := models.GetAgentByAuthId(agentUid)
@@ -139,39 +136,39 @@ func getAgentProduct(mgaProduct *models.Product, productName, agentUid string) (
 	agency, err := models.GetAgencyByAuthId(agent.AgencyUid)
 	lib.CheckError(err)
 
+	agentProduct := getProductByName(agent.Products, productName)
+	if agentProduct == nil {
+		return nil, errors.New("agent does not have product")
+	}
+
+	if !agentProduct.IsAgentActive {
+		return productNotActive()
+	}
+
 	// TODO: traverse network
 	agencyProduct := getProductByName(agency.Products, productName)
 	if agencyProduct != nil {
-		if len(agencyProduct.Steps) > 0 {
-			responseProduct.Steps = agencyProduct.Steps
-		}
-
-		for _, c := range agencyProduct.Companies {
-			for _, c2 := range responseProduct.Companies {
-				if c2.Name == c.Name {
-					c2.Mandate = c.Mandate
-				}
-			}
-		}
+		overrideProduct(responseProduct, agencyProduct)
 		log.Printf("Agent product modified by agency: %v", responseProduct)
 	}
 
-	agentProduct := getProductByName(agent.Products, productName)
-	if agentProduct != nil {
-		if len(agentProduct.Steps) > 0 {
-			responseProduct.Steps = agentProduct.Steps
-		}
-
-		for _, c := range agentProduct.Companies {
-			for _, c2 := range responseProduct.Companies {
-				if c2.Name == c.Name {
-					c2.Mandate = c.Mandate
-				}
-			}
-		}
-		log.Printf("Agent product modified by agent: %v", responseProduct)
-	}
+	overrideProduct(responseProduct, agentProduct)
+	log.Printf("Agent product modified by agent: %v", responseProduct)
 
 	log.Printf("Agent Product Response: %v", responseProduct)
 	return responseProduct, nil
+}
+
+func overrideProduct(baseProduct *models.Product, insertedProduct *models.Product) {
+	if len(insertedProduct.Steps) > 0 {
+		baseProduct.Steps = insertedProduct.Steps
+	}
+
+	for _, c := range insertedProduct.Companies {
+		for _, c2 := range baseProduct.Companies {
+			if c2.Name == c.Name {
+				c2.Mandate = c.Mandate
+			}
+		}
+	}
 }
