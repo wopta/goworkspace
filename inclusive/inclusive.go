@@ -55,6 +55,7 @@ func BankAccountFx(resp http.ResponseWriter, r *http.Request) (string, interface
 	if e != nil {
 		return "", nil, e
 	}
+	obj = SetData(obj)
 	e = lib.InsertRowsBigQuery("wopta", "inclusive_axa_bank_account", obj)
 
 	return `{"woptaUid":""}`, nil, e
@@ -135,11 +136,11 @@ func CheckData(r *http.Request) (BankAccountMovement, error) {
 	}
 	return obj, nil
 }
-func SetData(obj *BankAccountMovement) error {
+func SetData(obj BankAccountMovement) BankAccountMovement {
 
 	obj.BigStartDate = civil.DateTimeOf(obj.StartDate)
 	obj.BigEndDate = civil.DateTimeOf(obj.EndDate)
 	obj.PolicyNumber = ""
 
-	return nil
+	return obj
 }
