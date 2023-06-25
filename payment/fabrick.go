@@ -249,7 +249,7 @@ func getCommissionProduct(data models.Policy, prod models.Product) float64 {
 func getCommissionProducts(data models.Policy, products []models.Product) float64 {
 	var commission float64
 	for _, prod := range products {
-		if prod.Name == data.Company {
+		if prod.Name == data.Name {
 			return getCommissionProduct(data, prod)
 		}
 
