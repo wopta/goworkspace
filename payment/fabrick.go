@@ -122,8 +122,8 @@ func FabrickPayObj(data models.Policy, firstSchedule bool, scheduleDate string, 
 				ProviderName:       "fabrick",
 				AgentUid:           data.AgencyUid,
 				AgencyUid:          data.AgencyUid,
-				CommissionsAgent:   commissionAgent,
-				CommissionsAgency:  commissionAgency,
+				CommissionsAgent:   amountNet * commissionAgent,
+				CommissionsAgency:  amountNet * commissionAgency,
 				NetworkCommissions: netCommission,
 			}
 
