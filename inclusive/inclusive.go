@@ -11,6 +11,7 @@ import (
 
 	"cloud.google.com/go/civil"
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
+	"github.com/google/uuid"
 	lib "github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
@@ -58,7 +59,7 @@ func BankAccountFx(resp http.ResponseWriter, r *http.Request) (string, interface
 	obj = SetData(obj)
 	e = lib.InsertRowsBigQuery("wopta", "inclusive_axa_bank_account", obj)
 
-	return `{"woptaUid":""}`, nil, e
+	return `{"woptaUid":"` + obj.Uid + `"}`, nil, e
 }
 
 type BankAccountMovement struct {
@@ -137,10 +138,10 @@ func CheckData(r *http.Request) (BankAccountMovement, error) {
 	return obj, nil
 }
 func SetData(obj BankAccountMovement) BankAccountMovement {
-
 	obj.BigStartDate = civil.DateTimeOf(obj.StartDate)
 	obj.BigEndDate = civil.DateTimeOf(obj.EndDate)
 	obj.PolicyNumber = ""
+	obj.Uid = uuid.New().String()
 
 	return obj
 }

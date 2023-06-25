@@ -18,8 +18,11 @@ type Transaction struct {
 	Amount             float64               `firestore:"amount,omitempty" json:"amount,omitempty" bigquery:"amount" `
 	AmountNet          float64               `json:"amountNet,omitempty" firestore:"amountNet,omitempty" bigquery:"amountNet"`
 	AgentUid           string                `json:"agentUid,omitempty" firestore:"agentUid,omitempty" bigquery:"agentUid"`
+	AgencyUid          string                `json:"agencyUid,omitempty" firestore:"agencyUid,omitempty" bigquery:"agencyUid"`
 	Commissions        float64               `firestore:"commissions,omitempty" json:"commissions,omitempty" bigquery:"commissions"`
 	CommissionsCompany float64               `firestore:"commissionsCompany,omitempty" json:"commissionsCompany,omitempty" bigquery:"commissionsCompany"`
+	CommissionsAgent   float64               `firestore:"commissionsAgent,omitempty" json:"commissionsAgent,omitempty" bigquery:"commissionsAgent"`
+	CommissionsAgency  float64               `firestore:"commissionsAgency,omitempty" json:"commissionsAgency,omitempty" bigquery:"commissionsAgency"`
 	Status             string                `firestore:"status,omitempty" json:"status,omitempty" bigquery:"status"`
 	PolicyName         string                `firestore:"policyName,omitempty" json:"policName,omitempty" bigquery:"policyName"`
 	Name               string                `firestore:"name,omitempty" json:"name,omitempty" bigquery:"name"`
