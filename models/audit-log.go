@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"strings"
 	"time"
 
+	"cloud.google.com/go/civil"
 	"github.com/wopta/goworkspace/lib"
 )
 
@@ -23,39 +23,45 @@ const (
 //	a := ParseHttpRequest(r)
 //	a.SaveToBigQuery()
 type AuditLog struct {
-	Payload  string    `bigquery:"payload"`
-	Date     time.Time `bigquery:"date"`
-	UserUid  string    `bigquery:"userUid"`
-	Method   string    `bigquery:"method"`
-	Endpoint string    `bigquery:"endpoint"`
-	Role     string    `bigquery:"role"`
+	Payload  string         `bigquery:"payload"`
+	Date     civil.DateTime `bigquery:"date"`
+	UserUid  string         `bigquery:"userUid"`
+	Method   string         `bigquery:"method"`
+	Endpoint string         `bigquery:"endpoint"`
+	Role     string         `bigquery:"role"`
 }
 
 func ParseHttpRequest(r *http.Request) (AuditLog, error) {
+	body := ""
 	if r.Body != nil {
-		return AuditLog{}, fmt.Errorf("no payload found: body is empty!")
+		defer r.Body.Close()
+		body_bytes, err := io.ReadAll(r.Body)
+		if err != nil {
+			return AuditLog{}, fmt.Errorf("cannot retrieve the payload: %v", err)
+		}
+		body = string(body_bytes)
 	}
 
-	defer r.Body.Close()
-
-	body, err := io.ReadAll(r.Body)
+	idToken := r.Header.Get("Authorization")
+	token, err := lib.VerifyUserIdToken(idToken)
 	if err != nil {
-		return AuditLog{}, fmt.Errorf("cannot retrieve the payload: %v", err)
+		return AuditLog{}, fmt.Errorf("cannot retrieve the user's token: %v", err)
 	}
 
-	userUid := r.Header.Get("userUid")
-	if userUid == "" {
+	userUid, err := lib.GetUserIdFromIdToken(idToken)
+	if err != nil {
 		return AuditLog{}, fmt.Errorf("cannot retrieve the user's UID. Header (userUid) is empty")
 	}
 
-	role, err := getRole(r)
-	if err != nil {
+	role := ""
+	if token.Claims["role"] == nil {
 		return AuditLog{}, fmt.Errorf("cannot retrieve the role: %s", err)
 	}
+	role = token.Claims["role"].(string)
 
 	return AuditLog{
-		Payload:  string(body),
-		Date:     time.Now().UTC(),
+		Payload:  body,
+		Date:     civil.DateTimeOf(time.Now().UTC()),
 		UserUid:  userUid,
 		Method:   r.Method,
 		Endpoint: r.RequestURI,
@@ -68,23 +74,4 @@ func (a AuditLog) SaveToBigQuery() error {
 		return fmt.Errorf("cannot save the audit-log: %v", err)
 	}
 	return nil
-}
-
-// Copy and paseted from router/router.go: VerifyAuthorization.
-// Modified so that it returns an error in case.
-func getRole(r *http.Request) (string, error) {
-	idToken := strings.ReplaceAll(r.Header.Get("Authorization"), "Bearer ", "")
-	if idToken == "" {
-		return "", fmt.Errorf("the authorization Header is empty!")
-	}
-
-	token, err := lib.VerifyUserIdToken(idToken)
-	if err != nil {
-		return "", fmt.Errorf("verify ID token error: %s", err)
-	}
-	if token.Claims["role"] == nil {
-		return "", fmt.Errorf("user role not set")
-	}
-	role := token.Claims["role"].(string)
-	return role, nil
 }
