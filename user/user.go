@@ -53,6 +53,12 @@ func User(w http.ResponseWriter, r *http.Request) {
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
+				Route:   "/agency/authid/v1/:authId",
+				Handler: GetAgencyByAuthIdFx,
+				Method:  "GET",
+				Roles:   []string{models.UserRoleAll},
+			},
+			{
 				Route:   "/onboarding/v1",
 				Handler: OnboardUserFx,
 				Method:  "POST",
@@ -133,6 +139,24 @@ func GetAgentByAuthId(origin, authId string) (*models.Agent, error) {
 	var agent *models.Agent
 	agent, err := models.FirestoreDocumentToAgent(userFirebase)
 	return agent, err
+}
+
+func GetAgencyByAuthIdFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	resp.Header().Set("Access-Control-Allow-Methods", "GET")
+	log.Println(r.Header.Get("authId"))
+	agency, err := GetAgencyByAuthId(r.Header.Get("Origin"), r.Header.Get("authId"))
+	lib.CheckError(err)
+	jsonString, err := json.Marshal(agency)
+	return string(jsonString), agency, err
+}
+
+func GetAgencyByAuthId(origin, authId string) (*models.Agency, error) {
+	log.Println(authId)
+	fireAgency := lib.GetDatasetByEnv(origin, models.AgencyCollection)
+	userFirebase := lib.WhereLimitFirestore(fireAgency, "authId", "==", authId, 1)
+	var agency *models.Agency
+	agency, err := models.FirestoreDocumentToAgency(userFirebase)
+	return agency, err
 }
 
 func GetUserByFiscalCodeFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
