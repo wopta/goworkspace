@@ -128,16 +128,15 @@ func GetName(origin string, name string, version string) (models.Product, error)
 	return products[0], nil
 }
 
-func GetProduct(name, version, entitlement string) (models.Product, error) {
+func GetProduct(name, version, role string) (models.Product, error) {
 	var (
 		product  models.Product
 		filePath string = "products/"
 	)
 
-	switch entitlement {
-	case models.UserRoleAgency:
-	case models.UserRoleAgent:
-		filePath += entitlement + "/" + name + "-" + version + ".json"
+	switch role {
+	case models.UserRoleAgency, models.UserRoleAgent:
+		filePath += role + "/" + name + "-" + version + ".json"
 	case "":
 		filePath += "e-commerce/" + name + "-" + version + ".json"
 	}

@@ -119,13 +119,10 @@ func FabrickExpireBill(w http.ResponseWriter, r *http.Request) (string, interfac
 	fireTransactions := lib.GetDatasetByEnv(r.Header.Get("origin"), "transactions")
 	docsnap, e := lib.GetFirestoreErr(fireTransactions, uid)
 	docsnap.DataTo(&transaction)
-	expirationDate := time.Now().UTC().Format(layout2)
+	expirationDate := time.Now().UTC().AddDate(0, 0, -1).Format(layout2)
 	var urlstring = os.Getenv("FABRICK_BASEURL") + "api/fabrick/pace/v4.0/mods/back/v1.0/payments/change-expiration"
 
-	req, _ := http.NewRequest(http.MethodPut, urlstring, strings.NewReader(`{
-		"id": "`+transaction.ProviderId+`",
-		"newExpirationDate": "`+expirationDate+expirationTimeSuffix+`"
-	  }`))
+	req, _ := http.NewRequest(http.MethodPut, urlstring, strings.NewReader(`{"id":"`+transaction.ProviderId+`","newExpirationDate":"`+expirationDate+expirationTimeSuffix+`"}`))
 	res, e := getFabrickClient(urlstring, req)
 	respBody, e := io.ReadAll(res.Body)
 	log.Println("Fabrick res body: ", string(respBody))

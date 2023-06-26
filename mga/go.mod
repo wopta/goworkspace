@@ -1,13 +1,14 @@
-module github.com/wopta/goworkspace/product
+module github.com/wopta/goworkspace/mga
 
 go 1.19
 
-replace github.com/wopta/goworkspace/product => ./
+replace github.com/wopta/goworkspace/mga => ./
 
 require (
-	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
+	github.com/GoogleCloudPlatform/functions-framework-go v1.7.4
 	github.com/wopta/goworkspace/lib v1.0.53
 	github.com/wopta/goworkspace/models v1.1.3
+	github.com/wopta/goworkspace/product v1.0.26
 )
 
 require (
@@ -27,7 +28,7 @@ require (
 	github.com/apache/arrow/go/v12 v12.0.0 // indirect
 	github.com/apache/thrift v0.16.0 // indirect
 	github.com/bmatcuk/doublestar v1.3.2 // indirect
-	github.com/cloudevents/sdk-go/v2 v2.6.1 // indirect
+	github.com/cloudevents/sdk-go/v2 v2.14.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
 	github.com/go-gota/gota v0.12.0 // indirect
@@ -79,7 +80,7 @@ require (
 	golang.org/x/sync v0.1.0 // indirect
 	golang.org/x/sys v0.7.0 // indirect
 	golang.org/x/text v0.9.0 // indirect
-	golang.org/x/time v0.1.0 // indirect
+	golang.org/x/time v0.3.0 // indirect
 	golang.org/x/tools v0.6.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	gonum.org/v1/gonum v0.11.0 // indirect

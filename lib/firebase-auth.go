@@ -56,6 +56,14 @@ func GetUserIdFromIdToken(idToken string) (string, error) {
 	return token.Claims["user_id"].(string), err
 }
 
+func GetUserRoleFromIdToken(idToken string) (string, error) {
+	token, err := VerifyUserIdToken(idToken)
+	if err != nil {
+		return "", err
+	}
+	return token.Claims["role"].(string), err
+}
+
 func VerifyAuthorization(handler func(w http.ResponseWriter, r *http.Request) (string, interface{}, error), roles ...string) func(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	wrappedHandler := func(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 		errorHandler := func(w http.ResponseWriter) (string, interface{}, error) {
@@ -105,9 +113,9 @@ func SetCustomClaimForUser(uid string, claims map[string]interface{}) {
 
 func GetAuthUserIdByEmail(mail string) (string, error) {
 	client, ctx := getClient()
-	
+
 	user, err := client.GetUserByEmail(ctx, mail)
-	
+
 	if err != nil {
 		return "", err
 	}

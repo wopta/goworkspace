@@ -68,3 +68,8 @@ func GetAllRoles() []string {
 const (
 	TimeDateOnly string = "2006-01-02"
 )
+
+const (
+	AgentCollection  string = "agents"
+	AgencyCollection string = "agencies"
+)
