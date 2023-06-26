@@ -17,6 +17,7 @@ type GetProductListResp struct {
 }
 
 type ProductInfo struct {
+	Name         string `json:"name"`
 	NameTitle    string `json:"nameTitle"`
 	NameSubtitle string `json:"nameSubtitle"`
 	NameDesc     string `json:"nameDesc"`
@@ -55,6 +56,7 @@ func GetProductsListByEntitlementFx(w http.ResponseWriter, r *http.Request) (str
 	for _, product := range roleProducts {
 		for _, company := range product.Companies {
 			resp.Products = append(resp.Products, ProductInfo{
+				Name:         product.Name,
 				NameTitle:    product.NameTitle,
 				NameSubtitle: product.NameSubtitle,
 				NameDesc:     *product.NameDesc,
