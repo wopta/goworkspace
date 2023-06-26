@@ -120,15 +120,23 @@ func CheckData(r *http.Request) (BankAccountMovement, error) {
 	if obj.Surname == "" {
 		return obj, GetErrorJson(400, "Bad request", "field name miss")
 	}
-	if obj.MovementType != "inclusive" && obj.MovementType != "delete" {
+	if obj.MovementType != "insert" && obj.MovementType != "delete" {
 		return obj, GetErrorJson(400, "Bad request", "field MovementType out of enum")
 	}
-	if obj.StartDate.IsZero() {
-		return obj, GetErrorJson(400, "Bad request", "field StartDate miss")
+	if obj.MovementType == "insert" {
+		if obj.StartDate.IsZero() {
+			return obj, GetErrorJson(400, "Bad request", "field StartDate miss")
+		}
 	}
-	if obj.EndDate.IsZero() {
-		return obj, GetErrorJson(400, "Bad request", "field EndDate miss")
+	if obj.MovementType == "delete" {
+		if obj.StartDate.IsZero() {
+			return obj, GetErrorJson(400, "Bad request", "field StartDate miss")
+		}
+		if obj.EndDate.IsZero() {
+			return obj, GetErrorJson(400, "Bad request", "field EndDate miss")
+		}
 	}
+
 	if obj.HypeId == "" {
 		return obj, GetErrorJson(400, "Bad request", "field HypeId miss")
 	}
