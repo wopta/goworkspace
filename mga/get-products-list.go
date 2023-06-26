@@ -110,7 +110,7 @@ func getAgencyProductsList(agencyUid, origin string) []models.Product {
 
 	log.Println("GetAgentProducts")
 
-	fireAgency := lib.GetDatasetByEnv(origin, models.UserRoleAgency)
+	fireAgency := lib.GetDatasetByEnv(origin, models.AgencyCollection)
 	docsnap, err := lib.GetFirestoreErr(fireAgency, agencyUid)
 	lib.CheckError(err)
 	err = docsnap.DataTo(&agency)
@@ -143,7 +143,7 @@ func getAgentProductsList(agentUid, origin string) []models.Product {
 
 	log.Println("GetAgentProducts")
 
-	fireAgent := lib.GetDatasetByEnv(origin, models.UserRoleAgent)
+	fireAgent := lib.GetDatasetByEnv(origin, models.AgentCollection)
 	docsnap, err := lib.GetFirestoreErr(fireAgent, agentUid)
 	lib.CheckError(err)
 	err = docsnap.DataTo(&agent)
