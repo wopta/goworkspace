@@ -3,12 +3,13 @@ package mga
 import (
 	"encoding/json"
 	"errors"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/product"
 	"io"
 	"log"
 	"net/http"
+
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/product"
 )
 
 type GetProductByRoleRequest struct {
@@ -157,8 +158,7 @@ func getAgentProduct(productName, version, company, agentUid string) (*models.Pr
 	log.Printf("Agent Product Start: %v", responseProduct)
 	agent, err := models.GetAgentByAuthId(agentUid)
 	lib.CheckError(err)
-	agency, err := models.GetAgencyByAuthId(agent.AgencyUid)
-	lib.CheckError(err)
+	agency, _ := models.GetAgencyByAuthId(agent.AgencyUid)
 
 	agentProduct := getProductByName(agent.Products, productName)
 	if agentProduct == nil {
