@@ -73,7 +73,7 @@ func CreateInvite(inviteRequest CreateInviteRequest, origin, creatorUid string) 
 	}
 
 	// check if user exists
-	_, err := GetAuthUserByMail(inviteRequest.Email)
+	_, err := GetAuthUserByMail(origin, inviteRequest.Email)
 	if err == nil {
 		log.Printf("[CreateInvite]: user %s already exists", inviteRequest.Email)
 		return "", errors.New("user already exists")

@@ -1,6 +1,7 @@
 package user
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"os"
@@ -42,6 +43,12 @@ func User(w http.ResponseWriter, r *http.Request) {
 			{
 				Route:   "/authId/v1/:authId",
 				Handler: GetUserByAuthIdFx,
+				Method:  "GET",
+				Roles:   []string{models.UserRoleAll},
+			},
+			{
+				Route:   "/agent/authid/v1/:authId",
+				Handler: GetAgentByAuthIdFx,
 				Method:  "GET",
 				Roles:   []string{models.UserRoleAll},
 			},
@@ -96,17 +103,36 @@ func User(w http.ResponseWriter, r *http.Request) {
 func GetUserByAuthIdFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	resp.Header().Set("Access-Control-Allow-Methods", "GET")
 	log.Println(r.Header.Get("authId"))
-	user, e := GetUserByAuthId(r.Header.Get("authId"))
+	user, e := GetUserByAuthId(r.Header.Get("Origin"), r.Header.Get("authId"))
 	jsonString, e := user.Marshal()
 	return string(jsonString), user, e
 }
 
-func GetUserByAuthId(authId string) (models.User, error) {
+func GetUserByAuthId(origin, authId string) (models.User, error) {
 	log.Println(authId)
-	userFirebase := lib.WhereLimitFirestore("users", "authId", "==", authId, 1)
+	fireUsers := lib.GetDatasetByEnv(origin, "users")
+	userFirebase := lib.WhereLimitFirestore(fireUsers, "authId", "==", authId, 1)
 	var user models.User
 	user, err := models.FirestoreDocumentToUser(userFirebase)
 	return user, err
+}
+
+func GetAgentByAuthIdFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	resp.Header().Set("Access-Control-Allow-Methods", "GET")
+	log.Println(r.Header.Get("authId"))
+	agent, err := GetAgentByAuthId(r.Header.Get("Origin"), r.Header.Get("authId"))
+	lib.CheckError(err)
+	jsonString, err := json.Marshal(agent)
+	return string(jsonString), agent, err
+}
+
+func GetAgentByAuthId(origin, authId string) (*models.Agent, error) {
+	log.Println(authId)
+	fireAgents := lib.GetDatasetByEnv(origin, models.AgentCollection)
+	userFirebase := lib.WhereLimitFirestore(fireAgents, "authId", "==", authId, 1)
+	var agent *models.Agent
+	agent, err := models.FirestoreDocumentToAgent(userFirebase)
+	return agent, err
 }
 
 func GetUserByFiscalCodeFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -182,7 +208,7 @@ func SetUserIntoPolicyContractor(policy *models.Policy, origin string) {
 	}
 }
 
-func GetAuthUserByMail(mail string) (models.User, error) {
+func GetAuthUserByMail(origin, mail string) (models.User, error) {
 	var user models.User
 
 	authId, err := lib.GetAuthUserIdByEmail(mail)
@@ -190,5 +216,5 @@ func GetAuthUserByMail(mail string) (models.User, error) {
 		return user, err
 	}
 
-	return GetUserByAuthId(authId)
+	return GetUserByAuthId(origin, authId)
 }
