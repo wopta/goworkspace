@@ -70,7 +70,7 @@ func GetProductsListByEntitlementFx(w http.ResponseWriter, r *http.Request) (str
 
 func getMgaProductsList() []models.Product {
 	productsList := make([]models.Product, 0)
-	res := lib.GetFolderContentByEnv(pathPrefix + models.UserRoleAgent)
+	res := lib.GetFolderContentByEnv(pathPrefix + "mga/")
 	for _, file := range res {
 		var product models.Product
 		err := json.Unmarshal(file, &product)
@@ -85,7 +85,7 @@ func getMgaProductsList() []models.Product {
 
 func getEcommerceProductsList() []models.Product {
 	productsList := make([]models.Product, 0)
-	res := lib.GetFolderContentByEnv(pathPrefix + "e-commerce")
+	res := lib.GetFolderContentByEnv(pathPrefix + "e-commerce/")
 	for _, file := range res {
 		var product models.Product
 		err := json.Unmarshal(file, &product)
