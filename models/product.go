@@ -22,6 +22,8 @@ func (r *Product) Marshal() ([]byte, error) {
 }
 
 type Product struct {
+	NameTitle         string           `firestore:"nameTitle,omitempty" json:"nameTitle,omitempty"`
+	NameSubtitle      string           `firestore:"nameSubtitle,omitempty" json:"nameSubtitle,omitempty`
 	NameDesc          *string          `firestore:"nameDesc,omitempty" json:"nameDesc,omitempty"`
 	Companies         []Company        `firestore:"companies,omitempty" json:"companies,omitempty"`
 	ProductUid        string           `firestore:"productUid,omitempty" json:"productUid,omitempty"`

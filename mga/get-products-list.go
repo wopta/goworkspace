@@ -17,11 +17,12 @@ type GetProductListResp struct {
 }
 
 type ProductInfo struct {
-	Name     string `json:"name"`
-	NameDesc string `json:"nameDesc"`
-	Version  string `json:"version"`
-	Company  string `json:"company"`
-	Logo     string `json:"logo"`
+	NameTitle    string `json:"nameTitle"`
+	NameSubtitle string `json:"nameSubtitle"`
+	NameDesc     string `json:"nameDesc"`
+	Version      string `json:"version"`
+	Company      string `json:"company"`
+	Logo         string `json:"logo"`
 }
 
 func GetProductsListByEntitlementFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -54,11 +55,12 @@ func GetProductsListByEntitlementFx(w http.ResponseWriter, r *http.Request) (str
 	for _, product := range roleProducts {
 		for _, company := range product.Companies {
 			resp.Products = append(resp.Products, ProductInfo{
-				Name:     product.Name,
-				NameDesc: *product.NameDesc,
-				Version:  product.Version,
-				Company:  company.Name,
-				Logo:     product.Logo,
+				NameTitle:    product.NameTitle,
+				NameSubtitle: product.NameSubtitle,
+				NameDesc:     *product.NameDesc,
+				Version:      product.Version,
+				Company:      company.Name,
+				Logo:         product.Logo,
 			})
 		}
 	}
