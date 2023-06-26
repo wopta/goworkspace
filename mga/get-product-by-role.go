@@ -20,9 +20,10 @@ type GetProductByRoleRequest struct {
 func GetProductByRoleFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println("GetProductByRoleFx")
 	var (
-		resp    *models.Product
-		request GetProductByRoleRequest
-		err     error
+		resp       models.Product
+		respString string
+		request    GetProductByRoleRequest
+		err        error
 	)
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
@@ -40,11 +41,19 @@ func GetProductByRoleFx(w http.ResponseWriter, r *http.Request) (string, interfa
 	}
 	jsonResp, err := json.Marshal(resp)
 
-	log.Printf("GetProductByRoleFx response: %s", string(jsonResp))
-	return string(jsonResp), resp, err
+	respString = string(jsonResp)
+	switch request.Name {
+	case "persona":
+		respString, resp, err = product.ReplaceDatesInProduct(resp, 75)
+	case "life":
+		respString, resp, err = product.ReplaceDatesInProduct(resp, 55)
+	}
+
+	log.Printf("GetProductByRoleFx response: %s", respString)
+	return respString, resp, err
 }
 
-func GetProductByRole(productName, version, company string, authToken models.AuthToken) (*models.Product, error) {
+func GetProductByRole(productName, version, company string, authToken models.AuthToken) (models.Product, error) {
 	log.Println("GetProductByRole")
 	var (
 		responseProduct *models.Product
@@ -64,7 +73,7 @@ func GetProductByRole(productName, version, company string, authToken models.Aut
 		responseProduct, err = productNotFound()
 	}
 
-	return responseProduct, err
+	return *responseProduct, err
 }
 
 func getProductByName(products []models.Product, productName string) *models.Product {
