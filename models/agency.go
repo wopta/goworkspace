@@ -13,6 +13,7 @@ import (
 type Agency struct {
 	AuthId       string    `json:"authId" firestore:"authId" bigquery:"-"`
 	Uid          string    `json:"uid" firestore:"uid" bigquery:"-"`
+	Email        string    `json:"email" firestore:"email" bigquery:"-"`
 	Name         string    `json:"name" firestore:"name" bigquery:"-"`
 	Manager      User      `json:"manager" firestore:"manager" bigquery:"-"`
 	Portfolio    []string  `json:"portfolio" firestore:"portfolio" bigquery:"-"`                           // will contain users UIDs
@@ -26,7 +27,7 @@ type Agency struct {
 	Skin         Skin      `json:"skin" firestore:"skin" bigquery:"-"`
 	RuiCode      string    `json:"ruiCode" firestore:"ruiCode" bigquery:"-"`
 	CreationDate time.Time `json:"creationDate" firestore:"creationDate" bigquery:"-"`
-	UpdateDate   time.Time `json:"updateDate" firestore:"updateDate" bigquery:"-"`
+	UpdatedDate  time.Time `json:"updatedDate" firestore:"updatedDate" bigquery:"-"`
 }
 
 type Skin struct {

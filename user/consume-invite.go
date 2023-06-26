@@ -3,6 +3,7 @@ package user
 import (
 	"encoding/json"
 	"errors"
+	"firebase.google.com/go/v4/auth"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -57,39 +58,27 @@ func ConsumeInvite(inviteUid, password, origin string) (bool, error) {
 	case models.UserRoleAgent:
 		collection = lib.GetDatasetByEnv(origin, models.AgentCollection)
 		docUid = lib.NewDoc(collection) + "_agent"
+		agentRecord, err := lib.CreateUserWithEmailAndPassword(invite.Email, password, &docUid)
+		if err != nil {
+			return false, err
+		}
+		createAgent(collection, agentRecord, invite)
 	case models.UserRoleAgency:
 		collection = lib.GetDatasetByEnv(origin, models.AgencyCollection)
 		docUid = lib.NewDoc(collection) + "_agency"
+		agencyRecord, err := lib.CreateUserWithEmailAndPassword(invite.Email, password, &docUid)
+		if err != nil {
+			return false, err
+		}
+		createAgency(collection, agencyRecord, invite)
 	default:
 		collection = lib.GetDatasetByEnv(origin, usersCollection)
+		userRecord, err := lib.CreateUserWithEmailAndPassword(invite.Email, password, &docUid)
+		if err != nil {
+			return false, err
+		}
+		createUser(collection, userRecord, invite)
 	}
-
-	// Create the user in auth with the invite data
-	userRecord, err := lib.CreateUserWithEmailAndPassword(invite.Email, password, &docUid)
-	if err != nil {
-		return false, err
-	}
-
-	// create user in DB
-	user := models.User{
-		Mail:       invite.Email,
-		Uid:        userRecord.UID,
-		AuthId:     userRecord.UID,
-		Role:       invite.Role,
-		FiscalCode: invite.FiscalCode,
-		Name:       invite.Name,
-		Surname:    invite.Surname,
-	}
-
-	err = lib.SetFirestoreErr(collection, user.Uid, user)
-	if err != nil {
-		return false, err
-	}
-
-	// update the user custom claim
-	lib.SetCustomClaimForUser(user.AuthId, map[string]interface{}{
-		"role": user.Role,
-	})
 
 	// update the invite to consumed
 	invite.Consumed = true
@@ -98,4 +87,72 @@ func ConsumeInvite(inviteUid, password, origin string) (bool, error) {
 
 	log.Printf("[ConsumeInvite] Consumed invite with uid %s", invite.Uid)
 	return true, nil
+}
+
+func createUser(collection string, userRecord *auth.UserRecord, invite UserInvite) {
+	// create user in DB
+	user := models.User{
+		Mail:         invite.Email,
+		Uid:          userRecord.UID,
+		AuthId:       userRecord.UID,
+		Role:         invite.Role,
+		FiscalCode:   invite.FiscalCode,
+		Name:         invite.Name,
+		Surname:      invite.Surname,
+		CreationDate: time.Now().UTC(),
+		UpdatedDate:  time.Now().UTC(),
+	}
+
+	err := lib.SetFirestoreErr(collection, user.Uid, user)
+	lib.CheckError(err)
+
+	// update the user custom claim
+	lib.SetCustomClaimForUser(user.AuthId, map[string]interface{}{
+		"role": user.Role,
+	})
+}
+
+func createAgent(collection string, userRecord *auth.UserRecord, invite UserInvite) {
+	// create user in DB
+	agent := models.Agent{
+		User: models.User{
+			Mail:         invite.Email,
+			Uid:          userRecord.UID,
+			AuthId:       userRecord.UID,
+			Role:         invite.Role,
+			FiscalCode:   invite.FiscalCode,
+			Name:         invite.Name,
+			Surname:      invite.Surname,
+			CreationDate: time.Now().UTC(),
+			UpdatedDate:  time.Now().UTC(),
+		},
+	}
+
+	err := lib.SetFirestoreErr(collection, agent.Uid, agent)
+	lib.CheckError(err)
+
+	// update the user custom claim
+	lib.SetCustomClaimForUser(agent.AuthId, map[string]interface{}{
+		"role": agent.Role,
+	})
+}
+
+func createAgency(collection string, userRecord *auth.UserRecord, invite UserInvite) {
+	// create user in DB
+	agency := models.Agency{
+		AuthId:       userRecord.UID,
+		Uid:          userRecord.UID,
+		Name:         invite.Name,
+		Email:        invite.Email,
+		CreationDate: time.Now().UTC(),
+		UpdatedDate:  time.Now().UTC(),
+	}
+
+	err := lib.SetFirestoreErr(collection, agency.Uid, agency)
+	lib.CheckError(err)
+
+	// update the user custom claim
+	lib.SetCustomClaimForUser(agency.AuthId, map[string]interface{}{
+		"role": invite.Role,
+	})
 }
