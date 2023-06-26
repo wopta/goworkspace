@@ -51,19 +51,21 @@ func ConsumeInvite(inviteUid, password, origin string) (bool, error) {
 		return false, errors.New("invite consumed or expired")
 	}
 
+	docUid := ""
 	collection = ""
 	switch invite.Role {
 	case models.UserRoleAgent:
-		collection = lib.GetDatasetByEnv(origin, models.UserRoleAgent)
+		collection = lib.GetDatasetByEnv(origin, models.AgentCollection)
+		docUid = lib.NewDoc(collection) + "_agent"
 	case models.UserRoleAgency:
-		collection = lib.GetDatasetByEnv(origin, models.UserRoleAgency)
+		collection = lib.GetDatasetByEnv(origin, models.AgencyCollection)
+		docUid = lib.NewDoc(collection) + "_agency"
 	default:
 		collection = lib.GetDatasetByEnv(origin, usersCollection)
 	}
-	//usersCollectionName := lib.GetDatasetByEnv(origin, usersCollection)
 
 	// Create the user in auth with the invite data
-	userRecord, err := lib.CreateUserWithEmailAndPassword(invite.Email, password, nil)
+	userRecord, err := lib.CreateUserWithEmailAndPassword(invite.Email, password, &docUid)
 	if err != nil {
 		return false, err
 	}

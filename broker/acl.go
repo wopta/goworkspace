@@ -10,7 +10,7 @@ func HasUserAccessToPolicy(idToken string, policyID string, origin string) (bool
 	authID, err := lib.GetUserIdFromIdToken(idToken)
 	lib.CheckError(err)
 
-	usr, err := user.GetUserByAuthId(authID)
+	usr, err := user.GetUserByAuthId(origin, authID)
 	lib.CheckError(err)
 
 	policies := GetPoliciesFromFirebase(usr.FiscalCode, origin)
