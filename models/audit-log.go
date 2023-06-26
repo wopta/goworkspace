@@ -43,29 +43,18 @@ func ParseHttpRequest(r *http.Request) (AuditLog, error) {
 	}
 
 	idToken := r.Header.Get("Authorization")
-	token, err := lib.VerifyUserIdToken(idToken)
+	authToken, err := GetAuthTokenFromIdToken(idToken)
 	if err != nil {
-		return AuditLog{}, fmt.Errorf("cannot retrieve the user's token: %v", err)
+		return AuditLog{}, fmt.Errorf("cannot retrieve the user's authorization token: %v", err)
 	}
-
-	userUid, err := lib.GetUserIdFromIdToken(idToken)
-	if err != nil {
-		return AuditLog{}, fmt.Errorf("cannot retrieve the user's UID. Header (userUid) is empty")
-	}
-
-	role := ""
-	if token.Claims["role"] == nil {
-		return AuditLog{}, fmt.Errorf("cannot retrieve the role: %s", err)
-	}
-	role = token.Claims["role"].(string)
 
 	return AuditLog{
 		Payload:  body,
 		Date:     civil.DateTimeOf(time.Now().UTC()),
-		UserUid:  userUid,
+		UserUid:  authToken.UserID,
 		Method:   r.Method,
 		Endpoint: r.RequestURI,
-		Role:     role,
+		Role:     authToken.Role,
 	}, nil
 }
 
