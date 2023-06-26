@@ -128,6 +128,7 @@ type CreateInviteRequest struct {
 
 type UserInvite struct {
 	FiscalCode string    `json:"fiscalCode,omitempty" firestore:"fiscalCode,omitempty"`
+	VatCode    string    `json:"vatCode,omitempty" firestore:"vatCode,omitempty"`
 	Name       string    `json:"name,omitempty" firestore:"name,omitempty"`
 	Surname    string    `json:"surname,omitempty" firestore:"surname,omitempty"`
 	Role       string    `json:"role,omitempty" firestore:"role,omitempty"`
@@ -135,5 +136,6 @@ type UserInvite struct {
 	Uid        string    `json:"uid,omitempty" firestore:"uid,omitempty"`
 	CreatorUid string    `json:"creatorUid,omitempty" firestore:"creatorUid,omitempty"`
 	Consumed   bool      `json:"consumed" firestore:"consumed"`
+	RuiCode    string    `json:"ruiCode,omitempty" firestore:"ruiCode,omitempty"`
 	Expiration time.Time `json:"expiration,omitempty" firestore:"expiration,omitempty"`
 }
