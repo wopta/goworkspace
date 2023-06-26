@@ -69,8 +69,8 @@ type BankAccountMovement struct {
 	Surname        string         `firestore:"-" json:"surname,omitempty" bigquery:"surname"`       //Cognome
 	FiscalCode     string         `firestore:"-" json:"fiscalCode,omitempty" bigquery:"fiscalCode"` //Codice fiscale
 	HypeId         string         `firestore:"-" json:"hypeId,omitempty" bigquery:"hypeId"`         //h-Ultime 3 / 5 cifre conto corrente
-	StartDate      time.Time      `bigquery:"-" firestore:"-" json:"startDate"`                     //h-Data ingresso (inizio validità copertura)
-	EndDate        time.Time      `bigquery:"-" firestore:"-" json:"endDate"`
+	StartDate      time.Time      `bigquery:"-" firestore:"-" json:"startDate,omitempty"`           //h-Data ingresso (inizio validità copertura)
+	EndDate        time.Time      `bigquery:"-" firestore:"-" json:"endDate,omitempty"`
 	BigStartDate   civil.DateTime `bigquery:"startDate" firestore:"-" json:"-"`                             //Data ingresso (inizio validità copertura)
 	BigEndDate     civil.DateTime `bigquery:"endDate" firestore:"-" json:"-"`                               //Data uscita ()
 	MovementType   string         `firestore:"-" json:"movementType,omitempty" bigquery:"movementType"`     //Movimento (ingresso o uscita)
