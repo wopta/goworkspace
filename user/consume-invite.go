@@ -127,7 +127,8 @@ func createAgent(collection string, userRecord *auth.UserRecord, invite UserInvi
 			CreationDate: time.Now().UTC(),
 			UpdatedDate:  time.Now().UTC(),
 		},
-		RuiCode: invite.RuiCode,
+		RuiCode:         invite.RuiCode,
+		RuiRegistration: invite.RuiRegistration,
 	}
 
 	err := lib.SetFirestoreErr(collection, agent.Uid, agent)
@@ -142,14 +143,15 @@ func createAgent(collection string, userRecord *auth.UserRecord, invite UserInvi
 func createAgency(collection string, userRecord *auth.UserRecord, invite UserInvite) {
 	// create user in DB
 	agency := models.Agency{
-		AuthId:       userRecord.UID,
-		Uid:          userRecord.UID,
-		Name:         invite.Name,
-		Email:        invite.Email,
-		VatCode:      invite.VatCode,
-		RuiCode:      invite.RuiCode,
-		CreationDate: time.Now().UTC(),
-		UpdatedDate:  time.Now().UTC(),
+		AuthId:          userRecord.UID,
+		Uid:             userRecord.UID,
+		Name:            invite.Name,
+		Email:           invite.Email,
+		VatCode:         invite.VatCode,
+		RuiCode:         invite.RuiCode,
+		RuiRegistration: invite.RuiRegistration,
+		CreationDate:    time.Now().UTC(),
+		UpdatedDate:     time.Now().UTC(),
 	}
 
 	err := lib.SetFirestoreErr(collection, agency.Uid, agency)
