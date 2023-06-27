@@ -73,7 +73,7 @@ func CreateInvite(inviteRequest CreateInviteRequest, origin, creatorUid string) 
 	}
 
 	// check if user exists
-	_, err := GetAuthUserByMail(inviteRequest.Email)
+	_, err := GetAuthUserByMail(origin, inviteRequest.Email)
 	if err == nil {
 		log.Printf("[CreateInvite]: user %s already exists", inviteRequest.Email)
 		return "", errors.New("user already exists")
@@ -127,13 +127,16 @@ type CreateInviteRequest struct {
 }
 
 type UserInvite struct {
-	FiscalCode string    `json:"fiscalCode,omitempty" firestore:"fiscalCode,omitempty"`
-	Name       string    `json:"name,omitempty" firestore:"name,omitempty"`
-	Surname    string    `json:"surname,omitempty" firestore:"surname,omitempty"`
-	Role       string    `json:"role,omitempty" firestore:"role,omitempty"`
-	Email      string    `json:"email,omitempty" firestore:"email,omitempty"`
-	Uid        string    `json:"uid,omitempty" firestore:"uid,omitempty"`
-	CreatorUid string    `json:"creatorUid,omitempty" firestore:"creatorUid,omitempty"`
-	Consumed   bool      `json:"consumed" firestore:"consumed"`
-	Expiration time.Time `json:"expiration,omitempty" firestore:"expiration,omitempty"`
+	FiscalCode      string    `json:"fiscalCode,omitempty" firestore:"fiscalCode,omitempty"`
+	VatCode         string    `json:"vatCode,omitempty" firestore:"vatCode,omitempty"`
+	Name            string    `json:"name,omitempty" firestore:"name,omitempty"`
+	Surname         string    `json:"surname,omitempty" firestore:"surname,omitempty"`
+	Role            string    `json:"role,omitempty" firestore:"role,omitempty"`
+	Email           string    `json:"email,omitempty" firestore:"email,omitempty"`
+	Uid             string    `json:"uid,omitempty" firestore:"uid,omitempty"`
+	CreatorUid      string    `json:"creatorUid,omitempty" firestore:"creatorUid,omitempty"`
+	Consumed        bool      `json:"consumed" firestore:"consumed"`
+	RuiCode         string    `json:"ruiCode,omitempty" firestore:"ruiCode,omitempty"`
+	RuiRegistration time.Time `json:"ruiRegistration" firestore:"ruiRegistration"`
+	Expiration      time.Time `json:"expiration,omitempty" firestore:"expiration,omitempty"`
 }

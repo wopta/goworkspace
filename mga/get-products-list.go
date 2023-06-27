@@ -17,11 +17,13 @@ type GetProductListResp struct {
 }
 
 type ProductInfo struct {
-	Name     string `json:"name"`
-	NameDesc string `json:"nameDesc"`
-	Version  string `json:"version"`
-	Company  string `json:"company"`
-	Logo     string `json:"logo"`
+	Name         string `json:"name"`
+	NameTitle    string `json:"nameTitle"`
+	NameSubtitle string `json:"nameSubtitle"`
+	NameDesc     string `json:"nameDesc"`
+	Version      string `json:"version"`
+	Company      string `json:"company"`
+	Logo         string `json:"logo"`
 }
 
 func GetProductsListByEntitlementFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -54,11 +56,13 @@ func GetProductsListByEntitlementFx(w http.ResponseWriter, r *http.Request) (str
 	for _, product := range roleProducts {
 		for _, company := range product.Companies {
 			resp.Products = append(resp.Products, ProductInfo{
-				Name:     product.Name,
-				NameDesc: *product.NameDesc,
-				Version:  product.Version,
-				Company:  company.Name,
-				Logo:     product.Logo,
+				Name:         product.Name,
+				NameTitle:    product.NameTitle,
+				NameSubtitle: product.NameSubtitle,
+				NameDesc:     *product.NameDesc,
+				Version:      product.Version,
+				Company:      company.Name,
+				Logo:         product.Logo,
 			})
 		}
 	}
@@ -70,7 +74,7 @@ func GetProductsListByEntitlementFx(w http.ResponseWriter, r *http.Request) (str
 
 func getMgaProductsList() []models.Product {
 	productsList := make([]models.Product, 0)
-	res := lib.GetFolderContentByEnv(pathPrefix + models.UserRoleAgent)
+	res := lib.GetFolderContentByEnv(pathPrefix + "mga/")
 	for _, file := range res {
 		var product models.Product
 		err := json.Unmarshal(file, &product)
@@ -85,7 +89,7 @@ func getMgaProductsList() []models.Product {
 
 func getEcommerceProductsList() []models.Product {
 	productsList := make([]models.Product, 0)
-	res := lib.GetFolderContentByEnv(pathPrefix + "e-commerce")
+	res := lib.GetFolderContentByEnv(pathPrefix + "e-commerce/")
 	for _, file := range res {
 		var product models.Product
 		err := json.Unmarshal(file, &product)
@@ -106,13 +110,13 @@ func getAgencyProductsList(agencyUid, origin string) []models.Product {
 
 	log.Println("GetAgentProducts")
 
-	fireAgency := lib.GetDatasetByEnv(origin, models.UserRoleAgency)
+	fireAgency := lib.GetDatasetByEnv(origin, models.AgencyCollection)
 	docsnap, err := lib.GetFirestoreErr(fireAgency, agencyUid)
 	lib.CheckError(err)
 	err = docsnap.DataTo(&agency)
 	lib.CheckError(err)
 
-	defaultAgencyProduct := getDefaultProductsByChannel(models.UserRoleAgency)
+	defaultAgencyProduct := getDefaultProductsByChannel(models.UserRoleAgency + "/")
 
 	for _, product := range agency.Products {
 		if !product.IsAgencyActive {
@@ -139,13 +143,13 @@ func getAgentProductsList(agentUid, origin string) []models.Product {
 
 	log.Println("GetAgentProducts")
 
-	fireAgent := lib.GetDatasetByEnv(origin, models.UserRoleAgent)
+	fireAgent := lib.GetDatasetByEnv(origin, models.AgentCollection)
 	docsnap, err := lib.GetFirestoreErr(fireAgent, agentUid)
 	lib.CheckError(err)
 	err = docsnap.DataTo(&agent)
 	lib.CheckError(err)
 
-	defaultAgentProducts := getDefaultProductsByChannel(models.UserRoleAgent)
+	defaultAgentProducts := getDefaultProductsByChannel(models.UserRoleAgent + "/")
 
 	for _, product := range agent.Products {
 		if !product.IsAgentActive {
