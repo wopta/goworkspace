@@ -241,9 +241,21 @@ func getCommissionProduct(data models.Policy, prod models.Product) float64 {
 	for _, x := range prod.Companies {
 		if x.Name == data.Company {
 			if data.IsRenew {
-				return x.CommissionRenew
+				//TODO when pmi migration in done delete shit code check
+				if x.Commission == 0 {
+					return x.Mandate.CommissionRenew
+				} else {
+					return x.CommissionRenew
+				}
+
 			} else {
-				return x.Commission
+				//TODO when pmi migration in done delete shit code check
+				if x.Commission == 0 {
+					return x.Mandate.Commission
+				} else {
+					return x.Commission
+				}
+
 			}
 		}
 
