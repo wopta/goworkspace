@@ -131,15 +131,18 @@ func GetName(origin string, name string, version string) (models.Product, error)
 func GetProduct(name, version, role string) (models.Product, error) {
 	var (
 		product  models.Product
-		filePath string = "products/"
+		filePath = "products/"
 	)
 
 	switch role {
+	case models.UserRoleAdmin:
+		filePath += "mga"
 	case models.UserRoleAgency, models.UserRoleAgent:
-		filePath += role + "/" + name + "-" + version + ".json"
-	case "":
-		filePath += "e-commerce/" + name + "-" + version + ".json"
+		filePath += role
+	default:
+		filePath += "e-commerce"
 	}
+	filePath += "/" + name + "-" + version + ".json"
 
 	jsonFile := lib.GetFilesByEnv(filePath)
 	err := json.Unmarshal(jsonFile, &product)
