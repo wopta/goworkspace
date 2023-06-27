@@ -110,13 +110,13 @@ func getAgencyProductsList(agencyUid, origin string) []models.Product {
 
 	log.Println("GetAgentProducts")
 
-	fireAgency := lib.GetDatasetByEnv(origin, models.AgencyCollection)
+	fireAgency := lib.GetDatasetByEnv(origin, models.AgencyCollection+"/")
 	docsnap, err := lib.GetFirestoreErr(fireAgency, agencyUid)
 	lib.CheckError(err)
 	err = docsnap.DataTo(&agency)
 	lib.CheckError(err)
 
-	defaultAgencyProduct := getDefaultProductsByChannel(models.UserRoleAgency)
+	defaultAgencyProduct := getDefaultProductsByChannel(models.UserRoleAgency + "/")
 
 	for _, product := range agency.Products {
 		if !product.IsAgencyActive {
@@ -143,7 +143,7 @@ func getAgentProductsList(agentUid, origin string) []models.Product {
 
 	log.Println("GetAgentProducts")
 
-	fireAgent := lib.GetDatasetByEnv(origin, models.AgentCollection)
+	fireAgent := lib.GetDatasetByEnv(origin, models.AgentCollection+"/")
 	docsnap, err := lib.GetFirestoreErr(fireAgent, agentUid)
 	lib.CheckError(err)
 	err = docsnap.DataTo(&agent)
