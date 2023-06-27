@@ -79,12 +79,16 @@ func FabrickPayObj(data models.Policy, firstSchedule bool, scheduleDate string, 
 
 			if data.AgentUid != "" {
 				var agent models.Agent
-				dn := lib.GetFirestore("agent", data.AgentUid)
+				dn := lib.GetFirestore(models.AgentCollection, data.AgentUid)
 				dn.DataTo(&agent)
 				commissionAgent = getCommissionProducts(data, agent.Products)
 
 			}
-			if data.AgentUid != "" {
+			if data.AgencyUid != "" {
+				var agency models.Agency
+				dn := lib.GetFirestore(models.AgencyCollection, data.AgentUid)
+				dn.DataTo(&agency)
+				commissionAgent = getCommissionProducts(data, agency.Products)
 			}
 			log.Println(data.Uid+"pay commission: ", commission)
 			layout2 := "2006-01-02"
@@ -237,9 +241,21 @@ func getCommissionProduct(data models.Policy, prod models.Product) float64 {
 	for _, x := range prod.Companies {
 		if x.Name == data.Company {
 			if data.IsRenew {
-				return x.CommissionRenew
+				//TODO when pmi migration in done delete shit code check
+				if x.Commission == 0 {
+					return x.Mandate.CommissionRenew
+				} else {
+					return x.CommissionRenew
+				}
+
 			} else {
-				return x.Commission
+				//TODO when pmi migration in done delete shit code check
+				if x.Commission == 0 {
+					return x.Mandate.Commission
+				} else {
+					return x.Commission
+				}
+
 			}
 		}
 
