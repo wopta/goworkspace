@@ -7,6 +7,7 @@ replace github.com/wopta/goworkspace/user => ./
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.3
 	github.com/wopta/goworkspace/lib v1.0.47
+	github.com/wopta/goworkspace/mail v1.0.21
 	github.com/wopta/goworkspace/models v1.0.95
 	github.com/wopta/goworkspace/wiseproxy v1.0.3
 	golang.org/x/exp v0.0.0-20230515195305-f3d0a9c9a5cc
@@ -63,7 +64,7 @@ require (
 	github.com/richardlehane/mscfb v1.0.4 // indirect
 	github.com/richardlehane/msoleps v1.0.3 // indirect
 	github.com/sergi/go-diff v1.0.0 // indirect
-	github.com/sirupsen/logrus v1.8.1 // indirect
+	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
