@@ -101,7 +101,7 @@ func mainFooter(pdf *fpdf.Fpdf, productName string) {
 		footerText = ""
 		logoPath = ""
 	case "persona":
-		footerText = "Wopta per te. PersonaGlobal è un prodotto assicurativo di Global Assistance Compagnia di assicurazioni e riassicurazioni S.p.A, distribuito da Wopta Assicurazioni S.r.l"
+		footerText = "Wopta per te. PersonaGlobal è un prodotto assicurativo di Global Assistance Compagnia di assicurazioni e riassicurazioni S.p.A,\ndistribuito da Wopta Assicurazioni S.r.l"
 		logoPath = lib.GetAssetPathByEnv(basePath) + "/logo_global.png"
 		x = 180
 		y = 280
