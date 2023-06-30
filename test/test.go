@@ -28,10 +28,7 @@ func Test(w http.ResponseWriter, r *http.Request) {
 	log.Println("Test")
 	lib.EnableCors(&w, r)
 	w.Header().Set("Access-Control-Allow-Methods", "POST")
-	route := lib.RouteData{
-		Routes: []lib.Route{},
-	}
-	route.Router(w, r)
+
 	creationDateFrom := time.Now()
 	q := lib.Firequeries{
 		Queries: []lib.Firequery{
@@ -45,16 +42,17 @@ func Test(w http.ResponseWriter, r *http.Request) {
 	fireTransactions := "transactions"
 	query, _ := q.FirestoreWherefields(fireTransactions)
 	transactions := models.TransactionToListData(query)
-	for _, transaction := range transactions {
+	for i, transaction := range transactions {
 		transaction.BigPayDate = lib.GetBigQueryNullDateTime(transaction.PayDate)
 		transaction.BigTransactionDate = lib.GetBigQueryNullDateTime(transaction.TransactionDate)
 		transaction.BigCreationDate = civil.DateTimeOf(transaction.CreationDate)
 		transaction.BigStatusHistory = strings.Join(transaction.StatusHistory, ",")
-		log.Println("Transaction save BigQuery: " + transaction.Uid)
+		log.Println(i)
+		log.Println(" Transaction save BigQuery: " + transaction.Uid)
 		err := lib.InsertRowsBigQuery("wopta", fireTransactions, transaction)
 		if err != nil {
 			log.Println("ERROR Transaction "+transaction.Uid+" save BigQuery: ", err)
-			return
+
 		}
 	}
 }
