@@ -200,7 +200,7 @@ func personaSurveySection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	surveys := *policy.Surveys
 
 	for _, survey := range surveys {
-		err := printSurvey(pdf, survey)
+		err := printSurvey(pdf, survey, policy.Company)
 		lib.CheckError(err)
 	}
 
@@ -211,7 +211,7 @@ func personaStatementsSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	statements := *policy.Statements
 
 	for _, statement := range statements {
-		printStatement(pdf, statement)
+		printStatement(pdf, statement, policy.Company)
 	}
 }
 

@@ -156,7 +156,7 @@ func getParagraphTitle(pdf *fpdf.Fpdf, title string) {
 	pdf.MultiCell(0, titleTextSize, title, "", "", false)
 }
 
-func printSurvey(pdf *fpdf.Fpdf, survey models.Survey) error {
+func printSurvey(pdf *fpdf.Fpdf, survey models.Survey, companyName string) error {
 	var dotsString string
 	leftMargin, _, rightMargin, _ := pdf.GetMargins()
 	pageWidth, _ := pdf.GetPageSize()
@@ -185,7 +185,12 @@ func printSurvey(pdf *fpdf.Fpdf, survey models.Survey) error {
 		dotWidth := pdf.GetStringWidth(".")
 
 		var surveyWidth, paddingWidth float64
-		lines := pdf.SplitText(surveyTitle+answer, availableWidth)
+		var lines []string
+		if surveyTitle != "" {
+			lines = pdf.SplitText(surveyTitle+answer, availableWidth)
+		} else if surveySubtitle != "" {
+			lines = pdf.SplitText(surveySubtitle+answer, availableWidth)
+		}
 
 		surveyWidth = pdf.GetStringWidth(lines[len(lines)-1])
 		paddingWidth = availableWidth - surveyWidth - answerWidth
@@ -215,6 +220,9 @@ func printSurvey(pdf *fpdf.Fpdf, survey models.Survey) error {
 		}
 
 		questionText := question.Question
+		if question.SimploQuestion != "" {
+			questionText = question.SimploQuestion
+		}
 
 		if question.HasAnswer {
 			var questionWidth, paddingWidth float64
@@ -239,15 +247,13 @@ func printSurvey(pdf *fpdf.Fpdf, survey models.Survey) error {
 		}
 		pdf.MultiCell(availableWidth, 3.5, questionText+dotsString, "", fpdf.AlignLeft, false)
 	}
-	pdf.Ln(5)
+
+	if survey.CompanySign || survey.ContractorSign {
+		pdf.Ln(5)
+	}
+
 	if survey.CompanySign {
-		setBlackBoldFont(pdf, standardTextSize)
-		pdf.CellFormat(70, 3, "Global Assistance", "", 0,
-			fpdf.AlignCenter, false, 0, "")
-		var opt fpdf.ImageOptions
-		opt.ImageType = "png"
-		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/firma_global.png", 25, pdf.GetY()+3, 40, 12,
-			false, opt, 0, "")
+		companySignature(pdf, companyName)
 	}
 	if survey.ContractorSign {
 		drawSignatureForm(pdf)
@@ -263,16 +269,34 @@ func checkSurveySpace(pdf *fpdf.Fpdf, survey models.Survey) {
 	availableWidth := pageWidth - leftMargin - rightMargin - 2
 	requiredHeight := 0.0
 
-	if survey.Title != "" {
-		lines := pdf.SplitText(survey.Title, availableWidth)
+	surveyTitle := survey.Title
+	surveySubtitle := survey.Subtitle
+
+	if survey.SimploTitle != "" {
+		surveyTitle = survey.SimploTitle
+	}
+	if survey.SimploSubtitle != "" {
+		surveySubtitle = survey.SimploSubtitle
+	}
+
+	if surveyTitle != "" {
+		setPinkBoldFont(pdf, titleTextSize)
+		lines := pdf.SplitText(surveyTitle, availableWidth)
+		requiredHeight += float64(titleTextSize * len(lines))
+	}
+	if surveySubtitle != "" {
+		setBlackBoldFont(pdf, standardTextSize)
+		lines := pdf.SplitText(surveySubtitle, availableWidth)
 		requiredHeight += float64(standardTextSize * len(lines))
 	}
-	if survey.Subtitle != "" {
-		lines := pdf.SplitText(survey.Title, availableWidth)
-		requiredHeight += float64(standardTextSize * len(lines))
-	}
+
 	for _, question := range survey.Questions {
 		availableWidth = pageWidth - leftMargin - rightMargin - 2
+
+		questionText := question.Question
+		if question.SimploQuestion != "" {
+			questionText = question.SimploQuestion
+		}
 
 		if question.IsBold {
 			setBlackBoldFont(pdf, standardTextSize)
@@ -290,12 +314,12 @@ func checkSurveySpace(pdf *fpdf.Fpdf, survey models.Survey) {
 			}
 		}
 
-		lines := pdf.SplitText(question.Question+answer, availableWidth)
+		lines := pdf.SplitText(questionText+answer, availableWidth)
 		requiredHeight += float64(standardTextSize * len(lines))
 	}
 
 	if survey.ContractorSign || survey.CompanySign {
-		requiredHeight += 30
+		requiredHeight += 10
 	}
 
 	if (pageHeight-bottomMargin)-pdf.GetY() < requiredHeight {
@@ -303,7 +327,7 @@ func checkSurveySpace(pdf *fpdf.Fpdf, survey models.Survey) {
 	}
 }
 
-func printStatement(pdf *fpdf.Fpdf, statement models.Statement) {
+func printStatement(pdf *fpdf.Fpdf, statement models.Statement, companyName string) {
 	checkStatementSpace(pdf, statement)
 
 	title := statement.Title
@@ -315,16 +339,13 @@ func printStatement(pdf *fpdf.Fpdf, statement models.Statement) {
 		subtitle = statement.SimploSubtitle
 	}
 
-	setPinkBoldFont(pdf, titleTextSize)
 	if title != "" {
-		pdf.MultiCell(0, 3.5, title, "", fpdf.AlignLeft, false)
-		pdf.Ln(3)
+		getParagraphTitle(pdf, title)
 	}
-	setBlackBoldFont(pdf, standardTextSize)
 	if subtitle != "" {
+		setBlackBoldFont(pdf, standardTextSize)
 		pdf.MultiCell(0, 3.5, subtitle, "", fpdf.AlignLeft, false)
 	}
-	setBlackRegularFont(pdf, standardTextSize)
 	for _, question := range statement.Questions {
 		text := question.Question
 		if question.SimploQuestion != "" {
@@ -342,13 +363,7 @@ func printStatement(pdf *fpdf.Fpdf, statement models.Statement) {
 	}
 	pdf.Ln(5)
 	if statement.CompanySign {
-		setBlackBoldFont(pdf, standardTextSize)
-		pdf.CellFormat(70, 3, "Global Assistance", "", 0,
-			fpdf.AlignCenter, false, 0, "")
-		var opt fpdf.ImageOptions
-		opt.ImageType = "png"
-		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/firma_global.png", 25, pdf.GetY()+3, 40, 12,
-			false, opt, 0, "")
+		companySignature(pdf, companyName)
 	}
 	if statement.ContractorSign {
 		drawSignatureForm(pdf)
@@ -372,17 +387,19 @@ func checkStatementSpace(pdf *fpdf.Fpdf, statement models.Statement) {
 	}
 
 	if title != "" {
+		setPinkBoldFont(pdf, titleTextSize)
 		lines := pdf.SplitText(title, availableWidth)
-		requiredHeight += float64(standardTextSize * len(lines))
+		requiredHeight += float64(titleTextSize * len(lines))
 	}
 	if subtitle != "" {
+		setBlackBoldFont(pdf, standardTextSize)
 		lines := pdf.SplitText(subtitle, availableWidth)
 		requiredHeight += float64(standardTextSize * len(lines))
 	}
 	for _, question := range statement.Questions {
 		availableWidth = pageWidth - leftMargin - rightMargin - 2
-		text := question.Question
 
+		text := question.Question
 		if question.SimploQuestion != "" {
 			text = question.SimploQuestion
 		}
