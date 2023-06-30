@@ -114,6 +114,7 @@ type RenewHistory struct {
 }
 
 type Survey struct {
+	Id                 int64       `json:"id" firestore:"id"`
 	Title              string      `firestore:"title,omitempty" json:"title,omitempty"`
 	SimploTitle        string      `json:"simploTitle,omitempty" firestore:"simploTitle,omitempty"`
 	Subtitle           string      `firestore:"subtitle,omitempty" json:"subtitle,omitempty"`
@@ -128,6 +129,7 @@ type Survey struct {
 }
 
 type Statement struct {
+	Id                 int64       `json:"id" firestore:"id"`
 	Title              string      `firestore:"title,omitempty" json:"title,omitempty"`
 	SimploTitle        string      `json:"simploTitle,omitempty" firestore:"simploTitle,omitempty"`
 	Subtitle           string      `firestore:"subtitle,omitempty" json:"subtitle,omitempty"`
@@ -142,6 +144,7 @@ type Statement struct {
 }
 
 type Question struct {
+	Id             int64  `json:"id" firestore:"id"`
 	Question       string `firestore:"question,omitempty" json:"question,omitempty"`
 	SimploText     string `json:"simploText,omitempty" firestore:"simploText,omitempty"`
 	IsBold         bool   `firestore:"isBold,omitempty" json:"isBold,omitempty"`

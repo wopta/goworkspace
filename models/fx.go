@@ -156,8 +156,9 @@ func (fx *Fx) FloatToString(in float64, decimal int64) string {
 	SURVEY AND STATEMENT CUSTOM FUNCTIONS
 */
 
-func (fx *Fx) AppendStatement(statements []*Statement, title, simploTitle, subtitle, simploSubtitle string, hasMultipleAnswers, hasAnswer, expectedAnswer, companySign, contractorSign bool) []*Statement {
+func (fx *Fx) AppendStatement(statements []*Statement, id int64, title, simploTitle, subtitle, simploSubtitle string, hasMultipleAnswers, hasAnswer, expectedAnswer, companySign, contractorSign bool) []*Statement {
 	statement := &Statement{
+		Id:                 id,
 		Title:              title,
 		SimploTitle:        simploTitle,
 		Subtitle:           subtitle,
@@ -179,8 +180,9 @@ func (fx *Fx) AppendStatement(statements []*Statement, title, simploTitle, subti
 	return append(statements, statement)
 }
 
-func (fx *Fx) AppendSurvey(surveys []*Survey, title, simploTitle, subtitle, simploSubtitle string, hasMultipleAnswers, hasAnswer, expectedAnswer, companySign, contractorSign bool) []*Survey {
+func (fx *Fx) AppendSurvey(surveys []*Survey, id int64, title, simploTitle, subtitle, simploSubtitle string, hasMultipleAnswers, hasAnswer, expectedAnswer, companySign, contractorSign bool) []*Survey {
 	survey := &Survey{
+		Id:                 id,
 		Title:              title,
 		Subtitle:           subtitle,
 		HasMultipleAnswers: nil,
@@ -198,8 +200,9 @@ func (fx *Fx) AppendSurvey(surveys []*Survey, title, simploTitle, subtitle, simp
 	return append(surveys, survey)
 }
 
-func (fx *Fx) AppendQuestion(questions []*Question, text, simploText string, isBold, indent, hasAnswer, expectedAnswer bool) []*Question {
+func (fx *Fx) AppendQuestion(questions []*Question, id int64, text, simploText string, isBold, indent, hasAnswer, expectedAnswer bool) []*Question {
 	question := &Question{
+		Id:             id,
 		Question:       text,
 		SimploText:     simploText,
 		IsBold:         isBold,
