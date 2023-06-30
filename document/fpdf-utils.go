@@ -306,17 +306,30 @@ func checkSurveySpace(pdf *fpdf.Fpdf, survey models.Survey) {
 func printStatement(pdf *fpdf.Fpdf, statement models.Statement) {
 	checkStatementSpace(pdf, statement)
 
+	title := statement.Title
+	if statement.SimploTitle != "" {
+		title = statement.SimploTitle
+	}
+	subtitle := statement.Subtitle
+	if statement.SimploSubtitle != "" {
+		subtitle = statement.SimploSubtitle
+	}
+
 	setPinkBoldFont(pdf, titleTextSize)
-	if statement.Title != "" {
-		pdf.MultiCell(0, 3.5, statement.Title, "", fpdf.AlignLeft, false)
+	if title != "" {
+		pdf.MultiCell(0, 3.5, title, "", fpdf.AlignLeft, false)
 		pdf.Ln(3)
 	}
 	setBlackBoldFont(pdf, standardTextSize)
-	if statement.Subtitle != "" {
-		pdf.MultiCell(0, 3.5, statement.Subtitle, "", fpdf.AlignLeft, false)
+	if subtitle != "" {
+		pdf.MultiCell(0, 3.5, subtitle, "", fpdf.AlignLeft, false)
 	}
 	setBlackRegularFont(pdf, standardTextSize)
 	for _, question := range statement.Questions {
+		text := question.Question
+		if question.SimploQuestion != "" {
+			text = question.SimploQuestion
+		}
 		if question.IsBold {
 			setBlackBoldFont(pdf, standardTextSize)
 		} else {
@@ -325,7 +338,7 @@ func printStatement(pdf *fpdf.Fpdf, statement models.Statement) {
 		if question.Indent {
 			pdf.SetX(tabDimension)
 		}
-		pdf.MultiCell(0, 3.5, question.Question, "", fpdf.AlignLeft, false)
+		pdf.MultiCell(0, 3.5, text, "", fpdf.AlignLeft, false)
 	}
 	pdf.Ln(5)
 	if statement.CompanySign {
@@ -349,16 +362,30 @@ func checkStatementSpace(pdf *fpdf.Fpdf, statement models.Statement) {
 	availableWidth := pageWidth - leftMargin - rightMargin - 2
 	requiredHeight := 0.0
 
-	if statement.Title != "" {
-		lines := pdf.SplitText(statement.Title, availableWidth)
+	title := statement.Title
+	if statement.SimploTitle != "" {
+		title = statement.SimploTitle
+	}
+	subtitle := statement.Subtitle
+	if statement.SimploSubtitle != "" {
+		subtitle = statement.SimploSubtitle
+	}
+
+	if title != "" {
+		lines := pdf.SplitText(title, availableWidth)
 		requiredHeight += float64(standardTextSize * len(lines))
 	}
-	if statement.Subtitle != "" {
-		lines := pdf.SplitText(statement.Title, availableWidth)
+	if subtitle != "" {
+		lines := pdf.SplitText(subtitle, availableWidth)
 		requiredHeight += float64(standardTextSize * len(lines))
 	}
 	for _, question := range statement.Questions {
 		availableWidth = pageWidth - leftMargin - rightMargin - 2
+		text := question.Question
+
+		if question.SimploQuestion != "" {
+			text = question.SimploQuestion
+		}
 
 		if question.IsBold {
 			setBlackBoldFont(pdf, standardTextSize)
@@ -377,7 +404,7 @@ func checkStatementSpace(pdf *fpdf.Fpdf, statement models.Statement) {
 			}
 		}
 
-		lines := pdf.SplitText(question.Question+answer, availableWidth)
+		lines := pdf.SplitText(text+answer, availableWidth)
 		requiredHeight += float64(standardTextSize * len(lines))
 	}
 
