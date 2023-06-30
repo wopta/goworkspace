@@ -199,29 +199,11 @@ func personaGuaranteesTable(pdf *fpdf.Fpdf, policy *models.Policy) {
 func personaSurveySection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	surveys := *policy.Surveys
 
-	getParagraphTitle(pdf, "Dichiarazioni da leggere con attenzione prima di firmare")
-	err := printSurvey(pdf, surveys[0])
-	lib.CheckError(err)
-
-	pdf.Ln(5)
-	if len(surveys) == 3 {
-		err = printSurvey(pdf, surveys[1])
+	for _, survey := range surveys {
+		err := printSurvey(pdf, survey)
 		lib.CheckError(err)
-	} else {
-		for _, survey := range surveys[1:3] {
-			err = printSurvey(pdf, survey)
-			lib.CheckError(err)
-			pdf.Ln(5)
-		}
 	}
 
-	surveys[len(surveys)-1].Title = ""
-	getParagraphTitle(pdf, "Tutela Privacy")
-	err = printSurvey(pdf, surveys[len(surveys)-1])
-	lib.CheckError(err)
-
-	pdf.Ln(5)
-	drawSignatureForm(pdf)
 	pdf.Ln(10)
 }
 

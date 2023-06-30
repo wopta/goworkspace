@@ -200,11 +200,10 @@ func (fx *Fx) AppendSurvey(surveys []*Survey, id int64, title, simploTitle, subt
 	return append(surveys, survey)
 }
 
-func (fx *Fx) AppendQuestion(questions []*Question, id int64, text, simploText string, isBold, indent, hasAnswer, expectedAnswer bool) []*Question {
+func (fx *Fx) AppendQuestion(questions []*Question, text, simploText string, isBold, indent, hasAnswer, expectedAnswer bool) []*Question {
 	question := &Question{
-		Id:             id,
 		Question:       text,
-		SimploText:     simploText,
+		SimploQuestion: simploText,
 		IsBold:         isBold,
 		Indent:         indent,
 		Answer:         nil,

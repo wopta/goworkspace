@@ -146,7 +146,7 @@ type Statement struct {
 type Question struct {
 	Id             int64  `json:"id" firestore:"id"`
 	Question       string `firestore:"question,omitempty" json:"question,omitempty"`
-	SimploText     string `json:"simploText,omitempty" firestore:"simploText,omitempty"`
+	SimploQuestion string `json:"simploQuestion,omitempty" firestore:"simploQuestion,omitempty"`
 	IsBold         bool   `firestore:"isBold,omitempty" json:"isBold,omitempty"`
 	Indent         bool   `firestore:"indent,omitempty" json:"indent,omitempty"`
 	Answer         *bool  `firestore:"answer,omitempty" json:"answer,omitempty"`

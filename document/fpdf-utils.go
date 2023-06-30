@@ -157,18 +157,25 @@ func getParagraphTitle(pdf *fpdf.Fpdf, title string) {
 }
 
 func printSurvey(pdf *fpdf.Fpdf, survey models.Survey) error {
-	var text string
+	var dotsString string
 	leftMargin, _, rightMargin, _ := pdf.GetMargins()
 	pageWidth, _ := pdf.GetPageSize()
 	availableWidth := pageWidth - leftMargin - rightMargin - 2
 
 	checkSurveySpace(pdf, survey)
 
+	surveyTitle := survey.Title
+	surveySubtitle := survey.Subtitle
+
+	if survey.SimploTitle != "" {
+		surveyTitle = survey.SimploTitle
+	}
+	if survey.SimploSubtitle != "" {
+		surveySubtitle = survey.SimploSubtitle
+	}
+
 	setBlackBoldFont(pdf, standardTextSize)
 	if survey.HasAnswer {
-		if *survey.Answer != *survey.ExpectedAnswer {
-			return fmt.Errorf("%s: answer not equal expected answer", survey.Title)
-		}
 		answer := "NO"
 		if *survey.Answer {
 			answer = "SI"
@@ -178,22 +185,23 @@ func printSurvey(pdf *fpdf.Fpdf, survey models.Survey) error {
 		dotWidth := pdf.GetStringWidth(".")
 
 		var surveyWidth, paddingWidth float64
-		lines := pdf.SplitText(survey.Title+answer, availableWidth)
+		lines := pdf.SplitText(surveyTitle+answer, availableWidth)
 
 		surveyWidth = pdf.GetStringWidth(lines[len(lines)-1])
 		paddingWidth = availableWidth - surveyWidth - answerWidth
 
-		text = strings.Repeat(".", int(paddingWidth/dotWidth)-2) + answer
+		dotsString = strings.Repeat(".", int(paddingWidth/dotWidth)-2) + answer
 	}
-	if survey.Title != "" {
-		pdf.MultiCell(availableWidth, 3.5, survey.Title+text, "", fpdf.AlignLeft, false)
+	if surveyTitle != "" {
+		getParagraphTitle(pdf, surveyTitle+dotsString)
 	}
-	if survey.Subtitle != "" {
-		pdf.MultiCell(availableWidth, 3.5, survey.Subtitle+text, "", fpdf.AlignLeft, false)
+	if surveySubtitle != "" {
+		setBlackBoldFont(pdf, standardTextSize)
+		pdf.MultiCell(availableWidth, 3.5, surveySubtitle+dotsString, "", fpdf.AlignLeft, false)
 	}
 
 	for _, question := range survey.Questions {
-		text = ""
+		dotsString = ""
 		availableWidth = pageWidth - leftMargin - rightMargin - 2
 
 		if question.IsBold {
@@ -206,10 +214,12 @@ func printSurvey(pdf *fpdf.Fpdf, survey models.Survey) error {
 			availableWidth -= tabDimension / 2
 		}
 
+		questionText := question.Question
+
 		if question.HasAnswer {
 			var questionWidth, paddingWidth float64
-			if *question.Answer != *question.ExpectedAnswer {
-				return fmt.Errorf("%s: answer not equal expected answer", question.Question)
+			if question.SimploQuestion != "" {
+
 			}
 
 			answer := "NO"
@@ -220,14 +230,28 @@ func printSurvey(pdf *fpdf.Fpdf, survey models.Survey) error {
 			answerWidth := pdf.GetStringWidth(answer)
 			dotWidth := pdf.GetStringWidth(".")
 
-			lines := pdf.SplitText(question.Question+answer, availableWidth)
+			lines := pdf.SplitText(questionText+answer, availableWidth)
 
 			questionWidth = pdf.GetStringWidth(lines[len(lines)-1])
 			paddingWidth = availableWidth - questionWidth - answerWidth
 
-			text = strings.Repeat(".", int(paddingWidth/dotWidth)-2) + answer
+			dotsString = strings.Repeat(".", int(paddingWidth/dotWidth)-2) + answer
 		}
-		pdf.MultiCell(availableWidth, 3.5, question.Question+text, "", fpdf.AlignLeft, false)
+		pdf.MultiCell(availableWidth, 3.5, questionText+dotsString, "", fpdf.AlignLeft, false)
+	}
+	pdf.Ln(5)
+	if survey.CompanySign {
+		setBlackBoldFont(pdf, standardTextSize)
+		pdf.CellFormat(70, 3, "Global Assistance", "", 0,
+			fpdf.AlignCenter, false, 0, "")
+		var opt fpdf.ImageOptions
+		opt.ImageType = "png"
+		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/firma_global.png", 25, pdf.GetY()+3, 40, 12,
+			false, opt, 0, "")
+	}
+	if survey.ContractorSign {
+		drawSignatureForm(pdf)
+		pdf.Ln(10)
 	}
 	return nil
 }
@@ -313,7 +337,6 @@ func printStatement(pdf *fpdf.Fpdf, statement models.Statement) {
 		drawSignatureForm(pdf)
 		pdf.Ln(10)
 	}
-	checkPage(pdf)
 }
 
 func checkStatementSpace(pdf *fpdf.Fpdf, statement models.Statement) {
