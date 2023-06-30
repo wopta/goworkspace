@@ -31,7 +31,7 @@ type EmitRequest struct {
 }
 
 func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.Println("[EmitFx] handler start ----------------------------------------")
+	log.Println("[EmitFx] Handler start ----------------------------------------")
 
 	var (
 		result     EmitRequest
@@ -44,7 +44,7 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	firePolicy = lib.GetDatasetByEnv(origin, "policy")
 	request := lib.ErrorByte(io.ReadAll(r.Body))
 
-	log.Printf("[EmitFx] request: %s", string(request))
+	log.Printf("[EmitFx] Request: %s", string(request))
 	json.Unmarshal([]byte(request), &result)
 
 	uid := result.Uid
@@ -57,48 +57,94 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	responseEmit := Emit(&policy, result, origin)
 	b, e := json.Marshal(responseEmit)
-	log.Println("[EmitFx] response: ", string(b))
+	log.Println("[EmitFx] Response: ", string(b))
 
 	return string(b), responseEmit, e
 }
 
 func Emit(policy *models.Policy, request EmitRequest, origin string) EmitResponse {
-	var payRes payment.FabrickPaymentResponse
+	var responseEmit EmitResponse
+
 	firePolicy := lib.GetDatasetByEnv(origin, "policy")
 	guaranteFire := lib.GetDatasetByEnv(origin, "guarante")
+	policy.Uid = request.Uid // we should enforce the setting of the ID on proposal
+
+	if policy.IsReserved {
+		emitApproval(policy)
+	} else {
+		log.Printf("[Emit] Policy Uid %s", request.Uid)
+
+		emitBase(policy, origin)
+
+		emitSign(policy, request, origin)
+
+		emitPay(policy, request, origin)
+
+		responseEmit = EmitResponse{UrlPay: policy.PayUrl, UrlSign: policy.SignUrl}
+		policyJson, _ := policy.Marshal()
+		log.Printf("[Emit] Policy %s: %s", request.Uid, string(policyJson))
+	}
+
+	policy.Updated = time.Now().UTC()
+	lib.SetFirestore(firePolicy, request.Uid, policy)
+	policy.BigquerySave(origin)
+	models.SetGuaranteBigquery(*policy, "emit", guaranteFire)
+
+	return responseEmit
+}
+
+func emitApproval(policy *models.Policy) {
+	log.Printf("[EmitApproval] Policy Uid %s: Reserved Flow", policy.Uid)
+	policy.Status = models.PolicyStatusWaitForApproval
+	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
+}
+
+func emitBase(policy *models.Policy, origin string) {
+	log.Printf("[EmitBase] Policy Uid %s", policy.Uid)
+	firePolicy := lib.GetDatasetByEnv(origin, "policy")
 	now := time.Now().UTC()
 
-	policy.IsSign = false
-	policy.IsPay = false
-	policy.Updated = now
-	policy.Uid = request.Uid
-	policy.Status = models.PolicyStatusToSign
-	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusContact)
-	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusToSign)
-	policy.PaymentSplit = request.PaymentSplit
 	policy.CompanyEmit = true
 	policy.CompanyEmitted = false
 	policy.EmitDate = now
 	policy.BigEmitDate = civil.DateTimeOf(now)
+	company, numb, tot := GetSequenceByCompany(strings.ToLower(policy.Company), firePolicy)
+	log.Printf("[EmitBase] codeCompany: %s", company)
+	log.Printf("[EmitBase] numberCompany: %d", numb)
+	log.Printf("[EmitBase] number: %d", tot)
+	policy.Number = tot
+	policy.NumberCompany = numb
+	policy.CodeCompany = company
+}
+
+func emitSign(policy *models.Policy, request EmitRequest, origin string) {
+	log.Printf("[EmitSign] Policy Uid %s", policy.Uid)
+
+	policy.IsSign = false
+	policy.Status = models.PolicyStatusToSign
+	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusContact)
+	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusToSign)
 
 	if policy.Statements == nil {
 		policy.Statements = request.Statements
 	}
-
-	company, numb, tot := GetSequenceByCompany(strings.ToLower(policy.Company), firePolicy)
-	log.Printf("[Emit] Policy Uid %s", request.Uid)
-	log.Printf("[Emit] codeCompany: %s", company)
-	log.Printf("[Emit] numberCompany: %d", numb)
-	log.Printf("[Emit] number: %d", tot)
-	policy.Number = tot
-	policy.NumberCompany = numb
-	policy.CodeCompany = company
 
 	p := <-document.ContractObj(*policy)
 	policy.DocumentName = p.LinkGcs
 	_, signResponse, _ := document.NamirialOtpV6(*policy, origin)
 	policy.ContractFileId = signResponse.FileId
 	policy.IdSign = signResponse.EnvelopeId
+	policy.SignUrl = signResponse.Url
+
+	mail.SendMailSign(*policy)
+}
+
+func emitPay(policy *models.Policy, request EmitRequest, origin string) {
+	log.Printf("[EmitPay] Policy Uid %s", policy.Uid)
+	var payRes payment.FabrickPaymentResponse
+
+	policy.IsPay = false
+	policy.PaymentSplit = request.PaymentSplit
 
 	if policy.PaymentSplit == string(models.PaySplitYear) {
 		payRes = payment.FabbrickYearPay(*policy, origin)
@@ -107,16 +153,5 @@ func Emit(policy *models.Policy, request EmitRequest, origin string) EmitRespons
 		payRes = payment.FabbrickMontlyPay(*policy, origin)
 	}
 
-	responseEmit := EmitResponse{UrlPay: *payRes.Payload.PaymentPageURL, UrlSign: signResponse.Url}
-	policy.SignUrl = signResponse.Url
 	policy.PayUrl = *payRes.Payload.PaymentPageURL
-	policyJson, _ := policy.Marshal()
-
-	log.Printf("[Emit] Policy %s: %s", request.Uid, string(policyJson))
-	lib.SetFirestore(firePolicy, request.Uid, policy)
-	policy.BigquerySave(origin)
-	models.SetGuaranteBigquery(*policy, "emit", guaranteFire)
-	mail.SendMailSign(*policy)
-
-	return responseEmit
 }
