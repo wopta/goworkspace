@@ -162,6 +162,8 @@ func printSurvey(pdf *fpdf.Fpdf, survey models.Survey) error {
 	pageWidth, _ := pdf.GetPageSize()
 	availableWidth := pageWidth - leftMargin - rightMargin - 2
 
+	checkSurveySpace(pdf, survey)
+
 	setBlackBoldFont(pdf, standardTextSize)
 	if survey.HasAnswer {
 		if *survey.Answer != *survey.ExpectedAnswer {
@@ -230,7 +232,52 @@ func printSurvey(pdf *fpdf.Fpdf, survey models.Survey) error {
 	return nil
 }
 
+func checkSurveySpace(pdf *fpdf.Fpdf, survey models.Survey) {
+	var answer string
+	leftMargin, _, rightMargin, bottomMargin := pdf.GetMargins()
+	pageWidth, pageHeight := pdf.GetPageSize()
+	availableWidth := pageWidth - leftMargin - rightMargin - 2
+	requiredHeight := 0.0
+
+	if survey.Title != "" {
+		lines := pdf.SplitText(survey.Title, availableWidth)
+		requiredHeight += float64(standardTextSize * len(lines))
+	}
+	if survey.Subtitle != "" {
+		lines := pdf.SplitText(survey.Title, availableWidth)
+		requiredHeight += float64(standardTextSize * len(lines))
+	}
+	for _, question := range survey.Questions {
+		availableWidth = pageWidth - leftMargin - rightMargin - 2
+
+		if question.IsBold {
+			setBlackBoldFont(pdf, standardTextSize)
+		} else {
+			setBlackRegularFont(pdf, standardTextSize)
+		}
+		if question.Indent {
+			availableWidth -= tabDimension / 2
+		}
+
+		if question.HasAnswer {
+			answer = "NO"
+			if *question.Answer {
+				answer = "SI"
+			}
+		}
+
+		lines := pdf.SplitText(question.Question+answer, availableWidth)
+		requiredHeight += float64(standardTextSize * len(lines))
+	}
+
+	if (pageHeight-bottomMargin)-pdf.GetY() < requiredHeight {
+		pdf.AddPage()
+	}
+}
+
 func printStatement(pdf *fpdf.Fpdf, statement models.Statement) {
+	checkStatementSpace(pdf, statement)
+
 	setPinkBoldFont(pdf, titleTextSize)
 	if statement.Title != "" {
 		pdf.MultiCell(0, 3.5, statement.Title, "", fpdf.AlignLeft, false)
@@ -267,6 +314,49 @@ func printStatement(pdf *fpdf.Fpdf, statement models.Statement) {
 		pdf.Ln(10)
 	}
 	checkPage(pdf)
+}
+
+func checkStatementSpace(pdf *fpdf.Fpdf, statement models.Statement) {
+	leftMargin, _, rightMargin, bottomMargin := pdf.GetMargins()
+	pageWidth, pageHeight := pdf.GetPageSize()
+	availableWidth := pageWidth - leftMargin - rightMargin - 2
+	requiredHeight := 0.0
+
+	if statement.Title != "" {
+		lines := pdf.SplitText(statement.Title, availableWidth)
+		requiredHeight += float64(standardTextSize * len(lines))
+	}
+	if statement.Subtitle != "" {
+		lines := pdf.SplitText(statement.Title, availableWidth)
+		requiredHeight += float64(standardTextSize * len(lines))
+	}
+	for _, question := range statement.Questions {
+		availableWidth = pageWidth - leftMargin - rightMargin - 2
+
+		if question.IsBold {
+			setBlackBoldFont(pdf, standardTextSize)
+		} else {
+			setBlackRegularFont(pdf, standardTextSize)
+		}
+		if question.Indent {
+			availableWidth -= tabDimension / 2
+		}
+
+		answer := ""
+		if question.HasAnswer {
+			answer = "NO"
+			if *question.Answer {
+				answer = "SI"
+			}
+		}
+
+		lines := pdf.SplitText(question.Question+answer, availableWidth)
+		requiredHeight += float64(standardTextSize * len(lines))
+	}
+
+	if (pageHeight-bottomMargin)-pdf.GetY() < requiredHeight {
+		pdf.AddPage()
+	}
 }
 
 func indentedText(pdf *fpdf.Fpdf, content string) {

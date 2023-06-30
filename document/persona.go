@@ -47,11 +47,11 @@ func PersonaGlobal(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 
 	paymentMethodSection(pdf)
 
-	pdf.AddPage()
-
 	emitResumeSection(pdf, policy)
 
 	companiesDescriptionSection(pdf, policy.Company)
+
+	pdf.AddPage()
 
 	personalDataHandlingSection(pdf, policy)
 
@@ -207,7 +207,6 @@ func personaSurveySection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	if len(surveys) == 3 {
 		err = printSurvey(pdf, surveys[1])
 		lib.CheckError(err)
-		pdf.AddPage()
 	} else {
 		for _, survey := range surveys[1:3] {
 			err = printSurvey(pdf, survey)
