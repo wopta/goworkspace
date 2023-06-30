@@ -294,6 +294,10 @@ func checkSurveySpace(pdf *fpdf.Fpdf, survey models.Survey) {
 		requiredHeight += float64(standardTextSize * len(lines))
 	}
 
+	if survey.ContractorSign || survey.CompanySign {
+		requiredHeight += 30
+	}
+
 	if (pageHeight-bottomMargin)-pdf.GetY() < requiredHeight {
 		pdf.AddPage()
 	}
@@ -377,6 +381,10 @@ func checkStatementSpace(pdf *fpdf.Fpdf, statement models.Statement) {
 		requiredHeight += float64(standardTextSize * len(lines))
 	}
 
+	if statement.ContractorSign || statement.CompanySign {
+		requiredHeight += 15
+	}
+
 	if (pageHeight-bottomMargin)-pdf.GetY() < requiredHeight {
 		pdf.AddPage()
 	}
@@ -385,11 +393,4 @@ func checkStatementSpace(pdf *fpdf.Fpdf, statement models.Statement) {
 func indentedText(pdf *fpdf.Fpdf, content string) {
 	pdf.SetX(tabDimension)
 	pdf.MultiCell(0, 3, content, "", fpdf.AlignLeft, false)
-}
-
-func checkPage(pdf *fpdf.Fpdf) {
-	_, pageHeight := pdf.GetPageSize()
-	if pageHeight-pdf.GetY() < 30 {
-		pdf.AddPage()
-	}
 }
