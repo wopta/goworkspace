@@ -21,12 +21,15 @@ func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	var data models.Policy
 	defer r.Body.Close()
 	e := json.Unmarshal(req, &data)
-	res, e := Life(data)
+
+	authToken, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
+	lib.CheckError(err)
+	res, e := Life(authToken.Role, data)
 	s, e := json.Marshal(res)
 	return string(s), nil, e
 
 }
-func Life(data models.Policy) (models.Policy, error) {
+func Life(role string, data models.Policy) (models.Policy, error) {
 	var err error
 	contractorAge, err := data.CalculateContractorAge()
 
@@ -34,7 +37,7 @@ func Life(data models.Policy) (models.Policy, error) {
 	df := lib.CsvToDataframe(b)
 	var selectRow []string
 
-	ruleProduct, _, err := sellable.Life(data)
+	ruleProduct, _, err := sellable.Life(role, data)
 	lib.CheckError(err)
 
 	originalPolicy := copyPolicy(data)
