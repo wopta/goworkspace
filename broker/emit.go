@@ -27,80 +27,96 @@ type EmitRequest struct {
 	Payment      string              `firestore:"payment,omitempty" json:"payment,omitempty"`
 	PaymentType  string              `firestore:"paymentType,omitempty" json:"paymentType,omitempty"`
 	PaymentSplit string              `firestore:"paymentSplit,omitempty" json:"paymentSplit,omitempty"`
-	Survay       *[]models.Statement `firestore:"survey,omitempty" json:"survey,omitempty"`
 	Statements   *[]models.Statement `firestore:"statements,omitempty" json:"statements,omitempty"`
 }
 
 func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	log.Println("[EmitFx] handler start ----------------------------------------")
+
 	var (
 		result     EmitRequest
 		e          error
 		firePolicy string
+		policy     models.Policy
 	)
 
-	log.Println("--------------------------Emit-------------------------------------------")
-	log.Println(r.Header.Get("origin"))
-
-	firePolicy = lib.GetDatasetByEnv(r.Header.Get("origin"), "policy")
-	guaranteFire := lib.GetDatasetByEnv(r.Header.Get("origin"), "guarante")
+	origin := r.Header.Get("origin")
+	firePolicy = lib.GetDatasetByEnv(origin, "policy")
 	request := lib.ErrorByte(io.ReadAll(r.Body))
-	log.Println("Emit", string(request))
+
+	log.Printf("[EmitFx] request: %s", string(request))
 	json.Unmarshal([]byte(request), &result)
 
 	uid := result.Uid
-	log.Println("Emit", uid)
-	//
-	var policy models.Policy
+	log.Printf("[EmitFx] Uid: %s", uid)
+
 	docsnap := lib.GetFirestore(firePolicy, string(uid))
 	docsnap.DataTo(&policy)
-	policyJsonLog, e := policy.Marshal()
-	log.Println("Emit get policy "+uid, string(policyJsonLog))
+	policyJsonLog, _ := policy.Marshal()
+	log.Printf("[EmitFx] Policy %s JSON: %s", uid, string(policyJsonLog))
+
+	responseEmit := Emit(&policy, result, origin)
+	b, e := json.Marshal(responseEmit)
+	log.Println("[EmitFx] response: ", string(b))
+
+	return string(b), responseEmit, e
+}
+
+func Emit(policy *models.Policy, request EmitRequest, origin string) EmitResponse {
+	var payRes payment.FabrickPaymentResponse
+	firePolicy := lib.GetDatasetByEnv(origin, "policy")
+	guaranteFire := lib.GetDatasetByEnv(origin, "guarante")
+	now := time.Now().UTC()
+
 	policy.IsSign = false
 	policy.IsPay = false
-	policy.Updated = time.Now().UTC()
-	policy.Uid = uid
+	policy.Updated = now
+	policy.Uid = request.Uid
 	policy.Status = models.PolicyStatusToSign
 	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusContact)
 	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusToSign)
-	policy.PaymentSplit = result.PaymentSplit
+	policy.PaymentSplit = request.PaymentSplit
 	policy.CompanyEmit = true
 	policy.CompanyEmitted = false
-	policy.EmitDate = time.Now().UTC()
-	policy.BigEmitDate = civil.DateTimeOf(policy.Updated)
+	policy.EmitDate = now
+	policy.BigEmitDate = civil.DateTimeOf(now)
 
 	if policy.Statements == nil {
-		policy.Statements = result.Statements
+		policy.Statements = request.Statements
 	}
 
 	company, numb, tot := GetSequenceByCompany(strings.ToLower(policy.Company), firePolicy)
-	log.Println("Emit code "+uid+" ", company)
-	log.Println("Emit code "+uid+" ", numb)
-	log.Println("Emit code "+uid+" ", tot)
+	log.Printf("[Emit] Policy Uid %s", request.Uid)
+	log.Printf("[Emit] codeCompany: %s", company)
+	log.Printf("[Emit] numberCompany: %d", numb)
+	log.Printf("[Emit] number: %d", tot)
 	policy.Number = tot
 	policy.NumberCompany = numb
 	policy.CodeCompany = company
-	p := <-document.ContractObj(policy)
 
+	p := <-document.ContractObj(*policy)
 	policy.DocumentName = p.LinkGcs
-	_, res, _ := document.NamirialOtpV6(policy, r.Header.Get("origin"))
-	policy.ContractFileId = res.FileId
-	policy.IdSign = res.EnvelopeId
-	var payRes payment.FabrickPaymentResponse
+	_, signResponse, _ := document.NamirialOtpV6(*policy, origin)
+	policy.ContractFileId = signResponse.FileId
+	policy.IdSign = signResponse.EnvelopeId
+
 	if policy.PaymentSplit == string(models.PaySplitYear) {
-		payRes = payment.FabbrickYearPay(policy, r.Header.Get("origin"))
+		payRes = payment.FabbrickYearPay(*policy, origin)
 	}
 	if policy.PaymentSplit == string(models.PaySplitMonthly) {
-		payRes = payment.FabbrickMontlyPay(policy, r.Header.Get("origin"))
+		payRes = payment.FabbrickMontlyPay(*policy, origin)
 	}
-	responseEmit := EmitResponse{UrlPay: *payRes.Payload.PaymentPageURL, UrlSign: res.Url}
-	policy.SignUrl = res.Url
+
+	responseEmit := EmitResponse{UrlPay: *payRes.Payload.PaymentPageURL, UrlSign: signResponse.Url}
+	policy.SignUrl = signResponse.Url
 	policy.PayUrl = *payRes.Payload.PaymentPageURL
-	policyJson, e := policy.Marshal()
-	log.Println("Emit policy "+uid, string(policyJson))
-	lib.SetFirestore(firePolicy, uid, policy)
-	policy.BigquerySave(r.Header.Get("origin"))
-	models.SetGuaranteBigquery(policy, "emit", guaranteFire)
-	mail.SendMailSign(policy)
-	b, e := json.Marshal(responseEmit)
-	return string(b), responseEmit, e
+	policyJson, _ := policy.Marshal()
+
+	log.Printf("[Emit] Policy %s: %s", request.Uid, string(policyJson))
+	lib.SetFirestore(firePolicy, request.Uid, policy)
+	policy.BigquerySave(origin)
+	models.SetGuaranteBigquery(*policy, "emit", guaranteFire)
+	mail.SendMailSign(*policy)
+
+	return responseEmit
 }
