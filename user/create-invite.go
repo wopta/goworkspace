@@ -2,21 +2,25 @@ package user
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"errors"
+	"io"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/mail"
+	"github.com/wopta/goworkspace/models"
 )
 
 func CreateInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var createInviteRequest CreateInviteRequest
 
-	reqBytes := lib.ErrorByte(ioutil.ReadAll(r.Body))
-	json.Unmarshal(reqBytes, &createInviteRequest)
+	reqBytes := lib.ErrorByte(io.ReadAll(r.Body))
+	err := json.Unmarshal(reqBytes, &createInviteRequest)
+	lib.CheckError(err)
 
 	creatorUid, err := lib.GetUserIdFromIdToken(r.Header.Get("Authorization"))
 	if err != nil {
@@ -24,32 +28,65 @@ func CreateInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 		return `{"success": false}`, `{"success": false}`, nil
 	}
 
-	if inviteUid, ok := CreateInvite(createInviteRequest.Email, createInviteRequest.Role, r.Header.Get("Origin"), creatorUid); ok {
-		SendInviteMail(inviteUid, createInviteRequest.Email)
+	inviteUid, err := CreateInvite(createInviteRequest, r.Header.Get("Origin"), creatorUid)
+	if err != nil {
+		log.Printf("[CreateInvite]: %s", err.Error())
+		return `{"success": false}`, `{"success": false}`, err
 	}
 
+	SendInviteMail(inviteUid, createInviteRequest.Email)
 	return `{"success": true}`, `{"success": true}`, nil
 }
 
-func CreateInvite(mail, role, origin, creatorUid string) (string, bool) {
-	log.Printf("[CreateInvite] Creating invite for user %s with role %s", mail, role)
+func CreateInvite(inviteRequest CreateInviteRequest, origin, creatorUid string) (string, error) {
+	log.Printf("[CreateInvite] Creating invite for user %s with role %s", inviteRequest.Email, inviteRequest.Role)
 
 	collectionName := lib.GetDatasetByEnv(origin, invitesCollection)
 	inviteUid := lib.NewDoc(collectionName)
-	inviteExpiration := time.Now().UTC().Add(time.Hour * 168)
+
+	oneWeek := time.Hour * 168
+	inviteExpiration := time.Now().UTC().Add(oneWeek)
+
+	roles := models.GetAllRoles()
+	var userRole string
+	for _, role := range roles {
+		if strings.EqualFold(inviteRequest.Role, role) {
+			userRole = role
+			break
+		}
+	}
+
+	if userRole == "" {
+		log.Println("[CreateInvite]: forbidden role")
+		return "", errors.New("forbidden role")
+	}
 
 	invite := UserInvite{
-		Email:      mail,
-		Role:       role,
+		Name:       inviteRequest.Name,
+		Surname:    inviteRequest.Surname,
+		FiscalCode: inviteRequest.FiscalCode,
+		Email:      inviteRequest.Email,
+		Role:       userRole,
 		Expiration: inviteExpiration,
 		Uid:        inviteUid,
 		CreatorUid: creatorUid,
 	}
 
-	lib.SetFirestore(collectionName, invite.Uid, invite)
+	// check if user exists
+	_, err := GetAuthUserByMail(origin, inviteRequest.Email)
+	if err == nil {
+		log.Printf("[CreateInvite]: user %s already exists", inviteRequest.Email)
+		return "", errors.New("user already exists")
+	}
+
+	err = lib.SetFirestoreErr(collectionName, invite.Uid, invite)
+	if err != nil {
+		log.Printf("[CreateInvite]: could not create user %s", inviteRequest.Email)
+		return "", errors.New("could not create user")
+	}
 
 	log.Printf("[CreateInvite] Created invite with uid %s", invite.Uid)
-	return invite.Uid, true
+	return invite.Uid, nil
 }
 
 func SendInviteMail(inviteUid, email string) {
@@ -82,15 +119,24 @@ func SendInviteMail(inviteUid, email string) {
 }
 
 type CreateInviteRequest struct {
-	Role  string `json:"role"`
-	Email string `json:"email"`
+	Role       string `json:"role"`
+	Email      string `json:"email"`
+	FiscalCode string `json:"fiscalCode,omitempty" firestore:"fiscalCode,omitempty"`
+	Name       string `json:"name,omitempty" firestore:"name,omitempty"`
+	Surname    string `json:"Surname,omitempty" firestore:"Surname,omitempty"`
 }
 
 type UserInvite struct {
-	Role       string    `json:"role,omitempty" firestore:"role,omitempty"`
-	Email      string    `json:"email,omitempty" firestore:"email,omitempty"`
-	Uid        string    `json:"uid,omitempty" firestore:"uid,omitempty"`
-	CreatorUid string    `json:"creatorUid,omitempty" firestore:"creatorUid,omitempty"`
-	Consumed   bool      `json:"consumed" firestore:"consumed"`
-	Expiration time.Time `json:"expiration,omitempty" firestore:"expiration,omitempty"`
+	FiscalCode      string    `json:"fiscalCode,omitempty" firestore:"fiscalCode,omitempty"`
+	VatCode         string    `json:"vatCode,omitempty" firestore:"vatCode,omitempty"`
+	Name            string    `json:"name,omitempty" firestore:"name,omitempty"`
+	Surname         string    `json:"surname,omitempty" firestore:"surname,omitempty"`
+	Role            string    `json:"role,omitempty" firestore:"role,omitempty"`
+	Email           string    `json:"email,omitempty" firestore:"email,omitempty"`
+	Uid             string    `json:"uid,omitempty" firestore:"uid,omitempty"`
+	CreatorUid      string    `json:"creatorUid,omitempty" firestore:"creatorUid,omitempty"`
+	Consumed        bool      `json:"consumed" firestore:"consumed"`
+	RuiCode         string    `json:"ruiCode,omitempty" firestore:"ruiCode,omitempty"`
+	RuiRegistration time.Time `json:"ruiRegistration" firestore:"ruiRegistration"`
+	Expiration      time.Time `json:"expiration,omitempty" firestore:"expiration,omitempty"`
 }

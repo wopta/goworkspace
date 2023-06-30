@@ -2,13 +2,13 @@ package broker
 
 import (
 	"fmt"
-	"github.com/wopta/goworkspace/models"
 	"log"
 	"net/http"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
-	dag "github.com/heimdalr/dag"
-	lib "github.com/wopta/goworkspace/lib"
+	"github.com/heimdalr/dag"
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 )
 
 func init() {

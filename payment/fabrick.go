@@ -36,10 +36,14 @@ func FabrickPayObj(data models.Policy, firstSchedule bool, scheduleDate string, 
 	go func() {
 		defer close(r)
 		log.Println("FabrickPay")
-		//var b bytes.Buffer
-		//fileReader := bytes.NewReader([]byte())
 
-		var urlstring = os.Getenv("FABRICK_BASEURL") + "api/fabrick/pace/v4.0/mods/back/v1.0/payments"
+		var (
+			urlstring        = os.Getenv("FABRICK_BASEURL") + "api/fabrick/pace/v4.0/mods/back/v1.0/payments"
+			commission       float64
+			commissionAgent  float64
+			commissionAgency float64
+			netCommission    map[string]float64
+		)
 		client := &http.Client{
 			Timeout: time.Second * 15,
 		}
@@ -70,20 +74,22 @@ func FabrickPayObj(data models.Policy, firstSchedule bool, scheduleDate string, 
 			//var prod models.Product
 			prod, err := models.UnmarshalProduct(prodb)
 			log.Println(data.Uid+" pay error marsh product:", err)
-			var commission float64
-			for _, x := range prod.Companies {
-				log.Println(data.Uid+" pay product name:", x.Name)
-				log.Println(data.Uid+" pay product name:", data.Company)
-				if x.Name == data.Company {
-					if data.IsRenew {
-						commission = x.CommissionRenew
-					} else {
-						commission = x.Commission
-					}
-				}
+
+			commission = getCommissionProduct(data, prod)
+
+			if data.AgentUid != "" {
+				var agent models.Agent
+				dn := lib.GetFirestore(models.AgentCollection, data.AgentUid)
+				dn.DataTo(&agent)
+				commissionAgent = getCommissionProducts(data, agent.Products)
 
 			}
-
+			if data.AgencyUid != "" {
+				var agency models.Agency
+				dn := lib.GetFirestore(models.AgencyCollection, data.AgentUid)
+				dn.DataTo(&agency)
+				commissionAgent = getCommissionProducts(data, agency.Products)
+			}
 			log.Println(data.Uid+"pay commission: ", commission)
 			layout2 := "2006-01-02"
 			var sd string
@@ -118,10 +124,16 @@ func FabrickPayObj(data models.Policy, firstSchedule bool, scheduleDate string, 
 				ProviderId:         *result.Payload.PaymentID,
 				UserToken:          customerId,
 				ProviderName:       "fabrick",
+				AgentUid:           data.AgencyUid,
+				AgencyUid:          data.AgencyUid,
+				CommissionsAgent:   amountNet * commissionAgent,
+				CommissionsAgency:  amountNet * commissionAgency,
+				NetworkCommissions: netCommission,
 			}
 
 			lib.SetFirestore(transactionsFire, transactionUid, tr)
 			tr.BigPayDate = bigquery.NullDateTime{}
+			tr.BigTransactionDate = bigquery.NullDateTime{}
 			tr.BigCreationDate = civil.DateTimeOf(time.Now().UTC())
 			tr.BigStatusHistory = strings.Join(tr.StatusHistory, ",")
 			err = lib.InsertRowsBigQuery("wopta", transactionsFire, tr)
@@ -223,4 +235,40 @@ func getfabbricPayments(data models.Policy, firstSchedule bool, scheduleDate str
 	res, _ := pay.Marshal()
 	result := strings.Replace(string(res), `\u0026`, `&`, -1)
 	return result
+}
+func getCommissionProduct(data models.Policy, prod models.Product) float64 {
+	var commission float64
+	for _, x := range prod.Companies {
+		if x.Name == data.Company {
+			if data.IsRenew {
+				//TODO when pmi migration in done delete shit code check
+				if x.Commission == 0 {
+					return x.Mandate.CommissionRenew
+				} else {
+					return x.CommissionRenew
+				}
+
+			} else {
+				//TODO when pmi migration in done delete shit code check
+				if x.Commission == 0 {
+					return x.Mandate.Commission
+				} else {
+					return x.Commission
+				}
+
+			}
+		}
+
+	}
+	return commission
+}
+func getCommissionProducts(data models.Policy, products []models.Product) float64 {
+	var commission float64
+	for _, prod := range products {
+		if prod.Name == data.Name {
+			return getCommissionProduct(data, prod)
+		}
+
+	}
+	return commission
 }

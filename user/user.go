@@ -1,6 +1,7 @@
 package user
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"os"
@@ -28,25 +29,37 @@ func User(w http.ResponseWriter, r *http.Request) {
 	route := lib.RouteData{
 		Routes: []lib.Route{
 			{
-				Route:   "/v1/fiscalCode/:fiscalcode",
+				Route:   "/fiscalCode/v1/:fiscalcode",
 				Handler: GetUserByFiscalCodeFx,
 				Method:  "GET",
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
-				Route:   "/v1/mail/:mail",
+				Route:   "/mail/v1/:mail",
 				Handler: GetUserByMailFx,
 				Method:  "GET",
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
-				Route:   "/v1/authId/:authId",
+				Route:   "/authId/v1/:authId",
 				Handler: GetUserByAuthIdFx,
 				Method:  "GET",
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
-				Route:   "/v1/onboarding",
+				Route:   "/agent/authid/v1/:authId",
+				Handler: GetAgentByAuthIdFx,
+				Method:  "GET",
+				Roles:   []string{models.UserRoleAll},
+			},
+			{
+				Route:   "/agency/authid/v1/:authId",
+				Handler: GetAgencyByAuthIdFx,
+				Method:  "GET",
+				Roles:   []string{models.UserRoleAll},
+			},
+			{
+				Route:   "/onboarding/v1",
 				Handler: OnboardUserFx,
 				Method:  "POST",
 				Roles:   []string{models.UserRoleAll},
@@ -75,6 +88,18 @@ func User(w http.ResponseWriter, r *http.Request) {
 				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAll},
 			},
+			{
+				Route:   "/role/v1/:userUid",
+				Handler: UpdateUserRoleFx,
+				Method:  http.MethodPatch,
+				Roles:   []string{models.UserRoleAdmin},
+			},
+			{
+				Route:   "/v1",
+				Handler: GetUsersFx,
+				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAdmin},
+			},
 		},
 	}
 	route.Router(w, r)
@@ -84,17 +109,54 @@ func User(w http.ResponseWriter, r *http.Request) {
 func GetUserByAuthIdFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	resp.Header().Set("Access-Control-Allow-Methods", "GET")
 	log.Println(r.Header.Get("authId"))
-	user, e := GetUserByAuthId(r.Header.Get("authId"))
+	user, e := GetUserByAuthId(r.Header.Get("Origin"), r.Header.Get("authId"))
 	jsonString, e := user.Marshal()
 	return string(jsonString), user, e
 }
 
-func GetUserByAuthId(authId string) (models.User, error) {
+func GetUserByAuthId(origin, authId string) (models.User, error) {
 	log.Println(authId)
-	userFirebase := lib.WhereLimitFirestore("users", "authId", "==", authId, 1)
+	fireUsers := lib.GetDatasetByEnv(origin, "users")
+	userFirebase := lib.WhereLimitFirestore(fireUsers, "authId", "==", authId, 1)
 	var user models.User
 	user, err := models.FirestoreDocumentToUser(userFirebase)
 	return user, err
+}
+
+func GetAgentByAuthIdFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	resp.Header().Set("Access-Control-Allow-Methods", "GET")
+	log.Println(r.Header.Get("authId"))
+	agent, err := GetAgentByAuthId(r.Header.Get("Origin"), r.Header.Get("authId"))
+	lib.CheckError(err)
+	jsonString, err := json.Marshal(agent)
+	return string(jsonString), agent, err
+}
+
+func GetAgentByAuthId(origin, authId string) (*models.Agent, error) {
+	log.Println(authId)
+	fireAgents := lib.GetDatasetByEnv(origin, models.AgentCollection)
+	userFirebase := lib.WhereLimitFirestore(fireAgents, "authId", "==", authId, 1)
+	var agent *models.Agent
+	agent, err := models.FirestoreDocumentToAgent(userFirebase)
+	return agent, err
+}
+
+func GetAgencyByAuthIdFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	resp.Header().Set("Access-Control-Allow-Methods", "GET")
+	log.Println(r.Header.Get("authId"))
+	agency, err := GetAgencyByAuthId(r.Header.Get("Origin"), r.Header.Get("authId"))
+	lib.CheckError(err)
+	jsonString, err := json.Marshal(agency)
+	return string(jsonString), agency, err
+}
+
+func GetAgencyByAuthId(origin, authId string) (*models.Agency, error) {
+	log.Println(authId)
+	fireAgency := lib.GetDatasetByEnv(origin, models.AgencyCollection)
+	userFirebase := lib.WhereLimitFirestore(fireAgency, "authId", "==", authId, 1)
+	var agency *models.Agency
+	agency, err := models.FirestoreDocumentToAgency(userFirebase)
+	return agency, err
 }
 
 func GetUserByFiscalCodeFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -107,7 +169,7 @@ func GetUserByFiscalCodeFx(resp http.ResponseWriter, r *http.Request) (string, i
 
 func GetUserByFiscalCode(fiscalCode string) (models.User, error) {
 	log.Println(fiscalCode)
-	userFirebase := lib.WhereLimitFirestore("users", "fiscalCode", "==", fiscalCode, 1)
+	userFirebase := lib.WhereLimitFirestore(usersCollection, "fiscalCode", "==", fiscalCode, 1)
 	var user models.User
 	user, err := models.FirestoreDocumentToUser(userFirebase)
 	return user, err
@@ -123,7 +185,7 @@ func GetUserByMailFx(resp http.ResponseWriter, r *http.Request) (string, interfa
 
 func GetUserByMail(mail string) (models.User, error) {
 	log.Println(mail)
-	userFirebase := lib.WhereLimitFirestore("users", "mail", "==", mail, 1)
+	userFirebase := lib.WhereLimitFirestore(usersCollection, "mail", "==", mail, 1)
 	var user models.User
 	user, err := models.FirestoreDocumentToUser(userFirebase)
 	return user, err
@@ -168,4 +230,15 @@ func SetUserIntoPolicyContractor(policy *models.Policy, origin string) {
 		_, err = models.UpdateUserByFiscalCode(origin, policy.Contractor)
 		lib.CheckError(err)
 	}
+}
+
+func GetAuthUserByMail(origin, mail string) (models.User, error) {
+	var user models.User
+
+	authId, err := lib.GetAuthUserIdByEmail(mail)
+	if err != nil {
+		return user, err
+	}
+
+	return GetUserByAuthId(origin, authId)
 }

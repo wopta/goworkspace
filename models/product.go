@@ -22,6 +22,8 @@ func (r *Product) Marshal() ([]byte, error) {
 }
 
 type Product struct {
+	NameTitle         string           `firestore:"nameTitle,omitempty" json:"nameTitle,omitempty"`
+	NameSubtitle      string           `firestore:"nameSubtitle,omitempty" json:"nameSubtitle,omitempty"`
 	NameDesc          *string          `firestore:"nameDesc,omitempty" json:"nameDesc,omitempty"`
 	Companies         []Company        `firestore:"companies,omitempty" json:"companies,omitempty"`
 	ProductUid        string           `firestore:"productUid,omitempty" json:"productUid,omitempty"`
@@ -35,6 +37,8 @@ type Product struct {
 	Offers            map[string]Offer `firestore:"offers,omitempty" json:"offers,omitempty"`
 	IsEcommerceActive bool             `json:"isEcommerceActive" firestore:"isEcommerceActive"`
 	IsAgencyActive    bool             `json:"isAgencyActive" firestore:"isAgencyActive"`
+	IsAgentActive     bool             `json:"isAgentActive" firestore:"isAgentActive"`
+	Logo              string           `json:"logo,omitempty" firestore:"logo,omitempty" bigquery:"-"`
 }
 
 type Company struct {
@@ -55,6 +59,9 @@ type Company struct {
 	Mandate                   Mandate              `json:"mandate" firestore:"mandate" bigquery:"-"`
 	DiscountLimit             float64              `json:"discountLimit" firestore:"discountLimit" bigquery:"-"`
 	AgentCode                 string               `json:"agentCode" firestore:"agentCode" bigquery:"-"`
+	IsEcommerceActive         bool                 `json:"isEcommerceActive" firestore:"isEcommerceActive" bigquery:"-"`
+	IsAgencyActive            bool                 `json:"isAgencyActive" firestore:"isAgencyActive" bigquery:"-"`
+	IsAgentActive             bool                 `json:"isAgentActive" firestore:"isAgentActive" bigquery:"-"`
 }
 
 type Mandate struct {

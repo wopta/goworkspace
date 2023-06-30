@@ -209,3 +209,26 @@ func updateUserConsens(oldConsens *[]Consens, newConsens *[]Consens) *[]Consens 
 	}
 	return oldConsens
 }
+
+func UsersToListData(query *firestore.DocumentIterator) []User {
+	result := make([]User, 0)
+	for {
+		d, err := query.Next()
+		if err != nil {
+			log.Println("error")
+			if err == iterator.Done {
+				log.Println("iterator.Done")
+				break
+			}
+			break
+		} else {
+			var value User
+			e := d.DataTo(&value)
+			log.Println("todata")
+			lib.CheckError(e)
+			result = append(result, value)
+			log.Printf("len result: %d\n", len(result))
+		}
+	}
+	return result
+}

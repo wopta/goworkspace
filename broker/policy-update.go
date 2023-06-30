@@ -26,7 +26,8 @@ func UpdatePolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	b := lib.ErrorByte(io.ReadAll(r.Body))
 	err = json.Unmarshal(b, &policy)
 	if err != nil {
-		return `{"uid":"` + policyUID + `", "success":"false"}`, `{"uid":"` + policyUID + `", "success":"false"}`, err
+		log.Println("UpdatePolicy: unable to unmarshal request body")
+		return `{"uid":"` + policyUID + `", "success":false}`, `{"uid":"` + policyUID + `", "success":false}`, nil
 	}
 
 	input = make(map[string]interface{}, 0)
@@ -43,7 +44,7 @@ func UpdatePolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 
 	lib.FireUpdate(firePolicy, policyUID, input)
 
-	return `{"uid":"` + policyUID + `", "success":"true"}`, `{"uid":"` + policyUID + `", "success":"true"}`, err
+	return `{"uid":"` + policyUID + `", "success":true}`, `{"uid":"` + policyUID + `", "success":true}`, err
 }
 
 func PatchPolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -60,18 +61,21 @@ func PatchPolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	b := lib.ErrorByte(io.ReadAll(r.Body))
 	err = json.Unmarshal(b, &updateValues)
 	if err != nil {
-		return `{"uid":"` + policyUID + `", "success":"false"}`, `{"uid":"` + policyUID + `", "success":"false"}`, err
+		log.Println("PatchPolicy: unable to unmarshal request body")
+		return `{"uid":"` + policyUID + `", "success":false}`, `{"uid":"` + policyUID + `", "success":false}`, nil
 	}
 
 	updateValues["updated"] = time.Now().UTC()
 
 	err = lib.UpdateFirestoreErr(firePolicy, policyUID, updateValues)
 	if err != nil {
-		return `{"uid":"` + policyUID + `", "success":"false"}`, `{"uid":"` + policyUID + `", "success":"false"}`, err
+		log.Println("PatchPolicy: error during policy update in firestore")
+		return `{"uid":"` + policyUID + `", "success":false}`, `{"uid":"` + policyUID + `", "success":false}`, nil
 	}
 
-	return `{"uid":"` + policyUID + `", "success":"true"}`, `{"uid":"` + policyUID + `", "success":"true"}`, err
+	return `{"uid":"` + policyUID + `", "success":true}`, `{"uid":"` + policyUID + `", "success":true}`, err
 }
+
 func DeletePolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err       error
@@ -80,23 +84,38 @@ func DeletePolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		request   PolicyDeleteReq
 	)
 	log.Println("DeletePolicy")
+	policyUID = r.Header.Get("uid")
 	guaranteFire := lib.GetDatasetByEnv(r.Header.Get("origin"), "guarante")
 	req := lib.ErrorByte(io.ReadAll(r.Body))
-	json.Unmarshal(req, &request)
+	err = json.Unmarshal(req, &request)
+	if err != nil {
+		log.Printf("DeletePolicy: unable to delete policy %s", policyUID)
+		return `{"uid":"` + policyUID + `", "success":false}`, `{"uid":"` + policyUID + `", "success":false}`, nil
+	}
 	firePolicy := lib.GetDatasetByEnv(r.Header.Get("origin"), "policy")
-	policyUID = r.Header.Get("uid")
-	docsnap := lib.GetFirestore(firePolicy, string(policyUID))
+	docsnap := lib.GetFirestore(firePolicy, policyUID)
 	docsnap.DataTo(&policy)
+	if policy.IsDeleted || !policy.CompanyEmit {
+		log.Printf("DeletePolicy: can't delete policy %s", policyUID)
+		return `{"uid":"` + policyUID + `", "success":false}`, `{"uid":"` + policyUID + `", "success":false}`, nil
+
+	}
 	policy.IsDeleted = true
-	policy.DeleteDesc = request.DeleteDesc
+	policy.DeleteCode = request.Code
+	policy.DeleteDesc = request.Description
+	policy.DeleteDate = request.Date
+	policy.RefundType = request.RefundType
 	policy.Status = models.PolicyStatusDeleted
 	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusDeleted)
 	lib.SetFirestore(firePolicy, policyUID, policy)
 	policy.BigquerySave(r.Header.Get("origin"))
 	models.SetGuaranteBigquery(policy, "delete", guaranteFire)
-	return `{"uid":"` + policyUID + `", "success":"true"}`, `{"uid":"` + policyUID + `", "success":"true"}`, err
+	return `{"uid":"` + policyUID + `", "success":true}`, `{"uid":"` + policyUID + `", "success":true}`, err
 }
 
 type PolicyDeleteReq struct {
-	DeleteDesc string `json:"deleteDesc,omitempty"`
+	Code        string    `json:"code,omitempty"`
+	Description string    `json:"description,omitempty"`
+	Date        time.Time `json:"date"`
+	RefundType  string    `json:"refundType,omitempty"`
 }

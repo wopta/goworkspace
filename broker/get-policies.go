@@ -11,6 +11,16 @@ import (
 	"time"
 )
 
+type GetPoliciesReq struct {
+	Queries []models.Query `json:"queries,omitempty"`
+	Limit   int            `json:"limit"`
+	Page    int            `json:"page"`
+}
+
+type GetPoliciesResp struct {
+	Policies []models.Policy `json:"policies"`
+}
+
 func GetPoliciesFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		req        GetPoliciesReq
@@ -60,19 +70,4 @@ func GetPoliciesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 
 	jsonOut, err := json.Marshal(response)
 	return string(jsonOut), response, err
-}
-
-type GetPoliciesResp struct {
-	Policies []models.Policy `json:"policies"`
-}
-
-type GetPoliciesReq struct {
-	Queries []struct {
-		Field string      `json:"field"`
-		Op    string      `json:"op"`
-		Value interface{} `json:"value"`
-		Type  string      `json:"type"`
-	} `json:"queries,omitempty"`
-	Limit int `json:"limit"`
-	Page  int `json:"page"`
 }

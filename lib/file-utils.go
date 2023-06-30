@@ -4,12 +4,14 @@ import (
 	"context"
 	"encoding/csv"
 	"fmt"
+	"google.golang.org/api/iterator"
 	"io"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"strconv"
+	"time"
 
 	"cloud.google.com/go/storage"
 	fireStorage "firebase.google.com/go"
@@ -34,6 +36,7 @@ func Files(path string) []string {
 	}
 	return res
 }
+
 func readCsvFile(filePath string) [][]string {
 	f, err := os.Open(filePath)
 	if err != nil {
@@ -49,6 +52,7 @@ func readCsvFile(filePath string) [][]string {
 
 	return records
 }
+
 func ReadDir() {
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {
@@ -61,6 +65,26 @@ func ReadDir() {
 	}
 	fmt.Println(dir)
 }
+
+func ReadLocalDirContent(folderPath string) [][]byte {
+	var (
+		res [][]byte
+	)
+	dir, err := os.ReadDir(folderPath)
+	CheckError(err)
+
+	for _, contentDir := range dir {
+		if contentDir.IsDir() {
+			res = append(res, ReadLocalDirContent(folderPath+"/"+contentDir.Name())...)
+			continue
+		}
+		fileByte := ErrorByte(os.ReadFile(folderPath + "/" + contentDir.Name()))
+		res = append(res, fileByte)
+	}
+
+	return res
+}
+
 func GetFromStorage(bucket string, file string, keyPath string) []byte {
 	//var credential models.Credential
 	log.Println("start GetFromStorage")
@@ -75,6 +99,7 @@ func GetFromStorage(bucket string, file string, keyPath string) []byte {
 	CheckError(err)
 	return slurp
 }
+
 func GetFromStorageErr(bucket string, file string, keyPath string) ([]byte, error) {
 	//var credential models.Credential
 	log.Println("start GetFromStorage")
@@ -99,9 +124,50 @@ func GetReaderGCS(bucket string, file string, keyPath string) io.Reader {
 	CheckError(err)
 	return slurp
 }
+
 func deleteFiles() {
 
 }
+
+func ReadStorageDirContent(bucketName, folderPath string) [][]byte {
+	var (
+		res [][]byte
+	)
+
+	ctx := context.Background()
+	client, err := storage.NewClient(ctx)
+	if err != nil {
+		return nil
+	}
+	defer client.Close()
+
+	ctx, cancel := context.WithTimeout(ctx, time.Second*10)
+	defer cancel()
+
+	it := client.Bucket(bucketName).Objects(ctx, &storage.Query{
+		Prefix:    folderPath,
+		Delimiter: "/",
+	})
+
+	for {
+		attrs, err := it.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			return nil
+		}
+		// this checks if blob correspond to a directory
+		if attrs.ContentType == "" {
+			continue
+		}
+		file := GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), attrs.Name, "")
+		res = append(res, file)
+	}
+
+	return res
+}
+
 func PutToStorage(bucketname string, path string, file []byte) string {
 
 	log.Println("start PutToStorage")
@@ -115,6 +181,7 @@ func PutToStorage(bucketname string, path string, file []byte) string {
 	return "gs://" + bucketname + "/" + path
 
 }
+
 func PutGoogleStorage(bucketname string, path string, file []byte, contentType string) (string, error) {
 	// some process request msg, decode base64 to image byte
 	// create image file in current directory with os.create()
@@ -160,6 +227,7 @@ func PutToFireStorage(bucketname string, path string, file []byte) string {
 	return "gs://positive-apex-350507.appspot.com/UID:0g10fVw0fdOM5Ugho1tQJcOcRVD3/image_profile/profileImage"
 
 }
+
 func GetFilesByEnv(file string) []byte {
 	var res1 []byte
 	switch os.Getenv("env") {
@@ -176,6 +244,22 @@ func GetFilesByEnv(file string) []byte {
 	}
 	return res1
 }
+
+func GetFolderContentByEnv(folderName string) [][]byte {
+	var res [][]byte
+
+	switch os.Getenv("env") {
+	case "local":
+		res = ReadLocalDirContent("../function-data/dev/" + folderName)
+	case "dev":
+		res = ReadStorageDirContent("function-data", folderName)
+	case "prod":
+		res = ReadStorageDirContent("core-350507-function-data", folderName)
+	}
+
+	return res
+}
+
 func GetByteByEnv(file string, isLocal bool) []byte {
 	var res1 []byte
 	switch os.Getenv("env") {

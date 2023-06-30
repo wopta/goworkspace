@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"cloud.google.com/go/civil"
@@ -41,6 +42,7 @@ type Policy struct {
 	CodeCompany       string                       `firestore:"codeCompany,omitempty" json:"codeCompany,omitempty" bigquery:"codeCompany"`
 	Status            string                       `firestore:"status,omitempty" json:"status,omitempty" bigquery:"status"`
 	StatusHistory     []string                     `firestore:"statusHistory,omitempty" json:"statusHistory,omitempty" bigquery:"-"`
+	BigStatusHistory  string                       `firestore:"-" json:"-" bigquery:"statusHistory"`
 	RenewHistory      *[]RenewHistory              `firestore:"renewHistory,omitempty" json:"renewHistory,omitempty" bigquery:"-"`
 	Transactions      *[]Transaction               `firestore:"transactions,omitempty" json:"transactions,omitempty" bigquery:"-"`
 	TransactionsUid   *[]string                    `firestore:"transactionsUid,omitempty" json:"transactionsUid ,omitempty" bigquery:"-"`
@@ -62,7 +64,10 @@ type Policy struct {
 	Payment           string                       `firestore:"payment,omitempty" json:"payment,omitempty" bigquery:"payment"`
 	PaymentType       string                       `firestore:"paymentType,omitempty" json:"paymentType,omitempty" bigquery:"paymentType"`
 	PaymentSplit      string                       `firestore:"paymentSplit,omitempty" json:"paymentSplit,omitempty" bigquery:"paymentSplit"`
+	DeleteCode        string                       `json:"deleteCode,omitempty" firestore:"deleteCode,omitempty" bigquery:"-"`
 	DeleteDesc        string                       `firestore:"deleteDesc,omitempty" json:"deleteDesc,omitempty" bigquery:"-"`
+	DeleteDate        time.Time                    `json:"deleteDate,omitempty" firestore:"deleteDate,omitempty" bigquery:"-"`
+	RefundType        string                       `json:"refundType,omitempty" firestore:"refundType,omitempty" bigquery:"-"`
 	IsPay             bool                         `firestore:"isPay" json:"isPay,omitempty" bigquery:"isPay"`
 	IsAutoRenew       bool                         `firestore:"isAutoRenew,omitempty" json:"isAutoRenew,omitempty" bigquery:"isAutoRenew"`
 	IsRenew           bool                         `firestore:"isRenew" json:"isRenew,omitempty" bigquery:"isRenew"`
@@ -210,6 +215,7 @@ func (policy *Policy) BigquerySave(origin string) {
 	policy.BigRenewDate = civil.DateTimeOf(policy.RenewDate)
 	policy.BigEndDate = civil.DateTimeOf(policy.EndDate)
 	policy.BigEmitDate = civil.DateTimeOf(policy.EmitDate)
+	policy.BigStatusHistory = strings.Join(policy.StatusHistory, ",")
 	log.Println(" policy save big query: " + policy.Uid)
 	e = lib.InsertRowsBigQuery("wopta", policyBig, policy)
 	log.Println(" policy save big query error: ", e)

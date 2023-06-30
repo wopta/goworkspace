@@ -58,6 +58,50 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 			// Update the first transaction in policy as paid
 			transaction.SetPolicyFirstTransactionPaid(uid, schedule, origin)
 
+			// Update agency if present
+			if p.AgencyUid != "" {
+				var agency models.Agency
+				fireAgency := lib.GetDatasetByEnv(origin, models.AgencyCollection)
+				docsnap, err := lib.GetFirestoreErr(fireAgency, p.AgentUid)
+				lib.CheckError(err)
+				docsnap.DataTo(&agency)
+				agency.Policies = append(agency.Policies, p.Uid)
+				found := false
+				for _, contractorUid := range agency.Portfolio {
+					if contractorUid == p.Contractor.Uid {
+						found = true
+						break
+					}
+				}
+				if !found {
+					agency.Portfolio = append(agency.Portfolio, p.Contractor.Uid)
+				}
+				err = lib.SetFirestoreErr(fireAgency, agency.Uid, agency)
+				lib.CheckError(err)
+			}
+
+			// Update agent if present
+			if p.AgentUid != "" {
+				var agent models.Agent
+				fireAgent := lib.GetDatasetByEnv(origin, models.AgentCollection)
+				docsnap, err := lib.GetFirestoreErr(fireAgent, p.AgentUid)
+				lib.CheckError(err)
+				docsnap.DataTo(&agent)
+				agent.Policies = append(agent.Policies, p.Uid)
+				found := false
+				for _, contractorUid := range agent.Portfolio {
+					if contractorUid == p.Contractor.Uid {
+						found = true
+						break
+					}
+				}
+				if !found {
+					agent.Portfolio = append(agent.Portfolio, p.Contractor.Uid)
+				}
+				err = lib.SetFirestoreErr(fireAgent, agent.Uid, agent)
+				lib.CheckError(err)
+			}
+
 			// Send mail with the contract to the user
 			log.Println("Payment: " + uid + " sendMail ")
 			var contractbyte []byte

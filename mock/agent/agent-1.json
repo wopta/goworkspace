@@ -1,0 +1,33 @@
+{
+    "user": {
+        "uid": "",
+        "name": "Mario",
+        "surname": "Rossi",
+        "mail": "mario@rossi.it",
+        "authId": ""
+    },
+    "managerUid": "",
+    "agencyUid": "",
+    "agents": [],
+    "portfolio": [],
+    "isActive": true,
+    "products": [
+        {
+            "name": "life",
+            "nameDesc": "Wopta per te Vita",
+            "version": "v1",
+            "steps": [],
+            "companies": [
+                {
+                    "name": "axa",
+                    "mandate": {
+                        "commission": 2,
+                        "commissionRenew": 2
+                    }
+                }
+            ]
+        }
+    ],
+    "policies": [],
+    "ruiCode": "E000000002"
+}

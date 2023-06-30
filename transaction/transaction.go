@@ -57,6 +57,7 @@ func SetPolicyFirstTransactionPaid(policyUid string, scheduleDate string, origin
 	transaction.Status = models.TransactionStatusPay
 	transaction.StatusHistory = append(transaction.StatusHistory, models.TransactionStatusPay)
 	transaction.PayDate = time.Now().UTC()
+	transaction.TransactionDate = time.Now().UTC()
 	lib.SetFirestore(fireTransactions, transaction.Uid, transaction)
 	transaction.BigQuerySave(origin)
 }

@@ -20,8 +20,10 @@ import (
 )
 
 type ManualPaymentPayload struct {
-	PaymentMethod string `json:"paymentMethod"`
-	Note          string `json:"note"`
+	PaymentMethod   string    `json:"paymentMethod"`
+	PayDate         time.Time `json:"payDate"`
+	TransactionDate time.Time `json:"transactionDate"`
+	Note            string    `json:"note"`
 }
 
 func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -30,9 +32,17 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 	defer r.Body.Close()
 	var payload ManualPaymentPayload
 
-	err := lib.CheckPayload[ManualPaymentPayload](body, &payload, []string{"paymentMethod"})
+	err := lib.CheckPayload[ManualPaymentPayload](body, &payload, []string{"paymentMethod", "payDate", "transactionDate"})
 	if err != nil {
 		return "", nil, err
+	}
+
+	methods := GetAllPaymentMethods()
+	isMethodAllowed := lib.SliceContains[string](methods, payload.PaymentMethod)
+
+	if !isMethodAllowed {
+		log.Printf("ManualPaymentFx ERROR: %s", errPaymentMethodNotAllowed)
+		return "", nil, errors.New(errPaymentMethodNotAllowed)
 	}
 
 	origin := r.Header.Get("origin")
@@ -51,8 +61,8 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 	lib.CheckError(err)
 
 	if t.IsPay {
-		log.Printf("ManualPaymentFx ERROR: %s", ERR_TR_PAID)
-		return "", nil, errors.New(ERR_TR_PAID)
+		log.Printf("ManualPaymentFx ERROR: %s", errTransactionPaid)
+		return "", nil, errors.New(errTransactionPaid)
 	}
 
 	firePolicyTransactions := transaction.GetPolicyTransactions(origin, t.PolicyUid)
@@ -71,8 +81,8 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 	}
 
 	if !canPayTransaction {
-		log.Printf("ManualPaymentFx ERROR: %s", ERR_TR_OUT_OF_ORDER)
-		return "", nil, errors.New(ERR_TR_OUT_OF_ORDER)
+		log.Printf("ManualPaymentFx ERROR: %s", errTransactionOutOfOrder)
+		return "", nil, errors.New(errTransactionOutOfOrder)
 	}
 
 	docsnap, err = lib.GetFirestoreErr(firePolicies, t.PolicyUid)
@@ -83,8 +93,8 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 	lib.CheckError(err)
 
 	if !p.IsSign {
-		log.Printf("ManualPaymentFx ERROR: %s", ERR_PL_NOT_SIGNED)
-		return "", nil, errors.New(ERR_PL_NOT_SIGNED)
+		log.Printf("ManualPaymentFx ERROR: %s", errPolicyNotSigned)
+		return "", nil, errors.New(errPolicyNotSigned)
 	}
 
 	ManualPayment(&t, origin, &payload)
@@ -115,7 +125,8 @@ func ManualPayment(transaction *models.Transaction, origin string, payload *Manu
 	transaction.PaymentMethod = payload.PaymentMethod
 	transaction.PaymentNote = payload.Note
 	transaction.IsPay = true
-	transaction.PayDate = time.Now().UTC()
+	transaction.PayDate = payload.PayDate
+	transaction.TransactionDate = payload.TransactionDate
 	transaction.Status = models.TransactionStatusPay
 	transaction.StatusHistory = append(transaction.StatusHistory, models.TransactionStatusPay)
 

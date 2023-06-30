@@ -4,8 +4,10 @@ import (
 	"context"
 	"log"
 	"os"
+	"time"
 
 	"cloud.google.com/go/bigquery"
+	"cloud.google.com/go/civil"
 )
 
 func getBigqueryClient() *bigquery.Client {
@@ -29,4 +31,12 @@ func QueryRowsBigQuery[T any](datasetID string, tableID string, query string) (*
 	queryi := client.Query(query)
 	iter, e := queryi.Read(ctx)
 	return iter, e
+}
+
+func GetBigQueryNullDateTime(date time.Time) bigquery.NullDateTime {
+	nilTime := time.Time{}
+	return bigquery.NullDateTime{
+		DateTime: civil.DateTimeOf(date),
+		Valid:    date != nilTime,
+	}
 }

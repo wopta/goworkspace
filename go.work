@@ -8,7 +8,6 @@ use(
     ./quote
     ./models
     ./wiseproxy
-    ./blockchain
     ./accounting
     ./document
     ./appcheck-proxy
@@ -28,4 +27,6 @@ use(
     ./sellable
     ./transaction
     ./policy
+    ./mga
+    ./inclusive
 )
