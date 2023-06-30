@@ -27,7 +27,7 @@ func Test(w http.ResponseWriter, r *http.Request) {
 	lib.EnableCors(&w, r)
 	w.Header().Set("Access-Control-Allow-Methods", "POST")
 
-	creationDateFrom := time.Now().AddDate(0, 0, 9)
+	creationDateFrom := time.Now().AddDate(0, 0, -9)
 	q := lib.Firequeries{
 		Queries: []lib.Firequery{
 			{
