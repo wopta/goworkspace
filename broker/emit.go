@@ -9,14 +9,29 @@ import (
 	"time"
 
 	"cloud.google.com/go/civil"
-	doc "github.com/wopta/goworkspace/document"
-	lib "github.com/wopta/goworkspace/lib"
-	mail "github.com/wopta/goworkspace/mail"
-	models "github.com/wopta/goworkspace/models"
-	pay "github.com/wopta/goworkspace/payment"
+	"github.com/wopta/goworkspace/document"
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/mail"
+	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/payment"
 )
 
-func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+type EmitResponse struct {
+	UrlPay  string `firestore:"urlPay,omitempty" json:"urlPay,omitempty"`
+	UrlSign string `firestore:"urlSign,omitempty" json:"urlSign,omitempty"`
+	Uid     string `firestore:"uid,omitempty" json:"uid,omitempty"`
+}
+
+type EmitRequest struct {
+	Uid          string              `firestore:"uid,omitempty" json:"uid,omitempty"`
+	Payment      string              `firestore:"payment,omitempty" json:"payment,omitempty"`
+	PaymentType  string              `firestore:"paymentType,omitempty" json:"paymentType,omitempty"`
+	PaymentSplit string              `firestore:"paymentSplit,omitempty" json:"paymentSplit,omitempty"`
+	Survay       *[]models.Statement `firestore:"survey,omitempty" json:"survey,omitempty"`
+	Statements   *[]models.Statement `firestore:"statements,omitempty" json:"statements,omitempty"`
+}
+
+func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		result     EmitRequest
 		e          error
@@ -64,18 +79,18 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	policy.Number = tot
 	policy.NumberCompany = numb
 	policy.CodeCompany = company
-	p := <-doc.ContractObj(policy)
+	p := <-document.ContractObj(policy)
 
 	policy.DocumentName = p.LinkGcs
-	_, res, _ := doc.NamirialOtpV6(policy, r.Header.Get("origin"))
+	_, res, _ := document.NamirialOtpV6(policy, r.Header.Get("origin"))
 	policy.ContractFileId = res.FileId
 	policy.IdSign = res.EnvelopeId
-	var payRes pay.FabrickPaymentResponse
+	var payRes payment.FabrickPaymentResponse
 	if policy.PaymentSplit == string(models.PaySplitYear) {
-		payRes = pay.FabbrickYearPay(policy, r.Header.Get("origin"))
+		payRes = payment.FabbrickYearPay(policy, r.Header.Get("origin"))
 	}
 	if policy.PaymentSplit == string(models.PaySplitMonthly) {
-		payRes = pay.FabbrickMontlyPay(policy, r.Header.Get("origin"))
+		payRes = payment.FabbrickMontlyPay(policy, r.Header.Get("origin"))
 	}
 	responseEmit := EmitResponse{UrlPay: *payRes.Payload.PaymentPageURL, UrlSign: res.Url}
 	policy.SignUrl = res.Url
@@ -88,19 +103,4 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	mail.SendMailSign(policy)
 	b, e := json.Marshal(responseEmit)
 	return string(b), responseEmit, e
-}
-
-type EmitResponse struct {
-	UrlPay  string `firestore:"urlPay,omitempty" json:"urlPay,omitempty"`
-	UrlSign string `firestore:"urlSign,omitempty" json:"urlSign,omitempty"`
-	Uid     string `firestore:"uid,omitempty" json:"uid,omitempty"`
-}
-
-type EmitRequest struct {
-	Uid          string              `firestore:"uid,omitempty" json:"uid,omitempty"`
-	Payment      string              `firestore:"payment,omitempty" json:"payment,omitempty"`
-	PaymentType  string              `firestore:"paymentType,omitempty" json:"paymentType,omitempty"`
-	PaymentSplit string              `firestore:"paymentSplit,omitempty" json:"paymentSplit,omitempty"`
-	Survay       *[]models.Statement `firestore:"survey,omitempty" json:"survey,omitempty"`
-	Statements   *[]models.Statement `firestore:"statements,omitempty" json:"statements,omitempty"`
 }
