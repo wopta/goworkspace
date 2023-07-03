@@ -39,7 +39,7 @@ type Transaction struct {
 	PolicyUid          string                `firestore:"policyUid,omitempty" json:"policyUid,omitempty" bigquery:"policyUid"`
 	Company            string                `firestore:"company,omitempty" json:"company,omitempty" bigquery:"company"`
 	NumberCompany      string                `firestore:"numberCompany,omitempty" json:"numberCompany,omitempty" bigquery:"numberCompany"`
-	StatusHistory      []string              `firestore:"statusHistory,omitempty" json:"statusHistory ,omitempty" bigquery:"-"`
+	StatusHistory      []string              `firestore:"statusHistory,omitempty" json:"statusHistory,omitempty" bigquery:"-"`
 	BigStatusHistory   string                `firestore:"-" json:"-" bigquery:"statusHistory"`
 	IsPay              bool                  `firestore:"isPay" json:"isPay,omitempty" bigquery:"isPay"`
 	IsEmit             bool                  `firestore:"isEmit" json:"isEmit,omitempty" bigquery:"isEmit"`
@@ -56,16 +56,12 @@ func TransactionToListData(query *firestore.DocumentIterator) []Transaction {
 	result := make([]Transaction, 0)
 	for {
 		d, err := query.Next()
-
 		if err != nil {
-
 		}
 		if err != nil {
 			if err == iterator.Done {
-
 				break
 			}
-
 		}
 		var value Transaction
 		e := d.DataTo(&value)
@@ -79,7 +75,6 @@ func TransactionToListData(query *firestore.DocumentIterator) []Transaction {
 }
 
 func SetTransactionPolicy(policy Policy, id string, amount float64, schedule string, Commissions float64, company string) Transaction {
-
 	return Transaction{
 		Amount:        amount,
 		Id:            id,
