@@ -29,4 +29,5 @@ use(
     ./policy
     ./mga
     ./inclusive
+    ./bpmn
 )
