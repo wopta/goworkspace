@@ -56,6 +56,7 @@ func BpmnFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 }
 func BpmnEngine(policy models.Policy) string {
 	// Init workflow with a name, and max concurrent tasks
+	log.Println("--------------------------BpmnEngine-------------------------------------------")
 	bpmnEngine := bpmn_engine.New("a name")
 	// basic example loading a BPMN from file,
 	filePath := "./serverless_function_source_code/test.bpmn"
@@ -79,7 +80,7 @@ func BpmnEngine(policy models.Policy) string {
 	return ""
 }
 func test(job bpmn_engine.ActivatedJob) {
-	fmt.Printf("int test: %v\n", "test")
+	log.Println("--------------------------Test-------------------------------------------")
 	fmt.Printf("job.GetState(): %v\n", job.GetState())
 	fmt.Printf(" job.GetVariable(policy): %v\n", job.GetVariable("policy"))
 }
