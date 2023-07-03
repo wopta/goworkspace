@@ -23,13 +23,13 @@ func Claim(w http.ResponseWriter, r *http.Request) {
 				Route:   "/v1",
 				Handler: PutClaimFx,
 				Method:  http.MethodPut,
-				Roles:   []string{models.UserRoleAll},
+				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager, models.UserRoleCustomer},
 			},
 			{
 				Route:   "/document/v1/:claimUid",
 				Handler: GetClaimDocumentFx,
 				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAll},
+				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager, models.UserRoleCustomer},
 			},
 		},
 	}
