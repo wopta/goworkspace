@@ -58,7 +58,8 @@ func BpmnEngine(policy models.Policy) string {
 	// Init workflow with a name, and max concurrent tasks
 	bpmnEngine := bpmn_engine.New("a name")
 	// basic example loading a BPMN from file,
-	process, err := bpmnEngine.LoadFromFile("test.bpmn")
+	filePath := "./serverless_function_source_code/test.bpmn"
+	process, err := bpmnEngine.LoadFromFile(filePath)
 	//lib.C
 	if err != nil {
 		panic("file \"simple_task.bpmn\" can't be read.")
