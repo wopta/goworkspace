@@ -69,6 +69,7 @@ type User struct {
 	IdentityDocuments []*IdentityDocument `json:"identityDocuments,omitempty" firestore:"identityDocuments,omitempty" bigquery:"-"`
 	AuthId            string              `json:"authId,omitempty" firestore:"authId,omitempty" bigquery:"-"`
 	Statements        []*Statement        `json:"statements,omitempty" firestore:"statements,omitempty" bigquery:"-"`
+	IsLegalPerson     bool                `json:"isLegalPerson,omitempty" firestore:"isLegalPerson,omitempty" bigquery:"-"`
 }
 
 type Consens struct {

@@ -12,6 +12,7 @@ import (
 	"github.com/google/uuid"
 	lib "github.com/wopta/goworkspace/lib"
 	mail "github.com/wopta/goworkspace/mail"
+	"github.com/wopta/goworkspace/models"
 	model "github.com/wopta/goworkspace/models"
 )
 
@@ -85,10 +86,17 @@ func put(w http.ResponseWriter, r *http.Request) {
 	}
 	obj.Attachments = &att
 
-	claims := append(*user.Claims, claim)
-	user.Claims = &claims
+	userClaims := make([]models.Claim, 0)
+	if user.Claims != nil {
+		userClaims = append(userClaims, *user.Claims...)
+	}
+	userClaims = append(userClaims, claim)
+
+	user.Claims = &userClaims
 	log.Println("SetFirestore")
-	lib.SetFirestore("users", claim.UserUid, user)
+	lib.UpdateFirestoreErr("users", claim.UserUid, map[string]interface{}{
+		"claims": userClaims,
+	})
 	mail.SendMail(obj)
 	// lib.PutFirestore("users")
 }

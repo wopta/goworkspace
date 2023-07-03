@@ -76,3 +76,7 @@ const (
 	AgentCollection  string = "agents"
 	AgencyCollection string = "agencies"
 )
+
+const (
+	VehiclePrivateUse string = "private"
+)
