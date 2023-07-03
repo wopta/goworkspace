@@ -79,6 +79,7 @@ func BpmnEngine(policy models.Policy) string {
 	return ""
 }
 func test(job bpmn_engine.ActivatedJob) {
+	fmt.Printf("int test: %v\n", "test")
 	fmt.Printf("job.GetState(): %v\n", job.GetState())
 	fmt.Printf(" job.GetVariable(policy): %v\n", job.GetVariable("policy"))
 }
