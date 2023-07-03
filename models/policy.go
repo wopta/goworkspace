@@ -44,7 +44,7 @@ type Policy struct {
 	BigStatusHistory  string                       `firestore:"-" json:"-" bigquery:"statusHistory"`
 	RenewHistory      *[]RenewHistory              `firestore:"renewHistory,omitempty" json:"renewHistory,omitempty" bigquery:"-"`
 	Transactions      *[]Transaction               `firestore:"transactions,omitempty" json:"transactions,omitempty" bigquery:"-"`
-	TransactionsUid   *[]string                    `firestore:"transactionsUid,omitempty" json:"transactionsUid ,omitempty" bigquery:"-"`
+	TransactionsUid   *[]string                    `firestore:"transactionsUid,omitempty" json:"transactionsUid,omitempty" bigquery:"-"`
 	Company           string                       `firestore:"company,omitempty" json:"company,omitempty" bigquery:"company"`
 	Name              string                       `firestore:"name,omitempty" json:"name,omitempty" bigquery:"name"`
 	NameDesc          string                       `firestore:"nameDesc,omitempty" json:"nameDesc,omitempty" bigquery:"nameDesc"`
