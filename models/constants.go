@@ -72,4 +72,6 @@ const (
 const (
 	AgentCollection  string = "agents"
 	AgencyCollection string = "agencies"
+	UserCollection   string = "users"
+	PolicyCollection string = "policy"
 )
