@@ -74,7 +74,8 @@ func BpmnEngine(policy models.Policy) string {
 
 	// setup some variables
 	variables := map[string]interface{}{}
-	variables["policy"] = policy
+	//variables["policy"] = policy
+	variables["policy"] = "test"
 	// and execute the process
 	bpmnEngine.CreateAndRunInstance(process.ProcessKey, variables)
 	return ""
