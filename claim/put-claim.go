@@ -2,10 +2,6 @@ package claim
 
 import (
 	"encoding/base64"
-	"github.com/google/uuid"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/mail"
-	"github.com/wopta/goworkspace/models"
 	"io"
 	"log"
 	"net/http"
@@ -13,14 +9,19 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/google/uuid"
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/mail"
+	"github.com/wopta/goworkspace/models"
 )
 
 func PutClaimFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.Println("PutClaim")
+	log.Println("[PutClaimFx]")
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
-	log.Println("[PutClaim] " + string(body))
+	log.Println("[PutClaimFx] " + string(body))
 
 	claim, err := models.UnmarshalClaim(body)
 	lib.CheckError(err)
@@ -39,8 +40,8 @@ func PutClaim(idToken string, origin string, claim *models.Claim) (string, inter
 
 	authToken, err := lib.VerifyUserIdToken(idToken)
 	if err != nil {
-		log.Printf("[GetClaimDocument] invalid idToken, error %s", err.Error())
-		return "", "", err
+		log.Printf("[PutClaim] invalid idToken, error %s", err.Error())
+		return `{"success":false}`, `{"success":false}`, nil
 	}
 
 	log.Printf("[PutClaim] get policy %s from firestore", claim.PolicyId)
@@ -76,18 +77,18 @@ func PutClaim(idToken string, origin string, claim *models.Claim) (string, inter
 	fireUsers := lib.GetDatasetByEnv(origin, models.UserCollection)
 	docsnap, err = lib.GetFirestoreErr(fireUsers, claim.UserUid)
 	if err != nil {
-		return "", nil, err
+		return `{"success":false}`, `{"success":false}`, nil
 	}
 	err = docsnap.DataTo(&user)
 	if err != nil {
-		return "", nil, err
+		return `{"success":false}`, `{"success":false}`, nil
 	}
-	log.Println("User: ", user)
+	log.Println("[PutClaim] User: ", user)
 
 	obj.From = "noreply@wopta.it"
 	obj.To = []string{"sinistri@wopta.it"}
-	obj.Message = `<p>ciao il cliente ` + claim.Name + ` ` + claim.Surname + `</p> <p>desidera notificare un sinistro per la polizza: ` + claim.PolicyId + ` per i seguenti motivi: ` + claim.Description + `</p> `
-	obj.Subject = "Notifica sinisto " + claim.PolicyId
+	obj.Message = `<p>Ciao il cliente ` + claim.Name + ` ` + claim.Surname + `</p> <p>desidera notificare un sinistro per la polizza: ` + claim.PolicyNumber + ` per i seguenti motivi: ` + claim.Description + `</p> `
+	obj.Subject = "Notifica sinisto polizza " + claim.PolicyNumber
 	obj.IsHtml = true
 	if len(claim.Documents) > 0 {
 		obj.IsAttachment = true
@@ -102,7 +103,7 @@ func PutClaim(idToken string, origin string, claim *models.Claim) (string, inter
 		}
 		gsLink := lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "assets/users/"+claim.UserUid+"/claims/"+
 			claim.ClaimUid+"/"+doc.FileName, byteFile)
-		att = append(att, mail.Attachment{Byte: doc.Byte, Name: doc.FileName, ContentType: doc.ContentType})
+		att = append(att, mail.Attachment{Byte: doc.Byte, Name: doc.Name, FileName: doc.FileName, ContentType: doc.ContentType})
 		claim.Documents[i].Byte = ""
 		claim.Documents[i].Link = gsLink
 	}

@@ -3,12 +3,14 @@ package claim
 import (
 	"encoding/base64"
 	"encoding/json"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
+	"errors"
 	"io"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 )
 
 type GetClaimDocumentReq struct {
@@ -21,58 +23,67 @@ type GetClaimDocumentResp struct {
 
 func GetClaimDocumentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		user     models.User
 		request  GetClaimDocumentReq
 		response GetClaimDocumentResp
 	)
-	log.Println("GetClaimDocument")
+	log.Println("[GetClaimDocumentFx]")
 
-	idToken := r.Header.Get("Authorization")
-	authToken, err := lib.VerifyUserIdToken(idToken)
+	authToken, err := lib.VerifyUserIdToken(r.Header.Get("Authorization"))
 	if err != nil {
-		log.Printf("[GetClaimDocument] invalid idToken, error %s", err.Error())
-		return "", "", err
-	}
-
-	claimUID := r.Header.Get("claimUid")
-
-	fireUser := lib.GetDatasetByEnv(r.Header.Get("Origin"), models.UserCollection)
-	docsnap, err := lib.GetFirestoreErr(fireUser, authToken.UID)
-	if err != nil {
-		log.Printf("[GetClaimDocument] error retrieving user %s from database, error message %s", authToken.UID, err.Error())
-		return "", "", err
-	}
-	err = docsnap.DataTo(&user)
-	if err != nil {
-		log.Println("[GetClaimDocument] error convert docsnap to user")
+		log.Printf("[GetClaimDocumentFx] invalid idToken, error %s", err.Error())
 		return "", "", err
 	}
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
-	log.Println("[GetClaimDocument] " + string(body))
+	log.Println("[GetClaimDocumentFx] " + string(body))
 	err = json.Unmarshal(body, &request)
 	if err != nil {
-		log.Printf("[GetClaimDocument] error parsing body, error %s", err.Error())
+		log.Printf("[GetClaimDocumentFx] error parsing body, error %s", err.Error())
 		return "", "", err
+	}
+
+	res, err := getClaimDocument(r.Header.Get("Origin"), authToken.UID, r.Header.Get("claimUid"), request.DocumentName)
+	if err != nil {
+		log.Printf("[GetClaimDocumentFx] error getting document, error %s", err.Error())
+		return "", "", err
+	}
+
+	response.Document = res
+
+	jsonResponse, err := json.Marshal(response)
+
+	return string(jsonResponse), response, err
+}
+
+func getClaimDocument(origin, userUid, claimUid, fileName string) (string, error) {
+	var user models.User
+
+	fireUser := lib.GetDatasetByEnv(origin, models.UserCollection)
+	docsnap, err := lib.GetFirestoreErr(fireUser, userUid)
+	if err != nil {
+		log.Printf("[getClaimDocument] error retrieving user %s from database, error message %s", userUid, err.Error())
+		return "", err
+	}
+	err = docsnap.DataTo(&user)
+	if err != nil {
+		log.Println("[getClaimDocument] error convert docsnap to user")
+		return "", err
 	}
 
 	if user.Claims != nil {
 		for _, userClaim := range *user.Claims {
-			if userClaim.ClaimUid == claimUID {
+			if userClaim.ClaimUid == claimUid {
 				for _, document := range userClaim.Documents {
-					if document.FileName == request.DocumentName {
-						response.Document = base64.StdEncoding.EncodeToString(
-							lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "assets/users/"+authToken.UID+
-								"/claims/"+claimUID+"/"+document.FileName, ""))
-						break
+					if document.FileName == fileName {
+						return base64.StdEncoding.EncodeToString(
+							lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "assets/users/"+userUid+
+								"/claims/"+claimUid+"/"+document.FileName, "")), nil
 					}
 				}
 			}
 		}
 	}
 
-	jsonResponse, err := json.Marshal(response)
-
-	return string(jsonResponse), response, err
+	return "", errors.New("[getClaimDocument] not found")
 }
