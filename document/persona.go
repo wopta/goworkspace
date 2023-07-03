@@ -51,7 +51,9 @@ func PersonaGlobal(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 
 	companiesDescriptionSection(pdf, policy.Company)
 
-	pdf.AddPage()
+	if policy.HasGuarantee("IPM") {
+		pdf.AddPage()
+	}
 
 	personalDataHandlingSection(pdf, policy)
 

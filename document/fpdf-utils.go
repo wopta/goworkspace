@@ -29,6 +29,7 @@ func initFpdf() *fpdf.Fpdf {
 	pdf.SetMargins(10, 15, 10)
 	pdf.SetAuthor("Wopta Assicurazioni s.r.l", true)
 	pdf.SetCreationDate(time.Now().UTC())
+	pdf.SetAutoPageBreak(true, 18)
 	loadCustomFonts(pdf)
 	return pdf
 }
@@ -251,7 +252,6 @@ func printSurvey(pdf *fpdf.Fpdf, survey models.Survey, companyName string) error
 	if survey.CompanySign || survey.ContractorSign {
 		pdf.Ln(5)
 	}
-
 	if survey.CompanySign {
 		companySignature(pdf, companyName)
 	}
@@ -264,10 +264,11 @@ func printSurvey(pdf *fpdf.Fpdf, survey models.Survey, companyName string) error
 
 func checkSurveySpace(pdf *fpdf.Fpdf, survey models.Survey) {
 	var answer string
-	leftMargin, _, rightMargin, bottomMargin := pdf.GetMargins()
+	leftMargin, _, rightMargin, _ := pdf.GetMargins()
 	pageWidth, pageHeight := pdf.GetPageSize()
 	availableWidth := pageWidth - leftMargin - rightMargin - 2
 	requiredHeight := 0.0
+	currentY := pdf.GetY()
 
 	surveyTitle := survey.Title
 	surveySubtitle := survey.Subtitle
@@ -282,12 +283,12 @@ func checkSurveySpace(pdf *fpdf.Fpdf, survey models.Survey) {
 	if surveyTitle != "" {
 		setPinkBoldFont(pdf, titleTextSize)
 		lines := pdf.SplitText(surveyTitle, availableWidth)
-		requiredHeight += float64(titleTextSize * len(lines))
+		requiredHeight += 3.5 * float64(len(lines))
 	}
 	if surveySubtitle != "" {
 		setBlackBoldFont(pdf, standardTextSize)
 		lines := pdf.SplitText(surveySubtitle, availableWidth)
-		requiredHeight += float64(standardTextSize * len(lines))
+		requiredHeight += 3.5 * float64(len(lines))
 	}
 
 	for _, question := range survey.Questions {
@@ -315,14 +316,14 @@ func checkSurveySpace(pdf *fpdf.Fpdf, survey models.Survey) {
 		}
 
 		lines := pdf.SplitText(questionText+answer, availableWidth)
-		requiredHeight += float64(standardTextSize * len(lines))
+		requiredHeight += 3 * float64(len(lines))
 	}
 
 	if survey.ContractorSign || survey.CompanySign {
-		requiredHeight += 10
+		requiredHeight += 30
 	}
 
-	if (pageHeight-bottomMargin)-pdf.GetY() < requiredHeight {
+	if (pageHeight-18)-currentY < requiredHeight {
 		pdf.AddPage()
 	}
 }
@@ -362,20 +363,24 @@ func printStatement(pdf *fpdf.Fpdf, statement models.Statement, companyName stri
 		pdf.MultiCell(0, 3.5, text, "", fpdf.AlignLeft, false)
 	}
 	pdf.Ln(5)
+	//log.Printf("Y: %d\n", pdf.GetY())
 	if statement.CompanySign {
 		companySignature(pdf, companyName)
 	}
 	if statement.ContractorSign {
 		drawSignatureForm(pdf)
+		//log.Printf("Y: %d\n", pdf.GetY())
 		pdf.Ln(10)
 	}
+	//log.Printf("Y: %d\n", pdf.GetY())
 }
 
 func checkStatementSpace(pdf *fpdf.Fpdf, statement models.Statement) {
-	leftMargin, _, rightMargin, bottomMargin := pdf.GetMargins()
+	leftMargin, _, rightMargin, _ := pdf.GetMargins()
 	pageWidth, pageHeight := pdf.GetPageSize()
 	availableWidth := pageWidth - leftMargin - rightMargin - 2
 	requiredHeight := 0.0
+	currentY := pdf.GetY()
 
 	title := statement.Title
 	if statement.SimploTitle != "" {
@@ -389,12 +394,12 @@ func checkStatementSpace(pdf *fpdf.Fpdf, statement models.Statement) {
 	if title != "" {
 		setPinkBoldFont(pdf, titleTextSize)
 		lines := pdf.SplitText(title, availableWidth)
-		requiredHeight += float64(titleTextSize * len(lines))
+		requiredHeight += 3.5 * float64(len(lines))
 	}
 	if subtitle != "" {
 		setBlackBoldFont(pdf, standardTextSize)
 		lines := pdf.SplitText(subtitle, availableWidth)
-		requiredHeight += float64(standardTextSize * len(lines))
+		requiredHeight += 3.5 * float64(len(lines))
 	}
 	for _, question := range statement.Questions {
 		availableWidth = pageWidth - leftMargin - rightMargin - 2
@@ -422,14 +427,14 @@ func checkStatementSpace(pdf *fpdf.Fpdf, statement models.Statement) {
 		}
 
 		lines := pdf.SplitText(text+answer, availableWidth)
-		requiredHeight += float64(standardTextSize * len(lines))
+		requiredHeight += 3 * float64(len(lines))
 	}
 
 	if statement.ContractorSign || statement.CompanySign {
-		requiredHeight += 15
+		requiredHeight += 30
 	}
 
-	if (pageHeight-bottomMargin)-pdf.GetY() < requiredHeight {
+	if (pageHeight-18)-currentY < requiredHeight {
 		pdf.AddPage()
 	}
 }

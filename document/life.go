@@ -50,6 +50,8 @@ func LifeAxa(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 
 	offerResumeSection(pdf, policy)
 
+	pdf.AddPage()
+
 	paymentResumeSection(pdf, policy)
 
 	contractWithdrawlSection(pdf)
