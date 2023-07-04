@@ -17,6 +17,11 @@ import (
 	lib "github.com/wopta/goworkspace/lib"
 )
 
+const (
+	outerBoundary = "outer"
+	innerBoundary = "inner"
+)
+
 type loginAuth struct {
 	username, password string
 }
@@ -42,11 +47,8 @@ func (a *loginAuth) Next(fromServer []byte, more bool) ([]byte, error) {
 	}
 	return nil, nil
 }
-func addAttachment(message string, name string, contentType string, data string, close bool) string {
 
-	const (
-		boundary = "my-boundary-779"
-	)
+func addAttachment(message string, name string, contentType string, data string, close bool) string {
 	var ct string
 	if contentType == "" {
 		sct := strings.Split(name, ".")
@@ -59,12 +61,11 @@ func addAttachment(message string, name string, contentType string, data string,
 
 	//message += fmt.Sprintf("Content-Type: multipart/mixed; boundary=%s\n", boundary)
 	message += fmt.Sprintf("\r\n")
-	message += fmt.Sprintf("Content-Type: " + ct + ";\r\n")
-	message += fmt.Sprintf("Content-Transfer-Encoding: base64\r\n")
+	message += fmt.Sprintf("Content-Type: " + ct + "\r\n")
 	message += fmt.Sprintf("Content-Disposition: attachment; filename=\"" + name + "\"\r\n")
-
+	message += fmt.Sprintf("Content-Transfer-Encoding: base64\r\n")
 	message += fmt.Sprintf("\r\n" + string(data) + "\r\n")
-	message += fmt.Sprintf("\r\n--%s", boundary)
+	message += fmt.Sprintf("\r\n--%s", innerBoundary)
 	if close {
 		message += fmt.Sprintf("--")
 	}
@@ -77,14 +78,14 @@ func getContentType(ext string) string {
 	m["doc"] = "application/msword"
 	m["docx"] = "application/msword"
 	m["pdf"] = "application/pdf"
-	m["GIF"] = "immagine/gif"
-	m["jpeg"] = "immagine/jpeg"
-	m["jpg"] = "immagine/jpeg"
-	m["jpe"] = "immagine/jpeg"
-	m["PNG"] = "immagine/png"
-	m["png"] = "immagine/png"
-	m["tiff"] = "immagine/tiff"
-	m["tif"] = "immagine/tiff"
+	m["GIF"] = "image/gif"
+	m["jpeg"] = "image/jpeg"
+	m["jpg"] = "image/jpeg"
+	m["jpe"] = "image/jpeg"
+	m["PNG"] = "image/png"
+	m["png"] = "image/png"
+	m["tiff"] = "image/tiff"
+	m["tif"] = "image/tiff"
 	m["xls"] = "application/vnd.ms-excel"
 	m["xlsx"] = "application/vnd.ms-excel"
 	m["pptx"] = "application/vnd.ms-powerpoint"
@@ -94,6 +95,7 @@ func getContentType(ext string) string {
 	m["gzip"] = "application/x-gzip"
 	return m[ext]
 }
+
 func SendMail(obj MailRequest) {
 	var (
 		username = os.Getenv("EMAIL_USERNAME")
@@ -102,22 +104,13 @@ func SendMail(obj MailRequest) {
 		file []byte
 	)
 
-	const (
-		boundary = "my-boundary-779"
-	)
-
 	switch os.Getenv("env") {
 	case "local":
 		file = lib.ErrorByte(ioutil.ReadFile("../function-data/dev/mail/mail_template.html"))
-
 	case "dev":
 		file = lib.GetFromStorage("function-data", "mail/mail_template.html", "")
-
 	case "prod":
 		file = lib.GetFromStorage("core-350507-function-data", "mail/mail_template.html", "")
-
-	default:
-
 	}
 	tmplt := template.New("action")
 	var tpl bytes.Buffer
@@ -157,21 +150,27 @@ func SendMail(obj MailRequest) {
 		}
 		message += fmt.Sprintf("MIME-Version: 1.0\r\n")
 		if obj.IsAttachment {
-			message += fmt.Sprintf("Content-Type: multipart/alternative; boundary=%s\n", boundary)
-			message += fmt.Sprintf("\r\n--%s\r\n", boundary)
+			message += fmt.Sprintf("Content-Type: multipart/mixed; boundary=%s\n", outerBoundary)
+			message += fmt.Sprintf("\r\n--%s\r\n", outerBoundary)
 		}
 		if obj.IsHtml {
-			message += "Content-Type: text/html; charset=\"UTF-8\";\r\n"
+			message += "Content-Type: text/html; charset=\"UTF-8\"\r\n"
 			message += "\r\n" + tpl.String()
 			if obj.IsAttachment {
-				message += fmt.Sprintf("\r\n--%s\r\n", boundary)
+				message += fmt.Sprintf("\r\n\n--%s\r\n", outerBoundary)
+				message += fmt.Sprintf("Content-Type: multipart/mixed; boundary=%s\n", innerBoundary)
+				message += fmt.Sprintf("Content-Disposition: attachment")
+				message += fmt.Sprintf("\r\n\n--%s\r\n", innerBoundary)
 			}
 
 		} else {
-			message += "Content-Type:text/plain; charset=\"UTF-8\";\r\n"
+			message += "Content-Type:text/plain; charset=\"UTF-8\"\r\n"
 			message += "\r\n" + body
 			if obj.IsAttachment {
-				message += fmt.Sprintf("\r\n--%s\r\n", boundary)
+				message += fmt.Sprintf("\r\n\n--%s\r\n", outerBoundary)
+				message += fmt.Sprintf("Content-Type: multipart/mixed; boundary=%s\n", innerBoundary)
+				message += fmt.Sprintf("Content-Disposition: attachment")
+				message += fmt.Sprintf("\r\n\n--%s\r\n", innerBoundary)
 			}
 		}
 
@@ -186,6 +185,9 @@ func SendMail(obj MailRequest) {
 			}
 
 		}
+
+		message += fmt.Sprintf("\r\n\n--%s--\r\n", outerBoundary)
+
 		//message += "\r\n" + body
 		log.Println("MESSAGE:----------------------")
 		//log.Println(message)
