@@ -38,15 +38,26 @@ func PutClaim(idToken string, origin string, claim *models.Claim) (string, inter
 		policy models.Policy
 	)
 
-	authToken, err := lib.VerifyUserIdToken(idToken)
+	userAuthID, err := lib.GetUserIdFromIdToken(idToken)
 	if err != nil {
 		log.Printf("[PutClaim] invalid idToken, error %s", err.Error())
 		return `{"success":false}`, `{"success":false}`, nil
 	}
 
+	fireUsers := lib.GetDatasetByEnv(origin, models.UserCollection)
+	docsnap, err := lib.GetFirestoreErr(fireUsers, userAuthID)
+	if err != nil {
+		return `{"success":false}`, `{"success":false}`, nil
+	}
+	err = docsnap.DataTo(&user)
+	if err != nil {
+		return `{"success":false}`, `{"success":false}`, nil
+	}
+	log.Println("[PutClaim] User: ", user)
+
 	log.Printf("[PutClaim] get policy %s from firestore", claim.PolicyId)
 	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
-	docsnap, err := lib.GetFirestoreErr(firePolicy, claim.PolicyId)
+	docsnap, err = lib.GetFirestoreErr(firePolicy, claim.PolicyId)
 	if err != nil {
 		log.Printf("[PutClaim] error retrieving policy %s from firestore, error message: %s", claim.PolicyId, err.Error())
 		return `{"success":false}`, `{"success":false}`, nil
@@ -57,7 +68,7 @@ func PutClaim(idToken string, origin string, claim *models.Claim) (string, inter
 		return `{"success":false}`, `{"success":false}`, nil
 	}
 
-	if authToken.UID != policy.Contractor.Uid {
+	if userAuthID != policy.Contractor.Uid {
 		log.Println("[PutClaim] claim requester and policy contractor are not the same")
 		return `{"success":false}`, `{"success":false}`, nil
 	}
@@ -74,21 +85,10 @@ func PutClaim(idToken string, origin string, claim *models.Claim) (string, inter
 		claim.Documents[index].FileName = splitName[0] + "_" + timestamp + "." + splitName[1]
 	}
 
-	fireUsers := lib.GetDatasetByEnv(origin, models.UserCollection)
-	docsnap, err = lib.GetFirestoreErr(fireUsers, claim.UserUid)
-	if err != nil {
-		return `{"success":false}`, `{"success":false}`, nil
-	}
-	err = docsnap.DataTo(&user)
-	if err != nil {
-		return `{"success":false}`, `{"success":false}`, nil
-	}
-	log.Println("[PutClaim] User: ", user)
-
 	obj.From = "noreply@wopta.it"
 	obj.To = []string{"sinistri@wopta.it"}
-	obj.Message = `<p>Ciao il cliente ` + claim.Name + ` ` + claim.Surname + `</p> <p>desidera notificare un sinistro per la polizza: ` + claim.PolicyNumber + ` per i seguenti motivi: ` + claim.Description + `</p> `
-	obj.Subject = "Notifica sinisto polizza " + claim.PolicyNumber
+	obj.Message = `<p>Ciao il cliente ` + user.Name + ` ` + user.Surname + `</p> <p>desidera notificare un sinistro per la polizza: ` + policy.CodeCompany + ` per i seguenti motivi: ` + claim.Description + `</p> `
+	obj.Subject = "Notifica sinisto polizza " + policy.CodeCompany
 	obj.IsHtml = true
 	if len(claim.Documents) > 0 {
 		obj.IsAttachment = true
@@ -101,7 +101,7 @@ func PutClaim(idToken string, origin string, claim *models.Claim) (string, inter
 			log.Println("[PutClaim] error decoding base64 document encoding")
 			return `{"success":false}`, `{"success":false}`, nil
 		}
-		gsLink := lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "assets/users/"+claim.UserUid+"/claims/"+
+		gsLink := lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "assets/users/"+userAuthID+"/claims/"+
 			claim.ClaimUid+"/"+doc.FileName, byteFile)
 		att = append(att, mail.Attachment{Byte: doc.Byte, Name: doc.Name, FileName: doc.FileName, ContentType: doc.ContentType})
 		claim.Documents[i].Byte = ""
@@ -115,8 +115,8 @@ func PutClaim(idToken string, origin string, claim *models.Claim) (string, inter
 	}
 	*user.Claims = append(*user.Claims, *claim)
 
-	log.Printf("[PutClaim] update user %s on firestore", claim.UserUid)
-	err = lib.UpdateFirestoreErr(fireUsers, claim.UserUid, map[string]interface{}{
+	log.Printf("[PutClaim] update user %s on firestore", userAuthID)
+	err = lib.UpdateFirestoreErr(fireUsers, userAuthID, map[string]interface{}{
 		"claims":  user.Claims,
 		"updated": time.Now().UTC(),
 	})
