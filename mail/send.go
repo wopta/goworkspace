@@ -17,6 +17,11 @@ import (
 	lib "github.com/wopta/goworkspace/lib"
 )
 
+const (
+	outerBoundary = "outer"
+	innerBoundary = "inner"
+)
+
 type loginAuth struct {
 	username, password string
 }
@@ -42,12 +47,8 @@ func (a *loginAuth) Next(fromServer []byte, more bool) ([]byte, error) {
 	}
 	return nil, nil
 }
-func addAttachment(message string, name string, contentType string, data string, close bool) string {
 
-	const (
-		//boundary = "my-boundary-779"
-		innerBoundary = "inner"
-	)
+func addAttachment(message string, name string, contentType string, data string, close bool) string {
 	var ct string
 	if contentType == "" {
 		sct := strings.Split(name, ".")
@@ -63,8 +64,6 @@ func addAttachment(message string, name string, contentType string, data string,
 	message += fmt.Sprintf("Content-Type: " + ct + "\r\n")
 	message += fmt.Sprintf("Content-Disposition: attachment; filename=\"" + name + "\"\r\n")
 	message += fmt.Sprintf("Content-Transfer-Encoding: base64\r\n")
-	//message += fmt.Sprintf("Content-ID: <" + name + ">\r\n")
-
 	message += fmt.Sprintf("\r\n" + string(data) + "\r\n")
 	message += fmt.Sprintf("\r\n--%s", innerBoundary)
 	if close {
@@ -96,6 +95,7 @@ func getContentType(ext string) string {
 	m["gzip"] = "application/x-gzip"
 	return m[ext]
 }
+
 func SendMail(obj MailRequest) {
 	var (
 		username = os.Getenv("EMAIL_USERNAME")
@@ -104,24 +104,13 @@ func SendMail(obj MailRequest) {
 		file []byte
 	)
 
-	const (
-		//boundary = "my-boundary-779"
-		outerBoundary = "outer"
-		innerBoundary = "inner"
-	)
-
 	switch os.Getenv("env") {
 	case "local":
 		file = lib.ErrorByte(ioutil.ReadFile("../function-data/dev/mail/mail_template.html"))
-
 	case "dev":
 		file = lib.GetFromStorage("function-data", "mail/mail_template.html", "")
-
 	case "prod":
 		file = lib.GetFromStorage("core-350507-function-data", "mail/mail_template.html", "")
-
-	default:
-
 	}
 	tmplt := template.New("action")
 	var tpl bytes.Buffer
