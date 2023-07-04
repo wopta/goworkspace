@@ -68,7 +68,7 @@ func PutClaim(idToken string, origin string, claim *models.Claim) (string, inter
 		return `{"success":false}`, `{"success":false}`, nil
 	}
 
-	if userAuthID != policy.Contractor.Uid {
+	if user.Uid != policy.Contractor.Uid {
 		log.Println("[PutClaim] claim requester and policy contractor are not the same")
 		return `{"success":false}`, `{"success":false}`, nil
 	}
@@ -101,7 +101,7 @@ func PutClaim(idToken string, origin string, claim *models.Claim) (string, inter
 			log.Println("[PutClaim] error decoding base64 document encoding")
 			return `{"success":false}`, `{"success":false}`, nil
 		}
-		gsLink := lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "assets/users/"+userAuthID+"/claims/"+
+		gsLink := lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "assets/users/"+user.Uid+"/claims/"+
 			claim.ClaimUid+"/"+doc.FileName, byteFile)
 		att = append(att, mail.Attachment{Byte: doc.Byte, Name: doc.Name, FileName: doc.FileName, ContentType: doc.ContentType})
 		claim.Documents[i].Byte = ""
@@ -115,8 +115,8 @@ func PutClaim(idToken string, origin string, claim *models.Claim) (string, inter
 	}
 	*user.Claims = append(*user.Claims, *claim)
 
-	log.Printf("[PutClaim] update user %s on firestore", userAuthID)
-	err = lib.UpdateFirestoreErr(fireUsers, userAuthID, map[string]interface{}{
+	log.Printf("[PutClaim] update user %s on firestore", user.Uid)
+	err = lib.UpdateFirestoreErr(fireUsers, user.Uid, map[string]interface{}{
 		"claims":  user.Claims,
 		"updated": time.Now().UTC(),
 	})
