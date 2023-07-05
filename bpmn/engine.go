@@ -5,32 +5,28 @@ import (
 	"log"
 )
 
-var (
-	state *State
-)
-
-func AddTaskHandler(name string, handler func(state *State) error, state *State) map[string]func(state *State) error {
+func (state *State) AddTaskHandler(name string, handler func(state *State) error) map[string]func(state *State) error {
 	log.Println("AddTaskHand")
 	if nil == state.handlers {
 		log.Println("nil")
-		state.handlers = make(map[string]func(state *State) error)
+
 	}
 	state.handlers[name] = handler
 
 	return state.handlers
 }
 
-func RunBpmn(processes []Process, data interface{}) {
+func (state *State) RunBpmn(processes []Process, data interface{}) {
 	state.processes = processes
 	state.data = data
 
 	for i, process := range processes {
 		log.Println(i)
 		if len(process.InProcess) == 0 {
-			runProcess(process)
+			state.runProcess(process)
 
 		} else if len(process.OutProcess) == 0 {
-			runProcess(process)
+			state.runProcess(process)
 			break
 
 		} else {
@@ -40,18 +36,18 @@ func RunBpmn(processes []Process, data interface{}) {
 	}
 
 }
-func runNextProcess(process Process) {
+func (state *State) runNextProcess(process Process) {
 	log.Println("runNextProcess")
 	if !process.IsFailed {
-		for _, x := range getProcesses(process.OutProcess) {
-			runProcess(x)
-			runNextProcess(x)
+		for _, x := range state.getProcesses(process.OutProcess) {
+			state.runProcess(x)
+			state.runNextProcess(x)
 		}
 
 	}
 
 }
-func runProcess(process Process) {
+func (state *State) runProcess(process Process) {
 	log.Println("runProcess")
 	id := process.Id
 	state.processes[id].Status = Active
@@ -69,10 +65,10 @@ func runProcess(process Process) {
 		state.IsFailed = true
 	} else {
 		state.processes[id].Status = Completed
-		runNextProcess(process)
+		state.runNextProcess(process)
 	}
 }
-func getProcesses(ids []int) []Process {
+func (state *State) getProcesses(ids []int) []Process {
 	var processes []Process
 	for _, id := range ids {
 		for _, process := range state.processes {
@@ -84,7 +80,7 @@ func getProcesses(ids []int) []Process {
 	}
 	return processes
 }
-func loadProcesses(data string) ([]Process, error) {
+func (state *State) loadProcesses(data string) ([]Process, error) {
 	var processes []Process
 	e := json.Unmarshal([]byte(data), &processes)
 

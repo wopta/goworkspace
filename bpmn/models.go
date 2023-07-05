@@ -41,7 +41,7 @@ type Process struct {
 	Y              float64     `json:"y"`
 	InProcess      []int       `json:"inProcess"`
 	OutProcess     []int       `json:"outProcess"`
-	OutTrueProcess []int       `json:"outProcess"`
+	OutTrueProcess []int       `json:"outTrueProcess"`
 	IsCompleted    bool        `json:"isCompleted"`
 	IsFailed       bool        `json:"isFailed"`
 	Error          string      `json:"error"`
