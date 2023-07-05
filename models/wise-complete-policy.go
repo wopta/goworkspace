@@ -32,6 +32,7 @@ func (wisePolicy *WiseCompletePolicy) ToDomain() Policy {
 	policy.PriceGross = wisePolicy.Contract.GrossAmount
 	policy.PriceNett = wisePolicy.Contract.NetAmount
 	policy.TaxAmount = wisePolicy.Contract.TaxesAmount
+	policy.ProductVersion = "v1"
 
 	switch wisePolicy.ProductTypeCode {
 	case "PMIW":
@@ -44,7 +45,7 @@ func (wisePolicy *WiseCompletePolicy) ToDomain() Policy {
 		policy.Company = "global"
 	default:
 	}
-	
+
 	for _, wiseAsset := range *wisePolicy.Assets {
 		policy.Assets = append(policy.Assets, wiseAsset.ToDomain(wisePolicy))
 	}
