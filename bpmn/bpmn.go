@@ -56,22 +56,25 @@ func BpmnFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 func BpmnEngine(policy models.Policy) string {
 	// Init workflow with a name, and max concurrent tasks
 	log.Println("--------------------------BpmnEngine-------------------------------------------")
-
+	var (
+		state *State
+	)
+	state.handlers = make(map[string]func(state *State) error)
 	// basic example loading a BPMN from file,
 	//filePath := "./serverless_function_source_code/test.bpmn"
-	processes, err := loadProcesses(getTest())
+	processes, err := state.loadProcesses(getTest())
 	//lib.C
 	if err != nil {
 		panic("file \"simple_task.bpmn\" can't be read.")
 	}
 	// register a handler for a service task by defined task type
-	AddTaskHandler("test", test)
-	AddTaskHandler("fabrickPayment", fabrickPayment)
-	AddTaskHandler("contract", contract)
-	AddTaskHandler("namirialSign", namirialSign)
-	AddTaskHandler("sendMailSign", sendMailSign)
+	state.AddTaskHandler("test", test)
+	state.AddTaskHandler("fabrickPayment", fabrickPayment)
+	state.AddTaskHandler("contract", contract)
+	state.AddTaskHandler("namirialSign", namirialSign)
+	state.AddTaskHandler("sendMailSign", sendMailSign)
 
-	RunBpmn(processes, policy)
+	state.RunBpmn(processes, policy)
 	return ""
 }
 func test(state *State) error {

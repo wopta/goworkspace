@@ -9,9 +9,10 @@ var (
 	state *State
 )
 
-func AddTaskHandler(name string, handler func(state *State) error) map[string]func(state *State) error {
+func AddTaskHandler(name string, handler func(state *State) error, state *State) map[string]func(state *State) error {
 	log.Println("AddTaskHand")
 	if nil == state.handlers {
+		log.Println("nil")
 		state.handlers = make(map[string]func(state *State) error)
 	}
 	state.handlers[name] = handler
