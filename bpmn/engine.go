@@ -9,10 +9,8 @@ func (state *State) AddTaskHandler(name string, handler func(state *State) error
 	log.Println("AddTaskHand")
 	if nil == state.handlers {
 		log.Println("nil")
-
 	}
 	state.handlers[name] = handler
-
 	return state.handlers
 }
 
