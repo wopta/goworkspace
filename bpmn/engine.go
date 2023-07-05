@@ -10,6 +10,7 @@ var (
 )
 
 func AddTaskHandler(name string, handler func(state *State) error) map[string]func(state *State) error {
+	log.Println("AddTaskHand")
 	if nil == state.handlers {
 		state.handlers = make(map[string]func(state *State) error)
 	}
@@ -39,7 +40,7 @@ func RunBpmn(processes []Process, data interface{}) {
 
 }
 func runNextProcess(process Process) {
-
+	log.Println("runNextProcess")
 	if !process.IsFailed {
 		for _, x := range getProcesses(process.OutProcess) {
 			runProcess(x)
@@ -50,6 +51,7 @@ func runNextProcess(process Process) {
 
 }
 func runProcess(process Process) {
+	log.Println("runProcess")
 	id := process.Id
 	state.processes[id].Status = Active
 	var (
