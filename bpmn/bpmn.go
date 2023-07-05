@@ -1,4 +1,4 @@
-package AppcheckProxy
+package bpmn
 
 import (
 	"encoding/json"
@@ -8,7 +8,6 @@ import (
 	"net/http"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
-	"github.com/nitram509/lib-bpmn-engine/pkg/bpmn_engine"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/mail"
 	pay "github.com/wopta/goworkspace/payment"
@@ -24,7 +23,7 @@ func init() {
 }
 
 func Bpmn(w http.ResponseWriter, r *http.Request) {
-	log.Println("Callback")
+	log.Println("Bpmn")
 	lib.EnableCors(&w, r)
 	w.Header().Set("Access-Control-Allow-Methods", "POST")
 	route := lib.RouteData{
@@ -57,42 +56,36 @@ func BpmnFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 func BpmnEngine(policy models.Policy) string {
 	// Init workflow with a name, and max concurrent tasks
 	log.Println("--------------------------BpmnEngine-------------------------------------------")
-	bpmnEngine := bpmn_engine.New("a name")
+
 	// basic example loading a BPMN from file,
-	filePath := "./serverless_function_source_code/test.bpmn"
-	process, err := bpmnEngine.LoadFromFile(filePath)
+	//filePath := "./serverless_function_source_code/test.bpmn"
+	processes, err := loadProcesses(getTest())
 	//lib.C
 	if err != nil {
 		panic("file \"simple_task.bpmn\" can't be read.")
 	}
 	// register a handler for a service task by defined task type
-	bpmnEngine.AddTaskHandler("test", test)
-	bpmnEngine.AddTaskHandler("fabrickPayment", fabrickPayment)
-	bpmnEngine.AddTaskHandler("contract", contract)
-	bpmnEngine.AddTaskHandler("namirialSign", namirialSign)
-	bpmnEngine.AddTaskHandler("sendMailSign", sendMailSign)
+	AddTaskHandler("test", test)
+	AddTaskHandler("fabrickPayment", fabrickPayment)
+	AddTaskHandler("contract", contract)
+	AddTaskHandler("namirialSign", namirialSign)
+	AddTaskHandler("sendMailSign", sendMailSign)
 
-	// setup some variables
-	variables := map[string]interface{}{}
-	//variables["policy"] = policy
-	variables["policy"] = "test"
-	// and execute the process
-	bpmnEngine.CreateAndRunInstance(process.ProcessKey, variables)
+	RunBpmn(processes, policy)
 	return ""
 }
-func test(job bpmn_engine.ActivatedJob) {
+func test(state *State) error {
 	log.Println("--------------------------Test-------------------------------------------")
-	fmt.Printf("job.GetState(): %v\n", job.GetState())
-	fmt.Printf(" job.GetVariable(policy): %v\n", job.GetVariable("policy"))
+	return nil
 }
-func contract(job bpmn_engine.ActivatedJob) {
-	policy := job.GetVariable("policy")
+func contract(state *State) error {
+	policy := state.data
 	doc.ContractObj(policy.(models.Policy))
-
+	return nil
 }
-func fabrickPayment(job bpmn_engine.ActivatedJob) {
+func fabrickPayment(state *State) error {
 	var payRes pay.FabrickPaymentResponse
-	policye := job.GetVariable("policy")
+	policye := state.data
 	policy := policye.(models.Policy)
 	if policy.PaymentSplit == string(models.PaySplitYear) {
 		payRes = pay.FabbrickYearPay(policy, "")
@@ -101,19 +94,33 @@ func fabrickPayment(job bpmn_engine.ActivatedJob) {
 		payRes = pay.FabbrickMontlyPay(policy, "")
 
 	}
-	state := job.GetState()
+
 	fmt.Printf("state: %v\n", state)
 	fmt.Printf("payRes: %v\n", payRes)
+	return nil
 
 }
 
-func namirialSign(job bpmn_engine.ActivatedJob) {
-	policy := job.GetVariable("policy")
+func namirialSign(state *State) error {
+	policy := state.data
 	doc.NamirialOtpV6(policy.(models.Policy), "")
-
+	return nil
 }
-func sendMailSign(job bpmn_engine.ActivatedJob) {
-	policy := job.GetVariable("policy")
+func sendMailSign(state *State) error {
+	policy := state.data
 	mail.SendMailSign(policy.(models.Policy))
+	return nil
+}
+func getTest() string {
+	return `
+	[{
+        "name": "test",
+        "type": "TASK",
+        "id": "0",
+        "outProcess": [1],
+        "inProcess": [],
+        "status": "READY"
 
+    }]
+	`
 }
