@@ -15,6 +15,31 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
+type CreateInviteRequest struct {
+	Role       string           `json:"role"`
+	Email      string           `json:"email"`
+	FiscalCode string           `json:"fiscalCode,omitempty" firestore:"fiscalCode,omitempty"`
+	Name       string           `json:"name,omitempty" firestore:"name,omitempty"`
+	Surname    string           `json:"surname,omitempty" firestore:"surname,omitempty"`
+	Products   []models.Product `json:"products,omitempty" firestore:"products,omitempty"`
+}
+
+type UserInvite struct {
+	FiscalCode      string           `json:"fiscalCode,omitempty" firestore:"fiscalCode,omitempty"`
+	VatCode         string           `json:"vatCode,omitempty" firestore:"vatCode,omitempty"`
+	Name            string           `json:"name,omitempty" firestore:"name,omitempty"`
+	Surname         string           `json:"surname,omitempty" firestore:"surname,omitempty"`
+	Role            string           `json:"role,omitempty" firestore:"role,omitempty"`
+	Email           string           `json:"email,omitempty" firestore:"email,omitempty"`
+	Uid             string           `json:"uid,omitempty" firestore:"uid,omitempty"`
+	CreatorUid      string           `json:"creatorUid,omitempty" firestore:"creatorUid,omitempty"`
+	Consumed        bool             `json:"consumed" firestore:"consumed"`
+	RuiCode         string           `json:"ruiCode,omitempty" firestore:"ruiCode,omitempty"`
+	RuiRegistration time.Time        `json:"ruiRegistration" firestore:"ruiRegistration"`
+	Expiration      time.Time        `json:"expiration,omitempty" firestore:"expiration,omitempty"`
+	Products        []models.Product `json:"products,omitempty" firestore:"products,omitempty"`
+}
+
 func CreateInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var createInviteRequest CreateInviteRequest
 
@@ -116,27 +141,4 @@ func SendInviteMail(inviteUid, email string) {
 	mailRequest.LinkLabel = "Crea la tua password"
 
 	mail.SendMail(mailRequest)
-}
-
-type CreateInviteRequest struct {
-	Role       string `json:"role"`
-	Email      string `json:"email"`
-	FiscalCode string `json:"fiscalCode,omitempty" firestore:"fiscalCode,omitempty"`
-	Name       string `json:"name,omitempty" firestore:"name,omitempty"`
-	Surname    string `json:"Surname,omitempty" firestore:"Surname,omitempty"`
-}
-
-type UserInvite struct {
-	FiscalCode      string    `json:"fiscalCode,omitempty" firestore:"fiscalCode,omitempty"`
-	VatCode         string    `json:"vatCode,omitempty" firestore:"vatCode,omitempty"`
-	Name            string    `json:"name,omitempty" firestore:"name,omitempty"`
-	Surname         string    `json:"surname,omitempty" firestore:"surname,omitempty"`
-	Role            string    `json:"role,omitempty" firestore:"role,omitempty"`
-	Email           string    `json:"email,omitempty" firestore:"email,omitempty"`
-	Uid             string    `json:"uid,omitempty" firestore:"uid,omitempty"`
-	CreatorUid      string    `json:"creatorUid,omitempty" firestore:"creatorUid,omitempty"`
-	Consumed        bool      `json:"consumed" firestore:"consumed"`
-	RuiCode         string    `json:"ruiCode,omitempty" firestore:"ruiCode,omitempty"`
-	RuiRegistration time.Time `json:"ruiRegistration" firestore:"ruiRegistration"`
-	Expiration      time.Time `json:"expiration,omitempty" firestore:"expiration,omitempty"`
 }
