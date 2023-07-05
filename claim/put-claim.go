@@ -68,11 +68,6 @@ func PutClaim(idToken string, origin string, claim *models.Claim) (string, inter
 		return `{"success":false}`, `{"success":false}`, nil
 	}
 
-	if user.Uid != policy.Contractor.Uid {
-		log.Println("[PutClaim] claim requester and policy contractor are not the same")
-		return `{"success":false}`, `{"success":false}`, nil
-	}
-
 	claim.CreationDate = time.Now().UTC()
 	claim.Updated = claim.CreationDate
 	claim.ClaimUid = uuid.New().String()
@@ -87,7 +82,8 @@ func PutClaim(idToken string, origin string, claim *models.Claim) (string, inter
 
 	obj.From = "noreply@wopta.it"
 	obj.To = []string{"sinistri@wopta.it"}
-	obj.Message = `<p>Ciao il cliente ` + user.Name + ` ` + user.Surname + `</p> <p>desidera notificare un sinistro per la polizza: ` + policy.CodeCompany + ` per i seguenti motivi: ` + claim.Description + `</p> `
+	obj.Message = `<p>Ciao il cliente ` + user.Name + ` ` + user.Surname + `</p> <p>desidera notificare un sinistro per la polizza: ` +
+		policy.CodeCompany + ` per i seguenti motivi: ` + claim.Description + `</p> `
 	obj.Subject = "Notifica sinisto polizza " + policy.CodeCompany
 	obj.IsHtml = true
 	if len(claim.Documents) > 0 {
