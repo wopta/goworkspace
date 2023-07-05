@@ -1,11 +1,12 @@
 package sellable
 
 import (
+	"log"
+	"net/http"
+
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	"log"
-	"net/http"
 )
 
 func init() {
@@ -26,6 +27,12 @@ func Sellable(w http.ResponseWriter, r *http.Request) {
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
+				Route:   "/v1/sales/vehicle",
+				Handler: VehicleHandler,
+				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAll},
+			},
+			{
 				Route:   "/v1/risk/person",
 				Handler: PersonHandler,
 				Method:  http.MethodPost,
@@ -34,5 +41,4 @@ func Sellable(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 	route.Router(w, r)
-
 }
