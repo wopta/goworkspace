@@ -32,6 +32,7 @@ func QueryRowsBigQuery[T any](datasetID string, tableID string, query string) ([
 		e    error
 		iter *bigquery.RowIterator
 	)
+	log.Println(query)
 	client := getBigqueryClient()
 	ctx := context.Background()
 	defer client.Close()
@@ -47,6 +48,7 @@ func QueryRowsBigQuery[T any](datasetID string, tableID string, query string) ([
 		if e != nil {
 			return res, e
 		}
+		res = append(res, row)
 
 	}
 

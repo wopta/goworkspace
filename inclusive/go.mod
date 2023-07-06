@@ -7,7 +7,7 @@ replace github.com/wopta/goworkspace/inclusive => ./
 require (
 	cloud.google.com/go v0.110.2
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
-	github.com/wopta/goworkspace/lib v1.0.52
+	github.com/wopta/goworkspace/lib v1.0.55
 	github.com/wopta/goworkspace/models v1.0.99
 	google.golang.org/api v0.128.0
 )

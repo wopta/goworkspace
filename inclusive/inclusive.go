@@ -78,6 +78,7 @@ type BankAccountMovement struct {
 	PolicyType     string         `firestore:"-" json:"policyType,omitempty" bigquery:"policyType"`         //TIPOLOGIA POLIZZA
 	GuaranteesCode string         `firestore:"-" json:"guaranteesCode,omitempty" bigquery:"guaranteesCode"` //CODICE CONFIGURAZIONE pacchetti
 	AssetType      string         `firestore:"-" json:"assetType,omitempty" bigquery:"assetType"`           //TIPO OGGETTO ASSICURATO
+	Customer       string         `firestore:"-" json:"-" bigquery:"customer"`                              //Hype
 }
 type ErrorResponse struct {
 	Code    int    `firestore:"-" json:"code,omitempty" bigquery:"name"`
@@ -129,7 +130,15 @@ func CheckData(r *http.Request) (BankAccountMovement, error) {
 		}
 	}
 	if obj.MovementType == "delete" {
+		res, e := lib.QueryRowsBigQuery[BankAccountMovement]("wopta",
+			"inclusive_axa_bank_account",
+			"select * from `wopta.inclusive_axa_bank_account` where fiscalCode='"+obj.FiscalCode+"' and guaranteesCode ='"+obj.GuaranteesCode+"'")
+
+		if len(res) == 0 || e != nil {
+			return obj, GetErrorJson(400, "Bad request", "insert movement miss")
+		}
 		if obj.StartDate.IsZero() {
+
 			return obj, GetErrorJson(400, "Bad request", "field StartDate miss")
 		}
 		if obj.EndDate.IsZero() {
@@ -150,6 +159,7 @@ func SetData(obj BankAccountMovement) BankAccountMovement {
 	obj.BigEndDate = civil.DateTimeOf(obj.EndDate)
 	obj.PolicyNumber = ""
 	obj.Uid = uuid.New().String()
+	obj.Customer = "hype"
 
 	return obj
 }
