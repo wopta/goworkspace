@@ -7,6 +7,7 @@ type Vehicle struct {
 	Model              string    `firestore:"model,omitempty"              json:"model,omitempty"              bigquery:"-"` // MODELLO
 	Manufacturer       string    `firestore:"manufacturer,omitempty"       json:"manufacturer,omitempty"       bigquery:"-"` // PRODUTTORE
 	RegistrationDate   time.Time `firestore:"registrationDate,omitempty"   json:"registrationDate,omitempty"   bigquery:"-"` // DATA IMMATRICOLAZIONE
+	PurchaseDate       time.Time `firestore:"purchaseDate,omitempty"       json:"purchaseDate,omitempty"       bigquery:"-"` // DATA D'ACQUISTO
 	OwnershipStatus    string    `firestore:"ownershipStatus,omitempty"    json:"ownershipStatus,omitempty"    bigquery:"-"` // GIA’ PROPRIETARIO (si/in attesa/la comprerò in futuro)
 	NumberOfOwners     int64     `firestore:"numberOfOwners,omitempty"     json:"numberOfOwners,omitempty"     bigquery:"-"` // NUMERO DI PROPRIETARI
 	PriceValue         int64     `firestore:"priceValue,omitempty"         json:"priceValue,omitempty"         bigquery:"-"` // VALORE VEICOLO
