@@ -78,6 +78,7 @@ type BankAccountMovement struct {
 	PolicyType     string         `firestore:"-" json:"policyType,omitempty" bigquery:"policyType"`         //TIPOLOGIA POLIZZA
 	GuaranteesCode string         `firestore:"-" json:"guaranteesCode,omitempty" bigquery:"guaranteesCode"` //CODICE CONFIGURAZIONE pacchetti
 	AssetType      string         `firestore:"-" json:"assetType,omitempty" bigquery:"assetType"`           //TIPO OGGETTO ASSICURATO
+	Customer       string         `firestore:"-" json:"-" bigquery:"customer"`                              //TIPO OGGETTO ASSICURATO
 }
 type ErrorResponse struct {
 	Code    int    `firestore:"-" json:"code,omitempty" bigquery:"name"`
