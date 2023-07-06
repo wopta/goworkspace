@@ -68,7 +68,7 @@ func personaInsuredInfoSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 		"extra": "Extraprofessionale",
 	}
 
-	getParagraphTitle(pdf, "La tua assicurazione per il seguente Assicurato e Garanzie")
+	getParagraphTitle(pdf, "La tua assicurazione è operante per il seguente Assicurato e Garanzie")
 	drawPinkHorizontalLine(pdf, thickLineWidth)
 	pdf.Ln(2)
 	contractorInfo := []keyValue{
@@ -226,22 +226,28 @@ func personaOfferResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	case string(models.PaySplitMonthly):
 		tableInfo = [][]string{
 			{
-				"Mensile firma del contratto",
-				lib.HumanaizePriceEuro(policy.PriceNett),
-				lib.HumanaizePriceEuro(policy.PriceGross - policy.PriceNett),
-				lib.HumanaizePriceEuro(policy.PriceGross),
+				"Annuale",
+				lib.HumanaizePriceEuro(policy.PriceNettMonthly * 12),
+				lib.HumanaizePriceEuro(policy.PriceGrossMonthly - policy.PriceNettMonthly*12),
+				lib.HumanaizePriceEuro(policy.PriceGrossMonthly * 12),
 			},
 			{
-				"Pari ad un premio Annuale",
-				lib.HumanaizePriceEuro(policy.PriceNett * 12),
-				lib.HumanaizePriceEuro(policy.PriceGross - policy.PriceNett*12),
-				lib.HumanaizePriceEuro(policy.PriceGross * 12),
+				"Rata firma della polizza",
+				lib.HumanaizePriceEuro(policy.PriceNettMonthly),
+				lib.HumanaizePriceEuro(policy.PriceGrossMonthly - policy.PriceNettMonthly),
+				lib.HumanaizePriceEuro(policy.PriceGrossMonthly),
+			},
+			{
+				"Rata mensile",
+				lib.HumanaizePriceEuro(policy.PriceNettMonthly),
+				lib.HumanaizePriceEuro(policy.PriceGrossMonthly - policy.PriceNettMonthly),
+				lib.HumanaizePriceEuro(policy.PriceGrossMonthly),
 			},
 		}
 	case string(models.PaySplitYear):
 		tableInfo = [][]string{
 			{
-				"Annuale firma del contratto",
+				"Annuale firma della polizza",
 				lib.HumanaizePriceEuro(policy.PriceNett),
 				lib.HumanaizePriceEuro(policy.PriceGross - policy.PriceNett),
 				lib.HumanaizePriceEuro(policy.PriceGross),
