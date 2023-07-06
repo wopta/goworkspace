@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -15,21 +16,25 @@ import (
 )
 
 func GapFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+
+	log.Println("[GapFx] Handler start")
+
 	req := lib.ErrorByte(io.ReadAll(r.Body))
 	var data models.Policy
 	defer r.Body.Close()
-	e := json.Unmarshal(req, &data)
 
-	authToken, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
+	e := json.Unmarshal(req, &data)
+	lib.CheckError(e)
+
+	_, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
 	lib.CheckError(err)
-	res, e := Gap(authToken.Role, data)
-	s, e := json.Marshal(res)
+	Gap(&data)
+	s, e := json.Marshal(data)
 	return string(s), nil, e
 
 }
 
-func Gap(role string, data models.Policy) (models.Policy, error) {
-	var err error
+func Gap(data *models.Policy) {
 
 	//sellable rules need to be called here
 
@@ -53,62 +58,77 @@ func Gap(role string, data models.Policy) (models.Policy, error) {
 	//get the duration
 	duration := getDuration(data.StartDate, data.EndDate)
 
-	fmt.Printf("valore base e' %d\n", duration)
+	log.Printf("base value e': %d\n", duration)
 
 	//get the base and complete multipliers
 	baseGapMultiplierFloat, completeGapMultiplierFloat := getGapMultipliers(baseMatrixDF, completeMatrixDF, duration, residenceArea)
 
 	//get the matrix area row
-	fmt.Printf("valore base e' %f\n", baseGapMultiplierFloat)
-	fmt.Printf("valore completo e' %f\n", completeGapMultiplierFloat)
-	fmt.Printf("valore base veicolo*tax e' %f\n", baseGapMultiplierFloat*float64(vehicleValue))
-	fmt.Printf("valore completo veicolo*tax e' %f\n", completeGapMultiplierFloat*float64(vehicleValue))
+	log.Printf("valore base e' %f\n", baseGapMultiplierFloat)
+	log.Printf("valore completo e' %f\n", completeGapMultiplierFloat)
+	log.Printf("valore base veicolo*tax e' %f\n", baseGapMultiplierFloat*float64(vehicleValue))
+	log.Printf("valore completo veicolo*tax e' %f\n", completeGapMultiplierFloat*float64(vehicleValue))
 
 	//set the offer in the policy and round to 2 decimal number
 
-	data = setOffersPrices(data, vehicleValue, baseGapMultiplierFloat, completeGapMultiplierFloat)
+	setOffersPrices(data, vehicleValue, baseGapMultiplierFloat, completeGapMultiplierFloat)
 
 	roundGapOffersPrices(data.OffersPrices)
 
-	return data, err
 }
 
 func roundGapOffersPrices(offersPrices map[string]map[string]*models.Price) {
 	for offerKey, offerValue := range offersPrices {
 		for paymentKey := range offerValue {
 			offersPrices[offerKey][paymentKey].Net = lib.RoundFloat(offersPrices[offerKey][paymentKey].Net, 2)
+			offersPrices[offerKey][paymentKey].Tax = lib.RoundFloat(offersPrices[offerKey][paymentKey].Tax, 2)
+			offersPrices[offerKey][paymentKey].Gross = lib.RoundFloat(offersPrices[offerKey][paymentKey].Gross, 2)
 		}
 	}
 }
 
-func setOffersPrices(data models.Policy, vehicleValue int64, baseGapMultiplierFloat float64, completeGapMultiplierFloat float64) models.Policy {
+func setOffersPrices(data *models.Policy, vehicleValue int64, baseGapMultiplierFloat float64, completeGapMultiplierFloat float64) {
 	data.OffersPrices = make(map[string]map[string]*models.Price)
 
 	data.OffersPrices["base"] = map[string]*models.Price{
 		"singleInstallment": {
-			Net:      baseGapMultiplierFloat * float64(vehicleValue),
-			Tax:      0.0,
-			Gross:    0.0,
+			Net:      getPrice("net", baseGapMultiplierFloat, vehicleValue),
+			Tax:      getPrice("tax", baseGapMultiplierFloat, vehicleValue),
+			Gross:    getPrice("gross", baseGapMultiplierFloat, vehicleValue),
 			Delta:    0.0,
 			Discount: 0.0,
 		},
 	}
 	data.OffersPrices["complete"] = map[string]*models.Price{
 		"singleInstallment": {
-			Net:      completeGapMultiplierFloat * float64(vehicleValue),
-			Tax:      0.0,
-			Gross:    0.0,
+			Net:      getPrice("net", completeGapMultiplierFloat, vehicleValue),
+			Tax:      getPrice("tax", completeGapMultiplierFloat, vehicleValue),
+			Gross:    getPrice("gross", completeGapMultiplierFloat, vehicleValue),
 			Delta:    0.0,
 			Discount: 0.0,
 		},
 	}
+}
 
-	return data
+func getPrice(mode string, gapMultipierFloat float64, vehicleValue int64) float64 {
+
+	taxValue := lib.RoundFloat(((gapMultipierFloat*float64(vehicleValue))/100)*13.5, 2)
+
+	switch mode {
+	case "net":
+		return gapMultipierFloat * float64(vehicleValue)
+	case "tax":
+		return taxValue
+	case "gross":
+		return (gapMultipierFloat * float64(vehicleValue)) + taxValue
+	default:
+		return 0
+	}
+
 }
 
 func getResidentArea(provincesMatrixDF dataframe.DataFrame, residenceCode string) string {
 	for _, row := range provincesMatrixDF.Records() {
-		//fmt.Println(row)
 		if row[1] == residenceCode {
 			return row[2]
 		}
