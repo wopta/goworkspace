@@ -119,19 +119,9 @@ func GetPoliciesFromFirebase(fiscalCode string, policyFire string) []models.Poli
 				QueryValue: fiscalCode,
 			},
 			{
-				Field:      "companyEmit",
-				Operator:   "==",
-				QueryValue: true,
-			},
-			{
-				Field:      "isPay",
-				Operator:   "==",
-				QueryValue: true,
-			},
-			{
-				Field:      "isSign",
-				Operator:   "==",
-				QueryValue: true,
+				Field:      "status",
+				Operator:   "in",
+				QueryValue: []string{models.PolicyStatusPay, models.PolicyStatusToRenew, models.PolicyStatusCompanyEmit},
 			},
 		},
 	}
