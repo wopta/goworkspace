@@ -24,7 +24,7 @@ func getFabrickClient(urlstring string, req *http.Request) (*http.Response, erro
 	req.Header.Set("api-key", os.Getenv("FABRICK_TOKEN_BACK_API"))
 	req.Header.Set("Auth-Schema", "S2S")
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("x-auth-token", os.Getenv("FABRICK_TOKEN_BACK_API"))
+	req.Header.Set("x-auth-token", os.Getenv("FABRICK_PERSISTENT_KEY"))
 	req.Header.Set("Accept", "application/json")
 	res, err := client.Do(req)
 

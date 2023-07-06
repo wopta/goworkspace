@@ -95,7 +95,7 @@ func getAllSimplePoliciesForUserFromWise(fiscalCode string) (*string, *[]WiseSim
 	}`)
 
 	responseReader, wiseToken = wiseProxy.WiseBatch("WebApiProduct/Api/RicercaPolizzaCliente", request, "POST", nil)
-	jsonData, e := ioutil.ReadAll(responseReader)
+	jsonData, e := io.ReadAll(responseReader)
 
 	if e != nil {
 		return nil, nil, e
