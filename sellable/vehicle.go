@@ -45,7 +45,10 @@ func GapFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 
 	authToken, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
 	lib.CheckError(err)
-	product, err := Vehicle(authToken.Role, policy)
+	product, err := Vehicle(authToken.Role, &policy)
+	if err != nil {
+		return "", models.Product{}, fmt.Errorf("cannot retrieve the product: %v", err)
+	}
 
 	jsonProduct, err := json.Marshal(product)
 	if err != nil {
@@ -58,7 +61,7 @@ func GapFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 // Given a policy that should contain the Vehicle and the Person assets, then it returns:
 //   - the product or parts of it depending on the sellable rules
 //   - and an eventual error
-func Vehicle(role string, p models.Policy) (models.Product, error) {
+func Vehicle(role string, p *models.Policy) (models.Product, error) {
 	if err := validatePolicy(p); err != nil {
 		return models.Product{}, fmt.Errorf("the policy did not pass validation: %v", err)
 	}
@@ -75,7 +78,7 @@ func Vehicle(role string, p models.Policy) (models.Product, error) {
 	return product, nil
 }
 
-func productForVehicle(p models.Policy, r string) (models.Product, error) {
+func productForVehicle(p *models.Policy, r string) (models.Product, error) {
 	product, err := prd.GetProduct("gap", "v1", r)
 	if err != nil {
 		return models.Product{}, fmt.Errorf("error in getting the product: %v", err)
@@ -90,7 +93,7 @@ func productForVehicle(p models.Policy, r string) (models.Product, error) {
 }
 
 // Returns true if the policy is conforming to the sellability rules
-func isVehicleSellable(p models.Policy) error {
+func isVehicleSellable(p *models.Policy) error {
 	v := p.Assets[0].Vehicle
 	if !v.IsFireTheftCovered {
 		return fmt.Errorf("fire and theft is not covered")
@@ -99,9 +102,9 @@ func isVehicleSellable(p models.Policy) error {
 		return fmt.Errorf("the vehicle is not private")
 	}
 
-	car_types := []string{"auto", "autocarro", "suv"}
-	if !lib.SliceContains(car_types, v.VehicleType) {
-		return fmt.Errorf("The vehicle type is not in: %v", car_types)
+	carTypes := []string{"auto", "autocarro", "suv"}
+	if !lib.SliceContains(carTypes, v.VehicleType) {
+		return fmt.Errorf("The vehicle type is not in: %v", carTypes)
 	}
 
 	anniversary := v.RegistrationDate.AddDate(maxAgeAtStartDate, 0, 0)
@@ -122,7 +125,7 @@ func isVehicleSellable(p models.Policy) error {
 	return nil
 }
 
-func validatePolicy(p models.Policy) error {
+func validatePolicy(p *models.Policy) error {
 	if len(p.Assets) == 0 {
 		return fmt.Errorf("no assets found")
 	}
@@ -140,8 +143,12 @@ func validatePolicy(p models.Policy) error {
 
 	maxAgeFullCoverageBD := v.RegistrationDate.AddDate(maxAgeFullCoverage, 0, 0)
 	if time.Now().Before(maxAgeFullCoverageBD) {
-		if pd != maxCoverage {
-			return fmt.Errorf("wrong policy duration! it should be 5, we've got %d", pd)
+		if pd <= maxCoverage {
+			return fmt.Errorf(
+				"wrong policy duration! It should be at maximum %d, we've got %d",
+				maxCoverage,
+				pd,
+			)
 		}
 	} else {
 		decrease := lib.ElapsedYears(maxAgeFullCoverageBD, time.Now())
@@ -150,8 +157,8 @@ func validatePolicy(p models.Policy) error {
 		if coverage <= 0 {
 			return fmt.Errorf("The coverage has duration 0")
 		}
-		if pd != coverage {
-			return fmt.Errorf("wrong policy duration! it should be %d, we've got %d", coverage, pd)
+		if pd <= coverage {
+			return fmt.Errorf("wrong policy duration! it should be at most %d, we've got %d", coverage, pd)
 		}
 	}
 	return nil
