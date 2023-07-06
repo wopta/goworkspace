@@ -133,7 +133,7 @@ func CheckData(r *http.Request) (BankAccountMovement, error) {
 		res, e := lib.QueryRowsBigQuery[BankAccountMovement]("wopta",
 			"inclusive_axa_bank_account",
 			"select * from `wopta.inclusive_axa_bank_account` where fiscalCode='"+obj.FiscalCode+"' and guaranteesCode ='"+obj.GuaranteesCode+"'")
-
+		log.Println(len(res))
 		if len(res) == 0 || e != nil {
 			return obj, GetErrorJson(400, "Bad request", "insert movement miss")
 		}
