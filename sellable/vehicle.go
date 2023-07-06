@@ -45,7 +45,7 @@ func GapFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 
 	authToken, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
 	lib.CheckError(err)
-	product, err := Vehicle(authToken.Role, &policy)
+	product, err := Gap(authToken.Role, &policy)
 	if err != nil {
 		return "", models.Product{}, fmt.Errorf("cannot retrieve the product: %v", err)
 	}
@@ -58,10 +58,10 @@ func GapFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 	return string(jsonProduct), product, err
 }
 
-// Given a policy that should contain the Vehicle and the Person assets, then it returns:
+// Given a policy that should contain the Gap and the Person assets, then it returns:
 //   - the product or parts of it depending on the sellable rules
 //   - and an eventual error
-func Vehicle(role string, p *models.Policy) (models.Product, error) {
+func Gap(role string, p *models.Policy) (models.Product, error) {
 	if err := validatePolicy(p); err != nil {
 		return models.Product{}, fmt.Errorf("the policy did not pass validation: %v", err)
 	}
@@ -92,7 +92,7 @@ func productForVehicle(p *models.Policy, r string) (models.Product, error) {
 	return product, nil
 }
 
-// Returns true if the policy is conforming to the sellability rules
+// Returns true if the policy is conforming to the sellability rules for GAP
 func isVehicleSellable(p *models.Policy) error {
 	v := p.Assets[0].Vehicle
 	if !v.IsFireTheftCovered {

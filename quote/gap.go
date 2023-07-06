@@ -2,131 +2,124 @@ package quote
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/go-gota/gota/dataframe"
-	lib "github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/sellable"
 )
 
 func GapFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-
 	log.Println("[GapFx] Handler start")
 
 	req := lib.ErrorByte(io.ReadAll(r.Body))
-	var data models.Policy
 	defer r.Body.Close()
 
-	e := json.Unmarshal(req, &data)
-	lib.CheckError(e)
-
-	_, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
+	var policy models.Policy
+	err := json.Unmarshal(req, &policy)
 	lib.CheckError(err)
-	Gap(&data)
-	s, e := json.Marshal(data)
-	return string(s), nil, e
 
+	authToken, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
+	lib.CheckError(err)
+
+	Gap(authToken.Role, &policy)
+	policyJson, err := json.Marshal(policy)
+	return string(policyJson), nil, err
 }
 
-func Gap(data *models.Policy) {
+func getDataFrameFromCsv(path string) dataframe.DataFrame {
+	csvFile := lib.GetFilesByEnv("quote/gap_matrix_base.csv")
+	return lib.CsvToDataframe(csvFile)
+}
 
-	//sellable rules need to be called here
+func Gap(role string, p *models.Policy) {
+	product, err := sellable.Gap(role, p)
+	lib.CheckError(err)
 
-	baseMatrix := lib.GetFilesByEnv("quote/gap_matrix_base.csv")
-	completeMatrix := lib.GetFilesByEnv("quote/gap_matrix_complete.csv")
-	provincesMatrix := lib.GetFilesByEnv("enrich/provinces.csv")
+	guarantees := make([]models.Guarante, 0, 10)
+	for _, g := range product.Companies[0].GuaranteesMap {
+		guarantees = append(guarantees, *g)
+	}
+	p.Assets[0].Guarantees = guarantees
 
-	baseMatrixDF := lib.CsvToDataframe(baseMatrix)
-	completeMatrixDF := lib.CsvToDataframe(completeMatrix)
-	provincesMatrixDF := lib.CsvToDataframe(provincesMatrix)
+	gapMatrices := map[string]dataframe.DataFrame{
+		"base":     getDataFrameFromCsv("quote/gap_matrix_base.csv"),
+		"complete": getDataFrameFromCsv("quote/gap_matrix_complete.csv"),
+	}
 
-	//get the:
-	// - vehicle owner residence
-	// - vechicle value
-	var residenceCode string = data.Assets[len(data.Assets)-1].Person.Residence.Locality
-	var vehicleValue int64 = data.Assets[len(data.Assets)-1].Vehicle.PriceValue
+	provincesMatrix := getDataFrameFromCsv("enrich/provinces.csv")
 
-	//get the residence area
-	residenceArea := getResidentArea(provincesMatrixDF, residenceCode)
-
-	//get the duration
-	duration := getDuration(data.StartDate, data.EndDate)
+	residenceCode := p.Assets[0].Person.Residence.Locality
+	vehiclePrice := p.Assets[0].Vehicle.PriceValue
+	residenceArea := getResidentArea(provincesMatrix, residenceCode)
+	duration := lib.ElapsedYears(p.StartDate, p.EndDate)
 
 	log.Printf("base value e': %d\n", duration)
 
-	//get the base and complete multipliers
-	baseGapMultiplierFloat, completeGapMultiplierFloat := getGapMultipliers(baseMatrixDF, completeMatrixDF, duration, residenceArea)
+	for offer := range product.Offers {
+		gapMatrix := gapMatrices[offer]
+		gapMultiplier := mustGetGapMultipliers(gapMatrix, duration, residenceArea)
 
-	//get the matrix area row
-	log.Printf("valore base e' %f\n", baseGapMultiplierFloat)
-	log.Printf("valore completo e' %f\n", completeGapMultiplierFloat)
-	log.Printf("valore base veicolo*tax e' %f\n", baseGapMultiplierFloat*float64(vehicleValue))
-	log.Printf("valore completo veicolo*tax e' %f\n", completeGapMultiplierFloat*float64(vehicleValue))
+		// BUG: The tax is applied to the offers "GapComplete" and "GapBase".
+		// However, theese taxes are defined by guaranteesMap "theft-fire", "catastrophic-event", and "total-damage".
+		// Still, it is possible to apply those taxes to the guarantees, since Policy.OffersPrices is a map[string]Price
+		// NOTE: Temp fix: tax should be taken from the "Product" data structure
+		initOfferPrices(p, offer, float64(vehiclePrice), gapMultiplier, 13.5)
 
-	//set the offer in the policy and round to 2 decimal number
-	setOffersPrices(data, vehicleValue, baseGapMultiplierFloat, completeGapMultiplierFloat)
-	roundGapOffersPrices(data.OffersPrices)
+		log.Printf("valore di %q e' %f\n", offer, gapMultiplier)
+		log.Printf(
+			"valore di %q per veicolo*tax e' %f\n",
+			offer,
+			gapMultiplier*float64(vehiclePrice),
+		)
+	}
 
+	roundOffersPrices(p.OffersPrices)
 }
 
-func roundGapOffersPrices(offersPrices map[string]map[string]*models.Price) {
-	for offerKey, offerValue := range offersPrices {
-		for paymentKey := range offerValue {
-			offersPrices[offerKey][paymentKey].Net = lib.RoundFloat(offersPrices[offerKey][paymentKey].Net, 2)
-			offersPrices[offerKey][paymentKey].Tax = lib.RoundFloat(offersPrices[offerKey][paymentKey].Tax, 2)
-			offersPrices[offerKey][paymentKey].Gross = lib.RoundFloat(offersPrices[offerKey][paymentKey].Gross, 2)
+// NOTE: Why are you not rounding when these are computed??? Is this for redundancy?
+func roundOffersPrices(offersPrices map[string]map[string]*models.Price) {
+	for offer, payments := range offersPrices {
+		for paymentType, price := range payments {
+			offersPrices[offer][paymentType].Net = lib.RoundFloat(price.Net, 2)
+			offersPrices[offer][paymentType].Tax = lib.RoundFloat(price.Tax, 2)
+			offersPrices[offer][paymentType].Gross = lib.RoundFloat(price.Gross, 2)
 		}
 	}
 }
 
-func setOffersPrices(data *models.Policy, vehicleValue int64, baseGapMultiplierFloat float64, completeGapMultiplierFloat float64) {
-	data.OffersPrices = make(map[string]map[string]*models.Price)
+func initOfferPrices(
+	p *models.Policy,
+	offer string,
+	vehiclePrice float64,
+	gapMultiplier float64,
+	tax float64,
+) {
+	netPrice := gapMultiplier * vehiclePrice
+	TaxOnPrice := netPrice * (tax / 100)
+	TaxOnPrice = lib.RoundFloat(TaxOnPrice, 2)
+	grossPrice := netPrice + TaxOnPrice
 
-	data.OffersPrices["base"] = map[string]*models.Price{
+	p.OffersPrices[offer] = map[string]*models.Price{
 		"singleInstallment": {
-			Net:      getPrice("net", baseGapMultiplierFloat, vehicleValue),
-			Tax:      getPrice("tax", baseGapMultiplierFloat, vehicleValue),
-			Gross:    getPrice("gross", baseGapMultiplierFloat, vehicleValue),
-			Delta:    0.0,
-			Discount: 0.0,
-		},
-	}
-	data.OffersPrices["complete"] = map[string]*models.Price{
-		"singleInstallment": {
-			Net:      getPrice("net", completeGapMultiplierFloat, vehicleValue),
-			Tax:      getPrice("tax", completeGapMultiplierFloat, vehicleValue),
-			Gross:    getPrice("gross", completeGapMultiplierFloat, vehicleValue),
+			Net:      netPrice,
+			Tax:      TaxOnPrice,
+			Gross:    grossPrice,
 			Delta:    0.0,
 			Discount: 0.0,
 		},
 	}
 }
 
-func getPrice(mode string, gapMultipierFloat float64, vehicleValue int64) float64 {
-
-	taxValue := lib.RoundFloat(((gapMultipierFloat*float64(vehicleValue))/100)*13.5, 2)
-
-	switch mode {
-	case "net":
-		return gapMultipierFloat * float64(vehicleValue)
-	case "tax":
-		return taxValue
-	case "gross":
-		return (gapMultipierFloat * float64(vehicleValue)) + taxValue
-	default:
-		return 0
-	}
-
-}
-
-func getResidentArea(provincesMatrixDF dataframe.DataFrame, residenceCode string) string {
-	for _, row := range provincesMatrixDF.Records() {
+// Returns the area (N,C,S) of the residence in input.
+// If the return value is "" then no match is found.
+func getResidentArea(provincesMatrix dataframe.DataFrame, residenceCode string) string {
+	for _, row := range provincesMatrix.Records() {
 		if row[1] == residenceCode {
 			return row[2]
 		}
@@ -134,32 +127,20 @@ func getResidentArea(provincesMatrixDF dataframe.DataFrame, residenceCode string
 	return ""
 }
 
-func getDuration(startDate time.Time, endDate time.Time) int64 {
+func mustGetGapMultipliers(residences dataframe.DataFrame, duration int, area string) float64 {
+	var matrixAreaRow []string
 
-	return int64(endDate.Year() - startDate.Year())
-}
-
-func getGapMultipliers(baseMatrixDF dataframe.DataFrame, completeMatrixDF dataframe.DataFrame, duration int64, residenceArea string) (float64, float64) {
-
-	var baseMatrixAreaRow []string
-	var completeMatrixAreaRow []string
-
-	for _, row := range baseMatrixDF.Records() {
-		fmt.Println(row)
-		if row[0] == residenceArea {
-			baseMatrixAreaRow = row
+	// We assume that the area is unique, hence the first match is the only one
+	for _, row := range residences.Records() {
+		if row[0] == area {
+			matrixAreaRow = row
+			break
 		}
 	}
 
-	for _, row := range completeMatrixDF.Records() {
-		fmt.Println(row)
-		if row[0] == residenceArea {
-			completeMatrixAreaRow = row
-		}
-	}
+	taxString := strings.Replace(matrixAreaRow[duration], "%", "", -1)
+	tax, err := strconv.ParseFloat(taxString, 64)
+	lib.CheckError(err)
 
-	baseTaxFloat, _ := strconv.ParseFloat(strings.Replace(baseMatrixAreaRow[duration], "%", "", -1), 64)
-	completeTaxFloat, _ := strconv.ParseFloat(strings.Replace(completeMatrixAreaRow[duration], "%", "", -1), 64)
-
-	return baseTaxFloat / 100, completeTaxFloat / 100
+	return tax / 100
 }
