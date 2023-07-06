@@ -46,6 +46,9 @@ func GapFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 	authToken, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
 	lib.CheckError(err)
 	product, err := Vehicle(authToken.Role, &policy)
+	if err != nil {
+		return "", models.Product{}, fmt.Errorf("cannot retrieve the product: %v", err)
+	}
 
 	jsonProduct, err := json.Marshal(product)
 	if err != nil {
@@ -99,9 +102,9 @@ func isVehicleSellable(p *models.Policy) error {
 		return fmt.Errorf("the vehicle is not private")
 	}
 
-	car_types := []string{"auto", "autocarro", "suv"}
-	if !lib.SliceContains(car_types, v.VehicleType) {
-		return fmt.Errorf("The vehicle type is not in: %v", car_types)
+	carTypes := []string{"auto", "autocarro", "suv"}
+	if !lib.SliceContains(carTypes, v.VehicleType) {
+		return fmt.Errorf("The vehicle type is not in: %v", carTypes)
 	}
 
 	anniversary := v.RegistrationDate.AddDate(maxAgeAtStartDate, 0, 0)
