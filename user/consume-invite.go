@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"firebase.google.com/go/v4/auth"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"time"
@@ -21,8 +21,9 @@ type ConsumeInviteReq struct {
 func ConsumeInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var ConsumeInviteRequest ConsumeInviteReq
 
-	reqBytes := lib.ErrorByte(ioutil.ReadAll(r.Body))
-	json.Unmarshal(reqBytes, &ConsumeInviteRequest)
+	reqBytes := lib.ErrorByte(io.ReadAll(r.Body))
+	err := json.Unmarshal(reqBytes, &ConsumeInviteRequest)
+	lib.CheckError(err)
 
 	if ok, _ := ConsumeInvite(ConsumeInviteRequest.InviteUid, ConsumeInviteRequest.Password, r.Header.Get("Origin")); ok {
 		return `{"success": true}`, `{"success": true}`, nil
@@ -114,6 +115,10 @@ func createUser(collection string, userRecord *auth.UserRecord, invite UserInvit
 
 func createAgent(collection string, userRecord *auth.UserRecord, invite UserInvite) {
 	// create user in DB
+	for productIndex, _ := range invite.Products {
+		invite.Products[productIndex].IsAgentActive = true
+	}
+
 	agent := models.Agent{
 		User: models.User{
 			Mail:         invite.Email,
@@ -143,6 +148,10 @@ func createAgent(collection string, userRecord *auth.UserRecord, invite UserInvi
 
 func createAgency(collection string, userRecord *auth.UserRecord, invite UserInvite) {
 	// create user in DB
+	for productIndex, _ := range invite.Products {
+		invite.Products[productIndex].IsAgencyActive = true
+	}
+
 	agency := models.Agency{
 		AuthId:          userRecord.UID,
 		Uid:             userRecord.UID,
