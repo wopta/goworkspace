@@ -199,6 +199,6 @@ func QueryRowsBigQuery[T any](datasetID string, tableID string, query string) ([
 func getBigqueryClient() *bigquery.Client {
 	ctx := context.Background()
 	client, err := bigquery.NewClient(ctx, os.Getenv("GOOGLE_PROJECT_ID"))
-	CheckError(err)
+	lib.CheckError(err)
 	return client
 }
