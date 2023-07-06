@@ -48,6 +48,7 @@ func QueryRowsBigQuery[T any](datasetID string, tableID string, query string) ([
 		if e != nil {
 			return res, e
 		}
+		log.Println(e)
 		res = append(res, row)
 
 	}
