@@ -124,6 +124,7 @@ func FabrickExpireBill(w http.ResponseWriter, r *http.Request) (string, interfac
 
 	req, _ := http.NewRequest(http.MethodPut, urlstring, strings.NewReader(`{"id":"`+transaction.ProviderId+`","newExpirationDate":"`+expirationDate+expirationTimeSuffix+`"}`))
 	res, e := getFabrickClient(urlstring, req)
+
 	respBody, e := io.ReadAll(res.Body)
 	log.Println("Fabrick res body: ", string(respBody))
 	if res.StatusCode != http.StatusOK {

@@ -26,6 +26,7 @@ func getFabrickClient(urlstring string, req *http.Request) (*http.Response, erro
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("x-auth-token", os.Getenv("FABRICK_PERSISTENT_KEY"))
 	req.Header.Set("Accept", "application/json")
+	log.Println("[GetFabrickClient]", req)
 	res, err := client.Do(req)
 
 	return res, err
