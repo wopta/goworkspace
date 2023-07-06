@@ -70,9 +70,7 @@ func Gap(data *models.Policy) {
 	log.Printf("valore completo veicolo*tax e' %f\n", completeGapMultiplierFloat*float64(vehicleValue))
 
 	//set the offer in the policy and round to 2 decimal number
-
 	setOffersPrices(data, vehicleValue, baseGapMultiplierFloat, completeGapMultiplierFloat)
-
 	roundGapOffersPrices(data.OffersPrices)
 
 }
