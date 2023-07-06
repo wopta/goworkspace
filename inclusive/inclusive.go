@@ -1,6 +1,7 @@
 package inclusive
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"io/ioutil"
@@ -9,11 +10,13 @@ import (
 	"os"
 	"time"
 
+	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/civil"
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/google/uuid"
 	lib "github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"google.golang.org/api/iterator"
 )
 
 func init() {
@@ -162,4 +165,40 @@ func SetData(obj BankAccountMovement) BankAccountMovement {
 	obj.Customer = "hype"
 
 	return obj
+}
+func QueryRowsBigQuery[T any](datasetID string, tableID string, query string) ([]T, error) {
+	var (
+		res  []T
+		e    error
+		iter *bigquery.RowIterator
+	)
+	log.Println(query)
+	client := getBigqueryClient()
+	ctx := context.Background()
+	defer client.Close()
+	queryi := client.Query(query)
+	iter, e = queryi.Read(ctx)
+	log.Println(e)
+	for {
+		var row T
+		e := iter.Next(&row)
+		log.Println(e)
+		if e == iterator.Done {
+			return res, e
+		}
+		if e != nil {
+			return res, e
+		}
+		log.Println(e)
+		res = append(res, row)
+
+	}
+
+}
+
+func getBigqueryClient() *bigquery.Client {
+	ctx := context.Background()
+	client, err := bigquery.NewClient(ctx, os.Getenv("GOOGLE_PROJECT_ID"))
+	CheckError(err)
+	return client
 }
