@@ -126,7 +126,7 @@ func CheckData(r *http.Request) (BankAccountMovement, error) {
 		}
 	}
 	if obj.MovementType == "delete" {
-		res, e := QueryRowsBigQuery[BankAccountMovement]("wopta",
+		res, _ := QueryRowsBigQuery[BankAccountMovement]("wopta",
 			"inclusive_axa_bank_account",
 			"select * from `wopta."+dataMovement+"` where fiscalCode='"+obj.FiscalCode+"' and guaranteesCode ='"+obj.GuaranteesCode+"'")
 		log.Println(len(res))
