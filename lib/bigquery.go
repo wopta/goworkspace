@@ -26,7 +26,8 @@ func InsertRowsBigQuery(datasetID string, tableID string, value interface{}) err
 	log.Println(e)
 	return e
 }
-func QueryRowsBigQuery[T any](datasetID string, tableID string, query string) ([]T, error) {
+
+func QueryRowsBigQuery[T any](query string) ([]T, error) {
 	var (
 		res  []T
 		e    error
@@ -42,6 +43,7 @@ func QueryRowsBigQuery[T any](datasetID string, tableID string, query string) ([
 	for {
 		var row T
 		e := iter.Next(&row)
+		log.Println(e)
 		if e == iterator.Done {
 			return res, e
 		}
