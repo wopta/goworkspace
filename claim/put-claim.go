@@ -47,10 +47,12 @@ func PutClaim(idToken string, origin string, claim *models.Claim) (string, inter
 	fireUsers := lib.GetDatasetByEnv(origin, models.UserCollection)
 	docsnap, err := lib.GetFirestoreErr(fireUsers, userAuthID)
 	if err != nil {
+		log.Printf("[PutClaim] get user from DB error %s", err.Error())
 		return `{"success":false}`, `{"success":false}`, nil
 	}
 	err = docsnap.DataTo(&user)
 	if err != nil {
+		log.Printf("[PutClaim] data to DB error %s", err.Error())
 		return `{"success":false}`, `{"success":false}`, nil
 	}
 	log.Println("[PutClaim] User: ", user)
