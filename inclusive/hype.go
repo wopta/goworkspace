@@ -24,6 +24,9 @@ const (
 
 // TO DO security,payload,error,fasature
 func BankAccountHypeFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	layout := "2006-01-02"
+	layout2 := "HH:mm:ss"
+
 	var (
 		e   error
 		obj BankAccountMovement
@@ -44,8 +47,8 @@ func BankAccountHypeFx(resp http.ResponseWriter, r *http.Request) (string, inter
 	}
 	if obj.MovementType == "delete" {
 		e = lib.UpdateRowBigQuery("wopta", dataBanckAccount, map[string]string{
-			"status": obj.Status,
-			//"endDate": civil.DateTimeOf(obj.EndDate).String(),
+			"status":  obj.Status,
+			"endDate": obj.EndDate.Format(layout) + " " + obj.EndDate.Format(layout2),
 		}, "fiscalCode='"+obj.FiscalCode+"' and guaranteesCode='"+obj.GuaranteesCode+"'")
 
 	}
