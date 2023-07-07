@@ -45,7 +45,7 @@ func BankAccountHypeFx(resp http.ResponseWriter, r *http.Request) (string, inter
 	if obj.MovementType == "delete" {
 		e = lib.UpdateRowBigQuery("wopta", dataBanckAccount, map[string]string{
 			"status":  obj.Status,
-			"endDate": obj.EndDate.String(),
+			"endDate": civil.DateTimeOf(obj.EndDate).String(),
 		}, "fiscalCode="+obj.FiscalCode+" and guaranteesCode="+obj.GuaranteesCode)
 
 	}
