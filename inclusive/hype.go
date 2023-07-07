@@ -25,7 +25,6 @@ const (
 // TO DO security,payload,error,fasature
 func BankAccountHypeFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	layout := "2006-01-02"
-	layout2 := "HH:mm:ss"
 
 	var (
 		e   error
