@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/go-gota/gota/dataframe"
-	"github.com/pkg/errors"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/sellable"
@@ -30,88 +29,82 @@ func GapFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 
 	Gap(authToken.Role, &policy)
 	policyJson, err := json.Marshal(policy)
-	return string(policyJson), nil, err
+	return string(policyJson), policy, err
 }
 
-func getDataFrameFromCsv(path string) dataframe.DataFrame {
-	csvFile := lib.GetFilesByEnv("quote/gap_matrix_base.csv")
-	return lib.CsvToDataframe(csvFile)
-}
-
-func Gap(role string, p *models.Policy) {
-	product, err := sellable.Gap(role, p)
+func Gap(role string, policy *models.Policy) {
+	product, err := sellable.Gap(role, policy)
 	lib.CheckError(err)
 
-	guarantees := make([]models.Guarante, 0, 10)
-	for _, g := range product.Companies[0].GuaranteesMap {
-		guarantees = append(guarantees, *g)
-	}
-	p.Assets[0].Guarantees = guarantees
+	policy.Assets[0].Guarantees = getGuarantees(product)
 
-	gapMatrices := map[string]dataframe.DataFrame{
-		"base":     getDataFrameFromCsv("quote/gap_matrix_base.csv"),
-		"complete": getDataFrameFromCsv("quote/gap_matrix_complete.csv"),
+	gapPaths := map[string]string{
+		"base":     "quote/gap_matrix_base.csv",
+		"complete": "quote/gap_matrix_complete.csv",
 	}
 
 	provincesMatrix := getDataFrameFromCsv("enrich/provinces.csv")
-
-	residenceCode := p.Assets[0].Person.Residence.Locality
-	vehiclePrice := p.Assets[0].Vehicle.PriceValue
-	residenceArea := getResidentArea(provincesMatrix, residenceCode)
-	duration := lib.ElapsedYears(p.StartDate, p.EndDate)
-
-	// Getting the first tax, and assuming every others are the same
-	tax := -1.0
-	for _, g := range product.Companies[0].GuaranteesMap {
-		tax = g.Tax
-		break
-	}
-	// Just in case
-	if tax == -1.0 {
-		lib.CheckError(errors.New("Error: no tax found"))
-	}
-
 	for offer := range product.Offers {
-		gapMatrix := gapMatrices[offer]
-		gapMultiplier := mustGetGapMultipliers(gapMatrix, duration, residenceArea)
-
-		initOfferPrices(p, offer, float64(vehiclePrice), gapMultiplier, tax)
-	}
-
-	roundOffersPrices(p.OffersPrices)
-}
-
-func roundOffersPrices(offersPrices map[string]map[string]*models.Price) {
-	for offer, payments := range offersPrices {
-		for paymentType, price := range payments {
-			offersPrices[offer][paymentType].Net = lib.RoundFloat(price.Net, 2)
-			offersPrices[offer][paymentType].Tax = lib.RoundFloat(price.Tax, 2)
-			offersPrices[offer][paymentType].Gross = lib.RoundFloat(price.Gross, 2)
-		}
+		gapMatrix := getDataFrameFromCsv(gapPaths[offer])
+		calculateGapOfferPrices(policy, product, offer, gapMatrix, provincesMatrix)
 	}
 }
 
-func initOfferPrices(
-	p *models.Policy,
+func calculateGapOfferPrices(
+	policy *models.Policy,
+	product models.Product,
 	offer string,
-	vehiclePrice float64,
-	gapMultiplier float64,
-	tax float64,
+	gapMatrix dataframe.DataFrame,
+	provincesMatrix dataframe.DataFrame,
 ) {
-	netPrice := gapMultiplier * vehiclePrice
-	TaxOnPrice := netPrice * (tax / 100)
-	TaxOnPrice = lib.RoundFloat(TaxOnPrice, 2)
-	grossPrice := netPrice + TaxOnPrice
+	var (
+		duration      = lib.ElapsedYears(policy.StartDate, policy.EndDate)
+		residenceCode = policy.Assets[0].Person.Residence.CityCode
+		residenceArea = getResidentArea(provincesMatrix, residenceCode)
+		multiplier    = getGapMultipliers(gapMatrix, duration, residenceArea)
 
-	p.OffersPrices[offer] = map[string]*models.Price{
+		tax          = getTax(product)
+		vehiclePrice = float64(policy.Assets[0].Vehicle.PriceValue)
+		netPrice     = multiplier * vehiclePrice
+		taxOnPrice   = lib.RoundFloat((netPrice/100)*tax, 2)
+		grossPrice   = netPrice + taxOnPrice
+	)
+
+	// Check if OffersPrices is not initialized
+	if policy.OffersPrices == nil {
+		policy.OffersPrices = make(map[string]map[string]*models.Price)
+	}
+
+	policy.OffersPrices[offer] = map[string]*models.Price{
 		"singleInstallment": {
-			Net:      netPrice,
-			Tax:      TaxOnPrice,
-			Gross:    grossPrice,
+			Net:      lib.RoundFloat(netPrice, 2),
+			Tax:      lib.RoundFloat(taxOnPrice, 2),
+			Gross:    lib.RoundFloat(grossPrice, 2),
 			Delta:    0.0,
 			Discount: 0.0,
 		},
 	}
+}
+
+// Getting the first tax, and assuming every others are the same
+func getTax(product models.Product) float64 {
+	for _, guarantee := range product.Companies[0].GuaranteesMap {
+		return guarantee.Tax
+	}
+	panic("no tax found")
+}
+
+func getDataFrameFromCsv(path string) dataframe.DataFrame {
+	csvFile := lib.GetFilesByEnv(path)
+	return lib.CsvToDataframe(csvFile)
+}
+
+func getGuarantees(product models.Product) []models.Guarante {
+	guarantees := make([]models.Guarante, 0)
+	for _, guarantee := range product.Companies[0].GuaranteesMap {
+		guarantees = append(guarantees, *guarantee)
+	}
+	return guarantees
 }
 
 // Returns the area (N,C,S) of the residence in input.
@@ -125,7 +118,7 @@ func getResidentArea(provincesMatrix dataframe.DataFrame, residenceCode string) 
 	return ""
 }
 
-func mustGetGapMultipliers(residences dataframe.DataFrame, duration int, area string) float64 {
+func getGapMultipliers(residences dataframe.DataFrame, duration int, area string) float64 {
 	var matrixAreaRow []string
 
 	// We assume that the area is unique, hence the first match is the only one

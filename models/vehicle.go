@@ -18,7 +18,7 @@ type Vehicle struct {
 	IsFireTheftCovered bool      `firestore:"isFireTheftCovered,omitempty" json:"isFireTheftCovered,omitempty" bigquery:"-"` // COPERTURA FURTO/INCENDIO PREESISTENTE
 	MainUse            string    `firestore:"mainUse,omitempty"            json:"mainUse,omitempty"            bigquery:"-"` // UTILIZZO PRINCIPALE (privato/...)
 	IsElectric         bool      `firestore:"isElectric,omitempty"         json:"isElectric,omitempty"         bigquery:"-"` // SE E' UN VEICOLO ELETTRICO O NO
-	State              string    `firestore:"state,omitempty"              json:"state,omitempty"              bigquery:"-"` // VEICOLO NUOVO, USATO, ETC...
+	Condition          string    `firestore:"condition,omitempty"          json:"condition,omitempty"          bigquery:"-"` // VEICOLO NUOVO, USATO, ETC...
 	// NOTE: Unused attributes
 	// Vin                string    `firestore:"vin,omitempty"                json:"vin,omitempty"                bigquery:"-"` // VIN (vehicle Identification Number)
 	// AlarmTypeInstalled string    `firestore:"alarmTypeInstalled,omitempty" json:"alarmTypeInstalled,omitempty" bigquery:"-"` // ANTIFURTO INSTALLATO (nessuno/meccanico/elettronico/satellitare)
