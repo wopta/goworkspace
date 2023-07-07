@@ -143,7 +143,7 @@ func validatePolicy(p *models.Policy) error {
 
 	maxAgeFullCoverageBD := v.RegistrationDate.AddDate(maxAgeFullCoverage, 0, 0)
 	if time.Now().Before(maxAgeFullCoverageBD) {
-		if pd <= maxCoverage {
+		if pd >= maxCoverage {
 			return fmt.Errorf(
 				"wrong policy duration! It should be at maximum %d, we've got %d",
 				maxCoverage,
@@ -157,7 +157,7 @@ func validatePolicy(p *models.Policy) error {
 		if coverage <= 0 {
 			return fmt.Errorf("The coverage has duration 0")
 		}
-		if pd <= coverage {
+		if pd >= coverage {
 			return fmt.Errorf("wrong policy duration! it should be at most %d, we've got %d", coverage, pd)
 		}
 	}
