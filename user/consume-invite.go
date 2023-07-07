@@ -98,6 +98,7 @@ func createUser(collection string, userRecord *auth.UserRecord, invite UserInvit
 		AuthId:       userRecord.UID,
 		Role:         invite.Role,
 		FiscalCode:   invite.FiscalCode,
+		VatCode:      invite.VatCode,
 		Name:         invite.Name,
 		Surname:      invite.Surname,
 		CreationDate: time.Now().UTC(),

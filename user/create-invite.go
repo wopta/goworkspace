@@ -16,12 +16,15 @@ import (
 )
 
 type CreateInviteRequest struct {
-	Role       string           `json:"role"`
-	Email      string           `json:"email"`
-	FiscalCode string           `json:"fiscalCode,omitempty" firestore:"fiscalCode,omitempty"`
-	Name       string           `json:"name,omitempty" firestore:"name,omitempty"`
-	Surname    string           `json:"surname,omitempty" firestore:"surname,omitempty"`
-	Products   []models.Product `json:"products,omitempty" firestore:"products,omitempty"`
+	Role            string           `json:"role"`
+	Email           string           `json:"email"`
+	FiscalCode      string           `json:"fiscalCode,omitempty"`
+	VatCode         string           `json:"vatCode,omitempty"`
+	Name            string           `json:"name,omitempty"`
+	Surname         string           `json:"surname,omitempty"`
+	RuiCode         string           `json:"ruiCode,omitempty"`
+	RuiRegistration time.Time        `json:"ruiRegistration"`
+	Products        []models.Product `json:"products,omitempty"`
 }
 
 type UserInvite struct {
@@ -87,14 +90,18 @@ func CreateInvite(inviteRequest CreateInviteRequest, origin, creatorUid string) 
 	}
 
 	invite := UserInvite{
-		Name:       inviteRequest.Name,
-		Surname:    inviteRequest.Surname,
-		FiscalCode: inviteRequest.FiscalCode,
-		Email:      inviteRequest.Email,
-		Role:       userRole,
-		Expiration: inviteExpiration,
-		Uid:        inviteUid,
-		CreatorUid: creatorUid,
+		Name:            inviteRequest.Name,
+		Surname:         inviteRequest.Surname,
+		VatCode:         inviteRequest.VatCode,
+		FiscalCode:      inviteRequest.FiscalCode,
+		Email:           inviteRequest.Email,
+		Role:            userRole,
+		Expiration:      inviteExpiration,
+		Uid:             inviteUid,
+		CreatorUid:      creatorUid,
+		RuiCode:         inviteRequest.RuiCode,
+		RuiRegistration: inviteRequest.RuiRegistration,
+		Products:        inviteRequest.Products,
 	}
 
 	// check if user exists
