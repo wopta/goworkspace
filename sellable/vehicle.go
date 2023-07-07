@@ -1,11 +1,7 @@
 package sellable
 
 import (
-	"encoding/json"
 	"fmt"
-	"io"
-	"log"
-	"net/http"
 	"time"
 
 	"github.com/wopta/goworkspace/lib"
@@ -23,54 +19,19 @@ const (
 	maxCoverage          = 5
 )
 
-// Function for exposing the sellability function of Gap (vehicles).
-// It takes a request in which the body contains the policy in JSON format,
-// which should contain a vehicle asset and a person asset
-// and then it returns the appropriate product.
-func GapFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	var (
-		policy models.Policy
-		err    error
-	)
-
-	log.Println("[GapFx] Handler start")
-
-	bytes, err := io.ReadAll(r.Body)
-	if err != nil {
-		return "{}", nil, fmt.Errorf("cannot read body: %v", err)
-	}
-	if err = json.Unmarshal(bytes, &policy); err != nil {
-		return "{}", nil, err
-	}
-
-	authToken, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
-	lib.CheckError(err)
-	product, err := Gap(authToken.Role, &policy)
-	if err != nil {
-		return "", models.Product{}, fmt.Errorf("cannot retrieve the product: %v", err)
-	}
-
-	jsonProduct, err := json.Marshal(product)
-	if err != nil {
-		return "", models.Product{}, fmt.Errorf("cannot generate the JSON: %v", err)
-	}
-
-	return string(jsonProduct), product, err
-}
-
 // Given a policy that should contain the Gap and the Person assets, then it returns:
 //   - the product or parts of it depending on the sellable rules
 //   - and an eventual error
-func Gap(role string, p *models.Policy) (models.Product, error) {
-	if err := validatePolicy(p); err != nil {
+func Gap(role string, policy *models.Policy) (models.Product, error) {
+	if err := validatePolicy(policy); err != nil {
 		return models.Product{}, fmt.Errorf("the policy did not pass validation: %v", err)
 	}
 
-	if err := isVehicleSellable(p); err != nil {
+	if err := isVehicleSellable(policy); err != nil {
 		return models.Product{}, fmt.Errorf("vehicle not sellable: %v", err)
 	}
 
-	product, err := productForVehicle(p, role)
+	product, err := getProduct(policy, role)
 	if err != nil {
 		return models.Product{}, fmt.Errorf("no products for this vehicle: %v", err)
 	}
@@ -78,14 +39,14 @@ func Gap(role string, p *models.Policy) (models.Product, error) {
 	return product, nil
 }
 
-func productForVehicle(p *models.Policy, r string) (models.Product, error) {
-	product, err := prd.GetProduct("gap", "v1", r)
+func getProduct(policy *models.Policy, role string) (models.Product, error) {
+	product, err := prd.GetProduct("gap", "v1", role)
 	if err != nil {
 		return models.Product{}, fmt.Errorf("error in getting the product: %v", err)
 	}
 
-	vp := p.Assets[0].Vehicle.PriceValue
-	if vp > minPriceOnlyComplete && vp <= maxPriceValue {
+	vehiclePrice := policy.Assets[0].Vehicle.PriceValue
+	if vehiclePrice > minPriceOnlyComplete && vehiclePrice <= maxPriceValue {
 		delete(product.Offers, "base")
 	}
 
@@ -93,61 +54,61 @@ func productForVehicle(p *models.Policy, r string) (models.Product, error) {
 }
 
 // Returns true if the policy is conforming to the sellability rules for GAP
-func isVehicleSellable(p *models.Policy) error {
-	v := p.Assets[0].Vehicle
-	if !v.IsFireTheftCovered {
+func isVehicleSellable(policy *models.Policy) error {
+	vehicle := policy.Assets[0].Vehicle
+	if !vehicle.IsFireTheftCovered {
 		return fmt.Errorf("fire and theft is not covered")
 	}
-	if v.MainUse != "private" {
+	if vehicle.MainUse != "private" {
 		return fmt.Errorf("the vehicle is not private")
 	}
 
 	carTypes := []string{"auto", "autocarro", "suv"}
-	if !lib.SliceContains(carTypes, v.VehicleType) {
+	if !lib.SliceContains(carTypes, vehicle.VehicleType) {
 		return fmt.Errorf("The vehicle type is not in: %v", carTypes)
 	}
 
-	anniversary := v.RegistrationDate.AddDate(maxAgeAtStartDate, 0, 0)
-	if p.StartDate.After(anniversary) {
+	anniversary := vehicle.RegistrationDate.AddDate(maxAgeAtStartDate, 0, 0)
+	if policy.StartDate.After(anniversary) {
 		return fmt.Errorf("The registration is too old, exceeded the start date")
 	}
 
-	anniversary = v.RegistrationDate.AddDate(maxAgeAtEndDate, 0, 0)
-	if p.EndDate.After(anniversary) {
+	anniversary = vehicle.RegistrationDate.AddDate(maxAgeAtEndDate, 0, 0)
+	if policy.EndDate.After(anniversary) {
 		return fmt.Errorf("The registration is too old, exceeded the end date")
 	}
 
-	vp := p.Assets[0].Vehicle.PriceValue
-	if vp < minPriceValue || vp > maxPriceValue {
+	vehiclePrice := policy.Assets[0].Vehicle.PriceValue
+	if vehiclePrice < minPriceValue || vehiclePrice > maxPriceValue {
 		return fmt.Errorf("the value is not within the accepted range")
 	}
 
 	return nil
 }
 
-func validatePolicy(p *models.Policy) error {
-	if len(p.Assets) == 0 {
+func validatePolicy(policy *models.Policy) error {
+	if len(policy.Assets) == 0 {
 		return fmt.Errorf("no assets found")
 	}
 
-	if p.Assets[0].Person == nil {
+	if policy.Assets[0].Person == nil {
 		return fmt.Errorf("no person found")
 	}
 
-	if p.Assets[0].Vehicle == nil {
+	if policy.Assets[0].Vehicle == nil {
 		return fmt.Errorf("no vehicle found")
 	}
 
-	v := p.Assets[0].Vehicle
-	pd := lib.ElapsedYears(p.StartDate, p.EndDate)
+	vehicle := policy.Assets[0].Vehicle
+	policyDuration := lib.ElapsedYears(policy.StartDate, policy.EndDate)
 
-	maxAgeFullCoverageBD := v.RegistrationDate.AddDate(maxAgeFullCoverage, 0, 0)
+	maxAgeFullCoverageBD := vehicle.RegistrationDate.AddDate(maxAgeFullCoverage, 0, 0)
 	if time.Now().Before(maxAgeFullCoverageBD) {
-		if pd >= maxCoverage {
+		if policyDuration > maxCoverage {
 			return fmt.Errorf(
 				"wrong policy duration! It should be at maximum %d, we've got %d",
 				maxCoverage,
-				pd,
+				policyDuration,
 			)
 		}
 	} else {
@@ -157,8 +118,8 @@ func validatePolicy(p *models.Policy) error {
 		if coverage <= 0 {
 			return fmt.Errorf("The coverage has duration 0")
 		}
-		if pd >= coverage {
-			return fmt.Errorf("wrong policy duration! it should be at most %d, we've got %d", coverage, pd)
+		if policyDuration > coverage {
+			return fmt.Errorf("wrong policy duration! it should be at most %d, we've got %d", coverage, policyDuration)
 		}
 	}
 	return nil

@@ -27,12 +27,6 @@ func Sellable(w http.ResponseWriter, r *http.Request) {
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
-				Route:   "/v1/sales/vehicle",
-				Handler: GapFx,
-				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAll},
-			},
-			{
 				Route:   "/v1/risk/person",
 				Handler: PersonHandler,
 				Method:  http.MethodPost,
