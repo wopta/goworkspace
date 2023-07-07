@@ -23,7 +23,7 @@ const (
 )
 
 // TO DO security,payload,error,fasature
-func BankAccountFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func BankAccountHypeFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		e   error
 		obj BankAccountMovement
