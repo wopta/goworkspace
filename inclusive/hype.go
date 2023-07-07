@@ -130,7 +130,7 @@ func CheckData(r *http.Request) (BankAccountMovement, error) {
 			"inclusive_axa_bank_account",
 			"select * from `wopta."+dataMovement+"` where fiscalCode='"+obj.FiscalCode+"' and guaranteesCode ='"+obj.GuaranteesCode+"'")
 		log.Println(len(res))
-		if len(res) == 0 || e != nil {
+		if len(res) == 0 {
 			return obj, GetErrorJson(400, "Bad request", "insert movement miss")
 		}
 		if obj.StartDate.IsZero() {
