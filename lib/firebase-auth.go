@@ -83,23 +83,21 @@ func VerifyAuthorization(handler func(w http.ResponseWriter, r *http.Request) (s
 		if err != nil {
 			log.Println("VerifyAuthorization: verify id token error: ", err)
 			return errorHandler(w)
-		} else if token.Claims["role"] == nil {
-			log.Println("VerifyAuthorization: user role not set")
+		}
+
+		userRole := "customer"
+		if role, ok := token.Claims["role"].(string); ok {
+			userRole = role
+		}
+
+		if !SliceContains(roles, userRole) {
 			return errorHandler(w)
 		}
 
-		userRole := token.Claims["role"].(string)
-
-		if SliceContains(roles, userRole) {
-			return handler(w, r)
-		}
-
-		return errorHandler(w)
-
+		return handler(w, r)
 	}
 
 	return wrappedHandler
-
 }
 
 func SetCustomClaimForUser(uid string, claims map[string]interface{}) {
