@@ -23,7 +23,9 @@ const (
 )
 
 // TO DO security,payload,error,fasature
-func BankAccountFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func BankAccountHypeFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	layout := "2006-01-02"
+
 	var (
 		e   error
 		obj BankAccountMovement
@@ -43,10 +45,10 @@ func BankAccountFx(resp http.ResponseWriter, r *http.Request) (string, interface
 		e = lib.InsertRowsBigQuery("wopta", dataBanckAccount, obj)
 	}
 	if obj.MovementType == "delete" {
-		e = lib.UpdateRowBigQuery("", dataBanckAccount, map[string]string{
+		e = lib.UpdateRowBigQuery("wopta", dataBanckAccount, map[string]string{
 			"status":  obj.Status,
-			"endDate": obj.EndDate.String(),
-		}, "fiscalCode="+obj.FiscalCode+" and guaranteesCode="+obj.GuaranteesCode)
+			"endDate": obj.EndDate.Format(layout) + " 00:00:00",
+		}, "fiscalCode='"+obj.FiscalCode+"' and guaranteesCode='"+obj.GuaranteesCode+"'")
 
 	}
 
@@ -126,11 +128,11 @@ func CheckData(r *http.Request) (BankAccountMovement, error) {
 		}
 	}
 	if obj.MovementType == "delete" {
-		res, e := QueryRowsBigQuery[BankAccountMovement]("wopta",
+		res, _ := QueryRowsBigQuery[BankAccountMovement]("wopta",
 			"inclusive_axa_bank_account",
 			"select * from `wopta."+dataMovement+"` where fiscalCode='"+obj.FiscalCode+"' and guaranteesCode ='"+obj.GuaranteesCode+"'")
 		log.Println(len(res))
-		if len(res) == 0 || e != nil {
+		if len(res) == 0 {
 			return obj, GetErrorJson(400, "Bad request", "insert movement miss")
 		}
 		if obj.StartDate.IsZero() {
