@@ -54,7 +54,7 @@ func QueryRowsBigQuery[T any](datasetID string, tableID string, query string) ([
 	}
 
 }
-func UpdateRowBigQuery(datasetID string, tableID string, id string, params map[string]string, condiction string) error {
+func UpdateRowBigQuery(datasetID string, tableID string, params map[string]string, condiction string) error {
 	var (
 		e error
 		b bytes.Buffer
