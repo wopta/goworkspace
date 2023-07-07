@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/go-gota/gota/dataframe"
+	"github.com/pkg/errors"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/sellable"
@@ -59,30 +60,27 @@ func Gap(role string, p *models.Policy) {
 	residenceArea := getResidentArea(provincesMatrix, residenceCode)
 	duration := lib.ElapsedYears(p.StartDate, p.EndDate)
 
-	log.Printf("base value e': %d\n", duration)
+	// Getting the first tax, and assuming every others are the same
+	tax := -1.0
+	for _, g := range product.Companies[0].GuaranteesMap {
+		tax = g.Tax
+		break
+	}
+	// Just in case
+	if tax == -1.0 {
+		lib.CheckError(errors.New("Error: no tax found"))
+	}
 
 	for offer := range product.Offers {
 		gapMatrix := gapMatrices[offer]
 		gapMultiplier := mustGetGapMultipliers(gapMatrix, duration, residenceArea)
 
-		// BUG: The tax is applied to the offers "GapComplete" and "GapBase".
-		// However, theese taxes are defined by guaranteesMap "theft-fire", "catastrophic-event", and "total-damage".
-		// Still, it is possible to apply those taxes to the guarantees, since Policy.OffersPrices is a map[string]Price
-		// NOTE: Temp fix: tax should be taken from the "Product" data structure
-		initOfferPrices(p, offer, float64(vehiclePrice), gapMultiplier, 13.5)
-
-		log.Printf("valore di %q e' %f\n", offer, gapMultiplier)
-		log.Printf(
-			"valore di %q per veicolo*tax e' %f\n",
-			offer,
-			gapMultiplier*float64(vehiclePrice),
-		)
+		initOfferPrices(p, offer, float64(vehiclePrice), gapMultiplier, tax)
 	}
 
 	roundOffersPrices(p.OffersPrices)
 }
 
-// NOTE: Why are you not rounding when these are computed??? Is this for redundancy?
 func roundOffersPrices(offersPrices map[string]map[string]*models.Price) {
 	for offer, payments := range offersPrices {
 		for paymentType, price := range payments {
