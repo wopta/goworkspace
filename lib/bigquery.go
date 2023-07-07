@@ -68,12 +68,16 @@ func UpdateRowBigQuery(datasetID string, tableID string, params map[string]strin
 	b.WriteString(" ")
 	b.WriteString("SET")
 	b.WriteString(" ")
+	count := 1
 	for k, v := range params {
 		b.WriteString(" ")
 		b.WriteString(k)
 		b.WriteString("=")
 		b.WriteString("'" + v + "'")
-		b.WriteString(" ")
+		if len(params) > count {
+			b.WriteString(", ")
+		}
+		count = count + 1
 
 	}
 	b.WriteString("WHERE")
