@@ -46,7 +46,7 @@ func BankAccountHypeFx(resp http.ResponseWriter, r *http.Request) (string, inter
 		e = lib.UpdateRowBigQuery("wopta", dataBanckAccount, map[string]string{
 			"status":  obj.Status,
 			"endDate": civil.DateTimeOf(obj.EndDate).String(),
-		}, "fiscalCode="+obj.FiscalCode+" and guaranteesCode="+obj.GuaranteesCode)
+		}, "fiscalCode='"+obj.FiscalCode+"' and guaranteesCode='"+obj.GuaranteesCode+"'")
 
 	}
 
