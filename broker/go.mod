@@ -12,7 +12,7 @@ require (
 	github.com/wopta/goworkspace/document v1.0.62
 	github.com/wopta/goworkspace/lib v1.0.53
 	github.com/wopta/goworkspace/mail v1.0.22
-	github.com/wopta/goworkspace/models v1.1.11
+	github.com/wopta/goworkspace/models v1.1.12
 	github.com/wopta/goworkspace/payment v1.0.50
 	github.com/wopta/goworkspace/user v1.0.14
 	github.com/wopta/goworkspace/wiseproxy v1.0.3
