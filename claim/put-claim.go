@@ -47,26 +47,15 @@ func PutClaim(idToken string, origin string, claim *models.Claim) (string, inter
 	fireUsers := lib.GetDatasetByEnv(origin, models.UserCollection)
 	docsnap, err := lib.GetFirestoreErr(fireUsers, userAuthID)
 	if err != nil {
+		log.Printf("[PutClaim] get user from DB error %s", err.Error())
 		return `{"success":false}`, `{"success":false}`, nil
 	}
 	err = docsnap.DataTo(&user)
 	if err != nil {
+		log.Printf("[PutClaim] data to DB error %s", err.Error())
 		return `{"success":false}`, `{"success":false}`, nil
 	}
 	log.Println("[PutClaim] User: ", user)
-
-	log.Printf("[PutClaim] get policy %s from firestore", claim.PolicyId)
-	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
-	docsnap, err = lib.GetFirestoreErr(firePolicy, claim.PolicyId)
-	if err != nil {
-		log.Printf("[PutClaim] error retrieving policy %s from firestore, error message: %s", claim.PolicyId, err.Error())
-		return `{"success":false}`, `{"success":false}`, nil
-	}
-	err = docsnap.DataTo(&policy)
-	if err != nil {
-		log.Println("[PutClaim] error convert docsnap to policy")
-		return `{"success":false}`, `{"success":false}`, nil
-	}
 
 	claim.CreationDate = time.Now().UTC()
 	claim.Updated = claim.CreationDate
