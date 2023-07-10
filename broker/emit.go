@@ -2,6 +2,7 @@ package broker
 
 import (
 	"encoding/json"
+	"errors"
 	"io"
 	"log"
 	"net/http"
@@ -14,6 +15,11 @@ import (
 	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/payment"
+)
+
+const (
+	typeEmit    string = "emit"
+	typeApprove string = "approve"
 )
 
 type EmitResponse struct {
@@ -53,7 +59,11 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	log.Printf("[EmitFx] Policy %s JSON: %s", uid, string(policyJsonLog))
 
 	emitUpdatePolicy(&policy, request)
-	responseEmit := Emit(&policy, origin)
+	responseEmit, e := Emit(&policy, origin)
+	if e != nil {
+		log.Printf("[EmitFx] cannot emit policy %s: %s", policy.Uid, e.Error())
+		return `{"success":false}`, `{"success":false}`, nil
+	}
 
 	b, e := json.Marshal(responseEmit)
 	log.Println("[EmitFx] Response: ", string(b))
@@ -61,15 +71,21 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	return string(b), responseEmit, e
 }
 
-func Emit(policy *models.Policy, origin string) EmitResponse {
-	var responseEmit EmitResponse
+func Emit(policy *models.Policy, origin string) (EmitResponse, error) {
+	var (
+		responseEmit EmitResponse
+		err          error
+	)
 
 	firePolicy := lib.GetDatasetByEnv(origin, "policy")
 	guaranteFire := lib.GetDatasetByEnv(origin, "guarante")
 
-	if policy.IsReserved && policy.Status != models.PolicyStatusWaitForApproval {
+	emitType := getEmitTypeFromPolicy(policy)
+	switch emitType {
+	case typeApprove:
+		log.Printf("[Emit] Wait for approval - Policy Uid %s", policy.Uid)
 		emitApproval(policy)
-	} else {
+	case typeEmit:
 		log.Printf("[Emit] Policy Uid %s", policy.Uid)
 
 		emitBase(policy, origin)
@@ -81,14 +97,22 @@ func Emit(policy *models.Policy, origin string) EmitResponse {
 		responseEmit = EmitResponse{UrlPay: policy.PayUrl, UrlSign: policy.SignUrl}
 		policyJson, _ := policy.Marshal()
 		log.Printf("[Emit] Policy %s: %s", policy.Uid, string(policyJson))
+	default:
+		err = errors.New("cannot emit policy")
+	}
+
+	if err != nil {
+		log.Printf("[Emit] Policy Uid %s cannot be emitted with status: %s", policy.Uid, policy.Status)
+		return responseEmit, err
 	}
 
 	policy.Updated = time.Now().UTC()
-	lib.SetFirestore(firePolicy, policy.Uid, policy)
+	err = lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
+	lib.CheckError(err)
 	policy.BigquerySave(origin)
 	models.SetGuaranteBigquery(*policy, "emit", guaranteFire)
 
-	return responseEmit
+	return responseEmit, nil
 }
 
 func emitUpdatePolicy(policy *models.Policy, request EmitRequest) {
@@ -155,4 +179,16 @@ func emitPay(policy *models.Policy, origin string) {
 	}
 
 	policy.PayUrl = *payRes.Payload.PaymentPageURL
+}
+
+func getEmitTypeFromPolicy(policy *models.Policy) string {
+	if !policy.IsReserved || policy.Status == models.PolicyStatusApproved {
+		return typeEmit
+	}
+
+	if policy.IsReserved && policy.Status == models.PolicyStatusInitLead {
+		return typeApprove
+	}
+
+	return ""
 }

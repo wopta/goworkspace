@@ -68,7 +68,11 @@ func PutPolicyReservedFx(w http.ResponseWriter, r *http.Request) (string, interf
 		policy.StatusHistory = append(policy.StatusHistory, policy.Status)
 
 		log.Println("[PutPolicyReservedFx] Invoking Emit")
-		Emit(&policy, origin)
+		_, err = Emit(&policy, origin)
+		if err != nil {
+			log.Printf("[PutPolicyReservedFx] cannot emit policy %s: %s", policy.Uid, err.Error())
+			return `{"success":false}`, `{"success":false}`, nil
+		}
 
 		return `{"success":true}`, `{"success":true}`, nil
 	}
