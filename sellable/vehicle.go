@@ -20,7 +20,7 @@ const (
 )
 
 // Given a policy that should contain the Gap and the Person assets, then it returns:
-//   - the product or parts of it depending on the sellable rules
+//   - the product or parts of it depending on the sellability rules
 //   - and an eventual error
 func Gap(role string, policy *models.Policy) (models.Product, error) {
 	if err := validatePolicy(policy); err != nil {
@@ -53,7 +53,7 @@ func getProduct(policy *models.Policy, role string) (models.Product, error) {
 	return product, nil
 }
 
-// Returns true if the policy is conforming to the sellability rules for GAP
+// Returns nil if the policy is eligible for GAP, otherwise returns an error describing why the vehicle is not sellable
 func isVehicleSellable(policy *models.Policy) error {
 	vehicle := policy.Assets[0].Vehicle
 	if !vehicle.IsFireTheftCovered {

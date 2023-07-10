@@ -61,7 +61,7 @@ func calculateGapOfferPrices(
 		duration      = lib.ElapsedYears(policy.StartDate, policy.EndDate)
 		residenceCode = policy.Assets[0].Person.Residence.CityCode
 		residenceArea = getResidentArea(provincesMatrix, residenceCode)
-		multiplier    = getGapMultipliers(gapMatrix, duration, residenceArea)
+		multiplier    = getGapMultiplier(gapMatrix, duration, residenceArea)
 
 		tax          = getTax(product)
 		vehiclePrice = float64(policy.Assets[0].Vehicle.PriceValue)
@@ -118,7 +118,7 @@ func getResidentArea(provincesMatrix dataframe.DataFrame, residenceCode string) 
 	return ""
 }
 
-func getGapMultipliers(residences dataframe.DataFrame, duration int, area string) float64 {
+func getGapMultiplier(residences dataframe.DataFrame, duration int, area string) float64 {
 	var matrixAreaRow []string
 
 	// We assume that the area is unique, hence the first match is the only one
