@@ -2,7 +2,6 @@ package payment
 
 import (
 	"encoding/base64"
-	"errors"
 	"io"
 	"log"
 	"net/http"
@@ -27,7 +26,7 @@ type ManualPaymentPayload struct {
 }
 
 func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.Println("ManualPaymentFx")
+	log.Println("[ManualPaymentFx] Handler start -----------------------------------------")
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 	var payload ManualPaymentPayload
@@ -41,8 +40,9 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 	isMethodAllowed := lib.SliceContains[string](methods, payload.PaymentMethod)
 
 	if !isMethodAllowed {
-		log.Printf("ManualPaymentFx ERROR: %s", errPaymentMethodNotAllowed)
-		return "", nil, errors.New(errPaymentMethodNotAllowed)
+		log.Printf("[ManualPaymentFx] ERROR %s", errPaymentMethodNotAllowed)
+		errorMessage := `{"success":false, "errorMessage":"` + errPaymentMethodNotAllowed + `"}`
+		return errorMessage, errorMessage, nil
 	}
 
 	origin := r.Header.Get("origin")
@@ -55,23 +55,25 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 
 	docsnap, err := lib.GetFirestoreErr(fireTransactions, transactionUid)
 	if err != nil {
-		return "", nil, err
+		log.Printf("[ManualPaymentFx] ERROR get transaction from firestore: %s", err.Error())
+		return `{"success":false}`, `{"success":false}`, nil
 	}
 	err = docsnap.DataTo(&t)
 	lib.CheckError(err)
 
 	if t.IsPay {
-		log.Printf("ManualPaymentFx ERROR: %s", errTransactionPaid)
-		return "", nil, errors.New(errTransactionPaid)
+		log.Printf("[ManualPaymentFx] ERROR %s", errTransactionPaid)
+		errorMessage := `{"success":false, "errorMessage":"` + errTransactionPaid + `"}`
+		return errorMessage, errorMessage, nil
 	}
 
 	firePolicyTransactions := transaction.GetPolicyTransactions(origin, t.PolicyUid)
-	log.Printf("ManualPaymentFx: Found transactions %v", firePolicyTransactions)
-	var canPayTransaction = false
+	log.Printf("[ManualPaymentFx] Found transactions %v", firePolicyTransactions)
+	canPayTransaction := false
 
 	for _, t := range firePolicyTransactions {
 		if !t.IsPay && t.Uid != transactionUid {
-			log.Printf("ManualPaymentFx: Next transaction to be paid should be %s", t.Uid)
+			log.Printf("[ManualPaymentFx] Next transaction to be paid should be %s", t.Uid)
 			break
 		}
 		if t.Uid == transactionUid {
@@ -81,20 +83,23 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 	}
 
 	if !canPayTransaction {
-		log.Printf("ManualPaymentFx ERROR: %s", errTransactionOutOfOrder)
-		return "", nil, errors.New(errTransactionOutOfOrder)
+		log.Printf("[ManualPaymentFx] ERROR %s", errTransactionOutOfOrder)
+		errorMessage := `{"success":false, "errorMessage":"` + errTransactionOutOfOrder + `"}`
+		return errorMessage, errorMessage, nil
 	}
 
 	docsnap, err = lib.GetFirestoreErr(firePolicies, t.PolicyUid)
 	if err != nil {
-		return "", nil, err
+		log.Printf("[ManualPaymentFx] ERROR get policy from firestore: %s", err.Error())
+		return `{"success":false}`, `{"success":false}`, nil
 	}
 	err = docsnap.DataTo(&p)
 	lib.CheckError(err)
 
 	if !p.IsSign {
-		log.Printf("ManualPaymentFx ERROR: %s", errPolicyNotSigned)
-		return "", nil, errors.New(errPolicyNotSigned)
+		log.Printf("[ManualPaymentFx] ERROR %s", errPolicyNotSigned)
+		errorMessage := `{"success":false, "errorMessage":"` + errPolicyNotSigned + `"}`
+		return errorMessage, errorMessage, nil
 	}
 
 	ManualPayment(&t, origin, &payload)
@@ -106,7 +111,7 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 
 		// Get Policy contract
 		gsLink := <-document.GetFileV6(p, t.PolicyUid)
-		log.Println("Payment::contractGsLink: ", gsLink)
+		log.Println("[ManualPaymentFx] contractGsLink: ", gsLink)
 
 		// Update Policy as paid
 		policy.SetPolicyPaid(&p, gsLink, origin)
@@ -115,7 +120,7 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		sendContractMail(&p)
 	}
 
-	return "", nil, nil
+	return `{"success":true}`, `{"success":true}`, nil
 }
 
 func ManualPayment(transaction *models.Transaction, origin string, payload *ManualPaymentPayload) {
