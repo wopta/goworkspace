@@ -65,10 +65,10 @@ func GetMailPolicy(
 
 func SendMailProposal(policy models.Policy) {
 	var (
-		name        string
-		link_format = "https://storage.googleapis.com/documents-public-dev/information-sets/%s/%s/Precontrattuale.pdf"
-		link        = fmt.Sprintf(link_format, policy.Name, policy.ProductVersion)
-		message     = make([]string, 0, 3)
+		name       string
+		linkFormat = "https://storage.googleapis.com/documents-public-dev/information-sets/%s/%s/Precontrattuale.pdf"
+		link       = fmt.Sprintf(linkFormat, policy.Name, policy.ProductVersion)
+		message    = make([]string, 0, 3)
 	)
 
 	message = append(
