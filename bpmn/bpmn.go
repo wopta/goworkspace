@@ -68,7 +68,8 @@ func BpmnEngine(policy models.Policy) string {
 	processes, err := state.loadProcesses(getTest())
 	//lib.C
 	if err != nil {
-		panic("file \"simple_task.bpmn\" can't be read.")
+		log.Println(err)
+
 	}
 	// register a handler for a service task by defined task type
 	state.AddTaskHandler("test", test)
