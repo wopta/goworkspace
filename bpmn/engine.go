@@ -93,7 +93,7 @@ func (state *State) decisionStep(process Process) (Process, error) {
 
 	decision := strings.Replace(process.Decision, "\\", "\\", -1)
 	log.Println(process.Decision)
-	variables := state.data.(map[string]interface{})
+	variables := state.decisionData
 	eval := goval.NewEvaluator()
 	result, e := eval.Evaluate(decision, variables, nil) // Returns <true, nil>
 	log.Println(result)

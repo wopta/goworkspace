@@ -44,23 +44,28 @@ func BpmnFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	log.Println("--------------------------BpmnFx-------------------------------------------")
 	var (
 		policy models.Policy
+		e      error
 	)
-	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
-	e := json.Unmarshal([]byte(req), &policy)
+	jsonMap := make(map[string]interface{})
+	rBody := lib.ErrorByte(ioutil.ReadAll(r.Body))
+	e = json.Unmarshal(rBody, &jsonMap)
+	e = json.Unmarshal(rBody, &policy)
 	j, e := policy.Marshal()
 	log.Println("Proposal request proposal: ", string(j))
 	defer r.Body.Close()
-	BpmnEngine(policy)
+	BpmnEngine(policy, jsonMap)
 	return "", nil, e
 }
-func BpmnEngine(policy models.Policy) string {
+func BpmnEngine(policy models.Policy, mapPolicy map[string]interface{}) string {
 	// Init workflow with a name, and max concurrent tasks
 	log.Println("--------------------------BpmnEngine-------------------------------------------")
 	var (
 		state *State
 	)
 	state = &State{
-		handlers: make(map[string]func(state *State) error),
+		handlers:     make(map[string]func(state *State) error),
+		data:         policy,
+		decisionData: mapPolicy,
 	}
 	state.handlers = make(map[string]func(state *State) error)
 	// basic example loading a BPMN from file,
