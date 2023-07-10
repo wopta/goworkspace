@@ -67,7 +67,7 @@ func SendMailProposal(policy models.Policy) {
 	var (
 		name        string
 		link_format = "https://storage.googleapis.com/documents-public-dev/information-sets/%s/v1/Precontrattuale.pdf"
-		link        = fmt.Sprint(link_format, policy.Name)
+		link        = fmt.Sprintf(link_format, policy.Name)
 		message     = make([]string, 0, 3)
 	)
 
