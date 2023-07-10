@@ -59,6 +59,9 @@ func BpmnEngine(policy models.Policy) string {
 	var (
 		state *State
 	)
+	state = &State{
+		handlers: make(map[string]func(state *State) error),
+	}
 	state.handlers = make(map[string]func(state *State) error)
 	// basic example loading a BPMN from file,
 	//filePath := "./serverless_function_source_code/test.bpmn"
