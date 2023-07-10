@@ -129,8 +129,8 @@ func getTest() string {
         "name": "test",
         "type": "TASK",
         "id": 1,
-        "outProcess": [1],
-        "inProcess": [],
+        "outProcess": [],
+        "inProcess": [0],
         "status": "READY"
 
     }]
