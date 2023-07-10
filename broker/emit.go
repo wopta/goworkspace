@@ -34,63 +34,70 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	log.Println("[EmitFx] Handler start ----------------------------------------")
 
 	var (
-		result     EmitRequest
-		e          error
-		firePolicy string
-		policy     models.Policy
+		request EmitRequest
+		e       error
+		policy  models.Policy
 	)
 
 	origin := r.Header.Get("origin")
-	firePolicy = lib.GetDatasetByEnv(origin, "policy")
-	request := lib.ErrorByte(io.ReadAll(r.Body))
+	body := lib.ErrorByte(io.ReadAll(r.Body))
 
-	log.Printf("[EmitFx] Request: %s", string(request))
-	json.Unmarshal([]byte(request), &result)
+	log.Printf("[EmitFx] Request body: %s", string(body))
+	json.Unmarshal([]byte(body), &request)
 
-	uid := result.Uid
+	uid := request.Uid
 	log.Printf("[EmitFx] Uid: %s", uid)
-
-	docsnap := lib.GetFirestore(firePolicy, string(uid))
-	docsnap.DataTo(&policy)
+	policy, e = GetPolicy(uid, origin)
+	lib.CheckError(e)
 	policyJsonLog, _ := policy.Marshal()
 	log.Printf("[EmitFx] Policy %s JSON: %s", uid, string(policyJsonLog))
 
-	responseEmit := Emit(&policy, result, origin)
+	emitUpdatePolicy(&policy, request)
+	responseEmit := Emit(&policy, origin)
+
 	b, e := json.Marshal(responseEmit)
 	log.Println("[EmitFx] Response: ", string(b))
 
 	return string(b), responseEmit, e
 }
 
-func Emit(policy *models.Policy, request EmitRequest, origin string) EmitResponse {
+func Emit(policy *models.Policy, origin string) EmitResponse {
 	var responseEmit EmitResponse
 
 	firePolicy := lib.GetDatasetByEnv(origin, "policy")
 	guaranteFire := lib.GetDatasetByEnv(origin, "guarante")
-	policy.Uid = request.Uid // we should enforce the setting of the ID on proposal
 
 	if policy.IsReserved && policy.Status != models.PolicyStatusWaitForApproval {
 		emitApproval(policy)
 	} else {
-		log.Printf("[Emit] Policy Uid %s", request.Uid)
+		log.Printf("[Emit] Policy Uid %s", policy.Uid)
 
 		emitBase(policy, origin)
 
-		emitSign(policy, request, origin)
+		emitSign(policy, origin)
 
-		emitPay(policy, request, origin)
+		emitPay(policy, origin)
 
 		responseEmit = EmitResponse{UrlPay: policy.PayUrl, UrlSign: policy.SignUrl}
 		policyJson, _ := policy.Marshal()
-		log.Printf("[Emit] Policy %s: %s", request.Uid, string(policyJson))
+		log.Printf("[Emit] Policy %s: %s", policy.Uid, string(policyJson))
 	}
 
 	policy.Updated = time.Now().UTC()
-	lib.SetFirestore(firePolicy, request.Uid, policy)
+	lib.SetFirestore(firePolicy, policy.Uid, policy)
 	policy.BigquerySave(origin)
 	models.SetGuaranteBigquery(*policy, "emit", guaranteFire)
 
 	return responseEmit
+}
+
+func emitUpdatePolicy(policy *models.Policy, request EmitRequest) {
+	if policy.Status == models.PolicyStatusInitLead {
+		if policy.Statements == nil {
+			policy.Statements = request.Statements
+		}
+		policy.PaymentSplit = request.PaymentSplit
+	}
 }
 
 func emitApproval(policy *models.Policy) {
@@ -117,17 +124,12 @@ func emitBase(policy *models.Policy, origin string) {
 	policy.CodeCompany = company
 }
 
-func emitSign(policy *models.Policy, request EmitRequest, origin string) {
+func emitSign(policy *models.Policy, origin string) {
 	log.Printf("[EmitSign] Policy Uid %s", policy.Uid)
 
 	policy.IsSign = false
 	policy.Status = models.PolicyStatusToSign
-	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusContact)
-	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusToSign)
-
-	if policy.Statements == nil {
-		policy.Statements = request.Statements
-	}
+	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusContact, models.PolicyStatusToSign)
 
 	p := <-document.ContractObj(*policy)
 	policy.DocumentName = p.LinkGcs
@@ -139,12 +141,11 @@ func emitSign(policy *models.Policy, request EmitRequest, origin string) {
 	mail.SendMailSign(*policy)
 }
 
-func emitPay(policy *models.Policy, request EmitRequest, origin string) {
+func emitPay(policy *models.Policy, origin string) {
 	log.Printf("[EmitPay] Policy Uid %s", policy.Uid)
 	var payRes payment.FabrickPaymentResponse
 
 	policy.IsPay = false
-	policy.PaymentSplit = request.PaymentSplit
 
 	if policy.PaymentSplit == string(models.PaySplitYear) {
 		payRes = payment.FabbrickYearPay(*policy, origin)
