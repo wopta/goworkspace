@@ -69,7 +69,7 @@ func Emit(policy *models.Policy, request EmitRequest, origin string) EmitRespons
 	guaranteFire := lib.GetDatasetByEnv(origin, "guarante")
 	policy.Uid = request.Uid // we should enforce the setting of the ID on proposal
 
-	if policy.IsReserved {
+	if policy.IsReserved && policy.Status != models.PolicyStatusWaitForApproval {
 		emitApproval(policy)
 	} else {
 		log.Printf("[Emit] Policy Uid %s", request.Uid)
