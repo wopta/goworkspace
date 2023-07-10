@@ -30,21 +30,23 @@ const TimerTriggered TimerState = "TRIGGERED"
 const TimerCancelled TimerState = "CANCELLED"
 
 type Process struct {
-	Id             int         `json:"id"`
-	LayerId        int         `json:"layer"`
-	Name           string      `json:"name"`
-	Shape          string      `json:"shape"`
-	Type           string      `json:"type"`
-	Status         string      `json:"status"`
-	Data           interface{} `json:"data"`
-	X              float64     `json:"x"`
-	Y              float64     `json:"y"`
-	InProcess      []int       `json:"inProcess"`
-	OutProcess     []int       `json:"outProcess"`
-	OutTrueProcess []int       `json:"outTrueProcess"`
-	IsCompleted    bool        `json:"isCompleted"`
-	IsFailed       bool        `json:"isFailed"`
-	Error          string      `json:"error"`
+	Id              int         `json:"id"`
+	LayerId         int         `json:"layer"`
+	Name            string      `json:"name"`
+	Shape           string      `json:"shape"`
+	Type            string      `json:"type"`
+	Status          string      `json:"decision "`
+	Decision        string      `json:"status"`
+	Data            interface{} `json:"data"`
+	X               float64     `json:"x"`
+	Y               float64     `json:"y"`
+	InProcess       []int       `json:"inProcess"`
+	OutProcess      []int       `json:"outProcess"`
+	OutTrueProcess  []int       `json:"outTrueProcess"`
+	OutFalseProcess []int       `json:"outFalseProcess"`
+	IsCompleted     bool        `json:"isCompleted"`
+	IsFailed        bool        `json:"isFailed"`
+	Error           string      `json:"error"`
 }
 type Timer struct {
 	ElementId          string

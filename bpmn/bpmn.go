@@ -130,10 +130,21 @@ func getTest() string {
     },
 	{
         "name": "test",
-        "type": "TASK",
+        "type": "DECISION",
         "id": 1,
-        "outProcess": [],
+        "outTrueProcess": [2],
+		"outFalseProcess": [2],
+		"decision":"payment== \"fabrick\""
         "inProcess": [0],
+        "status": "READY"
+
+    },
+	{
+        "name": "test",
+        "type": "TASK",
+        "id": 2,
+        "outProcess": [],
+        "inProcess": [1],
         "status": "READY"
 
     }]
