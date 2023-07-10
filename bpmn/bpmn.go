@@ -135,7 +135,7 @@ func getTest() string {
         "id": 1,
         "outTrueProcess": [2],
 		"outFalseProcess": [2],
-		"decision":"payment== \"fabrick\""
+		"decision":"payment== \"fabrick\"",
         "inProcess": [0],
         "status": "READY"
 
