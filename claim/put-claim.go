@@ -31,11 +31,10 @@ func PutClaimFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 
 func PutClaim(idToken string, origin string, claim *models.Claim) (string, interface{}, error) {
 	var (
-		user   models.User
-		obj    mail.MailRequest
-		att    []mail.Attachment
-		err    error
-		policy models.Policy
+		user models.User
+		obj  mail.MailRequest
+		att  []mail.Attachment
+		err  error
 	)
 
 	userAuthID, err := lib.GetUserIdFromIdToken(idToken)
@@ -71,9 +70,12 @@ func PutClaim(idToken string, origin string, claim *models.Claim) (string, inter
 
 	obj.From = "noreply@wopta.it"
 	obj.To = []string{"sinistri@wopta.it"}
-	obj.Message = `<p>Ciao il cliente ` + user.Name + ` ` + user.Surname + `</p> <p>desidera notificare un sinistro per la polizza: ` +
-		policy.CodeCompany + ` per i seguenti motivi: ` + claim.Description + `</p> `
-	obj.Subject = "Notifica sinisto polizza " + policy.CodeCompany
+	obj.Title = claim.PolicyDescription + " n° " + claim.PolicyNumber
+	obj.SubTitle = "Notifica sinistro"
+	obj.Message = `<p>Ciao il cliente ` + user.Name + ` ` + user.
+		Surname + `</p> <p>desidera notificare un sinistro per la polizza ` + claim.Company + ` n° ` +
+		claim.PolicyNumber + ` per i seguenti motivi: ` + claim.Description + `</p> `
+	obj.Subject = claim.PolicyDescription + " n° " + claim.PolicyNumber + " Notifica sinistro"
 	obj.IsHtml = true
 	if len(claim.Documents) > 0 {
 		obj.IsAttachment = true
