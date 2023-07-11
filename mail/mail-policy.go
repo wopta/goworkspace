@@ -19,18 +19,22 @@ func GetMailPolicy(
 	var (
 		name     string
 		obj      MailRequest
-		linkForm = "https://www.wopta.it/it/multi-rischio/"
+		linkForm = "https://www.wopta.it/it/"
 	)
 
 	switch policy.Name {
 	case "pmi":
 		name = "Artigiani & Imprese"
+		linkForm += "multi-rischio/"
 	case "persona":
 		name = "Persona"
+		linkForm += "infortunio/"
 	case "life":
 		name = "Vita"
+		linkForm += "vita/"
 	case "gap":
 		name = "GAP"
+		// TODO: No page yet
 	}
 
 	obj.From = "anna@wopta.it"
