@@ -11,7 +11,7 @@ require (
 	github.com/heimdalr/dag v1.2.1
 	github.com/wopta/goworkspace/document v1.0.61-hotfix.1
 	github.com/wopta/goworkspace/lib v1.0.48
-	github.com/wopta/goworkspace/mail v1.0.21
+	github.com/wopta/goworkspace/mail v1.0.22
 	github.com/wopta/goworkspace/models v1.0.96-hotfix.1
 	github.com/wopta/goworkspace/payment v1.0.39
 	github.com/wopta/goworkspace/user v1.0.7
