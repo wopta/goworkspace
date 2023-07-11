@@ -68,14 +68,14 @@ type job struct {
 	CreatedAt time.Time
 }
 type State struct {
-	name           string
-	processes      []Process
-	data           interface{}
-	decisionData   map[string]interface{} `json:"decisionData"`
-	jobs           []*job
-	timers         []*Timer
-	scheduledFlows []string
-	handlers       map[string]func(state *State) error
+	Name           string
+	Processes      []Process
+	Data           interface{}
+	DecisionData   map[string]interface{}
+	Jobs           []*job
+	Timers         []*Timer
+	ScheduledFlows []string
+	Handlers       map[string]func(state *State) error
 	IsFailed       bool
 }
 type activatedJob struct {

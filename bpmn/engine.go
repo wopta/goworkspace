@@ -10,16 +10,16 @@ import (
 
 func (state *State) AddTaskHandler(name string, handler func(state *State) error) map[string]func(state *State) error {
 	log.Println("AddTaskHand")
-	if nil == state.handlers {
+	if nil == state.Handlers {
 		log.Println("nil")
 	}
-	state.handlers[name] = handler
-	return state.handlers
+	state.Handlers[name] = handler
+	return state.Handlers
 }
 
 func (state *State) RunBpmn(processes []Process, data interface{}) {
-	state.processes = processes
-	state.data = data
+	state.Processes = processes
+	state.Data = data
 
 	for i, process := range processes {
 		log.Println(i)
@@ -51,30 +51,30 @@ func (state *State) runNextProcess(process Process) {
 func (state *State) runProcess(process Process) {
 	log.Println("runProcess")
 	id := process.Id
-	state.processes[id].Status = Active
+	state.Processes[id].Status = Active
 	var (
 		e error
 		p Process
 	)
 	if process.Type == Task {
-		e = state.handlers[process.Name](state)
+		e = state.Handlers[process.Name](state)
 	}
 	if process.Type == Decision {
 		p, e = state.decisionStep(process)
 		process = p
 	}
 	if e != nil {
-		state.processes[id].Status = Failed
+		state.Processes[id].Status = Failed
 		state.IsFailed = true
 	} else {
-		state.processes[id].Status = Completed
+		state.Processes[id].Status = Completed
 		state.runNextProcess(process)
 	}
 }
 func (state *State) getProcesses(ids []int) []Process {
 	var processes []Process
 	for _, id := range ids {
-		for _, process := range state.processes {
+		for _, process := range state.Processes {
 			if process.Id == id {
 				processes = append(processes, process)
 			}
@@ -93,7 +93,7 @@ func (state *State) decisionStep(process Process) (Process, error) {
 
 	decision := strings.Replace(process.Decision, "\\", "\\", -1)
 	log.Println(process.Decision)
-	variables := state.decisionData
+	variables := state.DecisionData
 	eval := goval.NewEvaluator()
 	result, e := eval.Evaluate(decision, variables, nil) // Returns <true, nil>
 	log.Println(result)

@@ -63,11 +63,11 @@ func BpmnEngine(policy models.Policy, mapPolicy map[string]interface{}) string {
 		state *State
 	)
 	state = &State{
-		handlers:     make(map[string]func(state *State) error),
-		data:         policy,
-		decisionData: mapPolicy,
+		Handlers:     make(map[string]func(state *State) error),
+		Data:         policy,
+		DecisionData: mapPolicy,
 	}
-	state.handlers = make(map[string]func(state *State) error)
+	state.Handlers = make(map[string]func(state *State) error)
 	// basic example loading a BPMN from file,
 	//filePath := "./serverless_function_source_code/test.bpmn"
 	processes, err := state.loadProcesses(getTest())
@@ -91,13 +91,13 @@ func test(state *State) error {
 	return nil
 }
 func contract(state *State) error {
-	policy := state.data
+	policy := state.Data
 	doc.ContractObj(policy.(models.Policy))
 	return nil
 }
 func fabrickPayment(state *State) error {
 	var payRes pay.FabrickPaymentResponse
-	policye := state.data
+	policye := state.Data
 	policy := policye.(models.Policy)
 	if policy.PaymentSplit == string(models.PaySplitYear) {
 		payRes = pay.FabbrickYearPay(policy, "")
@@ -114,12 +114,12 @@ func fabrickPayment(state *State) error {
 }
 
 func namirialSign(state *State) error {
-	policy := state.data
+	policy := state.Data
 	doc.NamirialOtpV6(policy.(models.Policy), "")
 	return nil
 }
 func sendMailSign(state *State) error {
-	policy := state.data
+	policy := state.Data
 	mail.SendMailSign(policy.(models.Policy))
 	return nil
 }
@@ -145,6 +145,16 @@ func getTest() string {
         "status": "READY"
 
     },
+	{
+        "name": "test",
+        "type": "TASK",
+        "id": 2,
+        "outProcess": [],
+        "inProcess": [1],
+        "status": "READY"
+
+    },
+	,
 	{
         "name": "test",
         "type": "TASK",
