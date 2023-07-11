@@ -7,6 +7,7 @@ type Vehicle struct {
 	Model              string    `firestore:"model,omitempty"              json:"model,omitempty"              bigquery:"-"` // MODELLO
 	Manufacturer       string    `firestore:"manufacturer,omitempty"       json:"manufacturer,omitempty"       bigquery:"-"` // PRODUTTORE
 	RegistrationDate   time.Time `firestore:"registrationDate,omitempty"   json:"registrationDate,omitempty"   bigquery:"-"` // DATA IMMATRICOLAZIONE
+	PurchaseDate       time.Time `firestore:"purchaseDate,omitempty"       json:"purchaseDate,omitempty"       bigquery:"-"` // DATA D'ACQUISTO
 	OwnershipStatus    string    `firestore:"ownershipStatus,omitempty"    json:"ownershipStatus,omitempty"    bigquery:"-"` // GIA’ PROPRIETARIO (si/in attesa/la comprerò in futuro)
 	NumberOfOwners     int64     `firestore:"numberOfOwners,omitempty"     json:"numberOfOwners,omitempty"     bigquery:"-"` // NUMERO DI PROPRIETARI
 	PriceValue         int64     `firestore:"priceValue,omitempty"         json:"priceValue,omitempty"         bigquery:"-"` // VALORE VEICOLO
@@ -16,6 +17,8 @@ type Vehicle struct {
 	HasSatellite       bool      `firestore:"hasSatellite,omitempty"       json:"hasSatellite,omitempty"       bigquery:"-"` // PRESENZA SATELLITARE
 	IsFireTheftCovered bool      `firestore:"isFireTheftCovered,omitempty" json:"isFireTheftCovered,omitempty" bigquery:"-"` // COPERTURA FURTO/INCENDIO PREESISTENTE
 	MainUse            string    `firestore:"mainUse,omitempty"            json:"mainUse,omitempty"            bigquery:"-"` // UTILIZZO PRINCIPALE (privato/...)
+	IsElectric         bool      `firestore:"isElectric,omitempty"         json:"isElectric,omitempty"         bigquery:"-"` // SE E' UN VEICOLO ELETTRICO O NO
+	Condition          string    `firestore:"condition,omitempty"          json:"condition,omitempty"          bigquery:"-"` // VEICOLO NUOVO, USATO, ETC...
 	// NOTE: Unused attributes
 	// Vin                string    `firestore:"vin,omitempty"                json:"vin,omitempty"                bigquery:"-"` // VIN (vehicle Identification Number)
 	// AlarmTypeInstalled string    `firestore:"alarmTypeInstalled,omitempty" json:"alarmTypeInstalled,omitempty" bigquery:"-"` // ANTIFURTO INSTALLATO (nessuno/meccanico/elettronico/satellitare)

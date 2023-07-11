@@ -44,23 +44,28 @@ func BpmnFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	log.Println("--------------------------BpmnFx-------------------------------------------")
 	var (
 		policy models.Policy
+		e      error
 	)
-	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
-	e := json.Unmarshal([]byte(req), &policy)
+	jsonMap := make(map[string]interface{})
+	rBody := lib.ErrorByte(ioutil.ReadAll(r.Body))
+	e = json.Unmarshal(rBody, &jsonMap)
+	e = json.Unmarshal(rBody, &policy)
 	j, e := policy.Marshal()
 	log.Println("Proposal request proposal: ", string(j))
 	defer r.Body.Close()
-	BpmnEngine(policy)
+	BpmnEngine(policy, jsonMap)
 	return "", nil, e
 }
-func BpmnEngine(policy models.Policy) string {
+func BpmnEngine(policy models.Policy, mapPolicy map[string]interface{}) string {
 	// Init workflow with a name, and max concurrent tasks
 	log.Println("--------------------------BpmnEngine-------------------------------------------")
 	var (
 		state *State
 	)
 	state = &State{
-		handlers: make(map[string]func(state *State) error),
+		handlers:     make(map[string]func(state *State) error),
+		data:         policy,
+		decisionData: mapPolicy,
 	}
 	state.handlers = make(map[string]func(state *State) error)
 	// basic example loading a BPMN from file,
@@ -68,7 +73,8 @@ func BpmnEngine(policy models.Policy) string {
 	processes, err := state.loadProcesses(getTest())
 	//lib.C
 	if err != nil {
-		panic("file \"simple_task.bpmn\" can't be read.")
+		log.Println(err)
+
 	}
 	// register a handler for a service task by defined task type
 	state.AddTaskHandler("test", test)
@@ -130,10 +136,21 @@ func getTest() string {
     },
 	{
         "name": "test",
-        "type": "TASK",
+        "type": "DECISION",
         "id": 1,
-        "outProcess": [],
+        "outTrueProcess": [2],
+		"outFalseProcess": [2],
+		"decision":"payment== \"fabrick\"",
         "inProcess": [0],
+        "status": "READY"
+
+    },
+	{
+        "name": "test",
+        "type": "TASK",
+        "id": 2,
+        "outProcess": [],
+        "inProcess": [1],
         "status": "READY"
 
     }]

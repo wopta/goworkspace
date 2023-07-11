@@ -3,6 +3,9 @@ package bpmn
 import (
 	"encoding/json"
 	"log"
+	"strings"
+
+	"github.com/maja42/goval"
 )
 
 func (state *State) AddTaskHandler(name string, handler func(state *State) error) map[string]func(state *State) error {
@@ -51,12 +54,14 @@ func (state *State) runProcess(process Process) {
 	state.processes[id].Status = Active
 	var (
 		e error
+		p Process
 	)
 	if process.Type == Task {
 		e = state.handlers[process.Name](state)
 	}
 	if process.Type == Decision {
-		e = state.handlers[process.Name](state)
+		p, e = state.decisionStep(process)
+		process = p
 	}
 	if e != nil {
 		state.processes[id].Status = Failed
@@ -83,4 +88,20 @@ func (state *State) loadProcesses(data string) ([]Process, error) {
 	e := json.Unmarshal([]byte(data), &processes)
 
 	return processes, e
+}
+func (state *State) decisionStep(process Process) (Process, error) {
+
+	decision := strings.Replace(process.Decision, "\\", "\\", -1)
+	log.Println(process.Decision)
+	variables := state.decisionData
+	eval := goval.NewEvaluator()
+	result, e := eval.Evaluate(decision, variables, nil) // Returns <true, nil>
+	log.Println(result)
+	if result.(bool) {
+		process.OutProcess = process.OutTrueProcess
+	} else {
+		process.OutProcess = process.OutFalseProcess
+	}
+
+	return process, e
 }
