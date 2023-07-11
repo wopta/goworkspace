@@ -2,7 +2,7 @@ package broker
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"time"
@@ -13,19 +13,23 @@ import (
 )
 
 func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.Println("Proposal")
-	log.Println("--------------------------Proposal-------------------------------------------")
+	log.Println("[Proposal] Handler start -----------------------------------------")
+
 	var (
 		policy     models.Policy
 		policyFire string
+		origin     string = r.Header.Get("origin")
 	)
-	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
+
+	req := lib.ErrorByte(io.ReadAll(r.Body))
 	e := json.Unmarshal([]byte(req), &policy)
 	j, e := policy.Marshal()
-	log.Println("Proposal request proposal: ", string(j))
+	log.Println("[Proposal] request body: ", string(j))
 	defer r.Body.Close()
-	policyFire = lib.GetDatasetByEnv(r.Header.Get("origin"), "policy")
-	guaranteFire := lib.GetDatasetByEnv(r.Header.Get("origin"), "guarante")
+
+	policyFire = lib.GetDatasetByEnv(origin, "policy")
+	guaranteFire := lib.GetDatasetByEnv(origin, "guarante")
+
 	policy.CreationDate = time.Now().UTC()
 	policy.RenewDate = policy.CreationDate.AddDate(1, 0, 0)
 	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusInitLead)
@@ -34,31 +38,29 @@ func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	policy.ProposalNumber = numb
 	policy.IsSign = false
 	policy.IsPay = false
-	policy.Updated = time.Now()
+	policy.Updated = time.Now().UTC()
 
-	//------------------------------------------
-	//Precontrattuale.pdf
 	if policy.ProductVersion == "" {
 		policy.ProductVersion = "v1"
 	}
-	policy.Attachments = &[]models.Attachment{
-		{
-			Name: "Precontrattuale", FileName: "Precontrattuale.pdf",
-			Link: "gs://documents-public-dev/information-sets/" + policy.Name + "/" + policy.ProductVersion + "/Precontrattuale.pdf",
-		},
-	}
-	log.Println("Proposal save")
-	ref, _ := lib.PutFirestore(policyFire, policy)
-	policy.BigquerySave(r.Header.Get("origin"))
+	policy.Attachments = &[]models.Attachment{{
+		Name: "Precontrattuale", FileName: "Precontrattuale.pdf",
+		Link: "gs://documents-public-dev/information-sets/" + policy.Name + "/" + policy.ProductVersion + "/Precontrattuale.pdf",
+	}}
+
+	log.Println("[Proposal] save")
+	policyUid := lib.NewDoc(policyFire)
+	policy.Uid = policyUid
+	err := lib.SetFirestoreErr(policyFire, policyUid, policy)
+	lib.CheckError(err)
+	policy.BigquerySave(origin)
 	models.SetGuaranteBigquery(policy, "proposal", guaranteFire)
-	log.Println(ref.ID + " Proposal sand mail")
+
+	log.Printf("[Proposal] Policy %s send mail", policy.Uid)
 	mail.SendMailProposal(policy)
 
-	log.Println("Proposal ", ref.ID)
-
-	policy.Uid = ref.ID
-
 	resp, e := policy.Marshal()
+	log.Println("[Proposal] response: ", string(resp))
 
 	return string(resp), policy, e
 }
