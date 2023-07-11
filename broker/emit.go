@@ -186,7 +186,9 @@ func getEmitTypeFromPolicy(policy *models.Policy) string {
 		return typeEmit
 	}
 
-	if policy.IsReserved && policy.Status == models.PolicyStatusInitLead {
+	deniedStatuses := []string{models.PolicyStatusDeleted, models.PolicyStatusRejected}
+
+	if policy.IsReserved && !lib.SliceContains(deniedStatuses, policy.Status) {
 		return typeApprove
 	}
 
