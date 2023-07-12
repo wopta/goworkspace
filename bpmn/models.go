@@ -71,7 +71,7 @@ type State struct {
 	Name           string
 	Processes      []Process
 	Data           interface{}
-	DecisionData   map[string]interface{}
+	DecisionData   *map[string]interface{}
 	Jobs           []*job
 	Timers         []*Timer
 	ScheduledFlows []string

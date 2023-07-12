@@ -17,9 +17,8 @@ func (state *State) AddTaskHandler(name string, handler func(state *State) error
 	return state.Handlers
 }
 
-func (state *State) RunBpmn(processes []Process, data interface{}) {
+func (state *State) RunBpmn(processes []Process) {
 	state.Processes = processes
-	state.Data = data
 
 	for i, process := range processes {
 		log.Println(i)
@@ -83,17 +82,19 @@ func (state *State) getProcesses(ids []int) []Process {
 	}
 	return processes
 }
-func (state *State) loadProcesses(data string) ([]Process, error) {
+func (state *State) LoadProcesses(data string) ([]Process, error) {
 	var processes []Process
 	e := json.Unmarshal([]byte(data), &processes)
 
 	return processes, e
 }
 func (state *State) decisionStep(process Process) (Process, error) {
-
+	jsonMap := make(map[string]interface{})
+	b, e := json.Marshal(state.Data)
+	e = json.Unmarshal(b, &jsonMap)
 	decision := strings.Replace(process.Decision, "\\", "\\", -1)
 	log.Println(process.Decision)
-	variables := state.DecisionData
+	variables := jsonMap
 	eval := goval.NewEvaluator()
 	result, e := eval.Evaluate(decision, variables, nil) // Returns <true, nil>
 	log.Println(result)

@@ -48,6 +48,12 @@ func Broker(w http.ResponseWriter, r *http.Request) {
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
+				Route:   "/v2/emit",
+				Handler: EmitFx,
+				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAll},
+			},
+			{
 				Route:   "/v1/policy/reserved",
 				Handler: reserved,
 				Method:  http.MethodPost,
@@ -81,12 +87,6 @@ func Broker(w http.ResponseWriter, r *http.Request) {
 				Route:   "policy/transactions/v1/:policyUid",
 				Handler: GetPolicyTransactions,
 				Method:  http.MethodGet,
-				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
-			},
-			{
-				Route:   "/policy/reserved/v1/:policyUid",
-				Handler: PutPolicyReservedFx,
-				Method:  http.MethodPut,
 				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},
 		},
