@@ -40,7 +40,9 @@ func LifeAxa(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, []by
 
 	avvertenzeBeneficiariSection(pdf)
 
-	beneficiariesSection(pdf, policy)
+	beneficiaries, legitimateSuccessorsChoice, designatedSuccessorsChoice := loadLifeBeneficiariesInfo(policy)
+
+	beneficiariesSection(pdf, beneficiaries, legitimateSuccessorsChoice, designatedSuccessorsChoice)
 
 	beneficiaryReferenceSection(pdf, policy)
 
@@ -264,60 +266,8 @@ func avvertenzeBeneficiariSection(pdf *fpdf.Fpdf) {
 		"il Beneficiario designato.", "", "", false)
 }
 
-func beneficiariesSection(pdf *fpdf.Fpdf, policy *models.Policy) {
-	legitimateSuccessorsChoice := "X"
-	designatedSuccessorsChoice := ""
-	beneficiaries := [2]map[string]string{
-		{
-			"name":     "=====",
-			"fiscCode": "=====",
-			"address":  "=====",
-			"mail":     "=====",
-			"phone":    "=====",
-			"relation": "=====",
-			"consent":  "=====",
-		},
-		{
-			"name":           "=====",
-			"fiscCode":       "=====",
-			"address":        "=====",
-			"mail":           "=====",
-			"phone":          "=====",
-			"relation":       "=====",
-			"contactConsent": "=====",
-		},
-	}
-
-	deathGuarantee, err := policy.ExtractGuarantee("death")
-	lib.CheckError(err)
-
-	if deathGuarantee.Beneficiaries != nil && !(*deathGuarantee.Beneficiaries)[0].IsLegitimateSuccessors {
-		legitimateSuccessorsChoice = ""
-		designatedSuccessorsChoice = "X"
-
-		for index, beneficiary := range *deathGuarantee.Beneficiaries {
-			address := strings.ToUpper(beneficiary.Residence.StreetName + ", " + beneficiary.Residence.StreetNumber +
-				" - " + beneficiary.Residence.PostalCode + " " + beneficiary.Residence.City +
-				" (" + beneficiary.Residence.CityCode + ")")
-			beneficiaries[index]["name"] = strings.ToUpper(beneficiary.Surname + " " + beneficiary.Name)
-			beneficiaries[index]["fiscCode"] = strings.ToUpper(beneficiary.FiscalCode)
-			beneficiaries[index]["address"] = address
-			beneficiaries[index]["mail"] = beneficiary.Mail
-			beneficiaries[index]["phone"] = beneficiary.Phone
-			if beneficiary.IsFamilyMember {
-				beneficiaries[index]["relation"] = "Nucleo familiare (rapporto di parentela, coniuge, unione civile, " +
-					"convivenza more uxorio)"
-			} else {
-				beneficiaries[index]["relation"] = "Altro (no rapporto parentela)"
-			}
-			if beneficiary.IsContactable {
-				beneficiaries[index]["contactConsent"] = "SI"
-			} else {
-				beneficiaries[index]["contactConsent"] = "NO"
-			}
-		}
-	}
-
+func beneficiariesSection(pdf *fpdf.Fpdf, beneficiaries []map[string]string, legitimateSuccessorsChoice,
+	designatedSuccessorsChoice string) {
 	getParagraphTitle(pdf, "Beneficiario")
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.CellFormat(0, 3, "Io sottoscritto Assicurato, con la sottoscrizione della presente polizza, in "+
@@ -337,7 +287,7 @@ func beneficiariesSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	beneficiariesTable(pdf, beneficiaries)
 }
 
-func beneficiariesTable(pdf *fpdf.Fpdf, beneficiaries [2]map[string]string) {
+func beneficiariesTable(pdf *fpdf.Fpdf, beneficiaries []map[string]string) {
 	for _, beneficiary := range beneficiaries {
 		drawPinkHorizontalLine(pdf, thickLineWidth)
 		pdf.Ln(1.5)
@@ -1031,43 +981,6 @@ func axaTablePart3Section(pdf *fpdf.Fpdf) {
 	indentedText(pdf, "3.2 le persone fisiche che detengono solo formalmente il controllo totalitario "+
 		"di un’entità notoriamente costituita, di fatto, nell’interesse e a beneficio di una persona politicamente "+
 		"esposta.")
-}
-
-func loadProducerInfo(origin string, policy *models.Policy) map[string]string {
-	policyProducer := map[string]string{
-		"name":            "MICHELE",
-		"surname":         "LOMAZZI",
-		"ruiSection":      "A",
-		"ruiCode":         "A000703480",
-		"ruiRegistration": "02.03.2022",
-	}
-
-	if policy.AgentUid != "" {
-		var agent models.Agent
-		fireAgent := lib.GetDatasetByEnv(origin, models.AgentCollection)
-		docsnap, err := lib.GetFirestoreErr(fireAgent, policy.AgentUid)
-		lib.CheckError(err)
-		err = docsnap.DataTo(&agent)
-		lib.CheckError(err)
-		policyProducer["name"] = strings.ToUpper(agent.Name)
-		policyProducer["surname"] = strings.ToUpper(agent.Surname)
-		policyProducer["ruiSection"] = agent.RuiSection
-		policyProducer["ruiCode"] = agent.RuiCode
-		policyProducer["ruiRegistration"] = agent.RuiRegistration.Format("02.01.2006")
-	} else if policy.AgencyUid != "" {
-		var agency models.Agency
-		fireAgency := lib.GetDatasetByEnv(origin, models.AgencyCollection)
-		docsnap, err := lib.GetFirestoreErr(fireAgency, policy.AgencyUid)
-		lib.CheckError(err)
-		err = docsnap.DataTo(&agency)
-		lib.CheckError(err)
-		policyProducer["name"] = strings.ToUpper(agency.Name)
-		policyProducer["surname"] = ""
-		policyProducer["ruiSection"] = agency.RuiSection
-		policyProducer["ruiCode"] = agency.RuiCode
-		policyProducer["ruiRegistration"] = agency.RuiRegistration.Format("02.01.2006")
-	}
-	return policyProducer
 }
 
 func getWoptaInfoTable(pdf *fpdf.Fpdf, producerInfo map[string]string) {
