@@ -14,18 +14,18 @@ var (
 	signatureID int
 )
 
-func LifeContract(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
+func LifeContract(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, []byte) {
 	var (
 		filename string
 		out      []byte
 	)
 
-	filename, out = LifeAxa(pdf, policy)
+	filename, out = LifeAxa(pdf, origin, policy)
 
 	return filename, out
 }
 
-func LifeAxa(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
+func LifeAxa(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, []byte) {
 	signatureID = 0
 
 	mainHeader(pdf, policy)
@@ -88,15 +88,17 @@ func LifeAxa(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 
 	woptaFooter(pdf)
 
-	allegato3Section(pdf)
+	producerInfo := loadProducerInfo(origin, policy)
+
+	allegato3Section(pdf, producerInfo)
 
 	pdf.AddPage()
 
-	allegato4Section(pdf)
+	allegato4Section(pdf, producerInfo)
 
 	pdf.AddPage()
 
-	allegato4TerSection(pdf)
+	allegato4TerSection(pdf, producerInfo)
 
 	pdf.AddPage()
 
@@ -1031,7 +1033,44 @@ func axaTablePart3Section(pdf *fpdf.Fpdf) {
 		"esposta.")
 }
 
-func GetWoptaInfoTable(pdf *fpdf.Fpdf) {
+func loadProducerInfo(origin string, policy *models.Policy) map[string]string {
+	policyProducer := map[string]string{
+		"name":            "MICHELE",
+		"surname":         "LOMAZZI",
+		"ruiSection":      "A",
+		"ruiCode":         "A000703480",
+		"ruiRegistration": "02.03.2022",
+	}
+
+	if policy.AgentUid != "" {
+		var agent models.Agent
+		fireAgent := lib.GetDatasetByEnv(origin, models.AgentCollection)
+		docsnap, err := lib.GetFirestoreErr(fireAgent, policy.AgentUid)
+		lib.CheckError(err)
+		err = docsnap.DataTo(&agent)
+		lib.CheckError(err)
+		policyProducer["name"] = strings.ToUpper(agent.Name)
+		policyProducer["surname"] = strings.ToUpper(agent.Surname)
+		policyProducer["ruiSection"] = agent.RuiSection
+		policyProducer["ruiCode"] = agent.RuiCode
+		policyProducer["ruiRegistration"] = agent.RuiRegistration.Format("02.01.2006")
+	} else if policy.AgencyUid != "" {
+		var agency models.Agency
+		fireAgency := lib.GetDatasetByEnv(origin, models.AgencyCollection)
+		docsnap, err := lib.GetFirestoreErr(fireAgency, policy.AgencyUid)
+		lib.CheckError(err)
+		err = docsnap.DataTo(&agency)
+		lib.CheckError(err)
+		policyProducer["name"] = strings.ToUpper(agency.Name)
+		policyProducer["surname"] = ""
+		policyProducer["ruiSection"] = agency.RuiSection
+		policyProducer["ruiCode"] = agency.RuiCode
+		policyProducer["ruiRegistration"] = agency.RuiRegistration.Format("02.01.2006")
+	}
+	return policyProducer
+}
+
+func getWoptaInfoTable(pdf *fpdf.Fpdf, producerInfo map[string]string) {
 	drawPinkHorizontalLine(pdf, 0.1)
 	pdf.Ln(0.5)
 	setBlackRegularFont(pdf, smallTextSize)
@@ -1039,8 +1078,9 @@ func GetWoptaInfoTable(pdf *fpdf.Fpdf) {
 		"CONTRAENTE", "", "", false)
 	pdf.Ln(1)
 	setBlackRegularFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3, "LOMAZZI MICHELE iscritto alla Sezione A del RUI con numero "+
-		"A000703480 in data 02.03.2022", "", "", false)
+	pdf.MultiCell(0, 3, producerInfo["surname"]+" "+producerInfo["name"]+" iscritto alla Sezione "+
+		producerInfo["ruiSection"]+" del RUI con numero "+producerInfo["ruiCode"]+" in data "+
+		producerInfo["ruiRegistration"], "", "", false)
 	pdf.Ln(0.5)
 	drawPinkHorizontalLine(pdf, 0.1)
 	pdf.Ln(0.5)
@@ -1097,7 +1137,7 @@ func GetWoptaInfoTable(pdf *fpdf.Fpdf) {
 	drawPinkHorizontalLine(pdf, 0.1)
 }
 
-func allegato3Section(pdf *fpdf.Fpdf) {
+func allegato3Section(pdf *fpdf.Fpdf, producerInfo map[string]string) {
 	setBlackBoldFont(pdf, titleTextSize)
 	pdf.MultiCell(0, 3, "ALLEGATO 3 - INFORMATIVA SUL DISTRIBUTORE", "", "CM", false)
 	pdf.Ln(3)
@@ -1117,7 +1157,7 @@ func allegato3Section(pdf *fpdf.Fpdf) {
 		"il contraente", "", "", false)
 	pdf.Ln(1)
 
-	GetWoptaInfoTable(pdf)
+	getWoptaInfoTable(pdf, producerInfo)
 	pdf.Ln(1)
 
 	setBlackRegularFont(pdf, standardTextSize)
@@ -1176,7 +1216,7 @@ func allegato3Section(pdf *fpdf.Fpdf) {
 		"", "", false)
 }
 
-func allegato4Section(pdf *fpdf.Fpdf) {
+func allegato4Section(pdf *fpdf.Fpdf, producerInfo map[string]string) {
 	setBlackBoldFont(pdf, titleTextSize)
 	pdf.MultiCell(0, 3, "ALLEGATO 4 - INFORMAZIONI SULLA DISTRIBUZIONE\nDEL PRODOTTO ASSICURATIVO NON IBIP",
 		"", "CM", false)
@@ -1188,7 +1228,7 @@ func allegato4Section(pdf *fpdf.Fpdf) {
 		"e sulle remunerazioni percepite.", "", "", false)
 	pdf.Ln(1)
 
-	GetWoptaInfoTable(pdf)
+	getWoptaInfoTable(pdf, producerInfo)
 	pdf.Ln(3)
 
 	setBlackBoldFont(pdf, titleTextSize)
@@ -1244,7 +1284,7 @@ func allegato4Section(pdf *fpdf.Fpdf) {
 	pdf.Ln(3)
 }
 
-func allegato4TerSection(pdf *fpdf.Fpdf) {
+func allegato4TerSection(pdf *fpdf.Fpdf, producerInfo map[string]string) {
 	setBlackBoldFont(pdf, titleTextSize)
 	pdf.MultiCell(0, 3, "ALLEGATO 4 TER - ELENCO DELLE REGOLE DI COMPORTAMENTO DEL DISTRIBUTORE",
 		"", fpdf.AlignCenter, false)
@@ -1259,7 +1299,7 @@ func allegato4TerSection(pdf *fpdf.Fpdf) {
 		"prevista, del contratto di assicurazione.", "", "", false)
 	pdf.Ln(1)
 
-	GetWoptaInfoTable(pdf)
+	getWoptaInfoTable(pdf, producerInfo)
 	pdf.Ln(3)
 
 	setBlackBoldFont(pdf, titleTextSize)
