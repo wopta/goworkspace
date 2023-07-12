@@ -44,9 +44,9 @@ func GetProductByRoleFx(w http.ResponseWriter, r *http.Request) (string, interfa
 	respString = string(jsonResp)
 	switch request.Name {
 	case "persona":
-		respString, resp, err = product.ReplaceDatesInProduct(resp, 75)
+		respString, resp, err = product.ReplaceDatesInProduct(resp, 70, 0)
 	case "life":
-		respString, resp, err = product.ReplaceDatesInProduct(resp, 55)
+		respString, resp, err = product.ReplaceDatesInProduct(resp, 70, 55)
 	}
 
 	log.Printf("GetProductByRoleFx response: %s", respString)

@@ -74,15 +74,15 @@ func GetNameFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	jsonString := string(jsonOut)
 	switch name {
 	case "persona":
-		jsonString, product, err = ReplaceDatesInProduct(product, 75)
+		jsonString, product, err = ReplaceDatesInProduct(product, 75, 0)
 	case "life":
-		jsonString, product, err = ReplaceDatesInProduct(product, 55)
+		jsonString, product, err = ReplaceDatesInProduct(product, 75, 55)
 	}
 
 	return jsonString, product, err
 }
 
-func ReplaceDatesInProduct(product models.Product, minYear int) (string, models.Product, error) {
+func ReplaceDatesInProduct(product models.Product, minYear, minAgentYear int) (string, models.Product, error) {
 	jsonOut, err := product.Marshal()
 	if err != nil {
 		return "", models.Product{}, err
@@ -92,12 +92,15 @@ func ReplaceDatesInProduct(product models.Product, minYear int) (string, models.
 
 	initialDate := time.Now().AddDate(-18, 0, 0).Format("2006-01-02")
 	minDate := time.Now().AddDate(-minYear, 0, 1).Format("2006-01-02")
+	minAgentDate := time.Now().AddDate(-minAgentYear, 0, 1).Format("2006-01-02")
 
 	regexInitialDate := regexp.MustCompile("{{INITIAL_DATE}}")
 	regexMinDate := regexp.MustCompile("{{MIN_DATE}}")
+	regexMinAgentDate := regexp.MustCompile("{{MIN_AGENT_DATE}}")
 
 	productJson = regexInitialDate.ReplaceAllString(productJson, initialDate)
 	productJson = regexMinDate.ReplaceAllString(productJson, minDate)
+	productJson = regexMinAgentDate.ReplaceAllString(productJson, minAgentDate)
 
 	err = json.Unmarshal(jsonOut, &product)
 	return productJson, product, err
