@@ -89,6 +89,8 @@ func emitData(state *bpmn.State) error {
 	p := state.Data.(models.Policy)
 
 	emitBase(&p, origin)
+	log.Println(p)
+	log.Println(state.Data.(models.Policy))
 	return nil
 }
 
