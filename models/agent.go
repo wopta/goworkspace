@@ -20,6 +20,7 @@ type Agent struct {
 	Products        []Product `json:"products" firestore:"products" bigquery:"-"`
 	Policies        []string  `json:"policies" firestore:"policies" bigquery:"-"` // will contain policies UIDs
 	RuiCode         string    `json:"ruiCode" firestore:"ruiCode" bigquery:"-"`
+	RuiSection      string    `json:"ruiSection" firestore:"ruiSection" bigquery:"-"`
 	RuiRegistration time.Time `json:"ruiRegistration" firestore:"ruiRegistration" bigquery:"-"`
 }
 
