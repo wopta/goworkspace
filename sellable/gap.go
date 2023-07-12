@@ -2,6 +2,7 @@ package sellable
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/wopta/goworkspace/lib"
@@ -63,9 +64,9 @@ func isVehicleSellable(policy *models.Policy) error {
 		return fmt.Errorf("the vehicle is not private")
 	}
 
-	carTypes := []string{"auto", "autocarro", "suv"}
-	if !lib.SliceContains(carTypes, vehicle.VehicleType) {
-		return fmt.Errorf("The vehicle type is not in: %v", carTypes)
+	vehicleTypes := []string{"autoveicolo", "autocarro", "camper"}
+	if !lib.SliceContains(vehicleTypes, strings.ToLower(vehicle.VehicleType)) {
+		return fmt.Errorf("The vehicle type is not in: %v", vehicleTypes)
 	}
 
 	anniversary := vehicle.RegistrationDate.AddDate(maxAgeAtStartDate, 0, 0)
