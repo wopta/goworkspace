@@ -9,6 +9,7 @@ import (
 
 	"github.com/wopta/goworkspace/bpmn"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -92,8 +93,8 @@ func emitData(state *bpmn.State) error {
 }
 
 func sendMailSign(state *bpmn.State) error {
-	//policy := state.Data
-	//mail.SendMailSign(policy.(models.Policy))
+	policy := state.Data
+	mail.SendMailSign(policy.(models.Policy))
 	return nil
 }
 
@@ -109,7 +110,7 @@ func runBpmn(policy *models.Policy, processByte string) {
 func getTest() string {
 	return `
 	[{
-        "name": "test",
+        "name": "emitData",
         "type": "TASK",
         "id": 0,
         "outProcess": [1],
@@ -117,35 +118,16 @@ func getTest() string {
         "status": "READY"
 
     },
+
 	{
-        "name": "test",
-        "type": "DECISION",
+        "name": "sendMailSign",
+        "type": "TASK",
         "id": 1,
-        "outTrueProcess": [2],
-		"outFalseProcess": [2],
-		"decision":"payment== \"fabrick\"",
-        "inProcess": [0],
-        "status": "READY"
-
-    },
-	{
-        "name": "test",
-        "type": "TASK",
-        "id": 2,
         "outProcess": [],
         "inProcess": [1],
         "status": "READY"
 
     },
-	,
-	{
-        "name": "test",
-        "type": "TASK",
-        "id": 2,
-        "outProcess": [],
-        "inProcess": [1],
-        "status": "READY"
-
-    }]
+]
 	`
 }

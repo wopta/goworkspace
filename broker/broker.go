@@ -49,7 +49,7 @@ func Broker(w http.ResponseWriter, r *http.Request) {
 			},
 			{
 				Route:   "/v2/emit",
-				Handler: EmitFx,
+				Handler: EmitV2Fx,
 				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAll},
 			},
