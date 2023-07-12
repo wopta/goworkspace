@@ -89,6 +89,12 @@ func Broker(w http.ResponseWriter, r *http.Request) {
 				Method:  http.MethodPut,
 				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},
+			{
+				Route:   "/policy/refund/v1/:policyUid",
+				Handler: RefundPolicyFx,
+				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
+			},
 		},
 	}
 	route.Router(w, r)

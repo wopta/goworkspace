@@ -50,6 +50,8 @@ type Transaction struct {
 	PaymentMethod      string                `firestore:"paymentMethod,omitempty" json:"paymentMethod,omitempty" bigquery:"paymentMethod"`
 	PaymentNote        string                `firestore:"paymentNote,omitempty" json:"paymentNote,omitempty" bigquery:"paymentNote"`
 	NetworkCommissions map[string]float64    `json:"networkCommissions,omitempty" firestore:"networkCommissions,omitempty" bigquery:"-"`
+	StartDate          time.Time             `json:"startDate,omitempty" firestore:"startDate,omitempty" bigquery:"-"`
+	BigStartDate       bigquery.NullDateTime `json:"-" firestore:"-" bigquery:"startDate"`
 }
 
 func TransactionToListData(query *firestore.DocumentIterator) []Transaction {
