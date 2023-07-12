@@ -123,7 +123,7 @@ func getAgencyProductsList(agencyUid, origin string) []models.Product {
 			continue
 		}
 		for _, defaultProduct := range defaultAgencyProduct {
-			isProductActive := product.Name == defaultProduct.Name && defaultProduct.IsAgentActive
+			isProductActive := product.Name == defaultProduct.Name && defaultProduct.IsAgencyActive
 			if isProductActive {
 				productsList = append(productsList, product)
 				break
