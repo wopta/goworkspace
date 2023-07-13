@@ -16,7 +16,7 @@ import (
 var origin string
 
 func EmitV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.Println("[EmitFx] Handler start ----------------------------------------")
+	log.Println("[EmitFxV2] Handler start ----------------------------------------")
 
 	var (
 		result     EmitRequest
@@ -29,20 +29,20 @@ func EmitV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	firePolicy = lib.GetDatasetByEnv(origin, "policy")
 	request := lib.ErrorByte(io.ReadAll(r.Body))
 
-	log.Printf("[EmitFx] Request: %s", string(request))
+	log.Printf("[EmitFxV2] Request: %s", string(request))
 	json.Unmarshal([]byte(request), &result)
 
 	uid := result.Uid
-	log.Printf("[EmitFx] Uid: %s", uid)
+	log.Printf("[EmitFxV2] Uid: %s", uid)
 
 	docsnap := lib.GetFirestore(firePolicy, string(uid))
 	docsnap.DataTo(&policy)
 	policyJsonLog, _ := policy.Marshal()
-	log.Printf("[EmitFx] Policy %s JSON: %s", uid, string(policyJsonLog))
+	log.Printf("[EmitFxV2] Policy %s JSON: %s", uid, string(policyJsonLog))
 
 	responseEmit := EmitV2(&policy, result, origin)
 	b, e := json.Marshal(responseEmit)
-	log.Println("[EmitFx] Response: ", string(b))
+	log.Println("[EmitFxV2] Response: ", string(b))
 
 	return string(b), responseEmit, e
 }
@@ -57,8 +57,9 @@ func EmitV2(policy *models.Policy, request EmitRequest, origin string) EmitRespo
 	if policy.IsReserved && policy.Status != models.PolicyStatusWaitForApproval {
 		emitApproval(policy)
 	} else {
-
+		log.Println("[EmitFxV2] AgencyUid: ", policy.AgencyUid)
 		if policy.AgencyUid != "" {
+
 			runBpmn(policy, getTest())
 		} else if policy.AgencyUid != "" {
 
