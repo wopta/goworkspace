@@ -63,14 +63,13 @@ func BpmnEngine(policy models.Policy, mapPolicy map[string]interface{}) string {
 		state *State
 	)
 	state = &State{
-		Handlers:     make(map[string]func(state *State) error),
-		Data:         policy,
-		DecisionData: mapPolicy,
+		Handlers: make(map[string]func(state *State) error),
+		Data:     policy,
 	}
 	state.Handlers = make(map[string]func(state *State) error)
 	// basic example loading a BPMN from file,
 	//filePath := "./serverless_function_source_code/test.bpmn"
-	processes, err := state.loadProcesses(getTest())
+	processes, err := state.LoadProcesses(getTest())
 	//lib.C
 	if err != nil {
 		log.Println(err)
@@ -83,8 +82,21 @@ func BpmnEngine(policy models.Policy, mapPolicy map[string]interface{}) string {
 	state.AddTaskHandler("namirialSign", namirialSign)
 	state.AddTaskHandler("sendMailSign", sendMailSign)
 
-	state.RunBpmn(processes, policy)
+	state.RunBpmn(processes)
 	return ""
+}
+func NewBpmn(data interface{}) *State {
+	// Init workflow with a name, and max concurrent tasks
+	log.Println("--------------------------BpmnEngine-------------------------------------------")
+	var (
+		state *State
+	)
+	state = &State{
+		Handlers: make(map[string]func(state *State) error),
+		Data:     data,
+	}
+	state.Handlers = make(map[string]func(state *State) error)
+	return state
 }
 func test(state *State) error {
 	log.Println("--------------------------Test-------------------------------------------")

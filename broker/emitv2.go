@@ -7,12 +7,16 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/wopta/goworkspace/bpmn"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
 )
 
-func Emitv2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.Println("[EmitFx] Handler start ----------------------------------------")
+var origin string
+
+func EmitV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	log.Println("[EmitFxV2] Handler start ----------------------------------------")
 
 	var (
 		result     EmitRequest
@@ -21,24 +25,24 @@ func Emitv2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 		policy     models.Policy
 	)
 
-	origin := r.Header.Get("origin")
+	origin = r.Header.Get("origin")
 	firePolicy = lib.GetDatasetByEnv(origin, "policy")
 	request := lib.ErrorByte(io.ReadAll(r.Body))
 
-	log.Printf("[EmitFx] Request: %s", string(request))
+	log.Printf("[EmitFxV2] Request: %s", string(request))
 	json.Unmarshal([]byte(request), &result)
 
 	uid := result.Uid
-	log.Printf("[EmitFx] Uid: %s", uid)
+	log.Printf("[EmitFxV2] Uid: %s", uid)
 
 	docsnap := lib.GetFirestore(firePolicy, string(uid))
 	docsnap.DataTo(&policy)
 	policyJsonLog, _ := policy.Marshal()
-	log.Printf("[EmitFx] Policy %s JSON: %s", uid, string(policyJsonLog))
+	log.Printf("[EmitFxV2] Policy %s JSON: %s", uid, string(policyJsonLog))
 
 	responseEmit := EmitV2(&policy, result, origin)
 	b, e := json.Marshal(responseEmit)
-	log.Println("[EmitFx] Response: ", string(b))
+	log.Println("[EmitFxV2] Response: ", string(b))
 
 	return string(b), responseEmit, e
 }
@@ -53,17 +57,25 @@ func EmitV2(policy *models.Policy, request EmitRequest, origin string) EmitRespo
 	if policy.IsReserved && policy.Status != models.PolicyStatusWaitForApproval {
 		emitApproval(policy)
 	} else {
-		log.Printf("[Emit] Policy Uid %s", request.Uid)
+		log.Println("[EmitFxV2] AgencyUid: ", policy.AgencyUid)
+		if policy.AgencyUid != "" {
 
-		emitBase(policy, origin)
+			runBpmn(policy, getTest())
+		} else if policy.AgencyUid != "" {
 
-		emitSign(policy, request, origin)
+		} else {
+			log.Printf("[Emit] Policy Uid %s", request.Uid)
 
-		emitPay(policy, request, origin)
+			emitBase(policy, origin)
 
-		responseEmit = EmitResponse{UrlPay: policy.PayUrl, UrlSign: policy.SignUrl}
-		policyJson, _ := policy.Marshal()
-		log.Printf("[Emit] Policy %s: %s", request.Uid, string(policyJson))
+			emitSign(policy, origin)
+
+			emitPay(policy, origin)
+
+			responseEmit = EmitResponse{UrlPay: policy.PayUrl, UrlSign: policy.SignUrl}
+			policyJson, _ := policy.Marshal()
+			log.Printf("[Emit] Policy %s: %s", request.Uid, string(policyJson))
+		}
 	}
 
 	policy.Updated = time.Now().UTC()
@@ -72,4 +84,53 @@ func EmitV2(policy *models.Policy, request EmitRequest, origin string) EmitRespo
 	models.SetGuaranteBigquery(*policy, "emit", guaranteFire)
 
 	return responseEmit
+}
+
+func emitData(state *bpmn.State) error {
+	p := state.Data.(models.Policy)
+
+	emitBase(&p, origin)
+	log.Println(p)
+	log.Println(state.Data.(models.Policy))
+	return nil
+}
+
+func sendMailSign(state *bpmn.State) error {
+	policy := state.Data
+	mail.SendMailSign(policy.(models.Policy))
+	return nil
+}
+
+func runBpmn(policy *models.Policy, processByte string) {
+	state := bpmn.NewBpmn(policy)
+	state.AddTaskHandler("emitData", emitData)
+
+	state.AddTaskHandler("sendMailSign", sendMailSign)
+	process, _ := state.LoadProcesses(processByte)
+	state.RunBpmn(process)
+
+}
+func getTest() string {
+	return `
+	[{
+        "name": "emitData",
+        "type": "TASK",
+        "id": 0,
+        "outProcess": [1],
+        "inProcess": [],
+        "status": "READY"
+
+    },
+
+	{
+        "name": "sendMailSign",
+        "type": "TASK",
+        "id": 1,
+        "outProcess": [],
+        "inProcess": [1],
+        "status": "READY"
+
+    },
+]
+	`
 }

@@ -48,6 +48,12 @@ func Broker(w http.ResponseWriter, r *http.Request) {
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
+				Route:   "/v1/policy/bpmn",
+				Handler: EmitV2Fx,
+				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAll},
+			},
+			{
 				Route:   "/v1/policy/reserved",
 				Handler: reserved,
 				Method:  http.MethodPost,

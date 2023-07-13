@@ -17,6 +17,7 @@ require (
 	github.com/wopta/goworkspace/transaction v1.0.5
 	github.com/wopta/goworkspace/user v1.0.14
 	github.com/wopta/goworkspace/wiseproxy v1.0.3
+	github.com/wopta/goworkspace/bpmn v1.0.2
 )
 
 require (
