@@ -2,6 +2,7 @@ package payment
 
 import (
 	"encoding/json"
+	"errors"
 	"io"
 	"log"
 	"net/http"
@@ -49,7 +50,7 @@ func Payment(w http.ResponseWriter, r *http.Request) {
 			},
 			{
 				Route:   "/v1/:uid",
-				Handler: FabrickExpireBill,
+				Handler: FabrickExpireBillFx,
 				Method:  http.MethodDelete,
 				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},
@@ -108,37 +109,63 @@ func getOrigin(origin string) string {
 	return result
 }
 
-func FabrickExpireBill(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	var transaction models.Transaction
-	const expirationTimeSuffix = " 00:00:00"
-	//layout := "2006-01-02T15:04:05.000Z"
-	layout2 := "2006-01-02"
+func FabrickExpireBillFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	var (
+		err         error
+		transaction models.Transaction
+	)
 
-	log.Println(r.Header.Get("uid"))
 	uid := r.Header.Get("uid")
-	fireTransactions := lib.GetDatasetByEnv(r.Header.Get("origin"), "transactions")
-	docsnap, e := lib.GetFirestoreErr(fireTransactions, uid)
+	origin := r.Header.Get("origin")
+
+	fireTransactions := lib.GetDatasetByEnv(origin, "transactions")
+	docsnap, err := lib.GetFirestoreErr(fireTransactions, uid)
+	lib.CheckError(err)
 	docsnap.DataTo(&transaction)
-	expirationDate := time.Now().UTC().AddDate(0, 0, 1).Format(layout2)
-	var urlstring = os.Getenv("FABRICK_BASEURL") + "api/fabrick/pace/v4.0/mods/back/v1.0/payments/change-expiration"
 
-	req, _ := http.NewRequest(http.MethodPut, urlstring, strings.NewReader(`{"id":"`+transaction.ProviderId+`","newExpirationDate":"`+expirationDate+expirationTimeSuffix+`"}`))
-	res, e := getFabrickClient(urlstring, req)
+	err = FabrickExpireBill(&transaction)
 
-	respBody, e := io.ReadAll(res.Body)
-	log.Println("Fabrick res body: ", string(respBody))
-	if res.StatusCode != http.StatusOK {
-		log.Printf("ExpireBill: fabrick error response status code: %s", res.Status)
+	if err != nil {
+		log.Printf("[FabrickExpireBillFx]: ERROR: %s", err.Error())
 		return `{"success":false}`, `{"success":false}`, nil
 	}
+
+	lib.SetFirestore(fireTransactions, transaction.Uid, transaction)
+	err = lib.InsertRowsBigQuery("wopta", fireTransactions, transaction)
+
+	return `{"success":true}`, `{"success":true}`, err
+}
+
+const (
+	layout               string = "2006-01-02T15:04:05.000Z"
+	layout2              string = "2006-01-02"
+	expirationTimeSuffix string = " 00:00:00"
+)
+
+func FabrickExpireBill(transaction *models.Transaction) error {
+	var err error
+
+	expirationDate := time.Now().UTC().AddDate(0, 0, 1).Format(layout2)
+	urlstring := os.Getenv("FABRICK_BASEURL") + "api/fabrick/pace/v4.0/mods/back/v1.0/payments/change-expiration"
+
+	req, _ := http.NewRequest(http.MethodPut, urlstring, strings.NewReader(`{"id":"`+transaction.ProviderId+`","newExpirationDate":"`+expirationDate+expirationTimeSuffix+`"}`))
+	res, err := getFabrickClient(urlstring, req)
+	lib.CheckError(err)
+
+	respBody, err := io.ReadAll(res.Body)
+	lib.CheckError(err)
+	log.Println("Fabrick res body: ", string(respBody))
+	if res.StatusCode != http.StatusOK {
+		log.Printf("[FabrickExpireBill] ERROR response status code: %s", res.Status)
+		return errors.New("status code " + res.Status)
+	}
+
 	transaction.ExpirationDate = expirationDate
 	transaction.Status = models.PolicyStatusDeleted
 	transaction.StatusHistory = append(transaction.StatusHistory, models.PolicyStatusDeleted)
 	transaction.IsDelete = true
 	transaction.BigCreationDate = civil.DateTimeOf(transaction.CreationDate)
 	transaction.BigStatusHistory = strings.Join(transaction.StatusHistory, ",")
-	lib.SetFirestore(fireTransactions, uid, transaction)
-	e = lib.InsertRowsBigQuery("wopta", fireTransactions, transaction)
 
-	return `{"success":true}`, `{"success":true}`, e
+	return err
 }

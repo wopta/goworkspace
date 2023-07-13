@@ -98,7 +98,7 @@ func Broker(w http.ResponseWriter, r *http.Request) {
 			{
 				Route:   "/policy/refund/v1/:policyUid",
 				Handler: RefundPolicyFx,
-				Method:  http.MethodPost,
+				Method:  http.MethodPut,
 				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},
 		},

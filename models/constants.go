@@ -24,6 +24,8 @@ const (
 	PolicyStatusPS              = "Pay&Sign"
 	PolicyStatusCompanyEmit     = "CompanyEmited"
 	PolicyStatusDeleted         = "Deleted"
+	PolicyStatusToRefund        = "ToRefund"
+	PolicyStatusRefunded        = "Refunded"
 )
 
 const (

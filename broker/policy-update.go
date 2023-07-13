@@ -2,7 +2,6 @@ package broker
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -10,7 +9,6 @@ import (
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/transaction"
 )
 
 func UpdatePolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -120,98 +118,4 @@ type PolicyDeleteReq struct {
 	Description string    `json:"description,omitempty"`
 	Date        time.Time `json:"date"`
 	RefundType  string    `json:"refundType,omitempty"`
-}
-
-func RefundPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.Println("[RefundPolicyFx] Handler start ----------------------------------------")
-	var (
-		err    error
-		policy models.Policy
-	)
-
-	policyUid := r.Header.Get("policyUid")
-	origin := r.Header.Get("origin")
-
-	log.Printf("[RefundPolicyFx] Uid: %s", policyUid)
-	policy, err = GetPolicy(policyUid, origin)
-	lib.CheckError(err)
-	policyJsonLog, err := policy.Marshal()
-	lib.CheckError(err)
-	log.Printf("[RefundPolicyFx] Policy %s JSON: %s", policyUid, string(policyJsonLog))
-
-	if !policy.IsPay {
-		log.Printf("[RefundPolicyFx] ERROR Policy %s is not paid, cannot refund", policyUid)
-		return `{"success":false}`, `{"success":false}`, nil
-	}
-
-	if !isPolicyInRefundPeriod(&policy) {
-		log.Printf("[RefundPolicyFx] ERROR Policy %s is out of refund period with startDate: %s", policyUid, policy.StartDate.String())
-		return `{"success":false}`, `{"success":false}`, nil
-	}
-
-	err = RefundPolicy(&policy, origin)
-
-	if err != nil {
-		log.Printf("[RefundPolicyFx] ERROR Policy %s: %s", policyUid, err.Error())
-		return `{"success":false}`, `{"success":false}`, nil
-	}
-
-	return `{"success":true}`, `{"success":true}`, nil
-}
-
-// TODO: this should be set in product
-// ex.: product.RefundPeriod = 30
-func isPolicyInRefundPeriod(policy *models.Policy) bool {
-	now := time.Now().UTC()
-	elapsedDaysFromStartDate := now.Sub(policy.StartDate).Hours() / 24
-
-	switch policy.Name {
-	case "life":
-		return elapsedDaysFromStartDate <= 30
-	default:
-		return elapsedDaysFromStartDate <= 14
-	}
-}
-
-func RefundPolicy(policy *models.Policy, origin string) error {
-	transactionsFire := lib.GetDatasetByEnv(origin, "transactions")
-
-	policyTransactions := transaction.GetPolicyTransactions(origin, policy.Uid)
-
-	refundedTransactions := []models.Transaction{}
-	for _, refundedTransaction := range policyTransactions {
-		if !refundedTransaction.IsPay {
-			break
-		}
-
-		transactionUid := lib.NewDoc(transactionsFire)
-
-		refundedTransaction.Uid = transactionUid
-		refundedTransaction.Amount = -refundedTransaction.Amount
-		refundedTransaction.AmountNet = refundedTransaction.AmountNet * -1
-		refundedTransaction.IsPay = false
-		refundedTransaction.IsDelete = false
-		refundedTransaction.PayDate = time.Time{}
-		refundedTransaction.CreationDate = time.Now().UTC()
-		refundedTransaction.StartDate = policy.StartDate
-		refundedTransaction.Status = models.TransactionStatusToPay
-		refundedTransaction.StatusHistory = []string{models.TransactionStatusToPay}
-		refundedTransaction.ScheduleDate = ""       //?
-		refundedTransaction.ExpirationDate = ""     //?
-		refundedTransaction.ProviderId = ""         //?
-		refundedTransaction.UserToken = ""          //?
-		refundedTransaction.ProviderName = "manual" //?
-
-		refundedTransactions = append(refundedTransactions, refundedTransaction)
-
-		jsonRt, _ := json.Marshal(refundedTransaction)
-
-		log.Printf("Refunded transaction: %v", string(jsonRt))
-	}
-
-	if len(refundedTransactions) == 0 {
-		return fmt.Errorf("no transaction to be refunded")
-	}
-
-	return nil
 }
