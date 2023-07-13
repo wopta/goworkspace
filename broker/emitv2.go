@@ -106,6 +106,8 @@ func runBpmn(policy *models.Policy, processByte string) {
 	state.AddTaskHandler("emitData", emitData)
 
 	state.AddTaskHandler("sendMailSign", sendMailSign)
+	log.Println(state.Handlers)
+	log.Println(state.Processes)
 	process, _ := state.LoadProcesses(processByte)
 	state.RunBpmn(process)
 

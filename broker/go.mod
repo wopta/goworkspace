@@ -16,7 +16,7 @@ require (
 	github.com/wopta/goworkspace/payment v1.0.50
 	github.com/wopta/goworkspace/user v1.0.14
 	github.com/wopta/goworkspace/wiseproxy v1.0.3
-	github.com/wopta/goworkspace/bpmn v1.0.2
+	github.com/wopta/goworkspace/bpmn v1.0.3
 )
 
 require (
