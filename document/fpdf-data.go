@@ -1,10 +1,19 @@
 package document
 
 import (
+	"github.com/dustin/go-humanize"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/product"
+	"sort"
+	"strconv"
 	"strings"
 )
+
+type slugStruct struct {
+	name  string
+	order int64
+}
 
 func loadLifeBeneficiariesInfo(policy *models.Policy) ([]map[string]string, string, string) {
 	legitimateSuccessorsChoice := "X"
@@ -95,4 +104,57 @@ func loadProducerInfo(origin string, policy *models.Policy) map[string]string {
 		policyProducer["ruiRegistration"] = agency.RuiRegistration.Format("02.01.2006")
 	}
 	return policyProducer
+}
+
+func loadLifeGuarantees(policy *models.Policy) (map[string]map[string]string, []slugStruct) {
+	const (
+		death               = "death"
+		permanentDisability = "permanent-disability"
+		temporaryDisability = "temporary-disability"
+		seriousIll          = "serious-ill"
+	)
+	var (
+		guaranteesMap map[string]map[string]string
+		slugs         []slugStruct
+	)
+	lifeProduct, err := product.GetProduct("life", "v1", "mga")
+	lib.CheckError(err)
+
+	guaranteesMap = make(map[string]map[string]string, 0)
+
+	for guaranteeSlug, guarantee := range lifeProduct.Companies[0].GuaranteesMap {
+		guaranteesMap[guaranteeSlug] = make(map[string]string, 0)
+
+		guaranteesMap[guaranteeSlug]["name"] = guarantee.CompanyName
+		guaranteesMap[guaranteeSlug]["sumInsuredLimitOfIndemnity"] = "====="
+		guaranteesMap[guaranteeSlug]["duration"] = "=="
+		guaranteesMap[guaranteeSlug]["endDate"] = "==="
+		guaranteesMap[guaranteeSlug]["price"] = "===="
+		if guaranteeSlug != death {
+			guaranteesMap[guaranteeSlug]["price"] += " (*)"
+		}
+		slugs = append(slugs, slugStruct{name: guaranteeSlug, order: guarantee.Order})
+	}
+
+	sort.Slice(slugs, func(i, j int) bool {
+		return slugs[i].order < slugs[j].order
+	})
+
+	for _, guarantee := range policy.GuaranteesToMap() {
+		var price float64
+		guaranteesMap[guarantee.Slug]["sumInsuredLimitOfIndemnity"] = humanize.FormatFloat("#.###,",
+			guarantee.Value.SumInsuredLimitOfIndemnity) + " €"
+		guaranteesMap[guarantee.Slug]["duration"] = strconv.Itoa(guarantee.Value.Duration.Year)
+		guaranteesMap[guarantee.Slug]["endDate"] = policy.StartDate.AddDate(guarantee.Value.Duration.Year, 0, 0).Format(dateLayout)
+		if policy.PaymentSplit == string(models.PaySplitMonthly) {
+			price = guarantee.Value.PremiumGrossMonthly * 12
+		} else {
+			price = guarantee.Value.PremiumGrossYearly
+		}
+		guaranteesMap[guarantee.Slug]["price"] = humanize.FormatFloat("#.###,##", price) + " €"
+		if guarantee.Slug != death {
+			guaranteesMap[guarantee.Slug]["price"] += " (*)"
+		}
+	}
+	return guaranteesMap, slugs
 }

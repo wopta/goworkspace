@@ -1,11 +1,9 @@
 package document
 
 import (
-	"github.com/dustin/go-humanize"
 	"github.com/go-pdf/fpdf"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -36,7 +34,9 @@ func LifeAxa(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, []by
 
 	insuredInfoSection(pdf, policy)
 
-	lifeGuaranteesTable(pdf, policy)
+	guaranteesMap, slugs := loadLifeGuarantees(policy)
+
+	lifeGuaranteesTable(pdf, guaranteesMap, slugs)
 
 	avvertenzeBeneficiariSection(pdf)
 
@@ -161,65 +161,7 @@ func insuredInfoTable(pdf *fpdf.Fpdf, insured *models.User) {
 	pdf.Ln(1)
 }
 
-func lifeGuaranteesTable(pdf *fpdf.Fpdf, policy *models.Policy) {
-	const (
-		death               = "death"
-		permanentDisability = "permanent-disability"
-		temporaryDisability = "temporary-disability"
-		seriousIll          = "serious-ill"
-	)
-	var (
-		price float64
-	)
-
-	slugs := []string{death, permanentDisability, temporaryDisability, seriousIll}
-
-	guarantees := map[string]map[string]string{
-		death: {
-			"name":                       "Decesso",
-			"sumInsuredLimitOfIndemnity": "======",
-			"duration":                   "==",
-			"endDate":                    "====",
-			"price":                      "====",
-		},
-		permanentDisability: {
-			"name":                       "Invalidità Totale Permanente da Infortunio o Malattia",
-			"sumInsuredLimitOfIndemnity": "======",
-			"duration":                   "==",
-			"endDate":                    "====",
-			"price":                      "==== (*)",
-		},
-		temporaryDisability: {
-			"name":                       "Inabilità Temporanea da Infortunio o Malattia",
-			"sumInsuredLimitOfIndemnity": "======",
-			"duration":                   "==",
-			"endDate":                    "====",
-			"price":                      "==== (*)",
-		},
-		seriousIll: {
-			"name":                       "Malattie Gravi",
-			"sumInsuredLimitOfIndemnity": "======",
-			"duration":                   "==",
-			"endDate":                    "====",
-			"price":                      "==== (*)",
-		},
-	}
-
-	for _, guarantee := range policy.GuaranteesToMap() {
-		guarantees[guarantee.Slug]["sumInsuredLimitOfIndemnity"] = humanize.FormatFloat("#.###,", guarantee.Value.SumInsuredLimitOfIndemnity) + " €"
-		guarantees[guarantee.Slug]["duration"] = strconv.Itoa(guarantee.Value.Duration.Year)
-		guarantees[guarantee.Slug]["endDate"] = policy.StartDate.AddDate(guarantee.Value.Duration.Year, 0, 0).Format(dateLayout)
-		if policy.PaymentSplit == string(models.PaySplitMonthly) {
-			price = guarantee.Value.PremiumGrossMonthly * 12
-		} else {
-			price = guarantee.Value.PremiumGrossYearly
-		}
-		guarantees[guarantee.Slug]["price"] = humanize.FormatFloat("#.###,##", price) + " €"
-		if guarantee.Slug != death {
-			guarantees[guarantee.Slug]["price"] += " (*)"
-		}
-	}
-
+func lifeGuaranteesTable(pdf *fpdf.Fpdf, guaranteesMap map[string]map[string]string, slugs []slugStruct) {
 	setBlackBoldFont(pdf, standardTextSize)
 	pdf.MultiCell(90, 3, "Garanzie", "", "CM", false)
 	pdf.SetXY(pdf.GetX()+90, pdf.GetY()-3)
@@ -235,14 +177,14 @@ func lifeGuaranteesTable(pdf *fpdf.Fpdf, policy *models.Policy) {
 
 	for _, slug := range slugs {
 		setBlackBoldFont(pdf, standardTextSize)
-		pdf.CellFormat(90, 6, guarantees[slug]["name"], "", 0, "", false, 0, "")
+		pdf.CellFormat(90, 6, guaranteesMap[slug.name]["name"], "", 0, "", false, 0, "")
 		setBlackRegularFont(pdf, standardTextSize)
-		pdf.CellFormat(25, 6, guarantees[slug]["sumInsuredLimitOfIndemnity"],
+		pdf.CellFormat(25, 6, guaranteesMap[slug.name]["sumInsuredLimitOfIndemnity"],
 			"", 0, "RM", false, 0, "")
-		pdf.CellFormat(25, 6, guarantees[slug]["duration"], "", 0, "CM",
+		pdf.CellFormat(25, 6, guaranteesMap[slug.name]["duration"], "", 0, "CM",
 			false, 0, "")
-		pdf.CellFormat(25, 6, guarantees[slug]["endDate"], "", 0, "CM", false, 0, "")
-		pdf.CellFormat(0, 6, guarantees[slug]["price"], "",
+		pdf.CellFormat(25, 6, guaranteesMap[slug.name]["endDate"], "", 0, "CM", false, 0, "")
+		pdf.CellFormat(0, 6, guaranteesMap[slug.name]["price"], "",
 			0, "RM", false, 0, "")
 		pdf.Ln(5)
 		drawPinkHorizontalLine(pdf, thinLineWidth)

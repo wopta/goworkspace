@@ -97,11 +97,6 @@ func personaInsuredInfoSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 }
 
 func personaGuaranteesTable(pdf *fpdf.Fpdf, policy *models.Policy) {
-	type slugStruct struct {
-		name  string
-		order int64
-	}
-
 	var table [][]string
 	offerName := policy.OfferlName
 	prod, err := product.GetProduct("persona", "v1", "")
