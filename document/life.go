@@ -991,7 +991,7 @@ func getWoptaInfoTable(pdf *fpdf.Fpdf, producerInfo map[string]string) {
 		"CONTRAENTE", "", "", false)
 	pdf.Ln(1)
 	setBlackRegularFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3, producerInfo["surname"]+" "+producerInfo["name"]+" iscritto alla Sezione "+
+	pdf.MultiCell(0, 3, producerInfo["name"]+" iscritto alla Sezione "+
 		producerInfo["ruiSection"]+" del RUI con numero "+producerInfo["ruiCode"]+" in data "+
 		producerInfo["ruiRegistration"], "", "", false)
 	pdf.Ln(0.5)

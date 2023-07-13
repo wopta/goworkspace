@@ -65,8 +65,7 @@ func loadLifeBeneficiariesInfo(policy *models.Policy) ([]map[string]string, stri
 
 func loadProducerInfo(origin string, policy *models.Policy) map[string]string {
 	policyProducer := map[string]string{
-		"name":            "MICHELE",
-		"surname":         "LOMAZZI",
+		"name":            "LOMAZZI MICHELE",
 		"ruiSection":      "A",
 		"ruiCode":         "A000703480",
 		"ruiRegistration": "02.03.2022",
@@ -79,8 +78,7 @@ func loadProducerInfo(origin string, policy *models.Policy) map[string]string {
 		lib.CheckError(err)
 		err = docsnap.DataTo(&agent)
 		lib.CheckError(err)
-		policyProducer["name"] = strings.ToUpper(agent.Name)
-		policyProducer["surname"] = strings.ToUpper(agent.Surname)
+		policyProducer["name"] = strings.ToUpper(agent.Surname) + " " + strings.ToUpper(agent.Name)
 		policyProducer["ruiSection"] = agent.RuiSection
 		policyProducer["ruiCode"] = agent.RuiCode
 		policyProducer["ruiRegistration"] = agent.RuiRegistration.Format("02.01.2006")
@@ -92,7 +90,6 @@ func loadProducerInfo(origin string, policy *models.Policy) map[string]string {
 		err = docsnap.DataTo(&agency)
 		lib.CheckError(err)
 		policyProducer["name"] = strings.ToUpper(agency.Name)
-		policyProducer["surname"] = ""
 		policyProducer["ruiSection"] = agency.RuiSection
 		policyProducer["ruiCode"] = agency.RuiCode
 		policyProducer["ruiRegistration"] = agency.RuiRegistration.Format("02.01.2006")
