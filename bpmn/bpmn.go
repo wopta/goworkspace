@@ -85,7 +85,7 @@ func BpmnEngine(policy models.Policy, mapPolicy map[string]interface{}) string {
 	state.RunBpmn(processes)
 	return ""
 }
-func NewBpmn(data interface{}) *State {
+func NewBpmn(data models.Policy) *State {
 	// Init workflow with a name, and max concurrent tasks
 	log.Println("--------------------------BpmnEngine-------------------------------------------")
 	var (
@@ -104,13 +104,13 @@ func test(state *State) error {
 }
 func contract(state *State) error {
 	policy := state.Data
-	doc.ContractObj(policy.(models.Policy))
+	doc.ContractObj(policy)
 	return nil
 }
 func fabrickPayment(state *State) error {
 	var payRes pay.FabrickPaymentResponse
 	policye := state.Data
-	policy := policye.(models.Policy)
+	policy := policye
 	if policy.PaymentSplit == string(models.PaySplitYear) {
 		payRes = pay.FabbrickYearPay(policy, "")
 	}
@@ -127,12 +127,12 @@ func fabrickPayment(state *State) error {
 
 func namirialSign(state *State) error {
 	policy := state.Data
-	doc.NamirialOtpV6(policy.(models.Policy), "")
+	doc.NamirialOtpV6(policy, "")
 	return nil
 }
 func sendMailSign(state *State) error {
 	policy := state.Data
-	mail.SendMailSign(policy.(models.Policy))
+	mail.SendMailSign(policy)
 	return nil
 }
 func getTest() string {

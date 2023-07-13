@@ -60,7 +60,7 @@ func EmitV2(policy *models.Policy, request EmitRequest, origin string) EmitRespo
 		log.Println("[EmitFxV2] AgencyUid: ", policy.AgencyUid)
 		if policy.AgencyUid != "" {
 
-			runBpmn(policy, getTest())
+			runBpmn(*policy, getTest())
 		} else if policy.AgencyUid != "" {
 
 		} else {
@@ -87,26 +87,27 @@ func EmitV2(policy *models.Policy, request EmitRequest, origin string) EmitRespo
 }
 
 func emitData(state *bpmn.State) error {
-	p := state.Data.(models.Policy)
-
+	p := state.Data
 	emitBase(&p, origin)
 	log.Println(p)
-	log.Println(state.Data.(models.Policy))
+	log.Println(state.Data)
 	return nil
 }
 
 func sendMailSign(state *bpmn.State) error {
 	policy := state.Data
-	mail.SendMailSign(policy.(models.Policy))
+	mail.SendMailSign(policy)
 	return nil
 }
 
-func runBpmn(policy *models.Policy, processByte string) {
+func runBpmn(policy models.Policy, processByte string) {
 	state := bpmn.NewBpmn(policy)
 	state.AddTaskHandler("emitData", emitData)
-
 	state.AddTaskHandler("sendMailSign", sendMailSign)
-	process, _ := state.LoadProcesses(processByte)
+	log.Println(state.Handlers)
+	log.Println(state.Processes)
+	process, e := state.LoadProcesses(processByte)
+	log.Println(e)
 	state.RunBpmn(process)
 
 }
@@ -130,7 +131,7 @@ func getTest() string {
         "inProcess": [1],
         "status": "READY"
 
-    },
+    }
 ]
 	`
 }

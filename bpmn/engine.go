@@ -18,6 +18,7 @@ func (state *State) AddTaskHandler(name string, handler func(state *State) error
 }
 
 func (state *State) RunBpmn(processes []Process) {
+	log.Println("RunBpmn")
 	state.Processes = processes
 
 	for i, process := range processes {
@@ -85,7 +86,7 @@ func (state *State) getProcesses(ids []int) []Process {
 func (state *State) LoadProcesses(data string) ([]Process, error) {
 	var processes []Process
 	e := json.Unmarshal([]byte(data), &processes)
-
+	state.Processes = processes
 	return processes, e
 }
 func (state *State) decisionStep(process Process) (Process, error) {
