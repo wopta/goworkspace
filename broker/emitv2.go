@@ -104,11 +104,11 @@ func sendMailSign(state *bpmn.State) error {
 func runBpmn(policy *models.Policy, processByte string) {
 	state := bpmn.NewBpmn(policy)
 	state.AddTaskHandler("emitData", emitData)
-
 	state.AddTaskHandler("sendMailSign", sendMailSign)
 	log.Println(state.Handlers)
 	log.Println(state.Processes)
-	process, _ := state.LoadProcesses(processByte)
+	process, e := state.LoadProcesses(processByte)
+	log.Println(e)
 	state.RunBpmn(process)
 
 }
@@ -132,7 +132,7 @@ func getTest() string {
         "inProcess": [1],
         "status": "READY"
 
-    },
+    }
 ]
 	`
 }
