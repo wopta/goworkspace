@@ -2,6 +2,8 @@ package bpmn
 
 import (
 	"time"
+
+	models "github.com/wopta/goworkspace/models"
 )
 
 type ProcessType string
@@ -70,7 +72,7 @@ type job struct {
 type State struct {
 	Name           string
 	Processes      []Process
-	Data           interface{}
+	Data           models.Policy
 	DecisionData   *map[string]interface{}
 	Jobs           []*job
 	Timers         []*Timer
