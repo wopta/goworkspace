@@ -23,6 +23,7 @@ type CreateInviteRequest struct {
 	Name            string           `json:"name,omitempty"`
 	Surname         string           `json:"surname,omitempty"`
 	RuiCode         string           `json:"ruiCode,omitempty"`
+	RuiSection      string           `json:"ruiSection,omitempty"`
 	RuiRegistration time.Time        `json:"ruiRegistration"`
 	Products        []models.Product `json:"products,omitempty"`
 }
@@ -38,6 +39,7 @@ type UserInvite struct {
 	CreatorUid      string           `json:"creatorUid,omitempty" firestore:"creatorUid,omitempty"`
 	Consumed        bool             `json:"consumed" firestore:"consumed"`
 	RuiCode         string           `json:"ruiCode,omitempty" firestore:"ruiCode,omitempty"`
+	RuiSection      string           `json:"ruiSection,omitempty" firestore:"ruiSection,omitempty"`
 	RuiRegistration time.Time        `json:"ruiRegistration" firestore:"ruiRegistration"`
 	Expiration      time.Time        `json:"expiration,omitempty" firestore:"expiration,omitempty"`
 	Products        []models.Product `json:"products,omitempty" firestore:"products,omitempty"`
@@ -100,6 +102,7 @@ func CreateInvite(inviteRequest CreateInviteRequest, origin, creatorUid string) 
 		Uid:             inviteUid,
 		CreatorUid:      creatorUid,
 		RuiCode:         inviteRequest.RuiCode,
+		RuiSection:      inviteRequest.RuiSection,
 		RuiRegistration: inviteRequest.RuiRegistration,
 		Products:        inviteRequest.Products,
 	}

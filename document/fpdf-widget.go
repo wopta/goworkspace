@@ -274,18 +274,17 @@ func companiesDescriptionSection(pdf *fpdf.Fpdf, companyName string) {
 			"operare in Italia in regime di stabilimento. Iscritta all’Albo delle imprese di assicurazione tenuto "+
 			"dall’IVASS, in appendice Elenco I, nr. I.00149.", "", "", false)
 	case "global":
-		pdf.MultiCell(0, 3, "Global Assistance Compagnia di assicurazioni e riassicurazioni S.p.A. a"+
-			" Socio Unico - Capitale Sociale: Euro 5.000.000 i.v. Codice Fiscale, Partita IVA e Registro Imprese di"+
-			" Milano n. 10086540159 R.E.A. n. 1345012 della C.C.I.A.A. di Milano. Sede e Direzione Generale Piazza"+
-			" Diaz 6 – 20123 Milano – Italia E-mail: global.assistance@globalassistance.it PEC: "+
+		pdf.MultiCell(0, 3, "Global Assistance Compagnia di assicurazioni e riassicurazioni S.p.A. a "+
+			"Socio Unico - Capitale Sociale: Euro 5.000.000 i.v. Codice Fiscale, Partita IVA e Registro Imprese di "+
+			"Milano n. 10086540159 R.E.A. n. 1345012 della C.C.I.A.A. di Milano. Sede e Direzione Generale Piazza "+
+			"Diaz 6 – 20123 Milano – Italia E-mail: global.assistance@globalassistance.it PEC: "+
 			"globalassistancespa@legalmail.it. Società soggetta all’attività di direzione e coordinamento di Ri-Fin "+
 			"S.r.l., iscritta all’Albo dei gruppi assicurativi presso l’Ivass al n. 014. La Società è autorizzata "+
-			"all’esercizio delle Assicurazioni e Riassicurazioni con D.M. del 2/8/93 n. 19619 (G.U. 7/8/93 n. 184) e"+
-			" successive autorizzazioni ed è iscritta all’Albo Imprese presso l’IVASS al n. 1.00111. La Società è"+
-			" soggetta alla vigilanza dell’IVASS; è possibile verificare la veridicità e la regolarità delle "+
+			"all’esercizio delle Assicurazioni e Riassicurazioni con D.M. del 2/8/93 n. 19619 (G.U. 7/8/93 n. 184) e "+
+			"successive autorizzazioni ed è iscritta all’Albo Imprese presso l’IVASS al n. 1.00111. La Società è "+
+			"soggetta alla vigilanza dell’IVASS; è possibile verificare la veridicità e la regolarità delle "+
 			"autorizzazioni mediante l'accesso al sito www.ivass.it", "", "", false)
 	}
-
 }
 
 func personalDataHandlingSection(pdf *fpdf.Fpdf, policy *models.Policy) {
