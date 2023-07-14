@@ -45,38 +45,40 @@ func PutPolicyReservedFx(w http.ResponseWriter, r *http.Request) (string, interf
 		return `{"success":false}`, `{"success":false}`, nil
 	}
 
-	if payload.Action == models.PolicyStatusRejected {
-		log.Printf("[PutPolicyReservedFx] Policy Uid %s REJECTED", policy.Uid)
-		policy.IsDeleted = true
-		policy.Status = models.PolicyStatusDeleted
-		policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusRejected, models.PolicyStatusDeleted)
-		policy.RejectReasons = payload.Reasons
-		policy.Updated = time.Now().UTC()
-		err := lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
-		lib.CheckError(err)
-		policy.BigquerySave(origin)
-
-		policyJsonLog, _ := policy.Marshal()
-		log.Printf("[PutPolicyReservedFx] Policy: %s", string(policyJsonLog))
-
-		return `{"success":true}`, `{"success":true}`, nil
+	switch payload.Action {
+	case models.PolicyStatusRejected:
+		rejectPolicy(&policy, payload.Reasons)
+	case models.PolicyStatusApproved:
+		approvePolicy(&policy)
+	default:
+		log.Printf("[PutPolicyReservedFx] Unhandled action %s", payload.Action)
+		return `{"success":false}`, `{"success":false}`, nil
 	}
 
-	if payload.Action == models.PolicyStatusApproved {
-		log.Printf("[PutPolicyReservedFx] Policy Uid %s APPROVED", policy.Uid)
-		policy.Status = models.PolicyStatusApproved
-		policy.StatusHistory = append(policy.StatusHistory, policy.Status)
+	policy.Updated = time.Now().UTC()
+	err = lib.SetFirestoreErr(firePolicy, policy.Uid, &policy)
+	lib.CheckError(err)
+	policy.BigquerySave(origin)
 
-		log.Println("[PutPolicyReservedFx] Invoking Emit")
-		_, err = Emit(&policy, origin)
-		if err != nil {
-			log.Printf("[PutPolicyReservedFx] cannot emit policy %s: %s", policy.Uid, err.Error())
-			return `{"success":false}`, `{"success":false}`, nil
-		}
+	policyJsonLog, _ := policy.Marshal()
+	log.Printf("[PutPolicyReservedFx] Policy: %s", string(policyJsonLog))
 
-		return `{"success":true}`, `{"success":true}`, nil
-	}
+	return `{"success":true}`, `{"success":true}`, nil
+}
 
-	log.Printf("[PutPolicyReservedFx] Unhandled action %s", payload.Action)
-	return `{"success":false}`, `{"success":false}`, nil
+func rejectPolicy(policy *models.Policy, reasons string) {
+	log.Printf("[rejectPolicy] Policy Uid %s REJECTED", policy.Uid)
+	policy.Status = models.PolicyStatusRejected
+	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
+	policy.RejectReasons = reasons
+
+	// send mail to agent
+}
+
+func approvePolicy(policy *models.Policy) {
+	log.Printf("[approvePolicy] Policy Uid %s APPROVED", policy.Uid)
+	policy.Status = models.PolicyStatusApproved
+	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
+
+	// send mail to agent
 }
