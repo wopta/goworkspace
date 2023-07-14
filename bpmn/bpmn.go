@@ -3,7 +3,7 @@ package bpmn
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 
@@ -16,6 +16,8 @@ import (
 	models "github.com/wopta/goworkspace/models"
 	//lib "github.com/wopta/goworkspace/lib"
 )
+
+var origin string
 
 func init() {
 	log.Println("INIT AppcheckProxy")
@@ -46,8 +48,9 @@ func BpmnFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		policy models.Policy
 		e      error
 	)
+	origin = r.Header.Get("Origin")
 	jsonMap := make(map[string]interface{})
-	rBody := lib.ErrorByte(ioutil.ReadAll(r.Body))
+	rBody := lib.ErrorByte(io.ReadAll(r.Body))
 	e = json.Unmarshal(rBody, &jsonMap)
 	e = json.Unmarshal(rBody, &policy)
 	j, e := policy.Marshal()
@@ -104,7 +107,7 @@ func test(state *State) error {
 }
 func contract(state *State) error {
 	policy := state.Data
-	doc.ContractObj(policy)
+	doc.ContractObj(origin, policy)
 	return nil
 }
 func fabrickPayment(state *State) error {
