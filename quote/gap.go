@@ -37,9 +37,9 @@ func Gap(role string, policy *models.Policy) {
 	product, err := sellable.Gap(role, policy)
 	lib.CheckError(err)
 
-	policy.Assets[0].Guarantees = getGuarantees(product)
+	policy.Assets[0].Guarantees = getGuarantees(*product)
 
-	calculateGapOfferPrices(policy, product)
+	calculateGapOfferPrices(policy, *product)
 }
 
 func calculateGapOfferPrices(policy *models.Policy, product models.Product) {
@@ -52,10 +52,7 @@ func calculateGapOfferPrices(policy *models.Policy, product models.Product) {
 	vehicleValue := float64(policy.Assets[0].Vehicle.PriceValue)
 	taxValue := getTax(product)
 
-	// Check if OffersPrices is not initialized
-	if policy.OffersPrices == nil {
-		policy.OffersPrices = make(map[string]map[string]*models.Price)
-	}
+	policy.OffersPrices = make(map[string]map[string]*models.Price)
 
 	for offerName, _ := range product.Offers {
 		matrix := getGapMatrix(offerName)

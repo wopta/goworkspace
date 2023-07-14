@@ -23,27 +23,27 @@ const (
 // Given a policy that should contain the Gap and the Person assets, then it returns:
 //   - the product or parts of it depending on the sellability rules
 //   - and an eventual error
-func Gap(role string, policy *models.Policy) (models.Product, error) {
+func Gap(role string, policy *models.Policy) (*models.Product, error) {
 	if err := validatePolicy(policy); err != nil {
-		return models.Product{}, fmt.Errorf("the policy did not pass validation: %v", err)
+		return &models.Product{}, fmt.Errorf("the policy did not pass validation: %v", err)
 	}
 
 	if err := isVehicleSellable(policy); err != nil {
-		return models.Product{}, fmt.Errorf("vehicle not sellable: %v", err)
+		return &models.Product{}, fmt.Errorf("vehicle not sellable: %v", err)
 	}
 
 	product, err := getProduct(policy, role)
 	if err != nil {
-		return models.Product{}, fmt.Errorf("no products for this vehicle: %v", err)
+		return &models.Product{}, fmt.Errorf("no products for this vehicle: %v", err)
 	}
 
 	return product, nil
 }
 
-func getProduct(policy *models.Policy, role string) (models.Product, error) {
-	product, err := prd.GetProduct("gap", "v1", role)
+func getProduct(policy *models.Policy, role string) (*models.Product, error) {
+	product, err := prd.GetProduct(models.GapProduct, "v1", role)
 	if err != nil {
-		return models.Product{}, fmt.Errorf("error in getting the product: %v", err)
+		return &models.Product{}, fmt.Errorf("error in getting the product: %v", err)
 	}
 
 	vehiclePrice := policy.Assets[0].Vehicle.PriceValue
