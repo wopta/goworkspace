@@ -7,9 +7,9 @@ replace github.com/wopta/goworkspace/user => ./
 require (
 	firebase.google.com/go/v4 v4.10.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.3
-	github.com/wopta/goworkspace/lib v1.0.53
+	github.com/wopta/goworkspace/lib v1.0.61
 	github.com/wopta/goworkspace/mail v1.0.22
-	github.com/wopta/goworkspace/models v1.1.8
+	github.com/wopta/goworkspace/models v1.1.15
 	github.com/wopta/goworkspace/wiseproxy v1.0.3
 	golang.org/x/exp v0.0.0-20230515195305-f3d0a9c9a5cc
 )

@@ -1,11 +1,9 @@
 package document
 
 import (
-	"github.com/dustin/go-humanize"
 	"github.com/go-pdf/fpdf"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -14,18 +12,18 @@ var (
 	signatureID int
 )
 
-func LifeContract(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
+func LifeContract(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, []byte) {
 	var (
 		filename string
 		out      []byte
 	)
 
-	filename, out = LifeAxa(pdf, policy)
+	filename, out = LifeAxa(pdf, origin, policy)
 
 	return filename, out
 }
 
-func LifeAxa(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
+func LifeAxa(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, []byte) {
 	signatureID = 0
 
 	mainHeader(pdf, policy)
@@ -36,11 +34,15 @@ func LifeAxa(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 
 	insuredInfoSection(pdf, policy)
 
-	lifeGuaranteesTable(pdf, policy)
+	guaranteesMap, slugs := loadLifeGuarantees(policy)
+
+	lifeGuaranteesTable(pdf, guaranteesMap, slugs)
 
 	avvertenzeBeneficiariSection(pdf)
 
-	beneficiariesSection(pdf, policy)
+	beneficiaries, legitimateSuccessorsChoice, designatedSuccessorsChoice := loadLifeBeneficiariesInfo(policy)
+
+	beneficiariesSection(pdf, beneficiaries, legitimateSuccessorsChoice, designatedSuccessorsChoice)
 
 	beneficiaryReferenceSection(pdf, policy)
 
@@ -88,15 +90,17 @@ func LifeAxa(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 
 	woptaFooter(pdf)
 
-	allegato3Section(pdf)
+	producerInfo := loadProducerInfo(origin, policy)
+
+	allegato3Section(pdf, producerInfo)
 
 	pdf.AddPage()
 
-	allegato4Section(pdf)
+	allegato4Section(pdf, producerInfo)
 
 	pdf.AddPage()
 
-	allegato4TerSection(pdf)
+	allegato4TerSection(pdf, producerInfo)
 
 	pdf.AddPage()
 
@@ -157,65 +161,7 @@ func insuredInfoTable(pdf *fpdf.Fpdf, insured *models.User) {
 	pdf.Ln(1)
 }
 
-func lifeGuaranteesTable(pdf *fpdf.Fpdf, policy *models.Policy) {
-	const (
-		death               = "death"
-		permanentDisability = "permanent-disability"
-		temporaryDisability = "temporary-disability"
-		seriousIll          = "serious-ill"
-	)
-	var (
-		price float64
-	)
-
-	slugs := []string{death, permanentDisability, temporaryDisability, seriousIll}
-
-	guarantees := map[string]map[string]string{
-		death: {
-			"name":                       "Decesso",
-			"sumInsuredLimitOfIndemnity": "======",
-			"duration":                   "==",
-			"endDate":                    "====",
-			"price":                      "====",
-		},
-		permanentDisability: {
-			"name":                       "Invalidità Totale Permanente da Infortunio o Malattia",
-			"sumInsuredLimitOfIndemnity": "======",
-			"duration":                   "==",
-			"endDate":                    "====",
-			"price":                      "==== (*)",
-		},
-		temporaryDisability: {
-			"name":                       "Inabilità Temporanea da Infortunio o Malattia",
-			"sumInsuredLimitOfIndemnity": "======",
-			"duration":                   "==",
-			"endDate":                    "====",
-			"price":                      "==== (*)",
-		},
-		seriousIll: {
-			"name":                       "Malattie Gravi",
-			"sumInsuredLimitOfIndemnity": "======",
-			"duration":                   "==",
-			"endDate":                    "====",
-			"price":                      "==== (*)",
-		},
-	}
-
-	for _, guarantee := range policy.GuaranteesToMap() {
-		guarantees[guarantee.Slug]["sumInsuredLimitOfIndemnity"] = humanize.FormatFloat("#.###,", guarantee.Value.SumInsuredLimitOfIndemnity) + " €"
-		guarantees[guarantee.Slug]["duration"] = strconv.Itoa(guarantee.Value.Duration.Year)
-		guarantees[guarantee.Slug]["endDate"] = policy.StartDate.AddDate(guarantee.Value.Duration.Year, 0, 0).Format(dateLayout)
-		if policy.PaymentSplit == string(models.PaySplitMonthly) {
-			price = guarantee.Value.PremiumGrossMonthly * 12
-		} else {
-			price = guarantee.Value.PremiumGrossYearly
-		}
-		guarantees[guarantee.Slug]["price"] = humanize.FormatFloat("#.###,##", price) + " €"
-		if guarantee.Slug != death {
-			guarantees[guarantee.Slug]["price"] += " (*)"
-		}
-	}
-
+func lifeGuaranteesTable(pdf *fpdf.Fpdf, guaranteesMap map[string]map[string]string, slugs []slugStruct) {
 	setBlackBoldFont(pdf, standardTextSize)
 	pdf.MultiCell(90, 3, "Garanzie", "", "CM", false)
 	pdf.SetXY(pdf.GetX()+90, pdf.GetY()-3)
@@ -231,14 +177,14 @@ func lifeGuaranteesTable(pdf *fpdf.Fpdf, policy *models.Policy) {
 
 	for _, slug := range slugs {
 		setBlackBoldFont(pdf, standardTextSize)
-		pdf.CellFormat(90, 6, guarantees[slug]["name"], "", 0, "", false, 0, "")
+		pdf.CellFormat(90, 6, guaranteesMap[slug.name]["name"], "", 0, "", false, 0, "")
 		setBlackRegularFont(pdf, standardTextSize)
-		pdf.CellFormat(25, 6, guarantees[slug]["sumInsuredLimitOfIndemnity"],
+		pdf.CellFormat(25, 6, guaranteesMap[slug.name]["sumInsuredLimitOfIndemnity"],
 			"", 0, "RM", false, 0, "")
-		pdf.CellFormat(25, 6, guarantees[slug]["duration"], "", 0, "CM",
+		pdf.CellFormat(25, 6, guaranteesMap[slug.name]["duration"], "", 0, "CM",
 			false, 0, "")
-		pdf.CellFormat(25, 6, guarantees[slug]["endDate"], "", 0, "CM", false, 0, "")
-		pdf.CellFormat(0, 6, guarantees[slug]["price"], "",
+		pdf.CellFormat(25, 6, guaranteesMap[slug.name]["endDate"], "", 0, "CM", false, 0, "")
+		pdf.CellFormat(0, 6, guaranteesMap[slug.name]["price"], "",
 			0, "RM", false, 0, "")
 		pdf.Ln(5)
 		drawPinkHorizontalLine(pdf, thinLineWidth)
@@ -262,60 +208,8 @@ func avvertenzeBeneficiariSection(pdf *fpdf.Fpdf) {
 		"il Beneficiario designato.", "", "", false)
 }
 
-func beneficiariesSection(pdf *fpdf.Fpdf, policy *models.Policy) {
-	legitimateSuccessorsChoice := "X"
-	designatedSuccessorsChoice := ""
-	beneficiaries := [2]map[string]string{
-		{
-			"name":     "=====",
-			"fiscCode": "=====",
-			"address":  "=====",
-			"mail":     "=====",
-			"phone":    "=====",
-			"relation": "=====",
-			"consent":  "=====",
-		},
-		{
-			"name":           "=====",
-			"fiscCode":       "=====",
-			"address":        "=====",
-			"mail":           "=====",
-			"phone":          "=====",
-			"relation":       "=====",
-			"contactConsent": "=====",
-		},
-	}
-
-	deathGuarantee, err := policy.ExtractGuarantee("death")
-	lib.CheckError(err)
-
-	if deathGuarantee.Beneficiaries != nil && !(*deathGuarantee.Beneficiaries)[0].IsLegitimateSuccessors {
-		legitimateSuccessorsChoice = ""
-		designatedSuccessorsChoice = "X"
-
-		for index, beneficiary := range *deathGuarantee.Beneficiaries {
-			address := strings.ToUpper(beneficiary.Residence.StreetName + ", " + beneficiary.Residence.StreetNumber +
-				" - " + beneficiary.Residence.PostalCode + " " + beneficiary.Residence.City +
-				" (" + beneficiary.Residence.CityCode + ")")
-			beneficiaries[index]["name"] = strings.ToUpper(beneficiary.Surname + " " + beneficiary.Name)
-			beneficiaries[index]["fiscCode"] = strings.ToUpper(beneficiary.FiscalCode)
-			beneficiaries[index]["address"] = address
-			beneficiaries[index]["mail"] = beneficiary.Mail
-			beneficiaries[index]["phone"] = beneficiary.Phone
-			if beneficiary.IsFamilyMember {
-				beneficiaries[index]["relation"] = "Nucleo familiare (rapporto di parentela, coniuge, unione civile, " +
-					"convivenza more uxorio)"
-			} else {
-				beneficiaries[index]["relation"] = "Altro (no rapporto parentela)"
-			}
-			if beneficiary.IsContactable {
-				beneficiaries[index]["contactConsent"] = "SI"
-			} else {
-				beneficiaries[index]["contactConsent"] = "NO"
-			}
-		}
-	}
-
+func beneficiariesSection(pdf *fpdf.Fpdf, beneficiaries []map[string]string, legitimateSuccessorsChoice,
+	designatedSuccessorsChoice string) {
 	getParagraphTitle(pdf, "Beneficiario")
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.CellFormat(0, 3, "Io sottoscritto Assicurato, con la sottoscrizione della presente polizza, in "+
@@ -335,7 +229,7 @@ func beneficiariesSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	beneficiariesTable(pdf, beneficiaries)
 }
 
-func beneficiariesTable(pdf *fpdf.Fpdf, beneficiaries [2]map[string]string) {
+func beneficiariesTable(pdf *fpdf.Fpdf, beneficiaries []map[string]string) {
 	for _, beneficiary := range beneficiaries {
 		drawPinkHorizontalLine(pdf, thickLineWidth)
 		pdf.Ln(1.5)
@@ -1031,7 +925,7 @@ func axaTablePart3Section(pdf *fpdf.Fpdf) {
 		"esposta.")
 }
 
-func GetWoptaInfoTable(pdf *fpdf.Fpdf) {
+func getWoptaInfoTable(pdf *fpdf.Fpdf, producerInfo map[string]string) {
 	drawPinkHorizontalLine(pdf, 0.1)
 	pdf.Ln(0.5)
 	setBlackRegularFont(pdf, smallTextSize)
@@ -1039,8 +933,9 @@ func GetWoptaInfoTable(pdf *fpdf.Fpdf) {
 		"CONTRAENTE", "", "", false)
 	pdf.Ln(1)
 	setBlackRegularFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3, "LOMAZZI MICHELE iscritto alla Sezione A del RUI con numero "+
-		"A000703480 in data 02.03.2022", "", "", false)
+	pdf.MultiCell(0, 3, producerInfo["name"]+" iscritto alla Sezione "+
+		producerInfo["ruiSection"]+" del RUI con numero "+producerInfo["ruiCode"]+" in data "+
+		producerInfo["ruiRegistration"], "", "", false)
 	pdf.Ln(0.5)
 	drawPinkHorizontalLine(pdf, 0.1)
 	pdf.Ln(0.5)
@@ -1097,7 +992,7 @@ func GetWoptaInfoTable(pdf *fpdf.Fpdf) {
 	drawPinkHorizontalLine(pdf, 0.1)
 }
 
-func allegato3Section(pdf *fpdf.Fpdf) {
+func allegato3Section(pdf *fpdf.Fpdf, producerInfo map[string]string) {
 	setBlackBoldFont(pdf, titleTextSize)
 	pdf.MultiCell(0, 3, "ALLEGATO 3 - INFORMATIVA SUL DISTRIBUTORE", "", "CM", false)
 	pdf.Ln(3)
@@ -1117,7 +1012,7 @@ func allegato3Section(pdf *fpdf.Fpdf) {
 		"il contraente", "", "", false)
 	pdf.Ln(1)
 
-	GetWoptaInfoTable(pdf)
+	getWoptaInfoTable(pdf, producerInfo)
 	pdf.Ln(1)
 
 	setBlackRegularFont(pdf, standardTextSize)
@@ -1176,7 +1071,7 @@ func allegato3Section(pdf *fpdf.Fpdf) {
 		"", "", false)
 }
 
-func allegato4Section(pdf *fpdf.Fpdf) {
+func allegato4Section(pdf *fpdf.Fpdf, producerInfo map[string]string) {
 	setBlackBoldFont(pdf, titleTextSize)
 	pdf.MultiCell(0, 3, "ALLEGATO 4 - INFORMAZIONI SULLA DISTRIBUZIONE\nDEL PRODOTTO ASSICURATIVO NON IBIP",
 		"", "CM", false)
@@ -1188,7 +1083,7 @@ func allegato4Section(pdf *fpdf.Fpdf) {
 		"e sulle remunerazioni percepite.", "", "", false)
 	pdf.Ln(1)
 
-	GetWoptaInfoTable(pdf)
+	getWoptaInfoTable(pdf, producerInfo)
 	pdf.Ln(3)
 
 	setBlackBoldFont(pdf, titleTextSize)
@@ -1244,7 +1139,7 @@ func allegato4Section(pdf *fpdf.Fpdf) {
 	pdf.Ln(3)
 }
 
-func allegato4TerSection(pdf *fpdf.Fpdf) {
+func allegato4TerSection(pdf *fpdf.Fpdf, producerInfo map[string]string) {
 	setBlackBoldFont(pdf, titleTextSize)
 	pdf.MultiCell(0, 3, "ALLEGATO 4 TER - ELENCO DELLE REGOLE DI COMPORTAMENTO DEL DISTRIBUTORE",
 		"", fpdf.AlignCenter, false)
@@ -1259,7 +1154,7 @@ func allegato4TerSection(pdf *fpdf.Fpdf) {
 		"prevista, del contratto di assicurazione.", "", "", false)
 	pdf.Ln(1)
 
-	GetWoptaInfoTable(pdf)
+	getWoptaInfoTable(pdf, producerInfo)
 	pdf.Ln(3)
 
 	setBlackBoldFont(pdf, titleTextSize)
