@@ -74,12 +74,20 @@ const (
 )
 
 const (
-	AgentCollection  string = "agents"
-	AgencyCollection string = "agencies"
-	UserCollection   string = "users"
-	PolicyCollection string = "policy"
+	AgentCollection    string = "agents"
+	AgencyCollection   string = "agencies"
+	UserCollection     string = "users"
+	PolicyCollection   string = "policy"
+	ProductsCollection string = "products"
 )
 
 const (
 	VehiclePrivateUse string = "private"
+)
+
+const (
+	LifeProduct    string = "life"
+	PmiProduct     string = "pmi"
+	PersonaProduct string = "persona"
+	GapProduct     string = "gap"
 )
