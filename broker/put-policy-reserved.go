@@ -1,13 +1,17 @@
 package broker
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/user"
 )
 
 type PutPolicyReservedPayload struct {
@@ -25,6 +29,7 @@ func PutPolicyReservedFx(w http.ResponseWriter, r *http.Request) (string, interf
 	)
 
 	origin := r.Header.Get("origin")
+	authId := r.Header.Get("authId")
 	policyUid := r.Header.Get("policyUid")
 	firePolicy := lib.GetDatasetByEnv(origin, "policy")
 
@@ -63,6 +68,13 @@ func PutPolicyReservedFx(w http.ResponseWriter, r *http.Request) (string, interf
 	policyJsonLog, _ := policy.Marshal()
 	log.Printf("[PutPolicyReservedFx] Policy: %s", string(policyJsonLog))
 
+	// send mail
+	sendReservedMail(
+		&policy,
+		getMailAddressesByAuthId(authId, origin),
+		getEmailMessageByAction(payload.Action),
+	)
+
 	return `{"success":true}`, `{"success":true}`, nil
 }
 
@@ -71,14 +83,59 @@ func rejectPolicy(policy *models.Policy, reasons string) {
 	policy.Status = models.PolicyStatusRejected
 	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
 	policy.RejectReasons = reasons
-
-	// send mail to agent
 }
 
 func approvePolicy(policy *models.Policy) {
 	log.Printf("[approvePolicy] Policy Uid %s APPROVED", policy.Uid)
 	policy.Status = models.PolicyStatusApproved
 	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
+}
 
-	// send mail to agent
+func getMailAddressesByAuthId(authId, origin string) []string {
+	var (
+		agent    *models.Agent
+		agency   *models.Agency
+		err      error
+		response []string = make([]string, 1)
+	)
+
+	if strings.HasSuffix(authId, "agent") {
+		agent, err = user.GetAgentByAuthId(origin, authId)
+		response = append(response, agent.Mail)
+	}
+
+	if strings.HasSuffix(authId, "agency") {
+		agency, err = user.GetAgencyByAuthId(origin, authId)
+		response = append(response, agency.Email)
+	}
+
+	if err != nil {
+		log.Println("[getMailAddressesByAuthId] ERROR getting broker data")
+		return []string{}
+	}
+
+	return response
+}
+
+func getEmailMessageByAction(action string) string {
+	if action == models.PolicyStatusRejected {
+		return `<p>REJECTED</p>`
+	}
+	if action == models.PolicyStatusApproved {
+		return `<p>APPROVED</p>`
+	}
+	return ""
+}
+
+func sendReservedMail(policy *models.Policy, to []string, message string) {
+	var obj mail.MailRequest
+	obj.From = "noreply@wopta.it"
+	obj.To = to
+	obj.Title = fmt.Sprintf("Polizza n° %s", policy.CodeCompany)
+	obj.SubTitle = "Riservato direzione"
+	obj.Message = message
+	obj.Subject = obj.SubTitle + ": " + obj.Title
+	obj.IsHtml = true
+
+	mail.SendMail(obj)
 }
