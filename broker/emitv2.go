@@ -60,11 +60,13 @@ func EmitV2(policy *models.Policy, request EmitRequest, origin string) EmitRespo
 		log.Println("[EmitFxV2] AgencyUid: ", policy.AgencyUid)
 		if policy.AgencyUid != "" {
 
-			runBpmn(*policy, getTest())
-		} else if policy.AgencyUid != "" {
+			state := runBpmn(*policy, getTest())
+			log.Println("[EmitV2] state.Data Policy:", state.Data)
+
+		} else if policy.AgentUid != "" {
 
 		} else {
-			log.Printf("[Emit] Policy Uid %s", request.Uid)
+			log.Printf("[EmitV2] Policy Uid %s", request.Uid)
 
 			emitBase(policy, origin)
 
@@ -72,12 +74,11 @@ func EmitV2(policy *models.Policy, request EmitRequest, origin string) EmitRespo
 
 			emitPay(policy, origin)
 
-			responseEmit = EmitResponse{UrlPay: policy.PayUrl, UrlSign: policy.SignUrl}
-			policyJson, _ := policy.Marshal()
-			log.Printf("[Emit] Policy %s: %s", request.Uid, string(policyJson))
 		}
 	}
-
+	responseEmit = EmitResponse{UrlPay: policy.PayUrl, UrlSign: policy.SignUrl}
+	policyJson, _ := policy.Marshal()
+	log.Printf("[EmitV2] Policy %s: %s", request.Uid, string(policyJson))
 	policy.Updated = time.Now().UTC()
 	lib.SetFirestore(firePolicy, request.Uid, policy)
 	policy.BigquerySave(origin)
@@ -86,7 +87,7 @@ func EmitV2(policy *models.Policy, request EmitRequest, origin string) EmitRespo
 	return responseEmit
 }
 
-func emitData(state *bpmn.State) error {
+func setData(state *bpmn.State) error {
 	p := state.Data
 	emitBase(&p, origin)
 	log.Println(p)
@@ -99,17 +100,23 @@ func sendMailSign(state *bpmn.State) error {
 	mail.SendMailSign(policy)
 	return nil
 }
+func sign(state *bpmn.State) error {
+	policy := state.Data
+	emitSign(&policy, origin)
+	return nil
+}
 
-func runBpmn(policy models.Policy, processByte string) {
+func runBpmn(policy models.Policy, processByte string) *bpmn.State {
 	state := bpmn.NewBpmn(policy)
-	state.AddTaskHandler("emitData", emitData)
+	state.AddTaskHandler("emitData", setData)
 	state.AddTaskHandler("sendMailSign", sendMailSign)
+	state.AddTaskHandler("sign", sendMailSign)
 	log.Println(state.Handlers)
 	log.Println(state.Processes)
 	process, e := state.LoadProcesses(processByte)
 	log.Println(e)
 	state.RunBpmn(process)
-
+	return state
 }
 func getTest() string {
 	return `
@@ -124,9 +131,19 @@ func getTest() string {
     },
 
 	{
-        "name": "sendMailSign",
+        "name": "sign",
         "type": "TASK",
         "id": 1,
+        "outProcess": [2],
+        "inProcess": [0],
+        "status": "READY"
+
+    },
+
+	{
+        "name": "sendMailSign",
+        "type": "TASK",
+        "id": 2,
         "outProcess": [],
         "inProcess": [1],
         "status": "READY"
