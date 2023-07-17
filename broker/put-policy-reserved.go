@@ -5,7 +5,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/wopta/goworkspace/lib"
@@ -29,7 +28,6 @@ func PutPolicyReservedFx(w http.ResponseWriter, r *http.Request) (string, interf
 	)
 
 	origin := r.Header.Get("origin")
-	authId := r.Header.Get("authId")
 	policyUid := r.Header.Get("policyUid")
 	firePolicy := lib.GetDatasetByEnv(origin, "policy")
 
@@ -68,10 +66,9 @@ func PutPolicyReservedFx(w http.ResponseWriter, r *http.Request) (string, interf
 	policyJsonLog, _ := policy.Marshal()
 	log.Printf("[PutPolicyReservedFx] Policy: %s", string(policyJsonLog))
 
-	// send mail
 	sendReservedMail(
 		&policy,
-		getMailAddressesByAuthId(authId, origin),
+		getMailAddressesByAuthId(&policy, origin),
 		getEmailMessageByAction(payload.Action),
 	)
 
@@ -91,22 +88,23 @@ func approvePolicy(policy *models.Policy) {
 	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
 }
 
-func getMailAddressesByAuthId(authId, origin string) []string {
+func getMailAddressesByAuthId(policy *models.Policy, origin string) []string {
 	var (
 		agent    *models.Agent
 		agency   *models.Agency
 		err      error
-		response []string = make([]string, 1)
+		response []string = make([]string, 0, 2)
 	)
 
-	if strings.HasSuffix(authId, "agent") {
-		agent, err = user.GetAgentByAuthId(origin, authId)
-		response = append(response, agent.Mail)
+	// TODO traverse network ?
+	if policy.AgencyUid != "" {
+		agency, err = user.GetAgencyByAuthId(origin, policy.AgencyUid)
+		response = append(response, agency.Email)
 	}
 
-	if strings.HasSuffix(authId, "agency") {
-		agency, err = user.GetAgencyByAuthId(origin, authId)
-		response = append(response, agency.Email)
+	if policy.AgentUid != "" {
+		agent, err = user.GetAgentByAuthId(origin, policy.AgentUid)
+		response = append(response, agent.Mail)
 	}
 
 	if err != nil {
@@ -131,7 +129,7 @@ func sendReservedMail(policy *models.Policy, to []string, message string) {
 	var obj mail.MailRequest
 	obj.From = "noreply@wopta.it"
 	obj.To = to
-	obj.Title = fmt.Sprintf("Polizza n° %s", policy.CodeCompany)
+	obj.Title = fmt.Sprintf("Proposta di polizza n° %d", policy.ProposalNumber)
 	obj.SubTitle = "Riservato direzione"
 	obj.Message = message
 	obj.Subject = obj.SubTitle + ": " + obj.Title
