@@ -10,7 +10,7 @@ require (
 	github.com/dustin/go-humanize v1.0.1
 	github.com/wopta/goworkspace/lib v1.0.61
 	github.com/wopta/goworkspace/models v1.1.17
-	github.com/wopta/goworkspace/sellable v1.0.18
+	github.com/wopta/goworkspace/sellable v1.0.19
 	modernc.org/mathutil v1.5.0
 )
 
