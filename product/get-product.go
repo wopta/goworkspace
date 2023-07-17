@@ -1,0 +1,118 @@
+package product
+
+import (
+	"encoding/json"
+	"fmt"
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
+	"log"
+	"net/http"
+	"regexp"
+	"time"
+)
+
+func GetProduct(name, version, role string) (*models.Product, error) {
+	var (
+		product  *models.Product
+		filePath = "products/"
+	)
+
+	switch role {
+	case models.UserRoleAdmin:
+		filePath += "mga"
+	case models.UserRoleAgency, models.UserRoleAgent:
+		filePath += role
+	default:
+		filePath += "e-commerce"
+	}
+	filePath += "/" + name + "-" + version + ".json"
+
+	jsonFile := lib.GetFilesByEnv(filePath)
+	err := json.Unmarshal(jsonFile, &product)
+
+	product, err = replaceDatesInProduct(product, role)
+
+	return product, err
+}
+
+func replaceDatesInProduct(product *models.Product, role string) (*models.Product, error) {
+	jsonOut, err := product.Marshal()
+	if err != nil {
+		return &models.Product{}, err
+	}
+
+	productJson := string(jsonOut)
+
+	minAgeValue, minReservedAgeValue := ageMap[role][product.Name][minAge], ageMap[role][product.Name][minReservedAge]
+
+	initialDate := time.Now().AddDate(-18, 0, 0).Format("2006-01-02")
+	minDate := time.Now().AddDate(-minAgeValue, 0, 1).Format("2006-01-02")
+	minReservedDate := time.Now().AddDate(-minReservedAgeValue, 0, 1).Format("2006-01-02")
+
+	regexInitialDate := regexp.MustCompile("{{INITIAL_DATE}}")
+	regexMinDate := regexp.MustCompile("{{MIN_DATE}}")
+	regexMinAgentDate := regexp.MustCompile("{{MIN_RESERVED_DATE}}")
+
+	productJson = regexInitialDate.ReplaceAllString(productJson, initialDate)
+	productJson = regexMinDate.ReplaceAllString(productJson, minDate)
+	productJson = regexMinAgentDate.ReplaceAllString(productJson, minReservedDate)
+
+	err = json.Unmarshal([]byte(productJson), product)
+
+	return product, err
+}
+
+// TODO: remove this endpoint once in production
+func GetNameFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	name := r.Header.Get("name")
+	origin := r.Header.Get("origin")
+
+	log.Println(r.RequestURI)
+
+	product, err := GetName(origin, name, "v1")
+	if err != nil {
+
+		return "", nil, err
+	}
+	jsonOut, err := product.Marshal()
+	if err != nil {
+		return "", nil, err
+	}
+
+	switch name {
+	case "persona":
+		product, err = replaceDatesInProduct(product, models.UserRoleAll)
+	case "life":
+		product, err = replaceDatesInProduct(product, models.UserRoleAll)
+	}
+
+	jsonOut, err = json.Marshal(product)
+
+	return string(jsonOut), product, err
+}
+
+// TODO: remove this endpoint once in production
+func GetName(origin string, name string, version string) (*models.Product, error) {
+	q := lib.Firequeries{
+		Queries: []lib.Firequery{{
+			Field:      "name",
+			Operator:   "==",
+			QueryValue: name,
+		},
+			{
+				Field:      "version",
+				Operator:   "==",
+				QueryValue: version,
+			},
+		},
+	}
+
+	fireProduct := lib.GetDatasetByEnv(origin, "products")
+	query, _ := q.FirestoreWherefields(fireProduct)
+	products := models.ProductToListData(query)
+	if len(products) == 0 {
+		return &models.Product{}, fmt.Errorf("no product json file found for %s %s", name, version)
+	}
+
+	return &products[0], nil
+}
