@@ -1,12 +1,9 @@
 package document
 
 import (
-	"github.com/dustin/go-humanize"
 	"github.com/go-pdf/fpdf"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/product"
-	"sort"
 	"strings"
 )
 
@@ -37,7 +34,9 @@ func PersonaGlobal(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 
 	personaInsuredInfoSection(pdf, policy)
 
-	personaGuaranteesTable(pdf, policy)
+	guaranteesMap, slugs := loadPersonaGuarantees(policy)
+
+	personaGuaranteesTable(pdf, guaranteesMap, slugs)
 
 	personaSurveySection(pdf, policy)
 
@@ -98,67 +97,9 @@ func personaInsuredInfoSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	}
 }
 
-func personaGuaranteesTable(pdf *fpdf.Fpdf, policy *models.Policy) {
+func personaGuaranteesTable(pdf *fpdf.Fpdf, guaranteesMap map[string]map[string]string,
+	slugs []slugStruct) {
 	var table [][]string
-	offerName := policy.OfferlName
-	prod, err := product.GetProduct("persona", "v1", "")
-	lib.CheckError(err)
-
-	guaranteesMap := map[string]map[string]string{}
-	var slugs []slugStruct
-
-	for guaranteeSlug, guarantee := range prod.Companies[0].GuaranteesMap {
-		guaranteesMap[guaranteeSlug] = make(map[string]string, 0)
-
-		guaranteesMap[guaranteeSlug]["name"] = guarantee.CompanyName
-		guaranteesMap[guaranteeSlug]["sumInsuredLimitOfIndemnity"] = "====="
-		guaranteesMap[guaranteeSlug]["details"] = "====="
-		guaranteesMap[guaranteeSlug]["price"] = "====="
-		slugs = append(slugs, slugStruct{name: guaranteeSlug, order: guarantee.Order})
-	}
-
-	sort.Slice(slugs, func(i, j int) bool {
-		return slugs[i].order < slugs[j].order
-	})
-
-	for _, asset := range policy.Assets {
-		for _, guarantee := range asset.Guarantees {
-			var price float64
-			var details string
-
-			guaranteesMap[guarantee.Slug]["sumInsuredLimitOfIndemnity"] = humanize.FormatFloat("#.###,", guarantee.Offer[offerName].SumInsuredLimitOfIndemnity) + " €"
-			if policy.PaymentSplit == string(models.PaySplitMonthly) {
-				price = guarantee.Value.PremiumGrossMonthly * 12
-			} else {
-				price = guarantee.Value.PremiumGrossYearly
-			}
-			guaranteesMap[guarantee.Slug]["price"] = humanize.FormatFloat("#.###,##", price) + " €"
-
-			switch guarantee.Slug {
-			case "IPI":
-				details = "Franchigia " + guarantee.Value.Deductible + guarantee.Value.DeductibleUnit
-				if guarantee.Value.DeductibleType == "absolute" {
-					details += " Assoluta"
-				} else {
-					details += " Assorbibile"
-				}
-			case "D":
-				details = "Beneficiari:\n"
-				if guarantee.Beneficiaries == nil || (*guarantee.Beneficiaries)[0].IsLegitimateSuccessors {
-					details += "Eredi leggitimi e/o testamentari"
-				} else {
-					for _, beneficiary := range *guarantee.Beneficiaries {
-						details += beneficiary.Name + " " + beneficiary.Surname + " " + beneficiary.FiscalCode + "\n"
-					}
-				}
-			case "ITI":
-				details = "Franchigia " + guarantee.Value.Deductible + " " + guarantee.Offer[offerName].DeductibleUnit
-			default:
-				details = "====="
-			}
-			guaranteesMap[guarantee.Slug]["details"] = details
-		}
-	}
 
 	for _, slug := range slugs {
 		r := []string{guaranteesMap[slug.name]["name"], guaranteesMap[slug.name]["sumInsuredLimitOfIndemnity"],

@@ -320,7 +320,7 @@ func checkSurveySpace(pdf *fpdf.Fpdf, survey models.Survey) {
 	}
 
 	if survey.ContractorSign || survey.CompanySign {
-		requiredHeight += 30
+		requiredHeight += 35
 	}
 
 	if (pageHeight-18)-currentY < requiredHeight {
@@ -431,7 +431,7 @@ func checkStatementSpace(pdf *fpdf.Fpdf, statement models.Statement) {
 	}
 
 	if statement.ContractorSign || statement.CompanySign {
-		requiredHeight += 30
+		requiredHeight += 35
 	}
 
 	if (pageHeight-18)-currentY < requiredHeight {
