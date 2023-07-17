@@ -142,7 +142,7 @@ func setRow(policy models.Policy, df dataframe.DataFrame, trans models.Transacti
 			)
 			beneficiary1, beneficiary1S, beneficiary1T = mapBeneficiary(g, 0) //Codice Fiscale Beneficiario
 			beneficiary2, beneficiary2S, _ = mapBeneficiary(g, 1)
-			if policy.PaymentSplit == "monthly" {
+			if policy.PaymentSplit == string(models.PaySplitMonthly) {
 				price = g.Value.PremiumGrossMonthly
 			} else {
 				price = g.Value.PremiumGrossYearly
@@ -441,7 +441,7 @@ func getRenew(p models.Policy) string {
 	if p.PaymentSplit == "year" {
 		result = "A"
 	}
-	if p.PaymentSplit == "montly" {
+	if p.PaymentSplit == string(models.PaySplitMonthly) {
 		if addMonth.Before(now) {
 			result = "A"
 		} else {
@@ -472,7 +472,7 @@ func mapCoverageDuration(p models.Policy) string {
 	if p.PaymentSplit == "year" {
 		result = "012"
 	}
-	if p.PaymentSplit == "montly" {
+	if p.PaymentSplit == string(models.PaySplitMonthly) {
 		result = "001"
 	}
 	return result
@@ -483,7 +483,7 @@ func mapCodecCompany(p models.Policy, g string) string {
 	if p.PaymentSplit == "year" {
 		pay = "W"
 	}
-	if p.PaymentSplit == "montly" {
+	if p.PaymentSplit == string(models.PaySplitMonthly) {
 		pay = "M"
 	}
 	if g == "D" {

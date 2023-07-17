@@ -24,8 +24,9 @@ func getFabrickClient(urlstring string, req *http.Request) (*http.Response, erro
 	req.Header.Set("api-key", os.Getenv("FABRICK_TOKEN_BACK_API"))
 	req.Header.Set("Auth-Schema", "S2S")
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("x-auth-token", os.Getenv("FABRICK_TOKEN_BACK_API"))
+	req.Header.Set("x-auth-token", os.Getenv("FABRICK_PERSISTENT_KEY"))
 	req.Header.Set("Accept", "application/json")
+	log.Println("[GetFabrickClient]", req)
 	res, err := client.Do(req)
 
 	return res, err
@@ -86,7 +87,7 @@ func FabrickPayObj(data models.Policy, firstSchedule bool, scheduleDate string, 
 			}
 			if data.AgencyUid != "" {
 				var agency models.Agency
-				dn := lib.GetFirestore(models.AgencyCollection, data.AgentUid)
+				dn := lib.GetFirestore(models.AgencyCollection, data.AgencyUid)
 				dn.DataTo(&agency)
 				commissionAgent = getCommissionProducts(data, agency.Products)
 			}

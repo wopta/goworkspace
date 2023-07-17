@@ -17,7 +17,6 @@ func init() {
 }
 
 func Broker(w http.ResponseWriter, r *http.Request) {
-
 	log.Println("Broker")
 	lib.EnableCors(&w, r)
 	route := lib.RouteData{
@@ -25,33 +24,39 @@ func Broker(w http.ResponseWriter, r *http.Request) {
 			{
 				Route:   "/v1/policies/fiscalcode/:fiscalcode",
 				Handler: PolicyFiscalcode,
-				Method:  "GET",
+				Method:  http.MethodGet,
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
 				Route:   "/v1/policy/:uid",
 				Handler: GetPolicyFx,
-				Method:  "GET",
+				Method:  http.MethodGet,
 				Roles:   []string{models.UserRoleAll},
 			},
 
 			{
 				Route:   "/v1/policy/proposal",
 				Handler: Proposal,
-				Method:  "POST",
+				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAll},
 			},
 
 			{
 				Route:   "/v1/policy/emit",
-				Handler: Emit,
-				Method:  "POST",
+				Handler: EmitFx,
+				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAll},
+			},
+			{
+				Route:   "/v1/policy/bpmn",
+				Handler: EmitV2Fx,
+				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
 				Route:   "/v1/policy/reserved",
 				Handler: reserved,
-				Method:  "POST",
+				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
@@ -84,10 +89,15 @@ func Broker(w http.ResponseWriter, r *http.Request) {
 				Method:  http.MethodGet,
 				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},
+			{
+				Route:   "/policy/reserved/v1/:policyUid",
+				Handler: PutPolicyReservedFx,
+				Method:  http.MethodPut,
+				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
+			},
 		},
 	}
 	route.Router(w, r)
-
 }
 
 func GetNumberCompany(w http.ResponseWriter, r *http.Request) (string, interface{}) {

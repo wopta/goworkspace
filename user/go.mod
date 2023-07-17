@@ -5,9 +5,11 @@ go 1.19
 replace github.com/wopta/goworkspace/user => ./
 
 require (
+	firebase.google.com/go/v4 v4.10.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.3
-	github.com/wopta/goworkspace/lib v1.0.53
-	github.com/wopta/goworkspace/models v1.1.7
+	github.com/wopta/goworkspace/lib v1.0.61
+	github.com/wopta/goworkspace/mail v1.0.22
+	github.com/wopta/goworkspace/models v1.1.15
 	github.com/wopta/goworkspace/wiseproxy v1.0.3
 	golang.org/x/exp v0.0.0-20230515195305-f3d0a9c9a5cc
 )
@@ -22,7 +24,6 @@ require (
 	cloud.google.com/go/longrunning v0.4.1 // indirect
 	cloud.google.com/go/storage v1.29.0 // indirect
 	firebase.google.com/go v3.13.0+incompatible // indirect
-	firebase.google.com/go/v4 v4.10.0 // indirect
 	github.com/MicahParks/keyfunc v1.5.1 // indirect
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/antlr/antlr4/runtime/Go/antlr v0.0.0-20220527190237-ee62e23da966 // indirect
@@ -63,7 +64,7 @@ require (
 	github.com/richardlehane/mscfb v1.0.4 // indirect
 	github.com/richardlehane/msoleps v1.0.3 // indirect
 	github.com/sergi/go-diff v1.0.0 // indirect
-	github.com/sirupsen/logrus v1.8.1 // indirect
+	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect

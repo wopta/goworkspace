@@ -15,7 +15,8 @@ func CsvToDataframe(data []byte) dataframe.DataFrame {
 	reader := bytes.NewReader(data)
 	df := dataframe.ReadCSV(reader,
 		dataframe.WithDelimiter(';'),
-		dataframe.HasHeader(true))
+		dataframe.HasHeader(true),
+		dataframe.NaNValues(nil))
 	log.Println(df.Error())
 	return df
 }

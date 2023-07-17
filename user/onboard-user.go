@@ -39,13 +39,19 @@ func OnboardUserFx(resp http.ResponseWriter, r *http.Request) (string, interface
 
 	if userId != nil {
 		fmt.Printf("User with fiscalCode %s is being updated", onboardUserRequest.FiscalCode)
-		lib.UpdateFirestoreErr("users", fireUser.UID, map[string]interface{}{"authId": fireUser.UID})
+		lib.UpdateFirestoreErr("users", fireUser.UID, map[string]interface{}{"authId": fireUser.UID, "role": models.UserRoleCustomer})
 	} else {
 		fmt.Printf("User with fiscalCode %s is being created", onboardUserRequest.FiscalCode)
 		user.Uid = fireUser.UID
 		user.AuthId = fireUser.UID
+		user.Role = models.UserRoleCustomer
 		lib.SetFirestore("users", fireUser.UID, user)
 	}
+
+	// update the user custom claim
+	lib.SetCustomClaimForUser(fireUser.UID, map[string]interface{}{
+		"role": models.UserRoleCustomer,
+	})
 
 	return `{"success": true}`, `{"success": true}`, nil
 }

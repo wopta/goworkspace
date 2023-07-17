@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"bytes"
 	"context"
 	"log"
 	"os"
@@ -8,6 +9,7 @@ import (
 
 	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/civil"
+	"google.golang.org/api/iterator"
 )
 
 func getBigqueryClient() *bigquery.Client {
@@ -24,13 +26,82 @@ func InsertRowsBigQuery(datasetID string, tableID string, value interface{}) err
 	log.Println(e)
 	return e
 }
-func QueryRowsBigQuery[T any](datasetID string, tableID string, query string) (*bigquery.RowIterator, error) {
+
+func QueryRowsBigQuery[T any](query string) ([]T, error) {
+	var (
+		res  []T
+		e    error
+		iter *bigquery.RowIterator
+	)
+	log.Println(query)
 	client := getBigqueryClient()
 	ctx := context.Background()
 	defer client.Close()
 	queryi := client.Query(query)
-	iter, e := queryi.Read(ctx)
-	return iter, e
+	iter, e = queryi.Read(ctx)
+	log.Println(e)
+	for {
+		var row T
+		e := iter.Next(&row)
+		log.Println(e)
+		if e == iterator.Done {
+			return res, e
+		}
+		if e != nil {
+			return res, e
+		}
+		log.Println(e)
+		res = append(res, row)
+
+	}
+
+}
+func UpdateRowBigQuery(datasetID string, tableID string, params map[string]string, condiction string) error {
+	var (
+		e error
+		b bytes.Buffer
+	)
+
+	b.WriteString("UPDATE")
+	b.WriteString(" ")
+	b.WriteString(datasetID + "." + tableID)
+	b.WriteString(" ")
+	b.WriteString("SET")
+	b.WriteString(" ")
+	count := 1
+	for k, v := range params {
+		b.WriteString(" ")
+		b.WriteString(k)
+		b.WriteString("=")
+		b.WriteString("'" + v + "'")
+		if len(params) > count {
+			b.WriteString(", ")
+		}
+		count = count + 1
+
+	}
+	b.WriteString("WHERE")
+	b.WriteString(" ")
+	b.WriteString(condiction)
+
+	log.Println(b.String())
+
+	client := getBigqueryClient()
+	ctx := context.Background()
+	defer client.Close()
+	q := client.Query(b.String())
+	job, err := q.Run(ctx)
+	status, err := job.Wait(ctx)
+	if err != nil {
+		log.Println(e)
+		return err
+	}
+
+	if err := status.Err(); err != nil {
+		log.Println(e)
+		return err
+	}
+	return e
 }
 
 func GetBigQueryNullDateTime(date time.Time) bigquery.NullDateTime {

@@ -5,22 +5,25 @@ type Roles string
 type PolicyStatus string
 
 const (
-	PolicyStatusInit        = "Inizialize"
-	PolicyStatusInitData    = "InizializeData"
-	PolicyStatusInitLead    = "Lead"
-	PolicyStatusProspet     = "Prospet"
-	PolicyStatusProposal    = "Proposal"
-	PolicyStatusContact     = "Contact"
-	PolicyStatusToEmit      = "ToEmit"
-	PolicyStatusEmited      = "Emited"
-	PolicyStatusToSign      = "ToSign"
-	PolicyStatusSign        = "Signed"
-	PolicyStatusPay         = "Paid"
-	PolicyStatusToPay       = "ToPay"
-	PolicyStatusToRenew     = "Renew"
-	PolicyStatusPS          = "Pay&Sign"
-	PolicyStatusCompanyEmit = "CompanyEmited"
-	PolicyStatusDeleted     = "Deleted"
+	PolicyStatusInit            = "Inizialize"
+	PolicyStatusInitData        = "InizializeData"
+	PolicyStatusInitLead        = "Lead"
+	PolicyStatusProspet         = "Prospet"
+	PolicyStatusProposal        = "Proposal"
+	PolicyStatusContact         = "Contact"
+	PolicyStatusToEmit          = "ToEmit"
+	PolicyStatusEmited          = "Emited"
+	PolicyStatusWaitForApproval = "WaitForApproval"
+	PolicyStatusApproved        = "Approved"
+	PolicyStatusRejected        = "Rejected"
+	PolicyStatusToSign          = "ToSign"
+	PolicyStatusSign            = "Signed"
+	PolicyStatusPay             = "Paid"
+	PolicyStatusToPay           = "ToPay"
+	PolicyStatusToRenew         = "Renew"
+	PolicyStatusPS              = "Pay&Sign"
+	PolicyStatusCompanyEmit     = "CompanyEmited"
+	PolicyStatusDeleted         = "Deleted"
 )
 
 const (
@@ -36,8 +39,9 @@ const (
 type PaySplit string
 
 const (
-	PaySplitMonthly PaySplit = "monthly"
-	PaySplitYear    PaySplit = "year"
+	PaySplitMonthly      PaySplit = "monthly"
+	PaySplitYear         PaySplit = "year"
+	PaySingleInstallment PaySplit = "singleInstallment"
 )
 
 type PayType string
@@ -70,6 +74,20 @@ const (
 )
 
 const (
-	AgentCollection  string = "agents"
-	AgencyCollection string = "agencies"
+	AgentCollection    string = "agents"
+	AgencyCollection   string = "agencies"
+	UserCollection     string = "users"
+	PolicyCollection   string = "policy"
+	ProductsCollection string = "products"
+)
+
+const (
+	VehiclePrivateUse string = "private"
+)
+
+const (
+	LifeProduct    string = "life"
+	PmiProduct     string = "pmi"
+	PersonaProduct string = "persona"
+	GapProduct     string = "gap"
 )

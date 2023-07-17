@@ -25,12 +25,11 @@ func LifeHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 
 	authToken, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
 	lib.CheckError(err)
-	product, productJson, err := Life(authToken.Role, policy)
 
-	return productJson, product, err
+	return Life(authToken.Role, policy)
 }
 
-func Life(role string, policy models.Policy) (models.Product, string, error) {
+func Life(role string, policy models.Policy) (string, *models.Product, error) {
 	var (
 		err error
 	)
@@ -40,20 +39,22 @@ func Life(role string, policy models.Policy) (models.Product, string, error) {
 
 	in, err := getInputData(policy)
 	if err != nil {
-		return models.Product{}, "", err
+		return "", &models.Product{}, err
 	}
 	rulesFile := lib.GetRulesFile(rulesFileName)
 	product, err := prd.GetProduct("life", "v1", role)
 	if err != nil {
-		return models.Product{}, "", err
+		return "", &models.Product{}, err
 	}
 
 	fx := new(models.Fx)
 
 	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, product, in, nil)
 
-	productJson, product, err := prd.ReplaceDatesInProduct(ruleOutput.(models.Product), 55)
-	return product, productJson, err
+	product = ruleOutput.(*models.Product)
+	jsonOut, err := json.Marshal(product)
+
+	return string(jsonOut), product, err
 }
 
 func getInputData(policy models.Policy) ([]byte, error) {

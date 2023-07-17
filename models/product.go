@@ -17,28 +17,28 @@ func UnmarshalProduct(data []byte) (Product, error) {
 }
 
 func (r *Product) Marshal() ([]byte, error) {
-
 	return json.Marshal(r)
 }
 
 type Product struct {
-	NameTitle         string           `firestore:"nameTitle,omitempty" json:"nameTitle,omitempty"`
-	NameSubtitle      string           `firestore:"nameSubtitle,omitempty" json:"nameSubtitle,omitempty"`
-	NameDesc          *string          `firestore:"nameDesc,omitempty" json:"nameDesc,omitempty"`
-	Companies         []Company        `firestore:"companies,omitempty" json:"companies,omitempty"`
-	ProductUid        string           `firestore:"productUid,omitempty" json:"productUid,omitempty"`
-	ProductVersion    int              `firestore:"productVersion,omitempty" json:"productVersion,omitempty"`
-	Version           string           `firestore:"version,omitempty" json:"version,omitempty"`
-	Number            int              `firestore:"number,omitempty" json:"number,omitempty"`
-	Name              string           `firestore:"name,omitempty" json:"name,omitempty"`
-	Commission        float64          `firestore:"commission,omitempty" json:"commission,omitempty"`
-	CommissionRenew   float64          `firestore:"commissionRenew,omitempty" json:"commissionRenew,omitempty"`
-	Steps             []Step           `firestore:"steps,omitempty" json:"steps"`
-	Offers            map[string]Offer `firestore:"offers,omitempty" json:"offers,omitempty"`
-	IsEcommerceActive bool             `json:"isEcommerceActive" firestore:"isEcommerceActive"`
-	IsAgencyActive    bool             `json:"isAgencyActive" firestore:"isAgencyActive"`
-	IsAgentActive     bool             `json:"isAgentActive" firestore:"isAgentActive"`
-	Logo              string           `json:"logo,omitempty" firestore:"logo,omitempty" bigquery:"-"`
+	NameTitle         string            `firestore:"nameTitle,omitempty" json:"nameTitle,omitempty"`
+	NameSubtitle      string            `firestore:"nameSubtitle,omitempty" json:"nameSubtitle,omitempty"`
+	NameDesc          *string           `firestore:"nameDesc,omitempty" json:"nameDesc,omitempty"`
+	Companies         []Company         `firestore:"companies,omitempty" json:"companies,omitempty"`
+	ProductUid        string            `firestore:"productUid,omitempty" json:"productUid,omitempty"`
+	ProductVersion    int               `firestore:"productVersion,omitempty" json:"productVersion,omitempty"`
+	Version           string            `firestore:"version,omitempty" json:"version,omitempty"`
+	Number            int               `firestore:"number,omitempty" json:"number,omitempty"`
+	Name              string            `firestore:"name,omitempty" json:"name,omitempty"`
+	Commission        float64           `firestore:"commission,omitempty" json:"commission,omitempty"`
+	CommissionRenew   float64           `firestore:"commissionRenew,omitempty" json:"commissionRenew,omitempty"`
+	Steps             []Step            `firestore:"steps,omitempty" json:"steps"`
+	Offers            map[string]Offer  `firestore:"offers,omitempty" json:"offers,omitempty"`
+	IsEcommerceActive bool              `json:"isEcommerceActive" firestore:"isEcommerceActive"`
+	IsAgencyActive    bool              `json:"isAgencyActive" firestore:"isAgencyActive"`
+	IsAgentActive     bool              `json:"isAgentActive" firestore:"isAgentActive"`
+	Logo              string            `json:"logo,omitempty" firestore:"logo,omitempty" bigquery:"-"`
+	PaymentProviders  []PaymentProvider `json:"paymentProviders,omitempty" firestore:"paymentProviders,omitempty" bigquery:"-"`
 }
 
 type Company struct {
@@ -62,6 +62,7 @@ type Company struct {
 	IsEcommerceActive         bool                 `json:"isEcommerceActive" firestore:"isEcommerceActive" bigquery:"-"`
 	IsAgencyActive            bool                 `json:"isAgencyActive" firestore:"isAgencyActive" bigquery:"-"`
 	IsAgentActive             bool                 `json:"isAgentActive" firestore:"isAgentActive" bigquery:"-"`
+	AnnulmentCodes            []AnnulmentCode      `json:"annulmentCodes,omitempty" firestore:"annulmentCodes,omitempty" bigquery:"-"`
 }
 
 type Mandate struct {
@@ -69,7 +70,7 @@ type Mandate struct {
 	CommissionRenew float64   `json:"commissionRenew" firestore:"commissionRenew"`
 	StartDate       time.Time `json:"startDate" firestore:"startDate"`
 	ExpireDate      time.Time `json:"expireDate" firestore:"expireDate"`
-	//Bonus TBD
+	// Bonus TBD
 }
 
 type Step struct {
@@ -101,6 +102,18 @@ type Column struct {
 	Name   string `firestore:"name,omitempty" json:"name,omitempty"`
 	Type   string `firestore:"type,omitempty" json:"type"`
 	Format string `firestore:"format,omitempty" json:"format,omitempty"`
+}
+
+type PaymentProvider struct {
+	Name   string   `json:"name,omitempty" firestore:"name,omitempty" bigquery:"-"`
+	Method string   `json:"method,omitempty" firestore:"method,omitempty" bigquery:"-"`
+	Rates  []string `json:"rates,omitempty" firestore:"rates,omitempty" bigquery:"-"`
+}
+
+type AnnulmentCode struct {
+	Code        string   `json:"code,omitempty" firestore:"code,omitempty" bigquery:"-"`
+	Description string   `json:"description,omitempty" firestore:"description,omitempty" bigquery:"-"`
+	RefundTypes []string `json:"refundTypes,omitempty" firestore:"refundTypes,omitempty" bigquery:"-"`
 }
 
 func ProductToListData(query *firestore.DocumentIterator) []Product {

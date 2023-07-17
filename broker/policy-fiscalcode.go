@@ -95,7 +95,7 @@ func getAllSimplePoliciesForUserFromWise(fiscalCode string) (*string, *[]WiseSim
 	}`)
 
 	responseReader, wiseToken = wiseProxy.WiseBatch("WebApiProduct/Api/RicercaPolizzaCliente", request, "POST", nil)
-	jsonData, e := ioutil.ReadAll(responseReader)
+	jsonData, e := io.ReadAll(responseReader)
 
 	if e != nil {
 		return nil, nil, e
@@ -119,19 +119,9 @@ func GetPoliciesFromFirebase(fiscalCode string, policyFire string) []models.Poli
 				QueryValue: fiscalCode,
 			},
 			{
-				Field:      "companyEmit",
-				Operator:   "==",
-				QueryValue: true,
-			},
-			{
-				Field:      "isPay",
-				Operator:   "==",
-				QueryValue: true,
-			},
-			{
-				Field:      "isSign",
-				Operator:   "==",
-				QueryValue: true,
+				Field:      "status",
+				Operator:   "in",
+				QueryValue: []string{models.PolicyStatusPay, models.PolicyStatusToRenew, models.PolicyStatusCompanyEmit},
 			},
 		},
 	}

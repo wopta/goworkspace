@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"firebase.google.com/go/v4/auth"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"time"
@@ -21,8 +21,9 @@ type ConsumeInviteReq struct {
 func ConsumeInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var ConsumeInviteRequest ConsumeInviteReq
 
-	reqBytes := lib.ErrorByte(ioutil.ReadAll(r.Body))
-	json.Unmarshal(reqBytes, &ConsumeInviteRequest)
+	reqBytes := lib.ErrorByte(io.ReadAll(r.Body))
+	err := json.Unmarshal(reqBytes, &ConsumeInviteRequest)
+	lib.CheckError(err)
 
 	if ok, _ := ConsumeInvite(ConsumeInviteRequest.InviteUid, ConsumeInviteRequest.Password, r.Header.Get("Origin")); ok {
 		return `{"success": true}`, `{"success": true}`, nil
@@ -97,6 +98,7 @@ func createUser(collection string, userRecord *auth.UserRecord, invite UserInvit
 		AuthId:       userRecord.UID,
 		Role:         invite.Role,
 		FiscalCode:   invite.FiscalCode,
+		VatCode:      invite.VatCode,
 		Name:         invite.Name,
 		Surname:      invite.Surname,
 		CreationDate: time.Now().UTC(),
@@ -114,6 +116,10 @@ func createUser(collection string, userRecord *auth.UserRecord, invite UserInvit
 
 func createAgent(collection string, userRecord *auth.UserRecord, invite UserInvite) {
 	// create user in DB
+	for productIndex, _ := range invite.Products {
+		invite.Products[productIndex].IsAgentActive = true
+	}
+
 	agent := models.Agent{
 		User: models.User{
 			Mail:         invite.Email,
@@ -128,7 +134,9 @@ func createAgent(collection string, userRecord *auth.UserRecord, invite UserInvi
 			UpdatedDate:  time.Now().UTC(),
 		},
 		RuiCode:         invite.RuiCode,
+		RuiSection:      invite.RuiSection,
 		RuiRegistration: invite.RuiRegistration,
+		Products:        invite.Products,
 	}
 
 	err := lib.SetFirestoreErr(collection, agent.Uid, agent)
@@ -142,6 +150,10 @@ func createAgent(collection string, userRecord *auth.UserRecord, invite UserInvi
 
 func createAgency(collection string, userRecord *auth.UserRecord, invite UserInvite) {
 	// create user in DB
+	for productIndex, _ := range invite.Products {
+		invite.Products[productIndex].IsAgencyActive = true
+	}
+
 	agency := models.Agency{
 		AuthId:          userRecord.UID,
 		Uid:             userRecord.UID,
@@ -149,9 +161,11 @@ func createAgency(collection string, userRecord *auth.UserRecord, invite UserInv
 		Email:           invite.Email,
 		VatCode:         invite.VatCode,
 		RuiCode:         invite.RuiCode,
+		RuiSection:      invite.RuiSection,
 		RuiRegistration: invite.RuiRegistration,
 		CreationDate:    time.Now().UTC(),
 		UpdatedDate:     time.Now().UTC(),
+		Products:        invite.Products,
 	}
 
 	err := lib.SetFirestoreErr(collection, agency.Uid, agency)

@@ -18,9 +18,14 @@ func PersonFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 		personaRates map[string]json.RawMessage
 	)
 
+	authToken, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
+	lib.CheckError(err)
+
 	body := lib.ErrorByte(io.ReadAll(r.Body))
-	err := json.Unmarshal(body, &policy)
-	personProduct := sellable.Person(body)
+	err = json.Unmarshal(body, &policy)
+	lib.CheckError(err)
+
+	personProduct := sellable.Person(authToken.Role, body)
 
 	b := lib.GetByteByEnv("quote/persona-tassi.json", false)
 	err = json.Unmarshal(b, &personaRates)

@@ -1,1689 +1,501 @@
 {
-  "version": 3,
-  "name": "KrakenD - API Gateway",
-  "port": 8080,
-  "timeout": "70000ms",
-  "extra_config": {
-      "telemetry/logging": {
-        "level": "DEBUG",
-        "prefix": "[KRAKEND]",
-        "syslog": false,
-        "stdout": true,
-        "format": "custom",
-        "custom_format": "%{time} %{color:bold} [%{level}] %{color:reset} - %{message} - %{callpath:3}"
-      },
-      "security/cors": {
-           "allow_origins": [
-              "*"
-          ],
-          "allow_methods": [
-              "GET",
-              "POST",
-              "PUT",
-              "PATCH",
-              "DELETE"
-          ],
-          "expose_headers": [
-              "Authorization",
-              "Content-type",
-              "X-Firebase-Appcheck",
-              "Origin",
-              "x-device-architecture",
-              "x-device-model",
-              "x-device-platform",
-              "x-device-brand"
-
-          ],
-          "allow_headers": [
-             "Authorization",
-             "Content-type",
-             "X-Firebase-Appcheck",
-             "Origin",
-             "x-device-architecture",
-             "x-device-model",
-             "x-device-platform",
-             "x-device-brand"
-          ],
-          "allow_credentials": true,
-          "max_age": "600s",
-          "debug": true
-      }  
-  },
-  "endpoints": [
-  {
-      "endpoint": "/ip",
-      "method": "GET",
-      "backend": [
-      {
-          "url_pattern": "/ip",
-          "host": [
-              "http://httpbin.org/"
-          ]
-      }
-      ]
-  },
-  {
-      "endpoint": "/WebApiProduct/Api/{ApiNameGET}",
-      "input_headers": ["*"],
-      "output_encoding": "negotiate",
-      "method": "GET",
-      "backend": [
-      {
-          "url_pattern": "/test-function/",
-          "encoding": "string",
-          "method": "GET",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ],
-          "group": "auth",
-          "extra_config": {
-              "validation/cel": [
-                  {
-                      "check_expr": "resp_metadata_status == '200'"
-                  }
-              ],
-              "modifier/martian": {
-                  "body.Modifier" : {
-                      "scope": ["request"],
-                      "body": ""
-                  }
-              }
-              
-          }
-      },     
-      {
-          "url_pattern": "/wise-proxy/WebApiProduct/Api/{ApiNameGET}",
-          "encoding": "json",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ]
-      }
-      ],
-      "extra_config": {
-          "proxy": {
-              "sequential": true
-          }
-      }
-  },
-  {
-      "endpoint": "/WebApiProduct/Api/{ApiNamePOST}",
-      "input_headers": ["*"],
-      "output_encoding": "negotiate",
-      "method": "POST",
-      "backend": [
-      {
-          "url_pattern": "/test-function/",
-          "encoding": "string",
-          "method": "GET",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ],
-          "group": "auth",
-          "extra_config": {
-              "validation/cel": [
-                  {
-                      "check_expr": "resp_metadata_status == '200'"
-                  }
-              ],
-              "modifier/martian": {
-                  "body.Modifier" : {
-                      "scope": ["request"],
-                      "body": ""
-                  }
-              }
-              
-          }
-      },     
-      {
-          "url_pattern": "/wise-proxy/WebApiProduct/Api/{ApiNamePOST}",
-          "encoding": "json",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ]
-      }
-      ],
-      "extra_config": {
-          "proxy": {
-              "sequential": true
-          }
-      }
-  },
-  {
-      "endpoint": "/claim",
-      "input_headers": ["*"],
-      "method": "PUT",
-      "output_encoding": "negotiate",
-      "backend": [
-      {
-         "url_pattern": "/test-function",
-         "encoding": "string",
-         "method": "GET",
-         "host": [
-              "https://europe-west1-core-350507.cloudfunctions.net"
-         ],
-         "group": "auth",
-         "extra_config": {
-             "validation/cel": [
-                 {
-                     "check_expr": "resp_metadata_status == '200'"
-                 }
-             ],
-             "modifier/martian": {
-                 "body.Modifier" : {
-                     "scope": ["request"],
-                     "body": ""
-              }
-          }
-      }
-      },
-      {
-          "url_pattern": "/claim",
-          "encoding": "no-op",
-          "host": [
-              "https://europe-west1-core-350507.cloudfunctions.net"
-          ]
-      }
-      ],
-      "extra_config": {
-          "proxy": {
-              "sequential": true
-          }
-      }
-  },
-  {
-      "endpoint": "/rules/{name}/{param2}",
-      "input_headers": ["*"],
-      "output_encoding": "negotiate",
-      "method": "POST",
-      "backend": [
-      {
-          "url_pattern": "/test-function/{name}/{param2}",
-          "encoding": "string",
-          "method": "GET",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ],
-          "group": "auth",
-          "extra_config": {
-              "validation/cel": [
-                  {
-                      "check_expr": "resp_metadata_status == '200'"
-                  }
-              ],
-              "modifier/martian": {
-                  "body.Modifier" : {
-                      "scope": ["request"],
-                      "body": ""
-                  }
-              }
-              
-          }
-      },
-      {
-          "url_pattern": "/rules/{name}/{param2}",
-          "encoding": "json",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ]
-      }
-      ],
-      "extra_config": {
-          "proxy": {
-              "sequential": true
-          }
-      }
-  },
-  {
-      "endpoint": "/enrich/vat/{param1}/{param2}",
-      "input_headers": [
-        "*"
-      ],
-      "output_encoding": "negotiate",
-      "method": "GET",
-      "backend": [
-      {
-          "url_pattern": "/test-function/vat/{param1}/{param2}",
-          "encoding": "string",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ],
-          "group": "auth",
-          "extra_config": {
-              "validation/cel": [
-                  {
-                      "check_expr": "resp_metadata_status == '200'"
-                  }
-              ]
-          }
-
-      },
-      {
-          "url_pattern": "/enrich/vat/{param1}/{param2}",
-          "encoding": "json",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ]
-      }
-
-      ],
-      "extra_config": {
-          "proxy": {
-              "sequential": true
-          }
-      }
-  },
-  {
-      "endpoint": "/enrich/{paramVat}",
-      "input_headers": [
-        "*"
-      ],
-      "output_encoding": "negotiate",
-      "method": "GET",
-      "backend": [
-      {
-          "url_pattern": "/test-function/{paramVat}",
-          "encoding": "string",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ],
-          "group": "auth",
-          "extra_config": {
-              "validation/cel": [
-                  {
-                      "check_expr": "resp_metadata_status == '200'"
-                  }
-              ]
-          }
-
-      },
-      {
-          "url_pattern": "/enrich/{paramVat}",
-          "encoding": "json",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ]
-      }
-
-      ],
-      "extra_config": {
-          "proxy": {
-              "sequential": true
-          }
-      }
-  },
-  {
-      "endpoint": "/enrich/ateco/{paramAteco}",
-      "input_headers": [
-        "*"
-      ],
-      "output_encoding": "negotiate",
-      "method": "GET",
-      "backend": [
-      {
-          "url_pattern": "/test-function/ateco/{paramAteco}",
-          "encoding": "string",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ],
-          "group": "auth",
-          "extra_config": {
-              "validation/cel": [
-                  {
-                      "check_expr": "resp_metadata_status == '200'"
-                  }
-              ]
-          }
-
-      },
-      {
-          "url_pattern": "/enrich/ateco/{paramAteco}",
-          "encoding": "json",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ]
-      }
-
-      ],
-      "extra_config": {
-          "proxy": {
-              "sequential": true
-          }
-      }
-  },
-  {
-      "endpoint": "/mail/{paramMail}",
-      "input_headers": ["*"],
-      "output_encoding": "negotiate",
-      "method": "POST",
-      "backend": [
-      {
-          "url_pattern": "/test-function/mail/{paramMail}",
-          "encoding": "string",
-          "method": "GET",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ],
-         "group": "auth",
-          "extra_config": {
-              "validation/cel": [
-                  {
-                      "check_expr": "resp_metadata_status == '200'"
-                  }
-              ],
-              "modifier/martian": {
-                  "body.Modifier" : {
-                      "scope": ["request"],
-                      "body": ""
-                  }
-              }
-              
-          }
-      },
-      {
-          "url_pattern": "/mail/{paramMail}",
-          "encoding": "json",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ]
-      }
-
-      ],
-      "extra_config": {
-          "proxy": {
-              "sequential": true
-          }
-      }
-  },
-  {
-      "endpoint": "/mail/v1/{validate}",
-      "input_headers": ["*"],
-      "output_encoding": "negotiate",
-      "method": "POST",
-      "backend": [
-      {
-          "url_pattern": "/test-function/mail/v1/{validate}",
-          "encoding": "string",
-          "method": "GET",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ],
-         "group": "auth",
-          "extra_config": {
-              "validation/cel": [
-                  {
-                      "check_expr": "resp_metadata_status == '200'"
-                  }
-              ],
-              "modifier/martian": {
-                  "body.Modifier" : {
-                      "scope": ["request"],
-                      "body": ""
-                  }
-              }
-              
-          }
-      },
-      {
-          "url_pattern": "/mail/v1/{validate}",
-          "encoding": "json",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ]
-      }
-      ],
-      "extra_config": {
-          "proxy": {
-              "sequential": true
-          }
-      }
-  },
-  {
-      "endpoint": "/quote/pmi/{paramPmi}",
-      "input_headers": ["*"],
-      "output_encoding": "negotiate",
-      "method": "POST",
-      "backend": [
-      {
-          "url_pattern": "/test-function/quote/pmi/{paramPmi}",
-          "encoding": "string",
-          "method": "GET",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ],
-         "group": "auth",
-          "extra_config": {
-              "validation/cel": [
-                  {
-                      "check_expr": "resp_metadata_status == '200'"
-                  }
-              ],
-              "modifier/martian": {
-                  "body.Modifier" : {
-                      "scope": ["request"],
-                      "body": ""
-                  }
-              }
-              
-          }
-      },
-      {
-          "url_pattern": "/quote/pmi/{paramPmi}",
-          "encoding": "json",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ]
-      }
-
-      ],
-      "extra_config": {
-          "proxy": {
-              "sequential": true
-          },
-          "backend/http": {
-              "return_error_details": "backend_b"
-          }
-      }
-  },
-  {
-      "endpoint": "/broker/v1/policy/{paramBroker}",
-      "input_headers": ["*"],
-      "output_encoding": "negotiate",
-      "method": "POST",
-      "backend": [
-      {
-          "url_pattern": "/test-function/broker/v1/policy/{paramBroker}",
-          "encoding": "string",
-          "method": "GET",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ],
-         "group": "auth",
-          "extra_config": {
-              "validation/cel": [
-                  {
-                      "check_expr": "resp_metadata_status == '200'"
-                  }
-              ],
-              "modifier/martian": {
-                  "body.Modifier" : {
-                      "scope": ["request"],
-                      "body": ""
-                  }
-              }
-              
-          }
-      },
-      {
-          "url_pattern": "/broker/v1/policy/{paramBroker}",
-          "encoding": "json",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ]
-      }
-      ],
-      "extra_config": {
-          "proxy": {
-              "sequential": true
-          }
-      }
-  },
-  {
-      "endpoint": "/broker/v1/policy/{UID}",
-      "input_headers": ["*"],
-      "output_encoding": "negotiate",
-      "method": "GET",
-      "backend": [
-      {
-          "url_pattern": "/test-function/broker/v1/policy/{UID}",
-          "encoding": "string",
-          "method": "GET",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ],
-         "group": "auth",
-          "extra_config": {
-              "validation/cel": [
-                  {
-                      "check_expr": "resp_metadata_status == '200'"
-                  }
-              ],
-              "modifier/martian": {
-                  "body.Modifier" : {
-                      "scope": ["request"],
-                      "body": ""
-                  }
-              }
-              
-          }
-      },
-      {
-          "url_pattern": "/broker/v1/policy/{UID}",
-          "encoding": "json",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ]
-      }
-      ],
-      "extra_config": {
-          "proxy": {
-              "sequential": true
-          }
-      }
-  },
-  {
-      "endpoint": "/document/v1/{paramDocument}",
-      "input_headers": ["*"],
-      "output_encoding": "negotiate",
-      "method": "POST",
-      "backend": [
-      {
-          "url_pattern": "/test-function/document/v1/{paramDocument}",
-          "encoding": "string",
-          "method": "GET",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ],
-         "group": "auth",
-          "extra_config": {
-              "validation/cel": [
-                  {
-                      "check_expr": "resp_metadata_status == '200'"
-                  }
-              ],
-              "modifier/martian": {
-                  "body.Modifier" : {
-                      "scope": ["request"],
-                      "body": ""
-                  }
-              }
-              
-          }
-      },
-      {
-          "url_pattern": "/document/v1/{paramDocument}",
-          "encoding": "json",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ]
-      }
-      ],
-      "extra_config": {
-          "proxy": {
-              "sequential": true
-          }
-      }
-  },
-  {
-      "endpoint": "/callback/v1/{paramCallback}",
-      "input_headers": [
-        "*"
-      ],
-      "output_encoding": "negotiate",
-      "method": "GET",
-      "backend": [
-      {
-          "url_pattern": "/test-function/v1/{paramCallback}",
-          "encoding": "string",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ],
-          "group": "auth",
-          "extra_config": {
-              "validation/cel": [
-                  {
-                      "check_expr": "resp_metadata_status == '200'"
-                  }
-              ]
-          }
-      },
-      {
-          "url_pattern": "/callback/v1/{paramCallback}",
-          "encoding": "json",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ]
-      }
-      ],
-      "extra_config": {
-          "proxy": {
-              "sequential": true
-          }
-      }
-  },
-  {
-      "endpoint": "/user/v1/onboarding",
-      "input_headers": [
-        "*"
-      ],
-      "output_encoding": "negotiate",
-      "method": "POST",
-      "backend": [
-      {
-          "url_pattern": "/test-function/user/v1/onboarding",
-          "method": "GET",
-          "encoding": "string",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ],
-          "group": "auth",
-          "extra_config": {
-              "validation/cel": [
-                  {
-                      "check_expr": "resp_metadata_status == '200'"
-                  }
-              ],
-              "modifier/martian": {
-                  "body.Modifier" : {
-                      "scope": ["request"],
-                      "body": ""
-                  }
-              }
-          }
-      },
-      {
-          "url_pattern": "/user/v1/onboarding",
-          "encoding": "json",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ]
-      }
-      ],
-      "extra_config": {
-          "proxy": {
-              "sequential": true
-          }
-      }
-  },
-  {
-      "endpoint": "/user/v1/authId/{authId}",
-      "input_headers": ["*"],
-      "output_encoding": "negotiate",
-      "method": "GET",
-      "backend": [
-      {
-          "url_pattern": "/test-function/user/v1/authId/{authId}",
-          "encoding": "string",
-          "method": "GET",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ],
-          "group": "auth",
-          "extra_config": {
-              "validation/cel": [
-                  {
-                      "check_expr": "resp_metadata_status == '200'"
-                  }
-              ],
-              "modifier/martian": {
-                  "body.Modifier" : {
-                      "scope": ["request"],
-                      "body": ""
-                  }
-              }
-          }
-      },
-      {
-          "url_pattern": "/user/v1/authId/{authId}",
-          "encoding": "json",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ]
-      }
-      ],
-      "extra_config": {
-          "proxy": {
-              "sequential": true
-          }
-      }
-  },
-  {
-      "endpoint": "/user/v1/mail/{mail}",
-      "input_headers": [
-        "*"
-      ],
-      "output_encoding": "negotiate",
-      "method": "GET",
-      "backend": [
-      {
-          "url_pattern": "/test-function/user/v1/mail/{mail}",
-          "encoding": "string",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ],
-          "group": "auth",
-          "extra_config": {
-              "validation/cel": [
-                  {
-                      "check_expr": "resp_metadata_status == '200'"
-                  }
-              ]
-          }
-      },
-      {
-          "url_pattern": "/user/v1/mail/{mail}",
-          "encoding": "json",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ]
-      }
-      ],
-      "extra_config": {
-          "proxy": {
-              "sequential": true
-          }
-      }
-  },
-  {
-      "endpoint": "/user/v1/fiscalCode/{fiscalCode}",
-      "input_headers": [
-        "*"
-      ],
-      "output_encoding": "negotiate",
-      "method": "GET",
-      "backend": [
-      {
-          "url_pattern": "/test-function/user/v1/fiscalCode/{fiscalCode}",
-          "encoding": "string",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ],
-          "group": "auth",
-          "extra_config": {
-              "validation/cel": [
-                  {
-                      "check_expr": "resp_metadata_status == '200'"
-                  }
-              ]
-          }
-      },
-      {
-          "url_pattern": "/user/v1/fiscalCode/{fiscalCode}",
-          "encoding": "json",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ]
-      }
-      ],
-      "extra_config": {
-          "proxy": {
-              "sequential": true
-          }
-      }
-  },
-  {
-      "endpoint": "/partnership/v1/life",
-      "input_headers": ["*"],
-      "output_encoding": "negotiate",
-      "method": "GET",
-      "input_query_strings": ["jwt"],
-      "backend": [
-      {
-          "url_pattern": "/test-function/partnership/v1/life",
-          "encoding": "string",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ],
-          "group": "auth",
-          "extra_config": {
-              "validation/cel": [
-                  {
-                      "check_expr": "resp_metadata_status == '200'"
-                  }
-              ],
-              "modifier/martian": {
-                  "body.Modifier" : {
-                      "scope": ["request"],
-                      "body": ""
-                  }
-              }
-          }
-      },
-      {
-          "url_pattern": "/partnership/v1/life",
-          "encoding": "json",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ]
-      }
-      ],
-      "extra_config": {
-          "proxy": {
-              "sequential": true
-          }
-      }
-  },
-  {
-      "endpoint": "/product/v1/name/{name}",
-      "input_headers": [
-        "*"
-      ],
-      "output_encoding": "negotiate",
-      "method": "GET",
-      "backend": [
-      {
-          "url_pattern": "/test-function/product/v1/name/{name}",
-          "encoding": "string",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ],
-          "group": "auth",
-          "extra_config": {
-              "validation/cel": [
-                  {
-                      "check_expr": "resp_metadata_status == '200'"
-                  }
-              ],
-              "modifier/martian": {
-                  "body.Modifier" : {
-                      "scope": ["request"],
-                      "body": ""
-                  }
-              }
-          }
-      },
-      {
-          "url_pattern": "/product/v1/name/{name}",
-          "encoding": "json",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ]
-      }
-      ],
-      "extra_config": {
-          "proxy": {
-              "sequential": true
-          }
-      }
-  },
-  {
-      "endpoint": "/quote/v1/life",
-      "input_headers": [
-        "*"
-      ],
-      "output_encoding": "negotiate",
-      "method": "POST",
-      "backend": [
-      {
-          "url_pattern": "/test-function/quote/v1/life",
-          "encoding": "string",
-          "method": "GET",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ],
-          "group": "auth",
-          "extra_config": {
-              "validation/cel": [
-                  {
-                      "check_expr": "resp_metadata_status == '200'"
-                  }
-              ],
-              "modifier/martian": {
-                  "body.Modifier" : {
-                      "scope": ["request"],
-                      "body": ""
-                  }
-              }
-          }
-      },
-      {
-          "url_pattern": "/quote/v1/life",
-          "encoding": "json",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ]
-      }
-      ],
-      "extra_config": {
-          "proxy": {
-              "sequential": true
-          }
-      }
-  },
-  {
-      "endpoint": "/quote/{product}/{company}",
-      "input_headers": [
-        "*"
-      ],
-      "output_encoding": "negotiate",
-      "method": "POST",
-      "backend": [
-      {
-          "url_pattern": "/test-function/quote/{product}/{company}",
-          "encoding": "string",
-          "method": "GET",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ],
-          "group": "auth",
-          "extra_config": {
-              "validation/cel": [
-                  {
-                      "check_expr": "resp_metadata_status == '200'"
-                  }
-              ],
-              "modifier/martian": {
-                  "body.Modifier" : {
-                      "scope": ["request"],
-                      "body": ""
-                  }
-              }
-          }
-      },
-      {
-          "url_pattern": "/quote/{product}/{company}",
-          "encoding": "json",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ]
-      }
-      ],
-      "extra_config": {
-          "proxy": {
-              "sequential": true
-          }
-      }
-  },
-  {
-      "endpoint": "/rules/sales/life",
-      "input_headers": [
-        "*"
-      ],
-      "output_encoding": "negotiate",
-      "method": "POST",
-      "backend": [
-      {
-          "url_pattern": "/test-function/rules/sales/life",
-          "encoding": "string",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ],
-          "group": "auth",
-          "extra_config": {
-              "validation/cel": [
-                  {
-                      "check_expr": "resp_metadata_status == '200'"
-                  }
-              ],
-              "modifier/martian": {
-                  "body.Modifier" : {
-                      "scope": ["request"],
-                      "body": ""
-                  }
-              }
-          }
-      },
-      {
-          "url_pattern": "/rules/sales/life",
-          "encoding": "json",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ]
-      }
-      ],
-      "extra_config": {
-          "proxy": {
-              "sequential": true
-          }
-      }
-  },
-  {
-      "endpoint": "/broker/v1/policies/fiscalcode/{fiscalcode}",
-      "input_headers": [
-        "*"
-      ],
-      "output_encoding": "negotiate",
-      "method": "GET",
-      "backend": [
-      {
-          "url_pattern": "/test-function/broker/v1/policies/fiscalcode/{fiscalcode}",
-          "encoding": "string",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ],
-          "group": "auth",
-          "extra_config": {
-              "validation/cel": [
-                  {
-                      "check_expr": "resp_metadata_status == '200'"
-                  }
-              ],
-              "modifier/martian": {
-                  "body.Modifier" : {
-                      "scope": ["request"],
-                      "body": ""
-                  }
-              }
-          }
-      },
-      {
-          "url_pattern": "/broker/v1/policies/fiscalcode/{fiscalcode}",
-          "encoding": "json",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ]
-      }
-      ],
-      "extra_config": {
-          "proxy": {
-              "sequential": true
-          }
-      }
-  },
-  {
-      "endpoint": "/rules/v1/statements/{product}",
-      "input_headers": [
-        "*"
-      ],
-      "output_encoding": "negotiate",
-      "method": "POST",
-      "backend": [
-      {
-          "url_pattern": "/test-function/rules/v1/statements/{product}",
-          "encoding": "string",
-          "method": "GET",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ],
-          "group": "auth",
-          "extra_config": {
-              "validation/cel": [
-                  {
-                      "check_expr": "resp_metadata_status == '200'"
-                  }
-              ],
-              "modifier/martian": {
-                  "body.Modifier" : {
-                      "scope": ["request"],
-                      "body": ""
-                  }
-              }
-          }
-      },
-      {
-          "url_pattern": "/rules/v1/statements/{product}",
-          "encoding": "json",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ]
-      }
-      ],
-      "extra_config": {
-          "proxy": {
-              "sequential": true
-          }
-      }
-  },
-  {
-      "endpoint": "/rules/v2/statements/{product}",
-      "input_headers": [
-        "*"
-      ],
-      "output_encoding": "negotiate",
-      "method": "POST",
-      "backend": [
-      {
-          "url_pattern": "/test-function/rules/v2/statements/{product}",
-          "encoding": "string",
-          "method": "GET",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ],
-          "group": "auth",
-          "extra_config": {
-              "validation/cel": [
-                  {
-                      "check_expr": "resp_metadata_status == '200'"
-                  }
-              ],
-              "modifier/martian": {
-                  "body.Modifier" : {
-                      "scope": ["request"],
-                      "body": ""
-                  }
-              }
-          }
-      },
-      {
-          "url_pattern": "/rules/v2/statements/{product}",
-          "encoding": "json",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ]
-      }
-      ],
-      "extra_config": {
-          "proxy": {
-              "sequential": true
-          }
-      }
-  },
-  {
-      "endpoint": "/question/v1/statements/{name}",
-      "input_headers": [
-        "*"
-      ],
-      "output_encoding": "negotiate",
-      "method": "POST",
-      "backend": [
-      {
-          "url_pattern": "/test-function/question/v1/statements/{name}",
-          "encoding": "string",
-          "method": "GET",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ],
-          "group": "auth",
-          "extra_config": {
-              "validation/cel": [
-                  {
-                      "check_expr": "resp_metadata_status == '200'"
-                  }
-              ],
-              "modifier/martian": {
-                  "body.Modifier" : {
-                      "scope": ["request"],
-                      "body": ""
-                  }
-              }
-          }
-      },
-      {
-          "url_pattern": "/question/v1/statements/{name}",
-          "encoding": "json",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ]
-      }
-      ],
-      "extra_config": {
-          "proxy": {
-              "sequential": true
-          }
-      }
-  },
-  {
-      "endpoint": "/question/v2/statements/{name}",
-      "input_headers": [
-        "*"
-      ],
-      "output_encoding": "negotiate",
-      "method": "POST",
-      "backend": [
-      {
-          "url_pattern": "/test-function/question/v2/statements/{name}",
-          "encoding": "string",
-          "method": "GET",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ],
-          "group": "auth",
-          "extra_config": {
-              "validation/cel": [
-                  {
-                      "check_expr": "resp_metadata_status == '200'"
-                  }
-              ],
-              "modifier/martian": {
-                  "body.Modifier" : {
-                      "scope": ["request"],
-                      "body": ""
-                  }
-              }
-          }
-      },
-      {
-          "url_pattern": "/question/v2/statements/{name}",
-          "encoding": "json",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ]
-      }
-      ],
-      "extra_config": {
-          "proxy": {
-              "sequential": true
-          }
-      }
-  },
-  {
-      "endpoint": "/question/v1/survey/{name}",
-      "input_headers": [
-        "*"
-      ],
-      "output_encoding": "negotiate",
-      "method": "POST",
-      "backend": [
-      {
-          "url_pattern": "/test-function/question/v1/survey/{name}",
-          "encoding": "string",
-          "method": "GET",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ],
-          "group": "auth",
-          "extra_config": {
-              "validation/cel": [
-                  {
-                      "check_expr": "resp_metadata_status == '200'"
-                  }
-              ],
-              "modifier/martian": {
-                  "body.Modifier" : {
-                      "scope": ["request"],
-                      "body": ""
-                  }
-              }
-          }
-      },
-      {
-          "url_pattern": "/question/v1/survey/{name}",
-          "encoding": "json",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ]
-      }
-      ],
-      "extra_config": {
-          "proxy": {
-              "sequential": true
-          }
-      }
-  },
-  {
-      "endpoint": "/question/v2/survey/{name}",
-      "input_headers": [
-        "*"
-      ],
-      "output_encoding": "negotiate",
-      "method": "POST",
-      "backend": [
-      {
-          "url_pattern": "/test-function/question/v2/survey/{name}",
-          "encoding": "string",
-          "method": "GET",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ],
-          "group": "auth",
-          "extra_config": {
-              "validation/cel": [
-                  {
-                      "check_expr": "resp_metadata_status == '200'"
-                  }
-              ],
-              "modifier/martian": {
-                  "body.Modifier" : {
-                      "scope": ["request"],
-                      "body": ""
-                  }
-              }
-          }
-      },
-      {
-          "url_pattern": "/question/v2/survey/{name}",
-          "encoding": "json",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ]
-      }
-      ],
-      "extra_config": {
-          "proxy": {
-              "sequential": true
-          }
-      }
-  },
-  {
-      "endpoint": "/sellable/v1/sales/{name}",
-      "input_headers": [
-        "*"
-      ],
-      "output_encoding": "negotiate",
-      "method": "POST",
-      "backend": [
-      {
-          "url_pattern": "/test-function/sellable/v1/sales/{name}",
-          "encoding": "string",
-          "method": "GET",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ],
-          "group": "auth",
-          "extra_config": {
-              "validation/cel": [
-                  {
-                      "check_expr": "resp_metadata_status == '200'"
-                  }
-              ],
-              "modifier/martian": {
-                  "body.Modifier" : {
-                      "scope": ["request"],
-                      "body": ""
-                  }
-              }
-          }
-      },
-      {
-          "url_pattern": "/sellable/v1/sales/{name}",
-          "encoding": "json",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ]
-      }
-      ],
-      "extra_config": {
-          "proxy": {
-              "sequential": true
-          }
-      }
-  },
-  {
-      "endpoint": "/sellable/v2/sales/{name}",
-      "input_headers": [
-        "*"
-      ],
-      "output_encoding": "negotiate",
-      "method": "POST",
-      "backend": [
-      {
-          "url_pattern": "/test-function/sellable/v2/sales/{name}",
-          "encoding": "string",
-          "method": "GET",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ],
-          "group": "auth",
-          "extra_config": {
-              "validation/cel": [
-                  {
-                      "check_expr": "resp_metadata_status == '200'"
-                  }
-              ],
-              "modifier/martian": {
-                  "body.Modifier" : {
-                      "scope": ["request"],
-                      "body": ""
-                  }
-              }
-          }
-      },
-      {
-          "url_pattern": "/sellable/v2/sales/{name}",
-          "encoding": "json",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ]
-      }
-      ],
-      "extra_config": {
-          "proxy": {
-              "sequential": true
-          }
-      }
-  },
-  {
-      "endpoint": "/sellable/v1/risk/{name}",
-      "input_headers": [
-        "*"
-      ],
-      "output_encoding": "negotiate",
-      "method": "POST",
-      "backend": [
-      {
-          "url_pattern": "/test-function/sellable/v1/risk/{name}",
-          "encoding": "string",
-          "method": "GET",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ],
-          "group": "auth",
-          "extra_config": {
-              "validation/cel": [
-                  {
-                      "check_expr": "resp_metadata_status == '200'"
-                  }
-              ],
-              "modifier/martian": {
-                  "body.Modifier" : {
-                      "scope": ["request"],
-                      "body": ""
-                  }
-              }
-          }
-      },
-      {
-          "url_pattern": "/sellable/v1/risk/{name}",
-          "encoding": "json",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ]
-      }
-      ],
-      "extra_config": {
-          "proxy": {
-              "sequential": true
-          }
-      }
-  },
-  {
-      "endpoint": "/sellable/v2/risk/{name}",
-      "input_headers": [
-        "*"
-      ],
-      "output_encoding": "negotiate",
-      "method": "POST",
-      "backend": [
-      {
-          "url_pattern": "/test-function/sellable/v2/risk/{name}",
-          "encoding": "string",
-          "method": "GET",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ],
-          "group": "auth",
-          "extra_config": {
-              "validation/cel": [
-                  {
-                      "check_expr": "resp_metadata_status == '200'"
-                  }
-              ],
-              "modifier/martian": {
-                  "body.Modifier" : {
-                      "scope": ["request"],
-                      "body": ""
-                  }
-              }
-          }
-      },
-      {
-          "url_pattern": "/sellable/v2/risk/{name}",
-          "encoding": "json",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ]
-      }
-      ],
-      "extra_config": {
-          "proxy": {
-              "sequential": true
-          }
-      }
-  },
-  {
-      "endpoint": "/broker/policy/{version}/{uid}",
-      "input_headers": [
-        "*"
-      ],
-      "output_encoding": "negotiate",
-      "method": "PATCH",
-      "backend": [
-      {
-          "url_pattern": "/test-function/broker/policy/{version}/{uid}",
-          "encoding": "string",
-          "method": "GET",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ],
-          "group": "auth",
-          "extra_config": {
-              "validation/cel": [
-                  {
-                      "check_expr": "resp_metadata_status == '200'"
-                  }
-              ],
-              "modifier/martian": {
-                  "body.Modifier" : {
-                      "scope": ["request"],
-                      "body": ""
-                  }
-              }
-          }
-      },
-      {
-          "url_pattern": "/broker/policy/{version}/{uid}",
-          "encoding": "json",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ]
-      }
-      ],
-      "extra_config": {
-          "proxy": {
-              "sequential": true
-          }
-      }
-  },
-  {
-      "endpoint": "/user/document/{version}/{userUid}",
-      "input_headers": [
-        "*"
-      ],
-      "output_encoding": "negotiate",
-      "method": "POST",
-      "backend": [
-      {
-          "url_pattern": "/test-function/user/document/{version}/{userUid}",
-          "encoding": "string",
-          "method": "GET",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ],
-          "group": "auth",
-          "extra_config": {
-              "validation/cel": [
-                  {
-                      "check_expr": "resp_metadata_status == '200'"
-                  }
-              ],
-              "modifier/martian": {
-                  "body.Modifier" : {
-                      "scope": ["request"],
-                      "body": ""
-                  }
-              }
-          }
-      },
-      {
-          "url_pattern": "/user/document/{version}/{userUid}",
-          "encoding": "json",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ]
-      }
-      ],
-      "extra_config": {
-          "proxy": {
-              "sequential": true
-          }
-      }
-  },
-  {
-      "endpoint": "/broker/attachment/{version}/{policyUid}",
-      "input_headers": [
-        "*"
-      ],
-      "output_encoding": "negotiate",
-      "method": "GET",
-      "backend": [
-      {
-          "url_pattern": "/test-function/broker/attachment/{version}/{policyUid}",
-          "encoding": "string",
-          "method": "GET",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ],
-          "group": "auth",
-          "extra_config": {
-              "validation/cel": [
-                  {
-                      "check_expr": "resp_metadata_status == '200'"
-                  }
-              ],
-              "modifier/martian": {
-                  "body.Modifier" : {
-                      "scope": ["request"],
-                      "body": ""
-                  }
-              }
-          }
-      },
-      {
-          "url_pattern": "/broker/attachment/{version}/{policyUid}",
-          "encoding": "json",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ]
-      }
-      ],
-      "extra_config": {
-          "proxy": {
-              "sequential": true
-          }
-      }
-  },
-  {
-      "endpoint": "/user/fiscalcode/{version}/{nation}/{operation}",
-      "input_headers": [
-        "*"
-      ],
-      "output_encoding": "negotiate",
-      "method": "POST",
-      "backend": [
-      {
-          "url_pattern": "/test-function/user/fiscalcode/{version}/{nation}/{operation}",
-          "encoding": "string",
-          "method": "GET",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ],
-          "group": "auth",
-          "extra_config": {
-              "validation/cel": [
-                  {
-                      "check_expr": "resp_metadata_status == '200'"
-                  }
-              ],
-              "modifier/martian": {
-                  "body.Modifier" : {
-                      "scope": ["request"],
-                      "body": ""
-                  }
-              }
-          }
-      },
-      {
-          "url_pattern": "/user/fiscalcode/{version}/{nation}/{operation}",
-          "encoding": "json",
-          "host": [
-               "https://europe-west1-core-350507.cloudfunctions.net"
-          ]
-      }
-      ],
-      "extra_config": {
-          "proxy": {
-              "sequential": true
-          }
-      }
-  }
-  ]
-  }
+    "idSign": "73246330-d8e0-4b5e-a8be-73fe832a37b8",
+    "contractFileId": "3d6fe034-6f7a-40e9-986b-7b8d612d50fa",
+    "uid": "Nj8SjhFS5uUUvY6LhEgV",
+    "payUrl": "https://pre.fabrick.com/pacewhitelabel/landingpage-web/pay-by-link/e01e41ee-3378-4186-88be-b0f3d1dc817d/modalita-addebito",
+    "signUrl": "https://saas.esignanywhere.net/workstepredirector/sign?identifier=wM~2WOMg0e0W/UNqndE3NyfoG8Zy0wDibBwigfcR8cHx0tBc5t/WHWe4jdcDCRnGV/sE3HfF/7Htgj~xfi7Hlw==",
+    "productVersion": "v1",
+    "proposalNumber": 1026,
+    "offerName": "default",
+    "number": 101,
+    "numberCompany": 100088,
+    "codeCompany": "0100088",
+    "status": "ToSign",
+    "statusHistory": [
+        "Lead",
+        "Contact",
+        "ToSign"
+    ],
+    "company": "axa",
+    "name": "life",
+    "nameDesc": "Wopta per te Vita",
+    "emitDate": "2023-05-23T16:21:18.633986Z",
+    "startDate": "2023-05-23T16:11:50.206Z",
+    "renewDate": "0001-01-01T00:00:00Z",
+    "endDate": "2033-05-23T16:11:50.206Z",
+    "creationDate": "2023-05-23T16:13:19.37981Z",
+    "updated": "2023-05-23T16:21:18.633982Z",
+    "nextPay": "0001-01-01T00:00:00Z",
+    "paymentSplit": "year",
+    "deleteDate": "0001-01-01T00:00:00Z",
+    "companyEmit": true,
+    "priceNett": 15.93,
+    "priceGross": 15.93,
+    "contractor": {
+        "uid": "EOAGV2B7KARzcxb5QGAR",
+        "birthDate": "2005-05-23T00:00:00.000Z",
+        "birthCity": "Milano",
+        "birthProvince": "MI",
+        "location": {},
+        "name": "luca",
+        "gender": "M",
+        "surname": "barbieri",
+        "workType": "Dirigente/Soggetto apicale",
+        "mail": "luca.barbieri@wopta.it",
+        "phone": "+393668134257",
+        "fiscalCode": "BRBLCU05E23F205W",
+        "vatCode": "",
+        "creationDate": "0001-01-01T00:00:00Z",
+        "updatedDate": "0001-01-01T00:00:00Z",
+        "consens": [
+            {
+                "consens": "Il sottoscritto, letta e compresa l'informativa sul trattamento dei dati personali, ACCONSENTE al trattamento dei propri dati personali da parte di Wopta Assicurazioni per l'invio di comunicazioni e proposte commerciali e di marketing, incluso l'invio di newsletter e ricerche di mercato, attraverso strumenti automatizzati (sms, mms, e-mail, ecc.) e non (posta cartacea e telefono con operatore).",
+                "key": 2,
+                "answer": true,
+                "creationDate": "0001-01-01T00:00:00Z"
+            }
+        ],
+        "height": 0,
+        "weight": 0,
+        "residence": {
+            "streetName": "Viale Emilio Bassi",
+            "streetNumber": "1",
+            "city": "Tortona",
+            "postalCode": "15057",
+            "locality": "Tortona",
+            "cityCode": "AL"
+        },
+        "identityDocuments": [
+            {
+                "code": "01",
+                "type": "Carta di Identità",
+                "number": "ca70373ks",
+                "issuingAuthority": "Comune",
+                "placeOfIssue": "milano",
+                "dateOfIssue": "2023-05-23T00:00:00Z",
+                "expiryDate": "2023-05-24T00:00:00Z",
+                "frontMedia": {
+                    "sourceFileName": "",
+                    "fileName": "identity_document_front_1684858870.png",
+                    "link": "gs://function-data/assets/users/EOAGV2B7KARzcxb5QGAR/identity_document_front_1684858870.png",
+                    "mimeType": "image/png"
+                },
+                "backMedia": {
+                    "sourceFileName": "",
+                    "fileName": "identity_document_back_1684858871.png",
+                    "link": "gs://function-data/assets/users/EOAGV2B7KARzcxb5QGAR/identity_document_back_1684858871.png",
+                    "mimeType": "image/png"
+                },
+                "lastUpdate": "2023-05-23T16:21:11.104Z"
+            }
+        ]
+    },
+    "documentName": "temp/luca_barbieri_1684858883_contract.pdf",
+    "statements": [
+        {
+            "title": "DICHIARAZIONI E ADEGUATEZZA",
+            "subtitle": "Presta attenzione alle seguenti dichiarazioni e condizioni, importanti per l’efficacia della tua polizza",
+            "hasAnswer": false
+        },
+        {
+            "title": "1) SCELTA FIRMA ELETTRONICA",
+            "questions": [
+                {
+                    "question": "Si prende e si dà atto tra le Parti che, il contratto viene sottoscritto con Firma Elettronica Avanzata, redatto in un unico esemplare. Pertanto:",
+                    "isBold": true,
+                    "hasAnswer": false
+                },
+                {
+                    "question": "1. DICHIARO di aver ricevuto, preso visione, conoscere ed accettare le \"Condizioni Generali di Servizio per l'utilizzazione della Firma Elettronica Avanzata\" prevista da Wopta e l'annessa \"Scheda Tecnica Illustrativa\"",
+                    "indent": true,
+                    "hasAnswer": false
+                },
+                {
+                    "question": "2. CONFERMO la veridicità dei dati forniti, la titolarità del numero di cellulare e dell'indirizzo mail, acconsentendo al trattamento di tali dati per questa specifica finalità;",
+                    "indent": true,
+                    "hasAnswer": false
+                },
+                {
+                    "question": "3. DICHIARO altresì di avere titolo a richiedere l'attivazione e l'uso del Servizio per la sottoscrizione del presente contratto",
+                    "indent": true,
+                    "hasAnswer": false
+                }
+            ],
+            "answer": true,
+            "hasAnswer": true,
+            "expectedAnswer": true
+        },
+        {
+            "title": "2) PER NOI QUESTA POLIZZA FA AL CASO TUO",
+            "questions": [
+                {
+                    "question": "Dichiaro che quanto indicato di seguito corrisponde alle informazioni ottenute dall’intermediario, sia attraverso i documenti resi disponibili e/o inviati che nelle pagine web del sito wopta.it.",
+                    "isBold": true,
+                    "hasAnswer": false
+                },
+                {
+                    "question": "Hai effettuato dichiarazioni relative al rischio da assicurare e scelto prestazioni e garanzie tra quelle proposte. Sulla base di tali dichiarazioni, delle tue esigenze e richieste, le soluzioni assicurative individuate in coerenza con esse, sono:",
+                    "hasAnswer": false
+                },
+                {
+                    "question": "- tutelare dei soggetti cari, in caso di decesso dell’Assicurato nel corso della durata della copertura, attraverso un sostegno economico indennizzato ai Beneficiari, che sono stati indicati dal Contraente;",
+                    "indent": true,
+                    "hasAnswer": false
+                },
+                {
+                    "question": "- le coperture operano con un orizzonte l’orizzonte temporale di 10 anni per Decesso; ",
+                    "indent": true,
+                    "hasAnswer": false
+                },
+                {
+                    "question": "non rilevando interesse per altre eventuali coperture previste dal prodotto, ma non incluse in questa Polizza. Sono informato che la Polizza può prevedere, in relazione alle garanzie che precedono, l’applicazione di Scoperti, Franchigie, Limiti di indennizzo ed esclusioni, meglio riportate nelle Condizioni Generali di Assicurazione, da me valutati in linea con la capacità finanziaria di sostenere in proprio tale livello di danno e rischio.",
+                    "hasAnswer": false
+                }
+            ],
+            "answer": true,
+            "hasAnswer": true,
+            "expectedAnswer": true
+        },
+        {
+            "title": "3) SCELTA COMUNICAZIONI VIA MAIL E ACCETTAZIONE POLIZZA",
+            "questions": [
+                {
+                    "question": "Scelgo la ricezione della seguente documentazione via e-mail al seguente indirizzo: luca.barbieri@wopta.it nonché all’utilizzo della stessa per l’invio delle comunicazioni in corso di contratto da parte di Wopta e della Compagnia. Sono a conoscenza che, qualora volessi modificare questa mia scelta, potrò farlo scrivendo alla Compagnia, con le modalità previste nelle Condizioni di Assicurazione.",
+                    "hasAnswer": false
+                },
+                {
+                    "question": "Confermo quindi di aver ricevuto e preso visione, prima della conclusione del contratto:",
+                    "isBold": true,
+                    "hasAnswer": false
+                },
+                {
+                    "question": "1. degli Allegati 3, 4 e 4-ter, di cui al Regolamento IVASS n. 40/2018, relativi agli obblighi informativi e di comportamento dell’Intermediario, inclusa l’informativa privacy dell’intermediario (ai sensi dell’art. 13 del regolamento UE n. 2016/679);",
+                    "isBold": true,
+                    "indent": true,
+                    "hasAnswer": false
+                },
+                {
+                    "question": "2. del Set informativo, identificato dal modello AX01-0323, contenente: 1) Documento informativo precontrattuale per i prodotti assicurativi vita diversi dai prodotti d’investimento assicurativi (DIP Vita), Documento informativo per i prodotti assicurativi danni (DIP Danni), Documento informativo precontrattuale aggiuntivo per i prodotti assicurativi multirischi (DIP aggiuntivo Multirischi), di cui al Regolamento IVASS n. 41/2018; 2) Condizioni di Assicurazione comprensive di Glossario, che dichiaro altresì di conoscere ed accettare.",
+                    "isBold": true,
+                    "indent": true,
+                    "hasAnswer": false
+                }
+            ],
+            "answer": true,
+            "hasAnswer": true,
+            "expectedAnswer": true
+        }
+    ],
+    "surveys": [
+        {
+            "subtitle": "INFORMAZIONI SULLO STATO DI SALUTE - AVVERTENZE SULLA COMPILAZIONE DEL QUESTIONARIO MEDICO",
+            "questions": [
+                {
+                    "question": "L’Assicurato è tenuto a rispondere alle domande di un Questionario Medico. Si avverte l’Assicurato che:",
+                    "hasAnswer": false
+                },
+                {
+                    "question": "a) le dichiarazioni non veritiere, inesatte o reticenti compromettono il diritto alla prestazione;",
+                    "isBold": true,
+                    "indent": true,
+                    "hasAnswer": false
+                },
+                {
+                    "question": "b) è necessario verificare l’esattezza e la rispondenza a verità delle risposte al Questionario Medico prima della sua sottoscrizione;",
+                    "isBold": true,
+                    "indent": true,
+                    "hasAnswer": false
+                },
+                {
+                    "question": "c) anche nei casi non previsti dalla Compagnia, l’Aderente/Assicurato può chiedere di essere sottoposto a visita medica, per certificare lo stato di salute. Il costo di tale visita medica sarà a suo carico.",
+                    "indent": true,
+                    "hasAnswer": false
+                },
+                {
+                    "question": "Sono assicurabili solo i soggetti che rispondono “NO” a tutte le domande incluse nel Questionario Medico.",
+                    "hasAnswer": false
+                }
+            ],
+            "hasAnswer": false
+        },
+        {
+            "title": "A. Ha ricevuto, negli ultimi 5 anni, una diagnosi o prescrizione di esami, trattamenti, subito interventi chirurgici o assunto farmaci in merito alle seguenti patologie?",
+            "hasMultipleAnswers": true,
+            "questions": [
+                {
+                    "question": "1. Ipertensione arteriosa (pressione superiore a 145/90 o trattamento con 2 o più medicinali)",
+                    "indent": true,
+                    "answer": false,
+                    "hasAnswer": true,
+                    "expectedAnswer": false
+                },
+                {
+                    "question": "2. Ictus, attacco ischemico transitorio (mini-ictus), emorragia cerebrale",
+                    "indent": true,
+                    "answer": false,
+                    "hasAnswer": true,
+                    "expectedAnswer": false
+                },
+                {
+                    "question": "3. Infarto, cardiopatia ischemica/coronarica, arteriosclerosi",
+                    "indent": true,
+                    "answer": false,
+                    "hasAnswer": true,
+                    "expectedAnswer": false
+                },
+                {
+                    "question": "4. Aritmia cardiaca tale da richiedere un trattamento farmacologico e/o controlli periodici",
+                    "indent": true,
+                    "answer": false,
+                    "hasAnswer": true,
+                    "expectedAnswer": false
+                },
+                {
+                    "question": "5. Qualsiasi forma di neoplasia maligna, inclusi cancro alla pelle (melanoma), leucemie, linfomi, mieloma, tumore del midollo osseo ed inoltre meningioma, nonché cisti o crescita benigna delle meningi all’interno del cervello o della spina dorsale",
+                    "indent": true,
+                    "answer": false,
+                    "hasAnswer": true,
+                    "expectedAnswer": false
+                },
+                {
+                    "question": "6. Immunodeficienza acquisita (AIDS) e qualsiasi altra immunopatologia",
+                    "indent": true,
+                    "answer": false,
+                    "hasAnswer": true,
+                    "expectedAnswer": false
+                },
+                {
+                    "question": "7. Sclerosi laterale amiotrofica, sclerosi multipla, morbo di Alzheimer, morbo di Parkinson e tutte le malattie neurogenerative",
+                    "indent": true,
+                    "answer": false,
+                    "hasAnswer": true,
+                    "expectedAnswer": false
+                },
+                {
+                    "question": "8. Discopatia osteoartrite o artrite infiammatoria estesa ad una o più articolazioni",
+                    "indent": true,
+                    "answer": false,
+                    "hasAnswer": true,
+                    "expectedAnswer": false
+                },
+                {
+                    "question": "9. Broncopneumopatia cronica ostruttiva, l’asma moderato/severo, la sarcoidosi e l’enfisema",
+                    "indent": true,
+                    "answer": false,
+                    "hasAnswer": true,
+                    "expectedAnswer": false
+                },
+                {
+                    "question": "10. Insufficienza renale acuta o cronica, malattie infiammatorie croniche intestinali, pancreatite cronica",
+                    "indent": true,
+                    "answer": false,
+                    "hasAnswer": true,
+                    "expectedAnswer": false
+                },
+                {
+                    "question": "11. Diabete",
+                    "indent": true,
+                    "answer": false,
+                    "hasAnswer": true,
+                    "expectedAnswer": false
+                },
+                {
+                    "question": "12. Cirrosi da qualsiasi causa, epatite B e C e steatosi epatica o qualsiasi epatopatia",
+                    "indent": true,
+                    "answer": false,
+                    "hasAnswer": true,
+                    "expectedAnswer": false
+                },
+                {
+                    "question": "13. Le seguenti Malattie o malformazioni congenite/ereditarie: idrocefalo, pneumopatia fibrocistica, cardiopatie congenite, spina bifida, atresie di organi addominali, trisomie, agenesie renali, malformazioni vascolari endocraniche, malformazioni dell’apparato urinario non corrette chirurgicamente, malformazioni dei grossi vasi",
+                    "indent": true,
+                    "answer": false,
+                    "hasAnswer": true,
+                    "expectedAnswer": false
+                }
+            ],
+            "hasAnswer": false
+        },
+        {
+            "title": "B. È a conoscenza di essere affetto da una delle malattie di cui al punto A, o di una loro possibile insorgenza, di essere in attesa di risultati di consulti medici, esami medici o ricoveri ospedalieri (o in istituti di cura) sempre in riferimento alle patologie elencate al punto A?",
+            "answer": false,
+            "hasAnswer": true,
+            "expectedAnswer": false
+        },
+        {
+            "title": "C. Per ragioni di lavoro è esposto a pericoli di qualsiavoglia natura che possano attentare alla sua salute o intende intraprendere una delle seguenti attività: Aviazione, paracadutismo, deltaplano, sport motoristici, immersioni, arrampicata, speleologia o qualsiasi altro sport estremo?",
+            "answer": false,
+            "hasAnswer": true,
+            "expectedAnswer": false
+        },
+        {
+            "title": "D. È titolare di una pensione di invalidità o inabilità (parziale o totale) o ha in corso pratiche per il relativo riconoscimento?",
+            "answer": false,
+            "hasAnswer": true,
+            "expectedAnswer": false
+        }
+    ],
+    "attachments": [
+        {
+            "name": "Precontrattuale",
+            "link": "gs://documents-public-dev/information-sets/life/v1/Precontrattuale.pdf",
+            "fileName": "Precontrattuale.pdf"
+        }
+    ],
+    "assets": [
+        {
+            "person": {
+                "uid": "EOAGV2B7KARzcxb5QGAR",
+                "birthDate": "2005-05-23T00:00:00.000Z",
+                "birthCity": "Milano",
+                "birthProvince": "MI",
+                "location": {},
+                "name": "luca",
+                "gender": "M",
+                "surname": "barbieri",
+                "workType": "Dirigente/Soggetto apicale",
+                "mail": "luca.barbieri@wopta.it",
+                "phone": "+393668134257",
+                "fiscalCode": "BRBLCU05E23F205W",
+                "vatCode": "",
+                "creationDate": "0001-01-01T00:00:00Z",
+                "updatedDate": "0001-01-01T00:00:00Z",
+                "consens": [
+                    {
+                        "consens": "Il sottoscritto, letta e compresa l'informativa sul trattamento dei dati personali, ACCONSENTE al trattamento dei propri dati personali da parte di Wopta Assicurazioni per l'invio di comunicazioni e proposte commerciali e di marketing, incluso l'invio di newsletter e ricerche di mercato, attraverso strumenti automatizzati (sms, mms, e-mail, ecc.) e non (posta cartacea e telefono con operatore).",
+                        "key": 2,
+                        "answer": true,
+                        "creationDate": "0001-01-01T00:00:00Z"
+                    }
+                ],
+                "height": 0,
+                "weight": 0,
+                "residence": {
+                    "streetName": "Viale Emilio Bassi",
+                    "streetNumber": "1",
+                    "city": "Tortona",
+                    "postalCode": "15057",
+                    "locality": "Tortona",
+                    "cityCode": "AL"
+                },
+                "identityDocuments": [
+                    {
+                        "code": "01",
+                        "type": "Carta di Identità",
+                        "number": "ca70373ks",
+                        "issuingAuthority": "Comune",
+                        "placeOfIssue": "milano",
+                        "dateOfIssue": "2023-05-23T00:00:00Z",
+                        "expiryDate": "2023-05-24T00:00:00Z",
+                        "frontMedia": {
+                            "sourceFileName": "",
+                            "fileName": "identity_document_front_1684858870.png",
+                            "link": "gs://function-data/assets/users/EOAGV2B7KARzcxb5QGAR/identity_document_front_1684858870.png",
+                            "mimeType": "image/png"
+                        },
+                        "backMedia": {
+                            "sourceFileName": "",
+                            "fileName": "identity_document_back_1684858871.png",
+                            "link": "gs://function-data/assets/users/EOAGV2B7KARzcxb5QGAR/identity_document_back_1684858871.png",
+                            "mimeType": "image/png"
+                        },
+                        "lastUpdate": "2023-05-23T16:21:11.104Z"
+                    }
+                ]
+            },
+            "isContractor": true,
+            "guarantees": [
+                {
+                    "type": "person",
+                    "beneficiaries": [
+                        {
+                            "location": {},
+                            "vatCode": "",
+                            "creationDate": "0001-01-01T00:00:00Z",
+                            "updatedDate": "0001-01-01T00:00:00Z",
+                            "height": 0,
+                            "weight": 0,
+                            "isFamilyMember": false,
+                            "isContactable": false,
+                            "isLegitimateSuccessors": true
+                        }
+                    ],
+                    "description": "Cosa significa amare le persone a te più care? Scegli il sostegno di un capitale, a disposizione di chi resta, per affrontare «il dopo» di un drammatico imprevisto, con una certezza economica in più.",
+                    "companyCodec": "D",
+                    "companyName": "Decesso",
+                    "group": "DEATH",
+                    "value": {
+                        "deductibleValues": {},
+                        "sumInsuredLimitOfIndemnity": 100000,
+                        "sumInsuredValues": {},
+                        "selfInsuranceValues": {},
+                        "duration": {
+                            "year": 10
+                        },
+                        "tax": 0,
+                        "percentage": 0,
+                        "premiumNetYearly": 15.93,
+                        "premiumGrossYearly": 15.93,
+                        "premiumNetMonthly": 1.33,
+                        "premiumGrossMonthly": 1.33
+                    },
+                    "config": {
+                        "deductibleValues": {},
+                        "sumInsuredValues": {
+                            "min": 50000,
+                            "max": 200000,
+                            "step": 25000
+                        },
+                        "selfInsuranceValues": {},
+                        "durationValues": {
+                            "min": 5,
+                            "max": 20,
+                            "step": 5
+                        },
+                        "tax": 0,
+                        "percentage": 0,
+                        "premiumNetYearly": 0
+                    },
+                    "offer": {
+                        "default": {
+                            "deductibleValues": {},
+                            "sumInsuredLimitOfIndemnity": 100000,
+                            "sumInsuredValues": {},
+                            "selfInsuranceValues": {},
+                            "duration": {
+                                "year": 10
+                            },
+                            "tax": 0,
+                            "percentage": 0,
+                            "premiumNetYearly": 0
+                        }
+                    },
+                    "slug": "death",
+                    "isMandatory": true,
+                    "isExtension": false,
+                    "name": "morte",
+                    "tax": 10,
+                    "isSellable": true,
+                    "isConfigurable": true,
+                    "subtitle": "per qualsiasi causa",
+                    "reserved": false
+                }
+            ]
+        }
+    ],
+    "offersPrices": {
+        "default": {
+            "yearly": {
+                "net": 15.93,
+                "tax": 0,
+                "gross": 15.93,
+                "delta": 0,
+                "discount": 0
+            }
+        }
+    },
+    "partnershipName": "",
+    "partnershipData": null,
+    "isReserved": false,
+    "agencyUid": "Nj8SjhFS5uUUvY6LhEgV"
+}

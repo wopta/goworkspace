@@ -50,6 +50,12 @@ func Quote(w http.ResponseWriter, r *http.Request) {
 				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAll},
 			},
+			{
+				Route:   "/v1/gap",
+				Handler: GapFx,
+				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAdmin, models.UserRoleAgency},
+			},
 		},
 	}
 	route.Router(w, r)

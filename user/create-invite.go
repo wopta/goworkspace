@@ -15,6 +15,36 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
+type CreateInviteRequest struct {
+	Role            string           `json:"role"`
+	Email           string           `json:"email"`
+	FiscalCode      string           `json:"fiscalCode,omitempty"`
+	VatCode         string           `json:"vatCode,omitempty"`
+	Name            string           `json:"name,omitempty"`
+	Surname         string           `json:"surname,omitempty"`
+	RuiCode         string           `json:"ruiCode,omitempty"`
+	RuiSection      string           `json:"ruiSection,omitempty"`
+	RuiRegistration time.Time        `json:"ruiRegistration"`
+	Products        []models.Product `json:"products,omitempty"`
+}
+
+type UserInvite struct {
+	FiscalCode      string           `json:"fiscalCode,omitempty" firestore:"fiscalCode,omitempty"`
+	VatCode         string           `json:"vatCode,omitempty" firestore:"vatCode,omitempty"`
+	Name            string           `json:"name,omitempty" firestore:"name,omitempty"`
+	Surname         string           `json:"surname,omitempty" firestore:"surname,omitempty"`
+	Role            string           `json:"role,omitempty" firestore:"role,omitempty"`
+	Email           string           `json:"email,omitempty" firestore:"email,omitempty"`
+	Uid             string           `json:"uid,omitempty" firestore:"uid,omitempty"`
+	CreatorUid      string           `json:"creatorUid,omitempty" firestore:"creatorUid,omitempty"`
+	Consumed        bool             `json:"consumed" firestore:"consumed"`
+	RuiCode         string           `json:"ruiCode,omitempty" firestore:"ruiCode,omitempty"`
+	RuiSection      string           `json:"ruiSection,omitempty" firestore:"ruiSection,omitempty"`
+	RuiRegistration time.Time        `json:"ruiRegistration" firestore:"ruiRegistration"`
+	Expiration      time.Time        `json:"expiration,omitempty" firestore:"expiration,omitempty"`
+	Products        []models.Product `json:"products,omitempty" firestore:"products,omitempty"`
+}
+
 func CreateInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var createInviteRequest CreateInviteRequest
 
@@ -62,14 +92,19 @@ func CreateInvite(inviteRequest CreateInviteRequest, origin, creatorUid string) 
 	}
 
 	invite := UserInvite{
-		Name:       inviteRequest.Name,
-		Surname:    inviteRequest.Surname,
-		FiscalCode: inviteRequest.FiscalCode,
-		Email:      inviteRequest.Email,
-		Role:       userRole,
-		Expiration: inviteExpiration,
-		Uid:        inviteUid,
-		CreatorUid: creatorUid,
+		Name:            inviteRequest.Name,
+		Surname:         inviteRequest.Surname,
+		VatCode:         inviteRequest.VatCode,
+		FiscalCode:      inviteRequest.FiscalCode,
+		Email:           inviteRequest.Email,
+		Role:            userRole,
+		Expiration:      inviteExpiration,
+		Uid:             inviteUid,
+		CreatorUid:      creatorUid,
+		RuiCode:         inviteRequest.RuiCode,
+		RuiSection:      inviteRequest.RuiSection,
+		RuiRegistration: inviteRequest.RuiRegistration,
+		Products:        inviteRequest.Products,
 	}
 
 	// check if user exists
@@ -116,27 +151,4 @@ func SendInviteMail(inviteUid, email string) {
 	mailRequest.LinkLabel = "Crea la tua password"
 
 	mail.SendMail(mailRequest)
-}
-
-type CreateInviteRequest struct {
-	Role       string `json:"role"`
-	Email      string `json:"email"`
-	FiscalCode string `json:"fiscalCode,omitempty" firestore:"fiscalCode,omitempty"`
-	Name       string `json:"name,omitempty" firestore:"name,omitempty"`
-	Surname    string `json:"Surname,omitempty" firestore:"Surname,omitempty"`
-}
-
-type UserInvite struct {
-	FiscalCode      string    `json:"fiscalCode,omitempty" firestore:"fiscalCode,omitempty"`
-	VatCode         string    `json:"vatCode,omitempty" firestore:"vatCode,omitempty"`
-	Name            string    `json:"name,omitempty" firestore:"name,omitempty"`
-	Surname         string    `json:"surname,omitempty" firestore:"surname,omitempty"`
-	Role            string    `json:"role,omitempty" firestore:"role,omitempty"`
-	Email           string    `json:"email,omitempty" firestore:"email,omitempty"`
-	Uid             string    `json:"uid,omitempty" firestore:"uid,omitempty"`
-	CreatorUid      string    `json:"creatorUid,omitempty" firestore:"creatorUid,omitempty"`
-	Consumed        bool      `json:"consumed" firestore:"consumed"`
-	RuiCode         string    `json:"ruiCode,omitempty" firestore:"ruiCode,omitempty"`
-	RuiRegistration time.Time `json:"ruiRegistration" firestore:"ruiRegistration"`
-	Expiration      time.Time `json:"expiration,omitempty" firestore:"expiration,omitempty"`
 }

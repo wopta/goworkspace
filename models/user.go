@@ -20,7 +20,6 @@ func UnmarshalUser(data []byte) (Claim, error) {
 }
 
 func (r *User) Marshal() ([]byte, error) {
-
 	return json.Marshal(r)
 }
 
@@ -61,7 +60,7 @@ type User struct {
 	BigPoliciesUid    string              `firestore:"-" json:"-" bigquery:"policiesUid"`
 	Claims            *[]Claim            `firestore:"claims" json:"claims,omitempty" bigquery:"-"`
 	Consens           *[]Consens          `firestore:"consens" json:"consens,omitempty"`
-	IsAgent           bool                `firestore:"isAgent ,omitempty" json:"isAgent,omitempty" bigquery:"isAgent"`
+	IsAgent           bool                `firestore:"isAgent,omitempty" json:"isAgent,omitempty" bigquery:"isAgent"`
 	Height            int                 `firestore:"height" json:"height" bigquery:"height"`
 	Weight            int                 `firestore:"weight" json:"weight" bigquery:"weight"`
 	Json              string              `firestore:"-" json:"-" bigquery:"json"`
@@ -70,16 +69,17 @@ type User struct {
 	IdentityDocuments []*IdentityDocument `json:"identityDocuments,omitempty" firestore:"identityDocuments,omitempty" bigquery:"-"`
 	AuthId            string              `json:"authId,omitempty" firestore:"authId,omitempty" bigquery:"-"`
 	Statements        []*Statement        `json:"statements,omitempty" firestore:"statements,omitempty" bigquery:"-"`
+	IsLegalPerson     bool                `json:"isLegalPerson,omitempty" firestore:"isLegalPerson,omitempty" bigquery:"-"`
 }
 
 type Consens struct {
-	UserUid         string         `firestore:"useruid" json:"useruid,omitempty" bigquery:"useruid" `
-	Title           string         `firestore:"title ,omitempty" json:"title,omitempty" bigquery:"title"`
+	UserUid         string         `firestore:"useruid" json:"useruid,omitempty" bigquery:"useruid"`
+	Title           string         `firestore:"title,omitempty" json:"title,omitempty" bigquery:"title"`
 	Consens         string         `firestore:"consens,omitempty" json:"consens,omitempty" bigquery:"consens"`
 	Key             int64          `firestore:"key,omitempty" json:"key,omitempty" bigquery:"key"`
 	Answer          bool           `firestore:"answer" json:"answer" bigquery:"answer"`
-	CreationDate    time.Time      `firestore:"creationDate,omitempty" json:"creationDate,omitempty" bigquery:"-" bigquery:"-"`
-	BigCreationDate civil.DateTime `bigquery:"creationDate" firestore:"-" json:"-"`
+	CreationDate    time.Time      `firestore:"creationDate,omitempty" json:"creationDate,omitempty" bigquery:"-"`
+	BigCreationDate civil.DateTime `firestore:"-" json:"-" bigquery:"creationDate"`
 	Mail            string         `firestore:"-" json:"-" bigquery:"mail"`
 }
 
@@ -145,9 +145,7 @@ func GetUserUIDByFiscalCode(origin string, fiscalCode string) (string, bool, err
 }
 
 func UpdateUserByFiscalCode(origin string, user User) (string, error) {
-	var (
-		err error
-	)
+	var err error
 
 	usersFire := lib.GetDatasetByEnv(origin, "users")
 	docSnap := lib.WhereFirestore(usersFire, "fiscalCode", "==", user.FiscalCode)
