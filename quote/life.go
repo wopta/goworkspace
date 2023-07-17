@@ -37,12 +37,12 @@ func Life(role string, data models.Policy) (models.Policy, error) {
 	df := lib.CsvToDataframe(b)
 	var selectRow []string
 
-	ruleProduct, _, err := sellable.Life(role, data)
+	_, ruleProduct, err := sellable.Life(role, data)
 	lib.CheckError(err)
 
 	originalPolicy := copyPolicy(data)
 
-	addDefaultGuarantees(data, ruleProduct)
+	addDefaultGuarantees(data, *ruleProduct)
 
 	//TODO: this should not be here, only for version 1
 	deathGuarantee, err := data.ExtractGuarantee("death")
@@ -78,7 +78,7 @@ func Life(role string, data models.Policy) (models.Policy, error) {
 
 			baseFloat, taxFloat := getMultipliers(selectRow, offset, base, baseTax)
 
-			calculateGuaranteePrices(guarantee, baseFloat, taxFloat, ruleProduct)
+			calculateGuaranteePrices(guarantee, baseFloat, taxFloat, *ruleProduct)
 
 			if originalPolicy.HasGuarantee(guarantee.Slug) && guarantee.IsSellable {
 				calculateOfferPrices(data, guarantee)

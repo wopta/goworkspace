@@ -20,10 +20,9 @@ type GetProductByRoleRequest struct {
 func GetProductByRoleFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println("GetProductByRoleFx")
 	var (
-		resp       models.Product
-		respString string
-		request    GetProductByRoleRequest
-		err        error
+		resp    models.Product
+		request GetProductByRoleRequest
+		err     error
 	)
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
@@ -40,15 +39,7 @@ func GetProductByRoleFx(w http.ResponseWriter, r *http.Request) (string, interfa
 		return "", resp, err
 	}
 	jsonResp, err := json.Marshal(resp)
+	log.Printf("GetProductByRoleFx response: %s", string(jsonResp))
 
-	respString = string(jsonResp)
-	switch request.Name {
-	case "persona":
-		respString, resp, err = product.ReplaceDatesInProduct(resp, 70, 0)
-	case "life":
-		respString, resp, err = product.ReplaceDatesInProduct(resp, 70, 55)
-	}
-
-	log.Printf("GetProductByRoleFx response: %s", respString)
-	return respString, resp, err
+	return string(jsonResp), resp, err
 }
