@@ -2,8 +2,11 @@ package product
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"log"
+	"net/http"
 	"regexp"
 	"time"
 )
@@ -57,4 +60,59 @@ func replaceDatesInProduct(product *models.Product, role string) (*models.Produc
 	err = json.Unmarshal([]byte(productJson), product)
 
 	return product, err
+}
+
+// TODO: remove this endpoint once in production
+func GetNameFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	name := r.Header.Get("name")
+	origin := r.Header.Get("origin")
+
+	log.Println(r.RequestURI)
+
+	product, err := GetName(origin, name, "v1")
+	if err != nil {
+
+		return "", nil, err
+	}
+	jsonOut, err := product.Marshal()
+	if err != nil {
+		return "", nil, err
+	}
+
+	switch name {
+	case "persona":
+		product, err = replaceDatesInProduct(product, models.UserRoleAll)
+	case "life":
+		product, err = replaceDatesInProduct(product, models.UserRoleAll)
+	}
+
+	jsonOut, err = json.Marshal(product)
+
+	return string(jsonOut), product, err
+}
+
+// TODO: remove this endpoint once in production
+func GetName(origin string, name string, version string) (*models.Product, error) {
+	q := lib.Firequeries{
+		Queries: []lib.Firequery{{
+			Field:      "name",
+			Operator:   "==",
+			QueryValue: name,
+		},
+			{
+				Field:      "version",
+				Operator:   "==",
+				QueryValue: version,
+			},
+		},
+	}
+
+	fireProduct := lib.GetDatasetByEnv(origin, "products")
+	query, _ := q.FirestoreWherefields(fireProduct)
+	products := models.ProductToListData(query)
+	if len(products) == 0 {
+		return &models.Product{}, fmt.Errorf("no product json file found for %s %s", name, version)
+	}
+
+	return &products[0], nil
 }

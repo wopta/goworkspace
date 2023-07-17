@@ -21,6 +21,20 @@ func Product(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Methods", "POST")
 	route := lib.RouteData{
 		Routes: []lib.Route{
+			// TODO: remove this endpoint once in production
+			{
+				Route:   "/v1/:name",
+				Handler: GetNameFx,
+				Method:  "GET",
+				Roles:   []string{models.UserRoleAll},
+			},
+			// TODO: remove this endpoint once in production
+			{
+				Route:   "/v1/name/:name",
+				Handler: GetNameFx,
+				Method:  "GET",
+				Roles:   []string{models.UserRoleAll},
+			},
 			{
 				Route:   "/v1",
 				Handler: PutFx,
