@@ -51,7 +51,7 @@ func Life(role string, policy models.Policy) (string, *models.Product, error) {
 
 	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, product, in, nil)
 
-	*product = ruleOutput.(models.Product)
+	product = ruleOutput.(*models.Product)
 	jsonOut, err := json.Marshal(product)
 
 	return string(jsonOut), product, err
