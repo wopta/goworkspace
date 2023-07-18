@@ -41,3 +41,12 @@ func SliceFilter[T any](ss []T, test func(T) bool) (ret []T) {
 	}
 	return
 }
+
+func SliceFindIndex[T any](slice []T, exp func(T) bool) int {
+	for index, item := range slice {
+		if exp(item) {
+			return index
+		}
+	}
+	return -1
+}

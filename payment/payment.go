@@ -10,8 +10,6 @@ import (
 	"strings"
 	"time"
 
-	"cloud.google.com/go/civil"
-
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
@@ -118,20 +116,23 @@ func FabrickExpireBillFx(w http.ResponseWriter, r *http.Request) (string, interf
 	uid := r.Header.Get("uid")
 	origin := r.Header.Get("origin")
 
-	fireTransactions := lib.GetDatasetByEnv(origin, "transactions")
+	fireTransactions := lib.GetDatasetByEnv(origin, models.TransactionCollection)
 	docsnap, err := lib.GetFirestoreErr(fireTransactions, uid)
 	lib.CheckError(err)
 	docsnap.DataTo(&transaction)
 
 	err = FabrickExpireBill(&transaction)
-
 	if err != nil {
-		log.Printf("[FabrickExpireBillFx]: ERROR: %s", err.Error())
+		log.Printf("[FabrickExpireBillFx] ERROR: %s", err.Error())
 		return `{"success":false}`, `{"success":false}`, nil
 	}
 
-	lib.SetFirestore(fireTransactions, transaction.Uid, transaction)
-	err = lib.InsertRowsBigQuery("wopta", fireTransactions, transaction)
+	err = lib.SetFirestoreErr(fireTransactions, transaction.Uid, transaction)
+	if err != nil {
+		log.Printf("[FabrickExpireBillFx] ERROR setFirestore: %s", err.Error())
+		return `{"success":false}`, `{"success":false}`, nil
+	}
+	transaction.BigQuerySave(origin)
 
 	return `{"success":true}`, `{"success":true}`, err
 }
@@ -140,13 +141,15 @@ const (
 	layout               string = "2006-01-02T15:04:05.000Z"
 	layout2              string = "2006-01-02"
 	expirationTimeSuffix string = " 00:00:00"
+	fabrickExpirationUrl string = "api/fabrick/pace/v4.0/mods/back/v1.0/payments/change-expiration"
 )
 
 func FabrickExpireBill(transaction *models.Transaction) error {
+	log.Printf("[FabrickExpireBill] transaction: %s", transaction.Uid)
 	var err error
 
 	expirationDate := time.Now().UTC().AddDate(0, 0, 1).Format(layout2)
-	urlstring := os.Getenv("FABRICK_BASEURL") + "api/fabrick/pace/v4.0/mods/back/v1.0/payments/change-expiration"
+	urlstring := os.Getenv("FABRICK_BASEURL") + fabrickExpirationUrl
 
 	req, _ := http.NewRequest(http.MethodPut, urlstring, strings.NewReader(`{"id":"`+transaction.ProviderId+`","newExpirationDate":"`+expirationDate+expirationTimeSuffix+`"}`))
 	res, err := getFabrickClient(urlstring, req)
@@ -154,7 +157,7 @@ func FabrickExpireBill(transaction *models.Transaction) error {
 
 	respBody, err := io.ReadAll(res.Body)
 	lib.CheckError(err)
-	log.Println("Fabrick res body: ", string(respBody))
+	log.Println("[FabrickExpireBill] response body: ", string(respBody))
 	if res.StatusCode != http.StatusOK {
 		log.Printf("[FabrickExpireBill] ERROR response status code: %s", res.Status)
 		return errors.New("status code " + res.Status)
@@ -164,8 +167,6 @@ func FabrickExpireBill(transaction *models.Transaction) error {
 	transaction.Status = models.PolicyStatusDeleted
 	transaction.StatusHistory = append(transaction.StatusHistory, models.PolicyStatusDeleted)
 	transaction.IsDelete = true
-	transaction.BigCreationDate = civil.DateTimeOf(transaction.CreationDate)
-	transaction.BigStatusHistory = strings.Join(transaction.StatusHistory, ",")
 
 	return err
 }

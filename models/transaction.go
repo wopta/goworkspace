@@ -106,6 +106,7 @@ func (transaction *Transaction) BigQuerySave(origin string) {
 	transaction.BigTransactionDate = lib.GetBigQueryNullDateTime(transaction.TransactionDate)
 	transaction.BigCreationDate = civil.DateTimeOf(transaction.CreationDate)
 	transaction.BigStatusHistory = strings.Join(transaction.StatusHistory, ",")
+	transaction.BigStartDate = lib.GetBigQueryNullDateTime(transaction.StartDate)
 	log.Println("Transaction save BigQuery: " + transaction.Uid)
 
 	err = lib.InsertRowsBigQuery("wopta", fireTransactions, transaction)
