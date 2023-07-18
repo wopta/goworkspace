@@ -19,7 +19,6 @@ import (
 )
 
 func SignNamirialV6(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-
 	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
 	var data model.Policy
 	defer r.Body.Close()
@@ -28,16 +27,14 @@ func SignNamirialV6(w http.ResponseWriter, r *http.Request) (string, interface{}
 	//file, _ := os.Open("document/billing.pdf")
 
 	return NamirialOtpV6(data, r.Header.Get("origin"))
-
 }
 
 func NamirialOtpV6(data model.Policy, origin string) (string, NamirialOtpResponse, error) {
 	var file []byte
+
 	if os.Getenv("env") == "local" {
-		file = lib.ErrorByte(ioutil.ReadFile("document/contract.pdf"))
-
+		file = lib.ErrorByte(os.ReadFile("document/contract.pdf"))
 	} else {
-
 		file = lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), data.DocumentName, "")
 	}
 
@@ -57,8 +54,8 @@ func NamirialOtpV6(data model.Policy, origin string) (string, NamirialOtpRespons
 	}
 	return "{}", resp, nil
 }
-func GetClient(method string, urlstring string, payload io.Reader) ([]byte, error) {
 
+func GetClient(method string, urlstring string, payload io.Reader) ([]byte, error) {
 	var (
 		r []byte
 		e error
@@ -77,6 +74,7 @@ func GetClient(method string, urlstring string, payload io.Reader) ([]byte, erro
 
 	return r, e
 }
+
 func prepareEnvelopV6(id string) <-chan string {
 	r := make(chan string)
 	go func() {
@@ -84,15 +82,12 @@ func prepareEnvelopV6(id string) <-chan string {
 		//var b bytes.Buffer
 		//fileReader := bytes.NewReader([]byte())
 		var urlstring = os.Getenv("ESIGN_BASEURL") + "v6/file/prepare"
-		client := &http.Client{
-			Timeout: time.Second * 10,
-		}
+
 		req, _ := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(getPrepareV6(id)))
 		req.Header.Set("apiToken", os.Getenv("ESIGN_TOKEN_API"))
 		req.Header.Set("Content-Type", "application/json")
-		//header('Content-Length: ' . filesize($pdf));
 
-		res, err := client.Do(req)
+		res, err := lib.RetryDo(req, 10)
 		lib.CheckError(err)
 
 		if res != nil {
@@ -110,6 +105,7 @@ func prepareEnvelopV6(id string) <-chan string {
 	}()
 	return r
 }
+
 func sendEnvelopV6(id string, data model.Policy, unassigned string, origin string) <-chan string {
 	r := make(chan string)
 
@@ -117,16 +113,11 @@ func sendEnvelopV6(id string, data model.Policy, unassigned string, origin strin
 		defer close(r)
 		log.Println("Send")
 		var urlstring = os.Getenv("ESIGN_BASEURL") + "/v6/envelope/send"
-		client := &http.Client{
-			Timeout: time.Second * 10,
-		}
-		//log.Println(data.Uid+" body:", string(getSendV6(id, data, unassigned,)))
 		req, _ := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(getSendV6(id, data, unassigned, origin)))
 		req.Header.Set("apiToken", os.Getenv("ESIGN_TOKEN_API"))
 		req.Header.Set("Content-Type", "application/json")
-		//header('Content-Length: ' . filesize($pdf));
 
-		res, err := client.Do(req)
+		res, err := lib.RetryDo(req, 5)
 		lib.CheckError(err)
 
 		if res != nil {
@@ -143,6 +134,7 @@ func sendEnvelopV6(id string, data model.Policy, unassigned string, origin strin
 	}()
 	return r
 }
+
 func GetEnvelopV6(id string) <-chan string {
 	r := make(chan string)
 
@@ -152,15 +144,12 @@ func GetEnvelopV6(id string) <-chan string {
 		//var b bytes.Buffer
 		//fileReader := bytes.NewReader([]byte())GET /v6/envelope/{envelopeId}/viewerlinks
 		var urlstring = os.Getenv("ESIGN_BASEURL") + "/v6/envelope/" + id + "/viewerlinks"
-		client := &http.Client{
-			Timeout: time.Second * 10,
-		}
+
 		req, _ := http.NewRequest(http.MethodGet, urlstring, nil)
 		req.Header.Set("apiToken", os.Getenv("ESIGN_TOKEN_API"))
 		req.Header.Set("Content-Type", "application/json")
-		//header('Content-Length: ' . filesize($pdf));
 
-		res, err := client.Do(req)
+		res, err := lib.RetryDo(req, 5)
 		lib.CheckError(err)
 
 		if res != nil {
@@ -178,6 +167,7 @@ func GetEnvelopV6(id string) <-chan string {
 	}()
 	return r
 }
+
 func postDataV6(data []byte, productNameDesc string) <-chan string {
 	r := make(chan string)
 	var urlstring = os.Getenv("ESIGN_BASEURL") + "v6/file/upload"
@@ -195,10 +185,8 @@ func postDataV6(data []byte, productNameDesc string) <-chan string {
 		lib.CheckError(err)
 		req.Header.Set("apiToken", os.Getenv("ESIGN_TOKEN_API"))
 		req.Header.Set("Content-Type", w.FormDataContentType())
-		client := &http.Client{
-			Timeout: time.Second * 10,
-		}
-		res, err := client.Do(req)
+
+		res, err := lib.RetryDo(req, 5)
 		var result map[string]string
 		if res != nil {
 			resByte, err := io.ReadAll(res.Body)
@@ -213,6 +201,7 @@ func postDataV6(data []byte, productNameDesc string) <-chan string {
 
 	return r
 }
+
 func GetFileV6(policy model.Policy, uid string) chan string {
 	r := make(chan string)
 	log.Println("Get file: ", policy.IdSign)
@@ -222,13 +211,12 @@ func GetFileV6(policy model.Policy, uid string) chan string {
 		files := <-GetFilesV6(policy.IdSign)
 
 		var urlstring = os.Getenv("ESIGN_BASEURL") + "v6/file/" + files.Documents[0].FileID
-		client := &http.Client{
-			Timeout: time.Second * 10,
-		}
+
 		req, _ := http.NewRequest(http.MethodGet, urlstring, nil)
 		req.Header.Set("apiToken", os.Getenv("ESIGN_TOKEN_API"))
 		log.Println("url parse:", req.Header)
-		res, err := client.Do(req)
+
+		res, err := lib.RetryDo(req, 5)
 		lib.CheckError(err)
 		if res != nil {
 			body, _ := io.ReadAll(res.Body)
@@ -245,23 +233,21 @@ func GetFileV6(policy model.Policy, uid string) chan string {
 	}()
 	return r
 }
+
 func GetFilesV6(envelopeId string) chan NamirialFiles {
 	r := make(chan NamirialFiles)
 
 	go func() {
 		defer close(r)
 		var urlstring = os.Getenv("ESIGN_BASEURL") + "v6/envelope/" + envelopeId + "/files"
-		client := &http.Client{
-			Timeout: time.Second * 10,
-		}
+
 		req, _ := http.NewRequest(http.MethodGet, urlstring, nil)
 		req.Header.Set("apiToken", os.Getenv("ESIGN_TOKEN_API"))
 
-		res, err := client.Do(req)
+		res, err := lib.RetryDo(req, 5)
 		lib.CheckError(err)
 
 		if res != nil {
-
 			body, _ := io.ReadAll(res.Body)
 			resp, _ := UnmarshalNamirialFiles(body)
 			res.Body.Close()
@@ -269,10 +255,10 @@ func GetFilesV6(envelopeId string) chan NamirialFiles {
 			log.Println("body:", string(body))
 			r <- resp
 		}
-
 	}()
 	return r
 }
+
 func getPrepareV6(id string) string {
 	return `{
 		"FileIds": [
@@ -289,6 +275,7 @@ func getPrepareV6(id string) string {
 		]
 	  }`
 }
+
 func getSendV6(id string, data model.Policy, prepare string, origin string) string {
 	var preparePointer PrepareResponse
 	json.Unmarshal([]byte(prepare), &preparePointer)
@@ -490,6 +477,7 @@ type OrderDefinition struct {
 type GetEvelopViewerLinkResponse struct {
 	ViewerLinks []ViewerLink `json:"ViewerLinks"`
 }
+
 type ViewerLink struct {
 	ActivityID string `json:"ActivityId"`
 	Email      string `json:"Email"`

@@ -18,8 +18,11 @@ func PersonHandler(w http.ResponseWriter, r *http.Request) (string, interface{},
 
 	log.Println("Person Sellable")
 
+	authToken, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
+	lib.CheckError(err)
+
 	body := lib.ErrorByte(io.ReadAll(r.Body))
-	product = Person(body)
+	product = Person(authToken.Role, body)
 
 	productJson, err := json.Marshal(product)
 	lib.CheckError(err)
@@ -27,7 +30,7 @@ func PersonHandler(w http.ResponseWriter, r *http.Request) (string, interface{},
 	return string(productJson), product, nil
 }
 
-func Person(body []byte) *models.Product {
+func Person(role string, body []byte) *models.Product {
 	var (
 		policy models.Policy
 		err    error
@@ -37,13 +40,13 @@ func Person(body []byte) *models.Product {
 	)
 
 	quotingInputData := getRulesInputData(&policy, err, body)
-	product, err := prd.GetProduct("persona", "v1", "")
+	product, err := prd.GetProduct("persona", "v1", role)
 	lib.CheckError(err)
 
 	fx := new(models.Fx)
 
 	rulesFile := lib.GetRulesFile(rulesFileName)
-	_, ruleOut := lib.RulesFromJsonV2(fx, rulesFile, &product, quotingInputData, []byte(getQuotingData()))
+	_, ruleOut := lib.RulesFromJsonV2(fx, rulesFile, product, quotingInputData, []byte(getQuotingData()))
 
 	return ruleOut.(*models.Product)
 }

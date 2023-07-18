@@ -80,10 +80,18 @@ const (
 	AgencyCollection      string = "agencies"
 	UserCollection        string = "users"
 	PolicyCollection      string = "policy"
+	ProductsCollection    string = "products"
 	GuaranteCollection    string = "guarante"
 	TransactionCollection string = "transactions"
 )
 
 const (
 	VehiclePrivateUse string = "private"
+)
+
+const (
+	LifeProduct    string = "life"
+	PmiProduct     string = "pmi"
+	PersonaProduct string = "persona"
+	GapProduct     string = "gap"
 )

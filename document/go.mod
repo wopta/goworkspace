@@ -9,9 +9,9 @@ require (
 	github.com/dustin/go-humanize v1.0.1
 	github.com/go-pdf/fpdf v0.8.0
 	github.com/johnfercher/maroto v0.41.0
-	github.com/wopta/goworkspace/lib v1.0.50
-	github.com/wopta/goworkspace/models v1.1.0
-	github.com/wopta/goworkspace/product v1.0.25
+	github.com/wopta/goworkspace/lib v1.0.62
+	github.com/wopta/goworkspace/models v1.1.15
+	github.com/wopta/goworkspace/product v1.0.29
 )
 
 require (

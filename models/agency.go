@@ -27,6 +27,7 @@ type Agency struct {
 	Steps           []Step    `json:"steps" firestore:"steps" bigquery:"-"`
 	Skin            Skin      `json:"skin" firestore:"skin" bigquery:"-"`
 	RuiCode         string    `json:"ruiCode" firestore:"ruiCode" bigquery:"-"`
+	RuiSection      string    `json:"ruiSection" firestore:"ruiSection" bigquery:"-"`
 	RuiRegistration time.Time `json:"ruiRegistration" firestore:"ruiRegistration" bigquery:"-"`
 	CreationDate    time.Time `json:"creationDate" firestore:"creationDate" bigquery:"-"`
 	UpdatedDate     time.Time `json:"updatedDate" firestore:"updatedDate" bigquery:"-"`

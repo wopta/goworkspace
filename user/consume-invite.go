@@ -134,6 +134,7 @@ func createAgent(collection string, userRecord *auth.UserRecord, invite UserInvi
 			UpdatedDate:  time.Now().UTC(),
 		},
 		RuiCode:         invite.RuiCode,
+		RuiSection:      invite.RuiSection,
 		RuiRegistration: invite.RuiRegistration,
 		Products:        invite.Products,
 	}
@@ -160,6 +161,7 @@ func createAgency(collection string, userRecord *auth.UserRecord, invite UserInv
 		Email:           invite.Email,
 		VatCode:         invite.VatCode,
 		RuiCode:         invite.RuiCode,
+		RuiSection:      invite.RuiSection,
 		RuiRegistration: invite.RuiRegistration,
 		CreationDate:    time.Now().UTC(),
 		UpdatedDate:     time.Now().UTC(),

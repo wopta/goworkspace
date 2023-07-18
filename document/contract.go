@@ -14,19 +14,20 @@ import (
 func ContractFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println("Contract")
 	//lib.Files("./serverless_function_source_code")
+	origin := r.Header.Get("Origin")
 	req := lib.ErrorByte(io.ReadAll(r.Body))
 	var data model.Policy
 	defer r.Body.Close()
 	err := json.Unmarshal([]byte(req), &data)
 	lib.CheckError(err)
-	respObj := <-ContractObj(data)
+	respObj := <-ContractObj(origin, data)
 	resp, err := json.Marshal(respObj)
 
 	lib.CheckError(err)
 	return string(resp), respObj, nil
 }
 
-func ContractObj(data model.Policy) <-chan DocumentResponse {
+func ContractObj(origin string, data model.Policy) <-chan DocumentResponse {
 	r := make(chan DocumentResponse)
 
 	//now := time.Now()
@@ -48,7 +49,7 @@ func ContractObj(data model.Policy) <-chan DocumentResponse {
 			filename, out = Save(m, data)
 		case "life":
 			pdf := initFpdf()
-			filename, out = LifeContract(pdf, &data)
+			filename, out = LifeContract(pdf, origin, &data)
 		case "persona":
 			pdf := initFpdf()
 			filename, out = PersonaContract(pdf, &data)

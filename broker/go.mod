@@ -9,15 +9,15 @@ require (
 	cloud.google.com/go/firestore v1.9.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.4
 	github.com/heimdalr/dag v1.2.1
-	github.com/wopta/goworkspace/document v1.0.62
-	github.com/wopta/goworkspace/lib v1.0.60
-	github.com/wopta/goworkspace/mail v1.0.23
-	github.com/wopta/goworkspace/models v1.1.14
-	github.com/wopta/goworkspace/payment v1.0.50
+	github.com/wopta/goworkspace/bpmn v1.0.5
+	github.com/wopta/goworkspace/document v1.0.66
+	github.com/wopta/goworkspace/lib v1.0.62
+	github.com/wopta/goworkspace/mail v1.0.24
+	github.com/wopta/goworkspace/models v1.1.15
+	github.com/wopta/goworkspace/payment v1.0.52
 	github.com/wopta/goworkspace/transaction v1.0.5
 	github.com/wopta/goworkspace/user v1.0.14
 	github.com/wopta/goworkspace/wiseproxy v1.0.3
-	github.com/wopta/goworkspace/bpmn v1.0.4
 )
 
 require (
@@ -62,6 +62,7 @@ require (
 	github.com/klauspost/compress v1.15.9 // indirect
 	github.com/klauspost/cpuid/v2 v2.0.9 // indirect
 	github.com/kr/fs v0.1.0 // indirect
+	github.com/maja42/goval v1.3.1 // indirect
 	github.com/minio/asm2plan9s v0.0.0-20200509001527-cdd76441f9d8 // indirect
 	github.com/minio/c2goasm v0.0.0-20190812172519-36a3d3bbc4f3 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
@@ -77,7 +78,7 @@ require (
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
 	github.com/wopta/goworkspace/policy v1.0.1 // indirect
-	github.com/wopta/goworkspace/product v1.0.25 // indirect
+	github.com/wopta/goworkspace/product v1.0.29 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
 	github.com/xuri/excelize/v2 v2.7.0 // indirect
