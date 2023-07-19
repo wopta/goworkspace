@@ -137,7 +137,11 @@ func personaGuaranteesTable(pdf *fpdf.Fpdf, guaranteesMap map[string]map[string]
 func personaSurveySection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	surveys := *policy.Surveys
 
-	for _, survey := range surveys {
+	getParagraphTitle(pdf, "Dichiarazioni da leggere con attenzione prima di firmare")
+	err := printSurvey(pdf, surveys[0], policy.Company)
+	lib.CheckError(err)
+
+	for _, survey := range surveys[1:] {
 		err := printSurvey(pdf, survey, policy.Company)
 		lib.CheckError(err)
 	}

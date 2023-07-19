@@ -133,9 +133,7 @@ type Survey struct {
 type Statement struct {
 	Id                 int64       `json:"id" firestore:"id"`
 	Title              string      `firestore:"title,omitempty" json:"title,omitempty"`
-	SimploTitle        string      `json:"simploTitle,omitempty" firestore:"simploTitle,omitempty"`
 	Subtitle           string      `firestore:"subtitle,omitempty" json:"subtitle,omitempty"`
-	SimploSubtitle     string      `json:"simploSubtitle,omitempty" firestore:"simploSubtitle,omitempty"`
 	HasMultipleAnswers *bool       `firestore:"hasMultipleAnswers,omitempty" json:"hasMultipleAnswers,omitempty"`
 	Questions          []*Question `firestore:"questions,omitempty" json:"questions,omitempty"`
 	Answer             *bool       `firestore:"answer,omitempty" json:"answer,omitempty"`
@@ -148,7 +146,6 @@ type Statement struct {
 type Question struct {
 	Id             int64  `json:"id" firestore:"id"`
 	Question       string `firestore:"question,omitempty" json:"question,omitempty"`
-	SimploQuestion string `json:"simploQuestion,omitempty" firestore:"simploQuestion,omitempty"`
 	IsBold         bool   `firestore:"isBold,omitempty" json:"isBold,omitempty"`
 	Indent         bool   `firestore:"indent,omitempty" json:"indent,omitempty"`
 	Answer         *bool  `firestore:"answer,omitempty" json:"answer,omitempty"`

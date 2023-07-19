@@ -156,13 +156,12 @@ func (fx *Fx) FloatToString(in float64, decimal int64) string {
 	SURVEY AND STATEMENT CUSTOM FUNCTIONS
 */
 
-func (fx *Fx) AppendStatement(statements []*Statement, id int64, title, simploTitle, subtitle, simploSubtitle string, hasMultipleAnswers, hasAnswer, expectedAnswer, companySign, contractorSign bool) []*Statement {
+func (fx *Fx) AppendStatement(statements []*Statement, id int64, title, subtitle string,
+	hasMultipleAnswers, hasAnswer, expectedAnswer, companySign, contractorSign bool) []*Statement {
 	statement := &Statement{
 		Id:                 id,
 		Title:              title,
-		SimploTitle:        simploTitle,
 		Subtitle:           subtitle,
-		SimploSubtitle:     simploSubtitle,
 		HasMultipleAnswers: nil,
 		Questions:          make([]*Question, 0),
 		Answer:             nil,
@@ -180,7 +179,8 @@ func (fx *Fx) AppendStatement(statements []*Statement, id int64, title, simploTi
 	return append(statements, statement)
 }
 
-func (fx *Fx) AppendSurvey(surveys []*Survey, id int64, title, simploTitle, subtitle, simploSubtitle string, hasMultipleAnswers, hasAnswer, expectedAnswer, companySign, contractorSign bool) []*Survey {
+func (fx *Fx) AppendSurvey(surveys []*Survey, id int64, title, subtitle string, hasMultipleAnswers,
+	hasAnswer, expectedAnswer, companySign, contractorSign bool) []*Survey {
 	survey := &Survey{
 		Id:                 id,
 		Title:              title,
@@ -190,6 +190,8 @@ func (fx *Fx) AppendSurvey(surveys []*Survey, id int64, title, simploTitle, subt
 		Answer:             nil,
 		HasAnswer:          hasAnswer,
 		ExpectedAnswer:     nil,
+		ContractorSign:     contractorSign,
+		CompanySign:        companySign,
 	}
 	if hasAnswer {
 		survey.ExpectedAnswer = &expectedAnswer
@@ -200,10 +202,9 @@ func (fx *Fx) AppendSurvey(surveys []*Survey, id int64, title, simploTitle, subt
 	return append(surveys, survey)
 }
 
-func (fx *Fx) AppendQuestion(questions []*Question, text, simploText string, isBold, indent, hasAnswer, expectedAnswer bool) []*Question {
+func (fx *Fx) AppendQuestion(questions []*Question, text string, isBold, indent, hasAnswer, expectedAnswer bool) []*Question {
 	question := &Question{
 		Question:       text,
-		SimploQuestion: simploText,
 		IsBold:         isBold,
 		Indent:         indent,
 		Answer:         nil,

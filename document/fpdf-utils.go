@@ -168,13 +168,6 @@ func printSurvey(pdf *fpdf.Fpdf, survey models.Survey, companyName string) error
 	surveyTitle := survey.Title
 	surveySubtitle := survey.Subtitle
 
-	if survey.SimploTitle != "" {
-		surveyTitle = survey.SimploTitle
-	}
-	if survey.SimploSubtitle != "" {
-		surveySubtitle = survey.SimploSubtitle
-	}
-
 	setBlackBoldFont(pdf, standardTextSize)
 	if survey.HasAnswer {
 		answer := "NO"
@@ -220,17 +213,8 @@ func printSurvey(pdf *fpdf.Fpdf, survey models.Survey, companyName string) error
 			availableWidth -= tabDimension / 2
 		}
 
-		questionText := question.Question
-		if question.SimploQuestion != "" {
-			questionText = question.SimploQuestion
-		}
-
 		if question.HasAnswer {
 			var questionWidth, paddingWidth float64
-			if question.SimploQuestion != "" {
-
-			}
-
 			answer := "NO"
 			if *question.Answer {
 				answer = "SI"
@@ -239,14 +223,14 @@ func printSurvey(pdf *fpdf.Fpdf, survey models.Survey, companyName string) error
 			answerWidth := pdf.GetStringWidth(answer)
 			dotWidth := pdf.GetStringWidth(".")
 
-			lines := pdf.SplitText(questionText+answer, availableWidth)
+			lines := pdf.SplitText(question.Question+answer, availableWidth)
 
 			questionWidth = pdf.GetStringWidth(lines[len(lines)-1])
 			paddingWidth = availableWidth - questionWidth - answerWidth
 
 			dotsString = strings.Repeat(".", int(paddingWidth/dotWidth)-2) + answer
 		}
-		pdf.MultiCell(availableWidth, 3.5, questionText+dotsString, "", fpdf.AlignLeft, false)
+		pdf.MultiCell(availableWidth, 3.5, question.Question+dotsString, "", fpdf.AlignLeft, false)
 	}
 
 	if survey.CompanySign || survey.ContractorSign {
@@ -295,9 +279,6 @@ func checkSurveySpace(pdf *fpdf.Fpdf, survey models.Survey) {
 		availableWidth = pageWidth - leftMargin - rightMargin - 2
 
 		questionText := question.Question
-		if question.SimploQuestion != "" {
-			questionText = question.SimploQuestion
-		}
 
 		if question.IsBold {
 			setBlackBoldFont(pdf, standardTextSize)
@@ -332,13 +313,7 @@ func printStatement(pdf *fpdf.Fpdf, statement models.Statement, companyName stri
 	checkStatementSpace(pdf, statement)
 
 	title := statement.Title
-	if statement.SimploTitle != "" {
-		title = statement.SimploTitle
-	}
 	subtitle := statement.Subtitle
-	if statement.SimploSubtitle != "" {
-		subtitle = statement.SimploSubtitle
-	}
 
 	if title != "" {
 		getParagraphTitle(pdf, title)
@@ -349,9 +324,6 @@ func printStatement(pdf *fpdf.Fpdf, statement models.Statement, companyName stri
 	}
 	for _, question := range statement.Questions {
 		text := question.Question
-		if question.SimploQuestion != "" {
-			text = question.SimploQuestion
-		}
 		if question.IsBold {
 			setBlackBoldFont(pdf, standardTextSize)
 		} else {
@@ -383,13 +355,7 @@ func checkStatementSpace(pdf *fpdf.Fpdf, statement models.Statement) {
 	currentY := pdf.GetY()
 
 	title := statement.Title
-	if statement.SimploTitle != "" {
-		title = statement.SimploTitle
-	}
 	subtitle := statement.Subtitle
-	if statement.SimploSubtitle != "" {
-		subtitle = statement.SimploSubtitle
-	}
 
 	if title != "" {
 		setPinkBoldFont(pdf, titleTextSize)
@@ -405,9 +371,6 @@ func checkStatementSpace(pdf *fpdf.Fpdf, statement models.Statement) {
 		availableWidth = pageWidth - leftMargin - rightMargin - 2
 
 		text := question.Question
-		if question.SimploQuestion != "" {
-			text = question.SimploQuestion
-		}
 
 		if question.IsBold {
 			setBlackBoldFont(pdf, standardTextSize)
