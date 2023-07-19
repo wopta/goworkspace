@@ -1,8 +1,10 @@
 package document
 
 import (
+	"fmt"
 	"github.com/dustin/go-humanize"
 	"github.com/go-pdf/fpdf"
+	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -36,9 +38,15 @@ func GapSogessur(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, 
 	contractor := policy.Contractor
 	insured := policy.Assets[0].Person
 
-	vehicleDataTable(pdf, vehicle)
+	gapVehicleDataTable(pdf, vehicle)
 
 	gapPersonalInfoTable(pdf, contractor, *insured)
+
+	gapPolicyDataTable(pdf, policy)
+
+	gapPriceTable(pdf, policy)
+
+	pdf.AddPage()
 
 	companiesDescriptionSection(pdf, policy.Company)
 
@@ -64,7 +72,7 @@ func GapSogessur(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, 
 	return filename, out
 }
 
-func vehicleDataTable(pdf *fpdf.Fpdf, vehicle *models.Vehicle) {
+func gapVehicleDataTable(pdf *fpdf.Fpdf, vehicle *models.Vehicle) {
 	tableRows := [][]string{
 		{"Tipo Veicolo", vehicle.VehicleType, "Data prima immatricolazione", vehicle.RegistrationDate.Format(dateLayout)},
 		{"Marca", vehicle.Manufacturer, "Stato veicolo", vehicle.Condition},
@@ -138,6 +146,85 @@ func gapPersonalInfoTable(pdf *fpdf.Fpdf, contractor, insured models.User) {
 			pdf.CellFormat(55, 5, tableRows[x][3], "BR", 1, fpdf.AlignLeft, false, 0, "")
 		}
 	}
+	pdf.Ln(5)
+}
+
+func gapPolicyDataTable(pdf *fpdf.Fpdf, policy *models.Policy) {
+	offerMap := map[string]string{
+		"base":     "Base",
+		"complete": "Completa",
+	}
+
+	setWhiteBoldFont(pdf, standardTextSize)
+	pdf.SetFillColor(229, 0, 117)
+	pdf.SetDrawColor(229, 0, 117)
+	pdf.CellFormat(190, 5, "Dati di polizza", "TBL", 1, fpdf.AlignLeft, true, 0,
+		"")
+
+	setPinkRegularFont(pdf, 8)
+	pdf.CellFormat(40, 5, "Decorrenza", "BL", 0, fpdf.AlignLeft, false, 0, "")
+	setBlackRegularFont(pdf, 8)
+	pdf.CellFormat(55, 5, policy.StartDate.Format(dateLayout), "B", 0, fpdf.AlignLeft, false,
+		0, "")
+	setPinkRegularFont(pdf, 8)
+	pdf.CellFormat(40, 5, "Ore", "B", 0, fpdf.AlignLeft, false, 0, "")
+	setBlackRegularFont(pdf, 8)
+	pdf.CellFormat(55, 5, "24:00", "BR", 1, fpdf.AlignLeft, false, 0, "")
+
+	setPinkRegularFont(pdf, 8)
+	pdf.CellFormat(40, 5, "Scadenza", "BL", 0, fpdf.AlignLeft, false, 0, "")
+	setBlackRegularFont(pdf, 8)
+	pdf.CellFormat(55, 5, policy.EndDate.Format(dateLayout), "B", 0, fpdf.AlignLeft, false,
+		0, "")
+	setPinkRegularFont(pdf, 8)
+	pdf.CellFormat(40, 5, "Ore", "B", 0, fpdf.AlignLeft, false, 0, "")
+	setBlackRegularFont(pdf, 8)
+	pdf.CellFormat(55, 5, "24:00", "BR", 1, fpdf.AlignLeft, false, 0, "")
+
+	duration := int((policy.EndDate.Sub(policy.StartDate).Hours() / 24) / 30)
+	setPinkRegularFont(pdf, 8)
+	pdf.CellFormat(40, 5, "Durata", "BL", 0, fpdf.AlignLeft, false, 0, "")
+	setBlackRegularFont(pdf, 8)
+	pdf.CellFormat(0, 5, fmt.Sprintf("%d mesi", duration), "BR", 1, fpdf.AlignLeft, false,
+		0, "")
+	setPinkBoldFont(pdf, 8)
+	pdf.CellFormat(0, 5, "Opzione  di prodotto selezionata: "+offerMap[policy.OfferlName], "BLR", 1, fpdf.AlignLeft,
+		false,
+		0, "")
+	setBlackRegularFont(pdf, 8)
+	// TODO: make this dynamic based on user choice
+	pdf.MultiCell(0, 4, "Include le seguenti garanzie, come definite nel Set Informativo"+
+		"\nDanno totale da Incendio, Furto totale e  Danno totale (perdita pecuniaria)", "BLR",
+		fpdf.AlignLeft, false)
+
+	pdf.Ln(5)
+}
+
+func gapPriceTable(pdf *fpdf.Fpdf, policy *models.Policy) {
+	setWhiteBoldFont(pdf, standardTextSize)
+	pdf.SetFillColor(229, 0, 117)
+	pdf.SetDrawColor(229, 0, 117)
+	pdf.CellFormat(30, 5, "Premio", "TBL", 0, fpdf.AlignLeft, true, 0, "")
+	pdf.CellFormat(0, 5, "Unico Anticipato", "TBR", 1, fpdf.AlignCenter, true, 0,
+		"")
+
+	setPinkRegularFont(pdf, 8)
+	pdf.CellFormat(20, 5, "", "BL", 0, fpdf.AlignLeft, false, 0, "")
+	pdf.CellFormat(56, 5, "Imponibile", "B", 0, fpdf.AlignCenter, false, 0, "")
+	pdf.CellFormat(56, 5, "Imposte Assicurative", "B", 0, fpdf.AlignCenter, false,
+		0, "")
+	pdf.CellFormat(0, 5, "Totale", "BR", 1, fpdf.AlignCenter, false, 0, "")
+
+	pdf.CellFormat(20, 5, "Alla firma", "BL", 0, fpdf.AlignLeft, false, 0, "")
+	setBlackRegularFont(pdf, 8)
+	pdf.CellFormat(56, 5, lib.HumanaizePriceEuro(policy.PriceNett), "B", 0, fpdf.AlignCenter,
+		false, 0, "")
+	pdf.CellFormat(56, 5, lib.HumanaizePriceEuro(policy.PriceGross-policy.PriceNett), "B",
+		0, fpdf.AlignCenter, false,
+		0, "")
+	pdf.CellFormat(0, 5, lib.HumanaizePriceEuro(policy.PriceGross), "BR", 1, fpdf.AlignCenter,
+		false, 0, "")
+
 	pdf.Ln(5)
 }
 
