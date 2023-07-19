@@ -6,14 +6,12 @@ package test
 import (
 	"encoding/json"
 	"errors"
-	"io"
-	"log"
-	"net/http"
-	"time"
-
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"io"
+	"log"
+	"net/http"
 )
 
 var (
@@ -32,12 +30,6 @@ func Test(w http.ResponseWriter, r *http.Request) {
 	route := lib.RouteData{
 		Routes: []lib.Route{
 			{
-				Route:   "/",
-				Handler: TestFx,
-				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAll},
-			},
-			{
 				Route:   "/:operation",
 				Handler: TestPostFx,
 				Method:  http.MethodPost,
@@ -54,7 +46,7 @@ func Test(w http.ResponseWriter, r *http.Request) {
 	route.Router(w, r)
 }
 
-func TestFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+/*func TestFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println("[TestFx]")
 
 	creationDateFrom := time.Now().AddDate(0, 0, -9)
@@ -73,7 +65,7 @@ func TestFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		log.Println(i)
 		policy.BigquerySave("")
 	}
-	/*
+
 		fireTransactions := "transactions"
 
 		transactions := models.TransactionToListData(query)
@@ -90,9 +82,9 @@ func TestFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 			}
 		}
-	*/
+
 	return "", nil, nil
-}
+}*/
 
 func TestPostFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var request interface{}
