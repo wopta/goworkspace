@@ -229,7 +229,7 @@ func woptaFooter(pdf *fpdf.Fpdf) {
 		pdf.Ln(5)
 		setPinkRegularFont(pdf, smallTextSize)
 		pdf.Cell(pdf.GetStringWidth("Wopta Assicurazioni s.r.l"), 3, "Wopta Assicurazioni s.r.l")
-		pdf.Cell(120, 3, "")
+		pdf.Cell(112, 3, "")
 		pdf.Cell(pdf.GetStringWidth("www.wopta.it"), 3, "www.wopta.it")
 		pdf.Ln(3)
 		setBlackRegularFont(pdf, smallTextSize)
