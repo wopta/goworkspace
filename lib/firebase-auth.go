@@ -71,6 +71,9 @@ func VerifyAuthorization(handler func(w http.ResponseWriter, r *http.Request) (s
 		}
 
 		if len(roles) == 0 || SliceContains(roles, "all") {
+			if os.Getenv("env") == "local" {
+				return handler(w, r)
+			}
 			return VerifyAppcheck(handler)(w, r)
 		}
 
