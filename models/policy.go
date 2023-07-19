@@ -118,9 +118,7 @@ type RenewHistory struct {
 type Survey struct {
 	Id                 int64       `json:"id" firestore:"id"`
 	Title              string      `firestore:"title,omitempty" json:"title,omitempty"`
-	SimploTitle        string      `json:"simploTitle,omitempty" firestore:"simploTitle,omitempty"`
 	Subtitle           string      `firestore:"subtitle,omitempty" json:"subtitle,omitempty"`
-	SimploSubtitle     string      `json:"simploSubtitle,omitempty" firestore:"simploSubtitle,omitempty"`
 	HasMultipleAnswers *bool       `firestore:"hasMultipleAnswers,omitempty" json:"hasMultipleAnswers,omitempty"`
 	Questions          []*Question `firestore:"questions,omitempty" json:"questions,omitempty"`
 	Answer             *bool       `firestore:"answer,omitempty" json:"answer,omitempty"`
