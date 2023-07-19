@@ -41,7 +41,7 @@ func Test(w http.ResponseWriter, r *http.Request) {
 				Route:   "/:operation",
 				Handler: TestPostFx,
 				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAll},
+				Roles:   []string{models.UserRoleAdmin},
 			},
 			{
 				Route:   "/:operation",
