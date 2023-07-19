@@ -190,7 +190,8 @@ func axaFooter(pdf *fpdf.Fpdf) {
 			"per l'Italia: Corso Como n. 17, 20154 Milano - CF, P.IVA e N.Iscr. Reg. Imprese 08875230016 - "+
 			"REA MI-2525395 - Telefono: 02-87103548 - Fax: 02-23331247 - PEC: axafrancevie@legalmail.it - sito "+
 			"internet: www.clp.partners.axa/it. Ammessa ad operare in Italia in regime di stabilimento. Iscritta "+
-			"all'Albo delle imprese di assicurazione tenuto dall'IVASS, in appendice Elenco I, nr. I.00149.", "", "", false)
+			"all'Albo delle imprese di assicurazione tenuto dall'IVASS, in appendice Elenco I, nr. I.00149.",
+			"", "", false)
 		pdf.SetY(-7)
 		pageNumber(pdf)
 	})
@@ -198,6 +199,12 @@ func axaFooter(pdf *fpdf.Fpdf) {
 
 func sogessurHeader(pdf *fpdf.Fpdf) {
 	pdf.SetHeaderFunc(func() {
+		var opt fpdf.ImageOptions
+		pdf.SetXY(-30, 7)
+		opt.ImageType = "png"
+		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/logo_sogessur.png", 190, 7, 0, 8, false,
+			opt, 0, "")
+		pdf.Ln(15)
 	})
 }
 
