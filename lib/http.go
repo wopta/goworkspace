@@ -4,34 +4,38 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"math"
 	"net"
 	"net/http"
 	"time"
 )
 
 func RetryDo(req *http.Request, retry int) (*http.Response, error) {
+	const (
+		maxRetry = 5
+	)
 	var (
 		resp *http.Response
-		e    error
+		err  error
 	)
 
 	client := http.Client{
-		Timeout: time.Millisecond * 10,
+		Timeout: time.Second * 10,
 	}
 
-	for i := 1; i <= retry; i++ {
-		resp, e = client.Do(req)
-		if e != nil {
-			log.Printf("error sending the first time: %v\n", e)
-			time.Sleep(5000)
-		} else {
-			e = nil
-
+	for i := 0; i < retry && i < maxRetry; i++ {
+		log.Printf("[RetryDo] sending request %d at time %s", i+1, time.Now().UTC())
+		resp, err = client.Do(req)
+		if err == nil || (i == maxRetry-1) {
+			break
 		}
-
+		log.Printf("[RetryDo] error: %s", err.Error())
+		time.Sleep(time.Duration(500*math.Pow(2, float64(i))) * time.Millisecond)
 	}
-	return resp, e
+
+	return resp, err
 }
+
 func getIP(req *http.Request) net.IP {
 
 	ip, _, err := net.SplitHostPort(req.RemoteAddr)

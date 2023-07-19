@@ -184,9 +184,8 @@ func SendMail(obj MailRequest) {
 				message = addAttachment(message, v.Name, v.ContentType, v.Byte, close)
 			}
 
+			message += fmt.Sprintf("\r\n\n--%s--\r\n", outerBoundary)
 		}
-
-		message += fmt.Sprintf("\r\n\n--%s--\r\n", outerBoundary)
 
 		//message += "\r\n" + body
 		log.Println("MESSAGE:----------------------")

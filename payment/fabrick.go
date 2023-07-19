@@ -87,7 +87,7 @@ func FabrickPayObj(data models.Policy, firstSchedule bool, scheduleDate string, 
 			}
 			if data.AgencyUid != "" {
 				var agency models.Agency
-				dn := lib.GetFirestore(models.AgencyCollection, data.AgentUid)
+				dn := lib.GetFirestore(models.AgencyCollection, data.AgencyUid)
 				dn.DataTo(&agency)
 				commissionAgent = getCommissionProducts(data, agency.Products)
 			}

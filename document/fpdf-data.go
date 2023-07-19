@@ -117,7 +117,7 @@ func loadLifeGuarantees(policy *models.Policy) (map[string]map[string]string, []
 		guaranteesMap map[string]map[string]string
 		slugs         []slugStruct
 	)
-	lifeProduct, err := product.GetProduct("life", "v1", "mga")
+	lifeProduct, err := product.GetProduct("life", "v1", models.UserRoleAdmin)
 	lib.CheckError(err)
 
 	guaranteesMap = make(map[string]map[string]string, 0)

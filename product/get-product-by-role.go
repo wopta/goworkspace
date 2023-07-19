@@ -8,6 +8,76 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
+const (
+	minAge         = "minAge"
+	minReservedAge = "minReservedAge"
+)
+
+var (
+	ageMap = map[string]map[string]map[string]int{
+		models.UserRoleAdmin: {
+			models.LifeProduct: {
+				minAge:         75,
+				minReservedAge: 55,
+			},
+			models.PersonaProduct: {
+				minAge:         75,
+				minReservedAge: 75,
+			},
+		},
+		models.UserRoleManager: {
+			models.LifeProduct: {
+				minAge:         75,
+				minReservedAge: 55,
+			},
+			models.PersonaProduct: {
+				minAge:         75,
+				minReservedAge: 75,
+			},
+		},
+		models.UserRoleAgent: {
+			models.LifeProduct: {
+				minAge:         75,
+				minReservedAge: 55,
+			},
+			models.PersonaProduct: {
+				minAge:         75,
+				minReservedAge: 75,
+			},
+		},
+		models.UserRoleAgency: {
+			models.LifeProduct: {
+				minAge:         75,
+				minReservedAge: 55,
+			},
+			models.PersonaProduct: {
+				minAge:         75,
+				minReservedAge: 75,
+			},
+		},
+		models.UserRoleAll: {
+			models.LifeProduct: {
+				minAge:         55,
+				minReservedAge: 55,
+			},
+			models.PersonaProduct: {
+				minAge:         75,
+				minReservedAge: 75,
+			},
+		},
+		models.UserRoleCustomer: {
+			models.LifeProduct: {
+				minAge:         55,
+				minReservedAge: 55,
+			},
+			models.PersonaProduct: {
+				minAge:         75,
+				minReservedAge: 75,
+			},
+		},
+	}
+)
+
 func GetProductByRole(productName, version, company string, authToken models.AuthToken) (models.Product, error) {
 	log.Println("GetProductByRole")
 	var (
@@ -33,21 +103,18 @@ func GetProductByRole(productName, version, company string, authToken models.Aut
 
 func getMgaProduct(productName, version, company string) (*models.Product, error) {
 	log.Println("getMgaProduct")
-	mgaProduct, err := GetMgaProduct(productName, version)
-	lib.CheckError(err)
-
-	return &mgaProduct, nil
+	return GetProduct(productName, version, models.UserRoleAdmin)
 }
 
 func getEcommerceProduct(productName, version, company string) (*models.Product, error) {
 	log.Println("getEcommerceProduct")
-	ecomProduct, err := GetProduct(productName, version, "")
+	ecomProduct, err := GetProduct(productName, version, models.UserRoleAll)
 
 	if !ecomProduct.IsEcommerceActive {
 		return productNotActive()
 	}
 
-	return &ecomProduct, err
+	return ecomProduct, err
 }
 
 func getAgencyProduct(productName, version, company, agencyUid string) (*models.Product, error) {
@@ -59,7 +126,7 @@ func getAgencyProduct(productName, version, company, agencyUid string) (*models.
 		return productNotActive()
 	}
 
-	responseProduct := &agencyDefaultProduct
+	responseProduct := agencyDefaultProduct
 	log.Printf("Agency Product Start: %v", responseProduct)
 	agency, err := models.GetAgencyByAuthId(agencyUid)
 	lib.CheckError(err)
@@ -88,7 +155,7 @@ func getAgentProduct(productName, version, company, agentUid string) (*models.Pr
 		return productNotActive()
 	}
 
-	responseProduct := &agentDefaultProduct
+	responseProduct := agentDefaultProduct
 	log.Printf("Agent Product Start: %v", responseProduct)
 	agent, err := models.GetAgentByAuthId(agentUid)
 	lib.CheckError(err)
