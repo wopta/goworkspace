@@ -1,9 +1,10 @@
 package companydata
 
 import (
-	"github.com/wopta/goworkspace/models"
 	"log"
 	"net/http"
+
+	"github.com/wopta/goworkspace/models"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	lib "github.com/wopta/goworkspace/lib"
@@ -52,6 +53,12 @@ func Callback(w http.ResponseWriter, r *http.Request) {
 			{
 				Route:   "/v1/emit",
 				Handler: Emit,
+				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAll},
+			},
+			{
+				Route:   "/v1/axa/inclusive/bankaccount",
+				Handler: BankAccountAxaInclusive,
 				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAll},
 			},

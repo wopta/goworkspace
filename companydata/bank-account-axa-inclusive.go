@@ -1,0 +1,86 @@
+package companydata
+
+import (
+	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"os"
+	"strconv"
+	"time"
+
+	"github.com/wopta/goworkspace/inclusive"
+	lib "github.com/wopta/goworkspace/lib"
+)
+
+const (
+	dataMovement     = "inclusive_bank_account_movement"
+	dataBanckAccount = "inclusive_bank_account"
+	dateString       = "2021-11-22"
+	layout           = "2006-01-02"
+)
+
+func BankAccountAxaInclusive(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	var (
+		from   time.Time
+		to     time.Time
+		result [][]string
+	)
+	now := time.Now()
+	M := time.Now().AddDate(0, 0, -2)
+	date, _ := time.Parse("2006-01-02", dateString)
+	log.Println(date)
+	from, e = time.Parse("2006-01-02", strconv.Itoa(M.Year())+"-"+fmt.Sprintf("%02d", int(M.Month()))+"-"+fmt.Sprintf("%02d", 1))
+	to, e = time.Parse("2006-01-02", strconv.Itoa(M.Year())+"-"+fmt.Sprintf("%02d", int(M.Month()))+"-"+fmt.Sprintf("%02d", M.Day()))
+	log.Println(from)
+	log.Println(to)
+	query := "select * from `wopta." + dataMovement + "` where _PARTITIONTIME >'" + from.Format(layout) + " 00:00:00" + "' and _PARTITIONTIME <'" + to.Format(layout) + " 00:00:00" + "'"
+	log.Println(query)
+	bankaccountlist, e := lib.QueryRowsBigQuery[inclusive.BankAccountMovement](query)
+	log.Println(e)
+	//result = append(result, getHeader())
+	for _, mov := range bankaccountlist {
+
+		result = append(result, setInclusiveRow(mov)...)
+
+	}
+	refMontly := now.AddDate(0, -1, 0)
+	filepath := "180623_" + strconv.Itoa(refMontly.Year()) + fmt.Sprintf("%02d", int(refMontly.Month())) + "_" + fmt.Sprintf("%02d", now.Day()) + ".xlsx"
+	lib.CreateExcel(result, "../tmp/"+filepath, "")
+	source, _ := ioutil.ReadFile("../tmp/" + filepath)
+	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/axa/inclusive/hype/"+strconv.Itoa(refMontly.Year())+"/"+fmt.Sprintf("%02d", int(refMontly.Month()))+"/"+filepath, source)
+	AxaSftpUpload("/HYPE/IN" + filepath)
+	return "", nil, e
+}
+func setInclusiveRow(mov inclusive.BankAccountMovement) [][]string {
+	var (
+		result [][]string
+	)
+	_, user, _ := ExtractUserDataFromFiscalCode(mov.FiscalCode)
+	row := []string{
+		"180623",                     // NUMERO POLIZZA
+		"T",                          //    LOB
+		"C",                          //    TIPOLOGIA POLIZZA
+		"0548100",                    //    CODICE CONFIGURAZIONE
+		"1",                          //    TIPO OGGETTO ASSICURATO
+		mov.HypeId,                   //    IDENTIFICATIVO UNIVOCO APPLICAZIONE
+		mov.FiscalCode,               //    CODICE FISCALE / P.IVA ASSICURATO
+		mov.Surname,                  //    COGNOME / RAGIONE SOCIALE ASSICURATO
+		mov.Name,                     //    NOME ASSICURATO
+		"",                           //    INDIRIZZO RESIDENZA ASSICURATO
+		"",                           //    CAP RESIDENZA ASSICURATO
+		"",                           //    CITTA' RESIDENZA ASSICURATO
+		"",                           //    PROVINCIA RESIDENZA ASSICURATO
+		user.BirthDate,               //    DATA DI NASCITA ASSICURATO
+		mov.StartDate.Format(layout), //    DATA INIZIO VALIDITA' COPERTURA
+		"",                           //    DATA FINE VALIDITA' COPERTURA
+		StringMapping(mov.MovementType, map[string]string{
+			"insert": "A",
+			"delete": "E",
+		}), //    TIPO MOVIMENTO
+	}
+
+	result = append(result, row)
+
+	return result
+}

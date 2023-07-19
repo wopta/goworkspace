@@ -42,7 +42,7 @@ func (state *State) runNextProcess(process Process) {
 	if !process.IsFailed {
 		for _, x := range state.getProcesses(process.OutProcess) {
 			state.runProcess(x)
-			state.runNextProcess(x)
+			//state.runNextProcess(x)
 		}
 
 	}

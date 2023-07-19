@@ -11,6 +11,7 @@ import (
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/user"
 )
 
 var origin string
@@ -105,6 +106,12 @@ func sign(state *bpmn.State) error {
 	emitSign(&policy, origin)
 	return nil
 }
+func putUser(state *bpmn.State) error {
+	policy := state.Data
+	user.SetUserIntoPolicyContractor(&policy, origin)
+	emitSign(&policy, origin)
+	return nil
+}
 
 func runBpmn(policy models.Policy, processByte string) *bpmn.State {
 	state := bpmn.NewBpmn(policy)
@@ -149,6 +156,5 @@ func getTest() string {
         "status": "READY"
 
     }
-]
-	`
+]`
 }

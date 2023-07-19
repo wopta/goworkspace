@@ -87,7 +87,7 @@ func BpmnEngine(policy models.Policy, mapPolicy map[string]interface{}) string {
 }
 func NewBpmn(data models.Policy) *State {
 	// Init workflow with a name, and max concurrent tasks
-	log.Println("--------------------------BpmnEngine-------------------------------------------")
+	log.Println("--------------------------NewBpmn-------------------------------------------")
 	var (
 		state *State
 	)
@@ -104,7 +104,7 @@ func test(state *State) error {
 }
 func contract(state *State) error {
 	policy := state.Data
-	doc.ContractObj(policy)
+	doc.ContractObj("", policy)
 	return nil
 }
 func fabrickPayment(state *State) error {
@@ -152,7 +152,7 @@ func getTest() string {
         "id": 1,
         "outTrueProcess": [2],
 		"outFalseProcess": [2],
-		"decision":"payment== \"fabrick\"",
+		"decision":"payment == \"fabrick\"",
         "inProcess": [0],
         "status": "READY"
 

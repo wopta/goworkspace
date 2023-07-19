@@ -18,7 +18,7 @@ func PmiGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface{},
 
 		e error
 	)
-
+	log.Println("----------------PmiGlobalEmit-----------------")
 	layoutFilename := "20060102"
 	location, e := time.LoadLocation("Europe/Rome")
 	collection := "policy"

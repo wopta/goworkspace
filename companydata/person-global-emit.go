@@ -17,7 +17,7 @@ func PersonGlobalEmit(w http.ResponseWriter, r *http.Request) (string, interface
 
 		e error
 	)
-
+	log.Println("----------------PersonGlobalEmit-----------------")
 	//layout := "02/01/2006"
 	layoutFilename := "20060102"
 	//client, e := lib.NewSftpclient(config)

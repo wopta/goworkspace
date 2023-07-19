@@ -166,6 +166,7 @@ func SendMailSign(policy models.Policy) {
 
 func SendMailContract(policy models.Policy, at *[]Attachment) {
 	var message []string
+
 	message = append(
 		message,
 		`<p>ti confermiamo che la protezione offerta dalla tua polizza è ora attiva. 

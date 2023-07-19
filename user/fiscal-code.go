@@ -3,8 +3,6 @@ package user
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
 	"io"
 	"log"
 	"net/http"
@@ -13,6 +11,9 @@ import (
 	"strings"
 	"time"
 	"unicode"
+
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 )
 
 func FiscalCode(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -35,7 +36,7 @@ func FiscalCode(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 	case "encode":
 		outJson, user, err = calculateFiscalCode(user)
 	case "decode":
-		outJson, user, err = extractUserDataFromFiscalCode(user)
+		outJson, user, err = ExtractUserDataFromFiscalCode(user)
 	}
 
 	return outJson, user, err
@@ -280,7 +281,7 @@ func calculateControlCharacter(surnameCode, nameCode, birthDateCode, birthPlaceC
 	return string('A' + rune(sum%26)), nil
 }
 
-func extractUserDataFromFiscalCode(user models.User) (string, models.User, error) {
+func ExtractUserDataFromFiscalCode(user models.User) (string, models.User, error) {
 	var (
 		codes map[string]map[string]string
 	)
