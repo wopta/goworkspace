@@ -21,7 +21,12 @@ func GapSogessur(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, 
 
 	mainMotorHeader(pdf, policy)
 
+	mainFooter(pdf, policy.Name)
+
 	pdf.AddPage()
+
+	getParagraphTitle(pdf, "La tua assicurazione è operante sui dati sotto riportati, verifica la loro correttezza"+
+		" e segnala eventuali inesattezze")
 
 	filename, out := save(pdf, policy)
 	return filename, out

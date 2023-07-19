@@ -145,6 +145,16 @@ func mainFooter(pdf *fpdf.Fpdf, productName string) {
 		x = 180
 		y = 280
 		height = 10
+	case "gap":
+		footerText = "Wopta per te. Auto Valore Protetto è un prodotto assicurativo di Sogessur SA – Rappresentanza" +
+			" Generale per l’Italia con sede in Via Tiziano, 32 – 20145 Milano – \nIscritta alla CCIAA di Milano P." +
+			"I.07420570967 – REA MI 1957443 Sogecap SA – Rappresentanza Generale per l’Italia con sede in Via" +
+			" Tiziano, 32 – 20145 Milano –\nIscritta alla CCIAA di Milano P.I. 07160010968 – REA MI 193970"
+		logoPath = lib.GetAssetPathByEnv(basePath) + "/logo_sogessur.png"
+		x = 180
+		y = 280
+		height = 15
+
 	}
 
 	pdf.SetFooterFunc(func() {
