@@ -147,9 +147,9 @@ func mainFooter(pdf *fpdf.Fpdf, productName string) {
 		height = 10
 	case "gap":
 		footerText = "Wopta per te. Auto Valore Protetto è un prodotto assicurativo di Sogessur SA – Rappresentanza" +
-			" Generale per l’Italia con sede in Via Tiziano, 32 – 20145 Milano – \nIscritta alla CCIAA di Milano P." +
-			"I.07420570967 – REA MI 1957443 Sogecap SA – Rappresentanza Generale per l’Italia con sede in Via" +
-			" Tiziano, 32 – 20145 Milano –\nIscritta alla CCIAA di Milano P.I. 07160010968 – REA MI 193970"
+			" Generale per l’Italia con sede in Via Tiziano, 32 – 20145 Milano – \nIscritta alla CCIAA di Milano " +
+			"P. I.07420570967 – REA MI 1957443 Sogecap SA – Rappresentanza Generale per l’Italia con sede in Via " +
+			"Tiziano, 32 – 20145 Milano –\nIscritta alla CCIAA di Milano P.I. 07160010968 – REA MI 193970"
 		logoPath = lib.GetAssetPathByEnv(basePath) + "/logo_sogessur.png"
 		x = 180
 		y = 280
@@ -191,6 +191,23 @@ func axaFooter(pdf *fpdf.Fpdf) {
 			"REA MI-2525395 - Telefono: 02-87103548 - Fax: 02-23331247 - PEC: axafrancevie@legalmail.it - sito "+
 			"internet: www.clp.partners.axa/it. Ammessa ad operare in Italia in regime di stabilimento. Iscritta "+
 			"all'Albo delle imprese di assicurazione tenuto dall'IVASS, in appendice Elenco I, nr. I.00149.", "", "", false)
+		pdf.SetY(-7)
+		pageNumber(pdf)
+	})
+}
+
+func sogessurHeader(pdf *fpdf.Fpdf) {
+	pdf.SetHeaderFunc(func() {
+	})
+}
+
+func sogessurFooter(pdf *fpdf.Fpdf) {
+	pdf.SetFooterFunc(func() {
+		pdf.SetXY(10, -25)
+		setBlackRegularFont(pdf, smallTextSize)
+		pdf.MultiCell(0, 3, "Sogecap SA – Rappresentanza Generale per l’Italia con sede in Via Tiziano, "+
+			"32 – 20145 Milano – Iscritta alla CCIAA di Milano P.I. 07160010968 – REA MI 1939709", "",
+			"", false)
 		pdf.SetY(-7)
 		pageNumber(pdf)
 	})
@@ -333,6 +350,11 @@ func companiesDescriptionSection(pdf *fpdf.Fpdf, companyName string) {
 			"successive autorizzazioni ed è iscritta all’Albo Imprese presso l’IVASS al n. 1.00111. La Società è "+
 			"soggetta alla vigilanza dell’IVASS; è possibile verificare la veridicità e la regolarità delle "+
 			"autorizzazioni mediante l'accesso al sito www.ivass.it", "", "", false)
+	case "sogessur":
+		pdf.MultiCell(0, 3, "Sogessur SA – Rappresentanza Generale per l’Italia con sede in Via Tiziano, "+
+			"32 – 20145 Milano – Iscritta alla CCIAA di Milano P.I. 07420570967 – REA MI 1957443 Sogecap SA – "+
+			"Rappresentanza Generale per l’Italia con sede in Via Tiziano, 32 – 20145 Milano – Iscritta alla CCIAA di "+
+			"Milano P.I. 07160010968 ", "", "", false)
 	}
 }
 

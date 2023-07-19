@@ -37,9 +37,18 @@ func GapSogessur(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, 
 	insured := policy.Assets[0].Person
 
 	vehicleDataTable(pdf, vehicle)
-	pdf.Ln(5)
 
 	gapPersonalInfoTable(pdf, contractor, *insured)
+
+	companiesDescriptionSection(pdf, policy.Company)
+
+	sogessurHeader(pdf)
+
+	pdf.AddPage()
+
+	sogessurFooter(pdf)
+
+	gapConsentDeclaration(pdf)
 
 	woptaHeader(pdf)
 
@@ -82,6 +91,7 @@ func vehicleDataTable(pdf *fpdf.Fpdf, vehicle *models.Vehicle) {
 	pdf.MultiCell(0, 4, "*Veicolo Immatricolato in Italia ad uso privato, il peso a pieno carico non"+
 		" eccede le 3,5 tonnellate ed è già coperto da una polizza furto e incendio.", "1",
 		fpdf.AlignLeft, false)
+	pdf.Ln(5)
 }
 
 func gapPersonalInfoTable(pdf *fpdf.Fpdf, contractor, insured models.User) {
@@ -128,5 +138,26 @@ func gapPersonalInfoTable(pdf *fpdf.Fpdf, contractor, insured models.User) {
 			pdf.CellFormat(55, 5, tableRows[x][3], "BR", 1, fpdf.AlignLeft, false, 0, "")
 		}
 	}
+	pdf.Ln(5)
+}
 
+func gapConsentDeclaration(pdf *fpdf.Fpdf) {
+	setBlackBoldFont(pdf, standardTextSize)
+	pdf.SetDrawColor(0, 0, 0)
+	pdf.MultiCell(0, 3, "Consenso al trattemento dei dati personali", "", fpdf.AlignLeft, false)
+	pdf.SetLineWidth(thinLineWidth)
+	pdf.Line(10, pdf.GetY(), 80, pdf.GetY())
+	pdf.Ln(1)
+	setBlackRegularFont(pdf, standardTextSize)
+	pdf.MultiCell(0, 3, "Il sottoscritto, dopo aver ricevuto copia e preso visione dell’Informativa "+
+		"della Compagnia sul trattamento dei dati personali, ai sensi della normativa sulla privacy "+
+		"(Reg. UE 2016/679) acconsente al trattamento dei propri dati personali, anche sensibili (particolari?), da "+
+		"parte di Sogessur S.A. - Rappresentanza Generale per l’Italia, per le finalità, secondo le modalità e "+
+		"mediante i soggetti indicati nella predetta informativa.", "", fpdf.AlignLeft, false)
+	setBlackBoldFont(pdf, standardTextSize)
+	pdf.MultiCell(0, 3, "Sono consapevole che il mancato consenso al trattamento dei dati "+
+		"personali, necessari alla Compagnia per le finalità ivi illustrate, comporta l’impossibilità di "+
+		"dare esecuzione al rapporto contrattuale.\"", "", fpdf.AlignLeft, false)
+	pdf.Ln(3)
+	drawSignatureForm(pdf)
 }
