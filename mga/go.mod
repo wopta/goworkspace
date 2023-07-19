@@ -7,8 +7,8 @@ replace github.com/wopta/goworkspace/mga => ./
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.4
 	github.com/wopta/goworkspace/lib v1.0.60
-	github.com/wopta/goworkspace/models v1.1.17
-	github.com/wopta/goworkspace/product v1.0.30
+	github.com/wopta/goworkspace/models v1.1.18
+	github.com/wopta/goworkspace/product v1.0.31
 )
 
 require (
