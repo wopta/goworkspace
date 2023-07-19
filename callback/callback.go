@@ -29,7 +29,7 @@ func Callback(w http.ResponseWriter, r *http.Request) {
 			},
 			{
 				Route:   "/v1/payment",
-				Handler: Payment,
+				Handler: PaymentFx,
 				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAll},
 			},

@@ -18,7 +18,57 @@ import (
 	"github.com/wopta/goworkspace/user"
 )
 
-func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func PaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	log.Println("[PaymentFx] Handler start -----------------------------------")
+
+	var (
+		response        string
+		err             error
+		fabrickCallback FabrickCallback
+	)
+
+	policyUid := r.URL.Query().Get("uid")
+	schedule := r.URL.Query().Get("schedule")
+	// origin := r.URL.Query().Get("origin")
+	log.Printf("[PaymentFx] uid %s, schedule %s", policyUid, schedule)
+
+	request := lib.ErrorByte(io.ReadAll(r.Body))
+	defer r.Body.Close()
+
+	log.Printf("[PaymentFx] request payload: %s", string(request))
+	err = json.Unmarshal([]byte(request), &fabrickCallback)
+	if err != nil {
+		log.Printf("[PaymentFx] ERROR unmarshaling request: %s", err.Error())
+		return response, nil, err
+	}
+
+	/*
+	 * TODO
+	 * Check request status:
+	 * - PAID:
+	 *   extract uid and origin from ExternalID if needed
+	 *   get policy from firestore
+	 *   check for error
+	 *   check isPay and status:
+	 *   - false and ToPay:
+	 *     create/update user
+	 *     get contract
+	 *     update policy
+	 *     update transaction
+	 *     update agency
+	 *     update agent
+	 *     save all operations to firestore (?)
+	 *     send mail
+	 *   - else:
+	 *     log error and return response, nil, err
+	 * - else:
+	 *   log error and return response, nil, err
+	 */
+
+	return response, nil, err
+}
+
+func PaymentOld(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println("Payment")
 	var response string
 	var e error
