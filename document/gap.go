@@ -2,7 +2,6 @@ package document
 
 import (
 	"fmt"
-	"github.com/dustin/go-humanize"
 	"github.com/go-pdf/fpdf"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
@@ -76,7 +75,7 @@ func gapVehicleDataTable(pdf *fpdf.Fpdf, vehicle *models.Vehicle) {
 	tableRows := [][]string{
 		{"Tipo Veicolo", vehicle.VehicleType, "Data prima immatricolazione", vehicle.RegistrationDate.Format(dateLayout)},
 		{"Marca", vehicle.Manufacturer, "Stato veicolo", vehicle.Condition},
-		{"Modello", vehicle.Model, "Valore veicolo", humanize.FormatFloat("#.###,", float64(vehicle.PriceValue))},
+		{"Modello", vehicle.Model, "Valore veicolo", lib.HumanaizePriceEuro(float64(vehicle.PriceValue))},
 	}
 
 	setWhiteBoldFont(pdf, standardTextSize)
