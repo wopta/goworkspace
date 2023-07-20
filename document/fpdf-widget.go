@@ -201,7 +201,7 @@ func sogessurHeader(pdf *fpdf.Fpdf) {
 		var opt fpdf.ImageOptions
 		pdf.SetXY(-30, 7)
 		opt.ImageType = "png"
-		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/logo_sogessur.png", 190, 7, 0, 8, false,
+		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/logo_sogessur.png", 145, 7, 0, 8, false,
 			opt, 0, "")
 		pdf.Ln(15)
 	})
