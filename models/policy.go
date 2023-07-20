@@ -116,6 +116,7 @@ type RenewHistory struct {
 }
 
 type Survey struct {
+	Id                 int64       `json:"id" firestore:"id"`
 	Title              string      `firestore:"title,omitempty" json:"title,omitempty"`
 	Subtitle           string      `firestore:"subtitle,omitempty" json:"subtitle,omitempty"`
 	HasMultipleAnswers *bool       `firestore:"hasMultipleAnswers,omitempty" json:"hasMultipleAnswers,omitempty"`
@@ -123,9 +124,12 @@ type Survey struct {
 	Answer             *bool       `firestore:"answer,omitempty" json:"answer,omitempty"`
 	HasAnswer          bool        `firestore:"hasAnswer" json:"hasAnswer"`
 	ExpectedAnswer     *bool       `firestore:"expectedAnswer,omitempty" json:"expectedAnswer,omitempty"`
+	ContractorSign     bool        `json:"contractorSign,omitempty" firestore:"contractorSign,omitempty"`
+	CompanySign        bool        `json:"companySign,omitempty" firestore:"companySign,omitempty"`
 }
 
 type Statement struct {
+	Id                 int64       `json:"id" firestore:"id"`
 	Title              string      `firestore:"title,omitempty" json:"title,omitempty"`
 	Subtitle           string      `firestore:"subtitle,omitempty" json:"subtitle,omitempty"`
 	HasMultipleAnswers *bool       `firestore:"hasMultipleAnswers,omitempty" json:"hasMultipleAnswers,omitempty"`
@@ -133,9 +137,12 @@ type Statement struct {
 	Answer             *bool       `firestore:"answer,omitempty" json:"answer,omitempty"`
 	HasAnswer          bool        `firestore:"hasAnswer" json:"hasAnswer"`
 	ExpectedAnswer     *bool       `firestore:"expectedAnswer,omitempty" json:"expectedAnswer,omitempty"`
+	ContractorSign     bool        `json:"contractorSign,omitempty" firestore:"contractorSign,omitempty"`
+	CompanySign        bool        `json:"companySign,omitempty" firestore:"companySign,omitempty"`
 }
 
 type Question struct {
+	Id             int64  `json:"id" firestore:"id"`
 	Question       string `firestore:"question,omitempty" json:"question,omitempty"`
 	IsBold         bool   `firestore:"isBold,omitempty" json:"isBold,omitempty"`
 	Indent         bool   `firestore:"indent,omitempty" json:"indent,omitempty"`

@@ -48,15 +48,17 @@ func LifeAxa(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, []by
 
 	surveysSection(pdf, policy)
 
-	statementsSection(pdf, policy)
-
 	pdf.AddPage()
+
+	statementsSection(pdf, policy)
 
 	offerResumeSection(pdf, policy)
 
 	paymentResumeSection(pdf, policy)
 
 	contractWithdrawlSection(pdf)
+
+	pdf.AddPage()
 
 	paymentMethodSection(pdf)
 
@@ -359,13 +361,12 @@ func surveysSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	}
 
 	getParagraphTitle(pdf, "Dichiarazioni da leggere con attenzione prima di firmare")
-	err := printSurvey(pdf, surveys[0])
+	err := printSurvey(pdf, surveys[0], policy.Company)
 	lib.CheckError(err)
 
-	pdf.AddPage()
 	getParagraphTitle(pdf, "Questionario Medico")
 	for _, survey := range surveys[1:] {
-		err := printSurvey(pdf, survey)
+		err := printSurvey(pdf, survey, policy.Company)
 		lib.CheckError(err)
 	}
 	// TODO: added when RVM will be implemented
@@ -381,26 +382,14 @@ func surveysSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 			setBlackBoldFont(pdf, standardTextSize)
 		}
 	*/
-	pdf.Ln(5)
-	drawSignatureForm(pdf)
-	pdf.Ln(5)
 }
 
 func statementsSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	statements := *policy.Statements
-	pdf.Ln(8)
 	for _, statement := range statements {
-		printStatement(pdf, statement)
+		printStatement(pdf, statement, policy.Company)
 	}
-	pdf.SetY(pdf.GetY() - 28)
-	setBlackBoldFont(pdf, standardTextSize)
-	pdf.MultiCell(70, 3, "AXA France Vie\n(Rappresentanza Generale per l'Italia)", "",
-		fpdf.AlignCenter, false)
-	var opt fpdf.ImageOptions
-	opt.ImageType = "png"
-	pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/firma_axa.png", 35, pdf.GetY()+3, 30, 8,
-		false, opt, 0, "")
-	pdf.Ln(15)
+
 }
 
 func offerResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
