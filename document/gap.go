@@ -35,11 +35,11 @@ func GapSogessur(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, 
 
 	vehicle := policy.Assets[0].Vehicle
 	contractor := policy.Contractor
-	insured := policy.Assets[0].Person
+	vehicleOwner := policy.Assets[0].Person
 
 	gapVehicleDataTable(pdf, vehicle)
 
-	gapPersonalInfoTable(pdf, contractor, *insured)
+	gapPersonalInfoTable(pdf, contractor, *vehicleOwner)
 
 	gapPolicyDataTable(pdf, policy)
 
