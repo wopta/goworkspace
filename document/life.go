@@ -52,8 +52,6 @@ func LifeAxa(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, []by
 
 	offerResumeSection(pdf, policy)
 
-	pdf.AddPage()
-
 	paymentResumeSection(pdf, policy)
 
 	contractWithdrawlSection(pdf)
@@ -358,7 +356,12 @@ func surveysSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 			" che precede."
 	}
 
-	for _, survey := range surveys {
+	getParagraphTitle(pdf, "Dichiarazioni da leggere con attenzione prima di firmare")
+	err := printSurvey(pdf, surveys[0], policy.Company)
+	lib.CheckError(err)
+
+	getParagraphTitle(pdf, "Questionario Medico")
+	for _, survey := range surveys[1:] {
 		err := printSurvey(pdf, survey, policy.Company)
 		lib.CheckError(err)
 	}
