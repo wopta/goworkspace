@@ -5,6 +5,8 @@ import (
 	"github.com/go-pdf/fpdf"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"sort"
+	"strings"
 )
 
 func GapContract(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, []byte) {
@@ -20,8 +22,6 @@ func GapContract(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, 
 
 func GapSogessur(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, []byte) {
 	signatureID = 0
-
-	//pageWidth, _ := pdf.GetPageSize()
 
 	mainMotorHeader(pdf, policy)
 
@@ -81,8 +81,8 @@ func gapVehicleDataTable(pdf *fpdf.Fpdf, vehicle *models.Vehicle) {
 	setWhiteBoldFont(pdf, standardTextSize)
 	pdf.SetFillColor(229, 0, 117)
 	pdf.SetDrawColor(229, 0, 117)
-	pdf.CellFormat(95, 5, "Dati Veicolo", "TBL", 0, fpdf.AlignLeft, true, 0, "")
-	pdf.CellFormat(95, 5, "Targa: "+vehicle.Plate, "TBR", 1, fpdf.AlignLeft, true, 0, "")
+	pdf.CellFormat(95, 5, "Dati Veicolo", "1", 0, fpdf.AlignLeft, true, 0, "")
+	pdf.CellFormat(95, 5, "Targa: "+vehicle.Plate, "1", 1, fpdf.AlignLeft, true, 0, "")
 
 	for x := 0; x < len(tableRows); x++ {
 		setPinkRegularFont(pdf, 8)
@@ -154,6 +154,16 @@ func gapPolicyDataTable(pdf *fpdf.Fpdf, policy *models.Policy) {
 		"complete": "Completa",
 	}
 
+	sort.Slice(policy.Assets[0].Guarantees, func(i, j int) bool {
+		return policy.Assets[0].Guarantees[i].Order < policy.Assets[0].Guarantees[j].Order
+	})
+
+	var guaranteesNames []string
+
+	for _, guarantee := range policy.Assets[0].Guarantees {
+		guaranteesNames = append(guaranteesNames, guarantee.CompanyName)
+	}
+
 	setWhiteBoldFont(pdf, standardTextSize)
 	pdf.SetFillColor(229, 0, 117)
 	pdf.SetDrawColor(229, 0, 117)
@@ -192,9 +202,9 @@ func gapPolicyDataTable(pdf *fpdf.Fpdf, policy *models.Policy) {
 		0, "")
 	setBlackRegularFont(pdf, 8)
 	// TODO: make this dynamic based on user choice
-	pdf.MultiCell(0, 4, "Include le seguenti garanzie, come definite nel Set Informativo"+
-		"\nDanno totale da Incendio, Furto totale e  Danno totale (perdita pecuniaria)", "BLR",
-		fpdf.AlignLeft, false)
+	pdf.MultiCell(0, 4, "Include le seguenti garanzie, come definite nel Set Informativo\n"+strings.Join(
+		guaranteesNames, ", "),
+		"BLR", fpdf.AlignLeft, false)
 
 	pdf.Ln(5)
 }
@@ -231,8 +241,9 @@ func gapConsentDeclaration(pdf *fpdf.Fpdf) {
 	setBlackBoldFont(pdf, standardTextSize)
 	pdf.SetDrawColor(0, 0, 0)
 	pdf.MultiCell(0, 3, "Consenso al trattemento dei dati personali", "", fpdf.AlignLeft, false)
+	pdf.Ln(1)
 	pdf.SetLineWidth(thinLineWidth)
-	pdf.Line(10, pdf.GetY(), 80, pdf.GetY())
+	pdf.Line(11, pdf.GetY(), 80, pdf.GetY())
 	pdf.Ln(1)
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "Il sottoscritto, dopo aver ricevuto copia e preso visione dell’Informativa "+

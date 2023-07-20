@@ -152,7 +152,7 @@ func mainFooter(pdf *fpdf.Fpdf, productName string) {
 		logoPath = lib.GetAssetPathByEnv(basePath) + "/logo_sogessur.png"
 		x = 151
 		y = 281
-		height = 8
+		height = 7
 
 	}
 
@@ -201,7 +201,7 @@ func sogessurHeader(pdf *fpdf.Fpdf) {
 		var opt fpdf.ImageOptions
 		pdf.SetXY(-30, 7)
 		opt.ImageType = "png"
-		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/logo_sogessur.png", 145, 7, 0, 8, false,
+		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/logo_sogessur.png", 160, 7, 0, 6, false,
 			opt, 0, "")
 		pdf.Ln(15)
 	})
