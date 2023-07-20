@@ -557,33 +557,6 @@ func paymentResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 		"o interessi di frazionamento.", "", "", false)
 }
 
-func contractWithdrawlSection(pdf *fpdf.Fpdf) {
-	getParagraphTitle(pdf, "Informativa sul diritto di recesso")
-	setBlackBoldFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3, "Diritto di recesso entro i primi 30 giorni dalla stipula ("+
-		"diritto di ripensamento)", "", "", false)
-	setBlackRegularFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3, "Il Contraente può recedere dal contratto entro il termine di 30 giorni dalla "+
-		"decorrenza dell’assicurazione (diritto di ripensamento). In tal caso, l’assicurazione si intende come mai "+
-		"entrata in vigore e la Compagnia, per il tramite dell’intermediario, provvederà a rimborsare al Contraente "+
-		"l’importo di Premio già versato (al netto delle imposte).", "", "", false)
-	setBlackBoldFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3, "Diritto di recesso annuale (disdetta alla annualità)", "", "",
-		false)
-	setBlackRegularFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3, "Il Contraente può recedere dal contratto annualmente, entro il termine di 30 "+
-		"giorni dalla scadenza annuale della polizza (disdetta alla annualità). In tal caso, l’assicurazione cessa alle "+
-		"ore 24:00 dell’ultimo giorno della annualità in corso. È possibile disdettare singolarmente una o più delle "+
-		"coperture attivate in fase di sottoscrizione.", "", "", false)
-	setBlackBoldFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3, "Modalità per l’esercizio del diritto di recesso", "", "", false)
-	setBlackRegularFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3, "Il Contraente è tenuto ad esercitare il diritto di recesso mediante invio di una "+
-		"lettera raccomandata a.r. al seguente indirizzo: Wopta Assicurazioni srl – Gestione Portafoglio – Galleria del "+
-		"Corso, 1 – 201212 Milano (MI) oppure via posta elettronica certificata (PEC) all’indirizzo "+
-		"email: woptaassicurazioni@legalmail.it", "", "", false)
-}
-
 func axaDeclarationsConsentSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	setBlackBoldFont(pdf, standardTextSize)
 	pdf.Cell(0, 3, "DICHIARAZIONI E CONSENSI")

@@ -47,6 +47,8 @@ func GapSogessur(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, 
 
 	pdf.AddPage()
 
+	contractWithdrawlSection(pdf)
+
 	companiesDescriptionSection(pdf, policy.Company)
 
 	sogessurHeader(pdf)
