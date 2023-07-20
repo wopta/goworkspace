@@ -124,8 +124,8 @@ type Survey struct {
 	Answer             *bool       `firestore:"answer,omitempty" json:"answer,omitempty"`
 	HasAnswer          bool        `firestore:"hasAnswer" json:"hasAnswer"`
 	ExpectedAnswer     *bool       `firestore:"expectedAnswer,omitempty" json:"expectedAnswer,omitempty"`
-	ContractorSign     bool        `json:"contractorSign,omitempty" firestore:"contractorSign,omitempty"`
-	CompanySign        bool        `json:"companySign,omitempty" firestore:"companySign,omitempty"`
+	ContractorSign     bool        `json:"contractorSign" firestore:"contractorSign"`
+	CompanySign        bool        `json:"companySign" firestore:"companySign"`
 }
 
 type Statement struct {
@@ -137,8 +137,8 @@ type Statement struct {
 	Answer             *bool       `firestore:"answer,omitempty" json:"answer,omitempty"`
 	HasAnswer          bool        `firestore:"hasAnswer" json:"hasAnswer"`
 	ExpectedAnswer     *bool       `firestore:"expectedAnswer,omitempty" json:"expectedAnswer,omitempty"`
-	ContractorSign     bool        `json:"contractorSign,omitempty" firestore:"contractorSign,omitempty"`
-	CompanySign        bool        `json:"companySign,omitempty" firestore:"companySign,omitempty"`
+	ContractorSign     bool        `json:"contractorSign" firestore:"contractorSign"`
+	CompanySign        bool        `json:"companySign" firestore:"companySign"`
 }
 
 type Question struct {
