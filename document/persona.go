@@ -145,8 +145,6 @@ func personaSurveySection(pdf *fpdf.Fpdf, policy *models.Policy) {
 		err := printSurvey(pdf, survey, policy.Company)
 		lib.CheckError(err)
 	}
-
-	pdf.Ln(10)
 }
 
 func personaStatementsSection(pdf *fpdf.Fpdf, policy *models.Policy) {

@@ -162,7 +162,7 @@ func checkSurveySpace(pdf *fpdf.Fpdf, survey models.Survey) {
 	leftMargin, _, rightMargin, _ := pdf.GetMargins()
 	pageWidth, pageHeight := pdf.GetPageSize()
 	availableWidth := pageWidth - leftMargin - rightMargin - 2
-	requiredHeight := 0.0
+	requiredHeight := 5.0
 	currentY := pdf.GetY()
 
 	surveyTitle := survey.Title
@@ -288,7 +288,7 @@ func printSurvey(pdf *fpdf.Fpdf, survey models.Survey, companyName string) error
 		}
 		pdf.MultiCell(availableWidth, 3.5, question.Question+dotsString, "", fpdf.AlignLeft, false)
 	}
-	pdf.Ln(5)
+	pdf.Ln(3)
 
 	if survey.CompanySign {
 		companySignature(pdf, companyName)
@@ -304,7 +304,7 @@ func checkStatementSpace(pdf *fpdf.Fpdf, statement models.Statement) {
 	leftMargin, _, rightMargin, _ := pdf.GetMargins()
 	pageWidth, pageHeight := pdf.GetPageSize()
 	availableWidth := pageWidth - leftMargin - rightMargin - 2
-	requiredHeight := 0.0
+	requiredHeight := 5.0
 	currentY := pdf.GetY()
 
 	title := statement.Title
@@ -380,7 +380,7 @@ func printStatement(pdf *fpdf.Fpdf, statement models.Statement, companyName stri
 		}
 		pdf.MultiCell(0, 3.5, text, "", fpdf.AlignLeft, false)
 	}
-	pdf.Ln(5)
+	pdf.Ln(3)
 
 	if statement.CompanySign {
 		companySignature(pdf, companyName)
