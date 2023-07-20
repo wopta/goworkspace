@@ -26,6 +26,12 @@ func Question(w http.ResponseWriter, r *http.Request) {
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
+				Route:   "/v1/statements/gap",
+				Handler: GapStatementsFx,
+				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAll},
+			},
+			{
 				Route:   "/v1/survey/life",
 				Handler: LifeSurvey,
 				Method:  http.MethodPost,

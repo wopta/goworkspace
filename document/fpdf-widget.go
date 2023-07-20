@@ -625,6 +625,15 @@ func companySignature(pdf *fpdf.Fpdf, companyName string) {
 		opt.ImageType = "png"
 		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/firma_axa.png", 35, pdf.GetY()+9, 30, 8,
 			false, opt, 0, "")
+	case "sogessur":
+		setBlackBoldFont(pdf, standardTextSize)
+		pdf.MultiCell(70, 3, "Sogessur SA\n(Rappresentanza Generale per l'Italia)", "",
+			fpdf.AlignCenter, false)
+		pdf.SetY(pdf.GetY() - 6)
+		var opt fpdf.ImageOptions
+		opt.ImageType = "png"
+		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/firma_axa.png", 35, pdf.GetY()+9, 30, 8,
+			false, opt, 0, "")
 	}
 }
 
@@ -653,5 +662,7 @@ func contractWithdrawlSection(pdf *fpdf.Fpdf) {
 		"lettera raccomandata a.r. al seguente indirizzo: Wopta Assicurazioni srl – Gestione Portafoglio – Galleria del "+
 		"Corso, 1 – 201212 Milano (MI) oppure via posta elettronica certificata (PEC) all’indirizzo "+
 		"email: woptaassicurazioni@legalmail.it", "", "", false)
-	pdf.Ln(3)
+	pdf.Ln(5)
+	drawSignatureForm(pdf)
+	pdf.Ln(5)
 }

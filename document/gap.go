@@ -5,6 +5,7 @@ import (
 	"github.com/go-pdf/fpdf"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/question"
 	"sort"
 	"strings"
 )
@@ -47,7 +48,13 @@ func GapSogessur(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, 
 
 	pdf.AddPage()
 
+	gapStatements(pdf, policy)
+
 	contractWithdrawlSection(pdf)
+
+	gapClauseApprovalSection(pdf)
+
+	pdf.AddPage()
 
 	companiesDescriptionSection(pdf, policy.Company)
 
@@ -236,6 +243,29 @@ func gapPriceTable(pdf *fpdf.Fpdf, policy *models.Policy) {
 	pdf.CellFormat(0, 5, lib.HumanaizePriceEuro(policy.PriceGross), "BR", 1, fpdf.AlignCenter,
 		false, 0, "")
 
+	pdf.Ln(5)
+}
+
+func gapStatements(pdf *fpdf.Fpdf, policy *models.Policy) {
+	var statements []models.Statement
+
+	if policy.Statements == nil {
+		statements = question.GapStatements(*policy)
+	}
+
+	for _, statement := range statements {
+		printStatement(pdf, statement, policy.Company)
+	}
+}
+
+func gapClauseApprovalSection(pdf *fpdf.Fpdf) {
+	getParagraphTitle(pdf, "Le clausole della Polizza da approvare in modo specifico")
+	setBlackRegularFont(pdf, standardTextSize)
+	pdf.MultiCell(0, 3, "Il sottoscritto dichiara di approvare, ai sensi e per gli effetti degli artt. "+
+		"1341 e 1342 del codice civile, i seguenti articoli delle Condizioni di Assicurazione: INSERIRE VESSATORIE",
+		"", fpdf.AlignLeft, false)
+	pdf.Ln(5)
+	drawSignatureForm(pdf)
 	pdf.Ln(5)
 }
 
