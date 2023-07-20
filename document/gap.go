@@ -106,9 +106,9 @@ func gapPersonalInfoTable(pdf *fpdf.Fpdf, contractor, insured models.User) {
 	setWhiteBoldFont(pdf, standardTextSize)
 	pdf.SetFillColor(229, 0, 117)
 	pdf.SetDrawColor(229, 0, 117)
-	pdf.CellFormat(30, 5, "Dati Personali", "TBL", 0, fpdf.AlignLeft, true, 0, "")
-	pdf.CellFormat(65, 5, "Contraente", "TBL", 0, fpdf.AlignCenter, true, 0, "")
-	pdf.CellFormat(95, 5, "Assicurato", "TBR", 1, fpdf.AlignCenter, true, 0, "")
+	pdf.CellFormat(30, 5, "Dati Personali", "1", 0, fpdf.AlignLeft, true, 0, "")
+	pdf.CellFormat(65, 5, "Contraente", "1", 0, fpdf.AlignCenter, true, 0, "")
+	pdf.CellFormat(95, 5, "Assicurato", "1", 1, fpdf.AlignCenter, true, 0, "")
 
 	tableRows := [][]string{
 		{"Cognome e Nome", contractor.Surname + " " + contractor.Name, "Cognome e Nome",
@@ -158,7 +158,7 @@ func gapPolicyDataTable(pdf *fpdf.Fpdf, policy *models.Policy) {
 	setWhiteBoldFont(pdf, standardTextSize)
 	pdf.SetFillColor(229, 0, 117)
 	pdf.SetDrawColor(229, 0, 117)
-	pdf.CellFormat(190, 5, "Dati di polizza", "TBL", 1, fpdf.AlignLeft, true, 0,
+	pdf.CellFormat(190, 5, "Dati di polizza", "1", 1, fpdf.AlignLeft, true, 0,
 		"")
 
 	setPinkRegularFont(pdf, 8)
@@ -204,8 +204,8 @@ func gapPriceTable(pdf *fpdf.Fpdf, policy *models.Policy) {
 	setWhiteBoldFont(pdf, standardTextSize)
 	pdf.SetFillColor(229, 0, 117)
 	pdf.SetDrawColor(229, 0, 117)
-	pdf.CellFormat(30, 5, "Premio", "TBL", 0, fpdf.AlignLeft, true, 0, "")
-	pdf.CellFormat(0, 5, "Unico Anticipato", "TBR", 1, fpdf.AlignCenter, true, 0,
+	pdf.CellFormat(30, 5, "Premio", "1", 0, fpdf.AlignLeft, true, 0, "")
+	pdf.CellFormat(0, 5, "Unico Anticipato", "1", 1, fpdf.AlignCenter, true, 0,
 		"")
 
 	setPinkRegularFont(pdf, 8)

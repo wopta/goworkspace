@@ -210,7 +210,7 @@ func sogessurHeader(pdf *fpdf.Fpdf) {
 
 func sogessurFooter(pdf *fpdf.Fpdf) {
 	pdf.SetFooterFunc(func() {
-		pdf.SetXY(10, -25)
+		pdf.SetXY(10, -12)
 		setBlackRegularFont(pdf, smallTextSize)
 		pdf.MultiCell(0, 3, "Sogecap SA – Rappresentanza Generale per l’Italia con sede in Via Tiziano, "+
 			"32 – 20145 Milano – Iscritta alla CCIAA di Milano P.I. 07160010968 – REA MI 1939709", "",
