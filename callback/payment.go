@@ -113,7 +113,8 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 				Byte:        base64.StdEncoding.EncodeToString(contractbyte),
 				ContentType: "application/pdf",
 				Name: p.Contractor.Name + "_" + p.Contractor.Surname + "_" +
-					strings.ReplaceAll(p.NameDesc, " ", "_") + "_contratto.pdf",
+					strings.ReplaceAll(p.Contractor.Name+"_"+p.Contractor.Surname+"_"+p.NameDesc, " ",
+						"_") + "_contratto.pdf",
 			}})
 
 			response = `{
