@@ -632,7 +632,7 @@ func companySignature(pdf *fpdf.Fpdf, companyName string) {
 		pdf.SetY(pdf.GetY() - 6)
 		var opt fpdf.ImageOptions
 		opt.ImageType = "png"
-		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/firma_axa.png", 35, pdf.GetY()+9, 30, 8,
+		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/firma_sogessur.png", 30, pdf.GetY()+9, 30, 8,
 			false, opt, 0, "")
 	}
 }
