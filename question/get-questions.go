@@ -66,7 +66,7 @@ func GetStatements(policy models.Policy) []models.Statement {
 
 func GetSurveys(policy models.Policy) []models.Survey {
 	const (
-		rulesFilenameSuffix = "_survey.json"
+		rulesFilenameSuffix = "_surveys.json"
 	)
 
 	policyJson, err := policy.Marshal()
