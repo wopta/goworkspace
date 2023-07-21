@@ -16,7 +16,7 @@ func PersonHandler(w http.ResponseWriter, r *http.Request) (string, interface{},
 		err     error
 	)
 
-	log.Println("Person Sellable")
+	log.Println("Persona Sellable")
 
 	authToken, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
 	lib.CheckError(err)
@@ -36,11 +36,11 @@ func Person(role string, body []byte) *models.Product {
 		err    error
 	)
 	const (
-		rulesFileName = "person.json"
+		rulesFileName = "persona.json"
 	)
 
 	quotingInputData := getRulesInputData(&policy, err, body)
-	product, err := prd.GetProduct("persona", "v1", role)
+	product, err := prd.GetProduct(policy.Name, policy.ProductVersion, role)
 	lib.CheckError(err)
 
 	fx := new(models.Fx)
