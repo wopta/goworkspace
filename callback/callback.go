@@ -6,7 +6,6 @@ import (
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
 )
 
 func init() {
@@ -25,19 +24,19 @@ func Callback(w http.ResponseWriter, r *http.Request) {
 				Route:   "/v1/sign",
 				Handler: SignFx,
 				Method:  http.MethodGet,
-				Roles:   []string{models.UserRoleAll},
+				Roles:   []string{},
 			},
 			{
 				Route:   "/v1/payment",
 				Handler: PaymentFx,
 				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAll},
+				Roles:   []string{},
 			},
 			{
 				Route:   "/v1/emailVerify",
 				Handler: EmailVerify,
 				Method:  http.MethodGet,
-				Roles:   []string{models.UserRoleAll},
+				Roles:   []string{},
 			},
 		},
 	}

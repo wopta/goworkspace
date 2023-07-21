@@ -170,14 +170,13 @@ func setRow(policy models.Policy, df dataframe.DataFrame, trans models.Transacti
 				"",                        //campo disponibile
 				"",                        //% di sovrappremio da applicare alla garanzia
 				"W1",                      //Codice Concessionario /dipendenti (iscr.E)
-				"",                        //Codice Banca
 				"",                        //Codice Campagna
 				"T",                       //Copertura Assicurativa: Totale o Pro quota
 				"",                        //% assicurata dell'assicurato
 				"",                        //campo disponibile
 				"",                        //Maxi rata finale/Valore riscatto
 				"",                        //Stato occupazionale dell'Assicurato
-				"2",                       //Tipo aderente
+				"1",                       //Tipo aderente
 				"WEB",                     //Canale di vendita
 				"PF",                      //Tipo contraente / Contraente
 				policy.Contractor.Surname, //Denominazione Sociale o Cognome contraente
@@ -208,7 +207,7 @@ func setRow(policy models.Policy, df dataframe.DataFrame, trans models.Transacti
 				ChekDomicilie(policy.Contractor).Locality,   //Comune di domicilio
 				ChekDomicilie(policy.Contractor).CityCode,   //Provincia di domicilio
 				policy.Contractor.BirthCity,                 //Luogo di nascita dell’contraente persona fisica
-				policy.Contractor.BirthCity,                 //Provincia di nascita dell’contraente persona fisica
+				policy.Contractor.BirthProvince,             //Provincia di nascita dell’contraente persona fisica
 				"086",                                       //Stato di residenza dell’contraente
 				residenceCab,                                //Cab della città di residenza dell’contraente
 				"600",                                       //Sottogruppo attività economica
@@ -433,7 +432,7 @@ func getFormatBithdate(d string) string {
 	if d != "" {
 		splitD := strings.Split(d, "-")
 		split2 := strings.Split(splitD[2], "T")
-		res = splitD[0] + splitD[1] + split2[0]
+		res = splitD[2] + splitD[1] + split2[0]
 	}
 	return res
 
@@ -461,7 +460,7 @@ func getRenewDate(p models.Policy, trans models.Transaction) time.Time {
 	if p.PaymentSplit == "year" {
 		result = p.StartDate
 	}
-	if p.PaymentSplit == "montly" {
+	if p.PaymentSplit == string(models.PaySplitMonthly) {
 
 		if addMonth.Before(now) {
 			result = p.StartDate
@@ -509,6 +508,8 @@ func ChekDomicilie(u models.User) models.Address {
 	//log.Println(reflect.ValueOf(u.Domicile))
 	if reflect.ValueOf(u.Domicile).IsNil() {
 		res = *u.Residence
+	} else {
+		res = *u.Domicile
 	}
 	return res
 }
@@ -544,15 +545,15 @@ func MapBool(s bool) string {
 	}
 	return res
 }
-func ExistIdentityDocument(docs []*models.IdentityDocument) models.IdentityDocument {
+func ExistIdentityDocument(docs []*models.IdentityDocument) *models.IdentityDocument {
 	var (
-		result models.IdentityDocument
+		result *models.IdentityDocument
 	)
-	result = models.IdentityDocument{}
+	result = &models.IdentityDocument{}
 	if len(docs) > 0 {
 		for _, doc := range docs {
 			log.Println(doc)
-			//doc.DateOfIssue
+			result = doc
 
 		}
 
