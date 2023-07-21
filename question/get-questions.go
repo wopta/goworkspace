@@ -2,11 +2,17 @@ package question
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"io"
 	"log"
 	"net/http"
+)
+
+const (
+	statements = "statements"
+	surveys    = "surveys"
 )
 
 func GetQuestionsFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -24,12 +30,14 @@ func GetQuestionsFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	err = json.Unmarshal(body, &policy)
 
 	switch questionType {
-	case "statements":
+	case statements:
 		log.Printf("[GetQuestionFx] loading statements for %s product", policy.Name)
 		out = GetStatements(policy)
-	case "surveys":
+	case surveys:
 		log.Printf("[GetQuestionFx] loading surveys for %s product", policy.Name)
 		out = GetSurveys(policy)
+	default:
+		return "", nil, fmt.Errorf("questionType %s not allowed", questionType)
 	}
 
 	jsonOut, err := json.Marshal(out)
@@ -46,7 +54,7 @@ func GetStatements(policy models.Policy) []models.Statement {
 	lib.CheckError(err)
 
 	fx := new(models.Fx)
-	statements := &Statements{
+	statementsValue := &Statements{
 		Statements: make([]*models.Statement, 0),
 		Text:       "",
 	}
@@ -54,7 +62,7 @@ func GetStatements(policy models.Policy) []models.Statement {
 	rulesFile := lib.GetRulesFile(policy.Name + rulesFilenameSuffix)
 	data := loadExternalData(policy.Name)
 
-	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, statements, policyJson, data)
+	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, statementsValue, policyJson, data)
 
 	out := make([]models.Statement, 0)
 	for _, statement := range ruleOutput.(*Statements).Statements {
@@ -73,7 +81,7 @@ func GetSurveys(policy models.Policy) []models.Survey {
 	lib.CheckError(err)
 
 	fx := new(models.Fx)
-	surveys := &Surveys{
+	surveysValue := &Surveys{
 		Surveys: make([]*models.Survey, 0),
 		Text:    "",
 	}
@@ -81,7 +89,7 @@ func GetSurveys(policy models.Policy) []models.Survey {
 	rulesFile := lib.GetRulesFile(policy.Name + rulesFilenameSuffix)
 	data := loadExternalData(policy.Name)
 
-	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, surveys, policyJson, data)
+	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, surveysValue, policyJson, data)
 
 	out := make([]models.Survey, 0)
 	for _, survey := range ruleOutput.(*Surveys).Surveys {
@@ -94,7 +102,7 @@ func GetSurveys(policy models.Policy) []models.Survey {
 func loadExternalData(productName string) []byte {
 	var data []byte
 	switch productName {
-	case "persona":
+	case models.PersonaProduct:
 		data = []byte(getCoherenceData())
 	}
 	return data
