@@ -1,7 +1,6 @@
 package callback
 
 import (
-	"github.com/wopta/goworkspace/models"
 	"log"
 	"net/http"
 
@@ -26,19 +25,19 @@ func Callback(w http.ResponseWriter, r *http.Request) {
 				Route:   "/v1/sign",
 				Handler: Sign,
 				Method:  "GET",
-				Roles:   []string{models.UserRoleAll},
+				Roles:   []string{},
 			},
 			{
 				Route:   "/v1/payment",
 				Handler: Payment,
 				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAll},
+				Roles:   []string{},
 			},
 			{
 				Route:   "/v1/emailVerify",
 				Handler: EmailVerify,
 				Method:  "GET",
-				Roles:   []string{models.UserRoleAll},
+				Roles:   []string{},
 			},
 		},
 	}
