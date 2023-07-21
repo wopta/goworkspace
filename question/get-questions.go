@@ -9,35 +9,95 @@ import (
 	"net/http"
 )
 
-func PersonStatements(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func GetQuestionsFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
+		out    interface{}
 		policy models.Policy
 	)
-	const (
-		rulesFileName = "person_statements.json"
-	)
+	log.Println("[GetQuestionsFx]")
 
-	log.Println("Person Survey")
+	questionType := r.Header.Get("questionType")
+	log.Println("[GetQuestionFx] questionType " + questionType)
 
-	b, err := io.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	lib.CheckError(err)
-	err = json.Unmarshal(b, &policy)
+	err = json.Unmarshal(body, &policy)
+
+	switch questionType {
+	case "statements":
+		log.Printf("[GetQuestionFx] loading statements for %s product", policy.Name)
+		out = GetStatements(policy)
+	case "surveys":
+		log.Printf("[GetQuestionFx] loading surveys for %s product", policy.Name)
+		out = GetSurveys(policy)
+	}
+
+	jsonOut, err := json.Marshal(out)
+
+	return `{"` + questionType + `": ` + string(jsonOut) + `}`, out, err
+}
+
+func GetStatements(policy models.Policy) []models.Statement {
+	const (
+		rulesFilenameSuffix = "_statements.json"
+	)
 
 	policyJson, err := policy.Marshal()
 	lib.CheckError(err)
 
 	fx := new(models.Fx)
+	statements := &Statements{
+		Statements: make([]*models.Statement, 0),
+		Text:       "",
+	}
 
-	surveys := &Statements{Statements: make([]*models.Statement, 0), Text: ""}
+	rulesFile := lib.GetRulesFile(policy.Name + rulesFilenameSuffix)
+	data := loadExternalData(policy.Name)
 
-	rulesFile := lib.GetRulesFile(rulesFileName)
+	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, statements, policyJson, data)
 
-	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, surveys, policyJson, []byte(getCoherenceData()))
+	out := make([]models.Statement, 0)
+	for _, statement := range ruleOutput.(*Statements).Statements {
+		out = append(out, *statement)
+	}
 
-	ruleOutputJson, err := json.Marshal(ruleOutput)
+	return out
+}
+
+func GetSurveys(policy models.Policy) []models.Survey {
+	const (
+		rulesFilenameSuffix = "_survey.json"
+	)
+
+	policyJson, err := policy.Marshal()
 	lib.CheckError(err)
 
-	return string(ruleOutputJson), ruleOutput, nil
+	fx := new(models.Fx)
+	surveys := &Surveys{
+		Surveys: make([]*models.Survey, 0),
+		Text:    "",
+	}
+
+	rulesFile := lib.GetRulesFile(policy.Name + rulesFilenameSuffix)
+	data := loadExternalData(policy.Name)
+
+	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, surveys, policyJson, data)
+
+	out := make([]models.Survey, 0)
+	for _, survey := range ruleOutput.(*Surveys).Surveys {
+		out = append(out, *survey)
+	}
+
+	return out
+}
+
+func loadExternalData(productName string) []byte {
+	var data []byte
+	switch productName {
+	case "persona":
+		data = []byte(getCoherenceData())
+	}
+	return data
 }
 
 func getCoherenceData() string {
