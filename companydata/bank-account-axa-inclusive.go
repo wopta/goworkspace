@@ -48,10 +48,13 @@ func BankAccountAxaInclusive(w http.ResponseWriter, r *http.Request) (string, in
 
 	}
 	refMontly := now.AddDate(0, -1, 0)
-	filepath := "180623_" + strconv.Itoa(refMontly.Year()) + fmt.Sprintf("%02d", int(refMontly.Month())) + "_" + fmt.Sprintf("%02d", now.Day()) + ".xlsx"
-	lib.CreateExcel(result, "../tmp/"+filepath, "")
-	source, _ := ioutil.ReadFile("../tmp/" + filepath)
+	filepath := "180623_" + strconv.Itoa(refMontly.Year()) + fmt.Sprintf("%02d", int(refMontly.Month())) + "_" + fmt.Sprintf("%02d", now.Day())
+	lib.CreateExcel(result, "../tmp/"+filepath+".xlsx", "")
+	lib.WriteCsv("../tmp/"+filepath+".csv", result, ';')
+	source, _ := ioutil.ReadFile("../tmp/" + filepath + ".xlsx")
+	sourceCsv, _ := ioutil.ReadFile("../tmp/" + filepath + ".csv")
 	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/axa/inclusive/hype/"+strconv.Itoa(refMontly.Year())+"/"+fmt.Sprintf("%02d", int(refMontly.Month()))+"/"+filepath, source)
+	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/axa/inclusive/hype/"+strconv.Itoa(refMontly.Year())+"/"+fmt.Sprintf("%02d", int(refMontly.Month()))+"/"+filepath, sourceCsv)
 	//AxaSftpUpload("/HYPE/IN" + filepath)
 	return "", nil, e
 }
