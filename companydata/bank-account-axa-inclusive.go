@@ -55,8 +55,8 @@ func BankAccountAxaInclusive(w http.ResponseWriter, r *http.Request) (string, in
 	lib.WriteCsv("../tmp/"+filepath+".csv", result, ';')
 	source, _ := ioutil.ReadFile("../tmp/" + filepath + ".xlsx")
 	sourceCsv, _ := ioutil.ReadFile("../tmp/" + filepath + ".csv")
-	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/axa/inclusive/hype/"+strconv.Itoa(refMontly.Year())+"/"+fmt.Sprintf("%02d", int(refMontly.Month()))+"/"+filepath, source)
-	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/axa/inclusive/hype/"+strconv.Itoa(refMontly.Year())+"/"+fmt.Sprintf("%02d", int(refMontly.Month()))+"/"+filepath, sourceCsv)
+	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/axa/inclusive/hype/"+strconv.Itoa(refMontly.Year())+"/"+fmt.Sprintf("%02d", int(refMontly.Month()))+"/"+filepath+".xlsx", source)
+	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/axa/inclusive/hype/"+strconv.Itoa(refMontly.Year())+"/"+fmt.Sprintf("%02d", int(refMontly.Month()))+"/"+filepath+".csv", sourceCsv)
 	//AxaSftpUpload("/HYPE/IN/" + filepath + ".xlsx")
 	return "", nil, e
 }
@@ -101,7 +101,8 @@ func setInclusiveRow(mov inclusive.BankAccountMovement) [][]string {
 }
 func mapEndDate(mov inclusive.BankAccountMovement) string {
 	if mov.MovementType == "delete" {
-		return mov.EndDate.Format(layout)
+		endDate, _ := time.Parse("2006-01-02", mov.BigEndDate.Date.String())
+		return endDate.Format(layout)
 	}
 	return ""
 }
