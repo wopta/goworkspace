@@ -34,7 +34,7 @@ func BankAccountAxaInclusive(w http.ResponseWriter, r *http.Request) (string, in
 	to, e = time.Parse("2006-01-02", strconv.Itoa(M.Year())+"-"+fmt.Sprintf("%02d", int(M.Month()))+"-"+fmt.Sprintf("%02d", M.Day()))
 	log.Println(from)
 	log.Println(to)
-	query := "select * from `wopta." + dataMovement + "` where _PARTITIONTIME >'" + from.Format(layout) + " 00:00:00" + "' and _PARTITIONTIME <'" + to.Format(layout) + " 00:00:00" + "'"
+	query := "select * from `wopta." + dataMovement + "` where _PARTITIONTIME >'" + from.Format(layout) + " 00:00:00" + "' and _PARTITIONTIME <'" + to.Format(layout) + " 23:59:00" + "'"
 	log.Println(query)
 	bankaccountlist, e := lib.QueryRowsBigQuery[inclusive.BankAccountMovement](query)
 	log.Println(e)

@@ -24,6 +24,8 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		filenamesplit string
 		cabCsv        []byte
 		result        [][]string
+		refMontly     time.Time
+		upload        bool
 	)
 	log.Println("----------------LifeAxalEmit-----------------")
 	now := time.Now()
@@ -31,20 +33,33 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	Q2 := time.Now().AddDate(0, 0, -1)
 
 	if now.Day() == 16 {
+		upload = true
+		refMontly = now
 		log.Println("LifeAxalEmit q1")
 		from, e = time.Parse("2006-01-02", strconv.Itoa(now.Year())+"-"+fmt.Sprintf("%02d", int(now.Month()))+"-"+fmt.Sprintf("%02d", 1))
 		to, e = time.Parse("2006-01-02", strconv.Itoa(now.Year())+"-"+fmt.Sprintf("%02d", int(now.Month()))+"-"+fmt.Sprintf("%02d", 16))
 		filenamesplit = "Q"
 	} else if now.Day() == 1 {
+		upload = true
+		refMontly = now.AddDate(0, -1, 0)
 		log.Println("LifeAxalEmit q2")
 		from, e = time.Parse("2006-01-02", strconv.Itoa(Q2.Year())+"-"+fmt.Sprintf("%02d", int(Q2.Month()))+"-"+fmt.Sprintf("%02d", 16))
 		to, e = time.Parse("2006-01-02", strconv.Itoa(Q2.Year())+"-"+fmt.Sprintf("%02d", int(Q2.Month()))+"-"+fmt.Sprintf("%02d", Q2.Day()))
 		filenamesplit = "Q"
 	} else if now.Day() == 2 {
+		upload = true
+		refMontly = now.AddDate(0, -1, 0)
 		log.Println("LifeAxalEmit M")
 		from, e = time.Parse("2006-01-02", strconv.Itoa(M.Year())+"-"+fmt.Sprintf("%02d", int(M.Month()))+"-"+fmt.Sprintf("%02d", 1))
 		to, e = time.Parse("2006-01-02", strconv.Itoa(M.Year())+"-"+fmt.Sprintf("%02d", int(M.Month()))+"-"+fmt.Sprintf("%02d", M.Day()))
 		filenamesplit = "M"
+	} else {
+		upload = false
+		refMontly = now.AddDate(0, -1, 0)
+		log.Println("LifeAxalEmit ALL")
+		from, e = time.Parse("2006-01-02", "2023-06-01")
+		to, e = time.Parse("2006-01-02", "2023-07-23")
+		filenamesplit = "A"
 	}
 	switch os.Getenv("env") {
 	case "local":
@@ -111,12 +126,13 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 
 	}
 
-	refMontly := now.AddDate(0, -1, 0)
 	filepath := "WOPTAKEYweb_NB" + filenamesplit + "_" + strconv.Itoa(refMontly.Year()) + fmt.Sprintf("%02d", int(refMontly.Month())) + "_" + fmt.Sprintf("%02d", now.Day()) + fmt.Sprintf("%02d", int(now.Month())) + ".txt"
 	lib.WriteCsv("../tmp/"+filepath, result, ';')
 	source, _ := ioutil.ReadFile("../tmp/" + filepath)
 	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/axa/life/"+strconv.Itoa(refMontly.Year())+"/"+filepath, source)
-	AxaPartnersSftpUpload(filepath)
+	if upload {
+		AxaPartnersSftpUpload(filepath)
+	}
 	return "", nil, e
 }
 func setRow(policy models.Policy, df dataframe.DataFrame, trans models.Transaction) [][]string {
