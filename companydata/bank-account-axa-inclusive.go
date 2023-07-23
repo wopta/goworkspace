@@ -70,24 +70,25 @@ func setInclusiveRow(mov inclusive.BankAccountMovement) [][]string {
 		_, user, _ = ExtractUserDataFromFiscalCode(mov.FiscalCode)
 	}
 	birthDate, _ := time.Parse("1980-12-09T00:00:00Z", user.BirthDate)
+	startDate, _ := time.Parse("2006-01-02", mov.BigStartDate.Date.String())
 	log.Println(mov.StartDate)
 	row := []string{
-		"180623",                     // NUMERO POLIZZA
-		"T",                          //    LOB
-		"C",                          //    TIPOLOGIA POLIZZA
-		"0548100",                    //    CODICE CONFIGURAZIONE
-		"1",                          //    TIPO OGGETTO ASSICURATO
-		mov.HypeId,                   //    IDENTIFICATIVO UNIVOCO APPLICAZIONE
-		mov.FiscalCode,               //    CODICE FISCALE / P.IVA ASSICURATO
-		mov.Surname,                  //    COGNOME / RAGIONE SOCIALE ASSICURATO
-		mov.Name,                     //    NOME ASSICURATO
-		"",                           //    INDIRIZZO RESIDENZA ASSICURATO
-		"",                           //    CAP RESIDENZA ASSICURATO
-		"",                           //    CITTA' RESIDENZA ASSICURATO
-		"",                           //    PROVINCIA RESIDENZA ASSICURATO
-		birthDate.Format(layout),     //    DATA DI NASCITA ASSICURATO 1980-12-09T00:00:00Z
-		mov.StartDate.Format(layout), //    DATA INIZIO VALIDITA' COPERTURA
-		mapEndDate(mov),              //    DATA FINE VALIDITA' COPERTURA
+		"180623",                 // NUMERO POLIZZA
+		"T",                      //    LOB
+		"C",                      //    TIPOLOGIA POLIZZA
+		"0548100",                //    CODICE CONFIGURAZIONE
+		"1",                      //    TIPO OGGETTO ASSICURATO
+		mov.HypeId,               //    IDENTIFICATIVO UNIVOCO APPLICAZIONE
+		mov.FiscalCode,           //    CODICE FISCALE / P.IVA ASSICURATO
+		mov.Surname,              //    COGNOME / RAGIONE SOCIALE ASSICURATO
+		mov.Name,                 //    NOME ASSICURATO
+		"",                       //    INDIRIZZO RESIDENZA ASSICURATO
+		"",                       //    CAP RESIDENZA ASSICURATO
+		"",                       //    CITTA' RESIDENZA ASSICURATO
+		"",                       //    PROVINCIA RESIDENZA ASSICURATO
+		birthDate.Format(layout), //    DATA DI NASCITA ASSICURATO 1980-12-09T00:00:00Z
+		startDate.Format(layout), //    DATA INIZIO VALIDITA' COPERTURA
+		mapEndDate(mov),          //    DATA FINE VALIDITA' COPERTURA
 		StringMapping(mov.MovementType, map[string]string{
 			"insert": "A",
 			"delete": "E",
