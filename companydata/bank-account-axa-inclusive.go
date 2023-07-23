@@ -19,7 +19,7 @@ const (
 	dataBanckAccount = "inclusive_bank_account"
 	dateString       = "2021-11-22"
 	layout           = "02/01/2006"
-	layoutQuery      = "2006-02-01"
+	layoutQuery      = "2006-01-02"
 )
 
 func BankAccountAxaInclusive(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
