@@ -11,6 +11,7 @@ import (
 
 	"github.com/wopta/goworkspace/inclusive"
 	lib "github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 )
 
 const (
@@ -26,6 +27,7 @@ func BankAccountAxaInclusive(w http.ResponseWriter, r *http.Request) (string, in
 		to     time.Time
 		result [][]string
 	)
+	log.Println("----------------BankAccountAxaInclusive-----------------")
 	now := time.Now()
 	M := time.Now().AddDate(0, 0, -2)
 	date, _ := time.Parse("2006-01-02", dateString)
@@ -55,8 +57,12 @@ func BankAccountAxaInclusive(w http.ResponseWriter, r *http.Request) (string, in
 func setInclusiveRow(mov inclusive.BankAccountMovement) [][]string {
 	var (
 		result [][]string
+		user   models.User
 	)
-	_, user, _ := ExtractUserDataFromFiscalCode(mov.FiscalCode)
+	log.Println(mov.FiscalCode)
+	if mov.FiscalCode != "" {
+		_, user, _ = ExtractUserDataFromFiscalCode(mov.FiscalCode)
+	}
 	row := []string{
 		"180623",                     // NUMERO POLIZZA
 		"T",                          //    LOB
