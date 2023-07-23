@@ -69,7 +69,7 @@ func setInclusiveRow(mov inclusive.BankAccountMovement) [][]string {
 	if mov.FiscalCode != "" {
 		_, user, _ = ExtractUserDataFromFiscalCode(mov.FiscalCode)
 	}
-	birthDate, _ := time.Parse("1980-12-09T00:00:00Z", user.BirthDate)
+	birthDate, _ := time.Parse("2006-01-02T15:04:05Z07:00", user.BirthDate)
 	startDate, _ := time.Parse("2006-01-02", mov.BigStartDate.Date.String())
 	log.Println(mov.StartDate)
 	row := []string{
