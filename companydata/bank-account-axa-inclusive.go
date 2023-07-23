@@ -18,7 +18,7 @@ const (
 	dataMovement     = "inclusive_bank_account_movement"
 	dataBanckAccount = "inclusive_bank_account"
 	dateString       = "2021-11-22"
-	layout           = "2006-01-02"
+	layout           = "02/01/2006"
 )
 
 func BankAccountAxaInclusive(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -42,6 +42,7 @@ func BankAccountAxaInclusive(w http.ResponseWriter, r *http.Request) (string, in
 
 	log.Println("len(bankaccountlist): ", len(bankaccountlist))
 	//result = append(result, getHeader())
+	result = append(result, getHeaderInclusiveBank())
 	for _, mov := range bankaccountlist {
 
 		result = append(result, setInclusiveRow(mov)...)
@@ -55,7 +56,7 @@ func BankAccountAxaInclusive(w http.ResponseWriter, r *http.Request) (string, in
 	sourceCsv, _ := ioutil.ReadFile("../tmp/" + filepath + ".csv")
 	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/axa/inclusive/hype/"+strconv.Itoa(refMontly.Year())+"/"+fmt.Sprintf("%02d", int(refMontly.Month()))+"/"+filepath, source)
 	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/axa/inclusive/hype/"+strconv.Itoa(refMontly.Year())+"/"+fmt.Sprintf("%02d", int(refMontly.Month()))+"/"+filepath, sourceCsv)
-	//AxaSftpUpload("/HYPE/IN" + filepath)
+	//AxaSftpUpload("/HYPE/IN/" + filepath + ".xlsx")
 	return "", nil, e
 }
 func setInclusiveRow(mov inclusive.BankAccountMovement) [][]string {
@@ -67,6 +68,8 @@ func setInclusiveRow(mov inclusive.BankAccountMovement) [][]string {
 	if mov.FiscalCode != "" {
 		_, user, _ = ExtractUserDataFromFiscalCode(mov.FiscalCode)
 	}
+	birthDate, _ := time.Parse("1980-12-09T00:00:00Z", user.BirthDate)
+	log.Println(mov.StartDate)
 	row := []string{
 		"180623",                     // NUMERO POLIZZA
 		"T",                          //    LOB
@@ -81,7 +84,7 @@ func setInclusiveRow(mov inclusive.BankAccountMovement) [][]string {
 		"",                           //    CAP RESIDENZA ASSICURATO
 		"",                           //    CITTA' RESIDENZA ASSICURATO
 		"",                           //    PROVINCIA RESIDENZA ASSICURATO
-		user.BirthDate,               //    DATA DI NASCITA ASSICURATO
+		birthDate.Format(layout),     //    DATA DI NASCITA ASSICURATO 1980-12-09T00:00:00Z
 		mov.StartDate.Format(layout), //    DATA INIZIO VALIDITA' COPERTURA
 		"",                           //    DATA FINE VALIDITA' COPERTURA
 		StringMapping(mov.MovementType, map[string]string{
@@ -93,4 +96,31 @@ func setInclusiveRow(mov inclusive.BankAccountMovement) [][]string {
 	result = append(result, row)
 
 	return result
+}
+func mapEndDate(mov inclusive.BankAccountMovement) string {
+	if mov.MovementType == "delete" {
+		return mov.EndDate.Format(layout)
+	}
+	return ""
+}
+func getHeaderInclusiveBank() []string {
+	return []string{
+		"NUMERO POLIZZA",                       // NUMERO POLIZZA
+		"LOB",                                  //    LOB
+		"TIPOLOGIA POLIZZA",                    //    TIPOLOGIA POLIZZA
+		"CODICE CONFIGURAZIONE",                //    CODICE CONFIGURAZIONE
+		"TIPO OGGETTO ASSICURATO",              //    TIPO OGGETTO ASSICURATO
+		"IDENTIFICATIVO UNIVOCO APPLICAZIONE",  //    IDENTIFICATIVO UNIVOCO APPLICAZIONE
+		"CODICE FISCALE / P.IVA ASSICURATO",    //    CODICE FISCALE / P.IVA ASSICURATO
+		"COGNOME / RAGIONE SOCIALE ASSICURATO", //    COGNOME / RAGIONE SOCIALE ASSICURATO
+		"NOME ASSICURATO",                      //    NOME ASSICURATO
+		"INDIRIZZO RESIDENZA ASSICURATO",       //    INDIRIZZO RESIDENZA ASSICURATO
+		"CAP RESIDENZA ASSICURATO",             //    CAP RESIDENZA ASSICURATO
+		" CITTA' RESIDENZA ASSICURATO",         //    CITTA' RESIDENZA ASSICURATO
+		"PROVINCIA RESIDENZA ASSICURATO",       //    PROVINCIA RESIDENZA ASSICURATO
+		"DATA DI NASCITA ASSICURATO",           //    DATA DI NASCITA ASSICURATO
+		"DATA INIZIO VALIDITA' COPERTURA",      //    DATA INIZIO VALIDITA' COPERTURA
+		" DATA FINE VALIDITA' COPERTURA",       //    DATA FINE VALIDITA' COPERTURA
+		"TIPO MOVIMENTO",
+	}
 }
