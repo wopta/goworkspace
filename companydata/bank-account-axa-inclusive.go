@@ -19,6 +19,7 @@ const (
 	dataBanckAccount = "inclusive_bank_account"
 	dateString       = "2021-11-22"
 	layout           = "02/01/2006"
+	layoutQuery      = "2021-11-22"
 )
 
 func BankAccountAxaInclusive(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -36,7 +37,7 @@ func BankAccountAxaInclusive(w http.ResponseWriter, r *http.Request) (string, in
 	to, e = time.Parse("2006-01-02", strconv.Itoa(M.Year())+"-"+fmt.Sprintf("%02d", int(M.Month()))+"-"+fmt.Sprintf("%02d", M.Day()))
 	log.Println(from)
 	log.Println(to)
-	query := "select * from `wopta." + dataMovement + "` where _PARTITIONTIME >'" + from.Format(layout) + " 00:00:00" + "' and _PARTITIONTIME <'" + to.Format(layout) + " 23:59:00" + "'"
+	query := "select * from `wopta." + dataMovement + "` where _PARTITIONTIME >'" + from.Format(layoutQuery) + " 00:00:00" + "' and _PARTITIONTIME <'" + to.Format(layoutQuery) + " 23:59:00" + "'"
 	log.Println(query)
 	bankaccountlist, e := lib.QueryRowsBigQuery[inclusive.BankAccountMovement](query)
 
@@ -86,7 +87,7 @@ func setInclusiveRow(mov inclusive.BankAccountMovement) [][]string {
 		"",                           //    PROVINCIA RESIDENZA ASSICURATO
 		birthDate.Format(layout),     //    DATA DI NASCITA ASSICURATO 1980-12-09T00:00:00Z
 		mov.StartDate.Format(layout), //    DATA INIZIO VALIDITA' COPERTURA
-		"",                           //    DATA FINE VALIDITA' COPERTURA
+		mapEndDate(mov),              //    DATA FINE VALIDITA' COPERTURA
 		StringMapping(mov.MovementType, map[string]string{
 			"insert": "A",
 			"delete": "E",
