@@ -39,11 +39,9 @@ type Agency struct {
 }
 
 // TODO: missing Surname in Agency
-// TODO: missing VatCode in Agency
 type AgencyBigquery struct {
 	Uid             string                `bigquery:"uid"`
 	Name            string                `bigquery:"name"`
-	Surname         string                `bigquery:"surname"`
 	VatCode         string                `bigquery:"vatCode"`
 	IsActive        bool                  `bigquery:"isActive"`
 	RuiCode         string                `bigquery:"ruiCode"`
@@ -66,8 +64,7 @@ func (agency Agency) toBigquery() (AgencyBigquery, error) {
 	return AgencyBigquery{
 		Uid:             agency.Uid,
 		Name:            agency.Name,
-		Surname:         "",
-		VatCode:         "",
+		VatCode:         agency.VatCode,
 		IsActive:        agency.IsActive,
 		RuiCode:         agency.RuiCode,
 		RuiSection:      agency.RuiSection,
