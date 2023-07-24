@@ -34,7 +34,7 @@ func ExtractUserDataFromFiscalCode(fiscalCode string) (string, models.User, erro
 		codes map[string]map[string]string
 		user  = models.User{}
 	)
-
+	user.FiscalCode = fiscalCode
 	log.Println("Decode")
 
 	if len(fiscalCode) < 15 {
