@@ -24,6 +24,12 @@ func GapContract(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, 
 func GapSogessur(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, []byte) {
 	signatureID = 0
 
+	var statements []models.Statement
+
+	if policy.Statements == nil {
+		statements = question.GapStatements(*policy)
+	}
+
 	mainMotorHeader(pdf, policy)
 
 	mainFooter(pdf, policy.Name)
@@ -48,29 +54,33 @@ func GapSogessur(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, 
 
 	pdf.AddPage()
 
-	gapStatements(pdf, policy)
+	gapStatements(pdf, statements[:len(statements)-1], policy.Company)
 
-	contractWithdrawlSection(pdf)
+	//contractWithdrawlSection(pdf)
 
-	gapClauseApprovalSection(pdf)
+	//gapClauseApprovalSection(pdf)
 
-	pdf.AddPage()
+	//pdf.AddPage()
 
 	companiesDescriptionSection(pdf, policy.Company)
 
-	sogessurHeader(pdf)
+	/*sogessurHeader(pdf)
 
 	pdf.AddPage()
 
 	sogessurFooter(pdf)
 
-	gapConsentDeclaration(pdf)
-
-	woptaHeader(pdf)
+	gapConsentDeclaration(pdf)*/
 
 	pdf.AddPage()
 
 	woptaFooter(pdf)
+
+	printStatement(pdf, statements[len(statements)-1], policy.Company)
+
+	woptaHeader(pdf)
+
+	pdf.AddPage()
 
 	woptaPrivacySection(pdf)
 
@@ -246,15 +256,9 @@ func gapPriceTable(pdf *fpdf.Fpdf, policy *models.Policy) {
 	pdf.Ln(5)
 }
 
-func gapStatements(pdf *fpdf.Fpdf, policy *models.Policy) {
-	var statements []models.Statement
-
-	if policy.Statements == nil {
-		statements = question.GapStatements(*policy)
-	}
-
+func gapStatements(pdf *fpdf.Fpdf, statements []models.Statement, companyName string) {
 	for _, statement := range statements {
-		printStatement(pdf, statement, policy.Company)
+		printStatement(pdf, statement, companyName)
 	}
 }
 
