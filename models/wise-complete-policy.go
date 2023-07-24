@@ -32,7 +32,7 @@ func (wisePolicy *WiseCompletePolicy) ToDomain() Policy {
 	policy.Uid = fmt.Sprintf("wise:%d", wisePolicy.Id)
 	policy.Contractor = *wisePolicy.Contractors[0].Registry.ToDomain()
 	policy.CodeCompany = wisePolicy.PolicyNumber
-	
+
 	updatePolicyPrice(&policy, wisePolicy)
 
 	policy.ProductVersion = "v1"

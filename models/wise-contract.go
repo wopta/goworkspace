@@ -61,7 +61,7 @@ type WiseContract struct {
 }
 
 const (
-	WiseYearlyPaymentSplitCode = "01"
+	WiseYearlyPaymentSplitCode    = "01"
 	WiseSemestralPaymentSplitCode = "02"
-	WiseMonthlyPaymentSplitCode = "06"
+	WiseMonthlyPaymentSplitCode   = "06"
 )
