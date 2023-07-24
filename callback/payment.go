@@ -112,8 +112,8 @@ func PaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 			mail.SendMailContract(p, &[]mail.Attachment{{
 				Byte:        base64.StdEncoding.EncodeToString(contractbyte),
 				ContentType: "application/pdf",
-				Name: p.Contractor.Name + "_" + p.Contractor.Surname + "_" +
-					strings.ReplaceAll(p.NameDesc, " ", "_") + "_contratto.pdf",
+				Name: strings.ReplaceAll(p.Contractor.Name+"_"+p.Contractor.Surname+"_"+p.NameDesc, " ",
+					"_") + "_contratto.pdf",
 			}})
 
 			response = `{
