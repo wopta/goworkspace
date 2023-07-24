@@ -38,7 +38,6 @@ type Agency struct {
 	UpdatedDate     time.Time   `json:"updatedDate"            firestore:"updatedDate"`
 }
 
-// TODO: missing Surname in Agency
 type AgencyBigquery struct {
 	Uid             string                `bigquery:"uid"`
 	Name            string                `bigquery:"name"`
