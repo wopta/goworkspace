@@ -30,7 +30,7 @@ func GapSogessur(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, 
 		statements = question.GetStatements(*policy)
 	}
 
-	mainMotorHeader(pdf, policy)
+	gapHeader(pdf, policy)
 
 	mainFooter(pdf, policy.Name)
 
@@ -38,7 +38,7 @@ func GapSogessur(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, 
 
 	getParagraphTitle(pdf, "La tua assicurazione è operante sui dati sotto riportati, verifica la loro correttezza"+
 		" e segnala eventuali inesattezze")
-	pdf.Ln(5)
+	pdf.Ln(3)
 
 	vehicle := policy.Assets[0].Vehicle
 	contractor := policy.Contractor
@@ -52,7 +52,7 @@ func GapSogessur(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, 
 
 	gapPriceTable(pdf, policy)
 
-	pdf.AddPage()
+	pdf.Ln(3)
 
 	gapStatements(pdf, statements[:len(statements)-1], policy.Company)
 
@@ -72,6 +72,8 @@ func GapSogessur(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, 
 
 	gapConsentDeclaration(pdf)*/
 
+	woptaHeader(pdf)
+
 	pdf.AddPage()
 
 	woptaFooter(pdf)
@@ -90,11 +92,55 @@ func GapSogessur(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, 
 	return filename, out
 }
 
+func gapHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
+	var (
+		opt                   fpdf.ImageOptions
+		logoPath, productName string
+	)
+
+	switch policy.Name {
+	case "gap":
+		logoPath = lib.GetAssetPathByEnv(basePath) + "/logo_gap.png"
+		productName = "Auto Valore Protetto"
+	}
+
+	policyInfo := "Polizza Numero: " + policy.CodeCompany + "\n" +
+		"Targa Veicolo: " + policy.Assets[0].Vehicle.Plate + "\n" +
+		"Decorre dal: " + policy.StartDate.Format(dateLayout) + " ore 24:00\n" +
+		"Scade il: " + policy.EndDate.Format(dateLayout) + " ore 24:00"
+
+	pdf.SetHeaderFunc(func() {
+		opt.ImageType = "png"
+		pdf.ImageOptions(logoPath, 10, 6, 13, 13, false, opt, 0, "")
+		pdf.SetXY(23, 7)
+		setPinkBoldFont(pdf, 18)
+		pdf.Cell(10, 6, "Wopta per te")
+		setPinkItalicFont(pdf, 18)
+		pdf.SetXY(23, 13)
+		pdf.SetTextColor(92, 89, 92)
+		pdf.Cell(10, 6, productName)
+		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/ARTW_LOGO_RGB_400px.png", 135, 8, 0, 6, false, opt, 0, "")
+		pdf.SetX(pdf.GetX() + 126)
+		pdf.SetDrawColor(229, 0, 117)
+		pdf.SetLineWidth(0.5)
+		pdf.Line(pdf.GetX(), 8, pdf.GetX(), 14)
+		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/logo_sogessur.png", 161, 8, 0, 6, false, opt, 0, "")
+
+		setBlackBoldFont(pdf, standardTextSize)
+		pdf.SetXY(11, 20)
+		pdf.Cell(0, 3, "I dati della tua polizza")
+		setBlackRegularFont(pdf, standardTextSize)
+		pdf.SetXY(11, pdf.GetY()+3)
+		pdf.MultiCell(0, 3.5, policyInfo, "", "", false)
+		pdf.Ln(8)
+	})
+}
+
 func gapVehicleDataTable(pdf *fpdf.Fpdf, vehicle *models.Vehicle) {
 	tableRows := [][]string{
 		{"Tipo Veicolo", vehicle.VehicleType, "Data prima immatricolazione", vehicle.RegistrationDate.Format(dateLayout)},
 		{"Marca", vehicle.Manufacturer, "Stato veicolo", vehicle.Condition},
-		{"Modello", vehicle.Model, "Valore veicolo", lib.HumanaizePriceEuro(float64(vehicle.PriceValue))},
+		{"Modello", vehicle.Model, "Valore veicolo (*)", lib.HumanaizePriceEuro(float64(vehicle.PriceValue))},
 	}
 
 	setWhiteBoldFont(pdf, standardTextSize)
@@ -114,9 +160,19 @@ func gapVehicleDataTable(pdf *fpdf.Fpdf, vehicle *models.Vehicle) {
 		pdf.CellFormat(50, 5, tableRows[x][3], "BR", 1, fpdf.AlignLeft, false, 0, "")
 	}
 	setBlackRegularFont(pdf, 7)
-	pdf.MultiCell(0, 4, "*Veicolo Immatricolato in Italia ad uso privato, il peso a pieno carico non"+
-		" eccede le 3,5 tonnellate ed è già coperto da una polizza furto e incendio.", "1",
+	pdf.MultiCell(0, 4, "Il veicolo deve essere Immatricolato in Italia ad uso privato, con peso a pieno "+
+		"carico non eccedente le 3,5 tonnellate ed essere già coperto da una polizza furto e incendio. L’elenco di "+
+		"tutte le condizioni di assicurabilità è presente nel Set Informativo", "LR",
 		fpdf.AlignLeft, false)
+	setPinkRegularFont(pdf, 7)
+	pdf.CellFormat(pdf.GetStringWidth("(*) "), 4, "(*) ", "L", 0, fpdf.AlignLeft,
+		false, 0, "")
+	setBlackRegularFont(pdf, 7)
+	pdf.MultiCell(0, 4, "Valore Veicolo si intende:", "R", fpdf.AlignLeft, false)
+	pdf.MultiCell(0, 4, "- il valore di fattura se l’acquisto della polizza è contestuale all’acquisto "+
+		"del veicolo;", "LR", fpdf.AlignLeft, false)
+	pdf.MultiCell(0, 4, "- il valore commerciale al momento della sottoscrizione se l’acquisto della "+
+		"polizza è differito dall’acquisto del veicolo.", "BLR", fpdf.AlignLeft, false)
 	pdf.Ln(5)
 }
 
@@ -126,7 +182,7 @@ func gapPersonalInfoTable(pdf *fpdf.Fpdf, contractor, insured models.User) {
 	pdf.SetDrawColor(229, 0, 117)
 	pdf.CellFormat(30, 5, "Dati Personali", "1", 0, fpdf.AlignLeft, true, 0, "")
 	pdf.CellFormat(65, 5, "Contraente", "1", 0, fpdf.AlignCenter, true, 0, "")
-	pdf.CellFormat(95, 5, "Assicurato", "1", 1, fpdf.AlignCenter, true, 0, "")
+	pdf.CellFormat(95, 5, "Proprietario", "1", 1, fpdf.AlignCenter, true, 0, "")
 
 	tableRows := [][]string{
 		{"Cognome e Nome", contractor.Surname + " " + contractor.Name, "Cognome e Nome",
@@ -220,9 +276,8 @@ func gapPolicyDataTable(pdf *fpdf.Fpdf, policy *models.Policy) {
 		false,
 		0, "")
 	setBlackRegularFont(pdf, 8)
-	// TODO: make this dynamic based on user choice
-	pdf.MultiCell(0, 4, "Include le seguenti garanzie, come definite nel Set Informativo\n"+strings.Join(
-		guaranteesNames, ", "),
+	pdf.MultiCell(0, 4, "Include le seguenti garanzie: "+strings.Join(
+		guaranteesNames, ", ")+"\nPer il dettaglio delle garanzie vedere il Set Informativo.",
 		"BLR", fpdf.AlignLeft, false)
 
 	pdf.Ln(5)

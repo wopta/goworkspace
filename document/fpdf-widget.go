@@ -90,45 +90,6 @@ func mainHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 	})
 }
 
-func mainMotorHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
-	var (
-		opt                   fpdf.ImageOptions
-		logoPath, productName string
-	)
-
-	switch policy.Name {
-	case "gap":
-		logoPath = lib.GetAssetPathByEnv(basePath) + "/logo_gap.png"
-		productName = "Auto Valore Protetto"
-	}
-
-	policyInfo := "Polizza Numero: " + policy.CodeCompany + "\n" +
-		"Targa Veicolo: " + policy.Assets[0].Vehicle.Plate + "\n" +
-		"Decorre dal: " + policy.StartDate.Format(dateLayout) + " ore 24:00\n" +
-		"Scade il: " + policy.EndDate.Format(dateLayout) + " ore 24:00"
-
-	pdf.SetHeaderFunc(func() {
-		opt.ImageType = "png"
-		pdf.ImageOptions(logoPath, 10, 6, 13, 13, false, opt, 0, "")
-		pdf.SetXY(23, 7)
-		setPinkBoldFont(pdf, 18)
-		pdf.Cell(10, 6, "Wopta per te")
-		setPinkItalicFont(pdf, 18)
-		pdf.SetXY(23, 13)
-		pdf.SetTextColor(92, 89, 92)
-		pdf.Cell(10, 6, productName)
-		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/ARTW_LOGO_RGB_400px.png", 170, 6, 0, 8, false, opt, 0, "")
-
-		setBlackBoldFont(pdf, standardTextSize)
-		pdf.SetXY(11, 20)
-		pdf.Cell(0, 3, "I dati della tua polizza")
-		setBlackRegularFont(pdf, standardTextSize)
-		pdf.SetXY(11, pdf.GetY()+3)
-		pdf.MultiCell(0, 3.5, policyInfo, "", "", false)
-		pdf.Ln(8)
-	})
-}
-
 func mainFooter(pdf *fpdf.Fpdf, productName string) {
 	var (
 		opt                  fpdf.ImageOptions
@@ -230,7 +191,8 @@ func woptaHeader(pdf *fpdf.Fpdf) {
 	pdf.SetHeaderFunc(func() {
 		var opt fpdf.ImageOptions
 		opt.ImageType = "png"
-		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/ARTW_LOGO_RGB_400px.png", 10, 6, 0, 15, false, opt, 0, "")
+		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/ARTW_LOGO_RGB_400px.png", 10, 6, 0, 10,
+			false, opt, 0, "")
 		pdf.Ln(10)
 	})
 }
@@ -632,7 +594,7 @@ func companySignature(pdf *fpdf.Fpdf, companyName string) {
 		pdf.SetY(pdf.GetY() - 6)
 		var opt fpdf.ImageOptions
 		opt.ImageType = "png"
-		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/firma_sogessur.png", 30, pdf.GetY()+9, 30, 8,
+		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/firma_sogessur.png", 40, pdf.GetY()+9, 10, 10,
 			false, opt, 0, "")
 	}
 }
