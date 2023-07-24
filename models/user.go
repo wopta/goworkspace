@@ -2,6 +2,7 @@ package models
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"time"
@@ -104,14 +105,26 @@ func (user User) toBigquery() (UserBigquery, error) {
 	if err != nil {
 		return UserBigquery{}, err
 	}
+
 	birthDate, err := time.Parse(time.RFC3339, user.BirthDate)
 	if err != nil {
 		return UserBigquery{}, err
 	}
+
+	if user.Residence == nil {
+		return UserBigquery{}, errors.New("'Residence' is nil")
+	}
+
+	if user.Domicile == nil {
+		return UserBigquery{}, errors.New("'Domicile' is nil")
+	}
+
 	geography := bigquery.NullGeography{
-		GeographyVal: "",
+		// TODO: Check if correct: Geography type uses the WKT format for geometry
+		GeographyVal: fmt.Sprintf("POINT (%f %f)", user.Location.Lng, user.Location.Lat),
 		Valid:        true,
 	}
+
 	return UserBigquery{
 		Uid:                  user.Uid,
 		Name:                 user.Name,
@@ -141,14 +154,14 @@ func (user User) toBigquery() (UserBigquery, error) {
 
 func (user User) BigquerySave(origin string) error {
 	table := lib.GetDatasetByEnv(origin, "user")
-	agentBigquery, err := user.toBigquery()
+	userBigquery, err := user.toBigquery()
 	if err != nil {
 		return err
 	}
 
 	log.Println("user save big query: " + user.Uid)
 
-	return lib.InsertRowsBigQuery("wopta", table, agentBigquery)
+	return lib.InsertRowsBigQuery("wopta", table, userBigquery)
 }
 
 type Consens struct {
