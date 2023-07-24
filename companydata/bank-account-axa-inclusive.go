@@ -29,10 +29,11 @@ type BankAccountAxaInclusiveReq struct {
 
 func BankAccountAxaInclusive(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		from   time.Time
-		to     time.Time
-		result [][]string
-		now    time.Time
+		from      time.Time
+		to        time.Time
+		result    [][]string
+		now       time.Time
+		refMontly time.Time
 	)
 	log.Println("----------------BankAccountAxaInclusive-----------------")
 	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
@@ -42,23 +43,24 @@ func BankAccountAxaInclusive(w http.ResponseWriter, r *http.Request) (string, in
 	defer r.Body.Close()
 	json.Unmarshal([]byte(req), &obj)
 	if obj.Day == "" {
-		now = time.Now()
-		M := time.Now().AddDate(0, 0, -2)
-		from, e = time.Parse("2006-01-02", strconv.Itoa(M.Year())+"-"+fmt.Sprintf("%02d", int(M.Month()))+"-"+fmt.Sprintf("%02d", 1))
-		to, e = time.Parse("2006-01-02", strconv.Itoa(M.Year())+"-"+fmt.Sprintf("%02d", int(M.Month()))+"-"+fmt.Sprintf("%02d", M.Day()))
-	} else {
+		refMontly = now.AddDate(0, 0, -1)
+		now = time.Now().AddDate(0, 0, -1)
 
+		from, e = time.Parse("2006-01-02", strconv.Itoa(now.Year())+"-"+fmt.Sprintf("%02d", int(now.Month()))+"-"+fmt.Sprintf("%02d", 1))
+		to, e = time.Parse("2006-01-02", strconv.Itoa(now.Year())+"-"+fmt.Sprintf("%02d", int(now.Month()))+"-"+fmt.Sprintf("%02d", now.Day()))
+	} else {
 		date, _ := time.Parse("2006-01-02", obj.Day)
+		refMontly = date
 		log.Println(date)
 		from = date
 		to = date
 	}
 	log.Println(from)
 	log.Println(to)
-	query := "select * from `wopta." + dataMovement + "` where _PARTITIONTIME >'" + from.Format(layoutQuery) + " 00:00:00" + "' and _PARTITIONTIME <'" + to.Format(layoutQuery) + " 23:59:00" + "'"
+	//query := "select * from `wopta." + dataMovement + "` where _PARTITIONTIME >'" + from.Format(layoutQuery) + " 00:00:00" + "' and _PARTITIONTIME <'" + to.Format(layoutQuery) + " 23:59:00" + "'"
+	query := "select * from `wopta." + dataMovement + "` where _PARTITIONTIME ='" + from.Format(layoutQuery) + "'"
 	log.Println(query)
 	bankaccountlist, e := lib.QueryRowsBigQuery[inclusive.BankAccountMovement](query)
-
 	log.Println("len(bankaccountlist): ", len(bankaccountlist))
 	//result = append(result, getHeader())
 	result = append(result, getHeaderInclusiveBank())
@@ -67,8 +69,8 @@ func BankAccountAxaInclusive(w http.ResponseWriter, r *http.Request) (string, in
 		result = append(result, setInclusiveRow(mov)...)
 
 	}
-	refMontly := now.AddDate(0, -1, 0)
-	filepath := "180623_" + strconv.Itoa(refMontly.Year()) + fmt.Sprintf("%02d", int(refMontly.Month())) + "_" + fmt.Sprintf("%02d", now.Day())
+
+	filepath := "180623_" + strconv.Itoa(refMontly.Year()) + fmt.Sprintf("%02d", int(refMontly.Month())) + fmt.Sprintf("%02d", now.Day())
 	lib.CreateExcel(result, "../tmp/"+filepath+".xlsx", "")
 	lib.WriteCsv("../tmp/"+filepath+".csv", result, ';')
 	source, _ := ioutil.ReadFile("../tmp/" + filepath + ".xlsx")
