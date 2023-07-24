@@ -146,7 +146,7 @@ func sendContractMail(policy *models.Policy) {
 		policy.Contractor.Uid+"/contract_"+name)
 	lib.CheckError(err)
 
-	mail.SendMailContract(*policy, &[]mail.Attachment{{
+	mail.SendMailContract(policy, &[]mail.Attachment{{
 		Byte:        base64.StdEncoding.EncodeToString(contractbyte),
 		ContentType: "application/pdf",
 		Name: policy.Contractor.Name + "_" + policy.Contractor.Surname + "_" +

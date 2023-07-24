@@ -135,7 +135,7 @@ func namirialSign(state *State) error {
 }
 func sendMailSign(state *State) error {
 	policy := state.Data
-	mail.SendMailSign(policy)
+	mail.SendMailSign(&policy)
 	return nil
 }
 func getTest() string {

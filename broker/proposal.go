@@ -57,7 +57,7 @@ func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	models.SetGuaranteBigquery(policy, "proposal", guaranteFire)
 
 	log.Printf("[Proposal] Policy %s send mail", policy.Uid)
-	mail.SendMailProposal(policy)
+	mail.SendMailProposal(&policy)
 
 	resp, e := policy.Marshal()
 	log.Println("[Proposal] response: ", string(resp))

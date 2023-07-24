@@ -109,7 +109,7 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 			contractbyte, e = lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "assets/users/"+
 				p.Contractor.Uid+"/contract_"+name)
 
-			mail.SendMailContract(p, &[]mail.Attachment{{
+			mail.SendMailContract(&p, &[]mail.Attachment{{
 				Byte:        base64.StdEncoding.EncodeToString(contractbyte),
 				ContentType: "application/pdf",
 				Name: p.Contractor.Name + "_" + p.Contractor.Surname + "_" +

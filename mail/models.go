@@ -10,10 +10,14 @@ type Data struct {
 	IsApp     bool
 }
 type BodyData struct {
-	Name        string
-	Surname     string
-	ProductForm string
-	ProductName string
+	ContractorName    string
+	ContractorSurname string
+	AgentName         string
+	AgentSurname      string
+	AgencyName        string
+	AgencySurname     string
+	ProductForm       string
+	ProductName       string
 }
 type Attachment struct {
 	Name        string `firestore:"name,omitempty" json:"name,omitempty"`

@@ -49,7 +49,7 @@ func Sign(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 			}
 			lib.SetFirestore(firePolicy, uid, policy)
 			policy.BigquerySave(origin)
-			mail.SendMailPay(policy)
+			mail.SendMailPay(&policy)
 			//s := <-document.GetFileV6(&policy, uid)
 
 			//log.Println(s)
