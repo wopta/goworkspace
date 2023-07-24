@@ -52,7 +52,7 @@ func GapSogessur(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, 
 
 	gapPriceTable(pdf, policy)
 
-	pdf.Ln(3)
+	//pdf.Ln(3)
 
 	gapStatements(pdf, statements[:len(statements)-1], policy.Company)
 
