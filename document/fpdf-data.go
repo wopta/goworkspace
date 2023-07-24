@@ -207,12 +207,14 @@ func loadPersonaGuarantees(policy *models.Policy) (map[string]map[string]string,
 				}
 			case "D":
 				details = "Beneficiari:\n"
-				if guarantee.Beneficiaries == nil || (*guarantee.Beneficiaries)[0].IsLegitimateSuccessors {
-					details += "Eredi leggitimi e/o testamentari"
-				} else {
-					for _, beneficiary := range *guarantee.Beneficiaries {
-						details += beneficiary.Name + " " + beneficiary.Surname + " " + beneficiary.FiscalCode + "\n"
+				for _, beneficiary := range *guarantee.Beneficiaries {
+					if beneficiary.BeneficiaryType != "chosenBeneficiary" {
+						details += personaProduct.Companies[0].GuaranteesMap["D"].BeneficiaryOptions[beneficiary.
+							BeneficiaryType]
+						break
 					}
+					details += beneficiary.Name + " " + beneficiary.Surname + " " + beneficiary.FiscalCode + "\n"
+
 				}
 			case "ITI":
 				details = "Franchigia " + guarantee.Value.Deductible + " " + guarantee.Offer[offerName].DeductibleUnit
