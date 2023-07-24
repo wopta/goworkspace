@@ -27,7 +27,7 @@ func GapSogessur(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, 
 	var statements []models.Statement
 
 	if policy.Statements == nil {
-		statements = question.GapStatements(*policy)
+		statements = question.GetStatements(*policy)
 	}
 
 	mainMotorHeader(pdf, policy)
