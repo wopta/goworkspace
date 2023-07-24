@@ -75,7 +75,7 @@ func namirialStepFinished(origin, policyUid string) {
 		return
 	}
 
-	log.Printf("[namirialStepFinished] ERROR Policy %s with status %s and flag %t cannot be signed", policyUid, policy.Status, policy.IsSign)
+	log.Printf("[namirialStepFinished] ERROR Policy %s with status %s and isSign %t cannot be signed", policyUid, policy.Status, policy.IsSign)
 }
 
 func FillAttachments(policy *models.Policy) {
