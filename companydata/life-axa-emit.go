@@ -450,8 +450,11 @@ func getFormatBithdate(d string) string {
 	if d != "" {
 		splitD := strings.Split(d, "-")
 		split2 := strings.Split(splitD[2], "T")
-		res = split2[0] + splitD[1] + splitD[0]
+		day, _ := strconv.Atoi(split2[0])
+		month, _ := strconv.Atoi(splitD[1])
+		res = fmt.Sprintf("%02d", day) + fmt.Sprintf("%02d", month) + splitD[0]
 	}
+
 	return res
 
 }

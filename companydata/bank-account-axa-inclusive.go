@@ -1,6 +1,7 @@
 package companydata
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -22,19 +23,36 @@ const (
 	layoutQuery      = "2006-01-02"
 )
 
+type BankAccountAxaInclusiveReq struct {
+	Day string `firestore:"-" json:"day,omitempty" bigquery:"-"`
+}
+
 func BankAccountAxaInclusive(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		from   time.Time
 		to     time.Time
 		result [][]string
+		now    time.Time
 	)
 	log.Println("----------------BankAccountAxaInclusive-----------------")
-	now := time.Now()
-	M := time.Now().AddDate(0, 0, -2)
-	date, _ := time.Parse("2006-01-02", dateString)
-	log.Println(date)
-	from, e = time.Parse("2006-01-02", strconv.Itoa(M.Year())+"-"+fmt.Sprintf("%02d", int(M.Month()))+"-"+fmt.Sprintf("%02d", 1))
-	to, e = time.Parse("2006-01-02", strconv.Itoa(M.Year())+"-"+fmt.Sprintf("%02d", int(M.Month()))+"-"+fmt.Sprintf("%02d", M.Day()))
+	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
+	log.Println(r.Header)
+	log.Println(string(req))
+	var obj BankAccountAxaInclusiveReq
+	defer r.Body.Close()
+	json.Unmarshal([]byte(req), &obj)
+	if obj.Day == "" {
+		now = time.Now()
+		M := time.Now().AddDate(0, 0, -2)
+		from, e = time.Parse("2006-01-02", strconv.Itoa(M.Year())+"-"+fmt.Sprintf("%02d", int(M.Month()))+"-"+fmt.Sprintf("%02d", 1))
+		to, e = time.Parse("2006-01-02", strconv.Itoa(M.Year())+"-"+fmt.Sprintf("%02d", int(M.Month()))+"-"+fmt.Sprintf("%02d", M.Day()))
+	} else {
+
+		date, _ := time.Parse("2006-01-02", obj.Day)
+		log.Println(date)
+		from = date
+		to = date
+	}
 	log.Println(from)
 	log.Println(to)
 	query := "select * from `wopta." + dataMovement + "` where _PARTITIONTIME >'" + from.Format(layoutQuery) + " 00:00:00" + "' and _PARTITIONTIME <'" + to.Format(layoutQuery) + " 23:59:00" + "'"
@@ -57,7 +75,7 @@ func BankAccountAxaInclusive(w http.ResponseWriter, r *http.Request) (string, in
 	sourceCsv, _ := ioutil.ReadFile("../tmp/" + filepath + ".csv")
 	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/axa/inclusive/hype/"+strconv.Itoa(refMontly.Year())+"/"+fmt.Sprintf("%02d", int(refMontly.Month()))+"/"+filepath+".xlsx", source)
 	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/axa/inclusive/hype/"+strconv.Itoa(refMontly.Year())+"/"+fmt.Sprintf("%02d", int(refMontly.Month()))+"/"+filepath+".csv", sourceCsv)
-	//AxaSftpUpload("/HYPE/IN/" + filepath + ".xlsx")
+	AxaSftpUpload("/HYPE/IN/" + filepath + ".xlsx")
 	return "", nil, e
 }
 func setInclusiveRow(mov inclusive.BankAccountMovement) [][]string {
