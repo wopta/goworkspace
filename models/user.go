@@ -155,7 +155,7 @@ func UpdateUserByFiscalCode(origin string, user User) (string, error) {
 			retrievedUser.IdentityDocuments = append(retrievedUser.IdentityDocuments, identityDocument)
 		}
 
-		retrievedUser.Consens = updateUserConsens(retrievedUser.Consens, user.Consens)
+		retrievedUser.Consens = UpdateUserConsens(retrievedUser.Consens, user.Consens)
 
 		updatedUser := map[string]interface{}{
 			"address":           user.Address,
@@ -185,7 +185,7 @@ func UpdateUserByFiscalCode(origin string, user User) (string, error) {
 	return "", fmt.Errorf("no user found with this fiscal code")
 }
 
-func updateUserConsens(oldConsens *[]Consens, newConsens *[]Consens) *[]Consens {
+func UpdateUserConsens(oldConsens *[]Consens, newConsens *[]Consens) *[]Consens {
 	if newConsens == nil {
 		return oldConsens
 	}
