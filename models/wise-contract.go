@@ -57,4 +57,11 @@ type WiseContract struct {
 	AnnualityStartDate                  time.Time `json:"dtInizioAnnualita,omitempty"`
 	AnnualityEndDate                    time.Time `json:"dtFineAnnualita,omitempty"`
 	IsExternal                          bool      `json:"bIddEsterno,omitempty"`
+	AnnualGrossPrice                    float64   `json:"nImpLordoAnnuo,omitempty"`
 }
+
+const (
+	WiseYearlyPaymentSplitCode = "01"
+	WiseSemestralPaymentSplitCode = "02"
+	WiseMonthlyPaymentSplitCode = "06"
+)

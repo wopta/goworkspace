@@ -48,8 +48,8 @@ func (wiseGuarantee *WiseGuarantee) ToDomain() Guarante {
 	}
 	guarantee.SumInsuredLimitOfIndemnity = wiseGuarantee.SumInsuredLimitOfIndemnity
 
+	var guaranteeValue GuaranteValue
 	for _, parameter := range wiseGuarantee.Parameters {
-		var guaranteeValue GuaranteValue
 		if strings.EqualFold(parameter.Name, "FRANCHIGIA") {
 			guaranteeValue.Deductible = parameter.Value
 		}
@@ -58,8 +58,8 @@ func (wiseGuarantee *WiseGuarantee) ToDomain() Guarante {
 				guaranteeValue.SumInsuredLimitOfIndemnity = value
 			}
 		}
-		guarantee.Value = &guaranteeValue
 	}
+	guarantee.Value = &guaranteeValue
 
 	return guarantee
 }
