@@ -77,7 +77,7 @@ func BankAccountAxaInclusive(w http.ResponseWriter, r *http.Request) (string, in
 	sourceCsv, _ := ioutil.ReadFile("../tmp/" + filepath + ".csv")
 	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/axa/inclusive/hype/"+strconv.Itoa(refMontly.Year())+"/"+fmt.Sprintf("%02d", int(refMontly.Month()))+"/"+filepath+".xlsx", source)
 	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/axa/inclusive/hype/"+strconv.Itoa(refMontly.Year())+"/"+fmt.Sprintf("%02d", int(refMontly.Month()))+"/"+filepath+".csv", sourceCsv)
-	AxaSftpUpload("/HYPE/IN/" + filepath + ".xlsx")
+	AxaSftpUpload(filepath+".xlsx", "HYPE/IN/")
 	return "", nil, e
 }
 func setInclusiveRow(mov inclusive.BankAccountMovement) [][]string {
