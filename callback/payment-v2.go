@@ -22,6 +22,8 @@ import (
 
 const fabrickBillPaid string = "PAID"
 
+var operations = make(map[string]map[string]interface{})
+
 func PaymentV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println("[PaymentV2Fx] Handler start -----------------------------------")
 
@@ -80,24 +82,14 @@ func fabrickPayment(origin, policyUid, schedule string) error {
 	policy := plc.GetPolicyByUid(policyUid, origin)
 
 	if !policy.IsPay && policy.Status == models.PolicyStatusToPay {
-		operations := make(map[string]map[string]interface{})
 		fireTransactions := lib.GetDatasetByEnv(origin, models.TransactionsCollection)
 		firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
-		fireUser := lib.GetDatasetByEnv(origin, models.UserCollection)
 
 		// update policy and create/update user
-		policyOperation, userOperation := updatePolicyPaidAndSaveUser(&policy, origin)
-		if policyOperation != nil {
-			operations[firePolicy] = policyOperation
-		} else {
-			log.Printf("[fabrickPayment] ERROR modifying policy")
-			return errors.New("policy error")
-		}
-		if userOperation != nil {
-			operations[fireUser] = userOperation
-		} else {
-			log.Printf("[fabrickPayment] ERROR modifying user")
-			return errors.New("user error")
+		err := updatePolicyPaidAndSaveUser(&policy, origin)
+		if err != nil {
+			log.Printf("[fabrickPayment] ERROR modifying policy/user")
+			return errors.New("policy/user error")
 		}
 
 		// Update the first transaction in policy as paid
@@ -124,7 +116,7 @@ func fabrickPayment(origin, policyUid, schedule string) error {
 		}
 
 		// Do batch operations
-		err := lib.SetBatchFirestoreErr(operations)
+		err = lib.SetBatchFirestoreErr(operations)
 		if err != nil {
 			log.Printf("[fabrickPayment] ERROR %s", err.Error())
 			return err
@@ -150,21 +142,21 @@ func fabrickPayment(origin, policyUid, schedule string) error {
 	return errors.New("cannot pay policy")
 }
 
-func updatePolicyPaidAndSaveUser(policy *models.Policy, origin string) (map[string]interface{}, map[string]interface{}) {
+func updatePolicyPaidAndSaveUser(policy *models.Policy, origin string) error {
 	log.Printf("[updatePolicyPaidAndSaveUser] Policy %s", policy.Uid)
 
 	// promove documents from temp bucket to user
 	err := updateIdentityDocument(policy)
 	if err != nil {
 		log.Printf("[updatePolicyPaidAndSaveUser] ERROR %s", err.Error())
-		return nil, nil
+		return err
 	}
 
 	// Create/Update document on user collection based on contractor fiscalCode
 	err = setUserIntoPolicyContractor(policy, origin)
 	if err != nil {
 		log.Printf("[updatePolicyPaidAndSaveUser] ERROR %s", err.Error())
-		return nil, nil
+		return err
 	}
 
 	// Get Policy contract
@@ -173,12 +165,17 @@ func updatePolicyPaidAndSaveUser(policy *models.Policy, origin string) (map[stri
 	// Update Policy as paid
 	setPolicyPaid(policy, origin)
 
+	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
+	fireUser := lib.GetDatasetByEnv(origin, models.UserCollection)
 	policyOperation := make(map[string]interface{})
-	policyOperation[policy.Uid] = policy
 	userOperation := make(map[string]interface{})
-	userOperation[policy.Contractor.Uid] = &policy.Contractor
 
-	return policyOperation, userOperation
+	policyOperation[policy.Uid] = policy
+	userOperation[policy.Contractor.Uid] = &policy.Contractor
+	operations[firePolicy] = policyOperation
+	operations[fireUser] = userOperation
+
+	return nil
 }
 
 func updateIdentityDocument(policy *models.Policy) error {
@@ -221,7 +218,7 @@ func updateIdentityDocument(policy *models.Policy) error {
 }
 
 func setUserIntoPolicyContractor(policy *models.Policy, origin string) error {
-	log.Printf("[setUserIntoPolicyContractor] Policy &s", policy.Uid)
+	log.Printf("[setUserIntoPolicyContractor] Policy %s", policy.Uid)
 	userUID, newUser, err := models.GetUserUIDByFiscalCode(origin, policy.Contractor.FiscalCode)
 	if err != nil {
 		log.Printf("[setUserIntoPolicyContractor] ERROR finding user: %s", err.Error())
@@ -244,10 +241,7 @@ func setUserIntoPolicyContractor(policy *models.Policy, origin string) error {
 		}
 
 		if retrievedUser.Uid != "" {
-			for _, identityDocument := range contractor.IdentityDocuments {
-				retrievedUser.IdentityDocuments = append(retrievedUser.IdentityDocuments, identityDocument)
-			}
-
+			retrievedUser.IdentityDocuments = append(retrievedUser.IdentityDocuments, contractor.IdentityDocuments...)
 			retrievedUser.Consens = models.UpdateUserConsens(retrievedUser.Consens, contractor.Consens)
 			retrievedUser.Address = contractor.Address
 			retrievedUser.PostalCode = contractor.PostalCode
