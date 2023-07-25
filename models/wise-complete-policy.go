@@ -87,14 +87,14 @@ func updatePolicyPrice(policy *Policy, wisePolicy *WiseCompletePolicy) {
 	if wisePolicy.Contract.InstalmentTypeCode == WiseMonthlyPaymentSplitCode {
 		policy.PaymentSplit = string(PaySplitMonthly)
 		policy.PriceGross = policy.PriceGrossMonthly * 12
-		policy.PriceNett = policy.PriceNett * 12
+		policy.PriceNett = policy.PriceNettMonthly * 12
 		policy.TaxAmount = policy.TaxAmountMonthly * 12
 		return
 	}
 	if wisePolicy.Contract.InstalmentTypeCode == WiseSemestralPaymentSplitCode {
 		policy.PaymentSplit = string(PaySplitSemestral)
 		policy.PriceGross = policy.PriceGrossMonthly * 2
-		policy.PriceNett = policy.PriceNett * 2
+		policy.PriceNett = policy.PriceNettMonthly * 2
 		policy.TaxAmount = policy.TaxAmountMonthly * 2
 		return
 	}
