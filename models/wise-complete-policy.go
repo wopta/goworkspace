@@ -3,6 +3,8 @@ package models
 import (
 	"fmt"
 	"time"
+
+	"github.com/wopta/goworkspace/lib"
 )
 
 type WiseCompletePolicy struct {
@@ -25,13 +27,14 @@ func (wisePolicy *WiseCompletePolicy) ToDomain() Policy {
 		attachment Attachment
 	)
 
+	updatePolicyEndDate(&policy, wisePolicy)
+
 	policy.Uid = fmt.Sprintf("wise:%d", wisePolicy.Id)
 	policy.Contractor = *wisePolicy.Contractors[0].Registry.ToDomain()
-	policy.EndDate = wisePolicy.Contract.PolicyExpirationDate
 	policy.CodeCompany = wisePolicy.PolicyNumber
-	policy.PriceGross = wisePolicy.Contract.GrossAmount
-	policy.PriceNett = wisePolicy.Contract.NetAmount
-	policy.TaxAmount = wisePolicy.Contract.TaxesAmount
+
+	updatePolicyPrice(&policy, wisePolicy)
+
 	policy.ProductVersion = "v1"
 
 	switch wisePolicy.ProductTypeCode {
@@ -57,6 +60,44 @@ func (wisePolicy *WiseCompletePolicy) ToDomain() Policy {
 	}
 
 	return policy
+}
+
+func updatePolicyEndDate(policy *Policy, wisePolicy *WiseCompletePolicy) {
+	location, err := time.LoadLocation("Europe/Rome")
+	lib.CheckError(err)
+	policyEndDate := wisePolicy.Contract.PolicyExpirationDate.In(location)
+	_, offset := policyEndDate.Zone()
+	policy.EndDate = policyEndDate.Add(time.Duration(time.Second * time.Duration(offset)))
+}
+
+func updatePolicyPrice(policy *Policy, wisePolicy *WiseCompletePolicy) {
+	policy.PriceGross = wisePolicy.Contract.AnnualGrossPrice
+	policy.PriceNett = wisePolicy.Contract.NetAmount
+	policy.TaxAmount = policy.PriceGross - policy.PriceNett
+
+	if wisePolicy.Contract.InstalmentTypeCode == WiseYearlyPaymentSplitCode {
+		policy.PaymentSplit = string(PaySplitYear)
+		return
+	}
+
+	policy.PriceGrossMonthly = wisePolicy.Contract.GrossAmount
+	policy.PriceNettMonthly = wisePolicy.Contract.NetAmount
+	policy.TaxAmountMonthly = policy.PriceGrossMonthly - policy.PriceNettMonthly
+
+	if wisePolicy.Contract.InstalmentTypeCode == WiseMonthlyPaymentSplitCode {
+		policy.PaymentSplit = string(PaySplitMonthly)
+		policy.PriceGross = policy.PriceGrossMonthly * 12
+		policy.PriceNett = policy.PriceNettMonthly * 12
+		policy.TaxAmount = policy.TaxAmountMonthly * 12
+		return
+	}
+	if wisePolicy.Contract.InstalmentTypeCode == WiseSemestralPaymentSplitCode {
+		policy.PaymentSplit = string(PaySplitSemestral)
+		policy.PriceGross = policy.PriceGrossMonthly * 2
+		policy.PriceNett = policy.PriceNettMonthly * 2
+		policy.TaxAmount = policy.TaxAmountMonthly * 2
+		return
+	}
 }
 
 type WiseBase64Annex struct {
