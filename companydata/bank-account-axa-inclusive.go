@@ -71,7 +71,7 @@ func BankAccountAxaInclusive(w http.ResponseWriter, r *http.Request) (string, in
 	}
 
 	filepath := "180623_" + strconv.Itoa(refMontly.Year()) + fmt.Sprintf("%02d", int(refMontly.Month())) + fmt.Sprintf("%02d", refMontly.Day())
-	lib.CreateExcel(result, "../tmp/"+filepath+".xlsx", "")
+	CreateExcel(result, "../tmp/"+filepath+".xlsx")
 	lib.WriteCsv("../tmp/"+filepath+".csv", result, ';')
 	source, _ := ioutil.ReadFile("../tmp/" + filepath + ".xlsx")
 	sourceCsv, _ := ioutil.ReadFile("../tmp/" + filepath + ".csv")
