@@ -124,7 +124,7 @@ func mapEndDate(mov inclusive.BankAccountMovement) string {
 		endDate, _ := time.Parse("2006-01-02", mov.BigEndDate.Date.String())
 		return endDate.Format(layout)
 	}
-	return ""
+	return "31/12/9999"
 }
 func getHeaderInclusiveBank() []string {
 	return []string{

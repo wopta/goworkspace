@@ -87,7 +87,12 @@ func EmitV2(policy *models.Policy, request EmitRequest, origin string) EmitRespo
 
 	return responseEmit
 }
+func setAdvice(policy *models.Policy, origin string) {
 
+	policy.Payment = ""
+	policy.IsPay = true
+
+}
 func setData(state *bpmn.State) error {
 	p := state.Data
 	emitBase(&p, origin)
