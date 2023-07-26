@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -184,6 +185,7 @@ func getGapRowMap(policy models.Policy, transaction models.Transaction) map[stri
 	vehicleOwner := policy.Contractor // NOTE: For the moment assuming vehicleOwner is the contractor
 	offerName := policy.OfferlName
 
+	genders := []string{"F", "M", "G"} // For validation
 	// Maps for replacing the values in policy into valid values for the gap csv
 	vehicleTypes := map[string]string{
 		"Autocarro":   "C",
@@ -213,21 +215,22 @@ func getGapRowMap(policy models.Policy, transaction models.Transaction) map[stri
 	if vehicle.Weight > 0 {
 		vehicleWeight = strconv.Itoa(int(vehicle.Weight))
 	}
+	zoneCode := quote.GetAreaByProvince(policyHolder.Residence.CityCode)
 	return map[string]string{
-		"NUMERO POLIZZA":                       policy.CodeCompany,
-		"NUMERO CONTRATTO":                     policy.CodeCompany,
+		"NUMERO POLIZZA":                       CheckIfIsAlphaNumeric(policy.CodeCompany),
+		"NUMERO CONTRATTO":                     CheckIfIsAlphaNumeric(policy.CodeCompany),
 		"TIPO OPERAZIONE":                      "A", // 'A' = Subscription
 		"DATA OPERAZIONE":                      policy.StartDate.Format(gapDateFormat),
 		"COGNOME/RAGIONE SOCIALE ASSICURATO":   policyHolder.Surname,
 		"NOME ASSICURATO":                      policyHolder.Name,
 		"INDIRIZZO ASSICURATO":                 getAddress(*policyHolder.Residence),
 		"COMUNE ASSICURATO":                    policyHolder.Residence.Locality,
-		"CAP ASSICURATO":                       policyHolder.Residence.PostalCode,
-		"PROVINCIA ASSICURATO":                 policyHolder.Residence.CityCode,
+		"CAP ASSICURATO":                       CheckIfIsNumeric(policyHolder.Residence.PostalCode),
+		"PROVINCIA ASSICURATO":                 CheckIfIsAlphaNumeric(policyHolder.Residence.CityCode),
 		"NAZIONE ASSICURATO":                   "Italia",
-		"CODICE FISCALE ASSICURATO":            policyHolder.FiscalCode,
-		"PARTITA IVA ASSICURATO":               policyHolder.VatCode,
-		"TARGA":                                vehicle.Plate,
+		"CODICE FISCALE ASSICURATO":            CheckIfIsAlphaNumeric(policyHolder.FiscalCode),
+		"PARTITA IVA ASSICURATO":               CheckIfIsNumeric(policyHolder.VatCode),
+		"TARGA":                                CheckIfIsAlphaNumeric(vehicle.Plate),
 		"TELAIO":                               "",
 		"MODELLO":                              vehicle.Model,
 		"MARCA":                                vehicle.Manufacturer,
@@ -280,24 +283,24 @@ func getGapRowMap(policy models.Policy, transaction models.Transaction) map[stri
 		"VINCOLO":                              "",
 		"DATA VINCOLO":                         "",
 		"ENTE VINCOLATARIO":                    "",
-		"CODICE ZONA":                          quote.GetAreaByProvince(policyHolder.Residence.CityCode),
-		"CL_SESSO":                             contractor.Gender,
+		"CODICE ZONA":                          CheckIfIsAlphaNumeric(zoneCode),
+		"CL_SESSO":                             CheckIfIsWithin(contractor.Gender, genders),
 		"CL_DATA_NASC":                         stringToDateFormat(contractor.BirthDate, gapDateFormat),
 		"CL_LUOGO_NASC":                        contractor.BirthCity,
-		"CL_PROV_NASC":                         contractor.BirthProvince,
+		"CL_PROV_NASC":                         CheckIfIsAlphaNumeric(contractor.BirthProvince),
 		"COGNOME/RAGIONE SOCIALE PROPRIETARIO": vehicleOwner.Surname,
 		"NOME PROPRIETARIO":                    vehicleOwner.Name,
 		"INDIRIZZO PROPRIETARIO":               getAddress(*vehicleOwner.Residence),
 		"COMUNE PROPRIETARIO":                  vehicleOwner.Residence.Locality,
-		"CAP PROPRIETARIO":                     vehicleOwner.Residence.PostalCode,
-		"PROVINCIA PROPRIETARIO":               vehicleOwner.Residence.CityCode,
+		"CAP PROPRIETARIO":                     CheckIfIsNumeric(vehicleOwner.Residence.PostalCode),
+		"PROVINCIA PROPRIETARIO":               CheckIfIsAlphaNumeric(vehicleOwner.Residence.CityCode),
 		"NAZIONE PROPRIETARIO":                 "Italia",
 		"CODICE FISCALE PROPRIETARIO":          CheckIfIsAlphaNumeric(vehicleOwner.FiscalCode),
 		"PARTITA IVA PROPRIETARIO":             "",
 		"PR_SESSO":                             CheckIfIsWithin(vehicleOwner.Gender, genders),
 		"PR_DATA_NASC":                         stringToDateFormat(vehicleOwner.BirthDate, gapDateFormat),
 		"PR_LUOGO_NASC":                        vehicleOwner.BirthCity,
-		"PR_PROV_NASC":                         vehicleOwner.BirthProvince,
+		"PR_PROV_NASC":                         CheckIfIsAlphaNumeric(vehicleOwner.BirthProvince),
 	}
 }
 
