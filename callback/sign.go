@@ -3,11 +3,11 @@ package callback
 import (
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
+	plc "github.com/wopta/goworkspace/policy"
 )
 
 const (
@@ -59,15 +59,22 @@ func namirialStepFinished(origin, policyUid string) {
 	}
 
 	if !policy.IsSign && policy.Status == models.PolicyStatusToSign {
-		FillAttachments(&policy)
-		Sign(&policy)
-		SetToPay(&policy)
-
-		err = lib.SetFirestoreErr(firePolicy, policyUid, policy)
+		err = plc.FillAttachments(&policy, origin)
 		if err != nil {
-			log.Printf("[namirialStepFinished] ERROR saving policy to firestore: %s", err.Error())
+			log.Printf("[namirialStepFinished] ERROR FillAttachments: %s", err.Error())
 			return
 		}
+		err = plc.Sign(&policy, origin)
+		if err != nil {
+			log.Printf("[namirialStepFinished] ERROR Sign: %s", err.Error())
+			return
+		}
+		err = plc.SetToPay(&policy, origin)
+		if err != nil {
+			log.Printf("[namirialStepFinished] ERROR SetToPay: %s", err.Error())
+			return
+		}
+
 		policy.BigquerySave(origin)
 
 		mail.SendMailPay(policy)
@@ -76,24 +83,4 @@ func namirialStepFinished(origin, policyUid string) {
 	}
 
 	log.Printf("[namirialStepFinished] ERROR Policy %s with status %s and isSign %t cannot be signed", policyUid, policy.Status, policy.IsSign)
-}
-
-func FillAttachments(policy *models.Policy) {
-	if policy.Attachments == nil {
-		policy.Attachments = new([]models.Attachment)
-	}
-	policy.Updated = time.Now().UTC()
-}
-
-func Sign(policy *models.Policy) {
-	policy.IsSign = true
-	policy.Status = models.PolicyStatusSign
-	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusSign)
-	policy.Updated = time.Now().UTC()
-}
-
-func SetToPay(policy *models.Policy) {
-	policy.Status = models.PolicyStatusToPay
-	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusToPay)
-	policy.Updated = time.Now().UTC()
 }
