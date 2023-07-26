@@ -67,14 +67,14 @@ func PaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 				docsnap.DataTo(&agency)
 				agency.Policies = append(agency.Policies, p.Uid)
 				found := false
-				for _, contractorUid := range agency.Portfolio {
+				for _, contractorUid := range agency.Users {
 					if contractorUid == p.Contractor.Uid {
 						found = true
 						break
 					}
 				}
 				if !found {
-					agency.Portfolio = append(agency.Portfolio, p.Contractor.Uid)
+					agency.Users = append(agency.Users, p.Contractor.Uid)
 				}
 				err = lib.SetFirestoreErr(fireAgency, agency.Uid, agency)
 				lib.CheckError(err)
@@ -89,14 +89,14 @@ func PaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 				docsnap.DataTo(&agent)
 				agent.Policies = append(agent.Policies, p.Uid)
 				found := false
-				for _, contractorUid := range agent.Portfolio {
+				for _, contractorUid := range agent.Users {
 					if contractorUid == p.Contractor.Uid {
 						found = true
 						break
 					}
 				}
 				if !found {
-					agent.Portfolio = append(agent.Portfolio, p.Contractor.Uid)
+					agent.Users = append(agent.Users, p.Contractor.Uid)
 				}
 				err = lib.SetFirestoreErr(fireAgent, agent.Uid, agent)
 				lib.CheckError(err)

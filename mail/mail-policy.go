@@ -1,8 +1,12 @@
 package mail
 
 import (
+	"encoding/base64"
 	"fmt"
+	"os"
+	"strings"
 
+	lib "github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -177,6 +181,25 @@ func SendMailContract(policy models.Policy, at *[]Attachment) {
 Seguici su nostri canali social o sul sito e scopri le iniziative a te riservate.
 	`,
 	)
+
+	// retrocompatibility - the new use extracts the contract from the policy
+	if at == nil {
+		var contractbyte []byte
+
+		filepath := fmt.Sprintf("assets/users/%s/contract_%s.pdf", policy.Contractor.Uid, policy.Uid)
+		contractbyte, err := lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filepath)
+		lib.CheckError(err)
+
+		filenameParts := []string{policy.Contractor.Name, policy.Contractor.Surname, policy.NameDesc, "contratto.pdf"}
+		filename := strings.Join(filenameParts, "_")
+		filename = strings.ReplaceAll(filename, " ", "_")
+		at = &[]Attachment{{
+			Byte:        base64.StdEncoding.EncodeToString(contractbyte),
+			ContentType: "application/pdf",
+			Name:        filename,
+		}}
+	}
+
 	SendMail(
 		GetMailPolicy(
 			policy,

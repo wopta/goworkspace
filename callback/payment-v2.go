@@ -1,10 +1,8 @@
 package callback
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -102,18 +100,12 @@ func fabrickPayment(origin, policyUid, schedule string) error {
 		}
 
 		// Update agency if present
-		agencyOperation := updateAgencyPortfolio(&policy, origin)
-		if agencyOperation != nil {
-			fireAgency := lib.GetDatasetByEnv(origin, models.AgencyCollection)
-			operations[fireAgency] = agencyOperation
-		}
+		err = models.UpdateAgencyPortfolio(&policy, origin)
+		// check handling of error
 
 		// Update agent if present
-		agentOperation := updateAgentPortfolio(&policy, origin)
-		if agentOperation != nil {
-			fireAgent := lib.GetDatasetByEnv(origin, models.AgentCollection)
-			operations[fireAgent] = agentOperation
-		}
+		err = models.UpdateAgentPortfolio(&policy, origin)
+		// check habdling of error
 
 		// Do batch operations
 		err = lib.SetBatchFirestoreErr(operations)
@@ -129,11 +121,7 @@ func fabrickPayment(origin, policyUid, schedule string) error {
 		}
 
 		// Send mail with the contract to the user
-		err = sendMailContract(&policy)
-		if err != nil {
-			log.Printf("[fabrickPayment] ERROR sending email: %s", err.Error())
-			return err
-		}
+		mail.SendMailContract(policy, nil)
 
 		return nil
 	}
@@ -332,89 +320,6 @@ func setPolicyFirstTransactionPaid(policyUid, scheduleDate, origin string) map[s
 	transactionOperation[transaction.Uid] = &transaction
 
 	return transactionOperation
-}
-
-func updateAgencyPortfolio(policy *models.Policy, origin string) map[string]interface{} {
-	log.Printf("[updateAgencyPortfolio] Policy %s", policy.Uid)
-	if policy.AgencyUid == "" {
-		return nil
-	}
-
-	var agency models.Agency
-	fireAgency := lib.GetDatasetByEnv(origin, models.AgencyCollection)
-	docsnap, err := lib.GetFirestoreErr(fireAgency, policy.AgentUid)
-	if err != nil {
-		log.Printf("[updateAgencyPortfolio] ERROR getting agency from firestore: %s", err.Error())
-		return nil
-	}
-	err = docsnap.DataTo(&agency)
-	if err != nil {
-		log.Printf("[updateAgencyPortfolio] ERROR parsing agency: %s", err.Error())
-		return nil
-	}
-	agency.Policies = append(agency.Policies, policy.Uid)
-
-	if !lib.SliceContains(agency.Portfolio, policy.Contractor.Uid) {
-		agency.Portfolio = append(agency.Portfolio, policy.Contractor.Uid)
-	}
-
-	agentOperation := make(map[string]interface{})
-	agentOperation[agency.Uid] = agency
-
-	return agentOperation
-}
-
-func updateAgentPortfolio(policy *models.Policy, origin string) map[string]interface{} {
-	log.Printf("[updateAgentPortfolio] Policy %s", policy.Uid)
-	if policy.AgentUid == "" {
-		return nil
-	}
-
-	var agent models.Agent
-	fireAgent := lib.GetDatasetByEnv(origin, models.AgentCollection)
-	docsnap, err := lib.GetFirestoreErr(fireAgent, policy.AgentUid)
-	if err != nil {
-		log.Printf("[updateAgentPortfolio] ERROR getting agent from firestore: %s", err.Error())
-		return nil
-	}
-	err = docsnap.DataTo(&agent)
-	if err != nil {
-		log.Printf("[updateAgentPortfolio] ERROR parsing agent: %s", err.Error())
-		return nil
-	}
-	agent.Policies = append(agent.Policies, policy.Uid)
-
-	if !lib.SliceContains(agent.Portfolio, policy.Contractor.Uid) {
-		agent.Portfolio = append(agent.Portfolio, policy.Contractor.Uid)
-	}
-
-	agentOperation := make(map[string]interface{})
-	agentOperation[agent.Uid] = agent
-
-	return agentOperation
-}
-
-func sendMailContract(policy *models.Policy) error {
-	log.Printf("[sendMailContract] Policy %s send email", policy.Uid)
-
-	var contractbyte []byte
-
-	filepath := fmt.Sprintf("assets/users/%s/contract_%s.pdf", policy.Contractor.Uid, policy.Uid)
-	contractbyte, err := lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filepath)
-	if err != nil {
-		log.Printf("[sendMailContract] ERROR getting file: %s", err.Error())
-		return err
-	}
-
-	filename := buildFilename([]string{policy.Contractor.Name, policy.Contractor.Surname, policy.NameDesc, "contratto.pdf"})
-	mail.SendMailContract(*policy, &[]mail.Attachment{{
-		Byte:        base64.StdEncoding.EncodeToString(contractbyte),
-		ContentType: "application/pdf",
-		Name:        filename,
-	}})
-
-	log.Println("[sendMailContract] email sent")
-	return nil
 }
 
 func buildFilename(parts []string) string {
