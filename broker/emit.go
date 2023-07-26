@@ -162,7 +162,7 @@ func emitSign(policy *models.Policy, origin string) {
 	policy.IdSign = signResponse.EnvelopeId
 	policy.SignUrl = signResponse.Url
 
-	mail.SendMailSign(*policy)
+	mail.SendMailSign(policy)
 }
 
 func emitPay(policy *models.Policy, origin string) {

@@ -3,22 +3,18 @@ package mail
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
-	"os"
 	"text/template"
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
 
-func CheckChannel(policy *models.Policy) string {
-	agentUid := policy.AgentUid
-	agencyUid := policy.AgencyUid
+func getChannel(policy *models.Policy) string {
 
-	if agentUid != "" {
+	if policy.AgentUid != "" {
 		return "agent"
 	}
-	if agencyUid != "" {
+	if policy.AgencyUid != "" {
 		return "agency"
 	}
 
@@ -28,7 +24,7 @@ func CheckChannel(policy *models.Policy) string {
 
 func SetBodyDataAndGetCC(policy *models.Policy, bodyData *BodyData) string {
 	var cc string
-	channel := CheckChannel(policy)
+	channel := getChannel(policy)
 
 	switch channel {
 	case "agent":
@@ -76,7 +72,7 @@ func GetProductBodyData(policy *models.Policy, bodyData *BodyData) {
 		bodyData.ProductName = "Vita"
 		bodyData.ProductForm += "vita/"
 	case "gap":
-		bodyData.ProductName = "GAP"
+		bodyData.ProductName = "Auto Valore Protetto"
 		bodyData.ProductForm = "gap/"
 	}
 }
@@ -84,28 +80,14 @@ func GetProductBodyData(policy *models.Policy, bodyData *BodyData) {
 func GetTemplateByChannel(policy *models.Policy, templateType string) []byte {
 
 	var file []byte
-	channel := CheckChannel(policy)
+	channel := getChannel(policy)
 
 	if channel == "agent" {
-		switch os.Getenv("env") {
-		case "local":
-			file = lib.ErrorByte(ioutil.ReadFile(fmt.Sprintf("../function-data/dev/mail/agent/%s.html", templateType)))
-			// case "dev":
-			// 	file = lib.GetFromStorage("function-data", "mail/mail_template.html", "")
-			// case "prod":
-			// 	file = lib.GetFromStorage("core-350507-function-data", "mail/mail_template.html", "")
-		}
+		file = lib.GetFilesByEnv(fmt.Sprintf("mail/agent/%s.html", templateType))
 	}
 
 	if channel == "agency" {
-		switch os.Getenv("env") {
-		case "local":
-			file = lib.ErrorByte(ioutil.ReadFile(fmt.Sprintf("../function-data/dev/mail/agency/%s.html", templateType)))
-			// case "dev":
-			// 	file = lib.GetFromStorage("function-data", "mail/mail_template.html", "")
-			// case "prod":
-			// 	file = lib.GetFromStorage("core-350507-function-data", "mail/mail_template.html", "")
-		}
+		file = lib.GetFilesByEnv(fmt.Sprintf("mail/agency/%s.html", templateType))
 	}
 
 	return file
