@@ -41,6 +41,7 @@ type PaySplit string
 const (
 	PaySplitMonthly      PaySplit = "monthly"
 	PaySplitYear         PaySplit = "year"
+	PaySplitSemestral    PaySplit = "semestral"
 	PaySingleInstallment PaySplit = "singleInstallment"
 )
 

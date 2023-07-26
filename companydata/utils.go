@@ -11,6 +11,7 @@ import (
 
 	lib "github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/xuri/excelize/v2"
 )
 
 func CheckStructNil[T interface{}](s interface{}) T {
@@ -68,4 +69,27 @@ func ExtractUserDataFromFiscalCode(fiscalCode string) (string, models.User, erro
 	lib.CheckError(err)
 
 	return string(outJson), user, nil
+}
+func CreateExcel(sheet [][]string, filePath string) ([]byte, error) {
+	log.Println("CreateExcel")
+	f := excelize.NewFile()
+	alfabet := []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"}
+	// Create a new sheet.
+	index, err := f.NewSheet("Sheet1")
+	for x, row := range sheet {
+		for i, cel := range row {
+
+			fmt.Println(cel)
+			f.SetCellValue("Sheet1", alfabet[i]+""+strconv.Itoa(x+1), cel)
+		}
+	}
+	//Set active sheet of the workbook.
+	f.SetActiveSheet(index)
+
+	//Save spreadsheet by the given path.
+	err = f.SaveAs(filePath)
+
+	resByte, err := f.WriteToBuffer()
+
+	return resByte.Bytes(), err
 }

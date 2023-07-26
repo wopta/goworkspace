@@ -70,14 +70,14 @@ func BankAccountAxaInclusive(w http.ResponseWriter, r *http.Request) (string, in
 
 	}
 
-	filepath := "180623_" + strconv.Itoa(refMontly.Year()) + fmt.Sprintf("%02d", int(refMontly.Month())) + fmt.Sprintf("%02d", now.Day())
-	lib.CreateExcel(result, "../tmp/"+filepath+".xlsx", "")
+	filepath := "180623_" + strconv.Itoa(refMontly.Year()) + fmt.Sprintf("%02d", int(refMontly.Month())) + fmt.Sprintf("%02d", refMontly.Day())
+	CreateExcel(result, "../tmp/"+filepath+".xlsx")
 	lib.WriteCsv("../tmp/"+filepath+".csv", result, ';')
 	source, _ := ioutil.ReadFile("../tmp/" + filepath + ".xlsx")
 	sourceCsv, _ := ioutil.ReadFile("../tmp/" + filepath + ".csv")
 	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/axa/inclusive/hype/"+strconv.Itoa(refMontly.Year())+"/"+fmt.Sprintf("%02d", int(refMontly.Month()))+"/"+filepath+".xlsx", source)
 	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/axa/inclusive/hype/"+strconv.Itoa(refMontly.Year())+"/"+fmt.Sprintf("%02d", int(refMontly.Month()))+"/"+filepath+".csv", sourceCsv)
-	AxaSftpUpload("/HYPE/IN/" + filepath + ".xlsx")
+	AxaSftpUpload(filepath+".xlsx", "HYPE/IN/")
 	return "", nil, e
 }
 func setInclusiveRow(mov inclusive.BankAccountMovement) [][]string {
@@ -124,7 +124,7 @@ func mapEndDate(mov inclusive.BankAccountMovement) string {
 		endDate, _ := time.Parse("2006-01-02", mov.BigEndDate.Date.String())
 		return endDate.Format(layout)
 	}
-	return ""
+	return "31/12/9999"
 }
 func getHeaderInclusiveBank() []string {
 	return []string{
