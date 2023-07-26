@@ -67,14 +67,14 @@ func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 				docsnap.DataTo(&agency)
 				agency.Policies = append(agency.Policies, p.Uid)
 				found := false
-				for _, contractorUid := range agency.Portfolio {
+				for _, contractorUid := range agency.Users {
 					if contractorUid == p.Contractor.Uid {
 						found = true
 						break
 					}
 				}
 				if !found {
-					agency.Portfolio = append(agency.Portfolio, p.Contractor.Uid)
+					agency.Users = append(agency.Users, p.Contractor.Uid)
 				}
 				err = lib.SetFirestoreErr(fireAgency, agency.Uid, agency)
 				lib.CheckError(err)

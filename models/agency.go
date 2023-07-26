@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"time"
@@ -18,7 +19,7 @@ type Agency struct {
 	Name            string      `json:"name" firestore:"name" bigquery:"-"`
 	Manager         User        `json:"manager" firestore:"manager" bigquery:"-"`
 	NodeSetting     NodeSetting `json:"nodeSetting" firestore:"nodeSetting" bigquery:"-"`
-	Portfolio       []string    `json:"portfolio" firestore:"portfolio" bigquery:"-"`                           // will contain users UIDs
+	Users           []string    `json:"users" firestore:"users" bigquery:"-"`                                   // will contain users UIDs
 	ParentAgency    string      `json:"parentAgency,omitempty" firestore:"parentAgency,omitempty" bigquery:"-"` // parent Agency UID
 	Agencies        []string    `json:"agencies" firestore:"agencies" bigquery:"-"`                             // will contain agencies UIDs
 	Agents          []string    `json:"agents" firestore:"agents" bigquery:"-"`                                 // will contain agents UIDs
@@ -67,4 +68,34 @@ func FirestoreDocumentToAgency(query *firestore.DocumentIterator) (*Agency, erro
 	}
 
 	return &result, e
+}
+
+func UpdateAgencyPortfolio(policy *Policy, origin string) error {
+	log.Printf("[updateAgencyPortfolio] Policy %s", policy.Uid)
+	if policy.AgencyUid == "" {
+		log.Printf("[updateAgencyPortfolio] ERROR agency not set")
+		return errors.New("agency not set")
+	}
+
+	var agency Agency
+	fireAgency := lib.GetDatasetByEnv(origin, AgencyCollection)
+	docsnap, err := lib.GetFirestoreErr(fireAgency, policy.AgentUid)
+	if err != nil {
+		log.Printf("[updateAgencyPortfolio] ERROR getting agency from firestore: %s", err.Error())
+		return err
+	}
+	err = docsnap.DataTo(&agency)
+	if err != nil {
+		log.Printf("[updateAgencyPortfolio] ERROR parsing agency: %s", err.Error())
+		return err
+	}
+	agency.Policies = append(agency.Policies, policy.Uid)
+
+	if !lib.SliceContains(agency.Users, policy.Contractor.Uid) {
+		agency.Users = append(agency.Users, policy.Contractor.Uid)
+	}
+
+	err = lib.SetFirestoreErr(fireAgency, agency.Uid, agency)
+
+	return err
 }
