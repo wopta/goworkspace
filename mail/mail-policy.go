@@ -1,8 +1,12 @@
 package mail
 
 import (
+	"encoding/base64"
 	"fmt"
+	"os"
+	"strings"
 
+	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -170,13 +174,32 @@ func SendMailContract(policy models.Policy, at *[]Attachment) {
 	message = append(
 		message,
 		`<p>ti confermiamo che la protezione offerta dalla tua polizza è ora attiva. 
-	in allegato trovi la documentazione firmata tramite l’utilizzo della Firma Elettronica. Salva e conserva i documenti con cura, ti serviranno in caso di sinistro.
-	Ti consigliamo di scaricare l’App di Wopta dagli store tramite il comodo QR code che trovi nell area sottostante per accedere 
-	alla tua area riservata nella quale troverai tutte le informazioni sulle polizze in tuo possesso e altri servizi a te riservati.</p>
-	Puoi usare anche questi canali per effettuare una denuncia di sinistro e verificare lo stato delle tue polizze e dei pagamenti.
+    in allegato trovi la documentazione firmata tramite l’utilizzo della Firma Elettronica. Salva e conserva i documenti con cura, ti serviranno in caso di sinistro.
+    Ti consigliamo di scaricare l’App di Wopta dagli store tramite il comodo QR code che trovi nell area sottostante per accedere 
+    alla tua area riservata nella quale troverai tutte le informazioni sulle polizze in tuo possesso e altri servizi a te riservati.</p>
+    Puoi usare anche questi canali per effettuare una denuncia di sinistro e verificare lo stato delle tue polizze e dei pagamenti.
 Seguici su nostri canali social o sul sito e scopri le iniziative a te riservate.
-	`,
+    `,
 	)
+
+	// retrocompatibility - the new use extracts the contract from the policy
+	if at == nil {
+		var contractbyte []byte
+
+		filepath := fmt.Sprintf("assets/users/%s/contract_%s.pdf", policy.Contractor.Uid, policy.Uid)
+		contractbyte, err := lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filepath)
+		lib.CheckError(err)
+
+		filenameParts := []string{policy.Contractor.Name, policy.Contractor.Surname, policy.NameDesc, "contratto.pdf"}
+		filename := strings.Join(filenameParts, "_")
+		filename = strings.ReplaceAll(filename, " ", "_")
+		at = &[]Attachment{{
+			Byte:        base64.StdEncoding.EncodeToString(contractbyte),
+			ContentType: "application/pdf",
+			Name:        filename,
+		}}
+	}
+
 	SendMail(
 		GetMailPolicy(
 			policy,
