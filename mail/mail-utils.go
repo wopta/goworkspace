@@ -92,7 +92,7 @@ func getTemplateByChannel(policy models.Policy, templateType string) []byte {
 	return file
 }
 
-func FillTemplate(htmlTemplate []byte, bodyData *BodyData, tpl *bytes.Buffer) {
+func fillTemplate(htmlTemplate []byte, bodyData *BodyData, tpl *bytes.Buffer) {
 	tmplt := template.New("htmlTemplate")
 	tmplt, err := tmplt.Parse(string(htmlTemplate))
 	lib.CheckError(err)
