@@ -66,13 +66,6 @@ func EmitV2(policy *models.Policy, request EmitRequest, origin string) EmitRespo
 	} else {
 		log.Println("[EmitFxV2] AgencyUid: ", policy.AgencyUid)
 		if policy.AgencyUid != "" {
-			settingByte, _ := lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "products/Agency/setting.json")
-			//var prod models.Product
-
-			setting := map[string]interface{}{}
-
-			//Parsing/Unmarshalling JSON encoding/json
-			json.Unmarshal([]byte(settingByte), &setting)
 			state := runBpmn(*policy, "agency")
 			log.Println("[EmitV2] state.Data Policy:", state.Data)
 			policy = &state.Data
