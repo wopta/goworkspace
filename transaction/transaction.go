@@ -62,7 +62,7 @@ func SetPolicyFirstTransactionPaid(policyUid string, scheduleDate string, origin
 	transaction.BigQuerySave(origin)
 }
 
-func GetPolicyFirstTransaction(policyUid string, scheduleDate string, origin string) (models.Transaction, error) {
+func GetTransactionByPolicyUidAndScheduleDate(policyUid string, scheduleDate string, origin string) (models.Transaction, error) {
 	q := lib.Firequeries{
 		Queries: []lib.Firequery{
 			{

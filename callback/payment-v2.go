@@ -71,6 +71,14 @@ func fabrickPayment(origin, policyUid, schedule string) error {
 
 	policy := plc.GetPolicyByUid(policyUid, origin)
 
+	if !canPayPolicy(&policy) {
+		log.Printf(
+			"[fabrickPayment] ERROR cannot be paid. Policy %s | status %s | isPay %t | paymentSplit %s",
+			policyUid, policy.Status, policy.IsPay, policy.PaymentSplit,
+		)
+		return errors.New("cannot pay policy")
+	}
+
 	if !policy.IsPay && policy.Status == models.PolicyStatusToPay {
 		// promote documents from temp bucket to user and connect it to policy
 		err := plc.SetUserIntoPolicyContractor(&policy, origin)
@@ -93,20 +101,6 @@ func fabrickPayment(origin, policyUid, schedule string) error {
 			return err
 		}
 
-		// Get Transaction
-		tr, err := transaction.GetPolicyFirstTransaction(policy.Uid, schedule, origin)
-		if err != nil {
-			log.Printf("[fabrickPayment] ERROR GetPolicyFirstTransaction %s", err.Error())
-			return err
-		}
-
-		// Pay Transaction
-		err = transaction.Pay(&tr, origin)
-		if err != nil {
-			log.Printf("[fabrickPayment] ERROR Transaction Pay %s", err.Error())
-			return err
-		}
-
 		// Update agency if present
 		err = models.UpdateAgencyPortfolio(&policy, origin)
 		if err != nil && err.Error() != "agency not set" {
@@ -122,14 +116,31 @@ func fabrickPayment(origin, policyUid, schedule string) error {
 		}
 
 		policy.BigquerySave(origin)
-		tr.BigQuerySave(origin)
 
 		// Send mail with the contract to the user
 		mail.SendMailContract(policy, nil)
-
-		return nil
 	}
 
-	log.Printf("[fabrickPayment] ERROR Policy %s with status %s and isPay %t cannot be paid", policyUid, policy.Status, policy.IsPay)
-	return errors.New("cannot pay policy")
+	// Get Transaction
+	tr, err := transaction.GetTransactionByPolicyUidAndScheduleDate(policy.Uid, schedule, origin)
+	if err != nil {
+		log.Printf("[fabrickPayment] ERROR GetPolicyFirstTransaction %s", err.Error())
+		return err
+	}
+
+	// Pay Transaction
+	err = transaction.Pay(&tr, origin)
+	if err != nil {
+		log.Printf("[fabrickPayment] ERROR Transaction Pay %s", err.Error())
+		return err
+	}
+
+	tr.BigQuerySave(origin)
+
+	return nil
+}
+
+func canPayPolicy(policy *models.Policy) bool {
+	return (!policy.IsPay && policy.Status == models.PolicyStatusToPay) ||
+		(policy.IsPay && policy.Status == models.PolicyStatusPay && policy.PaymentSplit == string(models.PaySplitMonthly))
 }
