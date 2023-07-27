@@ -85,7 +85,6 @@ func promoteContractorDocumentsToUser(policy *models.Policy, origin string) erro
 	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
 }
 
-// Not sure if keep it in user since it saves the user
 func SetUserIntoPolicyContractor(policy *models.Policy, origin string) error {
 	log.Printf("[setUserIntoPolicyContractor] Policy %s", policy.Uid)
 	userUid, newUser, err := models.GetUserUIDByFiscalCode(origin, policy.Contractor.FiscalCode)
@@ -94,9 +93,12 @@ func SetUserIntoPolicyContractor(policy *models.Policy, origin string) error {
 		return err
 	}
 
-	// smells.. decouple and save policy also here?
 	policy.Contractor.Uid = userUid
-	promoteContractorDocumentsToUser(policy, origin)
+	err = promoteContractorDocumentsToUser(policy, origin)
+	if err != nil {
+		log.Printf("[setUserIntoPolicyContractor] ERROR updating documents: %s", err.Error())
+		return err
+	}
 
 	if newUser {
 		policy.Contractor.CreationDate = time.Now().UTC()
