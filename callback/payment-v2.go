@@ -75,7 +75,7 @@ func fabrickPayment(origin, policyUid, schedule string) error {
 	policy := plc.GetPolicyByUid(policyUid, origin)
 
 	if !policy.IsPay && policy.Status == models.PolicyStatusToPay {
-		// promove documents from temp bucket to user
+		// promote documents from temp bucket to user and connect it to policy
 		err := plc.SetUserIntoPolicyContractor(&policy, origin)
 		if err != nil {
 			log.Printf("[fabrickPayment] ERROR SetUserIntoPolicyContractor %s", err.Error())

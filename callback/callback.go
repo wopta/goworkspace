@@ -28,12 +28,6 @@ func Callback(w http.ResponseWriter, r *http.Request) {
 			},
 			{
 				Route:   "/v1/payment",
-				Handler: PaymentFx,
-				Method:  http.MethodPost,
-				Roles:   []string{},
-			},
-			{
-				Route:   "/v2/payment",
 				Handler: PaymentV2Fx,
 				Method:  http.MethodPost,
 				Roles:   []string{},
