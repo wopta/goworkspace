@@ -31,26 +31,6 @@ const TimerCreated TimerState = "CREATED"
 const TimerTriggered TimerState = "TRIGGERED"
 const TimerCancelled TimerState = "CANCELLED"
 
-type Process struct {
-	Id              int                    `json:"id"`
-	LayerId         int                    `json:"layer"`
-	Name            string                 `json:"name"`
-	Shape           string                 `json:"shape"`
-	Type            string                 `json:"type"`
-	Status          string                 `json:"status"`
-	Decision        string                 `json:"decision"`
-	DecisionData    map[string]interface{} `json:"decisionData"`
-	Data            interface{}            `json:"data"`
-	X               float64                `json:"x"`
-	Y               float64                `json:"y"`
-	InProcess       []int                  `json:"inProcess"`
-	OutProcess      []int                  `json:"outProcess"`
-	OutTrueProcess  []int                  `json:"outTrueProcess"`
-	OutFalseProcess []int                  `json:"outFalseProcess"`
-	IsCompleted     bool                   `json:"isCompleted"`
-	IsFailed        bool                   `json:"isFailed"`
-	Error           string                 `json:"error"`
-}
 type Timer struct {
 	ElementId          string
 	ElementInstanceKey int64
@@ -71,7 +51,7 @@ type job struct {
 }
 type State struct {
 	Name           string
-	Processes      []Process
+	Processes      []models.Process
 	Data           models.Policy
 	DecisionData   *map[string]interface{}
 	Jobs           []*job
