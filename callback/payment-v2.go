@@ -3,6 +3,7 @@ package callback
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -21,7 +22,7 @@ func PaymentV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	log.Println("[PaymentV2Fx] Handler start -----------------------------------")
 
 	var (
-		response        string
+		responseFormat  string = `{"result":%t,"requestPayload":%s,"locale": "it"}`
 		err             error
 		fabrickCallback FabrickCallback
 	)
@@ -38,7 +39,7 @@ func PaymentV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	err = json.Unmarshal([]byte(request), &fabrickCallback)
 	if err != nil {
 		log.Printf("[PaymentV2Fx] ERROR unmarshaling request: %s", err.Error())
-		return response, nil, err
+		return fmt.Sprintf(responseFormat, false, string(request)), nil, nil
 	}
 
 	if policyUid == "" || origin == "" {
@@ -56,14 +57,10 @@ func PaymentV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 
 	if err != nil {
 		log.Printf("[PaymentV2Fx] ERROR: %s", err.Error())
-		return response, nil, err
+		return fmt.Sprintf(responseFormat, false, string(request)), nil, nil
 	}
 
-	response = `{
-		"result": true,
-		"requestPayload": ` + string(request) + `,
-		"locale": "it"
-	}`
+	response := fmt.Sprintf(responseFormat, true, string(request))
 	log.Printf("[PaymentV2Fx] response: %s", response)
 
 	return response, nil, nil
