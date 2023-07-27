@@ -42,7 +42,7 @@ func AxaPartnersSftpUpload(filePath string) {
 	lib.CheckError(e)
 
 }
-func AxaSftpUpload(filePath string) {
+func AxaSftpUpload(filePath string, basePath string) {
 	var (
 		pk []byte
 		e  error
@@ -82,7 +82,7 @@ func AxaSftpUpload(filePath string) {
 	// Create remote file for writing.
 	lib.Files("../tmp")
 	//destination, e := client.Create(filePath)
-	destination, e := client.Create("IN/" + filePath)
+	destination, e := client.Create("IN/" + basePath + filePath)
 	lib.CheckError(e)
 	defer destination.Close()
 	log.Println("Upload local file to a remote location as in 1MB (byte) chunks.")

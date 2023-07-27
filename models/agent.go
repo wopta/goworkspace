@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"time"
@@ -15,7 +16,7 @@ type Agent struct {
 	ManagerUid      string    `json:"managerUid,omitempty" firestore:"managerUid,omitempty" bigquery:"-"`
 	AgencyUid       string    `json:"agencyUid" firestore:"agencyUid" bigquery:"-"`
 	Agents          []string  `json:"agents" firestore:"agents" bigquery:"-"`
-	Portfolio       []string  `json:"portfolio" firestore:"portfolio" bigquery:"-"` // will contain users UIDs
+	Users           []string  `json:"users" firestore:"users" bigquery:"-"` // will contain users UIDs
 	IsActive        bool      `json:"isActive" firestore:"isActive" bigquery:"-"`
 	Products        []Product `json:"products" firestore:"products" bigquery:"-"`
 	Policies        []string  `json:"policies" firestore:"policies" bigquery:"-"` // will contain policies UIDs
@@ -51,4 +52,34 @@ func FirestoreDocumentToAgent(query *firestore.DocumentIterator) (*Agent, error)
 	}
 
 	return &result, e
+}
+
+func UpdateAgentPortfolio(policy *Policy, origin string) error {
+	log.Printf("[updateAgentPortfolio] Policy %s", policy.Uid)
+	if policy.AgentUid == "" {
+		log.Printf("[updateAgentPortfolio] ERROR agent not set")
+		return errors.New("agent not set")
+	}
+
+	var agent Agent
+	fireAgent := lib.GetDatasetByEnv(origin, AgentCollection)
+	docsnap, err := lib.GetFirestoreErr(fireAgent, policy.AgentUid)
+	if err != nil {
+		log.Printf("[updateAgentPortfolio] ERROR getting agent from firestore: %s", err.Error())
+		return err
+	}
+	err = docsnap.DataTo(&agent)
+	if err != nil {
+		log.Printf("[updateAgentPortfolio] ERROR parsing agent: %s", err.Error())
+		return err
+	}
+	agent.Policies = append(agent.Policies, policy.Uid)
+
+	if !lib.SliceContains(agent.Users, policy.Contractor.Uid) {
+		agent.Users = append(agent.Users, policy.Contractor.Uid)
+	}
+
+	err = lib.SetFirestoreErr(fireAgent, agent.Uid, agent)
+
+	return err
 }

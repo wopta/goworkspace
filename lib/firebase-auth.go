@@ -70,10 +70,11 @@ func VerifyAuthorization(handler func(w http.ResponseWriter, r *http.Request) (s
 			return "", nil, fmt.Errorf("not found")
 		}
 
-		if len(roles) == 0 || SliceContains(roles, "all") {
-			if os.Getenv("env") == "local" {
-				return handler(w, r)
-			}
+		if len(roles) == 0 || os.Getenv("env") == "local" {
+			return handler(w, r)
+		}
+
+		if SliceContains(roles, "all") {
 			return VerifyAppcheck(handler)(w, r)
 		}
 

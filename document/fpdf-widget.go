@@ -14,16 +14,28 @@ func mainHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 		logoPath, cfpi, expiryInfo, productName string
 	)
 
+	policyInfo := "Numero: " + policy.CodeCompany + "\n" +
+		"Decorre dal: " + policy.StartDate.Format(dateLayout) + " ore 24:00\n" +
+		"Scade il: " + policy.EndDate.Format(dateLayout) + " ore 24:00\n"
+
 	switch policy.Name {
 	case "life":
 		logoPath = lib.GetAssetPathByEnv(basePath) + "/logo_vita.png"
 		productName = "Vita"
+		policyInfo += expiryInfo + "Non si rinnova a scadenza."
 	case "pmi":
 		logoPath = lib.GetAssetPathByEnv(basePath) + "/pmi.png"
 		productName = "Artigiani & Imprese"
 	case "persona":
 		logoPath = lib.GetAssetPathByEnv(basePath) + "/persona.png"
 		productName = "Persona"
+		policyInfo += "Si rinnova a scadenza salvo disdetta da inviare 30 giorni prima\n" + "Prossimo pagamento "
+		if policy.PaymentSplit == string(models.PaySplitMonthly) {
+			policyInfo += policy.StartDate.AddDate(0, 1, 0).Format(dateLayout) + "\n"
+		} else if policy.PaymentSplit == string(models.PaySplitYear) {
+			policyInfo += policy.StartDate.AddDate(1, 0, 0).Format(dateLayout) + "\n"
+		}
+		policyInfo += "Sostituisce la polizza ========"
 	}
 
 	contractor := policy.Contractor
@@ -43,11 +55,6 @@ func mainHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 		expiryInfo = "Prima scadenza annuale il: " +
 			policy.StartDate.AddDate(1, 0, 0).Format(dateLayout) + "\n"
 	}
-
-	policyInfo := "Numero: " + policy.CodeCompany + "\n" +
-		"Decorre dal: " + policy.StartDate.Format(dateLayout) + " ore 24:00\n" +
-		"Scade il: " + policy.EndDate.Format(dateLayout) + " ore 24:00\n" +
-		expiryInfo + "Non si rinnova a scadenza."
 
 	contractorInfo := "Contraente: " + strings.ToUpper(contractor.Surname+" "+contractor.Name+"\n"+
 		"C.F./P.IVA: "+cfpi) + "\n" +
@@ -79,7 +86,7 @@ func mainHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 		setBlackRegularFont(pdf, standardTextSize)
 		pdf.SetXY(-95, pdf.GetY()+3)
 		pdf.MultiCell(0, 3.5, contractorInfo, "", "", false)
-		pdf.Ln(8)
+		pdf.Ln(5)
 	})
 }
 
@@ -95,17 +102,18 @@ func mainFooter(pdf *fpdf.Fpdf, productName string) {
 		footerText = "Wopta per te. Vita è un prodotto assicurativo di AXA France Vie S.A. – Rappresentanza Generale per l’Italia\ndistribuito da Wopta Assicurazioni S.r.l."
 		logoPath = lib.GetAssetPathByEnv(basePath) + "/axa/logo.png"
 		x = 190
-		y = 281
+		y = 282.5
 		height = 8
 	case "pmi":
 		footerText = ""
 		logoPath = ""
 	case "persona":
-		footerText = "Wopta per te. PersonaGlobal è un prodotto assicurativo di Global Assistance Compagnia di assicurazioni e riassicurazioni S.p.A, distribuito da Wopta Assicurazioni S.r.l"
+		footerText = "Wopta per te. Persona è un prodotto assicurativo di Global Assistance Compagnia di assicurazioni" +
+			" e riassicurazioni S.p.A,\ndistribuito da Wopta Assicurazioni S.r.l"
 		logoPath = lib.GetAssetPathByEnv(basePath) + "/logo_global.png"
-		x = 180
-		y = 280
-		height = 10
+		x = 185
+		y = 282.5
+		height = 8
 	}
 
 	pdf.SetFooterFunc(func() {
@@ -245,8 +253,15 @@ func emitResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 		offerPrice = humanize.FormatFloat("#.###,##", policy.PriceGross)
 	}
 	text := "Polizza emessa a Milano il " + emitDate + " per un importo di € " + offerPrice + " quale " +
-		"prima rata alla firma, il cui pagamento a saldo è da effettuarsi con i metodi di pagamento sopra indicati. " +
-		"Wopta conferma avvenuto incasso e copertura della polizza dal " + startDate + "."
+		"prima rata alla firma, il cui pagamento a saldo è da effettuarsi con i metodi di pagamento sopra indicati."
+	switch policy.Name {
+	case "life":
+		text += " Wopta conferma avvenuto incasso e copertura della polizza dal " + startDate + "."
+	case "persona":
+		text += "\nCostituisce quietanza di pagamento la mail di conferma che Wopta invierà al Contraente."
+
+	}
+
 	getParagraphTitle(pdf, "Emissione polizza e pagamento della prima rata")
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, text, "", "", false)
@@ -321,4 +336,26 @@ func personalDataHandlingSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	pdf.Ln(3)
 	pdf.Cell(0, 3, policy.EmitDate.Format(dateLayout))
 	drawSignatureForm(pdf)
+}
+
+func companySignature(pdf *fpdf.Fpdf, companyName string) {
+	switch companyName {
+	case "global":
+		setBlackBoldFont(pdf, standardTextSize)
+		pdf.CellFormat(70, 3, "Global Assistance", "", 0,
+			fpdf.AlignCenter, false, 0, "")
+		var opt fpdf.ImageOptions
+		opt.ImageType = "png"
+		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/firma_global.png", 25, pdf.GetY()+3, 40, 12,
+			false, opt, 0, "")
+	case "axa":
+		setBlackBoldFont(pdf, standardTextSize)
+		pdf.MultiCell(70, 3, "AXA France Vie\n(Rappresentanza Generale per l'Italia)", "",
+			fpdf.AlignCenter, false)
+		pdf.SetY(pdf.GetY() - 6)
+		var opt fpdf.ImageOptions
+		opt.ImageType = "png"
+		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/firma_axa.png", 35, pdf.GetY()+9, 30, 8,
+			false, opt, 0, "")
+	}
 }

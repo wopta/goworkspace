@@ -52,7 +52,7 @@ func (registry *WiseUserRegistryDto) ToDomain() *User {
 	person.StreetNumber = registry.Address.HouseNumber
 	person.PostalCode = registry.Address.PostalCode
 	person.City = registry.Address.Municipality
-	person.BirthDate = registry.BirthDate.Format("02/01/2006")
+	person.BirthDate = registry.BirthDate.Format(TimeDateOnly)
 
 	for _, contact := range registry.Contacts {
 		switch contact.TypeCode {

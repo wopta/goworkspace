@@ -34,6 +34,7 @@ type Claim struct {
 	UserUid           string       `firestore:"userUid,omitempty" json:"userUid,omitempty"`
 	ClaimUid          string       `firestore:"claimUid,omitempty" json:"claimUid,omitempty"`
 	Status            string       `firestore:"status,omitempty" json:"status,omitempty"`
+	StatusHistory     []string     `json:"statusHistory,omitempty" firestore:"statusHistory,omitempty"`
 	Documents         []Attachment `firestore:"documents,omitempty" json:"documents,omitempty"`
 	History           []Claim      `firestore:"history,omitempty" json:"history,omitempty"`
 }

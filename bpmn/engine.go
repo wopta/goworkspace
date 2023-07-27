@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/maja42/goval"
+	models "github.com/wopta/goworkspace/models"
 )
 
 func (state *State) AddTaskHandler(name string, handler func(state *State) error) map[string]func(state *State) error {
@@ -17,7 +18,7 @@ func (state *State) AddTaskHandler(name string, handler func(state *State) error
 	return state.Handlers
 }
 
-func (state *State) RunBpmn(processes []Process) {
+func (state *State) RunBpmn(processes []models.Process) {
 	log.Println("RunBpmn")
 	state.Processes = processes
 
@@ -37,7 +38,7 @@ func (state *State) RunBpmn(processes []Process) {
 	}
 
 }
-func (state *State) runNextProcess(process Process) {
+func (state *State) runNextProcess(process models.Process) {
 	log.Println("runNextProcess")
 	if !process.IsFailed {
 		for _, x := range state.getProcesses(process.OutProcess) {
@@ -48,13 +49,13 @@ func (state *State) runNextProcess(process Process) {
 	}
 
 }
-func (state *State) runProcess(process Process) {
+func (state *State) runProcess(process models.Process) {
 	log.Println("runProcess")
 	id := process.Id
 	state.Processes[id].Status = Active
 	var (
 		e error
-		p Process
+		p models.Process
 	)
 	if process.Type == Task {
 		e = state.Handlers[process.Name](state)
@@ -71,8 +72,8 @@ func (state *State) runProcess(process Process) {
 		state.runNextProcess(process)
 	}
 }
-func (state *State) getProcesses(ids []int) []Process {
-	var processes []Process
+func (state *State) getProcesses(ids []int) []models.Process {
+	var processes []models.Process
 	for _, id := range ids {
 		for _, process := range state.Processes {
 			if process.Id == id {
@@ -83,13 +84,13 @@ func (state *State) getProcesses(ids []int) []Process {
 	}
 	return processes
 }
-func (state *State) LoadProcesses(data string) ([]Process, error) {
-	var processes []Process
+func (state *State) LoadProcesses(data string) ([]models.Process, error) {
+	var processes []models.Process
 	e := json.Unmarshal([]byte(data), &processes)
 	state.Processes = processes
 	return processes, e
 }
-func (state *State) decisionStep(process Process) (Process, error) {
+func (state *State) decisionStep(process models.Process) (models.Process, error) {
 	jsonMap := make(map[string]interface{})
 	b, e := json.Marshal(state.Data)
 	e = json.Unmarshal(b, &jsonMap)

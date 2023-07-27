@@ -5,16 +5,20 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/wopta/goworkspace/bpmn"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
+	tr "github.com/wopta/goworkspace/transaction"
 	"github.com/wopta/goworkspace/user"
 )
 
 var origin string
+
+//var policy *models.Policy
 
 func EmitV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println("[EmitFxV2] Handler start ----------------------------------------")
@@ -49,7 +53,9 @@ func EmitV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 }
 
 func EmitV2(policy *models.Policy, request EmitRequest, origin string) EmitResponse {
-	var responseEmit EmitResponse
+	var (
+		responseEmit EmitResponse
+	)
 
 	firePolicy := lib.GetDatasetByEnv(origin, "policy")
 	guaranteFire := lib.GetDatasetByEnv(origin, "guarante")
@@ -60,9 +66,9 @@ func EmitV2(policy *models.Policy, request EmitRequest, origin string) EmitRespo
 	} else {
 		log.Println("[EmitFxV2] AgencyUid: ", policy.AgencyUid)
 		if policy.AgencyUid != "" {
-
-			state := runBpmn(*policy, getTest())
+			state := runBpmn(*policy, "agency")
 			log.Println("[EmitV2] state.Data Policy:", state.Data)
+			policy = &state.Data
 
 		} else if policy.AgentUid != "" {
 
@@ -87,7 +93,29 @@ func EmitV2(policy *models.Policy, request EmitRequest, origin string) EmitRespo
 
 	return responseEmit
 }
+func CheckChannel(policy models.Policy, t func()) {
+	if policy.AgencyUid != "" {
 
+	} else if policy.AgentUid != "" {
+
+	} else {
+	}
+
+}
+func setAdvice(policy *models.Policy, origin string) {
+
+	policy.Payment = "manual"
+	policy.PaymentSplit = string(models.PaySingleInstallment)
+	policy.IsPay = true
+	tr.PutByPolicy(*policy, "", origin, "", "", policy.PriceGross, policy.PriceNett, "")
+
+}
+func setAdviceBpm(state *bpmn.State) error {
+
+	p := state.Data
+	setAdvice(&p, origin)
+	return nil
+}
 func setData(state *bpmn.State) error {
 	p := state.Data
 	emitBase(&p, origin)
@@ -113,16 +141,23 @@ func putUser(state *bpmn.State) error {
 	return nil
 }
 
-func runBpmn(policy models.Policy, processByte string) *bpmn.State {
+func runBpmn(policy models.Policy, channel string) *bpmn.State {
+	settingByte, _ := lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "products/"+channel+"/setting.json")
+	//var prod models.Product
+
+	var setting models.NodeSetting
+
+	//Parsing/Unmarshalling JSON encoding/json
+	json.Unmarshal(settingByte, &setting)
 	state := bpmn.NewBpmn(policy)
 	state.AddTaskHandler("emitData", setData)
 	state.AddTaskHandler("sendMailSign", sendMailSign)
 	state.AddTaskHandler("sign", sendMailSign)
+	state.AddTaskHandler("setAdvice", setAdviceBpm)
+	state.AddTaskHandler("putUser", putUser)
 	log.Println(state.Handlers)
 	log.Println(state.Processes)
-	process, e := state.LoadProcesses(processByte)
-	log.Println(e)
-	state.RunBpmn(process)
+	state.RunBpmn(setting.EmitFlow)
 	return state
 }
 func getTest() string {
@@ -151,8 +186,28 @@ func getTest() string {
         "name": "sendMailSign",
         "type": "TASK",
         "id": 2,
-        "outProcess": [],
+        "outProcess": [3],
         "inProcess": [1],
+        "status": "READY"
+
+    },
+
+	{
+        "name": "setAdvice",
+        "type": "TASK",
+        "id": 3,
+        "outProcess": [4],
+        "inProcess": [2],
+        "status": "READY"
+
+    },
+
+	{
+        "name": "putUser",
+        "type": "TASK",
+        "id": 4,
+        "outProcess": [],
+        "inProcess": [3],
         "status": "READY"
 
     }

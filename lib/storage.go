@@ -4,6 +4,7 @@ import (
 	"context"
 	"io/ioutil"
 	"log"
+	"os"
 
 	"cloud.google.com/go/storage"
 )
@@ -34,4 +35,13 @@ func GetFromGoogleStorage(bucket string, file string) ([]byte, error) {
 	slurp, err := ioutil.ReadAll(rc)
 
 	return slurp, err
+}
+
+func PromoteFile(fromPath, toPath string) (string, error) {
+	fileBytes, err := GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), fromPath)
+	if err != nil {
+		return "", err
+	}
+
+	return PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), toPath, fileBytes)
 }
