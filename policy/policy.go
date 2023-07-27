@@ -36,7 +36,7 @@ func Policy(w http.ResponseWriter, r *http.Request) {
 			},
 			{
 				Route:   "v1/:uid",
-				Handler: UpdatePolicyFx, // Broker.UpdatePolicy
+				Handler: PatchPolicyFx, // Broker.UpdatePolicy
 				Method:  http.MethodPatch,
 				Roles:   []string{models.UserRoleAll},
 			},

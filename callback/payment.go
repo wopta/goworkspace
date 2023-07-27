@@ -18,7 +18,7 @@ import (
 	"github.com/wopta/goworkspace/user"
 )
 
-func Payment(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func PaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println("Payment")
 	var response string
 	var e error
