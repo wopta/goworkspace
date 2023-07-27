@@ -11,17 +11,7 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
-func GetMailPolicy(
-	policy *models.Policy,
-	subject string,
-	isLink bool,
-	cc string,
-	link string,
-	linkLabel string,
-	lines string,
-	isAttachment bool,
-	at *[]Attachment,
-) MailRequest {
+func GetMailPolicy(policy *models.Policy, subject string, isLink bool, cc string, link string, linkLabel string, lines string, isAttachment bool, at *[]Attachment) MailRequest {
 	var (
 		name     string
 		obj      MailRequest
@@ -75,11 +65,11 @@ func SendMailProposal(policy models.Policy) {
 
 	bodyData := BodyData{}
 
-	cc := SetBodyDataAndGetCC(policy, &bodyData)
+	cc := setBodyDataAndGetCC(policy, &bodyData)
 
-	templateFile := GetTemplateByChannel(policy, "pay")
+	templateFile := getTemplateByChannel(policy, "pay")
 
-	FillTemplate(templateFile, &bodyData, &tpl)
+	fillTemplate(templateFile, &bodyData, &tpl)
 
 	SendMail(
 		GetMailPolicy(
@@ -100,11 +90,11 @@ func SendMailPay(policy models.Policy) {
 	bodyData := BodyData{}
 	var tpl bytes.Buffer
 
-	cc := SetBodyDataAndGetCC(policy, &bodyData)
+	cc := setBodyDataAndGetCC(policy, &bodyData)
 
-	templateFile := GetTemplateByChannel(policy, "pay")
+	templateFile := getTemplateByChannel(policy, "pay")
 
-	FillTemplate(templateFile, &bodyData, &tpl)
+	fillTemplate(templateFile, &bodyData, &tpl)
 
 	SendMail(
 		GetMailPolicy(
@@ -125,11 +115,11 @@ func SendMailSign(policy models.Policy) {
 	bodyData := BodyData{}
 	var tpl bytes.Buffer
 
-	cc := SetBodyDataAndGetCC(policy, &bodyData)
+	cc := setBodyDataAndGetCC(policy, &bodyData)
 
-	templateFile := GetTemplateByChannel(policy, "sign")
+	templateFile := getTemplateByChannel(policy, "sign")
 
-	FillTemplate(templateFile, &bodyData, &tpl)
+	fillTemplate(templateFile, &bodyData, &tpl)
 
 	SendMail(
 		GetMailPolicy(
@@ -150,11 +140,11 @@ func SendMailContract(policy models.Policy, at *[]Attachment) {
 	bodyData := BodyData{}
 	var tpl bytes.Buffer
 
-	cc := SetBodyDataAndGetCC(policy, &bodyData)
+	cc := setBodyDataAndGetCC(policy, &bodyData)
 
-	templateFile := GetTemplateByChannel(policy, "sign")
+	templateFile := getTemplateByChannel(policy, "sign")
 
-	FillTemplate(templateFile, &bodyData, &tpl)
+	fillTemplate(templateFile, &bodyData, &tpl)
 
 	// retrocompatibility - the new use extracts the contract from the policy
 	if at == nil {

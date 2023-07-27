@@ -19,33 +19,32 @@ func getChannel(policy models.Policy) string {
 	}
 
 	return "e-commerce"
-
 }
 
-func SetBodyDataAndGetCC(policy models.Policy, bodyData *BodyData) string {
+func setBodyDataAndGetCC(policy models.Policy, bodyData *BodyData) string {
 	var cc string
 	channel := getChannel(policy)
 
 	switch channel {
 	case "agent":
-		cc = GetAgentBodyData(policy.AgentUid, bodyData)
+		cc = getAgentBodyData(policy.AgentUid, bodyData)
 	case "agency":
-		cc = GetAgencyBodyData(policy.AgencyUid, bodyData)
+		cc = getAgencyBodyData(policy.AgencyUid, bodyData)
 	}
 
-	GetProductBodyData(policy, bodyData)
+	getProductBodyData(policy, bodyData)
 
-	GetContractorBodyData(policy, bodyData)
+	getContractorBodyData(policy, bodyData)
 
 	return cc
 }
 
-func GetContractorBodyData(policy models.Policy, bodyData *BodyData) {
+func getContractorBodyData(policy models.Policy, bodyData *BodyData) {
 	bodyData.ContractorName = policy.Contractor.Name
 	bodyData.ContractorSurname = policy.Contractor.Surname
 }
 
-func GetAgentBodyData(agentUid string, bodyData *BodyData) string {
+func getAgentBodyData(agentUid string, bodyData *BodyData) string {
 	agent, err := models.GetAgentByAuthId(agentUid)
 	lib.CheckError(err)
 	bodyData.AgentName = agent.Name
@@ -53,14 +52,14 @@ func GetAgentBodyData(agentUid string, bodyData *BodyData) string {
 	return agent.Mail
 }
 
-func GetAgencyBodyData(agencyUid string, bodyData *BodyData) string {
+func getAgencyBodyData(agencyUid string, bodyData *BodyData) string {
 	agency, err := models.GetAgencyByAuthId(agencyUid)
 	lib.CheckError(err)
 	bodyData.AgencyName = agency.Name
 	return agency.Email
 }
 
-func GetProductBodyData(policy models.Policy, bodyData *BodyData) {
+func getProductBodyData(policy models.Policy, bodyData *BodyData) {
 	switch policy.Name {
 	case "pmi":
 		bodyData.ProductName = "Artigiani & Imprese"
@@ -77,7 +76,7 @@ func GetProductBodyData(policy models.Policy, bodyData *BodyData) {
 	}
 }
 
-func GetTemplateByChannel(policy models.Policy, templateType string) []byte {
+func getTemplateByChannel(policy models.Policy, templateType string) []byte {
 
 	var file []byte
 	channel := getChannel(policy)
@@ -91,11 +90,9 @@ func GetTemplateByChannel(policy models.Policy, templateType string) []byte {
 	}
 
 	return file
-
 }
 
 func FillTemplate(htmlTemplate []byte, bodyData *BodyData, tpl *bytes.Buffer) {
-
 	tmplt := template.New("htmlTemplate")
 	tmplt, err := tmplt.Parse(string(htmlTemplate))
 	lib.CheckError(err)

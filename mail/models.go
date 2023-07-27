@@ -15,7 +15,6 @@ type BodyData struct {
 	AgentName         string
 	AgentSurname      string
 	AgencyName        string
-	AgencySurname     string
 	ProductForm       string
 	ProductName       string
 }
