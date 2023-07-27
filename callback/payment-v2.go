@@ -7,8 +7,10 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 
+	"github.com/wopta/goworkspace/bpmn"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
@@ -17,6 +19,11 @@ import (
 )
 
 const fabrickBillPaid string = "PAID"
+
+var (
+	origin   string
+	schedule string
+)
 
 func PaymentV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println("[PaymentV2Fx] Handler start -----------------------------------")
@@ -28,8 +35,8 @@ func PaymentV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	)
 
 	policyUid := r.URL.Query().Get("uid")
-	schedule := r.URL.Query().Get("schedule")
-	origin := r.URL.Query().Get("origin")
+	schedule = r.URL.Query().Get("schedule")
+	origin = r.URL.Query().Get("origin")
 	log.Printf("[PaymentV2Fx] uid %s, schedule %s", policyUid, schedule)
 
 	request := lib.ErrorByte(io.ReadAll(r.Body))
@@ -71,7 +78,16 @@ func fabrickPayment(origin, policyUid, schedule string) error {
 
 	policy := plc.GetPolicyByUid(policyUid, origin)
 
-	if !policy.IsPay && policy.Status == models.PolicyStatusToPay {
+	// TODO check handling: on what state we expect the policy to be for agency flow?
+	if policy.AgencyUid != "" {
+		state := runAgencyFlow(policy, models.UserRoleAgency)
+
+		if state.IsFailed {
+			return errors.New("bpmn failed")
+		}
+
+		return nil
+	} else if !policy.IsPay && policy.Status == models.PolicyStatusToPay {
 		// promote documents from temp bucket to user and connect it to policy
 		err := plc.SetUserIntoPolicyContractor(&policy, origin)
 		if err != nil {
@@ -132,4 +148,58 @@ func fabrickPayment(origin, policyUid, schedule string) error {
 
 	log.Printf("[fabrickPayment] ERROR Policy %s with status %s and isPay %t cannot be paid", policyUid, policy.Status, policy.IsPay)
 	return errors.New("cannot pay policy")
+}
+
+func runAgencyFlow(policy models.Policy, channel string) *bpmn.State {
+	var (
+		setting models.NodeSetting
+		err     error
+		state   *bpmn.State
+	)
+
+	settingByte, err := lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "products/"+channel+"/setting.json")
+	if err != nil {
+		log.Printf("[runAgencyFlow] ERROR loading setting: %s", err.Error())
+	}
+	err = json.Unmarshal(settingByte, &setting)
+	if err != nil {
+		log.Printf("[runAgencyFlow] ERROR unmarshaling setting: %s", err.Error())
+	}
+
+	state = bpmn.NewBpmn(policy)
+
+	state.AddTaskHandler("payTransaction", payTransaction)
+	state.AddTaskHandler("sendMailContract", sendMailContract)
+
+	state.RunBpmn(setting.PayFlow)
+
+	return state
+}
+
+func payTransaction(state *bpmn.State) error {
+	log.Println("[payTransaction] Handler start ---")
+
+	policy := state.Data
+	tr, err := transaction.GetPolicyFirstTransaction(policy.Uid, schedule, origin)
+	if err != nil {
+		log.Printf("[payTransaction] ERROR GetPolicyFirstTransaction %s", err.Error())
+		return err
+	}
+	err = transaction.Pay(&tr, origin)
+	if err != nil {
+		log.Printf("[payTransaction] ERROR Pay %s", err.Error())
+		return err
+	}
+	tr.BigQuerySave(origin)
+
+	return nil
+}
+
+func sendMailContract(state *bpmn.State) error {
+	log.Println("[sendMailContract] Handler start ---")
+
+	policy := state.Data
+	mail.SendMailContract(policy, nil)
+
+	return nil
 }
