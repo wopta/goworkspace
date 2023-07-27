@@ -15,77 +15,63 @@ import (
 )
 
 type Agency struct {
-	AuthId          string      `json:"authId"                 firestore:"authId"`
-	Uid             string      `json:"uid"                    firestore:"uid"`
-	Email           string      `json:"email"                  firestore:"email"`
-	VatCode         string      `json:"vatCode"                firestore:"vatCode"`
-	Name            string      `json:"name"                   firestore:"name"`
-	Manager         User        `json:"manager"                firestore:"manager"`
-	NodeSetting     NodeSetting `json:"nodeSetting"            firestore:"nodeSetting"`
-	Users           []string    `json:"users"                  firestore:"users"                  bigquery:"-"` // will contain users UIDs
-	ParentAgency    string      `json:"parentAgency,omitempty" firestore:"parentAgency,omitempty"`              // parent Agency UID
-	Agencies        []string    `json:"agencies"               firestore:"agencies"`                            // will contain agencies UIDs
-	Agents          []string    `json:"agents"                 firestore:"agents"`                              // will contain agents UIDs
-	IsActive        bool        `json:"isActive"               firestore:"isActive"`
-	Products        []Product   `json:"products"               firestore:"products"`
-	Policies        []string    `json:"policies"               firestore:"policies"` // will contain policies UIDs
-	Steps           []Step      `json:"steps"                  firestore:"steps"`
-	Skin            Skin        `json:"skin"                   firestore:"skin"`
-	RuiCode         string      `json:"ruiCode"                firestore:"ruiCode"`
-	RuiSection      string      `json:"ruiSection"             firestore:"ruiSection"`
-	RuiRegistration time.Time   `json:"ruiRegistration"        firestore:"ruiRegistration"`
-	CreationDate    time.Time   `json:"creationDate"           firestore:"creationDate"`
-	UpdatedDate     time.Time   `json:"updatedDate"            firestore:"updatedDate"`
+	AuthId             string                `json:"authId"                 firestore:"authId"                 bigquery:"-"`
+	Uid                string                `json:"uid"                    firestore:"uid"                    bigquery:"uid"`
+	Email              string                `json:"email"                  firestore:"email"                  bigquery:"-"`
+	VatCode            string                `json:"vatCode"                firestore:"vatCode"                bigquery:"vatCode"`
+	Name               string                `json:"name"                   firestore:"name"                   bigquery:"name"`
+	Manager            User                  `json:"manager"                firestore:"manager"                bigquery:"-"`
+	BigManagerUid      string                `json:"-"                      firestore:"-"                      bigquery:"managerUid"`
+	NodeSetting        NodeSetting           `json:"nodeSetting"            firestore:"nodeSetting"            bigquery:"-"`
+	Users              []string              `json:"users"                  firestore:"users"                  bigquery:"-"`            // will contain users UIDs
+	ParentAgency       string                `json:"parentAgency,omitempty" firestore:"parentAgency,omitempty" bigquery:"parentAgency"` // parent Agency UID
+	Agencies           []string              `json:"agencies"               firestore:"agencies"               bigquery:"-"`            // will contain agencies UIDs
+	BigAgencies        string                `json:"-"                      firestore:"-"                      bigquery:"agencies"`     // will contain agencies UIDs
+	Agents             []string              `json:"agents"                 firestore:"agents"                 bigquery:"-"`            // will contain agents UIDs
+	BigAgents          string                `json:"-"                      firestore:"-"                      bigquery:"agents"`       // will contain agents UIDs
+	IsActive           bool                  `json:"isActive"               firestore:"isActive"               bigquery:"isActive"`
+	Products           []Product             `json:"products"               firestore:"products"               bigquery:"-"`
+	Policies           []string              `json:"policies"               firestore:"policies"               bigquery:"-"` // will contain policies UIDs
+	Steps              []Step                `json:"steps"                  firestore:"steps"                  bigquery:"-"`
+	Skin               Skin                  `json:"skin"                   firestore:"skin"                   bigquery:"-"`
+	RuiCode            string                `json:"ruiCode"                firestore:"ruiCode"                bigquery:"ruiCode"`
+	RuiSection         string                `json:"ruiSection"             firestore:"ruiSection"             bigquery:"ruiSection"`
+	RuiRegistration    time.Time             `json:"ruiRegistration"        firestore:"ruiRegistration"        bigquery:"-"`
+	BigRuiRegistration bigquery.NullDateTime `json:"-"                      firestore:"-"                      bigquery:"ruiRegistration"`
+	CreationDate       time.Time             `json:"creationDate"           firestore:"creationDate"           bigquery:"-"`
+	BigCreationDate    bigquery.NullDateTime `json:"-"                      firestore:"-"                      bigquery:"creationDate"`
+	UpdatedDate        time.Time             `json:"updatedDate"            firestore:"updatedDate"            bigquery:"-"`
+	BigUpdatedDate     bigquery.NullDateTime `json:"-"                      firestore:"-"                      bigquery:"updateDate"`
+	Data               string                `json:"-"                      firestore:"-"                      bigquery:"data"`
 }
 
-type AgencyBigquery struct {
-	Uid             string                `bigquery:"uid"`
-	Name            string                `bigquery:"name"`
-	VatCode         string                `bigquery:"vatCode"`
-	IsActive        bool                  `bigquery:"isActive"`
-	RuiCode         string                `bigquery:"ruiCode"`
-	RuiSection      string                `bigquery:"ruiSection"`
-	RuiRegistration bigquery.NullDateTime `bigquery:"ruiRegistration"`
-	ManagerUid      string                `bigquery:"managerUid"`
-	ParentAgency    string                `bigquery:"parentAgency"` // parent Agency UID
-	Agencies        string                `bigquery:"agencies"`     // will contain agencies UIDs
-	Agents          string                `bigquery:"agents"`       // will contain agents UIDs
-	CreationDate    bigquery.NullDateTime `bigquery:"creationDate"`
-	UpdateDate      bigquery.NullDateTime `bigquery:"updateDate"`
-	Data            string                `bigquery:"data"`
-}
+func (agency *Agency) prepareForBigquerySave() error {
+	agency.BigManagerUid = agency.Manager.Uid
+	agency.BigAgencies = strings.Join(agency.Agencies, ",")
+	agency.BigAgents = strings.Join(agency.Agents, ",")
+	agency.BigRuiRegistration = lib.GetBigQueryNullDateTime(agency.RuiRegistration)
+	agency.BigCreationDate = lib.GetBigQueryNullDateTime(agency.CreationDate)
+	agency.BigUpdatedDate = lib.GetBigQueryNullDateTime(agency.UpdatedDate)
 
-func (agency Agency) toBigquery() (AgencyBigquery, error) {
-	agencyJson, err := json.Marshal(agency)
+	data, err := json.Marshal(agency)
 	if err != nil {
-		return AgencyBigquery{}, err
+		return err
 	}
-	return AgencyBigquery{
-		Uid:             agency.Uid,
-		Name:            agency.Name,
-		VatCode:         agency.VatCode,
-		IsActive:        agency.IsActive,
-		RuiCode:         agency.RuiCode,
-		RuiSection:      agency.RuiSection,
-		RuiRegistration: lib.GetBigQueryNullDateTime(agency.RuiRegistration),
-		ManagerUid:      agency.Manager.Uid,
-		Agents:          strings.Join(agency.Agents, ","),
-		CreationDate:    lib.GetBigQueryNullDateTime(agency.CreationDate),
-		UpdateDate:      lib.GetBigQueryNullDateTime(agency.UpdatedDate),
-		Data:            string(agencyJson),
-	}, nil
+	agency.Data = string(data)
+
+	return nil
 }
 
 func (agency Agency) BigquerySave(origin string) error {
 	table := lib.GetDatasetByEnv(origin, "agency")
-	agencyBigquery, err := agency.toBigquery()
+	err := agency.prepareForBigquerySave()
 	if err != nil {
 		return err
 	}
 
 	log.Println("agency save big query: " + agency.Uid)
 
-	return lib.InsertRowsBigQuery("wopta", table, agencyBigquery)
+	return lib.InsertRowsBigQuery("wopta", table, agency)
 }
 
 type Skin struct {

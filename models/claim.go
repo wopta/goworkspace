@@ -21,66 +21,53 @@ func (r *Claim) Marshal() ([]byte, error) {
 }
 
 type Claim struct {
-	Name              string       `firestore:"name"                        json:"name,omitempty"`
-	Date              time.Time    `firestore:"date"                        json:"date,omitempty"`
-	Surname           string       `firestore:"surname"                     json:"surname,omitempty"`
-	Mail              string       `firestore:"mail"                        json:"mail,omitempty"`
-	PolicyDescription string       `firestore:"policyDescription,omitempty" json:"policyDescription,omitempty"`
-	PolicyId          string       `firestore:"policyId,omitempty"          json:"policyId,omitempty"`
-	PolicyUid         string       `firestore:"policyUid,omitempty"         json:"policyUid,omitempty"`
-	PolicyNumber      string       `firestore:"policyNumber,omitempty"      json:"policyNumber,omitempty"`
-	CreationDate      time.Time    `firestore:"creationDate,omitempty"      json:"creationDate,omitempty"`
-	Updated           time.Time    `firestore:"updated,omitempty"           json:"updated,omitempty"`
-	Company           string       `firestore:"company,omitempty"           json:"company,omitempty"`
-	Policy            string       `firestore:"policy,omitempty"            json:"policy,omitempty"`
-	Description       string       `firestore:"description,omitempty"       json:"description,omitempty"`
-	IdCompany         string       `firestore:"idCompany,omitempty"         json:"idCompany,omitempty"`
-	UserUid           string       `firestore:"userUid,omitempty"           json:"userUid,omitempty"`
-	ClaimUid          string       `firestore:"claimUid,omitempty"          json:"claimUid,omitempty"`
-	Status            string       `firestore:"status,omitempty"            json:"status,omitempty"`
-	StatusHistory     []string     `firestore:"statusHistory,omitempty"     json:"statusHistory,omitempty"`
-	Documents         []Attachment `firestore:"documents,omitempty"         json:"documents,omitempty"`
-	History           []Claim      `firestore:"history,omitempty"           json:"history,omitempty"`
+	Name              string                `firestore:"name"                        json:"name,omitempty"              bigquery:"-"`
+	Date              time.Time             `firestore:"date"                        json:"date,omitempty"              bigquery:"-"`
+	Surname           string                `firestore:"surname"                     json:"surname,omitempty"           bigquery:"-"`
+	Mail              string                `firestore:"mail"                        json:"mail,omitempty"              bigquery:"-"`
+	PolicyDescription string                `firestore:"policyDescription,omitempty" json:"policyDescription,omitempty" bigquery:"-"`
+	PolicyId          string                `firestore:"policyId,omitempty"          json:"policyId,omitempty"          bigquery:"-"`
+	PolicyUid         string                `firestore:"policyUid,omitempty"         json:"policyUid,omitempty"         bigquery:"policyUid"`
+	PolicyNumber      string                `firestore:"policyNumber,omitempty"      json:"policyNumber,omitempty"      bigquery:"-"`
+	CreationDate      time.Time             `firestore:"creationDate,omitempty"      json:"creationDate,omitempty"      bigquery:"-"`
+	BigCreationDate   bigquery.NullDateTime `firestore:"-"                           json:"-"                           bigquery:"creationDate"`
+	Updated           time.Time             `firestore:"updated,omitempty"           json:"updated,omitempty"           bigquery:"-"`
+	Company           string                `firestore:"company,omitempty"           json:"company,omitempty"           bigquery:"-"`
+	Policy            string                `firestore:"policy,omitempty"            json:"policy,omitempty"            bigquery:"-"`
+	Description       string                `firestore:"description,omitempty"       json:"description,omitempty"       bigquery:"description"`
+	IdCompany         string                `firestore:"idCompany,omitempty"         json:"idCompany,omitempty"         bigquery:"-"`
+	UserUid           string                `firestore:"userUid,omitempty"           json:"userUid,omitempty"           bigquery:"userUid"`
+	ClaimUid          string                `firestore:"claimUid,omitempty"          json:"claimUid,omitempty"          bigquery:"uid"`
+	Status            string                `firestore:"status,omitempty"            json:"status,omitempty"            bigquery:"status"`
+	StatusHistory     []string              `firestore:"statusHistory,omitempty"     json:"statusHistory,omitempty"     bigquery:"-"`
+	BigStatusHistory  string                `firestore:"-"                           json:"-"                           bigquery:"statusHistory"`
+	Documents         []Attachment          `firestore:"documents,omitempty"         json:"documents,omitempty"         bigquery:"-"`
+	History           []Claim               `firestore:"history,omitempty"           json:"history,omitempty"           bigquery:"-"`
+	Data              string                `firestore:"-"                           json:"-"                           bigquery:"data"`
 }
 
-type ClaimBigquery struct {
-	Uid           string                `bigquery:"uid"`
-	PolicyUid     string                `bigquery:"policyUid"`
-	UserUid       string                `bigquery:"userUid"`
-	Status        string                `bigquery:"status"`
-	StatusHistory string                `bigquery:"statusHistory"`
-	Description   string                `bigquery:"description"`
-	Data          string                `bigquery:"data"`
-	CreationDate  bigquery.NullDateTime `bigquery:"creationDate"`
-}
+func (claim *Claim) prepareForBigquerySave() error {
+	claim.BigCreationDate = lib.GetBigQueryNullDateTime(claim.CreationDate)
+	claim.BigStatusHistory = strings.Join(claim.StatusHistory, ",")
 
-func (claim Claim) toBigquery() (ClaimBigquery, error) {
-	claimData, err := json.Marshal(claim)
+	data, err := json.Marshal(claim)
 	if err != nil {
-		return ClaimBigquery{}, err
+		return err
 	}
-	return ClaimBigquery{
-		Uid:           claim.ClaimUid,
-		PolicyUid:     claim.PolicyId,
-		UserUid:       claim.UserUid,
-		Status:        claim.Status,
-		StatusHistory: strings.Join(claim.StatusHistory, ","),
-		Description:   claim.Description,
-		Data:          string(claimData),
-		CreationDate:  lib.GetBigQueryNullDateTime(claim.CreationDate),
-	}, nil
+	claim.Data = string(data)
+	return nil
 }
 
 func (claim Claim) BigquerySave(origin string) error {
 	table := lib.GetDatasetByEnv(origin, "claim")
-	claimBigquery, err := claim.toBigquery()
-	if err != nil {
+
+	if err := claim.prepareForBigquerySave(); err != nil {
 		return err
 	}
 
 	log.Println("claim save big query: " + claim.ClaimUid)
 
-	return lib.InsertRowsBigQuery("wopta", table, claimBigquery)
+	return lib.InsertRowsBigQuery("wopta", table, claim)
 }
 
 type Attachment struct {

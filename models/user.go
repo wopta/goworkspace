@@ -26,142 +26,126 @@ func (r *User) Marshal() ([]byte, error) {
 }
 
 type User struct {
-	EmailVerified     bool                `firestore:"emailVerified"               json:"emailVerified,omitempty"`
-	Uid               string              `firestore:"uid"                         json:"uid,omitempty"`
-	Status            string              `firestore:"status,omitempty"            json:"status,omitempty"`
-	StatusHistory     []string            `firestore:"statusHistory,omitempty"     json:"statusHistory,omitempty"`
-	BirthDate         string              `firestore:"birthDate"                   json:"birthDate,omitempty"`
-	BirthCity         string              `firestore:"birthCity"                   json:"birthCity,omitempty"`
-	BirthProvince     string              `firestore:"birthProvince"               json:"birthProvince,omitempty"`
-	PictureUrl        string              `firestore:"pictureUrl"                  json:"pictureUrl,omitempty"`
-	Location          Location            `firestore:"location"                    json:"location,omitempty"`
-	Geo               latlng.LatLng       `firestore:"geo"                         json:"-"`
-	Name              string              `firestore:"name"                        json:"name,omitempty"`
-	Gender            string              `firestore:"gender"                      json:"gender,omitempty"`
-	Type              string              `firestore:"type"                        json:"type,omitempty"`
-	Cluster           string              `firestore:"cluster"                     json:"cluster,omitempty"`
-	Surname           string              `firestore:"surname"                     json:"surname,omitempty"`
-	Address           string              `firestore:"address"                     json:"address,omitempty"`
-	PostalCode        string              `firestore:"postalCode"                  json:"postalCode,omitempty"`
-	City              string              `firestore:"city"                        json:"city,omitempty"`
-	Locality          string              `firestore:"locality"                    json:"locality,omitempty"`
-	StreetNumber      string              `firestore:"streetNumber,omitempty"      json:"streetNumber,omitempty"`
-	CityCode          string              `firestore:"cityCode"                    json:"cityCode,omitempty"`
-	Role              string              `firestore:"role"                        json:"role,omitempty"`
-	Work              string              `firestore:"work"                        json:"work,omitempty"`
-	WorkType          string              `firestore:"workType"                    json:"workType,omitempty"`
-	WorkStatus        string              `firestore:"workStatus,omitempty"        json:"workStatus,omitempty"`
-	Mail              string              `firestore:"mail"                        json:"mail,omitempty"`
-	Phone             string              `firestore:"phone"                       json:"phone,omitempty"`
-	FiscalCode        string              `firestore:"fiscalCode"                  json:"fiscalCode,omitempty"`
-	VatCode           string              `firestore:"vatCode"                     json:"vatCode"`
-	RiskClass         string              `firestore:"riskClass"                   json:"riskClass,omitempty"`
-	CreationDate      time.Time           `firestore:"creationDate,omitempty"      json:"creationDate,omitempty"`
-	UpdatedDate       time.Time           `firestore:"updatedDate,omitempty"       json:"updatedDate,omitempty"`
-	PoliciesUid       []string            `firestore:"policiesUid"                 json:"policiesUid,omitempty"`
-	BigPoliciesUid    string              `firestore:"-"                           json:"-"`
-	Claims            *[]Claim            `firestore:"claims"                      json:"claims,omitempty"`
-	Consens           *[]Consens          `firestore:"consens"                     json:"consens,omitempty"`
-	IsAgent           bool                `firestore:"isAgent,omitempty"           json:"isAgent,omitempty"`
-	Height            int                 `firestore:"height"                      json:"height"`
-	Weight            int                 `firestore:"weight"                      json:"weight"`
-	Json              string              `firestore:"-"                           json:"-"`
-	Residence         *Address            `firestore:"residence,omitempty"         json:"residence,omitempty"`
-	Domicile          *Address            `firestore:"domicile,omitempty"          json:"domicile,omitempty"`
-	IdentityDocuments []*IdentityDocument `firestore:"identityDocuments,omitempty" json:"identityDocuments,omitempty"`
-	AuthId            string              `firestore:"authId,omitempty"            json:"authId,omitempty"`
-	Statements        []*Statement        `firestore:"statements,omitempty"        json:"statements,omitempty"`
-	IsLegalPerson     bool                `firestore:"isLegalPerson,omitempty"     json:"isLegalPerson,omitempty"`
+	EmailVerified        bool                   `firestore:"emailVerified"               json:"emailVerified,omitempty"     bigquery:"-"`
+	Uid                  string                 `firestore:"uid"                         json:"uid,omitempty"               bigquery:"uid"`
+	Status               string                 `firestore:"status,omitempty"            json:"status,omitempty"            bigquery:"-"`
+	StatusHistory        []string               `firestore:"statusHistory,omitempty"     json:"statusHistory,omitempty"     bigquery:"-"`
+	BirthDate            string                 `firestore:"birthDate"                   json:"birthDate,omitempty"         bigquery:"-"`
+	BigBirthDate         bigquery.NullDateTime  `firestore:"-"                           json:"-"                           bigquery:"birthDate"`
+	BirthCity            string                 `firestore:"birthCity"                   json:"birthCity,omitempty"         bigquery:"birthCity"`
+	BirthProvince        string                 `firestore:"birthProvince"               json:"birthProvince,omitempty"     bigquery:"birthProvince"`
+	PictureUrl           string                 `firestore:"pictureUrl"                  json:"pictureUrl,omitempty"        bigquery:"-"`
+	Location             Location               `firestore:"location"                    json:"location,omitempty"          bigquery:"-"`
+	BigLocation          bigquery.NullGeography `firestore:"-"                           json:"-"                           bigquery:"location"`
+	Geo                  latlng.LatLng          `firestore:"geo"                         json:"-"                           bigquery:"-"`
+	Name                 string                 `firestore:"name"                        json:"name,omitempty"              bigquery:"name"`
+	Gender               string                 `firestore:"gender"                      json:"gender,omitempty"            bigquery:"-"`
+	Type                 string                 `firestore:"type"                        json:"type,omitempty"              bigquery:"-"`
+	Cluster              string                 `firestore:"cluster"                     json:"cluster,omitempty"           bigquery:"-"`
+	Surname              string                 `firestore:"surname"                     json:"surname,omitempty"           bigquery:"surname"`
+	Address              string                 `firestore:"address"                     json:"address,omitempty"           bigquery:"-"`
+	PostalCode           string                 `firestore:"postalCode"                  json:"postalCode,omitempty"        bigquery:"-"`
+	City                 string                 `firestore:"city"                        json:"city,omitempty"              bigquery:"-"`
+	Locality             string                 `firestore:"locality"                    json:"locality,omitempty"          bigquery:"-"`
+	StreetNumber         string                 `firestore:"streetNumber,omitempty"      json:"streetNumber,omitempty"      bigquery:"-"`
+	CityCode             string                 `firestore:"cityCode"                    json:"cityCode,omitempty"          bigquery:"-"`
+	Role                 string                 `firestore:"role"                        json:"role,omitempty"              bigquery:"-"`
+	Work                 string                 `firestore:"work"                        json:"work,omitempty"              bigquery:"-"`
+	WorkType             string                 `firestore:"workType"                    json:"workType,omitempty"          bigquery:"-"`
+	WorkStatus           string                 `firestore:"workStatus,omitempty"        json:"workStatus,omitempty"        bigquery:"-"`
+	Mail                 string                 `firestore:"mail"                        json:"mail,omitempty"              bigquery:"-"`
+	Phone                string                 `firestore:"phone"                       json:"phone,omitempty"             bigquery:"phone"`
+	FiscalCode           string                 `firestore:"fiscalCode"                  json:"fiscalCode,omitempty"        bigquery:"fiscalCode"`
+	VatCode              string                 `firestore:"vatCode"                     json:"vatCode"                     bigquery:"vatCode"`
+	RiskClass            string                 `firestore:"riskClass"                   json:"riskClass,omitempty"         bigquery:"-"`
+	CreationDate         time.Time              `firestore:"creationDate,omitempty"      json:"creationDate,omitempty"      bigquery:"-"`
+	BigCreationDate      bigquery.NullDateTime  `firestore:"-"                           json:"-"                           bigquery:"creationDate"`
+	UpdatedDate          time.Time              `firestore:"updatedDate,omitempty"       json:"updatedDate,omitempty"       bigquery:"-"`
+	BigUpdatedDate       bigquery.NullDateTime  `firestore:"-"                           json:"-"                           bigquery:"updatedDate"`
+	PoliciesUid          []string               `firestore:"policiesUid"                 json:"policiesUid,omitempty"       bigquery:"-"`
+	BigPoliciesUid       string                 `firestore:"-"                           json:"-"                           bigquery:"-"`
+	Claims               *[]Claim               `firestore:"claims"                      json:"claims,omitempty"            bigquery:"-"`
+	Consens              *[]Consens             `firestore:"consens"                     json:"consens,omitempty"           bigquery:"-"`
+	IsAgent              bool                   `firestore:"isAgent,omitempty"           json:"isAgent,omitempty"           bigquery:"-"`
+	Height               int                    `firestore:"height"                      json:"height"                      bigquery:"-"`
+	Weight               int                    `firestore:"weight"                      json:"weight"                      bigquery:"-"`
+	Json                 string                 `firestore:"-"                           json:"-"                           bigquery:"-"`
+	Residence            *Address               `firestore:"residence,omitempty"         json:"residence,omitempty"         bigquery:"-"`
+	ResidenceStretName   string                 `firestore:"-"                           json:"-"                           bigquery:"residenceStretName"`
+	ResidenceStretNumber string                 `firestore:"-"                           json:"-"                           bigquery:"residenceStretNumber"`
+	ResidenceCity        string                 `firestore:"-"                           json:"-"                           bigquery:"residenceCity"`
+	ResidencePostalCode  string                 `firestore:"-"                           json:"-"                           bigquery:"residencePostalCode"`
+	ResidenceLocality    string                 `firestore:"-"                           json:"-"                           bigquery:"residenceLocality"`
+	ResidenceCityCode    string                 `firestore:"-"                           json:"-"                           bigquery:"residenceCityCode"`
+	Domicile             *Address               `firestore:"domicile,omitempty"          json:"domicile,omitempty"          bigquery:"-"`
+	DomicileStretName    string                 `firestore:"-"                           json:"-"                           bigquery:"domicileStretName"`
+	DomicileStretNumber  string                 `firestore:"-"                           json:"-"                           bigquery:"domicileStretNumber"`
+	DomicileCity         string                 `firestore:"-"                           json:"-"                           bigquery:"domicileCity"`
+	DomicilePostalCode   string                 `firestore:"-"                           json:"-"                           bigquery:"domicilePostalCode"`
+	DomicileLocality     string                 `firestore:"-"                           json:"-"                           bigquery:"domicileLocality"`
+	DomicileCityCode     string                 `firestore:"-"                           json:"-"                           bigquery:"domicileCityCode"`
+	IdentityDocuments    []*IdentityDocument    `firestore:"identityDocuments,omitempty" json:"identityDocuments,omitempty" bigquery:"-"`
+	AuthId               string                 `firestore:"authId,omitempty"            json:"authId,omitempty"            bigquery:"-"`
+	Statements           []*Statement           `firestore:"statements,omitempty"        json:"statements,omitempty"        bigquery:"-"`
+	IsLegalPerson        bool                   `firestore:"isLegalPerson,omitempty"     json:"isLegalPerson,omitempty"     bigquery:"-"`
+	Data                 string                 `firestore:"-"                           json:"-"                           bigquery:"data"`
 }
 
-type UserBigquery struct {
-	Uid                  string                 `bigquery:"uid"`
-	Name                 string                 `bigquery:"name"`
-	Surname              string                 `bigquery:"surname"`
-	BirthDate            bigquery.NullDateTime  `bigquery:"birthDate"`
-	FiscalCode           string                 `bigquery:"fiscalCode"`
-	VatCode              string                 `bigquery:"vatCode"`
-	ResidenceStretName   string                 `bigquery:"residenceStretName"`
-	ResidenceStretNumber string                 `bigquery:"residenceStretNumber"`
-	ResidenceCity        string                 `bigquery:"residenceCity"`
-	ResidencePostalCode  string                 `bigquery:"residencePostalCode"`
-	ResidenceLocality    string                 `bigquery:"residenceLocality"`
-	ResidenceCityCode    string                 `bigquery:"residenceCityCode"`
-	DomicileStretName    string                 `bigquery:"domicileStretName"`
-	DomicileStretNumber  string                 `bigquery:"domicileStretNumber"`
-	DomicileCity         string                 `bigquery:"domicileCity"`
-	DomicilePostalCode   string                 `bigquery:"domicilePostalCode"`
-	DomicileLocality     string                 `bigquery:"domicileLocality"`
-	DomicileCityCode     string                 `bigquery:"domicileCityCode"`
-	Phone                string                 `bigquery:"phone"`
-	Location             bigquery.NullGeography `bigquery:"location"`
-	CreationDate         bigquery.NullDateTime  `bigquery:"creationDate"`
-	UpdatedDate          bigquery.NullDateTime  `bigquery:"updatedDate"`
-	Data                 string                 `bigquery:"data"`
-}
-
-func (user User) toBigquery() (UserBigquery, error) {
+func (user *User) prepareForBigquerySave() error {
 	userJson, err := json.Marshal(user)
 	if err != nil {
-		return UserBigquery{}, err
+		return err
 	}
+	user.Data = string(userJson)
 
 	birthDate, err := time.Parse(time.RFC3339, user.BirthDate)
 	if err != nil {
-		return UserBigquery{}, err
+		return err
 	}
+	user.BigBirthDate = lib.GetBigQueryNullDateTime(birthDate)
 
 	if user.Residence == nil {
-		return UserBigquery{}, errors.New("'Residence' is nil")
+		return errors.New("'Residence' is nil")
 	}
+	user.ResidenceStretName = user.Residence.StreetName
+	user.ResidenceStretNumber = user.Residence.StreetNumber
+	user.ResidenceCity = user.Residence.City
+	user.ResidencePostalCode = user.Residence.PostalCode
+	user.ResidenceLocality = user.Residence.Locality
+	user.ResidenceCityCode = user.Residence.CityCode
 
 	if user.Domicile == nil {
-		return UserBigquery{}, errors.New("'Domicile' is nil")
+		return errors.New("'Domicile' is nil")
 	}
+	user.DomicileStretName = user.Domicile.StreetName
+	user.DomicileStretNumber = user.Domicile.StreetNumber
+	user.DomicileCity = user.Domicile.City
+	user.DomicilePostalCode = user.Domicile.PostalCode
+	user.DomicileLocality = user.Domicile.Locality
+	user.DomicileCityCode = user.Domicile.CityCode
 
 	geography := bigquery.NullGeography{
 		// TODO: Check if correct: Geography type uses the WKT format for geometry
 		GeographyVal: fmt.Sprintf("POINT (%f %f)", user.Location.Lng, user.Location.Lat),
 		Valid:        true,
 	}
+	user.BigLocation = geography
+	user.BigCreationDate = lib.GetBigQueryNullDateTime(user.CreationDate)
+	user.BigUpdatedDate = lib.GetBigQueryNullDateTime(user.UpdatedDate)
 
-	return UserBigquery{
-		Uid:                  user.Uid,
-		Name:                 user.Name,
-		Surname:              user.Surname,
-		BirthDate:            lib.GetBigQueryNullDateTime(birthDate),
-		FiscalCode:           user.FiscalCode,
-		VatCode:              user.VatCode,
-		ResidenceStretName:   user.Residence.StreetName,
-		ResidenceStretNumber: user.Residence.StreetNumber,
-		ResidenceCity:        user.Residence.City,
-		ResidencePostalCode:  user.Residence.PostalCode,
-		ResidenceLocality:    user.Residence.Locality,
-		ResidenceCityCode:    user.Residence.CityCode,
-		DomicileStretName:    user.Domicile.StreetName,
-		DomicileStretNumber:  user.Domicile.StreetNumber,
-		DomicileCity:         user.Domicile.City,
-		DomicilePostalCode:   user.Domicile.PostalCode,
-		DomicileLocality:     user.Domicile.Locality,
-		DomicileCityCode:     user.Domicile.CityCode,
-		Phone:                user.Phone,
-		Location:             geography,
-		CreationDate:         lib.GetBigQueryNullDateTime(user.CreationDate),
-		UpdatedDate:          lib.GetBigQueryNullDateTime(user.UpdatedDate),
-		Data:                 string(userJson),
-	}, nil
+	return nil
 }
 
 func (user User) BigquerySave(origin string) error {
 	table := lib.GetDatasetByEnv(origin, "user")
-	userBigquery, err := user.toBigquery()
-	if err != nil {
+
+	if err := user.prepareForBigquerySave(); err != nil {
 		return err
 	}
 
 	log.Println("user save big query: " + user.Uid)
 
-	return lib.InsertRowsBigQuery("wopta", table, userBigquery)
+	return lib.InsertRowsBigQuery("wopta", table, user)
 }
 
 type Consens struct {
