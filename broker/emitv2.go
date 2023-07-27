@@ -126,7 +126,7 @@ func setData(state *bpmn.State) error {
 
 func sendMailSign(state *bpmn.State) error {
 	policy := state.Data
-	mail.SendMailSign(&policy)
+	mail.SendMailSign(policy)
 	return nil
 }
 func sign(state *bpmn.State) error {

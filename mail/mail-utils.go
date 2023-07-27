@@ -9,7 +9,7 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
-func getChannel(policy *models.Policy) string {
+func getChannel(policy models.Policy) string {
 
 	if policy.AgentUid != "" {
 		return "agent"
@@ -22,7 +22,7 @@ func getChannel(policy *models.Policy) string {
 
 }
 
-func SetBodyDataAndGetCC(policy *models.Policy, bodyData *BodyData) string {
+func SetBodyDataAndGetCC(policy models.Policy, bodyData *BodyData) string {
 	var cc string
 	channel := getChannel(policy)
 
@@ -40,7 +40,7 @@ func SetBodyDataAndGetCC(policy *models.Policy, bodyData *BodyData) string {
 	return cc
 }
 
-func GetContractorBodyData(policy *models.Policy, bodyData *BodyData) {
+func GetContractorBodyData(policy models.Policy, bodyData *BodyData) {
 	bodyData.ContractorName = policy.Contractor.Name
 	bodyData.ContractorSurname = policy.Contractor.Surname
 }
@@ -60,7 +60,7 @@ func GetAgencyBodyData(agencyUid string, bodyData *BodyData) string {
 	return agency.Email
 }
 
-func GetProductBodyData(policy *models.Policy, bodyData *BodyData) {
+func GetProductBodyData(policy models.Policy, bodyData *BodyData) {
 	switch policy.Name {
 	case "pmi":
 		bodyData.ProductName = "Artigiani & Imprese"
@@ -77,7 +77,7 @@ func GetProductBodyData(policy *models.Policy, bodyData *BodyData) {
 	}
 }
 
-func GetTemplateByChannel(policy *models.Policy, templateType string) []byte {
+func GetTemplateByChannel(policy models.Policy, templateType string) []byte {
 
 	var file []byte
 	channel := getChannel(policy)

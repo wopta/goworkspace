@@ -66,7 +66,7 @@ func GetMailPolicy(
 	return obj
 }
 
-func SendMailProposal(policy *models.Policy) {
+func SendMailProposal(policy models.Policy) {
 	var (
 		linkFormat = "https://storage.googleapis.com/documents-public-dev/information-sets/%s/%s/Precontrattuale.pdf"
 		link       = fmt.Sprintf(linkFormat, policy.Name, policy.ProductVersion)
@@ -83,7 +83,7 @@ func SendMailProposal(policy *models.Policy) {
 
 	SendMail(
 		GetMailPolicy(
-			policy,
+			&policy,
 			"Documenti precontrattuali",
 			true,
 			cc,
@@ -96,7 +96,7 @@ func SendMailProposal(policy *models.Policy) {
 	)
 }
 
-func SendMailPay(policy *models.Policy) {
+func SendMailPay(policy models.Policy) {
 	bodyData := BodyData{}
 	var tpl bytes.Buffer
 
@@ -108,7 +108,7 @@ func SendMailPay(policy *models.Policy) {
 
 	SendMail(
 		GetMailPolicy(
-			policy,
+			&policy,
 			"Paga la tua polizza"+" n° "+policy.CodeCompany,
 			true,
 			cc,
@@ -121,7 +121,7 @@ func SendMailPay(policy *models.Policy) {
 	)
 }
 
-func SendMailSign(policy *models.Policy) {
+func SendMailSign(policy models.Policy) {
 	bodyData := BodyData{}
 	var tpl bytes.Buffer
 
@@ -133,7 +133,7 @@ func SendMailSign(policy *models.Policy) {
 
 	SendMail(
 		GetMailPolicy(
-			policy,
+			&policy,
 			"Firma la tua polizza"+" n° "+policy.CodeCompany,
 			true,
 			cc,
@@ -146,8 +146,7 @@ func SendMailSign(policy *models.Policy) {
 	)
 }
 
-func SendMailContract(policy *models.Policy, at *[]Attachment) {
-
+func SendMailContract(policy models.Policy, at *[]Attachment) {
 	bodyData := BodyData{}
 	var tpl bytes.Buffer
 
@@ -177,7 +176,7 @@ func SendMailContract(policy *models.Policy, at *[]Attachment) {
 
 	SendMail(
 		GetMailPolicy(
-			policy,
+			&policy,
 			"Contratto"+" n° "+policy.CodeCompany,
 			false,
 			cc,
