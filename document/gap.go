@@ -177,8 +177,8 @@ func gapPersonalInfoTable(pdf *fpdf.Fpdf, contractor, insured models.User) {
 			"" + contractor.Residence.PostalCode + ", " + contractor.Residence.City + "(" + contractor.Residence.
 			CityCode + ")",
 			"Residente in", insured.Residence.StreetName + " " + insured.Residence.StreetNumber + ", " +
-			"" + insured.Residence.PostalCode + ", " + insured.Residence.City + "(" + insured.Residence.
-			CityCode + ")"},
+				"" + insured.Residence.PostalCode + ", " + insured.Residence.City + "(" + insured.Residence.
+				CityCode + ")"},
 		{"Mail", contractor.Mail, "Mail", insured.Mail},
 		{"Codice Fiscale", contractor.FiscalCode, "Codice Fiscale", insured.FiscalCode},
 		{"Data nascita", contractor.BirthDate, "Data nascita", insured.BirthDate},
