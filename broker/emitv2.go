@@ -70,7 +70,7 @@ func EmitV2(policy *models.Policy, request EmitRequest, origin string) EmitRespo
 		if policy.AgencyUid != "" {
 			state := runBpmn(policy, "agency")
 			log.Println("[EmitV2] state.Data Policy:", state.Data)
-			policy = &state.Data
+			//policy = &state.Data
 
 		} else if policy.AgentUid != "" {
 			runBpmn(policy, "agent")
