@@ -27,7 +27,7 @@ func GapSogessur(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, 
 
 	var statements []models.Statement
 
-	if *policy.Statements == nil {
+	if policy.Statements == nil {
 		statements = question.GetStatements(*policy)
 	}
 
