@@ -265,7 +265,7 @@ func gapPolicyDataTable(pdf *fpdf.Fpdf, policy *models.Policy) {
 	setBlackRegularFont(pdf, 8)
 	pdf.CellFormat(55, 5, "24:00", "BR", 1, fpdf.AlignLeft, false, 0, "")
 
-	duration := int((policy.EndDate.Sub(policy.StartDate).Hours() / 24) / 30)
+	duration := lib.MonthsDifference(policy.StartDate, policy.EndDate)
 	setPinkRegularFont(pdf, 8)
 	pdf.CellFormat(40, 5, "Durata", "BL", 0, fpdf.AlignLeft, false, 0, "")
 	setBlackRegularFont(pdf, 8)

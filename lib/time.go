@@ -29,3 +29,24 @@ func ElapsedYears(t1 time.Time, t2 time.Time) int {
 
 	return years
 }
+
+func MonthsDifference(t1, t2 time.Time) int {
+	// Ensure t1 is before t2
+	if t1.After(t2) {
+		t1, t2 = t2, t1
+	}
+
+	// Calculate the difference in years and months
+	yearDiff := t2.Year() - t1.Year()
+	monthDiff := int(t2.Month()) - int(t1.Month())
+
+	// Adjust the difference if the day of the month is smaller in t1
+	if t2.Day() < t1.Day() {
+		monthDiff--
+	}
+
+	// Calculate the total difference in months
+	totalMonths := (yearDiff * 12) + monthDiff
+
+	return totalMonths
+}
