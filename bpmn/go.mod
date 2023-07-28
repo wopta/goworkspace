@@ -7,7 +7,7 @@ replace github.com/wopta/goworkspace/bpmn => ./
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.4
 	github.com/nitram509/lib-bpmn-engine v0.2.4
-	github.com/wopta/goworkspace/document v1.0.73
+	github.com/wopta/goworkspace/document v1.0.74
 	github.com/wopta/goworkspace/lib v1.0.66
 	github.com/wopta/goworkspace/mail v1.0.26
 	github.com/wopta/goworkspace/models v1.1.25
