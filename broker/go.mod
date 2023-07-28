@@ -10,8 +10,8 @@ require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.4
 	github.com/heimdalr/dag v1.2.1
 	github.com/wopta/goworkspace/bpmn v1.0.6
-	github.com/wopta/goworkspace/document v1.0.71
-	github.com/wopta/goworkspace/lib v1.0.65
+	github.com/wopta/goworkspace/document v1.0.72
+	github.com/wopta/goworkspace/lib v1.0.66
 	github.com/wopta/goworkspace/mail v1.0.25
 	github.com/wopta/goworkspace/models v1.1.25
 	github.com/wopta/goworkspace/payment v1.0.53
