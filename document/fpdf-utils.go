@@ -312,13 +312,13 @@ func checkStatementSpace(pdf *fpdf.Fpdf, statement models.Statement) {
 
 	if title != "" {
 		setPinkBoldFont(pdf, titleTextSize)
-		fmt.Printf("Title: " + title)
+		fmt.Printf("title: %s available width: %f\n", title, availableWidth)
 		lines := pdf.SplitText(title, availableWidth)
 		requiredHeight += 3.5 * float64(len(lines))
 	}
 	if subtitle != "" {
 		setBlackBoldFont(pdf, standardTextSize)
-		fmt.Printf("Subtitle: " + subtitle)
+		fmt.Printf("subtitle: %s available width: %f\n", subtitle, availableWidth)
 		lines := pdf.SplitText(subtitle, availableWidth)
 		requiredHeight += 3.5 * float64(len(lines))
 	}
@@ -344,7 +344,7 @@ func checkStatementSpace(pdf *fpdf.Fpdf, statement models.Statement) {
 			}
 		}
 
-		fmt.Printf("QuestionText: " + text + answer)
+		fmt.Printf("question: %s available width: %f\n", text+answer, availableWidth)
 		lines := pdf.SplitText(text+answer, availableWidth)
 		requiredHeight += 3 * float64(len(lines))
 	}
