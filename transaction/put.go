@@ -72,7 +72,7 @@ func PutByPolicy(data models.Policy, scheduleDate string, origin string, expireD
 		IsDelete:           false,
 		ProviderId:         providerId,
 		UserToken:          customerId,
-		ProviderName:       "fabrick",
+		ProviderName:       data.Payment,
 		AgentUid:           data.AgencyUid,
 		AgencyUid:          data.AgencyUid,
 		CommissionsAgent:   amountNet * commissionAgent,

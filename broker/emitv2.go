@@ -130,7 +130,7 @@ func setAdvice(policy *models.Policy, origin string) {
 
 	policy.PaymentSplit = string(models.PaySingleInstallment)
 	policy.IsPay = true
-	tr.PutByPolicy(*policy, "", origin, "", "", policy.PriceGross, policy.PriceNett, "")
+	tr.PutByPolicy(*policy, "", origin, "", "", policy.PriceGross, policy.PriceNett, "", true)
 
 }
 func setAdviceBpm(state *bpmn.State) error {
@@ -160,7 +160,6 @@ func sign(state *bpmn.State) error {
 func putUser(state *bpmn.State) error {
 	policy := state.Data
 	user.SetUserIntoPolicyContractor(&policy, origin)
-	emitSign(&policy, origin)
 	return nil
 }
 
