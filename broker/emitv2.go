@@ -66,17 +66,17 @@ func EmitV2(policy *models.Policy, request EmitRequest, origin string) EmitRespo
 
 		log.Println("[EmitFxV2] AgencyUid: ", policy.AgencyUid)
 
-		/*if policy.AgencyUid != "" {
+		if policy.AgencyUid != "" {
 			state := runBpmn(policy, "agency")
 			log.Println("[EmitV2] state.Data Policy:", state.Data)
 			//policy = &state.Data
 
 		} else if policy.AgentUid != "" {
 			runBpmn(policy, "agent")
-		} else {*/
-		log.Printf("[EmitV2] Policy Uid %s", request.Uid)
-		ecommerceFlow(policy, origin)
-		//}
+		} else {
+			log.Printf("[EmitV2] Policy Uid %s", request.Uid)
+			ecommerceFlow(policy, origin)
+		}
 
 	}
 	responseEmit = EmitResponse{UrlPay: policy.PayUrl, UrlSign: policy.SignUrl}
