@@ -15,7 +15,7 @@ require (
 	github.com/wopta/goworkspace/mail v1.0.25
 	github.com/wopta/goworkspace/models v1.1.25
 	github.com/wopta/goworkspace/payment v1.0.53
-	github.com/wopta/goworkspace/transaction v1.0.7
+	github.com/wopta/goworkspace/transaction v1.0.8
 	github.com/wopta/goworkspace/user v1.0.16
 	github.com/wopta/goworkspace/wiseproxy v1.0.3
 )
