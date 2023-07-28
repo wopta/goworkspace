@@ -12,6 +12,7 @@ require (
 	github.com/wopta/goworkspace/lib v1.0.66
 	github.com/wopta/goworkspace/models v1.1.25
 	github.com/wopta/goworkspace/product v1.0.31
+	github.com/wopta/goworkspace/question v1.0.0
 )
 
 require (
