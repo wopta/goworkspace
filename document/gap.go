@@ -23,13 +23,18 @@ func GapContract(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, 
 }
 
 func GapSogessur(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, []byte) {
-	signatureID = 0
+	var (
+		statements []models.Statement
+	)
 
-	var statements []models.Statement
+	signatureID = 0
 
 	if policy.Statements == nil {
 		statements = question.GetStatements(*policy)
+	} else {
+		statements = *policy.Statements
 	}
+	fmt.Println("[GapSogessur] statements: ", statements)
 
 	gapHeader(pdf, policy)
 
