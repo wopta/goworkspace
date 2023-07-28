@@ -25,8 +25,8 @@ func FillAttachments(policy *models.Policy, origin string) error {
 }
 
 func Sign(policy *models.Policy, origin string) error {
-	if policy.Status != models.PolicyStatusToSign {
-		return errors.New("policy wrong status")
+	if !lib.SliceContains(policy.StatusHistory, models.PolicyStatusToSign) {
+		return errors.New("policy has not been set to be signed")
 	}
 
 	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
