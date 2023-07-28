@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -27,6 +28,7 @@ type Agent struct {
 	RuiSection         string                `json:"ruiSection"           firestore:"ruiSection"           bigquery:"ruiSection"`
 	RuiRegistration    time.Time             `json:"ruiRegistration"      firestore:"ruiRegistration"      bigquery:"-"`
 	BigRuiRegistration bigquery.NullDateTime `json:"-"                    firestore:"-"                    bigquery:"ruiRegistration"`
+	Data               string                `json:"-"                    firestore:"-"                    bigquery:"data"`
 }
 
 func (agent *Agent) prepareForBigquerySave() error {
@@ -35,6 +37,13 @@ func (agent *Agent) prepareForBigquerySave() error {
 	}
 	agent.BigAgents = strings.Join(agent.Agents, ",")
 	agent.BigRuiRegistration = lib.GetBigQueryNullDateTime(agent.RuiRegistration)
+
+	data, err := json.Marshal(agent)
+	if err != nil {
+		return err
+	}
+	agent.Data = string(data)
+
 	return nil
 }
 
