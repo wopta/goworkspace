@@ -194,7 +194,7 @@ func lifeGuaranteesTable(pdf *fpdf.Fpdf, guaranteesMap map[string]map[string]str
 	pdf.Ln(0.5)
 	setBlackRegularFont(pdf, smallTextSize)
 	pdf.Cell(80, 3, "(*) imposte assicurative di legge incluse nella misura del 2,50% del premio imponibile")
-	pdf.Ln(3)
+	pdf.Ln(5)
 }
 
 func avvertenzeBeneficiariSection(pdf *fpdf.Fpdf) {
@@ -364,24 +364,24 @@ func surveysSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	err := printSurvey(pdf, surveys[0], policy.Company)
 	lib.CheckError(err)
 
+	pdf.AddPage()
+
 	getParagraphTitle(pdf, "Questionario Medico")
 	for _, survey := range surveys[1:] {
 		err := printSurvey(pdf, survey, policy.Company)
 		lib.CheckError(err)
 	}
-	// TODO: added when RVM will be implemented
-	/*
-		if rvm == true {
-			pdf.Ln(3)
-			setBlackRegularFont(pdf, standardTextSize)
-			pdf.MultiCell(0, 3, "Nota  bene:  Ai  fini  della  valutazione  del  rischio,  l’Assicurato  ha  "+
-				"inviato  alla  compagnia  un  Rapporto  di  Visita  Medica,  sottoscritto  dal medico curante, che  "+
-				"costituisce  parte  integrante della  presente  Polizza  e  la Compagnia, valutato il  rischio,  ha  "+
-				"accettato  il rischio  alle condizioni indicate nella presente Polizza", "", fpdf.AlignLeft, false)
 
-			setBlackBoldFont(pdf, standardTextSize)
-		}
-	*/
+	if policy.IsReserved {
+		pdf.Ln(3)
+		setBlackRegularFont(pdf, standardTextSize)
+		pdf.MultiCell(0, 3, "Nota  bene:  Ai  fini  della  valutazione  del  rischio,  l’Assicurato  ha  "+
+			"inviato  alla  compagnia  un  Rapporto  di  Visita  Medica,  sottoscritto  dal medico curante, che  "+
+			"costituisce  parte  integrante della  presente  Polizza  e  la Compagnia, valutato il  rischio,  ha  "+
+			"accettato  il rischio  alle condizioni indicate nella presente Polizza", "", fpdf.AlignLeft, false)
+
+		setBlackBoldFont(pdf, standardTextSize)
+	}
 }
 
 func statementsSection(pdf *fpdf.Fpdf, policy *models.Policy) {

@@ -29,7 +29,7 @@ func GapSogessur(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, 
 
 	signatureID = 0
 
-	if policy.Statements == nil {
+	if policy.Statements == nil || len(*policy.Statements) == 0 {
 		statements = question.GetStatements(*policy)
 	} else {
 		statements = *policy.Statements
@@ -42,13 +42,13 @@ func GapSogessur(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, 
 
 	pdf.AddPage()
 
-	getParagraphTitle(pdf, "La tua assicurazione è operante sui dati sotto riportati, verifica la loro correttezza"+
-		" e segnala eventuali inesattezze")
-	pdf.Ln(3)
-
 	vehicle := policy.Assets[0].Vehicle
 	contractor := policy.Contractor
 	vehicleOwner := policy.Assets[0].Person
+
+	getParagraphTitle(pdf, "La tua assicurazione è operante sui dati sotto riportati, verifica la loro correttezza"+
+		" e segnala eventuali inesattezze")
+	pdf.Ln(3)
 
 	gapVehicleDataTable(pdf, vehicle)
 
@@ -315,37 +315,4 @@ func gapStatements(pdf *fpdf.Fpdf, statements []models.Statement, companyName st
 	for _, statement := range statements {
 		printStatement(pdf, statement, companyName)
 	}
-}
-
-func gapClauseApprovalSection(pdf *fpdf.Fpdf) {
-	getParagraphTitle(pdf, "Le clausole della Polizza da approvare in modo specifico")
-	setBlackRegularFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3, "Il sottoscritto dichiara di approvare, ai sensi e per gli effetti degli artt. "+
-		"1341 e 1342 del codice civile, i seguenti articoli delle Condizioni di Assicurazione: INSERIRE VESSATORIE",
-		"", fpdf.AlignLeft, false)
-	pdf.Ln(5)
-	drawSignatureForm(pdf)
-	pdf.Ln(5)
-}
-
-func gapConsentDeclaration(pdf *fpdf.Fpdf) {
-	setBlackBoldFont(pdf, standardTextSize)
-	pdf.SetDrawColor(0, 0, 0)
-	pdf.MultiCell(0, 3, "Consenso al trattemento dei dati personali", "", fpdf.AlignLeft, false)
-	pdf.Ln(1)
-	pdf.SetLineWidth(thinLineWidth)
-	pdf.Line(11, pdf.GetY(), 80, pdf.GetY())
-	pdf.Ln(1)
-	setBlackRegularFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3, "Il sottoscritto, dopo aver ricevuto copia e preso visione dell’Informativa "+
-		"della Compagnia sul trattamento dei dati personali, ai sensi della normativa sulla privacy "+
-		"(Reg. UE 2016/679) acconsente al trattamento dei propri dati personali, anche sensibili (particolari?), da "+
-		"parte di Sogessur S.A. - Rappresentanza Generale per l’Italia, per le finalità, secondo le modalità e "+
-		"mediante i soggetti indicati nella predetta informativa.", "", fpdf.AlignLeft, false)
-	setBlackBoldFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3, "Sono consapevole che il mancato consenso al trattamento dei dati "+
-		"personali, necessari alla Compagnia per le finalità ivi illustrate, comporta l’impossibilità di "+
-		"dare esecuzione al rapporto contrattuale.\"", "", fpdf.AlignLeft, false)
-	pdf.Ln(3)
-	drawSignatureForm(pdf)
 }
