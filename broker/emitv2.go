@@ -65,30 +65,21 @@ func EmitV2(policy *models.Policy, request EmitRequest, origin string) EmitRespo
 		emitApproval(policy)
 	} else {
 
-		GetFlow(*policy, map[string]interface{}{
-			"agency":    runBpmn(*policy, "agency"),
-			"agent":     runBpmn(*policy, "agent"),
-			"ecommerce": ecommerceFlow(policy, origin)})
 		log.Println("[EmitFxV2] AgencyUid: ", policy.AgencyUid)
-		/*
-			if policy.AgencyUid != "" {
-				state := runBpmn(*policy, "agency")
-				log.Println("[EmitV2] state.Data Policy:", state.Data)
-				policy = &state.Data
 
-			} else if policy.AgentUid != "" {
+		if policy.AgencyUid != "" {
+			state := runBpmn(policy, "agency")
+			log.Println("[EmitV2] state.Data Policy:", state.Data)
+			policy = &state.Data
 
-			} else {
-				log.Printf("[EmitV2] Policy Uid %s", request.Uid)
+		} else if policy.AgentUid != "" {
+			runBpmn(policy, "agent")
+		} else {
+			log.Printf("[EmitV2] Policy Uid %s", request.Uid)
+			ecommerceFlow(policy, origin)
 
-				emitBase(policy, origin)
+		}
 
-				emitSign(policy, origin)
-
-				emitPay(policy, origin)
-
-			}
-		*/
 	}
 	responseEmit = EmitResponse{UrlPay: policy.PayUrl, UrlSign: policy.SignUrl}
 	policyJson, _ := policy.Marshal()
@@ -163,7 +154,7 @@ func putUser(state *bpmn.State) error {
 	return nil
 }
 
-func runBpmn(policy models.Policy, channel string) *bpmn.State {
+func runBpmn(policy *models.Policy, channel string) *bpmn.State {
 	settingByte, _ := lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "products/"+channel+"/setting.json")
 	//var prod models.Product
 
@@ -171,7 +162,7 @@ func runBpmn(policy models.Policy, channel string) *bpmn.State {
 
 	//Parsing/Unmarshalling JSON encoding/json
 	json.Unmarshal(settingByte, &setting)
-	state := bpmn.NewBpmn(policy)
+	state := bpmn.NewBpmn(*policy)
 	state.AddTaskHandler("emitData", setData)
 	state.AddTaskHandler("sendMailSign", sendMailSign)
 	state.AddTaskHandler("sign", sign)
