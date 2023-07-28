@@ -8,6 +8,7 @@ import (
 	"github.com/wopta/goworkspace/question"
 	"sort"
 	"strings"
+	"time"
 )
 
 func GapContract(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, []byte) {
@@ -26,7 +27,7 @@ func GapSogessur(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, 
 
 	var statements []models.Statement
 
-	if policy.Statements == nil {
+	if *policy.Statements == nil {
 		statements = question.GetStatements(*policy)
 	}
 
@@ -162,7 +163,7 @@ func gapVehicleDataTable(pdf *fpdf.Fpdf, vehicle *models.Vehicle) {
 	pdf.Ln(5)
 }
 
-func gapPersonalInfoTable(pdf *fpdf.Fpdf, contractor, insured models.User) {
+func gapPersonalInfoTable(pdf *fpdf.Fpdf, contractor, vehicleOwner models.User) {
 	setWhiteBoldFont(pdf, standardTextSize)
 	pdf.SetFillColor(229, 0, 117)
 	pdf.SetDrawColor(229, 0, 117)
@@ -170,19 +171,24 @@ func gapPersonalInfoTable(pdf *fpdf.Fpdf, contractor, insured models.User) {
 	pdf.CellFormat(65, 5, "Contraente", "1", 0, fpdf.AlignCenter, true, 0, "")
 	pdf.CellFormat(95, 5, "Proprietario", "1", 1, fpdf.AlignCenter, true, 0, "")
 
+	contractorBirthDate, err := time.Parse(time.RFC3339, contractor.BirthDate)
+	lib.CheckError(err)
+	vehicleOwnerBirthDate, err := time.Parse(time.RFC3339, vehicleOwner.BirthDate)
+	lib.CheckError(err)
+
 	tableRows := [][]string{
 		{"Cognome e Nome", contractor.Surname + " " + contractor.Name, "Cognome e Nome",
-			insured.Surname + " " + insured.Name},
+			vehicleOwner.Surname + " " + vehicleOwner.Name},
 		{"Residente in", contractor.Residence.StreetName + " " + contractor.Residence.StreetNumber + ", " +
 			"" + contractor.Residence.PostalCode + ", " + contractor.Residence.City + "(" + contractor.Residence.
 			CityCode + ")",
-			"Residente in", insured.Residence.StreetName + " " + insured.Residence.StreetNumber + ", " +
-				"" + insured.Residence.PostalCode + ", " + insured.Residence.City + "(" + insured.Residence.
+			"Residente in", vehicleOwner.Residence.StreetName + " " + vehicleOwner.Residence.StreetNumber + ", " +
+				"" + vehicleOwner.Residence.PostalCode + ", " + vehicleOwner.Residence.City + "(" + vehicleOwner.Residence.
 				CityCode + ")"},
-		{"Mail", contractor.Mail, "Mail", insured.Mail},
-		{"Codice Fiscale", contractor.FiscalCode, "Codice Fiscale", insured.FiscalCode},
-		{"Data nascita", contractor.BirthDate, "Data nascita", insured.BirthDate},
-		{"Telefono", contractor.Phone, "Telefono", insured.Phone},
+		{"Mail", contractor.Mail, "Mail", vehicleOwner.Mail},
+		{"Codice Fiscale", contractor.FiscalCode, "Codice Fiscale", vehicleOwner.FiscalCode},
+		{"Data nascita", contractorBirthDate.Format(dateLayout), "Data nascita", vehicleOwnerBirthDate.Format(dateLayout)},
+		{"Telefono", contractor.Phone, "Telefono", vehicleOwner.Phone},
 	}
 
 	for x := 0; x < len(tableRows); x++ {
@@ -215,6 +221,9 @@ func gapPolicyDataTable(pdf *fpdf.Fpdf, policy *models.Policy) {
 		"complete": "Completa",
 	}
 
+	location, err := time.LoadLocation("Europe/Rome")
+	lib.CheckError(err)
+
 	sort.Slice(policy.Assets[0].Guarantees, func(i, j int) bool {
 		return policy.Assets[0].Guarantees[i].Order < policy.Assets[0].Guarantees[j].Order
 	})
@@ -234,7 +243,7 @@ func gapPolicyDataTable(pdf *fpdf.Fpdf, policy *models.Policy) {
 	setPinkRegularFont(pdf, 8)
 	pdf.CellFormat(40, 5, "Decorrenza", "BL", 0, fpdf.AlignLeft, false, 0, "")
 	setBlackRegularFont(pdf, 8)
-	pdf.CellFormat(55, 5, policy.StartDate.Format(dateLayout), "B", 0, fpdf.AlignLeft, false,
+	pdf.CellFormat(55, 5, policy.StartDate.In(location).Format(dateLayout), "B", 0, fpdf.AlignLeft, false,
 		0, "")
 	setPinkRegularFont(pdf, 8)
 	pdf.CellFormat(40, 5, "Ore", "B", 0, fpdf.AlignLeft, false, 0, "")
@@ -244,14 +253,14 @@ func gapPolicyDataTable(pdf *fpdf.Fpdf, policy *models.Policy) {
 	setPinkRegularFont(pdf, 8)
 	pdf.CellFormat(40, 5, "Scadenza", "BL", 0, fpdf.AlignLeft, false, 0, "")
 	setBlackRegularFont(pdf, 8)
-	pdf.CellFormat(55, 5, policy.EndDate.Format(dateLayout), "B", 0, fpdf.AlignLeft, false,
+	pdf.CellFormat(55, 5, policy.EndDate.In(location).Format(dateLayout), "B", 0, fpdf.AlignLeft, false,
 		0, "")
 	setPinkRegularFont(pdf, 8)
 	pdf.CellFormat(40, 5, "Ore", "B", 0, fpdf.AlignLeft, false, 0, "")
 	setBlackRegularFont(pdf, 8)
 	pdf.CellFormat(55, 5, "24:00", "BR", 1, fpdf.AlignLeft, false, 0, "")
 
-	duration := lib.MonthsDifference(policy.StartDate, policy.EndDate)
+	duration := lib.MonthsDifference(policy.StartDate.In(location), policy.EndDate.In(location))
 	setPinkRegularFont(pdf, 8)
 	pdf.CellFormat(40, 5, "Durata", "BL", 0, fpdf.AlignLeft, false, 0, "")
 	setBlackRegularFont(pdf, 8)
