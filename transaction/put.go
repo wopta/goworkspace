@@ -13,7 +13,7 @@ import (
 	pr "github.com/wopta/goworkspace/product"
 )
 
-func PutByPolicy(data models.Policy, scheduleDate string, origin string, expireDate string, customerId string, amount float64, amountNet float64, providerId string) {
+func PutByPolicy(data models.Policy, scheduleDate string, origin string, expireDate string, customerId string, amount float64, amountNet float64, providerId string, isPay bool) {
 	var (
 		commission       float64
 		commissionAgent  float64

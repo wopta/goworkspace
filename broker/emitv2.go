@@ -64,24 +64,31 @@ func EmitV2(policy *models.Policy, request EmitRequest, origin string) EmitRespo
 	if policy.IsReserved && policy.Status != models.PolicyStatusWaitForApproval {
 		emitApproval(policy)
 	} else {
+
+		GetFlow(*policy, map[string]interface{}{
+			"agency":    runBpmn(*policy, "agency"),
+			"agent":     runBpmn(*policy, "agent"),
+			"ecommerce": ecommerceFlow(policy, origin)})
 		log.Println("[EmitFxV2] AgencyUid: ", policy.AgencyUid)
-		if policy.AgencyUid != "" {
-			state := runBpmn(*policy, "agency")
-			log.Println("[EmitV2] state.Data Policy:", state.Data)
-			policy = &state.Data
+		/*
+			if policy.AgencyUid != "" {
+				state := runBpmn(*policy, "agency")
+				log.Println("[EmitV2] state.Data Policy:", state.Data)
+				policy = &state.Data
 
-		} else if policy.AgentUid != "" {
+			} else if policy.AgentUid != "" {
 
-		} else {
-			log.Printf("[EmitV2] Policy Uid %s", request.Uid)
+			} else {
+				log.Printf("[EmitV2] Policy Uid %s", request.Uid)
 
-			emitBase(policy, origin)
+				emitBase(policy, origin)
 
-			emitSign(policy, origin)
+				emitSign(policy, origin)
 
-			emitPay(policy, origin)
+				emitPay(policy, origin)
 
-		}
+			}
+		*/
 	}
 	responseEmit = EmitResponse{UrlPay: policy.PayUrl, UrlSign: policy.SignUrl}
 	policyJson, _ := policy.Marshal()
@@ -89,22 +96,38 @@ func EmitV2(policy *models.Policy, request EmitRequest, origin string) EmitRespo
 	policy.Updated = time.Now().UTC()
 	lib.SetFirestore(firePolicy, request.Uid, policy)
 	policy.BigquerySave(origin)
+
 	models.SetGuaranteBigquery(*policy, "emit", guaranteFire)
 
 	return responseEmit
 }
-func CheckChannel(policy models.Policy, t func()) {
+func ecommerceFlow(policy *models.Policy, origin string) string {
+	emitBase(policy, origin)
+
+	emitSign(policy, origin)
+
+	emitPay(policy, origin)
+	return ""
+}
+func GetFlow[F any](policy models.Policy, funtions map[string]F) F {
+
 	if policy.AgencyUid != "" {
-
+		return funtions["agency"]
 	} else if policy.AgentUid != "" {
-
+		return funtions["agent"]
 	} else {
+		return funtions["ecommerce"]
 	}
 
 }
 func setAdvice(policy *models.Policy, origin string) {
 
 	policy.Payment = "manual"
+	policy.StatusHistory = append(policy.StatusHistory, string(models.PolicyStatusToPay))
+	policy.StatusHistory = append(policy.StatusHistory, string(models.PolicyStatusPay))
+	policy.StatusHistory = append(policy.StatusHistory, string(models.PolicyStatusToSign))
+	policy.Status = string(models.PolicyStatusToSign)
+
 	policy.PaymentSplit = string(models.PaySingleInstallment)
 	policy.IsPay = true
 	tr.PutByPolicy(*policy, "", origin, "", "", policy.PriceGross, policy.PriceNett, "")
@@ -152,7 +175,7 @@ func runBpmn(policy models.Policy, channel string) *bpmn.State {
 	state := bpmn.NewBpmn(policy)
 	state.AddTaskHandler("emitData", setData)
 	state.AddTaskHandler("sendMailSign", sendMailSign)
-	state.AddTaskHandler("sign", sendMailSign)
+	state.AddTaskHandler("sign", sign)
 	state.AddTaskHandler("setAdvice", setAdviceBpm)
 	state.AddTaskHandler("putUser", putUser)
 	log.Println(state.Handlers)
