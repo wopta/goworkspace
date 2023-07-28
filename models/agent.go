@@ -1,11 +1,14 @@
 package models
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
+	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/firestore"
 	"github.com/wopta/goworkspace/lib"
 	"google.golang.org/api/iterator"
@@ -13,16 +16,70 @@ import (
 
 type Agent struct {
 	User
-	ManagerUid      string    `json:"managerUid,omitempty" firestore:"managerUid,omitempty" bigquery:"-"`
-	AgencyUid       string    `json:"agencyUid" firestore:"agencyUid" bigquery:"-"`
-	Agents          []string  `json:"agents" firestore:"agents" bigquery:"-"`
-	Users           []string  `json:"users" firestore:"users" bigquery:"-"` // will contain users UIDs
-	IsActive        bool      `json:"isActive" firestore:"isActive" bigquery:"-"`
-	Products        []Product `json:"products" firestore:"products" bigquery:"-"`
-	Policies        []string  `json:"policies" firestore:"policies" bigquery:"-"` // will contain policies UIDs
-	RuiCode         string    `json:"ruiCode" firestore:"ruiCode" bigquery:"-"`
-	RuiSection      string    `json:"ruiSection" firestore:"ruiSection" bigquery:"-"`
-	RuiRegistration time.Time `json:"ruiRegistration" firestore:"ruiRegistration" bigquery:"-"`
+	ManagerUid      string    `json:"managerUid,omitempty" firestore:"managerUid,omitempty"`
+	AgencyUid       string    `json:"agencyUid"            firestore:"agencyUid"`
+	Agents          []string  `json:"agents"               firestore:"agents"`
+	Users           []string  `json:"users"                firestore:"users"                bigquery:"-"` // will contain users UIDs
+	IsActive        bool      `json:"isActive"             firestore:"isActive"`
+	Products        []Product `json:"products"             firestore:"products"`
+	Policies        []string  `json:"policies"             firestore:"policies"` // will contain policies UIDs
+	RuiCode         string    `json:"ruiCode"              firestore:"ruiCode"`
+	RuiSection      string    `json:"ruiSection"           firestore:"ruiSection"`
+	RuiRegistration time.Time `json:"ruiRegistration"      firestore:"ruiRegistration"`
+}
+
+type AgentBigquery struct {
+	Uid             string                `bigquery:"uid"`
+	Name            string                `bigquery:"name"`
+	Surname         string                `bigquery:"surname"`
+	FiscalCode      string                `bigquery:"fiscalCode"`
+	VatCode         string                `bigquery:"vatCode"`
+	IsActive        bool                  `bigquery:"isActive"`
+	RuiCode         string                `bigquery:"ruiCode"`
+	RuiSection      string                `bigquery:"ruiSection"`
+	RuiRegistration bigquery.NullDateTime `bigquery:"ruiRegistration"`
+	AgencyUid       string                `bigquery:"agencyUid"`
+	ManagerUid      string                `bigquery:"managerUid"`
+	Agents          string                `bigquery:"agents"`
+	CreationDate    bigquery.NullDateTime `bigquery:"creationDate"`
+	UpdateDate      bigquery.NullDateTime `bigquery:"updateDate"`
+	Data            string                `bigquery:"data"`
+}
+
+func (agent Agent) toBigquery() (AgentBigquery, error) {
+	agentJson, err := json.Marshal(agent)
+	if err != nil {
+		return AgentBigquery{}, err
+	}
+	return AgentBigquery{
+		Uid:             agent.Uid,
+		Name:            agent.Name,
+		Surname:         agent.Surname,
+		FiscalCode:      agent.FiscalCode,
+		VatCode:         agent.VatCode,
+		IsActive:        agent.IsActive,
+		RuiCode:         agent.RuiCode,
+		RuiSection:      agent.RuiSection,
+		RuiRegistration: lib.GetBigQueryNullDateTime(agent.RuiRegistration),
+		AgencyUid:       agent.AgencyUid,
+		ManagerUid:      agent.ManagerUid,
+		Agents:          strings.Join(agent.Agents, ","),
+		CreationDate:    lib.GetBigQueryNullDateTime(agent.CreationDate),
+		UpdateDate:      lib.GetBigQueryNullDateTime(agent.UpdatedDate),
+		Data:            string(agentJson),
+	}, nil
+}
+
+func (agent Agent) BigquerySave(origin string) error {
+	table := lib.GetDatasetByEnv(origin, "agent")
+	agentBigquery, err := agent.toBigquery()
+	if err != nil {
+		return err
+	}
+
+	log.Println("agent save big query: " + agent.Uid)
+
+	return lib.InsertRowsBigQuery("wopta", table, agentBigquery)
 }
 
 func GetAgentByAuthId(authId string) (*Agent, error) {
