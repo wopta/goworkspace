@@ -87,7 +87,6 @@ func EmitV2(policy *models.Policy, request EmitRequest, origin string) EmitRespo
 	policy.Updated = time.Now().UTC()
 	lib.SetFirestore(firePolicy, request.Uid, policy)
 	policy.BigquerySave(origin)
-
 	models.SetGuaranteBigquery(*policy, "emit", guaranteFire)
 
 	return responseEmit
