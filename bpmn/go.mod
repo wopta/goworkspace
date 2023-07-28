@@ -6,12 +6,9 @@ replace github.com/wopta/goworkspace/bpmn => ./
 
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.4
-	github.com/nitram509/lib-bpmn-engine v0.2.4
-	github.com/wopta/goworkspace/document v1.0.75
+	github.com/maja42/goval v1.3.1
 	github.com/wopta/goworkspace/lib v1.0.66
-	github.com/wopta/goworkspace/mail v1.0.26
 	github.com/wopta/goworkspace/models v1.1.25
-	github.com/wopta/goworkspace/payment v1.0.53
 )
 
 require (
@@ -28,17 +25,13 @@ require (
 	github.com/MicahParks/keyfunc v1.5.1 // indirect
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/antlr/antlr4/runtime/Go/antlr v0.0.0-20220527190237-ee62e23da966 // indirect
-	github.com/antonmedv/expr v1.9.0 // indirect
 	github.com/apache/arrow/go/v12 v12.0.0 // indirect
 	github.com/apache/thrift v0.16.0 // indirect
 	github.com/bmatcuk/doublestar v1.3.2 // indirect
-	github.com/boombuler/barcode v1.0.1 // indirect
-	github.com/bwmarrin/snowflake v0.3.0 // indirect
 	github.com/cloudevents/sdk-go/v2 v2.14.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
 	github.com/go-gota/gota v0.12.0 // indirect
-	github.com/go-pdf/fpdf v0.8.0 // indirect
 	github.com/goccy/go-json v0.9.11 // indirect
 	github.com/golang-jwt/jwt/v4 v4.4.2 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
@@ -52,15 +45,12 @@ require (
 	github.com/googleapis/gax-go/v2 v2.8.0 // indirect
 	github.com/hyperjumptech/grule-rule-engine v1.12.0 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
-	github.com/johnfercher/maroto v0.41.0 // indirect
 	github.com/json-iterator/go v1.1.10 // indirect
-	github.com/jung-kurt/gofpdf v1.16.2 // indirect
 	github.com/kevinburke/ssh_config v0.0.0-20190725054713-01f96b0aa0cd // indirect
 	github.com/klauspost/asmfmt v1.3.2 // indirect
 	github.com/klauspost/compress v1.15.9 // indirect
 	github.com/klauspost/cpuid/v2 v2.0.9 // indirect
 	github.com/kr/fs v0.1.0 // indirect
-	github.com/maja42/goval v1.3.1 // indirect
 	github.com/minio/asm2plan9s v0.0.0-20200509001527-cdd76441f9d8 // indirect
 	github.com/minio/c2goasm v0.0.0-20190812172519-36a3d3bbc4f3 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
@@ -71,16 +61,9 @@ require (
 	github.com/pkg/sftp v1.13.5 // indirect
 	github.com/richardlehane/mscfb v1.0.4 // indirect
 	github.com/richardlehane/msoleps v1.0.3 // indirect
-	github.com/ruudk/golang-pdf417 v0.0.0-20201230142125-a7e3863a1245 // indirect
-	github.com/senseyeio/duration v0.0.0-20180430131211-7c2a214ada46 // indirect
 	github.com/sergi/go-diff v1.0.0 // indirect
-	github.com/sirupsen/logrus v1.9.0 // indirect
+	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
-	github.com/wopta/goworkspace/policy v1.0.1 // indirect
-	github.com/wopta/goworkspace/product v1.0.25 // indirect
-	github.com/wopta/goworkspace/transaction v1.0.5 // indirect
-	github.com/wopta/goworkspace/user v1.0.14 // indirect
-	github.com/wopta/goworkspace/wiseproxy v1.0.3 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
 	github.com/xuri/excelize/v2 v2.7.0 // indirect
@@ -91,7 +74,6 @@ require (
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.21.0 // indirect
 	golang.org/x/crypto v0.7.0 // indirect
-	golang.org/x/exp v0.0.0-20230515195305-f3d0a9c9a5cc // indirect
 	golang.org/x/mod v0.8.0 // indirect
 	golang.org/x/net v0.9.0 // indirect
 	golang.org/x/oauth2 v0.7.0 // indirect
