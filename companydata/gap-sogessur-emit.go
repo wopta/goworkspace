@@ -33,7 +33,8 @@ func GapSogessurEmit(w http.ResponseWriter, r *http.Request) (string, interface{
 	now := time.Now()
 	filename := fmt.Sprintf(gapCsvFilenameFormat, prevMonth.Year(), prevMonth.Month(), now.Day(), now.Month())
 
-	policies, transactions := getGapCsvPoliciesTransactions(from, to)
+	policies := getGapPolicies(from, to)
+	transactions := getGapTransactions(policies)
 	csvRows := getGapCsv(policies, transactions)
 	lib.WriteCsv(tmpPath+filename, csvRows, ';')
 	source, err := os.ReadFile(tmpPath + filename)
@@ -323,7 +324,7 @@ func stringToDateFormat(date string, layout string) string {
 	return t.Format(layout)
 }
 
-func getGapCsvPoliciesTransactions(from time.Time, to time.Time) ([]models.Policy, []models.Transaction) {
+func getGapPolicies(from time.Time, to time.Time) []models.Policy {
 	queries := lib.Firequeries{
 		Queries: []lib.Firequery{
 			{
@@ -360,6 +361,12 @@ func getGapCsvPoliciesTransactions(from time.Time, to time.Time) ([]models.Polic
 	}
 
 	policies := models.PolicyToListData(iter)
+	return policies
+}
+
+// Returns all the transactions with the same order of their relative policies.
+// That is, the transaction of policy[i] has the same index: policy[i] => transaction[i]
+func getGapTransactions(policies []models.Policy) []models.Transaction {
 	transactions := make([]models.Transaction, len(policies))
 	for i, policy := range policies {
 		iter := lib.WhereFirestore("transactions", "policyUid", "==", policy.Uid)
@@ -369,7 +376,7 @@ func getGapCsvPoliciesTransactions(from time.Time, to time.Time) ([]models.Polic
 		}
 		transactions[i] = transactionsBuffer[0]
 	}
-	return policies, transactions
+	return transactions
 }
 
 func setCompanyEmitted(policies []models.Policy) {
