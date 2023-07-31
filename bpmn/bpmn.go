@@ -62,7 +62,7 @@ func NewBpmn(data models.Policy) *State {
 	)
 	state = &State{
 		Handlers: make(map[string]func(state *State) error),
-		Data:     data,
+		Data:     &data,
 	}
 	state.Handlers = make(map[string]func(state *State) error)
 	return state

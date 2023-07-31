@@ -124,12 +124,12 @@ func setAdvice(policy *models.Policy, origin string) {
 func setAdviceBpm(state *bpmn.State) error {
 
 	p := state.Data
-	setAdvice(&p, origin)
+	setAdvice(p, origin)
 	return nil
 }
 func setData(state *bpmn.State) error {
 	p := state.Data
-	emitBase(*p, origin)
+	emitBase(p, origin)
 	log.Println(p)
 	log.Println(state.Data)
 	return nil
@@ -137,17 +137,17 @@ func setData(state *bpmn.State) error {
 
 func sendMailSign(state *bpmn.State) error {
 	policy := state.Data
-	mail.SendMailSign(policy)
+	mail.SendMailSign(*policy)
 	return nil
 }
 func sign(state *bpmn.State) error {
 	policy := state.Data
-	emitSign(&policy, origin)
+	emitSign(policy, origin)
 	return nil
 }
 func putUser(state *bpmn.State) error {
 	policy := state.Data
-	user.SetUserIntoPolicyContractor(&policy, origin)
+	user.SetUserIntoPolicyContractor(policy, origin)
 	return nil
 }
 
