@@ -44,7 +44,7 @@ func Gap(role string, policy *models.Policy) {
 
 func calculateGapOfferPrices(policy *models.Policy, product models.Product) {
 	duration := lib.ElapsedYears(policy.StartDate, policy.EndDate)
-	residenceArea := getAreaByProvince(policy.Assets[0].Person.Residence.CityCode)
+	residenceArea := GetAreaByProvince(policy.Assets[0].Person.Residence.CityCode)
 	if residenceArea == "" {
 		log.Println("[CalculateGapOfferPrices] residence area not set")
 		lib.CheckError(errors.New("residence area not set"))
@@ -57,7 +57,7 @@ func calculateGapOfferPrices(policy *models.Policy, product models.Product) {
 		policy.OffersPrices = make(map[string]map[string]*models.Price)
 	}
 
-	for offerName, _ := range product.Offers {
+	for offerName := range product.Offers {
 		matrix := getGapMatrix(offerName)
 		multiplier := getGapMultiplier(matrix, duration, residenceArea)
 
@@ -76,7 +76,7 @@ func calculateGapOfferPrices(policy *models.Policy, product models.Product) {
 	}
 }
 
-func getAreaByProvince(province string) string {
+func GetAreaByProvince(province string) string {
 	provincesMatrix := lib.CsvToDataframe(lib.GetFilesByEnv("enrich/provinces.csv"))
 
 	for _, row := range provincesMatrix.Records() {
