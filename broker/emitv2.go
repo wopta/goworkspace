@@ -129,7 +129,7 @@ func setAdviceBpm(state *bpmn.State) error {
 }
 func setData(state *bpmn.State) error {
 	p := state.Data
-	emitBase(&p, origin)
+	emitBase(*p, origin)
 	log.Println(p)
 	log.Println(state.Data)
 	return nil
