@@ -38,7 +38,7 @@ func GapSogessur(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, 
 
 	gapHeader(pdf, policy)
 
-	mainFooter(pdf, policy.Name)
+	gapFooter(pdf, policy.Name)
 
 	pdf.AddPage()
 
@@ -125,6 +125,23 @@ func gapHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 		pdf.SetXY(11, pdf.GetY()+3)
 		pdf.MultiCell(0, 3.5, policyInfo, "", "", false)
 		pdf.Ln(8)
+	})
+}
+
+func gapFooter(pdf *fpdf.Fpdf, productName string) {
+	footerText := "Wopta per te. Auto Valore Protetto è un prodotto assicurativo di Sogessur - Société Anonyme " +
+		"– Capitale Sociale € 33 825 000 – Sede legale: Tour D2, 17bis Place des Reflets – 92919\n" +
+		"Paris La Défense Cedex - 379 846 637 R.C.S. Nanterre - Francia - Sede secondaria: Via Tiziano 32, " +
+		"20145 Milano - Italia - Registro delle Imprese di Milano, Lodi, Monza-Brianza\n" +
+		"Codice Fiscale e P.IVA  07420570967  Iscritta nell’elenco I dell’Albo delle Imprese di Assicurazione tenuto " +
+		"dall’IVASS al n. I00094"
+
+	pdf.SetFooterFunc(func() {
+		pdf.SetXY(10, -15)
+		setPinkRegularFont(pdf, smallTextSize)
+		pdf.MultiCell(0, 3, footerText, "", "", false)
+		pdf.SetY(-7)
+		pageNumber(pdf)
 	})
 }
 
