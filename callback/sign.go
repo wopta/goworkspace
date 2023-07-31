@@ -143,7 +143,7 @@ func setSign(state *bpmn.State) error {
 	log.Println("[setSign] Handler start ---")
 
 	policy := state.Data
-	err := plc.Sign(&policy, origin)
+	err := plc.Sign(policy, origin)
 	if err != nil {
 		log.Printf("[setSign] ERROR: %s", err.Error())
 		return err
@@ -156,7 +156,7 @@ func sendMailContract(state *bpmn.State) error {
 	log.Println("[sendMailContract] Handler start ---")
 
 	policy := state.Data
-	mail.SendMailContract(policy, nil)
+	mail.SendMailContract(*policy, nil)
 
 	return nil
 }

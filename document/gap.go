@@ -5,7 +5,6 @@ import (
 	"github.com/go-pdf/fpdf"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/question"
 	"sort"
 	"strings"
 	"time"
@@ -23,18 +22,7 @@ func GapContract(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, 
 }
 
 func GapSogessur(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, []byte) {
-	var (
-		statements []models.Statement
-	)
-
 	signatureID = 0
-
-	if policy.Statements == nil || len(*policy.Statements) == 0 {
-		statements = question.GetStatements(*policy)
-	} else {
-		statements = *policy.Statements
-	}
-	fmt.Println("[GapSogessur] statements: ", statements)
 
 	gapHeader(pdf, policy)
 
@@ -45,6 +33,7 @@ func GapSogessur(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, 
 	vehicle := policy.Assets[0].Vehicle
 	contractor := policy.Contractor
 	vehicleOwner := policy.Assets[0].Person
+	statements := *policy.Statements
 
 	getParagraphTitle(pdf, "La tua assicurazione è operante sui dati sotto riportati, verifica la loro correttezza"+
 		" e segnala eventuali inesattezze")

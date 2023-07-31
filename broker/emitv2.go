@@ -32,9 +32,9 @@ func EmitV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 		firePolicy string
 		policy     models.Policy
 	)
-	authToken, e = models.GetAuthTokenFromIdToken(r.Header.Get("autorization"))
+	authToken, e = models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
 	origin = r.Header.Get("origin")
-	firePolicy = lib.GetDatasetByEnv(origin, "policy")
+	firePolicy = lib.GetDatasetByEnv(origin, models.PolicyCollection)
 	request := lib.ErrorByte(io.ReadAll(r.Body))
 
 	log.Printf("[EmitFxV2] Request: %s", string(request))
@@ -74,8 +74,7 @@ func EmitV2(policy *models.Policy, request EmitRequest, origin string) EmitRespo
 		if policy.AgencyUid != "" {
 			state := runBpmn(policy, "agency")
 			log.Println("[EmitV2] state.Data Policy:", state.Data)
-			//policy = &state.Data
-
+			policy = state.Data
 		} else if policy.AgentUid != "" {
 			runBpmn(policy, "agent")
 		} else {
