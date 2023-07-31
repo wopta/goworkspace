@@ -24,7 +24,7 @@ const (
 	bucket               = "GOOGLE_STORAGE_BUCKET"
 )
 
-func SogessurGapEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func GapSogessurEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	prevMonth := getPreviousMonth()
 	from := getFirstDay(prevMonth)
 	to := getFirstDay(time.Now())
