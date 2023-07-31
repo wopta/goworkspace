@@ -48,6 +48,7 @@ func EmitV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	policyJsonLog, _ := policy.Marshal()
 	log.Printf("[EmitFxV2] Policy %s JSON: %s", uid, string(policyJsonLog))
 
+	emitUpdatePolicy(&policy, result)
 	responseEmit := EmitV2(&policy, result, origin)
 	b, e := json.Marshal(responseEmit)
 	log.Println("[EmitFxV2] Response: ", string(b))
