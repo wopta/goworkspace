@@ -2,20 +2,24 @@ package broker
 
 import (
 	"encoding/json"
+	"io"
+	"log"
+	"net/http"
+	"os"
+	"time"
+
 	"github.com/wopta/goworkspace/bpmn"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
 	tr "github.com/wopta/goworkspace/transaction"
 	"github.com/wopta/goworkspace/user"
-	"io"
-	"log"
-	"net/http"
-	"os"
-	"time"
 )
 
-var origin string
+var (
+	origin    string
+	authToken models.AuthToken
+)
 
 //var policy *models.Policy
 
@@ -28,7 +32,7 @@ func EmitV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 		firePolicy string
 		policy     models.Policy
 	)
-
+	authToken, e = models.GetAuthTokenFromIdToken(r.Header.Get("autorization"))
 	origin = r.Header.Get("origin")
 	firePolicy = lib.GetDatasetByEnv(origin, "policy")
 	request := lib.ErrorByte(io.ReadAll(r.Body))
@@ -118,7 +122,7 @@ func setAdvice(policy *models.Policy, origin string) {
 
 	policy.PaymentSplit = string(models.PaySingleInstallment)
 	policy.IsPay = true
-	tr.PutByPolicy(*policy, "", origin, "", "", policy.PriceGross, policy.PriceNett, "", true)
+	tr.PutByPolicy(*policy, "", origin, "", "", policy.PriceGross, policy.PriceNett, "", true, authToken.Role)
 
 }
 func setAdviceBpm(state *bpmn.State) error {
