@@ -6,6 +6,7 @@ import (
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"strings"
+	"time"
 )
 
 func mainHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
@@ -14,9 +15,15 @@ func mainHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 		logoPath, cfpi, expiryInfo, productName string
 	)
 
+	location, err := time.LoadLocation("Europe/Rome")
+	lib.CheckError(err)
+
+	policyStartDate := policy.StartDate.In(location)
+	policyEndDate := policy.EndDate.In(location)
+
 	policyInfo := "Numero: " + policy.CodeCompany + "\n" +
-		"Decorre dal: " + policy.StartDate.Format(dateLayout) + " ore 24:00\n" +
-		"Scade il: " + policy.EndDate.Format(dateLayout) + " ore 24:00\n"
+		"Decorre dal: " + policyStartDate.Format(dateLayout) + " ore 24:00\n" +
+		"Scade il: " + policyEndDate.In(location).Format(dateLayout) + " ore 24:00\n"
 
 	switch policy.Name {
 	case "life":
@@ -31,9 +38,9 @@ func mainHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 		productName = "Persona"
 		policyInfo += "Si rinnova a scadenza salvo disdetta da inviare 30 giorni prima\n" + "Prossimo pagamento "
 		if policy.PaymentSplit == string(models.PaySplitMonthly) {
-			policyInfo += policy.StartDate.AddDate(0, 1, 0).Format(dateLayout) + "\n"
+			policyInfo += policyStartDate.In(location).AddDate(0, 1, 0).Format(dateLayout) + "\n"
 		} else if policy.PaymentSplit == string(models.PaySplitYear) {
-			policyInfo += policy.StartDate.AddDate(1, 0, 0).Format(dateLayout) + "\n"
+			policyInfo += policyStartDate.In(location).AddDate(1, 0, 0).Format(dateLayout) + "\n"
 		}
 		policyInfo += "Sostituisce la polizza ========"
 	}
@@ -50,10 +57,10 @@ func mainHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 
 	if policy.PaymentSplit == string(models.PaySplitMonthly) {
 		expiryInfo = "Prima scandenza mensile il: " +
-			policy.StartDate.AddDate(0, 1, 0).Format(dateLayout) + "\n"
+			policyStartDate.AddDate(0, 1, 0).Format(dateLayout) + "\n"
 	} else if policy.PaymentSplit == string(models.PaySplitYear) {
 		expiryInfo = "Prima scadenza annuale il: " +
-			policy.StartDate.AddDate(1, 0, 0).Format(dateLayout) + "\n"
+			policyStartDate.AddDate(1, 0, 0).Format(dateLayout) + "\n"
 	}
 
 	contractorInfo := "Contraente: " + strings.ToUpper(contractor.Surname+" "+contractor.Name+"\n"+
@@ -274,6 +281,7 @@ func paymentMethodSection(pdf *fpdf.Fpdf) {
 		"bonifico e strumenti di pagamento elettronico, quali ad esempio, carte di credito e/o carte di debito, "+
 		"incluse le carte prepagate. Oppure può essere pagato direttamente alla Compagnia alla "+
 		"stipula del contratto, via bonifico o carta di credito.", "", "", false)
+	pdf.Ln(3)
 }
 
 func emitResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
@@ -298,6 +306,7 @@ func emitResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	getParagraphTitle(pdf, "Emissione polizza e pagamento della prima rata")
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, text, "", "", false)
+	pdf.Ln(3)
 }
 
 func companiesDescriptionSection(pdf *fpdf.Fpdf, companyName string) {
@@ -338,6 +347,7 @@ func companiesDescriptionSection(pdf *fpdf.Fpdf, companyName string) {
 			"Rappresentanza Generale per l’Italia con sede in Via Tiziano, 32 – 20145 Milano – Iscritta alla CCIAA di "+
 			"Milano P.I. 07160010968 ", "", "", false)
 	}
+	pdf.Ln(3)
 }
 
 func personalDataHandlingSection(pdf *fpdf.Fpdf, policy *models.Policy) {

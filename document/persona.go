@@ -38,9 +38,15 @@ func PersonaGlobal(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 
 	personaGuaranteesTable(pdf, guaranteesMap, slugs)
 
+	pdf.Ln(5)
+
 	personaSurveySection(pdf, policy)
 
 	personaStatementsSection(pdf, policy)
+
+	if policy.HasGuarantee("IPM") {
+		pdf.AddPage()
+	}
 
 	personaOfferResumeSection(pdf, policy)
 
@@ -49,10 +55,6 @@ func PersonaGlobal(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 	emitResumeSection(pdf, policy)
 
 	companiesDescriptionSection(pdf, policy.Company)
-
-	if policy.HasGuarantee("IPM") {
-		pdf.AddPage()
-	}
 
 	personalDataHandlingSection(pdf, policy)
 
@@ -145,6 +147,7 @@ func personaSurveySection(pdf *fpdf.Fpdf, policy *models.Policy) {
 		err := printSurvey(pdf, survey, policy.Company)
 		lib.CheckError(err)
 	}
+	pdf.Ln(3)
 }
 
 func personaStatementsSection(pdf *fpdf.Fpdf, policy *models.Policy) {
@@ -153,6 +156,7 @@ func personaStatementsSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	for _, statement := range statements {
 		printStatement(pdf, statement, policy.Company)
 	}
+	pdf.Ln(3)
 }
 
 func personaOfferResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
@@ -226,7 +230,7 @@ func personaOfferResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	pdf.MultiCell(0, 3, "In caso di sostituzione, il premio alla firma è al netto dell’eventuale rimborso"+
 		" dei premi non goduti sulla polizza sostituita e tiene conto dell’eventuale diversa durata rispetto alle"+
 		" rate successive.", "", fpdf.AlignLeft, false)
-
+	pdf.Ln(3)
 }
 
 func globalStamentsAndConsens(pdf *fpdf.Fpdf) {

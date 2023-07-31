@@ -93,13 +93,16 @@ func gapHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 	location, err := time.LoadLocation("Europe/Rome")
 	lib.CheckError(err)
 
+	policyStartDate := policy.StartDate.In(location)
+	policyEndDate := policy.EndDate.In(location)
+
 	logoPath = lib.GetAssetPathByEnv(basePath) + "/logo_gap.png"
 	productName = "Auto Valore Protetto"
 
 	policyInfo := "Polizza Numero: " + policy.CodeCompany + "\n" +
 		"Targa Veicolo: " + policy.Assets[0].Vehicle.Plate + "\n" +
-		"Decorre dal: " + policy.StartDate.In(location).Format(dateLayout) + " ore 24:00\n" +
-		"Scade il: " + policy.EndDate.In(location).Format(dateLayout) + " ore 24:00"
+		"Decorre dal: " + policyStartDate.Format(dateLayout) + " ore 24:00\n" +
+		"Scade il: " + policyEndDate.Format(dateLayout) + " ore 24:00"
 
 	pdf.SetHeaderFunc(func() {
 		opt.ImageType = "png"
