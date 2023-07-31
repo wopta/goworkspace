@@ -62,9 +62,6 @@ func getGapCsv(policies []models.Policy, transactions []models.Transaction) [][]
 	header := getGapHeader()
 	// Space for header
 	csvRows := make([][]string, len(policies)+1)
-	for i := range csvRows {
-		csvRows[i] = make([]string, len(header))
-	}
 	csvRows[0] = header
 
 	// Caching columns' position in array for faster search
@@ -75,19 +72,30 @@ func getGapCsv(policies []models.Policy, transactions []models.Transaction) [][]
 	}
 
 	for i := range policies {
-		row := getGapRowMap(policies[i], transactions[i])
-		if len(row) > len(header) {
-			panic("The number of columns in the header (%d) are less than the fields on a row (%d)")
+		rowMap := getGapRowMap(policies[i], transactions[i])
+		if len(rowMap) > len(header) {
+			panic(fmt.Errorf("the header (%d) has less columns than the row's fields (%d)", len(header), len(rowMap)))
 		}
-		for fieldName, value := range row {
-			colIdx, ok := columnsIdx[fieldName]
-			if !ok {
-				panic(fmt.Sprintf("The key %q is not present in the header", fieldName))
-			}
-			csvRows[i+1][colIdx] = value
+
+		if row, err := mapToSlice(rowMap, columnsIdx); err != nil {
+			panic(err)
+		} else {
+			csvRows[i+1] = row
 		}
 	}
 	return csvRows
+}
+
+func mapToSlice(values map[string]string, indices map[string]int) ([]string, error) {
+	slice := make([]string, len(values))
+	for key, value := range values {
+		index, ok := indices[key]
+		if !ok {
+			return nil, fmt.Errorf("the key %q is not present in the header", key)
+		}
+		slice[index] = value
+	}
+	return slice, nil
 }
 
 func getGapHeader() []string {
