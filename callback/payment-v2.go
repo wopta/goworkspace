@@ -71,12 +71,16 @@ func fabrickPayment(origin, policyUid, schedule string) error {
 
 	policy := plc.GetPolicyByUid(policyUid, origin)
 
-	if !canPayPolicy(&policy) {
-		log.Printf(
-			"[fabrickPayment] ERROR cannot be paid. Policy %s | status %s | isPay %t | paymentSplit %s",
-			policyUid, policy.Status, policy.IsPay, policy.PaymentSplit,
-		)
-		return errors.New("cannot pay policy")
+	// Get Transaction
+	tr, err := transaction.GetTransactionByPolicyUidAndScheduleDate(policy.Uid, schedule, origin)
+	if err != nil {
+		log.Printf("[fabrickPayment] ERROR getting transaction: %s", err.Error())
+		return err
+	}
+
+	if tr.IsPay {
+		log.Printf("[fabrickPayment] ERROR Policy %s with transaction %s already paid", policy.Uid, tr.Uid)
+		return errors.New("transaction already paid")
 	}
 
 	if !policy.IsPay && policy.Status == models.PolicyStatusToPay {
@@ -121,13 +125,6 @@ func fabrickPayment(origin, policyUid, schedule string) error {
 		mail.SendMailContract(policy, nil)
 	}
 
-	// Get Transaction
-	tr, err := transaction.GetTransactionByPolicyUidAndScheduleDate(policy.Uid, schedule, origin)
-	if err != nil {
-		log.Printf("[fabrickPayment] ERROR GetPolicyFirstTransaction %s", err.Error())
-		return err
-	}
-
 	// Pay Transaction
 	err = transaction.Pay(&tr, origin)
 	if err != nil {
@@ -138,9 +135,4 @@ func fabrickPayment(origin, policyUid, schedule string) error {
 	tr.BigQuerySave(origin)
 
 	return nil
-}
-
-func canPayPolicy(policy *models.Policy) bool {
-	return (!policy.IsPay && policy.Status == models.PolicyStatusToPay) ||
-		(policy.IsPay && policy.Status == models.PolicyStatusPay && policy.PaymentSplit == string(models.PaySplitMonthly))
 }
