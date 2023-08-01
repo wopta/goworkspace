@@ -60,7 +60,7 @@ func BankAccountAxaInclusive(w http.ResponseWriter, r *http.Request) (string, in
 	//query := "select * from `wopta." + dataMovement + "` where _PARTITIONTIME >'" + from.Format(layoutQuery) + " 00:00:00" + "' and _PARTITIONTIME <'" + to.Format(layoutQuery) + " 23:59:00" + "'"
 	query := "select * from `wopta." + dataMovement + "` where _PARTITIONTIME ='" + from.Format(layoutQuery) + "'"
 	log.Println(query)
-	bankaccountlist, e := lib.QueryRowsBigQuery[inclusive.BankAccountMovement](query)
+	bankaccountlist, _ := lib.QueryRowsBigQuery[inclusive.BankAccountMovement](query)
 	log.Println("len(bankaccountlist): ", len(bankaccountlist))
 	//result = append(result, getHeader())
 	result = append(result, getHeaderInclusiveBank())

@@ -154,7 +154,7 @@ func drawSignatureForm(pdf *fpdf.Fpdf) {
 func getParagraphTitle(pdf *fpdf.Fpdf, title string) {
 	pdf.SetTextColor(229, 0, 117)
 	pdf.SetFont("Montserrat", "B", titleTextSize)
-	pdf.MultiCell(0, titleTextSize, title, "", "", false)
+	pdf.MultiCell(0, 4, title, "", "", false)
 }
 
 func checkSurveySpace(pdf *fpdf.Fpdf, survey models.Survey) {

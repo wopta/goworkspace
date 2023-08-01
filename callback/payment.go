@@ -149,9 +149,9 @@ type Bill struct {
 	Amount         *float64      `json:"amount,omitempty"`
 	Currency       *string       `json:"currency,omitempty"`
 	Description    *string       `json:"description,omitempty"`
-	ReservedAmount *int64        `json:"reservedAmount,omitempty"`
-	ResidualAmount *int64        `json:"residualAmount,omitempty"`
-	RefundedAmount *int64        `json:"refundedAmount,omitempty"`
+	ReservedAmount *float64      `json:"reservedAmount,omitempty"`
+	ResidualAmount *float64      `json:"residualAmount,omitempty"`
+	RefundedAmount *float64      `json:"refundedAmount,omitempty"`
 	PaidAmout      *float64      `json:"paidAmout,omitempty"`
 	Items          []Item        `json:"items,omitempty"`
 	Status         string        `json:"status,omitempty"`

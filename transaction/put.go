@@ -2,7 +2,6 @@ package transaction
 
 import (
 	"log"
-	"os"
 	"strings"
 	"time"
 
@@ -10,21 +9,22 @@ import (
 	"cloud.google.com/go/civil"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/product"
 	pr "github.com/wopta/goworkspace/product"
 )
 
-func PutByPolicy(data models.Policy, scheduleDate string, origin string, expireDate string, customerId string, amount float64, amountNet float64, providerId string) {
+func PutByPolicy(data models.Policy, scheduleDate string, origin string, expireDate string, customerId string, amount float64, amountNet float64, providerId string, isPay bool, role string) {
 	var (
 		commission       float64
 		commissionAgent  float64
 		commissionAgency float64
 		netCommission    map[string]float64
 	)
-	prodb, err := lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "products/"+data.Name+"-"+data.ProductVersion+".json")
+
 	//var prod models.Product
-	prod, err := models.UnmarshalProduct(prodb)
+	prod, err := product.GetProduct(data.Name, data.ProductVersion, role)
 	log.Println(data.Uid+" pay error marsh product:", err)
-	commission = pr.GetCommissionProduct(data, prod)
+	commission = pr.GetCommissionProduct(data, *prod)
 
 	if data.AgentUid != "" {
 		var agent models.Agent
@@ -72,7 +72,7 @@ func PutByPolicy(data models.Policy, scheduleDate string, origin string, expireD
 		IsDelete:           false,
 		ProviderId:         providerId,
 		UserToken:          customerId,
-		ProviderName:       "fabrick",
+		ProviderName:       data.Payment,
 		AgentUid:           data.AgencyUid,
 		AgencyUid:          data.AgencyUid,
 		CommissionsAgent:   amountNet * commissionAgent,

@@ -38,7 +38,7 @@ func PaymentV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	log.Printf("[PaymentV2Fx] request payload: %s", string(request))
 	err = json.Unmarshal([]byte(request), &fabrickCallback)
 	if err != nil {
-		log.Printf("[PaymentV2Fx] ERROR unmarshaling request: %s", err.Error())
+		log.Printf("[PaymentV2Fx] ERROR unmarshaling request (%s): %s", string(request), err.Error())
 		return fmt.Sprintf(responseFormat, false, string(request)), nil, nil
 	}
 
@@ -56,7 +56,7 @@ func PaymentV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	}
 
 	if err != nil {
-		log.Printf("[PaymentV2Fx] ERROR: %s", err.Error())
+		log.Printf("[PaymentV2Fx] ERROR request (%s): %s", string(request), err.Error())
 		return fmt.Sprintf(responseFormat, false, string(request)), nil, nil
 	}
 
