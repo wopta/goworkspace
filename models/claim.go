@@ -23,6 +23,7 @@ func (r *Claim) Marshal() ([]byte, error) {
 type Claim struct {
 	Name              string                `firestore:"name"                        json:"name,omitempty"              bigquery:"-"`
 	Date              time.Time             `firestore:"date"                        json:"date,omitempty"              bigquery:"-"`
+	BigDate           bigquery.NullDateTime `firestore:"-"                        json:"-"              bigquery:"date"`
 	Surname           string                `firestore:"surname"                     json:"surname,omitempty"           bigquery:"-"`
 	Mail              string                `firestore:"mail"                        json:"mail,omitempty"              bigquery:"-"`
 	PolicyDescription string                `firestore:"policyDescription,omitempty" json:"policyDescription,omitempty" bigquery:"-"`
@@ -48,6 +49,7 @@ type Claim struct {
 
 func (claim *Claim) BigquerySave(origin string) error {
 	claim.BigCreationDate = lib.GetBigQueryNullDateTime(claim.CreationDate)
+	claim.BigDate = lib.GetBigQueryNullDateTime(claim.Date)
 	claim.BigStatusHistory = strings.Join(claim.StatusHistory, ",")
 	data, err := json.Marshal(claim)
 	if err != nil {
