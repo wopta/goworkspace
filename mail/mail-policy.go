@@ -11,6 +11,13 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
+const (
+	proposalTemplateType = "proposal"
+	payTemplateType      = "pay"
+	signTemplateType     = "sign"
+	emittedTemplateType  = "emitted"
+)
+
 func GetMailPolicy(policy *models.Policy, subject string, isLink bool, cc string, link string, linkLabel string, lines string, isAttachment bool, at *[]Attachment) MailRequest {
 	var (
 		name     string
@@ -68,7 +75,7 @@ func SendMailProposal(policy models.Policy) {
 
 	cc := setBodyDataAndGetCC(channel, policy, &bodyData)
 
-	templateFile := getTemplateByChannel(channel, "proposal")
+	templateFile := getTemplateByChannel(channel, proposalTemplateType)
 
 	fillTemplate(templateFile, &bodyData, &tpl)
 
@@ -97,7 +104,7 @@ func SendMailPay(policy models.Policy) {
 
 	cc := setBodyDataAndGetCC(channel, policy, &bodyData)
 
-	templateFile := getTemplateByChannel(channel, "pay")
+	templateFile := getTemplateByChannel(channel, payTemplateType)
 
 	fillTemplate(templateFile, &bodyData, &tpl)
 
@@ -126,7 +133,7 @@ func SendMailSign(policy models.Policy) {
 
 	cc := setBodyDataAndGetCC(channel, policy, &bodyData)
 
-	templateFile := getTemplateByChannel(channel, "sign")
+	templateFile := getTemplateByChannel(channel, signTemplateType)
 
 	fillTemplate(templateFile, &bodyData, &tpl)
 
@@ -155,7 +162,7 @@ func SendMailContract(policy models.Policy, at *[]Attachment) {
 
 	cc := setBodyDataAndGetCC(channel, policy, &bodyData)
 
-	templateFile := getTemplateByChannel(channel, "emitted")
+	templateFile := getTemplateByChannel(channel, emittedTemplateType)
 
 	fillTemplate(templateFile, &bodyData, &tpl)
 
