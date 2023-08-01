@@ -2,7 +2,6 @@ package mail
 
 import (
 	"bytes"
-	"fmt"
 	"text/template"
 
 	"github.com/wopta/goworkspace/lib"
@@ -11,52 +10,52 @@ import (
 
 func getChannel(policy models.Policy) string {
 	if policy.AgentUid != "" {
-		return models.UserRoleAgent
+		return models.AgentChannel
 	}
 	if policy.AgencyUid != "" {
-		return models.UserRoleAgency
+		return models.AgencyChannel
 	}
-	return "e-commerce"
+	return models.ECommerceChannel
 }
 
 func setBodyDataAndGetCC(channel string, policy models.Policy, bodyData *BodyData) string {
 	var cc string
 
 	switch channel {
-	case models.UserRoleAgent:
-		cc = getAgentBodyData(policy.AgentUid, bodyData)
-	case models.UserRoleAgency:
-		cc = getAgencyBodyData(policy.AgencyUid, bodyData)
+	case models.AgentChannel:
+		agent, err := models.GetAgentByAuthId(policy.AgencyUid)
+		lib.CheckError(err)
+		cc = agent.Mail
+		setAgentBodyData(*agent, bodyData)
+	case models.AgencyChannel:
+		agency, err := models.GetAgencyByAuthId(policy.AgencyUid)
+		lib.CheckError(err)
+		cc = agency.Email
+		setAgencyBodyData(*agency, bodyData)
 	}
 
-	getProductBodyData(policy, bodyData)
+	setProductBodyData(policy, bodyData)
 
-	getContractorBodyData(policy, bodyData)
+	setContractorBodyData(policy, bodyData)
 
 	return cc
 }
 
-func getContractorBodyData(policy models.Policy, bodyData *BodyData) {
+func setContractorBodyData(policy models.Policy, bodyData *BodyData) {
 	bodyData.ContractorName = policy.Contractor.Name
 	bodyData.ContractorSurname = policy.Contractor.Surname
 }
 
-func getAgentBodyData(agentUid string, bodyData *BodyData) string {
-	agent, err := models.GetAgentByAuthId(agentUid)
-	lib.CheckError(err)
+func setAgentBodyData(agent models.Agent, bodyData *BodyData) {
 	bodyData.AgentName = agent.Name
 	bodyData.AgentSurname = agent.Surname
-	return agent.Mail
 }
 
-func getAgencyBodyData(agencyUid string, bodyData *BodyData) string {
-	agency, err := models.GetAgencyByAuthId(agencyUid)
-	lib.CheckError(err)
+func setAgencyBodyData(agency models.Agency, bodyData *BodyData) {
 	bodyData.AgencyName = agency.Name
-	return agency.Email
 }
 
-func getProductBodyData(policy models.Policy, bodyData *BodyData) {
+func setProductBodyData(policy models.Policy, bodyData *BodyData) {
 	switch policy.Name {
 	case models.PmiProduct:
 		bodyData.ProductName = "Artigiani & Imprese"
@@ -69,29 +68,16 @@ func getProductBodyData(policy models.Policy, bodyData *BodyData) {
 		bodyData.ProductForm += "vita/"
 	case models.GapProduct:
 		bodyData.ProductName = "Auto Valore Protetto"
-		bodyData.ProductForm = "gap/"
+		bodyData.ProductForm = ""
 	}
 }
 
-func getTemplateByChannel(channel, templateType string) []byte {
-	var file []byte
-
-	switch channel {
-	case models.UserRoleAgency:
-		file = lib.GetFilesByEnv(fmt.Sprintf("mail/agent/%s.html", templateType))
-	case models.UserRoleAgent:
-		file = lib.GetFilesByEnv(fmt.Sprintf("mail/agency/%s.html", templateType))
-	case "e-commerce":
-		file = lib.GetFilesByEnv(fmt.Sprintf("mail/e-commerce/%s.html", templateType))
-	}
-
-	return file
-}
-
-func fillTemplate(htmlTemplate []byte, bodyData *BodyData, tpl *bytes.Buffer) {
+func fillTemplate(htmlTemplate []byte, bodyData *BodyData) string {
+	var tpl *bytes.Buffer
 	tmplt := template.New("htmlTemplate")
 	tmplt, err := tmplt.Parse(string(htmlTemplate))
 	lib.CheckError(err)
 	err = tmplt.Execute(tpl, bodyData)
 	lib.CheckError(err)
+	return tpl.String()
 }

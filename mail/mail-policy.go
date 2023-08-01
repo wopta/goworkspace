@@ -1,7 +1,6 @@
 package mail
 
 import (
-	"bytes"
 	"encoding/base64"
 	"fmt"
 	"os"
@@ -67,7 +66,6 @@ func SendMailProposal(policy models.Policy) {
 	var (
 		linkFormat = "https://storage.googleapis.com/documents-public-dev/information-sets/%s/%s/Precontrattuale.pdf"
 		link       = fmt.Sprintf(linkFormat, policy.Name, policy.ProductVersion)
-		tpl        bytes.Buffer
 		bodyData   = BodyData{}
 	)
 
@@ -75,9 +73,9 @@ func SendMailProposal(policy models.Policy) {
 
 	cc := setBodyDataAndGetCC(channel, policy, &bodyData)
 
-	templateFile := getTemplateByChannel(channel, proposalTemplateType)
+	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", channel, proposalTemplateType))
 
-	fillTemplate(templateFile, &bodyData, &tpl)
+	messageBody := fillTemplate(templateFile, &bodyData)
 
 	SendMail(
 		GetMailPolicy(
@@ -87,7 +85,7 @@ func SendMailProposal(policy models.Policy) {
 			cc,
 			link,
 			"Leggi documentazione",
-			tpl.String(),
+			messageBody,
 			false,
 			nil,
 		),
@@ -96,7 +94,6 @@ func SendMailProposal(policy models.Policy) {
 
 func SendMailPay(policy models.Policy) {
 	var (
-		tpl      bytes.Buffer
 		bodyData = BodyData{}
 	)
 
@@ -104,9 +101,9 @@ func SendMailPay(policy models.Policy) {
 
 	cc := setBodyDataAndGetCC(channel, policy, &bodyData)
 
-	templateFile := getTemplateByChannel(channel, payTemplateType)
+	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", channel, payTemplateType))
 
-	fillTemplate(templateFile, &bodyData, &tpl)
+	messageBody := fillTemplate(templateFile, &bodyData)
 
 	SendMail(
 		GetMailPolicy(
@@ -116,7 +113,7 @@ func SendMailPay(policy models.Policy) {
 			cc,
 			policy.PayUrl,
 			"Paga la tua polizza",
-			tpl.String(),
+			messageBody,
 			false,
 			nil,
 		),
@@ -125,7 +122,6 @@ func SendMailPay(policy models.Policy) {
 
 func SendMailSign(policy models.Policy) {
 	var (
-		tpl      bytes.Buffer
 		bodyData = BodyData{}
 	)
 
@@ -133,9 +129,9 @@ func SendMailSign(policy models.Policy) {
 
 	cc := setBodyDataAndGetCC(channel, policy, &bodyData)
 
-	templateFile := getTemplateByChannel(channel, signTemplateType)
+	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", channel, signTemplateType))
 
-	fillTemplate(templateFile, &bodyData, &tpl)
+	messageBody := fillTemplate(templateFile, &bodyData)
 
 	SendMail(
 		GetMailPolicy(
@@ -145,7 +141,7 @@ func SendMailSign(policy models.Policy) {
 			cc,
 			policy.SignUrl,
 			"Firma la tua polizza",
-			tpl.String(),
+			messageBody,
 			false,
 			nil,
 		),
@@ -154,7 +150,6 @@ func SendMailSign(policy models.Policy) {
 
 func SendMailContract(policy models.Policy, at *[]Attachment) {
 	var (
-		tpl      bytes.Buffer
 		bodyData = BodyData{}
 	)
 
@@ -162,9 +157,9 @@ func SendMailContract(policy models.Policy, at *[]Attachment) {
 
 	cc := setBodyDataAndGetCC(channel, policy, &bodyData)
 
-	templateFile := getTemplateByChannel(channel, emittedTemplateType)
+	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", channel, emittedTemplateType))
 
-	fillTemplate(templateFile, &bodyData, &tpl)
+	messageBody := fillTemplate(templateFile, &bodyData)
 
 	// retrocompatibility - the new use extracts the contract from the policy
 	if at == nil {
@@ -192,7 +187,7 @@ func SendMailContract(policy models.Policy, at *[]Attachment) {
 			cc,
 			"",
 			"",
-			tpl.String(),
+			messageBody,
 			true,
 			at,
 		),
