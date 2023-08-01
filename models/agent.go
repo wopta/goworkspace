@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"strings"
 	"time"
 
 	"cloud.google.com/go/bigquery"
@@ -19,7 +18,6 @@ type Agent struct {
 	ManagerUid         string                `json:"managerUid,omitempty" firestore:"managerUid,omitempty" bigquery:"managerUid"`
 	AgencyUid          string                `json:"agencyUid"            firestore:"agencyUid"            bigquery:"agencyUid"`
 	Agents             []string              `json:"agents"               firestore:"agents"               bigquery:"-"`
-	BigAgents          string                `json:"_"                    firestore:"-"                    bigquery:"agents"`
 	Users              []string              `json:"users"                firestore:"users"                bigquery:"-"` // will contain users UIDs
 	IsActive           bool                  `json:"isActive"             firestore:"isActive"             bigquery:"isActive"`
 	Products           []Product             `json:"products"             firestore:"products"             bigquery:"-"`
@@ -37,7 +35,6 @@ func (agent *Agent) BigquerySave(origin string) error {
 		return err
 	}
 	agent.User.Data = ""
-	agent.BigAgents = strings.Join(agent.Agents, ",")
 	agent.BigRuiRegistration = lib.GetBigQueryNullDateTime(agent.RuiRegistration)
 
 	data, err := json.Marshal(agent)

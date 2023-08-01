@@ -110,7 +110,7 @@ type Address struct {
 	CityCode     string `json:"cityCode,omitempty" firestore:"cityCode" bigquery:"-"`
 }
 
-func (user *User) prepareForBigquerySave() error {
+func (user *User) initBigqueryData() error {
 	userJson, err := json.Marshal(user)
 	if err != nil {
 		return err
@@ -158,7 +158,7 @@ func (user *User) prepareForBigquerySave() error {
 func (user *User) BigquerySave(origin string) error {
 	table := lib.GetDatasetByEnv(origin, UserCollection)
 
-	if err := user.prepareForBigquerySave(); err != nil {
+	if err := user.initBigqueryData(); err != nil {
 		return err
 	}
 
