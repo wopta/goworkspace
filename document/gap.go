@@ -199,10 +199,10 @@ func gapPersonalInfoTable(pdf *fpdf.Fpdf, contractor, vehicleOwner models.User) 
 			"Residente in", vehicleOwner.Residence.StreetName + " " + vehicleOwner.Residence.StreetNumber + ", " +
 				"" + vehicleOwner.Residence.PostalCode + ", " + vehicleOwner.Residence.City + "(" + vehicleOwner.Residence.
 				CityCode + ")"},
-		{"Mail", contractor.Mail, "Mail", vehicleOwner.Mail},
+		{"Mail", contractor.Mail, "Mail", "====="},
 		{"Codice Fiscale", contractor.FiscalCode, "Codice Fiscale", vehicleOwner.FiscalCode},
 		{"Data nascita", contractorBirthDate.Format(dateLayout), "Data nascita", vehicleOwnerBirthDate.Format(dateLayout)},
-		{"Telefono", contractor.Phone, "Telefono", vehicleOwner.Phone},
+		{"Telefono", contractor.Phone, "Telefono", "====="},
 	}
 
 	for x := 0; x < len(tableRows); x++ {
