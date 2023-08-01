@@ -6,12 +6,13 @@ replace github.com/wopta/goworkspace/callback => ./
 
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.4
-	github.com/wopta/goworkspace/document v1.0.73
+	github.com/wopta/goworkspace/bpmn v1.0.12
+	github.com/wopta/goworkspace/document v1.0.81
 	github.com/wopta/goworkspace/lib v1.0.66
 	github.com/wopta/goworkspace/mail v1.0.26
 	github.com/wopta/goworkspace/models v1.1.25
 	github.com/wopta/goworkspace/policy v1.0.4
-	github.com/wopta/goworkspace/transaction v1.0.7
+	github.com/wopta/goworkspace/transaction v1.0.9
 	github.com/wopta/goworkspace/user v1.0.16
 )
 
@@ -59,6 +60,7 @@ require (
 	github.com/klauspost/compress v1.15.9 // indirect
 	github.com/klauspost/cpuid/v2 v2.0.9 // indirect
 	github.com/kr/fs v0.1.0 // indirect
+	github.com/maja42/goval v1.3.1 // indirect
 	github.com/minio/asm2plan9s v0.0.0-20200509001527-cdd76441f9d8 // indirect
 	github.com/minio/c2goasm v0.0.0-20190812172519-36a3d3bbc4f3 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
@@ -73,7 +75,7 @@ require (
 	github.com/sergi/go-diff v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
-	github.com/wopta/goworkspace/product v1.0.29 // indirect
+	github.com/wopta/goworkspace/product v1.0.32 // indirect
 	github.com/wopta/goworkspace/wiseproxy v1.0.3 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect

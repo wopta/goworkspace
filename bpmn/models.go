@@ -52,7 +52,7 @@ type job struct {
 type State struct {
 	Name           string
 	Processes      []models.Process
-	Data           models.Policy
+	Data           *models.Policy
 	DecisionData   *map[string]interface{}
 	Jobs           []*job
 	Timers         []*Timer

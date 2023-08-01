@@ -139,9 +139,7 @@ func SendMail(obj MailRequest) {
 		headers["From"] = from.String()
 		headers["To"] = _to
 		headers["Subject"] = subj
-		if len(obj.Cc) > 2 {
-			headers["Cc"] = obj.Cc
-		}
+		headers["Cc"] = obj.Cc
 
 		// Setup message
 		message := ""

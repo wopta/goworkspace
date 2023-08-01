@@ -93,3 +93,10 @@ const (
 	PersonaProduct string = "persona"
 	GapProduct     string = "gap"
 )
+
+const (
+	ECommerceChannel string = "e-commerce"
+	AgentChannel     string = "agent"
+	AgencyChannel    string = "agency"
+	MgaChannel       string = "mga"
+)

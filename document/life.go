@@ -194,7 +194,7 @@ func lifeGuaranteesTable(pdf *fpdf.Fpdf, guaranteesMap map[string]map[string]str
 	pdf.Ln(0.5)
 	setBlackRegularFont(pdf, smallTextSize)
 	pdf.Cell(80, 3, "(*) imposte assicurative di legge incluse nella misura del 2,50% del premio imponibile")
-	pdf.Ln(3)
+	pdf.Ln(5)
 }
 
 func avvertenzeBeneficiariSection(pdf *fpdf.Fpdf) {
@@ -208,6 +208,7 @@ func avvertenzeBeneficiariSection(pdf *fpdf.Fpdf) {
 		"comunicata alla Compagnia in forma scritta.\nIn caso di specifiche esigenze di riservatezza, la Compagnia "+
 		"potrà rivolgersi ad un soggetto terzo (diverso dal Beneficiario) in caso di Decesso al fine di contattare "+
 		"il Beneficiario designato.", "", "", false)
+	pdf.Ln(3)
 }
 
 func beneficiariesSection(pdf *fpdf.Fpdf, beneficiaries []map[string]string, legitimateSuccessorsChoice,
@@ -229,6 +230,7 @@ func beneficiariesSection(pdf *fpdf.Fpdf, beneficiaries []map[string]string, leg
 		"prestazione", "", 0, "", false, 0, "")
 	pdf.Ln(5)
 	beneficiariesTable(pdf, beneficiaries)
+	pdf.Ln(1)
 }
 
 func beneficiariesTable(pdf *fpdf.Fpdf, beneficiaries []map[string]string) {
@@ -364,24 +366,24 @@ func surveysSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	err := printSurvey(pdf, surveys[0], policy.Company)
 	lib.CheckError(err)
 
+	pdf.AddPage()
+
 	getParagraphTitle(pdf, "Questionario Medico")
 	for _, survey := range surveys[1:] {
 		err := printSurvey(pdf, survey, policy.Company)
 		lib.CheckError(err)
 	}
-	// TODO: added when RVM will be implemented
-	/*
-		if rvm == true {
-			pdf.Ln(3)
-			setBlackRegularFont(pdf, standardTextSize)
-			pdf.MultiCell(0, 3, "Nota  bene:  Ai  fini  della  valutazione  del  rischio,  l’Assicurato  ha  "+
-				"inviato  alla  compagnia  un  Rapporto  di  Visita  Medica,  sottoscritto  dal medico curante, che  "+
-				"costituisce  parte  integrante della  presente  Polizza  e  la Compagnia, valutato il  rischio,  ha  "+
-				"accettato  il rischio  alle condizioni indicate nella presente Polizza", "", fpdf.AlignLeft, false)
 
-			setBlackBoldFont(pdf, standardTextSize)
-		}
-	*/
+	if policy.IsReserved {
+		pdf.Ln(3)
+		setBlackRegularFont(pdf, standardTextSize)
+		pdf.MultiCell(0, 3, "Nota  bene:  Ai  fini  della  valutazione  del  rischio,  l’Assicurato  ha  "+
+			"inviato  alla  compagnia  un  Rapporto  di  Visita  Medica,  sottoscritto  dal medico curante, che  "+
+			"costituisce  parte  integrante della  presente  Polizza  e  la Compagnia, valutato il  rischio,  ha  "+
+			"accettato  il rischio  alle condizioni indicate nella presente Polizza", "", fpdf.AlignLeft, false)
+
+		setBlackBoldFont(pdf, standardTextSize)
+	}
 }
 
 func statementsSection(pdf *fpdf.Fpdf, policy *models.Policy) {
@@ -456,7 +458,7 @@ func offerResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 		drawPinkHorizontalLine(pdf, thinLineWidth)
 		pdf.Ln(1)
 	}
-
+	pdf.Ln(3)
 }
 
 func paymentResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
@@ -555,6 +557,7 @@ func paymentResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	pdf.MultiCell(0, 3, "In caso di frazionamento mensile i Premi sopra riportati sono dovuti, alle date "+
 		"indicate e con successiva frequenza mensile, in misura di 1/12 per ogni mensilità. Non sono previsti oneri "+
 		"o interessi di frazionamento.", "", "", false)
+	pdf.Ln(3)
 }
 
 func axaDeclarationsConsentSection(pdf *fpdf.Fpdf, policy *models.Policy) {

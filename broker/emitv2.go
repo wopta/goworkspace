@@ -16,7 +16,10 @@ import (
 	"github.com/wopta/goworkspace/user"
 )
 
-var origin string
+var (
+	origin    string
+	authToken models.AuthToken
+)
 
 //var policy *models.Policy
 
@@ -29,9 +32,9 @@ func EmitV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 		firePolicy string
 		policy     models.Policy
 	)
-
+	authToken, e = models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
 	origin = r.Header.Get("origin")
-	firePolicy = lib.GetDatasetByEnv(origin, "policy")
+	firePolicy = lib.GetDatasetByEnv(origin, models.PolicyCollection)
 	request := lib.ErrorByte(io.ReadAll(r.Body))
 
 	log.Printf("[EmitFxV2] Request: %s", string(request))
@@ -45,6 +48,7 @@ func EmitV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	policyJsonLog, _ := policy.Marshal()
 	log.Printf("[EmitFxV2] Policy %s JSON: %s", uid, string(policyJsonLog))
 
+	emitUpdatePolicy(&policy, result)
 	responseEmit := EmitV2(&policy, result, origin)
 	b, e := json.Marshal(responseEmit)
 	log.Println("[EmitFxV2] Response: ", string(b))
@@ -70,14 +74,12 @@ func EmitV2(policy *models.Policy, request EmitRequest, origin string) EmitRespo
 		if policy.AgencyUid != "" {
 			state := runBpmn(policy, "agency")
 			log.Println("[EmitV2] state.Data Policy:", state.Data)
-			//policy = &state.Data
-
+			policy = state.Data
 		} else if policy.AgentUid != "" {
 			runBpmn(policy, "agent")
 		} else {
 			log.Printf("[EmitV2] Policy Uid %s", request.Uid)
 			ecommerceFlow(policy, origin)
-
 		}
 
 	}
@@ -120,36 +122,35 @@ func setAdvice(policy *models.Policy, origin string) {
 
 	policy.PaymentSplit = string(models.PaySingleInstallment)
 	policy.IsPay = true
-	tr.PutByPolicy(*policy, "", origin, "", "", policy.PriceGross, policy.PriceNett, "", true)
+	tr.PutByPolicy(*policy, "", origin, "", "", policy.PriceGross, policy.PriceNett, "", true, authToken.Role)
 
 }
 func setAdviceBpm(state *bpmn.State) error {
 
 	p := state.Data
-	setAdvice(&p, origin)
+	setAdvice(p, origin)
 	return nil
 }
 func setData(state *bpmn.State) error {
+	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 	p := state.Data
-	emitBase(&p, origin)
-	log.Println(p)
-	log.Println(state.Data)
-	return nil
+	emitBase(p, origin)
+	return lib.SetFirestoreErr(firePolicy, p.Uid, p)
 }
 
 func sendMailSign(state *bpmn.State) error {
 	policy := state.Data
-	mail.SendMailSign(policy)
+	mail.SendMailSign(*policy)
 	return nil
 }
 func sign(state *bpmn.State) error {
 	policy := state.Data
-	emitSign(&policy, origin)
+	emitSign(policy, origin)
 	return nil
 }
 func putUser(state *bpmn.State) error {
 	policy := state.Data
-	user.SetUserIntoPolicyContractor(&policy, origin)
+	user.SetUserIntoPolicyContractor(policy, origin)
 	return nil
 }
 

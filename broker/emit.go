@@ -3,6 +3,7 @@ package broker
 import (
 	"encoding/json"
 	"errors"
+	"github.com/wopta/goworkspace/question"
 	"io"
 	"log"
 	"net/http"
@@ -12,7 +13,6 @@ import (
 	"cloud.google.com/go/civil"
 	"github.com/wopta/goworkspace/document"
 	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/payment"
 )
@@ -116,12 +116,17 @@ func Emit(policy *models.Policy, origin string) (EmitResponse, error) {
 }
 
 func emitUpdatePolicy(policy *models.Policy, request EmitRequest) {
-	if policy.Status == models.PolicyStatusInitLead {
-		if policy.Statements == nil {
-			policy.Statements = request.Statements
-		}
-		policy.PaymentSplit = request.PaymentSplit
+	if policy.Status != models.PolicyStatusInitLead {
+		return
 	}
+	if policy.Statements == nil || len(*policy.Statements) == 0 {
+		if request.Statements != nil {
+			policy.Statements = request.Statements
+		} else {
+			*policy.Statements = question.GetStatements(*policy)
+		}
+	}
+	policy.PaymentSplit = request.PaymentSplit
 }
 
 func emitApproval(policy *models.Policy) {
@@ -161,8 +166,6 @@ func emitSign(policy *models.Policy, origin string) {
 	policy.ContractFileId = signResponse.FileId
 	policy.IdSign = signResponse.EnvelopeId
 	policy.SignUrl = signResponse.Url
-
-	mail.SendMailSign(*policy)
 }
 
 func emitPay(policy *models.Policy, origin string) {

@@ -132,6 +132,7 @@ func runAgencyFlow(policy models.Policy, channel string) *bpmn.State {
 	state = bpmn.NewBpmn(policy)
 
 	state.AddTaskHandler("setSign", setSign)
+	state.AddTaskHandler("addContract", addContract)
 	state.AddTaskHandler("sendMailContract", sendMailContract)
 
 	state.RunBpmn(setting.SignFlow)
@@ -143,7 +144,7 @@ func setSign(state *bpmn.State) error {
 	log.Println("[setSign] Handler start ---")
 
 	policy := state.Data
-	err := plc.Sign(&policy, origin)
+	err := plc.Sign(policy, origin)
 	if err != nil {
 		log.Printf("[setSign] ERROR: %s", err.Error())
 		return err
@@ -156,7 +157,16 @@ func sendMailContract(state *bpmn.State) error {
 	log.Println("[sendMailContract] Handler start ---")
 
 	policy := state.Data
-	mail.SendMailContract(policy, nil)
+	mail.SendMailContract(*policy, nil)
+
+	return nil
+}
+
+func addContract(state *bpmn.State) error {
+	log.Println("[addContract] Handler start ---")
+
+	policy := state.Data
+	plc.AddContract(policy, origin)
 
 	return nil
 }

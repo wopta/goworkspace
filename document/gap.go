@@ -5,7 +5,6 @@ import (
 	"github.com/go-pdf/fpdf"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/question"
 	"sort"
 	"strings"
 	"time"
@@ -25,25 +24,20 @@ func GapContract(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, 
 func GapSogessur(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, []byte) {
 	signatureID = 0
 
-	var statements []models.Statement
-
-	if policy.Statements == nil {
-		statements = question.GetStatements(*policy)
-	}
-
 	gapHeader(pdf, policy)
 
-	mainFooter(pdf, policy.Name)
+	gapFooter(pdf, policy.Name)
 
 	pdf.AddPage()
-
-	getParagraphTitle(pdf, "La tua assicurazione è operante sui dati sotto riportati, verifica la loro correttezza"+
-		" e segnala eventuali inesattezze")
-	pdf.Ln(3)
 
 	vehicle := policy.Assets[0].Vehicle
 	contractor := policy.Contractor
 	vehicleOwner := policy.Assets[0].Person
+	statements := *policy.Statements
+
+	getParagraphTitle(pdf, "La tua assicurazione è operante sui dati sotto riportati, verifica la loro correttezza"+
+		" e segnala eventuali inesattezze")
+	pdf.Ln(3)
 
 	gapVehicleDataTable(pdf, vehicle)
 
@@ -88,13 +82,16 @@ func gapHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 	location, err := time.LoadLocation("Europe/Rome")
 	lib.CheckError(err)
 
+	policyStartDate := policy.StartDate.In(location)
+	policyEndDate := policy.EndDate.In(location)
+
 	logoPath = lib.GetAssetPathByEnv(basePath) + "/logo_gap.png"
 	productName = "Auto Valore Protetto"
 
 	policyInfo := "Polizza Numero: " + policy.CodeCompany + "\n" +
 		"Targa Veicolo: " + policy.Assets[0].Vehicle.Plate + "\n" +
-		"Decorre dal: " + policy.StartDate.In(location).Format(dateLayout) + " ore 24:00\n" +
-		"Scade il: " + policy.EndDate.In(location).Format(dateLayout) + " ore 24:00"
+		"Decorre dal: " + policyStartDate.Format(dateLayout) + " ore 24:00\n" +
+		"Scade il: " + policyEndDate.Format(dateLayout) + " ore 24:00"
 
 	pdf.SetHeaderFunc(func() {
 		opt.ImageType = "png"
@@ -120,6 +117,23 @@ func gapHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 		pdf.SetXY(11, pdf.GetY()+3)
 		pdf.MultiCell(0, 3.5, policyInfo, "", "", false)
 		pdf.Ln(8)
+	})
+}
+
+func gapFooter(pdf *fpdf.Fpdf, productName string) {
+	footerText := "Wopta per te. Auto Valore Protetto è un prodotto assicurativo di Sogessur - Société Anonyme " +
+		"– Capitale Sociale € 33 825 000 – Sede legale: Tour D2, 17bis Place des Reflets – 92919\n" +
+		"Paris La Défense Cedex - 379 846 637 R.C.S. Nanterre - Francia - Sede secondaria: Via Tiziano 32, " +
+		"20145 Milano - Italia - Registro delle Imprese di Milano, Lodi, Monza-Brianza\n" +
+		"Codice Fiscale e P.IVA  07420570967  Iscritta nell’elenco I dell’Albo delle Imprese di Assicurazione tenuto " +
+		"dall’IVASS al n. I00094"
+
+	pdf.SetFooterFunc(func() {
+		pdf.SetXY(10, -15)
+		setPinkRegularFont(pdf, smallTextSize)
+		pdf.MultiCell(0, 3, footerText, "", "", false)
+		pdf.SetY(-7)
+		pageNumber(pdf)
 	})
 }
 
@@ -185,10 +199,10 @@ func gapPersonalInfoTable(pdf *fpdf.Fpdf, contractor, vehicleOwner models.User) 
 			"Residente in", vehicleOwner.Residence.StreetName + " " + vehicleOwner.Residence.StreetNumber + ", " +
 				"" + vehicleOwner.Residence.PostalCode + ", " + vehicleOwner.Residence.City + "(" + vehicleOwner.Residence.
 				CityCode + ")"},
-		{"Mail", contractor.Mail, "Mail", vehicleOwner.Mail},
+		{"Mail", contractor.Mail, "Mail", "====="},
 		{"Codice Fiscale", contractor.FiscalCode, "Codice Fiscale", vehicleOwner.FiscalCode},
 		{"Data nascita", contractorBirthDate.Format(dateLayout), "Data nascita", vehicleOwnerBirthDate.Format(dateLayout)},
-		{"Telefono", contractor.Phone, "Telefono", vehicleOwner.Phone},
+		{"Telefono", contractor.Phone, "Telefono", "====="},
 	}
 
 	for x := 0; x < len(tableRows); x++ {
@@ -310,37 +324,4 @@ func gapStatements(pdf *fpdf.Fpdf, statements []models.Statement, companyName st
 	for _, statement := range statements {
 		printStatement(pdf, statement, companyName)
 	}
-}
-
-func gapClauseApprovalSection(pdf *fpdf.Fpdf) {
-	getParagraphTitle(pdf, "Le clausole della Polizza da approvare in modo specifico")
-	setBlackRegularFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3, "Il sottoscritto dichiara di approvare, ai sensi e per gli effetti degli artt. "+
-		"1341 e 1342 del codice civile, i seguenti articoli delle Condizioni di Assicurazione: INSERIRE VESSATORIE",
-		"", fpdf.AlignLeft, false)
-	pdf.Ln(5)
-	drawSignatureForm(pdf)
-	pdf.Ln(5)
-}
-
-func gapConsentDeclaration(pdf *fpdf.Fpdf) {
-	setBlackBoldFont(pdf, standardTextSize)
-	pdf.SetDrawColor(0, 0, 0)
-	pdf.MultiCell(0, 3, "Consenso al trattemento dei dati personali", "", fpdf.AlignLeft, false)
-	pdf.Ln(1)
-	pdf.SetLineWidth(thinLineWidth)
-	pdf.Line(11, pdf.GetY(), 80, pdf.GetY())
-	pdf.Ln(1)
-	setBlackRegularFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3, "Il sottoscritto, dopo aver ricevuto copia e preso visione dell’Informativa "+
-		"della Compagnia sul trattamento dei dati personali, ai sensi della normativa sulla privacy "+
-		"(Reg. UE 2016/679) acconsente al trattamento dei propri dati personali, anche sensibili (particolari?), da "+
-		"parte di Sogessur S.A. - Rappresentanza Generale per l’Italia, per le finalità, secondo le modalità e "+
-		"mediante i soggetti indicati nella predetta informativa.", "", fpdf.AlignLeft, false)
-	setBlackBoldFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3, "Sono consapevole che il mancato consenso al trattamento dei dati "+
-		"personali, necessari alla Compagnia per le finalità ivi illustrate, comporta l’impossibilità di "+
-		"dare esecuzione al rapporto contrattuale.\"", "", fpdf.AlignLeft, false)
-	pdf.Ln(3)
-	drawSignatureForm(pdf)
 }
