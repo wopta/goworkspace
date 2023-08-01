@@ -68,15 +68,14 @@ func EmitV2(policy *models.Policy, request EmitRequest, origin string) EmitRespo
 	if policy.IsReserved && policy.Status != models.PolicyStatusWaitForApproval {
 		emitApproval(policy)
 	} else {
-
 		log.Println("[EmitFxV2] AgencyUid: ", policy.AgencyUid)
 
 		if policy.AgencyUid != "" {
-			state := runBpmn(policy, "agency")
+			state := runBpmn(policy, models.AgencyChannel)
 			log.Println("[EmitV2] state.Data Policy:", state.Data)
 			policy = state.Data
 		} else if policy.AgentUid != "" {
-			runBpmn(policy, "agent")
+			runBpmn(policy, models.AgentChannel)
 		} else {
 			log.Printf("[EmitV2] Policy Uid %s", request.Uid)
 			ecommerceFlow(policy, origin)
@@ -93,6 +92,7 @@ func EmitV2(policy *models.Policy, request EmitRequest, origin string) EmitRespo
 
 	return responseEmit
 }
+
 func ecommerceFlow(policy *models.Policy, origin string) string {
 	emitBase(policy, origin)
 
@@ -101,8 +101,8 @@ func ecommerceFlow(policy *models.Policy, origin string) string {
 	emitPay(policy, origin)
 	return ""
 }
-func GetFlow[F any](policy models.Policy, funtions map[string]F) F {
 
+func GetFlow[F any](policy models.Policy, funtions map[string]F) F {
 	if policy.AgencyUid != "" {
 		return funtions["agency"]
 	} else if policy.AgentUid != "" {
@@ -110,27 +110,27 @@ func GetFlow[F any](policy models.Policy, funtions map[string]F) F {
 	} else {
 		return funtions["ecommerce"]
 	}
-
 }
-func setAdvice(policy *models.Policy, origin string) {
 
+func setAdvice(policy *models.Policy, origin string) {
 	policy.Payment = "manual"
-	policy.StatusHistory = append(policy.StatusHistory, string(models.PolicyStatusToPay))
-	policy.StatusHistory = append(policy.StatusHistory, string(models.PolicyStatusPay))
-	policy.StatusHistory = append(policy.StatusHistory, string(models.PolicyStatusToSign))
-	policy.Status = string(models.PolicyStatusToSign)
+	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusToPay)
+	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusPay)
+	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusToSign)
+	policy.Status = models.PolicyStatusToSign
 
 	policy.PaymentSplit = string(models.PaySingleInstallment)
 	policy.IsPay = true
 	tr.PutByPolicy(*policy, "", origin, "", "", policy.PriceGross, policy.PriceNett, "", true, authToken.Role)
 
 }
-func setAdviceBpm(state *bpmn.State) error {
 
+func setAdviceBpm(state *bpmn.State) error {
 	p := state.Data
 	setAdvice(p, origin)
 	return nil
 }
+
 func setData(state *bpmn.State) error {
 	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 	p := state.Data
@@ -143,11 +143,13 @@ func sendMailSign(state *bpmn.State) error {
 	mail.SendMailSign(*policy)
 	return nil
 }
+
 func sign(state *bpmn.State) error {
 	policy := state.Data
 	emitSign(policy, origin)
 	return nil
 }
+
 func putUser(state *bpmn.State) error {
 	policy := state.Data
 	user.SetUserIntoPolicyContractor(policy, origin)
