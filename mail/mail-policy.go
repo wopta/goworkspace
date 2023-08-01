@@ -18,7 +18,7 @@ const (
 	emittedTemplateType  = "emitted"
 )
 
-func GetMailPolicy(policy *models.Policy, subject string, isLink bool, cc string, link string, linkLabel string, lines string, isAttachment bool, at *[]Attachment) MailRequest {
+func GetMailPolicy(policy *models.Policy, subject string, isLink bool, cc, link, linkLabel, message string, isAttachment bool, at *[]Attachment) MailRequest {
 	var (
 		name     string
 		obj      MailRequest
@@ -43,7 +43,7 @@ func GetMailPolicy(policy *models.Policy, subject string, isLink bool, cc string
 	obj.From = "anna@wopta.it"
 	obj.To = []string{policy.Contractor.Mail}
 	obj.Cc = cc
-	obj.Message = lines
+	obj.Message = message
 	obj.Title = "Wopta per te " + name
 	obj.Subject = obj.Title + " " + subject
 	obj.SubTitle = subject
