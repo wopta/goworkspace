@@ -66,7 +66,7 @@ func User(w http.ResponseWriter, r *http.Request) {
 			},
 			{
 				Route:   "/document/v1/:policyUid",
-				Handler: UploadDocument,
+				Handler: UploadDocumentFx,
 				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAll},
 			},
