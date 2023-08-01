@@ -1,0 +1,301 @@
+"filename", "language", "Go", "Go Module File", "Batch", "Python", "Shell Script", "JSON", "HTML", "YAML", "Grule Rules", "TypeScript", "Go Work File", "bpmn", "comment", "blank", "total"
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\_script\git.bat", "Batch", 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\_script\push.bat", "Batch", 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 11
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\_script\push.sh", "Shell Script", 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 3, 9
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\_script\startFx.bat", "Batch", 0, 0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 15
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\_script\startFx.sh", "Shell Script", 0, 0, 0, 0, 13, 0, 0, 0, 0, 0, 0, 0, 1, 0, 14
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\_script\tag.bat", "Batch", 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 15
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\_script\tag_update.bat", "Batch", 0, 0, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 14
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\_script\tag_update.sh", "Shell Script", 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 3, 13
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\_script\updateAllDep.bat", "Batch", 0, 0, 48, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 56
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\_script\updateAllFx.bat", "Batch", 0, 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 19, 47
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\_script\update_all_dependencies.py", "Python", 0, 0, 0, 172, 0, 0, 0, 0, 0, 0, 0, 0, 12, 50, 234
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\accounting\accounting.go", "Go", 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 18, 120
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\accounting\axa-fleet.go", "Go", 252, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 45, 37, 334
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\accounting\go.mod", "Go Module File", 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 12
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\appcheck-proxy\appcheck-proxy.go", "Go", 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 11, 53
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\appcheck-proxy\go.mod", "Go Module File", 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 13
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\blockchain\blockchain.go", "Go", 64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 73
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\blockchain\go.mod", "Go Module File", 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 11
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\blockchain\model.go", "Go", 22, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 25
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\bpmn\bpmn.go", "Go", 59, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 9, 70
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\bpmn\engine.go", "Go", 95, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 15, 111
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\bpmn\go.mod", "Go Module File", 0, 92, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 97
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\bpmn\models.go", "Go", 65, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 74
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\bpmn\test.bpmn", "bpmn", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 125, 0, 0, 125
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\broker\acl.go", "Go", 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 26
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\broker\broker.go", "Go", 116, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 14, 134
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\broker\emit.go", "Go", 157, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 40, 197
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\broker\emitv2.go", "Go", 181, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 41, 226
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\broker\get-policies.go", "Go", 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 74
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\broker\get-policy.go", "Go", 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 36
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\broker\get-transactions.go", "Go", 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 42
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\broker\go.mod", "Go Module File", 0, 109, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 114
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\broker\policy-attachment.go", "Go", 113, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 26, 140
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\broker\policy-fiscalcode.go", "Go", 123, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 154
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\broker\policy-update.go", "Go", 105, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 123
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\broker\proposal.go", "Go", 54, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 67
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\broker\put-policy-reserved.go", "Go", 113, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 26, 140
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\broker\sequence.go", "Go", 68, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 9, 78
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\callback\callback.go", "Go", 39, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 45
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\callback\email-verify.go", "Go", 225, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 234
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\callback\go.mod", "Go Module File", 0, 104, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 109
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\callback\payment-v2.go", "Go", 101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 27, 136
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\callback\payment.go", "Go", 153, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 21, 182
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\callback\sign.go", "Go", 129, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 34, 163
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\claim\claim.go", "Go", 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 38
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\claim\get-claim-document.go", "Go", 74, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 90
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\claim\go.mod", "Go Module File", 0, 92, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 97
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\claim\put-claim.go", "Go", 102, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 120
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\cloudbuild.yaml", "YAML", 0, 0, 0, 0, 0, 0, 0, 44, 0, 0, 0, 0, 13, 8, 65
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\companydata\assets\foreign-codes.json", "JSON", 0, 0, 0, 0, 0, 689, 0, 0, 0, 0, 0, 0, 0, 2, 691
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\companydata\assets\italian-codes.json", "JSON", 0, 0, 0, 0, 0, 24254, 0, 0, 0, 0, 0, 0, 0, 1, 24255
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\companydata\assets\reverse-codes.json", "JSON", 0, 0, 0, 0, 0, 33248, 0, 0, 0, 0, 0, 0, 0, 0, 33248
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\companydata\axa.go", "Go", 77, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 30, 9, 116
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\companydata\bank-account-axa-inclusive.go", "Go", 136, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 12, 150
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\companydata\companydata.go", "Go", 61, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 8, 70
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\companydata\emit-product.go", "Go", 1056, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 17, 1075
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\companydata\gessur-gap-emit.go", "Go", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\companydata\global-transaction.go", "Go", 80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 11, 95
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\companydata\global.go", "Go", 253, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 26, 287
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\companydata\go.mod", "Go Module File", 0, 94, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 99
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\companydata\life-axa-delete.go", "Go", 106, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 19, 129
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\companydata\life-axa-emit.go", "Go", 810, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 28, 841
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\companydata\person-global-emit.go", "Go", 139, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 13, 158
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\companydata\pmi-global-emit.go", "Go", 283, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 18, 306
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\companydata\utils.go", "Go", 75, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 17, 96
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\document\components.go", "Go", 380, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 80, 465
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\document\contract.go", "Go", 55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 10, 70
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\document\document.go", "Go", 110, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 10, 124
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\document\fpdf-data.go", "Go", 204, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 26, 230
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\document\fpdf-utils.go", "Go", 338, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 63, 401
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\document\fpdf-widget.go", "Go", 595, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 36, 631
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\document\gap.go", "Go", 262, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 57, 319
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\document\global.go", "Go", 337, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 48, 401
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\document\go.mod", "Go Module File", 0, 98, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 103
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\document\labels.go", "Go", 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 35
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\document\life.go", "Go", 1031, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 120, 1151
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\document\persona.go", "Go", 215, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 43, 258
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\document\sign-namirial.go", "Go", 767, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 44, 822
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\document\sign-namirialV6.go", "Go", 438, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 80, 528
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\document\template.html", "HTML", 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 11, 43
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\document\utils.go", "Go", 319, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 37, 358
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\document\widget.go", "Go", 472, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 58, 544
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\document\wopta.go", "Go", 27, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 36
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\enrich\ateco.go", "Go", 69, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 11, 81
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\enrich\cities.go", "Go", 8375, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 11, 8387
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\enrich\enrich.go", "Go", 51, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 9, 61
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\enrich\go.mod", "Go Module File", 0, 75, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 80
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\enrich\munich-vat.go", "Go", 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 5, 41
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\enrich\works.go", "Go", 65, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 12, 81
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\form\axa-fleet.go", "Go", 235, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 37, 35, 307
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\form\form.go", "Go", 34, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 6, 41
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\form\go.mod", "Go Module File", 0, 93, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 98
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\go.work", "Go Work File", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 0, 0, 2, 34
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\inclusive\go.mod", "Go Module File", 0, 93, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 98
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\inclusive\hype.go", "Go", 194, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 20, 215
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\inclusive\inclusive.go", "Go", 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 37
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\lib\bigquery.go", "Go", 101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 114
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\lib\blockchain-transaction.go", "Go", 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 17, 80
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\lib\blockchain-wallet.go", "Go", 106, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 32, 141
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\lib\blockchain.go", "Go", 69, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 73
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\lib\cors.go", "Go", 19, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 4, 24
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\lib\csv.go", "Go", 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 18
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\lib\dataframe.go", "Go", 45, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 84, 7, 136
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\lib\enviroment.go", "Go", 27, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 31
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\lib\errors.go", "Go", 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 51
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\lib\excel.go", "Go", 66, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 9, 79
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\lib\execute-in-batches.go", "Go", 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 34
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\lib\file-utils.go", "Go", 246, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 52, 306
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\lib\firebase-auth.go", "Go", 130, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 161
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\lib\firestore.go", "Go", 229, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 40, 272
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\lib\fiscal-code.go", "Go", 38, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 46
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\lib\format-date.go", "Go", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\lib\format-string.go", "Go", 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 8
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\lib\go.mod", "Go Module File", 0, 84, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 89
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\lib\http.go", "Go", 54, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 69
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\lib\logging.go", "Go", 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 15
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\lib\math.go", "Go", 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 9
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\lib\oauthlib.go", "Go", 19, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 26
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\lib\router.go", "Go", 62, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 11, 80
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\lib\rules.go", "Go", 163, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 22, 192
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\lib\rulesV2.go", "Go", 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 13, 68
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\lib\sftp.go", "Go", 238, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 23, 51, 312
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\lib\slice.go", "Go", 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 44
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\lib\storage.go", "Go", 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 10, 48
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\lib\struct.go", "Go", 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 4, 27
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\lib\time.go", "Go", 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 13, 53
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mail\go.mod", "Go Module File", 0, 91, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 96
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mail\mail-policy.go", "Go", 195, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 19, 216
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mail\mail.go", "Go", 62, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 18, 104
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mail\models.go", "Go", 49, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 51
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mail\score.go", "Go", 98, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 11, 113
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mail\send.go", "Go", 191, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 27, 242
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mail\validate.go", "Go", 99, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 117
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mail_template.html", "HTML", 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mga\get-product-by-role.go", "Go", 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 46
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mga\get-products-list.go", "Go", 152, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 29, 194
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mga\go.mod", "Go Module File", 0, 92, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 97
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mga\mga.go", "Go", 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 40
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\agency\agency-1.json", "JSON", 0, 0, 0, 0, 0, 116, 0, 0, 0, 0, 0, 0, 0, 0, 116
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\agent\agent-1.json", "JSON", 0, 0, 0, 0, 0, 33, 0, 0, 0, 0, 0, 0, 0, 0, 33
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\agent\agent-2.json", "JSON", 0, 0, 0, 0, 0, 112, 0, 0, 0, 0, 0, 0, 0, 0, 112
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\agent\user.json", "JSON", 0, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 3, 27
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\claim\request01.json", "JSON", 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 0, 0, 0, 0, 22
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\collections\WoptaDev.postman_collection.json", "JSON", 0, 0, 0, 0, 0, 1351, 0, 0, 0, 0, 0, 0, 0, 0, 1351
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\company\ProductInfo.json", "JSON", 0, 0, 0, 0, 0, 4637, 0, 0, 0, 0, 0, 0, 0, 1, 4638
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\company\comanyBarilla.json", "JSON", 0, 0, 0, 0, 0, 2162, 0, 0, 0, 0, 0, 0, 0, 1, 2163
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\company\company.json", "JSON", 0, 0, 0, 0, 0, 694, 0, 0, 0, 0, 0, 0, 0, 1, 695
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\ducument\document.json", "JSON", 0, 0, 0, 0, 0, 47, 0, 0, 0, 0, 0, 0, 0, 1, 48
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\ducument\namirial\namirialSand.json", "JSON", 0, 0, 0, 0, 0, 254, 0, 0, 0, 0, 0, 0, 0, 1, 255
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\ducument\person.json", "JSON", 0, 0, 0, 0, 0, 50, 0, 0, 0, 0, 0, 0, 0, 2, 52
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\mail\01.json", "JSON", 0, 0, 0, 0, 0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 14
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\mga.json", "JSON", 0, 0, 0, 0, 0, 48, 0, 0, 0, 0, 0, 0, 0, 7, 55
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\namirial\evelopget.json", "JSON", 0, 0, 0, 0, 0, 472, 0, 0, 0, 0, 0, 0, 0, 0, 472
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\payment\atum01.json", "JSON", 0, 0, 0, 0, 0, 19, 0, 0, 0, 0, 0, 0, 0, 0, 19
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\payment\response01.json", "JSON", 0, 0, 0, 0, 0, 13, 0, 0, 0, 0, 0, 0, 0, 0, 13
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\policy\obj.json", "JSON", 0, 0, 0, 0, 0, 788, 0, 0, 0, 0, 0, 0, 0, 0, 788
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\policy\person01.json", "JSON", 0, 0, 0, 0, 0, 93, 0, 0, 0, 0, 0, 0, 0, 5, 98
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\policy\pmi01.json", "JSON", 0, 0, 0, 0, 0, 1082, 0, 0, 0, 0, 0, 0, 0, 0, 1082
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\policy\pmi2.json", "JSON", 0, 0, 0, 0, 0, 947, 0, 0, 0, 0, 0, 0, 0, 1, 948
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\product\flutter_sdui.json", "JSON", 0, 0, 0, 0, 0, 115, 0, 0, 0, 0, 0, 0, 18, 1, 134
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\product\life.json", "JSON", 0, 0, 0, 0, 0, 264, 0, 0, 0, 0, 0, 0, 0, 0, 264
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\product\persona.json", "JSON", 0, 0, 0, 0, 0, 698, 0, 0, 0, 0, 0, 0, 0, 0, 698
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\product\pmi.json", "JSON", 0, 0, 0, 0, 0, 1203, 0, 0, 0, 0, 0, 0, 0, 8, 1211
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\quote\pmi\02.json", "JSON", 0, 0, 0, 0, 0, 93, 0, 0, 0, 0, 0, 0, 0, 0, 93
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\quote\pmi\04.json", "JSON", 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 0, 0, 101
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\quote\pmi\05.json", "JSON", 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 0, 0, 41
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\quote\pmi\1.json", "JSON", 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 0, 0, 41
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\quote\pmi\Request.json", "JSON", 0, 0, 0, 0, 0, 336, 0, 0, 0, 0, 0, 0, 0, 0, 336
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\quote\pmi\Response.json", "JSON", 0, 0, 0, 0, 0, 303, 0, 0, 0, 0, 0, 0, 0, 0, 303
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\quote\pmi\SmeRateRequest-09062022.ts", "TypeScript", 0, 0, 0, 0, 0, 0, 0, 0, 0, 103, 0, 0, 7, 14, 124
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\rules\allrisk\01.json", "JSON", 0, 0, 0, 0, 0, 18, 0, 0, 0, 0, 0, 0, 0, 0, 18
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\rules\allrisk\02 copy.json", "JSON", 0, 0, 0, 0, 0, 18, 0, 0, 0, 0, 0, 0, 0, 0, 18
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\rules\allrisk\02.json", "JSON", 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 1, 21
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\rules\allrisk\03.json", "JSON", 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 16
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\rules\allrisk\company_profile.json", "JSON", 0, 0, 0, 0, 0, 19, 0, 0, 0, 0, 0, 0, 0, 0, 19
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\rules\allrisk\req04.json", "JSON", 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 16
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\rules\allrisk\res04.json", "JSON", 0, 0, 0, 0, 0, 816, 0, 0, 0, 0, 0, 0, 0, 0, 816
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\rules\allrisk\response-data-export.json", "JSON", 0, 0, 0, 0, 0, 409, 0, 0, 0, 0, 0, 0, 0, 0, 409
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\rules\person\req02.json", "JSON", 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 4, 9
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\rules\person\response01.json", "JSON", 0, 0, 0, 0, 0, 434, 0, 0, 0, 0, 0, 0, 0, 1, 435
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\rules\person\risk01.json", "JSON", 0, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 1, 11
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\user.json", "JSON", 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 0, 0, 0, 1, 23
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\wise\documentazioneContrattuale.json", "JSON", 0, 0, 0, 0, 0, 2119, 0, 0, 0, 0, 0, 0, 0, 0, 2119
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\wise\getanagrafica.json", "JSON", 0, 0, 0, 0, 0, 143, 0, 0, 0, 0, 0, 0, 0, 3, 146
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\wise\getpolizzaclienterequest.json", "JSON", 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\wise\getpolizzaclienteresp.json", "JSON", 0, 0, 0, 0, 0, 227, 0, 0, 0, 0, 0, 0, 0, 0, 227
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\wise\newAnag.json", "JSON", 0, 0, 0, 0, 0, 42, 0, 0, 0, 0, 0, 0, 0, 0, 42
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\wise\scriviPolizza.json", "JSON", 0, 0, 0, 0, 0, 2119, 0, 0, 0, 0, 0, 0, 0, 0, 2119
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\mock\wise\stampaDocumento.json", "JSON", 0, 0, 0, 0, 0, 1221, 0, 0, 0, 0, 0, 0, 0, 0, 1221
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\models\agency.go", "Go", 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 17, 102
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\models\agent.go", "Go", 70, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 86
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\models\asset.go", "Go", 69, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 71
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\models\audit-log.go", "Go", 51, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 9, 67
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\models\authToken.go", "Go", 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 36
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\models\beneficiary.go", "Go", 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 10
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\models\claim.go", "Go", 44, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 51
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\models\constants.go", "Go", 80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 96
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\models\coverage.go", "Go", 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 33
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\models\credential.go", "Go", 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 15
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\models\document.go", "Go", 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 30
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\models\fx.go", "Go", 396, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 46, 445
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\models\go.mod", "Go Module File", 0, 85, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 90
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\models\guarante.go", "Go", 111, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 122
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\models\identity-document.go", "Go", 26, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 32
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\models\message-resp.go", "Go", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\models\mga.go", "Go", 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 5
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\models\node-setting.go", "Go", 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 34
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\models\policy.go", "Go", 229, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 247
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\models\product.go", "Go", 120, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 17, 138
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\models\productRiks.go", "Go", 21, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 23
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\models\query.go", "Go", 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 9
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\models\transaction.go", "Go", 107, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 116
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\models\user.go", "Go", 209, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 233
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\models\vehicle.go", "Go", 21, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 3, 33
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\models\wise-address.go", "Go", 23, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 24
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\models\wise-annex.go", "Go", 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 20
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\models\wise-asset.go", "Go", 47, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 7, 68
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\models\wise-complete-policy.go", "Go", 87, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 19, 106
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\models\wise-contract.go", "Go", 64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 68
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\models\wise-contractor.go", "Go", 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 6
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\models\wise-guarantee.go", "Go", 58, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 67
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\models\wise-location.go", "Go", 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 15
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\models\wise-policy-events.go", "Go", 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 11
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\models\wise-user-address-registrydto.go", "Go", 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 26
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\models\wise-user-privacy-options-dto.go", "Go", 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 10
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\models\wise-user-registry-dto.go", "Go", 59, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 68
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\models\wise-user-registry-response-dto.go", "Go", 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 6
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\partnership\extract_fiscal_code_test.go", "Go", 26, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 30
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\partnership\go.mod", "Go Module File", 0, 75, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 80
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\partnership\partnership.go", "Go", 108, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 48, 28, 184
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\payment\coinquest.go", "Go", 90, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 9, 102
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\payment\constants.go", "Go", 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 19
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\payment\fabrick.go", "Go", 229, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 33, 276
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\payment\go.mod", "Go Module File", 0, 104, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 109
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\payment\manual.go", "Go", 123, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 28, 156
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\payment\models.go", "Go", 88, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 17, 105
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\payment\payment.go", "Go", 124, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 20, 145
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\policy\delete-handler.go", "Go", 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 41
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\policy\get-policies-by-query-handler.go", "Go", 59, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 73
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\policy\get-policy-attachment-handler.go", "Go", 113, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 26, 140
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\policy\get-policy-by-fiscalcode-handler.go", "Go", 133, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 164
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\policy\get-policy-handler.go", "Go", 39, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 44
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\policy\go.mod", "Go Module File", 0, 92, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 97
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\policy\patch-handler.go", "Go", 63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 78
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\policy\policy.go", "Go", 86, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 8, 96
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\policy\utils.go", "Go", 113, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 28, 145
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\product\get-product-by-role.go", "Go", 188, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 32, 221
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\product\get-product.go", "Go", 92, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 25, 119
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\product\go.mod", "Go Module File", 0, 91, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 96
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\product\product-commission.go", "Go", 34, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 7, 43
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\product\product.go", "Go", 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 6, 49
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\product\put-product.go", "Go", 22, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 27
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\question\get-questions.go", "Go", 116, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 141
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\question\go.mod", "Go Module File", 0, 76, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 81
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\question\question.go", "Go", 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8, 43
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\quote\gap.go", "Go", 101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 25, 128
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\quote\go.mod", "Go Module File", 0, 94, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 99
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\quote\life.go", "Go", 230, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 45, 277
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\quote\person.go", "Go", 387, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 84, 471
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\quote\pmi-munichRe.go", "Go", 173, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32, 205
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\quote\quote.go", "Go", 56, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 63
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\rules\allrisk.grl", "Grule Rules", 0, 0, 0, 0, 0, 0, 0, 0, 632, 0, 0, 0, 102, 84, 818
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\rules\go.mod", "Go Module File", 0, 76, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 81
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\rules\grules\pmi-allrisk.json", "JSON", 0, 0, 0, 0, 0, 524, 0, 0, 0, 0, 0, 0, 0, 11, 535
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\rules\pmi-allrisk.go", "Go", 905, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 30, 940
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\rules\rules.go", "Go", 95, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 106
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\sellable\gap.go", "Go", 101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 23, 128
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\sellable\go.mod", "Go Module File", 0, 92, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 97
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\sellable\life.go", "Go", 56, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 17, 73
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\sellable\persona.go", "Go", 56, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 17, 73
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\sellable\sellable.go", "Go", 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 39
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\swagger.yaml", "YAML", 0, 0, 0, 0, 0, 0, 0, 282, 0, 0, 0, 0, 0, 4, 286
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\test.json", "JSON", 0, 0, 0, 0, 0, 205, 0, 0, 0, 0, 0, 0, 0, 0, 205
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\test02.json", "JSON", 0, 0, 0, 0, 0, 1161, 0, 0, 0, 0, 0, 0, 0, 0, 1161
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\test03.json", "JSON", 0, 0, 0, 0, 0, 501, 0, 0, 0, 0, 0, 0, 0, 0, 501
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\test\go.mod", "Go Module File", 0, 91, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 96
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\test\test.go", "Go", 70, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 42, 14, 126
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\transaction\get-transactions-by-policy-uid.go", "Go", 38, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 58
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\transaction\go.mod", "Go Module File", 0, 92, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 97
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\transaction\put.go", "Go", 81, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 8, 91
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\transaction\transaction.go", "Go", 92, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 103
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\user\assets\foreign-codes.json", "JSON", 0, 0, 0, 0, 0, 689, 0, 0, 0, 0, 0, 0, 0, 2, 691
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\user\assets\italian-codes.json", "JSON", 0, 0, 0, 0, 0, 24254, 0, 0, 0, 0, 0, 0, 0, 1, 24255
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\user\assets\reverse-codes.json", "JSON", 0, 0, 0, 0, 0, 33248, 0, 0, 0, 0, 0, 0, 0, 0, 33248
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\user\can-user-register-use-case.go", "Go", 72, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 16, 89
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\user\consume-invite.go", "Go", 144, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 26, 179
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\user\create-invite.go", "Go", 130, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 24, 155
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\user\fiscal-code.go", "Go", 267, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 56, 323
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\user\get-users.go", "Go", 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 75
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\user\go.mod", "Go Module File", 0, 94, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 99
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\user\onboard-user.go", "Go", 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 13, 64
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\user\update-role.go", "Go", 52, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13, 65
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\user\upload-document.go", "Go", 88, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 110
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\user\user.go", "Go", 216, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 26, 245
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\wise-broker\go.mod", "Go Module File", 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 13
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\wise-broker\request-epoli.html", "HTML", 0, 0, 0, 0, 0, 0, 97, 0, 0, 0, 0, 0, 0, 1, 98
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\wise-broker\wise-broker.go", "Go", 57, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 8, 69
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\wiseproxy\go.mod", "Go Module File", 0, 74, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 79
+"c:\Users\luca barbieri\Desktop\Workspace\google-function\wiseproxy\wise-proxy.go", "Go", 117, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 17, 141
+"Total", "-", 31229, 2285, 122, 172, 29, 142621, 130, 326, 632, 103, 32, 125, 853, 3754, 182413
