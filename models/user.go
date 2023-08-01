@@ -2,7 +2,6 @@ package models
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 	"time"
@@ -123,32 +122,29 @@ func (user *User) initBigqueryData() error {
 	}
 	user.BigBirthDate = lib.GetBigQueryNullDateTime(birthDate)
 
-	if user.Residence == nil {
-		return errors.New("'Residence' is nil")
+	if user.Residence != nil {
+		user.BigResidenceStreetName = user.Residence.StreetName
+		user.BigResidenceStreetNumber = user.Residence.StreetNumber
+		user.BigResidenceCity = user.Residence.City
+		user.BigResidencePostalCode = user.Residence.PostalCode
+		user.BigResidenceLocality = user.Residence.Locality
+		user.BigResidenceCityCode = user.Residence.CityCode
 	}
-	user.BigResidenceStreetName = user.Residence.StreetName
-	user.BigResidenceStreetNumber = user.Residence.StreetNumber
-	user.BigResidenceCity = user.Residence.City
-	user.BigResidencePostalCode = user.Residence.PostalCode
-	user.BigResidenceLocality = user.Residence.Locality
-	user.BigResidenceCityCode = user.Residence.CityCode
 
-	if user.Domicile == nil {
-		return errors.New("'Domicile' is nil")
+	if user.Domicile != nil {
+		user.BigDomicileStreetName = user.Domicile.StreetName
+		user.BigDomicileStreetNumber = user.Domicile.StreetNumber
+		user.BigDomicileCity = user.Domicile.City
+		user.BigDomicilePostalCode = user.Domicile.PostalCode
+		user.BigDomicileLocality = user.Domicile.Locality
+		user.BigDomicileCityCode = user.Domicile.CityCode
 	}
-	user.BigDomicileStreetName = user.Domicile.StreetName
-	user.BigDomicileStreetNumber = user.Domicile.StreetNumber
-	user.BigDomicileCity = user.Domicile.City
-	user.BigDomicilePostalCode = user.Domicile.PostalCode
-	user.BigDomicileLocality = user.Domicile.Locality
-	user.BigDomicileCityCode = user.Domicile.CityCode
 
-	geography := bigquery.NullGeography{
+	user.BigLocation = bigquery.NullGeography{
 		// TODO: Check if correct: Geography type uses the WKT format for geometry
 		GeographyVal: fmt.Sprintf("POINT (%f %f)", user.Location.Lng, user.Location.Lat),
 		Valid:        true,
 	}
-	user.BigLocation = geography
 	user.BigCreationDate = lib.GetBigQueryNullDateTime(user.CreationDate)
 	user.BigUpdatedDate = lib.GetBigQueryNullDateTime(user.UpdatedDate)
 
