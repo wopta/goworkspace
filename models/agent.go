@@ -30,7 +30,7 @@ type Agent struct {
 }
 
 func (agent *Agent) BigquerySave(origin string) error {
-	err := agent.User.prepareForBigquerySave()
+	err := agent.User.initBigqueryData()
 	if err != nil {
 		return err
 	}
@@ -44,7 +44,7 @@ func (agent *Agent) BigquerySave(origin string) error {
 	agent.Data = string(data) // includes agent.User data
 
 	table := lib.GetDatasetByEnv(origin, AgentCollection)
-	if err := agent.prepareForBigquerySave(); err != nil {
+	if err := agent.initBigqueryData(); err != nil {
 		return err
 	}
 

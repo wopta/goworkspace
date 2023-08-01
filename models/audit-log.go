@@ -10,10 +10,6 @@ import (
 	"github.com/wopta/goworkspace/lib"
 )
 
-const (
-	auditTable = "audit"
-)
-
 // The AuditLog is a data structure that stores request's data.
 // In particular, the Payload should contain data from the request's body.
 //
@@ -58,7 +54,7 @@ func ParseHttpRequest(r *http.Request) (AuditLog, error) {
 }
 
 func (a AuditLog) SaveToBigQuery() error {
-	if err := lib.InsertRowsBigQuery(WoptaDataset, auditTable, a); err != nil {
+	if err := lib.InsertRowsBigQuery(WoptaDataset, AuditsCollection, a); err != nil {
 		return fmt.Errorf("cannot save the audit-log: %v", err)
 	}
 	return nil

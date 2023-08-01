@@ -82,6 +82,7 @@ const (
 	ProductsCollection     string = "products"
 	TransactionsCollection string = "transactions"
 	ClaimsCollection       string = "claims" //only for bigquery
+	AuditsCollection       string = "audits"
 )
 
 const (
