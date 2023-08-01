@@ -33,7 +33,7 @@ type Claim struct {
 	CreationDate      time.Time             `firestore:"creationDate,omitempty"      json:"creationDate,omitempty"      bigquery:"-"`
 	BigCreationDate   bigquery.NullDateTime `firestore:"-"                           json:"-"                           bigquery:"creationDate"`
 	Updated           time.Time             `firestore:"updated,omitempty"           json:"updated,omitempty"           bigquery:"-"`
-	BigUpdated        time.Time             `firestore:"-"           json:"-"           bigquery:"updated"`
+	BigUpdated        bigquery.NullDateTime `firestore:"-"           json:"-"           bigquery:"updated"`
 	Company           string                `firestore:"company,omitempty"           json:"company,omitempty"           bigquery:"-"`
 	Policy            string                `firestore:"policy,omitempty"            json:"policy,omitempty"            bigquery:"-"`
 	Description       string                `firestore:"description,omitempty"       json:"description,omitempty"       bigquery:"description"`
