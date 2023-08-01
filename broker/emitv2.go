@@ -132,11 +132,10 @@ func setAdviceBpm(state *bpmn.State) error {
 	return nil
 }
 func setData(state *bpmn.State) error {
+	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 	p := state.Data
 	emitBase(p, origin)
-	log.Println(p)
-	log.Println(state.Data)
-	return nil
+	return lib.SetFirestoreErr(firePolicy, p.Uid, p)
 }
 
 func sendMailSign(state *bpmn.State) error {
