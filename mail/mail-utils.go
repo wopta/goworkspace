@@ -10,25 +10,22 @@ import (
 )
 
 func getChannel(policy models.Policy) string {
-
 	if policy.AgentUid != "" {
-		return "agent"
+		return models.UserRoleAgent
 	}
 	if policy.AgencyUid != "" {
-		return "agency"
+		return models.UserRoleAgency
 	}
-
 	return "e-commerce"
 }
 
-func setBodyDataAndGetCC(policy models.Policy, bodyData *BodyData) string {
+func setBodyDataAndGetCC(channel string, policy models.Policy, bodyData *BodyData) string {
 	var cc string
-	channel := getChannel(policy)
 
 	switch channel {
-	case "agent":
+	case models.UserRoleAgent:
 		cc = getAgentBodyData(policy.AgentUid, bodyData)
-	case "agency":
+	case models.UserRoleAgency:
 		cc = getAgencyBodyData(policy.AgencyUid, bodyData)
 	}
 
@@ -61,31 +58,28 @@ func getAgencyBodyData(agencyUid string, bodyData *BodyData) string {
 
 func getProductBodyData(policy models.Policy, bodyData *BodyData) {
 	switch policy.Name {
-	case "pmi":
+	case models.PmiProduct:
 		bodyData.ProductName = "Artigiani & Imprese"
 		bodyData.ProductForm += "multi-rischio/"
-	case "persona":
+	case models.PersonaProduct:
 		bodyData.ProductName = "Persona"
 		bodyData.ProductForm += "infortunio/"
-	case "life":
+	case models.LifeProduct:
 		bodyData.ProductName = "Vita"
 		bodyData.ProductForm += "vita/"
-	case "gap":
+	case models.GapProduct:
 		bodyData.ProductName = "Auto Valore Protetto"
 		bodyData.ProductForm = "gap/"
 	}
 }
 
-func getTemplateByChannel(policy models.Policy, templateType string) []byte {
-
+func getTemplateByChannel(channel, templateType string) []byte {
 	var file []byte
-	channel := getChannel(policy)
 
-	if channel == "agent" {
+	switch channel {
+	case models.UserRoleAgency:
 		file = lib.GetFilesByEnv(fmt.Sprintf("mail/agent/%s.html", templateType))
-	}
-
-	if channel == "agency" {
+	case models.UserRoleAgent:
 		file = lib.GetFilesByEnv(fmt.Sprintf("mail/agency/%s.html", templateType))
 	}
 

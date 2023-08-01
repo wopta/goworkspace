@@ -61,13 +61,14 @@ func SendMailProposal(policy models.Policy) {
 		linkFormat = "https://storage.googleapis.com/documents-public-dev/information-sets/%s/%s/Precontrattuale.pdf"
 		link       = fmt.Sprintf(linkFormat, policy.Name, policy.ProductVersion)
 		tpl        bytes.Buffer
+		bodyData   = BodyData{}
 	)
 
-	bodyData := BodyData{}
+	channel := getChannel(policy)
 
-	cc := setBodyDataAndGetCC(policy, &bodyData)
+	cc := setBodyDataAndGetCC(channel, policy, &bodyData)
 
-	templateFile := getTemplateByChannel(policy, "pay")
+	templateFile := getTemplateByChannel(channel, "pay")
 
 	fillTemplate(templateFile, &bodyData, &tpl)
 
@@ -87,12 +88,16 @@ func SendMailProposal(policy models.Policy) {
 }
 
 func SendMailPay(policy models.Policy) {
-	bodyData := BodyData{}
-	var tpl bytes.Buffer
+	var (
+		tpl      bytes.Buffer
+		bodyData = BodyData{}
+	)
 
-	cc := setBodyDataAndGetCC(policy, &bodyData)
+	channel := getChannel(policy)
 
-	templateFile := getTemplateByChannel(policy, "pay")
+	cc := setBodyDataAndGetCC(channel, policy, &bodyData)
+
+	templateFile := getTemplateByChannel(channel, "pay")
 
 	fillTemplate(templateFile, &bodyData, &tpl)
 
@@ -112,12 +117,16 @@ func SendMailPay(policy models.Policy) {
 }
 
 func SendMailSign(policy models.Policy) {
-	bodyData := BodyData{}
-	var tpl bytes.Buffer
+	var (
+		tpl      bytes.Buffer
+		bodyData = BodyData{}
+	)
 
-	cc := setBodyDataAndGetCC(policy, &bodyData)
+	channel := getChannel(policy)
 
-	templateFile := getTemplateByChannel(policy, "sign")
+	cc := setBodyDataAndGetCC(channel, policy, &bodyData)
+
+	templateFile := getTemplateByChannel(channel, "sign")
 
 	fillTemplate(templateFile, &bodyData, &tpl)
 
@@ -137,12 +146,16 @@ func SendMailSign(policy models.Policy) {
 }
 
 func SendMailContract(policy models.Policy, at *[]Attachment) {
-	bodyData := BodyData{}
-	var tpl bytes.Buffer
+	var (
+		tpl      bytes.Buffer
+		bodyData = BodyData{}
+	)
 
-	cc := setBodyDataAndGetCC(policy, &bodyData)
+	channel := getChannel(policy)
 
-	templateFile := getTemplateByChannel(policy, "sign")
+	cc := setBodyDataAndGetCC(channel, policy, &bodyData)
+
+	templateFile := getTemplateByChannel(channel, "sign")
 
 	fillTemplate(templateFile, &bodyData, &tpl)
 
