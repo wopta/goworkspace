@@ -46,28 +46,19 @@ type Claim struct {
 	Data              string                `firestore:"-"                           json:"-"                           bigquery:"data"`
 }
 
-func (claim *Claim) prepareForBigquerySave() error {
+func (claim *Claim) BigquerySave(origin string) error {
 	claim.BigCreationDate = lib.GetBigQueryNullDateTime(claim.CreationDate)
 	claim.BigStatusHistory = strings.Join(claim.StatusHistory, ",")
-
 	data, err := json.Marshal(claim)
 	if err != nil {
 		return err
 	}
 	claim.Data = string(data)
-	return nil
-}
-
-func (claim Claim) BigquerySave(origin string) error {
-	table := lib.GetDatasetByEnv(origin, "claim")
-
-	if err := claim.prepareForBigquerySave(); err != nil {
-		return err
-	}
 
 	log.Println("claim save big query: " + claim.ClaimUid)
+	table := lib.GetDatasetByEnv(origin, ClaimsCollection)
 
-	return lib.InsertRowsBigQuery("wopta", table, claim)
+	return lib.InsertRowsBigQuery(WoptaDataset, table, claim)
 }
 
 type Attachment struct {

@@ -31,10 +31,12 @@ type Agent struct {
 	Data               string                `json:"-"                    firestore:"-"                    bigquery:"data"`
 }
 
-func (agent *Agent) prepareForBigquerySave() error {
-	if err := agent.User.prepareForBigquerySave(); err != nil {
+func (agent *Agent) BigquerySave(origin string) error {
+	err := agent.User.prepareForBigquerySave()
+	if err != nil {
 		return err
 	}
+	agent.User.Data = ""
 	agent.BigAgents = strings.Join(agent.Agents, ",")
 	agent.BigRuiRegistration = lib.GetBigQueryNullDateTime(agent.RuiRegistration)
 
@@ -42,20 +44,16 @@ func (agent *Agent) prepareForBigquerySave() error {
 	if err != nil {
 		return err
 	}
-	agent.Data = string(data)
+	agent.Data = string(data) // includes agent.User data
 
-	return nil
-}
-
-func (agent Agent) BigquerySave(origin string) error {
-	table := lib.GetDatasetByEnv(origin, "agent")
+	table := lib.GetDatasetByEnv(origin, AgentCollection)
 	if err := agent.prepareForBigquerySave(); err != nil {
 		return err
 	}
 
 	log.Println("agent save big query: " + agent.Uid)
 
-	return lib.InsertRowsBigQuery("wopta", table, agent)
+	return lib.InsertRowsBigQuery(WoptaDataset, table, agent)
 }
 
 func GetAgentByAuthId(authId string) (*Agent, error) {

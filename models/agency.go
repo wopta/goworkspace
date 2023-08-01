@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"strings"
 	"time"
 
 	"cloud.google.com/go/bigquery"
@@ -17,7 +16,7 @@ import (
 type Agency struct {
 	AuthId             string                `json:"authId"                 firestore:"authId"                 bigquery:"-"`
 	Uid                string                `json:"uid"                    firestore:"uid"                    bigquery:"uid"`
-	Email              string                `json:"email"                  firestore:"email"                  bigquery:"-"`
+	Email              string                `json:"email"                  firestore:"email"                  bigquery:"email"`
 	VatCode            string                `json:"vatCode"                firestore:"vatCode"                bigquery:"vatCode"`
 	Name               string                `json:"name"                   firestore:"name"                   bigquery:"name"`
 	Manager            User                  `json:"manager"                firestore:"manager"                bigquery:"-"`
@@ -26,9 +25,7 @@ type Agency struct {
 	Users              []string              `json:"users"                  firestore:"users"                  bigquery:"-"`            // will contain users UIDs
 	ParentAgency       string                `json:"parentAgency,omitempty" firestore:"parentAgency,omitempty" bigquery:"parentAgency"` // parent Agency UID
 	Agencies           []string              `json:"agencies"               firestore:"agencies"               bigquery:"-"`            // will contain agencies UIDs
-	BigAgencies        string                `json:"-"                      firestore:"-"                      bigquery:"agencies"`     // will contain agencies UIDs
 	Agents             []string              `json:"agents"                 firestore:"agents"                 bigquery:"-"`            // will contain agents UIDs
-	BigAgents          string                `json:"-"                      firestore:"-"                      bigquery:"agents"`       // will contain agents UIDs
 	IsActive           bool                  `json:"isActive"               firestore:"isActive"               bigquery:"isActive"`
 	Products           []Product             `json:"products"               firestore:"products"               bigquery:"-"`
 	Policies           []string              `json:"policies"               firestore:"policies"               bigquery:"-"` // will contain policies UIDs
@@ -45,39 +42,24 @@ type Agency struct {
 	Data               string                `json:"-"                      firestore:"-"                      bigquery:"data"`
 }
 
-func (agency *Agency) prepareForBigquerySave() error {
-	agency.BigManagerUid = agency.Manager.Uid
-	agency.BigAgencies = strings.Join(agency.Agencies, ",")
-	agency.BigAgents = strings.Join(agency.Agents, ",")
-	agency.BigRuiRegistration = lib.GetBigQueryNullDateTime(agency.RuiRegistration)
-	agency.BigCreationDate = lib.GetBigQueryNullDateTime(agency.CreationDate)
-	agency.BigUpdatedDate = lib.GetBigQueryNullDateTime(agency.UpdatedDate)
-
-	data, err := json.Marshal(agency)
-	if err != nil {
-		return err
-	}
-	agency.Data = string(data)
-
-	return nil
-}
-
-func (agency Agency) BigquerySave(origin string) error {
-	table := lib.GetDatasetByEnv(origin, "agency")
-	err := agency.prepareForBigquerySave()
-	if err != nil {
-		return err
-	}
-
-	log.Println("agency save big query: " + agency.Uid)
-
-	return lib.InsertRowsBigQuery("wopta", table, agency)
-}
-
 type Skin struct {
 	PrimaryColor   string `json:"primaryColor"   firestore:"primaryColor"   bigquery:"-"`
 	SecondaryColor string `json:"secondaryColor" firestore:"secondaryColor" bigquery:"-"`
 	LogoUrl        string `json:"logoUrl"        firestore:"logoUrl"        bigquery:"-"`
+}
+
+func (agency *Agency) BigquerySave(origin string) error {
+	agency.BigManagerUid = agency.Manager.Uid
+	agency.BigRuiRegistration = lib.GetBigQueryNullDateTime(agency.RuiRegistration)
+	agency.BigCreationDate = lib.GetBigQueryNullDateTime(agency.CreationDate)
+	agency.BigUpdatedDate = lib.GetBigQueryNullDateTime(agency.UpdatedDate)
+	data, _ := json.Marshal(agency)
+	agency.Data = string(data)
+
+	table := lib.GetDatasetByEnv(origin, AgencyCollection)
+	log.Println("[Agency] save big query: " + agency.Uid)
+
+	return lib.InsertRowsBigQuery(WoptaDataset, table, agency)
 }
 
 func GetAgencyByAuthId(authId string) (*Agency, error) {

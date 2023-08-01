@@ -12,7 +12,6 @@ import (
 
 const (
 	auditTable = "audit"
-	dataset    = "wopta"
 )
 
 // The AuditLog is a data structure that stores request's data.
@@ -59,7 +58,7 @@ func ParseHttpRequest(r *http.Request) (AuditLog, error) {
 }
 
 func (a AuditLog) SaveToBigQuery() error {
-	if err := lib.InsertRowsBigQuery(dataset, auditTable, a); err != nil {
+	if err := lib.InsertRowsBigQuery(WoptaDataset, auditTable, a); err != nil {
 		return fmt.Errorf("cannot save the audit-log: %v", err)
 	}
 	return nil
