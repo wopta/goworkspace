@@ -81,6 +81,8 @@ func getTemplateByChannel(channel, templateType string) []byte {
 		file = lib.GetFilesByEnv(fmt.Sprintf("mail/agent/%s.html", templateType))
 	case models.UserRoleAgent:
 		file = lib.GetFilesByEnv(fmt.Sprintf("mail/agency/%s.html", templateType))
+	case "e-commerce":
+		file = lib.GetFilesByEnv(fmt.Sprintf("mail/e-commerce/%s.html", templateType))
 	}
 
 	return file
@@ -90,5 +92,6 @@ func fillTemplate(htmlTemplate []byte, bodyData *BodyData, tpl *bytes.Buffer) {
 	tmplt := template.New("htmlTemplate")
 	tmplt, err := tmplt.Parse(string(htmlTemplate))
 	lib.CheckError(err)
-	tmplt.Execute(tpl, bodyData)
+	err = tmplt.Execute(tpl, bodyData)
+	lib.CheckError(err)
 }

@@ -68,7 +68,7 @@ func SendMailProposal(policy models.Policy) {
 
 	cc := setBodyDataAndGetCC(channel, policy, &bodyData)
 
-	templateFile := getTemplateByChannel(channel, "pay")
+	templateFile := getTemplateByChannel(channel, "proposal")
 
 	fillTemplate(templateFile, &bodyData, &tpl)
 
@@ -155,7 +155,7 @@ func SendMailContract(policy models.Policy, at *[]Attachment) {
 
 	cc := setBodyDataAndGetCC(channel, policy, &bodyData)
 
-	templateFile := getTemplateByChannel(channel, "sign")
+	templateFile := getTemplateByChannel(channel, "emitted")
 
 	fillTemplate(templateFile, &bodyData, &tpl)
 
