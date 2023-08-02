@@ -99,32 +99,18 @@ func ecommerceFlow(policy *models.Policy, origin string) string {
 	emitSign(policy, origin)
 
 	emitPay(policy, origin)
-	return ""
 }
-func GetFlow[F any](policy models.Policy, funtions map[string]F) F {
 
-	if policy.AgencyUid != "" {
-		return funtions["agency"]
-	} else if policy.AgentUid != "" {
-		return funtions["agent"]
-	} else {
-		return funtions["ecommerce"]
-	}
-
-}
 func setAdvice(policy *models.Policy, origin string) {
-
 	policy.Payment = "manual"
-	policy.StatusHistory = append(policy.StatusHistory, string(models.PolicyStatusToPay))
-	policy.StatusHistory = append(policy.StatusHistory, string(models.PolicyStatusPay))
-	policy.StatusHistory = append(policy.StatusHistory, string(models.PolicyStatusToSign))
-	policy.Status = string(models.PolicyStatusToSign)
-
-	policy.PaymentSplit = string(models.PaySingleInstallment)
 	policy.IsPay = true
-	tr.PutByPolicy(*policy, "", origin, "", "", policy.PriceGross, policy.PriceNett, "", true, authToken.Role)
+	policy.Status = models.PolicyStatusPay
+	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusToPay, models.PolicyStatusPay)
+	policy.PaymentSplit = string(models.PaySingleInstallment)
 
+	tr.PutByPolicy(*policy, "", origin, "", "", policy.PriceGross, policy.PriceNett, "", true, authToken.Role)
 }
+
 func setAdviceBpm(state *bpmn.State) error {
 
 	p := state.Data
