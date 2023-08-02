@@ -117,6 +117,12 @@ func UpdateAgencyPortfolio(policy *Policy, origin string) error {
 	}
 
 	err = lib.SetFirestoreErr(fireAgency, agency.Uid, agency)
+	if err != nil {
+		log.Printf("[updateAgencyPortfolio] ERROR saving agency: %s", err.Error())
+		return err
+	}
+
+	err = agency.BigquerySave(origin)
 
 	return err
 }
