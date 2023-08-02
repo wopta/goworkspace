@@ -26,7 +26,7 @@ func GapSogessur(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, 
 
 	gapHeader(pdf, policy)
 
-	gapFooter(pdf, policy.Name)
+	gapFooter(pdf)
 
 	pdf.AddPage()
 
@@ -120,7 +120,7 @@ func gapHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 	})
 }
 
-func gapFooter(pdf *fpdf.Fpdf, productName string) {
+func gapFooter(pdf *fpdf.Fpdf) {
 	footerText := "Wopta per te. Auto Valore Protetto è un prodotto assicurativo di Sogessur - Société Anonyme " +
 		"– Capitale Sociale € 33 825 000 – Sede legale: Tour D2, 17bis Place des Reflets – 92919\n" +
 		"Paris La Défense Cedex - 379 846 637 R.C.S. Nanterre - Francia - Sede secondaria: Via Tiziano 32, " +
@@ -139,9 +139,9 @@ func gapFooter(pdf *fpdf.Fpdf, productName string) {
 
 func gapVehicleDataTable(pdf *fpdf.Fpdf, vehicle *models.Vehicle) {
 	tableRows := [][]string{
-		{"Tipo Veicolo", vehicle.VehicleType, "Data prima immatricolazione", vehicle.RegistrationDate.Format(dateLayout)},
+		{"Tipo Veicolo", vehicle.VehicleTypeDesc, "Data prima immatricolazione", vehicle.RegistrationDate.Format(dateLayout)},
 		{"Marca", vehicle.Manufacturer, "Stato veicolo", vehicle.Condition},
-		{"Modello", vehicle.Model, "Valore veicolo (*)", lib.HumanaizePriceEuro(float64(vehicle.PriceValue))},
+		{"Modello", vehicle.Model, "Valore veicolo (*)", lib.HumanaizePriceEuro(vehicle.PriceValue)},
 	}
 
 	setWhiteBoldFont(pdf, standardTextSize)
