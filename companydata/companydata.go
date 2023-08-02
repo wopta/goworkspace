@@ -8,7 +8,6 @@ import (
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
 )
 
 func init() {
