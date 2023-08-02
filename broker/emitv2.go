@@ -21,13 +21,11 @@ var (
 	authToken models.AuthToken
 )
 
-//var policy *models.Policy
-
 func EmitV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println("[EmitFxV2] Handler start ----------------------------------------")
 
 	var (
-		result     EmitRequest
+		request    EmitRequest
 		e          error
 		firePolicy string
 		policy     models.Policy
@@ -35,12 +33,12 @@ func EmitV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	authToken, e = models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
 	origin = r.Header.Get("origin")
 	firePolicy = lib.GetDatasetByEnv(origin, models.PolicyCollection)
-	request := lib.ErrorByte(io.ReadAll(r.Body))
+	body := lib.ErrorByte(io.ReadAll(r.Body))
 
-	log.Printf("[EmitFxV2] Request: %s", string(request))
-	json.Unmarshal([]byte(request), &result)
+	log.Printf("[EmitFxV2] Request: %s", string(body))
+	json.Unmarshal([]byte(body), &request)
 
-	uid := result.Uid
+	uid := request.Uid
 	log.Printf("[EmitFxV2] Uid: %s", uid)
 
 	docsnap := lib.GetFirestore(firePolicy, string(uid))
@@ -48,8 +46,8 @@ func EmitV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	policyJsonLog, _ := policy.Marshal()
 	log.Printf("[EmitFxV2] Policy %s JSON: %s", uid, string(policyJsonLog))
 
-	emitUpdatePolicy(&policy, result)
-	responseEmit := EmitV2(&policy, result, origin)
+	emitUpdatePolicy(&policy, request)
+	responseEmit := EmitV2(&policy, request, origin)
 	b, e := json.Marshal(responseEmit)
 	log.Println("[EmitFxV2] Response: ", string(b))
 
@@ -57,26 +55,22 @@ func EmitV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 }
 
 func EmitV2(policy *models.Policy, request EmitRequest, origin string) EmitResponse {
-	var (
-		responseEmit EmitResponse
-	)
+	var responseEmit EmitResponse
 
-	firePolicy := lib.GetDatasetByEnv(origin, "policy")
-	guaranteFire := lib.GetDatasetByEnv(origin, "guarante")
-	policy.Uid = request.Uid // we should enforce the setting of the ID on proposal
+	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
+	fireGuarantee := lib.GetDatasetByEnv(origin, models.GuaranteeCollection)
 
 	if policy.IsReserved && policy.Status != models.PolicyStatusWaitForApproval {
 		emitApproval(policy)
 	} else {
-
 		log.Println("[EmitFxV2] AgencyUid: ", policy.AgencyUid)
 
 		if policy.AgencyUid != "" {
-			state := runBpmn(policy, "agency")
+			state := runBpmn(policy, models.AgencyChannel)
 			log.Println("[EmitV2] state.Data Policy:", state.Data)
 			policy = state.Data
 		} else if policy.AgentUid != "" {
-			runBpmn(policy, "agent")
+			runBpmn(policy, models.AgentChannel)
 		} else {
 			log.Printf("[EmitV2] Policy Uid %s", request.Uid)
 			ecommerceFlow(policy, origin)
@@ -89,48 +83,36 @@ func EmitV2(policy *models.Policy, request EmitRequest, origin string) EmitRespo
 	policy.Updated = time.Now().UTC()
 	lib.SetFirestore(firePolicy, request.Uid, policy)
 	policy.BigquerySave(origin)
-	models.SetGuaranteBigquery(*policy, "emit", guaranteFire)
+	models.SetGuaranteBigquery(*policy, "emit", fireGuarantee)
 
 	return responseEmit
 }
-func ecommerceFlow(policy *models.Policy, origin string) string {
+
+func ecommerceFlow(policy *models.Policy, origin string) {
 	emitBase(policy, origin)
 
 	emitSign(policy, origin)
 
 	emitPay(policy, origin)
-	return ""
 }
-func GetFlow[F any](policy models.Policy, funtions map[string]F) F {
 
-	if policy.AgencyUid != "" {
-		return funtions["agency"]
-	} else if policy.AgentUid != "" {
-		return funtions["agent"]
-	} else {
-		return funtions["ecommerce"]
-	}
-
-}
 func setAdvice(policy *models.Policy, origin string) {
-
 	policy.Payment = "manual"
-	policy.StatusHistory = append(policy.StatusHistory, string(models.PolicyStatusToPay))
-	policy.StatusHistory = append(policy.StatusHistory, string(models.PolicyStatusPay))
-	policy.StatusHistory = append(policy.StatusHistory, string(models.PolicyStatusToSign))
-	policy.Status = string(models.PolicyStatusToSign)
-
-	policy.PaymentSplit = string(models.PaySingleInstallment)
 	policy.IsPay = true
-	tr.PutByPolicy(*policy, "", origin, "", "", policy.PriceGross, policy.PriceNett, "", true, authToken.Role)
+	policy.Status = models.PolicyStatusPay
+	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusToPay, models.PolicyStatusPay)
+	policy.PaymentSplit = string(models.PaySingleInstallment)
 
+	tr.PutByPolicy(*policy, "", origin, "", "", policy.PriceGross, policy.PriceNett, "", true, authToken.Role)
 }
+
 func setAdviceBpm(state *bpmn.State) error {
 
 	p := state.Data
 	setAdvice(p, origin)
 	return nil
 }
+
 func setData(state *bpmn.State) error {
 	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 	p := state.Data
@@ -143,20 +125,21 @@ func sendMailSign(state *bpmn.State) error {
 	mail.SendMailSign(*policy)
 	return nil
 }
+
 func sign(state *bpmn.State) error {
 	policy := state.Data
 	emitSign(policy, origin)
 	return nil
 }
-func putUser(state *bpmn.State) error {
+
+func updateUserAndAgency(state *bpmn.State) error {
 	policy := state.Data
 	user.SetUserIntoPolicyContractor(policy, origin)
-	return nil
+	return models.UpdateAgencyPortfolio(policy, origin)
 }
 
 func runBpmn(policy *models.Policy, channel string) *bpmn.State {
 	settingByte, _ := lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "products/"+channel+"/setting.json")
-	//var prod models.Product
 
 	var setting models.NodeSetting
 
@@ -167,62 +150,9 @@ func runBpmn(policy *models.Policy, channel string) *bpmn.State {
 	state.AddTaskHandler("sendMailSign", sendMailSign)
 	state.AddTaskHandler("sign", sign)
 	state.AddTaskHandler("setAdvice", setAdviceBpm)
-	state.AddTaskHandler("putUser", putUser)
+	state.AddTaskHandler("putUser", updateUserAndAgency)
 	log.Println(state.Handlers)
 	log.Println(state.Processes)
 	state.RunBpmn(setting.EmitFlow)
 	return state
-}
-func getTest() string {
-	return `
-	[{
-        "name": "emitData",
-        "type": "TASK",
-        "id": 0,
-        "outProcess": [1],
-        "inProcess": [],
-        "status": "READY"
-
-    },
-
-	{
-        "name": "sign",
-        "type": "TASK",
-        "id": 1,
-        "outProcess": [2],
-        "inProcess": [0],
-        "status": "READY"
-
-    },
-
-	{
-        "name": "sendMailSign",
-        "type": "TASK",
-        "id": 2,
-        "outProcess": [3],
-        "inProcess": [1],
-        "status": "READY"
-
-    },
-
-	{
-        "name": "setAdvice",
-        "type": "TASK",
-        "id": 3,
-        "outProcess": [4],
-        "inProcess": [2],
-        "status": "READY"
-
-    },
-
-	{
-        "name": "putUser",
-        "type": "TASK",
-        "id": 4,
-        "outProcess": [],
-        "inProcess": [3],
-        "status": "READY"
-
-    }
-]`
 }
