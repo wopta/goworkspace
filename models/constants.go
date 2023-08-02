@@ -81,6 +81,7 @@ const (
 	PolicyCollection       string = "policy"
 	ProductsCollection     string = "products"
 	TransactionsCollection string = "transactions"
+	GuaranteeCollection    string = "guarante"
 )
 
 const (
