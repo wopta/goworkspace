@@ -17,6 +17,7 @@ type Guarante struct {
 	Beneficiary                *User                      `firestore:"beneficiary,omitempty" json:"beneficiary,omitempty"  bigquery:"-"`
 	BeneficiaryReference       *User                      `firestore:"beneficiaryReference,omitempty" json:"beneficiaryReference,omitempty"  bigquery:"-"`
 	Beneficiaries              *[]Beneficiary             `firestore:"beneficiaries,omitempty" json:"beneficiaries,omitempty"  bigquery:"-"`
+	BeneficiaryOptions         map[string]string          `json:"beneficiaryOptions,omitempty" firestore:"beneficiaryOptions,omitempty" bigquery:"-"`
 	TypeOfSumInsured           string                     `firestore:"typeOfSumInsured" json:"typeOfSumInsured,omitempty"  bigquery:"typeOfSumInsured"`
 	Description                string                     `firestore:"description,omitempty" json:"description,omitempty"  bigquery:"-"`
 	ContractDetail             string                     `firestore:"contractDetail,omitempty" json:"contractDetail,omitempty"  bigquery:"-"`

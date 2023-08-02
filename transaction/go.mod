@@ -5,14 +5,15 @@ go 1.19
 replace github.com/wopta/goworkspace/transaction => ./
 
 require (
+	cloud.google.com/go v0.110.2
+	cloud.google.com/go/bigquery v1.51.1
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.4
-	github.com/wopta/goworkspace/lib v1.0.53
-	github.com/wopta/goworkspace/models v1.1.7
+	github.com/wopta/goworkspace/lib v1.0.65
+	github.com/wopta/goworkspace/models v1.1.25
+	github.com/wopta/goworkspace/product v1.0.32
 )
 
 require (
-	cloud.google.com/go v0.110.2 // indirect
-	cloud.google.com/go/bigquery v1.51.1 // indirect
 	cloud.google.com/go/compute v1.19.0 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
 	cloud.google.com/go/firestore v1.9.0 // indirect
@@ -61,7 +62,7 @@ require (
 	github.com/richardlehane/mscfb v1.0.4 // indirect
 	github.com/richardlehane/msoleps v1.0.3 // indirect
 	github.com/sergi/go-diff v1.0.0 // indirect
-	github.com/sirupsen/logrus v1.8.1 // indirect
+	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect

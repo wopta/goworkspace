@@ -260,3 +260,25 @@ func FireToListData[T interface{}](query *firestore.DocumentIterator) []T {
 	}
 	return result
 }
+
+func SetBatchFirestoreErr[T any](operations map[string]map[string]T) error {
+	ctx := context.Background()
+	client, err := firestore.NewClient(ctx, os.Getenv("GOOGLE_PROJECT_ID"))
+	if err != nil {
+		return err
+	}
+
+	batch := client.Batch()
+	for collection, values := range operations {
+		c := client.Collection(collection)
+
+		for k, v := range values {
+			col := c.Doc(k)
+			batch.Set(col, v)
+		}
+	}
+
+	_, err = batch.Commit(ctx)
+
+	return err
+}

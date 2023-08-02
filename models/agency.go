@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"time"
@@ -11,26 +12,27 @@ import (
 )
 
 type Agency struct {
-	AuthId          string    `json:"authId" firestore:"authId" bigquery:"-"`
-	Uid             string    `json:"uid" firestore:"uid" bigquery:"-"`
-	Email           string    `json:"email" firestore:"email" bigquery:"-"`
-	VatCode         string    `json:"vatCode" firestore:"vatCode" bigquery:"-"`
-	Name            string    `json:"name" firestore:"name" bigquery:"-"`
-	Manager         User      `json:"manager" firestore:"manager" bigquery:"-"`
-	Portfolio       []string  `json:"portfolio" firestore:"portfolio" bigquery:"-"`                           // will contain users UIDs
-	ParentAgency    string    `json:"parentAgency,omitempty" firestore:"parentAgency,omitempty" bigquery:"-"` // parent Agency UID
-	Agencies        []string  `json:"agencies" firestore:"agencies" bigquery:"-"`                             // will contain agencies UIDs
-	Agents          []string  `json:"agents" firestore:"agents" bigquery:"-"`                                 // will contain agents UIDs
-	IsActive        bool      `json:"isActive" firestore:"isActive" bigquery:"-"`
-	Products        []Product `json:"products" firestore:"products" bigquery:"-"`
-	Policies        []string  `json:"policies" firestore:"policies" bigquery:"-"` // will contain policies UIDs
-	Steps           []Step    `json:"steps" firestore:"steps" bigquery:"-"`
-	Skin            Skin      `json:"skin" firestore:"skin" bigquery:"-"`
-	RuiCode         string    `json:"ruiCode" firestore:"ruiCode" bigquery:"-"`
-	RuiSection      string    `json:"ruiSection" firestore:"ruiSection" bigquery:"-"`
-	RuiRegistration time.Time `json:"ruiRegistration" firestore:"ruiRegistration" bigquery:"-"`
-	CreationDate    time.Time `json:"creationDate" firestore:"creationDate" bigquery:"-"`
-	UpdatedDate     time.Time `json:"updatedDate" firestore:"updatedDate" bigquery:"-"`
+	AuthId          string      `json:"authId" firestore:"authId" bigquery:"-"`
+	Uid             string      `json:"uid" firestore:"uid" bigquery:"-"`
+	Email           string      `json:"email" firestore:"email" bigquery:"-"`
+	VatCode         string      `json:"vatCode" firestore:"vatCode" bigquery:"-"`
+	Name            string      `json:"name" firestore:"name" bigquery:"-"`
+	Manager         User        `json:"manager" firestore:"manager" bigquery:"-"`
+	NodeSetting     NodeSetting `json:"nodeSetting" firestore:"nodeSetting" bigquery:"-"`
+	Users           []string    `json:"users" firestore:"users" bigquery:"-"`                                   // will contain users UIDs
+	ParentAgency    string      `json:"parentAgency,omitempty" firestore:"parentAgency,omitempty" bigquery:"-"` // parent Agency UID
+	Agencies        []string    `json:"agencies" firestore:"agencies" bigquery:"-"`                             // will contain agencies UIDs
+	Agents          []string    `json:"agents" firestore:"agents" bigquery:"-"`                                 // will contain agents UIDs
+	IsActive        bool        `json:"isActive" firestore:"isActive" bigquery:"-"`
+	Products        []Product   `json:"products" firestore:"products" bigquery:"-"`
+	Policies        []string    `json:"policies" firestore:"policies" bigquery:"-"` // will contain policies UIDs
+	Steps           []Step      `json:"steps" firestore:"steps" bigquery:"-"`
+	Skin            Skin        `json:"skin" firestore:"skin" bigquery:"-"`
+	RuiCode         string      `json:"ruiCode" firestore:"ruiCode" bigquery:"-"`
+	RuiSection      string      `json:"ruiSection" firestore:"ruiSection" bigquery:"-"`
+	RuiRegistration time.Time   `json:"ruiRegistration" firestore:"ruiRegistration" bigquery:"-"`
+	CreationDate    time.Time   `json:"creationDate" firestore:"creationDate" bigquery:"-"`
+	UpdatedDate     time.Time   `json:"updatedDate" firestore:"updatedDate" bigquery:"-"`
 }
 
 type Skin struct {
@@ -66,4 +68,34 @@ func FirestoreDocumentToAgency(query *firestore.DocumentIterator) (*Agency, erro
 	}
 
 	return &result, e
+}
+
+func UpdateAgencyPortfolio(policy *Policy, origin string) error {
+	log.Printf("[updateAgencyPortfolio] Policy %s", policy.Uid)
+	if policy.AgencyUid == "" {
+		log.Printf("[updateAgencyPortfolio] ERROR agency not set")
+		return errors.New("agency not set")
+	}
+
+	var agency Agency
+	fireAgency := lib.GetDatasetByEnv(origin, AgencyCollection)
+	docsnap, err := lib.GetFirestoreErr(fireAgency, policy.AgentUid)
+	if err != nil {
+		log.Printf("[updateAgencyPortfolio] ERROR getting agency from firestore: %s", err.Error())
+		return err
+	}
+	err = docsnap.DataTo(&agency)
+	if err != nil {
+		log.Printf("[updateAgencyPortfolio] ERROR parsing agency: %s", err.Error())
+		return err
+	}
+	agency.Policies = append(agency.Policies, policy.Uid)
+
+	if !lib.SliceContains(agency.Users, policy.Contractor.Uid) {
+		agency.Users = append(agency.Users, policy.Contractor.Uid)
+	}
+
+	err = lib.SetFirestoreErr(fireAgency, agency.Uid, agency)
+
+	return err
 }

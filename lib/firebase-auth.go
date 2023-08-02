@@ -70,8 +70,12 @@ func VerifyAuthorization(handler func(w http.ResponseWriter, r *http.Request) (s
 			return "", nil, fmt.Errorf("not found")
 		}
 
-		if len(roles) == 0 || SliceContains(roles, "all") {
+		if len(roles) == 0 || os.Getenv("env") == "local" {
 			return handler(w, r)
+		}
+
+		if SliceContains(roles, "all") {
+			return VerifyAppcheck(handler)(w, r)
 		}
 
 		idToken := strings.ReplaceAll(r.Header.Get("Authorization"), "Bearer ", "")
@@ -118,4 +122,39 @@ func GetAuthUserIdByEmail(mail string) (string, error) {
 		return "", err
 	}
 	return user.UID, nil
+}
+
+func VerifyAppcheck(handler func(w http.ResponseWriter, r *http.Request) (string, interface{}, error)) func(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	wrappedHandler := func(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+		errorHandler := func(w http.ResponseWriter) (string, interface{}, error) {
+			log.Println("[VerifyAppcheck]: unauthenticated.")
+			return "", nil, fmt.Errorf("Unavailable")
+		}
+
+		ctx := context.Background()
+		app, err := firebase.NewApp(ctx, &firebase.Config{ProjectID: os.Getenv("GOOGLE_PROJECT_ID")})
+		if err != nil {
+			log.Fatalf("error initializing app: %v\n", err)
+			return errorHandler(w)
+		}
+
+		appCheck, err := app.AppCheck(context.Background())
+		if err != nil {
+			log.Fatalf("error initializing app: %v\n", err)
+			return errorHandler(w)
+		}
+
+		appCheckToken, ok := r.Header[http.CanonicalHeaderKey("X-Firebase-AppCheck")]
+		if !ok {
+			return errorHandler(w)
+		}
+
+		_, err = appCheck.VerifyToken(appCheckToken[0])
+		if err != nil {
+			return errorHandler(w)
+		}
+
+		return handler(w, r)
+	}
+	return wrappedHandler
 }

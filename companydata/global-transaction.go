@@ -14,6 +14,7 @@ import (
 const collection = "transactions"
 
 func GlobalTransaction(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	log.Println("----------------GlobalTransaction-----------------")
 	var (
 		result [][]string
 

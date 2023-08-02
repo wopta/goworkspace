@@ -139,9 +139,7 @@ func SendMail(obj MailRequest) {
 		headers["From"] = from.String()
 		headers["To"] = _to
 		headers["Subject"] = subj
-		if len(obj.Cc) > 2 {
-			headers["Cc"] = obj.Cc
-		}
+		headers["Cc"] = obj.Cc
 
 		// Setup message
 		message := ""
@@ -184,9 +182,8 @@ func SendMail(obj MailRequest) {
 				message = addAttachment(message, v.Name, v.ContentType, v.Byte, close)
 			}
 
+			message += fmt.Sprintf("\r\n\n--%s--\r\n", outerBoundary)
 		}
-
-		message += fmt.Sprintf("\r\n\n--%s--\r\n", outerBoundary)
 
 		//message += "\r\n" + body
 		log.Println("MESSAGE:----------------------")

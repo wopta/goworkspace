@@ -24,27 +24,42 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		filenamesplit string
 		cabCsv        []byte
 		result        [][]string
+		refMontly     time.Time
+		upload        bool
 	)
-
+	log.Println("----------------LifeAxalEmit-----------------")
 	now := time.Now()
 	M := time.Now().AddDate(0, 0, -2)
 	Q2 := time.Now().AddDate(0, 0, -1)
-	dateString := "2021-11-22"
-	date, _ := time.Parse("2006-01-02", dateString)
-	log.Println(date)
+
 	if now.Day() == 16 {
+		upload = true
+		refMontly = now
+		log.Println("LifeAxalEmit q1")
 		from, e = time.Parse("2006-01-02", strconv.Itoa(now.Year())+"-"+fmt.Sprintf("%02d", int(now.Month()))+"-"+fmt.Sprintf("%02d", 1))
 		to, e = time.Parse("2006-01-02", strconv.Itoa(now.Year())+"-"+fmt.Sprintf("%02d", int(now.Month()))+"-"+fmt.Sprintf("%02d", 16))
 		filenamesplit = "Q"
 	} else if now.Day() == 1 {
-
+		upload = true
+		refMontly = now.AddDate(0, -1, 0)
+		log.Println("LifeAxalEmit q2")
 		from, e = time.Parse("2006-01-02", strconv.Itoa(Q2.Year())+"-"+fmt.Sprintf("%02d", int(Q2.Month()))+"-"+fmt.Sprintf("%02d", 16))
 		to, e = time.Parse("2006-01-02", strconv.Itoa(Q2.Year())+"-"+fmt.Sprintf("%02d", int(Q2.Month()))+"-"+fmt.Sprintf("%02d", Q2.Day()))
 		filenamesplit = "Q"
 	} else if now.Day() == 2 {
+		upload = true
+		refMontly = now.AddDate(0, -1, 0)
+		log.Println("LifeAxalEmit M")
 		from, e = time.Parse("2006-01-02", strconv.Itoa(M.Year())+"-"+fmt.Sprintf("%02d", int(M.Month()))+"-"+fmt.Sprintf("%02d", 1))
 		to, e = time.Parse("2006-01-02", strconv.Itoa(M.Year())+"-"+fmt.Sprintf("%02d", int(M.Month()))+"-"+fmt.Sprintf("%02d", M.Day()))
 		filenamesplit = "M"
+	} else {
+		upload = false
+		refMontly = now.AddDate(0, -1, 0)
+		log.Println("LifeAxalEmit ALL")
+		from, e = time.Parse("2006-01-02", "2023-06-01")
+		to, e = time.Parse("2006-01-02", "2023-07-23")
+		filenamesplit = "A"
 	}
 	switch os.Getenv("env") {
 	case "local":
@@ -52,8 +67,11 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	default:
 		cabCsv = lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "data/cab-cap-istat.csv", "")
 	}
-	log.Println(from)
-	log.Println(to)
+	log.Println("now: " + now.String())
+	log.Println("now.Day: ", now.Day())
+	log.Println("from: " + from.String())
+	log.Println("to: " + to.String())
+	log.Println(": " + filenamesplit)
 	df := lib.CsvToDataframe(cabCsv)
 	q := lib.Firequeries{
 		Queries: []lib.Firequery{
@@ -91,9 +109,10 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	}
 
 	query, e := q.FirestoreWherefields("transactions")
-	log.Println("transaction")
+
 	log.Println(e)
 	transactions := models.TransactionToListData(query)
+	log.Println("transaction len: ", len(transactions))
 	//result = append(result, getHeader())
 	for _, transaction := range transactions {
 		var (
@@ -107,12 +126,13 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 
 	}
 
-	refMontly := now.AddDate(0, -1, 0)
 	filepath := "WOPTAKEYweb_NB" + filenamesplit + "_" + strconv.Itoa(refMontly.Year()) + fmt.Sprintf("%02d", int(refMontly.Month())) + "_" + fmt.Sprintf("%02d", now.Day()) + fmt.Sprintf("%02d", int(now.Month())) + ".txt"
 	lib.WriteCsv("../tmp/"+filepath, result, ';')
 	source, _ := ioutil.ReadFile("../tmp/" + filepath)
-	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/axa/life/"+filepath, source)
-	SftpUpload(filepath)
+	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/axa/life/"+strconv.Itoa(refMontly.Year())+"/"+filepath, source)
+	if upload {
+		AxaPartnersSftpUpload(filepath)
+	}
 	return "", nil, e
 }
 func setRow(policy models.Policy, df dataframe.DataFrame, trans models.Transaction) [][]string {
@@ -166,14 +186,13 @@ func setRow(policy models.Policy, df dataframe.DataFrame, trans models.Transacti
 				"",                        //campo disponibile
 				"",                        //% di sovrappremio da applicare alla garanzia
 				"W1",                      //Codice Concessionario /dipendenti (iscr.E)
-				"",                        //Codice Banca
 				"",                        //Codice Campagna
 				"T",                       //Copertura Assicurativa: Totale o Pro quota
 				"",                        //% assicurata dell'assicurato
 				"",                        //campo disponibile
 				"",                        //Maxi rata finale/Valore riscatto
 				"",                        //Stato occupazionale dell'Assicurato
-				"2",                       //Tipo aderente
+				"1",                       //Tipo aderente
 				"WEB",                     //Canale di vendita
 				"PF",                      //Tipo contraente / Contraente
 				policy.Contractor.Surname, //Denominazione Sociale o Cognome contraente
@@ -181,10 +200,10 @@ func setRow(policy models.Policy, df dataframe.DataFrame, trans models.Transacti
 				policy.Contractor.Gender,  //Sesso
 				getFormatBithdate(policy.Contractor.BirthDate),       //Data di nascita
 				policy.Contractor.FiscalCode,                         //Codice Fiscale
-				policy.Contractor.Address,                            //Indirizzo di residenza
-				policy.Contractor.PostalCode,                         //C.A.P. Di residenza
-				policy.Contractor.Locality,                           //Comune di residenza
-				policy.Contractor.City,                               //Provincia di residenza
+				policy.Contractor.Residence.StreetName,               //Indirizzo di residenza
+				policy.Contractor.Residence.PostalCode,               //C.A.P. Di residenza
+				policy.Contractor.Residence.Locality,                 //Comune di residenza
+				policy.Contractor.Residence.City,                     //Provincia di residenza
 				policy.Contractor.Mail,                               //Indirizzo e-mail
 				policy.Contractor.Phone,                              //Numero di Cellulare
 				policy.Assets[0].Person.Surname,                      //Cognome Assicurato
@@ -199,16 +218,16 @@ func setRow(policy models.Policy, df dataframe.DataFrame, trans models.Transacti
 				"PAS",                                                //Scopo del rapporto
 				"BO",                                                 //Modalità di pagamento del premio assicurativo (all'intermediario)
 				"SI",                                                 //contraente = Assicurato?
-				ChekDomicilie(policy.Contractor).StreetName, //Indirizzo di domicilio contraente
-				ChekDomicilie(policy.Contractor).PostalCode, //C.A.P. Di domicilio
-				ChekDomicilie(policy.Contractor).Locality,   //Comune di domicilio
-				ChekDomicilie(policy.Contractor).CityCode,   //Provincia di domicilio
-				policy.Contractor.BirthCity,                 //Luogo di nascita dell’contraente persona fisica
-				policy.Contractor.BirthCity,                 //Provincia di nascita dell’contraente persona fisica
-				"086",                                       //Stato di residenza dell’contraente
-				residenceCab,                                //Cab della città di residenza dell’contraente
-				"600",                                       //Sottogruppo attività economica
-				"600",                                       //Ramo gruppo attività economica
+				ChekDomicilie(policy.Contractor).StreetName,          //Indirizzo di domicilio contraente
+				ChekDomicilie(policy.Contractor).PostalCode,          //C.A.P. Di domicilio
+				ChekDomicilie(policy.Contractor).Locality,            //Comune di domicilio
+				ChekDomicilie(policy.Contractor).CityCode,            //Provincia di domicilio
+				policy.Contractor.BirthCity,                          //Luogo di nascita dell’contraente persona fisica
+				policy.Contractor.BirthProvince,                      //Provincia di nascita dell’contraente persona fisica
+				"086",                                                //Stato di residenza dell’contraente
+				residenceCab,                                         //Cab della città di residenza dell’contraente
+				"600",                                                //Sottogruppo attività economica
+				"600",                                                //Ramo gruppo attività economica
 				ExistIdentityDocument(policy.Contractor.IdentityDocuments).Code,                       //Tipo documento dell'contraente persona fisica
 				ExistIdentityDocument(policy.Contractor.IdentityDocuments).Number,                     //Numero documento dell'contraente persona fisica
 				getFormatdate(ExistIdentityDocument(policy.Contractor.IdentityDocuments).DateOfIssue), //Data rilascio documento dell'contraente persona fisica
@@ -415,7 +434,7 @@ func setRow(policy models.Policy, df dataframe.DataFrame, trans models.Transacti
 		}
 
 	}
-
+	log.Println("----------------End LifeAxalEmit-----------------")
 	return result
 }
 func getFormatdate(d time.Time) string {
@@ -424,13 +443,18 @@ func getFormatdate(d time.Time) string {
 	return res
 
 }
+
+// 1989-03-13T00:00:00Z
 func getFormatBithdate(d string) string {
 	var res string
 	if d != "" {
 		splitD := strings.Split(d, "-")
 		split2 := strings.Split(splitD[2], "T")
-		res = splitD[0] + splitD[1] + split2[0]
+		day, _ := strconv.Atoi(split2[0])
+		month, _ := strconv.Atoi(splitD[1])
+		res = fmt.Sprintf("%02d", day) + fmt.Sprintf("%02d", month) + splitD[0]
 	}
+
 	return res
 
 }
@@ -457,7 +481,7 @@ func getRenewDate(p models.Policy, trans models.Transaction) time.Time {
 	if p.PaymentSplit == "year" {
 		result = p.StartDate
 	}
-	if p.PaymentSplit == "montly" {
+	if p.PaymentSplit == string(models.PaySplitMonthly) {
 
 		if addMonth.Before(now) {
 			result = p.StartDate
@@ -505,22 +529,12 @@ func ChekDomicilie(u models.User) models.Address {
 	//log.Println(reflect.ValueOf(u.Domicile))
 	if reflect.ValueOf(u.Domicile).IsNil() {
 		res = *u.Residence
+	} else {
+		res = *u.Domicile
 	}
 	return res
 }
-func CheckStructNil[T interface{}](s interface{}) T {
-	var result T
-	result1 := new(T)
-	result = *result1
-	//log.Println(reflect.TypeOf(s))
-	if reflect.TypeOf(s) != nil {
-		log.Println("is not nill")
-		result = s.(T)
-	}
-	log.Println(s)
-	log.Println(result)
-	return result
-}
+
 func mapBeneficiary(g models.Guarante, b int) (string, models.Beneficiary, string) {
 	var (
 		result      string
@@ -552,15 +566,15 @@ func MapBool(s bool) string {
 	}
 	return res
 }
-func ExistIdentityDocument(docs []*models.IdentityDocument) models.IdentityDocument {
+func ExistIdentityDocument(docs []*models.IdentityDocument) *models.IdentityDocument {
 	var (
-		result models.IdentityDocument
+		result *models.IdentityDocument
 	)
-	result = models.IdentityDocument{}
+	result = &models.IdentityDocument{}
 	if len(docs) > 0 {
 		for _, doc := range docs {
 			log.Println(doc)
-			//doc.DateOfIssue
+			result = doc
 
 		}
 
@@ -823,37 +837,4 @@ func getHeader() []string {
 		"Codice Fiscale",
 		"Numero di Telefono",
 		"Email"}
-}
-func SftpUpload(filePath string) {
-
-	pk := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "env/axa-life.ppk", "")
-	config := lib.SftpConfig{
-		Username:     os.Getenv("AXA_LIFE_SFTP_USER"),
-		Password:     "",                                                                                                          // required only if password authentication is to be used
-		PrivateKey:   string(pk),                                                                                                  //                           // required only if private key authentication is to be used
-		Server:       os.Getenv("AXA_LIFE_SFTP_HOST") + ":10026",                                                                  //
-		KeyExchanges: []string{"diffie-hellman-group-exchange-sha1", "diffie-hellman-group1-sha1", "diffie-hellman-group14-sha1"}, // optional
-		Timeout:      time.Second * 30,
-		KeyPsw:       "", // 0 for not timeout
-	}
-	client, e := lib.NewSftpclient(config)
-	lib.CheckError(e)
-	defer client.Close()
-	log.Println("Open local file for reading.:")
-	source, e := os.Open("../tmp/" + filePath)
-	lib.CheckError(e)
-	//defer source.Close()
-	log.Println("Create remote file for writing:")
-	// Create remote file for writing.
-	lib.Files("../tmp")
-	destination, e := client.Create("To_CLP/" + filePath)
-	lib.CheckError(e)
-	defer destination.Close()
-	log.Println("Upload local file to a remote location as in 1MB (byte) chunks.")
-	info, e := source.Stat()
-	log.Println(info.Size())
-	// Upload local file to a remote location as in 1MB (byte) chunks.
-	e = client.Upload(source, destination, int(info.Size()))
-	lib.CheckError(e)
-
 }

@@ -1,11 +1,12 @@
 package broker
 
 import (
-	"cloud.google.com/go/firestore"
 	"fmt"
+	"log"
+
+	"cloud.google.com/go/firestore"
 	lib "github.com/wopta/goworkspace/lib"
 	models "github.com/wopta/goworkspace/models"
-	"log"
 )
 
 func GetSequenceByCompany(name string, firePolicy string) (string, int, int) {
@@ -25,6 +26,10 @@ func GetSequenceByCompany(name string, firePolicy string) (string, int, int) {
 	case "axa":
 		companyDefault = 100001
 		companyPrefixLenght = `%06d`
+	case "sogessur":
+		companyDefault = 1
+		companyPrefixLenght = `%07d`
+		companyPrefix = "G"
 	}
 
 	rn, e := lib.OrderWhereLimitFirestoreErr(firePolicy, "company", "numberCompany", "==", name, firestore.Desc, 1)

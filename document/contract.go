@@ -53,6 +53,9 @@ func ContractObj(origin string, data model.Policy) <-chan DocumentResponse {
 		case "persona":
 			pdf := initFpdf()
 			filename, out = PersonaContract(pdf, &data)
+		case "gap":
+			pdf := initFpdf()
+			filename, out = GapContract(pdf, origin, &data)
 		}
 
 		data.DocumentName = filename

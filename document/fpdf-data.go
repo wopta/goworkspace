@@ -117,7 +117,7 @@ func loadLifeGuarantees(policy *models.Policy) (map[string]map[string]string, []
 		guaranteesMap map[string]map[string]string
 		slugs         []slugStruct
 	)
-	lifeProduct, err := product.GetProduct("life", "v1", "mga")
+	lifeProduct, err := product.GetProduct(policy.Name, policy.ProductVersion, models.UserRoleAdmin)
 	lib.CheckError(err)
 
 	guaranteesMap = make(map[string]map[string]string, 0)
@@ -156,5 +156,74 @@ func loadLifeGuarantees(policy *models.Policy) (map[string]map[string]string, []
 			guaranteesMap[guarantee.Slug]["price"] += " (*)"
 		}
 	}
+	return guaranteesMap, slugs
+}
+
+func loadPersonaGuarantees(policy *models.Policy) (map[string]map[string]string, []slugStruct) {
+	var (
+		guaranteesMap map[string]map[string]string
+		slugs         []slugStruct
+	)
+	personaProduct, err := product.GetProduct(policy.Name, policy.ProductVersion, models.UserRoleAdmin)
+	lib.CheckError(err)
+
+	guaranteesMap = make(map[string]map[string]string, 0)
+	offerName := policy.OfferlName
+
+	for guaranteeSlug, guarantee := range personaProduct.Companies[0].GuaranteesMap {
+		guaranteesMap[guaranteeSlug] = make(map[string]string, 0)
+
+		guaranteesMap[guaranteeSlug]["name"] = guarantee.CompanyName
+		guaranteesMap[guaranteeSlug]["sumInsuredLimitOfIndemnity"] = "====="
+		guaranteesMap[guaranteeSlug]["details"] = "====="
+		guaranteesMap[guaranteeSlug]["price"] = "====="
+		slugs = append(slugs, slugStruct{name: guaranteeSlug, order: guarantee.Order})
+	}
+
+	sort.Slice(slugs, func(i, j int) bool {
+		return slugs[i].order < slugs[j].order
+	})
+
+	for _, asset := range policy.Assets {
+		for _, guarantee := range asset.Guarantees {
+			var price float64
+			var details string
+
+			guaranteesMap[guarantee.Slug]["sumInsuredLimitOfIndemnity"] = humanize.FormatFloat("#.###,", guarantee.Offer[offerName].SumInsuredLimitOfIndemnity) + " €"
+			if policy.PaymentSplit == string(models.PaySplitMonthly) {
+				price = guarantee.Value.PremiumGrossMonthly * 12
+			} else {
+				price = guarantee.Value.PremiumGrossYearly
+			}
+			guaranteesMap[guarantee.Slug]["price"] = humanize.FormatFloat("#.###,##", price) + " €"
+
+			switch guarantee.Slug {
+			case "IPI":
+				details = "Franchigia " + guarantee.Value.Deductible + guarantee.Value.DeductibleUnit
+				if guarantee.Value.DeductibleType == "absolute" {
+					details += " Assoluta"
+				} else {
+					details += " Assorbibile"
+				}
+			case "D":
+				details = "Beneficiari:\n"
+				for _, beneficiary := range *guarantee.Beneficiaries {
+					if beneficiary.BeneficiaryType != "chosenBeneficiary" {
+						details += personaProduct.Companies[0].GuaranteesMap["D"].BeneficiaryOptions[beneficiary.
+							BeneficiaryType]
+						break
+					}
+					details += beneficiary.Name + " " + beneficiary.Surname + " " + beneficiary.FiscalCode + "\n"
+
+				}
+			case "ITI":
+				details = "Franchigia " + guarantee.Value.Deductible + " " + guarantee.Offer[offerName].DeductibleUnit
+			default:
+				details = "====="
+			}
+			guaranteesMap[guarantee.Slug]["details"] = details
+		}
+	}
+
 	return guaranteesMap, slugs
 }

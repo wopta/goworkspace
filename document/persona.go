@@ -1,12 +1,9 @@
 package document
 
 import (
-	"github.com/dustin/go-humanize"
 	"github.com/go-pdf/fpdf"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/product"
-	"sort"
 	"strings"
 )
 
@@ -37,17 +34,23 @@ func PersonaGlobal(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 
 	personaInsuredInfoSection(pdf, policy)
 
-	personaGuaranteesTable(pdf, policy)
+	guaranteesMap, slugs := loadPersonaGuarantees(policy)
+
+	personaGuaranteesTable(pdf, guaranteesMap, slugs)
+
+	pdf.Ln(5)
 
 	personaSurveySection(pdf, policy)
 
 	personaStatementsSection(pdf, policy)
 
+	if policy.HasGuarantee("IPM") {
+		pdf.AddPage()
+	}
+
 	personaOfferResumeSection(pdf, policy)
 
 	paymentMethodSection(pdf)
-
-	pdf.AddPage()
 
 	emitResumeSection(pdf, policy)
 
@@ -66,7 +69,7 @@ func personaInsuredInfoSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 		"extra": "Extraprofessionale",
 	}
 
-	getParagraphTitle(pdf, "La tua assicurazione per il seguente Assicurato e Garanzie")
+	getParagraphTitle(pdf, "La tua assicurazione è operante per il seguente Assicurato e Garanzie")
 	drawPinkHorizontalLine(pdf, thickLineWidth)
 	pdf.Ln(2)
 	contractorInfo := []keyValue{
@@ -96,67 +99,9 @@ func personaInsuredInfoSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	}
 }
 
-func personaGuaranteesTable(pdf *fpdf.Fpdf, policy *models.Policy) {
+func personaGuaranteesTable(pdf *fpdf.Fpdf, guaranteesMap map[string]map[string]string,
+	slugs []slugStruct) {
 	var table [][]string
-	offerName := policy.OfferlName
-	prod, err := product.GetProduct("persona", "v1", "")
-	lib.CheckError(err)
-
-	guaranteesMap := map[string]map[string]string{}
-	var slugs []slugStruct
-
-	for guaranteeSlug, guarantee := range prod.Companies[0].GuaranteesMap {
-		guaranteesMap[guaranteeSlug] = make(map[string]string, 0)
-
-		guaranteesMap[guaranteeSlug]["name"] = guarantee.CompanyName
-		guaranteesMap[guaranteeSlug]["sumInsuredLimitOfIndemnity"] = "====="
-		guaranteesMap[guaranteeSlug]["details"] = "====="
-		guaranteesMap[guaranteeSlug]["price"] = "====="
-		slugs = append(slugs, slugStruct{name: guaranteeSlug, order: guarantee.Order})
-	}
-
-	sort.Slice(slugs, func(i, j int) bool {
-		return slugs[i].order < slugs[j].order
-	})
-
-	for _, asset := range policy.Assets {
-		for _, guarantee := range asset.Guarantees {
-			var price float64
-			var details string
-
-			guaranteesMap[guarantee.Slug]["sumInsuredLimitOfIndemnity"] = humanize.FormatFloat("#.###,", guarantee.Offer[offerName].SumInsuredLimitOfIndemnity) + " €"
-			if policy.PaymentSplit == string(models.PaySplitMonthly) {
-				price = guarantee.Value.PremiumGrossMonthly * 12
-			} else {
-				price = guarantee.Value.PremiumGrossYearly
-			}
-			guaranteesMap[guarantee.Slug]["price"] = humanize.FormatFloat("#.###,##", price) + " €"
-
-			switch guarantee.Slug {
-			case "IPI":
-				details = "Franchigia " + guarantee.Value.Deductible + guarantee.Value.DeductibleUnit
-				if guarantee.Value.DeductibleType == "absolute" {
-					details += " Assoluta"
-				} else {
-					details += " Assorbibile"
-				}
-			case "D":
-				details = "Beneficiari:\n"
-				if guarantee.Beneficiaries == nil || (*guarantee.Beneficiaries)[0].IsLegitimateSuccessors {
-					details += "Eredi leggitimi e/o testamentari"
-				} else {
-					for _, beneficiary := range *guarantee.Beneficiaries {
-						details += beneficiary.Name + " " + beneficiary.Surname + " " + beneficiary.FiscalCode + "\n"
-					}
-				}
-			case "ITI":
-				details = "Franchigia " + guarantee.Value.Deductible + " " + guarantee.Offer[offerName].DeductibleUnit
-			default:
-				details = "====="
-			}
-			guaranteesMap[guarantee.Slug]["details"] = details
-		}
-	}
 
 	for _, slug := range slugs {
 		r := []string{guaranteesMap[slug.name]["name"], guaranteesMap[slug.name]["sumInsuredLimitOfIndemnity"],
@@ -195,47 +140,23 @@ func personaSurveySection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	surveys := *policy.Surveys
 
 	getParagraphTitle(pdf, "Dichiarazioni da leggere con attenzione prima di firmare")
-	err := printSurvey(pdf, surveys[0])
+	err := printSurvey(pdf, surveys[0], policy.Company)
 	lib.CheckError(err)
 
-	pdf.Ln(5)
-	if len(surveys) == 3 {
-		err = printSurvey(pdf, surveys[1])
+	for _, survey := range surveys[1:] {
+		err := printSurvey(pdf, survey, policy.Company)
 		lib.CheckError(err)
-		pdf.AddPage()
-	} else {
-		for _, survey := range surveys[1:3] {
-			err = printSurvey(pdf, survey)
-			lib.CheckError(err)
-			pdf.Ln(5)
-		}
 	}
-
-	surveys[len(surveys)-1].Title = ""
-	getParagraphTitle(pdf, "Tutela Privacy")
-	err = printSurvey(pdf, surveys[len(surveys)-1])
-	lib.CheckError(err)
-
-	pdf.Ln(5)
-	drawSignatureForm(pdf)
-	pdf.Ln(10)
+	pdf.Ln(3)
 }
 
 func personaStatementsSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	statements := *policy.Statements
 
 	for _, statement := range statements {
-		printStatement(pdf, statement)
+		printStatement(pdf, statement, policy.Company)
 	}
-	pdf.SetY(pdf.GetY() - 28)
-	setBlackBoldFont(pdf, standardTextSize)
-	pdf.MultiCell(70, 3, "Global Assistance", "",
-		fpdf.AlignCenter, false)
-	var opt fpdf.ImageOptions
-	opt.ImageType = "png"
-	pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/firma_global.png", 25, pdf.GetY()+3, 40, 12,
-		false, opt, 0, "")
-	pdf.Ln(20)
+	pdf.Ln(3)
 }
 
 func personaOfferResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
@@ -247,22 +168,28 @@ func personaOfferResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	case string(models.PaySplitMonthly):
 		tableInfo = [][]string{
 			{
-				"Mensile firma del contratto",
-				lib.HumanaizePriceEuro(policy.PriceNett),
-				lib.HumanaizePriceEuro(policy.PriceGross - policy.PriceNett),
-				lib.HumanaizePriceEuro(policy.PriceGross),
+				"Annuale",
+				lib.HumanaizePriceEuro(policy.PriceNettMonthly * 12),
+				lib.HumanaizePriceEuro(policy.PriceGrossMonthly - policy.PriceNettMonthly*12),
+				lib.HumanaizePriceEuro(policy.PriceGrossMonthly * 12),
 			},
 			{
-				"Pari ad un premio Annuale",
-				lib.HumanaizePriceEuro(policy.PriceNett * 12),
-				lib.HumanaizePriceEuro(policy.PriceGross - policy.PriceNett*12),
-				lib.HumanaizePriceEuro(policy.PriceGross * 12),
+				"Rata firma della polizza",
+				lib.HumanaizePriceEuro(policy.PriceNettMonthly),
+				lib.HumanaizePriceEuro(policy.PriceGrossMonthly - policy.PriceNettMonthly),
+				lib.HumanaizePriceEuro(policy.PriceGrossMonthly),
+			},
+			{
+				"Rata mensile",
+				lib.HumanaizePriceEuro(policy.PriceNettMonthly),
+				lib.HumanaizePriceEuro(policy.PriceGrossMonthly - policy.PriceNettMonthly),
+				lib.HumanaizePriceEuro(policy.PriceGrossMonthly),
 			},
 		}
 	case string(models.PaySplitYear):
 		tableInfo = [][]string{
 			{
-				"Annuale firma del contratto",
+				"Annuale firma della polizza",
 				lib.HumanaizePriceEuro(policy.PriceNett),
 				lib.HumanaizePriceEuro(policy.PriceGross - policy.PriceNett),
 				lib.HumanaizePriceEuro(policy.PriceGross),
@@ -303,7 +230,7 @@ func personaOfferResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	pdf.MultiCell(0, 3, "In caso di sostituzione, il premio alla firma è al netto dell’eventuale rimborso"+
 		" dei premi non goduti sulla polizza sostituita e tiene conto dell’eventuale diversa durata rispetto alle"+
 		" rate successive.", "", fpdf.AlignLeft, false)
-
+	pdf.Ln(3)
 }
 
 func globalStamentsAndConsens(pdf *fpdf.Fpdf) {

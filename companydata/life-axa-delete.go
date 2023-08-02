@@ -108,7 +108,7 @@ func LifeAxaDelete(w http.ResponseWriter, r *http.Request) (string, interface{},
 	lib.WriteCsv("../tmp/"+filepath, result, ';')
 	source, _ := ioutil.ReadFile("../tmp/" + filepath)
 	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "axa/life/"+filepath, source)
-	SftpUpload(filepath)
+	AxaPartnersSftpUpload(filepath)
 	return "", nil, e
 }
 

@@ -60,6 +60,7 @@ func PutClaim(idToken string, origin string, claim *models.Claim) (string, inter
 	claim.Updated = claim.CreationDate
 	claim.ClaimUid = uuid.New().String()
 	claim.Status = "open"
+	claim.StatusHistory = []string{"open"}
 
 	for index, document := range claim.Documents {
 		splitName := strings.Split(document.FileName, ".")
