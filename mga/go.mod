@@ -6,9 +6,9 @@ replace github.com/wopta/goworkspace/mga => ./
 
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.4
-	github.com/wopta/goworkspace/lib v1.0.60
-	github.com/wopta/goworkspace/models v1.1.18
-	github.com/wopta/goworkspace/product v1.0.31
+	github.com/wopta/goworkspace/lib v1.0.66
+	github.com/wopta/goworkspace/models v1.1.26
+	github.com/wopta/goworkspace/product v1.0.33
 )
 
 require (
@@ -62,7 +62,7 @@ require (
 	github.com/richardlehane/mscfb v1.0.4 // indirect
 	github.com/richardlehane/msoleps v1.0.3 // indirect
 	github.com/sergi/go-diff v1.0.0 // indirect
-	github.com/sirupsen/logrus v1.9.0 // indirect
+	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
