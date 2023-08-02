@@ -250,6 +250,10 @@ func UpdateUserByFiscalCode(origin string, user User) (string, error) {
 		}
 
 		_, err = lib.FireUpdate(usersFire, retrievedUser.Uid, updatedUser)
+		if err != nil {
+			return "", fmt.Errorf("error firestore updated user %s", user.Uid)
+		}
+		err = user.BigquerySave(origin)
 		return retrievedUser.Uid, err
 	}
 

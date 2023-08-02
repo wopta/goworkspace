@@ -44,10 +44,6 @@ func (agent *Agent) BigquerySave(origin string) error {
 	agent.Data = string(data) // includes agent.User data
 
 	table := lib.GetDatasetByEnv(origin, AgentCollection)
-	if err := agent.initBigqueryData(); err != nil {
-		return err
-	}
-
 	log.Println("agent save big query: " + agent.Uid)
 
 	return lib.InsertRowsBigQuery(WoptaDataset, table, agent)

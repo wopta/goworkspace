@@ -38,7 +38,7 @@ type Agency struct {
 	CreationDate       time.Time             `json:"creationDate"           firestore:"creationDate"           bigquery:"-"`
 	BigCreationDate    bigquery.NullDateTime `json:"-"                      firestore:"-"                      bigquery:"creationDate"`
 	UpdatedDate        time.Time             `json:"updatedDate"            firestore:"updatedDate"            bigquery:"-"`
-	BigUpdatedDate     bigquery.NullDateTime `json:"-"                      firestore:"-"                      bigquery:"updateDate"`
+	BigUpdatedDate     bigquery.NullDateTime `json:"-"                      firestore:"-"                      bigquery:"updatedDate"`
 	Data               string                `json:"-"                      firestore:"-"                      bigquery:"data"`
 }
 

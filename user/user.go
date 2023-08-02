@@ -224,17 +224,17 @@ func SetUserIntoPolicyContractor(policy *models.Policy, origin string) {
 
 	if newUser {
 		policy.Contractor.CreationDate = time.Now().UTC()
+		policy.Contractor.UpdatedDate = policy.Contractor.CreationDate
 		fireUsers := lib.GetDatasetByEnv(origin, models.UserCollection)
 		lib.SetFirestore(fireUsers, userUID, policy.Contractor)
-	} else {
-		_, err = models.UpdateUserByFiscalCode(origin, policy.Contractor)
-		lib.CheckError(err)
+		err = policy.Contractor.BigquerySave(origin)
+		if err != nil {
+			log.Printf("[SetUserIntoPolicyContractor] error save user %s bigquery\n", policy.Contractor.Uid)
+		}
+		return
 	}
-
-	err = policy.Contractor.BigquerySave(origin)
-	if err != nil {
-		log.Printf("[SetUserIntoPolicyContractor] error save user %s bigquery\n", policy.Contractor.Uid)
-	}
+	_, err = models.UpdateUserByFiscalCode(origin, policy.Contractor)
+	lib.CheckError(err)
 }
 
 func GetAuthUserByMail(origin, mail string) (models.User, error) {
