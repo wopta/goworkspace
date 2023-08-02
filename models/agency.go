@@ -100,7 +100,7 @@ func UpdateAgencyPortfolio(policy *Policy, origin string) error {
 
 	var agency Agency
 	fireAgency := lib.GetDatasetByEnv(origin, AgencyCollection)
-	docsnap, err := lib.GetFirestoreErr(fireAgency, policy.AgentUid)
+	docsnap, err := lib.GetFirestoreErr(fireAgency, policy.AgencyUid)
 	if err != nil {
 		log.Printf("[updateAgencyPortfolio] ERROR getting agency from firestore: %s", err.Error())
 		return err

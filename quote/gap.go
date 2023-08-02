@@ -49,7 +49,7 @@ func calculateGapOfferPrices(policy *models.Policy, product models.Product) {
 		log.Println("[CalculateGapOfferPrices] residence area not set")
 		lib.CheckError(errors.New("residence area not set"))
 	}
-	vehicleValue := float64(policy.Assets[0].Vehicle.PriceValue)
+	vehicleValue := policy.Assets[0].Vehicle.PriceValue
 	taxValue := getTax(product)
 
 	policy.OffersPrices = make(map[string]map[string]*models.Price)
