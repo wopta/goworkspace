@@ -195,12 +195,6 @@ func getGapRowMap(policy models.Policy, transaction models.Transaction) map[stri
 
 	genders := []string{"F", "M", "G"} // For validation
 	// Maps for replacing the values in policy into valid values for the gap csv
-	vehicleTypes := map[string]string{
-		"Autocarro":   "C",
-		"Autoveicolo": "A",
-		"Motociclo":   "M",
-		"Camper":      "P",
-	}
 	boolAnswers := map[bool]string{
 		true:  "SI",
 		false: "NO",
@@ -245,7 +239,7 @@ func getGapRowMap(policy models.Policy, transaction models.Transaction) map[stri
 		"CILINDRATA":                           "",
 		"ALIMENTAZIONE":                        powerSupplyCodes[vehicle.PowerSupply],
 		"ANTIFURTO SATELLITARE":                boolAnswers[vehicle.HasSatellite],
-		"TIPO VEICOLO":                         vehicleTypes[vehicle.VehicleType],
+		"TIPO VEICOLO":                         vehicle.VehicleTypeDesc,
 		"TIPO TARGA":                           "",
 		"CAVALLI":                              "",
 		"QUINTALI":                             vehicleWeight,
