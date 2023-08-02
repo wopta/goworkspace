@@ -3,7 +3,6 @@ package broker
 import (
 	"encoding/json"
 	"errors"
-	"github.com/wopta/goworkspace/question"
 	"io"
 	"log"
 	"net/http"
@@ -13,8 +12,10 @@ import (
 	"cloud.google.com/go/civil"
 	"github.com/wopta/goworkspace/document"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/payment"
+	"github.com/wopta/goworkspace/question"
 )
 
 const (
@@ -109,6 +110,9 @@ func Emit(policy *models.Policy, origin string) (EmitResponse, error) {
 	policy.Updated = time.Now().UTC()
 	err = lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
 	lib.CheckError(err)
+
+	mail.SendMailSign(*policy)
+
 	policy.BigquerySave(origin)
 	models.SetGuaranteBigquery(*policy, "emit", guaranteFire)
 

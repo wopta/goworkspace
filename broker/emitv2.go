@@ -94,6 +94,8 @@ func ecommerceFlow(policy *models.Policy, origin string) {
 	emitSign(policy, origin)
 
 	emitPay(policy, origin)
+
+	mail.SendMailSign(*policy)
 }
 
 func setAdvice(policy *models.Policy, origin string) {
