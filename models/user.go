@@ -217,46 +217,39 @@ func GetUserUIDByFiscalCode(origin string, fiscalCode string) (string, bool, err
 
 func UpdateUserByFiscalCode(origin string, user User) (string, error) {
 	var err error
-
-	usersFire := lib.GetDatasetByEnv(origin, "users")
-	docSnap := lib.WhereFirestore(usersFire, "fiscalCode", "==", user.FiscalCode)
+	fireUser := lib.GetDatasetByEnv(origin, UserCollection)
+	docSnap := lib.WhereFirestore(fireUser, "fiscalCode", "==", user.FiscalCode)
 	retrievedUser, err := FirestoreDocumentToUser(docSnap)
+
 	if retrievedUser.Uid != "" {
-		for _, identityDocument := range user.IdentityDocuments {
-			retrievedUser.IdentityDocuments = append(retrievedUser.IdentityDocuments, identityDocument)
-		}
-
+		retrievedUser.IdentityDocuments = append(retrievedUser.IdentityDocuments, user.IdentityDocuments...)
 		retrievedUser.Consens = updateUserConsens(retrievedUser.Consens, user.Consens)
-
-		updatedUser := map[string]interface{}{
-			"address":           user.Address,
-			"postalCode":        user.PostalCode,
-			"city":              user.City,
-			"locality":          user.Locality,
-			"cityCode":          user.CityCode,
-			"streetNumber":      user.StreetNumber,
-			"location":          user.Location,
-			"identityDocuments": retrievedUser.IdentityDocuments,
-			"consens":           retrievedUser.Consens,
-			"residence":         user.Residence,
-			"domicile":          user.Domicile,
-			"updatedDate":       time.Now().UTC(),
-		}
+		retrievedUser.Address = user.Address
+		retrievedUser.PostalCode = user.PostalCode
+		retrievedUser.City = user.City
+		retrievedUser.Locality = user.Locality
+		retrievedUser.CityCode = user.CityCode
+		retrievedUser.StreetNumber = user.StreetNumber
+		retrievedUser.Location = user.Location
+		retrievedUser.Residence = user.Residence
+		retrievedUser.Domicile = user.Domicile
+		retrievedUser.Phone = user.Phone
+		retrievedUser.UpdatedDate = time.Now().UTC()
 		if user.Height != 0 {
-			updatedUser["height"] = user.Height
+			retrievedUser.Height = user.Height
 		}
 		if user.Weight != 0 {
-			updatedUser["weight"] = user.Weight
+			retrievedUser.Weight = user.Weight
+		}
+		err = lib.SetFirestoreErr(fireUser, retrievedUser.Uid, retrievedUser)
+		if err != nil {
+			return "", fmt.Errorf("[UpdateUserByFiscalCode] error saving user %s into firestore %s", retrievedUser.Uid,
+				err.Error())
 		}
 
-		_, err = lib.FireUpdate(usersFire, retrievedUser.Uid, updatedUser)
-		if err != nil {
-			return "", fmt.Errorf("error firestore updated user %s", user.Uid)
-		}
-		err = user.BigquerySave(origin)
+		err = retrievedUser.BigquerySave(origin)
 		return retrievedUser.Uid, err
 	}
-
 	return "", fmt.Errorf("no user found with this fiscal code")
 }
 
