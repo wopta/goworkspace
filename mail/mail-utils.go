@@ -73,7 +73,7 @@ func setProductBodyData(policy models.Policy, bodyData *BodyData) {
 }
 
 func fillTemplate(htmlTemplate []byte, bodyData *BodyData) string {
-	var tpl *bytes.Buffer
+	tpl := new(bytes.Buffer)
 	tmplt := template.New("htmlTemplate")
 	tmplt, err := tmplt.Parse(string(htmlTemplate))
 	lib.CheckError(err)
