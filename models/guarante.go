@@ -112,7 +112,7 @@ func SetGuaranteBigquery(policy Policy, status string, origin string) error {
 		for _, g := range asset.Guarantees {
 			g.Status = status
 			g.PolicyUid = policy.Uid
-			e = lib.InsertRowsBigQuery("wopta", origin, g)
+			e = lib.InsertRowsBigQuery(WoptaDataset, origin, g)
 			log.Println(e)
 		}
 

@@ -63,7 +63,7 @@ func ConsumeInvite(inviteUid, password, origin string) (bool, error) {
 		if err != nil {
 			return false, err
 		}
-		createAgent(collection, agentRecord, invite)
+		createAgent(collection, origin, agentRecord, invite)
 	case models.UserRoleAgency:
 		collection = lib.GetDatasetByEnv(origin, models.AgencyCollection)
 		docUid = lib.NewDoc(collection) + "_agency"
@@ -71,14 +71,14 @@ func ConsumeInvite(inviteUid, password, origin string) (bool, error) {
 		if err != nil {
 			return false, err
 		}
-		createAgency(collection, agencyRecord, invite)
+		createAgency(collection, origin, agencyRecord, invite)
 	default:
 		collection = lib.GetDatasetByEnv(origin, usersCollection)
 		userRecord, err := lib.CreateUserWithEmailAndPassword(invite.Email, password, &docUid)
 		if err != nil {
 			return false, err
 		}
-		createUser(collection, userRecord, invite)
+		createUser(collection, origin, userRecord, invite)
 	}
 
 	// update the invite to consumed
@@ -90,7 +90,7 @@ func ConsumeInvite(inviteUid, password, origin string) (bool, error) {
 	return true, nil
 }
 
-func createUser(collection string, userRecord *auth.UserRecord, invite UserInvite) {
+func createUser(collection, origin string, userRecord *auth.UserRecord, invite UserInvite) {
 	// create user in DB
 	user := models.User{
 		Mail:         invite.Email,
@@ -108,13 +108,16 @@ func createUser(collection string, userRecord *auth.UserRecord, invite UserInvit
 	err := lib.SetFirestoreErr(collection, user.Uid, user)
 	lib.CheckError(err)
 
+	err = user.BigquerySave(origin)
+	lib.CheckError(err)
+
 	// update the user custom claim
 	lib.SetCustomClaimForUser(user.AuthId, map[string]interface{}{
 		"role": user.Role,
 	})
 }
 
-func createAgent(collection string, userRecord *auth.UserRecord, invite UserInvite) {
+func createAgent(collection, origin string, userRecord *auth.UserRecord, invite UserInvite) {
 	// create user in DB
 	for productIndex, _ := range invite.Products {
 		invite.Products[productIndex].IsAgentActive = true
@@ -142,13 +145,16 @@ func createAgent(collection string, userRecord *auth.UserRecord, invite UserInvi
 	err := lib.SetFirestoreErr(collection, agent.Uid, agent)
 	lib.CheckError(err)
 
+	err = agent.BigquerySave(origin)
+	lib.CheckError(err)
+
 	// update the user custom claim
 	lib.SetCustomClaimForUser(agent.AuthId, map[string]interface{}{
 		"role": agent.Role,
 	})
 }
 
-func createAgency(collection string, userRecord *auth.UserRecord, invite UserInvite) {
+func createAgency(collection, origin string, userRecord *auth.UserRecord, invite UserInvite) {
 	// create user in DB
 	for productIndex, _ := range invite.Products {
 		invite.Products[productIndex].IsAgencyActive = true
@@ -169,6 +175,9 @@ func createAgency(collection string, userRecord *auth.UserRecord, invite UserInv
 	}
 
 	err := lib.SetFirestoreErr(collection, agency.Uid, agency)
+	lib.CheckError(err)
+
+	err = agency.BigquerySave(origin)
 	lib.CheckError(err)
 
 	// update the user custom claim

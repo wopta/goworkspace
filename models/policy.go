@@ -218,7 +218,7 @@ func (policy *Policy) BigquerySave(origin string) {
 	policy.BigStatusHistory = strings.Join(policy.StatusHistory, ",")
 	policy.BigReservedMotives = strings.Join(policy.ReservedMotives, ",")
 	log.Println(" policy save big query: " + policy.Uid)
-	e = lib.InsertRowsBigQuery("wopta", policyBig, policy)
+	e = lib.InsertRowsBigQuery(WoptaDataset, policyBig, policy)
 	log.Println(" policy save big query error: ", e)
 }
 

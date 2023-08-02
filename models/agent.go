@@ -1,11 +1,13 @@
 package models
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
 	"time"
 
+	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/firestore"
 	"github.com/wopta/goworkspace/lib"
 	"google.golang.org/api/iterator"
@@ -13,16 +15,42 @@ import (
 
 type Agent struct {
 	User
-	ManagerUid      string    `json:"managerUid,omitempty" firestore:"managerUid,omitempty" bigquery:"-"`
-	AgencyUid       string    `json:"agencyUid" firestore:"agencyUid" bigquery:"-"`
-	Agents          []string  `json:"agents" firestore:"agents" bigquery:"-"`
-	Users           []string  `json:"users" firestore:"users" bigquery:"-"` // will contain users UIDs
-	IsActive        bool      `json:"isActive" firestore:"isActive" bigquery:"-"`
-	Products        []Product `json:"products" firestore:"products" bigquery:"-"`
-	Policies        []string  `json:"policies" firestore:"policies" bigquery:"-"` // will contain policies UIDs
-	RuiCode         string    `json:"ruiCode" firestore:"ruiCode" bigquery:"-"`
-	RuiSection      string    `json:"ruiSection" firestore:"ruiSection" bigquery:"-"`
-	RuiRegistration time.Time `json:"ruiRegistration" firestore:"ruiRegistration" bigquery:"-"`
+	ManagerUid         string                `json:"managerUid,omitempty" firestore:"managerUid,omitempty" bigquery:"managerUid"`
+	AgencyUid          string                `json:"agencyUid"            firestore:"agencyUid"            bigquery:"agencyUid"`
+	Agents             []string              `json:"agents"               firestore:"agents"               bigquery:"-"`
+	Users              []string              `json:"users"                firestore:"users"                bigquery:"-"` // will contain users UIDs
+	IsActive           bool                  `json:"isActive"             firestore:"isActive"             bigquery:"isActive"`
+	Products           []Product             `json:"products"             firestore:"products"             bigquery:"-"`
+	Policies           []string              `json:"policies"             firestore:"policies"             bigquery:"-"` // will contain policies UIDs
+	RuiCode            string                `json:"ruiCode"              firestore:"ruiCode"              bigquery:"ruiCode"`
+	RuiSection         string                `json:"ruiSection"           firestore:"ruiSection"           bigquery:"ruiSection"`
+	RuiRegistration    time.Time             `json:"ruiRegistration"      firestore:"ruiRegistration"      bigquery:"-"`
+	BigRuiRegistration bigquery.NullDateTime `json:"-"                    firestore:"-"                    bigquery:"ruiRegistration"`
+	Data               string                `json:"-"                    firestore:"-"                    bigquery:"data"`
+}
+
+func (agent *Agent) BigquerySave(origin string) error {
+	err := agent.User.initBigqueryData()
+	if err != nil {
+		return err
+	}
+	agent.User.Data = ""
+	agent.BigRuiRegistration = lib.GetBigQueryNullDateTime(agent.RuiRegistration)
+
+	data, err := json.Marshal(agent)
+	if err != nil {
+		return err
+	}
+	agent.Data = string(data) // includes agent.User data
+
+	table := lib.GetDatasetByEnv(origin, AgentCollection)
+	if err := agent.initBigqueryData(); err != nil {
+		return err
+	}
+
+	log.Println("agent save big query: " + agent.Uid)
+
+	return lib.InsertRowsBigQuery(WoptaDataset, table, agent)
 }
 
 func GetAgentByAuthId(authId string) (*Agent, error) {

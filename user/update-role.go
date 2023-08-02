@@ -27,6 +27,7 @@ func UpdateUserRoleFx(w http.ResponseWriter, r *http.Request) (string, interface
 	defer r.Body.Close()
 
 	userUid = r.Header.Get("userUid")
+	origin := r.Header.Get("origin")
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	err = json.Unmarshal(body, &request)
@@ -45,7 +46,7 @@ func UpdateUserRoleFx(w http.ResponseWriter, r *http.Request) (string, interface
 	}
 
 	log.Println("UpdateUserRole: get user from firestore")
-	fireUser := lib.GetDatasetByEnv(r.Header.Get("origin"), usersCollection)
+	fireUser := lib.GetDatasetByEnv(origin, usersCollection)
 	docsnap, err := lib.GetFirestoreErr(fireUser, userUid)
 	lib.CheckError(err)
 	err = docsnap.DataTo(&user)
@@ -59,6 +60,12 @@ func UpdateUserRoleFx(w http.ResponseWriter, r *http.Request) (string, interface
 	log.Println("UpdateUserRole: updating user role in DB")
 	user.Role = request.Role
 	err = lib.SetFirestoreErr(fireUser, userUid, user)
+	if err != nil {
+		log.Printf("UpdateUserRole: error save user %s firestore: %s", user.Role, err.Error())
+		return `{"success":false}`, `{"success":false}`, nil
+	}
+
+	err = user.BigquerySave(origin)
 
 	return `{"success":true}`, `{"success":true}`, err
 }

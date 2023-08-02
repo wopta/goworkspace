@@ -107,7 +107,6 @@ func setAdvice(policy *models.Policy, origin string) {
 }
 
 func setAdviceBpm(state *bpmn.State) error {
-
 	p := state.Data
 	setAdvice(p, origin)
 	return nil

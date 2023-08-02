@@ -103,11 +103,18 @@ func SetUserIntoPolicyContractor(policy *models.Policy, origin string) error {
 	if newUser {
 		policy.Contractor.CreationDate = time.Now().UTC()
 		fireUsers := lib.GetDatasetByEnv(origin, "users")
-		return lib.SetFirestoreErr(fireUsers, userUid, policy.Contractor)
+		err = lib.SetFirestoreErr(fireUsers, userUid, policy.Contractor)
+	} else {
+		_, err = models.UpdateUserByFiscalCode(origin, policy.Contractor)
 	}
 
-	_, err = models.UpdateUserByFiscalCode(origin, policy.Contractor)
-	return err
+	if err != nil {
+		log.Printf("[setUserIntoPolicyContractor] ERROR creating/updating user %s: %s", policy.Contractor.Uid,
+			err.Error())
+		return err
+	}
+
+	return policy.Contractor.BigquerySave(origin)
 }
 
 // Not sure if this is the right place

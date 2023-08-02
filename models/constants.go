@@ -81,6 +81,8 @@ const (
 	PolicyCollection       string = "policy"
 	ProductsCollection     string = "products"
 	TransactionsCollection string = "transactions"
+	ClaimsCollection       string = "claims" //only for bigquery
+	AuditsCollection       string = "audits"
 	GuaranteeCollection    string = "guarante"
 )
 
@@ -100,4 +102,8 @@ const (
 	AgentChannel     string = "agent"
 	AgencyChannel    string = "agency"
 	MgaChannel       string = "mga"
+)
+
+const (
+	WoptaDataset string = "wopta"
 )
