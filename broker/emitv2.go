@@ -105,7 +105,7 @@ func setAdvice(policy *models.Policy, origin string) {
 	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusToPay, models.PolicyStatusPay)
 	policy.PaymentSplit = string(models.PaySingleInstallment)
 
-	tr.PutByPolicy(*policy, "", origin, "", "", policy.PriceGross, policy.PriceNett, "", true, authToken.Role)
+	tr.PutByPolicy(*policy, "", origin, "", "", policy.PriceGross, policy.PriceNett, "", true)
 }
 
 func setAdviceBpm(state *bpmn.State) error {

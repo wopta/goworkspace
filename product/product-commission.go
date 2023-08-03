@@ -1,40 +1,52 @@
 package product
 
 import (
+	"log"
+
 	"github.com/wopta/goworkspace/models"
 )
 
 func GetCommissionProducts(data models.Policy, products []models.Product) float64 {
+	log.Println("[GetCommissionProducts]")
 	var commission float64
 	for _, prod := range products {
 		if prod.Name == data.Name {
+			log.Printf("[GetCommissionProducts] found product: %s", prod.Name)
 			return GetCommissionProduct(data, prod)
 		}
 
 	}
+	log.Println("[GetCommissionProducts] no product found")
 	return commission
 }
 
 func GetCommissionProduct(data models.Policy, prod models.Product) float64 {
+	log.Println("[GetCommissionProduct]")
 	var (
 		amountNet, commissionValue float64
 	)
 
-	if data.PaymentSplit == string(models.PaySplitMonthly) {
+	switch data.PaymentSplit {
+	case string(models.PaySplitMonthly), string(models.PaySplitSemestral):
 		amountNet = data.PriceNettMonthly
-	} else {
+		log.Printf("[GetCommissionProduct] using PriceNettMonthly as amountNet: %g", amountNet)
+	default:
 		amountNet = data.PriceNett
+		log.Printf("[GetCommissionProduct] using PriceNett as amountNet: %g", amountNet)
 	}
 
 	for _, company := range prod.Companies {
 		if data.Company == company.Name {
 			if company.CommissionSetting.IsFlat {
+				log.Println("[GetCommissionProduct] Flat commission")
 				return calculateCommission(amountNet, data.IsRenew, company.CommissionSetting.Commissions)
 			}
 			if company.CommissionSetting.IsByOffer {
+				log.Println("[GetCommissionProduct] By offer commission")
 				return calculateCommission(amountNet, data.IsRenew, prod.Offers[data.OfferlName].Commissions)
 			}
 
+			log.Println("[GetCommissionProduct] By guarantee commission")
 			for _, asset := range data.Assets {
 				for _, guarantee := range asset.Guarantees {
 					if data.PaymentSplit == string(models.PaySplitMonthly) {
@@ -52,7 +64,9 @@ func GetCommissionProduct(data models.Policy, prod models.Product) float64 {
 
 func calculateCommission(amount float64, isRenew bool, commissions *models.Commission) float64 {
 	if isRenew {
+		log.Println("[calculateCommission] commission renew")
 		return amount * commissions.Renew
 	}
+	log.Println("[calculateCommission] commission new business")
 	return amount * commissions.NewBusiness
 }

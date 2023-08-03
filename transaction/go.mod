@@ -5,8 +5,6 @@ go 1.19
 replace github.com/wopta/goworkspace/transaction => ./
 
 require (
-	cloud.google.com/go v0.110.7
-	cloud.google.com/go/bigquery v1.51.1
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.4
 	github.com/wopta/goworkspace/lib v1.0.66
 	github.com/wopta/goworkspace/models v1.1.26
@@ -14,6 +12,8 @@ require (
 )
 
 require (
+	cloud.google.com/go v0.110.7 // indirect
+	cloud.google.com/go/bigquery v1.51.1 // indirect
 	cloud.google.com/go/compute v1.19.3 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
 	cloud.google.com/go/firestore v1.9.0 // indirect
