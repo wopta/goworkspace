@@ -50,6 +50,7 @@ type Guarante struct {
 	Reserved                   bool                       `json:"reserved" firestore:"reserved" bigquery:"-"`
 	ReservedConfig             map[string]*ReservedLimits `json:"reservedConfig,omitempty" firestore:"reservedConfig,omitempty" bigquery:"-"`
 	Order                      int64                      `json:"order,omitempty" firestore:"order,omitempty" bigquery:"-"`
+	Commissions                *Commission                `json:"commissions,omitempty" firestore:"commissions,omitempty" bigquery:"-"`
 }
 
 type GuaranteValue struct {

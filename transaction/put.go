@@ -22,7 +22,8 @@ func PutByPolicy(data models.Policy, scheduleDate string, origin string, expireD
 	)
 
 	//var prod models.Product
-	prod, err := product.GetProduct(data.Name, data.ProductVersion, role)
+	// TODO: load mga product not by role
+	prod, err := product.GetProduct(data.Name, data.ProductVersion, models.UserRoleAdmin)
 	log.Println(data.Uid+" pay error marsh product:", err)
 	commission = pr.GetCommissionProduct(data, *prod)
 
@@ -31,23 +32,21 @@ func PutByPolicy(data models.Policy, scheduleDate string, origin string, expireD
 		dn := lib.GetFirestore(models.AgentCollection, data.AgentUid)
 		dn.DataTo(&agent)
 		commissionAgent = pr.GetCommissionProducts(data, agent.Products)
-
 	}
 	if data.AgencyUid != "" {
 		var agency models.Agency
 		dn := lib.GetFirestore(models.AgencyCollection, data.AgencyUid)
 		dn.DataTo(&agency)
-		commissionAgent = pr.GetCommissionProducts(data, agency.Products)
+		commissionAgency = pr.GetCommissionProducts(data, agency.Products)
 	}
 	log.Println(data.Uid+"pay commission: ", commission)
-	layout2 := "2006-01-02"
 	var sd string
 	if scheduleDate == "" {
-		sd = time.Now().UTC().Format(layout2)
+		sd = time.Now().UTC().Format(models.TimeDateOnly)
 	} else {
 		sd = scheduleDate
 	}
-	//tr := models.SetTransactionPolicy(data, data.Uid+"_"+scheduleDate, amount, scheduleDate, data.PriceNett * commission)
+
 	transactionsFire := lib.GetDatasetByEnv(origin, "transactions")
 	transactionUid := lib.NewDoc(transactionsFire)
 
@@ -64,19 +63,18 @@ func PutByPolicy(data models.Policy, scheduleDate string, origin string, expireD
 		ScheduleDate:       sd,
 		ExpirationDate:     expireDate,
 		NumberCompany:      data.CodeCompany,
-		Commissions:        amountNet * commission,
+		Commissions:        commission,
 		IsPay:              false,
 		Name:               data.Contractor.Name + " " + data.Contractor.Surname,
 		Company:            data.Company,
-		CommissionsCompany: commission,
 		IsDelete:           false,
 		ProviderId:         providerId,
 		UserToken:          customerId,
 		ProviderName:       data.Payment,
 		AgentUid:           data.AgencyUid,
 		AgencyUid:          data.AgencyUid,
-		CommissionsAgent:   amountNet * commissionAgent,
-		CommissionsAgency:  amountNet * commissionAgency,
+		CommissionsAgent:   commissionAgent,
+		CommissionsAgency:  commissionAgency,
 		NetworkCommissions: netCommission,
 	}
 

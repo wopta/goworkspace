@@ -63,6 +63,7 @@ type Company struct {
 	IsAgencyActive            bool                 `json:"isAgencyActive" firestore:"isAgencyActive" bigquery:"-"`
 	IsAgentActive             bool                 `json:"isAgentActive" firestore:"isAgentActive" bigquery:"-"`
 	AnnulmentCodes            []AnnulmentCode      `json:"annulmentCodes,omitempty" firestore:"annulmentCodes,omitempty" bigquery:"-"`
+	CommissionSetting         *CommissionsSetting  `json:"commissionsSetting,omitempty" firestore:"commissionsSetting,omitempty" bigquery:"-"`
 }
 
 type Mandate struct {
@@ -85,9 +86,10 @@ type Child struct {
 }
 
 type Offer struct {
-	Name        string `firestore:"name,omitempty" json:"name,omitempty"`
-	Description string `firestore:"description,omitempty" json:"description,omitempty"`
-	Order       int    `firestore:"order,omitempty" json:"order,omitempty"`
+	Name        string      `firestore:"name,omitempty" json:"name,omitempty"`
+	Description string      `firestore:"description,omitempty" json:"description,omitempty"`
+	Order       int         `firestore:"order,omitempty" json:"order,omitempty"`
+	Commissions *Commission `json:"commissions" firestore:"commissions"`
 }
 
 type Track struct {
