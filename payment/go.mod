@@ -11,9 +11,9 @@ require (
 	github.com/wopta/goworkspace/document v1.0.83
 	github.com/wopta/goworkspace/lib v1.0.66
 	github.com/wopta/goworkspace/mail v1.0.27
-	github.com/wopta/goworkspace/models v1.1.30
-	github.com/wopta/goworkspace/policy v1.0.7
-	github.com/wopta/goworkspace/transaction v1.0.11
+	github.com/wopta/goworkspace/models v1.1.31
+	github.com/wopta/goworkspace/policy v1.0.8
+	github.com/wopta/goworkspace/transaction v1.0.12
 	github.com/wopta/goworkspace/user v1.0.19
 )
 
