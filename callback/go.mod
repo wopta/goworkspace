@@ -6,13 +6,13 @@ replace github.com/wopta/goworkspace/callback => ./
 
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.4
-	github.com/wopta/goworkspace/bpmn v1.0.12
-	github.com/wopta/goworkspace/document v1.0.82
+	github.com/wopta/goworkspace/bpmn v1.0.14
+	github.com/wopta/goworkspace/document v1.0.83
 	github.com/wopta/goworkspace/lib v1.0.66
 	github.com/wopta/goworkspace/mail v1.0.28
-	github.com/wopta/goworkspace/models v1.1.29
+	github.com/wopta/goworkspace/models v1.1.30
 	github.com/wopta/goworkspace/policy v1.0.7
-	github.com/wopta/goworkspace/transaction v1.0.10
+	github.com/wopta/goworkspace/transaction v1.0.11
 	github.com/wopta/goworkspace/user v1.0.19
 )
 
