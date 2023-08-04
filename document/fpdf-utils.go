@@ -3,14 +3,15 @@ package document
 import (
 	"bytes"
 	"fmt"
-	"github.com/go-pdf/fpdf"
-	"github.com/johnfercher/maroto/pkg/consts"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
 	"os"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/go-pdf/fpdf"
+	"github.com/johnfercher/maroto/pkg/consts"
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 )
 
 const (
@@ -141,7 +142,7 @@ func drawSignatureForm(pdf *fpdf.Fpdf) {
 		"(\\\"firma qui\\\"):size(width=150,height=60)]]\"", signatureID)
 	pdf.SetDrawColor(0, 0, 0)
 	pdf.SetX(-90)
-	pdf.Cell(0, 3, "Firma del Contraente/Assicurato")
+	pdf.Cell(0, 3, "Firma del Contraente")
 	pdf.Ln(15)
 	pdf.SetLineWidth(thinLineWidth)
 	pdf.Line(100, pdf.GetY(), 190, pdf.GetY())
