@@ -15,12 +15,12 @@ import (
 	"time"
 
 	lib "github.com/wopta/goworkspace/lib"
-	model "github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/models"
 )
 
 func SignNamirialV6(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
-	var data model.Policy
+	var data models.Policy
 	defer r.Body.Close()
 	err := json.Unmarshal([]byte(req), &data)
 	lib.CheckError(err)
@@ -29,7 +29,7 @@ func SignNamirialV6(w http.ResponseWriter, r *http.Request) (string, interface{}
 	return NamirialOtpV6(data, r.Header.Get("origin"))
 }
 
-func NamirialOtpV6(data model.Policy, origin string) (string, NamirialOtpResponse, error) {
+func NamirialOtpV6(data models.Policy, origin string) (string, NamirialOtpResponse, error) {
 	var file []byte
 
 	if os.Getenv("env") == "local" {
@@ -106,7 +106,7 @@ func prepareEnvelopV6(id string) <-chan string {
 	return r
 }
 
-func sendEnvelopV6(id string, data model.Policy, unassigned string, origin string) <-chan string {
+func sendEnvelopV6(id string, data models.Policy, unassigned string, origin string) <-chan string {
 	r := make(chan string)
 
 	go func() {
@@ -202,7 +202,7 @@ func postDataV6(data []byte, productNameDesc string) <-chan string {
 	return r
 }
 
-func GetFileV6(policy model.Policy, uid string) chan string {
+func GetFileV6(policy models.Policy, uid string) chan string {
 	r := make(chan string)
 	log.Println("Get file: ", policy.IdSign)
 	go func() {
@@ -276,7 +276,7 @@ func getPrepareV6(id string) string {
 	  }`
 }
 
-func getSendV6(id string, data model.Policy, prepare string, origin string) string {
+func getSendV6(id string, data models.Policy, prepare string, origin string) string {
 	var preparePointer PrepareResponse
 	json.Unmarshal([]byte(prepare), &preparePointer)
 	unassignedElements := preparePointer.UnassignedElements
@@ -297,6 +297,20 @@ func getSendV6(id string, data model.Policy, prepare string, origin string) stri
 			  "Code": "test"
 			}, `
 	}
+	var redirectUrl string
+	if data.Name == models.GapProduct {
+		var baseUrl string = "https://www.wopta.it"
+		if os.Getenv("env") != "prod" {
+			baseUrl = "https://dev.wopta.it"
+		}
+		redirectUrl = `
+		"FinishActionConfiguration": {
+			"SignAnyWhereViewer": {
+				"RedirectUri": "` + baseUrl + `"/it/quote/gap/thank-you"
+			}
+		},
+		`
+	}
 
 	return `{
 		"Documents": [
@@ -312,12 +326,9 @@ func getSendV6(id string, data model.Policy, prepare string, origin string) stri
 		"LockFormFieldsOnFinish": true,
 		"UnassignedElements": ` + string(unassignedJson) + `,
 		"Activities": [
-			 
 			{
-			 
 				"Action": {
 					"Sign": {
-					
                         "RequireViewContentBeforeFormFilling": false,
 						"RecipientConfiguration": {
 							"SendEmails": false,
@@ -336,8 +347,10 @@ func getSendV6(id string, data model.Policy, prepare string, origin string) stri
 							  "SmsOneTimePassword": {
 								"PhoneNumber": "` + data.Contractor.Phone + `"
 							  }
-						}},
+							}
+						},
 						"Elements": ` + string(elementsJson) + `,
+						` + redirectUrl + `
 						"SigningGroup": "CONTRAENTE"
 					}
 				}
