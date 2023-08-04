@@ -19,6 +19,8 @@ func PutByPolicy(policy models.Policy, scheduleDate string, origin string, expir
 		sd               string
 		status           string
 		statusHistory    = make([]string, 0)
+		payDate          time.Time
+		transactionDate  time.Time
 	)
 
 	prod, err := product.GetProduct(policy.Name, policy.ProductVersion, models.UserRoleAdmin)
@@ -46,9 +48,13 @@ func PutByPolicy(policy models.Policy, scheduleDate string, origin string, expir
 		sd = scheduleDate
 	}
 
+	now := time.Now().UTC()
+
 	if isPay {
 		status = models.TransactionStatusPay
 		statusHistory = append(statusHistory, models.TransactionStatusToPay, models.TransactionStatusPay)
+		payDate = now
+		transactionDate = now
 	} else {
 		status = models.TransactionStatusToPay
 		statusHistory = append(statusHistory, models.TransactionStatusToPay)
@@ -64,7 +70,7 @@ func PutByPolicy(policy models.Policy, scheduleDate string, origin string, expir
 		Uid:                transactionUid,
 		PolicyName:         policy.Name,
 		PolicyUid:          policy.Uid,
-		CreationDate:       time.Now().UTC(),
+		CreationDate:       now,
 		Status:             status,
 		StatusHistory:      statusHistory,
 		ScheduleDate:       sd,
@@ -72,6 +78,8 @@ func PutByPolicy(policy models.Policy, scheduleDate string, origin string, expir
 		NumberCompany:      policy.CodeCompany,
 		Commissions:        commissionMga,
 		IsPay:              isPay,
+		PayDate:            payDate,
+		TransactionDate:    transactionDate,
 		Name:               policy.Contractor.Name + " " + policy.Contractor.Surname,
 		Company:            policy.Company,
 		IsDelete:           false,
