@@ -124,9 +124,9 @@ func AddContract(policy *models.Policy, origin string) error {
 	gsLink := <-document.GetFileV6(*policy, policy.Uid)
 	// Add Contract
 	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
-	filenameParts := []string{"Contratto", policy.NameDesc, timestamp, ".pdf"}
+	filenameParts := []string{"Contratto", policy.NameDesc, timestamp}
 	filename := strings.Join(filenameParts, "_")
-	filename = strings.ReplaceAll(filename, " ", "_")
+	filename = strings.ReplaceAll(filename, " ", "_") + ".pdf"
 	*policy.Attachments = append(*policy.Attachments, models.Attachment{
 		Name:     "Contratto",
 		Link:     gsLink,
