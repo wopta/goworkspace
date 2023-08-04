@@ -103,6 +103,7 @@ func UpdateAgentPortfolio(policy *Policy, origin string) error {
 		agent.Users = append(agent.Users, policy.Contractor.Uid)
 	}
 
+	agent.UpdatedDate = time.Now().UTC()
 	err = lib.SetFirestoreErr(fireAgent, agent.Uid, agent)
 	if err != nil {
 		log.Printf("[updateAgentPortfolio] ERROR saving agent: %s", err.Error())
