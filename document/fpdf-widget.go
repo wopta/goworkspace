@@ -342,10 +342,11 @@ func companiesDescriptionSection(pdf *fpdf.Fpdf, companyName string) {
 			"soggetta alla vigilanza dell’IVASS; è possibile verificare la veridicità e la regolarità delle "+
 			"autorizzazioni mediante l'accesso al sito www.ivass.it", "", "", false)
 	case "sogessur":
-		pdf.MultiCell(0, 3, "Sogessur SA – Rappresentanza Generale per l’Italia con sede in Via Tiziano, "+
-			"32 – 20145 Milano – Iscritta alla CCIAA di Milano P.I. 07420570967 – REA MI 1957443 Sogecap SA – "+
-			"Rappresentanza Generale per l’Italia con sede in Via Tiziano, 32 – 20145 Milano – Iscritta alla CCIAA di "+
-			"Milano P.I. 07160010968 ", "", "", false)
+		pdf.MultiCell(0, 3, "Sogessur SA – Sogessur - Société Anonyme – Capitale Sociale € 33 825 000 "+
+			"– Sede legale: Tour D2, 17bis Place des Reflets – 92919 Paris La Défense Cedex - 379 846 637 R.C.S. "+
+			"Nanterre - Francia - Sede secondaria: Via Tiziano 32, 20145 Milano - Italia - Registro delle Imprese di "+
+			"Milano, Lodi,Monza-Brianza Codice Fiscale e P.IVA  07420570967  Iscritta nell’elenco I dell’Albo delle "+
+			"Imprese di Assicurazione tenuto dall’IVASS al n. I00094", "", "", false)
 	}
 	pdf.Ln(3)
 }

@@ -53,7 +53,7 @@ func GapSogessur(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, 
 
 	companiesDescriptionSection(pdf, policy.Company)
 
-	woptaHeader(pdf)
+	woptaGapHeader(pdf, *policy)
 
 	pdf.AddPage()
 
@@ -129,12 +129,44 @@ func gapFooter(pdf *fpdf.Fpdf) {
 		"dall’IVASS al n. I00094"
 
 	pdf.SetFooterFunc(func() {
-		pdf.SetXY(10, -15)
+		pdf.SetXY(10, -17)
 		setPinkRegularFont(pdf, smallTextSize)
 		pdf.MultiCell(0, 3, footerText, "", "", false)
-		pdf.SetY(-7)
+		pdf.SetY(-8)
+		setBlackRegularFont(pdf, smallTextSize)
+		pdf.MultiCell(0, 3, "Auto Valore Protetto - VI - Settembre_2023", "", fpdf.AlignRight,
+			false)
 		pageNumber(pdf)
 	})
+}
+
+func woptaGapHeader(pdf *fpdf.Fpdf, policy models.Policy) {
+	location, err := time.LoadLocation("Europe/Rome")
+	lib.CheckError(err)
+
+	policyStartDate := policy.StartDate.In(location)
+	policyEndDate := policy.EndDate.In(location)
+
+	policyInfo := "Polizza Numero: " + policy.CodeCompany + "\n" +
+		"Targa Veicolo: " + policy.Assets[0].Vehicle.Plate + "\n" +
+		"Decorre dal: " + policyStartDate.Format(dateLayout) + " ore 24:00\n" +
+		"Scade il: " + policyEndDate.Format(dateLayout) + " ore 24:00"
+
+	pdf.SetHeaderFunc(func() {
+		var opt fpdf.ImageOptions
+		opt.ImageType = "png"
+		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/ARTW_LOGO_RGB_400px.png", 11, 6, 0, 10,
+			false, opt, 0, "")
+
+		setBlackBoldFont(pdf, standardTextSize)
+		pdf.SetXY(11, 17)
+		pdf.Cell(0, 3, "I dati della tua polizza")
+		setBlackRegularFont(pdf, standardTextSize)
+		pdf.SetXY(11, pdf.GetY()+3)
+		pdf.MultiCell(0, 3.5, policyInfo, "", "", false)
+		pdf.Ln(8)
+	})
+
 }
 
 func gapVehicleDataTable(pdf *fpdf.Fpdf, vehicle *models.Vehicle) {
@@ -199,10 +231,10 @@ func gapPersonalInfoTable(pdf *fpdf.Fpdf, contractor, vehicleOwner models.User) 
 			"Residente in", vehicleOwner.Residence.StreetName + " " + vehicleOwner.Residence.StreetNumber + ", " +
 				"" + vehicleOwner.Residence.PostalCode + ", " + vehicleOwner.Residence.City + "(" + vehicleOwner.Residence.
 				CityCode + ")"},
-		{"Mail", contractor.Mail, "Mail", "====="},
+		{"Mail", contractor.Mail, "Mail", "================"},
 		{"Codice Fiscale", contractor.FiscalCode, "Codice Fiscale", vehicleOwner.FiscalCode},
 		{"Data nascita", contractorBirthDate.Format(dateLayout), "Data nascita", vehicleOwnerBirthDate.Format(dateLayout)},
-		{"Telefono", contractor.Phone, "Telefono", "====="},
+		{"Telefono", contractor.Phone, "Telefono", "================"},
 	}
 
 	for x := 0; x < len(tableRows); x++ {
