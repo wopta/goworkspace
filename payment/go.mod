@@ -8,12 +8,12 @@ require (
 	cloud.google.com/go v0.110.7
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.4
 	github.com/google/uuid v1.3.0
-	github.com/wopta/goworkspace/document v1.0.82
+	github.com/wopta/goworkspace/document v1.0.83
 	github.com/wopta/goworkspace/lib v1.0.66
 	github.com/wopta/goworkspace/mail v1.0.27
-	github.com/wopta/goworkspace/models v1.1.29
+	github.com/wopta/goworkspace/models v1.1.30
 	github.com/wopta/goworkspace/policy v1.0.7
-	github.com/wopta/goworkspace/transaction v1.0.10
+	github.com/wopta/goworkspace/transaction v1.0.11
 	github.com/wopta/goworkspace/user v1.0.19
 )
 
@@ -73,7 +73,7 @@ require (
 	github.com/sergi/go-diff v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
-	github.com/wopta/goworkspace/product v1.0.33 // indirect
+	github.com/wopta/goworkspace/product v1.0.34 // indirect
 	github.com/wopta/goworkspace/wiseproxy v1.0.3 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
