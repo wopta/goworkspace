@@ -5,6 +5,7 @@ import (
 	"github.com/go-pdf/fpdf"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"math"
 	"sort"
 	"strings"
 	"time"
@@ -237,25 +238,62 @@ func gapPersonalInfoTable(pdf *fpdf.Fpdf, contractor, vehicleOwner models.User) 
 		{"Telefono", contractor.Phone, "Telefono", "================"},
 	}
 
+	lastRowBordersList := []string{"BL", "B", "B", "BR"}
+
 	for x := 0; x < len(tableRows); x++ {
-		if x != len(tableRows)-1 {
-			setPinkRegularFont(pdf, 8)
-			pdf.CellFormat(40, 5, tableRows[x][0], "L", 0, fpdf.AlignLeft, false, 0, "")
-			setBlackRegularFont(pdf, 8)
-			pdf.CellFormat(55, 5, tableRows[x][1], "B", 0, fpdf.AlignLeft, false, 0, "")
-			setPinkRegularFont(pdf, 8)
-			pdf.CellFormat(40, 5, tableRows[x][2], "", 0, fpdf.AlignLeft, false, 0, "")
-			setBlackRegularFont(pdf, 8)
-			pdf.CellFormat(55, 5, tableRows[x][3], "BR", 1, fpdf.AlignLeft, false, 0, "")
+		bordersList := []string{"L", "B", "", "BR"}
+
+		setBlackRegularFont(pdf, 8)
+		secondColumnText := pdf.SplitText(tableRows[x][1], 55)
+		fourthColumnText := pdf.SplitText(tableRows[x][3], 55)
+		secondColumnNumLines := float64(len(secondColumnText))
+		fourthColumnNumLines := float64(len(fourthColumnText))
+		numLines := math.Max(secondColumnNumLines, fourthColumnNumLines)
+
+		if x == len(tableRows)-1 {
+			bordersList = lastRowBordersList
+		}
+
+		setPinkRegularFont(pdf, 8)
+		pdf.CellFormat(40, 5*numLines, tableRows[x][0], bordersList[0], 0, fpdf.AlignLeft, false, 0, "")
+
+		setBlackRegularFont(pdf, 8)
+		if secondColumnNumLines > 1 {
+			if secondColumnNumLines < numLines {
+				secondColumnText = append(secondColumnText, strings.Repeat("", int(numLines-secondColumnNumLines)))
+			}
+
+			for index, text := range secondColumnText {
+				if index < int(numLines-1) {
+					pdf.CellFormat(55, 5, text, "", 2, fpdf.AlignLeft, false, 0, "")
+				} else {
+					pdf.CellFormat(55, 5, text, bordersList[1], 1, fpdf.AlignLeft, false, 0, "")
+				}
+			}
+			pdf.SetXY(pdf.GetX()+95, pdf.GetY()-(5*numLines))
+
 		} else {
-			setPinkRegularFont(pdf, 8)
-			pdf.CellFormat(40, 5, tableRows[x][0], "BL", 0, fpdf.AlignLeft, false, 0, "")
-			setBlackRegularFont(pdf, 8)
-			pdf.CellFormat(55, 5, tableRows[x][1], "B", 0, fpdf.AlignLeft, false, 0, "")
-			setPinkRegularFont(pdf, 8)
-			pdf.CellFormat(40, 5, tableRows[x][2], "B", 0, fpdf.AlignLeft, false, 0, "")
-			setBlackRegularFont(pdf, 8)
-			pdf.CellFormat(55, 5, tableRows[x][3], "BR", 1, fpdf.AlignLeft, false, 0, "")
+			pdf.CellFormat(55, 5*numLines, tableRows[x][1], bordersList[1], 0, fpdf.AlignLeft, false, 0, "")
+		}
+
+		setPinkRegularFont(pdf, 8)
+		pdf.CellFormat(40, 5*numLines, tableRows[x][2], bordersList[2], 0, fpdf.AlignLeft, false, 0, "")
+
+		setBlackRegularFont(pdf, 8)
+		if fourthColumnNumLines > 1 {
+			if fourthColumnNumLines < numLines {
+				fourthColumnText = append(fourthColumnText, strings.Repeat("", int(numLines-fourthColumnNumLines)))
+			}
+
+			for index, text := range fourthColumnText {
+				if index < int(numLines-1) {
+					pdf.CellFormat(55, 5, text, "R", 2, fpdf.AlignLeft, false, 0, "")
+				} else {
+					pdf.CellFormat(55, 5, text, bordersList[3], 1, fpdf.AlignLeft, false, 0, "")
+				}
+			}
+		} else {
+			pdf.CellFormat(55, 5*numLines, tableRows[x][3], bordersList[3], 1, fpdf.AlignLeft, false, 0, "")
 		}
 	}
 	pdf.Ln(5)
