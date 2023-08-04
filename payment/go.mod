@@ -8,7 +8,7 @@ require (
 	cloud.google.com/go v0.110.7
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.4
 	github.com/google/uuid v1.3.0
-	github.com/wopta/goworkspace/document v1.0.84
+	github.com/wopta/goworkspace/document v1.0.85
 	github.com/wopta/goworkspace/lib v1.0.66
 	github.com/wopta/goworkspace/mail v1.0.27
 	github.com/wopta/goworkspace/models v1.1.31
