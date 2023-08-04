@@ -3,6 +3,7 @@ package product
 import (
 	"log"
 
+	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -63,10 +64,15 @@ func GetCommissionProduct(data models.Policy, prod models.Product) float64 {
 }
 
 func calculateCommission(amount float64, isRenew bool, commissions *models.Commissions) float64 {
+	var commission float64
+
 	if isRenew {
 		log.Println("[calculateCommission] commission renew")
-		return amount * commissions.Renew
+		commission = amount * commissions.Renew
+	} else {
+		log.Println("[calculateCommission] commission new business")
+		commission = amount * commissions.NewBusiness
 	}
-	log.Println("[calculateCommission] commission new business")
-	return amount * commissions.NewBusiness
+
+	return lib.RoundFloat(commission, 2)
 }
