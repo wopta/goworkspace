@@ -264,40 +264,6 @@ func gapPersonalInfoTable(pdf *fpdf.Fpdf, contractor, vehicleOwner models.User) 
 	pdf.Ln(5)
 }
 
-func drawDynamicCell(pdf *fpdf.Fpdf, fontSize, cellHeight, cellWidth, rowLines, nextX float64, cellText, border,
-	align string, rightMost bool) {
-	cellSplittedText := pdf.SplitText(cellText, cellWidth)
-	cellNumLines := float64(len(cellSplittedText))
-
-	setXY := func() {}
-	ln := 1
-
-	if !rightMost {
-		setXY = func() {
-			pdf.SetXY(pdf.GetX()+nextX, pdf.GetY()-(cellHeight*rowLines))
-		}
-		ln = 0
-	}
-
-	setBlackRegularFont(pdf, fontSize)
-	if cellNumLines > 1 {
-		if cellNumLines < rowLines {
-			cellSplittedText = append(cellSplittedText, strings.Repeat("", int(rowLines-cellNumLines)))
-		}
-
-		for index, text := range cellSplittedText {
-			ln = 1
-			if index < int(rowLines-1) {
-				ln = 2
-			}
-			pdf.CellFormat(cellWidth, cellHeight, text, border, ln, align, false, 0, "")
-		}
-		setXY()
-	} else {
-		pdf.CellFormat(cellWidth, cellHeight*rowLines, cellText, border, ln, align, false, 0, "")
-	}
-}
-
 func gapPolicyDataTable(pdf *fpdf.Fpdf, policy *models.Policy) {
 	offerMap := map[string]string{
 		"base":     "Base",
