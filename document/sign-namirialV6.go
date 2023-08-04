@@ -306,7 +306,7 @@ func getSendV6(id string, data models.Policy, prepare string, origin string) str
 		redirectUrl = `
 		"FinishActionConfiguration": {
 			"SignAnyWhereViewer": {
-				"RedirectUri": "` + baseUrl + `"/it/quote/gap/thank-you"
+				"RedirectUri": "` + baseUrl + `/it/quote/gap/thank-you"
 			}
 		},
 		`
