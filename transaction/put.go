@@ -2,89 +2,106 @@ package transaction
 
 import (
 	"log"
-	"strings"
 	"time"
 
-	"cloud.google.com/go/bigquery"
-	"cloud.google.com/go/civil"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/product"
-	pr "github.com/wopta/goworkspace/product"
 )
 
-func PutByPolicy(data models.Policy, scheduleDate string, origin string, expireDate string, customerId string, amount float64, amountNet float64, providerId string, isPay bool, role string) {
+func PutByPolicy(policy models.Policy, scheduleDate string, origin string, expireDate string, customerId string, amount float64, amountNet float64, providerId string, isPay bool) {
+	log.Printf("[PutByPolicy] Policy %s", policy.Uid)
 	var (
-		commission       float64
+		commissionMga    float64
 		commissionAgent  float64
 		commissionAgency float64
 		netCommission    map[string]float64
+		sd               string
+		status           string
+		statusHistory    = make([]string, 0)
 	)
 
-	//var prod models.Product
-	prod, err := product.GetProduct(data.Name, data.ProductVersion, role)
-	log.Println(data.Uid+" pay error marsh product:", err)
-	commission = pr.GetCommissionProduct(data, *prod)
-
-	if data.AgentUid != "" {
-		var agent models.Agent
-		dn := lib.GetFirestore(models.AgentCollection, data.AgentUid)
-		dn.DataTo(&agent)
-		commissionAgent = pr.GetCommissionProducts(data, agent.Products)
-
+	prod, err := product.GetProduct(policy.Name, policy.ProductVersion, models.UserRoleAdmin)
+	if err != nil {
+		log.Printf("[PutByPolicy] ERROR getting mga product: %s", err.Error())
+		return
 	}
-	if data.AgencyUid != "" {
-		var agency models.Agency
-		dn := lib.GetFirestore(models.AgencyCollection, data.AgencyUid)
-		dn.DataTo(&agency)
-		commissionAgent = pr.GetCommissionProducts(data, agency.Products)
+
+	commissionMga = product.GetCommissionProduct(policy, *prod)
+	log.Printf("[PutByPolicy] commissionMga: %g", commissionMga)
+
+	if policy.AgentUid != "" {
+		commissionAgent = getAgentCommission(policy)
+		log.Printf("[PutByPolicy] commissionAgent: %g", commissionAgent)
 	}
-	log.Println(data.Uid+"pay commission: ", commission)
-	layout2 := "2006-01-02"
-	var sd string
+
+	if policy.AgencyUid != "" {
+		commissionAgency = getAgencyCommission(policy)
+		log.Printf("[PutByPolicy] commissionAgency: %g", commissionAgency)
+	}
+
 	if scheduleDate == "" {
-		sd = time.Now().UTC().Format(layout2)
+		sd = time.Now().UTC().Format(models.TimeDateOnly)
 	} else {
 		sd = scheduleDate
 	}
-	//tr := models.SetTransactionPolicy(data, data.Uid+"_"+scheduleDate, amount, scheduleDate, data.PriceNett * commission)
-	transactionsFire := lib.GetDatasetByEnv(origin, "transactions")
-	transactionUid := lib.NewDoc(transactionsFire)
+
+	if isPay {
+		status = models.TransactionStatusPay
+		statusHistory = append(statusHistory, models.TransactionStatusToPay, models.TransactionStatusPay)
+	} else {
+		status = models.TransactionStatusToPay
+		statusHistory = append(statusHistory, models.TransactionStatusToPay)
+	}
+
+	fireTransactions := lib.GetDatasetByEnv(origin, models.TransactionsCollection)
+	transactionUid := lib.NewDoc(fireTransactions)
 
 	tr := models.Transaction{
 		Amount:             amount,
 		AmountNet:          amountNet,
 		Id:                 "",
 		Uid:                transactionUid,
-		PolicyName:         data.Name,
-		PolicyUid:          data.Uid,
+		PolicyName:         policy.Name,
+		PolicyUid:          policy.Uid,
 		CreationDate:       time.Now().UTC(),
-		Status:             models.TransactionStatusToPay,
-		StatusHistory:      []string{models.TransactionStatusToPay},
+		Status:             status,
+		StatusHistory:      statusHistory,
 		ScheduleDate:       sd,
 		ExpirationDate:     expireDate,
-		NumberCompany:      data.CodeCompany,
-		Commissions:        amountNet * commission,
-		IsPay:              false,
-		Name:               data.Contractor.Name + " " + data.Contractor.Surname,
-		Company:            data.Company,
-		CommissionsCompany: commission,
+		NumberCompany:      policy.CodeCompany,
+		Commissions:        commissionMga,
+		IsPay:              isPay,
+		Name:               policy.Contractor.Name + " " + policy.Contractor.Surname,
+		Company:            policy.Company,
 		IsDelete:           false,
 		ProviderId:         providerId,
 		UserToken:          customerId,
-		ProviderName:       data.Payment,
-		AgentUid:           data.AgencyUid,
-		AgencyUid:          data.AgencyUid,
-		CommissionsAgent:   amountNet * commissionAgent,
-		CommissionsAgency:  amountNet * commissionAgency,
+		ProviderName:       policy.Payment,
+		AgentUid:           policy.AgencyUid,
+		AgencyUid:          policy.AgencyUid,
+		CommissionsAgent:   commissionAgent,
+		CommissionsAgency:  commissionAgency,
 		NetworkCommissions: netCommission,
 	}
 
-	lib.SetFirestore(transactionsFire, transactionUid, tr)
-	tr.BigPayDate = bigquery.NullDateTime{}
-	tr.BigTransactionDate = bigquery.NullDateTime{}
-	tr.BigCreationDate = civil.DateTimeOf(time.Now().UTC())
-	tr.BigStatusHistory = strings.Join(tr.StatusHistory, ",")
-	err = lib.InsertRowsBigQuery("wopta", transactionsFire, tr)
+	err = lib.SetFirestoreErr(fireTransactions, transactionUid, tr)
 	lib.CheckError(err)
+
+	tr.BigQuerySave(origin)
+}
+
+func getAgentCommission(policy models.Policy) float64 {
+	var agent models.Agent
+	dn := lib.GetFirestore(models.AgentCollection, policy.AgentUid)
+	dn.DataTo(&agent)
+
+	return product.GetCommissionProducts(policy, agent.Products)
+}
+
+func getAgencyCommission(policy models.Policy) float64 {
+	var agency models.Agency
+	dn := lib.GetFirestore(models.AgencyCollection, policy.AgencyUid)
+	dn.DataTo(&agency)
+	return product.GetCommissionProducts(policy, agency.Products)
 }
