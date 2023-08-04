@@ -244,11 +244,8 @@ func gapPersonalInfoTable(pdf *fpdf.Fpdf, contractor, vehicleOwner models.User) 
 		bordersList := []string{"L", "B", "", "BR"}
 
 		setBlackRegularFont(pdf, 8)
-		secondColumnText := pdf.SplitText(tableRows[x][1], 55)
-		fourthColumnText := pdf.SplitText(tableRows[x][3], 55)
-		secondColumnNumLines := float64(len(secondColumnText))
-		fourthColumnNumLines := float64(len(fourthColumnText))
-		numLines := math.Max(secondColumnNumLines, fourthColumnNumLines)
+		numLines := math.Max(float64(len(pdf.SplitText(tableRows[x][1], 55))),
+			float64(len(pdf.SplitText(tableRows[x][3], 55))))
 
 		if x == len(tableRows)-1 {
 			bordersList = lastRowBordersList
@@ -257,46 +254,48 @@ func gapPersonalInfoTable(pdf *fpdf.Fpdf, contractor, vehicleOwner models.User) 
 		setPinkRegularFont(pdf, 8)
 		pdf.CellFormat(40, 5*numLines, tableRows[x][0], bordersList[0], 0, fpdf.AlignLeft, false, 0, "")
 
-		setBlackRegularFont(pdf, 8)
-		if secondColumnNumLines > 1 {
-			if secondColumnNumLines < numLines {
-				secondColumnText = append(secondColumnText, strings.Repeat("", int(numLines-secondColumnNumLines)))
-			}
-
-			for index, text := range secondColumnText {
-				if index < int(numLines-1) {
-					pdf.CellFormat(55, 5, text, "", 2, fpdf.AlignLeft, false, 0, "")
-				} else {
-					pdf.CellFormat(55, 5, text, bordersList[1], 1, fpdf.AlignLeft, false, 0, "")
-				}
-			}
-			pdf.SetXY(pdf.GetX()+95, pdf.GetY()-(5*numLines))
-
-		} else {
-			pdf.CellFormat(55, 5*numLines, tableRows[x][1], bordersList[1], 0, fpdf.AlignLeft, false, 0, "")
-		}
+		drawDynamicCell(pdf, 8, 5, 55, numLines, 95, tableRows[x][1], bordersList[1], fpdf.AlignLeft, false)
 
 		setPinkRegularFont(pdf, 8)
 		pdf.CellFormat(40, 5*numLines, tableRows[x][2], bordersList[2], 0, fpdf.AlignLeft, false, 0, "")
 
-		setBlackRegularFont(pdf, 8)
-		if fourthColumnNumLines > 1 {
-			if fourthColumnNumLines < numLines {
-				fourthColumnText = append(fourthColumnText, strings.Repeat("", int(numLines-fourthColumnNumLines)))
-			}
-
-			for index, text := range fourthColumnText {
-				if index < int(numLines-1) {
-					pdf.CellFormat(55, 5, text, "R", 2, fpdf.AlignLeft, false, 0, "")
-				} else {
-					pdf.CellFormat(55, 5, text, bordersList[3], 1, fpdf.AlignLeft, false, 0, "")
-				}
-			}
-		} else {
-			pdf.CellFormat(55, 5*numLines, tableRows[x][3], bordersList[3], 1, fpdf.AlignLeft, false, 0, "")
-		}
+		drawDynamicCell(pdf, 8, 5, 55, numLines, 135, tableRows[x][3], bordersList[3], fpdf.AlignLeft, true)
 	}
 	pdf.Ln(5)
+}
+
+func drawDynamicCell(pdf *fpdf.Fpdf, fontSize, cellHeight, cellWidth, rowLines, nextX float64, cellText, border,
+	align string, rightMost bool) {
+	cellSplittedText := pdf.SplitText(cellText, cellWidth)
+	cellNumLines := float64(len(cellSplittedText))
+
+	setXY := func() {}
+	ln := 1
+
+	if !rightMost {
+		setXY = func() {
+			pdf.SetXY(pdf.GetX()+nextX, pdf.GetY()-(cellHeight*rowLines))
+		}
+		ln = 0
+	}
+
+	setBlackRegularFont(pdf, fontSize)
+	if cellNumLines > 1 {
+		if cellNumLines < rowLines {
+			cellSplittedText = append(cellSplittedText, strings.Repeat("", int(rowLines-cellNumLines)))
+		}
+
+		for index, text := range cellSplittedText {
+			ln = 1
+			if index < int(rowLines-1) {
+				ln = 2
+			}
+			pdf.CellFormat(cellWidth, cellHeight, text, border, ln, align, false, 0, "")
+		}
+		setXY()
+	} else {
+		pdf.CellFormat(cellWidth, cellHeight*rowLines, cellText, border, ln, align, false, 0, "")
+	}
 }
 
 func gapPolicyDataTable(pdf *fpdf.Fpdf, policy *models.Policy) {
