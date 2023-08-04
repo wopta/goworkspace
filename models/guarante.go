@@ -50,7 +50,7 @@ type Guarante struct {
 	Reserved                   bool                       `json:"reserved" firestore:"reserved" bigquery:"-"`
 	ReservedConfig             map[string]*ReservedLimits `json:"reservedConfig,omitempty" firestore:"reservedConfig,omitempty" bigquery:"-"`
 	Order                      int64                      `json:"order,omitempty" firestore:"order,omitempty" bigquery:"-"`
-	Commissions                *Commission                `json:"commissions,omitempty" firestore:"commissions,omitempty" bigquery:"-"`
+	Commissions                *Commissions               `json:"commissions,omitempty" firestore:"commissions,omitempty" bigquery:"-"`
 }
 
 type GuaranteValue struct {
@@ -80,6 +80,7 @@ type GuaranteValue struct {
 	MinimumGrossMonthly        float64             `firestore:"minimumGrossMonthly,omitempty" json:"minimumGrossMonthly,omitempty"`
 	MinimumGrossYearly         float64             `firestore:"minimumGrossYearly,omitempty" json:"minimumGrossYearly,omitempty"`
 }
+
 type GuaranteFieldValue struct {
 	Min    float64   `firestore:"min,omitempty" json:"min,omitempty"`
 	Max    float64   `firestore:"max,omitempty" json:"max,omitempty"`

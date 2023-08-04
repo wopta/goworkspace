@@ -86,10 +86,10 @@ type Child struct {
 }
 
 type Offer struct {
-	Name        string      `firestore:"name,omitempty" json:"name,omitempty"`
-	Description string      `firestore:"description,omitempty" json:"description,omitempty"`
-	Order       int         `firestore:"order,omitempty" json:"order,omitempty"`
-	Commissions *Commission `json:"commissions" firestore:"commissions"`
+	Name        string       `firestore:"name,omitempty" json:"name,omitempty"`
+	Description string       `firestore:"description,omitempty" json:"description,omitempty"`
+	Order       int          `firestore:"order,omitempty" json:"order,omitempty"`
+	Commissions *Commissions `json:"commissions" firestore:"commissions"`
 }
 
 type Track struct {

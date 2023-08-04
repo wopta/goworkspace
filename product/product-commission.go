@@ -62,7 +62,7 @@ func GetCommissionProduct(data models.Policy, prod models.Product) float64 {
 	return commissionValue
 }
 
-func calculateCommission(amount float64, isRenew bool, commissions *models.Commission) float64 {
+func calculateCommission(amount float64, isRenew bool, commissions *models.Commissions) float64 {
 	if isRenew {
 		log.Println("[calculateCommission] commission renew")
 		return amount * commissions.Renew
