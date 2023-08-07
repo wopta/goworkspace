@@ -396,3 +396,38 @@ func indentedText(pdf *fpdf.Fpdf, content string) {
 	pdf.SetX(tabDimension)
 	pdf.MultiCell(0, 3, content, "", fpdf.AlignLeft, false)
 }
+
+func drawDynamicCell(pdf *fpdf.Fpdf, fontSize, cellHeight, cellWidth, rowLines, nextX float64, cellText,
+	innerCellBorder, outerCellBorder,
+	align string, rightMost bool) {
+	cellSplittedText := pdf.SplitText(cellText, cellWidth)
+	cellNumLines := float64(len(cellSplittedText))
+
+	setXY := func() {}
+	ln := 1
+
+	if !rightMost {
+		setXY = func() {
+			pdf.SetXY(pdf.GetX()+nextX, pdf.GetY()-(cellHeight*rowLines))
+		}
+		ln = 0
+	}
+
+	setBlackRegularFont(pdf, fontSize)
+	if cellNumLines > 1 {
+		if cellNumLines < rowLines {
+			cellSplittedText = append(cellSplittedText, strings.Repeat("", int(rowLines-cellNumLines)))
+		}
+
+		for index, text := range cellSplittedText {
+			if index < int(rowLines-1) {
+				pdf.CellFormat(cellWidth, cellHeight, text, innerCellBorder, 2, fpdf.AlignLeft, false, 0, "")
+			} else {
+				pdf.CellFormat(cellWidth, cellHeight, text, outerCellBorder, 1, fpdf.AlignLeft, false, 0, "")
+			}
+		}
+		setXY()
+	} else {
+		pdf.CellFormat(cellWidth, cellHeight*rowLines, cellText, outerCellBorder, ln, align, false, 0, "")
+	}
+}

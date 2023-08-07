@@ -5,6 +5,7 @@ import (
 	"github.com/go-pdf/fpdf"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"math"
 	"sort"
 	"strings"
 	"time"
@@ -237,26 +238,28 @@ func gapPersonalInfoTable(pdf *fpdf.Fpdf, contractor, vehicleOwner models.User) 
 		{"Telefono", contractor.Phone, "Telefono", "================"},
 	}
 
+	lastRowBordersList := []string{"BL", "B", "B", "BR"}
+
 	for x := 0; x < len(tableRows); x++ {
-		if x != len(tableRows)-1 {
-			setPinkRegularFont(pdf, 8)
-			pdf.CellFormat(40, 5, tableRows[x][0], "L", 0, fpdf.AlignLeft, false, 0, "")
-			setBlackRegularFont(pdf, 8)
-			pdf.CellFormat(55, 5, tableRows[x][1], "B", 0, fpdf.AlignLeft, false, 0, "")
-			setPinkRegularFont(pdf, 8)
-			pdf.CellFormat(40, 5, tableRows[x][2], "", 0, fpdf.AlignLeft, false, 0, "")
-			setBlackRegularFont(pdf, 8)
-			pdf.CellFormat(55, 5, tableRows[x][3], "BR", 1, fpdf.AlignLeft, false, 0, "")
-		} else {
-			setPinkRegularFont(pdf, 8)
-			pdf.CellFormat(40, 5, tableRows[x][0], "BL", 0, fpdf.AlignLeft, false, 0, "")
-			setBlackRegularFont(pdf, 8)
-			pdf.CellFormat(55, 5, tableRows[x][1], "B", 0, fpdf.AlignLeft, false, 0, "")
-			setPinkRegularFont(pdf, 8)
-			pdf.CellFormat(40, 5, tableRows[x][2], "B", 0, fpdf.AlignLeft, false, 0, "")
-			setBlackRegularFont(pdf, 8)
-			pdf.CellFormat(55, 5, tableRows[x][3], "BR", 1, fpdf.AlignLeft, false, 0, "")
+		bordersList := []string{"L", "B", "", "BR"}
+
+		setBlackRegularFont(pdf, 8)
+		numLines := math.Max(float64(len(pdf.SplitText(tableRows[x][1], 55))),
+			float64(len(pdf.SplitText(tableRows[x][3], 55))))
+
+		if x == len(tableRows)-1 {
+			bordersList = lastRowBordersList
 		}
+
+		setPinkRegularFont(pdf, 8)
+		pdf.CellFormat(40, 5*numLines, tableRows[x][0], bordersList[0], 0, fpdf.AlignLeft, false, 0, "")
+
+		drawDynamicCell(pdf, 8, 5, 55, numLines, 95, tableRows[x][1], "", bordersList[1], fpdf.AlignLeft, false)
+
+		setPinkRegularFont(pdf, 8)
+		pdf.CellFormat(40, 5*numLines, tableRows[x][2], bordersList[2], 0, fpdf.AlignLeft, false, 0, "")
+
+		drawDynamicCell(pdf, 8, 5, 55, numLines, 135, tableRows[x][3], "R", bordersList[3], fpdf.AlignLeft, true)
 	}
 	pdf.Ln(5)
 }
