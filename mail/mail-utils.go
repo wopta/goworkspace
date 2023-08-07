@@ -23,7 +23,7 @@ func setBodyDataAndGetCC(channel string, policy models.Policy, bodyData *BodyDat
 
 	switch channel {
 	case models.AgentChannel:
-		agent, err := models.GetAgentByAuthId(policy.AgencyUid)
+		agent, err := models.GetAgentByAuthId(policy.AgentUid)
 		lib.CheckError(err)
 		cc = agent.Mail
 		setAgentBodyData(*agent, bodyData)
