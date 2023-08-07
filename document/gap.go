@@ -254,12 +254,12 @@ func gapPersonalInfoTable(pdf *fpdf.Fpdf, contractor, vehicleOwner models.User) 
 		setPinkRegularFont(pdf, 8)
 		pdf.CellFormat(40, 5*numLines, tableRows[x][0], bordersList[0], 0, fpdf.AlignLeft, false, 0, "")
 
-		drawDynamicCell(pdf, 8, 5, 55, numLines, 95, tableRows[x][1], bordersList[1], fpdf.AlignLeft, false)
+		drawDynamicCell(pdf, 8, 5, 55, numLines, 95, tableRows[x][1], "", bordersList[1], fpdf.AlignLeft, false)
 
 		setPinkRegularFont(pdf, 8)
 		pdf.CellFormat(40, 5*numLines, tableRows[x][2], bordersList[2], 0, fpdf.AlignLeft, false, 0, "")
 
-		drawDynamicCell(pdf, 8, 5, 55, numLines, 135, tableRows[x][3], bordersList[3], fpdf.AlignLeft, true)
+		drawDynamicCell(pdf, 8, 5, 55, numLines, 135, tableRows[x][3], "R", bordersList[3], fpdf.AlignLeft, true)
 	}
 	pdf.Ln(5)
 }

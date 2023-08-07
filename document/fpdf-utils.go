@@ -397,7 +397,8 @@ func indentedText(pdf *fpdf.Fpdf, content string) {
 	pdf.MultiCell(0, 3, content, "", fpdf.AlignLeft, false)
 }
 
-func drawDynamicCell(pdf *fpdf.Fpdf, fontSize, cellHeight, cellWidth, rowLines, nextX float64, cellText, border,
+func drawDynamicCell(pdf *fpdf.Fpdf, fontSize, cellHeight, cellWidth, rowLines, nextX float64, cellText,
+	innerCellBorder, outerCellBorder,
 	align string, rightMost bool) {
 	cellSplittedText := pdf.SplitText(cellText, cellWidth)
 	cellNumLines := float64(len(cellSplittedText))
@@ -420,13 +421,13 @@ func drawDynamicCell(pdf *fpdf.Fpdf, fontSize, cellHeight, cellWidth, rowLines, 
 
 		for index, text := range cellSplittedText {
 			if index < int(rowLines-1) {
-				pdf.CellFormat(cellWidth, cellHeight, text, "", 2, fpdf.AlignLeft, false, 0, "")
+				pdf.CellFormat(cellWidth, cellHeight, text, innerCellBorder, 2, fpdf.AlignLeft, false, 0, "")
 			} else {
-				pdf.CellFormat(cellWidth, cellHeight, text, border, 1, fpdf.AlignLeft, false, 0, "")
+				pdf.CellFormat(cellWidth, cellHeight, text, outerCellBorder, 1, fpdf.AlignLeft, false, 0, "")
 			}
 		}
 		setXY()
 	} else {
-		pdf.CellFormat(cellWidth, cellHeight*rowLines, cellText, border, ln, align, false, 0, "")
+		pdf.CellFormat(cellWidth, cellHeight*rowLines, cellText, outerCellBorder, ln, align, false, 0, "")
 	}
 }
