@@ -4,13 +4,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/dustin/go-humanize"
-	"github.com/mohae/deepcopy"
 	lib "github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/sellable"
 	"io"
+	"math"
 	"modernc.org/mathutil"
 	"net/http"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -41,19 +42,37 @@ func Life(role string, data models.Policy) (models.Policy, error) {
 	_, ruleProduct, err := sellable.Life(role, data)
 	lib.CheckError(err)
 
-	originalPolicy := deepcopy.Copy(data).(models.Policy)
-
 	addDefaultGuarantees(data, *ruleProduct)
 
-	if role == models.UserRoleAll || role == models.UserRoleCustomer {
-		//TODO: this should not be here, only for version 1
+	switch role {
+	case models.UserRoleAll, models.UserRoleCustomer:
 		deathGuarantee, err := data.ExtractGuarantee("death")
 		lib.CheckError(err)
-		//TODO: this should not be here, only for version 1
 		fmt.Println("[Life] setting sumInsuredLimitOfIndeminity")
 		calculateSumInsuredLimitOfIndemnity(data.Assets, deathGuarantee.Value.SumInsuredLimitOfIndemnity)
 		fmt.Println("[Life] setting guarantees duration")
 		calculateGuaranteeDuration(data.Assets, contractorAge, deathGuarantee.Value.Duration.Year)
+	case models.UserRoleAgent, models.UserRoleAgency:
+		guaranteesMap := data.GuaranteesToMap()
+		if guaranteesMap["death"].IsSelected {
+			guaranteesMap["permanent-disability"].Value.SumInsuredLimitOfIndemnity = math.Max(
+				guaranteesMap["permanent-disability"].Value.SumInsuredLimitOfIndemnity,
+				guaranteesMap["death"].Value.SumInsuredLimitOfIndemnity)
+
+			guaranteesMap["serious-ill"].Value.SumInsuredLimitOfIndemnity = math.Min(guaranteesMap["serious-ill"].
+				Value.SumInsuredLimitOfIndemnity, guaranteesMap["death"].Value.SumInsuredLimitOfIndemnity*0.5)
+		} else if guaranteesMap["permanent-disability"].IsSelected {
+			guaranteesMap["serious-ill"].Value.SumInsuredLimitOfIndemnity = math.Min(guaranteesMap["serious-ill"].
+				Value.SumInsuredLimitOfIndemnity, guaranteesMap["permanent-disability"].Value.
+				SumInsuredLimitOfIndemnity*0.5)
+		}
+
+		guaranteesList := make([]models.Guarante, 0)
+		for _, guarantee := range guaranteesMap {
+			guaranteesList = append(guaranteesList, guarantee)
+		}
+
+		data.Assets[0].Guarantees = guaranteesList
 	}
 
 	updatePolicyStartEndDate(&data)
@@ -84,7 +103,7 @@ func Life(role string, data models.Policy) (models.Policy, error) {
 
 			calculateGuaranteePrices(guarantee, baseFloat, taxFloat, *ruleProduct)
 
-			if originalPolicy.HasGuarantee(guarantee.Slug) && guarantee.IsSellable {
+			if guarantee.IsSelected && guarantee.IsSellable {
 				calculateOfferPrices(data, guarantee)
 			}
 		}
@@ -98,6 +117,10 @@ func Life(role string, data models.Policy) (models.Policy, error) {
 	}
 
 	roundOfferPrices(data.OffersPrices)
+
+	sort.Slice(data.Assets[0].Guarantees, func(i, j int) bool {
+		return data.Assets[0].Guarantees[i].Order < data.Assets[0].Guarantees[j].Order
+	})
 
 	return data, err
 }
