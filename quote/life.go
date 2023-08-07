@@ -8,6 +8,7 @@ import (
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/sellable"
 	"io"
+	"log"
 	"math"
 	"modernc.org/mathutil"
 	"net/http"
@@ -29,6 +30,8 @@ func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	var data models.Policy
 	defer r.Body.Close()
 	e := json.Unmarshal(req, &data)
+	lib.CheckError(e)
+	log.Println("[Life] body: ", string(req))
 
 	authToken, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
 	lib.CheckError(err)
@@ -46,21 +49,26 @@ func Life(role string, data models.Policy) (models.Policy, error) {
 	df := lib.CsvToDataframe(b)
 	var selectRow []string
 
+	log.Printf("[Life] getting product file")
 	_, ruleProduct, err := sellable.Life(role, data)
 	lib.CheckError(err)
+	log.Printf("[Life] product file loaded")
 
 	addDefaultGuarantees(data, *ruleProduct)
 
 	switch role {
 	case models.UserRoleAll, models.UserRoleCustomer:
+		log.Println("[Life] e-commerce flow")
 		death, err := data.ExtractGuarantee(deathGuarantee)
 		lib.CheckError(err)
-		fmt.Println("[Life] setting sumInsuredLimitOfIndeminity")
+		log.Println("[Life] setting sumInsuredLimitOfIndeminity")
 		calculateSumInsuredLimitOfIndemnity(data.Assets, death.Value.SumInsuredLimitOfIndemnity)
-		fmt.Println("[Life] setting guarantees duration")
+		log.Println("[Life] setting guarantees duration")
 		calculateGuaranteeDuration(data.Assets, contractorAge, death.Value.Duration.Year)
 	case models.UserRoleAgent, models.UserRoleAgency:
+		log.Println("[Life] agent/agency flow")
 		guaranteesMap := data.GuaranteesToMap()
+		log.Println("[Life] setting sumInsuredLimitOfIndeminity")
 		if guaranteesMap[deathGuarantee].IsSelected {
 			guaranteesMap[permanentDisabilityGuarantee].Value.SumInsuredLimitOfIndemnity = math.Max(
 				guaranteesMap[permanentDisabilityGuarantee].Value.SumInsuredLimitOfIndemnity,
@@ -135,12 +143,15 @@ func Life(role string, data models.Policy) (models.Policy, error) {
 func addDefaultGuarantees(data models.Policy, product models.Product) {
 	guaranteeList := make([]models.Guarante, 0)
 
+	log.Println("[Life] adding default guarantees")
+
 	for _, guarantee := range data.Assets[0].Guarantees {
 		product.Companies[0].GuaranteesMap[guarantee.Slug].Value = guarantee.Value
 		product.Companies[0].GuaranteesMap[guarantee.Slug].IsSelected = guarantee.IsSelected
 	}
 
 	if !data.HasGuarantee(deathGuarantee) {
+		log.Println("[Life] death guarantee not selected, set isSelected to false")
 		product.Companies[0].GuaranteesMap[deathGuarantee].IsSelected = false
 	}
 
@@ -152,6 +163,7 @@ func addDefaultGuarantees(data models.Policy, product models.Product) {
 	}
 
 	data.Assets[0].Guarantees = guaranteeList
+	log.Println("[Life] added default guarantees")
 }
 
 func calculateSumInsuredLimitOfIndemnity(assets []models.Asset, deathSumInsuredLimitOfIndemnity float64) {
@@ -187,6 +199,7 @@ func calculateGuaranteeDuration(assets []models.Asset, contractorAge int, deathD
 }
 
 func updatePolicyStartEndDate(policy *models.Policy) {
+	log.Println("[Life] setting policy start and end date")
 	if policy.StartDate.IsZero() {
 		policy.StartDate = time.Now().UTC()
 	}
@@ -200,6 +213,7 @@ func updatePolicyStartEndDate(policy *models.Policy) {
 }
 
 func getGuaranteeSubtitle(assets []models.Asset) {
+	log.Println("[Life] setting guarantees subtitles")
 	for assetIndex, asset := range assets {
 		for guaranteeIndex, guarantee := range asset.Guarantees {
 			assets[assetIndex].Guarantees[guaranteeIndex].Subtitle = fmt.Sprintf("Durata: %d anni - "+
@@ -225,6 +239,7 @@ func getMultipliersIndex(guaranteeSlug string) (int, int) {
 		base = 7
 		baseTax = 8
 	}
+	log.Printf("[Life] guarantee multipliers indexes base: %d baseTax: %d", base, baseTax)
 	return base, baseTax
 }
 
@@ -240,6 +255,7 @@ func getOffset(duration int) int {
 	case 20:
 		offset = 8*3 + 4
 	}
+	log.Printf("[Life] offset: %d", offset)
 	return offset
 }
 
@@ -248,6 +264,7 @@ func getMultipliers(selectRow []string, offset int, base int, baseTax int) (floa
 	taxFloat, _ := strconv.ParseFloat(strings.Replace(strings.Replace(selectRow[baseTax+offset], "%", "", 1), ",", ".", 1), 64)
 	baseFloat = baseFloat / 100
 	taxFloat = taxFloat / 100
+	log.Printf("[Life] guarantee multipliers baseFloat: %d taxFloat: %d", baseFloat, taxFloat)
 	return baseFloat, taxFloat
 }
 
@@ -284,6 +301,7 @@ func calculateGuaranteePrices(guarantee models.Guarante, baseFloat, taxFloat flo
 }
 
 func calculateOfferPrices(data models.Policy, guarantee models.Guarante) {
+	log.Println("[Life] calculate offer prices")
 	data.OffersPrices["default"]["yearly"].Gross += guarantee.Value.PremiumGrossYearly
 	data.OffersPrices["default"]["yearly"].Net += guarantee.Value.PremiumNetYearly
 	data.OffersPrices["default"]["yearly"].Tax += guarantee.Value.PremiumGrossYearly - guarantee.Value.PremiumNetYearly
@@ -293,6 +311,7 @@ func calculateOfferPrices(data models.Policy, guarantee models.Guarante) {
 }
 
 func roundOfferPrices(offersPrices map[string]map[string]*models.Price) {
+	log.Println("[Life] round offer prices")
 	for offerKey, offerValue := range offersPrices {
 		for paymentKey, _ := range offerValue {
 			offersPrices[offerKey][paymentKey].Net = lib.RoundFloat(offersPrices[offerKey][paymentKey].Net, 2)
