@@ -4,16 +4,17 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/dustin/go-humanize"
+	lib "github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/sellable"
 	"io"
+	"math"
 	"modernc.org/mathutil"
 	"net/http"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
-
-	lib "github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
 )
 
 func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -41,19 +42,37 @@ func Life(role string, data models.Policy) (models.Policy, error) {
 	_, ruleProduct, err := sellable.Life(role, data)
 	lib.CheckError(err)
 
-	originalPolicy := copyPolicy(data)
-
 	addDefaultGuarantees(data, *ruleProduct)
 
-	if role == models.UserRoleAll || role == models.UserRoleCustomer {
-		//TODO: this should not be here, only for version 1
+	switch role {
+	case models.UserRoleAll, models.UserRoleCustomer:
 		deathGuarantee, err := data.ExtractGuarantee("death")
 		lib.CheckError(err)
-		//TODO: this should not be here, only for version 1
 		fmt.Println("[Life] setting sumInsuredLimitOfIndeminity")
 		calculateSumInsuredLimitOfIndemnity(data.Assets, deathGuarantee.Value.SumInsuredLimitOfIndemnity)
 		fmt.Println("[Life] setting guarantees duration")
 		calculateGuaranteeDuration(data.Assets, contractorAge, deathGuarantee.Value.Duration.Year)
+	case models.UserRoleAgent, models.UserRoleAgency:
+		guaranteesMap := data.GuaranteesToMap()
+		if guaranteesMap["death"].IsSelected {
+			guaranteesMap["permanent-disability"].Value.SumInsuredLimitOfIndemnity = math.Max(
+				guaranteesMap["permanent-disability"].Value.SumInsuredLimitOfIndemnity,
+				guaranteesMap["death"].Value.SumInsuredLimitOfIndemnity)
+
+			guaranteesMap["serious-ill"].Value.SumInsuredLimitOfIndemnity = math.Min(guaranteesMap["serious-ill"].
+				Value.SumInsuredLimitOfIndemnity, guaranteesMap["death"].Value.SumInsuredLimitOfIndemnity*0.5)
+		} else if guaranteesMap["permanent-disability"].IsSelected {
+			guaranteesMap["serious-ill"].Value.SumInsuredLimitOfIndemnity = math.Min(guaranteesMap["serious-ill"].
+				Value.SumInsuredLimitOfIndemnity, guaranteesMap["permanent-disability"].Value.
+				SumInsuredLimitOfIndemnity*0.5)
+		}
+
+		guaranteesList := make([]models.Guarante, 0)
+		for _, guarantee := range guaranteesMap {
+			guaranteesList = append(guaranteesList, guarantee)
+		}
+
+		data.Assets[0].Guarantees = guaranteesList
 	}
 
 	updatePolicyStartEndDate(&data)
@@ -84,7 +103,7 @@ func Life(role string, data models.Policy) (models.Policy, error) {
 
 			calculateGuaranteePrices(guarantee, baseFloat, taxFloat, *ruleProduct)
 
-			if originalPolicy.HasGuarantee(guarantee.Slug) && guarantee.IsSellable {
+			if guarantee.IsSelected && guarantee.IsSellable {
 				calculateOfferPrices(data, guarantee)
 			}
 		}
@@ -99,14 +118,11 @@ func Life(role string, data models.Policy) (models.Policy, error) {
 
 	roundOfferPrices(data.OffersPrices)
 
-	return data, err
-}
+	sort.Slice(data.Assets[0].Guarantees, func(i, j int) bool {
+		return data.Assets[0].Guarantees[i].Order < data.Assets[0].Guarantees[j].Order
+	})
 
-func copyPolicy(data models.Policy) models.Policy {
-	var originalPolicy models.Policy
-	originalPolicyBytes, _ := json.Marshal(data)
-	json.Unmarshal(originalPolicyBytes, &originalPolicy)
-	return originalPolicy
+	return data, err
 }
 
 func addDefaultGuarantees(data models.Policy, product models.Product) {
@@ -159,7 +175,9 @@ func calculateGuaranteeDuration(assets []models.Asset, contractorAge int, deathD
 }
 
 func updatePolicyStartEndDate(policy *models.Policy) {
-	policy.StartDate = time.Now().UTC()
+	if policy.StartDate.IsZero() {
+		policy.StartDate = time.Now().UTC()
+	}
 	maxDuration := 0
 	for _, guarantee := range policy.Assets[0].Guarantees {
 		if guarantee.Value.Duration.Year > maxDuration {
@@ -172,12 +190,9 @@ func updatePolicyStartEndDate(policy *models.Policy) {
 func getGuaranteeSubtitle(assets []models.Asset) {
 	for assetIndex, asset := range assets {
 		for guaranteeIndex, guarantee := range asset.Guarantees {
-			if guarantee.Slug != "death" {
-				assets[assetIndex].Guarantees[guaranteeIndex].Subtitle = fmt.Sprintf("Durata: %d anni - Capitale: %s€",
-					guarantee.Value.Duration.Year, humanize.FormatFloat("#.###,", guarantee.Value.SumInsuredLimitOfIndemnity))
-			} else {
-				assets[assetIndex].Guarantees[guaranteeIndex].Subtitle = "per qualsiasi causa"
-			}
+			assets[assetIndex].Guarantees[guaranteeIndex].Subtitle = fmt.Sprintf("Durata: %d anni - "+
+				"Capitale: %s€", guarantee.Value.Duration.Year, humanize.FormatFloat("#.###,",
+				guarantee.Value.SumInsuredLimitOfIndemnity))
 		}
 	}
 }
