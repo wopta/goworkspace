@@ -4,6 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/dustin/go-humanize"
+	"github.com/mohae/deepcopy"
+	lib "github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/sellable"
 	"io"
 	"modernc.org/mathutil"
@@ -11,9 +14,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	lib "github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
 )
 
 func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -41,7 +41,7 @@ func Life(role string, data models.Policy) (models.Policy, error) {
 	_, ruleProduct, err := sellable.Life(role, data)
 	lib.CheckError(err)
 
-	originalPolicy := copyPolicy(data)
+	originalPolicy := deepcopy.Copy(data).(models.Policy)
 
 	addDefaultGuarantees(data, *ruleProduct)
 
@@ -102,13 +102,6 @@ func Life(role string, data models.Policy) (models.Policy, error) {
 	return data, err
 }
 
-func copyPolicy(data models.Policy) models.Policy {
-	var originalPolicy models.Policy
-	originalPolicyBytes, _ := json.Marshal(data)
-	json.Unmarshal(originalPolicyBytes, &originalPolicy)
-	return originalPolicy
-}
-
 func addDefaultGuarantees(data models.Policy, product models.Product) {
 	guaranteeList := make([]models.Guarante, 0)
 
@@ -159,7 +152,9 @@ func calculateGuaranteeDuration(assets []models.Asset, contractorAge int, deathD
 }
 
 func updatePolicyStartEndDate(policy *models.Policy) {
-	policy.StartDate = time.Now().UTC()
+	if policy.StartDate.IsZero() {
+		policy.StartDate = time.Now().UTC()
+	}
 	maxDuration := 0
 	for _, guarantee := range policy.Assets[0].Guarantees {
 		if guarantee.Value.Duration.Year > maxDuration {
@@ -172,12 +167,9 @@ func updatePolicyStartEndDate(policy *models.Policy) {
 func getGuaranteeSubtitle(assets []models.Asset) {
 	for assetIndex, asset := range assets {
 		for guaranteeIndex, guarantee := range asset.Guarantees {
-			if guarantee.Slug != "death" {
-				assets[assetIndex].Guarantees[guaranteeIndex].Subtitle = fmt.Sprintf("Durata: %d anni - Capitale: %s€",
-					guarantee.Value.Duration.Year, humanize.FormatFloat("#.###,", guarantee.Value.SumInsuredLimitOfIndemnity))
-			} else {
-				assets[assetIndex].Guarantees[guaranteeIndex].Subtitle = "per qualsiasi causa"
-			}
+			assets[assetIndex].Guarantees[guaranteeIndex].Subtitle = fmt.Sprintf("Durata: %d anni - "+
+				"Capitale: %s€", guarantee.Value.Duration.Year, humanize.FormatFloat("#.###,",
+				guarantee.Value.SumInsuredLimitOfIndemnity))
 		}
 	}
 }
