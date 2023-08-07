@@ -130,6 +130,7 @@ func addDefaultGuarantees(data models.Policy, product models.Product) {
 
 	for _, guarantee := range data.Assets[0].Guarantees {
 		product.Companies[0].GuaranteesMap[guarantee.Slug].Value = guarantee.Value
+		product.Companies[0].GuaranteesMap[guarantee.Slug].IsSelected = guarantee.IsSelected
 	}
 
 	for _, guarantee := range product.Companies[0].GuaranteesMap {
