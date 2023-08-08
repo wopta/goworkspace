@@ -49,6 +49,12 @@ func Document(w http.ResponseWriter, r *http.Request) {
 				Method:  "POST",
 				Roles:   []string{models.UserRoleAll},
 			},
+			{
+				Route:   "reserved/v1",
+				Handler: ReservedFx,
+				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAll},
+			},
 		},
 	}
 	route.Router(w, r)
