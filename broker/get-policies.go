@@ -24,10 +24,10 @@ type GetPoliciesResp struct {
 func GetPoliciesFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		req        GetPoliciesReq
-		response   GetPoliciesResp
+		resp       GetPoliciesResp
 		limitValue = 10
 	)
-	log.Println("GetPolicies")
+	log.Println("[GetPolicies]")
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	err := json.Unmarshal(body, &req)
@@ -41,14 +41,26 @@ func GetPoliciesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		limitValue = req.Limit
 	}
 
-	firePolicy := lib.GetDatasetByEnv(r.Header.Get("origin"), "policy")
+	resp.Policies, err = getPolicies(origin, req.Queries, limitValue)
+	if err != nil {
+		log.Println("[GetPolicies] query error: ", err.Error())
+		return "", nil, err
+	}
+	log.Printf("[GetPolicies]: found %d policies", len(resp.Policies))
+
+	jsonOut, err := json.Marshal(resp)
+	return string(jsonOut), resp, err
+}
+
+func getPolicies(origin string, queries []models.Query, limitValue int) ([]models.Policy, error) {
+	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 
 	fireQueries := lib.Firequeries{
 		Queries: make([]lib.Firequery, 0),
 	}
 
-	for index, q := range req.Queries {
-		log.Printf("query %d/%d field: \"%s\" op: \"%s\" value: \"%v\"", index+1, len(req.Queries), q.Field, q.Op, q.Value)
+	for index, q := range queries {
+		log.Printf("query %d/%d field: \"%s\" op: \"%s\" value: \"%v\"", index+1, len(queries), q.Field, q.Op, q.Value)
 		value := q.Value
 		if q.Type == "dateTime" {
 			value, _ = time.Parse(time.RFC3339, value.(string))
@@ -60,14 +72,6 @@ func GetPoliciesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		})
 	}
 
-	docsnap, err := fireQueries.FirestoreWhereLimitFields(firePolicy, limitValue)
-	if err != nil {
-		return "", nil, err
-	}
-
-	response.Policies = models.PolicyToListData(docsnap)
-	log.Printf("GetPolicies: found %d policies", len(response.Policies))
-
-	jsonOut, err := json.Marshal(response)
-	return string(jsonOut), response, err
+	docSnap, err := fireQueries.FirestoreWhereLimitFields(firePolicy, limitValue)
+	return models.PolicyToListData(docSnap), err
 }

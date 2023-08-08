@@ -95,6 +95,12 @@ func Broker(w http.ResponseWriter, r *http.Request) {
 				Method:  http.MethodPut,
 				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},
+			{
+				Route:   "/policies/auth/v1",
+				Handler: GetPoliciesByAuthFx,
+				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAgent, models.UserRoleAgency},
+			},
 		},
 	}
 	route.Router(w, r)
