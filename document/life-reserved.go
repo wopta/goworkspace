@@ -11,10 +11,6 @@ import (
 )
 
 func LifeReserved(pdf *fpdf.Fpdf, origin string, policy models.Policy) (string, []byte) {
-	var (
-	//cfpi, expiryInfo string
-	)
-
 	log.Println("[LifeReserved]")
 
 	lifeReservedFooter(pdf)
@@ -115,7 +111,7 @@ func lifeReservedHeader(pdf *fpdf.Fpdf, policy models.Policy) {
 
 func lifeReservedFooter(pdf *fpdf.Fpdf) {
 	pdf.SetFooterFunc(func() {
-		pdf.SetY(-7)
+		pdf.SetY(-8)
 		pageNumber(pdf)
 	})
 }
@@ -128,7 +124,7 @@ func insuranceLimitSection(pdf *fpdf.Fpdf) {
 		"Malattie Gravi: 65 anni a scadenza - max 100.000 euro"
 
 	setBlackBoldFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3, text, "", fpdf.AlignLeft, false)
+	pdf.MultiCell(0, 3.5, text, "", fpdf.AlignLeft, false)
 	pdf.Ln(5)
 }
 
