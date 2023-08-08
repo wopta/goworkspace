@@ -41,7 +41,7 @@ func loadCustomFonts(pdf *fpdf.Fpdf) {
 	pdf.AddUTF8Font("Montserrat", "I", lib.GetAssetPathByEnv(basePath)+"/montserrat_italic.ttf")
 }
 
-func save(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
+func saveContract(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 	var filename string
 	if os.Getenv("env") == "local" {
 		err := pdf.OutputFileAndClose(basePath + "/contract.pdf")
@@ -53,6 +53,24 @@ func save(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 		now := time.Now()
 		timestamp := strconv.FormatInt(now.Unix(), 10)
 		filename = "temp/" + policy.Uid + "/" + policy.Contractor.Name + "_" + policy.Contractor.Surname + "_" + timestamp + "_contract.pdf"
+		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, out.Bytes())
+		lib.CheckError(err)
+		return filename, out.Bytes()
+	}
+	return filename, nil
+}
+
+func saveReservedDocument(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
+	var filename string
+	if os.Getenv("env") == "local" {
+		err := pdf.OutputFileAndClose(basePath + "/reserved_document.pdf")
+		lib.CheckError(err)
+	} else {
+		var out bytes.Buffer
+		err := pdf.Output(&out)
+		lib.CheckError(err)
+		filename = "assets/users/" + policy.Contractor.
+			Uid + "/" + policy.NameDesc + "_" + policy.Uid + "_reserved_document.pdf"
 		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, out.Bytes())
 		lib.CheckError(err)
 		return filename, out.Bytes()

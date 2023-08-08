@@ -21,6 +21,14 @@ func mainHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 	policyStartDate := policy.StartDate.In(location)
 	policyEndDate := policy.EndDate.In(location)
 
+	if policy.PaymentSplit == string(models.PaySplitMonthly) {
+		expiryInfo = "Prima scandenza mensile il: " +
+			policyStartDate.AddDate(0, 1, 0).Format(dateLayout) + "\n"
+	} else if policy.PaymentSplit == string(models.PaySplitYear) {
+		expiryInfo = "Prima scadenza annuale il: " +
+			policyStartDate.AddDate(1, 0, 0).Format(dateLayout) + "\n"
+	}
+
 	policyInfo := "Numero: " + policy.CodeCompany + "\n" +
 		"Decorre dal: " + policyStartDate.Format(dateLayout) + " ore 24:00\n" +
 		"Scade il: " + policyEndDate.In(location).Format(dateLayout) + " ore 24:00\n"
@@ -53,14 +61,6 @@ func mainHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 		cfpi = contractor.FiscalCode
 	} else {
 		cfpi = contractor.VatCode
-	}
-
-	if policy.PaymentSplit == string(models.PaySplitMonthly) {
-		expiryInfo = "Prima scandenza mensile il: " +
-			policyStartDate.AddDate(0, 1, 0).Format(dateLayout) + "\n"
-	} else if policy.PaymentSplit == string(models.PaySplitYear) {
-		expiryInfo = "Prima scadenza annuale il: " +
-			policyStartDate.AddDate(1, 0, 0).Format(dateLayout) + "\n"
 	}
 
 	contractorInfo := "Contraente: " + strings.ToUpper(contractor.Surname+" "+contractor.Name+"\n"+

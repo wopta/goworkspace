@@ -70,7 +70,7 @@ func GapSogessur(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, 
 
 	personalDataHandlingSection(pdf, policy)
 
-	filename, out := save(pdf, policy)
+	filename, out := saveContract(pdf, policy)
 	return filename, out
 }
 
