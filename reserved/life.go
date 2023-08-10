@@ -11,17 +11,6 @@ import (
 	"strings"
 )
 
-type Contact struct {
-	ContactType string `json:"contactType"`
-	Address     string `json:"address"`
-	Object      string `json:"object,omitempty"`
-}
-
-type LifeReservedResp struct {
-	Documents []string  `json:"documents"`
-	Contacts  []Contact `json:"contacts"`
-}
-
 func LifeReservedFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	const (
 		rulesFileName = "life-reserved.json"
@@ -36,9 +25,10 @@ func LifeReservedFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	err = json.Unmarshal(lib.ErrorByte(io.ReadAll(r.Body)), &policy)
 	lib.CheckError(err)
 
-	resp := &LifeReservedResp{
-		Documents: make([]string, 0),
-		Contacts:  getContactsDetails(policy),
+	resp := &models.Reserved{
+		MedicalDocuments:  make([]string, 0),
+		Contacts:          getContactsDetails(policy),
+		DownloadDocuments: make([]models.Attachment, 0),
 	}
 
 	fx := new(models.Fx)
@@ -46,14 +36,14 @@ func LifeReservedFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 
 	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, resp, getInputData(policy), nil)
 
-	resp = ruleOutput.(*LifeReservedResp)
+	resp = ruleOutput.(*models.Reserved)
 	jsonOut, err := json.Marshal(resp)
 
 	return string(jsonOut), resp, err
 }
 
-func getContactsDetails(policy models.Policy) []Contact {
-	return []Contact{
+func getContactsDetails(policy models.Policy) []models.Contact {
+	return []models.Contact{
 		{
 			ContactType: "e-mail",
 			Address:     "clp.it.sinistri@partners.axa",
