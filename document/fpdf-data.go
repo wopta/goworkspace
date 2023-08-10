@@ -42,7 +42,7 @@ func loadLifeBeneficiariesInfo(policy *models.Policy) ([]map[string]string, stri
 	deathGuarantee, err := policy.ExtractGuarantee("death")
 	lib.CheckError(err)
 
-	if deathGuarantee.Beneficiaries != nil && !(*deathGuarantee.Beneficiaries)[0].IsLegitimateSuccessors {
+	if deathGuarantee.Beneficiaries != nil && (*deathGuarantee.Beneficiaries)[0].BeneficiaryType != "legalAndWillSuccessors" {
 		legitimateSuccessorsChoice = ""
 		designatedSuccessorsChoice = "X"
 
