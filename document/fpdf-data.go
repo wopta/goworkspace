@@ -20,13 +20,13 @@ func loadLifeBeneficiariesInfo(policy *models.Policy) ([]map[string]string, stri
 	designatedSuccessorsChoice := ""
 	beneficiaries := []map[string]string{
 		{
-			"name":       "=====",
-			"fiscalCode": "=====",
-			"address":    "=====",
-			"mail":       "=====",
-			"phone":      "=====",
-			"relation":   "=====",
-			"consent":    "=====",
+			"name":           "=====",
+			"fiscalCode":     "=====",
+			"address":        "=====",
+			"mail":           "=====",
+			"phone":          "=====",
+			"relation":       "=====",
+			"contactConsent": "=====",
 		},
 		{
 			"name":           "=====",
