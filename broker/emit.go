@@ -78,8 +78,8 @@ func Emit(policy *models.Policy, origin string) (EmitResponse, error) {
 		err          error
 	)
 
-	firePolicy := lib.GetDatasetByEnv(origin, "policy")
-	guaranteFire := lib.GetDatasetByEnv(origin, "guarante")
+	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
+	fireGuarantee := lib.GetDatasetByEnv(origin, models.GuaranteeCollection)
 
 	emitType := getEmitTypeFromPolicy(policy)
 	switch emitType {
@@ -114,7 +114,7 @@ func Emit(policy *models.Policy, origin string) (EmitResponse, error) {
 	mail.SendMailSign(*policy)
 
 	policy.BigquerySave(origin)
-	models.SetGuaranteBigquery(*policy, "emit", guaranteFire)
+	models.SetGuaranteBigquery(*policy, "emit", fireGuarantee)
 
 	return responseEmit, nil
 }
@@ -141,7 +141,7 @@ func emitApproval(policy *models.Policy) {
 
 func emitBase(policy *models.Policy, origin string) {
 	log.Printf("[EmitBase] Policy Uid %s", policy.Uid)
-	firePolicy := lib.GetDatasetByEnv(origin, "policy")
+	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 	now := time.Now().UTC()
 
 	policy.CompanyEmit = true
