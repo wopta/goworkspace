@@ -12,6 +12,7 @@ import (
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/reserved"
 	tr "github.com/wopta/goworkspace/transaction"
 	"github.com/wopta/goworkspace/user"
 )
@@ -62,6 +63,8 @@ func EmitV2(policy *models.Policy, request EmitRequest, origin string) EmitRespo
 
 	if policy.IsReserved && policy.Status != models.PolicyStatusWaitForApproval {
 		emitApproval(policy)
+		policy.ReservedInfo = reserved.GetReservedInfo(*policy)
+		mail.SendMailReserved(*policy)
 	} else {
 		log.Println("[EmitFxV2] AgencyUid: ", policy.AgencyUid)
 
@@ -77,11 +80,12 @@ func EmitV2(policy *models.Policy, request EmitRequest, origin string) EmitRespo
 		}
 
 	}
-	responseEmit = EmitResponse{UrlPay: policy.PayUrl, UrlSign: policy.SignUrl}
+	responseEmit = EmitResponse{UrlPay: policy.PayUrl, UrlSign: policy.SignUrl, ReservedInfo: policy.ReservedInfo}
 	policyJson, _ := policy.Marshal()
 	log.Printf("[EmitV2] Policy %s: %s", request.Uid, string(policyJson))
 	policy.Updated = time.Now().UTC()
-	lib.SetFirestore(firePolicy, request.Uid, policy)
+	err := lib.SetFirestoreErr(firePolicy, request.Uid, policy)
+	lib.CheckError(err)
 	policy.BigquerySave(origin)
 	models.SetGuaranteBigquery(*policy, "emit", fireGuarantee)
 

@@ -24,9 +24,10 @@ const (
 )
 
 type EmitResponse struct {
-	UrlPay  string `firestore:"urlPay,omitempty" json:"urlPay,omitempty"`
-	UrlSign string `firestore:"urlSign,omitempty" json:"urlSign,omitempty"`
-	Uid     string `firestore:"uid,omitempty" json:"uid,omitempty"`
+	UrlPay       string               `firestore:"urlPay,omitempty" json:"urlPay,omitempty"`
+	UrlSign      string               `firestore:"urlSign,omitempty" json:"urlSign,omitempty"`
+	Uid          string               `firestore:"uid,omitempty" json:"uid,omitempty"`
+	ReservedInfo *models.ReservedInfo `json:"reservedInfo,omitempty" firestore:"reservedInfo,omitempty"`
 }
 
 type EmitRequest struct {
