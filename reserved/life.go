@@ -1,58 +1,47 @@
 package reserved
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/wopta/goworkspace/document"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	"io"
 	"log"
-	"net/http"
 	"strings"
 )
 
-func LifeReservedFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	const (
-		rulesFileName = "life-reserved.json"
-	)
-	var (
-		policy models.Policy
-		err    error
-	)
-
+func LifeReserved(policy models.Policy) models.ReservedInfo {
 	log.Println("[LifeReserved]")
 
-	err = json.Unmarshal(lib.ErrorByte(io.ReadAll(r.Body)), &policy)
-	lib.CheckError(err)
+	requiredExams := getMedicalDocuments(policy)
+	contacts := getContactsDetails(policy)
+	documents := getReservedDocument(contacts, requiredExams, policy)
 
-	resp := &models.Reserved{
-		MedicalDocuments:  make([]string, 0),
-		Contacts:          getContactsDetails(policy),
-		DownloadDocuments: make([]models.Attachment, 0),
+	reservedInfo := models.ReservedInfo{
+		RequiredExams: requiredExams,
+		Contacts:      contacts,
+		Documents:     documents,
 	}
 
-	fx := new(models.Fx)
-	rulesFile := lib.GetRulesFile(rulesFileName)
-
-	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, resp, getInputData(policy), nil)
-
-	resp = ruleOutput.(*models.Reserved)
-	jsonOut, err := json.Marshal(resp)
-
-	return string(jsonOut), resp, err
+	return reservedInfo
 }
 
 func getContactsDetails(policy models.Policy) []models.Contact {
+	// TODO: check if we can put these info in product file
 	return []models.Contact{
 		{
-			ContactType: "e-mail",
-			Address:     "clp.it.sinistri@partners.axa",
-			Object: fmt.Sprintf("%s proposta %d - UNDERWRITING MEDICO - %s", policy.NameDesc, policy.ProposalNumber,
-				strings.ToUpper(policy.Contractor.Surname+" "+policy.Contractor.Name)),
+			Title:   "Tramite Posta a:",
+			Type:    "post",
+			Address: "AXA PARTNERS",
+			Object:  "Ufficio Underwriting Medico – Corso Como n. 17 – 20154 MILANO",
 		},
 		{
-			ContactType: "posta",
-			Address:     "AXA PARTNERS Ufficio Underwriting Medico – Corso Como n. 17 – 20154 MILANO",
+			Title:   "Tramite e-mail:",
+			Type:    "e-mail",
+			Address: "clp.it.sinistri@partners.axa",
+			Object: fmt.Sprintf("Oggetto: %s proposta %d - UNDERWRITING MEDICO - %s", policy.NameDesc, policy.ProposalNumber,
+				strings.ToUpper(policy.Contractor.Surname+" "+policy.Contractor.Name)),
 		},
 	}
 }
@@ -76,4 +65,46 @@ func getInputData(policy models.Policy) []byte {
 	lib.CheckError(err)
 
 	return out
+}
+
+func getMedicalDocuments(policy models.Policy) []string {
+	const (
+		rulesFileName = "life-reserved.json"
+	)
+
+	fx := new(models.Fx)
+	reservedInfo := &models.ReservedInfo{
+		RequiredExams: make([]string, 0),
+	}
+
+	rulesFile := lib.GetRulesFile(rulesFileName)
+
+	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, reservedInfo, getInputData(policy), nil)
+
+	return ruleOutput.(*models.ReservedInfo).RequiredExams
+}
+
+func getReservedDocument(contacts []models.Contact, medicalDocuments []string, policy models.Policy) []models.Attachment {
+	attachments := make([]models.Attachment, 0)
+
+	gsLink, b := document.LifeReserved(contacts, medicalDocuments, policy)
+
+	attachments = append(attachments, models.Attachment{
+		Name:        fmt.Sprintf("%s_proposta_%d_rvm_istruzioni.pdf", policy.NameDesc, policy.ProposalNumber),
+		Link:        gsLink,
+		Byte:        base64.StdEncoding.EncodeToString(b),
+		ContentType: "application/pdf",
+	})
+
+	rvmLink := "medical-report/" + policy.Name + "/" + policy.ProductVersion + "/rvm-life.pdf"
+	b = lib.GetFromStorage("documents-public-dev", rvmLink, "")
+
+	attachments = append(attachments, models.Attachment{
+		Name:        fmt.Sprintf("%s_proposta_%d_rvm.pdf", policy.NameDesc, policy.ProposalNumber),
+		Link:        fmt.Sprintf("gs://documents-public-dev/%s", rvmLink),
+		Byte:        base64.StdEncoding.EncodeToString(b),
+		ContentType: "application/pdf",
+	})
+
+	return attachments
 }

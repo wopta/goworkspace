@@ -61,21 +61,23 @@ func saveContract(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 }
 
 func saveReservedDocument(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
-	var filename string
-	if os.Getenv("env") == "local" {
-		err := pdf.OutputFileAndClose(basePath + "/reserved_document.pdf")
-		lib.CheckError(err)
-	} else {
-		var out bytes.Buffer
-		err := pdf.Output(&out)
-		lib.CheckError(err)
-		filename = "assets/users/" + policy.Contractor.
-			Uid + "/" + policy.NameDesc + "_" + policy.Uid + "_reserved_document.pdf"
-		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, out.Bytes())
-		lib.CheckError(err)
-		return filename, out.Bytes()
-	}
-	return filename, nil
+	var (
+		gsLink string
+		out    bytes.Buffer
+	)
+
+	err := pdf.Output(&out)
+	lib.CheckError(err)
+
+	now := time.Now()
+	timestamp := strconv.FormatInt(now.Unix(), 10)
+	filename := "temp/" + policy.Uid + "/" + policy.Contractor.Name + "_" + policy.Contractor.Surname + "_" +
+		timestamp + "_reserved_document.pdf"
+	gsLink = lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, out.Bytes())
+	lib.CheckError(err)
+
+	return gsLink, out.Bytes()
+
 }
 
 func pageNumber(pdf *fpdf.Fpdf) {

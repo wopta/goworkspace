@@ -10,8 +10,10 @@ import (
 	"time"
 )
 
-func LifeReserved(pdf *fpdf.Fpdf, origin string, policy models.Policy) (string, []byte) {
+func LifeReserved(contacts []models.Contact, medicalDocuments []string, policy models.Policy) (string, []byte) {
 	log.Println("[LifeReserved]")
+
+	pdf := initFpdf()
 
 	lifeReservedFooter(pdf)
 
@@ -27,10 +29,10 @@ func LifeReserved(pdf *fpdf.Fpdf, origin string, policy models.Policy) (string, 
 
 	insuranceLimitSection(pdf)
 
-	instructionsSection(pdf, policy)
+	instructionsSection(pdf, contacts, medicalDocuments, policy)
 
-	filename, out := saveReservedDocument(pdf, &policy)
-	return filename, out
+	gsLink, out := saveReservedDocument(pdf, &policy)
+	return gsLink, out
 }
 
 func lifeReservedHeader(pdf *fpdf.Fpdf, policy models.Policy) {
@@ -81,9 +83,9 @@ func lifeReservedHeader(pdf *fpdf.Fpdf, policy models.Policy) {
 			Name), cfpi, strings.ToUpper(address), contractor.Mail, contractor.Phone)
 
 	opt.ImageType = "png"
-	pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/axa/logo.png", 180, 15, 0, 20,
+	pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/axa/logo.png", 180, 10, 0, 15,
 		false, opt, 0, "")
-	pdf.SetY(pdf.GetY() + 22)
+	pdf.SetY(pdf.GetY() + 18)
 
 	setBlackBoldFont(pdf, 20)
 	pdf.MultiCell(0, 3, "RAPPORTO DI VISITA MEDICA", "", fpdf.AlignCenter, false)
@@ -106,7 +108,7 @@ func lifeReservedHeader(pdf *fpdf.Fpdf, policy models.Policy) {
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.SetXY(-90, pdf.GetY()+3)
 	pdf.MultiCell(0, 3.5, contractorInfo, "", "", false)
-	pdf.Ln(10)
+	pdf.Ln(6)
 }
 
 func lifeReservedFooter(pdf *fpdf.Fpdf) {
@@ -128,7 +130,7 @@ func insuranceLimitSection(pdf *fpdf.Fpdf) {
 	pdf.Ln(5)
 }
 
-func instructionsSection(pdf *fpdf.Fpdf, policy models.Policy) {
+func instructionsSection(pdf *fpdf.Fpdf, contacts []models.Contact, medicalDocuments []string, policy models.Policy) {
 	setBlackDrawColor(pdf)
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3.5, "", "LTR", fpdf.AlignCenter, false)
@@ -136,44 +138,34 @@ func instructionsSection(pdf *fpdf.Fpdf, policy models.Policy) {
 		"schede “dati Polizza”,\n“Questionario Medico” e “Antiriciclaggio” compilate e sottoscritte in ogni sua parte, "+
 		"alternativamente a:", "LR", fpdf.AlignCenter, false)
 
-	setBlackBoldFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3.5, "", "LR", fpdf.AlignCenter, false)
-	pdf.MultiCell(0, 3.5, "", "LR", fpdf.AlignCenter, false)
-	pdf.MultiCell(0, 3.5, "Tramite Posta a:", "LR", fpdf.AlignCenter, false)
-	setBlackRegularFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3.5, "AXA PARTNERS", "LR", fpdf.AlignCenter, false)
-	pdf.MultiCell(0, 3.5, "Ufficio Underwriting Medico – Corso Como n. 17 – 20154 MILANO",
-		"LR", fpdf.AlignCenter,
-		false)
-	setBlackBoldFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3.5, "", "LR", fpdf.AlignCenter, false)
-	pdf.MultiCell(0, 3.5, "", "LR", fpdf.AlignCenter, false)
-	pdf.MultiCell(0, 3.5, "Tramite e-mail:", "LR", fpdf.AlignCenter,
-		false)
-	setBlackRegularFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3.5, fmt.Sprintf("clp.it.sinistri@partners."+
-		"axa – oggetto dell’email: %s %d –\nUNDERWRITING MEDICO – %s %s", policy.NameDesc,
-		policy.ProposalNumber, strings.ToUpper(policy.Contractor.Surname), strings.ToUpper(policy.Contractor.Name)), "LR",
-		fpdf.AlignCenter, false)
+	for _, contact := range contacts {
+		setBlackBoldFont(pdf, standardTextSize)
+		pdf.MultiCell(0, 3.5, "", "LR", fpdf.AlignCenter, false)
+		pdf.MultiCell(0, 3.5, "", "LR", fpdf.AlignCenter, false)
+		pdf.MultiCell(0, 3.5, contact.Title, "LR", fpdf.AlignCenter, false)
+		setBlackRegularFont(pdf, standardTextSize)
+		pdf.MultiCell(0, 3.5, contact.Address, "LR", fpdf.AlignCenter, false)
+		pdf.MultiCell(0, 3.5, contact.Object,
+			"LR", fpdf.AlignCenter,
+			false)
+	}
 
-	setBlackBoldFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3.5, "", "LR", fpdf.AlignCenter, false)
-	pdf.MultiCell(0, 3.5, "", "LR", fpdf.AlignCenter, false)
-	pdf.MultiCell(0, 3.5, "In caso di capitali assicurati tra i €400.000,00 ed €500.000,00 allegare "+
-		"altresì i seguenti esami medici:", "LR", fpdf.AlignLeft, false)
 	setBlackRegularFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3.5, "- Analisi del sangue: esame emocromocitometrico - piastrine - Velocità di eritro"+
-		" sedimentazione – Glicemia – creatinina – uricemia - colesterolo totale - HDL ("+
-		"Lipoproteine ad alta densità) - LDL (Lipoproteine a bassa densità) – trigliceridi - transaminasi GOT/GPT"+
-		" - Gammaglutammiltransferasi - anticorpi anti HIV 1 e 2 - sierologia epatite virale B ("+
-		"antigeni HB – anti-HBs – anti HBc) - sierologia epatite virale C (anti VHC), Hba1c;", "LR",
-		fpdf.AlignLeft, false)
-	pdf.MultiCell(0, 3.5, "- Esame cardiovascolare con resoconto medico; ", "LR",
-		fpdf.AlignLeft, false)
-	pdf.MultiCell(0, 3.5, "- Elettrocardiogramma;", "LR", fpdf.AlignLeft, false)
-	pdf.MultiCell(0, 3.5, "- Analisi del PSA (semenogelasi/antigene prostatico specifico) "+
-		"esclusivamente per gli uomini la cui età all’Adesione supera i 50 anni.", "LR",
-		fpdf.AlignLeft, false)
-	pdf.MultiCell(0, 3.5, "", "LBR",
-		fpdf.AlignLeft, false)
+	pdf.MultiCell(0, 3.5, "", "LR", fpdf.AlignCenter, false)
+	pdf.MultiCell(0, 3.5, "", "LR", fpdf.AlignCenter, false)
+	pdf.MultiCell(0, 3.5, fmt.Sprintf("1 - %s", medicalDocuments[0]), "LR", fpdf.AlignLeft, false)
+	pdf.MultiCell(0, 3.5, "", "LR", fpdf.AlignCenter, false)
+
+	if len(medicalDocuments) > 1 {
+		setBlackBoldFont(pdf, standardTextSize)
+		pdf.MultiCell(0, 3.5, "In caso di capitali assicurati tra i €400.000,00 ed €500.000,00 allegare "+
+			"altresì i seguenti esami medici:", "LR", fpdf.AlignLeft, false)
+
+		for index, medicalDocument := range medicalDocuments[1:] {
+			setBlackRegularFont(pdf, standardTextSize)
+			pdf.MultiCell(0, 3.5, fmt.Sprintf("%d - %s", index+2, medicalDocument), "LR", fpdf.AlignLeft, false)
+		}
+	}
+
+	pdf.MultiCell(0, 3.5, "", "LBR", fpdf.AlignLeft, false)
 }
