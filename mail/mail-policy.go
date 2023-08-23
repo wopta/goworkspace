@@ -15,6 +15,7 @@ const (
 	payTemplateType      = "pay"
 	signTemplateType     = "sign"
 	emittedTemplateType  = "emitted"
+	reservedTemplateType = "reserved"
 )
 
 func GetMailPolicy(policy *models.Policy, subject string, isLink bool, cc, link, linkLabel, message string, isAttachment bool, at *[]Attachment) MailRequest {
@@ -192,4 +193,50 @@ func SendMailContract(policy models.Policy, at *[]Attachment) {
 			at,
 		),
 	)
+}
+
+func SendMailReserved(policy models.Policy) {
+	var (
+		at       []Attachment
+		bodyData = BodyData{}
+	)
+
+	channel := getChannel(policy)
+
+	cc := setBodyDataAndGetCC(channel, policy, &bodyData)
+
+	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", channel, emittedTemplateType))
+
+	messageBody := fillTemplate(templateFile, &bodyData)
+
+	for _, attachment := range policy.ReservedInfo.Documents {
+		at = append(at, Attachment{
+			Name:        attachment.Name,
+			Link:        attachment.Link,
+			Byte:        attachment.Byte,
+			FileName:    attachment.FileName,
+			MimeType:    attachment.MimeType,
+			Url:         attachment.Url,
+			ContentType: attachment.ContentType,
+		})
+	}
+
+	SendMail(
+		GetMailPolicy(
+			&policy,
+			fmt.Sprintf("Documenti Riservato %s proposta %d", policy.NameDesc, policy.ProposalNumber),
+			false,
+			cc,
+			"",
+			"",
+			messageBody,
+			true,
+			&at,
+		),
+	)
+
+	// TODO: find a better solution for this
+	for index, _ := range policy.ReservedInfo.Documents {
+		policy.ReservedInfo.Documents[index].Byte = ""
+	}
 }
