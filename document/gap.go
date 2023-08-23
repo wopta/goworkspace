@@ -206,7 +206,9 @@ func gapVehicleDataTable(pdf *fpdf.Fpdf, vehicle *models.Vehicle) {
 	pdf.MultiCell(0, 4, "- il valore di fattura se l’acquisto della polizza è contestuale all’acquisto "+
 		"del veicolo;", "LR", fpdf.AlignLeft, false)
 	pdf.MultiCell(0, 4, "- il valore commerciale al momento della sottoscrizione se l’acquisto della "+
-		"polizza è differito dall’acquisto del veicolo.", "BLR", fpdf.AlignLeft, false)
+		"polizza è differito dall’acquisto del veicolo.", "LR", fpdf.AlignLeft, false)
+	pdf.MultiCell(0, 4, "Per la definizione di contestuale vedere il Set Informativo", "BLR",
+		fpdf.AlignLeft, false)
 	pdf.Ln(5)
 }
 
