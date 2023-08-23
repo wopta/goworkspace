@@ -4,32 +4,25 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"log"
+	"strings"
+
 	"github.com/wopta/goworkspace/document"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	"log"
-	"strings"
 )
 
-func LifeReserved(policy models.Policy) models.ReservedInfo {
+func lifeReserved(policy *models.Policy) {
 	log.Println("[LifeReserved]")
 
-	requiredExams := getMedicalDocuments(policy)
-	contacts := getContactsDetails(policy)
-	documents := getReservedDocument(contacts, requiredExams, policy)
-
-	reservedInfo := models.ReservedInfo{
-		RequiredExams: requiredExams,
-		Contacts:      contacts,
-		Documents:     documents,
-	}
-
-	return reservedInfo
+	setContactsDetails(policy)
+	setMedicalDocuments(policy)
+	setReservedDocument(policy)
 }
 
-func getContactsDetails(policy models.Policy) []models.Contact {
+func setContactsDetails(policy *models.Policy) {
 	// TODO: check if we can put these info in product file
-	return []models.Contact{
+	policy.ReservedInfo.Contacts = []models.Contact{
 		{
 			Title:   "Tramite Posta a:",
 			Type:    "post",
@@ -46,7 +39,7 @@ func getContactsDetails(policy models.Policy) []models.Contact {
 	}
 }
 
-func getInputData(policy models.Policy) []byte {
+func getInputData(policy *models.Policy) []byte {
 	var err error
 
 	in := make(map[string]interface{})
@@ -67,9 +60,9 @@ func getInputData(policy models.Policy) []byte {
 	return out
 }
 
-func getMedicalDocuments(policy models.Policy) []string {
+func setMedicalDocuments(policy *models.Policy) {
 	const (
-		rulesFileName = "life-reserved.json"
+		rulesFileName = "life_reserved.json"
 	)
 
 	fx := new(models.Fx)
@@ -81,13 +74,13 @@ func getMedicalDocuments(policy models.Policy) []string {
 
 	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, reservedInfo, getInputData(policy), nil)
 
-	return ruleOutput.(*models.ReservedInfo).RequiredExams
+	policy.ReservedInfo.RequiredExams = ruleOutput.(*models.ReservedInfo).RequiredExams
 }
 
-func getReservedDocument(contacts []models.Contact, medicalDocuments []string, policy models.Policy) []models.Attachment {
+func setReservedDocument(policy *models.Policy) {
 	attachments := make([]models.Attachment, 0)
 
-	gsLink, b := document.LifeReserved(contacts, medicalDocuments, policy)
+	gsLink, b := document.LifeReserved(*policy)
 
 	attachments = append(attachments, models.Attachment{
 		Name:        fmt.Sprintf("%s_proposta_%d_rvm_istruzioni.pdf", policy.NameDesc, policy.ProposalNumber),
@@ -106,5 +99,5 @@ func getReservedDocument(contacts []models.Contact, medicalDocuments []string, p
 		ContentType: "application/pdf",
 	})
 
-	return attachments
+	policy.ReservedInfo.Documents = attachments
 }

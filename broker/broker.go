@@ -31,23 +31,15 @@ func Broker(w http.ResponseWriter, r *http.Request) {
 				Method:  http.MethodGet,
 				Roles:   []string{models.UserRoleAll},
 			},
-
 			{
 				Route:   "/v1/policy/proposal",
 				Handler: Proposal,
 				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAll},
 			},
-
 			{
 				Route:   "/v1/policy/emit",
-				Handler: EmitV2Fx,
-				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAll},
-			},
-			{
-				Route:   "/v1/policy/bpmn",
-				Handler: EmitV2Fx,
+				Handler: EmitFx,
 				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAll},
 			},
