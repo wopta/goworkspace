@@ -35,7 +35,7 @@ func GetMailPolicy(policy *models.Policy, subject string, isLink bool, cc, link,
 		name = "Vita"
 		linkForm += "vita/"
 	case "gap":
-		name = "GAP"
+		name = "Auto Valore Protetto"
 		// TODO: No page yet
 	}
 
