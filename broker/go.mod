@@ -8,14 +8,14 @@ require (
 	cloud.google.com/go v0.110.7
 	cloud.google.com/go/firestore v1.9.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.4
-	github.com/heimdalr/dag v1.2.1
 	github.com/wopta/goworkspace/bpmn v1.0.15
-	github.com/wopta/goworkspace/document v1.0.89
+	github.com/wopta/goworkspace/document v1.0.90
 	github.com/wopta/goworkspace/lib v1.0.66
-	github.com/wopta/goworkspace/mail v1.0.29
-	github.com/wopta/goworkspace/models v1.1.32
+	github.com/wopta/goworkspace/mail v1.0.30
+	github.com/wopta/goworkspace/models v1.1.33
 	github.com/wopta/goworkspace/payment v1.0.59
 	github.com/wopta/goworkspace/question v1.0.1
+	github.com/wopta/goworkspace/reserved v1.0.0
 	github.com/wopta/goworkspace/transaction v1.0.12
 	github.com/wopta/goworkspace/user v1.0.19
 	github.com/wopta/goworkspace/wiseproxy v1.0.3
@@ -78,8 +78,8 @@ require (
 	github.com/sergi/go-diff v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
-	github.com/wopta/goworkspace/policy v1.0.7 // indirect
-	github.com/wopta/goworkspace/product v1.0.33 // indirect
+	github.com/wopta/goworkspace/policy v1.0.8 // indirect
+	github.com/wopta/goworkspace/product v1.0.35 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
 	github.com/xuri/excelize/v2 v2.7.0 // indirect
