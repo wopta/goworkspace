@@ -215,7 +215,9 @@ func (policy *Policy) BigquerySave(origin string) {
 	policy.BigEndDate = civil.DateTimeOf(policy.EndDate)
 	policy.BigEmitDate = civil.DateTimeOf(policy.EmitDate)
 	policy.BigStatusHistory = strings.Join(policy.StatusHistory, ",")
-	policy.ReservedInfo.BigReasons = strings.Join(policy.ReservedInfo.Reasons, ",")
+	if policy.ReservedInfo != nil {
+		policy.ReservedInfo.BigReasons = strings.Join(policy.ReservedInfo.Reasons, ",")
+	}
 	log.Println(" policy save big query: " + policy.Uid)
 	e = lib.InsertRowsBigQuery(WoptaDataset, policyBig, policy)
 	log.Println(" policy save big query error: ", e)
