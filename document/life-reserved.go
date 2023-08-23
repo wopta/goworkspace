@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func LifeReserved(contacts []models.Contact, medicalDocuments []string, policy models.Policy) (string, []byte) {
+func LifeReserved(policy models.Policy) (string, []byte) {
 	log.Println("[LifeReserved]")
 
 	pdf := initFpdf()
@@ -29,7 +29,7 @@ func LifeReserved(contacts []models.Contact, medicalDocuments []string, policy m
 
 	insuranceLimitSection(pdf)
 
-	instructionsSection(pdf, contacts, medicalDocuments, policy)
+	instructionsSection(pdf, policy)
 
 	gsLink, out := saveReservedDocument(pdf, &policy)
 	return gsLink, out
@@ -78,7 +78,7 @@ func lifeReservedHeader(pdf *fpdf.Fpdf, policy models.Policy) {
 			policyStartDate.AddDate(1, 0, 0).Format(dateLayout) + "\n"
 	}
 
-	contractorInfo := fmt.Sprintf("Contraente: %s\nC.F./P.IVA%s\nIndirizzo: %s\nMail: %s\nTelefono: %s",
+	contractorInfo := fmt.Sprintf("Contraente: %s\nC.F./P.IVA: %s\nIndirizzo: %s\nMail: %s\nTelefono: %s",
 		strings.ToUpper(contractor.Surname+" "+contractor.
 			Name), cfpi, strings.ToUpper(address), contractor.Mail, contractor.Phone)
 
@@ -130,7 +130,7 @@ func insuranceLimitSection(pdf *fpdf.Fpdf) {
 	pdf.Ln(5)
 }
 
-func instructionsSection(pdf *fpdf.Fpdf, contacts []models.Contact, medicalDocuments []string, policy models.Policy) {
+func instructionsSection(pdf *fpdf.Fpdf, policy models.Policy) {
 	setBlackDrawColor(pdf)
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3.5, "", "LTR", fpdf.AlignCenter, false)
@@ -138,7 +138,7 @@ func instructionsSection(pdf *fpdf.Fpdf, contacts []models.Contact, medicalDocum
 		"schede “dati Polizza”,\n“Questionario Medico” e “Antiriciclaggio” compilate e sottoscritte in ogni sua parte, "+
 		"alternativamente a:", "LR", fpdf.AlignCenter, false)
 
-	for _, contact := range contacts {
+	for _, contact := range policy.ReservedInfo.Contacts {
 		setBlackBoldFont(pdf, standardTextSize)
 		pdf.MultiCell(0, 3.5, "", "LR", fpdf.AlignCenter, false)
 		pdf.MultiCell(0, 3.5, "", "LR", fpdf.AlignCenter, false)
@@ -153,15 +153,15 @@ func instructionsSection(pdf *fpdf.Fpdf, contacts []models.Contact, medicalDocum
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3.5, "", "LR", fpdf.AlignCenter, false)
 	pdf.MultiCell(0, 3.5, "", "LR", fpdf.AlignCenter, false)
-	pdf.MultiCell(0, 3.5, fmt.Sprintf("1 - %s", medicalDocuments[0]), "LR", fpdf.AlignLeft, false)
+	pdf.MultiCell(0, 3.5, fmt.Sprintf("1 - %s", policy.ReservedInfo.RequiredExams[0]), "LR", fpdf.AlignLeft, false)
 	pdf.MultiCell(0, 3.5, "", "LR", fpdf.AlignCenter, false)
 
-	if len(medicalDocuments) > 1 {
+	if len(policy.ReservedInfo.RequiredExams) > 1 {
 		setBlackBoldFont(pdf, standardTextSize)
 		pdf.MultiCell(0, 3.5, "In caso di capitali assicurati tra i €400.000,00 ed €500.000,00 allegare "+
 			"altresì i seguenti esami medici:", "LR", fpdf.AlignLeft, false)
 
-		for index, medicalDocument := range medicalDocuments[1:] {
+		for index, medicalDocument := range policy.ReservedInfo.RequiredExams[1:] {
 			setBlackRegularFont(pdf, standardTextSize)
 			pdf.MultiCell(0, 3.5, fmt.Sprintf("%d - %s", index+2, medicalDocument), "LR", fpdf.AlignLeft, false)
 		}
