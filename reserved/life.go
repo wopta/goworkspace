@@ -34,13 +34,13 @@ func getContactsDetails(policy models.Policy) []models.Contact {
 			Title:   "Tramite Posta a:",
 			Type:    "post",
 			Address: "AXA PARTNERS",
-			Object:  "Ufficio Underwriting Medico – Corso Como n. 17 – 20154 MILANO",
+			Subject: "Ufficio Underwriting Medico – Corso Como n. 17 – 20154 MILANO",
 		},
 		{
 			Title:   "Tramite e-mail:",
 			Type:    "e-mail",
 			Address: "clp.it.sinistri@partners.axa",
-			Object: fmt.Sprintf("Oggetto: %s proposta %d - UNDERWRITING MEDICO - %s", policy.NameDesc, policy.ProposalNumber,
+			Subject: fmt.Sprintf("Oggetto: %s proposta %d - UNDERWRITING MEDICO - %s", policy.NameDesc, policy.ProposalNumber,
 				strings.ToUpper(policy.Contractor.Surname+" "+policy.Contractor.Name)),
 		},
 	}

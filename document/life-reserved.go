@@ -145,7 +145,7 @@ func instructionsSection(pdf *fpdf.Fpdf, contacts []models.Contact, medicalDocum
 		pdf.MultiCell(0, 3.5, contact.Title, "LR", fpdf.AlignCenter, false)
 		setBlackRegularFont(pdf, standardTextSize)
 		pdf.MultiCell(0, 3.5, contact.Address, "LR", fpdf.AlignCenter, false)
-		pdf.MultiCell(0, 3.5, contact.Object,
+		pdf.MultiCell(0, 3.5, contact.Subject,
 			"LR", fpdf.AlignCenter,
 			false)
 	}

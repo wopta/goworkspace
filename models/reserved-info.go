@@ -12,5 +12,5 @@ type Contact struct {
 	Title   string `json:"title,omitempty" firestore:"title,omitempty"`
 	Type    string `json:"type,omitempty" firestore:"type,omitempty"`
 	Address string `json:"address,omitempty" firestore:"address,omitempty"`
-	Object  string `json:"object,omitempty" firestore:"object,omitempty"`
+	Subject string `json:"subject,omitempty" firestore:"subject,omitempty"`
 }
