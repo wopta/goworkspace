@@ -2,6 +2,7 @@ package mail
 
 import (
 	"bytes"
+	"fmt"
 	"text/template"
 
 	"github.com/wopta/goworkspace/lib"
@@ -70,6 +71,10 @@ func setProductBodyData(policy models.Policy, bodyData *BodyData) {
 		bodyData.ProductName = "Auto Valore Protetto"
 		bodyData.ProductForm = ""
 	}
+
+	bodyData.InformationSetsUrl = fmt.Sprintf(
+		"https://storage.googleapis.com/documents-public-dev/information-sets/%s/%s/Precontrattuale.pdf",
+		policy.Name, policy.ProductVersion)
 }
 
 func fillTemplate(htmlTemplate []byte, bodyData *BodyData) string {
