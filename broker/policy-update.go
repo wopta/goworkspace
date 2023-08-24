@@ -40,6 +40,9 @@ func UpdatePolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	if policy.Statements != nil {
 		input["statements"] = policy.Statements
 	}
+	if policy.ReservedInfo != nil {
+		input["reservedInfo"] = policy.ReservedInfo
+	}
 	input["isReserved"] = policy.IsReserved
 	input["updated"] = time.Now().UTC()
 
