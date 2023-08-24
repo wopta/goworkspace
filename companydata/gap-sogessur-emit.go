@@ -16,12 +16,17 @@ import (
 )
 
 const (
-	gapProduct           = "gap"
-	gapCompany           = "sogessur"
-	gapDateFormat        = "02/01/2006"
-	gapCsvFilenameFormat = "Contratti_GAP_%02d_%04d.csv"
-	storagePath          = "track/" + gapCompany + "/" + gapProduct + "/"
-	tmpPath              = "../tmp/"
+	gapProduct                     = "gap"
+	gapCompany                     = "sogessur"
+	gapDateFormat                  = "02/01/2006"
+	gapCsvFilenameFormat           = "Contratti_GAP_%02d_%04d.csv"
+	storagePath                    = "track/" + gapCompany + "/" + gapProduct + "/"
+	tmpPath                        = "../tmp/"
+	subscriptionOperation          = "A"
+	withdrawalOperation            = "P"
+	earlyWithdrawalOperation       = "S"
+	variationWithPriceOperation    = "I"
+	variationWithoutPriceOperation = "V"
 )
 
 func GapSogessurEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -183,6 +188,15 @@ func getGapHeader() []string {
 	}
 }
 
+func getOperationType(policy models.Policy) string {
+	if policy.CompanyEmit && !policy.IsDeleted {
+		return subscriptionOperation
+	} else if policy.IsDeleted && policy.DeleteEmited {
+		return withdrawalOperation
+	}
+	return ""
+}
+
 func getGapRowMap(policy models.Policy, transaction models.Transaction) map[string]string {
 	vehicle := policy.Assets[0].Vehicle
 	contractor := policy.Contractor
@@ -221,7 +235,7 @@ func getGapRowMap(policy models.Policy, transaction models.Transaction) map[stri
 	return map[string]string{
 		"NUMERO POLIZZA":                       CheckIfIsAlphaNumeric(policy.CodeCompany),
 		"NUMERO CONTRATTO":                     CheckIfIsAlphaNumeric(policy.CodeCompany),
-		"TIPO OPERAZIONE":                      "A", // 'A' = Subscription
+		"TIPO OPERAZIONE":                      getOperationType(policy),
 		"DATA OPERAZIONE":                      policy.StartDate.Format(gapDateFormat),
 		"COGNOME/RAGIONE SOCIALE ASSICURATO":   vehicleOwner.Surname,
 		"NOME ASSICURATO":                      vehicleOwner.Name,
