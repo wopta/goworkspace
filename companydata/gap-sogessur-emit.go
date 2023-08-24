@@ -15,11 +15,9 @@ import (
 )
 
 const (
-	gapProduct                     = "gap"
-	gapCompany                     = "sogessur"
 	gapDateFormat                  = "02/01/2006"
 	gapCsvFilenameFormat           = "Contratti_GAP_%02d_%04d.csv"
-	storagePath                    = "track/" + gapCompany + "/" + gapProduct + "/"
+	storagePath                    = "track/" + models.SogessurCompany + "/" + models.GapProduct + "/"
 	tmpPath                        = "../tmp/"
 	subscriptionOperation          = "A"
 	withdrawalOperation            = "P"
@@ -346,7 +344,7 @@ func getGapPolicies(from time.Time, to time.Time) []models.Policy {
 			{
 				Field:      "company",
 				Operator:   "==",
-				QueryValue: gapCompany,
+				QueryValue: models.SogessurCompany,
 			},
 			{
 				Field:      "companyEmit",

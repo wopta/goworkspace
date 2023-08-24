@@ -107,3 +107,9 @@ const (
 const (
 	WoptaDataset string = "wopta"
 )
+
+const (
+	AxaCompany      string = "axa"
+	GlobalCompany   string = "global"
+	SogessurCompany string = "sogessur"
+)
