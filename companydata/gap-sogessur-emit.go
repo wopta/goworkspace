@@ -3,11 +3,12 @@ package companydata
 import (
 	"errors"
 	"fmt"
+	"github.com/dustin/go-humanize"
+	"log"
 	"net/http"
 	"os"
 	"regexp"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/wopta/goworkspace/lib"
@@ -34,7 +35,13 @@ func GapSogessurEmit(w http.ResponseWriter, r *http.Request) (string, interface{
 	filename := fmt.Sprintf(gapCsvFilenameFormat, prevMonth.Year(), prevMonth.Month(), now.Day(), now.Month())
 
 	policies := getGapPolicies(from, to)
+	if len(policies) == 0 {
+		return "", nil, fmt.Errorf("no policy found")
+	}
 	transactions := getGapTransactions(policies)
+	if len(policies) != len(transactions) {
+		return "", nil, fmt.Errorf("number of transactions doesn't match number of policies")
+	}
 	csvRows := getGapCsv(policies, transactions)
 	lib.WriteCsv(tmpPath+filename, csvRows, ';')
 	source, err := os.ReadFile(tmpPath + filename)
@@ -51,14 +58,6 @@ func GapSogessurEmit(w http.ResponseWriter, r *http.Request) (string, interface{
 }
 
 func getGapCsv(policies []models.Policy, transactions []models.Transaction) [][]string {
-	if len(policies) == 0 {
-		panic("[getGapCsv]Error: no policies given")
-	}
-
-	if len(policies) != len(transactions) {
-		panic("[getGapCsv]Error: the number of policies is different to the number of transactions")
-	}
-
 	header := getGapHeader()
 	// Space for header
 	csvRows := make([][]string, len(policies)+1)
@@ -211,6 +210,12 @@ func getGapRowMap(policy models.Policy, transaction models.Transaction) map[stri
 		"Sì": "E",
 		"No": "",
 	}
+
+	vehicleTypeCodes := map[string]string{
+		"car":    "A",
+		"truck":  "C",
+		"camper": "P",
+	}
 	// Assuming we have only this payment type
 	offer := policy.OffersPrices[offerName][string(models.PaySingleInstallment)]
 	vehicleWeight := ""
@@ -239,7 +244,7 @@ func getGapRowMap(policy models.Policy, transaction models.Transaction) map[stri
 		"CILINDRATA":                           "",
 		"ALIMENTAZIONE":                        powerSupplyCodes[vehicle.PowerSupply],
 		"ANTIFURTO SATELLITARE":                boolAnswers[vehicle.HasSatellite],
-		"TIPO VEICOLO":                         vehicle.VehicleTypeDesc,
+		"TIPO VEICOLO":                         vehicleTypeCodes[vehicle.VehicleType],
 		"TIPO TARGA":                           "",
 		"CAVALLI":                              "",
 		"QUINTALI":                             vehicleWeight,
@@ -251,7 +256,7 @@ func getGapRowMap(policy models.Policy, transaction models.Transaction) map[stri
 		"PACCHETTO":                            gapOptions[offerName],
 		"CODICE DEALER":                        "",
 		"DEALER":                               "",
-		"CAPITALE ASSICURATO":                  fmt.Sprintf("%d", vehicle.PriceValue),
+		"CAPITALE ASSICURATO":                  floatToPrice(vehicle.PriceValue),
 		"DATA INIZIO POLIZZA":                  policy.StartDate.Format(gapDateFormat),
 		"DATA FINE POLIZZA":                    policy.EndDate.Format(gapDateFormat),
 		"ORA EFFETTO":                          "24:00",
@@ -312,8 +317,7 @@ func getAddress(address models.Address) string {
 
 // The float numbers in the csv are divided by ',' and not by '.'
 func floatToPrice(n float64) string {
-	res := fmt.Sprintf("%.2f", n)
-	return strings.Replace(res, ".", ",", 1)
+	return humanize.FormatFloat("####,##", n)
 }
 
 // Some dates are saved as strings(time.RFC3339 format), this ensures that they will follow the csv date format.
@@ -339,9 +343,14 @@ func getGapPolicies(from time.Time, to time.Time) []models.Policy {
 				QueryValue: true, // NOTE: Not working for testing env: the DB has every Gap policy with companyEmit to false
 			},
 			{
+				Field:      "companyEmitted",
+				Operator:   "==",
+				QueryValue: false,
+			},
+			{
 				Field:      "name",
 				Operator:   "==",
-				QueryValue: gapProduct,
+				QueryValue: models.GapProduct,
 			},
 			{
 				Field:      "startDate",
@@ -356,9 +365,9 @@ func getGapPolicies(from time.Time, to time.Time) []models.Policy {
 		},
 	}
 
-	iter, err := queries.FirestoreWherefields("policy")
+	iter, err := queries.FirestoreWherefields(models.PolicyCollection)
 	if err != nil {
-		panic(err)
+		log.Println(err.Error())
 	}
 
 	policies := models.PolicyToListData(iter)
@@ -370,7 +379,7 @@ func getGapPolicies(from time.Time, to time.Time) []models.Policy {
 func getGapTransactions(policies []models.Policy) []models.Transaction {
 	transactions := make([]models.Transaction, len(policies))
 	for i, policy := range policies {
-		iter := lib.WhereFirestore("transactions", "policyUid", "==", policy.Uid)
+		iter := lib.WhereFirestore(models.TransactionsCollection, "policyUid", "==", policy.Uid)
 		transactionsBuffer := models.TransactionToListData(iter)
 		if len(transactionsBuffer) == 0 {
 			panic(errors.New("no transcations found"))
@@ -383,7 +392,9 @@ func getGapTransactions(policies []models.Policy) []models.Transaction {
 func setCompanyEmitted(policies []models.Policy) {
 	for _, policy := range policies {
 		policy.CompanyEmitted = true
-		lib.SetFirestore("policy", policy.Uid, policy)
+		policy.Updated = time.Now().UTC()
+		lib.SetFirestore(models.PolicyCollection, policy.Uid, policy)
+		policy.BigquerySave("")
 	}
 }
 
