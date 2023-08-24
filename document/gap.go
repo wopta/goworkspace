@@ -159,11 +159,8 @@ func woptaGapHeader(pdf *fpdf.Fpdf, policy models.Policy) {
 		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/ARTW_LOGO_RGB_400px.png", 11, 6, 0, 10,
 			false, opt, 0, "")
 
-		setBlackBoldFont(pdf, standardTextSize)
-		pdf.SetXY(11, 17)
-		pdf.Cell(0, 3, "I dati della tua polizza")
 		setBlackRegularFont(pdf, standardTextSize)
-		pdf.SetXY(11, pdf.GetY()+3)
+		pdf.SetXY(11, 20)
 		pdf.MultiCell(0, 3.5, policyInfo, "", "", false)
 		pdf.Ln(8)
 	})

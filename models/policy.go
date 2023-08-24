@@ -73,8 +73,8 @@ type Policy struct {
 	IsSign            bool                         `firestore:"isSign" json:"isSign,omitempty" bigquery:"isSign"`
 	IsDeleted         bool                         `firestore:"isDeleted" json:"isDeleted,omitempty" bigquery:"isDeleted"`
 	DeleteEmited      bool                         `firestore:"deleteEmited" json:"deleteEmited,omitempty" bigquery:"deleteEmited"`
-	CompanyEmit       bool                         `firestore:"companyEmit" json:"companyEmit,omitempty" bigquery:"-"`
-	CompanyEmitted    bool                         `firestore:"companyEmitted" json:"companyEmitted,omitempty" bigquery:"-"`
+	CompanyEmit       bool                         `firestore:"companyEmit" json:"companyEmit,omitempty" bigquery:"companyEmit"`
+	CompanyEmitted    bool                         `firestore:"companyEmitted" json:"companyEmitted,omitempty" bigquery:"companyEmitted"`
 	CoverageType      string                       `firestore:"coverageType,omitempty" json:"coverageType,omitempty" bigquery:"coverageType"`
 	Voucher           string                       `firestore:"voucher,omitempty" json:"voucher,omitempty" bigquery:"voucher"`
 	Channel           string                       `firestore:"channel,omitempty" json:"channel,omitempty" bigquery:"channel"`
