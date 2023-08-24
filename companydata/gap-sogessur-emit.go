@@ -50,7 +50,7 @@ func GapSogessurEmit(w http.ResponseWriter, r *http.Request) (string, interface{
 	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), storagePath+filename, source)
 	// TODO: SftUpload
 
-	setCompanyEmitted(policies)
+	//setCompanyEmitted(policies)
 
 	return "", nil, e
 }
@@ -204,11 +204,10 @@ func getGapRowMap(policy models.Policy, transaction models.Transaction) map[stri
 		"Nuovo": "SI",
 		"Usato": "NO",
 	}
-	powerSupplyCodes := map[string]string{
-		"Sì": "E",
-		"No": "",
+	powerSupplyCodes := map[bool]string{
+		true:  "E",
+		false: "",
 	}
-
 	vehicleTypeCodes := map[string]string{
 		"car":    "A",
 		"truck":  "C",
@@ -240,7 +239,7 @@ func getGapRowMap(policy models.Policy, transaction models.Transaction) map[stri
 		"MODELLO":                              vehicle.Model,
 		"MARCA":                                vehicle.Manufacturer,
 		"CILINDRATA":                           "",
-		"ALIMENTAZIONE":                        powerSupplyCodes[vehicle.PowerSupply],
+		"ALIMENTAZIONE":                        powerSupplyCodes[vehicle.IsElectric],
 		"ANTIFURTO SATELLITARE":                boolAnswers[vehicle.HasSatellite],
 		"TIPO VEICOLO":                         vehicleTypeCodes[vehicle.VehicleType],
 		"TIPO TARGA":                           "",
