@@ -96,8 +96,8 @@ func Emit(policy *models.Policy, request EmitRequest, origin string) EmitRespons
 			log.Println("[Emit] state.Data Policy:", state.Data)
 			policy = state.Data
 		} else if policy.AgentUid != "" {
-			log.Println("[Emit] Agent Flow")
-			runBpmn(policy, models.AgentChannel)
+			log.Println("[Emit] Agent (E-commerce) Flow")
+			ecommerceFlow(policy, origin)
 		} else {
 			log.Println("[Emit] E-commerce Flow")
 			ecommerceFlow(policy, origin)
