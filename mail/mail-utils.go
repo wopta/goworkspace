@@ -2,6 +2,7 @@ package mail
 
 import (
 	"bytes"
+	"fmt"
 	"text/template"
 
 	"github.com/wopta/goworkspace/lib"
@@ -23,7 +24,7 @@ func setBodyDataAndGetCC(channel string, policy models.Policy, bodyData *BodyDat
 
 	switch channel {
 	case models.AgentChannel:
-		agent, err := models.GetAgentByAuthId(policy.AgencyUid)
+		agent, err := models.GetAgentByAuthId(policy.AgentUid)
 		lib.CheckError(err)
 		cc = agent.Mail
 		setAgentBodyData(*agent, bodyData)
@@ -70,10 +71,14 @@ func setProductBodyData(policy models.Policy, bodyData *BodyData) {
 		bodyData.ProductName = "Auto Valore Protetto"
 		bodyData.ProductForm = ""
 	}
+
+	bodyData.InformationSetsUrl = fmt.Sprintf(
+		"https://storage.googleapis.com/documents-public-dev/information-sets/%s/%s/Precontrattuale.pdf",
+		policy.Name, policy.ProductVersion)
 }
 
 func fillTemplate(htmlTemplate []byte, bodyData *BodyData) string {
-	var tpl *bytes.Buffer
+	tpl := new(bytes.Buffer)
 	tmplt := template.New("htmlTemplate")
 	tmplt, err := tmplt.Parse(string(htmlTemplate))
 	lib.CheckError(err)

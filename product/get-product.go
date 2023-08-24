@@ -45,17 +45,23 @@ func replaceDatesInProduct(product *models.Product, role string) (*models.Produc
 
 	minAgeValue, minReservedAgeValue := ageMap[role][product.Name][minAge], ageMap[role][product.Name][minReservedAge]
 
-	initialDate := time.Now().AddDate(-18, 0, 0).Format("2006-01-02")
-	minDate := time.Now().AddDate(-minAgeValue, 0, 1).Format("2006-01-02")
-	minReservedDate := time.Now().AddDate(-minReservedAgeValue, 0, 1).Format("2006-01-02")
+	initialDate := time.Now().AddDate(-18, 0, 0).Format(models.TimeDateOnly)
+	minDate := time.Now().AddDate(-minAgeValue, 0, 1).Format(models.TimeDateOnly)
+	minReservedDate := time.Now().AddDate(-minReservedAgeValue, 0, 1).Format(models.TimeDateOnly)
+	startDate := time.Now().Format(models.TimeDateOnly)
+	maxStartDate := time.Now().AddDate(0, 0, 30).Format(models.TimeDateOnly)
 
 	regexInitialDate := regexp.MustCompile("{{INITIAL_DATE}}")
 	regexMinDate := regexp.MustCompile("{{MIN_DATE}}")
 	regexMinAgentDate := regexp.MustCompile("{{MIN_RESERVED_DATE}}")
+	regexStartDate := regexp.MustCompile("{{START_DATE}}")
+	regexMaxStartDate := regexp.MustCompile("{{MAX_START_DATE}}")
 
 	productJson = regexInitialDate.ReplaceAllString(productJson, initialDate)
 	productJson = regexMinDate.ReplaceAllString(productJson, minDate)
 	productJson = regexMinAgentDate.ReplaceAllString(productJson, minReservedDate)
+	productJson = regexStartDate.ReplaceAllString(productJson, startDate)
+	productJson = regexMaxStartDate.ReplaceAllString(productJson, maxStartDate)
 
 	err = json.Unmarshal([]byte(productJson), product)
 

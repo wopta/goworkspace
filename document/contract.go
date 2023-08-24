@@ -7,16 +7,16 @@ import (
 	"log"
 	"net/http"
 
-	lib "github.com/wopta/goworkspace/lib"
-	model "github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 )
 
 func ContractFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.Println("Contract")
+	log.Println("[Contract]")
 	//lib.Files("./serverless_function_source_code")
 	origin := r.Header.Get("Origin")
 	req := lib.ErrorByte(io.ReadAll(r.Body))
-	var data model.Policy
+	var data models.Policy
 	defer r.Body.Close()
 	err := json.Unmarshal([]byte(req), &data)
 	lib.CheckError(err)
@@ -27,12 +27,8 @@ func ContractFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 	return string(resp), respObj, nil
 }
 
-func ContractObj(origin string, data model.Policy) <-chan DocumentResponse {
+func ContractObj(origin string, data models.Policy) <-chan DocumentResponse {
 	r := make(chan DocumentResponse)
-
-	//now := time.Now()
-	//next := now.AddDate(0, 0, 4)
-	//layout := "2006-01-02T15:04:05.000Z"
 
 	go func() {
 		var (
@@ -41,19 +37,19 @@ func ContractObj(origin string, data model.Policy) <-chan DocumentResponse {
 		)
 
 		switch data.Name {
-		case "pmi":
+		case models.PmiProduct:
 			skin := getVar()
 			m := skin.initDefault()
 			skin.GlobalContract(m, data)
 			//-----------Save file
 			filename, out = Save(m, data)
-		case "life":
+		case models.LifeProduct:
 			pdf := initFpdf()
 			filename, out = LifeContract(pdf, origin, &data)
-		case "persona":
+		case models.PersonaProduct:
 			pdf := initFpdf()
 			filename, out = PersonaContract(pdf, &data)
-		case "gap":
+		case models.GapProduct:
 			pdf := initFpdf()
 			filename, out = GapContract(pdf, origin, &data)
 		}

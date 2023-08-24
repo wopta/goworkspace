@@ -115,5 +115,10 @@ func PutClaim(idToken string, origin string, claim *models.Claim) (string, inter
 
 	mail.SendMail(obj)
 
+	err = claim.BigquerySave(origin)
+	if err != nil {
+		log.Printf("[PutClaim] error bigquery save claim %s", claim.ClaimUid)
+	}
+
 	return `{"success":true}`, `{"success":true}`, nil
 }

@@ -8,11 +8,10 @@ require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.2
 	github.com/dustin/go-humanize v1.0.1
 	github.com/go-pdf/fpdf v0.8.0
-	github.com/johnfercher/maroto v0.41.0
+	github.com/johnfercher/maroto v0.42.0
 	github.com/wopta/goworkspace/lib v1.0.66
-	github.com/wopta/goworkspace/models v1.1.25
-	github.com/wopta/goworkspace/product v1.0.31
-	github.com/wopta/goworkspace/question v1.0.0
+	github.com/wopta/goworkspace/models v1.1.33
+	github.com/wopta/goworkspace/product v1.0.34
 )
 
 require (

@@ -50,6 +50,8 @@ type Guarante struct {
 	Reserved                   bool                       `json:"reserved" firestore:"reserved" bigquery:"-"`
 	ReservedConfig             map[string]*ReservedLimits `json:"reservedConfig,omitempty" firestore:"reservedConfig,omitempty" bigquery:"-"`
 	Order                      int64                      `json:"order,omitempty" firestore:"order,omitempty" bigquery:"-"`
+	Commissions                *Commissions               `json:"commissions,omitempty" firestore:"commissions,omitempty" bigquery:"-"`
+	IsSelected                 bool                       `json:"isSelected" firestore:"isSelected" bigquery:"-"`
 }
 
 type GuaranteValue struct {
@@ -79,6 +81,7 @@ type GuaranteValue struct {
 	MinimumGrossMonthly        float64             `firestore:"minimumGrossMonthly,omitempty" json:"minimumGrossMonthly,omitempty"`
 	MinimumGrossYearly         float64             `firestore:"minimumGrossYearly,omitempty" json:"minimumGrossYearly,omitempty"`
 }
+
 type GuaranteFieldValue struct {
 	Min    float64   `firestore:"min,omitempty" json:"min,omitempty"`
 	Max    float64   `firestore:"max,omitempty" json:"max,omitempty"`
@@ -112,7 +115,7 @@ func SetGuaranteBigquery(policy Policy, status string, origin string) error {
 		for _, g := range asset.Guarantees {
 			g.Status = status
 			g.PolicyUid = policy.Uid
-			e = lib.InsertRowsBigQuery("wopta", origin, g)
+			e = lib.InsertRowsBigQuery(WoptaDataset, origin, g)
 			log.Println(e)
 		}
 

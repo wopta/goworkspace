@@ -3,14 +3,15 @@ package document
 import (
 	"bytes"
 	"fmt"
-	"github.com/go-pdf/fpdf"
-	"github.com/johnfercher/maroto/pkg/consts"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
 	"os"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/go-pdf/fpdf"
+	"github.com/johnfercher/maroto/pkg/consts"
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 )
 
 const (
@@ -40,7 +41,7 @@ func loadCustomFonts(pdf *fpdf.Fpdf) {
 	pdf.AddUTF8Font("Montserrat", "I", lib.GetAssetPathByEnv(basePath)+"/montserrat_italic.ttf")
 }
 
-func save(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
+func saveContract(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 	var filename string
 	if os.Getenv("env") == "local" {
 		err := pdf.OutputFileAndClose(basePath + "/contract.pdf")
@@ -57,6 +58,26 @@ func save(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 		return filename, out.Bytes()
 	}
 	return filename, nil
+}
+
+func saveReservedDocument(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
+	var (
+		gsLink string
+		out    bytes.Buffer
+	)
+
+	err := pdf.Output(&out)
+	lib.CheckError(err)
+
+	now := time.Now()
+	timestamp := strconv.FormatInt(now.Unix(), 10)
+	filename := "temp/" + policy.Uid + "/" + policy.Contractor.Name + "_" + policy.Contractor.Surname + "_" +
+		timestamp + "_reserved_document.pdf"
+	gsLink = lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, out.Bytes())
+	lib.CheckError(err)
+
+	return gsLink, out.Bytes()
+
 }
 
 func pageNumber(pdf *fpdf.Fpdf) {
@@ -141,7 +162,7 @@ func drawSignatureForm(pdf *fpdf.Fpdf) {
 		"(\\\"firma qui\\\"):size(width=150,height=60)]]\"", signatureID)
 	pdf.SetDrawColor(0, 0, 0)
 	pdf.SetX(-90)
-	pdf.Cell(0, 3, "Firma del Contraente/Assicurato")
+	pdf.Cell(0, 3, "Firma del Contraente")
 	pdf.Ln(15)
 	pdf.SetLineWidth(thinLineWidth)
 	pdf.Line(100, pdf.GetY(), 190, pdf.GetY())
@@ -394,4 +415,39 @@ func printStatement(pdf *fpdf.Fpdf, statement models.Statement, companyName stri
 func indentedText(pdf *fpdf.Fpdf, content string) {
 	pdf.SetX(tabDimension)
 	pdf.MultiCell(0, 3, content, "", fpdf.AlignLeft, false)
+}
+
+func drawDynamicCell(pdf *fpdf.Fpdf, fontSize, cellHeight, cellWidth, rowLines, nextX float64, cellText,
+	innerCellBorder, outerCellBorder,
+	align string, rightMost bool) {
+	cellSplittedText := pdf.SplitText(cellText, cellWidth)
+	cellNumLines := float64(len(cellSplittedText))
+
+	setXY := func() {}
+	ln := 1
+
+	if !rightMost {
+		setXY = func() {
+			pdf.SetXY(pdf.GetX()+nextX, pdf.GetY()-(cellHeight*rowLines))
+		}
+		ln = 0
+	}
+
+	setBlackRegularFont(pdf, fontSize)
+	if cellNumLines > 1 {
+		if cellNumLines < rowLines {
+			cellSplittedText = append(cellSplittedText, strings.Repeat("", int(rowLines-cellNumLines)))
+		}
+
+		for index, text := range cellSplittedText {
+			if index < int(rowLines-1) {
+				pdf.CellFormat(cellWidth, cellHeight, text, innerCellBorder, 2, fpdf.AlignLeft, false, 0, "")
+			} else {
+				pdf.CellFormat(cellWidth, cellHeight, text, outerCellBorder, 1, fpdf.AlignLeft, false, 0, "")
+			}
+		}
+		setXY()
+	} else {
+		pdf.CellFormat(cellWidth, cellHeight*rowLines, cellText, outerCellBorder, ln, align, false, 0, "")
+	}
 }

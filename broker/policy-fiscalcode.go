@@ -119,9 +119,14 @@ func GetPoliciesFromFirebase(fiscalCode string, policyFire string) []models.Poli
 				QueryValue: fiscalCode,
 			},
 			{
-				Field:      "status",
-				Operator:   "in",
-				QueryValue: []string{models.PolicyStatusPay, models.PolicyStatusToRenew, models.PolicyStatusCompanyEmit},
+				Field:      "isPay",
+				Operator:   "==",
+				QueryValue: true,
+			},
+			{
+				Field:      "isDeleted",
+				Operator:   "==",
+				QueryValue: false,
 			},
 		},
 	}

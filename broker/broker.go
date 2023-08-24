@@ -1,12 +1,10 @@
 package broker
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
-	"github.com/heimdalr/dag"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
@@ -33,29 +31,15 @@ func Broker(w http.ResponseWriter, r *http.Request) {
 				Method:  http.MethodGet,
 				Roles:   []string{models.UserRoleAll},
 			},
-
 			{
 				Route:   "/v1/policy/proposal",
 				Handler: Proposal,
 				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAll},
 			},
-
 			{
 				Route:   "/v1/policy/emit",
-				Handler: EmitV2Fx,
-				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAll},
-			},
-			{
-				Route:   "/v1/policy/bpmn",
-				Handler: EmitV2Fx,
-				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAll},
-			},
-			{
-				Route:   "/v1/policy/reserved",
-				Handler: reserved,
+				Handler: EmitFx,
 				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAll},
 			},
@@ -95,39 +79,13 @@ func Broker(w http.ResponseWriter, r *http.Request) {
 				Method:  http.MethodPut,
 				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},
+			{
+				Route:   "/policies/auth/v1",
+				Handler: GetPoliciesByAuthFx,
+				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAgent, models.UserRoleAgency},
+			},
 		},
 	}
 	route.Router(w, r)
-}
-
-func GetNumberCompany(w http.ResponseWriter, r *http.Request) (string, interface{}) {
-	return "", nil
-}
-
-type BrokerResponse struct {
-	EnvelopSignId string `json:"envelopSignId"`
-	LinkGcs       string `json:"linkGcs"`
-	Bytes         string `json:"bytes"`
-}
-
-func reserved(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	// initialize a new graph
-	d := dag.NewDAG()
-
-	// init three vertices
-	v1, _ := d.AddVertex(1)
-	v2, _ := d.AddVertex(2)
-	v3, _ := d.AddVertex(struct {
-		a string
-		b string
-	}{a: "foo", b: "bar"})
-
-	// add the above vertices and connect them with two edges
-	_ = d.AddEdge(v1, v2)
-	_ = d.AddEdge(v1, v3)
-
-	// describe the graph
-	fmt.Print(d.String())
-
-	return "", nil, nil
 }

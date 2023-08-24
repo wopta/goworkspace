@@ -10,7 +10,7 @@ import (
 )
 
 func GetPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	firePolicy := lib.GetDatasetByEnv(r.Header.Get("origin"), "policy")
+	firePolicy := lib.GetDatasetByEnv(r.Header.Get("origin"), models.PolicyCollection)
 	log.Println("GetPolicy")
 	log.Println(r.RequestURI)
 	policyUid := r.Header.Get("uid")
@@ -25,7 +25,7 @@ func GetPolicy(uid string, origin string) (models.Policy, error) {
 		policy models.Policy
 		err    error
 	)
-	firePolicy := lib.GetDatasetByEnv(origin, "policy")
+	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 	docsnap, err := lib.GetFirestoreErr(firePolicy, uid)
 	if err != nil {
 		return policy, err
