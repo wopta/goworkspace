@@ -13,7 +13,6 @@ import (
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/quote"
 )
 
 const (
@@ -219,7 +218,6 @@ func getGapRowMap(policy models.Policy, transaction models.Transaction) map[stri
 	if vehicle.Weight > 0 {
 		vehicleWeight = strconv.Itoa(int(vehicle.Weight))
 	}
-	zoneCode := quote.GetAreaByProvince(vehicleOwner.Residence.CityCode)
 	return map[string]string{
 		"NUMERO POLIZZA":                       CheckIfIsAlphaNumeric(policy.CodeCompany),
 		"NUMERO CONTRATTO":                     CheckIfIsAlphaNumeric(policy.CodeCompany),
@@ -287,7 +285,7 @@ func getGapRowMap(policy models.Policy, transaction models.Transaction) map[stri
 		"VINCOLO":                              "",
 		"DATA VINCOLO":                         "",
 		"ENTE VINCOLATARIO":                    "",
-		"CODICE ZONA":                          CheckIfIsAlphaNumeric(zoneCode),
+		"CODICE ZONA":                          vehicleOwner.Residence.Area,
 		"CL_SESSO":                             CheckIfIsWithin(contractor.Gender, genders),
 		"CL_DATA_NASC":                         stringToDateFormat(contractor.BirthDate, gapDateFormat),
 		"CL_LUOGO_NASC":                        contractor.BirthCity,

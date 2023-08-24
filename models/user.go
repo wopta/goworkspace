@@ -107,6 +107,7 @@ type Address struct {
 	PostalCode   string `json:"postalCode,omitempty" firestore:"postalCode" bigquery:"-"`
 	Locality     string `json:"locality,omitempty" firestore:"locality" bigquery:"-"`
 	CityCode     string `json:"cityCode,omitempty" firestore:"cityCode" bigquery:"-"`
+	Area         string `json:"area,omitempty" firestore:"area,omitempty" bigquery:"-"`
 }
 
 func (user *User) initBigqueryData() error {
