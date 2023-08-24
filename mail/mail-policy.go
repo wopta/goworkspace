@@ -205,7 +205,7 @@ func SendMailReserved(policy models.Policy) {
 
 	cc := setBodyDataAndGetCC(channel, policy, &bodyData)
 
-	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", channel, emittedTemplateType))
+	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", channel, reservedTemplateType))
 
 	messageBody := fillTemplate(templateFile, &bodyData)
 
@@ -224,7 +224,7 @@ func SendMailReserved(policy models.Policy) {
 	SendMail(
 		GetMailPolicy(
 			&policy,
-			fmt.Sprintf("Documenti Riservato %s proposta %d", policy.NameDesc, policy.ProposalNumber),
+			fmt.Sprintf("Documenti Riservato proposta %d", policy.ProposalNumber),
 			false,
 			cc,
 			"",
