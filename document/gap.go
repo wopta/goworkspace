@@ -111,11 +111,8 @@ func gapHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 		pdf.Line(pdf.GetX(), 8, pdf.GetX(), 14)
 		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/logo_sogessur.png", 161, 8, 0, 6, false, opt, 0, "")
 
-		setBlackBoldFont(pdf, standardTextSize)
-		pdf.SetXY(11, 20)
-		pdf.Cell(0, 3, "I dati della tua polizza")
 		setBlackRegularFont(pdf, standardTextSize)
-		pdf.SetXY(11, pdf.GetY()+3)
+		pdf.SetXY(11, 20)
 		pdf.MultiCell(0, 3.5, policyInfo, "", "", false)
 		pdf.Ln(8)
 	})
