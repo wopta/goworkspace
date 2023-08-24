@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"regexp"
 	"strconv"
 	"time"
 
@@ -29,20 +28,46 @@ const (
 	variationWithoutPriceOperation = "V"
 )
 
+var (
+	// Maps for replacing the values in policy into valid values for the gap csv
+	boolAnswers = map[bool]string{
+		true:  "SI",
+		false: "NO",
+	}
+	gapOptions = map[string]string{
+		"base":     "OPTION 1",
+		"complete": "OPTION 2",
+	}
+	isVehicleNew = map[string]string{
+		"Nuovo": "SI",
+		"Usato": "NO",
+	}
+	powerSupplyCodes = map[bool]string{
+		true:  "E",
+		false: "",
+	}
+	vehicleTypeCodes = map[string]string{
+		"car":    "A",
+		"truck":  "C",
+		"camper": "P",
+	}
+)
+
 func GapSogessurEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	prevMonth := getPreviousMonth()
-	from := getFirstDay(prevMonth)
-	to := getFirstDay(time.Now())
+	now := time.Now()
+	prevMonth := lib.GetPreviousMonth(now)
+	from := lib.GetFirstDay(prevMonth)
+	to := lib.GetFirstDay(now)
 
 	filename := fmt.Sprintf(gapCsvFilenameFormat, prevMonth.Month(), prevMonth.Year())
 
 	policies := getGapPolicies(from, to)
 	if len(policies) == 0 {
-		return "", nil, fmt.Errorf("no policy found")
+		return "", nil, fmt.Errorf("[GapSogessurEmit] no policies found")
 	}
 	transactions := getGapTransactions(policies)
 	if len(policies) != len(transactions) {
-		return "", nil, fmt.Errorf("number of transactions doesn't match number of policies")
+		return "", nil, fmt.Errorf("[GapSogessurEmit] number of transactions doesn't match number of policies")
 	}
 	csvRows := getGapCsv(policies, transactions)
 	lib.WriteCsv(tmpPath+filename, csvRows, ';')
@@ -54,7 +79,7 @@ func GapSogessurEmit(w http.ResponseWriter, r *http.Request) (string, interface{
 	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), storagePath+filename, source)
 	// TODO: SftUpload
 
-	//setCompanyEmitted(policies)
+	setCompanyEmitted(policies)
 
 	return "", nil, e
 }
@@ -203,29 +228,6 @@ func getGapRowMap(policy models.Policy, transaction models.Transaction) map[stri
 	vehicleOwner := policy.Assets[0].Person
 	offerName := policy.OfferlName
 
-	genders := []string{"F", "M", "G"} // For validation
-	// Maps for replacing the values in policy into valid values for the gap csv
-	boolAnswers := map[bool]string{
-		true:  "SI",
-		false: "NO",
-	}
-	gapOptions := map[string]string{
-		"base":     "OPTION 1",
-		"complete": "OPTION 2",
-	}
-	isVehicleNew := map[string]string{
-		"Nuovo": "SI",
-		"Usato": "NO",
-	}
-	powerSupplyCodes := map[bool]string{
-		true:  "E",
-		false: "",
-	}
-	vehicleTypeCodes := map[string]string{
-		"car":    "A",
-		"truck":  "C",
-		"camper": "P",
-	}
 	// Assuming we have only this payment type
 	offer := policy.OffersPrices[offerName][string(models.PaySingleInstallment)]
 	vehicleWeight := ""
@@ -233,20 +235,20 @@ func getGapRowMap(policy models.Policy, transaction models.Transaction) map[stri
 		vehicleWeight = strconv.Itoa(int(vehicle.Weight))
 	}
 	return map[string]string{
-		"NUMERO POLIZZA":                       CheckIfIsAlphaNumeric(policy.CodeCompany),
-		"NUMERO CONTRATTO":                     CheckIfIsAlphaNumeric(policy.CodeCompany),
+		"NUMERO POLIZZA":                       policy.CodeCompany,
+		"NUMERO CONTRATTO":                     policy.CodeCompany,
 		"TIPO OPERAZIONE":                      getOperationType(policy),
 		"DATA OPERAZIONE":                      policy.StartDate.Format(gapDateFormat),
-		"COGNOME/RAGIONE SOCIALE ASSICURATO":   vehicleOwner.Surname,
-		"NOME ASSICURATO":                      vehicleOwner.Name,
-		"INDIRIZZO ASSICURATO":                 getAddress(*vehicleOwner.Residence),
-		"COMUNE ASSICURATO":                    vehicleOwner.Residence.Locality,
-		"CAP ASSICURATO":                       CheckIfIsNumeric(vehicleOwner.Residence.PostalCode),
-		"PROVINCIA ASSICURATO":                 CheckIfIsAlphaNumeric(vehicleOwner.Residence.CityCode),
+		"COGNOME/RAGIONE SOCIALE ASSICURATO":   contractor.Surname,
+		"NOME ASSICURATO":                      contractor.Name,
+		"INDIRIZZO ASSICURATO":                 getAddress(*contractor.Residence),
+		"COMUNE ASSICURATO":                    contractor.Residence.Locality,
+		"CAP ASSICURATO":                       contractor.Residence.PostalCode,
+		"PROVINCIA ASSICURATO":                 contractor.Residence.CityCode,
 		"NAZIONE ASSICURATO":                   "Italia",
-		"CODICE FISCALE ASSICURATO":            CheckIfIsAlphaNumeric(vehicleOwner.FiscalCode),
-		"PARTITA IVA ASSICURATO":               CheckIfIsNumeric(vehicleOwner.VatCode),
-		"TARGA":                                CheckIfIsAlphaNumeric(vehicle.Plate),
+		"CODICE FISCALE ASSICURATO":            contractor.FiscalCode,
+		"PARTITA IVA ASSICURATO":               contractor.VatCode,
+		"TARGA":                                vehicle.Plate,
 		"TELAIO":                               "",
 		"MODELLO":                              vehicle.Model,
 		"MARCA":                                vehicle.Manufacturer,
@@ -273,7 +275,7 @@ func getGapRowMap(policy models.Policy, transaction models.Transaction) map[stri
 		"DATA SCADENZA RATE":                   "",
 		"TIPO FRAZIONAMENTO":                   "",
 		"NUMERO RATE":                          "",
-		"DURATA COPERTURA":                     strconv.Itoa(ElapsedMonths(policy.StartDate, policy.EndDate)),
+		"DURATA COPERTURA":                     strconv.Itoa(lib.MonthsDifference(policy.StartDate, policy.EndDate)),
 		"PREMIO NETTO GAP":                     floatToPrice(offer.Net),
 		"IMPOSTE GAP":                          floatToPrice(offer.Tax),
 		"PREMIO LORDO GAP":                     floatToPrice(offer.Gross),
@@ -295,28 +297,28 @@ func getGapRowMap(policy models.Policy, transaction models.Transaction) map[stri
 		"FEE MGT":                              "",
 		"TIPO PACCHETTO":                       "",
 		"IBAN":                                 "",
-		"DATA INCASSO":                         policy.StartDate.Format(gapDateFormat),
+		"DATA INCASSO":                         transaction.PayDate.Format(gapDateFormat),
 		"VINCOLO":                              "",
 		"DATA VINCOLO":                         "",
 		"ENTE VINCOLATARIO":                    "",
 		"CODICE ZONA":                          vehicleOwner.Residence.Area,
-		"CL_SESSO":                             CheckIfIsWithin(contractor.Gender, genders),
+		"CL_SESSO":                             contractor.Gender,
 		"CL_DATA_NASC":                         stringToDateFormat(contractor.BirthDate, gapDateFormat),
 		"CL_LUOGO_NASC":                        contractor.BirthCity,
-		"CL_PROV_NASC":                         CheckIfIsAlphaNumeric(contractor.BirthProvince),
+		"CL_PROV_NASC":                         contractor.BirthProvince,
 		"COGNOME/RAGIONE SOCIALE PROPRIETARIO": vehicleOwner.Surname,
 		"NOME PROPRIETARIO":                    vehicleOwner.Name,
 		"INDIRIZZO PROPRIETARIO":               getAddress(*vehicleOwner.Residence),
 		"COMUNE PROPRIETARIO":                  vehicleOwner.Residence.Locality,
-		"CAP PROPRIETARIO":                     CheckIfIsNumeric(vehicleOwner.Residence.PostalCode),
-		"PROVINCIA PROPRIETARIO":               CheckIfIsAlphaNumeric(vehicleOwner.Residence.CityCode),
+		"CAP PROPRIETARIO":                     vehicleOwner.Residence.PostalCode,
+		"PROVINCIA PROPRIETARIO":               vehicleOwner.Residence.CityCode,
 		"NAZIONE PROPRIETARIO":                 "Italia",
-		"CODICE FISCALE PROPRIETARIO":          CheckIfIsAlphaNumeric(vehicleOwner.FiscalCode),
+		"CODICE FISCALE PROPRIETARIO":          vehicleOwner.FiscalCode,
 		"PARTITA IVA PROPRIETARIO":             "",
-		"PR_SESSO":                             CheckIfIsWithin(vehicleOwner.Gender, genders),
+		"PR_SESSO":                             vehicleOwner.Gender,
 		"PR_DATA_NASC":                         stringToDateFormat(vehicleOwner.BirthDate, gapDateFormat),
 		"PR_LUOGO_NASC":                        vehicleOwner.BirthCity,
-		"PR_PROV_NASC":                         CheckIfIsAlphaNumeric(vehicleOwner.BirthProvince),
+		"PR_PROV_NASC":                         vehicleOwner.BirthProvince,
 	}
 }
 
@@ -363,7 +365,7 @@ func getGapPolicies(from time.Time, to time.Time) []models.Policy {
 			},
 			{
 				Field:      "startDate",
-				Operator:   ">",
+				Operator:   ">=",
 				QueryValue: from,
 			},
 			{
@@ -404,84 +406,5 @@ func setCompanyEmitted(policies []models.Policy) {
 		policy.Updated = time.Now().UTC()
 		lib.SetFirestore(models.PolicyCollection, policy.Uid, policy)
 		policy.BigquerySave("")
-	}
-}
-
-func getPreviousMonth() time.Time {
-	return time.Now().AddDate(0, -1, 0)
-}
-
-func getFirstDay(t time.Time) time.Time {
-	year, month, _ := t.Date()
-	return time.Date(year, month, 1, 0, 0, 0, 0, time.UTC)
-}
-
-func getLastDay(t time.Time) time.Time {
-	t = getFirstDay(t)
-	year, month, _ := t.Date()
-	lastDay := t.AddDate(0, 1, -1).Day()
-	return time.Date(year, month, lastDay, 0, 0, 0, 0, time.UTC)
-}
-
-func ElapsedMonths(t1 time.Time, t2 time.Time) int {
-	if t1.After(t2) {
-		t1, t2 = t2, t1
-	}
-
-	t1y, t1m, t1d := t1.Date()
-	date1 := time.Date(t1y, t1m, t1d, 0, 0, 0, 0, time.UTC)
-
-	t2y, t2m, t2d := t2.Date()
-
-	months := (t2y - t1y) * 12
-	anniversary := date1.AddDate(0, months, 0)
-	months += int(t2m - anniversary.Month())
-
-	if t2d < t1d {
-		months--
-	}
-
-	return months
-}
-
-// ----------------------------------------------------
-// ----------------VALIDATION--------------------------
-// ----------------------------------------------------
-
-func CheckIfIsWithin(value string, values []string) string {
-	if value == "" {
-		return value
-	}
-	if !lib.SliceContains(values, value) {
-		panic(errors.New("value not in slice"))
-	}
-	return value
-}
-
-func CheckIfIsDate(value string) string {
-	if value == "" {
-		return value
-	}
-	RegexPanicOnFail(value, `^\d{2}/\d{2}/\d{4}$`, "the value is not a date")
-	return value
-}
-
-func CheckIfIsAlphaNumeric(value string) string {
-	RegexPanicOnFail(value, "^[A-Za-z0-9]*$", "the value is not alphanumeric")
-	return value
-}
-
-func CheckIfIsNumeric(value string) string {
-	RegexPanicOnFail(value, `^\d*$`, "the value is not an integer")
-	return value
-}
-
-func RegexPanicOnFail(value string, pattern string, noMatchMsg string) {
-	isMatching, err := regexp.Match(pattern, []byte(value))
-	if err != nil {
-		panic(err)
-	}
-	if !isMatching {
-		panic(errors.New(noMatchMsg + ": " + value))
 	}
 }

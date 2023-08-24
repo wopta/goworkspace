@@ -50,3 +50,12 @@ func MonthsDifference(t1, t2 time.Time) int {
 
 	return totalMonths
 }
+
+func GetPreviousMonth(t time.Time) time.Time {
+	return t.AddDate(0, -1, 0)
+}
+
+func GetFirstDay(t time.Time) time.Time {
+	year, month, _ := t.Date()
+	return time.Date(year, month, 1, 0, 0, 0, 0, time.UTC)
+}
