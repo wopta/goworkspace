@@ -62,7 +62,7 @@ func SetPolicyFirstTransactionPaid(policyUid string, scheduleDate string, origin
 	transaction.BigQuerySave(origin)
 }
 
-func GetPolicyFirstTransaction(policyUid string, scheduleDate string, origin string) (models.Transaction, error) {
+func GetTransactionByPolicyUidAndScheduleDate(policyUid string, scheduleDate string, origin string) (models.Transaction, error) {
 	q := lib.Firequeries{
 		Queries: []lib.Firequery{
 			{
@@ -96,7 +96,7 @@ func Pay(transaction *models.Transaction, origin string) error {
 	transaction.Status = models.TransactionStatusPay
 	transaction.StatusHistory = append(transaction.StatusHistory, models.TransactionStatusPay)
 	transaction.PayDate = time.Now().UTC()
-	transaction.TransactionDate = time.Now().UTC()
+	transaction.TransactionDate = transaction.PayDate
 
 	return lib.SetFirestoreErr(fireTransactions, transaction.Uid, transaction)
 }

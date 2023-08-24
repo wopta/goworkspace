@@ -28,20 +28,20 @@ func Gap(role string, policy *models.Policy) (*models.Product, error) {
 		return &models.Product{}, fmt.Errorf("the policy did not pass validation: %v", err)
 	}
 
-	if err := isVehicleSellable(policy); err != nil {
-		return &models.Product{}, fmt.Errorf("vehicle not sellable: %v", err)
-	}
-
 	product, err := getProduct(policy, role)
 	if err != nil {
 		return &models.Product{}, fmt.Errorf("no products for this vehicle: %v", err)
+	}
+
+	if err := isVehicleSellable(policy); err != nil {
+		return &models.Product{}, fmt.Errorf("vehicle not sellable: %v", err)
 	}
 
 	return product, nil
 }
 
 func getProduct(policy *models.Policy, role string) (*models.Product, error) {
-	product, err := prd.GetProduct(models.GapProduct, "v1", role)
+	product, err := prd.GetProduct(policy.Name, policy.ProductVersion, role)
 	if err != nil {
 		return &models.Product{}, fmt.Errorf("error in getting the product: %v", err)
 	}
@@ -64,7 +64,7 @@ func isVehicleSellable(policy *models.Policy) error {
 		return fmt.Errorf("the vehicle is not private")
 	}
 
-	vehicleTypes := []string{"autoveicolo", "autocarro", "camper"}
+	vehicleTypes := []string{"car", "truck", "camper"}
 	if !lib.SliceContains(vehicleTypes, strings.ToLower(vehicle.VehicleType)) {
 		return fmt.Errorf("The vehicle type is not in: %v", vehicleTypes)
 	}

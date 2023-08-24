@@ -71,6 +71,18 @@ func fabrickPayment(origin, policyUid, schedule string) error {
 
 	policy := plc.GetPolicyByUid(policyUid, origin)
 
+	// Get Transaction
+	tr, err := transaction.GetTransactionByPolicyUidAndScheduleDate(policy.Uid, schedule, origin)
+	if err != nil {
+		log.Printf("[fabrickPayment] ERROR getting transaction: %s", err.Error())
+		return err
+	}
+
+	if tr.IsPay {
+		log.Printf("[fabrickPayment] ERROR Policy %s with transaction %s already paid", policy.Uid, tr.Uid)
+		return errors.New("transaction already paid")
+	}
+
 	if !policy.IsPay && policy.Status == models.PolicyStatusToPay {
 		// promote documents from temp bucket to user and connect it to policy
 		err := plc.SetUserIntoPolicyContractor(&policy, origin)
@@ -93,20 +105,6 @@ func fabrickPayment(origin, policyUid, schedule string) error {
 			return err
 		}
 
-		// Get Transaction
-		tr, err := transaction.GetPolicyFirstTransaction(policy.Uid, schedule, origin)
-		if err != nil {
-			log.Printf("[fabrickPayment] ERROR GetPolicyFirstTransaction %s", err.Error())
-			return err
-		}
-
-		// Pay Transaction
-		err = transaction.Pay(&tr, origin)
-		if err != nil {
-			log.Printf("[fabrickPayment] ERROR Transaction Pay %s", err.Error())
-			return err
-		}
-
 		// Update agency if present
 		err = models.UpdateAgencyPortfolio(&policy, origin)
 		if err != nil && err.Error() != "agency not set" {
@@ -122,14 +120,19 @@ func fabrickPayment(origin, policyUid, schedule string) error {
 		}
 
 		policy.BigquerySave(origin)
-		tr.BigQuerySave(origin)
 
 		// Send mail with the contract to the user
 		mail.SendMailContract(policy, nil)
-
-		return nil
 	}
 
-	log.Printf("[fabrickPayment] ERROR Policy %s with status %s and isPay %t cannot be paid", policyUid, policy.Status, policy.IsPay)
-	return errors.New("cannot pay policy")
+	// Pay Transaction
+	err = transaction.Pay(&tr, origin)
+	if err != nil {
+		log.Printf("[fabrickPayment] ERROR Transaction Pay %s", err.Error())
+		return err
+	}
+
+	tr.BigQuerySave(origin)
+
+	return nil
 }

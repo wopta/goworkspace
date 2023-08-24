@@ -45,16 +45,17 @@ func Gap(role string, policy *models.Policy) {
 func calculateGapOfferPrices(policy *models.Policy, product models.Product) {
 	duration := lib.ElapsedYears(policy.StartDate, policy.EndDate)
 	residenceArea := getAreaByProvince(policy.Assets[0].Person.Residence.CityCode)
+	policy.Assets[0].Person.Residence.Area = residenceArea
 	if residenceArea == "" {
 		log.Println("[CalculateGapOfferPrices] residence area not set")
 		lib.CheckError(errors.New("residence area not set"))
 	}
-	vehicleValue := float64(policy.Assets[0].Vehicle.PriceValue)
+	vehicleValue := policy.Assets[0].Vehicle.PriceValue
 	taxValue := getTax(product)
 
 	policy.OffersPrices = make(map[string]map[string]*models.Price)
 
-	for offerName, _ := range product.Offers {
+	for offerName := range product.Offers {
 		matrix := getGapMatrix(offerName)
 		multiplier := getGapMultiplier(matrix, duration, residenceArea)
 

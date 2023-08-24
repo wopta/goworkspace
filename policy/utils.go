@@ -102,8 +102,15 @@ func SetUserIntoPolicyContractor(policy *models.Policy, origin string) error {
 
 	if newUser {
 		policy.Contractor.CreationDate = time.Now().UTC()
+		policy.Contractor.UpdatedDate = policy.Contractor.CreationDate
 		fireUsers := lib.GetDatasetByEnv(origin, "users")
-		return lib.SetFirestoreErr(fireUsers, userUid, policy.Contractor)
+		err = lib.SetFirestoreErr(fireUsers, userUid, policy.Contractor)
+		if err != nil {
+			log.Printf("[setUserIntoPolicyContractor] ERROR creating/updating user %s: %s", policy.Contractor.Uid,
+				err.Error())
+			return err
+		}
+		return policy.Contractor.BigquerySave(origin)
 	}
 
 	_, err = models.UpdateUserByFiscalCode(origin, policy.Contractor)
@@ -117,9 +124,9 @@ func AddContract(policy *models.Policy, origin string) error {
 	gsLink := <-document.GetFileV6(*policy, policy.Uid)
 	// Add Contract
 	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
-	filenameParts := []string{"Contratto", policy.NameDesc, timestamp, ".pdf"}
+	filenameParts := []string{"Contratto", policy.NameDesc, timestamp}
 	filename := strings.Join(filenameParts, "_")
-	filename = strings.ReplaceAll(filename, " ", "_")
+	filename = strings.ReplaceAll(filename, " ", "_") + ".pdf"
 	*policy.Attachments = append(*policy.Attachments, models.Attachment{
 		Name:     "Contratto",
 		Link:     gsLink,

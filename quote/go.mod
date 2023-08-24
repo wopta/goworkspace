@@ -8,9 +8,10 @@ require (
 	cloud.google.com/go v0.110.2
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.3
 	github.com/dustin/go-humanize v1.0.1
-	github.com/wopta/goworkspace/lib v1.0.63
-	github.com/wopta/goworkspace/models v1.1.21
-	github.com/wopta/goworkspace/sellable v1.0.23
+	github.com/go-gota/gota v0.12.0
+	github.com/wopta/goworkspace/lib v1.0.67
+	github.com/wopta/goworkspace/models v1.1.35
+	github.com/wopta/goworkspace/sellable v1.0.25
 	modernc.org/mathutil v1.5.0
 )
 
@@ -32,7 +33,6 @@ require (
 	github.com/bmatcuk/doublestar v1.3.2 // indirect
 	github.com/cloudevents/sdk-go/v2 v2.14.0 // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
-	github.com/go-gota/gota v0.12.0 // indirect
 	github.com/goccy/go-json v0.9.11 // indirect
 	github.com/golang-jwt/jwt/v4 v4.4.2 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
@@ -40,7 +40,7 @@ require (
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/flatbuffers v2.0.8+incompatible // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
-	github.com/google/s2a-go v0.1.0 // indirect
+	github.com/google/s2a-go v0.1.3 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.2.3 // indirect
 	github.com/googleapis/gax-go/v2 v2.8.0 // indirect
@@ -64,8 +64,9 @@ require (
 	github.com/richardlehane/mscfb v1.0.4 // indirect
 	github.com/richardlehane/msoleps v1.0.3 // indirect
 	github.com/sergi/go-diff v1.0.0 // indirect
-	github.com/sirupsen/logrus v1.9.0 // indirect
+	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
+	github.com/wopta/goworkspace/product v1.0.33 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
 	github.com/xuri/excelize/v2 v2.7.0 // indirect
@@ -86,7 +87,7 @@ require (
 	golang.org/x/tools v0.6.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	gonum.org/v1/gonum v0.11.0 // indirect
-	google.golang.org/api v0.118.0 // indirect
+	google.golang.org/api v0.122.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/appengine/v2 v2.0.2 // indirect
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1 // indirect

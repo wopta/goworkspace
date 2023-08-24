@@ -15,7 +15,7 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
-func UploadDocument(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func UploadDocumentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var identityDocument models.IdentityDocument
 
 	log.Println("Upload User IdentityDocument")

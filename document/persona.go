@@ -58,7 +58,7 @@ func PersonaGlobal(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 
 	personalDataHandlingSection(pdf, policy)
 
-	filename, out := save(pdf, policy)
+	filename, out := saveContract(pdf, policy)
 	return filename, out
 }
 

@@ -10,9 +10,9 @@ type Vehicle struct {
 	PurchaseDate       time.Time `firestore:"purchaseDate,omitempty"       json:"purchaseDate,omitempty"       bigquery:"-"` // DATA D'ACQUISTO
 	OwnershipStatus    string    `firestore:"ownershipStatus,omitempty"    json:"ownershipStatus,omitempty"    bigquery:"-"` // GIA’ PROPRIETARIO (si/in attesa/la comprerò in futuro)
 	NumberOfOwners     int64     `firestore:"numberOfOwners,omitempty"     json:"numberOfOwners,omitempty"     bigquery:"-"` // NUMERO DI PROPRIETARI
-	PriceValue         int64     `firestore:"priceValue,omitempty"         json:"priceValue,omitempty"         bigquery:"-"` // VALORE VEICOLO
+	PriceValue         float64   `firestore:"priceValue,omitempty"         json:"priceValue,omitempty"         bigquery:"-"` // VALORE VEICOLO
 	VehicleType        string    `firestore:"vehicleType,omitempty"        json:"vehicleType,omitempty"        bigquery:"-"` // TIPO VEICOLO
-	VehicleTypeDesc    string    `firestore:"vehicleTypeDesc,omitempty" json:"vehicleTypeDesc,omitempty" bigquery:"-"`       // TIPO VEICOLO DESCRIZIONE
+	VehicleTypeDesc    string    `firestore:"vehicleTypeDesc,omitempty"    json:"vehicleTypeDesc,omitempty"    bigquery:"-"` // TIPO VEICOLO DESCRIZIONE
 	Weight             float64   `firestore:"weight,omitempty"             json:"weight,omitempty"             bigquery:"-"` // PESO VEICOLO IN QUINTALI
 	PowerSupply        string    `firestore:"powerSupply,omitempty"        json:"powerSupply,omitempty"        bigquery:"-"` // ALIMENTAZIONE
 	HasSatellite       bool      `firestore:"hasSatellite,omitempty"       json:"hasSatellite,omitempty"       bigquery:"-"` // PRESENZA SATELLITARE

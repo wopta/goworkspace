@@ -31,4 +31,5 @@ use(
     ./inclusive
     ./bpmn
     ./auth
+    ./reserved
 )

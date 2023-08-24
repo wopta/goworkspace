@@ -106,7 +106,7 @@ func (transaction *Transaction) BigQuerySave(origin string) {
 	transaction.BigStatusHistory = strings.Join(transaction.StatusHistory, ",")
 	log.Println("Transaction save BigQuery: " + transaction.Uid)
 
-	err = lib.InsertRowsBigQuery("wopta", fireTransactions, transaction)
+	err = lib.InsertRowsBigQuery(WoptaDataset, fireTransactions, transaction)
 	if err != nil {
 		log.Println("ERROR Transaction "+transaction.Uid+" save BigQuery: ", err)
 		return

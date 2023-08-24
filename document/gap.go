@@ -5,6 +5,7 @@ import (
 	"github.com/go-pdf/fpdf"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"math"
 	"sort"
 	"strings"
 	"time"
@@ -26,7 +27,7 @@ func GapSogessur(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, 
 
 	gapHeader(pdf, policy)
 
-	gapFooter(pdf, policy.Name)
+	gapFooter(pdf)
 
 	pdf.AddPage()
 
@@ -53,7 +54,7 @@ func GapSogessur(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, 
 
 	companiesDescriptionSection(pdf, policy.Company)
 
-	woptaHeader(pdf)
+	woptaGapHeader(pdf, *policy)
 
 	pdf.AddPage()
 
@@ -69,7 +70,7 @@ func GapSogessur(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, 
 
 	personalDataHandlingSection(pdf, policy)
 
-	filename, out := save(pdf, policy)
+	filename, out := saveContract(pdf, policy)
 	return filename, out
 }
 
@@ -110,17 +111,14 @@ func gapHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 		pdf.Line(pdf.GetX(), 8, pdf.GetX(), 14)
 		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/logo_sogessur.png", 161, 8, 0, 6, false, opt, 0, "")
 
-		setBlackBoldFont(pdf, standardTextSize)
-		pdf.SetXY(11, 20)
-		pdf.Cell(0, 3, "I dati della tua polizza")
 		setBlackRegularFont(pdf, standardTextSize)
-		pdf.SetXY(11, pdf.GetY()+3)
+		pdf.SetXY(11, 20)
 		pdf.MultiCell(0, 3.5, policyInfo, "", "", false)
 		pdf.Ln(8)
 	})
 }
 
-func gapFooter(pdf *fpdf.Fpdf, productName string) {
+func gapFooter(pdf *fpdf.Fpdf) {
 	footerText := "Wopta per te. Auto Valore Protetto è un prodotto assicurativo di Sogessur - Société Anonyme " +
 		"– Capitale Sociale € 33 825 000 – Sede legale: Tour D2, 17bis Place des Reflets – 92919\n" +
 		"Paris La Défense Cedex - 379 846 637 R.C.S. Nanterre - Francia - Sede secondaria: Via Tiziano 32, " +
@@ -129,19 +127,48 @@ func gapFooter(pdf *fpdf.Fpdf, productName string) {
 		"dall’IVASS al n. I00094"
 
 	pdf.SetFooterFunc(func() {
-		pdf.SetXY(10, -15)
+		pdf.SetXY(10, -17)
 		setPinkRegularFont(pdf, smallTextSize)
 		pdf.MultiCell(0, 3, footerText, "", "", false)
-		pdf.SetY(-7)
+		pdf.SetY(-8)
+		setBlackRegularFont(pdf, smallTextSize)
+		pdf.MultiCell(0, 3, "Auto Valore Protetto - VI - Settembre_2023", "", fpdf.AlignRight,
+			false)
 		pageNumber(pdf)
 	})
 }
 
+func woptaGapHeader(pdf *fpdf.Fpdf, policy models.Policy) {
+	location, err := time.LoadLocation("Europe/Rome")
+	lib.CheckError(err)
+
+	policyStartDate := policy.StartDate.In(location)
+	policyEndDate := policy.EndDate.In(location)
+
+	policyInfo := "Polizza Numero: " + policy.CodeCompany + "\n" +
+		"Targa Veicolo: " + policy.Assets[0].Vehicle.Plate + "\n" +
+		"Decorre dal: " + policyStartDate.Format(dateLayout) + " ore 24:00\n" +
+		"Scade il: " + policyEndDate.Format(dateLayout) + " ore 24:00"
+
+	pdf.SetHeaderFunc(func() {
+		var opt fpdf.ImageOptions
+		opt.ImageType = "png"
+		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/ARTW_LOGO_RGB_400px.png", 11, 6, 0, 10,
+			false, opt, 0, "")
+
+		setBlackRegularFont(pdf, standardTextSize)
+		pdf.SetXY(11, 20)
+		pdf.MultiCell(0, 3.5, policyInfo, "", "", false)
+		pdf.Ln(8)
+	})
+
+}
+
 func gapVehicleDataTable(pdf *fpdf.Fpdf, vehicle *models.Vehicle) {
 	tableRows := [][]string{
-		{"Tipo Veicolo", vehicle.VehicleType, "Data prima immatricolazione", vehicle.RegistrationDate.Format(dateLayout)},
+		{"Tipo Veicolo", vehicle.VehicleTypeDesc, "Data prima immatricolazione", vehicle.RegistrationDate.Format(dateLayout)},
 		{"Marca", vehicle.Manufacturer, "Stato veicolo", vehicle.Condition},
-		{"Modello", vehicle.Model, "Valore veicolo (*)", lib.HumanaizePriceEuro(float64(vehicle.PriceValue))},
+		{"Modello", vehicle.Model, "Valore veicolo (*)", lib.HumanaizePriceEuro(vehicle.PriceValue)},
 	}
 
 	setWhiteBoldFont(pdf, standardTextSize)
@@ -173,7 +200,9 @@ func gapVehicleDataTable(pdf *fpdf.Fpdf, vehicle *models.Vehicle) {
 	pdf.MultiCell(0, 4, "- il valore di fattura se l’acquisto della polizza è contestuale all’acquisto "+
 		"del veicolo;", "LR", fpdf.AlignLeft, false)
 	pdf.MultiCell(0, 4, "- il valore commerciale al momento della sottoscrizione se l’acquisto della "+
-		"polizza è differito dall’acquisto del veicolo.", "BLR", fpdf.AlignLeft, false)
+		"polizza è differito dall’acquisto del veicolo.", "LR", fpdf.AlignLeft, false)
+	pdf.MultiCell(0, 4, "Per la definizione di contestuale vedere il Set Informativo", "BLR",
+		fpdf.AlignLeft, false)
 	pdf.Ln(5)
 }
 
@@ -199,32 +228,34 @@ func gapPersonalInfoTable(pdf *fpdf.Fpdf, contractor, vehicleOwner models.User) 
 			"Residente in", vehicleOwner.Residence.StreetName + " " + vehicleOwner.Residence.StreetNumber + ", " +
 				"" + vehicleOwner.Residence.PostalCode + ", " + vehicleOwner.Residence.City + "(" + vehicleOwner.Residence.
 				CityCode + ")"},
-		{"Mail", contractor.Mail, "Mail", vehicleOwner.Mail},
+		{"Mail", contractor.Mail, "Mail", "================"},
 		{"Codice Fiscale", contractor.FiscalCode, "Codice Fiscale", vehicleOwner.FiscalCode},
 		{"Data nascita", contractorBirthDate.Format(dateLayout), "Data nascita", vehicleOwnerBirthDate.Format(dateLayout)},
-		{"Telefono", contractor.Phone, "Telefono", vehicleOwner.Phone},
+		{"Telefono", contractor.Phone, "Telefono", "================"},
 	}
 
+	lastRowBordersList := []string{"BL", "B", "B", "BR"}
+
 	for x := 0; x < len(tableRows); x++ {
-		if x != len(tableRows)-1 {
-			setPinkRegularFont(pdf, 8)
-			pdf.CellFormat(40, 5, tableRows[x][0], "L", 0, fpdf.AlignLeft, false, 0, "")
-			setBlackRegularFont(pdf, 8)
-			pdf.CellFormat(55, 5, tableRows[x][1], "B", 0, fpdf.AlignLeft, false, 0, "")
-			setPinkRegularFont(pdf, 8)
-			pdf.CellFormat(40, 5, tableRows[x][2], "", 0, fpdf.AlignLeft, false, 0, "")
-			setBlackRegularFont(pdf, 8)
-			pdf.CellFormat(55, 5, tableRows[x][3], "BR", 1, fpdf.AlignLeft, false, 0, "")
-		} else {
-			setPinkRegularFont(pdf, 8)
-			pdf.CellFormat(40, 5, tableRows[x][0], "BL", 0, fpdf.AlignLeft, false, 0, "")
-			setBlackRegularFont(pdf, 8)
-			pdf.CellFormat(55, 5, tableRows[x][1], "B", 0, fpdf.AlignLeft, false, 0, "")
-			setPinkRegularFont(pdf, 8)
-			pdf.CellFormat(40, 5, tableRows[x][2], "B", 0, fpdf.AlignLeft, false, 0, "")
-			setBlackRegularFont(pdf, 8)
-			pdf.CellFormat(55, 5, tableRows[x][3], "BR", 1, fpdf.AlignLeft, false, 0, "")
+		bordersList := []string{"L", "B", "", "BR"}
+
+		setBlackRegularFont(pdf, 8)
+		numLines := math.Max(float64(len(pdf.SplitText(tableRows[x][1], 55))),
+			float64(len(pdf.SplitText(tableRows[x][3], 55))))
+
+		if x == len(tableRows)-1 {
+			bordersList = lastRowBordersList
 		}
+
+		setPinkRegularFont(pdf, 8)
+		pdf.CellFormat(40, 5*numLines, tableRows[x][0], bordersList[0], 0, fpdf.AlignLeft, false, 0, "")
+
+		drawDynamicCell(pdf, 8, 5, 55, numLines, 95, tableRows[x][1], "", bordersList[1], fpdf.AlignLeft, false)
+
+		setPinkRegularFont(pdf, 8)
+		pdf.CellFormat(40, 5*numLines, tableRows[x][2], bordersList[2], 0, fpdf.AlignLeft, false, 0, "")
+
+		drawDynamicCell(pdf, 8, 5, 55, numLines, 135, tableRows[x][3], "R", bordersList[3], fpdf.AlignLeft, true)
 	}
 	pdf.Ln(5)
 }

@@ -6,51 +6,50 @@ import (
 	"strings"
 
 	"github.com/maja42/goval"
-	models "github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/models"
 )
 
 func (state *State) AddTaskHandler(name string, handler func(state *State) error) map[string]func(state *State) error {
-	log.Println("AddTaskHand")
+	log.Println("[AddTaskHandler]")
 	if nil == state.Handlers {
-		log.Println("nil")
+		log.Println("[AddTaskHandler] state.Handlers == nil")
 	}
 	state.Handlers[name] = handler
 	return state.Handlers
 }
 
 func (state *State) RunBpmn(processes []models.Process) {
-	log.Println("RunBpmn")
+	log.Println("[RunBpmn]")
 	state.Processes = processes
 
+	startProcesses := make([]models.Process, 0)
+
 	for i, process := range processes {
-		log.Println(i)
+		log.Printf("[RunBpmn] Index %d", i)
 		if len(process.InProcess) == 0 {
-			state.runProcess(process)
-
-		} else if len(process.OutProcess) == 0 {
-			state.runProcess(process)
-			break
-
-		} else {
-
+			log.Printf("[RunBpmn] Adding process %s", process.Name)
+			startProcesses = append(startProcesses, process)
 		}
-
 	}
 
+	for _, process := range startProcesses {
+		log.Printf("[RunBpmn] Running process %s", process.Name)
+		state.runProcess(process)
+	}
 }
+
 func (state *State) runNextProcess(process models.Process) {
-	log.Println("runNextProcess")
+	log.Println("[runNextProcess]")
 	if !process.IsFailed {
 		for _, x := range state.getProcesses(process.OutProcess) {
 			state.runProcess(x)
-			//state.runNextProcess(x)
 		}
 
 	}
-
 }
+
 func (state *State) runProcess(process models.Process) {
-	log.Println("runProcess")
+	log.Println("[runProcess]")
 	id := process.Id
 	state.Processes[id].Status = Active
 	var (
@@ -65,13 +64,16 @@ func (state *State) runProcess(process models.Process) {
 		process = p
 	}
 	if e != nil {
+		log.Printf("[runProcess] process %s FAILED", process.Name)
 		state.Processes[id].Status = Failed
 		state.IsFailed = true
 	} else {
+		log.Printf("[runProcess] process %s COMPLETED", process.Name)
 		state.Processes[id].Status = Completed
 		state.runNextProcess(process)
 	}
 }
+
 func (state *State) getProcesses(ids []int) []models.Process {
 	var processes []models.Process
 	for _, id := range ids {
@@ -84,12 +86,14 @@ func (state *State) getProcesses(ids []int) []models.Process {
 	}
 	return processes
 }
+
 func (state *State) LoadProcesses(data string) ([]models.Process, error) {
 	var processes []models.Process
 	e := json.Unmarshal([]byte(data), &processes)
 	state.Processes = processes
 	return processes, e
 }
+
 func (state *State) decisionStep(process models.Process) (models.Process, error) {
 	jsonMap := make(map[string]interface{})
 	b, e := json.Marshal(state.Data)

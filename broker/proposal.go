@@ -56,8 +56,11 @@ func Proposal(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	policy.BigquerySave(origin)
 	models.SetGuaranteBigquery(policy, "proposal", guaranteFire)
 
-	log.Printf("[Proposal] Policy %s send mail", policy.Uid)
-	mail.SendMailProposal(policy)
+	// TODO: fix me
+	if policy.Name != models.GapProduct {
+		log.Printf("[Proposal] Policy %s send mail", policy.Uid)
+		mail.SendMailProposal(policy)
+	}
 
 	resp, e := policy.Marshal()
 	log.Println("[Proposal] response: ", string(resp))

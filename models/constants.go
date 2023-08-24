@@ -81,6 +81,9 @@ const (
 	PolicyCollection       string = "policy"
 	ProductsCollection     string = "products"
 	TransactionsCollection string = "transactions"
+	ClaimsCollection       string = "claims" //only for bigquery
+	AuditsCollection       string = "audits"
+	GuaranteeCollection    string = "guarante"
 )
 
 const (
@@ -92,4 +95,21 @@ const (
 	PmiProduct     string = "pmi"
 	PersonaProduct string = "persona"
 	GapProduct     string = "gap"
+)
+
+const (
+	ECommerceChannel string = "e-commerce"
+	AgentChannel     string = "agent"
+	AgencyChannel    string = "agency"
+	MgaChannel       string = "mga"
+)
+
+const (
+	WoptaDataset string = "wopta"
+)
+
+const (
+	AxaCompany      string = "axa"
+	GlobalCompany   string = "global"
+	SogessurCompany string = "sogessur"
 )
