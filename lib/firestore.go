@@ -167,7 +167,6 @@ func (queries *Firequeries) FirestoreWherefields(collection string) (*firestore.
 	ctx := context.Background()
 	var query firestore.Query
 	client, err := firestore.NewClient(ctx, os.Getenv("GOOGLE_PROJECT_ID"))
-	CheckError(err)
 	col := client.Collection(collection)
 	query = col.Where(queries.Queries[0].Field, queries.Queries[0].Operator, queries.Queries[0].QueryValue)
 	for i := 1; i <= len(queries.Queries)-1; i++ {
