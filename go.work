@@ -30,4 +30,5 @@ use(
     ./mga
     ./inclusive
     ./bpmn
+    ./auth
 )

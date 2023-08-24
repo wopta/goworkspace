@@ -122,6 +122,8 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		docsnap.DataTo(&policy)
 		result = append(result, setRow(policy, df, transaction)...)
 		transaction.IsEmit = true
+
+		
 		lib.SetFirestore("transactions", transaction.Uid, transaction)
 
 	}
