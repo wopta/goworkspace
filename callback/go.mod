@@ -9,7 +9,7 @@ require (
 	github.com/wopta/goworkspace/bpmn v1.0.15
 	github.com/wopta/goworkspace/document v1.0.91
 	github.com/wopta/goworkspace/lib v1.0.66
-	github.com/wopta/goworkspace/mail v1.0.30
+	github.com/wopta/goworkspace/mail v1.0.31
 	github.com/wopta/goworkspace/models v1.1.34
 	github.com/wopta/goworkspace/policy v1.0.10
 	github.com/wopta/goworkspace/transaction v1.0.12
