@@ -20,10 +20,9 @@ const (
 	gapProduct           = "gap"
 	gapCompany           = "sogessur"
 	gapDateFormat        = "02/01/2006"
-	gapCsvFilenameFormat = "WOPTAKEYweb_NB_%02d%02d_%02d%02d.csv"
+	gapCsvFilenameFormat = "Contratti_GAP_%02d_%04d.csv"
 	storagePath          = "track/" + gapCompany + "/" + gapProduct + "/"
 	tmpPath              = "../tmp/"
-	bucket               = "GOOGLE_STORAGE_BUCKET"
 )
 
 func GapSogessurEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -31,8 +30,7 @@ func GapSogessurEmit(w http.ResponseWriter, r *http.Request) (string, interface{
 	from := getFirstDay(prevMonth)
 	to := getFirstDay(time.Now())
 
-	now := time.Now()
-	filename := fmt.Sprintf(gapCsvFilenameFormat, prevMonth.Year(), prevMonth.Month(), now.Day(), now.Month())
+	filename := fmt.Sprintf(gapCsvFilenameFormat, prevMonth.Month(), prevMonth.Year())
 
 	policies := getGapPolicies(from, to)
 	if len(policies) == 0 {
