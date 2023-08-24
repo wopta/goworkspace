@@ -159,12 +159,18 @@ type Price struct {
 }
 
 func (policy *Policy) CalculateContractorAge() (int, error) {
+	var startDate time.Time
+	if policy.StartDate.IsZero() {
+		startDate = time.Now()
+	} else {
+		startDate = policy.StartDate
+	}
+
 	birthdate, e := time.Parse(time.RFC3339, policy.Contractor.BirthDate)
-	now := time.Now()
-	age := now.Year() - birthdate.Year()
-	log.Println(now.YearDay(), birthdate.YearDay())
-	birthdate.Day()
-	if now.YearDay() < birthdate.YearDay() && !(now.Month() == birthdate.Month() && now.Day() == birthdate.Day()) {
+	age := startDate.Year() - birthdate.Year()
+	log.Printf("[CalculateContractorAge] startDate.YearDay %d - birthdate.YearDay %d", startDate.YearDay(), birthdate.YearDay())
+
+	if startDate.YearDay() < birthdate.YearDay() && !(startDate.Month() == birthdate.Month() && startDate.Day() == birthdate.Day()) {
 		age--
 	}
 	return age, e
