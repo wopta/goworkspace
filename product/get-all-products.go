@@ -9,7 +9,7 @@ import (
 
 func GetAllProductsByChannel(channel string) []models.Product {
 	const (
-		filePath = "products/mga"
+		filePath = "products/mga/"
 	)
 
 	products := make([]models.Product, 0)
