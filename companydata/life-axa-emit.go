@@ -1,6 +1,7 @@
 package companydata
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -28,9 +29,21 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		upload        bool
 	)
 	log.Println("----------------LifeAxalEmit-----------------")
+	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
+	log.Println(r.Header)
+	log.Println(string(req))
+	var obj DataReq
+	defer r.Body.Close()
+	json.Unmarshal([]byte(req), &obj)
 	now := time.Now()
-	M := time.Now().AddDate(0, 0, -2)
-	Q2 := time.Now().AddDate(0, 0, -1)
+	if obj.Day == "" {
+		now = time.Now()
+	} else {
+		date, _ := time.Parse("2006-01-02", obj.Day)
+		now=date
+	}
+	M := now.AddDate(0, 0, -2)
+	Q2 := now.AddDate(0, 0, -1)
 
 	if now.Day() == 16 {
 		upload = true
