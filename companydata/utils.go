@@ -78,8 +78,6 @@ func CreateExcel(sheet [][]string, filePath string) ([]byte, error) {
 	index, err := f.NewSheet("Sheet1")
 	for x, row := range sheet {
 		for i, cel := range row {
-
-			fmt.Println(cel)
 			f.SetCellValue("Sheet1", alfabet[i]+""+strconv.Itoa(x+1), cel)
 		}
 	}
@@ -92,4 +90,16 @@ func CreateExcel(sheet [][]string, filePath string) ([]byte, error) {
 	resByte, err := f.WriteToBuffer()
 
 	return resByte.Bytes(), err
+}
+func getNow(req []byte) time.Time {
+	var obj DataReq
+	json.Unmarshal([]byte(req), &obj)
+	now := time.Now()
+	if obj.Day == "" {
+		now = time.Now()
+	} else {
+		date, _ := time.Parse("2006-01-02", obj.Day)
+		now = date
+	}
+	return now
 }

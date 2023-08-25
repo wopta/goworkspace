@@ -1,9 +1,11 @@
 package companydata
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
+	"strconv"
 	"time"
 
 	lib "github.com/wopta/goworkspace/lib"
@@ -112,4 +114,48 @@ func AxaSftpUpload(filePath string, basePath string) {
 			log.Fatalln(err)
 		}
 		fmt.Printf("%+v\n", info)*/
+}
+
+func AxaPartnersSchedule(now time.Time) (time.Time, time.Time, time.Time, string, bool) {
+	var (
+		from          time.Time
+		to            time.Time
+		refMontly     time.Time
+		filenamesplit string
+		upload        bool
+	)
+
+	M := now.AddDate(0, 0, -2)
+	Q2 := now.AddDate(0, 0, -1)
+
+	if now.Day() == 16 {
+		upload = true
+		refMontly = now
+		log.Println("LifeAxaEmit q1")
+		from, e = time.Parse("2006-01-02", strconv.Itoa(now.Year())+"-"+fmt.Sprintf("%02d", int(now.Month()))+"-"+fmt.Sprintf("%02d", 1))
+		to, e = time.Parse("2006-01-02", strconv.Itoa(now.Year())+"-"+fmt.Sprintf("%02d", int(now.Month()))+"-"+fmt.Sprintf("%02d", 16))
+		filenamesplit = "Q"
+	} else if now.Day() == 1 {
+		upload = true
+		refMontly = now.AddDate(0, -1, 0)
+		log.Println("LifeAxaEmit q2")
+		from, e = time.Parse("2006-01-02", strconv.Itoa(Q2.Year())+"-"+fmt.Sprintf("%02d", int(Q2.Month()))+"-"+fmt.Sprintf("%02d", 16))
+		to, e = time.Parse("2006-01-02", strconv.Itoa(Q2.Year())+"-"+fmt.Sprintf("%02d", int(Q2.Month()))+"-"+fmt.Sprintf("%02d", Q2.Day()))
+		filenamesplit = "Q"
+	} else if now.Day() == 2 {
+		upload = true
+		refMontly = now.AddDate(0, -1, 0)
+		log.Println("LifeAxaEmit M")
+		from, e = time.Parse("2006-01-02", strconv.Itoa(M.Year())+"-"+fmt.Sprintf("%02d", int(M.Month()))+"-"+fmt.Sprintf("%02d", 1))
+		to, e = time.Parse("2006-01-02", strconv.Itoa(M.Year())+"-"+fmt.Sprintf("%02d", int(M.Month()))+"-"+fmt.Sprintf("%02d", M.Day()))
+		filenamesplit = "M"
+	} else {
+		upload = false
+		refMontly = now.AddDate(0, -1, 0)
+		log.Println("LifeAxalEmit ALL")
+		from, e = time.Parse("2006-01-02", "2023-06-01")
+		to, e = time.Parse("2006-01-02", "2023-07-23")
+		filenamesplit = "A"
+	}
+	return from, to, refMontly, filenamesplit, upload
 }

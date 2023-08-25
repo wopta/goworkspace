@@ -1,7 +1,6 @@
 package companydata
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -30,61 +29,23 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	)
 	log.Println("----------------LifeAxalEmit-----------------")
 	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
-	log.Println(r.Header)
-	log.Println(string(req))
-	var obj DataReq
 	defer r.Body.Close()
-	json.Unmarshal([]byte(req), &obj)
-	now := time.Now()
-	if obj.Day == "" {
-		now = time.Now()
-	} else {
-		date, _ := time.Parse("2006-01-02", obj.Day)
-		now=date
-	}
-	M := now.AddDate(0, 0, -2)
-	Q2 := now.AddDate(0, 0, -1)
-
-	if now.Day() == 16 {
-		upload = true
-		refMontly = now
-		log.Println("LifeAxalEmit q1")
-		from, e = time.Parse("2006-01-02", strconv.Itoa(now.Year())+"-"+fmt.Sprintf("%02d", int(now.Month()))+"-"+fmt.Sprintf("%02d", 1))
-		to, e = time.Parse("2006-01-02", strconv.Itoa(now.Year())+"-"+fmt.Sprintf("%02d", int(now.Month()))+"-"+fmt.Sprintf("%02d", 16))
-		filenamesplit = "Q"
-	} else if now.Day() == 1 {
-		upload = true
-		refMontly = now.AddDate(0, -1, 0)
-		log.Println("LifeAxalEmit q2")
-		from, e = time.Parse("2006-01-02", strconv.Itoa(Q2.Year())+"-"+fmt.Sprintf("%02d", int(Q2.Month()))+"-"+fmt.Sprintf("%02d", 16))
-		to, e = time.Parse("2006-01-02", strconv.Itoa(Q2.Year())+"-"+fmt.Sprintf("%02d", int(Q2.Month()))+"-"+fmt.Sprintf("%02d", Q2.Day()))
-		filenamesplit = "Q"
-	} else if now.Day() == 2 {
-		upload = true
-		refMontly = now.AddDate(0, -1, 0)
-		log.Println("LifeAxalEmit M")
-		from, e = time.Parse("2006-01-02", strconv.Itoa(M.Year())+"-"+fmt.Sprintf("%02d", int(M.Month()))+"-"+fmt.Sprintf("%02d", 1))
-		to, e = time.Parse("2006-01-02", strconv.Itoa(M.Year())+"-"+fmt.Sprintf("%02d", int(M.Month()))+"-"+fmt.Sprintf("%02d", M.Day()))
-		filenamesplit = "M"
-	} else {
-		upload = false
-		refMontly = now.AddDate(0, -1, 0)
-		log.Println("LifeAxalEmit ALL")
-		from, e = time.Parse("2006-01-02", "2023-06-01")
-		to, e = time.Parse("2006-01-02", "2023-07-23")
-		filenamesplit = "A"
-	}
+	log.Println("LifeAxalEmit: ", r.Header)
+	log.Println("LifeAxalEmit: ", string(req))
+	now := getNow(req)
+	from,to,refMontly,filenamesplit,upload= AxaPartnersSchedule(now)
 	switch os.Getenv("env") {
 	case "local":
 		cabCsv = lib.ErrorByte(ioutil.ReadFile("function-data/data/rules/Riclassificazione_Ateco.csv"))
 	default:
 		cabCsv = lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "data/cab-cap-istat.csv", "")
 	}
-	log.Println("now: " + now.String())
-	log.Println("now.Day: ", now.Day())
-	log.Println("from: " + from.String())
-	log.Println("to: " + to.String())
-	log.Println(": " + filenamesplit)
+
+	log.Println("LifeAxalEmit now: " + now.String())
+	log.Println("LifeAxalEmit now.Day: ", now.Day())
+	log.Println("LifeAxalEmit from: " + from.String())
+	log.Println("LifeAxalEmit to: " + to.String())
+	log.Println("LifeAxalEmit: " + filenamesplit)
 	df := lib.CsvToDataframe(cabCsv)
 	q := lib.Firequeries{
 		Queries: []lib.Firequery{
@@ -123,9 +84,9 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 
 	query, e := q.FirestoreWherefields("transactions")
 
-	log.Println(e)
+	log.Println("LifeAxalEmit: ", e)
 	transactions := models.TransactionToListData(query)
-	log.Println("transaction len: ", len(transactions))
+	log.Println("LifeAxalEmit: transaction len: ", len(transactions))
 	//result = append(result, getHeader())
 	for _, transaction := range transactions {
 		var (
@@ -133,10 +94,9 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		)
 		docsnap := lib.GetFirestore("policy", transaction.PolicyUid)
 		docsnap.DataTo(&policy)
-		result = append(result, setRow(policy, df, transaction)...)
+		result = append(result, setRowLifeEmit(policy, df, transaction)...)
 		transaction.IsEmit = true
 
-		
 		lib.SetFirestore("transactions", transaction.Uid, transaction)
 
 	}
@@ -150,12 +110,13 @@ func LifeAxalEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	}
 	return "", nil, e
 }
-func setRow(policy models.Policy, df dataframe.DataFrame, trans models.Transaction) [][]string {
+
+func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.Transaction) [][]string {
 	var (
 		result       [][]string
 		residenceCab string
 	)
-	log.Println("policy.Uid: ", policy.Uid)
+	log.Println("LifeAxalEmit:  policy.Uid: ", policy.Uid)
 	fil := df.Filter(
 		dataframe.F{Colidx: 4, Colname: "CAP", Comparator: series.Eq, Comparando: policy.Contractor.Residence.PostalCode},
 	)
@@ -163,10 +124,10 @@ func setRow(policy models.Policy, df dataframe.DataFrame, trans models.Transacti
 		residenceCab = fil.Records()[1][5]
 	}
 
-	log.Println("residenceCab:", residenceCab)
-	log.Println("fil.Records()[0]:", fil.Records()[0])
-	log.Println("filtered col", fil.Ncol())
-	log.Println("filtered row", fil.Nrow())
+	log.Println("LifeAxalEmit:  residenceCab:", residenceCab)
+	log.Println("LifeAxalEmit:  fil.Records()[0]:", fil.Records()[0])
+	log.Println("LifeAxalEmit:  filtered col", fil.Ncol())
+	log.Println("LifeAxalEmit: filtered row", fil.Nrow())
 	for _, asset := range policy.Assets {
 
 		for _, g := range asset.Guarantees {
@@ -183,10 +144,10 @@ func setRow(policy models.Policy, df dataframe.DataFrame, trans models.Transacti
 				price = g.Value.PremiumGrossYearly
 			}
 
-			log.Println(price)
+			log.Println("LifeAxalEmit: ", price)
 			var intNum = int(price * 100)
 			priceGrossFormat := fmt.Sprintf("%012d", intNum) // 000000001220
-			log.Println(priceGrossFormat)
+			log.Println("LifeAxalEmit: ", priceGrossFormat)
 			row := []string{
 				mapCodecCompany(policy, g.CompanyCodec),                 //Codice schema
 				policy.CodeCompany,                                      //N° adesione individuale univoco
@@ -558,15 +519,16 @@ func mapBeneficiary(g models.Guarante, b int) (string, models.Beneficiary, strin
 	)
 	resulStruct = models.Beneficiary{User: models.User{Residence: &models.Address{}}}
 	if g.Beneficiaries != nil {
+		resulStruct = (*g.Beneficiaries)[b]
+
 		if len(*g.Beneficiaries) > 0 && len(*g.Beneficiaries) > b {
 			result = ""
-			if (*g.Beneficiaries)[b].IsLegitimateSuccessors || (*g.Beneficiaries)[b].IsFamilyMember {
+			if (*g.Beneficiaries)[b].IsLegitimateSuccessors || (*g.Beneficiaries)[b].IsFamilyMember || (*g.Beneficiaries)[b].BeneficiaryType == models.BeneficiaryLegalAndWillSuccessors {
 				result = "GE"
 				result2 = "GE"
 			} else {
 				result = (*g.Beneficiaries)[b].FiscalCode
 				result2 = "NM"
-				resulStruct = (*g.Beneficiaries)[b]
 			}
 
 		}
@@ -588,7 +550,7 @@ func ExistIdentityDocument(docs []*models.IdentityDocument) *models.IdentityDocu
 	result = &models.IdentityDocument{}
 	if len(docs) > 0 {
 		for _, doc := range docs {
-			log.Println(doc)
+			log.Println("LifeAxalEmit: ", doc)
 			result = doc
 
 		}
