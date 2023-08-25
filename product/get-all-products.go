@@ -15,7 +15,7 @@ func GetAllProductsByChannel(channel string) []models.Product {
 	products := make([]models.Product, 0)
 
 	rawProducts := lib.GetFolderContentByEnv(filePath)
-	log.Printf("[GetAllProductsByChannel] found %d products for channel %s", len(rawProducts), channel)
+	log.Printf("[GetAllProductsByChannel] found %d products for channel %s", len(rawProducts), models.MgaChannel)
 	for _, rawProduct := range rawProducts {
 		var product *models.Product
 		var isActive bool
