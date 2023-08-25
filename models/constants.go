@@ -89,7 +89,10 @@ const (
 const (
 	VehiclePrivateUse string = "private"
 )
-
+const (
+	BeneficiaryLegalAndWillSuccessors string = "legalAndWillSuccessors"
+	BeneficiaryChosenBeneficiary      string = "chosenBeneficiary"
+)
 const (
 	LifeProduct    string = "life"
 	PmiProduct     string = "pmi"
