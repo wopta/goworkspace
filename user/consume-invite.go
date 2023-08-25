@@ -124,18 +124,16 @@ func createAgent(collection, origin string, userRecord *auth.UserRecord, invite 
 	}
 
 	agent := models.Agent{
-		User: models.User{
-			Mail:         invite.Email,
-			Uid:          userRecord.UID,
-			AuthId:       userRecord.UID,
-			Role:         invite.Role,
-			FiscalCode:   invite.FiscalCode,
-			VatCode:      invite.VatCode,
-			Name:         invite.Name,
-			Surname:      invite.Surname,
-			CreationDate: time.Now().UTC(),
-			UpdatedDate:  time.Now().UTC(),
-		},
+		Mail:            invite.Email,
+		Uid:             userRecord.UID,
+		AuthId:          userRecord.UID,
+		Role:            invite.Role,
+		FiscalCode:      invite.FiscalCode,
+		VatCode:         invite.VatCode,
+		Name:            invite.Name,
+		Surname:         invite.Surname,
+		CreationDate:    time.Now().UTC(),
+		UpdatedDate:     time.Now().UTC(),
 		RuiCode:         invite.RuiCode,
 		RuiSection:      invite.RuiSection,
 		RuiRegistration: invite.RuiRegistration,

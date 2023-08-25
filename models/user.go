@@ -117,11 +117,13 @@ func (user *User) initBigqueryData() error {
 	}
 	user.Data = string(userJson)
 
-	birthDate, err := time.Parse(time.RFC3339, user.BirthDate)
-	if err != nil {
-		return err
+	if user.BirthDate != "" {
+		birthDate, err := time.Parse(time.RFC3339, user.BirthDate)
+		if err != nil {
+			return err
+		}
+		user.BigBirthDate = lib.GetBigQueryNullDateTime(birthDate)
 	}
-	user.BigBirthDate = lib.GetBigQueryNullDateTime(birthDate)
 
 	if user.Residence != nil {
 		user.BigResidenceStreetName = user.Residence.StreetName
