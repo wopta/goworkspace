@@ -11,7 +11,7 @@ require (
 	github.com/wopta/goworkspace/bpmn v1.0.15
 	github.com/wopta/goworkspace/document v1.0.93
 	github.com/wopta/goworkspace/lib v1.0.67
-	github.com/wopta/goworkspace/mail v1.0.31
+	github.com/wopta/goworkspace/mail v1.0.32
 	github.com/wopta/goworkspace/models v1.1.36
 	github.com/wopta/goworkspace/payment v1.0.61
 	github.com/wopta/goworkspace/question v1.0.1
