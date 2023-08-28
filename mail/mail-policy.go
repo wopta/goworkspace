@@ -11,11 +11,13 @@ import (
 )
 
 const (
-	proposalTemplateType = "proposal"
-	payTemplateType      = "pay"
-	signTemplateType     = "sign"
-	emittedTemplateType  = "emitted"
-	reservedTemplateType = "reserved"
+	proposalTemplateType         = "proposal"
+	payTemplateType              = "pay"
+	signTemplateType             = "sign"
+	emittedTemplateType          = "emitted"
+	reservedTemplateType         = "reserved"
+	reservedApprovedTemplateType = "approved"
+	reservedRejectedTemplateType = "rejected"
 )
 
 func GetMailPolicy(policy *models.Policy, subject string, isLink bool, cc, link, linkLabel, message string, isAttachment bool, at *[]Attachment) MailRequest {
@@ -239,4 +241,35 @@ func SendMailReserved(policy models.Policy) {
 	for index, _ := range policy.ReservedInfo.Documents {
 		policy.ReservedInfo.Documents[index].Byte = ""
 	}
+}
+
+func SendMailReservedResult(policy models.Policy) {
+	var (
+		bodyData = BodyData{}
+		template string
+	)
+
+	if policy.Status == models.PolicyStatusApproved {
+		template = reservedApprovedTemplateType
+	} else {
+		template = reservedRejectedTemplateType
+	}
+
+	channel := getChannel(policy)
+
+	to := setBodyDataAndGetCC(channel, policy, &bodyData)
+
+	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", channel, template))
+
+	messageBody := fillTemplate(templateFile, &bodyData)
+
+	SendMail(MailRequest{
+		From:     "anna@wopta.it",
+		To:       []string{to},
+		Title:    fmt.Sprintf("%s proposta n° %d", policy.NameDesc, policy.ProposalNumber),
+		SubTitle: "Riservato direzione",
+		Message:  messageBody,
+		Subject:  "Riservato direzione: " + fmt.Sprintf("%s proposta n° %d", policy.NameDesc, policy.ProposalNumber),
+		IsHtml:   true,
+	})
 }
