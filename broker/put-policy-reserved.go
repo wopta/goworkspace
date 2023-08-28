@@ -1,7 +1,6 @@
 package broker
 
 import (
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -10,7 +9,6 @@ import (
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/user"
 )
 
 type PutPolicyReservedPayload struct {
@@ -66,11 +64,7 @@ func PutPolicyReservedFx(w http.ResponseWriter, r *http.Request) (string, interf
 	policyJsonLog, _ := policy.Marshal()
 	log.Printf("[PutPolicyReservedFx] Policy: %s", string(policyJsonLog))
 
-	sendReservedMail(
-		&policy,
-		getMailAddressesByAuthId(&policy, origin),
-		getEmailMessageByAction(payload.Action),
-	)
+	mail.SendMailReservedResult(policy)
 
 	return `{"success":true}`, `{"success":true}`, nil
 }
@@ -86,54 +80,4 @@ func approvePolicy(policy *models.Policy) {
 	log.Printf("[approvePolicy] Policy Uid %s APPROVED", policy.Uid)
 	policy.Status = models.PolicyStatusApproved
 	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
-}
-
-func getMailAddressesByAuthId(policy *models.Policy, origin string) []string {
-	var (
-		agent    *models.Agent
-		agency   *models.Agency
-		err      error
-		response []string = make([]string, 0, 2)
-	)
-
-	// TODO traverse network ?
-	if policy.AgencyUid != "" {
-		agency, err = user.GetAgencyByAuthId(origin, policy.AgencyUid)
-		response = append(response, agency.Email)
-	}
-
-	if policy.AgentUid != "" {
-		agent, err = user.GetAgentByAuthId(origin, policy.AgentUid)
-		response = append(response, agent.Mail)
-	}
-
-	if err != nil {
-		log.Println("[getMailAddressesByAuthId] ERROR getting broker data")
-		return []string{}
-	}
-
-	return response
-}
-
-func getEmailMessageByAction(action string) string {
-	if action == models.PolicyStatusRejected {
-		return `<p>REJECTED</p>`
-	}
-	if action == models.PolicyStatusApproved {
-		return `<p>APPROVED</p>`
-	}
-	return ""
-}
-
-func sendReservedMail(policy *models.Policy, to []string, message string) {
-	var obj mail.MailRequest
-	obj.From = "noreply@wopta.it"
-	obj.To = to
-	obj.Title = fmt.Sprintf("Proposta di polizza n° %d", policy.ProposalNumber)
-	obj.SubTitle = "Riservato direzione"
-	obj.Message = message
-	obj.Subject = obj.SubTitle + ": " + obj.Title
-	obj.IsHtml = true
-
-	mail.SendMail(obj)
 }
