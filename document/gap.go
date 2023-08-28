@@ -27,7 +27,7 @@ func GapSogessur(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, 
 
 	gapHeader(pdf, policy)
 
-	gapFooter(pdf)
+	gapFooter(pdf, policy.NameDesc)
 
 	pdf.AddPage()
 
@@ -118,7 +118,7 @@ func gapHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 	})
 }
 
-func gapFooter(pdf *fpdf.Fpdf) {
+func gapFooter(pdf *fpdf.Fpdf, productName string) {
 	footerText := "Wopta per te. Auto Valore Protetto è un prodotto assicurativo di Sogessur - Société Anonyme " +
 		"– Capitale Sociale € 33 825 000 – Sede legale: Tour D2, 17bis Place des Reflets – 92919\n" +
 		"Paris La Défense Cedex - 379 846 637 R.C.S. Nanterre - Francia - Sede secondaria: Via Tiziano 32, " +
@@ -132,7 +132,7 @@ func gapFooter(pdf *fpdf.Fpdf) {
 		pdf.MultiCell(0, 3, footerText, "", "", false)
 		pdf.SetY(-8)
 		setBlackRegularFont(pdf, smallTextSize)
-		pdf.MultiCell(0, 3, "Auto Valore Protetto - VI - Settembre_2023", "", fpdf.AlignRight,
+		pdf.MultiCell(0, 3, fmt.Sprintf("%s - VI - Settembre_2023", productName), "", fpdf.AlignRight,
 			false)
 		pageNumber(pdf)
 	})
