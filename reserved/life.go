@@ -21,18 +21,11 @@ func lifeReserved(policy *models.Policy) {
 }
 
 func setContactsDetails(policy *models.Policy) {
-	// TODO: check if we can put these info in product file
 	policy.ReservedInfo.Contacts = []models.Contact{
-		{
-			Title:   "Tramite Posta a:",
-			Type:    "post",
-			Address: "AXA PARTNERS",
-			Subject: "Ufficio Underwriting Medico – Corso Como n. 17 – 20154 MILANO",
-		},
 		{
 			Title:   "Tramite e-mail:",
 			Type:    "e-mail",
-			Address: "clp.it.sinistri@partners.axa",
+			Address: "assunzione@wopta.it",
 			Subject: fmt.Sprintf("Oggetto: %s proposta %d - UNDERWRITING MEDICO - %s", policy.NameDesc, policy.ProposalNumber,
 				strings.ToUpper(policy.Contractor.Surname+" "+policy.Contractor.Name)),
 		},
