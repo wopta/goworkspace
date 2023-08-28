@@ -41,7 +41,7 @@ func Callback(w http.ResponseWriter, r *http.Request) {
 			},
 			{
 				Route:   "/v1/axa/life/emit",
-				Handler: LifeAxalEmit,
+				Handler: LifeAxaEmit,
 				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAll},
 			},

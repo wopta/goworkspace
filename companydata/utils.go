@@ -91,15 +91,23 @@ func CreateExcel(sheet [][]string, filePath string) ([]byte, error) {
 
 	return resByte.Bytes(), err
 }
-func getNow(req []byte) time.Time {
-	var obj DataReq
+func getRequestData(req []byte) (time.Time, bool) {
+	var (
+		obj    DataReq
+		upload bool
+	)
+
 	json.Unmarshal([]byte(req), &obj)
+
 	now := time.Now()
+
 	if obj.Day == "" {
 		now = time.Now()
+		upload = true
 	} else {
 		date, _ := time.Parse("2006-01-02", obj.Day)
 		now = date
+		upload = obj.Upload
 	}
-	return now
+	return now, upload
 }
