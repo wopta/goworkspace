@@ -77,7 +77,9 @@ func VerifyAuthorization(handler func(w http.ResponseWriter, r *http.Request) (s
 		if SliceContains(roles, "all") {
 			return VerifyAppcheck(handler)(w, r)
 		}
-
+		if SliceContains(roles, "internal") {
+			return handler(w, r)
+		}
 		idToken := strings.ReplaceAll(r.Header.Get("Authorization"), "Bearer ", "")
 		if idToken == "" {
 			return errorHandler(w)
@@ -125,6 +127,7 @@ func GetAuthUserIdByEmail(mail string) (string, error) {
 }
 
 func VerifyAppcheck(handler func(w http.ResponseWriter, r *http.Request) (string, interface{}, error)) func(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+
 	wrappedHandler := func(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 		errorHandler := func(w http.ResponseWriter) (string, interface{}, error) {
 			log.Println("[VerifyAppcheck]: unauthenticated.")

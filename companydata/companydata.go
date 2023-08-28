@@ -4,8 +4,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/wopta/goworkspace/models"
-
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/wopta/goworkspace/lib"
 )
@@ -25,49 +23,49 @@ func Callback(w http.ResponseWriter, r *http.Request) {
 				Route:   "/v1/global/transactions",
 				Handler: GlobalTransaction,
 				Method:  "GET",
-				Roles:   []string{models.UserRoleAll},
+				Roles:   []string{},
 			},
 			{
 				Route:   "/v1/global/pmi/emit",
 				Handler: PmiGlobalEmit,
 				Method:  "GET",
-				Roles:   []string{models.UserRoleAll},
+				Roles:   []string{},
 			},
 			{
 				Route:   "/v1/global/person/emit",
 				Handler: PersonGlobalEmit,
 				Method:  "GET",
-				Roles:   []string{models.UserRoleAll},
+				Roles:   []string{},
 			},
 			{
 				Route:   "/v1/axa/life/emit",
 				Handler: LifeAxaEmit,
 				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAll},
+				Roles:   []string{},
 			},
 			{
 				Route:   "/v1/sogessur/gap/emit",
 				Handler: GapSogessurEmit,
 				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAll},
+				Roles:   []string{},
 			},
 			{
 				Route:   "/v1/axa/life/delete",
 				Handler: LifeAxaDelete,
 				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAll},
+				Roles:   []string{},
 			},
 			{
 				Route:   "/v1/emit",
 				Handler: Emit,
 				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAll},
+				Roles:   []string{},
 			},
 			{
 				Route:   "/v1/axa/inclusive/bankaccount",
 				Handler: BankAccountAxaInclusive,
 				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAll},
+				Roles:   []string{},
 			},
 		},
 	}
