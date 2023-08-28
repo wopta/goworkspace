@@ -15,7 +15,7 @@ require (
 	github.com/wopta/goworkspace/models v1.1.36
 	github.com/wopta/goworkspace/payment v1.0.61
 	github.com/wopta/goworkspace/question v1.0.1
-	github.com/wopta/goworkspace/reserved v1.0.1
+	github.com/wopta/goworkspace/reserved v1.0.2
 	github.com/wopta/goworkspace/transaction v1.0.12
 	github.com/wopta/goworkspace/user v1.0.21
 	github.com/wopta/goworkspace/wiseproxy v1.0.3
