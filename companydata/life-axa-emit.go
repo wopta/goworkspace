@@ -16,40 +16,6 @@ import (
 	lib "github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
-var lifeAxaEmitQuery =lib.Firequeries{
-	Queries: []lib.Firequery{
-
-		{
-			Field:      "isDelete", //
-			Operator:   "==",       //
-			QueryValue: false,
-		},
-		{
-			Field:      "isPay", //
-			Operator:   "==",    //
-			QueryValue: true,
-		},
-		{
-			Field:      "company", //
-			Operator:   "==",      //
-			QueryValue: "axa",
-		},
-		{
-			Field:      "policyName", //
-			Operator:   "==",         //
-			QueryValue: "life",
-		}, {
-			Field:      "payDate", //
-			Operator:   ">",       //
-			QueryValue: from,
-		},
-		{
-			Field:      "payDate", //
-			Operator:   "<",       //
-			QueryValue: to,
-		},
-	},
-}
 
 func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
@@ -61,6 +27,40 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 		refMontly     time.Time
 		upload        bool
 	)
+	var lifeAxaEmitQuery = lib.Firequeries{
+		Queries: []lib.Firequery{
+
+			{
+				Field:      "isDelete", //
+				Operator:   "==",       //
+				QueryValue: false,
+			},
+			{
+				Field:      "isPay", //
+				Operator:   "==",    //
+				QueryValue: true,
+			},
+			{
+				Field:      "company", //
+				Operator:   "==",      //
+				QueryValue: "axa",
+			},
+			{
+				Field:      "policyName", //
+				Operator:   "==",         //
+				QueryValue: "life",
+			}, {
+				Field:      "payDate", //
+				Operator:   ">",       //
+				QueryValue: from,
+			},
+			{
+				Field:      "payDate", //
+				Operator:   "<",       //
+				QueryValue: to,
+			},
+		},
+	}
 	log.Println("----------------LifeAxalEmit-----------------")
 	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
 	defer r.Body.Close()
@@ -68,13 +68,47 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	log.Println("LifeAxalEmit: ", string(req))
 	now, upload := getRequestData(req)
 	from, to, refMontly, filenamesplit = AxaPartnersSchedule(now)
-	cabCsv =lib.GetFilesByEnv( "data/cab-cap-istat.csv")
+	cabCsv = lib.GetFilesByEnv("data/cab-cap-istat.csv")
 
 	log.Println("LifeAxalEmit now: " + now.String())
 	log.Println("LifeAxalEmit now.Day: ", now.Day())
 	log.Println("LifeAxalEmit from: " + from.String())
 	log.Println("LifeAxalEmit to: " + to.String())
 	log.Println("LifeAxalEmit: " + filenamesplit)
+	lifeAxaEmitQuery = lib.Firequeries{
+		Queries: []lib.Firequery{
+
+			{
+				Field:      "isDelete", //
+				Operator:   "==",       //
+				QueryValue: false,
+			},
+			{
+				Field:      "isPay", //
+				Operator:   "==",    //
+				QueryValue: true,
+			},
+			{
+				Field:      "company", //
+				Operator:   "==",      //
+				QueryValue: "axa",
+			},
+			{
+				Field:      "policyName", //
+				Operator:   "==",         //
+				QueryValue: "life",
+			}, {
+				Field:      "payDate", //
+				Operator:   ">",       //
+				QueryValue: from,
+			},
+			{
+				Field:      "payDate", //
+				Operator:   "<",       //
+				QueryValue: to,
+			},
+		},
+	}
 	df := lib.CsvToDataframe(cabCsv)
 	query, e := lifeAxaEmitQuery.FirestoreWherefields("transactions")
 	log.Println("LifeAxalEmit: ", e)
@@ -88,7 +122,7 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 		docsnap := lib.GetFirestore("policy", transaction.PolicyUid)
 		docsnap.DataTo(&policy)
 		result = append(result, setRowLifeEmit(policy, df, transaction)...)
-		
+
 		transaction.IsEmit = true
 
 		lib.SetFirestore("transactions", transaction.Uid, transaction)

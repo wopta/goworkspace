@@ -69,5 +69,5 @@ func Callback(w http.ResponseWriter, r *http.Request) {
 			},
 		},
 	}
-	route.Router(w, r)
+	route.Router(w, r) 
 }
