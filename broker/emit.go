@@ -19,8 +19,6 @@ import (
 	"github.com/wopta/goworkspace/transaction"
 )
 
-var origin string
-
 const (
 	typeEmit    string = "emit"
 	typeApprove string = "approve"
@@ -52,6 +50,7 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	origin = r.Header.Get("origin")
 	body := lib.ErrorByte(io.ReadAll(r.Body))
+	defer r.Body.Close()
 
 	log.Printf("[EmitFx] Request: %s", string(body))
 	json.Unmarshal([]byte(body), &request)
@@ -73,6 +72,7 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 }
 
 func Emit(policy *models.Policy, request EmitRequest, origin string) EmitResponse {
+	log.Println("[Emit] start ------------------------------------------------")
 	var responseEmit EmitResponse
 
 	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
@@ -87,11 +87,12 @@ func Emit(policy *models.Policy, request EmitRequest, origin string) EmitRespons
 		mail.SendMailReserved(*policy)
 	case typeEmit:
 		log.Printf("[Emit] Emitting - Policy Uid %s", policy.Uid)
-
-		channel := models.GetChannel(policy)
-
 		log.Println("[Emit] starting bpmn flow...")
-		state := runEmitBpmn(policy, channel)
+		state := runBrokerBpmn(policy, emitFlowKey)
+		if state == nil || state.Data == nil {
+			log.Println("[Emit] error bpmn - state not set")
+			return responseEmit
+		}
 		policy = state.Data
 	default:
 		log.Printf("[Emit] ERROR cannot emit policy")
@@ -113,12 +114,13 @@ func Emit(policy *models.Policy, request EmitRequest, origin string) EmitRespons
 	err := lib.SetFirestoreErr(firePolicy, request.Uid, policy)
 	lib.CheckError(err)
 
-	log.Println("[Emit] saving policy to bigquery")
+	log.Println("[Emit] saving policy to bigquery...")
 	policy.BigquerySave(origin)
 
-	log.Println("[Emit] saving guarantees to bigquery")
+	log.Println("[Emit] saving guarantees to bigquery...")
 	models.SetGuaranteBigquery(*policy, "emit", fireGuarantee)
 
+	log.Println("[Emit] end --------------------------------------------------")
 	return responseEmit
 }
 

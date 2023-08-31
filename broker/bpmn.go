@@ -12,37 +12,69 @@ import (
 	"github.com/wopta/goworkspace/user"
 )
 
-func runEmitBpmn(policy *models.Policy, channel string) *bpmn.State {
-	log.Printf("[runEmitBpmn] configuring flow for %s", channel)
+var origin string
+
+const (
+	emitFlowKey     = "emit"
+	proposalFlowKey = "proposal"
+)
+
+func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
+	log.Println("[runBrokerBpmn] configuring flow")
 
 	var (
 		err           error
+		flow          []models.Process
 		setting       models.NodeSetting
 		settingFormat string = "products/%s/setting.json"
 	)
 
+	channel := models.GetChannel(policy)
 	settingFile := fmt.Sprintf(settingFormat, channel)
+
+	log.Printf("[runBrokerBpmn] loading file for channel %s", channel)
 	settingByte := lib.GetFilesByEnv(settingFile)
 
 	err = json.Unmarshal(settingByte, &setting)
 	if err != nil {
-		log.Printf("[runEmitBpmn] error unmarshaling setting file: %s", err.Error())
+		log.Printf("[runBrokerBpmn] error unmarshaling setting file: %s", err.Error())
 	}
 
 	state := bpmn.NewBpmn(*policy)
+
+	switch flowKey {
+	case proposalFlowKey:
+		flow = setting.ProposalFlow
+		addProposalHandlers(state)
+	case emitFlowKey:
+		flow = setting.EmitFlow
+		addEmitHandlers(state)
+	default:
+		log.Println("[runBrokerBpmn] error flow not set")
+		return nil
+	}
+	log.Printf("[runBrokerBpmn] using flow %s", flowKey)
+
+	// TODO: use a map function to print only the name of each step
+	flowBytes, _ := json.Marshal(flow)
+	log.Printf("[runBrokerBpmn] starting %s flow: %s", flowKey, string(flowBytes))
+
+	state.RunBpmn(flow)
+	return state
+}
+
+func addEmitHandlers(state *bpmn.State) {
 	state.AddTaskHandler("emitData", emitData)
 	state.AddTaskHandler("sendMailSign", sendMailSign)
 	state.AddTaskHandler("sign", sign)
 	state.AddTaskHandler("pay", pay)
 	state.AddTaskHandler("setAdvice", setAdvanceBpm)
 	state.AddTaskHandler("putUser", updateUserAndAgency)
+}
 
-	// TODO: use a map function to print only the name of each step
-	flowBytes, _ := json.Marshal(setting.EmitFlow)
-	log.Printf("[runEmitBpmn] starting emit flow: %s", string(flowBytes))
-
-	state.RunBpmn(setting.EmitFlow)
-	return state
+func addProposalHandlers(state *bpmn.State) {
+	state.AddTaskHandler("setProposalData", setProposalBpm)
+	state.AddTaskHandler("sendProposalMail", sendProposalMail)
 }
 
 func emitData(state *bpmn.State) error {
@@ -80,4 +112,16 @@ func updateUserAndAgency(state *bpmn.State) error {
 	policy := state.Data
 	user.SetUserIntoPolicyContractor(policy, origin)
 	return models.UpdateAgencyPortfolio(policy, origin)
+}
+
+func setProposalBpm(state *bpmn.State) error {
+	p := state.Data
+	setProposalData(p)
+	return nil
+}
+
+func sendProposalMail(state *bpmn.State) error {
+	policy := state.Data
+	mail.SendMailProposal(*policy)
+	return nil
 }
