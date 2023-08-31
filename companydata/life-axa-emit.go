@@ -165,7 +165,7 @@ func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.T
 				beneficiary1S, beneficiary2S              models.Beneficiary
 			)
 			beneficiary1, beneficiary1S, beneficiary1T = mapBeneficiary(g, 0) //Codice Fiscale Beneficiario
-			beneficiary2, beneficiary2S, _ = mapBeneficiary(g, 1)
+			beneficiary2, beneficiary2S, _ = mapBeneficiary(g, 0)
 			if policy.PaymentSplit == string(models.PaySplitMonthly) {
 				price = g.Value.PremiumGrossMonthly
 			} else {
@@ -547,18 +547,20 @@ func mapBeneficiary(g models.Guarante, b int) (string, models.Beneficiary, strin
 	)
 	resulStruct = models.Beneficiary{User: models.User{Residence: &models.Address{}}}
 	if g.Beneficiaries != nil {
-		resulStruct = (*g.Beneficiaries)[b]
+		if len(*g.Beneficiaries) >= b {
+			resulStruct = (*g.Beneficiaries)[b]
 
-		if len(*g.Beneficiaries) > 0 && len(*g.Beneficiaries) > b {
-			result = ""
-			if (*g.Beneficiaries)[b].IsLegitimateSuccessors || (*g.Beneficiaries)[b].IsFamilyMember || (*g.Beneficiaries)[b].BeneficiaryType == models.BeneficiaryLegalAndWillSuccessors {
-				result = "GE"
-				result2 = "GE"
-			} else {
-				result = (*g.Beneficiaries)[b].FiscalCode
-				result2 = "NM"
+			if len(*g.Beneficiaries) > 0 && len(*g.Beneficiaries) > b {
+				result = ""
+				if (*g.Beneficiaries)[b].IsLegitimateSuccessors || (*g.Beneficiaries)[b].IsFamilyMember || (*g.Beneficiaries)[b].BeneficiaryType == models.BeneficiaryLegalAndWillSuccessors {
+					result = "GE"
+					result2 = "GE"
+				} else {
+					result = (*g.Beneficiaries)[b].FiscalCode
+					result2 = "NM"
+				}
+
 			}
-
 		}
 	}
 	return result, resulStruct, result2
