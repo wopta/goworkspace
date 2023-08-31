@@ -41,3 +41,11 @@ func SliceFilter[T any](ss []T, test func(T) bool) (ret []T) {
 	}
 	return
 }
+
+func SliceMap[T, U any](s []T, f func(T) U) []U {
+	r := make([]U, len(s))
+	for i, v := range s {
+		r[i] = f(v)
+	}
+	return r
+}

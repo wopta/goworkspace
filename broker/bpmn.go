@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/wopta/goworkspace/bpmn"
 	"github.com/wopta/goworkspace/lib"
@@ -53,11 +54,9 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 		log.Println("[runBrokerBpmn] error flow not set")
 		return nil
 	}
-	log.Printf("[runBrokerBpmn] using flow %s", flowKey)
 
-	// TODO: use a map function to print only the name of each step
-	flowBytes, _ := json.Marshal(flow)
-	log.Printf("[runBrokerBpmn] starting %s flow: %s", flowKey, string(flowBytes))
+	flowHandlers := lib.SliceMap[models.Process, string](flow, func(h models.Process) string { return h.Name })
+	log.Printf("[runBrokerBpmn] starting %s flow with set handlers: %s", flowKey, strings.Join(flowHandlers, ","))
 
 	state.RunBpmn(flow)
 	return state
