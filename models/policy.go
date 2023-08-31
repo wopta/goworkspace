@@ -251,3 +251,13 @@ func PolicyToListData(query *firestore.DocumentIterator) []Policy {
 	}
 	return result
 }
+
+func GetChannel(policy *Policy) string {
+	if policy.AgentUid != "" {
+		return AgentChannel
+	}
+	if policy.AgencyUid != "" {
+		return AgencyChannel
+	}
+	return ECommerceChannel
+}
