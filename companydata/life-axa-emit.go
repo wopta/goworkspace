@@ -545,22 +545,23 @@ func mapBeneficiary(g models.Guarante, b int) (string, models.Beneficiary, strin
 		result2     string
 		resulStruct models.Beneficiary
 	)
-	resulStruct = models.Beneficiary{User: models.User{Residence: &models.Address{}}}
+	resulStructDefault := models.Beneficiary{User: models.User{Residence: &models.Address{}}}
+	resulStruct = resulStructDefault
 	if g.Beneficiaries != nil {
-		if len(*g.Beneficiaries) >= b {
-			resulStruct = (*g.Beneficiaries)[b]
 
-			if len(*g.Beneficiaries) > 0 && len(*g.Beneficiaries) > b {
-				result = ""
-				if (*g.Beneficiaries)[b].IsLegitimateSuccessors || (*g.Beneficiaries)[b].IsFamilyMember || (*g.Beneficiaries)[b].BeneficiaryType == models.BeneficiaryLegalAndWillSuccessors {
-					result = "GE"
-					result2 = "GE"
-				} else {
-					result = (*g.Beneficiaries)[b].FiscalCode
-					result2 = "NM"
-				}
+		if len(*g.Beneficiaries) > 0 && len(*g.Beneficiaries) > b {
+			result = ""
+			if (*g.Beneficiaries)[b].IsLegitimateSuccessors || (*g.Beneficiaries)[b].IsFamilyMember || (*g.Beneficiaries)[b].BeneficiaryType == models.BeneficiaryLegalAndWillSuccessors {
+				result = "GE"
+				result2 = "GE"
+				resulStruct = resulStructDefault
 
+			} else {
+				result = (*g.Beneficiaries)[b].FiscalCode
+				result2 = "NM"
+				resulStruct = (*g.Beneficiaries)[b]
 			}
+
 		}
 	}
 	return result, resulStruct, result2
