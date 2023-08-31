@@ -51,7 +51,11 @@ func FabrickPay(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 	err := json.Unmarshal([]byte(req), &data)
 	log.Println(data.PriceGross)
 	lib.CheckError(err)
-	resultPay := <-FabrickPayObj(data, false, "", "", "", data.PriceGross, data.PriceNett, getOrigin(r.Header.Get("origin")))
+
+	paymentMethods := getPaymentMethods(data)
+
+	resultPay := <-FabrickPayObj(data, false, "", "", "", data.PriceGross,
+		data.PriceNett, getOrigin(r.Header.Get("origin")), paymentMethods)
 
 	log.Println(resultPay)
 	return "", nil, err
@@ -65,13 +69,16 @@ func FabrickPayMontly(w http.ResponseWriter, r *http.Request) (string, interface
 	err := json.Unmarshal([]byte(req), &data)
 	log.Println(data.PriceGross)
 	lib.CheckError(err)
-	resultPay := FabbrickMontlyPay(data, getOrigin(r.Header.Get("origin")))
+
+	paymentMethods := getPaymentMethods(data)
+
+	resultPay := FabbrickMontlyPay(data, getOrigin(r.Header.Get("origin")), paymentMethods)
 	b, err := json.Marshal(resultPay)
 	log.Println(resultPay)
 	return string(b), resultPay, err
 }
 
-func FabrickPayObj(data models.Policy, firstSchedule bool, scheduleDate string, expireDate string, customerId string, amount float64, amountNet float64, origin string) <-chan FabrickPaymentResponse {
+func FabrickPayObj(data models.Policy, firstSchedule bool, scheduleDate string, expireDate string, customerId string, amount float64, amountNet float64, origin string, paymentMethods []string) <-chan FabrickPaymentResponse {
 	r := make(chan FabrickPaymentResponse)
 
 	go func() {
@@ -81,11 +88,11 @@ func FabrickPayObj(data models.Policy, firstSchedule bool, scheduleDate string, 
 		var (
 			urlstring = os.Getenv("FABRICK_BASEURL") + "api/fabrick/pace/v4.0/mods/back/v1.0/payments"
 		)
-		client := &http.Client{
+		/*client := &http.Client{
 			Timeout: time.Second * 15,
-		}
+		}*/
 
-		marshal := getFabrickPayments(data, firstSchedule, scheduleDate, expireDate, customerId, amount, origin)
+		marshal := getFabrickPayments(data, firstSchedule, scheduleDate, expireDate, customerId, amount, origin, paymentMethods)
 		log.Printf("[FabrickPayObj] Policy %s: %s", data.Uid, string(marshal))
 
 		req, _ := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(string(marshal)))
@@ -96,7 +103,7 @@ func FabrickPayObj(data models.Policy, firstSchedule bool, scheduleDate string, 
 		req.Header.Set("Accept", "application/json")
 		log.Printf("[FabrickPayObj] Policy %s request headers: %s", data.Uid, req.Header)
 
-		res, err := client.Do(req)
+		res, err := lib.RetryDo(req, 5)
 		lib.CheckError(err)
 
 		if res != nil {
@@ -117,17 +124,17 @@ func FabrickPayObj(data models.Policy, firstSchedule bool, scheduleDate string, 
 	return r
 }
 
-func FabbrickMontlyPay(data models.Policy, origin string) FabrickPaymentResponse {
+func FabbrickMontlyPay(data models.Policy, origin string, paymentMethods []string) FabrickPaymentResponse {
 	log.Printf("[FabbrickMontlyPay] Policy %s", data.Uid)
 
 	customerId := uuid.New().String()
-	firstres := <-FabrickPayObj(data, true, "", "", customerId, data.PriceGrossMonthly, data.PriceNettMonthly, origin)
+	firstres := <-FabrickPayObj(data, true, "", "", customerId, data.PriceGrossMonthly, data.PriceNettMonthly, origin, paymentMethods)
 	time.Sleep(100)
 
 	for i := 1; i <= 11; i++ {
 		date := data.StartDate.AddDate(0, i, 0)
 		expireDate := date.AddDate(0, 0, 4)
-		res := <-FabrickPayObj(data, false, date.Format(models.TimeDateOnly), expireDate.Format(models.TimeDateOnly), customerId, data.PriceGrossMonthly, data.PriceNettMonthly, origin)
+		res := <-FabrickPayObj(data, false, date.Format(models.TimeDateOnly), expireDate.Format(models.TimeDateOnly), customerId, data.PriceGrossMonthly, data.PriceNettMonthly, origin, paymentMethods)
 		log.Printf("[FabbrickMontlyPay] Policy %s - Index %d - response: %v", data.Uid, i, res)
 		time.Sleep(100)
 	}
@@ -135,16 +142,16 @@ func FabbrickMontlyPay(data models.Policy, origin string) FabrickPaymentResponse
 	return firstres
 }
 
-func FabbrickYearPay(data models.Policy, origin string) FabrickPaymentResponse {
+func FabbrickYearPay(data models.Policy, origin string, paymentMethods []string) FabrickPaymentResponse {
 	log.Printf("[FabbrickYearPay] Policy %s", data.Uid)
 
 	customerId := uuid.New().String()
-	res := <-FabrickPayObj(data, false, "", "", customerId, data.PriceGross, data.PriceNett, origin)
+	res := <-FabrickPayObj(data, false, "", "", customerId, data.PriceGross, data.PriceNett, origin, paymentMethods)
 
 	return res
 }
 
-func getFabrickPayments(data models.Policy, firstSchedule bool, scheduleDate string, expireDate string, customerId string, amount float64, origin string) string {
+func getFabrickPayments(data models.Policy, firstSchedule bool, scheduleDate string, expireDate string, customerId string, amount float64, origin string, paymentMethods []string) string {
 	log.Printf("[getFabrickPayments] Policy %s", data.Uid)
 
 	var (
@@ -164,7 +171,7 @@ func getFabrickPayments(data models.Policy, firstSchedule bool, scheduleDate str
 	}
 	now := time.Now()
 
-	paymentMethods := []string{"CREDITCARD"}
+	//paymentMethods := []string{"CREDITCARD"}
 
 	if scheduleDate != "" {
 		scheduleTransaction = ScheduleTransaction{DueDate: scheduleDate, PaymentInstrumentResolutionStrategy: "BY_PAYER"}
@@ -196,8 +203,9 @@ func getFabrickPayments(data models.Policy, firstSchedule bool, scheduleDate str
 			OnSuccess: "https://www.wopta.it",
 			OnFailure: "https://www.wopta.it",
 		},
-		AllowedPaymentMethods: &[]AllowedPaymentMethod{{Role: "payer", PaymentMethods: paymentMethods}},
-		CallbackURL:           callbackUrl,
+		AllowedPaymentMethods: &[]AllowedPaymentMethod{{Role: "payer", PaymentMethods: lib.SliceMap(paymentMethods,
+			func(item string) string { return strings.ToUpper(item) })}},
+		CallbackURL: callbackUrl,
 	}
 	pay.Bill = bill
 

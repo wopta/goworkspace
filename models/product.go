@@ -107,9 +107,14 @@ type Column struct {
 }
 
 type PaymentProvider struct {
-	Name   string   `json:"name,omitempty" firestore:"name,omitempty" bigquery:"-"`
-	Method string   `json:"method,omitempty" firestore:"method,omitempty" bigquery:"-"`
-	Rates  []string `json:"rates,omitempty" firestore:"rates,omitempty" bigquery:"-"`
+	Name    string          `json:"name,omitempty" firestore:"name,omitempty" bigquery:"-"`
+	Methods []PaymentMethod `json:"methods,omitempty" firestore:"methods,omitempty" bigquery:"-"`
+	Rates   []string        `json:"rates,omitempty" firestore:"rates,omitempty" bigquery:"-"`
+}
+
+type PaymentMethod struct {
+	Name  string   `json:"name" firestore:"name" bigquery:"-"`
+	Rates []string `json:"rates" firestore:"rates" bigquery:"-"`
 }
 
 type AnnulmentCode struct {
