@@ -24,13 +24,13 @@ func Payment(w http.ResponseWriter, r *http.Request) {
 
 			{
 				Route:   "/v1/fabrick",
-				Handler: FabrickPay,
+				Handler: FabrickPayFx,
 				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
 				Route:   "/v1/fabrick/montly",
-				Handler: FabrickPayMontly,
+				Handler: FabrickPayMonthlyFx,
 				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAll},
 			},
@@ -83,11 +83,11 @@ func PaymentController(origin string, policy *models.Policy) (string, error) {
 
 		if policy.PaymentSplit == string(models.PaySplitYear) || policy.PaymentSplit == string(models.PaySplitYearly) {
 			log.Printf("[PaymentController] fabrick yearly pay")
-			payRes = FabbrickYearPay(*policy, origin, paymentMethods)
+			payRes = FabrickYearPay(*policy, origin, paymentMethods)
 		}
 		if policy.PaymentSplit == string(models.PaySplitMonthly) {
 			log.Printf("[PaymentController] fabrick monthly pay")
-			payRes = FabbrickMontlyPay(*policy, origin, paymentMethods)
+			payRes = FabrickMonthlyPay(*policy, origin, paymentMethods)
 		}
 		if payRes.Payload.PaymentPageURL == nil {
 			return "", fmt.Errorf("fabrick error: %v", payRes.Errors)
