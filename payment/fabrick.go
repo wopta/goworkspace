@@ -88,9 +88,6 @@ func FabrickPayObj(data models.Policy, firstSchedule bool, scheduleDate string, 
 		var (
 			urlstring = os.Getenv("FABRICK_BASEURL") + "api/fabrick/pace/v4.0/mods/back/v1.0/payments"
 		)
-		/*client := &http.Client{
-			Timeout: time.Second * 15,
-		}*/
 
 		marshal := getFabrickPayments(data, firstSchedule, scheduleDate, expireDate, customerId, amount, origin, paymentMethods)
 		log.Printf("[FabrickPayObj] Policy %s: %s", data.Uid, string(marshal))
@@ -170,8 +167,6 @@ func getFabrickPayments(data models.Policy, firstSchedule bool, scheduleDate str
 		customerId = uuid.New().String()
 	}
 	now := time.Now()
-
-	//paymentMethods := []string{"CREDITCARD"}
 
 	if scheduleDate != "" {
 		scheduleTransaction = ScheduleTransaction{DueDate: scheduleDate, PaymentInstrumentResolutionStrategy: "BY_PAYER"}

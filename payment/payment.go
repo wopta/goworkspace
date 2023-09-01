@@ -2,12 +2,13 @@ package payment
 
 import (
 	"fmt"
+	"log"
+	"net/http"
+
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	prd "github.com/wopta/goworkspace/product"
-	"log"
-	"net/http"
 )
 
 func init() {
