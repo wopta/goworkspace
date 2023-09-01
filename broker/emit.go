@@ -5,12 +5,10 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
 	"cloud.google.com/go/civil"
-	"github.com/wopta/goworkspace/bpmn"
 	"github.com/wopta/goworkspace/document"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/mail"
@@ -18,11 +16,8 @@ import (
 	"github.com/wopta/goworkspace/payment"
 	"github.com/wopta/goworkspace/question"
 	"github.com/wopta/goworkspace/reserved"
-	tr "github.com/wopta/goworkspace/transaction"
-	"github.com/wopta/goworkspace/user"
+	"github.com/wopta/goworkspace/transaction"
 )
-
-var origin string
 
 const (
 	typeEmit    string = "emit"
@@ -55,6 +50,7 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	origin = r.Header.Get("origin")
 	body := lib.ErrorByte(io.ReadAll(r.Body))
+	defer r.Body.Close()
 
 	log.Printf("[EmitFx] Request: %s", string(body))
 	json.Unmarshal([]byte(body), &request)
@@ -76,6 +72,7 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 }
 
 func Emit(policy *models.Policy, request EmitRequest, origin string) EmitResponse {
+	log.Println("[Emit] start ------------------------------------------------")
 	var responseEmit EmitResponse
 
 	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
@@ -90,18 +87,13 @@ func Emit(policy *models.Policy, request EmitRequest, origin string) EmitRespons
 		mail.SendMailReserved(*policy)
 	case typeEmit:
 		log.Printf("[Emit] Emitting - Policy Uid %s", policy.Uid)
-		if policy.AgencyUid != "" {
-			log.Println("[Emit] Agency Flow")
-			state := runBpmn(policy, models.AgencyChannel)
-			log.Println("[Emit] state.Data Policy:", state.Data)
-			policy = state.Data
-		} else if policy.AgentUid != "" {
-			log.Println("[Emit] Agent (E-commerce) Flow")
-			ecommerceFlow(policy, origin)
-		} else {
-			log.Println("[Emit] E-commerce Flow")
-			ecommerceFlow(policy, origin)
+		log.Println("[Emit] starting bpmn flow...")
+		state := runBrokerBpmn(policy, emitFlowKey)
+		if state == nil || state.Data == nil {
+			log.Println("[Emit] error bpmn - state not set")
+			return responseEmit
 		}
+		policy = state.Data
 	default:
 		log.Printf("[Emit] ERROR cannot emit policy")
 		return responseEmit
@@ -113,85 +105,23 @@ func Emit(policy *models.Policy, request EmitRequest, origin string) EmitRespons
 		ReservedInfo: policy.ReservedInfo,
 		Uid:          policy.Uid,
 	}
+
+	policy.Updated = time.Now().UTC()
 	policyJson, _ := policy.Marshal()
 	log.Printf("[Emit] Policy %s: %s", request.Uid, string(policyJson))
-	policy.Updated = time.Now().UTC()
+
+	log.Println("[Emit] saving policy to firestore...")
 	err := lib.SetFirestoreErr(firePolicy, request.Uid, policy)
 	lib.CheckError(err)
+
+	log.Println("[Emit] saving policy to bigquery...")
 	policy.BigquerySave(origin)
+
+	log.Println("[Emit] saving guarantees to bigquery...")
 	models.SetGuaranteBigquery(*policy, "emit", fireGuarantee)
 
+	log.Println("[Emit] end --------------------------------------------------")
 	return responseEmit
-}
-
-func ecommerceFlow(policy *models.Policy, origin string) {
-	emitBase(policy, origin)
-
-	emitSign(policy, origin)
-
-	emitPay(policy, origin)
-
-	mail.SendMailSign(*policy)
-}
-
-func setAdvice(policy *models.Policy, origin string) {
-	policy.Payment = "manual"
-	policy.IsPay = true
-	policy.Status = models.PolicyStatusPay
-	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusToPay, models.PolicyStatusPay)
-	policy.PaymentSplit = string(models.PaySingleInstallment)
-
-	tr.PutByPolicy(*policy, "", origin, "", "", policy.PriceGross, policy.PriceNett, "", true)
-}
-
-func setAdviceBpm(state *bpmn.State) error {
-	p := state.Data
-	setAdvice(p, origin)
-	return nil
-}
-
-func setData(state *bpmn.State) error {
-	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
-	p := state.Data
-	emitBase(p, origin)
-	return lib.SetFirestoreErr(firePolicy, p.Uid, p)
-}
-
-func sendMailSign(state *bpmn.State) error {
-	policy := state.Data
-	mail.SendMailSign(*policy)
-	return nil
-}
-
-func sign(state *bpmn.State) error {
-	policy := state.Data
-	emitSign(policy, origin)
-	return nil
-}
-
-func updateUserAndAgency(state *bpmn.State) error {
-	policy := state.Data
-	user.SetUserIntoPolicyContractor(policy, origin)
-	return models.UpdateAgencyPortfolio(policy, origin)
-}
-
-func runBpmn(policy *models.Policy, channel string) *bpmn.State {
-	settingByte, _ := lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "products/"+channel+"/setting.json")
-
-	var setting models.NodeSetting
-
-	//Parsing/Unmarshalling JSON encoding/json
-	json.Unmarshal(settingByte, &setting)
-	state := bpmn.NewBpmn(*policy)
-	state.AddTaskHandler("emitData", setData)
-	state.AddTaskHandler("sendMailSign", sendMailSign)
-	state.AddTaskHandler("sign", sign)
-	state.AddTaskHandler("setAdvice", setAdviceBpm)
-	state.AddTaskHandler("putUser", updateUserAndAgency)
-	log.Println(state.Handlers)
-	log.Println(state.Processes)
-	state.RunBpmn(setting.EmitFlow)
-	return state
 }
 
 func emitUpdatePolicy(policy *models.Policy, request EmitRequest) {
@@ -219,6 +149,7 @@ func getEmitTypeFromPolicy(policy *models.Policy) string {
 		return typeApprove
 	}
 
+	log.Printf("[getEmitTypeFromPolicy] error no type found for isReserved '%t' and status '%s'", policy.IsReserved, policy.Status)
 	return ""
 }
 
@@ -275,4 +206,14 @@ func emitPay(policy *models.Policy, origin string) {
 	}
 
 	policy.PayUrl = *payRes.Payload.PaymentPageURL
+}
+
+func setAdvance(policy *models.Policy, origin string) {
+	policy.Payment = "manual"
+	policy.IsPay = true
+	policy.Status = models.PolicyStatusPay
+	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusToPay, models.PolicyStatusPay)
+	policy.PaymentSplit = string(models.PaySingleInstallment)
+
+	transaction.PutByPolicy(*policy, "", origin, "", "", policy.PriceGross, policy.PriceNett, "", true)
 }

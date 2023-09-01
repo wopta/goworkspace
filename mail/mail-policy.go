@@ -72,7 +72,7 @@ func SendMailProposal(policy models.Policy) {
 		bodyData   = BodyData{}
 	)
 
-	channel := getChannel(policy)
+	channel := models.GetChannel(&policy)
 
 	cc := setBodyDataAndGetCC(channel, policy, &bodyData)
 
@@ -100,7 +100,7 @@ func SendMailPay(policy models.Policy) {
 		bodyData = BodyData{}
 	)
 
-	channel := getChannel(policy)
+	channel := models.GetChannel(&policy)
 
 	cc := setBodyDataAndGetCC(channel, policy, &bodyData)
 
@@ -128,7 +128,7 @@ func SendMailSign(policy models.Policy) {
 		bodyData = BodyData{}
 	)
 
-	channel := getChannel(policy)
+	channel := models.GetChannel(&policy)
 
 	cc := setBodyDataAndGetCC(channel, policy, &bodyData)
 
@@ -156,7 +156,7 @@ func SendMailContract(policy models.Policy, at *[]Attachment) {
 		bodyData = BodyData{}
 	)
 
-	channel := getChannel(policy)
+	channel := models.GetChannel(&policy)
 
 	cc := setBodyDataAndGetCC(channel, policy, &bodyData)
 
@@ -203,7 +203,7 @@ func SendMailReserved(policy models.Policy) {
 		bodyData = BodyData{}
 	)
 
-	channel := getChannel(policy)
+	channel := models.GetChannel(&policy)
 
 	cc := setBodyDataAndGetCC(channel, policy, &bodyData)
 
@@ -255,7 +255,7 @@ func SendMailReservedResult(policy models.Policy) {
 		template = reservedRejectedTemplateType
 	}
 
-	channel := getChannel(policy)
+	channel := models.GetChannel(&policy)
 
 	to := setBodyDataAndGetCC(channel, policy, &bodyData)
 

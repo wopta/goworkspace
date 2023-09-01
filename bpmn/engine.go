@@ -10,7 +10,7 @@ import (
 )
 
 func (state *State) AddTaskHandler(name string, handler func(state *State) error) map[string]func(state *State) error {
-	log.Println("[AddTaskHandler]")
+	log.Printf("[AddTaskHandler] %s", name)
 	if nil == state.Handlers {
 		log.Println("[AddTaskHandler] state.Handlers == nil")
 	}
@@ -44,12 +44,11 @@ func (state *State) runNextProcess(process models.Process) {
 		for _, x := range state.getProcesses(process.OutProcess) {
 			state.runProcess(x)
 		}
-
 	}
 }
 
 func (state *State) runProcess(process models.Process) {
-	log.Println("[runProcess]")
+	log.Printf("[runProcess] %s", process.Name)
 	id := process.Id
 	state.Processes[id].Status = Active
 	var (

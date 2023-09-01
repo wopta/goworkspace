@@ -41,3 +41,44 @@ func SliceFilter[T any](ss []T, test func(T) bool) (ret []T) {
 	}
 	return
 }
+
+func SliceMap[T, U any](s []T, f func(T) U) []U {
+	r := make([]U, len(s))
+	for i, v := range s {
+		r[i] = f(v)
+	}
+	return r
+}
+
+func SliceToSet[T comparable](s []T) []T {
+	inResult := make(map[T]bool)
+	var result []T
+	for _, str := range s {
+		if _, ok := inResult[str]; !ok {
+			inResult[str] = true
+			result = append(result, str)
+		}
+	}
+	return result
+}
+
+func SliceFlatten[T any](s [][]T) []T {
+	itemCount := 0
+	for i := 0; i < len(s); i++ {
+		itemCount = itemCount + len(s[i])
+	}
+
+	r := make([]T, itemCount)
+	idx := 0
+	for i := 0; i < len(s); i++ {
+		for j := 0; j < len(s[i]); j++ {
+			r[idx] = s[i][j]
+			idx++
+		}
+	}
+	return r
+}
+
+func SliceFlatMap[T, U any](s [][]T, f func(T) U) []U {
+	return SliceFlatten(SliceMap(s, func(t []T) []U { return SliceMap(t, f) }))
+}

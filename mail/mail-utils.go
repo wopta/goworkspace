@@ -9,16 +9,6 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
-func getChannel(policy models.Policy) string {
-	if policy.AgentUid != "" {
-		return models.AgentChannel
-	}
-	if policy.AgencyUid != "" {
-		return models.AgencyChannel
-	}
-	return models.ECommerceChannel
-}
-
 func setBodyDataAndGetCC(channel string, policy models.Policy, bodyData *BodyData) string {
 	var cc string
 

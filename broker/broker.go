@@ -33,7 +33,7 @@ func Broker(w http.ResponseWriter, r *http.Request) {
 			},
 			{
 				Route:   "/v1/policy/proposal",
-				Handler: Proposal,
+				Handler: ProposalFx,
 				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAll},
 			},
