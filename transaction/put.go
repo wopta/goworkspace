@@ -31,7 +31,7 @@ func PutByPolicy(policy models.Policy, scheduleDate string, origin string, expir
 
 	// TODO fix me - workaround for Gap camper mga commissions
 	if isGapCamper(&policy) {
-		log.Println("[GetCommissionProduct] using GAP camper commissions")
+		log.Println("[PutByPolicy] overrinding product commissions for Gap camper")
 		prod.Offers["base"].Commissions.NewBusiness = 0.22
 		prod.Offers["base"].Commissions.Renew = 0.22
 		prod.Offers["complete"].Commissions.NewBusiness = 0.37
