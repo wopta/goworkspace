@@ -110,6 +110,11 @@ func getPaymentMethods(policy models.Policy) []string {
 	product, err := prd.GetProduct(policy.Name, policy.ProductVersion, models.UserRoleAdmin)
 	lib.CheckError(err)
 
+	// TODO: remove me once established standard
+	if policy.PaymentSplit == string(models.PaySplitYear) {
+		policy.PaymentSplit = string(models.PaySplitYearly)
+	}
+
 	for _, provider := range product.PaymentProviders {
 		if provider.Name == policy.Payment {
 			for _, method := range provider.Methods {
