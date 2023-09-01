@@ -99,6 +99,7 @@ func FabrickPayObj(data models.Policy, firstSchedule bool, scheduleDate string, 
 		req.Header.Set("x-auth-token", os.Getenv("FABRICK_TOKEN_BACK_API"))
 		req.Header.Set("Accept", "application/json")
 		log.Printf("[FabrickPayObj] Policy %s request headers: %s", data.Uid, req.Header)
+		log.Printf("[FabrickPayObj] Policy %s request body: %s", data.Uid, req.Body)
 
 		res, err := lib.RetryDo(req, 5)
 		lib.CheckError(err)
