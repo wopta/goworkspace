@@ -41,6 +41,7 @@ type PaySplit string
 const (
 	PaySplitMonthly      PaySplit = "monthly"
 	PaySplitYear         PaySplit = "year"
+	PaySplitYearly       PaySplit = "yearly"
 	PaySplitSemestral    PaySplit = "semestral"
 	PaySingleInstallment PaySplit = "singleInstallment"
 )
@@ -115,4 +116,9 @@ const (
 	AxaCompany      string = "axa"
 	GlobalCompany   string = "global"
 	SogessurCompany string = "sogessur"
+)
+
+const (
+	FabrickPaymentProvider string = "fabrick"
+	ManualPaymentProvider  string = "payment"
 )

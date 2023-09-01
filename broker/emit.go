@@ -194,18 +194,9 @@ func emitSign(policy *models.Policy, origin string) {
 
 func emitPay(policy *models.Policy, origin string) {
 	log.Printf("[EmitPay] Policy Uid %s", policy.Uid)
-	var payRes payment.FabrickPaymentResponse
 
 	policy.IsPay = false
-
-	if policy.PaymentSplit == string(models.PaySplitYear) {
-		payRes = payment.FabbrickYearPay(*policy, origin)
-	}
-	if policy.PaymentSplit == string(models.PaySplitMonthly) {
-		payRes = payment.FabbrickMontlyPay(*policy, origin)
-	}
-
-	policy.PayUrl = *payRes.Payload.PaymentPageURL
+	policy.PayUrl, _ = payment.PaymentController(origin, policy)
 }
 
 func setAdvance(policy *models.Policy, origin string) {

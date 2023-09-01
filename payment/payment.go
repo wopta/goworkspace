@@ -1,19 +1,14 @@
 package payment
 
 import (
-	"encoding/json"
-	"io"
+	"fmt"
 	"log"
 	"net/http"
-	"os"
-	"strings"
-	"time"
-
-	"cloud.google.com/go/civil"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	prd "github.com/wopta/goworkspace/product"
 )
 
 func init() {
@@ -22,7 +17,6 @@ func init() {
 }
 
 func Payment(w http.ResponseWriter, r *http.Request) {
-
 	log.Println("Payment")
 	lib.EnableCors(&w, r)
 	w.Header().Set("Access-Control-Allow-Methods", "POST")
@@ -31,20 +25,20 @@ func Payment(w http.ResponseWriter, r *http.Request) {
 
 			{
 				Route:   "/v1/fabrick",
-				Handler: FabrickPay,
-				Method:  "POST",
+				Handler: FabrickPayFx,
+				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
 				Route:   "/v1/fabrick/montly",
-				Handler: FabrickPayMontly,
-				Method:  "POST",
+				Handler: FabrickPayMonthlyFx,
+				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
 				Route:   "/v1/cripto",
 				Handler: CriptoPay,
-				Method:  "POST",
+				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
@@ -64,81 +58,73 @@ func Payment(w http.ResponseWriter, r *http.Request) {
 	route.Router(w, r)
 
 }
-func FabrickPay(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	req := lib.ErrorByte(io.ReadAll(r.Body))
-
-	var data models.Policy
-	defer r.Body.Close()
-	err := json.Unmarshal([]byte(req), &data)
-	log.Println(data.PriceGross)
-	lib.CheckError(err)
-	resultPay := <-FabrickPayObj(data, false, "", "", "", data.PriceGross, data.PriceNett, getOrigin(r.Header.Get("origin")))
-
-	log.Println(resultPay)
-	return "", nil, err
-}
-func FabrickPayMontly(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	req := lib.ErrorByte(io.ReadAll(r.Body))
-
-	var data models.Policy
-	defer r.Body.Close()
-	err := json.Unmarshal([]byte(req), &data)
-	log.Println(data.PriceGross)
-	lib.CheckError(err)
-	resultPay := FabbrickMontlyPay(data, getOrigin(r.Header.Get("origin")))
-	b, err := json.Marshal(resultPay)
-	log.Println(resultPay)
-	return string(b), resultPay, err
-}
 
 func CriptoPay(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-
 	return "", nil, nil
 }
 
-func getOrigin(origin string) string {
-	var result string
-	if strings.Contains(origin, "uat") || strings.Contains(origin, "dev") {
-		result = "uat"
-	} else {
-		result = ""
+func PaymentController(origin string, policy *models.Policy) (string, error) {
+	var (
+		payUrl         string
+		paymentMethods []string
+	)
+
+	log.Printf("[PaymentController] init")
+
+	// TODO: fix me
+	if policy.Payment == "" || policy.Payment == "fabrik" {
+		policy.Payment = models.FabrickPaymentProvider
 	}
-	log.Println(" getOrigin: name:", origin)
-	log.Println(" getOrigin result: ", result)
-	return result
+	paymentMethods = getPaymentMethods(*policy)
+
+	log.Printf("[PaymentController] generating payment URL")
+	switch policy.Payment {
+	case models.FabrickPaymentProvider:
+		var payRes FabrickPaymentResponse
+
+		if policy.PaymentSplit == string(models.PaySplitYear) || policy.PaymentSplit == string(models.PaySplitYearly) {
+			log.Printf("[PaymentController] fabrick yearly pay")
+			payRes = FabrickYearPay(*policy, origin, paymentMethods)
+		}
+		if policy.PaymentSplit == string(models.PaySplitMonthly) {
+			log.Printf("[PaymentController] fabrick monthly pay")
+			payRes = FabrickMonthlyPay(*policy, origin, paymentMethods)
+		}
+		if payRes.Payload == nil || payRes.Payload.PaymentPageURL == nil {
+			log.Println("[PaymentController] fabrick error payload or paymentUrl empty")
+			return "", fmt.Errorf("fabrick error: %v", payRes.Errors)
+		}
+		payUrl = *payRes.Payload.PaymentPageURL
+	default:
+		return "", fmt.Errorf("payment provider %s not supported", policy.Payment)
+	}
+
+	log.Printf("[PaymentController] payUrl: %s", payUrl)
+
+	return payUrl, nil
 }
 
-func FabrickExpireBill(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	var transaction models.Transaction
-	const expirationTimeSuffix = " 00:00:00"
-	//layout := "2006-01-02T15:04:05.000Z"
-	layout2 := "2006-01-02"
+func getPaymentMethods(policy models.Policy) []string {
+	paymentMethods := make([]string, 0)
 
-	log.Println(r.Header.Get("uid"))
-	uid := r.Header.Get("uid")
-	fireTransactions := lib.GetDatasetByEnv(r.Header.Get("origin"), "transactions")
-	docsnap, e := lib.GetFirestoreErr(fireTransactions, uid)
-	docsnap.DataTo(&transaction)
-	expirationDate := time.Now().UTC().AddDate(0, 0, 1).Format(layout2)
-	var urlstring = os.Getenv("FABRICK_BASEURL") + "api/fabrick/pace/v4.0/mods/back/v1.0/payments/change-expiration"
+	log.Printf("[GetPaymentMethods] loading available payment methods for %s payment provider", policy.Payment)
 
-	req, _ := http.NewRequest(http.MethodPut, urlstring, strings.NewReader(`{"id":"`+transaction.ProviderId+`","newExpirationDate":"`+expirationDate+expirationTimeSuffix+`"}`))
-	res, e := getFabrickClient(urlstring, req)
+	product, err := prd.GetProduct(policy.Name, policy.ProductVersion, models.UserRoleAdmin)
+	lib.CheckError(err)
 
-	respBody, e := io.ReadAll(res.Body)
-	log.Println("Fabrick res body: ", string(respBody))
-	if res.StatusCode != http.StatusOK {
-		log.Printf("ExpireBill: fabrick error response status code: %s", res.Status)
-		return `{"success":false}`, `{"success":false}`, nil
+	// TODO: remove me once established standard
+	if policy.PaymentSplit == string(models.PaySplitYear) {
+		policy.PaymentSplit = string(models.PaySplitYearly)
 	}
-	transaction.ExpirationDate = expirationDate
-	transaction.Status = models.PolicyStatusDeleted
-	transaction.StatusHistory = append(transaction.StatusHistory, models.PolicyStatusDeleted)
-	transaction.IsDelete = true
-	transaction.BigCreationDate = civil.DateTimeOf(transaction.CreationDate)
-	transaction.BigStatusHistory = strings.Join(transaction.StatusHistory, ",")
-	lib.SetFirestore(fireTransactions, uid, transaction)
-	e = lib.InsertRowsBigQuery("wopta", fireTransactions, transaction)
 
-	return `{"success":true}`, `{"success":true}`, e
+	for _, provider := range product.PaymentProviders {
+		if provider.Name == policy.Payment {
+			for _, method := range provider.Methods {
+				if lib.SliceContains(method.Rates, policy.PaymentSplit) {
+					paymentMethods = append(paymentMethods, method.Name)
+				}
+			}
+		}
+	}
+	return paymentMethods
 }
