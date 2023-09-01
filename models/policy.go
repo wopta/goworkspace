@@ -104,7 +104,8 @@ type Policy struct {
 	FundsOrigin       string                       `json:"fundsOrigin,omitempty" firestore:"fundsOrigin,omitempty" bigquery:"-"`
 	AgentUid          string                       `json:"agentUid,omitempty" firestore:"agentUid,omitempty" bigquery:"agentUid"`
 	AgencyUid         string                       `json:"agencyUid,omitempty" firestore:"agencyUid,omitempty" bigquery:"agencyUid"`
-	ReservedInfo      *ReservedInfo                `json:"reservedInfo,omitempty" firestore:"reservedInfo,omitempty" bigquery:"reservedInfo"`
+	ReservedInfo      *ReservedInfo                `json:"reservedInfo,omitempty" firestore:"reservedInfo,omitempty" bigquery:"-"`
+	BigReasons        string                       `json:"-" firestore:"-" bigquery:"reasons"`
 }
 
 type RenewHistory struct {
@@ -222,7 +223,7 @@ func (policy *Policy) BigquerySave(origin string) {
 	policy.BigEmitDate = civil.DateTimeOf(policy.EmitDate)
 	policy.BigStatusHistory = strings.Join(policy.StatusHistory, ",")
 	if policy.ReservedInfo != nil {
-		policy.ReservedInfo.BigReasons = strings.Join(policy.ReservedInfo.Reasons, ",")
+		policy.BigReasons = strings.Join(policy.ReservedInfo.Reasons, ",")
 	}
 	log.Println(" policy save big query: " + policy.Uid)
 	e = lib.InsertRowsBigQuery(WoptaDataset, policyBig, policy)

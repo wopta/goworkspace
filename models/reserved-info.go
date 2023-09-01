@@ -5,7 +5,6 @@ type ReservedInfo struct {
 	Contacts      []Contact    `json:"contacts,omitempty" firestore:"contacts,omitempty" bigquery:"-"`
 	Documents     []Attachment `json:"documents,omitempty" firestore:"documents,omitempty" bigquery:"-"`
 	Reasons       []string     `json:"reasons,omitempty" firestore:"reasons,omitempty" bigquery:"-"`
-	BigReasons    string       `json:"-" firestore:"-" bigquery:"reasons"`
 }
 
 type Contact struct {
