@@ -39,6 +39,7 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 	err = json.Unmarshal(settingByte, &setting)
 	if err != nil {
 		log.Printf("[runBrokerBpmn] error unmarshaling setting file: %s", err.Error())
+		return nil
 	}
 
 	state := bpmn.NewBpmn(*policy)
@@ -78,14 +79,14 @@ func addProposalHandlers(state *bpmn.State) {
 
 func emitData(state *bpmn.State) error {
 	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
-	p := state.Data
-	emitBase(p, origin)
-	return lib.SetFirestoreErr(firePolicy, p.Uid, p)
+	policy := state.Data
+	emitBase(policy, origin)
+	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
 }
 
 func setAdvanceBpm(state *bpmn.State) error {
-	p := state.Data
-	setAdvance(p, origin)
+	policy := state.Data
+	setAdvance(policy, origin)
 	return nil
 }
 
@@ -114,8 +115,8 @@ func updateUserAndAgency(state *bpmn.State) error {
 }
 
 func setProposalBpm(state *bpmn.State) error {
-	p := state.Data
-	setProposalData(p)
+	policy := state.Data
+	setProposalData(policy)
 	return nil
 }
 
