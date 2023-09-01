@@ -77,7 +77,7 @@ func PaymentController(origin string, policy *models.Policy) (string, error) {
 	}
 	paymentMethods = getPaymentMethods(*policy)
 
-	log.Printf("[PaymentController] genereting payment URL")
+	log.Printf("[PaymentController] generating payment URL")
 	switch policy.Payment {
 	case models.FabrickPaymentProvider:
 		var payRes FabrickPaymentResponse
@@ -90,7 +90,8 @@ func PaymentController(origin string, policy *models.Policy) (string, error) {
 			log.Printf("[PaymentController] fabrick monthly pay")
 			payRes = FabrickMonthlyPay(*policy, origin, paymentMethods)
 		}
-		if payRes.Payload.PaymentPageURL == nil {
+		if payRes.Payload == nil || payRes.Payload.PaymentPageURL == nil {
+			log.Println("[PaymentController] fabrick error payload or paymentUrl empty")
 			return "", fmt.Errorf("fabrick error: %v", payRes.Errors)
 		}
 		payUrl = *payRes.Payload.PaymentPageURL
