@@ -64,7 +64,7 @@ func Proposal(policy *models.Policy) error {
 		log.Println("[Proposal] error bpmn - state not set")
 		return errors.New("error on bpmn - no data present")
 	}
-	policy = state.Data
+	*policy = *state.Data
 
 	log.Println("[Proposal] saving proposal to firestore...")
 	policyUid := lib.NewDoc(policyFire)

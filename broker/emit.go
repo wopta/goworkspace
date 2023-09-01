@@ -93,7 +93,7 @@ func Emit(policy *models.Policy, request EmitRequest, origin string) EmitRespons
 			log.Println("[Emit] error bpmn - state not set")
 			return responseEmit
 		}
-		policy = state.Data
+		*policy = *state.Data
 	default:
 		log.Printf("[Emit] ERROR cannot emit policy")
 		return responseEmit
