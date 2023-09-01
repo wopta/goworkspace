@@ -8,11 +8,11 @@ require (
 	cloud.google.com/go v0.110.7
 	cloud.google.com/go/firestore v1.9.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.4
-	github.com/wopta/goworkspace/bpmn v1.0.15
+	github.com/wopta/goworkspace/bpmn v1.0.16
 	github.com/wopta/goworkspace/document v1.0.94
-	github.com/wopta/goworkspace/lib v1.0.67
-	github.com/wopta/goworkspace/mail v1.0.32
-	github.com/wopta/goworkspace/models v1.1.36
+	github.com/wopta/goworkspace/lib v1.0.68
+	github.com/wopta/goworkspace/mail v1.0.33
+	github.com/wopta/goworkspace/models v1.1.38
 	github.com/wopta/goworkspace/payment v1.0.61
 	github.com/wopta/goworkspace/question v1.0.1
 	github.com/wopta/goworkspace/reserved v1.0.2
@@ -51,7 +51,7 @@ require (
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/s2a-go v0.1.4 // indirect
 	github.com/google/uuid v1.3.0 // indirect
-	github.com/googleapis/enterprise-certificate-proxy v0.2.3 // indirect
+	github.com/googleapis/enterprise-certificate-proxy v0.2.4 // indirect
 	github.com/googleapis/gax-go/v2 v2.11.0 // indirect
 	github.com/hyperjumptech/grule-rule-engine v1.12.0 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
@@ -78,11 +78,11 @@ require (
 	github.com/sergi/go-diff v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
-	github.com/wopta/goworkspace/policy v1.0.8 // indirect
-	github.com/wopta/goworkspace/product v1.0.35 // indirect
+	github.com/wopta/goworkspace/policy v1.0.11 // indirect
+	github.com/wopta/goworkspace/product v1.0.38 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
-	github.com/xuri/excelize/v2 v2.7.0 // indirect
+	github.com/xuri/excelize/v2 v2.7.1 // indirect
 	github.com/xuri/nfp v0.0.0-20220409054826-5e722a1d9e22 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
 	go.opencensus.io v0.24.0 // indirect
@@ -101,7 +101,7 @@ require (
 	golang.org/x/tools v0.6.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	gonum.org/v1/gonum v0.11.0 // indirect
-	google.golang.org/api v0.126.0 // indirect
+	google.golang.org/api v0.128.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/appengine/v2 v2.0.2 // indirect
 	google.golang.org/genproto v0.0.0-20230530153820-e85fd2cbaebc // indirect
