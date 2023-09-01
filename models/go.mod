@@ -6,14 +6,14 @@ replace github.com/wopta/goworkspace/models => ./
 
 require (
 	cloud.google.com/go v0.110.2
+	cloud.google.com/go/bigquery v1.51.1
 	cloud.google.com/go/firestore v1.9.0
-	github.com/wopta/goworkspace/lib v1.0.67
+	github.com/wopta/goworkspace/lib v1.0.68
 	google.golang.org/api v0.122.0
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1
 )
 
 require (
-	cloud.google.com/go/bigquery v1.51.1 // indirect
 	cloud.google.com/go/compute v1.19.0 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
 	cloud.google.com/go/iam v0.13.0 // indirect
