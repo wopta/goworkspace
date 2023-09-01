@@ -62,27 +62,32 @@ func CriptoPay(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	return "", nil, nil
 }
 
-func PaymentController(origin string, policy models.Policy) (string, error) {
+func PaymentController(origin string, policy *models.Policy) (string, error) {
 	var (
-		payUrl, paymentProvider string
-		paymentMethods          []string
+		payUrl         string
+		paymentMethods []string
 	)
 
 	log.Printf("[PaymentController] init")
 
-	paymentProvider = policy.Payment
-	paymentMethods = getPaymentMethods(policy)
+	// TODO: fix me
+	if policy.Payment == "" || policy.Payment == "fabrik" {
+		policy.Payment = models.FabrickPaymentProvider
+	}
+	paymentMethods = getPaymentMethods(*policy)
 
 	log.Printf("[PaymentController] genereting payment URL")
-	switch paymentProvider {
+	switch policy.Payment {
 	case models.FabrickPaymentProvider:
 		var payRes FabrickPaymentResponse
 
 		if policy.PaymentSplit == string(models.PaySplitYear) {
-			payRes = FabbrickYearPay(policy, origin, paymentMethods)
+			log.Printf("[PaymentController] fabrick monthly pay")
+			payRes = FabbrickYearPay(*policy, origin, paymentMethods)
 		}
 		if policy.PaymentSplit == string(models.PaySplitMonthly) {
-			payRes = FabbrickMontlyPay(policy, origin, paymentMethods)
+			log.Printf("[PaymentController] fabrick yearly pay")
+			payRes = FabbrickMontlyPay(*policy, origin, paymentMethods)
 		}
 		if payRes.Payload.PaymentPageURL == nil {
 			return "", fmt.Errorf("fabrick error: %v", payRes.Errors)
@@ -91,6 +96,9 @@ func PaymentController(origin string, policy models.Policy) (string, error) {
 	default:
 		return "", fmt.Errorf("payment provider %s not supported", policy.Payment)
 	}
+
+	log.Printf("[PaymentController] payUrl: %s", payUrl)
+
 	return payUrl, nil
 }
 
