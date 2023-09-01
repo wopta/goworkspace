@@ -81,12 +81,12 @@ func PaymentController(origin string, policy *models.Policy) (string, error) {
 	case models.FabrickPaymentProvider:
 		var payRes FabrickPaymentResponse
 
-		if policy.PaymentSplit == string(models.PaySplitYear) {
-			log.Printf("[PaymentController] fabrick monthly pay")
+		if policy.PaymentSplit == string(models.PaySplitYear) || policy.PaymentSplit == string(models.PaySplitYearly) {
+			log.Printf("[PaymentController] fabrick yearly pay")
 			payRes = FabbrickYearPay(*policy, origin, paymentMethods)
 		}
 		if policy.PaymentSplit == string(models.PaySplitMonthly) {
-			log.Printf("[PaymentController] fabrick yearly pay")
+			log.Printf("[PaymentController] fabrick monthly pay")
 			payRes = FabbrickMontlyPay(*policy, origin, paymentMethods)
 		}
 		if payRes.Payload.PaymentPageURL == nil {
