@@ -3,6 +3,7 @@ package document
 import (
 	"bytes"
 	"fmt"
+	"math"
 	"os"
 	"strconv"
 	"strings"
@@ -266,7 +267,7 @@ func printSurvey(pdf *fpdf.Fpdf, survey models.Survey, companyName string) error
 		surveyWidth = pdf.GetStringWidth(lines[len(lines)-1])
 		paddingWidth = availableWidth - surveyWidth - answerWidth
 
-		dotsString = strings.Repeat(".", int(paddingWidth/dotWidth)-2) + answer
+		dotsString = strings.Repeat(".", int(math.Max((paddingWidth/dotWidth)-2, 0))) + answer
 	}
 	if surveyTitle != "" {
 		getParagraphTitle(pdf, surveyTitle+dotsString)
@@ -305,7 +306,7 @@ func printSurvey(pdf *fpdf.Fpdf, survey models.Survey, companyName string) error
 			questionWidth = pdf.GetStringWidth(lines[len(lines)-1])
 			paddingWidth = availableWidth - questionWidth - answerWidth
 
-			dotsString = strings.Repeat(".", int(paddingWidth/dotWidth)-2) + answer
+			dotsString = strings.Repeat(".", int(math.Max((paddingWidth/dotWidth)-2, 0))) + answer
 		}
 		pdf.MultiCell(availableWidth, 3.5, question.Question+dotsString, "", fpdf.AlignLeft, false)
 	}
