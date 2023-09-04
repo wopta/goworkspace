@@ -95,7 +95,7 @@ func PutByPolicy(policy models.Policy, scheduleDate string, origin string, expir
 		ProviderId:         providerId,
 		UserToken:          customerId,
 		ProviderName:       policy.Payment,
-		AgentUid:           policy.AgencyUid,
+		AgentUid:           policy.AgentUid,
 		AgencyUid:          policy.AgencyUid,
 		CommissionsAgent:   commissionAgent,
 		CommissionsAgency:  commissionAgency,
