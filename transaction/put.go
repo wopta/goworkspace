@@ -29,6 +29,15 @@ func PutByPolicy(policy models.Policy, scheduleDate string, origin string, expir
 		return
 	}
 
+	// TODO fix me - workaround for Gap camper mga commissions
+	if isGapCamper(&policy) {
+		log.Println("[PutByPolicy] overrinding product commissions for Gap camper")
+		prod.Offers["base"].Commissions.NewBusiness = 0.22
+		prod.Offers["base"].Commissions.Renew = 0.22
+		prod.Offers["complete"].Commissions.NewBusiness = 0.37
+		prod.Offers["complete"].Commissions.Renew = 0.37
+	}
+
 	commissionMga = product.GetCommissionProduct(policy, *prod)
 	log.Printf("[PutByPolicy] commissionMga: %g", commissionMga)
 
@@ -112,4 +121,11 @@ func getAgencyCommission(policy models.Policy) float64 {
 	dn := lib.GetFirestore(models.AgencyCollection, policy.AgencyUid)
 	dn.DataTo(&agency)
 	return product.GetCommissionProducts(policy, agency.Products)
+}
+
+func isGapCamper(policy *models.Policy) bool {
+	return policy.Name == models.GapProduct &&
+		len(policy.Assets) > 0 &&
+		policy.Assets[0].Vehicle != nil &&
+		policy.Assets[0].Vehicle.VehicleType == "camper"
 }
