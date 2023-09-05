@@ -100,8 +100,8 @@ func SendMail(obj MailRequest) {
 	var (
 		username = os.Getenv("EMAIL_USERNAME")
 		password = os.Getenv("EMAIL_PASSWORD")
-
-		file []byte
+		fromName = "Anna di Wopta Assicurazioni"
+		file     []byte
 	)
 
 	switch os.Getenv("env") {
@@ -128,9 +128,13 @@ func SendMail(obj MailRequest) {
 	}
 	tmplt.Execute(&tpl, data)
 	log.Println()
-	for _, _to := range obj.To {
 
-		from := mail.Address{Name: "Anna di Wopta Assicurazioni", Address: obj.From}
+	if obj.FromName != "" {
+		fromName = obj.FromName
+	}
+
+	for _, _to := range obj.To {
+		from := mail.Address{Name: fromName, Address: obj.From}
 		to := mail.Address{Name: _to, Address: _to}
 		subj := obj.Subject
 		body := obj.Message
