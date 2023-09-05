@@ -29,6 +29,10 @@ func setBodyDataAndGetCC(channel string, policy models.Policy, bodyData *BodyDat
 
 	setContractorBodyData(policy, bodyData)
 
+	if policy.IsReserved {
+		setPolicyReservedBodyData(policy, bodyData)
+	}
+
 	return cc
 }
 
@@ -65,6 +69,13 @@ func setProductBodyData(policy models.Policy, bodyData *BodyData) {
 	bodyData.InformationSetsUrl = fmt.Sprintf(
 		"https://storage.googleapis.com/documents-public-dev/information-sets/%s/%s/Precontrattuale.pdf",
 		policy.Name, policy.ProductVersion)
+}
+
+func setPolicyReservedBodyData(policy models.Policy, bodyData *BodyData) {
+	bodyData.ProposalNumber = policy.ProposalNumber
+	if policy.ReservedInfo != nil && len(policy.ReservedInfo.RequiredExams) > 0 {
+		bodyData.ExtraContent = policy.ReservedInfo.RequiredExams
+	}
 }
 
 func fillTemplate(htmlTemplate []byte, bodyData *BodyData) string {
