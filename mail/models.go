@@ -18,6 +18,8 @@ type BodyData struct {
 	ProductForm        string
 	ProductName        string
 	InformationSetsUrl string
+	ProposalNumber     int
+	ExtraContent       []string
 }
 type Attachment struct {
 	Name        string `firestore:"name,omitempty" json:"name,omitempty"`
