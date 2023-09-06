@@ -2,7 +2,6 @@ package models
 
 import (
 	"fmt"
-	"io"
 	"net/http"
 	"time"
 
@@ -26,17 +25,10 @@ type AuditLog struct {
 	Role     string         `bigquery:"role"`
 }
 
-func ParseHttpRequest(r *http.Request) (AuditLog, error) {
-	body := ""
-	if r.Body != nil {
-		defer r.Body.Close()
-		body_bytes, err := io.ReadAll(r.Body)
-		if err != nil {
-			return AuditLog{}, fmt.Errorf("cannot retrieve the payload: %v", err)
-		}
-		body = string(body_bytes)
-	}
-
+// Since io.ReadAll is a stream we cannot read r.Body twice
+// so we pass the string that was read by the original
+// function as a param and use it in the AuditLog.Payload
+func ParseHttpRequest(r *http.Request, payload string) (AuditLog, error) {
 	idToken := r.Header.Get("Authorization")
 	authToken, err := GetAuthTokenFromIdToken(idToken)
 	if err != nil {
@@ -44,7 +36,7 @@ func ParseHttpRequest(r *http.Request) (AuditLog, error) {
 	}
 
 	return AuditLog{
-		Payload:  body,
+		Payload:  payload,
 		Date:     civil.DateTimeOf(time.Now().UTC()),
 		UserUid:  authToken.UserID,
 		Method:   r.Method,
