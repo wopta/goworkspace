@@ -69,7 +69,7 @@ func Broker(w http.ResponseWriter, r *http.Request) {
 			},
 			{
 				Route:   "policy/transactions/v1/:policyUid",
-				Handler: GetPolicyTransactions,
+				Handler: GetPolicyTransactionsFx,
 				Method:  http.MethodGet,
 				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager, models.UserRoleAgency, models.UserRoleAgent},
 			},
