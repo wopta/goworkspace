@@ -99,6 +99,13 @@ func GetAgentByAuthId(authId string) (*Agent, error) {
 	return agent, err
 }
 
+func GetAgentByUid(uid string) (*Agent, error) {
+	agentFirebase := lib.WhereLimitFirestore(AgentCollection, "uid", "==", uid, 1)
+	agent, err := FirestoreDocumentToAgent(agentFirebase)
+
+	return agent, err
+}
+
 func FirestoreDocumentToAgent(query *firestore.DocumentIterator) (*Agent, error) {
 	var result Agent
 	agentDocumentSnapshot, err := query.Next()
@@ -156,4 +163,14 @@ func UpdateAgentPortfolio(policy *Policy, origin string) error {
 	err = agent.BigquerySave(origin)
 
 	return err
+}
+
+func IsPolicyInAgentPortfolio(agentUid, policyUid string) bool {
+	agent, err := GetAgentByUid(agentUid)
+	if err != nil {
+		log.Printf("[IsPolicyInAgentPortfolio] error retrieving agent: %s", err.Error())
+		return false
+	}
+
+	return lib.SliceContains(agent.Policies, policyUid)
 }
