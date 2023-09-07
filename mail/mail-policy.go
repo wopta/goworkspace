@@ -261,15 +261,25 @@ func SendMailReservedResult(policy models.Policy) {
 
 	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", channel, template))
 
+	title := fmt.Sprintf(
+		"Wopta per te %s - Proposta %d di %s %s",
+		bodyData.ProductName,
+		policy.ProposalNumber,
+		bodyData.ContractorSurname,
+		bodyData.ContractorName,
+	)
+	subtitle := "Esito valutazione medica assuntiva"
+
 	messageBody := fillTemplate(templateFile, &bodyData)
 
 	SendMail(MailRequest{
-		From:     "anna@wopta.it",
+		FromName: "Assunzione",
+		From:     "assunzione@wopta.it",
 		To:       []string{to},
-		Title:    fmt.Sprintf("%s proposta n° %d", policy.NameDesc, policy.ProposalNumber),
-		SubTitle: "Riservato direzione",
+		Title:    title,
+		SubTitle: subtitle,
 		Message:  messageBody,
-		Subject:  "Riservato direzione: " + fmt.Sprintf("%s proposta n° %d", policy.NameDesc, policy.ProposalNumber),
+		Subject:  title + " - " + subtitle,
 		IsHtml:   true,
 	})
 }

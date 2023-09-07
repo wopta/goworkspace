@@ -32,6 +32,7 @@ type Attachment struct {
 }
 type MailRequest struct {
 	From         string        `json:"from"`
+	FromName     string        `json:"fromName"`
 	To           []string      `json:"to"`
 	Message      string        `json:"message"`
 	Subject      string        `json:"subject"`
