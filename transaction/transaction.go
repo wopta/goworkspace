@@ -23,9 +23,14 @@ func Transaction(w http.ResponseWriter, r *http.Request) {
 		Routes: []lib.Route{
 			{
 				Route:   "policy/v1/:policyUid",
-				Handler: GetTransactionsByPolicyUidFx, // GetPolicyTransactions,
+				Handler: GetTransactionsByPolicyUidFx, // Broker.GetPolicyTransactions,
 				Method:  http.MethodGet,
-				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
+				Roles: []string{
+					models.UserRoleAdmin,
+					models.UserRoleManager,
+					models.UserRoleAgency,
+					models.UserRoleAgent,
+				},
 			},
 		},
 	}

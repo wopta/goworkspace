@@ -71,7 +71,7 @@ func Broker(w http.ResponseWriter, r *http.Request) {
 				Route:   "policy/transactions/v1/:policyUid",
 				Handler: GetPolicyTransactions,
 				Method:  http.MethodGet,
-				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
+				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager, models.UserRoleAgency, models.UserRoleAgent},
 			},
 			{
 				Route:   "/policy/reserved/v1/:policyUid",
