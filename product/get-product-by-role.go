@@ -37,7 +37,7 @@ var (
 		},
 		models.UserRoleAgent: {
 			models.LifeProduct: {
-				minAge:         71,
+				minAge:         70,
 				minReservedAge: 55,
 			},
 			models.PersonaProduct: {
