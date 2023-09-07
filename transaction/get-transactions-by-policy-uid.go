@@ -36,12 +36,12 @@ func GetTransactionsByPolicyUidFx(w http.ResponseWriter, r *http.Request) (strin
 	switch authToken.Role {
 	case models.UserRoleAgent:
 		if !models.IsPolicyInAgentPortfolio(userUid, policyUid) {
-			log.Printf("[GetPolicyTransactionsFx] policy %s is not included in agent %s", policyUid, userUid)
+			log.Printf("[GetTransactionsByPolicyUidFx] policy %s is not included in agent %s", policyUid, userUid)
 			return "", response, fmt.Errorf("agent %s unauthorized for policy %s", userUid, policyUid)
 		}
 	case models.UserRoleAgency:
 		if !models.IsPolicyInAgencyPortfolio(userUid, policyUid) {
-			log.Printf("[GetPolicyTransactionsFx] policy %s is not included in agency %s", policyUid, userUid)
+			log.Printf("[GetTransactionsByPolicyUidFx] policy %s is not included in agency %s", policyUid, userUid)
 			return "", response, fmt.Errorf("agency %s unauthorized for policy %s", userUid, policyUid)
 		}
 	}
@@ -51,6 +51,8 @@ func GetTransactionsByPolicyUidFx(w http.ResponseWriter, r *http.Request) (strin
 	response.Transactions = transactions
 
 	jsonOut, err := json.Marshal(response)
+
+	log.Printf("[GetTransactionsByPolicyUidFx] response: %s", string(jsonOut))
 
 	return string(jsonOut), response, err
 }

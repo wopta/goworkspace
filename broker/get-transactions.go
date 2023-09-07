@@ -51,5 +51,7 @@ func GetPolicyTransactionsFx(w http.ResponseWriter, r *http.Request) (string, in
 
 	jsonOut, err := json.Marshal(response)
 
+	log.Printf("[GetPolicyTransactionsFx] response: %s", string(jsonOut))
+
 	return string(jsonOut), response, err
 }
