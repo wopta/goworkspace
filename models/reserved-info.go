@@ -1,10 +1,14 @@
 package models
 
+import "time"
+
 type ReservedInfo struct {
-	RequiredExams []string     `json:"requiredExams,omitempty" firestore:"requiredExams,omitempty" bigquery:"-"`
-	Contacts      []Contact    `json:"contacts,omitempty" firestore:"contacts,omitempty" bigquery:"-"`
-	Documents     []Attachment `json:"documents,omitempty" firestore:"documents,omitempty" bigquery:"-"`
-	Reasons       []string     `json:"reasons,omitempty" firestore:"reasons,omitempty" bigquery:"-"`
+	RequiredExams  []string     `json:"requiredExams,omitempty" firestore:"requiredExams,omitempty" bigquery:"-"`
+	Contacts       []Contact    `json:"contacts,omitempty" firestore:"contacts,omitempty" bigquery:"-"`
+	Documents      []Attachment `json:"documents,omitempty" firestore:"documents,omitempty" bigquery:"-"`
+	Reasons        []string     `json:"reasons,omitempty" firestore:"reasons,omitempty" bigquery:"-"`
+	AcceptanceNote string       `json:"acceptanceNote,omitempty" firestore:"acceptanceNote,omitempty" bigquery:"-"`
+	AcceptanceDate time.Time    `json:"acceptanceDate,omitempty" firestore:"acceptanceDate,omitempty" bigquery:"-"`
 }
 
 type Contact struct {

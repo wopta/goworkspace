@@ -63,7 +63,14 @@ func (agency *Agency) BigquerySave(origin string) error {
 }
 
 func GetAgencyByAuthId(authId string) (*Agency, error) {
-	agencyFirebase := lib.WhereLimitFirestore(AgencyCollection, "uid", "==", authId, 1)
+	agencyFirebase := lib.WhereLimitFirestore(AgencyCollection, "authId", "==", authId, 1)
+	agency, err := FirestoreDocumentToAgency(agencyFirebase)
+
+	return agency, err
+}
+
+func GetAgencyByUid(uid string) (*Agency, error) {
+	agencyFirebase := lib.WhereLimitFirestore(AgencyCollection, "uid", "==", uid, 1)
 	agency, err := FirestoreDocumentToAgency(agencyFirebase)
 
 	return agency, err
@@ -126,4 +133,14 @@ func UpdateAgencyPortfolio(policy *Policy, origin string) error {
 	err = agency.BigquerySave(origin)
 
 	return err
+}
+
+func IsPolicyInAgencyPortfolio(agencyUid, policyUid string) bool {
+	agency, err := GetAgencyByUid(agencyUid)
+	if err != nil {
+		log.Printf("[IsPolicyInAgencyPortfolio] error retrieving agency: %s", err.Error())
+		return false
+	}
+
+	return lib.SliceContains(agency.Policies, policyUid)
 }

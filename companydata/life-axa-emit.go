@@ -176,32 +176,35 @@ func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.T
 			var intNum = int(price * 100)
 			priceGrossFormat := fmt.Sprintf("%012d", intNum) // 000000001220
 			log.Println("LifeAxalEmit: ", priceGrossFormat)
+			sumInsuredLimitRound := fmt.Sprintf("%.0f", g.Value.SumInsuredLimitOfIndemnity)
+			sumInsuredLimit, e := strconv.Atoi(sumInsuredLimitRound)
+			log.Println(e)
 			row := []string{
-				mapCodecCompany(policy, g.CompanyCodec),                 //Codice schema
-				policy.CodeCompany,                                      //N° adesione individuale univoco
-				getRenew(policy),                                        //Tipo di Transazione
-				getFormatdate(policy.StartDate),                         //Data di decorrenza
-				getFormatdate(getRenewDate(policy, trans)),              //"Data di rinnovo"
-				mapCoverageDuration(policy),                             //"Durata copertura assicurativa"
-				fmt.Sprint(g.Value.Duration.Year * 12),                  //"Durata complessiva"
-				priceGrossFormat,                                        //"Premio assicurativo lordo"
-				fmt.Sprintf("%.0f", g.Value.SumInsuredLimitOfIndemnity), //"Importo Assicurato"
-				"0",                       //indennizzo mensile
-				"",                        //campo disponibile
-				"",                        //% di sovrappremio da applicare alla garanzia
-				"W1",                      //Codice Concessionario /dipendenti (iscr.E)
-				"",                        //Codice Campagna
-				"T",                       //Copertura Assicurativa: Totale o Pro quota
-				"",                        //% assicurata dell'assicurato
-				"",                        //campo disponibile
-				"",                        //Maxi rata finale/Valore riscatto
-				"",                        //Stato occupazionale dell'Assicurato
-				"1",                       //Tipo aderente
-				"WEB",                     //Canale di vendita
-				"PF",                      //Tipo contraente / Contraente
-				policy.Contractor.Surname, //Denominazione Sociale o Cognome contraente
-				policy.Contractor.Name,    //campo vuoto o nome
-				policy.Contractor.Gender,  //Sesso
+				mapCodecCompany(policy, g.CompanyCodec),    //Codice schema
+				policy.CodeCompany,                         //N° adesione individuale univoco
+				getRenew(policy),                           //Tipo di Transazione
+				getFormatdate(policy.StartDate),            //Data di decorrenza
+				getFormatdate(getRenewDate(policy, trans)), //"Data di rinnovo"
+				mapCoverageDuration(policy),                //"Durata copertura assicurativa"
+				fmt.Sprint(g.Value.Duration.Year * 12),     //"Durata complessiva"
+				priceGrossFormat,                           //"Premio assicurativo lordo"
+				fmt.Sprintf("%013d", sumInsuredLimit),      //"Importo Assicurato"
+				"0",                                        //indennizzo mensile
+				"",                                         //campo disponibile
+				"",                                         //% di sovrappremio da applicare alla garanzia
+				"W1",                                       //Codice Concessionario /dipendenti (iscr.E)
+				"",                                         //Codice Campagna
+				"T",                                        //Copertura Assicurativa: Totale o Pro quota
+				"",                                         //% assicurata dell'assicurato
+				"",                                         //campo disponibile
+				"",                                         //Maxi rata finale/Valore riscatto
+				"",                                         //Stato occupazionale dell'Assicurato
+				"1",                                        //Tipo aderente
+				"WEB",                                      //Canale di vendita
+				"PF",                                       //Tipo contraente / Contraente
+				policy.Contractor.Surname,                  //Denominazione Sociale o Cognome contraente
+				policy.Contractor.Name,                     //campo vuoto o nome
+				policy.Contractor.Gender,                   //Sesso
 				getFormatBithdate(policy.Contractor.BirthDate),       //Data di nascita
 				policy.Contractor.FiscalCode,                         //Codice Fiscale
 				policy.Contractor.Residence.StreetName,               //Indirizzo di residenza
@@ -222,7 +225,7 @@ func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.T
 				"PAS",                                                //Scopo del rapporto
 				"BO",                                                 //Modalità di pagamento del premio assicurativo (all'intermediario)
 				"SI",                                                 //contraente = Assicurato?
-				ChekDomicilie(policy.Contractor).StreetName,          //Indirizzo di domicilio contraente
+				ChekDomicilie(policy.Contractor).StreetName + ", "+ChekDomicilie(policy.Contractor).StreetNumber,          //Indirizzo di domicilio contraente
 				ChekDomicilie(policy.Contractor).PostalCode,          //C.A.P. Di domicilio
 				ChekDomicilie(policy.Contractor).Locality,            //Comune di domicilio
 				ChekDomicilie(policy.Contractor).CityCode,            //Provincia di domicilio
@@ -235,11 +238,11 @@ func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.T
 				ExistIdentityDocument(policy.Contractor.IdentityDocuments).Code,                       //Tipo documento dell'contraente persona fisica
 				ExistIdentityDocument(policy.Contractor.IdentityDocuments).Number,                     //Numero documento dell'contraente persona fisica
 				getFormatdate(ExistIdentityDocument(policy.Contractor.IdentityDocuments).DateOfIssue), //Data rilascio documento dell'contraente persona fisica
-				ExistIdentityDocument(policy.Contractor.IdentityDocuments).IssuingAuthority,           //Ente rilascio documento dell'contraente persona fisica
+				ExistIdentityDocument(policy.Contractor.IdentityDocuments).IssuingAuthority  +" di "+ ExistIdentityDocument(policy.Contractor.IdentityDocuments).PlaceOfIssue,           //Ente rilascio documento dell'contraente persona fisica
 				"NO", //PEP - Persona Politicamente Esposta
 				"",   //Tipologia di PEP
 				"E",  //Modalità di comunicazione prescelta tra Compagnia ed contraente
-				policy.Assets[0].Person.Residence.StreetName,                                                //Indirizzo di residenza Assicurato
+				policy.Assets[0].Person.Residence.StreetName + ", "+policy.Assets[0].Person.Residence.StreetNumber,                                                //Indirizzo di residenza Assicurato
 				policy.Assets[0].Person.Residence.PostalCode,                                                //C.A.P. Residenza
 				policy.Assets[0].Person.Residence.Locality,                                                  //Comune Residenza
 				policy.Assets[0].Person.Residence.CityCode,                                                  //Provincia Residenza
@@ -255,7 +258,7 @@ func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.T
 				ExistIdentityDocument(policy.Assets[0].Person.IdentityDocuments).Code,                       //Tipo documento
 				ExistIdentityDocument(policy.Assets[0].Person.IdentityDocuments).Number,                     //Numero documento
 				getFormatdate(ExistIdentityDocument(policy.Assets[0].Person.IdentityDocuments).DateOfIssue), //Data rilascio documento
-				ExistIdentityDocument(policy.Assets[0].Person.IdentityDocuments).IssuingAuthority,           //Ente rilascio documento
+				ExistIdentityDocument(policy.Assets[0].Person.IdentityDocuments).IssuingAuthority +" di "+ ExistIdentityDocument(policy.Assets[0].Person.IdentityDocuments).PlaceOfIssue,           //Ente rilascio documento
 				"NO",                                  //PEP - Persona Politicamente Esposta
 				"",                                    //Tipologia di PEP
 				beneficiary1T,                         //Eredi designati nominativamente o genericamente?
@@ -275,7 +278,7 @@ func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.T
 				beneficiary2S.Name,                    //Nome
 				beneficiary2S.FiscalCode,              //Codice Fiscale
 				beneficiary2S.Phone,                   //Numero di Telefono del Beneficiario
-				beneficiary2S.Residence.StreetName,    //Indirizzo di residenza
+				beneficiary2S.Residence.StreetName + ", "+ChekDomicilie(policy.Contractor).StreetNumber,    //Indirizzo di residenza
 				beneficiary2S.Residence.City,          //Città /Comune di Residenza
 				beneficiary2S.Residence.PostalCode,    //CAP
 				beneficiary2S.Residence.CityCode,      //Provincia
@@ -438,6 +441,7 @@ func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.T
 		}
 
 	}
+
 	log.Println("----------------End LifeAxalEmit-----------------")
 	return result
 }
@@ -581,7 +585,7 @@ func ExistIdentityDocument(docs []*models.IdentityDocument) *models.IdentityDocu
 	result = &models.IdentityDocument{}
 	if len(docs) > 0 {
 		for _, doc := range docs {
-			log.Println("LifeAxalEmit: ", doc)
+
 			result = doc
 
 		}

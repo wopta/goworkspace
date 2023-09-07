@@ -2,33 +2,14 @@ package broker
 
 import (
 	"encoding/json"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
+	"fmt"
 	"log"
 	"net/http"
-	"sort"
+
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/transaction"
 )
-
-func GetPolicyTransactions(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	var (
-		response GetPolicyTransactionsResp
-	)
-
-	log.Println("GetPolicyTransactions")
-
-	fireTransactions := lib.GetDatasetByEnv(r.Header.Get("origin"), "transactions")
-	policyUID := r.Header.Get("policyUid")
-
-	res := lib.WhereFirestore(fireTransactions, "policyUid", "==", policyUID)
-
-	response.Transactions = models.TransactionToListData(res)
-
-	sort.Sort(response.Transactions)
-
-	jsonOut, err := json.Marshal(response)
-
-	return string(jsonOut), response, err
-}
 
 type GetPolicyTransactionsResp struct {
 	Transactions Transactions `json:"transactions"`
@@ -36,6 +17,41 @@ type GetPolicyTransactionsResp struct {
 
 type Transactions []models.Transaction
 
-func (t Transactions) Len() int           { return len(t) }
-func (t Transactions) Swap(i, j int)      { t[i], t[j] = t[j], t[i] }
-func (t Transactions) Less(i, j int) bool { return t[i].CreationDate.Before(t[j].CreationDate) }
+func GetPolicyTransactionsFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	log.Println("[GetPolicyTransactionsFx] Handler start ---------------------")
+
+	var response GetPolicyTransactionsResp
+
+	policyUid := r.Header.Get("policyUid")
+
+	log.Printf("[GetPolicyTransactionsFx] policyUid %s", policyUid)
+
+	idToken := r.Header.Get("Authorization")
+	authToken, err := models.GetAuthTokenFromIdToken(idToken)
+	lib.CheckError(err)
+
+	userUid := authToken.UserID
+
+	switch authToken.Role {
+	case models.UserRoleAgent:
+		if !models.IsPolicyInAgentPortfolio(userUid, policyUid) {
+			log.Printf("[GetPolicyTransactionsFx] policy %s is not included in agent %s", policyUid, userUid)
+			return "", response, fmt.Errorf("agent %s unauthorized for policy %s", userUid, policyUid)
+		}
+	case models.UserRoleAgency:
+		if !models.IsPolicyInAgencyPortfolio(userUid, policyUid) {
+			log.Printf("[GetPolicyTransactionsFx] policy %s is not included in agency %s", policyUid, userUid)
+			return "", response, fmt.Errorf("agency %s unauthorized for policy %s", userUid, policyUid)
+		}
+	}
+
+	transactions := transaction.GetPolicyTransactions(r.Header.Get("origin"), policyUid)
+
+	response.Transactions = transactions
+
+	jsonOut, err := json.Marshal(response)
+
+	log.Printf("[GetPolicyTransactionsFx] response: %s", string(jsonOut))
+
+	return string(jsonOut), response, err
+}

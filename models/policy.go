@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/civil"
 	"cloud.google.com/go/firestore"
 	"github.com/wopta/goworkspace/lib"
@@ -106,6 +107,8 @@ type Policy struct {
 	AgencyUid         string                       `json:"agencyUid,omitempty" firestore:"agencyUid,omitempty" bigquery:"agencyUid"`
 	ReservedInfo      *ReservedInfo                `json:"reservedInfo,omitempty" firestore:"reservedInfo,omitempty" bigquery:"-"`
 	BigReasons        string                       `json:"-" firestore:"-" bigquery:"reasons"`
+	BigAcceptanceNote string                       `json:"-" firestore:"-" bigquery:"acceptanceNote"`
+	BigAcceptanceDate bigquery.NullDateTime        `json:"-" firestore:"-" bigquery:"acceptanceDate"`
 }
 
 type RenewHistory struct {
@@ -213,9 +216,15 @@ func (policy *Policy) GuaranteesToMap() map[string]Guarante {
 }
 
 func (policy *Policy) BigquerySave(origin string) {
+	log.Printf("[policy.BigquerySave] parsing data for policy %s", policy.Uid)
+
 	policyBig := lib.GetDatasetByEnv(origin, PolicyCollection)
-	policyJson, e := policy.Marshal()
-	log.Println(" policy "+policy.Uid, string(policyJson))
+	policyJson, err := policy.Marshal()
+	if err != nil {
+		log.Printf("[policy.BigquerySave] error marshaling policy: %s", err.Error())
+	}
+	log.Printf("[policy.BigquerySave] policy data: %s", string(policyJson))
+
 	policy.Data = string(policyJson)
 	policy.BigStartDate = civil.DateTimeOf(policy.StartDate)
 	policy.BigRenewDate = civil.DateTimeOf(policy.RenewDate)
@@ -224,10 +233,17 @@ func (policy *Policy) BigquerySave(origin string) {
 	policy.BigStatusHistory = strings.Join(policy.StatusHistory, ",")
 	if policy.ReservedInfo != nil {
 		policy.BigReasons = strings.Join(policy.ReservedInfo.Reasons, ",")
+		policy.BigAcceptanceNote = policy.ReservedInfo.AcceptanceNote
+		policy.BigAcceptanceDate = lib.GetBigQueryNullDateTime(policy.ReservedInfo.AcceptanceDate)
 	}
-	log.Println(" policy save big query: " + policy.Uid)
-	e = lib.InsertRowsBigQuery(WoptaDataset, policyBig, policy)
-	log.Println(" policy save big query error: ", e)
+
+	log.Println("[policy.BigquerySave] saving to bigquery...")
+	err = lib.InsertRowsBigQuery(WoptaDataset, policyBig, policy)
+	if err != nil {
+		log.Println("[policy.BigquerySave] error saving policy to bigquery: ", err.Error())
+		return
+	}
+	log.Println("[policy.BigquerySave] bigquery saved!")
 }
 
 func PolicyToListData(query *firestore.DocumentIterator) []Policy {
