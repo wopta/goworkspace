@@ -22,6 +22,8 @@ const (
 	innerBoundary = "inner"
 )
 
+type Address = mail.Address
+
 type loginAuth struct {
 	username, password string
 }

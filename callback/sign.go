@@ -105,7 +105,11 @@ func namirialStepFinished(origin, policyUid string) {
 
 		policy.BigquerySave(origin)
 
-		mail.SendMailPay(policy)
+		mail.SendMailPay(
+			policy,
+			mail.Address{Address: "anna@wopta.it"},
+			mail.Address{Address: policy.Contractor.Mail},
+		)
 
 		return
 	}
@@ -157,7 +161,12 @@ func sendMailContract(state *bpmn.State) error {
 	log.Println("[sendMailContract] Handler start ---")
 
 	policy := state.Data
-	mail.SendMailContract(*policy, nil)
+	mail.SendMailContract(
+		*policy,
+		nil,
+		mail.Address{Address: "anna@wopta.it"},
+		mail.Address{Address: policy.Contractor.Mail},
+	)
 
 	return nil
 }

@@ -20,52 +20,7 @@ const (
 	reservedRejectedTemplateType = "rejected"
 )
 
-func GetMailPolicy(policy *models.Policy, subject string, isLink bool, cc, link, linkLabel, message string, isAttachment bool, at *[]Attachment) MailRequest {
-	var (
-		name     string
-		obj      MailRequest
-		linkForm = "https://www.wopta.it/it/"
-	)
-
-	switch policy.Name {
-	case "pmi":
-		name = "Artigiani & Imprese"
-		linkForm += "multi-rischio/"
-	case "persona":
-		name = "Persona"
-		linkForm += "infortunio/"
-	case "life":
-		name = "Vita"
-		linkForm += "vita/"
-	case "gap":
-		name = "Auto Valore Protetto"
-		// TODO: No page yet
-	}
-
-	obj.From = "anna@wopta.it"
-	obj.To = []string{policy.Contractor.Mail}
-	obj.Cc = cc
-	obj.Message = message
-	obj.Title = "Wopta per te " + name
-	obj.Subject = obj.Title + " " + subject
-	obj.SubTitle = subject
-	obj.IsHtml = true
-	obj.IsAttachment = isAttachment
-	obj.IsLink = isLink
-	if isLink {
-		obj.Link = link
-		obj.LinkLabel = linkLabel
-	} else {
-		obj.IsApp = true
-	}
-	if isAttachment {
-		obj.Attachments = at
-	}
-
-	return obj
-}
-
-func SendMailProposal(policy models.Policy) {
+func SendMailProposal(policy models.Policy, from, to Address) {
 	var (
 		linkFormat = "https://storage.googleapis.com/documents-public-dev/information-sets/%s/%s/Precontrattuale.pdf"
 		link       = fmt.Sprintf(linkFormat, policy.Name, policy.ProductVersion)
@@ -80,22 +35,27 @@ func SendMailProposal(policy models.Policy) {
 
 	messageBody := fillTemplate(templateFile, &bodyData)
 
-	SendMail(
-		GetMailPolicy(
-			&policy,
-			"Documenti precontrattuali",
-			true,
-			cc,
-			link,
-			"Leggi documentazione",
-			messageBody,
-			false,
-			nil,
-		),
-	)
+	title := policy.NameDesc
+	subtitle := "Documenti precontrattuali"
+	subject := fmt.Sprintf("%s %s", title, subtitle)
+
+	SendMail(MailRequest{
+		FromName:  from.Name,
+		From:      from.Address,
+		To:        []string{to.Address},
+		Cc:        cc,
+		Message:   messageBody,
+		Title:     title,
+		SubTitle:  subtitle,
+		Subject:   subject,
+		IsHtml:    true,
+		IsLink:    true,
+		Link:      link,
+		LinkLabel: "Leggi documentazione",
+	})
 }
 
-func SendMailPay(policy models.Policy) {
+func SendMailPay(policy models.Policy, from, to Address) {
 	var (
 		bodyData = BodyData{}
 	)
@@ -108,22 +68,27 @@ func SendMailPay(policy models.Policy) {
 
 	messageBody := fillTemplate(templateFile, &bodyData)
 
-	SendMail(
-		GetMailPolicy(
-			&policy,
-			"Paga la tua polizza"+" n° "+policy.CodeCompany,
-			true,
-			cc,
-			policy.PayUrl,
-			"Paga la tua polizza",
-			messageBody,
-			false,
-			nil,
-		),
-	)
+	title := policy.NameDesc
+	subtitle := fmt.Sprintf("Paga la tua polizza n° %s", policy.CodeCompany)
+	subject := fmt.Sprintf("%s %s", title, subtitle)
+
+	SendMail(MailRequest{
+		FromName:  from.Name,
+		From:      from.Address,
+		To:        []string{to.Address},
+		Cc:        cc,
+		Message:   messageBody,
+		Title:     title,
+		SubTitle:  subtitle,
+		Subject:   subject,
+		IsHtml:    true,
+		IsLink:    true,
+		Link:      policy.PayUrl,
+		LinkLabel: "Paga la tua polizza",
+	})
 }
 
-func SendMailSign(policy models.Policy) {
+func SendMailSign(policy models.Policy, from, to Address) {
 	var (
 		bodyData = BodyData{}
 	)
@@ -136,22 +101,27 @@ func SendMailSign(policy models.Policy) {
 
 	messageBody := fillTemplate(templateFile, &bodyData)
 
-	SendMail(
-		GetMailPolicy(
-			&policy,
-			"Firma la tua polizza"+" n° "+policy.CodeCompany,
-			true,
-			cc,
-			policy.SignUrl,
-			"Firma la tua polizza",
-			messageBody,
-			false,
-			nil,
-		),
-	)
+	title := policy.NameDesc
+	subtitle := fmt.Sprintf("Firma la tua polizza n° %s", policy.CodeCompany)
+	subject := fmt.Sprintf("%s %s", title, subtitle)
+
+	SendMail(MailRequest{
+		FromName:  from.Name,
+		From:      from.Address,
+		To:        []string{to.Address},
+		Cc:        cc,
+		Message:   messageBody,
+		Title:     title,
+		SubTitle:  subtitle,
+		Subject:   subject,
+		IsHtml:    true,
+		IsLink:    true,
+		Link:      policy.SignUrl,
+		LinkLabel: "Firma la tua polizza",
+	})
 }
 
-func SendMailContract(policy models.Policy, at *[]Attachment) {
+func SendMailContract(policy models.Policy, at *[]Attachment, from, to Address) {
 	var (
 		bodyData = BodyData{}
 	)
@@ -182,22 +152,26 @@ func SendMailContract(policy models.Policy, at *[]Attachment) {
 		}}
 	}
 
-	SendMail(
-		GetMailPolicy(
-			&policy,
-			"Contratto"+" n° "+policy.CodeCompany,
-			false,
-			cc,
-			"",
-			"",
-			messageBody,
-			true,
-			at,
-		),
-	)
+	title := policy.NameDesc
+	subtitle := fmt.Sprintf("Contratto n° %s", policy.CodeCompany)
+	subject := fmt.Sprintf("%s %s", title, subtitle)
+
+	SendMail(MailRequest{
+		FromName:     from.Name,
+		From:         from.Address,
+		To:           []string{to.Address},
+		Cc:           cc,
+		Message:      messageBody,
+		Title:        policy.NameDesc,
+		SubTitle:     subtitle,
+		Subject:      subject,
+		IsHtml:       true,
+		IsAttachment: true,
+		Attachments:  at,
+	})
 }
 
-func SendMailReserved(policy models.Policy) {
+func SendMailReserved(policy models.Policy, from, to Address) {
 	var (
 		at       []Attachment
 		bodyData = BodyData{}
@@ -223,19 +197,23 @@ func SendMailReserved(policy models.Policy) {
 		})
 	}
 
-	SendMail(
-		GetMailPolicy(
-			&policy,
-			fmt.Sprintf("Documenti Riservato proposta %d", policy.ProposalNumber),
-			false,
-			cc,
-			"",
-			"",
-			messageBody,
-			true,
-			&at,
-		),
-	)
+	title := policy.NameDesc
+	subtitle := fmt.Sprintf("Documenti Riservato proposta %d", policy.ProposalNumber)
+	subject := fmt.Sprintf("%s - %s", title, subtitle)
+
+	SendMail(MailRequest{
+		FromName:     from.Name,
+		From:         from.Address,
+		To:           []string{to.Address},
+		Cc:           cc,
+		Message:      messageBody,
+		Title:        title,
+		SubTitle:     subtitle,
+		Subject:      subject,
+		IsHtml:       true,
+		IsAttachment: true,
+		Attachments:  &at,
+	})
 
 	// TODO: find a better solution for this
 	for index, _ := range policy.ReservedInfo.Documents {
@@ -243,7 +221,7 @@ func SendMailReserved(policy models.Policy) {
 	}
 }
 
-func SendMailReservedResult(policy models.Policy) {
+func SendMailReservedResult(policy models.Policy, from, to Address) {
 	var (
 		bodyData = BodyData{}
 		template string
@@ -257,7 +235,7 @@ func SendMailReservedResult(policy models.Policy) {
 
 	channel := models.GetChannel(&policy)
 
-	to := setBodyDataAndGetCC(channel, policy, &bodyData)
+	_ = setBodyDataAndGetCC(channel, policy, &bodyData)
 
 	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", channel, template))
 
@@ -269,17 +247,18 @@ func SendMailReservedResult(policy models.Policy) {
 		bodyData.ContractorName,
 	)
 	subtitle := "Esito valutazione medica assuntiva"
+	subject := fmt.Sprintf("%s - %s", title, subtitle)
 
 	messageBody := fillTemplate(templateFile, &bodyData)
 
 	SendMail(MailRequest{
-		FromName: "Assunzione",
-		From:     "assunzione@wopta.it",
-		To:       []string{to},
+		FromName: from.Name,
+		From:     from.Address,
+		To:       []string{to.Address},
+		Message:  messageBody,
 		Title:    title,
 		SubTitle: subtitle,
-		Message:  messageBody,
-		Subject:  title + " - " + subtitle,
+		Subject:  subject,
 		IsHtml:   true,
 	})
 }

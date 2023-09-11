@@ -92,7 +92,11 @@ func setAdvanceBpm(state *bpmn.State) error {
 
 func sendMailSign(state *bpmn.State) error {
 	policy := state.Data
-	mail.SendMailSign(*policy)
+	mail.SendMailSign(
+		*policy,
+		mail.Address{Address: "anna@wopta.it"},
+		mail.Address{Address: policy.Contractor.Mail},
+	)
 	return nil
 }
 
@@ -122,6 +126,10 @@ func setProposalBpm(state *bpmn.State) error {
 
 func sendProposalMail(state *bpmn.State) error {
 	policy := state.Data
-	mail.SendMailProposal(*policy)
+	mail.SendMailProposal(
+		*policy,
+		mail.Address{Address: "anna@wopta.it"},
+		mail.Address{Address: policy.Contractor.Mail},
+	)
 	return nil
 }

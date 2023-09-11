@@ -1,12 +1,9 @@
 package payment
 
 import (
-	"encoding/base64"
 	"io"
 	"log"
 	"net/http"
-	"os"
-	"strings"
 	"time"
 
 	"github.com/wopta/goworkspace/document"
@@ -117,7 +114,12 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		policy.SetPolicyPaid(&p, gsLink, origin)
 
 		// Send mail with the contract to the user
-		sendContractMail(&p)
+		mail.SendMailContract(
+			p,
+			nil,
+			mail.Address{Address: "anna@wopta.it"},
+			mail.Address{Address: p.Contractor.Mail},
+		)
 	}
 
 	return `{"success":true}`, `{"success":true}`, nil
@@ -137,18 +139,4 @@ func ManualPayment(transaction *models.Transaction, origin string, payload *Manu
 
 	lib.SetFirestore(fireTransactions, transaction.Uid, transaction)
 	transaction.BigQuerySave(origin)
-}
-
-func sendContractMail(policy *models.Policy) {
-	log.Printf("SendContractMail: %s", policy.Uid)
-	name := policy.Uid + ".pdf"
-	contractbyte, err := lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "assets/users/"+
-		policy.Contractor.Uid+"/contract_"+name)
-	lib.CheckError(err)
-
-	mail.SendMailContract(*policy, &[]mail.Attachment{{
-		Byte:        base64.StdEncoding.EncodeToString(contractbyte),
-		ContentType: "application/pdf",
-		Name:        strings.ReplaceAll(policy.Contractor.Name+" "+policy.Contractor.Surname+" "+policy.NameDesc, " ", "_") + "_contratto.pdf",
-	}})
 }

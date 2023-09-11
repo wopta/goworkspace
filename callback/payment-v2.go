@@ -122,7 +122,12 @@ func fabrickPayment(origin, policyUid, schedule string) error {
 		policy.BigquerySave(origin)
 
 		// Send mail with the contract to the user
-		mail.SendMailContract(policy, nil)
+		mail.SendMailContract(
+			policy,
+			nil,
+			mail.Address{Address: "anna@wopta.it"},
+			mail.Address{Address: policy.Contractor.Mail},
+		)
 	}
 
 	// Pay Transaction

@@ -75,7 +75,14 @@ func PutPolicyReservedFx(w http.ResponseWriter, r *http.Request) (string, interf
 	log.Printf("[PutPolicyReservedFx] Policy: %s", string(policyJsonLog))
 
 	log.Println("[PutPolicyReservedFx] sending acceptance email...")
-	mail.SendMailReservedResult(policy)
+	mail.SendMailReservedResult(
+		policy,
+		mail.Address{
+			Name:    "Assunzione",
+			Address: "assunzione@wopta.it",
+		},
+		mail.Address{Address: policy.Contractor.Mail},
+	)
 
 	log.Println("[PutPolicyReservedFx] saving audit trail...")
 	audit, err := models.ParseHttpRequest(r, string(body))
