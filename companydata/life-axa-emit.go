@@ -174,7 +174,7 @@ func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.T
 
 			log.Println("LifeAxalEmit: ", price)
 			var intNum = int(price * 100)
-			priceGrossFormat := fmt.Sprintf("%012d", intNum) // 000000001220
+			priceGrossFormat := fmt.Sprintf("%013d", intNum) // 000000001220
 			log.Println("LifeAxalEmit: ", priceGrossFormat)
 			sumInsuredLimitRound := fmt.Sprintf("%.0f", g.Value.SumInsuredLimitOfIndemnity)
 			sumInsuredLimit, e := strconv.Atoi(sumInsuredLimitRound)
@@ -205,80 +205,80 @@ func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.T
 				policy.Contractor.Surname,                  //Denominazione Sociale o Cognome contraente
 				policy.Contractor.Name,                     //campo vuoto o nome
 				policy.Contractor.Gender,                   //Sesso
-				getFormatBithdate(policy.Contractor.BirthDate),       //Data di nascita
-				policy.Contractor.FiscalCode,                         //Codice Fiscale
-				policy.Contractor.Residence.StreetName,               //Indirizzo di residenza
-				policy.Contractor.Residence.PostalCode,               //C.A.P. Di residenza
-				policy.Contractor.Residence.Locality,                 //Comune di residenza
-				policy.Contractor.Residence.City,                     //Provincia di residenza
-				policy.Contractor.Mail,                               //Indirizzo e-mail
-				policy.Contractor.Phone,                              //Numero di Cellulare
-				policy.Assets[0].Person.Surname,                      //Cognome Assicurato
-				policy.Assets[0].Person.Name,                         //Nome
-				policy.Assets[0].Person.Gender,                       //Sesso
-				getFormatBithdate(policy.Assets[0].Person.BirthDate), //Data di nascita
-				policy.Assets[0].Person.FiscalCode,                   //Codice Fiscale
-				beneficiary1,                                         //Codice Fiscale Beneficiario
-				beneficiary2,                                         //Codice Fiscale Beneficiario 2
-				"",                                                   //Codice Fiscale Beneficiario 3
-				"VIT",                                                //Natura del rapporto
-				"PAS",                                                //Scopo del rapporto
-				"BO",                                                 //Modalità di pagamento del premio assicurativo (all'intermediario)
-				"SI",                                                 //contraente = Assicurato?
-				ChekDomicilie(policy.Contractor).StreetName + ", "+ChekDomicilie(policy.Contractor).StreetNumber,          //Indirizzo di domicilio contraente
-				ChekDomicilie(policy.Contractor).PostalCode,          //C.A.P. Di domicilio
-				ChekDomicilie(policy.Contractor).Locality,            //Comune di domicilio
-				ChekDomicilie(policy.Contractor).CityCode,            //Provincia di domicilio
-				policy.Contractor.BirthCity,                          //Luogo di nascita dell’contraente persona fisica
-				policy.Contractor.BirthProvince,                      //Provincia di nascita dell’contraente persona fisica
-				"086",                                                //Stato di residenza dell’contraente
-				residenceCab,                                         //Cab della città di residenza dell’contraente
-				"600",                                                //Sottogruppo attività economica
-				"600",                                                //Ramo gruppo attività economica
-				ExistIdentityDocument(policy.Contractor.IdentityDocuments).Code,                       //Tipo documento dell'contraente persona fisica
-				ExistIdentityDocument(policy.Contractor.IdentityDocuments).Number,                     //Numero documento dell'contraente persona fisica
-				getFormatdate(ExistIdentityDocument(policy.Contractor.IdentityDocuments).DateOfIssue), //Data rilascio documento dell'contraente persona fisica
-				ExistIdentityDocument(policy.Contractor.IdentityDocuments).IssuingAuthority  +" di "+ ExistIdentityDocument(policy.Contractor.IdentityDocuments).PlaceOfIssue,           //Ente rilascio documento dell'contraente persona fisica
+				getFormatBithdate(policy.Contractor.BirthDate),                                           //Data di nascita
+				policy.Contractor.FiscalCode,                                                             //Codice Fiscale
+				policy.Contractor.Residence.StreetName + ", " + policy.Contractor.Residence.StreetNumber, //Indirizzo di residenza
+				policy.Contractor.Residence.PostalCode,                                                   //C.A.P. Di residenza
+				policy.Contractor.Residence.Locality,                                                     //Comune di residenza
+				policy.Contractor.Residence.CityCode,                                                     //Provincia di residenza
+				policy.Contractor.Mail,                                                                   //Indirizzo e-mail
+				policy.Contractor.Phone,                                                                  //Numero di Cellulare
+				policy.Assets[0].Person.Surname,                                                          //Cognome Assicurato
+				policy.Assets[0].Person.Name,                                                             //Nome
+				policy.Assets[0].Person.Gender,                                                           //Sesso
+				getFormatBithdate(policy.Assets[0].Person.BirthDate),                                     //Data di nascita
+				policy.Assets[0].Person.FiscalCode,                                                       //Codice Fiscale
+				beneficiary1,                                                                             //Codice Fiscale Beneficiario
+				beneficiary2,                                                                             //Codice Fiscale Beneficiario 2
+				"",                                                                                       //Codice Fiscale Beneficiario 3
+				"VIT",                                                                                    //Natura del rapporto
+				"PAS",                                                                                    //Scopo del rapporto
+				"BO",                                                                                     //Modalità di pagamento del premio assicurativo (all'intermediario)
+				"SI",                                                                                     //contraente = Assicurato?
+				ChekDomicilie(policy.Contractor).StreetName + ", " + ChekDomicilie(policy.Contractor).StreetNumber, //Indirizzo di domicilio contraente
+				ChekDomicilie(policy.Contractor).PostalCode,                                                        //C.A.P. Di domicilio
+				ChekDomicilie(policy.Contractor).Locality,                                                          //Comune di domicilio
+				ChekDomicilie(policy.Contractor).CityCode,                                                          //Provincia di domicilio
+				policy.Contractor.BirthCity,                                                                        //Luogo di nascita dell’contraente persona fisica
+				policy.Contractor.BirthProvince,                                                                    //Provincia di nascita dell’contraente persona fisica
+				"086",                                                                                              //Stato di residenza dell’contraente
+				residenceCab,                                                                                       //Cab della città di residenza dell’contraente
+				"600",                                                                                              //Sottogruppo attività economica
+				"600",                                                                                              //Ramo gruppo attività economica
+				ExistIdentityDocument(policy.Contractor.IdentityDocuments).Code,                                                                                                //Tipo documento dell'contraente persona fisica
+				ExistIdentityDocument(policy.Contractor.IdentityDocuments).Number,                                                                                              //Numero documento dell'contraente persona fisica
+				getFormatdate(ExistIdentityDocument(policy.Contractor.IdentityDocuments).DateOfIssue),                                                                          //Data rilascio documento dell'contraente persona fisica
+				ExistIdentityDocument(policy.Contractor.IdentityDocuments).IssuingAuthority + " di " + ExistIdentityDocument(policy.Contractor.IdentityDocuments).PlaceOfIssue, //Ente rilascio documento dell'contraente persona fisica
 				"NO", //PEP - Persona Politicamente Esposta
 				"",   //Tipologia di PEP
 				"E",  //Modalità di comunicazione prescelta tra Compagnia ed contraente
-				policy.Assets[0].Person.Residence.StreetName + ", "+policy.Assets[0].Person.Residence.StreetNumber,                                                //Indirizzo di residenza Assicurato
-				policy.Assets[0].Person.Residence.PostalCode,                                                //C.A.P. Residenza
-				policy.Assets[0].Person.Residence.Locality,                                                  //Comune Residenza
-				policy.Assets[0].Person.Residence.CityCode,                                                  //Provincia Residenza
-				ChekDomicilie(*policy.Assets[0].Person).StreetName,                                          //Indirizzo di domicilio
-				ChekDomicilie(*policy.Assets[0].Person).PostalCode,                                          //C.A.P. Domicilio
-				ChekDomicilie(*policy.Assets[0].Person).Locality,                                            //Comune Domicilio
-				ChekDomicilie(*policy.Assets[0].Person).CityCode,                                            //Provincia Domicilio
-				policy.Assets[0].Person.Mail,                                                                //Indirizzo e-mail
-				policy.Assets[0].Person.Phone,                                                               //Numero di cellulare
-				policy.Assets[0].Person.BirthCity,                                                           //Luogo di nascita
-				policy.Assets[0].Person.BirthCity,                                                           //Provincia di nascita
-				"ITA",                                                                                       //Stato di residenza
-				ExistIdentityDocument(policy.Assets[0].Person.IdentityDocuments).Code,                       //Tipo documento
-				ExistIdentityDocument(policy.Assets[0].Person.IdentityDocuments).Number,                     //Numero documento
-				getFormatdate(ExistIdentityDocument(policy.Assets[0].Person.IdentityDocuments).DateOfIssue), //Data rilascio documento
-				ExistIdentityDocument(policy.Assets[0].Person.IdentityDocuments).IssuingAuthority +" di "+ ExistIdentityDocument(policy.Assets[0].Person.IdentityDocuments).PlaceOfIssue,           //Ente rilascio documento
-				"NO",                                  //PEP - Persona Politicamente Esposta
-				"",                                    //Tipologia di PEP
-				beneficiary1T,                         //Eredi designati nominativamente o genericamente?
-				beneficiary1S.Surname,                 //Cognome Beneficiario 1
-				beneficiary1S.Name,                    //Nome
-				beneficiary1S.FiscalCode,              //Codice Fiscale
-				beneficiary1S.Phone,                   //Numero di Telefono del Beneficiario
-				beneficiary1S.Residence.StreetName,    //Indirizzo di residenza
+				policy.Assets[0].Person.Residence.StreetName + ", " + policy.Assets[0].Person.Residence.StreetNumber, //Indirizzo di residenza Assicurato
+				policy.Assets[0].Person.Residence.PostalCode,                                                         //C.A.P. Residenza
+				policy.Assets[0].Person.Residence.Locality,                                                           //Comune Residenza
+				policy.Assets[0].Person.Residence.CityCode,                                                           //Provincia Residenza
+				ChekDomicilie(*policy.Assets[0].Person).StreetName,                                                   //Indirizzo di domicilio
+				ChekDomicilie(*policy.Assets[0].Person).PostalCode,                                                   //C.A.P. Domicilio
+				ChekDomicilie(*policy.Assets[0].Person).Locality,                                                     //Comune Domicilio
+				ChekDomicilie(*policy.Assets[0].Person).CityCode,                                                     //Provincia Domicilio
+				policy.Assets[0].Person.Mail,                                                                         //Indirizzo e-mail
+				policy.Assets[0].Person.Phone,                                                                        //Numero di cellulare
+				policy.Assets[0].Person.BirthCity,                                                                    //Luogo di nascita
+				policy.Assets[0].Person.BirthCity,                                                                    //Provincia di nascita
+				"ITA",                                                                                                //Stato di residenza
+				ExistIdentityDocument(policy.Assets[0].Person.IdentityDocuments).Code,                                //Tipo documento
+				ExistIdentityDocument(policy.Assets[0].Person.IdentityDocuments).Number,                              //Numero documento
+				getFormatdate(ExistIdentityDocument(policy.Assets[0].Person.IdentityDocuments).DateOfIssue),          //Data rilascio documento
+				ExistIdentityDocument(policy.Assets[0].Person.IdentityDocuments).IssuingAuthority + " di " + ExistIdentityDocument(policy.Assets[0].Person.IdentityDocuments).PlaceOfIssue, //Ente rilascio documento
+				"NO",                     //PEP - Persona Politicamente Esposta
+				"",                       //Tipologia di PEP
+				beneficiary1T,            //Eredi designati nominativamente o genericamente?
+				beneficiary1S.Surname,    //Cognome Beneficiario 1
+				beneficiary1S.Name,       //Nome
+				beneficiary1S.FiscalCode, //Codice Fiscale
+				beneficiary1S.Phone,      //Numero di Telefono del Beneficiario
+				beneficiary1S.Residence.StreetName + ", " + beneficiary1S.Residence.StreetNumber, //Indirizzo di residenza
 				beneficiary1S.Residence.City,          //Città /Comune di Residenza
 				beneficiary1S.Residence.PostalCode,    //CAP
 				beneficiary1S.Residence.CityCode,      //Provincia
 				beneficiary1S.Mail,                    //Email
 				MapBool(beneficiary1S.IsFamilyMember), //Legame del Cliente col Beneficiario
 
-				MapBool(beneficiary1S.IsContactable),  //Lcontraente ha escluso l invio di comunicazioni da parte dell Impresa al Beneficiario?
-				beneficiary2S.Surname,                 //Cognome Beneficiario 2
-				beneficiary2S.Name,                    //Nome
-				beneficiary2S.FiscalCode,              //Codice Fiscale
-				beneficiary2S.Phone,                   //Numero di Telefono del Beneficiario
-				beneficiary2S.Residence.StreetName + ", "+ChekDomicilie(policy.Contractor).StreetNumber,    //Indirizzo di residenza
+				MapBool(beneficiary1S.IsContactable), //Lcontraente ha escluso l invio di comunicazioni da parte dell Impresa al Beneficiario?
+				beneficiary2S.Surname,                //Cognome Beneficiario 2
+				beneficiary2S.Name,                   //Nome
+				beneficiary2S.FiscalCode,             //Codice Fiscale
+				beneficiary2S.Phone,                  //Numero di Telefono del Beneficiario
+				beneficiary2S.Residence.StreetName + ", " + beneficiary2S.Residence.StreetNumber, //Indirizzo di residenza
 				beneficiary2S.Residence.City,          //Città /Comune di Residenza
 				beneficiary2S.Residence.PostalCode,    //CAP
 				beneficiary2S.Residence.CityCode,      //Provincia

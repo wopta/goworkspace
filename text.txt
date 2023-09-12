@@ -1,53 +1,14 @@
-"",TIPO OPERAZIONE
-"",//N. POLIZZA SOSTITUITA
-"",//DENOMINAZIONE PRODOTTO
-"",//NODO DI GESTIONE
-"",//DATA EMISSIONE
-"",//DATA EFFETTO
-"",//CODICE FISCALE CONTRAENTE
-"",//PIVA CONTRAENTE
-"",//COGNOME/RAGIONE SOCIALE CONTRAENTE
-"",//NOME CONTRENTE
-"",//SESSO CONTRAENTE
-"",//DATA DI NASCITA CONTRAENTE
-"",//PROVINCIA DI NASCITA CONTRAENTE
-"",//COMUNE DI NASCITA CONTRAENTE
-"",//PROVINCIA CONTRAENTE
-"",//COMUNE CONTRAENTE
-"",//CAP CONTRAENTE
-"",//TOPONIMO CONTRAENTE
-"",//INDIRIZZO CONTRAENTE
-"",//NUMERO CIVICO CONTRAENTE
-"",//DATA SCADENZA
-"",//FRAZIONAMENTO
-"",//CANALE
-"",//SCELTA OPZIONI
-"",//CODICE FISCALE ASSICURATO
-"",//PIVA ASSICURATO
-"",//COGNOME/RAGIONE SOCIALE ASSICURATO
-"",//NOME ASSICURATO
-"",//SESSO ASSICURATO
-"",//DATA DI NASCITA ASSICURATO
-"",//PROVINCIA DI NASCITA ASSICURATO
-"",//COMUNE DI NASCITA ASSICURATO
-"",//PROVINCIA ASSICURATO
-"",//COMUNE ASSICURATO
-"",//CAP ASSICURATO
-"",//TOPONIMO ASSICURATO
-"",//INDIRIZZO ASSICURATO
-"",//NUMERO CIVICO ASSICURATO
-"",//CODICE ATTIVITA' ASSICURATO
-"",//SETTORE ASSICURATO
-"",//TIPO ASSICURATO
-"",//GARANZIE/PACCHETTI
-"",//KEY MAN
-"",//ESTENSIONE SUPERVALUTAZIONE ARTI SUPERIORI
-"",//FRANCHIGIA
-"",//MASSIMALE
-"",//TIPO COPERTURA INFORTUNI
-"",//PREMIO ANNUO LORDO DI GARANZIA
-"",//SCONTO %
-"",//RATA ALLA FIRMA
-"",//RATA SUCCESSIVA
-"",//DATA SCADENZA I RATA
-"",//NUMERO POLIZZA
+1W5;100004;A;05062023;05062023;012;240;000000042824;0000000200000;0;;;W1;;T;;;;;1;WEB;PF;Aspes;Stefano;M;21021978;SPSSFN78B21G224C;San Giovanni;39030;;Valle Aurina;stefanoaspes@yahoo.it;+393479931338;Aspes;Stefano;M;21021978;SPSSFN78B21G224C;GE;GE;;VIT;PAS;BO;SI;San Giovanni, Wolfsgrube 6;39030;;BZ;Padova;PD;086;58180;600;600;01;AX4254741;27122016;Comune di VALLE AURINA;NO;;E;San Giovanni, Wolfsgrube 6;39030;;BZ;San Giovanni;39030;;BZ;stefanoaspes@yahoo.it;+393479931338;Padova;Padova;ITA;01;AX4254741;27122016;Comune di VALLE AURINA;NO;;GE;;;;;;;;;;NO;NO;;;;;, Wolfsgrube 6;;;;;NO;NO;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+1W6;100004;A;05062023;05062023;012;240;000000005268;0000000200000;0;;;W1;;T;;;;;1;WEB;PF;Aspes;Stefano;M;21021978;SPSSFN78B21G224C;San Giovanni;39030;;Valle Aurina;stefanoaspes@yahoo.it;+393479931338;Aspes;Stefano;M;21021978;SPSSFN78B21G224C;;;;VIT;PAS;BO;SI;San Giovanni, Wolfsgrube 6;39030;;BZ;Padova;PD;086;58180;600;600;01;AX4254741;27122016;Comune di VALLE AURINA;NO;;E;San Giovanni, Wolfsgrube 6;39030;;BZ;San Giovanni;39030;;BZ;stefanoaspes@yahoo.it;+393479931338;Padova;Padova;ITA;01;AX4254741;27122016;Comune di VALLE AURINA;NO;;;;;;;;;;;;NO;NO;;;;;, Wolfsgrube 6;;;;;NO;NO;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+1W5;100008;A;06062023;06062023;012;120;000000010810;0000000200000;0;;;W1;;T;;;;;1;WEB;PF;Martinelli;Stefano;M;13031989;MRTSFN89C13I828A;Via Piandelvino;23038;Pradelle;Valdidentro;stemarti@ymail.com;+393332948758;Martinelli;Stefano;M;13031989;MRTSFN89C13I828A;GE;GE;;VIT;PAS;BO;SI;Via Piandelvino, 28;23038;Pradelle;SO;Sondalo;SO;086;52300;600;600;01;AV1674544;16042014;Comune di Valdidentro ;NO;;E;Via Piandelvino, 28;23038;Pradelle;SO;Via Piandelvino;23038;Pradelle;SO;stemarti@ymail.com;+393332948758;Sondalo;Sondalo;ITA;01;AV1674544;16042014;Comune di Valdidentro ;NO;;GE;;;;;;;;;;NO;NO;;;;;, 28;;;;;NO;NO;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+1W6;100008;A;06062023;06062023;012;120;000000001330;0000000200000;0;;;W1;;T;;;;;1;WEB;PF;Martinelli;Stefano;M;13031989;MRTSFN89C13I828A;Via Piandelvino;23038;Pradelle;Valdidentro;stemarti@ymail.com;+393332948758;Martinelli;Stefano;M;13031989;MRTSFN89C13I828A;;;;VIT;PAS;BO;SI;Via Piandelvino, 28;23038;Pradelle;SO;Sondalo;SO;086;52300;600;600;01;AV1674544;16042014;Comune di Valdidentro ;NO;;E;Via Piandelvino, 28;23038;Pradelle;SO;Via Piandelvino;23038;Pradelle;SO;stemarti@ymail.com;+393332948758;Sondalo;Sondalo;ITA;01;AV1674544;16042014;Comune di Valdidentro ;NO;;;;;;;;;;;;NO;NO;;;;;, 28;;;;;NO;NO;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+1W7;100008;A;06062023;06062023;012;120;000000002948;0000000002000;0;;;W1;;T;;;;;1;WEB;PF;Martinelli;Stefano;M;13031989;MRTSFN89C13I828A;Via Piandelvino;23038;Pradelle;Valdidentro;stemarti@ymail.com;+393332948758;Martinelli;Stefano;M;13031989;MRTSFN89C13I828A;;;;VIT;PAS;BO;SI;Via Piandelvino, 28;23038;Pradelle;SO;Sondalo;SO;086;52300;600;600;01;AV1674544;16042014;Comune di Valdidentro ;NO;;E;Via Piandelvino, 28;23038;Pradelle;SO;Via Piandelvino;23038;Pradelle;SO;stemarti@ymail.com;+393332948758;Sondalo;Sondalo;ITA;01;AV1674544;16042014;Comune di Valdidentro ;NO;;;;;;;;;;;;NO;NO;;;;;, 28;;;;;NO;NO;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+1W5;100014;A;08062023;08062023;012;240;000000039254;0000000200000;0;;;W1;;T;;;;;1;WEB;PF;scatena salerno;mauro;M;04051979;SCTMRA79E04E715X;Via Mimose;55100;Lucca;Lucca;mscatenasalerno@notariato.it;+393457158892;scatena salerno;mauro;M;04051979;SCTMRA79E04E715X;GE;GE;;VIT;PAS;BO;SI;Via Tosco Romagnola, 259;56021;Cascina;PI;Lucca;LU;086;13700;600;600;02;u17n59620x;25092019;MIT-UCO di lucca;NO;;E;Via Mimose, 47;55100;Lucca;LU;Via Tosco Romagnola;56021;Cascina;PI;mscatenasalerno@notariato.it;+393457158892;Lucca;Lucca;ITA;02;u17n59620x;25092019;MIT-UCO di lucca;NO;;GE;;;;;;;;;;NO;NO;;;;;, 259;;;;;NO;NO;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+1W6;100014;A;08062023;08062023;012;240;000000004828;0000000200000;0;;;W1;;T;;;;;1;WEB;PF;scatena salerno;mauro;M;04051979;SCTMRA79E04E715X;Via Mimose;55100;Lucca;Lucca;mscatenasalerno@notariato.it;+393457158892;scatena salerno;mauro;M;04051979;SCTMRA79E04E715X;;;;VIT;PAS;BO;SI;Via Tosco Romagnola, 259;56021;Cascina;PI;Lucca;LU;086;13700;600;600;02;u17n59620x;25092019;MIT-UCO di lucca;NO;;E;Via Mimose, 47;55100;Lucca;LU;Via Tosco Romagnola;56021;Cascina;PI;mscatenasalerno@notariato.it;+393457158892;Lucca;Lucca;ITA;02;u17n59620x;25092019;MIT-UCO di lucca;NO;;;;;;;;;;;;NO;NO;;;;;, 259;;;;;NO;NO;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+1W7;100014;A;08062023;08062023;012;120;000000004952;0000000002000;0;;;W1;;T;;;;;1;WEB;PF;scatena salerno;mauro;M;04051979;SCTMRA79E04E715X;Via Mimose;55100;Lucca;Lucca;mscatenasalerno@notariato.it;+393457158892;scatena salerno;mauro;M;04051979;SCTMRA79E04E715X;;;;VIT;PAS;BO;SI;Via Tosco Romagnola, 259;56021;Cascina;PI;Lucca;LU;086;13700;600;600;02;u17n59620x;25092019;MIT-UCO di lucca;NO;;E;Via Mimose, 47;55100;Lucca;LU;Via Tosco Romagnola;56021;Cascina;PI;mscatenasalerno@notariato.it;+393457158892;Lucca;Lucca;ITA;02;u17n59620x;25092019;MIT-UCO di lucca;NO;;;;;;;;;;;;NO;NO;;;;;, 259;;;;;NO;NO;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+1W5;100015;A;09062023;09062023;012;240;000000039358;0000000100000;0;;;W1;;T;;;;;1;WEB;PF;Miglia;Stefano;M;25071970;MGLSFN70L25D969D;Corso Ettore Archinti;26900;Lodi;Lodi;stefano.miglia@gmail.com;+393492330150;Miglia;Stefano;M;25071970;MGLSFN70L25D969D;GE;GE;;VIT;PAS;BO;SI;Corso Ettore Archinti, 60;26900;Lodi;LO;Genova;GE;086;20300;600;600;01;CA44992IV;24052021;Comune di Lodi;NO;;E;Corso Ettore Archinti, 60;26900;Lodi;LO;Corso Ettore Archinti;26900;Lodi;LO;stefano.miglia@gmail.com;+393492330150;Genova;Genova;ITA;01;CA44992IV;24052021;Comune di Lodi;NO;;GE;;;;;;;;;;NO;NO;;;;;, 60;;;;;NO;NO;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+1W6;100015;A;09062023;09062023;012;240;000000004841;0000000100000;0;;;W1;;T;;;;;1;WEB;PF;Miglia;Stefano;M;25071970;MGLSFN70L25D969D;Corso Ettore Archinti;26900;Lodi;Lodi;stefano.miglia@gmail.com;+393492330150;Miglia;Stefano;M;25071970;MGLSFN70L25D969D;;;;VIT;PAS;BO;SI;Corso Ettore Archinti, 60;26900;Lodi;LO;Genova;GE;086;20300;600;600;01;CA44992IV;24052021;Comune di Lodi;NO;;E;Corso Ettore Archinti, 60;26900;Lodi;LO;Corso Ettore Archinti;26900;Lodi;LO;stefano.miglia@gmail.com;+393492330150;Genova;Genova;ITA;01;CA44992IV;24052021;Comune di Lodi;NO;;;;;;;;;;;;NO;NO;;;;;, 60;;;;;NO;NO;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+1W7;100015;A;09062023;09062023;012;120;000000003786;0000000001000;0;;;W1;;T;;;;;1;WEB;PF;Miglia;Stefano;M;25071970;MGLSFN70L25D969D;Corso Ettore Archinti;26900;Lodi;Lodi;stefano.miglia@gmail.com;+393492330150;Miglia;Stefano;M;25071970;MGLSFN70L25D969D;;;;VIT;PAS;BO;SI;Corso Ettore Archinti, 60;26900;Lodi;LO;Genova;GE;086;20300;600;600;01;CA44992IV;24052021;Comune di Lodi;NO;;E;Corso Ettore Archinti, 60;26900;Lodi;LO;Corso Ettore Archinti;26900;Lodi;LO;stefano.miglia@gmail.com;+393492330150;Genova;Genova;ITA;01;CA44992IV;24052021;Comune di Lodi;NO;;;;;;;;;;;;NO;NO;;;;;, 60;;;;;NO;NO;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+1M5;100023;A;26062023;26062023;001;240;000000002683;0000000075000;0;;;W1;;T;;;;;1;WEB;PF;Grieco;Antonio;M;10121969;GRCNTN69T10G942X;Via Roma;85028;Rionero In Vulture;Rionero in Vulture;griecantonio@tiscali.it;+393471862614;Grieco;Antonio;M;10121969;GRCNTN69T10G942X;GE;GE;;VIT;PAS;BO;SI;Via Roma, 204/C;85028;Rionero In Vulture;PZ;Potenza;PZ;086;42200;600;600;01;CA17231CK;09102018;Comune di RIONERO IN VULTURE;NO;;E;Via Roma, 204/C;85028;Rionero In Vulture;PZ;Via Roma;85028;Rionero In Vulture;PZ;griecantonio@tiscali.it;+393471862614;Potenza;Potenza;ITA;01;CA17231CK;09102018;Comune di RIONERO IN VULTURE;NO;;GE;;;;;;;;;;NO;NO;;;;;, 204/C;;;;;NO;NO;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+1M6;100023;A;26062023;26062023;001;240;000000000330;0000000075000;0;;;W1;;T;;;;;1;WEB;PF;Grieco;Antonio;M;10121969;GRCNTN69T10G942X;Via Roma;85028;Rionero In Vulture;Rionero in Vulture;griecantonio@tiscali.it;+393471862614;Grieco;Antonio;M;10121969;GRCNTN69T10G942X;;;;VIT;PAS;BO;SI;Via Roma, 204/C;85028;Rionero In Vulture;PZ;Potenza;PZ;086;42200;600;600;01;CA17231CK;09102018;Comune di RIONERO IN VULTURE;NO;;E;Via Roma, 204/C;85028;Rionero In Vulture;PZ;Via Roma;85028;Rionero In Vulture;PZ;griecantonio@tiscali.it;+393471862614;Potenza;Potenza;ITA;01;CA17231CK;09102018;Comune di RIONERO IN VULTURE;NO;;;;;;;;;;;;NO;NO;;;;;, 204/C;;;;;NO;NO;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+1M7;100023;A;26062023;26062023;001;120;000000000250;0000000000750;0;;;W1;;T;;;;;1;WEB;PF;Grieco;Antonio;M;10121969;GRCNTN69T10G942X;Via Roma;85028;Rionero In Vulture;Rionero in Vulture;griecantonio@tiscali.it;+393471862614;Grieco;Antonio;M;10121969;GRCNTN69T10G942X;;;;VIT;PAS;BO;SI;Via Roma, 204/C;85028;Rionero In Vulture;PZ;Potenza;PZ;086;42200;600;600;01;CA17231CK;09102018;Comune di RIONERO IN VULTURE;NO;;E;Via Roma, 204/C;85028;Rionero In Vulture;PZ;Via Roma;85028;Rionero In Vulture;PZ;griecantonio@tiscali.it;+393471862614;Potenza;Potenza;ITA;01;CA17231CK;09102018;Comune di RIONERO IN VULTURE;NO;;;;;;;;;;;;NO;NO;;;;;, 204/C;;;;;NO;NO;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;NO;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

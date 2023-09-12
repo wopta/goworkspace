@@ -44,7 +44,7 @@ func BankAccountHypeFx(resp http.ResponseWriter, r *http.Request) (string, inter
 
 		e = lib.InsertRowsBigQuery("wopta", dataBanckAccount, obj)
 	}
-	if obj.MovementType == "delete" {
+	if obj.MovementType == "delete"||obj.MovementType =="suspended" {
 		e = lib.UpdateRowBigQuery("wopta", dataBanckAccount, map[string]string{
 			"status":  obj.Status,
 			"endDate": obj.EndDate.Format(layout) + " 00:00:00",
@@ -127,7 +127,7 @@ func CheckData(r *http.Request) (BankAccountMovement, error) {
 			return obj, GetErrorJson(400, "Bad request", "field StartDate miss")
 		}
 	}
-	if obj.MovementType == "delete" {
+	if obj.MovementType == "delete"||obj.MovementType =="suspended" {
 		res, _ := QueryRowsBigQuery[BankAccountMovement]("wopta",
 			"inclusive_axa_bank_account",
 			"select * from `wopta."+dataMovement+"` where fiscalCode='"+obj.FiscalCode+"' and guaranteesCode ='"+obj.GuaranteesCode+"'")
@@ -212,3 +212,11 @@ func getBigqueryClient() *bigquery.Client {
 	lib.CheckError(err)
 	return client
 }
+func Count(date string) *bigquery.Client {
+	res, _ := QueryRowsBigQuery[BankAccountMovement]("wopta",
+	"inclusive_axa_bank_account",
+	"select * from `wopta."+dataMovement+"` where fiscalCode='"+obj.FiscalCode+"' and guaranteesCode ='"+obj.GuaranteesCode+"'")
+log.Println(len(res))
+	return client
+}
+
