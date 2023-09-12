@@ -14,8 +14,10 @@ import (
 )
 
 var (
-	origin    string
-	ccAddress mail.Address
+	origin      string
+	ccAddress   mail.Address
+	toAddress   mail.Address
+	fromAddress mail.Address
 )
 
 const (
@@ -33,6 +35,10 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 		settingFormat string = "products/%s/setting.json"
 	)
 
+	fromAddress = mail.Address{
+		Name:    "Anna di Wopta Assicurazioni",
+		Address: "anna@wopta.it",
+	}
 	channel := models.GetChannel(policy)
 	settingFile := fmt.Sprintf(settingFormat, channel)
 
@@ -47,25 +53,33 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 
 	state := bpmn.NewBpmn(*policy)
 
-	ccAddress = mail.GetEmailByChannel(policy)
-
 	switch flowKey {
 	case proposalFlowKey:
 		flow = setting.ProposalFlow
-		addProposalHandlers(state)
+		toAddress = mail.Address{
+			Name:    policy.Contractor.Name + " " + policy.Contractor.Surname,
+			Address: policy.Contractor.Mail,
+		}
 	case emitFlowKey:
 		flow = setting.EmitFlow
-		addEmitHandlers(state)
+		toAddress = mail.GetEmailByChannel(policy)
 	default:
 		log.Println("[runBrokerBpmn] error flow not set")
 		return nil
 	}
+
+	addHandlers(state)
 
 	flowHandlers := lib.SliceMap[models.Process, string](flow, func(h models.Process) string { return h.Name })
 	log.Printf("[runBrokerBpmn] starting %s flow with set handlers: %s", flowKey, strings.Join(flowHandlers, ","))
 
 	state.RunBpmn(flow)
 	return state
+}
+
+func addHandlers(state *bpmn.State) {
+	addEmitHandlers(state)
+	addProposalHandlers(state)
 }
 
 func addEmitHandlers(state *bpmn.State) {
@@ -99,8 +113,8 @@ func sendMailSign(state *bpmn.State) error {
 	policy := state.Data
 	mail.SendMailSign(
 		*policy,
-		mail.Address{Address: "anna@wopta.it"},
-		mail.Address{Address: policy.Contractor.Mail},
+		fromAddress,
+		toAddress,
 		ccAddress,
 	)
 	return nil
@@ -134,8 +148,8 @@ func sendProposalMail(state *bpmn.State) error {
 	policy := state.Data
 	mail.SendMailProposal(
 		*policy,
-		mail.Address{Address: "anna@wopta.it"},
-		mail.Address{Address: policy.Contractor.Mail},
+		fromAddress,
+		toAddress,
 		ccAddress,
 	)
 	return nil
