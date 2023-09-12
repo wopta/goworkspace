@@ -127,6 +127,7 @@ func fabrickPayment(origin, policyUid, schedule string) error {
 			nil,
 			mail.Address{Address: "anna@wopta.it"},
 			mail.Address{Address: policy.Contractor.Mail},
+			mail.Address{},
 		)
 	}
 

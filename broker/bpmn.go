@@ -13,7 +13,10 @@ import (
 	"github.com/wopta/goworkspace/user"
 )
 
-var origin string
+var (
+	origin    string
+	ccAddress mail.Address
+)
 
 const (
 	emitFlowKey     = "emit"
@@ -43,6 +46,8 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 	}
 
 	state := bpmn.NewBpmn(*policy)
+
+	ccAddress = mail.GetEmailByChannel(policy)
 
 	switch flowKey {
 	case proposalFlowKey:
@@ -96,6 +101,7 @@ func sendMailSign(state *bpmn.State) error {
 		*policy,
 		mail.Address{Address: "anna@wopta.it"},
 		mail.Address{Address: policy.Contractor.Mail},
+		ccAddress,
 	)
 	return nil
 }
@@ -130,6 +136,7 @@ func sendProposalMail(state *bpmn.State) error {
 		*policy,
 		mail.Address{Address: "anna@wopta.it"},
 		mail.Address{Address: policy.Contractor.Mail},
+		ccAddress,
 	)
 	return nil
 }

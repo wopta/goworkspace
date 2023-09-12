@@ -16,6 +16,7 @@ import (
 	"github.com/wopta/goworkspace/user"
 )
 
+// DEPRECATED
 func PaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println("Payment")
 	var response string
@@ -106,6 +107,7 @@ func PaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 				nil,
 				mail.Address{Address: "anna@wopta.it"},
 				mail.Address{Address: p.Contractor.Mail},
+				mail.Address{},
 			)
 
 			response = `{

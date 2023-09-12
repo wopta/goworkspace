@@ -84,10 +84,12 @@ func Emit(policy *models.Policy, request EmitRequest, origin string) EmitRespons
 		log.Printf("[Emit] Wait for approval - Policy Uid %s", policy.Uid)
 		emitApproval(policy)
 		reserved.GetReservedInfo(policy)
+		ccAddress := mail.GetEmailByChannel(policy)
 		mail.SendMailReserved(
 			*policy,
 			mail.Address{Address: "anna@wopta.it"},
 			mail.Address{Address: policy.Contractor.Mail},
+			ccAddress,
 		)
 	case typeEmit:
 		log.Printf("[Emit] Emitting - Policy Uid %s", policy.Uid)

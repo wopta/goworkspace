@@ -14,7 +14,9 @@ type BodyData struct {
 	ContractorSurname  string
 	AgentName          string
 	AgentSurname       string
+	AgentMail          string
 	AgencyName         string
+	AgencyMail         string
 	ProductForm        string
 	ProductName        string
 	InformationSetsUrl string
@@ -33,6 +35,7 @@ type Attachment struct {
 type MailRequest struct {
 	From         string        `json:"from"`
 	FromName     string        `json:"fromName"`
+	FromAddress  Address       `json:"fromAddress"`
 	To           []string      `json:"to"`
 	Message      string        `json:"message"`
 	Subject      string        `json:"subject"`

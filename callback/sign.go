@@ -109,6 +109,7 @@ func namirialStepFinished(origin, policyUid string) {
 			policy,
 			mail.Address{Address: "anna@wopta.it"},
 			mail.Address{Address: policy.Contractor.Mail},
+			mail.Address{},
 		)
 
 		return
@@ -166,6 +167,7 @@ func sendMailContract(state *bpmn.State) error {
 		nil,
 		mail.Address{Address: "anna@wopta.it"},
 		mail.Address{Address: policy.Contractor.Mail},
+		mail.Address{},
 	)
 
 	return nil

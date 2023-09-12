@@ -20,7 +20,7 @@ const (
 	reservedRejectedTemplateType = "rejected"
 )
 
-func SendMailProposal(policy models.Policy, from, to Address) {
+func SendMailProposal(policy models.Policy, from, to, cc Address) {
 	var (
 		linkFormat = "https://storage.googleapis.com/documents-public-dev/information-sets/%s/%s/Precontrattuale.pdf"
 		link       = fmt.Sprintf(linkFormat, policy.Name, policy.ProductVersion)
@@ -29,7 +29,7 @@ func SendMailProposal(policy models.Policy, from, to Address) {
 
 	channel := models.GetChannel(&policy)
 
-	cc := setBodyDataAndGetCC(channel, policy, &bodyData)
+	setBodyData(channel, policy, &bodyData)
 
 	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", channel, proposalTemplateType))
 
@@ -40,29 +40,28 @@ func SendMailProposal(policy models.Policy, from, to Address) {
 	subject := fmt.Sprintf("%s %s", title, subtitle)
 
 	SendMail(MailRequest{
-		FromName:  from.Name,
-		From:      from.Address,
-		To:        []string{to.Address},
-		Cc:        cc,
-		Message:   messageBody,
-		Title:     title,
-		SubTitle:  subtitle,
-		Subject:   subject,
-		IsHtml:    true,
-		IsLink:    true,
-		Link:      link,
-		LinkLabel: "Leggi documentazione",
+		FromAddress: from,
+		To:          []string{to.Address},
+		Cc:          cc.Address,
+		Message:     messageBody,
+		Title:       title,
+		SubTitle:    subtitle,
+		Subject:     subject,
+		IsHtml:      true,
+		IsLink:      true,
+		Link:        link,
+		LinkLabel:   "Leggi documentazione",
 	})
 }
 
-func SendMailPay(policy models.Policy, from, to Address) {
+func SendMailPay(policy models.Policy, from, to, cc Address) {
 	var (
 		bodyData = BodyData{}
 	)
 
 	channel := models.GetChannel(&policy)
 
-	cc := setBodyDataAndGetCC(channel, policy, &bodyData)
+	setBodyData(channel, policy, &bodyData)
 
 	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", channel, payTemplateType))
 
@@ -73,29 +72,28 @@ func SendMailPay(policy models.Policy, from, to Address) {
 	subject := fmt.Sprintf("%s %s", title, subtitle)
 
 	SendMail(MailRequest{
-		FromName:  from.Name,
-		From:      from.Address,
-		To:        []string{to.Address},
-		Cc:        cc,
-		Message:   messageBody,
-		Title:     title,
-		SubTitle:  subtitle,
-		Subject:   subject,
-		IsHtml:    true,
-		IsLink:    true,
-		Link:      policy.PayUrl,
-		LinkLabel: "Paga la tua polizza",
+		FromAddress: from,
+		To:          []string{to.Address},
+		Cc:          cc.Address,
+		Message:     messageBody,
+		Title:       title,
+		SubTitle:    subtitle,
+		Subject:     subject,
+		IsHtml:      true,
+		IsLink:      true,
+		Link:        policy.PayUrl,
+		LinkLabel:   "Paga la tua polizza",
 	})
 }
 
-func SendMailSign(policy models.Policy, from, to Address) {
+func SendMailSign(policy models.Policy, from, to, cc Address) {
 	var (
 		bodyData = BodyData{}
 	)
 
 	channel := models.GetChannel(&policy)
 
-	cc := setBodyDataAndGetCC(channel, policy, &bodyData)
+	setBodyData(channel, policy, &bodyData)
 
 	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", channel, signTemplateType))
 
@@ -106,29 +104,28 @@ func SendMailSign(policy models.Policy, from, to Address) {
 	subject := fmt.Sprintf("%s %s", title, subtitle)
 
 	SendMail(MailRequest{
-		FromName:  from.Name,
-		From:      from.Address,
-		To:        []string{to.Address},
-		Cc:        cc,
-		Message:   messageBody,
-		Title:     title,
-		SubTitle:  subtitle,
-		Subject:   subject,
-		IsHtml:    true,
-		IsLink:    true,
-		Link:      policy.SignUrl,
-		LinkLabel: "Firma la tua polizza",
+		FromAddress: from,
+		To:          []string{to.Address},
+		Cc:          cc.Address,
+		Message:     messageBody,
+		Title:       title,
+		SubTitle:    subtitle,
+		Subject:     subject,
+		IsHtml:      true,
+		IsLink:      true,
+		Link:        policy.SignUrl,
+		LinkLabel:   "Firma la tua polizza",
 	})
 }
 
-func SendMailContract(policy models.Policy, at *[]Attachment, from, to Address) {
+func SendMailContract(policy models.Policy, at *[]Attachment, from, to, cc Address) {
 	var (
 		bodyData = BodyData{}
 	)
 
 	channel := models.GetChannel(&policy)
 
-	cc := setBodyDataAndGetCC(channel, policy, &bodyData)
+	setBodyData(channel, policy, &bodyData)
 
 	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", channel, emittedTemplateType))
 
@@ -157,10 +154,9 @@ func SendMailContract(policy models.Policy, at *[]Attachment, from, to Address) 
 	subject := fmt.Sprintf("%s %s", title, subtitle)
 
 	SendMail(MailRequest{
-		FromName:     from.Name,
-		From:         from.Address,
+		FromAddress:  from,
 		To:           []string{to.Address},
-		Cc:           cc,
+		Cc:           cc.Address,
 		Message:      messageBody,
 		Title:        policy.NameDesc,
 		SubTitle:     subtitle,
@@ -171,7 +167,7 @@ func SendMailContract(policy models.Policy, at *[]Attachment, from, to Address) 
 	})
 }
 
-func SendMailReserved(policy models.Policy, from, to Address) {
+func SendMailReserved(policy models.Policy, from, to, cc Address) {
 	var (
 		at       []Attachment
 		bodyData = BodyData{}
@@ -179,7 +175,7 @@ func SendMailReserved(policy models.Policy, from, to Address) {
 
 	channel := models.GetChannel(&policy)
 
-	cc := setBodyDataAndGetCC(channel, policy, &bodyData)
+	setBodyData(channel, policy, &bodyData)
 
 	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", channel, reservedTemplateType))
 
@@ -202,10 +198,9 @@ func SendMailReserved(policy models.Policy, from, to Address) {
 	subject := fmt.Sprintf("%s - %s", title, subtitle)
 
 	SendMail(MailRequest{
-		FromName:     from.Name,
-		From:         from.Address,
+		FromAddress:  from,
 		To:           []string{to.Address},
-		Cc:           cc,
+		Cc:           cc.Address,
 		Message:      messageBody,
 		Title:        title,
 		SubTitle:     subtitle,
@@ -221,7 +216,7 @@ func SendMailReserved(policy models.Policy, from, to Address) {
 	}
 }
 
-func SendMailReservedResult(policy models.Policy, from, to Address) {
+func SendMailReservedResult(policy models.Policy, from, to, cc Address) {
 	var (
 		bodyData = BodyData{}
 		template string
@@ -235,7 +230,7 @@ func SendMailReservedResult(policy models.Policy, from, to Address) {
 
 	channel := models.GetChannel(&policy)
 
-	_ = setBodyDataAndGetCC(channel, policy, &bodyData)
+	setBodyData(channel, policy, &bodyData)
 
 	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", channel, template))
 
@@ -252,13 +247,13 @@ func SendMailReservedResult(policy models.Policy, from, to Address) {
 	messageBody := fillTemplate(templateFile, &bodyData)
 
 	SendMail(MailRequest{
-		FromName: from.Name,
-		From:     from.Address,
-		To:       []string{to.Address},
-		Message:  messageBody,
-		Title:    title,
-		SubTitle: subtitle,
-		Subject:  subject,
-		IsHtml:   true,
+		FromAddress: from,
+		To:          []string{to.Address},
+		Cc:          cc.Address,
+		Message:     messageBody,
+		Title:       title,
+		SubTitle:    subtitle,
+		Subject:     subject,
+		IsHtml:      true,
 	})
 }
