@@ -103,6 +103,11 @@ func setProposalData(policy *models.Policy) {
 		policy.ProductVersion = "v1"
 	}
 
+	// TODO delete me when PMI is fixed
+	if policy.Name == models.PmiProduct {
+		policy.NameDesc = "Wopta per te Artigiani & Imprese"
+	}
+
 	policy.Attachments = &[]models.Attachment{{
 		Name: "Precontrattuale", FileName: "Precontrattuale.pdf",
 		Link: "gs://documents-public-dev/information-sets/" + policy.Name + "/" + policy.ProductVersion + "/Precontrattuale.pdf",
