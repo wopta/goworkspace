@@ -134,7 +134,8 @@ func SendMail(obj MailRequest) {
 	tmplt.Execute(&tpl, data)
 	log.Println()
 
-	if obj.FromAddress.String() != "" {
+	emptyAddress := mail.Address{}
+	if obj.FromAddress != emptyAddress {
 		from = obj.FromAddress
 	} else if obj.From != "" {
 		from.Address = obj.From
