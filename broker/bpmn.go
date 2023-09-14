@@ -53,16 +53,24 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 
 	state := bpmn.NewBpmn(*policy)
 
+	// TODO: fix me - maybe get to/from/cc from setting.json?
 	switch flowKey {
 	case proposalFlowKey:
 		flow = setting.ProposalFlow
-		toAddress = mail.Address{
-			Name:    policy.Contractor.Name + " " + policy.Contractor.Surname,
-			Address: policy.Contractor.Mail,
+		toAddress = mail.GetContractorEmail(policy)
+		switch channel {
+		case models.AgentChannel:
+			ccAddress = mail.GetAgentEmail(policy)
 		}
 	case emitFlowKey:
 		flow = setting.EmitFlow
-		toAddress = mail.GetEmailByChannel(policy)
+		switch channel {
+		case models.AgencyChannel:
+			toAddress = mail.GetContractorEmail(policy)
+			ccAddress = mail.GetEmailByChannel(policy)
+		default:
+			toAddress = mail.GetEmailByChannel(policy)
+		}
 	default:
 		log.Println("[runBrokerBpmn] error flow not set")
 		return nil

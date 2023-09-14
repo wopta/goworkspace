@@ -91,20 +91,43 @@ func GetEmailByChannel(policy *models.Policy) Address {
 
 	switch channel {
 	case models.AgentChannel:
-		agent, err := models.GetAgentByAuthId(policy.AgentUid)
-		lib.CheckError(err)
-		return Address{
-			Name:    agent.Name + " " + agent.Surname,
-			Address: agent.Mail,
-		}
+		return GetAgentEmail(policy)
 	case models.AgencyChannel:
-		agency, err := models.GetAgencyByAuthId(policy.AgencyUid)
-		lib.CheckError(err)
-		return Address{
-			Name:    agency.Name,
-			Address: agency.Email,
-		}
+		return GetAgencyEmail(policy)
+	case models.ECommerceChannel:
+		return GetContractorEmail(policy)
 	}
 
 	return address
+}
+
+func GetContractorEmail(policy *models.Policy) Address {
+	return Address{
+		Name:    policy.Contractor.Name + " " + policy.Contractor.Surname,
+		Address: policy.Contractor.Mail,
+	}
+}
+
+func GetAgencyEmail(policy *models.Policy) Address {
+	if policy.AgencyUid == "" {
+		return Address{}
+	}
+	agency, err := models.GetAgencyByAuthId(policy.AgencyUid)
+	lib.CheckError(err)
+	return Address{
+		Name:    agency.Name,
+		Address: agency.Email,
+	}
+}
+
+func GetAgentEmail(policy *models.Policy) Address {
+	if policy.AgentUid == "" {
+		return Address{}
+	}
+	agent, err := models.GetAgentByAuthId(policy.AgentUid)
+	lib.CheckError(err)
+	return Address{
+		Name:    agent.Name + " " + agent.Surname,
+		Address: agent.Mail,
+	}
 }
