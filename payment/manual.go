@@ -117,8 +117,8 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		mail.SendMailContract(
 			p,
 			nil,
-			mail.Address{Address: "anna@wopta.it"},
-			mail.Address{Address: p.Contractor.Mail},
+			mail.AddressAnna,
+			mail.GetContractorEmail(&p),
 			mail.Address{},
 		)
 	}

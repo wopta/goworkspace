@@ -86,10 +86,7 @@ func Emit(policy *models.Policy, request EmitRequest, origin string) EmitRespons
 		reserved.GetReservedInfo(policy)
 		mail.SendMailReserved(
 			*policy,
-			mail.Address{
-				Name:    "Anna di Wopta Assicurazioni",
-				Address: "anna@wopta.it",
-			},
+			mail.AddressAnna,
 			mail.GetContractorEmail(policy),
 			mail.GetAgentEmail(policy),
 		)

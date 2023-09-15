@@ -1,5 +1,7 @@
 package mail
 
+import m "net/mail"
+
 type Data struct {
 	Title     string
 	SubTitle  string
@@ -58,3 +60,16 @@ type MailValidate struct {
 	IsValidS  bool   `firestore:"-" json:"isValid "`
 	FidoScore int64  `firestore:"fidoScore" json:"fidoScore"`
 }
+
+type Address = m.Address
+
+var (
+	AddressAnna = Address{
+		Name:    "Anna di Wopta Assicurazioni",
+		Address: "anna@wopta.it",
+	}
+	AddressAssunzione = Address{
+		Name:    "Assunzione",
+		Address: "assunzione@wopta.it",
+	}
+)

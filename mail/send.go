@@ -22,8 +22,6 @@ const (
 	innerBoundary = "inner"
 )
 
-type Address = mail.Address
-
 type loginAuth struct {
 	username, password string
 }
@@ -102,11 +100,8 @@ func SendMail(obj MailRequest) {
 	var (
 		username = os.Getenv("EMAIL_USERNAME")
 		password = os.Getenv("EMAIL_PASSWORD")
-		from     = mail.Address{
-			Name:    "Anna di Wopta Assicurazioni",
-			Address: "anna@wopta.it",
-		}
-		file []byte
+		from     = AddressAnna
+		file     []byte
 	)
 
 	switch os.Getenv("env") {
@@ -135,7 +130,7 @@ func SendMail(obj MailRequest) {
 	log.Println()
 
 	emptyAddress := mail.Address{}
-	if obj.FromAddress != emptyAddress {
+	if obj.FromAddress.String() != emptyAddress.String() {
 		from = obj.FromAddress
 	} else if obj.From != "" {
 		from.Address = obj.From

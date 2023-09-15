@@ -37,10 +37,7 @@ func runCallbackBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 		settingFormat string = "products/%s/setting.json"
 	)
 
-	fromAddress = mail.Address{
-		Name:    "Anna di Wopta Assicurazioni",
-		Address: "anna@wopta.it",
-	}
+	fromAddress = mail.AddressAnna
 	channel := models.GetChannel(policy)
 	settingFile := fmt.Sprintf(settingFormat, channel)
 

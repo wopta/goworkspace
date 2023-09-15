@@ -77,10 +77,7 @@ func PutPolicyReservedFx(w http.ResponseWriter, r *http.Request) (string, interf
 	log.Println("[PutPolicyReservedFx] sending acceptance email...")
 	mail.SendMailReservedResult(
 		policy,
-		mail.Address{
-			Name:    "Assunzione",
-			Address: "assunzione@wopta.it",
-		},
+		mail.AddressAssunzione,
 		mail.GetAgentEmail(&policy),
 		mail.Address{},
 	)
