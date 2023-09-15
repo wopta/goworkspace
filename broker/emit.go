@@ -84,7 +84,12 @@ func Emit(policy *models.Policy, request EmitRequest, origin string) EmitRespons
 		log.Printf("[Emit] Wait for approval - Policy Uid %s", policy.Uid)
 		emitApproval(policy)
 		reserved.GetReservedInfo(policy)
-		mail.SendMailReserved(*policy)
+		mail.SendMailReserved(
+			*policy,
+			mail.AddressAnna,
+			mail.GetContractorEmail(policy),
+			mail.GetAgentEmail(policy),
+		)
 	case typeEmit:
 		log.Printf("[Emit] Emitting - Policy Uid %s", policy.Uid)
 		log.Println("[Emit] starting bpmn flow...")

@@ -13,7 +13,12 @@ import (
 	"github.com/wopta/goworkspace/user"
 )
 
-var origin string
+var (
+	origin      string
+	ccAddress   mail.Address
+	toAddress   mail.Address
+	fromAddress mail.Address
+)
 
 const (
 	emitFlowKey     = "emit"
@@ -30,6 +35,7 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 		settingFormat string = "products/%s/setting.json"
 	)
 
+	fromAddress = mail.AddressAnna
 	channel := models.GetChannel(policy)
 	settingFile := fmt.Sprintf(settingFormat, channel)
 
@@ -44,23 +50,41 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 
 	state := bpmn.NewBpmn(*policy)
 
+	// TODO: fix me - maybe get to/from/cc from setting.json?
 	switch flowKey {
 	case proposalFlowKey:
 		flow = setting.ProposalFlow
-		addProposalHandlers(state)
+		toAddress = mail.GetContractorEmail(policy)
+		switch channel {
+		case models.AgentChannel:
+			ccAddress = mail.GetAgentEmail(policy)
+		}
 	case emitFlowKey:
 		flow = setting.EmitFlow
-		addEmitHandlers(state)
+		switch channel {
+		case models.AgencyChannel:
+			toAddress = mail.GetContractorEmail(policy)
+			ccAddress = mail.GetEmailByChannel(policy)
+		default:
+			toAddress = mail.GetEmailByChannel(policy)
+		}
 	default:
 		log.Println("[runBrokerBpmn] error flow not set")
 		return nil
 	}
+
+	addHandlers(state)
 
 	flowHandlers := lib.SliceMap[models.Process, string](flow, func(h models.Process) string { return h.Name })
 	log.Printf("[runBrokerBpmn] starting %s flow with set handlers: %s", flowKey, strings.Join(flowHandlers, ","))
 
 	state.RunBpmn(flow)
 	return state
+}
+
+func addHandlers(state *bpmn.State) {
+	addEmitHandlers(state)
+	addProposalHandlers(state)
 }
 
 func addEmitHandlers(state *bpmn.State) {
@@ -92,7 +116,12 @@ func setAdvanceBpm(state *bpmn.State) error {
 
 func sendMailSign(state *bpmn.State) error {
 	policy := state.Data
-	mail.SendMailSign(*policy)
+	mail.SendMailSign(
+		*policy,
+		fromAddress,
+		toAddress,
+		ccAddress,
+	)
 	return nil
 }
 
@@ -122,6 +151,11 @@ func setProposalBpm(state *bpmn.State) error {
 
 func sendProposalMail(state *bpmn.State) error {
 	policy := state.Data
-	mail.SendMailProposal(*policy)
+	mail.SendMailProposal(
+		*policy,
+		fromAddress,
+		toAddress,
+		ccAddress,
+	)
 	return nil
 }

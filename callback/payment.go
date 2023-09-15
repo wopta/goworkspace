@@ -1,12 +1,10 @@
 package callback
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"io"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 
 	"github.com/wopta/goworkspace/document"
@@ -18,6 +16,7 @@ import (
 	"github.com/wopta/goworkspace/user"
 )
 
+// DEPRECATED
 func PaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println("Payment")
 	var response string
@@ -103,18 +102,13 @@ func PaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 			}
 
 			// Send mail with the contract to the user
-			log.Println("Payment: " + uid + " sendMail ")
-			var contractbyte []byte
-			name := p.Uid + ".pdf"
-			contractbyte, e = lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "assets/users/"+
-				p.Contractor.Uid+"/contract_"+name)
-
-			mail.SendMailContract(p, &[]mail.Attachment{{
-				Byte:        base64.StdEncoding.EncodeToString(contractbyte),
-				ContentType: "application/pdf",
-				Name: strings.ReplaceAll(p.Contractor.Name+"_"+p.Contractor.Surname+"_"+p.NameDesc, " ",
-					"_") + "_contratto.pdf",
-			}})
+			mail.SendMailContract(
+				p,
+				nil,
+				mail.AddressAnna,
+				mail.GetContractorEmail(&p),
+				mail.Address{},
+			)
 
 			response = `{
 				"result": true,
