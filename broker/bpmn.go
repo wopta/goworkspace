@@ -58,6 +58,8 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 		switch channel {
 		case models.AgentChannel:
 			ccAddress = mail.GetAgentEmail(policy)
+		default:
+			ccAddress = mail.Address{}
 		}
 	case emitFlowKey:
 		flow = setting.EmitFlow
@@ -67,6 +69,7 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 			ccAddress = mail.GetEmailByChannel(policy)
 		default:
 			toAddress = mail.GetEmailByChannel(policy)
+			ccAddress = mail.Address{}
 		}
 	default:
 		log.Println("[runBrokerBpmn] error flow not set")
@@ -116,6 +119,12 @@ func setAdvanceBpm(state *bpmn.State) error {
 
 func sendMailSign(state *bpmn.State) error {
 	policy := state.Data
+	log.Printf(
+		"[sendMailSign] from '%s', to '%s', cc '%s'",
+		fromAddress.String(),
+		toAddress.String(),
+		ccAddress.String(),
+	)
 	mail.SendMailSign(
 		*policy,
 		fromAddress,
@@ -151,6 +160,12 @@ func setProposalBpm(state *bpmn.State) error {
 
 func sendProposalMail(state *bpmn.State) error {
 	policy := state.Data
+	log.Printf(
+		"[sendProposalMail] from '%s', to '%s', cc '%s'",
+		fromAddress.String(),
+		toAddress.String(),
+		ccAddress.String(),
+	)
 	mail.SendMailProposal(
 		*policy,
 		fromAddress,

@@ -60,8 +60,9 @@ func runCallbackBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 		case models.AgencyChannel:
 			toAddress = mail.GetContractorEmail(policy)
 			ccAddress = mail.GetEmailByChannel(policy)
-		case models.AgentChannel, models.ECommerceChannel:
+		default:
 			toAddress = mail.GetEmailByChannel(policy)
+			ccAddress = mail.Address{}
 		}
 	case payFlowKey:
 		flow = setting.PayFlow
@@ -69,8 +70,9 @@ func runCallbackBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 		case models.AgentChannel:
 			toAddress = mail.GetContractorEmail(policy)
 			ccAddress = mail.GetEmailByChannel(policy)
-		case models.ECommerceChannel:
+		default:
 			toAddress = mail.GetEmailByChannel(policy)
+			ccAddress = mail.Address{}
 		}
 	default:
 		log.Println("[runCallbackBpmn] error flow not set")
@@ -125,6 +127,12 @@ func addContract(state *bpmn.State) error {
 
 func sendMailContract(state *bpmn.State) error {
 	policy := state.Data
+	log.Printf(
+		"[sendMailContract] from '%s', to '%s', cc '%s'",
+		fromAddress.String(),
+		toAddress.String(),
+		ccAddress.String(),
+	)
 	mail.SendMailContract(
 		*policy,
 		nil,
@@ -160,6 +168,12 @@ func setToPay(state *bpmn.State) error {
 
 func sendMailPay(state *bpmn.State) error {
 	policy := state.Data
+	log.Printf(
+		"[sendMailPay] from '%s', to '%s', cc '%s'",
+		fromAddress.String(),
+		toAddress.String(),
+		ccAddress.String(),
+	)
 	mail.SendMailPay(
 		*policy,
 		fromAddress,
@@ -217,6 +231,12 @@ func updatePolicy(state *bpmn.State) error {
 	policy.BigquerySave(origin)
 
 	// Send mail with the contract to the user
+	log.Printf(
+		"[updatePolicy] from '%s', to '%s', cc '%s'",
+		fromAddress.String(),
+		toAddress.String(),
+		ccAddress.String(),
+	)
 	mail.SendMailContract(
 		*policy,
 		nil,
