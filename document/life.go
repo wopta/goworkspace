@@ -417,7 +417,7 @@ func offerResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 				lib.HumanaizePriceEuro(policy.OffersPrices["default"]["monthly"].Gross * 12),
 			},
 		}
-	case string(models.PaySplitYear):
+	case string(models.PaySplitYear), string(models.PaySplitYearly):
 		paymentSplit = "ANNUALE"
 		tableInfo = [][]string{
 			{
@@ -468,7 +468,7 @@ func paymentResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 
 	cellWidth := pdf.GetStringWidth("00/00/0000:") + pdf.GetStringWidth("€ ###.###,##")
 
-	if policy.PaymentSplit == string(models.PaySplitYear) {
+	if policy.PaymentSplit == string(models.PaySplitYear) || policy.PaymentSplit == string(models.PaySplitYearly) {
 		paymentSplit = "ANNUALE"
 		for _, guarantee := range policy.Assets[0].Guarantees {
 			for i := 0; i < guarantee.Value.Duration.Year; i++ {
