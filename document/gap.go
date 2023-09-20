@@ -96,16 +96,16 @@ func gapHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 
 	pdf.SetHeaderFunc(func() {
 		opt.ImageType = "png"
-		pdf.ImageOptions(logoPath, 10, 6, 13, 13, false, opt, 0, "")
-		pdf.SetXY(23, 7)
+		pdf.ImageOptions(logoPath, 10, 6, 18, 13, false, opt, 0, "")
+		pdf.SetXY(28, 7)
 		setPinkBoldFont(pdf, 18)
-		pdf.Cell(10, 6, "Wopta per te")
+		pdf.Cell(20, 6, "Wopta per te")
 		setPinkItalicFont(pdf, 18)
-		pdf.SetXY(23, 13)
+		pdf.SetXY(28, 13)
 		pdf.SetTextColor(92, 89, 92)
-		pdf.Cell(10, 6, productName)
+		pdf.Cell(20, 6, productName)
 		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/ARTW_LOGO_RGB_400px.png", 135, 8, 0, 5, false, opt, 0, "")
-		pdf.SetX(pdf.GetX() + 121)
+		pdf.SetX(pdf.GetX() + 106)
 		pdf.SetDrawColor(229, 0, 117)
 		pdf.SetLineWidth(0.5)
 		pdf.Line(pdf.GetX(), 8, pdf.GetX(), 13)
