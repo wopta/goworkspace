@@ -11,17 +11,17 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
-type PutPolicyReservedPayload struct {
+type AcceptancePayload struct {
 	Action  string `json:"action"` // models.PolicyStatusRejected (Rejected) | models.PolicyStatusApproved (Approved)
 	Reasons string `json:"reasons"`
 }
 
-func PutPolicyReservedFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println("[PutPolicyReservedFx] Handler start ----------------------------------------")
 
 	var (
 		err     error
-		payload PutPolicyReservedPayload
+		payload AcceptancePayload
 		policy  models.Policy
 	)
 
@@ -35,7 +35,7 @@ func PutPolicyReservedFx(w http.ResponseWriter, r *http.Request) (string, interf
 	defer r.Body.Close()
 	log.Printf("[PutPolicyReservedFx] Payload: %s", string(body))
 
-	err = lib.CheckPayload[PutPolicyReservedPayload](body, &payload, []string{"action"})
+	err = lib.CheckPayload[AcceptancePayload](body, &payload, []string{"action"})
 	if err != nil {
 		log.Printf("[PutPolicyReservedFx] ERROR: %s", err.Error())
 		return `{"success":false}`, `{"success":false}`, nil
