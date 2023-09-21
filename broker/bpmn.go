@@ -1,6 +1,7 @@
 package broker
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -184,6 +185,31 @@ func setRequestApprovalBpmn(state *bpmn.State) error {
 
 func sendRequestApprovalMail(state *bpmn.State) error {
 	policy := state.Data
+
+	for index, doc := range policy.ReservedInfo.Documents {
+		
+		components := strings.Split(doc.Link, "://")
+
+		// Check if there are two components (scheme and path)
+		if len(components) == 2 {
+			scheme := components[0]
+			path := components[1]
+	
+			// Split the path into bucket and object name
+			pathComponents := strings.SplitN(path, "/", 2)
+			if len(pathComponents) == 2 {
+				bucketName := pathComponents[0]
+				objectName := pathComponents[1]
+	
+				fmt.Println("Scheme:", scheme)
+				fmt.Println("Bucket Name:", bucketName)
+				fmt.Println("Object Name:", objectName)
+
+				policy.ReservedInfo.Documents[index].Byte = base64.StdEncoding.EncodeToString(lib.GetFromStorage(bucketName, objectName, ""))
+			}
+		}
+	}
+
 	mail.SendMailReserved(*policy, fromAddress, toAddress, ccAddress)
 	return nil
 }

@@ -10,6 +10,7 @@ import (
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/reserved"
 )
 
 func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -77,6 +78,7 @@ func setRequestApprovalData(policy *models.Policy) {
 	log.Printf("[setRequestApproval] policy uid %s: reserved flow", policy.Uid)
 
 	setProposalNumber(policy)
+	reserved.GetReservedInfo(policy)
 
 	policy.Status = models.PolicyStatusWaitForApproval
 	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
