@@ -74,6 +74,14 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 		}
 	case requestApprovalFlowKey:
 		flow = setting.RequestApprovalFlow
+		switch channel {
+		case models.AgentChannel:
+			toAddress = mail.GetContractorEmail(policy)
+			ccAddress = mail.GetAgentEmail(policy)
+		default:
+			toAddress = mail.Address{}
+			ccAddress = mail.Address{}
+		}
 	case emitFlowKey:
 		flow = setting.EmitFlow
 		switch channel {
@@ -147,8 +155,12 @@ func addProposalHandlers(state *bpmn.State) {
 
 func setProposalBpm(state *bpmn.State) error {
 	policy := state.Data
+	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
+
 	setProposalData(policy)
-	return nil
+
+	log.Printf("[setProposalData] saving proposal n. %d to firestore...", policy.ProposalNumber)
+	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
 }
 
 //	======================================
@@ -162,15 +174,16 @@ func addRequestApprovalHandlers(state *bpmn.State) {
 
 func setRequestApprovalBpmn(state *bpmn.State) error {
 	policy := state.Data
+	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
+
 	setRequestApprovalData(policy)
-	return nil
+
+	log.Printf("[setRequestApproval] saving policy with uid %s to Firestore....", policy.Uid)
+	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
 }
 
 func sendRequestApprovalMail(state *bpmn.State) error {
 	policy := state.Data
-	fromAddress = mail.AddressAnna
-	toAddress = mail.GetContractorEmail(policy)
-	ccAddress = mail.GetAgentEmail(policy)
 	mail.SendMailReserved(*policy, fromAddress, toAddress, ccAddress)
 	return nil
 }

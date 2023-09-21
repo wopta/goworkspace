@@ -20,13 +20,6 @@ func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 
 	log.Println("[RequestApprovalFx] Handler start ----------------------")
 
-	allowedStatus := []string{models.PolicyStatusInitLead, models.PolicyStatusNeedsApproval}
-
-	if lib.SliceContains(allowedStatus, policy.Status) {
-		log.Printf("[ProposalFx] cannot request approval for policy with status %s", policy.Status)
-		return "", nil, fmt.Errorf("cannot request approval for policy with status %s", policy.Status)
-	}
-
 	origin = r.Header.Get("Origin")
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
@@ -36,6 +29,13 @@ func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 	if err != nil {
 		log.Printf("[RequestApprovalFx] error unmarshaling policy: %s", err.Error())
 		return "", nil, err
+	}
+
+	allowedStatus := []string{models.PolicyStatusInitLead, models.PolicyStatusNeedsApproval}
+
+	if !policy.IsReserved || !lib.SliceContains(allowedStatus, policy.Status) {
+		log.Printf("[ProposalFx] cannot request approval for policy with status %s and isReserved %t", policy.Status, policy.IsReserved)
+		return "", nil, fmt.Errorf("cannot request approval for policy with status %s and isReserved %t", policy.Status, policy.IsReserved)
 	}
 
 	err = requestApproval(&policy)
@@ -53,13 +53,6 @@ func requestApproval(policy *models.Policy) error {
 	)
 
 	log.Println("[RequestApproval] start --------------------")
-
-	deniedStatuses := []string{models.PolicyStatusDeleted, models.PolicyStatusRejected}
-
-	if policy.IsReserved && !lib.SliceContains(deniedStatuses, policy.Status) {
-		fmt.Errorf("[RequestApproval] error request approval for policy with uid %s", policy.Uid)
-		return fmt.Errorf("error request approval for policy with uid %s", policy.Uid)
-	}
 
 	log.Println("[RequestApproval] starting bpmn flow...")
 	state := runBrokerBpmn(policy, requestApprovalFlowKey)
@@ -80,14 +73,11 @@ func requestApproval(policy *models.Policy) error {
 	return err
 }
 
-func setRequestApprovalData(policy *models.Policy) error {
+func setRequestApprovalData(policy *models.Policy) {
 	log.Printf("[setRequestApproval] policy uid %s: reserved flow", policy.Uid)
 
-	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
+	setProposalNumber(policy)
 
 	policy.Status = models.PolicyStatusWaitForApproval
 	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
-
-	log.Printf("[setRequestApproval] saving policy with uid %s to Firestore....", policy.Uid)
-	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
 }

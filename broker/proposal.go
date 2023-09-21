@@ -87,10 +87,8 @@ func proposal(policy *models.Policy) error {
 	return nil
 }
 
-func setProposalData(policy *models.Policy) error {
+func setProposalData(policy *models.Policy) {
 	log.Println("[setProposalData]")
-
-	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 
 	setProposalNumber(policy)
 	policy.Status = models.PolicyStatusProposal
@@ -104,12 +102,16 @@ func setProposalData(policy *models.Policy) error {
 
 	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
 	policy.Updated = time.Now().UTC()
-
-	log.Printf("[setProposalData] saving proposal n. %d to firestore...", policy.ProposalNumber)
-	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
 }
 
 func setProposalNumber(policy *models.Policy) {
+	log.Println("[setProposalNumber] set proposal number start -----------------")
+
+	if policy.ProposalNumber != 0 {
+		log.Printf("[setProposalNumber] proposal number already set %d", policy.ProposalNumber)
+		return
+	}
+
 	log.Println("[setProposalNumber] setting proposal number...")
 	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 	policy.ProposalNumber = GetSequenceProposal("", firePolicy)
