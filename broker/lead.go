@@ -6,8 +6,11 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
+	"strconv"
 	"time"
 
+	"github.com/juju/utils/featureflag"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
@@ -20,21 +23,30 @@ func LeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		policy models.Policy
 	)
 
-	origin = r.Header.Get("origin")
+	origin = r.Header.Get("Origin")
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 
-	log.Printf("[LeadFx] Request: %s", string(body))
+	log.Printf("[LeadFx] request: %s", string(body))
 	err = json.Unmarshal([]byte(body), &policy)
 	if err != nil {
 		log.Printf("[LeadFx] error unmarshaling policy: %s", err.Error())
 		return "", nil, err
 	}
 
-	err = lead(&policy)
-	if err != nil {
-		log.Printf("[LeadFx] error creating lead: %s", err.Error())
-		return "", nil, err
+	featureFlagEnabled := lib.GetBoolEnv("PROPOSAL_V2")
+	if featureFlagEnabled {
+		err = lead(&policy)
+		if err != nil {
+			log.Printf("[LeadFx] error creating lead: %s", err.Error())
+			return "", nil, err
+		}
+	}else {
+		err = Proposal(&policy)
+		if err != nil {
+			log.Printf("[LeadFx] error creating proposal: %s", err.Error())
+			return "", nil, err
+		}
 	}
 
 	resp, err := policy.Marshal()
