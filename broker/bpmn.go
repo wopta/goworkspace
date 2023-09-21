@@ -110,58 +110,6 @@ func addEmitHandlers(state *bpmn.State) {
 	state.AddTaskHandler("putUser", updateUserAndAgency)
 }
 
-
-
-func emitData(state *bpmn.State) error {
-	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
-	policy := state.Data
-	emitBase(policy, origin)
-	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
-}
-
-func setAdvanceBpm(state *bpmn.State) error {
-	policy := state.Data
-	setAdvance(policy, origin)
-	return nil
-}
-
-func sendMailSign(state *bpmn.State) error {
-	policy := state.Data
-	log.Printf(
-		"[sendMailSign] from '%s', to '%s', cc '%s'",
-		fromAddress.String(),
-		toAddress.String(),
-		ccAddress.String(),
-	)
-	mail.SendMailSign(
-		*policy,
-		fromAddress,
-		toAddress,
-		ccAddress,
-	)
-	return nil
-}
-
-func sign(state *bpmn.State) error {
-	policy := state.Data
-	emitSign(policy, origin)
-	return nil
-}
-
-func pay(state *bpmn.State) error {
-	policy := state.Data
-	emitPay(policy, origin)
-	return nil
-}
-
-func updateUserAndAgency(state *bpmn.State) error {
-	policy := state.Data
-	user.SetUserIntoPolicyContractor(policy, origin)
-	return models.UpdateAgencyPortfolio(policy, origin)
-}
-
-
-
 //	======================================
 //	LEAD FUNCTIONS
 //	======================================
@@ -206,4 +154,56 @@ func setProposalBpm(state *bpmn.State) error {
 	policy := state.Data
 	setProposalData(policy)
 	return nil
+}
+
+//	======================================
+//	EMIT FUNCTIONS
+//	======================================
+
+func emitData(state *bpmn.State) error {
+	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
+	policy := state.Data
+	emitBase(policy, origin)
+	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
+}
+
+func sendMailSign(state *bpmn.State) error {
+	policy := state.Data
+	log.Printf(
+		"[sendMailSign] from '%s', to '%s', cc '%s'",
+		fromAddress.String(),
+		toAddress.String(),
+		ccAddress.String(),
+	)
+	mail.SendMailSign(
+		*policy,
+		fromAddress,
+		toAddress,
+		ccAddress,
+	)
+	return nil
+}
+
+func sign(state *bpmn.State) error {
+	policy := state.Data
+	emitSign(policy, origin)
+	return nil
+}
+
+func pay(state *bpmn.State) error {
+	policy := state.Data
+	emitPay(policy, origin)
+	return nil
+}
+
+func setAdvanceBpm(state *bpmn.State) error {
+	policy := state.Data
+	setAdvance(policy, origin)
+	return nil
+}
+
+func updateUserAndAgency(state *bpmn.State) error {
+	policy := state.Data
+	user.SetUserIntoPolicyContractor(policy, origin)
+	return models.UpdateAgencyPortfolio(policy, origin)
 }
