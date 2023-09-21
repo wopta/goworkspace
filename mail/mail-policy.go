@@ -20,7 +20,7 @@ const (
 	reservedRejectedTemplateType = "rejected"
 )
 
-func SendMailProposal(policy models.Policy, from, to, cc Address) {
+func SendMailLead(policy models.Policy, from, to, cc Address) {
 	var (
 		linkFormat = "https://storage.googleapis.com/documents-public-dev/information-sets/%s/%s/Precontrattuale.pdf"
 		link       = fmt.Sprintf(linkFormat, policy.Name, policy.ProductVersion)
