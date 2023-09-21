@@ -2,6 +2,7 @@ package models
 
 type NodeSetting struct {
 	EmitFlow     []Process `json:"emitFlow" firestore:"emitFlow" bigquery:"-"`
+	LeadFlow     []Process `json:"leadFlow" firestore:"leadFlow" bigquery:"-`
 	ProposalFlow []Process `json:"proposalFlow" firestore:"proposalFlow" bigquery:"-"`
 	PayFlow      []Process `json:"payFlow" firestore:"payFlow" bigquery:"-"`
 	SignFlow     []Process `json:"signFlow" firestore:"signFlow" bigquery:"-"`
