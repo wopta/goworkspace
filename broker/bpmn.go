@@ -24,6 +24,7 @@ const (
 	emitFlowKey     = "emit"
 	leadFlowKey     = "lead"
 	proposalFlowKey = "proposal"
+	requestApprovalFlowKey = "requestApproval"
 )
 
 func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
