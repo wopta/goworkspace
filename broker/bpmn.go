@@ -99,16 +99,8 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 func addHandlers(state *bpmn.State) {
 	addLeadHandlers(state)
 	addProposalHandlers(state)
+	addRequestApprovalHandlers(state)
 	addEmitHandlers(state)
-}
-
-func addEmitHandlers(state *bpmn.State) {
-	state.AddTaskHandler("emitData", emitData)
-	state.AddTaskHandler("sendMailSign", sendMailSign)
-	state.AddTaskHandler("sign", sign)
-	state.AddTaskHandler("pay", pay)
-	state.AddTaskHandler("setAdvice", setAdvanceBpm)
-	state.AddTaskHandler("putUser", updateUserAndAgency)
 }
 
 //	======================================
@@ -158,8 +150,42 @@ func setProposalBpm(state *bpmn.State) error {
 }
 
 //	======================================
+//	REQUEST APPROVAL FUNCTIONS
+//	======================================
+
+func addRequestApprovalHandlers(state *bpmn.State) {
+	state.AddTaskHandler("setRequestApprovalData", setRequestApprovalBpmn)
+	state.AddTaskHandler("sendRequestApprovalMail", sendRequestApprovalMail)
+}
+
+func setRequestApprovalBpmn(state *bpmn.State) error {
+	policy := state.Data
+	setRequestApprovalData(policy)
+	return nil
+}
+
+func sendRequestApprovalMail(state *bpmn.State) error {
+	policy := state.Data
+	fromAddress = mail.AddressAnna
+	toAddress = mail.GetContractorEmail(policy)
+	ccAddress = mail.GetAgentEmail(policy)
+	mail.SendMailReserved(*policy, fromAddress, toAddress, ccAddress)
+	return nil
+}
+
+
+//	======================================
 //	EMIT FUNCTIONS
 //	======================================
+
+func addEmitHandlers(state *bpmn.State) {
+	state.AddTaskHandler("emitData", emitData)
+	state.AddTaskHandler("sendMailSign", sendMailSign)
+	state.AddTaskHandler("sign", sign)
+	state.AddTaskHandler("pay", pay)
+	state.AddTaskHandler("setAdvice", setAdvanceBpm)
+	state.AddTaskHandler("putUser", updateUserAndAgency)
+}
 
 func emitData(state *bpmn.State) error {
 	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
