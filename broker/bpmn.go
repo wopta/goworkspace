@@ -110,10 +110,7 @@ func addEmitHandlers(state *bpmn.State) {
 	state.AddTaskHandler("putUser", updateUserAndAgency)
 }
 
-func addProposalHandlers(state *bpmn.State) {
-	state.AddTaskHandler("setProposalData", setProposalBpm)
-	state.AddTaskHandler("sendProposalMail", sendLeadMail)
-}
+
 
 func emitData(state *bpmn.State) error {
 	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
@@ -163,11 +160,7 @@ func updateUserAndAgency(state *bpmn.State) error {
 	return models.UpdateAgencyPortfolio(policy, origin)
 }
 
-func setProposalBpm(state *bpmn.State) error {
-	policy := state.Data
-	setProposalData(policy)
-	return nil
-}
+
 
 //	======================================
 //	LEAD FUNCTIONS
@@ -204,3 +197,13 @@ func sendLeadMail(state *bpmn.State) error {
 //	======================================
 //	PROPOSAL FUNCTIONS
 //	======================================
+
+func addProposalHandlers(state *bpmn.State) {
+	state.AddTaskHandler("setProposalData", setProposalBpm)
+}
+
+func setProposalBpm(state *bpmn.State) error {
+	policy := state.Data
+	setProposalData(policy)
+	return nil
+}

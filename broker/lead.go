@@ -6,11 +6,8 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"os"
-	"strconv"
 	"time"
 
-	"github.com/juju/utils/featureflag"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
@@ -34,20 +31,11 @@ func LeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		return "", nil, err
 	}
 
-	featureFlagEnabled := lib.GetBoolEnv("PROPOSAL_V2")
-	if featureFlagEnabled {
-		err = lead(&policy)
+	err = lead(&policy)
 		if err != nil {
 			log.Printf("[LeadFx] error creating lead: %s", err.Error())
 			return "", nil, err
 		}
-	}else {
-		err = Proposal(&policy)
-		if err != nil {
-			log.Printf("[LeadFx] error creating proposal: %s", err.Error())
-			return "", nil, err
-		}
-	}
 
 	resp, err := policy.Marshal()
 	if err != nil {
@@ -97,16 +85,12 @@ func lead(policy *models.Policy) error {
 func setLeadData(policy *models.Policy) {
 	log.Println("[setLeadData]")
 
-	//policyFire := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 	now := time.Now().UTC()
 
 	policy.CreationDate = now
-	//policy.RenewDate = policy.CreationDate.AddDate(1, 0, 0)
 	policy.Status = models.PolicyStatusInitLead
 	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
 
-	/*numb := GetSequenceProposal("", policyFire)
-	policy.ProposalNumber = numb*/
 	policy.IsSign = false
 	policy.IsPay = false
 	policy.Updated = now
