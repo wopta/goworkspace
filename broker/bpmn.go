@@ -72,6 +72,8 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 		default:
 			ccAddress = mail.Address{}
 		}
+	case requestApprovalFlowKey:
+		flow = setting.RequestApprovalFlow
 	case emitFlowKey:
 		flow = setting.EmitFlow
 		switch channel {

@@ -32,10 +32,10 @@ func LeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	}
 
 	err = lead(&policy)
-		if err != nil {
-			log.Printf("[LeadFx] error creating lead: %s", err.Error())
-			return "", nil, err
-		}
+	if err != nil {
+		log.Printf("[LeadFx] error creating lead: %s", err.Error())
+		return "", nil, err
+	}
 
 	resp, err := policy.Marshal()
 	if err != nil {

@@ -20,7 +20,9 @@ func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 
 	log.Println("[RequestApprovalFx] Handler start ----------------------")
 
-	if policy.Status != models.PolicyStatusInitLead {
+	allowedStatus := []string{models.PolicyStatusInitLead, models.PolicyStatusNeedsApproval}
+
+	if lib.SliceContains(allowedStatus, policy.Status) {
 		log.Printf("[ProposalFx] cannot request approval for policy with status %s", policy.Status)
 		return "", nil, fmt.Errorf("cannot request approval for policy with status %s", policy.Status)
 	}
@@ -84,7 +86,7 @@ func setRequestApprovalData(policy *models.Policy) error {
 	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 
 	policy.Status = models.PolicyStatusWaitForApproval
-	policy.StatusHistory = append(policy.StatusHistory, []string{models.PolicyStatusProposal, policy.Status}...)
+	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
 
 	log.Printf("[setRequestApproval] saving policy with uid %s to Firestore....", policy.Uid)
 	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
