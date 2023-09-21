@@ -32,6 +32,12 @@ func Broker(w http.ResponseWriter, r *http.Request) {
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
+				Route:   "/v1/policy/lead",
+				Handler: LeadFx,
+				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAll},
+			},
+			{
 				Route:   "/v1/policy/proposal",
 				Handler: ProposalFx,
 				Method:  http.MethodPost,

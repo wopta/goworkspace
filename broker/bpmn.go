@@ -22,6 +22,7 @@ var (
 
 const (
 	emitFlowKey     = "emit"
+	leadFlowKey     = "lead"
 	proposalFlowKey = "proposal"
 )
 
@@ -52,6 +53,15 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 
 	// TODO: fix me - maybe get to/from/cc from setting.json?
 	switch flowKey {
+	case leadFlowKey:
+		flow = setting.LeadFlow
+		toAddress = mail.GetContractorEmail(policy)
+		switch channel {
+		case models.AgentChannel:
+			ccAddress = mail.GetAgentEmail(policy)
+		default:
+			ccAddress = mail.Address{}
+		}
 	case proposalFlowKey:
 		flow = setting.ProposalFlow
 		toAddress = mail.GetContractorEmail(policy)
@@ -86,8 +96,9 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 }
 
 func addHandlers(state *bpmn.State) {
-	addEmitHandlers(state)
+	addLeadHandlers(state)
 	addProposalHandlers(state)
+	addEmitHandlers(state)
 }
 
 func addEmitHandlers(state *bpmn.State) {
@@ -101,7 +112,7 @@ func addEmitHandlers(state *bpmn.State) {
 
 func addProposalHandlers(state *bpmn.State) {
 	state.AddTaskHandler("setProposalData", setProposalBpm)
-	state.AddTaskHandler("sendProposalMail", sendProposalMail)
+	state.AddTaskHandler("sendProposalMail", sendLeadMail)
 }
 
 func emitData(state *bpmn.State) error {
@@ -158,7 +169,22 @@ func setProposalBpm(state *bpmn.State) error {
 	return nil
 }
 
-func sendProposalMail(state *bpmn.State) error {
+//	======================================
+//	LEAD FUNCTIONS
+//	======================================
+
+func addLeadHandlers(state *bpmn.State) {
+	state.AddTaskHandler("setLeadData", setLeadBpmn)
+	state.AddTaskHandler("sendLeadMail", sendLeadMail)
+}
+
+func setLeadBpmn(state *bpmn.State) error {
+	policy := state.Data
+	setLeadData(policy)
+	return nil
+}
+
+func sendLeadMail(state *bpmn.State) error {
 	policy := state.Data
 	log.Printf(
 		"[sendProposalMail] from '%s', to '%s', cc '%s'",
@@ -166,7 +192,7 @@ func sendProposalMail(state *bpmn.State) error {
 		toAddress.String(),
 		ccAddress.String(),
 	)
-	mail.SendMailProposal(
+	mail.SendMailLead(
 		*policy,
 		fromAddress,
 		toAddress,
@@ -174,3 +200,7 @@ func sendProposalMail(state *bpmn.State) error {
 	)
 	return nil
 }
+
+//	======================================
+//	PROPOSAL FUNCTIONS
+//	======================================
