@@ -3,6 +3,7 @@ package broker
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -31,6 +32,11 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 		return "", nil, err
 	}
 
+	if policy.Status != models.PolicyStatusInitLead {
+		log.Printf("[ProposalFx] cannot save proposal for policy with status %s", policy.Status)
+		return "", nil, fmt.Errorf("cannot save proposal for policy with status %s", policy.Status)
+	}
+
 	featureFlagEnabled := lib.GetBoolEnv("PROPOSAL_V2")
 	if featureFlagEnabled {
 		err = proposal(&policy)
@@ -46,12 +52,6 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 		}
 		setProposalNumber(&policy)
 		policy.RenewDate = policy.CreationDate.AddDate(1, 0, 0)
-	}
-
-	err = proposal(&policy)
-	if err != nil {
-		log.Printf("[ProposalFx] error creating proposal: %s", err.Error())
-		return "", nil, err
 	}
 
 	resp, err := policy.Marshal()
@@ -105,7 +105,7 @@ func setProposalData(policy *models.Policy) error {
 	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
 	policy.Updated = time.Now().UTC()
 
-	log.Printf("[setProposalDataV2] saving proposal n. %d to firestore...", policy.Number)
+	log.Printf("[setProposalData] saving proposal n. %d to firestore...", policy.ProposalNumber)
 	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
 }
 
