@@ -4,9 +4,11 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
-func GetReservedInfo(policy *models.Policy) {
+func GetReservedInfo(policy *models.Policy) (bool, *models.ReservedInfo) {
 	switch policy.Name {
 	case models.LifeProduct:
-		lifeReserved(policy)
+		return lifeReserved(policy)
+	default:
+		return false, nil
 	}
 }
