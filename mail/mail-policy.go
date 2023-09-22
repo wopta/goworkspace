@@ -3,6 +3,7 @@ package mail
 import (
 	"encoding/base64"
 	"fmt"
+	"log"
 	"os"
 	"strings"
 
@@ -182,6 +183,15 @@ func SendMailReserved(policy models.Policy, from, to, cc Address) {
 	messageBody := fillTemplate(templateFile, &bodyData)
 
 	for _, attachment := range policy.ReservedInfo.Documents {
+		if attachment.Byte == "" {
+			rawDoc, err := lib.ReadFileFromGoogleStorage(attachment.Link)
+			if err != nil {
+				log.Printf("[sendMailReserved] error reading document %s from google storage: %s", attachment.Name, err.Error())
+				return
+			}
+			attachment.Byte = base64.StdEncoding.EncodeToString(rawDoc)
+		}
+
 		at = append(at, Attachment{
 			Name:        attachment.Name,
 			Link:        attachment.Link,
@@ -209,11 +219,6 @@ func SendMailReserved(policy models.Policy, from, to, cc Address) {
 		IsAttachment: true,
 		Attachments:  &at,
 	})
-
-	// TODO: find a better solution for this
-	for index, _ := range policy.ReservedInfo.Documents {
-		policy.ReservedInfo.Documents[index].Byte = ""
-	}
 }
 
 func SendMailReservedResult(policy models.Policy, from, to, cc Address) {

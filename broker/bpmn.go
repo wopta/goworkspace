@@ -1,7 +1,6 @@
 package broker
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -22,9 +21,9 @@ var (
 )
 
 const (
-	emitFlowKey     = "emit"
-	leadFlowKey     = "lead"
-	proposalFlowKey = "proposal"
+	emitFlowKey            = "emit"
+	leadFlowKey            = "lead"
+	proposalFlowKey        = "proposal"
 	requestApprovalFlowKey = "requestApproval"
 )
 
@@ -38,6 +37,8 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 		settingFormat string = "products/%s/setting.json"
 	)
 
+	toAddress = mail.Address{}
+	ccAddress = mail.Address{}
 	fromAddress = mail.AddressAnna
 	channel := models.GetChannel(policy)
 	settingFile := fmt.Sprintf(settingFormat, channel)
@@ -61,27 +62,15 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 		switch channel {
 		case models.AgentChannel:
 			ccAddress = mail.GetAgentEmail(policy)
-		default:
-			ccAddress = mail.Address{}
 		}
 	case proposalFlowKey:
 		flow = setting.ProposalFlow
-		toAddress = mail.GetContractorEmail(policy)
-		switch channel {
-		case models.AgentChannel:
-			ccAddress = mail.GetAgentEmail(policy)
-		default:
-			ccAddress = mail.Address{}
-		}
 	case requestApprovalFlowKey:
 		flow = setting.RequestApprovalFlow
 		switch channel {
 		case models.AgentChannel:
 			toAddress = mail.GetContractorEmail(policy)
 			ccAddress = mail.GetAgentEmail(policy)
-		default:
-			toAddress = mail.Address{}
-			ccAddress = mail.Address{}
 		}
 	case emitFlowKey:
 		flow = setting.EmitFlow
@@ -91,7 +80,6 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 			ccAddress = mail.GetEmailByChannel(policy)
 		default:
 			toAddress = mail.GetEmailByChannel(policy)
-			ccAddress = mail.Address{}
 		}
 	default:
 		log.Println("[runBrokerBpmn] error flow not set")
@@ -132,7 +120,7 @@ func setLeadBpmn(state *bpmn.State) error {
 func sendLeadMail(state *bpmn.State) error {
 	policy := state.Data
 	log.Printf(
-		"[sendProposalMail] from '%s', to '%s', cc '%s'",
+		"[sendLeadMail] from '%s', to '%s', cc '%s'",
 		fromAddress.String(),
 		toAddress.String(),
 		ccAddress.String(),
@@ -185,20 +173,9 @@ func setRequestApprovalBpmn(state *bpmn.State) error {
 
 func sendRequestApprovalMail(state *bpmn.State) error {
 	policy := state.Data
-
-	for index, doc := range policy.ReservedInfo.Documents {
-		rawDoc, err := lib.ReadFileFromGoogleStorage(doc.Link)
-		if err != nil {
-			log.Printf("[sendRequestApprovalMail] error reading document %s from google storage: %s", doc.Name, err.Error())
-			return err
-		}
-		policy.ReservedInfo.Documents[index].Byte = base64.StdEncoding.EncodeToString(rawDoc)
-	}
-
 	mail.SendMailReserved(*policy, fromAddress, toAddress, ccAddress)
 	return nil
 }
-
 
 //	======================================
 //	EMIT FUNCTIONS

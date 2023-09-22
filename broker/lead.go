@@ -83,13 +83,14 @@ func lead(policy *models.Policy) error {
 }
 
 func setLeadData(policy *models.Policy) {
-	log.Println("[setLeadData]")
+	log.Println("[setLeadData] start -------------------")
 
 	now := time.Now().UTC()
 
 	policy.CreationDate = now
 	policy.Status = models.PolicyStatusInitLead
 	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
+	log.Printf("[setLeadData] policy status %s", policy.Status)
 
 	policy.IsSign = false
 	policy.IsPay = false
@@ -104,10 +105,10 @@ func setLeadData(policy *models.Policy) {
 		policy.NameDesc = "Wopta per te Artigiani & Imprese"
 	}
 
+	log.Println("[setLeadData] add information stet")
 	policy.Attachments = &[]models.Attachment{{
 		Name: "Precontrattuale", FileName: "Precontrattuale.pdf",
 		Link: "gs://documents-public-dev/information-sets/" + policy.Name + "/" + policy.ProductVersion + "/Precontrattuale.pdf",
 	}}
-
-	log.Printf("[setProposalData] proposal number: %d", policy.ProposalNumber)
+	log.Println("[setLeadData] end -------------------")
 }
