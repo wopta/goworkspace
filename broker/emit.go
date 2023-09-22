@@ -2,6 +2,7 @@ package broker
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -43,9 +44,9 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	log.Println("[EmitFx] Handler start --------------------------------------")
 
 	var (
-		request EmitRequest
-		err     error
-		policy  models.Policy
+		request      EmitRequest
+		err          error
+		policy       models.Policy
 		responseEmit EmitResponse
 	)
 
@@ -61,6 +62,12 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	policy, err = GetPolicy(uid, origin)
 	lib.CheckError(err)
+
+	if policy.IsReserved && policy.Status != models.PolicyStatusApproved {
+		log.Printf("[EmitFx] cannot emit policy uid %s with status %s and isReserved %t", policy.Uid, policy.Status, policy.IsReserved)
+		return "", nil, fmt.Errorf("cannot emit policy uid %s with status %s and isReserved %t", policy.Uid, policy.Status, policy.IsReserved)
+	}
+
 	policyJsonLog, _ := policy.Marshal()
 	log.Printf("[EmitFx] Policy %s JSON: %s", uid, string(policyJsonLog))
 
@@ -68,7 +75,7 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	if lib.GetBoolEnv("PROPOSAL_V2") {
 		responseEmit = emitV2(&policy, request, origin)
-	}else {
+	} else {
 		responseEmit = emit(&policy, request, origin)
 	}
 	b, e := json.Marshal(responseEmit)
