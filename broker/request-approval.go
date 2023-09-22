@@ -13,9 +13,14 @@ import (
 	"github.com/wopta/goworkspace/reserved"
 )
 
+type RequestApprovalReq struct {
+	PolicyUid string `json:"policyUid"`
+}
+
 func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err    error
+		req    RequestApprovalReq
 		policy models.Policy
 	)
 
@@ -26,11 +31,15 @@ func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 	defer r.Body.Close()
 
 	log.Printf("[RequestApprovalFx] request body: %s", string(body))
-	err = json.Unmarshal(body, &policy)
+	err = json.Unmarshal(body, &req)
 	if err != nil {
-		log.Printf("[RequestApprovalFx] error unmarshaling policy: %s", err.Error())
+		log.Printf("[RequestApprovalFx] error unmarshaling request body: %s", err.Error())
 		return "", nil, err
 	}
+
+	log.Printf("[RequestApprovalFx] fetching policy %s from Firestore...", req.PolicyUid)
+	policy, err = GetPolicy(req.PolicyUid, origin)
+	lib.CheckError(err)
 
 	allowedStatus := []string{models.PolicyStatusInitLead, models.PolicyStatusNeedsApproval}
 
