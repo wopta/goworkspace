@@ -37,8 +37,7 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 		return "", nil, fmt.Errorf("cannot save proposal for policy with status %s", policy.Status)
 	}
 
-	featureFlagEnabled := lib.GetBoolEnv("PROPOSAL_V2")
-	if featureFlagEnabled {
+	if lib.GetBoolEnv("PROPOSAL_V2") {
 		err = proposal(&policy)
 		if err != nil {
 			log.Printf("[ProposalFx] error creating proposal: %s", err.Error())
