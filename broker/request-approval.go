@@ -39,7 +39,10 @@ func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 
 	log.Printf("[RequestApprovalFx] fetching policy %s from Firestore...", req.PolicyUid)
 	policy, err = GetPolicy(req.PolicyUid, origin)
-	lib.CheckError(err)
+	if err != nil {
+		log.Printf("[RequestApprovalFx] error fetching policy %s from Firestore...", req.PolicyUid)
+		return "", nil, err
+	}
 
 	allowedStatus := []string{models.PolicyStatusInitLead, models.PolicyStatusNeedsApproval}
 
