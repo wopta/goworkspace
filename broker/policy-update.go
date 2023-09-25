@@ -2,7 +2,6 @@ package broker
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -13,12 +12,16 @@ import (
 	"github.com/wopta/goworkspace/reserved"
 )
 
+type UpdatePolicyResponse struct {
+	Policy *models.Policy `json:"policy"`
+}
+
 func UpdatePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println("[UpdatePolicyFx] Handler start ------------------------------")
 	var (
-		err              error
-		responseTemplate = `{"uid":"%s","success":%t}`
-		policy           models.Policy
+		err      error
+		policy   models.Policy
+		response UpdatePolicyResponse
 	)
 
 	origin := r.Header.Get("Origin")
@@ -29,15 +32,13 @@ func UpdatePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	err = json.Unmarshal(body, &policy)
 	if err != nil {
 		log.Printf("[UpdatePolicyFx] error unable to unmarshal request body: %s", err.Error())
-		response := fmt.Sprintf(responseTemplate, policyUid, false)
-		return response, response, nil
+		return "", nil, err
 	}
 
 	originalPolicy, err := GetPolicy(policyUid, origin)
 	if err != nil {
 		log.Printf("[UpdatePolicyFx] error unable to retrieve original policy: %s", err.Error())
-		response := fmt.Sprintf(responseTemplate, policyUid, false)
-		return response, response, nil
+		return "", nil, err
 	}
 	originalPolicyBytes, _ := json.Marshal(originalPolicy)
 	log.Printf("[UpdatePolicyFx] original policy: %s", string(originalPolicyBytes))
@@ -46,21 +47,26 @@ func UpdatePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	inputJson, err := json.Marshal(input)
 	if err != nil {
 		log.Printf("[UpdatePolicyFx] error unable to marshal input result: %s", err.Error())
-		response := fmt.Sprintf(responseTemplate, policyUid, false)
-		return response, response, nil
+		return "", nil, err
 	}
 	log.Printf("[UpdatePolicyFx] modified policy values: %v", string(inputJson))
 
 	_, err = lib.FireUpdate(firePolicy, policyUid, input)
 	if err != nil {
 		log.Printf("[UpdatePolicyFx] error updating policy in firestore: %s", err.Error())
-		response := fmt.Sprintf(responseTemplate, policyUid, false)
-		return response, response, nil
+		return "", nil, err
 	}
 
-	response := fmt.Sprintf(responseTemplate, policyUid, true)
+	// TODO: improve me
+	updatedPolicy, err := GetPolicy(policyUid, origin)
+	if err != nil {
+		log.Printf("[UpdatePolicyFx] error unable to retrieve updated policy: %s", err.Error())
+		return "", nil, err
+	}
+	response.Policy = &updatedPolicy
+	responseJson, err := json.Marshal(&response)
 
-	return response, response, nil
+	return string(responseJson), response, err
 }
 
 func UpdatePolicy(policy *models.Policy) map[string]interface{} {
