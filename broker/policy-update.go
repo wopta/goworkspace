@@ -43,7 +43,13 @@ func UpdatePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	log.Printf("[UpdatePolicyFx] original policy: %s", string(originalPolicyBytes))
 
 	input := UpdatePolicy(&policy)
-	log.Printf("[UpdatePolicyFx] modified policy values: %v", input)
+	inputJson, err := json.Marshal(input)
+	if err != nil {
+		log.Printf("[UpdatePolicyFx] error unable to marshal input result: %s", err.Error())
+		response := fmt.Sprintf(responseTemplate, policyUid, false)
+		return response, response, nil
+	}
+	log.Printf("[UpdatePolicyFx] modified policy values: %v", string(inputJson))
 
 	_, err = lib.FireUpdate(firePolicy, policyUid, input)
 	if err != nil {
