@@ -9,42 +9,78 @@ import (
 	"github.com/wopta/goworkspace/document"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	prd "github.com/wopta/goworkspace/product"
 )
 
-func lifeReserved(policy *models.Policy) {
-	log.Println("[LifeReserved]")
-
-	setContactsDetails(policy)
-	setMedicalDocuments(policy)
-	setReservedDocument(policy)
+type ReservedRuleOutput struct {
+	IsReserved   bool
+	ReservedInfo *models.ReservedInfo
 }
 
-func setContactsDetails(policy *models.Policy) {
-	policy.ReservedInfo.Contacts = []models.Contact{
-		{
-			Title:   "Tramite e-mail:",
-			Type:    "e-mail",
-			Address: "assunzione@wopta.it",
-			Subject: fmt.Sprintf("Oggetto: %s proposta %d - UNDERWRITING MEDICO - %s", policy.NameDesc, policy.ProposalNumber,
-				strings.ToUpper(policy.Contractor.Surname+" "+policy.Contractor.Name)),
+func lifeReserved(policy *models.Policy) (bool, *models.ReservedInfo) {
+	log.Println("[lifeReserved]")
+
+	const (
+		rulesFileName = "life_reserved.json"
+	)
+
+	var output = ReservedRuleOutput{
+		IsReserved: false,
+		ReservedInfo: &models.ReservedInfo{
+			Reasons:       make([]string, 0),
+			RequiredExams: make([]string, 0),
 		},
 	}
+
+	fx := new(models.Fx)
+	rulesFile := lib.GetRulesFile(rulesFileName)
+	input := getInputData(policy)
+	log.Printf("[lifeReserved] input %v", string(input))
+	data := getReservedData(policy)
+	log.Printf("[lifeReserved] data %v", string(data))
+
+	ruleOutputString, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, &output, input, data)
+
+	log.Printf("[lifeReserved] rules output: %s", ruleOutputString)
+
+	return ruleOutput.(*ReservedRuleOutput).IsReserved, ruleOutput.(*ReservedRuleOutput).ReservedInfo
 }
 
 func getInputData(policy *models.Policy) []byte {
-	var err error
+	var (
+		err error
+		in  = make(map[string]interface{})
+	)
 
-	in := make(map[string]interface{})
 	in["gender"] = policy.Contractor.Gender
-	in["age"], err = policy.CalculateContractorAge()
+
+	age, err := policy.CalculateContractorAge()
 	lib.CheckError(err)
+	in["age"] = int64(age)
+
 	maxSumInsuredLimitOfIndemnity := 0.0
+	in["death"] = 0.0
+	in["permanent-disability"] = 0.0
 	for _, guarantee := range policy.Assets[0].Guarantees {
+		if guarantee.Slug == "death" {
+			in["death"] = guarantee.Value.SumInsuredLimitOfIndemnity
+		}
+		if guarantee.Slug == "permanent-disability" {
+			in["permanent-disability"] = guarantee.Value.SumInsuredLimitOfIndemnity
+		}
 		if guarantee.Value.SumInsuredLimitOfIndemnity > maxSumInsuredLimitOfIndemnity {
 			maxSumInsuredLimitOfIndemnity = guarantee.Value.SumInsuredLimitOfIndemnity
 		}
 	}
 	in["sumInsuredLimitOfIndemnity"] = maxSumInsuredLimitOfIndemnity
+
+	in["statements"] = false
+	for _, statement := range *policy.Statements {
+		if statement.Answer != nil && *statement.Answer {
+			in["statements"] = true
+			break
+		}
+	}
 
 	out, err := json.Marshal(in)
 	lib.CheckError(err)
@@ -52,24 +88,19 @@ func getInputData(policy *models.Policy) []byte {
 	return out
 }
 
-func setMedicalDocuments(policy *models.Policy) {
-	const (
-		rulesFileName = "life_reserved.json"
-	)
+func getReservedData(policy *models.Policy) []byte {
+	data := make(map[string]interface{})
 
-	fx := new(models.Fx)
-	reservedInfo := &models.ReservedInfo{
-		RequiredExams: make([]string, 0),
-	}
+	reservedAge := prd.GetReservedAge(policy.Name, models.GetChannel(policy))
+	data["reservedAge"] = int64(reservedAge)
 
-	rulesFile := lib.GetRulesFile(rulesFileName)
+	ret, err := json.Marshal(data)
+	lib.CheckError(err)
 
-	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, reservedInfo, getInputData(policy), nil)
-
-	policy.ReservedInfo.RequiredExams = ruleOutput.(*models.ReservedInfo).RequiredExams
+	return ret
 }
 
-func setReservedDocument(policy *models.Policy) {
+func GetLifeReservedDocument(policy *models.Policy) []models.Attachment {
 	attachments := make([]models.Attachment, 0)
 
 	gsLink, _ := document.LifeReserved(*policy)
@@ -88,5 +119,17 @@ func setReservedDocument(policy *models.Policy) {
 		ContentType: "application/pdf",
 	})
 
-	policy.ReservedInfo.Documents = attachments
+	return attachments
+}
+
+func GetLifeContactsDetails(policy *models.Policy) []models.Contact {
+	return []models.Contact{
+		{
+			Title:   "Tramite e-mail:",
+			Type:    "e-mail",
+			Address: "assunzione@wopta.it",
+			Subject: fmt.Sprintf("Oggetto: %s proposta %d - UNDERWRITING MEDICO - %s", policy.NameDesc, policy.ProposalNumber,
+				strings.ToUpper(policy.Contractor.Surname+" "+policy.Contractor.Name)),
+		},
+	}
 }

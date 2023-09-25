@@ -16,7 +16,6 @@ import (
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/payment"
 	"github.com/wopta/goworkspace/question"
-	"github.com/wopta/goworkspace/reserved"
 	"github.com/wopta/goworkspace/transaction"
 )
 
@@ -96,7 +95,6 @@ func emit(policy *models.Policy, request EmitRequest, origin string) EmitRespons
 	case typeApprove:
 		log.Printf("[Emit] Wait for approval - Policy Uid %s", policy.Uid)
 		emitApproval(policy)
-		reserved.GetReservedInfo(policy)
 		mail.SendMailReserved(
 			*policy,
 			mail.AddressAnna,
