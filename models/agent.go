@@ -15,6 +15,7 @@ import (
 
 type Agent struct {
 	Uid                      string                 `json:"uid" firestore:"uid" bigquery:"uid"`
+	Code                     string                 `json:"code" firestore:"code" bigquery:"code"`
 	AuthId                   string                 `json:"authId,omitempty" firestore:"authId,omitempty" bigquery:"-"`
 	Name                     string                 `json:"name" firestore:"name" bigquery:"name"`
 	Surname                  string                 `json:"surname" firestore:"surname" bigquery:"surname"`

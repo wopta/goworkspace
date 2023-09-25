@@ -16,6 +16,7 @@ import (
 type Agency struct {
 	AuthId             string                `json:"authId"                 firestore:"authId"                 bigquery:"-"`
 	Uid                string                `json:"uid"                    firestore:"uid"                    bigquery:"uid"`
+	Code               string                `json:"code" firestore:"code" bigquery:"-"`
 	Email              string                `json:"email"                  firestore:"email"                  bigquery:"email"`
 	VatCode            string                `json:"vatCode"                firestore:"vatCode"                bigquery:"vatCode"`
 	Name               string                `json:"name"                   firestore:"name"                   bigquery:"name"`
