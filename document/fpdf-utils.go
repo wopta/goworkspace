@@ -3,6 +3,7 @@ package document
 import (
 	"bytes"
 	"fmt"
+	"log"
 	"math"
 	"os"
 	"strconv"
@@ -11,6 +12,7 @@ import (
 
 	"github.com/go-pdf/fpdf"
 	"github.com/johnfercher/maroto/pkg/consts"
+	"github.com/ttacon/libphonenumber"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
@@ -451,4 +453,13 @@ func drawDynamicCell(pdf *fpdf.Fpdf, fontSize, cellHeight, cellWidth, rowLines, 
 	} else {
 		pdf.CellFormat(cellWidth, cellHeight*rowLines, cellText, outerCellBorder, ln, align, false, 0, "")
 	}
+}
+
+func formatPhoneNumber(phone string) string {
+	num, err := libphonenumber.Parse(phone, "IT")
+	if err != nil {
+		log.Printf("[DisplayPhoneNumber] error parsing phone %s", phone)
+		return "================"
+	}
+	return libphonenumber.Format(num, libphonenumber.INTERNATIONAL)
 }
