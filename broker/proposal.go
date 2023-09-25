@@ -32,12 +32,12 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 		return "", nil, err
 	}
 
-	if policy.Status != models.PolicyStatusInitLead {
-		log.Printf("[ProposalFx] cannot save proposal for policy with status %s", policy.Status)
-		return "", nil, fmt.Errorf("cannot save proposal for policy with status %s", policy.Status)
-	}
-
 	if lib.GetBoolEnv("PROPOSAL_V2") {
+		if policy.Status != models.PolicyStatusInitLead {
+			log.Printf("[ProposalFx] cannot save proposal for policy with status %s", policy.Status)
+			return "", nil, fmt.Errorf("cannot save proposal for policy with status %s", policy.Status)
+		}
+
 		err = proposal(&policy)
 		if err != nil {
 			log.Printf("[ProposalFx] error creating proposal: %s", err.Error())
@@ -63,7 +63,6 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 
 	return string(resp), &policy, err
 }
-
 
 func proposal(policy *models.Policy) error {
 	log.Println("[proposal] starting bpmn flow...")
