@@ -176,8 +176,8 @@ func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.T
 			var intNum = int(price * 100)
 			priceGrossFormat := fmt.Sprintf("%013d", intNum) // 000000001220
 			log.Println("LifeAxalEmit: ", priceGrossFormat)
-			sumInsuredLimitRound := fmt.Sprintf("%.0f", g.Value.SumInsuredLimitOfIndemnity)
-			sumInsuredLimit, e := strconv.Atoi(sumInsuredLimitRound)
+
+			r, m := getIndennity(g)
 			log.Println(e)
 			row := []string{
 				mapCodecCompany(policy, g.CompanyCodec),    //Codice schema
@@ -188,8 +188,8 @@ func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.T
 				mapCoverageDuration(policy),                //"Durata copertura assicurativa"
 				fmt.Sprint(g.Value.Duration.Year * 12),     //"Durata complessiva"
 				priceGrossFormat,                           //"Premio assicurativo lordo"
-				fmt.Sprintf("%013d", sumInsuredLimit),      //"Importo Assicurato"
-				"0",                                        //indennizzo mensile
+				r,                                          //"Importo Assicurato"
+				m,                                          //indennizzo mensile
 				"",                                         //campo disponibile
 				"",                                         //% di sovrappremio da applicare alla garanzia
 				"W1",                                       //Codice Concessionario /dipendenti (iscr.E)
@@ -284,8 +284,7 @@ func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.T
 				beneficiary2S.Residence.CityCode,      //Provincia
 				beneficiary2S.Mail,                    //Email
 				MapBool(beneficiary2S.IsFamilyMember), //Legame del Cliente col Beneficiario
-				MapBool(beneficiary2S.IsContactable),  //NUCLEO FAMILIARE
-				"",                                    //L contraente ha escluso l invio di comunicazioni da parte dell Impresa al Beneficiario?
+				MapBool(beneficiary2S.IsContactable),  //L contraente ha escluso l invio di comunicazioni da parte dell Impresa al Beneficiario?
 				"",                                    //Cognome Beneficiario 3
 				"",                                    //Nome
 				"",                                    //Codice Fiscale
@@ -451,6 +450,14 @@ func getFormatdate(d time.Time) string {
 	return res
 
 }
+func getFormatIndennity(i float64) string {
+	var res string
+	sumInsuredLimitRound := fmt.Sprintf("%.0f", i)
+	sumInsuredLimit, _ := strconv.Atoi(sumInsuredLimitRound)
+	res = fmt.Sprintf("%013d", sumInsuredLimit)
+	return res
+
+}
 
 // 1989-03-13T00:00:00Z
 func getFormatBithdate(d string) string {
@@ -531,6 +538,19 @@ func mapCodecCompany(p models.Policy, g string) string {
 		result = "1" + pay + "8"
 	}
 	return result
+}
+func getIndennity(g models.Guarante	) (string, string) {
+	var result, monthly string
+	sumInsuredLimitRound := g.Value.SumInsuredLimitOfIndemnity * 100
+	sumInsuredLimit := int(sumInsuredLimitRound)
+
+	if g.CompanyCodec == "TTD" {
+		monthly = fmt.Sprintf("%013d", sumInsuredLimit)
+	} else {
+		result = fmt.Sprintf("%013d", sumInsuredLimit)
+	}
+
+	return result, monthly
 }
 func ChekDomicilie(u models.User) models.Address {
 	var res models.Address
