@@ -25,6 +25,7 @@ type CreateInviteRequest struct {
 	RuiCode         string           `json:"ruiCode,omitempty"`
 	RuiSection      string           `json:"ruiSection,omitempty"`
 	RuiRegistration time.Time        `json:"ruiRegistration"`
+	Code            string           `json:"code"`
 	Products        []models.Product `json:"products,omitempty"`
 }
 
@@ -41,6 +42,7 @@ type UserInvite struct {
 	RuiCode         string           `json:"ruiCode,omitempty" firestore:"ruiCode,omitempty"`
 	RuiSection      string           `json:"ruiSection,omitempty" firestore:"ruiSection,omitempty"`
 	RuiRegistration time.Time        `json:"ruiRegistration" firestore:"ruiRegistration"`
+	Code            string           `json:"code"`
 	Expiration      time.Time        `json:"expiration,omitempty" firestore:"expiration,omitempty"`
 	Products        []models.Product `json:"products,omitempty" firestore:"products,omitempty"`
 }
@@ -104,6 +106,7 @@ func CreateInvite(inviteRequest CreateInviteRequest, origin, creatorUid string) 
 		RuiCode:         inviteRequest.RuiCode,
 		RuiSection:      inviteRequest.RuiSection,
 		RuiRegistration: inviteRequest.RuiRegistration,
+		Code:            inviteRequest.Code,
 		Products:        inviteRequest.Products,
 	}
 

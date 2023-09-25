@@ -3,11 +3,12 @@ package user
 import (
 	"encoding/json"
 	"errors"
-	"firebase.google.com/go/v4/auth"
 	"io"
 	"log"
 	"net/http"
 	"time"
+
+	"firebase.google.com/go/v4/auth"
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
@@ -127,6 +128,7 @@ func createAgent(collection, origin string, userRecord *auth.UserRecord, invite 
 		Mail:            invite.Email,
 		Uid:             userRecord.UID,
 		AuthId:          userRecord.UID,
+		Code:            invite.Code,
 		Role:            invite.Role,
 		FiscalCode:      invite.FiscalCode,
 		VatCode:         invite.VatCode,
@@ -161,6 +163,7 @@ func createAgency(collection, origin string, userRecord *auth.UserRecord, invite
 	agency := models.Agency{
 		AuthId:          userRecord.UID,
 		Uid:             userRecord.UID,
+		Code:            invite.Code,
 		Name:            invite.Name,
 		Email:           invite.Email,
 		VatCode:         invite.VatCode,
