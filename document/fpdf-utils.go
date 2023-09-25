@@ -3,6 +3,7 @@ package document
 import (
 	"bytes"
 	"fmt"
+	"log"
 	"math"
 	"os"
 	"strconv"
@@ -11,6 +12,7 @@ import (
 
 	"github.com/go-pdf/fpdf"
 	"github.com/johnfercher/maroto/pkg/consts"
+	"github.com/ttacon/libphonenumber"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
@@ -111,22 +113,22 @@ func setBlackMonospaceFont(pdf *fpdf.Fpdf, fontSize float64) {
 }
 
 func setPinkBoldFont(pdf *fpdf.Fpdf, fontSize float64) {
-	pdf.SetTextColor(229, 0, 117)
+	pdf.SetTextColor(229, 9, 117)
 	pdf.SetFont("Montserrat", "B", fontSize)
 }
 
 func setPinkRegularFont(pdf *fpdf.Fpdf, fontSize float64) {
-	pdf.SetTextColor(229, 0, 117)
+	pdf.SetTextColor(229, 9, 117)
 	pdf.SetFont("Montserrat", "", fontSize)
 }
 
 func setPinkItalicFont(pdf *fpdf.Fpdf, fontSize float64) {
-	pdf.SetTextColor(229, 0, 117)
+	pdf.SetTextColor(229, 9, 117)
 	pdf.SetFont("Montserrat", "I", fontSize)
 }
 
 func setPinkMonospaceFont(pdf *fpdf.Fpdf, fontSize float64) {
-	pdf.SetTextColor(229, 0, 117)
+	pdf.SetTextColor(229, 9, 117)
 	pdf.SetFont("Noto", "", fontSize)
 }
 
@@ -152,7 +154,7 @@ func drawBlackHorizontalLine(pdf *fpdf.Fpdf, width float64) {
 }
 
 func drawPinkHorizontalLine(pdf *fpdf.Fpdf, lineWidth float64) {
-	pdf.SetDrawColor(229, 0, 117)
+	pdf.SetDrawColor(229, 9, 117)
 	pdf.SetLineWidth(lineWidth)
 	pdf.Line(11, pdf.GetY(), 200, pdf.GetY())
 }
@@ -451,4 +453,13 @@ func drawDynamicCell(pdf *fpdf.Fpdf, fontSize, cellHeight, cellWidth, rowLines, 
 	} else {
 		pdf.CellFormat(cellWidth, cellHeight*rowLines, cellText, outerCellBorder, ln, align, false, 0, "")
 	}
+}
+
+func formatPhoneNumber(phone string) string {
+	num, err := libphonenumber.Parse(phone, "IT")
+	if err != nil {
+		log.Printf("[DisplayPhoneNumber] error parsing phone %s", phone)
+		return "================"
+	}
+	return libphonenumber.Format(num, libphonenumber.INTERNATIONAL)
 }
