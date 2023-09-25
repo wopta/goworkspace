@@ -109,6 +109,8 @@ type Policy struct {
 	BigReasons        string                       `json:"-" firestore:"-" bigquery:"reasons"`
 	BigAcceptanceNote string                       `json:"-" firestore:"-" bigquery:"acceptanceNote"`
 	BigAcceptanceDate bigquery.NullDateTime        `json:"-" firestore:"-" bigquery:"acceptanceDate"`
+	Step              string                       `json:"step,omitempty" firestore:"step,omitempty" bigquery:"step"`
+	ProducerCode      string                       `json:"producerCode,omitempty" firestore:"producerCode,omitempty" bigquery:"producerCode"`
 }
 
 type RenewHistory struct {

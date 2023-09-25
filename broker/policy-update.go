@@ -75,6 +75,7 @@ func UpdatePolicy(policy *models.Policy) map[string]interface{} {
 	if policy.Statements != nil {
 		input["statements"] = policy.Statements
 	}
+	input["step"] = policy.Step
 	input["updated"] = time.Now().UTC()
 
 	isReserved, reservedInfo := reserved.GetReservedInfo(policy)
