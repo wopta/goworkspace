@@ -9,10 +9,10 @@ require (
 	github.com/dustin/go-humanize v1.0.1
 	github.com/go-pdf/fpdf v0.8.0
 	github.com/johnfercher/maroto v0.42.0
-	github.com/wopta/goworkspace/lib v1.0.67
-	github.com/wopta/goworkspace/models v1.1.35
-	github.com/wopta/goworkspace/product v1.0.38
 	github.com/ttacon/libphonenumber v1.2.1
+	github.com/wopta/goworkspace/lib v1.0.68
+	github.com/wopta/goworkspace/models v1.1.43
+	github.com/wopta/goworkspace/product v1.0.44
 )
 
 require (
@@ -68,7 +68,7 @@ require (
 	github.com/richardlehane/msoleps v1.0.3 // indirect
 	github.com/ruudk/golang-pdf417 v0.0.0-20201230142125-a7e3863a1245 // indirect
 	github.com/sergi/go-diff v1.0.0 // indirect
-	github.com/sirupsen/logrus v1.9.0 // indirect
+	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
