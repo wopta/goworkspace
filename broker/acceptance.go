@@ -17,7 +17,7 @@ type AcceptancePayload struct {
 }
 
 func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.Println("[PutPolicyReservedFx] Handler start ----------------------------------------")
+	log.Println("[AcceptanceFx] Handler start ----------------------------------------")
 
 	var (
 		err     error
@@ -29,15 +29,15 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	policyUid := r.Header.Get("policyUid")
 	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 
-	log.Printf("[PutPolicyReservedFx] Policy Uid %s", policyUid)
+	log.Printf("[AcceptanceFx] Policy Uid %s", policyUid)
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
-	log.Printf("[PutPolicyReservedFx] Payload: %s", string(body))
+	log.Printf("[AcceptanceFx] Payload: %s", string(body))
 
 	err = lib.CheckPayload[AcceptancePayload](body, &payload, []string{"action"})
 	if err != nil {
-		log.Printf("[PutPolicyReservedFx] ERROR: %s", err.Error())
+		log.Printf("[AcceptanceFx] ERROR: %s", err.Error())
 		return `{"success":false}`, `{"success":false}`, nil
 	}
 
@@ -45,7 +45,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	lib.CheckError(err)
 
 	if policy.Status != models.PolicyStatusWaitForApproval {
-		log.Printf("[PutPolicyReservedFx] Policy Uid %s: wrong status %s", policy.Uid, policy.Status)
+		log.Printf("[AcceptanceFx] Policy Uid %s: wrong status %s", policy.Uid, policy.Status)
 		return `{"success":false}`, `{"success":false}`, nil
 	}
 
@@ -55,26 +55,26 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	case models.PolicyStatusApproved:
 		approvePolicy(&policy, payload.Reasons)
 	default:
-		log.Printf("[PutPolicyReservedFx] Unhandled action %s", payload.Action)
+		log.Printf("[AcceptanceFx] Unhandled action %s", payload.Action)
 		return `{"success":false}`, `{"success":false}`, nil
 	}
 
 	policy.Updated = time.Now().UTC()
 
-	log.Println("[PutPolicyReservedFx] saving to firestore...")
+	log.Println("[AcceptanceFx] saving to firestore...")
 	err = lib.SetFirestoreErr(firePolicy, policy.Uid, &policy)
 	lib.CheckError(err)
-	log.Println("[PutPolicyReservedFx] firestore saved!")
+	log.Println("[AcceptanceFx] firestore saved!")
 
 	policy.BigquerySave(origin)
 
 	policyJsonLog, err := policy.Marshal()
 	if err != nil {
-		log.Printf("[PutPolicyReservedFx] error marshaling policy: %s", err.Error())
+		log.Printf("[AcceptanceFx] error marshaling policy: %s", err.Error())
 	}
-	log.Printf("[PutPolicyReservedFx] Policy: %s", string(policyJsonLog))
+	log.Printf("[AcceptanceFx] Policy: %s", string(policyJsonLog))
 
-	log.Println("[PutPolicyReservedFx] sending acceptance email...")
+	log.Println("[AcceptanceFx] sending acceptance email...")
 	mail.SendMailReservedResult(
 		policy,
 		mail.AddressAssunzione,
@@ -82,12 +82,12 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		mail.Address{},
 	)
 
-	log.Println("[PutPolicyReservedFx] saving audit trail...")
+	log.Println("[AcceptanceFx] saving audit trail...")
 	audit, err := models.ParseHttpRequest(r, string(body))
 	if err != nil {
-		log.Printf("[PutPolicyReservedFx] error creating audit log: %s", err.Error())
+		log.Printf("[AcceptanceFx] error creating audit log: %s", err.Error())
 	}
-	log.Printf("[PutPolicyReservedFx] audit log: %v", audit)
+	log.Printf("[AcceptanceFx] audit log: %v", audit)
 	audit.SaveToBigQuery()
 
 	return `{"success":true}`, `{"success":true}`, nil
