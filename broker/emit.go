@@ -2,6 +2,7 @@ package broker
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -42,9 +43,10 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	log.Println("[EmitFx] Handler start --------------------------------------")
 
 	var (
-		request EmitRequest
-		err     error
-		policy  models.Policy
+		request      EmitRequest
+		err          error
+		policy       models.Policy
+		responseEmit EmitResponse
 	)
 
 	origin = r.Header.Get("origin")
@@ -59,18 +61,29 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	policy, err = GetPolicy(uid, origin)
 	lib.CheckError(err)
+
+	if policy.IsReserved && policy.Status != models.PolicyStatusApproved {
+		log.Printf("[EmitFx] cannot emit policy uid %s with status %s and isReserved %t", policy.Uid, policy.Status, policy.IsReserved)
+		return "", nil, fmt.Errorf("cannot emit policy uid %s with status %s and isReserved %t", policy.Uid, policy.Status, policy.IsReserved)
+	}
+
 	policyJsonLog, _ := policy.Marshal()
 	log.Printf("[EmitFx] Policy %s JSON: %s", uid, string(policyJsonLog))
 
 	emitUpdatePolicy(&policy, request)
-	responseEmit := Emit(&policy, request, origin)
+
+	if lib.GetBoolEnv("PROPOSAL_V2") {
+		responseEmit = emitV2(&policy, request, origin)
+	} else {
+		responseEmit = emit(&policy, request, origin)
+	}
 	b, e := json.Marshal(responseEmit)
 	log.Println("[EmitFx] Response: ", string(b))
 
 	return string(b), responseEmit, e
 }
 
-func Emit(policy *models.Policy, request EmitRequest, origin string) EmitResponse {
+func emit(policy *models.Policy, request EmitRequest, origin string) EmitResponse {
 	log.Println("[Emit] start ------------------------------------------------")
 	var responseEmit EmitResponse
 
@@ -101,6 +114,47 @@ func Emit(policy *models.Policy, request EmitRequest, origin string) EmitRespons
 		log.Printf("[Emit] ERROR cannot emit policy")
 		return responseEmit
 	}
+
+	responseEmit = EmitResponse{
+		UrlPay:       policy.PayUrl,
+		UrlSign:      policy.SignUrl,
+		ReservedInfo: policy.ReservedInfo,
+		Uid:          policy.Uid,
+	}
+
+	policy.Updated = time.Now().UTC()
+	policyJson, _ := policy.Marshal()
+	log.Printf("[Emit] Policy %s: %s", request.Uid, string(policyJson))
+
+	log.Println("[Emit] saving policy to firestore...")
+	err := lib.SetFirestoreErr(firePolicy, request.Uid, policy)
+	lib.CheckError(err)
+
+	log.Println("[Emit] saving policy to bigquery...")
+	policy.BigquerySave(origin)
+
+	log.Println("[Emit] saving guarantees to bigquery...")
+	models.SetGuaranteBigquery(*policy, "emit", fireGuarantee)
+
+	log.Println("[Emit] end --------------------------------------------------")
+	return responseEmit
+}
+
+func emitV2(policy *models.Policy, request EmitRequest, origin string) EmitResponse {
+	log.Println("[Emit] start ------------------------------------------------")
+	var responseEmit EmitResponse
+
+	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
+	fireGuarantee := lib.GetDatasetByEnv(origin, models.GuaranteeCollection)
+
+	log.Printf("[Emit] Emitting - Policy Uid %s", policy.Uid)
+	log.Println("[Emit] starting bpmn flow...")
+	state := runBrokerBpmn(policy, emitFlowKey)
+	if state == nil || state.Data == nil {
+		log.Println("[Emit] error bpmn - state not set")
+		return responseEmit
+	}
+	*policy = *state.Data
 
 	responseEmit = EmitResponse{
 		UrlPay:       policy.PayUrl,

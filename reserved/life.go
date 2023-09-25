@@ -1,7 +1,6 @@
 package reserved
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -104,22 +103,19 @@ func getReservedData(policy *models.Policy) []byte {
 func GetLifeReservedDocument(policy *models.Policy) []models.Attachment {
 	attachments := make([]models.Attachment, 0)
 
-	gsLink, b := document.LifeReserved(*policy)
+	gsLink, _ := document.LifeReserved(*policy)
 
 	attachments = append(attachments, models.Attachment{
 		Name:        fmt.Sprintf("%s_proposta_%d_rvm_istruzioni.pdf", policy.NameDesc, policy.ProposalNumber),
 		Link:        gsLink,
-		Byte:        base64.StdEncoding.EncodeToString(b),
 		ContentType: "application/pdf",
 	})
 
 	rvmLink := "medical-report/" + policy.Name + "/" + policy.ProductVersion + "/rvm-life.pdf"
-	b = lib.GetFromStorage("documents-public-dev", rvmLink, "")
 
 	attachments = append(attachments, models.Attachment{
 		Name:        fmt.Sprintf("%s_proposta_%d_rvm.pdf", policy.NameDesc, policy.ProposalNumber),
 		Link:        fmt.Sprintf("gs://documents-public-dev/%s", rvmLink),
-		Byte:        base64.StdEncoding.EncodeToString(b),
 		ContentType: "application/pdf",
 	})
 

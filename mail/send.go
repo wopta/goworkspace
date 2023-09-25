@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net"
 	"net/mail"
@@ -14,12 +13,11 @@ import (
 	"strings"
 	"text/template"
 
-	lib "github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib"
 )
 
 const (
 	outerBoundary = "outer"
-	innerBoundary = "inner"
 )
 
 type loginAuth struct {
@@ -42,33 +40,29 @@ func (a *loginAuth) Next(fromServer []byte, more bool) ([]byte, error) {
 		case "Password:":
 			return []byte(a.password), nil
 		default:
-			return nil, errors.New("Unknown fromServer")
+			return nil, errors.New("unknown fromServer")
 		}
 	}
 	return nil, nil
 }
 
-func addAttachment(message string, name string, contentType string, data string, close bool) string {
+func addAttachment(message, filename, contentType, data string) string {
 	var ct string
 	if contentType == "" {
-		sct := strings.Split(name, ".")
+		sct := strings.Split(filename, ".")
 		ct = getContentType(sct[1])
 	} else {
 		ct = contentType
 	}
 
-	//b := base64.URLEncoding.EncodeToString(data) iso-8859-1
+	description := strings.ReplaceAll(filename, "_", " ")
 
-	//message += fmt.Sprintf("Content-Type: multipart/mixed; boundary=%s\n", boundary)
-	message += fmt.Sprintf("\r\n")
-	message += fmt.Sprintf("Content-Type: " + ct + "\r\n")
-	message += fmt.Sprintf("Content-Disposition: attachment; filename=\"" + name + "\"\r\n")
+	message += fmt.Sprintf("\r\n--%s\r\n", outerBoundary)
+	message += fmt.Sprintf("Content-Type: %s; name=\"%s\"\r\n", ct, description)
+	message += fmt.Sprintf("Content-Description: %s\r\n", description)
+	message += fmt.Sprintf("Content-Disposition: attachment; filename=\"%s\"\r\n", filename)
 	message += fmt.Sprintf("Content-Transfer-Encoding: base64\r\n")
-	message += fmt.Sprintf("\r\n" + string(data) + "\r\n")
-	message += fmt.Sprintf("\r\n--%s", innerBoundary)
-	if close {
-		message += fmt.Sprintf("--")
-	}
+	message += fmt.Sprintf("\r\n%s\r\n", string(data))
 
 	return message
 }
@@ -97,26 +91,28 @@ func getContentType(ext string) string {
 }
 
 func SendMail(obj MailRequest) {
+	log.Println("[SendMail] start --------------------------------------------")
 	var (
 		username = os.Getenv("EMAIL_USERNAME")
 		password = os.Getenv("EMAIL_PASSWORD")
 		from     = AddressAnna
 		file     []byte
+		tpl      bytes.Buffer
 	)
 
 	switch os.Getenv("env") {
 	case "local":
-		file = lib.ErrorByte(ioutil.ReadFile("../function-data/dev/mail/mail_template.html"))
+		file = lib.ErrorByte(os.ReadFile("../function-data/dev/mail/mail_template.html"))
 	case "dev":
 		file = lib.GetFromStorage("function-data", "mail/mail_template.html", "")
 	case "prod":
 		file = lib.GetFromStorage("core-350507-function-data", "mail/mail_template.html", "")
 	}
-	tmplt := template.New("action")
-	var tpl bytes.Buffer
 
+	tmplt := template.New("action")
 	tmplt, err := tmplt.Parse(string(file))
 	lib.CheckError(err)
+
 	data := Data{
 		Title:     obj.Title,
 		SubTitle:  obj.SubTitle,
@@ -127,7 +123,6 @@ func SendMail(obj MailRequest) {
 		Content:   obj.Message,
 	}
 	tmplt.Execute(&tpl, data)
-	log.Println()
 
 	emptyAddress := mail.Address{}
 	if obj.FromAddress.String() != emptyAddress.String() {
@@ -145,6 +140,7 @@ func SendMail(obj MailRequest) {
 		to := mail.Address{Name: _to, Address: _to}
 		subj := obj.Subject
 		body := obj.Message
+
 		// Setup headers
 		headers := make(map[string]string)
 		headers["From"] = from.String()
@@ -157,48 +153,37 @@ func SendMail(obj MailRequest) {
 		for k, v := range headers {
 			message += fmt.Sprintf("%s: %s\r\n", k, v)
 		}
-		message += fmt.Sprintf("MIME-Version: 1.0\r\n")
+		message += "MIME-Version: 1.0\r\n"
+
 		if obj.IsAttachment {
-			message += fmt.Sprintf("Content-Type: multipart/mixed; boundary=%s\n", outerBoundary)
+			message += fmt.Sprintf("Content-Type: multipart/mixed; boundary=\"%s\"\n", outerBoundary)
 			message += fmt.Sprintf("\r\n--%s\r\n", outerBoundary)
 		}
+
 		if obj.IsHtml {
 			message += "Content-Type: text/html; charset=\"UTF-8\"\r\n"
-			message += "\r\n" + tpl.String()
-			if obj.IsAttachment {
-				message += fmt.Sprintf("\r\n\n--%s\r\n", outerBoundary)
-				message += fmt.Sprintf("Content-Type: multipart/mixed; boundary=%s\n", innerBoundary)
-				message += fmt.Sprintf("Content-Disposition: attachment")
-				message += fmt.Sprintf("\r\n\n--%s\r\n", innerBoundary)
-			}
+			message += fmt.Sprintf("\r\n%s", tpl.String())
 
+			if obj.IsAttachment {
+				for _, v := range *obj.Attachments {
+					message = addAttachment(message, v.Name, v.ContentType, v.Byte)
+				}
+				message += fmt.Sprintf("\r\n--%s--\r\n", outerBoundary)
+			}
 		} else {
 			message += "Content-Type:text/plain; charset=\"UTF-8\"\r\n"
-			message += "\r\n" + body
+			message += fmt.Sprintf("\r\n%s", body)
+
 			if obj.IsAttachment {
-				message += fmt.Sprintf("\r\n\n--%s\r\n", outerBoundary)
-				message += fmt.Sprintf("Content-Type: multipart/mixed; boundary=%s\n", innerBoundary)
-				message += fmt.Sprintf("Content-Disposition: attachment")
-				message += fmt.Sprintf("\r\n\n--%s\r\n", innerBoundary)
-			}
-		}
-
-		if obj.IsAttachment {
-			for k, v := range *obj.Attachments {
-
-				var close bool
-				if k == len(*obj.Attachments)-1 {
-					close = true
+				for _, v := range *obj.Attachments {
+					message = addAttachment(message, v.Name, v.ContentType, v.Byte)
 				}
-				message = addAttachment(message, v.Name, v.ContentType, v.Byte, close)
+				message += fmt.Sprintf("\r\n\n--%s--\r\n", outerBoundary)
 			}
-
-			message += fmt.Sprintf("\r\n\n--%s--\r\n", outerBoundary)
 		}
 
-		//message += "\r\n" + body
-		log.Println("MESSAGE:----------------------")
-		//log.Println(message)
+		log.Println("[SendMail] sending message...")
+
 		// Connect to the SMTP Server
 		servername := "smtp.office365.com:587"
 		host, _, err := net.SplitHostPort(servername)
@@ -206,45 +191,55 @@ func SendMail(obj MailRequest) {
 
 		// TLS config
 		tlsconfig := &tls.Config{
-			//InsecureSkipVerify: true,
 			ServerName: host,
 		}
 
 		// Here is the key, you need to call tls.Dial instead of smtp.Dial
 		// for smtp servers running on 465 that require an ssl connection
 		// from the very beginning (no starttls)40.99.214.146
-		//log.Println("end MESSAGE:----------------------")
 		conn, err := net.Dial("tcp", "smtp.office365.com:587")
-		//log.Println("end DIAL:----------------------")
 		lib.CheckError(err)
+
 		c, err := smtp.NewClient(conn, host)
 		lib.CheckError(err)
+
 		c.StartTLS(tlsconfig)
 		lib.CheckError(err)
-		//log.Println("end Tls:----------------------")
+
 		// Auth
 		err = c.Auth(LoginAuth(username, password))
 		lib.CheckError(err)
-		// To && From
-		//log.Println("start mail:----------------------")
+
+		// To, From and Cc
+		log.Printf("[SendMail] setting address from: %s", from.Address)
 		err = c.Mail(from.Address)
-		//log.Println("end Mail:----------------------")
 		lib.CheckError(err)
+
+		log.Printf("[SendMail] setting address to: %s", to.Address)
 		err = c.Rcpt(to.Address)
-		//log.Println("end Rcpt:----------------------")
 		lib.CheckError(err)
+
+		if obj.Cc != "" {
+			// TODO: in the future we might need to handle multiple Ccs
+			log.Printf("[SendMail] setting cc to: %s", obj.Cc)
+			err = c.Rcpt(obj.Cc)
+			lib.CheckError(err)
+		}
+
 		// Data
 		w, err := c.Data()
 		lib.CheckError(err)
-		//log.Println("start write massage:----------------------")
+
 		_, err = w.Write([]byte(message))
-		//log.Println(message)
-		log.Println("end write massage:----------------------")
-		//log.Println(message)
 		lib.CheckError(err)
+
 		err = w.Close()
 		lib.CheckError(err)
+
 		c.Quit()
 
+		log.Println("[SendMail] message sent")
 	}
+
+	log.Println("[SendMail] end ----------------------------------------------")
 }

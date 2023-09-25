@@ -7,9 +7,9 @@ replace github.com/wopta/goworkspace/claim => ./
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.4
 	github.com/google/uuid v1.3.0
-	github.com/wopta/goworkspace/lib v1.0.66
-	github.com/wopta/goworkspace/mail v1.0.28
-	github.com/wopta/goworkspace/models v1.1.26
+	github.com/wopta/goworkspace/lib v1.0.68
+	github.com/wopta/goworkspace/mail v1.0.37
+	github.com/wopta/goworkspace/models v1.1.42
 )
 
 require (
