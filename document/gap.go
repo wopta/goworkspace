@@ -10,7 +10,6 @@ import (
 	"github.com/go-pdf/fpdf"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	"github.com/ttacon/libphonenumber"
 )
 
 func GapContract(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, []byte) {
@@ -234,7 +233,7 @@ func gapPersonalInfoTable(pdf *fpdf.Fpdf, contractor, vehicleOwner models.User) 
 		{"Mail", contractor.Mail, "Mail", "================"},
 		{"Codice Fiscale", contractor.FiscalCode, "Codice Fiscale", vehicleOwner.FiscalCode},
 		{"Data nascita", contractorBirthDate.Format(dateLayout), "Data nascita", vehicleOwnerBirthDate.Format(dateLayout)},
-		{"Telefono", formatPhoneNumber(contractor.Phone), "Telefono", "================"},
+		{"Telefono", formatPhoneNumber(contractor.Phone), "Telefono", formatPhoneNumber(vehicleOwner.Phone)},
 	}
 
 	lastRowBordersList := []string{"BL", "B", "B", "B", "BR"}
@@ -255,7 +254,6 @@ func gapPersonalInfoTable(pdf *fpdf.Fpdf, contractor, vehicleOwner models.User) 
 
 		drawDynamicCell(pdf, 8, 5, 64, numLines, 94, tableRows[x][1], "", bordersList[1], fpdf.AlignLeft, false)
 		pdf.CellFormat(1, 5*numLines, "", bordersList[2], 0, fpdf.AlignLeft, false, 0, "")
-
 
 		setPinkRegularFont(pdf, 8)
 		pdf.CellFormat(30, 5*numLines, tableRows[x][2], bordersList[3], 0, fpdf.AlignLeft, false, 0, "")
