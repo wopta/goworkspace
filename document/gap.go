@@ -2,13 +2,15 @@ package document
 
 import (
 	"fmt"
-	"github.com/go-pdf/fpdf"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
 	"math"
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/go-pdf/fpdf"
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
+	"github.com/ttacon/libphonenumber"
 )
 
 func GapContract(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, []byte) {
@@ -179,9 +181,10 @@ func gapVehicleDataTable(pdf *fpdf.Fpdf, vehicle *models.Vehicle) {
 
 	for x := 0; x < len(tableRows); x++ {
 		setPinkRegularFont(pdf, 8)
-		pdf.CellFormat(40, 5, tableRows[x][0], "L", 0, fpdf.AlignLeft, false, 0, "")
+		pdf.CellFormat(23, 5, tableRows[x][0], "L", 0, fpdf.AlignLeft, false, 0, "")
 		setBlackRegularFont(pdf, 8)
-		pdf.CellFormat(55, 5, tableRows[x][1], "B", 0, fpdf.AlignLeft, false, 0, "")
+		pdf.CellFormat(71, 5, tableRows[x][1], "B", 0, fpdf.AlignLeft, false, 0, "")
+		pdf.CellFormat(1, 5, "", "", 0, fpdf.AlignLeft, false, 0, "")
 		setPinkRegularFont(pdf, 8)
 		pdf.CellFormat(45, 5, tableRows[x][2], "", 0, fpdf.AlignLeft, false, 0, "")
 		setBlackRegularFont(pdf, 8)
@@ -223,39 +226,41 @@ func gapPersonalInfoTable(pdf *fpdf.Fpdf, contractor, vehicleOwner models.User) 
 		{"Cognome e Nome", contractor.Surname + " " + contractor.Name, "Cognome e Nome",
 			vehicleOwner.Surname + " " + vehicleOwner.Name},
 		{"Residente in", contractor.Residence.StreetName + " " + contractor.Residence.StreetNumber + ", " +
-			"" + contractor.Residence.PostalCode + ", " + contractor.Residence.City + "(" + contractor.Residence.
+			"" + contractor.Residence.PostalCode + ", " + contractor.Residence.City + " (" + contractor.Residence.
 			CityCode + ")",
 			"Residente in", vehicleOwner.Residence.StreetName + " " + vehicleOwner.Residence.StreetNumber + ", " +
-				"" + vehicleOwner.Residence.PostalCode + ", " + vehicleOwner.Residence.City + "(" + vehicleOwner.Residence.
+				"" + vehicleOwner.Residence.PostalCode + ", " + vehicleOwner.Residence.City + " (" + vehicleOwner.Residence.
 				CityCode + ")"},
 		{"Mail", contractor.Mail, "Mail", "================"},
 		{"Codice Fiscale", contractor.FiscalCode, "Codice Fiscale", vehicleOwner.FiscalCode},
 		{"Data nascita", contractorBirthDate.Format(dateLayout), "Data nascita", vehicleOwnerBirthDate.Format(dateLayout)},
-		{"Telefono", contractor.Phone, "Telefono", "================"},
+		{"Telefono", formatPhoneNumber(contractor.Phone), "Telefono", "================"},
 	}
 
-	lastRowBordersList := []string{"BL", "B", "B", "BR"}
+	lastRowBordersList := []string{"BL", "B", "B", "B", "BR"}
 
 	for x := 0; x < len(tableRows); x++ {
-		bordersList := []string{"L", "B", "", "BR"}
+		bordersList := []string{"L", "B", "", "", "BR"}
 
 		setBlackRegularFont(pdf, 8)
-		numLines := math.Max(float64(len(pdf.SplitText(tableRows[x][1], 55))),
-			float64(len(pdf.SplitText(tableRows[x][3], 55))))
+		numLines := math.Max(float64(len(pdf.SplitText(tableRows[x][1], 64))),
+			float64(len(pdf.SplitText(tableRows[x][3], 65))))
 
 		if x == len(tableRows)-1 {
 			bordersList = lastRowBordersList
 		}
 
 		setPinkRegularFont(pdf, 8)
-		pdf.CellFormat(40, 5*numLines, tableRows[x][0], bordersList[0], 0, fpdf.AlignLeft, false, 0, "")
+		pdf.CellFormat(30, 5*numLines, tableRows[x][0], bordersList[0], 0, fpdf.AlignLeft, false, 0, "")
 
-		drawDynamicCell(pdf, 8, 5, 55, numLines, 95, tableRows[x][1], "", bordersList[1], fpdf.AlignLeft, false)
+		drawDynamicCell(pdf, 8, 5, 64, numLines, 94, tableRows[x][1], "", bordersList[1], fpdf.AlignLeft, false)
+		pdf.CellFormat(1, 5*numLines, "", bordersList[2], 0, fpdf.AlignLeft, false, 0, "")
+
 
 		setPinkRegularFont(pdf, 8)
-		pdf.CellFormat(40, 5*numLines, tableRows[x][2], bordersList[2], 0, fpdf.AlignLeft, false, 0, "")
+		pdf.CellFormat(30, 5*numLines, tableRows[x][2], bordersList[3], 0, fpdf.AlignLeft, false, 0, "")
 
-		drawDynamicCell(pdf, 8, 5, 55, numLines, 135, tableRows[x][3], "R", bordersList[3], fpdf.AlignLeft, true)
+		drawDynamicCell(pdf, 8, 5, 65, numLines, 135, tableRows[x][3], "R", bordersList[4], fpdf.AlignLeft, true)
 	}
 	pdf.Ln(5)
 }
