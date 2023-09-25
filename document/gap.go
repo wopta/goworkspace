@@ -92,10 +92,8 @@ func gapHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 	logoPath = lib.GetAssetPathByEnv(basePath) + "/logo_gap.png"
 	productName = "Auto Valore Protetto"
 
-	policyInfo := "Polizza Numero: " + policy.CodeCompany + "\n" +
-		"Targa Veicolo: " + policy.Assets[0].Vehicle.Plate + "\n" +
-		"Decorre dal: " + policyStartDate.Format(dateLayout) + " ore 24:00\n" +
-		"Scade il: " + policyEndDate.Format(dateLayout) + " ore 24:00"
+	policyInfo := [][]string{{"Polizza Numero:", policy.CodeCompany, ""}, {"Targa Veicolo:", policy.Assets[0].Vehicle.Plate, ""},
+		{"Decorre dal:", policyStartDate.Format(dateLayout), "ore 24:00"}, {"Scade il:", policyEndDate.Format(dateLayout), "ore 24:00"}}
 
 	pdf.SetHeaderFunc(func() {
 		opt.ImageType = "png"
@@ -105,19 +103,42 @@ func gapHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 		pdf.Cell(20, 6, "Wopta per te")
 		setPinkItalicFont(pdf, 18)
 		pdf.SetXY(28, 13)
+		pdf.SetFontSize(14)
 		pdf.SetTextColor(92, 89, 92)
 		pdf.Cell(20, 6, productName)
-		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/ARTW_LOGO_RGB_400px.png", 135, 8, 0, 5, false, opt, 0, "")
-		pdf.SetX(pdf.GetX() + 106)
+		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/ARTW_LOGO_RGB_400px.png", 115, 6.5, 0, 8, false, opt, 0, "")
+		pdf.SetX(pdf.GetX() + 96.5)
 		pdf.SetDrawColor(229, 0, 117)
 		pdf.SetLineWidth(0.5)
-		pdf.Line(pdf.GetX(), 8, pdf.GetX(), 13)
-		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/logo_sogessur.png", 156, 8, 0, 5, false, opt, 0, "")
+		pdf.Line(pdf.GetX(), 6, pdf.GetX(), 15.25)
+		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/logo_sogessur.png", 146, 7.5, 0, 6, false, opt, 0, "")
 
 		setBlackRegularFont(pdf, standardTextSize)
-		pdf.SetXY(11, 20)
-		pdf.MultiCell(0, 3.5, policyInfo, "", "", false)
-		pdf.Ln(8)
+		pdf.SetXY(10, 20)
+		setBlackBoldFont(pdf, standardTextSize)
+		for _, row := range policyInfo[:2] {
+			pdf.CellFormat(pdf.GetStringWidth(row[0]), 3.5, row[0], "", 0, fpdf.AlignLeft, false, 0, "")
+			pdf.CellFormat(pdf.GetStringWidth(" "), 3.5, " ", "", 0, fpdf.AlignLeft, false, 0, "")
+
+			pdf.CellFormat(pdf.GetStringWidth(row[1]), 3.5, row[1], "", 0, fpdf.AlignLeft, false, 0, "")
+			pdf.CellFormat(pdf.GetStringWidth(" "), 3.5, " ", "", 0, fpdf.AlignLeft, false, 0, "")
+
+			pdf.CellFormat(pdf.GetStringWidth(row[1]), 3.5, row[2], "", 0, fpdf.AlignLeft, false, 0, "")
+			pdf.CellFormat(pdf.GetStringWidth(" "), 3.5, " ", "", 1, fpdf.AlignLeft, false, 0, "")
+		}
+
+		setBlackRegularFont(pdf, standardTextSize)
+		for _, row := range policyInfo[2:] {
+			pdf.CellFormat(pdf.GetStringWidth(row[0]), 3.5, row[0], "", 0, fpdf.AlignLeft, false, 0, "")
+			pdf.CellFormat(pdf.GetStringWidth(" "), 3.5, " ", "", 0, fpdf.AlignLeft, false, 0, "")
+
+			pdf.CellFormat(pdf.GetStringWidth(row[1]), 3.5, row[1], "", 0, fpdf.AlignLeft, false, 0, "")
+			pdf.CellFormat(pdf.GetStringWidth(" "), 3.5, " ", "", 0, fpdf.AlignLeft, false, 0, "")
+
+			pdf.CellFormat(pdf.GetStringWidth(row[1]), 3.5, row[2], "", 0, fpdf.AlignLeft, false, 0, "")
+			pdf.CellFormat(pdf.GetStringWidth(" "), 3.5, " ", "", 1, fpdf.AlignLeft, false, 0, "")
+		}
+		pdf.Ln(6)
 	})
 }
 
@@ -142,16 +163,8 @@ func gapFooter(pdf *fpdf.Fpdf, productName string) {
 }
 
 func woptaGapHeader(pdf *fpdf.Fpdf, policy models.Policy) {
-	location, err := time.LoadLocation("Europe/Rome")
-	lib.CheckError(err)
-
-	policyStartDate := policy.StartDate.In(location)
-	policyEndDate := policy.EndDate.In(location)
-
 	policyInfo := "Polizza Numero: " + policy.CodeCompany + "\n" +
-		"Targa Veicolo: " + policy.Assets[0].Vehicle.Plate + "\n" +
-		"Decorre dal: " + policyStartDate.Format(dateLayout) + " ore 24:00\n" +
-		"Scade il: " + policyEndDate.Format(dateLayout) + " ore 24:00"
+		"Targa Veicolo: " + policy.Assets[0].Vehicle.Plate 
 
 	pdf.SetHeaderFunc(func() {
 		var opt fpdf.ImageOptions
