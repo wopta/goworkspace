@@ -37,8 +37,10 @@ func GapSogessur(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, 
 	vehicleOwner := policy.Assets[0].Person
 	statements := *policy.Statements
 
-	getParagraphTitle(pdf, "La tua assicurazione è operante sui dati sotto riportati, verifica la loro correttezza"+
-		" e segnala eventuali inesattezze")
+	pdf.SetTextColor(229, 0, 117)
+	pdf.SetFont("Montserrat", "B", 9)
+	pdf.MultiCell(0, 4, "La tua assicurazione è operante sui dati sotto riportati, verifica la loro correttezza"+
+		" e segnala eventuali inesattezze", "", "", false)
 	pdf.Ln(3)
 
 	gapVehicleDataTable(pdf, vehicle)
