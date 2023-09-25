@@ -13,7 +13,6 @@ import (
 	"github.com/wopta/goworkspace/reserved"
 )
 
-// TODO: update also in policy domain
 func UpdatePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println("[UpdatePolicyFx] Handler start ------------------------------")
 	var (
@@ -22,7 +21,7 @@ func UpdatePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 		policy           models.Policy
 	)
 
-	origin := r.Header.Get("origin")
+	origin := r.Header.Get("Origin")
 	policyUid := r.Header.Get("uid")
 	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 

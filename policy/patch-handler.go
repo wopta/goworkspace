@@ -2,6 +2,7 @@ package policy
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -9,28 +10,56 @@ import (
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/reserved"
 )
 
 func PatchPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	log.Println("[PatchPolicyFx] Handler start -------------------------------")
 	var (
-		err       error
-		policy    models.Policy
-		policyUID string
-		input     map[string]interface{}
+		err              error
+		responseTemplate = `{"uid":"%s","success":%t}`
+		policy           models.Policy
 	)
-	log.Println("PatchPolicyFx")
 
-	firePolicy := lib.GetDatasetByEnv(r.Header.Get("origin"), "policy")
-	policyUID = r.Header.Get("uid")
+	origin := r.Header.Get("Origin")
+	policyUid := r.Header.Get("uid")
+	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 
-	b := lib.ErrorByte(io.ReadAll(r.Body))
-	err = json.Unmarshal(b, &policy)
+	body := lib.ErrorByte(io.ReadAll(r.Body))
+	err = json.Unmarshal(body, &policy)
 	if err != nil {
-		log.Println("PatchPolicyFx: unable to unmarshal request body")
-		return `{"uid":"` + policyUID + `", "success":false}`, `{"uid":"` + policyUID + `", "success":false}`, err
+		log.Printf("[PatchPolicyFx] error unable to unmarshal request body: %s", err.Error())
+		response := fmt.Sprintf(responseTemplate, policyUid, false)
+		return response, response, nil
 	}
 
-	input = make(map[string]interface{}, 0)
+	originalPolicy, err := GetPolicy(policyUid, origin)
+	if err != nil {
+		log.Printf("[PatchPolicyFx] error unable to retrieve original policy: %s", err.Error())
+		response := fmt.Sprintf(responseTemplate, policyUid, false)
+		return response, response, nil
+	}
+	originalPolicyBytes, _ := json.Marshal(originalPolicy)
+	log.Printf("[PatchPolicyFx] original policy: %s", string(originalPolicyBytes))
+
+	input := PatchPolicy(&policy)
+	log.Printf("[PatchPolicyFx] modified policy values: %v", input)
+
+	_, err = lib.FireUpdate(firePolicy, policyUid, input)
+	if err != nil {
+		log.Printf("[PatchPolicyFx] error updating policy in firestore: %s", err.Error())
+		response := fmt.Sprintf(responseTemplate, policyUid, false)
+		return response, response, nil
+	}
+
+	response := fmt.Sprintf(responseTemplate, policyUid, true)
+
+	return response, response, nil
+}
+
+func PatchPolicy(policy *models.Policy) map[string]interface{} {
+	input := make(map[string]interface{}, 0)
+
 	input["assets"] = policy.Assets
 	input["contractor"] = policy.Contractor
 	input["fundsOrigin"] = policy.FundsOrigin
@@ -42,36 +71,9 @@ func PatchPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	}
 	input["updated"] = time.Now().UTC()
 
-	lib.FireUpdate(firePolicy, policyUID, input)
+	isReserved, reservedInfo := reserved.GetReservedInfo(policy)
+	input["isReserved"] = isReserved
+	input["reservedInfo"] = reservedInfo
 
-	return `{"uid":"` + policyUID + `", "success":true}`, `{"uid":"` + policyUID + `", "success":true}`, err
-}
-
-func PatchPolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	var (
-		err          error
-		policyUID    string
-		updateValues map[string]interface{}
-	)
-	log.Println("PatchPolicy")
-
-	firePolicy := lib.GetDatasetByEnv(r.Header.Get("origin"), "policy")
-	policyUID = r.Header.Get("uid")
-
-	b := lib.ErrorByte(io.ReadAll(r.Body))
-	err = json.Unmarshal(b, &updateValues)
-	if err != nil {
-		log.Println("PatchPolicy: unable to unmarshal request body")
-		return `{"uid":"` + policyUID + `", "success":false}`, `{"uid":"` + policyUID + `", "success":false}`, nil
-	}
-
-	updateValues["updated"] = time.Now().UTC()
-
-	err = lib.UpdateFirestoreErr(firePolicy, policyUID, updateValues)
-	if err != nil {
-		log.Println("PatchPolicy: error during update policy in firestore ")
-		return `{"uid":"` + policyUID + `", "success":false}`, `{"uid":"` + policyUID + `", "success":false}`, nil
-	}
-
-	return `{"uid":"` + policyUID + `", "success":true}`, `{"uid":"` + policyUID + `", "success":true}`, err
+	return input
 }
