@@ -21,8 +21,10 @@ var (
 )
 
 const (
-	emitFlowKey     = "emit"
-	proposalFlowKey = "proposal"
+	emitFlowKey            = "emit"
+	leadFlowKey            = "lead"
+	proposalFlowKey        = "proposal"
+	requestApprovalFlowKey = "requestApproval"
 )
 
 func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
@@ -35,6 +37,8 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 		settingFormat string = "products/%s/setting.json"
 	)
 
+	toAddress = mail.Address{}
+	ccAddress = mail.Address{}
 	fromAddress = mail.AddressAnna
 	channel := models.GetChannel(policy)
 	settingFile := fmt.Sprintf(settingFormat, channel)
@@ -52,14 +56,21 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 
 	// TODO: fix me - maybe get to/from/cc from setting.json?
 	switch flowKey {
-	case proposalFlowKey:
-		flow = setting.ProposalFlow
+	case leadFlowKey:
+		flow = setting.LeadFlow
 		toAddress = mail.GetContractorEmail(policy)
 		switch channel {
 		case models.AgentChannel:
 			ccAddress = mail.GetAgentEmail(policy)
-		default:
-			ccAddress = mail.Address{}
+		}
+	case proposalFlowKey:
+		flow = setting.ProposalFlow
+	case requestApprovalFlowKey:
+		flow = setting.RequestApprovalFlow
+		switch channel {
+		case models.AgentChannel:
+			toAddress = mail.GetContractorEmail(policy)
+			ccAddress = mail.GetAgentEmail(policy)
 		}
 	case emitFlowKey:
 		flow = setting.EmitFlow
@@ -69,7 +80,6 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 			ccAddress = mail.GetEmailByChannel(policy)
 		default:
 			toAddress = mail.GetEmailByChannel(policy)
-			ccAddress = mail.Address{}
 		}
 	default:
 		log.Println("[runBrokerBpmn] error flow not set")
@@ -86,9 +96,90 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 }
 
 func addHandlers(state *bpmn.State) {
-	addEmitHandlers(state)
+	addLeadHandlers(state)
 	addProposalHandlers(state)
+	addRequestApprovalHandlers(state)
+	addEmitHandlers(state)
 }
+
+//	======================================
+//	LEAD FUNCTIONS
+//	======================================
+
+func addLeadHandlers(state *bpmn.State) {
+	state.AddTaskHandler("setLeadData", setLeadBpmn)
+	state.AddTaskHandler("sendLeadMail", sendLeadMail)
+}
+
+func setLeadBpmn(state *bpmn.State) error {
+	policy := state.Data
+	setLeadData(policy)
+	return nil
+}
+
+func sendLeadMail(state *bpmn.State) error {
+	policy := state.Data
+	log.Printf(
+		"[sendLeadMail] from '%s', to '%s', cc '%s'",
+		fromAddress.String(),
+		toAddress.String(),
+		ccAddress.String(),
+	)
+	mail.SendMailLead(
+		*policy,
+		fromAddress,
+		toAddress,
+		ccAddress,
+	)
+	return nil
+}
+
+//	======================================
+//	PROPOSAL FUNCTIONS
+//	======================================
+
+func addProposalHandlers(state *bpmn.State) {
+	state.AddTaskHandler("setProposalData", setProposalBpm)
+}
+
+func setProposalBpm(state *bpmn.State) error {
+	policy := state.Data
+	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
+
+	setProposalData(policy)
+
+	log.Printf("[setProposalData] saving proposal n. %d to firestore...", policy.ProposalNumber)
+	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
+}
+
+//	======================================
+//	REQUEST APPROVAL FUNCTIONS
+//	======================================
+
+func addRequestApprovalHandlers(state *bpmn.State) {
+	state.AddTaskHandler("setRequestApprovalData", setRequestApprovalBpmn)
+	state.AddTaskHandler("sendRequestApprovalMail", sendRequestApprovalMail)
+}
+
+func setRequestApprovalBpmn(state *bpmn.State) error {
+	policy := state.Data
+	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
+
+	setRequestApprovalData(policy)
+
+	log.Printf("[setRequestApproval] saving policy with uid %s to Firestore....", policy.Uid)
+	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
+}
+
+func sendRequestApprovalMail(state *bpmn.State) error {
+	policy := state.Data
+	mail.SendMailReserved(*policy, fromAddress, toAddress, ccAddress)
+	return nil
+}
+
+//	======================================
+//	EMIT FUNCTIONS
+//	======================================
 
 func addEmitHandlers(state *bpmn.State) {
 	state.AddTaskHandler("emitData", emitData)
@@ -99,22 +190,11 @@ func addEmitHandlers(state *bpmn.State) {
 	state.AddTaskHandler("putUser", updateUserAndAgency)
 }
 
-func addProposalHandlers(state *bpmn.State) {
-	state.AddTaskHandler("setProposalData", setProposalBpm)
-	state.AddTaskHandler("sendProposalMail", sendProposalMail)
-}
-
 func emitData(state *bpmn.State) error {
 	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 	policy := state.Data
 	emitBase(policy, origin)
 	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
-}
-
-func setAdvanceBpm(state *bpmn.State) error {
-	policy := state.Data
-	setAdvance(policy, origin)
-	return nil
 }
 
 func sendMailSign(state *bpmn.State) error {
@@ -146,31 +226,14 @@ func pay(state *bpmn.State) error {
 	return nil
 }
 
+func setAdvanceBpm(state *bpmn.State) error {
+	policy := state.Data
+	setAdvance(policy, origin)
+	return nil
+}
+
 func updateUserAndAgency(state *bpmn.State) error {
 	policy := state.Data
 	user.SetUserIntoPolicyContractor(policy, origin)
 	return models.UpdateAgencyPortfolio(policy, origin)
-}
-
-func setProposalBpm(state *bpmn.State) error {
-	policy := state.Data
-	setProposalData(policy)
-	return nil
-}
-
-func sendProposalMail(state *bpmn.State) error {
-	policy := state.Data
-	log.Printf(
-		"[sendProposalMail] from '%s', to '%s', cc '%s'",
-		fromAddress.String(),
-		toAddress.String(),
-		ccAddress.String(),
-	)
-	mail.SendMailProposal(
-		*policy,
-		fromAddress,
-		toAddress,
-		ccAddress,
-	)
-	return nil
 }

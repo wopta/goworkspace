@@ -2,6 +2,8 @@ package lib
 
 import (
 	"log"
+	"os"
+	"strconv"
 	"strings"
 )
 
@@ -27,4 +29,13 @@ func GetDatasetByEnv(origin string, dataset string) string {
 	log.Println("GetDatasetByEnv: name:", origin)
 	log.Println("GetDatasetByEnv result: ", result)
 	return result
+}
+
+func GetBoolEnv(key string) bool {
+	flag, err := strconv.ParseBool(os.Getenv(key))
+	if err != nil {
+		log.Printf("error loading %s environment variable", key)
+		return false
+	}
+	return flag
 }

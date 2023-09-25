@@ -1,14 +1,16 @@
 package models
 
 type NodeSetting struct {
-	EmitFlow     []Process `json:"emitFlow" firestore:"emitFlow" bigquery:"-"`
-	ProposalFlow []Process `json:"proposalFlow" firestore:"proposalFlow" bigquery:"-"`
-	PayFlow      []Process `json:"payFlow" firestore:"payFlow" bigquery:"-"`
-	SignFlow     []Process `json:"signFlow" firestore:"signFlow" bigquery:"-"`
-	MailProposal string    `firestore:"mailProposal" json:"mailProposal" bigquery:"-"`
-	MailEmitted  string    `firestore:"mailEmitted" json:"mailEmittedx" bigquery:"-"`
-	MailPay      string    `firestore:"mailPay" json:"mailPay" bigquery:"-"`
-	MailSign     string    `firestore:"mailSign" json:"mailSign" bigquery:"-"`
+	EmitFlow            []Process `json:"emitFlow" firestore:"emitFlow" bigquery:"-"`
+	LeadFlow            []Process `json:"leadFlow" firestore:"leadFlow" bigquery:"-"`
+	ProposalFlow        []Process `json:"proposalFlow" firestore:"proposalFlow" bigquery:"-"`
+	RequestApprovalFlow []Process `json:"requestApprovalFlow" firestore:"requestApprovalFlow" bigquery:"-"`
+	PayFlow             []Process `json:"payFlow" firestore:"payFlow" bigquery:"-"`
+	SignFlow            []Process `json:"signFlow" firestore:"signFlow" bigquery:"-"`
+	MailProposal        string    `firestore:"mailProposal" json:"mailProposal" bigquery:"-"`
+	MailEmitted         string    `firestore:"mailEmitted" json:"mailEmittedx" bigquery:"-"`
+	MailPay             string    `firestore:"mailPay" json:"mailPay" bigquery:"-"`
+	MailSign            string    `firestore:"mailSign" json:"mailSign" bigquery:"-"`
 }
 
 type Process struct {

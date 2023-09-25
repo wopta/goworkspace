@@ -13,6 +13,7 @@ const (
 	PolicyStatusContact         = "Contact"
 	PolicyStatusToEmit          = "ToEmit"
 	PolicyStatusEmited          = "Emited"
+	PolicyStatusNeedsApproval   = "NeedsApproval"
 	PolicyStatusWaitForApproval = "WaitForApproval"
 	PolicyStatusApproved        = "Approved"
 	PolicyStatusRejected        = "Rejected"
