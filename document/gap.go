@@ -363,6 +363,7 @@ func gapPriceTable(pdf *fpdf.Fpdf, policy *models.Policy) {
 	pdf.CellFormat(56, 5, lib.HumanaizePriceEuro(policy.PriceGross-policy.PriceNett), "B",
 		0, fpdf.AlignCenter, false,
 		0, "")
+		setBlackBoldFont(pdf, 8)
 	pdf.CellFormat(0, 5, lib.HumanaizePriceEuro(policy.PriceGross), "BR", 1, fpdf.AlignCenter,
 		false, 0, "")
 
