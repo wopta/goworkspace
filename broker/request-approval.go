@@ -57,7 +57,9 @@ func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		return "", nil, err
 	}
 
-	return "", nil, err
+	jsonOut, err := policy.Marshal()
+
+	return string(jsonOut), policy, err
 }
 
 func requestApproval(policy *models.Policy) error {
