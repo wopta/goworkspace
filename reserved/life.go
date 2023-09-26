@@ -112,7 +112,7 @@ func getReservedData(policy *models.Policy) []byte {
 	return ret
 }
 
-func GetLifeReservedDocument(policy *models.Policy) []models.Attachment {
+func SetLifeReservedDocument(policy *models.Policy) {
 	attachments := make([]models.Attachment, 0)
 
 	gsLink, _ := document.LifeReserved(*policy)
@@ -131,11 +131,11 @@ func GetLifeReservedDocument(policy *models.Policy) []models.Attachment {
 		ContentType: "application/pdf",
 	})
 
-	return attachments
+	policy.ReservedInfo.Documents = attachments
 }
 
-func GetLifeContactsDetails(policy *models.Policy) []models.Contact {
-	return []models.Contact{
+func SetLifeContactsDetails(policy *models.Policy) {
+	policy.ReservedInfo.Contacts = []models.Contact{
 		{
 			Title:   "Tramite e-mail:",
 			Type:    "e-mail",
