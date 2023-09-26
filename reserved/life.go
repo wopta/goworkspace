@@ -82,7 +82,7 @@ func getInputData(policy *models.Policy) []byte {
 				break
 			} else if survey.HasMultipleAnswers != nil && *survey.HasMultipleAnswers {
 				for _, question := range survey.Questions {
-					if question.Answer != question.ExpectedAnswer {
+					if question.HasAnswer && question.Answer != question.ExpectedAnswer {
 						in["surveys"] = true
 						break
 					}
