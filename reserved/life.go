@@ -74,11 +74,20 @@ func getInputData(policy *models.Policy) []byte {
 	}
 	in["sumInsuredLimitOfIndemnity"] = maxSumInsuredLimitOfIndemnity
 
-	in["statements"] = false
-	for _, statement := range *policy.Statements {
-		if statement.Answer != nil && *statement.Answer {
-			in["statements"] = true
-			break
+	in["surveys"] = false
+	if policy.Surveys != nil {
+		for _, survey := range *policy.Surveys {
+			if survey.HasAnswer && (*survey.Answer != *survey.ExpectedAnswer) {
+				in["surveys"] = true
+				break
+			} else if survey.HasMultipleAnswers != nil && *survey.HasMultipleAnswers {
+				for _, question := range survey.Questions {
+					if question.Answer != question.ExpectedAnswer {
+						in["surveys"] = true
+						break
+					}
+				}
+			}
 		}
 	}
 
