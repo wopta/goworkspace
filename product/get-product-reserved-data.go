@@ -6,27 +6,7 @@ import (
 
 var (
 	ageMap = map[string]map[string]map[string]int{
-		models.UserRoleAdmin: {
-			models.LifeProduct: {
-				minAge:         75,
-				minReservedAge: 55,
-			},
-			models.PersonaProduct: {
-				minAge:         75,
-				minReservedAge: 75,
-			},
-		},
-		models.UserRoleManager: {
-			models.LifeProduct: {
-				minAge:         75,
-				minReservedAge: 55,
-			},
-			models.PersonaProduct: {
-				minAge:         75,
-				minReservedAge: 75,
-			},
-		},
-		models.UserRoleAgent: {
+		models.AgentChannel: {
 			models.LifeProduct: {
 				minAge:         70,
 				minReservedAge: 55,
@@ -36,9 +16,9 @@ var (
 				minReservedAge: 75,
 			},
 		},
-		models.UserRoleAgency: {
+		models.AgencyChannel: {
 			models.LifeProduct: {
-				minAge:         71,
+				minAge:         70,
 				minReservedAge: 55,
 			},
 			models.PersonaProduct: {
@@ -46,17 +26,7 @@ var (
 				minReservedAge: 75,
 			},
 		},
-		models.UserRoleAll: {
-			models.LifeProduct: {
-				minAge:         55,
-				minReservedAge: 55,
-			},
-			models.PersonaProduct: {
-				minAge:         75,
-				minReservedAge: 75,
-			},
-		},
-		models.UserRoleCustomer: {
+		models.ECommerceChannel: {
 			models.LifeProduct: {
 				minAge:         55,
 				minReservedAge: 55,
