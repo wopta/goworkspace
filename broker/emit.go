@@ -62,17 +62,16 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	policy, err = GetPolicy(uid, origin)
 	lib.CheckError(err)
 
-	if policy.IsReserved && policy.Status != models.PolicyStatusApproved {
-		log.Printf("[EmitFx] cannot emit policy uid %s with status %s and isReserved %t", policy.Uid, policy.Status, policy.IsReserved)
-		return "", nil, fmt.Errorf("cannot emit policy uid %s with status %s and isReserved %t", policy.Uid, policy.Status, policy.IsReserved)
-	}
-
 	policyJsonLog, _ := policy.Marshal()
 	log.Printf("[EmitFx] Policy %s JSON: %s", uid, string(policyJsonLog))
 
 	emitUpdatePolicy(&policy, request)
 
 	if lib.GetBoolEnv("PROPOSAL_V2") {
+		if policy.IsReserved && policy.Status != models.PolicyStatusApproved {
+			log.Printf("[EmitFx] cannot emit policy uid %s with status %s and isReserved %t", policy.Uid, policy.Status, policy.IsReserved)
+			return "", nil, fmt.Errorf("cannot emit policy uid %s with status %s and isReserved %t", policy.Uid, policy.Status, policy.IsReserved)
+		}
 		responseEmit = emitV2(&policy, request, origin)
 	} else {
 		responseEmit = emit(&policy, request, origin)
