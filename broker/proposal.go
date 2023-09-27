@@ -13,12 +13,18 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
+type ProposalReq struct {
+	PolicyUid    string `json:"policyUid"`
+	PaymentSplit string `json:"paymentSplit"`
+}
+
 func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println("[ProposalFx] Handler start -----------------------------------------")
 
 	var (
 		err    error
 		policy models.Policy
+		req    ProposalReq
 	)
 
 	origin = r.Header.Get("Origin")
@@ -26,13 +32,22 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 	defer r.Body.Close()
 
 	log.Printf("[ProposalFx] Request: %s", string(body))
-	err = json.Unmarshal([]byte(body), &policy)
-	if err != nil {
-		log.Printf("[ProposalFx] error unmarshaling policy: %s", err.Error())
-		return "", nil, err
-	}
 
 	if lib.GetBoolEnv("PROPOSAL_V2") {
+		err = json.Unmarshal([]byte(body), &req)
+		if err != nil {
+			log.Printf("[ProposalFx] error proposal body: %s", err.Error())
+			return "", nil, err
+		}
+
+		paymentSplit = req.PaymentSplit
+
+		policy, err = GetPolicy(req.PolicyUid, origin)
+		if err != nil {
+			log.Printf("[ProposalFx] error fetching policy %s from Firestore...: %s", req.PolicyUid, err.Error())
+			return "", nil, err
+		}
+
 		if policy.Status != models.PolicyStatusInitLead {
 			log.Printf("[ProposalFx] cannot save proposal for policy with status %s", policy.Status)
 			return "", nil, fmt.Errorf("cannot save proposal for policy with status %s", policy.Status)
@@ -44,6 +59,12 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 			return "", nil, err
 		}
 	} else {
+		err = json.Unmarshal([]byte(body), &policy)
+		if err != nil {
+			log.Printf("[ProposalFx] error unmarshaling policy: %s", err.Error())
+			return "", nil, err
+		}
+
 		err = lead(&policy)
 		if err != nil {
 			log.Printf("[ProposalFx] error creating lead: %s", err.Error())
@@ -106,6 +127,7 @@ func setProposalData(policy *models.Policy) {
 
 	log.Printf("[setProposalData] policy status %s", policy.Status)
 
+	policy.PaymentSplit = paymentSplit
 	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
 	policy.Updated = time.Now().UTC()
 }

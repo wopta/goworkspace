@@ -14,10 +14,8 @@ import (
 )
 
 var (
-	origin      string
-	ccAddress   mail.Address
-	toAddress   mail.Address
-	fromAddress mail.Address
+	origin, paymentSplit              string
+	ccAddress, toAddress, fromAddress mail.Address
 )
 
 const (

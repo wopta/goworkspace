@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
@@ -14,7 +15,8 @@ import (
 )
 
 type RequestApprovalReq struct {
-	PolicyUid string `json:"policyUid"`
+	PolicyUid    string `json:"policyUid"`
+	PaymentSplit string `json:"paymentSplit"`
 }
 
 func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -36,6 +38,8 @@ func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		log.Printf("[RequestApprovalFx] error unmarshaling request body: %s", err.Error())
 		return "", nil, err
 	}
+
+	paymentSplit = req.PaymentSplit
 
 	log.Printf("[RequestApprovalFx] fetching policy %s from Firestore...", req.PolicyUid)
 	policy, err = GetPolicy(req.PolicyUid, origin)
@@ -97,4 +101,6 @@ func setRequestApprovalData(policy *models.Policy) {
 
 	policy.Status = models.PolicyStatusWaitForApproval
 	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
+	policy.PaymentSplit = paymentSplit
+	policy.Updated = time.Now().UTC()
 }
