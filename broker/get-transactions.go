@@ -8,6 +8,7 @@ import (
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	plc "github.com/wopta/goworkspace/policy"
 	"github.com/wopta/goworkspace/transaction"
 )
 
@@ -30,16 +31,19 @@ func GetPolicyTransactionsFx(w http.ResponseWriter, r *http.Request) (string, in
 	authToken, err := models.GetAuthTokenFromIdToken(idToken)
 	lib.CheckError(err)
 
+	policy, err := plc.GetPolicy(policyUid, origin)
+	lib.CheckError(err)
+
 	userUid := authToken.UserID
 
 	switch authToken.Role {
 	case models.UserRoleAgent:
-		if !models.IsPolicyInAgentPortfolio(userUid, policyUid) {
+		if policy.AgentUid != userUid {
 			log.Printf("[GetPolicyTransactionsFx] policy %s is not included in agent %s", policyUid, userUid)
 			return "", response, fmt.Errorf("agent %s unauthorized for policy %s", userUid, policyUid)
 		}
 	case models.UserRoleAgency:
-		if !models.IsPolicyInAgencyPortfolio(userUid, policyUid) {
+		if policy.AgencyUid != userUid {
 			log.Printf("[GetPolicyTransactionsFx] policy %s is not included in agency %s", policyUid, userUid)
 			return "", response, fmt.Errorf("agency %s unauthorized for policy %s", userUid, policyUid)
 		}
