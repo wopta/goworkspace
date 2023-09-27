@@ -231,6 +231,8 @@ func emitBase(policy *models.Policy, origin string) {
 	policy.Number = tot
 	policy.NumberCompany = numb
 	policy.CodeCompany = company
+	policy.RenewDate = policy.StartDate.AddDate(1, 0, 0)
+	policy.BigRenewDate = civil.DateTimeOf(policy.RenewDate)
 }
 
 func emitSign(policy *models.Policy, origin string) {
