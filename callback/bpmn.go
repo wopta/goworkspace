@@ -15,11 +15,12 @@ import (
 )
 
 var (
-	origin      string
-	trSchedule  string
-	ccAddress   mail.Address
-	toAddress   mail.Address
-	fromAddress mail.Address
+	origin        string
+	trSchedule    string
+	paymentMethod string
+	ccAddress     mail.Address
+	toAddress     mail.Address
+	fromAddress   mail.Address
 )
 
 const (
@@ -251,7 +252,7 @@ func updatePolicy(state *bpmn.State) error {
 func payTransaction(state *bpmn.State) error {
 	policy := state.Data
 	transaction, _ := tr.GetTransactionByPolicyUidAndScheduleDate(policy.Uid, trSchedule, origin)
-	err := tr.Pay(&transaction, origin)
+	err := tr.Pay(&transaction, origin, paymentMethod)
 	if err != nil {
 		log.Printf("[fabrickPayment] ERROR Transaction Pay %s", err.Error())
 		return err

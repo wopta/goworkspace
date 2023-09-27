@@ -9,7 +9,7 @@ import (
 	"github.com/wopta/goworkspace/product"
 )
 
-func PutByPolicy(policy models.Policy, scheduleDate string, origin string, expireDate string, customerId string, amount float64, amountNet float64, providerId string, isPay bool) {
+func PutByPolicy(policy models.Policy, scheduleDate, origin, expireDate, customerId string, amount, amountNet float64, providerId, paymentMethod string, isPay bool) {
 	log.Printf("[PutByPolicy] Policy %s", policy.Uid)
 	var (
 		commissionMga    float64
@@ -100,6 +100,7 @@ func PutByPolicy(policy models.Policy, scheduleDate string, origin string, expir
 		CommissionsAgent:   commissionAgent,
 		CommissionsAgency:  commissionAgency,
 		NetworkCommissions: netCommission,
+		PaymentMethod:      paymentMethod,
 	}
 
 	err = lib.SetFirestoreErr(fireTransactions, transactionUid, tr)

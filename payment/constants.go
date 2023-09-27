@@ -8,9 +8,10 @@ const (
 )
 
 const (
-	payMethodCard     = "creditcard"
-	payMethodTransfer = "transfer"
-	payMethodSdd      = "sdd"
+	payMethodCard       = "creditcard"
+	payMethodTransfer   = "transfer"
+	payMethodSdd        = "sdd"
+	PayMethodRemittance = "remittance"
 )
 
 func GetAllPaymentMethods() []string {
