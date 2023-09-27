@@ -49,6 +49,7 @@ func PaymentV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 
 	switch fabrickCallback.Bill.Status {
 	case fabrickBillPaid:
+		paymentMethod = strings.ToLower(*fabrickCallback.Bill.Transactions[0].PaymentMethod)
 		err = fabrickPayment(origin, policyUid, trSchedule)
 	default:
 	}

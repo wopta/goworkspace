@@ -114,7 +114,7 @@ func FabrickPayObj(data models.Policy, firstSchedule bool, scheduleDate string, 
 			json.Unmarshal([]byte(body), &result)
 			defer res.Body.Close()
 
-			tr.PutByPolicy(data, scheduleDate, origin, expireDate, customerId, amount, amountNet, *result.Payload.PaymentID, false)
+			tr.PutByPolicy(data, scheduleDate, origin, expireDate, customerId, amount, amountNet, *result.Payload.PaymentID, "", false)
 
 			r <- result
 		}
