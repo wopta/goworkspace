@@ -121,5 +121,16 @@ const (
 
 const (
 	FabrickPaymentProvider string = "fabrick"
-	ManualPaymentProvider  string = "payment"
+	ManualPaymentProvider  string = "manual"
 )
+
+const (
+	PayMethodCard       = "creditcard"
+	PayMethodTransfer   = "transfer"
+	PayMethodSdd        = "sdd"
+	PayMethodRemittance = "remittance"
+)
+
+func GetAllPaymentMethods() []string {
+	return []string{PayMethodCard, PayMethodTransfer, PayMethodSdd}
+}

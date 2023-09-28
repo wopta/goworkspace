@@ -33,7 +33,7 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		return "", nil, err
 	}
 
-	methods := GetAllPaymentMethods()
+	methods := models.GetAllPaymentMethods()
 	isMethodAllowed := lib.SliceContains[string](methods, payload.PaymentMethod)
 
 	if !isMethodAllowed {
@@ -42,10 +42,10 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		return errorMessage, errorMessage, nil
 	}
 
-	origin := r.Header.Get("origin")
+	origin := r.Header.Get("Origin")
 	transactionUid := r.Header.Get("transactionUid")
-	fireTransactions := lib.GetDatasetByEnv(origin, "transactions")
-	firePolicies := lib.GetDatasetByEnv(origin, "policy")
+	fireTransactions := lib.GetDatasetByEnv(origin, models.TransactionsCollection)
+	firePolicies := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 
 	var t models.Transaction
 	var p models.Policy
@@ -129,7 +129,7 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 func ManualPayment(transaction *models.Transaction, origin string, payload *ManualPaymentPayload) {
 	fireTransactions := lib.GetDatasetByEnv(origin, "transactions")
 
-	transaction.ProviderName = "manual"
+	transaction.ProviderName = models.ManualPaymentProvider
 	transaction.PaymentMethod = payload.PaymentMethod
 	transaction.PaymentNote = payload.Note
 	transaction.IsPay = true
