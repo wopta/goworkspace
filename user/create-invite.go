@@ -42,7 +42,7 @@ type UserInvite struct {
 	RuiCode         string           `json:"ruiCode,omitempty" firestore:"ruiCode,omitempty"`
 	RuiSection      string           `json:"ruiSection,omitempty" firestore:"ruiSection,omitempty"`
 	RuiRegistration time.Time        `json:"ruiRegistration" firestore:"ruiRegistration"`
-	Code            string           `json:"code"`
+	Code            string           `json:"code" firestore:"code"`
 	Expiration      time.Time        `json:"expiration,omitempty" firestore:"expiration,omitempty"`
 	Products        []models.Product `json:"products,omitempty" firestore:"products,omitempty"`
 }
