@@ -111,6 +111,9 @@ type Policy struct {
 	BigAcceptanceDate bigquery.NullDateTime        `json:"-" firestore:"-" bigquery:"acceptanceDate"`
 	Step              string                       `json:"step,omitempty" firestore:"step,omitempty" bigquery:"step"`
 	ProducerCode      string                       `json:"producerCode,omitempty" firestore:"producerCode,omitempty" bigquery:"producerCode"`
+	NetworkUid        string                       `json:"networkUid" firestore:"networkUid" bigquery:"networkUid"`
+	ProducerUid       string                       `json:"producerUid" firestore:"producerUid" bigquery:"producerUid"`
+	ProducerType      string                       `json:"producerType" firestore:"producerType" bigquery:"producerType"`
 }
 
 type RenewHistory struct {
