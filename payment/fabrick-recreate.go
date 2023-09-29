@@ -64,7 +64,7 @@ func FabrickRecreateFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		}
 	}
 
-	return "", nil, nil
+	return `{"success":true}`, `{"success":true}`, nil
 }
 
 func FabrickRecreate(policyUid, origin string) (*models.Policy, error) {
@@ -102,6 +102,7 @@ func FabrickRecreate(policyUid, origin string) (*models.Policy, error) {
 		transaction.ExpirationDate = now.AddDate(0, 0, 1).Format(models.TimeDateOnly)
 		transaction.Status = models.PolicyStatusDeleted
 		transaction.StatusHistory = append(transaction.StatusHistory, transaction.Status)
+		transaction.PaymentNote = "Cancellata per ricreazione titoli"
 
 		log.Println("[FabrickRecreate] saving transaction to firestore...")
 		err = lib.SetFirestoreErr(fireTransactions, transaction.Uid, transaction)
