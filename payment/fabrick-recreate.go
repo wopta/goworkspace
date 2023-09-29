@@ -52,6 +52,18 @@ func FabrickRecreateFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		mail.Address{},
 	)
 
+	log.Println("[FabrickRecreateFx] saving audit trail...")
+	audit, err := models.ParseHttpRequest(r, string(body))
+	if err != nil {
+		log.Printf("[FabrickRecreateFx] error creating audit log: %s", err.Error())
+	} else {
+		log.Printf("[FabrickRecreateFx] audit log: %v", audit)
+		err = audit.SaveToBigQuery()
+		if err != nil {
+			log.Printf("[FabrickRecreateFx] error saving audit log: %s", err.Error())
+		}
+	}
+
 	return "", nil, nil
 }
 
