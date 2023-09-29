@@ -25,7 +25,7 @@ func FabrickRecreateFx(w http.ResponseWriter, r *http.Request) (string, interfac
 	var (
 		request FabrickRefreshPayByLinkRequest
 		err     error
-		policy  models.Policy
+		policy  *models.Policy
 	)
 
 	origin := r.Header.Get("Origin")
@@ -38,7 +38,7 @@ func FabrickRecreateFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		return "", nil, err
 	}
 
-	err = FabrickRecreate(request.PolicyUid, origin)
+	policy, err = FabrickRecreate(request.PolicyUid, origin)
 	if err != nil {
 		log.Printf("[FabrickRecreateFx] error recreating payment: %s", err.Error())
 		return "", nil, err
@@ -46,16 +46,16 @@ func FabrickRecreateFx(w http.ResponseWriter, r *http.Request) (string, interfac
 
 	log.Println("[FabrickRecreateFx] send pay mail to contractor...")
 	mail.SendMailPay(
-		policy,
+		*policy,
 		mail.AddressAnna,
-		mail.GetContractorEmail(&policy),
+		mail.GetContractorEmail(policy),
 		mail.Address{},
 	)
 
 	return "", nil, nil
 }
 
-func FabrickRecreate(policyUid, origin string) error {
+func FabrickRecreate(policyUid, origin string) (*models.Policy, error) {
 	log.Println("[FabrickRecreate]")
 	var (
 		err    error
@@ -65,7 +65,7 @@ func FabrickRecreate(policyUid, origin string) error {
 	policy = plc.GetPolicyByUid(policyUid, origin)
 	if policy.IsPay {
 		log.Printf("[FabrickRecreate] policy %s already paid cannot recreate payment(s)", policy.Uid)
-		return fmt.Errorf("policy %s already paid cannot recreate payment(s)", policy.Uid)
+		return nil, fmt.Errorf("policy %s already paid cannot recreate payment(s)", policy.Uid)
 	}
 
 	oldTransactions := tr.GetPolicyTransactions(origin, policy.Uid)
@@ -74,10 +74,12 @@ func FabrickRecreate(policyUid, origin string) error {
 	payUrl, err := PaymentController(origin, &policy)
 	if err != nil {
 		log.Printf("[FabrickRecreate] error creating payment: %s", err.Error())
-		return err
+		return nil, err
 	}
 
 	now := time.Now().UTC()
+	policy.PayUrl = payUrl
+	policy.Updated = now
 
 	// TODO: automatically delete the transacations on fabrick DB (expireBill)
 	fireTransactions := lib.GetDatasetByEnv(origin, models.TransactionsCollection)
@@ -93,7 +95,7 @@ func FabrickRecreate(policyUid, origin string) error {
 		err = lib.SetFirestoreErr(fireTransactions, transaction.Uid, transaction)
 		if err != nil {
 			log.Printf("[FabrickRecreate] error saving transaction to firestore: %s", err.Error())
-			return err
+			return nil, err
 		}
 		log.Println("[FabrickRecreate] saving transaction to bigquery...")
 		transaction.BigQuerySave(origin)
@@ -101,18 +103,15 @@ func FabrickRecreate(policyUid, origin string) error {
 
 	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 
-	policy.PayUrl = payUrl
-	policy.Updated = now
-
 	log.Println("[FabrickRecreate] saving policy to firestore...")
 	err = lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
 	if err != nil {
 		log.Printf("[FabrickRecreate] error saving policy to firestore: %s", err.Error())
-		return err
+		return nil, err
 	}
 
 	log.Println("[FabrickRecreate] saving policy to bigquery...")
 	policy.BigquerySave(origin)
 
-	return nil
+	return &policy, nil
 }
