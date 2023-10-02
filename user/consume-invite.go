@@ -20,11 +20,16 @@ type ConsumeInviteReq struct {
 }
 
 func ConsumeInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	log.Println("[ConsumeInviteFx] Handler start -----------------------------")
 	var ConsumeInviteRequest ConsumeInviteReq
 
 	reqBytes := lib.ErrorByte(io.ReadAll(r.Body))
+	log.Printf("[ConsumeInviteFx] request body: %s", string(reqBytes))
 	err := json.Unmarshal(reqBytes, &ConsumeInviteRequest)
-	lib.CheckError(err)
+	if err != nil {
+		log.Printf("[ConsumeInviteFx] error unmarshaling request: %s", err.Error())
+		return `{"success": false}`, `{"success": false}`, nil
+	}
 
 	if ok, _ := ConsumeInvite(ConsumeInviteRequest.InviteUid, ConsumeInviteRequest.Password, r.Header.Get("Origin")); ok {
 		return `{"success": true}`, `{"success": true}`, nil
@@ -40,17 +45,20 @@ func ConsumeInvite(inviteUid, password, origin string) (bool, error) {
 	collection := lib.GetDatasetByEnv(origin, invitesCollection)
 	docSnapshot, err := lib.GetFirestoreErr(collection, inviteUid)
 	if err != nil {
+		log.Printf("[ConsumeInvite] error retrieving data from firestore: %s", err.Error())
 		return false, err
 	}
 
 	var invite UserInvite
 	err = docSnapshot.DataTo(&invite)
 	if err != nil {
+		log.Printf("[ConsumeInvite] error unmarshaling data: %s", err.Error())
 		return false, err
 	}
 
 	// Check if invite is not consumed nor expired
 	if invite.Consumed || time.Now().UTC().After(invite.Expiration) {
+		log.Printf("[ConsumeInvite] cannot consume invite with Consumed %t and Expiration %s", invite.Consumed, invite.Expiration.String())
 		return false, errors.New("invite consumed or expired")
 	}
 
