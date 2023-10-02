@@ -38,6 +38,12 @@ func Mga(w http.ResponseWriter, r *http.Request) {
 				Method:  http.MethodGet,
 				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},
+			{
+				Route:   "/network/node/:uid",
+				Handler: GetNetworkNodeByUidFx,
+				Method:  http.MethodGet,
+				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
+			},
 		},
 	}
 
