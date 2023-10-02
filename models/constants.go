@@ -86,7 +86,7 @@ const (
 	ClaimsCollection       string = "claims" //only for bigquery
 	AuditsCollection       string = "audits"
 	GuaranteeCollection    string = "guarante"
-	NetworkNodeCollection  string = "networkNodes"
+	NetworkNodeCollection  string = "network-nodes"
 )
 
 const (
