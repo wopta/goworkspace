@@ -167,6 +167,7 @@ func CreateInviteV2Fx(w http.ResponseWriter, r *http.Request) (string, interface
 		err                 error
 	)
 
+	origin := r.Header.Get("Origin")
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	log.Printf("[CreateInviteV2Fx] request: %s", string(body))
 	err = json.Unmarshal(body, &createInviteRequest)
@@ -183,7 +184,7 @@ func CreateInviteV2Fx(w http.ResponseWriter, r *http.Request) (string, interface
 	}
 
 	log.Println("[CreateInviteV2Fx] creating invite...")
-	inviteUid, err := createInvite(createInviteRequest, r.Header.Get("Origin"), creatorUid)
+	inviteUid, err := createInvite(createInviteRequest, origin, creatorUid)
 	if err != nil {
 		log.Printf("[CreateInviteV2Fx] error creating invite: %s", err.Error())
 		return "", "", err
@@ -196,7 +197,7 @@ func CreateInviteV2Fx(w http.ResponseWriter, r *http.Request) (string, interface
 }
 
 func createInvite(inviteRequest CreateInviteRequest, origin, creatorUid string) (string, error) {
-	log.Printf("[CreateInvite] Creating invite for user %s with role %s", inviteRequest.Email, inviteRequest.Role)
+	log.Printf("[createInvite] Creating invite for user %s with role %s", inviteRequest.Email, inviteRequest.Role)
 
 	collectionName := lib.GetDatasetByEnv(origin, invitesCollection)
 	inviteUid := lib.NewDoc(collectionName)
@@ -214,7 +215,7 @@ func createInvite(inviteRequest CreateInviteRequest, origin, creatorUid string) 
 	}
 
 	if userRole == "" {
-		log.Println("[CreateInvite]: forbidden role")
+		log.Println("[createInvite]: forbidden role")
 		return "", errors.New("forbidden role")
 	}
 
@@ -238,16 +239,17 @@ func createInvite(inviteRequest CreateInviteRequest, origin, creatorUid string) 
 	// check if user exists
 	_, err := GetAuthUserByMail(origin, inviteRequest.Email)
 	if err == nil {
-		log.Printf("[CreateInvite]: user %s already exists", inviteRequest.Email)
+		log.Printf("[createInvite] user %s already exists", inviteRequest.Email)
 		return "", errors.New("user already exists")
 	}
 
+	log.Println("[createInvite] saving invite...")
 	err = lib.SetFirestoreErr(collectionName, invite.Uid, invite)
 	if err != nil {
-		log.Printf("[CreateInvite]: could not create user %s", inviteRequest.Email)
+		log.Printf("[createInvite] could not create user %s", inviteRequest.Email)
 		return "", errors.New("could not create user")
 	}
 
-	log.Printf("[CreateInvite] Created invite with uid %s", invite.Uid)
+	log.Printf("[createInvite] created invite with uid %s", invite.Uid)
 	return invite.Uid, nil
 }
