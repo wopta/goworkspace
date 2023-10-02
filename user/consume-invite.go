@@ -19,6 +19,7 @@ type ConsumeInviteReq struct {
 	Password  string `json:"password"`
 }
 
+// DEPRECATED
 func ConsumeInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var ConsumeInviteRequest ConsumeInviteReq
 
@@ -33,6 +34,7 @@ func ConsumeInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{
 	return `{"success": false}`, `{"success": false}`, nil
 }
 
+// DEPRECATED
 func ConsumeInvite(inviteUid, password, origin string) (bool, error) {
 	log.Printf("[ConsumeInvite] Consuming invite %s", inviteUid)
 
@@ -185,4 +187,88 @@ func createAgency(collection, origin string, userRecord *auth.UserRecord, invite
 	lib.SetCustomClaimForUser(agency.AuthId, map[string]interface{}{
 		"role": invite.Role,
 	})
+}
+
+func ConsumeInviteV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	log.Println("[ConsumeInviteV2Fx] Handler start -----------------------------")
+	var ConsumeInviteRequest ConsumeInviteReq
+
+	body := lib.ErrorByte(io.ReadAll(r.Body))
+	log.Printf("[ConsumeInviteV2Fx] request body: %s", string(body))
+	err := json.Unmarshal(body, &ConsumeInviteRequest)
+	if err != nil {
+		log.Printf("[ConsumeInviteV2Fx] error unmarshaling request: %s", err.Error())
+		return "", "", err
+	}
+
+	origin := r.Header.Get("Origin")
+	if ok, _ := consumeInvite(ConsumeInviteRequest.InviteUid, ConsumeInviteRequest.Password, origin); ok {
+		log.Println("[ConsumeInviteV2Fx] invite correctly consumed")
+		return `{"success": true}`, `{"success": true}`, nil
+	}
+
+	return `{"success": false}`, `{"success": false}`, nil
+}
+
+func consumeInvite(inviteUid, password, origin string) (bool, error) {
+	log.Printf("[consumeInvite] consuming invite %s", inviteUid)
+
+	var invite UserInvite
+
+	// Get the invite
+	collection := lib.GetDatasetByEnv(origin, invitesCollection)
+	docSnapshot, err := lib.GetFirestoreErr(collection, inviteUid)
+	if err != nil {
+		log.Printf("[consumeInvite] error retrieving data from firestore: %s", err.Error())
+		return false, err
+	}
+
+	err = docSnapshot.DataTo(&invite)
+	if err != nil {
+		log.Printf("[consumeInvite] error unmarshaling data: %s", err.Error())
+		return false, err
+	}
+
+	// Check if invite is not consumed nor expired
+	if invite.Consumed || time.Now().UTC().After(invite.Expiration) {
+		log.Printf("[consumeInvite] cannot consume invite with Consumed: %t and Expiration: %s", invite.Consumed, invite.Expiration.String())
+		return false, errors.New("invite consumed or expired")
+	}
+
+	// TODO use the networkNode collection
+	docUid := ""
+	collection = ""
+	switch invite.Role {
+	case models.UserRoleAgent:
+		collection = lib.GetDatasetByEnv(origin, models.AgentCollection)
+		docUid = lib.NewDoc(collection) + "_agent"
+		agentRecord, err := lib.CreateUserWithEmailAndPassword(invite.Email, password, &docUid)
+		if err != nil {
+			return false, err
+		}
+		createAgent(collection, origin, agentRecord, invite)
+	case models.UserRoleAgency:
+		collection = lib.GetDatasetByEnv(origin, models.AgencyCollection)
+		docUid = lib.NewDoc(collection) + "_agency"
+		agencyRecord, err := lib.CreateUserWithEmailAndPassword(invite.Email, password, &docUid)
+		if err != nil {
+			return false, err
+		}
+		createAgency(collection, origin, agencyRecord, invite)
+	default:
+		collection = lib.GetDatasetByEnv(origin, usersCollection)
+		userRecord, err := lib.CreateUserWithEmailAndPassword(invite.Email, password, &docUid)
+		if err != nil {
+			return false, err
+		}
+		createUser(collection, origin, userRecord, invite)
+	}
+
+	// update the invite to consumed
+	invite.Consumed = true
+	invitesCollectionName := lib.GetDatasetByEnv(origin, invitesCollection)
+	lib.SetFirestore(invitesCollectionName, invite.Uid, invite)
+
+	log.Printf("[consumeInvite] Consumed invite with uid %s", invite.Uid)
+	return true, nil
 }
