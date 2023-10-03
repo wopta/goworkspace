@@ -159,11 +159,12 @@ func addProposalHandlers(state *bpmn.State) {
 
 func setProposalBpm(state *bpmn.State) error {
 	policy := state.Data
-	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 
 	setProposalData(policy)
 
 	log.Printf("[setProposalData] saving proposal n. %d to firestore...", policy.ProposalNumber)
+	
+	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
 }
 
