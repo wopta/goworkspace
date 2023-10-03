@@ -13,7 +13,7 @@ func GetNodeByUid(uid string) (models.NetworkNode, error) {
 	if err != nil {
 		return models.NetworkNode{}, fmt.Errorf("could not fetch node: %s", err.Error())
 	}
-	err = docSnapshot.DataTo(node)
+	err = docSnapshot.DataTo(&node)
 
 	if node == nil || err != nil {
 		return models.NetworkNode{}, fmt.Errorf("could not parse node: %s", err.Error())
