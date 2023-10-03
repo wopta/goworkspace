@@ -109,7 +109,7 @@ func (nn *NetworkNode) SaveBigQuery(origin string) error {
 		})
 	}
 
-	err := lib.InsertRowsBigQuery(WoptaDataset, NetworkNodeCollection, nn)
+	err := lib.InsertRowsBigQuery(WoptaDataset, NetworkNodesCollection, nn)
 	return err
 }
 

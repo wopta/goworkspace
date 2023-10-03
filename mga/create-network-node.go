@@ -41,7 +41,7 @@ func CreateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 
 	node := createNetworkNode(request, origin)
 
-	fireNetwork := lib.GetDatasetByEnv(origin, models.NetworkNodeCollection)
+	fireNetwork := lib.GetDatasetByEnv(origin, models.NetworkNodesCollection)
 	err = lib.SetFirestoreErr(fireNetwork, node.Uid, node)
 	if err != nil {
 		log.Printf("[CreateNetworkNodeFx] error saving node to firestore: %s", err.Error())
@@ -57,7 +57,7 @@ func CreateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 
 // TODO: mode to network domain
 func createNetworkNode(request CreateNetworkNodeRequest, origin string) *models.NetworkNode {
-	uid := lib.NewDoc(models.NetworkNodeCollection)
+	uid := lib.NewDoc(models.NetworkNodesCollection)
 	now := time.Now().UTC()
 
 	log.Printf("[createNetworkNode] creating node with uid %s", uid)
