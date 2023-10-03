@@ -1,13 +1,17 @@
 package document
 
 import (
-	"github.com/dustin/go-humanize"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/product"
+	"encoding/json"
+	"log"
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/dustin/go-humanize"
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
+	"github.com/wopta/goworkspace/product"
 )
 
 type slugStruct struct {
@@ -80,29 +84,35 @@ func loadProducerInfo(origin string, policy *models.Policy) map[string]string {
 		"ruiRegistration": "02.03.2022",
 	}
 
-	if policy.AgentUid != "" {
-		var agent models.Agent
-		fireAgent := lib.GetDatasetByEnv(origin, models.AgentCollection)
-		docsnap, err := lib.GetFirestoreErr(fireAgent, policy.AgentUid)
-		lib.CheckError(err)
-		err = docsnap.DataTo(&agent)
-		lib.CheckError(err)
-		policyProducer["name"] = strings.ToUpper(agent.Surname) + " " + strings.ToUpper(agent.Name)
-		policyProducer["ruiSection"] = agent.RuiSection
-		policyProducer["ruiCode"] = agent.RuiCode
-		policyProducer["ruiRegistration"] = agent.RuiRegistration.Format("02.01.2006")
-	} else if policy.AgencyUid != "" {
-		var agency models.Agency
-		fireAgency := lib.GetDatasetByEnv(origin, models.AgencyCollection)
-		docsnap, err := lib.GetFirestoreErr(fireAgency, policy.AgencyUid)
-		lib.CheckError(err)
-		err = docsnap.DataTo(&agency)
-		lib.CheckError(err)
-		policyProducer["name"] = strings.ToUpper(agency.Name)
-		policyProducer["ruiSection"] = agency.RuiSection
-		policyProducer["ruiCode"] = agency.RuiCode
-		policyProducer["ruiRegistration"] = agency.RuiRegistration.Format("02.01.2006")
+	if policy.ProducerUid == "" || policy.ProducerType == models.PartnershipProducerType {
+		jsonProducer, _ := json.Marshal(policyProducer)
+		log.Printf("[loadProducerInfo] producer info %s", string(jsonProducer))
+		return policyProducer
 	}
+
+	log.Printf("[loadProducerInfo] loading producer %s data from Firestore...", policy.ProducerUid)
+
+	networkNode, err := network.GetNodeByUid(policy.ProducerUid)
+	lib.CheckError(err)
+
+	log.Printf("[loadProducerInfo] setting producer %s info, producerType", policy.ProducerUid, policy.ProducerType)
+
+	switch policy.ProducerType {
+	case models.AgentProducerType:
+		policyProducer["name"] = strings.ToUpper(networkNode.Agent.Surname) + " " + strings.ToUpper(networkNode.Agent.Name)
+		policyProducer["ruiSection"] = networkNode.Agent.RuiSection
+		policyProducer["ruiCode"] = networkNode.Agent.RuiCode
+		policyProducer["ruiRegistration"] = networkNode.Agent.RuiRegistration.Format("02.01.2006")
+	case models.AgencyProducerType:
+		policyProducer["name"] = strings.ToUpper(networkNode.Agency.Name)
+		policyProducer["ruiSection"] = networkNode.Agency.RuiSection
+		policyProducer["ruiCode"] = networkNode.Agency.RuiCode
+		policyProducer["ruiRegistration"] = networkNode.Agency.RuiRegistration.Format("02.01.2006")
+	}
+
+	jsonProducer, _ := json.Marshal(policyProducer)
+	log.Printf("[loadProducerInfo] producer info %s", string(jsonProducer))
+
 	return policyProducer
 }
 
