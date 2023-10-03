@@ -63,7 +63,6 @@ func QueryParametrizedRowsBigQuery[T any](query string, params map[string]interf
 		e    error
 		iter *bigquery.RowIterator
 	)
-	log.Println(query)
 	client := getBigqueryClient()
 	ctx := context.Background()
 	defer client.Close()
@@ -74,18 +73,19 @@ func QueryParametrizedRowsBigQuery[T any](query string, params map[string]interf
 	}
 
 	iter, e = queryBigQuery.Read(ctx)
-	log.Println(e)
+
+	if e != nil {
+		return res, e
+	}
 	for {
 		var row T
 		e := iter.Next(&row)
-		log.Println(e)
 		if e == iterator.Done {
 			return res, e
 		}
 		if e != nil {
 			return res, e
 		}
-		log.Println(e)
 		res = append(res, row)
 
 	}

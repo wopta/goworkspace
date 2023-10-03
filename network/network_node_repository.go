@@ -78,7 +78,7 @@ func GetAllSubNodesFromNodeBigQuery(uid string) ([]models.NetworkNode, error) {
 	return nodes, err
 }
 
-func GetAllParentNodesFromNode(uid string) ([]models.NetworkNode, error) {
+func GetAllParentNodesFromNodeBigQuery(uid string) ([]models.NetworkNode, error) {
 	query := `WITH
 	RECURSIVE network AS (
 	SELECT
