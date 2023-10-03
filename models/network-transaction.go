@@ -18,7 +18,6 @@ const (
 	NetworkTransactionStatusToPay     string = "ToPay"
 	NetworkTransactionStatusPaid      string = "Paid"
 	NetworkTransactionStatusConfirmed string = "Confirmed"
-	networkTransactionTableId         string = "network-transactions"
 )
 
 type NetworkTransaction struct {
@@ -43,12 +42,16 @@ type NetworkTransaction struct {
 	ConfirmationDate bigquery.NullDateTime `json:"confirmationDate" bigquery:"confirmationDate"`
 }
 
-func (nt *NetworkTransaction) SaveBigQuery(origin string) error {
+func (nt *NetworkTransaction) SaveBigQuery() error {
 	log.Println("[NetworkTransaction.SaveBigQuery]")
 
-	var err error
+	var (
+		err       error
+		datasetId = "test1" // WoptaDataset
+		tableId   = NetworkTransactionCollection
+	)
 
-	baseQuery := fmt.Sprintf("SELECT * FROM `%s.%s` WHERE ", WoptaDataset, networkTransactionTableId)
+	baseQuery := fmt.Sprintf("SELECT * FROM `%s.%s` WHERE ", datasetId, tableId)
 	whereClause := fmt.Sprintf("uid = %s", nt.Uid)
 	query := fmt.Sprintf("%s %s", baseQuery, whereClause)
 
@@ -59,10 +62,10 @@ func (nt *NetworkTransaction) SaveBigQuery(origin string) error {
 	}
 
 	if len(result) == 0 {
-		log.Println("[NetworkTransaction.SaveBigQuery] creating new NetworkTransaction %s", nt.Uid)
-		err = lib.InsertRowsBigQuery(WoptaDataset, networkTransactionTableId, nt)
+		log.Printf("[NetworkTransaction.SaveBigQuery] creating new NetworkTransaction %s", nt.Uid)
+		err = lib.InsertRowsBigQuery(datasetId, tableId, nt)
 	} else {
-		log.Println("[NetworkTransaction.SaveBigQuery] updating NetworkTransaction %s", nt.Uid)
+		log.Printf("[NetworkTransaction.SaveBigQuery] updating NetworkTransaction %s", nt.Uid)
 		updatedFields := make(map[string]interface{})
 		updatedFields["status"] = nt.Status
 		updatedFields["statusHistory"] = nt.StatusHistory
@@ -72,7 +75,7 @@ func (nt *NetworkTransaction) SaveBigQuery(origin string) error {
 		updatedFields["transactionDate"] = nt.TransactionDate
 		updatedFields["confirmationDate"] = nt.ConfirmationDate
 
-		err = lib.UpdateRowBigQuery(WoptaDataset, networkTransactionTableId, updatedFields, whereClause)
+		err = lib.UpdateRowBigQueryV2(datasetId, tableId, updatedFields, whereClause)
 	}
 
 	if err != nil {

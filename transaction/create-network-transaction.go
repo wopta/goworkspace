@@ -13,11 +13,27 @@ import (
 func CreateNetworkTransaction(
 	policy *models.Policy,
 	transaction *models.Transaction,
-	commission float64,
+	commission float64, // Percentual
 	accountType string,
 	paymentType string,
 ) *models.NetworkTransaction {
-	amount := transaction.Amount - commission
+	log.Printf(
+		"[CreateNetworkTransaction] accountType '%s' paymentType '%s' commission '%f' amount '%f'",
+		accountType,
+		paymentType,
+		commission,
+		transaction.Amount,
+	)
+
+	var amount float64
+
+	switch paymentType {
+	case models.PaymentTypeRemittanceCompany, models.PaymentTypeCommission:
+		amount = transaction.Amount * commission
+	case models.PaymentTypeRemittanceMga:
+		amount = transaction.Amount - (transaction.Amount * commission)
+	}
+
 	if accountType == models.AccountTypePassive {
 		amount = -amount
 	}
@@ -45,6 +61,12 @@ func CreateNetworkTransaction(
 	}
 
 	jsonLog, _ := json.Marshal(&netTransaction)
+
+	err := netTransaction.SaveBigQuery()
+	if err != nil {
+		log.Printf("[CreateNetworkTransaction] error saving network transaction to bigquery: %s", err.Error())
+		return nil
+	}
 
 	log.Printf("[CreateNetworkTransaction] network transaction created! %s", string(jsonLog))
 

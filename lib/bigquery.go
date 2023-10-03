@@ -3,8 +3,10 @@ package lib
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"log"
 	"os"
+	"reflect"
 	"time"
 
 	"cloud.google.com/go/bigquery"
@@ -102,6 +104,62 @@ func UpdateRowBigQuery(datasetID string, tableID string, params map[string]strin
 		return err
 	}
 	return e
+}
+
+func UpdateRowBigQueryV2(datasetId, tableId string, params map[string]interface{}, condition string) error {
+	var (
+		bytes bytes.Buffer
+		err   error
+	)
+
+	if len(params) == 0 {
+		return fmt.Errorf("no params to update")
+	}
+
+	tableSelection := fmt.Sprintf("UPDATE `%s.%s` SET ", datasetId, tableId)
+	bytes.WriteString(tableSelection)
+
+	count := 1
+	length := len(params)
+	for key, value := range params {
+		var query string
+		if reflect.TypeOf(value).String() == "string" {
+			query = key + "=" + "'" + reflect.ValueOf(value).String() + "'"
+		} else {
+			query = key + "=" + reflect.ValueOf(value).String()
+		}
+		if count < length {
+			query = query + ", "
+		} else {
+			query = query + " "
+		}
+		bytes.WriteString(query)
+		count = count + 1
+	}
+	bytes.WriteString(condition)
+	queryString := bytes.String()
+	log.Printf("[UpdateRowBigQueryV2] query: %s", queryString)
+
+	client := getBigqueryClient()
+	defer client.Close()
+	ctx := context.Background()
+	query := client.Query(queryString)
+	job, err := query.Run(ctx)
+	if err != nil {
+		log.Printf("[UpdateRowBigQueryV2] error running query: %s", err.Error())
+		return err
+	}
+	status, err := job.Wait(ctx)
+	if err != nil {
+		log.Printf("[UpdateRowBigQueryV2] error waiting for job to run: %s", err.Error())
+		return err
+	}
+	if err := status.Err(); err != nil {
+		log.Printf("[UpdateRowBigQueryV2] error on job: %s", err.Error())
+		return err
+	}
+
+	return err
 }
 
 func GetBigQueryNullDateTime(date time.Time) bigquery.NullDateTime {
