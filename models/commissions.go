@@ -8,6 +8,8 @@ type CommissionsSetting struct {
 }
 
 type Commissions struct {
-	NewBusiness float64 `json:"newBusiness" firestore:"newBusiness" bigquery:"-"`
-	Renew       float64 `json:"renew" firestore:"renew" bigquery:"-"`
+	NewBusiness        float64 `json:"newBusiness" firestore:"newBusiness" bigquery:"-"`
+	Renew              float64 `json:"renew" firestore:"renew" bigquery:"-"`
+	NewBusinessPassive float64 `json:"newBusinessPassive" firestore:"newBusinessPassive" bigquery:"-"`
+	RenewPassive       float64 `json:"renewPassive" firestore:"renewPassive" bigquery:"-"`
 }

@@ -33,7 +33,7 @@ type NetworkTransaction struct {
 	AmountNet        float64               `json:"amountNet" bigquery:"amountNet"`
 	Name             string                `json:"name" bigquery:"name"`
 	Status           string                `json:"status" bigquery:"status"`
-	StatusHistory    string                `json:"statusHistory" bigquery:"statusHistory"`
+	StatusHistory    []string              `json:"statusHistory" bigquery:"statusHistory"`
 	IsPay            bool                  `json:"isPay" bigquery:"isPay"`
 	IsConfirmed      bool                  `json:"isConfirmed" bigquery:"isConfirmed"`
 	CreationDate     bigquery.NullDateTime `json:"creationDate" bigquery:"creationDate"`

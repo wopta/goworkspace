@@ -60,6 +60,7 @@ type AgencyNode struct {
 }
 
 type AgentNode struct {
+	Name                     string                 `json:"name" firestore:"name" bigquery:"name"`
 	Surname                  string                 `json:"surname,omitempty" firestore:"surname,omitempty" bigquery:"surname"`
 	FiscalCode               string                 `json:"fiscalCode,omitempty" firestore:"fiscalCode,omitempty" bigquery:"fiscalCode"`
 	BirthDate                string                 `json:"birthDate,omitempty" firestore:"birthDate,omitempty" bigquery:"-"`
@@ -91,4 +92,20 @@ type AgentNode struct {
 func (nn *NetworkNode) SaveBigQuery(origin string) error {
 	log.Println("[NetworkNode.SaveBigQuery] TO BE IMPLEMENTED")
 	return nil
+}
+
+func (nn *NetworkNode) GetName() string {
+	var name string
+
+	// use constants
+	switch nn.Type {
+	case "agent":
+		name = nn.Agent.Name
+	case "agency", "broker":
+		name = nn.Agency.Name
+	case "partnership":
+		name = nn.Partnership.Name
+	}
+
+	return name
 }

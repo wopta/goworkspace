@@ -76,3 +76,72 @@ func calculateCommission(amount float64, isRenew bool, commissions *models.Commi
 
 	return lib.RoundFloat(commission, 2)
 }
+
+func calculateCommissionV2(commissions *models.Commissions, isRenew, isActive bool, amount float64) float64 {
+	var commission float64
+
+	if isRenew {
+		if isActive {
+			log.Println("[calculateCommissionV2] commission renew active")
+			commission = amount * commissions.Renew
+		} else {
+			log.Println("[calculateCommissionV2] commission renew passive")
+			commission = amount * commissions.RenewPassive
+		}
+	} else {
+		if isActive {
+			log.Println("[calculateCommissionV2] commission renew active")
+			commission = amount * commissions.NewBusiness
+		} else {
+			log.Println("[calculateCommissionV2] commission renew passive")
+			commission = amount * commissions.NewBusinessPassive
+		}
+	}
+
+	return lib.RoundFloat(commission, 2)
+}
+
+func GetCommissionByNode(policy *models.Policy, prod *models.Product, isActive bool) float64 {
+	log.Println("[GetCommissionByNode]")
+
+	var (
+		amountNet, commissionValue float64
+	)
+
+	switch policy.PaymentSplit {
+	case string(models.PaySplitMonthly), string(models.PaySplitSemestral):
+		amountNet = policy.PriceNettMonthly
+		log.Printf("[GetCommissionByNode] using PriceNettMonthly as amountNet: %g", amountNet)
+	default:
+		amountNet = policy.PriceNett
+		log.Printf("[GetCommissionByNode] using PriceNett as amountNet: %g", amountNet)
+	}
+
+	for _, company := range prod.Companies {
+		if policy.Company == company.Name {
+			if company.CommissionSetting.IsFlat {
+				log.Println("[GetCommissionByNode] Flat commission")
+				return calculateCommissionV2(company.CommissionSetting.Commissions, policy.IsRenew, isActive, amountNet)
+			}
+
+			if company.CommissionSetting.IsByOffer {
+				log.Println("[GetCommissionByNode] By offer commission")
+				return calculateCommissionV2(prod.Offers[policy.OfferlName].Commissions, policy.IsRenew, isActive, amountNet)
+			}
+
+			log.Println("[GetCommissionByNode] By guarantee commission")
+			for _, asset := range policy.Assets {
+				for _, guarantee := range asset.Guarantees {
+					if policy.PaymentSplit == string(models.PaySplitMonthly) {
+						amountNet = guarantee.Value.PremiumNetMonthly
+					} else {
+						amountNet = guarantee.Value.PremiumNetYearly
+					}
+					commissionValue += calculateCommissionV2(guarantee.Commissions, policy.IsRenew, isActive, amountNet)
+				}
+			}
+		}
+	}
+
+	return commissionValue
+}
