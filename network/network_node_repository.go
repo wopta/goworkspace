@@ -2,6 +2,8 @@ package network
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
@@ -21,10 +23,18 @@ func GetNodeByUid(uid string) (models.NetworkNode, error) {
 	return *node, err
 }
 
-func CreateNode(node models.NetworkNode) (string, error) {
+func initNode(node *models.NetworkNode) {
 	if len(node.Uid) == 0 {
 		node.Uid = lib.NewDoc(models.NetworkNodesCollection)
 	}
+	now := time.Now().UTC()
+	node.CreationDate, node.UpdatedDate = now, now
+	node.NetworkUid = node.NetworkCode
+	node.IsActive = true
+}
+
+func CreateNode(node models.NetworkNode) (string, error) {
+	initNode(&node)
 	return node.Uid, lib.SetFirestoreErr(models.NetworkNodesCollection, node.Uid, node)
 }
 
@@ -41,6 +51,7 @@ func GetNodeByUidBigQuery(uid string) (models.NetworkNode, error) {
 }
 
 func CreateNodeBigQuery(node models.NetworkNode) error {
+	initNode(&node)
 	return lib.InsertRowsBigQuery(models.WoptaDataset, models.NetworkNodesCollection, node)
 }
 
