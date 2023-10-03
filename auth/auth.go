@@ -12,7 +12,7 @@ import (
 var origin string
 
 func init() {
-	log.Println("INIT AppcheckProxy")
+	log.Println("INIT Auth")
 	functions.HTTP("Auth", Auth)
 }
 
