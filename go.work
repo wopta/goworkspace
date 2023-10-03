@@ -32,4 +32,5 @@ use(
     ./bpmn
     ./auth
     ./reserved
+    ./network
 )
