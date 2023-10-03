@@ -127,3 +127,9 @@ const (
 	FabrickPaymentProvider string = "fabrick"
 	ManualPaymentProvider  string = "payment"
 )
+
+const (
+	AgentProducerType       string = "agent"
+	AgencyProducerType      string = "agency"
+	PartnershipProducerType string = "partnership"
+)
