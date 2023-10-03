@@ -10,12 +10,14 @@ import (
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
 	"github.com/wopta/goworkspace/user"
 )
 
 var (
 	origin, paymentSplit              string
 	ccAddress, toAddress, fromAddress mail.Address
+	networkNode                       *models.NetworkNode
 )
 
 const (
@@ -59,7 +61,10 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 		toAddress = mail.GetContractorEmail(policy)
 		switch channel {
 		case models.AgentChannel:
-			ccAddress = mail.GetAgentEmail(policy)
+			ccAddress = mail.Address{
+				Name:    networkNode.Agent.Name + " " + networkNode.Agent.Surname,
+				Address: networkNode.Agent.Mail,
+			}
 		}
 	case proposalFlowKey:
 		flow = setting.ProposalFlow
@@ -68,16 +73,16 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 		switch channel {
 		case models.AgentChannel:
 			toAddress = mail.GetContractorEmail(policy)
-			ccAddress = mail.GetAgentEmail(policy)
+			ccAddress = mail.GetNetworkNodeEmail(networkNode)
 		}
 	case emitFlowKey:
 		flow = setting.EmitFlow
 		switch channel {
 		case models.AgencyChannel:
 			toAddress = mail.GetContractorEmail(policy)
-			ccAddress = mail.GetEmailByChannel(policy)
+			ccAddress = mail.GetNetworkNodeEmail(networkNode)
 		default:
-			toAddress = mail.GetEmailByChannel(policy)
+			toAddress = mail.GetNetworkNodeEmail(networkNode)
 		}
 	default:
 		log.Println("[runBrokerBpmn] error flow not set")
@@ -98,6 +103,18 @@ func addHandlers(state *bpmn.State) {
 	addProposalHandlers(state)
 	addRequestApprovalHandlers(state)
 	addEmitHandlers(state)
+}
+
+func getNetworkNode(policy models.Policy) {
+	var err error
+
+	if policy.ProducerUid != "" {
+		log.Printf("[getNetworkNode] loading producer %s from Firestore...", policy.ProducerUid)
+		*networkNode, err = network.GetNodeByUid(policy.ProducerUid)
+		if err != nil {
+			log.Printf("[getNetworkNode] error getting producer %s from Firestore", policy.ProducerUid)
+		}
+	}
 }
 
 //	======================================

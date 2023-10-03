@@ -133,3 +133,22 @@ func GetAgentEmail(policy *models.Policy) Address {
 		Address: agent.Mail,
 	}
 }
+
+func GetNetworkNodeEmail(networkNode *models.NetworkNode) Address {
+	var address Address
+
+	switch networkNode.Type {
+	case models.AgentProducerType:
+		address = Address{
+			Name:    networkNode.Agent.Name + " " + networkNode.Agent.Surname,
+			Address: networkNode.Agent.Mail,
+		}
+	case models.AgencyProducerType:
+		address = Address{
+			Name:    networkNode.Agency.Name,
+			Address: networkNode.Agency.Mail,
+		}
+	}
+
+	return address
+}

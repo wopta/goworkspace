@@ -49,14 +49,14 @@ func LeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 }
 
 func lead(policy *models.Policy) error {
-	log.Println("[lead] start --------------------------------------------")
+	var err error
 
-	var (
-		err error
-	)
+	log.Println("[lead] start --------------------------------------------")
 
 	policyFire := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 	guaranteFire := lib.GetDatasetByEnv(origin, models.GuaranteeCollection)
+
+	getNetworkNode(*policy)
 
 	log.Println("[lead] starting bpmn flow...")
 	state := runBrokerBpmn(policy, leadFlowKey)
