@@ -17,9 +17,9 @@ type Firequery struct {
 type Firequeries struct {
 	Queries []Firequery
 }
-type FireGenericQueries[T any]  struct {
+type FireGenericQueries[T any] struct {
 	Queries []Firequery
-	result []T
+	result  []T
 }
 
 func getFireClient() *firestore.Client {
@@ -194,9 +194,10 @@ func (queries *FireGenericQueries[T]) FireQuery(collection string) ([]T, error) 
 	for i := 1; i <= len(queries.Queries)-1; i++ {
 		query = query.Where(queries.Queries[i].Field, queries.Queries[i].Operator, queries.Queries[i].QueryValue)
 	}
+	q := query.Documents(ctx)
 	result := make([]T, 0)
 	for {
-		d, err := query.Next()
+		d, err := q.Next()
 		if err != nil {
 		}
 		if err != nil {
@@ -212,7 +213,6 @@ func (queries *FireGenericQueries[T]) FireQuery(collection string) ([]T, error) 
 	}
 	return result, err
 }
-
 
 func (queries *Firequeries) FirestoreWhereLimitFields(collection string, limit int) (*firestore.DocumentIterator, error) {
 	ctx := context.Background()
