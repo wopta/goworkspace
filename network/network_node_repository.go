@@ -8,18 +8,12 @@ import (
 
 func GetNodeByUid(uid string) (models.NetworkNode, error) {
 	var node *models.NetworkNode
-	docSnapshot := lib.WhereLimitFirestore(models.NetworkNodesCollection, "uid", "==", uid, 1)
-
-	documents, err := docSnapshot.GetAll()
+	docSnapshot, err := lib.GetFirestoreErr(models.NetworkNodesCollection, uid)
 
 	if err != nil {
 		return models.NetworkNode{}, fmt.Errorf("could not fetch node: %s", err.Error())
 	}
-
-	if len(documents) == 0 {
-		return models.NetworkNode{}, fmt.Errorf("could not find node with uid %s", uid)
-	}
-	err = documents[0].DataTo(node)
+	err = docSnapshot.DataTo(node)
 
 	if node == nil || err != nil {
 		return models.NetworkNode{}, fmt.Errorf("could not parse node: %s", err.Error())
@@ -36,7 +30,7 @@ func CreateNode(node models.NetworkNode) (string, error) {
 
 func GetNodeByUidBigQuery(uid string) (models.NetworkNode, error) {
 	query := "select * from `%s.%s` where uid = @uid limit 1"
-	query = fmt.Sprintf(query, models.WoptaDataset, models.NetworkNodesTable)
+	query = fmt.Sprintf(query, models.WoptaDataset, models.NetworkNodesCollection)
 	params := map[string]interface{}{"uid": uid}
 	nodes, err := lib.QueryParametrizedRowsBigQuery[models.NetworkNode](query, params)
 
@@ -47,7 +41,7 @@ func GetNodeByUidBigQuery(uid string) (models.NetworkNode, error) {
 }
 
 func CreateNodeBigQuery(node models.NetworkNode) error {
-	return lib.InsertRowsBigQuery(models.WoptaDataset, models.NetworkNodesTable, node)
+	return lib.InsertRowsBigQuery(models.WoptaDataset, models.NetworkNodesCollection, node)
 }
 
 func GetAllSubNodesFromNodeBigQuery(uid string) ([]models.NetworkNode, error) {
@@ -74,7 +68,7 @@ func GetAllSubNodesFromNodeBigQuery(uid string) ([]models.NetworkNode, error) {
 	network n
   WHERE
 	uid <> @uid`
-	query = fmt.Sprintf(query, models.WoptaDataset, models.NetworkNodesTable, models.WoptaDataset, models.NetworkNodesTable)
+	query = fmt.Sprintf(query, models.WoptaDataset, models.NetworkNodesCollection, models.WoptaDataset, models.NetworkNodesCollection)
 	params := map[string]interface{}{"uid": uid}
 	nodes, err := lib.QueryParametrizedRowsBigQuery[models.NetworkNode](query, params)
 
@@ -108,7 +102,7 @@ func GetAllParentNodesFromNode(uid string) ([]models.NetworkNode, error) {
 	network n
   WHERE
 	uid <> @uid`
-	query = fmt.Sprintf(query, models.WoptaDataset, models.NetworkNodesTable, models.WoptaDataset, models.NetworkNodesTable)
+	query = fmt.Sprintf(query, models.WoptaDataset, models.NetworkNodesCollection, models.WoptaDataset, models.NetworkNodesCollection)
 	params := map[string]interface{}{"uid": uid}
 	nodes, err := lib.QueryParametrizedRowsBigQuery[models.NetworkNode](query, params)
 
