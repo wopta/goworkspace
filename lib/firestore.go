@@ -51,6 +51,11 @@ func GetFirestore(collection string, doc string) *firestore.DocumentSnapshot {
 func GetFirestoreErr(collection string, doc string) (*firestore.DocumentSnapshot, error) {
 	ctx := context.Background()
 	client, err := firestore.NewClient(ctx, os.Getenv("GOOGLE_PROJECT_ID"))
+
+	if err != nil {
+		return nil, err
+	}
+
 	c := client.Collection(collection)
 	col := c.Doc(doc)
 	docsnap, err := col.Get(ctx)
