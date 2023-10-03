@@ -84,7 +84,7 @@ func loadProducerInfo(origin string, policy *models.Policy) map[string]string {
 		"ruiRegistration": "02.03.2022",
 	}
 
-	if policy.ProducerUid == "" || policy.ProducerType == models.PartnershipProducerType {
+	if policy.ProducerUid == "" || strings.EqualFold(policy.ProducerType, models.PartnershipProducerType) {
 		jsonProducer, _ := json.Marshal(policyProducer)
 		log.Printf("[loadProducerInfo] producer info %s", string(jsonProducer))
 		return policyProducer
@@ -95,9 +95,9 @@ func loadProducerInfo(origin string, policy *models.Policy) map[string]string {
 	networkNode, err := network.GetNodeByUid(policy.ProducerUid)
 	lib.CheckError(err)
 
-	log.Printf("[loadProducerInfo] setting producer %s info, producerType", policy.ProducerUid, policy.ProducerType)
+	log.Printf("[loadProducerInfo] setting producer %s info, producerType %s", policy.ProducerUid, policy.ProducerType)
 
-	switch policy.ProducerType {
+	switch networkNode.Type {
 	case models.AgentProducerType:
 		policyProducer["name"] = strings.ToUpper(networkNode.Agent.Surname) + " " + strings.ToUpper(networkNode.Agent.Name)
 		policyProducer["ruiSection"] = networkNode.Agent.RuiSection
