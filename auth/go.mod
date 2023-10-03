@@ -6,7 +6,7 @@ replace github.com/wopta/goworkspace/auth => ./
 
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.4
-	github.com/wopta/goworkspace/lib v1.0.66
+	github.com/wopta/goworkspace/lib v1.0.72
 	github.com/wopta/goworkspace/models v1.1.25
 )
 
