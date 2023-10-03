@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
@@ -36,17 +37,10 @@ func GetPolicyTransactionsFx(w http.ResponseWriter, r *http.Request) (string, in
 
 	userUid := authToken.UserID
 
-	switch authToken.Role {
-	case models.UserRoleAgent:
-		if policy.AgentUid != userUid {
-			log.Printf("[GetPolicyTransactionsFx] policy %s is not included in agent %s", policyUid, userUid)
-			return "", response, fmt.Errorf("agent %s unauthorized for policy %s", userUid, policyUid)
-		}
-	case models.UserRoleAgency:
-		if policy.AgencyUid != userUid {
-			log.Printf("[GetPolicyTransactionsFx] policy %s is not included in agency %s", policyUid, userUid)
-			return "", response, fmt.Errorf("agency %s unauthorized for policy %s", userUid, policyUid)
-		}
+	isAgentOrAgency := strings.EqualFold(authToken.Role, models.UserRoleAgent) || strings.EqualFold(authToken.Role, models.UserRoleAgency)
+	if isAgentOrAgency && policy.ProducerUid != userUid {
+		log.Printf("[GetPolicyTransactionsFx] policy %s is not included in %s %s portfolio", policyUid, authToken.Role, userUid)
+		return "", response, fmt.Errorf("%s %s unauthorized for policy %s", authToken.Role, userUid, policyUid)
 	}
 
 	transactions := transaction.GetPolicyTransactions(r.Header.Get("origin"), policyUid)
