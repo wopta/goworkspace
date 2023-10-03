@@ -56,6 +56,42 @@ func QueryRowsBigQuery[T any](query string) ([]T, error) {
 	}
 
 }
+
+func QueryParametrizedRowsBigQuery[T any](query string, params map[string]interface{}) ([]T, error) {
+	var (
+		res  []T
+		e    error
+		iter *bigquery.RowIterator
+	)
+	log.Println(query)
+	client := getBigqueryClient()
+	ctx := context.Background()
+	defer client.Close()
+	queryBigQuery := client.Query(query)
+
+	for name, value := range params {
+		queryBigQuery.Parameters = append(queryBigQuery.Parameters, bigquery.QueryParameter{Name: name, Value: value})
+	}
+
+	iter, e = queryBigQuery.Read(ctx)
+	log.Println(e)
+	for {
+		var row T
+		e := iter.Next(&row)
+		log.Println(e)
+		if e == iterator.Done {
+			return res, e
+		}
+		if e != nil {
+			return res, e
+		}
+		log.Println(e)
+		res = append(res, row)
+
+	}
+
+}
+
 func UpdateRowBigQuery(datasetID string, tableID string, params map[string]string, condiction string) error {
 	var (
 		e error
