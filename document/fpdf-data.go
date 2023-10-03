@@ -10,7 +10,6 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/network"
 	"github.com/wopta/goworkspace/product"
 )
 
@@ -76,7 +75,7 @@ func loadLifeBeneficiariesInfo(policy *models.Policy) ([]map[string]string, stri
 	return beneficiaries, legitimateSuccessorsChoice, designatedSuccessorsChoice
 }
 
-func loadProducerInfo(origin string, policy *models.Policy) map[string]string {
+func loadProducerInfo(origin string, networkNode *models.NetworkNode) map[string]string {
 	policyProducer := map[string]string{
 		"name":            "LOMAZZI MICHELE",
 		"ruiSection":      "A",
@@ -84,18 +83,13 @@ func loadProducerInfo(origin string, policy *models.Policy) map[string]string {
 		"ruiRegistration": "02.03.2022",
 	}
 
-	if policy.ProducerUid == "" || strings.EqualFold(policy.ProducerType, models.PartnershipProducerType) {
+	if networkNode == nil || strings.EqualFold(networkNode.Type, models.PartnershipProducerType) {
 		jsonProducer, _ := json.Marshal(policyProducer)
 		log.Printf("[loadProducerInfo] producer info %s", string(jsonProducer))
 		return policyProducer
 	}
 
-	log.Printf("[loadProducerInfo] loading producer %s data from Firestore...", policy.ProducerUid)
-
-	networkNode, err := network.GetNodeByUid(policy.ProducerUid)
-	lib.CheckError(err)
-
-	log.Printf("[loadProducerInfo] setting producer %s info, producerType %s", policy.ProducerUid, policy.ProducerType)
+	log.Printf("[loadProducerInfo] setting producer %s info, producerType %s", networkNode.Uid, networkNode.Type)
 
 	switch networkNode.Type {
 	case models.AgentProducerType:

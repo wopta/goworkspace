@@ -146,6 +146,8 @@ func emitV2(policy *models.Policy, request EmitRequest, origin string) EmitRespo
 	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 	fireGuarantee := lib.GetDatasetByEnv(origin, models.GuaranteeCollection)
 
+	getNetworkNode(*policy)
+
 	log.Printf("[Emit] Emitting - Policy Uid %s", policy.Uid)
 	log.Println("[Emit] starting bpmn flow...")
 	state := runBrokerBpmn(policy, emitFlowKey)
@@ -242,7 +244,7 @@ func emitSign(policy *models.Policy, origin string) {
 	policy.Status = models.PolicyStatusToSign
 	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusContact, models.PolicyStatusToSign)
 
-	p := <-document.ContractObj(origin, *policy)
+	p := <-document.ContractObj(origin, *policy, networkNode)
 	policy.DocumentName = p.LinkGcs
 	_, signResponse, _ := document.NamirialOtpV6(*policy, origin)
 	policy.ContractFileId = signResponse.FileId
