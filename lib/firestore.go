@@ -17,6 +17,10 @@ type Firequery struct {
 type Firequeries struct {
 	Queries []Firequery
 }
+type FireGenericQueries[T any]  struct {
+	Queries []Firequery
+	result []T
+}
 
 func getFireClient() *firestore.Client {
 	ctx := context.Background()
@@ -180,6 +184,35 @@ func (queries *Firequeries) FirestoreWherefields(collection string) (*firestore.
 
 	return query.Documents(ctx), err
 }
+
+func (queries *FireGenericQueries[T]) FireQuery(collection string) ([]T, error) {
+	ctx := context.Background()
+	var query firestore.Query
+	client, err := firestore.NewClient(ctx, os.Getenv("GOOGLE_PROJECT_ID"))
+	col := client.Collection(collection)
+	query = col.Where(queries.Queries[0].Field, queries.Queries[0].Operator, queries.Queries[0].QueryValue)
+	for i := 1; i <= len(queries.Queries)-1; i++ {
+		query = query.Where(queries.Queries[i].Field, queries.Queries[i].Operator, queries.Queries[i].QueryValue)
+	}
+	result := make([]T, 0)
+	for {
+		d, err := query.Next()
+		if err != nil {
+		}
+		if err != nil {
+			if err == iterator.Done {
+				break
+			}
+		}
+		var value T
+		e := d.DataTo(&value)
+		CheckError(e)
+		result = append(result, value)
+		log.Println(len(result))
+	}
+	return result, err
+}
+
 
 func (queries *Firequeries) FirestoreWhereLimitFields(collection string, limit int) (*firestore.DocumentIterator, error) {
 	ctx := context.Background()

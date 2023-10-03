@@ -74,7 +74,6 @@ func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, inter
 		person.CityCode = claims.UserMunicipalityCode
 		person.Work = claims.UserEmploymentSector
 		person.VatCode = claims.UserPiva
-
 		policy.Contractor = person
 		asset.Person = &person
 		policy.Assets = append(policy.Assets, asset)

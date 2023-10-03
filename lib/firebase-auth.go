@@ -21,7 +21,19 @@ func getClient() (*auth.Client, context.Context) {
 	}
 	return client, ctx
 }
-
+func CreateCustomJwt(email string, role string, id string) (string, error) {
+	
+	client, ctx := getClient()
+	claims := map[string]interface{}{
+        "role": role,
+}
+	token, err := client.CustomTokenWithClaims(ctx, id, claims)
+	if err != nil {
+			log.Fatalf("error minting custom token: %v\n", err)
+	}
+	log.Printf("Got custom token: %v\n", token)
+	return token, err
+}
 func CreateUserWithEmailAndPassword(email string, password string, id *string) (*auth.UserRecord, error) {
 	client, ctx := getClient()
 	params := (&auth.UserToCreate{}).
