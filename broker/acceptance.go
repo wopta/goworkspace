@@ -74,11 +74,13 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	}
 	log.Printf("[AcceptanceFx] Policy: %s", string(policyJsonLog))
 
+	getNetworkNode(policy)
+
 	log.Println("[AcceptanceFx] sending acceptance email...")
 	mail.SendMailReservedResult(
 		policy,
 		mail.AddressAssunzione,
-		mail.GetAgentEmail(&policy),
+		mail.GetNetworkNodeEmail(networkNode),
 		mail.Address{},
 	)
 
