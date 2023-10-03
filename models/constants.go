@@ -57,6 +57,7 @@ const (
 
 const (
 	PartnershipBeProf string = "beprof"
+	PartnershipFacile string = "facile"
 )
 
 const (
@@ -86,16 +87,18 @@ const (
 	ClaimsCollection       string = "claims" //only for bigquery
 	AuditsCollection       string = "audits"
 	GuaranteeCollection    string = "guarante"
-	NetworkNodeCollection  string = "network-nodes"
+	NetworkNodesCollection string = "networkNodes"
 )
 
 const (
 	VehiclePrivateUse string = "private"
 )
+
 const (
 	BeneficiaryLegalAndWillSuccessors string = "legalAndWillSuccessors"
 	BeneficiaryChosenBeneficiary      string = "chosenBeneficiary"
 )
+
 const (
 	LifeProduct    string = "life"
 	PmiProduct     string = "pmi"
