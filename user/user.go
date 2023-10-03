@@ -83,6 +83,12 @@ func User(w http.ResponseWriter, r *http.Request) {
 				Roles:   []string{models.UserRoleAdmin},
 			},
 			{
+				Route:   "/invite/v2/create",
+				Handler: CreateInviteV2Fx,
+				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAdmin},
+			},
+			{
 				Route:   "/invite/v1/consume",
 				Handler: ConsumeInviteFx,
 				Method:  http.MethodPost,
