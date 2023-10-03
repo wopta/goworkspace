@@ -38,7 +38,7 @@ func Auth(w http.ResponseWriter, r *http.Request) {
 			},
 			{
 				Route:   "/token/v1/sso/jwt/aua/",
-				Handler: TokenFx,
+				Handler: JwtFx,
 				Method:  http.MethodGet,
 				Roles:   []string{models.UserRoleAll},
 			},
