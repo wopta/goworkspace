@@ -275,11 +275,16 @@ func PolicyToListData(query *firestore.DocumentIterator) []Policy {
 }
 
 func GetChannel(policy *Policy) string {
-	if policy.AgentUid != "" {
-		return AgentChannel
+	var channel string
+
+	switch policy.ProducerType {
+	case AgentProducerType:
+		channel = AgentChannel
+	case AgencyProducerType:
+		channel = AgencyChannel
+	default:
+		channel = ECommerceChannel
 	}
-	if policy.AgencyUid != "" {
-		return AgencyChannel
-	}
-	return ECommerceChannel
+
+	return channel
 }
