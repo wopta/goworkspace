@@ -12,7 +12,7 @@ import (
 )
 
 func JwtFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.Println("--------------------------AuthorizeFx-------------------------------------------")
+	log.Println("--------------------------JwtFx-------------------------------------------")
 	var (
 		tokenString string
 		e           error
@@ -20,6 +20,7 @@ func JwtFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 	)
 	origin = r.Header.Get("Origin")
 	tokenReq := r.URL.Query().Get("jwt")
+	log.Println("JwtFx request token:", tokenReq)
 	claims, isvalid, e := verifyAuaJwt(tokenReq)
 
 	if isvalid {
