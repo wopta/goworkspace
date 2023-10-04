@@ -10,6 +10,7 @@ import (
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
 	plc "github.com/wopta/goworkspace/policy"
 	tr "github.com/wopta/goworkspace/transaction"
 )
@@ -21,6 +22,7 @@ var (
 	ccAddress     mail.Address
 	toAddress     mail.Address
 	fromAddress   mail.Address
+	networkNode   *models.NetworkNode
 )
 
 const (
@@ -53,6 +55,8 @@ func runCallbackBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 
 	state := bpmn.NewBpmn(*policy)
 
+	networkNode = network.GetNetworkNodeByUid(policy.ProductUid)
+
 	// TODO: fix me - maybe get to/from/cc from setting.json?
 	switch flowKey {
 	case signFlowKey:
@@ -60,9 +64,9 @@ func runCallbackBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 		switch channel {
 		case models.AgencyChannel:
 			toAddress = mail.GetContractorEmail(policy)
-			ccAddress = mail.GetEmailByChannel(policy)
+			ccAddress = mail.GetNetworkNodeEmail(networkNode)
 		default:
-			toAddress = mail.GetEmailByChannel(policy)
+			toAddress = mail.GetNetworkNodeEmail(networkNode)
 			ccAddress = mail.Address{}
 		}
 	case payFlowKey:
@@ -70,9 +74,9 @@ func runCallbackBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 		switch channel {
 		case models.AgentChannel:
 			toAddress = mail.GetContractorEmail(policy)
-			ccAddress = mail.GetEmailByChannel(policy)
+			ccAddress = mail.GetNetworkNodeEmail(networkNode)
 		default:
-			toAddress = mail.GetEmailByChannel(policy)
+			toAddress = mail.GetNetworkNodeEmail(networkNode)
 			ccAddress = mail.Address{}
 		}
 	default:
@@ -215,17 +219,9 @@ func updatePolicy(state *bpmn.State) error {
 		return err
 	}
 
-	// Update agency if present
-	err = models.UpdateAgencyPortfolio(policy, origin)
-	if err != nil && err.Error() != "agency not set" {
-		log.Printf("[updatePolicy] ERROR updateAgencyPortfolio %s", err.Error())
-		return err
-	}
-
-	// Update agent if present
-	err = models.UpdateAgentPortfolio(policy, origin)
-	if err != nil && err.Error() != "agent not set" {
-		log.Printf("[updatePolicy] ERROR UpdateAgentPortfolio %s", err.Error())
+	err = network.UpdateNetworkNodePortfolio(origin, policy, networkNode)
+	if err != nil {
+		log.Printf("[updatePolicy] error updating %s portfolio %s", networkNode.Type, err.Error())
 		return err
 	}
 
