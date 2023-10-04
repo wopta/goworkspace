@@ -199,7 +199,7 @@ func getFabrickPayments(data models.Policy, firstSchedule bool, scheduleDate str
 			OnSuccess: "https://www.wopta.it",
 			OnFailure: "https://www.wopta.it",
 		},
-		ExpirationDate: time.Now().UTC().AddDate(10, 0, 0).Format(time.RFC3339),
+		ExpirationDate: time.Now().UTC().AddDate(10, 0, 0).Format("2006-01-02T15:04:05.999999999Z"),
 		AllowedPaymentMethods: &[]AllowedPaymentMethod{{Role: "payer", PaymentMethods: lib.SliceMap(paymentMethods,
 			func(item string) string { return strings.ToUpper(item) })}},
 		CallbackURL: callbackUrl,
