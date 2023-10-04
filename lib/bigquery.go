@@ -47,7 +47,7 @@ func QueryRowsBigQuery[T any](query string) ([]T, error) {
 		e := iter.Next(&row)
 		log.Println(e)
 		if e == iterator.Done {
-			return res, e
+			return res, nil
 		}
 		if e != nil {
 			return res, e
