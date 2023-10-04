@@ -2,6 +2,7 @@ package network
 
 import (
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/wopta/goworkspace/lib"
@@ -121,4 +122,30 @@ func GetAllParentNodesFromNodeBigQuery(uid string) ([]models.NetworkNode, error)
 		return []models.NetworkNode{}, fmt.Errorf("could not find node with uid %s", uid)
 	}
 	return nodes, err
+}
+
+func UpdateNetworkNodePortfolio(origin string, policy *models.Policy, networkNode *models.NetworkNode) error {
+	log.Printf("[UpdateNetworkNodePortfolio] adding policy %s to networkNode %s portfolio", policy.Uid, networkNode.Uid)
+
+	networkNode.Policies = append(networkNode.Policies, policy.Uid)
+
+	if !lib.SliceContains(networkNode.Users, policy.Contractor.Uid) {
+		log.Printf("[UpdateNetworkNodePortfolio] adding user %s to networkNode %s users list", policy.Contractor.Uid, networkNode.Uid)
+		networkNode.Users = append(networkNode.Users, policy.Contractor.Uid)
+	}
+
+	networkNode.UpdatedDate = time.Now().UTC()
+	
+	log.Printf("[UpdateNetworkNodePortfolio] saving networkNode %s to Firestore...", networkNode.Uid)
+	fireNetwork := lib.GetDatasetByEnv(origin, models.NetworkNodesCollection)
+	err := lib.SetFirestoreErr(fireNetwork, networkNode.Uid, networkNode)
+	if err != nil {
+		log.Printf("[UpdateNetworkNodePortfolio] error saving networkNode %s to Firestore: %s", networkNode.Uid, err.Error())
+		return err
+	}
+
+	log.Printf("[UpdateNetworkNodePortfolio] saving networkNode %s to BigQuery...", networkNode.Uid)
+	err = networkNode.SaveBigQuery(origin)
+
+	return err
 }

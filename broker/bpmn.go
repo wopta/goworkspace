@@ -203,7 +203,8 @@ func addEmitHandlers(state *bpmn.State) {
 	state.AddTaskHandler("sign", sign)
 	state.AddTaskHandler("pay", pay)
 	state.AddTaskHandler("setAdvice", setAdvanceBpm)
-	state.AddTaskHandler("putUser", updateUserAndAgency)
+	// state.AddTaskHandler("putUser", updateUserAndAgency)
+	state.AddTaskHandler("putUser", updateUserAndNetworkNode)
 }
 
 func emitData(state *bpmn.State) error {
@@ -248,8 +249,14 @@ func setAdvanceBpm(state *bpmn.State) error {
 	return nil
 }
 
-func updateUserAndAgency(state *bpmn.State) error {
+// func updateUserAndAgency(state *bpmn.State) error {
+// 	policy := state.Data
+// 	user.SetUserIntoPolicyContractor(policy, origin)
+// 	return models.UpdateAgencyPortfolio(policy, origin)
+// }
+
+func updateUserAndNetworkNode(state *bpmn.State) error {
 	policy := state.Data
 	user.SetUserIntoPolicyContractor(policy, origin)
-	return models.UpdateAgencyPortfolio(policy, origin)
+	return network.UpdateNetworkNodePortfolio(origin, policy, networkNode)
 }
