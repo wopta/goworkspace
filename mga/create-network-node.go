@@ -16,19 +16,22 @@ type CreateNetworkNodeRequest struct {
 	Type        string                  `json:"type"`
 	Role        string                  `json:"role"`
 	NetworkCode string                  `json:"networkCode"`
+	ManagerUid  string                  `json:"managerUid,omitempty"`
+	ParentUid   string                  `json:"parentUid,omitempty"`
 	Agent       *models.AgentNode       `json:"agent,omitempty"`
 	Agency      *models.AgencyNode      `json:"agency,omitempty"`
 	Broker      *models.AgencyNode      `json:"broker,omitempty"`
 	Partnership *models.PartnershipNode `json:"partnership,omitempty"`
+	Products    []models.Product        `json:"products,omitempty"`
 }
 
 func CreateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.Println("[CreateNetworkNodeFx] Handler start -------------------------")
-
 	var (
 		request CreateNetworkNodeRequest
 		err     error
 	)
+
+	log.Println("[CreateNetworkNodeFx] Handler start -------------------------")
 
 	origin := r.Header.Get("Origin")
 	body := lib.ErrorByte(io.ReadAll(r.Body))
@@ -73,6 +76,7 @@ func createNetworkNode(request CreateNetworkNodeRequest, origin string) *models.
 		Agency:       request.Agency,
 		Broker:       request.Broker,
 		Partnership:  request.Partnership,
+		Products:     request.Products,
 		IsActive:     true,
 		CreationDate: now,
 		UpdatedDate:  now,

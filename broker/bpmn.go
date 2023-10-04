@@ -237,12 +237,6 @@ func setAdvanceBpm(state *bpmn.State) error {
 	return nil
 }
 
-// func updateUserAndAgency(state *bpmn.State) error {
-// 	policy := state.Data
-// 	user.SetUserIntoPolicyContractor(policy, origin)
-// 	return models.UpdateAgencyPortfolio(policy, origin)
-// }
-
 func updateUserAndNetworkNode(state *bpmn.State) error {
 	policy := state.Data
 	user.SetUserIntoPolicyContractor(policy, origin)
