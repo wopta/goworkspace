@@ -1,7 +1,6 @@
 package payment
 
 import (
-	"cloud.google.com/go/civil"
 	"encoding/json"
 	"io"
 	"log"
@@ -9,6 +8,8 @@ import (
 	"os"
 	"strings"
 	"time"
+
+	"cloud.google.com/go/civil"
 
 	"github.com/google/uuid"
 	"github.com/wopta/goworkspace/lib"
@@ -194,15 +195,18 @@ func getFabrickPayments(data models.Policy, firstSchedule bool, scheduleDate str
 
 	log.Printf("[getFabrickPayments] Policy %s callbackUrl: %s", data.Uid, callbackUrl)
 
-	tmpExpireDate, err := time.Parse(models.TimeDateOnly, expireDate)
-	lib.CheckError(err)
+	if expireDate != "" {
+		tmpExpireDate, err := time.Parse(models.TimeDateOnly, expireDate)
+		lib.CheckError(err)
+		expireDate = tmpExpireDate.Format("2006-01-02T15:04:05.999999999Z")
+	}
 
 	pay.PaymentConfiguration = PaymentConfiguration{
 		PaymentPageRedirectUrls: PaymentPageRedirectUrls{
 			OnSuccess: "https://www.wopta.it",
 			OnFailure: "https://www.wopta.it",
 		},
-		ExpirationDate: tmpExpireDate.Format("2006-01-02T15:04:05.999999999Z"),
+		ExpirationDate: expireDate,
 		AllowedPaymentMethods: &[]AllowedPaymentMethod{{Role: "payer", PaymentMethods: lib.SliceMap(paymentMethods,
 			func(item string) string { return strings.ToUpper(item) })}},
 		CallbackURL: callbackUrl,
