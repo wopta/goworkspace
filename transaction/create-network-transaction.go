@@ -78,6 +78,8 @@ func createNetworkTransaction(
 }
 
 func createCompanyNetworkTransaction(policy *models.Policy, transaction *models.Transaction) (*models.NetworkTransaction, error) {
+	log.Println("[createCompanyNetworkTransaction]")
+
 	prod, err := product.GetProduct(policy.Name, policy.ProductVersion, models.UserRoleAdmin)
 	if err != nil {
 		log.Printf("[createCompanyNetworkTransaction] error getting mga product: %s", err.Error())
@@ -98,6 +100,8 @@ func createCompanyNetworkTransaction(policy *models.Policy, transaction *models.
 }
 
 func CreateNetworkTransactions(policy *models.Policy, transaction *models.Transaction) error {
+	log.Println("[CreateNetworkTransactions]")
+
 	var (
 		err error
 	)

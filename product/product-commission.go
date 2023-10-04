@@ -78,27 +78,31 @@ func calculateCommission(amount float64, isRenew bool, commissions *models.Commi
 }
 
 func calculateCommissionV2(commissions *models.Commissions, isRenew, isActive bool, amount float64) float64 {
+	log.Printf("[calculateCommissionV2] amount: %f", amount)
 	var commission float64
 
 	if isRenew {
 		if isActive {
-			log.Println("[calculateCommissionV2] commission renew active")
+			log.Printf("[calculateCommissionV2] commission renew active at %f", commissions.Renew)
 			commission = amount * commissions.Renew
 		} else {
-			log.Println("[calculateCommissionV2] commission renew passive")
+			log.Printf("[calculateCommissionV2] commission renew passive at %f", commissions.RenewPassive)
 			commission = amount * commissions.RenewPassive
 		}
 	} else {
 		if isActive {
-			log.Println("[calculateCommissionV2] commission renew active")
+			log.Printf("[calculateCommissionV2] commission renew active at %f", commissions.NewBusiness)
 			commission = amount * commissions.NewBusiness
 		} else {
-			log.Println("[calculateCommissionV2] commission renew passive")
+			log.Printf("[calculateCommissionV2] commission renew passive at %f", commissions.NewBusinessPassive)
 			commission = amount * commissions.NewBusinessPassive
 		}
 	}
 
-	return lib.RoundFloat(commission, 2)
+	commission = lib.RoundFloat(commission, 2)
+	log.Printf("[calculateCommissionV2] calculated commission: %f", commission)
+
+	return commission
 }
 
 func GetCommissionByNode(policy *models.Policy, prod *models.Product, isActive bool) float64 {
