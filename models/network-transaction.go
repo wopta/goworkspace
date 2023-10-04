@@ -52,7 +52,7 @@ func (nt *NetworkTransaction) SaveBigQuery() error {
 	)
 
 	baseQuery := fmt.Sprintf("SELECT * FROM `%s.%s` WHERE ", datasetId, tableId)
-	whereClause := fmt.Sprintf("uid = %s", nt.Uid)
+	whereClause := fmt.Sprintf("uid = '%s'", nt.Uid)
 	query := fmt.Sprintf("%s %s", baseQuery, whereClause)
 
 	result, err := lib.QueryRowsBigQuery[NetworkTransaction](query)
