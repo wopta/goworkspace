@@ -9,19 +9,19 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
-func GetNodeByUid(uid string) (models.NetworkNode, error) {
+func GetNodeByUid(uid string) (*models.NetworkNode, error) {
 	var node *models.NetworkNode
 	docSnapshot, err := lib.GetFirestoreErr(models.NetworkNodesCollection, uid)
 
 	if err != nil {
-		return models.NetworkNode{}, fmt.Errorf("could not fetch node: %s", err.Error())
+		return nil, fmt.Errorf("could not fetch node: %s", err.Error())
 	}
 	err = docSnapshot.DataTo(&node)
 
 	if node == nil || err != nil {
-		return models.NetworkNode{}, fmt.Errorf("could not parse node: %s", err.Error())
+		return nil, fmt.Errorf("could not parse node: %s", err.Error())
 	}
-	return *node, err
+	return node, err
 }
 
 func initNode(node *models.NetworkNode) {

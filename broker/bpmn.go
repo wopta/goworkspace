@@ -110,7 +110,7 @@ func getNetworkNode(policy models.Policy) {
 
 	if policy.ProducerUid != "" {
 		log.Printf("[getNetworkNode] loading producer %s from Firestore...", policy.ProducerUid)
-		*networkNode, err = network.GetNodeByUid(policy.ProducerUid)
+		networkNode, err = network.GetNodeByUid(policy.ProducerUid)
 		if err != nil {
 			log.Printf("[getNetworkNode] error getting producer %s from Firestore", policy.ProducerUid)
 		}

@@ -1,4 +1,4 @@
-package broker
+ package broker
 
 import (
 	"encoding/json"
@@ -23,6 +23,8 @@ func LeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	origin = r.Header.Get("Origin")
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
+
+	// TODO: extract producer data from Token
 
 	log.Printf("[LeadFx] request: %s", string(body))
 	err = json.Unmarshal([]byte(body), &policy)
