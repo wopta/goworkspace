@@ -146,8 +146,6 @@ func emitV2(policy *models.Policy, request EmitRequest, origin string) EmitRespo
 	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 	fireGuarantee := lib.GetDatasetByEnv(origin, models.GuaranteeCollection)
 
-	getNetworkNode(*policy)
-
 	log.Printf("[Emit] Emitting - Policy Uid %s", policy.Uid)
 	log.Println("[Emit] starting bpmn flow...")
 	state := runBrokerBpmn(policy, emitFlowKey)

@@ -58,8 +58,6 @@ func lead(policy *models.Policy) error {
 	policyFire := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 	guaranteFire := lib.GetDatasetByEnv(origin, models.GuaranteeCollection)
 
-	getNetworkNode(*policy)
-
 	log.Println("[lead] starting bpmn flow...")
 	state := runBrokerBpmn(policy, leadFlowKey)
 	if state == nil || state.Data == nil {

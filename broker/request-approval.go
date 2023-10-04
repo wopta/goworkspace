@@ -73,8 +73,6 @@ func requestApproval(policy *models.Policy) error {
 
 	log.Println("[RequestApproval] start --------------------")
 
-	getNetworkNode(*policy)
-
 	log.Println("[RequestApproval] starting bpmn flow...")
 	state := runBrokerBpmn(policy, requestApprovalFlowKey)
 	if state == nil || state.Data == nil {

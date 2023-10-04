@@ -40,6 +40,7 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 	toAddress = mail.Address{}
 	ccAddress = mail.Address{}
 	fromAddress = mail.AddressAnna
+
 	channel := models.GetChannel(policy)
 	settingFile := fmt.Sprintf(settingFormat, channel)
 
@@ -54,6 +55,8 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 
 	state := bpmn.NewBpmn(*policy)
 
+	networkNode = network.GetNetworkNodeByUid(policy.ProductUid)
+
 	// TODO: fix me - maybe get to/from/cc from setting.json?
 	switch flowKey {
 	case leadFlowKey:
@@ -61,10 +64,7 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 		toAddress = mail.GetContractorEmail(policy)
 		switch channel {
 		case models.AgentChannel:
-			ccAddress = mail.Address{
-				Name:    networkNode.Agent.Name + " " + networkNode.Agent.Surname,
-				Address: networkNode.Agent.Mail,
-			}
+			ccAddress = mail.GetNetworkNodeEmail(networkNode)
 		}
 	case proposalFlowKey:
 		flow = setting.ProposalFlow
@@ -103,18 +103,6 @@ func addHandlers(state *bpmn.State) {
 	addProposalHandlers(state)
 	addRequestApprovalHandlers(state)
 	addEmitHandlers(state)
-}
-
-func getNetworkNode(policy models.Policy) {
-	var err error
-
-	if policy.ProducerUid != "" {
-		log.Printf("[getNetworkNode] loading producer %s from Firestore...", policy.ProducerUid)
-		networkNode, err = network.GetNodeByUid(policy.ProducerUid)
-		if err != nil {
-			log.Printf("[getNetworkNode] error getting producer %s from Firestore", policy.ProducerUid)
-		}
-	}
 }
 
 //	======================================
@@ -163,7 +151,7 @@ func setProposalBpm(state *bpmn.State) error {
 	setProposalData(policy)
 
 	log.Printf("[setProposalData] saving proposal n. %d to firestore...", policy.ProposalNumber)
-	
+
 	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
 }

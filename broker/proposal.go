@@ -88,8 +88,6 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 func proposal(policy *models.Policy) error {
 	log.Println("[proposal] starting bpmn flow...")
 
-	getNetworkNode(*policy)
-
 	state := runBrokerBpmn(policy, proposalFlowKey)
 	if state == nil || state.Data == nil {
 		log.Println("[proposal] error bpmn - state not set")

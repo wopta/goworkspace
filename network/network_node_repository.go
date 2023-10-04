@@ -124,6 +124,20 @@ func GetAllParentNodesFromNodeBigQuery(uid string) ([]models.NetworkNode, error)
 	return nodes, err
 }
 
+func GetNetworkNodeByUid(producerUid string) *models.NetworkNode {
+	if producerUid == "" {
+		log.Println("[GetNetworkNodeByPolicy] producerUid empty")
+		return nil
+	}
+
+	networkNode, err := GetNodeByUid(producerUid)
+	if err != nil {
+		log.Printf("[GetNetworkNodeByPolicy] error getting producer %s from Firestore", producerUid)
+	}
+
+	return networkNode
+}
+
 func UpdateNetworkNodePortfolio(origin string, policy *models.Policy, networkNode *models.NetworkNode) error {
 	log.Printf("[UpdateNetworkNodePortfolio] adding policy %s to networkNode %s portfolio", policy.Uid, networkNode.Uid)
 
@@ -135,7 +149,7 @@ func UpdateNetworkNodePortfolio(origin string, policy *models.Policy, networkNod
 	}
 
 	networkNode.UpdatedDate = time.Now().UTC()
-	
+
 	log.Printf("[UpdateNetworkNodePortfolio] saving networkNode %s to Firestore...", networkNode.Uid)
 	fireNetwork := lib.GetDatasetByEnv(origin, models.NetworkNodesCollection)
 	err := lib.SetFirestoreErr(fireNetwork, networkNode.Uid, networkNode)
