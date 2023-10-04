@@ -70,6 +70,6 @@ func verifyAuaJwt(tokenReq string) (*AuaClaims, bool, error) {
 type AuaClaims struct {
 	Id   int    `json:"codSubAgent"`
 	Name string `json:"name"`
-	Exp  string `json:"exp"`
+	Exp  int    `json:"exp"`
 	jwt.RegisteredClaims
 }
