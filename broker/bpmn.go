@@ -10,12 +10,14 @@ import (
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
 	"github.com/wopta/goworkspace/user"
 )
 
 var (
 	origin, paymentSplit              string
 	ccAddress, toAddress, fromAddress mail.Address
+	networkNode                       *models.NetworkNode
 )
 
 const (
@@ -51,6 +53,8 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 	}
 
 	state := bpmn.NewBpmn(*policy)
+
+	networkNode = network.GetNetworkNodeByUid(policy.ProductUid)
 
 	// TODO: fix me - maybe get to/from/cc from setting.json?
 	switch flowKey {

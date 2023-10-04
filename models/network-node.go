@@ -100,7 +100,7 @@ func (nn *NetworkNode) GetName() string {
 	// use constants
 	switch nn.Type {
 	case "agent":
-		name = nn.Agent.Name
+		name = nn.Agent.Name + "-" + nn.Agent.Surname
 	case "agency", "broker":
 		name = nn.Agency.Name
 	case "partnership":

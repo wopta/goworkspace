@@ -10,6 +10,7 @@ import (
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
 	plc "github.com/wopta/goworkspace/policy"
 	tr "github.com/wopta/goworkspace/transaction"
 )
@@ -21,6 +22,7 @@ var (
 	ccAddress     mail.Address
 	toAddress     mail.Address
 	fromAddress   mail.Address
+	networkNode   *models.NetworkNode
 )
 
 const (
@@ -52,6 +54,8 @@ func runCallbackBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 	}
 
 	state := bpmn.NewBpmn(*policy)
+
+	networkNode = network.GetNetworkNodeByUid(policy.ProductUid)
 
 	// TODO: fix me - maybe get to/from/cc from setting.json?
 	switch flowKey {
@@ -262,5 +266,5 @@ func payTransaction(state *bpmn.State) error {
 
 	transaction.BigQuerySave(origin)
 
-	return tr.CreateNetworkTransactions(policy, &transaction)
+	return tr.CreateNetworkTransactions(policy, &transaction, networkNode)
 }

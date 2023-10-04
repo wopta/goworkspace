@@ -77,7 +77,7 @@ func createNetworkTransaction(
 	return &netTransaction, err
 }
 
-func createCompanyNetworkTransaction(policy *models.Policy, transaction *models.Transaction) (*models.NetworkTransaction, error) {
+func createCompanyNetworkTransaction(policy *models.Policy, transaction *models.Transaction, producerNode *models.NetworkNode) (*models.NetworkTransaction, error) {
 	log.Println("[createCompanyNetworkTransaction]")
 
 	prod, err := product.GetProduct(policy.Name, policy.ProductVersion, models.UserRoleAdmin)
@@ -88,6 +88,8 @@ func createCompanyNetworkTransaction(policy *models.Policy, transaction *models.
 
 	commissionCompany := product.GetCommissionByNode(policy, prod, false)
 
+	name := strings.ToLower(strings.Join([]string{producerNode.Code, policy.Company}, "_"))
+
 	return createNetworkTransaction(
 		policy,
 		transaction,
@@ -95,31 +97,31 @@ func createCompanyNetworkTransaction(policy *models.Policy, transaction *models.
 		commissionCompany,
 		models.AccountTypePassive,
 		models.PaymentTypeRemittanceCompany,
-		policy.Company,
+		name,
 	)
 }
 
-func CreateNetworkTransactions(policy *models.Policy, transaction *models.Transaction) error {
+func CreateNetworkTransactions(policy *models.Policy, transaction *models.Transaction, producerNode *models.NetworkNode) error {
 	log.Println("[CreateNetworkTransactions]")
 
 	var (
 		err error
 	)
 
-	_, err = createCompanyNetworkTransaction(policy, transaction)
+	_, err = createCompanyNetworkTransaction(policy, transaction, producerNode)
 	if err != nil {
 		log.Printf("[CreateNetworkTransactions] error creating company network-transaction: %s", err.Error())
 		return err
 	}
 
 	if policy.ProducerUid != "" && policy.ProducerType != "partnership" { // use constant
-		network.TraverseNetworkByNodeUid(policy.ProducerUid, func(n *models.NetworkNode) {
+		network.TraverseNetworkByNodeUid(producerNode, func(currentNode *models.NetworkNode, currentName string) string {
 			var (
 				accountType, paymentType string
 				prod                     models.Product
 			)
 
-			for _, p := range n.Products {
+			for _, p := range currentNode.Products {
 				if p.Name == policy.Name {
 					prod = p
 					break
@@ -134,15 +136,17 @@ func CreateNetworkTransactions(policy *models.Policy, transaction *models.Transa
 				accountType = models.AccountTypePassive
 				paymentType = models.PaymentTypeCommission
 			}
-			name := n.GetName()
-			nodeName := strings.ToLower(strings.Join([]string{n.Uid, n.Type, name}, "."))
 
-			_, err = createNetworkTransaction(policy, transaction, n, commission, accountType, paymentType, nodeName)
+			nodeName := strings.ToLower(strings.Join([]string{currentName, currentNode.Code, currentNode.GetName()}, "_"))
+
+			_, err = createNetworkTransaction(policy, transaction, currentNode, commission, accountType, paymentType, nodeName)
 			if err != nil {
 				log.Printf("[CreateNetworkTransactions] error creating network-transaction: %s", err.Error())
 			} else {
-				log.Printf("[CreateNetworkTransactions] created network-transaction for node: %s", n.Uid)
+				log.Printf("[CreateNetworkTransactions] created network-transaction for node: %s", currentNode.Uid)
 			}
+
+			return nodeName
 		})
 	}
 
