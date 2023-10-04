@@ -50,6 +50,12 @@ func Mga(w http.ResponseWriter, r *http.Request) {
 				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},
+			{
+				Route:   "/network/node/v1/:uid",
+				Handler: DeleteNetworkNodeFx,
+				Method:  http.MethodDelete,
+				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
+			},
 		},
 	}
 
