@@ -91,6 +91,10 @@ type NodeProduct struct {
 	Version string `json:"-" firestore:"-" bigquery:"version"`
 }
 
+func (nn *NetworkNode) Marshal() ([]byte, error) {
+	return json.Marshal(nn)
+}
+
 func (nn *NetworkNode) SaveBigQuery(origin string) error {
 	log.Println("[NetworkNode.SaveBigQuery]")
 
