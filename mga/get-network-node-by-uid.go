@@ -3,6 +3,8 @@ package mga
 import (
 	"log"
 	"net/http"
+
+	"github.com/wopta/goworkspace/network"
 )
 
 func GetNetworkNodeByUidFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -11,7 +13,9 @@ func GetNetworkNodeByUidFx(w http.ResponseWriter, r *http.Request) (string, inte
 	nodeUid := r.Header.Get("uid")
 	log.Printf("[GetNetworkNodeByUidFx] Uid %s", nodeUid)
 
-	// Call network domain
+	networkNode := network.GetNetworkNodeByUid(nodeUid)
 
-	return "", "", nil
+	jsonOut, err := networkNode.Marshal()
+
+	return string(jsonOut), networkNode, err
 }
