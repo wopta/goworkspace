@@ -13,7 +13,7 @@ require (
 	github.com/wopta/goworkspace/lib v1.0.69
 	github.com/wopta/goworkspace/mail v1.0.38
 	github.com/wopta/goworkspace/models v1.1.43
-	github.com/wopta/goworkspace/payment v1.0.76
+	github.com/wopta/goworkspace/payment v1.0.77
 	github.com/wopta/goworkspace/question v1.0.1
 	github.com/wopta/goworkspace/reserved v1.0.8
 	github.com/wopta/goworkspace/transaction v1.0.16
