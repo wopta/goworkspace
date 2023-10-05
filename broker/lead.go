@@ -67,6 +67,8 @@ func lead(authToken models.AuthToken, policy *models.Policy) error {
 	policyFire := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 	guaranteFire := lib.GetDatasetByEnv(origin, models.GuaranteeCollection)
 
+	policy.Channel = authToken.GetChannelByRole()
+
 	log.Println("[lead] starting bpmn flow...")
 	state := runBrokerBpmn(policy, leadFlowKey)
 	if state == nil || state.Data == nil {
@@ -78,7 +80,6 @@ func lead(authToken models.AuthToken, policy *models.Policy) error {
 	log.Println("[lead] saving lead to firestore...")
 	policyUid := lib.NewDoc(policyFire)
 	policy.Uid = policyUid
-	policy.Channel = authToken.GetChannelByRole()
 	err = lib.SetFirestoreErr(policyFire, policyUid, policy)
 	lib.CheckError(err)
 
