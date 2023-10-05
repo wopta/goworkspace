@@ -15,12 +15,8 @@ import (
 )
 
 var (
-	origin        string
-	trSchedule    string
-	paymentMethod string
-	ccAddress     mail.Address
-	toAddress     mail.Address
-	fromAddress   mail.Address
+	origin, trSchedule, paymentMethod, channel string
+	ccAddress, toAddress, fromAddress          mail.Address
 )
 
 const (

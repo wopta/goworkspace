@@ -102,21 +102,6 @@ func addHandlers(state *bpmn.State) {
 	addEmitHandlers(state)
 }
 
-func getChannelByRole(role string) string {
-	channel := models.ECommerceChannel
-
-	switch role {
-	case models.UserRoleAdmin:
-		channel = models.MgaChannel
-	case models.UserRoleAgency:
-		channel = models.AgencyChannel
-	case models.UserRoleAgent:
-		channel = models.AgentChannel
-	}
-
-	return channel
-}
-
 //	======================================
 //	LEAD FUNCTIONS
 //	======================================

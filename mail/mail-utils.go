@@ -9,8 +9,8 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
-func setBodyData(channel string, policy models.Policy, bodyData *BodyData) {
-	switch channel {
+func setBodyData(policy models.Policy, bodyData *BodyData) {
+	switch policy.Channel {
 	case models.AgentChannel:
 		agent, err := models.GetAgentByAuthId(policy.AgentUid)
 		lib.CheckError(err)

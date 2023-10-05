@@ -78,7 +78,7 @@ func lead(authToken models.AuthToken, policy *models.Policy) error {
 	log.Println("[lead] saving lead to firestore...")
 	policyUid := lib.NewDoc(policyFire)
 	policy.Uid = policyUid
-	policy.Channel = getChannelByRole(authToken.Role)
+	policy.Channel = authToken.GetChannelByRole()
 	err = lib.SetFirestoreErr(policyFire, policyUid, policy)
 	lib.CheckError(err)
 

@@ -26,12 +26,11 @@ func SendMailLead(policy models.Policy, from, to, cc Address) {
 		linkFormat = "https://storage.googleapis.com/documents-public-dev/information-sets/%s/%s/Precontrattuale.pdf"
 		link       = fmt.Sprintf(linkFormat, policy.Name, policy.ProductVersion)
 		bodyData   = BodyData{}
-		channel    = policy.Channel
 	)
 
-	setBodyData(channel, policy, &bodyData)
+	setBodyData(policy, &bodyData)
 
-	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", channel, proposalTemplateType))
+	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", policy.Channel, proposalTemplateType))
 
 	messageBody := fillTemplate(templateFile, &bodyData)
 
@@ -57,12 +56,11 @@ func SendMailLead(policy models.Policy, from, to, cc Address) {
 func SendMailPay(policy models.Policy, from, to, cc Address) {
 	var (
 		bodyData = BodyData{}
-		channel  = policy.Channel
 	)
 
-	setBodyData(channel, policy, &bodyData)
+	setBodyData(policy, &bodyData)
 
-	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", channel, payTemplateType))
+	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", policy.Channel, payTemplateType))
 
 	messageBody := fillTemplate(templateFile, &bodyData)
 
@@ -88,12 +86,11 @@ func SendMailPay(policy models.Policy, from, to, cc Address) {
 func SendMailSign(policy models.Policy, from, to, cc Address) {
 	var (
 		bodyData = BodyData{}
-		channel  = policy.Channel
 	)
 
-	setBodyData(channel, policy, &bodyData)
+	setBodyData(policy, &bodyData)
 
-	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", channel, signTemplateType))
+	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", policy.Channel, signTemplateType))
 
 	messageBody := fillTemplate(templateFile, &bodyData)
 
@@ -119,12 +116,11 @@ func SendMailSign(policy models.Policy, from, to, cc Address) {
 func SendMailContract(policy models.Policy, at *[]Attachment, from, to, cc Address) {
 	var (
 		bodyData = BodyData{}
-		channel  = policy.Channel
 	)
 
-	setBodyData(channel, policy, &bodyData)
+	setBodyData(policy, &bodyData)
 
-	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", channel, emittedTemplateType))
+	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", policy.Channel, emittedTemplateType))
 
 	messageBody := fillTemplate(templateFile, &bodyData)
 
@@ -168,12 +164,11 @@ func SendMailReserved(policy models.Policy, from, to, cc Address) {
 	var (
 		at       []Attachment
 		bodyData = BodyData{}
-		channel  = policy.Channel
 	)
 
-	setBodyData(channel, policy, &bodyData)
+	setBodyData(policy, &bodyData)
 
-	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", channel, reservedTemplateType))
+	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", policy.Channel, reservedTemplateType))
 
 	messageBody := fillTemplate(templateFile, &bodyData)
 
@@ -219,7 +214,6 @@ func SendMailReserved(policy models.Policy, from, to, cc Address) {
 func SendMailReservedResult(policy models.Policy, from, to, cc Address) {
 	var (
 		bodyData = BodyData{}
-		channel  = policy.Channel
 		template string
 	)
 
@@ -229,9 +223,9 @@ func SendMailReservedResult(policy models.Policy, from, to, cc Address) {
 		template = reservedRejectedTemplateType
 	}
 
-	setBodyData(channel, policy, &bodyData)
+	setBodyData(policy, &bodyData)
 
-	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", channel, template))
+	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", policy.Channel, template))
 
 	title := fmt.Sprintf(
 		"Wopta per te %s - Proposta %d di %s %s",

@@ -33,3 +33,18 @@ func GetAuthTokenFromIdToken(idToken string) (AuthToken, error) {
 		Email:  token.Claims["email"].(string),
 	}, nil
 }
+
+func (at *AuthToken) GetChannelByRole() string {
+	channel := ECommerceChannel
+
+	switch at.Role {
+	case UserRoleAdmin:
+		channel = MgaChannel
+	case UserRoleAgency:
+		channel = AgencyChannel
+	case UserRoleAgent:
+		channel = AgentChannel
+	}
+
+	return channel
+}
