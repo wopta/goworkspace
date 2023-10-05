@@ -6,7 +6,6 @@ import (
 	"log"
 	"strings"
 
-	"github.com/wopta/goworkspace/auth"
 	"github.com/wopta/goworkspace/bpmn"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/mail"
