@@ -198,7 +198,7 @@ func getFabrickPayments(data models.Policy, firstSchedule bool, scheduleDate str
 	if expireDate != "" {
 		tmpExpireDate, err := time.Parse(models.TimeDateOnly, expireDate)
 		lib.CheckError(err)
-		expireDate = time.Date(tmpExpireDate.Year(), tmpExpireDate.Month(), tmpExpireDate.Day(), 2,0,0,0, time.UTC).Format("2006-01-02T15:04:05.999999999Z") //tmpExpireDate.UTC().Format("2006-01-02T15:04:05.999999999Z")
+		expireDate = time.Date(tmpExpireDate.Year(), tmpExpireDate.Month(), tmpExpireDate.Day(), 2, 30, 30, 30, time.UTC).Format("2006-01-02T15:04:05.999999999Z") //tmpExpireDate.UTC().Format("2006-01-02T15:04:05.999999999Z")
 	} else {
 		expireDate = time.Now().UTC().AddDate(10, 0, 0).Format("2006-01-02T15:04:05.999999999Z")
 	}
