@@ -61,15 +61,14 @@ func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, inter
 
 func LifePartnership(partnershipUid, jwtData string) (models.Policy, models.Product, models.NetworkNode, error) {
 	var (
-		policy      models.Policy
-		productLife models.Product
-		node        models.NetworkNode
+		policy          models.Policy
+		productLife     models.Product
+		partnershipNode models.NetworkNode
+		err error
 	)
 
-	partnershipNode, err := network.GetNodeByUid(partnershipUid)
-
-	if err != nil {
-		return policy, productLife, node, err
+	if partnershipNode, err = network.GetNodeByUid(partnershipUid); err != nil {
+		return policy, productLife, partnershipNode, err
 	}
 
 	partnershipName := partnershipNode.Partnership.Name
@@ -97,16 +96,16 @@ func LifePartnership(partnershipUid, jwtData string) (models.Policy, models.Prod
 	}
 
 	if err != nil {
-		return policy, productLife, node, err
+		return policy, productLife, partnershipNode, err
 	}
 
 	policy, err = quote.Life(models.UserRoleCustomer, policy)
 
 	if err != nil {
-		return policy, productLife, node, err
+		return policy, productLife, partnershipNode, err
 	}
 
-	return policy, productLife, node, err
+	return policy, productLife, partnershipNode, err
 }
 
 func getLatestLifeProduct(products []models.Product) models.Product {
@@ -223,9 +222,10 @@ func facilePartnership(jwtData string, policy *models.Policy, product *models.Pr
 
 		policy.Assets = append(policy.Assets, asset)
 		policy.PartnershipData = claims.ToMap()
+		return err
 	}
 
-	log.Printf("[beProfPartnership] could not validate beprof partnership JWT - %s", err.Error())
+	log.Printf("[facilePartnership] could not validate facile partnership JWT - %s", err.Error())
 	return err
 }
 
