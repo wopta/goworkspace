@@ -12,7 +12,7 @@ import (
 )
 
 func JwtFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.Println("--------------------------AuthorizeFx-------------------------------------------")
+	log.Println("--------------------------JwtFx-------------------------------------------")
 	var (
 		tokenString string
 		e           error
@@ -20,6 +20,8 @@ func JwtFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 	)
 	origin = r.Header.Get("Origin")
 	tokenReq := r.URL.Query().Get("jwt")
+	log.Println("JwtFx request token:", tokenReq)
+	log.Println("JwtFx AUAJWTSIGNKEY:", os.Getenv("AUAJWTSIGNKEY"))
 	claims, isvalid, e := verifyAuaJwt(tokenReq)
 
 	if isvalid {
@@ -32,7 +34,7 @@ func JwtFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 				},
 			},
 		}
-		node, e = q.FireQuery("network-node")
+		node, e = q.FireQuery("networkNodes")
 		if len(node) > 0 {
 
 			tokenString, e = lib.CreateCustomJwt("", "", node[0].AuthId)
@@ -51,11 +53,11 @@ func verifyAuaJwt(tokenReq string) (*AuaClaims, bool, error) {
 
 	token, e := jwt.ParseWithClaims(tokenReq, &AuaClaims{}, func(token *jwt.Token) (interface{}, error) {
 		// Don't forget to validate the alg is what you expect:
-		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
-			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header)
 		}
 		// hmacSampleSecret is a []byte containing your secret, e.g. []byte("my_secret_key")
-		return os.Getenv("AUAJWTSIGNKEY"), nil
+		return []byte(os.Getenv("AUAJWTSIGNKEY")), nil
 	})
 	if claims, ok := token.Claims.(*AuaClaims); ok && token.Valid {
 		fmt.Println(claims)
@@ -68,8 +70,8 @@ func verifyAuaJwt(tokenReq string) (*AuaClaims, bool, error) {
 }
 
 type AuaClaims struct {
-	Id   int    `json:"codSubAgent"`
+	Id   string `json:"codSubAgent"`
 	Name string `json:"name"`
-	Exp  string `json:"exp"`
+	Exp  int    `json:"exp"`
 	jwt.RegisteredClaims
 }

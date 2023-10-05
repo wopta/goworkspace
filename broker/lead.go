@@ -13,16 +13,25 @@ import (
 )
 
 func LeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.Println("[LeadFx] Handler start -----------------------------------------")
-
 	var (
 		err    error
 		policy models.Policy
 	)
 
+	log.Println("[LeadFx] Handler start -----------------------------------------")
+
 	origin = r.Header.Get("Origin")
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
+
+	log.Println("[LeadFx] loading authToken from idToken...")
+
+	token := r.Header.Get("Authorization")
+	authToken, err := models.GetAuthTokenFromIdToken(token)
+	if err != nil {
+		log.Printf("[LeadFx] error getting authToken")
+		return "", nil, err
+	}
 
 	log.Printf("[LeadFx] request: %s", string(body))
 	err = json.Unmarshal([]byte(body), &policy)
@@ -31,7 +40,7 @@ func LeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		return "", nil, err
 	}
 
-	err = lead(&policy)
+	err = lead(authToken, &policy)
 	if err != nil {
 		log.Printf("[LeadFx] error creating lead: %s", err.Error())
 		return "", nil, err
@@ -48,7 +57,7 @@ func LeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	return string(resp), &policy, err
 }
 
-func lead(policy *models.Policy) error {
+func lead(authToken models.AuthToken, policy *models.Policy) error {
 	log.Println("[lead] start --------------------------------------------")
 
 	var (
@@ -57,6 +66,8 @@ func lead(policy *models.Policy) error {
 
 	policyFire := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 	guaranteFire := lib.GetDatasetByEnv(origin, models.GuaranteeCollection)
+
+	policy.Channel = authToken.GetChannelByRole()
 
 	log.Println("[lead] starting bpmn flow...")
 	state := runBrokerBpmn(policy, leadFlowKey)

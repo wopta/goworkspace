@@ -11,10 +11,12 @@ type RouteData struct {
 	Routes []Route
 }
 type Route struct {
-	Route   string
-	Method  string
-	Handler func(http.ResponseWriter, *http.Request) (string, interface{}, error)
-	Roles   []string
+	Route    string
+	Method   string
+	Handler  func(http.ResponseWriter, *http.Request) (string, interface{}, error)
+	Roles    []string
+	ReqModel *interface{}
+	ResModel *interface{}
 }
 
 func (router RouteData) Router(w http.ResponseWriter, r *http.Request) {

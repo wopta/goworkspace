@@ -28,11 +28,9 @@ func SendMailLead(policy models.Policy, from, to, cc Address) {
 		bodyData   = BodyData{}
 	)
 
-	channel := models.GetChannel(&policy)
+	setBodyData(policy, &bodyData)
 
-	setBodyData(channel, policy, &bodyData)
-
-	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", channel, proposalTemplateType))
+	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", policy.Channel, proposalTemplateType))
 
 	messageBody := fillTemplate(templateFile, &bodyData)
 
@@ -60,11 +58,9 @@ func SendMailPay(policy models.Policy, from, to, cc Address) {
 		bodyData = BodyData{}
 	)
 
-	channel := models.GetChannel(&policy)
+	setBodyData(policy, &bodyData)
 
-	setBodyData(channel, policy, &bodyData)
-
-	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", channel, payTemplateType))
+	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", policy.Channel, payTemplateType))
 
 	messageBody := fillTemplate(templateFile, &bodyData)
 
@@ -92,11 +88,9 @@ func SendMailSign(policy models.Policy, from, to, cc Address) {
 		bodyData = BodyData{}
 	)
 
-	channel := models.GetChannel(&policy)
+	setBodyData(policy, &bodyData)
 
-	setBodyData(channel, policy, &bodyData)
-
-	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", channel, signTemplateType))
+	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", policy.Channel, signTemplateType))
 
 	messageBody := fillTemplate(templateFile, &bodyData)
 
@@ -124,11 +118,9 @@ func SendMailContract(policy models.Policy, at *[]Attachment, from, to, cc Addre
 		bodyData = BodyData{}
 	)
 
-	channel := models.GetChannel(&policy)
+	setBodyData(policy, &bodyData)
 
-	setBodyData(channel, policy, &bodyData)
-
-	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", channel, emittedTemplateType))
+	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", policy.Channel, emittedTemplateType))
 
 	messageBody := fillTemplate(templateFile, &bodyData)
 
@@ -174,11 +166,9 @@ func SendMailReserved(policy models.Policy, from, to, cc Address) {
 		bodyData = BodyData{}
 	)
 
-	channel := models.GetChannel(&policy)
+	setBodyData(policy, &bodyData)
 
-	setBodyData(channel, policy, &bodyData)
-
-	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", channel, reservedTemplateType))
+	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", policy.Channel, reservedTemplateType))
 
 	messageBody := fillTemplate(templateFile, &bodyData)
 
@@ -233,11 +223,9 @@ func SendMailReservedResult(policy models.Policy, from, to, cc Address) {
 		template = reservedRejectedTemplateType
 	}
 
-	channel := models.GetChannel(&policy)
+	setBodyData(policy, &bodyData)
 
-	setBodyData(channel, policy, &bodyData)
-
-	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", channel, template))
+	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", policy.Channel, template))
 
 	title := fmt.Sprintf(
 		"Wopta per te %s - Proposta %d di %s %s",
