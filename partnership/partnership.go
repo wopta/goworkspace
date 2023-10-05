@@ -249,10 +249,10 @@ type BeprofClaims struct {
 	jwt.RegisteredClaims
 }
 
-func (bpc BeprofClaims) ToMap() map[string]interface{} {
+func (facileClaims BeprofClaims) ToMap() map[string]interface{} {
 	m := make(map[string]interface{})
 
-	b, err := json.Marshal(bpc)
+	b, err := json.Marshal(facileClaims)
 	lib.CheckError(err)
 
 	err = json.Unmarshal(b, &m)
@@ -275,17 +275,16 @@ type FacileClaims struct {
 	jwt.RegisteredClaims
 }
 
-func (bpc FacileClaims) ToMap() map[string]interface{} {
+func (facileClaims FacileClaims) ToMap() map[string]interface{} {
 	m := make(map[string]interface{})
 
-	b, err := json.Marshal(bpc)
+	b, err := json.Marshal(facileClaims)
 	lib.CheckError(err)
 
 	err = json.Unmarshal(b, &m)
 	lib.CheckError(err)
 
 	return m
-
 }
 
 type PartnershipResponse struct {
