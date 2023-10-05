@@ -55,7 +55,7 @@ func FabrickPayFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 
 	paymentMethods := getPaymentMethods(data)
 
-	resultPay := <-FabrickPayObj(data, false, "", time.Now().UTC().AddDate(10, 0, 0).Format(models.TimeDateOnly), "", data.PriceGross,
+	resultPay := <-FabrickPayObj(data, false, "", data.StartDate.AddDate(10, 0, 0).Format(models.TimeDateOnly), "", data.PriceGross,
 		data.PriceNett, getOrigin(r.Header.Get("origin")), paymentMethods)
 
 	log.Println(resultPay)
@@ -132,7 +132,7 @@ func FabrickMonthlyPay(data models.Policy, origin string, paymentMethods []strin
 
 	for i := 1; i <= 11; i++ {
 		date := data.StartDate.AddDate(0, i, 0)
-		expireDate := date.AddDate(0, 1, -1)
+		expireDate := date.AddDate(10, 0, 0)
 		res := <-FabrickPayObj(data, false, date.Format(models.TimeDateOnly), expireDate.Format(models.TimeDateOnly), customerId, data.PriceGrossMonthly, data.PriceNettMonthly, origin, paymentMethods)
 		log.Printf("[FabrickMonthlyPay] Policy %s - Index %d - response: %v", data.Uid, i, res)
 		time.Sleep(100)
@@ -145,7 +145,7 @@ func FabrickYearPay(data models.Policy, origin string, paymentMethods []string) 
 	log.Printf("[FabrickYearPay] Policy %s", data.Uid)
 
 	customerId := uuid.New().String()
-	res := <-FabrickPayObj(data, false, "", time.Now().UTC().AddDate(10, 0, 0).Format(models.TimeDateOnly), customerId, data.PriceGross, data.PriceNett, origin, paymentMethods)
+	res := <-FabrickPayObj(data, false, "", data.StartDate.AddDate(10, 0, 0).Format(models.TimeDateOnly), customerId, data.PriceGross, data.PriceNett, origin, paymentMethods)
 
 	return res
 }
@@ -198,7 +198,7 @@ func getFabrickPayments(data models.Policy, firstSchedule bool, scheduleDate str
 	if expireDate != "" {
 		tmpExpireDate, err := time.Parse(models.TimeDateOnly, expireDate)
 		lib.CheckError(err)
-		expireDate = time.Date(tmpExpireDate.Year(), tmpExpireDate.Month(), tmpExpireDate.Day(), 2, 30, 30, 30, time.UTC).Format("2006-01-02T15:04:05.999999999Z") //tmpExpireDate.UTC().Format("2006-01-02T15:04:05.999999999Z")
+		expireDate = time.Date(tmpExpireDate.Year(), tmpExpireDate.Month(), tmpExpireDate.Day(), 2, 30, 30, 30, time.UTC).Format("2006-01-02T15:04:05.999999999Z")
 	} else {
 		expireDate = time.Now().UTC().AddDate(10, 0, 0).Format("2006-01-02T15:04:05.999999999Z")
 	}
