@@ -10,6 +10,7 @@ import (
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
 	"github.com/wopta/goworkspace/policy"
 	"github.com/wopta/goworkspace/transaction"
 	"github.com/wopta/goworkspace/user"
@@ -101,6 +102,9 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 
 	ManualPayment(&t, origin, &payload)
 
+	producerNode := network.GetNetworkNodeByUid(p.ProducerUid)
+	transaction.CreateNetworkTransactions(&p, &t, producerNode)
+
 	// Update policy if needed
 	if !p.IsPay {
 		// Create/Update document on user collection based on contractor fiscalCode
@@ -127,7 +131,7 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 }
 
 func ManualPayment(transaction *models.Transaction, origin string, payload *ManualPaymentPayload) {
-	fireTransactions := lib.GetDatasetByEnv(origin, "transactions")
+	fireTransactions := lib.GetDatasetByEnv(origin, models.TransactionsCollection)
 
 	transaction.ProviderName = models.ManualPaymentProvider
 	transaction.PaymentMethod = payload.PaymentMethod

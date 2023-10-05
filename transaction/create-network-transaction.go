@@ -80,6 +80,8 @@ func createNetworkTransaction(
 func createCompanyNetworkTransaction(policy *models.Policy, transaction *models.Transaction, producerNode *models.NetworkNode) (*models.NetworkTransaction, error) {
 	log.Println("[createCompanyNetworkTransaction]")
 
+	var code string
+
 	prod, err := product.GetProduct(policy.Name, policy.ProductVersion, models.UserRoleAdmin)
 	if err != nil {
 		log.Printf("[createCompanyNetworkTransaction] error getting mga product: %s", err.Error())
@@ -88,7 +90,13 @@ func createCompanyNetworkTransaction(policy *models.Policy, transaction *models.
 
 	commissionCompany := product.GetCommissionByNode(policy, prod, false)
 
-	name := strings.ToUpper(strings.Join([]string{producerNode.Code, policy.Company}, "-"))
+	if producerNode != nil {
+		code = producerNode.Code
+	} else {
+		code = models.ECommerceChannel
+	}
+
+	name := strings.ToUpper(strings.Join([]string{code, policy.Company}, "-"))
 
 	return createNetworkTransaction(
 		policy,

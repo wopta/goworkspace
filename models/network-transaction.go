@@ -47,7 +47,7 @@ func (nt *NetworkTransaction) SaveBigQuery() error {
 
 	var (
 		err       error
-		datasetId = "test1" // WoptaDataset
+		datasetId = WoptaDataset
 		tableId   = NetworkTransactionCollection
 	)
 
