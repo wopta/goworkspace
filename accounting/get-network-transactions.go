@@ -14,14 +14,14 @@ type GetNetworkTransactionsResponse struct {
 	NetworkTransactions []models.NetworkTransaction `json:"networkTransactions"`
 }
 
-func GetNetworkTransactions(w http.ResponseWriter, r *http.Request) (string, any, error) {
-	log.Println("[GetNetworkTransactions] Handler start ---------------------")
+func GetNetworkTransactionsFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
+	log.Println("[GetNetworkTransactionsFx] Handler start ---------------------")
 
 	var response GetNetworkTransactionsResponse
 
 	transactionUid := r.Header.Get("transactionUid")
 
-	log.Printf("[GetNetworkTransactions] transactionUid %s", transactionUid)
+	log.Printf("[GetNetworkTransactionsFx] transactionUid %s", transactionUid)
 
 	netTranscations := GetNetworkTransactionsByTransactionUid(transactionUid)
 	if len(netTranscations) == 0 {
@@ -31,7 +31,7 @@ func GetNetworkTransactions(w http.ResponseWriter, r *http.Request) (string, any
 	response.NetworkTransactions = netTranscations
 	responseByte, err := json.Marshal(response)
 	if err != nil {
-		log.Printf("[GetNetworkTransactions] error marshaling response: %s", err.Error())
+		log.Printf("[GetNetworkTransactionsFx] error marshaling response: %s", err.Error())
 		return "", "", err
 	}
 

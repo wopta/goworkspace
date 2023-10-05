@@ -22,18 +22,22 @@ func Accounting(w http.ResponseWriter, r *http.Request) {
 		Routes: []lib.Route{
 			{
 				Route:   "/network/transactions/v1/transaction/:transactionUid",
-				Handler: GetNetworkTransactions,
+				Handler: GetNetworkTransactionsFx,
 				Method:  http.MethodGet,
 				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},
 			{
 				Route:   "/network/transactions/v1/:uid",
-				Handler: PutNetworkTransaction,
+				Handler: PutNetworkTransactionFx,
 				Method:  http.MethodPut,
-				// Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
-				Roles: []string{},
+				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},
-			// POST
+			{
+				Route:   "/network/transactions/v1/transaction/:transactionUid",
+				Handler: CreateNetworkTransactionFx,
+				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
+			},
 		},
 	}
 
