@@ -131,7 +131,7 @@ func CreateNetworkTransactions(policy *models.Policy, transaction *models.Transa
 
 			accountType = getAccountType(transaction)
 			paymentType = getPaymentType(transaction, policy, currentNode)
-			commission := product.GetCommissionByNode(policy, &prod, policy.ProducerUid == producerNode.Uid)
+			commission := product.GetCommissionByNode(policy, &prod, policy.ProducerUid == currentNode.Uid)
 
 			if currentName != "" {
 				baseName = strings.ToUpper(strings.Join([]string{currentName, currentNode.Code}, "__"))
