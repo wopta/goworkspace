@@ -24,23 +24,23 @@ func Auth(w http.ResponseWriter, r *http.Request) {
 		Routes: []lib.Route{
 
 			{
-				Route:   "/authorize/v1/",
+				Route:   "/authorize/v1",
 				Handler: AuthorizeFx,
 				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAll},
 			},
 
 			{
-				Route:   "/token/v1/",
+				Route:   "/token/v1",
 				Handler: TokenFx,
 				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
-				Route:   "/token/v1/sso/jwt/aua",
-				Handler: TokenFx,
+				Route:   "/sso/jwt/aua/v1",
+				Handler: JwtFx,
 				Method:  http.MethodGet,
-				Roles:   []string{models.UserRoleAll},
+				Roles:   []string{"internal"},
 			},
 		},
 	}
