@@ -47,6 +47,7 @@ func (router RouteData) Router(w http.ResponseWriter, r *http.Request) {
 			key := routeSplit[1]
 			reqUris := strings.Split(r.RequestURI, "/")
 			value := reqUris[len(reqUris)-1]
+			value = strings.Split(value, "?")[0]
 
 			r.Header.Add(key, value)
 			route = base
