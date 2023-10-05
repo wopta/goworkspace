@@ -2,6 +2,7 @@ package models
 
 import (
 	"log"
+	"strings"
 	"time"
 
 	"cloud.google.com/go/bigquery"
@@ -100,12 +101,14 @@ func (nn *NetworkNode) GetName() string {
 	// use constants
 	switch nn.Type {
 	case "agent":
-		name = nn.Agent.Name + "-" + nn.Agent.Surname
+		name = nn.Agent.Name + " " + nn.Agent.Surname
 	case "agency", "broker":
 		name = nn.Agency.Name
 	case "partnership":
 		name = nn.Partnership.Name
+	case "manager":
+		name = "manager"
 	}
 
-	return name
+	return strings.ReplaceAll(name, " ", "-")
 }

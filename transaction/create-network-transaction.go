@@ -88,7 +88,7 @@ func createCompanyNetworkTransaction(policy *models.Policy, transaction *models.
 
 	commissionCompany := product.GetCommissionByNode(policy, prod, false)
 
-	name := strings.ToLower(strings.Join([]string{producerNode.Code, policy.Company}, "_"))
+	name := strings.ToUpper(strings.Join([]string{producerNode.Code, policy.Company}, "-"))
 
 	return createNetworkTransaction(
 		policy,
@@ -115,10 +115,11 @@ func CreateNetworkTransactions(policy *models.Policy, transaction *models.Transa
 	}
 
 	if policy.ProducerUid != "" && policy.ProducerType != "partnership" { // use constant
-		network.TraverseNetworkByNodeUid(producerNode, func(currentNode *models.NetworkNode, currentName string) string {
+		network.TraverseWithCallbackNetworkByNodeUid(producerNode, "", func(currentNode *models.NetworkNode, currentName string) string {
 			var (
 				accountType, paymentType string
 				prod                     models.Product
+				baseName                 string
 			)
 
 			for _, p := range currentNode.Products {
@@ -127,17 +128,17 @@ func CreateNetworkTransactions(policy *models.Policy, transaction *models.Transa
 					break
 				}
 			}
-			isActive := transaction.ProviderName == models.ManualPaymentProvider
-			commission := product.GetCommissionByNode(policy, &prod, isActive)
-			if isActive {
-				accountType = models.AccountTypeActive
-				paymentType = models.PaymentTypeRemittanceMga
-			} else {
-				accountType = models.AccountTypePassive
-				paymentType = models.PaymentTypeCommission
-			}
 
-			nodeName := strings.ToLower(strings.Join([]string{currentName, currentNode.Code, currentNode.GetName()}, "_"))
+			accountType = getAccountType(transaction)
+			paymentType = getPaymentType(transaction, policy, currentNode)
+			commission := product.GetCommissionByNode(policy, &prod, policy.ProducerUid == producerNode.Uid)
+
+			if currentName != "" {
+				baseName = strings.ToUpper(strings.Join([]string{currentName, currentNode.Code}, "__"))
+			} else {
+				baseName = strings.ToUpper(currentNode.Code)
+			}
+			nodeName := strings.ToUpper(strings.Join([]string{baseName, currentNode.GetName()}, "-"))
 
 			_, err = createNetworkTransaction(policy, transaction, currentNode, commission, accountType, paymentType, nodeName)
 			if err != nil {
@@ -146,9 +147,23 @@ func CreateNetworkTransactions(policy *models.Policy, transaction *models.Transa
 				log.Printf("[CreateNetworkTransactions] created network-transaction for node: %s", currentNode.Uid)
 			}
 
-			return nodeName
+			return baseName
 		})
 	}
 
 	return err
+}
+
+func getAccountType(transaction *models.Transaction) string {
+	if transaction.ProviderName == models.ManualPaymentProvider {
+		return models.AccountTypeActive
+	}
+	return models.AccountTypePassive
+}
+
+func getPaymentType(transaction *models.Transaction, policy *models.Policy, producerNode *models.NetworkNode) string {
+	if policy.ProducerUid == producerNode.Uid && transaction.ProviderName == models.ManualPaymentProvider {
+		return models.PaymentTypeRemittanceMga
+	}
+	return models.PaymentTypeCommission
 }
