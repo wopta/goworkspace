@@ -15,8 +15,8 @@ import (
 )
 
 var (
-	origin, trSchedule, paymentMethod, channel string
-	ccAddress, toAddress, fromAddress          mail.Address
+	origin, trSchedule, paymentMethod string
+	ccAddress, toAddress, fromAddress mail.Address
 )
 
 const (
@@ -35,7 +35,7 @@ func runCallbackBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 	)
 
 	fromAddress = mail.AddressAnna
-	channel := models.GetChannel(policy)
+	channel := policy.Channel
 	settingFile := fmt.Sprintf(settingFormat, channel)
 
 	log.Printf("[runCallbackBpmn] loading file for channel %s", channel)
