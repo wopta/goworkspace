@@ -89,9 +89,7 @@ func fillTemplate(htmlTemplate []byte, bodyData *BodyData) string {
 func GetEmailByChannel(policy *models.Policy) Address {
 	var address Address
 
-	channel := models.GetChannel(policy)
-
-	switch channel {
+	switch policy.Channel {
 	case models.AgentChannel:
 		return GetAgentEmail(policy)
 	case models.AgencyChannel:

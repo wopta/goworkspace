@@ -53,6 +53,15 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 
+	log.Println("[EmitFx] loading authToken from idToken...")
+
+	token := r.Header.Get("Authorization")
+	authToken, err := models.GetAuthTokenFromIdToken(token)
+	if err != nil {
+		log.Printf("[EmitFx] error getting authToken")
+		return "", nil, err
+	}
+
 	log.Printf("[EmitFx] Request: %s", string(body))
 	json.Unmarshal([]byte(body), &request)
 
@@ -72,9 +81,9 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			log.Printf("[EmitFx] cannot emit policy uid %s with status %s and isReserved %t", policy.Uid, policy.Status, policy.IsReserved)
 			return "", nil, fmt.Errorf("cannot emit policy uid %s with status %s and isReserved %t", policy.Uid, policy.Status, policy.IsReserved)
 		}
-		responseEmit = emitV2(&policy, request, origin)
+		responseEmit = emitV2(authToken, &policy, request, origin)
 	} else {
-		responseEmit = emit(&policy, request, origin)
+		responseEmit = emit(authToken, &policy, request, origin)
 	}
 	b, e := json.Marshal(responseEmit)
 	log.Println("[EmitFx] Response: ", string(b))
@@ -82,7 +91,7 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	return string(b), responseEmit, e
 }
 
-func emit(policy *models.Policy, request EmitRequest, origin string) EmitResponse {
+func emit(authToken models.AuthToken, policy *models.Policy, request EmitRequest, origin string) EmitResponse {
 	log.Println("[Emit] start ------------------------------------------------")
 	var responseEmit EmitResponse
 
@@ -139,7 +148,7 @@ func emit(policy *models.Policy, request EmitRequest, origin string) EmitRespons
 	return responseEmit
 }
 
-func emitV2(policy *models.Policy, request EmitRequest, origin string) EmitResponse {
+func emitV2(authToken models.AuthToken, policy *models.Policy, request EmitRequest, origin string) EmitResponse {
 	log.Println("[Emit] start ------------------------------------------------")
 	var responseEmit EmitResponse
 

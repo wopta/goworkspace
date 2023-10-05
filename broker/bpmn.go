@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	origin, paymentSplit              string
+	origin, paymentSplit, channel     string
 	ccAddress, toAddress, fromAddress mail.Address
 )
 
@@ -38,7 +38,7 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 	toAddress = mail.Address{}
 	ccAddress = mail.Address{}
 	fromAddress = mail.AddressAnna
-	channel := models.GetChannel(policy)
+	channel = policy.Channel
 	settingFile := fmt.Sprintf(settingFormat, channel)
 
 	log.Printf("[runBrokerBpmn] loading file for channel %s", channel)
@@ -69,6 +69,8 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 		case models.AgentChannel:
 			toAddress = mail.GetContractorEmail(policy)
 			ccAddress = mail.GetAgentEmail(policy)
+		case models.MgaChannel:
+			toAddress = mail.GetContractorEmail(policy)
 		}
 	case emitFlowKey:
 		flow = setting.EmitFlow
@@ -98,6 +100,21 @@ func addHandlers(state *bpmn.State) {
 	addProposalHandlers(state)
 	addRequestApprovalHandlers(state)
 	addEmitHandlers(state)
+}
+
+func getChannelByRole(role string) string {
+	channel := models.ECommerceChannel
+
+	switch role {
+	case models.UserRoleAdmin:
+		channel = models.MgaChannel
+	case models.UserRoleAgency:
+		channel = models.AgencyChannel
+	case models.UserRoleAgent:
+		channel = models.AgentChannel
+	}
+
+	return channel
 }
 
 //	======================================

@@ -26,9 +26,8 @@ func SendMailLead(policy models.Policy, from, to, cc Address) {
 		linkFormat = "https://storage.googleapis.com/documents-public-dev/information-sets/%s/%s/Precontrattuale.pdf"
 		link       = fmt.Sprintf(linkFormat, policy.Name, policy.ProductVersion)
 		bodyData   = BodyData{}
+		channel    = policy.Channel
 	)
-
-	channel := models.GetChannel(&policy)
 
 	setBodyData(channel, policy, &bodyData)
 
@@ -58,9 +57,8 @@ func SendMailLead(policy models.Policy, from, to, cc Address) {
 func SendMailPay(policy models.Policy, from, to, cc Address) {
 	var (
 		bodyData = BodyData{}
+		channel  = policy.Channel
 	)
-
-	channel := models.GetChannel(&policy)
 
 	setBodyData(channel, policy, &bodyData)
 
@@ -90,9 +88,8 @@ func SendMailPay(policy models.Policy, from, to, cc Address) {
 func SendMailSign(policy models.Policy, from, to, cc Address) {
 	var (
 		bodyData = BodyData{}
+		channel  = policy.Channel
 	)
-
-	channel := models.GetChannel(&policy)
 
 	setBodyData(channel, policy, &bodyData)
 
@@ -122,9 +119,8 @@ func SendMailSign(policy models.Policy, from, to, cc Address) {
 func SendMailContract(policy models.Policy, at *[]Attachment, from, to, cc Address) {
 	var (
 		bodyData = BodyData{}
+		channel  = policy.Channel
 	)
-
-	channel := models.GetChannel(&policy)
 
 	setBodyData(channel, policy, &bodyData)
 
@@ -172,9 +168,8 @@ func SendMailReserved(policy models.Policy, from, to, cc Address) {
 	var (
 		at       []Attachment
 		bodyData = BodyData{}
+		channel  = policy.Channel
 	)
-
-	channel := models.GetChannel(&policy)
 
 	setBodyData(channel, policy, &bodyData)
 
@@ -224,6 +219,7 @@ func SendMailReserved(policy models.Policy, from, to, cc Address) {
 func SendMailReservedResult(policy models.Policy, from, to, cc Address) {
 	var (
 		bodyData = BodyData{}
+		channel  = policy.Channel
 		template string
 	)
 
@@ -232,8 +228,6 @@ func SendMailReservedResult(policy models.Policy, from, to, cc Address) {
 	} else {
 		template = reservedRejectedTemplateType
 	}
-
-	channel := models.GetChannel(&policy)
 
 	setBodyData(channel, policy, &bodyData)
 
