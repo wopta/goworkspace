@@ -6,6 +6,7 @@ import (
 	"log"
 	"strings"
 
+	"github.com/wopta/goworkspace/auth"
 	"github.com/wopta/goworkspace/bpmn"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/mail"
@@ -78,6 +79,8 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 		case models.AgencyChannel:
 			toAddress = mail.GetContractorEmail(policy)
 			ccAddress = mail.GetEmailByChannel(policy)
+		case models.MgaChannel:
+			toAddress = mail.GetContractorEmail(policy)
 		default:
 			toAddress = mail.GetEmailByChannel(policy)
 		}
