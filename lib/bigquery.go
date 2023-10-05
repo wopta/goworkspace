@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"reflect"
+	"strconv"
 	"time"
 
 	"cloud.google.com/go/bigquery"
@@ -142,6 +143,7 @@ func UpdateRowBigQuery(datasetID string, tableID string, params map[string]strin
 	return e
 }
 
+// use biquery query constructors
 func UpdateRowBigQueryV2(datasetId, tableId string, params map[string]interface{}, condition string) error {
 	var (
 		bytes bytes.Buffer
@@ -161,8 +163,19 @@ func UpdateRowBigQueryV2(datasetId, tableId string, params map[string]interface{
 		var query string
 		if reflect.TypeOf(value).String() == "string" {
 			query = key + "=" + "'" + reflect.ValueOf(value).String() + "'"
-		} else {
-			query = key + "=" + reflect.ValueOf(value).String()
+		} else if reflect.TypeOf(value).String() == "bool" {
+			query = key + "=" + strconv.FormatBool(value.(bool))
+		} else if reflect.TypeOf(value).String() == "[]string" {
+			query = key + "=" + "ARRAY ["
+			for index, s := range value.([]string) {
+				query = query + "'" + s + "'"
+				if index < len(value.([]string))-1 {
+					query = query + ", "
+				}
+			}
+			query = query + "]"
+		} else if reflect.TypeOf(value).String() == "bigquery.NullDateTime" {
+			query = key + "=" + "'" + bigquery.CivilDateTimeString(value.(bigquery.NullDateTime).DateTime) + "'"
 		}
 		if count < length {
 			query = query + ", "

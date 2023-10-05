@@ -71,11 +71,17 @@ func (nt *NetworkTransaction) SaveBigQuery() error {
 		updatedFields["statusHistory"] = nt.StatusHistory
 		updatedFields["isPay"] = nt.IsPay
 		updatedFields["isConfirmed"] = nt.IsConfirmed
-		updatedFields["payDate"] = nt.PayDate
-		updatedFields["transactionDate"] = nt.TransactionDate
-		updatedFields["confirmationDate"] = nt.ConfirmationDate
+		if nt.PayDate.Valid {
+			updatedFields["payDate"] = nt.PayDate
+		}
+		if nt.TransactionDate.Valid {
+			updatedFields["transactionDate"] = nt.TransactionDate
+		}
+		if nt.ConfirmationDate.Valid {
+			updatedFields["confirmationDate"] = nt.ConfirmationDate
+		}
 
-		err = lib.UpdateRowBigQueryV2(datasetId, tableId, updatedFields, whereClause)
+		err = lib.UpdateRowBigQueryV2(datasetId, tableId, updatedFields, "WHERE "+whereClause)
 	}
 
 	if err != nil {

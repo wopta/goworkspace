@@ -54,8 +54,8 @@ func createNetworkTransaction(
 		Amount:           amount,
 		AmountNet:        amount, // TBD
 		Name:             name,
-		Status:           models.NetworkTransactionStatusCreated,
-		StatusHistory:    []string{models.NetworkTransactionStatusCreated},
+		Status:           models.NetworkTransactionStatusToPay,
+		StatusHistory:    []string{models.NetworkTransactionStatusCreated, models.NetworkTransactionStatusToPay},
 		IsPay:            false,
 		IsConfirmed:      false,
 		CreationDate:     lib.GetBigQueryNullDateTime(time.Now().UTC()),
