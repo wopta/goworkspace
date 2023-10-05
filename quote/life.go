@@ -3,19 +3,20 @@ package quote
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/dustin/go-humanize"
-	lib "github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/sellable"
 	"io"
 	"log"
 	"math"
-	"modernc.org/mathutil"
 	"net/http"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/dustin/go-humanize"
+	lib "github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/sellable"
+	"modernc.org/mathutil"
 )
 
 const (

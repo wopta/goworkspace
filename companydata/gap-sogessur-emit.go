@@ -3,12 +3,13 @@ package companydata
 import (
 	"errors"
 	"fmt"
-	"github.com/dustin/go-humanize"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/dustin/go-humanize"
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
@@ -227,7 +228,7 @@ func getGapRowMap(policy models.Policy, transaction models.Transaction) map[stri
 	offerName := policy.OfferlName
 
 	// Assuming we have only this payment type
-	offer := policy.OffersPrices[offerName][string(models.PaySingleInstallment)]
+	offer := policy.OffersPrices[offerName][string(models.PaySplitSingleInstallment)]
 	vehicleWeight := ""
 	if vehicle.Weight > 0 {
 		vehicleWeight = strconv.Itoa(int(vehicle.Weight))
