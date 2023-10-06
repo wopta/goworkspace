@@ -16,13 +16,9 @@ import (
 )
 
 var (
-	origin        string
-	trSchedule    string
-	paymentMethod string
-	ccAddress     mail.Address
-	toAddress     mail.Address
-	fromAddress   mail.Address
-	networkNode   *models.NetworkNode
+	origin, trSchedule, paymentMethod string
+	ccAddress, toAddress, fromAddress mail.Address
+	networkNode                       *models.NetworkNode
 )
 
 const (
@@ -41,7 +37,7 @@ func runCallbackBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 	)
 
 	fromAddress = mail.AddressAnna
-	channel := models.GetChannel(policy)
+	channel := policy.Channel
 	settingFile := fmt.Sprintf(settingFormat, channel)
 
 	log.Printf("[runCallbackBpmn] loading file for channel %s", channel)
@@ -65,6 +61,8 @@ func runCallbackBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 		case models.AgencyChannel:
 			toAddress = mail.GetContractorEmail(policy)
 			ccAddress = mail.GetNetworkNodeEmail(networkNode)
+		case models.MgaChannel:
+			toAddress = mail.GetContractorEmail(policy)
 		default:
 			toAddress = mail.GetNetworkNodeEmail(networkNode)
 			ccAddress = mail.Address{}
@@ -75,6 +73,8 @@ func runCallbackBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 		case models.AgentChannel:
 			toAddress = mail.GetContractorEmail(policy)
 			ccAddress = mail.GetNetworkNodeEmail(networkNode)
+		case models.MgaChannel:
+			toAddress = mail.GetContractorEmail(policy)
 		default:
 			toAddress = mail.GetNetworkNodeEmail(networkNode)
 			ccAddress = mail.Address{}

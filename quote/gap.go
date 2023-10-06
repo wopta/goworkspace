@@ -63,7 +63,7 @@ func calculateGapOfferPrices(policy *models.Policy, product models.Product) {
 		taxOnPrice := netPrice / 100 * taxValue
 
 		policy.OffersPrices[offerName] = map[string]*models.Price{
-			string(models.PaySingleInstallment): {
+			string(models.PaySplitSingleInstallment): {
 				Net:      lib.RoundFloat(netPrice, 2),
 				Tax:      lib.RoundFloat(taxOnPrice, 2),
 				Gross:    lib.RoundFloat(netPrice+taxOnPrice, 2),

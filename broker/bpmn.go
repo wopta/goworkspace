@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	origin, paymentSplit              string
+	origin, paymentSplit, channel     string
 	ccAddress, toAddress, fromAddress mail.Address
 	networkNode                       *models.NetworkNode
 )
@@ -40,8 +40,7 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 	toAddress = mail.Address{}
 	ccAddress = mail.Address{}
 	fromAddress = mail.AddressAnna
-
-	channel := models.GetChannel(policy)
+	channel = policy.Channel
 	settingFile := fmt.Sprintf(settingFormat, channel)
 
 	log.Printf("[runBrokerBpmn] loading file for channel %s", channel)
@@ -74,6 +73,8 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 		case models.AgentChannel:
 			toAddress = mail.GetContractorEmail(policy)
 			ccAddress = mail.GetNetworkNodeEmail(networkNode)
+		case models.MgaChannel:
+			toAddress = mail.GetContractorEmail(policy)
 		}
 	case emitFlowKey:
 		flow = setting.EmitFlow
@@ -81,6 +82,8 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 		case models.AgencyChannel:
 			toAddress = mail.GetContractorEmail(policy)
 			ccAddress = mail.GetNetworkNodeEmail(networkNode)
+		case models.MgaChannel:
+			toAddress = mail.GetContractorEmail(policy)
 		default:
 			toAddress = mail.GetNetworkNodeEmail(networkNode)
 		}
