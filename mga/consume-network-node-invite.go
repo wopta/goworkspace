@@ -97,6 +97,10 @@ func consumeNetworkNodeInvite(origin, inviteUid, password string) error {
 		return err
 	}
 
+	log.Printf("[consumeNetworkInvite] updating network node %s in BigQuery...", networkNode.Uid)
+
+	networkNode.SaveBigQuery(origin)
+
 	invite.Consumed = true
 	invite.ConsumeDate = time.Now().UTC()
 

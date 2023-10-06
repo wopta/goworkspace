@@ -91,7 +91,7 @@ func createNetworkNodeInvite(origin, networkNodeUid, creatorUid string) (string,
 		CreatorUid:     creatorUid,
 		Consumed:       false,
 		NetworkNodeUid: networkNodeUid,
-		CreationDate: time.Now().UTC(),
+		CreationDate:   time.Now().UTC(),
 		Expiration:     time.Now().UTC().Add(time.Hour * 168),
 	}
 
