@@ -45,8 +45,12 @@ func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, inter
 	var response PartnershipResponse
 	resp.Header().Set("Access-Control-Allow-Methods", "GET")
 
+	log.Println("[LifePartnershipFx] handler start ----------------------------")
+
 	partnershipUid := strings.ToLower(r.Header.Get("partnershipUid"))
 	jwtData := r.URL.Query().Get("jwt")
+
+	log.Println("[LifePartnershipFx] partnershipUid: %s jwt: %s", partnershipUid, jwtData)
 
 	policy, product, node, err := LifePartnership(partnershipUid, jwtData)
 
@@ -55,6 +59,8 @@ func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, inter
 	response.Partnership = *node.Partnership
 
 	responseJson, err := json.Marshal(response)
+
+	log.Printf("[LifePartnershipFx] response: %s", string(responseJson))
 
 	return string(responseJson), response, err
 }
@@ -67,17 +73,25 @@ func LifePartnership(partnershipUid, jwtData string) (models.Policy, models.Prod
 		err error
 	)
 
+	log.Printf("[LifePartnership]")
+
 	if partnershipNode, err = network.GetNodeByUid(partnershipUid); err != nil {
 		return policy, productLife, partnershipNode, err
 	}
 
 	partnershipName := partnershipNode.Partnership.Name
 
+	log.Printf("[LifePartnership] loading latest life product")
+
 	products := partnershipNode.Products
 	productLife = getLatestLifeProduct(products)
 
+	log.Printf("[LifePartnership] loading life product by channel")
+
 	ecommerceProducts := product.GetAllProductsByChannel(models.ECommerceChannel)
 	latestLifeProduct := getLatestLifeProduct(ecommerceProducts)
+
+	log.Printf("[LifePartnership] setting policy basic info")
 
 	policy.Name = productLife.Name
 	policy.NameDesc = *productLife.NameDesc
@@ -90,8 +104,10 @@ func LifePartnership(partnershipUid, jwtData string) (models.Policy, models.Prod
 
 	switch partnershipName {
 	case models.PartnershipBeProf:
+		log.Println("[LifePartnership] call beProfPartnership function")
 		err = beProfPartnership(jwtData, &policy, &latestLifeProduct)
 	case models.PartnershipFacile:
+		log.Println("[LifePartnership] call facilePartnership function")
 		err = facilePartnership(jwtData, &policy, &latestLifeProduct)
 	}
 
@@ -141,6 +157,8 @@ func beProfPartnership(jwtData string, policy *models.Policy, product *models.Pr
 		asset  models.Asset
 	)
 
+	log.Println("[beProfPartnership] decoding jwt")
+
 	token, err := jwt.ParseWithClaims(jwtData, &BeprofClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
@@ -152,6 +170,7 @@ func beProfPartnership(jwtData string, policy *models.Policy, product *models.Pr
 	})
 
 	if claims, ok := token.Claims.(*BeprofClaims); ok && token.Valid {
+		log.Println("[beProfPartnership] setting person info")
 		person.Name = claims.UserFirstname
 		person.Surname = claims.UserLastname
 		person.Mail = claims.UserEmail
@@ -189,6 +208,8 @@ func facilePartnership(jwtData string, policy *models.Policy, product *models.Pr
 		asset  models.Asset
 	)
 
+	log.Println("[facilePartnership] decoding jwt")
+
 	token, err := jwt.ParseWithClaims(jwtData, &FacileClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
@@ -200,6 +221,7 @@ func facilePartnership(jwtData string, policy *models.Policy, product *models.Pr
 	})
 
 	if claims, ok := token.Claims.(*FacileClaims); ok && token.Valid {
+		log.Println("[facilePartnership] setting person info")
 		person.Name = claims.CustomerName
 		person.Surname = claims.CustomerFamilyName
 		person.Mail = claims.Email
@@ -212,6 +234,8 @@ func facilePartnership(jwtData string, policy *models.Policy, product *models.Pr
 		policy.OfferlName = "default"
 
 		//addDefaultGuarantees(&asset, &product.Companies[0].GuaranteesMap, policy.OfferlName)
+
+		log.Println("[facilePartnership] setting death guarantee info")
 
 		deathGuarantee := product.Companies[0].GuaranteesMap["death"]
 		deathGuarantee.Value = &models.GuaranteValue{
