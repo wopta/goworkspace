@@ -9,25 +9,13 @@ import (
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
 )
 
-type CreateNetworkNodeRequest struct {
-	Code        string                  `json:"code"`
-	Type        string                  `json:"type"`
-	Role        string                  `json:"role"`
-	NetworkCode string                  `json:"networkCode"`
-	ManagerUid  string                  `json:"managerUid,omitempty"`
-	ParentUid   string                  `json:"parentUid,omitempty"`
-	Agent       *models.AgentNode       `json:"agent,omitempty"`
-	Agency      *models.AgencyNode      `json:"agency,omitempty"`
-	Broker      *models.AgencyNode      `json:"broker,omitempty"`
-	Partnership *models.PartnershipNode `json:"partnership,omitempty"`
-	Products    []models.Product        `json:"products,omitempty"`
-}
 
 func CreateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		request CreateNetworkNodeRequest
+		request *models.NetworkNode
 		err     error
 	)
 
@@ -42,12 +30,11 @@ func CreateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 		return "", "", err
 	}
 
-	node := createNetworkNode(request, origin)
+	log.Printf("[CreateNetworkNodeFx] creating network node %s into Firestore...", request.Uid)
 
-	fireNetwork := lib.GetDatasetByEnv(origin, models.NetworkNodesCollection)
-	err = lib.SetFirestoreErr(fireNetwork, node.Uid, node)
+	node, err := network.CreateNode(*request) 
 	if err != nil {
-		log.Printf("[CreateNetworkNodeFx] error saving node to firestore: %s", err.Error())
+		log.Printf("[CreateNetworkNodeFx] error creating network node %s into Firestore...", request.Uid)
 		return "", "", err
 	}
 
@@ -56,29 +43,4 @@ func CreateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 	log.Println("[CreateNetworkNodeFx] network node successfully created!")
 
 	return "", "", err
-}
-
-// TODO: mode to network domain
-func createNetworkNode(request CreateNetworkNodeRequest, origin string) *models.NetworkNode {
-	uid := lib.NewDoc(models.NetworkNodesCollection)
-	now := time.Now().UTC()
-
-	log.Printf("[createNetworkNode] creating node with uid %s", uid)
-
-	return &models.NetworkNode{
-		Uid:          uid,
-		Code:         request.Code,
-		Type:         request.Type,
-		Role:         request.Role,
-		NetworkCode:  request.NetworkCode,
-		NetworkUid:   request.NetworkCode,
-		Agent:        request.Agent,
-		Agency:       request.Agency,
-		Broker:       request.Broker,
-		Partnership:  request.Partnership,
-		Products:     request.Products,
-		IsActive:     true,
-		CreationDate: now,
-		UpdatedDate:  now,
-	}
 }

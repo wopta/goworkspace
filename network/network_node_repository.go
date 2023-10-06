@@ -34,9 +34,9 @@ func initNode(node *models.NetworkNode) {
 	node.IsActive = true
 }
 
-func CreateNode(node models.NetworkNode) (string, error) {
+func CreateNode(node models.NetworkNode) (*models.NetworkNode, error) {
 	initNode(&node)
-	return node.Uid, lib.SetFirestoreErr(models.NetworkNodesCollection, node.Uid, node)
+	return &node, lib.SetFirestoreErr(models.NetworkNodesCollection, node.Uid, node)
 }
 
 func GetNetworkNodeByUid(nodeUid string) *models.NetworkNode {
