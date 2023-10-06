@@ -57,10 +57,16 @@ func Mga(w http.ResponseWriter, r *http.Request) {
 				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},
 			{
-				Route: "/network/invite/v1/create",
+				Route:   "/network/invite/v1/create",
 				Handler: CreateNetworkNodeInviteFx,
-				Method: http.MethodPost,
-				Roles: []string{models.UserRoleAdmin, models.UserRoleManager},
+				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
+			},
+			{
+				Route:   "/network/invite/v1/consume",
+				Handler: ConsumeNetworkNodeInviteFx,
+				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},
 		},
 	}
