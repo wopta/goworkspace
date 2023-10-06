@@ -16,6 +16,7 @@ type NetworkNode struct {
 	Code            string                `json:"code" firestore:"code" bigquery:"code"`
 	Type            string                `json:"type" firestore:"type" bigquery:"type"`
 	Role            string                `json:"role" firestore:"role" bigquery:"role"`
+	Mail            string                `json:"mail" firestore:"mail" bigquery:"mail"`
 	NetworkUid      string                `json:"networkUid" firestore:"networkUid" bigquery:"networkUid"`
 	NetworkCode     string                `json:"networkCode" firestore:"networkCode" bigquery:"networkCode"`
 	ParentUid       string                `json:"parentUid,omitempty" firestore:"parentUid,omitempty" bigquery:"parentUid"`
@@ -28,6 +29,7 @@ type NetworkNode struct {
 	Agent           *AgentNode            `json:"agent,omitempty" firestore:"agent,omitempty" bigquery:"agent"`
 	Agency          *AgencyNode           `json:"agency,omitempty" firestore:"agency,omitempty" bigquery:"agency"`
 	Broker          *AgencyNode           `json:"broker,omitempty" firestore:"broker,omitempty" bigquery:"broker"`
+	AreaManager     *AgentNode            `json:"areaManager,omitempty" firestore:"areaManager,omitempty" bigquery:"areaManager"`
 	Partnership     *PartnershipNode      `json:"partnership,omitempty" firestore:"partnership,omitempty" bigquery:"partnership"`
 	NodeSetting     *NodeSetting          `json:"nodeSetting,omitempty" firestore:"nodeSetting,omitempty" bigquery:"-"`
 	CreationDate    time.Time             `json:"creationDate" firestore:"creationDate" bigquery:"-"`
@@ -45,9 +47,9 @@ type PartnershipNode struct {
 type AgencyNode struct {
 	Name               string                `json:"name" firestore:"name" bigquery:"name"`
 	VatCode            string                `json:"vatCode,omitempty" firestore:"vatCode,omitempty" bigquery:"vatCode"`
-	Mail               string                `json:"mail" firestore:"mail" bigquery:"mail"`
 	Phone              string                `json:"phone,omitempty" firestore:"phone,omitempty" bigquery:"phone"`
 	Address            *NodeAddress          `json:"address,omitempty" firestore:"address,omitempty" bigquery:"-"`
+	Manager            *AgentNode            `json:"manager,omitempty" firestore:"manager,omitempty" bigquery:"manager"`
 	RuiCode            string                `json:"ruiCode" firestore:"ruiCode" bigquery:"ruiCode"`
 	RuiSection         string                `json:"ruiSection" firestore:"ruiSection" bigquery:"ruiSection"`
 	RuiRegistration    time.Time             `json:"ruiRegistration" firestore:"ruiRegistration" bigquery:"-"`
@@ -59,7 +61,7 @@ type AgentNode struct {
 	Name               string                `json:"name" firestore:"name" bigquery:"name"`
 	Surname            string                `json:"surname,omitempty" firestore:"surname,omitempty" bigquery:"surname"`
 	FiscalCode         string                `json:"fiscalCode,omitempty" firestore:"fiscalCode,omitempty" bigquery:"fiscalCode"`
-	Mail               string                `json:"mail" firestore:"mail" bigquery:"mail"`
+	VatCode            string                `json:"vatCode,omitempty" firestore:"vatCode,omitempty" bigquery:"vatCode"`
 	Phone              string                `json:"phone,omitempty" firestore:"phone,omitempty" bigquery:"phone"`
 	BirthDate          string                `json:"birthDate,omitempty" firestore:"birthDate,omitempty" bigquery:"-"`
 	BigBirthDate       bigquery.NullDateTime `json:"-" firestore:"-" bigquery:"birthDate"`

@@ -129,7 +129,9 @@ const (
 )
 
 const (
-	AgentProducerType       string = "agent"
-	AgencyProducerType      string = "agency"
-	PartnershipProducerType string = "partnership"
+	AgentNetworkNodeType       string = "agent"
+	AgencyNetworkNodeType      string = "agency"
+	BrokerNetworkNodeType      string = "broker"
+	AreaManagerNetworkNodeType string = "area-manager"
+	PartnershipNetworkNodeType string = "partnership"
 )

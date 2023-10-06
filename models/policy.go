@@ -278,9 +278,9 @@ func GetChannel(policy *Policy) string {
 	var channel string
 
 	switch policy.ProducerType {
-	case AgentProducerType:
+	case AgentNetworkNodeType:
 		channel = AgentChannel
-	case AgencyProducerType:
+	case AgencyNetworkNodeType:
 		channel = AgencyChannel
 	default:
 		channel = ECommerceChannel
