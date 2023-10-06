@@ -228,7 +228,7 @@ func Count(date string, fiscalCode string, guaranteesCode string)  {
 		"select * from `wopta."+dataMovement+"` where fiscalCode='"+fiscalCode+"' and guaranteesCode ='"+guaranteesCode+"'")
 	log.Println(len(queryWopta))
 
-	requestUrl:=os.Getenv("HYPE_PLATHFORM_PATH")+""
+	requestUrl:=os.Getenv("HYPE_PLATHFORM_PATH")+"/profile/insurance/v1/wopta/{guaranteesCode}/amount/{fromDate}/{endDate}"
 	
 	req, err := http.NewRequest(http.MethodGet, requestUrl, nil)
 	if err != nil {

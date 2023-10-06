@@ -195,7 +195,7 @@ func (queries *Firequeries) FirestoreWherefields(collection string) (*firestore.
 	return query.Documents(ctx), err
 }
 
-/*func (queries *FireGenericQueries[T]) FireQuery(collection string) ([]T, error) {
+func (queries *FireGenericQueries[T]) FireQuery(collection string) ([]T, error) {
 	ctx := context.Background()
 	var query firestore.Query
 	client, err := firestore.NewClient(ctx, os.Getenv("GOOGLE_PROJECT_ID"))
@@ -222,7 +222,7 @@ func (queries *Firequeries) FirestoreWherefields(collection string) (*firestore.
 		log.Println(len(result))
 	}
 	return result, err
-}*/
+}
 
 func (queries *Firequeries) FirestoreWhereLimitFields(collection string, limit int) (*firestore.DocumentIterator, error) {
 	ctx := context.Background()
