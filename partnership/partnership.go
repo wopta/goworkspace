@@ -171,7 +171,7 @@ func beProfPartnership(jwtData string, policy *models.Policy, product *models.Pr
 		asset.Person = &person
 		policy.OfferlName = "default"
 
-		addDefaultGuarantees(&asset, &product.Companies[0].GuaranteesMap, policy.OfferlName)
+		//addDefaultGuarantees(&asset, &product.Companies[0].GuaranteesMap, policy.OfferlName)
 
 		policy.Assets = append(policy.Assets, asset)
 		policy.PartnershipData = claims.ToMap()
@@ -211,14 +211,24 @@ func facilePartnership(jwtData string, policy *models.Policy, product *models.Pr
 		asset.Person = &person
 		policy.OfferlName = "default"
 
-		addDefaultGuarantees(&asset, &product.Companies[0].GuaranteesMap, policy.OfferlName)
+		//addDefaultGuarantees(&asset, &product.Companies[0].GuaranteesMap, policy.OfferlName)
 
-		for index, guarantee := range asset.Guarantees {
-			if guarantee.Slug == "death" {
-				asset.Guarantees[index].Value.Duration.Year = claims.Duration
-				asset.Guarantees[index].Value.SumInsuredLimitOfIndemnity = float64(claims.InsuredCapital)
-			}
+		deathGuarantee := product.Companies[0].GuaranteesMap["death"]
+		deathGuarantee.Value = &models.GuaranteValue{
+			Duration: &models.Duration{
+				Year: claims.Duration,
+			},
+			SumInsuredLimitOfIndemnity: float64(claims.InsuredCapital),
 		}
+		asset.Guarantees = make([]models.Guarante, 0)
+		asset.Guarantees = append(asset.Guarantees, *deathGuarantee)
+
+		// for index, guarantee := range asset.Guarantees {
+		// 	if guarantee.Slug == "death" {
+		// 		asset.Guarantees[index].Value.Duration.Year = claims.Duration
+		// 		asset.Guarantees[index].Value.SumInsuredLimitOfIndemnity = float64(claims.InsuredCapital)
+		// 	}
+		// }
 
 		policy.Assets = append(policy.Assets, asset)
 		policy.PartnershipData = claims.ToMap()

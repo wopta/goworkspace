@@ -150,10 +150,10 @@ func addDefaultGuarantees(data models.Policy, product models.Product) {
 		product.Companies[0].GuaranteesMap[guarantee.Slug].IsSelected = guarantee.IsSelected
 	}
 
-	if !data.HasGuarantee(deathGuarantee) {
-		log.Println("[Life] death guarantee not selected, set isSelected to false")
-		product.Companies[0].GuaranteesMap[deathGuarantee].IsSelected = false
-	}
+	// if !data.HasGuarantee(deathGuarantee) {
+	// 	log.Println("[Life] death guarantee not selected, set isSelected to false")
+	// 	product.Companies[0].GuaranteesMap[deathGuarantee].IsSelected = false
+	// }
 
 	for _, guarantee := range product.Companies[0].GuaranteesMap {
 		if guarantee.Value == nil {
