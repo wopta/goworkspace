@@ -51,7 +51,7 @@ func runCallbackBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 
 	state := bpmn.NewBpmn(*policy)
 
-	networkNode = network.GetNetworkNodeByUid(policy.ProductUid)
+	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
 
 	// TODO: fix me - maybe get to/from/cc from setting.json?
 	switch flowKey {
@@ -256,5 +256,5 @@ func payTransaction(state *bpmn.State) error {
 
 	transaction.BigQuerySave(origin)
 
-	return nil
+	return tr.CreateNetworkTransactions(policy, &transaction, networkNode)
 }

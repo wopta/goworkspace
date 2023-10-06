@@ -78,18 +78,19 @@ const (
 )
 
 const (
-	AgentCollection            string = "agents"
-	AgencyCollection           string = "agencies"
-	UserCollection             string = "users"
-	PolicyCollection           string = "policy"
-	ProductsCollection         string = "products"
-	TransactionsCollection     string = "transactions"
-	ClaimsCollection           string = "claims" //only for bigquery
-	AuditsCollection           string = "audits"
-	GuaranteeCollection        string = "guarante"
-	NetworkNodesCollection     string = "networkNodes"
-	InvitesCollection          string = "invites"
-	EmergencyNumbersCollection string = "emergencyNumbers"
+	AgentCollection              string = "agents"
+	AgencyCollection             string = "agencies"
+	UserCollection               string = "users"
+	PolicyCollection             string = "policy"
+	ProductsCollection           string = "products"
+	TransactionsCollection       string = "transactions"
+	ClaimsCollection             string = "claims" //only for bigquery
+	AuditsCollection             string = "audits"
+	GuaranteeCollection          string = "guarante"
+	NetworkNodesCollection       string = "networkNodes"
+	NetworkTransactionCollection string = "networkTransactions" //only for bigquery
+	InvitesCollection            string = "invites"
+	EmergencyNumbersCollection   string = "emergencyNumbers"
 )
 
 const (
@@ -127,8 +128,19 @@ const (
 
 const (
 	FabrickPaymentProvider string = "fabrick"
-	ManualPaymentProvider  string = "payment"
+	ManualPaymentProvider  string = "manual"
 )
+
+const (
+	PayMethodCard       = "creditcard"
+	PayMethodTransfer   = "transfer"
+	PayMethodSdd        = "sdd"
+	PayMethodRemittance = "remittance"
+)
+
+func GetAllPaymentMethods() []string {
+	return []string{PayMethodCard, PayMethodTransfer, PayMethodSdd}
+}
 
 const (
 	AgentNetworkNodeType       string = "agent"

@@ -3,6 +3,7 @@ package models
 import (
 	"encoding/json"
 	"log"
+	"strings"
 	"time"
 
 	"cloud.google.com/go/bigquery"
@@ -162,4 +163,22 @@ func parseBigQueryAgencyNode(agency *AgencyNode) *AgencyNode {
 	agency.BigRuiRegistration = lib.GetBigQueryNullDateTime(agency.RuiRegistration)
 
 	return agency
+}
+
+func (nn *NetworkNode) GetName() string {
+	var name string
+
+	// use constants
+	switch nn.Type {
+	case "agent":
+		name = nn.Agent.Name + " " + nn.Agent.Surname
+	case "agency", "broker":
+		name = nn.Agency.Name
+	case "partnership":
+		name = nn.Partnership.Name
+	case "manager":
+		name = "manager"
+	}
+
+	return strings.ReplaceAll(name, " ", "-")
 }

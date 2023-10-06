@@ -267,11 +267,13 @@ func emitPay(policy *models.Policy, origin string) {
 }
 
 func setAdvance(policy *models.Policy, origin string) {
-	policy.Payment = "manual"
+	policy.Payment = models.ManualPaymentProvider
 	policy.IsPay = true
 	policy.Status = models.PolicyStatusPay
 	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusToPay, models.PolicyStatusPay)
 	policy.PaymentSplit = string(models.PaySplitSingleInstallment)
 
-	transaction.PutByPolicy(*policy, "", origin, "", "", policy.PriceGross, policy.PriceNett, "", payment.PayMethodRemittance, true)
+	tr := transaction.PutByPolicy(*policy, "", origin, "", "", policy.PriceGross, policy.PriceNett, "", models.PayMethodRemittance, true)
+
+	transaction.CreateNetworkTransactions(policy, tr, networkNode)
 }
