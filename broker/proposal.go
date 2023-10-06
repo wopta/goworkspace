@@ -97,15 +97,7 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 }
 
 func proposal(policy *models.Policy) error {
-	var err error
-	policyUid := policy.Uid
 	log.Println("[proposal] starting bpmn flow...")
-
-	*policy, err = GetPolicy(policyUid, origin)
-	if err != nil {
-		log.Printf("[proposal] error getting policy %s from firestore: %s", policyUid, err.Error())
-		return err
-	}
 
 	state := runBrokerBpmn(policy, proposalFlowKey)
 	if state == nil || state.Data == nil {

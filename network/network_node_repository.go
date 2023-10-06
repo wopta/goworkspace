@@ -34,23 +34,65 @@ func initNode(node *models.NetworkNode) {
 	node.IsActive = true
 }
 
-func GetNetworkNodeByUid(producerUid string) *models.NetworkNode {
-	if producerUid == "" {
-		log.Println("[GetNetworkNodeByPolicy] producerUid empty")
+func CreateNode(node models.NetworkNode) (*models.NetworkNode, error) {
+	initNode(&node)
+	return &node, lib.SetFirestoreErr(models.NetworkNodesCollection, node.Uid, node)
+}
+
+func GetNetworkNodeByUid(nodeUid string) *models.NetworkNode {
+	if nodeUid == "" {
+		log.Println("[GetNetworkNodeByPolicy] nodeUid empty")
 		return nil
 	}
 
-	networkNode, err := GetNodeByUid(producerUid)
+	networkNode, err := GetNodeByUid(nodeUid)
 	if err != nil {
-		log.Printf("[GetNetworkNodeByPolicy] error getting producer %s from Firestore", producerUid)
+		log.Printf("[GetNetworkNodeByPolicy] error getting producer %s from Firestore", nodeUid)
 	}
 
 	return networkNode
 }
 
-func CreateNode(node models.NetworkNode) (string, error) {
-	initNode(&node)
-	return node.Uid, lib.SetFirestoreErr(models.NetworkNodesCollection, node.Uid, node)
+func DeleteNetworkNodeByUid(origin, nodeUid string) error {
+	if nodeUid == "" {
+		log.Println("[DeleteNetworkNodeByUid] no nodeUid specified")
+		return fmt.Errorf("no nodeUid specified")
+	}
+
+	fireNetwork := lib.GetDatasetByEnv(origin, models.NetworkNodesCollection)
+	_, err := lib.DeleteFirestoreErr(fireNetwork, nodeUid)
+	return err
+}
+
+func UpdateNetworkNodePortfolio(origin string, policy *models.Policy, networkNode *models.NetworkNode) error {
+	if networkNode == nil {
+		log.Printf("[UpdateNetworkNodePortfolio] no networkNode specified")
+		return nil
+	}
+
+	log.Printf("[UpdateNetworkNodePortfolio] adding policy %s to networkNode %s portfolio", policy.Uid, networkNode.Uid)
+
+	networkNode.Policies = append(networkNode.Policies, policy.Uid)
+
+	if !lib.SliceContains(networkNode.Users, policy.Contractor.Uid) {
+		log.Printf("[UpdateNetworkNodePortfolio] adding user %s to networkNode %s users list", policy.Contractor.Uid, networkNode.Uid)
+		networkNode.Users = append(networkNode.Users, policy.Contractor.Uid)
+	}
+
+	networkNode.UpdatedDate = time.Now().UTC()
+
+	log.Printf("[UpdateNetworkNodePortfolio] saving networkNode %s to Firestore...", networkNode.Uid)
+	fireNetwork := lib.GetDatasetByEnv(origin, models.NetworkNodesCollection)
+	err := lib.SetFirestoreErr(fireNetwork, networkNode.Uid, networkNode)
+	if err != nil {
+		log.Printf("[UpdateNetworkNodePortfolio] error saving networkNode %s to Firestore: %s", networkNode.Uid, err.Error())
+		return err
+	}
+
+	log.Printf("[UpdateNetworkNodePortfolio] saving networkNode %s to BigQuery...", networkNode.Uid)
+	err = networkNode.SaveBigQuery(origin)
+
+	return err
 }
 
 func GetNodeByUidBigQuery(uid string) (models.NetworkNode, error) {

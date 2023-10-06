@@ -89,6 +89,8 @@ const (
 	GuaranteeCollection          string = "guarante"
 	NetworkNodesCollection       string = "networkNodes"
 	NetworkTransactionCollection string = "networkTransactions" //only for bigquery
+	InvitesCollection            string = "invites"
+	EmergencyNumbersCollection   string = "emergencyNumbers"
 )
 
 const (
@@ -139,3 +141,11 @@ const (
 func GetAllPaymentMethods() []string {
 	return []string{PayMethodCard, PayMethodTransfer, PayMethodSdd}
 }
+
+const (
+	AgentNetworkNodeType       string = "agent"
+	AgencyNetworkNodeType      string = "agency"
+	BrokerNetworkNodeType      string = "broker"
+	AreaManagerNetworkNodeType string = "area-manager"
+	PartnershipNetworkNodeType string = "partnership"
+)

@@ -10,6 +10,7 @@ import (
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
 )
 
 func LeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -58,16 +59,22 @@ func LeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 }
 
 func lead(authToken models.AuthToken, policy *models.Policy) error {
-	log.Println("[lead] start --------------------------------------------")
+	var err error
 
-	var (
-		err error
-	)
+	log.Println("[lead] start --------------------------------------------")
 
 	policyFire := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 	guaranteFire := lib.GetDatasetByEnv(origin, models.GuaranteeCollection)
 
 	policy.Channel = authToken.GetChannelByRole()
+
+	node := network.GetNetworkNodeByUid(authToken.UserID)
+	if node != nil {
+		policy.ProducerUid = node.Uid
+		policy.ProducerCode = node.Code
+		policy.ProducerType = node.Type
+		policy.NetworkUid = node.NetworkUid
+	}
 
 	log.Println("[lead] starting bpmn flow...")
 	state := runBrokerBpmn(policy, leadFlowKey)
