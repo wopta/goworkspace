@@ -7,19 +7,19 @@ import (
 	"strings"
 )
 
-type RouteData struct {
+type RouteDataV2 struct {
 	Routes []Route
 }
-type Route struct {
+type RouteV2[Req any, Resp any] struct {
 	Route    string
 	Method   string
 	Handler  func(http.ResponseWriter, *http.Request) (string, interface{}, error)
 	Roles    []string
-	ReqModel *interface{}
-	ResModel *interface{}
+	ReqModel *Req
+	ResModel *Resp
 }
 
-func (router RouteData) Router(w http.ResponseWriter, r *http.Request) {
+func (router RouteDataV2) Router(w http.ResponseWriter, r *http.Request) {
 	log.Println("Router")
 	var result string
 	var isFound bool
