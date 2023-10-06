@@ -5,13 +5,11 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 )
-
 
 func CreateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
@@ -32,7 +30,7 @@ func CreateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 
 	log.Printf("[CreateNetworkNodeFx] creating network node %s into Firestore...", request.Uid)
 
-	node, err := network.CreateNode(*request) 
+	node, err := network.CreateNode(*request)
 	if err != nil {
 		log.Printf("[CreateNetworkNodeFx] error creating network node %s into Firestore...", request.Uid)
 		return "", "", err
