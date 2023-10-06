@@ -65,6 +65,11 @@ func DeleteNetworkNodeByUid(origin, nodeUid string) error {
 }
 
 func UpdateNetworkNodePortfolio(origin string, policy *models.Policy, networkNode *models.NetworkNode) error {
+	if networkNode == nil {
+		log.Printf("[UpdateNetworkNodePortfolio] no networkNode specified")
+		return nil
+	}
+
 	log.Printf("[UpdateNetworkNodePortfolio] adding policy %s to networkNode %s portfolio", policy.Uid, networkNode.Uid)
 
 	networkNode.Policies = append(networkNode.Policies, policy.Uid)
