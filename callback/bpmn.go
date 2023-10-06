@@ -61,7 +61,7 @@ func runCallbackBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 		case models.AgencyChannel:
 			toAddress = mail.GetContractorEmail(policy)
 			ccAddress = mail.GetNetworkNodeEmail(networkNode)
-		case models.MgaChannel:
+		case models.MgaChannel, models.ECommerceChannel:
 			toAddress = mail.GetContractorEmail(policy)
 		default:
 			toAddress = mail.GetNetworkNodeEmail(networkNode)
