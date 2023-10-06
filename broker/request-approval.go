@@ -74,6 +74,7 @@ func requestApproval(policy *models.Policy) error {
 	log.Println("[RequestApproval] start --------------------")
 
 	log.Println("[RequestApproval] starting bpmn flow...")
+
 	state := runBrokerBpmn(policy, requestApprovalFlowKey)
 	if state == nil || state.Data == nil {
 		log.Println("[RequestApproval] error bpmn - state not set")

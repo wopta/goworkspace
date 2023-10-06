@@ -2,12 +2,13 @@ package sellable
 
 import (
 	"encoding/json"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
-	prd "github.com/wopta/goworkspace/product"
 	"io"
 	"log"
 	"net/http"
+
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
+	prd "github.com/wopta/goworkspace/product"
 )
 
 func LifeHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {

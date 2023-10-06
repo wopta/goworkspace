@@ -19,17 +19,28 @@ type ProposalReq struct {
 }
 
 func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.Println("[ProposalFx] Handler start -----------------------------------------")
-
 	var (
 		err    error
 		policy models.Policy
 		req    ProposalReq
 	)
 
+	log.Println("[ProposalFx] Handler start -----------------------------------------")
+
 	origin = r.Header.Get("Origin")
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
+
+
+	// TODO: remove when PROPOSAL_V2 will be fully integrated in prod 
+	log.Println("[ProposalFx] loading authToken from idToken...")
+
+	token := r.Header.Get("Authorization")
+	authToken, err := models.GetAuthTokenFromIdToken(token)
+	if err != nil {
+		log.Printf("[LeadFx] error getting authToken")
+		return "", nil, err
+	}
 
 	log.Printf("[ProposalFx] Request: %s", string(body))
 
@@ -65,7 +76,7 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 			return "", nil, err
 		}
 
-		err = lead(&policy)
+		err = lead(authToken, &policy)
 		if err != nil {
 			log.Printf("[ProposalFx] error creating lead: %s", err.Error())
 			return "", nil, err
@@ -86,15 +97,7 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 }
 
 func proposal(policy *models.Policy) error {
-	var err error
-	policyUid := policy.Uid
 	log.Println("[proposal] starting bpmn flow...")
-
-	*policy, err = GetPolicy(policyUid, origin)
-	if err != nil {
-		log.Printf("[proposal] error getting policy %s from firestore: %s", policyUid, err.Error())
-		return err
-	}
 
 	state := runBrokerBpmn(policy, proposalFlowKey)
 	if state == nil || state.Data == nil {

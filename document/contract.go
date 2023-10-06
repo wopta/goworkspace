@@ -20,14 +20,14 @@ func ContractFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 	defer r.Body.Close()
 	err := json.Unmarshal([]byte(req), &data)
 	lib.CheckError(err)
-	respObj := <-ContractObj(origin, data)
+	respObj := <-ContractObj(origin, data, nil)
 	resp, err := json.Marshal(respObj)
 
 	lib.CheckError(err)
 	return string(resp), respObj, nil
 }
 
-func ContractObj(origin string, data models.Policy) <-chan DocumentResponse {
+func ContractObj(origin string, data models.Policy, networkNode *models.NetworkNode) <-chan DocumentResponse {
 	r := make(chan DocumentResponse)
 
 	go func() {
@@ -45,7 +45,7 @@ func ContractObj(origin string, data models.Policy) <-chan DocumentResponse {
 			filename, out = Save(m, data)
 		case models.LifeProduct:
 			pdf := initFpdf()
-			filename, out = LifeContract(pdf, origin, &data)
+			filename, out = LifeContract(pdf, origin, &data, networkNode)
 		case models.PersonaProduct:
 			pdf := initFpdf()
 			filename, out = PersonaContract(pdf, &data)

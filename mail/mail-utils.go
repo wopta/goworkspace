@@ -9,8 +9,8 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
-func setBodyData(channel string, policy models.Policy, bodyData *BodyData) {
-	switch channel {
+func setBodyData(policy models.Policy, bodyData *BodyData) {
+	switch policy.Channel {
 	case models.AgentChannel:
 		agent, err := models.GetAgentByAuthId(policy.AgentUid)
 		lib.CheckError(err)
@@ -89,9 +89,7 @@ func fillTemplate(htmlTemplate []byte, bodyData *BodyData) string {
 func GetEmailByChannel(policy *models.Policy) Address {
 	var address Address
 
-	channel := models.GetChannel(policy)
-
-	switch channel {
+	switch policy.Channel {
 	case models.AgentChannel:
 		return GetAgentEmail(policy)
 	case models.AgencyChannel:
@@ -132,4 +130,25 @@ func GetAgentEmail(policy *models.Policy) Address {
 		Name:    agent.Name + " " + agent.Surname,
 		Address: agent.Mail,
 	}
+}
+
+func GetNetworkNodeEmail(networkNode *models.NetworkNode) Address {
+	var address Address = Address{
+		Address: networkNode.Mail,
+	}
+
+	switch networkNode.Type {
+	case models.AgentNetworkNodeType:
+		address.Name = networkNode.Agent.Name + " " + networkNode.Agent.Surname
+	case models.AgencyNetworkNodeType:
+		address.Name = networkNode.Agency.Name
+	case models.BrokerNetworkNodeType:
+		address.Name = networkNode.Broker.Name
+	case models.AreaManagerNetworkNodeType:
+		address.Name = networkNode.AreaManager.Name
+	case models.PartnershipNetworkNodeType:
+		address.Name = networkNode.Partnership.Name
+	}
+
+	return address
 }

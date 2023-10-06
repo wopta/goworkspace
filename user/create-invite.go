@@ -6,7 +6,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
@@ -47,7 +46,6 @@ type UserInvite struct {
 	Products        []models.Product `json:"products,omitempty" firestore:"products,omitempty"`
 }
 
-// DEPRECATED
 func CreateInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var createInviteRequest CreateInviteRequest
 
@@ -67,11 +65,10 @@ func CreateInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 		return `{"success": false}`, `{"success": false}`, err
 	}
 
-	SendInviteMail(inviteUid, createInviteRequest.Email)
+	mail.SendInviteMail(inviteUid, createInviteRequest.Email)
 	return `{"success": true}`, `{"success": true}`, nil
 }
 
-// DEPRECATED
 func CreateInvite(inviteRequest CreateInviteRequest, origin, creatorUid string) (string, error) {
 	log.Printf("[CreateInvite] Creating invite for user %s with role %s", inviteRequest.Email, inviteRequest.Role)
 
@@ -126,130 +123,5 @@ func CreateInvite(inviteRequest CreateInviteRequest, origin, creatorUid string) 
 	}
 
 	log.Printf("[CreateInvite] Created invite with uid %s", invite.Uid)
-	return invite.Uid, nil
-}
-
-// DEPRECATED
-func SendInviteMail(inviteUid, email string) {
-	var mailRequest mail.MailRequest
-
-	mailRequest.From = "anna@wopta.it"
-	mailRequest.To = []string{email}
-	mailRequest.Subject = "Benvenuto in Wopta!"
-	mailRequest.IsHtml = true
-
-	lines := []string{
-		"Ciao,",
-		"Ecco il tuo invito al tuo account wopta.it.",
-		"Accedi al link sottostante e crea la tua password.",
-	}
-	for _, line := range lines {
-		mailRequest.Message = mailRequest.Message + `<p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:17px;color:#000000;font-size:14px">` + line + `</p>`
-	}
-
-	mailRequest.Message = mailRequest.Message + ` 
-	<p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:17px;color:#000000;font-size:14px"><br></p><p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:17px;color:#000000;font-size:14px">A presto,</p>
-	<p style="Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:17px;color:#e50075;font-size:14px"><strong>Anna</strong> di Wopta Assicurazioni</p> `
-	mailRequest.Title = "Invito a wopta.it"
-	mailRequest.IsHtml = true
-	mailRequest.IsLink = true
-	mailRequest.Link = os.Getenv("WOPTA_CUSTOMER_AREA_BASE_URL") + "/login/inviteregistration?inviteUid=" + inviteUid
-	mailRequest.LinkLabel = "Crea la tua password"
-
-	mail.SendMail(mailRequest)
-}
-
-func CreateInviteV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.Println("[CreateInviteV2Fx] Handler start ----------------------------")
-
-	var (
-		createInviteRequest CreateInviteRequest
-		err                 error
-	)
-
-	origin := r.Header.Get("Origin")
-	body := lib.ErrorByte(io.ReadAll(r.Body))
-	log.Printf("[CreateInviteV2Fx] request: %s", string(body))
-	err = json.Unmarshal(body, &createInviteRequest)
-	if err != nil {
-		log.Printf("[CreateInviteV2Fx] error unmarshaling request: %s", err.Error())
-		return "", "", err
-	}
-
-	log.Println("[CreateInviteV2Fx] extracting creator from AuthToken...")
-	creatorUid, err := lib.GetUserIdFromIdToken(r.Header.Get("Authorization"))
-	if err != nil {
-		log.Println("[CreateInviteV2Fx] Invalid auth token")
-		return "", "", err
-	}
-
-	log.Println("[CreateInviteV2Fx] creating invite...")
-	inviteUid, err := createInvite(createInviteRequest, origin, creatorUid)
-	if err != nil {
-		log.Printf("[CreateInviteV2Fx] error creating invite: %s", err.Error())
-		return "", "", err
-	}
-
-	log.Println("[CreateInviteV2Fx] sending invite mail...")
-	mail.SendInviteMail(inviteUid, createInviteRequest.Email)
-
-	return `{"success": true}`, `{"success": true}`, nil
-}
-
-func createInvite(inviteRequest CreateInviteRequest, origin, creatorUid string) (string, error) {
-	log.Printf("[createInvite] Creating invite for user %s with role %s", inviteRequest.Email, inviteRequest.Role)
-
-	collectionName := lib.GetDatasetByEnv(origin, invitesCollection)
-	inviteUid := lib.NewDoc(collectionName)
-
-	oneWeek := time.Hour * 168
-	inviteExpiration := time.Now().UTC().Add(oneWeek)
-
-	roles := models.GetAllRoles()
-	var userRole string
-	for _, role := range roles {
-		if strings.EqualFold(inviteRequest.Role, role) {
-			userRole = role
-			break
-		}
-	}
-
-	if userRole == "" {
-		log.Println("[createInvite]: forbidden role")
-		return "", errors.New("forbidden role")
-	}
-
-	invite := UserInvite{
-		Name:            inviteRequest.Name,
-		Surname:         inviteRequest.Surname,
-		VatCode:         inviteRequest.VatCode,
-		FiscalCode:      inviteRequest.FiscalCode,
-		Email:           inviteRequest.Email,
-		Role:            userRole,
-		Expiration:      inviteExpiration,
-		Uid:             inviteUid,
-		CreatorUid:      creatorUid,
-		RuiCode:         inviteRequest.RuiCode,
-		RuiSection:      inviteRequest.RuiSection,
-		RuiRegistration: inviteRequest.RuiRegistration,
-		Code:            inviteRequest.Code,
-		Products:        inviteRequest.Products,
-	}
-
-	// check if user exists
-	_, err := GetAuthUserByMail(origin, inviteRequest.Email)
-	if err == nil {
-		log.Printf("[createInvite] user %s already exists", inviteRequest.Email)
-		return "", errors.New("user already exists")
-	}
-
-	log.Println("[createInvite] saving invite...")
-	err = lib.SetFirestoreErr(collectionName, invite.Uid, invite)
-	if err != nil {
-		log.Printf("[createInvite] could not create user %s", inviteRequest.Email)
-		return "", errors.New("could not create user")
-	}
-
-	log.Printf("[createInvite] created invite with uid %s", invite.Uid)
 	return invite.Uid, nil
 }

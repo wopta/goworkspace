@@ -3,19 +3,20 @@ package quote
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/dustin/go-humanize"
-	lib "github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/sellable"
 	"io"
 	"log"
 	"math"
-	"modernc.org/mathutil"
 	"net/http"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/dustin/go-humanize"
+	lib "github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/sellable"
+	"modernc.org/mathutil"
 )
 
 const (
@@ -65,8 +66,8 @@ func Life(role string, data models.Policy) (models.Policy, error) {
 		calculateSumInsuredLimitOfIndemnity(data.Assets, death.Value.SumInsuredLimitOfIndemnity)
 		log.Println("[Life] setting guarantees duration")
 		calculateGuaranteeDuration(data.Assets, contractorAge, death.Value.Duration.Year)
-	case models.UserRoleAgent, models.UserRoleAgency:
-		log.Println("[Life] agent/agency flow")
+	case models.UserRoleAgent, models.UserRoleAgency, models.UserRoleAdmin:
+		log.Println("[Life] admin/agent/agency flow")
 		guaranteesMap := data.GuaranteesToMap()
 		log.Println("[Life] setting sumInsuredLimitOfIndeminity")
 		if guaranteesMap[deathGuarantee].IsSelected {
