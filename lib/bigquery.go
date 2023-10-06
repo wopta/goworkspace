@@ -3,6 +3,7 @@ package lib
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -145,5 +146,13 @@ func GetBigQueryNullDateTime(date time.Time) bigquery.NullDateTime {
 	return bigquery.NullDateTime{
 		DateTime: civil.DateTimeOf(date),
 		Valid:    date != nilTime,
+	}
+}
+
+func GetBigQueryNullGeography(latitude, longitude float64) bigquery.NullGeography {
+	// TODO: Check if correct: Geography type uses the WKT format for geometry
+	return bigquery.NullGeography{
+		GeographyVal: fmt.Sprintf("POINT (%f %f)", longitude, latitude),
+		Valid:        true,
 	}
 }

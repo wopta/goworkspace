@@ -78,16 +78,18 @@ const (
 )
 
 const (
-	AgentCollection        string = "agents"
-	AgencyCollection       string = "agencies"
-	UserCollection         string = "users"
-	PolicyCollection       string = "policy"
-	ProductsCollection     string = "products"
-	TransactionsCollection string = "transactions"
-	ClaimsCollection       string = "claims" //only for bigquery
-	AuditsCollection       string = "audits"
-	GuaranteeCollection    string = "guarante"
-	NetworkNodesCollection string = "networkNodes"
+	AgentCollection            string = "agents"
+	AgencyCollection           string = "agencies"
+	UserCollection             string = "users"
+	PolicyCollection           string = "policy"
+	ProductsCollection         string = "products"
+	TransactionsCollection     string = "transactions"
+	ClaimsCollection           string = "claims" //only for bigquery
+	AuditsCollection           string = "audits"
+	GuaranteeCollection        string = "guarante"
+	NetworkNodesCollection     string = "networkNodes"
+	InvitesCollection          string = "invites"
+	EmergencyNumbersCollection string = "emergencyNumbers"
 )
 
 const (
@@ -126,4 +128,12 @@ const (
 const (
 	FabrickPaymentProvider string = "fabrick"
 	ManualPaymentProvider  string = "payment"
+)
+
+const (
+	AgentNetworkNodeType       string = "agent"
+	AgencyNetworkNodeType      string = "agency"
+	BrokerNetworkNodeType      string = "broker"
+	AreaManagerNetworkNodeType string = "area-manager"
+	PartnershipNetworkNodeType string = "partnership"
 )
