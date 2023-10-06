@@ -28,8 +28,6 @@ func ConsumeNetworkNodeInviteFx(w http.ResponseWriter, r *http.Request) (string,
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	origin := r.Header.Get("Origin")
 
-	log.Printf("[ConsumeNetworkNodeInviteFx] request body: %s", string(body))
-
 	err := json.Unmarshal(body, &req)
 	if err != nil {
 		log.Println("[ConsumeNetworkNodeInviteFx] error unmarshaling request body")

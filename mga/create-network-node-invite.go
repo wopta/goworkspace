@@ -22,6 +22,8 @@ type NetworkNodeInvite struct {
 	CreatorUid     string    `json:"creatorUid,omitempty" firestore:"creatorUid,omitempty"`
 	Consumed       bool      `json:"consumed,omitempty" firestore:"consumed,omtiempty"`
 	NetworkNodeUid string    `json:"networkNodeUid,omitempty" firestore:"networkNodeUid,omitempty"`
+	CreationDate   time.Time `json:"creationDate,omitempty" firestore:"creationDate,omitempty"`
+	ConsumeDate    time.Time `json:"consumeDate,omitempty" firestore:"consumeDate,omitempty"`
 	Expiration     time.Time `json:"expiration,omitempty" firestore:"expiration,omitempty"`
 }
 
@@ -36,13 +38,14 @@ func CreateNetworkNodeInviteFx(w http.ResponseWriter, r *http.Request) (string, 
 	origin := r.Header.Get("Origin")
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
+
+	log.Printf("[CreateNetworkNodeInviteFx] request body %s", string(body))
+
 	err := json.Unmarshal(body, &req)
 	if err != nil {
 		log.Println("[CreateNetworkNodeInviteFx] error unmarshalling body")
 		return "", nil, err
 	}
-
-	log.Printf("[CreateNetworkNodeInviteFx] request body %s", string(body))
 
 	token := r.Header.Get("Authorization")
 
@@ -88,6 +91,7 @@ func createNetworkNodeInvite(origin, networkNodeUid, creatorUid string) (string,
 		CreatorUid:     creatorUid,
 		Consumed:       false,
 		NetworkNodeUid: networkNodeUid,
+		CreationDate: time.Now().UTC(),
 		Expiration:     time.Now().UTC().Add(time.Hour * 168),
 	}
 
