@@ -38,12 +38,12 @@ func GetProductByRole(productName, version, company string, authToken models.Aut
 
 func getMgaProduct(productName, version, company string) (*models.Product, error) {
 	log.Println("getMgaProduct")
-	return GetProduct(productName, version, models.UserRoleAdmin)
+	return GetProduct(productName, version, models.MgaChannel)
 }
 
 func getEcommerceProduct(productName, version, company string) (*models.Product, error) {
 	log.Println("getEcommerceProduct")
-	ecomProduct, err := GetProduct(productName, version, models.UserRoleAll)
+	ecomProduct, err := GetProduct(productName, version, models.ECommerceChannel)
 
 	if !ecomProduct.IsEcommerceActive {
 		return productNotActive()
@@ -54,7 +54,7 @@ func getEcommerceProduct(productName, version, company string) (*models.Product,
 
 func getAgencyProduct(productName, version, company, agencyUid string) (*models.Product, error) {
 	log.Println("getAgencyProduct")
-	agencyDefaultProduct, err := GetProduct(productName, version, models.UserRoleAgency)
+	agencyDefaultProduct, err := GetProduct(productName, version, models.AgencyChannel)
 	lib.CheckError(err)
 
 	if !agencyDefaultProduct.IsAgencyActive {
@@ -83,7 +83,7 @@ func getAgencyProduct(productName, version, company, agencyUid string) (*models.
 
 func getAgentProduct(productName, version, company, agentUid string) (*models.Product, error) {
 	log.Println("getAgentProduct")
-	agentDefaultProduct, err := GetProduct(productName, version, models.UserRoleAgent)
+	agentDefaultProduct, err := GetProduct(productName, version, models.AgencyChannel)
 	lib.CheckError(err)
 
 	if !agentDefaultProduct.IsAgentActive {
