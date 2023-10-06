@@ -78,16 +78,18 @@ const (
 )
 
 const (
-	AgentCollection        string = "agents"
-	AgencyCollection       string = "agencies"
-	UserCollection         string = "users"
-	PolicyCollection       string = "policy"
-	ProductsCollection     string = "products"
-	TransactionsCollection string = "transactions"
-	ClaimsCollection       string = "claims" //only for bigquery
-	AuditsCollection       string = "audits"
-	GuaranteeCollection    string = "guarante"
-	NetworkNodesCollection string = "networkNodes"
+	AgentCollection            string = "agents"
+	AgencyCollection           string = "agencies"
+	UserCollection             string = "users"
+	PolicyCollection           string = "policy"
+	ProductsCollection         string = "products"
+	TransactionsCollection     string = "transactions"
+	ClaimsCollection           string = "claims" //only for bigquery
+	AuditsCollection           string = "audits"
+	GuaranteeCollection        string = "guarante"
+	NetworkNodesCollection     string = "networkNodes"
+	InvitesCollection          string = "invites"
+	EmergencyNumbersCollection string = "emergencyNumbers"
 )
 
 const (
