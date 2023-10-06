@@ -56,6 +56,12 @@ func Mga(w http.ResponseWriter, r *http.Request) {
 				Method:  http.MethodDelete,
 				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},
+			{
+				Route: "/network/invite/v1/create",
+				Handler: CreateNetworkNodeInviteFx,
+				Method: http.MethodPost,
+				Roles: []string{models.UserRoleAdmin, models.UserRoleManager},
+			},
 		},
 	}
 
