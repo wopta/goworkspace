@@ -6,9 +6,11 @@ replace github.com/wopta/goworkspace/transaction => ./
 
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.4
-	github.com/wopta/goworkspace/lib v1.0.69
-	github.com/wopta/goworkspace/models v1.1.43
-	github.com/wopta/goworkspace/product v1.0.45
+	github.com/google/uuid v1.3.0
+	github.com/wopta/goworkspace/lib v1.0.70
+	github.com/wopta/goworkspace/models v1.1.46
+	github.com/wopta/goworkspace/network v1.0.0
+	github.com/wopta/goworkspace/product v1.0.46
 )
 
 require (
@@ -40,7 +42,6 @@ require (
 	github.com/google/flatbuffers v2.0.8+incompatible // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/s2a-go v0.1.3 // indirect
-	github.com/google/uuid v1.3.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.2.3 // indirect
 	github.com/googleapis/gax-go/v2 v2.8.0 // indirect
 	github.com/hyperjumptech/grule-rule-engine v1.12.0 // indirect

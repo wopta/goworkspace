@@ -6,6 +6,16 @@ import (
 
 var (
 	ageMap = map[string]map[string]map[string]int{
+		models.MgaChannel: {
+			models.LifeProduct: {
+				minAge:         70,
+				minReservedAge: 55,
+			},
+			models.PersonaProduct: {
+				minAge:         75,
+				minReservedAge: 75,
+			},
+		},
 		models.AgentChannel: {
 			models.LifeProduct: {
 				minAge:         70,
