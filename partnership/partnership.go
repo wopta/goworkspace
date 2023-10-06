@@ -205,7 +205,7 @@ func facilePartnership(jwtData string, policy *models.Policy, product *models.Pr
 		person.Mail = claims.Email
 		birthDate, _ := time.Parse(models.TimeDateOnly, claims.CustomerBirthDate)
 		person.BirthDate = birthDate.Format(time.RFC3339)
-		person.Phone = claims.Mobile
+		person.Phone = fmt.Sprintf("+39%s", claims.Mobile)
 		person.Gender = claims.Gender
 		policy.Contractor = person
 		asset.Person = &person
