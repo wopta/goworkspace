@@ -105,8 +105,10 @@ func (nn *NetworkNode) SaveBigQuery(origin string) error {
 	nn.Data = string(nnJson)
 	nn.BigCreationDate = lib.GetBigQueryNullDateTime(nn.CreationDate)
 	nn.BigUpdatedDate = lib.GetBigQueryNullDateTime(nn.UpdatedDate)
-	nn.parseBigQueryAgent()
-	nn.parseBigQueryAgency()
+	*nn.Agent = *parseBigQueryAgentNode(nn.Agent)
+	*nn.AreaManager = *parseBigQueryAgentNode(nn.AreaManager)
+	*nn.Agency = *parseBigQueryAgencyNode(nn.Agency)
+	*nn.Broker = *parseBigQueryAgencyNode(nn.Broker)
 
 	for _, p := range nn.Products {
 		nn.BigProducts = append(nn.BigProducts, NodeProduct{
@@ -119,40 +121,45 @@ func (nn *NetworkNode) SaveBigQuery(origin string) error {
 	return err
 }
 
-func (nn *NetworkNode) parseBigQueryAgent() {
-	if nn.Agent == nil {
-		return
+func parseBigQueryAgentNode(agent *AgentNode) *AgentNode {
+	if agent == nil {
+		return nil
 	}
 
-	if nn.Agent.BirthDate != "" {
-		birthDate, _ := time.Parse(time.RFC3339, nn.Agent.BirthDate)
-		nn.Agent.BigBirthDate = lib.GetBigQueryNullDateTime(birthDate)
+	if agent.BirthDate != "" {
+		birthDate, _ := time.Parse(time.RFC3339, agent.BirthDate)
+		agent.BigBirthDate = lib.GetBigQueryNullDateTime(birthDate)
 	}
-	if nn.Agent.Residence != nil {
-		nn.Agent.Residence.BigLocation = lib.GetBigQueryNullGeography(
-			nn.Agent.Residence.Location.Lng,
-			nn.Agent.Residence.Location.Lat,
+	if agent.Residence != nil {
+		agent.Residence.BigLocation = lib.GetBigQueryNullGeography(
+			agent.Residence.Location.Lng,
+			agent.Residence.Location.Lat,
 		)
 	}
-	if nn.Agent.Domicile != nil {
-		nn.Agent.Domicile.BigLocation = lib.GetBigQueryNullGeography(
-			nn.Agent.Domicile.Location.Lng,
-			nn.Agent.Domicile.Location.Lat,
+	if agent.Domicile != nil {
+		agent.Domicile.BigLocation = lib.GetBigQueryNullGeography(
+			agent.Domicile.Location.Lng,
+			agent.Domicile.Location.Lat,
 		)
 	}
-	nn.Agent.BigRuiRegistration = lib.GetBigQueryNullDateTime(nn.Agent.RuiRegistration)
+	agent.BigRuiRegistration = lib.GetBigQueryNullDateTime(agent.RuiRegistration)
+
+	return agent
 }
 
-func (nn *NetworkNode) parseBigQueryAgency() {
-	if nn.Agency == nil {
-		return
+func parseBigQueryAgencyNode(agency *AgencyNode) *AgencyNode {
+	if agency == nil {
+		return nil
 	}
 
-	if nn.Agency.Address != nil {
-		nn.Agency.Address.BigLocation = lib.GetBigQueryNullGeography(
-			nn.Agency.Address.Location.Lng,
-			nn.Agency.Address.Location.Lat,
+	if agency.Address != nil {
+		agency.Address.BigLocation = lib.GetBigQueryNullGeography(
+			agency.Address.Location.Lng,
+			agency.Address.Location.Lat,
 		)
 	}
-	nn.Agency.BigRuiRegistration = lib.GetBigQueryNullDateTime(nn.Agency.RuiRegistration)
+	*agency.Manager = *parseBigQueryAgentNode(agency.Manager)
+	agency.BigRuiRegistration = lib.GetBigQueryNullDateTime(agency.RuiRegistration)
+
+	return agency
 }
