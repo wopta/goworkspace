@@ -27,10 +27,10 @@ func LifeHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	authToken, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
 	lib.CheckError(err)
 
-	return Life(authToken.Role, policy)
+	return Life(authToken.GetChannelByRole(), policy)
 }
 
-func Life(role string, policy models.Policy) (string, *models.Product, error) {
+func Life(channel string, policy models.Policy) (string, *models.Product, error) {
 	var (
 		err error
 	)
@@ -43,7 +43,7 @@ func Life(role string, policy models.Policy) (string, *models.Product, error) {
 		return "", &models.Product{}, err
 	}
 	rulesFile := lib.GetRulesFile(rulesFileName)
-	product, err := prd.GetProduct(policy.Name, policy.ProductVersion, role)
+	product, err := prd.GetProduct(policy.Name, policy.ProductVersion, channel)
 	if err != nil {
 		return "", &models.Product{}, err
 	}

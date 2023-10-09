@@ -36,13 +36,13 @@ func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	authToken, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
 	lib.CheckError(err)
-	res, e := Life(authToken.Role, data)
+	res, e := Life(authToken.GetChannelByRole(), data)
 	s, e := json.Marshal(res)
 	return string(s), nil, e
 
 }
 
-func Life(role string, data models.Policy) (models.Policy, error) {
+func Life(channel string, data models.Policy) (models.Policy, error) {
 	var err error
 	contractorAge, err := data.CalculateContractorAge()
 
@@ -51,22 +51,14 @@ func Life(role string, data models.Policy) (models.Policy, error) {
 	var selectRow []string
 
 	log.Printf("[Life] getting product file")
-	_, ruleProduct, err := sellable.Life(role, data)
+	_, ruleProduct, err := sellable.Life(channel, data)
 	lib.CheckError(err)
 	log.Printf("[Life] product file loaded")
 
 	addDefaultGuarantees(data, *ruleProduct)
 
-	switch role {
-	case models.UserRoleAll, models.UserRoleCustomer:
-		log.Println("[Life] e-commerce flow")
-		death, err := data.ExtractGuarantee(deathGuarantee)
-		lib.CheckError(err)
-		log.Println("[Life] setting sumInsuredLimitOfIndeminity")
-		calculateSumInsuredLimitOfIndemnity(data.Assets, death.Value.SumInsuredLimitOfIndemnity)
-		log.Println("[Life] setting guarantees duration")
-		calculateGuaranteeDuration(data.Assets, contractorAge, death.Value.Duration.Year)
-	case models.UserRoleAgent, models.UserRoleAgency, models.UserRoleAdmin:
+	switch channel {
+	case models.AgentChannel, models.AgencyChannel, models.MgaChannel:
 		log.Println("[Life] admin/agent/agency flow")
 		guaranteesMap := data.GuaranteesToMap()
 		log.Println("[Life] setting sumInsuredLimitOfIndeminity")
@@ -89,6 +81,14 @@ func Life(role string, data models.Policy) (models.Policy, error) {
 		}
 
 		data.Assets[0].Guarantees = guaranteesList
+	case models.ECommerceChannel:
+		log.Println("[Life] e-commerce flow")
+		death, err := data.ExtractGuarantee(deathGuarantee)
+		lib.CheckError(err)
+		log.Println("[Life] setting sumInsuredLimitOfIndeminity")
+		calculateSumInsuredLimitOfIndemnity(data.Assets, death.Value.SumInsuredLimitOfIndemnity)
+		log.Println("[Life] setting guarantees duration")
+		calculateGuaranteeDuration(data.Assets, contractorAge, death.Value.Duration.Year)
 	}
 
 	updatePolicyStartEndDate(&data)
