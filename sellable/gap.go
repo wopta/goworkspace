@@ -23,12 +23,12 @@ const (
 // Given a policy that should contain the Gap and the Person assets, then it returns:
 //   - the product or parts of it depending on the sellability rules
 //   - and an eventual error
-func Gap(role string, policy *models.Policy) (*models.Product, error) {
+func Gap(channel string, policy *models.Policy) (*models.Product, error) {
 	if err := validatePolicy(policy); err != nil {
 		return &models.Product{}, fmt.Errorf("the policy did not pass validation: %v", err)
 	}
 
-	product, err := getProduct(policy, role)
+	product, err := getProduct(policy, channel)
 	if err != nil {
 		return &models.Product{}, fmt.Errorf("no products for this vehicle: %v", err)
 	}
@@ -40,8 +40,8 @@ func Gap(role string, policy *models.Policy) (*models.Product, error) {
 	return product, nil
 }
 
-func getProduct(policy *models.Policy, role string) (*models.Product, error) {
-	product, err := prd.GetProduct(policy.Name, policy.ProductVersion, role)
+func getProduct(policy *models.Policy, channel string) (*models.Product, error) {
+	product, err := prd.GetProduct(policy.Name, policy.ProductVersion, channel)
 	if err != nil {
 		return &models.Product{}, fmt.Errorf("error in getting the product: %v", err)
 	}

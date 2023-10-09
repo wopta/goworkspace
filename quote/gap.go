@@ -28,13 +28,13 @@ func GapFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 	authToken, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
 	lib.CheckError(err)
 
-	Gap(authToken.Role, &policy)
+	Gap(authToken.GetChannelByRole(), &policy)
 	policyJson, err := json.Marshal(policy)
 	return string(policyJson), policy, err
 }
 
-func Gap(role string, policy *models.Policy) {
-	product, err := sellable.Gap(role, policy)
+func Gap(channel string, policy *models.Policy) {
+	product, err := sellable.Gap(channel, policy)
 	lib.CheckError(err)
 
 	policy.Assets[0].Guarantees = getGuarantees(*product)
