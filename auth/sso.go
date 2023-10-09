@@ -40,6 +40,9 @@ func JwtFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 		node, e = q.FireQuery("networkNodes")
 		if len(node) > 0 {
 			if node[0].AuthId == "" {
+				userfire, _ := lib.CreateUserWithEmailAndPassword(node[0].Mail, os.Getenv("DEFAULT_PSW"), &node[0].Uid)
+				node[0].AuthId = userfire.UID
+				e = lib.SetFirestoreErr("networkNodes", node[0].Uid, node[0])
 
 			}
 			tokenString, e = lib.CreateCustomJwt("", "", node[0].AuthId)
