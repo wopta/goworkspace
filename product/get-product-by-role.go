@@ -83,7 +83,7 @@ func getAgencyProduct(productName, version, company, agencyUid string) (*models.
 
 func getAgentProduct(productName, version, company, agentUid string) (*models.Product, error) {
 	log.Println("getAgentProduct")
-	agentDefaultProduct, err := GetProduct(productName, version, models.AgencyChannel)
+	agentDefaultProduct, err := GetProduct(productName, version, models.AgentChannel)
 	lib.CheckError(err)
 
 	if !agentDefaultProduct.IsAgentActive {
