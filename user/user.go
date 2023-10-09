@@ -47,12 +47,14 @@ func User(w http.ResponseWriter, r *http.Request) {
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
+				// DEPRECATED
 				Route:   "/agent/authid/v1/:authId",
 				Handler: GetAgentByAuthIdFx,
 				Method:  "GET",
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
+				//DEPRECATED
 				Route:   "/agency/authid/v1/:authId",
 				Handler: GetAgencyByAuthIdFx,
 				Method:  "GET",

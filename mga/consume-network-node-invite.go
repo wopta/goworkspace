@@ -31,7 +31,7 @@ func ConsumeNetworkNodeInviteFx(w http.ResponseWriter, r *http.Request) (string,
 	err := json.Unmarshal(body, &req)
 	if err != nil {
 		log.Println("[ConsumeNetworkNodeInviteFx] error unmarshaling request body")
-		return "", nil, err
+		return "", "", err
 	}
 
 	log.Printf("[consumeNetworkNodeInvite] Consuming invite %s...", req.InviteUid)
@@ -39,10 +39,10 @@ func ConsumeNetworkNodeInviteFx(w http.ResponseWriter, r *http.Request) (string,
 	err = consumeNetworkNodeInvite(origin, req.InviteUid, req.Password)
 	if err != nil {
 		log.Printf("[ConsumeNetworkNodeInviteFx] error consuming invite %s: %s", req.InviteUid, err.Error())
-		return "", nil, err
+		return "", "", err
 	}
 
-	return "", nil, nil
+	return "", "", nil
 }
 
 func consumeNetworkNodeInvite(origin, inviteUid, password string) error {
@@ -111,6 +111,10 @@ func consumeNetworkNodeInvite(origin, inviteUid, password string) error {
 		log.Printf("[consumeNetworkInvite] error updating invite %s in Firestore...", inviteUid)
 		return err
 	}
+
+	lib.SetCustomClaimForUser(networkNode.AuthId, map[string]interface{}{
+		"role": networkNode.Role,
+	})
 
 	return nil
 }

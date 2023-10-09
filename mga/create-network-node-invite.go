@@ -44,7 +44,7 @@ func CreateNetworkNodeInviteFx(w http.ResponseWriter, r *http.Request) (string, 
 	err := json.Unmarshal(body, &req)
 	if err != nil {
 		log.Println("[CreateNetworkNodeInviteFx] error unmarshalling body")
-		return "", nil, err
+		return "", "", err
 	}
 
 	token := r.Header.Get("Authorization")
@@ -54,7 +54,7 @@ func CreateNetworkNodeInviteFx(w http.ResponseWriter, r *http.Request) (string, 
 	authToken, err := models.GetAuthTokenFromIdToken(token)
 	if err != nil {
 		log.Printf("[CreateNetworkNodeInviteFx] invalid JWT %s", token)
-		return "", nil, err
+		return "", "", err
 	}
 
 	log.Printf("[CreateNetworkNodeInviteFx] getting network node %s from Firestore...", req.NetworkNodeUid)
@@ -62,7 +62,7 @@ func CreateNetworkNodeInviteFx(w http.ResponseWriter, r *http.Request) (string, 
 	networkNode, err = network.GetNodeByUid(req.NetworkNodeUid)
 	if err != nil {
 		log.Printf("[CreateNetworkNodeInviteFx] error getting network node %s from Firestore...", req.NetworkNodeUid)
-		return "", nil, err
+		return "", "", err
 	}
 
 	log.Printf("[CreateNetworkNodeInviteFx] generating invite for network node %s", req.NetworkNodeUid)
@@ -70,7 +70,7 @@ func CreateNetworkNodeInviteFx(w http.ResponseWriter, r *http.Request) (string, 
 	inviteUid, err := createNetworkNodeInvite(origin, networkNode.Uid, authToken.UserID)
 	if err != nil {
 		log.Printf("[CreateNetworkNodeInviteFx] error generating invite for network node %s", req.NetworkNodeUid)
-		return "", nil, err
+		return "", "", err
 	}
 
 	log.Printf("[CreateNetworkNodeInviteFx] sending network node invite mail to %s", networkNode.Mail)
@@ -79,7 +79,7 @@ func CreateNetworkNodeInviteFx(w http.ResponseWriter, r *http.Request) (string, 
 
 	log.Printf("[CreateNetworkNodeInviteFx] network node invite mail sent to %s", networkNode.Mail)
 
-	return "", nil, nil
+	return "", "", nil
 }
 
 func createNetworkNodeInvite(origin, networkNodeUid, creatorUid string) (string, error) {
