@@ -106,10 +106,10 @@ func (nn *NetworkNode) SaveBigQuery(origin string) error {
 	nn.Data = string(nnJson)
 	nn.BigCreationDate = lib.GetBigQueryNullDateTime(nn.CreationDate)
 	nn.BigUpdatedDate = lib.GetBigQueryNullDateTime(nn.UpdatedDate)
-	*nn.Agent = *parseBigQueryAgentNode(nn.Agent)
-	*nn.AreaManager = *parseBigQueryAgentNode(nn.AreaManager)
-	*nn.Agency = *parseBigQueryAgencyNode(nn.Agency)
-	*nn.Broker = *parseBigQueryAgencyNode(nn.Broker)
+	nn.Agent = parseBigQueryAgentNode(nn.Agent)
+	nn.AreaManager = parseBigQueryAgentNode(nn.AreaManager)
+	nn.Agency = parseBigQueryAgencyNode(nn.Agency)
+	nn.Broker = parseBigQueryAgencyNode(nn.Broker)
 
 	for _, p := range nn.Products {
 		nn.BigProducts = append(nn.BigProducts, NodeProduct{
