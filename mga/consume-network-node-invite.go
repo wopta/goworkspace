@@ -42,7 +42,7 @@ func ConsumeNetworkNodeInviteFx(w http.ResponseWriter, r *http.Request) (string,
 		return "", "", err
 	}
 
-	return "", "", nil
+	return "{}", "", nil
 }
 
 func consumeNetworkNodeInvite(origin, inviteUid, password string) error {

@@ -79,7 +79,7 @@ func CreateNetworkNodeInviteFx(w http.ResponseWriter, r *http.Request) (string, 
 
 	log.Printf("[CreateNetworkNodeInviteFx] network node invite mail sent to %s", networkNode.Mail)
 
-	return "", "", nil
+	return "{}", nil, nil
 }
 
 func createNetworkNodeInvite(origin, networkNodeUid, creatorUid string) (string, error) {
