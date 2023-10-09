@@ -42,7 +42,7 @@ func Mga(w http.ResponseWriter, r *http.Request) {
 				Route:   "/network/node/v1/:uid",
 				Handler: GetNetworkNodeByUidFx,
 				Method:  http.MethodGet,
-				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
+				Roles:   []string{models.UserRoleAll},
 			},
 			{
 				Route:   "/network/node/v1",
