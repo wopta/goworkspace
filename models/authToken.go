@@ -38,7 +38,7 @@ func (at *AuthToken) GetChannelByRole() string {
 	channel := ECommerceChannel
 
 	switch at.Role {
-	case UserRoleAdmin:
+	case UserRoleAdmin, UserRoleManager:
 		channel = MgaChannel
 	case UserRoleAgency:
 		channel = AgencyChannel
