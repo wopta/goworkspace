@@ -86,12 +86,12 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 
 	log.Println("[AcceptanceFx] sending acceptance email...")
 
-	switch authToken.Role {
-	case models.UserRoleAdmin:
+	switch policy.Channel {
+	case models.MgaChannel:
 		toAddress = mail.Address{
 			Address: authToken.Email,
 		}
-	case models.UserRoleAgent:
+	case models.AgentChannel:
 		toAddress = mail.GetAgentEmail(&policy)
 	default:
 		toAddress = mail.GetContractorEmail(&policy)
