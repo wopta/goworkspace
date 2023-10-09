@@ -11,31 +11,24 @@ import (
 	"time"
 )
 
-func GetProduct(name, version, role string) (*models.Product, error) {
+func GetProduct(name, version, channel string) (*models.Product, error) {
 	var (
 		product  *models.Product
 		filePath = "products/"
 	)
 
-	switch role {
-	case models.UserRoleAdmin:
-		filePath += "mga"
-	case models.UserRoleAgency, models.UserRoleAgent:
-		filePath += role
-	default:
-		filePath += "e-commerce"
-	}
-	filePath += "/" + name + "-" + version + ".json"
+	filePath += channel + "/" + name + "-" + version + ".json"
 
 	jsonFile := lib.GetFilesByEnv(filePath)
 	err := json.Unmarshal(jsonFile, &product)
+	lib.CheckError(err)
 
-	product, err = replaceDatesInProduct(product, role)
+	product, err = replaceDatesInProduct(product, channel)
 
 	return product, err
 }
 
-func replaceDatesInProduct(product *models.Product, role string) (*models.Product, error) {
+func replaceDatesInProduct(product *models.Product, channel string) (*models.Product, error) {
 	jsonOut, err := product.Marshal()
 	if err != nil {
 		return &models.Product{}, err
@@ -43,7 +36,7 @@ func replaceDatesInProduct(product *models.Product, role string) (*models.Produc
 
 	productJson := string(jsonOut)
 
-	minAgeValue, minReservedAgeValue := ageMap[role][product.Name][minAge], ageMap[role][product.Name][minReservedAge]
+	minAgeValue, minReservedAgeValue := ageMap[channel][product.Name][minAge], ageMap[channel][product.Name][minReservedAge]
 
 	initialDate := time.Now().AddDate(-18, 0, 0).Format(models.TimeDateOnly)
 	minDate := time.Now().AddDate(-minAgeValue, 0, 1).Format(models.TimeDateOnly)
