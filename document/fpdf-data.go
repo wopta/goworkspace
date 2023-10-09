@@ -168,7 +168,7 @@ func loadPersonaGuarantees(policy *models.Policy) (map[string]map[string]string,
 		guaranteesMap map[string]map[string]string
 		slugs         []slugStruct
 	)
-	personaProduct, err := product.GetProduct(policy.Name, policy.ProductVersion, models.UserRoleAdmin)
+	personaProduct, err := product.GetProduct(policy.Name, policy.ProductVersion, models.MgaChannel)
 	lib.CheckError(err)
 
 	guaranteesMap = make(map[string]map[string]string, 0)

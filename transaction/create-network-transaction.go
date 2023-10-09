@@ -82,7 +82,7 @@ func createCompanyNetworkTransaction(policy *models.Policy, transaction *models.
 
 	var code string
 
-	prod, err := product.GetProduct(policy.Name, policy.ProductVersion, models.UserRoleAdmin)
+	prod, err := product.GetProduct(policy.Name, policy.ProductVersion, models.MgaChannel)
 	if err != nil {
 		log.Printf("[createCompanyNetworkTransaction] error getting mga product: %s", err.Error())
 		return nil, err
