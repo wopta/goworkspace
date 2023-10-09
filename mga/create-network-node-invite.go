@@ -20,7 +20,7 @@ type CreateNetworkNodeInviteRequest struct {
 type NetworkNodeInvite struct {
 	Uid            string    `json:"uid,omitempty" firestore:"uid,omitempty"`
 	CreatorUid     string    `json:"creatorUid,omitempty" firestore:"creatorUid,omitempty"`
-	Consumed       bool      `json:"consumed,omitempty" firestore:"consumed,omtiempty"`
+	Consumed       bool      `json:"consumed,omitempty" firestore:"consumed,omitempty"`
 	NetworkNodeUid string    `json:"networkNodeUid,omitempty" firestore:"networkNodeUid,omitempty"`
 	CreationDate   time.Time `json:"creationDate,omitempty" firestore:"creationDate,omitempty"`
 	ConsumeDate    time.Time `json:"consumeDate,omitempty" firestore:"consumeDate,omitempty"`

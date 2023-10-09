@@ -47,7 +47,7 @@ func ConsumeNetworkNodeInviteFx(w http.ResponseWriter, r *http.Request) (string,
 
 func consumeNetworkNodeInvite(origin, inviteUid, password string) error {
 	var (
-		invite      *NetworkNodeInvite
+		invite      NetworkNodeInvite
 		networkNode *models.NetworkNode
 	)
 
@@ -60,7 +60,7 @@ func consumeNetworkNodeInvite(origin, inviteUid, password string) error {
 		return err
 	}
 
-	err = docsnap.DataTo(invite)
+	err = docsnap.DataTo(&invite)
 	if err != nil {
 		log.Printf("consumeNetworkNodeInvite] error unmarshaling invite %s", inviteUid)
 		return err
