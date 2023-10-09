@@ -22,7 +22,7 @@ func PersonHandler(w http.ResponseWriter, r *http.Request) (string, interface{},
 	lib.CheckError(err)
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
-	product = Person(authToken.Role, body)
+	product = Person(authToken.GetChannelByRole(), body)
 
 	productJson, err := json.Marshal(product)
 	lib.CheckError(err)
@@ -30,7 +30,7 @@ func PersonHandler(w http.ResponseWriter, r *http.Request) (string, interface{},
 	return string(productJson), product, nil
 }
 
-func Person(role string, body []byte) *models.Product {
+func Person(channel string, body []byte) *models.Product {
 	var (
 		policy models.Policy
 		err    error
@@ -40,7 +40,7 @@ func Person(role string, body []byte) *models.Product {
 	)
 
 	quotingInputData := getRulesInputData(&policy, err, body)
-	product, err := prd.GetProduct(policy.Name, policy.ProductVersion, role)
+	product, err := prd.GetProduct(policy.Name, policy.ProductVersion, channel)
 	lib.CheckError(err)
 
 	fx := new(models.Fx)

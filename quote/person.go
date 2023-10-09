@@ -25,7 +25,7 @@ func PersonFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	err = json.Unmarshal(body, &policy)
 	lib.CheckError(err)
 
-	personProduct := sellable.Person(authToken.Role, body)
+	personProduct := sellable.Person(authToken.GetChannelByRole(), body)
 
 	b := lib.GetByteByEnv("quote/persona-tassi.json", false)
 	err = json.Unmarshal(b, &personaRates)
