@@ -115,7 +115,7 @@ func getPaymentMethods(policy models.Policy) []string {
 
 	log.Printf("[GetPaymentMethods] loading available payment methods for %s payment provider", policy.Payment)
 
-	product, err := prd.GetProduct(policy.Name, policy.ProductVersion, models.UserRoleAdmin)
+	product, err := prd.GetProduct(policy.Name, policy.ProductVersion, models.MgaChannel)
 	lib.CheckError(err)
 
 	// TODO: remove me once established standard
