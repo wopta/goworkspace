@@ -113,6 +113,7 @@ func consumeNetworkNodeInvite(origin, inviteUid, password string) error {
 	}
 
 	lib.SetCustomClaimForUser(networkNode.AuthId, map[string]interface{}{
+		"isNetworkNode": true, 
 		"role": networkNode.Role,
 	})
 
