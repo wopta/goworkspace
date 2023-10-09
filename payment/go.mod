@@ -8,14 +8,14 @@ require (
 	cloud.google.com/go v0.110.7
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.4
 	github.com/google/uuid v1.3.0
-	github.com/wopta/goworkspace/document v1.0.99
-	github.com/wopta/goworkspace/lib v1.0.70
+	github.com/wopta/goworkspace/document v1.1.0
+	github.com/wopta/goworkspace/lib v1.0.76
 	github.com/wopta/goworkspace/mail v1.0.40
-	github.com/wopta/goworkspace/models v1.1.46
-	github.com/wopta/goworkspace/network v1.0.0
+	github.com/wopta/goworkspace/models v1.1.47
+	github.com/wopta/goworkspace/network v1.0.1
 	github.com/wopta/goworkspace/policy v1.0.14
-	github.com/wopta/goworkspace/product v1.0.46
-	github.com/wopta/goworkspace/transaction v1.0.17
+	github.com/wopta/goworkspace/product v1.0.48
+	github.com/wopta/goworkspace/transaction v1.0.18
 	github.com/wopta/goworkspace/user v1.0.24
 )
 
