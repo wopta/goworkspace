@@ -6,9 +6,9 @@ replace github.com/wopta/goworkspace/reserved => ./
 
 require (
 	github.com/wopta/goworkspace/document v1.0.98
-	github.com/wopta/goworkspace/lib v1.0.68
-	github.com/wopta/goworkspace/models v1.1.43
-	github.com/wopta/goworkspace/product v1.0.45
+	github.com/wopta/goworkspace/lib v1.0.76
+	github.com/wopta/goworkspace/models v1.1.47
+	github.com/wopta/goworkspace/product v1.0.48
 )
 
 require (
