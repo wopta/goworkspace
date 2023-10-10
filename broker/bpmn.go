@@ -54,7 +54,7 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 
 	state := bpmn.NewBpmn(*policy)
 
-	networkNode = network.GetNetworkNodeByUid(policy.ProductUid)
+	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
 
 	// TODO: fix me - maybe get to/from/cc from setting.json?
 	switch flowKey {
