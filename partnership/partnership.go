@@ -13,6 +13,7 @@ import (
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/mohae/deepcopy"
 	lib "github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
@@ -44,15 +45,16 @@ func Partnership(w http.ResponseWriter, r *http.Request) {
 func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var response PartnershipResponse
 	resp.Header().Set("Access-Control-Allow-Methods", "GET")
+	resp.Header().Set("Content-Type", "application/json")
 
 	log.Println("[LifePartnershipFx] handler start ----------------------------")
 
 	partnershipUid := strings.ToLower(r.Header.Get("partnershipUid"))
 	jwtData := r.URL.Query().Get("jwt")
 
-	log.Println("[LifePartnershipFx] partnershipUid: %s jwt: %s", partnershipUid, jwtData)
+	log.Printf("[LifePartnershipFx] partnershipUid: %s jwt: %s", partnershipUid, jwtData)
 
-	policy, product, node, err := LifePartnership(partnershipUid, jwtData)
+	policy, product, node, err := LifePartnership(partnershipUid, jwtData, r.Header.Get("Origin"))
 
 	response.Policy = policy
 	response.Product = product
@@ -65,11 +67,11 @@ func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, inter
 	return string(responseJson), response, err
 }
 
-func LifePartnership(partnershipUid, jwtData string) (models.Policy, models.Product, models.NetworkNode, error) {
+func LifePartnership(partnershipUid, jwtData, origin string) (models.Policy, models.Product, *models.NetworkNode, error) {
 	var (
 		policy          models.Policy
 		productLife     models.Product
-		partnershipNode models.NetworkNode
+		partnershipNode *models.NetworkNode
 		err error
 	)
 
@@ -115,13 +117,79 @@ func LifePartnership(partnershipUid, jwtData string) (models.Policy, models.Prod
 		return policy, productLife, partnershipNode, err
 	}
 
-	policy, err = quote.Life(models.UserRoleCustomer, policy)
-
+	policy, err = quote.Life(models.ECommerceChannel, policy)
+	
 	if err != nil {
 		return policy, productLife, partnershipNode, err
 	}
 
+	err = savePartnershipLead(&policy, partnershipNode, origin)
+
 	return policy, productLife, partnershipNode, err
+}
+
+func removeUnselectedGuarantees(policy *models.Policy) models.Policy {
+	policyCopy := deepcopy.Copy(*policy).(models.Policy)
+	for i, asset := range policy.Assets {
+		policyCopy.Assets[i].Guarantees = lib.SliceFilter(asset.Guarantees, func (guarantee models.Guarante) bool {
+			return guarantee.IsSelected
+		})
+	}
+	return policyCopy
+}
+
+func savePartnershipLead(policy *models.Policy, node *models.NetworkNode, origin string) error {
+	var err error
+
+	log.Println("[savePartnershipLead] start --------------------------------------------")
+
+	policyFire := lib.GetDatasetByEnv(origin, models.PolicyCollection)
+	guaranteFire := lib.GetDatasetByEnv(origin, models.GuaranteeCollection)
+
+	policy.Channel = models.ECommerceChannel
+
+	if node != nil {
+		policy.ProducerUid = node.Uid
+		policy.ProducerCode = node.Code
+		policy.ProducerType = node.Type
+		policy.NetworkUid = node.NetworkUid
+	}
+
+	now := time.Now().UTC()
+
+	policy.CreationDate = now
+	policy.Status = models.PolicyStatusInitLead
+	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
+	log.Printf("[savePartnershipLead] policy status %s", policy.Status)
+
+	policy.IsSign = false
+	policy.IsPay = false
+	policy.Updated = now
+
+	log.Println("[savePartnershipLead] add information stet")
+	policy.Attachments = &[]models.Attachment{{
+		Name: "Precontrattuale", FileName: "Precontrattuale.pdf",
+		Link: "gs://documents-public-dev/information-sets/" + policy.Name + "/" + policy.ProductVersion + "/Precontrattuale.pdf",
+	}}
+
+	log.Println("[savePartnershipLead] saving lead to firestore...")
+	policyUid := lib.NewDoc(policyFire)
+	policy.Uid = policyUid
+
+	policyToSave := removeUnselectedGuarantees(policy)
+	
+	if err = lib.SetFirestoreErr(policyFire, policyUid, policyToSave); err != nil {
+		return err
+	}
+
+	log.Println("[savePartnershipLead] saving lead to bigquery...")
+	policyToSave.BigquerySave(origin)
+
+	log.Println("[savePartnershipLead] saving guarantees to bigquery...")
+	models.SetGuaranteBigquery(policyToSave, "lead", guaranteFire)
+
+	log.Println("[savePartnershipLead] end ----------------------------------------------")
+	return err
 }
 
 func getLatestLifeProduct(products []models.Product) models.Product {
@@ -133,22 +201,6 @@ func getLatestLifeProduct(products []models.Product) models.Product {
 	})
 	latestLifeProduct := products[0]
 	return latestLifeProduct
-}
-
-func addDefaultGuarantees(asset *models.Asset, guarantees *map[string]*models.Guarante, offerName string) {
-	for _, guarantee := range *guarantees {
-		guarantee.IsSelected = guarantee.IsSelected || guarantee.IsMandatory
-
-		if !guarantee.IsSelected {
-			continue
-		}
-
-		guarantee.Value = &models.GuaranteValue{
-			SumInsuredLimitOfIndemnity: guarantee.Offer[offerName].SumInsuredLimitOfIndemnity,
-			Duration:                   guarantee.Offer[offerName].Duration,
-		}
-		asset.Guarantees = append(asset.Guarantees, *guarantee)
-	}
 }
 
 func beProfPartnership(jwtData string, policy *models.Policy, product *models.Product) error {
@@ -189,8 +241,6 @@ func beProfPartnership(jwtData string, policy *models.Policy, product *models.Pr
 		policy.Contractor = person
 		asset.Person = &person
 		policy.OfferlName = "default"
-
-		//addDefaultGuarantees(&asset, &product.Companies[0].GuaranteesMap, policy.OfferlName)
 
 		policy.Assets = append(policy.Assets, asset)
 		policy.PartnershipData = claims.ToMap()
@@ -233,8 +283,6 @@ func facilePartnership(jwtData string, policy *models.Policy, product *models.Pr
 		asset.Person = &person
 		policy.OfferlName = "default"
 
-		//addDefaultGuarantees(&asset, &product.Companies[0].GuaranteesMap, policy.OfferlName)
-
 		log.Println("[facilePartnership] setting death guarantee info")
 
 		deathGuarantee := product.Companies[0].GuaranteesMap["death"]
@@ -246,13 +294,6 @@ func facilePartnership(jwtData string, policy *models.Policy, product *models.Pr
 		}
 		asset.Guarantees = make([]models.Guarante, 0)
 		asset.Guarantees = append(asset.Guarantees, *deathGuarantee)
-
-		// for index, guarantee := range asset.Guarantees {
-		// 	if guarantee.Slug == "death" {
-		// 		asset.Guarantees[index].Value.Duration.Year = claims.Duration
-		// 		asset.Guarantees[index].Value.SumInsuredLimitOfIndemnity = float64(claims.InsuredCapital)
-		// 	}
-		// }
 
 		policy.Assets = append(policy.Assets, asset)
 		policy.PartnershipData = claims.ToMap()
