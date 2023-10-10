@@ -22,14 +22,16 @@ func getClient() (*auth.Client, context.Context) {
 	return client, ctx
 }
 func CreateCustomJwt(email string, role string, id string) (string, error) {
-	
+
 	client, ctx := getClient()
 	claims := map[string]interface{}{
-        "role": role,
-}
+		"role":          role,
+		"email":         email,
+		"isNetworkNode": true,
+	}
 	token, err := client.CustomTokenWithClaims(ctx, id, claims)
 	if err != nil {
-			log.Fatalf("error minting custom token: %v\n", err)
+		log.Fatalf("error minting custom token: %v\n", err)
 	}
 	log.Printf("Got custom token: %v\n", token)
 	return token, err
