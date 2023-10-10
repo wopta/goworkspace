@@ -17,17 +17,27 @@ type AcceptancePayload struct {
 }
 
 func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.Println("[AcceptanceFx] Handler start ----------------------------------------")
-
 	var (
-		err     error
-		payload AcceptancePayload
-		policy  models.Policy
+		err       error
+		payload   AcceptancePayload
+		policy    models.Policy
+		toAddress mail.Address
 	)
+
+	log.Println("[AcceptanceFx] Handler start ----------------------------------------")
 
 	origin := r.Header.Get("origin")
 	policyUid := r.Header.Get("policyUid")
 	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
+
+	log.Println("[AcceptanceFx] loading authToken from idToken...")
+
+	token := r.Header.Get("Authorization")
+	authToken, err := models.GetAuthTokenFromIdToken(token)
+	if err != nil {
+		log.Printf("[AcceptanceFx] error getting authToken")
+		return "", nil, err
+	}
 
 	log.Printf("[AcceptanceFx] Policy Uid %s", policyUid)
 
@@ -75,20 +85,26 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	log.Printf("[AcceptanceFx] Policy: %s", string(policyJsonLog))
 
 	log.Println("[AcceptanceFx] sending acceptance email...")
+
+	switch policy.Channel {
+	case models.MgaChannel:
+		toAddress = mail.Address{
+			Address: authToken.Email,
+		}
+	case models.AgentChannel:
+		toAddress = mail.GetAgentEmail(&policy)
+	default:
+		toAddress = mail.GetContractorEmail(&policy)
+	}
+
 	mail.SendMailReservedResult(
 		policy,
 		mail.AddressAssunzione,
-		mail.GetAgentEmail(&policy),
+		toAddress,
 		mail.Address{},
 	)
 
-	log.Println("[AcceptanceFx] saving audit trail...")
-	audit, err := models.ParseHttpRequest(r, string(body))
-	if err != nil {
-		log.Printf("[AcceptanceFx] error creating audit log: %s", err.Error())
-	}
-	log.Printf("[AcceptanceFx] audit log: %v", audit)
-	audit.SaveToBigQuery()
+	models.CreateAuditLog(r, string(body))
 
 	return `{"success":true}`, `{"success":true}`, nil
 }

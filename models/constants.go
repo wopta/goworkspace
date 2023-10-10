@@ -40,11 +40,11 @@ const (
 type PaySplit string
 
 const (
-	PaySplitMonthly      PaySplit = "monthly"
-	PaySplitYear         PaySplit = "year"
-	PaySplitYearly       PaySplit = "yearly"
-	PaySplitSemestral    PaySplit = "semestral"
-	PaySingleInstallment PaySplit = "singleInstallment"
+	PaySplitMonthly           PaySplit = "monthly"
+	PaySplitYear              PaySplit = "year"
+	PaySplitYearly            PaySplit = "yearly"
+	PaySplitSemestral         PaySplit = "semestral"
+	PaySplitSingleInstallment PaySplit = "singleInstallment"
 )
 
 type PayType string
@@ -78,16 +78,19 @@ const (
 )
 
 const (
-	AgentCollection        string = "agents"
-	AgencyCollection       string = "agencies"
-	UserCollection         string = "users"
-	PolicyCollection       string = "policy"
-	ProductsCollection     string = "products"
-	TransactionsCollection string = "transactions"
-	ClaimsCollection       string = "claims" //only for bigquery
-	AuditsCollection       string = "audits"
-	GuaranteeCollection    string = "guarante"
-	NetworkNodesCollection string = "networkNodes"
+	AgentCollection              string = "agents"
+	AgencyCollection             string = "agencies"
+	UserCollection               string = "users"
+	PolicyCollection             string = "policy"
+	ProductsCollection           string = "products"
+	TransactionsCollection       string = "transactions"
+	ClaimsCollection             string = "claims" //only for bigquery
+	AuditsCollection             string = "audits"
+	GuaranteeCollection          string = "guarante"
+	NetworkNodesCollection       string = "networkNodes"
+	NetworkTransactionCollection string = "networkTransactions" //only for bigquery
+	InvitesCollection            string = "invites"
+	EmergencyNumbersCollection   string = "emergencyNumbers"
 )
 
 const (
@@ -125,5 +128,24 @@ const (
 
 const (
 	FabrickPaymentProvider string = "fabrick"
-	ManualPaymentProvider  string = "payment"
+	ManualPaymentProvider  string = "manual"
+)
+
+const (
+	PayMethodCard       = "creditcard"
+	PayMethodTransfer   = "transfer"
+	PayMethodSdd        = "sdd"
+	PayMethodRemittance = "remittance"
+)
+
+func GetAllPaymentMethods() []string {
+	return []string{PayMethodCard, PayMethodTransfer, PayMethodSdd}
+}
+
+const (
+	AgentNetworkNodeType       string = "agent"
+	AgencyNetworkNodeType      string = "agency"
+	BrokerNetworkNodeType      string = "broker"
+	AreaManagerNetworkNodeType string = "area-manager"
+	PartnershipNetworkNodeType string = "partnership"
 )

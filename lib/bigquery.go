@@ -3,8 +3,11 @@ package lib
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"log"
 	"os"
+	"reflect"
+	"strconv"
 	"time"
 
 	"cloud.google.com/go/bigquery"
@@ -45,7 +48,7 @@ func QueryRowsBigQuery[T any](query string) ([]T, error) {
 		e := iter.Next(&row)
 		log.Println(e)
 		if e == iterator.Done {
-			return res, e
+			return res, nil
 		}
 		if e != nil {
 			return res, e
@@ -140,10 +143,86 @@ func UpdateRowBigQuery(datasetID string, tableID string, params map[string]strin
 	return e
 }
 
+// use biquery query constructors
+func UpdateRowBigQueryV2(datasetId, tableId string, params map[string]interface{}, condition string) error {
+	var (
+		bytes bytes.Buffer
+		err   error
+	)
+
+	if len(params) == 0 {
+		return fmt.Errorf("no params to update")
+	}
+
+	tableSelection := fmt.Sprintf("UPDATE `%s.%s` SET ", datasetId, tableId)
+	bytes.WriteString(tableSelection)
+
+	count := 1
+	length := len(params)
+	for key, value := range params {
+		var query string
+		if reflect.TypeOf(value).String() == "string" {
+			query = key + "=" + "'" + reflect.ValueOf(value).String() + "'"
+		} else if reflect.TypeOf(value).String() == "bool" {
+			query = key + "=" + strconv.FormatBool(value.(bool))
+		} else if reflect.TypeOf(value).String() == "[]string" {
+			query = key + "=" + "ARRAY ["
+			for index, s := range value.([]string) {
+				query = query + "'" + s + "'"
+				if index < len(value.([]string))-1 {
+					query = query + ", "
+				}
+			}
+			query = query + "]"
+		} else if reflect.TypeOf(value).String() == "bigquery.NullDateTime" {
+			query = key + "=" + "'" + bigquery.CivilDateTimeString(value.(bigquery.NullDateTime).DateTime) + "'"
+		}
+		if count < length {
+			query = query + ", "
+		} else {
+			query = query + " "
+		}
+		bytes.WriteString(query)
+		count = count + 1
+	}
+	bytes.WriteString(condition)
+	queryString := bytes.String()
+	log.Printf("[UpdateRowBigQueryV2] query: %s", queryString)
+
+	client := getBigqueryClient()
+	defer client.Close()
+	ctx := context.Background()
+	query := client.Query(queryString)
+	job, err := query.Run(ctx)
+	if err != nil {
+		log.Printf("[UpdateRowBigQueryV2] error running query: %s", err.Error())
+		return err
+	}
+	status, err := job.Wait(ctx)
+	if err != nil {
+		log.Printf("[UpdateRowBigQueryV2] error waiting for job to run: %s", err.Error())
+		return err
+	}
+	if err := status.Err(); err != nil {
+		log.Printf("[UpdateRowBigQueryV2] error on job: %s", err.Error())
+		return err
+	}
+
+	return err
+}
+
 func GetBigQueryNullDateTime(date time.Time) bigquery.NullDateTime {
 	nilTime := time.Time{}
 	return bigquery.NullDateTime{
 		DateTime: civil.DateTimeOf(date),
 		Valid:    date != nilTime,
+	}
+}
+
+func GetBigQueryNullGeography(latitude, longitude float64) bigquery.NullGeography {
+	// TODO: Check if correct: Geography type uses the WKT format for geometry
+	return bigquery.NullGeography{
+		GeographyVal: fmt.Sprintf("POINT (%f %f)", longitude, latitude),
+		Valid:        true,
 	}
 }

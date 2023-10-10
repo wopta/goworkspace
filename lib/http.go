@@ -9,7 +9,17 @@ import (
 	"net/http"
 	"time"
 )
-
+func Httpclient(req *http.Request)*http.Response{
+  
+	client := http.Client{
+	   Timeout: 30 * time.Second,
+	}
+	res, err := client.Do(req)
+	if err != nil {
+		fmt.Printf("client: error making http request: %s\n", err)
+	}
+	return res
+}
 func RetryDo(req *http.Request, retry int) (*http.Response, error) {
 	const (
 		maxRetry = 5

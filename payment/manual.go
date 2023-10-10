@@ -10,6 +10,7 @@ import (
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
 	"github.com/wopta/goworkspace/policy"
 	"github.com/wopta/goworkspace/transaction"
 	"github.com/wopta/goworkspace/user"
@@ -33,7 +34,7 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		return "", nil, err
 	}
 
-	methods := GetAllPaymentMethods()
+	methods := models.GetAllPaymentMethods()
 	isMethodAllowed := lib.SliceContains[string](methods, payload.PaymentMethod)
 
 	if !isMethodAllowed {
@@ -42,10 +43,10 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		return errorMessage, errorMessage, nil
 	}
 
-	origin := r.Header.Get("origin")
+	origin := r.Header.Get("Origin")
 	transactionUid := r.Header.Get("transactionUid")
-	fireTransactions := lib.GetDatasetByEnv(origin, "transactions")
-	firePolicies := lib.GetDatasetByEnv(origin, "policy")
+	fireTransactions := lib.GetDatasetByEnv(origin, models.TransactionsCollection)
+	firePolicies := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 
 	var t models.Transaction
 	var p models.Policy
@@ -101,6 +102,9 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 
 	ManualPayment(&t, origin, &payload)
 
+	producerNode := network.GetNetworkNodeByUid(p.ProducerUid)
+	transaction.CreateNetworkTransactions(&p, &t, producerNode)
+
 	// Update policy if needed
 	if !p.IsPay {
 		// Create/Update document on user collection based on contractor fiscalCode
@@ -127,9 +131,9 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 }
 
 func ManualPayment(transaction *models.Transaction, origin string, payload *ManualPaymentPayload) {
-	fireTransactions := lib.GetDatasetByEnv(origin, "transactions")
+	fireTransactions := lib.GetDatasetByEnv(origin, models.TransactionsCollection)
 
-	transaction.ProviderName = "manual"
+	transaction.ProviderName = models.ManualPaymentProvider
 	transaction.PaymentMethod = payload.PaymentMethod
 	transaction.PaymentNote = payload.Note
 	transaction.IsPay = true

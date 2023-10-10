@@ -87,14 +87,15 @@ func PaymentController(origin string, policy *models.Policy) (string, error) {
 	case models.FabrickPaymentProvider:
 		var payRes FabrickPaymentResponse
 
-		if policy.PaymentSplit == string(models.PaySplitYear) || policy.PaymentSplit == string(models.PaySplitYearly) {
+		switch policy.PaymentSplit {
+		case string(models.PaySplitYear), string(models.PaySplitYearly), string(models.PaySplitSingleInstallment):
 			log.Printf("[PaymentController] fabrick yearly pay")
 			payRes = FabrickYearPay(*policy, origin, paymentMethods)
-		}
-		if policy.PaymentSplit == string(models.PaySplitMonthly) {
+		case string(models.PaySplitMonthly):
 			log.Printf("[PaymentController] fabrick monthly pay")
 			payRes = FabrickMonthlyPay(*policy, origin, paymentMethods)
 		}
+		
 		if payRes.Payload == nil || payRes.Payload.PaymentPageURL == nil {
 			log.Println("[PaymentController] fabrick error payload or paymentUrl empty")
 			return "", fmt.Errorf("fabrick error: %v", payRes.Errors)
@@ -114,7 +115,7 @@ func getPaymentMethods(policy models.Policy) []string {
 
 	log.Printf("[GetPaymentMethods] loading available payment methods for %s payment provider", policy.Payment)
 
-	product, err := prd.GetProduct(policy.Name, policy.ProductVersion, models.UserRoleAdmin)
+	product, err := prd.GetProduct(policy.Name, policy.ProductVersion, models.MgaChannel)
 	lib.CheckError(err)
 
 	// TODO: remove me once established standard

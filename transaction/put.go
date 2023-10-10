@@ -9,7 +9,7 @@ import (
 	"github.com/wopta/goworkspace/product"
 )
 
-func PutByPolicy(policy models.Policy, scheduleDate, origin, expireDate, customerId string, amount, amountNet float64, providerId, paymentMethod string, isPay bool) {
+func PutByPolicy(policy models.Policy, scheduleDate, origin, expireDate, customerId string, amount, amountNet float64, providerId, paymentMethod string, isPay bool) *models.Transaction {
 	log.Printf("[PutByPolicy] Policy %s", policy.Uid)
 	var (
 		commissionMga    float64
@@ -23,10 +23,10 @@ func PutByPolicy(policy models.Policy, scheduleDate, origin, expireDate, custome
 		transactionDate  time.Time
 	)
 
-	prod, err := product.GetProduct(policy.Name, policy.ProductVersion, models.UserRoleAdmin)
+	prod, err := product.GetProduct(policy.Name, policy.ProductVersion, models.MgaChannel)
 	if err != nil {
 		log.Printf("[PutByPolicy] ERROR getting mga product: %s", err.Error())
-		return
+		return nil
 	}
 
 	// TODO fix me - workaround for Gap camper mga commissions
@@ -104,9 +104,14 @@ func PutByPolicy(policy models.Policy, scheduleDate, origin, expireDate, custome
 	}
 
 	err = lib.SetFirestoreErr(fireTransactions, transactionUid, tr)
-	lib.CheckError(err)
+	if err != nil {
+		log.Printf("[PutByPolicy] error saving transaction to firestore: %s", err.Error())
+		return nil
+	}
 
 	tr.BigQuerySave(origin)
+
+	return &tr
 }
 
 func getAgentCommission(policy models.Policy) float64 {

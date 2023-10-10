@@ -25,9 +25,10 @@ func (router RouteData) Router(w http.ResponseWriter, r *http.Request) {
 	var isFound bool
 	var route string
 	var e error
+
 	//reqUri := r.RequestURI
 	for _, v := range router.Routes {
-
+		
 		route = v.Route
 		if strings.Contains(route, "?") {
 			//i := strings.Index(route, ":")

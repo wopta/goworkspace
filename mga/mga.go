@@ -38,6 +38,36 @@ func Mga(w http.ResponseWriter, r *http.Request) {
 				Method:  http.MethodGet,
 				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},
+			{
+				Route:   "/network/node/v1/:uid",
+				Handler: GetNetworkNodeByUidFx,
+				Method:  http.MethodGet,
+				Roles:   []string{models.UserRoleAll},
+			},
+			{
+				Route:   "/network/node/v1",
+				Handler: CreateNetworkNodeFx,
+				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
+			},
+			{
+				Route:   "/network/node/v1/:uid",
+				Handler: DeleteNetworkNodeFx,
+				Method:  http.MethodDelete,
+				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
+			},
+			{
+				Route:   "/network/invite/v1/create",
+				Handler: CreateNetworkNodeInviteFx,
+				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
+			},
+			{
+				Route:   "/network/invite/v1/consume",
+				Handler: ConsumeNetworkNodeInviteFx,
+				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
+			},
 		},
 	}
 

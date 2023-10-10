@@ -2,10 +2,11 @@ package mga
 
 import (
 	"encoding/json"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
 	"log"
 	"net/http"
+
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 )
 
 const (
@@ -43,10 +44,8 @@ func GetProductsListByEntitlementFx(w http.ResponseWriter, r *http.Request) (str
 	switch authToken.Role {
 	case models.UserRoleAdmin, models.UserRoleManager:
 		roleProducts = getMgaProductsList()
-	case models.UserRoleAgency:
-		roleProducts = getAgencyProductsList(authToken.UserID, origin)
-	case models.UserRoleAgent:
-		roleProducts = getAgentProductsList(authToken.UserID, origin)
+	case models.UserRoleAgency, models.UserRoleAgent:
+		roleProducts = getNetworkNodeProductsList(authToken.UserID, origin)
 	case models.UserRoleCustomer, models.UserRoleAll:
 		roleProducts = getEcommerceProductsList()
 	}
@@ -102,30 +101,35 @@ func getEcommerceProductsList() []models.Product {
 	return productsList
 }
 
-func getAgencyProductsList(agencyUid, origin string) []models.Product {
+func 
+getNetworkNodeProductsList(networkNodeUid, origin string) []models.Product {
 	var (
-		agency       models.Agency
+		networkNode  models.NetworkNode
+		channel      string
 		productsList = make([]models.Product, 0)
 	)
 
-	log.Println("GetAgentProducts")
+	log.Println("GetAgencyProducts")
 
-	fireAgency := lib.GetDatasetByEnv(origin, models.AgencyCollection)
-	docsnap, err := lib.GetFirestoreErr(fireAgency, agencyUid)
+	fireNetwork := lib.GetDatasetByEnv(origin, models.NetworkNodesCollection)
+	docsnap, err := lib.GetFirestoreErr(fireNetwork, networkNodeUid)
 	lib.CheckError(err)
-	err = docsnap.DataTo(&agency)
+	err = docsnap.DataTo(&networkNode)
 	lib.CheckError(err)
 
-	defaultAgencyProduct := getDefaultProductsByChannel(models.UserRoleAgency + "/")
+	switch networkNode.Type {
+	case models.AgentNetworkNodeType:
+		channel = models.AgentChannel
+	case models.AgencyNetworkNodeType:
+		channel = models.AgencyChannel
+	}
 
-	for _, product := range agency.Products {
-		if !product.IsAgencyActive {
-			continue
-		}
-		for _, defaultProduct := range defaultAgencyProduct {
-			isProductActive := product.Name == defaultProduct.Name && defaultProduct.IsAgencyActive
-			if isProductActive {
-				productsList = append(productsList, product)
+	defaultChannelProduct := getDefaultProductsByChannel(channel + "/")
+
+	for _, product := range networkNode.Products {
+		for _, defaultProduct := range defaultChannelProduct {
+			if product.Name == defaultProduct.Name && product.Version == defaultProduct.Version {
+				productsList = append(productsList, defaultProduct)
 				break
 			}
 		}
@@ -134,51 +138,6 @@ func getAgencyProductsList(agencyUid, origin string) []models.Product {
 	return productsList
 }
 
-func getAgentProductsList(agentUid, origin string) []models.Product {
-	var (
-		agent models.Agent
-		//agency       models.Agency
-		productsList = make([]models.Product, 0)
-	)
-
-	log.Println("GetAgentProducts")
-
-	fireAgent := lib.GetDatasetByEnv(origin, models.AgentCollection)
-	docsnap, err := lib.GetFirestoreErr(fireAgent, agentUid)
-	lib.CheckError(err)
-	err = docsnap.DataTo(&agent)
-	lib.CheckError(err)
-
-	defaultAgentProducts := getDefaultProductsByChannel(models.UserRoleAgent + "/")
-
-	for _, product := range agent.Products {
-		if !product.IsAgentActive {
-			continue
-		}
-		for _, defaultProduct := range defaultAgentProducts {
-			isProductActive := product.Name == defaultProduct.Name && defaultProduct.IsAgentActive
-			if isProductActive {
-				productsList = append(productsList, product)
-				break
-			}
-		}
-	}
-
-	/*if agent.AgencyUid != "" {
-		agencyProductsList := getAgencyProductsList(agent.AgencyUid, origin)
-		err = docsnap.DataTo(&agency)
-		for index, product := range productsList {
-			for _, agencyProduct := range agencyProductsList {
-				hasToBeRemoved := product.Name == agencyProduct.Name && !agency.IsActive
-				if hasToBeRemoved {
-					productsList = append(productsList[index:], productsList[index+1:]...)
-				}
-			}
-		}
-	}*/
-
-	return productsList
-}
 
 func getDefaultProductsByChannel(channel string) []models.Product {
 	products := make([]models.Product, 0)

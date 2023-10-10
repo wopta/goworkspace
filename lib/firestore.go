@@ -154,6 +154,16 @@ func UpdateFirestoreErr(collection string, doc string, values map[string]interfa
 	return err
 }
 
+func DeleteFirestoreErr(collection string, doc string) (*firestore.WriteResult, error) {
+	ctx := context.Background()
+	client, err := firestore.NewClient(ctx, os.Getenv("GOOGLE_PROJECT_ID"))
+	CheckError(err)
+	c := client.Collection(collection)
+	col := c.Doc(doc)
+	res, err := col.Delete(ctx)
+	return res, err
+}
+
 func WhereFirestore(collection string, field string, operator string, queryValue string) *firestore.DocumentIterator {
 	ctx := context.Background()
 

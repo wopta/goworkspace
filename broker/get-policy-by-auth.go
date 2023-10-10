@@ -2,18 +2,19 @@ package broker
 
 import (
 	"encoding/json"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
 	"io"
 	"log"
 	"net/http"
+
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 )
 
 func GetPoliciesByAuthFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		req        GetPoliciesReq
 		resp       GetPoliciesResp
-		fieldName  string
+		fieldName  = "producerUid"
 		limitValue = 25
 	)
 
@@ -28,12 +29,6 @@ func GetPoliciesByAuthFx(w http.ResponseWriter, r *http.Request) (string, interf
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	err = json.Unmarshal(body, &req)
 	lib.CheckError(err)
-
-	if authToken.Role == models.UserRoleAgent {
-		fieldName = "agentUid"
-	} else if authToken.Role == models.UserRoleAgency {
-		fieldName = "agencyUid"
-	}
 
 	if req.Limit != 0 {
 		limitValue = req.Limit

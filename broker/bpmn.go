@@ -10,12 +10,14 @@ import (
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
 	"github.com/wopta/goworkspace/user"
 )
 
 var (
-	origin, paymentSplit              string
+	origin, paymentSplit, channel     string
 	ccAddress, toAddress, fromAddress mail.Address
+	networkNode                       *models.NetworkNode
 )
 
 const (
@@ -38,7 +40,7 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 	toAddress = mail.Address{}
 	ccAddress = mail.Address{}
 	fromAddress = mail.AddressAnna
-	channel := models.GetChannel(policy)
+	channel = policy.Channel
 	settingFile := fmt.Sprintf(settingFormat, channel)
 
 	log.Printf("[runBrokerBpmn] loading file for channel %s", channel)
@@ -52,6 +54,8 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 
 	state := bpmn.NewBpmn(*policy)
 
+	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
+
 	// TODO: fix me - maybe get to/from/cc from setting.json?
 	switch flowKey {
 	case leadFlowKey:
@@ -59,7 +63,7 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 		toAddress = mail.GetContractorEmail(policy)
 		switch channel {
 		case models.AgentChannel:
-			ccAddress = mail.GetAgentEmail(policy)
+			ccAddress = mail.GetNetworkNodeEmail(networkNode)
 		}
 	case proposalFlowKey:
 		flow = setting.ProposalFlow
@@ -68,16 +72,20 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 		switch channel {
 		case models.AgentChannel:
 			toAddress = mail.GetContractorEmail(policy)
-			ccAddress = mail.GetAgentEmail(policy)
+			ccAddress = mail.GetNetworkNodeEmail(networkNode)
+		case models.MgaChannel:
+			toAddress = mail.GetContractorEmail(policy)
 		}
 	case emitFlowKey:
 		flow = setting.EmitFlow
 		switch channel {
 		case models.AgencyChannel:
 			toAddress = mail.GetContractorEmail(policy)
-			ccAddress = mail.GetEmailByChannel(policy)
+			ccAddress = mail.GetNetworkNodeEmail(networkNode)
+		case models.MgaChannel, models.ECommerceChannel:
+			toAddress = mail.GetContractorEmail(policy)
 		default:
-			toAddress = mail.GetEmailByChannel(policy)
+			toAddress = mail.GetNetworkNodeEmail(networkNode)
 		}
 	default:
 		log.Println("[runBrokerBpmn] error flow not set")
@@ -142,11 +150,12 @@ func addProposalHandlers(state *bpmn.State) {
 
 func setProposalBpm(state *bpmn.State) error {
 	policy := state.Data
-	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 
 	setProposalData(policy)
 
 	log.Printf("[setProposalData] saving proposal n. %d to firestore...", policy.ProposalNumber)
+
+	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
 }
 
@@ -185,7 +194,8 @@ func addEmitHandlers(state *bpmn.State) {
 	state.AddTaskHandler("sign", sign)
 	state.AddTaskHandler("pay", pay)
 	state.AddTaskHandler("setAdvice", setAdvanceBpm)
-	state.AddTaskHandler("putUser", updateUserAndAgency)
+	// state.AddTaskHandler("putUser", updateUserAndAgency)
+	state.AddTaskHandler("putUser", updateUserAndNetworkNode)
 }
 
 func emitData(state *bpmn.State) error {
@@ -230,8 +240,8 @@ func setAdvanceBpm(state *bpmn.State) error {
 	return nil
 }
 
-func updateUserAndAgency(state *bpmn.State) error {
+func updateUserAndNetworkNode(state *bpmn.State) error {
 	policy := state.Data
 	user.SetUserIntoPolicyContractor(policy, origin)
-	return models.UpdateAgencyPortfolio(policy, origin)
+	return network.UpdateNetworkNodePortfolio(origin, policy, networkNode)
 }

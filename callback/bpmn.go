@@ -10,17 +10,15 @@ import (
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
 	plc "github.com/wopta/goworkspace/policy"
 	tr "github.com/wopta/goworkspace/transaction"
 )
 
 var (
-	origin        string
-	trSchedule    string
-	paymentMethod string
-	ccAddress     mail.Address
-	toAddress     mail.Address
-	fromAddress   mail.Address
+	origin, trSchedule, paymentMethod string
+	ccAddress, toAddress, fromAddress mail.Address
+	networkNode                       *models.NetworkNode
 )
 
 const (
@@ -39,7 +37,7 @@ func runCallbackBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 	)
 
 	fromAddress = mail.AddressAnna
-	channel := models.GetChannel(policy)
+	channel := policy.Channel
 	settingFile := fmt.Sprintf(settingFormat, channel)
 
 	log.Printf("[runCallbackBpmn] loading file for channel %s", channel)
@@ -53,6 +51,8 @@ func runCallbackBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 
 	state := bpmn.NewBpmn(*policy)
 
+	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
+
 	// TODO: fix me - maybe get to/from/cc from setting.json?
 	switch flowKey {
 	case signFlowKey:
@@ -60,9 +60,11 @@ func runCallbackBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 		switch channel {
 		case models.AgencyChannel:
 			toAddress = mail.GetContractorEmail(policy)
-			ccAddress = mail.GetEmailByChannel(policy)
+			ccAddress = mail.GetNetworkNodeEmail(networkNode)
+		case models.MgaChannel, models.ECommerceChannel:
+			toAddress = mail.GetContractorEmail(policy)
 		default:
-			toAddress = mail.GetEmailByChannel(policy)
+			toAddress = mail.GetNetworkNodeEmail(networkNode)
 			ccAddress = mail.Address{}
 		}
 	case payFlowKey:
@@ -70,9 +72,11 @@ func runCallbackBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 		switch channel {
 		case models.AgentChannel:
 			toAddress = mail.GetContractorEmail(policy)
-			ccAddress = mail.GetEmailByChannel(policy)
+			ccAddress = mail.GetNetworkNodeEmail(networkNode)
+		case models.MgaChannel, models.ECommerceChannel:
+			toAddress = mail.GetContractorEmail(policy)
 		default:
-			toAddress = mail.GetEmailByChannel(policy)
+			toAddress = mail.GetNetworkNodeEmail(networkNode)
 			ccAddress = mail.Address{}
 		}
 	default:
@@ -215,17 +219,9 @@ func updatePolicy(state *bpmn.State) error {
 		return err
 	}
 
-	// Update agency if present
-	err = models.UpdateAgencyPortfolio(policy, origin)
-	if err != nil && err.Error() != "agency not set" {
-		log.Printf("[updatePolicy] ERROR updateAgencyPortfolio %s", err.Error())
-		return err
-	}
-
-	// Update agent if present
-	err = models.UpdateAgentPortfolio(policy, origin)
-	if err != nil && err.Error() != "agent not set" {
-		log.Printf("[updatePolicy] ERROR UpdateAgentPortfolio %s", err.Error())
+	err = network.UpdateNetworkNodePortfolio(origin, policy, networkNode)
+	if err != nil {
+		log.Printf("[updatePolicy] error updating %s portfolio %s", networkNode.Type, err.Error())
 		return err
 	}
 
@@ -260,5 +256,5 @@ func payTransaction(state *bpmn.State) error {
 
 	transaction.BigQuerySave(origin)
 
-	return nil
+	return tr.CreateNetworkTransactions(policy, &transaction, networkNode)
 }

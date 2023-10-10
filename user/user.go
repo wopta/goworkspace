@@ -47,12 +47,14 @@ func User(w http.ResponseWriter, r *http.Request) {
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
+				// DEPRECATED
 				Route:   "/agent/authid/v1/:authId",
 				Handler: GetAgentByAuthIdFx,
 				Method:  "GET",
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
+				//DEPRECATED
 				Route:   "/agency/authid/v1/:authId",
 				Handler: GetAgencyByAuthIdFx,
 				Method:  "GET",
@@ -79,12 +81,6 @@ func User(w http.ResponseWriter, r *http.Request) {
 			{
 				Route:   "/invite/v1/create",
 				Handler: CreateInviteFx,
-				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAdmin},
-			},
-			{
-				Route:   "/invite/v2/create",
-				Handler: CreateInviteV2Fx,
 				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAdmin},
 			},

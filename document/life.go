@@ -12,18 +12,18 @@ var (
 	signatureID int
 )
 
-func LifeContract(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, []byte) {
+func LifeContract(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode *models.NetworkNode) (string, []byte) {
 	var (
 		filename string
 		out      []byte
 	)
 
-	filename, out = LifeAxa(pdf, origin, policy)
+	filename, out = LifeAxa(pdf, origin, policy, networkNode)
 
 	return filename, out
 }
 
-func LifeAxa(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, []byte) {
+func LifeAxa(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode *models.NetworkNode) (string, []byte) {
 	signatureID = 0
 
 	mainHeader(pdf, policy)
@@ -92,7 +92,7 @@ func LifeAxa(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, []by
 
 	woptaFooter(pdf)
 
-	producerInfo := loadProducerInfo(origin, policy)
+	producerInfo := loadProducerInfo(origin, networkNode)
 
 	allegato3Section(pdf, producerInfo)
 

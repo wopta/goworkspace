@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -20,6 +21,10 @@ import (
 const (
 	dataMovement     = "inclusive_bank_account_movement"
 	dataBanckAccount = "inclusive_bank_account"
+	suspended="suspended"
+	insert="insert"
+	delete="delete"
+
 )
 
 // TO DO security,payload,error,fasature
@@ -173,6 +178,10 @@ func SetData(obj BankAccountMovement) BankAccountMovement {
 		obj.Status = "delete"
 
 	}
+	if obj.MovementType == "suspended" {
+		obj.Status = "delete"
+
+	}
 
 	return obj
 }
@@ -212,11 +221,22 @@ func getBigqueryClient() *bigquery.Client {
 	lib.CheckError(err)
 	return client
 }
-func Count(date string, fiscalCode string, guaranteesCode string) *bigquery.Client {
-	client := getBigqueryClient()
-	res, _ := QueryRowsBigQuery[BankAccountMovement]("wopta",
+func Count(date string, fiscalCode string, guaranteesCode string)  {
+
+	queryWopta, _ := QueryRowsBigQuery[BankAccountMovement]("wopta",
 		"inclusive_axa_bank_account",
 		"select * from `wopta."+dataMovement+"` where fiscalCode='"+fiscalCode+"' and guaranteesCode ='"+guaranteesCode+"'")
-	log.Println(len(res))
-	return client
+	log.Println(len(queryWopta))
+
+	requestUrl:=os.Getenv("HYPE_PLATHFORM_PATH")+"/profile/insurance/v1/wopta/{guaranteesCode}/amount/{fromDate}/{endDate}"
+	
+	req, err := http.NewRequest(http.MethodGet, requestUrl, nil)
+	if err != nil {
+		   fmt.Printf("client: could not create request: %s\n", err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+	res:=lib.Httpclient(req)
+	log.Println(res)
+
+	
 }

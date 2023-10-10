@@ -4,7 +4,6 @@ import (
 	"errors"
 	"log"
 
-	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -25,10 +24,8 @@ func GetProductByRole(productName, version, company string, authToken models.Aut
 		responseProduct, err = getMgaProduct(productName, version, company)
 	case models.UserRoleAll, models.UserRoleCustomer:
 		responseProduct, err = getEcommerceProduct(productName, version, company)
-	case models.UserRoleAgency:
-		responseProduct, err = getAgencyProduct(productName, version, company, authToken.UserID)
-	case models.UserRoleAgent:
-		responseProduct, err = getAgentProduct(productName, version, company, authToken.UserID)
+	case models.UserRoleAgency, models.UserRoleAgent:
+		responseProduct, err = getNetworkNodeProduct(authToken.Type, productName, version, company)
 	default:
 		responseProduct, err = productNotFound()
 	}
@@ -38,12 +35,12 @@ func GetProductByRole(productName, version, company string, authToken models.Aut
 
 func getMgaProduct(productName, version, company string) (*models.Product, error) {
 	log.Println("getMgaProduct")
-	return GetProduct(productName, version, models.UserRoleAdmin)
+	return GetProduct(productName, version, models.MgaChannel)
 }
 
 func getEcommerceProduct(productName, version, company string) (*models.Product, error) {
 	log.Println("getEcommerceProduct")
-	ecomProduct, err := GetProduct(productName, version, models.UserRoleAll)
+	ecomProduct, err := GetProduct(productName, version, models.ECommerceChannel)
 
 	if !ecomProduct.IsEcommerceActive {
 		return productNotActive()
@@ -52,71 +49,16 @@ func getEcommerceProduct(productName, version, company string) (*models.Product,
 	return ecomProduct, err
 }
 
-func getAgencyProduct(productName, version, company, agencyUid string) (*models.Product, error) {
-	log.Println("getAgencyProduct")
-	agencyDefaultProduct, err := GetProduct(productName, version, models.UserRoleAgency)
-	lib.CheckError(err)
+func getNetworkNodeProduct(nodeType, productName, version, company string) (*models.Product, error) {
+	log.Println("[getNetworkNodeProduct]")
 
-	if !agencyDefaultProduct.IsAgencyActive {
-		return productNotActive()
+	channel := models.AgentChannel
+
+	if nodeType == models.AgencyNetworkNodeType {
+		channel = models.AgencyChannel
 	}
 
-	responseProduct := agencyDefaultProduct
-	log.Printf("Agency Product Start: %v", responseProduct)
-	agency, err := models.GetAgencyByAuthId(agencyUid)
-	lib.CheckError(err)
-
-	agencyProduct := getProductByName(agency.Products, productName)
-	if agencyProduct == nil {
-		return nil, errors.New("agency does not have product")
-	}
-
-	if !agencyProduct.IsAgencyActive {
-		return productNotActive()
-	}
-
-	overrideProduct(responseProduct, agencyProduct)
-
-	log.Printf("Agency Product Response: %v", responseProduct)
-	return responseProduct, nil
-}
-
-func getAgentProduct(productName, version, company, agentUid string) (*models.Product, error) {
-	log.Println("getAgentProduct")
-	agentDefaultProduct, err := GetProduct(productName, version, models.UserRoleAgent)
-	lib.CheckError(err)
-
-	if !agentDefaultProduct.IsAgentActive {
-		return productNotActive()
-	}
-
-	responseProduct := agentDefaultProduct
-	log.Printf("Agent Product Start: %v", responseProduct)
-	agent, err := models.GetAgentByAuthId(agentUid)
-	lib.CheckError(err)
-	agency, _ := models.GetAgencyByAuthId(agent.AgencyUid)
-
-	agentProduct := getProductByName(agent.Products, productName)
-	if agentProduct == nil {
-		return nil, errors.New("agent does not have product")
-	}
-
-	if !agentProduct.IsAgentActive {
-		return productNotActive()
-	}
-
-	// TODO: traverse network
-	agencyProduct := getProductByName(agency.Products, productName)
-	if agencyProduct != nil {
-		overrideProduct(responseProduct, agencyProduct)
-		log.Printf("Agent product modified by agency: %v", responseProduct)
-	}
-
-	overrideProduct(responseProduct, agentProduct)
-	log.Printf("Agent product modified by agent: %v", responseProduct)
-
-	log.Printf("Agent Product Response: %v", responseProduct)
-	return responseProduct, nil
+	return GetProduct(productName, version, channel)
 }
 
 func getProductByName(products []models.Product, productName string) *models.Product {
