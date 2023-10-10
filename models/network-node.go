@@ -159,7 +159,7 @@ func parseBigQueryAgencyNode(agency *AgencyNode) *AgencyNode {
 			agency.Address.Location.Lat,
 		)
 	}
-	*agency.Manager = *parseBigQueryAgentNode(agency.Manager)
+	agency.Manager = parseBigQueryAgentNode(agency.Manager)
 	agency.BigRuiRegistration = lib.GetBigQueryNullDateTime(agency.RuiRegistration)
 
 	return agency

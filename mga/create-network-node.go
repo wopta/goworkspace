@@ -28,13 +28,14 @@ func CreateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 		return "", "", err
 	}
 
-	log.Printf("[CreateNetworkNodeFx] creating network node %s into Firestore...", request.Uid)
+	log.Println("[CreateNetworkNodeFx] creating network node into Firestore...")
 
 	node, err := network.CreateNode(*request)
 	if err != nil {
-		log.Printf("[CreateNetworkNodeFx] error creating network node %s into Firestore...", request.Uid)
+		log.Println("[CreateNetworkNodeFx] error creating network node into Firestore...")
 		return "", "", err
 	}
+	log.Printf("[CreateNetworkNodeFx] network node created with uid %s", node.Uid)
 
 	node.SaveBigQuery(origin)
 
