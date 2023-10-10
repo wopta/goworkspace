@@ -7,26 +7,34 @@ import (
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
 )
 
 func setBodyData(policy models.Policy, bodyData *BodyData) {
-	switch policy.Channel {
-	case models.AgentChannel:
-		agent, err := models.GetAgentByAuthId(policy.AgentUid)
-		lib.CheckError(err)
-		setAgentBodyData(*agent, bodyData)
-	case models.AgencyChannel:
-		agency, err := models.GetAgencyByAuthId(policy.AgencyUid)
-		lib.CheckError(err)
-		setAgencyBodyData(*agency, bodyData)
-	}
-
 	setProductBodyData(policy, bodyData)
 
 	setContractorBodyData(policy, bodyData)
 
 	if policy.IsReserved {
 		setPolicyReservedBodyData(policy, bodyData)
+	}
+
+	node := network.GetNetworkNodeByUid(policy.ProducerUid)
+
+	if node != nil {
+		setNetworkNodeBodyData(node, bodyData)
+	}
+}
+
+func setNetworkNodeBodyData(node *models.NetworkNode, bodyData *BodyData) {
+	if node.Type == models.AgentNetworkNodeType {
+		bodyData.AgentName = node.Agent.Name
+		bodyData.AgentSurname = node.Agent.Surname
+		bodyData.AgentMail = node.Mail
+	}
+	if node.Type == models.AgencyNetworkNodeType {
+		bodyData.AgencyName = node.Agency.Name
+		bodyData.AgencyMail = node.Mail
 	}
 }
 
