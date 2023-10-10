@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -50,4 +51,14 @@ func (a AuditLog) SaveToBigQuery() error {
 		return fmt.Errorf("cannot save the audit-log: %v", err)
 	}
 	return nil
+}
+
+func CreateAuditLog(r *http.Request, payload string) {
+	log.Println("[CreateAuditLog] saving audit trail...")
+	audit, err := ParseHttpRequest(r, payload)
+	if err != nil {
+		log.Printf("[CreateAuditLog] error creating audit log: %s", err.Error())
+	}
+	log.Printf("[CreateAuditLog] audit log: %v", audit)
+	audit.SaveToBigQuery()
 }

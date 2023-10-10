@@ -40,5 +40,7 @@ func CreateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 
 	log.Println("[CreateNetworkNodeFx] network node successfully created!")
 
+	models.CreateAuditLog(r, string(body))
+
 	return "{}", "", err
 }

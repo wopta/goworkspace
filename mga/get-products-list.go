@@ -101,7 +101,8 @@ func getEcommerceProductsList() []models.Product {
 	return productsList
 }
 
-func getNetworkNodeProductsList(networkNodeUid, origin string) []models.Product {
+func 
+getNetworkNodeProductsList(networkNodeUid, origin string) []models.Product {
 	var (
 		networkNode  models.NetworkNode
 		channel      string

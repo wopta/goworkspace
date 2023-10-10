@@ -8,6 +8,7 @@ import (
 
 type AuthToken struct {
 	Role   string `json:"role"`
+	Type   string `json:"type"`
 	UserID string `json:"userId"`
 	Email  string `json:"email"`
 }
@@ -16,6 +17,7 @@ func GetAuthTokenFromIdToken(idToken string) (AuthToken, error) {
 	if idToken == "" {
 		return AuthToken{
 			Role:   UserRoleAll,
+			Type:   "",
 			UserID: "",
 			Email:  "",
 		}, nil
@@ -27,8 +29,14 @@ func GetAuthTokenFromIdToken(idToken string) (AuthToken, error) {
 		return AuthToken{}, err
 	}
 
+	nodeType := ""
+	if token.Claims["type"] != nil {
+		nodeType = token.Claims["type"].(string)
+	}
+
 	return AuthToken{
 		Role:   token.Claims["role"].(string),
+		Type:   nodeType,
 		UserID: token.Claims["user_id"].(string),
 		Email:  token.Claims["email"].(string),
 	}, nil

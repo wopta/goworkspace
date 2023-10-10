@@ -104,13 +104,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		mail.Address{},
 	)
 
-	log.Println("[AcceptanceFx] saving audit trail...")
-	audit, err := models.ParseHttpRequest(r, string(body))
-	if err != nil {
-		log.Printf("[AcceptanceFx] error creating audit log: %s", err.Error())
-	}
-	log.Printf("[AcceptanceFx] audit log: %v", audit)
-	audit.SaveToBigQuery()
+	models.CreateAuditLog(r, string(body))
 
 	return `{"success":true}`, `{"success":true}`, nil
 }
