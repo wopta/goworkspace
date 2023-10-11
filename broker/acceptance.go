@@ -1,6 +1,7 @@
 package broker
 
 import (
+	"github.com/wopta/goworkspace/network"
 	"io"
 	"log"
 	"net/http"
@@ -86,13 +87,15 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 
 	log.Println("[AcceptanceFx] sending acceptance email...")
 
+	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
+
 	switch policy.Channel {
 	case models.MgaChannel:
 		toAddress = mail.Address{
 			Address: authToken.Email,
 		}
-	case models.AgentChannel:
-		toAddress = mail.GetAgentEmail(&policy)
+	case models.AgentChannel, models.AgencyChannel:
+		toAddress = mail.GetNetworkNodeEmail(networkNode)
 	default:
 		toAddress = mail.GetContractorEmail(&policy)
 	}
