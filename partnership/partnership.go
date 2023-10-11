@@ -7,12 +7,19 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"sort"
+	"strings"
 	"time"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/mohae/deepcopy"
 	lib "github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
+	"github.com/wopta/goworkspace/product"
+	"github.com/wopta/goworkspace/quote"
+	"github.com/wopta/goworkspace/user"
 )
 
 func init() {
@@ -25,7 +32,7 @@ func Partnership(w http.ResponseWriter, r *http.Request) {
 	route := lib.RouteData{
 		Routes: []lib.Route{
 			{
-				Route:   "/v1/life",
+				Route:   "/v1/life/:partnershipUid",
 				Handler: LifePartnershipFx,
 				Method:  "GET",
 				Roles:   []string{models.UserRoleAll},
@@ -36,25 +43,159 @@ func Partnership(w http.ResponseWriter, r *http.Request) {
 }
 
 func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	var (
-		policy   models.Policy
-		person   models.User
-		asset    models.Asset
-		response PartnershipResponse
-	)
+	var response PartnershipResponse
 	resp.Header().Set("Access-Control-Allow-Methods", "GET")
+	resp.Header().Set("Content-Type", "application/json")
 
+	log.Println("[LifePartnershipFx] handler start ----------------------------")
+
+	partnershipUid := strings.ToLower(r.Header.Get("partnershipUid"))
 	jwtData := r.URL.Query().Get("jwt")
 
-	// decode JWT
-	// Parse takes the token string and a function for looking up the key. The latter is especially
-	// useful if you use multiple keys for your application.  The standard is to use 'kid' in the
-	// head of the token to identify which key to use, but the parsed token (head and claims) is provided
-	// to the callback, providing flexibility.
+	log.Printf("[LifePartnershipFx] partnershipUid: %s jwt: %s", partnershipUid, jwtData)
+
+	policy, product, node, err := LifePartnership(partnershipUid, jwtData, r.Header.Get("Origin"))
+
+	response.Policy = policy
+	response.Product = product
+	response.Partnership = *node.Partnership
+
+	responseJson, err := json.Marshal(response)
+
+	log.Printf("[LifePartnershipFx] response: %s", string(responseJson))
+
+	return string(responseJson), response, err
+}
+
+func LifePartnership(partnershipUid, jwtData, origin string) (models.Policy, models.Product, *models.NetworkNode, error) {
+	var (
+		policy          models.Policy
+		productLife     models.Product
+		partnershipNode *models.NetworkNode
+		err error
+	)
+
+	log.Printf("[LifePartnership]")
+
+	if partnershipNode, err = network.GetNodeByUid(partnershipUid); err != nil {
+		return policy, productLife, partnershipNode, err
+	}
+
+	partnershipName := partnershipNode.Partnership.Name
+
+	log.Printf("[LifePartnership] loading latest life product")
+
+	products := partnershipNode.Products
+	productLife = getLatestLifeProduct(products)
+
+	log.Printf("[LifePartnership] loading life product by channel")
+
+	ecommerceProducts := product.GetAllProductsByChannel(models.ECommerceChannel)
+	latestLifeProduct := getLatestLifeProduct(ecommerceProducts)
+
+	log.Printf("[LifePartnership] setting policy basic info")
+
+	policy.Name = productLife.Name
+	policy.NameDesc = *productLife.NameDesc
+	policy.ProductVersion = productLife.Version
+	policy.Company = productLife.Companies[0].Name
+	policy.ProducerUid = partnershipUid
+	policy.ProducerCode = partnershipName
+	policy.PartnershipName = partnershipName
+	policy.ProducerType = partnershipNode.Type
+
+	switch partnershipName {
+	case models.PartnershipBeProf:
+		log.Println("[LifePartnership] call beProfPartnership function")
+		err = beProfPartnership(jwtData, &policy, &latestLifeProduct)
+	case models.PartnershipFacile:
+		log.Println("[LifePartnership] call facilePartnership function")
+		err = facilePartnership(jwtData, &policy, &latestLifeProduct)
+	}
+
+	if err != nil {
+		return policy, productLife, partnershipNode, err
+	}
+
+	policy, err = quote.Life(models.ECommerceChannel, policy)
+	
+	if err != nil {
+		return policy, productLife, partnershipNode, err
+	}
+
+	err = savePartnershipLead(&policy, partnershipNode, origin)
+
+	return policy, productLife, partnershipNode, err
+}
+
+func removeUnselectedGuarantees(policy *models.Policy) models.Policy {
+	policyCopy := deepcopy.Copy(*policy).(models.Policy)
+	for i, asset := range policy.Assets {
+		policyCopy.Assets[i].Guarantees = lib.SliceFilter(asset.Guarantees, func (guarantee models.Guarante) bool {
+			return guarantee.IsSelected
+		})
+	}
+	return policyCopy
+}
+
+func savePartnershipLead(policy *models.Policy, node *models.NetworkNode, origin string) error {
+	var err error
+
+	log.Println("[savePartnershipLead] start --------------------------------------------")
+
+	policyFire := lib.GetDatasetByEnv(origin, models.PolicyCollection)
+
+	policy.Channel = models.ECommerceChannel
+	now := time.Now().UTC()
+
+	policy.CreationDate = now
+	policy.Status = models.PolicyStatusPartnershipLead
+	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
+	log.Printf("[savePartnershipLead] policy status %s", policy.Status)
+
+	policy.IsSign = false
+	policy.IsPay = false
+	policy.Updated = now
+
+	log.Println("[savePartnershipLead] saving lead to firestore...")
+	policyUid := lib.NewDoc(policyFire)
+	policy.Uid = policyUid
+
+	policyToSave := removeUnselectedGuarantees(policy)
+	
+	if err = lib.SetFirestoreErr(policyFire, policyUid, policyToSave); err != nil {
+		return err
+	}
+
+	log.Println("[savePartnershipLead] saving lead to bigquery...")
+	policyToSave.BigquerySave(origin)
+
+	log.Println("[savePartnershipLead] end ----------------------------------------------")
+	return err
+}
+
+func getLatestLifeProduct(products []models.Product) models.Product {
+	products = lib.SliceFilter(products, func(product models.Product) bool {
+		return product.Name == "life"
+	})
+	sort.Slice(products, func(i, j int) bool {
+		return products[i].Version > products[j].Version
+	})
+	latestLifeProduct := products[0]
+	return latestLifeProduct
+}
+
+func beProfPartnership(jwtData string, policy *models.Policy, product *models.Product) error {
+	var (
+		person models.User
+		asset  models.Asset
+	)
+
+	log.Println("[beProfPartnership] decoding jwt")
+
 	token, err := jwt.ParseWithClaims(jwtData, &BeprofClaims{}, func(token *jwt.Token) (interface{}, error) {
-		// Don't forget to validate the alg is what you expect:
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 
 		key, e := b64.StdEncoding.DecodeString(os.Getenv("BEPROF_SIGNING_KEY"))
@@ -63,85 +204,87 @@ func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, inter
 	})
 
 	if claims, ok := token.Claims.(*BeprofClaims); ok && token.Valid {
+		log.Println("[beProfPartnership] setting person info")
 		person.Name = claims.UserFirstname
 		person.Surname = claims.UserLastname
 		person.Mail = claims.UserEmail
 		person.FiscalCode = claims.UserFiscalcode
-		person.BirthDate = lib.ExtractBirthdateFromItalianFiscalCode(claims.UserFiscalcode).Format(time.RFC3339)
 		person.Address = claims.UserAddress
 		person.PostalCode = claims.UserPostalcode
 		person.City = claims.UserCity
 		person.CityCode = claims.UserMunicipalityCode
 		person.Work = claims.UserEmploymentSector
 		person.VatCode = claims.UserPiva
+
+		if _, personData, err := user.ExtractUserDataFromFiscalCode(person); err == nil {
+			person = personData
+		}
+
 		policy.Contractor = person
 		asset.Person = &person
+		policy.OfferlName = "default"
+
 		policy.Assets = append(policy.Assets, asset)
-		policy.PartnershipName = models.PartnershipBeProf
 		policy.PartnershipData = claims.ToMap()
 
-		response.Policy = policy
-		response.Step = 1
-	} else {
-		fmt.Println(err)
-		return "{}", nil, nil
+		return nil
 	}
 
-	// verify if this user has already a policy from beprof
-
-	// catalogo e servizio
-	// proccedi e i miei servizi
-
-	// call vendibility rules
-
-	// call quoter
-
-	p, err := json.Marshal(response)
-
-	if err != nil {
-		return "", nil, err
-	}
-
-	return string(p), policy, err
+	log.Printf("[beProfPartnership] could not validate beprof partnership JWT - %s", err.Error())
+	return err
 }
 
-/*func extractBirthdateFromItalianFiscalCode(fiscalCode string) time.Time {
-	year, _ := strconv.Atoi(fiscalCode[6:8])
-	month := getMonth(fiscalCode[8:9])
-	day, _ := strconv.Atoi(fiscalCode[9:11])
+func facilePartnership(jwtData string, policy *models.Policy, product *models.Product) error {
+	var (
+		person models.User
+		asset  models.Asset
+	)
 
-	if day > 40 {
-		day -= 40
+	log.Println("[facilePartnership] decoding jwt")
+
+	token, err := jwt.ParseWithClaims(jwtData, &FacileClaims{}, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+
+		key := os.Getenv("FACILE_SIGNING_KEY")
+
+		return []byte(key), nil
+	})
+
+	if claims, ok := token.Claims.(*FacileClaims); ok && token.Valid {
+		log.Println("[facilePartnership] setting person info")
+		person.Name = claims.CustomerName
+		person.Surname = claims.CustomerFamilyName
+		person.Mail = claims.Email
+		birthDate, _ := time.Parse(models.TimeDateOnly, claims.CustomerBirthDate)
+		person.BirthDate = birthDate.Format(time.RFC3339)
+		person.Phone = fmt.Sprintf("+39%s", claims.Mobile)
+		person.Gender = claims.Gender
+		policy.Contractor = person
+		asset.Person = &person
+		policy.OfferlName = "default"
+
+		log.Println("[facilePartnership] setting death guarantee info")
+
+		deathGuarantee := product.Companies[0].GuaranteesMap["death"]
+		deathGuarantee.Value = &models.GuaranteValue{
+			Duration: &models.Duration{
+				Year: claims.Duration,
+			},
+			SumInsuredLimitOfIndemnity: float64(claims.InsuredCapital),
+		}
+		asset.Guarantees = make([]models.Guarante, 0)
+		asset.Guarantees = append(asset.Guarantees, *deathGuarantee)
+
+		policy.Assets = append(policy.Assets, asset)
+		policy.PartnershipData = claims.ToMap()
+		return err
 	}
 
-	if year < time.Now().Year()-2000 {
-		year += 2000
-	} else {
-		year += 1900
-	}
-
-	birthdate := time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.UTC)
-	return birthdate
+	log.Printf("[facilePartnership] could not validate facile partnership JWT - %s", err.Error())
+	return err
 }
-
-func getMonth(monthCode string) int {
-	monthMap := map[string]int{
-		"A": 1,
-		"B": 2,
-		"C": 3,
-		"D": 4,
-		"E": 5,
-		"H": 6,
-		"L": 7,
-		"M": 8,
-		"P": 9,
-		"R": 10,
-		"S": 11,
-		"T": 12,
-	}
-
-	return monthMap[strings.ToUpper(monthCode)]
-}*/
 
 type BeprofClaims struct {
 	UserBeprofid         int    `json:"user.beprofid"`
@@ -163,10 +306,10 @@ type BeprofClaims struct {
 	jwt.RegisteredClaims
 }
 
-func (bpc BeprofClaims) ToMap() map[string]interface{} {
+func (beprofClaims BeprofClaims) ToMap() map[string]interface{} {
 	m := make(map[string]interface{})
 
-	b, err := json.Marshal(bpc)
+	b, err := json.Marshal(beprofClaims)
 	lib.CheckError(err)
 
 	err = json.Unmarshal(b, &m)
@@ -176,7 +319,33 @@ func (bpc BeprofClaims) ToMap() map[string]interface{} {
 
 }
 
+type FacileClaims struct {
+	CustomerName       string `json:"customerName"`
+	CustomerFamilyName string `json:"customerFamilyName"`
+	CustomerBirthDate  string `json:"customerBirthDate"`
+	Gender             string `json:"gender"`
+	Email              string `json:"email"`
+	Mobile             string `json:"mobile"`
+	IsSmoker           bool   `json:"isSmoker"`
+	InsuredCapital     int    `json:"insuredCapital"`
+	Duration           int    `json:"duration"`
+	jwt.RegisteredClaims
+}
+
+func (facileClaims FacileClaims) ToMap() map[string]interface{} {
+	m := make(map[string]interface{})
+
+	b, err := json.Marshal(facileClaims)
+	lib.CheckError(err)
+
+	err = json.Unmarshal(b, &m)
+	lib.CheckError(err)
+
+	return m
+}
+
 type PartnershipResponse struct {
-	Policy models.Policy `json:"policy"`
-	Step   int           `json:"step"`
+	Policy      models.Policy          `json:"policy"`
+	Partnership models.PartnershipNode `json:"partnership"`
+	Product     models.Product         `json:"product"`
 }

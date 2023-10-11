@@ -66,14 +66,31 @@ func lead(authToken models.AuthToken, policy *models.Policy) error {
 	policyFire := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 	guaranteFire := lib.GetDatasetByEnv(origin, models.GuaranteeCollection)
 
-	policy.Channel = authToken.GetChannelByRole()
+	if policy.Uid != "" {
+		log.Printf("[lead] creating lead for existing policy %s", policy.Uid)
+		policyDoc, err := lib.GetFirestoreErr(models.PolicyCollection, policy.Uid)
 
-	node := network.GetNetworkNodeByUid(authToken.UserID)
-	if node != nil {
-		policy.ProducerUid = node.Uid
-		policy.ProducerCode = node.Code
-		policy.ProducerType = node.Type
-		policy.NetworkUid = node.NetworkUid
+		if err != nil {
+			log.Printf("[lead] error getting policy %s from firebase: %s", policy.Uid, err.Error())
+		}
+
+		if  err == nil && policyDoc.Exists() {
+			log.Printf("[lead] found policy %s on Firebase", policy.Uid)
+			policyDoc.DataTo(policy)
+		}
+	} else {
+		policy.Uid = lib.NewDoc(policyFire)
+	}
+
+	if policy.Channel == "" {
+		policy.Channel = authToken.GetChannelByRole()
+	}
+
+	if policy.ProducerUid == "" {
+		node := network.GetNetworkNodeByUid(authToken.UserID)
+		if node != nil {
+			setPolicyProducerNode(policy, node)
+		}
 	}
 
 	log.Println("[lead] starting bpmn flow...")
@@ -85,9 +102,7 @@ func lead(authToken models.AuthToken, policy *models.Policy) error {
 	*policy = *state.Data
 
 	log.Println("[lead] saving lead to firestore...")
-	policyUid := lib.NewDoc(policyFire)
-	policy.Uid = policyUid
-	err = lib.SetFirestoreErr(policyFire, policyUid, policy)
+	err = lib.SetFirestoreErr(policyFire, policy.Uid, policy)
 	lib.CheckError(err)
 
 	log.Println("[lead] saving lead to bigquery...")
@@ -100,12 +115,21 @@ func lead(authToken models.AuthToken, policy *models.Policy) error {
 	return err
 }
 
+func setPolicyProducerNode(policy *models.Policy, node *models.NetworkNode) {
+	policy.ProducerUid = node.Uid
+	policy.ProducerCode = node.Code
+	policy.ProducerType = node.Type
+	policy.NetworkUid = node.NetworkUid
+}
+
 func setLeadData(policy *models.Policy) {
 	log.Println("[setLeadData] start -------------------")
 
 	now := time.Now().UTC()
 
-	policy.CreationDate = now
+	if policy.CreationDate.IsZero() {
+		policy.CreationDate = now
+	}
 	policy.Status = models.PolicyStatusInitLead
 	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
 	log.Printf("[setLeadData] policy status %s", policy.Status)
