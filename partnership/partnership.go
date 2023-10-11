@@ -306,10 +306,10 @@ type BeprofClaims struct {
 	jwt.RegisteredClaims
 }
 
-func (facileClaims BeprofClaims) ToMap() map[string]interface{} {
+func (beprofClaims BeprofClaims) ToMap() map[string]interface{} {
 	m := make(map[string]interface{})
 
-	b, err := json.Marshal(facileClaims)
+	b, err := json.Marshal(beprofClaims)
 	lib.CheckError(err)
 
 	err = json.Unmarshal(b, &m)
