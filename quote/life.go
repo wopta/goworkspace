@@ -154,13 +154,22 @@ func addDefaultGuarantees(data models.Policy, product models.Product) {
 	for _, guarantee := range product.Companies[0].GuaranteesMap {
 		if guarantee.Value == nil {
 			guarantee.Value = guarantee.Offer["default"]
-			guarantee.IsSelected = guarantee.IsMandatory || guarantee.IsSelected
+			guarantee.IsSelected = guarantee.IsMandatory || getGuaranteeIsSelected(data, guarantee)
 		}
 		guaranteeList = append(guaranteeList, *guarantee)
 	}
 
 	data.Assets[0].Guarantees = guaranteeList
 	log.Println("[Life] added default guarantees")
+}
+
+func getGuaranteeIsSelected(data models.Policy, guarantee *models.Guarante) bool {
+	isSelected := false
+	policyGuarantee, err := data.ExtractGuarantee(guarantee.Slug)
+	if err == nil {
+		isSelected = policyGuarantee.IsSelected
+	}
+	return isSelected
 }
 
 func calculateSumInsuredLimitOfIndemnity(assets []models.Asset, deathSumInsuredLimitOfIndemnity float64) {
