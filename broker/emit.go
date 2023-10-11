@@ -190,17 +190,21 @@ func emitV2(authToken models.AuthToken, policy *models.Policy, request EmitReque
 }
 
 func emitUpdatePolicy(policy *models.Policy, request EmitRequest) {
-	if policy.Status != models.PolicyStatusInitLead {
-		return
-	}
+	log.Println("[emitUpdatePolicy] start --------------------")
 	if policy.Statements == nil || len(*policy.Statements) == 0 {
 		if request.Statements != nil {
+			log.Println("[emitUpdatePolicy] inject policy statements from request")
 			policy.Statements = request.Statements
 		} else {
+			log.Println("[emitUpdatePolicy] inject policy statements from question module")
+			policy.Statements = new([]models.Statement)
 			*policy.Statements = question.GetStatements(*policy)
 		}
 	}
-	policy.PaymentSplit = request.PaymentSplit
+	if policy.PaymentSplit == "" {
+		policy.PaymentSplit = request.PaymentSplit
+	}
+	log.Println("[emitUpdatePolicy] end --------------------")
 }
 
 func getEmitTypeFromPolicy(policy *models.Policy) string {

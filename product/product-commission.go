@@ -91,10 +91,10 @@ func calculateCommissionV2(commissions *models.Commissions, isRenew, isActive bo
 		}
 	} else {
 		if isActive {
-			log.Printf("[calculateCommissionV2] commission renew active at %f", commissions.NewBusiness)
+			log.Printf("[calculateCommissionV2] commission new business active at %f", commissions.NewBusiness)
 			commission = amount * commissions.NewBusiness
 		} else {
-			log.Printf("[calculateCommissionV2] commission renew passive at %f", commissions.NewBusinessPassive)
+			log.Printf("[calculateCommissionV2] commission new business passive at %f", commissions.NewBusinessPassive)
 			commission = amount * commissions.NewBusinessPassive
 		}
 	}
