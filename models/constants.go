@@ -8,6 +8,7 @@ const (
 	PolicyStatusInit            = "Inizialize"
 	PolicyStatusInitData        = "InizializeData"
 	PolicyStatusInitLead        = "Lead"
+	PolicyStatusPartnershipLead = "PartnershipLead"
 	PolicyStatusProspet         = "Prospet"
 	PolicyStatusProposal        = "Proposal"
 	PolicyStatusContact         = "Contact"

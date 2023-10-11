@@ -144,33 +144,18 @@ func savePartnershipLead(policy *models.Policy, node *models.NetworkNode, origin
 	log.Println("[savePartnershipLead] start --------------------------------------------")
 
 	policyFire := lib.GetDatasetByEnv(origin, models.PolicyCollection)
-	guaranteFire := lib.GetDatasetByEnv(origin, models.GuaranteeCollection)
 
 	policy.Channel = models.ECommerceChannel
-
-	if node != nil {
-		policy.ProducerUid = node.Uid
-		policy.ProducerCode = node.Code
-		policy.ProducerType = node.Type
-		policy.NetworkUid = node.NetworkUid
-	}
-
 	now := time.Now().UTC()
 
 	policy.CreationDate = now
-	policy.Status = models.PolicyStatusInitLead
+	policy.Status = models.PolicyStatusPartnershipLead
 	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
 	log.Printf("[savePartnershipLead] policy status %s", policy.Status)
 
 	policy.IsSign = false
 	policy.IsPay = false
 	policy.Updated = now
-
-	log.Println("[savePartnershipLead] add information stet")
-	policy.Attachments = &[]models.Attachment{{
-		Name: "Precontrattuale", FileName: "Precontrattuale.pdf",
-		Link: "gs://documents-public-dev/information-sets/" + policy.Name + "/" + policy.ProductVersion + "/Precontrattuale.pdf",
-	}}
 
 	log.Println("[savePartnershipLead] saving lead to firestore...")
 	policyUid := lib.NewDoc(policyFire)
@@ -184,9 +169,6 @@ func savePartnershipLead(policy *models.Policy, node *models.NetworkNode, origin
 
 	log.Println("[savePartnershipLead] saving lead to bigquery...")
 	policyToSave.BigquerySave(origin)
-
-	log.Println("[savePartnershipLead] saving guarantees to bigquery...")
-	models.SetGuaranteBigquery(policyToSave, "lead", guaranteFire)
 
 	log.Println("[savePartnershipLead] end ----------------------------------------------")
 	return err
