@@ -3,10 +3,13 @@ package lib
 import (
 	"context"
 	"errors"
+	"fmt"
+	"google.golang.org/api/iterator"
 	"io/ioutil"
 	"log"
 	"os"
 	"strings"
+	"time"
 
 	"cloud.google.com/go/storage"
 )
@@ -72,4 +75,42 @@ func ReadFileFromGoogleStorage(gsLink string) ([]byte, error) {
 	}
 	log.Printf("[ReadFileFromGoogleStorage] invalid gsLink: %s", gsLink)
 	return nil, errors.New("invalid gsLink")
+}
+
+func ListGoogleStorageFolderContent(folderPath string) ([]string, error) {
+	filesList := make([]string, 0)
+	bucket := os.Getenv("GOOGLE_STORAGE_BUCKET")
+
+	log.Println("[ListGoogleStorageFolderContent] function start ---------------")
+
+	log.Printf("[ListGoogleStorageFolderContent] bucket: %s ---- folderPath: %s", bucket, folderPath)
+
+	client, ctx, err := GetGoogleStorageClient()
+	if err != nil {
+		return filesList, fmt.Errorf("storage.NewClient: %w", err)
+	}
+	defer client.Close()
+
+	ctx, cancel := context.WithTimeout(ctx, time.Second*10)
+	defer cancel()
+
+	query := &storage.Query{
+		Prefix: folderPath,
+	}
+
+	it := client.Bucket(bucket).Objects(ctx, query)
+	for {
+		attrs, err := it.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			return filesList, fmt.Errorf("Bucket(%q).Objects: %w", bucket, err)
+		}
+		filesList = append(filesList, attrs.Name)
+	}
+
+	log.Printf("[ListGoogleStorageFolderContent] found %d files", len(filesList))
+
+	return filesList, nil
 }
