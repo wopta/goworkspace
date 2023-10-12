@@ -60,11 +60,12 @@ type Company struct {
 	Mandate                   Mandate              `json:"mandate" firestore:"mandate" bigquery:"-"`
 	DiscountLimit             float64              `json:"discountLimit" firestore:"discountLimit" bigquery:"-"`
 	AgentCode                 string               `json:"agentCode" firestore:"agentCode" bigquery:"-"`
-	IsEcommerceActive         bool                 `json:"isEcommerceActive" firestore:"isEcommerceActive" bigquery:"-"`
-	IsAgencyActive            bool                 `json:"isAgencyActive" firestore:"isAgencyActive" bigquery:"-"`
-	IsAgentActive             bool                 `json:"isAgentActive" firestore:"isAgentActive" bigquery:"-"`
+	IsEcommerceActive         bool                 `json:"isEcommerceActive" firestore:"isEcommerceActive" bigquery:"-"` // TODO: remove this boolean once product versioning completed
+	IsAgencyActive            bool                 `json:"isAgencyActive" firestore:"isAgencyActive" bigquery:"-"`       // TODO: remove this boolean once product versioning completed
+	IsAgentActive             bool                 `json:"isAgentActive" firestore:"isAgentActive" bigquery:"-"`         // TODO: remove this boolean once product versioning completed
 	AnnulmentCodes            []AnnulmentCode      `json:"annulmentCodes,omitempty" firestore:"annulmentCodes,omitempty" bigquery:"-"`
 	CommissionSetting         *CommissionsSetting  `json:"commissionsSetting,omitempty" firestore:"commissionsSetting,omitempty" bigquery:"-"`
+	IsActive                  bool                 `json:"isActive" json:"isActive" bigquery:"-"`
 	// MaxFreeDiscount           float64              `json:"maxFreeDiscount,omitempty" firestore:"maxFreeDiscount,omitempty" bigquery:"-"`
 	// MaxReservedDiscount       float64              `json:"maxReservedDiscount,omitempty" firestore:"maxReservedDiscount,omitempty" bigquery:"-"`
 }
