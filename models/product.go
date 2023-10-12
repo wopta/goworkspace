@@ -111,6 +111,7 @@ type Column struct {
 
 type PaymentProvider struct {
 	Name    string          `json:"name,omitempty" firestore:"name,omitempty" bigquery:"-"`
+	Flows   []string        `json:"flows,omitempty" firestore:"flows,omitempty" bigquery:"-"`
 	Methods []PaymentMethod `json:"methods,omitempty" firestore:"methods,omitempty" bigquery:"-"`
 	Rates   []string        `json:"rates,omitempty" firestore:"rates,omitempty" bigquery:"-"`
 }
