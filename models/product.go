@@ -39,6 +39,7 @@ type Product struct {
 	IsAgentActive     bool              `json:"isAgentActive" firestore:"isAgentActive"`
 	Logo              string            `json:"logo,omitempty" firestore:"logo,omitempty" bigquery:"-"`
 	PaymentProviders  []PaymentProvider `json:"paymentProviders,omitempty" firestore:"paymentProviders,omitempty" bigquery:"-"`
+	Flow              string            `json:"flow,omitempty" firestore:"flow,omitempty" bigquery:"-"` // the name of the flow file to be used
 }
 
 type Company struct {
