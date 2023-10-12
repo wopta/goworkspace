@@ -81,7 +81,7 @@ func verifyAuaJwt(tokenReq string) (*AuaClaims, bool, error) {
 		fmt.Println(e)
 	}
 
-	return nil, token.Valid, e
+	return nil, token.Valid, e	
 }
 
 type ResponseSsoJwt struct {
@@ -89,8 +89,10 @@ type ResponseSsoJwt struct {
 	Producer models.NetworkNode `json:"producer"`
 }
 type AuaClaims struct {
-	Id   string `json:"codSubAgent"`
-	Name string `json:"name"`
-	Exp  int    `json:"exp"`
+	Id         string `json:"codSubAgent"`
+	Name       string `json:"name"`
+	Exp        int    `json:"exp"`
+	Mail       string `json:"email"`
+	AgencyCode string `json:"codiceagenzia"`
 	jwt.RegisteredClaims
 }
