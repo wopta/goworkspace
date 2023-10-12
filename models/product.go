@@ -39,6 +39,7 @@ type Product struct {
 	IsAgentActive     bool              `json:"isAgentActive" firestore:"isAgentActive"`
 	Logo              string            `json:"logo,omitempty" firestore:"logo,omitempty" bigquery:"-"`
 	PaymentProviders  []PaymentProvider `json:"paymentProviders,omitempty" firestore:"paymentProviders,omitempty" bigquery:"-"`
+	Flow              string            `json:"flow,omitempty" firestore:"flow,omitempty" bigquery:"-"` // the name of the flow file to be used
 }
 
 type Company struct {
@@ -64,6 +65,8 @@ type Company struct {
 	IsAgentActive             bool                 `json:"isAgentActive" firestore:"isAgentActive" bigquery:"-"`
 	AnnulmentCodes            []AnnulmentCode      `json:"annulmentCodes,omitempty" firestore:"annulmentCodes,omitempty" bigquery:"-"`
 	CommissionSetting         *CommissionsSetting  `json:"commissionsSetting,omitempty" firestore:"commissionsSetting,omitempty" bigquery:"-"`
+	// MaxFreeDiscount           float64              `json:"maxFreeDiscount,omitempty" firestore:"maxFreeDiscount,omitempty" bigquery:"-"`
+	// MaxReservedDiscount       float64              `json:"maxReservedDiscount,omitempty" firestore:"maxReservedDiscount,omitempty" bigquery:"-"`
 }
 
 type Mandate struct {
@@ -108,6 +111,7 @@ type Column struct {
 
 type PaymentProvider struct {
 	Name    string          `json:"name,omitempty" firestore:"name,omitempty" bigquery:"-"`
+	Flows   []string        `json:"flows,omitempty" firestore:"flows,omitempty" bigquery:"-"`
 	Methods []PaymentMethod `json:"methods,omitempty" firestore:"methods,omitempty" bigquery:"-"`
 	Rates   []string        `json:"rates,omitempty" firestore:"rates,omitempty" bigquery:"-"`
 }

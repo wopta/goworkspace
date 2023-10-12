@@ -18,6 +18,7 @@ type NetworkNode struct {
 	Type            string                `json:"type" firestore:"type" bigquery:"type"`
 	Role            string                `json:"role" firestore:"role" bigquery:"role"`
 	Mail            string                `json:"mail" firestore:"mail" bigquery:"mail"`
+	Warrant         string                `json:"warrant" firestore:"warrant" bigquery:"warrant"` // the name of the warrant file attached to the node
 	NetworkUid      string                `json:"networkUid" firestore:"networkUid" bigquery:"networkUid"`
 	NetworkCode     string                `json:"networkCode" firestore:"networkCode" bigquery:"networkCode"`
 	ParentUid       string                `json:"parentUid,omitempty" firestore:"parentUid,omitempty" bigquery:"parentUid"`
