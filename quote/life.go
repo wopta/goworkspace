@@ -46,6 +46,8 @@ func Life(channel string, data models.Policy) (models.Policy, error) {
 	var err error
 	contractorAge, err := data.CalculateContractorAge()
 
+	log.Printf("[Life] contractor age: %d", contractorAge)
+
 	b := lib.GetFilesByEnv("quote/life_matrix.csv")
 	df := lib.CsvToDataframe(b)
 	var selectRow []string
@@ -270,7 +272,7 @@ func getMultipliers(selectRow []string, offset int, base int, baseTax int) (floa
 	taxFloat, _ := strconv.ParseFloat(strings.Replace(strings.Replace(selectRow[baseTax+offset], "%", "", 1), ",", ".", 1), 64)
 	baseFloat = baseFloat / 100
 	taxFloat = taxFloat / 100
-	log.Printf("[Life] guarantee multipliers baseFloat: %d taxFloat: %d", baseFloat, taxFloat)
+	log.Printf("[Life] guarantee multipliers baseFloat: %f taxFloat: %f", baseFloat, taxFloat)
 	return baseFloat, taxFloat
 }
 
