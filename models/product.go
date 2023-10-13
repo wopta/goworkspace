@@ -57,7 +57,7 @@ type Company struct {
 	GuaranteesMap             map[string]*Guarante `firestore:"guaranteesMap,omitempty" json:"guaranteesMap,omitempty"`
 	InformationSetLink        string               `firestore:"informationSetLink,omitempty" json:"informationSetLink,omitempty"`
 	IsMonthlyPaymentAvailable bool                 `firestore:"isMonthlyPaymentAvailable" json:"isMonthlyPaymentAvailable"`
-	Mandate                   Mandate              `json:"mandate" firestore:"mandate" bigquery:"-"`
+	Mandate                   Mandate              `json:"mandate" firestore:"mandate" bigquery:"-"` // DEPRECATED
 	DiscountLimit             float64              `json:"discountLimit" firestore:"discountLimit" bigquery:"-"`
 	AgentCode                 string               `json:"agentCode" firestore:"agentCode" bigquery:"-"`
 	IsEcommerceActive         bool                 `json:"isEcommerceActive" firestore:"isEcommerceActive" bigquery:"-"` // TODO: remove this boolean once product versioning completed
@@ -70,6 +70,7 @@ type Company struct {
 	// MaxReservedDiscount       float64              `json:"maxReservedDiscount,omitempty" firestore:"maxReservedDiscount,omitempty" bigquery:"-"`
 }
 
+// DEPRECATED
 type Mandate struct {
 	Commission      float64   `json:"commission" firestore:"commission"`
 	CommissionRenew float64   `json:"commissionRenew" firestore:"commissionRenew"`
@@ -126,6 +127,16 @@ type AnnulmentCode struct {
 	Code        string   `json:"code,omitempty" firestore:"code,omitempty" bigquery:"-"`
 	Description string   `json:"description,omitempty" firestore:"description,omitempty" bigquery:"-"`
 	RefundTypes []string `json:"refundTypes,omitempty" firestore:"refundTypes,omitempty" bigquery:"-"`
+}
+
+type ProductInfo struct {
+	Name         string `json:"name"`
+	NameTitle    string `json:"nameTitle"`
+	NameSubtitle string `json:"nameSubtitle"`
+	NameDesc     string `json:"nameDesc"`
+	Version      string `json:"version"`
+	Company      string `json:"company"`
+	Logo         string `json:"logo"`
 }
 
 func ProductToListData(query *firestore.DocumentIterator) []Product {
