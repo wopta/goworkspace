@@ -48,7 +48,7 @@ func GetProductByChannelFx(w http.ResponseWriter, r *http.Request) (string, inte
 
 	if strings.EqualFold(channel, models.NetworkChannel) {
 		networkNode = network.GetNetworkNodeByUid(authToken.UserID)
-		if networkNode != nil && !networkNode.HasAccessToProduct(req.ProductName, req.CompanyName) {
+		if networkNode != nil && !networkNode.HasAccessToProduct(req.ProductName) {
 			log.Printf("[GetProductByChannelFx] network node %s hasn't access to product %s for company %s", networkNode.Uid, req.ProductName, req.CompanyName)
 			return "", nil, fmt.Errorf("network node hasn't access to product")
 		}

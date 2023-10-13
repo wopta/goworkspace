@@ -93,12 +93,27 @@ func GetProductV2(productName, channel string, networkNode *models.NetworkNode) 
 
 	log.Printf("[GetProductV2] productName: %s productVersion: %s channel: %s", product.Name, product.Version, channel)
 
-	if networkNode != nil {
+	if networkNode != nil && networkNode.HasAccessToProduct(result.Name) {
+
 		for _, nodeProduct := range networkNode.Products {
 			if nodeProduct.Name == result.Name && len(nodeProduct.Steps) > 0 {
 				log.Printf("[GetProductV2] overriding steps for product %s", result.Name)
 				result.Steps = nodeProduct.Steps
 			}
+		}
+
+		warrant := networkNode.GetWarrant()
+		if warrant != nil {
+			paymentProviders := make([]models.PaymentProvider, 0)
+			warrantProduct := warrant.GetProduct(result.Name)
+			if warrantProduct != nil {
+				for _, paymentProvider := range result.PaymentProviders {
+					if lib.SliceContains(paymentProvider.Flows, warrantProduct.Flow) {
+						paymentProviders = append(paymentProviders, paymentProvider)
+					}
+				}
+			}
+			result.PaymentProviders = paymentProviders
 		}
 	}
 

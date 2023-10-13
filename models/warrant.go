@@ -11,3 +11,12 @@ type Warrant struct {
 	EndDate      time.Time `json:"endDate"`      // the date when the Warrant becomes inactive
 	Products     []Product `json:"products"`     // the list of product with their commisionsSettings for the given Warrant
 }
+
+func (w *Warrant) GetProduct(productName string) *Product {
+	for _, product := range w.Products {
+		if product.Name == productName {
+			return &product
+		}
+	}
+	return nil
+}
