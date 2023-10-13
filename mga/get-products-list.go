@@ -101,8 +101,7 @@ func getEcommerceProductsList() []models.Product {
 	return productsList
 }
 
-func 
-getNetworkNodeProductsList(networkNodeUid, origin string) []models.Product {
+func getNetworkNodeProductsList(networkNodeUid, origin string) []models.Product {
 	var (
 		networkNode  models.NetworkNode
 		channel      string
@@ -137,7 +136,6 @@ getNetworkNodeProductsList(networkNodeUid, origin string) []models.Product {
 
 	return productsList
 }
-
 
 func getDefaultProductsByChannel(channel string) []models.Product {
 	products := make([]models.Product, 0)
