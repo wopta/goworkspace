@@ -34,12 +34,13 @@ type Product struct {
 	CommissionRenew   float64           `firestore:"commissionRenew,omitempty" json:"commissionRenew,omitempty"`
 	Steps             []Step            `firestore:"steps,omitempty" json:"steps"`
 	Offers            map[string]Offer  `firestore:"offers,omitempty" json:"offers,omitempty"`
-	IsEcommerceActive bool              `json:"isEcommerceActive" firestore:"isEcommerceActive"`
-	IsAgencyActive    bool              `json:"isAgencyActive" firestore:"isAgencyActive"`
-	IsAgentActive     bool              `json:"isAgentActive" firestore:"isAgentActive"`
+	IsEcommerceActive bool              `json:"isEcommerceActive" firestore:"isEcommerceActive"` // DEPRECATED
+	IsAgencyActive    bool              `json:"isAgencyActive" firestore:"isAgencyActive"`       // DEPRECATED
+	IsAgentActive     bool              `json:"isAgentActive" firestore:"isAgentActive"`         // DEPRECATED
 	Logo              string            `json:"logo,omitempty" firestore:"logo,omitempty" bigquery:"-"`
 	PaymentProviders  []PaymentProvider `json:"paymentProviders,omitempty" firestore:"paymentProviders,omitempty" bigquery:"-"`
 	Flow              string            `json:"flow,omitempty" firestore:"flow,omitempty" bigquery:"-"` // the name of the flow file to be used
+	IsActive          bool              `json:"isActive" json:"isActive" bigquery:"-"`
 }
 
 type Company struct {
@@ -60,12 +61,11 @@ type Company struct {
 	Mandate                   Mandate              `json:"mandate" firestore:"mandate" bigquery:"-"` // DEPRECATED
 	DiscountLimit             float64              `json:"discountLimit" firestore:"discountLimit" bigquery:"-"`
 	AgentCode                 string               `json:"agentCode" firestore:"agentCode" bigquery:"-"`
-	IsEcommerceActive         bool                 `json:"isEcommerceActive" firestore:"isEcommerceActive" bigquery:"-"` // TODO: remove this boolean once product versioning completed
-	IsAgencyActive            bool                 `json:"isAgencyActive" firestore:"isAgencyActive" bigquery:"-"`       // TODO: remove this boolean once product versioning completed
-	IsAgentActive             bool                 `json:"isAgentActive" firestore:"isAgentActive" bigquery:"-"`         // TODO: remove this boolean once product versioning completed
+	IsEcommerceActive         bool                 `json:"isEcommerceActive" firestore:"isEcommerceActive" bigquery:"-"` // DEPRECATED
+	IsAgencyActive            bool                 `json:"isAgencyActive" firestore:"isAgencyActive" bigquery:"-"`       // DEPRECATED
+	IsAgentActive             bool                 `json:"isAgentActive" firestore:"isAgentActive" bigquery:"-"`         // DEPRECATED
 	AnnulmentCodes            []AnnulmentCode      `json:"annulmentCodes,omitempty" firestore:"annulmentCodes,omitempty" bigquery:"-"`
 	CommissionSetting         *CommissionsSetting  `json:"commissionsSetting,omitempty" firestore:"commissionsSetting,omitempty" bigquery:"-"`
-	IsActive                  bool                 `json:"isActive" json:"isActive" bigquery:"-"`
 	// MaxFreeDiscount           float64              `json:"maxFreeDiscount,omitempty" firestore:"maxFreeDiscount,omitempty" bigquery:"-"`
 	// MaxReservedDiscount       float64              `json:"maxReservedDiscount,omitempty" firestore:"maxReservedDiscount,omitempty" bigquery:"-"`
 }
