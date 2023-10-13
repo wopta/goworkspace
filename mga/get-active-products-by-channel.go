@@ -12,6 +12,7 @@ type GetActiveProductsByChannelResp struct {
 	Products []models.Product `json:"products"`
 }
 
+// DEPRECATED
 func GetActiveProductsByChannelFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		resp GetActiveProductsByChannelResp
