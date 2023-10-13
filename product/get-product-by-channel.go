@@ -38,15 +38,13 @@ func GetProduct(name, version, channel string) (*models.Product, error) {
 	return product, err
 }
 
-func GetProductV2(productName, channel string, networkNode *models.NetworkNode) *models.Product {
+func GetDefaultProduct(productName, channel string) *models.Product {
 	var (
 		result, product *models.Product
 		basePath        = "products-v2"
 	)
 
-	log.Println("[GetProductV2] function start ---------------------")
-
-	log.Printf("[GetProductV2] product: %s", productName)
+	log.Println("[GetDefaultProduct] function start --------------")
 
 	filesList, err := lib.ListGoogleStorageFolderContent(fmt.Sprintf("%s/%s/", basePath, productName))
 	if err != nil {
@@ -54,17 +52,17 @@ func GetProductV2(productName, channel string, networkNode *models.NetworkNode) 
 		return nil
 	}
 
-	log.Println("[GetProductV2] filtering file list by channel")
+	log.Println("[GetDefaultProduct] filtering file list by channel")
 
 	filesList = lib.SliceFilter(filesList, func(filePath string) bool {
 		return strings.HasSuffix(filePath, fmt.Sprintf("%s.json", channel))
 	})
 	if len(filesList) == 0 {
-		log.Println("[GetProductV2] empty file list")
+		log.Println("[GetDefaultProduct] empty file list")
 		return nil
 	}
 
-	log.Println("[GetProductV2] sorting file list by version")
+	log.Println("[GetDefaultProduct] sorting file list by version")
 
 	sort.Slice(filesList, func(i, j int) bool {
 		return strings.SplitN(filesList[i], "/", 4)[2] > strings.SplitN(filesList[j], "/", 4)[2]
@@ -75,53 +73,73 @@ func GetProductV2(productName, channel string, networkNode *models.NetworkNode) 
 
 		err = json.Unmarshal(productBytes, &product)
 		if err != nil {
-			log.Printf("[GetProductV2] error unmarshaling product: %s", err.Error())
+			log.Printf("[GetDefaultProduct] error unmarshaling product: %s", err.Error())
 			return nil
 		}
 
 		if product.IsActive {
+			log.Printf("[GetDefaultProduct] product %s version %s is active", product.Name, product.Version)
 			result = product
 			break
 		}
-		log.Printf("[GetProductV2] product %s version %s is not active", product.Name, product.Version)
+		log.Printf("[GetDefaultProduct] product %s version %s is not active", product.Name, product.Version)
 	}
 
 	if result == nil {
-		log.Printf("[GetProductV2] no active %s product found", productName)
+		log.Printf("[GetDefaultProduct] no active %s product found", productName)
 		return nil
 	}
 
-	log.Printf("[GetProductV2] productName: %s productVersion: %s channel: %s", product.Name, product.Version, channel)
+	err = replaceDatesInProduct(result, channel)
 
-	if networkNode != nil && networkNode.HasAccessToProduct(result.Name) {
+	log.Println("[GetDefaultProduct] function end ---------------------")
 
+	return result
+}
+
+func GetProductV2(productName, channel string, networkNode *models.NetworkNode) *models.Product {
+	var (
+		product *models.Product
+	)
+
+	log.Println("[GetProductV2] function start ---------------------")
+
+	log.Printf("[GetProductV2] product: %s", productName)
+
+	product = GetDefaultProduct(productName, channel)
+	if product == nil {
+		log.Printf("[GetProductV2] no active product found")
+		return nil
+	}
+
+	if networkNode != nil && networkNode.HasAccessToProduct(product.Name) {
 		for _, nodeProduct := range networkNode.Products {
-			if nodeProduct.Name == result.Name && len(nodeProduct.Steps) > 0 {
-				log.Printf("[GetProductV2] overriding steps for product %s", result.Name)
-				result.Steps = nodeProduct.Steps
+			if nodeProduct.Name == product.Name && len(nodeProduct.Steps) > 0 {
+				log.Printf("[GetProductV2] overriding steps for product %s", product.Name)
+				product.Steps = nodeProduct.Steps
 			}
 		}
 
 		warrant := networkNode.GetWarrant()
 		if warrant != nil {
 			paymentProviders := make([]models.PaymentProvider, 0)
-			warrantProduct := warrant.GetProduct(result.Name)
+			warrantProduct := warrant.GetProduct(product.Name)
 			if warrantProduct != nil {
-				for _, paymentProvider := range result.PaymentProviders {
+				for _, paymentProvider := range product.PaymentProviders {
 					if lib.SliceContains(paymentProvider.Flows, warrantProduct.Flow) {
 						paymentProviders = append(paymentProviders, paymentProvider)
 					}
 				}
 			}
-			result.PaymentProviders = paymentProviders
+			product.PaymentProviders = paymentProviders
 		}
 	}
 
-	err = replaceDatesInProduct(result, channel)
+	//err = replaceDatesInProduct(result, channel)
 
 	log.Println("[GetProductV2] function end ---------------------")
 
-	return result
+	return product
 }
 
 func replaceDatesInProduct(product *models.Product, channel string) error {
