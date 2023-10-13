@@ -92,11 +92,11 @@ outerLoop:
 		return nil
 	}
 
-	log.Printf("[GetProduct] productName: %s productVersion: %s channel: %s", product.Name, product.Version, channel)
+	log.Printf("[GetProductV2] productName: %s productVersion: %s channel: %s", product.Name, product.Version, channel)
 
 	err = replaceDatesInProduct(result, channel)
 
-	log.Println("[GetProduct] function end ---------------------")
+	log.Println("[GetProductV2] function end ---------------------")
 
 	return result
 }
