@@ -39,13 +39,13 @@ func GetProduct(name, version, channel string) (*models.Product, error) {
 
 func GetProductV2(productName, companyName, channel string) *models.Product {
 	var (
-		product  *models.Product
-		basePath = "products-v2"
+		result, product *models.Product
+		basePath        = "products-v2"
 	)
 
-	log.Println("[GetProduct] function start ---------------------")
+	log.Println("[GetProductV2] function start ---------------------")
 
-	log.Printf("[GetProduct] product: %s", productName)
+	log.Printf("[GetProductV2] product: %s", productName)
 
 	filesList, err := lib.ListGoogleStorageFolderContent(fmt.Sprintf("%s/%s/", basePath, productName))
 	if err != nil {
@@ -53,17 +53,17 @@ func GetProductV2(productName, companyName, channel string) *models.Product {
 		return nil
 	}
 
-	log.Println("[GetProduct] filtering file list by channel")
+	log.Println("[GetProductV2] filtering file list by channel")
 
 	filesList = lib.SliceFilter(filesList, func(filePath string) bool {
 		return strings.HasSuffix(filePath, fmt.Sprintf("%s.json", channel))
 	})
 	if len(filesList) == 0 {
-		log.Println("[GetProduct] empty file list")
+		log.Println("[GetProductV2] empty file list")
 		return nil
 	}
 
-	log.Println("[GetProduct] sorting file list by version")
+	log.Println("[GetProductV2] sorting file list by version")
 
 	sort.Slice(filesList, func(i, j int) bool {
 		return strings.SplitN(filesList[i], "/", 4)[2] > strings.SplitN(filesList[j], "/", 4)[2]
@@ -75,24 +75,30 @@ outerLoop:
 
 		err = json.Unmarshal(productBytes, &product)
 		if err != nil {
-			log.Printf("[GetProduct] error unmarshaling product: %s", err.Error())
+			log.Printf("[GetProductV2] error unmarshaling product: %s", err.Error())
 			return nil
 		}
 
 		for _, company := range product.Companies {
 			if company.Name == companyName && company.IsActive {
+				result = product
 				break outerLoop
 			}
 		}
 	}
 
+	if result == nil {
+		log.Printf("[GetProductV2] no active %s product for %s company found", productName, companyName)
+		return nil
+	}
+
 	log.Printf("[GetProduct] productName: %s productVersion: %s channel: %s", product.Name, product.Version, channel)
 
-	err = replaceDatesInProduct(product, channel)
+	err = replaceDatesInProduct(result, channel)
 
 	log.Println("[GetProduct] function end ---------------------")
 
-	return product
+	return result
 }
 
 func replaceDatesInProduct(product *models.Product, channel string) error {
