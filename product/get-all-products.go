@@ -7,6 +7,7 @@ import (
 	"log"
 )
 
+// DEPRECATED
 func GetAllProductsByChannel(channel string) []models.Product {
 	const (
 		filePath = "products/mga/"

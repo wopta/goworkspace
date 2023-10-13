@@ -147,7 +147,7 @@ func replaceDatesInProduct(product *models.Product, channel string) error {
 	return err
 }
 
-// TODO: remove this endpoint once in production
+// DEPRECATED
 func GetNameFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	name := r.Header.Get("name")
 	origin := r.Header.Get("origin")

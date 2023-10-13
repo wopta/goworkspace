@@ -8,6 +8,7 @@ import (
 	"net/http"
 )
 
+// DEPRECTED
 func PutFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println(models.ProductsCollection)
 	origin := r.Header.Get("origin")
