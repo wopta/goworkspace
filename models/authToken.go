@@ -42,6 +42,7 @@ func GetAuthTokenFromIdToken(idToken string) (AuthToken, error) {
 	}, nil
 }
 
+// DEPRECATED: remove once product versioning completed
 func (at *AuthToken) GetChannelByRole() string {
 	channel := ECommerceChannel
 
@@ -52,6 +53,19 @@ func (at *AuthToken) GetChannelByRole() string {
 		channel = AgencyChannel
 	case UserRoleAgent:
 		channel = AgentChannel
+	}
+
+	return channel
+}
+
+func (at *AuthToken) GetChannelByRoleV2() string {
+	channel := ECommerceChannel
+
+	switch at.Role {
+	case UserRoleAdmin, UserRoleManager:
+		channel = MgaChannel
+	case UserRoleAgency, UserRoleAgent:
+		channel = NetworkChannel
 	}
 
 	return channel

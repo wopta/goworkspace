@@ -112,9 +112,10 @@ const (
 
 const (
 	ECommerceChannel string = "e-commerce"
-	AgentChannel     string = "agent"
-	AgencyChannel    string = "agency"
+	AgentChannel     string = "agent"  //DEPRECATED: remove this constant once product versioning is completed
+	AgencyChannel    string = "agency" //DEPRECATED: remove this constant once product versioning is completed
 	MgaChannel       string = "mga"
+	NetworkChannel   string = "network"
 )
 
 const (
