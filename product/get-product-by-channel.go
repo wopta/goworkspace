@@ -30,14 +30,14 @@ func GetProduct(name, version, channel string) (*models.Product, error) {
 	err := json.Unmarshal(jsonFile, &product)
 	lib.CheckError(err)
 
-	product, err = replaceDatesInProduct(product, channel)
+	err = replaceDatesInProduct(product, channel)
 
 	log.Println("[GetProduct] function end ---------------------")
 
 	return product, err
 }
 
-func GetProductV2(productName, companyName, channel string) (*models.Product, error) {
+func GetProductV2(productName, companyName, channel string) *models.Product {
 	var (
 		product  *models.Product
 		basePath = "products-v2"
@@ -50,7 +50,7 @@ func GetProductV2(productName, companyName, channel string) (*models.Product, er
 	filesList, err := lib.ListGoogleStorageFolderContent(fmt.Sprintf("%s/%s/", basePath, productName))
 	if err != nil {
 		log.Printf("[GetProduct] error: %s", err.Error())
-		return nil, err
+		return nil
 	}
 
 	log.Println("[GetProduct] filtering file list by channel")
@@ -58,6 +58,10 @@ func GetProductV2(productName, companyName, channel string) (*models.Product, er
 	filesList = lib.SliceFilter(filesList, func(filePath string) bool {
 		return strings.HasSuffix(filePath, fmt.Sprintf("%s.json", channel))
 	})
+	if len(filesList) == 0 {
+		log.Println("[GetProduct] empty file list")
+		return nil
+	}
 
 	log.Println("[GetProduct] sorting file list by version")
 
@@ -72,7 +76,7 @@ outerLoop:
 		err = json.Unmarshal(productBytes, &product)
 		if err != nil {
 			log.Printf("[GetProduct] error unmarshaling product: %s", err.Error())
-			return nil, err
+			return nil
 		}
 
 		for _, company := range product.Companies {
@@ -80,26 +84,25 @@ outerLoop:
 				break outerLoop
 			}
 		}
-
-		pathComponents := strings.SplitN(file, "/", 4)
-		log.Printf("basePath: %s folder: %s version: %s filename: %s", pathComponents[0], pathComponents[1], pathComponents[2], pathComponents[3])
 	}
 
-	product, err = replaceDatesInProduct(product, channel)
+	log.Printf("[GetProduct] productName: %s productVersion: %s channel: %s", product.Name, product.Version, channel)
+
+	err = replaceDatesInProduct(product, channel)
 
 	log.Println("[GetProduct] function end ---------------------")
 
-	return product, err
+	return product
 }
 
-func replaceDatesInProduct(product *models.Product, channel string) (*models.Product, error) {
+func replaceDatesInProduct(product *models.Product, channel string) error {
 	if product == nil {
-		return nil, fmt.Errorf("no product found")
+		return fmt.Errorf("no product found")
 	}
 
 	jsonOut, err := product.Marshal()
 	if err != nil {
-		return &models.Product{}, err
+		return err
 	}
 
 	log.Println("[replaceDatesInProduct] function start -------------------")
@@ -110,7 +113,7 @@ func replaceDatesInProduct(product *models.Product, channel string) (*models.Pro
 
 	minAgeValue, minReservedAgeValue := ageMap[channel][product.Name][minAge], ageMap[channel][product.Name][minReservedAge]
 
-	log.Printf("[replaceDatesInProduct] minAgeValue: %d minReservedAgeValue: %d", minAgeValue, minReservedAgeValue)
+	log.Printf("[replaceDatesInProduct] minAge: %d minReservedAge: %d", minAgeValue, minReservedAgeValue)
 
 	initialDate := time.Now().AddDate(-18, 0, 0).Format(models.TimeDateOnly)
 	minDate := time.Now().AddDate(-minAgeValue, 0, 1).Format(models.TimeDateOnly)
@@ -130,11 +133,11 @@ func replaceDatesInProduct(product *models.Product, channel string) (*models.Pro
 	productJson = regexStartDate.ReplaceAllString(productJson, startDate)
 	productJson = regexMaxStartDate.ReplaceAllString(productJson, maxStartDate)
 
-	err = json.Unmarshal([]byte(productJson), product)
+	err = json.Unmarshal([]byte(productJson), &product)
 
 	log.Println("[replaceDatesInProduct] function end -------------------")
 
-	return product, err
+	return err
 }
 
 // TODO: remove this endpoint once in production
@@ -156,9 +159,9 @@ func GetNameFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 
 	switch name {
 	case "persona":
-		product, err = replaceDatesInProduct(product, models.UserRoleAll)
+		err = replaceDatesInProduct(product, models.UserRoleAll)
 	case "life":
-		product, err = replaceDatesInProduct(product, models.UserRoleAll)
+		err = replaceDatesInProduct(product, models.UserRoleAll)
 	}
 
 	jsonOut, err = json.Marshal(product)
