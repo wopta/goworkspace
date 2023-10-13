@@ -27,6 +27,7 @@ type ProductInfo struct {
 	Logo         string `json:"logo"`
 }
 
+// DEPRECATED
 func GetProductsListByEntitlementFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 
 	var (

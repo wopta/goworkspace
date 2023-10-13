@@ -22,7 +22,7 @@ func Mga(w http.ResponseWriter, r *http.Request) {
 		Routes: []lib.Route{
 			{
 				Route:   "/products/v1",
-				Handler: GetProductsListByEntitlementFx, // SOON TO BE DEPRECATED
+				Handler: GetProductsListByEntitlementFx, // DEPRECATED
 				Method:  http.MethodGet,
 				Roles:   []string{models.UserRoleAll},
 			},
