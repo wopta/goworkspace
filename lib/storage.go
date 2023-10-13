@@ -112,5 +112,7 @@ func ListGoogleStorageFolderContent(folderPath string) ([]string, error) {
 
 	log.Printf("[ListGoogleStorageFolderContent] found %d files", len(filesList))
 
+	log.Println("[ListGoogleStorageFolderContent] function end --------------")
+
 	return filesList, nil
 }

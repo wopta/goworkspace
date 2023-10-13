@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/http"
 	"regexp"
+	"sort"
+	"strings"
 	"time"
 
 	"github.com/wopta/goworkspace/lib"
@@ -35,7 +37,66 @@ func GetProduct(name, version, channel string) (*models.Product, error) {
 	return product, err
 }
 
+func GetProductV2(productName, companyName, channel string) (*models.Product, error) {
+	var (
+		product  *models.Product
+		basePath = "products-v2"
+	)
+
+	log.Println("[GetProduct] function start ---------------------")
+
+	log.Printf("[GetProduct] product: %s", productName)
+
+	filesList, err := lib.ListGoogleStorageFolderContent(fmt.Sprintf("%s/%s/", basePath, productName))
+	if err != nil {
+		log.Printf("[GetProduct] error: %s", err.Error())
+		return nil, err
+	}
+
+	log.Println("[GetProduct] filtering file list by channel")
+
+	filesList = lib.SliceFilter(filesList, func(filePath string) bool {
+		return strings.HasSuffix(filePath, fmt.Sprintf("%s.json", channel))
+	})
+
+	log.Println("[GetProduct] sorting file list by version")
+
+	sort.Slice(filesList, func(i, j int) bool {
+		return strings.SplitN(filesList[i], "/", 4)[2] > strings.SplitN(filesList[j], "/", 4)[2]
+	})
+
+outerLoop:
+	for _, file := range filesList {
+		productBytes := lib.GetFilesByEnv(file)
+
+		err = json.Unmarshal(productBytes, &product)
+		if err != nil {
+			log.Printf("[GetProduct] error unmarshaling product: %s", err.Error())
+			return nil, err
+		}
+
+		for _, company := range product.Companies {
+			if company.Name == companyName && company.IsActive {
+				break outerLoop
+			}
+		}
+
+		pathComponents := strings.SplitN(file, "/", 4)
+		log.Printf("basePath: %s folder: %s version: %s filename: %s", pathComponents[0], pathComponents[1], pathComponents[2], pathComponents[3])
+	}
+
+	product, err = replaceDatesInProduct(product, channel)
+
+	log.Println("[GetProduct] function end ---------------------")
+
+	return product, err
+}
+
 func replaceDatesInProduct(product *models.Product, channel string) (*models.Product, error) {
+	if product == nil {
+		return nil, fmt.Errorf("no product found")
+	}
+
 	jsonOut, err := product.Marshal()
 	if err != nil {
 		return &models.Product{}, err
