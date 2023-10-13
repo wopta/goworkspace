@@ -39,6 +39,12 @@ func Mga(w http.ResponseWriter, r *http.Request) {
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
+				Route:   "/products/v2",
+				Handler: GetProductByChannelFx,
+				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAll},
+			},
+			{
 				Route:   "/products/channel/v1/:channel",
 				Handler: GetActiveProductsByChannelFx,
 				Method:  http.MethodGet,

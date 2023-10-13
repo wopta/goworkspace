@@ -2,6 +2,7 @@ package models
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"strings"
 	"time"
@@ -182,4 +183,52 @@ func (nn *NetworkNode) GetName() string {
 	}
 
 	return strings.ReplaceAll(name, " ", "-")
+}
+
+func (nn *NetworkNode) GetWarrant(filename string) *Warrant {
+	var (
+		warrant       *Warrant
+		warrantFormat = "warrants/%s.json"
+	)
+
+	if filename == "" {
+		log.Printf("[GetWarrant] no filename specified")
+		return nil
+	}
+
+	log.Printf("[GetWarrant] requesting warrant %s", filename)
+
+	warrantBytes := lib.GetFilesByEnv(fmt.Sprintf(warrantFormat, filename))
+
+	err := json.Unmarshal(warrantBytes, &warrant)
+	if err != nil {
+		log.Printf("[GetWarrant] error unmarshaling warrant %s: %s", filename, err.Error())
+		return nil
+	}
+
+	return warrant
+}
+
+func (nn *NetworkNode) HasAccessToProduct(productName, companyName string) bool {
+	log.Println("[HasAccessToProduct] method start -----------------")
+
+	warrant := nn.GetWarrant(nn.Warrant)
+	if warrant == nil {
+		log.Printf("[HasAccessToProduct] no %s warrant found", nn.Warrant)
+		return false
+	}
+
+	log.Printf("[HasAccessToProduct] checking if network node %s has access product %s", nn.Uid, productName)
+
+	for _, product := range warrant.Products {
+		if product.Name == productName {
+			for _, company := range product.Companies {
+				if company.Name == companyName {
+					return true
+				}
+			}
+		}
+	}
+
+	return false
 }

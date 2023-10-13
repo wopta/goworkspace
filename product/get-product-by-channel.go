@@ -6,12 +6,15 @@ import (
 	"log"
 	"net/http"
 	"regexp"
+	"sort"
+	"strings"
 	"time"
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
 
+// DEPRECATED
 func GetProduct(name, version, channel string) (*models.Product, error) {
 	var (
 		product  *models.Product
@@ -28,17 +31,85 @@ func GetProduct(name, version, channel string) (*models.Product, error) {
 	err := json.Unmarshal(jsonFile, &product)
 	lib.CheckError(err)
 
-	product, err = replaceDatesInProduct(product, channel)
+	err = replaceDatesInProduct(product, channel)
 
 	log.Println("[GetProduct] function end ---------------------")
 
 	return product, err
 }
 
-func replaceDatesInProduct(product *models.Product, channel string) (*models.Product, error) {
+func GetProductV2(productName, companyName, channel string) *models.Product {
+	var (
+		result, product *models.Product
+		basePath        = "products-v2"
+	)
+
+	log.Println("[GetProductV2] function start ---------------------")
+
+	log.Printf("[GetProductV2] product: %s", productName)
+
+	filesList, err := lib.ListGoogleStorageFolderContent(fmt.Sprintf("%s/%s/", basePath, productName))
+	if err != nil {
+		log.Printf("[GetProduct] error: %s", err.Error())
+		return nil
+	}
+
+	log.Println("[GetProductV2] filtering file list by channel")
+
+	filesList = lib.SliceFilter(filesList, func(filePath string) bool {
+		return strings.HasSuffix(filePath, fmt.Sprintf("%s.json", channel))
+	})
+	if len(filesList) == 0 {
+		log.Println("[GetProductV2] empty file list")
+		return nil
+	}
+
+	log.Println("[GetProductV2] sorting file list by version")
+
+	sort.Slice(filesList, func(i, j int) bool {
+		return strings.SplitN(filesList[i], "/", 4)[2] > strings.SplitN(filesList[j], "/", 4)[2]
+	})
+
+outerLoop:
+	for _, file := range filesList {
+		productBytes := lib.GetFilesByEnv(file)
+
+		err = json.Unmarshal(productBytes, &product)
+		if err != nil {
+			log.Printf("[GetProductV2] error unmarshaling product: %s", err.Error())
+			return nil
+		}
+
+		for _, company := range product.Companies {
+			if company.Name == companyName && company.IsActive {
+				result = product
+				break outerLoop
+			}
+		}
+	}
+
+	if result == nil {
+		log.Printf("[GetProductV2] no active %s product for %s company found", productName, companyName)
+		return nil
+	}
+
+	log.Printf("[GetProductV2] productName: %s productVersion: %s channel: %s", product.Name, product.Version, channel)
+
+	err = replaceDatesInProduct(result, channel)
+
+	log.Println("[GetProductV2] function end ---------------------")
+
+	return result
+}
+
+func replaceDatesInProduct(product *models.Product, channel string) error {
+	if product == nil {
+		return fmt.Errorf("no product found")
+	}
+
 	jsonOut, err := product.Marshal()
 	if err != nil {
-		return &models.Product{}, err
+		return err
 	}
 
 	log.Println("[replaceDatesInProduct] function start -------------------")
@@ -49,7 +120,7 @@ func replaceDatesInProduct(product *models.Product, channel string) (*models.Pro
 
 	minAgeValue, minReservedAgeValue := ageMap[channel][product.Name][minAge], ageMap[channel][product.Name][minReservedAge]
 
-	log.Printf("[replaceDatesInProduct] minAgeValue: %d minReservedAgeValue: %d", minAgeValue, minReservedAgeValue)
+	log.Printf("[replaceDatesInProduct] minAge: %d minReservedAge: %d", minAgeValue, minReservedAgeValue)
 
 	initialDate := time.Now().AddDate(-18, 0, 0).Format(models.TimeDateOnly)
 	minDate := time.Now().AddDate(-minAgeValue, 0, 1).Format(models.TimeDateOnly)
@@ -69,11 +140,11 @@ func replaceDatesInProduct(product *models.Product, channel string) (*models.Pro
 	productJson = regexStartDate.ReplaceAllString(productJson, startDate)
 	productJson = regexMaxStartDate.ReplaceAllString(productJson, maxStartDate)
 
-	err = json.Unmarshal([]byte(productJson), product)
+	err = json.Unmarshal([]byte(productJson), &product)
 
 	log.Println("[replaceDatesInProduct] function end -------------------")
 
-	return product, err
+	return err
 }
 
 // TODO: remove this endpoint once in production
@@ -95,9 +166,9 @@ func GetNameFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 
 	switch name {
 	case "persona":
-		product, err = replaceDatesInProduct(product, models.UserRoleAll)
+		err = replaceDatesInProduct(product, models.UserRoleAll)
 	case "life":
-		product, err = replaceDatesInProduct(product, models.UserRoleAll)
+		err = replaceDatesInProduct(product, models.UserRoleAll)
 	}
 
 	jsonOut, err = json.Marshal(product)

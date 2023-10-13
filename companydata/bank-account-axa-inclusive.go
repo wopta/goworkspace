@@ -29,11 +29,10 @@ type BankAccountAxaInclusiveReq struct {
 
 func BankAccountAxaInclusive(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		from      time.Time
-		to        time.Time
-		result    [][]string
-		now       time.Time
-		refMontly time.Time
+		result [][]string
+		now    time.Time
+		refDay time.Time
+		upload bool
 	)
 	log.Println("----------------BankAccountAxaInclusive-----------------")
 	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
@@ -42,26 +41,17 @@ func BankAccountAxaInclusive(w http.ResponseWriter, r *http.Request) (string, in
 	var obj BankAccountAxaInclusiveReq
 	defer r.Body.Close()
 	json.Unmarshal([]byte(req), &obj)
-	if obj.Day == "" {
-		refMontly = now.AddDate(0, 0, -1)
-		now = time.Now().AddDate(0, 0, -1)
+	now, upload = getRequestData(req)
+	refDay = now.AddDate(0, 0, -1)
 
-		from, e = time.Parse("2006-01-02", strconv.Itoa(now.Year())+"-"+fmt.Sprintf("%02d", int(now.Month()))+"-"+fmt.Sprintf("%02d", 1))
-		to, e = time.Parse("2006-01-02", strconv.Itoa(now.Year())+"-"+fmt.Sprintf("%02d", int(now.Month()))+"-"+fmt.Sprintf("%02d", now.Day()))
-	} else {
-		date, _ := time.Parse("2006-01-02", obj.Day)
-		refMontly = date
-		log.Println(date)
-		from = date
-		to = date
-	}
-	log.Println(from)
-	log.Println(to)
+	log.Println("BankAccountAxaInclusive refMontly: ", refDay)
+	//from, e = time.Parse("2006-01-02", strconv.Itoa(now.Year())+"-"+fmt.Sprintf("%02d", int(now.Month()))+"-"+fmt.Sprintf("%02d", 1))
 	//query := "select * from `wopta." + dataMovement + "` where _PARTITIONTIME >'" + from.Format(layoutQuery) + " 00:00:00" + "' and _PARTITIONTIME <'" + to.Format(layoutQuery) + " 23:59:00" + "'"
-	query := "select * from `wopta." + dataMovement + "` where _PARTITIONTIME ='" + from.Format(layoutQuery) + "'"
-	log.Println(query)
-	bankaccountlist, _ := lib.QueryRowsBigQuery[inclusive.BankAccountMovement](query)
-	log.Println("len(bankaccountlist): ", len(bankaccountlist))
+	query := "select * from `wopta." + dataMovement + "` where _PARTITIONTIME ='" + refDay.Format(layoutQuery) + "'"
+	log.Println("BankAccountAxaInclusive bigquery query: ", query)
+	bankaccountlist, e := lib.QueryRowsBigQuery[inclusive.BankAccountMovement](query)
+	log.Println("BankAccountAxaInclusive bigquery error: ", e)
+	log.Println("BankAccountAxaInclusive len(bankaccountlist): ", len(bankaccountlist))
 	//result = append(result, getHeader())
 	result = append(result, getHeaderInclusiveBank())
 	for _, mov := range bankaccountlist {
@@ -70,14 +60,17 @@ func BankAccountAxaInclusive(w http.ResponseWriter, r *http.Request) (string, in
 
 	}
 
-	filepath := "180623_" + strconv.Itoa(refMontly.Year()) + fmt.Sprintf("%02d", int(refMontly.Month())) + fmt.Sprintf("%02d", refMontly.Day())
+	filepath := "180623_" + strconv.Itoa(refDay.Year()) + fmt.Sprintf("%02d", int(refDay.Month())) + fmt.Sprintf("%02d", refDay.Day())
 	CreateExcel(result, "../tmp/"+filepath+".xlsx")
 	lib.WriteCsv("../tmp/"+filepath+".csv", result, ';')
 	source, _ := ioutil.ReadFile("../tmp/" + filepath + ".xlsx")
 	sourceCsv, _ := ioutil.ReadFile("../tmp/" + filepath + ".csv")
-	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/axa/inclusive/hype/"+strconv.Itoa(refMontly.Year())+"/"+fmt.Sprintf("%02d", int(refMontly.Month()))+"/"+filepath+".xlsx", source)
-	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/axa/inclusive/hype/"+strconv.Itoa(refMontly.Year())+"/"+fmt.Sprintf("%02d", int(refMontly.Month()))+"/"+filepath+".csv", sourceCsv)
-	AxaSftpUpload(filepath+".xlsx", "HYPE/IN/")
+	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/axa/inclusive/hype/"+strconv.Itoa(refDay.Year())+"/"+fmt.Sprintf("%02d", int(refDay.Month()))+"/"+filepath+".xlsx", source)
+	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/axa/inclusive/hype/"+strconv.Itoa(refDay.Year())+"/"+fmt.Sprintf("%02d", int(refDay.Month()))+"/"+filepath+".csv", sourceCsv)
+	if upload {
+
+		AxaSftpUpload(filepath+".xlsx", "HYPE/IN/")
+	}
 	return "", nil, e
 }
 func setInclusiveRow(mov inclusive.BankAccountMovement) [][]string {
@@ -109,8 +102,9 @@ func setInclusiveRow(mov inclusive.BankAccountMovement) [][]string {
 		startDate.Format(layout), //    DATA INIZIO VALIDITA' COPERTURA
 		mapEndDate(mov),          //    DATA FINE VALIDITA' COPERTURA
 		StringMapping(mov.MovementType, map[string]string{
-			"insert": "A",
-			"delete": "E",
+			"insert":    "A",
+			"delete":    "E",
+			"suspended": "E",
 		}), //    TIPO MOVIMENTO
 	}
 
