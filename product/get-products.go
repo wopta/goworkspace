@@ -17,21 +17,9 @@ const (
 func GetProductsByChannel(channel string) []models.ProductInfo {
 	log.Println("[GetProductsByChannel] function start -----------------------")
 
-	var (
-		err      error
-		products []models.ProductInfo = make([]models.ProductInfo, 0)
-	)
+	var products = make([]models.ProductInfo, 0)
 
-	// TODO use lib function
-	fileList, err := GetFileListMock(productFolderPath)
-	if err != nil {
-		log.Printf("[GetProductsByChannel] error getting file list: %s", err.Error())
-		return products
-	}
-	if len(fileList) == 0 {
-		log.Println("[GetProductsByChannel] no files/products found")
-		return products
-	}
+	fileList := getProductsFileList()
 
 	// filter only the files for the given channel
 	fileList = lib.SliceFilter(fileList, func(file string) bool {
@@ -50,27 +38,15 @@ func GetProductsByChannel(channel string) []models.ProductInfo {
 func GetNetworkNodeProducts(productList []string) []models.ProductInfo {
 	log.Println("[GetNetworkNodeProducts] function start ---------------------")
 
-	var (
-		err      error
-		products []models.ProductInfo = make([]models.ProductInfo, 0)
-	)
+	var products = make([]models.ProductInfo, 0)
 
-	// TODO use lib function
-	fileList, err := GetFileListMock(productFolderPath)
-	if err != nil {
-		log.Printf("[GetNetworkNodeProducts] error getting file list: %s", err.Error())
-		return products
-	}
-	if len(fileList) == 0 {
-		log.Println("[GetNetworkNodeProducts] no files/products found")
-		return products
-	}
+	fileList := getProductsFileList()
 
 	// filter only the files for the network channel present on the product list
 	fileList = lib.SliceFilter(fileList, func(file string) bool {
 		filenameParts := strings.SplitN(file, "/", 4)
-		// TODO: use constants
-		return strings.HasPrefix(filenameParts[3], "network") && lib.SliceContains[string](productList, filenameParts[1])
+		return strings.HasPrefix(filenameParts[3], models.NetworkChannel) &&
+			lib.SliceContains[string](productList, filenameParts[1])
 	})
 
 	products = getProductsFromFileList(fileList)
@@ -90,7 +66,7 @@ func getProductsFromFileList(fileList []string) []models.ProductInfo {
 	)
 
 	if len(fileList) == 0 {
-		log.Println("[getProductsFromFileList] empty fileList")
+		log.Println("[getProductsFromFileList] error empty fileList")
 		return products
 	}
 
@@ -159,17 +135,16 @@ func getProductsFromFileList(fileList []string) []models.ProductInfo {
 	return products
 }
 
-func GetFileListMock(folderPath string) ([]string, error) {
-	return []string{
-		"products-v2/life/v1/mga.json",
-		"products-v2/life/v1/e-commerce.json",
-		"products-v2/life/v1/network.json",
-		"products-v2/life/v2/mga.json",
-		"products-v2/life/v2/e-commerce.json",
-		"products-v2/life/v2/network.json",
-		"products-v2/gap/v1/mga.json",
-		"products-v2/gap/v1/network.json",
-		"products-v2/persona/v1/mga.json",
-		"products-v2/persona/v1/e-commerce.json",
-	}, nil
+func getProductsFileList() []string {
+	var (
+		err      error
+		fileList = make([]string, 0)
+	)
+
+	fileList, err = lib.ListGoogleStorageFolderContent(productFolderPath)
+	if err != nil {
+		log.Printf("[GetNetworkNodeProducts] error getting file list: %s", err.Error())
+	}
+
+	return fileList
 }
