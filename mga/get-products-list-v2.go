@@ -2,6 +2,7 @@ package mga
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -41,6 +42,10 @@ func GetProductsListByChannelFx(w http.ResponseWriter, r *http.Request) (string,
 	} else {
 		log.Println("[GetProductsListByChannelFx] getting network products")
 		warrant := network.GetWarrant(networkNode.Warrant)
+		if warrant == nil {
+			log.Println("[GetProductsListByChannelFx] warrant not found")
+			return "", "", fmt.Errorf("no warrant set for node")
+		}
 		productList := lib.SliceMap[models.Product, string](warrant.Products, func(p models.Product) string { return p.Name })
 		log.Printf("[GetProductsListByChannelFx] product list '%s'", productList)
 		response.Products = product.GetNetworkNodeProducts(productList)
