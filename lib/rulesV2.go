@@ -2,6 +2,7 @@ package lib
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/hyperjumptech/grule-rule-engine/ast"
 	"github.com/hyperjumptech/grule-rule-engine/builder"
 	"github.com/hyperjumptech/grule-rule-engine/engine"
@@ -62,6 +63,12 @@ func RulesFromJsonV2(fx interface{}, groule []byte, out interface{}, in []byte, 
 	return string(b), out
 }
 
+// DEPRECATED
 func GetRulesFile(rulesFileName string) []byte {
 	return GetFilesByEnv("grules/" + rulesFileName)
+}
+
+func GetRulesFileV2(productName, productVersion, rulesFileName string) []byte {
+	filePath := fmt.Sprintf("products-v2/%s/%s/%s_rules.json", productName, productVersion, rulesFileName)
+	return GetFilesByEnv(filePath)
 }
