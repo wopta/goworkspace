@@ -12,6 +12,7 @@ const (
 	minReservedAge = "minReservedAge"
 )
 
+// DEPRECATED
 func GetProductByRole(productName, version, company string, authToken models.AuthToken) (models.Product, error) {
 	log.Println("GetProductByRole")
 	var (
