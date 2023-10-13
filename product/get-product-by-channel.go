@@ -14,6 +14,7 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
+// DEPRECATED
 func GetProduct(name, version, channel string) (*models.Product, error) {
 	var (
 		product  *models.Product
