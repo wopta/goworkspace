@@ -134,8 +134,6 @@ type ProductInfo struct {
 	NameTitle    string `json:"nameTitle"`
 	NameSubtitle string `json:"nameSubtitle"`
 	NameDesc     string `json:"nameDesc"`
-	Version      string `json:"version"`
-	Company      string `json:"company"`
 	Logo         string `json:"logo"`
 }
 

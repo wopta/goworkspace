@@ -38,7 +38,7 @@ func GetProduct(name, version, channel string) (*models.Product, error) {
 	return product, err
 }
 
-func GetProductV2(productName, companyName, channel string) *models.Product {
+func GetProductV2(productName, channel string, networkNode *models.NetworkNode) *models.Product {
 	var (
 		result, product *models.Product
 		basePath        = "products-v2"
@@ -70,7 +70,6 @@ func GetProductV2(productName, companyName, channel string) *models.Product {
 		return strings.SplitN(filesList[i], "/", 4)[2] > strings.SplitN(filesList[j], "/", 4)[2]
 	})
 
-outerLoop:
 	for _, file := range filesList {
 		productBytes := lib.GetFilesByEnv(file)
 
@@ -80,20 +79,28 @@ outerLoop:
 			return nil
 		}
 
-		for _, company := range product.Companies {
-			if company.Name == companyName && company.IsActive {
-				result = product
-				break outerLoop
-			}
+		if product.IsActive {
+			result = product
+			break
 		}
+		log.Printf("[GetProductV2] product %s version %s is not active", product.Name, product.Version)
 	}
 
 	if result == nil {
-		log.Printf("[GetProductV2] no active %s product for %s company found", productName, companyName)
+		log.Printf("[GetProductV2] no active %s product found", productName)
 		return nil
 	}
 
 	log.Printf("[GetProductV2] productName: %s productVersion: %s channel: %s", product.Name, product.Version, channel)
+
+	if networkNode != nil {
+		for _, nodeProduct := range networkNode.Products {
+			if nodeProduct.Name == result.Name && len(nodeProduct.Steps) > 0 {
+				log.Printf("[GetProductV2] overriding steps for product %s", result.Name)
+				result.Steps = nodeProduct.Steps
+			}
+		}
+	}
 
 	err = replaceDatesInProduct(result, channel)
 
@@ -165,9 +172,9 @@ func GetNameFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	}
 
 	switch name {
-	case "persona":
+	case models.PersonaProduct:
 		err = replaceDatesInProduct(product, models.UserRoleAll)
-	case "life":
+	case models.LifeProduct:
 		err = replaceDatesInProduct(product, models.UserRoleAll)
 	}
 
@@ -176,7 +183,7 @@ func GetNameFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	return string(jsonOut), product, err
 }
 
-// TODO: remove this endpoint once in production
+// DEPRECATED
 func GetName(origin string, name string, version string) (*models.Product, error) {
 	q := lib.Firequeries{
 		Queries: []lib.Firequery{{

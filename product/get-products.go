@@ -60,8 +60,8 @@ func GetNetworkNodeProducts(productList []string) []models.ProductInfo {
 func getProductsFromFileList(fileList []string) []models.ProductInfo {
 	var (
 		err            error
-		products       []models.ProductInfo = make([]models.ProductInfo, 0)
-		fileChunks     [][]string           = make([][]string, 0)
+		products       = make([]models.ProductInfo, 0)
+		fileChunks     = make([][]string, 0)
 		currentProduct models.Product
 	)
 
@@ -109,23 +109,14 @@ func getProductsFromFileList(fileList []string) []models.ProductInfo {
 				log.Printf("[GetProductsByChannel] error unmarshaling file: %s", err.Error())
 				break
 			}
-			// loop all companies for that product/version
-			for _, company := range currentProduct.Companies {
-				log.Printf("[getProductsFromFileList] checking company '%s' with isActive '%t'", company.Name, company.IsActive)
-				// if active add to response
-				if company.IsActive {
-					log.Printf("[GetProductsByChannel] adding %s %s %s", currentProduct.Name, currentProduct.Version, company.Name)
-					products = append(products, models.ProductInfo{
-						Name:         currentProduct.Name,
-						NameTitle:    currentProduct.NameTitle,
-						NameSubtitle: currentProduct.NameSubtitle,
-						NameDesc:     *currentProduct.NameDesc,
-						Version:      currentProduct.Version,
-						Company:      company.Name,
-						Logo:         currentProduct.Logo,
-					})
-				}
-			}
+
+			products = append(products, models.ProductInfo{
+				Name:         currentProduct.Name,
+				NameTitle:    currentProduct.NameTitle,
+				NameSubtitle: currentProduct.NameSubtitle,
+				NameDesc:     *currentProduct.NameDesc,
+				Logo:         currentProduct.Logo,
+			})
 		}
 		if err != nil {
 			break

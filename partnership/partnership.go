@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"sort"
 	"strings"
 	"time"
 
@@ -70,28 +69,26 @@ func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, inter
 func LifePartnership(partnershipUid, jwtData, origin string) (models.Policy, models.Product, *models.NetworkNode, error) {
 	var (
 		policy          models.Policy
-		productLife     models.Product
+		productLife     *models.Product
 		partnershipNode *models.NetworkNode
-		err error
+		err             error
 	)
 
 	log.Printf("[LifePartnership]")
 
 	if partnershipNode, err = network.GetNodeByUid(partnershipUid); err != nil {
-		return policy, productLife, partnershipNode, err
+		return policy, *productLife, partnershipNode, err
 	}
 
 	partnershipName := partnershipNode.Partnership.Name
 
 	log.Printf("[LifePartnership] loading latest life product")
 
-	products := partnershipNode.Products
-	productLife = getLatestLifeProduct(products)
-
-	log.Printf("[LifePartnership] loading life product by channel")
-
-	ecommerceProducts := product.GetAllProductsByChannel(models.ECommerceChannel)
-	latestLifeProduct := getLatestLifeProduct(ecommerceProducts)
+	productLife = product.GetProductV2(models.LifeProduct, models.ECommerceChannel, partnershipNode)
+	if productLife == nil {
+		log.Printf("[LifePartnership] no product found")
+		return policy, models.Product{}, partnershipNode, fmt.Errorf("no product found")
+	}
 
 	log.Printf("[LifePartnership] setting policy basic info")
 
@@ -107,34 +104,34 @@ func LifePartnership(partnershipUid, jwtData, origin string) (models.Policy, mod
 	switch partnershipName {
 	case models.PartnershipBeProf:
 		log.Println("[LifePartnership] call beProfPartnership function")
-		err = beProfPartnership(jwtData, &policy, &latestLifeProduct)
+		err = beProfPartnership(jwtData, &policy, productLife)
 	case models.PartnershipFacile:
 		log.Println("[LifePartnership] call facilePartnership function")
-		err = facilePartnership(jwtData, &policy, &latestLifeProduct)
+		err = facilePartnership(jwtData, &policy, productLife)
 	default:
 		log.Printf("[LifePartnership] could not find partnership with name %s", partnershipName)
 		err = fmt.Errorf("invalid partnership name: %s", partnershipName)
 	}
 
 	if err != nil {
-		return policy, productLife, partnershipNode, err
+		return policy, *productLife, partnershipNode, err
 	}
 
 	policy, err = quote.Life(models.ECommerceChannel, policy)
-	
+
 	if err != nil {
-		return policy, productLife, partnershipNode, err
+		return policy, *productLife, partnershipNode, err
 	}
 
 	err = savePartnershipLead(&policy, partnershipNode, origin)
 
-	return policy, productLife, partnershipNode, err
+	return policy, *productLife, partnershipNode, err
 }
 
 func removeUnselectedGuarantees(policy *models.Policy) models.Policy {
 	policyCopy := deepcopy.Copy(*policy).(models.Policy)
 	for i, asset := range policy.Assets {
-		policyCopy.Assets[i].Guarantees = lib.SliceFilter(asset.Guarantees, func (guarantee models.Guarante) bool {
+		policyCopy.Assets[i].Guarantees = lib.SliceFilter(asset.Guarantees, func(guarantee models.Guarante) bool {
 			return guarantee.IsSelected
 		})
 	}
@@ -165,7 +162,7 @@ func savePartnershipLead(policy *models.Policy, node *models.NetworkNode, origin
 	policy.Uid = policyUid
 
 	policyToSave := removeUnselectedGuarantees(policy)
-	
+
 	if err = lib.SetFirestoreErr(policyFire, policyUid, policyToSave); err != nil {
 		return err
 	}
@@ -175,17 +172,6 @@ func savePartnershipLead(policy *models.Policy, node *models.NetworkNode, origin
 
 	log.Println("[savePartnershipLead] end ----------------------------------------------")
 	return err
-}
-
-func getLatestLifeProduct(products []models.Product) models.Product {
-	products = lib.SliceFilter(products, func(product models.Product) bool {
-		return product.Name == "life"
-	})
-	sort.Slice(products, func(i, j int) bool {
-		return products[i].Version > products[j].Version
-	})
-	latestLifeProduct := products[0]
-	return latestLifeProduct
 }
 
 func beProfPartnership(jwtData string, policy *models.Policy, product *models.Product) error {
