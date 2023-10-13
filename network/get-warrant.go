@@ -9,7 +9,13 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
+// Use network node method
 func GetWarrant(filename string) *models.Warrant {
+	if filename == "" {
+		log.Println("[GetWarrant] no filename specified")
+		return nil
+	}
+
 	log.Printf("[GetWarrant] requesting warrant %s", filename)
 
 	var (
