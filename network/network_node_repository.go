@@ -41,13 +41,13 @@ func CreateNode(node models.NetworkNode) (*models.NetworkNode, error) {
 
 func GetNetworkNodeByUid(nodeUid string) *models.NetworkNode {
 	if nodeUid == "" {
-		log.Println("[GetNetworkNodeByPolicy] nodeUid empty")
+		log.Println("[GetNetworkNodeByUid] nodeUid empty")
 		return nil
 	}
 
 	networkNode, err := GetNodeByUid(nodeUid)
 	if err != nil {
-		log.Printf("[GetNetworkNodeByPolicy] error getting producer %s from Firestore", nodeUid)
+		log.Printf("[GetNetworkNodeByUid] error getting producer %s from Firestore", nodeUid)
 	}
 
 	return networkNode
