@@ -56,7 +56,7 @@ func GetProductByChannelFx(w http.ResponseWriter, r *http.Request) (string, inte
 
 	log.Printf("[GetProductByChannelFx] getting last active action for product %s", req.ProductName)
 
-	product := prd.GetProductV2(req.ProductName, channel, networkNode)
+	product := prd.GetLatestActiveProduct(req.ProductName, channel, networkNode)
 	if product == nil {
 		log.Printf("[GetProductByChannelFx] no active product found")
 		return "", nil, fmt.Errorf("no product active found")

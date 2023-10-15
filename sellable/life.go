@@ -61,6 +61,7 @@ func Life(channel string, policy models.Policy) (string, *models.Product, error)
 	return string(jsonOut), product, err
 }
 
+// DEPRECATED
 func LifeV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		policy *models.Policy
@@ -123,7 +124,7 @@ func LifeV2(policy *models.Policy, channel string) (*models.Product, error) {
 	*/
 
 	log.Println("[LifeV2] loading product")
-	product = prd.GetDefaultProduct(policy.Name, channel)
+	product = prd.GetProductV2(policy.Name, policy.ProductVersion, channel)
 	if product == nil {
 		return nil, fmt.Errorf("no product found")
 	}

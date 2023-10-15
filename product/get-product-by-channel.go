@@ -14,6 +14,10 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
+const (
+	basePath = "products-v2"
+)
+
 // DEPRECATED
 func GetProduct(name, version, channel string) (*models.Product, error) {
 	var (
@@ -38,10 +42,51 @@ func GetProduct(name, version, channel string) (*models.Product, error) {
 	return product, err
 }
 
+/*
+Returns the requested product version for the specified channel based on the provided input parameters, including
+product name, version, and channel.
+*/
+func GetProductV2(productName, productVersion, channel string) *models.Product {
+	var (
+		product *models.Product
+	)
+
+	log.Println("[GetProductV2] function start -----------------")
+
+	filePath := fmt.Sprintf("%s/%s/%s/%s.json", basePath, productName, productVersion, channel)
+
+	log.Printf("[GetProductV2] filePath: %s", filePath)
+
+	productBytes := lib.GetFilesByEnv(filePath)
+
+	log.Printf("[GetProductV2] retrieved product: %s", string(productBytes))
+
+	err := json.Unmarshal(productBytes, &product)
+	if err != nil {
+		log.Printf("[GetProductV2] error unmarshaling product: %s", err.Error())
+		return nil
+	}
+
+	err = replaceDatesInProduct(product, channel)
+	if err != nil {
+		log.Printf("[GetProductV2] error during replace dates in product: %s", err.Error())
+		return nil
+	}
+
+	// TODO: check comment
+	/*
+		Da aggiungere anche override del product?
+	*/
+
+	return product
+}
+
+/*
+Returns the most recent active default product associated with the specified channel.
+*/
 func GetDefaultProduct(productName, channel string) *models.Product {
 	var (
 		result, product *models.Product
-		basePath        = "products-v2"
 	)
 
 	log.Println("[GetDefaultProduct] function start --------------")
@@ -97,47 +142,30 @@ func GetDefaultProduct(productName, channel string) *models.Product {
 	return result
 }
 
-func GetProductV2(productName, channel string, networkNode *models.NetworkNode) *models.Product {
+/*
+Returns the latest active default product linked to the specified channel. If a network node is provided and is
+not nil, and it possesses a custom journey product, the defined steps will take precedence over the defaults.
+Furthermore, if the network node has a warrant, payment providers will be filtered based on the specified flow
+for the requested product.
+*/
+func GetLatestActiveProduct(productName, channel string, networkNode *models.NetworkNode) *models.Product {
 	var (
 		product *models.Product
 	)
 
-	log.Println("[GetProductV2] function start ---------------------")
+	log.Println("[GetLatestActiveProduct] function start ---------------------")
 
-	log.Printf("[GetProductV2] product: %s", productName)
+	log.Printf("[GetLatestActiveProduct] product: %s", productName)
 
 	product = GetDefaultProduct(productName, channel)
 	if product == nil {
-		log.Printf("[GetProductV2] no active product found")
+		log.Printf("[GetLatestActiveProduct] no active product found")
 		return nil
 	}
 
-	if networkNode != nil && networkNode.HasAccessToProduct(product.Name) {
-		for _, nodeProduct := range networkNode.Products {
-			if nodeProduct.Name == product.Name && len(nodeProduct.Steps) > 0 {
-				log.Printf("[GetProductV2] overriding steps for product %s", product.Name)
-				product.Steps = nodeProduct.Steps
-			}
-		}
+	overrideProductInfo(product, networkNode)
 
-		warrant := networkNode.GetWarrant()
-		if warrant != nil {
-			paymentProviders := make([]models.PaymentProvider, 0)
-			warrantProduct := warrant.GetProduct(product.Name)
-			if warrantProduct != nil {
-				for _, paymentProvider := range product.PaymentProviders {
-					if lib.SliceContains(paymentProvider.Flows, warrantProduct.Flow) {
-						paymentProviders = append(paymentProviders, paymentProvider)
-					}
-				}
-			}
-			product.PaymentProviders = paymentProviders
-		}
-	}
-
-	//err = replaceDatesInProduct(result, channel)
-
-	log.Println("[GetProductV2] function end ---------------------")
+	log.Println("[GetLatestActiveProduct] function end ---------------------")
 
 	return product
 }
@@ -185,6 +213,35 @@ func replaceDatesInProduct(product *models.Product, channel string) error {
 	log.Println("[replaceDatesInProduct] function end -------------------")
 
 	return err
+}
+
+func overrideProductInfo(product *models.Product, networkNode *models.NetworkNode) {
+	if networkNode == nil {
+		return
+	}
+
+	if networkNode.HasAccessToProduct(product.Name) {
+		for _, nodeProduct := range networkNode.Products {
+			if nodeProduct.Name == product.Name && len(nodeProduct.Steps) > 0 {
+				log.Printf("[GetLatestActiveProduct] overriding steps for product %s", product.Name)
+				product.Steps = nodeProduct.Steps
+			}
+		}
+
+		warrant := networkNode.GetWarrant()
+		if warrant != nil {
+			paymentProviders := make([]models.PaymentProvider, 0)
+			warrantProduct := warrant.GetProduct(product.Name)
+			if warrantProduct != nil {
+				for _, paymentProvider := range product.PaymentProviders {
+					if lib.SliceContains(paymentProvider.Flows, warrantProduct.Flow) {
+						paymentProviders = append(paymentProviders, paymentProvider)
+					}
+				}
+			}
+			product.PaymentProviders = paymentProviders
+		}
+	}
 }
 
 // DEPRECATED
