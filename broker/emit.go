@@ -15,6 +15,7 @@ import (
 	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/payment"
+	plc "github.com/wopta/goworkspace/policy"
 	"github.com/wopta/goworkspace/question"
 	"github.com/wopta/goworkspace/transaction"
 )
@@ -68,7 +69,7 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	uid := request.Uid
 	log.Printf("[EmitFx] Uid: %s", uid)
 
-	policy, err = GetPolicy(uid, origin)
+	policy, err = plc.GetPolicy(uid, origin)
 	lib.CheckError(err)
 
 	policyJsonLog, _ := policy.Marshal()

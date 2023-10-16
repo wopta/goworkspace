@@ -11,6 +11,7 @@ import (
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	plc "github.com/wopta/goworkspace/policy"
 )
 
 type ProposalReq struct {
@@ -31,14 +32,13 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 
-
-	// TODO: remove when PROPOSAL_V2 will be fully integrated in prod 
+	// TODO: remove when PROPOSAL_V2 will be fully integrated in prod
 	log.Println("[ProposalFx] loading authToken from idToken...")
 
 	token := r.Header.Get("Authorization")
 	authToken, err := models.GetAuthTokenFromIdToken(token)
 	if err != nil {
-		log.Printf("[LeadFx] error getting authToken")
+		log.Printf("[ProposalFx] error getting authToken")
 		return "", nil, err
 	}
 
@@ -53,7 +53,7 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 
 		paymentSplit = req.PaymentSplit
 
-		policy, err = GetPolicy(req.PolicyUid, origin)
+		policy, err = plc.GetPolicy(req.PolicyUid, origin)
 		if err != nil {
 			log.Printf("[ProposalFx] error fetching policy %s from Firestore...: %s", req.PolicyUid, err.Error())
 			return "", nil, err

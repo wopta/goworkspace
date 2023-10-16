@@ -11,6 +11,7 @@ import (
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	plc "github.com/wopta/goworkspace/policy"
 	"github.com/wopta/goworkspace/reserved"
 )
 
@@ -42,7 +43,7 @@ func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 	paymentSplit = req.PaymentSplit
 
 	log.Printf("[RequestApprovalFx] fetching policy %s from Firestore...", req.PolicyUid)
-	policy, err = GetPolicy(req.PolicyUid, origin)
+	policy, err = plc.GetPolicy(req.PolicyUid, origin)
 	if err != nil {
 		log.Printf("[RequestApprovalFx] error fetching policy %s from Firestore...", req.PolicyUid)
 		return "", nil, err

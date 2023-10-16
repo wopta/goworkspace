@@ -9,6 +9,7 @@ import (
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	plc "github.com/wopta/goworkspace/policy"
 	"github.com/wopta/goworkspace/reserved"
 )
 
@@ -35,7 +36,7 @@ func UpdatePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 		return "", nil, err
 	}
 
-	originalPolicy, err := GetPolicy(policyUid, origin)
+	originalPolicy, err := plc.GetPolicy(policyUid, origin)
 	if err != nil {
 		log.Printf("[UpdatePolicyFx] error unable to retrieve original policy: %s", err.Error())
 		return "", nil, err
@@ -58,7 +59,7 @@ func UpdatePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	}
 
 	// TODO: improve me
-	updatedPolicy, err := GetPolicy(policyUid, origin)
+	updatedPolicy, err := plc.GetPolicy(policyUid, origin)
 	if err != nil {
 		log.Printf("[UpdatePolicyFx] error unable to retrieve updated policy: %s", err.Error())
 		return "", nil, err
