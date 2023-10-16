@@ -10,11 +10,7 @@ import (
 	"net/http"
 )
 
-const (
-	statements = "statements"
-	surveys    = "surveys"
-)
-
+// DEPRECATED
 func GetQuestionsFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		out    interface{}
@@ -45,6 +41,7 @@ func GetQuestionsFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	return `{"` + questionType + `": ` + string(jsonOut) + `}`, out, err
 }
 
+// DEPRECATED
 func GetStatements(policy models.Policy) []models.Statement {
 	const (
 		rulesFilenameSuffix = "_statements.json"
@@ -72,6 +69,7 @@ func GetStatements(policy models.Policy) []models.Statement {
 	return out
 }
 
+// DEPRECATED
 func GetSurveys(policy models.Policy) []models.Survey {
 	const (
 		rulesFilenameSuffix = "_surveys.json"
@@ -97,44 +95,4 @@ func GetSurveys(policy models.Policy) []models.Survey {
 	}
 
 	return out
-}
-
-func loadExternalData(productName string) []byte {
-	var data []byte
-	switch productName {
-	case models.PersonaProduct:
-		data = []byte(getCoherenceData())
-	}
-	return data
-}
-
-func getCoherenceData() string {
-	return `{
-		"AA": {
-			"extra": "nel tempo libero,",
-			"professionale": "nello svolgimento dell'attivtà lavorativa,",
-			"24h": "sia al lavoro che nel tempo libero,"
-		},
-		"BB": {
-			"dipendente": "lavoratore dipendente",
-			"autonomo": "lavoratore autonomo",
-			"non lavoratore": "non lavoratore"
-		},
-		"CC1": "un capitale all'Assicurato, in caso di Invalidità Permanente,",
-		"FR": {
-			"3": "oltre il 3% di invalidità,",
-			"5": "oltre il 5% di invalidità,",
-			"10": "oltre il 10% di invalidità,"
-		},
-		"CC2": "a copertura della minore capacità di reddito;",
-		"DD": "un capitale in caso di Decesso, avente finalità previdenziale, a copertura delle minori disponibilità che risulterebbero, in seguito al decesso dell'Assicurato, a favore dei beneficiari designati;",
-		"EE": "una Diaria (importo giornaliero) in caso di ricovero o gessatura;",
-		"FF": "una Diaria in caso di convalescenza post ricovero;",
-		"GG": "un indennizzo per ogni giorno in cui l'Assicurato è inabile, in tutto o in parte, allo svolgimento delle proprie attività lavorative;",
-		"HH": "inoltre l'assicurazione, sempre in caso di infortunio, risponde al bisogno di",
-		"II": "rimborsare le spese mediche sostenute;",
-		"JJ": "assicurare la difesa legale, per fatti illeciti di terzi o malpractice sanitaria;",
-		"KK": "aiutare l'Assicurato con servizi di assistenza utili in momenti di bisogno (es. invio di un medico, consulto medico, trasporto in ambulanza, …);",
-		"LL": "in caso di malattia, infine, consente di disporre di un capitale, a integrazione del reddito, qualora all'Assicurato derivi dalla malattia stessa una riduzione della capacità lavorativa (invalidità permanente) oltre il 24%"
-	}`
 }

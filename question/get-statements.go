@@ -26,8 +26,12 @@ func GetStatementsV2(policy *models.Policy) ([]models.Statement, error) {
 		Text:       "",
 	}
 
+	log.Println("[GetStatementsV2] loading rules file")
+
 	rulesFile := lib.GetRulesFileV2(policy.Name, policy.ProductVersion, statements)
 	data := loadExternalData(policy.Name)
+
+	log.Println("[GetStatementsV2] executing rules")
 
 	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, rulesStatements, policyJson, data)
 
