@@ -27,7 +27,7 @@ func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		policy models.Policy
 	)
 
-	log.Println("[RequestApprovalFx] Handler start ----------------------")
+	log.Println("[RequestApprovalFx] Handler start ---------------------------")
 
 	origin = r.Header.Get("Origin")
 	body := lib.ErrorByte(io.ReadAll(r.Body))
@@ -72,7 +72,7 @@ func requestApproval(policy *models.Policy) error {
 		err error
 	)
 
-	log.Println("[RequestApproval] start --------------------")
+	log.Println("[RequestApproval] start -------------------------------------")
 
 	log.Println("[RequestApproval] starting bpmn flow...")
 
@@ -88,8 +88,10 @@ func requestApproval(policy *models.Policy) error {
 
 	*policy = *state.Data
 
-	log.Printf("[RequestApproval] policy with uid %s to bigquery...", policy.Uid)
+	log.Printf("[RequestApproval] saving policy with uid %s to bigquery...", policy.Uid)
 	policy.BigquerySave(origin)
+
+	log.Println("[RequestApproval] end ---------------------------------------")
 
 	return err
 }

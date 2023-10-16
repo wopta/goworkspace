@@ -3,6 +3,7 @@ package broker
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -19,7 +20,7 @@ func LeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		policy models.Policy
 	)
 
-	log.Println("[LeadFx] Handler start -----------------------------------------")
+	log.Println("[LeadFx] Handler start --------------------------------------")
 
 	origin = r.Header.Get("Origin")
 	body := lib.ErrorByte(io.ReadAll(r.Body))
@@ -54,6 +55,7 @@ func LeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	}
 
 	log.Printf("[LeadFx] response: %s", string(resp))
+	log.Println("[LeadFx] Handler end ----------------------------------------")
 
 	return string(resp), &policy, err
 }
@@ -61,12 +63,13 @@ func LeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 func lead(authToken models.AuthToken, policy *models.Policy) error {
 	var err error
 
-	log.Println("[lead] start --------------------------------------------")
+	log.Println("[lead] start ------------------------------------------------")
 
 	policyFire := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 	guaranteFire := lib.GetDatasetByEnv(origin, models.GuaranteeCollection)
 
 	if policy.Uid != "" {
+		// TODO merge master with fix for partnership
 		log.Printf("[lead] creating lead for existing policy %s", policy.Uid)
 		policyDoc, err := lib.GetFirestoreErr(models.PolicyCollection, policy.Uid)
 
@@ -74,7 +77,7 @@ func lead(authToken models.AuthToken, policy *models.Policy) error {
 			log.Printf("[lead] error getting policy %s from firebase: %s", policy.Uid, err.Error())
 		}
 
-		if  err == nil && policyDoc.Exists() {
+		if err == nil && policyDoc.Exists() {
 			log.Printf("[lead] found policy %s on Firebase", policy.Uid)
 			policyDoc.DataTo(policy)
 		}
@@ -83,15 +86,10 @@ func lead(authToken models.AuthToken, policy *models.Policy) error {
 	}
 
 	if policy.Channel == "" {
-		policy.Channel = authToken.GetChannelByRole()
+		policy.Channel = authToken.GetChannelByRoleV2()
 	}
 
-	if policy.ProducerUid == "" {
-		node := network.GetNetworkNodeByUid(authToken.UserID)
-		if node != nil {
-			setPolicyProducerNode(policy, node)
-		}
-	}
+	networkNode = network.GetNetworkNodeByUid(authToken.UserID)
 
 	log.Println("[lead] starting bpmn flow...")
 	state := runBrokerBpmn(policy, leadFlowKey)
@@ -123,7 +121,7 @@ func setPolicyProducerNode(policy *models.Policy, node *models.NetworkNode) {
 }
 
 func setLeadData(policy *models.Policy) {
-	log.Println("[setLeadData] start -------------------")
+	log.Println("[setLeadData] start -----------------------------------------")
 
 	now := time.Now().UTC()
 
@@ -138,19 +136,27 @@ func setLeadData(policy *models.Policy) {
 	policy.IsPay = false
 	policy.Updated = now
 
-	if policy.ProductVersion == "" {
-		policy.ProductVersion = "v1"
+	if networkNode != nil {
+		setPolicyProducerNode(policy, networkNode)
 	}
 
 	// TODO delete me when PMI is fixed
 	if policy.Name == models.PmiProduct {
 		policy.NameDesc = "Wopta per te Artigiani & Imprese"
 	}
+	if policy.ProductVersion == "" {
+		policy.ProductVersion = "v1"
+	}
 
 	log.Println("[setLeadData] add information stet")
 	policy.Attachments = &[]models.Attachment{{
-		Name: "Precontrattuale", FileName: "Precontrattuale.pdf",
-		Link: "gs://documents-public-dev/information-sets/" + policy.Name + "/" + policy.ProductVersion + "/Precontrattuale.pdf",
+		Name:     "Precontrattuale",
+		FileName: "Precontrattuale.pdf",
+		Link: fmt.Sprintf(
+			"gs://documents-public-dev/information-sets/%s/%s/Precontrattuale.pdf",
+			policy.Name,
+			policy.ProductVersion,
+		),
 	}}
-	log.Println("[setLeadData] end -------------------")
+	log.Println("[setLeadData] end -------------------------------------------")
 }

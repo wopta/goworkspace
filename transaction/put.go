@@ -23,9 +23,9 @@ func PutByPolicy(policy models.Policy, scheduleDate, origin, expireDate, custome
 		transactionDate  time.Time
 	)
 
-	prod, err := product.GetProduct(policy.Name, policy.ProductVersion, models.MgaChannel)
-	if err != nil {
-		log.Printf("[PutByPolicy] ERROR getting mga product: %s", err.Error())
+	prod := product.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil)
+	if prod == nil {
+		log.Printf("[PutByPolicy] error getting mga product")
 		return nil
 	}
 
@@ -103,7 +103,7 @@ func PutByPolicy(policy models.Policy, scheduleDate, origin, expireDate, custome
 		PaymentMethod:      paymentMethod,
 	}
 
-	err = lib.SetFirestoreErr(fireTransactions, transactionUid, tr)
+	err := lib.SetFirestoreErr(fireTransactions, transactionUid, tr)
 	if err != nil {
 		log.Printf("[PutByPolicy] error saving transaction to firestore: %s", err.Error())
 		return nil

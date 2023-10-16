@@ -11,7 +11,9 @@ import (
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
 	plc "github.com/wopta/goworkspace/policy"
+	prd "github.com/wopta/goworkspace/product"
 	tr "github.com/wopta/goworkspace/transaction"
 )
 
@@ -73,7 +75,9 @@ func FabrickRecreate(policyUid, origin string) (*models.Policy, error) {
 	oldTransactions := tr.GetPolicyTransactions(origin, policy.Uid)
 
 	log.Println("[FabrickRecreate] recreating payment...")
-	payUrl, err := PaymentController(origin, &policy)
+	networkNode := network.GetNetworkNodeByUid(policy.ProducerUid)
+	product := prd.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, networkNode)
+	payUrl, err := PaymentController(origin, &policy, product)
 	if err != nil {
 		log.Printf("[FabrickRecreate] error creating payment: %s", err.Error())
 		return nil, err

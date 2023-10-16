@@ -3,14 +3,15 @@ package mga
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/network"
-	prd "github.com/wopta/goworkspace/product"
 	"io"
 	"log"
 	"net/http"
 	"strings"
+
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
+	prd "github.com/wopta/goworkspace/product"
 )
 
 type GetProductReq struct {

@@ -14,6 +14,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
+	prd "github.com/wopta/goworkspace/product"
 	tr "github.com/wopta/goworkspace/transaction"
 )
 
@@ -53,7 +55,10 @@ func FabrickPayFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	log.Println(data.PriceGross)
 	lib.CheckError(err)
 
-	paymentMethods := getPaymentMethods(data)
+	networkNode := network.GetNetworkNodeByUid(data.ProducerUid)
+	product := prd.GetProductV2(data.Name, data.ProductVersion, data.Channel, networkNode)
+
+	paymentMethods := getPaymentMethods(data, product)
 
 	resultPay := <-FabrickPayObj(data, false, "", data.StartDate.AddDate(10, 0, 0).Format(models.TimeDateOnly), "", data.PriceGross,
 		data.PriceNett, getOrigin(r.Header.Get("origin")), paymentMethods)
@@ -71,7 +76,10 @@ func FabrickPayMonthlyFx(w http.ResponseWriter, r *http.Request) (string, interf
 	log.Println(data.PriceGross)
 	lib.CheckError(err)
 
-	paymentMethods := getPaymentMethods(data)
+	networkNode := network.GetNetworkNodeByUid(data.ProducerUid)
+	product := prd.GetProductV2(data.Name, data.ProductVersion, data.Channel, networkNode)
+
+	paymentMethods := getPaymentMethods(data, product)
 
 	resultPay := FabrickMonthlyPay(data, getOrigin(r.Header.Get("origin")), paymentMethods)
 	b, err := json.Marshal(resultPay)

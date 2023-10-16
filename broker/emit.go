@@ -191,7 +191,7 @@ func emitV2(authToken models.AuthToken, policy *models.Policy, request EmitReque
 }
 
 func emitUpdatePolicy(policy *models.Policy, request EmitRequest) {
-	log.Println("[emitUpdatePolicy] start --------------------")
+	log.Println("[emitUpdatePolicy] start ------------------------------------")
 	if policy.Statements == nil || len(*policy.Statements) == 0 {
 		if request.Statements != nil {
 			log.Println("[emitUpdatePolicy] inject policy statements from request")
@@ -205,7 +205,7 @@ func emitUpdatePolicy(policy *models.Policy, request EmitRequest) {
 	if policy.PaymentSplit == "" {
 		policy.PaymentSplit = request.PaymentSplit
 	}
-	log.Println("[emitUpdatePolicy] end --------------------")
+	log.Println("[emitUpdatePolicy] end --------------------------------------")
 }
 
 func getEmitTypeFromPolicy(policy *models.Policy) string {
@@ -256,7 +256,7 @@ func emitSign(policy *models.Policy, origin string) {
 	policy.Status = models.PolicyStatusToSign
 	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusContact, models.PolicyStatusToSign)
 
-	p := <-document.ContractObj(origin, *policy, networkNode)
+	p := <-document.ContractObj(origin, *policy, networkNode, product)
 	policy.DocumentName = p.LinkGcs
 	_, signResponse, _ := document.NamirialOtpV6(*policy, origin)
 	policy.ContractFileId = signResponse.FileId
@@ -268,7 +268,7 @@ func emitPay(policy *models.Policy, origin string) {
 	log.Printf("[EmitPay] Policy Uid %s", policy.Uid)
 
 	policy.IsPay = false
-	policy.PayUrl, _ = payment.PaymentController(origin, policy)
+	policy.PayUrl, _ = payment.PaymentController(origin, policy, product)
 }
 
 func setAdvance(policy *models.Policy, origin string) {

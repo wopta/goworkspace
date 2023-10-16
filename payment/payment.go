@@ -8,7 +8,6 @@ import (
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	prd "github.com/wopta/goworkspace/product"
 )
 
 func init() {
@@ -68,7 +67,7 @@ func CriptoPay(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	return "", nil, nil
 }
 
-func PaymentController(origin string, policy *models.Policy) (string, error) {
+func PaymentController(origin string, policy *models.Policy, product *models.Product) (string, error) {
 	var (
 		payUrl         string
 		paymentMethods []string
@@ -80,7 +79,7 @@ func PaymentController(origin string, policy *models.Policy) (string, error) {
 	if policy.Payment == "" || policy.Payment == "fabrik" {
 		policy.Payment = models.FabrickPaymentProvider
 	}
-	paymentMethods = getPaymentMethods(*policy)
+	paymentMethods = getPaymentMethods(*policy, product)
 
 	log.Printf("[PaymentController] generating payment URL")
 	switch policy.Payment {
@@ -95,7 +94,6 @@ func PaymentController(origin string, policy *models.Policy) (string, error) {
 			log.Printf("[PaymentController] fabrick monthly pay")
 			payRes = FabrickMonthlyPay(*policy, origin, paymentMethods)
 		}
-		
 		if payRes.Payload == nil || payRes.Payload.PaymentPageURL == nil {
 			log.Println("[PaymentController] fabrick error payload or paymentUrl empty")
 			return "", fmt.Errorf("fabrick error: %v", payRes.Errors)
@@ -110,13 +108,10 @@ func PaymentController(origin string, policy *models.Policy) (string, error) {
 	return payUrl, nil
 }
 
-func getPaymentMethods(policy models.Policy) []string {
-	paymentMethods := make([]string, 0)
+func getPaymentMethods(policy models.Policy, product *models.Product) []string {
+	var paymentMethods = make([]string, 0)
 
 	log.Printf("[GetPaymentMethods] loading available payment methods for %s payment provider", policy.Payment)
-
-	product, err := prd.GetProduct(policy.Name, policy.ProductVersion, models.MgaChannel)
-	lib.CheckError(err)
 
 	// TODO: remove me once established standard
 	if policy.PaymentSplit == string(models.PaySplitYear) {

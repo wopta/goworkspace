@@ -20,14 +20,15 @@ func ContractFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 	defer r.Body.Close()
 	err := json.Unmarshal([]byte(req), &data)
 	lib.CheckError(err)
-	respObj := <-ContractObj(origin, data, nil)
+	respObj := <-ContractObj(origin, data, nil, nil) // TODO review product nil
 	resp, err := json.Marshal(respObj)
 
 	lib.CheckError(err)
 	return string(resp), respObj, nil
 }
 
-func ContractObj(origin string, data models.Policy, networkNode *models.NetworkNode) <-chan DocumentResponse {
+// TODO: handle product param
+func ContractObj(origin string, data models.Policy, networkNode *models.NetworkNode, product *models.Product) <-chan DocumentResponse {
 	r := make(chan DocumentResponse)
 
 	go func() {

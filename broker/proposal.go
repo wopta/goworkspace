@@ -26,7 +26,7 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 		req    ProposalReq
 	)
 
-	log.Println("[ProposalFx] Handler start -----------------------------------------")
+	log.Println("[ProposalFx] Handler start ----------------------------------")
 
 	origin = r.Header.Get("Origin")
 	body := lib.ErrorByte(io.ReadAll(r.Body))
@@ -136,7 +136,7 @@ func setProposalData(policy *models.Policy) {
 }
 
 func setProposalNumber(policy *models.Policy) {
-	log.Println("[setProposalNumber] set proposal number start -----------------")
+	log.Println("[setProposalNumber] set proposal number start ---------------")
 
 	if policy.ProposalNumber != 0 {
 		log.Printf("[setProposalNumber] proposal number already set %d", policy.ProposalNumber)
