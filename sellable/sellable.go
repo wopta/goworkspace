@@ -9,6 +9,10 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
+const (
+	rulesFilename = "sellable"
+)
+
 func init() {
 	log.Println("INIT Sellable")
 
@@ -22,19 +26,13 @@ func Sellable(w http.ResponseWriter, r *http.Request) {
 		Routes: []lib.Route{
 			{
 				Route:   "/v1/sales/life",
-				Handler: LifeHandler,
-				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAll},
-			},
-			{
-				Route:   "/v1/life",
-				Handler: LifeV2Fx,
+				Handler: LifeFx,
 				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
 				Route:   "/v1/risk/person",
-				Handler: PersonHandler,
+				Handler: PersonaFx,
 				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAll},
 			},

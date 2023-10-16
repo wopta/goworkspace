@@ -13,65 +13,16 @@ import (
 )
 
 // DEPRECATED
-func LifeHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	var (
-		policy models.Policy
-		err    error
-	)
-
-	log.Println("Life")
-
-	err = json.Unmarshal(lib.ErrorByte(io.ReadAll(r.Body)), &policy)
-	if err != nil {
-		return "", nil, err
-	}
-
-	authToken, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
-	lib.CheckError(err)
-
-	return Life(authToken.GetChannelByRole(), policy)
-}
-
-// DEPRECATED
-func Life(channel string, policy models.Policy) (string, *models.Product, error) {
-	var (
-		err error
-	)
-	const (
-		rulesFileName = "life.json"
-	)
-
-	in, err := getInputData(policy)
-	if err != nil {
-		return "", &models.Product{}, err
-	}
-	rulesFile := lib.GetRulesFile(rulesFileName)
-	product, err := prd.GetProduct(policy.Name, policy.ProductVersion, channel)
-	if err != nil {
-		return "", &models.Product{}, err
-	}
-
-	fx := new(models.Fx)
-
-	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, product, in, nil)
-
-	product = ruleOutput.(*models.Product)
-	jsonOut, err := json.Marshal(product)
-
-	return string(jsonOut), product, err
-}
-
-// DEPRECATED
-func LifeV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		policy *models.Policy
 		err    error
 	)
 
-	log.Println("[LifeV2Fx] handler start ----------- ")
+	log.Println("[LifeFx] handler start ----------- ")
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
-	log.Printf("[LifeV2Fx] body: %s", string(body))
+	log.Printf("[LifeFx] body: %s", string(body))
 
 	err = json.Unmarshal(body, &policy)
 	if err != nil {
@@ -81,57 +32,55 @@ func LifeV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	authToken, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
 	lib.CheckError(err)
 
-	log.Println("[LifeV2Fx] calling vendibility rules function")
+	log.Println("[LifeFx] calling vendibility rules function")
 
-	product, err := LifeV2(policy, authToken.GetChannelByRoleV2())
+	product, err := Life(policy, authToken.GetChannelByRoleV2())
 	if err != nil {
-		log.Printf("[LifeV2Fx] vednibility rules error: %s", err.Error())
+		log.Printf("[LifeFx] vednibility rules error: %s", err.Error())
 		return "", nil, err
 	}
 
 	jsonOut, err := product.Marshal()
 
-	log.Printf("[LifeV2Fx] response: %s", string(jsonOut))
+	log.Printf("[LifeFx] response: %s", string(jsonOut))
+	log.Println("[LifeFx] handler end -------------------")
 
 	return string(jsonOut), product, err
 }
 
-func LifeV2(policy *models.Policy, channel string) (*models.Product, error) {
+func Life(policy *models.Policy, channel string) (*models.Product, error) {
 	var (
 		err     error
 		product *models.Product
 	)
-	const (
-		sellableFileName = "sellable"
-	)
 
-	log.Println("[LifeV2] function start -----------")
+	log.Println("[Life] function start -----------")
 
-	log.Println("[LifeV2] loading input data")
+	log.Println("[Life] loading input data")
 
 	in, err := getInputData(*policy)
 	if err != nil {
-		log.Printf("[LifeV2] error getting input data: %s", err.Error())
+		log.Printf("[Life] error getting input data: %s", err.Error())
 		return nil, err
 	}
 
-	log.Println("[LifeV2] loading vendibility rules file")
-	rulesFile := lib.GetRulesFileV2(policy.Name, policy.ProductVersion, sellableFileName)
+	log.Println("[Life] loading vendibility rules file")
+	rulesFile := lib.GetRulesFileV2(policy.Name, policy.ProductVersion, rulesFilename)
 
-	log.Println("[LifeV2] loading product")
+	log.Println("[Life] loading product")
 	product = prd.GetProductV2(policy.Name, policy.ProductVersion, channel)
 	if product == nil {
 		return nil, fmt.Errorf("no product found")
 	}
 
-	log.Println("[LifeV2] applying vendibility rules")
+	log.Println("[Life] applying vendibility rules")
 
 	fx := new(models.Fx)
 	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, product, in, nil)
 
 	product = ruleOutput.(*models.Product)
 
-	log.Println("[LifeV2] function end ----------")
+	log.Println("[Life] function end ----------")
 
 	return product, nil
 }
