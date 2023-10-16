@@ -24,7 +24,7 @@ const (
 // Given a policy that should contain the Gap and the Persona assets, then it returns:
 //   - the product or parts of it depending on the sellability rules
 //   - and an eventual error
-func Gap(channel string, policy *models.Policy) (*models.Product, error) {
+func Gap(policy *models.Policy, channel string, networkNode *models.NetworkNode) (*models.Product, error) {
 	log.Println("[Gap] function start ---------------")
 
 	log.Println("[Gap] validating policy")
@@ -36,7 +36,7 @@ func Gap(channel string, policy *models.Policy) (*models.Product, error) {
 
 	log.Println("[Gap] loading product file")
 
-	product, err := getProduct(policy, channel)
+	product, err := getProduct(policy, channel, networkNode)
 	if err != nil {
 		log.Printf("[Gap] error loading product: %s", err.Error())
 		return nil, fmt.Errorf("no products for this vehicle: %v", err)
@@ -54,8 +54,8 @@ func Gap(channel string, policy *models.Policy) (*models.Product, error) {
 	return product, nil
 }
 
-func getProduct(policy *models.Policy, channel string) (*models.Product, error) {
-	product := prd.GetProductV2(policy.Name, policy.ProductVersion, channel)
+func getProduct(policy *models.Policy, channel string, networkNode *models.NetworkNode) (*models.Product, error) {
+	product := prd.GetProductV2(policy.Name, policy.ProductVersion, channel, networkNode)
 	if product == nil {
 		return nil, fmt.Errorf("no product found")
 	}

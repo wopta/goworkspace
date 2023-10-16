@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
 	"github.com/wopta/goworkspace/sellable"
 	"io"
 	"log"
@@ -21,24 +22,27 @@ func PersonaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 
 	log.Println("[PersonaFx] handler start ----------------------------------")
 
+	body := lib.ErrorByte(io.ReadAll(r.Body))
+	log.Printf("[PersonaFx] body: %s", string(body))
+
+	err := json.Unmarshal(body, &policy)
+	if err != nil {
+		log.Printf("[PersonaFx] error unmarshaling body: %s", err.Error())
+		return "", nil, err
+	}
+
 	authToken, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
 	if err != nil {
 		log.Printf("[PersonaFx] error getting authToken from idToken: %s", err.Error())
 		return "", nil, err
 	}
 
-	body := lib.ErrorByte(io.ReadAll(r.Body))
-	log.Printf("[PersonaFx] body: %s", string(body))
-
-	err = json.Unmarshal(body, &policy)
-	if err != nil {
-		log.Printf("[PersonaFx] error unmarshaling body: %s", err.Error())
-		return "", nil, err
-	}
+	log.Println("[PersonaFx] loading network node")
+	networkNode := network.GetNetworkNodeByUid(authToken.UserID)
 
 	log.Println("[PersonaFx] start quoting")
 
-	err = Persona(&policy, authToken.GetChannelByRoleV2())
+	err = Persona(&policy, authToken.GetChannelByRoleV2(), networkNode)
 
 	policyJson, err := policy.Marshal()
 
@@ -49,12 +53,12 @@ func PersonaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	return string(policyJson), policy, err
 }
 
-func Persona(policy *models.Policy, channel string) error {
+func Persona(policy *models.Policy, channel string, networkNode *models.NetworkNode) error {
 	var personaRates map[string]json.RawMessage
 
 	log.Println("[Persona] function start -----------------------------------")
 
-	personProduct := sellable.Persona(*policy, channel)
+	personProduct := sellable.Persona(*policy, channel, networkNode)
 
 	b := lib.GetFilesByEnv(fmt.Sprintf("products-v2/%s/%s/taxes.json", policy.Name, policy.ProductVersion))
 	err := json.Unmarshal(b, &personaRates)

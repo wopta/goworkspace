@@ -117,7 +117,7 @@ func LifePartnership(partnershipUid, jwtData, origin string) (models.Policy, mod
 		return policy, *productLife, partnershipNode, err
 	}
 
-	policy, err = quote.Life(models.ECommerceChannel, policy)
+	policy, err = quote.Life(policy, models.ECommerceChannel, partnershipNode)
 
 	if err != nil {
 		return policy, *productLife, partnershipNode, err

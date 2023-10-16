@@ -3,6 +3,7 @@ package sellable
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/wopta/goworkspace/network"
 	"io"
 	"log"
 	"net/http"
@@ -32,9 +33,12 @@ func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	authToken, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
 	lib.CheckError(err)
 
+	log.Println("[LifeFx] loading network node")
+	networkNode := network.GetNetworkNodeByUid(authToken.UserID)
+
 	log.Println("[LifeFx] calling vendibility rules function")
 
-	product, err := Life(policy, authToken.GetChannelByRoleV2())
+	product, err := Life(policy, authToken.GetChannelByRoleV2(), networkNode)
 	if err != nil {
 		log.Printf("[LifeFx] vednibility rules error: %s", err.Error())
 		return "", nil, err
@@ -48,7 +52,7 @@ func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	return string(jsonOut), product, err
 }
 
-func Life(policy *models.Policy, channel string) (*models.Product, error) {
+func Life(policy *models.Policy, channel string, networkNode *models.NetworkNode) (*models.Product, error) {
 	var (
 		err     error
 		product *models.Product
@@ -68,7 +72,7 @@ func Life(policy *models.Policy, channel string) (*models.Product, error) {
 	rulesFile := lib.GetRulesFileV2(policy.Name, policy.ProductVersion, rulesFilename)
 
 	log.Println("[Life] loading product")
-	product = prd.GetProductV2(policy.Name, policy.ProductVersion, channel)
+	product = prd.GetProductV2(policy.Name, policy.ProductVersion, channel, networkNode)
 	if product == nil {
 		return nil, fmt.Errorf("no product found")
 	}

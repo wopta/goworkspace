@@ -46,7 +46,7 @@ func GetProduct(name, version, channel string) (*models.Product, error) {
 Returns the requested product version for the specified channel based on the provided input parameters, including
 product name, version, and channel.
 */
-func GetProductV2(productName, productVersion, channel string) *models.Product {
+func GetProductV2(productName, productVersion, channel string, networkNode *models.NetworkNode) *models.Product {
 	var (
 		product *models.Product
 	)
@@ -72,6 +72,8 @@ func GetProductV2(productName, productVersion, channel string) *models.Product {
 		log.Printf("[GetProductV2] error during replace dates in product: %s", err.Error())
 		return nil
 	}
+
+	overrideProductInfo(product, networkNode)
 
 	return product
 }

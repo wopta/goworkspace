@@ -3,6 +3,7 @@ package quote
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/wopta/goworkspace/network"
 	"io"
 	"log"
 	"math"
@@ -48,9 +49,12 @@ func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		return "", nil, err
 	}
 
+	log.Println("[LifeFx] loading network node")
+	networkNode := network.GetNetworkNodeByUid(authToken.UserID)
+
 	log.Println("[LifeFx] start quoting")
 
-	result, err := Life(authToken.GetChannelByRoleV2(), data)
+	result, err := Life(data, authToken.GetChannelByRoleV2(), networkNode)
 	jsonOut, err := json.Marshal(result)
 
 	log.Printf("[LifeFx] response: %s", string(jsonOut))
@@ -61,7 +65,7 @@ func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 }
 
-func Life(channel string, data models.Policy) (models.Policy, error) {
+func Life(data models.Policy, channel string, networkNode *models.NetworkNode) (models.Policy, error) {
 	var err error
 
 	log.Println("[Life] function start --------------------------------------")
@@ -75,7 +79,7 @@ func Life(channel string, data models.Policy) (models.Policy, error) {
 	var selectRow []string
 
 	log.Printf("[Life] call sellable")
-	ruleProduct, err := sellable.Life(&data, channel)
+	ruleProduct, err := sellable.Life(&data, channel, networkNode)
 	if err != nil {
 		log.Printf("[Life] error in sellable: %s", err.Error())
 		return models.Policy{}, err

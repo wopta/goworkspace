@@ -13,6 +13,7 @@ import (
 	"github.com/go-gota/gota/dataframe"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
 	"github.com/wopta/goworkspace/sellable"
 )
 
@@ -29,7 +30,10 @@ func GapFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 	authToken, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
 	lib.CheckError(err)
 
-	Gap(authToken.GetChannelByRoleV2(), policy)
+	log.Println("[GapFx] load network node")
+	networkNode := network.GetNetworkNodeByUid(authToken.UserID)
+
+	Gap(policy, authToken.GetChannelByRoleV2(), networkNode)
 	policyJson, err := policy.Marshal()
 
 	log.Printf("[GapFx] response: %s", string(policyJson))
@@ -39,8 +43,8 @@ func GapFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 	return string(policyJson), policy, err
 }
 
-func Gap(channel string, policy *models.Policy) {
-	product, err := sellable.Gap(channel, policy)
+func Gap(policy *models.Policy, channel string, networkNode *models.NetworkNode) {
+	product, err := sellable.Gap(policy, channel, networkNode)
 	lib.CheckError(err)
 
 	policy.Assets[0].Guarantees = getGuarantees(*product)
