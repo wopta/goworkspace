@@ -29,7 +29,7 @@ func GetSurveys(policy *models.Policy) ([]models.Survey, error) {
 	log.Println("[GetSurveys] loading rules file")
 
 	rulesFile := lib.GetRulesFileV2(policy.Name, policy.ProductVersion, surveys)
-	data := loadExternalData(policy.Name)
+	data := loadExternalData(policy.Name, policy.ProductVersion)
 
 	log.Println("[GetSurveys] executing rules")
 

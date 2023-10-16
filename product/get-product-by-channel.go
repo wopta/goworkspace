@@ -73,11 +73,6 @@ func GetProductV2(productName, productVersion, channel string) *models.Product {
 		return nil
 	}
 
-	// TODO: check comment
-	/*
-		Da aggiungere anche override del product?
-	*/
-
 	return product
 }
 

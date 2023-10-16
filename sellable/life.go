@@ -91,6 +91,8 @@ func LifeV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 
 	jsonOut, err := product.Marshal()
 
+	log.Printf("[LifeV2Fx] response: %s", string(jsonOut))
+
 	return string(jsonOut), product, err
 }
 
@@ -115,13 +117,6 @@ func LifeV2(policy *models.Policy, channel string) (*models.Product, error) {
 
 	log.Println("[LifeV2] loading vendibility rules file")
 	rulesFile := lib.GetRulesFileV2(policy.Name, policy.ProductVersion, sellableFileName)
-
-	// TODO: controllare questo caso
-	/*
-		corretto prendere ultima versione attiva e non versione del prodotto all'interno della policy?
-		potrebbero esserci problemi per la chiamata di quote all'emit (tentativo emissione di una proposta
-		creata con versione vecchia di un prodotto)
-	*/
 
 	log.Println("[LifeV2] loading product")
 	product = prd.GetProductV2(policy.Name, policy.ProductVersion, channel)
