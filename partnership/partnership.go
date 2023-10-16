@@ -84,7 +84,7 @@ func LifePartnership(partnershipUid, jwtData, origin string) (models.Policy, mod
 
 	log.Printf("[LifePartnership] loading latest life product")
 
-	productLife = product.GetProductV2(models.LifeProduct, models.ECommerceChannel, partnershipNode)
+	productLife = product.GetLatestActiveProduct(models.LifeProduct, models.ECommerceChannel, partnershipNode)
 	if productLife == nil {
 		log.Printf("[LifePartnership] no product found")
 		return policy, models.Product{}, partnershipNode, fmt.Errorf("no product found")
@@ -117,7 +117,7 @@ func LifePartnership(partnershipUid, jwtData, origin string) (models.Policy, mod
 		return policy, *productLife, partnershipNode, err
 	}
 
-	policy, err = quote.Life(models.ECommerceChannel, policy)
+	policy, err = quote.Life(policy, models.ECommerceChannel, partnershipNode)
 
 	if err != nil {
 		return policy, *productLife, partnershipNode, err

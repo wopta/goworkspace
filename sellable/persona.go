@@ -4,67 +4,104 @@ import (
 	"encoding/json"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
 	prd "github.com/wopta/goworkspace/product"
 	"io"
 	"log"
 	"net/http"
 )
 
-func PersonHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+// DEPRECATED
+func PersonaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
+		policy  *models.Policy
 		product *models.Product
 		err     error
 	)
 
-	log.Println("Persona Sellable")
+	log.Println("[PersonaFx] handler start ----------------------")
+
+	body := lib.ErrorByte(io.ReadAll(r.Body))
+	log.Printf("[PersonaFx] body: %s", string(body))
+
+	err = json.Unmarshal(body, &policy)
+	if err != nil {
+		log.Printf("[PersonaFx] error unmarshaling body: %s", err.Error())
+		return "", nil, err
+	}
 
 	authToken, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
 	lib.CheckError(err)
 
-	body := lib.ErrorByte(io.ReadAll(r.Body))
-	product = Person(authToken.GetChannelByRole(), body)
+	log.Println("[PersonaFx] loading network node")
+	networkNode := network.GetNetworkNodeByUid(authToken.UserID)
+
+	product = Persona(*policy, authToken.GetChannelByRoleV2(), networkNode)
 
 	productJson, err := json.Marshal(product)
 	lib.CheckError(err)
 
+	log.Printf("[PersonaFx] response: %s", string(productJson))
+
+	log.Println("[PersonaFx] handler end ------------------------")
+
 	return string(productJson), product, nil
 }
 
-func Person(channel string, body []byte) *models.Product {
-	var (
-		policy models.Policy
-		err    error
-	)
-	const (
-		rulesFileName = "persona.json"
-	)
+func Persona(policy models.Policy, channel string, networkNode *models.NetworkNode) *models.Product {
+	log.Println("[Persona] function start -------------------------------------")
 
-	quotingInputData := getRulesInputData(&policy, err, body)
-	product, err := prd.GetProduct(policy.Name, policy.ProductVersion, channel)
-	lib.CheckError(err)
+	log.Println("[Persona] loading rules input data")
+
+	quotingInputData := getPersonaRulesInputData(policy)
+
+	log.Println("[Persona] loading product file")
+
+	product := prd.GetProductV2(policy.Name, policy.ProductVersion, channel, networkNode)
+	if product == nil {
+		log.Printf("[Persona] no product found")
+		return nil
+	}
 
 	fx := new(models.Fx)
 
-	rulesFile := lib.GetRulesFile(rulesFileName)
+	log.Println("[Persona] loading rules file")
+
+	rulesFile := lib.GetRulesFileV2(policy.Name, policy.ProductVersion, rulesFilename)
 	_, ruleOut := lib.RulesFromJsonV2(fx, rulesFile, product, quotingInputData, []byte(getQuotingData()))
+
+	log.Println("[Persona] function end -------------------------------------")
 
 	return ruleOut.(*models.Product)
 }
 
-func getRulesInputData(policy *models.Policy, e error, req []byte) []byte {
-	*policy, e = models.UnmarshalPolicy(req)
-	lib.CheckError(e)
+func getPersonaRulesInputData(policy models.Policy) []byte {
+	log.Println("[getPersonaRulesInputData] function start ------------------")
 
-	age, e := policy.CalculateContractorAge()
-	lib.CheckError(e)
+	age, err := policy.CalculateContractorAge()
+	if err != nil {
+		log.Printf("[getPersonaRulesInputData] error getting contractor age: %s", err.Error())
+		return nil
+	}
+
+	log.Printf("[getPersonaRulesInputData] contractor age: %d", age)
+
 	policy.QuoteQuestions["age"] = age
 	policy.QuoteQuestions["work"] = policy.Contractor.Work
 	policy.QuoteQuestions["workType"] = policy.Contractor.WorkType
 	policy.QuoteQuestions["class"] = policy.Contractor.RiskClass
 
-	request, e := json.Marshal(policy.QuoteQuestions)
-	lib.CheckError(e)
-	return request
+	result, err := json.Marshal(policy.QuoteQuestions)
+	if err != nil {
+		log.Printf("[getPersonaRulesInputData] error marshaling policy quote questions: %s", err.Error())
+		return nil
+	}
+
+	log.Printf("[getPersonaRulesInputData] response: %s", result)
+
+	log.Println("[getPersonaRulesInputData] function end --------------------")
+
+	return result
 }
 
 func getQuotingData() string {

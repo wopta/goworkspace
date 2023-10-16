@@ -34,11 +34,13 @@ func GetProductByRole(productName, version, company string, authToken models.Aut
 	return *responseProduct, err
 }
 
+// DEPRECATED
 func getMgaProduct(productName, version, company string) (*models.Product, error) {
 	log.Println("getMgaProduct")
 	return GetProduct(productName, version, models.MgaChannel)
 }
 
+// DEPRECATED
 func getEcommerceProduct(productName, version, company string) (*models.Product, error) {
 	log.Println("getEcommerceProduct")
 	ecomProduct, err := GetProduct(productName, version, models.ECommerceChannel)
@@ -50,6 +52,7 @@ func getEcommerceProduct(productName, version, company string) (*models.Product,
 	return ecomProduct, err
 }
 
+// DEPRECATED
 func getNetworkNodeProduct(nodeType, productName, version, company string) (*models.Product, error) {
 	log.Println("[getNetworkNodeProduct]")
 
@@ -62,6 +65,7 @@ func getNetworkNodeProduct(nodeType, productName, version, company string) (*mod
 	return GetProduct(productName, version, channel)
 }
 
+// DEPRECATED
 func getProductByName(products []models.Product, productName string) *models.Product {
 	log.Println("getProductByName")
 	mapProduct := map[string]models.Product{}
@@ -74,6 +78,7 @@ func getProductByName(products []models.Product, productName string) *models.Pro
 	return nil
 }
 
+// DEPRECATED
 func overrideProduct(baseProduct *models.Product, insertedProduct *models.Product) {
 	log.Println("overrideProduct")
 	if len(insertedProduct.Steps) > 0 {
