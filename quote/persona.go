@@ -2,44 +2,138 @@ package quote
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/sellable"
 	"io"
+	"log"
 	"math"
 	"net/http"
 	"strconv"
 	"time"
 )
 
-func PersonFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func PersonaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		policy       models.Policy
-		personaRates map[string]json.RawMessage
+		policy models.Policy
 	)
 
+	log.Println("[PersonaFx] handler start ----------------------------------")
+
 	authToken, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
-	lib.CheckError(err)
+	if err != nil {
+		log.Printf("[PersonaFx] error getting authToken from idToken: %s", err.Error())
+		return "", nil, err
+	}
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
+	log.Printf("[PersonaFx] body: %s", string(body))
+
 	err = json.Unmarshal(body, &policy)
-	lib.CheckError(err)
+	if err != nil {
+		log.Printf("[PersonaFx] error unmarshaling body: %s", err.Error())
+		return "", nil, err
+	}
 
-	personProduct := sellable.Person(authToken.GetChannelByRole(), body)
+	log.Println("[PersonaFx] start quoting")
 
-	b := lib.GetByteByEnv("quote/persona-tassi.json", false)
-	err = json.Unmarshal(b, &personaRates)
-	lib.CheckError(err)
+	err = Persona(&policy, authToken.GetChannelByRoleV2())
+
+	policyJson, err := policy.Marshal()
+
+	log.Printf("[PersonaFx] response: %s", string(policyJson))
+
+	log.Println("[PersonaFx] handler end ------------------------------------")
+
+	return string(policyJson), policy, err
+}
+
+func Persona(policy *models.Policy, channel string) error {
+	var personaRates map[string]json.RawMessage
+
+	log.Println("[Persona] function start -----------------------------------")
+
+	personProduct := sellable.Persona(*policy, channel)
+
+	b := lib.GetFilesByEnv(fmt.Sprintf("products-v2/%s/%s/taxes.json", policy.Name, policy.ProductVersion))
+	err := json.Unmarshal(b, &personaRates)
+	if err != nil {
+		log.Printf("[Persona] error unmarshaling persona rates: %s", err.Error())
+		return err
+	}
 
 	policy.StartDate = time.Now().UTC()
 	policy.EndDate = policy.StartDate.AddDate(1, 0, 0)
+
+	log.Println("[Persona] populating policy guarantees list")
 
 	guaranteesList := make([]models.Guarante, 0)
 	for _, guarantee := range personProduct.Companies[0].GuaranteesMap {
 		guaranteesList = append(guaranteesList, *guarantee)
 	}
-
 	policy.Assets[0].Guarantees = guaranteesList
+
+	log.Println("[Persona] init offer prices struct")
+
+	initOfferPrices(policy, personProduct)
+
+	log.Println("[Persona] calculate guarantees prices")
+
+	for _, guarantee := range policy.Assets[0].Guarantees {
+		switch guarantee.Slug {
+		case "IPI":
+			calculateIPIPrices(policy.Contractor, &guarantee, personaRates)
+		case "D":
+			calculateDPrices(policy.Contractor, &guarantee, personaRates)
+		case "DRG":
+			calculateDRGPrices(policy.Contractor, &guarantee, personaRates)
+		case "ITI":
+			calculateITIPrices(policy.Contractor, &guarantee, personaRates)
+		case "DC":
+			calculateDCPrices(policy.Contractor, &guarantee, personaRates)
+		case "RSC":
+			calculateRSCPrices(policy.Contractor, &guarantee, personaRates)
+		case "IPM":
+			contractorAge, err := policy.CalculateContractorAge()
+			if err != nil {
+				log.Printf("[Persona] error calculate contractor age: %s", err.Error())
+				return err
+			}
+			if contractorAge < 66 {
+				calculateIPMPrices(contractorAge, &guarantee, personaRates)
+			}
+		}
+	}
+
+	log.Println("[Persona] applying discounts")
+
+	applyDiscounts(policy)
+
+	log.Println("[Persona] calculate offers prices")
+
+	calculatePersonaOfferPrices(policy)
+
+	log.Println("[Persona] round offers prices")
+
+	roundMonthlyOfferPrices(policy, "IPI", "DRG")
+
+	roundYearlyOfferPrices(policy, "IPI", "DRG")
+
+	roundOfferPrices(policy.OffersPrices)
+
+	roundToTwoDecimalPlaces(policy)
+
+	log.Println("[Persona] filter by minimum price")
+
+	filterOffersByMinimumPrice(policy, 120.0, 50.0)
+
+	log.Println("[Persona] function end -----------------------------------")
+
+	return nil
+}
+
+func initOfferPrices(policy *models.Policy, personProduct *models.Product) {
 	policy.OffersPrices = make(map[string]map[string]*models.Price)
 
 	for offerKey, _ := range personProduct.Offers {
@@ -60,47 +154,6 @@ func PersonFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 			},
 		}
 	}
-
-	for _, guarantee := range policy.Assets[0].Guarantees {
-		switch guarantee.Slug {
-		case "IPI":
-			calculateIPIPrices(policy.Contractor, &guarantee, personaRates)
-		case "D":
-			calculateDPrices(policy.Contractor, &guarantee, personaRates)
-		case "DRG":
-			calculateDRGPrices(policy.Contractor, &guarantee, personaRates)
-		case "ITI":
-			calculateITIPrices(policy.Contractor, &guarantee, personaRates)
-		case "DC":
-			calculateDCPrices(policy.Contractor, &guarantee, personaRates)
-		case "RSC":
-			calculateRSCPrices(policy.Contractor, &guarantee, personaRates)
-		case "IPM":
-			contractorAge, err := policy.CalculateContractorAge()
-			lib.CheckError(err)
-			if contractorAge < 66 {
-				calculateIPMPrices(contractorAge, &guarantee, personaRates)
-			}
-		}
-	}
-
-	applyDiscounts(&policy)
-
-	offerPrices(&policy)
-
-	roundMonthlyOfferPrices(&policy, "IPI", "DRG")
-
-	roundYearlyOfferPrices(&policy, "IPI", "DRG")
-
-	roundOfferPrices(policy.OffersPrices)
-
-	roundToTwoDecimalPlaces(&policy)
-
-	filterOffersByMinimumPrice(&policy, 120.0, 50.0)
-
-	policyJson, err := policy.Marshal()
-
-	return string(policyJson), policy, err
 }
 
 func calculateIPIPrices(contractor models.User, guarantee *models.Guarante, personaTassi map[string]json.RawMessage) {
@@ -316,7 +369,7 @@ func applyDiscounts(policy *models.Policy) {
 
 }
 
-func offerPrices(policy *models.Policy) {
+func calculatePersonaOfferPrices(policy *models.Policy) {
 	for offerKey, _ := range policy.OffersPrices {
 		for _, guarantee := range policy.Assets[0].Guarantees {
 			if guarantee.Offer[offerKey] != nil {

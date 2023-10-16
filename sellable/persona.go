@@ -13,6 +13,7 @@ import (
 // DEPRECATED
 func PersonaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
+		policy  *models.Policy
 		product *models.Product
 		err     error
 	)
@@ -25,7 +26,13 @@ func PersonaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	log.Printf("[PersonaFx] body: %s", string(body))
 
-	product = Persona(authToken.GetChannelByRoleV2(), body)
+	err = json.Unmarshal(body, &policy)
+	if err != nil {
+		log.Printf("[PersonaFx] error unmarshaling body: %s", err.Error())
+		return "", nil, err
+	}
+
+	product = Persona(*policy, authToken.GetChannelByRoleV2())
 
 	productJson, err := json.Marshal(product)
 	lib.CheckError(err)
@@ -37,16 +44,12 @@ func PersonaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	return string(productJson), product, nil
 }
 
-func Persona(channel string, body []byte) *models.Product {
-	var (
-		policy models.Policy
-	)
-
+func Persona(policy models.Policy, channel string) *models.Product {
 	log.Println("[Persona] function start -------------------------------------")
 
 	log.Println("[Persona] loading rules input data")
 
-	quotingInputData := getPersonaRulesInputData(&policy, body)
+	quotingInputData := getPersonaRulesInputData(policy)
 
 	log.Println("[Persona] loading product file")
 
@@ -68,16 +71,8 @@ func Persona(channel string, body []byte) *models.Product {
 	return ruleOut.(*models.Product)
 }
 
-func getPersonaRulesInputData(policy *models.Policy, req []byte) []byte {
-	var err error
-
+func getPersonaRulesInputData(policy models.Policy) []byte {
 	log.Println("[getPersonaRulesInputData] function start ------------------")
-
-	*policy, err = models.UnmarshalPolicy(req)
-	if err != nil {
-		log.Printf("[getPersonaRulesInputData] error unmarshaling policy: %s", err.Error())
-		return nil
-	}
 
 	age, err := policy.CalculateContractorAge()
 	if err != nil {
