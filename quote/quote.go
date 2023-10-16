@@ -46,7 +46,7 @@ func Quote(w http.ResponseWriter, r *http.Request) {
 			},
 			{
 				Route:   "/v1/person",
-				Handler: PersonFx,
+				Handler: PersonaFx,
 				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAll},
 			},
