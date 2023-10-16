@@ -10,6 +10,7 @@ import (
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
+	plc "github.com/wopta/goworkspace/policy"
 )
 
 type AcceptancePayload struct {
@@ -52,7 +53,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		return `{"success":false}`, `{"success":false}`, nil
 	}
 
-	policy, err = GetPolicy(policyUid, origin)
+	policy, err = plc.GetPolicy(policyUid, origin)
 	lib.CheckError(err)
 
 	if policy.Status != models.PolicyStatusWaitForApproval {
@@ -94,7 +95,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		toAddress = mail.Address{
 			Address: authToken.Email,
 		}
-	case models.AgentChannel, models.AgencyChannel:
+	case models.NetworkChannel:
 		toAddress = mail.GetNetworkNodeEmail(networkNode)
 	default:
 		toAddress = mail.GetContractorEmail(&policy)
