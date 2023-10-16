@@ -33,59 +33,53 @@ func Question(w http.ResponseWriter, r *http.Request) {
 				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAll},
 			},
-			{
-				Route:   "/v2/:questionType",
-				Handler: GetQuestionsV2Fx,
-				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAll},
-			},
 		},
 	}
 	route.Router(w, r)
 
 }
 
-func GetQuestionsV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func GetQuestionsFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		result interface{}
 		policy *models.Policy
 	)
 
-	log.Println("[GetQuestionsV2Fx] handler start -------------------")
+	log.Println("[GetQuestionsFx] handler start -------------------")
 
 	questionType := r.Header.Get("questionType")
-	log.Printf("[GetQuestionsV2Fx] questions: %s", questionType)
+	log.Printf("[GetQuestionsFx] questions: %s", questionType)
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 
-	log.Printf("[GetQuestionsV2Fx] req body: %s", string(body))
+	log.Printf("[GetQuestionsFx] req body: %s", string(body))
 
 	err := json.Unmarshal(body, &policy)
 	if err != nil {
-		log.Printf("[GetQuestionsV2] error unmarshaling request body: %s", err.Error())
+		log.Printf("[GetQuestionsFx] error unmarshaling request body: %s", err.Error())
 		return "", nil, err
 	}
 
 	switch questionType {
 	case statements:
-		log.Printf("[GetQuestionsV2Fx] loading statements for %s product", policy.Name)
-		result, err = GetStatementsV2(policy)
+		log.Printf("[GetQuestionsFx] loading statements for %s product", policy.Name)
+		result, err = GetStatements(policy)
 	case surveys:
-		log.Printf("[GetQuestionV2Fx] loading surveys for %s product", policy.Name)
-		//out = GetSurveysV2(policy)
+		log.Printf("[GetQuestionsFx] loading surveys for %s product", policy.Name)
+		result, err = GetSurveys(policy)
 	default:
-		log.Printf("[GetQuestionV2Fx] questionType %s not allowed", questionType)
+		log.Printf("[GetQuestionsFx] questionType %s not allowed", questionType)
 		return "", nil, fmt.Errorf("questionType %s not allowed", questionType)
 	}
 
 	if err != nil {
-		log.Printf("[GetQuestionsV2Fx] error: %s", err.Error())
+		log.Printf("[GetQuestionsFx] error: %s", err.Error())
 		return "", nil, err
 	}
 
 	jsonOut, err := json.Marshal(result)
 
-	log.Println("[GetQuestionsV2Fx] handler end -------------------")
+	log.Println("[GetQuestionsFx] handler end -------------------")
 
 	return `{"` + questionType + `": ` + string(jsonOut) + `}`, result, err
 }

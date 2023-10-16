@@ -198,7 +198,7 @@ func emitUpdatePolicy(policy *models.Policy, request EmitRequest) {
 		} else {
 			log.Println("[emitUpdatePolicy] inject policy statements from question module")
 			policy.Statements = new([]models.Statement)
-			*policy.Statements = question.GetStatements(*policy)
+			*policy.Statements, _ = question.GetStatements(policy)
 		}
 	}
 	if policy.PaymentSplit == "" {

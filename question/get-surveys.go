@@ -11,12 +11,12 @@ type Surveys struct {
 	Text    string
 }
 
-func GetSurveysV2(policy *models.Policy) ([]models.Survey, error) {
-	log.Println("[GetSurveysV2] function start ---------------------")
+func GetSurveys(policy *models.Policy) ([]models.Survey, error) {
+	log.Println("[GetSurveys] function start ---------------------")
 
 	policyJson, err := policy.Marshal()
 	if err != nil {
-		log.Printf("[GetSurveysV2] error marshaling policy: %s", err.Error())
+		log.Printf("[GetSurveys] error marshaling policy: %s", err.Error())
 		return nil, err
 	}
 
@@ -26,12 +26,12 @@ func GetSurveysV2(policy *models.Policy) ([]models.Survey, error) {
 		Text:    "",
 	}
 
-	log.Println("[GetSurveysV2] loading rules file")
+	log.Println("[GetSurveys] loading rules file")
 
 	rulesFile := lib.GetRulesFileV2(policy.Name, policy.ProductVersion, surveys)
 	data := loadExternalData(policy.Name)
 
-	log.Println("[GetSurveysV2] executing rules")
+	log.Println("[GetSurveys] executing rules")
 
 	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, ruleSurveys, policyJson, data)
 
@@ -40,7 +40,7 @@ func GetSurveysV2(policy *models.Policy) ([]models.Survey, error) {
 		result = append(result, *survey)
 	}
 
-	log.Println("[GetSurveysV2] function end ------------------")
+	log.Println("[GetSurveys] function end ------------------")
 
 	return result, err
 

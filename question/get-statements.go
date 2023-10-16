@@ -11,12 +11,12 @@ type Statements struct {
 	Text       string
 }
 
-func GetStatementsV2(policy *models.Policy) ([]models.Statement, error) {
-	log.Println("[GetStatementsV2] function start ----------------")
+func GetStatements(policy *models.Policy) ([]models.Statement, error) {
+	log.Println("[GetStatements] function start ----------------")
 
 	policyJson, err := policy.Marshal()
 	if err != nil {
-		log.Printf("[GetStatementsV2] error marshaling policy: %s", err.Error())
+		log.Printf("[GetStatements] error marshaling policy: %s", err.Error())
 		return nil, err
 	}
 
@@ -26,12 +26,12 @@ func GetStatementsV2(policy *models.Policy) ([]models.Statement, error) {
 		Text:       "",
 	}
 
-	log.Println("[GetStatementsV2] loading rules file")
+	log.Println("[GetStatements] loading rules file")
 
 	rulesFile := lib.GetRulesFileV2(policy.Name, policy.ProductVersion, statements)
 	data := loadExternalData(policy.Name)
 
-	log.Println("[GetStatementsV2] executing rules")
+	log.Println("[GetStatements] executing rules")
 
 	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, rulesStatements, policyJson, data)
 
@@ -40,7 +40,7 @@ func GetStatementsV2(policy *models.Policy) ([]models.Statement, error) {
 		result = append(result, *statement)
 	}
 
-	log.Println("[GetStatementsV2] function end ----------------")
+	log.Println("[GetStatements] function end ----------------")
 
 	return result, err
 }
