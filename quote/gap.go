@@ -3,6 +3,7 @@ package quote
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -16,20 +17,25 @@ import (
 )
 
 func GapFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.Println("[GapFx] Handler start")
+	log.Println("[GapFx] handler start --------------------------------------")
 
 	req := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 
-	var policy models.Policy
+	var policy *models.Policy
 	err := json.Unmarshal(req, &policy)
 	lib.CheckError(err)
 
 	authToken, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
 	lib.CheckError(err)
 
-	Gap(authToken.GetChannelByRole(), &policy)
-	policyJson, err := json.Marshal(policy)
+	Gap(authToken.GetChannelByRoleV2(), policy)
+	policyJson, err := policy.Marshal()
+
+	log.Printf("[GapFx] response: %s", string(policyJson))
+
+	log.Println("[GapFx] handler end --------------------------------------")
+
 	return string(policyJson), policy, err
 }
 
@@ -56,7 +62,7 @@ func calculateGapOfferPrices(policy *models.Policy, product models.Product) {
 	policy.OffersPrices = make(map[string]map[string]*models.Price)
 
 	for offerName := range product.Offers {
-		matrix := getGapMatrix(offerName)
+		matrix := getGapMatrix(policy.Name, policy.ProductVersion, offerName)
 		multiplier := getGapMultiplier(matrix, duration, residenceArea)
 
 		netPrice := vehicleValue * multiplier
@@ -85,12 +91,8 @@ func getAreaByProvince(province string) string {
 	return ""
 }
 
-func getGapMatrix(offerName string) dataframe.DataFrame {
-	gapPaths := map[string]string{
-		"base":     "quote/gap_matrix_base.csv",
-		"complete": "quote/gap_matrix_complete.csv",
-	}
-	return lib.CsvToDataframe(lib.GetFilesByEnv(gapPaths[offerName]))
+func getGapMatrix(productName, productVersion, offerName string) dataframe.DataFrame {
+	return lib.CsvToDataframe(lib.GetFilesByEnv(fmt.Sprintf("products-v2/%s/%s/taxes_%s.csv", productName, productVersion, offerName)))
 }
 
 // Getting the first tax, and assuming every others are the same
