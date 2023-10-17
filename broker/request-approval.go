@@ -100,7 +100,7 @@ func setRequestApprovalData(policy *models.Policy) {
 	log.Printf("[setRequestApproval] policy uid %s: reserved flow", policy.Uid)
 
 	setProposalNumber(policy)
-	reserved.SetReservedInfo(policy)
+	reserved.SetReservedInfo(policy, mgaProduct)
 
 	policy.Status = models.PolicyStatusWaitForApproval
 	policy.StatusHistory = append(policy.StatusHistory, policy.Status)

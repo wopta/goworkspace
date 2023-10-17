@@ -256,7 +256,7 @@ func emitSign(policy *models.Policy, origin string) {
 	policy.Status = models.PolicyStatusToSign
 	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusContact, models.PolicyStatusToSign)
 
-	p := <-document.ContractObj(origin, *policy, networkNode, product)
+	p := <-document.ContractObj(origin, *policy, networkNode, mgaProduct)
 	policy.DocumentName = p.LinkGcs
 	_, signResponse, _ := document.NamirialOtpV6(*policy, origin)
 	policy.ContractFileId = signResponse.FileId

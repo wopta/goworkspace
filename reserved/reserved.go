@@ -13,9 +13,9 @@ func GetReservedInfo(policy *models.Policy) (bool, *models.ReservedInfo) {
 	}
 }
 
-func SetReservedInfo(policy *models.Policy) {
+func SetReservedInfo(policy *models.Policy, product *models.Product) {
 	switch policy.Name {
 	case models.LifeProduct:
-		setLifeReservedInfo(policy)
+		setLifeReservedInfo(policy, product)
 	}
 }

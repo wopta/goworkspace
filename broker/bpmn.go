@@ -19,7 +19,7 @@ var (
 	origin, paymentSplit              string
 	ccAddress, toAddress, fromAddress mail.Address
 	networkNode                       *models.NetworkNode
-	product                           *models.Product
+	product, mgaProduct               *models.Product
 )
 
 const (
@@ -65,6 +65,7 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 	}
 
 	product = prd.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, networkNode)
+	mgaProduct = prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil)
 
 	// TODO: fix me - maybe get to/from/cc from flowFile.json?
 	switch flowKey {

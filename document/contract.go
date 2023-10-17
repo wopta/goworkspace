@@ -46,10 +46,10 @@ func ContractObj(origin string, data models.Policy, networkNode *models.NetworkN
 			filename, out = Save(m, data)
 		case models.LifeProduct:
 			pdf := initFpdf()
-			filename, out = LifeContract(pdf, origin, &data, networkNode)
+			filename, out = LifeContract(pdf, origin, &data, networkNode, product)
 		case models.PersonaProduct:
 			pdf := initFpdf()
-			filename, out = PersonaContract(pdf, &data)
+			filename, out = PersonaContract(pdf, &data, product)
 		case models.GapProduct:
 			pdf := initFpdf()
 			filename, out = GapContract(pdf, origin, &data)
