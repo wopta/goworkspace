@@ -305,7 +305,7 @@ func GetAssetPathByEnvV2() string {
 	case "local":
 		path = "../function-data/dev/assets/documents/"
 	case "dev", "prod":
-		path = "./serverless_function_source_code/tmp/"
+		path = "/tmp/"
 	}
 
 	return path
