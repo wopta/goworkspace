@@ -58,10 +58,10 @@ func downloadAssets() error {
 		return fmt.Errorf("no files found")
 	}
 
-	err = os.Mkdir(folderPath, 0750)
+	/*err = os.Mkdir(folderPath, 0750)
 	if err != nil {
 		return err
-	}
+	}*/
 
 	for _, file := range filesList {
 		rawFile := lib.GetFromStorage(bucket, file, "")
