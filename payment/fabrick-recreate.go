@@ -25,9 +25,12 @@ func FabrickRecreateFx(w http.ResponseWriter, r *http.Request) (string, interfac
 	log.Println("[FabrickRecreateFx] Handler start ---------------------------")
 
 	var (
-		request FabrickRefreshPayByLinkRequest
-		err     error
-		policy  *models.Policy
+		request     FabrickRefreshPayByLinkRequest
+		err         error
+		policy      *models.Policy
+		flowName    string
+		networkNode *models.NetworkNode
+		warrant     *models.Warrant
 	)
 
 	origin := r.Header.Get("Origin")
@@ -40,7 +43,21 @@ func FabrickRecreateFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		return "", nil, err
 	}
 
-	policy, err = FabrickRecreate(request.PolicyUid, origin)
+	flowName = models.ECommerceFlow
+	if policy.Channel == models.MgaChannel {
+		flowName = models.MgaFlow
+	} else {
+		networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
+		if networkNode != nil {
+			warrant = networkNode.GetWarrant()
+			if warrant != nil {
+				flowName = warrant.GetFlowName(policy.Name)
+			}
+		}
+	}
+	log.Printf("[FabrickRecreateFx] flowName '%s'", flowName)
+
+	policy, err = FabrickRecreate(request.PolicyUid, origin, networkNode, warrant)
 	if err != nil {
 		log.Printf("[FabrickRecreateFx] error recreating payment: %s", err.Error())
 		return "", nil, err
@@ -52,6 +69,7 @@ func FabrickRecreateFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		mail.AddressAnna,
 		mail.GetContractorEmail(policy),
 		mail.Address{},
+		flowName,
 	)
 
 	models.CreateAuditLog(r, string(body))
@@ -59,12 +77,11 @@ func FabrickRecreateFx(w http.ResponseWriter, r *http.Request) (string, interfac
 	return `{"success":true}`, `{"success":true}`, nil
 }
 
-func FabrickRecreate(policyUid, origin string) (*models.Policy, error) {
+func FabrickRecreate(policyUid, origin string, networkNode *models.NetworkNode, warrant *models.Warrant) (*models.Policy, error) {
 	log.Println("[FabrickRecreate]")
 	var (
-		err     error
-		policy  models.Policy
-		warrant *models.Warrant
+		err    error
+		policy models.Policy
 	)
 
 	policy = plc.GetPolicyByUid(policyUid, origin)
@@ -76,10 +93,6 @@ func FabrickRecreate(policyUid, origin string) (*models.Policy, error) {
 	oldTransactions := tr.GetPolicyTransactions(origin, policy.Uid)
 
 	log.Println("[FabrickRecreate] recreating payment...")
-	networkNode := network.GetNetworkNodeByUid(policy.ProducerUid)
-	if networkNode != nil {
-		warrant = networkNode.GetWarrant()
-	}
 	product := prd.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, networkNode, warrant)
 	payUrl, err := PaymentController(origin, &policy, product)
 	if err != nil {

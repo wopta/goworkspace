@@ -89,10 +89,19 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	emitUpdatePolicy(&policy, request)
 
-	networkNode = network.GetNetworkNodeByUid(authToken.UserID)
-	if networkNode != nil {
-		warrant = networkNode.GetWarrant()
+	flowName = models.ECommerceFlow
+	if policy.Channel == models.MgaChannel {
+		flowName = models.MgaFlow
+	} else {
+		networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
+		if networkNode != nil {
+			warrant = networkNode.GetWarrant()
+			if warrant != nil {
+				flowName = warrant.GetFlowName(policy.Name)
+			}
+		}
 	}
+	log.Printf("[EmitFx] flowName '%s'", flowName)
 
 	if lib.GetBoolEnv("PROPOSAL_V2") {
 		if policy.IsReserved && policy.Status != models.PolicyStatusApproved {
@@ -128,6 +137,7 @@ func emit(authToken models.AuthToken, policy *models.Policy, request EmitRequest
 			mail.AddressAnna,
 			mail.GetContractorEmail(policy),
 			mail.GetAgentEmail(policy),
+			models.ProviderMgaFlow, // With PROPOSAL_V2 turned off, the only flow that should get here is the old agent
 		)
 	case typeEmit:
 		log.Printf("[Emit] Emitting - Policy Uid %s", policy.Uid)

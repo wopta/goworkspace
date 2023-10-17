@@ -90,10 +90,19 @@ func lead(authToken models.AuthToken, policy *models.Policy) error {
 		log.Printf("[lead] setting policy channel to '%s'", policy.Channel)
 	}
 
-	networkNode = network.GetNetworkNodeByUid(authToken.UserID)
-	if networkNode != nil {
-		warrant = networkNode.GetWarrant()
+	flowName = models.ECommerceFlow
+	if policy.Channel == models.MgaChannel {
+		flowName = models.MgaFlow
+	} else {
+		networkNode = network.GetNetworkNodeByUid(authToken.UserID)
+		if networkNode != nil {
+			warrant = networkNode.GetWarrant()
+			if warrant != nil {
+				flowName = warrant.GetFlowName(policy.Name)
+			}
+		}
 	}
+	log.Printf("[lead] flowName '%s'", flowName)
 
 	log.Println("[lead] starting bpmn flow...")
 	state := runBrokerBpmn(policy, leadFlowKey)

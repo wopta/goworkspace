@@ -1,7 +1,6 @@
 package broker
 
 import (
-	"github.com/wopta/goworkspace/network"
 	"io"
 	"log"
 	"net/http"
@@ -10,6 +9,7 @@ import (
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
 	plc "github.com/wopta/goworkspace/policy"
 )
 
@@ -95,10 +95,19 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 
 	log.Println("[AcceptanceFx] sending acceptance email...")
 
-	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
-	if networkNode != nil {
-		warrant = networkNode.GetWarrant()
+	flowName = models.ECommerceFlow
+	if policy.Channel == models.MgaChannel {
+		flowName = models.MgaFlow
+	} else {
+		networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
+		if networkNode != nil {
+			warrant = networkNode.GetWarrant()
+			if warrant != nil {
+				flowName = warrant.GetFlowName(policy.Name)
+			}
+		}
 	}
+	log.Printf("[AcceptanceFx] flowName '%s'", flowName)
 
 	switch policy.Channel {
 	case models.MgaChannel:
@@ -111,11 +120,14 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		toAddress = mail.GetContractorEmail(&policy)
 	}
 
+	log.Printf("[AcceptanceFx] toAddress '%s'", toAddress.String())
+
 	mail.SendMailReservedResult(
 		policy,
 		mail.AddressAssunzione,
 		toAddress,
 		mail.Address{},
+		flowName,
 	)
 
 	models.CreateAuditLog(r, string(body))

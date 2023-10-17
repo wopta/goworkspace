@@ -20,3 +20,14 @@ func (w *Warrant) GetProduct(productName string) *Product {
 	}
 	return nil
 }
+
+func (w *Warrant) GetFlowName(productName string) string {
+	var flowName string
+	product := w.GetProduct(productName)
+
+	if product != nil {
+		flowName = product.Flow
+	}
+
+	return flowName
+}

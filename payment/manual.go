@@ -27,7 +27,11 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 	log.Println("[ManualPaymentFx] Handler start -----------------------------------------")
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
-	var payload ManualPaymentPayload
+	var (
+		payload      ManualPaymentPayload
+		flowName     string
+		producerNode *models.NetworkNode
+	)
 
 	err := lib.CheckPayload[ManualPaymentPayload](body, &payload, []string{"paymentMethod", "payDate", "transactionDate"})
 	if err != nil {
@@ -102,7 +106,20 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 
 	ManualPayment(&t, origin, &payload)
 
-	producerNode := network.GetNetworkNodeByUid(p.ProducerUid)
+	flowName = models.ECommerceFlow
+	if p.Channel == models.MgaChannel {
+		flowName = models.MgaFlow
+	} else {
+		producerNode = network.GetNetworkNodeByUid(p.ProducerUid)
+		if producerNode != nil {
+			warrant := producerNode.GetWarrant()
+			if warrant != nil {
+				flowName = warrant.GetFlowName(p.Name)
+			}
+		}
+	}
+	log.Printf("[ManualPaymentFx] flowName '%s'", flowName)
+
 	transaction.CreateNetworkTransactions(&p, &t, producerNode)
 
 	// Update policy if needed
@@ -124,6 +141,7 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 			mail.AddressAnna,
 			mail.GetContractorEmail(&p),
 			mail.Address{},
+			flowName,
 		)
 	}
 

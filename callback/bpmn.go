@@ -16,9 +16,10 @@ import (
 )
 
 var (
-	origin, trSchedule, paymentMethod string
-	ccAddress, toAddress, fromAddress mail.Address
-	networkNode                       *models.NetworkNode
+	origin, trSchedule, paymentMethod, flowName string
+	ccAddress, toAddress, fromAddress           mail.Address
+	networkNode                                 *models.NetworkNode
+	warrant                                     *models.Warrant
 )
 
 const (
@@ -51,7 +52,19 @@ func runCallbackBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 
 	state := bpmn.NewBpmn(*policy)
 
-	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
+	flowName = models.ECommerceFlow
+	if policy.Channel == models.MgaChannel {
+		flowName = models.MgaFlow
+	} else {
+		networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
+		if networkNode != nil {
+			warrant = networkNode.GetWarrant()
+			if warrant != nil {
+				flowName = warrant.GetFlowName(policy.Name)
+			}
+		}
+	}
+	log.Printf("[runCallbackBpmn] flowName '%s'", flowName)
 
 	// TODO: fix me - maybe get to/from/cc from setting.json?
 	switch flowKey {
@@ -138,13 +151,7 @@ func sendMailContract(state *bpmn.State) error {
 		toAddress.String(),
 		ccAddress.String(),
 	)
-	mail.SendMailContract(
-		*policy,
-		nil,
-		fromAddress,
-		toAddress,
-		ccAddress,
-	)
+	mail.SendMailContract(*policy, nil, fromAddress, toAddress, ccAddress, flowName)
 
 	return nil
 }
@@ -179,12 +186,7 @@ func sendMailPay(state *bpmn.State) error {
 		toAddress.String(),
 		ccAddress.String(),
 	)
-	mail.SendMailPay(
-		*policy,
-		fromAddress,
-		toAddress,
-		ccAddress,
-	)
+	mail.SendMailPay(*policy, fromAddress, toAddress, ccAddress, flowName)
 
 	return nil
 }
@@ -234,13 +236,7 @@ func updatePolicy(state *bpmn.State) error {
 		toAddress.String(),
 		ccAddress.String(),
 	)
-	mail.SendMailContract(
-		*policy,
-		nil,
-		fromAddress,
-		toAddress,
-		ccAddress,
-	)
+	mail.SendMailContract(*policy, nil, fromAddress, toAddress, ccAddress, flowName)
 
 	return nil
 }

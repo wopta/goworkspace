@@ -71,10 +71,19 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 			return "", nil, fmt.Errorf("cannot save proposal for policy with status %s", policy.Status)
 		}
 
-		networkNode = network.GetNetworkNodeByUid(authToken.UserID)
-		if networkNode != nil {
-			warrant = networkNode.GetWarrant()
+		flowName = models.ECommerceFlow
+		if policy.Channel == models.MgaChannel {
+			flowName = models.MgaFlow
+		} else {
+			networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
+			if networkNode != nil {
+				warrant = networkNode.GetWarrant()
+				if warrant != nil {
+					flowName = warrant.GetFlowName(policy.Name)
+				}
+			}
 		}
+		log.Printf("[ProposalFx] flowName '%s'", flowName)
 
 		err = proposal(&policy)
 		if err != nil {

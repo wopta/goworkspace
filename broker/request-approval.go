@@ -73,10 +73,19 @@ func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		return "", nil, fmt.Errorf("cannot request approval for policy with status %s and isReserved %t", policy.Status, policy.IsReserved)
 	}
 
-	networkNode = network.GetNetworkNodeByUid(authToken.UserID)
-	if networkNode != nil {
-		warrant = networkNode.GetWarrant()
+	flowName = models.ECommerceFlow
+	if policy.Channel == models.MgaChannel {
+		flowName = models.MgaFlow
+	} else {
+		networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
+		if networkNode != nil {
+			warrant = networkNode.GetWarrant()
+			if warrant != nil {
+				flowName = warrant.GetFlowName(policy.Name)
+			}
+		}
 	}
+	log.Printf("[RequestApprovalFx] flowName '%s'", flowName)
 
 	err = requestApproval(&policy)
 	if err != nil {

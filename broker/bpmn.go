@@ -16,7 +16,7 @@ import (
 )
 
 var (
-	origin, paymentSplit              string
+	origin, paymentSplit, flowName    string
 	ccAddress, toAddress, fromAddress mail.Address
 	networkNode                       *models.NetworkNode
 	product, mgaProduct               *models.Product
@@ -145,12 +145,7 @@ func sendLeadMail(state *bpmn.State) error {
 		toAddress.String(),
 		ccAddress.String(),
 	)
-	mail.SendMailLead(
-		*policy,
-		fromAddress,
-		toAddress,
-		ccAddress,
-	)
+	mail.SendMailLead(*policy, fromAddress, toAddress, ccAddress, flowName)
 	return nil
 }
 
@@ -194,7 +189,7 @@ func setRequestApprovalBpmn(state *bpmn.State) error {
 
 func sendRequestApprovalMail(state *bpmn.State) error {
 	policy := state.Data
-	mail.SendMailReserved(*policy, fromAddress, toAddress, ccAddress)
+	mail.SendMailReserved(*policy, fromAddress, toAddress, ccAddress, flowName)
 	return nil
 }
 
@@ -226,12 +221,7 @@ func sendMailSign(state *bpmn.State) error {
 		toAddress.String(),
 		ccAddress.String(),
 	)
-	mail.SendMailSign(
-		*policy,
-		fromAddress,
-		toAddress,
-		ccAddress,
-	)
+	mail.SendMailSign(*policy, fromAddress, toAddress, ccAddress, flowName)
 	return nil
 }
 
