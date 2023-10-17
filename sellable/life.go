@@ -16,8 +16,9 @@ import (
 // DEPRECATED
 func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		policy *models.Policy
-		err    error
+		policy  *models.Policy
+		warrant *models.Warrant
+		err     error
 	)
 
 	log.Println("[LifeFx] handler start ----------- ")
@@ -35,10 +36,13 @@ func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	log.Println("[LifeFx] loading network node")
 	networkNode := network.GetNetworkNodeByUid(authToken.UserID)
+	if networkNode != nil {
+		warrant = networkNode.GetWarrant()
+	}
 
 	log.Println("[LifeFx] calling vendibility rules function")
 
-	product, err := Life(policy, authToken.GetChannelByRoleV2(), networkNode)
+	product, err := Life(policy, authToken.GetChannelByRoleV2(), networkNode, warrant)
 	if err != nil {
 		log.Printf("[LifeFx] vednibility rules error: %s", err.Error())
 		return "", nil, err
@@ -52,7 +56,7 @@ func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	return string(jsonOut), product, err
 }
 
-func Life(policy *models.Policy, channel string, networkNode *models.NetworkNode) (*models.Product, error) {
+func Life(policy *models.Policy, channel string, networkNode *models.NetworkNode, warrant *models.Warrant) (*models.Product, error) {
 	var (
 		err     error
 		product *models.Product
@@ -72,7 +76,7 @@ func Life(policy *models.Policy, channel string, networkNode *models.NetworkNode
 	rulesFile := lib.GetRulesFileV2(policy.Name, policy.ProductVersion, rulesFilename)
 
 	log.Println("[Life] loading product")
-	product = prd.GetProductV2(policy.Name, policy.ProductVersion, channel, networkNode)
+	product = prd.GetProductV2(policy.Name, policy.ProductVersion, channel, networkNode, warrant)
 	if product == nil {
 		return nil, fmt.Errorf("no product found")
 	}

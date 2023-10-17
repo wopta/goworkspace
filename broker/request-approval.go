@@ -74,6 +74,9 @@ func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 	}
 
 	networkNode = network.GetNetworkNodeByUid(authToken.UserID)
+	if networkNode != nil {
+		warrant = networkNode.GetWarrant()
+	}
 
 	err = requestApproval(&policy)
 	if err != nil {

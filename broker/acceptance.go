@@ -96,6 +96,9 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	log.Println("[AcceptanceFx] sending acceptance email...")
 
 	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
+	if networkNode != nil {
+		warrant = networkNode.GetWarrant()
+	}
 
 	switch policy.Channel {
 	case models.MgaChannel:

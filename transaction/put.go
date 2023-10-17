@@ -23,7 +23,7 @@ func PutByPolicy(policy models.Policy, scheduleDate, origin, expireDate, custome
 		transactionDate  time.Time
 	)
 
-	prod := product.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil)
+	prod := product.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
 	if prod == nil {
 		log.Printf("[PutByPolicy] error getting mga product")
 		return nil

@@ -91,6 +91,9 @@ func lead(authToken models.AuthToken, policy *models.Policy) error {
 	}
 
 	networkNode = network.GetNetworkNodeByUid(authToken.UserID)
+	if networkNode != nil {
+		warrant = networkNode.GetWarrant()
+	}
 
 	log.Println("[lead] starting bpmn flow...")
 	state := runBrokerBpmn(policy, leadFlowKey)

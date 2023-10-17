@@ -23,6 +23,7 @@ func GetProductByChannelFx(w http.ResponseWriter, r *http.Request) (string, inte
 	var (
 		req         *GetProductReq
 		networkNode *models.NetworkNode
+		warrant     *models.Warrant
 	)
 
 	log.Println("[GetProductByChannelFx] handler start -------------")
@@ -49,7 +50,10 @@ func GetProductByChannelFx(w http.ResponseWriter, r *http.Request) (string, inte
 
 	if strings.EqualFold(channel, models.NetworkChannel) {
 		networkNode = network.GetNetworkNodeByUid(authToken.UserID)
-		if networkNode != nil && !networkNode.HasAccessToProduct(req.ProductName) {
+		if networkNode != nil {
+			warrant = networkNode.GetWarrant()
+		}
+		if warrant != nil && !networkNode.HasAccessToProduct(req.ProductName, warrant) {
 			log.Printf("[GetProductByChannelFx] network node %s hasn't access to product %s for company %s", networkNode.Uid, req.ProductName, req.CompanyName)
 			return "", nil, fmt.Errorf("network node hasn't access to product")
 		}
@@ -57,7 +61,7 @@ func GetProductByChannelFx(w http.ResponseWriter, r *http.Request) (string, inte
 
 	log.Printf("[GetProductByChannelFx] getting last active action for product %s", req.ProductName)
 
-	product := prd.GetLatestActiveProduct(req.ProductName, channel, networkNode)
+	product := prd.GetLatestActiveProduct(req.ProductName, channel, networkNode, warrant)
 	if product == nil {
 		log.Printf("[GetProductByChannelFx] no active product found")
 		return "", nil, fmt.Errorf("no product active found")

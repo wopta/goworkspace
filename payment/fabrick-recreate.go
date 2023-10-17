@@ -62,8 +62,9 @@ func FabrickRecreateFx(w http.ResponseWriter, r *http.Request) (string, interfac
 func FabrickRecreate(policyUid, origin string) (*models.Policy, error) {
 	log.Println("[FabrickRecreate]")
 	var (
-		err    error
-		policy models.Policy
+		err     error
+		policy  models.Policy
+		warrant *models.Warrant
 	)
 
 	policy = plc.GetPolicyByUid(policyUid, origin)
@@ -76,7 +77,10 @@ func FabrickRecreate(policyUid, origin string) (*models.Policy, error) {
 
 	log.Println("[FabrickRecreate] recreating payment...")
 	networkNode := network.GetNetworkNodeByUid(policy.ProducerUid)
-	product := prd.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, networkNode)
+	if networkNode != nil {
+		warrant = networkNode.GetWarrant()
+	}
+	product := prd.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, networkNode, warrant)
 	payUrl, err := PaymentController(origin, &policy, product)
 	if err != nil {
 		log.Printf("[FabrickRecreate] error creating payment: %s", err.Error())

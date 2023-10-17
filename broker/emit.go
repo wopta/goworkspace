@@ -90,6 +90,9 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	emitUpdatePolicy(&policy, request)
 
 	networkNode = network.GetNetworkNodeByUid(authToken.UserID)
+	if networkNode != nil {
+		warrant = networkNode.GetWarrant()
+	}
 
 	if lib.GetBoolEnv("PROPOSAL_V2") {
 		if policy.IsReserved && policy.Status != models.PolicyStatusApproved {

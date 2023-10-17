@@ -72,6 +72,9 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 		}
 
 		networkNode = network.GetNetworkNodeByUid(authToken.UserID)
+		if networkNode != nil {
+			warrant = networkNode.GetWarrant()
+		}
 
 		err = proposal(&policy)
 		if err != nil {

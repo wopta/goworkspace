@@ -17,7 +17,8 @@ import (
 
 func PersonaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		policy models.Policy
+		policy  models.Policy
+		warrant *models.Warrant
 	)
 
 	log.Println("[PersonaFx] handler start ----------------------------------")
@@ -39,10 +40,13 @@ func PersonaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 
 	log.Println("[PersonaFx] loading network node")
 	networkNode := network.GetNetworkNodeByUid(authToken.UserID)
+	if networkNode != nil {
+		warrant = networkNode.GetWarrant()
+	}
 
 	log.Println("[PersonaFx] start quoting")
 
-	err = Persona(&policy, authToken.GetChannelByRoleV2(), networkNode)
+	err = Persona(&policy, authToken.GetChannelByRoleV2(), networkNode, warrant)
 
 	policyJson, err := policy.Marshal()
 
@@ -53,12 +57,12 @@ func PersonaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	return string(policyJson), policy, err
 }
 
-func Persona(policy *models.Policy, channel string, networkNode *models.NetworkNode) error {
+func Persona(policy *models.Policy, channel string, networkNode *models.NetworkNode, warrant *models.Warrant) error {
 	var personaRates map[string]json.RawMessage
 
 	log.Println("[Persona] function start -----------------------------------")
 
-	personProduct := sellable.Persona(*policy, channel, networkNode)
+	personProduct := sellable.Persona(*policy, channel, networkNode, warrant)
 
 	b := lib.GetFilesByEnv(fmt.Sprintf("products-v2/%s/%s/taxes.json", policy.Name, policy.ProductVersion))
 	err := json.Unmarshal(b, &personaRates)

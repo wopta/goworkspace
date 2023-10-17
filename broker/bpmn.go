@@ -20,6 +20,7 @@ var (
 	ccAddress, toAddress, fromAddress mail.Address
 	networkNode                       *models.NetworkNode
 	product, mgaProduct               *models.Product
+	warrant                           *models.Warrant
 )
 
 const (
@@ -47,7 +48,7 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 	log.Printf("[runBrokerBpmn] loading file for channel %s", policy.Channel)
 	switch policy.Channel {
 	case models.NetworkChannel:
-		flowByte = getNetworkNodeFlow(networkNode, policy.Name)
+		flowByte = getNetworkNodeFlow(policy.Name)
 	case models.ECommerceChannel, models.MgaChannel:
 		flowByte = lib.GetFilesByEnv(fmt.Sprintf(flowFileFormat, policy.Channel))
 	default:
@@ -64,8 +65,8 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 		return nil
 	}
 
-	product = prd.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, networkNode)
-	mgaProduct = prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil)
+	product = prd.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, networkNode, warrant)
+	mgaProduct = prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
 
 	// TODO: fix me - maybe get to/from/cc from flowFile.json?
 	switch flowKey {
@@ -263,12 +264,11 @@ func updateUserAndNetworkNode(state *bpmn.State) error {
 	return network.UpdateNetworkNodePortfolio(origin, policy, networkNode)
 }
 
-func getNetworkNodeFlow(networkNode *models.NetworkNode, productName string) []byte {
+func getNetworkNodeFlow(productName string) []byte {
 	if networkNode == nil {
 		log.Println("[getNetworkNodeFlow] error networkNode not set")
 		return []byte{}
 	}
-	warrant := networkNode.GetWarrant()
 	if warrant == nil {
 		log.Printf("[getNetworkNodeFlow] error warrant not set for node %s", networkNode.Uid)
 		return []byte{}
@@ -278,5 +278,6 @@ func getNetworkNodeFlow(networkNode *models.NetworkNode, productName string) []b
 		log.Printf("[getNetworkNodeFlow] error product not set for warrant %s", warrant.Name)
 		return []byte{}
 	}
+	log.Printf("[getNetworkNodeFlow] getting flow '%s' file for product '%s'", product.Flow, productName)
 	return lib.GetFilesByEnv(fmt.Sprintf(flowFileFormat, product.Flow))
 }

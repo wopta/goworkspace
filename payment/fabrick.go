@@ -49,14 +49,21 @@ func getOrigin(origin string) string {
 func FabrickPayFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	req := lib.ErrorByte(io.ReadAll(r.Body))
 
-	var data models.Policy
+	var (
+		data    models.Policy
+		warrant *models.Warrant
+	)
+
 	defer r.Body.Close()
 	err := json.Unmarshal([]byte(req), &data)
 	log.Println(data.PriceGross)
 	lib.CheckError(err)
 
 	networkNode := network.GetNetworkNodeByUid(data.ProducerUid)
-	product := prd.GetProductV2(data.Name, data.ProductVersion, data.Channel, networkNode)
+	if networkNode != nil {
+		warrant = networkNode.GetWarrant()
+	}
+	product := prd.GetProductV2(data.Name, data.ProductVersion, data.Channel, networkNode, warrant)
 
 	paymentMethods := getPaymentMethods(data, product)
 
@@ -70,14 +77,21 @@ func FabrickPayFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 func FabrickPayMonthlyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	req := lib.ErrorByte(io.ReadAll(r.Body))
 
-	var data models.Policy
+	var (
+		data    models.Policy
+		warrant *models.Warrant
+	)
+
 	defer r.Body.Close()
 	err := json.Unmarshal([]byte(req), &data)
 	log.Println(data.PriceGross)
 	lib.CheckError(err)
 
 	networkNode := network.GetNetworkNodeByUid(data.ProducerUid)
-	product := prd.GetProductV2(data.Name, data.ProductVersion, data.Channel, networkNode)
+	if networkNode != nil {
+		warrant = networkNode.GetWarrant()
+	}
+	product := prd.GetProductV2(data.Name, data.ProductVersion, data.Channel, networkNode, warrant)
 
 	paymentMethods := getPaymentMethods(data, product)
 

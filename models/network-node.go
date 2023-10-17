@@ -209,7 +209,7 @@ func (nn *NetworkNode) GetWarrant() *Warrant {
 	return warrant
 }
 
-func (nn *NetworkNode) HasAccessToProduct(productName string) bool {
+func (nn *NetworkNode) HasAccessToProduct(productName string, warrant *Warrant) bool {
 	log.Println("[HasAccessToProduct] method start -----------------")
 
 	needCheckTypes := []string{AgencyNetworkNodeType, AgentNetworkNodeType, BrokerNetworkNodeType}
@@ -218,7 +218,9 @@ func (nn *NetworkNode) HasAccessToProduct(productName string) bool {
 		return true
 	}
 
-	warrant := nn.GetWarrant()
+	if warrant == nil {
+		warrant = nn.GetWarrant()
+	}
 	if warrant == nil {
 		log.Printf("[HasAccessToProduct] no %s warrant found", nn.Warrant)
 		return false
