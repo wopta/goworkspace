@@ -111,29 +111,28 @@ func lead(authToken models.AuthToken, policy *models.Policy) error {
 
 func checkIfPolicyIsLead(policy *models.Policy) error {
 	var recoveredPolicy models.Policy
-	log.Printf("[lead] found lead for existing policy %s", policy.Uid)
-
 	policyDoc, err := lib.GetFirestoreErr(models.PolicyCollection, policy.Uid)
 	if err != nil {
-		log.Printf("[lead] error getting policy %s from firebase: %s", policy.Uid, err.Error())
+		log.Printf("[checkIfPolicyIsLead] error getting policy %s from firebase: %s", policy.Uid, err.Error())
 		return nil
 	} else if !policyDoc.Exists() {
-		log.Printf("[lead] policy %s not found on Firebase", policy.Uid)
+		log.Printf("[checkIfPolicyIsLead] policy %s not found on Firebase", policy.Uid)
 		return nil
 	}
 
 	if err := policyDoc.DataTo(&recoveredPolicy); err != nil {
-		log.Printf("[lead] error converting policy %s data: %s", policy.Uid, err.Error())
+		log.Printf("[checkIfPolicyIsLead] error converting policy %s data: %s", policy.Uid, err.Error())
 		return nil
 	}
 
 	if recoveredPolicy.Status != models.PolicyStatusPartnershipLead && recoveredPolicy.Status != models.PolicyStatusInitLead {
-		log.Printf("[lead] error policy %s is not a lead", policy.Uid)
+		log.Printf("[checkIfPolicyIsLead] error policy %s is not a lead", policy.Uid)
 		return errors.New("policy is not a lead")
 	}
 
+	log.Printf("[checkIfPolicyIsLead] found lead for existing policy %s", policy.Uid)
+
 	policy.CreationDate = recoveredPolicy.CreationDate
-	policy.Updated = recoveredPolicy.Updated
 	policy.Status = recoveredPolicy.Status
 	policy.StatusHistory = recoveredPolicy.StatusHistory
 	policy.ProducerUid = recoveredPolicy.ProducerUid
