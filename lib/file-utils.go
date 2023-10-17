@@ -305,7 +305,7 @@ func GetAssetPathByEnvV2() string {
 	case "local":
 		path = "../function-data/dev/assets/documents/"
 	case "dev", "prod":
-		path = "../tmp/assets/"
+		path = "/tmp/assets/"
 	}
 
 	return path

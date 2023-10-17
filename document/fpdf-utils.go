@@ -40,7 +40,7 @@ func initFpdf() *fpdf.Fpdf {
 
 func downloadAssets() error {
 	const (
-		folderPath = "../tmp/assets/"
+		basePath = "../tmp/assets/"
 	)
 
 	env := os.Getenv("env")
@@ -58,14 +58,14 @@ func downloadAssets() error {
 		return fmt.Errorf("no files found")
 	}
 
-	err = os.Mkdir(folderPath, 0750)
+	err = os.Mkdir(basePath, 0750)
 	if err != nil {
 		return err
 	}
 
 	for _, file := range filesList {
 		rawFile := lib.GetFromStorage(bucket, file, "")
-		filePath := fmt.Sprintf("%s%s", folderPath, strings.SplitN(file, "/", 3)[2])
+		filePath := fmt.Sprintf("%s%s", basePath, strings.SplitN(file, "/", 3)[2])
 		log.Printf("[downloadAssets] write file to: %s", filePath)
 		err = os.WriteFile(filePath, rawFile, 0666)
 		if err != nil {
@@ -73,7 +73,7 @@ func downloadAssets() error {
 		}
 	}
 
-	files, err := os.ReadDir(folderPath)
+	files, err := os.ReadDir(basePath)
 	if err != nil {
 		return err
 	}
@@ -86,15 +86,15 @@ func downloadAssets() error {
 }
 
 func loadCustomFonts(pdf *fpdf.Fpdf) {
-	pdf.AddUTF8Font("Montserrat", "", lib.GetAssetPathByEnvV2()+"montserrat_light.ttf")
-	pdf.AddUTF8Font("Montserrat", "B", lib.GetAssetPathByEnvV2()+"montserrat_bold.ttf")
-	pdf.AddUTF8Font("Montserrat", "I", lib.GetAssetPathByEnvV2()+"montserrat_italic.ttf")
+	pdf.AddUTF8Font("Montserrat", "", folderPath+"montserrat_light.ttf")
+	pdf.AddUTF8Font("Montserrat", "B", folderPath+"montserrat_bold.ttf")
+	pdf.AddUTF8Font("Montserrat", "I", folderPath+"montserrat_italic.ttf")
 }
 
 func saveContract(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 	var filename string
 	if os.Getenv("env") == "local" {
-		err := pdf.OutputFileAndClose(basePath + "/contract.pdf")
+		err := pdf.OutputFileAndClose("./contract.pdf")
 		lib.CheckError(err)
 	} else {
 		var out bytes.Buffer
