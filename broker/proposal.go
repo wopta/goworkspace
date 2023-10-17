@@ -11,6 +11,7 @@ import (
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
 	plc "github.com/wopta/goworkspace/policy"
 )
 
@@ -63,6 +64,8 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 			log.Printf("[ProposalFx] cannot save proposal for policy with status %s", policy.Status)
 			return "", nil, fmt.Errorf("cannot save proposal for policy with status %s", policy.Status)
 		}
+
+		networkNode = network.GetNetworkNodeByUid(authToken.UserID)
 
 		err = proposal(&policy)
 		if err != nil {

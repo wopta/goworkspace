@@ -14,6 +14,7 @@ import (
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
 	"github.com/wopta/goworkspace/payment"
 	plc "github.com/wopta/goworkspace/policy"
 	"github.com/wopta/goworkspace/question"
@@ -76,6 +77,8 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	log.Printf("[EmitFx] Policy %s JSON: %s", uid, string(policyJsonLog))
 
 	emitUpdatePolicy(&policy, request)
+
+	networkNode = network.GetNetworkNodeByUid(authToken.UserID)
 
 	if lib.GetBoolEnv("PROPOSAL_V2") {
 		if policy.IsReserved && policy.Status != models.PolicyStatusApproved {

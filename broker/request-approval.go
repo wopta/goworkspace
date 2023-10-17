@@ -11,6 +11,7 @@ import (
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
 	plc "github.com/wopta/goworkspace/policy"
 	"github.com/wopta/goworkspace/reserved"
 )
@@ -32,6 +33,15 @@ func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 	origin = r.Header.Get("Origin")
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
+
+	log.Println("[RequestApprovalFx] loading authToken from idToken...")
+
+	token := r.Header.Get("Authorization")
+	authToken, err := models.GetAuthTokenFromIdToken(token)
+	if err != nil {
+		log.Printf("[EmitFx] error getting authToken")
+		return "", nil, err
+	}
 
 	log.Printf("[RequestApprovalFx] request body: %s", string(body))
 	err = json.Unmarshal(body, &req)
@@ -55,6 +65,8 @@ func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		log.Printf("[ProposalFx] cannot request approval for policy with status %s and isReserved %t", policy.Status, policy.IsReserved)
 		return "", nil, fmt.Errorf("cannot request approval for policy with status %s and isReserved %t", policy.Status, policy.IsReserved)
 	}
+
+	networkNode = network.GetNetworkNodeByUid(authToken.UserID)
 
 	err = requestApproval(&policy)
 	if err != nil {
