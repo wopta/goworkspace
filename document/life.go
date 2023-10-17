@@ -391,7 +391,6 @@ func statementsSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	for _, statement := range statements {
 		printStatement(pdf, statement, policy.Company)
 	}
-
 }
 
 func offerResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {

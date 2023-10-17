@@ -40,13 +40,13 @@ func initFpdf() *fpdf.Fpdf {
 
 func downloadAssets() error {
 	const (
-		folderPath = "./test/tmp"
+		folderPath = "./test/assets"
 	)
 
-	/*env := os.Getenv("env")
+	env := os.Getenv("env")
 	if env == "local" {
 		return nil
-	}*/
+	}
 
 	bucket := os.Getenv("GOOGLE_STORAGE_BUCKET")
 
@@ -76,9 +76,9 @@ func downloadAssets() error {
 }
 
 func loadCustomFonts(pdf *fpdf.Fpdf) {
-	pdf.AddUTF8Font("Montserrat", "", lib.GetAssetPathByEnv(basePath)+"/montserrat_light.ttf")
-	pdf.AddUTF8Font("Montserrat", "B", lib.GetAssetPathByEnv(basePath)+"/montserrat_bold.ttf")
-	pdf.AddUTF8Font("Montserrat", "I", lib.GetAssetPathByEnv(basePath)+"/montserrat_italic.ttf")
+	pdf.AddUTF8Font("Montserrat", "", lib.GetAssetPathByEnvV2()+"montserrat_light.ttf")
+	pdf.AddUTF8Font("Montserrat", "B", lib.GetAssetPathByEnvV2()+"montserrat_bold.ttf")
+	pdf.AddUTF8Font("Montserrat", "I", lib.GetAssetPathByEnvV2()+"montserrat_italic.ttf")
 }
 
 func saveContract(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
