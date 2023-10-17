@@ -40,7 +40,7 @@ func initFpdf() *fpdf.Fpdf {
 
 func downloadAssets() error {
 	const (
-		folderPath = "./assets"
+		folderPath = "./tmp"
 	)
 
 	env := os.Getenv("env")
