@@ -22,6 +22,8 @@ func LeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	log.Println("[LeadFx] Handler start --------------------------------------")
 
+	w.Header().Add("content-type", "application/json")
+
 	log.Println("[LeadFx] loading authToken from idToken...")
 
 	token := r.Header.Get("Authorization")
@@ -76,17 +78,8 @@ func lead(authToken models.AuthToken, policy *models.Policy) error {
 	guaranteFire := lib.GetDatasetByEnv(origin, models.GuaranteeCollection)
 
 	if policy.Uid != "" {
-		// TODO merge master with fix for partnership
-		log.Printf("[lead] creating lead for existing policy %s", policy.Uid)
-		policyDoc, err := lib.GetFirestoreErr(models.PolicyCollection, policy.Uid)
-
-		if err != nil {
-			log.Printf("[lead] error getting policy %s from firebase: %s", policy.Uid, err.Error())
-		}
-
-		if err == nil && policyDoc.Exists() {
-			log.Printf("[lead] found policy %s on Firebase", policy.Uid)
-			policyDoc.DataTo(policy)
+		if err = checkIfPolicyIsLead(policy); err != nil {
+			return err
 		}
 	} else {
 		policy.Uid = lib.NewDoc(policyFire)
@@ -121,6 +114,40 @@ func lead(authToken models.AuthToken, policy *models.Policy) error {
 	return err
 }
 
+func checkIfPolicyIsLead(policy *models.Policy) error {
+	var recoveredPolicy models.Policy
+	policyDoc, err := lib.GetFirestoreErr(models.PolicyCollection, policy.Uid)
+	if err != nil {
+		log.Printf("[checkIfPolicyIsLead] error getting policy %s from firebase: %s", policy.Uid, err.Error())
+		return nil
+	} else if !policyDoc.Exists() {
+		log.Printf("[checkIfPolicyIsLead] policy %s not found on Firebase", policy.Uid)
+		return nil
+	}
+
+	if err := policyDoc.DataTo(&recoveredPolicy); err != nil {
+		log.Printf("[checkIfPolicyIsLead] error converting policy %s data: %s", policy.Uid, err.Error())
+		return nil
+	}
+
+	if recoveredPolicy.Status != models.PolicyStatusPartnershipLead && recoveredPolicy.Status != models.PolicyStatusInitLead {
+		log.Printf("[checkIfPolicyIsLead] error policy %s is not a lead", policy.Uid)
+		return errors.New("policy is not a lead")
+	}
+
+	log.Printf("[checkIfPolicyIsLead] found lead for existing policy %s", policy.Uid)
+
+	policy.CreationDate = recoveredPolicy.CreationDate
+	policy.Status = recoveredPolicy.Status
+	policy.StatusHistory = recoveredPolicy.StatusHistory
+	policy.ProducerUid = recoveredPolicy.ProducerUid
+	policy.ProducerCode = recoveredPolicy.ProducerCode
+	policy.ProducerType = recoveredPolicy.ProducerType
+	policy.NetworkUid = recoveredPolicy.NetworkUid
+
+	return nil
+}
+
 func setPolicyProducerNode(policy *models.Policy, node *models.NetworkNode) {
 	policy.ProducerUid = node.Uid
 	policy.ProducerCode = node.Code
@@ -136,8 +163,10 @@ func setLeadData(policy *models.Policy) {
 	if policy.CreationDate.IsZero() {
 		policy.CreationDate = now
 	}
-	policy.Status = models.PolicyStatusInitLead
-	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
+	if policy.Status != models.PolicyStatusInitLead {
+		policy.Status = models.PolicyStatusInitLead
+		policy.StatusHistory = append(policy.StatusHistory, policy.Status)
+	}
 	log.Printf("[setLeadData] policy status %s", policy.Status)
 
 	policy.IsSign = false
@@ -156,7 +185,7 @@ func setLeadData(policy *models.Policy) {
 		policy.ProductVersion = "v1"
 	}
 
-	log.Println("[setLeadData] add information stet")
+	log.Println("[setLeadData] add information set")
 	policy.Attachments = &[]models.Attachment{{
 		Name:     "Precontrattuale",
 		FileName: "Precontrattuale.pdf",
