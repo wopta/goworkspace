@@ -42,8 +42,6 @@ type EmitRequest struct {
 }
 
 func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.Println("[EmitFx] Handler start --------------------------------------")
-
 	var (
 		request      EmitRequest
 		err          error
@@ -51,9 +49,7 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		responseEmit EmitResponse
 	)
 
-	origin = r.Header.Get("origin")
-	body := lib.ErrorByte(io.ReadAll(r.Body))
-	defer r.Body.Close()
+	log.Println("[EmitFx] Handler start --------------------------------------")
 
 	log.Println("[EmitFx] loading authToken from idToken...")
 
@@ -63,9 +59,24 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		log.Printf("[EmitFx] error getting authToken")
 		return "", nil, err
 	}
+	log.Printf(
+		"[EmitFx] authToken - type: '%s' role: '%s' uid: '%s' email: '%s'",
+		authToken.Type,
+		authToken.Role,
+		authToken.UserID,
+		authToken.Email,
+	)
+
+	origin = r.Header.Get("origin")
+	body := lib.ErrorByte(io.ReadAll(r.Body))
+	defer r.Body.Close()
 
 	log.Printf("[EmitFx] Request: %s", string(body))
-	json.Unmarshal([]byte(body), &request)
+	err = json.Unmarshal([]byte(body), &request)
+	if err != nil {
+		log.Printf("[EmitFx] error unmarshaling policy: %s", err.Error())
+		return "", nil, err
+	}
 
 	uid := request.Uid
 	log.Printf("[EmitFx] Uid: %s", uid)
@@ -90,7 +101,9 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		responseEmit = emit(authToken, &policy, request, origin)
 	}
 	b, e := json.Marshal(responseEmit)
+
 	log.Println("[EmitFx] Response: ", string(b))
+	log.Println("[EmitFx] Handler end ----------------------------------------")
 
 	return string(b), responseEmit, e
 }
@@ -227,13 +240,13 @@ func getEmitTypeFromPolicy(policy *models.Policy) string {
 }
 
 func emitApproval(policy *models.Policy) {
-	log.Printf("[EmitApproval] Policy Uid %s: Reserved Flow", policy.Uid)
+	log.Printf("[emitApproval] Policy Uid %s: Reserved Flow", policy.Uid)
 	policy.Status = models.PolicyStatusWaitForApproval
 	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
 }
 
 func emitBase(policy *models.Policy, origin string) {
-	log.Printf("[EmitBase] Policy Uid %s", policy.Uid)
+	log.Printf("[emitBase] Policy Uid %s", policy.Uid)
 	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 	now := time.Now().UTC()
 
@@ -242,9 +255,9 @@ func emitBase(policy *models.Policy, origin string) {
 	policy.EmitDate = now
 	policy.BigEmitDate = civil.DateTimeOf(now)
 	company, numb, tot := GetSequenceByCompany(strings.ToLower(policy.Company), firePolicy)
-	log.Printf("[EmitBase] codeCompany: %s", company)
-	log.Printf("[EmitBase] numberCompany: %d", numb)
-	log.Printf("[EmitBase] number: %d", tot)
+	log.Printf("[emitBase] codeCompany: %s", company)
+	log.Printf("[emitBase] numberCompany: %d", numb)
+	log.Printf("[emitBase] number: %d", tot)
 	policy.Number = tot
 	policy.NumberCompany = numb
 	policy.CodeCompany = company
@@ -253,7 +266,7 @@ func emitBase(policy *models.Policy, origin string) {
 }
 
 func emitSign(policy *models.Policy, origin string) {
-	log.Printf("[EmitSign] Policy Uid %s", policy.Uid)
+	log.Printf("[emitSign] Policy Uid %s", policy.Uid)
 
 	policy.IsSign = false
 	policy.Status = models.PolicyStatusToSign
@@ -268,7 +281,7 @@ func emitSign(policy *models.Policy, origin string) {
 }
 
 func emitPay(policy *models.Policy, origin string) {
-	log.Printf("[EmitPay] Policy Uid %s", policy.Uid)
+	log.Printf("[emitPay] Policy Uid %s", policy.Uid)
 
 	policy.IsPay = false
 	policy.PayUrl, _ = payment.PaymentController(origin, policy, product)

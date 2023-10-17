@@ -26,11 +26,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		toAddress mail.Address
 	)
 
-	log.Println("[AcceptanceFx] Handler start ----------------------------------------")
-
-	origin := r.Header.Get("origin")
-	policyUid := r.Header.Get("policyUid")
-	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
+	log.Println("[AcceptanceFx] Handler start --------------------------------")
 
 	log.Println("[AcceptanceFx] loading authToken from idToken...")
 
@@ -40,6 +36,17 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		log.Printf("[AcceptanceFx] error getting authToken")
 		return "", nil, err
 	}
+	log.Printf(
+		"[AcceptanceFx] authToken - type: '%s' role: '%s' uid: '%s' email: '%s'",
+		authToken.Type,
+		authToken.Role,
+		authToken.UserID,
+		authToken.Email,
+	)
+
+	origin := r.Header.Get("origin")
+	policyUid := r.Header.Get("policyUid")
+	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 
 	log.Printf("[AcceptanceFx] Policy Uid %s", policyUid)
 
@@ -109,6 +116,8 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	)
 
 	models.CreateAuditLog(r, string(body))
+
+	log.Println("[AcceptanceFx] Handler end ----------------------------------")
 
 	return `{"success":true}`, `{"success":true}`, nil
 }

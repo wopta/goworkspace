@@ -22,10 +22,6 @@ func LeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	log.Println("[LeadFx] Handler start --------------------------------------")
 
-	origin = r.Header.Get("Origin")
-	body := lib.ErrorByte(io.ReadAll(r.Body))
-	defer r.Body.Close()
-
 	log.Println("[LeadFx] loading authToken from idToken...")
 
 	token := r.Header.Get("Authorization")
@@ -34,6 +30,17 @@ func LeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		log.Printf("[LeadFx] error getting authToken")
 		return "", nil, err
 	}
+	log.Printf(
+		"[LeadFx] authToken - type: '%s' role: '%s' uid: '%s' email: '%s'",
+		authToken.Type,
+		authToken.Role,
+		authToken.UserID,
+		authToken.Email,
+	)
+
+	origin = r.Header.Get("Origin")
+	body := lib.ErrorByte(io.ReadAll(r.Body))
+	defer r.Body.Close()
 
 	log.Printf("[LeadFx] request: %s", string(body))
 	err = json.Unmarshal([]byte(body), &policy)
@@ -87,6 +94,7 @@ func lead(authToken models.AuthToken, policy *models.Policy) error {
 
 	if policy.Channel == "" {
 		policy.Channel = authToken.GetChannelByRoleV2()
+		log.Printf("[lead] setting policy channel to '%s'", policy.Channel)
 	}
 
 	networkNode = network.GetNetworkNodeByUid(authToken.UserID)

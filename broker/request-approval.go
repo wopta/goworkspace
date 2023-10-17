@@ -30,18 +30,25 @@ func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 
 	log.Println("[RequestApprovalFx] Handler start ---------------------------")
 
-	origin = r.Header.Get("Origin")
-	body := lib.ErrorByte(io.ReadAll(r.Body))
-	defer r.Body.Close()
-
 	log.Println("[RequestApprovalFx] loading authToken from idToken...")
 
 	token := r.Header.Get("Authorization")
 	authToken, err := models.GetAuthTokenFromIdToken(token)
 	if err != nil {
-		log.Printf("[EmitFx] error getting authToken")
+		log.Printf("[RequestApprovalFx] error getting authToken")
 		return "", nil, err
 	}
+	log.Printf(
+		"[RequestApprovalFx] authToken - type: '%s' role: '%s' uid: '%s' email: '%s'",
+		authToken.Type,
+		authToken.Role,
+		authToken.UserID,
+		authToken.Email,
+	)
+
+	origin = r.Header.Get("Origin")
+	body := lib.ErrorByte(io.ReadAll(r.Body))
+	defer r.Body.Close()
 
 	log.Printf("[RequestApprovalFx] request body: %s", string(body))
 	err = json.Unmarshal(body, &req)
@@ -62,7 +69,7 @@ func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 	allowedStatus := []string{models.PolicyStatusInitLead, models.PolicyStatusNeedsApproval}
 
 	if !policy.IsReserved || !lib.SliceContains(allowedStatus, policy.Status) {
-		log.Printf("[ProposalFx] cannot request approval for policy with status %s and isReserved %t", policy.Status, policy.IsReserved)
+		log.Printf("[RequestApprovalFx] cannot request approval for policy with status %s and isReserved %t", policy.Status, policy.IsReserved)
 		return "", nil, fmt.Errorf("cannot request approval for policy with status %s and isReserved %t", policy.Status, policy.IsReserved)
 	}
 
@@ -76,6 +83,9 @@ func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 
 	jsonOut, err := policy.Marshal()
 
+	log.Printf("[RequestApprovalFx] response: %s", string(jsonOut))
+	log.Println("[RequestApprovalFx] Handler end -----------------------------")
+
 	return string(jsonOut), policy, err
 }
 
@@ -84,32 +94,32 @@ func requestApproval(policy *models.Policy) error {
 		err error
 	)
 
-	log.Println("[RequestApproval] start -------------------------------------")
+	log.Println("[requestApproval] start -------------------------------------")
 
-	log.Println("[RequestApproval] starting bpmn flow...")
+	log.Println("[requestApproval] starting bpmn flow...")
 
 	state := runBrokerBpmn(policy, requestApprovalFlowKey)
 	if state == nil || state.Data == nil {
-		log.Println("[RequestApproval] error bpmn - state not set")
+		log.Println("[requestApproval] error bpmn - state not set")
 		return errors.New("error on bpmn - no data present")
 	}
 	if state.IsFailed {
-		log.Println("[RequestApproval] error bpmn - state failed")
+		log.Println("[requestApproval] error bpmn - state failed")
 		return nil
 	}
 
 	*policy = *state.Data
 
-	log.Printf("[RequestApproval] saving policy with uid %s to bigquery...", policy.Uid)
+	log.Printf("[requestApproval] saving policy with uid %s to bigquery...", policy.Uid)
 	policy.BigquerySave(origin)
 
-	log.Println("[RequestApproval] end ---------------------------------------")
+	log.Println("[requestApproval] end ---------------------------------------")
 
 	return err
 }
 
 func setRequestApprovalData(policy *models.Policy) {
-	log.Printf("[setRequestApproval] policy uid %s: reserved flow", policy.Uid)
+	log.Printf("[setRequestApprovalData] policy uid %s: reserved flow", policy.Uid)
 
 	setProposalNumber(policy)
 	reserved.SetReservedInfo(policy, mgaProduct)

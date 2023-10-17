@@ -29,11 +29,6 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 
 	log.Println("[ProposalFx] Handler start ----------------------------------")
 
-	origin = r.Header.Get("Origin")
-	body := lib.ErrorByte(io.ReadAll(r.Body))
-	defer r.Body.Close()
-
-	// TODO: remove when PROPOSAL_V2 will be fully integrated in prod
 	log.Println("[ProposalFx] loading authToken from idToken...")
 
 	token := r.Header.Get("Authorization")
@@ -42,6 +37,17 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 		log.Printf("[ProposalFx] error getting authToken")
 		return "", nil, err
 	}
+	log.Printf(
+		"[ProposalFx] authToken - type: '%s' role: '%s' uid: '%s' email: '%s'",
+		authToken.Type,
+		authToken.Role,
+		authToken.UserID,
+		authToken.Email,
+	)
+
+	origin = r.Header.Get("Origin")
+	body := lib.ErrorByte(io.ReadAll(r.Body))
+	defer r.Body.Close()
 
 	log.Printf("[ProposalFx] Request: %s", string(body))
 
@@ -95,6 +101,7 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 	}
 
 	log.Printf("[ProposalFx] response: %s", string(resp))
+	log.Println("[ProposalFx] Handler end ------------------------------------")
 
 	return string(resp), &policy, err
 }
