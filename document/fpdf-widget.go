@@ -1,10 +1,13 @@
 package document
 
 import (
+	"fmt"
 	"github.com/dustin/go-humanize"
 	"github.com/go-pdf/fpdf"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"log"
+	"os"
 	"strings"
 	"time"
 )
@@ -17,6 +20,12 @@ func mainHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 
 	location, err := time.LoadLocation("Europe/Rome")
 	lib.CheckError(err)
+
+	path, err := os.Getwd()
+	if err != nil {
+		log.Println(err)
+	}
+	fmt.Println(path)
 
 	policyStartDate := policy.StartDate.In(location)
 	policyEndDate := policy.EndDate.In(location)
@@ -103,6 +112,12 @@ func mainFooter(pdf *fpdf.Fpdf, productName string) {
 		footerText, logoPath string
 		x, y, height         float64
 	)
+
+	path, err := os.Getwd()
+	if err != nil {
+		log.Println(err)
+	}
+	fmt.Println(path)
 
 	switch productName {
 	case models.LifeProduct:
