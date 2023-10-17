@@ -298,3 +298,15 @@ func GetAssetPathByEnv(base string) string {
 
 	return res1
 }
+
+func GetAssetPathByEnvV2() string {
+	var path string
+	switch os.Getenv("env") {
+	case "local":
+		path = "../function-data/dev/assets/documents/"
+	case "dev", "prod":
+		path = "./serverless_function_source_code/assets/"
+	}
+
+	return path
+}
