@@ -40,13 +40,13 @@ func initFpdf() *fpdf.Fpdf {
 
 func downloadAssets() error {
 	const (
-		folderPath = "/tmp"
+		folderPath = "./tmp"
 	)
 
-	env := os.Getenv("env")
+	/*env := os.Getenv("env")
 	if env == "local" {
 		return nil
-	}
+	}*/
 
 	bucket := os.Getenv("GOOGLE_STORAGE_BUCKET")
 
@@ -58,10 +58,10 @@ func downloadAssets() error {
 		return fmt.Errorf("no files found")
 	}
 
-	/*err = os.Mkdir(folderPath, 0750)
+	err = os.Mkdir(folderPath, 0750)
 	if err != nil {
 		return err
-	}*/
+	}
 
 	for _, file := range filesList {
 		rawFile := lib.GetFromStorage(bucket, file, "")
@@ -70,6 +70,15 @@ func downloadAssets() error {
 		if err != nil {
 			return err
 		}
+	}
+
+	files, err := os.ReadDir(folderPath)
+	if err != nil {
+		return err
+	}
+
+	for _, file := range files {
+		log.Println(file.Name())
 	}
 
 	return nil
