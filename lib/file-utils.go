@@ -266,18 +266,15 @@ func GetByteByEnv(file string, isLocal bool) []byte {
 
 	case "local":
 		res1 = ErrorByte(os.ReadFile("../function-data/dev/" + file))
-
 	case "dev":
 		if isLocal {
-			res1 = ErrorByte(ioutil.ReadFile("./serverless_function_source_code/" + file))
+			res1 = ErrorByte(os.ReadFile("./serverless_function_source_code/" + file))
 		} else {
 			res1 = GetFromStorage("function-data", file, "")
 		}
-
 	case "prod":
-
 		if isLocal {
-			res1 = ErrorByte(ioutil.ReadFile("./serverless_function_source_code/" + file))
+			res1 = ErrorByte(os.ReadFile("./serverless_function_source_code/" + file))
 		} else {
 			res1 = GetFromStorage("core-350507-function-data", file, "")
 		}
@@ -286,18 +283,16 @@ func GetByteByEnv(file string, isLocal bool) []byte {
 	}
 	return res1
 }
+
 func GetAssetPathByEnv(base string) string {
 	var res1 string
 	switch os.Getenv("env") {
-
 	case "local":
 		res1 = base + "/assets"
-
 	case "dev":
 		res1 = "./serverless_function_source_code/assets"
 	case "prod":
 		res1 = "./serverless_function_source_code/assets"
-
 	default:
 	}
 

@@ -38,6 +38,43 @@ func initFpdf() *fpdf.Fpdf {
 	return pdf
 }
 
+func downloadAssets() error {
+	const (
+		folderPath = "./test/tmp"
+	)
+
+	/*env := os.Getenv("env")
+	if env == "local" {
+		return nil
+	}*/
+
+	bucket := os.Getenv("GOOGLE_STORAGE_BUCKET")
+
+	filesList, err := lib.ListGoogleStorageFolderContent("assets/documents")
+	if err != nil {
+		return err
+	}
+	if len(filesList) == 0 {
+		return fmt.Errorf("no files found")
+	}
+
+	err = os.Mkdir(folderPath, 0750)
+	if err != nil {
+		return err
+	}
+
+	for _, file := range filesList {
+		rawFile := lib.GetFromStorage(bucket, file, "")
+		filePath := fmt.Sprintf("%s/%s", folderPath, strings.SplitN(file, "/", 3)[2])
+		err = os.WriteFile(filePath, rawFile, 0750)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func loadCustomFonts(pdf *fpdf.Fpdf) {
 	pdf.AddUTF8Font("Montserrat", "", lib.GetAssetPathByEnv(basePath)+"/montserrat_light.ttf")
 	pdf.AddUTF8Font("Montserrat", "B", lib.GetAssetPathByEnv(basePath)+"/montserrat_bold.ttf")
