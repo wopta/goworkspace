@@ -73,6 +73,13 @@ func downloadAssets() error {
 		}
 	}
 
+	b, err := os.ReadFile(basePath + "logo_axa.png")
+	if err != nil {
+		log.Println(err.Error())
+		return err
+	}
+	log.Printf("logo axa: %s", string(b))
+
 	files, err := os.ReadDir(basePath)
 	if err != nil {
 		return err
