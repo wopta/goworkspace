@@ -66,7 +66,8 @@ func downloadAssets() error {
 	for _, file := range filesList {
 		rawFile := lib.GetFromStorage(bucket, file, "")
 		filePath := fmt.Sprintf("%s%s", folderPath, strings.SplitN(file, "/", 3)[2])
-		err = os.WriteFile(filePath, rawFile, 0750)
+		log.Printf("[downloadAssets] write file to: %s", filePath)
+		err = os.WriteFile(filePath, rawFile, 0666)
 		if err != nil {
 			return err
 		}
