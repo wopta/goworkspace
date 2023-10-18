@@ -6,9 +6,9 @@ replace github.com/wopta/goworkspace/reserved => ./
 
 require (
 	github.com/wopta/goworkspace/document v1.0.98
-	github.com/wopta/goworkspace/lib v1.0.76
-	github.com/wopta/goworkspace/models v1.1.47
-	github.com/wopta/goworkspace/product v1.0.48
+	github.com/wopta/goworkspace/lib v1.0.78
+	github.com/wopta/goworkspace/models v1.1.52
+	github.com/wopta/goworkspace/product v1.0.52
 )
 
 require (
@@ -22,7 +22,7 @@ require (
 	cloud.google.com/go/storage v1.29.0 // indirect
 	firebase.google.com/go v3.13.0+incompatible // indirect
 	firebase.google.com/go/v4 v4.10.0 // indirect
-	github.com/GoogleCloudPlatform/functions-framework-go v1.7.4 // indirect
+	github.com/GoogleCloudPlatform/functions-framework-go v1.7.2 // indirect
 	github.com/MicahParks/keyfunc v1.5.1 // indirect
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/antlr/antlr4/runtime/Go/antlr v0.0.0-20220527190237-ee62e23da966 // indirect
