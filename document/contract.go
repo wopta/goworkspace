@@ -27,7 +27,6 @@ func ContractFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 	return string(resp), respObj, nil
 }
 
-// TODO: handle product param
 func ContractObj(origin string, data models.Policy, networkNode *models.NetworkNode, product *models.Product) <-chan DocumentResponse {
 	r := make(chan DocumentResponse)
 
