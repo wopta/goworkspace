@@ -167,9 +167,28 @@ func GetLatestActiveProduct(productName, channel string, networkNode *models.Net
 	return product
 }
 
+func GetAgeInfo(productName, productVersion, channel string) (int, int) {
+	var ageMap map[string]map[string]int
+
+	rawMap := lib.GetFilesByEnv(fmt.Sprintf("products-v2/%s/%s/age_info.json", productName, productVersion))
+	err := json.Unmarshal(rawMap, &ageMap)
+	if err != nil {
+		return 0, 0
+	}
+	if ageMap[channel] != nil {
+		return ageMap[channel]["minAge"], ageMap[channel][minReservedAge]
+	}
+	return 0, 0
+}
+
 func replaceDatesInProduct(product *models.Product, channel string) error {
 	if product == nil {
 		return fmt.Errorf("no product found")
+	}
+
+	filePath := fmt.Sprintf("products-v2/%s/%s/age_info.json", product.Name, product.Version)
+	if !lib.CheckFileExistence(filePath) {
+		return fmt.Errorf("file not found")
 	}
 
 	jsonOut, err := product.Marshal()
@@ -183,7 +202,7 @@ func replaceDatesInProduct(product *models.Product, channel string) error {
 
 	productJson := string(jsonOut)
 
-	minAgeValue, minReservedAgeValue := ageMap[channel][product.Name][minAge], ageMap[channel][product.Name][minReservedAge]
+	minAgeValue, minReservedAgeValue := GetAgeInfo(product.Name, product.Version, channel)
 
 	log.Printf("[replaceDatesInProduct] minAge: %d minReservedAge: %d", minAgeValue, minReservedAgeValue)
 

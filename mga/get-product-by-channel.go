@@ -15,8 +15,9 @@ import (
 )
 
 type GetProductReq struct {
-	ProductName string `json:"productName"`
-	CompanyName string `json:"companyName"`
+	ProductName string `json:"name"`
+	CompanyName string `json:"company"` // DEPRECATED
+	Version     string `json:"version"` // DEPRECATED
 }
 
 func GetProductByChannelFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -54,7 +55,7 @@ func GetProductByChannelFx(w http.ResponseWriter, r *http.Request) (string, inte
 			warrant = networkNode.GetWarrant()
 		}
 		if warrant != nil && !networkNode.HasAccessToProduct(req.ProductName, warrant) {
-			log.Printf("[GetProductByChannelFx] network node %s hasn't access to product %s for company %s", networkNode.Uid, req.ProductName, req.CompanyName)
+			log.Printf("[GetProductByChannelFx] network node %s hasn't access to product %s", networkNode.Uid, req.ProductName)
 			return "", nil, fmt.Errorf("network node hasn't access to product")
 		}
 	}

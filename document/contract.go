@@ -3,6 +3,7 @@ package document
 import (
 	"encoding/base64"
 	"encoding/json"
+	prd "github.com/wopta/goworkspace/product"
 	"io"
 	"log"
 	"net/http"
@@ -20,7 +21,10 @@ func ContractFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 	defer r.Body.Close()
 	err := json.Unmarshal([]byte(req), &data)
 	lib.CheckError(err)
-	respObj := <-ContractObj(origin, data, nil, nil) // TODO review product nil
+
+	product := prd.GetProductV2(data.Name, data.ProductVersion, models.MgaChannel, nil, nil)
+
+	respObj := <-ContractObj(origin, data, nil, product) // TODO review product nil
 	resp, err := json.Marshal(respObj)
 
 	lib.CheckError(err)

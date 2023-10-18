@@ -39,15 +39,15 @@ func initFpdf() *fpdf.Fpdf {
 }
 
 func loadCustomFonts(pdf *fpdf.Fpdf) {
-	pdf.AddUTF8Font("Montserrat", "", lib.GetAssetPathByEnv(basePath)+"/montserrat_light.ttf")
-	pdf.AddUTF8Font("Montserrat", "B", lib.GetAssetPathByEnv(basePath)+"/montserrat_bold.ttf")
-	pdf.AddUTF8Font("Montserrat", "I", lib.GetAssetPathByEnv(basePath)+"/montserrat_italic.ttf")
+	pdf.AddUTF8Font("Montserrat", "", lib.GetAssetPathByEnvV2()+"montserrat_light.ttf")
+	pdf.AddUTF8Font("Montserrat", "B", lib.GetAssetPathByEnvV2()+"montserrat_bold.ttf")
+	pdf.AddUTF8Font("Montserrat", "I", lib.GetAssetPathByEnvV2()+"montserrat_italic.ttf")
 }
 
 func saveContract(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 	var filename string
 	if os.Getenv("env") == "local" {
-		err := pdf.OutputFileAndClose(basePath + "/contract.pdf")
+		err := pdf.OutputFileAndClose("./contract.pdf")
 		lib.CheckError(err)
 	} else {
 		var out bytes.Buffer
