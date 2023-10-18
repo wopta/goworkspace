@@ -48,6 +48,15 @@ func downloadAssets() error {
 		return nil
 	}
 
+	files, err := os.ReadDir("..")
+	if err != nil {
+		return err
+	}
+
+	for _, file := range files {
+		log.Println(file.Name())
+	}
+
 	bucket := os.Getenv("GOOGLE_STORAGE_BUCKET")
 
 	filesList, err := lib.ListGoogleStorageFolderContent("assets/documents")
@@ -58,7 +67,7 @@ func downloadAssets() error {
 		return fmt.Errorf("no files found")
 	}
 
-	err = os.Mkdir(basePath, 0750)
+	err = os.Mkdir(basePath, 0777)
 	if err != nil {
 		return err
 	}
@@ -73,6 +82,7 @@ func downloadAssets() error {
 		}
 	}
 
+	// TODO: remove this
 	b, err := os.ReadFile(basePath + "logo_axa.png")
 	if err != nil {
 		log.Println(err.Error())
@@ -80,7 +90,8 @@ func downloadAssets() error {
 	}
 	log.Printf("logo axa: %s", string(b))
 
-	files, err := os.ReadDir(basePath)
+	// TODO: remove this
+	files, err = os.ReadDir(basePath)
 	if err != nil {
 		return err
 	}

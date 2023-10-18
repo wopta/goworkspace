@@ -21,11 +21,12 @@ func mainHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 	location, err := time.LoadLocation("Europe/Rome")
 	lib.CheckError(err)
 
+	// TODO: remove this
 	path, err := os.Getwd()
 	if err != nil {
 		log.Println(err)
 	}
-	fmt.Println(path)
+	fmt.Printf("[mainHeader] path: %s", path)
 
 	policyStartDate := policy.StartDate.In(location)
 	policyEndDate := policy.EndDate.In(location)
@@ -113,11 +114,12 @@ func mainFooter(pdf *fpdf.Fpdf, productName string) {
 		x, y, height         float64
 	)
 
+	// TODO: remove this
 	path, err := os.Getwd()
 	if err != nil {
 		log.Println(err)
 	}
-	fmt.Println(path)
+	fmt.Printf("[mainFooter] path: %s", path)
 
 	switch productName {
 	case models.LifeProduct:
