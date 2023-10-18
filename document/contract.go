@@ -30,14 +30,6 @@ func ContractFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 func ContractObj(origin string, data models.Policy, networkNode *models.NetworkNode) <-chan DocumentResponse {
 	r := make(chan DocumentResponse)
 
-	/*err := downloadAssets()
-	if err != nil {
-		log.Printf("[ContractObj] error: %s", err.Error())
-		lib.CheckError(err)
-	}*/
-
-	//folderPath = lib.GetAssetPathByEnvV2()
-
 	go func() {
 		var (
 			filename string
