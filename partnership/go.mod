@@ -7,10 +7,13 @@ replace github.com/wopta/goworkspace/partnership => ./
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.3
 	github.com/golang-jwt/jwt/v4 v4.4.2
-	github.com/wopta/goworkspace/lib v1.0.77
-	github.com/wopta/goworkspace/models v1.1.51
-	github.com/wopta/goworkspace/product v1.0.51
-	github.com/wopta/goworkspace/quote v1.0.3
+	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
+	github.com/wopta/goworkspace/lib v1.0.78
+	github.com/wopta/goworkspace/models v1.1.52
+	github.com/wopta/goworkspace/network v1.0.4
+	github.com/wopta/goworkspace/product v1.0.52
+	github.com/wopta/goworkspace/quote v1.0.4
+	github.com/wopta/goworkspace/user v1.0.25
 )
 
 require (
@@ -57,16 +60,17 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180228061459-e0a39a4cb421 // indirect
 	github.com/modern-go/reflect2 v0.0.0-20180701023420-4b7aa43c6742 // indirect
-	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/pierrec/lz4/v4 v4.1.15 // indirect
 	github.com/pkg/sftp v1.13.5 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/richardlehane/mscfb v1.0.4 // indirect
 	github.com/richardlehane/msoleps v1.0.3 // indirect
 	github.com/sergi/go-diff v1.0.0 // indirect
-	github.com/sirupsen/logrus v1.9.0 // indirect
+	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
-	github.com/wopta/goworkspace/sellable v1.0.11 // indirect
+	github.com/wopta/goworkspace/mail v1.0.41 // indirect
+	github.com/wopta/goworkspace/sellable v1.0.29 // indirect
+	github.com/wopta/goworkspace/wiseproxy v1.0.3 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
 	github.com/xuri/excelize/v2 v2.7.0 // indirect
@@ -77,7 +81,8 @@ require (
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.21.0 // indirect
 	golang.org/x/crypto v0.7.0 // indirect
-	golang.org/x/mod v0.8.0 // indirect
+	golang.org/x/exp v0.0.0-20230801115018-d63ba01acd4b // indirect
+	golang.org/x/mod v0.11.0 // indirect
 	golang.org/x/net v0.9.0 // indirect
 	golang.org/x/oauth2 v0.7.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
