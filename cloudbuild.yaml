@@ -45,11 +45,11 @@ steps:
     mkdir -p /workspace/tmp/assets
     if [[ "${strarr[1]}" == *"dev"* ]]; then
     echo "dev enviroment"
-      gsutil -m cp -r gs://function-data/assets/documents/** /workspace/tmp/assets
+      gsutil -m cp -r gs://function-data/assets/documents/** /workspace/${strarr[0]}/tmp/assets
     fi
      if [[ "${strarr[1]}" == *"prod"* ]]; then
     echo "prod enviroment"
-      gsutil -m cp -r gs://core-350507-function-data/prod/assets/documents/** /workspace/tmp/assets
+      gsutil -m cp -r gs://core-350507-function-data/prod/assets/documents/** /workspace/${strarr[0]}/tmp/assets
     fi
     
     gcloud functions deploy ${strarr[0]} \
