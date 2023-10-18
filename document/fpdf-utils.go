@@ -104,21 +104,9 @@ func downloadAssets() error {
 }
 
 func loadCustomFonts(pdf *fpdf.Fpdf) {
-	pdf.AddUTF8Font("Montserrat", "", GetAssetPathByEnvV2()+"montserrat_light.ttf")
-	pdf.AddUTF8Font("Montserrat", "B", GetAssetPathByEnvV2()+"montserrat_bold.ttf")
-	pdf.AddUTF8Font("Montserrat", "I", GetAssetPathByEnvV2()+"montserrat_italic.ttf")
-}
-
-func GetAssetPathByEnvV2() string {
-	var path string
-	switch os.Getenv("env") {
-	case "local":
-		path = "../function-data/dev/assets/documents/"
-	case "dev", "prod":
-		path = "./serverless_function_source_code/tmp/assets/"
-	}
-
-	return path
+	pdf.AddUTF8Font("Montserrat", "", lib.GetAssetPathByEnvV2()+"montserrat_light.ttf")
+	pdf.AddUTF8Font("Montserrat", "B", lib.GetAssetPathByEnvV2()+"montserrat_bold.ttf")
+	pdf.AddUTF8Font("Montserrat", "I", lib.GetAssetPathByEnvV2()+"montserrat_italic.ttf")
 }
 
 func saveContract(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {

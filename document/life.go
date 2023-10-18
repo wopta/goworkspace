@@ -46,11 +46,11 @@ func LifeAxa(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode *
 
 	beneficiaryReferenceSection(pdf, policy)
 
-	//surveysSection(pdf, policy)
+	surveysSection(pdf, policy)
 
 	pdf.AddPage()
 
-	//statementsSection(pdf, policy)
+	statementsSection(pdf, policy)
 
 	offerResumeSection(pdf, policy)
 
