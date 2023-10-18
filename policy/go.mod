@@ -6,9 +6,10 @@ replace github.com/wopta/goworkspace/policy => ./
 
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.4
-	github.com/wopta/goworkspace/document v1.0.98
-	github.com/wopta/goworkspace/lib v1.0.68
-	github.com/wopta/goworkspace/models v1.1.43
+	github.com/wopta/goworkspace/document v1.1.2
+	github.com/wopta/goworkspace/lib v1.0.78
+	github.com/wopta/goworkspace/models v1.1.52
+	github.com/wopta/goworkspace/reserved v1.0.10
 	github.com/wopta/goworkspace/wiseproxy v1.0.3
 )
 
@@ -68,9 +69,11 @@ require (
 	github.com/richardlehane/msoleps v1.0.3 // indirect
 	github.com/ruudk/golang-pdf417 v0.0.0-20201230142125-a7e3863a1245 // indirect
 	github.com/sergi/go-diff v1.0.0 // indirect
-	github.com/sirupsen/logrus v1.9.0 // indirect
+	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
-	github.com/wopta/goworkspace/product v1.0.38 // indirect
+	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
+	github.com/ttacon/libphonenumber v1.2.1 // indirect
+	github.com/wopta/goworkspace/product v1.0.52 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
 	github.com/xuri/excelize/v2 v2.7.0 // indirect
