@@ -43,6 +43,7 @@ steps:
     gcloud functions deploy ${strarr[0]} \
     --region=europe-west1 \
     --source=/workspace/${strarr[0]} \
+    --source-asset-url=gs://function-data/${starr[1]}/assets/
     --entry-point=${name_camel} \
     --trigger-http \
     --runtime=go119 \
