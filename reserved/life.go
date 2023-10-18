@@ -20,10 +20,6 @@ type ReservedRuleOutput struct {
 func lifeReserved(policy *models.Policy) (bool, *models.ReservedInfo) {
 	log.Println("[lifeReserved]")
 
-	const (
-		rulesFileName = "life_reserved.json"
-	)
-
 	var output = ReservedRuleOutput{
 		IsReserved: false,
 		ReservedInfo: &models.ReservedInfo{
@@ -33,7 +29,7 @@ func lifeReserved(policy *models.Policy) (bool, *models.ReservedInfo) {
 	}
 
 	fx := new(models.Fx)
-	rulesFile := lib.GetRulesFile(rulesFileName)
+	rulesFile := lib.GetRulesFileV2(policy.Name, policy.ProductVersion, "reserved")
 	input := getInputData(policy)
 	log.Printf("[lifeReserved] input %v", string(input))
 	data := getReservedData(policy)
@@ -103,7 +99,7 @@ func getInputData(policy *models.Policy) []byte {
 func getReservedData(policy *models.Policy) []byte {
 	data := make(map[string]interface{})
 
-	reservedAge := prd.GetReservedAge(policy.Name, models.GetChannel(policy))
+	_, reservedAge := prd.GetAgeInfo(policy.Name, policy.ProductVersion, policy.Channel)
 	data["reservedAge"] = int64(reservedAge)
 
 	ret, err := json.Marshal(data)
