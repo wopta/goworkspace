@@ -13,11 +13,6 @@ import (
 func LifeReserved(policy models.Policy) (string, []byte) {
 	log.Println("[LifeReserved]")
 
-	err := downloadAssets()
-	if err != nil {
-		return "", nil
-	}
-
 	pdf := initFpdf()
 
 	lifeReservedFooter(pdf)
