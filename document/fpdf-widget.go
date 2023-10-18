@@ -5,7 +5,6 @@ import (
 	"github.com/go-pdf/fpdf"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	"log"
 	"strings"
 	"time"
 )
@@ -79,7 +78,6 @@ func mainHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 		pdf.SetXY(23, 13)
 		pdf.SetTextColor(92, 89, 92)
 		pdf.Cell(10, 6, productName)
-		log.Printf("[logo_wopta] path: %s", lib.GetAssetPathByEnvV2()+"logo_wopta.png")
 		pdf.ImageOptions(lib.GetAssetPathByEnvV2()+"logo_wopta.png", 170, 6, 0, 8, false, opt, 0, "")
 
 		setBlackBoldFont(pdf, standardTextSize)
