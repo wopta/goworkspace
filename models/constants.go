@@ -158,3 +158,7 @@ const (
 	RemittanceMgaFlow = "remittance_mga"
 	ProviderMgaFlow   = "provider_mga"
 )
+
+const (
+	FlowFileFormat = "flows/%s.json"
+)

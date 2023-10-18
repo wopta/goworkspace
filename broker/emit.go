@@ -89,19 +89,10 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	emitUpdatePolicy(&policy, request)
 
-	flowName = models.ECommerceFlow
-	if policy.Channel == models.MgaChannel {
-		flowName = models.MgaFlow
-	} else {
-		networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
-		if networkNode != nil {
-			warrant = networkNode.GetWarrant()
-			if warrant != nil {
-				flowName = warrant.GetFlowName(policy.Name)
-			}
-		}
+	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
+	if networkNode != nil {
+		warrant = networkNode.GetWarrant()
 	}
-	log.Printf("[EmitFx] flowName '%s'", flowName)
 
 	if lib.GetBoolEnv("PROPOSAL_V2") {
 		if policy.IsReserved && policy.Status != models.PolicyStatusApproved {
@@ -309,5 +300,5 @@ func setAdvance(policy *models.Policy, origin string) {
 
 	tr := transaction.PutByPolicy(*policy, "", origin, "", "", policy.PriceGross, policy.PriceNett, "", models.PayMethodRemittance, true)
 
-	transaction.CreateNetworkTransactions(policy, tr, networkNode)
+	transaction.CreateNetworkTransactions(policy, tr, networkNode, mgaProduct)
 }

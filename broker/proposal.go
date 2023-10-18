@@ -71,20 +71,6 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 			return "", nil, fmt.Errorf("cannot save proposal for policy with status %s", policy.Status)
 		}
 
-		flowName = models.ECommerceFlow
-		if policy.Channel == models.MgaChannel {
-			flowName = models.MgaFlow
-		} else {
-			networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
-			if networkNode != nil {
-				warrant = networkNode.GetWarrant()
-				if warrant != nil {
-					flowName = warrant.GetFlowName(policy.Name)
-				}
-			}
-		}
-		log.Printf("[ProposalFx] flowName '%s'", flowName)
-
 		err = proposal(&policy)
 		if err != nil {
 			log.Printf("[ProposalFx] error creating proposal: %s", err.Error())
@@ -120,6 +106,11 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 
 func proposal(policy *models.Policy) error {
 	log.Println("[proposal] starting bpmn flow...")
+
+	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
+	if networkNode != nil {
+		warrant = networkNode.GetWarrant()
+	}
 
 	state := runBrokerBpmn(policy, proposalFlowKey)
 	if state == nil || state.Data == nil {

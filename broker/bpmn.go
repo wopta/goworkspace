@@ -1,8 +1,6 @@
 package broker
 
 import (
-	"encoding/json"
-	"fmt"
 	"log"
 	"strings"
 
@@ -28,42 +26,26 @@ const (
 	leadFlowKey            = "lead"
 	proposalFlowKey        = "proposal"
 	requestApprovalFlowKey = "requestApproval"
-	flowFileFormat         = "flows/%s.json"
 )
 
 func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
-	log.Println("[runBrokerBpmn] configuring flow ----------------------------")
-
 	var (
-		err      error
 		flow     []models.Process
-		flowFile models.NodeSetting
-		flowByte []byte
+		flowFile *models.NodeSetting
 	)
+
+	log.Println("[runBrokerBpmn] configuring flow ----------------------------")
 
 	toAddress = mail.Address{}
 	ccAddress = mail.Address{}
 	fromAddress = mail.AddressAnna
 
-	log.Printf("[runBrokerBpmn] loading file for channel %s", policy.Channel)
-	switch policy.Channel {
-	case models.NetworkChannel:
-		flowByte = getNetworkNodeFlow(policy.Name)
-	case models.ECommerceChannel, models.MgaChannel:
-		flowByte = lib.GetFilesByEnv(fmt.Sprintf(flowFileFormat, policy.Channel))
-	default:
-		log.Printf("[runBrokerBpmn] error unavailable channel: '%s'", policy.Channel)
-		return nil
-	}
-	if len(flowByte) == 0 {
+	flowName, flowFile = policy.GetFlow(networkNode, warrant)
+	if flowFile == nil {
 		log.Println("[runBrokerBpmn] exiting bpmn - flowFile not loaded")
 		return nil
 	}
-	err = json.Unmarshal(flowByte, &flowFile)
-	if err != nil {
-		log.Printf("[runBrokerBpmn] error unmarshaling flow file: %s", err.Error())
-		return nil
-	}
+	log.Printf("[runBrokerBpmn] flowName '%s'", flowName)
 
 	product = prd.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, networkNode, warrant)
 	mgaProduct = prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
@@ -92,12 +74,15 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 		flow = flowFile.EmitFlow
 		switch policy.Channel {
 		case models.NetworkChannel:
-			toAddress = mail.GetContractorEmail(policy)
-			ccAddress = mail.GetNetworkNodeEmail(networkNode)
+			switch networkNode.Type {
+			case models.AgencyNetworkNodeType:
+				toAddress = mail.GetContractorEmail(policy)
+				ccAddress = mail.GetNetworkNodeEmail(networkNode)
+			case models.AgentNetworkNodeType:
+				toAddress = mail.GetNetworkNodeEmail(networkNode)
+			}
 		case models.MgaChannel, models.ECommerceChannel:
 			toAddress = mail.GetContractorEmail(policy)
-		default:
-			toAddress = mail.GetNetworkNodeEmail(networkNode)
 		}
 	default:
 		log.Println("[runBrokerBpmn] error flow not set")
@@ -252,22 +237,4 @@ func updateUserAndNetworkNode(state *bpmn.State) error {
 		return err
 	}
 	return network.UpdateNetworkNodePortfolio(origin, policy, networkNode)
-}
-
-func getNetworkNodeFlow(productName string) []byte {
-	if networkNode == nil {
-		log.Println("[getNetworkNodeFlow] error networkNode not set")
-		return []byte{}
-	}
-	if warrant == nil {
-		log.Printf("[getNetworkNodeFlow] error warrant not set for node %s", networkNode.Uid)
-		return []byte{}
-	}
-	product := warrant.GetProduct(productName)
-	if product == nil {
-		log.Printf("[getNetworkNodeFlow] error product not set for warrant %s", warrant.Name)
-		return []byte{}
-	}
-	log.Printf("[getNetworkNodeFlow] getting flow '%s' file for product '%s'", product.Flow, productName)
-	return lib.GetFilesByEnv(fmt.Sprintf(flowFileFormat, product.Flow))
 }

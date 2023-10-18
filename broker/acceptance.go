@@ -95,18 +95,12 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 
 	log.Println("[AcceptanceFx] sending acceptance email...")
 
-	flowName = models.ECommerceFlow
-	if policy.Channel == models.MgaChannel {
-		flowName = models.MgaFlow
-	} else {
-		networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
-		if networkNode != nil {
-			warrant = networkNode.GetWarrant()
-			if warrant != nil {
-				flowName = warrant.GetFlowName(policy.Name)
-			}
-		}
+	// TODO: port acceptance into bpmn to keep code centralized and dynamic
+	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
+	if networkNode != nil {
+		warrant = networkNode.GetWarrant()
 	}
+	flowName, _ = policy.GetFlow(networkNode, warrant)
 	log.Printf("[AcceptanceFx] flowName '%s'", flowName)
 
 	switch policy.Channel {

@@ -1,8 +1,6 @@
 package callback
 
 import (
-	"encoding/json"
-	"fmt"
 	"log"
 	"strings"
 
@@ -12,6 +10,7 @@ import (
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 	plc "github.com/wopta/goworkspace/policy"
+	prd "github.com/wopta/goworkspace/product"
 	tr "github.com/wopta/goworkspace/transaction"
 )
 
@@ -19,6 +18,7 @@ var (
 	origin, trSchedule, paymentMethod, flowName string
 	ccAddress, toAddress, fromAddress           mail.Address
 	networkNode                                 *models.NetworkNode
+	mgaProduct                                  *models.Product
 	warrant                                     *models.Warrant
 )
 
@@ -28,79 +28,72 @@ const (
 )
 
 func runCallbackBpmn(policy *models.Policy, flowKey string) *bpmn.State {
-	log.Println("[runCallbackBpmn] configuring flow")
-
 	var (
-		err           error
-		flow          []models.Process
-		setting       models.NodeSetting
-		settingFormat string = "products/%s/setting.json"
+		flow     []models.Process
+		flowFile *models.NodeSetting
 	)
 
+	log.Println("[runCallbackBpmn] configuring flow --------------------------")
+
+	toAddress = mail.Address{}
+	ccAddress = mail.Address{}
 	fromAddress = mail.AddressAnna
-	channel := policy.Channel
-	settingFile := fmt.Sprintf(settingFormat, channel)
 
-	log.Printf("[runCallbackBpmn] loading file for channel %s", channel)
-	settingByte := lib.GetFilesByEnv(settingFile)
-
-	err = json.Unmarshal(settingByte, &setting)
-	if err != nil {
-		log.Printf("[runCallbackBpmn] error unmarshaling setting file: %s", err.Error())
-		return nil
+	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
+	if networkNode != nil {
+		warrant = networkNode.GetWarrant()
 	}
 
-	state := bpmn.NewBpmn(*policy)
-
-	flowName = models.ECommerceFlow
-	if policy.Channel == models.MgaChannel {
-		flowName = models.MgaFlow
-	} else {
-		networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
-		if networkNode != nil {
-			warrant = networkNode.GetWarrant()
-			if warrant != nil {
-				flowName = warrant.GetFlowName(policy.Name)
-			}
-		}
+	flowName, flowFile = policy.GetFlow(networkNode, warrant)
+	if flowFile == nil {
+		log.Println("[runCallbackBpmn] exiting bpmn - flowFile not loaded")
+		return nil
 	}
 	log.Printf("[runCallbackBpmn] flowName '%s'", flowName)
 
-	// TODO: fix me - maybe get to/from/cc from setting.json?
+	mgaProduct = prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
+
+	// TODO: fix me - maybe get to/from/cc from flowFile.json?
 	switch flowKey {
 	case signFlowKey:
-		flow = setting.SignFlow
-		switch channel {
-		case models.AgencyChannel:
-			toAddress = mail.GetContractorEmail(policy)
-			ccAddress = mail.GetNetworkNodeEmail(networkNode)
+		flow = flowFile.SignFlow
+		switch policy.Channel {
+		case models.NetworkChannel:
+			switch networkNode.Type {
+			case models.AgencyNetworkNodeType:
+				toAddress = mail.GetContractorEmail(policy)
+				ccAddress = mail.GetNetworkNodeEmail(networkNode)
+			case models.AgentNetworkNodeType:
+				toAddress = mail.GetNetworkNodeEmail(networkNode)
+			}
 		case models.MgaChannel, models.ECommerceChannel:
 			toAddress = mail.GetContractorEmail(policy)
-		default:
-			toAddress = mail.GetNetworkNodeEmail(networkNode)
-			ccAddress = mail.Address{}
 		}
 	case payFlowKey:
-		flow = setting.PayFlow
-		switch channel {
-		case models.AgentChannel:
-			toAddress = mail.GetContractorEmail(policy)
-			ccAddress = mail.GetNetworkNodeEmail(networkNode)
+		flow = flowFile.PayFlow
+		switch policy.Channel {
+		case models.NetworkChannel:
+			switch networkNode.Type {
+			case models.AgentNetworkNodeType:
+				toAddress = mail.GetContractorEmail(policy)
+				ccAddress = mail.GetNetworkNodeEmail(networkNode)
+			case models.AgencyNetworkNodeType:
+				toAddress = mail.GetNetworkNodeEmail(networkNode)
+			}
 		case models.MgaChannel, models.ECommerceChannel:
 			toAddress = mail.GetContractorEmail(policy)
-		default:
-			toAddress = mail.GetNetworkNodeEmail(networkNode)
-			ccAddress = mail.Address{}
 		}
 	default:
 		log.Println("[runCallbackBpmn] error flow not set")
 		return nil
 	}
 
-	addHandlers(state)
-
 	flowHandlers := lib.SliceMap[models.Process, string](flow, func(h models.Process) string { return h.Name })
 	log.Printf("[runCallbackBpmn] starting %s flow with set handlers: %s", flowKey, strings.Join(flowHandlers, ","))
+
+	state := bpmn.NewBpmn(*policy)
+
+	addHandlers(state)
 
 	state.RunBpmn(flow)
 	return state
@@ -252,5 +245,5 @@ func payTransaction(state *bpmn.State) error {
 
 	transaction.BigQuerySave(origin)
 
-	return tr.CreateNetworkTransactions(policy, &transaction, networkNode)
+	return tr.CreateNetworkTransactions(policy, &transaction, networkNode, mgaProduct)
 }

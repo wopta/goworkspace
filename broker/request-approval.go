@@ -73,20 +73,6 @@ func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		return "", nil, fmt.Errorf("cannot request approval for policy with status %s and isReserved %t", policy.Status, policy.IsReserved)
 	}
 
-	flowName = models.ECommerceFlow
-	if policy.Channel == models.MgaChannel {
-		flowName = models.MgaFlow
-	} else {
-		networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
-		if networkNode != nil {
-			warrant = networkNode.GetWarrant()
-			if warrant != nil {
-				flowName = warrant.GetFlowName(policy.Name)
-			}
-		}
-	}
-	log.Printf("[RequestApprovalFx] flowName '%s'", flowName)
-
 	err = requestApproval(&policy)
 	if err != nil {
 		log.Printf("[RequestApprovalFx] error request approval: %s", err.Error())
@@ -107,6 +93,11 @@ func requestApproval(policy *models.Policy) error {
 	)
 
 	log.Println("[requestApproval] start -------------------------------------")
+
+	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
+	if networkNode != nil {
+		warrant = networkNode.GetWarrant()
+	}
 
 	log.Println("[requestApproval] starting bpmn flow...")
 

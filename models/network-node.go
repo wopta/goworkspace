@@ -236,3 +236,20 @@ func (nn *NetworkNode) HasAccessToProduct(productName string, warrant *Warrant) 
 
 	return false
 }
+
+func (nn *NetworkNode) GetNetworkNodeFlow(productName string, warrant *Warrant) (string, []byte) {
+	if warrant == nil {
+		log.Printf("[getNetworkNodeFlow] error warrant not set for node %s", nn.Uid)
+		return "", []byte{}
+	}
+
+	product := warrant.GetProduct(productName)
+	if product == nil {
+		log.Printf("[getNetworkNodeFlow] error product not set for warrant %s", warrant.Name)
+		return "", []byte{}
+	}
+
+	log.Printf("[getNetworkNodeFlow] getting flow '%s' file for product '%s'", product.Flow, productName)
+
+	return product.Flow, lib.GetFilesByEnv(fmt.Sprintf(FlowFileFormat, product.Flow))
+}

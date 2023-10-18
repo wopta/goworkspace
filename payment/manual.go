@@ -11,8 +11,9 @@ import (
 	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
-	"github.com/wopta/goworkspace/policy"
-	"github.com/wopta/goworkspace/transaction"
+	plc "github.com/wopta/goworkspace/policy"
+	prd "github.com/wopta/goworkspace/product"
+	trn "github.com/wopta/goworkspace/transaction"
 	"github.com/wopta/goworkspace/user"
 )
 
@@ -24,15 +25,17 @@ type ManualPaymentPayload struct {
 }
 
 func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.Println("[ManualPaymentFx] Handler start -----------------------------------------")
-	body := lib.ErrorByte(io.ReadAll(r.Body))
-	defer r.Body.Close()
 	var (
-		payload      ManualPaymentPayload
-		flowName     string
-		producerNode *models.NetworkNode
+		payload     ManualPaymentPayload
+		flowName    string
+		networkNode *models.NetworkNode
+		warrant     *models.Warrant
 	)
 
+	log.Println("[ManualPaymentFx] Handler start -----------------------------------------")
+
+	body := lib.ErrorByte(io.ReadAll(r.Body))
+	defer r.Body.Close()
 	err := lib.CheckPayload[ManualPaymentPayload](body, &payload, []string{"paymentMethod", "payDate", "transactionDate"})
 	if err != nil {
 		return "", nil, err
@@ -52,24 +55,24 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 	fireTransactions := lib.GetDatasetByEnv(origin, models.TransactionsCollection)
 	firePolicies := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 
-	var t models.Transaction
-	var p models.Policy
+	var transaction models.Transaction
+	var policy models.Policy
 
 	docsnap, err := lib.GetFirestoreErr(fireTransactions, transactionUid)
 	if err != nil {
 		log.Printf("[ManualPaymentFx] ERROR get transaction from firestore: %s", err.Error())
 		return `{"success":false}`, `{"success":false}`, nil
 	}
-	err = docsnap.DataTo(&t)
+	err = docsnap.DataTo(&transaction)
 	lib.CheckError(err)
 
-	if t.IsPay {
+	if transaction.IsPay {
 		log.Printf("[ManualPaymentFx] ERROR %s", errTransactionPaid)
 		errorMessage := `{"success":false, "errorMessage":"` + errTransactionPaid + `"}`
 		return errorMessage, errorMessage, nil
 	}
 
-	firePolicyTransactions := transaction.GetPolicyTransactions(origin, t.PolicyUid)
+	firePolicyTransactions := trn.GetPolicyTransactions(origin, transaction.PolicyUid)
 	log.Printf("[ManualPaymentFx] Found transactions %v", firePolicyTransactions)
 	canPayTransaction := false
 
@@ -90,56 +93,51 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		return errorMessage, errorMessage, nil
 	}
 
-	docsnap, err = lib.GetFirestoreErr(firePolicies, t.PolicyUid)
+	docsnap, err = lib.GetFirestoreErr(firePolicies, transaction.PolicyUid)
 	if err != nil {
 		log.Printf("[ManualPaymentFx] ERROR get policy from firestore: %s", err.Error())
 		return `{"success":false}`, `{"success":false}`, nil
 	}
-	err = docsnap.DataTo(&p)
+	err = docsnap.DataTo(&policy)
 	lib.CheckError(err)
 
-	if !p.IsSign {
+	if !policy.IsSign {
 		log.Printf("[ManualPaymentFx] ERROR %s", errPolicyNotSigned)
 		errorMessage := `{"success":false, "errorMessage":"` + errPolicyNotSigned + `"}`
 		return errorMessage, errorMessage, nil
 	}
 
-	ManualPayment(&t, origin, &payload)
+	ManualPayment(&transaction, origin, &payload)
 
-	flowName = models.ECommerceFlow
-	if p.Channel == models.MgaChannel {
-		flowName = models.MgaFlow
-	} else {
-		producerNode = network.GetNetworkNodeByUid(p.ProducerUid)
-		if producerNode != nil {
-			warrant := producerNode.GetWarrant()
-			if warrant != nil {
-				flowName = warrant.GetFlowName(p.Name)
-			}
-		}
+	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
+	if networkNode != nil {
+		warrant = networkNode.GetWarrant()
 	}
-	log.Printf("[ManualPaymentFx] flowName '%s'", flowName)
+	flowName, _ = policy.GetFlow(networkNode, warrant)
+	log.Printf("[runBrokerBpmn] flowName '%s'", flowName)
 
-	transaction.CreateNetworkTransactions(&p, &t, producerNode)
+	mgaProduct := prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
+
+	trn.CreateNetworkTransactions(&policy, &transaction, networkNode, mgaProduct)
 
 	// Update policy if needed
-	if !p.IsPay {
+	if !policy.IsPay {
 		// Create/Update document on user collection based on contractor fiscalCode
-		user.SetUserIntoPolicyContractor(&p, origin)
+		user.SetUserIntoPolicyContractor(&policy, origin)
 
 		// Get Policy contract
-		gsLink := <-document.GetFileV6(p, t.PolicyUid)
+		gsLink := <-document.GetFileV6(policy, transaction.PolicyUid)
 		log.Println("[ManualPaymentFx] contractGsLink: ", gsLink)
 
 		// Update Policy as paid
-		policy.SetPolicyPaid(&p, gsLink, origin)
+		plc.SetPolicyPaid(&policy, gsLink, origin)
 
 		// Send mail with the contract to the user
 		mail.SendMailContract(
-			p,
+			policy,
 			nil,
 			mail.AddressAnna,
-			mail.GetContractorEmail(&p),
+			mail.GetContractorEmail(&policy),
 			mail.Address{},
 			flowName,
 		)

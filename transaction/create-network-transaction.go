@@ -18,12 +18,12 @@ func createNetworkTransaction(
 	transaction *models.Transaction,
 	node *models.NetworkNode,
 	commission float64, // Amount
-	accountType, paymentType, name string,
+	mgaAccountType, paymentType, name string,
 ) (*models.NetworkTransaction, error) {
 	log.Printf(
 		"[createNetworkTransaction] name '%s' accountType '%s' paymentType '%s' commission '%f' amount '%f'",
 		name,
-		accountType,
+		mgaAccountType,
 		paymentType,
 		commission,
 		transaction.Amount,
@@ -38,10 +38,6 @@ func createNetworkTransaction(
 		amount = transaction.Amount - commission
 	}
 
-	if accountType == models.AccountTypePassive {
-		amount = -amount
-	}
-
 	netTransaction := models.NetworkTransaction{
 		Uid:              uuid.New().String(),
 		PolicyUid:        policy.Uid,
@@ -49,7 +45,7 @@ func createNetworkTransaction(
 		NetworkUid:       node.NetworkUid,
 		NetworkNodeUid:   node.Uid,
 		NetworkNodeType:  node.Type,
-		AccountType:      accountType,
+		AccountType:      mgaAccountType,
 		PaymentType:      paymentType,
 		Amount:           amount,
 		AmountNet:        amount, // TBD
@@ -77,18 +73,29 @@ func createNetworkTransaction(
 	return &netTransaction, err
 }
 
-func createCompanyNetworkTransaction(policy *models.Policy, transaction *models.Transaction, producerNode *models.NetworkNode) (*models.NetworkTransaction, error) {
+func createCompanyNetworkTransaction(
+	policy *models.Policy,
+	transaction *models.Transaction,
+	producerNode *models.NetworkNode,
+	mgaProduct *models.Product,
+) (*models.NetworkTransaction, error) {
 	log.Println("[createCompanyNetworkTransaction]")
 
 	var code string
 
-	prod, err := product.GetProduct(policy.Name, policy.ProductVersion, models.MgaChannel)
-	if err != nil {
-		log.Printf("[createCompanyNetworkTransaction] error getting mga product: %s", err.Error())
-		return nil, err
+	if isGapCamper(policy) {
+		log.Println("[GetCommissionByNode] overrinding product commissions for Gap camper")
+		mgaProduct.Offers["base"].Commissions.NewBusiness = 0.22
+		mgaProduct.Offers["base"].Commissions.NewBusinessPassive = 0.22
+		mgaProduct.Offers["base"].Commissions.Renew = 0
+		mgaProduct.Offers["base"].Commissions.RenewPassive = 0
+		mgaProduct.Offers["complete"].Commissions.NewBusiness = 0.37
+		mgaProduct.Offers["complete"].Commissions.NewBusinessPassive = 0.37
+		mgaProduct.Offers["complete"].Commissions.Renew = 0
+		mgaProduct.Offers["complete"].Commissions.RenewPassive = 0
 	}
 
-	commissionCompany := product.GetCommissionByNode(policy, prod, false)
+	commissionCompany := product.GetCommissionByProduct(policy, mgaProduct, false)
 
 	if producerNode != nil {
 		code = producerNode.Code
@@ -109,37 +116,43 @@ func createCompanyNetworkTransaction(policy *models.Policy, transaction *models.
 	)
 }
 
-func CreateNetworkTransactions(policy *models.Policy, transaction *models.Transaction, producerNode *models.NetworkNode) error {
+func CreateNetworkTransactions(
+	policy *models.Policy,
+	transaction *models.Transaction,
+	producerNode *models.NetworkNode,
+	mgaProduct *models.Product,
+) error {
 	log.Println("[CreateNetworkTransactions]")
 
-	var (
-		err error
-	)
+	var err error
 
-	_, err = createCompanyNetworkTransaction(policy, transaction, producerNode)
+	_, err = createCompanyNetworkTransaction(policy, transaction, producerNode, mgaProduct)
 	if err != nil {
 		log.Printf("[CreateNetworkTransactions] error creating company network-transaction: %s", err.Error())
 		return err
 	}
 
-	if policy.ProducerUid != "" && policy.ProducerType != "partnership" { // use constant
+	if policy.ProducerUid != "" && policy.ProducerType != models.PartnershipNetworkNodeType {
 		network.TraverseWithCallbackNetworkByNodeUid(producerNode, "", func(currentNode *models.NetworkNode, currentName string) string {
 			var (
 				accountType, paymentType string
-				prod                     models.Product
 				baseName                 string
 			)
 
-			for _, p := range currentNode.Products {
-				if p.Name == policy.Name {
-					prod = p
-					break
-				}
+			warrant := currentNode.GetWarrant()
+			if warrant == nil {
+				log.Printf("[CreateNetworkTransactions] error getting warrant for node: %s", currentNode.Uid)
+				return baseName
+			}
+			prod := warrant.GetProduct(policy.Name)
+			if warrant == nil {
+				log.Printf("[CreateNetworkTransactions] error getting product for warrant: %s", warrant.Name)
+				return baseName
 			}
 
 			accountType = getAccountType(transaction)
 			paymentType = getPaymentType(transaction, policy, currentNode)
-			commission := product.GetCommissionByNode(policy, &prod, policy.ProducerUid == currentNode.Uid)
+			commission := product.GetCommissionByProduct(policy, prod, policy.ProducerUid == currentNode.Uid)
 
 			if currentName != "" {
 				baseName = strings.ToUpper(strings.Join([]string{currentName, currentNode.Code}, "__"))
@@ -174,4 +187,11 @@ func getPaymentType(transaction *models.Transaction, policy *models.Policy, prod
 		return models.PaymentTypeRemittanceMga
 	}
 	return models.PaymentTypeCommission
+}
+
+func isGapCamper(policy *models.Policy) bool {
+	return policy.Name == models.GapProduct &&
+		len(policy.Assets) > 0 &&
+		policy.Assets[0].Vehicle != nil &&
+		policy.Assets[0].Vehicle.VehicleType == "camper"
 }
