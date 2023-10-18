@@ -108,6 +108,7 @@ func PaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 				mail.AddressAnna,
 				mail.GetContractorEmail(&p),
 				mail.Address{},
+				models.ECommerceFlow, // only for compiling - not used
 			)
 
 			response = `{

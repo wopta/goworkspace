@@ -1,7 +1,6 @@
 package broker
 
 import (
-	"github.com/wopta/goworkspace/network"
 	"io"
 	"log"
 	"net/http"
@@ -10,6 +9,8 @@ import (
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
+	plc "github.com/wopta/goworkspace/policy"
 )
 
 type AcceptancePayload struct {
@@ -25,11 +26,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		toAddress mail.Address
 	)
 
-	log.Println("[AcceptanceFx] Handler start ----------------------------------------")
-
-	origin := r.Header.Get("origin")
-	policyUid := r.Header.Get("policyUid")
-	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
+	log.Println("[AcceptanceFx] Handler start --------------------------------")
 
 	log.Println("[AcceptanceFx] loading authToken from idToken...")
 
@@ -39,6 +36,17 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		log.Printf("[AcceptanceFx] error getting authToken")
 		return "", nil, err
 	}
+	log.Printf(
+		"[AcceptanceFx] authToken - type: '%s' role: '%s' uid: '%s' email: '%s'",
+		authToken.Type,
+		authToken.Role,
+		authToken.UserID,
+		authToken.Email,
+	)
+
+	origin := r.Header.Get("origin")
+	policyUid := r.Header.Get("policyUid")
+	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 
 	log.Printf("[AcceptanceFx] Policy Uid %s", policyUid)
 
@@ -52,7 +60,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		return `{"success":false}`, `{"success":false}`, nil
 	}
 
-	policy, err = GetPolicy(policyUid, origin)
+	policy, err = plc.GetPolicy(policyUid, origin)
 	lib.CheckError(err)
 
 	if policy.Status != models.PolicyStatusWaitForApproval {
@@ -87,27 +95,38 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 
 	log.Println("[AcceptanceFx] sending acceptance email...")
 
+	// TODO: port acceptance into bpmn to keep code centralized and dynamic
 	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
+	if networkNode != nil {
+		warrant = networkNode.GetWarrant()
+	}
+	flowName, _ = policy.GetFlow(networkNode, warrant)
+	log.Printf("[AcceptanceFx] flowName '%s'", flowName)
 
 	switch policy.Channel {
 	case models.MgaChannel:
 		toAddress = mail.Address{
 			Address: authToken.Email,
 		}
-	case models.AgentChannel, models.AgencyChannel:
+	case models.NetworkChannel:
 		toAddress = mail.GetNetworkNodeEmail(networkNode)
 	default:
 		toAddress = mail.GetContractorEmail(&policy)
 	}
+
+	log.Printf("[AcceptanceFx] toAddress '%s'", toAddress.String())
 
 	mail.SendMailReservedResult(
 		policy,
 		mail.AddressAssunzione,
 		toAddress,
 		mail.Address{},
+		flowName,
 	)
 
 	models.CreateAuditLog(r, string(body))
+
+	log.Println("[AcceptanceFx] Handler end ----------------------------------")
 
 	return `{"success":true}`, `{"success":true}`, nil
 }

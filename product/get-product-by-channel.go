@@ -46,7 +46,7 @@ func GetProduct(name, version, channel string) (*models.Product, error) {
 Returns the requested product version for the specified channel based on the provided input parameters, including
 product name, version, and channel.
 */
-func GetProductV2(productName, productVersion, channel string, networkNode *models.NetworkNode) *models.Product {
+func GetProductV2(productName, productVersion, channel string, networkNode *models.NetworkNode, warrant *models.Warrant) *models.Product {
 	var (
 		product *models.Product
 	)
@@ -73,7 +73,7 @@ func GetProductV2(productName, productVersion, channel string, networkNode *mode
 		return nil
 	}
 
-	overrideProductInfo(product, networkNode)
+	overrideProductInfo(product, networkNode, warrant)
 
 	return product
 }
@@ -145,7 +145,7 @@ not nil, and it possesses a custom journey product, the defined steps will take 
 Furthermore, if the network node has a warrant, payment providers will be filtered based on the specified flow
 for the requested product.
 */
-func GetLatestActiveProduct(productName, channel string, networkNode *models.NetworkNode) *models.Product {
+func GetLatestActiveProduct(productName, channel string, networkNode *models.NetworkNode, warrant *models.Warrant) *models.Product {
 	var (
 		product *models.Product
 	)
@@ -160,7 +160,7 @@ func GetLatestActiveProduct(productName, channel string, networkNode *models.Net
 		return nil
 	}
 
-	overrideProductInfo(product, networkNode)
+	overrideProductInfo(product, networkNode, warrant)
 
 	log.Println("[GetLatestActiveProduct] function end ---------------------")
 
@@ -230,12 +230,12 @@ func replaceDatesInProduct(product *models.Product, channel string) error {
 	return err
 }
 
-func overrideProductInfo(product *models.Product, networkNode *models.NetworkNode) {
+func overrideProductInfo(product *models.Product, networkNode *models.NetworkNode, warrant *models.Warrant) {
 	if networkNode == nil {
 		return
 	}
 
-	if networkNode.HasAccessToProduct(product.Name) {
+	if networkNode.HasAccessToProduct(product.Name, warrant) {
 		for _, nodeProduct := range networkNode.Products {
 			if nodeProduct.Name == product.Name && len(nodeProduct.Steps) > 0 {
 				log.Printf("[GetLatestActiveProduct] overriding steps for product %s", product.Name)
@@ -243,7 +243,6 @@ func overrideProductInfo(product *models.Product, networkNode *models.NetworkNod
 			}
 		}
 
-		warrant := networkNode.GetWarrant()
 		if warrant != nil {
 			paymentProviders := make([]models.PaymentProvider, 0)
 			warrantProduct := warrant.GetProduct(product.Name)

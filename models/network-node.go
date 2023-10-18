@@ -209,7 +209,7 @@ func (nn *NetworkNode) GetWarrant() *Warrant {
 	return warrant
 }
 
-func (nn *NetworkNode) HasAccessToProduct(productName string) bool {
+func (nn *NetworkNode) HasAccessToProduct(productName string, warrant *Warrant) bool {
 	log.Println("[HasAccessToProduct] method start -----------------")
 
 	needCheckTypes := []string{AgencyNetworkNodeType, AgentNetworkNodeType, BrokerNetworkNodeType}
@@ -218,7 +218,9 @@ func (nn *NetworkNode) HasAccessToProduct(productName string) bool {
 		return true
 	}
 
-	warrant := nn.GetWarrant()
+	if warrant == nil {
+		warrant = nn.GetWarrant()
+	}
 	if warrant == nil {
 		log.Printf("[HasAccessToProduct] no %s warrant found", nn.Warrant)
 		return false
@@ -233,4 +235,21 @@ func (nn *NetworkNode) HasAccessToProduct(productName string) bool {
 	}
 
 	return false
+}
+
+func (nn *NetworkNode) GetNetworkNodeFlow(productName string, warrant *Warrant) (string, []byte) {
+	if warrant == nil {
+		log.Printf("[getNetworkNodeFlow] error warrant not set for node %s", nn.Uid)
+		return "", []byte{}
+	}
+
+	product := warrant.GetProduct(productName)
+	if product == nil {
+		log.Printf("[getNetworkNodeFlow] error product not set for warrant %s", warrant.Name)
+		return "", []byte{}
+	}
+
+	log.Printf("[getNetworkNodeFlow] getting flow '%s' file for product '%s'", product.Flow, productName)
+
+	return product.Flow, lib.GetFilesByEnv(fmt.Sprintf(FlowFileFormat, product.Flow))
 }

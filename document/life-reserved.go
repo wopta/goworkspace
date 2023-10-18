@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func LifeReserved(policy models.Policy) (string, []byte) {
+func LifeReserved(policy models.Policy, product *models.Product) (string, []byte) {
 	log.Println("[LifeReserved]")
 
 	pdf := initFpdf()
@@ -23,7 +23,7 @@ func LifeReserved(policy models.Policy) (string, []byte) {
 
 	insuredInfoSection(pdf, &policy)
 
-	guaranteesMap, slugs := loadLifeGuarantees(&policy)
+	guaranteesMap, slugs := loadLifeGuarantees(&policy, product)
 
 	lifeGuaranteesTable(pdf, guaranteesMap, slugs)
 

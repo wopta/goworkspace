@@ -14,7 +14,9 @@ import (
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
 	"github.com/wopta/goworkspace/payment"
+	plc "github.com/wopta/goworkspace/policy"
 	"github.com/wopta/goworkspace/question"
 	"github.com/wopta/goworkspace/transaction"
 )
@@ -40,8 +42,6 @@ type EmitRequest struct {
 }
 
 func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.Println("[EmitFx] Handler start --------------------------------------")
-
 	var (
 		request      EmitRequest
 		err          error
@@ -49,9 +49,7 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		responseEmit EmitResponse
 	)
 
-	origin = r.Header.Get("origin")
-	body := lib.ErrorByte(io.ReadAll(r.Body))
-	defer r.Body.Close()
+	log.Println("[EmitFx] Handler start --------------------------------------")
 
 	log.Println("[EmitFx] loading authToken from idToken...")
 
@@ -61,20 +59,40 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		log.Printf("[EmitFx] error getting authToken")
 		return "", nil, err
 	}
+	log.Printf(
+		"[EmitFx] authToken - type: '%s' role: '%s' uid: '%s' email: '%s'",
+		authToken.Type,
+		authToken.Role,
+		authToken.UserID,
+		authToken.Email,
+	)
+
+	origin = r.Header.Get("origin")
+	body := lib.ErrorByte(io.ReadAll(r.Body))
+	defer r.Body.Close()
 
 	log.Printf("[EmitFx] Request: %s", string(body))
-	json.Unmarshal([]byte(body), &request)
+	err = json.Unmarshal([]byte(body), &request)
+	if err != nil {
+		log.Printf("[EmitFx] error unmarshaling policy: %s", err.Error())
+		return "", nil, err
+	}
 
 	uid := request.Uid
 	log.Printf("[EmitFx] Uid: %s", uid)
 
-	policy, err = GetPolicy(uid, origin)
+	policy, err = plc.GetPolicy(uid, origin)
 	lib.CheckError(err)
 
 	policyJsonLog, _ := policy.Marshal()
 	log.Printf("[EmitFx] Policy %s JSON: %s", uid, string(policyJsonLog))
 
 	emitUpdatePolicy(&policy, request)
+
+	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
+	if networkNode != nil {
+		warrant = networkNode.GetWarrant()
+	}
 
 	if lib.GetBoolEnv("PROPOSAL_V2") {
 		if policy.IsReserved && policy.Status != models.PolicyStatusApproved {
@@ -86,7 +104,9 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		responseEmit = emit(authToken, &policy, request, origin)
 	}
 	b, e := json.Marshal(responseEmit)
+
 	log.Println("[EmitFx] Response: ", string(b))
+	log.Println("[EmitFx] Handler end ----------------------------------------")
 
 	return string(b), responseEmit, e
 }
@@ -108,6 +128,7 @@ func emit(authToken models.AuthToken, policy *models.Policy, request EmitRequest
 			mail.AddressAnna,
 			mail.GetContractorEmail(policy),
 			mail.GetAgentEmail(policy),
+			models.ProviderMgaFlow, // With PROPOSAL_V2 turned off, the only flow that should get here is the old agent
 		)
 	case typeEmit:
 		log.Printf("[Emit] Emitting - Policy Uid %s", policy.Uid)
@@ -190,7 +211,7 @@ func emitV2(authToken models.AuthToken, policy *models.Policy, request EmitReque
 }
 
 func emitUpdatePolicy(policy *models.Policy, request EmitRequest) {
-	log.Println("[emitUpdatePolicy] start --------------------")
+	log.Println("[emitUpdatePolicy] start ------------------------------------")
 	if policy.Statements == nil || len(*policy.Statements) == 0 {
 		if request.Statements != nil {
 			log.Println("[emitUpdatePolicy] inject policy statements from request")
@@ -204,7 +225,7 @@ func emitUpdatePolicy(policy *models.Policy, request EmitRequest) {
 	if policy.PaymentSplit == "" {
 		policy.PaymentSplit = request.PaymentSplit
 	}
-	log.Println("[emitUpdatePolicy] end --------------------")
+	log.Println("[emitUpdatePolicy] end --------------------------------------")
 }
 
 func getEmitTypeFromPolicy(policy *models.Policy) string {
@@ -223,13 +244,13 @@ func getEmitTypeFromPolicy(policy *models.Policy) string {
 }
 
 func emitApproval(policy *models.Policy) {
-	log.Printf("[EmitApproval] Policy Uid %s: Reserved Flow", policy.Uid)
+	log.Printf("[emitApproval] Policy Uid %s: Reserved Flow", policy.Uid)
 	policy.Status = models.PolicyStatusWaitForApproval
 	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
 }
 
 func emitBase(policy *models.Policy, origin string) {
-	log.Printf("[EmitBase] Policy Uid %s", policy.Uid)
+	log.Printf("[emitBase] Policy Uid %s", policy.Uid)
 	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 	now := time.Now().UTC()
 
@@ -238,9 +259,9 @@ func emitBase(policy *models.Policy, origin string) {
 	policy.EmitDate = now
 	policy.BigEmitDate = civil.DateTimeOf(now)
 	company, numb, tot := GetSequenceByCompany(strings.ToLower(policy.Company), firePolicy)
-	log.Printf("[EmitBase] codeCompany: %s", company)
-	log.Printf("[EmitBase] numberCompany: %d", numb)
-	log.Printf("[EmitBase] number: %d", tot)
+	log.Printf("[emitBase] codeCompany: %s", company)
+	log.Printf("[emitBase] numberCompany: %d", numb)
+	log.Printf("[emitBase] number: %d", tot)
 	policy.Number = tot
 	policy.NumberCompany = numb
 	policy.CodeCompany = company
@@ -249,13 +270,13 @@ func emitBase(policy *models.Policy, origin string) {
 }
 
 func emitSign(policy *models.Policy, origin string) {
-	log.Printf("[EmitSign] Policy Uid %s", policy.Uid)
+	log.Printf("[emitSign] Policy Uid %s", policy.Uid)
 
 	policy.IsSign = false
 	policy.Status = models.PolicyStatusToSign
 	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusContact, models.PolicyStatusToSign)
 
-	p := <-document.ContractObj(origin, *policy, networkNode)
+	p := <-document.ContractObj(origin, *policy, networkNode, mgaProduct)
 	policy.DocumentName = p.LinkGcs
 	_, signResponse, _ := document.NamirialOtpV6(*policy, origin)
 	policy.ContractFileId = signResponse.FileId
@@ -264,10 +285,10 @@ func emitSign(policy *models.Policy, origin string) {
 }
 
 func emitPay(policy *models.Policy, origin string) {
-	log.Printf("[EmitPay] Policy Uid %s", policy.Uid)
+	log.Printf("[emitPay] Policy Uid %s", policy.Uid)
 
 	policy.IsPay = false
-	policy.PayUrl, _ = payment.PaymentController(origin, policy)
+	policy.PayUrl, _ = payment.PaymentController(origin, policy, product)
 }
 
 func setAdvance(policy *models.Policy, origin string) {
@@ -279,5 +300,5 @@ func setAdvance(policy *models.Policy, origin string) {
 
 	tr := transaction.PutByPolicy(*policy, "", origin, "", "", policy.PriceGross, policy.PriceNett, "", models.PayMethodRemittance, true)
 
-	transaction.CreateNetworkTransactions(policy, tr, networkNode)
+	transaction.CreateNetworkTransactions(policy, tr, networkNode, mgaProduct)
 }

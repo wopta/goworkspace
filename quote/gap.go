@@ -18,12 +18,16 @@ import (
 )
 
 func GapFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	var (
+		policy  *models.Policy
+		warrant *models.Warrant
+	)
+
 	log.Println("[GapFx] handler start --------------------------------------")
 
 	req := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 
-	var policy *models.Policy
 	err := json.Unmarshal(req, &policy)
 	lib.CheckError(err)
 
@@ -32,8 +36,11 @@ func GapFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 
 	log.Println("[GapFx] load network node")
 	networkNode := network.GetNetworkNodeByUid(authToken.UserID)
+	if networkNode != nil {
+		warrant = networkNode.GetWarrant()
+	}
 
-	Gap(policy, authToken.GetChannelByRoleV2(), networkNode)
+	Gap(policy, authToken.GetChannelByRoleV2(), networkNode, warrant)
 	policyJson, err := policy.Marshal()
 
 	log.Printf("[GapFx] response: %s", string(policyJson))
@@ -43,8 +50,8 @@ func GapFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 	return string(policyJson), policy, err
 }
 
-func Gap(policy *models.Policy, channel string, networkNode *models.NetworkNode) {
-	product, err := sellable.Gap(policy, channel, networkNode)
+func Gap(policy *models.Policy, channel string, networkNode *models.NetworkNode, warrant *models.Warrant) {
+	product, err := sellable.Gap(policy, channel, networkNode, warrant)
 	lib.CheckError(err)
 
 	policy.Assets[0].Guarantees = getGuarantees(*product)

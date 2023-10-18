@@ -28,7 +28,10 @@ const (
 )
 
 func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	var data models.Policy
+	var (
+		data    models.Policy
+		warrant *models.Warrant
+	)
 
 	log.Println("[LifeFx] handler start ----------------------")
 
@@ -51,10 +54,13 @@ func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	log.Println("[LifeFx] loading network node")
 	networkNode := network.GetNetworkNodeByUid(authToken.UserID)
+	if networkNode != nil {
+		warrant = networkNode.GetWarrant()
+	}
 
 	log.Println("[LifeFx] start quoting")
 
-	result, err := Life(data, authToken.GetChannelByRoleV2(), networkNode)
+	result, err := Life(data, authToken.GetChannelByRoleV2(), networkNode, warrant)
 	jsonOut, err := json.Marshal(result)
 
 	log.Printf("[LifeFx] response: %s", string(jsonOut))
@@ -65,7 +71,7 @@ func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 }
 
-func Life(data models.Policy, channel string, networkNode *models.NetworkNode) (models.Policy, error) {
+func Life(data models.Policy, channel string, networkNode *models.NetworkNode, warrant *models.Warrant) (models.Policy, error) {
 	var err error
 
 	log.Println("[Life] function start --------------------------------------")
@@ -79,7 +85,7 @@ func Life(data models.Policy, channel string, networkNode *models.NetworkNode) (
 	var selectRow []string
 
 	log.Printf("[Life] call sellable")
-	ruleProduct, err := sellable.Life(&data, channel, networkNode)
+	ruleProduct, err := sellable.Life(&data, channel, networkNode, warrant)
 	if err != nil {
 		log.Printf("[Life] error in sellable: %s", err.Error())
 		return models.Policy{}, err

@@ -477,11 +477,11 @@ func getRenew(p models.Policy) string {
 	var result string
 	now := time.Now()
 	addMonth := p.StartDate.AddDate(0, 1, 0)
-	if p.PaymentSplit == "year" {
+	if p.PaymentSplit == string(models.PaySplitYear) {
 		result = "A"
 	}
 	if p.PaymentSplit == string(models.PaySplitMonthly) {
-		if addMonth.Before(now) {
+		if now.Before(addMonth) {
 			result = "A"
 		} else {
 			result = "R"
@@ -498,7 +498,7 @@ func getRenewDate(p models.Policy, trans models.Transaction) time.Time {
 	}
 	if p.PaymentSplit == string(models.PaySplitMonthly) {
 
-		if addMonth.Before(now) {
+		if now.Before(addMonth) {
 			result = p.StartDate
 		} else {
 			result = trans.PayDate

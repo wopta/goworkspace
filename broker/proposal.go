@@ -11,6 +11,8 @@ import (
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
+	plc "github.com/wopta/goworkspace/policy"
 )
 
 type ProposalReq struct {
@@ -25,22 +27,27 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 		req    ProposalReq
 	)
 
-	log.Println("[ProposalFx] Handler start -----------------------------------------")
+	log.Println("[ProposalFx] Handler start ----------------------------------")
 
-	origin = r.Header.Get("Origin")
-	body := lib.ErrorByte(io.ReadAll(r.Body))
-	defer r.Body.Close()
-
-
-	// TODO: remove when PROPOSAL_V2 will be fully integrated in prod 
 	log.Println("[ProposalFx] loading authToken from idToken...")
 
 	token := r.Header.Get("Authorization")
 	authToken, err := models.GetAuthTokenFromIdToken(token)
 	if err != nil {
-		log.Printf("[LeadFx] error getting authToken")
+		log.Printf("[ProposalFx] error getting authToken")
 		return "", nil, err
 	}
+	log.Printf(
+		"[ProposalFx] authToken - type: '%s' role: '%s' uid: '%s' email: '%s'",
+		authToken.Type,
+		authToken.Role,
+		authToken.UserID,
+		authToken.Email,
+	)
+
+	origin = r.Header.Get("Origin")
+	body := lib.ErrorByte(io.ReadAll(r.Body))
+	defer r.Body.Close()
 
 	log.Printf("[ProposalFx] Request: %s", string(body))
 
@@ -53,7 +60,7 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 
 		paymentSplit = req.PaymentSplit
 
-		policy, err = GetPolicy(req.PolicyUid, origin)
+		policy, err = plc.GetPolicy(req.PolicyUid, origin)
 		if err != nil {
 			log.Printf("[ProposalFx] error fetching policy %s from Firestore...: %s", req.PolicyUid, err.Error())
 			return "", nil, err
@@ -92,12 +99,18 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 	}
 
 	log.Printf("[ProposalFx] response: %s", string(resp))
+	log.Println("[ProposalFx] Handler end ------------------------------------")
 
 	return string(resp), &policy, err
 }
 
 func proposal(policy *models.Policy) error {
 	log.Println("[proposal] starting bpmn flow...")
+
+	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
+	if networkNode != nil {
+		warrant = networkNode.GetWarrant()
+	}
 
 	state := runBrokerBpmn(policy, proposalFlowKey)
 	if state == nil || state.Data == nil {
@@ -136,7 +149,7 @@ func setProposalData(policy *models.Policy) {
 }
 
 func setProposalNumber(policy *models.Policy) {
-	log.Println("[setProposalNumber] set proposal number start -----------------")
+	log.Println("[setProposalNumber] set proposal number start ---------------")
 
 	if policy.ProposalNumber != 0 {
 		log.Printf("[setProposalNumber] proposal number already set %d", policy.ProposalNumber)

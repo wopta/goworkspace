@@ -288,3 +288,39 @@ func GetChannel(policy *Policy) string {
 
 	return channel
 }
+
+func (policy *Policy) GetFlow(networkNode *NetworkNode, warrant *Warrant) (string, *NodeSetting) {
+	var (
+		channel  = policy.Channel
+		flowByte []byte
+		flowName string
+		flowFile NodeSetting
+		err      error
+	)
+
+	log.Printf("[Policy.GetFlow] loading file for channel %s", channel)
+
+	switch channel {
+	case NetworkChannel:
+		flowName, flowByte = networkNode.GetNetworkNodeFlow(policy.Name, warrant)
+	case ECommerceChannel, MgaChannel:
+		flowName = channel
+		flowByte = lib.GetFilesByEnv(fmt.Sprintf(FlowFileFormat, channel))
+	default:
+		log.Printf("[Policy.GetFlow] error unavailable channel: '%s'", channel)
+		return flowName, nil
+	}
+
+	if len(flowByte) == 0 {
+		log.Printf("[Policy.GetFlow] error flowFile '%s' empty", flowName)
+		return flowName, nil
+	}
+
+	err = json.Unmarshal(flowByte, &flowFile)
+	if err != nil {
+		log.Printf("[Policy.GetFlow] error unmarshaling flow '%s' file: %s", flowName, err.Error())
+		return flowName, nil
+	}
+
+	return flowName, &flowFile
+}

@@ -12,18 +12,18 @@ type keyValue struct {
 	value string
 }
 
-func PersonaContract(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
+func PersonaContract(pdf *fpdf.Fpdf, policy *models.Policy, product *models.Product) (string, []byte) {
 	var (
 		filename string
 		out      []byte
 	)
 
-	filename, out = PersonaGlobal(pdf, policy)
+	filename, out = PersonaGlobal(pdf, policy, product)
 
 	return filename, out
 }
 
-func PersonaGlobal(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
+func PersonaGlobal(pdf *fpdf.Fpdf, policy *models.Policy, product *models.Product) (string, []byte) {
 	signatureID = 0
 
 	mainHeader(pdf, policy)
@@ -34,7 +34,7 @@ func PersonaGlobal(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 
 	personaInsuredInfoSection(pdf, policy)
 
-	guaranteesMap, slugs := loadPersonaGuarantees(policy)
+	guaranteesMap, slugs := loadPersonaGuarantees(policy, product)
 
 	personaGuaranteesTable(pdf, guaranteesMap, slugs)
 
