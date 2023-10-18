@@ -13,6 +13,11 @@ import (
 func LifeReserved(policy models.Policy) (string, []byte) {
 	log.Println("[LifeReserved]")
 
+	err := downloadAssets()
+	if err != nil {
+		return "", nil
+	}
+
 	pdf := initFpdf()
 
 	lifeReservedFooter(pdf)
@@ -41,7 +46,7 @@ func lifeReservedHeader(pdf *fpdf.Fpdf, policy models.Policy) {
 		logoPath, cfpi, expiryInfo string
 	)
 
-	logoPath = lib.GetAssetPathByEnv(basePath) + "/logo_vita.png"
+	logoPath = lib.GetAssetPathByEnvV2() + "logo_vita.png"
 
 	location, err := time.LoadLocation("Europe/Rome")
 	lib.CheckError(err)
@@ -83,7 +88,7 @@ func lifeReservedHeader(pdf *fpdf.Fpdf, policy models.Policy) {
 			Name), cfpi, strings.ToUpper(address), contractor.Mail, contractor.Phone)
 
 	opt.ImageType = "png"
-	pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/axa/logo.png", 180, 10, 0, 15,
+	pdf.ImageOptions(lib.GetAssetPathByEnvV2()+"logo_axa.png", 180, 10, 0, 15,
 		false, opt, 0, "")
 	pdf.SetY(pdf.GetY() + 18)
 
