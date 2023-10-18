@@ -597,13 +597,14 @@ func woptaPrivacySection(pdf *fpdf.Fpdf) {
 }
 
 func companySignature(pdf *fpdf.Fpdf, companyName string) {
+	var opt fpdf.ImageOptions
+	opt.ImageType = "png"
+
 	switch companyName {
 	case "global":
 		setBlackBoldFont(pdf, standardTextSize)
 		pdf.CellFormat(70, 3, "Global Assistance", "", 0,
 			fpdf.AlignCenter, false, 0, "")
-		var opt fpdf.ImageOptions
-		opt.ImageType = "png"
 		pdf.ImageOptions(folderPath+"signature_global.png", 25, pdf.GetY()+3, 40, 12,
 			false, opt, 0, "")
 	case "axa":
@@ -611,8 +612,6 @@ func companySignature(pdf *fpdf.Fpdf, companyName string) {
 		pdf.MultiCell(70, 3, "AXA France Vie\n(Rappresentanza Generale per l'Italia)", "",
 			fpdf.AlignCenter, false)
 		pdf.SetY(pdf.GetY() - 6)
-		var opt fpdf.ImageOptions
-		opt.ImageType = "png"
 		pdf.ImageOptions(folderPath+"signature_axa.png", 35, pdf.GetY()+9, 30, 8,
 			false, opt, 0, "")
 	case "sogessur":
@@ -620,8 +619,6 @@ func companySignature(pdf *fpdf.Fpdf, companyName string) {
 		pdf.MultiCell(70, 3, "Sogessur SA\n(Rappresentanza Generale per l'Italia)", "",
 			fpdf.AlignCenter, false)
 		pdf.SetY(pdf.GetY() - 6)
-		var opt fpdf.ImageOptions
-		opt.ImageType = "png"
 		pdf.ImageOptions(folderPath+"signature_sogessur.png", 40, pdf.GetY()+9, 10, 10,
 			false, opt, 0, "")
 	}
