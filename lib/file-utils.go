@@ -3,6 +3,7 @@ package lib
 import (
 	"context"
 	"encoding/csv"
+	"errors"
 	"fmt"
 	"google.golang.org/api/iterator"
 	"io"
@@ -230,18 +231,16 @@ func PutToFireStorage(bucketname string, path string, file []byte) string {
 
 func GetFilesByEnv(file string) []byte {
 	var res1 []byte
-	switch os.Getenv("env") {
 
+	switch os.Getenv("env") {
 	case "local":
 		res1 = ErrorByte(os.ReadFile("../function-data/dev/" + file))
 	case "dev":
 		res1 = GetFromStorage("function-data", file, "")
 	case "prod":
 		res1 = GetFromStorage("core-350507-function-data", file, "")
-
-	default:
-
 	}
+
 	return res1
 }
 
@@ -266,18 +265,15 @@ func GetByteByEnv(file string, isLocal bool) []byte {
 
 	case "local":
 		res1 = ErrorByte(os.ReadFile("../function-data/dev/" + file))
-
 	case "dev":
 		if isLocal {
-			res1 = ErrorByte(ioutil.ReadFile("./serverless_function_source_code/" + file))
+			res1 = ErrorByte(os.ReadFile("./serverless_function_source_code/" + file))
 		} else {
 			res1 = GetFromStorage("function-data", file, "")
 		}
-
 	case "prod":
-
 		if isLocal {
-			res1 = ErrorByte(ioutil.ReadFile("./serverless_function_source_code/" + file))
+			res1 = ErrorByte(os.ReadFile("./serverless_function_source_code/" + file))
 		} else {
 			res1 = GetFromStorage("core-350507-function-data", file, "")
 		}
@@ -286,20 +282,47 @@ func GetByteByEnv(file string, isLocal bool) []byte {
 	}
 	return res1
 }
+
 func GetAssetPathByEnv(base string) string {
 	var res1 string
 	switch os.Getenv("env") {
-
 	case "local":
 		res1 = base + "/assets"
-
 	case "dev":
 		res1 = "./serverless_function_source_code/assets"
 	case "prod":
 		res1 = "./serverless_function_source_code/assets"
-
 	default:
 	}
 
 	return res1
+}
+
+func GetAssetPathByEnvV2() string {
+	var path string
+	switch os.Getenv("env") {
+	case "local":
+		path = "../function-data/dev/assets/documents/"
+	case "dev", "prod":
+		path = "./serverless_function_source_code/tmp/assets/"
+	}
+
+	return path
+}
+
+func CheckFileExistence(filePath string) bool {
+	if os.Getenv("env") == "local" {
+		_, err := os.OpenFile("../function-data/dev/"+filePath, os.O_RDWR, 0755)
+		if errors.Is(err, os.ErrNotExist) {
+			return false
+		}
+		return true
+	}
+	ctx := context.Background()
+	client, err := storage.NewClient(ctx)
+	_, err = client.Bucket(os.Getenv("GOOGLE_STORAGE_BUCKET")).Object(filePath).Attrs(ctx)
+	if err != nil {
+		return false
+	}
+	return true
 }

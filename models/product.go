@@ -34,12 +34,13 @@ type Product struct {
 	CommissionRenew   float64           `firestore:"commissionRenew,omitempty" json:"commissionRenew,omitempty"`
 	Steps             []Step            `firestore:"steps,omitempty" json:"steps"`
 	Offers            map[string]Offer  `firestore:"offers,omitempty" json:"offers,omitempty"`
-	IsEcommerceActive bool              `json:"isEcommerceActive" firestore:"isEcommerceActive"`
-	IsAgencyActive    bool              `json:"isAgencyActive" firestore:"isAgencyActive"`
-	IsAgentActive     bool              `json:"isAgentActive" firestore:"isAgentActive"`
+	IsEcommerceActive bool              `json:"isEcommerceActive" firestore:"isEcommerceActive"` // DEPRECATED
+	IsAgencyActive    bool              `json:"isAgencyActive" firestore:"isAgencyActive"`       // DEPRECATED
+	IsAgentActive     bool              `json:"isAgentActive" firestore:"isAgentActive"`         // DEPRECATED
 	Logo              string            `json:"logo,omitempty" firestore:"logo,omitempty" bigquery:"-"`
 	PaymentProviders  []PaymentProvider `json:"paymentProviders,omitempty" firestore:"paymentProviders,omitempty" bigquery:"-"`
 	Flow              string            `json:"flow,omitempty" firestore:"flow,omitempty" bigquery:"-"` // the name of the flow file to be used
+	IsActive          bool              `json:"isActive" json:"isActive" bigquery:"-"`
 }
 
 type Company struct {
@@ -57,19 +58,19 @@ type Company struct {
 	GuaranteesMap             map[string]*Guarante `firestore:"guaranteesMap,omitempty" json:"guaranteesMap,omitempty"`
 	InformationSetLink        string               `firestore:"informationSetLink,omitempty" json:"informationSetLink,omitempty"`
 	IsMonthlyPaymentAvailable bool                 `firestore:"isMonthlyPaymentAvailable" json:"isMonthlyPaymentAvailable"`
-	Mandate                   Mandate              `json:"mandate" firestore:"mandate" bigquery:"-"`
+	Mandate                   Mandate              `json:"mandate" firestore:"mandate" bigquery:"-"` // DEPRECATED
 	DiscountLimit             float64              `json:"discountLimit" firestore:"discountLimit" bigquery:"-"`
 	AgentCode                 string               `json:"agentCode" firestore:"agentCode" bigquery:"-"`
-	IsEcommerceActive         bool                 `json:"isEcommerceActive" firestore:"isEcommerceActive" bigquery:"-"` // TODO: remove this boolean once product versioning completed
-	IsAgencyActive            bool                 `json:"isAgencyActive" firestore:"isAgencyActive" bigquery:"-"`       // TODO: remove this boolean once product versioning completed
-	IsAgentActive             bool                 `json:"isAgentActive" firestore:"isAgentActive" bigquery:"-"`         // TODO: remove this boolean once product versioning completed
+	IsEcommerceActive         bool                 `json:"isEcommerceActive" firestore:"isEcommerceActive" bigquery:"-"` // DEPRECATED
+	IsAgencyActive            bool                 `json:"isAgencyActive" firestore:"isAgencyActive" bigquery:"-"`       // DEPRECATED
+	IsAgentActive             bool                 `json:"isAgentActive" firestore:"isAgentActive" bigquery:"-"`         // DEPRECATED
 	AnnulmentCodes            []AnnulmentCode      `json:"annulmentCodes,omitempty" firestore:"annulmentCodes,omitempty" bigquery:"-"`
 	CommissionSetting         *CommissionsSetting  `json:"commissionsSetting,omitempty" firestore:"commissionsSetting,omitempty" bigquery:"-"`
-	IsActive                  bool                 `json:"isActive" json:"isActive" bigquery:"-"`
 	// MaxFreeDiscount           float64              `json:"maxFreeDiscount,omitempty" firestore:"maxFreeDiscount,omitempty" bigquery:"-"`
 	// MaxReservedDiscount       float64              `json:"maxReservedDiscount,omitempty" firestore:"maxReservedDiscount,omitempty" bigquery:"-"`
 }
 
+// DEPRECATED
 type Mandate struct {
 	Commission      float64   `json:"commission" firestore:"commission"`
 	CommissionRenew float64   `json:"commissionRenew" firestore:"commissionRenew"`
@@ -126,6 +127,14 @@ type AnnulmentCode struct {
 	Code        string   `json:"code,omitempty" firestore:"code,omitempty" bigquery:"-"`
 	Description string   `json:"description,omitempty" firestore:"description,omitempty" bigquery:"-"`
 	RefundTypes []string `json:"refundTypes,omitempty" firestore:"refundTypes,omitempty" bigquery:"-"`
+}
+
+type ProductInfo struct {
+	Name         string `json:"name"`
+	NameTitle    string `json:"nameTitle"`
+	NameSubtitle string `json:"nameSubtitle"`
+	NameDesc     string `json:"nameDesc"`
+	Logo         string `json:"logo"`
 }
 
 func ProductToListData(query *firestore.DocumentIterator) []Product {

@@ -10,7 +10,6 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/product"
 )
 
 type slugStruct struct {
@@ -110,7 +109,7 @@ func loadProducerInfo(origin string, networkNode *models.NetworkNode) map[string
 	return policyProducer
 }
 
-func loadLifeGuarantees(policy *models.Policy) (map[string]map[string]string, []slugStruct) {
+func loadLifeGuarantees(policy *models.Policy, product *models.Product) (map[string]map[string]string, []slugStruct) {
 	const (
 		death               = "death"
 		permanentDisability = "permanent-disability"
@@ -121,12 +120,10 @@ func loadLifeGuarantees(policy *models.Policy) (map[string]map[string]string, []
 		guaranteesMap map[string]map[string]string
 		slugs         []slugStruct
 	)
-	lifeProduct, err := product.GetProduct(policy.Name, policy.ProductVersion, models.MgaChannel)
-	lib.CheckError(err)
 
 	guaranteesMap = make(map[string]map[string]string, 0)
 
-	for guaranteeSlug, guarantee := range lifeProduct.Companies[0].GuaranteesMap {
+	for guaranteeSlug, guarantee := range product.Companies[0].GuaranteesMap {
 		guaranteesMap[guaranteeSlug] = make(map[string]string, 0)
 
 		guaranteesMap[guaranteeSlug]["name"] = guarantee.CompanyName
@@ -163,18 +160,16 @@ func loadLifeGuarantees(policy *models.Policy) (map[string]map[string]string, []
 	return guaranteesMap, slugs
 }
 
-func loadPersonaGuarantees(policy *models.Policy) (map[string]map[string]string, []slugStruct) {
+func loadPersonaGuarantees(policy *models.Policy, product *models.Product) (map[string]map[string]string, []slugStruct) {
 	var (
 		guaranteesMap map[string]map[string]string
 		slugs         []slugStruct
 	)
-	personaProduct, err := product.GetProduct(policy.Name, policy.ProductVersion, models.MgaChannel)
-	lib.CheckError(err)
 
 	guaranteesMap = make(map[string]map[string]string, 0)
 	offerName := policy.OfferlName
 
-	for guaranteeSlug, guarantee := range personaProduct.Companies[0].GuaranteesMap {
+	for guaranteeSlug, guarantee := range product.Companies[0].GuaranteesMap {
 		guaranteesMap[guaranteeSlug] = make(map[string]string, 0)
 
 		guaranteesMap[guaranteeSlug]["name"] = guarantee.CompanyName
@@ -213,7 +208,7 @@ func loadPersonaGuarantees(policy *models.Policy) (map[string]map[string]string,
 				details = "Beneficiari:\n"
 				for _, beneficiary := range *guarantee.Beneficiaries {
 					if beneficiary.BeneficiaryType != "chosenBeneficiary" {
-						details += personaProduct.Companies[0].GuaranteesMap["D"].BeneficiaryOptions[beneficiary.
+						details += product.Companies[0].GuaranteesMap["D"].BeneficiaryOptions[beneficiary.
 							BeneficiaryType]
 						break
 					}

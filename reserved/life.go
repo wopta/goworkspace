@@ -20,10 +20,6 @@ type ReservedRuleOutput struct {
 func lifeReserved(policy *models.Policy) (bool, *models.ReservedInfo) {
 	log.Println("[lifeReserved]")
 
-	const (
-		rulesFileName = "life_reserved.json"
-	)
-
 	var output = ReservedRuleOutput{
 		IsReserved: false,
 		ReservedInfo: &models.ReservedInfo{
@@ -33,7 +29,7 @@ func lifeReserved(policy *models.Policy) (bool, *models.ReservedInfo) {
 	}
 
 	fx := new(models.Fx)
-	rulesFile := lib.GetRulesFile(rulesFileName)
+	rulesFile := lib.GetRulesFileV2(policy.Name, policy.ProductVersion, "reserved")
 	input := getInputData(policy)
 	log.Printf("[lifeReserved] input %v", string(input))
 	data := getReservedData(policy)
@@ -103,7 +99,7 @@ func getInputData(policy *models.Policy) []byte {
 func getReservedData(policy *models.Policy) []byte {
 	data := make(map[string]interface{})
 
-	reservedAge := prd.GetReservedAge(policy.Name, models.GetChannel(policy))
+	_, reservedAge := prd.GetAgeInfo(policy.Name, policy.ProductVersion, policy.Channel)
 	data["reservedAge"] = int64(reservedAge)
 
 	ret, err := json.Marshal(data)
@@ -112,10 +108,10 @@ func getReservedData(policy *models.Policy) []byte {
 	return ret
 }
 
-func SetLifeReservedDocument(policy *models.Policy) {
+func setLifeReservedDocument(policy *models.Policy, product *models.Product) {
 	attachments := make([]models.Attachment, 0)
 
-	gsLink, _ := document.LifeReserved(*policy)
+	gsLink, _ := document.LifeReserved(*policy, product)
 
 	attachments = append(attachments, models.Attachment{
 		Name:        fmt.Sprintf("%s_proposta_%d_rvm_istruzioni.pdf", policy.NameDesc, policy.ProposalNumber),
@@ -134,7 +130,7 @@ func SetLifeReservedDocument(policy *models.Policy) {
 	policy.ReservedInfo.Documents = attachments
 }
 
-func SetLifeContactsDetails(policy *models.Policy) {
+func setLifeContactsDetails(policy *models.Policy) {
 	policy.ReservedInfo.Contacts = []models.Contact{
 		{
 			Title:   "Tramite e-mail:",
@@ -143,5 +139,14 @@ func SetLifeContactsDetails(policy *models.Policy) {
 			Subject: fmt.Sprintf("Oggetto: %s proposta %d - UNDERWRITING MEDICO - %s", policy.NameDesc, policy.ProposalNumber,
 				strings.ToUpper(policy.Contractor.Surname+" "+policy.Contractor.Name)),
 		},
+	}
+}
+
+func setLifeReservedInfo(policy *models.Policy, product *models.Product) {
+	switch policy.ProductVersion {
+	default:
+		// TODO: how to handle the contents dinamically?
+		setLifeReservedDocument(policy, product)
+		setLifeContactsDetails(policy)
 	}
 }

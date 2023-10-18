@@ -34,15 +34,15 @@ func mainHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 		"Scade il: " + policyEndDate.In(location).Format(dateLayout) + " ore 24:00\n"
 
 	switch policy.Name {
-	case "life":
-		logoPath = lib.GetAssetPathByEnv(basePath) + "/logo_vita.png"
+	case models.LifeProduct:
+		logoPath = lib.GetAssetPathByEnvV2() + "logo_vita.png"
 		productName = "Vita"
 		policyInfo += expiryInfo + "Non si rinnova a scadenza."
-	case "pmi":
-		logoPath = lib.GetAssetPathByEnv(basePath) + "/pmi.png"
+	case models.PmiProduct:
+		logoPath = lib.GetAssetPathByEnvV2() + "logo_pmi.png"
 		productName = "Artigiani & Imprese"
-	case "persona":
-		logoPath = lib.GetAssetPathByEnv(basePath) + "/persona.png"
+	case models.PersonaProduct:
+		logoPath = lib.GetAssetPathByEnvV2() + "logo_persona.png"
 		productName = "Persona"
 		policyInfo += "Si rinnova a scadenza salvo disdetta da inviare 30 giorni prima\n" + "Prossimo pagamento "
 		if policy.PaymentSplit == string(models.PaySplitMonthly) {
@@ -78,7 +78,7 @@ func mainHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 		pdf.SetXY(23, 13)
 		pdf.SetTextColor(92, 89, 92)
 		pdf.Cell(10, 6, productName)
-		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/ARTW_LOGO_RGB_400px.png", 170, 6, 0, 8, false, opt, 0, "")
+		pdf.ImageOptions(lib.GetAssetPathByEnvV2()+"logo_wopta.png", 170, 6, 0, 8, false, opt, 0, "")
 
 		setBlackBoldFont(pdf, standardTextSize)
 		pdf.SetXY(11, 20)
@@ -105,27 +105,27 @@ func mainFooter(pdf *fpdf.Fpdf, productName string) {
 	)
 
 	switch productName {
-	case "life":
+	case models.LifeProduct:
 		footerText = "Wopta per te. Vita è un prodotto assicurativo di AXA France Vie S.A. – Rappresentanza Generale per l’Italia\ndistribuito da Wopta Assicurazioni S.r.l."
-		logoPath = lib.GetAssetPathByEnv(basePath) + "/axa/logo.png"
+		logoPath = lib.GetAssetPathByEnvV2() + "logo_axa.png"
 		x = 190
 		y = 282.5
 		height = 8
-	case "pmi":
+	case models.PmiProduct:
 		footerText = ""
 		logoPath = ""
-	case "persona":
+	case models.PersonaProduct:
 		footerText = "Wopta per te. Persona è un prodotto assicurativo di Global Assistance Compagnia di assicurazioni" +
 			" e riassicurazioni S.p.A,\ndistribuito da Wopta Assicurazioni S.r.l"
-		logoPath = lib.GetAssetPathByEnv(basePath) + "/logo_global.png"
+		logoPath = lib.GetAssetPathByEnvV2() + "logo_global.png"
 		x = 180
 		y = 280
 		height = 10
-	case "gap":
+	case models.GapProduct:
 		footerText = "Wopta per te. Auto Valore Protetto è un prodotto assicurativo di Sogessur SA – Rappresentanza " +
 			" Generale per l’Italia con sede in Via Tiziano, 32 – 20145 Milano – \nIscritta alla CCIAA di Milano P.I." +
 			" 07420570967 – REA MI 1957443; distribuito da Wopta Assicurazioni Srl"
-		logoPath = lib.GetAssetPathByEnv(basePath) + "/logo_sogessur.png"
+		logoPath = lib.GetAssetPathByEnvV2() + "logo_sogessur.png"
 		x = 183
 		y = 285
 		height = 3
@@ -147,7 +147,7 @@ func axaHeader(pdf *fpdf.Fpdf) {
 		var opt fpdf.ImageOptions
 		pdf.SetXY(-30, 7)
 		opt.ImageType = "png"
-		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/axa/logo.png", 190, 7, 0, 8, false, opt, 0, "")
+		pdf.ImageOptions(lib.GetAssetPathByEnvV2()+"logo_axa.png", 190, 7, 0, 8, false, opt, 0, "")
 		pdf.Ln(15)
 	})
 }
@@ -176,7 +176,7 @@ func sogessurHeader(pdf *fpdf.Fpdf) {
 		var opt fpdf.ImageOptions
 		pdf.SetXY(-30, 7)
 		opt.ImageType = "png"
-		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/logo_sogessur.png", 160, 7, 0, 6, false,
+		pdf.ImageOptions(lib.GetAssetPathByEnvV2()+"logo_sogessur.png", 160, 7, 0, 6, false,
 			opt, 0, "")
 		pdf.Ln(15)
 	})
@@ -198,7 +198,7 @@ func woptaHeader(pdf *fpdf.Fpdf) {
 	pdf.SetHeaderFunc(func() {
 		var opt fpdf.ImageOptions
 		opt.ImageType = "png"
-		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/ARTW_LOGO_RGB_400px.png", 10, 6, 0, 10,
+		pdf.ImageOptions(lib.GetAssetPathByEnvV2()+"logo_wopta.png", 10, 6, 0, 10,
 			false, opt, 0, "")
 		pdf.Ln(10)
 	})
@@ -250,7 +250,7 @@ func globalHeader(pdf *fpdf.Fpdf) {
 		var opt fpdf.ImageOptions
 		pdf.SetXY(-30, 7)
 		opt.ImageType = "png"
-		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/logo_global_02.png", 180, 7, 0, 15, false, opt, 0, "")
+		pdf.ImageOptions(lib.GetAssetPathByEnvV2()+"logo_global_02.png", 180, 7, 0, 15, false, opt, 0, "")
 		pdf.Ln(15)
 	})
 }
@@ -296,9 +296,9 @@ func emitResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	text := "Polizza emessa a Milano il " + emitDate + " per un importo di € " + offerPrice + " quale " +
 		"prima rata alla firma, il cui pagamento a saldo è da effettuarsi con i metodi di pagamento sopra indicati."
 	switch policy.Name {
-	case "life":
+	case models.LifeProduct:
 		text += " Wopta conferma avvenuto incasso e copertura della polizza dal " + startDate + "."
-	case "persona":
+	case models.PersonaProduct:
 		text += "\nCostituisce quietanza di pagamento la mail di conferma che Wopta invierà al Contraente."
 
 	}
@@ -580,32 +580,29 @@ func woptaPrivacySection(pdf *fpdf.Fpdf) {
 }
 
 func companySignature(pdf *fpdf.Fpdf, companyName string) {
+	var opt fpdf.ImageOptions
+	opt.ImageType = "png"
+
 	switch companyName {
 	case "global":
 		setBlackBoldFont(pdf, standardTextSize)
 		pdf.CellFormat(70, 3, "Global Assistance", "", 0,
 			fpdf.AlignCenter, false, 0, "")
-		var opt fpdf.ImageOptions
-		opt.ImageType = "png"
-		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/firma_global.png", 25, pdf.GetY()+3, 40, 12,
+		pdf.ImageOptions(lib.GetAssetPathByEnvV2()+"signature_global.png", 25, pdf.GetY()+3, 40, 12,
 			false, opt, 0, "")
 	case "axa":
 		setBlackBoldFont(pdf, standardTextSize)
 		pdf.MultiCell(70, 3, "AXA France Vie\n(Rappresentanza Generale per l'Italia)", "",
 			fpdf.AlignCenter, false)
 		pdf.SetY(pdf.GetY() - 6)
-		var opt fpdf.ImageOptions
-		opt.ImageType = "png"
-		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/firma_axa.png", 35, pdf.GetY()+9, 30, 8,
+		pdf.ImageOptions(lib.GetAssetPathByEnvV2()+"signature_axa.png", 35, pdf.GetY()+9, 30, 8,
 			false, opt, 0, "")
 	case "sogessur":
 		setBlackBoldFont(pdf, standardTextSize)
 		pdf.MultiCell(70, 3, "Sogessur SA\n(Rappresentanza Generale per l'Italia)", "",
 			fpdf.AlignCenter, false)
 		pdf.SetY(pdf.GetY() - 6)
-		var opt fpdf.ImageOptions
-		opt.ImageType = "png"
-		pdf.ImageOptions(lib.GetAssetPathByEnv(basePath)+"/firma_sogessur.png", 40, pdf.GetY()+9, 10, 10,
+		pdf.ImageOptions(lib.GetAssetPathByEnvV2()+"signature_sogessur.png", 40, pdf.GetY()+9, 10, 10,
 			false, opt, 0, "")
 	}
 }

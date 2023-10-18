@@ -3,6 +3,7 @@ package quote
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/wopta/goworkspace/network"
 	"io"
 	"log"
 	"math"
@@ -27,41 +28,76 @@ const (
 )
 
 func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	var (
+		data    models.Policy
+		warrant *models.Warrant
+	)
+
+	log.Println("[LifeFx] handler start ----------------------")
+
 	req := lib.ErrorByte(io.ReadAll(r.Body))
-	var data models.Policy
 	defer r.Body.Close()
-	e := json.Unmarshal(req, &data)
-	lib.CheckError(e)
-	log.Println("[Life] body: ", string(req))
+
+	log.Println("[LifeFx] body: ", string(req))
+
+	err := json.Unmarshal(req, &data)
+	if err != nil {
+		log.Printf("[LifeFx] error unmarshaling body: %s", err.Error())
+		return "", nil, err
+	}
 
 	authToken, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
-	lib.CheckError(err)
-	res, e := Life(authToken.GetChannelByRole(), data)
-	s, e := json.Marshal(res)
-	return string(s), nil, e
+	if err != nil {
+		log.Printf("[LifeFx] error getting authToken from idToken: %s", err.Error())
+		return "", nil, err
+	}
+
+	log.Println("[LifeFx] loading network node")
+	networkNode := network.GetNetworkNodeByUid(authToken.UserID)
+	if networkNode != nil {
+		warrant = networkNode.GetWarrant()
+	}
+
+	log.Println("[LifeFx] start quoting")
+
+	result, err := Life(data, authToken.GetChannelByRoleV2(), networkNode, warrant)
+	jsonOut, err := json.Marshal(result)
+
+	log.Printf("[LifeFx] response: %s", string(jsonOut))
+
+	log.Println("[LifeFx] handler end ---------------------------------------")
+
+	return string(jsonOut), result, err
 
 }
 
-func Life(channel string, data models.Policy) (models.Policy, error) {
+func Life(data models.Policy, channel string, networkNode *models.NetworkNode, warrant *models.Warrant) (models.Policy, error) {
 	var err error
+
+	log.Println("[Life] function start --------------------------------------")
+
 	contractorAge, err := data.CalculateContractorAge()
 
 	log.Printf("[Life] contractor age: %d", contractorAge)
 
-	b := lib.GetFilesByEnv("quote/life_matrix.csv")
+	b := lib.GetFilesByEnv(fmt.Sprintf("products-v2/%s/%s/taxes.csv", data.Name, data.ProductVersion))
 	df := lib.CsvToDataframe(b)
 	var selectRow []string
 
-	log.Printf("[Life] getting product file")
-	_, ruleProduct, err := sellable.Life(channel, data)
-	lib.CheckError(err)
-	log.Printf("[Life] product file loaded")
+	log.Printf("[Life] call sellable")
+	ruleProduct, err := sellable.Life(&data, channel, networkNode, warrant)
+	if err != nil {
+		log.Printf("[Life] error in sellable: %s", err.Error())
+		return models.Policy{}, err
+	}
+
+	log.Printf("[Life] add default guarantees")
 
 	addDefaultGuarantees(data, *ruleProduct)
 
 	switch channel {
-	case models.AgentChannel, models.AgencyChannel, models.MgaChannel:
-		log.Println("[Life] admin/agent/agency flow")
+	case models.MgaChannel, models.NetworkChannel:
+		log.Println("[Life] mga, network flow")
 		guaranteesMap := data.GuaranteesToMap()
 		log.Println("[Life] setting sumInsuredLimitOfIndeminity")
 		if guaranteesMap[deathGuarantee].IsSelected {
@@ -93,7 +129,11 @@ func Life(channel string, data models.Policy) (models.Policy, error) {
 		calculateGuaranteeDuration(data.Assets, contractorAge, death.Value.Duration.Year)
 	}
 
+	log.Println("[Life] updating policy start and end date")
+
 	updatePolicyStartEndDate(&data)
+
+	log.Println("[Life] set guarantees subtitle")
 
 	getGuaranteeSubtitle(data.Assets)
 
@@ -110,6 +150,8 @@ func Life(channel string, data models.Policy) (models.Policy, error) {
 			"monthly": &models.Price{},
 		},
 	}
+
+	log.Println("[Life] calculate guarantees and offers prices")
 
 	for _, asset := range data.Assets {
 		for _, guarantee := range asset.Guarantees {
@@ -131,14 +173,21 @@ func Life(channel string, data models.Policy) (models.Policy, error) {
 	monthlyToBeRemoved := !ruleProduct.Companies[0].IsMonthlyPaymentAvailable ||
 		data.OffersPrices["default"]["monthly"].Gross < ruleProduct.Companies[0].MinimumMonthlyPrice
 	if monthlyToBeRemoved {
+		log.Println("[Life] monthly payment disabled")
 		delete(data.OffersPrices["default"], "monthly")
 	}
 
+	log.Println("[Life] round offers prices")
+
 	roundOfferPrices(data.OffersPrices)
+
+	log.Println("[Life] sort guarantees list")
 
 	sort.Slice(data.Assets[0].Guarantees, func(i, j int) bool {
 		return data.Assets[0].Guarantees[i].Order < data.Assets[0].Guarantees[j].Order
 	})
+
+	log.Println("[Life] function end --------------------------------------")
 
 	return data, err
 }
@@ -207,7 +256,6 @@ func calculateGuaranteeDuration(assets []models.Asset, contractorAge int, deathD
 }
 
 func updatePolicyStartEndDate(policy *models.Policy) {
-	log.Println("[Life] setting policy start and end date")
 	if policy.StartDate.IsZero() {
 		policy.StartDate = time.Now().UTC()
 	}

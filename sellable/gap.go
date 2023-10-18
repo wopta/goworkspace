@@ -2,6 +2,7 @@ package sellable
 
 import (
 	"fmt"
+	"log"
 	"strings"
 	"time"
 
@@ -20,30 +21,43 @@ const (
 	maxCoverage          = 5
 )
 
-// Given a policy that should contain the Gap and the Person assets, then it returns:
+// Given a policy that should contain the Gap and the Persona assets, then it returns:
 //   - the product or parts of it depending on the sellability rules
 //   - and an eventual error
-func Gap(channel string, policy *models.Policy) (*models.Product, error) {
+func Gap(policy *models.Policy, channel string, networkNode *models.NetworkNode, warrant *models.Warrant) (*models.Product, error) {
+	log.Println("[Gap] function start ---------------")
+
+	log.Println("[Gap] validating policy")
+
 	if err := validatePolicy(policy); err != nil {
-		return &models.Product{}, fmt.Errorf("the policy did not pass validation: %v", err)
+		log.Printf("[Gap] error validating policy: %s", err.Error())
+		return nil, fmt.Errorf("the policy did not pass validation: %v", err)
 	}
 
-	product, err := getProduct(policy, channel)
+	log.Println("[Gap] loading product file")
+
+	product, err := getProduct(policy, channel, networkNode, warrant)
 	if err != nil {
-		return &models.Product{}, fmt.Errorf("no products for this vehicle: %v", err)
+		log.Printf("[Gap] error loading product: %s", err.Error())
+		return nil, fmt.Errorf("no products for this vehicle: %v", err)
 	}
+
+	log.Println("[Gap] check policy vendibility")
 
 	if err := isVehicleSellable(policy); err != nil {
-		return &models.Product{}, fmt.Errorf("vehicle not sellable: %v", err)
+		log.Printf("[Gap] error check policy vendility: %s", err.Error())
+		return nil, fmt.Errorf("vehicle not sellable: %v", err)
 	}
+
+	log.Println("[Gap] function end ---------------")
 
 	return product, nil
 }
 
-func getProduct(policy *models.Policy, channel string) (*models.Product, error) {
-	product, err := prd.GetProduct(policy.Name, policy.ProductVersion, channel)
-	if err != nil {
-		return &models.Product{}, fmt.Errorf("error in getting the product: %v", err)
+func getProduct(policy *models.Policy, channel string, networkNode *models.NetworkNode, warrant *models.Warrant) (*models.Product, error) {
+	product := prd.GetProductV2(policy.Name, policy.ProductVersion, channel, networkNode, warrant)
+	if product == nil {
+		return nil, fmt.Errorf("no product found")
 	}
 
 	vehiclePrice := policy.Assets[0].Vehicle.PriceValue

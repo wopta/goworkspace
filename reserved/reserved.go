@@ -12,3 +12,10 @@ func GetReservedInfo(policy *models.Policy) (bool, *models.ReservedInfo) {
 		return false, nil
 	}
 }
+
+func SetReservedInfo(policy *models.Policy, product *models.Product) {
+	switch policy.Name {
+	case models.LifeProduct:
+		setLifeReservedInfo(policy, product)
+	}
+}

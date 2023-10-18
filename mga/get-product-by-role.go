@@ -17,6 +17,7 @@ type GetProductByRoleRequest struct {
 	Company string `json:"company"`
 }
 
+// DEPRECATED
 func GetProductByRoleFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println("GetProductByRoleFx")
 	var (

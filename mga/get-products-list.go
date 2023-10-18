@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	pathPrefix = "products/"
+	pathPrefix = "products/" // DEPRECATED
 )
 
 type GetProductListResp struct {
@@ -27,6 +27,7 @@ type ProductInfo struct {
 	Logo         string `json:"logo"`
 }
 
+// DEPRECATED
 func GetProductsListByEntitlementFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 
 	var (
@@ -71,6 +72,7 @@ func GetProductsListByEntitlementFx(w http.ResponseWriter, r *http.Request) (str
 	return string(jsonResp), resp, err
 }
 
+// DEPRECATED
 func getMgaProductsList() []models.Product {
 	productsList := make([]models.Product, 0)
 	res := lib.GetFolderContentByEnv(pathPrefix + "mga/")
@@ -86,6 +88,7 @@ func getMgaProductsList() []models.Product {
 	return productsList
 }
 
+// DEPRECATED
 func getEcommerceProductsList() []models.Product {
 	productsList := make([]models.Product, 0)
 	res := lib.GetFolderContentByEnv(pathPrefix + "e-commerce/")
@@ -101,8 +104,8 @@ func getEcommerceProductsList() []models.Product {
 	return productsList
 }
 
-func 
-getNetworkNodeProductsList(networkNodeUid, origin string) []models.Product {
+// DEPRECATED
+func getNetworkNodeProductsList(networkNodeUid, origin string) []models.Product {
 	var (
 		networkNode  models.NetworkNode
 		channel      string
@@ -138,7 +141,7 @@ getNetworkNodeProductsList(networkNodeUid, origin string) []models.Product {
 	return productsList
 }
 
-
+// DEPRECATED
 func getDefaultProductsByChannel(channel string) []models.Product {
 	products := make([]models.Product, 0)
 	res := lib.GetFolderContentByEnv(pathPrefix + channel)

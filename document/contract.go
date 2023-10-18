@@ -3,6 +3,7 @@ package document
 import (
 	"encoding/base64"
 	"encoding/json"
+	prd "github.com/wopta/goworkspace/product"
 	"io"
 	"log"
 	"net/http"
@@ -20,14 +21,17 @@ func ContractFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 	defer r.Body.Close()
 	err := json.Unmarshal([]byte(req), &data)
 	lib.CheckError(err)
-	respObj := <-ContractObj(origin, data, nil)
+
+	product := prd.GetProductV2(data.Name, data.ProductVersion, models.MgaChannel, nil, nil)
+
+	respObj := <-ContractObj(origin, data, nil, product) // TODO review product nil
 	resp, err := json.Marshal(respObj)
 
 	lib.CheckError(err)
 	return string(resp), respObj, nil
 }
 
-func ContractObj(origin string, data models.Policy, networkNode *models.NetworkNode) <-chan DocumentResponse {
+func ContractObj(origin string, data models.Policy, networkNode *models.NetworkNode, product *models.Product) <-chan DocumentResponse {
 	r := make(chan DocumentResponse)
 
 	go func() {
@@ -45,10 +49,10 @@ func ContractObj(origin string, data models.Policy, networkNode *models.NetworkN
 			filename, out = Save(m, data)
 		case models.LifeProduct:
 			pdf := initFpdf()
-			filename, out = LifeContract(pdf, origin, &data, networkNode)
+			filename, out = LifeContract(pdf, origin, &data, networkNode, product)
 		case models.PersonaProduct:
 			pdf := initFpdf()
-			filename, out = PersonaContract(pdf, &data)
+			filename, out = PersonaContract(pdf, &data, product)
 		case models.GapProduct:
 			pdf := initFpdf()
 			filename, out = GapContract(pdf, origin, &data)

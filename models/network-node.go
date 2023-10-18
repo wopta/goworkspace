@@ -2,6 +2,7 @@ package models
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"strings"
 	"time"
@@ -182,4 +183,73 @@ func (nn *NetworkNode) GetName() string {
 	}
 
 	return strings.ReplaceAll(name, " ", "-")
+}
+
+func (nn *NetworkNode) GetWarrant() *Warrant {
+	var (
+		warrant       *Warrant
+		warrantFormat = "warrants/%s.json"
+	)
+
+	if nn.Warrant == "" {
+		log.Printf("[GetWarrant] warrant not set for node %s", nn.Uid)
+		return nil
+	}
+
+	log.Printf("[GetWarrant] requesting warrant %s", nn.Warrant)
+
+	warrantBytes := lib.GetFilesByEnv(fmt.Sprintf(warrantFormat, nn.Warrant))
+
+	err := json.Unmarshal(warrantBytes, &warrant)
+	if err != nil {
+		log.Printf("[GetWarrant] error unmarshaling warrant %s: %s", nn.Warrant, err.Error())
+		return nil
+	}
+
+	return warrant
+}
+
+func (nn *NetworkNode) HasAccessToProduct(productName string, warrant *Warrant) bool {
+	log.Println("[HasAccessToProduct] method start -----------------")
+
+	needCheckTypes := []string{AgencyNetworkNodeType, AgentNetworkNodeType, BrokerNetworkNodeType}
+
+	if !lib.SliceContains(needCheckTypes, nn.Type) {
+		return true
+	}
+
+	if warrant == nil {
+		warrant = nn.GetWarrant()
+	}
+	if warrant == nil {
+		log.Printf("[HasAccessToProduct] no %s warrant found", nn.Warrant)
+		return false
+	}
+
+	log.Printf("[HasAccessToProduct] checking if network node %s has access product %s", nn.Uid, productName)
+
+	for _, product := range warrant.Products {
+		if product.Name == productName {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (nn *NetworkNode) GetNetworkNodeFlow(productName string, warrant *Warrant) (string, []byte) {
+	if warrant == nil {
+		log.Printf("[getNetworkNodeFlow] error warrant not set for node %s", nn.Uid)
+		return "", []byte{}
+	}
+
+	product := warrant.GetProduct(productName)
+	if product == nil {
+		log.Printf("[getNetworkNodeFlow] error product not set for warrant %s", warrant.Name)
+		return "", []byte{}
+	}
+
+	log.Printf("[getNetworkNodeFlow] getting flow '%s' file for product '%s'", product.Flow, productName)
+
+	return product.Flow, lib.GetFilesByEnv(fmt.Sprintf(FlowFileFormat, product.Flow))
 }
