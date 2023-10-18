@@ -3,6 +3,7 @@ package lib
 import (
 	"context"
 	"encoding/csv"
+	"errors"
 	"fmt"
 	"google.golang.org/api/iterator"
 	"io"
@@ -230,18 +231,16 @@ func PutToFireStorage(bucketname string, path string, file []byte) string {
 
 func GetFilesByEnv(file string) []byte {
 	var res1 []byte
-	switch os.Getenv("env") {
 
+	switch os.Getenv("env") {
 	case "local":
 		res1 = ErrorByte(os.ReadFile("../function-data/dev/" + file))
 	case "dev":
 		res1 = GetFromStorage("function-data", file, "")
 	case "prod":
 		res1 = GetFromStorage("core-350507-function-data", file, "")
-
-	default:
-
 	}
+
 	return res1
 }
 
@@ -309,4 +308,21 @@ func GetAssetPathByEnvV2() string {
 	}
 
 	return path
+}
+
+func CheckFileExistence(filePath string) bool {
+	if os.Getenv("env") == "local" {
+		_, err := os.OpenFile(filePath, os.O_RDWR, 0755)
+		if errors.Is(err, os.ErrNotExist) {
+			return false
+		}
+		return true
+	}
+	ctx := context.Background()
+	client, err := storage.NewClient(ctx)
+	_, err = client.Bucket(os.Getenv("GOOGLE_STORAGE_BUCKET")).Object(filePath).Attrs(ctx)
+	if err != nil {
+		return false
+	}
+	return true
 }
