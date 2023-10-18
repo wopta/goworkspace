@@ -8,6 +8,7 @@ import (
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 	plc "github.com/wopta/goworkspace/policy"
+	prd "github.com/wopta/goworkspace/product"
 	tr "github.com/wopta/goworkspace/transaction"
 )
 
@@ -36,6 +37,7 @@ func createNetworkTransaction(transaction *models.Transaction, origin string) er
 	log.Println("[createNetworkTransaction]")
 	policy := plc.GetPolicyByUid(transaction.PolicyUid, origin)
 	producerNode := network.GetNetworkNodeByUid(policy.ProducerUid)
+	mgaProduct := prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
 
-	return tr.CreateNetworkTransactions(&policy, transaction, producerNode)
+	return tr.CreateNetworkTransactions(&policy, transaction, producerNode, mgaProduct)
 }

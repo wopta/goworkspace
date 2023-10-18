@@ -2,13 +2,14 @@ package sellable
 
 import (
 	"encoding/json"
+	"io"
+	"log"
+	"net/http"
+
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 	prd "github.com/wopta/goworkspace/product"
-	"io"
-	"log"
-	"net/http"
 )
 
 // DEPRECATED
@@ -16,6 +17,7 @@ func PersonaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	var (
 		policy  *models.Policy
 		product *models.Product
+		warrant *models.Warrant
 		err     error
 	)
 
@@ -35,8 +37,11 @@ func PersonaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 
 	log.Println("[PersonaFx] loading network node")
 	networkNode := network.GetNetworkNodeByUid(authToken.UserID)
+	if networkNode != nil {
+		warrant = networkNode.GetWarrant()
+	}
 
-	product = Persona(*policy, authToken.GetChannelByRoleV2(), networkNode)
+	product = Persona(*policy, authToken.GetChannelByRoleV2(), networkNode, warrant)
 
 	productJson, err := json.Marshal(product)
 	lib.CheckError(err)
@@ -48,7 +53,7 @@ func PersonaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	return string(productJson), product, nil
 }
 
-func Persona(policy models.Policy, channel string, networkNode *models.NetworkNode) *models.Product {
+func Persona(policy models.Policy, channel string, networkNode *models.NetworkNode, warrant *models.Warrant) *models.Product {
 	log.Println("[Persona] function start -------------------------------------")
 
 	log.Println("[Persona] loading rules input data")
@@ -57,7 +62,7 @@ func Persona(policy models.Policy, channel string, networkNode *models.NetworkNo
 
 	log.Println("[Persona] loading product file")
 
-	product := prd.GetProductV2(policy.Name, policy.ProductVersion, channel, networkNode)
+	product := prd.GetProductV2(policy.Name, policy.ProductVersion, channel, networkNode, warrant)
 	if product == nil {
 		log.Printf("[Persona] no product found")
 		return nil

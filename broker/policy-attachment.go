@@ -12,6 +12,7 @@ import (
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	plc "github.com/wopta/goworkspace/policy"
 	"github.com/wopta/goworkspace/wiseproxy"
 )
 
@@ -91,7 +92,7 @@ func GetPolicyAttachments(policyUid string, origin string) ([]models.Attachment,
 	var policy models.Policy
 
 	log.Println("Getting attachments for policy saved in Wopta")
-	if policy, err = GetPolicy(policyUid, origin); err != nil {
+	if policy, err = plc.GetPolicy(policyUid, origin); err != nil {
 		log.Println("Error when getting policy: " + err.Error())
 		return make([]models.Attachment, 0), err
 	}

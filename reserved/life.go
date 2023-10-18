@@ -112,10 +112,10 @@ func getReservedData(policy *models.Policy) []byte {
 	return ret
 }
 
-func SetLifeReservedDocument(policy *models.Policy) {
+func setLifeReservedDocument(policy *models.Policy, product *models.Product) {
 	attachments := make([]models.Attachment, 0)
 
-	gsLink, _ := document.LifeReserved(*policy)
+	gsLink, _ := document.LifeReserved(*policy, product)
 
 	attachments = append(attachments, models.Attachment{
 		Name:        fmt.Sprintf("%s_proposta_%d_rvm_istruzioni.pdf", policy.NameDesc, policy.ProposalNumber),
@@ -134,7 +134,7 @@ func SetLifeReservedDocument(policy *models.Policy) {
 	policy.ReservedInfo.Documents = attachments
 }
 
-func SetLifeContactsDetails(policy *models.Policy) {
+func setLifeContactsDetails(policy *models.Policy) {
 	policy.ReservedInfo.Contacts = []models.Contact{
 		{
 			Title:   "Tramite e-mail:",
@@ -143,5 +143,14 @@ func SetLifeContactsDetails(policy *models.Policy) {
 			Subject: fmt.Sprintf("Oggetto: %s proposta %d - UNDERWRITING MEDICO - %s", policy.NameDesc, policy.ProposalNumber,
 				strings.ToUpper(policy.Contractor.Surname+" "+policy.Contractor.Name)),
 		},
+	}
+}
+
+func setLifeReservedInfo(policy *models.Policy, product *models.Product) {
+	switch policy.ProductVersion {
+	default:
+		// TODO: how to handle the contents dinamically?
+		setLifeReservedDocument(policy, product)
+		setLifeContactsDetails(policy)
 	}
 }

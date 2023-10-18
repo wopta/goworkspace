@@ -151,3 +151,14 @@ const (
 	AreaManagerNetworkNodeType string = "area-manager"
 	PartnershipNetworkNodeType string = "partnership"
 )
+
+const (
+	ECommerceFlow     = "e-commerce"
+	MgaFlow           = "mga"
+	RemittanceMgaFlow = "remittance_mga"
+	ProviderMgaFlow   = "provider_mga"
+)
+
+const (
+	FlowFileFormat = "flows/%s.json"
+)

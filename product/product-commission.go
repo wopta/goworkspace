@@ -7,6 +7,7 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
+// DEPRECATED
 func GetCommissionProducts(data models.Policy, products []models.Product) float64 {
 	log.Println("[GetCommissionProducts]")
 	var commission float64
@@ -21,6 +22,7 @@ func GetCommissionProducts(data models.Policy, products []models.Product) float6
 	return commission
 }
 
+// DEPRECATED
 func GetCommissionProduct(data models.Policy, prod models.Product) float64 {
 	log.Println("[GetCommissionProduct]")
 	var (
@@ -63,6 +65,7 @@ func GetCommissionProduct(data models.Policy, prod models.Product) float64 {
 	return commissionValue
 }
 
+// DEPRECATED
 func calculateCommission(amount float64, isRenew bool, commissions *models.Commissions) float64 {
 	var commission float64
 
@@ -105,35 +108,28 @@ func calculateCommissionV2(commissions *models.Commissions, isRenew, isActive bo
 	return commission
 }
 
-func GetCommissionByNode(policy *models.Policy, prod *models.Product, isActive bool) float64 {
-	log.Println("[GetCommissionByNode]")
+func GetCommissionByProduct(policy *models.Policy, prod *models.Product, isActive bool) float64 {
+	log.Println("[GetCommissionByProduct]")
 
 	var (
 		amountNet, commissionValue float64
 	)
 
-	switch policy.PaymentSplit {
-	case string(models.PaySplitMonthly), string(models.PaySplitSemestral):
-		amountNet = policy.PriceNettMonthly
-		log.Printf("[GetCommissionByNode] using PriceNettMonthly as amountNet: %g", amountNet)
-	default:
-		amountNet = policy.PriceNett
-		log.Printf("[GetCommissionByNode] using PriceNett as amountNet: %g", amountNet)
-	}
+	amountNet = getCommissionAmountByPaymentSplit(policy)
 
 	for _, company := range prod.Companies {
 		if policy.Company == company.Name {
 			if company.CommissionSetting.IsFlat {
-				log.Println("[GetCommissionByNode] Flat commission")
+				log.Println("[GetCommissionByProduct] Flat commission")
 				return calculateCommissionV2(company.CommissionSetting.Commissions, policy.IsRenew, isActive, amountNet)
 			}
 
 			if company.CommissionSetting.IsByOffer {
-				log.Println("[GetCommissionByNode] By offer commission")
+				log.Println("[GetCommissionByProduct] By offer commission")
 				return calculateCommissionV2(prod.Offers[policy.OfferlName].Commissions, policy.IsRenew, isActive, amountNet)
 			}
 
-			log.Println("[GetCommissionByNode] By guarantee commission")
+			log.Println("[GetCommissionByProduct] By guarantee commission")
 			for _, asset := range policy.Assets {
 				for _, guarantee := range asset.Guarantees {
 					if policy.PaymentSplit == string(models.PaySplitMonthly) {
@@ -148,4 +144,15 @@ func GetCommissionByNode(policy *models.Policy, prod *models.Product, isActive b
 	}
 
 	return commissionValue
+}
+
+func getCommissionAmountByPaymentSplit(policy *models.Policy) float64 {
+	switch policy.PaymentSplit {
+	case string(models.PaySplitMonthly), string(models.PaySplitSemestral):
+		log.Printf("[getCommissionAmountByPaymentSplit] using PriceNettMonthly as amountNet: %g", policy.PriceNettMonthly)
+		return policy.PriceNettMonthly
+	default:
+		log.Printf("[getCommissionAmountByPaymentSplit] using PriceNett as amountNet: %g", policy.PriceNett)
+		return policy.PriceNett
+	}
 }
