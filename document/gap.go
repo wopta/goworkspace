@@ -89,7 +89,7 @@ func gapHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 	policyStartDate := policy.StartDate.In(location)
 	policyEndDate := policy.EndDate.In(location)
 
-	logoPath = lib.GetAssetPathByEnvV2() + "logo_gap.png"
+	logoPath = GetAssetPathByEnvV2() + "logo_gap.png"
 	productName = "Auto Valore Protetto"
 
 	policyInfo := [][]string{{"Polizza Numero:", policy.CodeCompany, ""}, {"Targa Veicolo:", policy.Assets[0].Vehicle.Plate, ""},
@@ -106,12 +106,12 @@ func gapHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 		pdf.SetFontSize(14)
 		pdf.SetTextColor(92, 89, 92)
 		pdf.Cell(20, 6, productName)
-		pdf.ImageOptions(lib.GetAssetPathByEnvV2()+"logo_wopta.png", 115, 6.5, 0, 8, false, opt, 0, "")
+		pdf.ImageOptions(GetAssetPathByEnvV2()+"logo_wopta.png", 115, 6.5, 0, 8, false, opt, 0, "")
 		pdf.SetX(pdf.GetX() + 96.5)
 		pdf.SetDrawColor(229, 0, 117)
 		pdf.SetLineWidth(0.5)
 		pdf.Line(pdf.GetX(), 6, pdf.GetX(), 15.25)
-		pdf.ImageOptions(lib.GetAssetPathByEnvV2()+"logo_sogessur.png", 146, 7.5, 0, 6, false, opt, 0, "")
+		pdf.ImageOptions(GetAssetPathByEnvV2()+"logo_sogessur.png", 146, 7.5, 0, 6, false, opt, 0, "")
 
 		setBlackRegularFont(pdf, standardTextSize)
 		pdf.SetXY(10, 20)
@@ -169,7 +169,7 @@ func woptaGapHeader(pdf *fpdf.Fpdf, policy models.Policy) {
 	pdf.SetHeaderFunc(func() {
 		var opt fpdf.ImageOptions
 		opt.ImageType = "png"
-		pdf.ImageOptions(lib.GetAssetPathByEnvV2()+"logo_wopta.png", 11, 6, 0, 10,
+		pdf.ImageOptions(GetAssetPathByEnvV2()+"logo_wopta.png", 11, 6, 0, 10,
 			false, opt, 0, "")
 
 		setBlackRegularFont(pdf, standardTextSize)

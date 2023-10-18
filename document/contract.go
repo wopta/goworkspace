@@ -11,10 +11,6 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
-var (
-	folderPath string
-)
-
 func ContractFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println("[Contract]")
 	//lib.Files("./serverless_function_source_code")
@@ -40,7 +36,7 @@ func ContractObj(origin string, data models.Policy, networkNode *models.NetworkN
 		lib.CheckError(err)
 	}*/
 
-	folderPath = lib.GetAssetPathByEnvV2()
+	//folderPath = lib.GetAssetPathByEnvV2()
 
 	go func() {
 		var (
