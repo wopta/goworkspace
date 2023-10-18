@@ -88,6 +88,7 @@ func mainHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 		pdf.SetXY(23, 13)
 		pdf.SetTextColor(92, 89, 92)
 		pdf.Cell(10, 6, productName)
+		log.Printf("[logo_wopta+ path: %s", folderPath+"logo_wopta.png")
 		pdf.ImageOptions(folderPath+"logo_wopta.png", 170, 6, 0, 8, false, opt, 0, "")
 
 		setBlackBoldFont(pdf, standardTextSize)

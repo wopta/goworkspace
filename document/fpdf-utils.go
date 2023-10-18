@@ -67,7 +67,7 @@ func downloadAssets() error {
 		return fmt.Errorf("no files found")
 	}
 
-	err = os.Mkdir(basePath, 0777)
+	err = os.Mkdir(folderPath, 0777)
 	if err != nil {
 		return err
 	}
@@ -83,7 +83,7 @@ func downloadAssets() error {
 	}
 
 	// TODO: remove this
-	b, err := os.ReadFile(basePath + "logo_axa.png")
+	b, err := os.ReadFile(folderPath + "logo_wopta.png")
 	if err != nil {
 		log.Println(err.Error())
 		return err
@@ -91,7 +91,7 @@ func downloadAssets() error {
 	log.Printf("logo axa: %s", string(b))
 
 	// TODO: remove this
-	files, err = os.ReadDir(basePath)
+	files, err = os.ReadDir(folderPath)
 	if err != nil {
 		return err
 	}
