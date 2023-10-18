@@ -44,11 +44,11 @@ steps:
     # Copy assets folder from Google Bucket to directory
     if [[ "${strarr[1]}" == *"dev"* ]]; then
     echo "dev enviroment"
-      gsutil cp gs://function-data/dev/assets/ ./tmp/
+      gsutil -m cp -r dir gs://function-data/dev/assets /workspace/tmp/assets/
     fi
      if [[ "${strarr[1]}" == *"prod"* ]]; then
     echo "prod enviroment"
-      gsutil cp gs://core-350507-function-data/prod/assets/ ./tmp/
+      gsutil -m cp -r dir gs://core-350507-function-data/prod/assets /workspace/tmp/assets/
     fi
     
     gcloud functions deploy ${strarr[0]} \
