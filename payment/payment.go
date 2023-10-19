@@ -127,5 +127,7 @@ func getPaymentMethods(policy models.Policy, product *models.Product) []string {
 			}
 		}
 	}
+
+	log.Printf("[GetPaymentMethods] found %v", paymentMethods)
 	return paymentMethods
 }

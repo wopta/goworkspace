@@ -1,6 +1,7 @@
 package product
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -58,8 +59,10 @@ func GetProductV2(productName, productVersion, channel string, networkNode *mode
 	log.Printf("[GetProductV2] filePath: %s", filePath)
 
 	productBytes := lib.GetFilesByEnv(filePath)
+	buffer := new(bytes.Buffer)
+	_ = json.Compact(buffer, productBytes)
 
-	log.Printf("[GetProductV2] retrieved product: %s", string(productBytes))
+	log.Printf("[GetProductV2] retrieved product: %s", buffer.String())
 
 	err := json.Unmarshal(productBytes, &product)
 	if err != nil {
