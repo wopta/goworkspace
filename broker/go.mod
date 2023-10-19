@@ -9,17 +9,17 @@ require (
 	cloud.google.com/go/firestore v1.9.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.4
 	github.com/wopta/goworkspace/bpmn v1.0.16
-	github.com/wopta/goworkspace/document v1.1.2
-	github.com/wopta/goworkspace/lib v1.0.78
-	github.com/wopta/goworkspace/mail v1.0.42
-	github.com/wopta/goworkspace/models v1.1.52
-	github.com/wopta/goworkspace/network v1.0.4
-	github.com/wopta/goworkspace/payment v1.0.84
-	github.com/wopta/goworkspace/policy v1.0.15
-	github.com/wopta/goworkspace/product v1.0.52
-	github.com/wopta/goworkspace/question v1.0.2
-	github.com/wopta/goworkspace/reserved v1.0.10
-	github.com/wopta/goworkspace/transaction v1.0.20
+	github.com/wopta/goworkspace/document v1.1.3
+	github.com/wopta/goworkspace/lib v1.0.79
+	github.com/wopta/goworkspace/mail v1.0.43
+	github.com/wopta/goworkspace/models v1.1.53
+	github.com/wopta/goworkspace/network v1.0.5
+	github.com/wopta/goworkspace/payment v1.0.85
+	github.com/wopta/goworkspace/policy v1.0.16
+	github.com/wopta/goworkspace/product v1.0.53
+	github.com/wopta/goworkspace/question v1.0.3
+	github.com/wopta/goworkspace/reserved v1.0.11
+	github.com/wopta/goworkspace/transaction v1.0.21
 	github.com/wopta/goworkspace/wiseproxy v1.0.3
 )
 
@@ -78,7 +78,7 @@ require (
 	github.com/richardlehane/msoleps v1.0.3 // indirect
 	github.com/ruudk/golang-pdf417 v0.0.0-20201230142125-a7e3863a1245 // indirect
 	github.com/sergi/go-diff v1.0.0 // indirect
-	github.com/sirupsen/logrus v1.9.0 // indirect
+	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.2.1 // indirect
