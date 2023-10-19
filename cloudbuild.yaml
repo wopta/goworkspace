@@ -9,6 +9,9 @@ steps:
   - '-c'
   - |
     export namefx=( $(grep -Eo '[[:digit:]]+|[^[:digit:]]+' <<<'$TAG_NAME') )
+    #Print current tag
+    echo "current tag: ${TAG_NAME}"
+  
     #Read the string value
     echo $namefx
     read text
@@ -59,8 +62,7 @@ steps:
     --trigger-http \
     --runtime=go119 \
     --env-vars-file ${env}.yaml \
-    --project=${project} \
-    --verbosity=debug
+    --project=${project}
 
     
      #gcloud functions add-iam-policy-binding ${strarr[0]} \
