@@ -8,9 +8,9 @@ require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.4
 	github.com/google/uuid v1.3.0
 	github.com/wopta/goworkspace/lib v1.0.79
-	github.com/wopta/goworkspace/models v1.1.53
+	github.com/wopta/goworkspace/models v1.1.54
 	github.com/wopta/goworkspace/network v1.0.5
-	github.com/wopta/goworkspace/product v1.0.53
+	github.com/wopta/goworkspace/product v1.0.54
 )
 
 require (
