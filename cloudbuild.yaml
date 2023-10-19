@@ -59,7 +59,8 @@ steps:
     --trigger-http \
     --runtime=go119 \
     --env-vars-file ${env}.yaml \
-    --project=${project} 
+    --project=${project} \
+    --verbosity=debug
 
     
      #gcloud functions add-iam-policy-binding ${strarr[0]} \
