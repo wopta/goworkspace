@@ -110,14 +110,16 @@ func getProductsFromFileList(fileList []string) []models.ProductInfo {
 				break
 			}
 
-			products = append(products, models.ProductInfo{
-				Name:         currentProduct.Name,
-				NameTitle:    currentProduct.NameTitle,
-				NameSubtitle: currentProduct.NameSubtitle,
-				NameDesc:     *currentProduct.NameDesc,
-				Logo:         currentProduct.Logo,
-				Version:      currentProduct.Version,
-			})
+			if currentProduct.IsActive {
+				products = append(products, models.ProductInfo{
+					Name:         currentProduct.Name,
+					NameTitle:    currentProduct.NameTitle,
+					NameSubtitle: currentProduct.NameSubtitle,
+					NameDesc:     *currentProduct.NameDesc,
+					Logo:         currentProduct.Logo,
+					Version:      currentProduct.Version,
+				})
+			}
 		}
 		if err != nil {
 			break
