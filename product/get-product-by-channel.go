@@ -188,7 +188,8 @@ func replaceDatesInProduct(product *models.Product, channel string) error {
 
 	filePath := fmt.Sprintf("products-v2/%s/%s/age_info.json", product.Name, product.Version)
 	if !lib.CheckFileExistence(filePath) {
-		return fmt.Errorf("file not found")
+		log.Printf("[replaceDatesInProduct] file not found: %s", filePath)
+		return nil
 	}
 
 	jsonOut, err := product.Marshal()
