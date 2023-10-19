@@ -135,6 +135,8 @@ type ProductInfo struct {
 	NameSubtitle string `json:"nameSubtitle"`
 	NameDesc     string `json:"nameDesc"`
 	Logo         string `json:"logo"`
+	Version      string `json:"version"`
+	Company      string `json:"company"` // DEPRECATED
 }
 
 func ProductToListData(query *firestore.DocumentIterator) []Product {

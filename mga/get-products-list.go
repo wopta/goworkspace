@@ -14,17 +14,7 @@ const (
 )
 
 type GetProductListResp struct {
-	Products []ProductInfo `json:"products"`
-}
-
-type ProductInfo struct {
-	Name         string `json:"name"`
-	NameTitle    string `json:"nameTitle"`
-	NameSubtitle string `json:"nameSubtitle"`
-	NameDesc     string `json:"nameDesc"`
-	Version      string `json:"version"`
-	Company      string `json:"company"`
-	Logo         string `json:"logo"`
+	Products []models.ProductInfo `json:"products"`
 }
 
 // DEPRECATED
@@ -52,10 +42,10 @@ func GetProductsListByEntitlementFx(w http.ResponseWriter, r *http.Request) (str
 	}
 	log.Printf("GetProductsListByEntitlement: found %d products for %s", len(roleProducts), authToken.Role)
 
-	resp := GetProductListResp{Products: make([]ProductInfo, 0)}
+	resp := GetProductListResp{Products: make([]models.ProductInfo, 0)}
 	for _, product := range roleProducts {
 		for _, company := range product.Companies {
-			resp.Products = append(resp.Products, ProductInfo{
+			resp.Products = append(resp.Products, models.ProductInfo{
 				Name:         product.Name,
 				NameTitle:    product.NameTitle,
 				NameSubtitle: product.NameSubtitle,

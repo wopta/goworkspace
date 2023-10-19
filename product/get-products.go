@@ -116,6 +116,7 @@ func getProductsFromFileList(fileList []string) []models.ProductInfo {
 				NameSubtitle: currentProduct.NameSubtitle,
 				NameDesc:     *currentProduct.NameDesc,
 				Logo:         currentProduct.Logo,
+				Version:      currentProduct.Version,
 			})
 		}
 		if err != nil {
