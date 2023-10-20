@@ -22,7 +22,7 @@ func lifeAxaV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode
 
 	guaranteesMap, slugs := loadLifeGuarantees(policy, product)
 
-	lifeGuaranteesTable(pdf, guaranteesMap, slugs)
+	lifeGuaranteesTableV2(pdf, guaranteesMap, slugs)
 
 	avvertenzeBeneficiariSection(pdf)
 
@@ -233,4 +233,39 @@ func lifeInsuredInfoTableV2(pdf *fpdf.Fpdf, insured *models.User) {
 		}
 		drawPinkHorizontalLine(pdf, thinLineWidth)
 	}
+}
+
+func lifeGuaranteesTableV2(pdf *fpdf.Fpdf, guaranteesMap map[string]map[string]string, slugs []slugStruct) {
+	setBlackBoldFont(pdf, standardTextSize)
+	pdf.MultiCell(90, 3, "Garanzie", "", "CM", false)
+	pdf.SetXY(pdf.GetX()+90, pdf.GetY()-3)
+	pdf.MultiCell(30, 3, "Somma\nassicurata €", "", "CM", false)
+	pdf.SetXY(pdf.GetX()+117, pdf.GetY()-6)
+	pdf.MultiCell(20, 3, "Durata\nanni", "", "CM", false)
+	pdf.SetXY(pdf.GetX()+140, pdf.GetY()-6)
+	pdf.MultiCell(25, 3, "Scade il", "", "CM", false)
+	pdf.SetXY(pdf.GetX()+169, pdf.GetY()-3)
+	pdf.MultiCell(0, 3, "Premio annuale €", "", "CM", false)
+	pdf.Ln(1)
+	drawPinkHorizontalLine(pdf, thinLineWidth)
+	pdf.Ln(1)
+
+	for _, slug := range slugs {
+		setBlackBoldFont(pdf, standardTextSize)
+		pdf.CellFormat(90, 6, guaranteesMap[slug.name]["name"], "", 0, "", false, 0, "")
+		setBlackRegularFont(pdf, standardTextSize)
+		pdf.CellFormat(25, 6, guaranteesMap[slug.name]["sumInsuredLimitOfIndemnity"],
+			"", 0, "RM", false, 0, "")
+		pdf.CellFormat(25, 6, guaranteesMap[slug.name]["duration"], "", 0, "CM",
+			false, 0, "")
+		pdf.CellFormat(25, 6, guaranteesMap[slug.name]["endDate"], "", 0, "CM", false, 0, "")
+		pdf.CellFormat(0, 6, guaranteesMap[slug.name]["price"], "",
+			1, "RM", false, 0, "")
+		//pdf.Ln(5)
+		drawPinkHorizontalLine(pdf, thinLineWidth)
+	}
+	pdf.Ln(0.5)
+	setBlackRegularFont(pdf, smallTextSize)
+	pdf.Cell(80, 3, "(*) imposte assicurative di legge incluse nella misura del 2,50% del premio imponibile")
+	pdf.Ln(5)
 }
