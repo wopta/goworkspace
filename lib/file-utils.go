@@ -196,9 +196,14 @@ func PutToStorageIfNotExists(bucketname string, path string, file []byte) (strin
 	obj := bucket.Object(path)
 
 	// Check if the object already exists
-	if _, err := obj.Attrs(ctx); err == nil {
+	_, err = obj.Attrs(ctx);
+	if err == nil {
 		// Object already exists, return an error
 		return "", fmt.Errorf("file already exists")
+	}
+	// check if the error is because the object does not exist
+	if err != storage.ErrObjectNotExist {
+		return "", err
 	}
 
 	// Object does not exist, create a new writer and writer the file
