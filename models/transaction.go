@@ -113,3 +113,7 @@ func (transaction *Transaction) BigQuerySave(origin string) {
 	}
 	log.Println("Transaction BigQuery saved!")
 }
+
+func (tr *Transaction) IsLate(limit time.Time) bool {
+	return tr.PayDate.After(limit)
+}
