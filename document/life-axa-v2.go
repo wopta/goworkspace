@@ -601,3 +601,13 @@ func lifeContractWithdrawlSectionV2(pdf *fpdf.Fpdf) {
 	drawSignatureForm(pdf)
 	pdf.Ln(5)
 }
+
+func lifePaymentMethodSectionV2(pdf *fpdf.Fpdf) {
+	getParagraphTitle(pdf, "Come puoi pagare il premio")
+	setBlackRegularFont(pdf, standardTextSize)
+	pdf.MultiCell(0, 3, "I mezzi di pagamento consentiti, nei confronti di Wopta, sono esclusivamente "+
+		"bonifico e strumenti di pagamento elettronico, quali ad esempio, carte di credito e/o carte di debito, "+
+		"incluse le carte prepagate. Oppure può essere pagato direttamente alla Compagnia alla "+
+		"stipula del contratto, via bonifico o carta di credito.", "", "", false)
+	pdf.Ln(3)
+}
