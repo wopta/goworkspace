@@ -5,16 +5,65 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"time"
 
 	"github.com/wopta/goworkspace/document"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	prd "github.com/wopta/goworkspace/product"
+	trn "github.com/wopta/goworkspace/transaction"
 )
 
-type ReservedRuleOutput struct {
-	IsReserved   bool
-	ReservedInfo *models.ReservedInfo
+type ByAssetPerson struct{}
+
+func (*ByAssetPerson) isCovered(w *PolicyReservedWrapper) (bool, *models.Policy, error) {
+	var (
+		result              = false
+		coveredPolicy       *models.Policy
+		lastPaidTransaction *models.Transaction
+	)
+	log.Println("[ByAssetPerson.isCovered] start -----------------------------")
+
+	now := time.Now().UTC()
+	lateDate := now.AddDate(0, 2, 0)
+
+	// Check JSON query
+	query := fmt.Sprintf(
+		"SELECT * FROM `%s.%s` WHERE ",
+		models.WoptaDataset,
+		models.PolicyCollection,
+	)
+
+	policies, err := lib.QueryRowsBigQuery[models.Policy](query)
+	if err != nil {
+		log.Printf("[ByAssetPerson.isCovered] error getting network transactions: %s", err.Error())
+	}
+
+	for _, policy := range policies {
+		// check if foundPolicy is in validity range (now ≥ policy.StartDate && now ≤ policy.StartDate)
+		// TODO: improve comparison with inclusive dates
+		if policy.IsInActiveRange() {
+			// TODO: improve query with by date + 2 months
+			transactions := trn.GetPolicyTransactions(w.Origin, policy.Uid)
+			for _, tr := range transactions {
+				if tr.IsPay {
+					lastPaidTransaction = &tr
+				}
+			}
+			// check if policy is paid valid (lastPaidTransaction + 2 months < now)
+			// check if newPolicy.StartDate ≤ foundPolicy.EndDate;
+			if !lastPaidTransaction.IsLate(lateDate) && w.Policy.StartDate.Before(policy.EndDate) {
+				result = true
+				coveredPolicy = &policy
+				break
+			}
+		}
+	}
+
+	fmt.Printf("[ByAssetPerson.isCovered] result '%t'", result)
+	fmt.Println("[ByAssetPerson.isCovered] end -------------------------------")
+
+	return result, coveredPolicy, nil
 }
 
 func lifeReserved(policy *models.Policy) (bool, *models.ReservedInfo) {
@@ -149,4 +198,31 @@ func setLifeReservedInfo(policy *models.Policy, product *models.Product) {
 		setLifeReservedDocument(policy, product)
 		setLifeContactsDetails(policy)
 	}
+}
+
+func lifeReservedByCoverage(wrapper *PolicyReservedWrapper) (bool, *models.ReservedInfo) {
+	log.Println("[lifeReservedByCoverage] start ------------------------------")
+
+	var output = ReservedRuleOutput{
+		IsReserved: false,
+		ReservedInfo: &models.ReservedInfo{
+			Reasons: make([]string, 0),
+		},
+	}
+
+	isCovered, coveredPolicy, err := wrapper.AlreadyCovered.isCovered(wrapper)
+	if err != nil {
+		// TODO: check handling of error
+		panic("help")
+	}
+
+	output.IsReserved = isCovered
+	if isCovered {
+		reason := fmt.Sprintf("Assicurato già coperto dalla polizza %s", coveredPolicy.CodeCompany)
+		log.Printf("[lifeReservedByCoverage] %s", reason)
+		output.ReservedInfo.Reasons = append(output.ReservedInfo.Reasons, reason)
+	}
+
+	log.Println("[lifeReservedByCoverage] end --------------------------------")
+	return output.IsReserved, output.ReservedInfo
 }

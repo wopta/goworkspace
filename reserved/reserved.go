@@ -1,21 +1,31 @@
 package reserved
 
 import (
+	"log"
+	"net/http"
+
+	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
+	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
 
-func GetReservedInfo(policy *models.Policy) (bool, *models.ReservedInfo) {
-	switch policy.Name {
-	case models.LifeProduct:
-		return lifeReserved(policy)
-	default:
-		return false, nil
-	}
+func init() {
+	log.Println("INIT Reserved")
+	functions.HTTP("Reserved", Reserved)
 }
 
-func SetReservedInfo(policy *models.Policy, product *models.Product) {
-	switch policy.Name {
-	case models.LifeProduct:
-		setLifeReservedInfo(policy, product)
+func Reserved(w http.ResponseWriter, r *http.Request) {
+	log.Println("Reserved")
+	lib.EnableCors(&w, r)
+	route := lib.RouteData{
+		Routes: []lib.Route{
+			{
+				Route:   "/coverage/v1/:policyUid",
+				Handler: SetCoverageReservedFx,
+				Method:  http.MethodPatch,
+				Roles:   []string{models.UserRoleAll},
+			},
+		},
 	}
+	route.Router(w, r)
 }
