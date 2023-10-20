@@ -68,6 +68,18 @@ func Mga(w http.ResponseWriter, r *http.Request) {
 				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},
+			{
+				Route: "/warrants/v1",
+				Handler: GetWarrantsFx,
+				Method: http.MethodGet,
+				Roles: []string{models.UserRoleAdmin, models.UserRoleManager},
+			},
+			{
+				Route: "/warrant/v1",
+				Handler: CreateWarrantFx,
+				Method: http.MethodPut,
+				Roles: []string{models.UserRoleAdmin, models.UserRoleManager},
+			},
 		},
 	}
 
