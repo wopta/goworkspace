@@ -161,4 +161,6 @@ const (
 
 const (
 	FlowFileFormat = "flows/%s.json"
+	WarrantFormat  = "warrants/%s.json"
+	WarrantsFolder = "warrants/"
 )
