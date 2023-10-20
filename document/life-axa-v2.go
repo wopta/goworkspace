@@ -24,11 +24,11 @@ func lifeAxaV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode
 
 	lifeGuaranteesTableV2(pdf, guaranteesMap, slugs)
 
-	avvertenzeBeneficiariSection(pdf)
+	lifeAvvertenzeBeneficiariSectionV2(pdf)
 
 	beneficiaries, legitimateSuccessorsChoice, designatedSuccessorsChoice := loadLifeBeneficiariesInfo(policy)
 
-	beneficiariesSection(pdf, beneficiaries, legitimateSuccessorsChoice, designatedSuccessorsChoice)
+	lifeBeneficiariesSectionV2(pdf, beneficiaries, legitimateSuccessorsChoice, designatedSuccessorsChoice)
 
 	beneficiaryReferenceSection(pdf, policy)
 
@@ -268,4 +268,79 @@ func lifeGuaranteesTableV2(pdf *fpdf.Fpdf, guaranteesMap map[string]map[string]s
 	setBlackRegularFont(pdf, smallTextSize)
 	pdf.Cell(80, 3, "(*) imposte assicurative di legge incluse nella misura del 2,50% del premio imponibile")
 	pdf.Ln(5)
+}
+
+func lifeAvvertenzeBeneficiariSectionV2(pdf *fpdf.Fpdf) {
+	getParagraphTitle(pdf, "Nomina dei Beneficiari e Referente terzo, per il caso di garanzia Decesso "+
+		"(qualora sottoscritta)")
+	setBlackRegularFont(pdf, standardTextSize)
+	pdf.MultiCell(0, 3, "AVVERTENZE: Può scegliere se designare nominativamente i beneficiari o se "+
+		"designare genericamente come beneficiari i suoi eredi legittimi e/o testamentari. In caso di mancata "+
+		"designazione nominativa, la Compagnia potrà incontrare, al decesso dell’Assicurato, maggiori difficoltà "+
+		"nell’identificazione e nella ricerca dei beneficiari. La modifica o revoca del/i beneficiario/i deve essere "+
+		"comunicata alla Compagnia in forma scritta.\nIn caso di specifiche esigenze di riservatezza, la Compagnia "+
+		"potrà rivolgersi ad un soggetto terzo (diverso dal Beneficiario) in caso di Decesso al fine di contattare "+
+		"il Beneficiario designato.", "", "", false)
+	pdf.Ln(2)
+}
+
+func lifeBeneficiariesSectionV2(pdf *fpdf.Fpdf, beneficiaries []map[string]string, legitimateSuccessorsChoice,
+	designatedSuccessorsChoice string) {
+	getParagraphTitle(pdf, "Beneficiario")
+	setBlackRegularFont(pdf, standardTextSize)
+	pdf.CellFormat(0, 4, "Io sottoscritto Assicurato, con la sottoscrizione della presente polizza, in "+
+		"riferimento alla garanzia Decesso:", "", 1, "", false, 0, "")
+
+	rows := [][]string{
+		{legitimateSuccessorsChoice, "Designo genericamente quali beneficiari della prestazione i miei eredi " +
+			"(legittimi e/o testamentari)"},
+		{designatedSuccessorsChoice, "Designo nominativamente il/i seguente/i soggetto/i quale beneficiario/i della " +
+			"prestazione"},
+	}
+
+	setBlackDrawColor(pdf)
+	for _, row := range rows {
+		pdf.SetX(11.4)
+		pdf.CellFormat(3, 3, row[0], "1", 0, "CM", false, 0, "")
+		pdf.CellFormat(0, 3.5, row[1], "", 1, "LM", false, 0, "")
+	}
+	pdf.Ln(1)
+
+	lifeBeneficiariesTableV2(pdf, beneficiaries)
+}
+
+func lifeBeneficiariesTableV2(pdf *fpdf.Fpdf, beneficiaries []map[string]string) {
+	tables := make([][][]string, 0)
+
+	for _, beneficiary := range beneficiaries {
+		tableRows := [][]string{
+			{"Cognome e nome", beneficiary["name"], "Cod. Fisc.:", beneficiary["fiscCode"]},
+			{"Indirizzo", beneficiary["address"], "", ""},
+			{"Mail", beneficiary["mail"], "Telefono:", beneficiary["phone"]},
+			{"Relazione con assicurato", beneficiary["relation"], "", ""},
+		}
+		tables = append(tables, tableRows)
+	}
+
+	for tableIndex, table := range tables {
+		drawPinkHorizontalLine(pdf, thickLineWidth)
+
+		for _, row := range table {
+			setBlackBoldFont(pdf, standardTextSize)
+			pdf.CellFormat(45, 5, row[0], "", 0, fpdf.AlignLeft, false, 0, "")
+			setBlackRegularFont(pdf, standardTextSize)
+			pdf.CellFormat(80, 5, row[1], "", 0, fpdf.AlignLeft, false, 0, "")
+			setBlackBoldFont(pdf, standardTextSize)
+			pdf.CellFormat(20, 5, row[2], "", 0, fpdf.AlignLeft, false, 0, "")
+			setBlackRegularFont(pdf, standardTextSize)
+			pdf.CellFormat(45, 5, row[3], "", 1, fpdf.AlignLeft, false, 0, "")
+			drawPinkHorizontalLine(pdf, thinLineWidth)
+		}
+
+		pdf.CellFormat(165, 5, "Consenso ad invio comunicazioni da parte della Compagnia al beneficiario, prima "+
+			"dell'evento Decesso:", "", 0, fpdf.AlignLeft, false, 0, "")
+		pdf.CellFormat(50, 5, beneficiaries[tableIndex]["contactConsent"], "", 1, fpdf.AlignLeft, false, 0, "")
+		drawPinkHorizontalLine(pdf, thinLineWidth)
+		pdf.Ln(2)
+	}
 }
