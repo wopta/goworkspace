@@ -38,9 +38,9 @@ func lifeAxaV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode
 
 	pdf.AddPage()
 
-	statementsSection(pdf, policy)
+	lifeStatementsSectionV2(pdf, policy)
 
-	offerResumeSection(pdf, policy)
+	lifeOfferResumeSectionV2(pdf, policy)
 
 	paymentResumeSection(pdf, policy)
 
@@ -409,4 +409,63 @@ func lifeSurveysSectionV2(pdf *fpdf.Fpdf, policy *models.Policy) {
 		err = printSurvey(pdf, survey, policy.Company)
 		lib.CheckError(err)
 	}
+}
+
+func lifeStatementsSectionV2(pdf *fpdf.Fpdf, policy *models.Policy) {
+	statements := *policy.Statements
+	for _, statement := range statements {
+		printStatement(pdf, statement, policy.Company)
+	}
+}
+
+func lifeOfferResumeSectionV2(pdf *fpdf.Fpdf, policy *models.Policy) {
+	var (
+		paymentSplit string
+		paymentInfo  [][]string
+		tableRows    = [][]string{
+			{"Premio", "Imponibile", "Imposte Assicurative", "Totale"},
+		}
+	)
+
+	switch policy.PaymentSplit {
+	case string(models.PaySplitMonthly):
+		paymentSplit = "MENSILE"
+		paymentInfo = [][]string{
+			{
+				"Mensile firma del contratto",
+				lib.HumanaizePriceEuro(policy.OffersPrices["default"]["monthly"].Net),
+				lib.HumanaizePriceEuro(policy.OffersPrices["default"]["monthly"].Tax),
+				lib.HumanaizePriceEuro(policy.OffersPrices["default"]["monthly"].Gross),
+			},
+			{
+				"Pari ad un premio Annuale",
+				lib.HumanaizePriceEuro(policy.OffersPrices["default"]["monthly"].Net * 12),
+				lib.HumanaizePriceEuro(policy.OffersPrices["default"]["monthly"].Tax * 12),
+				lib.HumanaizePriceEuro(policy.OffersPrices["default"]["monthly"].Gross * 12),
+			},
+		}
+	case string(models.PaySplitYear), string(models.PaySplitYearly):
+		paymentSplit = "ANNUALE"
+		paymentInfo = [][]string{
+			{
+				"Annuale firma del contratto",
+				lib.HumanaizePriceEuro(policy.OffersPrices["default"]["yearly"].Net),
+				lib.HumanaizePriceEuro(policy.OffersPrices["default"]["yearly"].Tax),
+				lib.HumanaizePriceEuro(policy.OffersPrices["default"]["yearly"].Gross),
+			},
+		}
+	}
+	tableRows = append(tableRows, paymentInfo...)
+
+	getParagraphTitle(pdf, "Il premio per tutte le coperture assicurative attivate sulla polizza – Frazionamento: "+paymentSplit)
+
+	for _, row := range tableRows {
+		setBlackRegularFont(pdf, standardTextSize)
+		pdf.CellFormat(70, 5, row[0], "", 0, fpdf.AlignLeft, false, 0, "")
+		pdf.CellFormat(50, 5, row[1], "", 0, fpdf.AlignLeft, false, 0, "")
+		pdf.CellFormat(40, 5, row[2], "", 0, fpdf.AlignLeft, false, 0, "")
+		pdf.CellFormat(30, 5, row[3], "", 1, fpdf.AlignRight, false, 0, "")
+		drawPinkHorizontalLine(pdf, thinLineWidth)
+	}
+	pdf.Ln(3)
 }
