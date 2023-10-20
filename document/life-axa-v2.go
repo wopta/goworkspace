@@ -32,7 +32,9 @@ func lifeAxaV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode
 
 	lifeBeneficiaryReferenceSectionV2(pdf, policy)
 
-	surveysSection(pdf, policy)
+	pdf.AddPage()
+
+	lifeSurveysSectionV2(pdf, policy)
 
 	pdf.AddPage()
 
@@ -392,4 +394,49 @@ func lifeBeneficiaryReferenceTableV2(pdf *fpdf.Fpdf, beneficiaryReference map[st
 		pdf.CellFormat(45, 5, row[3], "", 1, fpdf.AlignLeft, false, 0, "")
 		drawPinkHorizontalLine(pdf, thinLineWidth)
 	}
+}
+
+func lifeSurveysSectionV2(pdf *fpdf.Fpdf, policy *models.Policy) {
+	surveys := *policy.Surveys
+
+	getParagraphTitle(pdf, "Dichiarazioni da leggere con attenzione prima di firmare")
+	err := printSurvey(pdf, surveys[0], policy.Company)
+	lib.CheckError(err)
+
+	getParagraphTitle(pdf, "Questionario Medico")
+	for _, survey := range surveys[1:] {
+		err := printSurvey(pdf, survey, policy.Company)
+		lib.CheckError(err)
+	}
+
+	/*
+		if policy.PartnershipName == models.PartnershipBeProf {
+			surveys[0].Questions[len(surveys[0].Questions)-1].Question += " In caso anche di una sola risposta positiva, ovvero in caso di somme" +
+				" assicurate per le garanzie Decesso e/o Invalidità Totale Permanente da Infortunio o Malattia superiori" +
+				" a 200.000 €, è richiesto che l’Assicurato si sottoponga a visita medica come indicato al punto c)" +
+				" che precede."
+		}
+
+		getParagraphTitle(pdf, "Dichiarazioni da leggere con attenzione prima di firmare")
+		err := printSurvey(pdf, surveys[0], policy.Company)
+		lib.CheckError(err)
+
+		pdf.AddPage()
+
+		getParagraphTitle(pdf, "Questionario Medico")
+		for _, survey := range surveys[1:] {
+			err := printSurvey(pdf, survey, policy.Company)
+			lib.CheckError(err)
+		}
+
+		if policy.IsReserved {
+			pdf.Ln(3)
+			setBlackRegularFont(pdf, standardTextSize)
+			pdf.MultiCell(0, 3, "Nota  bene:  Ai  fini  della  valutazione  del  rischio,  l’Assicurato  ha  "+
+				"inviato  alla  compagnia  un  Rapporto  di  Visita  Medica,  sottoscritto  dal medico curante, che  "+
+				"costituisce  parte  integrante della  presente  Polizza  e  la Compagnia, valutato il  rischio,  ha  "+
+				"accettato  il rischio  alle condizioni indicate nella presente Polizza", "", fpdf.AlignLeft, false)
+
+			setBlackBoldFont(pdf, standardTextSize)
+		}*/
 }
