@@ -47,7 +47,7 @@ func loadCustomFonts(pdf *fpdf.Fpdf) {
 func saveContract(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 	var filename string
 	if os.Getenv("env") == "local" {
-		err := pdf.OutputFileAndClose("./contract.pdf")
+		err := pdf.OutputFileAndClose("./document/contract.pdf")
 		lib.CheckError(err)
 	} else {
 		var out bytes.Buffer

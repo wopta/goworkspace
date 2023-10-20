@@ -162,3 +162,8 @@ const (
 const (
 	FlowFileFormat = "flows/%s.json"
 )
+
+const (
+	ProductV1 = "v1"
+	ProductV2 = "v2"
+)

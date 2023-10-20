@@ -172,11 +172,11 @@ func (nn *NetworkNode) GetName() string {
 
 	// use constants
 	switch nn.Type {
-	case "agent":
+	case AgentNetworkNodeType:
 		name = nn.Agent.Name + " " + nn.Agent.Surname
-	case "agency", "broker":
+	case AgencyNetworkNodeType, BrokerNetworkNodeType:
 		name = nn.Agency.Name
-	case "partnership":
+	case PartnershipNetworkNodeType:
 		name = nn.Partnership.Name
 	case "manager":
 		name = "manager"

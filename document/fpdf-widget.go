@@ -1,6 +1,7 @@
 package document
 
 import (
+	"fmt"
 	"github.com/dustin/go-humanize"
 	"github.com/go-pdf/fpdf"
 	"github.com/wopta/goworkspace/lib"
@@ -51,6 +52,103 @@ func mainHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 			policyInfo += policyStartDate.In(location).AddDate(1, 0, 0).Format(dateLayout) + "\n"
 		}
 		policyInfo += "Sostituisce la polizza ========"
+	}
+
+	contractor := policy.Contractor
+	address := strings.ToUpper(contractor.Residence.StreetName + ", " + contractor.Residence.StreetNumber + "\n" +
+		contractor.Residence.PostalCode + " " + contractor.Residence.City + " (" + contractor.Residence.CityCode + ")\n")
+
+	if contractor.VatCode == "" {
+		cfpi = contractor.FiscalCode
+	} else {
+		cfpi = contractor.VatCode
+	}
+
+	contractorInfo := "Contraente: " + strings.ToUpper(contractor.Surname+" "+contractor.Name+"\n"+
+		"C.F./P.IVA: "+cfpi) + "\n" +
+		"Indirizzo: " + strings.ToUpper(address) + "Mail: " + contractor.Mail + "\n" +
+		"Telefono: " + contractor.Phone
+
+	pdf.SetHeaderFunc(func() {
+		opt.ImageType = "png"
+		pdf.ImageOptions(logoPath, 10, 6, 13, 13, false, opt, 0, "")
+		pdf.SetXY(23, 7)
+		setPinkBoldFont(pdf, 18)
+		pdf.Cell(10, 6, "Wopta per te")
+		setPinkItalicFont(pdf, 18)
+		pdf.SetXY(23, 13)
+		pdf.SetTextColor(92, 89, 92)
+		pdf.Cell(10, 6, productName)
+		pdf.ImageOptions(lib.GetAssetPathByEnvV2()+"logo_wopta.png", 170, 6, 0, 8, false, opt, 0, "")
+
+		setBlackBoldFont(pdf, standardTextSize)
+		pdf.SetXY(11, 20)
+		pdf.Cell(0, 3, "I dati della tua polizza")
+		setBlackRegularFont(pdf, standardTextSize)
+		pdf.SetXY(11, pdf.GetY()+3)
+		pdf.MultiCell(0, 3.5, policyInfo, "", "", false)
+
+		setBlackBoldFont(pdf, standardTextSize)
+		pdf.SetXY(-95, 20)
+		pdf.Cell(0, 3, "I tuoi dati")
+		setBlackRegularFont(pdf, standardTextSize)
+		pdf.SetXY(-95, pdf.GetY()+3)
+		pdf.MultiCell(0, 3.5, contractorInfo, "", "", false)
+		pdf.Ln(5)
+	})
+}
+
+func mainHeaderV2(pdf *fpdf.Fpdf, policy *models.Policy, networkNode *models.NetworkNode) {
+	var (
+		opt                                     fpdf.ImageOptions
+		logoPath, cfpi, expiryInfo, productName string
+	)
+
+	location, err := time.LoadLocation("Europe/Rome")
+	lib.CheckError(err)
+
+	policyStartDate := policy.StartDate.In(location)
+	policyEndDate := policy.EndDate.In(location)
+
+	if policy.PaymentSplit == string(models.PaySplitMonthly) {
+		expiryInfo = "Prima scandenza mensile il: " +
+			policyStartDate.AddDate(0, 1, 0).Format(dateLayout) + "\n"
+	} else if policy.PaymentSplit == string(models.PaySplitYear) || policy.PaymentSplit == string(models.PaySplitYearly) {
+		expiryInfo = "Prima scadenza annuale il: " +
+			policyStartDate.AddDate(1, 0, 0).Format(dateLayout) + "\n"
+	}
+
+	policyInfo := "Numero: " + policy.CodeCompany + "\n" +
+		"Decorre dal: " + policyStartDate.Format(dateLayout) + " ore 24:00\n" +
+		"Scade il: " + policyEndDate.In(location).Format(dateLayout) + " ore 24:00\n"
+
+	switch policy.Name {
+	case models.LifeProduct:
+		logoPath = lib.GetAssetPathByEnvV2() + "logo_vita.png"
+		productName = "Vita"
+		policyInfo += expiryInfo + "Non si rinnova a scadenza.\n"
+	case models.PmiProduct:
+		logoPath = lib.GetAssetPathByEnvV2() + "logo_pmi.png"
+		productName = "Artigiani & Imprese"
+	case models.PersonaProduct:
+		logoPath = lib.GetAssetPathByEnvV2() + "logo_persona.png"
+		productName = "Persona"
+		policyInfo += "Si rinnova a scadenza salvo disdetta da inviare 30 giorni prima\n" + "Prossimo pagamento "
+		if policy.PaymentSplit == string(models.PaySplitMonthly) {
+			policyInfo += policyStartDate.In(location).AddDate(0, 1, 0).Format(dateLayout) + "\n"
+		} else if policy.PaymentSplit == string(models.PaySplitYear) {
+			policyInfo += policyStartDate.In(location).AddDate(1, 0, 0).Format(dateLayout) + "\n"
+		}
+		policyInfo += "Sostituisce la polizza ========"
+	}
+	if networkNode != nil {
+		policyInfo += "Produttore: "
+		switch networkNode.Type {
+		case models.AgentNetworkNodeType:
+			policyInfo += strings.ToUpper(fmt.Sprintf("%s %s\n", networkNode.Agent.Surname, networkNode.Agent.Name))
+		case models.AgencyNetworkNodeType:
+			policyInfo += strings.ToUpper(fmt.Sprintf("%s\n", networkNode.Agency.Name))
+		}
 	}
 
 	contractor := policy.Contractor

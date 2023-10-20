@@ -3,6 +3,7 @@ package document
 import (
 	"encoding/base64"
 	"encoding/json"
+	"github.com/wopta/goworkspace/network"
 	prd "github.com/wopta/goworkspace/product"
 	"io"
 	"log"
@@ -22,9 +23,15 @@ func ContractFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 	err := json.Unmarshal([]byte(req), &data)
 	lib.CheckError(err)
 
-	product := prd.GetProductV2(data.Name, data.ProductVersion, models.MgaChannel, nil, nil)
+	var warrant *models.Warrant
+	networkNode := network.GetNetworkNodeByUid(data.ProducerUid)
+	if networkNode != nil {
+		warrant = networkNode.GetWarrant()
+	}
 
-	respObj := <-ContractObj(origin, data, nil, product) // TODO review product nil
+	product := prd.GetProductV2(data.Name, data.ProductVersion, models.MgaChannel, networkNode, warrant)
+
+	respObj := <-ContractObj(origin, data, networkNode, product) // TODO review product nil
 	resp, err := json.Marshal(respObj)
 
 	lib.CheckError(err)
