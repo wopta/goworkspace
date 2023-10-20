@@ -42,7 +42,7 @@ func lifeAxaV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode
 
 	lifeOfferResumeSectionV2(pdf, policy)
 
-	paymentResumeSection(pdf, policy)
+	lifePaymentResumeSectionV2(pdf, policy)
 
 	contractWithdrawlSection(pdf)
 
@@ -467,5 +467,107 @@ func lifeOfferResumeSectionV2(pdf *fpdf.Fpdf, policy *models.Policy) {
 		pdf.CellFormat(30, 5, row[3], "", 1, fpdf.AlignRight, false, 0, "")
 		drawPinkHorizontalLine(pdf, thinLineWidth)
 	}
+	pdf.Ln(3)
+}
+
+func lifePaymentResumeSectionV2(pdf *fpdf.Fpdf, policy *models.Policy) {
+	var (
+		paymentSplit string
+		payments     = make([]float64, 20)
+	)
+
+	policyStartDate := policy.StartDate
+
+	cellWidth := pdf.GetStringWidth("00/00/0000:") + pdf.GetStringWidth("€ ###.###,##")
+
+	switch policy.PaymentSplit {
+	case string(models.PaySplitYear), string(models.PaySplitYearly):
+		paymentSplit = "ANNUALE"
+		for _, guarantee := range policy.Assets[0].Guarantees {
+			for i := 0; i < guarantee.Value.Duration.Year; i++ {
+				payments[i] += guarantee.Value.PremiumGrossYearly
+			}
+		}
+	case string(models.PaySplitMonthly):
+		paymentSplit = "MENSILE"
+		for _, guarantee := range policy.Assets[0].Guarantees {
+			for i := 0; i < guarantee.Value.Duration.Year; i++ {
+				for y := 0; y < 12; y++ {
+					payments[i] += guarantee.Value.PremiumGrossMonthly
+				}
+			}
+		}
+	}
+
+	getParagraphTitle(pdf, "Pagamento dei premi successivi al primo")
+	setBlackRegularFont(pdf, standardTextSize)
+	pdf.MultiCell(0, 3, "Il Contraente è tenuto a pagare i Premi entro 30 giorni dalle relative scadenze. "+
+		"In caso di mancato pagamento del premio entro 30 giorni dalla scadenza (c.d. termine di tolleranza) "+
+		"l’assicurazione è sospesa. Il contratto è risolto automaticamente in caso di mancato pagamento "+
+		"del Premio entro 90 giorni dalla scadenza.", "", "", false)
+	drawPinkHorizontalLine(pdf, thickLineWidth)
+	pdf.Ln(1)
+	setBlackBoldFont(pdf, standardTextSize)
+	pdf.CellFormat(pdf.GetStringWidth("Tipologia di premio"), 3, "Tipologia di premio:", "",
+		0, "", false, 0, "")
+	pdf.SetX(pdf.GetX() + 5)
+	setBlackRegularFont(pdf, standardTextSize)
+	setBlackDrawColor(pdf)
+	pdf.CellFormat(3, 3, "", "1", 0, "", false, 0, "")
+	pdf.SetX(pdf.GetX() + 1)
+	pdf.CellFormat(pdf.GetStringWidth("naturale variabile annualmente"), 3, "naturale variabile annualmente",
+		"", 0, "", false, 0, "")
+	pdf.SetX(pdf.GetX() + 5)
+	pdf.CellFormat(3, 3, "X", "1", 0, "CM", false, 0, "")
+	pdf.SetX(pdf.GetX() + 1)
+	pdf.CellFormat(pdf.GetStringWidth("fisso"), 3, "fisso", "", 0, "", false, 0,
+		"")
+	pdf.SetX(pdf.GetX() + 40)
+	setBlackBoldFont(pdf, standardTextSize)
+	pdf.CellFormat(pdf.GetStringWidth("Frazionamento"), 3, "Frazionamento:", "", 0, "",
+		false, 0, "")
+	pdf.SetX(pdf.GetX() + 3)
+	pdf.CellFormat(pdf.GetStringWidth(paymentSplit), 3, paymentSplit, "", 0, "", false,
+		0, "")
+	pdf.Ln(4)
+	drawPinkHorizontalLine(pdf, 0.1)
+	pdf.Ln(1)
+	setBlackRegularFont(pdf, standardTextSize)
+	pdf.Cell(0, 3, "Il Premio è dovuto alle diverse annualità di Polizza, alle date qui sotto indicate:")
+	pdf.Ln(4)
+	drawPinkHorizontalLine(pdf, 0.1)
+
+	for x := 0; x < len(payments)/4; x++ {
+		pdf.Ln(1)
+		for y := 0; y < 4; y++ {
+			pdf.SetX(pdf.GetX() + 4)
+
+			if payments[x+(5*y)] != 0 {
+				var date string
+				if x == 0 && y == 0 {
+					date = "Alla firma:"
+				} else {
+					date = policyStartDate.AddDate(x+(5*y), 0, 0).Format(dateLayout) + ":"
+				}
+				price := lib.HumanaizePriceEuro(payments[x+(5*y)])
+
+				pdf.CellFormat(cellWidth, 3, date+" "+price, "", 0, fpdf.AlignRight, false,
+					0, "")
+
+			} else {
+				pdf.CellFormat(cellWidth, 3, "===========", "", 0, fpdf.AlignRight, false,
+					0, "")
+			}
+
+		}
+		pdf.Ln(4)
+		drawPinkHorizontalLine(pdf, 0.1)
+	}
+
+	pdf.Ln(1)
+	setBlackRegularFont(pdf, smallTextSize)
+	pdf.MultiCell(0, 3, "In caso di frazionamento mensile i Premi sopra riportati sono dovuti, alle date "+
+		"indicate e con successiva frequenza mensile, in misura di 1/12 per ogni mensilità. Non sono previsti oneri "+
+		"o interessi di frazionamento.", "", "", false)
 	pdf.Ln(3)
 }
