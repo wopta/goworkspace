@@ -2,6 +2,7 @@ package document
 
 import (
 	"fmt"
+	"github.com/dustin/go-humanize"
 	"github.com/go-pdf/fpdf"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
@@ -46,11 +47,9 @@ func lifeAxaV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode
 
 	lifeContractWithdrawlSectionV2(pdf)
 
-	pdf.AddPage()
+	lifePaymentMethodSectionV2(pdf)
 
-	paymentMethodSection(pdf)
-
-	emitResumeSection(pdf, policy)
+	lifeEmitResumeSectionV2(pdf, policy)
 
 	companiesDescriptionSection(pdf, policy.Company)
 
@@ -609,5 +608,24 @@ func lifePaymentMethodSectionV2(pdf *fpdf.Fpdf) {
 		"bonifico e strumenti di pagamento elettronico, quali ad esempio, carte di credito e/o carte di debito, "+
 		"incluse le carte prepagate. Oppure può essere pagato direttamente alla Compagnia alla "+
 		"stipula del contratto, via bonifico o carta di credito.", "", "", false)
+	pdf.Ln(3)
+}
+
+func lifeEmitResumeSectionV2(pdf *fpdf.Fpdf, policy *models.Policy) {
+	var offerPrice string
+	emitDate := policy.EmitDate.Format(dateLayout)
+	startDate := policy.StartDate.Format(dateLayout)
+	if policy.PaymentSplit == string(models.PaySplitMonthly) {
+		offerPrice = humanize.FormatFloat("#.###,##", policy.PriceGrossMonthly)
+	} else {
+		offerPrice = humanize.FormatFloat("#.###,##", policy.PriceGross)
+	}
+	text := "Polizza emessa a Milano il " + emitDate + " per un importo di € " + offerPrice + " quale " +
+		"prima rata alla firma, il cui pagamento a saldo è da effettuarsi con i metodi di pagamento sopra indicati. " +
+		"Wopta conferma avvenuto incasso e copertura della polizza dal " + startDate + "."
+
+	getParagraphTitle(pdf, "Emissione polizza e pagamento della prima rata")
+	setBlackRegularFont(pdf, standardTextSize)
+	pdf.MultiCell(0, 3, text, "", "", false)
 	pdf.Ln(3)
 }
