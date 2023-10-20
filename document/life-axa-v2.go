@@ -30,7 +30,7 @@ func lifeAxaV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode
 
 	lifeBeneficiariesSectionV2(pdf, beneficiaries, legitimateSuccessorsChoice, designatedSuccessorsChoice)
 
-	beneficiaryReferenceSection(pdf, policy)
+	lifeBeneficiaryReferenceSectionV2(pdf, policy)
 
 	surveysSection(pdf, policy)
 
@@ -342,5 +342,54 @@ func lifeBeneficiariesTableV2(pdf *fpdf.Fpdf, beneficiaries []map[string]string)
 		pdf.CellFormat(50, 5, beneficiaries[tableIndex]["contactConsent"], "", 1, fpdf.AlignLeft, false, 0, "")
 		drawPinkHorizontalLine(pdf, thinLineWidth)
 		pdf.Ln(2)
+	}
+}
+
+func lifeBeneficiaryReferenceSectionV2(pdf *fpdf.Fpdf, policy *models.Policy) {
+	beneficiaryReference := map[string]string{
+		"name":     "=====",
+		"fiscCode": "=====",
+		"address":  "=====",
+		"mail":     "=====",
+		"phone":    "=====",
+	}
+
+	deathGuarantee, err := policy.ExtractGuarantee("death")
+	lib.CheckError(err)
+
+	if deathGuarantee.BeneficiaryReference != nil {
+		beneficiary := deathGuarantee.BeneficiaryReference
+		address := strings.ToUpper(beneficiary.Residence.StreetName + ", " + beneficiary.Residence.StreetNumber +
+			" - " + beneficiary.Residence.PostalCode + " " + beneficiary.Residence.City +
+			" (" + beneficiary.Residence.CityCode + ")")
+		beneficiaryReference["name"] = strings.ToUpper(beneficiary.Surname + " " + beneficiary.Name)
+		beneficiaryReference["fiscCode"] = strings.ToUpper(beneficiary.FiscalCode)
+		beneficiaryReference["address"] = address
+		beneficiaryReference["mail"] = beneficiary.Mail
+		beneficiaryReference["phone"] = beneficiary.Phone
+	}
+
+	getParagraphTitle(pdf, "Referente terzo")
+	lifeBeneficiaryReferenceTableV2(pdf, beneficiaryReference)
+	pdf.Ln(2)
+}
+
+func lifeBeneficiaryReferenceTableV2(pdf *fpdf.Fpdf, beneficiaryReference map[string]string) {
+	tableRows := [][]string{
+		{"Cognome e nome", beneficiaryReference["name"], "Cod, Fisc.:", beneficiaryReference["fiscCode"]},
+		{"Indirizzo", beneficiaryReference["address"], "", ""},
+		{"Mail", beneficiaryReference["mail"], "Telefono:", beneficiaryReference["phone"]},
+	}
+
+	for _, row := range tableRows {
+		setBlackBoldFont(pdf, standardTextSize)
+		pdf.CellFormat(45, 5, row[0], "", 0, fpdf.AlignLeft, false, 0, "")
+		setBlackRegularFont(pdf, standardTextSize)
+		pdf.CellFormat(80, 5, row[1], "", 0, fpdf.AlignLeft, false, 0, "")
+		setBlackBoldFont(pdf, standardTextSize)
+		pdf.CellFormat(20, 5, row[2], "", 0, fpdf.AlignLeft, false, 0, "")
+		setBlackRegularFont(pdf, standardTextSize)
+		pdf.CellFormat(45, 5, row[3], "", 1, fpdf.AlignLeft, false, 0, "")
+		drawPinkHorizontalLine(pdf, thinLineWidth)
 	}
 }
