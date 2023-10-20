@@ -324,3 +324,14 @@ func (policy *Policy) GetFlow(networkNode *NetworkNode, warrant *Warrant) (strin
 
 	return flowName, &flowFile
 }
+
+func (p *Policy) IsInActiveRange() bool {
+	now := time.Now().UTC()
+
+	// TODO: improve comparison with inclusive dates
+	if p.StartDate.Before(now) && p.EndDate.After(now) { // check if foundPolicy is in validity range (now ≥ policy.StartDate && now ≤ policy.StartDate)
+		return true
+	}
+
+	return false
+}
