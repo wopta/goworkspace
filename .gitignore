@@ -12,4 +12,5 @@ function-data/
 .idea
 .DS_Store
 *.code-workspace
+document/*.pdf
 
