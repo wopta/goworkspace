@@ -56,7 +56,7 @@ func ContractObj(origin string, data models.Policy, networkNode *models.NetworkN
 			filename, out = Save(m, data)
 		case models.LifeProduct:
 			pdf := initFpdf()
-			filename, out = LifeContract(pdf, origin, &data, networkNode, product)
+			filename, out = lifeContract(pdf, origin, &data, networkNode, product)
 		case models.PersonaProduct:
 			pdf := initFpdf()
 			filename, out = PersonaContract(pdf, &data, product)

@@ -67,8 +67,8 @@ func Proposal(origin string, policy *models.Policy, networkNode *models.NetworkN
 
 	switch policy.Name {
 	case models.LifeProduct:
-		log.Println("[Proposal] call LifeProposal...")
-		filename, rawDoc = LifeProposal(pdf, origin, policy, networkNode, product)
+		log.Println("[Proposal] call lifeProposal...")
+		filename, rawDoc = lifeProposal(pdf, origin, policy, networkNode, product)
 	}
 
 	log.Printf("[Proposal] proposal document generated for proposal n. %d", policy.ProposalNumber)
