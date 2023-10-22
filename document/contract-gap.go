@@ -5,13 +5,13 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
-func gapContract(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, []byte) {
+func gapContract(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode *models.NetworkNode) (string, []byte) {
 	var (
 		filename string
 		out      []byte
 	)
 
-	filename, out = GapSogessur(pdf, origin, policy)
+	filename, out = gapSogessurContractV1(pdf, origin, policy, networkNode)
 
 	return filename, out
 }

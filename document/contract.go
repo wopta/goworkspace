@@ -62,7 +62,7 @@ func ContractObj(origin string, data models.Policy, networkNode *models.NetworkN
 			filename, out = PersonaContract(pdf, &data, product)
 		case models.GapProduct:
 			pdf := initFpdf()
-			filename, out = GapContract(pdf, origin, &data)
+			filename, out = gapContract(pdf, origin, &data, networkNode)
 		}
 
 		data.DocumentName = filename
