@@ -214,7 +214,7 @@ func lifeInsuredInfoTableV2(pdf *fpdf.Fpdf, insured *models.User) {
 	}
 
 	tmpBirthDate, err := time.Parse(time.RFC3339, insured.BirthDate)
-	if err != nil {
+	if err == nil {
 		birthDate = tmpBirthDate.Format(dateLayout)
 	}
 
