@@ -533,3 +533,21 @@ func woptaInfoTable(pdf *fpdf.Fpdf, producerInfo map[string]string) {
 		"21 - 00187 Roma", "", "", false)
 	drawPinkHorizontalLine(pdf, 0.1)
 }
+
+func getProducerName(networkNode *models.NetworkNode) string {
+	var producerName string
+
+	if networkNode == nil {
+		return producerName
+	}
+
+	switch networkNode.Type {
+	case models.AgentNetworkNodeType:
+		producerName = strings.ToUpper(fmt.Sprintf("%s %s", networkNode.Agent.Surname, networkNode.Agent.Name))
+	case models.AgencyNetworkNodeType:
+		producerName = strings.ToUpper(fmt.Sprintf("%s", networkNode.Agency.Name))
+	case models.BrokerNetworkNodeType:
+		producerName = strings.ToUpper(fmt.Sprintf("%s", networkNode.Broker.Name))
+	}
+	return producerName
+}

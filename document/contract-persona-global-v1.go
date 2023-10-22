@@ -87,13 +87,7 @@ func personaMainHeaderV1(pdf *fpdf.Fpdf, policy *models.Policy, networkNode *mod
 	policyInfo += "Sostituisce la polizza ========\n"
 
 	if networkNode != nil {
-		policyInfo += "Produttore: "
-		switch networkNode.Type {
-		case models.AgentNetworkNodeType:
-			policyInfo += strings.ToUpper(fmt.Sprintf("%s %s\n", networkNode.Agent.Surname, networkNode.Agent.Name))
-		case models.AgencyNetworkNodeType:
-			policyInfo += strings.ToUpper(fmt.Sprintf("%s\n", networkNode.Agency.Name))
-		}
+		policyInfo += "Produttore: " + getProducerName(networkNode)
 	}
 
 	contractor := policy.Contractor

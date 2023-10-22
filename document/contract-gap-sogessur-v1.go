@@ -92,14 +92,7 @@ func gapHeaderV1(pdf *fpdf.Fpdf, policy *models.Policy, networkNode *models.Netw
 		{"Decorre dal:", policyStartDate.Format(dateLayout), "ore 24:00"}, {"Scade il:", policyEndDate.Format(dateLayout), "ore 24:00"}}...)
 
 	if networkNode != nil {
-		networkNodeInfo := []string{"Produttore:"}
-		switch networkNode.Type {
-		case models.AgentNetworkNodeType:
-			networkNodeInfo = append(networkNodeInfo, strings.ToUpper(fmt.Sprintf("%s %s", networkNode.Agent.Surname, networkNode.Agent.Name)))
-		case models.AgencyNetworkNodeType:
-			networkNodeInfo = append(networkNodeInfo, strings.ToUpper(fmt.Sprintf("%s", networkNode.Agency.Name)))
-		}
-		networkNodeInfo = append(networkNodeInfo, "")
+		networkNodeInfo := []string{"Produttore:", getProducerName(networkNode), ""}
 		policyInfo = append(policyInfo, networkNodeInfo)
 	}
 

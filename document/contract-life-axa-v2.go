@@ -136,18 +136,12 @@ func lifeMainHeaderV2(pdf *fpdf.Fpdf, policy *models.Policy, networkNode *models
 		expiryInfo +
 		"Non si rinnova a scadenza.\n"
 
+	if networkNode != nil {
+		policyInfo += "Produttore: " + getProducerName(networkNode)
+	}
+
 	logoPath = lib.GetAssetPathByEnvV2() + "logo_vita.png"
 	productName = "Vita"
-
-	if networkNode != nil {
-		policyInfo += "Produttore: "
-		switch networkNode.Type {
-		case models.AgentNetworkNodeType:
-			policyInfo += strings.ToUpper(fmt.Sprintf("%s %s\n", networkNode.Agent.Surname, networkNode.Agent.Name))
-		case models.AgencyNetworkNodeType:
-			policyInfo += strings.ToUpper(fmt.Sprintf("%s\n", networkNode.Agency.Name))
-		}
-	}
 
 	contractor := policy.Contractor
 	address := strings.ToUpper(contractor.Residence.StreetName + ", " + contractor.Residence.StreetNumber + "\n" +
