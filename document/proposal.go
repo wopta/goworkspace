@@ -86,3 +86,55 @@ func Proposal(origin string, policy *models.Policy, networkNode *models.NetworkN
 		Bytes:   base64.StdEncoding.EncodeToString(rawDoc),
 	}
 }
+
+func lifeProposal(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode *models.NetworkNode, product *models.Product) (string, []byte) {
+	var (
+		rawDoc   []byte
+		filename string
+	)
+
+	log.Println("[lifeProposal] function start ------------------------------")
+
+	switch policy.ProductVersion {
+	case models.ProductV1:
+		log.Println("[lifeProposal] life v1")
+		filename, rawDoc = lifeAxaProposalV1(pdf, origin, policy, networkNode, product)
+	case models.ProductV2:
+		log.Println("[lifeProposal] life v2")
+		filename, rawDoc = lifeAxaProposalV2(pdf, origin, policy, networkNode, product)
+	}
+
+	log.Println("[lifeProposal] function end --------------------------------")
+
+	return filename, rawDoc
+}
+
+func gapProposal(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode *models.NetworkNode) (string, []byte) {
+	var (
+		filename string
+		out      []byte
+	)
+
+	log.Println("[gapProposal] function start -------------------------------")
+
+	filename, out = gapSogessurProposalV1(pdf, origin, policy, networkNode)
+
+	log.Println("[gapProposal] function end ---------------------------------")
+
+	return filename, out
+}
+
+func personaProposal(pdf *fpdf.Fpdf, policy *models.Policy, networkNode *models.NetworkNode, product *models.Product) (string, []byte) {
+	var (
+		filename string
+		out      []byte
+	)
+
+	log.Println("[personaProposal] function start ---------------------------")
+
+	filename, out = personaGlobalProposalV1(pdf, policy, networkNode, product)
+
+	log.Println("[personaProposal] function end -----------------------------")
+
+	return filename, out
+}
