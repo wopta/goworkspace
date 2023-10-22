@@ -46,7 +46,7 @@ func lifeAxaV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode
 
 	lifePaymentResumeSectionV2(pdf, policy)
 
-	lifeContractWithdrawlSectionV2(pdf)
+	lifeContractWithdrawlSectionV2(pdf, isProposal)
 
 	pdf.AddPage()
 
@@ -583,7 +583,7 @@ func lifePaymentResumeSectionV2(pdf *fpdf.Fpdf, policy *models.Policy) {
 	pdf.Ln(3)
 }
 
-func lifeContractWithdrawlSectionV2(pdf *fpdf.Fpdf) {
+func lifeContractWithdrawlSectionV2(pdf *fpdf.Fpdf, isProposal bool) {
 	getParagraphTitle(pdf, "Informativa sul diritto di recesso")
 
 	paragraphs := [][]string{
@@ -608,9 +608,11 @@ func lifeContractWithdrawlSectionV2(pdf *fpdf.Fpdf) {
 		pdf.MultiCell(0, 3, paragraph[1], "", "", false)
 	}
 
-	pdf.Ln(5)
-	drawSignatureForm(pdf)
-	pdf.Ln(5)
+	if !isProposal {
+		pdf.Ln(5)
+		drawSignatureForm(pdf)
+		pdf.Ln(5)
+	}
 }
 
 func lifePaymentMethodSectionV2(pdf *fpdf.Fpdf) {
