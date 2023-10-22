@@ -347,14 +347,14 @@ func surveysSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	}
 
 	getParagraphTitle(pdf, "Dichiarazioni da leggere con attenzione prima di firmare")
-	err := printSurvey(pdf, surveys[0], policy.Company)
+	err := printSurvey(pdf, surveys[0], policy.Company, false)
 	lib.CheckError(err)
 
 	pdf.AddPage()
 
 	getParagraphTitle(pdf, "Questionario Medico")
 	for _, survey := range surveys[1:] {
-		err := printSurvey(pdf, survey, policy.Company)
+		err := printSurvey(pdf, survey, policy.Company, false)
 		lib.CheckError(err)
 	}
 
@@ -373,7 +373,7 @@ func surveysSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 func statementsSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	statements := *policy.Statements
 	for _, statement := range statements {
-		printStatement(pdf, statement, policy.Company)
+		printStatement(pdf, statement, policy.Company, false)
 	}
 }
 

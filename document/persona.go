@@ -140,11 +140,11 @@ func personaSurveySection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	surveys := *policy.Surveys
 
 	getParagraphTitle(pdf, "Dichiarazioni da leggere con attenzione prima di firmare")
-	err := printSurvey(pdf, surveys[0], policy.Company)
+	err := printSurvey(pdf, surveys[0], policy.Company, false)
 	lib.CheckError(err)
 
 	for _, survey := range surveys[1:] {
-		err := printSurvey(pdf, survey, policy.Company)
+		err := printSurvey(pdf, survey, policy.Company, false)
 		lib.CheckError(err)
 	}
 	pdf.Ln(3)
@@ -154,7 +154,7 @@ func personaStatementsSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	statements := *policy.Statements
 
 	for _, statement := range statements {
-		printStatement(pdf, statement, policy.Company)
+		printStatement(pdf, statement, policy.Company, false)
 	}
 	pdf.Ln(3)
 }

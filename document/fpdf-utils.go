@@ -181,7 +181,7 @@ func getParagraphTitle(pdf *fpdf.Fpdf, title string) {
 	pdf.MultiCell(0, 4, title, "", "", false)
 }
 
-func checkSurveySpace(pdf *fpdf.Fpdf, survey models.Survey) {
+func checkSurveySpace(pdf *fpdf.Fpdf, survey models.Survey, isProposal bool) {
 	var answer string
 	leftMargin, _, rightMargin, _ := pdf.GetMargins()
 	pageWidth, pageHeight := pdf.GetPageSize()
@@ -228,7 +228,7 @@ func checkSurveySpace(pdf *fpdf.Fpdf, survey models.Survey) {
 		requiredHeight += 3 * float64(len(lines))
 	}
 
-	if survey.ContractorSign || survey.CompanySign {
+	if (!isProposal && survey.ContractorSign) || survey.CompanySign {
 		requiredHeight += 35
 	}
 
@@ -237,13 +237,13 @@ func checkSurveySpace(pdf *fpdf.Fpdf, survey models.Survey) {
 	}
 }
 
-func printSurvey(pdf *fpdf.Fpdf, survey models.Survey, companyName string) error {
+func printSurvey(pdf *fpdf.Fpdf, survey models.Survey, companyName string, isProposal bool) error {
 	var dotsString string
 	leftMargin, _, rightMargin, _ := pdf.GetMargins()
 	pageWidth, _ := pdf.GetPageSize()
 	availableWidth := pageWidth - leftMargin - rightMargin - 2
 
-	checkSurveySpace(pdf, survey)
+	checkSurveySpace(pdf, survey, isProposal)
 
 	surveyTitle := survey.Title
 	surveySubtitle := survey.Subtitle
@@ -316,15 +316,18 @@ func printSurvey(pdf *fpdf.Fpdf, survey models.Survey, companyName string) error
 
 	if survey.CompanySign {
 		companySignature(pdf, companyName)
+		if isProposal {
+			pdf.Ln(20)
+		}
 	}
-	if survey.ContractorSign {
+	if !isProposal && survey.ContractorSign {
 		drawSignatureForm(pdf)
 		pdf.Ln(10)
 	}
 	return nil
 }
 
-func checkStatementSpace(pdf *fpdf.Fpdf, statement models.Statement) {
+func checkStatementSpace(pdf *fpdf.Fpdf, statement models.Statement, isProposal bool) {
 	leftMargin, _, rightMargin, _ := pdf.GetMargins()
 	pageWidth, pageHeight := pdf.GetPageSize()
 	availableWidth := pageWidth - leftMargin - rightMargin - 2
@@ -370,7 +373,7 @@ func checkStatementSpace(pdf *fpdf.Fpdf, statement models.Statement) {
 		requiredHeight += 3 * float64(len(lines))
 	}
 
-	if statement.ContractorSign || statement.CompanySign {
+	if (!isProposal && statement.ContractorSign) || statement.CompanySign {
 		requiredHeight += 35
 	}
 
@@ -379,8 +382,8 @@ func checkStatementSpace(pdf *fpdf.Fpdf, statement models.Statement) {
 	}
 }
 
-func printStatement(pdf *fpdf.Fpdf, statement models.Statement, companyName string) {
-	checkStatementSpace(pdf, statement)
+func printStatement(pdf *fpdf.Fpdf, statement models.Statement, companyName string, isProposal bool) {
+	checkStatementSpace(pdf, statement, isProposal)
 
 	title := statement.Title
 	subtitle := statement.Subtitle
@@ -408,8 +411,11 @@ func printStatement(pdf *fpdf.Fpdf, statement models.Statement, companyName stri
 
 	if statement.CompanySign {
 		companySignature(pdf, companyName)
+		if isProposal {
+			pdf.Ln(20)
+		}
 	}
-	if statement.ContractorSign {
+	if !isProposal && statement.ContractorSign {
 		drawSignatureForm(pdf)
 		pdf.Ln(10)
 	}

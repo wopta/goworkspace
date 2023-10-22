@@ -12,8 +12,9 @@ import (
 
 func lifeAxaV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode *models.NetworkNode, product *models.Product) (string, []byte) {
 	signatureID = 0
+	isProposal := true
 
-	lifeMainHeaderV2(pdf, policy, networkNode)
+	lifeMainHeaderV2(pdf, policy, networkNode, isProposal)
 
 	mainFooter(pdf, policy.Name)
 
@@ -33,19 +34,21 @@ func lifeAxaV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode
 
 	lifeBeneficiaryReferenceSectionV2(pdf, policy)
 
+	//pdf.AddPage()
+
+	lifeSurveysSectionV2(pdf, policy, isProposal)
+
 	pdf.AddPage()
 
-	lifeSurveysSectionV2(pdf, policy)
-
-	pdf.AddPage()
-
-	lifeStatementsSectionV2(pdf, policy)
+	lifeStatementsSectionV2(pdf, policy, isProposal)
 
 	lifeOfferResumeSectionV2(pdf, policy)
 
 	lifePaymentResumeSectionV2(pdf, policy)
 
 	lifeContractWithdrawlSectionV2(pdf)
+
+	pdf.AddPage()
 
 	lifePaymentMethodSectionV2(pdf)
 
@@ -101,10 +104,10 @@ func lifeAxaV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode
 	return filename, out
 }
 
-func lifeMainHeaderV2(pdf *fpdf.Fpdf, policy *models.Policy, networkNode *models.NetworkNode) {
+func lifeMainHeaderV2(pdf *fpdf.Fpdf, policy *models.Policy, networkNode *models.NetworkNode, isProposal bool) {
 	var (
-		opt                                     fpdf.ImageOptions
-		logoPath, cfpi, expiryInfo, productName string
+		opt                                                                   fpdf.ImageOptions
+		logoPath, cfpi, policyInfoHeader, policyInfo, expiryInfo, productName string
 	)
 
 	location, err := time.LoadLocation("Europe/Rome")
@@ -121,8 +124,15 @@ func lifeMainHeaderV2(pdf *fpdf.Fpdf, policy *models.Policy, networkNode *models
 			policyStartDate.AddDate(1, 0, 0).Format(dateLayout) + "\n"
 	}
 
-	policyInfo := "Numero: " + policy.CodeCompany + "\n" +
-		"Decorre dal: " + policyStartDate.Format(dateLayout) + " ore 24:00\n" +
+	if isProposal {
+		policyInfoHeader = "I dati della tua proposta"
+		policyInfo = fmt.Sprintf("Numero: %d\n", policy.ProposalNumber)
+	} else {
+		policyInfoHeader = "I dati della tua polizza"
+		policyInfo = fmt.Sprintf("Numero: %s\n", policy.CodeCompany)
+	}
+
+	policyInfo += "Decorre dal: " + policyStartDate.Format(dateLayout) + " ore 24:00\n" +
 		"Scade il: " + policyEndDate.In(location).Format(dateLayout) + " ore 24:00\n" +
 		expiryInfo +
 		"Non si rinnova a scadenza.\n"
@@ -169,7 +179,7 @@ func lifeMainHeaderV2(pdf *fpdf.Fpdf, policy *models.Policy, networkNode *models
 
 		setBlackBoldFont(pdf, standardTextSize)
 		pdf.SetXY(10, 20)
-		pdf.Cell(0, 3, "I dati della tua polizza")
+		pdf.Cell(0, 3, policyInfoHeader)
 		setBlackRegularFont(pdf, standardTextSize)
 		pdf.SetXY(10, pdf.GetY()+3)
 		pdf.MultiCell(0, 3.5, policyInfo, "", "", false)
@@ -396,24 +406,26 @@ func lifeBeneficiaryReferenceTableV2(pdf *fpdf.Fpdf, beneficiaryReference map[st
 	}
 }
 
-func lifeSurveysSectionV2(pdf *fpdf.Fpdf, policy *models.Policy) {
+func lifeSurveysSectionV2(pdf *fpdf.Fpdf, policy *models.Policy, isProposal bool) {
 	surveys := *policy.Surveys
 
 	getParagraphTitle(pdf, "Dichiarazioni da leggere con attenzione prima di firmare")
-	err := printSurvey(pdf, surveys[0], policy.Company)
+	err := printSurvey(pdf, surveys[0], policy.Company, isProposal)
 	lib.CheckError(err)
+
+	pdf.AddPage()
 
 	getParagraphTitle(pdf, "Questionario Medico")
 	for _, survey := range surveys[1:] {
-		err = printSurvey(pdf, survey, policy.Company)
+		err = printSurvey(pdf, survey, policy.Company, isProposal)
 		lib.CheckError(err)
 	}
 }
 
-func lifeStatementsSectionV2(pdf *fpdf.Fpdf, policy *models.Policy) {
+func lifeStatementsSectionV2(pdf *fpdf.Fpdf, policy *models.Policy, isProposal bool) {
 	statements := *policy.Statements
 	for _, statement := range statements {
-		printStatement(pdf, statement, policy.Company)
+		printStatement(pdf, statement, policy.Company, isProposal)
 	}
 }
 

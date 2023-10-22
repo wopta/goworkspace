@@ -63,7 +63,7 @@ func GapSogessur(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, 
 
 	woptaFooter(pdf)
 
-	printStatement(pdf, statements[len(statements)-1], policy.Company)
+	printStatement(pdf, statements[len(statements)-1], policy.Company, false)
 
 	woptaHeader(pdf)
 
@@ -372,6 +372,6 @@ func gapPriceTable(pdf *fpdf.Fpdf, policy *models.Policy) {
 
 func gapStatements(pdf *fpdf.Fpdf, statements []models.Statement, companyName string) {
 	for _, statement := range statements {
-		printStatement(pdf, statement, companyName)
+		printStatement(pdf, statement, companyName, false)
 	}
 }
