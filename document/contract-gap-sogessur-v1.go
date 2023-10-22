@@ -15,7 +15,7 @@ import (
 func gapSogessurContractV1(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode *models.NetworkNode) (string, []byte) {
 	signatureID = 0
 
-	gapHeaderV1(pdf, policy, networkNode, true)
+	gapHeaderV1(pdf, policy, networkNode, false)
 
 	gapFooterV1(pdf, policy.NameDesc)
 
@@ -42,7 +42,7 @@ func gapSogessurContractV1(pdf *fpdf.Fpdf, origin string, policy *models.Policy,
 
 	pdf.Ln(3)
 
-	gapStatementsV1(pdf, statements[:len(statements)-1], policy.Company)
+	gapStatementsV1(pdf, statements[:len(statements)-1], policy.Company, false)
 
 	companiesDescriptionSection(pdf, policy.Company)
 
@@ -378,8 +378,8 @@ func gapPriceTableV1(pdf *fpdf.Fpdf, policy *models.Policy) {
 	pdf.Ln(5)
 }
 
-func gapStatementsV1(pdf *fpdf.Fpdf, statements []models.Statement, companyName string) {
+func gapStatementsV1(pdf *fpdf.Fpdf, statements []models.Statement, companyName string, isProposal bool) {
 	for _, statement := range statements {
-		printStatement(pdf, statement, companyName, false)
+		printStatement(pdf, statement, companyName, isProposal)
 	}
 }

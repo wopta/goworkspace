@@ -6,8 +6,6 @@ import (
 )
 
 func lifeAxaProposalV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode *models.NetworkNode, product *models.Product) (string, []byte) {
-	signatureID = 0
-
 	lifeMainHeaderV2(pdf, policy, networkNode, true)
 
 	mainFooter(pdf, policy.Name)
@@ -41,7 +39,7 @@ func lifeAxaProposalV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, net
 	lifePaymentResumeSectionV2(pdf, policy)
 
 	lifeContractWithdrawlSectionV2(pdf, true)
-	
+
 	lifePaymentMethodSectionV2(pdf)
 
 	lifeEmitResumeSectionV2(pdf, policy)
