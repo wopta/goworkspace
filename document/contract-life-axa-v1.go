@@ -10,7 +10,7 @@ import (
 func lifeAxaContractV1(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode *models.NetworkNode, product *models.Product) (string, []byte) {
 	signatureID = 0
 
-	mainHeader(pdf, policy)
+	mainHeader(pdf, policy, false)
 
 	mainFooter(pdf, policy.Name)
 
@@ -40,7 +40,7 @@ func lifeAxaContractV1(pdf *fpdf.Fpdf, origin string, policy *models.Policy, net
 
 	paymentResumeSection(pdf, policy)
 
-	contractWithdrawlSection(pdf)
+	contractWithdrawlSection(pdf, false)
 
 	pdf.AddPage()
 

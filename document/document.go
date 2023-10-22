@@ -38,6 +38,12 @@ func Document(w http.ResponseWriter, r *http.Request) {
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
+				Route:   "/v1/proposal",
+				Handler: ProposalFx,
+				Method:  "POST",
+				Roles:   []string{models.UserRoleAll},
+			},
+			{
 				Route:   "/v1/sign/",
 				Handler: SignNamirial,
 				Method:  "POST",

@@ -1,6 +1,7 @@
 package document
 
 import (
+	"fmt"
 	"github.com/dustin/go-humanize"
 	"github.com/go-pdf/fpdf"
 	"github.com/wopta/goworkspace/lib"
@@ -9,10 +10,10 @@ import (
 	"time"
 )
 
-func mainHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
+func mainHeader(pdf *fpdf.Fpdf, policy *models.Policy, isProposal bool) {
 	var (
-		opt                                     fpdf.ImageOptions
-		logoPath, cfpi, expiryInfo, productName string
+		opt                                                                   fpdf.ImageOptions
+		logoPath, cfpi, policyInfoHeader, policyInfo, expiryInfo, productName string
 	)
 
 	location, err := time.LoadLocation("Europe/Rome")
@@ -29,8 +30,15 @@ func mainHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 			policyStartDate.AddDate(1, 0, 0).Format(dateLayout) + "\n"
 	}
 
-	policyInfo := "Numero: " + policy.CodeCompany + "\n" +
-		"Decorre dal: " + policyStartDate.Format(dateLayout) + " ore 24:00\n" +
+	if isProposal {
+		policyInfoHeader = "I dati della tua proposta"
+		policyInfo = fmt.Sprintf("Numero: %d\n", policy.ProposalNumber)
+	} else {
+		policyInfoHeader = "I dati della tua polizza"
+		policyInfo = fmt.Sprintf("Numero: %s\n", policy.CodeCompany)
+	}
+
+	policyInfo += "Decorre dal: " + policyStartDate.Format(dateLayout) + " ore 24:00\n" +
 		"Scade il: " + policyEndDate.In(location).Format(dateLayout) + " ore 24:00\n"
 
 	switch policy.Name {
@@ -82,7 +90,7 @@ func mainHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 
 		setBlackBoldFont(pdf, standardTextSize)
 		pdf.SetXY(11, 20)
-		pdf.Cell(0, 3, "I dati della tua polizza")
+		pdf.Cell(0, 3, policyInfoHeader)
 		setBlackRegularFont(pdf, standardTextSize)
 		pdf.SetXY(11, pdf.GetY()+3)
 		pdf.MultiCell(0, 3.5, policyInfo, "", "", false)
@@ -609,7 +617,7 @@ func companySignature(pdf *fpdf.Fpdf, companyName string) {
 	}
 }
 
-func contractWithdrawlSection(pdf *fpdf.Fpdf) {
+func contractWithdrawlSection(pdf *fpdf.Fpdf, isProposal bool) {
 	getParagraphTitle(pdf, "Informativa sul diritto di recesso")
 	setBlackBoldFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "Diritto di recesso entro i primi 30 giorni dalla stipula ("+
@@ -634,9 +642,11 @@ func contractWithdrawlSection(pdf *fpdf.Fpdf) {
 		"lettera raccomandata a.r. al seguente indirizzo: Wopta Assicurazioni srl – Gestione Portafoglio – Galleria del "+
 		"Corso, 1 – 201212 Milano (MI) oppure via posta elettronica certificata (PEC) all’indirizzo "+
 		"email: woptaassicurazioni@legalmail.it", "", "", false)
-	pdf.Ln(5)
-	drawSignatureForm(pdf)
-	pdf.Ln(5)
+	if !isProposal {
+		pdf.Ln(5)
+		drawSignatureForm(pdf)
+		pdf.Ln(5)
+	}
 }
 
 func allegato3Section(pdf *fpdf.Fpdf, producerInfo map[string]string) {

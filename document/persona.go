@@ -26,7 +26,7 @@ func PersonaContract(pdf *fpdf.Fpdf, policy *models.Policy, product *models.Prod
 func PersonaGlobal(pdf *fpdf.Fpdf, policy *models.Policy, product *models.Product) (string, []byte) {
 	signatureID = 0
 
-	mainHeader(pdf, policy)
+	mainHeader(pdf, policy, false)
 
 	mainFooter(pdf, policy.Name)
 
