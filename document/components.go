@@ -324,7 +324,7 @@ func (s Skin) SignDouleLine(m pdf.Maroto, name string, name2 string, id string, 
 		})
 		m.Col(6, func() {
 
-			_ = m.FileImage(lib.GetAssetPathByEnv("document")+"/firma_global.png", props.Rect{
+			_ = m.FileImage(lib.GetAssetPathByEnvV2()+"signature_global.png", props.Rect{
 				Left:    20,
 				Top:     -20,
 				Center:  false,

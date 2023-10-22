@@ -47,14 +47,14 @@ func (skin Skin) GlobalContract(m pdf.Maroto, data models.Policy) {
 	}
 
 	if data.Name == "pmi" {
-		logo = "/pmi.png"
+		logo = "logo_pmi.png"
 		name = "Artigiani & Imprese"
 		if data.PaymentSplit == "monthly" {
 			data.PriceNett = data.PriceNettMonthly
 			data.PriceGross = data.PriceGrossMonthly
 		}
 		m = skin.GetHeader(m, data, logo, name)
-		m = skin.GetFooter(m, "/logo_global.png", "Wopta per te. Artigiani & Imprese è un prodotto assicurativo di Global Assistance Compagnia di assicurazioni e riassicurazioni S.p.A, distribuito da Wopta Assicurazioni S.r.l")
+		m = skin.GetFooter(m, "logo_global.png", "Wopta per te. Artigiani & Imprese è un prodotto assicurativo di Global Assistance Compagnia di assicurazioni e riassicurazioni S.p.A, distribuito da Wopta Assicurazioni S.r.l")
 		m = skin.Space(m, 5.0)
 		m = skin.GetPmi(data, m)
 		m = skin.Space(m, 5.0)
@@ -140,7 +140,7 @@ commerciali e di marketing, incluso l’invio di newsletter e ricerche di mercat
 
 			m.ColSpace(10)
 			m.Col(2, func() {
-				_ = m.FileImage(lib.GetAssetPathByEnv("document")+"/logo_global_02.png", props.Rect{
+				_ = m.FileImage(lib.GetAssetPathByEnvV2()+"logo_global_02.png", props.Rect{
 					Left:    1,
 					Top:     1,
 					Center:  false,

@@ -432,7 +432,7 @@ func (skin Skin) GetHeader(m pdf.Maroto, data models.Policy, logo string, namePr
 		m.Row(15.0, func() {
 			m.Col(2, func() {
 
-				_ = m.FileImage(lib.GetAssetPathByEnv("document")+logo, props.Rect{
+				_ = m.FileImage(lib.GetAssetPathByEnvV2()+logo, props.Rect{
 					Left:    1,
 					Top:     1,
 					Center:  false,
@@ -460,7 +460,7 @@ func (skin Skin) GetHeader(m pdf.Maroto, data models.Policy, logo string, namePr
 			})
 			m.ColSpace(6)
 			m.Col(2, func() {
-				_ = m.FileImage(lib.GetAssetPathByEnv("document")+"/ARTW_LOGO_RGB_400px.png", props.Rect{
+				_ = m.FileImage(lib.GetAssetPathByEnvV2()+"logo_wopta.png", props.Rect{
 					Left:    1,
 					Top:     1,
 					Center:  false,
@@ -530,7 +530,7 @@ func (skin Skin) GetFooter(m pdf.Maroto, logo string, name string) pdf.Maroto {
 				})
 			})
 			m.Col(2, func() {
-				_ = m.FileImage(lib.GetAssetPathByEnv("document")+logo, props.Rect{
+				_ = m.FileImage(lib.GetAssetPathByEnvV2()+logo, props.Rect{
 					Left:    5,
 					Top:     10,
 					Center:  false,
