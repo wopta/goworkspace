@@ -3,6 +3,7 @@ package document
 import (
 	"encoding/base64"
 	"encoding/json"
+	"github.com/go-pdf/fpdf"
 	"github.com/wopta/goworkspace/network"
 	prd "github.com/wopta/goworkspace/product"
 	"io"
@@ -11,6 +12,10 @@ import (
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+)
+
+var (
+	signatureID int
 )
 
 func ContractFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -73,4 +78,56 @@ func ContractObj(origin string, data models.Policy, networkNode *models.NetworkN
 		}
 	}()
 	return r
+}
+
+func lifeContract(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode *models.NetworkNode, product *models.Product) (string, []byte) {
+	var (
+		filename string
+		out      []byte
+	)
+
+	log.Println("[lifeContract] function start ------------------------------")
+
+	switch policy.ProductVersion {
+	case models.ProductV1:
+		log.Println("[lifeContract] life v1")
+		filename, out = lifeAxaContractV1(pdf, origin, policy, networkNode, product)
+	case models.ProductV2:
+		log.Println("[lifeContract] life v2")
+		filename, out = lifeAxaContractV2(pdf, origin, policy, networkNode, product)
+	}
+
+	log.Println("[lifeContract] function end --------------------------------")
+
+	return filename, out
+}
+
+func gapContract(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode *models.NetworkNode) (string, []byte) {
+	var (
+		filename string
+		out      []byte
+	)
+
+	log.Println("[gapContract] function start -------------------------------")
+
+	filename, out = gapSogessurContractV1(pdf, origin, policy, networkNode)
+
+	log.Println("[gapContract] function end ---------------------------------")
+
+	return filename, out
+}
+
+func personaContract(pdf *fpdf.Fpdf, policy *models.Policy, networkNode *models.NetworkNode, product *models.Product) (string, []byte) {
+	var (
+		filename string
+		out      []byte
+	)
+
+	log.Println("[personaContract] function start ---------------------------")
+
+	filename, out = personaGlobalContractV1(pdf, policy, networkNode, product)
+
+	log.Println("[personaContract] function end -----------------------------")
+
+	return filename, out
 }
