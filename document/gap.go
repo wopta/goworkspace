@@ -71,7 +71,7 @@ func GapSogessur(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, 
 
 	woptaPrivacySection(pdf)
 
-	personalDataHandlingSection(pdf, policy)
+	personalDataHandlingSection(pdf, policy, false)
 
 	filename, out := saveContract(pdf, policy)
 	return filename, out

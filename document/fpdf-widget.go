@@ -351,7 +351,7 @@ func companiesDescriptionSection(pdf *fpdf.Fpdf, companyName string) {
 	pdf.Ln(3)
 }
 
-func personalDataHandlingSection(pdf *fpdf.Fpdf, policy *models.Policy) {
+func personalDataHandlingSection(pdf *fpdf.Fpdf, policy *models.Policy, isProposal bool) {
 	consentText := ""
 	notConsentText := "X"
 
@@ -384,7 +384,9 @@ func personalDataHandlingSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 		"con operatore).", "", "", false)
 	pdf.Ln(3)
 	pdf.Cell(0, 3, policy.EmitDate.Format(dateLayout))
-	drawSignatureForm(pdf)
+	if !isProposal {
+		drawSignatureForm(pdf)
+	}
 }
 
 func woptaPrivacySection(pdf *fpdf.Fpdf) {

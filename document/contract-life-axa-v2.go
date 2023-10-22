@@ -62,7 +62,7 @@ func lifeAxaV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode
 
 	axaFooter(pdf)
 
-	axaDeclarationsConsentSection(pdf, policy)
+	axaDeclarationsConsentSection(pdf, policy, isProposal)
 
 	pdf.AddPage()
 
@@ -70,7 +70,7 @@ func lifeAxaV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode
 
 	pdf.AddPage()
 
-	axaTablePart2Section(pdf, policy)
+	axaTablePart2Section(pdf, policy, isProposal)
 
 	pdf.Ln(15)
 
@@ -98,7 +98,7 @@ func lifeAxaV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode
 
 	woptaPrivacySection(pdf)
 
-	personalDataHandlingSection(pdf, policy)
+	personalDataHandlingSection(pdf, policy, isProposal)
 
 	filename, out := saveContract(pdf, policy)
 	return filename, out

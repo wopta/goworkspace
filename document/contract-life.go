@@ -28,7 +28,7 @@ func LifeContract(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkN
 	return filename, out
 }
 
-func axaDeclarationsConsentSection(pdf *fpdf.Fpdf, policy *models.Policy) {
+func axaDeclarationsConsentSection(pdf *fpdf.Fpdf, policy *models.Policy, isProposal bool) {
 	setBlackBoldFont(pdf, standardTextSize)
 	pdf.Cell(0, 3, "DICHIARAZIONI E CONSENSI")
 	pdf.Ln(3)
@@ -48,7 +48,9 @@ func axaDeclarationsConsentSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	drawBlackHorizontalLine(pdf, thinLineWidth)
 	pdf.Ln(5)
 	pdf.Cell(0, 3, policy.EmitDate.Format(dateLayout))
-	drawSignatureForm(pdf)
+	if !isProposal {
+		drawSignatureForm(pdf)
+	}
 }
 
 func axaTableSection(pdf *fpdf.Fpdf, policy *models.Policy) {
@@ -245,7 +247,7 @@ func axaTableSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	pdf.CellFormat(0, 2, "", "", 1, "", false, 0, "")
 }
 
-func axaTablePart2Section(pdf *fpdf.Fpdf, policy *models.Policy) {
+func axaTablePart2Section(pdf *fpdf.Fpdf, policy *models.Policy, isProposal bool) {
 	pdf.MultiCell(0, 3, "Il sottoscritto, ai sensi degli artt. 22 e 55 comma 3 del d.lgs. 231/2007, "+
 		"consapevole della responsabilità penale derivante da omesse e/o mendaci affermazioni, dichiara che tutte le "+
 		"informazioni fornite (anche in riferimento al titolare effettivo), le dichiarazioni rilasciate il documento "+
@@ -259,7 +261,9 @@ func axaTablePart2Section(pdf *fpdf.Fpdf, policy *models.Policy) {
 	setBlackBoldFont(pdf, standardTextSize)
 	pdf.CellFormat(30, 3, "Data "+policy.EmitDate.Format(dateLayout), "", 0, "CM",
 		false, 0, "")
-	drawSignatureForm(pdf)
+	if !isProposal {
+		drawSignatureForm(pdf)
+	}
 }
 
 func axaTablePart3Section(pdf *fpdf.Fpdf) {
