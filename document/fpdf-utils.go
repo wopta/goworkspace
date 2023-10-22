@@ -63,6 +63,25 @@ func saveContract(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 	return filename, nil
 }
 
+func saveProposal(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
+	var filename string
+	if os.Getenv("env") == "local" {
+		err := pdf.OutputFileAndClose("./document/proposal.pdf")
+		lib.CheckError(err)
+	} else {
+		var out bytes.Buffer
+		err := pdf.Output(&out)
+		lib.CheckError(err)
+		now := time.Now()
+		timestamp := strconv.FormatInt(now.Unix(), 10)
+		filename = "temp/" + policy.Uid + "/" + policy.Contractor.Name + "_" + policy.Contractor.Surname + "_" + timestamp + "_proposal.pdf"
+		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, out.Bytes())
+		lib.CheckError(err)
+		return filename, out.Bytes()
+	}
+	return filename, nil
+}
+
 func saveReservedDocument(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 	var (
 		gsLink string

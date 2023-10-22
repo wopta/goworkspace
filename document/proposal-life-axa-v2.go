@@ -90,6 +90,6 @@ func lifeAxaProposalV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, net
 
 	personalDataHandlingSection(pdf, policy, true)
 
-	filename, out := saveContract(pdf, policy)
+	filename, out := saveProposal(pdf, policy)
 	return filename, out
 }
