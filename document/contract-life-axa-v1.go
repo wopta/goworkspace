@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func lifeAxaV1(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode *models.NetworkNode, product *models.Product) (string, []byte) {
+func lifeAxaContractV1(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode *models.NetworkNode, product *models.Product) (string, []byte) {
 	signatureID = 0
 
 	mainHeader(pdf, policy)
@@ -30,11 +30,11 @@ func lifeAxaV1(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode
 
 	beneficiaryReferenceSection(pdf, policy)
 
-	surveysSection(pdf, policy)
+	surveysSection(pdf, policy, false)
 
 	pdf.AddPage()
 
-	statementsSection(pdf, policy)
+	statementsSection(pdf, policy, false)
 
 	offerResumeSection(pdf, policy)
 
@@ -336,7 +336,7 @@ func beneficiaryReferenceTable(pdf *fpdf.Fpdf, beneficiaryReference map[string]s
 	drawPinkHorizontalLine(pdf, thinLineWidth)
 }
 
-func surveysSection(pdf *fpdf.Fpdf, policy *models.Policy) {
+func surveysSection(pdf *fpdf.Fpdf, policy *models.Policy, isProposal bool) {
 	surveys := *policy.Surveys
 
 	if policy.PartnershipName == models.PartnershipBeProf {
@@ -347,14 +347,14 @@ func surveysSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	}
 
 	getParagraphTitle(pdf, "Dichiarazioni da leggere con attenzione prima di firmare")
-	err := printSurvey(pdf, surveys[0], policy.Company, false)
+	err := printSurvey(pdf, surveys[0], policy.Company, isProposal)
 	lib.CheckError(err)
 
 	pdf.AddPage()
 
 	getParagraphTitle(pdf, "Questionario Medico")
 	for _, survey := range surveys[1:] {
-		err := printSurvey(pdf, survey, policy.Company, false)
+		err := printSurvey(pdf, survey, policy.Company, isProposal)
 		lib.CheckError(err)
 	}
 
@@ -370,10 +370,10 @@ func surveysSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	}
 }
 
-func statementsSection(pdf *fpdf.Fpdf, policy *models.Policy) {
+func statementsSection(pdf *fpdf.Fpdf, policy *models.Policy, isProposal bool) {
 	statements := *policy.Statements
 	for _, statement := range statements {
-		printStatement(pdf, statement, policy.Company, false)
+		printStatement(pdf, statement, policy.Company, isProposal)
 	}
 }
 

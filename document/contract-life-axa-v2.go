@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func lifeAxaV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode *models.NetworkNode, product *models.Product) (string, []byte) {
+func lifeAxaContractV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode *models.NetworkNode, product *models.Product) (string, []byte) {
 	signatureID = 0
 	isProposal := true
 

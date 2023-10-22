@@ -20,9 +20,9 @@ func LifeContract(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkN
 
 	switch policy.ProductVersion {
 	case models.ProductV1:
-		filename, out = lifeAxaV1(pdf, origin, policy, networkNode, product)
+		filename, out = lifeAxaContractV1(pdf, origin, policy, networkNode, product)
 	case models.ProductV2:
-		filename, out = lifeAxaV2(pdf, origin, policy, networkNode, product)
+		filename, out = lifeAxaContractV2(pdf, origin, policy, networkNode, product)
 	}
 
 	return filename, out
