@@ -36,6 +36,7 @@ updateable_modules = ["models", "lib", "mga", "network",
 
 increment_version_key = "patch"
 environment = 'dev'  # Replace with your desired environment
+dry_run = True
 
 commands = []
 
@@ -229,8 +230,11 @@ def updateDependencies(dependency_map, updateable_modules, modules, updated_modu
             if dependency_to_update.module in dependencies and dependant in updateable_modules:
                 print(
                     f"Updating module {dependency_to_update.module} in {dependant}")
-                update_dependency_version(
-                    dependant, dependency_to_update.module, incremented_version)
+                if not dry_run:
+                    update_dependency_version(
+                        dependant, dependency_to_update.module, incremented_version)
+                else:
+                    print("Dry run, not updating module")
                 print(
                     f"git add {dependant}/go.mod && git commit -m \"Updating {dependency_to_update.module} in {dependant}\" && git push origin master && git push google master")
                 commands.append(Command(CommandType.UPDATE_MODULE, dependant,
@@ -338,9 +342,12 @@ if ordered_commands is None or len(ordered_commands) == 0:
     for command in commands:
         print()
         print(f"Running {command.command}")
-        output = subprocess.check_output(
-            command.command, shell=True, text=True)
-        print(f"Output {output}")
+        if not dry_run:
+            output = subprocess.check_output(
+                command.command, shell=True, text=True)
+            print(f"Output {output}")
+        else:
+            print("Dry run, not running command")
         # sleep for 2 seconds
         print("Sleeping for 2 seconds")
         time.sleep(2)
@@ -354,9 +361,12 @@ for commands in ordered_commands:
     for command in uniqueidlist:
         print()
         print(f"Running {command.command}")
-        output = subprocess.check_output(
-            command.command, shell=True, text=True)
-        print(f"Output {output}")
+        if not dry_run:
+            output = subprocess.check_output(
+                command.command, shell=True, text=True)
+            print(f"Output {output}")
+            time.sleep(2)
+        else:
+            print("Dry run, not running command")
         # sleep for 2 seconds
         print()
-        time.sleep(2)
