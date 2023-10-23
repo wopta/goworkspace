@@ -2,7 +2,7 @@ package mail
 
 import "os"
 
-func SendInviteMail(inviteUid, email string) {
+func SendInviteMail(inviteUid, email string, isNetworkNode bool) {
 	var mailRequest MailRequest
 
 	mailRequest.FromAddress = AddressAnna
@@ -26,6 +26,9 @@ func SendInviteMail(inviteUid, email string) {
 	mailRequest.Title = "Invito a wopta.it"
 	mailRequest.IsLink = true
 	mailRequest.Link = os.Getenv("WOPTA_CUSTOMER_AREA_BASE_URL") + "/login/inviteregistration?inviteUid=" + inviteUid
+	if isNetworkNode {
+		mailRequest.Link += "&isNetworkNode=true"
+	}
 	mailRequest.LinkLabel = "Crea la tua password"
 
 	SendMail(mailRequest)

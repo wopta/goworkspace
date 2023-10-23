@@ -75,7 +75,7 @@ func CreateNetworkNodeInviteFx(w http.ResponseWriter, r *http.Request) (string, 
 
 	log.Printf("[CreateNetworkNodeInviteFx] sending network node invite mail to %s", networkNode.Mail)
 
-	mail.SendInviteMail(inviteUid, networkNode.Mail)
+	mail.SendInviteMail(inviteUid, networkNode.Mail, true)
 
 	log.Printf("[CreateNetworkNodeInviteFx] network node invite mail sent to %s", networkNode.Mail)
 

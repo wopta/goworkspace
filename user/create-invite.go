@@ -65,7 +65,7 @@ func CreateInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 		return `{"success": false}`, `{"success": false}`, err
 	}
 
-	mail.SendInviteMail(inviteUid, createInviteRequest.Email)
+	mail.SendInviteMail(inviteUid, createInviteRequest.Email, false)
 	return `{"success": true}`, `{"success": true}`, nil
 }
 
