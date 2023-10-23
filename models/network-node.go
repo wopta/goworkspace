@@ -188,7 +188,6 @@ func (nn *NetworkNode) GetName() string {
 func (nn *NetworkNode) GetWarrant() *Warrant {
 	var (
 		warrant       *Warrant
-		warrantFormat = "warrants/%s.json"
 	)
 
 	if nn.Warrant == "" {
@@ -198,7 +197,7 @@ func (nn *NetworkNode) GetWarrant() *Warrant {
 
 	log.Printf("[GetWarrant] requesting warrant %s", nn.Warrant)
 
-	warrantBytes := lib.GetFilesByEnv(fmt.Sprintf(warrantFormat, nn.Warrant))
+	warrantBytes := lib.GetFilesByEnv(fmt.Sprintf(WarrantFormat, nn.Warrant))
 
 	err := json.Unmarshal(warrantBytes, &warrant)
 	if err != nil {
