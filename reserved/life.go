@@ -225,7 +225,7 @@ func lifeReservedByCoverage(wrapper *PolicyReservedWrapper) (bool, *models.Reser
 	output.IsReserved = isCovered
 	if isCovered {
 		policies := lib.SliceMap[*models.Policy](coveredPolicies, func(p *models.Policy) string { return p.CodeCompany })
-		reason := fmt.Sprintf("Assicurato già coperto dalla polizze %s", policies)
+		reason := fmt.Sprintf("Cliente già assicurato con le polizze numero %v", policies)
 		output.ReservedInfo.Reasons = append(output.ReservedInfo.Reasons, reason)
 	}
 	jsonLog, _ := json.Marshal(output)
