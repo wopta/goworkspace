@@ -4,9 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/wopta/goworkspace/document"
 	"io"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/wopta/goworkspace/lib"
@@ -135,15 +137,28 @@ func setProposalData(policy *models.Policy) {
 
 	setProposalNumber(policy)
 	policy.Status = models.PolicyStatusProposal
+	policy.PaymentSplit = paymentSplit
 
 	if policy.IsReserved {
 		log.Println("[setProposalData] setting NeedsApproval status")
 		policy.Status = models.PolicyStatusNeedsApproval
+	} else {
+		result := document.Proposal(origin, policy, networkNode, mgaProduct)
+		if policy.Attachments == nil {
+			policy.Attachments = new([]models.Attachment)
+		}
+
+		filename := fmt.Sprintf("Proposta_%s_%s.pdf", policy.NameDesc, time.Now().UTC())
+		filename = strings.ReplaceAll(filename, " ", "_")
+		*policy.Attachments = append(*policy.Attachments, models.Attachment{
+			Name:     "Proposta",
+			Link:     result.LinkGcs,
+			FileName: filename,
+		})
 	}
 
 	log.Printf("[setProposalData] policy status %s", policy.Status)
 
-	policy.PaymentSplit = paymentSplit
 	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
 	policy.Updated = time.Now().UTC()
 }
