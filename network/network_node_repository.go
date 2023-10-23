@@ -5,6 +5,7 @@ import (
 	"log"
 	"time"
 
+	"cloud.google.com/go/firestore"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
@@ -51,6 +52,29 @@ func GetNetworkNodeByUid(nodeUid string) *models.NetworkNode {
 	}
 
 	return networkNode
+}
+
+func GetAllNetworkNodes() ([]models.NetworkNode, error) {
+	var nodes []models.NetworkNode
+	docIterator := lib.OrderFirestore(models.NetworkNodesCollection, "code", firestore.Asc)
+
+	snapshots, err := docIterator.GetAll()
+	if err != nil {
+		log.Printf("[GetAllNetworkNodes] error getting nodes from Firestore: %s", err.Error())
+		return nodes, err
+	}
+
+	for _, snapshot := range snapshots {
+		var node models.NetworkNode
+		err = snapshot.DataTo(&node)
+		if err != nil {
+			log.Printf("[GetAllNetworkNodes] error parsing node %s: %s", snapshot.Ref.ID, err.Error())
+		} else {
+			nodes = append(nodes, node)
+		}
+	}
+
+	return nodes, nil
 }
 
 func DeleteNetworkNodeByUid(origin, nodeUid string) error {
