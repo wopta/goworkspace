@@ -149,8 +149,7 @@ func setProposalData(policy *models.Policy) {
 		policy.Attachments = new([]models.Attachment)
 	}
 
-	filename := fmt.Sprintf("Proposta_%s_%s.pdf", policy.NameDesc, time.Now().UTC())
-	filename = strings.ReplaceAll(filename, " ", "_")
+	filename := strings.SplitN(result.LinkGcs, "/", 3)[2]
 	*policy.Attachments = append(*policy.Attachments, models.Attachment{
 		Name:     "Proposta",
 		Link:     result.LinkGcs,

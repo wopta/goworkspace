@@ -160,7 +160,8 @@ const (
 )
 
 const (
-	FlowFileFormat = "flows/%s.json"
+	FlowFileFormat         = "flows/%s.json"
+	ProposalDocumentFormat = "Proposta_%s_%d.pdf"
 )
 
 const (
