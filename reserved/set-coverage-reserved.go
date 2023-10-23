@@ -33,7 +33,11 @@ func SetCoverageReservedFx(w http.ResponseWriter, r *http.Request) (string, inte
 		return "", nil, err
 	}
 
-	input := UpdatePolicyReservedCoverage(&originalPolicy, origin)
+	input, err := UpdatePolicyReservedCoverage(&originalPolicy, origin)
+	if err != nil {
+		log.Printf("[SetCoverageReservedFx] error calculating reserved coverage: %s", err.Error())
+		return "", nil, err
+	}
 
 	_, err = lib.FireUpdate(firePolicy, policyUid, input)
 	if err != nil {

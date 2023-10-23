@@ -13,7 +13,7 @@ func GetReservedInfo(policy *models.Policy) (bool, *models.ReservedInfo) {
 	}
 }
 
-func GetReservedInfoByCoverage(policy *models.Policy, origin string) (bool, *models.ReservedInfo) {
+func GetReservedInfoByCoverage(policy *models.Policy, origin string) (bool, *models.ReservedInfo, error) {
 	var wrapper *PolicyReservedWrapper
 
 	switch policy.Name {
@@ -22,7 +22,7 @@ func GetReservedInfoByCoverage(policy *models.Policy, origin string) (bool, *mod
 	}
 
 	if wrapper == nil {
-		return false, nil
+		return false, nil, nil
 	}
 
 	return wrapper.evaluate()

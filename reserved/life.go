@@ -206,7 +206,7 @@ func setLifeReservedInfo(policy *models.Policy, product *models.Product) {
 	}
 }
 
-func lifeReservedByCoverage(wrapper *PolicyReservedWrapper) (bool, *models.ReservedInfo) {
+func lifeReservedByCoverage(wrapper *PolicyReservedWrapper) (bool, *models.ReservedInfo, error) {
 	log.Println("[lifeReservedByCoverage] start ------------------------------")
 
 	var output = ReservedRuleOutput{
@@ -218,8 +218,8 @@ func lifeReservedByCoverage(wrapper *PolicyReservedWrapper) (bool, *models.Reser
 
 	isCovered, coveredPolicies, err := wrapper.AlreadyCovered.isCovered(wrapper)
 	if err != nil {
-		// TODO: check handling of error
-		panic("help")
+		log.Printf("[lifeReservedByCoverage] error calculating coverage: %s", err.Error())
+		return false, nil, err
 	}
 
 	output.IsReserved = isCovered
@@ -232,5 +232,5 @@ func lifeReservedByCoverage(wrapper *PolicyReservedWrapper) (bool, *models.Reser
 	log.Printf("[lifeReservedByCoverage] result: %v", string(jsonLog))
 
 	log.Println("[lifeReservedByCoverage] end --------------------------------")
-	return output.IsReserved, output.ReservedInfo
+	return output.IsReserved, output.ReservedInfo, nil
 }
