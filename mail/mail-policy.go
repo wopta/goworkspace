@@ -12,6 +12,7 @@ import (
 )
 
 const (
+	leadTemplateType             = "lead"
 	proposalTemplateType         = "proposal"
 	payTemplateType              = "pay"
 	signTemplateType             = "sign"
@@ -191,6 +192,27 @@ func SendMailReserved(policy models.Policy, from, to, cc Address, flowName strin
 			Url:         attachment.Url,
 			ContentType: attachment.ContentType,
 		})
+	}
+
+	if policy.Attachments != nil {
+		for _, attachment := range *policy.Attachments {
+			if attachment.Name == "Proposta" {
+				rawDoc, err := lib.ReadFileFromGoogleStorage(attachment.Link)
+				if err != nil {
+					log.Printf("[sendMailReserved] error reading document %s from google storage: %s", attachment.Name, err.Error())
+					return
+				}
+				attachment.Byte = base64.StdEncoding.EncodeToString(rawDoc)
+
+				at = append(at, Attachment{
+					Name:        attachment.Name,
+					Link:        attachment.Link,
+					Byte:        attachment.Byte,
+					FileName:    attachment.FileName,
+					ContentType: "application/pdf",
+				})
+			}
+		}
 	}
 
 	title := policy.NameDesc
