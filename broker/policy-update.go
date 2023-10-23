@@ -49,7 +49,7 @@ func UpdatePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	for k, v := range input {
 		mergedInput[k] = v
 	}
-	inputReserved := reserved.UpdatePolicy(&policy)
+	inputReserved := reserved.UpdatePolicyReserved(&policy)
 	for k, v := range inputReserved {
 		mergedInput[k] = v
 	}

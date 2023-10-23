@@ -10,7 +10,7 @@ type ReservedRuleOutput struct {
 }
 
 type AlreadyCoveredAlgorithm interface {
-	isCovered(*PolicyReservedWrapper) (bool, *models.Policy, error)
+	isCovered(*PolicyReservedWrapper) (bool, []*models.Policy, error)
 }
 
 type PolicyReservedWrapper struct {
