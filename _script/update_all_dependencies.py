@@ -334,17 +334,29 @@ def bfs(visited, graph, node):  # function for BFS
 # Driver Code
 bfs(visited, dependency_graph, 'lib')    # function calling
 
+if ordered_commands is None or len(ordered_commands) == 0:
+    for command in commands:
+        print()
+        print(f"Running {command.command}")
+        output = subprocess.check_output(
+            command.command, shell=True, text=True)
+        print(f"Output {output}")
+        # sleep for 2 seconds
+        print("Sleeping for 2 seconds")
+        time.sleep(2)
+        exit()
 
 for commands in ordered_commands:
     # remove duplicate commands by command_type
     commands_unique = set()
-    uniqueidlist = [commands_unique.add(obj.command_type) or obj for obj in commands if obj.command_type not in commands_unique]
+    uniqueidlist = [commands_unique.add(
+        obj.command_type) or obj for obj in commands if obj.command_type not in commands_unique]
     for command in uniqueidlist:
         print()
         print(f"Running {command.command}")
-        output = subprocess.check_output(command.command, shell=True, text=True)
+        output = subprocess.check_output(
+            command.command, shell=True, text=True)
         print(f"Output {output}")
         # sleep for 2 seconds
         print()
         time.sleep(2)
-    # time.sleep(2)
