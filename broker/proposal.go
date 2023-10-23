@@ -142,20 +142,20 @@ func setProposalData(policy *models.Policy) {
 	if policy.IsReserved {
 		log.Println("[setProposalData] setting NeedsApproval status")
 		policy.Status = models.PolicyStatusNeedsApproval
-	} else {
-		result := document.Proposal(origin, policy, networkNode, mgaProduct)
-		if policy.Attachments == nil {
-			policy.Attachments = new([]models.Attachment)
-		}
-
-		filename := fmt.Sprintf("Proposta_%s_%s.pdf", policy.NameDesc, time.Now().UTC())
-		filename = strings.ReplaceAll(filename, " ", "_")
-		*policy.Attachments = append(*policy.Attachments, models.Attachment{
-			Name:     "Proposta",
-			Link:     result.LinkGcs,
-			FileName: filename,
-		})
 	}
+
+	result := document.Proposal(origin, policy, networkNode, mgaProduct)
+	if policy.Attachments == nil {
+		policy.Attachments = new([]models.Attachment)
+	}
+
+	filename := fmt.Sprintf("Proposta_%s_%s.pdf", policy.NameDesc, time.Now().UTC())
+	filename = strings.ReplaceAll(filename, " ", "_")
+	*policy.Attachments = append(*policy.Attachments, models.Attachment{
+		Name:     "Proposta",
+		Link:     result.LinkGcs,
+		FileName: filename,
+	})
 
 	log.Printf("[setProposalData] policy status %s", policy.Status)
 
