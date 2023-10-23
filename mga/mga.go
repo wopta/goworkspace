@@ -72,7 +72,7 @@ func Mga(w http.ResponseWriter, r *http.Request) {
 				Route:   "/network/invite/v1/consume",
 				Handler: ConsumeNetworkNodeInviteFx,
 				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
+				Roles:   []string{models.UserRoleAll},
 			},
 			{
 				Route: "/warrants/v1",
