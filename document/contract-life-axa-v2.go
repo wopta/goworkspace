@@ -621,15 +621,13 @@ func lifePaymentMethodSectionV2(pdf *fpdf.Fpdf) {
 func lifeEmitResumeSectionV2(pdf *fpdf.Fpdf, policy *models.Policy) {
 	var offerPrice string
 	emitDate := policy.EmitDate.Format(dateLayout)
-	startDate := policy.StartDate.Format(dateLayout)
 	if policy.PaymentSplit == string(models.PaySplitMonthly) {
 		offerPrice = humanize.FormatFloat("#.###,##", policy.PriceGrossMonthly)
 	} else {
 		offerPrice = humanize.FormatFloat("#.###,##", policy.PriceGross)
 	}
 	text := "Polizza emessa a Milano il " + emitDate + " per un importo di € " + offerPrice + " quale " +
-		"prima rata alla firma, il cui pagamento a saldo è da effettuarsi con i metodi di pagamento sopra indicati. " +
-		"Wopta conferma avvenuto incasso e copertura della polizza dal " + startDate + "."
+		"prima rata alla firma, il cui pagamento a saldo è da effettuarsi con i metodi di pagamento sopra indicati."
 
 	getParagraphTitle(pdf, "Emissione polizza e pagamento della prima rata")
 	setBlackRegularFont(pdf, standardTextSize)

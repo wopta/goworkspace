@@ -295,7 +295,6 @@ func paymentMethodSection(pdf *fpdf.Fpdf) {
 func emitResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	var offerPrice string
 	emitDate := policy.EmitDate.Format(dateLayout)
-	startDate := policy.StartDate.Format(dateLayout)
 	if policy.PaymentSplit == "monthly" {
 		offerPrice = humanize.FormatFloat("#.###,##", policy.PriceGrossMonthly)
 	} else {
@@ -304,8 +303,6 @@ func emitResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	text := "Polizza emessa a Milano il " + emitDate + " per un importo di € " + offerPrice + " quale " +
 		"prima rata alla firma, il cui pagamento a saldo è da effettuarsi con i metodi di pagamento sopra indicati."
 	switch policy.Name {
-	case models.LifeProduct:
-		text += " Wopta conferma avvenuto incasso e copertura della polizza dal " + startDate + "."
 	case models.PersonaProduct:
 		text += "\nCostituisce quietanza di pagamento la mail di conferma che Wopta invierà al Contraente."
 
