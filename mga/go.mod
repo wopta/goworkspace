@@ -6,10 +6,10 @@ replace github.com/wopta/goworkspace/mga => ./
 
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.4
-	github.com/wopta/goworkspace/lib v1.0.79
-	github.com/wopta/goworkspace/mail v1.0.43
-	github.com/wopta/goworkspace/models v1.1.54
-	github.com/wopta/goworkspace/network v1.0.5
+	github.com/wopta/goworkspace/lib v1.0.82
+	github.com/wopta/goworkspace/mail v1.0.45
+	github.com/wopta/goworkspace/models v1.1.56
+	github.com/wopta/goworkspace/network v1.0.7
 	github.com/wopta/goworkspace/product v1.0.55
 )
 

@@ -5,28 +5,33 @@ type Roles string
 type PolicyStatus string
 
 const (
-	PolicyStatusInit            = "Inizialize"
-	PolicyStatusInitData        = "InizializeData"
-	PolicyStatusInitLead        = "Lead"
-	PolicyStatusPartnershipLead = "PartnershipLead"
-	PolicyStatusProspet         = "Prospet"
-	PolicyStatusProposal        = "Proposal"
-	PolicyStatusContact         = "Contact"
-	PolicyStatusToEmit          = "ToEmit"
-	PolicyStatusEmited          = "Emited"
-	PolicyStatusNeedsApproval   = "NeedsApproval"
-	PolicyStatusWaitForApproval = "WaitForApproval"
-	PolicyStatusApproved        = "Approved"
-	PolicyStatusRejected        = "Rejected"
-	PolicyStatusToSign          = "ToSign"
-	PolicyStatusSign            = "Signed"
-	PolicyStatusPay             = "Paid"
-	PolicyStatusToPay           = "ToPay"
-	PolicyStatusToRenew         = "Renew"
-	PolicyStatusPS              = "Pay&Sign"
-	PolicyStatusCompanyEmit     = "CompanyEmited"
-	PolicyStatusDeleted         = "Deleted"
+	PolicyStatusInit               = "Inizialize"
+	PolicyStatusInitData           = "InizializeData"
+	PolicyStatusInitLead           = "Lead"
+	PolicyStatusPartnershipLead    = "PartnershipLead"
+	PolicyStatusProspet            = "Prospet"
+	PolicyStatusProposal           = "Proposal"
+	PolicyStatusContact            = "Contact"
+	PolicyStatusToEmit             = "ToEmit"
+	PolicyStatusEmited             = "Emited"
+	PolicyStatusNeedsApproval      = "NeedsApproval"
+	PolicyStatusWaitForApproval    = "WaitForApproval"
+	PolicyStatusWaitForApprovalMga = "WaitForApprovalMga"
+	PolicyStatusApproved           = "Approved"
+	PolicyStatusRejected           = "Rejected"
+	PolicyStatusToSign             = "ToSign"
+	PolicyStatusSign               = "Signed"
+	PolicyStatusPay                = "Paid"
+	PolicyStatusToPay              = "ToPay"
+	PolicyStatusToRenew            = "Renew"
+	PolicyStatusPS                 = "Pay&Sign"
+	PolicyStatusCompanyEmit        = "CompanyEmited"
+	PolicyStatusDeleted            = "Deleted"
 )
+
+func GetWaitForApprovalStatusList() []string {
+	return []string{PolicyStatusWaitForApproval, PolicyStatusWaitForApprovalMga}
+}
 
 const (
 	TransactionStatusInit        = "Inizialize"
@@ -162,6 +167,8 @@ const (
 const (
 	FlowFileFormat         = "flows/%s.json"
 	ProposalDocumentFormat = "Proposta_%s_%d.pdf"
+	WarrantFormat  = "warrants/%s.json"
+	WarrantsFolder = "warrants/"
 )
 
 const (

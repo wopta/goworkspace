@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/wopta/goworkspace/lib"
@@ -128,6 +129,13 @@ func setRequestApprovalData(policy *models.Policy) {
 	reserved.SetReservedInfo(policy, mgaProduct)
 
 	policy.Status = models.PolicyStatusWaitForApproval
+	for _, reason := range policy.ReservedInfo.Reasons {
+		// TODO: add key/id for reasons so we do not have to cjeck string equallity
+		if strings.HasPrefix(reason, "Cliente già assicurato") {
+			policy.Status = models.PolicyStatusWaitForApprovalMga
+		}
+	}
+
 	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
 	policy.PaymentSplit = paymentSplit
 	policy.Updated = time.Now().UTC()
