@@ -9,7 +9,6 @@ require (
 	github.com/wopta/goworkspace/document v1.1.4
 	github.com/wopta/goworkspace/lib v1.0.79
 	github.com/wopta/goworkspace/models v1.1.54
-	github.com/wopta/goworkspace/reserved v1.0.12
 	github.com/wopta/goworkspace/wiseproxy v1.0.3
 )
 
