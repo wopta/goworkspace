@@ -5,16 +5,71 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"time"
 
 	"github.com/wopta/goworkspace/document"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	prd "github.com/wopta/goworkspace/product"
+	trn "github.com/wopta/goworkspace/transaction"
 )
 
-type ReservedRuleOutput struct {
-	IsReserved   bool
-	ReservedInfo *models.ReservedInfo
+type ByAssetPerson struct{}
+
+func (*ByAssetPerson) isCovered(w *PolicyReservedWrapper) (bool, []*models.Policy, error) {
+	var (
+		result              = false
+		coveredPolicies     = make([]*models.Policy, 0)
+		lastPaidTransaction *models.Transaction
+	)
+	log.Println("[ByAssetPerson.isCovered] start -----------------------------")
+
+	now := time.Now().UTC()
+	lateDate := now.AddDate(0, 2, 0)
+	bigNow := lib.GetBigQueryNullDateTime(now)
+
+	query := fmt.Sprintf(
+		"SELECT %s FROM `%s.%s` WHERE name = @name AND isPay = true AND (isDeleted = false OR isDelete IS NULL) AND startDate <= @now AND endDate >= @now AND JSON_VALUE(data, '$.assets[0].person.fiscalCode') = @fiscalCode ORDER BY JSON_VALUE(data, '$.creationDate') ASC",
+		"uid, data.creationDate as creationDate, startDate, endDate, codeCompany, paymentSplit, isPay, name, isDeleted",
+		models.WoptaDataset,
+		models.PolicyCollection,
+	)
+	params := map[string]interface{}{
+		"name":       w.Policy.Name,
+		"now":        bigNow,
+		"fiscalCode": w.Policy.Assets[0].Person.FiscalCode,
+	}
+	policies, err := lib.QueryParametrizedRowsBigQuery[models.Policy](query, params)
+	if err != nil {
+		log.Printf("[ByAssetPerson.isCovered] error getting policies: %s", err.Error())
+	}
+
+	for _, policy := range policies {
+		if policy.PaymentSplit == string(models.PaySplitYearly) || policy.PaymentSplit == string(models.PaySplitYear) {
+			// As of now, we have only one transaction for annaul policies, so no extra control is needed
+			// TODO: check behaviour when will have policy renewal
+			result = true
+			coveredPolicies = append(coveredPolicies, &policy)
+			continue
+		}
+
+		// TODO: remove me when we have a job for deleting policies that have not been paid for X months
+		transactions := trn.GetPolicyTransactions(w.Origin, policy.Uid)
+		for _, tr := range transactions {
+			if tr.IsPay {
+				lastPaidTransaction = &tr
+			}
+		}
+		if !lastPaidTransaction.IsLate(lateDate) && w.Policy.StartDate.Before(policy.EndDate) {
+			result = true
+			coveredPolicies = append(coveredPolicies, &policy)
+		}
+	}
+
+	log.Printf("[ByAssetPerson.isCovered] result '%t'", result)
+	log.Println("[ByAssetPerson.isCovered] end -------------------------------")
+
+	return result, coveredPolicies, nil
 }
 
 func lifeReserved(policy *models.Policy) (bool, *models.ReservedInfo) {
@@ -149,4 +204,33 @@ func setLifeReservedInfo(policy *models.Policy, product *models.Product) {
 		setLifeReservedDocument(policy, product)
 		setLifeContactsDetails(policy)
 	}
+}
+
+func lifeReservedByCoverage(wrapper *PolicyReservedWrapper) (bool, *models.ReservedInfo, error) {
+	log.Println("[lifeReservedByCoverage] start ------------------------------")
+
+	var output = ReservedRuleOutput{
+		IsReserved: false,
+		ReservedInfo: &models.ReservedInfo{
+			Reasons: make([]string, 0),
+		},
+	}
+
+	isCovered, coveredPolicies, err := wrapper.AlreadyCovered.isCovered(wrapper)
+	if err != nil {
+		log.Printf("[lifeReservedByCoverage] error calculating coverage: %s", err.Error())
+		return false, nil, err
+	}
+
+	output.IsReserved = isCovered
+	if isCovered {
+		policies := lib.SliceMap[*models.Policy](coveredPolicies, func(p *models.Policy) string { return p.CodeCompany })
+		reason := fmt.Sprintf("Cliente già assicurato con le polizze numero %v", policies)
+		output.ReservedInfo.Reasons = append(output.ReservedInfo.Reasons, reason)
+	}
+	jsonLog, _ := json.Marshal(output)
+	log.Printf("[lifeReservedByCoverage] result: %v", string(jsonLog))
+
+	log.Println("[lifeReservedByCoverage] end --------------------------------")
+	return output.IsReserved, output.ReservedInfo, nil
 }

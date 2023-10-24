@@ -3,6 +3,7 @@ package lib
 import (
 	"log"
 	"net/http"
+	"os"
 )
 
 func EnableCors(w *http.ResponseWriter, r *http.Request) {
@@ -20,4 +21,9 @@ func EnableCors(w *http.ResponseWriter, r *http.Request) {
 	(*w).Header().Set("Access-Control-Allow-Headers", "*")
 	(*w).Header().Set("Access-Control-Allow-Credentials", "false")
 
+	// Only for local development
+	if os.Getenv("env") == "local" {
+		(*w).Header().Set("Access-Control-Allow-Origin", "*")
+		(*w).Header().Set("Content-Type", "application/json")
+	}
 }
