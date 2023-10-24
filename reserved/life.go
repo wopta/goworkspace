@@ -111,11 +111,11 @@ func getReservedData(policy *models.Policy) []byte {
 func setLifeReservedDocument(policy *models.Policy, product *models.Product) {
 	attachments := make([]models.Attachment, 0)
 
-	gsLink, _ := document.LifeReserved(*policy, product)
+	docInfo := document.Reserved(policy, product)
 
 	attachments = append(attachments, models.Attachment{
 		Name:        fmt.Sprintf("%s_proposta_%d_rvm_istruzioni.pdf", policy.NameDesc, policy.ProposalNumber),
-		Link:        gsLink,
+		Link:        docInfo.LinkGcs,
 		ContentType: "application/pdf",
 	})
 
