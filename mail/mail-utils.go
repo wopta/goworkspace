@@ -2,7 +2,9 @@ package mail
 
 import (
 	"bytes"
+	"encoding/base64"
 	"fmt"
+	"log"
 	"text/template"
 
 	"github.com/wopta/goworkspace/lib"
@@ -41,6 +43,7 @@ func setNetworkNodeBodyData(node *models.NetworkNode, bodyData *BodyData) {
 func setContractorBodyData(policy models.Policy, bodyData *BodyData) {
 	bodyData.ContractorName = policy.Contractor.Name
 	bodyData.ContractorSurname = policy.Contractor.Surname
+	bodyData.ContractorFiscalCode = policy.Contractor.FiscalCode
 }
 
 func setAgentBodyData(agent models.Agent, bodyData *BodyData) {
@@ -159,4 +162,38 @@ func GetNetworkNodeEmail(networkNode *models.NetworkNode) Address {
 	}
 
 	return address
+}
+
+func getMailAttachments(policy models.Policy, attachmentNames []string) []Attachment {
+	var (
+		at []Attachment
+	)
+
+	if policy.Attachments == nil || len(*policy.Attachments) == 0 {
+		log.Println("[getMailAttachments] policy has no attachment")
+		return at
+	}
+
+	at = make([]Attachment, 0)
+
+	for _, attachment := range *policy.Attachments {
+		if lib.SliceContains(attachmentNames, attachment.Name) {
+			rawDoc, err := lib.ReadFileFromGoogleStorage(attachment.Link)
+			if err != nil {
+				log.Printf("[getMailAttachments] error reading document %s from google storage: %s", attachment.Name, err.Error())
+				return nil
+			}
+			attachment.Byte = base64.StdEncoding.EncodeToString(rawDoc)
+
+			at = append(at, Attachment{
+				Name:        attachment.Name,
+				Link:        attachment.Link,
+				Byte:        attachment.Byte,
+				FileName:    attachment.FileName,
+				ContentType: "application/pdf",
+			})
+		}
+	}
+
+	return at
 }

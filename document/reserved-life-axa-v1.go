@@ -10,8 +10,8 @@ import (
 	"time"
 )
 
-func LifeReserved(policy models.Policy, product *models.Product) (string, []byte) {
-	log.Println("[LifeReserved]")
+func lifeReserved(policy *models.Policy, product *models.Product) (string, []byte) {
+	log.Println("[lifeReserved] function start ------------------------------")
 
 	pdf := initFpdf()
 
@@ -21,21 +21,24 @@ func LifeReserved(policy models.Policy, product *models.Product) (string, []byte
 
 	lifeReservedHeader(pdf, policy)
 
-	insuredInfoSection(pdf, &policy)
+	lifeReservedInsuredInfoSection(pdf, policy)
 
-	guaranteesMap, slugs := loadLifeGuarantees(&policy, product)
+	guaranteesMap, slugs := loadLifeGuarantees(policy, product)
 
 	lifeGuaranteesTable(pdf, guaranteesMap, slugs)
 
-	insuranceLimitSection(pdf)
+	lifeReservedInsuranceLimitSection(pdf)
 
-	instructionsSection(pdf, policy)
+	lifeReservedInstructionsSection(pdf, policy)
 
-	gsLink, out := saveReservedDocument(pdf, &policy)
+	gsLink, out := saveReservedDocument(pdf, policy)
+
+	log.Println("[lifeReserved] function end --------------------------------")
+
 	return gsLink, out
 }
 
-func lifeReservedHeader(pdf *fpdf.Fpdf, policy models.Policy) {
+func lifeReservedHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 	var (
 		opt                        fpdf.ImageOptions
 		logoPath, cfpi, expiryInfo string
@@ -118,7 +121,12 @@ func lifeReservedFooter(pdf *fpdf.Fpdf) {
 	})
 }
 
-func insuranceLimitSection(pdf *fpdf.Fpdf) {
+func lifeReservedInsuredInfoSection(pdf *fpdf.Fpdf, policy *models.Policy) {
+	getParagraphTitle(pdf, "La tua assicurazione sarà operante per il seguente Assicurato e Garanzie")
+	insuredInfoSection(pdf, policy)
+}
+
+func lifeReservedInsuranceLimitSection(pdf *fpdf.Fpdf) {
 	text := "Limiti assuntivi:\n\n" +
 		"Decesso: 75 anni a scadenza - max 500.000 euro\n" +
 		"Invalidità Totale Permanente: 75 anni a scadenza - max 500.000 euro\n" +
@@ -130,7 +138,7 @@ func insuranceLimitSection(pdf *fpdf.Fpdf) {
 	pdf.Ln(5)
 }
 
-func instructionsSection(pdf *fpdf.Fpdf, policy models.Policy) {
+func lifeReservedInstructionsSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	setBlackDrawColor(pdf)
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3.5, "", "LTR", fpdf.AlignCenter, false)

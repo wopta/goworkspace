@@ -175,3 +175,7 @@ const (
 	ProductV1 = "v1"
 	ProductV2 = "v2"
 )
+
+const (
+	ProposalAttachmentName = "Proposta"
+)

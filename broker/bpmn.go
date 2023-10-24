@@ -19,6 +19,7 @@ var (
 	networkNode                       *models.NetworkNode
 	product, mgaProduct               *models.Product
 	warrant                           *models.Warrant
+	sendEmail                         bool
 )
 
 const (
@@ -61,6 +62,11 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 		}
 	case proposalFlowKey:
 		flow = flowFile.ProposalFlow
+		toAddress = mail.GetContractorEmail(policy)
+		switch policy.Channel {
+		case models.NetworkChannel:
+			ccAddress = mail.GetNetworkNodeEmail(networkNode)
+		}
 	case requestApprovalFlowKey:
 		flow = flowFile.RequestApprovalFlow
 		switch policy.Channel {
@@ -140,6 +146,7 @@ func sendLeadMail(state *bpmn.State) error {
 
 func addProposalHandlers(state *bpmn.State) {
 	state.AddTaskHandler("setProposalData", setProposalBpm)
+	state.AddTaskHandler("sendProposalMail", sendProposalMail)
 }
 
 func setProposalBpm(state *bpmn.State) error {
@@ -151,6 +158,24 @@ func setProposalBpm(state *bpmn.State) error {
 
 	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
+}
+
+func sendProposalMail(state *bpmn.State) error {
+	policy := state.Data
+
+	if !sendEmail || policy.IsReserved {
+		return nil
+	}
+
+	log.Printf(
+		"[sendProposalMail] from '%s', to '%s', cc '%s'",
+		fromAddress.String(),
+		toAddress.String(),
+		ccAddress.String(),
+	)
+
+	mail.SendMailProposal(*policy, fromAddress, toAddress, ccAddress, flowName, []string{models.ProposalAttachmentName})
+	return nil
 }
 
 //	======================================
@@ -174,7 +199,7 @@ func setRequestApprovalBpmn(state *bpmn.State) error {
 
 func sendRequestApprovalMail(state *bpmn.State) error {
 	policy := state.Data
-	mail.SendMailReserved(*policy, fromAddress, toAddress, ccAddress, flowName)
+	mail.SendMailReserved(*policy, fromAddress, toAddress, ccAddress, flowName, []string{models.ProposalAttachmentName})
 	return nil
 }
 
