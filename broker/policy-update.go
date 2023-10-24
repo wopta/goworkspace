@@ -61,7 +61,7 @@ func UpdatePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	}
 	log.Printf("[UpdatePolicyFx] modified policy values: %v", string(inputJson))
 
-	_, err = lib.FireUpdate(firePolicy, policyUid, input)
+	_, err = lib.FireUpdate(firePolicy, policyUid, mergedInput)
 	if err != nil {
 		log.Printf("[UpdatePolicyFx] error updating policy in firestore: %s", err.Error())
 		return "", nil, err
