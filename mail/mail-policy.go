@@ -31,7 +31,7 @@ func SendMailLead(policy models.Policy, from, to, cc Address, flowName string) {
 
 	setBodyData(policy, &bodyData)
 
-	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", flowName, proposalTemplateType))
+	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", flowName, leadTemplateType))
 
 	messageBody := fillTemplate(templateFile, &bodyData)
 
