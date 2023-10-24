@@ -15,7 +15,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	var (
 		guarantees []models.Guarante
 	)
-	ricAteco := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "/track/in/life/", "")
+	ricAteco := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "/track/in/life/life.csv", "")
 
 	df := lib.CsvToDataframe(ricAteco)
 	group := df.GroupBy("N° adesione individuale univoco")
