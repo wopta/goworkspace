@@ -65,39 +65,42 @@ func saveContract(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 
 func saveProposal(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 	var filename string
-	/*if os.Getenv("env") == "local" {
+	if os.Getenv("env") == "local" {
 		err := pdf.OutputFileAndClose("./document/proposal.pdf")
 		lib.CheckError(err)
-	} else {*/
-	var out bytes.Buffer
-	err := pdf.Output(&out)
-	lib.CheckError(err)
-	filename = fmt.Sprintf("%s/%s/"+models.ProposalDocumentFormat, "temp", policy.Uid, policy.NameDesc, policy.ProposalNumber)
-	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, out.Bytes())
-	lib.CheckError(err)
-	return filename, out.Bytes()
-	//}
+	} else {
+		var out bytes.Buffer
+		err := pdf.Output(&out)
+		lib.CheckError(err)
+		filename = fmt.Sprintf("%s/%s/"+models.ProposalDocumentFormat, "temp", policy.Uid, policy.NameDesc, policy.ProposalNumber)
+		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, out.Bytes())
+		lib.CheckError(err)
+		return filename, out.Bytes()
+	}
 	return filename, nil
 }
 
 func saveReservedDocument(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 	var (
-		gsLink string
-		out    bytes.Buffer
+		filename string
+		out      bytes.Buffer
 	)
 
-	err := pdf.Output(&out)
-	lib.CheckError(err)
-
-	now := time.Now()
-	timestamp := strconv.FormatInt(now.Unix(), 10)
-	filename := "temp/" + policy.Uid + "/" + policy.Contractor.Name + "_" + policy.Contractor.Surname + "_" +
-		timestamp + "_reserved_document.pdf"
-	gsLink = lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, out.Bytes())
-	lib.CheckError(err)
-
-	return gsLink, out.Bytes()
-
+	if os.Getenv("env") == "local" {
+		err := pdf.OutputFileAndClose("./document/reserved_document.pdf")
+		lib.CheckError(err)
+	} else {
+		err := pdf.Output(&out)
+		lib.CheckError(err)
+		now := time.Now()
+		timestamp := strconv.FormatInt(now.Unix(), 10)
+		filename = "temp/" + policy.Uid + "/" + policy.Contractor.Name + "_" + policy.Contractor.Surname + "_" +
+			timestamp + "_reserved_document.pdf"
+		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, out.Bytes())
+		lib.CheckError(err)
+		return filename, out.Bytes()
+	}
+	return filename, nil
 }
 
 func pageNumber(pdf *fpdf.Fpdf) {
