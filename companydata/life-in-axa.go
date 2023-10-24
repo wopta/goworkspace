@@ -15,14 +15,14 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	var (
 		guarantees []models.Guarante
 	)
-	ricAteco := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "/track/in/life/life.csv", "")
+	ricAteco := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/life/life.csv", "")
 
 	df := lib.CsvToDataframe(ricAteco)
 	group := df.GroupBy("N° adesione individuale univoco")
 
 	for _, d := range group.GetGroups() {
-		log.Println("filtered row", d.Nrow())
-		log.Println("filtered col", d.Ncol())
+		log.Println("LifeIn  row", d.Nrow())
+		log.Println("LifeIn  col", d.Ncol())
 		_, _, _, version := LifeMapCodecCompanyAxaRevert(d.Elem(0, 1).String())
 		policy := models.Policy{
 			Name:           "life",
@@ -109,7 +109,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			beneficiaries = append(beneficiaries, benef1)
 			beneficiaries = append(beneficiaries, benef2)
 			beneficiaries = append(beneficiaries, benef3)
-			dur,_:= strconv.Atoi( r[7])
+			dur, _ := strconv.Atoi(r[7])
 
 			var guarante models.Guarante = models.Guarante{
 				Slug:                       slug,
@@ -118,8 +118,8 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 				Beneficiaries: &beneficiaries,
 				Value: &models.GuaranteValue{
-					SumInsuredLimitOfIndemnity: ParseAxaFloat(r[9]) ,
-					PremiumGrossYearly: ParseAxaFloat(r[8]),
+					SumInsuredLimitOfIndemnity: ParseAxaFloat(r[9]),
+					PremiumGrossYearly:         ParseAxaFloat(r[8]),
 					Duration: &models.Duration{
 						Year: dur / 12,
 					},
@@ -129,10 +129,10 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			guarantees = append(guarantees, guarante)
 		}
 
-		policy.Assets[0].Guarantees=guarantees
+		policy.Assets[0].Guarantees = guarantees
 
 		log.Println("LifeIn policy:", policy)
-		lib.PutFirestoreErr("policy",policy)
+		lib.PutFirestoreErr("policy", policy)
 
 	}
 
@@ -190,7 +190,7 @@ func ParseAxaBeneficiary(r []string, base int) models.Beneficiary {
 	var (
 		benef models.Beneficiary
 	)
-	rangeCell:=11*base
+	rangeCell := 11 * base
 
 	if r[82] == "GE" {
 		benef = models.Beneficiary{
@@ -210,8 +210,8 @@ func ParseAxaBeneficiary(r []string, base int) models.Beneficiary {
 				Name:       r[84+rangeCell],
 				Surname:    r[83+rangeCell],
 				FiscalCode: r[85+rangeCell],
-				Mail: r[91+rangeCell] ,
-			
+				Mail:       r[91+rangeCell],
+
 				Residence: &models.Address{
 					StreetName: r[87+rangeCell],
 					City:       r[90+rangeCell],
@@ -219,8 +219,6 @@ func ParseAxaBeneficiary(r []string, base int) models.Beneficiary {
 					PostalCode: r[89+rangeCell],
 					Locality:   r[88+rangeCell],
 				},
-			
-			
 			},
 			IsLegitimateSuccessors: false,
 		}
