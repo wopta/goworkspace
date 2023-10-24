@@ -7,10 +7,11 @@ import (
 )
 
 type AuthToken struct {
-	Role   string `json:"role"`
-	Type   string `json:"type"`
-	UserID string `json:"userId"`
-	Email  string `json:"email"`
+	Role          string `json:"role"`
+	Type          string `json:"type"`
+	UserID        string `json:"userId"`
+	Email         string `json:"email"`
+	IsNetworkNode bool   `json:"isNetworkNode"`
 }
 
 func GetAuthTokenFromIdToken(idToken string) (AuthToken, error) {
@@ -34,11 +35,17 @@ func GetAuthTokenFromIdToken(idToken string) (AuthToken, error) {
 		nodeType = token.Claims["type"].(string)
 	}
 
+	isNetworkNode := false
+	if token.Claims["isNetworkNode"] != nil {
+		isNetworkNode = token.Claims["isNetworkNode"].(bool)
+	}
+
 	return AuthToken{
-		Role:   token.Claims["role"].(string),
-		Type:   nodeType,
-		UserID: token.Claims["user_id"].(string),
-		Email:  token.Claims["email"].(string),
+		Role:          token.Claims["role"].(string),
+		Type:          nodeType,
+		UserID:        token.Claims["user_id"].(string),
+		Email:         token.Claims["email"].(string),
+		IsNetworkNode: isNetworkNode,
 	}, nil
 }
 
@@ -59,14 +66,13 @@ func (at *AuthToken) GetChannelByRole() string {
 }
 
 func (at *AuthToken) GetChannelByRoleV2() string {
-	channel := ECommerceChannel
-
-	switch at.Role {
-	case UserRoleAdmin, UserRoleManager:
-		channel = MgaChannel
-	case UserRoleAgency, UserRoleAgent:
-		channel = NetworkChannel
+	if at.IsNetworkNode {
+		return NetworkChannel
 	}
 
-	return channel
+	if lib.SliceContains([]string{UserRoleAdmin, UserRoleManager}, at.Role) {
+		return MgaChannel
+	}
+
+	return ECommerceChannel
 }
