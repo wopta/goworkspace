@@ -30,7 +30,7 @@ go_modules = [
     "network",
     "bpmn",]
 changed_modules = ["models", "lib", "mga", "network",
-                      "sellable", "payment", "quote", "broker", "partnership"]
+                   "sellable", "payment", "quote", "broker", "partnership"]
 updateable_modules = ["models", "lib", "mga", "network",
                       "sellable", "payment", "quote", "broker", "partnership"]
 
@@ -39,6 +39,25 @@ environment = 'dev'  # Replace with your desired environment
 dry_run = True
 
 commands = []
+
+print("""
+ _______  _______  _       _________          _______ _________ _______  _        _______  
+(  ____ \(  ____ \( (    /|\__   __/|\     /|(  ____ )\__   __/(  ___  )( (    /|(  ____ \ 
+| (    \/| (    \/|  \  ( |   ) (   | )   ( || (    )|   ) (   | (   ) ||  \  ( || (    \/ 
+| |      | (__    |   \ | |   | |   | |   | || (____)|   | |   | |   | ||   \ | || (__     
+| |      |  __)   | (\ \) |   | |   | |   | ||     __)   | |   | |   | || (\ \) ||  __)    
+| |      | (      | | \   |   | |   | |   | || (\ (      | |   | |   | || | \   || (       
+| (____/\| (____/\| )  \  |   | |   | (___) || ) \ \_____) (___| (___) || )  \  || (____/\ 
+(_______/(_______/|/    )_)   )_(   (_______)|/   \__/\_______/(_______)|/    )_)(_______/ 
+                                                                                          
+""")
+print("======== Initializing ========")
+print(f"Changed modules: {changed_modules}")
+print(f"Updateable modules: {updateable_modules}")
+print(f"Environment: {environment}")
+print(f"Dry run: {dry_run}")
+print()
+print()
 
 
 class Dependecy(object):
@@ -220,8 +239,6 @@ def updateDependencies(dependency_map, updateable_modules, modules, updated_modu
 
         # TODO: update
         tag = f"{dependency_to_update.module}/v{incremented_version}"
-        print(
-            f"git tag -a {tag} -m \"Updating {dependency_to_update.module}\"")
         commands.append(Command(CommandType.TAG, dependency_to_update.module,
                         f"git tag -a {tag} -m \"Updating {dependency_to_update.module}\" && git push origin {tag} && git push google {tag}"))
 
@@ -235,8 +252,6 @@ def updateDependencies(dependency_map, updateable_modules, modules, updated_modu
                         dependant, dependency_to_update.module, incremented_version)
                 else:
                     print("Dry run, not updating module")
-                print(
-                    f"git add {dependant}/go.mod && git commit -m \"Updating {dependency_to_update.module} in {dependant}\" && git push origin master && git push google master")
                 commands.append(Command(CommandType.UPDATE_MODULE, dependant,
                                 f"git add {dependant}/go.mod && git commit -m \"Updating {dependency_to_update.module} in {dependant}\" && git push origin master && git push google master"))
                 print()
@@ -268,8 +283,6 @@ def updateFunctions(modules, updateable_modules):
 
         # TODO: update
         tag = f"{dependency_to_update.module}/{incremented_version}.{environment}"
-        print(
-            f"git tag -a {tag} -m \"Updating {dependency_to_update.module}\" && git push origin {tag} && git push google {tag}")
         commands.append(Command(CommandType.UPDATE_FUNCTION, dependency_to_update.module,
                         f"git tag -a {tag} -m \"Updating {dependency_to_update.module}\" && git push origin {tag} && git push google {tag}"))
         print()
