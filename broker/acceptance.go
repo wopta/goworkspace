@@ -63,7 +63,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	policy, err = plc.GetPolicy(policyUid, origin)
 	lib.CheckError(err)
 
-	if policy.Status != models.PolicyStatusWaitForApproval {
+	if !lib.SliceContains(models.GetWaitForApprovalStatusList(), policy.Status) {
 		log.Printf("[AcceptanceFx] Policy Uid %s: wrong status %s", policy.Uid, policy.Status)
 		return `{"success":false}`, `{"success":false}`, nil
 	}
