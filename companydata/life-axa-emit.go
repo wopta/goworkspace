@@ -143,6 +143,7 @@ func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.T
 	var (
 		result       [][]string
 		residenceCab string
+		networkCode  string
 	)
 	log.Println("LifeAxalEmit:  policy.Uid: ", policy.Uid)
 	fil := df.Filter(
@@ -156,6 +157,16 @@ func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.T
 	log.Println("LifeAxalEmit:  fil.Records()[0]:", fil.Records()[0])
 	log.Println("LifeAxalEmit:  filtered col", fil.Ncol())
 	log.Println("LifeAxalEmit: filtered row", fil.Nrow())
+	if policy.NetworkUid != "" {
+		var node *models.NetworkNode
+		snap, e := lib.GetFirestoreErr("networkNodes", policy.NetworkUid)
+		log.Println(e)
+		snap.DataTo(&node)
+		log.Println("LifeAxalEmit: node.Code", node.Code)
+		networkCode = node.Code
+	} else {
+		networkCode = "W1"
+	}
 	for _, asset := range policy.Assets {
 
 		for _, g := range asset.Guarantees {
@@ -192,7 +203,7 @@ func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.T
 				m,                                          //indennizzo mensile
 				"",                                         //campo disponibile
 				"",                                         //% di sovrappremio da applicare alla garanzia
-				"W1",                                       //Codice Concessionario /dipendenti (iscr.E)
+				networkCode,                                //Codice Concessionario /dipendenti (iscr.E)
 				"",                                         //Codice Campagna
 				"T",                                        //Copertura Assicurativa: Totale o Pro quota
 				"",                                         //% assicurata dell'assicurato
@@ -539,7 +550,7 @@ func mapCodecCompany(p models.Policy, g string) string {
 	}
 	return result
 }
-func getIndennity(g models.Guarante	) (string, string) {
+func getIndennity(g models.Guarante) (string, string) {
 	var result, monthly string
 	sumInsuredLimitRound := g.Value.SumInsuredLimitOfIndemnity * 100
 	sumInsuredLimit := int(sumInsuredLimitRound)

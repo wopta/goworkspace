@@ -21,10 +21,9 @@ import (
 const (
 	dataMovement     = "inclusive_bank_account_movement"
 	dataBanckAccount = "inclusive_bank_account"
-	suspended="suspended"
-	insert="insert"
-	delete="delete"
-
+	suspended        = "suspended"
+	insert           = "insert"
+	delete           = "delete"
 )
 
 // TO DO security,payload,error,fasature
@@ -221,22 +220,34 @@ func getBigqueryClient() *bigquery.Client {
 	lib.CheckError(err)
 	return client
 }
-func Count(date string, fiscalCode string, guaranteesCode string)  {
-
+func Count(date string, fiscalCode string, guaranteesCode string) {
+	var (
+		countResponseModel CountResponseModel
+	)
+	refday:=time.Now().AddDate(0,0,-1)
+	refdayString:=refday.Format("2006-01-02")
 	queryWopta, _ := QueryRowsBigQuery[BankAccountMovement]("wopta",
 		"inclusive_axa_bank_account",
-		"select * from `wopta."+dataMovement+"` where fiscalCode='"+fiscalCode+"' and guaranteesCode ='"+guaranteesCode+"'")
+		"select * from `wopta."+dataMovement+"` where fiscalCode='"+fiscalCode+"' and guaranteesCode ='"+guaranteesCode+"and _PARTITIONTIME ='" + refdayString+ "'")
 	log.Println(len(queryWopta))
-
-	requestUrl:=os.Getenv("HYPE_PLATHFORM_PATH")+"/profile/insurance/v1/wopta/{guaranteesCode}/amount/{fromDate}/{endDate}"
 	
+	requestUrl := os.Getenv("HYPE_PLATHFORM_PATH") + "/profile/insurance/v1/wopta/next/amount/"+refdayString+"/"+refdayString
+
 	req, err := http.NewRequest(http.MethodGet, requestUrl, nil)
 	if err != nil {
-		   fmt.Printf("client: could not create request: %s\n", err)
+		fmt.Printf("client: could not create request: %s\n", err)
 	}
 	req.Header.Set("Content-Type", "application/json")
-	res:=lib.Httpclient(req)
+	res := lib.Httpclient(req)
+	reqAll := lib.ErrorByte(ioutil.ReadAll(res.Body))
+	json.Unmarshal(reqAll, &countResponseModel)
 	log.Println(res)
 
-	
+}
+
+type CountResponseModel struct {
+	Total     int `json:"total"`
+	Insert    int `json:"insert"`
+	Delete    int `json:"delete"`
+	Suspended int `json:"suspended"`
 }

@@ -67,7 +67,13 @@ func Callback(w http.ResponseWriter, r *http.Request) {
 				Method:  http.MethodPost,
 				Roles:   []string{},
 			},
+			{
+				Route:   "/v1/in/life",
+				Handler: LifeIn,
+				Method:  http.MethodPost,
+				Roles:   []string{},
+			},
 		},
 	}
-	route.Router(w, r) 
+	route.Router(w, r)
 }
