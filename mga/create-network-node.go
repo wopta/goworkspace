@@ -28,6 +28,10 @@ func CreateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 		return "", "", err
 	}
 
+	// TODO: check node.Type in warrant.AllowedTypes
+	// TODO: check unique node.Code
+	// TODO: check unique companyCode for company
+
 	log.Println("[CreateNetworkNodeFx] creating network node into Firestore...")
 
 	node, err := network.CreateNode(*request)

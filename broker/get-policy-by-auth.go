@@ -8,6 +8,7 @@ import (
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	plc "github.com/wopta/goworkspace/policy"
 )
 
 func GetPoliciesByAuthFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -40,7 +41,7 @@ func GetPoliciesByAuthFx(w http.ResponseWriter, r *http.Request) (string, interf
 		Value: authToken.UserID,
 	})
 
-	resp.Policies, err = getPolicies(origin, req.Queries, limitValue)
+	resp.Policies, err = plc.GetPoliciesByQueries(origin, req.Queries, limitValue)
 	if err != nil {
 		log.Println("[GetPoliciesByAuth] query error: ", err.Error())
 		return "", nil, err

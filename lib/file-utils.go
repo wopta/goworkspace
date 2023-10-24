@@ -183,6 +183,39 @@ func PutToStorage(bucketname string, path string, file []byte) string {
 
 }
 
+func PutToStorageIfNotExists(bucketname string, path string, file []byte) (string, error) {
+	log.Println("start PutToStorage")
+	ctx := context.Background()
+	client, err := storage.NewClient(ctx)
+	if err != nil {
+		return "", err
+	}
+	defer client.Close()
+
+	bucket := client.Bucket(bucketname)
+	obj := bucket.Object(path)
+
+	// Check if the object already exists
+	_, err = obj.Attrs(ctx);
+	if err == nil {
+		// Object already exists, return an error
+		return "", fmt.Errorf("file already exists")
+	}
+	// check if the error is because the object does not exist
+	if err != storage.ErrObjectNotExist {
+		return "", err
+	}
+
+	// Object does not exist, create a new writer and writer the file
+	writer := obj.NewWriter(ctx)
+	defer writer.Close()
+	if _, err := writer.Write(file); err != nil {
+		return "", err
+	}
+
+	return "gs://" + bucketname + "/" + path, nil
+}
+
 func PutGoogleStorage(bucketname string, path string, file []byte, contentType string) (string, error) {
 	// some process request msg, decode base64 to image byte
 	// create image file in current directory with os.create()

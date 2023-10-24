@@ -44,8 +44,17 @@ func UpdatePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	originalPolicyBytes, _ := json.Marshal(originalPolicy)
 	log.Printf("[UpdatePolicyFx] original policy: %s", string(originalPolicyBytes))
 
-	input := UpdatePolicy(&policy)
-	inputJson, err := json.Marshal(input)
+	mergedInput := make(map[string]interface{})
+	input := plc.UpdatePolicy(&policy)
+	for k, v := range input {
+		mergedInput[k] = v
+	}
+	inputReserved := reserved.UpdatePolicyReserved(&policy)
+	for k, v := range inputReserved {
+		mergedInput[k] = v
+	}
+
+	inputJson, err := json.Marshal(mergedInput)
 	if err != nil {
 		log.Printf("[UpdatePolicyFx] error unable to marshal input result: %s", err.Error())
 		return "", nil, err
@@ -68,28 +77,6 @@ func UpdatePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	responseJson, err := json.Marshal(&response)
 
 	return string(responseJson), response, err
-}
-
-func UpdatePolicy(policy *models.Policy) map[string]interface{} {
-	input := make(map[string]interface{}, 0)
-
-	input["assets"] = policy.Assets
-	input["contractor"] = policy.Contractor
-	input["fundsOrigin"] = policy.FundsOrigin
-	if policy.Surveys != nil {
-		input["surveys"] = policy.Surveys
-	}
-	if policy.Statements != nil {
-		input["statements"] = policy.Statements
-	}
-	input["step"] = policy.Step
-	input["updated"] = time.Now().UTC()
-
-	isReserved, reservedInfo := reserved.GetReservedInfo(policy)
-	input["isReserved"] = isReserved
-	input["reservedInfo"] = reservedInfo
-
-	return input
 }
 
 func PatchPolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
