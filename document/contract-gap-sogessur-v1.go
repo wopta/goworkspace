@@ -12,23 +12,12 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
-func GapContract(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, []byte) {
-	var (
-		filename string
-		out      []byte
-	)
-
-	filename, out = GapSogessur(pdf, origin, policy)
-
-	return filename, out
-}
-
-func GapSogessur(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, []byte) {
+func gapSogessurContractV1(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode *models.NetworkNode) (string, []byte) {
 	signatureID = 0
 
-	gapHeader(pdf, policy)
+	gapHeaderV1(pdf, policy, networkNode, false)
 
-	gapFooter(pdf, policy.NameDesc)
+	gapFooterV1(pdf, policy.NameDesc)
 
 	pdf.AddPage()
 
@@ -43,17 +32,17 @@ func GapSogessur(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, 
 		" e segnala eventuali inesattezze", "", "", false)
 	pdf.Ln(3)
 
-	gapVehicleDataTable(pdf, vehicle)
+	gapVehicleDataTableV1(pdf, vehicle)
 
-	gapPersonalInfoTable(pdf, contractor, *vehicleOwner)
+	gapPersonalInfoTableV1(pdf, contractor, *vehicleOwner)
 
-	gapPolicyDataTable(pdf, policy)
+	gapPolicyDataTableV1(pdf, policy)
 
-	gapPriceTable(pdf, policy)
+	gapPriceTableV1(pdf, policy)
 
 	pdf.Ln(3)
 
-	gapStatements(pdf, statements[:len(statements)-1], policy.Company)
+	gapStatementsV1(pdf, statements[:len(statements)-1], policy.Company, false)
 
 	companiesDescriptionSection(pdf, policy.Company)
 
@@ -63,7 +52,7 @@ func GapSogessur(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, 
 
 	woptaFooter(pdf)
 
-	printStatement(pdf, statements[len(statements)-1], policy.Company)
+	printStatement(pdf, statements[len(statements)-1], policy.Company, false)
 
 	woptaHeader(pdf)
 
@@ -71,16 +60,17 @@ func GapSogessur(pdf *fpdf.Fpdf, origin string, policy *models.Policy) (string, 
 
 	woptaPrivacySection(pdf)
 
-	personalDataHandlingSection(pdf, policy)
+	personalDataHandlingSection(pdf, policy, false)
 
 	filename, out := saveContract(pdf, policy)
 	return filename, out
 }
 
-func gapHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
+func gapHeaderV1(pdf *fpdf.Fpdf, policy *models.Policy, networkNode *models.NetworkNode, isProposal bool) {
 	var (
 		opt                   fpdf.ImageOptions
 		logoPath, productName string
+		policyInfo            = make([][]string, 0)
 	)
 
 	location, err := time.LoadLocation("Europe/Rome")
@@ -92,8 +82,19 @@ func gapHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 	logoPath = lib.GetAssetPathByEnvV2() + "logo_gap.png"
 	productName = "Auto Valore Protetto"
 
-	policyInfo := [][]string{{"Polizza Numero:", policy.CodeCompany, ""}, {"Targa Veicolo:", policy.Assets[0].Vehicle.Plate, ""},
-		{"Decorre dal:", policyStartDate.Format(dateLayout), "ore 24:00"}, {"Scade il:", policyEndDate.Format(dateLayout), "ore 24:00"}}
+	if isProposal {
+		policyInfo = append(policyInfo, []string{"Proposta Numero:", fmt.Sprintf("%d", policy.ProposalNumber), ""})
+	} else {
+		policyInfo = append(policyInfo, []string{"Polizza Numero:", policy.CodeCompany, ""})
+	}
+
+	policyInfo = append(policyInfo, [][]string{{"Targa Veicolo:", policy.Assets[0].Vehicle.Plate, ""},
+		{"Decorre dal:", policyStartDate.Format(dateLayout), "ore 24:00"}, {"Scade il:", policyEndDate.Format(dateLayout), "ore 24:00"}}...)
+
+	if networkNode != nil {
+		networkNodeInfo := []string{"Produttore:", getProducerName(networkNode), ""}
+		policyInfo = append(policyInfo, networkNodeInfo)
+	}
 
 	pdf.SetHeaderFunc(func() {
 		opt.ImageType = "png"
@@ -142,7 +143,7 @@ func gapHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 	})
 }
 
-func gapFooter(pdf *fpdf.Fpdf, productName string) {
+func gapFooterV1(pdf *fpdf.Fpdf, productName string) {
 	footerText := "Wopta per te. Auto Valore Protetto è un prodotto assicurativo di Sogessur - Société Anonyme " +
 		"– Capitale Sociale € 33 825 000 – Sede legale: Tour D2, 17bis Place des Reflets – 92919\n" +
 		"Paris La Défense Cedex - 379 846 637 R.C.S. Nanterre - Francia - Sede secondaria: Via Tiziano 32, " +
@@ -180,7 +181,7 @@ func woptaGapHeader(pdf *fpdf.Fpdf, policy models.Policy) {
 
 }
 
-func gapVehicleDataTable(pdf *fpdf.Fpdf, vehicle *models.Vehicle) {
+func gapVehicleDataTableV1(pdf *fpdf.Fpdf, vehicle *models.Vehicle) {
 	tableRows := [][]string{
 		{"Tipo Veicolo", vehicle.VehicleTypeDesc, "Prima immatricolazione", vehicle.RegistrationDate.Format(dateLayout)},
 		{"Marca", vehicle.Manufacturer, "Stato veicolo", vehicle.Condition},
@@ -223,7 +224,7 @@ func gapVehicleDataTable(pdf *fpdf.Fpdf, vehicle *models.Vehicle) {
 	pdf.Ln(5)
 }
 
-func gapPersonalInfoTable(pdf *fpdf.Fpdf, contractor, vehicleOwner models.User) {
+func gapPersonalInfoTableV1(pdf *fpdf.Fpdf, contractor, vehicleOwner models.User) {
 	setWhiteBoldFont(pdf, standardTextSize)
 	pdf.SetFillColor(229, 9, 117)
 	pdf.SetDrawColor(229, 9, 117)
@@ -278,7 +279,7 @@ func gapPersonalInfoTable(pdf *fpdf.Fpdf, contractor, vehicleOwner models.User) 
 	pdf.Ln(5)
 }
 
-func gapPolicyDataTable(pdf *fpdf.Fpdf, policy *models.Policy) {
+func gapPolicyDataTableV1(pdf *fpdf.Fpdf, policy *models.Policy) {
 	offerMap := map[string]string{
 		"base":     "Base",
 		"complete": "Completa",
@@ -341,7 +342,7 @@ func gapPolicyDataTable(pdf *fpdf.Fpdf, policy *models.Policy) {
 	pdf.Ln(5)
 }
 
-func gapPriceTable(pdf *fpdf.Fpdf, policy *models.Policy) {
+func gapPriceTableV1(pdf *fpdf.Fpdf, policy *models.Policy) {
 	setWhiteBoldFont(pdf, standardTextSize)
 	pdf.SetFillColor(229, 9, 117)
 	pdf.SetDrawColor(229, 9, 117)
@@ -370,8 +371,8 @@ func gapPriceTable(pdf *fpdf.Fpdf, policy *models.Policy) {
 	pdf.Ln(5)
 }
 
-func gapStatements(pdf *fpdf.Fpdf, statements []models.Statement, companyName string) {
+func gapStatementsV1(pdf *fpdf.Fpdf, statements []models.Statement, companyName string, isProposal bool) {
 	for _, statement := range statements {
-		printStatement(pdf, statement, companyName)
+		printStatement(pdf, statement, companyName, isProposal)
 	}
 }

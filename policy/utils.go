@@ -100,6 +100,12 @@ func SetUserIntoPolicyContractor(policy *models.Policy, origin string) error {
 		return err
 	}
 
+	err = promotePolicyAttachments(policy, origin)
+	if err != nil {
+		log.Printf("[setUserIntoPolicyContractor] ERROR updating attachments: %s", err.Error())
+		return err
+	}
+
 	if newUser {
 		policy.Contractor.CreationDate = time.Now().UTC()
 		policy.Contractor.UpdatedDate = policy.Contractor.CreationDate
@@ -148,4 +154,31 @@ func Pay(policy *models.Policy, origin string) error {
 	policy.Updated = time.Now().UTC()
 
 	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
+}
+
+func promotePolicyAttachments(policy *models.Policy, origin string) error {
+	const (
+		tempPathFormat string = "temp/%s/%s"
+		userPathFormat string = "assets/users/%s/%s"
+	)
+
+	if policy.Attachments == nil {
+		return nil
+	}
+
+	for index, attachment := range *policy.Attachments {
+		if !strings.HasPrefix(attachment.Link, "temp") {
+			continue
+		}
+		gsLink, err := lib.PromoteFile(
+			fmt.Sprintf(tempPathFormat, policy.Uid, attachment.FileName),
+			fmt.Sprintf(userPathFormat, policy.Contractor.Uid, attachment.FileName),
+		)
+		if err != nil {
+			log.Printf("[promotoPolicyAttachments] error: %s", err.Error())
+			return err
+		}
+		(*policy.Attachments)[index].Link = gsLink
+	}
+	return nil
 }

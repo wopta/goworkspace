@@ -47,7 +47,7 @@ func loadCustomFonts(pdf *fpdf.Fpdf) {
 func saveContract(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 	var filename string
 	if os.Getenv("env") == "local" {
-		err := pdf.OutputFileAndClose("./contract.pdf")
+		err := pdf.OutputFileAndClose("./document/contract.pdf")
 		lib.CheckError(err)
 	} else {
 		var out bytes.Buffer
@@ -60,6 +60,23 @@ func saveContract(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 		lib.CheckError(err)
 		return filename, out.Bytes()
 	}
+	return filename, nil
+}
+
+func saveProposal(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
+	var filename string
+	/*if os.Getenv("env") == "local" {
+		err := pdf.OutputFileAndClose("./document/proposal.pdf")
+		lib.CheckError(err)
+	} else {*/
+	var out bytes.Buffer
+	err := pdf.Output(&out)
+	lib.CheckError(err)
+	filename = fmt.Sprintf("%s/%s/"+models.ProposalDocumentFormat, "temp", policy.Uid, policy.NameDesc, policy.ProposalNumber)
+	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, out.Bytes())
+	lib.CheckError(err)
+	return filename, out.Bytes()
+	//}
 	return filename, nil
 }
 
@@ -181,7 +198,7 @@ func getParagraphTitle(pdf *fpdf.Fpdf, title string) {
 	pdf.MultiCell(0, 4, title, "", "", false)
 }
 
-func checkSurveySpace(pdf *fpdf.Fpdf, survey models.Survey) {
+func checkSurveySpace(pdf *fpdf.Fpdf, survey models.Survey, isProposal bool) {
 	var answer string
 	leftMargin, _, rightMargin, _ := pdf.GetMargins()
 	pageWidth, pageHeight := pdf.GetPageSize()
@@ -228,7 +245,7 @@ func checkSurveySpace(pdf *fpdf.Fpdf, survey models.Survey) {
 		requiredHeight += 3 * float64(len(lines))
 	}
 
-	if survey.ContractorSign || survey.CompanySign {
+	if (!isProposal && survey.ContractorSign) || survey.CompanySign {
 		requiredHeight += 35
 	}
 
@@ -237,13 +254,13 @@ func checkSurveySpace(pdf *fpdf.Fpdf, survey models.Survey) {
 	}
 }
 
-func printSurvey(pdf *fpdf.Fpdf, survey models.Survey, companyName string) error {
+func printSurvey(pdf *fpdf.Fpdf, survey models.Survey, companyName string, isProposal bool) error {
 	var dotsString string
 	leftMargin, _, rightMargin, _ := pdf.GetMargins()
 	pageWidth, _ := pdf.GetPageSize()
 	availableWidth := pageWidth - leftMargin - rightMargin - 2
 
-	checkSurveySpace(pdf, survey)
+	checkSurveySpace(pdf, survey, isProposal)
 
 	surveyTitle := survey.Title
 	surveySubtitle := survey.Subtitle
@@ -316,15 +333,18 @@ func printSurvey(pdf *fpdf.Fpdf, survey models.Survey, companyName string) error
 
 	if survey.CompanySign {
 		companySignature(pdf, companyName)
+		if isProposal {
+			pdf.Ln(20)
+		}
 	}
-	if survey.ContractorSign {
+	if !isProposal && survey.ContractorSign {
 		drawSignatureForm(pdf)
 		pdf.Ln(10)
 	}
 	return nil
 }
 
-func checkStatementSpace(pdf *fpdf.Fpdf, statement models.Statement) {
+func checkStatementSpace(pdf *fpdf.Fpdf, statement models.Statement, isProposal bool) {
 	leftMargin, _, rightMargin, _ := pdf.GetMargins()
 	pageWidth, pageHeight := pdf.GetPageSize()
 	availableWidth := pageWidth - leftMargin - rightMargin - 2
@@ -370,7 +390,7 @@ func checkStatementSpace(pdf *fpdf.Fpdf, statement models.Statement) {
 		requiredHeight += 3 * float64(len(lines))
 	}
 
-	if statement.ContractorSign || statement.CompanySign {
+	if (!isProposal && statement.ContractorSign) || statement.CompanySign {
 		requiredHeight += 35
 	}
 
@@ -379,8 +399,8 @@ func checkStatementSpace(pdf *fpdf.Fpdf, statement models.Statement) {
 	}
 }
 
-func printStatement(pdf *fpdf.Fpdf, statement models.Statement, companyName string) {
-	checkStatementSpace(pdf, statement)
+func printStatement(pdf *fpdf.Fpdf, statement models.Statement, companyName string, isProposal bool) {
+	checkStatementSpace(pdf, statement, isProposal)
 
 	title := statement.Title
 	subtitle := statement.Subtitle
@@ -408,8 +428,11 @@ func printStatement(pdf *fpdf.Fpdf, statement models.Statement, companyName stri
 
 	if statement.CompanySign {
 		companySignature(pdf, companyName)
+		if isProposal {
+			pdf.Ln(20)
+		}
 	}
-	if statement.ContractorSign {
+	if !isProposal && statement.ContractorSign {
 		drawSignatureForm(pdf)
 		pdf.Ln(10)
 	}
@@ -462,4 +485,67 @@ func formatPhoneNumber(phone string) string {
 		return "================"
 	}
 	return libphonenumber.Format(num, libphonenumber.INTERNATIONAL)
+}
+
+func woptaInfoTable(pdf *fpdf.Fpdf, producerInfo map[string]string) {
+	drawPinkHorizontalLine(pdf, 0.1)
+	setBlackRegularFont(pdf, smallTextSize)
+	pdf.MultiCell(0, 5, "DATI DELLA PERSONA FISICA CHE ENTRA IN CONTATTO CON IL "+
+		"CONTRAENTE", "", "", false)
+	setBlackRegularFont(pdf, standardTextSize)
+	pdf.MultiCell(0, 5, producerInfo["name"]+" iscritto alla Sezione "+
+		producerInfo["ruiSection"]+" del RUI con numero "+producerInfo["ruiCode"]+" in data "+
+		producerInfo["ruiRegistration"], "", "", false)
+	drawPinkHorizontalLine(pdf, 0.1)
+	setBlackRegularFont(pdf, smallTextSize)
+	pdf.MultiCell(0, 5, "QUALIFICA", "", "", false)
+	setBlackRegularFont(pdf, standardTextSize)
+	pdf.MultiCell(0, 3.5, "Responsabile dell’attività di intermediazione assicurativa di Wopta "+
+		"Assicurazioni Srl, Società iscritta alla Sezione A del RUI con numero A000701923 in data "+
+		"14.02.2022", "", "", false)
+	drawPinkHorizontalLine(pdf, 0.1)
+	setBlackRegularFont(pdf, smallTextSize)
+	pdf.MultiCell(0, 5, "SEDE LEGALE", "", "", false)
+	setBlackRegularFont(pdf, standardTextSize)
+	pdf.MultiCell(0, 5, "Galleria del Corso, 1 – 20122 MILANO (MI)", "", "", false)
+	drawPinkHorizontalLine(pdf, 0.1)
+	setBlackRegularFont(pdf, smallTextSize)
+	pdf.CellFormat(90, 5, "RECAPITI TELEFONICI", "", 0, fpdf.AlignLeft, false, 0, "")
+	pdf.CellFormat(90, 5, "E-MAIL", "", 1, fpdf.AlignLeft, false, 0, "")
+	setBlackRegularFont(pdf, standardTextSize)
+	pdf.CellFormat(90, 5, "02.91.24.03.46", "", 0, fpdf.AlignLeft, false, 0, "")
+	pdf.CellFormat(90, 5, "info@wopta.it", "", 1, fpdf.AlignLeft, false, 0, "")
+	drawPinkHorizontalLine(pdf, 0.1)
+	setBlackRegularFont(pdf, smallTextSize)
+	pdf.CellFormat(90, 5, "PEC", "", 0, fpdf.AlignLeft, false, 0, "")
+	pdf.CellFormat(90, 5, "SITO INTERNET", "", 1, fpdf.AlignLeft, false, 0, "")
+	setBlackRegularFont(pdf, standardTextSize)
+	pdf.CellFormat(90, 5, "woptaassicurazioni@legalmail.it", "", 0, fpdf.AlignLeft, false, 0, "")
+	pdf.CellFormat(90, 5, "wopta.it", "", 1, fpdf.AlignLeft, false, 0, "")
+	drawPinkHorizontalLine(pdf, 0.1)
+	setBlackRegularFont(pdf, smallTextSize)
+	pdf.MultiCell(0, 5, "AUTORITÀ COMPETENTE ALLA VIGILANZA DELL’ATTIVITÀ SVOLTA",
+		"", "", false)
+	setBlackRegularFont(pdf, standardTextSize)
+	pdf.MultiCell(0, 5, "IVASS – Istituto per la Vigilanza sulle Assicurazioni - Via del Quirinale, "+
+		"21 - 00187 Roma", "", "", false)
+	drawPinkHorizontalLine(pdf, 0.1)
+}
+
+func getProducerName(networkNode *models.NetworkNode) string {
+	var producerName string
+
+	if networkNode == nil {
+		return producerName
+	}
+
+	switch networkNode.Type {
+	case models.AgentNetworkNodeType:
+		producerName = strings.ToUpper(fmt.Sprintf("%s %s", networkNode.Agent.Surname, networkNode.Agent.Name))
+	case models.AgencyNetworkNodeType:
+		producerName = strings.ToUpper(fmt.Sprintf("%s", networkNode.Agency.Name))
+	case models.BrokerNetworkNodeType:
+		producerName = strings.ToUpper(fmt.Sprintf("%s", networkNode.Broker.Name))
+	}
+	return producerName
 }

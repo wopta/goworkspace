@@ -1,6 +1,7 @@
 package document
 
 import (
+	"fmt"
 	"github.com/dustin/go-humanize"
 	"github.com/go-pdf/fpdf"
 	"github.com/wopta/goworkspace/lib"
@@ -9,10 +10,10 @@ import (
 	"time"
 )
 
-func mainHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
+func mainHeader(pdf *fpdf.Fpdf, policy *models.Policy, isProposal bool) {
 	var (
-		opt                                     fpdf.ImageOptions
-		logoPath, cfpi, expiryInfo, productName string
+		opt                                                                   fpdf.ImageOptions
+		logoPath, cfpi, policyInfoHeader, policyInfo, expiryInfo, productName string
 	)
 
 	location, err := time.LoadLocation("Europe/Rome")
@@ -29,8 +30,15 @@ func mainHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 			policyStartDate.AddDate(1, 0, 0).Format(dateLayout) + "\n"
 	}
 
-	policyInfo := "Numero: " + policy.CodeCompany + "\n" +
-		"Decorre dal: " + policyStartDate.Format(dateLayout) + " ore 24:00\n" +
+	if isProposal {
+		policyInfoHeader = "I dati della tua proposta"
+		policyInfo = fmt.Sprintf("Numero: %d\n", policy.ProposalNumber)
+	} else {
+		policyInfoHeader = "I dati della tua polizza"
+		policyInfo = fmt.Sprintf("Numero: %s\n", policy.CodeCompany)
+	}
+
+	policyInfo += "Decorre dal: " + policyStartDate.Format(dateLayout) + " ore 24:00\n" +
 		"Scade il: " + policyEndDate.In(location).Format(dateLayout) + " ore 24:00\n"
 
 	switch policy.Name {
@@ -82,7 +90,7 @@ func mainHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 
 		setBlackBoldFont(pdf, standardTextSize)
 		pdf.SetXY(11, 20)
-		pdf.Cell(0, 3, "I dati della tua polizza")
+		pdf.Cell(0, 3, policyInfoHeader)
 		setBlackRegularFont(pdf, standardTextSize)
 		pdf.SetXY(11, pdf.GetY()+3)
 		pdf.MultiCell(0, 3.5, policyInfo, "", "", false)
@@ -287,7 +295,6 @@ func paymentMethodSection(pdf *fpdf.Fpdf) {
 func emitResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	var offerPrice string
 	emitDate := policy.EmitDate.Format(dateLayout)
-	startDate := policy.StartDate.Format(dateLayout)
 	if policy.PaymentSplit == "monthly" {
 		offerPrice = humanize.FormatFloat("#.###,##", policy.PriceGrossMonthly)
 	} else {
@@ -296,8 +303,6 @@ func emitResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	text := "Polizza emessa a Milano il " + emitDate + " per un importo di € " + offerPrice + " quale " +
 		"prima rata alla firma, il cui pagamento a saldo è da effettuarsi con i metodi di pagamento sopra indicati."
 	switch policy.Name {
-	case models.LifeProduct:
-		text += " Wopta conferma avvenuto incasso e copertura della polizza dal " + startDate + "."
 	case models.PersonaProduct:
 		text += "\nCostituisce quietanza di pagamento la mail di conferma che Wopta invierà al Contraente."
 
@@ -351,7 +356,7 @@ func companiesDescriptionSection(pdf *fpdf.Fpdf, companyName string) {
 	pdf.Ln(3)
 }
 
-func personalDataHandlingSection(pdf *fpdf.Fpdf, policy *models.Policy) {
+func personalDataHandlingSection(pdf *fpdf.Fpdf, policy *models.Policy, isProposal bool) {
 	consentText := ""
 	notConsentText := "X"
 
@@ -384,7 +389,9 @@ func personalDataHandlingSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 		"con operatore).", "", "", false)
 	pdf.Ln(3)
 	pdf.Cell(0, 3, policy.EmitDate.Format(dateLayout))
-	drawSignatureForm(pdf)
+	if !isProposal {
+		drawSignatureForm(pdf)
+	}
 }
 
 func woptaPrivacySection(pdf *fpdf.Fpdf) {
@@ -607,7 +614,7 @@ func companySignature(pdf *fpdf.Fpdf, companyName string) {
 	}
 }
 
-func contractWithdrawlSection(pdf *fpdf.Fpdf) {
+func contractWithdrawlSection(pdf *fpdf.Fpdf, isProposal bool) {
 	getParagraphTitle(pdf, "Informativa sul diritto di recesso")
 	setBlackBoldFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3, "Diritto di recesso entro i primi 30 giorni dalla stipula ("+
@@ -632,7 +639,204 @@ func contractWithdrawlSection(pdf *fpdf.Fpdf) {
 		"lettera raccomandata a.r. al seguente indirizzo: Wopta Assicurazioni srl – Gestione Portafoglio – Galleria del "+
 		"Corso, 1 – 201212 Milano (MI) oppure via posta elettronica certificata (PEC) all’indirizzo "+
 		"email: woptaassicurazioni@legalmail.it", "", "", false)
-	pdf.Ln(5)
-	drawSignatureForm(pdf)
-	pdf.Ln(5)
+	if !isProposal {
+		pdf.Ln(5)
+		drawSignatureForm(pdf)
+		pdf.Ln(5)
+	}
+}
+
+func allegato3Section(pdf *fpdf.Fpdf, producerInfo map[string]string) {
+	setBlackBoldFont(pdf, titleTextSize)
+	pdf.MultiCell(0, 3, "ALLEGATO 3 - INFORMATIVA SUL DISTRIBUTORE", "", "CM", false)
+	pdf.Ln(3)
+	setBlackRegularFont(pdf, standardTextSize)
+	pdf.MultiCell(0, 3, "Il distributore ha l’obbligo di consegnare/trasmettere al contraente il presente"+
+		" documento, prima della sottoscrizione della prima proposta o, qualora non prevista, del primo contratto di "+
+		"assicurazione, di metterlo a disposizione del pubblico nei propri locali, anche mediante apparecchiature "+
+		"tecnologiche, oppure di pubblicarlo sul proprio sito internet ove utilizzato per la promozione e collocamento "+
+		"di prodotti assicurativi, dando avviso della pubblicazione nei propri locali. In occasione di rinnovo o "+
+		"stipula di un nuovo contratto o di qualsiasi operazione avente ad oggetto un prodotto di investimento "+
+		"assicurativo il distributore consegna o trasmette le informazioni di cui all’Allegato 3 solo in caso di "+
+		"successive modifiche di rilievo delle stesse.", "", "", false)
+	pdf.Ln(3)
+
+	setBlackBoldFont(pdf, titleTextSize)
+	pdf.MultiCell(0, 3, "SEZIONE I - Informazioni generali sull’intermediario che entra in contatto con "+
+		"il contraente", "", "", false)
+	pdf.Ln(1)
+
+	woptaInfoTable(pdf, producerInfo)
+	pdf.Ln(1)
+
+	setBlackRegularFont(pdf, standardTextSize)
+	pdf.MultiCell(0, 3, "Gli estremi identificativi e di iscrizione dell’Intermediario e dei soggetti che "+
+		"operano per lo stesso possono essere verificati consultando il Registro Unico degli Intermediari assicurativi "+
+		"e riassicurativi sul sito internet dell’IVASS (www.ivass.it)", "", fpdf.AlignLeft, false)
+	pdf.Ln(3)
+	setBlackBoldFont(pdf, titleTextSize)
+	pdf.MultiCell(0, 3, "SEZIONE II - Informazioni sull’attività svolta dall’intermediario assicurativo ",
+		"", fpdf.AlignLeft, false)
+	pdf.Ln(1)
+
+	setBlackRegularFont(pdf, standardTextSize)
+	pdf.MultiCell(0, 3, "La Wopta Assicurazioni Srl comunica di aver messo a disposizione nei propri "+
+		"locali l’elenco degli obblighi di comportamento cui adempie, come indicati nell’allegato 4-ter del Regolamento"+
+		" IVASS n. 40/2018.", "", "", false)
+	pdf.Ln(1)
+	pdf.MultiCell(0, 3, "Si comunica che nel caso di offerta fuori sede o nel caso in cui la fase "+
+		"precontrattuale si svolga mediante tecniche di comunicazione a distanza il contraente riceve l’elenco "+
+		"degli obblighi.", "", "", false)
+	pdf.Ln(3)
+	setBlackBoldFont(pdf, titleTextSize)
+	pdf.MultiCell(0, 3, "SEZIONE III - Informazioni relative a potenziali situazioni di conflitto "+
+		"d’interessi", "", "", false)
+	pdf.Ln(1)
+	setBlackRegularFont(pdf, standardTextSize)
+	pdf.MultiCell(0, 3, "Wopta Assicurazioni Srl ed i soggetti che operano per la stessa non sono "+
+		"detentori di una partecipazione, diretta o indiretta, pari o superiore al 10% del capitale sociale o dei "+
+		"diritti di voto di alcuna Impresa di assicurazione.", "", "", false)
+	pdf.Ln(1)
+	pdf.MultiCell(0, 3, "Le Imprese di assicurazione o Imprese controllanti un’Impresa di assicurazione "+
+		"non sono detentrici di una partecipazione, diretta o indiretta, pari o superiore al 10% del capitale sociale "+
+		"o dei diritti di voto dell’Intermediario.", "", "", false)
+	pdf.Ln(3)
+	setBlackBoldFont(pdf, titleTextSize)
+	pdf.MultiCell(0, 3, "SEZIONE IV - Informazioni sugli strumenti di tutela del contraente",
+		"", "", false)
+	pdf.Ln(1)
+	setBlackRegularFont(pdf, standardTextSize)
+	pdf.MultiCell(0, 3, "L’attività di distribuzione è garantita da un contratto di assicurazione della "+
+		"responsabilità civile che copre i danni arrecati ai contraenti da negligenze ed errori professionali "+
+		"dell’intermediario o da negligenze, errori professionali ed infedeltà dei dipendenti, dei collaboratori o "+
+		"delle persone del cui operato l’intermediario deve rispondere a norma di legge.",
+		"", "", false)
+	pdf.Ln(1)
+	pdf.MultiCell(0, 3, "Il contraente ha la facoltà, ferma restando la possibilità di rivolgersi "+
+		"all’Autorità Giudiziaria, di inoltrare reclamo per iscritto all’intermediario, via posta all’indirizzo di "+
+		"sede legale o a mezzo mail alla PEC sopra indicati, oppure all’Impresa secondo le modalità e presso i "+
+		"recapiti indicati nel DIP aggiuntivo nella relativa sezione, nonché la possibilità, qualora non dovesse "+
+		"ritenersi soddisfatto dall’esito del reclamo o in caso di assenza di riscontro da parte dell’intermediario "+
+		"o dell’impresa entro il termine di legge, di rivolgersi all’IVASS secondo quanto indicato nei DIP aggiuntivi.",
+		"", "", false)
+	pdf.Ln(1)
+	pdf.MultiCell(0, 3, "Il contraente ha la facoltà di avvalersi di altri eventuali sistemi alternativi "+
+		"di risoluzione delle controversie previsti dalla normativa vigente nonché quelli indicati nei DIP aggiuntivi.",
+		"", "", false)
+}
+
+func allegato4Section(pdf *fpdf.Fpdf, producerInfo map[string]string) {
+	setBlackBoldFont(pdf, titleTextSize)
+	pdf.MultiCell(0, 3, "ALLEGATO 4 - INFORMAZIONI SULLA DISTRIBUZIONE\nDEL PRODOTTO ASSICURATIVO NON IBIP",
+		"", "CM", false)
+	pdf.Ln(3)
+	setBlackRegularFont(pdf, standardTextSize)
+	pdf.MultiCell(0, 3, "Il distributore ha l’obbligo di consegnare o trasmettere al contraente, prima "+
+		"della sottoscrizione di ciascuna proposta o, qualora non prevista, di ciascun contratto assicurativo, il "+
+		"presente documento, che contiene notizie sul modello e l’attività di distribuzione, sulla consulenza fornita "+
+		"e sulle remunerazioni percepite.", "", "", false)
+	pdf.Ln(1)
+
+	woptaInfoTable(pdf, producerInfo)
+	pdf.Ln(3)
+
+	setBlackBoldFont(pdf, titleTextSize)
+	pdf.MultiCell(0, 3, "SEZIONE I - Informazioni sul modello di distribuzione", "",
+		"", false)
+	pdf.Ln(1)
+	setBlackRegularFont(pdf, standardTextSize)
+	pdf.MultiCell(0, 3, "Secondo quanto indicato nel modulo di proposta/polizza e documentazione "+
+		"precontrattuale ricevuta, la distribuzione relativamente a questa proposta/contratto è svolta per conto "+
+		"della seguente impresa di assicurazione: AXA FRANCE VIE S.A.", "", "", false)
+	pdf.Ln(3)
+	setBlackBoldFont(pdf, titleTextSize)
+	pdf.MultiCell(0, 3, "SEZIONE II: Informazioni sull’attività di distribuzione e consulenza",
+		"", "", false)
+	pdf.Ln(1)
+	setBlackRegularFont(pdf, standardTextSize)
+	pdf.MultiCell(0, 3, "Nello svolgimento dell’attività di distribuzione, l’intermediario non presta "+
+		"attività di consulenza prima della conclusione del contratto né fornisce al contraente una raccomandazione "+
+		"personalizzata ai sensi dell’art. 119-ter, comma 3, del decreto legislativo n. 209/2005 "+
+		"(Codice delle Assicurazioni Private)", "", "", false)
+	pdf.Ln(1)
+	pdf.MultiCell(0, 3, "L'attività di distribuzione assicurativa è svolta in assenza di obblighi "+
+		"contrattuali che impongano di offrire esclusivamente i contratti di una o più imprese di "+
+		"assicurazioni.", "", "", false)
+	pdf.Ln(3)
+	setBlackBoldFont(pdf, titleTextSize)
+	pdf.MultiCell(0, 3, "SEZIONE III - Informazioni relative alle remunerazioni", "", "", false)
+	pdf.Ln(1)
+	setBlackRegularFont(pdf, standardTextSize)
+	pdf.MultiCell(0, 3, "Per il prodotto intermediato, è corrisposto all’intermediario, da parte "+
+		"dell’impresa di assicurazione, un compenso sotto forma di commissione inclusa nel premio "+
+		"assicurativo.", "", "", false)
+	pdf.Ln(1)
+	pdf.MultiCell(0, 3, "L’informazione sopra resa riguarda i compensi complessivamente percepiti da tutti "+
+		"gli intermediari coinvolti nella distribuzione del prodotto.", "", "", false)
+	pdf.Ln(3)
+	setBlackBoldFont(pdf, titleTextSize)
+	pdf.MultiCell(0, 3, "SEZIONE IV – Informazioni sul pagamento dei premi", "", "", false)
+	pdf.Ln(1)
+	setBlackRegularFont(pdf, standardTextSize)
+	pdf.MultiCell(0, 3, "Relativamente a questo contratto i premi pagati dal Contraente "+
+		"all’intermediario e le somme destinate ai risarcimenti o ai pagamenti dovuti dalle Imprese di Assicurazione, "+
+		"se regolati per il tramite dell’intermediario costituiscono patrimonio autonomo e separato dal patrimonio "+
+		"dello stesso.", "", "", false)
+	pdf.Ln(3)
+	setBlackBoldFont(pdf, titleTextSize)
+	pdf.MultiCell(0, 3, "Indicare le modalità di pagamento ammesse ", "", "", false)
+	pdf.Ln(1)
+	setBlackRegularFont(pdf, standardTextSize)
+	pdf.MultiCell(0, 3, "Sono consentiti, nei confronti di Wopta, esclusivamente bonifico e strumenti di "+
+		"pagamento elettronico, quali ad esempio, carte di credito e/o carte di debito, incluse le carte "+
+		"prepagate.", "", "", false)
+	pdf.Ln(3)
+}
+
+func allegato4TerSection(pdf *fpdf.Fpdf, producerInfo map[string]string) {
+	setBlackBoldFont(pdf, titleTextSize)
+	pdf.MultiCell(0, 3, "ALLEGATO 4 TER - ELENCO DELLE REGOLE DI COMPORTAMENTO DEL DISTRIBUTORE",
+		"", fpdf.AlignCenter, false)
+	pdf.Ln(3)
+	setBlackRegularFont(pdf, standardTextSize)
+	pdf.MultiCell(0, 3, "Il distributore ha l’obbligo di mettere a disposizione del pubblico il "+
+		"presente documento nei propri locali, anche mediante apparecchiature tecnologiche, oppure pubblicarlo su "+
+		"un sito internet ove utilizzato per la promozione e il collocamento di prodotti assicurativi, dando avviso "+
+		"della pubblicazione nei propri locali. Nel caso di offerta fuori sede o nel caso in cui la fase "+
+		"precontrattuale si svolga mediante tecniche di comunicazione a distanza, il distributore consegna o "+
+		"trasmette al contraente il presente documento prima della sottoscrizione della proposta o, qualora non "+
+		"prevista, del contratto di assicurazione.", "", "", false)
+	pdf.Ln(1)
+
+	woptaInfoTable(pdf, producerInfo)
+	pdf.Ln(3)
+
+	setBlackBoldFont(pdf, titleTextSize)
+	pdf.MultiCell(0, 3, "Sezione I - Regole generali per la distribuzione di prodotti assicurativi",
+		"", "", false)
+	pdf.Ln(1)
+	setBlackRegularFont(pdf, standardTextSize)
+	pdf.MultiCell(0, 3, "a. obbligo di consegna al contraente dell’allegato 3 al Regolamento IVASS "+
+		"n. 40 del 2 agosto 2018, prima della sottoscrizione della prima proposta o, qualora non prevista, del primo "+
+		"contratto di assicurazione, di metterlo a disposizione del pubblico nei locali del distributore, anche "+
+		"mediante apparecchiature tecnologiche, e di pubblicarlo sul sito internet, ove esistente",
+		"", "", false)
+	pdf.MultiCell(0, 3, "b. obbligo di consegna dell’allegato 4 al Regolamento IVASS n. 40 del 2 agosto "+
+		"2018, prima della sottoscrizione di ciascuna proposta di assicurazione o, qualora non prevista, del contratto "+
+		"di assicurazione", "", "", false)
+	pdf.MultiCell(0, 3, "c. obbligo di consegnare copia della documentazione precontrattuale e "+
+		"contrattuale prevista dalle vigenti disposizioni, copia della polizza e di ogni altro atto o documento "+
+		"sottoscritto dal contraente", "", "", false)
+	pdf.MultiCell(0, 3, "d. obbligo di proporre o raccomandare contratti coerenti con le richieste e le "+
+		"esigenze di copertura assicurativa e previdenziale del contraente o dell’assicurato, acquisendo a tal fine, "+
+		"ogni utile informazione", "", "", false)
+	pdf.MultiCell(0, 3, "e. obbligo di valutare se il contraente rientra nel mercato di riferimento "+
+		"identificato per il contratto di assicurazione proposto e non appartiene alle categorie di clienti per i quali "+
+		"il prodotto non è compatibile, nonché l’obbligo di adottare opportune disposizioni per ottenere dai produttori"+
+		" le informazioni di cui all’articolo 30-decies comma 5 del Codice e per comprendere le caratteristiche e il "+
+		"mercato di riferimento individuato per ciascun prodotto", "", "", false)
+	pdf.MultiCell(0, 3, "f. obbligo di fornire in forma chiara e comprensibile le informazioni "+
+		"oggettive sul prodotto, illustrandone le caratteristiche, la durata, i costi e i limiti della copertura ed "+
+		"ogni altro elemento utile a consentire al contraente di prendere una decisione informata",
+		"", "", false)
 }

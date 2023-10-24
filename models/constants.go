@@ -165,7 +165,13 @@ const (
 )
 
 const (
-	FlowFileFormat = "flows/%s.json"
+	FlowFileFormat         = "flows/%s.json"
+	ProposalDocumentFormat = "Proposta_%s_%d.pdf"
 	WarrantFormat  = "warrants/%s.json"
 	WarrantsFolder = "warrants/"
+)
+
+const (
+	ProductV1 = "v1"
+	ProductV2 = "v2"
 )
