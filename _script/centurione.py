@@ -37,6 +37,8 @@ updateable_modules = ["models", "lib", "mga", "network",
 increment_version_key = "patch"
 environment = 'dev'  # Replace with your desired environment
 dry_run = True
+google_repository = "google"
+github_repository = "origin"
 
 commands = []
 
@@ -56,6 +58,8 @@ print(f"Changed modules: {changed_modules}")
 print(f"Updateable modules: {updateable_modules}")
 print(f"Environment: {environment}")
 print(f"Dry run: {dry_run}")
+print(f"Google repository: {google_repository}")
+print(f"GitHub repository: {github_repository}")
 print()
 print()
 
@@ -240,7 +244,7 @@ def updateDependencies(dependency_map, updateable_modules, modules, updated_modu
         # TODO: update
         tag = f"{dependency_to_update.module}/v{incremented_version}"
         commands.append(Command(CommandType.TAG, dependency_to_update.module,
-                        f"git tag -a {tag} -m \"Updating {dependency_to_update.module}\" && git push origin {tag} && git push google {tag}"))
+                        f"git tag -a {tag} -m \"Updating {dependency_to_update.module}\" && git push {github_repository} {tag} && git push {google_repository} {tag}"))
 
         # this should go at the end
         for dependant, dependencies in dependency_map.items():
@@ -253,7 +257,7 @@ def updateDependencies(dependency_map, updateable_modules, modules, updated_modu
                 else:
                     print("Dry run, not updating module")
                 commands.append(Command(CommandType.UPDATE_MODULE, dependant,
-                                f"git add {dependant}/go.mod && git commit -m \"Updating {dependency_to_update.module} in {dependant}\" && git push origin master && git push google master"))
+                                f"git add {dependant}/go.mod && git commit -m \"Updating {dependency_to_update.module} in {dependant}\" && git push {github_repository} master && git push {google_repository} master"))
                 print()
 
             # clean module in other dependencies
@@ -284,7 +288,7 @@ def updateFunctions(modules, updateable_modules):
         # TODO: update
         tag = f"{dependency_to_update.module}/{incremented_version}.{environment}"
         commands.append(Command(CommandType.UPDATE_FUNCTION, dependency_to_update.module,
-                        f"git tag -a {tag} -m \"Updating {dependency_to_update.module}\" && git push origin {tag} && git push google {tag}"))
+                        f"git tag -a {tag} -m \"Updating {dependency_to_update.module}\" && git push {github_repository} {tag} && git push {google_repository} {tag}"))
         print()
 
 
@@ -366,20 +370,15 @@ if ordered_commands is None or len(ordered_commands) == 0:
         time.sleep(2)
         exit()
 
-for commands in ordered_commands:
+for command_group in ordered_commands:
     # remove duplicate commands by command_type
-    commands_unique = set()
-    uniqueidlist = [commands_unique.add(
-        obj.command_type) or obj for obj in commands if obj.command_type not in commands_unique]
-    for command in uniqueidlist:
-        print()
-        print(f"Running {command.command}")
-        if not dry_run:
+    commands_unique = {cmd.command_type: cmd for cmd in command_group}.values()
+    for command in commands_unique:
+        print(f"\nRunning {command.command}")
+        if dry_run:
+            print("Dry run, not running command")
+        else:
             output = subprocess.check_output(
                 command.command, shell=True, text=True)
             print(f"Output {output}")
             time.sleep(2)
-        else:
-            print("Dry run, not running command")
-        # sleep for 2 seconds
-        print()
