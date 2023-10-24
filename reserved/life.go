@@ -16,10 +16,10 @@ import (
 
 type ByAssetPerson struct{}
 
-func (*ByAssetPerson) isCovered(w *PolicyReservedWrapper) (bool, []*models.Policy, error) {
+func (*ByAssetPerson) isCovered(w *PolicyReservedWrapper) (bool, []models.Policy, error) {
 	var (
 		result              = false
-		coveredPolicies     = make([]*models.Policy, 0)
+		coveredPolicies     = make([]models.Policy, 0)
 		lastPaidTransaction *models.Transaction
 	)
 	log.Println("[ByAssetPerson.isCovered] start -----------------------------")
@@ -43,13 +43,16 @@ func (*ByAssetPerson) isCovered(w *PolicyReservedWrapper) (bool, []*models.Polic
 	if err != nil {
 		log.Printf("[ByAssetPerson.isCovered] error getting policies: %s", err.Error())
 	}
+	log.Printf("[ByAssetPerson.isCovered] found %d policies", len(policies))
 
 	for _, policy := range policies {
+		log.Printf("[ByAssetPerson.isCovered] checking policy %s", policy.Uid)
 		if policy.PaymentSplit == string(models.PaySplitYearly) || policy.PaymentSplit == string(models.PaySplitYear) {
-			// As of now, we have only one transaction for annaul policies, so no extra control is needed
+			log.Printf("[ByAssetPerson.isCovered] Yearly pay: found a match! %s - %s", policy.Uid, policy.CodeCompany)
+			// As of now, we have only one transaction for annual policies, so no extra control is needed
 			// TODO: check behaviour when will have policy renewal
 			result = true
-			coveredPolicies = append(coveredPolicies, &policy)
+			coveredPolicies = append(coveredPolicies, policy)
 			continue
 		}
 
@@ -61,8 +64,9 @@ func (*ByAssetPerson) isCovered(w *PolicyReservedWrapper) (bool, []*models.Polic
 			}
 		}
 		if !lastPaidTransaction.IsLate(lateDate) && w.Policy.StartDate.Before(policy.EndDate) {
+			log.Printf("[ByAssetPerson.isCovered] Monthly pay: found a match! %s - %s", policy.Uid, policy.CodeCompany)
 			result = true
-			coveredPolicies = append(coveredPolicies, &policy)
+			coveredPolicies = append(coveredPolicies, policy)
 		}
 	}
 
@@ -224,7 +228,7 @@ func lifeReservedByCoverage(wrapper *PolicyReservedWrapper) (bool, *models.Reser
 
 	output.IsReserved = isCovered
 	if isCovered {
-		policies := lib.SliceMap[*models.Policy](coveredPolicies, func(p *models.Policy) string { return p.CodeCompany })
+		policies := lib.SliceMap[models.Policy](coveredPolicies, func(p models.Policy) string { return p.CodeCompany })
 		reason := fmt.Sprintf("Cliente già assicurato con le polizze numero %v", policies)
 		output.ReservedInfo.Reasons = append(output.ReservedInfo.Reasons, reason)
 	}
