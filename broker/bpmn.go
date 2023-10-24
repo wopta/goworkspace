@@ -174,7 +174,7 @@ func setRequestApprovalBpmn(state *bpmn.State) error {
 
 func sendRequestApprovalMail(state *bpmn.State) error {
 	policy := state.Data
-	mail.SendMailReserved(*policy, fromAddress, toAddress, ccAddress, flowName)
+	mail.SendMailReserved(*policy, fromAddress, toAddress, ccAddress, flowName, []string{"Proposta"})
 	return nil
 }
 

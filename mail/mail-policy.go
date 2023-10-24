@@ -161,7 +161,7 @@ func SendMailContract(policy models.Policy, at *[]Attachment, from, to, cc Addre
 	})
 }
 
-func SendMailReserved(policy models.Policy, from, to, cc Address, flowName string) {
+func SendMailReserved(policy models.Policy, from, to, cc Address, flowName string, attachmentNames []string) {
 	var (
 		at       []Attachment
 		bodyData = BodyData{}
@@ -196,7 +196,7 @@ func SendMailReserved(policy models.Policy, from, to, cc Address, flowName strin
 
 	if policy.Attachments != nil {
 		for _, attachment := range *policy.Attachments {
-			if attachment.Name == "Proposta" {
+			if lib.SliceContains(attachmentNames, attachment.Name) {
 				rawDoc, err := lib.ReadFileFromGoogleStorage(attachment.Link)
 				if err != nil {
 					log.Printf("[sendMailReserved] error reading document %s from google storage: %s", attachment.Name, err.Error())

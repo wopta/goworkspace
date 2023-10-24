@@ -11,20 +11,23 @@ type Data struct {
 	IsLink    bool
 	IsApp     bool
 }
+
 type BodyData struct {
-	ContractorName     string
-	ContractorSurname  string
-	AgentName          string
-	AgentSurname       string
-	AgentMail          string
-	AgencyName         string
-	AgencyMail         string
-	ProductForm        string
-	ProductName        string
-	InformationSetsUrl string
-	ProposalNumber     int
-	ExtraContent       []string
+	ContractorName       string
+	ContractorSurname    string
+	ContractorFiscalCode string
+	AgentName            string
+	AgentSurname         string
+	AgentMail            string
+	AgencyName           string
+	AgencyMail           string
+	ProductForm          string
+	ProductName          string
+	InformationSetsUrl   string
+	ProposalNumber       int
+	ExtraContent         []string
 }
+
 type Attachment struct {
 	Name        string `firestore:"name,omitempty" json:"name,omitempty"`
 	Link        string `firestore:"link,omitempty" json:"link,omitempty"`
@@ -34,6 +37,7 @@ type Attachment struct {
 	Url         string `firestore:"url,omitempty" json:"url,omitempty"`
 	ContentType string `firestore:"contentType,omitempty" json:"contentType,omitempty"`
 }
+
 type MailRequest struct {
 	From         string        `json:"from"`
 	FromName     string        `json:"fromName"`
@@ -54,6 +58,7 @@ type MailRequest struct {
 	IsLink       bool          `json:"isLink,omitempty"`
 	IsApp        bool          `json:"isApp,omitempty"`
 }
+
 type MailValidate struct {
 	Mail      string `firestore:"mail,omitempty" json:"mail,omitempty"`
 	IsValid   bool   `firestore:"isValid" json:"isValid"`

@@ -41,6 +41,7 @@ func setNetworkNodeBodyData(node *models.NetworkNode, bodyData *BodyData) {
 func setContractorBodyData(policy models.Policy, bodyData *BodyData) {
 	bodyData.ContractorName = policy.Contractor.Name
 	bodyData.ContractorSurname = policy.Contractor.Surname
+	bodyData.ContractorFiscalCode = policy.Contractor.FiscalCode
 }
 
 func setAgentBodyData(agent models.Agent, bodyData *BodyData) {
