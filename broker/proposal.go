@@ -20,6 +20,7 @@ import (
 type ProposalReq struct {
 	PolicyUid    string `json:"policyUid"`
 	PaymentSplit string `json:"paymentSplit"`
+	SendEmail    bool   `json:"sendEmail"`
 }
 
 func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -59,6 +60,8 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 			log.Printf("[ProposalFx] error proposal body: %s", err.Error())
 			return "", nil, err
 		}
+
+		sendEmail = req.SendEmail
 
 		paymentSplit = req.PaymentSplit
 
