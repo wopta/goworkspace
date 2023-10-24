@@ -199,6 +199,12 @@ func setRequestApprovalBpmn(state *bpmn.State) error {
 
 func sendRequestApprovalMail(state *bpmn.State) error {
 	policy := state.Data
+
+	// if policy.Status == models.PolicyStatusWaitForApprovalMga {
+	if len(policy.ReservedInfo.Documents) == 0 {
+		return nil
+	}
+
 	mail.SendMailReserved(*policy, fromAddress, toAddress, ccAddress, flowName, []string{models.ProposalAttachmentName})
 	return nil
 }

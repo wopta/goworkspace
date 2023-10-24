@@ -126,14 +126,20 @@ func setRequestApprovalData(policy *models.Policy) {
 	log.Printf("[setRequestApprovalData] policy uid %s: reserved flow", policy.Uid)
 
 	setProposalNumber(policy)
-	reserved.SetReservedInfo(policy, mgaProduct)
 
 	policy.Status = models.PolicyStatusWaitForApproval
+	needsMedicalDocuments := false
 	for _, reason := range policy.ReservedInfo.Reasons {
 		// TODO: add key/id for reasons so we do not have to cjeck string equallity
 		if strings.HasPrefix(reason, "Cliente già assicurato") {
 			policy.Status = models.PolicyStatusWaitForApprovalMga
+		} else {
+			needsMedicalDocuments = true
 		}
+	}
+
+	if needsMedicalDocuments {
+		reserved.SetReservedInfo(policy, mgaProduct)
 	}
 
 	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
