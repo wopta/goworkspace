@@ -175,7 +175,7 @@ func SendMailReserved(policy models.Policy, from, to, cc Address, flowName strin
 
 	for _, attachment := range policy.ReservedInfo.Documents {
 		if attachment.Byte == "" {
-			rawDoc, err := lib.ReadFileFromGoogleStorage(attachment.Link)
+			rawDoc, err := lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), attachment.Link)
 			if err != nil {
 				log.Printf("[sendMailReserved] error reading document %s from google storage: %s", attachment.Name, err.Error())
 				return
@@ -184,7 +184,7 @@ func SendMailReserved(policy models.Policy, from, to, cc Address, flowName strin
 		}
 
 		at = append(at, Attachment{
-			Name:        attachment.Name,
+			Name:        fmt.Sprintf("%s.pdf", attachment.Name),
 			Link:        attachment.Link,
 			Byte:        attachment.Byte,
 			FileName:    attachment.FileName,
@@ -269,7 +269,7 @@ func SendMailProposal(policy models.Policy, from, to, cc Address, flowName strin
 	at = append(at, getMailAttachments(policy, attachmentNames)...)
 
 	title := policy.NameDesc
-	subtitle := fmt.Sprintf("Documenti Riservato proposta %d", policy.ProposalNumber)
+	subtitle := fmt.Sprintf("Documento Proposta %d", policy.ProposalNumber)
 	subject := fmt.Sprintf("%s - %s", title, subtitle)
 
 	SendMail(MailRequest{

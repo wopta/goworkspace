@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"log"
+	"os"
 	"text/template"
 
 	"github.com/wopta/goworkspace/lib"
@@ -178,7 +179,7 @@ func getMailAttachments(policy models.Policy, attachmentNames []string) []Attach
 
 	for _, attachment := range *policy.Attachments {
 		if lib.SliceContains(attachmentNames, attachment.Name) {
-			rawDoc, err := lib.ReadFileFromGoogleStorage(attachment.Link)
+			rawDoc, err := lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), attachment.Link)
 			if err != nil {
 				log.Printf("[getMailAttachments] error reading document %s from google storage: %s", attachment.Name, err.Error())
 				return nil
@@ -186,7 +187,7 @@ func getMailAttachments(policy models.Policy, attachmentNames []string) []Attach
 			attachment.Byte = base64.StdEncoding.EncodeToString(rawDoc)
 
 			at = append(at, Attachment{
-				Name:        attachment.Name,
+				Name:        fmt.Sprintf("%s.pdf", attachment.Name),
 				Link:        attachment.Link,
 				Byte:        attachment.Byte,
 				FileName:    attachment.FileName,

@@ -31,14 +31,33 @@ go_modules = [
     "reserved",
     "policy",
     "bpmn",]
-changed_modules = ["models", "lib", "mga", "network",
-                   "sellable", "payment", "quote", "broker", "partnership"]
-updateable_modules = ["models", "lib", "mga", "network",
-                      "sellable", "payment", "quote", "broker", "partnership"]
+changed_modules = [
+    "policy"
+]
+updateable_modules = [
+    "broker",
+    "callback",
+    "document",
+    "lib",
+    "mail",
+    "models",
+    "partnership",
+    "payment",
+    "product",
+    "question",
+    "quote",
+    "sellable",
+    "user",
+    "sellable",
+    "mga",
+    "network",
+    "reserved",
+    "policy",
+]
 
 increment_version_key = "patch"
 environment = 'dev'  # Replace with your desired environment
-dry_run = True
+dry_run = False
 google_repository = "google"
 github_repository = "origin"
 
