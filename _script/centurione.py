@@ -28,6 +28,8 @@ go_modules = [
     "sellable",
     "mga",
     "network",
+    "reserved",
+    "policy",
     "bpmn",]
 changed_modules = ["models", "lib", "mga", "network",
                    "sellable", "payment", "quote", "broker", "partnership"]
