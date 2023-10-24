@@ -154,7 +154,7 @@ func setProposalData(policy *models.Policy) {
 
 	filename := strings.SplitN(result.LinkGcs, "/", 3)[2]
 	*policy.Attachments = append(*policy.Attachments, models.Attachment{
-		Name:     "Proposta",
+		Name:     models.ProposalAttachmentName,
 		Link:     result.LinkGcs,
 		FileName: filename,
 	})

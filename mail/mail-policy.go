@@ -194,26 +194,7 @@ func SendMailReserved(policy models.Policy, from, to, cc Address, flowName strin
 		})
 	}
 
-	if policy.Attachments != nil {
-		for _, attachment := range *policy.Attachments {
-			if lib.SliceContains(attachmentNames, attachment.Name) {
-				rawDoc, err := lib.ReadFileFromGoogleStorage(attachment.Link)
-				if err != nil {
-					log.Printf("[sendMailReserved] error reading document %s from google storage: %s", attachment.Name, err.Error())
-					return
-				}
-				attachment.Byte = base64.StdEncoding.EncodeToString(rawDoc)
-
-				at = append(at, Attachment{
-					Name:        attachment.Name,
-					Link:        attachment.Link,
-					Byte:        attachment.Byte,
-					FileName:    attachment.FileName,
-					ContentType: "application/pdf",
-				})
-			}
-		}
-	}
+	at = append(at, getMailAttachments(policy, attachmentNames)...)
 
 	title := policy.NameDesc
 	subtitle := fmt.Sprintf("Documenti Riservato proposta %d", policy.ProposalNumber)
@@ -270,5 +251,37 @@ func SendMailReservedResult(policy models.Policy, from, to, cc Address, flowName
 		SubTitle:    subtitle,
 		Subject:     subject,
 		IsHtml:      true,
+	})
+}
+
+func SendMailProposal(policy models.Policy, from, to, cc Address, flowName string, attachmentNames []string) {
+	var (
+		at       []Attachment
+		bodyData = BodyData{}
+	)
+
+	setBodyData(policy, &bodyData)
+
+	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", flowName, proposalTemplateType))
+
+	messageBody := fillTemplate(templateFile, &bodyData)
+
+	at = append(at, getMailAttachments(policy, attachmentNames)...)
+
+	title := policy.NameDesc
+	subtitle := fmt.Sprintf("Documenti Riservato proposta %d", policy.ProposalNumber)
+	subject := fmt.Sprintf("%s - %s", title, subtitle)
+
+	SendMail(MailRequest{
+		FromAddress:  from,
+		To:           []string{to.Address},
+		Cc:           cc.Address,
+		Message:      messageBody,
+		Title:        title,
+		SubTitle:     subtitle,
+		Subject:      subject,
+		IsHtml:       true,
+		IsAttachment: true,
+		Attachments:  &at,
 	})
 }

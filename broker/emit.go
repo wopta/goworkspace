@@ -129,7 +129,7 @@ func emit(authToken models.AuthToken, policy *models.Policy, request EmitRequest
 			mail.GetContractorEmail(policy),
 			mail.GetAgentEmail(policy),
 			models.ProviderMgaFlow, // With PROPOSAL_V2 turned off, the only flow that should get here is the old agent
-			[]string{"Proposta"},
+			[]string{models.ProposalAttachmentName},
 		)
 	case typeEmit:
 		log.Printf("[Emit] Emitting - Policy Uid %s", policy.Uid)
