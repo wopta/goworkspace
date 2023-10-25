@@ -4,11 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/wopta/goworkspace/document"
 	"io"
 	"log"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/wopta/goworkspace/lib"
@@ -151,17 +149,7 @@ func setProposalData(policy *models.Policy) {
 		policy.Status = models.PolicyStatusNeedsApproval
 	}
 
-	result := document.Proposal(origin, policy, networkNode, mgaProduct)
-	if policy.Attachments == nil {
-		policy.Attachments = new([]models.Attachment)
-	}
-
-	filename := strings.SplitN(result.LinkGcs, "/", 3)[2]
-	*policy.Attachments = append(*policy.Attachments, models.Attachment{
-		Name:     models.ProposalAttachmentName,
-		Link:     result.LinkGcs,
-		FileName: filename,
-	})
+	plc.AddProposalDoc(origin, policy, networkNode, mgaProduct)
 
 	log.Printf("[setProposalData] policy status %s", policy.Status)
 

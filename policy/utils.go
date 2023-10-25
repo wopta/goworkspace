@@ -182,3 +182,17 @@ func promotePolicyAttachments(policy *models.Policy, origin string) error {
 	}
 	return nil
 }
+
+func AddProposalDoc(origin string, policy *models.Policy, networkNode *models.NetworkNode, mgaProduct *models.Product) {
+	result := document.Proposal(origin, policy, networkNode, mgaProduct)
+	if policy.Attachments == nil {
+		policy.Attachments = new([]models.Attachment)
+	}
+
+	filename := strings.SplitN(result.LinkGcs, "/", 3)[2]
+	*policy.Attachments = append(*policy.Attachments, models.Attachment{
+		Name:     models.ProposalAttachmentName,
+		Link:     result.LinkGcs,
+		FileName: filename,
+	})
+}

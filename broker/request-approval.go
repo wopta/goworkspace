@@ -127,6 +127,10 @@ func setRequestApprovalData(policy *models.Policy) {
 
 	setProposalNumber(policy)
 
+	if policy.Status == models.PolicyStatusInitLead {
+		plc.AddProposalDoc(origin, policy, networkNode, mgaProduct)
+	}
+
 	policy.Status = models.PolicyStatusWaitForApproval
 	needsMedicalDocuments := false
 	for _, reason := range policy.ReservedInfo.Reasons {
