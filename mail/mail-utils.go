@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"text/template"
 
 	"github.com/wopta/goworkspace/lib"
@@ -187,7 +188,7 @@ func getMailAttachments(policy models.Policy, attachmentNames []string) []Attach
 			attachment.Byte = base64.StdEncoding.EncodeToString(rawDoc)
 
 			at = append(at, Attachment{
-				Name:        fmt.Sprintf("%s.pdf", attachment.Name),
+				Name:        strings.ReplaceAll(attachment.FileName, "_", " "),
 				Link:        attachment.Link,
 				Byte:        attachment.Byte,
 				FileName:    attachment.FileName,

@@ -20,13 +20,13 @@ const (
 	reservedTemplateType         = "reserved"
 	reservedApprovedTemplateType = "approved"
 	reservedRejectedTemplateType = "rejected"
+	linkFormat                   = "https://storage.googleapis.com/documents-public-dev/information-sets/%s/%s/Precontrattuale.pdf"
 )
 
 func SendMailLead(policy models.Policy, from, to, cc Address, flowName string) {
 	var (
-		linkFormat = "https://storage.googleapis.com/documents-public-dev/information-sets/%s/%s/Precontrattuale.pdf"
-		link       = fmt.Sprintf(linkFormat, policy.Name, policy.ProductVersion)
-		bodyData   = BodyData{}
+		link     = fmt.Sprintf(linkFormat, policy.Name, policy.ProductVersion)
+		bodyData = BodyData{}
 	)
 
 	setBodyData(policy, &bodyData)
@@ -258,6 +258,7 @@ func SendMailProposal(policy models.Policy, from, to, cc Address, flowName strin
 	var (
 		at       []Attachment
 		bodyData = BodyData{}
+		link     = fmt.Sprintf(linkFormat, policy.Name, policy.ProductVersion)
 	)
 
 	setBodyData(policy, &bodyData)
@@ -283,5 +284,8 @@ func SendMailProposal(policy models.Policy, from, to, cc Address, flowName strin
 		IsHtml:       true,
 		IsAttachment: true,
 		Attachments:  &at,
+		IsLink:       true,
+		Link:         link,
+		LinkLabel:    "Leggi documentazione",
 	})
 }

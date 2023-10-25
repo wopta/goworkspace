@@ -17,7 +17,7 @@ func lifeAxaContractV1(pdf *fpdf.Fpdf, origin string, policy *models.Policy, net
 
 	pdf.AddPage()
 
-	insuredInfoSection(pdf, policy)
+	insuredInfoSection(pdf, policy, false)
 
 	guaranteesMap, slugs := loadLifeGuarantees(policy, product)
 
@@ -99,8 +99,13 @@ func lifeAxaContractV1(pdf *fpdf.Fpdf, origin string, policy *models.Policy, net
 	return filename, out
 }
 
-func insuredInfoSection(pdf *fpdf.Fpdf, policy *models.Policy) {
-	getParagraphTitle(pdf, "La tua assicurazione è operante per il seguente Assicurato e Garanzie")
+func insuredInfoSection(pdf *fpdf.Fpdf, policy *models.Policy, isProposal bool) {
+	title := "La tua assicurazione è operante per il seguente Assicurato e Garanzie"
+
+	if isProposal {
+		title = "La tua assicurazione sarà operante per il seguente Assicurato e Garanzie"
+	}
+	getParagraphTitle(pdf, title)
 	insuredInfoTable(pdf, policy.Assets[0].Person)
 }
 

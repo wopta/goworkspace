@@ -64,20 +64,18 @@ func saveContract(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 }
 
 func saveProposal(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
-	var filename string
-	if os.Getenv("env") == "local" {
-		err := pdf.OutputFileAndClose("./document/proposal.pdf")
-		lib.CheckError(err)
-	} else {
-		var out bytes.Buffer
-		err := pdf.Output(&out)
-		lib.CheckError(err)
-		filename = strings.ReplaceAll(fmt.Sprintf("%s/%s/"+models.ProposalDocumentFormat, "temp", policy.Uid, policy.NameDesc, policy.ProposalNumber), " ", "_")
-		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, out.Bytes())
-		lib.CheckError(err)
-		return filename, out.Bytes()
-	}
-	return filename, nil
+	var (
+		filename string
+		out      bytes.Buffer
+	)
+
+	err := pdf.Output(&out)
+	lib.CheckError(err)
+	filename = strings.ReplaceAll(fmt.Sprintf("%s/%s/"+models.ProposalDocumentFormat, "temp", policy.Uid, policy.NameDesc, policy.ProposalNumber), " ", "_")
+	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, out.Bytes())
+	lib.CheckError(err)
+	return filename, out.Bytes()
+
 }
 
 func saveReservedDocument(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {

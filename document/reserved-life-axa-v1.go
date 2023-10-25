@@ -25,7 +25,7 @@ func lifeReserved(policy *models.Policy, product *models.Product) (string, []byt
 
 	guaranteesMap, slugs := loadLifeGuarantees(policy, product)
 
-	lifeGuaranteesTable(pdf, guaranteesMap, slugs)
+	lifeGuaranteesTableV2(pdf, guaranteesMap, slugs)
 
 	lifeReservedInsuranceLimitSection(pdf)
 
@@ -122,8 +122,7 @@ func lifeReservedFooter(pdf *fpdf.Fpdf) {
 }
 
 func lifeReservedInsuredInfoSection(pdf *fpdf.Fpdf, policy *models.Policy) {
-	getParagraphTitle(pdf, "La tua assicurazione sarà operante per il seguente Assicurato e Garanzie")
-	insuredInfoSection(pdf, policy)
+	lifeInsuredInfoSectionV2(pdf, policy, true)
 }
 
 func lifeReservedInsuranceLimitSection(pdf *fpdf.Fpdf) {
