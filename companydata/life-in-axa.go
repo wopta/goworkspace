@@ -39,7 +39,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		log.Println("LifeIn  elemets (0-1 ): ", d[0][1])
 		log.Println("LifeIn  elemets (0-2 ): ", d[0][2])
 		log.Println("LifeIn  elemets (0-3 ): ", d[0][3])
-		_, _, _, version := LifeMapCodecCompanyAxaRevert(d[0][0])
+		_, _, _, version := LifeMapCodecCompanyAxaRevert(d[0][1])
 		policy := models.Policy{
 			Name:           "life",
 			CodeCompany:    "",
@@ -261,7 +261,7 @@ func ParseAxaBeneficiary(r []string, base int) models.Beneficiary {
 func GroupBy(df dataframe.DataFrame, col int) map[string][][]string {
 	log.Println("GroupBy")
 	var (
-		res map[string][][]string
+		res map[string][][]string = make(map[string][][]string)
 	)
 	for _, k := range df.Records() {
 		if resFound, found := res[k[col]]; found {
