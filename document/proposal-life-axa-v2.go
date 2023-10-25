@@ -12,7 +12,7 @@ func lifeAxaProposalV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, net
 
 	pdf.AddPage()
 
-	lifeInsuredInfoSectionV2(pdf, policy)
+	lifeInsuredInfoSectionV2(pdf, policy, true)
 
 	guaranteesMap, slugs := loadLifeGuarantees(policy, product)
 
