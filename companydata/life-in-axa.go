@@ -150,6 +150,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 }
 
 func LifeMapCodecCompanyAxaRevert(g string) (string, string, string, string) {
+	log.Println("LifeIn LifeMapCodecCompanyAxaRevert:", g)
 	var result, pay, slug, version string
 	version = g[0:0]
 	code := g[2:2]
