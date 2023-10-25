@@ -165,6 +165,8 @@ func SendMailReserved(policy models.Policy, from, to, cc Address, flowName strin
 	var (
 		at       []Attachment
 		bodyData = BodyData{}
+		rawDoc   []byte
+		err      error
 	)
 
 	setBodyData(policy, &bodyData)
@@ -175,7 +177,11 @@ func SendMailReserved(policy models.Policy, from, to, cc Address, flowName strin
 
 	for _, attachment := range policy.ReservedInfo.Documents {
 		if attachment.Byte == "" {
-			rawDoc, err := lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), attachment.Link)
+			if strings.HasPrefix(attachment.Link, "gs://") {
+				rawDoc, err = lib.ReadFileFromGoogleStorage(attachment.Link)
+			} else {
+				rawDoc, err = lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), attachment.Link)
+			}
 			if err != nil {
 				log.Printf("[sendMailReserved] error reading document %s from google storage: %s", attachment.Name, err.Error())
 				return
@@ -184,7 +190,7 @@ func SendMailReserved(policy models.Policy, from, to, cc Address, flowName strin
 		}
 
 		at = append(at, Attachment{
-			Name:        fmt.Sprintf("%s.pdf", attachment.Name),
+			Name:        strings.ReplaceAll(fmt.Sprintf("%s", attachment.Name), "_", " "),
 			Link:        attachment.Link,
 			Byte:        attachment.Byte,
 			FileName:    attachment.FileName,
