@@ -32,7 +32,10 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		log.Println("LifeIn  row", d.Nrow())
 		log.Println("LifeIn  col", d.Ncol())
 		log.Println("LifeIn  d: ", d)
-		log.Println("LifeIn  elemets (0-1 1-1): ", d.Elem(0, 1).String(), d.Elem(0, 2).String(), d.Elem(1, 1).String(), d.Elem(1, 2).String())
+		log.Println("LifeIn  elemets (0-0 ): ", d.Elem(0, 0).String())
+		log.Println("LifeIn  elemets (0-1 ): ", d.Elem(0, 1).String())
+		log.Println("LifeIn  elemets (0-2 ): ", d.Elem(0, 2).String())
+		log.Println("LifeIn  elemets (0-3 ): ", d.Elem(0, 3).String())
 		_, _, _, version := LifeMapCodecCompanyAxaRevert(d.Elem(1, 1).String())
 		policy := models.Policy{
 			Name:           "life",
