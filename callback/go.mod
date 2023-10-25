@@ -9,13 +9,13 @@ require (
 	github.com/wopta/goworkspace/bpmn v1.0.16
 	github.com/wopta/goworkspace/document v1.1.6
 	github.com/wopta/goworkspace/lib v1.0.83
-	github.com/wopta/goworkspace/mail v1.0.49
+	github.com/wopta/goworkspace/mail v1.0.50
 	github.com/wopta/goworkspace/models v1.1.57
 	github.com/wopta/goworkspace/network v1.0.8
 	github.com/wopta/goworkspace/policy v1.0.19
 	github.com/wopta/goworkspace/product v1.0.56
 	github.com/wopta/goworkspace/transaction v1.0.22
-	github.com/wopta/goworkspace/user v1.0.30
+	github.com/wopta/goworkspace/user v1.0.31
 )
 
 require (
