@@ -11,10 +11,10 @@ require (
 	github.com/wopta/goworkspace/bpmn v1.0.16
 	github.com/wopta/goworkspace/document v1.1.6
 	github.com/wopta/goworkspace/lib v1.0.83
-	github.com/wopta/goworkspace/mail v1.0.48
+	github.com/wopta/goworkspace/mail v1.0.50
 	github.com/wopta/goworkspace/models v1.1.57
 	github.com/wopta/goworkspace/network v1.0.8
-	github.com/wopta/goworkspace/payment v1.0.91
+	github.com/wopta/goworkspace/payment v1.0.93
 	github.com/wopta/goworkspace/policy v1.0.19
 	github.com/wopta/goworkspace/product v1.0.56
 	github.com/wopta/goworkspace/question v1.0.4
@@ -82,7 +82,7 @@ require (
 	github.com/src-d/gcfg v1.4.0 // indirect
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.2.1 // indirect
-	github.com/wopta/goworkspace/user v1.0.28 // indirect
+	github.com/wopta/goworkspace/user v1.0.31 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
 	github.com/xuri/excelize/v2 v2.7.0 // indirect
