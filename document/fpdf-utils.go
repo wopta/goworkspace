@@ -90,10 +90,7 @@ func saveReservedDocument(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte
 	} else {
 		err := pdf.Output(&out)
 		lib.CheckError(err)
-		now := time.Now()
-		timestamp := strconv.FormatInt(now.Unix(), 10)
-		filename = "temp/" + policy.Uid + "/" + policy.Contractor.Name + "_" + policy.Contractor.Surname + "_" +
-			timestamp + "_reserved_document.pdf"
+		filename = strings.ReplaceAll(fmt.Sprintf("%s/%s/%s_Proposta_%d_rvm_istruzioni.pdf", "temp", policy.Uid, policy.NameDesc, policy.ProposalNumber), " ", "_")
 		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, out.Bytes())
 		lib.CheckError(err)
 		return filename, out.Bytes()

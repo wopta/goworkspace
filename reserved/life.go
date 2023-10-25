@@ -173,16 +173,16 @@ func setLifeReservedDocument(policy *models.Policy, product *models.Product) {
 	docInfo := document.Reserved(policy, product)
 
 	attachments = append(attachments, models.Attachment{
-		Name:        fmt.Sprintf("%s_proposta_%d_rvm_istruzioni.pdf", policy.NameDesc, policy.ProposalNumber),
+		Name:        strings.ReplaceAll(fmt.Sprintf("%s_Proposta_%d_rvm_istruzioni.pdf", policy.NameDesc, policy.ProposalNumber), " ", "_"),
 		Link:        docInfo.LinkGcs,
 		ContentType: "application/pdf",
 	})
 
-	rvmLink := "medical-report/" + policy.Name + "/" + policy.ProductVersion + "/rvm-life.pdf"
+	rvmLink := "gs://documents-public-dev/medical-report/" + policy.Name + "/" + policy.ProductVersion + "/rvm-life.pdf"
 
 	attachments = append(attachments, models.Attachment{
-		Name:        fmt.Sprintf("%s_proposta_%d_rvm.pdf", policy.NameDesc, policy.ProposalNumber),
-		Link:        fmt.Sprintf("gs://documents-public-dev/%s", rvmLink),
+		Name:        strings.ReplaceAll(fmt.Sprintf("%s_Proposta_%d_questionario_rvm.pdf", policy.NameDesc, policy.ProposalNumber), " ", "_"),
+		Link:        fmt.Sprintf("%s", rvmLink),
 		ContentType: "application/pdf",
 	})
 
