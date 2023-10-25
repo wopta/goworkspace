@@ -186,13 +186,15 @@ func LifeMapCodecCompanyAxaRevert(g string) (string, string, string, string) {
 	return result, slug, version, pay
 }
 func ParseDateDDMMYYYY(date string) time.Time {
+	log.Println("LifeIn ParseDateDDMMYYYY date:", date)
+	log.Println("LifeIn ParseDateDDMMYYYY len(date):", date)
 	if len(date) < 8 {
 		date = "0" + date
 	}
 	d, e := strconv.Atoi(date[0:1])
 	m, e := strconv.Atoi(date[2:3])
 	y, e := strconv.Atoi(date[4:7])
-	log.Println("LifeIn LifeMapCodecCompanyAxaRevert d:", d)
+
 	res := time.Date(y, time.Month(m),
 		d, 0, 0, 0, 0, time.UTC)
 	log.Println(e)
@@ -200,6 +202,7 @@ func ParseDateDDMMYYYY(date string) time.Time {
 
 }
 func ParseAxaFloat(price string) float64 {
+	log.Println("LifeIn ParseAxaFloat price:", price)
 	d := price[len(price)-2 : len(price)-1]
 	i := price[0 : len(price)-3]
 	f64string := d + "." + i
