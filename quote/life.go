@@ -95,9 +95,17 @@ func Life(data models.Policy, channel string, networkNode *models.NetworkNode, w
 
 	addDefaultGuarantees(data, *ruleProduct)
 
-	switch channel {
-	case models.MgaChannel, models.NetworkChannel:
-		log.Println("[Life] mga, network flow")
+	switch data.ProductVersion {
+	case models.ProductV1:
+		log.Printf("[Life] product version %s", data.ProductVersion)
+		death, err := data.ExtractGuarantee(deathGuarantee)
+		lib.CheckError(err)
+		log.Println("[Life] setting sumInsuredLimitOfIndeminity")
+		calculateSumInsuredLimitOfIndemnity(data.Assets, death.Value.SumInsuredLimitOfIndemnity)
+		log.Println("[Life] setting guarantees duration")
+		calculateGuaranteeDuration(data.Assets, contractorAge, death.Value.Duration.Year)
+	case models.ProductV2:
+		log.Printf("[Life] product version %s", data.ProductVersion)
 		guaranteesMap := data.GuaranteesToMap()
 		log.Println("[Life] setting sumInsuredLimitOfIndeminity")
 		if guaranteesMap[deathGuarantee].IsSelected {
@@ -119,14 +127,6 @@ func Life(data models.Policy, channel string, networkNode *models.NetworkNode, w
 		}
 
 		data.Assets[0].Guarantees = guaranteesList
-	case models.ECommerceChannel:
-		log.Println("[Life] e-commerce flow")
-		death, err := data.ExtractGuarantee(deathGuarantee)
-		lib.CheckError(err)
-		log.Println("[Life] setting sumInsuredLimitOfIndeminity")
-		calculateSumInsuredLimitOfIndemnity(data.Assets, death.Value.SumInsuredLimitOfIndemnity)
-		log.Println("[Life] setting guarantees duration")
-		calculateGuaranteeDuration(data.Assets, contractorAge, death.Value.Duration.Year)
 	}
 
 	log.Println("[Life] updating policy start and end date")
