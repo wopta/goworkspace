@@ -30,7 +30,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		log.Println("LifeIn  row", d.Nrow())
 		log.Println("LifeIn  col", d.Ncol())
 		log.Println("LifeIn  d: ", d)
-		_, _, _, version := LifeMapCodecCompanyAxaRevert(d.Elem(0, 1).String())
+		_, _, _, version := LifeMapCodecCompanyAxaRevert(d.Elem(1, 1).String())
 		policy := models.Policy{
 			Name:           "life",
 			CodeCompany:    "",
@@ -105,6 +105,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		}
 
 		for _, r := range d.Records() {
+			log.Println("LifeIn  d: ", r)
 			result, _, slug, _ := LifeMapCodecCompanyAxaRevert(r[1])
 			var (
 				beneficiaries []models.Beneficiary
