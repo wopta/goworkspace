@@ -13,14 +13,19 @@ import (
 
 func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		guarantees []models.Guarante
+		guarantees    []models.Guarante
+		sumPriseGross float64
 	)
 	ricAteco := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/life/life.csv", "")
 
 	df := lib.CsvToDataframe(ricAteco)
+	log.Println("LifeIn  df.Describe: ", df.Describe())
+	log.Println("LifeIn  row", df.Nrow())
+	log.Println("LifeIn  col", df.Ncol())
 	group := df.GroupBy("N° adesione individuale univoco")
 
 	for _, d := range group.GetGroups() {
+		sumPriseGross = 0
 		log.Println("LifeIn  row", d.Nrow())
 		log.Println("LifeIn  col", d.Ncol())
 		_, _, _, version := LifeMapCodecCompanyAxaRevert(d.Elem(0, 1).String())
@@ -110,7 +115,8 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			beneficiaries = append(beneficiaries, benef2)
 			beneficiaries = append(beneficiaries, benef3)
 			dur, _ := strconv.Atoi(r[7])
-
+			priceGross := ParseAxaFloat(r[8])
+			sumPriseGross = priceGross + sumPriseGross
 			var guarante models.Guarante = models.Guarante{
 				Slug:                       slug,
 				CompanyCodec:               result,
@@ -119,7 +125,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 				Beneficiaries: &beneficiaries,
 				Value: &models.GuaranteValue{
 					SumInsuredLimitOfIndemnity: ParseAxaFloat(r[9]),
-					PremiumGrossYearly:         ParseAxaFloat(r[8]),
+					PremiumGrossYearly:         priceGross,
 					Duration: &models.Duration{
 						Year: dur / 12,
 					},
@@ -130,9 +136,13 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		}
 
 		policy.Assets[0].Guarantees = guarantees
+		policy.PriceGross = sumPriseGross
 
 		log.Println("LifeIn policy:", policy)
 		lib.PutFirestoreErr("policy", policy)
+		//user,e:=models.UpdateUserByFiscalCode("", policy.Contractor)
+		//tr := transaction.PutByPolicy(policy, "", "", "", "", sumPriseGross, 0, "", "BO", true)
+		//accounting.CreateNetworkTransaction(tr, "uat")
 
 	}
 

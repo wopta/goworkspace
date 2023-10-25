@@ -25,7 +25,7 @@ func CreateNetworkTransactionFx(w http.ResponseWriter, r *http.Request) (string,
 		return "", "", fmt.Errorf("error transaction %s not found", transactionUid)
 	}
 
-	err := createNetworkTransaction(transaction, origin)
+	err := CreateNetworkTransaction(transaction, origin)
 	if err != nil {
 		log.Printf("[CreateNetworkTransactionFx] error creating network transactions: %s", err.Error())
 	}
@@ -33,7 +33,7 @@ func CreateNetworkTransactionFx(w http.ResponseWriter, r *http.Request) (string,
 	return "", "", err
 }
 
-func createNetworkTransaction(transaction *models.Transaction, origin string) error {
+func CreateNetworkTransaction(transaction *models.Transaction, origin string) error {
 	log.Println("[createNetworkTransaction]")
 	policy := plc.GetPolicyByUid(transaction.PolicyUid, origin)
 	producerNode := network.GetNetworkNodeByUid(policy.ProducerUid)
