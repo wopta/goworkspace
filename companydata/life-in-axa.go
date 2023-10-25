@@ -32,8 +32,8 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 		log.Println("LifeIn  value", v)
 		sumPriseGross = 0
-		log.Println("LifeIn  row", d)
-		log.Println("LifeIn  col", d)
+		log.Println("LifeIn  row", len(d))
+		log.Println("LifeIn  col", len(d[0]))
 		log.Println("LifeIn  d: ", d)
 		log.Println("LifeIn  elemets (0-0 ): ", d[0][0])
 		log.Println("LifeIn  elemets (0-1 ): ", d[0][1])
@@ -260,9 +260,7 @@ func ParseAxaBeneficiary(r []string, base int) models.Beneficiary {
 }
 func GroupBy(df dataframe.DataFrame, col int) map[string][][]string {
 	log.Println("GroupBy")
-	var (
-		res map[string][][]string = make(map[string][][]string)
-	)
+	res := make(map[string][][]string)
 	for _, k := range df.Records() {
 		if resFound, found := res[k[col]]; found {
 			resFound = append(resFound, k)
