@@ -28,6 +28,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		sumPriseGross = 0
 		log.Println("LifeIn  row", d.Nrow())
 		log.Println("LifeIn  col", d.Ncol())
+		log.Println("LifeIn  df.Describe: ", d.Describe())
 		_, _, _, version := LifeMapCodecCompanyAxaRevert(d.Elem(0, 1).String())
 		policy := models.Policy{
 			Name:           "life",
