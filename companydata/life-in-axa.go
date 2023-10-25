@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/go-gota/gota/dataframe"
 	lib "github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
@@ -19,24 +20,26 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		guarantees    []models.Guarante
 		sumPriseGross float64
 	)
-	ricAteco := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/life/life.csv", "")
-	df := lib.CsvToDataframe(ricAteco)
+	data := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/life/life.csv", "")
+	df := lib.CsvToDataframe(data)
 	//log.Println("LifeIn  df.Describe: ", df.Describe())
 	log.Println("LifeIn  row", df.Nrow())
 	log.Println("LifeIn  col", df.Ncol())
-	group := df.GroupBy("N\xb0 adesione individuale univoco")
+	//group := df.GroupBy("N\xb0 adesione individuale univoco")
+	group := GroupBy(df, 2)
 
-	for v, d := range group.GetGroups() {
+	for v, d := range group {
+
 		log.Println("LifeIn  value", v)
 		sumPriseGross = 0
-		log.Println("LifeIn  row", d.Nrow())
-		log.Println("LifeIn  col", d.Ncol())
+		log.Println("LifeIn  row", d)
+		log.Println("LifeIn  col", d)
 		log.Println("LifeIn  d: ", d)
-		log.Println("LifeIn  elemets (0-0 ): ", d.Elem(0, 0).String())
-		log.Println("LifeIn  elemets (0-1 ): ", d.Elem(0, 1).String())
-		log.Println("LifeIn  elemets (0-2 ): ", d.Elem(0, 2).String())
-		log.Println("LifeIn  elemets (0-3 ): ", d.Elem(0, 3).String())
-		_, _, _, version := LifeMapCodecCompanyAxaRevert(d.Elem(1, 1).String())
+		log.Println("LifeIn  elemets (0-0 ): ", d[0][0])
+		log.Println("LifeIn  elemets (0-1 ): ", d[0][1])
+		log.Println("LifeIn  elemets (0-2 ): ", d[0][2])
+		log.Println("LifeIn  elemets (0-3 ): ", d[0][3])
+		_, _, _, version := LifeMapCodecCompanyAxaRevert(d[0][0])
 		policy := models.Policy{
 			Name:           "life",
 			CodeCompany:    "",
@@ -45,72 +48,72 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			IsPay:          true,
 			IsSign:         true,
 			PaymentSplit:   "",
-			StartDate:      ParseDateDDMMYYYY(d.Elem(0, 4).String()),
-			EndDate:        ParseDateDDMMYYYY(d.Elem(0, 5).String()),
+			StartDate:      ParseDateDDMMYYYY(d[0][4]),
+			EndDate:        ParseDateDDMMYYYY(d[0][5]),
 
 			Contractor: models.User{
-				Type:       d.Elem(0, 22).String(),
-				Name:       d.Elem(0, 23).String(),
-				Surname:    d.Elem(0, 24).String(),
-				FiscalCode: d.Elem(0, 27).String(),
-				Gender:     d.Elem(0, 25).String(),
-				BirthDate:  d.Elem(0, 26).String(),
+				Type:       d[0][22],
+				Name:       d[0][23],
+				Surname:    d[0][24],
+				FiscalCode: d[0][27],
+				Gender:     d[0][25],
+				BirthDate:  d[0][26],
 				IdentityDocuments: []*models.IdentityDocument{{
-					Code:             d.Elem(0, 57).String(),
-					Type:             d.Elem(0, 56).String(),
-					DateOfIssue:      ParseDateDDMMYYYY(d.Elem(0, 58).String()),
-					IssuingAuthority: d.Elem(0, 59).String(),
+					Code:             d[0][57],
+					Type:             d[0][56],
+					DateOfIssue:      ParseDateDDMMYYYY(d[0][58]),
+					IssuingAuthority: d[0][59],
 				}},
 				Residence: &models.Address{
-					StreetName: d.Elem(0, 28).String(),
+					StreetName: d[0][28],
 
-					City:       d.Elem(0, 31).String(),
-					CityCode:   d.Elem(0, 31).String(),
-					PostalCode: d.Elem(0, 29).String(),
-					Locality:   d.Elem(0, 30).String(),
+					City:       d[0][31],
+					CityCode:   d[0][31],
+					PostalCode: d[0][29],
+					Locality:   d[0][30],
 				},
 			},
 			Assets: []models.Asset{{
 				Name: "person",
 
 				Person: &models.User{
-					Type:       d.Elem(0, 22).String(),
-					Name:       d.Elem(0, 35).String(),
-					Surname:    d.Elem(0, 34).String(),
-					FiscalCode: d.Elem(0, 38).String(),
-					Gender:     d.Elem(0, 36).String(),
-					BirthDate:  d.Elem(0, 37).String(),
-					Mail:       d.Elem(0, 71).String(),
-					Phone:      d.Elem(0, 72).String(),
+					Type:       d[0][22],
+					Name:       d[0][35],
+					Surname:    d[0][34],
+					FiscalCode: d[0][38],
+					Gender:     d[0][36],
+					BirthDate:  d[0][37],
+					Mail:       d[0][71],
+					Phone:      d[0][72],
 					IdentityDocuments: []*models.IdentityDocument{{
-						Code:             d.Elem(0, 77).String(),
-						Type:             d.Elem(0, 76).String(),
-						DateOfIssue:      ParseDateDDMMYYYY(d.Elem(0, 78).String()),
-						IssuingAuthority: d.Elem(0, 79).String(),
+						Code:             d[0][77],
+						Type:             d[0][76],
+						DateOfIssue:      ParseDateDDMMYYYY(d[0][78]),
+						IssuingAuthority: d[0][79],
 					}},
-					BirthCity: d.Elem(0, 37).String(),
+					BirthCity: d[0][37],
 
-					BirthProvince: d.Elem(0, 37).String(),
+					BirthProvince: d[0][37],
 					Residence: &models.Address{
-						StreetName: d.Elem(0, 63).String(),
-						City:       d.Elem(0, 66).String(),
-						CityCode:   d.Elem(0, 66).String(),
-						PostalCode: d.Elem(0, 64).String(),
-						Locality:   d.Elem(0, 65).String(),
+						StreetName: d[0][63],
+						City:       d[0][66],
+						CityCode:   d[0][66],
+						PostalCode: d[0][64],
+						Locality:   d[0][65],
 					},
 					Domicile: &models.Address{
-						StreetName: d.Elem(0, 67).String(),
-						City:       d.Elem(0, 70).String(),
-						CityCode:   d.Elem(0, 70).String(),
-						PostalCode: d.Elem(0, 68).String(),
-						Locality:   d.Elem(0, 69).String(),
+						StreetName: d[0][67],
+						City:       d[0][70],
+						CityCode:   d[0][70],
+						PostalCode: d[0][68],
+						Locality:   d[0][69],
 					},
 				},
 			},
 			},
 		}
 
-		for _, r := range d.Records() {
+		for _, r := range d {
 			log.Println("LifeIn  d: ", r)
 			result, _, slug, _ := LifeMapCodecCompanyAxaRevert(r[1])
 			var (
@@ -254,4 +257,19 @@ func ParseAxaBeneficiary(r []string, base int) models.Beneficiary {
 	}
 	return benef
 
+}
+func GroupBy(df dataframe.DataFrame, col int) map[string][][]string {
+	log.Println("GroupBy")
+	var (
+		res map[string][][]string
+	)
+	for _, k := range df.Records() {
+		if resFound, found := res[k[col]]; found {
+			resFound = append(resFound, k)
+		} else {
+			res[k[col]] = [][]string{k}
+		}
+
+	}
+	return res
 }
