@@ -19,10 +19,10 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	ricAteco := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/life/life.csv", "")
 
 	df := lib.CsvToDataframe(ricAteco)
-	log.Println("LifeIn  df.Describe: ", df.Describe())
+	//log.Println("LifeIn  df.Describe: ", df.Describe())
 	log.Println("LifeIn  row", df.Nrow())
 	log.Println("LifeIn  col", df.Ncol())
-	group := df.GroupBy("N° adesione individuale univoco")
+	group := df.GroupBy("N\xb0 adesione individuale univoco")
 
 	for _, d := range group.GetGroups() {
 		sumPriseGross = 0
