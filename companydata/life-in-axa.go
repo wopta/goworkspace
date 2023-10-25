@@ -24,11 +24,12 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	log.Println("LifeIn  col", df.Ncol())
 	group := df.GroupBy("N\xb0 adesione individuale univoco")
 
-	for _, d := range group.GetGroups() {
-
+	for v, d := range group.GetGroups() {
+		log.Println("LifeIn  value", v)
 		sumPriseGross = 0
 		log.Println("LifeIn  row", d.Nrow())
 		log.Println("LifeIn  col", d.Ncol())
+		log.Println("LifeIn  value", v)
 		log.Println("LifeIn  d: ", d)
 		_, _, _, version := LifeMapCodecCompanyAxaRevert(d.Elem(1, 1).String())
 		policy := models.Policy{
