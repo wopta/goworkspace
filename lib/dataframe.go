@@ -20,6 +20,16 @@ func CsvToDataframe(data []byte) dataframe.DataFrame {
 	log.Println(df.Error())
 	return df
 }
+func CsvToDataframeV2(data []byte,delimiter rune,hasHeader bool ) (dataframe.DataFrame,error) {
+	reader := bytes.NewReader(data)
+	df := dataframe.ReadCSV(reader,
+		dataframe.WithDelimiter(delimiter),
+		dataframe.HasHeader(true),
+		dataframe.NaNValues(nil))
+	return df,df.Error()
+}
+
+// TODO error mng
 func FileToDf(path string, delimiter rune, header bool) dataframe.DataFrame {
 	log.Println("Opening a file ")
 	var file, err = os.Open(path)
@@ -33,13 +43,15 @@ func FileToDf(path string, delimiter rune, header bool) dataframe.DataFrame {
 		dataframe.HasHeader(header))
 	return df
 }
+
+// TODO error mng
 func FilesToDf(filenames []string) dataframe.DataFrame {
 	log.Println("Opening a file ")
 	buf := bytes.NewBuffer(nil)
 	for _, filename := range filenames {
 		f, err := os.Open(filename)
 		CheckError(err)
-		io.Copy(buf, f) // Error handling elided for brevity.
+		io.Copy(buf, f)
 		defer f.Close()
 	}
 	//s := string(buf.Bytes())
@@ -49,6 +61,25 @@ func FilesToDf(filenames []string) dataframe.DataFrame {
 		dataframe.WithDelimiter(';'),
 		dataframe.HasHeader(true))
 	return df
+}
+
+// not tested for production but if you are a man ....
+// col base 0
+// TODO multi col
+func GroupBy(df dataframe.DataFrame, col int) map[string][][]string {
+	log.Println("GroupBy")
+	var (
+		res map[string][][]string
+	)
+	for _, k := range df.Records() {
+			if resFound, found := res[k[col]]; found {
+				resFound = append(resFound, k)
+			}else{
+				res[k[col]] = [][]string{k}
+			}		
+
+	}
+	return res
 }
 
 // ExportToCSV exports a Dataframe to a CSV file.

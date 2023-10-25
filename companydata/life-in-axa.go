@@ -12,12 +12,14 @@ import (
 )
 
 func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	const (
+		slide int = -1
+	)
 	var (
 		guarantees    []models.Guarante
 		sumPriseGross float64
 	)
 	ricAteco := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/life/life.csv", "")
-
 	df := lib.CsvToDataframe(ricAteco)
 	//log.Println("LifeIn  df.Describe: ", df.Describe())
 	log.Println("LifeIn  row", df.Nrow())
@@ -29,8 +31,8 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		sumPriseGross = 0
 		log.Println("LifeIn  row", d.Nrow())
 		log.Println("LifeIn  col", d.Ncol())
-		log.Println("LifeIn  value", v)
 		log.Println("LifeIn  d: ", d)
+		log.Println("LifeIn  elemets (0-1 1-1): ", d.Elem(0, 1).String(), d.Elem(0, 2).String(), d.Elem(1, 1).String(), d.Elem(1, 2).String())
 		_, _, _, version := LifeMapCodecCompanyAxaRevert(d.Elem(1, 1).String())
 		policy := models.Policy{
 			Name:           "life",

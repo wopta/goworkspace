@@ -1,6 +1,8 @@
 package lib
 
 import (
+	"log"
+	"strconv"
 	"time"
 )
 
@@ -58,4 +60,18 @@ func GetPreviousMonth(t time.Time) time.Time {
 func GetFirstDay(t time.Time) time.Time {
 	year, month, _ := t.Date()
 	return time.Date(year, month, 1, 0, 0, 0, 0, time.UTC)
+}
+func ParseDateDDMMYYYY(date string) time.Time {
+	if len(date) < 8 {
+		date = "0" + date
+	}
+	d, e := strconv.Atoi(date[0:1])
+	m, e := strconv.Atoi(date[2:3])
+	y, e := strconv.Atoi(date[4:7])
+	log.Println("ParseDateDDMMYYYY", d)
+	res := time.Date(y, time.Month(m),
+		d, 0, 0, 0, 0, time.UTC)
+	log.Println(e)
+	return res
+
 }
