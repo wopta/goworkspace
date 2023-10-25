@@ -10,13 +10,13 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/wopta/goworkspace/document v1.1.6
 	github.com/wopta/goworkspace/lib v1.0.83
-	github.com/wopta/goworkspace/mail v1.0.48
+	github.com/wopta/goworkspace/mail v1.0.50
 	github.com/wopta/goworkspace/models v1.1.57
 	github.com/wopta/goworkspace/network v1.0.8
 	github.com/wopta/goworkspace/policy v1.0.19
 	github.com/wopta/goworkspace/product v1.0.56
 	github.com/wopta/goworkspace/transaction v1.0.22
-	github.com/wopta/goworkspace/user v1.0.28
+	github.com/wopta/goworkspace/user v1.0.31
 )
 
 require (
