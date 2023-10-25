@@ -29,7 +29,7 @@ func (*ByAssetPerson) isCovered(w *PolicyReservedWrapper) (bool, []models.Policy
 	bigNow := lib.GetBigQueryNullDateTime(now)
 
 	query := fmt.Sprintf(
-		"SELECT %s FROM `%s.%s` WHERE name = @name AND isPay = true AND (isDeleted = false OR isDelete IS NULL) AND startDate <= @now AND endDate >= @now AND JSON_VALUE(data, '$.assets[0].person.fiscalCode') = @fiscalCode ORDER BY JSON_VALUE(data, '$.creationDate') ASC",
+		"SELECT %s FROM `%s.%s` WHERE name = @name AND isPay = true AND (isDeleted = false OR isDelete IS NULL) AND startDate <= @now AND endDate >= @now AND LOWER(JSON_VALUE(data, '$.assets[0].person.fiscalCode')) = LOWER(@fiscalCode) ORDER BY JSON_VALUE(data, '$.creationDate') ASC",
 		"uid, data.creationDate as creationDate, startDate, endDate, codeCompany, paymentSplit, isPay, name, isDeleted",
 		models.WoptaDataset,
 		models.PolicyCollection,
