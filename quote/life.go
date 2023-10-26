@@ -103,7 +103,7 @@ func Life(data models.Policy, channel string, networkNode *models.NetworkNode, w
 		log.Println("[Life] setting sumInsuredLimitOfIndeminity")
 		calculateSumInsuredLimitOfIndemnity(data.Assets, death.Value.SumInsuredLimitOfIndemnity)
 		log.Println("[Life] setting guarantees duration")
-		calculateGuaranteeDuration(data.Assets, contractorAge, death.Value.Duration.Year)
+		calculateGuaranteeDuration(data.Assets, death.Value.Duration.Year)
 	case models.ProductV2:
 		log.Printf("[Life] product version %s", data.ProductVersion)
 		guaranteesMap := data.GuaranteesToMap()
@@ -224,25 +224,25 @@ func getGuaranteeIsSelected(data models.Policy, guarantee *models.Guarante) bool
 }
 
 func calculateSumInsuredLimitOfIndemnity(assets []models.Asset, deathSumInsuredLimitOfIndemnity float64) {
-	for _, asset := range assets {
-		for _, guarantee := range asset.Guarantees {
+	for assetIndex, asset := range assets {
+		for guaranteeIndex, guarantee := range asset.Guarantees {
 			switch guarantee.Slug {
 			case permanentDisabilityGuarantee:
-				guarantee.Value.SumInsuredLimitOfIndemnity = deathSumInsuredLimitOfIndemnity
+				assets[assetIndex].Guarantees[guaranteeIndex].Value.SumInsuredLimitOfIndemnity = deathSumInsuredLimitOfIndemnity
 			case temporaryDisabilityGuarantee:
-				guarantee.Value.SumInsuredLimitOfIndemnity = (deathSumInsuredLimitOfIndemnity / 100) * 1
+				assets[assetIndex].Guarantees[guaranteeIndex].Value.SumInsuredLimitOfIndemnity = (deathSumInsuredLimitOfIndemnity / 100) * 1
 			case seriousIllGuarantee:
 				if deathSumInsuredLimitOfIndemnity > 100000 {
-					guarantee.Value.SumInsuredLimitOfIndemnity = 10000
+					assets[assetIndex].Guarantees[guaranteeIndex].Value.SumInsuredLimitOfIndemnity = 10000
 				} else {
-					guarantee.Value.SumInsuredLimitOfIndemnity = 5000
+					assets[assetIndex].Guarantees[guaranteeIndex].Value.SumInsuredLimitOfIndemnity = 5000
 				}
 			}
 		}
 	}
 }
 
-func calculateGuaranteeDuration(assets []models.Asset, contractorAge int, deathDuration int) {
+func calculateGuaranteeDuration(assets []models.Asset, deathDuration int) {
 	for assetIndex, asset := range assets {
 		for guaranteeIndex, guarantee := range asset.Guarantees {
 			switch guarantee.Slug {
