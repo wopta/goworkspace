@@ -16,7 +16,8 @@ import (
 
 func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	const (
-		slide int = -1
+		slide     int = -1
+		spaceChar     = "\ufffd"
 	)
 	var (
 		guarantees    []models.Guarante
@@ -104,7 +105,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 				FiscalCode: d[0][27],
 				Gender:     d[0][25],
 				BirthDate:  d[0][26],
-				Phone: strings.ReplaceAll(d[0][33], " ", "")  ,
+				Phone:      strings.ReplaceAll(d[0][33], spaceChar, ""),
 				IdentityDocuments: []*models.IdentityDocument{{
 					Code:             d[0][57],
 					Type:             d[0][56],
@@ -131,7 +132,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 					Gender:     d[0][36],
 					BirthDate:  d[0][37],
 					Mail:       d[0][71],
-					Phone: strings.ReplaceAll(d[0][72], " ", ""),
+					Phone:      strings.ReplaceAll(d[0][72], spaceChar, ""),
 					IdentityDocuments: []*models.IdentityDocument{{
 						Code:             d[0][77],
 						Type:             d[0][76],
