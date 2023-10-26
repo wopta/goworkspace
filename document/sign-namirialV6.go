@@ -223,8 +223,8 @@ func GetFileV6(policy models.Policy, uid string) chan string {
 			defer res.Body.Close()
 			//log.Println("Get body: ", string(body))
 			log.Println("Document Policy Contractor UID: ", policy.Contractor.Uid)
-			gsLink, err := lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "assets/users/"+
-				policy.Contractor.Uid+"/contract_"+uid+".pdf", body)
+			gsLink, err := lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"),
+				fmt.Sprintf("assets/users/"+models.ContractDocumentFormat, policy.NameDesc, policy.CodeCompany), body)
 			lib.CheckError(err)
 			r <- gsLink
 
