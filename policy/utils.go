@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"strconv"
 	"strings"
 	"time"
 
@@ -51,8 +50,8 @@ func SetToPay(policy *models.Policy, origin string) error {
 
 func promoteContractorDocumentsToUser(policy *models.Policy, origin string) error {
 	var (
-		tempPathFormat string = "temp/%s/%s"
-		userPathFormat string = "assets/users/%s/%s"
+		tempPathFormat = "temp/%s/%s"
+		userPathFormat = "assets/users/%s/%s"
 	)
 
 	for _, identityDocument := range policy.Contractor.IdentityDocuments {
@@ -126,15 +125,10 @@ func SetUserIntoPolicyContractor(policy *models.Policy, origin string) error {
 // Not sure if this is the right place
 // because it creates a dependency with document
 func AddContract(policy *models.Policy, origin string) error {
-	// Get Policy contract
 	gsLink := <-document.GetFileV6(*policy, policy.Uid)
-	// Add Contract
-	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
-	filenameParts := []string{"Contratto", policy.NameDesc, timestamp}
-	filename := strings.Join(filenameParts, "_")
-	filename = strings.ReplaceAll(filename, " ", "_") + ".pdf"
+	filename := strings.ReplaceAll(fmt.Sprintf(models.ContractDocumentFormat, policy.NameDesc, policy.CodeCompany), " ", "_") + ".pdf"
 	*policy.Attachments = append(*policy.Attachments, models.Attachment{
-		Name:     "Contratto",
+		Name:     models.ContractAttachmentName,
 		Link:     gsLink,
 		FileName: filename,
 	})
@@ -189,7 +183,7 @@ func AddProposalDoc(origin string, policy *models.Policy, networkNode *models.Ne
 		policy.Attachments = new([]models.Attachment)
 	}
 
-	filename := strings.SplitN(result.LinkGcs, "/", 3)[2]
+	filename := strings.ReplaceAll(fmt.Sprintf(models.ProposalDocumentFormat, policy.NameDesc, policy.ProposalNumber), " ", "_")
 	*policy.Attachments = append(*policy.Attachments, models.Attachment{
 		Name:     models.ProposalAttachmentName,
 		Link:     result.LinkGcs,

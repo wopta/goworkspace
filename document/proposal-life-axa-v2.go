@@ -42,8 +42,6 @@ func lifeAxaProposalV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, net
 
 	lifePaymentMethodSectionV2(pdf)
 
-	lifeEmitResumeSectionV2(pdf, policy)
-
 	companiesDescriptionSection(pdf, policy.Company)
 
 	axaHeader(pdf)
