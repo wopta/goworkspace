@@ -215,9 +215,10 @@ func ParseDateDDMMYYYY(date string) time.Time {
 }
 func ParseAxaFloat(price string) float64 {
 	log.Println("LifeIn ParseAxaFloat price:", price)
+
 	d := price[len(price)-2 : len(price)-1]
 	i := price[0 : len(price)-3]
-	f64string := d + "." + i
+	f64string := i + "." + d
 	res, e := strconv.ParseFloat(f64string, 64)
 	log.Println("LifeIn ParseAxaFloat d:", res)
 	log.Println(e)
