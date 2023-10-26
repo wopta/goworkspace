@@ -95,38 +95,31 @@ func Life(data models.Policy, channel string, networkNode *models.NetworkNode, w
 
 	addDefaultGuarantees(data, *ruleProduct)
 
-	switch channel {
-	case models.MgaChannel, models.NetworkChannel:
-		log.Println("[Life] mga, network flow")
-		guaranteesMap := data.GuaranteesToMap()
-		log.Println("[Life] setting sumInsuredLimitOfIndeminity")
-		if guaranteesMap[deathGuarantee].IsSelected {
-			guaranteesMap[permanentDisabilityGuarantee].Value.SumInsuredLimitOfIndemnity = math.Max(
-				guaranteesMap[permanentDisabilityGuarantee].Value.SumInsuredLimitOfIndemnity,
-				guaranteesMap[deathGuarantee].Value.SumInsuredLimitOfIndemnity)
-
-			guaranteesMap[seriousIllGuarantee].Value.SumInsuredLimitOfIndemnity = math.Min(guaranteesMap[seriousIllGuarantee].
-				Value.SumInsuredLimitOfIndemnity, guaranteesMap[deathGuarantee].Value.SumInsuredLimitOfIndemnity*0.5)
-		} else if guaranteesMap[permanentDisabilityGuarantee].IsSelected {
-			guaranteesMap[seriousIllGuarantee].Value.SumInsuredLimitOfIndemnity = math.Min(guaranteesMap[seriousIllGuarantee].
-				Value.SumInsuredLimitOfIndemnity, guaranteesMap[permanentDisabilityGuarantee].Value.
-				SumInsuredLimitOfIndemnity*0.5)
-		}
-
-		guaranteesList := make([]models.Guarante, 0)
-		for _, guarantee := range guaranteesMap {
-			guaranteesList = append(guaranteesList, guarantee)
-		}
-
-		data.Assets[0].Guarantees = guaranteesList
-	case models.ECommerceChannel:
-		log.Println("[Life] e-commerce flow")
+	switch data.ProductVersion {
+	case models.ProductV1:
 		death, err := data.ExtractGuarantee(deathGuarantee)
 		lib.CheckError(err)
-		log.Println("[Life] setting sumInsuredLimitOfIndeminity")
-		calculateSumInsuredLimitOfIndemnity(data.Assets, death.Value.SumInsuredLimitOfIndemnity)
-		log.Println("[Life] setting guarantees duration")
-		calculateGuaranteeDuration(data.Assets, contractorAge, death.Value.Duration.Year)
+
+		if channel == models.ECommerceChannel {
+			log.Println("[Life] e-commerce flow")
+			log.Println("[Life] setting sumInsuredLimitOfIndeminity")
+			calculateSumInsuredLimitOfIndemnity(data.Assets, death.Value.SumInsuredLimitOfIndemnity)
+			log.Println("[Life] setting guarantees duration")
+			calculateGuaranteeDuration(data.Assets, death.Value.Duration.Year)
+		} else {
+			log.Println("[Life] mga, network flow")
+			log.Println("[Life] setting sumInsuredLimitOfIndeminity")
+			calculateSumInsuredLimitOfIndemnityV2(&data)
+		}
+	case models.ProductV2:
+		calculateSumInsuredLimitOfIndemnityV2(&data)
+
+		if channel == models.ECommerceChannel {
+			death, err := data.ExtractGuarantee(deathGuarantee)
+			lib.CheckError(err)
+			log.Println("[Life] setting guarantees duration")
+			calculateGuaranteeDuration(data.Assets, death.Value.Duration.Year)
+		}
 	}
 
 	log.Println("[Life] updating policy start and end date")
@@ -192,6 +185,33 @@ func Life(data models.Policy, channel string, networkNode *models.NetworkNode, w
 	return data, err
 }
 
+func calculateSumInsuredLimitOfIndemnityV2(data *models.Policy) {
+	var minSumInsuredLimitOfIndeminity float64
+
+	guaranteesMap := data.GuaranteesToMap()
+	log.Println("[Life] setting sumInsuredLimitOfIndeminity")
+	if guaranteesMap[deathGuarantee].IsSelected {
+		guaranteesMap[permanentDisabilityGuarantee].Value.SumInsuredLimitOfIndemnity =
+			math.Max(guaranteesMap[permanentDisabilityGuarantee].Value.SumInsuredLimitOfIndemnity,
+				guaranteesMap[deathGuarantee].Value.SumInsuredLimitOfIndemnity)
+
+		minSumInsuredLimitOfIndeminity = math.Min(guaranteesMap[deathGuarantee].Value.SumInsuredLimitOfIndemnity,
+			guaranteesMap[permanentDisabilityGuarantee].Value.SumInsuredLimitOfIndemnity)
+	} else if guaranteesMap[permanentDisabilityGuarantee].IsSelected {
+		minSumInsuredLimitOfIndeminity = guaranteesMap[permanentDisabilityGuarantee].Value.SumInsuredLimitOfIndemnity
+	}
+
+	guaranteesMap[seriousIllGuarantee].Value.SumInsuredLimitOfIndemnity = math.Min(0.5*minSumInsuredLimitOfIndeminity,
+		guaranteesMap[seriousIllGuarantee].Config.SumInsuredValues.Max)
+
+	guaranteesList := make([]models.Guarante, 0)
+	for _, guarantee := range guaranteesMap {
+		guaranteesList = append(guaranteesList, guarantee)
+	}
+
+	data.Assets[0].Guarantees = guaranteesList
+}
+
 func addDefaultGuarantees(data models.Policy, product models.Product) {
 	guaranteeList := make([]models.Guarante, 0)
 
@@ -224,25 +244,25 @@ func getGuaranteeIsSelected(data models.Policy, guarantee *models.Guarante) bool
 }
 
 func calculateSumInsuredLimitOfIndemnity(assets []models.Asset, deathSumInsuredLimitOfIndemnity float64) {
-	for _, asset := range assets {
-		for _, guarantee := range asset.Guarantees {
+	for assetIndex, asset := range assets {
+		for guaranteeIndex, guarantee := range asset.Guarantees {
 			switch guarantee.Slug {
 			case permanentDisabilityGuarantee:
-				guarantee.Value.SumInsuredLimitOfIndemnity = deathSumInsuredLimitOfIndemnity
+				assets[assetIndex].Guarantees[guaranteeIndex].Value.SumInsuredLimitOfIndemnity = deathSumInsuredLimitOfIndemnity
 			case temporaryDisabilityGuarantee:
-				guarantee.Value.SumInsuredLimitOfIndemnity = (deathSumInsuredLimitOfIndemnity / 100) * 1
+				assets[assetIndex].Guarantees[guaranteeIndex].Value.SumInsuredLimitOfIndemnity = (deathSumInsuredLimitOfIndemnity / 100) * 1
 			case seriousIllGuarantee:
 				if deathSumInsuredLimitOfIndemnity > 100000 {
-					guarantee.Value.SumInsuredLimitOfIndemnity = 10000
+					assets[assetIndex].Guarantees[guaranteeIndex].Value.SumInsuredLimitOfIndemnity = 10000
 				} else {
-					guarantee.Value.SumInsuredLimitOfIndemnity = 5000
+					assets[assetIndex].Guarantees[guaranteeIndex].Value.SumInsuredLimitOfIndemnity = 5000
 				}
 			}
 		}
 	}
 }
 
-func calculateGuaranteeDuration(assets []models.Asset, contractorAge int, deathDuration int) {
+func calculateGuaranteeDuration(assets []models.Asset, deathDuration int) {
 	for assetIndex, asset := range assets {
 		for guaranteeIndex, guarantee := range asset.Guarantees {
 			switch guarantee.Slug {
