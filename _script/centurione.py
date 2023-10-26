@@ -32,7 +32,7 @@ go_modules = [
     "policy",
     "bpmn",]
 changed_modules = [
-    "policy"
+    "policy", "broker", "payment"
 ]
 updateable_modules = [
     "broker",
