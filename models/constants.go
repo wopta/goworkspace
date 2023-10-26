@@ -168,8 +168,8 @@ const (
 	FlowFileFormat                = "flows/%s.json"
 	ContractDocumentFormat        = "%s_Contratto_%s.pdf"
 	ProposalDocumentFormat        = "%s_Proposta_%d.pdf"
-	RvmInstructionsDocumentFormat = "%s_Proposta_%d_rvm_istruzioni.pdf"
-	RvmSurveyDocumentFormat       = "%s_Proposta_%d_rvm_questionario.pdf"
+	RvmInstructionsDocumentFormat = "%s_Proposta_%d_RVM_Istruzioni.pdf"
+	RvmSurveyDocumentFormat       = "%s_Proposta_%d_RVM_Questionario.pdf"
 	WarrantFormat                 = "warrants/%s.json"
 	WarrantsFolder                = "warrants/"
 )
