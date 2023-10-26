@@ -298,7 +298,7 @@ func getSendV6(id string, data models.Policy, prepare string, origin string) str
 			}, `
 	}
 	var redirectUrl string
-	if data.Name == models.GapProduct {
+	if data.Name == models.GapProduct && data.Channel != models.MgaChannel {
 		var baseUrl string = "https://www.wopta.it"
 		if os.Getenv("env") != "prod" {
 			baseUrl = "https://dev.wopta.it"
