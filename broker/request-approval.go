@@ -127,6 +127,7 @@ func setRequestApprovalData(policy *models.Policy) {
 
 	setProposalNumber(policy)
 
+	policy.PaymentSplit = paymentSplit
 	if policy.Status == models.PolicyStatusInitLead {
 		plc.AddProposalDoc(origin, policy, networkNode, mgaProduct)
 	}
@@ -147,6 +148,5 @@ func setRequestApprovalData(policy *models.Policy) {
 	}
 
 	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
-	policy.PaymentSplit = paymentSplit
 	policy.Updated = time.Now().UTC()
 }
