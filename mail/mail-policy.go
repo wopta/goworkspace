@@ -190,7 +190,7 @@ func SendMailReserved(policy models.Policy, from, to, cc Address, flowName strin
 		}
 
 		at = append(at, Attachment{
-			Name:        strings.ReplaceAll(fmt.Sprintf("%s", attachment.Name), "_", " "),
+			Name:        strings.ReplaceAll(fmt.Sprintf("%s", attachment.FileName), "_", " "),
 			Link:        attachment.Link,
 			Byte:        attachment.Byte,
 			FileName:    attachment.FileName,
