@@ -61,6 +61,9 @@ func Proposal(origin string, policy *models.Policy, networkNode *models.NetworkN
 
 	log.Println("[Proposal] function start ----------------------------------")
 
+	rawPolicy, _ := policy.Marshal()
+	log.Printf("[Proposal] policy: %s", string(rawPolicy))
+
 	log.Printf("[Proposal] generating proposal document for proposal n. %d", policy.ProposalNumber)
 
 	pdf = initFpdf()

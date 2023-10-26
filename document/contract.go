@@ -46,6 +46,11 @@ func ContractFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 func ContractObj(origin string, data models.Policy, networkNode *models.NetworkNode, product *models.Product) <-chan DocumentResponse {
 	r := make(chan DocumentResponse)
 
+	log.Println("[ContractObj] function start -------------------------------")
+
+	rawPolicy, _ := data.Marshal()
+	log.Printf("[ContractObj] policy: %s", string(rawPolicy))
+
 	go func() {
 		var (
 			filename string
@@ -77,6 +82,9 @@ func ContractObj(origin string, data models.Policy, networkNode *models.NetworkN
 			Bytes:   base64.StdEncoding.EncodeToString(out),
 		}
 	}()
+
+	log.Println("[ContractObj] function end -------------------------------..")
+
 	return r
 }
 
