@@ -294,7 +294,7 @@ func paymentMethodSection(pdf *fpdf.Fpdf) {
 
 func emitResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	var offerPrice string
-	emitDate := policy.EmitDate.Format(dateLayout)
+	emitDate := time.Now().UTC().Format(dateLayout)
 	if policy.PaymentSplit == "monthly" {
 		offerPrice = humanize.FormatFloat("#.###,##", policy.PriceGrossMonthly)
 	} else {
@@ -388,7 +388,7 @@ func personalDataHandlingSection(pdf *fpdf.Fpdf, policy *models.Policy, isPropos
 		"mercato, attraverso strumenti automatizzati (sms, mms, e-mail, ecc.) e non (posta cartacea e telefono "+
 		"con operatore).", "", "", false)
 	pdf.Ln(3)
-	pdf.Cell(0, 3, policy.EmitDate.Format(dateLayout))
+	pdf.Cell(0, 3, time.Now().UTC().Format(dateLayout))
 	if !isProposal {
 		drawSignatureForm(pdf)
 	}

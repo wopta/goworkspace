@@ -568,7 +568,7 @@ func axaDeclarationsConsentSection(pdf *fpdf.Fpdf, policy *models.Policy, isProp
 	setBlackDrawColor(pdf)
 	drawBlackHorizontalLine(pdf, thinLineWidth)
 	pdf.Ln(5)
-	pdf.Cell(0, 3, policy.EmitDate.Format(dateLayout))
+	pdf.Cell(0, 3, time.Now().UTC().Format(dateLayout))
 	if !isProposal {
 		drawSignatureForm(pdf)
 	}
@@ -780,7 +780,7 @@ func axaTablePart2Section(pdf *fpdf.Fpdf, policy *models.Policy, isProposal bool
 	pdf.Ln(4)
 
 	setBlackBoldFont(pdf, standardTextSize)
-	pdf.CellFormat(30, 3, "Data "+policy.EmitDate.Format(dateLayout), "", 0, "CM",
+	pdf.CellFormat(30, 3, "Data "+time.Now().UTC().Format(dateLayout), "", 0, "CM",
 		false, 0, "")
 	if !isProposal {
 		drawSignatureForm(pdf)

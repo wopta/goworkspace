@@ -625,7 +625,7 @@ func lifePaymentMethodSectionV2(pdf *fpdf.Fpdf) {
 
 func lifeEmitResumeSectionV2(pdf *fpdf.Fpdf, policy *models.Policy) {
 	var offerPrice string
-	emitDate := policy.EmitDate.Format(dateLayout)
+	emitDate := time.Now().UTC().Format(dateLayout)
 	if policy.PaymentSplit == string(models.PaySplitMonthly) {
 		offerPrice = humanize.FormatFloat("#.###,##", policy.PriceGrossMonthly)
 	} else {
