@@ -133,13 +133,13 @@ func SendMailContract(policy models.Policy, at *[]Attachment, from, to, cc Addre
 		contractbyte, err := lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filepath)
 		lib.CheckError(err)
 
-		filename := strings.ReplaceAll(fmt.Sprintf(models.ContractDocumentFormat, policy.NameDesc,
-			policy.CodeCompany), "_", " ")
+		filename := fmt.Sprintf(models.ContractDocumentFormat, policy.NameDesc,
+			policy.CodeCompany)
 		at = &[]Attachment{{
 			Byte:        base64.StdEncoding.EncodeToString(contractbyte),
 			ContentType: "application/pdf",
 			FileName:    filename,
-			Name:        models.ContractAttachmentName,
+			Name:        strings.ReplaceAll(filename, "_", " "),
 		}}
 	}
 
