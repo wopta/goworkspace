@@ -1,0 +1,130 @@
+{
+    "company": "axa",
+    "name": "life",
+    "emitDate": "0001-01-01T00:00:00Z",
+    "startDate": "0201-12-01T00:00:00Z",
+    "renewDate": "0001-01-01T00:00:00Z",
+    "endDate": "0201-12-01T00:00:00Z",
+    "creationDate": "0001-01-01T00:00:00Z",
+    "updated": "0001-01-01T00:00:00Z",
+    "nextPay": "0001-01-01T00:00:00Z",
+    "deleteDate": "0001-01-01T00:00:00Z",
+    "isPay": true,
+    "isSign": true,
+    "priceGross": 15.1,
+    "contractor": {
+        "birthDate": "15081982",
+        "location": {},
+        "name": "BORGO ",
+        "gender": "F",
+        "type": "PF",
+        "surname": "ERIKA",
+        "fiscalCode": "BRGRKE82M55L157P",
+        "vatCode": "",
+        "creationDate": "0001-01-01T00:00:00Z",
+        "updatedDate": "0001-01-01T00:00:00Z",
+        "height": 0,
+        "weight": 0,
+        "residence": {
+            "streetName": "VIA CRUNI 4",
+            "city": "VICENZA",
+            "postalCode": "36010",
+            "locality": "FOZA",
+            "cityCode": "VICENZA"
+        },
+        "identityDocuments": [
+            {
+                "code": "CA96357EF",
+                "type": "1",
+                "number": "",
+                "issuingAuthority": "Comune FOZA",
+                "placeOfIssue": "",
+                "dateOfIssue": "0200-11-30T00:00:00Z",
+                "expiryDate": "0001-01-01T00:00:00Z",
+                "frontMedia": null,
+                "lastUpdate": "0001-01-01T00:00:00Z"
+            }
+        ]
+    },
+    "assets": [
+        {
+            "name": "person",
+            "person": {
+                "birthDate": "15081982",
+                "birthCity": "15081982",
+                "birthProvince": "15081982",
+                "location": {},
+                "name": "ERIKA",
+                "gender": "F",
+                "type": "PF",
+                "surname": "BORGO ",
+                "mail": "erikaborgo@alice.it",
+                "phone": "+39\ufffd349\ufffd782\ufffd0428",
+                "fiscalCode": "BRGRKE82M55L157P",
+                "vatCode": "",
+                "creationDate": "0001-01-01T00:00:00Z",
+                "updatedDate": "0001-01-01T00:00:00Z",
+                "height": 0,
+                "weight": 0,
+                "residence": {
+                    "streetName": "VIA CRUNI 4",
+                    "city": "VICENZA",
+                    "postalCode": "36010",
+                    "locality": "FOZA",
+                    "cityCode": "VICENZA"
+                },
+                "domicile": {
+                    "streetName": "VIA CRUNI 4",
+                    "city": "VICENZA",
+                    "postalCode": "36010",
+                    "locality": "FOZA",
+                    "cityCode": "VICENZA"
+                },
+                "identityDocuments": [
+                    {
+                        "code": "CA96357EF",
+                        "type": "1",
+                        "number": "",
+                        "issuingAuthority": "Comune FOZA",
+                        "placeOfIssue": "",
+                        "dateOfIssue": "0200-11-30T00:00:00Z",
+                        "expiryDate": "0001-01-01T00:00:00Z",
+                        "frontMedia": null,
+                        "lastUpdate": "0001-01-01T00:00:00Z"
+                    }
+                ]
+            },
+            "guarantees": [
+                {
+                    "beneficiaries": null,
+                    "value": {
+                        "deductibleValues": {},
+                        "sumInsuredLimitOfIndemnity": 10000,
+                        "sumInsuredValues": {},
+                        "selfInsuranceValues": {},
+                        "duration": {
+                            "year": 20
+                        },
+                        "tax": 0,
+                        "percentage": 0,
+                        "premiumNetYearly": 0,
+                        "premiumGrossYearly": 15.1
+                    },
+                    "isMandatory": false,
+                    "isExtension": false,
+                    "isSellable": false,
+                    "isConfigurable": false,
+                    "subtitle": "",
+                    "reserved": false,
+                    "isSelected": false
+                }
+            ]
+        }
+    ],
+    "partnershipName": "",
+    "partnershipData": null,
+    "isReserved": false,
+    "networkUid": "",
+    "producerUid": "",
+    "producerType": ""
+}
