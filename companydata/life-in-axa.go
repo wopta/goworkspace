@@ -1,6 +1,7 @@
 package companydata
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"os"
@@ -153,8 +154,11 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		policy.Assets[0].Guarantees = guarantees
 		policy.PriceGross = sumPriseGross
 
-		log.Println("LifeIn policy:", policy)
-		docref, _, _ := lib.PutFirestoreErr("policy", policy)
+		//log.Println("LifeIn policy:", policy)
+		b, e := json.Marshal(policy)
+		log.Println("LifeIn policy:", e)
+		log.Println("LifeIn policy:", string(b))
+		docref, _, _ := lib.PutFirestoreErr("test-policy", policy)
 		log.Println("LifeIn doc id: ", docref.ID)
 
 		//user,e:=models.UpdateUserByFiscalCode("", policy.Contractor)
@@ -225,6 +229,7 @@ func ParseAxaFloat(price string) float64 {
 	return res
 
 }
+
 func ParseAxaBeneficiary(r []string, base int) models.Beneficiary {
 	var (
 		benef models.Beneficiary
