@@ -204,7 +204,8 @@ func sendRequestApprovalMail(state *bpmn.State) error {
 		return nil
 	}
 
-	mail.SendMailReserved(*policy, fromAddress, toAddress, ccAddress, flowName, []string{models.ProposalAttachmentName})
+	mail.SendMailReserved(*policy, fromAddress, toAddress, ccAddress, flowName,
+		[]string{models.InformationSetAttachmentName, models.ProposalAttachmentName})
 	return nil
 }
 

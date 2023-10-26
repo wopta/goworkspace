@@ -180,6 +180,7 @@ const (
 )
 
 const (
+	InformationSetAttachmentName  = "Precontrattuale"
 	ProposalAttachmentName        = "Proposta"
 	ContractAttachmentName        = "Contratto"
 	RvmInstructionsAttachmentName = "RVM Istruzioni"

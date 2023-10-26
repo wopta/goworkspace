@@ -168,7 +168,9 @@ func GetNetworkNodeEmail(networkNode *models.NetworkNode) Address {
 
 func getMailAttachments(policy models.Policy, attachmentNames []string) []Attachment {
 	var (
-		at []Attachment
+		at     []Attachment
+		rawDoc []byte
+		err    error
 	)
 
 	if policy.Attachments == nil || len(*policy.Attachments) == 0 {
@@ -180,7 +182,11 @@ func getMailAttachments(policy models.Policy, attachmentNames []string) []Attach
 
 	for _, attachment := range *policy.Attachments {
 		if lib.SliceContains(attachmentNames, attachment.Name) {
-			rawDoc, err := lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), attachment.Link)
+			if strings.HasPrefix(attachment.Link, "gs://") {
+				rawDoc, err = lib.ReadFileFromGoogleStorage(attachment.Link)
+			} else {
+				rawDoc, err = lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), attachment.Link)
+			}
 			if err != nil {
 				log.Printf("[getMailAttachments] error reading document %s from google storage: %s", attachment.Name, err.Error())
 				return nil
