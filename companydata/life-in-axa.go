@@ -184,8 +184,8 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 func LifeMapCodecCompanyAxaRevert(g string) (string, string, string, string) {
 	log.Println("LifeIn LifeMapCodecCompanyAxaRevert:", g)
 	var result, pay, slug, version string
-	version = g[0:0]
-	code := g[2:2]
+	version = g[:1]
+	code := g[2:3]
 
 	if code == "5" {
 		result = "D"
@@ -227,15 +227,19 @@ func ParseDateDDMMYYYY(date string) time.Time {
 
 }
 func ParseAxaFloat(price string) float64 {
-	log.Println("LifeIn ParseAxaFloat price:", price)
+	//pricelen:=len("0000001500000")
+	if len(price) > 3 {
+		log.Println("LifeIn ParseAxaFloat price:", price)
 
-	d := price[len(price)-2 : len(price)-1]
-	i := price[0 : len(price)-3]
-	f64string := i + "." + d
-	res, e := strconv.ParseFloat(f64string, 64)
-	log.Println("LifeIn ParseAxaFloat d:", res)
-	log.Println(e)
-	return res
+		d := price[len(price)-2 :]
+		i := price[: len(price)-3]
+		f64string := i + "." + d
+		res, e := strconv.ParseFloat(f64string, 64)
+		log.Println("LifeIn ParseAxaFloat d:", res)
+		log.Println(e)
+		return res
+	}
+	return 0
 
 }
 
