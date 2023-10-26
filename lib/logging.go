@@ -5,9 +5,9 @@ import (
 	"os"
 )
 
-func Debug(message string) {
+func Debug(v ...interface{}) {
 	if os.Getenv("env") == "dev" {
-		log.Println(message)
+		log.Println(v)
 
 	}
 

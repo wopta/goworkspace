@@ -120,12 +120,15 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 				beneficiaries []models.Beneficiary
 				benef1        models.Beneficiary
 			)
+
 			benef1 = ParseAxaBeneficiary(r, 0)
 			benef2 := ParseAxaBeneficiary(r, 1)
 			benef3 := ParseAxaBeneficiary(r, 2)
-			beneficiaries = append(beneficiaries, benef1)
-			beneficiaries = append(beneficiaries, benef2)
-			beneficiaries = append(beneficiaries, benef3)
+			if slug == "death" {
+				beneficiaries = append(beneficiaries, benef1)
+				beneficiaries = append(beneficiaries, benef2)
+				beneficiaries = append(beneficiaries, benef3)
+			}
 			dur, _ := strconv.Atoi(r[7])
 			priceGross := ParseAxaFloat(r[8])
 			sumPriseGross = priceGross + sumPriseGross
@@ -151,7 +154,9 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		policy.PriceGross = sumPriseGross
 
 		log.Println("LifeIn policy:", policy)
-		lib.PutFirestoreErr("policy", policy)
+		docref, _, _ := lib.PutFirestoreErr("policy", policy)
+		log.Println("LifeIn doc id: ", docref.ID)
+
 		//user,e:=models.UpdateUserByFiscalCode("", policy.Contractor)
 		//tr := transaction.PutByPolicy(policy, "", "", "", "", sumPriseGross, 0, "", "BO", true)
 		//accounting.CreateNetworkTransaction(tr, "uat")
@@ -186,18 +191,23 @@ func LifeMapCodecCompanyAxaRevert(g string) (string, string, string, string) {
 	return result, slug, version, pay
 }
 func ParseDateDDMMYYYY(date string) time.Time {
+	var (
+		res time.Time
+	)
 	log.Println("LifeIn ParseDateDDMMYYYY date:", date)
-	log.Println("LifeIn ParseDateDDMMYYYY len(date):", date)
+	log.Println("LifeIn ParseDateDDMMYYYY len(date):", len(date))
 	if len(date) < 8 {
 		date = "0" + date
 	}
-	d, e := strconv.Atoi(date[0:1])
-	m, e := strconv.Atoi(date[2:3])
-	y, e := strconv.Atoi(date[4:7])
+	if len(date) < 8 {
+		d, e := strconv.Atoi(date[0:1])
+		m, e := strconv.Atoi(date[2:3])
+		y, e := strconv.Atoi(date[4:7])
 
-	res := time.Date(y, time.Month(m),
-		d, 0, 0, 0, 0, time.UTC)
-	log.Println(e)
+		res = time.Date(y, time.Month(m),
+			d, 0, 0, 0, 0, time.UTC)
+		log.Println(e)
+	}
 	return res
 
 }
