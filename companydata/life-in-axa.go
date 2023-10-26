@@ -158,7 +158,9 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		log.Println("LifeIn doc id: ", docref.ID)
 
 		//user,e:=models.UpdateUserByFiscalCode("", policy.Contractor)
+		//	log.Println("LifeIn policy:", policy)
 		//tr := transaction.PutByPolicy(policy, "", "", "", "", sumPriseGross, 0, "", "BO", true)
+		//	log.Println("LifeIn transactionpolicy:",tr)
 		//accounting.CreateNetworkTransaction(tr, "uat")
 
 	}
@@ -199,7 +201,7 @@ func ParseDateDDMMYYYY(date string) time.Time {
 	if len(date) < 8 {
 		date = "0" + date
 	}
-	if len(date) < 8 {
+	if len(date) >= 8 {
 		d, e := strconv.Atoi(date[0:1])
 		m, e := strconv.Atoi(date[2:3])
 		y, e := strconv.Atoi(date[4:7])
