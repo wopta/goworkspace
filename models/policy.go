@@ -101,10 +101,10 @@ type Policy struct {
 	PartnershipName   string                       `json:"partnershipName" firestore:"partnershipName" bigquery:"partnershipName"`
 	PartnershipData   map[string]interface{}       `json:"partnershipData" firestore:"partnershipData" bigquery:"-"`
 	IsReserved        bool                         `json:"isReserved" firestore:"isReserved" bigquery:"-"`
-	RejectReasons     string                       `json:"rejectReasons,omitempty" firestore:"rejectReasons,omitempty" bigquery:"rejectReasons"`
+	RejectReasons     string                       `json:"rejectReasons,omitempty" firestore:"rejectReasons,omitempty" bigquery:"-"` // DEPRECATED
 	FundsOrigin       string                       `json:"fundsOrigin,omitempty" firestore:"fundsOrigin,omitempty" bigquery:"-"`
-	AgentUid          string                       `json:"agentUid,omitempty" firestore:"agentUid,omitempty" bigquery:"agentUid"`
-	AgencyUid         string                       `json:"agencyUid,omitempty" firestore:"agencyUid,omitempty" bigquery:"agencyUid"`
+	AgentUid          string                       `json:"agentUid,omitempty" firestore:"agentUid,omitempty" bigquery:"agentUid"`    // DEPRECATED
+	AgencyUid         string                       `json:"agencyUid,omitempty" firestore:"agencyUid,omitempty" bigquery:"agencyUid"` // DEPRECATED
 	ReservedInfo      *ReservedInfo                `json:"reservedInfo,omitempty" firestore:"reservedInfo,omitempty" bigquery:"-"`
 	BigReasons        string                       `json:"-" firestore:"-" bigquery:"reasons"`
 	BigAcceptanceNote string                       `json:"-" firestore:"-" bigquery:"acceptanceNote"`
