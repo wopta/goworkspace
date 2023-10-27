@@ -57,7 +57,7 @@ updateable_modules = [
 
 increment_version_key = "patch"
 environment = 'dev'  # Replace with your desired environment
-dry_run = False
+dry_run = True
 google_repository = "google"
 github_repository = "origin"
 
