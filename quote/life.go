@@ -186,23 +186,26 @@ func Life(data models.Policy, channel string, networkNode *models.NetworkNode, w
 }
 
 func calculateSumInsuredLimitOfIndemnityV2(data *models.Policy) {
-	var minSumInsuredLimitOfIndeminity float64
-
 	guaranteesMap := data.GuaranteesToMap()
+
 	log.Println("[Life] setting sumInsuredLimitOfIndeminity")
 	if guaranteesMap[deathGuarantee].IsSelected {
 		guaranteesMap[permanentDisabilityGuarantee].Value.SumInsuredLimitOfIndemnity =
 			math.Max(guaranteesMap[permanentDisabilityGuarantee].Value.SumInsuredLimitOfIndemnity,
 				guaranteesMap[deathGuarantee].Value.SumInsuredLimitOfIndemnity)
 
-		minSumInsuredLimitOfIndeminity = math.Min(guaranteesMap[deathGuarantee].Value.SumInsuredLimitOfIndemnity,
+		minSumInsuredLimitOfIndemnity := math.Min(guaranteesMap[deathGuarantee].Value.SumInsuredLimitOfIndemnity,
 			guaranteesMap[permanentDisabilityGuarantee].Value.SumInsuredLimitOfIndemnity)
-	} else if guaranteesMap[permanentDisabilityGuarantee].IsSelected {
-		minSumInsuredLimitOfIndeminity = guaranteesMap[permanentDisabilityGuarantee].Value.SumInsuredLimitOfIndemnity
-	}
 
-	guaranteesMap[seriousIllGuarantee].Value.SumInsuredLimitOfIndemnity = math.Min(0.5*minSumInsuredLimitOfIndeminity,
-		guaranteesMap[seriousIllGuarantee].Config.SumInsuredValues.Max)
+		guaranteesMap[seriousIllGuarantee].Value.SumInsuredLimitOfIndemnity = math.Min(0.5*minSumInsuredLimitOfIndemnity,
+			guaranteesMap[seriousIllGuarantee].Value.SumInsuredLimitOfIndemnity)
+
+	} else if guaranteesMap[permanentDisabilityGuarantee].IsSelected {
+		minSumInsuredLimitOfIndemnity := guaranteesMap[permanentDisabilityGuarantee].Value.SumInsuredLimitOfIndemnity
+
+		guaranteesMap[seriousIllGuarantee].Value.SumInsuredLimitOfIndemnity = math.Min(0.5*minSumInsuredLimitOfIndemnity,
+			guaranteesMap[seriousIllGuarantee].Value.SumInsuredLimitOfIndemnity)
+	}
 
 	guaranteesList := make([]models.Guarante, 0)
 	for _, guarantee := range guaranteesMap {
