@@ -14,7 +14,6 @@ import (
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 	plc "github.com/wopta/goworkspace/policy"
-	"github.com/wopta/goworkspace/reserved"
 )
 
 type RequestApprovalReq struct {
@@ -133,18 +132,12 @@ func setRequestApprovalData(policy *models.Policy) {
 	}
 
 	policy.Status = models.PolicyStatusWaitForApproval
-	needsMedicalDocuments := false
 	for _, reason := range policy.ReservedInfo.Reasons {
 		// TODO: add key/id for reasons so we do not have to cjeck string equallity
 		if strings.HasPrefix(reason, "Cliente già assicurato") {
 			policy.Status = models.PolicyStatusWaitForApprovalMga
-		} else {
-			needsMedicalDocuments = true
+			break
 		}
-	}
-
-	if needsMedicalDocuments {
-		reserved.SetReservedInfo(policy, mgaProduct)
 	}
 
 	policy.StatusHistory = append(policy.StatusHistory, policy.Status)

@@ -7,12 +7,14 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 	plc "github.com/wopta/goworkspace/policy"
+	"github.com/wopta/goworkspace/reserved"
 )
 
 type ProposalReq struct {
@@ -147,6 +149,14 @@ func setProposalData(policy *models.Policy) {
 	if policy.IsReserved {
 		log.Println("[setProposalData] setting NeedsApproval status")
 		policy.Status = models.PolicyStatusNeedsApproval
+
+		for _, reason := range policy.ReservedInfo.Reasons {
+			// TODO: add key/id for reasons so we do not have to cjeck string equallity
+			if !strings.HasPrefix(reason, "Cliente già assicurato") {
+				reserved.SetReservedInfo(policy, mgaProduct)
+				break
+			}
+		}
 	}
 
 	plc.AddProposalDoc(origin, policy, networkNode, mgaProduct)
