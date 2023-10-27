@@ -81,7 +81,7 @@ func personaMainHeaderV1(pdf *fpdf.Fpdf, policy *models.Policy, networkNode *mod
 	policyInfo += "Si rinnova a scadenza salvo disdetta da inviare 30 giorni prima\n" + "Prossimo pagamento "
 	if policy.PaymentSplit == string(models.PaySplitMonthly) {
 		policyInfo += policyStartDate.In(location).AddDate(0, 1, 0).Format(dateLayout) + "\n"
-	} else if policy.PaymentSplit == string(models.PaySplitYear) {
+	} else if policy.PaymentSplit == string(models.PaySplitYear) || policy.PaymentSplit == string(models.PaySplitYearly) {
 		policyInfo += policyStartDate.In(location).AddDate(1, 0, 0).Format(dateLayout) + "\n"
 	}
 	policyInfo += "Sostituisce la polizza ========\n"
