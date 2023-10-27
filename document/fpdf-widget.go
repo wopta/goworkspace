@@ -25,7 +25,7 @@ func mainHeader(pdf *fpdf.Fpdf, policy *models.Policy, isProposal bool) {
 	if policy.PaymentSplit == string(models.PaySplitMonthly) {
 		expiryInfo = "Prima scandenza mensile il: " +
 			policyStartDate.AddDate(0, 1, 0).Format(dateLayout) + "\n"
-	} else if policy.PaymentSplit == string(models.PaySplitYear) {
+	} else if policy.PaymentSplit == string(models.PaySplitYear) || policy.PaymentSplit == string(models.PaySplitYearly) {
 		expiryInfo = "Prima scadenza annuale il: " +
 			policyStartDate.AddDate(1, 0, 0).Format(dateLayout) + "\n"
 	}

@@ -105,8 +105,8 @@ func lifeAxaContractV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, net
 
 func lifeMainHeaderV2(pdf *fpdf.Fpdf, policy *models.Policy, networkNode *models.NetworkNode, isProposal bool) {
 	var (
-		opt                                                                   fpdf.ImageOptions
-		logoPath, cfpi, policyInfoHeader, policyInfo, expiryInfo, productName string
+		opt                                                             fpdf.ImageOptions
+		logoPath, policyInfoHeader, policyInfo, expiryInfo, productName string
 	)
 
 	location, err := time.LoadLocation("Europe/Rome")
@@ -147,14 +147,8 @@ func lifeMainHeaderV2(pdf *fpdf.Fpdf, policy *models.Policy, networkNode *models
 	address := strings.ToUpper(contractor.Residence.StreetName + ", " + contractor.Residence.StreetNumber + "\n" +
 		contractor.Residence.PostalCode + " " + contractor.Residence.City + " (" + contractor.Residence.CityCode + ")\n")
 
-	if contractor.VatCode == "" {
-		cfpi = contractor.FiscalCode
-	} else {
-		cfpi = contractor.VatCode
-	}
-
 	contractorInfo := "Contraente: " + strings.ToUpper(contractor.Surname+" "+contractor.Name+"\n"+
-		"C.F./P.IVA: "+cfpi) + "\n" +
+		"C.F./P.IVA: "+contractor.FiscalCode) + "\n" +
 		"Indirizzo: " + strings.ToUpper(address) + "Mail: " + contractor.Mail + "\n" +
 		"Telefono: " + contractor.Phone
 
