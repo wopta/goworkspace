@@ -40,8 +40,8 @@ func lifeReserved(policy *models.Policy, product *models.Product) (string, []byt
 
 func lifeReservedHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 	var (
-		opt                        fpdf.ImageOptions
-		logoPath, cfpi, expiryInfo string
+		opt                  fpdf.ImageOptions
+		logoPath, expiryInfo string
 	)
 
 	logoPath = lib.GetAssetPathByEnvV2() + "logo_vita.png"
@@ -55,7 +55,7 @@ func lifeReservedHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 	if policy.PaymentSplit == string(models.PaySplitMonthly) {
 		expiryInfo = "Prima scandenza mensile il: " +
 			policyStartDate.AddDate(0, 1, 0).Format(dateLayout)
-	} else if policy.PaymentSplit == string(models.PaySplitYear) {
+	} else if policy.PaymentSplit == string(models.PaySplitYear) || policy.PaymentSplit == string(models.PaySplitYearly) {
 		expiryInfo = "Prima scadenza annuale il: " +
 			policyStartDate.AddDate(1, 0, 0).Format(dateLayout)
 	}
@@ -67,12 +67,6 @@ func lifeReservedHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 	address := strings.ToUpper(contractor.Residence.StreetName + ", " + contractor.Residence.StreetNumber + "\n" +
 		contractor.Residence.PostalCode + " " + contractor.Residence.City + " (" + contractor.Residence.CityCode + ")")
 
-	if contractor.VatCode == "" {
-		cfpi = contractor.FiscalCode
-	} else {
-		cfpi = contractor.VatCode
-	}
-
 	if policy.PaymentSplit == string(models.PaySplitMonthly) {
 		expiryInfo = "Prima scandenza mensile il: " +
 			policyStartDate.AddDate(0, 1, 0).Format(dateLayout) + "\n"
@@ -83,7 +77,7 @@ func lifeReservedHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 
 	contractorInfo := fmt.Sprintf("Contraente: %s\nC.F./P.IVA: %s\nIndirizzo: %s\nMail: %s\nTelefono: %s",
 		strings.ToUpper(contractor.Surname+" "+contractor.
-			Name), cfpi, strings.ToUpper(address), contractor.Mail, contractor.Phone)
+			Name), contractor.FiscalCode, strings.ToUpper(address), contractor.Mail, contractor.Phone)
 
 	opt.ImageType = "png"
 	pdf.ImageOptions(lib.GetAssetPathByEnvV2()+"logo_axa.png", 180, 10, 0, 15,
@@ -141,9 +135,8 @@ func lifeReservedInstructionsSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	setBlackDrawColor(pdf)
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3.5, "", "LTR", fpdf.AlignCenter, false)
-	pdf.MultiCell(0, 3.5, "Da restituire in busta chiusa alla compagnia assicurativa, unitamente alle "+
-		"schede “dati Polizza”,\n“Questionario Medico” e “Antiriciclaggio” compilate e sottoscritte in ogni sua parte, "+
-		"alternativamente a:", "LR", fpdf.AlignCenter, false)
+	pdf.MultiCell(0, 3.5, "Da restituire alla compagnia assicurativa, unitamente alle schede "+
+		"“dati Polizza”,\n“Questionario Medico” e “Antiriciclaggio” compilate e sottoscritte in ogni sua parte", "LR", fpdf.AlignCenter, false)
 
 	for _, contact := range policy.ReservedInfo.Contacts {
 		setBlackBoldFont(pdf, standardTextSize)
