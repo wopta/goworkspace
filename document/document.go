@@ -44,6 +44,12 @@ func Document(w http.ResponseWriter, r *http.Request) {
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
+				Route:   "/v1/reserved",
+				Handler: ReservedFx,
+				Method:  "POST",
+				Roles:   []string{models.UserRoleAll},
+			},
+			{
 				Route:   "/v1/sign/",
 				Handler: SignNamirial,
 				Method:  "POST",
