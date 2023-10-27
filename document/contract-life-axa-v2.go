@@ -55,7 +55,7 @@ func lifeAxaContractV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, net
 
 	companiesDescriptionSection(pdf, policy.Company)
 
-	axaHeader(pdf)
+	axaHeader(pdf, false)
 
 	pdf.AddPage()
 
@@ -75,7 +75,7 @@ func lifeAxaContractV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, net
 
 	axaTablePart3Section(pdf)
 
-	woptaHeader(pdf)
+	woptaHeader(pdf, false)
 
 	pdf.AddPage()
 
@@ -178,6 +178,10 @@ func lifeMainHeaderV2(pdf *fpdf.Fpdf, policy *models.Policy, networkNode *models
 		pdf.SetXY(-95, pdf.GetY()+3)
 		pdf.MultiCell(0, 3.5, contractorInfo, "", "", false)
 		pdf.Ln(5)
+
+		if isProposal {
+			insertWatermark(pdf, proposal)
+		}
 	})
 }
 

@@ -54,7 +54,7 @@ func gapSogessurContractV1(pdf *fpdf.Fpdf, origin string, policy *models.Policy,
 
 	printStatement(pdf, statements[len(statements)-1], policy.Company, false)
 
-	woptaHeader(pdf)
+	woptaHeader(pdf, false)
 
 	pdf.AddPage()
 
@@ -140,6 +140,10 @@ func gapHeaderV1(pdf *fpdf.Fpdf, policy *models.Policy, networkNode *models.Netw
 			pdf.CellFormat(pdf.GetStringWidth(" "), 3.5, " ", "", 1, fpdf.AlignLeft, false, 0, "")
 		}
 		pdf.Ln(6)
+
+		if isProposal {
+			insertWatermark(pdf, proposal)
+		}
 	})
 }
 
