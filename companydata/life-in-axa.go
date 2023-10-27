@@ -17,7 +17,7 @@ import (
 func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	const (
 		slide     int = -1
-		spaceChar     = "\ufffd"
+		spaceChar     = "\ufffd346"
 	)
 	var (
 		guarantees    []models.Guarante
@@ -231,8 +231,8 @@ func ParseAxaFloat(price string) float64 {
 	if len(price) > 3 {
 		log.Println("LifeIn ParseAxaFloat price:", price)
 
-		d := price[len(price)-2 :]
-		i := price[: len(price)-3]
+		d := price[len(price)-2:]
+		i := price[:len(price)-3]
 		f64string := i + "." + d
 		res, e := strconv.ParseFloat(f64string, 64)
 		log.Println("LifeIn ParseAxaFloat d:", res)
