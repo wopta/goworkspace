@@ -209,6 +209,7 @@ func calculateSumInsuredLimitOfIndemnityV2(data *models.Policy) {
 
 	guaranteesList := make([]models.Guarante, 0)
 	for _, guarantee := range guaranteesMap {
+		guarantee.Value.SumInsuredLimitOfIndemnity = lib.RoundFloat(guarantee.Value.SumInsuredLimitOfIndemnity, 0)
 		guaranteesList = append(guaranteesList, guarantee)
 	}
 
