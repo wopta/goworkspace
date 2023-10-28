@@ -17,7 +17,7 @@ import (
 func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	const (
 		slide     int = -1
-		spaceChar     = "\ufffd346"
+		spaceChar     = "\ufffd"
 	)
 	var (
 		guarantees    []models.Guarante
