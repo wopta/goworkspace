@@ -33,8 +33,8 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	for v, d := range group {
 		sumPriseGross = 0
-		for _, r := range d {
-
+		for i, r := range d {
+			log.Println("LifeIn  i: ", i)
 			log.Println("LifeIn  d: ", r)
 			result, _, slug, _ := LifeMapCodecCompanyAxaRevert(r[1])
 			var (
@@ -132,7 +132,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 					Gender:     d[0][36],
 					BirthDate:  d[0][37],
 					Mail:       d[0][71],
-					Phone:      strings.ReplaceAll(d[0][72], spaceChar, ""),
+					Phone:      d[0][72],
 					IdentityDocuments: []*models.IdentityDocument{{
 						Code:             d[0][77],
 						Type:             d[0][76],
