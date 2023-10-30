@@ -268,7 +268,11 @@ func overrideProductInfo(product *models.Product, networkNode *models.NetworkNod
 			product.PaymentProviders = paymentProviders
 		}
 
-		product.Steps = filterProductStepsByFlow(product.Steps, warrant.GetFlowName(product.Name))
+		if networkNode.Type == models.PartnershipNetworkNodeType {
+			product.Steps = filterProductStepsByFlow(product.Steps, channel)
+		} else {
+			product.Steps = filterProductStepsByFlow(product.Steps, warrant.GetFlowName(product.Name))
+		}
 	}
 }
 
