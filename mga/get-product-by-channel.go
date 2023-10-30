@@ -68,25 +68,9 @@ func GetProductByChannelFx(w http.ResponseWriter, r *http.Request) (string, inte
 		return "", nil, fmt.Errorf("no product active found")
 	}
 
-	product.Steps = filterProductSteps(product, warrant)
-
 	jsonOut, err := product.Marshal()
 
 	log.Println("[GetProductByChannelFx] handler end -------------")
 
 	return string(jsonOut), product, err
-}
-
-func filterProductSteps(product *models.Product, warrant *models.Warrant) []models.Step {
-	var steps []models.Step
-	rawSteps := lib.GetFilesByEnv(fmt.Sprintf("products-v2/%s/%s/builder_ui.json", product.Name, product.Version))
-	_ = json.Unmarshal(rawSteps, &steps)
-
-	outputSteps := make([]models.Step, 0)
-	for _, step := range steps {
-		if len(step.Flows) == 0 || lib.SliceContains(step.Flows, warrant.GetFlowName(product.Name)) {
-			outputSteps = append(outputSteps, step)
-		}
-	}
-	return outputSteps
 }

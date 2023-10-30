@@ -135,7 +135,7 @@ func GetDefaultProduct(productName, channel string) *models.Product {
 		return nil
 	}
 
-	err = replaceDatesInProduct(result, channel)
+	product.Steps = loadProductSteps(product)
 
 	log.Println("[GetDefaultProduct] function end ---------------------")
 
@@ -164,6 +164,12 @@ func GetLatestActiveProduct(productName, channel string, networkNode *models.Net
 	}
 
 	overrideProductInfo(product, networkNode, warrant)
+
+	err := replaceDatesInProduct(product, channel)
+	if err != nil {
+		log.Printf("[GetLatestActiveProduct] error replacing dates in product: %s", err.Error())
+		return nil
+	}
 
 	log.Println("[GetLatestActiveProduct] function end ---------------------")
 
@@ -260,7 +266,23 @@ func overrideProductInfo(product *models.Product, networkNode *models.NetworkNod
 			}
 			product.PaymentProviders = paymentProviders
 		}
+
+		outputSteps := make([]models.Step, 0)
+		for _, step := range product.Steps {
+			if len(step.Flows) == 0 || lib.SliceContains(step.Flows, warrant.GetFlowName(product.Name)) {
+				outputSteps = append(outputSteps, step)
+			}
+		}
+		product.Steps = outputSteps
 	}
+}
+
+func loadProductSteps(product *models.Product) []models.Step {
+	var steps []models.Step
+	rawSteps := lib.GetFilesByEnv(fmt.Sprintf("products-v2/%s/%s/builder_ui.json", product.Name, product.Version))
+	_ = json.Unmarshal(rawSteps, &steps)
+
+	return steps
 }
 
 // DEPRECATED
