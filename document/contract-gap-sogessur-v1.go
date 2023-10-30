@@ -46,7 +46,7 @@ func gapSogessurContractV1(pdf *fpdf.Fpdf, origin string, policy *models.Policy,
 
 	companiesDescriptionSection(pdf, policy.Company)
 
-	woptaGapHeader(pdf, *policy)
+	woptaGapHeader(pdf, *policy, false)
 
 	pdf.AddPage()
 
@@ -54,7 +54,7 @@ func gapSogessurContractV1(pdf *fpdf.Fpdf, origin string, policy *models.Policy,
 
 	printStatement(pdf, statements[len(statements)-1], policy.Company, false)
 
-	woptaHeader(pdf)
+	woptaHeader(pdf, false)
 
 	pdf.AddPage()
 
@@ -140,6 +140,10 @@ func gapHeaderV1(pdf *fpdf.Fpdf, policy *models.Policy, networkNode *models.Netw
 			pdf.CellFormat(pdf.GetStringWidth(" "), 3.5, " ", "", 1, fpdf.AlignLeft, false, 0, "")
 		}
 		pdf.Ln(6)
+
+		if isProposal {
+			insertWatermark(pdf, proposal)
+		}
 	})
 }
 
@@ -163,7 +167,7 @@ func gapFooterV1(pdf *fpdf.Fpdf, productName string) {
 	})
 }
 
-func woptaGapHeader(pdf *fpdf.Fpdf, policy models.Policy) {
+func woptaGapHeader(pdf *fpdf.Fpdf, policy models.Policy, isProposal bool) {
 	policyInfo := "Polizza Numero: " + policy.CodeCompany + "\n" +
 		"Targa Veicolo: " + policy.Assets[0].Vehicle.Plate
 
@@ -177,6 +181,10 @@ func woptaGapHeader(pdf *fpdf.Fpdf, policy models.Policy) {
 		pdf.SetXY(11, 20)
 		pdf.MultiCell(0, 3.5, policyInfo, "", "", false)
 		pdf.Ln(8)
+
+		if isProposal {
+			insertWatermark(pdf, proposal)
+		}
 	})
 
 }

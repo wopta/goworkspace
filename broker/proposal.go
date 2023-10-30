@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/wopta/goworkspace/question"
 	"io"
 	"log"
 	"net/http"
@@ -157,6 +158,20 @@ func setProposalData(policy *models.Policy) {
 				break
 			}
 		}
+	}
+
+	if policy.Statements == nil || len(*policy.Statements) == 0 {
+		var err error
+		policy.Statements = new([]models.Statement)
+
+		log.Println("[setProposalData] setting policy statements")
+
+		*policy.Statements, err = question.GetStatements(policy)
+		if err != nil {
+			log.Printf("[setProposalData] error setting policy statements: %s", err.Error())
+			return
+		}
+
 	}
 
 	plc.AddProposalDoc(origin, policy, networkNode, mgaProduct)

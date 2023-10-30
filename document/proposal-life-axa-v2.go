@@ -44,7 +44,7 @@ func lifeAxaProposalV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, net
 
 	companiesDescriptionSection(pdf, policy.Company)
 
-	axaHeader(pdf)
+	axaHeader(pdf, true)
 
 	pdf.AddPage()
 
@@ -64,7 +64,7 @@ func lifeAxaProposalV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, net
 
 	axaTablePart3Section(pdf)
 
-	woptaHeader(pdf)
+	woptaHeader(pdf, true)
 
 	pdf.AddPage()
 

@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/go-gota/gota/dataframe"
@@ -16,8 +15,8 @@ import (
 
 func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	const (
-		slide     int = -1
-		spaceChar     = "\ufffd"
+		slide       int = -1
+		headervalue     = "N° adesione individuale univoco"
 	)
 	var (
 		guarantees    []models.Guarante
@@ -30,151 +29,153 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	log.Println("LifeIn  col", df.Ncol())
 	//group := df.GroupBy("N\xb0 adesione individuale univoco")
 	group := GroupBy(df, 2)
-
 	for v, d := range group {
-		sumPriseGross = 0
-		for _, r := range d {
+		if v != headervalue {
+			sumPriseGross = 0
+			for i, r := range d {
+				log.Println("LifeIn  i: ", i)
+				log.Println("LifeIn  d: ", r)
+				result, _, slug, _ := LifeMapCodecCompanyAxaRevert(r[1])
+				var (
+					beneficiaries []models.Beneficiary
+					benef1        models.Beneficiary
+				)
 
-			log.Println("LifeIn  d: ", r)
-			result, _, slug, _ := LifeMapCodecCompanyAxaRevert(r[1])
-			var (
-				beneficiaries []models.Beneficiary
-				benef1        models.Beneficiary
-			)
+				benef1 = ParseAxaBeneficiary(r, 0)
+				benef2 := ParseAxaBeneficiary(r, 1)
+				benef3 := ParseAxaBeneficiary(r, 2)
+				if slug == "death" {
+					beneficiaries = append(beneficiaries, benef1)
+					beneficiaries = append(beneficiaries, benef2)
+					beneficiaries = append(beneficiaries, benef3)
+				}
+				dur, _ := strconv.Atoi(r[7])
+				priceGross := ParseAxaFloat(r[8])
+				sumPriseGross = priceGross + sumPriseGross
+				var guarante models.Guarante = models.Guarante{
+					Slug:                       slug,
+					CompanyCodec:               result,
+					SumInsuredLimitOfIndemnity: 0,
 
-			benef1 = ParseAxaBeneficiary(r, 0)
-			benef2 := ParseAxaBeneficiary(r, 1)
-			benef3 := ParseAxaBeneficiary(r, 2)
-			if slug == "death" {
-				beneficiaries = append(beneficiaries, benef1)
-				beneficiaries = append(beneficiaries, benef2)
-				beneficiaries = append(beneficiaries, benef3)
-			}
-			dur, _ := strconv.Atoi(r[7])
-			priceGross := ParseAxaFloat(r[8])
-			sumPriseGross = priceGross + sumPriseGross
-			var guarante models.Guarante = models.Guarante{
-				Slug:                       slug,
-				CompanyCodec:               result,
-				SumInsuredLimitOfIndemnity: 0,
-
-				Beneficiaries: &beneficiaries,
-				Value: &models.GuaranteValue{
-					SumInsuredLimitOfIndemnity: ParseAxaFloat(r[9]),
-					PremiumGrossYearly:         priceGross,
-					Duration: &models.Duration{
-						Year: dur / 12,
+					Beneficiaries: &beneficiaries,
+					Value: &models.GuaranteValue{
+						SumInsuredLimitOfIndemnity: ParseAxaFloat(r[9]),
+						PremiumGrossYearly:         priceGross,
+						Duration: &models.Duration{
+							Year: dur / 12,
+						},
 					},
-				},
+				}
+
+				guarantees = append(guarantees, guarante)
 			}
 
-			guarantees = append(guarantees, guarante)
-		}
+			log.Println("LifeIn  value", v)
 
-		log.Println("LifeIn  value", v)
+			log.Println("LifeIn  row", len(d))
+			log.Println("LifeIn  col", len(d[0]))
+			log.Println("LifeIn  d: ", d)
+			log.Println("LifeIn  elemets (0-0 ): ", d[0][0])
+			log.Println("LifeIn  elemets (0-1 ): ", d[0][1])
+			log.Println("LifeIn  elemets (0-2 ): ", d[0][2])
+			log.Println("LifeIn  elemets (0-3 ): ", d[0][3])
+			_, _, _, version := LifeMapCodecCompanyAxaRevert(d[0][1])
 
-		log.Println("LifeIn  row", len(d))
-		log.Println("LifeIn  col", len(d[0]))
-		log.Println("LifeIn  d: ", d)
-		log.Println("LifeIn  elemets (0-0 ): ", d[0][0])
-		log.Println("LifeIn  elemets (0-1 ): ", d[0][1])
-		log.Println("LifeIn  elemets (0-2 ): ", d[0][2])
-		log.Println("LifeIn  elemets (0-3 ): ", d[0][3])
-		_, _, _, version := LifeMapCodecCompanyAxaRevert(d[0][1])
-
-		policy := models.Policy{
-			Status:         "imported",
-			StatusHistory:  []string{"imported"},
-			Name:           "life",
-			CodeCompany:    d[0][2],
-			Company:        "axa",
-			ProductVersion: "v" + version,
-			IsPay:          true,
-			IsSign:         true,
-			Channel:        "Network-node",
-			PaymentSplit:   "",
-			StartDate:      ParseDateDDMMYYYY(d[0][4]),
-			EndDate:        ParseDateDDMMYYYY(d[0][5]),
-			Updated:        time.Now(),
-			PriceGross:     sumPriseGross,
-			PriceNett:      0,
-			Contractor: models.User{
-				Type:       d[0][22],
-				Name:       d[0][23],
-				Surname:    d[0][24],
-				FiscalCode: d[0][27],
-				Gender:     d[0][25],
-				BirthDate:  d[0][26],
-				Phone:      strings.ReplaceAll(d[0][33], spaceChar, ""),
-				IdentityDocuments: []*models.IdentityDocument{{
-					Code:             d[0][57],
-					Type:             d[0][56],
-					DateOfIssue:      ParseDateDDMMYYYY(d[0][58]),
-					IssuingAuthority: d[0][59],
-				}},
-				Residence: &models.Address{
-					StreetName: d[0][28],
-
-					City:       d[0][31],
-					CityCode:   d[0][31],
-					PostalCode: d[0][29],
-					Locality:   d[0][30],
-				},
-			},
-			Assets: []models.Asset{{
-				Name: "person",
-
-				Person: &models.User{
+			policy := models.Policy{
+				Status:         "imported",
+				StatusHistory:  []string{"imported"},
+				Name:           "life",
+				CodeCompany:    d[0][2],
+				Company:        "axa",
+				ProductVersion: "v" + version,
+				IsPay:          true,
+				IsSign:         true,
+				Channel:        "Network-node",
+				PaymentSplit:   "",
+				StartDate:      ParseDateDDMMYYYY(d[0][4]),
+				EndDate:        ParseDateDDMMYYYY(d[0][5]),
+				Updated:        time.Now(),
+				PriceGross:     sumPriseGross,
+				PriceNett:      0,
+				Contractor: models.User{
 					Type:       d[0][22],
-					Name:       d[0][35],
-					Surname:    d[0][34],
-					FiscalCode: d[0][38],
-					Gender:     d[0][36],
-					BirthDate:  d[0][37],
-					Mail:       d[0][71],
-					Phone:      strings.ReplaceAll(d[0][72], spaceChar, ""),
+					Name:       d[0][23],
+					Surname:    d[0][24],
+					FiscalCode: d[0][27],
+					Gender:     d[0][25],
+					BirthDate:  d[0][26],
+					Phone:      d[0][33],
 					IdentityDocuments: []*models.IdentityDocument{{
-						Code:             d[0][77],
-						Type:             d[0][76],
-						DateOfIssue:      ParseDateDDMMYYYY(d[0][78]),
-						IssuingAuthority: d[0][79],
+						Code:             d[0][57],
+						Type:             d[0][56],
+						DateOfIssue:      ParseDateDDMMYYYY(d[0][58]),
+						IssuingAuthority: d[0][59],
 					}},
-					BirthCity: d[0][37],
-
-					BirthProvince: d[0][37],
 					Residence: &models.Address{
-						StreetName: d[0][63],
-						City:       d[0][66],
-						CityCode:   d[0][66],
-						PostalCode: d[0][64],
-						Locality:   d[0][65],
-					},
-					Domicile: &models.Address{
-						StreetName: d[0][67],
-						City:       d[0][70],
-						CityCode:   d[0][70],
-						PostalCode: d[0][68],
-						Locality:   d[0][69],
+						StreetName: d[0][28],
+
+						City:       d[0][31],
+						CityCode:   d[0][31],
+						PostalCode: d[0][29],
+						Locality:   d[0][30],
 					},
 				},
-			},
-			},
+				Assets: []models.Asset{{
+					Name: "person",
+
+					Person: &models.User{
+						Type:       d[0][22],
+						Name:       d[0][35],
+						Surname:    d[0][34],
+						FiscalCode: d[0][38],
+						Gender:     d[0][36],
+						BirthDate:  d[0][37],
+						Mail:       d[0][71],
+						Phone:      d[0][72],
+						IdentityDocuments: []*models.IdentityDocument{{
+							Code:             d[0][77],
+							Type:             d[0][76],
+							DateOfIssue:      ParseDateDDMMYYYY(d[0][78]),
+							IssuingAuthority: d[0][79],
+						}},
+						BirthCity: d[0][37],
+
+						BirthProvince: d[0][37],
+						Residence: &models.Address{
+							StreetName: d[0][63],
+							City:       d[0][66],
+							CityCode:   d[0][66],
+							PostalCode: d[0][64],
+							Locality:   d[0][65],
+						},
+						Domicile: &models.Address{
+							StreetName: d[0][67],
+							City:       d[0][70],
+							CityCode:   d[0][70],
+							PostalCode: d[0][68],
+							Locality:   d[0][69],
+						},
+					},
+				},
+				},
+			}
+
+			policy.Assets[0].Guarantees = guarantees
+			policy.PriceGross = sumPriseGross
+
+			//log.Println("LifeIn policy:", policy)
+			b, e := json.Marshal(policy)
+			log.Println("LifeIn policy:", e)
+			log.Println("LifeIn policy:", string(b))
+			docref, _, _ := lib.PutFirestoreErr("test-policy", policy)
+			log.Println("LifeIn doc id: ", docref.ID)
+			//user,e:=models.UpdateUserByFiscalCode("", policy.Contractor)
+			//	log.Println("LifeIn policy:", policy)
+			//tr := transaction.PutByPolicy(policy, "", "", "", "", sumPriseGross, 0, "", "BO", true)
+			//	log.Println("LifeIn transactionpolicy:",tr)
+			//accounting.CreateNetworkTransaction(tr, "uat")
+
 		}
-
-		policy.Assets[0].Guarantees = guarantees
-		policy.PriceGross = sumPriseGross
-
-		//log.Println("LifeIn policy:", policy)
-		b, e := json.Marshal(policy)
-		log.Println("LifeIn policy:", e)
-		log.Println("LifeIn policy:", string(b))
-		docref, _, _ := lib.PutFirestoreErr("test-policy", policy)
-		log.Println("LifeIn doc id: ", docref.ID)
-		//user,e:=models.UpdateUserByFiscalCode("", policy.Contractor)
-		//	log.Println("LifeIn policy:", policy)
-		//tr := transaction.PutByPolicy(policy, "", "", "", "", sumPriseGross, 0, "", "BO", true)
-		//	log.Println("LifeIn transactionpolicy:",tr)
-		//accounting.CreateNetworkTransaction(tr, "uat")
 
 	}
 
@@ -231,8 +232,8 @@ func ParseAxaFloat(price string) float64 {
 	if len(price) > 3 {
 		log.Println("LifeIn ParseAxaFloat price:", price)
 
-		d := price[len(price)-2 :]
-		i := price[: len(price)-3]
+		d := price[len(price)-2:]
+		i := price[:len(price)-3]
 		f64string := i + "." + d
 		res, e := strconv.ParseFloat(f64string, 64)
 		log.Println("LifeIn ParseAxaFloat d:", res)
