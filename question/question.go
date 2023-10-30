@@ -93,7 +93,7 @@ func loadExternalData(productName, productVersion string) []byte {
 
 	switch productName {
 	case models.PersonaProduct:
-		data = lib.GetFilesByEnv(fmt.Sprintf("products-v2/%s/%s/statements_coherence_data.json", productName, productVersion))
+		data = lib.GetFilesByEnv(fmt.Sprintf("%s%s/%s/statements_coherence_data.json", models.ProductsFolder, productName, productVersion))
 	}
 
 	log.Printf("[loadExternalData] response: %s", string(data))

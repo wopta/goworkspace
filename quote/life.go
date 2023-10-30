@@ -80,7 +80,7 @@ func Life(data models.Policy, channel string, networkNode *models.NetworkNode, w
 
 	log.Printf("[Life] contractor age: %d", contractorAge)
 
-	b := lib.GetFilesByEnv(fmt.Sprintf("products-v2/%s/%s/taxes.csv", data.Name, data.ProductVersion))
+	b := lib.GetFilesByEnv(fmt.Sprintf("%s%s/%s/taxes.csv", models.ProductsFolder, data.Name, data.ProductVersion))
 	df := lib.CsvToDataframe(b)
 	var selectRow []string
 

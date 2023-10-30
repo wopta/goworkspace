@@ -15,10 +15,6 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
-const (
-	basePath = "products-v2"
-)
-
 // DEPRECATED
 func GetProduct(name, version, channel string) (*models.Product, error) {
 	var (
@@ -54,7 +50,7 @@ func GetProductV2(productName, productVersion, channel string, networkNode *mode
 
 	log.Println("[GetProductV2] function start -----------------")
 
-	filePath := fmt.Sprintf("%s/%s/%s/%s.json", basePath, productName, productVersion, channel)
+	filePath := fmt.Sprintf("%s%s/%s/%s.json", models.ProductsFolder, productName, productVersion, channel)
 
 	log.Printf("[GetProductV2] filePath: %s", filePath)
 
@@ -91,7 +87,7 @@ func GetDefaultProduct(productName, channel string) *models.Product {
 
 	log.Println("[GetDefaultProduct] function start --------------")
 
-	filesList, err := lib.ListGoogleStorageFolderContent(fmt.Sprintf("%s/%s/", basePath, productName))
+	filesList, err := lib.ListGoogleStorageFolderContent(fmt.Sprintf("%s%s/", models.ProductsFolder, productName))
 	if err != nil {
 		log.Printf("[GetProduct] error: %s", err.Error())
 		return nil
@@ -179,7 +175,8 @@ func GetLatestActiveProduct(productName, channel string, networkNode *models.Net
 func GetAgeInfo(productName, productVersion, channel string) (int, int) {
 	var ageMap map[string]map[string]int
 
-	rawMap := lib.GetFilesByEnv(fmt.Sprintf("products-v2/%s/%s/age_info.json", productName, productVersion))
+	rawMap := lib.GetFilesByEnv(fmt.Sprintf("%s%s/%s/age_info.json", models.ProductsFolder, productName,
+		productVersion))
 	err := json.Unmarshal(rawMap, &ageMap)
 	if err != nil {
 		return 0, 0
@@ -195,7 +192,7 @@ func replaceDatesInProduct(product *models.Product, channel string) error {
 		return fmt.Errorf("no product found")
 	}
 
-	filePath := fmt.Sprintf("products-v2/%s/%s/age_info.json", product.Name, product.Version)
+	filePath := fmt.Sprintf("%s%s/%s/age_info.json", models.ProductsFolder, product.Name, product.Version)
 	if !lib.CheckFileExistence(filePath) {
 		log.Printf("[replaceDatesInProduct] file not found: %s", filePath)
 		return nil
@@ -279,7 +276,8 @@ func overrideProductInfo(product *models.Product, networkNode *models.NetworkNod
 
 func loadProductSteps(product *models.Product) []models.Step {
 	var steps []models.Step
-	rawSteps := lib.GetFilesByEnv(fmt.Sprintf("products-v2/%s/%s/builder_ui.json", product.Name, product.Version))
+	rawSteps := lib.GetFilesByEnv(fmt.Sprintf("%s%s/%s/builder_ui.json", models.ProductsFolder, product.Name,
+		product.Version))
 	_ = json.Unmarshal(rawSteps, &steps)
 
 	return steps

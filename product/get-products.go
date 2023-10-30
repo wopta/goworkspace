@@ -10,10 +10,6 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
-const (
-	productFolderPath = "products-v2"
-)
-
 func GetProductsByChannel(channel string) []models.ProductInfo {
 	log.Println("[GetProductsByChannel] function start -----------------------")
 
@@ -135,7 +131,7 @@ func getProductsFileList() []string {
 		fileList = make([]string, 0)
 	)
 
-	fileList, err = lib.ListGoogleStorageFolderContent(productFolderPath)
+	fileList, err = lib.ListGoogleStorageFolderContent(models.ProductsFolder)
 	if err != nil {
 		log.Printf("[GetNetworkNodeProducts] error getting file list: %s", err.Error())
 	}

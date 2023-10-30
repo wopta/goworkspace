@@ -172,6 +172,7 @@ const (
 	RvmSurveyDocumentFormat       = "%s_Proposta_%d_RVM_Questionario.pdf"
 	WarrantFormat                 = "warrants/%s.json"
 	WarrantsFolder                = "warrants/"
+	ProductsFolder                = "products-v2/"
 )
 
 const (
