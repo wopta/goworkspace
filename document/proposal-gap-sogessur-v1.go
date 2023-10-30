@@ -37,7 +37,7 @@ func gapSogessurProposalV1(pdf *fpdf.Fpdf, origin string, policy *models.Policy,
 
 	companiesDescriptionSection(pdf, policy.Company)
 
-	woptaGapHeader(pdf, *policy)
+	woptaGapHeader(pdf, *policy, true)
 
 	pdf.AddPage()
 
