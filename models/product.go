@@ -83,6 +83,7 @@ type Step struct {
 	Widget     string      `firestore:"widget,omitempty" json:"widget"`
 	Attributes interface{} `firestore:"attributes,omitempty" json:"attributes"`
 	Children   []Child     `firestore:"children,omitempty" json:"children,omitempty"`
+	Flows      []string    `json:"flows" firestore:"flows,omitempty"`
 }
 
 type Child struct {
