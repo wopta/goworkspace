@@ -76,7 +76,7 @@ func GetProductV2(productName, productVersion, channel string, networkNode *mode
 		return nil
 	}
 
-	overrideProductInfo(product, networkNode, warrant)
+	overrideProductInfo(product, networkNode, warrant, channel)
 
 	return product
 }
@@ -163,7 +163,7 @@ func GetLatestActiveProduct(productName, channel string, networkNode *models.Net
 		return nil
 	}
 
-	overrideProductInfo(product, networkNode, warrant)
+	overrideProductInfo(product, networkNode, warrant, channel)
 
 	err := replaceDatesInProduct(product, channel)
 	if err != nil {
@@ -241,8 +241,9 @@ func replaceDatesInProduct(product *models.Product, channel string) error {
 	return err
 }
 
-func overrideProductInfo(product *models.Product, networkNode *models.NetworkNode, warrant *models.Warrant) {
+func overrideProductInfo(product *models.Product, networkNode *models.NetworkNode, warrant *models.Warrant, channel string) {
 	if networkNode == nil {
+		product.Steps = filterProductStepsByFlow(product.Steps, channel)
 		return
 	}
 
@@ -267,14 +268,18 @@ func overrideProductInfo(product *models.Product, networkNode *models.NetworkNod
 			product.PaymentProviders = paymentProviders
 		}
 
-		outputSteps := make([]models.Step, 0)
-		for _, step := range product.Steps {
-			if len(step.Flows) == 0 || lib.SliceContains(step.Flows, warrant.GetFlowName(product.Name)) {
-				outputSteps = append(outputSteps, step)
-			}
-		}
-		product.Steps = outputSteps
+		product.Steps = filterProductStepsByFlow(product.Steps, warrant.GetFlowName(product.Name))
 	}
+}
+
+func filterProductStepsByFlow(steps []models.Step, flowName string) []models.Step {
+	outputSteps := make([]models.Step, 0)
+	for _, step := range steps {
+		if len(step.Flows) == 0 || lib.SliceContains(step.Flows, flowName) {
+			outputSteps = append(outputSteps, step)
+		}
+	}
+	return outputSteps
 }
 
 func loadProductSteps(product *models.Product) []models.Step {
