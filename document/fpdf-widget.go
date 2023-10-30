@@ -150,13 +150,17 @@ func mainFooter(pdf *fpdf.Fpdf, productName string) {
 	})
 }
 
-func axaHeader(pdf *fpdf.Fpdf) {
+func axaHeader(pdf *fpdf.Fpdf, isProposal bool) {
 	pdf.SetHeaderFunc(func() {
 		var opt fpdf.ImageOptions
 		pdf.SetXY(-30, 7)
 		opt.ImageType = "png"
 		pdf.ImageOptions(lib.GetAssetPathByEnvV2()+"logo_axa.png", 190, 7, 0, 8, false, opt, 0, "")
 		pdf.Ln(15)
+
+		if isProposal {
+			insertWatermark(pdf, proposal)
+		}
 	})
 }
 
@@ -202,13 +206,17 @@ func sogessurFooter(pdf *fpdf.Fpdf) {
 	})
 }
 
-func woptaHeader(pdf *fpdf.Fpdf) {
+func woptaHeader(pdf *fpdf.Fpdf, isProposal bool) {
 	pdf.SetHeaderFunc(func() {
 		var opt fpdf.ImageOptions
 		opt.ImageType = "png"
 		pdf.ImageOptions(lib.GetAssetPathByEnvV2()+"logo_wopta.png", 10, 6, 0, 10,
 			false, opt, 0, "")
 		pdf.Ln(10)
+
+		if isProposal {
+			insertWatermark(pdf, proposal)
+		}
 	})
 }
 

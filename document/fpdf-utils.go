@@ -25,6 +25,7 @@ const (
 	titleTextSize    = 10
 	tabDimension     = 15
 	dateLayout       = "02/01/2006"
+	proposal         = "PROPOSTA"
 )
 
 func initFpdf() *fpdf.Fpdf {
@@ -95,6 +96,23 @@ func saveReservedDocument(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte
 		return filename, out.Bytes()
 	}
 	return filename, nil
+}
+
+func insertWatermark(pdf *fpdf.Fpdf, text string) {
+	currentY := pdf.GetY()
+	markFontHt := 115.0
+	markLineHt := pdf.PointToUnitConvert(markFontHt)
+	markY := (297.0 - markLineHt) / 2.0
+	ctrX := 210.0 / 2.0
+	ctrY := 297.0 / 2.0
+	pdf.SetFont("Arial", "B", markFontHt)
+	pdf.SetTextColor(206, 216, 232)
+	pdf.SetXY(10, markY)
+	pdf.TransformBegin()
+	pdf.TransformRotate(-45, ctrX, ctrY)
+	pdf.CellFormat(0, markLineHt, text, "", 0, "C", false, 0, "")
+	pdf.TransformEnd()
+	pdf.SetXY(10, currentY)
 }
 
 func pageNumber(pdf *fpdf.Fpdf) {
