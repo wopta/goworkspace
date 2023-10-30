@@ -69,6 +69,6 @@ func GetRulesFile(rulesFileName string) []byte {
 }
 
 func GetRulesFileV2(productName, productVersion, rulesFileName string) []byte {
-	filePath := fmt.Sprintf("products-v2/%s/%s/%s_rules.json", productName, productVersion, rulesFileName)
+	filePath := fmt.Sprintf("products/%s/%s/%s_rules.json", productName, productVersion, rulesFileName)
 	return GetFilesByEnv(filePath)
 }
