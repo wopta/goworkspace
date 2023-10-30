@@ -14,6 +14,7 @@ import (
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 	plc "github.com/wopta/goworkspace/policy"
+	"github.com/wopta/goworkspace/reserved"
 )
 
 type RequestApprovalReq struct {
@@ -129,11 +130,19 @@ func setRequestApprovalData(policy *models.Policy) {
 	policy.PaymentSplit = paymentSplit
 	if policy.Status == models.PolicyStatusInitLead {
 		plc.AddProposalDoc(origin, policy, networkNode, mgaProduct)
+
+		for _, reason := range policy.ReservedInfo.Reasons {
+			// TODO: add key/id for reasons so we do not have to check string equallity
+			if !strings.HasPrefix(reason, "Cliente già assicurato") {
+				reserved.SetReservedInfo(policy, mgaProduct)
+				break
+			}
+		}
 	}
 
 	policy.Status = models.PolicyStatusWaitForApproval
 	for _, reason := range policy.ReservedInfo.Reasons {
-		// TODO: add key/id for reasons so we do not have to cjeck string equallity
+		// TODO: add key/id for reasons so we do not have to check string equallity
 		if strings.HasPrefix(reason, "Cliente già assicurato") {
 			policy.Status = models.PolicyStatusWaitForApprovalMga
 			break
