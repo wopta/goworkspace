@@ -5,8 +5,8 @@ go 1.19
 replace github.com/wopta/goworkspace/network => ./
 
 require (
-	github.com/wopta/goworkspace/lib v1.0.83
-	github.com/wopta/goworkspace/models v1.1.59
+	github.com/wopta/goworkspace/lib v1.0.84
+	github.com/wopta/goworkspace/models v1.1.60
 )
 
 require (
