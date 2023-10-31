@@ -34,12 +34,14 @@ type NetworkNode struct {
 	Broker          *AgencyNode           `json:"broker,omitempty" firestore:"broker,omitempty" bigquery:"broker"`
 	AreaManager     *AgentNode            `json:"areaManager,omitempty" firestore:"areaManager,omitempty" bigquery:"areaManager"`
 	Partnership     *PartnershipNode      `json:"partnership,omitempty" firestore:"partnership,omitempty" bigquery:"partnership"`
-	NodeSetting     *NodeSetting          `json:"nodeSetting,omitempty" firestore:"nodeSetting,omitempty" bigquery:"-"`
+	NodeSetting     *NodeSetting          `json:"nodeSetting,omitempty" firestore:"nodeSetting,omitempty" bigquery:"-"` // Not implemented
 	CreationDate    time.Time             `json:"creationDate" firestore:"creationDate" bigquery:"-"`
 	BigCreationDate bigquery.NullDateTime `json:"-" firestore:"-" bigquery:"creationDate"`
 	UpdatedDate     time.Time             `json:"updatedDate" firestore:"updatedDate" bigquery:"-"`
 	BigUpdatedDate  bigquery.NullDateTime `json:"-" firestore:"-" bigquery:"updatedDate"`
 	Data            string                `json:"-" firestore:"-" bigquery:"data"`
+	HasAnnex        bool                  `json:"hasAnnex" firestore:"hasAnnex" bigquery:"hasAnnex"`
+	Designation     string                `json:"designation" firestore:"designation" bigquery:"designation"`
 }
 
 type PartnershipNode struct {
@@ -187,7 +189,7 @@ func (nn *NetworkNode) GetName() string {
 
 func (nn *NetworkNode) GetWarrant() *Warrant {
 	var (
-		warrant       *Warrant
+		warrant *Warrant
 	)
 
 	if nn.Warrant == "" {
