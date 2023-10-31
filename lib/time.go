@@ -75,3 +75,7 @@ func ParseDateDDMMYYYY(date string) time.Time {
 	return res
 
 }
+
+func SetDateToStartOfDay(date time.Time) time.Time {
+	return date.Truncate(24 * time.Hour)
+}

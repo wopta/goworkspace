@@ -71,7 +71,7 @@ func Persona(policy *models.Policy, channel string, networkNode *models.NetworkN
 		return err
 	}
 
-	policy.StartDate = time.Now().UTC()
+	policy.StartDate = lib.SetDateToStartOfDay(time.Now().UTC())
 	policy.EndDate = policy.StartDate.AddDate(1, 0, 0)
 
 	log.Println("[Persona] populating policy guarantees list")
