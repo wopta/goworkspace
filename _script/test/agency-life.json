@@ -1,0 +1,38 @@
+{
+    "code": "W0004",
+    "type": "agency",
+    "networkCode": "WN0003",
+    "role": "agency",
+    "mail": "diogo.carvalho+agency@wopta.it",
+    "parentUid": "TxBeDhxG7GANmf22k4Gr",
+    "agency": {
+        "name": "Unipol",
+        "vatCode": "123456789213",
+        "phone": "+393421526354",
+        "ruiCode": "9548437",
+        "ruiSection": "B",
+        "ruiRegistration": "2013-10-03T14:48:37.597277Z"
+    },
+    "products": [
+        {
+            "companies": [
+                {
+                    "name": "axa",
+                    "commissionsSetting": {
+                        "commissions": {
+                            "newBusiness": 0.23,
+                            "newBusinessPassive": 0.23,
+                            "renew": 0,
+                            "renewPassive": 0
+                        },
+                        "isByGuarantee": false,
+                        "isByOffer": false,
+                        "isFlat": true
+                    }
+                }
+            ],
+            "version": "v1",
+            "name": "life"
+        }
+    ]
+}

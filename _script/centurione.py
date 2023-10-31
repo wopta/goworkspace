@@ -32,7 +32,7 @@ go_modules = [
     "policy",
     "bpmn",]
 changed_modules = [
-    "policy", "broker", "payment"
+    "document", "policy", "payment", "reserved"
 ]
 updateable_modules = [
     "broker",
@@ -57,7 +57,7 @@ updateable_modules = [
 
 increment_version_key = "patch"
 environment = 'dev'  # Replace with your desired environment
-dry_run = True
+dry_run = False
 google_repository = "google"
 github_repository = "origin"
 

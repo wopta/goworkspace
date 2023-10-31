@@ -1,0 +1,38 @@
+{
+    "code": "W0005",
+    "type": "agent",
+    "networkCode": "WN0003",
+    "role": "agent",
+    "mail": "diogo.carvalho+agent@wopta.it",
+    "parentUid": "s9dAAutuPKLCAmmosgDC",
+    "agent": {
+        "name": "Diogo",
+        "surname": "Carvalho",
+        "phone": "+393421526354",
+        "ruiCode": "43875643",
+        "ruiSection": "E",
+        "ruiRegistration": "2018-10-03T14:48:37.597277Z"
+    },
+    "products": [
+        {
+            "companies": [
+                {
+                    "name": "axa",
+                    "commissionsSetting": {
+                        "commissions": {
+                            "newBusiness": 0,
+                            "newBusinessPassive": 0,
+                            "renew": 0,
+                            "renewPassive": 0
+                        },
+                        "isByGuarantee": false,
+                        "isByOffer": false,
+                        "isFlat": true
+                    }
+                }
+            ],
+            "version": "v1",
+            "name": "life"
+        }
+    ]
+}

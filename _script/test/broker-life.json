@@ -1,0 +1,37 @@
+{
+    "code": "W0003",
+    "type": "broker",
+    "networkCode": "WN0003",
+    "role": "broker",
+    "mail": "diogo.carvalho+broker@wopta.it",
+    "agency": {
+        "name": "AUA",
+        "vatCode": "458734",
+        "phone": "+393421526354",
+        "ruiCode": "9548437",
+        "ruiSection": "A",
+        "ruiRegistration": "2013-10-03T14:48:37.597277Z"
+    },
+    "products": [
+        {
+            "companies": [
+                {
+                    "name": "axa",
+                    "commissionsSetting": {
+                        "commissions": {
+                            "newBusiness": 0,
+                            "newBusinessPassive": 0.03,
+                            "renew": 0,
+                            "renewPassive": 0
+                        },
+                        "isByGuarantee": false,
+                        "isByOffer": false,
+                        "isFlat": true
+                    }
+                }
+            ],
+            "version": "v1",
+            "name": "life"
+        }
+    ]
+}
