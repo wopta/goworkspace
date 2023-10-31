@@ -9,6 +9,7 @@ import (
 	"log"
 	"mime/multipart"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"os"
@@ -26,10 +27,12 @@ func SignNamirialV6(w http.ResponseWriter, r *http.Request) (string, interface{}
 	lib.CheckError(err)
 	//file, _ := os.Open("document/billing.pdf")
 
-	return NamirialOtpV6(data, r.Header.Get("origin"))
+	sendEmail := true // CHECK
+
+	return NamirialOtpV6(data, r.Header.Get("origin"), sendEmail)
 }
 
-func NamirialOtpV6(data models.Policy, origin string) (string, NamirialOtpResponse, error) {
+func NamirialOtpV6(data models.Policy, origin string, sendEmail bool) (string, NamirialOtpResponse, error) {
 	var file []byte
 
 	if os.Getenv("env") == "local" {
@@ -43,7 +46,7 @@ func NamirialOtpV6(data models.Policy, origin string) (string, NamirialOtpRespon
 	//prepareEnvelop(SspFileId)
 	unassigned := <-prepareEnvelopV6(SspFileId)
 
-	id := <-sendEnvelopV6(SspFileId, data, unassigned, origin)
+	id := <-sendEnvelopV6(SspFileId, data, unassigned, origin, sendEmail)
 
 	log.Println(data.Uid+" sendEnvelop:", id)
 	url := <-GetEnvelopV6(id)
@@ -106,14 +109,14 @@ func prepareEnvelopV6(id string) <-chan string {
 	return r
 }
 
-func sendEnvelopV6(id string, data models.Policy, unassigned string, origin string) <-chan string {
+func sendEnvelopV6(id string, data models.Policy, unassigned string, origin string, sendEmail bool) <-chan string {
 	r := make(chan string)
 
 	go func() {
 		defer close(r)
 		log.Println("Send")
 		var urlstring = os.Getenv("ESIGN_BASEURL") + "/v6/envelope/send"
-		req, _ := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(getSendV6(id, data, unassigned, origin)))
+		req, _ := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(getSendV6(id, data, unassigned, origin, sendEmail)))
 		req.Header.Set("apiToken", os.Getenv("ESIGN_TOKEN_API"))
 		req.Header.Set("Content-Type", "application/json")
 
@@ -276,7 +279,7 @@ func getPrepareV6(id string) string {
 	  }`
 }
 
-func getSendV6(id string, data models.Policy, prepare string, origin string) string {
+func getSendV6(id string, data models.Policy, prepare string, origin string, sendEmail bool) string {
 	var preparePointer PrepareResponse
 	json.Unmarshal([]byte(prepare), &preparePointer)
 	unassignedElements := preparePointer.UnassignedElements
@@ -289,7 +292,7 @@ func getSendV6(id string, data models.Policy, prepare string, origin string) str
 	unassignedJson, e := json.Marshal(unassignedElements)
 	elementsJson, e := json.Marshal(elements)
 	lib.CheckError(e)
-	calbackurl := `"https://europe-west1-` + os.Getenv("GOOGLE_PROJECT_ID") + `.cloudfunctions.net/callback/v1/sign?envelope=##EnvelopeId##&action=##Action##&uid=` + data.Uid + `&token=` + os.Getenv("WOPTA_TOKEN_API") + `&origin=` + origin + `"`
+	calbackurl := `"https://europe-west1-` + os.Getenv("GOOGLE_PROJECT_ID") + `.cloudfunctions.net/callback/v1/sign?envelope=##EnvelopeId##&action=##Action##&uid=` + data.Uid + `&token=` + os.Getenv("WOPTA_TOKEN_API") + `&origin=` + origin + `&sendEmail=` + strconv.FormatBool(sendEmail) + `"`
 	var testPin string
 	if os.Getenv("env") == "local" || os.Getenv("env") == "dev" {
 		testPin = `

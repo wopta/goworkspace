@@ -286,7 +286,7 @@ func emitSign(policy *models.Policy, origin string) {
 
 	p := <-document.ContractObj(origin, *policy, networkNode, mgaProduct)
 	policy.DocumentName = p.LinkGcs
-	_, signResponse, _ := document.NamirialOtpV6(*policy, origin)
+	_, signResponse, _ := document.NamirialOtpV6(*policy, origin, sendEmail)
 	policy.ContractFileId = signResponse.FileId
 	policy.IdSign = signResponse.EnvelopeId
 	policy.SignUrl = signResponse.Url
