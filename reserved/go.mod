@@ -5,10 +5,10 @@ go 1.19
 replace github.com/wopta/goworkspace/reserved => ./
 
 require (
-	github.com/wopta/goworkspace/document v1.1.21
-	github.com/wopta/goworkspace/lib v1.0.87
-	github.com/wopta/goworkspace/models v1.1.63
-	github.com/wopta/goworkspace/product v1.0.62
+	github.com/wopta/goworkspace/document v1.1.22
+	github.com/wopta/goworkspace/lib v1.0.88
+	github.com/wopta/goworkspace/models v1.1.64
+	github.com/wopta/goworkspace/product v1.0.63
 )
 
 require (
