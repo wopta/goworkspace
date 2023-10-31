@@ -27,18 +27,19 @@ const (
 )
 
 type EmitResponse struct {
-	UrlPay       string               `firestore:"urlPay,omitempty" json:"urlPay,omitempty"`
-	UrlSign      string               `firestore:"urlSign,omitempty" json:"urlSign,omitempty"`
-	Uid          string               `firestore:"uid,omitempty" json:"uid,omitempty"`
-	ReservedInfo *models.ReservedInfo `json:"reservedInfo,omitempty" firestore:"reservedInfo,omitempty"`
+	UrlPay       string               `json:"urlPay,omitempty"`
+	UrlSign      string               `json:"urlSign,omitempty"`
+	Uid          string               `json:"uid,omitempty"`
+	ReservedInfo *models.ReservedInfo `json:"reservedInfo,omitempty"`
 }
 
 type EmitRequest struct {
-	Uid          string              `firestore:"uid,omitempty" json:"uid,omitempty"`
-	Payment      string              `firestore:"payment,omitempty" json:"payment,omitempty"`
-	PaymentType  string              `firestore:"paymentType,omitempty" json:"paymentType,omitempty"`
-	PaymentSplit string              `firestore:"paymentSplit,omitempty" json:"paymentSplit,omitempty"`
-	Statements   *[]models.Statement `firestore:"statements,omitempty" json:"statements,omitempty"`
+	Uid          string              `json:"uid,omitempty"`
+	Payment      string              `json:"payment,omitempty"`
+	PaymentType  string              `json:"paymentType,omitempty"`
+	PaymentSplit string              `json:"paymentSplit,omitempty"`
+	Statements   *[]models.Statement `json:"statements,omitempty"`
+	SendEmail    *bool               `json:"sendEmail"`
 }
 
 func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -86,6 +87,12 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	policyJsonLog, _ := policy.Marshal()
 	log.Printf("[EmitFx] Policy %s JSON: %s", uid, string(policyJsonLog))
+
+	if request.SendEmail == nil {
+		sendEmail = true
+	} else {
+		sendEmail = *request.SendEmail
+	}
 
 	emitUpdatePolicy(&policy, request)
 
