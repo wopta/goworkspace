@@ -70,17 +70,7 @@ func lifeAxaProposalV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, net
 
 	woptaFooter(pdf)
 
-	producerInfo := loadProducerInfo(origin, networkNode)
-
-	allegato3Section(pdf, producerInfo)
-
-	pdf.AddPage()
-
-	allegato4Section(pdf, producerInfo)
-
-	pdf.AddPage()
-
-	allegato4TerSection(pdf, producerInfo)
+	generatePolicyAnnex(pdf, origin, networkNode)
 
 	pdf.AddPage()
 
