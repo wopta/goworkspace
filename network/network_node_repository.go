@@ -32,6 +32,7 @@ func initNode(node *models.NetworkNode) {
 	now := time.Now().UTC()
 	node.CreationDate, node.UpdatedDate = now, now
 	node.NetworkUid = node.NetworkCode
+	node.Role = node.Type
 	node.IsActive = true
 }
 

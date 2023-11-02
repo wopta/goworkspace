@@ -11,8 +11,8 @@ require (
 	github.com/go-gota/gota v0.12.0
 	github.com/wopta/goworkspace/lib v1.0.89
 	github.com/wopta/goworkspace/models v1.1.65
-	github.com/wopta/goworkspace/network v1.0.16
-	github.com/wopta/goworkspace/sellable v1.0.41
+	github.com/wopta/goworkspace/network v1.0.17
+	github.com/wopta/goworkspace/sellable v1.0.42
 	modernc.org/mathutil v1.5.0
 )
 

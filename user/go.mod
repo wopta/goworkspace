@@ -8,7 +8,7 @@ require (
 	firebase.google.com/go/v4 v4.10.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.3
 	github.com/wopta/goworkspace/lib v1.0.89
-	github.com/wopta/goworkspace/mail v1.0.61
+	github.com/wopta/goworkspace/mail v1.0.62
 	github.com/wopta/goworkspace/models v1.1.65
 	github.com/wopta/goworkspace/wiseproxy v1.0.3
 	golang.org/x/exp v0.0.0-20230801115018-d63ba01acd4b
