@@ -238,7 +238,7 @@ func sendMailSign(state *bpmn.State) error {
 	policy := state.Data
 
 	// TODO smelly control flow
-	if policy.Channel == models.NetworkChannel && networkNode.Type == models.AgentNetworkNodeType {
+	if policy.Channel != models.ECommerceChannel && flowName != models.RemittanceMgaFlow {
 		sendMailInformationSet(state)
 	}
 
