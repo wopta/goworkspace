@@ -123,7 +123,7 @@ func CheckData(r *http.Request) (BankAccountMovement, error) {
 	if obj.Surname == "" {
 		return obj, GetErrorJson(400, "Bad request", "field name miss")
 	}
-	if obj.MovementType != "insert" && obj.MovementType != "delete" {
+	if obj.MovementType != "insert" && obj.MovementType != "delete" && obj.MovementType != "suspended" {
 		return obj, GetErrorJson(400, "Bad request", "field MovementType out of enum")
 	}
 	if obj.MovementType == "insert" {
@@ -178,7 +178,7 @@ func SetData(obj BankAccountMovement) BankAccountMovement {
 
 	}
 	if obj.MovementType == "suspended" {
-		obj.Status = "delete"
+		obj.Status = "suspended"
 
 	}
 
@@ -224,14 +224,14 @@ func Count(date string, fiscalCode string, guaranteesCode string) {
 	var (
 		countResponseModel CountResponseModel
 	)
-	refday:=time.Now().AddDate(0,0,-1)
-	refdayString:=refday.Format("2006-01-02")
+	refday := time.Now().AddDate(0, 0, -1)
+	refdayString := refday.Format("2006-01-02")
 	queryWopta, _ := QueryRowsBigQuery[BankAccountMovement]("wopta",
 		"inclusive_axa_bank_account",
-		"select * from `wopta."+dataMovement+"` where fiscalCode='"+fiscalCode+"' and guaranteesCode ='"+guaranteesCode+"and _PARTITIONTIME ='" + refdayString+ "'")
+		"select * from `wopta."+dataMovement+"` where fiscalCode='"+fiscalCode+"' and guaranteesCode ='"+guaranteesCode+"and _PARTITIONTIME ='"+refdayString+"'")
 	log.Println(len(queryWopta))
-	
-	requestUrl := os.Getenv("HYPE_PLATHFORM_PATH") + "/profile/insurance/v1/wopta/next/amount/"+refdayString+"/"+refdayString
+
+	requestUrl := os.Getenv("HYPE_PLATHFORM_PATH") + "/profile/insurance/v1/wopta/next/amount/" + refdayString + "/" + refdayString
 
 	req, err := http.NewRequest(http.MethodGet, requestUrl, nil)
 	if err != nil {

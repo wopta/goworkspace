@@ -9,8 +9,10 @@ import (
 	"time"
 
 	"github.com/go-gota/gota/dataframe"
+	"github.com/wopta/goworkspace/accounting"
 	lib "github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/transaction"
 )
 
 func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -56,7 +58,6 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 					Slug:                       slug,
 					CompanyCodec:               result,
 					SumInsuredLimitOfIndemnity: 0,
-
 					Beneficiaries: &beneficiaries,
 					Value: &models.GuaranteValue{
 						SumInsuredLimitOfIndemnity: ParseAxaFloat(r[9]),
@@ -71,7 +72,6 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			}
 
 			log.Println("LifeIn  value", v)
-
 			log.Println("LifeIn  row", len(d))
 			log.Println("LifeIn  col", len(d[0]))
 			log.Println("LifeIn  d: ", d)
@@ -81,6 +81,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			log.Println("LifeIn  elemets (0-3 ): ", d[0][3])
 			_, _, _, version := LifeMapCodecCompanyAxaRevert(d[0][1])
 
+
 			policy := models.Policy{
 				Status:         "imported",
 				StatusHistory:  []string{"imported"},
@@ -88,6 +89,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 				CodeCompany:    d[0][2],
 				Company:        "axa",
 				ProductVersion: "v" + version,
+				NetworkUid: "",
 				IsPay:          true,
 				IsSign:         true,
 				Channel:        "Network-node",
@@ -162,18 +164,17 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 			policy.Assets[0].Guarantees = guarantees
 			policy.PriceGross = sumPriseGross
-
 			//log.Println("LifeIn policy:", policy)
 			b, e := json.Marshal(policy)
 			log.Println("LifeIn policy:", e)
 			log.Println("LifeIn policy:", string(b))
 			docref, _, _ := lib.PutFirestoreErr("test-policy", policy)
 			log.Println("LifeIn doc id: ", docref.ID)
-			//user,e:=models.UpdateUserByFiscalCode("", policy.Contractor)
-			//	log.Println("LifeIn policy:", policy)
-			//tr := transaction.PutByPolicy(policy, "", "", "", "", sumPriseGross, 0, "", "BO", true)
+			_, e = models.UpdateUserByFiscalCode("uat", policy.Contractor)
+			log.Println("LifeIn policy:", policy)
+			tr := transaction.PutByPolicy(policy, "", "uat", "", "", sumPriseGross, 0, "", "manual", true)
 			//	log.Println("LifeIn transactionpolicy:",tr)
-			//accounting.CreateNetworkTransaction(tr, "uat")
+			accounting.CreateNetworkTransaction(tr, "uat")
 
 		}
 
