@@ -20,6 +20,7 @@ var (
 	networkNode                                 *models.NetworkNode
 	mgaProduct                                  *models.Product
 	warrant                                     *models.Warrant
+	sendEmail                                   bool
 )
 
 const (
@@ -64,7 +65,12 @@ func runCallbackBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 				toAddress = mail.GetContractorEmail(policy)
 				ccAddress = mail.GetNetworkNodeEmail(networkNode)
 			case models.AgentNetworkNodeType:
-				toAddress = mail.GetNetworkNodeEmail(networkNode)
+				if sendEmail {
+					toAddress = mail.GetContractorEmail(policy)
+					ccAddress = mail.GetNetworkNodeEmail(networkNode)
+				} else {
+					toAddress = mail.GetNetworkNodeEmail(networkNode)
+				}
 			}
 		case models.MgaChannel, models.ECommerceChannel:
 			toAddress = mail.GetContractorEmail(policy)

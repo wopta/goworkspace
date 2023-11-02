@@ -85,7 +85,12 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 				toAddress = mail.GetContractorEmail(policy)
 				ccAddress = mail.GetNetworkNodeEmail(networkNode)
 			case models.AgentNetworkNodeType:
-				toAddress = mail.GetNetworkNodeEmail(networkNode)
+				if sendEmail {
+					toAddress = mail.GetContractorEmail(policy)
+					ccAddress = mail.GetNetworkNodeEmail(networkNode)
+				} else {
+					toAddress = mail.GetNetworkNodeEmail(networkNode)
+				}
 			}
 		case models.MgaChannel, models.ECommerceChannel:
 			toAddress = mail.GetContractorEmail(policy)
@@ -231,6 +236,12 @@ func emitData(state *bpmn.State) error {
 
 func sendMailSign(state *bpmn.State) error {
 	policy := state.Data
+
+	// TODO smelly control flow
+	if policy.Channel == models.NetworkChannel && networkNode.Type == models.AgentNetworkNodeType {
+		sendMailInformationSet(state)
+	}
+
 	log.Printf(
 		"[sendMailSign] from '%s', to '%s', cc '%s'",
 		fromAddress.String(),
@@ -239,6 +250,21 @@ func sendMailSign(state *bpmn.State) error {
 	)
 	mail.SendMailSign(*policy, fromAddress, toAddress, ccAddress, flowName)
 	return nil
+}
+
+func sendMailInformationSet(state *bpmn.State) {
+	log.Println("[sendMailInformationSet]")
+	policy := state.Data
+
+	to := mail.GetContractorEmail(policy)
+	cc := mail.GetNetworkNodeEmail(networkNode)
+	log.Printf(
+		"[sendLeadMail] from '%s', to '%s', cc '%s'",
+		fromAddress.String(),
+		to.String(),
+		cc.String(),
+	)
+	mail.SendMailLead(*policy, fromAddress, to, cc, flowName)
 }
 
 func sign(state *bpmn.State) error {
