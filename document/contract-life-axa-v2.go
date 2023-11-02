@@ -77,11 +77,13 @@ func lifeAxaContractV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, net
 
 	woptaHeader(pdf, false)
 
-	woptaFooter(pdf)
+	//woptaFooter(pdf)
 
 	generatePolicyAnnex(pdf, origin, networkNode)
 
 	pdf.AddPage()
+
+	woptaFooter(pdf)
 
 	woptaPrivacySection(pdf)
 

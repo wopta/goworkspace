@@ -856,6 +856,8 @@ func generatePolicyAnnex(pdf *fpdf.Fpdf, origin string, networkNode *models.Netw
 
 		pdf.AddPage()
 
+		woptaFooter(pdf)
+
 		allegato3Section(pdf, producerInfo, designation)
 
 		pdf.AddPage()
