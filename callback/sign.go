@@ -3,6 +3,7 @@ package callback
 import (
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/wopta/goworkspace/lib"
@@ -26,7 +27,15 @@ func SignFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	envelope := r.URL.Query().Get("envelope")
 	action := r.URL.Query().Get("action")
 	origin = r.URL.Query().Get("origin")
-	log.Printf("[SignFx] Uid: %s, Envelope: %s, Action: %s", policyUid, envelope, action)
+	sendEmailParam := r.URL.Query().Get("sendEmail")
+	log.Printf("[SignFx] Uid: '%s', Envelope: '%s', Action: '%s', SendEmailParam: '%s'", policyUid, envelope, action, sendEmailParam)
+
+	if v, err := strconv.ParseBool(sendEmailParam); err == nil {
+		sendEmail = v
+	} else {
+		sendEmail = true
+	}
+	log.Printf("[SignFx] sendEmail: %t", sendEmail)
 
 	switch action {
 	case namirialFinished:
