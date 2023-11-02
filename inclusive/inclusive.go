@@ -6,7 +6,6 @@ import (
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	lib "github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
 )
 
 func init() {
@@ -27,7 +26,7 @@ func InclusiveFx(w http.ResponseWriter, r *http.Request) {
 				Route:   "/bankaccount/v1/hype",
 				Handler: BankAccountHypeFx,
 				Method:  "POST",
-				Roles:   []string{models.UserRoleAll},
+				Roles:   []string{},
 			},
 		},
 	}
