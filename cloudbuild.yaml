@@ -52,7 +52,7 @@ steps:
     fi
      if [[ "${strarr[1]}" == *"prod"* ]]; then
     echo "prod enviroment"
-      gsutil -m cp -r gs://core-350507-function-data/prod/assets/documents/** /workspace/${strarr[0]}/tmp/assets
+      gsutil -m cp -r gs://core-350507-function-data/assets/documents/** /workspace/${strarr[0]}/tmp/assets
     fi
     
     gcloud functions deploy ${strarr[0]} \
