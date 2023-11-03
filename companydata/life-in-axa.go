@@ -6,13 +6,12 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/go-gota/gota/dataframe"
-	"github.com/wopta/goworkspace/accounting"
 	lib "github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/transaction"
 )
 
 func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -58,7 +57,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 					Slug:                       slug,
 					CompanyCodec:               result,
 					SumInsuredLimitOfIndemnity: 0,
-					Beneficiaries: &beneficiaries,
+					Beneficiaries:              &beneficiaries,
 					Value: &models.GuaranteValue{
 						SumInsuredLimitOfIndemnity: ParseAxaFloat(r[9]),
 						PremiumGrossYearly:         priceGross,
@@ -79,8 +78,8 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			log.Println("LifeIn  elemets (0-1 ): ", d[0][1])
 			log.Println("LifeIn  elemets (0-2 ): ", d[0][2])
 			log.Println("LifeIn  elemets (0-3 ): ", d[0][3])
+			//1998-09-27T00:00:00Z RFC3339
 			_, _, _, version := LifeMapCodecCompanyAxaRevert(d[0][1])
-
 
 			policy := models.Policy{
 				Status:         "imported",
@@ -89,7 +88,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 				CodeCompany:    d[0][2],
 				Company:        "axa",
 				ProductVersion: "v" + version,
-				NetworkUid: "",
+				NetworkUid:     "",
 				IsPay:          true,
 				IsSign:         true,
 				Channel:        "Network-node",
@@ -99,13 +98,14 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 				Updated:        time.Now(),
 				PriceGross:     sumPriseGross,
 				PriceNett:      0,
+
 				Contractor: models.User{
 					Type:       d[0][22],
 					Name:       d[0][23],
 					Surname:    d[0][24],
-					FiscalCode: d[0][27],
+					FiscalCode: strings.ToUpper(d[0][27]),
 					Gender:     d[0][25],
-					BirthDate:  d[0][26],
+					BirthDate:   ParseDateDDMMYYYY(d[0][26]).Format(time.RFC3339),
 					Phone:      d[0][33],
 					IdentityDocuments: []*models.IdentityDocument{{
 						Code:             d[0][57],
@@ -129,9 +129,9 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 						Type:       d[0][22],
 						Name:       d[0][35],
 						Surname:    d[0][34],
-						FiscalCode: d[0][38],
+						FiscalCode: strings.ToUpper(d[0][38]),
 						Gender:     d[0][36],
-						BirthDate:  d[0][37],
+						BirthDate:  ParseDateDDMMYYYY(d[0][37]).Format(time.RFC3339),
 						Mail:       d[0][71],
 						Phone:      d[0][72],
 						IdentityDocuments: []*models.IdentityDocument{{
@@ -170,11 +170,12 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			log.Println("LifeIn policy:", string(b))
 			docref, _, _ := lib.PutFirestoreErr("test-policy", policy)
 			log.Println("LifeIn doc id: ", docref.ID)
-			_, e = models.UpdateUserByFiscalCode("uat", policy.Contractor)
-			log.Println("LifeIn policy:", policy)
-			tr := transaction.PutByPolicy(policy, "", "uat", "", "", sumPriseGross, 0, "", "manual", true)
+
+			//_, e = models.UpdateUserByFiscalCode("uat", policy.Contractor)
+			//log.Println("LifeIn policy:", policy)
+			//tr := transaction.PutByPolicy(policy, "", "uat", "", "", sumPriseGross, 0, "", "manual", true)
 			//	log.Println("LifeIn transactionpolicy:",tr)
-			accounting.CreateNetworkTransaction(tr, "uat")
+			//accounting.CreateNetworkTransaction(tr, "uat")
 
 		}
 
@@ -268,7 +269,7 @@ func ParseAxaBeneficiary(r []string, base int) models.Beneficiary {
 			User: models.User{
 				Name:       r[84+rangeCell],
 				Surname:    r[83+rangeCell],
-				FiscalCode: r[85+rangeCell],
+				FiscalCode:strings.ToUpper( r[85+rangeCell]),
 				Mail:       r[91+rangeCell],
 
 				Residence: &models.Address{

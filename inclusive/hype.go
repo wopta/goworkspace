@@ -220,24 +220,29 @@ func getBigqueryClient() *bigquery.Client {
 	lib.CheckError(err)
 	return client
 }
-//https://api.stg.hype.it/external/wopta/v1/{guaranteesCode}/amount/{fromDate}/{endDate}
+
+// https://api.stg.hype.it/external/wopta/v1/{guaranteesCode}/amount/{fromDate}/{endDate}
 func Count(date string, fiscalCode string, guaranteesCode string) {
 	var (
 		countResponseModel CountResponseModel
 	)
+
 	refday := time.Now().AddDate(0, 0, -1)
 	refdayString := refday.Format("2006-01-02")
-	queryWopta, _ := QueryRowsBigQuery[BankAccountMovement]("wopta",
-		"inclusive_axa_bank_account",
-		"select * from `wopta."+dataMovement+"` where fiscalCode='"+fiscalCode+"' and guaranteesCode ='"+guaranteesCode+"and _PARTITIONTIME ='"+refdayString+"'")
+	stringquery := "with Mov AS(SELECT distinct fiscalCode,* from `wopta." + dataMovement + "` where fiscalCode='" + fiscalCode + "' and guaranteesCode ='" + guaranteesCode + "and _PARTITIONTIME ='" + refdayString + "' SELECT Mov.movementType ,count(*)as count FROM Mov group by Mov.movementType"
+	log.Println(len(stringquery))
+	queryWopta, _ := QueryRowsBigQuery[bigquery.Value]("wopta", "inclusive_axa_bank_account", stringquery)
 	log.Println(len(queryWopta))
+	for _, mov := range queryWopta {
+		log.Println(mov)
+	}
+	requestUrl := os.Getenv("HYPE_PLATHFORM_PATH") + "/external/wopta/v1/next/amount/" + refdayString + "/" + refdayString
 
-	requestUrl := os.Getenv("HYPE_PLATHFORM_PATH") + "/external/insurance/v1/wopta/next/amount/" + refdayString + "/" + refdayString
-	
 	req, err := http.NewRequest(http.MethodGet, requestUrl, nil)
 	if err != nil {
 		fmt.Printf("client: could not create request: %s\n", err)
 	}
+
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("ext-wopta-service-key", os.Getenv("HYPE_APIKEY_OUT"))
 	res := lib.Httpclient(req)
@@ -246,29 +251,9 @@ func Count(date string, fiscalCode string, guaranteesCode string) {
 	log.Println(res)
 
 }
-//https://api.stg.hype.it/external/wopta/v1/reconciliation
+
+// https://api.stg.hype.it/external/wopta/v1/reconciliation
 func Reconciliation(date string, fiscalCode string, guaranteesCode string) {
-	var (
-		countResponseModel CountResponseModel
-	)
-	refday := time.Now().AddDate(0, 0, -1)
-	refdayString := refday.Format("2006-01-02")
-	queryWopta, _ := QueryRowsBigQuery[BankAccountMovement]("wopta",
-		"inclusive_axa_bank_account",
-		"select * from `wopta."+dataMovement+"` where fiscalCode='"+fiscalCode+"' and guaranteesCode ='"+guaranteesCode+"and _PARTITIONTIME ='"+refdayString+"'")
-	log.Println(len(queryWopta))
-
-	requestUrl := os.Getenv("HYPE_PLATHFORM_PATH") + "/profile/insurance/v1/wopta/next/amount/" + refdayString + "/" + refdayString
-
-	req, err := http.NewRequest(http.MethodGet, requestUrl, nil)
-	if err != nil {
-		fmt.Printf("client: could not create request: %s\n", err)
-	}
-	req.Header.Set("Content-Type", "application/json")
-	res := lib.Httpclient(req)
-	reqAll := lib.ErrorByte(ioutil.ReadAll(res.Body))
-	json.Unmarshal(reqAll, &countResponseModel)
-	log.Println(res)
 
 }
 
