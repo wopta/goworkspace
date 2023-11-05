@@ -206,7 +206,8 @@ func LifeMapCodecCompanyAxaRevert(g string) (string, string, string, string) {
 		result = "CI"
 		slug = "serious-ill"
 	}
-
+	log.Println("LifeIn LifeMapCodecCompanyAxaRevert:", version)
+	log.Println("LifeIn LifeMapCodecCompanyAxaRevert:", code)
 	return result, slug, version, pay
 }
 func ParseDateDDMMYYYY(date string) time.Time {
@@ -219,9 +220,9 @@ func ParseDateDDMMYYYY(date string) time.Time {
 		date = "0" + date
 	}
 	if len(date) == 8 {
-		d, e := strconv.Atoi(date[0:1])
-		m, e := strconv.Atoi(date[2:3])
-		y, e := strconv.Atoi(date[4:7])
+		d, e := strconv.Atoi(date[:2])
+		m, e := strconv.Atoi(date[2:4])
+		y, e := strconv.Atoi(date[4:8])
 
 		res = time.Date(y, time.Month(m),
 			d, 0, 0, 0, 0, time.UTC)
