@@ -8,7 +8,7 @@ require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.3
 	github.com/golang-jwt/jwt/v4 v4.4.2
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
-	github.com/wopta/goworkspace/lib v1.0.89
+	github.com/wopta/goworkspace/lib v1.0.90
 	github.com/wopta/goworkspace/models v1.1.65
 	github.com/wopta/goworkspace/network v1.0.17
 	github.com/wopta/goworkspace/product v1.0.64
