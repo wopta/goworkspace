@@ -14,6 +14,7 @@ require (
 	github.com/wopta/goworkspace/product v1.0.64
 	github.com/wopta/goworkspace/quote v1.0.19
 	github.com/wopta/goworkspace/user v1.0.43
+	gopkg.in/square/go-jose.v2 v2.6.0
 )
 
 require (
