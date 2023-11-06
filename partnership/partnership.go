@@ -244,7 +244,6 @@ func facilePartnership(jwtData string, policy *models.Policy, product *models.Pr
 	var (
 		person models.User
 		asset  models.Asset
-		claims FacileClaims
 	)
 
 	log.Println("[facilePartnership] decoding jwt")
