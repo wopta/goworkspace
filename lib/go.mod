@@ -19,6 +19,7 @@ require (
 	golang.org/x/crypto v0.7.0
 	golang.org/x/oauth2 v0.7.0
 	google.golang.org/api v0.118.0
+	gopkg.in/square/go-jose.v2 v2.6.0
 )
 
 require (

@@ -55,6 +55,11 @@ func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, inter
 
 	policy, product, node, err := LifePartnership(partnershipUid, jwtData, r.Header.Get("Origin"))
 
+	if err != nil {
+		log.Printf("[LifePartnershipFx] error: %s", err.Error())
+		return "", response, err
+	}
+
 	response.Policy = policy
 	response.Product = product
 	response.Partnership = *node.Partnership
@@ -238,51 +243,48 @@ func facilePartnership(jwtData string, policy *models.Policy, product *models.Pr
 	var (
 		person models.User
 		asset  models.Asset
+		claims FacileClaims
 	)
 
 	log.Println("[facilePartnership] decoding jwt")
 
-	token, err := jwt.ParseWithClaims(jwtData, &FacileClaims{}, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-		}
-
-		key := os.Getenv("FACILE_SIGNING_KEY")
-
-		return []byte(key), nil
-	})
-
-	if claims, ok := token.Claims.(*FacileClaims); ok && token.Valid {
-		log.Println("[facilePartnership] setting person info")
-		person.Name = claims.CustomerName
-		person.Surname = claims.CustomerFamilyName
-		person.Mail = claims.Email
-		birthDate, _ := time.Parse(models.TimeDateOnly, claims.CustomerBirthDate)
-		person.BirthDate = birthDate.Format(time.RFC3339)
-		person.Phone = fmt.Sprintf("+39%s", claims.Mobile)
-		person.Gender = claims.Gender
-		policy.Contractor = person
-		asset.Person = &person
-		policy.OfferlName = "default"
-
-		log.Println("[facilePartnership] setting death guarantee info")
-
-		deathGuarantee := product.Companies[0].GuaranteesMap["death"]
-		deathGuarantee.Value = &models.GuaranteValue{
-			Duration: &models.Duration{
-				Year: claims.Duration,
-			},
-			SumInsuredLimitOfIndemnity: float64(claims.InsuredCapital),
-		}
-		asset.Guarantees = make([]models.Guarante, 0)
-		asset.Guarantees = append(asset.Guarantees, *deathGuarantee)
-
-		policy.Assets = append(policy.Assets, asset)
-		policy.PartnershipData = claims.ToMap()
+	err := lib.DecryptJwt(jwtData, os.Getenv("FACILE_SIGNING_KEY"), &claims)
+	if err != nil {
+		log.Printf("[facilePartnership] could not validate facile partnership JWT - %s", err.Error())
 		return err
 	}
 
-	log.Printf("[facilePartnership] could not validate facile partnership JWT - %s", err.Error())
+	if claims.ExpiresAt.Before(time.Now()) {
+		log.Printf("[facilePartnership] jwt expired")
+		return fmt.Errorf("jwt expired")
+	}
+
+	log.Println("[facilePartnership] setting person info")
+	person.Name = claims.CustomerName
+	person.Surname = claims.CustomerFamilyName
+	person.Mail = claims.Email
+	birthDate, _ := time.Parse(models.TimeDateOnly, claims.CustomerBirthDate)
+	person.BirthDate = birthDate.Format(time.RFC3339)
+	person.Phone = fmt.Sprintf("+39%s", claims.Mobile)
+	person.Gender = claims.Gender
+	policy.Contractor = person
+	asset.Person = &person
+	policy.OfferlName = "default"
+
+	log.Println("[facilePartnership] setting death guarantee info")
+
+	deathGuarantee := product.Companies[0].GuaranteesMap["death"]
+	deathGuarantee.Value = &models.GuaranteValue{
+		Duration: &models.Duration{
+			Year: claims.Duration,
+		},
+		SumInsuredLimitOfIndemnity: float64(claims.InsuredCapital),
+	}
+	asset.Guarantees = make([]models.Guarante, 0)
+	asset.Guarantees = append(asset.Guarantees, *deathGuarantee)
+
+	policy.Assets = append(policy.Assets, asset)
+	policy.PartnershipData = claims.ToMap()
 	return err
 }
 
