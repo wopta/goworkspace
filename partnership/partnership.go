@@ -19,7 +19,6 @@ import (
 	"github.com/wopta/goworkspace/product"
 	"github.com/wopta/goworkspace/quote"
 	"github.com/wopta/goworkspace/user"
-	"gopkg.in/square/go-jose.v2"
 )
 
 func init() {
@@ -244,11 +243,12 @@ func facilePartnership(jwtData string, policy *models.Policy, product *models.Pr
 	var (
 		person models.User
 		asset  models.Asset
+		claims FacileClaims
 	)
 
 	log.Println("[facilePartnership] decoding jwt")
 
-	claims, err := decryptJwt[FacileClaims](jwtData, os.Getenv("FACILE_SIGNING_KEY"))
+	err := lib.DecryptJwt(jwtData, os.Getenv("FACILE_SIGNING_KEY"), &claims)
 	if err != nil {
 		log.Printf("[facilePartnership] could not validate facile partnership JWT - %s", err.Error())
 		return err
@@ -286,29 +286,6 @@ func facilePartnership(jwtData string, policy *models.Policy, product *models.Pr
 	policy.Assets = append(policy.Assets, asset)
 	policy.PartnershipData = claims.ToMap()
 	return err
-}
-
-func decryptJwt[T interface{}](jwtData, key string) (T, error) {
-	var claims T
-	object, err := jose.ParseEncrypted(jwtData)
-	if err != nil {
-		log.Printf("[facilePartnership] could not parse jwt - %s", err.Error())
-		return claims, fmt.Errorf("could not decrypt jwt")
-	}
-
-	decryptionKey, err := b64.StdEncoding.DecodeString(key)
-	if err != nil {
-		log.Printf("[facilePartnership] could not decode signing key - %s", err.Error())
-		return claims, fmt.Errorf("could not decrypt jwt")
-	}
-	decrypted, err := object.Decrypt(decryptionKey)
-	if err != nil {
-		log.Printf("[facilePartnership] could not decrypt jwt - %s", err.Error())
-		return claims, fmt.Errorf("could not decrypt jwt")
-	}
-
-	err = json.Unmarshal(decrypted, &claims)
-	return claims, err
 }
 
 type BeprofClaims struct {
