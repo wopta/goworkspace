@@ -51,6 +51,8 @@ func GapFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 }
 
 func Gap(policy *models.Policy, channel string, networkNode *models.NetworkNode, warrant *models.Warrant) {
+	policy.StartDate = lib.SetDateToStartOfDay(policy.StartDate)
+
 	product, err := sellable.Gap(policy, channel, networkNode, warrant)
 	lib.CheckError(err)
 

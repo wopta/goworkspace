@@ -56,6 +56,8 @@ func gapSogessurContractV1(pdf *fpdf.Fpdf, origin string, policy *models.Policy,
 
 	woptaHeader(pdf, false)
 
+	generatePolicyAnnex(pdf, origin, networkNode)
+
 	pdf.AddPage()
 
 	woptaPrivacySection(pdf)
@@ -252,8 +254,8 @@ func gapPersonalInfoTableV1(pdf *fpdf.Fpdf, contractor, vehicleOwner models.User
 			"" + contractor.Residence.PostalCode + ", " + contractor.Residence.City + " (" + contractor.Residence.
 			CityCode + ")",
 			"Residente in", vehicleOwner.Residence.StreetName + " " + vehicleOwner.Residence.StreetNumber + ", " +
-				"" + vehicleOwner.Residence.PostalCode + ", " + vehicleOwner.Residence.City + " (" + vehicleOwner.Residence.
-				CityCode + ")"},
+			"" + vehicleOwner.Residence.PostalCode + ", " + vehicleOwner.Residence.City + " (" + vehicleOwner.Residence.
+			CityCode + ")"},
 		{"Mail", contractor.Mail, "Mail", "================"},
 		{"Codice Fiscale", contractor.FiscalCode, "Codice Fiscale", vehicleOwner.FiscalCode},
 		{"Data nascita", contractorBirthDate.Format(dateLayout), "Data nascita", vehicleOwnerBirthDate.Format(dateLayout)},

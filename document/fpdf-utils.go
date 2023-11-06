@@ -68,13 +68,19 @@ func saveProposal(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 		out      bytes.Buffer
 	)
 
-	err := pdf.Output(&out)
-	lib.CheckError(err)
-	filename = strings.ReplaceAll(fmt.Sprintf("%s/%s/"+models.ProposalDocumentFormat, "temp", policy.Uid,
-		policy.NameDesc, policy.ProposalNumber), " ", "_")
-	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, out.Bytes())
-	lib.CheckError(err)
-	return filename, out.Bytes()
+	if os.Getenv("env") == "local" {
+		err := pdf.OutputFileAndClose("./document/proposal.pdf")
+		lib.CheckError(err)
+	} else {
+		err := pdf.Output(&out)
+		lib.CheckError(err)
+		filename = strings.ReplaceAll(fmt.Sprintf("%s/%s/"+models.ProposalDocumentFormat, "temp", policy.Uid,
+			policy.NameDesc, policy.ProposalNumber), " ", "_")
+		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, out.Bytes())
+		lib.CheckError(err)
+		return filename, out.Bytes()
+	}
+	return "", nil
 }
 
 func saveReservedDocument(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
@@ -502,7 +508,7 @@ func formatPhoneNumber(phone string) string {
 	return libphonenumber.Format(num, libphonenumber.INTERNATIONAL)
 }
 
-func woptaInfoTable(pdf *fpdf.Fpdf, producerInfo map[string]string) {
+func woptaInfoTable(pdf *fpdf.Fpdf, producerInfo map[string]string, designation string) {
 	drawPinkHorizontalLine(pdf, 0.1)
 	setBlackRegularFont(pdf, smallTextSize)
 	pdf.MultiCell(0, 5, "DATI DELLA PERSONA FISICA CHE ENTRA IN CONTATTO CON IL "+
@@ -515,9 +521,7 @@ func woptaInfoTable(pdf *fpdf.Fpdf, producerInfo map[string]string) {
 	setBlackRegularFont(pdf, smallTextSize)
 	pdf.MultiCell(0, 5, "QUALIFICA", "", "", false)
 	setBlackRegularFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3.5, "Responsabile dell’attività di intermediazione assicurativa di Wopta "+
-		"Assicurazioni Srl, Società iscritta alla Sezione A del RUI con numero A000701923 in data "+
-		"14.02.2022", "", "", false)
+	pdf.MultiCell(0, 3.5, designation, "", "", false)
 	drawPinkHorizontalLine(pdf, 0.1)
 	setBlackRegularFont(pdf, smallTextSize)
 	pdf.MultiCell(0, 5, "SEDE LEGALE", "", "", false)

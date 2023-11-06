@@ -1,0 +1,20 @@
+{
+  "cecoslovacchia": {
+    "codFisc": "Z105"
+  },
+  "repubblica democratica tedesca": {
+    "codFisc": "Z111"
+  },
+  "repubblica socialista federale di jugoslavia": {
+    "codFisc": "Z118"
+  },
+  "serbia e montenegro": {
+    "codFisc": "Z157"
+  },
+  "unione sovietica": {
+    "codFisc": "Z135"
+  },
+  "yemen del sud": {
+    "codFisc": "Z250"
+  }
+}

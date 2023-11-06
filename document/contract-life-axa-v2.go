@@ -77,23 +77,13 @@ func lifeAxaContractV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, net
 
 	woptaHeader(pdf, false)
 
+	//woptaFooter(pdf)
+
+	generatePolicyAnnex(pdf, origin, networkNode)
+
 	pdf.AddPage()
 
 	woptaFooter(pdf)
-
-	producerInfo := loadProducerInfo(origin, networkNode)
-
-	allegato3Section(pdf, producerInfo)
-
-	pdf.AddPage()
-
-	allegato4Section(pdf, producerInfo)
-
-	pdf.AddPage()
-
-	allegato4TerSection(pdf, producerInfo)
-
-	pdf.AddPage()
 
 	woptaPrivacySection(pdf)
 
@@ -321,7 +311,7 @@ func lifeBeneficiariesTableV2(pdf *fpdf.Fpdf, beneficiaries []map[string]string)
 
 	for _, beneficiary := range beneficiaries {
 		tableRows := [][]string{
-			{"Cognome e nome", beneficiary["name"], "Cod. Fisc.:", beneficiary["fiscCode"]},
+			{"Cognome e nome", beneficiary["name"], "Cod. Fisc.:", beneficiary["fiscalCode"]},
 			{"Indirizzo", beneficiary["address"], "", ""},
 			{"Mail", beneficiary["mail"], "Telefono:", beneficiary["phone"]},
 			{"Relazione con assicurato", beneficiary["relation"], "", ""},
@@ -354,11 +344,11 @@ func lifeBeneficiariesTableV2(pdf *fpdf.Fpdf, beneficiaries []map[string]string)
 
 func lifeBeneficiaryReferenceSectionV2(pdf *fpdf.Fpdf, policy *models.Policy) {
 	beneficiaryReference := map[string]string{
-		"name":     "=====",
-		"fiscCode": "=====",
-		"address":  "=====",
-		"mail":     "=====",
-		"phone":    "=====",
+		"name":       "=====",
+		"fiscalCode": "=====",
+		"address":    "=====",
+		"mail":       "=====",
+		"phone":      "=====",
 	}
 
 	deathGuarantee, err := policy.ExtractGuarantee("death")
@@ -370,7 +360,7 @@ func lifeBeneficiaryReferenceSectionV2(pdf *fpdf.Fpdf, policy *models.Policy) {
 			" - " + beneficiary.Residence.PostalCode + " " + beneficiary.Residence.City +
 			" (" + beneficiary.Residence.CityCode + ")")
 		beneficiaryReference["name"] = strings.ToUpper(beneficiary.Surname + " " + beneficiary.Name)
-		beneficiaryReference["fiscCode"] = strings.ToUpper(beneficiary.FiscalCode)
+		beneficiaryReference["fiscalCode"] = strings.ToUpper(beneficiary.FiscalCode)
 		beneficiaryReference["address"] = address
 		beneficiaryReference["mail"] = beneficiary.Mail
 		beneficiaryReference["phone"] = beneficiary.Phone
@@ -383,7 +373,7 @@ func lifeBeneficiaryReferenceSectionV2(pdf *fpdf.Fpdf, policy *models.Policy) {
 
 func lifeBeneficiaryReferenceTableV2(pdf *fpdf.Fpdf, beneficiaryReference map[string]string) {
 	tableRows := [][]string{
-		{"Cognome e nome", beneficiaryReference["name"], "Cod, Fisc.:", beneficiaryReference["fiscCode"]},
+		{"Cognome e nome", beneficiaryReference["name"], "Cod, Fisc.:", beneficiaryReference["fiscalCode"]},
 		{"Indirizzo", beneficiaryReference["address"], "", ""},
 		{"Mail", beneficiaryReference["mail"], "Telefono:", beneficiaryReference["phone"]},
 	}

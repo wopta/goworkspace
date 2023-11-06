@@ -6,57 +6,91 @@ import time
 from enum import Enum
 import copy
 
+# modules
+BROKER = "broker"
+CALLBACK = "callback"
+CLAIM = "claim"
+COMPANY_DATA = "companydata"
+DOCUMENT = "document"
+ENRICH = "enrich"
+FORM = "form"
+LIB = "lib"
+MAIL = "mail"
+MODELS = "models"
+PARTNERSHIP = "partnership"
+PAYMENT = "payment"
+PRODUCT = "product"
+QUESTION = "question"
+QUOTE = "quote"
+RULES = "rules"
+SELLABLE = "sellable"
+USER = "user"
+MGA = "mga"
+NETWORK = "network"
+RESERVED = "reserved"
+POLICY = "policy"
+BPMN = "bpmn"
+
+# semver consts
+MAJOR = "major"
+MINOR = "minor"
+PATCH = "patch"
+
+# environment consts
+DEV = "dev"
+PROD = "prod"
+
+
 go_modules = [
-    "broker",
-    "callback",
-    "claim",
-    "companydata",
-    "document",
-    "enrich",
-    "form",
-    "lib",
-    "mail",
-    "models",
-    "partnership",
-    "payment",
-    "product",
-    "question",
-    "quote",
-    "rules",
-    "sellable",
-    "user",
-    "sellable",
-    "mga",
-    "network",
-    "reserved",
-    "policy",
-    "bpmn",]
+    BROKER,
+    CALLBACK,
+    CLAIM,
+    COMPANY_DATA,
+    DOCUMENT,
+    ENRICH,
+    FORM,
+    LIB,
+    MAIL,
+    MODELS,
+    PARTNERSHIP,
+    PAYMENT,
+    PRODUCT,
+    QUESTION,
+    QUOTE,
+    RULES,
+    SELLABLE,
+    USER,
+    MGA,
+    NETWORK,
+    RESERVED,
+    POLICY,
+    BPMN,]
 changed_modules = [
-    "policy", "broker", "payment"
+    DOCUMENT, POLICY, PAYMENT, RESERVED,
 ]
 updateable_modules = [
-    "broker",
-    "callback",
-    "document",
-    "lib",
-    "mail",
-    "models",
-    "partnership",
-    "payment",
-    "product",
-    "question",
-    "quote",
-    "sellable",
-    "user",
-    "sellable",
-    "mga",
-    "network",
-    "reserved",
-    "policy",
+    BROKER,
+    CALLBACK,
+    DOCUMENT,
+    LIB,
+    MAIL,
+    MODELS,
+    PARTNERSHIP,
+    PAYMENT,
+    PRODUCT,
+    QUESTION,
+    QUOTE,
+    SELLABLE,
+    USER,
+    SELLABLE,
+    MGA,
+    NETWORK,
+    RESERVED,
+    POLICY,
 ]
 
-increment_version_key = "patch"
-environment = 'dev'  # Replace with your desired environment
+increment_version_key = PATCH
+environment = DEV  # Replace with your desired environment
 dry_run = True
 google_repository = "google"
 github_repository = "origin"
@@ -191,14 +225,14 @@ def increment_version(version, increment_type):
 
     major, minor, patch = map(int, version_components)
 
-    if increment_type == "major":
+    if increment_type == MAJOR:
         major += 1
         minor = 0
         patch = 0
-    elif increment_type == "minor":
+    elif increment_type == MINOR:
         minor += 1
         patch = 0
-    elif increment_type == "patch":
+    elif increment_type == PATCH:
         patch += 1
     else:
         raise ValueError(
@@ -374,7 +408,7 @@ def bfs(visited, graph, node):  # function for BFS
 
 
 # Driver Code
-bfs(visited, dependency_graph, 'lib')    # function calling
+bfs(visited, dependency_graph, LIB)    # function calling
 
 if ordered_commands is None or len(ordered_commands) == 0:
     for command in commands:

@@ -283,6 +283,7 @@ func updatePolicyStartEndDate(policy *models.Policy) {
 	if policy.StartDate.IsZero() {
 		policy.StartDate = time.Now().UTC()
 	}
+	policy.StartDate = lib.SetDateToStartOfDay(policy.StartDate)
 	maxDuration := 0
 	for _, guarantee := range policy.Assets[0].Guarantees {
 		if guarantee.Value.Duration.Year > maxDuration {

@@ -109,6 +109,17 @@ func loadProducerInfo(origin string, networkNode *models.NetworkNode) map[string
 	return policyProducer
 }
 
+func loadDesignation(networkNode *models.NetworkNode) string {
+	designation := "Responsabile dell’attività di intermediazione assicurativa di Wopta " +
+		"Assicurazioni Srl, Società iscritta alla Sezione A del RUI con numero A000701923 in data 14.02.2022"
+
+	if networkNode != nil && networkNode.Designation != "" {
+		designation = networkNode.Designation
+	}
+
+	return designation
+}
+
 func loadLifeGuarantees(policy *models.Policy, product *models.Product) (map[string]map[string]string, []slugStruct) {
 	const (
 		death               = "death"

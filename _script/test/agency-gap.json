@@ -1,0 +1,49 @@
+{
+    "code": "W0002",
+    "type": "agency",
+    "networkCode": "WN0002",
+    "role": "agency",
+    "mail": "yousef.hammar+agency@wopta.it",
+    "agency": {
+        "name": "Yousef SRL",
+        "vatCode": "123456789213",
+        "phone": "+393421526354",
+        "ruiCode": "12345",
+        "ruiSection": "B",
+        "ruiRegistration": "2023-10-03T14:48:37.597277Z"
+    },
+    "products": [
+        {
+            "companies": [
+                {
+                    "name": "sogessur",
+                    "commissionsSetting": {
+                        "isFlat": false,
+                        "isByOffer": true,
+                        "isByGuarantee": false
+                    }
+                }
+            ],
+            "offers": {
+                "base": {
+                    "commissions": {
+                        "newBusiness": 0.25,
+                        "newBusinessPassive": 0.25,
+                        "renew": 0,
+                        "renewPassive": 0
+                    }
+                },
+                "complete": {
+                    "commissions": {
+                        "newBusiness": 0.40,
+                        "newBusinessPassive": 0.40,
+                        "renew": 0,
+                        "renewPassive": 0
+                    }
+                }
+            },
+            "version": "v1",
+            "name": "gap"
+        }
+    ]
+}

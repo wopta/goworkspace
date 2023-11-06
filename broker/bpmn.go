@@ -51,45 +51,15 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 	product = prd.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, networkNode, warrant)
 	mgaProduct = prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
 
-	// TODO: fix me - maybe get to/from/cc from flowFile.json?
 	switch flowKey {
 	case leadFlowKey:
 		flow = flowFile.LeadFlow
-		toAddress = mail.GetContractorEmail(policy)
-		switch policy.Channel {
-		case models.NetworkChannel:
-			ccAddress = mail.GetNetworkNodeEmail(networkNode)
-		}
 	case proposalFlowKey:
 		flow = flowFile.ProposalFlow
-		toAddress = mail.GetContractorEmail(policy)
-		switch policy.Channel {
-		case models.NetworkChannel:
-			ccAddress = mail.GetNetworkNodeEmail(networkNode)
-		}
 	case requestApprovalFlowKey:
 		flow = flowFile.RequestApprovalFlow
-		switch policy.Channel {
-		case models.NetworkChannel:
-			toAddress = mail.GetContractorEmail(policy)
-			ccAddress = mail.GetNetworkNodeEmail(networkNode)
-		case models.MgaChannel:
-			toAddress = mail.GetContractorEmail(policy)
-		}
 	case emitFlowKey:
 		flow = flowFile.EmitFlow
-		switch policy.Channel {
-		case models.NetworkChannel:
-			switch networkNode.Type {
-			case models.AgencyNetworkNodeType:
-				toAddress = mail.GetContractorEmail(policy)
-				ccAddress = mail.GetNetworkNodeEmail(networkNode)
-			case models.AgentNetworkNodeType:
-				toAddress = mail.GetNetworkNodeEmail(networkNode)
-			}
-		case models.MgaChannel, models.ECommerceChannel:
-			toAddress = mail.GetContractorEmail(policy)
-		}
 	default:
 		log.Println("[runBrokerBpmn] error flow not set")
 		return nil
@@ -130,6 +100,13 @@ func setLeadBpmn(state *bpmn.State) error {
 
 func sendLeadMail(state *bpmn.State) error {
 	policy := state.Data
+
+	toAddress = mail.GetContractorEmail(policy)
+	switch flowName {
+	case models.ProviderMgaFlow, models.RemittanceMgaFlow:
+		ccAddress = mail.GetNetworkNodeEmail(networkNode)
+	}
+
 	log.Printf(
 		"[sendLeadMail] from '%s', to '%s', cc '%s'",
 		fromAddress.String(),
@@ -165,6 +142,12 @@ func sendProposalMail(state *bpmn.State) error {
 
 	if !sendEmail || policy.IsReserved {
 		return nil
+	}
+
+	toAddress = mail.GetContractorEmail(policy)
+	switch flowName {
+	case models.ProviderMgaFlow, models.RemittanceMgaFlow:
+		ccAddress = mail.GetNetworkNodeEmail(networkNode)
 	}
 
 	log.Printf(
@@ -204,6 +187,14 @@ func sendRequestApprovalMail(state *bpmn.State) error {
 		return nil
 	}
 
+	toAddress = mail.GetContractorEmail(policy)
+	switch flowName {
+	case models.ProviderMgaFlow, models.RemittanceMgaFlow:
+		ccAddress = mail.GetNetworkNodeEmail(networkNode)
+	case models.ECommerceChannel:
+		toAddress = mail.Address{} // fail safe for not sending email on ecommerce reserved
+	}
+
 	mail.SendMailReserved(*policy, fromAddress, toAddress, ccAddress, flowName,
 		[]string{models.InformationSetAttachmentName, models.ProposalAttachmentName})
 	return nil
@@ -231,6 +222,24 @@ func emitData(state *bpmn.State) error {
 
 func sendMailSign(state *bpmn.State) error {
 	policy := state.Data
+
+	// TODO smelly control flow
+	if policy.Channel != models.ECommerceChannel && flowName != models.RemittanceMgaFlow {
+		sendMailInformationSet(state)
+	}
+
+	switch flowName {
+	case models.ProviderMgaFlow, models.RemittanceMgaFlow:
+		if sendEmail {
+			toAddress = mail.GetContractorEmail(policy)
+			ccAddress = mail.GetNetworkNodeEmail(networkNode)
+		} else {
+			toAddress = mail.GetNetworkNodeEmail(networkNode)
+		}
+	case models.MgaFlow, models.ECommerceFlow:
+		toAddress = mail.GetContractorEmail(policy)
+	}
+
 	log.Printf(
 		"[sendMailSign] from '%s', to '%s', cc '%s'",
 		fromAddress.String(),
@@ -239,6 +248,21 @@ func sendMailSign(state *bpmn.State) error {
 	)
 	mail.SendMailSign(*policy, fromAddress, toAddress, ccAddress, flowName)
 	return nil
+}
+
+func sendMailInformationSet(state *bpmn.State) {
+	log.Println("[sendMailInformationSet]")
+	policy := state.Data
+
+	to := mail.GetContractorEmail(policy)
+	cc := mail.GetNetworkNodeEmail(networkNode)
+	log.Printf(
+		"[sendLeadMail] from '%s', to '%s', cc '%s'",
+		fromAddress.String(),
+		to.String(),
+		cc.String(),
+	)
+	mail.SendMailLead(*policy, fromAddress, to, cc, flowName)
 }
 
 func sign(state *bpmn.State) error {

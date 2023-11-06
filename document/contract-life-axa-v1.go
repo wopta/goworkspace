@@ -77,17 +77,7 @@ func lifeAxaContractV1(pdf *fpdf.Fpdf, origin string, policy *models.Policy, net
 
 	woptaFooter(pdf)
 
-	producerInfo := loadProducerInfo(origin, networkNode)
-
-	allegato3Section(pdf, producerInfo)
-
-	pdf.AddPage()
-
-	allegato4Section(pdf, producerInfo)
-
-	pdf.AddPage()
-
-	allegato4TerSection(pdf, producerInfo)
+	generatePolicyAnnex(pdf, origin, networkNode)
 
 	pdf.AddPage()
 
@@ -235,7 +225,7 @@ func beneficiariesTable(pdf *fpdf.Fpdf, beneficiaries []map[string]string) {
 		setBlackBoldFont(pdf, standardTextSize)
 		pdf.Cell(20, 2, "Cod. Fisc.: ")
 		setBlackRegularFont(pdf, standardTextSize)
-		pdf.Cell(20, 2, beneficiary["fiscCode"])
+		pdf.Cell(20, 2, beneficiary["fiscalCode"])
 		pdf.Ln(3)
 		drawPinkHorizontalLine(pdf, thinLineWidth)
 		pdf.Ln(2)
@@ -278,11 +268,11 @@ func beneficiariesTable(pdf *fpdf.Fpdf, beneficiaries []map[string]string) {
 
 func beneficiaryReferenceSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	beneficiaryReference := map[string]string{
-		"name":     "=====",
-		"fiscCode": "=====",
-		"address":  "=====",
-		"mail":     "=====",
-		"phone":    "=====",
+		"name":       "=====",
+		"fiscalCode": "=====",
+		"address":    "=====",
+		"mail":       "=====",
+		"phone":      "=====",
 	}
 
 	deathGuarantee, err := policy.ExtractGuarantee("death")
@@ -294,7 +284,7 @@ func beneficiaryReferenceSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 			" - " + beneficiary.Residence.PostalCode + " " + beneficiary.Residence.City +
 			" (" + beneficiary.Residence.CityCode + ")")
 		beneficiaryReference["name"] = strings.ToUpper(beneficiary.Surname + " " + beneficiary.Name)
-		beneficiaryReference["fiscCode"] = strings.ToUpper(beneficiary.FiscalCode)
+		beneficiaryReference["fiscalCode"] = strings.ToUpper(beneficiary.FiscalCode)
 		beneficiaryReference["address"] = address
 		beneficiaryReference["mail"] = beneficiary.Mail
 		beneficiaryReference["phone"] = beneficiary.Phone
@@ -316,7 +306,7 @@ func beneficiaryReferenceTable(pdf *fpdf.Fpdf, beneficiaryReference map[string]s
 	setBlackBoldFont(pdf, standardTextSize)
 	pdf.Cell(20, 2, "Cod. Fisc.: ")
 	setBlackRegularFont(pdf, standardTextSize)
-	pdf.Cell(20, 2, beneficiaryReference["fiscCode"])
+	pdf.Cell(20, 2, beneficiaryReference["fiscalCode"])
 	pdf.Ln(3)
 	drawPinkHorizontalLine(pdf, thinLineWidth)
 	pdf.Ln(2)

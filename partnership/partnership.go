@@ -80,6 +80,16 @@ func LifePartnership(partnershipUid, jwtData, origin string) (models.Policy, mod
 		return policy, *productLife, partnershipNode, err
 	}
 
+	if partnershipNode == nil {
+		log.Printf("[LifePartnership] no partnership found")
+		return policy, *productLife, partnershipNode, fmt.Errorf("no partnership found")
+	}
+
+	if !partnershipNode.IsActive {
+		log.Printf("[LifePartnership] partnership is not active")
+		return policy, *productLife, partnershipNode, fmt.Errorf("partnership is not active")
+	}
+
 	partnershipName := partnershipNode.Partnership.Name
 
 	log.Printf("[LifePartnership] loading latest life product")

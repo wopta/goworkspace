@@ -20,6 +20,7 @@ var (
 	networkNode                                 *models.NetworkNode
 	mgaProduct                                  *models.Product
 	warrant                                     *models.Warrant
+	sendEmail                                   bool
 )
 
 const (
@@ -57,32 +58,8 @@ func runCallbackBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 	switch flowKey {
 	case signFlowKey:
 		flow = flowFile.SignFlow
-		switch policy.Channel {
-		case models.NetworkChannel:
-			switch networkNode.Type {
-			case models.AgencyNetworkNodeType:
-				toAddress = mail.GetContractorEmail(policy)
-				ccAddress = mail.GetNetworkNodeEmail(networkNode)
-			case models.AgentNetworkNodeType:
-				toAddress = mail.GetNetworkNodeEmail(networkNode)
-			}
-		case models.MgaChannel, models.ECommerceChannel:
-			toAddress = mail.GetContractorEmail(policy)
-		}
 	case payFlowKey:
 		flow = flowFile.PayFlow
-		switch policy.Channel {
-		case models.NetworkChannel:
-			switch networkNode.Type {
-			case models.AgentNetworkNodeType:
-				toAddress = mail.GetContractorEmail(policy)
-				ccAddress = mail.GetNetworkNodeEmail(networkNode)
-			case models.AgencyNetworkNodeType:
-				toAddress = mail.GetNetworkNodeEmail(networkNode)
-			}
-		case models.MgaChannel, models.ECommerceChannel:
-			toAddress = mail.GetContractorEmail(policy)
-		}
 	default:
 		log.Println("[runCallbackBpmn] error flow not set")
 		return nil
@@ -138,6 +115,19 @@ func addContract(state *bpmn.State) error {
 
 func sendMailContract(state *bpmn.State) error {
 	policy := state.Data
+
+	switch flowName {
+	case models.ProviderMgaFlow, models.RemittanceMgaFlow:
+		if sendEmail {
+			toAddress = mail.GetContractorEmail(policy)
+			ccAddress = mail.GetNetworkNodeEmail(networkNode)
+		} else {
+			toAddress = mail.GetNetworkNodeEmail(networkNode)
+		}
+	case models.MgaFlow, models.ECommerceFlow:
+		toAddress = mail.GetContractorEmail(policy)
+	}
+
 	log.Printf(
 		"[sendMailContract] from '%s', to '%s', cc '%s'",
 		fromAddress.String(),
@@ -173,6 +163,19 @@ func setToPay(state *bpmn.State) error {
 
 func sendMailPay(state *bpmn.State) error {
 	policy := state.Data
+
+	switch flowName {
+	case models.ProviderMgaFlow, models.RemittanceMgaFlow:
+		if sendEmail {
+			toAddress = mail.GetContractorEmail(policy)
+			ccAddress = mail.GetNetworkNodeEmail(networkNode)
+		} else {
+			toAddress = mail.GetNetworkNodeEmail(networkNode)
+		}
+	case models.MgaFlow, models.ECommerceFlow:
+		toAddress = mail.GetContractorEmail(policy)
+	}
+
 	log.Printf(
 		"[sendMailPay] from '%s', to '%s', cc '%s'",
 		fromAddress.String(),
@@ -221,6 +224,16 @@ func updatePolicy(state *bpmn.State) error {
 	}
 
 	policy.BigquerySave(origin)
+
+	switch flowName {
+	case models.ProviderMgaFlow:
+		toAddress = mail.GetContractorEmail(policy)
+		ccAddress = mail.GetNetworkNodeEmail(networkNode)
+	case models.RemittanceMgaFlow:
+		toAddress = mail.GetNetworkNodeEmail(networkNode)
+	case models.MgaFlow, models.ECommerceFlow:
+		toAddress = mail.GetContractorEmail(policy)
+	}
 
 	// Send mail with the contract to the user
 	log.Printf(

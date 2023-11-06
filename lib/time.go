@@ -62,16 +62,27 @@ func GetFirstDay(t time.Time) time.Time {
 	return time.Date(year, month, 1, 0, 0, 0, 0, time.UTC)
 }
 func ParseDateDDMMYYYY(date string) time.Time {
+	var (
+		res time.Time
+	)
+	log.Println(" ParseDateDDMMYYYY date:", date)
+	log.Println(" ParseDateDDMMYYYY len(date):", len(date))
 	if len(date) < 8 {
 		date = "0" + date
 	}
-	d, e := strconv.Atoi(date[0:1])
-	m, e := strconv.Atoi(date[2:3])
-	y, e := strconv.Atoi(date[4:7])
-	log.Println("ParseDateDDMMYYYY", d)
-	res := time.Date(y, time.Month(m),
-		d, 0, 0, 0, 0, time.UTC)
-	log.Println(e)
+	if len(date) >= 8 {
+		d, e := strconv.Atoi(date[0:1])
+		m, e := strconv.Atoi(date[2:3])
+		y, e := strconv.Atoi(date[4:7])
+
+		res = time.Date(y, time.Month(m),
+			d, 0, 0, 0, 0, time.UTC)
+		log.Println(e)
+	}
 	return res
 
+}
+
+func SetDateToStartOfDay(date time.Time) time.Time {
+	return date.Truncate(24 * time.Hour)
 }

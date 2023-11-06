@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/go-gota/gota/dataframe"
@@ -56,8 +57,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 					Slug:                       slug,
 					CompanyCodec:               result,
 					SumInsuredLimitOfIndemnity: 0,
-
-					Beneficiaries: &beneficiaries,
+					Beneficiaries:              &beneficiaries,
 					Value: &models.GuaranteValue{
 						SumInsuredLimitOfIndemnity: ParseAxaFloat(r[9]),
 						PremiumGrossYearly:         priceGross,
@@ -71,7 +71,6 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			}
 
 			log.Println("LifeIn  value", v)
-
 			log.Println("LifeIn  row", len(d))
 			log.Println("LifeIn  col", len(d[0]))
 			log.Println("LifeIn  d: ", d)
@@ -79,6 +78,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			log.Println("LifeIn  elemets (0-1 ): ", d[0][1])
 			log.Println("LifeIn  elemets (0-2 ): ", d[0][2])
 			log.Println("LifeIn  elemets (0-3 ): ", d[0][3])
+			//1998-09-27T00:00:00Z RFC3339
 			_, _, _, version := LifeMapCodecCompanyAxaRevert(d[0][1])
 
 			policy := models.Policy{
@@ -88,22 +88,24 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 				CodeCompany:    d[0][2],
 				Company:        "axa",
 				ProductVersion: "v" + version,
+				NetworkUid:     "",
 				IsPay:          true,
 				IsSign:         true,
-				Channel:        "Network-node",
+				Channel:        models.NetworkChannel,
 				PaymentSplit:   "",
 				StartDate:      ParseDateDDMMYYYY(d[0][4]),
 				EndDate:        ParseDateDDMMYYYY(d[0][5]),
 				Updated:        time.Now(),
 				PriceGross:     sumPriseGross,
 				PriceNett:      0,
+
 				Contractor: models.User{
 					Type:       d[0][22],
 					Name:       d[0][23],
 					Surname:    d[0][24],
-					FiscalCode: d[0][27],
+					FiscalCode: strings.ToUpper(d[0][27]),
 					Gender:     d[0][25],
-					BirthDate:  d[0][26],
+					BirthDate:  ParseDateDDMMYYYY(d[0][26]).Format(time.RFC3339),
 					Phone:      d[0][33],
 					IdentityDocuments: []*models.IdentityDocument{{
 						Code:             d[0][57],
@@ -127,9 +129,9 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 						Type:       d[0][22],
 						Name:       d[0][35],
 						Surname:    d[0][34],
-						FiscalCode: d[0][38],
+						FiscalCode: strings.ToUpper(d[0][38]),
 						Gender:     d[0][36],
-						BirthDate:  d[0][37],
+						BirthDate:  ParseDateDDMMYYYY(d[0][37]).Format(time.RFC3339),
 						Mail:       d[0][71],
 						Phone:      d[0][72],
 						IdentityDocuments: []*models.IdentityDocument{{
@@ -162,16 +164,16 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 			policy.Assets[0].Guarantees = guarantees
 			policy.PriceGross = sumPriseGross
-
 			//log.Println("LifeIn policy:", policy)
 			b, e := json.Marshal(policy)
 			log.Println("LifeIn policy:", e)
 			log.Println("LifeIn policy:", string(b))
 			docref, _, _ := lib.PutFirestoreErr("test-policy", policy)
 			log.Println("LifeIn doc id: ", docref.ID)
-			//user,e:=models.UpdateUserByFiscalCode("", policy.Contractor)
-			//	log.Println("LifeIn policy:", policy)
-			//tr := transaction.PutByPolicy(policy, "", "", "", "", sumPriseGross, 0, "", "BO", true)
+
+			//_, e = models.UpdateUserByFiscalCode("uat", policy.Contractor)
+			//log.Println("LifeIn policy:", policy)
+			//tr := transaction.PutByPolicy(policy, "", "uat", "", "", sumPriseGross, 0, "", "manual", true)
 			//	log.Println("LifeIn transactionpolicy:",tr)
 			//accounting.CreateNetworkTransaction(tr, "uat")
 
@@ -204,6 +206,8 @@ func LifeMapCodecCompanyAxaRevert(g string) (string, string, string, string) {
 		result = "CI"
 		slug = "serious-ill"
 	}
+	log.Println("LifeIn LifeMapCodecCompanyAxaRevert:", version)
+	log.Println("LifeIn LifeMapCodecCompanyAxaRevert:", code)
 	return result, slug, version, pay
 }
 func ParseDateDDMMYYYY(date string) time.Time {
@@ -212,17 +216,21 @@ func ParseDateDDMMYYYY(date string) time.Time {
 	)
 	log.Println("LifeIn ParseDateDDMMYYYY date:", date)
 	log.Println("LifeIn ParseDateDDMMYYYY len(date):", len(date))
-	if len(date) < 8 {
+	if len(date) == 7 {
 		date = "0" + date
 	}
-	if len(date) >= 8 {
-		d, e := strconv.Atoi(date[0:1])
-		m, e := strconv.Atoi(date[2:3])
-		y, e := strconv.Atoi(date[4:7])
+	if len(date) == 8 {
+		d, e := strconv.Atoi(date[:2])
+		m, e := strconv.Atoi(date[2:4])
+		y, e := strconv.Atoi(date[4:8])
 
 		res = time.Date(y, time.Month(m),
 			d, 0, 0, 0, 0, time.UTC)
 		log.Println(e)
+		log.Println("LifeIn ParseDateDDMMYYYY d:", d)
+		log.Println("LifeIn ParseDateDDMMYYYY m:", m)
+		log.Println("LifeIn ParseDateDDMMYYYY y:", y)
+		log.Println("LifeIn ParseDateDDMMYYYY res:", res)
 	}
 	return res
 
@@ -267,7 +275,7 @@ func ParseAxaBeneficiary(r []string, base int) models.Beneficiary {
 			User: models.User{
 				Name:       r[84+rangeCell],
 				Surname:    r[83+rangeCell],
-				FiscalCode: r[85+rangeCell],
+				FiscalCode: strings.ToUpper(r[85+rangeCell]),
 				Mail:       r[91+rangeCell],
 
 				Residence: &models.Address{

@@ -27,8 +27,9 @@ func (router RouteDataV2) Router(w http.ResponseWriter, r *http.Request) {
 	var e error
 
 	//reqUri := r.RequestURI
+	log.Printf("[RouterV2] request URI: %s", r.RequestURI)
+
 	for _, v := range router.Routes {
-		
 		route = v.Route
 		if strings.Contains(route, "?") {
 			//i := strings.Index(route, ":")
@@ -65,18 +66,12 @@ func (router RouteDataV2) Router(w http.ResponseWriter, r *http.Request) {
 	if e != nil {
 		log.Println("Router error")
 		log.Println(e.Error())
-		// Temporary work-around while test-function is not rewritten
-		//reader := strings.NewReader(e.Error())
-		//io.Copy(w, reader)
-
 		http.Error(w, e.Error(), 500)
 	}
 	if !isFound {
 		log.Println("Router not found")
 		http.NotFound(w, r)
-		//fmt.Fprintf(w, `{"message":" select correct path "}`)
 	}
 	reader := strings.NewReader(result)
 	io.Copy(w, reader)
-
 }

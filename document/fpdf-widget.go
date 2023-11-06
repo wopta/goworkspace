@@ -654,7 +654,7 @@ func contractWithdrawlSection(pdf *fpdf.Fpdf, isProposal bool) {
 	}
 }
 
-func allegato3Section(pdf *fpdf.Fpdf, producerInfo map[string]string) {
+func allegato3Section(pdf *fpdf.Fpdf, producerInfo map[string]string, designation string) {
 	setBlackBoldFont(pdf, titleTextSize)
 	pdf.MultiCell(0, 3, "ALLEGATO 3 - INFORMATIVA SUL DISTRIBUTORE", "", "CM", false)
 	pdf.Ln(3)
@@ -674,7 +674,7 @@ func allegato3Section(pdf *fpdf.Fpdf, producerInfo map[string]string) {
 		"il contraente", "", "", false)
 	pdf.Ln(1)
 
-	woptaInfoTable(pdf, producerInfo)
+	woptaInfoTable(pdf, producerInfo, designation)
 	pdf.Ln(1)
 
 	setBlackRegularFont(pdf, standardTextSize)
@@ -733,7 +733,7 @@ func allegato3Section(pdf *fpdf.Fpdf, producerInfo map[string]string) {
 		"", "", false)
 }
 
-func allegato4Section(pdf *fpdf.Fpdf, producerInfo map[string]string) {
+func allegato4Section(pdf *fpdf.Fpdf, producerInfo map[string]string, designation string) {
 	setBlackBoldFont(pdf, titleTextSize)
 	pdf.MultiCell(0, 3, "ALLEGATO 4 - INFORMAZIONI SULLA DISTRIBUZIONE\nDEL PRODOTTO ASSICURATIVO NON IBIP",
 		"", "CM", false)
@@ -745,7 +745,7 @@ func allegato4Section(pdf *fpdf.Fpdf, producerInfo map[string]string) {
 		"e sulle remunerazioni percepite.", "", "", false)
 	pdf.Ln(1)
 
-	woptaInfoTable(pdf, producerInfo)
+	woptaInfoTable(pdf, producerInfo, designation)
 	pdf.Ln(3)
 
 	setBlackBoldFont(pdf, titleTextSize)
@@ -801,7 +801,7 @@ func allegato4Section(pdf *fpdf.Fpdf, producerInfo map[string]string) {
 	pdf.Ln(3)
 }
 
-func allegato4TerSection(pdf *fpdf.Fpdf, producerInfo map[string]string) {
+func allegato4TerSection(pdf *fpdf.Fpdf, producerInfo map[string]string, designation string) {
 	setBlackBoldFont(pdf, titleTextSize)
 	pdf.MultiCell(0, 3, "ALLEGATO 4 TER - ELENCO DELLE REGOLE DI COMPORTAMENTO DEL DISTRIBUTORE",
 		"", fpdf.AlignCenter, false)
@@ -816,7 +816,7 @@ func allegato4TerSection(pdf *fpdf.Fpdf, producerInfo map[string]string) {
 		"prevista, del contratto di assicurazione.", "", "", false)
 	pdf.Ln(1)
 
-	woptaInfoTable(pdf, producerInfo)
+	woptaInfoTable(pdf, producerInfo, designation)
 	pdf.Ln(3)
 
 	setBlackBoldFont(pdf, titleTextSize)
@@ -847,4 +847,25 @@ func allegato4TerSection(pdf *fpdf.Fpdf, producerInfo map[string]string) {
 		"oggettive sul prodotto, illustrandone le caratteristiche, la durata, i costi e i limiti della copertura ed "+
 		"ogni altro elemento utile a consentire al contraente di prendere una decisione informata",
 		"", "", false)
+}
+
+func generatePolicyAnnex(pdf *fpdf.Fpdf, origin string, networkNode *models.NetworkNode) {
+	if networkNode == nil || networkNode.HasAnnex || networkNode.Type == models.PartnershipNetworkNodeType {
+		producerInfo := loadProducerInfo(origin, networkNode)
+		designation := loadDesignation(networkNode)
+
+		pdf.AddPage()
+
+		woptaFooter(pdf)
+
+		allegato3Section(pdf, producerInfo, designation)
+
+		pdf.AddPage()
+
+		allegato4Section(pdf, producerInfo, designation)
+
+		pdf.AddPage()
+
+		allegato4TerSection(pdf, producerInfo, designation)
+	}
 }
