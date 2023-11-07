@@ -42,7 +42,6 @@ func CreateWarrantFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		return "", response, err
 	}
 
-
 	response.Success = err == nil
 	if err == nil {
 		log.Printf("[CreateWarrantFx] created warrant %s", warrant.Name)
@@ -53,6 +52,8 @@ func CreateWarrantFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		log.Printf("[CreateWarrantFx] error marshaling response: %s", err.Error())
 		return "", response, err
 	}
+
+	models.CreateAuditLog(r, string(bodyBytes))
 
 	return string(responseBytes), response, err
 }

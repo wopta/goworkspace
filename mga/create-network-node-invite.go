@@ -79,6 +79,8 @@ func CreateNetworkNodeInviteFx(w http.ResponseWriter, r *http.Request) (string, 
 
 	log.Printf("[CreateNetworkNodeInviteFx] network node invite mail sent to %s", networkNode.Mail)
 
+	models.CreateAuditLog(r, string(body))
+
 	return "{}", nil, nil
 }
 

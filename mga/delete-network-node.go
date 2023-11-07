@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 )
 
@@ -26,6 +27,8 @@ func DeleteNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 	}
 
 	log.Printf("[DeleteNetworkNodeFx] node %s deleted from firestore...", nodeUid)
+
+	models.CreateAuditLog(r, "")
 
 	return "", "", nil
 }
