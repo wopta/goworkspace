@@ -21,7 +21,7 @@ func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		err     error
 	)
 
-	log.Println("[LifeFx] handler start ----------- ")
+	log.Println("[LifeFx] handler start ------------------------------------- ")
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	log.Printf("[LifeFx] body: %s", string(body))
@@ -50,8 +50,10 @@ func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	jsonOut, err := product.Marshal()
 
+	models.CreateAuditLog(r, string(body))
+
 	log.Printf("[LifeFx] response: %s", string(jsonOut))
-	log.Println("[LifeFx] handler end -------------------")
+	log.Println("[LifeFx] handler end ----------------------------------------")
 
 	return string(jsonOut), product, err
 }

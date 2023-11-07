@@ -21,7 +21,7 @@ func PersonaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 		err     error
 	)
 
-	log.Println("[PersonaFx] handler start ----------------------")
+	log.Println("[PersonaFx] handler start -----------------------------------")
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	log.Printf("[PersonaFx] body: %s", string(body))
@@ -46,9 +46,11 @@ func PersonaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	productJson, err := json.Marshal(product)
 	lib.CheckError(err)
 
+	models.CreateAuditLog(r, string(body))
+
 	log.Printf("[PersonaFx] response: %s", string(productJson))
 
-	log.Println("[PersonaFx] handler end ------------------------")
+	log.Println("[PersonaFx] handler end -------------------------------------")
 
 	return string(productJson), product, nil
 }
