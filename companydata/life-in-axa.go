@@ -79,7 +79,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			log.Println("LifeIn  elemets (0-2 ): ", d[0][2])
 			log.Println("LifeIn  elemets (0-3 ): ", d[0][3])
 			//1998-09-27T00:00:00Z RFC3339
-			_, _, _, version := LifeMapCodecCompanyAxaRevert(d[0][1])
+			_, _, version, _ := LifeMapCodecCompanyAxaRevert(d[0][1])
 
 			policy := models.Policy{
 				Status:         "imported",
@@ -98,7 +98,6 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 				Updated:        time.Now(),
 				PriceGross:     sumPriseGross,
 				PriceNett:      0,
-
 				Contractor: models.User{
 					Type:       d[0][22],
 					Name:       d[0][23],
@@ -235,6 +234,7 @@ func ParseDateDDMMYYYY(date string) time.Time {
 	return res
 
 }
+
 func ParseAxaFloat(price string) float64 {
 	//pricelen:=len("0000001500000")
 	if len(price) > 3 {

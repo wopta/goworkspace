@@ -75,40 +75,7 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	log.Println("LifeAxalEmit from: " + from.String())
 	log.Println("LifeAxalEmit to: " + to.String())
 	log.Println("LifeAxalEmit: " + filenamesplit)
-	lifeAxaEmitQuery = lib.Firequeries{
-		Queries: []lib.Firequery{
 
-			{
-				Field:      "isDelete", //
-				Operator:   "==",       //
-				QueryValue: false,
-			},
-			{
-				Field:      "isPay", //
-				Operator:   "==",    //
-				QueryValue: true,
-			},
-			{
-				Field:      "company", //
-				Operator:   "==",      //
-				QueryValue: "axa",
-			},
-			{
-				Field:      "policyName", //
-				Operator:   "==",         //
-				QueryValue: "life",
-			}, {
-				Field:      "payDate", //
-				Operator:   ">",       //
-				QueryValue: from,
-			},
-			{
-				Field:      "payDate", //
-				Operator:   "<",       //
-				QueryValue: to,
-			},
-		},
-	}
 	df := lib.CsvToDataframe(cabCsv)
 	query, e := lifeAxaEmitQuery.FirestoreWherefields("transactions")
 	log.Println("LifeAxalEmit: ", e)
@@ -488,7 +455,7 @@ func getRenew(p models.Policy) string {
 	var result string
 	now := time.Now()
 	addMonth := p.StartDate.AddDate(0, 1, 0)
-	if p.PaymentSplit == string(models.PaySplitYear) {
+	if p.PaymentSplit == string(models.PaySplitYear)  || p.PaymentSplit == string(models.PaySplitYearly){
 		result = "A"
 	}
 	if p.PaymentSplit == string(models.PaySplitMonthly) {
@@ -504,7 +471,7 @@ func getRenewDate(p models.Policy, trans models.Transaction) time.Time {
 	var result time.Time
 	now := time.Now()
 	addMonth := p.StartDate.AddDate(0, 1, 0)
-	if p.PaymentSplit == "year" {
+	if p.PaymentSplit == "year"  || p.PaymentSplit == string(models.PaySplitYearly){
 		result = p.StartDate
 	}
 	if p.PaymentSplit == string(models.PaySplitMonthly) {
@@ -512,14 +479,16 @@ func getRenewDate(p models.Policy, trans models.Transaction) time.Time {
 		if now.Before(addMonth) {
 			result = p.StartDate
 		} else {
-			result = trans.PayDate
+			sdate,e:=time.Parse("2006-01-02",trans.ScheduleDate)
+			log.Println(e)
+			result = sdate
 		}
 	}
 	return result
 }
 func mapCoverageDuration(p models.Policy) string {
 	var result string
-	if p.PaymentSplit == "year" {
+	if p.PaymentSplit == "year" || p.PaymentSplit == string(models.PaySplitYearly) {
 		result = "012"
 	}
 	if p.PaymentSplit == string(models.PaySplitMonthly) {
@@ -530,7 +499,7 @@ func mapCoverageDuration(p models.Policy) string {
 func mapCodecCompany(p models.Policy, g string) string {
 	var result, pay string
 
-	if p.PaymentSplit == "year" {
+	if p.PaymentSplit == "year" || p.PaymentSplit == string(models.PaySplitYearly) {
 		pay = "W"
 	}
 	if p.PaymentSplit == string(models.PaySplitMonthly) {
