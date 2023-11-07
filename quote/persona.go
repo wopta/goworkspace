@@ -50,9 +50,10 @@ func PersonaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 
 	policyJson, err := policy.Marshal()
 
-	log.Printf("[PersonaFx] response: %s", string(policyJson))
+	models.CreateAuditLog(r, string(body))
 
-	log.Println("[PersonaFx] handler end ------------------------------------")
+	log.Printf("[PersonaFx] response: %s", string(policyJson))
+	log.Println("[PersonaFx] handler end -------------------------------------")
 
 	return string(policyJson), policy, err
 }

@@ -63,9 +63,10 @@ func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	result, err := Life(data, authToken.GetChannelByRoleV2(), networkNode, warrant)
 	jsonOut, err := json.Marshal(result)
 
-	log.Printf("[LifeFx] response: %s", string(jsonOut))
+	models.CreateAuditLog(r, string(req))
 
-	log.Println("[LifeFx] handler end ---------------------------------------")
+	log.Printf("[LifeFx] response: %s", string(jsonOut))
+	log.Println("[LifeFx] handler end ----------------------------------------")
 
 	return string(jsonOut), result, err
 

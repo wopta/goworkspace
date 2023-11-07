@@ -43,9 +43,10 @@ func GapFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 	Gap(policy, authToken.GetChannelByRoleV2(), networkNode, warrant)
 	policyJson, err := policy.Marshal()
 
-	log.Printf("[GapFx] response: %s", string(policyJson))
+	models.CreateAuditLog(r, string(req))
 
-	log.Println("[GapFx] handler end --------------------------------------")
+	log.Printf("[GapFx] response: %s", string(policyJson))
+	log.Println("[GapFx] handler end -----------------------------------------")
 
 	return string(policyJson), policy, err
 }
