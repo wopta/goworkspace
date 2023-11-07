@@ -46,7 +46,7 @@ func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, inter
 	resp.Header().Set("Access-Control-Allow-Methods", "GET")
 	resp.Header().Set("Content-Type", "application/json")
 
-	log.Println("[LifePartnershipFx] handler start ----------------------------")
+	log.Println("[LifePartnershipFx] handler start ---------------------------")
 
 	partnershipUid := strings.ToLower(r.Header.Get("partnershipUid"))
 	jwtData := r.URL.Query().Get("jwt")
@@ -66,7 +66,10 @@ func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, inter
 
 	responseJson, err := json.Marshal(response)
 
+	models.CreateAuditLog(r, "")
+
 	log.Printf("[LifePartnershipFx] response: %s", string(responseJson))
+	log.Println("[LifePartnershipFx] handler end -----------------------------")
 
 	return string(responseJson), response, err
 }
