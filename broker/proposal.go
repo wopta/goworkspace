@@ -108,6 +108,8 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 		return "", nil, err
 	}
 
+	models.CreateAuditLog(r, string(body))
+
 	log.Printf("[ProposalFx] response: %s", string(resp))
 	log.Println("[ProposalFx] Handler end ------------------------------------")
 

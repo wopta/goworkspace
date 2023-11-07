@@ -82,6 +82,8 @@ func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 
 	jsonOut, err := policy.Marshal()
 
+	models.CreateAuditLog(r, string(body))
+
 	log.Printf("[RequestApprovalFx] response: %s", string(jsonOut))
 	log.Println("[RequestApprovalFx] Handler end -----------------------------")
 

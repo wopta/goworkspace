@@ -63,6 +63,8 @@ func LeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		return "", nil, err
 	}
 
+	models.CreateAuditLog(r, string(body))
+
 	log.Printf("[LeadFx] response: %s", string(resp))
 	log.Println("[LeadFx] Handler end ----------------------------------------")
 

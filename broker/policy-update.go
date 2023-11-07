@@ -76,9 +76,15 @@ func UpdatePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	response.Policy = &updatedPolicy
 	responseJson, err := json.Marshal(&response)
 
+	models.CreateAuditLog(r, string(body))
+
+	log.Printf("[UpdatePolicyFx] response: %s", string(responseJson))
+	log.Println("[UpdatePolicyFx] Handler end --------------------------------")
+
 	return string(responseJson), response, err
 }
 
+// DEPRECATED
 func PatchPolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err          error
@@ -142,6 +148,7 @@ func DeletePolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	lib.SetFirestore(firePolicy, policyUID, policy)
 	policy.BigquerySave(r.Header.Get("origin"))
 	models.SetGuaranteBigquery(policy, "delete", guaranteFire)
+	models.CreateAuditLog(r, string(req))
 	return `{"uid":"` + policyUID + `", "success":true}`, `{"uid":"` + policyUID + `", "success":true}`, err
 }
 

@@ -112,6 +112,8 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	}
 	b, e := json.Marshal(responseEmit)
 
+	models.CreateAuditLog(r, string(body))
+
 	log.Println("[EmitFx] Response: ", string(b))
 	log.Println("[EmitFx] Handler end ----------------------------------------")
 
