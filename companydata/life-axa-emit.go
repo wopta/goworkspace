@@ -27,7 +27,22 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 		refMontly     time.Time
 		upload        bool
 	)
-	var lifeAxaEmitQuery = lib.Firequeries{
+
+	log.Println("----------------LifeAxalEmit-----------------")
+	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
+	defer r.Body.Close()
+	log.Println("LifeAxalEmit: ", r.Header)
+	log.Println("LifeAxalEmit: ", string(req))
+	now, upload := getRequestData(req)
+	from, to, refMontly, filenamesplit = AxaPartnersSchedule(now)
+	cabCsv = lib.GetFilesByEnv("data/cab-cap-istat.csv")
+
+	log.Println("LifeAxalEmit now: " + now.String())
+	log.Println("LifeAxalEmit now.Day: ", now.Day())
+	log.Println("LifeAxalEmit from: " + from.String())
+	log.Println("LifeAxalEmit to: " + to.String())
+	log.Println("LifeAxalEmit: " + filenamesplit)
+	lifeAxaEmitQuery := lib.Firequeries{
 		Queries: []lib.Firequery{
 
 			{
@@ -61,21 +76,6 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 			},
 		},
 	}
-	log.Println("----------------LifeAxalEmit-----------------")
-	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
-	defer r.Body.Close()
-	log.Println("LifeAxalEmit: ", r.Header)
-	log.Println("LifeAxalEmit: ", string(req))
-	now, upload := getRequestData(req)
-	from, to, refMontly, filenamesplit = AxaPartnersSchedule(now)
-	cabCsv = lib.GetFilesByEnv("data/cab-cap-istat.csv")
-
-	log.Println("LifeAxalEmit now: " + now.String())
-	log.Println("LifeAxalEmit now.Day: ", now.Day())
-	log.Println("LifeAxalEmit from: " + from.String())
-	log.Println("LifeAxalEmit to: " + to.String())
-	log.Println("LifeAxalEmit: " + filenamesplit)
-
 	df := lib.CsvToDataframe(cabCsv)
 	query, e := lifeAxaEmitQuery.FirestoreWherefields("transactions")
 	log.Println("LifeAxalEmit: ", e)
@@ -455,7 +455,7 @@ func getRenew(p models.Policy) string {
 	var result string
 	now := time.Now()
 	addMonth := p.StartDate.AddDate(0, 1, 0)
-	if p.PaymentSplit == string(models.PaySplitYear)  || p.PaymentSplit == string(models.PaySplitYearly){
+	if p.PaymentSplit == string(models.PaySplitYear) || p.PaymentSplit == string(models.PaySplitYearly) {
 		result = "A"
 	}
 	if p.PaymentSplit == string(models.PaySplitMonthly) {
@@ -471,7 +471,7 @@ func getRenewDate(p models.Policy, trans models.Transaction) time.Time {
 	var result time.Time
 	now := time.Now()
 	addMonth := p.StartDate.AddDate(0, 1, 0)
-	if p.PaymentSplit == "year"  || p.PaymentSplit == string(models.PaySplitYearly){
+	if p.PaymentSplit == "year" || p.PaymentSplit == string(models.PaySplitYearly) {
 		result = p.StartDate
 	}
 	if p.PaymentSplit == string(models.PaySplitMonthly) {
@@ -479,7 +479,7 @@ func getRenewDate(p models.Policy, trans models.Transaction) time.Time {
 		if now.Before(addMonth) {
 			result = p.StartDate
 		} else {
-			sdate,e:=time.Parse("2006-01-02",trans.ScheduleDate)
+			sdate, e := time.Parse("2006-01-02", trans.ScheduleDate)
 			log.Println(e)
 			result = sdate
 		}
