@@ -28,6 +28,12 @@ func InclusiveFx(w http.ResponseWriter, r *http.Request) {
 				Method:  "POST",
 				Roles:   []string{},
 			},
+			{
+				Route:   "/bankaccount/v1/hype/count",
+				Handler: CountHypeFx,
+				Method:  "POST",
+				Roles:   []string{},
+			},
 		},
 	}
 	route.Router(w, r)

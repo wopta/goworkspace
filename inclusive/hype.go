@@ -28,7 +28,6 @@ const (
 
 // TO DO security,payload,error,fasature
 func BankAccountHypeFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	layout := "2006-01-02"
 
 	var (
 		e   error
@@ -48,15 +47,22 @@ func BankAccountHypeFx(resp http.ResponseWriter, r *http.Request) (string, inter
 
 		e = lib.InsertRowsBigQuery("wopta", dataBanckAccount, obj)
 	}
-	if obj.MovementType == "delete" || obj.MovementType == "suspended" {
-		e = lib.UpdateRowBigQuery("wopta", dataBanckAccount, map[string]string{
-			"status":  obj.Status,
-			"endDate": obj.EndDate.Format(layout) + " 00:00:00",
-		}, "fiscalCode='"+obj.FiscalCode+"' and guaranteesCode='"+obj.GuaranteesCode+"'")
+	/*
+		layout := "2006-01-02"
+		if obj.MovementType == "delete" || obj.MovementType == "suspended" {
+			e = lib.UpdateRowBigQuery("wopta", dataBanckAccount, map[string]string{
+				"status":  obj.Status,
+				"endDate": obj.EndDate.Format(layout) + " 00:00:00",
+			}, "fiscalCode='"+obj.FiscalCode+"' and guaranteesCode='"+obj.GuaranteesCode+"'")
 
-	}
-
+		}
+	*/
 	return `{"woptaUid":"` + obj.Uid + `"}`, nil, e
+}
+func CountHypeFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+
+	Count("", "", "")
+	return ``, nil, nil
 }
 
 type BankAccountMovement struct {

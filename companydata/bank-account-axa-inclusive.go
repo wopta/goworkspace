@@ -43,7 +43,7 @@ func BankAccountAxaInclusive(w http.ResponseWriter, r *http.Request) (string, in
 	json.Unmarshal([]byte(req), &obj)
 	now, upload = getRequestData(req)
 	refDay = now.AddDate(0, 0, -1)
-
+	
 	log.Println("BankAccountAxaInclusive refMontly: ", refDay)
 	//from, e = time.Parse("2006-01-02", strconv.Itoa(now.Year())+"-"+fmt.Sprintf("%02d", int(now.Month()))+"-"+fmt.Sprintf("%02d", 1))
 	//query := "select * from `wopta." + dataMovement + "` where _PARTITIONTIME >'" + from.Format(layoutQuery) + " 00:00:00" + "' and _PARTITIONTIME <'" + to.Format(layoutQuery) + " 23:59:00" + "'"
@@ -106,6 +106,14 @@ func setInclusiveRow(mov inclusive.BankAccountMovement) [][]string {
 			"delete":    "E",
 			"suspended": "E",
 		}), //    TIPO MOVIMENTO
+	}
+	layout := "2006-01-02"
+	if mov.MovementType == "delete" || mov.MovementType == "suspended" {
+		e = lib.UpdateRowBigQuery("wopta", dataBanckAccount, map[string]string{
+			"status":  mov.Status,
+			"endDate": mov.EndDate.Format(layout) + " 00:00:00",
+		}, "fiscalCode='"+mov.FiscalCode+"' and guaranteesCode='"+mov.GuaranteesCode+"'")
+
 	}
 
 	result = append(result, row)
