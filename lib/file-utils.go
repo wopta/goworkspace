@@ -5,7 +5,6 @@ import (
 	"encoding/csv"
 	"errors"
 	"fmt"
-	"google.golang.org/api/iterator"
 	"io"
 	"io/ioutil"
 	"log"
@@ -15,8 +14,8 @@ import (
 	"time"
 
 	"cloud.google.com/go/storage"
-	fireStorage "firebase.google.com/go"
 	firebase "firebase.google.com/go"
+	"google.golang.org/api/iterator"
 )
 
 func Files(path string) []string {
@@ -196,7 +195,7 @@ func PutToStorageIfNotExists(bucketname string, path string, file []byte) (strin
 	obj := bucket.Object(path)
 
 	// Check if the object already exists
-	_, err = obj.Attrs(ctx);
+	_, err = obj.Attrs(ctx)
 	if err == nil {
 		// Object already exists, return an error
 		return "", fmt.Errorf("file already exists")
@@ -242,7 +241,7 @@ func PutToFireStorage(bucketname string, path string, file []byte) string {
 	config := &firebase.Config{
 		StorageBucket: "positive-apex-350507.appspot.com",
 	}
-	app, err := fireStorage.NewApp(ctx, config, nil)
+	app, err := firebase.NewApp(ctx, config, nil)
 
 	CheckError(err)
 	client, e := app.Storage(ctx)
@@ -268,6 +267,8 @@ func GetFilesByEnv(file string) []byte {
 	switch os.Getenv("env") {
 	case "local":
 		res1 = ErrorByte(os.ReadFile("../function-data/dev/" + file))
+	case "test":
+		res1 = ErrorByte(os.ReadFile("../../function-data/dev/" + file))
 	case "dev":
 		res1 = GetFromStorage("function-data", file, "")
 	case "prod":
