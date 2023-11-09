@@ -95,7 +95,8 @@ func createCompanyNetworkTransaction(
 		mgaProduct.Offers["complete"].Commissions.RenewPassive = 0
 	}
 
-	commissionCompany := product.GetCommissionByProduct(policy, mgaProduct, false)
+	commissionMga := product.GetCommissionByProduct(policy, mgaProduct, false)
+	commissionCompany := lib.RoundFloat(transaction.AmountNet-commissionMga, 2)
 
 	if producerNode != nil {
 		code = producerNode.Code
