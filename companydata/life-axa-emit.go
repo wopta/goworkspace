@@ -26,6 +26,7 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 		result        [][]string
 		refMontly     time.Time
 		upload        bool
+		queryListdate []string
 	)
 
 	log.Println("----------------LifeAxalEmit-----------------")
@@ -42,6 +43,15 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	log.Println("LifeAxalEmit from: " + from.String())
 	log.Println("LifeAxalEmit to: " + to.String())
 	log.Println("LifeAxalEmit: " + filenamesplit)
+	i := from
+	for next := true; next; next = i.Before(to) {
+		fmt.Println("LifeAxalEmit: ", i.Format("2006-01-02"))
+		//2023-09-26
+		queryListdate = append(queryListdate, i.Format("2006-01-02"))
+		i = i.AddDate(0, 0, 1)
+
+	}
+
 	lifeAxaEmitQuery := lib.Firequeries{
 		Queries: []lib.Firequery{
 
@@ -64,15 +74,11 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 				Field:      "policyName", //
 				Operator:   "==",         //
 				QueryValue: "life",
-			}, {
-				Field:      "payDate", //
-				Operator:   ">",       //
-				QueryValue: from,
 			},
 			{
-				Field:      "payDate", //
-				Operator:   "<",       //
-				QueryValue: to,
+				Field:      "scheduleDate", //
+				Operator:   "in",           //
+				QueryValue: queryListdate,
 			},
 		},
 	}
@@ -108,9 +114,9 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 
 func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.Transaction) [][]string {
 	var (
-		result       [][]string
-		residenceCab string
-		networkCode  string
+		result               [][]string
+		residenceCab         string
+		networkCode, channel string
 	)
 	log.Println("LifeAxalEmit:  policy.Uid: ", policy.Uid)
 	fil := df.Filter(
@@ -131,7 +137,9 @@ func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.T
 		snap.DataTo(&node)
 		log.Println("LifeAxalEmit: node.Code", node.Code)
 		networkCode = node.Code
+		channel = "POS"
 	} else {
+		channel = "WEB"
 		networkCode = "W1"
 	}
 	for _, asset := range policy.Assets {
@@ -178,7 +186,7 @@ func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.T
 				"",                                         //Maxi rata finale/Valore riscatto
 				"",                                         //Stato occupazionale dell'Assicurato
 				"1",                                        //Tipo aderente
-				"WEB",                                      //Canale di vendita
+				channel,                                    //Canale di vendita
 				"PF",                                       //Tipo contraente / Contraente
 				policy.Contractor.Surname,                  //Denominazione Sociale o Cognome contraente
 				policy.Contractor.Name,                     //campo vuoto o nome
