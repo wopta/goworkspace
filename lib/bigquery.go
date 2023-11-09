@@ -42,18 +42,20 @@ func QueryRowsBigQuery[T any](query string) ([]T, error) {
 	defer client.Close()
 	queryi := client.Query(query)
 	iter, e = queryi.Read(ctx)
-	log.Println(e)
+
 	for {
 		var row T
-		e := iter.Next(&row)
-		log.Println(e)
+		e = iter.Next(&row)
+
 		if e == iterator.Done {
+			log.Println(e)
 			return res, nil
 		}
 		if e != nil {
+			log.Println(e)
 			return res, e
 		}
-		log.Println(e)
+
 		res = append(res, row)
 
 	}
