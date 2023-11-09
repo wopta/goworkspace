@@ -1,10 +1,12 @@
 package sellable
 
 import (
+	"encoding/json"
 	"os"
 	"testing"
 	"time"
 
+	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -20,97 +22,28 @@ func getPolicyByContractorAge(age int) models.Policy {
 
 func TestLife(t *testing.T) {
 	var (
-		output *models.Product
-		err    error
+		output  *models.Product
+		err     error
+		channel = models.ECommerceChannel
+		inputs  []int
+		outputs []map[string]*models.Guarante
 	)
-	channel := models.ECommerceChannel
-	os.Setenv("env", "test")
 
-	inputs := []int{17, 18, 53, 54, 55, 58, 59, 60, 63, 64, 65, 68, 69, 70, 71}
-	outputs := []map[string]*models.Guarante{
-		{},
-		{
-			"death":                {IsSellable: true, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 20}}},
-			"permanent-disability": {IsSellable: true, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 20}}},
-			"temporary-disability": {IsSellable: true, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 10}}},
-			"serious-ill":          {IsSellable: true, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 10}}},
-		},
-		{
-			"death":                {IsSellable: true, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 20}}},
-			"permanent-disability": {IsSellable: true, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 20}}},
-			"temporary-disability": {IsSellable: true, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 10}}},
-			"serious-ill":          {IsSellable: true, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 10}}},
-		},
-		{
-			"death":                {IsSellable: true, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 20}}},
-			"permanent-disability": {IsSellable: true, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 20}}},
-			"temporary-disability": {IsSellable: true, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 10}}},
-			"serious-ill":          {IsSellable: true, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 10}}},
-		},
-		{
-			"death":                {IsSellable: true, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 15}}},
-			"permanent-disability": {IsSellable: true, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 15}}},
-			"temporary-disability": {IsSellable: true, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 10}}},
-			"serious-ill":          {IsSellable: true, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 5}}},
-		},
-		{
-			"death":                {IsSellable: true, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 15}}},
-			"permanent-disability": {IsSellable: true, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 15}}},
-			"temporary-disability": {IsSellable: true, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 10}}},
-			"serious-ill":          {IsSellable: true, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 5}}},
-		},
-		{
-			"death":                {IsSellable: true, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 15}}},
-			"permanent-disability": {IsSellable: true, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 15}}},
-			"temporary-disability": {IsSellable: true, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 10}}},
-			"serious-ill":          {IsSellable: true, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 5}}},
-		},
-		{
-			"death":                {IsSellable: true, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 10}}},
-			"permanent-disability": {IsSellable: true, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 10}}},
-			"temporary-disability": {IsSellable: true, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 10}}},
-			"serious-ill":          {IsSellable: false, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 10}}},
-		},
-		{
-			"death":                {IsSellable: true, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 10}}},
-			"permanent-disability": {IsSellable: true, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 10}}},
-			"temporary-disability": {IsSellable: true, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 10}}},
-			"serious-ill":          {IsSellable: false, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 10}}},
-		},
-		{
-			"death":                {IsSellable: true, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 10}}},
-			"permanent-disability": {IsSellable: true, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 10}}},
-			"temporary-disability": {IsSellable: true, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 10}}},
-			"serious-ill":          {IsSellable: false, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 10}}},
-		},
-		{
-			"death":                {IsSellable: true, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 5}}},
-			"permanent-disability": {IsSellable: true, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 5}}},
-			"temporary-disability": {IsSellable: true, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 5}}},
-			"serious-ill":          {IsSellable: false, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 10}}},
-		},
-		{
-			"death":                {IsSellable: true, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 5}}},
-			"permanent-disability": {IsSellable: true, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 5}}},
-			"temporary-disability": {IsSellable: true, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 5}}},
-			"serious-ill":          {IsSellable: false, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 10}}},
-		},
-		{
-			"death":                {IsSellable: true, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 5}}},
-			"permanent-disability": {IsSellable: true, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 5}}},
-			"temporary-disability": {IsSellable: true, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 5}}},
-			"serious-ill":          {IsSellable: false, Config: &models.GuaranteValue{DurationValues: &models.DurationFieldValue{Max: 10}}},
-		},
-		{},
-		{},
-	}
+	os.Setenv("env", "local-test")
+
+	inputFile := lib.GetFilesByEnv("data/test/sellable/input.json")
+	err = json.Unmarshal(inputFile, &inputs)
+	lib.CheckError(err)
+	outputFile := lib.GetFilesByEnv("data/test/sellable/output.json")
+	err = json.Unmarshal(outputFile, &outputs)
+	lib.CheckError(err)
 
 	for index, age := range inputs {
 		policy := getPolicyByContractorAge(age)
 		expected := outputs[index]
 		output, err = Life(&policy, channel, nil, nil)
 		if err != nil {
-			t.Fatalf("error on sellable age %d", age)
+			t.Fatalf("error on sellable age %d: %s", age, err.Error())
 		}
 		if len(expected) == 0 {
 			if len(output.Companies[0].GuaranteesMap) > 0 {

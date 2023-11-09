@@ -267,7 +267,7 @@ func GetFilesByEnv(file string) []byte {
 	switch os.Getenv("env") {
 	case "local":
 		res1 = ErrorByte(os.ReadFile("../function-data/dev/" + file))
-	case "test":
+	case "local-test":
 		res1 = ErrorByte(os.ReadFile("../../function-data/dev/" + file))
 	case "dev":
 		res1 = GetFromStorage("function-data", file, "")
