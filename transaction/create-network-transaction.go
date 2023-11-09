@@ -96,7 +96,7 @@ func createCompanyNetworkTransaction(
 	}
 
 	commissionMga := product.GetCommissionByProduct(policy, mgaProduct, false)
-	commissionCompany := lib.RoundFloat(transaction.AmountNet-commissionMga, 2)
+	commissionCompany := lib.RoundFloat(transaction.Amount-commissionMga, 2)
 
 	if producerNode != nil {
 		code = producerNode.Code
