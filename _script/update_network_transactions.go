@@ -32,26 +32,17 @@ func UpdateNetworkTransactions() {
 	log.Printf("[UpdateNetworkTransactions] found %d netTransactions", len(netTransactions))
 	// loop nt
 	for _, nt := range netTransactions {
-
-		if nt.Uid == "ef8a69c7-820e-450b-8691-708e04b17b9d" {
-			originalAmount = nt.Amount
-			nt.Amount = lib.RoundFloat(nt.Amount, 2)
-			nt.AmountNet = nt.Amount
-		} else {
-			// for each nt get its parent transaction (t)
-			transaction = tr.GetTransactionByUid(nt.TransactionUid, "")
-			// update the nt.Amount and nt.AmountNet with t.Amount - nt.Amount
-			if transaction == nil {
-				log.Printf("[UpdateNetworkTransactions] error getting transaction '%s': %s", nt.TransactionUid, err.Error())
-				return
-			}
-			// log.Printf("[UpdateNetworkTransactions] transaction amount: '%f'", transaction.Amount)
-			// log.Printf("[UpdateNetworkTransactions] original amount: '%f' amountNet: '%f'", nt.Amount, nt.AmountNet)
-			originalAmount = nt.Amount
-			nt.Amount = lib.RoundFloat(transaction.Amount-nt.Amount, 2)
-			nt.AmountNet = nt.Amount
-			// log.Printf("[UpdateNetworkTransactions] modified amount: '%f' amountNet: '%f'", nt.Amount, nt.AmountNet)
+		// for each nt get its parent transaction (t)
+		transaction = tr.GetTransactionByUid(nt.TransactionUid, "")
+		// update the nt.Amount and nt.AmountNet with t.Amount - nt.Amount
+		if transaction == nil {
+			log.Printf("[UpdateNetworkTransactions] error getting transaction '%s': %s", nt.TransactionUid, err.Error())
+			return
 		}
+
+		originalAmount = nt.Amount
+		nt.Amount = lib.RoundFloat(transaction.Amount-nt.Amount, 2)
+		nt.AmountNet = nt.Amount
 
 		// save to bigquery
 		// TODO: remember to manually allow for the modification of amount and amountNet fields
