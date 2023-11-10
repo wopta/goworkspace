@@ -42,6 +42,7 @@ type NetworkNode struct {
 	Data            string                `json:"-" firestore:"-" bigquery:"data"`
 	HasAnnex        bool                  `json:"hasAnnex" firestore:"hasAnnex" bigquery:"hasAnnex"`
 	Designation     string                `json:"designation" firestore:"designation" bigquery:"designation"`
+	ProponentUid    string                `json:"proponentUid" firestore:"proponentUid" bigquery:"-"`
 }
 
 type PartnershipNode struct {
@@ -60,6 +61,8 @@ type AgencyNode struct {
 	RuiRegistration    time.Time             `json:"ruiRegistration" firestore:"ruiRegistration" bigquery:"-"`
 	BigRuiRegistration bigquery.NullDateTime `json:"-" firestore:"-" bigquery:"ruiRegistration"`
 	Skin               *Skin                 `json:"skin,omitempty" firestore:"skin,omitempty" bigquery:"-"`
+	Pec                string                `json:"pec,omitempty" firestore:"pec,omitempty" bigquery:"-"`
+	Website            string                `json:"website,omitempty" firestore:"website,omitempty" bigquery:"-"`
 }
 
 type AgentNode struct {
