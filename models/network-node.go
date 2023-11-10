@@ -42,7 +42,8 @@ type NetworkNode struct {
 	Data            string                `json:"-" firestore:"-" bigquery:"data"`
 	HasAnnex        bool                  `json:"hasAnnex" firestore:"hasAnnex" bigquery:"hasAnnex"`
 	Designation     string                `json:"designation" firestore:"designation" bigquery:"designation"`
-	ProponentUid    string                `json:"proponentUid" firestore:"proponentUid" bigquery:"-"`
+	ProponentUid    string                `json:"proponentUid,omitempty" firestore:"proponentUid,omitempty" bigquery:"-"`
+	DistributorUid  string                `json:"distributorUid,omitempty" firestore:"distributorUid,omitempty" bigquery:"-"`
 }
 
 type PartnershipNode struct {
