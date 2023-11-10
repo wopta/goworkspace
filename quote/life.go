@@ -106,19 +106,20 @@ func Life(data models.Policy, channel string, networkNode *models.NetworkNode, w
 			calculateSumInsuredLimitOfIndemnity(data.Assets, death.Value.SumInsuredLimitOfIndemnity)
 			log.Println("[Life] setting guarantees duration")
 			calculateGuaranteeDuration(data.Assets, death.Value.Duration.Year)
+		}
+	case models.ProductV2:
+		if channel == models.ECommerceChannel {
+			death, err := data.ExtractGuarantee(deathGuarantee)
+			lib.CheckError(err)
+			log.Println("[Life] e-commerce flow")
+			log.Println("[Life] setting sumInsuredLimitOfIndeminity")
+			calculateSumInsuredLimitOfIndemnity(data.Assets, death.Value.SumInsuredLimitOfIndemnity)
+			log.Println("[Life] setting guarantees duration")
+			calculateGuaranteeDuration(data.Assets, death.Value.Duration.Year)
 		} else {
 			log.Println("[Life] mga, network flow")
 			log.Println("[Life] setting sumInsuredLimitOfIndeminity")
 			calculateSumInsuredLimitOfIndemnityV2(&data)
-		}
-	case models.ProductV2:
-		calculateSumInsuredLimitOfIndemnityV2(&data)
-
-		if channel == models.ECommerceChannel {
-			death, err := data.ExtractGuarantee(deathGuarantee)
-			lib.CheckError(err)
-			log.Println("[Life] setting guarantees duration")
-			calculateGuaranteeDuration(data.Assets, death.Value.Duration.Year)
 		}
 	}
 
