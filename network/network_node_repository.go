@@ -34,6 +34,40 @@ func initNode(node *models.NetworkNode) {
 	node.NetworkUid = node.NetworkCode
 	node.Role = node.Type
 	node.IsActive = true
+
+	if node.Type != models.PartnershipNetworkNodeType && node.Type != models.AreaManagerNetworkNodeType {
+		if node.ExternalNetworkCode == "" {
+			node.ExternalNetworkCode = node.Code
+		}
+
+		warrant := node.GetWarrant()
+		if warrant != nil {
+			if node.Products == nil {
+				node.Products = make([]models.Product, 0)
+				for _, product := range warrant.Products {
+					companies := make([]models.Company, 0)
+					for _, company := range product.Companies {
+						companies = append(companies, models.Company{
+							Name:         company.Name,
+							ProducerCode: node.Code,
+						})
+					}
+					node.Products = append(node.Products, models.Product{
+						Name:      product.Name,
+						Companies: companies,
+					})
+				}
+			} else {
+				for prodIndex, product := range node.Products {
+					for companyIndex, company := range product.Companies {
+						if company.ProducerCode == "" {
+							node.Products[prodIndex].Companies[companyIndex].ProducerCode = node.Code
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 func CreateNode(node models.NetworkNode) (*models.NetworkNode, error) {
