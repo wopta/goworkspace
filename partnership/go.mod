@@ -68,7 +68,7 @@ require (
 	github.com/sergi/go-diff v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
-	github.com/wopta/goworkspace/mail v1.0.62 // indirect
+	github.com/wopta/goworkspace/mail v1.0.63 // indirect
 	github.com/wopta/goworkspace/sellable v1.0.42 // indirect
 	github.com/wopta/goworkspace/wiseproxy v1.0.3 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
