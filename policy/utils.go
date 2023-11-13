@@ -126,7 +126,7 @@ func SetUserIntoPolicyContractor(policy *models.Policy, origin string) error {
 // because it creates a dependency with document
 func AddContract(policy *models.Policy, origin string) error {
 	gsLink := <-document.GetFileV6(*policy, policy.Uid)
-	filename := strings.ReplaceAll(fmt.Sprintf(models.ContractDocumentFormat, policy.NameDesc, policy.CodeCompany), " ", "_") + ".pdf"
+	filename := strings.ReplaceAll(fmt.Sprintf(models.ContractDocumentFormat, policy.NameDesc, policy.CodeCompany), " ", "_")
 	*policy.Attachments = append(*policy.Attachments, models.Attachment{
 		Name:     models.ContractAttachmentName,
 		Link:     gsLink,
