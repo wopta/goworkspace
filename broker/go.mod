@@ -9,13 +9,13 @@ require (
 	cloud.google.com/go/firestore v1.9.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.4
 	github.com/wopta/goworkspace/bpmn v1.0.16
-	github.com/wopta/goworkspace/document v1.1.25
+	github.com/wopta/goworkspace/document v1.1.26
 	github.com/wopta/goworkspace/lib v1.0.89
-	github.com/wopta/goworkspace/mail v1.0.62
+	github.com/wopta/goworkspace/mail v1.0.63
 	github.com/wopta/goworkspace/models v1.1.65
 	github.com/wopta/goworkspace/network v1.0.17
 	github.com/wopta/goworkspace/payment v1.0.116
-	github.com/wopta/goworkspace/policy v1.0.39
+	github.com/wopta/goworkspace/policy v1.0.40
 	github.com/wopta/goworkspace/product v1.0.64
 	github.com/wopta/goworkspace/question v1.0.12
 	github.com/wopta/goworkspace/reserved v1.0.35
