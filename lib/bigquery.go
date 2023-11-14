@@ -178,6 +178,8 @@ func UpdateRowBigQueryV2(datasetId, tableId string, params map[string]interface{
 			query = query + "]"
 		} else if reflect.TypeOf(value).String() == "bigquery.NullDateTime" {
 			query = key + "=" + "'" + bigquery.CivilDateTimeString(value.(bigquery.NullDateTime).DateTime) + "'"
+		} else if reflect.TypeOf(value).String() == "float64" {
+			query = key + "=" + strconv.FormatFloat(value.(float64), 'f', 2, 64)
 		}
 		if count < length {
 			query = query + ", "
