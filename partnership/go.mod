@@ -13,7 +13,7 @@ require (
 	github.com/wopta/goworkspace/network v1.0.17
 	github.com/wopta/goworkspace/product v1.0.64
 	github.com/wopta/goworkspace/quote v1.0.20
-	github.com/wopta/goworkspace/user v1.0.43
+	github.com/wopta/goworkspace/user v1.0.44
 )
 
 require (
@@ -98,6 +98,7 @@ require (
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1 // indirect
 	google.golang.org/grpc v1.55.0 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
+	gopkg.in/square/go-jose.v2 v2.6.0 // indirect
 	gopkg.in/src-d/go-billy.v4 v4.3.2 // indirect
 	gopkg.in/src-d/go-git.v4 v4.13.1 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
