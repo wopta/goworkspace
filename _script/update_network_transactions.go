@@ -2,15 +2,17 @@ package _script
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
 	plc "github.com/wopta/goworkspace/policy"
 	"github.com/wopta/goworkspace/product"
 	tr "github.com/wopta/goworkspace/transaction"
 )
 
-func UpdateNetworkTransactions() {
+func UpdateCompanyNetworkTransactions() {
 	var (
 		netTransactions []models.NetworkTransaction
 		transaction     *models.Transaction
@@ -69,4 +71,52 @@ func UpdateNetworkTransactions() {
 	}
 	fmt.Printf("[UpdateNetworkTransactions] modified network transactions %s\n", modifiedCounter)
 	fmt.Println("[UpdateNetworkTransactions] script done")
+}
+
+func UpdateAreaManagerName() {
+	var (
+		netTransactions []models.NetworkTransaction
+		err             error
+		originalName    string
+		modifiedCounter = make([]string, 0)
+	)
+
+	query := fmt.Sprintf(
+		"SELECT * FROM `%s.%s` WHERE networkNodeType = '%s'",
+		models.WoptaDataset,
+		models.NetworkTransactionCollection,
+		models.AreaManagerNetworkNodeType,
+	)
+	netTransactions, err = lib.QueryRowsBigQuery[models.NetworkTransaction](query)
+	if err != nil {
+		fmt.Printf("[UpdateAreaManagerName] error getting network transactions: %s", err.Error())
+		return
+	}
+	fmt.Printf("[UpdateAreaManagerName] found %d netTransactions\n", len(netTransactions))
+
+	for _, nt := range netTransactions {
+		nn := network.GetNetworkNodeByUid(nt.NetworkNodeUid)
+
+		originalName = nt.Name
+		nodeName := nn.GetName()
+
+		if strings.HasSuffix(originalName, nodeName) {
+			fmt.Printf("[UpdateAreaManagerName] netTransaction '%s' with name '%s' already contains node name '%s'\n", nt.Uid, originalName, nodeName)
+			continue
+		}
+
+		nt.Name = nt.Name + nn.GetName()
+
+		err = nt.SaveBigQuery()
+		if err != nil {
+			fmt.Printf("[UpdateAreaManagerName] error updating network transaction '%s': %s\n", nt.Uid, err.Error())
+			break
+		}
+
+		modifiedCounter = append(modifiedCounter, nt.Uid)
+		fmt.Printf("[UpdateAreaManagerName] netTransaction '%s' original name '%s' modified name '%s'\n", nt.Uid, originalName, nt.Name)
+	}
+
+	fmt.Printf("[UpdateAreaManagerName] modified network transactions %s\n", modifiedCounter)
+	fmt.Println("[UpdateAreaManagerName] script done")
 }
