@@ -64,7 +64,8 @@ go_modules = [
     NETWORK,
     RESERVED,
     POLICY,
-    BPMN,]
+    BPMN,
+]
 changed_modules = [
     DOCUMENT, POLICY, PAYMENT, RESERVED,
 ]
@@ -82,7 +83,6 @@ updateable_modules = [
     QUOTE,
     SELLABLE,
     USER,
-    SELLABLE,
     MGA,
     NETWORK,
     RESERVED,
