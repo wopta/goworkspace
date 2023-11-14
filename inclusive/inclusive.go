@@ -34,6 +34,12 @@ func InclusiveFx(w http.ResponseWriter, r *http.Request) {
 				Method:  "POST",
 				Roles:   []string{},
 			},
+			{
+				Route:   "/bankaccount/v1/hype/in",
+				Handler: HypeImportMovementbankAccountFx,
+				Method:  "POST",
+				Roles:   []string{},
+			},
 		},
 	}
 	route.Router(w, r)

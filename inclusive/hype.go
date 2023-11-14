@@ -61,7 +61,12 @@ func BankAccountHypeFx(resp http.ResponseWriter, r *http.Request) (string, inter
 }
 func CountHypeFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 
-	Count("", "", "")
+	HypeCount("", "", "")
+	return ``, nil, nil
+}
+func HypeImportMovementbankAccountFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+
+	HypeImportMovementbankAccount()
 	return ``, nil, nil
 }
 
@@ -206,14 +211,16 @@ func QueryRowsBigQuery[T any](datasetID string, tableID string, query string) ([
 	for {
 		var row T
 		e := iter.Next(&row)
-		log.Println(e)
+
 		if e == iterator.Done {
+			log.Println(e)
 			return res, e
 		}
 		if e != nil {
+			log.Println(e)
 			return res, e
 		}
-		log.Println(e)
+
 		res = append(res, row)
 
 	}
@@ -228,7 +235,7 @@ func getBigqueryClient() *bigquery.Client {
 }
 
 // https://api.stg.hype.it/external/wopta/v1/{guaranteesCode}/amount/{fromDate}/{endDate}
-func Count(date string, fiscalCode string, guaranteesCode string) {
+func HypeCount(date string, fiscalCode string, guaranteesCode string) {
 	var (
 		countResponseModel CountResponseModel
 	)
@@ -259,7 +266,7 @@ func Count(date string, fiscalCode string, guaranteesCode string) {
 }
 
 // https://api.stg.hype.it/external/wopta/v1/reconciliation
-func Reconciliation(date string, fiscalCode string, guaranteesCode string) {
+func HypeReconciliation(date string, fiscalCode string, guaranteesCode string) {
 
 }
 
@@ -268,4 +275,42 @@ type CountResponseModel struct {
 	Insert    int `json:"insert"`
 	Delete    int `json:"delete"`
 	Suspended int `json:"suspended"`
+}
+
+/*
+		name,surname,fiscalCode,hypeId,guaranteesCode,startDate
+	    Luca,Barbieri,BRBLCU81H803F205Q,123789,next,2023-07-15
+*/
+func HypeImportMovementbankAccount() {
+	data := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/inclusive/bank-account/hype/in.csv", "")
+	df := lib.CsvToDataframe(data)
+	//log.Println("LifeIn  df.Describe: ", df.Describe())
+	log.Println("LifeIn  row", df.Nrow())
+	log.Println("LifeIn  col", df.Ncol())
+	//group := df.GroupBy("N\xb0 adesione individuale univoco")
+	var result [][]string
+	for i, d := range df.Records() {
+		log.Println("HypeImportMovementbankAccount  num ", i)
+		uid := uuid.New().String()
+		start, e := time.Parse("2006-01-02", d[5])
+		log.Println("HypeImportMovementbankAccount  error", e)
+		mov := BankAccountMovement{
+			Uid:            uid,
+			Name:           d[0],
+			Surname:        d[1],
+			FiscalCode:     d[2],
+			GuaranteesCode: d[4],
+			HypeId:         d[3],
+			BigStartDate:   civil.DateTimeOf(start),
+		}
+		result = append(result, []string{d[0], d[1], d[2], d[3], d[4], uid})
+		e = lib.InsertRowsBigQuery("wopta", dataMovement, mov)
+
+	}
+
+	filepath := "result.txt"
+	lib.WriteCsv("../tmp/"+filepath, result, ';')
+	source, _ := ioutil.ReadFile("../tmp/" + filepath)
+	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/axa/life/"+filepath, source)
+
 }
