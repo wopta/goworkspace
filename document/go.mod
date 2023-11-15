@@ -11,8 +11,8 @@ require (
 	github.com/johnfercher/maroto v0.42.0
 	github.com/ttacon/libphonenumber v1.2.1
 	github.com/wopta/goworkspace/lib v1.0.91
-	github.com/wopta/goworkspace/models v1.1.66
-	github.com/wopta/goworkspace/product v1.0.65
+	github.com/wopta/goworkspace/models v1.1.67
+	github.com/wopta/goworkspace/product v1.0.66
 )
 
 require (
