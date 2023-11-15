@@ -3,8 +3,6 @@ package policy
 import (
 	"log"
 	"net/http"
-	"strconv"
-	"strings"
 	"time"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
@@ -68,20 +66,12 @@ func GetPolicyByUid(policyUid string, origin string) models.Policy {
 	return policy
 }
 
-func SetPolicyPaid(policy *models.Policy, contractLink string, origin string) {
-	firePolicy := lib.GetDatasetByEnv(origin, "policy")
-	now := time.Now().UTC()
-	// Add Contract
-	timestamp := strconv.FormatInt(now.Unix(), 10)
-	*policy.Attachments = append(*policy.Attachments, models.Attachment{
-		Name: "Contratto",
-		Link: contractLink,
-		FileName: "Contratto_" + strings.ReplaceAll(policy.NameDesc, " ", "_") +
-			"_" + timestamp + ".pdf",
-	})
+func SetPolicyPaid(policy *models.Policy, origin string) {
+	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
+
 	// Update payment fields
 	policy.IsPay = true
-	policy.Updated = now
+	policy.Updated = time.Now().UTC()
 	policy.Status = models.PolicyStatusPay
 	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusPay)
 	lib.SetFirestore(firePolicy, policy.Uid, policy)

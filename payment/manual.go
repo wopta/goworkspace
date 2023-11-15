@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/wopta/goworkspace/document"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
@@ -125,12 +124,15 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		// Create/Update document on user collection based on contractor fiscalCode
 		user.SetUserIntoPolicyContractor(&policy, origin)
 
-		// Get Policy contract
-		gsLink := <-document.GetFileV6(policy, transaction.PolicyUid)
-		log.Println("[ManualPaymentFx] contractGsLink: ", gsLink)
+		// Add contract to policy
+		err = plc.AddContract(&policy, origin)
+		if err != nil {
+			log.Printf("[ManualPaymentFx] ERROR add contract to policy: %s", err.Error())
+			return `{"success":false}`, `{"success":false}`, nil
+		}
 
 		// Update Policy as paid
-		plc.SetPolicyPaid(&policy, gsLink, origin)
+		plc.SetPolicyPaid(&policy, origin)
 
 		// Send mail with the contract to the user
 		mail.SendMailContract(
