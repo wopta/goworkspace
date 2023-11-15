@@ -29,6 +29,7 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		flowName    string
 		networkNode *models.NetworkNode
 		warrant     *models.Warrant
+		cc          = mail.Address{}
 	)
 
 	log.Println("[ManualPaymentFx] Handler start -----------------------------------------")
@@ -111,6 +112,7 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
 	if networkNode != nil {
 		warrant = networkNode.GetWarrant()
+		cc = mail.GetNetworkNodeEmail(networkNode)
 	}
 	flowName, _ = policy.GetFlow(networkNode, warrant)
 	log.Printf("[runBrokerBpmn] flowName '%s'", flowName)
@@ -140,7 +142,7 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 			nil,
 			mail.AddressAnna,
 			mail.GetContractorEmail(&policy),
-			mail.Address{},
+			cc,
 			flowName,
 		)
 	}
