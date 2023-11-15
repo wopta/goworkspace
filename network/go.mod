@@ -6,7 +6,7 @@ replace github.com/wopta/goworkspace/network => ./
 
 require (
 	github.com/wopta/goworkspace/lib v1.0.91
-	github.com/wopta/goworkspace/models v1.1.66
+	github.com/wopta/goworkspace/models v1.1.67
 )
 
 require (
