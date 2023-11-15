@@ -24,6 +24,7 @@ const (
 	suspended        = "suspended"
 	insert           = "insert"
 	delete           = "delete"
+	active           = "active"
 )
 
 // TO DO security,payload,error,fasature
@@ -282,7 +283,7 @@ type CountResponseModel struct {
 	    Luca,Barbieri,BRBLCU81H803F205Q,123789,next,2023-07-15
 */
 func HypeImportMovementbankAccount() {
-	data := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/inclusive/bank-account/hype/in.csv", "")
+	data := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/inclusive/bank-account/hype/profile.accountInsurance_prod.csv", "")
 	df := lib.CsvToDataframe(data)
 	//log.Println("LifeIn  df.Describe: ", df.Describe())
 	log.Println("LifeIn  row", df.Nrow())
@@ -292,20 +293,26 @@ func HypeImportMovementbankAccount() {
 	for i, d := range df.Records() {
 		log.Println("HypeImportMovementbankAccount  num ", i)
 		uid := uuid.New().String()
-		start, e := time.Parse("2006-01-02", d[5])
-		log.Println("HypeImportMovementbankAccount  error", e)
+		start := time.Now()
+
 		mov := BankAccountMovement{
 			Uid:            uid,
+			Status:         active,
 			Name:           d[0],
 			Surname:        d[1],
 			FiscalCode:     d[2],
-			GuaranteesCode: d[4],
+			GuaranteesCode: "next",
 			HypeId:         d[3],
 			BigStartDate:   civil.DateTimeOf(start),
+			BigEndDate:     civil.DateTimeOf(start),
+			PolicyNumber:   "180623",
+			Customer:       "hype",
+			Company:        "axa",
+			PolicyName:     "Hype Next",
 		}
 		result = append(result, []string{d[0], d[1], d[2], d[3], d[4], uid})
-		e = lib.InsertRowsBigQuery("wopta", dataMovement, mov)
-
+		e := lib.InsertRowsBigQuery("wopta", dataMovement, mov)
+		log.Println("HypeImportMovementbankAccount error InsertRowsBigQuery: ", e)
 	}
 
 	filepath := "result.txt"
