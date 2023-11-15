@@ -352,9 +352,8 @@ func lifeBeneficiaryReferenceSectionV2(pdf *fpdf.Fpdf, policy *models.Policy) {
 	}
 
 	deathGuarantee, err := policy.ExtractGuarantee("death")
-	lib.CheckError(err)
 
-	if deathGuarantee.BeneficiaryReference != nil {
+	if err == nil && deathGuarantee.BeneficiaryReference != nil {
 		beneficiary := deathGuarantee.BeneficiaryReference
 		address := strings.ToUpper(beneficiary.Residence.StreetName + ", " + beneficiary.Residence.StreetNumber +
 			" - " + beneficiary.Residence.PostalCode + " " + beneficiary.Residence.City +
