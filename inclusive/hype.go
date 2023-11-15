@@ -66,7 +66,7 @@ func CountHypeFx(resp http.ResponseWriter, r *http.Request) (string, interface{}
 	return ``, nil, nil
 }
 func HypeImportMovementbankAccountFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-
+	log.Println("---------------HypeImportMovementbankAccountFx -------------------------------")
 	HypeImportMovementbankAccount()
 	return ``, nil, nil
 }
@@ -283,6 +283,7 @@ type CountResponseModel struct {
 	    Luca,Barbieri,BRBLCU81H803F205Q,123789,next,2023-07-15
 */
 func HypeImportMovementbankAccount() {
+	log.Println("---------------HypeImportMovementbankAccount -------------------------------")
 	data := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/inclusive/bank-account/hype/profile.accountInsurance_prod.csv", "")
 	df := lib.CsvToDataframe(data)
 	//log.Println("LifeIn  df.Describe: ", df.Describe())
