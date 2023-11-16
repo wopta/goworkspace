@@ -289,6 +289,7 @@ func HypeImportMovementbankAccount() {
 	log.Println("HypeImportMovementbankAccount  row", df.Nrow())
 	log.Println("HypeImportMovementbankAccount  col", df.Ncol())
 	var result [][]string
+	var movList []BankAccountMovement
 	for i, d := range df.Records() {
 
 		log.Println("HypeImportMovementbankAccount  num ", i)
@@ -312,15 +313,26 @@ func HypeImportMovementbankAccount() {
 				PolicyName:     "Hype Next",
 			}
 			result = append(result, []string{d[0], d[1], d[2], d[3], d[4], uid})
-			e := lib.InsertRowsBigQuery("wopta", dataMovement, mov)
-			e = lib.InsertRowsBigQuery("wopta", dataBanckAccount, mov)
-			log.Println("HypeImportMovementbankAccount error InsertRowsBigQuery: ", e)
+			movList = append(movList, mov)
+
+			//e = lib.InsertRowsBigQuery("wopta", dataBanckAccount, mov)
+
 		}
+		e := lib.InsertRowsBigQuery("wopta", dataMovement, movList)
+		log.Println("HypeImportMovementbankAccount error InsertRowsBigQuery: ", e)
 	}
 
 	filepath := "result_01.csv"
-	lib.WriteCsv("../tmp/"+filepath, result, ';')
+	lib.WriteCsv("../tmp/"+filepath, result, ',')
 	source, _ := ioutil.ReadFile("../tmp/" + filepath)
 	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/inclusive/bank-account/hype/"+filepath, source)
 
+}
+func InsertRowsBigQuery(datasetID string, tableID string, value interface{}) error {
+	client := getBigqueryClient()
+	defer client.Close()
+	inserter := client.Dataset(datasetID).Table(tableID).Inserter()
+	e := inserter.Put(context.Background(), value)
+	log.Println(e)
+	return e
 }
