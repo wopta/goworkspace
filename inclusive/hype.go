@@ -313,6 +313,7 @@ func HypeImportMovementbankAccount() {
 			}
 			result = append(result, []string{d[0], d[1], d[2], d[3], d[4], uid})
 			e := lib.InsertRowsBigQuery("wopta", dataMovement, mov)
+			e = lib.InsertRowsBigQuery("wopta", dataBanckAccount, mov)
 			log.Println("HypeImportMovementbankAccount error InsertRowsBigQuery: ", e)
 		}
 	}
