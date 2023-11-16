@@ -290,6 +290,7 @@ func HypeImportMovementbankAccount() {
 	log.Println("HypeImportMovementbankAccount  col", df.Ncol())
 	var result [][]string
 	var movList []BankAccountMovement
+	count := 0
 	for i, d := range df.Records() {
 
 		log.Println("HypeImportMovementbankAccount  num ", i)
@@ -314,13 +315,21 @@ func HypeImportMovementbankAccount() {
 			}
 			result = append(result, []string{d[0], d[1], d[2], d[3], d[4], uid})
 			movList = append(movList, mov)
+			count++
+			if count == 500 {
+				count = 0
+				e := lib.InsertRowsBigQuery("wopta", dataMovement, movList)
+				e = lib.InsertRowsBigQuery("wopta", dataBanckAccount, movList)
+				log.Println("HypeImportMovementbankAccount error InsertRowsBigQuery: ", e)
+				movList = []BankAccountMovement{}
 
-			//e = lib.InsertRowsBigQuery("wopta", dataBanckAccount, mov)
+			}
 
 		}
 
 	}
 	e := lib.InsertRowsBigQuery("wopta", dataMovement, movList)
+	e = lib.InsertRowsBigQuery("wopta", dataBanckAccount, movList)
 	log.Println("HypeImportMovementbankAccount error InsertRowsBigQuery: ", e)
 	filepath := "result_01.csv"
 	lib.WriteCsv("../tmp/"+filepath, result, ',')
