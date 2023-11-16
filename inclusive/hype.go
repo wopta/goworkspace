@@ -318,10 +318,10 @@ func HypeImportMovementbankAccount() {
 			//e = lib.InsertRowsBigQuery("wopta", dataBanckAccount, mov)
 
 		}
-		e := lib.InsertRowsBigQuery("wopta", dataMovement, movList)
-		log.Println("HypeImportMovementbankAccount error InsertRowsBigQuery: ", e)
-	}
 
+	}
+	e := lib.InsertRowsBigQuery("wopta", dataMovement, movList)
+	log.Println("HypeImportMovementbankAccount error InsertRowsBigQuery: ", e)
 	filepath := "result_01.csv"
 	lib.WriteCsv("../tmp/"+filepath, result, ',')
 	source, _ := ioutil.ReadFile("../tmp/" + filepath)
