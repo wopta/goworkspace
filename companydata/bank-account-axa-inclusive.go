@@ -43,7 +43,7 @@ func BankAccountAxaInclusive(w http.ResponseWriter, r *http.Request) (string, in
 	json.Unmarshal([]byte(req), &obj)
 	now, upload = getRequestData(req)
 	refDay = now.AddDate(0, 0, -1)
-	
+
 	log.Println("BankAccountAxaInclusive refMontly: ", refDay)
 	//from, e = time.Parse("2006-01-02", strconv.Itoa(now.Year())+"-"+fmt.Sprintf("%02d", int(now.Month()))+"-"+fmt.Sprintf("%02d", 1))
 	//query := "select * from `wopta." + dataMovement + "` where _PARTITIONTIME >'" + from.Format(layoutQuery) + " 00:00:00" + "' and _PARTITIONTIME <'" + to.Format(layoutQuery) + " 23:59:00" + "'"
@@ -54,9 +54,12 @@ func BankAccountAxaInclusive(w http.ResponseWriter, r *http.Request) (string, in
 	log.Println("BankAccountAxaInclusive len(bankaccountlist): ", len(bankaccountlist))
 	//result = append(result, getHeader())
 	result = append(result, getHeaderInclusiveBank())
+
+	b, err := os.ReadFile(lib.GetAssetPathByEnv("companyData") + "/reverse-codes.json")
+	lib.CheckError(err)
 	for _, mov := range bankaccountlist {
 
-		result = append(result, setInclusiveRow(mov)...)
+		result = append(result, setInclusiveRow(mov, b)...)
 
 	}
 
@@ -73,14 +76,14 @@ func BankAccountAxaInclusive(w http.ResponseWriter, r *http.Request) (string, in
 	}
 	return "", nil, e
 }
-func setInclusiveRow(mov inclusive.BankAccountMovement) [][]string {
+func setInclusiveRow(mov inclusive.BankAccountMovement, b []byte) [][]string {
 	var (
 		result [][]string
 		user   models.User
 	)
 
 	if mov.FiscalCode != "" {
-		_, user, _ = ExtractUserDataFromFiscalCode(mov.FiscalCode)
+		_, user, _ = ExtractUserDataFromFiscalCode(mov.FiscalCode, b)
 	}
 	birthDate, _ := time.Parse("2006-01-02T15:04:05Z07:00", user.BirthDate)
 	startDate, _ := time.Parse("2006-01-02", mov.BigStartDate.Date.String())
@@ -102,6 +105,7 @@ func setInclusiveRow(mov inclusive.BankAccountMovement) [][]string {
 		startDate.Format(layout), //    DATA INIZIO VALIDITA' COPERTURA
 		mapEndDate(mov),          //    DATA FINE VALIDITA' COPERTURA
 		StringMapping(mov.MovementType, map[string]string{
+			"active":    "A",
 			"insert":    "A",
 			"delete":    "E",
 			"suspended": "E",
