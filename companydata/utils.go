@@ -29,18 +29,14 @@ func CheckStructNil[T interface{}](s interface{}) T {
 func StringMapping(v string, m map[string]string) string {
 	return m[v]
 }
-func ExtractUserDataFromFiscalCode(fiscalCode string, b []byte) (string, models.User, error) {
+func ExtractUserDataFromFiscalCode(fiscalCode string, codes map[string]map[string]string) (string, models.User, error) {
 	var (
-		codes map[string]map[string]string
-		user  = models.User{}
+		user = models.User{}
 	)
 	user.FiscalCode = fiscalCode
 	if len(fiscalCode) < 15 {
 		return "", models.User{}, fmt.Errorf("invalid fiscal code")
 	}
-
-	err := json.Unmarshal(b, &codes)
-	lib.CheckError(err)
 
 	day, _ := strconv.Atoi(fiscalCode[9:11])
 

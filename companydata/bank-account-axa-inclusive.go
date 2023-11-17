@@ -56,10 +56,13 @@ func BankAccountAxaInclusive(w http.ResponseWriter, r *http.Request) (string, in
 	result = append(result, getHeaderInclusiveBank())
 
 	b, err := os.ReadFile(lib.GetAssetPathByEnv("companyData") + "/reverse-codes.json")
+	var codes map[string]map[string]string
+	err = json.Unmarshal(b, &codes)
 	lib.CheckError(err)
-	for _, mov := range bankaccountlist {
-
-		result = append(result, setInclusiveRow(mov, b)...)
+	lib.CheckError(err)
+	for i, mov := range bankaccountlist {
+		log.Println(i)
+		result = append(result, setInclusiveRow(mov, codes)...)
 
 	}
 
@@ -74,16 +77,17 @@ func BankAccountAxaInclusive(w http.ResponseWriter, r *http.Request) (string, in
 
 		AxaSftpUpload(filepath+".xlsx", "HYPE/IN/")
 	}
+	log.Println("---------------------end------------------------------")
 	return "", nil, e
 }
-func setInclusiveRow(mov inclusive.BankAccountMovement, b []byte) [][]string {
+func setInclusiveRow(mov inclusive.BankAccountMovement, codes map[string]map[string]string) [][]string {
 	var (
 		result [][]string
 		user   models.User
 	)
 
 	if mov.FiscalCode != "" {
-		_, user, _ = ExtractUserDataFromFiscalCode(mov.FiscalCode, b)
+		_, user, _ = ExtractUserDataFromFiscalCode(mov.FiscalCode, codes)
 	}
 	birthDate, _ := time.Parse("2006-01-02T15:04:05Z07:00", user.BirthDate)
 	startDate, _ := time.Parse("2006-01-02", mov.BigStartDate.Date.String())
