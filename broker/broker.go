@@ -9,6 +9,12 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
+type BrokerBaseRequest struct {
+	PolicyUid    string `json:"policyUid"`
+	PaymentSplit string `json:"paymentSplit"`
+	Payment      string `json:"payment"`
+}
+
 func init() {
 	log.Println("INIT Broker")
 	functions.HTTP("Broker", Broker)

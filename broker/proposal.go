@@ -18,12 +18,6 @@ import (
 	"github.com/wopta/goworkspace/reserved"
 )
 
-type BrokerBaseRequest struct {
-	PolicyUid    string `json:"policyUid"`
-	PaymentSplit string `json:"paymentSplit"`
-	Payment      string `json:"payment"`
-}
-
 type ProposalReq struct {
 	BrokerBaseRequest
 	SendEmail *bool `json:"sendEmail"`
