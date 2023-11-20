@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/wopta/goworkspace/question"
 	"io"
 	"log"
 	"net/http"
@@ -15,13 +14,19 @@ import (
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 	plc "github.com/wopta/goworkspace/policy"
+	"github.com/wopta/goworkspace/question"
 	"github.com/wopta/goworkspace/reserved"
 )
 
-type ProposalReq struct {
+type BrokerBaseRequest struct {
 	PolicyUid    string `json:"policyUid"`
 	PaymentSplit string `json:"paymentSplit"`
-	SendEmail    *bool  `json:"sendEmail"`
+	Payment      string `json:"payment"`
+}
+
+type ProposalReq struct {
+	BrokerBaseRequest
+	SendEmail *bool `json:"sendEmail"`
 }
 
 func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -68,7 +73,7 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 			sendEmail = *req.SendEmail
 		}
 
-		paymentSplit = req.PaymentSplit
+		brokerUpdatePolicy(&policy, req.BrokerBaseRequest)
 
 		policy, err = plc.GetPolicy(req.PolicyUid, origin)
 		if err != nil {
@@ -145,7 +150,6 @@ func setProposalData(policy *models.Policy) {
 
 	setProposalNumber(policy)
 	policy.Status = models.PolicyStatusProposal
-	policy.PaymentSplit = paymentSplit
 
 	if policy.IsReserved {
 		log.Println("[setProposalData] setting NeedsApproval status")

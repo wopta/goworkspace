@@ -34,12 +34,11 @@ type EmitResponse struct {
 }
 
 type EmitRequest struct {
-	Uid          string              `json:"uid,omitempty"`
-	Payment      string              `json:"payment,omitempty"`
-	PaymentType  string              `json:"paymentType,omitempty"`
-	PaymentSplit string              `json:"paymentSplit,omitempty"`
-	Statements   *[]models.Statement `json:"statements,omitempty"`
-	SendEmail    *bool               `json:"sendEmail"`
+	BrokerBaseRequest
+	Uid         string              `json:"uid,omitempty"`
+	PaymentType string              `json:"paymentType,omitempty"`
+	Statements  *[]models.Statement `json:"statements,omitempty"`
+	SendEmail   *bool               `json:"sendEmail"`
 }
 
 func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -230,10 +229,21 @@ func emitUpdatePolicy(policy *models.Policy, request EmitRequest) {
 			*policy.Statements, _ = question.GetStatements(policy)
 		}
 	}
+	brokerUpdatePolicy(policy, request.BrokerBaseRequest)
+	log.Println("[emitUpdatePolicy] end --------------------------------------")
+}
+
+func brokerUpdatePolicy(policy *models.Policy, request BrokerBaseRequest) {
+	log.Println("[brokerUpdatePolicy] start ------------------------------------")
 	if policy.PaymentSplit == "" {
+		log.Println("[brokerUpdatePolicy] inject policy payment split from request")
 		policy.PaymentSplit = request.PaymentSplit
 	}
-	log.Println("[emitUpdatePolicy] end --------------------------------------")
+	if policy.Payment == "" {
+		log.Println("[brokerUpdatePolicy] inject policy payment provider from request")
+		policy.Payment = request.Payment
+	}
+	log.Println("[brokerUpdatePolicy] end --------------------------------------")
 }
 
 func getEmitTypeFromPolicy(policy *models.Policy) string {
