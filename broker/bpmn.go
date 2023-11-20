@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	origin, paymentSplit, flowName    string
+	origin, flowName                  string
 	ccAddress, toAddress, fromAddress mail.Address
 	networkNode                       *models.NetworkNode
 	product, mgaProduct               *models.Product
