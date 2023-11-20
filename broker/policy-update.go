@@ -78,6 +78,8 @@ func UpdatePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	response.Policy = &updatedPolicy
 	responseJson, err := json.Marshal(&response)
 
+	updatedPolicy.BigquerySave(origin)
+
 	log.Printf("[UpdatePolicyFx] response: %s", string(responseJson))
 
 	return string(responseJson), response, err
