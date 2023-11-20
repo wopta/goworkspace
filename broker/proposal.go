@@ -67,8 +67,6 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 			sendEmail = *req.SendEmail
 		}
 
-		brokerUpdatePolicy(&policy, req.BrokerBaseRequest)
-
 		policy, err = plc.GetPolicy(req.PolicyUid, origin)
 		if err != nil {
 			log.Printf("[ProposalFx] error fetching policy %s from Firestore...: %s", req.PolicyUid, err.Error())
@@ -79,6 +77,8 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 			log.Printf("[ProposalFx] cannot save proposal for policy with status %s", policy.Status)
 			return "", nil, fmt.Errorf("cannot save proposal for policy with status %s", policy.Status)
 		}
+
+		brokerUpdatePolicy(&policy, req.BrokerBaseRequest)
 
 		err = proposal(&policy)
 		if err != nil {

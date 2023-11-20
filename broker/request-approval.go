@@ -55,8 +55,6 @@ func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		return "", nil, err
 	}
 
-	brokerUpdatePolicy(&policy, req)
-
 	log.Printf("[RequestApprovalFx] fetching policy %s from Firestore...", req.PolicyUid)
 	policy, err = plc.GetPolicy(req.PolicyUid, origin)
 	if err != nil {
@@ -70,6 +68,8 @@ func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		log.Printf("[RequestApprovalFx] cannot request approval for policy with status %s and isReserved %t", policy.Status, policy.IsReserved)
 		return "", nil, fmt.Errorf("cannot request approval for policy with status %s and isReserved %t", policy.Status, policy.IsReserved)
 	}
+
+	brokerUpdatePolicy(&policy, req)
 
 	err = requestApproval(&policy)
 	if err != nil {
