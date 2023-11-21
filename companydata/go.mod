@@ -6,10 +6,12 @@ replace github.com/wopta/goworkspace/companydata => ./
 
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.3
+	github.com/dustin/go-humanize v1.0.1
 	github.com/go-gota/gota v0.12.0
 	github.com/wopta/goworkspace/inclusive v0.0.0-20230719101556-99189b0ef4a8
-	github.com/wopta/goworkspace/lib v1.0.69
+	github.com/wopta/goworkspace/lib v1.0.89
 	github.com/wopta/goworkspace/models v1.1.65
+	github.com/xuri/excelize/v2 v2.7.0
 )
 
 require (
@@ -30,7 +32,6 @@ require (
 	github.com/apache/thrift v0.16.0 // indirect
 	github.com/bmatcuk/doublestar v1.3.2 // indirect
 	github.com/cloudevents/sdk-go/v2 v2.14.0 // indirect
-	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
 	github.com/goccy/go-json v0.9.11 // indirect
 	github.com/golang-jwt/jwt/v4 v4.4.2 // indirect
@@ -66,7 +67,6 @@ require (
 	github.com/src-d/gcfg v1.4.0 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
-	github.com/xuri/excelize/v2 v2.7.0 // indirect
 	github.com/xuri/nfp v0.0.0-20220409054826-5e722a1d9e22 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
 	go.opencensus.io v0.24.0 // indirect
