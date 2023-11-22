@@ -75,6 +75,70 @@ func CreateNode(node models.NetworkNode) (*models.NetworkNode, error) {
 	return &node, lib.SetFirestoreErr(models.NetworkNodesCollection, node.Uid, node)
 }
 
+func UpdateNode(node models.NetworkNode) error {
+	var originalNode models.NetworkNode
+
+	log.Println("[UpdateNode] function start ----------------------------------")
+
+	log.Printf("[UpdateNode] fetching network node %s from Firestore...", node.Uid)
+
+	docSnap, err := lib.GetFirestoreErr(models.NetworkNodesCollection, node.Uid)
+	if err != nil {
+		log.Printf("[UpdateNode] error fetching network node from firestore: %s", err.Error())
+		return err
+	}
+	err = docSnap.DataTo(&originalNode)
+	if err != nil {
+		log.Printf("[UpdateNode] error unmarshaling network node %s: %s", node.Uid, err.Error())
+		return err
+	}
+
+	if originalNode.Mail != node.Mail {
+		_, err := lib.UpdateUserEmail(node.Uid, node.Mail)
+		if err != nil {
+			log.Printf("[UpdateNode] error updating network node mail on Firebase Auth: %s", err.Error())
+			return err
+		}
+		originalNode.Mail = node.Mail
+	}
+	originalNode.Warrant = node.Warrant
+	originalNode.Products = node.Products
+	originalNode.ParentUid = node.ParentUid
+	originalNode.IsActive = node.IsActive
+	originalNode.Designation = node.Designation
+	originalNode.HasAnnex = node.HasAnnex
+	originalNode.UpdatedDate = time.Now().UTC()
+
+	switch node.Type {
+	case models.AgentNetworkNodeType:
+		originalNode.Agent = node.Agent
+	case models.AgencyNetworkNodeType:
+		originalNode.Agency = node.Agency
+	case models.BrokerNetworkNodeType:
+		originalNode.Broker = node.Broker
+	case models.AreaManagerNetworkNodeType:
+		originalNode.AreaManager = node.AreaManager
+	}
+
+	if originalNode.AuthId == "" {
+		originalNode.Code = node.Code
+		originalNode.Type = node.Type
+		originalNode.Role = node.Type
+	}
+
+	log.Printf("[UpdateNode] writing network node %s in Firestore...", originalNode.Uid)
+
+	err = lib.SetFirestoreErr(models.NetworkNodesCollection, originalNode.Uid, originalNode)
+	if err != nil {
+		log.Printf("[UpdateNode] error updating network node %s in Firestore", originalNode.Uid)
+		return err
+	}
+
+	log.Printf("[UpdateNode] writing network node %s in BigQuery...", originalNode.Uid)
+
+	return originalNode.SaveBigQuery("")
+}
+
 func GetNetworkNodeByUid(nodeUid string) *models.NetworkNode {
 	if nodeUid == "" {
 		log.Println("[GetNetworkNodeByUid] nodeUid empty")

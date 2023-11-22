@@ -7,6 +7,7 @@ from enum import Enum
 import copy
 
 # modules
+BPMN = "bpmn"
 BROKER = "broker"
 CALLBACK = "callback"
 CLAIM = "claim"
@@ -16,20 +17,20 @@ ENRICH = "enrich"
 FORM = "form"
 LIB = "lib"
 MAIL = "mail"
+MGA = "mga"
 MODELS = "models"
+NETWORK = "network"
 PARTNERSHIP = "partnership"
 PAYMENT = "payment"
+POLICY = "policy"
 PRODUCT = "product"
 QUESTION = "question"
 QUOTE = "quote"
+RESERVED = "reserved"
 RULES = "rules"
 SELLABLE = "sellable"
+TRANSACTION = "transaction"
 USER = "user"
-MGA = "mga"
-NETWORK = "network"
-RESERVED = "reserved"
-POLICY = "policy"
-BPMN = "bpmn"
 
 # semver consts
 MAJOR = "major"
@@ -42,6 +43,7 @@ PROD = "prod"
 
 
 go_modules = [
+    BPMN,
     BROKER,
     CALLBACK,
     CLAIM,
@@ -51,23 +53,23 @@ go_modules = [
     FORM,
     LIB,
     MAIL,
+    MGA,
     MODELS,
+    NETWORK,
     PARTNERSHIP,
     PAYMENT,
+    POLICY,
     PRODUCT,
     QUESTION,
     QUOTE,
+    RESERVED,
     RULES,
     SELLABLE,
+    TRANSACTION,
     USER,
-    MGA,
-    NETWORK,
-    RESERVED,
-    POLICY,
-    BPMN,
 ]
 changed_modules = [
-    DOCUMENT, POLICY, PAYMENT, RESERVED,
+    BROKER, DOCUMENT, PAYMENT, RESERVED, POLICY
 ]
 updateable_modules = [
     BROKER,
@@ -75,23 +77,24 @@ updateable_modules = [
     DOCUMENT,
     LIB,
     MAIL,
+    MGA,
     MODELS,
+    NETWORK,
     PARTNERSHIP,
     PAYMENT,
+    POLICY,
     PRODUCT,
     QUESTION,
     QUOTE,
-    SELLABLE,
-    USER,
-    MGA,
-    NETWORK,
     RESERVED,
-    POLICY,
+    SELLABLE,
+    TRANSACTION,
+    USER,
 ]
 
 increment_version_key = PATCH
 environment = DEV  # Replace with your desired environment
-dry_run = True
+dry_run = False
 google_repository = "google"
 github_repository = "origin"
 
