@@ -33,9 +33,9 @@ func createNetworkTransaction(
 
 	switch paymentType {
 	case models.PaymentTypeRemittanceCompany, models.PaymentTypeCommission:
-		amount = commission
+		amount = lib.RoundFloat(commission, 2)
 	case models.PaymentTypeRemittanceMga:
-		amount = transaction.Amount - commission
+		amount = lib.RoundFloat(transaction.Amount-commission, 2)
 	}
 
 	netTransaction := models.NetworkTransaction{
