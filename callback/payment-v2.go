@@ -26,9 +26,7 @@ func PaymentV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	)
 
 	policyUid := r.URL.Query().Get("uid")
-	trSchedule = r.URL.Query().Get("schedule")
 	origin = r.URL.Query().Get("origin")
-	log.Printf("[PaymentV2Fx] uid %s, schedule %s", policyUid, trSchedule)
 
 	request := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
@@ -40,17 +38,24 @@ func PaymentV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 		return fmt.Sprintf(responseFormat, false, string(request)), nil, nil
 	}
 
+	if fabrickCallback.PaymentID == nil {
+		log.Printf("[PaymentV2Fx] ERROR no providerId found: %s", err.Error())
+		return "", nil, fmt.Errorf("no providerId found")
+	}
+	providerId = *fabrickCallback.PaymentID
+
+	log.Printf("[PaymentV2Fx] uid %s, providerId %s", policyUid, providerId)
+
 	if policyUid == "" || origin == "" {
 		ext := strings.Split(fabrickCallback.ExternalID, "_")
 		policyUid = ext[0]
-		trSchedule = ext[1]
 		origin = ext[2]
 	}
 
 	switch fabrickCallback.Bill.Status {
 	case fabrickBillPaid:
 		paymentMethod = strings.ToLower(*fabrickCallback.Bill.Transactions[0].PaymentMethod)
-		err = fabrickPayment(origin, policyUid, trSchedule)
+		err = fabrickPayment(origin, policyUid, providerId)
 	default:
 	}
 
@@ -65,12 +70,12 @@ func PaymentV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	return response, nil, nil
 }
 
-func fabrickPayment(origin, policyUid, trSchedule string) error {
+func fabrickPayment(origin, policyUid, providerId string) error {
 	log.Printf("[fabrickPayment] Policy %s", policyUid)
 
 	policy := plc.GetPolicyByUid(policyUid, origin)
 
-	transaction, err := tr.GetTransactionByPolicyUidAndScheduleDate(policy.Uid, trSchedule, origin)
+	transaction, err := tr.GetTransactionByPolicyUidAndProviderId(policy.Uid, providerId, origin)
 	if err != nil {
 		log.Printf("[fabrickPayment] ERROR getting transaction: %s", err.Error())
 		return err

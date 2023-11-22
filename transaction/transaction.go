@@ -67,7 +67,7 @@ func SetPolicyFirstTransactionPaid(policyUid string, scheduleDate string, origin
 	transaction.BigQuerySave(origin)
 }
 
-func GetTransactionByPolicyUidAndScheduleDate(policyUid string, scheduleDate string, origin string) (models.Transaction, error) {
+func GetTransactionByPolicyUidAndProviderId(policyUid, providerId, origin string) (models.Transaction, error) {
 	q := lib.Firequeries{
 		Queries: []lib.Firequery{
 			{
@@ -76,9 +76,14 @@ func GetTransactionByPolicyUidAndScheduleDate(policyUid string, scheduleDate str
 				QueryValue: policyUid,
 			},
 			{
-				Field:      "scheduleDate",
+				Field:      "providerId",
 				Operator:   "==",
-				QueryValue: scheduleDate,
+				QueryValue: providerId,
+			},
+			{
+				Field:      "isDelete",
+				Operator:   "==",
+				QueryValue: false,
 			},
 		},
 	}

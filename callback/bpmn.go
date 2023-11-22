@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	origin, trSchedule, paymentMethod, flowName string
+	origin, providerId, paymentMethod, flowName string
 	ccAddress, toAddress, fromAddress           mail.Address
 	networkNode                                 *models.NetworkNode
 	mgaProduct                                  *models.Product
@@ -249,7 +249,7 @@ func updatePolicy(state *bpmn.State) error {
 
 func payTransaction(state *bpmn.State) error {
 	policy := state.Data
-	transaction, _ := tr.GetTransactionByPolicyUidAndScheduleDate(policy.Uid, trSchedule, origin)
+	transaction, _ := tr.GetTransactionByPolicyUidAndProviderId(policy.Uid, providerId, origin)
 	err := tr.Pay(&transaction, origin, paymentMethod)
 	if err != nil {
 		log.Printf("[fabrickPayment] ERROR Transaction Pay %s", err.Error())
