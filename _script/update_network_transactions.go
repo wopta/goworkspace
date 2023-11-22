@@ -100,7 +100,7 @@ func UpdateAreaManagerName() {
 		originalName = nt.Name
 		nodeName := nn.GetName()
 
-		if strings.HasSuffix(originalName, nodeName) {
+		if strings.HasSuffix(strings.ToLower(originalName), strings.ToLower(nodeName)) {
 			fmt.Printf("[UpdateAreaManagerName] netTransaction '%s' with name '%s' already contains node name '%s'\n", nt.Uid, originalName, nodeName)
 			continue
 		}
