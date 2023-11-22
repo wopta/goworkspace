@@ -208,6 +208,7 @@ func postDataV6(data []byte, productNameDesc string) <-chan string {
 func GetFileV6(policy models.Policy, uid string) chan string {
 	r := make(chan string)
 	log.Println("Get file: ", policy.IdSign)
+	contractPath := "assets/users/%s/" + models.ContractDocumentFormat
 	go func() {
 
 		defer close(r)
@@ -227,7 +228,7 @@ func GetFileV6(policy models.Policy, uid string) chan string {
 			//log.Println("Get body: ", string(body))
 			log.Println("Document Policy Contractor UID: ", policy.Contractor.Uid)
 			gsLink, err := lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"),
-				fmt.Sprintf("assets/users/"+models.ContractDocumentFormat, policy.NameDesc, policy.CodeCompany), body)
+				fmt.Sprintf(contractPath, policy.Contractor.Uid, policy.NameDesc, policy.CodeCompany), body)
 			lib.CheckError(err)
 			r <- gsLink
 

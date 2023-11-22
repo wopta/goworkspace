@@ -17,7 +17,6 @@ func InclusiveFx(w http.ResponseWriter, r *http.Request) {
 
 	lib.EnableCors(&w, r)
 	w.Header().Set("Access-Control-Allow-Methods", "POST")
-	log.Println("mail")
 	log.Println(r.RequestURI)
 	lib.EnableCors(&w, r)
 	route := lib.RouteData{
@@ -33,6 +32,12 @@ func InclusiveFx(w http.ResponseWriter, r *http.Request) {
 				Handler: CountHypeFx,
 				Method:  "POST",
 				Roles:   []string{},
+			},
+			{
+				Route:   "/bankaccount/in/v1",
+				Handler: HypeImportMovementbankAccountFx,
+				Method:  "POST",
+				Roles:   []string{"internal"},
 			},
 		},
 	}

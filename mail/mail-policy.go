@@ -129,7 +129,7 @@ func SendMailContract(policy models.Policy, at *[]Attachment, from, to, cc Addre
 	if at == nil {
 		var contractbyte []byte
 
-		filepath := fmt.Sprintf("assets/users/"+models.ContractDocumentFormat, policy.NameDesc, policy.CodeCompany)
+		filepath := fmt.Sprintf("assets/users/%s/"+models.ContractDocumentFormat, policy.Contractor.Uid, policy.NameDesc, policy.CodeCompany)
 		contractbyte, err := lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filepath)
 		lib.CheckError(err)
 

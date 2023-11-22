@@ -52,9 +52,12 @@ func lifeAxaProposalV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, net
 
 	axaDeclarationsConsentSection(pdf, policy, true)
 
-	pdf.AddPage()
+	_, err := policy.ExtractGuarantee("death")
+	if err == nil {
+		pdf.AddPage()
 
-	axaTableSection(pdf, policy)
+		axaTableSection(pdf, policy)
+	}
 
 	pdf.AddPage()
 

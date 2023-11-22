@@ -17,10 +17,7 @@ import (
 	"github.com/wopta/goworkspace/reserved"
 )
 
-type RequestApprovalReq struct {
-	PolicyUid    string `json:"policyUid"`
-	PaymentSplit string `json:"paymentSplit"`
-}
+type RequestApprovalReq = BrokerBaseRequest
 
 func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
@@ -58,8 +55,6 @@ func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		return "", nil, err
 	}
 
-	paymentSplit = req.PaymentSplit
-
 	log.Printf("[RequestApprovalFx] fetching policy %s from Firestore...", req.PolicyUid)
 	policy, err = plc.GetPolicy(req.PolicyUid, origin)
 	if err != nil {
@@ -73,6 +68,8 @@ func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		log.Printf("[RequestApprovalFx] cannot request approval for policy with status %s and isReserved %t", policy.Status, policy.IsReserved)
 		return "", nil, fmt.Errorf("cannot request approval for policy with status %s and isReserved %t", policy.Status, policy.IsReserved)
 	}
+
+	brokerUpdatePolicy(&policy, req)
 
 	err = requestApproval(&policy)
 	if err != nil {
@@ -127,7 +124,6 @@ func setRequestApprovalData(policy *models.Policy) {
 
 	setProposalNumber(policy)
 
-	policy.PaymentSplit = paymentSplit
 	if policy.Status == models.PolicyStatusInitLead {
 		plc.AddProposalDoc(origin, policy, networkNode, mgaProduct)
 

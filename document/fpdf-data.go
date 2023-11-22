@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/dustin/go-humanize"
-	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -18,7 +17,7 @@ type slugStruct struct {
 }
 
 func loadLifeBeneficiariesInfo(policy *models.Policy) ([]map[string]string, string, string) {
-	legitimateSuccessorsChoice := "X"
+	legitimateSuccessorsChoice := ""
 	designatedSuccessorsChoice := ""
 	beneficiaries := []map[string]string{
 		{
@@ -42,10 +41,11 @@ func loadLifeBeneficiariesInfo(policy *models.Policy) ([]map[string]string, stri
 	}
 
 	deathGuarantee, err := policy.ExtractGuarantee("death")
-	lib.CheckError(err)
+	if err != nil {
+		return beneficiaries, legitimateSuccessorsChoice, designatedSuccessorsChoice
+	}
 
-	if deathGuarantee.Beneficiaries != nil && (*deathGuarantee.Beneficiaries)[0].BeneficiaryType != "legalAndWillSuccessors" {
-		legitimateSuccessorsChoice = ""
+	if (*deathGuarantee.Beneficiaries)[0].BeneficiaryType != "legalAndWillSuccessors" {
 		designatedSuccessorsChoice = "X"
 
 		for index, beneficiary := range *deathGuarantee.Beneficiaries {
@@ -69,6 +69,8 @@ func loadLifeBeneficiariesInfo(policy *models.Policy) ([]map[string]string, stri
 				beneficiaries[index]["contactConsent"] = "NO"
 			}
 		}
+	} else {
+		legitimateSuccessorsChoice = "X"
 	}
 
 	return beneficiaries, legitimateSuccessorsChoice, designatedSuccessorsChoice

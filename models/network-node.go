@@ -189,12 +189,14 @@ func (nn *NetworkNode) GetName() string {
 	switch nn.Type {
 	case AgentNetworkNodeType:
 		name = nn.Agent.Name + " " + nn.Agent.Surname
-	case AgencyNetworkNodeType, BrokerNetworkNodeType:
+	case AgencyNetworkNodeType:
 		name = nn.Agency.Name
+	case BrokerNetworkNodeType:
+		name = nn.Broker.Name
 	case PartnershipNetworkNodeType:
 		name = nn.Partnership.Name
-	case "manager":
-		name = "manager"
+	case AreaManagerNetworkNodeType:
+		name = nn.AreaManager.Name + " " + nn.AreaManager.Surname
 	}
 
 	return strings.ReplaceAll(name, " ", "-")

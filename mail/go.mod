@@ -8,9 +8,9 @@ require (
 	cloud.google.com/go/firestore v1.9.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
 	github.com/google/uuid v1.3.0
-	github.com/wopta/goworkspace/lib v1.0.89
-	github.com/wopta/goworkspace/models v1.1.65
-	github.com/wopta/goworkspace/network v1.0.17
+	github.com/wopta/goworkspace/lib v1.0.91
+	github.com/wopta/goworkspace/models v1.1.67
+	github.com/wopta/goworkspace/network v1.0.19
 	google.golang.org/api v0.122.0
 )
 
@@ -90,6 +90,7 @@ require (
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1 // indirect
 	google.golang.org/grpc v1.55.0 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
+	gopkg.in/square/go-jose.v2 v2.6.0 // indirect
 	gopkg.in/src-d/go-billy.v4 v4.3.2 // indirect
 	gopkg.in/src-d/go-git.v4 v4.13.1 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect

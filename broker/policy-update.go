@@ -21,7 +21,7 @@ func UpdatePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	log.Println("[UpdatePolicyFx] Handler start ------------------------------")
 	var (
 		err      error
-		policy   models.Policy
+		request  models.Policy
 		response UpdatePolicyResponse
 	)
 
@@ -30,11 +30,13 @@ func UpdatePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
-	err = json.Unmarshal(body, &policy)
+	err = json.Unmarshal(body, &request)
 	if err != nil {
 		log.Printf("[UpdatePolicyFx] error unable to unmarshal request body: %s", err.Error())
 		return "", nil, err
 	}
+
+	log.Printf("[UpdatePolicyFx] request body: %s", string(body))
 
 	originalPolicy, err := plc.GetPolicy(policyUid, origin)
 	if err != nil {
@@ -45,11 +47,11 @@ func UpdatePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	log.Printf("[UpdatePolicyFx] original policy: %s", string(originalPolicyBytes))
 
 	mergedInput := make(map[string]interface{})
-	input := plc.UpdatePolicy(&policy)
+	input := plc.UpdatePolicy(&request)
 	for k, v := range input {
 		mergedInput[k] = v
 	}
-	inputReserved := reserved.UpdatePolicyReserved(&policy)
+	inputReserved := reserved.UpdatePolicyReserved(&request)
 	for k, v := range inputReserved {
 		mergedInput[k] = v
 	}
@@ -75,6 +77,10 @@ func UpdatePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	}
 	response.Policy = &updatedPolicy
 	responseJson, err := json.Marshal(&response)
+
+	updatedPolicy.BigquerySave(origin)
+
+	log.Printf("[UpdatePolicyFx] response: %s", string(responseJson))
 
 	return string(responseJson), response, err
 }

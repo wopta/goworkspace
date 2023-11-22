@@ -63,9 +63,12 @@ func lifeAxaContractV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, net
 
 	axaDeclarationsConsentSection(pdf, policy, false)
 
-	pdf.AddPage()
+	_, err := policy.ExtractGuarantee("death")
+	if err == nil {
+		pdf.AddPage()
 
-	axaTableSection(pdf, policy)
+		axaTableSection(pdf, policy)
+	}
 
 	pdf.AddPage()
 
@@ -219,7 +222,7 @@ func lifeInsuredInfoTableV2(pdf *fpdf.Fpdf, insured *models.User) {
 		setBlackRegularFont(pdf, standardTextSize)
 		pdf.CellFormat(98, 5, row[1], "", 0, fpdf.AlignLeft+fpdf.AlignMiddle, false, 0, "")
 		setBlackBoldFont(pdf, standardTextSize)
-		pdf.CellFormat(26, 5, row[2], "", 0, fpdf.AlignLeft+fpdf.AlignMiddle, false, 0, "")
+		pdf.CellFormat(24, 5, row[2], "", 0, fpdf.AlignLeft+fpdf.AlignMiddle, false, 0, "")
 		setBlackRegularFont(pdf, standardTextSize)
 		pdf.CellFormat(30, 5, row[3], "", 1, fpdf.AlignLeft+fpdf.AlignMiddle, false, 0, "")
 
@@ -352,9 +355,8 @@ func lifeBeneficiaryReferenceSectionV2(pdf *fpdf.Fpdf, policy *models.Policy) {
 	}
 
 	deathGuarantee, err := policy.ExtractGuarantee("death")
-	lib.CheckError(err)
 
-	if deathGuarantee.BeneficiaryReference != nil {
+	if err == nil && deathGuarantee.BeneficiaryReference != nil {
 		beneficiary := deathGuarantee.BeneficiaryReference
 		address := strings.ToUpper(beneficiary.Residence.StreetName + ", " + beneficiary.Residence.StreetNumber +
 			" - " + beneficiary.Residence.PostalCode + " " + beneficiary.Residence.City +

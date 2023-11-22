@@ -300,6 +300,13 @@ func (policy *Policy) GetFlow(networkNode *NetworkNode, warrant *Warrant) (strin
 
 	log.Printf("[Policy.GetFlow] loading file for channel %s", channel)
 
+	// Retrocompatibility with old emitted policies without channel when there was only e-commerce
+	if channel == "" {
+		channel = ECommerceChannel
+		policy.Channel = ECommerceChannel
+		log.Println("[Policy.GetFlow] overriding unset channel as e-commerce")
+	}
+
 	switch channel {
 	case NetworkChannel:
 		flowName, flowByte = networkNode.GetNetworkNodeFlow(policy.Name, warrant)

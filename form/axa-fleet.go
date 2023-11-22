@@ -290,6 +290,7 @@ func getMailObj(msg string, mailsource string) mail.MailRequest {
 	obj.To = []string{
 		"assunzione@wopta.it",
 		"luca.barbieri@wopta.it",
+		"beatrice.sala@wopta.it",
 		mailsource,
 	}
 	obj.Message = msg

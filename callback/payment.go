@@ -52,7 +52,7 @@ func PaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 			log.Println("Payment::contractGsLink: ", gsLink)
 
 			// Update Policy as paid
-			policy.SetPolicyPaid(&p, gsLink, origin)
+			policy.SetPolicyPaid(&p, origin)
 
 			// Update the first transaction in policy as paid
 			transaction.SetPolicyFirstTransactionPaid(uid, schedule, origin)

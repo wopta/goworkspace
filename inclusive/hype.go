@@ -24,6 +24,7 @@ const (
 	suspended        = "suspended"
 	insert           = "insert"
 	delete           = "delete"
+	active           = "active"
 )
 
 // TO DO security,payload,error,fasature
@@ -61,7 +62,12 @@ func BankAccountHypeFx(resp http.ResponseWriter, r *http.Request) (string, inter
 }
 func CountHypeFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 
-	Count("", "", "")
+	HypeCount("", "", "")
+	return ``, nil, nil
+}
+func HypeImportMovementbankAccountFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	log.Println("---------------HypeImportMovementbankAccountFx -------------------------------")
+	HypeImportMovementbankAccount()
 	return ``, nil, nil
 }
 
@@ -206,14 +212,16 @@ func QueryRowsBigQuery[T any](datasetID string, tableID string, query string) ([
 	for {
 		var row T
 		e := iter.Next(&row)
-		log.Println(e)
+
 		if e == iterator.Done {
+			log.Println(e)
 			return res, e
 		}
 		if e != nil {
+			log.Println(e)
 			return res, e
 		}
-		log.Println(e)
+
 		res = append(res, row)
 
 	}
@@ -228,7 +236,7 @@ func getBigqueryClient() *bigquery.Client {
 }
 
 // https://api.stg.hype.it/external/wopta/v1/{guaranteesCode}/amount/{fromDate}/{endDate}
-func Count(date string, fiscalCode string, guaranteesCode string) {
+func HypeCount(date string, fiscalCode string, guaranteesCode string) {
 	var (
 		countResponseModel CountResponseModel
 	)
@@ -259,7 +267,7 @@ func Count(date string, fiscalCode string, guaranteesCode string) {
 }
 
 // https://api.stg.hype.it/external/wopta/v1/reconciliation
-func Reconciliation(date string, fiscalCode string, guaranteesCode string) {
+func HypeReconciliation(date string, fiscalCode string, guaranteesCode string) {
 
 }
 
@@ -268,4 +276,72 @@ type CountResponseModel struct {
 	Insert    int `json:"insert"`
 	Delete    int `json:"delete"`
 	Suspended int `json:"suspended"`
+}
+
+/*
+		name,surname,fiscalCode,hypeId,guaranteesCode,startDate
+	    Luca,Barbieri,BRBLCU81H803F205Q,123789,next,2023-07-15
+*/
+func HypeImportMovementbankAccount() {
+	log.Println("---------------HypeImportMovementbankAccount -------------------------------")
+	data := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/inclusive/bank-account/hype/profile_accountInsurance_prod.csv", "")
+	df := lib.CsvToDataframe(data)
+	log.Println("HypeImportMovementbankAccount  row", df.Nrow())
+	log.Println("HypeImportMovementbankAccount  col", df.Ncol())
+	var result [][]string
+	var movList []BankAccountMovement
+	count := 0
+	for i, d := range df.Records() {
+
+		log.Println("HypeImportMovementbankAccount  num ", i)
+		if i > 0 {
+			uid := uuid.New().String()
+			start := time.Now()
+
+			mov := BankAccountMovement{
+				Uid:            uid,
+				Status:         active,
+				Name:           d[0],
+				Surname:        d[1],
+				FiscalCode:     d[2],
+				GuaranteesCode: "next",
+				HypeId:         d[3],
+				BigStartDate:   civil.DateTimeOf(start),
+				BigEndDate:     civil.DateTimeOf(start),
+				PolicyNumber:   "180623",
+				Customer:       "hype",
+				Company:        "axa",
+				PolicyName:     "Hype Next",
+			}
+			result = append(result, []string{d[0], d[1], d[2], d[3], d[4], uid})
+			movList = append(movList, mov)
+			count++
+			if count == 500 {
+				count = 0
+				e := lib.InsertRowsBigQuery("wopta", dataMovement, movList)
+				e = lib.InsertRowsBigQuery("wopta", dataBanckAccount, movList)
+				log.Println("HypeImportMovementbankAccount error InsertRowsBigQuery: ", e)
+				movList = []BankAccountMovement{}
+
+			}
+
+		}
+
+	}
+	e := lib.InsertRowsBigQuery("wopta", dataMovement, movList)
+	e = lib.InsertRowsBigQuery("wopta", dataBanckAccount, movList)
+	log.Println("HypeImportMovementbankAccount error InsertRowsBigQuery: ", e)
+	filepath := "result_01.csv"
+	lib.WriteCsv("../tmp/"+filepath, result, ',')
+	source, _ := ioutil.ReadFile("../tmp/" + filepath)
+	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/inclusive/bank-account/hype/"+filepath, source)
+
+}
+func InsertRowsBigQuery(datasetID string, tableID string, value interface{}) error {
+	client := getBigqueryClient()
+	defer client.Close()
+	inserter := client.Dataset(datasetID).Table(tableID).Inserter()
+	e := inserter.Put(context.Background(), value)
+	log.Println(e)
+	return e
 }
