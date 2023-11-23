@@ -43,7 +43,6 @@ func CreateNode(node models.NetworkNode) (*models.NetworkNode, error) {
 
 func UpdateNode(node models.NetworkNode) error {
 	var originalNode models.NetworkNode
-	//updatedNode := make(map[string]interface{}, 0)
 
 	log.Println("[UpdateNode] function start ----------------------------------")
 
