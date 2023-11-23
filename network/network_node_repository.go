@@ -41,6 +41,83 @@ func CreateNode(node models.NetworkNode) (*models.NetworkNode, error) {
 	return &node, lib.SetFirestoreErr(models.NetworkNodesCollection, node.Uid, node)
 }
 
+func UpdateNode(node models.NetworkNode) error {
+	var originalNode models.NetworkNode
+	updatedNode := make(map[string]interface{}, 0)
+
+	log.Println("[UpdateNode] function start ----------------------------------")
+
+	log.Printf("[UpdateNode] fetching network node %s from Firestore...", node.Uid)
+
+	docSnap, err := lib.GetFirestoreErr(models.NetworkNodesCollection, node.Uid)
+	if err != nil {
+		log.Printf("[UpdateNode] error fetching network node from firestore: %s", err.Error())
+		return err
+	}
+	err = docSnap.DataTo(&originalNode)
+	if err != nil {
+		log.Printf("[UpdateNode] error unmarshaling network node %s: %s", node.Uid, err.Error())
+		return err
+	}
+
+	originalNode.Mail = node.Mail
+	originalNode.Warrant = node.Warrant
+	originalNode.ParentUid = node.ParentUid
+	originalNode.IsActive = node.IsActive
+	originalNode.Designation = node.Designation
+	originalNode.HasAnnex = node.HasAnnex
+	originalNode.UpdatedDate = time.Now().UTC()
+
+	switch node.Type {
+	case models.AgentNetworkNodeType:
+		originalNode.Agent = node.Agent
+	case models.AgencyNetworkNodeType:
+		originalNode.Agency = node.Agency
+	case models.BrokerNetworkNodeType:
+		originalNode.Broker = node.Broker
+	case models.AreaManagerNetworkNodeType:
+		originalNode.AreaManager = node.AreaManager
+	}
+
+	if originalNode.AuthId == "" {
+		originalNode.Code = node.Code
+		originalNode.Type = node.Type
+		originalNode.Role = node.Type
+	}
+
+	/*
+		updatedNode["mail"] = node.Mail
+		updatedNode["warrant"] = node.Warrant
+		updatedNode["parentUid"] = node.ParentUid
+		updatedNode["isActive"] = node.IsActive
+		updatedNode["designation"] = node.Designation
+		updatedNode["hasAnnex"] = node.HasAnnex
+		updatedNode["updated"] = time.Now().UTC()
+
+
+		switch node.Type {
+		case models.AgentNetworkNodeType:
+			updatedNode[models.AgentNetworkNodeType] = node.Agent
+		case models.AgencyNetworkNodeType:
+			updatedNode[models.AgencyNetworkNodeType] = node.Agency
+		case models.BrokerNetworkNodeType:
+			updatedNode[models.BrokerNetworkNodeType] = node.Broker
+		case models.AreaManagerNetworkNodeType:
+			updatedNode[models.AreaManagerNetworkNodeType] = node.AreaManager
+		}
+
+		if originalNode.AuthId == "" {
+			updatedNode["code"] = node.Code
+			updatedNode["type"] = node.Type
+			updatedNode["role"] = node.Type
+		}
+	*/
+
+	_, err = lib.FireUpdate(models.NetworkNodesCollection, node.Uid, updatedNode)
+
+	return err
+}
+
 func GetNetworkNodeByUid(nodeUid string) *models.NetworkNode {
 	if nodeUid == "" {
 		log.Println("[GetNetworkNodeByUid] nodeUid empty")
