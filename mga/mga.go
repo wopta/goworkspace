@@ -51,6 +51,12 @@ func Mga(w http.ResponseWriter, r *http.Request) {
 				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},
 			{
+				Route:   "/network/node/v1",
+				Handler: UpdateNetworkNodeFx,
+				Method:  http.MethodPut,
+				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
+			},
+			{
 				Route:   "/network/nodes/v1",
 				Handler: GetAllNetworkNodesFx,
 				Method:  http.MethodGet,
@@ -75,16 +81,16 @@ func Mga(w http.ResponseWriter, r *http.Request) {
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
-				Route: "/warrants/v1",
+				Route:   "/warrants/v1",
 				Handler: GetWarrantsFx,
-				Method: http.MethodGet,
-				Roles: []string{models.UserRoleAdmin, models.UserRoleManager},
+				Method:  http.MethodGet,
+				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},
 			{
-				Route: "/warrant/v1",
+				Route:   "/warrant/v1",
 				Handler: CreateWarrantFx,
-				Method: http.MethodPut,
-				Roles: []string{models.UserRoleAdmin, models.UserRoleManager},
+				Method:  http.MethodPut,
+				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},
 		},
 	}

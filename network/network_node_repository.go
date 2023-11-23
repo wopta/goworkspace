@@ -43,7 +43,7 @@ func CreateNode(node models.NetworkNode) (*models.NetworkNode, error) {
 
 func UpdateNode(node models.NetworkNode) error {
 	var originalNode models.NetworkNode
-	updatedNode := make(map[string]interface{}, 0)
+	//updatedNode := make(map[string]interface{}, 0)
 
 	log.Println("[UpdateNode] function start ----------------------------------")
 
@@ -86,36 +86,48 @@ func UpdateNode(node models.NetworkNode) error {
 	}
 
 	/*
-		updatedNode["mail"] = node.Mail
-		updatedNode["warrant"] = node.Warrant
-		updatedNode["parentUid"] = node.ParentUid
-		updatedNode["isActive"] = node.IsActive
-		updatedNode["designation"] = node.Designation
-		updatedNode["hasAnnex"] = node.HasAnnex
-		updatedNode["updated"] = time.Now().UTC()
+			updatedNode["mail"] = node.Mail
+			updatedNode["warrant"] = node.Warrant
+			updatedNode["parentUid"] = node.ParentUid
+			updatedNode["isActive"] = node.IsActive
+			updatedNode["designation"] = node.Designation
+			updatedNode["hasAnnex"] = node.HasAnnex
+			updatedNode["updated"] = time.Now().UTC()
 
 
-		switch node.Type {
-		case models.AgentNetworkNodeType:
-			updatedNode[models.AgentNetworkNodeType] = node.Agent
-		case models.AgencyNetworkNodeType:
-			updatedNode[models.AgencyNetworkNodeType] = node.Agency
-		case models.BrokerNetworkNodeType:
-			updatedNode[models.BrokerNetworkNodeType] = node.Broker
-		case models.AreaManagerNetworkNodeType:
-			updatedNode[models.AreaManagerNetworkNodeType] = node.AreaManager
-		}
+			switch node.Type {
+			case models.AgentNetworkNodeType:
+				updatedNode[models.AgentNetworkNodeType] = node.Agent
+			case models.AgencyNetworkNodeType:
+				updatedNode[models.AgencyNetworkNodeType] = node.Agency
+			case models.BrokerNetworkNodeType:
+				updatedNode[models.BrokerNetworkNodeType] = node.Broker
+			case models.AreaManagerNetworkNodeType:
+				updatedNode[models.AreaManagerNetworkNodeType] = node.AreaManager
+			}
 
-		if originalNode.AuthId == "" {
-			updatedNode["code"] = node.Code
-			updatedNode["type"] = node.Type
-			updatedNode["role"] = node.Type
-		}
+			if originalNode.AuthId == "" {
+				updatedNode["code"] = node.Code
+				updatedNode["type"] = node.Type
+				updatedNode["role"] = node.Type
+			}
+
+		_, err = lib.FireUpdate(models.NetworkNodesCollection, node.Uid, updatedNode)
+
+		return err
 	*/
 
-	_, err = lib.FireUpdate(models.NetworkNodesCollection, node.Uid, updatedNode)
+	log.Printf("[UpdateNode] writing network node %s in Firestore...", originalNode.Uid)
 
-	return err
+	err = lib.SetFirestoreErr(models.NetworkNodesCollection, originalNode.Uid, originalNode)
+	if err != nil {
+		log.Printf("[UpdateNode] error updating network node %s in Firestore", originalNode.Uid)
+		return err
+	}
+
+	log.Printf("[UpdateNode] writing network node %s in BigQuery...", originalNode.Uid)
+
+	return originalNode.SaveBigQuery("")
 }
 
 func GetNetworkNodeByUid(nodeUid string) *models.NetworkNode {
