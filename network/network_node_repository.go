@@ -85,38 +85,6 @@ func UpdateNode(node models.NetworkNode) error {
 		originalNode.Role = node.Type
 	}
 
-	/*
-			updatedNode["mail"] = node.Mail
-			updatedNode["warrant"] = node.Warrant
-			updatedNode["parentUid"] = node.ParentUid
-			updatedNode["isActive"] = node.IsActive
-			updatedNode["designation"] = node.Designation
-			updatedNode["hasAnnex"] = node.HasAnnex
-			updatedNode["updated"] = time.Now().UTC()
-
-
-			switch node.Type {
-			case models.AgentNetworkNodeType:
-				updatedNode[models.AgentNetworkNodeType] = node.Agent
-			case models.AgencyNetworkNodeType:
-				updatedNode[models.AgencyNetworkNodeType] = node.Agency
-			case models.BrokerNetworkNodeType:
-				updatedNode[models.BrokerNetworkNodeType] = node.Broker
-			case models.AreaManagerNetworkNodeType:
-				updatedNode[models.AreaManagerNetworkNodeType] = node.AreaManager
-			}
-
-			if originalNode.AuthId == "" {
-				updatedNode["code"] = node.Code
-				updatedNode["type"] = node.Type
-				updatedNode["role"] = node.Type
-			}
-
-		_, err = lib.FireUpdate(models.NetworkNodesCollection, node.Uid, updatedNode)
-
-		return err
-	*/
-
 	log.Printf("[UpdateNode] writing network node %s in Firestore...", originalNode.Uid)
 
 	err = lib.SetFirestoreErr(models.NetworkNodesCollection, originalNode.Uid, originalNode)
