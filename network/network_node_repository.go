@@ -59,7 +59,14 @@ func UpdateNode(node models.NetworkNode) error {
 		return err
 	}
 
-	originalNode.Mail = node.Mail
+	if originalNode.Mail != node.Mail {
+		_, err := lib.UpdateUserEmail(node.Uid, node.Mail)
+		if err != nil {
+			log.Printf("[UpdateNode] error updating network node mail on Firebase Auth: %s", err.Error())
+			return err
+		}
+		originalNode.Mail = node.Mail
+	}
 	originalNode.Warrant = node.Warrant
 	originalNode.ParentUid = node.ParentUid
 	originalNode.IsActive = node.IsActive
