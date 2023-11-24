@@ -69,7 +69,7 @@ func UpdateCompanyNetworkTransactions() {
 		modifiedCounter = append(modifiedCounter, nt.Uid)
 		fmt.Printf("[UpdateNetworkTransactions] netTransaction '%s' original amount '%f' modified amount '%f'\n", nt.Uid, originalAmount, nt.Amount)
 	}
-	fmt.Printf("[UpdateNetworkTransactions] modified network transactions %s\n", modifiedCounter)
+	fmt.Printf("[UpdateNetworkTransactions] modified %d network transactions %s\n", len(modifiedCounter), modifiedCounter)
 	fmt.Println("[UpdateNetworkTransactions] script done")
 }
 
@@ -105,8 +105,9 @@ func UpdateAreaManagerName() {
 			continue
 		}
 
-		nt.Name = nt.Name + nn.GetName()
+		nt.Name = strings.ToUpper(nt.Name + nn.GetName())
 
+		// TODO: remember to manually allow for the modification of name field
 		err = nt.SaveBigQuery()
 		if err != nil {
 			fmt.Printf("[UpdateAreaManagerName] error updating network transaction '%s': %s\n", nt.Uid, err.Error())
@@ -117,6 +118,6 @@ func UpdateAreaManagerName() {
 		fmt.Printf("[UpdateAreaManagerName] netTransaction '%s' original name '%s' modified name '%s'\n", nt.Uid, originalName, nt.Name)
 	}
 
-	fmt.Printf("[UpdateAreaManagerName] modified network transactions %s\n", modifiedCounter)
+	fmt.Printf("[UpdateAreaManagerName] modified network %d transactions %s\n", len(modifiedCounter), modifiedCounter)
 	fmt.Println("[UpdateAreaManagerName] script done")
 }
