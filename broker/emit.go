@@ -31,6 +31,7 @@ type EmitResponse struct {
 	UrlSign      string               `json:"urlSign,omitempty"`
 	Uid          string               `json:"uid,omitempty"`
 	ReservedInfo *models.ReservedInfo `json:"reservedInfo,omitempty"`
+	CodeCompany  string               `json:"codeCompany,omitempty"`
 }
 
 type EmitRequest struct {
@@ -197,6 +198,7 @@ func emitV2(authToken models.AuthToken, policy *models.Policy, request EmitReque
 		UrlSign:      policy.SignUrl,
 		ReservedInfo: policy.ReservedInfo,
 		Uid:          policy.Uid,
+		CodeCompany:  policy.CodeCompany,
 	}
 
 	policy.Updated = time.Now().UTC()
