@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -199,7 +200,13 @@ func getFabrickPayments(data models.Policy, firstSchedule bool, scheduleDate str
 		scheduleDate = now.Format(models.TimeDateOnly)
 	}
 
-	externalId := data.Uid + "_" + scheduleDate + "_" + data.CodeCompany + "_" + strings.ReplaceAll(origin, "https://", "")
+	externalId := strings.Join([]string{
+		data.Uid,
+		scheduleDate,
+		data.CodeCompany,
+		strings.ReplaceAll(origin, "https://", ""),
+		strconv.FormatInt(now.Unix(), 10),
+	}, "_")
 	pay.MerchantID = "wop134b31-5926-4b26-1411-726bc9f0b111"
 	pay.ExternalID = externalId
 
