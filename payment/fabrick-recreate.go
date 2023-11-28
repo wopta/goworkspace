@@ -43,6 +43,12 @@ func FabrickRecreateFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		return "", nil, err
 	}
 
+	policy, err = FabrickRecreate(request.PolicyUid, origin, networkNode, warrant)
+	if err != nil {
+		log.Printf("[FabrickRecreateFx] error recreating payment: %s", err.Error())
+		return "", nil, err
+	}
+
 	flowName = models.ECommerceFlow
 	if policy.Channel == models.MgaChannel {
 		flowName = models.MgaFlow
@@ -56,12 +62,6 @@ func FabrickRecreateFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		}
 	}
 	log.Printf("[FabrickRecreateFx] flowName '%s'", flowName)
-
-	policy, err = FabrickRecreate(request.PolicyUid, origin, networkNode, warrant)
-	if err != nil {
-		log.Printf("[FabrickRecreateFx] error recreating payment: %s", err.Error())
-		return "", nil, err
-	}
 
 	log.Println("[FabrickRecreateFx] send pay mail to contractor...")
 	mail.SendMailPay(
