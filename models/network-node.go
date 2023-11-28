@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"strings"
 	"time"
 
 	"cloud.google.com/go/bigquery"
@@ -172,7 +171,6 @@ func parseBigQueryAgencyNode(agency *AgencyNode) *AgencyNode {
 func (nn *NetworkNode) GetName() string {
 	var name string
 
-	// use constants
 	switch nn.Type {
 	case AgentNetworkNodeType:
 		name = nn.Agent.Name + " " + nn.Agent.Surname
@@ -186,7 +184,7 @@ func (nn *NetworkNode) GetName() string {
 		name = nn.AreaManager.Name + " " + nn.AreaManager.Surname
 	}
 
-	return strings.ReplaceAll(name, " ", "-")
+	return name
 }
 
 func (nn *NetworkNode) GetWarrant() *Warrant {
