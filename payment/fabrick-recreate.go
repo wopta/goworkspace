@@ -31,6 +31,7 @@ func FabrickRecreateFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		flowName    string
 		networkNode *models.NetworkNode
 		warrant     *models.Warrant
+		toAddress   mail.Address
 	)
 
 	origin := r.Header.Get("Origin")
@@ -50,24 +51,28 @@ func FabrickRecreateFx(w http.ResponseWriter, r *http.Request) (string, interfac
 	}
 
 	flowName = models.ECommerceFlow
-	if policy.Channel == models.MgaChannel {
-		flowName = models.MgaFlow
-	} else {
+	if policy.Channel == models.NetworkChannel {
 		networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
-		if networkNode != nil {
-			warrant = networkNode.GetWarrant()
-			if warrant != nil {
-				flowName = warrant.GetFlowName(policy.Name)
-			}
+		if networkNode == nil {
+			log.Println("[FabrickRecreateFx] error getting network node")
+			return "", nil, fmt.Errorf("networkNode not found")
 		}
+		toAddress = mail.GetNetworkNodeEmail(networkNode)
+		warrant = networkNode.GetWarrant()
+		if warrant != nil {
+			flowName = warrant.GetFlowName(policy.Name)
+		}
+	} else {
+		toAddress = mail.GetContractorEmail(policy)
 	}
 	log.Printf("[FabrickRecreateFx] flowName '%s'", flowName)
+	log.Printf("[FabrickRecreateFx] toAddress '%s'", toAddress.String())
 
 	log.Println("[FabrickRecreateFx] send pay mail to contractor...")
 	mail.SendMailPay(
 		*policy,
 		mail.AddressAnna,
-		mail.GetContractorEmail(policy),
+		toAddress,
 		mail.Address{},
 		flowName,
 	)
