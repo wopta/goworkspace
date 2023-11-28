@@ -41,8 +41,8 @@ type NetworkNode struct {
 	Data            string                `json:"-" firestore:"-" bigquery:"data"`
 	HasAnnex        bool                  `json:"hasAnnex" firestore:"hasAnnex" bigquery:"hasAnnex"`
 	Designation     string                `json:"designation" firestore:"designation" bigquery:"designation"`
-	IsMgaProponent  bool                  `json:"isMgaProponent" firestore:"isMgaProponent" bigquery:"isMgaProponent"`
-	WorksForUid     string                `json:"worksForUid" firestore:"worksForUid" bigquery:"worksForUid"`
+	IsMgaProponent  bool                  `json:"isMgaProponent" firestore:"isMgaProponent" bigquery:"-"`
+	WorksForUid     string                `json:"worksForUid" firestore:"worksForUid" bigquery:"-"`
 }
 
 type PartnershipNode struct {
