@@ -175,3 +175,17 @@ func VerifyAppcheck(handler func(w http.ResponseWriter, r *http.Request) (string
 	}
 	return wrappedHandler
 }
+
+func UpdateUserEmail(uid, email string) (*auth.UserRecord, error) {
+	client, ctx := getClient()
+	params := (&auth.UserToUpdate{}).
+		Email(email).
+		EmailVerified(true)
+	userRecord, err := client.UpdateUser(ctx, uid, params)
+	if err != nil {
+		log.Printf("[UpdateUserEmail] error updating user: %v\n", err)
+		return nil, err
+	}
+	log.Printf("[UpdateUserEmail] successfully updated user: %v\n", userRecord)
+	return userRecord, err
+}
