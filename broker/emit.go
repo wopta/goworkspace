@@ -31,6 +31,7 @@ type EmitResponse struct {
 	UrlSign      string               `json:"urlSign,omitempty"`
 	Uid          string               `json:"uid,omitempty"`
 	ReservedInfo *models.ReservedInfo `json:"reservedInfo,omitempty"`
+	CodeCompany  string               `json:"codeCompany,omitempty"`
 }
 
 type EmitRequest struct {
@@ -80,6 +81,9 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	uid := request.Uid
 	log.Printf("[EmitFx] Uid: %s", uid)
+
+	paymentSplit = request.PaymentSplit
+	log.Printf("[EmitFx] paymentSplit: %s", paymentSplit)
 
 	policy, err = plc.GetPolicy(uid, origin)
 	lib.CheckError(err)
@@ -197,6 +201,7 @@ func emitV2(authToken models.AuthToken, policy *models.Policy, request EmitReque
 		UrlSign:      policy.SignUrl,
 		ReservedInfo: policy.ReservedInfo,
 		Uid:          policy.Uid,
+		CodeCompany:  policy.CodeCompany,
 	}
 
 	policy.Updated = time.Now().UTC()
@@ -314,7 +319,7 @@ func setAdvance(policy *models.Policy, origin string) {
 	policy.IsPay = true
 	policy.Status = models.PolicyStatusPay
 	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusToPay, models.PolicyStatusPay)
-	policy.PaymentSplit = string(models.PaySplitSingleInstallment)
+	policy.PaymentSplit = paymentSplit
 
 	tr := transaction.PutByPolicy(*policy, "", origin, "", "", policy.PriceGross, policy.PriceNett, "", models.PayMethodRemittance, true)
 
