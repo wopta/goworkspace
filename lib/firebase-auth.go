@@ -21,6 +21,7 @@ func getClient() (*auth.Client, context.Context) {
 	}
 	return client, ctx
 }
+
 func CreateCustomJwt(email string, role string, id string) (string, error) {
 
 	client, ctx := getClient()
@@ -36,6 +37,7 @@ func CreateCustomJwt(email string, role string, id string) (string, error) {
 	log.Printf("Got custom token: %v\n", token)
 	return token, err
 }
+
 func CreateUserWithEmailAndPassword(email string, password string, id *string) (*auth.UserRecord, error) {
 	client, ctx := getClient()
 	params := (&auth.UserToCreate{}).
@@ -51,6 +53,20 @@ func CreateUserWithEmailAndPassword(email string, password string, id *string) (
 		log.Printf("Error creating user: %v\n", err)
 	}
 	return u, err
+}
+
+func UpdateUserEmail(uid, email string) (*auth.UserRecord, error) {
+	client, ctx := getClient()
+	params := (&auth.UserToUpdate{}).
+		Email(email).
+		EmailVerified(true)
+	userRecord, err := client.UpdateUser(ctx, uid, params)
+	if err != nil {
+		log.Printf("[UpdateUserEmail] error updating user: %v\n", err)
+		return nil, err
+	}
+	log.Printf("[UpdateUserEmail] successfully updated user: %v\n", userRecord)
+	return userRecord, err
 }
 
 func VerifyUserIdToken(idToken string) (*auth.Token, error) {
