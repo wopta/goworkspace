@@ -82,6 +82,9 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	uid := request.Uid
 	log.Printf("[EmitFx] Uid: %s", uid)
 
+	paymentSplit = request.PaymentSplit
+	log.Printf("[EmitFx] paymentSplit: %s", paymentSplit)
+
 	policy, err = plc.GetPolicy(uid, origin)
 	lib.CheckError(err)
 
@@ -316,7 +319,7 @@ func setAdvance(policy *models.Policy, origin string) {
 	policy.IsPay = true
 	policy.Status = models.PolicyStatusPay
 	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusToPay, models.PolicyStatusPay)
-	policy.PaymentSplit = string(models.PaySplitSingleInstallment)
+	policy.PaymentSplit = paymentSplit
 
 	tr := transaction.PutByPolicy(*policy, "", origin, "", "", policy.PriceGross, policy.PriceNett, "", models.PayMethodRemittance, true)
 
