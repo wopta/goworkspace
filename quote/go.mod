@@ -9,10 +9,10 @@ require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.3
 	github.com/dustin/go-humanize v1.0.1
 	github.com/go-gota/gota v0.12.0
-	github.com/wopta/goworkspace/lib v1.0.91
-	github.com/wopta/goworkspace/models v1.1.67
-	github.com/wopta/goworkspace/network v1.0.19
-	github.com/wopta/goworkspace/sellable v1.0.44
+	github.com/wopta/goworkspace/lib v1.0.92
+	github.com/wopta/goworkspace/models v1.1.68
+	github.com/wopta/goworkspace/network v1.0.20
+	github.com/wopta/goworkspace/sellable v1.0.45
 	modernc.org/mathutil v1.5.0
 )
 
@@ -67,7 +67,7 @@ require (
 	github.com/sergi/go-diff v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
-	github.com/wopta/goworkspace/product v1.0.66 // indirect
+	github.com/wopta/goworkspace/product v1.0.67 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
 	github.com/xuri/excelize/v2 v2.7.0 // indirect
