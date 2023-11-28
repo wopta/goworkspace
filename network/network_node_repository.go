@@ -76,20 +76,18 @@ func CreateNode(node models.NetworkNode) (*models.NetworkNode, error) {
 }
 
 func UpdateNode(node models.NetworkNode) error {
-	var originalNode models.NetworkNode
+	var (
+		err          error
+		originalNode *models.NetworkNode
+	)
 
 	log.Println("[UpdateNode] function start ----------------------------------")
 
 	log.Printf("[UpdateNode] fetching network node %s from Firestore...", node.Uid)
 
-	docSnap, err := lib.GetFirestoreErr(models.NetworkNodesCollection, node.Uid)
+	originalNode, err = GetNodeByUid(node.Uid)
 	if err != nil {
 		log.Printf("[UpdateNode] error fetching network node from firestore: %s", err.Error())
-		return err
-	}
-	err = docSnap.DataTo(&originalNode)
-	if err != nil {
-		log.Printf("[UpdateNode] error unmarshaling network node %s: %s", node.Uid, err.Error())
 		return err
 	}
 
@@ -108,6 +106,7 @@ func UpdateNode(node models.NetworkNode) error {
 	originalNode.Designation = node.Designation
 	originalNode.HasAnnex = node.HasAnnex
 	originalNode.UpdatedDate = time.Now().UTC()
+	// TODO: check for isMgaProponent
 
 	switch node.Type {
 	case models.AgentNetworkNodeType:
