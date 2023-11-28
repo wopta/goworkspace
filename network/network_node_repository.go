@@ -25,7 +25,7 @@ func GetNodeByUid(uid string) (*models.NetworkNode, error) {
 	return node, err
 }
 
-func initNode(node *models.NetworkNode) {
+func initNode(node *models.NetworkNode) error {
 	if len(node.Uid) == 0 {
 		node.Uid = lib.NewDoc(models.NetworkNodesCollection)
 	}
@@ -34,10 +34,40 @@ func initNode(node *models.NetworkNode) {
 	node.NetworkUid = node.NetworkCode
 	node.Role = node.Type
 	node.IsActive = true
+
+	if node.IsMgaProponent {
+		node.HasAnnex = true
+	}
+
+	if node.Type == models.AgentNetworkNodeType && node.WorksForUid != "" && node.WorksForUid != models.WorksForMgaUid {
+		worksForNode := GetNetworkNodeByUid(node.WorksForUid)
+		// TODO: Check also for broker?
+		if worksForNode.Type != models.AgencyNetworkNodeType {
+			return fmt.Errorf("worksForUid must reference an agency, got %s", worksForNode.Type)
+		}
+		if node.IsMgaProponent && !lib.SliceContains(models.GetProponentRuiSections(), worksForNode.Agency.RuiSection) {
+			return fmt.Errorf(
+				"worksForUid must reference an agency of RuiSection %v when IsMgaProponent is %t",
+				models.GetProponentRuiSections(),
+				node.IsMgaProponent,
+			)
+		}
+		if !node.IsMgaProponent && !lib.SliceContains(models.GetIssuerRuiSections(), worksForNode.Agency.RuiSection) {
+			return fmt.Errorf(
+				"worksForUid must reference an agency of RuiSection %v when IsMgaProponent is %t",
+				models.GetIssuerRuiSections(),
+				node.IsMgaProponent,
+			)
+		}
+	}
+
+	return nil
 }
 
 func CreateNode(node models.NetworkNode) (*models.NetworkNode, error) {
-	initNode(&node)
+	if err := initNode(&node); err != nil {
+		return nil, err
+	}
 	return &node, lib.SetFirestoreErr(models.NetworkNodesCollection, node.Uid, node)
 }
 
