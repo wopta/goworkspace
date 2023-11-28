@@ -18,11 +18,11 @@ type NetworkNode struct {
 	Type            string                `json:"type" firestore:"type" bigquery:"type"`
 	Role            string                `json:"role" firestore:"role" bigquery:"role"`
 	Mail            string                `json:"mail" firestore:"mail" bigquery:"mail"`
-	Warrant         string                `json:"warrant" firestore:"warrant" bigquery:"warrant"` // the name of the warrant file attached to the node
-	NetworkUid      string                `json:"networkUid" firestore:"networkUid" bigquery:"networkUid"`
-	NetworkCode     string                `json:"networkCode" firestore:"networkCode" bigquery:"networkCode"`
+	Warrant         string                `json:"warrant" firestore:"warrant" bigquery:"warrant"`             // the name of the warrant file attached to the node
+	NetworkUid      string                `json:"networkUid" firestore:"networkUid" bigquery:"networkUid"`    // DEPRECATED
+	NetworkCode     string                `json:"networkCode" firestore:"networkCode" bigquery:"networkCode"` // DEPRECATED
 	ParentUid       string                `json:"parentUid,omitempty" firestore:"parentUid,omitempty" bigquery:"parentUid"`
-	ManagerUid      string                `json:"managerUid,omitempty" firestore:"managerUid,omitempty" bigquery:"managerUid"`
+	ManagerUid      string                `json:"managerUid,omitempty" firestore:"managerUid,omitempty" bigquery:"managerUid"` // DEPRECATED
 	IsActive        bool                  `json:"isActive" firestore:"isActive" bigquery:"isActive"`
 	Users           []string              `json:"users" firestore:"users" bigquery:"users"`
 	Products        []Product             `json:"products" firestore:"products" bigquery:"-"`
@@ -41,6 +41,8 @@ type NetworkNode struct {
 	Data            string                `json:"-" firestore:"-" bigquery:"data"`
 	HasAnnex        bool                  `json:"hasAnnex" firestore:"hasAnnex" bigquery:"hasAnnex"`
 	Designation     string                `json:"designation" firestore:"designation" bigquery:"designation"`
+	IsMgaProponent  bool                  `json:"isMgaProponent" firestore:"isMgaProponent" bigquery:"isMgaProponent"`
+	WorksForUid     string                `json:"worksForUid" firestore:"worksForUid" bigquery:"worksForUid"`
 }
 
 type PartnershipNode struct {
