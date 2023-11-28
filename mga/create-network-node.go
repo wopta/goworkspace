@@ -17,14 +17,16 @@ func CreateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 		err     error
 	)
 
-	log.Println("[CreateNetworkNodeFx] Handler start -------------------------")
+	log.SetPrefix("[CreateNetworkNodeFx] ")
+
+	log.Println("Handler start -------------------------")
 
 	origin := r.Header.Get("Origin")
 	body := lib.ErrorByte(io.ReadAll(r.Body))
-	log.Printf("[CreateNetworkNodeFx] request body: %s", string(body))
+	log.Printf("request body: %s", string(body))
 	err = json.Unmarshal(body, &request)
 	if err != nil {
-		log.Printf("[CreateNetworkNodeFx] error unmarshaling request: %s", err.Error())
+		log.Printf("error unmarshaling request: %s", err.Error())
 		return "", "", err
 	}
 
@@ -32,18 +34,18 @@ func CreateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 	// TODO: check unique node.Code
 	// TODO: check unique companyCode for company
 
-	log.Println("[CreateNetworkNodeFx] creating network node into Firestore...")
+	log.Println("creating network node into Firestore...")
 
 	node, err := network.CreateNode(*request)
 	if err != nil {
-		log.Println("[CreateNetworkNodeFx] error creating network node into Firestore...")
+		log.Println("error creating network node into Firestore...")
 		return "", "", err
 	}
-	log.Printf("[CreateNetworkNodeFx] network node created with uid %s", node.Uid)
+	log.Printf("network node created with uid %s", node.Uid)
 
 	node.SaveBigQuery(origin)
 
-	log.Println("[CreateNetworkNodeFx] network node successfully created!")
+	log.Println("network node successfully created!")
 
 	models.CreateAuditLog(r, string(body))
 

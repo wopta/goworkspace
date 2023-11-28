@@ -15,7 +15,9 @@ func init() {
 }
 
 func Mga(w http.ResponseWriter, r *http.Request) {
-	log.Println("Mga")
+	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
+
+	log.Println("Mga Router")
 	lib.EnableCors(&w, r)
 
 	route := lib.RouteData{
@@ -75,16 +77,16 @@ func Mga(w http.ResponseWriter, r *http.Request) {
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
-				Route: "/warrants/v1",
+				Route:   "/warrants/v1",
 				Handler: GetWarrantsFx,
-				Method: http.MethodGet,
-				Roles: []string{models.UserRoleAdmin, models.UserRoleManager},
+				Method:  http.MethodGet,
+				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},
 			{
-				Route: "/warrant/v1",
+				Route:   "/warrant/v1",
 				Handler: CreateWarrantFx,
-				Method: http.MethodPut,
-				Roles: []string{models.UserRoleAdmin, models.UserRoleManager},
+				Method:  http.MethodPut,
+				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},
 		},
 	}
