@@ -109,6 +109,7 @@ func setInclusiveRow(mov inclusive.BankAccountMovement, codes map[string]map[str
 		startDate.Format(layout), //    DATA INIZIO VALIDITA' COPERTURA
 		mapEndDate(mov),          //    DATA FINE VALIDITA' COPERTURA
 		StringMapping(mov.MovementType, map[string]string{
+			"":          "A",
 			"active":    "A",
 			"insert":    "A",
 			"delete":    "E",

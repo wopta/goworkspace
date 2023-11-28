@@ -69,7 +69,6 @@ go_modules = [
     USER,
 ]
 changed_modules = [
-    BROKER, DOCUMENT, PAYMENT, RESERVED, POLICY
 ]
 updateable_modules = [
     BROKER,
