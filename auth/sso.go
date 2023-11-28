@@ -45,7 +45,7 @@ func JwtFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 				e = lib.SetFirestoreErr("networkNodes", node[0].Uid, node[0])
 
 			}
-			tokenString, e = lib.CreateCustomJwt(node[0].Mail, "", node[0].AuthId)
+			tokenString, e = lib.CreateCustomJwt(node[0].Mail, node[0].Role, node[0].AuthId)
 			responseSsoJwt = ResponseSsoJwt{
 				Token:    tokenString,
 				Producer: node[0],
@@ -81,7 +81,7 @@ func verifyAuaJwt(tokenReq string) (*AuaClaims, bool, error) {
 		fmt.Println(e)
 	}
 
-	return nil, token.Valid, e	
+	return nil, token.Valid, e
 }
 
 type ResponseSsoJwt struct {

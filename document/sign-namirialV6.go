@@ -17,6 +17,7 @@ import (
 
 	lib "github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
 )
 
 func SignNamirialV6(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -314,6 +315,29 @@ func getSendV6(id string, data models.Policy, prepare string, origin string, sen
 			}
 		},
 		`
+	}
+
+	nn := network.GetNetworkNodeByUid(data.ProducerUid)
+	if nn != nil {
+		warrant := nn.GetWarrant()
+		if warrant != nil {
+			flow := warrant.GetFlowName(data.Name)
+			if flow != "" {
+				if data.Name == models.LifeProduct && data.Channel == models.NetworkChannel && flow == models.RemittanceMgaFlow {
+					var baseUrl string = "https://www.wopta.it"
+					if os.Getenv("env") != "prod" {
+						baseUrl = "https://dev.wopta.it"
+					}
+					redirectUrl = `
+					"FinishActionConfiguration": {
+						"SignAnyWhereViewer": {
+							"RedirectUri": "` + baseUrl + `/it/quote/life/thank-you"
+						}
+					},
+					`
+				}
+			}
+		}
 	}
 
 	return `{
