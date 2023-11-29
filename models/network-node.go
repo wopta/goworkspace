@@ -62,8 +62,8 @@ type AgencyNode struct {
 	RuiRegistration    time.Time             `json:"ruiRegistration" firestore:"ruiRegistration" bigquery:"-"`
 	BigRuiRegistration bigquery.NullDateTime `json:"-" firestore:"-" bigquery:"ruiRegistration"`
 	Skin               *Skin                 `json:"skin,omitempty" firestore:"skin,omitempty" bigquery:"-"`
-	Pec                string                `json:"pec,omitempty" firestore:"pec,omitempty" bigquery:"pec"`
-	Website            string                `json:"website,omitempty" firestore:"website,omitempty" bigquery:"website"`
+	Pec                string                `json:"pec,omitempty" firestore:"pec,omitempty" bigquery:"-"`
+	Website            string                `json:"website,omitempty" firestore:"website,omitempty" bigquery:"-"`
 }
 
 type AgentNode struct {
