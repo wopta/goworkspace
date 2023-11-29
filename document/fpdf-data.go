@@ -9,6 +9,7 @@ import (
 
 	"github.com/dustin/go-humanize"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
 )
 
 type slugStruct struct {
@@ -74,6 +75,33 @@ func loadLifeBeneficiariesInfo(policy *models.Policy) ([]map[string]string, stri
 	}
 
 	return beneficiaries, legitimateSuccessorsChoice, designatedSuccessorsChoice
+}
+
+func loadProponentInfo(networkNode *models.NetworkNode) map[string]string {
+	policyProponent := make(map[string]string)
+
+	if networkNode == nil || networkNode.IsMgaProponent {
+		policyProponent["address"] = "Galleria del Corso, 1 - 20122 MILANO (MI)"
+		policyProponent["phone"] = "02.91.24.03.46"
+		policyProponent["email"] = "info@wopta.it"
+		policyProponent["pec"] = "woptaassicurazioni@legalmail.it"
+		policyProponent["website"] = "wopta.it"
+	} else {
+		proponentNode := network.GetNetworkNodeByUid(networkNode.WorksForUid)
+		if proponentNode == nil {
+			panic("could not find node for proponent with uid " + networkNode.WorksForUid)
+		}
+
+		policyProponent["address"] = proponentNode.GetAddress()
+		policyProponent["phone"] = proponentNode.Agency.Phone
+		policyProponent["email"] = proponentNode.Mail
+		policyProponent["pec"] = proponentNode.Agency.Pec
+		policyProponent["website"] = proponentNode.Agency.Website
+	}
+
+	jsonProponent, _ := json.Marshal(policyProponent)
+	log.Printf("[loadProponentInfo] proponent info %s", string(jsonProponent))
+	return policyProponent
 }
 
 func loadProducerInfo(origin string, networkNode *models.NetworkNode) map[string]string {
