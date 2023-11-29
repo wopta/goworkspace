@@ -16,43 +16,46 @@ type CreateWarrantResponse struct {
 }
 
 func CreateWarrantFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.Println("[CreateWarrantFx] Handler start ------------")
-
 	var (
 		response CreateWarrantResponse
 		warrant  models.Warrant
 	)
 
+	log.SetPrefix("[CreateWarrantFx] ")
+
+	log.Println("Handler start -----------------------------------------------")
+
 	bodyBytes, err := io.ReadAll(r.Body)
 	defer r.Body.Close()
 	if err != nil {
-		log.Printf("[CreateWarrantFx] error reading request body: %s", err.Error())
+		log.Printf("error reading request body: %s", err.Error())
 		return "", "", err
 	}
 
 	err = json.Unmarshal(bodyBytes, &warrant)
 	if err != nil {
-		log.Printf("[CreateWarrantFx] error marshaling request: %s", err.Error())
+		log.Printf("error marshaling request: %s", err.Error())
 		return "", "", err
 	}
 
 	err = CreateWarrant(warrant)
 	if err != nil {
-		log.Printf("[CreateWarrantFx] error creating warrant: %s", err.Error())
+		log.Printf("error creating warrant: %s", err.Error())
 		return "", response, err
 	}
 
-
 	response.Success = err == nil
 	if err == nil {
-		log.Printf("[CreateWarrantFx] created warrant %s", warrant.Name)
+		log.Printf("created warrant %s", warrant.Name)
 	}
 
 	responseBytes, err := json.Marshal(response)
 	if err != nil {
-		log.Printf("[CreateWarrantFx] error marshaling response: %s", err.Error())
+		log.Printf("error marshaling response: %s", err.Error())
 		return "", response, err
 	}
+
+	log.Println("Handler end -------------------------------------------------")
 
 	return string(responseBytes), response, err
 }

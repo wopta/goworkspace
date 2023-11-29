@@ -23,24 +23,28 @@ func ConsumeNetworkNodeInviteFx(w http.ResponseWriter, r *http.Request) (string,
 		req ConsumeNetworkNodeInviteReq
 	)
 
-	log.Println("[ConsumeNetworkNodeInviteFx] handler start -----------------")
+	log.SetPrefix("[ConsumeNetworkNodeInviteFx] ")
+
+	log.Println("Handler start -----------------------------------------------")
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	origin := r.Header.Get("Origin")
 
 	err := json.Unmarshal(body, &req)
 	if err != nil {
-		log.Println("[ConsumeNetworkNodeInviteFx] error unmarshaling request body")
+		log.Println("error unmarshaling request body")
 		return "", "", err
 	}
 
-	log.Printf("[consumeNetworkNodeInvite] Consuming invite %s...", req.InviteUid)
+	log.Printf("Consuming invite %s...", req.InviteUid)
 
 	err = consumeNetworkNodeInvite(origin, req.InviteUid, req.Password)
 	if err != nil {
-		log.Printf("[ConsumeNetworkNodeInviteFx] error consuming invite %s: %s", req.InviteUid, err.Error())
+		log.Printf("error consuming invite %s: %s", req.InviteUid, err.Error())
 		return "", "", err
 	}
+
+	log.Println("Handler end -------------------------------------------------")
 
 	return "{}", "", nil
 }
@@ -51,18 +55,18 @@ func consumeNetworkNodeInvite(origin, inviteUid, password string) error {
 		networkNode *models.NetworkNode
 	)
 
-	log.Printf("consumeNetworkNodeInvite] getting invite %s from Firestore...", inviteUid)
+	log.Printf("[consumeNetworkNodeInvite] getting invite %s from Firestore...", inviteUid)
 
 	fireInvites := lib.GetDatasetByEnv(origin, models.InvitesCollection)
 	docsnap, err := lib.GetFirestoreErr(fireInvites, inviteUid)
 	if err != nil {
-		log.Printf("consumeNetworkNodeInvite] error getting invite %s from Firestore", inviteUid)
+		log.Printf("[consumeNetworkNodeInvite] error getting invite %s from Firestore", inviteUid)
 		return err
 	}
 
 	err = docsnap.DataTo(&invite)
 	if err != nil {
-		log.Printf("consumeNetworkNodeInvite] error unmarshaling invite %s", inviteUid)
+		log.Printf("[consumeNetworkNodeInvite] error unmarshaling invite %s", inviteUid)
 		return err
 	}
 
@@ -71,7 +75,7 @@ func consumeNetworkNodeInvite(origin, inviteUid, password string) error {
 		return errors.New("invite consumed or expired")
 	}
 
-	log.Printf("consumeNetworkNodeInvite] getting network node %s from Firestore...", invite.NetworkNodeUid)
+	log.Printf("[consumeNetworkNodeInvite] getting network node %s from Firestore...", invite.NetworkNodeUid)
 
 	networkNode, err = network.GetNodeByUid(invite.NetworkNodeUid)
 	if err != nil {
@@ -113,9 +117,9 @@ func consumeNetworkNodeInvite(origin, inviteUid, password string) error {
 	}
 
 	lib.SetCustomClaimForUser(networkNode.AuthId, map[string]interface{}{
-		"isNetworkNode": true, 
-		"role": networkNode.Role,
-		"type": networkNode.Type,
+		"isNetworkNode": true,
+		"role":          networkNode.Role,
+		"type":          networkNode.Type,
 	})
 
 	return nil

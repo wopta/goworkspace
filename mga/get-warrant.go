@@ -14,13 +14,15 @@ type GetWarrantsResponse struct {
 }
 
 func GetWarrantsFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.Println("[GetWarrantsFx] Handler start ------------")
-
 	var response GetWarrantsResponse
+
+	log.SetPrefix("[GetWarrantsFx] ")
+
+	log.Println("Handler start -----------------------------------------------")
 
 	warrants, err := GetWarrants()
 	if err != nil {
-		log.Printf("[GetWarrantsFx] error getting warrants: %s", err.Error())
+		log.Printf("error getting warrants: %s", err.Error())
 		return "", "", err
 	}
 
@@ -28,11 +30,13 @@ func GetWarrantsFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 
 	responseBytes, err := json.Marshal(response)
 	if err != nil {
-		log.Printf("[GetWarrantsFx] error marshaling response: %s", err.Error())
+		log.Printf("error marshaling response: %s", err.Error())
 		return "", "", err
 	}
 
-	log.Printf("[GetWarrantsFx] found warrants: %s", string(responseBytes))
+	log.Printf("found warrants: %s", string(responseBytes))
+
+	log.Println("Handler end -------------------------------------------------")
 
 	return string(responseBytes), response, nil
 }
@@ -49,7 +53,7 @@ func GetWarrants() ([]models.Warrant, error) {
 		var warrant models.Warrant
 		err = json.Unmarshal(warrantBytes, &warrant)
 		if err != nil {
-			log.Printf("[GetWarrantsFx] error unmarshaling warrant: %s", err.Error())
+			log.Printf("[GetWarrants] error unmarshaling warrant: %s", err.Error())
 			return warrants, err
 		}
 

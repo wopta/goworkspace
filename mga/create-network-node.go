@@ -19,7 +19,7 @@ func CreateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 
 	log.SetPrefix("[CreateNetworkNodeFx] ")
 
-	log.Println("Handler start -------------------------")
+	log.Println("Handler start -----------------------------------------------")
 
 	origin := r.Header.Get("Origin")
 	body := lib.ErrorByte(io.ReadAll(r.Body))
@@ -47,6 +47,8 @@ func CreateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 	log.Println("network node successfully created!")
 
 	models.CreateAuditLog(r, string(body))
+
+	log.Println("Handler end -------------------------------------------------")
 
 	return "{}", "", err
 }
