@@ -2,6 +2,7 @@ package document
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"sort"
 	"strconv"
@@ -140,12 +141,44 @@ func loadProducerInfo(origin string, networkNode *models.NetworkNode) map[string
 }
 
 func loadDesignation(networkNode *models.NetworkNode) string {
-	designation := "Responsabile dell’attività di intermediazione assicurativa di Wopta " +
-		"Assicurazioni Srl, Società iscritta alla Sezione A del RUI con numero A000701923 in data 14.02.2022"
+	var (
+		designation                           string
+		mgaProponentDirectDesignationFormat   = "%s %s"
+		mgaRuiInfo                            = "Wopta Assicurazioni Srl, Società iscritta alla Sezione A del RUI con numero A000701923 in data 14/02/2022"
+		designationDirectManager              = "Responsabile dell’attività di intermediazione assicurativa di"
+		mgaProponentIndirectDesignationFormat = "%s di %s, iscritta in sezione E del RUI con numero %s in data %s, che opera per conto di %s"
+		mgaEmitterDesignationFormat           = "%s dell’intermediario di %s scritta alla sezione %s del RUI con numero %s in data %s"
+	)
 
-	if networkNode != nil && networkNode.Designation != "" {
-		designation = networkNode.Designation
+	if networkNode == nil || networkNode.Type == models.PartnershipNetworkNodeType {
+		designation = fmt.Sprintf(mgaProponentDirectDesignationFormat, designationDirectManager, mgaRuiInfo)
+	} else if networkNode.IsMgaProponent {
+		if networkNode.WorksForUid == models.WorksForMgaUid {
+			designation = fmt.Sprintf(mgaProponentDirectDesignationFormat, networkNode.Designation, mgaRuiInfo)
+		} else {
+			worksForNode := network.GetNetworkNodeByUid(networkNode.WorksForUid)
+			designation = fmt.Sprintf(
+				mgaProponentIndirectDesignationFormat,
+				networkNode.Designation,
+				worksForNode.Agency.Name,
+				worksForNode.Agency.RuiCode,
+				worksForNode.Agency.RuiRegistration.Format(dateLayout),
+				mgaRuiInfo,
+			)
+		}
+	} else {
+		worksForNode := network.GetNetworkNodeByUid(networkNode.WorksForUid)
+		designation = fmt.Sprintf(
+			mgaEmitterDesignationFormat,
+			networkNode.Designation,
+			worksForNode.Agency.Name,
+			worksForNode.Agency.RuiSection,
+			worksForNode.Agency.RuiCode,
+			worksForNode.Agency.RuiRegistration.Format(dateLayout),
+		)
 	}
+
+	log.Printf("[loadDesignation] designation info %s", designation)
 
 	return designation
 }
