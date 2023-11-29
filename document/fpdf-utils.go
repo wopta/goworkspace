@@ -533,21 +533,21 @@ func woptaInfoTable(pdf *fpdf.Fpdf, producerInfo, proponentInfo map[string]strin
 	setBlackRegularFont(pdf, smallTextSize)
 	pdf.MultiCell(0, 5, "SEDE LEGALE", "", "", false)
 	setBlackRegularFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 5, proponentInfo["address"], "", "", false) //
+	pdf.MultiCell(0, 5, proponentInfo["address"], "", "", false)
 	drawPinkHorizontalLine(pdf, 0.1)
 	setBlackRegularFont(pdf, smallTextSize)
 	pdf.CellFormat(90, 5, "RECAPITI TELEFONICI", "", 0, fpdf.AlignLeft, false, 0, "")
 	pdf.CellFormat(90, 5, "E-MAIL", "", 1, fpdf.AlignLeft, false, 0, "")
 	setBlackRegularFont(pdf, standardTextSize)
-	pdf.CellFormat(90, 5, proponentInfo["phone"], "", 0, fpdf.AlignLeft, false, 0, "") //
-	pdf.CellFormat(90, 5, proponentInfo["email"], "", 1, fpdf.AlignLeft, false, 0, "") //
+	pdf.CellFormat(90, 5, proponentInfo["phone"], "", 0, fpdf.AlignLeft, false, 0, "")
+	pdf.CellFormat(90, 5, proponentInfo["email"], "", 1, fpdf.AlignLeft, false, 0, "")
 	drawPinkHorizontalLine(pdf, 0.1)
 	setBlackRegularFont(pdf, smallTextSize)
 	pdf.CellFormat(90, 5, "PEC", "", 0, fpdf.AlignLeft, false, 0, "")
 	pdf.CellFormat(90, 5, "SITO INTERNET", "", 1, fpdf.AlignLeft, false, 0, "")
 	setBlackRegularFont(pdf, standardTextSize)
-	pdf.CellFormat(90, 5, proponentInfo["pec"], "", 0, fpdf.AlignLeft, false, 0, "")     //
-	pdf.CellFormat(90, 5, proponentInfo["website"], "", 1, fpdf.AlignLeft, false, 0, "") //
+	pdf.CellFormat(90, 5, proponentInfo["pec"], "", 0, fpdf.AlignLeft, false, 0, "")
+	pdf.CellFormat(90, 5, proponentInfo["website"], "", 1, fpdf.AlignLeft, false, 0, "")
 	drawPinkHorizontalLine(pdf, 0.1)
 	setBlackRegularFont(pdf, smallTextSize)
 	pdf.MultiCell(0, 5, "AUTORITÀ COMPETENTE ALLA VIGILANZA DELL’ATTIVITÀ SVOLTA",
