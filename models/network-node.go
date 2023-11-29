@@ -258,3 +258,24 @@ func (nn *NetworkNode) GetNetworkNodeFlow(productName string, warrant *Warrant) 
 
 	return product.Flow, lib.GetFilesByEnv(fmt.Sprintf(FlowFileFormat, product.Flow))
 }
+
+func (nn *NetworkNode) GetAddress() string {
+	var (
+		address       string
+		addressFormat = "%s, %s - %s %s (%s)"
+	)
+
+	switch nn.Type {
+	case AgencyNetworkNodeType:
+		return fmt.Sprintf(
+			addressFormat,
+			nn.Agency.Address.StreetName,
+			nn.Agency.Address.StreetNumber,
+			nn.Agency.Address.PostalCode,
+			nn.Agency.Address.City,
+			nn.Agency.Address.CityCode,
+		)
+	}
+
+	return address
+}
