@@ -12,37 +12,38 @@ import (
 )
 
 type NetworkNode struct {
-	Uid             string                `json:"uid" firestore:"uid" bigquery:"uid"`
-	AuthId          string                `json:"authId,omitempty" firestore:"authId,omitempty" bigquery:"-"`
-	Code            string                `json:"code" firestore:"code" bigquery:"code"`
-	Type            string                `json:"type" firestore:"type" bigquery:"type"`
-	Role            string                `json:"role" firestore:"role" bigquery:"role"`
-	Mail            string                `json:"mail" firestore:"mail" bigquery:"mail"`
-	Warrant         string                `json:"warrant" firestore:"warrant" bigquery:"warrant"`             // the name of the warrant file attached to the node
-	NetworkUid      string                `json:"networkUid" firestore:"networkUid" bigquery:"networkUid"`    // DEPRECATED
-	NetworkCode     string                `json:"networkCode" firestore:"networkCode" bigquery:"networkCode"` // DEPRECATED
-	ParentUid       string                `json:"parentUid,omitempty" firestore:"parentUid,omitempty" bigquery:"parentUid"`
-	ManagerUid      string                `json:"managerUid,omitempty" firestore:"managerUid,omitempty" bigquery:"managerUid"` // DEPRECATED
-	IsActive        bool                  `json:"isActive" firestore:"isActive" bigquery:"isActive"`
-	Users           []string              `json:"users" firestore:"users" bigquery:"users"`
-	Products        []Product             `json:"products" firestore:"products" bigquery:"-"`
-	BigProducts     []NodeProduct         `json:"-" firestore:"-" bigquery:"products"`
-	Policies        []string              `json:"policies" firestore:"policies" bigquery:"policies"`
-	Agent           *AgentNode            `json:"agent,omitempty" firestore:"agent,omitempty" bigquery:"agent"`
-	Agency          *AgencyNode           `json:"agency,omitempty" firestore:"agency,omitempty" bigquery:"agency"`
-	Broker          *AgencyNode           `json:"broker,omitempty" firestore:"broker,omitempty" bigquery:"broker"`
-	AreaManager     *AgentNode            `json:"areaManager,omitempty" firestore:"areaManager,omitempty" bigquery:"areaManager"`
-	Partnership     *PartnershipNode      `json:"partnership,omitempty" firestore:"partnership,omitempty" bigquery:"partnership"`
-	NodeSetting     *NodeSetting          `json:"nodeSetting,omitempty" firestore:"nodeSetting,omitempty" bigquery:"-"` // Not implemented
-	CreationDate    time.Time             `json:"creationDate" firestore:"creationDate" bigquery:"-"`
-	BigCreationDate bigquery.NullDateTime `json:"-" firestore:"-" bigquery:"creationDate"`
-	UpdatedDate     time.Time             `json:"updatedDate" firestore:"updatedDate" bigquery:"-"`
-	BigUpdatedDate  bigquery.NullDateTime `json:"-" firestore:"-" bigquery:"updatedDate"`
-	Data            string                `json:"-" firestore:"-" bigquery:"data"`
-	HasAnnex        bool                  `json:"hasAnnex" firestore:"hasAnnex" bigquery:"hasAnnex"`
-	Designation     string                `json:"designation" firestore:"designation" bigquery:"designation"`
-	IsMgaProponent  bool                  `json:"isMgaProponent" firestore:"isMgaProponent" bigquery:"-"`
-	WorksForUid     string                `json:"worksForUid" firestore:"worksForUid" bigquery:"-"`
+	Uid                 string                `json:"uid" firestore:"uid" bigquery:"uid"`
+	AuthId              string                `json:"authId,omitempty" firestore:"authId,omitempty" bigquery:"-"`
+	Code                string                `json:"code" firestore:"code" bigquery:"code"`
+	ExternalNetworkCode string                `json:"externalNetworkCode" firestore:"externalNetworkCode" bigquery:"externalNetworkCode"`
+	Type                string                `json:"type" firestore:"type" bigquery:"type"`
+	Role                string                `json:"role" firestore:"role" bigquery:"role"`
+	Mail                string                `json:"mail" firestore:"mail" bigquery:"mail"`
+	Warrant             string                `json:"warrant" firestore:"warrant" bigquery:"warrant"`             // the name of the warrant file attached to the node
+	NetworkUid          string                `json:"networkUid" firestore:"networkUid" bigquery:"networkUid"`    // DEPRECATED
+	NetworkCode         string                `json:"networkCode" firestore:"networkCode" bigquery:"networkCode"` // DEPRECATED
+	ParentUid           string                `json:"parentUid,omitempty" firestore:"parentUid,omitempty" bigquery:"parentUid"`
+	ManagerUid          string                `json:"managerUid,omitempty" firestore:"managerUid,omitempty" bigquery:"managerUid"` // DEPRECATED
+	IsActive            bool                  `json:"isActive" firestore:"isActive" bigquery:"isActive"`
+	Users               []string              `json:"users" firestore:"users" bigquery:"users"`
+	Products            []Product             `json:"products" firestore:"products" bigquery:"-"`
+	BigProducts         []NodeProduct         `json:"-" firestore:"-" bigquery:"products"`
+	Policies            []string              `json:"policies" firestore:"policies" bigquery:"policies"`
+	Agent               *AgentNode            `json:"agent,omitempty" firestore:"agent,omitempty" bigquery:"agent"`
+	Agency              *AgencyNode           `json:"agency,omitempty" firestore:"agency,omitempty" bigquery:"agency"`
+	Broker              *AgencyNode           `json:"broker,omitempty" firestore:"broker,omitempty" bigquery:"broker"`
+	AreaManager         *AgentNode            `json:"areaManager,omitempty" firestore:"areaManager,omitempty" bigquery:"areaManager"`
+	Partnership         *PartnershipNode      `json:"partnership,omitempty" firestore:"partnership,omitempty" bigquery:"partnership"`
+	NodeSetting         *NodeSetting          `json:"nodeSetting,omitempty" firestore:"nodeSetting,omitempty" bigquery:"-"` // Not implemented
+	CreationDate        time.Time             `json:"creationDate" firestore:"creationDate" bigquery:"-"`
+	BigCreationDate     bigquery.NullDateTime `json:"-" firestore:"-" bigquery:"creationDate"`
+	UpdatedDate         time.Time             `json:"updatedDate" firestore:"updatedDate" bigquery:"-"`
+	BigUpdatedDate      bigquery.NullDateTime `json:"-" firestore:"-" bigquery:"updatedDate"`
+	Data                string                `json:"-" firestore:"-" bigquery:"data"`
+	HasAnnex            bool                  `json:"hasAnnex" firestore:"hasAnnex" bigquery:"hasAnnex"`
+	Designation         string                `json:"designation" firestore:"designation" bigquery:"designation"`
+	IsMgaProponent      bool                  `json:"isMgaProponent" firestore:"isMgaProponent" bigquery:"-"`
+	WorksForUid         string                `json:"worksForUid" firestore:"worksForUid" bigquery:"-"`
 }
 
 type PartnershipNode struct {
@@ -97,8 +98,13 @@ type NodeAddress struct {
 }
 
 type NodeProduct struct {
-	Name    string `json:"-" firestore:"-" bigquery:"name"`
-	Version string `json:"-" firestore:"-" bigquery:"version"`
+	Name      string        `json:"-" firestore:"-" bigquery:"name"`
+	Companies []NodeCompany `json:"-" firestore:"-" bigquery:"companies"`
+}
+
+type NodeCompany struct {
+	Name         string `json:"-" firestore:"-" bigquery:"name"`
+	ProducerCode string `json:"-" firestore:"-" bigquery:"producerCode"`
 }
 
 func (nn *NetworkNode) Marshal() ([]byte, error) {
@@ -119,9 +125,16 @@ func (nn *NetworkNode) SaveBigQuery(origin string) error {
 	nn.Broker = parseBigQueryAgencyNode(nn.Broker)
 
 	for _, p := range nn.Products {
+		companies := make([]NodeCompany, 0)
+		for _, c := range p.Companies {
+			companies = append(companies, NodeCompany{
+				Name:         c.Name,
+				ProducerCode: c.ProducerCode,
+			})
+		}
 		nn.BigProducts = append(nn.BigProducts, NodeProduct{
-			Name:    p.Name,
-			Version: p.Version,
+			Name:      p.Name,
+			Companies: companies,
 		})
 	}
 

@@ -29,7 +29,6 @@ func CreateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 		log.Printf("error unmarshaling request: %s", err.Error())
 		return "", "", err
 	}
-
 	// TODO: check node.Type in warrant.AllowedTypes
 	// TODO: check unique node.Code
 	// TODO: check unique companyCode for company

@@ -35,6 +35,42 @@ func initNode(node *models.NetworkNode) error {
 	node.Role = node.Type
 	node.IsActive = true
 
+	if node.Type != models.PartnershipNetworkNodeType && node.Type != models.AreaManagerNetworkNodeType {
+		if node.ExternalNetworkCode == "" {
+			node.ExternalNetworkCode = node.Code
+		}
+
+		warrant := node.GetWarrant()
+		if warrant == nil {
+			return fmt.Errorf("could not find warrant for node with value '%s'", node.Warrant)
+		}
+
+		if node.Products == nil {
+			node.Products = make([]models.Product, 0)
+			for _, product := range warrant.Products {
+				companies := make([]models.Company, 0)
+				for _, company := range product.Companies {
+					companies = append(companies, models.Company{
+						Name:         company.Name,
+						ProducerCode: node.Code,
+					})
+				}
+				node.Products = append(node.Products, models.Product{
+					Name:      product.Name,
+					Companies: companies,
+				})
+			}
+		} else {
+			for prodIndex, product := range node.Products {
+				for companyIndex, company := range product.Companies {
+					if company.ProducerCode == "" {
+						node.Products[prodIndex].Companies[companyIndex].ProducerCode = node.Code
+					}
+				}
+			}
+		}
+	}
+
 	if node.IsMgaProponent {
 		node.HasAnnex = true
 	}
@@ -69,6 +105,69 @@ func CreateNode(node models.NetworkNode) (*models.NetworkNode, error) {
 		return nil, err
 	}
 	return &node, lib.SetFirestoreErr(models.NetworkNodesCollection, node.Uid, node)
+}
+
+func UpdateNode(node models.NetworkNode) error {
+	var (
+		err          error
+		originalNode *models.NetworkNode
+	)
+
+	log.Println("[UpdateNode] function start ----------------------------------")
+
+	log.Printf("[UpdateNode] fetching network node %s from Firestore...", node.Uid)
+
+	originalNode, err = GetNodeByUid(node.Uid)
+	if err != nil {
+		log.Printf("[UpdateNode] error fetching network node from firestore: %s", err.Error())
+		return err
+	}
+
+	if originalNode.Mail != node.Mail {
+		_, err := lib.UpdateUserEmail(node.Uid, node.Mail)
+		if err != nil {
+			log.Printf("[UpdateNode] error updating network node mail on Firebase Auth: %s", err.Error())
+			return err
+		}
+		originalNode.Mail = node.Mail
+	}
+	originalNode.Warrant = node.Warrant
+	originalNode.Products = node.Products
+	originalNode.ParentUid = node.ParentUid
+	originalNode.IsActive = node.IsActive
+	originalNode.Designation = node.Designation
+	originalNode.HasAnnex = node.HasAnnex
+	originalNode.UpdatedDate = time.Now().UTC()
+	// TODO: check for isMgaProponent
+
+	switch node.Type {
+	case models.AgentNetworkNodeType:
+		originalNode.Agent = node.Agent
+	case models.AgencyNetworkNodeType:
+		originalNode.Agency = node.Agency
+	case models.BrokerNetworkNodeType:
+		originalNode.Broker = node.Broker
+	case models.AreaManagerNetworkNodeType:
+		originalNode.AreaManager = node.AreaManager
+	}
+
+	if originalNode.AuthId == "" {
+		originalNode.Code = node.Code
+		originalNode.Type = node.Type
+		originalNode.Role = node.Type
+	}
+
+	log.Printf("[UpdateNode] writing network node %s in Firestore...", originalNode.Uid)
+
+	err = lib.SetFirestoreErr(models.NetworkNodesCollection, originalNode.Uid, originalNode)
+	if err != nil {
+		log.Printf("[UpdateNode] error updating network node %s in Firestore", originalNode.Uid)
+		return err
+	}
+
+	log.Printf("[UpdateNode] writing network node %s in BigQuery...", originalNode.Uid)
+
+	return originalNode.SaveBigQuery("")
 }
 
 func GetNetworkNodeByUid(nodeUid string) *models.NetworkNode {
