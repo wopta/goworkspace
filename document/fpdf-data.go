@@ -300,3 +300,34 @@ func loadPersonaGuarantees(policy *models.Policy, product *models.Product) (map[
 
 	return guaranteesMap, slugs
 }
+
+func loadAnnex4Section1Info(policy *models.Policy, networkNode *models.NetworkNode) string {
+	var (
+		section1Info       string
+		mgaProponentFormat = "Secondo quanto indicato nel modulo di proposta/polizza e documentazione " +
+			"precontrattuale ricevuta, la distribuzione  relativamente a questa proposta/contratto è svolta per " +
+			"conto della seguente impresa di assicurazione: %s"
+		mgaEmitterFormat = "Il contratto viene intermediato da %s, in qualità di soggetto proponente, che opera in " +
+			"virtù della collaborazione con Wopta Assicurazioni Srl (intermediario emittente dell'Impresa di " +
+			"Assicurazione %s, iscritto al RUI sezione A nr A000701923 dal 14.02.2022, ai sensi dell’articolo 22, " +
+			"comma 10, del decreto legge 18 ottobre 2012, n. 179, convertito nella legge 17 dicembre 2012, n. 221"
+	)
+
+	if policy.Channel != models.NetworkChannel || networkNode == nil || networkNode.IsMgaProponent {
+		section1Info = fmt.Sprintf(
+			mgaProponentFormat,
+			productCompanyMap[policy.Name],
+		)
+	} else {
+		worksForNode := network.GetNetworkNodeByUid(networkNode.WorksForUid)
+		section1Info = fmt.Sprintf(
+			mgaEmitterFormat,
+			worksForNode.Agency.Name,
+			productCompanyMap[policy.Name],
+		)
+	}
+
+	log.Printf("[loadAnnex4Section1Info] section 1 info: %s", section1Info)
+
+	return section1Info
+}

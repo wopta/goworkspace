@@ -28,6 +28,13 @@ const (
 	proposal         = "PROPOSTA"
 )
 
+var productCompanyMap map[string]string = map[string]string{
+	models.LifeProduct:    "AXA FRANCE VIE S.A.",
+	models.GapProduct:     "Sogessur SA",
+	models.PmiProduct:     "Global Assistance",
+	models.PersonaProduct: "Global Assistance",
+}
+
 func initFpdf() *fpdf.Fpdf {
 	pdf := fpdf.New(fpdf.OrientationPortrait, fpdf.UnitMillimeter, fpdf.PageSizeA4, "")
 	pdf.SetMargins(10, 15, 10)
