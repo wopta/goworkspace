@@ -28,11 +28,10 @@ const (
 	proposal         = "PROPOSTA"
 )
 
-var productCompanyMap map[string]string = map[string]string{
-	models.LifeProduct:    "AXA FRANCE VIE S.A.",
-	models.GapProduct:     "Sogessur SA",
-	models.PmiProduct:     "Global Assistance",
-	models.PersonaProduct: "Global Assistance",
+var companyMap map[string]string = map[string]string{
+	models.AxaCompany:      "AXA FRANCE VIE S.A.",
+	models.SogessurCompany: "Sogessur SA",
+	models.GlobalCompany:   "Global Assistance",
 }
 
 func initFpdf() *fpdf.Fpdf {

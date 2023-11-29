@@ -316,14 +316,14 @@ func loadAnnex4Section1Info(policy *models.Policy, networkNode *models.NetworkNo
 	if policy.Channel != models.NetworkChannel || networkNode == nil || networkNode.IsMgaProponent {
 		section1Info = fmt.Sprintf(
 			mgaProponentFormat,
-			productCompanyMap[policy.Name],
+			companyMap[policy.Company],
 		)
 	} else {
 		worksForNode := network.GetNetworkNodeByUid(networkNode.WorksForUid)
 		section1Info = fmt.Sprintf(
 			mgaEmitterFormat,
 			worksForNode.Agency.Name,
-			productCompanyMap[policy.Name],
+			companyMap[policy.Company],
 		)
 	}
 
