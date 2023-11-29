@@ -49,7 +49,7 @@ func PaymentV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	if policyUid == "" || origin == "" {
 		ext := strings.Split(fabrickCallback.ExternalID, "_")
 		policyUid = ext[0]
-		origin = ext[2]
+		origin = ext[3]
 	}
 
 	switch fabrickCallback.Bill.Status {
