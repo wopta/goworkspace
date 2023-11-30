@@ -17,54 +17,58 @@ type GetProductsListByEntitlementResponse struct {
 }
 
 func GetProductsListByChannelFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.Println("[GetProductsListByChannelFx] Handler start ------------")
-
 	var (
 		err      error
 		response GetProductsListByEntitlementResponse
 	)
 
+	log.SetPrefix("[GetProductsListByChannelFx] ")
+
+	log.Println("Handler start -----------------------------------------------")
+
 	authToken, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
 	if err != nil {
-		log.Printf("[GetProductsListByChannelFx] error extracting auth token: %s", err.Error())
+		log.Printf("error extracting auth token: %s", err.Error())
 		return "", "", err
 	}
 
 	channel := authToken.GetChannelByRoleV2()
 	switch channel {
 	case models.MgaChannel:
-		log.Println("[GetProductsListByChannelFx] getting mga products")
+		log.Println("getting mga products")
 		response.Products = product.GetProductsByChannel(models.MgaChannel)
 	case models.ECommerceChannel:
-		log.Println("[GetProductsListByChannelFx] getting e-commerce products")
+		log.Println("getting e-commerce products")
 		response.Products = product.GetProductsByChannel(models.ECommerceChannel)
 	case models.NetworkChannel:
-		log.Println("[GetProductsListByChannelFx] getting network products")
+		log.Println("getting network products")
 		networkNode := network.GetNetworkNodeByUid(authToken.UserID)
 		if networkNode == nil {
-			log.Println("[GetProductsListByChannelFx] node not found")
+			log.Println("node not found")
 			return "", "", fmt.Errorf("no node set for authToken")
 		}
 		warrant := networkNode.GetWarrant()
 		if warrant == nil {
-			log.Println("[GetProductsListByChannelFx] warrant not found")
+			log.Println("warrant not found")
 			return "", "", fmt.Errorf("no warrant set for node")
 		}
 		productList := lib.SliceMap[models.Product, string](warrant.Products, func(p models.Product) string { return p.Name })
-		log.Printf("[GetProductsListByChannelFx] product list '%s'", productList)
+		log.Printf("product list '%s'", productList)
 		response.Products = product.GetNetworkNodeProducts(productList)
 	default:
-		log.Printf("[GetProductsListByChannelFx] error channel %s unaavailable", channel)
+		log.Printf("error channel %s unaavailable", channel)
 		return "", "", fmt.Errorf("unavailable channel")
 	}
 
 	responseBytes, err := json.Marshal(response)
 	if err != nil {
-		log.Printf("[GetProductsListByChannelFx] error marshaling response: %s", err.Error())
+		log.Printf("error marshaling response: %s", err.Error())
 		return "", "", err
 	}
 
-	log.Printf("[GetProductsListByChannelFx] found products: %s", string(responseBytes))
+	log.Printf("found products: %s", string(responseBytes))
+
+	log.Println("Handler end -------------------------------------------------")
 
 	return string(responseBytes), response, nil
 }

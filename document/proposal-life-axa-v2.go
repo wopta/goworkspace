@@ -71,7 +71,7 @@ func lifeAxaProposalV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, net
 
 	//pdf.AddPage()
 
-	generatePolicyAnnex(pdf, origin, networkNode)
+	generatePolicyAnnex(pdf, origin, networkNode, policy)
 
 	pdf.AddPage()
 

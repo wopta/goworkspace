@@ -654,7 +654,7 @@ func contractWithdrawlSection(pdf *fpdf.Fpdf, isProposal bool) {
 	}
 }
 
-func allegato3Section(pdf *fpdf.Fpdf, producerInfo map[string]string, designation string) {
+func allegato3Section(pdf *fpdf.Fpdf, producerInfo, proponentInfo map[string]string, designation string) {
 	setBlackBoldFont(pdf, titleTextSize)
 	pdf.MultiCell(0, 3, "ALLEGATO 3 - INFORMATIVA SUL DISTRIBUTORE", "", "CM", false)
 	pdf.Ln(3)
@@ -674,7 +674,7 @@ func allegato3Section(pdf *fpdf.Fpdf, producerInfo map[string]string, designatio
 		"il contraente", "", "", false)
 	pdf.Ln(1)
 
-	woptaInfoTable(pdf, producerInfo, designation)
+	woptaInfoTable(pdf, producerInfo, proponentInfo, designation)
 	pdf.Ln(1)
 
 	setBlackRegularFont(pdf, standardTextSize)
@@ -733,7 +733,7 @@ func allegato3Section(pdf *fpdf.Fpdf, producerInfo map[string]string, designatio
 		"", "", false)
 }
 
-func allegato4Section(pdf *fpdf.Fpdf, producerInfo map[string]string, designation string) {
+func allegato4Section(pdf *fpdf.Fpdf, producerInfo, proponentInfo map[string]string, designation, section1Info string) {
 	setBlackBoldFont(pdf, titleTextSize)
 	pdf.MultiCell(0, 3, "ALLEGATO 4 - INFORMAZIONI SULLA DISTRIBUZIONE\nDEL PRODOTTO ASSICURATIVO NON IBIP",
 		"", "CM", false)
@@ -745,7 +745,7 @@ func allegato4Section(pdf *fpdf.Fpdf, producerInfo map[string]string, designatio
 		"e sulle remunerazioni percepite.", "", "", false)
 	pdf.Ln(1)
 
-	woptaInfoTable(pdf, producerInfo, designation)
+	woptaInfoTable(pdf, producerInfo, proponentInfo, designation)
 	pdf.Ln(3)
 
 	setBlackBoldFont(pdf, titleTextSize)
@@ -753,9 +753,7 @@ func allegato4Section(pdf *fpdf.Fpdf, producerInfo map[string]string, designatio
 		"", false)
 	pdf.Ln(1)
 	setBlackRegularFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3, "Secondo quanto indicato nel modulo di proposta/polizza e documentazione "+
-		"precontrattuale ricevuta, la distribuzione relativamente a questa proposta/contratto è svolta per conto "+
-		"della seguente impresa di assicurazione: AXA FRANCE VIE S.A.", "", "", false)
+	pdf.MultiCell(0, 3, section1Info, "", "", false)
 	pdf.Ln(3)
 	setBlackBoldFont(pdf, titleTextSize)
 	pdf.MultiCell(0, 3, "SEZIONE II: Informazioni sull’attività di distribuzione e consulenza",
@@ -801,7 +799,7 @@ func allegato4Section(pdf *fpdf.Fpdf, producerInfo map[string]string, designatio
 	pdf.Ln(3)
 }
 
-func allegato4TerSection(pdf *fpdf.Fpdf, producerInfo map[string]string, designation string) {
+func allegato4TerSection(pdf *fpdf.Fpdf, producerInfo, proponentInfo map[string]string, designation string) {
 	setBlackBoldFont(pdf, titleTextSize)
 	pdf.MultiCell(0, 3, "ALLEGATO 4 TER - ELENCO DELLE REGOLE DI COMPORTAMENTO DEL DISTRIBUTORE",
 		"", fpdf.AlignCenter, false)
@@ -816,7 +814,7 @@ func allegato4TerSection(pdf *fpdf.Fpdf, producerInfo map[string]string, designa
 		"prevista, del contratto di assicurazione.", "", "", false)
 	pdf.Ln(1)
 
-	woptaInfoTable(pdf, producerInfo, designation)
+	woptaInfoTable(pdf, producerInfo, proponentInfo, designation)
 	pdf.Ln(3)
 
 	setBlackBoldFont(pdf, titleTextSize)
@@ -849,23 +847,25 @@ func allegato4TerSection(pdf *fpdf.Fpdf, producerInfo map[string]string, designa
 		"", "", false)
 }
 
-func generatePolicyAnnex(pdf *fpdf.Fpdf, origin string, networkNode *models.NetworkNode) {
+func generatePolicyAnnex(pdf *fpdf.Fpdf, origin string, networkNode *models.NetworkNode, policy *models.Policy) {
 	if networkNode == nil || networkNode.HasAnnex || networkNode.Type == models.PartnershipNetworkNodeType {
 		producerInfo := loadProducerInfo(origin, networkNode)
+		proponentInfo := loadProponentInfo(networkNode)
 		designation := loadDesignation(networkNode)
+		annex4Section1Info := loadAnnex4Section1Info(policy, networkNode)
 
 		pdf.AddPage()
 
 		woptaFooter(pdf)
 
-		allegato3Section(pdf, producerInfo, designation)
+		allegato3Section(pdf, producerInfo, proponentInfo, designation)
 
 		pdf.AddPage()
 
-		allegato4Section(pdf, producerInfo, designation)
+		allegato4Section(pdf, producerInfo, proponentInfo, designation, annex4Section1Info)
 
 		pdf.AddPage()
 
-		allegato4TerSection(pdf, producerInfo, designation)
+		allegato4TerSection(pdf, producerInfo, proponentInfo, designation)
 	}
 }

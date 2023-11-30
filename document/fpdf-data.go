@@ -2,6 +2,7 @@ package document
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"sort"
 	"strconv"
@@ -9,6 +10,7 @@ import (
 
 	"github.com/dustin/go-humanize"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
 )
 
 type slugStruct struct {
@@ -76,6 +78,33 @@ func loadLifeBeneficiariesInfo(policy *models.Policy) ([]map[string]string, stri
 	return beneficiaries, legitimateSuccessorsChoice, designatedSuccessorsChoice
 }
 
+func loadProponentInfo(networkNode *models.NetworkNode) map[string]string {
+	policyProponent := make(map[string]string)
+
+	if networkNode == nil || networkNode.IsMgaProponent {
+		policyProponent["address"] = "Galleria del Corso, 1 - 20122 MILANO (MI)"
+		policyProponent["phone"] = "02.91.24.03.46"
+		policyProponent["email"] = "info@wopta.it"
+		policyProponent["pec"] = "woptaassicurazioni@legalmail.it"
+		policyProponent["website"] = "wopta.it"
+	} else {
+		proponentNode := network.GetNetworkNodeByUid(networkNode.WorksForUid)
+		if proponentNode == nil {
+			panic("could not find node for proponent with uid " + networkNode.WorksForUid)
+		}
+
+		policyProponent["address"] = proponentNode.GetAddress()
+		policyProponent["phone"] = proponentNode.Agency.Phone
+		policyProponent["email"] = proponentNode.Mail
+		policyProponent["pec"] = proponentNode.Agency.Pec
+		policyProponent["website"] = proponentNode.Agency.Website
+	}
+
+	jsonProponent, _ := json.Marshal(policyProponent)
+	log.Printf("[loadProponentInfo] proponent info %s", string(jsonProponent))
+	return policyProponent
+}
+
 func loadProducerInfo(origin string, networkNode *models.NetworkNode) map[string]string {
 	policyProducer := map[string]string{
 		"name":            "LOMAZZI MICHELE",
@@ -112,12 +141,44 @@ func loadProducerInfo(origin string, networkNode *models.NetworkNode) map[string
 }
 
 func loadDesignation(networkNode *models.NetworkNode) string {
-	designation := "Responsabile dell’attività di intermediazione assicurativa di Wopta " +
-		"Assicurazioni Srl, Società iscritta alla Sezione A del RUI con numero A000701923 in data 14.02.2022"
+	var (
+		designation                           string
+		mgaProponentDirectDesignationFormat   = "%s %s"
+		mgaRuiInfo                            = "Wopta Assicurazioni Srl, Società iscritta alla Sezione A del RUI con numero A000701923 in data 14/02/2022"
+		designationDirectManager              = "Responsabile dell’attività di intermediazione assicurativa di"
+		mgaProponentIndirectDesignationFormat = "%s di %s, iscritta in sezione E del RUI con numero %s in data %s, che opera per conto di %s"
+		mgaEmitterDesignationFormat           = "%s dell’intermediario di %s scritta alla sezione %s del RUI con numero %s in data %s"
+	)
 
-	if networkNode != nil && networkNode.Designation != "" {
-		designation = networkNode.Designation
+	if networkNode == nil || networkNode.Type == models.PartnershipNetworkNodeType {
+		designation = fmt.Sprintf(mgaProponentDirectDesignationFormat, designationDirectManager, mgaRuiInfo)
+	} else if networkNode.IsMgaProponent {
+		if networkNode.WorksForUid == models.WorksForMgaUid {
+			designation = fmt.Sprintf(mgaProponentDirectDesignationFormat, networkNode.Designation, mgaRuiInfo)
+		} else {
+			worksForNode := network.GetNetworkNodeByUid(networkNode.WorksForUid)
+			designation = fmt.Sprintf(
+				mgaProponentIndirectDesignationFormat,
+				networkNode.Designation,
+				worksForNode.Agency.Name,
+				worksForNode.Agency.RuiCode,
+				worksForNode.Agency.RuiRegistration.Format(dateLayout),
+				mgaRuiInfo,
+			)
+		}
+	} else {
+		worksForNode := network.GetNetworkNodeByUid(networkNode.WorksForUid)
+		designation = fmt.Sprintf(
+			mgaEmitterDesignationFormat,
+			networkNode.Designation,
+			worksForNode.Agency.Name,
+			worksForNode.Agency.RuiSection,
+			worksForNode.Agency.RuiCode,
+			worksForNode.Agency.RuiRegistration.Format(dateLayout),
+		)
 	}
+
+	log.Printf("[loadDesignation] designation info %s", designation)
 
 	return designation
 }
@@ -238,4 +299,35 @@ func loadPersonaGuarantees(policy *models.Policy, product *models.Product) (map[
 	}
 
 	return guaranteesMap, slugs
+}
+
+func loadAnnex4Section1Info(policy *models.Policy, networkNode *models.NetworkNode) string {
+	var (
+		section1Info       string
+		mgaProponentFormat = "Secondo quanto indicato nel modulo di proposta/polizza e documentazione " +
+			"precontrattuale ricevuta, la distribuzione  relativamente a questa proposta/contratto è svolta per " +
+			"conto della seguente impresa di assicurazione: %s"
+		mgaEmitterFormat = "Il contratto viene intermediato da %s, in qualità di soggetto proponente, che opera in " +
+			"virtù della collaborazione con Wopta Assicurazioni Srl (intermediario emittente dell'Impresa di " +
+			"Assicurazione %s, iscritto al RUI sezione A nr A000701923 dal 14.02.2022, ai sensi dell’articolo 22, " +
+			"comma 10, del decreto legge 18 ottobre 2012, n. 179, convertito nella legge 17 dicembre 2012, n. 221"
+	)
+
+	if policy.Channel != models.NetworkChannel || networkNode == nil || networkNode.IsMgaProponent {
+		section1Info = fmt.Sprintf(
+			mgaProponentFormat,
+			companyMap[policy.Company],
+		)
+	} else {
+		worksForNode := network.GetNetworkNodeByUid(networkNode.WorksForUid)
+		section1Info = fmt.Sprintf(
+			mgaEmitterFormat,
+			worksForNode.Agency.Name,
+			companyMap[policy.Company],
+		)
+	}
+
+	log.Printf("[loadAnnex4Section1Info] section 1 info: %s", section1Info)
+
+	return section1Info
 }

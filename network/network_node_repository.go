@@ -25,7 +25,7 @@ func GetNodeByUid(uid string) (*models.NetworkNode, error) {
 	return node, err
 }
 
-func initNode(node *models.NetworkNode) {
+func initNode(node *models.NetworkNode) error {
 	if len(node.Uid) == 0 {
 		node.Uid = lib.NewDoc(models.NetworkNodesCollection)
 	}
@@ -41,37 +41,47 @@ func initNode(node *models.NetworkNode) {
 		}
 
 		warrant := node.GetWarrant()
-		if warrant != nil {
-			if node.Products == nil {
-				node.Products = make([]models.Product, 0)
-				for _, product := range warrant.Products {
-					companies := make([]models.Company, 0)
-					for _, company := range product.Companies {
-						companies = append(companies, models.Company{
-							Name:         company.Name,
-							ProducerCode: node.Code,
-						})
-					}
-					node.Products = append(node.Products, models.Product{
-						Name:      product.Name,
-						Companies: companies,
+		if warrant == nil {
+			return fmt.Errorf("could not find warrant for node with value '%s'", node.Warrant)
+		}
+
+		if node.Products == nil {
+			node.Products = make([]models.Product, 0)
+			for _, product := range warrant.Products {
+				companies := make([]models.Company, 0)
+				for _, company := range product.Companies {
+					companies = append(companies, models.Company{
+						Name:         company.Name,
+						ProducerCode: node.Code,
 					})
 				}
-			} else {
-				for prodIndex, product := range node.Products {
-					for companyIndex, company := range product.Companies {
-						if company.ProducerCode == "" {
-							node.Products[prodIndex].Companies[companyIndex].ProducerCode = node.Code
-						}
+				node.Products = append(node.Products, models.Product{
+					Name:      product.Name,
+					Companies: companies,
+				})
+			}
+		} else {
+			for prodIndex, product := range node.Products {
+				for companyIndex, company := range product.Companies {
+					if company.ProducerCode == "" {
+						node.Products[prodIndex].Companies[companyIndex].ProducerCode = node.Code
 					}
 				}
 			}
 		}
 	}
+
+	if node.IsMgaProponent {
+		node.HasAnnex = true
+	}
+
+	return addWorksForUid(node, node)
 }
 
 func CreateNode(node models.NetworkNode) (*models.NetworkNode, error) {
-	initNode(&node)
+	if err := initNode(&node); err != nil {
+		return nil, err
+	}
 	return &node, lib.SetFirestoreErr(models.NetworkNodesCollection, node.Uid, node)
 }
 
@@ -106,7 +116,17 @@ func UpdateNode(node models.NetworkNode) error {
 	originalNode.Designation = node.Designation
 	originalNode.HasAnnex = node.HasAnnex
 	originalNode.UpdatedDate = time.Now().UTC()
-	// TODO: check for isMgaProponent
+
+	originalNode.IsMgaProponent = node.IsMgaProponent
+	originalNode.HasAnnex = node.HasAnnex
+	if originalNode.IsMgaProponent {
+		originalNode.HasAnnex = true
+	}
+	err = addWorksForUid(originalNode, &node)
+	if err != nil {
+		log.Printf("[UpdateNode] error updating WorksForUid '%s' in network node '%s': %s", originalNode.WorksForUid, originalNode.Uid, err.Error())
+		return err
+	}
 
 	switch node.Type {
 	case models.AgentNetworkNodeType:
@@ -300,4 +320,31 @@ func GetAllParentNodesFromNodeBigQuery(uid string) ([]models.NetworkNode, error)
 		return []models.NetworkNode{}, fmt.Errorf("could not find node with uid %s", uid)
 	}
 	return nodes, err
+}
+
+func addWorksForUid(originalNode, inputNode *models.NetworkNode) error {
+	if inputNode.Type == models.AgentNetworkNodeType && inputNode.WorksForUid != "" && inputNode.WorksForUid != models.WorksForMgaUid {
+		worksForNode := GetNetworkNodeByUid(inputNode.WorksForUid)
+		// TODO: Check also for broker?
+		if worksForNode.Type != models.AgencyNetworkNodeType {
+			return fmt.Errorf("worksForUid must reference an agency, got %s", worksForNode.Type)
+		}
+		if inputNode.IsMgaProponent && !lib.SliceContains(models.GetProponentRuiSections(), worksForNode.Agency.RuiSection) {
+			return fmt.Errorf(
+				"worksForUid must reference an agency of RuiSection %v when IsMgaProponent is %t",
+				models.GetProponentRuiSections(),
+				inputNode.IsMgaProponent,
+			)
+		}
+		if !inputNode.IsMgaProponent && !lib.SliceContains(models.GetIssuerRuiSections(), worksForNode.Agency.RuiSection) {
+			return fmt.Errorf(
+				"worksForUid must reference an agency of RuiSection %v when IsMgaProponent is %t",
+				models.GetIssuerRuiSections(),
+				inputNode.IsMgaProponent,
+			)
+		}
+	}
+
+	originalNode.WorksForUid = inputNode.WorksForUid
+	return nil
 }

@@ -14,21 +14,26 @@ type GetAllNetworkNodesResponse struct {
 }
 
 func GetAllNetworkNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.Println("[GetAllNetworkNodesFx] Handler start -----------------------")
 	var response GetAllNetworkNodesResponse
+
+	log.SetPrefix("[GetAllNetworkNodesFx] ")
+
+	log.Println("Handler start -----------------------------------------------")
 
 	networkNodes, err := network.GetAllNetworkNodes()
 	if err != nil {
-		log.Printf("[GetAllNetworkNodesFx] error getting network nodes: %s", err.Error())
+		log.Printf("error getting network nodes: %s", err.Error())
 		return "", nil, err
 	}
 
 	response.NetworkNodes = networkNodes
 	responseBytes, err := json.Marshal(&response)
 	if err != nil {
-		log.Printf("[GetAllNetworkNodesFx] error marshalling response: %s", err.Error())
+		log.Printf("error marshalling response: %s", err.Error())
 		return "", nil, err
 	}
+
+	log.Println("Handler end -------------------------------------------------")
 
 	return string(responseBytes), response, nil
 }

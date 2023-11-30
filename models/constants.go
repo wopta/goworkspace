@@ -186,3 +186,18 @@ const (
 	RvmInstructionsAttachmentName = "RVM Istruzioni"
 	RvmSurveyAttachmentName       = "RVM Questionario"
 )
+
+const (
+	WorksForMgaUid = "__wopta__"
+	RuiSectionE    = "E"
+	RuiSectionA    = "A"
+	RuiSectionB    = "B"
+)
+
+func GetProponentRuiSections() []string {
+	return []string{RuiSectionE}
+}
+
+func GetIssuerRuiSections() []string {
+	return []string{RuiSectionA, RuiSectionB}
+}

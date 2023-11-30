@@ -8,14 +8,18 @@ import (
 )
 
 func GetNetworkNodeByUidFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.Println("[GetNetworkNodeByUidFx] Handler start -----------------------")
+	log.SetPrefix("[GetNetworkNodeByUidFx] ")
+
+	log.Println("Handler start -----------------------------------------------")
 
 	nodeUid := r.Header.Get("uid")
-	log.Printf("[GetNetworkNodeByUidFx] Uid %s", nodeUid)
+	log.Printf("Uid %s", nodeUid)
 
 	networkNode := network.GetNetworkNodeByUid(nodeUid)
 
 	jsonOut, err := networkNode.Marshal()
+
+	log.Println("Handler end -------------------------------------------------")
 
 	return string(jsonOut), networkNode, err
 }

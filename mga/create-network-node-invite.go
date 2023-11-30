@@ -33,51 +33,54 @@ func CreateNetworkNodeInviteFx(w http.ResponseWriter, r *http.Request) (string, 
 		networkNode *models.NetworkNode
 	)
 
-	log.Println("[CreateNetworkNodeInviteFx] handler start -------------------------")
+	log.SetPrefix("[CreateNetworkNodeInviteFx] ")
+
+	log.Println("Handler start -----------------------------------------------")
 
 	origin := r.Header.Get("Origin")
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 
-	log.Printf("[CreateNetworkNodeInviteFx] request body %s", string(body))
+	log.Printf("request body %s", string(body))
 
 	err := json.Unmarshal(body, &req)
 	if err != nil {
-		log.Println("[CreateNetworkNodeInviteFx] error unmarshalling body")
+		log.Println("error unmarshalling body")
 		return "", "", err
 	}
 
 	token := r.Header.Get("Authorization")
 
-	log.Printf("[CreateNetworkNodeInviteFx] getting creatorUid from token %s", token)
+	log.Printf("getting creatorUid from token %s", token)
 
 	authToken, err := models.GetAuthTokenFromIdToken(token)
 	if err != nil {
-		log.Printf("[CreateNetworkNodeInviteFx] invalid JWT %s", token)
+		log.Printf("invalid JWT %s", token)
 		return "", "", err
 	}
 
-	log.Printf("[CreateNetworkNodeInviteFx] getting network node %s from Firestore...", req.NetworkNodeUid)
+	log.Printf("getting network node %s from Firestore...", req.NetworkNodeUid)
 
 	networkNode, err = network.GetNodeByUid(req.NetworkNodeUid)
 	if err != nil {
-		log.Printf("[CreateNetworkNodeInviteFx] error getting network node %s from Firestore...", req.NetworkNodeUid)
+		log.Printf("error getting network node %s from Firestore...", req.NetworkNodeUid)
 		return "", "", err
 	}
 
-	log.Printf("[CreateNetworkNodeInviteFx] generating invite for network node %s", req.NetworkNodeUid)
+	log.Printf("generating invite for network node %s", req.NetworkNodeUid)
 
 	inviteUid, err := createNetworkNodeInvite(origin, networkNode.Uid, authToken.UserID)
 	if err != nil {
-		log.Printf("[CreateNetworkNodeInviteFx] error generating invite for network node %s", req.NetworkNodeUid)
+		log.Printf("error generating invite for network node %s", req.NetworkNodeUid)
 		return "", "", err
 	}
 
-	log.Printf("[CreateNetworkNodeInviteFx] sending network node invite mail to %s", networkNode.Mail)
+	log.Printf("sending network node invite mail to %s", networkNode.Mail)
 
 	mail.SendInviteMail(inviteUid, networkNode.Mail, true)
 
-	log.Printf("[CreateNetworkNodeInviteFx] network node invite mail sent to %s", networkNode.Mail)
+	log.Printf("network node invite mail sent to %s", networkNode.Mail)
+	log.Println("Handler end -------------------------------------------------")
 
 	return "{}", nil, nil
 }

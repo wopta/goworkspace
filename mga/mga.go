@@ -15,7 +15,9 @@ func init() {
 }
 
 func Mga(w http.ResponseWriter, r *http.Request) {
-	log.Println("Mga")
+	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
+
+	log.Println("Mga Router")
 	lib.EnableCors(&w, r)
 
 	route := lib.RouteData{

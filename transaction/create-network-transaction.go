@@ -160,7 +160,10 @@ func CreateNetworkTransactions(
 			} else {
 				baseName = strings.ToUpper(currentNode.Code)
 			}
-			nodeName := strings.ToUpper(strings.Join([]string{baseName, currentNode.GetName()}, "-"))
+			nodeName := strings.ToUpper(strings.Join([]string{
+				baseName,
+				strings.ReplaceAll(currentNode.GetName(), " ", "-"),
+			}, "-"))
 
 			_, err = createNetworkTransaction(policy, transaction, currentNode, commission, accountType, paymentType, nodeName)
 			if err != nil {
