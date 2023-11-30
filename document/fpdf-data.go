@@ -93,11 +93,27 @@ func loadProponentInfo(networkNode *models.NetworkNode) map[string]string {
 			panic("could not find node for proponent with uid " + networkNode.WorksForUid)
 		}
 
-		policyProponent["address"] = proponentNode.GetAddress()
-		policyProponent["phone"] = proponentNode.Agency.Phone
-		policyProponent["email"] = proponentNode.Mail
-		policyProponent["pec"] = proponentNode.Agency.Pec
-		policyProponent["website"] = proponentNode.Agency.Website
+		policyProponent["address"] = "====="
+		policyProponent["phone"] = "====="
+		policyProponent["email"] = "====="
+		policyProponent["pec"] = "====="
+		policyProponent["website"] = "====="
+
+		if address := proponentNode.GetAddress(); address != "" {
+			policyProponent["address"] = address
+		}
+		if phone := proponentNode.Agency.Phone; phone != "" {
+			policyProponent["phone"] = phone
+		}
+		if email := proponentNode.Mail; email != "" {
+			policyProponent["email"] = email
+		}
+		if pec := proponentNode.Agency.Pec; pec != "" {
+			policyProponent["pec"] = pec
+		}
+		if website := proponentNode.Agency.Website; website != "" {
+			policyProponent["website"] = website
+		}
 	}
 
 	jsonProponent, _ := json.Marshal(policyProponent)
