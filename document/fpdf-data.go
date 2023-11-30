@@ -147,7 +147,7 @@ func loadDesignation(networkNode *models.NetworkNode) string {
 		mgaRuiInfo                            = "Wopta Assicurazioni Srl, Società iscritta alla Sezione A del RUI con numero A000701923 in data 14/02/2022"
 		designationDirectManager              = "Responsabile dell’attività di intermediazione assicurativa di"
 		mgaProponentIndirectDesignationFormat = "%s di %s, iscritta in sezione E del RUI con numero %s in data %s, che opera per conto di %s"
-		mgaEmitterDesignationFormat           = "%s dell’intermediario di %s scritta alla sezione %s del RUI con numero %s in data %s"
+		mgaEmitterDesignationFormat           = "%s dell’intermediario di %s iscritta alla sezione %s del RUI con numero %s in data %s"
 	)
 
 	if networkNode == nil || networkNode.Type == models.PartnershipNetworkNodeType {
