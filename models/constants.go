@@ -98,6 +98,7 @@ const (
 	InvitesCollection            string = "invites"
 	EmergencyNumbersCollection   string = "emergencyNumbers"
 	PoliciesViewCollection       string = "policiesView"
+	TransactionsViewCollection   string = "transactionsView"
 )
 
 const (
