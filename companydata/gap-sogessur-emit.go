@@ -353,6 +353,11 @@ func getGapPolicies(from time.Time, to time.Time) []models.Policy {
 				QueryValue: true, // NOTE: Not working for testing env: the DB has every Gap policy with companyEmit to false
 			},
 			{
+				Field:      "isPay",
+				Operator:   "==",
+				QueryValue: true,
+			},
+			{
 				Field:      "companyEmitted",
 				Operator:   "==",
 				QueryValue: false,
