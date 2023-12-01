@@ -7,6 +7,7 @@ from enum import Enum
 import copy
 
 # modules
+AUTH = "auth"
 BPMN = "bpmn"
 BROKER = "broker"
 CALLBACK = "callback"
@@ -43,6 +44,7 @@ PROD = "prod"
 
 
 go_modules = [
+    AUTH,
     BPMN,
     BROKER,
     CALLBACK,
