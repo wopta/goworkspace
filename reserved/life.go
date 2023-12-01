@@ -24,26 +24,31 @@ func (*ByAssetPerson) isCovered(w *PolicyReservedWrapper) (bool, []models.Policy
 	)
 	log.Println("[ByAssetPerson.isCovered] start -----------------------------")
 
-	now := time.Now().UTC()
-	lateDate := now.AddDate(0, 2, 0)
-	bigNow := lib.GetBigQueryNullDateTime(now)
-
 	query := fmt.Sprintf(
-		"SELECT %s FROM `%s.%s` WHERE name = @name AND isPay = true AND (isDeleted = false OR isDelete IS NULL) AND startDate <= @now AND endDate >= @now AND LOWER(JSON_VALUE(data, '$.assets[0].person.fiscalCode')) = LOWER(@fiscalCode) ORDER BY JSON_VALUE(data, '$.creationDate') ASC",
-		"uid, data.creationDate as creationDate, startDate, endDate, codeCompany, paymentSplit, isPay, name, isDeleted",
+		"SELECT %s FROM `%s.%s` WHERE name = @name AND companyEmit = true AND "+
+			"(isDeleted = false OR isDelete IS NULL) AND "+
+			"((@startDate >= startDate AND @startDate <= endDate) OR (@endDate >= startDate AND @endDate <= endDate)) AND "+
+			"LOWER(JSON_VALUE(data, '$.assets[0].person.fiscalCode')) = LOWER(@fiscalCode) ORDER BY JSON_VALUE(data, '$.creationDate') ASC",
+		"uid, data.creationDate as creationDate, startDate, endDate, codeCompany, paymentSplit, companyEmit, isPay, name, isDeleted",
 		models.WoptaDataset,
-		models.PolicyCollection,
+		models.PoliciesViewCollection,
 	)
 	params := map[string]interface{}{
 		"name":       w.Policy.Name,
-		"now":        bigNow,
+		"startDate":  lib.GetBigQueryNullDateTime(w.Policy.StartDate),
+		"endDate":    lib.GetBigQueryNullDateTime(w.Policy.EndDate),
 		"fiscalCode": w.Policy.Assets[0].Person.FiscalCode,
 	}
+
+	log.Printf("[ByAssetPerson.isCovered] executing query %s with params %s", query, params)
+
 	policies, err := lib.QueryParametrizedRowsBigQuery[models.Policy](query, params)
 	if err != nil {
 		log.Printf("[ByAssetPerson.isCovered] error getting policies: %s", err.Error())
 	}
 	log.Printf("[ByAssetPerson.isCovered] found %d policies", len(policies))
+
+	lateDate := time.Now().UTC().AddDate(0, 2, 0)
 
 	for _, policy := range policies {
 		log.Printf("[ByAssetPerson.isCovered] checking policy %s", policy.Uid)

@@ -97,6 +97,7 @@ const (
 	NetworkTransactionCollection string = "networkTransactions" //only for bigquery
 	InvitesCollection            string = "invites"
 	EmergencyNumbersCollection   string = "emergencyNumbers"
+	PoliciesViewCollection       string = "policiesView"
 )
 
 const (
