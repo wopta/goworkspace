@@ -180,14 +180,14 @@ func CreateNetworkTransactions(
 }
 
 func getAccountType(transaction *models.Transaction) string {
-	if transaction.ProviderName == models.ManualPaymentProvider {
+	if transaction.PaymentMethod == models.PayMethodRemittance {
 		return models.AccountTypeActive
 	}
 	return models.AccountTypePassive
 }
 
 func getPaymentType(transaction *models.Transaction, policy *models.Policy, producerNode *models.NetworkNode) string {
-	if policy.ProducerUid == producerNode.Uid && transaction.ProviderName == models.ManualPaymentProvider {
+	if policy.ProducerUid == producerNode.Uid && transaction.PaymentMethod == models.PayMethodRemittance {
 		return models.PaymentTypeRemittanceMga
 	}
 	return models.PaymentTypeCommission
