@@ -67,7 +67,7 @@ func CriptoPay(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	return "", nil, nil
 }
 
-func PaymentController(origin string, policy *models.Policy, product *models.Product) (string, error) {
+func PaymentController(origin string, policy *models.Policy, product, mgaProduct *models.Product) (string, error) {
 	var (
 		payUrl         string
 		paymentMethods []string
@@ -89,10 +89,10 @@ func PaymentController(origin string, policy *models.Policy, product *models.Pro
 		switch policy.PaymentSplit {
 		case string(models.PaySplitYear), string(models.PaySplitYearly), string(models.PaySplitSingleInstallment):
 			log.Printf("[PaymentController] fabrick yearly pay")
-			payRes = FabrickYearPay(*policy, origin, paymentMethods)
+			payRes = FabrickYearPay(*policy, origin, paymentMethods, mgaProduct)
 		case string(models.PaySplitMonthly):
 			log.Printf("[PaymentController] fabrick monthly pay")
-			payRes = FabrickMonthlyPay(*policy, origin, paymentMethods)
+			payRes = FabrickMonthlyPay(*policy, origin, paymentMethods, mgaProduct)
 		}
 		if payRes.Payload == nil || payRes.Payload.PaymentPageURL == nil {
 			log.Println("[PaymentController] fabrick error payload or paymentUrl empty")

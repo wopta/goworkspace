@@ -6,6 +6,7 @@ import (
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/product"
 )
 
 func PutByPolicy(
@@ -14,6 +15,7 @@ func PutByPolicy(
 	amount, amountNet float64,
 	providerId, paymentMethod string,
 	isPay bool,
+	mgaProduct *models.Product,
 ) *models.Transaction {
 	var (
 		sd              string
@@ -47,7 +49,9 @@ func PutByPolicy(
 	fireTransactions := lib.GetDatasetByEnv(origin, models.TransactionsCollection)
 	transactionUid := lib.NewDoc(fireTransactions)
 
-	// All commission get calculated apart on payment
+	commissionMga := lib.RoundFloat(product.GetCommissionByProduct(&policy, mgaProduct, false), 2)
+	log.Printf("[PutByPolicy] commissionMga %.2f", commissionMga)
+
 	tr := models.Transaction{
 		Amount:          amount,
 		AmountNet:       amountNet,
@@ -73,6 +77,7 @@ func PutByPolicy(
 		AgentUid:        policy.AgentUid,
 		AgencyUid:       policy.AgencyUid,
 		PaymentMethod:   paymentMethod,
+		Commissions:     commissionMga,
 	}
 
 	log.Println("[PutByPolicy] saving transaction to firestore...")
