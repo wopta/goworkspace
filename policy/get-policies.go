@@ -21,13 +21,26 @@ func GetPoliciesByQueries(origin string, queries []models.Query, limitValue int)
 		if q.Type == "dateTime" {
 			value, _ = time.Parse(time.RFC3339, value.(string))
 		}
+
 		fireQueries.Queries = append(fireQueries.Queries, lib.Firequery{
 			Field:      q.Field,
-			Operator:   q.Op,
+			Operator:   getQueryOperator(q.Op),
 			QueryValue: value,
 		})
 	}
 
 	docSnap, err := fireQueries.FirestoreWhereLimitFields(firePolicy, limitValue)
 	return models.PolicyToListData(docSnap), err
+}
+
+func getQueryOperator(queryOp string) string {
+	switch queryOp {
+	case "lte":
+		return "<="
+	case "gte":
+		return ">="
+	case "neq":
+		return "!="
+	}
+	return queryOp
 }
