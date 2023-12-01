@@ -65,11 +65,12 @@ func FabrickPayFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		warrant = networkNode.GetWarrant()
 	}
 	product := prd.GetProductV2(data.Name, data.ProductVersion, data.Channel, networkNode, warrant)
+	mgaProduct := prd.GetProductV2(data.Name, data.ProductVersion, models.MgaChannel, nil, nil)
 
 	paymentMethods := getPaymentMethods(data, product)
 
 	resultPay := <-FabrickPayObj(data, false, "", data.StartDate.AddDate(10, 0, 0).Format(models.TimeDateOnly), "", data.PriceGross,
-		data.PriceNett, getOrigin(r.Header.Get("origin")), paymentMethods)
+		data.PriceNett, getOrigin(r.Header.Get("origin")), paymentMethods, mgaProduct)
 
 	log.Println(resultPay)
 	return "", nil, err
@@ -93,16 +94,25 @@ func FabrickPayMonthlyFx(w http.ResponseWriter, r *http.Request) (string, interf
 		warrant = networkNode.GetWarrant()
 	}
 	product := prd.GetProductV2(data.Name, data.ProductVersion, data.Channel, networkNode, warrant)
+	mgaProduct := prd.GetProductV2(data.Name, data.ProductVersion, models.MgaChannel, nil, nil)
 
 	paymentMethods := getPaymentMethods(data, product)
 
-	resultPay := FabrickMonthlyPay(data, getOrigin(r.Header.Get("origin")), paymentMethods)
+	resultPay := FabrickMonthlyPay(data, getOrigin(r.Header.Get("origin")), paymentMethods, mgaProduct)
 	b, err := json.Marshal(resultPay)
 	log.Println(resultPay)
 	return string(b), resultPay, err
 }
 
-func FabrickPayObj(data models.Policy, firstSchedule bool, scheduleDate string, expireDate string, customerId string, amount float64, amountNet float64, origin string, paymentMethods []string) <-chan FabrickPaymentResponse {
+func FabrickPayObj(
+	data models.Policy,
+	firstSchedule bool,
+	scheduleDate, expireDate, customerId string,
+	amount, amountNet float64,
+	origin string,
+	paymentMethods []string,
+	mgaProduct *models.Product,
+) <-chan FabrickPaymentResponse {
 	r := make(chan FabrickPaymentResponse)
 
 	go func() {
@@ -138,7 +148,7 @@ func FabrickPayObj(data models.Policy, firstSchedule bool, scheduleDate string, 
 			json.Unmarshal([]byte(body), &result)
 			defer res.Body.Close()
 
-			tr.PutByPolicy(data, scheduleDate, origin, expireDate, customerId, amount, amountNet, *result.Payload.PaymentID, "", false)
+			tr.PutByPolicy(data, scheduleDate, origin, expireDate, customerId, amount, amountNet, *result.Payload.PaymentID, "", false, mgaProduct)
 
 			r <- result
 		}
@@ -146,17 +156,17 @@ func FabrickPayObj(data models.Policy, firstSchedule bool, scheduleDate string, 
 	return r
 }
 
-func FabrickMonthlyPay(data models.Policy, origin string, paymentMethods []string) FabrickPaymentResponse {
+func FabrickMonthlyPay(data models.Policy, origin string, paymentMethods []string, mgaProduct *models.Product) FabrickPaymentResponse {
 	log.Printf("[FabrickMonthlyPay] Policy %s", data.Uid)
 
 	customerId := uuid.New().String()
-	firstres := <-FabrickPayObj(data, true, "", "", customerId, data.PriceGrossMonthly, data.PriceNettMonthly, origin, paymentMethods)
+	firstres := <-FabrickPayObj(data, true, "", "", customerId, data.PriceGrossMonthly, data.PriceNettMonthly, origin, paymentMethods, mgaProduct)
 	time.Sleep(100)
 
 	for i := 1; i <= 11; i++ {
 		date := data.StartDate.AddDate(0, i, 0)
 		expireDate := date.AddDate(10, 0, 0)
-		res := <-FabrickPayObj(data, false, date.Format(models.TimeDateOnly), expireDate.Format(models.TimeDateOnly), customerId, data.PriceGrossMonthly, data.PriceNettMonthly, origin, paymentMethods)
+		res := <-FabrickPayObj(data, false, date.Format(models.TimeDateOnly), expireDate.Format(models.TimeDateOnly), customerId, data.PriceGrossMonthly, data.PriceNettMonthly, origin, paymentMethods, mgaProduct)
 		log.Printf("[FabrickMonthlyPay] Policy %s - Index %d - response: %v", data.Uid, i, res)
 		time.Sleep(100)
 	}
@@ -164,11 +174,11 @@ func FabrickMonthlyPay(data models.Policy, origin string, paymentMethods []strin
 	return firstres
 }
 
-func FabrickYearPay(data models.Policy, origin string, paymentMethods []string) FabrickPaymentResponse {
+func FabrickYearPay(data models.Policy, origin string, paymentMethods []string, mgaProduct *models.Product) FabrickPaymentResponse {
 	log.Printf("[FabrickYearPay] Policy %s", data.Uid)
 
 	customerId := uuid.New().String()
-	res := <-FabrickPayObj(data, false, "", data.StartDate.AddDate(10, 0, 0).Format(models.TimeDateOnly), customerId, data.PriceGross, data.PriceNett, origin, paymentMethods)
+	res := <-FabrickPayObj(data, false, "", data.StartDate.AddDate(10, 0, 0).Format(models.TimeDateOnly), customerId, data.PriceGross, data.PriceNett, origin, paymentMethods, mgaProduct)
 
 	return res
 }

@@ -95,11 +95,13 @@ func FabrickRecreate(policyUid, origin string, networkNode *models.NetworkNode, 
 		return nil, fmt.Errorf("policy %s already paid cannot recreate payment(s)", policy.Uid)
 	}
 
+	mgaProduct := prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
+
 	oldTransactions := tr.GetPolicyTransactions(origin, policy.Uid)
 
 	log.Println("[FabrickRecreate] recreating payment...")
 	product := prd.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, networkNode, warrant)
-	payUrl, err := PaymentController(origin, &policy, product)
+	payUrl, err := PaymentController(origin, &policy, product, mgaProduct)
 	if err != nil {
 		log.Printf("[FabrickRecreate] error creating payment: %s", err.Error())
 		return nil, err

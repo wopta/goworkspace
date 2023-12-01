@@ -311,7 +311,7 @@ func emitPay(policy *models.Policy, origin string) {
 	log.Printf("[emitPay] Policy Uid %s", policy.Uid)
 
 	policy.IsPay = false
-	policy.PayUrl, _ = payment.PaymentController(origin, policy, product)
+	policy.PayUrl, _ = payment.PaymentController(origin, policy, product, mgaProduct)
 }
 
 func setAdvance(policy *models.Policy, origin string) {
@@ -321,7 +321,7 @@ func setAdvance(policy *models.Policy, origin string) {
 	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusToPay, models.PolicyStatusPay)
 	policy.PaymentSplit = paymentSplit
 
-	tr := transaction.PutByPolicy(*policy, "", origin, "", "", policy.PriceGross, policy.PriceNett, "", models.PayMethodRemittance, true)
+	tr := transaction.PutByPolicy(*policy, "", origin, "", "", policy.PriceGross, policy.PriceNett, "", models.PayMethodRemittance, true, mgaProduct)
 
 	transaction.CreateNetworkTransactions(policy, tr, networkNode, mgaProduct)
 }
