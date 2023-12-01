@@ -22,11 +22,11 @@ func getClient() (*auth.Client, context.Context) {
 	return client, ctx
 }
 
-func CreateCustomJwt(email string, role string, id string) (string, error) {
-
+func CreateCustomJwt(email, role, nodeType, id string) (string, error) {
 	client, ctx := getClient()
 	claims := map[string]interface{}{
 		"role":          role,
+		"type":          nodeType,
 		"email":         email,
 		"isNetworkNode": true,
 	}

@@ -13,7 +13,6 @@ import (
 )
 
 func JwtFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.Println("--------------------------JwtFx-------------------------------------------")
 	var (
 		tokenString    string
 		e              error
@@ -21,41 +20,43 @@ func JwtFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 		b              []byte
 		responseSsoJwt ResponseSsoJwt
 	)
+
+	log.Println("--------------------------JwtFx-------------------------------------------")
+
 	origin = r.Header.Get("Origin")
 	tokenReq := r.URL.Query().Get("jwt")
+	defer r.Body.Close()
+
 	log.Println("JwtFx request token:", tokenReq)
-	log.Println("JwtFx AUAJWTSIGNKEY:", os.Getenv("AUAJWTSIGNKEY"))
+
 	claims, isvalid, e := verifyAuaJwt(tokenReq)
 
 	if isvalid {
 		q := lib.FireGenericQueries[models.NetworkNode]{
 			Queries: []lib.Firequery{
 				{
-					Field:      "networkCode",
+					Field:      "externalNetworkCode",
 					Operator:   "==",
 					QueryValue: claims.Id,
 				},
 			},
 		}
-		node, e = q.FireQuery("networkNodes")
+		node, e = q.FireQuery(models.NetworkNodesCollection)
 		if len(node) > 0 {
 			if node[0].AuthId == "" {
 				userfire, _ := lib.CreateUserWithEmailAndPassword(node[0].Mail, os.Getenv("DEFAULT_PSW"), &node[0].Uid)
 				node[0].AuthId = userfire.UID
-				e = lib.SetFirestoreErr("networkNodes", node[0].Uid, node[0])
+				e = lib.SetFirestoreErr(models.NetworkNodesCollection, node[0].Uid, node[0])
 
 			}
-			tokenString, e = lib.CreateCustomJwt(node[0].Mail, node[0].Role, node[0].AuthId)
+			tokenString, e = lib.CreateCustomJwt(node[0].Mail, node[0].Role, node[0].Type, node[0].AuthId)
 			responseSsoJwt = ResponseSsoJwt{
 				Token:    tokenString,
 				Producer: node[0],
 			}
 			b, e = json.Marshal(responseSsoJwt)
-
 		}
 	}
-	//log.Println("Proposal request proposal: ", string(j))
-	defer r.Body.Close()
 
 	return string(b), responseSsoJwt, e
 }
