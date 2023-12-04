@@ -54,10 +54,12 @@ func createNetworkTransaction(
 		StatusHistory:    []string{models.NetworkTransactionStatusCreated, models.NetworkTransactionStatusToPay},
 		IsPay:            false,
 		IsConfirmed:      false,
+		IsDelete:         false,
 		CreationDate:     lib.GetBigQueryNullDateTime(time.Now().UTC()),
 		PayDate:          lib.GetBigQueryNullDateTime(time.Time{}),
 		TransactionDate:  lib.GetBigQueryNullDateTime(time.Time{}),
 		ConfirmationDate: lib.GetBigQueryNullDateTime(time.Time{}),
+		DeletionDate:     lib.GetBigQueryNullDateTime(time.Time{}),
 	}
 
 	jsonLog, _ := json.Marshal(&netTransaction)
