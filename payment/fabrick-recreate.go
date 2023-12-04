@@ -131,6 +131,14 @@ func FabrickRecreate(policyUid, origin string, networkNode *models.NetworkNode, 
 		}
 		log.Println("[FabrickRecreate] saving transaction to bigquery...")
 		transaction.BigQuerySave(origin)
+
+		nts := tr.GetNetworkTransactionsByTransactionUid(transaction.Uid)
+		for _, nt := range nts {
+			if err = tr.DeleteNetworkTransaction(&nt); err != nil {
+				log.Printf("[FabrickRecreate] error deleting network transaction '%s': %s", nt.Uid, err.Error())
+				return nil, err
+			}
+		}
 	}
 
 	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)

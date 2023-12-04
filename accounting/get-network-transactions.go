@@ -6,8 +6,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/transaction"
 )
 
 type GetNetworkTransactionsResponse struct {
@@ -23,7 +23,7 @@ func GetNetworkTransactionsFx(w http.ResponseWriter, r *http.Request) (string, a
 
 	log.Printf("[GetNetworkTransactionsFx] transactionUid %s", transactionUid)
 
-	netTranscations := GetNetworkTransactionsByTransactionUid(transactionUid)
+	netTranscations := transaction.GetNetworkTransactionsByTransactionUid(transactionUid)
 	if len(netTranscations) == 0 {
 		return "", "", fmt.Errorf("no network transactions found for transaction %s", transactionUid)
 	}
@@ -36,28 +36,4 @@ func GetNetworkTransactionsFx(w http.ResponseWriter, r *http.Request) (string, a
 	}
 
 	return string(responseByte), response, nil
-}
-
-func GetNetworkTransactionsByTransactionUid(transactionUid string) []models.NetworkTransaction {
-	log.Printf("[GetNetworkTransactionsByTransactionUid] transactionUid %s", transactionUid)
-
-	var (
-		netTransactions []models.NetworkTransaction
-		err             error
-	)
-
-	query := fmt.Sprintf(
-		"SELECT * FROM `%s.%s` WHERE transactionUid='%s'",
-		models.WoptaDataset,
-		models.NetworkTransactionCollection,
-		transactionUid,
-	)
-
-	netTransactions, err = lib.QueryRowsBigQuery[models.NetworkTransaction](query)
-	if err != nil {
-		log.Printf("[GetNetworkTransactionsByTransactionUid] error getting network transactions: %s", err.Error())
-	}
-
-	log.Printf("[GetNetworkTransactionsByTransactionUid] found %d network transactions", len(netTransactions))
-	return netTransactions
 }
