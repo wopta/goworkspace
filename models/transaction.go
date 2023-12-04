@@ -26,7 +26,7 @@ type Transaction struct {
 	Status             string                `firestore:"status,omitempty" json:"status,omitempty" bigquery:"status"`
 	PolicyName         string                `firestore:"policyName,omitempty" json:"policName,omitempty" bigquery:"policyName"`
 	Name               string                `firestore:"name,omitempty" json:"name,omitempty" bigquery:"name"`
-	Commission         float64               `firestore:"commission,omitempty" json:"commission,omitempty" bigquery:"commission"`
+	Commission         float64               `firestore:"commission,omitempty" json:"commission,omitempty" bigquery:"commission"` // DEPRECATED
 	ScheduleDate       string                `firestore:"scheduleDate,omitempty" json:"scheduleDate,omitempty" bigquery:"scheduleDate"`
 	ExpirationDate     string                `json:"expirationDate,omitempty" firestore:"expirationDate,omitempty" bigquery:"expirationDate"`
 	PayDate            time.Time             `firestore:"payDate,omitempty" json:"payDate,omitempty" bigquery:"-"`
