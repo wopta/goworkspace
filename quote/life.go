@@ -175,20 +175,18 @@ func Life(data models.Policy, channel string, networkNode *models.NetworkNode, w
 
 	}
 
-	log.Println("[Life] filtering rates")
-
-	removeOfferRate(&data, availableRates)
-
 	log.Println("[Life] check monthly limit")
 
-	if data.OffersPrices["default"][string(models.PaySplitMonthly)] != nil {
-		monthlyToBeRemoved := !ruleProduct.Companies[0].IsMonthlyPaymentAvailable ||
-			data.OffersPrices["default"]["monthly"].Gross < ruleProduct.Companies[0].MinimumMonthlyPrice
-		if monthlyToBeRemoved {
-			log.Println("[Life] monthly payment disabled")
-			delete(data.OffersPrices["default"], "monthly")
-		}
+	monthlyToBeRemoved := !ruleProduct.Companies[0].IsMonthlyPaymentAvailable ||
+		data.OffersPrices["default"]["monthly"].Gross < ruleProduct.Companies[0].MinimumMonthlyPrice
+	if monthlyToBeRemoved {
+		log.Println("[Life] monthly payment disabled")
+		delete(data.OffersPrices["default"], "monthly")
 	}
+
+	log.Println("[Life] filtering available rates")
+
+	removeOfferRate(&data, availableRates)
 
 	log.Println("[Life] round offers prices")
 
