@@ -133,7 +133,7 @@ func LifePartnership(partnershipUid, jwtData, origin string) (models.Policy, mod
 		return policy, *productLife, partnershipNode, err
 	}
 
-	policy, err = quote.Life(policy, models.ECommerceChannel, partnershipNode, warrant)
+	policy, err = quote.Life(policy, models.ECommerceChannel, partnershipNode, warrant, models.ECommerceFlow)
 
 	if err != nil {
 		return policy, *productLife, partnershipNode, err

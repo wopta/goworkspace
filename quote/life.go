@@ -52,15 +52,20 @@ func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		return "", nil, err
 	}
 
+	flow := authToken.GetChannelByRoleV2()
+
 	log.Println("[LifeFx] loading network node")
 	networkNode := network.GetNetworkNodeByUid(authToken.UserID)
 	if networkNode != nil {
 		warrant = networkNode.GetWarrant()
+		if warrant != nil {
+			flow = warrant.GetFlowName(data.Name)
+		}
 	}
 
 	log.Println("[LifeFx] start quoting")
 
-	result, err := Life(data, authToken.GetChannelByRoleV2(), networkNode, warrant)
+	result, err := Life(data, authToken.GetChannelByRoleV2(), networkNode, warrant, flow)
 	jsonOut, err := json.Marshal(result)
 
 	log.Printf("[LifeFx] response: %s", string(jsonOut))
@@ -71,7 +76,7 @@ func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 }
 
-func Life(data models.Policy, channel string, networkNode *models.NetworkNode, warrant *models.Warrant) (models.Policy, error) {
+func Life(data models.Policy, channel string, networkNode *models.NetworkNode, warrant *models.Warrant, flow string) (models.Policy, error) {
 	var err error
 
 	log.Println("[Life] function start --------------------------------------")
@@ -90,6 +95,12 @@ func Life(data models.Policy, channel string, networkNode *models.NetworkNode, w
 		log.Printf("[Life] error in sellable: %s", err.Error())
 		return models.Policy{}, err
 	}
+
+	log.Printf("[Life] loading available rates for flow %s", flow)
+
+	availableRates := getAvailableRates(ruleProduct, flow)
+
+	log.Printf("[Life] available rates: %s", availableRates)
 
 	log.Printf("[Life] add default guarantees")
 
@@ -164,11 +175,19 @@ func Life(data models.Policy, channel string, networkNode *models.NetworkNode, w
 
 	}
 
-	monthlyToBeRemoved := !ruleProduct.Companies[0].IsMonthlyPaymentAvailable ||
-		data.OffersPrices["default"]["monthly"].Gross < ruleProduct.Companies[0].MinimumMonthlyPrice
-	if monthlyToBeRemoved {
-		log.Println("[Life] monthly payment disabled")
-		delete(data.OffersPrices["default"], "monthly")
+	log.Println("[Life] filtering rates")
+
+	removeOfferRate(&data, availableRates)
+
+	log.Println("[Life] check monthly limit")
+
+	if data.OffersPrices["default"][string(models.PaySplitMonthly)] != nil {
+		monthlyToBeRemoved := !ruleProduct.Companies[0].IsMonthlyPaymentAvailable ||
+			data.OffersPrices["default"]["monthly"].Gross < ruleProduct.Companies[0].MinimumMonthlyPrice
+		if monthlyToBeRemoved {
+			log.Println("[Life] monthly payment disabled")
+			delete(data.OffersPrices["default"], "monthly")
+		}
 	}
 
 	log.Println("[Life] round offers prices")
