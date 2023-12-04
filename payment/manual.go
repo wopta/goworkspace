@@ -157,8 +157,10 @@ func ManualPayment(transaction *models.Transaction, origin string, payload *Manu
 	transaction.PaymentMethod = payload.PaymentMethod
 	transaction.PaymentNote = payload.Note
 	transaction.IsPay = true
+	transaction.IsDelete = false
 	transaction.PayDate = payload.PayDate
 	transaction.TransactionDate = payload.TransactionDate
+	transaction.UpdateDate = time.Now().UTC()
 	transaction.Status = models.TransactionStatusPay
 	transaction.StatusHistory = append(transaction.StatusHistory, models.TransactionStatusPay)
 

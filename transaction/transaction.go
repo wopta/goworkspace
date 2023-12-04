@@ -102,11 +102,13 @@ func GetTransactionByPolicyUidAndProviderId(policyUid, providerId, origin string
 func Pay(transaction *models.Transaction, origin, paymentMethod string) error {
 	fireTransactions := lib.GetDatasetByEnv(origin, models.TransactionsCollection)
 
+	transaction.IsDelete = false
 	transaction.IsPay = true
 	transaction.Status = models.TransactionStatusPay
 	transaction.StatusHistory = append(transaction.StatusHistory, models.TransactionStatusPay)
 	transaction.PayDate = time.Now().UTC()
 	transaction.TransactionDate = transaction.PayDate
+	transaction.UpdateDate = transaction.PayDate
 	transaction.PaymentMethod = paymentMethod
 
 	return lib.SetFirestoreErr(fireTransactions, transaction.Uid, transaction)

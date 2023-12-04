@@ -17,9 +17,9 @@ type Transaction struct {
 	Id                 string                `firestore:"id,omitempty" json:"id,omitempty" bigquery:"-"`
 	Amount             float64               `firestore:"amount,omitempty" json:"amount,omitempty" bigquery:"amount" `
 	AmountNet          float64               `json:"amountNet,omitempty" firestore:"amountNet,omitempty" bigquery:"amountNet"`
-	AgentUid           string                `json:"agentUid,omitempty" firestore:"agentUid,omitempty" bigquery:"agentUid"`                               // DEPRECATED
-	AgencyUid          string                `json:"agencyUid,omitempty" firestore:"agencyUid,omitempty" bigquery:"agencyUid"`                            // DEPRECATED
-	Commissions        float64               `firestore:"commissions,omitempty" json:"commissions,omitempty" bigquery:"commissions"`                      // DEPRECATED
+	AgentUid           string                `json:"agentUid,omitempty" firestore:"agentUid,omitempty" bigquery:"agentUid"`    // DEPRECATED
+	AgencyUid          string                `json:"agencyUid,omitempty" firestore:"agencyUid,omitempty" bigquery:"agencyUid"` // DEPRECATED
+	Commissions        float64               `firestore:"commissions,omitempty" json:"commissions,omitempty" bigquery:"commissions"`
 	CommissionsCompany float64               `firestore:"commissionsCompany,omitempty" json:"commissionsCompany,omitempty" bigquery:"commissionsCompany"` // DEPRECATED
 	CommissionsAgent   float64               `firestore:"commissionsAgent,omitempty" json:"commissionsAgent,omitempty" bigquery:"commissionsAgent"`       // DEPRECATED
 	CommissionsAgency  float64               `firestore:"commissionsAgency,omitempty" json:"commissionsAgency,omitempty" bigquery:"commissionsAgency"`    // DEPRECATED
@@ -43,13 +43,15 @@ type Transaction struct {
 	BigStatusHistory   string                `firestore:"-" json:"-" bigquery:"statusHistory"`
 	IsPay              bool                  `firestore:"isPay" json:"isPay,omitempty" bigquery:"isPay"`
 	IsEmit             bool                  `firestore:"isEmit" json:"isEmit,omitempty" bigquery:"isEmit"`
-	IsDelete           bool                  `json:"isDelete" firestore:"isDelete" bigquery:"-"`
+	IsDelete           bool                  `json:"isDelete" firestore:"isDelete" bigquery:"isDelete"`
 	ProviderId         string                `json:"providerId" firestore:"providerId" bigquery:"-"`
 	UserToken          string                `json:"userToken" firestore:"userToken" bigquery:"-"`
 	ProviderName       string                `json:"providerName" firestore:"providerName" bigquery:"-"`
 	PaymentMethod      string                `firestore:"paymentMethod,omitempty" json:"paymentMethod,omitempty" bigquery:"paymentMethod"`
 	PaymentNote        string                `firestore:"paymentNote,omitempty" json:"paymentNote,omitempty" bigquery:"paymentNote"`
 	NetworkCommissions map[string]float64    `json:"networkCommissions,omitempty" firestore:"networkCommissions,omitempty" bigquery:"-"` // DEPRECATED
+	UpdateDate         time.Time             `json:"updateDate" firestore:"updateDate" bigquery:"-"`
+	BigUpdateDate      bigquery.NullDateTime `json:"-" firestore:"-" bigquery:"updateDate"`
 }
 
 func TransactionToListData(query *firestore.DocumentIterator) []Transaction {
@@ -93,7 +95,7 @@ func SetTransactionPolicy(policy Policy, id string, amount float64, schedule str
 }
 
 func (transaction *Transaction) BigQuerySave(origin string) {
-	fireTransactions := lib.GetDatasetByEnv(origin, "transactions")
+	fireTransactions := lib.GetDatasetByEnv(origin, TransactionsCollection)
 	transactionJson, err := json.Marshal(transaction)
 	if err != nil {
 		log.Println("ERROR Transaction "+transaction.Uid+" Marshal: ", err)
@@ -104,6 +106,7 @@ func (transaction *Transaction) BigQuerySave(origin string) {
 	transaction.BigTransactionDate = lib.GetBigQueryNullDateTime(transaction.TransactionDate)
 	transaction.BigCreationDate = civil.DateTimeOf(transaction.CreationDate)
 	transaction.BigStatusHistory = strings.Join(transaction.StatusHistory, ",")
+	transaction.BigUpdateDate = lib.GetBigQueryNullDateTime(transaction.UpdateDate)
 	log.Println("Transaction save BigQuery: " + transaction.Uid)
 
 	err = lib.InsertRowsBigQuery(WoptaDataset, fireTransactions, transaction)

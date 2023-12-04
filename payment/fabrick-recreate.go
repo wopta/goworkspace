@@ -117,6 +117,7 @@ func FabrickRecreate(policyUid, origin string, networkNode *models.NetworkNode, 
 	for _, transaction := range oldTransactions {
 		log.Printf("[FabrickRecreate] deleting transaction %s", transaction.Uid)
 		transaction.IsDelete = true
+		transaction.UpdateDate = now
 		transaction.ExpirationDate = now.AddDate(0, 0, 1).Format(models.TimeDateOnly)
 		transaction.Status = models.PolicyStatusDeleted
 		transaction.StatusHistory = append(transaction.StatusHistory, transaction.Status)
