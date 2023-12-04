@@ -18,6 +18,7 @@ const (
 	NetworkTransactionStatusToPay     string = "ToPay"
 	NetworkTransactionStatusPaid      string = "Paid"
 	NetworkTransactionStatusConfirmed string = "Confirmed"
+	NetworkTransactionStatusDeleted   string = "Deleted"
 )
 
 type NetworkTransaction struct {
@@ -40,6 +41,8 @@ type NetworkTransaction struct {
 	PayDate          bigquery.NullDateTime `json:"payDate" bigquery:"payDate"`
 	TransactionDate  bigquery.NullDateTime `json:"transactionDate" bigquery:"transactionDate"`
 	ConfirmationDate bigquery.NullDateTime `json:"confirmationDate" bigquery:"confirmationDate"`
+	IsDelete         bool                  `json:"isDelete" bigquery:"isDelete"`
+	DeletionDate     bigquery.NullDateTime `json:"deletionDate" bigquery:"deletionDate"`
 }
 
 func (nt *NetworkTransaction) SaveBigQuery() error {
@@ -71,6 +74,7 @@ func (nt *NetworkTransaction) SaveBigQuery() error {
 		updatedFields["statusHistory"] = nt.StatusHistory
 		updatedFields["isPay"] = nt.IsPay
 		updatedFields["isConfirmed"] = nt.IsConfirmed
+		updatedFields["isDelete"] = nt.IsDelete
 		if nt.PayDate.Valid {
 			updatedFields["payDate"] = nt.PayDate
 		}
@@ -79,6 +83,9 @@ func (nt *NetworkTransaction) SaveBigQuery() error {
 		}
 		if nt.ConfirmationDate.Valid {
 			updatedFields["confirmationDate"] = nt.ConfirmationDate
+		}
+		if nt.DeletionDate.Valid {
+			updatedFields["deletionDate"] = nt.DeletionDate
 		}
 
 		err = lib.UpdateRowBigQueryV2(datasetId, tableId, updatedFields, "WHERE "+whereClause)
