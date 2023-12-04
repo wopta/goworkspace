@@ -16,9 +16,11 @@ import (
 type PutNetworkTransactionRequest struct {
 	IsPay            bool      `json:"isPay"`
 	IsConfirmed      bool      `json:"isConfirmed"`
+	IsDelete         bool      `json:"isDelete"`
 	PayDate          time.Time `json:"payDate"`
 	TransactionDate  time.Time `json:"transactionDate"`
 	ConfirmationDate time.Time `json:"confirmationDate"`
+	DeletionDate     time.Time `json:"deletionDate"`
 }
 
 func PutNetworkTransactionFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
@@ -64,9 +66,15 @@ func updateNetworkTransaction(original *models.NetworkTransaction, update *PutNe
 		original.Status = models.NetworkTransactionStatusConfirmed
 		original.StatusHistory = append(original.StatusHistory, original.Status)
 	}
+	if !original.IsDelete && update.IsDelete {
+		original.Status = models.NetworkTransactionStatusDeleted
+		original.StatusHistory = append(original.StatusHistory, original.Status)
+	}
 	original.IsPay = update.IsPay
 	original.IsConfirmed = update.IsConfirmed
+	original.IsDelete = update.IsDelete
 	original.PayDate = lib.GetBigQueryNullDateTime(update.PayDate)
 	original.TransactionDate = lib.GetBigQueryNullDateTime(update.TransactionDate)
 	original.ConfirmationDate = lib.GetBigQueryNullDateTime(update.ConfirmationDate)
+	original.DeletionDate = lib.GetBigQueryNullDateTime(update.DeletionDate)
 }
