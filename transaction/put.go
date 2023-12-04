@@ -60,6 +60,7 @@ func PutByPolicy(
 		PolicyName:      policy.Name,
 		PolicyUid:       policy.Uid,
 		CreationDate:    now,
+		UpdateDate:      now,
 		Status:          status,
 		StatusHistory:   statusHistory,
 		ScheduleDate:    sd,
