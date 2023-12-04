@@ -43,14 +43,14 @@ type Transaction struct {
 	BigStatusHistory   string                `firestore:"-" json:"-" bigquery:"statusHistory"`
 	IsPay              bool                  `firestore:"isPay" json:"isPay,omitempty" bigquery:"isPay"`
 	IsEmit             bool                  `firestore:"isEmit" json:"isEmit,omitempty" bigquery:"isEmit"`
-	IsDelete           bool                  `json:"isDelete" firestore:"isDelete" bigquery:"-"`
+	IsDelete           bool                  `json:"isDelete" firestore:"isDelete" bigquery:"isDelete"`
 	ProviderId         string                `json:"providerId" firestore:"providerId" bigquery:"-"`
 	UserToken          string                `json:"userToken" firestore:"userToken" bigquery:"-"`
 	ProviderName       string                `json:"providerName" firestore:"providerName" bigquery:"-"`
 	PaymentMethod      string                `firestore:"paymentMethod,omitempty" json:"paymentMethod,omitempty" bigquery:"paymentMethod"`
 	PaymentNote        string                `firestore:"paymentNote,omitempty" json:"paymentNote,omitempty" bigquery:"paymentNote"`
 	NetworkCommissions map[string]float64    `json:"networkCommissions,omitempty" firestore:"networkCommissions,omitempty" bigquery:"-"` // DEPRECATED
-	UpdateDate         time.Time             `json:"updateDate,omitempty" firestore:"updateDate,omitempty" bigquery:"-"`
+	UpdateDate         time.Time             `json:"updateDate" firestore:"updateDate" bigquery:"-"`
 	BigUpdateDate      bigquery.NullDateTime `json:"-" firestore:"-" bigquery:"updateDate"`
 }
 
