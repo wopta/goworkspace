@@ -159,6 +159,7 @@ func ManualPayment(transaction *models.Transaction, origin string, payload *Manu
 	transaction.IsPay = true
 	transaction.PayDate = payload.PayDate
 	transaction.TransactionDate = payload.TransactionDate
+	transaction.UpdateDate = time.Now().UTC()
 	transaction.Status = models.TransactionStatusPay
 	transaction.StatusHistory = append(transaction.StatusHistory, models.TransactionStatusPay)
 
