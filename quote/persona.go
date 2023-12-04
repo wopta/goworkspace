@@ -38,15 +38,20 @@ func PersonaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 		return "", nil, err
 	}
 
+	flow := authToken.GetChannelByRoleV2()
+
 	log.Println("[PersonaFx] loading network node")
 	networkNode := network.GetNetworkNodeByUid(authToken.UserID)
 	if networkNode != nil {
 		warrant = networkNode.GetWarrant()
+		if warrant != nil {
+			flow = warrant.GetFlowName(policy.Name)
+		}
 	}
 
 	log.Println("[PersonaFx] start quoting")
 
-	err = Persona(&policy, authToken.GetChannelByRoleV2(), networkNode, warrant)
+	err = Persona(&policy, authToken.GetChannelByRoleV2(), networkNode, warrant, flow)
 
 	policyJson, err := policy.Marshal()
 
@@ -57,12 +62,14 @@ func PersonaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	return string(policyJson), policy, err
 }
 
-func Persona(policy *models.Policy, channel string, networkNode *models.NetworkNode, warrant *models.Warrant) error {
+func Persona(policy *models.Policy, channel string, networkNode *models.NetworkNode, warrant *models.Warrant, flow string) error {
 	var personaRates map[string]json.RawMessage
 
 	log.Println("[Persona] function start -----------------------------------")
 
 	personProduct := sellable.Persona(*policy, channel, networkNode, warrant)
+
+	availableRate := getAvailableRates(personProduct, flow)
 
 	b := lib.GetFilesByEnv(fmt.Sprintf("products-v2/%s/%s/taxes.json", policy.Name, policy.ProductVersion))
 	err := json.Unmarshal(b, &personaRates)
@@ -135,6 +142,10 @@ func Persona(policy *models.Policy, channel string, networkNode *models.NetworkN
 	log.Println("[Persona] filter by minimum price")
 
 	filterOffersByMinimumPrice(policy, 120.0, 50.0)
+
+	log.Println("[Persona] filtering available rates")
+
+	removeOfferRate(policy, availableRate)
 
 	log.Println("[Persona] function end -----------------------------------")
 
