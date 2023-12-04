@@ -107,6 +107,7 @@ func Pay(transaction *models.Transaction, origin, paymentMethod string) error {
 	transaction.StatusHistory = append(transaction.StatusHistory, models.TransactionStatusPay)
 	transaction.PayDate = time.Now().UTC()
 	transaction.TransactionDate = transaction.PayDate
+	transaction.UpdateDate = transaction.PayDate
 	transaction.PaymentMethod = paymentMethod
 
 	return lib.SetFirestoreErr(fireTransactions, transaction.Uid, transaction)
