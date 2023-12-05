@@ -86,7 +86,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			log.Println("LifeIn  elemets (0-2 ): ", d[0][2])
 			log.Println("LifeIn  elemets (0-3 ): ", d[0][3])
 			//1998-09-27T00:00:00Z RFC3339
-			_, _, version, _ := LifeMapCodecCompanyAxaRevert(d[0][1])
+			_, _, version, paymentSplit := LifeMapCodecCompanyAxaRevert(d[0][1])
 
 			policy := models.Policy{
 				Status:         models.PolicyStatusPay,
@@ -95,11 +95,10 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 				CodeCompany:    fmt.Sprintf("%07s", d[0][2]),
 				Company:        models.AxaCompany,
 				ProductVersion: "v" + version,
-				NetworkUid:     "",
 				IsPay:          true,
 				IsSign:         true,
 				Channel:        models.NetworkChannel,
-				PaymentSplit:   "",
+				PaymentSplit:   paymentSplit,
 				StartDate:      ParseDateDDMMYYYY(d[0][4]),
 				EndDate:        ParseDateDDMMYYYY(d[0][5]),
 				Updated:        time.Now(),
@@ -195,6 +194,14 @@ func LifeMapCodecCompanyAxaRevert(g string) (string, string, string, string) {
 	var result, pay, slug, version string
 	version = g[:1]
 	code := g[2:3]
+	payCode := g[1:2]
+
+	switch payCode {
+	case "W":
+		pay = string(models.PaySplitYearly)
+	case "M":
+		pay = string(models.PaySplitMonthly)
+	}
 
 	if code == "5" {
 		result = "D"
