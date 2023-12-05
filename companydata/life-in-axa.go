@@ -261,24 +261,17 @@ func ParseAxaBeneficiary(r []string, base int) models.Beneficiary {
 
 	if r[82] == "GE" {
 		benef = models.Beneficiary{
-
-			User: models.User{Name: "",
-				Surname:    "",
-				FiscalCode: ""},
-			IsLegitimateSuccessors: true,
+			BeneficiaryType: "legalAndWillSuccessor",
 		}
-
 	}
-
 	if r[82] == "NM" {
 		benef = models.Beneficiary{
-
+			BeneficiaryType: "chosenBeneficiary",
 			User: models.User{
 				Name:       r[84+rangeCell],
 				Surname:    r[83+rangeCell],
 				FiscalCode: strings.ToUpper(r[85+rangeCell]),
 				Mail:       r[91+rangeCell],
-
 				Residence: &models.Address{
 					StreetName: r[87+rangeCell],
 					City:       r[90+rangeCell],
@@ -287,16 +280,6 @@ func ParseAxaBeneficiary(r []string, base int) models.Beneficiary {
 					Locality:   r[88+rangeCell],
 				},
 			},
-			IsLegitimateSuccessors: false,
-		}
-
-	} else {
-		benef = models.Beneficiary{
-
-			User: models.User{Name: "",
-				Surname:    "",
-				FiscalCode: ""},
-			IsLegitimateSuccessors: false,
 		}
 	}
 	return benef
