@@ -32,6 +32,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		var (
 			guarantees    []models.Guarante
 			sumPriceGross float64
+			maxDuration   int
 		)
 		if v != headervalue {
 			sumPriceGross = 0
@@ -58,6 +59,12 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 					}
 				}
 				dur, _ := strconv.Atoi(r[7])
+				guaranteeYearDuration := dur / 12
+
+				if guaranteeYearDuration > maxDuration {
+					maxDuration = guaranteeYearDuration
+				}
+
 				priceGross := ParseAxaFloat(r[8])
 				sumPriceGross = priceGross + sumPriceGross
 				var guarante models.Guarante = models.Guarante{
@@ -69,7 +76,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 						SumInsuredLimitOfIndemnity: lib.RoundFloat(ParseAxaFloat(r[9]), 0),
 						PremiumGrossYearly:         lib.RoundFloat(priceGross, 2),
 						Duration: &models.Duration{
-							Year: dur / 12,
+							Year: guaranteeYearDuration,
 						},
 					},
 				}
@@ -100,8 +107,8 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 				Channel:        models.NetworkChannel,
 				PaymentSplit:   paymentSplit,
 				StartDate:      ParseDateDDMMYYYY(d[0][4]),
-				EndDate:        ParseDateDDMMYYYY(d[0][5]),
-				Updated:        time.Now(),
+				EndDate:        ParseDateDDMMYYYY(d[0][4]).AddDate(maxDuration, 0, 0),
+				Updated:        time.Now().UTC(),
 				PriceGross:     sumPriceGross,
 				PriceNett:      0,
 				Contractor: models.User{
