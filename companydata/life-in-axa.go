@@ -89,11 +89,11 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			_, _, version, _ := LifeMapCodecCompanyAxaRevert(d[0][1])
 
 			policy := models.Policy{
-				Status:         "imported",
-				StatusHistory:  []string{"imported"},
-				Name:           "life",
+				Status:         models.PolicyStatusPay,
+				StatusHistory:  []string{"Imported", models.PolicyStatusInitLead, models.PolicyStatusContact, models.PolicyStatusToSign, models.PolicyStatusSign, models.NetworkTransactionStatusToPay, models.PolicyStatusPay},
+				Name:           models.LifeProduct,
 				CodeCompany:    fmt.Sprintf("%07s", d[0][2]),
-				Company:        "axa",
+				Company:        models.AxaCompany,
 				ProductVersion: "v" + version,
 				NetworkUid:     "",
 				IsPay:          true,
