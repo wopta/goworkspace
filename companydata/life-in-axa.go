@@ -120,14 +120,15 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 					BirthDate:  ParseDateDDMMYYYY(d[0][26]).Format(time.RFC3339),
 					Phone:      d[0][33],
 					IdentityDocuments: []*models.IdentityDocument{{
-						Code:             d[0][57],
-						Type:             d[0][56],
+						Code:             d[0][56],
+						Type:             identityDocumentMap[d[0][56]],
+						Number:           d[0][57],
 						DateOfIssue:      ParseDateDDMMYYYY(d[0][58]),
 						IssuingAuthority: d[0][59],
+						PlaceOfIssue:     d[0][59],
 					}},
 					Residence: &models.Address{
 						StreetName: d[0][28],
-
 						City:       d[0][31],
 						CityCode:   d[0][31],
 						PostalCode: d[0][29],
@@ -194,6 +195,12 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	}
 
 	return "", nil, e
+}
+
+var identityDocumentMap map[string]string = map[string]string{
+	"01": "Carta di Identità",
+	"02": "Patente di Guida",
+	"03": "Passaporto",
 }
 
 func LifeMapCodecCompanyAxaRevert(g string) (string, string, string, string) {
