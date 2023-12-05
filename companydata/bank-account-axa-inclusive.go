@@ -1,6 +1,7 @@
 package companydata
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -10,9 +11,11 @@ import (
 	"strconv"
 	"time"
 
+	"cloud.google.com/go/bigquery"
 	"github.com/wopta/goworkspace/inclusive"
 	lib "github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"google.golang.org/api/iterator"
 )
 
 const (
@@ -49,7 +52,7 @@ func BankAccountAxaInclusive(w http.ResponseWriter, r *http.Request) (string, in
 	//query := "select * from `wopta." + dataMovement + "` where _PARTITIONTIME >'" + from.Format(layoutQuery) + " 00:00:00" + "' and _PARTITIONTIME <'" + to.Format(layoutQuery) + " 23:59:00" + "'"
 	query := "select * from `wopta." + dataMovement + "` where _PARTITIONTIME ='" + refDay.Format(layoutQuery) + "'"
 	log.Println("BankAccountAxaInclusive bigquery query: ", query)
-	bankaccountlist, e := lib.QueryRowsBigQuery[inclusive.BankAccountMovement](query)
+	bankaccountlist, e := QueryRowsBigQuery[inclusive.BankAccountMovement](query)
 	log.Println("BankAccountAxaInclusive bigquery error: ", e)
 	log.Println("BankAccountAxaInclusive len(bankaccountlist): ", len(bankaccountlist))
 	//result = append(result, getHeader())
@@ -156,4 +159,38 @@ func getHeaderInclusiveBank() []string {
 		"DATA FINE VALIDITA' COPERTURA",        //    DATA FINE VALIDITA' COPERTURA
 		"TIPO MOVIMENTO",
 	}
+}
+
+func QueryRowsBigQuery[T any](query string) ([]T, error) {
+	var (
+		res  []T
+		e    error
+		iter *bigquery.RowIterator
+	)
+	log.Println(query)
+
+	ctx := context.Background()
+	client, err := bigquery.NewClient(ctx, os.Getenv("GOOGLE_PROJECT_ID"))
+	lib.CheckError(err)
+	defer client.Close()
+	queryi := client.Query(query)
+	iter, e = queryi.Read(ctx)
+
+	for {
+		var row T
+		e = iter.Next(&row)
+
+		if e == iterator.Done {
+			log.Println(e)
+			return res, nil
+		}
+		if e != nil {
+			log.Println(e)
+			return res, e
+		}
+
+		res = append(res, row)
+
+	}
+
 }
