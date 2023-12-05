@@ -13,6 +13,7 @@ import (
 	"github.com/go-gota/gota/dataframe"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
 )
 
 func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -20,6 +21,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		slide       int = -1
 		headervalue     = "N° adesione individuale univoco"
 	)
+	var skippedPolicies = make([]string, 0)
 
 	data := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/life/life.csv", "")
 	df := lib.CsvToDataframe(data)
@@ -93,6 +95,12 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			log.Println("LifeIn  elemets (0-3 ): ", d[0][3])
 			//1998-09-27T00:00:00Z RFC3339
 			_, _, version, paymentSplit := LifeMapCodecCompanyAxaRevert(d[0][1])
+			networkNode := network.GetNetworkNodeByCode(d[0][13])
+			if networkNode == nil {
+				log.Println("node not found!")
+				skippedPolicies = append(skippedPolicies, d[0][0])
+				continue
+			}
 
 			policy := models.Policy{
 				Uid:            lib.NewDoc(models.PolicyCollection),
@@ -118,9 +126,9 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 				PriceNett:      0,
 				Payment:        models.ManualPaymentProvider,
 				FundsOrigin:    "Proprie risorse economiche",
-				ProducerCode:   "", // extract from node
-				ProductUid:     "", // extract from node
-				ProducerType:   "", // extract from node
+				ProducerCode:   networkNode.Code,
+				ProducerUid:    networkNode.Uid,
+				ProducerType:   networkNode.Type,
 				Contractor: models.User{
 					Type:       d[0][22],
 					Name:       d[0][23],
@@ -193,6 +201,8 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 			// create network transactions
 
+			// update node portfolio
+
 			//log.Println("LifeIn policy:", policy)
 			b, e := json.Marshal(policy)
 			log.Println("LifeIn policy:", e)
@@ -209,6 +219,9 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		}
 
 	}
+
+	log.Printf("Skipped %d policies: %v", len(skippedPolicies), skippedPolicies)
+
 
 	return "", nil, e
 }
