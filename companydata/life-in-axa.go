@@ -2,6 +2,7 @@ package companydata
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -91,7 +92,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 				Status:         "imported",
 				StatusHistory:  []string{"imported"},
 				Name:           "life",
-				CodeCompany:    d[0][2],
+				CodeCompany:    fmt.Sprintf("%07s", d[0][2]),
 				Company:        "axa",
 				ProductVersion: "v" + version,
 				NetworkUid:     "",
