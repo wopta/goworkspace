@@ -35,7 +35,6 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			maxDuration   int
 		)
 		if v != headervalue {
-			sumPriceGross = 0
 			for i, r := range d {
 				log.Println("LifeIn  i: ", i)
 				log.Println("LifeIn  d: ", r)
@@ -66,7 +65,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 				}
 
 				priceGross := ParseAxaFloat(r[8])
-				sumPriceGross = priceGross + sumPriceGross
+				sumPriceGross += priceGross
 				var guarante models.Guarante = models.Guarante{
 					Slug:                       slug,
 					CompanyCodec:               companyCodec,
@@ -269,20 +268,22 @@ func ParseDateDDMMYYYY(date string) time.Time {
 }
 
 func ParseAxaFloat(price string) float64 {
-	//pricelen:=len("0000001500000")
-	if len(price) > 3 {
-		log.Println("LifeIn ParseAxaFloat price:", price)
+	// //pricelen:=len("0000001500000")
+	// if len(price) > 3 {
+	// 	log.Println("LifeIn ParseAxaFloat price:", price)
 
-		d := price[len(price)-2:]
-		i := price[:len(price)-3]
-		f64string := i + "." + d
-		res, e := strconv.ParseFloat(f64string, 64)
-		log.Println("LifeIn ParseAxaFloat d:", res)
-		log.Println(e)
-		return res
-	}
-	return 0
+	// 	d := price[len(price)-2:]
+	// 	i := price[:len(price)-3]
+	// 	f64string := i + "." + d
+	// 	res, e := strconv.ParseFloat(f64string, 64)
+	// 	log.Println("LifeIn ParseAxaFloat d:", res)
+	// 	log.Println(e)
+	// 	return res
+	// }
+	// return 0
 
+	princeInCents, _ := strconv.ParseFloat(price, 64)
+	return princeInCents / 100.0
 }
 
 func ParseAxaBeneficiary(r []string, base int) models.Beneficiary {
