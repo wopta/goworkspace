@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/go-gota/gota/dataframe"
-	lib "github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -167,8 +167,8 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			b, e := json.Marshal(policy)
 			log.Println("LifeIn policy:", e)
 			log.Println("LifeIn policy:", string(b))
-			docref, _, _ := lib.PutFirestoreErr("test-policy", policy)
-			log.Println("LifeIn doc id: ", docref.ID)
+			// docref, _, _ := lib.PutFirestoreErr("test-policy", policy)
+			// log.Println("LifeIn doc id: ", docref.ID)
 
 			//_, e = models.UpdateUserByFiscalCode("uat", policy.Contractor)
 			//log.Println("LifeIn policy:", policy)
@@ -305,8 +305,8 @@ func GroupBy(df dataframe.DataFrame, col int) map[string][][]string {
 	log.Println("GroupBy")
 	res := make(map[string][][]string)
 	for _, k := range df.Records() {
-		if resFound, found := res[k[col]]; found {
-			resFound = append(resFound, k)
+		if _, found := res[k[col]]; found {
+			res[k[col]] = append(res[k[col]], k)
 		} else {
 			res[k[col]] = [][]string{k}
 		}
