@@ -95,6 +95,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			_, _, version, paymentSplit := LifeMapCodecCompanyAxaRevert(d[0][1])
 
 			policy := models.Policy{
+				Uid:            lib.NewDoc(models.PolicyCollection),
 				Status:         models.PolicyStatusPay,
 				StatusHistory:  []string{"Imported", models.PolicyStatusInitLead, models.PolicyStatusContact, models.PolicyStatusToSign, models.PolicyStatusSign, models.NetworkTransactionStatusToPay, models.PolicyStatusPay},
 				Name:           models.LifeProduct,
@@ -116,7 +117,10 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 				PriceGross:     sumPriceGross,
 				PriceNett:      0,
 				Payment:        models.ManualPaymentProvider,
-				FundsOrigin:    "", // ?
+				FundsOrigin:    "Proprie risorse economiche",
+				ProducerCode:   "", // extract from node
+				ProductUid:     "", // extract from node
+				ProducerType:   "", // extract from node
 				Contractor: models.User{
 					Type:       d[0][22],
 					Name:       d[0][23],
@@ -142,6 +146,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 					},
 				},
 				Assets: []models.Asset{{
+					Guarantees: guarantees,
 					Person: &models.User{
 						Type:       d[0][22],
 						Name:       d[0][35],
@@ -157,8 +162,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 							DateOfIssue:      ParseDateDDMMYYYY(d[0][78]),
 							IssuingAuthority: d[0][79],
 						}},
-						BirthCity: d[0][37],
-
+						BirthCity:     d[0][37],
 						BirthProvince: d[0][37],
 						Residence: &models.Address{
 							StreetName: d[0][63],
@@ -179,8 +183,16 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 				},
 			}
 
-			policy.Assets[0].Guarantees = guarantees
-			policy.PriceGross = sumPriceGross
+			// save policy firestore
+
+			// save policy bigquery
+
+			// create user
+
+			// create transactions
+
+			// create network transactions
+
 			//log.Println("LifeIn policy:", policy)
 			b, e := json.Marshal(policy)
 			log.Println("LifeIn policy:", e)
