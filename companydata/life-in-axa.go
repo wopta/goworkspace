@@ -19,10 +19,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		slide       int = -1
 		headervalue     = "N° adesione individuale univoco"
 	)
-	var (
-		guarantees    []models.Guarante
-		sumPriseGross float64
-	)
+
 	data := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/life/life.csv", "")
 	df := lib.CsvToDataframe(data)
 	//log.Println("LifeIn  df.Describe: ", df.Describe())
@@ -31,6 +28,10 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	//group := df.GroupBy("N\xb0 adesione individuale univoco")
 	group := GroupBy(df, 2)
 	for v, d := range group {
+		var (
+			guarantees    []models.Guarante
+			sumPriseGross float64
+		)
 		if v != headervalue {
 			sumPriseGross = 0
 			for i, r := range d {
