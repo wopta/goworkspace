@@ -99,18 +99,25 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 				Status:         models.PolicyStatusPay,
 				StatusHistory:  []string{"Imported", models.PolicyStatusInitLead, models.PolicyStatusContact, models.PolicyStatusToSign, models.PolicyStatusSign, models.NetworkTransactionStatusToPay, models.PolicyStatusPay},
 				Name:           models.LifeProduct,
+				NameDesc:       "Wopta per te Vita",
 				CodeCompany:    fmt.Sprintf("%07s", d[0][2]),
 				Company:        models.AxaCompany,
 				ProductVersion: "v" + version,
 				IsPay:          true,
 				IsSign:         true,
+				CompanyEmit:    true,
+				CompanyEmitted: true,
 				Channel:        models.NetworkChannel,
 				PaymentSplit:   paymentSplit,
+				CreationDate:   ParseDateDDMMYYYY(d[0][4]),
+				EmitDate:       ParseDateDDMMYYYY(d[0][4]),
 				StartDate:      ParseDateDDMMYYYY(d[0][4]),
 				EndDate:        ParseDateDDMMYYYY(d[0][4]).AddDate(maxDuration, 0, 0),
 				Updated:        time.Now().UTC(),
 				PriceGross:     sumPriceGross,
 				PriceNett:      0,
+				Payment:        models.ManualPaymentProvider,
+				FundsOrigin:    "", // ?
 				Contractor: models.User{
 					Type:       d[0][22],
 					Name:       d[0][23],
@@ -136,8 +143,6 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 					},
 				},
 				Assets: []models.Asset{{
-					Name: "person",
-
 					Person: &models.User{
 						Type:       d[0][22],
 						Name:       d[0][35],
