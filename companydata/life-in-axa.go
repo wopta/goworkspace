@@ -36,16 +36,16 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			for i, r := range d {
 				log.Println("LifeIn  i: ", i)
 				log.Println("LifeIn  d: ", r)
-				result, _, slug, _ := LifeMapCodecCompanyAxaRevert(r[1])
+				companyCodec, slug, _, _ := LifeMapCodecCompanyAxaRevert(r[1])
 				var (
 					beneficiaries []models.Beneficiary
 					benef1        models.Beneficiary
 				)
 
-				benef1 = ParseAxaBeneficiary(r, 0)
-				benef2 := ParseAxaBeneficiary(r, 1)
-				benef3 := ParseAxaBeneficiary(r, 2)
 				if slug == "death" {
+					benef1 = ParseAxaBeneficiary(r, 0)
+					benef2 := ParseAxaBeneficiary(r, 1)
+					benef3 := ParseAxaBeneficiary(r, 2)
 					beneficiaries = append(beneficiaries, benef1)
 					beneficiaries = append(beneficiaries, benef2)
 					beneficiaries = append(beneficiaries, benef3)
@@ -55,7 +55,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 				sumPriseGross = priceGross + sumPriseGross
 				var guarante models.Guarante = models.Guarante{
 					Slug:                       slug,
-					CompanyCodec:               result,
+					CompanyCodec:               companyCodec,
 					SumInsuredLimitOfIndemnity: 0,
 					Beneficiaries:              &beneficiaries,
 					Value: &models.GuaranteValue{
