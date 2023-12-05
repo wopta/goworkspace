@@ -30,10 +30,10 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	for v, d := range group {
 		var (
 			guarantees    []models.Guarante
-			sumPriseGross float64
+			sumPriceGross float64
 		)
 		if v != headervalue {
-			sumPriseGross = 0
+			sumPriceGross = 0
 			for i, r := range d {
 				log.Println("LifeIn  i: ", i)
 				log.Println("LifeIn  d: ", r)
@@ -53,15 +53,15 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 				}
 				dur, _ := strconv.Atoi(r[7])
 				priceGross := ParseAxaFloat(r[8])
-				sumPriseGross = priceGross + sumPriseGross
+				sumPriceGross = priceGross + sumPriceGross
 				var guarante models.Guarante = models.Guarante{
 					Slug:                       slug,
 					CompanyCodec:               companyCodec,
 					SumInsuredLimitOfIndemnity: 0,
 					Beneficiaries:              &beneficiaries,
 					Value: &models.GuaranteValue{
-						SumInsuredLimitOfIndemnity: ParseAxaFloat(r[9]),
-						PremiumGrossYearly:         priceGross,
+						SumInsuredLimitOfIndemnity: lib.RoundFloat(ParseAxaFloat(r[9]), 0),
+						PremiumGrossYearly:         lib.RoundFloat(priceGross, 2),
 						Duration: &models.Duration{
 							Year: dur / 12,
 						},
@@ -97,7 +97,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 				StartDate:      ParseDateDDMMYYYY(d[0][4]),
 				EndDate:        ParseDateDDMMYYYY(d[0][5]),
 				Updated:        time.Now(),
-				PriceGross:     sumPriseGross,
+				PriceGross:     sumPriceGross,
 				PriceNett:      0,
 				Contractor: models.User{
 					Type:       d[0][22],
@@ -163,7 +163,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			}
 
 			policy.Assets[0].Guarantees = guarantees
-			policy.PriceGross = sumPriseGross
+			policy.PriceGross = sumPriceGross
 			//log.Println("LifeIn policy:", policy)
 			b, e := json.Marshal(policy)
 			log.Println("LifeIn policy:", e)
