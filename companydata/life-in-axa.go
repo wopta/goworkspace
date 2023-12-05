@@ -88,7 +88,6 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 				CodeCompany:    d[0][2],
 				Company:        "axa",
 				ProductVersion: "v" + version,
-				NetworkUid:     "",
 				IsPay:          true,
 				IsSign:         true,
 				Channel:        models.NetworkChannel,
