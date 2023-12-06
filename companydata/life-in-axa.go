@@ -30,6 +30,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	log.Println("LifeIn  col", df.Ncol())
 	//group := df.GroupBy("N\xb0 adesione individuale univoco")
 	group := GroupBy(df, 2)
+
 	for v, d := range group {
 		var (
 			guarantees    []models.Guarante
@@ -37,6 +38,10 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			maxDuration   int
 		)
 		if v != headervalue {
+			if d[0][13] == "W1" || d[0][22] == "PG" {
+				continue
+			}
+
 			for i, r := range d {
 				log.Println("LifeIn  i: ", i)
 				log.Println("LifeIn  d: ", r)
@@ -191,11 +196,11 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 				},
 			}
 
+			// create user
+
 			// save policy firestore
 
 			// save policy bigquery
-
-			// create user
 
 			// create transactions
 
@@ -221,7 +226,6 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	}
 
 	log.Printf("Skipped %d policies: %v", len(skippedPolicies), skippedPolicies)
-
 
 	return "", nil, e
 }
