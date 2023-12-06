@@ -6,7 +6,7 @@ replace github.com/wopta/goworkspace/policy => ./
 
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.4
-	github.com/wopta/goworkspace/document v1.1.34
+	github.com/wopta/goworkspace/document v1.1.35
 	github.com/wopta/goworkspace/lib v1.0.94
 	github.com/wopta/goworkspace/models v1.1.71
 	github.com/wopta/goworkspace/wiseproxy v1.0.3
