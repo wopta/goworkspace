@@ -6,10 +6,10 @@ replace github.com/wopta/goworkspace/reserved => ./
 
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.4
-	github.com/wopta/goworkspace/document v1.1.34
+	github.com/wopta/goworkspace/document v1.1.36
 	github.com/wopta/goworkspace/lib v1.0.94
 	github.com/wopta/goworkspace/models v1.1.71
-	github.com/wopta/goworkspace/policy v1.0.50
+	github.com/wopta/goworkspace/policy v1.0.52
 	github.com/wopta/goworkspace/product v1.0.70
 	github.com/wopta/goworkspace/transaction v1.0.29
 )
