@@ -58,10 +58,8 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 					} else {
 						benef1 := ParseAxaBeneficiary(r, 0)
 						benef2 := ParseAxaBeneficiary(r, 1)
-						benef3 := ParseAxaBeneficiary(r, 2)
 						beneficiaries = append(beneficiaries, benef1)
 						beneficiaries = append(beneficiaries, benef2)
-						beneficiaries = append(beneficiaries, benef3)
 					}
 				}
 				dur, _ := strconv.Atoi(r[7])
