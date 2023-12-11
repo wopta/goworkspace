@@ -105,6 +105,69 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 				continue
 			}
 
+			// create contractor
+
+			contractor := models.User{
+				Uid:        lib.NewDoc(models.UserCollection),
+				Type:       d[0][22],
+				Name:       d[0][23],
+				Surname:    d[0][24],
+				FiscalCode: strings.ToUpper(d[0][27]),
+				Gender:     d[0][25],
+				BirthDate:  ParseDateDDMMYYYY(d[0][26]).Format(time.RFC3339),
+				Phone:      d[0][33],
+				IdentityDocuments: []*models.IdentityDocument{{
+					Code:             d[0][56],
+					Type:             identityDocumentMap[d[0][56]],
+					Number:           d[0][57],
+					DateOfIssue:      ParseDateDDMMYYYY(d[0][58]),
+					IssuingAuthority: d[0][59],
+					PlaceOfIssue:     d[0][59],
+				}},
+				Residence: &models.Address{
+					StreetName: d[0][28],
+					City:       d[0][31],
+					CityCode:   d[0][31],
+					PostalCode: d[0][29],
+					Locality:   d[0][30],
+				},
+			}
+
+			// create insured
+
+			insured := &models.User{
+				Type:       d[0][22],
+				Name:       d[0][35],
+				Surname:    d[0][34],
+				FiscalCode: strings.ToUpper(d[0][38]),
+				Gender:     d[0][36],
+				BirthDate:  ParseDateDDMMYYYY(d[0][37]).Format(time.RFC3339),
+				Mail:       d[0][71],
+				Phone:      d[0][72],
+				IdentityDocuments: []*models.IdentityDocument{{
+					Code:             d[0][77],
+					Type:             d[0][76],
+					DateOfIssue:      ParseDateDDMMYYYY(d[0][78]),
+					IssuingAuthority: d[0][79],
+				}},
+				BirthCity:     d[0][37],
+				BirthProvince: d[0][37],
+				Residence: &models.Address{
+					StreetName: d[0][63],
+					City:       d[0][66],
+					CityCode:   d[0][66],
+					PostalCode: d[0][64],
+					Locality:   d[0][65],
+				},
+				Domicile: &models.Address{
+					StreetName: d[0][67],
+					City:       d[0][70],
+					CityCode:   d[0][70],
+					PostalCode: d[0][68],
+					Locality:   d[0][69],
+				},
+			}
+
 			policy := models.Policy{
 				Uid:            lib.NewDoc(models.PolicyCollection),
 				Status:         models.PolicyStatusPay,
@@ -132,79 +195,26 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 				ProducerCode:   networkNode.Code,
 				ProducerUid:    networkNode.Uid,
 				ProducerType:   networkNode.Type,
-				Contractor: models.User{
-					Type:       d[0][22],
-					Name:       d[0][23],
-					Surname:    d[0][24],
-					FiscalCode: strings.ToUpper(d[0][27]),
-					Gender:     d[0][25],
-					BirthDate:  ParseDateDDMMYYYY(d[0][26]).Format(time.RFC3339),
-					Phone:      d[0][33],
-					IdentityDocuments: []*models.IdentityDocument{{
-						Code:             d[0][56],
-						Type:             identityDocumentMap[d[0][56]],
-						Number:           d[0][57],
-						DateOfIssue:      ParseDateDDMMYYYY(d[0][58]),
-						IssuingAuthority: d[0][59],
-						PlaceOfIssue:     d[0][59],
-					}},
-					Residence: &models.Address{
-						StreetName: d[0][28],
-						City:       d[0][31],
-						CityCode:   d[0][31],
-						PostalCode: d[0][29],
-						Locality:   d[0][30],
-					},
-				},
+				Contractor:     contractor,
 				Assets: []models.Asset{{
 					Guarantees: guarantees,
-					Person: &models.User{
-						Type:       d[0][22],
-						Name:       d[0][35],
-						Surname:    d[0][34],
-						FiscalCode: strings.ToUpper(d[0][38]),
-						Gender:     d[0][36],
-						BirthDate:  ParseDateDDMMYYYY(d[0][37]).Format(time.RFC3339),
-						Mail:       d[0][71],
-						Phone:      d[0][72],
-						IdentityDocuments: []*models.IdentityDocument{{
-							Code:             d[0][77],
-							Type:             d[0][76],
-							DateOfIssue:      ParseDateDDMMYYYY(d[0][78]),
-							IssuingAuthority: d[0][79],
-						}},
-						BirthCity:     d[0][37],
-						BirthProvince: d[0][37],
-						Residence: &models.Address{
-							StreetName: d[0][63],
-							City:       d[0][66],
-							CityCode:   d[0][66],
-							PostalCode: d[0][64],
-							Locality:   d[0][65],
-						},
-						Domicile: &models.Address{
-							StreetName: d[0][67],
-							City:       d[0][70],
-							CityCode:   d[0][70],
-							PostalCode: d[0][68],
-							Locality:   d[0][69],
-						},
-					},
-				},
-				},
+					Person:     insured,
+				}},
 			}
-
-			// create user
-
-			// save policy firestore
-
-			// save policy bigquery
 
 			// create transactions
 
 			// create network transactions
 
 			// update node portfolio
+
+			// save policy firestore
+
+			// save policy bigquery
+
+			// save contractor firestore
+
+			// save contractor bigquery
 
 			//log.Println("LifeIn policy:", policy)
 			b, e := json.Marshal(policy)
