@@ -208,6 +208,9 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 			// update node portfolio
 
+			networkNode.Policies = append(networkNode.Policies, policy.Uid)
+			networkNode.Users = append(networkNode.Users, contractor.Uid)
+
 			// save policy firestore
 
 			// save policy bigquery
