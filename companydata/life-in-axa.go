@@ -50,6 +50,8 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			continue
 		}
 
+		row = pol[0]
+
 		for i, r := range pol {
 			var (
 				beneficiaries []models.Beneficiary
@@ -70,8 +72,6 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			}
 
 			companyCodec, slug, _, _ := LifeMapCodecCompanyAxaRevert(r[1])
-			row = r
-
 			if slug == "death" {
 				if r[82] == "GE" {
 					beneficiaries = append(beneficiaries, models.Beneficiary{
@@ -149,7 +149,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			BirthProvince: strings.TrimSpace(strings.ToUpper(row[74])),
 			Residence: &models.Address{
 				StreetName: strings.TrimSpace(lib.Capitalize(row[63])),
-				City:       strings.TrimSpace(lib.Capitalize(row[66])),
+				City:       strings.TrimSpace(lib.Capitalize(row[65])),
 				CityCode:   strings.TrimSpace(strings.ToUpper(row[66])),
 				PostalCode: row[64],
 				Locality:   strings.TrimSpace(lib.Capitalize(row[65])),
