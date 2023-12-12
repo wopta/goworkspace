@@ -201,6 +201,11 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 				IssuingAuthority: strings.TrimSpace(lib.Capitalize(row[79])),
 			}}
 
+			for index, _ := range insured.IdentityDocuments {
+				insured.IdentityDocuments[index].ExpiryDate = insured.IdentityDocuments[0].DateOfIssue.AddDate(10, 0, 0)
+				insured.IdentityDocuments[index].LastUpdate = policy.EmitDate
+			}
+
 			// setting email
 
 			insured.Mail = strings.TrimSpace(strings.ToLower(row[71]))
