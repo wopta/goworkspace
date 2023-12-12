@@ -131,35 +131,21 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		// create insured
 
 		insured := &models.User{
-			Type:       row[22],
-			Name:       strings.TrimSpace(lib.Capitalize(row[35])),
-			Surname:    strings.TrimSpace(lib.Capitalize(row[34])),
-			FiscalCode: strings.TrimSpace(strings.ToUpper(row[38])),
-			Gender:     strings.TrimSpace(strings.ToUpper(row[36])),
-			BirthDate:  ParseDateDDMMYYYY(row[37]).Format(time.RFC3339),
-			Mail:       strings.TrimSpace(strings.ToLower(row[71])),
-			Phone:      row[72],
-			IdentityDocuments: []*models.IdentityDocument{{
-				Code:             row[77],
-				Type:             identityDocumentMap[row[76]],
-				DateOfIssue:      ParseDateDDMMYYYY(row[78]),
-				IssuingAuthority: strings.TrimSpace(lib.Capitalize(row[79])),
-			}},
+			Type:          row[22],
+			Name:          strings.TrimSpace(lib.Capitalize(row[24])),
+			Surname:       strings.TrimSpace(lib.Capitalize(row[23])),
+			FiscalCode:    strings.TrimSpace(strings.ToUpper(row[27])),
+			Gender:        strings.TrimSpace(strings.ToUpper(row[25])),
+			BirthDate:     ParseDateDDMMYYYY(row[26]).Format(time.RFC3339),
+			Phone:         row[72],
 			BirthCity:     strings.TrimSpace(lib.Capitalize(row[73])),
 			BirthProvince: strings.TrimSpace(strings.ToUpper(row[74])),
 			Residence: &models.Address{
-				StreetName: strings.TrimSpace(lib.Capitalize(row[63])),
-				City:       strings.TrimSpace(lib.Capitalize(row[65])),
-				CityCode:   strings.TrimSpace(strings.ToUpper(row[66])),
-				PostalCode: row[64],
-				Locality:   strings.TrimSpace(lib.Capitalize(row[65])),
-			},
-			Domicile: &models.Address{
-				StreetName: strings.TrimSpace(lib.Capitalize(row[67])),
-				City:       strings.TrimSpace(lib.Capitalize(row[70])),
-				CityCode:   strings.TrimSpace(strings.ToUpper(row[70])),
-				PostalCode: row[68],
-				Locality:   strings.TrimSpace(lib.Capitalize(row[69])),
+				StreetName: strings.TrimSpace(lib.Capitalize(row[28])),
+				City:       strings.TrimSpace(lib.Capitalize(row[30])),
+				CityCode:   strings.TrimSpace(strings.ToUpper(row[31])),
+				PostalCode: row[29],
+				Locality:   strings.TrimSpace(lib.Capitalize(row[30])),
 			},
 		}
 
@@ -198,7 +184,45 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		}
 		policy.Contractor.Uid = lib.NewDoc(models.UserCollection)
 
+		if policy.HasGuarantee("death") {
+
+			// setting identity documents
+
+			insured.IdentityDocuments = []*models.IdentityDocument{{
+				Code:             row[77],
+				Type:             identityDocumentMap[row[76]],
+				DateOfIssue:      ParseDateDDMMYYYY(row[78]),
+				IssuingAuthority: strings.TrimSpace(lib.Capitalize(row[79])),
+			}}
+			policy.Contractor.IdentityDocuments = insured.IdentityDocuments
+			policy.Assets[0].Person.IdentityDocuments = insured.IdentityDocuments
+
+			// setting email
+
+			insured.Mail = strings.TrimSpace(strings.ToLower(row[71]))
+			policy.Contractor.Mail = insured.Mail
+			policy.Assets[0].Person.Mail = insured.Mail
+
+			// setting domicile
+
+			insured.Domicile = &models.Address{
+				StreetName: strings.TrimSpace(lib.Capitalize(row[67])),
+				City:       strings.TrimSpace(lib.Capitalize(row[69])),
+				CityCode:   strings.TrimSpace(strings.ToUpper(row[70])),
+				PostalCode: row[68],
+				Locality:   strings.TrimSpace(lib.Capitalize(row[69])),
+			}
+			policy.Contractor.Domicile = insured.Domicile
+			policy.Assets[0].Person.Domicile = insured.Domicile
+
+		}
+
+		// check fiscalcode
+
 		// create transactions
+
+		//mgaProduct := product.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, networkNode, networkNode.GetWarrant())
+		//tr := transaction.PutByPolicy(policy, "", "", "", "", policy.PriceGross, policy.PriceNett, "", models.PayMethodRemittance, true, mgaProduct)
 
 		// create network transactions
 
