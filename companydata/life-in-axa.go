@@ -80,8 +80,12 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 				} else {
 					benef1 := ParseAxaBeneficiary(r, 0)
 					benef2 := ParseAxaBeneficiary(r, 1)
-					beneficiaries = append(beneficiaries, benef1)
-					beneficiaries = append(beneficiaries, benef2)
+					if benef1 != nil {
+						beneficiaries = append(beneficiaries, *benef1)
+					}
+					if benef2 != nil {
+						beneficiaries = append(beneficiaries, *benef2)
+					}
 				}
 			}
 			dur, _ := strconv.Atoi(r[7])
@@ -121,7 +125,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		//1998-09-27T00:00:00Z RFC3339
 
 		_, _, version, paymentSplit := LifeMapCodecCompanyAxaRevert(row[1])
-		networkNode := network.GetNetworkNodeByCode(row[13])
+		networkNode := network.GetNetworkNodeByCode(strings.TrimSpace(strings.ToUpper(row[13])))
 		if networkNode == nil {
 			log.Println("node not found!")
 			skippedPolicies = append(skippedPolicies, row[0])
@@ -355,31 +359,35 @@ func ParseAxaFloat(price string) float64 {
 	return princeInCents / 100.0
 }
 
-func ParseAxaBeneficiary(r []string, base int) models.Beneficiary {
+func ParseAxaBeneficiary(r []string, base int) *models.Beneficiary {
 	var (
-		benef models.Beneficiary
+		benef *models.Beneficiary
 	)
 	rangeCell := 11 * base
 
 	if r[82] == "GE" {
-		benef = models.Beneficiary{
+		benef = &models.Beneficiary{
 			BeneficiaryType: "legalAndWillSuccessor",
 		}
 	}
 	if r[82] == "NM" {
-		benef = models.Beneficiary{
+		if strings.TrimSpace(strings.ToUpper(r[85+rangeCell])) == "" || strings.TrimSpace(strings.ToUpper(r[85+rangeCell])) == "0" {
+			return nil
+		}
+
+		benef = &models.Beneficiary{
 			BeneficiaryType: "chosenBeneficiary",
 			User: models.User{
-				Name:       r[84+rangeCell],
-				Surname:    r[83+rangeCell],
-				FiscalCode: strings.ToUpper(r[85+rangeCell]),
-				Mail:       r[91+rangeCell],
+				Name:       strings.TrimSpace(lib.Capitalize(r[84+rangeCell])),
+				Surname:    strings.TrimSpace(lib.Capitalize(r[83+rangeCell])),
+				FiscalCode: strings.TrimSpace(strings.ToUpper(r[85+rangeCell])),
+				Mail:       strings.TrimSpace(strings.ToLower(r[91+rangeCell])),
 				Residence: &models.Address{
-					StreetName: r[87+rangeCell],
-					City:       r[90+rangeCell],
-					CityCode:   r[90+rangeCell],
-					PostalCode: r[89+rangeCell],
-					Locality:   r[88+rangeCell],
+					StreetName: strings.TrimSpace(lib.Capitalize(r[87+rangeCell])),
+					City:       strings.TrimSpace(lib.Capitalize(r[88+rangeCell])),
+					CityCode:   strings.TrimSpace(strings.ToUpper(r[90+rangeCell])),
+					PostalCode: strings.TrimSpace(r[89+rangeCell]),
+					Locality:   strings.TrimSpace(lib.Capitalize(r[88+rangeCell])),
 				},
 			},
 		}
