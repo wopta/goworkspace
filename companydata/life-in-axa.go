@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/wopta/goworkspace/network"
+	"github.com/wopta/goworkspace/user"
 	"log"
 	"net/http"
 	"os"
@@ -22,12 +23,20 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		headervalue     = "N° adesione individuale univoco"
 	)
 	var (
-		policies        = make([]models.Policy, 0)
-		skippedPolicies = make([]string, 0)
-		monthlyPolicies = make(map[string]map[string][][]string, 0)
+		policies          = make([]models.Policy, 0)
+		skippedPolicies   = make([]string, 0)
+		birthCityPolicies = make([]string, 0)
+		monthlyPolicies   = make(map[string]map[string][][]string, 0)
+		codes             map[string]map[string]string
 	)
 
 	log.Println(os.Getwd())
+
+	b, err := os.ReadFile(lib.GetAssetPathByEnv("companyData") + "/reverse-codes.json")
+	err = json.Unmarshal(b, &codes)
+	if err != nil {
+		return "", nil, err
+	}
 
 	data, _ := os.ReadFile("./companydata/track_in_life.csv")
 	//data := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/life/life.csv", "")
@@ -227,6 +236,28 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		policy.Contractor.Uid = lib.NewDoc(models.UserCollection)
 
 		// check fiscalcode
+		var usr models.User
+		_, usr, err = user.CalculateFiscalCode(*insured)
+		if err != nil {
+			if strings.ToLower(err.Error()) == "invalid birth city" {
+				_, extractedUser, _ := ExtractUserDataFromFiscalCode(insured.FiscalCode, codes)
+				insured.BirthCity = extractedUser.BirthCity
+				insured.BirthProvince = extractedUser.BirthProvince
+
+				_, usr, err = user.CalculateFiscalCode(*insured)
+
+				birthCityPolicies = append(birthCityPolicies, policy.CodeCompany)
+			} else {
+				log.Printf("error: %s", err.Error())
+				continue
+			}
+
+		}
+
+		if strings.ToUpper(usr.FiscalCode) != strings.ToUpper(insured.FiscalCode) {
+			skippedPolicies = append(skippedPolicies, policy.CodeCompany)
+			continue
+		}
 
 		// create transactions
 
@@ -265,6 +296,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	}
 
 	log.Printf("Skipped %d policies: %v", len(skippedPolicies), skippedPolicies)
+	log.Printf("Missing Birth City %d policies: %v", len(birthCityPolicies), birthCityPolicies)
 	log.Printf("Created %d policies ", len(policies))
 
 	out, err := json.Marshal(policies)
