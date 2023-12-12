@@ -23,11 +23,14 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		headervalue     = "N° adesione individuale univoco"
 	)
 	var (
-		policies          = make([]models.Policy, 0)
-		skippedPolicies   = make([]string, 0)
-		birthCityPolicies = make([]string, 0)
-		monthlyPolicies   = make(map[string]map[string][][]string, 0)
-		codes             map[string]map[string]string
+		policies                 = make([]models.Policy, 0)
+		skippedPolicies          = make([]string, 0)
+		missingBirthCityPolicies = make([]string, 0)
+		missingProducerPolicies  = make([]string, 0)
+		missingProducers         = make([]string, 0)
+		wrongFiscalCodePolicies  = make([]string, 0)
+		monthlyPolicies          = make(map[string]map[string][][]string, 0)
+		codes                    map[string]map[string]string
 	)
 
 	log.Println(os.Getwd())
@@ -55,7 +58,11 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			maxDuration   int
 		)
 
-		if pol[0][3] == headervalue || pol[0][13] == "W1" || pol[0][22] == "PG" {
+		if pol[0][3] == headervalue {
+			continue
+		}
+		if pol[0][13] == "W1" || pol[0][22] == "PG" {
+			skippedPolicies = append(skippedPolicies, pol[0][2])
 			continue
 		}
 
@@ -137,7 +144,11 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		networkNode := network.GetNetworkNodeByCode(strings.TrimSpace(strings.ToUpper(row[13])))
 		if networkNode == nil {
 			log.Println("node not found!")
-			skippedPolicies = append(skippedPolicies, row[0])
+			missingProducerPolicies = append(missingProducerPolicies, fmt.Sprintf("%07s", strings.TrimSpace(row[2])))
+			skippedPolicies = append(skippedPolicies, fmt.Sprintf("%07s", strings.TrimSpace(row[2])))
+			if !lib.SliceContains(missingProducers, strings.TrimSpace(strings.ToUpper(row[13]))) {
+				missingProducers = append(missingProducers, strings.TrimSpace(strings.ToUpper(row[13])))
+			}
 			continue
 		}
 
@@ -246,7 +257,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 				_, usr, err = user.CalculateFiscalCode(*insured)
 
-				birthCityPolicies = append(birthCityPolicies, policy.CodeCompany)
+				missingBirthCityPolicies = append(missingBirthCityPolicies, policy.CodeCompany)
 			} else {
 				log.Printf("error: %s", err.Error())
 				continue
@@ -255,6 +266,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		}
 
 		if strings.ToUpper(usr.FiscalCode) != strings.ToUpper(insured.FiscalCode) {
+			wrongFiscalCodePolicies = append(wrongFiscalCodePolicies, policy.CodeCompany)
 			skippedPolicies = append(skippedPolicies, policy.CodeCompany)
 			continue
 		}
@@ -295,8 +307,10 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	}
 
-	log.Printf("Skipped %d policies: %v", len(skippedPolicies), skippedPolicies)
-	log.Printf("Missing Birth City %d policies: %v", len(birthCityPolicies), birthCityPolicies)
+	log.Printf("Skipped %d policies: %v\n", len(skippedPolicies), skippedPolicies)
+	log.Printf("Missing %d producers: %v\n", len(missingProducers), missingProducers)
+	log.Printf("Wrong fiscal code %d policies: %v\n", len(wrongFiscalCodePolicies), wrongFiscalCodePolicies)
+	log.Printf("Missing Birth City %d policies: %v\n", len(missingBirthCityPolicies), missingBirthCityPolicies)
 	log.Printf("Created %d policies ", len(policies))
 
 	out, err := json.Marshal(policies)
