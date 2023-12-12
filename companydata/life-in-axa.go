@@ -147,6 +147,8 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 				PostalCode: row[29],
 				Locality:   strings.TrimSpace(lib.Capitalize(row[30])),
 			},
+			CreationDate: ParseDateDDMMYYYY(row[4]),
+			UpdatedDate:  time.Now().UTC(),
 		}
 
 		policy := models.Policy{
@@ -176,32 +178,28 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			ProducerCode:   networkNode.Code,
 			ProducerUid:    networkNode.Uid,
 			ProducerType:   networkNode.Type,
-			Contractor:     *insured,
 			Assets: []models.Asset{{
 				Guarantees: guarantees,
-				Person:     insured,
 			}},
 		}
-		policy.Contractor.Uid = lib.NewDoc(models.UserCollection)
 
 		if policy.HasGuarantee("death") {
 
 			// setting identity documents
 
+			tmpCode, _ := strconv.Atoi(strings.TrimSpace(row[76]))
+			identityDocumentCode := fmt.Sprintf("%02d", tmpCode)
 			insured.IdentityDocuments = []*models.IdentityDocument{{
-				Code:             row[77],
-				Type:             identityDocumentMap[row[76]],
+				Number:           strings.TrimSpace(strings.ToUpper(row[77])),
+				Code:             identityDocumentCode,
+				Type:             identityDocumentMap[identityDocumentCode],
 				DateOfIssue:      ParseDateDDMMYYYY(row[78]),
 				IssuingAuthority: strings.TrimSpace(lib.Capitalize(row[79])),
 			}}
-			policy.Contractor.IdentityDocuments = insured.IdentityDocuments
-			policy.Assets[0].Person.IdentityDocuments = insured.IdentityDocuments
 
 			// setting email
 
 			insured.Mail = strings.TrimSpace(strings.ToLower(row[71]))
-			policy.Contractor.Mail = insured.Mail
-			policy.Assets[0].Person.Mail = insured.Mail
 
 			// setting domicile
 
@@ -212,10 +210,12 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 				PostalCode: row[68],
 				Locality:   strings.TrimSpace(lib.Capitalize(row[69])),
 			}
-			policy.Contractor.Domicile = insured.Domicile
-			policy.Assets[0].Person.Domicile = insured.Domicile
 
 		}
+
+		policy.Assets[0].Person = insured
+		policy.Contractor = *insured
+		policy.Contractor.Uid = lib.NewDoc(models.UserCollection)
 
 		// check fiscalcode
 
