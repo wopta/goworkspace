@@ -58,11 +58,11 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			maxDuration   int
 		)
 
-		if pol[0][3] == headervalue {
+		if pol[0][2] == headervalue {
 			continue
 		}
-		if pol[0][13] == "W1" || pol[0][22] == "PG" {
-			skippedPolicies = append(skippedPolicies, pol[0][2])
+		if strings.TrimSpace(pol[0][13]) == "W1" || strings.TrimSpace(pol[0][22]) == "PG" {
+			skippedPolicies = append(skippedPolicies, fmt.Sprintf("%07s", strings.TrimSpace(pol[0][2])))
 			continue
 		}
 
@@ -273,8 +273,11 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 		// create transactions
 
-		//mgaProduct := product.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, networkNode, networkNode.GetWarrant())
-		//tr := transaction.PutByPolicy(policy, "", "", "", "", policy.PriceGross, policy.PriceNett, "", models.PayMethodRemittance, true, mgaProduct)
+		/*mgaProduct := product.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, networkNode,
+			networkNode.GetWarrant())
+		tr := transaction.PutByPolicy(policy, policy.EmitDate.Format(models.TimeDateOnly), "",
+			policy.EmitDate.AddDate(10, 0, 0).Format(models.TimeDateOnly), uuid.New().String(), policy.PriceGross,
+			policy.PriceNett, "", models.PayMethodRemittance, true, mgaProduct)*/
 
 		// create network transactions
 
@@ -286,6 +289,8 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		// save policy firestore
 
 		// save policy bigquery
+
+		// save single guarantees into bigquery
 
 		// save contractor firestore
 
