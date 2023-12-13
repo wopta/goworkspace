@@ -31,6 +31,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		missingProducers         = make([]string, 0)
 		wrongFiscalCodePolicies  = make([]string, 0)
 		monthlyPolicies          = make(map[string]map[string][][]string, 0)
+		result                   = make(map[string]map[string]interface{}, 0)
 		codes                    map[string]map[string]string
 	)
 
@@ -76,6 +77,9 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 		row = pol[0]
 
+		codeCompany := fmt.Sprintf("%07s", strings.TrimSpace(row[2]))
+		payDate := fmt.Sprintf("%08s", strings.TrimSpace(row[5]))
+
 		for i, r := range pol {
 			var (
 				beneficiaries []models.Beneficiary
@@ -85,8 +89,6 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			log.Println("LifeIn  pol: ", r)
 
 			if strings.TrimSpace(r[3]) == "R" {
-				codeCompany := fmt.Sprintf("%07s", strings.TrimSpace(r[2]))
-				payDate := fmt.Sprintf("%08s", strings.TrimSpace(r[5]))
 				if monthlyPolicies[codeCompany] == nil {
 					monthlyPolicies[codeCompany] = make(map[string][][]string, 0)
 				}
@@ -123,7 +125,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 			priceGross := ParseAxaFloat(r[8])
 			sumPriceGross += priceGross
-			var guarante models.Guarante = models.Guarante{
+			guarante := models.Guarante{
 				Slug:                       slug,
 				CompanyCodec:               companyCodec,
 				SumInsuredLimitOfIndemnity: 0,
@@ -154,7 +156,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		networkNode := network.GetNetworkNodeByCode(strings.TrimSpace(strings.ToUpper(row[13])))
 		if networkNode == nil {
 			log.Println("node not found!")
-			missingProducerPolicies = append(missingProducerPolicies, fmt.Sprintf("%07s", strings.TrimSpace(row[2])))
+			missingProducerPolicies = append(missingProducerPolicies, codeCompany)
 			skippedPolicies = append(skippedPolicies, fmt.Sprintf("%07s", strings.TrimSpace(row[2])))
 			if !lib.SliceContains(missingProducers, strings.TrimSpace(strings.ToUpper(row[13]))) {
 				missingProducers = append(missingProducers, strings.TrimSpace(strings.ToUpper(row[13])))
@@ -191,7 +193,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			StatusHistory:  []string{"Imported", models.PolicyStatusInitLead, models.PolicyStatusContact, models.PolicyStatusToSign, models.PolicyStatusSign, models.NetworkTransactionStatusToPay, models.PolicyStatusPay},
 			Name:           models.LifeProduct,
 			NameDesc:       "Wopta per te Vita",
-			CodeCompany:    fmt.Sprintf("%07s", strings.TrimSpace(row[2])),
+			CodeCompany:    codeCompany,
 			Company:        models.AxaCompany,
 			ProductVersion: "v" + version,
 			IsPay:          true,
@@ -281,25 +283,36 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			continue
 		}
 
-		// create transactions
-
-		if monthlyPolicies[policy.CodeCompany] != nil {
-			payDate := policy.StartDate
-			createTransaction(policy, mgaProducts[policy.ProductVersion], "", payDate, lib.RoundFloat(policy.PriceGross/12, 2), true)
-			isPay := false
-			for i := 1; i < 12; i++ {
-				payDate = payDate.AddDate(0, 1, 0)
-				tmpPayDate := payDate.Format("02012006")
-				if monthlyPolicies[policy.CodeCompany][tmpPayDate] != nil {
-					isPay = true
-				}
-				createTransaction(policy, mgaProducts[policy.ProductVersion], "", payDate, lib.RoundFloat(policy.PriceGross/12, 2), isPay)
-			}
-		} else {
-			createTransaction(policy, mgaProducts[policy.ProductVersion], "", policy.EmitDate, lib.RoundFloat(policy.PriceGross, 2), true)
+		result[codeCompany] = map[string]interface{}{
+			"policy":              policy,
+			"transactions":        []models.Transaction{},
+			"networkTransactions": []models.NetworkTransaction{},
 		}
 
-		// create network transactions
+		// create transactions and network node transactions
+
+		transactions := make([]models.Transaction, 0)
+
+		if monthlyPolicies[policy.CodeCompany] != nil {
+			transactionPayDate := policy.StartDate
+			tr := createTransaction(policy, mgaProducts[policy.ProductVersion], "", transactionPayDate, lib.RoundFloat(policy.PriceGross/12, 2), true)
+			transactions = append(transactions, tr)
+			isPay := false
+			for i := 1; i < 12; i++ {
+				transactionPayDate = transactionPayDate.AddDate(0, 1, 0)
+				payDateString := transactionPayDate.Format("02012006")
+				if monthlyPolicies[policy.CodeCompany][payDateString] != nil {
+					isPay = true
+				}
+				tr = createTransaction(policy, mgaProducts[policy.ProductVersion], "", transactionPayDate, lib.RoundFloat(policy.PriceGross/12, 2), isPay)
+				transactions = append(transactions, tr)
+			}
+		} else {
+			tr := createTransaction(policy, mgaProducts[policy.ProductVersion], "", policy.EmitDate, lib.RoundFloat(policy.PriceGross, 2), true)
+			transactions = append(transactions, tr)
+		}
+
+		result[codeCompany]["transactions"] = transactions
 
 		// update node portfolio
 
@@ -336,9 +349,10 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	log.Printf("Missing %d producers: %v\n", len(missingProducers), missingProducers)
 	log.Printf("Wrong fiscal code %d policies: %v\n", len(wrongFiscalCodePolicies), wrongFiscalCodePolicies)
 	log.Printf("Missing Birth City %d policies: %v\n", len(missingBirthCityPolicies), missingBirthCityPolicies)
+	log.Printf("Missing Producer %d policies: %v\n", len(missingProducerPolicies), missingProducerPolicies)
 	log.Printf("Created %d policies ", len(policies))
 
-	out, err := json.Marshal(policies)
+	out, err := json.Marshal(result)
 	if err != nil {
 		log.Printf("error: %s", err.Error())
 	}
