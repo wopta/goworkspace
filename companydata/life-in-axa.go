@@ -77,14 +77,16 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			log.Println("LifeIn  i: ", i)
 			log.Println("LifeIn  pol: ", r)
 
-			if r[3] == "R" {
-				if monthlyPolicies[r[2]] == nil {
-					monthlyPolicies[r[2]] = make(map[string][][]string, 0)
+			if strings.TrimSpace(r[3]) == "R" {
+				codeCompany := fmt.Sprintf("%07s", strings.TrimSpace(r[2]))
+				payDate := fmt.Sprintf("%08s", strings.TrimSpace(r[5]))
+				if monthlyPolicies[codeCompany] == nil {
+					monthlyPolicies[codeCompany] = make(map[string][][]string, 0)
 				}
-				if monthlyPolicies[r[2]][r[5]] == nil {
-					monthlyPolicies[r[2]][r[5]] = make([][]string, 0)
+				if monthlyPolicies[codeCompany][payDate] == nil {
+					monthlyPolicies[codeCompany][payDate] = make([][]string, 0)
 				}
-				monthlyPolicies[r[2]][r[5]] = append(monthlyPolicies[r[2]][r[5]], r)
+				monthlyPolicies[codeCompany][payDate] = append(monthlyPolicies[codeCompany][payDate], r)
 				continue
 			}
 
@@ -278,12 +280,18 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			networkNode.GetWarrant())
 		if monthlyPolicies[policy.CodeCompany] != nil {
 			payDate := policy.StartDate
-			for i := 0; i < 12; i++ {
-				payDate = payDate.AddDate(0, 1*i, 0)
-				createTransaction(policy, mgaProduct, "", payDate, lib.RoundFloat(policy.PriceGross/12, 2))
+			createTransaction(policy, mgaProduct, "", payDate, lib.RoundFloat(policy.PriceGross/12, 2), true)
+			isPay := false
+			for i := 1; i < 12; i++ {
+				payDate = payDate.AddDate(0, 1, 0)
+				tmpPayDate := payDate.Format("02012006")
+				if monthlyPolicies[policy.CodeCompany][tmpPayDate] != nil {
+					isPay = true
+				}
+				createTransaction(policy, mgaProduct, "", payDate, lib.RoundFloat(policy.PriceGross/12, 2), isPay)
 			}
 		} else {
-			createTransaction(policy, mgaProduct, "", policy.EmitDate, lib.RoundFloat(policy.PriceGross, 2))
+			createTransaction(policy, mgaProduct, "", policy.EmitDate, lib.RoundFloat(policy.PriceGross, 2), true)
 		}
 
 		// create network transactions
@@ -377,6 +385,7 @@ func LifeMapCodecCompanyAxaRevert(g string) (string, string, string, string) {
 	log.Println("LifeIn LifeMapCodecCompanyAxaRevert:", code)
 	return result, slug, version, pay
 }
+
 func ParseDateDDMMYYYY(date string) time.Time {
 	var (
 		res time.Time
@@ -471,7 +480,7 @@ func GroupBy(df dataframe.DataFrame, col int) map[string][][]string {
 	return res
 }
 
-func createTransaction(policy models.Policy, mgaProduct *models.Product, customerId string, payDate time.Time, priceGross float64) models.Transaction {
+func createTransaction(policy models.Policy, mgaProduct *models.Product, customerId string, payDate time.Time, priceGross float64, isPay bool) models.Transaction {
 	return models.Transaction{
 		Amount:          priceGross,
 		Uid:             lib.NewDoc(models.TransactionsCollection),
@@ -484,7 +493,7 @@ func createTransaction(policy models.Policy, mgaProduct *models.Product, custome
 		ScheduleDate:    policy.EmitDate.Format(models.TimeDateOnly),
 		ExpirationDate:  policy.EmitDate.AddDate(10, 0, 0).Format(models.TimeDateOnly),
 		NumberCompany:   policy.CodeCompany,
-		IsPay:           true,
+		IsPay:           isPay,
 		PayDate:         payDate,
 		TransactionDate: payDate,
 		Name:            policy.Contractor.Name + " " + policy.Contractor.Surname,
