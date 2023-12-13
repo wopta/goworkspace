@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/wopta/goworkspace/network"
+	"github.com/wopta/goworkspace/product"
 	"github.com/wopta/goworkspace/user"
 	"log"
 	"net/http"
@@ -273,11 +274,17 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 		// create transactions
 
-		/*mgaProduct := product.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, networkNode,
+		mgaProduct := product.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, networkNode,
 			networkNode.GetWarrant())
-		tr := transaction.PutByPolicy(policy, policy.EmitDate.Format(models.TimeDateOnly), "",
-			policy.EmitDate.AddDate(10, 0, 0).Format(models.TimeDateOnly), uuid.New().String(), policy.PriceGross,
-			policy.PriceNett, "", models.PayMethodRemittance, true, mgaProduct)*/
+		if monthlyPolicies[policy.CodeCompany] != nil {
+			payDate := policy.StartDate
+			for i := 0; i < 12; i++ {
+				payDate = payDate.AddDate(0, 1*i, 0)
+				createTransaction(policy, mgaProduct, "", payDate, lib.RoundFloat(policy.PriceGross/12, 2))
+			}
+		} else {
+			createTransaction(policy, mgaProduct, "", policy.EmitDate, lib.RoundFloat(policy.PriceGross, 2))
+		}
 
 		// create network transactions
 
@@ -462,4 +469,30 @@ func GroupBy(df dataframe.DataFrame, col int) map[string][][]string {
 		}
 	}
 	return res
+}
+
+func createTransaction(policy models.Policy, mgaProduct *models.Product, customerId string, payDate time.Time, priceGross float64) models.Transaction {
+	return models.Transaction{
+		Amount:          priceGross,
+		Uid:             lib.NewDoc(models.TransactionsCollection),
+		PolicyName:      policy.Name,
+		PolicyUid:       policy.Uid,
+		CreationDate:    policy.EmitDate,
+		UpdateDate:      time.Now().UTC(),
+		Status:          models.TransactionStatusPay,
+		StatusHistory:   []string{models.TransactionStatusToPay, models.TransactionStatusPay},
+		ScheduleDate:    policy.EmitDate.Format(models.TimeDateOnly),
+		ExpirationDate:  policy.EmitDate.AddDate(10, 0, 0).Format(models.TimeDateOnly),
+		NumberCompany:   policy.CodeCompany,
+		IsPay:           true,
+		PayDate:         payDate,
+		TransactionDate: payDate,
+		Name:            policy.Contractor.Name + " " + policy.Contractor.Surname,
+		Company:         policy.Company,
+		IsDelete:        false,
+		UserToken:       customerId,
+		ProviderName:    policy.Payment,
+		PaymentMethod:   models.PayMethodRemittance,
+		Commissions:     lib.RoundFloat(product.GetCommissionByProduct(&policy, mgaProduct, false), 2),
+	}
 }
