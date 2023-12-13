@@ -175,7 +175,10 @@ func loadDesignation(networkNode *models.NetworkNode) string {
 		if networkNode.WorksForUid == models.WorksForMgaUid {
 			designation = fmt.Sprintf(mgaProponentDirectDesignationFormat, networkNode.Designation, mgaRuiInfo)
 		} else {
-			worksForNode := network.GetNetworkNodeByUid(networkNode.WorksForUid)
+			worksForNode := networkNode
+			if networkNode.WorksForUid != "" {
+				worksForNode = network.GetNetworkNodeByUid(networkNode.WorksForUid)
+			}
 			designation = fmt.Sprintf(
 				mgaProponentIndirectDesignationFormat,
 				networkNode.Designation,
