@@ -51,6 +51,13 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	//group := df.GroupBy("N\xb0 adesione individuale univoco")
 	group := GroupBy(df, 2)
 
+	mgaProducts := map[string]*models.Product{
+		models.ProductV1: product.GetProductV2(models.LifeProduct, models.ProductV1, models.MgaChannel, nil,
+			nil),
+		models.ProductV2: product.GetProductV2(models.LifeProduct, models.ProductV2, models.MgaChannel, nil,
+			nil),
+	}
+
 	for v, pol := range group {
 		var (
 			row           []string
@@ -276,11 +283,9 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 		// create transactions
 
-		mgaProduct := product.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, networkNode,
-			networkNode.GetWarrant())
 		if monthlyPolicies[policy.CodeCompany] != nil {
 			payDate := policy.StartDate
-			createTransaction(policy, mgaProduct, "", payDate, lib.RoundFloat(policy.PriceGross/12, 2), true)
+			createTransaction(policy, mgaProducts[policy.ProductVersion], "", payDate, lib.RoundFloat(policy.PriceGross/12, 2), true)
 			isPay := false
 			for i := 1; i < 12; i++ {
 				payDate = payDate.AddDate(0, 1, 0)
@@ -288,10 +293,10 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 				if monthlyPolicies[policy.CodeCompany][tmpPayDate] != nil {
 					isPay = true
 				}
-				createTransaction(policy, mgaProduct, "", payDate, lib.RoundFloat(policy.PriceGross/12, 2), isPay)
+				createTransaction(policy, mgaProducts[policy.ProductVersion], "", payDate, lib.RoundFloat(policy.PriceGross/12, 2), isPay)
 			}
 		} else {
-			createTransaction(policy, mgaProduct, "", policy.EmitDate, lib.RoundFloat(policy.PriceGross, 2), true)
+			createTransaction(policy, mgaProducts[policy.ProductVersion], "", policy.EmitDate, lib.RoundFloat(policy.PriceGross, 2), true)
 		}
 
 		// create network transactions
