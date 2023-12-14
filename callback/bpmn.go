@@ -249,7 +249,7 @@ func updatePolicy(state *bpmn.State) error {
 
 func payTransaction(state *bpmn.State) error {
 	policy := state.Data
-	transaction, _ := tr.GetTransactionByPolicyUidAndProviderId(policy.Uid, providerId, trSchedule, origin)
+	transaction, _ := tr.GetTransactionToBePaid(policy.Uid, providerId, trSchedule, origin)
 	err := tr.Pay(&transaction, origin, paymentMethod)
 	if err != nil {
 		log.Printf("[fabrickPayment] ERROR Transaction Pay %s", err.Error())
