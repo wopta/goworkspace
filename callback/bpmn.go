@@ -15,12 +15,12 @@ import (
 )
 
 var (
-	origin, providerId, paymentMethod, flowName string
-	ccAddress, toAddress, fromAddress           mail.Address
-	networkNode                                 *models.NetworkNode
-	mgaProduct                                  *models.Product
-	warrant                                     *models.Warrant
-	sendEmail                                   bool
+	origin, providerId, paymentMethod, flowName, trSchedule string
+	ccAddress, toAddress, fromAddress                       mail.Address
+	networkNode                                             *models.NetworkNode
+	mgaProduct                                              *models.Product
+	warrant                                                 *models.Warrant
+	sendEmail                                               bool
 )
 
 const (
@@ -249,7 +249,7 @@ func updatePolicy(state *bpmn.State) error {
 
 func payTransaction(state *bpmn.State) error {
 	policy := state.Data
-	transaction, _ := tr.GetTransactionByPolicyUidAndProviderId(policy.Uid, providerId, origin)
+	transaction, _ := tr.GetTransactionToBePaid(policy.Uid, providerId, trSchedule, origin)
 	err := tr.Pay(&transaction, origin, paymentMethod)
 	if err != nil {
 		log.Printf("[fabrickPayment] ERROR Transaction Pay %s", err.Error())
