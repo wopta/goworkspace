@@ -51,7 +51,7 @@ func GetPoliciesByQueriesBigQuery(datasetID string, tableID string, queries []mo
 func addQuery(query *bytes.Buffer, q models.Query, valueParameter string) {
 	switch q.Type {
 	case "dateTime":
-		query.WriteString(fmt.Sprintf(" PARSE_TIMESTAMP('%%Y-%%m-%%dT%%H:%%M:%%E*SZ', STRING(data.%s)) %s @%s", q.Field, q.Op, valueParameter))
+		query.WriteString(fmt.Sprintf(" JSON_VALUE(data.%s) %s @%s", q.Field, q.Op, valueParameter))
 	case "bool", "boolean":
 		query.WriteString(fmt.Sprintf(" BOOL(data.%s) %s @%s", q.Field, q.Op, valueParameter))
 		if q.Value == false {
