@@ -46,7 +46,6 @@ func BankAccountAxaInclusive(w http.ResponseWriter, r *http.Request) (string, in
 	json.Unmarshal([]byte(req), &obj)
 	now, upload = getRequestData(req)
 	refDay = now.AddDate(0, 0, -1)
-
 	log.Println("BankAccountAxaInclusive refMontly: ", refDay)
 	//from, e = time.Parse("2006-01-02", strconv.Itoa(now.Year())+"-"+fmt.Sprintf("%02d", int(now.Month()))+"-"+fmt.Sprintf("%02d", 1))
 	//query := "select * from `wopta." + dataMovement + "` where _PARTITIONTIME >'" + from.Format(layoutQuery) + " 00:00:00" + "' and _PARTITIONTIME <'" + to.Format(layoutQuery) + " 23:59:00" + "'"
@@ -57,11 +56,9 @@ func BankAccountAxaInclusive(w http.ResponseWriter, r *http.Request) (string, in
 	log.Println("BankAccountAxaInclusive len(bankaccountlist): ", len(bankaccountlist))
 	//result = append(result, getHeader())
 	result = append(result, getHeaderInclusiveBank())
-
 	b, err := os.ReadFile(lib.GetAssetPathByEnv("companyData") + "/reverse-codes.json")
 	var codes map[string]map[string]string
 	err = json.Unmarshal(b, &codes)
-	lib.CheckError(err)
 	lib.CheckError(err)
 	for i, mov := range bankaccountlist {
 		log.Println(i)

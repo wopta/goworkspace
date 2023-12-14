@@ -130,7 +130,7 @@ func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.T
 	log.Println("LifeAxalEmit:  fil.Records()[0]:", fil.Records()[0])
 	log.Println("LifeAxalEmit:  filtered col", fil.Ncol())
 	log.Println("LifeAxalEmit: filtered row", fil.Nrow())
-	if policy.NetworkUid != "" {
+	if policy.ProducerCode != "" {
 		var node *models.NetworkNode
 		snap, e := lib.GetFirestoreErr("networkNodes", policy.NetworkUid)
 		log.Println(e)
@@ -459,22 +459,34 @@ func getFormatBithdate(d string) string {
 	return res
 
 }
+
 func getRenew(p models.Policy) string {
 	var result string
 	now := time.Now()
 	addMonth := p.StartDate.AddDate(0, 1, 0)
 	if p.PaymentSplit == string(models.PaySplitYear) || p.PaymentSplit == string(models.PaySplitYearly) {
+
 		result = "A"
 	}
+
 	if p.PaymentSplit == string(models.PaySplitMonthly) {
+		log.Println("LifeAxalEmit : getRenew CodeCompany", p.CodeCompany)
+		log.Println("LifeAxalEmit : getRenew addMonth", addMonth)
+		log.Println("LifeAxalEmit : getRenew now", now)
+
 		if now.Before(addMonth) {
+
 			result = "A"
+
 		} else {
+
 			result = "R"
 		}
 	}
+	log.Println("LifeAxalEmit : getRenew result", result)
 	return result
 }
+
 func getRenewDate(p models.Policy, trans models.Transaction) time.Time {
 	var result time.Time
 	now := time.Now()
@@ -514,16 +526,16 @@ func mapCodecCompany(p models.Policy, g string) string {
 		pay = "M"
 	}
 	if g == "D" {
-		result = "1" + pay + "5"
+		result = p.ProductVersion + pay + "5"
 	}
 	if g == "PTD" {
-		result = "1" + pay + "6"
+		result = p.ProductVersion + pay + "6"
 	}
 	if g == "TTD" {
-		result = "1" + pay + "7"
+		result = p.ProductVersion + pay + "7"
 	}
 	if g == "CI" {
-		result = "1" + pay + "8"
+		result = p.ProductVersion + pay + "8"
 	}
 	return result
 }
