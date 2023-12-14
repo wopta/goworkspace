@@ -14,7 +14,7 @@ require (
 	github.com/wopta/goworkspace/network v1.0.19
 	github.com/wopta/goworkspace/policy v1.0.44
 	github.com/wopta/goworkspace/product v1.0.66
-	github.com/wopta/goworkspace/transaction v1.0.24
+	github.com/wopta/goworkspace/transaction v1.0.24-hotfix.1
 	github.com/wopta/goworkspace/user v1.0.46
 )
 
@@ -79,7 +79,6 @@ require (
 	github.com/src-d/gcfg v1.4.0 // indirect
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.2.1 // indirect
-	github.com/wopta/goworkspace/reserved v1.0.42 // indirect
 	github.com/wopta/goworkspace/wiseproxy v1.0.3 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
@@ -108,6 +107,7 @@ require (
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1 // indirect
 	google.golang.org/grpc v1.55.0 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
+	gopkg.in/square/go-jose.v2 v2.6.0 // indirect
 	gopkg.in/src-d/go-billy.v4 v4.3.2 // indirect
 	gopkg.in/src-d/go-git.v4 v4.13.1 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
