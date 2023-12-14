@@ -37,7 +37,6 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	now, upload := getRequestData(req)
 	from, to, refMontly, filenamesplit = AxaPartnersSchedule(now)
 	cabCsv = lib.GetFilesByEnv("data/cab-cap-istat.csv")
-
 	log.Println("LifeAxalEmit now: " + now.String())
 	log.Println("LifeAxalEmit now.Day: ", now.Day())
 	log.Println("LifeAxalEmit from: " + from.String())
@@ -94,7 +93,7 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 		)
 		docsnap := lib.GetFirestore("policy", transaction.PolicyUid)
 		docsnap.DataTo(&policy)
-		result = append(result, setRowLifeEmit(policy, df, transaction)...)
+		result = append(result, setRowLifeEmit(policy, df, transaction, now)...)
 
 		transaction.IsEmit = true
 
@@ -112,7 +111,7 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	return "", nil, e
 }
 
-func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.Transaction) [][]string {
+func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.Transaction, now time.Time) [][]string {
 	var (
 		result               [][]string
 		residenceCab         string
@@ -130,9 +129,9 @@ func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.T
 	log.Println("LifeAxalEmit:  fil.Records()[0]:", fil.Records()[0])
 	log.Println("LifeAxalEmit:  filtered col", fil.Ncol())
 	log.Println("LifeAxalEmit: filtered row", fil.Nrow())
-	if policy.ProducerCode != "" {
+	if policy.ProducerUid != "" {
 		var node *models.NetworkNode
-		snap, e := lib.GetFirestoreErr("networkNodes", policy.NetworkUid)
+		snap, e := lib.GetFirestoreErr("networkNodes", policy.ProducerUid)
 		log.Println(e)
 		snap.DataTo(&node)
 		log.Println("LifeAxalEmit: node.Code", node.Code)
@@ -150,6 +149,7 @@ func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.T
 				beneficiary1, beneficiary2, beneficiary1T string
 				beneficiary1S, beneficiary2S              models.Beneficiary
 			)
+
 			beneficiary1, beneficiary1S, beneficiary1T = mapBeneficiary(g, 0) //Codice Fiscale Beneficiario
 			beneficiary2, beneficiary2S, _ = mapBeneficiary(g, 0)
 			if policy.PaymentSplit == string(models.PaySplitMonthly) {
@@ -166,31 +166,31 @@ func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.T
 			r, m := getIndennity(g)
 			log.Println(e)
 			row := []string{
-				mapCodecCompany(policy, g.CompanyCodec),    //Codice schema
-				policy.CodeCompany,                         //N° adesione individuale univoco
-				getRenew(policy),                           //Tipo di Transazione
-				getFormatdate(policy.StartDate),            //Data di decorrenza
-				getFormatdate(getRenewDate(policy, trans)), //"Data di rinnovo"
-				mapCoverageDuration(policy),                //"Durata copertura assicurativa"
-				fmt.Sprint(g.Value.Duration.Year * 12),     //"Durata complessiva"
-				priceGrossFormat,                           //"Premio assicurativo lordo"
-				r,                                          //"Importo Assicurato"
-				m,                                          //indennizzo mensile
-				"",                                         //campo disponibile
-				"",                                         //% di sovrappremio da applicare alla garanzia
-				networkCode,                                //Codice Concessionario /dipendenti (iscr.E)
-				"",                                         //Codice Campagna
-				"T",                                        //Copertura Assicurativa: Totale o Pro quota
-				"",                                         //% assicurata dell'assicurato
-				"",                                         //campo disponibile
-				"",                                         //Maxi rata finale/Valore riscatto
-				"",                                         //Stato occupazionale dell'Assicurato
-				"1",                                        //Tipo aderente
-				channel,                                    //Canale di vendita
-				"PF",                                       //Tipo contraente / Contraente
-				policy.Contractor.Surname,                  //Denominazione Sociale o Cognome contraente
-				policy.Contractor.Name,                     //campo vuoto o nome
-				policy.Contractor.Gender,                   //Sesso
+				mapCodecCompany(policy, g.CompanyCodec),         //Codice schema
+				policy.CodeCompany,                              //N° adesione individuale univoco
+				getRenew(policy, now),                           //Tipo di Transazione
+				getFormatdate(policy.StartDate),                 //Data di decorrenza
+				getFormatdate(getRenewDate(policy, trans, now)), //"Data di rinnovo"
+				mapCoverageDuration(policy),                     //"Durata copertura assicurativa"
+				fmt.Sprint(g.Value.Duration.Year * 12),          //"Durata complessiva"
+				priceGrossFormat,                                //"Premio assicurativo lordo"
+				r,                                               //"Importo Assicurato"
+				m,                                               //indennizzo mensile
+				"",                                              //campo disponibile
+				"",                                              //% di sovrappremio da applicare alla garanzia
+				networkCode,                                     //Codice Concessionario /dipendenti (iscr.E)
+				"",                                              //Codice Campagna
+				"T",                                             //Copertura Assicurativa: Totale o Pro quota
+				"",                                              //% assicurata dell'assicurato
+				"",                                              //campo disponibile
+				"",                                              //Maxi rata finale/Valore riscatto
+				"",                                              //Stato occupazionale dell'Assicurato
+				"1",                                             //Tipo aderente
+				channel,                                         //Canale di vendita
+				"PF",                                            //Tipo contraente / Contraente
+				policy.Contractor.Surname,                       //Denominazione Sociale o Cognome contraente
+				policy.Contractor.Name,                          //campo vuoto o nome
+				policy.Contractor.Gender,                        //Sesso
 				getFormatBithdate(policy.Contractor.BirthDate),                                           //Data di nascita
 				policy.Contractor.FiscalCode,                                                             //Codice Fiscale
 				policy.Contractor.Residence.StreetName + ", " + policy.Contractor.Residence.StreetNumber, //Indirizzo di residenza
@@ -460,9 +460,8 @@ func getFormatBithdate(d string) string {
 
 }
 
-func getRenew(p models.Policy) string {
+func getRenew(p models.Policy, now time.Time) string {
 	var result string
-	now := time.Now()
 	addMonth := p.StartDate.AddDate(0, 1, 0)
 	if p.PaymentSplit == string(models.PaySplitYear) || p.PaymentSplit == string(models.PaySplitYearly) {
 
@@ -487,9 +486,8 @@ func getRenew(p models.Policy) string {
 	return result
 }
 
-func getRenewDate(p models.Policy, trans models.Transaction) time.Time {
+func getRenewDate(p models.Policy, trans models.Transaction, now time.Time) time.Time {
 	var result time.Time
-	now := time.Now()
 	addMonth := p.StartDate.AddDate(0, 1, 0)
 	if p.PaymentSplit == "year" || p.PaymentSplit == string(models.PaySplitYearly) {
 		result = p.StartDate
@@ -526,16 +524,16 @@ func mapCodecCompany(p models.Policy, g string) string {
 		pay = "M"
 	}
 	if g == "D" {
-		result = p.ProductVersion + pay + "5"
+		result = p.ProductVersion[1:] + pay + "5"
 	}
 	if g == "PTD" {
-		result = p.ProductVersion + pay + "6"
+		result = p.ProductVersion[1:] + pay + "6"
 	}
 	if g == "TTD" {
-		result = p.ProductVersion + pay + "7"
+		result = p.ProductVersion[1:] + pay + "7"
 	}
 	if g == "CI" {
-		result = p.ProductVersion + pay + "8"
+		result = p.ProductVersion[1:] + pay + "8"
 	}
 	return result
 }
