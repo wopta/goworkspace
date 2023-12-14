@@ -67,25 +67,48 @@ func SetPolicyFirstTransactionPaid(policyUid string, scheduleDate string, origin
 	transaction.BigQuerySave(origin)
 }
 
-func GetTransactionByPolicyUidAndProviderId(policyUid, providerId, origin string) (models.Transaction, error) {
-	q := lib.Firequeries{
-		Queries: []lib.Firequery{
-			{
-				Field:      "policyUid",
-				Operator:   "==",
-				QueryValue: policyUid,
+func GetTransactionByPolicyUidAndProviderId(policyUid, providerId, scheduleDate, origin string) (models.Transaction, error) {
+	var q lib.Firequeries
+	if providerId == "fabrick" {
+		q = lib.Firequeries{
+			Queries: []lib.Firequery{
+				{
+					Field:      "policyUid",
+					Operator:   "==",
+					QueryValue: policyUid,
+				},
+				{
+					Field:      "scheduleDate",
+					Operator:   "==",
+					QueryValue: scheduleDate,
+				},
+				{
+					Field:      "isDelete",
+					Operator:   "==",
+					QueryValue: false,
+				},
 			},
-			{
-				Field:      "providerId",
-				Operator:   "==",
-				QueryValue: providerId,
+		}
+	} else {
+		q = lib.Firequeries{
+			Queries: []lib.Firequery{
+				{
+					Field:      "policyUid",
+					Operator:   "==",
+					QueryValue: policyUid,
+				},
+				{
+					Field:      "providerId",
+					Operator:   "==",
+					QueryValue: providerId,
+				},
+				{
+					Field:      "isDelete",
+					Operator:   "==",
+					QueryValue: false,
+				},
 			},
-			{
-				Field:      "isDelete",
-				Operator:   "==",
-				QueryValue: false,
-			},
-		},
+		}
 	}
 	fireTransactions := lib.GetDatasetByEnv(origin, models.TransactionsCollection)
 	query, err := q.FirestoreWherefields(fireTransactions)
