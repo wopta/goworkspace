@@ -36,7 +36,12 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		codes                    map[string]map[string]string
 	)
 
-	log.Println(os.Getwd())
+	taxesByGuarantee := map[string]float64{
+		"death":                0,
+		"permanent-disability": 0.025,
+		"serious-ill":          0.025,
+		"temporary-disability": 0.025,
+	}
 
 	b, err := os.ReadFile(lib.GetAssetPathByEnv("companyData") + "/reverse-codes.json")
 	err = json.Unmarshal(b, &codes)
@@ -126,6 +131,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 			priceGross := ParseAxaFloat(r[8])
 			sumPriceGross += priceGross
+
 			guarante := models.Guarante{
 				Slug:                       slug,
 				CompanyCodec:               companyCodec,
@@ -218,6 +224,10 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			Assets: []models.Asset{{
 				Guarantees: guarantees,
 			}},
+		}
+
+		if policy.PaymentSplit == string(models.PaySplitMonthly) {
+			calculateMonthlyPrices(&policy, taxesByGuarantee)
 		}
 
 		if policy.HasGuarantee("death") {
@@ -371,6 +381,25 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	return "", nil, e
 }
 
+func calculateMonthlyPrices(policy *models.Policy, taxesByGuarantee map[string]float64) {
+	policy.PriceGrossMonthly = policy.PriceGross
+	policy.PriceGross *= 12
+
+	for index, guarantee := range policy.Assets[0].Guarantees {
+		policy.Assets[0].Guarantees[index].Value.PremiumGrossMonthly = lib.RoundFloat(guarantee.Value.PremiumGrossYearly, 2)
+		policy.Assets[0].Guarantees[index].Value.PremiumTaxAmountMonthly = lib.RoundFloat(policy.Assets[0].Guarantees[index].Value.PremiumGrossMonthly*taxesByGuarantee[guarantee.Slug], 2)
+		policy.Assets[0].Guarantees[index].Value.PremiumNetMonthly = lib.RoundFloat(policy.Assets[0].Guarantees[index].Value.PremiumGrossMonthly-policy.Assets[0].Guarantees[index].Value.PremiumTaxAmountMonthly, 2)
+		policy.TaxAmountMonthly += lib.RoundFloat(policy.Assets[0].Guarantees[index].Value.PremiumTaxAmountMonthly, 2)
+		policy.PriceNettMonthly += lib.RoundFloat(policy.Assets[0].Guarantees[index].Value.PremiumNetMonthly, 2)
+
+		policy.Assets[0].Guarantees[index].Value.PremiumGrossYearly = lib.RoundFloat(guarantee.Value.PremiumGrossYearly*12, 2)
+		policy.Assets[0].Guarantees[index].Value.PremiumTaxAmountYearly = lib.RoundFloat(policy.Assets[0].Guarantees[index].Value.PremiumGrossYearly*taxesByGuarantee[guarantee.Slug], 2)
+		policy.Assets[0].Guarantees[index].Value.PremiumNetYearly = lib.RoundFloat(policy.Assets[0].Guarantees[index].Value.PremiumGrossYearly-policy.Assets[0].Guarantees[index].Value.PremiumTaxAmountYearly, 2)
+		policy.TaxAmount += lib.RoundFloat(policy.Assets[0].Guarantees[index].Value.PremiumTaxAmountYearly, 2)
+		policy.PriceNett += lib.RoundFloat(policy.Assets[0].Guarantees[index].Value.PremiumNetYearly, 2)
+	}
+}
+
 var identityDocumentMap map[string]string = map[string]string{
 	"01": "Carta di Identità",
 	"02": "Patente di Guida",
@@ -513,7 +542,7 @@ func createTransaction(policy models.Policy, mgaProduct *models.Product, custome
 		IsDelete:        false,
 		UserToken:       customerId,
 		ProviderName:    policy.Payment,
-		PaymentMethod:   models.PayMethodRemittance,
+		PaymentMethod:   models.PayMethodTransfer,
 		Commissions:     lib.RoundFloat(product.GetCommissionByProduct(&policy, mgaProduct, false), 2),
 	}
 }
@@ -604,6 +633,10 @@ func createNetworkTransactions(
 	var err error
 
 	networkTransactions := make([]*models.NetworkTransaction, 0)
+
+	if policy.CodeCompany == "0000071" {
+		log.Printf("hello")
+	}
 
 	nt, err := createCompanyNetworkTransaction(policy, transaction, producerNode, mgaProduct)
 	if err != nil {
