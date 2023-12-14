@@ -318,8 +318,10 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 					isPay = true
 				}
 				tr = createTransaction(policy, mgaProducts[policy.ProductVersion], "", transactionPayDate, lib.RoundFloat(policy.PriceGross/12, 2), isPay)
-				transactions = append(transactions, tr)
-				networkTransactions = append(networkTransactions, createNetworkTransactions(&policy, &tr, networkNode, mgaProducts[policy.ProductVersion])...)
+				if isPay {
+					transactions = append(transactions, tr)
+					networkTransactions = append(networkTransactions, createNetworkTransactions(&policy, &tr, networkNode, mgaProducts[policy.ProductVersion])...)
+				}
 			}
 		} else {
 			tr := createTransaction(policy, mgaProducts[policy.ProductVersion], "", policy.EmitDate, lib.RoundFloat(policy.PriceGross, 2), true)
