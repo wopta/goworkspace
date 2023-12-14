@@ -67,7 +67,34 @@ func SetPolicyFirstTransactionPaid(policyUid string, scheduleDate string, origin
 	transaction.BigQuerySave(origin)
 }
 
-func GetTransactionByPolicyUidAndProviderId(policyUid, providerId, origin string) (models.Transaction, error) {
+func GetTransactionToBePaid(policyUid, providerId, scheduleDate, origin string) (models.Transaction, error) {
+	var (
+		transactions []models.Transaction
+		err          error
+	)
+
+	fireTransactions := lib.GetDatasetByEnv(origin, models.TransactionsCollection)
+
+	transactions, err = getTransactionByPolicyUidAndProviderId(policyUid, providerId, fireTransactions)
+	if err != nil {
+		log.Printf("[GetPolicyFirstTransaction] ERROR By ProviderId %s", err.Error())
+		return models.Transaction{}, err
+	}
+
+	if len(transactions) == 0 {
+		transactions, err = getTransactionByPolicyUidAndScheduleDate(policyUid, scheduleDate, fireTransactions)
+		if err != nil {
+			log.Printf("[GetPolicyFirstTransaction] ERROR By ScheduleDate %s", err.Error())
+			return models.Transaction{}, err
+		}
+	}
+
+	transaction := transactions[0]
+
+	return transaction, nil
+}
+
+func getTransactionByPolicyUidAndProviderId(policyUid, providerId, collection string) ([]models.Transaction, error) {
 	q := lib.Firequeries{
 		Queries: []lib.Firequery{
 			{
@@ -87,16 +114,41 @@ func GetTransactionByPolicyUidAndProviderId(policyUid, providerId, origin string
 			},
 		},
 	}
-	fireTransactions := lib.GetDatasetByEnv(origin, models.TransactionsCollection)
-	query, err := q.FirestoreWherefields(fireTransactions)
-	if err != nil {
-		log.Printf("[GetPolicyFirstTransaction] ERROR %s", err.Error())
-		return models.Transaction{}, err
-	}
-	transactions := models.TransactionToListData(query)
-	transaction := transactions[0]
 
-	return transaction, nil
+	query, err := q.FirestoreWherefields(collection)
+	if err != nil {
+		log.Printf("[getTransactionByPolicyUidAndProviderId] ERROR %s", err.Error())
+		return nil, err
+	}
+	return models.TransactionToListData(query), nil
+}
+
+func getTransactionByPolicyUidAndScheduleDate(policyUid, scheduleDate, collection string) ([]models.Transaction, error) {
+	q := lib.Firequeries{
+		Queries: []lib.Firequery{
+			{
+				Field:      "policyUid",
+				Operator:   "==",
+				QueryValue: policyUid,
+			},
+			{
+				Field:      "scheduleDate",
+				Operator:   "==",
+				QueryValue: scheduleDate,
+			},
+			{
+				Field:      "isDelete",
+				Operator:   "==",
+				QueryValue: false,
+			},
+		},
+	}
+	query, err := q.FirestoreWherefields(collection)
+	if err != nil {
+		log.Printf("[getTransactionByPolicyUidAndScheduleDate] ERROR %s", err.Error())
+		return nil, err
+	}
+	return models.TransactionToListData(query), nil
 }
 
 func Pay(transaction *models.Transaction, origin, paymentMethod string) error {
