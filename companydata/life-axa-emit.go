@@ -129,7 +129,7 @@ func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.T
 	log.Println("LifeAxalEmit:  fil.Records()[0]:", fil.Records()[0])
 	log.Println("LifeAxalEmit:  filtered col", fil.Ncol())
 	log.Println("LifeAxalEmit: filtered row", fil.Nrow())
-	if policy.ProducerUid != "" {
+	if policy.ProducerUid != "" && policy.Channel == "network" {
 		var node *models.NetworkNode
 		snap, e := lib.GetFirestoreErr("networkNodes", policy.ProducerUid)
 		log.Println(e)
