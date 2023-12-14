@@ -9,8 +9,6 @@ import (
 )
 
 func GetPoliciesByQueries(origin string, queries []models.Query, limitValue int) ([]models.Policy, error) {
-	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
-
 	fireQueries := lib.Firequeries{
 		Queries: make([]lib.Firequery, 0),
 	}
@@ -29,8 +27,18 @@ func GetPoliciesByQueries(origin string, queries []models.Query, limitValue int)
 		})
 	}
 
-	docSnap, err := fireQueries.FirestoreWhereLimitFields(firePolicy, limitValue)
-	return models.PolicyToListData(docSnap), err
+	// convert queries to lib.Query
+	queriesLib := make([]models.Query, 0)
+	for _, q := range queries {
+		queriesLib = append(queriesLib, models.Query{
+			Field:      q.Field,
+			Op:         getQueryOperator(q.Op),
+			Value:      q.Value,
+			Type:       q.Type,
+		})
+	}
+	
+	return GetPoliciesByQueriesBigQuery(models.WoptaDataset, "policiesViewTmp", queriesLib, limitValue)
 }
 
 func getQueryOperator(queryOp string) string {
@@ -41,6 +49,9 @@ func getQueryOperator(queryOp string) string {
 		return ">="
 	case "neq":
 		return "!="
+	case "==":
+		return "="
+	default:
+		return queryOp
 	}
-	return queryOp
 }
