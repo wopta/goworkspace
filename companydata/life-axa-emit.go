@@ -37,7 +37,6 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	now, upload := getRequestData(req)
 	from, to, refMontly, filenamesplit = AxaPartnersSchedule(now)
 	cabCsv = lib.GetFilesByEnv("data/cab-cap-istat.csv")
-
 	log.Println("LifeAxalEmit now: " + now.String())
 	log.Println("LifeAxalEmit now.Day: ", now.Day())
 	log.Println("LifeAxalEmit from: " + from.String())
@@ -94,7 +93,7 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 		)
 		docsnap := lib.GetFirestore("policy", transaction.PolicyUid)
 		docsnap.DataTo(&policy)
-		result = append(result, setRowLifeEmit(policy, df, transaction)...)
+		result = append(result, setRowLifeEmit(policy, df, transaction, now)...)
 
 		transaction.IsEmit = true
 
@@ -112,7 +111,7 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	return "", nil, e
 }
 
-func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.Transaction) [][]string {
+func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.Transaction, now time.Time) [][]string {
 	var (
 		result               [][]string
 		residenceCab         string
@@ -150,6 +149,7 @@ func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.T
 				beneficiary1, beneficiary2, beneficiary1T string
 				beneficiary1S, beneficiary2S              models.Beneficiary
 			)
+
 			beneficiary1, beneficiary1S, beneficiary1T = mapBeneficiary(g, 0) //Codice Fiscale Beneficiario
 			beneficiary2, beneficiary2S, _ = mapBeneficiary(g, 0)
 			if policy.PaymentSplit == string(models.PaySplitMonthly) {
@@ -168,9 +168,9 @@ func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.T
 			row := []string{
 				mapCodecCompany(policy, g.CompanyCodec),    //Codice schema
 				policy.CodeCompany,                         //N° adesione individuale univoco
-				getRenew(policy),                           //Tipo di Transazione
+				getRenew(policy, now),                      //Tipo di Transazione
 				getFormatdate(policy.StartDate),            //Data di decorrenza
-				getFormatdate(getRenewDate(policy, trans)), //"Data di rinnovo"
+				getFormatdate(getRenewDate(policy, trans,now)), //"Data di rinnovo"
 				mapCoverageDuration(policy),                //"Durata copertura assicurativa"
 				fmt.Sprint(g.Value.Duration.Year * 12),     //"Durata complessiva"
 				priceGrossFormat,                           //"Premio assicurativo lordo"
@@ -460,9 +460,8 @@ func getFormatBithdate(d string) string {
 
 }
 
-func getRenew(p models.Policy) string {
+func getRenew(p models.Policy, now time.Time) string {
 	var result string
-	now := time.Now()
 	addMonth := p.StartDate.AddDate(0, 1, 0)
 	if p.PaymentSplit == string(models.PaySplitYear) || p.PaymentSplit == string(models.PaySplitYearly) {
 
@@ -487,9 +486,8 @@ func getRenew(p models.Policy) string {
 	return result
 }
 
-func getRenewDate(p models.Policy, trans models.Transaction) time.Time {
+func getRenewDate(p models.Policy, trans models.Transaction,now time.Time) time.Time {
 	var result time.Time
-	now := time.Now()
 	addMonth := p.StartDate.AddDate(0, 1, 0)
 	if p.PaymentSplit == "year" || p.PaymentSplit == string(models.PaySplitYearly) {
 		result = p.StartDate
