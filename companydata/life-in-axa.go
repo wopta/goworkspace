@@ -3,6 +3,7 @@ package companydata
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/google/uuid"
 	"github.com/wopta/goworkspace/network"
 	"github.com/wopta/goworkspace/product"
 	"github.com/wopta/goworkspace/user"
@@ -286,17 +287,19 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		result[codeCompany] = map[string]interface{}{
 			"policy":              policy,
 			"transactions":        []models.Transaction{},
-			"networkTransactions": []models.NetworkTransaction{},
+			"networkTransactions": []*models.NetworkTransaction{},
 		}
 
 		// create transactions and network node transactions
 
 		transactions := make([]models.Transaction, 0)
+		networkTransactions := make([]*models.NetworkTransaction, 0)
 
 		if monthlyPolicies[policy.CodeCompany] != nil {
 			transactionPayDate := policy.StartDate
 			tr := createTransaction(policy, mgaProducts[policy.ProductVersion], "", transactionPayDate, lib.RoundFloat(policy.PriceGross/12, 2), true)
 			transactions = append(transactions, tr)
+			networkTransactions = append(networkTransactions, createNetworkTransactions(&policy, &tr, networkNode, mgaProducts[policy.ProductVersion])...)
 			isPay := false
 			for i := 1; i < 12; i++ {
 				transactionPayDate = transactionPayDate.AddDate(0, 1, 0)
@@ -306,13 +309,17 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 				}
 				tr = createTransaction(policy, mgaProducts[policy.ProductVersion], "", transactionPayDate, lib.RoundFloat(policy.PriceGross/12, 2), isPay)
 				transactions = append(transactions, tr)
+				networkTransactions = append(networkTransactions, createNetworkTransactions(&policy, &tr, networkNode, mgaProducts[policy.ProductVersion])...)
 			}
 		} else {
 			tr := createTransaction(policy, mgaProducts[policy.ProductVersion], "", policy.EmitDate, lib.RoundFloat(policy.PriceGross, 2), true)
 			transactions = append(transactions, tr)
+			networkTransactions = append(networkTransactions, createNetworkTransactions(&policy, &tr, networkNode, mgaProducts[policy.ProductVersion])...)
+
 		}
 
 		result[codeCompany]["transactions"] = transactions
+		result[codeCompany]["networkTransactions"] = networkTransactions
 
 		// update node portfolio
 
@@ -432,20 +439,6 @@ func ParseDateDDMMYYYY(date string) time.Time {
 }
 
 func ParseAxaFloat(price string) float64 {
-	// //pricelen:=len("0000001500000")
-	// if len(price) > 3 {
-	// 	log.Println("LifeIn ParseAxaFloat price:", price)
-
-	// 	d := price[len(price)-2:]
-	// 	i := price[:len(price)-3]
-	// 	f64string := i + "." + d
-	// 	res, e := strconv.ParseFloat(f64string, 64)
-	// 	log.Println("LifeIn ParseAxaFloat d:", res)
-	// 	log.Println(e)
-	// 	return res
-	// }
-	// return 0
-
 	princeInCents, _ := strconv.ParseFloat(price, 64)
 	return princeInCents / 100.0
 }
@@ -523,4 +516,160 @@ func createTransaction(policy models.Policy, mgaProduct *models.Product, custome
 		PaymentMethod:   models.PayMethodRemittance,
 		Commissions:     lib.RoundFloat(product.GetCommissionByProduct(&policy, mgaProduct, false), 2),
 	}
+}
+
+func createNetworkTransaction(
+	policy *models.Policy,
+	transaction *models.Transaction,
+	node *models.NetworkNode,
+	commission float64, // Amount
+	mgaAccountType, paymentType, name string,
+) (*models.NetworkTransaction, error) {
+	var amount float64
+
+	switch paymentType {
+	case models.PaymentTypeRemittanceCompany, models.PaymentTypeCommission:
+		amount = lib.RoundFloat(commission, 2)
+	case models.PaymentTypeRemittanceMga:
+		amount = lib.RoundFloat(transaction.Amount-commission, 2)
+	}
+
+	netTransaction := models.NetworkTransaction{
+		Uid:              uuid.New().String(),
+		PolicyUid:        policy.Uid,
+		TransactionUid:   transaction.Uid,
+		NetworkNodeUid:   node.Uid,
+		NetworkNodeType:  node.Type,
+		AccountType:      mgaAccountType,
+		PaymentType:      paymentType,
+		Amount:           amount,
+		AmountNet:        amount, // TBD
+		Name:             name,
+		Status:           models.NetworkTransactionStatusPaid,
+		StatusHistory:    []string{models.NetworkTransactionStatusCreated, models.NetworkTransactionStatusToPay, models.NetworkTransactionStatusPaid},
+		IsPay:            true,
+		IsConfirmed:      false,
+		IsDelete:         false,
+		CreationDate:     lib.GetBigQueryNullDateTime(transaction.PayDate),
+		PayDate:          lib.GetBigQueryNullDateTime(transaction.PayDate),
+		TransactionDate:  lib.GetBigQueryNullDateTime(transaction.PayDate),
+		ConfirmationDate: lib.GetBigQueryNullDateTime(time.Time{}),
+		DeletionDate:     lib.GetBigQueryNullDateTime(time.Time{}),
+	}
+
+	//jsonLog, _ := json.Marshal(&netTransaction)
+
+	/*err := netTransaction.SaveBigQuery()
+	if err != nil {
+		log.Printf("[createNetworkTransaction] error saving network transaction to bigquery: %s", err.Error())
+		return nil, err
+	}*/
+
+	//log.Printf("[createNetworkTransaction] network transaction created! %s", string(jsonLog))
+
+	return &netTransaction, nil
+}
+
+func createCompanyNetworkTransaction(
+	policy *models.Policy,
+	transaction *models.Transaction,
+	producerNode *models.NetworkNode,
+	mgaProduct *models.Product,
+) (*models.NetworkTransaction, error) {
+	var code string
+
+	commissionMga := product.GetCommissionByProduct(policy, mgaProduct, false)
+	commissionCompany := lib.RoundFloat(transaction.Amount-commissionMga, 2)
+	code = producerNode.Code
+
+	name := strings.ToUpper(strings.Join([]string{code, policy.Company}, "-"))
+
+	return createNetworkTransaction(
+		policy,
+		transaction,
+		&models.NetworkNode{},
+		commissionCompany,
+		models.AccountTypePassive,
+		models.PaymentTypeRemittanceCompany,
+		name,
+	)
+}
+
+func createNetworkTransactions(
+	policy *models.Policy,
+	transaction *models.Transaction,
+	producerNode *models.NetworkNode,
+	mgaProduct *models.Product,
+) []*models.NetworkTransaction {
+	var err error
+
+	networkTransactions := make([]*models.NetworkTransaction, 0)
+
+	nt, err := createCompanyNetworkTransaction(policy, transaction, producerNode, mgaProduct)
+	if err != nil {
+		log.Printf("[CreateNetworkTransactions] error creating company network-transaction: %s", err.Error())
+		return nil
+	}
+
+	networkTransactions = append(networkTransactions, nt)
+
+	if policy.ProducerUid != "" && policy.ProducerType != models.PartnershipNetworkNodeType {
+		network.TraverseWithCallbackNetworkByNodeUid(producerNode, "", func(currentNode *models.NetworkNode, currentName string) string {
+			var (
+				accountType, paymentType string
+				baseName                 string
+			)
+
+			warrant := currentNode.GetWarrant()
+			if warrant == nil {
+				log.Printf("[CreateNetworkTransactions] error getting warrant for node: %s", currentNode.Uid)
+				return ""
+			}
+			prod := warrant.GetProduct(policy.Name)
+			if warrant == nil {
+				log.Printf("[CreateNetworkTransactions] error getting product for warrant: %s", warrant.Name)
+				return ""
+			}
+
+			accountType = getAccountType(transaction)
+			paymentType = getPaymentType(transaction, policy, currentNode)
+			commission := product.GetCommissionByProduct(policy, prod, policy.ProducerUid == currentNode.Uid)
+
+			if currentName != "" {
+				baseName = strings.ToUpper(strings.Join([]string{currentName, currentNode.Code}, "__"))
+			} else {
+				baseName = strings.ToUpper(currentNode.Code)
+			}
+			nodeName := strings.ToUpper(strings.Join([]string{
+				baseName,
+				strings.ReplaceAll(currentNode.GetName(), " ", "-"),
+			}, "-"))
+
+			nt, err = createNetworkTransaction(policy, transaction, currentNode, commission, accountType, paymentType, nodeName)
+			if err != nil {
+				log.Printf("[CreateNetworkTransactions] error creating network-transaction: %s", err.Error())
+			} else {
+				log.Printf("[CreateNetworkTransactions] created network-transaction for node: %s", currentNode.Uid)
+			}
+
+			networkTransactions = append(networkTransactions, nt)
+			return ""
+		})
+	}
+
+	return networkTransactions
+}
+
+func getAccountType(transaction *models.Transaction) string {
+	if transaction.PaymentMethod == models.PayMethodRemittance {
+		return models.AccountTypeActive
+	}
+	return models.AccountTypePassive
+}
+
+func getPaymentType(transaction *models.Transaction, policy *models.Policy, producerNode *models.NetworkNode) string {
+	if policy.ProducerUid == producerNode.Uid && transaction.PaymentMethod == models.PayMethodRemittance {
+		return models.PaymentTypeRemittanceMga
+	}
+	return models.PaymentTypeCommission
 }
