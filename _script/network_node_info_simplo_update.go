@@ -16,6 +16,7 @@ func UpdateNetworkNodeInfoSimplo() {
 
 	for _, nn := range networkNodes {
 		nn.HasAnnex = true
+		nn.IsMgaProponent = true
 		nn.Designation = "Addetto Attività intermediazione al di fuori dei locali"
 		nn.WorksForUid = "__wopta__"
 

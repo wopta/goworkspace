@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func updateNetworkNodes() {
+func UpdateNetworkNodesCodes() {
 	networkNodes := make([]models.NetworkNode, 0)
 	updatedNodes := 0
 
