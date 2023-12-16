@@ -29,7 +29,7 @@ type NetworkNode struct {
 	IsActive            bool                  `json:"isActive" firestore:"isActive" bigquery:"isActive"`
 	Users               []string              `json:"users" firestore:"users" bigquery:"users"`
 	Products            []Product             `json:"products" firestore:"products" bigquery:"-"`
-	BigProducts         []NodeProduct         `json:"-" firestore:"-" bigquery:"products"`
+	BigProducts         []NodeProduct         `json:"-" firestore:"-" bigquery:"newProducts"`
 	Policies            []string              `json:"policies" firestore:"policies" bigquery:"policies"`
 	Agent               *AgentNode            `json:"agent,omitempty" firestore:"agent,omitempty" bigquery:"agent"`
 	Agency              *AgencyNode           `json:"agency,omitempty" firestore:"agency,omitempty" bigquery:"agency"`

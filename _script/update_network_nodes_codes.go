@@ -34,7 +34,6 @@ func UpdateNetworkNodesCodes() {
 		networkNodes = append(networkNodes, networkNode)
 	}
 
-	log.Printf("Total Nodes: %d", len(networkNodes))
 	notUpdatedNodes := 0
 
 	for _, nn := range networkNodes {
@@ -44,7 +43,7 @@ func UpdateNetworkNodesCodes() {
 			nn.SaveBigQuery("")
 			continue
 		} else if nn.Type != models.AgencyNetworkNodeType && nn.Type != models.AgentNetworkNodeType {
-			log.Printf("Node Uid: %s", nn.Uid)
+			log.Printf("Network Node %s Not Updated", nn.Code)
 			notUpdatedNodes++
 			continue
 		}
@@ -94,7 +93,7 @@ func UpdateNetworkNodesCodes() {
 				},
 			}
 		} else {
-			log.Printf("Node Uid: %s", nn.Uid)
+			log.Printf("Network Node %s Not Updated", nn.Code)
 			notUpdatedNodes++
 			continue
 		}
@@ -109,9 +108,10 @@ func UpdateNetworkNodesCodes() {
 			log.Println(nn.Uid + " error: " + err.Error())
 		}
 		updatedNodes++
-		log.Println("done")
+		log.Printf("Network Node %s Updated Succesfully", nn.Code)
 	}
 
+	log.Printf("Total Nodes: %d", len(networkNodes))
 	log.Printf("Updated Nodes: %d", updatedNodes)
 	log.Printf("Not Updated Nodes: %d", notUpdatedNodes)
 }
