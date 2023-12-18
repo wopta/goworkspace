@@ -675,12 +675,12 @@ func createNetworkTransactions(
 			warrant := currentNode.GetWarrant()
 			if warrant == nil {
 				log.Printf("[CreateNetworkTransactions] error getting warrant for node: %s", currentNode.Uid)
-				return ""
+				return baseName
 			}
 			prod := warrant.GetProduct(policy.Name)
 			if warrant == nil {
 				log.Printf("[CreateNetworkTransactions] error getting product for warrant: %s", warrant.Name)
-				return ""
+				return baseName
 			}
 
 			accountType = getAccountType(transaction)
@@ -705,7 +705,7 @@ func createNetworkTransactions(
 			}
 
 			networkTransactions = append(networkTransactions, nt)
-			return ""
+			return baseName
 		})
 	}
 
