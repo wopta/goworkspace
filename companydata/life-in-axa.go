@@ -308,25 +308,28 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		networkTransactions := make([]*models.NetworkTransaction, 0)
 
 		if monthlyPolicies[policy.CodeCompany] != nil {
+			scheduleDate := policy.EmitDate
 			transactionPayDate := policy.StartDate
-			tr := createTransaction(policy, mgaProducts[policy.ProductVersion], "", transactionPayDate, lib.RoundFloat(policy.PriceGross/12, 2), true)
+			tr := createTransaction(policy, mgaProducts[policy.ProductVersion], "", scheduleDate, transactionPayDate, lib.RoundFloat(policy.PriceGross/12, 2), true)
 			transactions = append(transactions, tr)
 			networkTransactions = append(networkTransactions, createNetworkTransactions(&policy, &tr, networkNode, mgaProducts[policy.ProductVersion])...)
-			isPay := false
 			for i := 1; i < 12; i++ {
-				transactionPayDate = transactionPayDate.AddDate(0, 1, 0)
-				payDateString := transactionPayDate.Format("02012006")
+				transactionPayDate = time.Time{}
+				scheduleDate = scheduleDate.AddDate(0, 1, 0)
+				isPay := false
+				payDateString := scheduleDate.Format("02012006")
 				if monthlyPolicies[policy.CodeCompany][payDateString] != nil {
 					isPay = true
+					transactionPayDate = scheduleDate
 				}
-				tr = createTransaction(policy, mgaProducts[policy.ProductVersion], "", transactionPayDate, lib.RoundFloat(policy.PriceGross/12, 2), isPay)
+				tr = createTransaction(policy, mgaProducts[policy.ProductVersion], "", scheduleDate, transactionPayDate, lib.RoundFloat(policy.PriceGross/12, 2), isPay)
+				transactions = append(transactions, tr)
 				if isPay {
-					transactions = append(transactions, tr)
 					networkTransactions = append(networkTransactions, createNetworkTransactions(&policy, &tr, networkNode, mgaProducts[policy.ProductVersion])...)
 				}
 			}
 		} else {
-			tr := createTransaction(policy, mgaProducts[policy.ProductVersion], "", policy.EmitDate, lib.RoundFloat(policy.PriceGross, 2), true)
+			tr := createTransaction(policy, mgaProducts[policy.ProductVersion], "", policy.EmitDate, policy.EmitDate, lib.RoundFloat(policy.PriceGross, 2), true)
 			transactions = append(transactions, tr)
 			networkTransactions = append(networkTransactions, createNetworkTransactions(&policy, &tr, networkNode, mgaProducts[policy.ProductVersion])...)
 
@@ -525,7 +528,19 @@ func GroupBy(df dataframe.DataFrame, col int) map[string][][]string {
 	return res
 }
 
-func createTransaction(policy models.Policy, mgaProduct *models.Product, customerId string, payDate time.Time, priceGross float64, isPay bool) models.Transaction {
+func createTransaction(policy models.Policy, mgaProduct *models.Product, customerId string, scheduleDate time.Time, payDate time.Time, priceGross float64, isPay bool) models.Transaction {
+	status := models.TransactionStatusToPay
+	statusHistory := []string{models.TransactionStatusToPay}
+	paymentMethod := ""
+
+	if isPay {
+		status = models.TransactionStatusPay
+		statusHistory = append(statusHistory, models.TransactionStatusPay)
+		paymentMethod = models.PayMethodTransfer
+	}
+
+	expireDate := scheduleDate.AddDate(10, 0, 0)
+
 	return models.Transaction{
 		Amount:          priceGross,
 		Uid:             lib.NewDoc(models.TransactionsCollection),
@@ -533,10 +548,10 @@ func createTransaction(policy models.Policy, mgaProduct *models.Product, custome
 		PolicyUid:       policy.Uid,
 		CreationDate:    policy.EmitDate,
 		UpdateDate:      time.Now().UTC(),
-		Status:          models.TransactionStatusPay,
-		StatusHistory:   []string{models.TransactionStatusToPay, models.TransactionStatusPay},
-		ScheduleDate:    policy.EmitDate.Format(models.TimeDateOnly),
-		ExpirationDate:  policy.EmitDate.AddDate(10, 0, 0).Format(models.TimeDateOnly),
+		Status:          status,
+		StatusHistory:   statusHistory,
+		ScheduleDate:    scheduleDate.Format(models.TimeDateOnly),
+		ExpirationDate:  expireDate.Format(models.TimeDateOnly),
 		NumberCompany:   policy.CodeCompany,
 		IsPay:           isPay,
 		PayDate:         payDate,
@@ -546,7 +561,7 @@ func createTransaction(policy models.Policy, mgaProduct *models.Product, custome
 		IsDelete:        false,
 		UserToken:       customerId,
 		ProviderName:    policy.Payment,
-		PaymentMethod:   models.PayMethodTransfer,
+		PaymentMethod:   paymentMethod,
 		Commissions:     lib.RoundFloat(product.GetCommissionByProduct(&policy, mgaProduct, false), 2),
 	}
 }
