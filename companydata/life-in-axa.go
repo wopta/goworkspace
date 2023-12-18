@@ -341,7 +341,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		if monthlyPolicies[policy.CodeCompany] != nil {
 			scheduleDate := policy.EmitDate
 			transactionPayDate := policy.StartDate
-			tr := createTransaction(policy, mgaProducts[policy.ProductVersion], "", scheduleDate, transactionPayDate, lib.RoundFloat(policy.PriceGross/12, 2), true)
+			tr := createTransaction(policy, mgaProducts[policy.ProductVersion], "", scheduleDate, transactionPayDate, policy.PriceGrossMonthly, policy.PriceNettMonthly, true)
 			transactions = append(transactions, tr)
 			networkTransactions = append(networkTransactions, createNetworkTransactions(&policy, &tr, networkNode, mgaProducts[policy.ProductVersion])...)
 			for i := 1; i < 12; i++ {
@@ -353,14 +353,14 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 					isPay = true
 					transactionPayDate = scheduleDate
 				}
-				tr = createTransaction(policy, mgaProducts[policy.ProductVersion], "", scheduleDate, transactionPayDate, lib.RoundFloat(policy.PriceGross/12, 2), isPay)
+				tr = createTransaction(policy, mgaProducts[policy.ProductVersion], "", scheduleDate, transactionPayDate, policy.PriceGrossMonthly, policy.PriceNettMonthly, isPay)
 				transactions = append(transactions, tr)
 				if isPay {
 					networkTransactions = append(networkTransactions, createNetworkTransactions(&policy, &tr, networkNode, mgaProducts[policy.ProductVersion])...)
 				}
 			}
 		} else {
-			tr := createTransaction(policy, mgaProducts[policy.ProductVersion], "", policy.EmitDate, policy.EmitDate, lib.RoundFloat(policy.PriceGross, 2), true)
+			tr := createTransaction(policy, mgaProducts[policy.ProductVersion], "", policy.EmitDate, policy.EmitDate, policy.PriceGross, policy.PriceNett, true)
 			transactions = append(transactions, tr)
 			networkTransactions = append(networkTransactions, createNetworkTransactions(&policy, &tr, networkNode, mgaProducts[policy.ProductVersion])...)
 
@@ -608,7 +608,7 @@ func GroupBy(df dataframe.DataFrame, col int) map[string][][]string {
 	return res
 }
 
-func createTransaction(policy models.Policy, mgaProduct *models.Product, customerId string, scheduleDate time.Time, payDate time.Time, priceGross float64, isPay bool) models.Transaction {
+func createTransaction(policy models.Policy, mgaProduct *models.Product, customerId string, scheduleDate time.Time, payDate time.Time, priceGross, priceNett float64, isPay bool) models.Transaction {
 	status := models.TransactionStatusToPay
 	statusHistory := []string{models.TransactionStatusToPay}
 	paymentMethod := ""
@@ -623,6 +623,7 @@ func createTransaction(policy models.Policy, mgaProduct *models.Product, custome
 
 	return models.Transaction{
 		Amount:          priceGross,
+		AmountNet:       priceNett,
 		Uid:             lib.NewDoc(models.TransactionsCollection),
 		PolicyName:      policy.Name,
 		PolicyUid:       policy.Uid,
