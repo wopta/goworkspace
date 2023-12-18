@@ -153,6 +153,9 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 						Year: guaranteeYearDuration,
 					},
 				},
+				IsSellable:     true,
+				IsSelected:     true,
+				IsConfigurable: true,
 			}
 
 			sumPriceTaxAmount += guarante.Value.PremiumTaxAmountYearly
@@ -258,7 +261,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			},
 		}
 
-		//calculateMonthlyPrices(&policy, taxesByGuarantee, policy.PaymentSplit)
+		calculateMonthlyPrices(&policy)
 
 		if policy.HasGuarantee("death") {
 
@@ -416,8 +419,38 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	return "", nil, e
 }
 
-func calculateMonthlyPrices(policy *models.Policy, taxesByGuarantee map[string]float64, paymentSplit string) {
-	if paymentSplit == string(models.PaySplitMonthly) {
+func calculateMonthlyPrices(policy *models.Policy) {
+	if policy.PaymentSplit == string(models.PaySplitMonthly) {
+		policy.PriceGross = lib.RoundFloat(policy.PriceGross*12, 2)
+		policy.PriceNett = lib.RoundFloat(policy.PriceNett*12, 2)
+		policy.TaxAmount = lib.RoundFloat(policy.TaxAmount*12, 2)
+
+		for index, guarantee := range policy.Assets[0].Guarantees {
+			policy.Assets[0].Guarantees[index].Value.PremiumGrossYearly = lib.RoundFloat(guarantee.Value.PremiumGrossYearly*12, 2)
+			policy.Assets[0].Guarantees[index].Value.PremiumNetYearly = lib.RoundFloat(guarantee.Value.PremiumNetYearly*12, 2)
+			policy.Assets[0].Guarantees[index].Value.PremiumTaxAmountYearly = lib.RoundFloat(guarantee.Value.PremiumNetYearly*12, 2)
+		}
+
+		policy.OffersPrices["default"][string(models.PaySplitYearly)].Gross = lib.RoundFloat(policy.OffersPrices["default"][string(models.PaySplitYearly)].Gross*12, 2)
+		policy.OffersPrices["default"][string(models.PaySplitYearly)].Net = lib.RoundFloat(policy.OffersPrices["default"][string(models.PaySplitYearly)].Net*12, 2)
+		policy.OffersPrices["default"][string(models.PaySplitYearly)].Tax = lib.RoundFloat(policy.OffersPrices["default"][string(models.PaySplitYearly)].Tax*12, 2)
+	} else {
+		policy.PriceGrossMonthly = lib.RoundFloat(policy.PriceGrossMonthly/12, 2)
+		policy.PriceNettMonthly = lib.RoundFloat(policy.PriceNettMonthly/12, 2)
+		policy.TaxAmountMonthly = lib.RoundFloat(policy.TaxAmountMonthly/12, 2)
+
+		for index, guarantee := range policy.Assets[0].Guarantees {
+			policy.Assets[0].Guarantees[index].Value.PremiumGrossMonthly = lib.RoundFloat(guarantee.Value.PremiumGrossMonthly/12, 2)
+			policy.Assets[0].Guarantees[index].Value.PremiumNetMonthly = lib.RoundFloat(guarantee.Value.PremiumNetMonthly/12, 2)
+			policy.Assets[0].Guarantees[index].Value.PremiumTaxAmountMonthly = lib.RoundFloat(guarantee.Value.PremiumTaxAmountMonthly/12, 2)
+		}
+
+		policy.OffersPrices["default"][string(models.PaySplitMonthly)].Gross = lib.RoundFloat(policy.OffersPrices["default"][string(models.PaySplitMonthly)].Gross/12, 2)
+		policy.OffersPrices["default"][string(models.PaySplitMonthly)].Net = lib.RoundFloat(policy.OffersPrices["default"][string(models.PaySplitMonthly)].Net/12, 2)
+		policy.OffersPrices["default"][string(models.PaySplitMonthly)].Tax = lib.RoundFloat(policy.OffersPrices["default"][string(models.PaySplitMonthly)].Tax/12, 2)
+	}
+
+	/*if paymentSplit == string(models.PaySplitMonthly) {
 		policy.PriceGrossMonthly = lib.RoundFloat(policy.PriceGross, 2)
 		policy.PriceGross = lib.RoundFloat(policy.PriceGross*12, 2)
 	} else {
@@ -451,7 +484,7 @@ func calculateMonthlyPrices(policy *models.Policy, taxesByGuarantee map[string]f
 		policy.Assets[0].Guarantees[index].Value.PremiumNetYearly = lib.RoundFloat(policy.Assets[0].Guarantees[index].Value.PremiumGrossYearly-policy.Assets[0].Guarantees[index].Value.PremiumTaxAmountYearly, 2)
 		policy.TaxAmount = lib.RoundFloat(policy.TaxAmount+policy.Assets[0].Guarantees[index].Value.PremiumTaxAmountYearly, 2)
 		policy.PriceNett += lib.RoundFloat(policy.PriceNett+policy.Assets[0].Guarantees[index].Value.PremiumNetYearly, 2)
-	}
+	}*/
 }
 
 var identityDocumentMap map[string]string = map[string]string{
