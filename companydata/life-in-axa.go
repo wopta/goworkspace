@@ -209,6 +209,15 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			},
 			CreationDate: ParseDateDDMMYYYY(row[4]),
 			UpdatedDate:  time.Now().UTC(),
+			Consens: &[]models.Consens{
+				{
+					Title:        "Privacy",
+					Consens:      "Il sottoscritto, letta e compresa l'informativa sul trattamento dei dati personali, ACCONSENTE al trattamento dei propri dati personali da parte di Wopta Assicurazioni per l'invio di comunicazioni e proposte commerciali e di marketing, incluso l'invio di newsletter e ricerche di mercato, attraverso strumenti automatizzati (sms, mms, e-mail, ecc.) e non (posta cartacea e telefono con operatore).",
+					Key:          2,
+					Answer:       false,
+					CreationDate: ParseDateDDMMYYYY(row[4]),
+				},
+			},
 		}
 
 		policy := models.Policy{
