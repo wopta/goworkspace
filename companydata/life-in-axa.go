@@ -94,6 +94,8 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			log.Println("LifeIn  i: ", i)
 			log.Println("LifeIn  pol: ", r)
 
+			payDate = fmt.Sprintf("%08s", strings.TrimSpace(r[5]))
+
 			if strings.TrimSpace(r[3]) == "R" {
 				if monthlyPolicies[codeCompany] == nil {
 					monthlyPolicies[codeCompany] = make(map[string][][]string, 0)
