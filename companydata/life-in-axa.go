@@ -284,6 +284,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 				Type:             identityDocumentMap[identityDocumentCode],
 				DateOfIssue:      ParseDateDDMMYYYY(row[78]),
 				IssuingAuthority: strings.TrimSpace(lib.Capitalize(row[79])),
+				PlaceOfIssue:     strings.TrimSpace(lib.Capitalize(row[79])),
 			}}
 
 			for index, _ := range insured.IdentityDocuments {
