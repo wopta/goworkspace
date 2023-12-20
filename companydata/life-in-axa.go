@@ -79,6 +79,13 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			nil),
 	}
 
+	networkProducts := map[string]*models.Product{
+		models.ProductV1: product.GetProductV2(models.LifeProduct, models.ProductV1, models.NetworkChannel, nil,
+			nil),
+		models.ProductV2: product.GetProductV2(models.LifeProduct, models.ProductV2, models.NetworkChannel, nil,
+			nil),
+	}
+
 	for v, pol := range group {
 		var (
 			row                                                                 []string
@@ -122,7 +129,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 				continue
 			}
 
-			companyCodec, slug, _, _ := LifeMapCodecCompanyAxaRevert(r[1])
+			companyCodec, slug, version, _ := LifeMapCodecCompanyAxaRevert(r[1])
 			if slug == "death" {
 				if r[82] == "GE" {
 					beneficiaries = append(beneficiaries, models.Beneficiary{
@@ -150,9 +157,16 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			sumPriceGross += priceGross
 			sumPriceGrossMonthly += priceGross
 
+			productVersion := fmt.Sprintf("v%s", version)
+
 			guarante := models.Guarante{
 				Slug:                       slug,
 				CompanyCodec:               companyCodec,
+				Description:                networkProducts[productVersion].Companies[0].GuaranteesMap[slug].Description,
+				Group:                      mgaProducts[productVersion].Companies[0].GuaranteesMap[slug].Group,
+				Type:                       mgaProducts[productVersion].Companies[0].GuaranteesMap[slug].Type,
+				Name:                       mgaProducts[productVersion].Companies[0].GuaranteesMap[slug].Name,
+				CompanyName:                mgaProducts[productVersion].Companies[0].GuaranteesMap[slug].Name,
 				SumInsuredLimitOfIndemnity: 0,
 				Beneficiaries:              &beneficiaries,
 				Value: &models.GuaranteValue{
@@ -167,9 +181,11 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 						Year: guaranteeYearDuration,
 					},
 				},
+				Config:         networkProducts[productVersion].Companies[0].GuaranteesMap[slug].Config,
 				IsSellable:     true,
 				IsSelected:     true,
 				IsConfigurable: true,
+				Order:          mgaProducts[productVersion].Companies[0].GuaranteesMap[slug].Order,
 			}
 
 			sumPriceTaxAmount += guarante.Value.PremiumTaxAmountYearly
