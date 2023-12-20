@@ -1,6 +1,8 @@
 package companydata
 
 import (
+	"cloud.google.com/go/bigquery"
+	"cloud.google.com/go/civil"
 	"encoding/json"
 	"fmt"
 	"github.com/google/uuid"
@@ -440,6 +442,8 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 			// save policy bigquery
 
+			policyBigquerySave(policy)
+
 			// save transactions firestore
 
 			for _, res := range transactionsOutput {
@@ -451,9 +455,12 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 				// save transactions bigquery
 
-				/*for _, nt := range res.NetworkTransactions {
+				transactionBigQuerySave(res.Transaction)
+
+				for _, nt := range res.NetworkTransactions {
 					// save network transactions bigquery
-				}*/
+					networkTransactionBigQuerySave(*nt)
+				}
 			}
 
 			// save user firestore
@@ -466,6 +473,8 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 			// save user bigquery
 
+			userBigQuerySave(policy.Contractor)
+
 			// save network node firestore
 
 			err = lib.SetFirestoreErr(fmt.Sprintf("import-%s", models.NetworkNodesCollection), networkNode.Uid, networkNode)
@@ -475,6 +484,8 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			}
 
 			// save network node bigquery
+
+			networkNodeBigQuerySave(*networkNode)
 
 			// save single guarantees into bigquery
 		}
@@ -854,4 +865,238 @@ func getPaymentType(transaction *models.Transaction, policy *models.Policy, prod
 		return models.PaymentTypeRemittanceMga
 	}
 	return models.PaymentTypeCommission
+}
+
+func policyBigquerySave(policy models.Policy) {
+	log.Printf("[policyBigquerySave] parsing data for policy %s", policy.Uid)
+
+	policyBig := lib.GetDatasetByEnv("", fmt.Sprintf("import-%s", models.PolicyCollection))
+	policyJson, err := policy.Marshal()
+	if err != nil {
+		log.Printf("[policy.BigquerySave] error marshaling policy: %s", err.Error())
+	}
+
+	policy.Data = string(policyJson)
+	policy.BigStartDate = civil.DateTimeOf(policy.StartDate)
+	policy.BigRenewDate = civil.DateTimeOf(policy.RenewDate)
+	policy.BigEndDate = civil.DateTimeOf(policy.EndDate)
+	policy.BigEmitDate = civil.DateTimeOf(policy.EmitDate)
+	policy.BigStatusHistory = strings.Join(policy.StatusHistory, ",")
+	if policy.ReservedInfo != nil {
+		policy.BigReasons = strings.Join(policy.ReservedInfo.Reasons, ",")
+		policy.BigAcceptanceNote = policy.ReservedInfo.AcceptanceNote
+		policy.BigAcceptanceDate = lib.GetBigQueryNullDateTime(policy.ReservedInfo.AcceptanceDate)
+	}
+
+	log.Println("[policyBigquerySave] saving to bigquery...")
+	err = lib.InsertRowsBigQuery(models.WoptaDataset, policyBig, policy)
+	if err != nil {
+		log.Println("[policyBigquerySave] error saving policy to bigquery: ", err.Error())
+		return
+	}
+	log.Println("[policyBigquerySave] bigquery saved!")
+}
+
+func transactionBigQuerySave(transaction models.Transaction) {
+	fireTransactions := lib.GetDatasetByEnv("", fmt.Sprintf("import-%s", models.TransactionsCollection))
+
+	transaction.BigPayDate = lib.GetBigQueryNullDateTime(transaction.PayDate)
+	transaction.BigTransactionDate = lib.GetBigQueryNullDateTime(transaction.TransactionDate)
+	transaction.BigCreationDate = civil.DateTimeOf(transaction.CreationDate)
+	transaction.BigStatusHistory = strings.Join(transaction.StatusHistory, ",")
+	transaction.BigUpdateDate = lib.GetBigQueryNullDateTime(transaction.UpdateDate)
+	log.Println("Transaction save BigQuery: " + transaction.Uid)
+
+	err := lib.InsertRowsBigQuery(models.WoptaDataset, fireTransactions, transaction)
+	if err != nil {
+		log.Println("ERROR Transaction "+transaction.Uid+" save BigQuery: ", err)
+		return
+	}
+	log.Println("Transaction BigQuery saved!")
+}
+
+func networkTransactionBigQuerySave(nt models.NetworkTransaction) error {
+	log.Println("[NetworkTransaction.SaveBigQuery]")
+
+	var (
+		err       error
+		datasetId = models.WoptaDataset
+		tableId   = fmt.Sprintf("import-%s", models.NetworkTransactionCollection)
+	)
+
+	baseQuery := fmt.Sprintf("SELECT * FROM `%s.%s` WHERE ", datasetId, tableId)
+	whereClause := fmt.Sprintf("uid = '%s'", nt.Uid)
+	query := fmt.Sprintf("%s %s", baseQuery, whereClause)
+
+	result, err := lib.QueryRowsBigQuery[models.NetworkTransaction](query)
+	if err != nil {
+		log.Printf("[NetworkTransaction.SaveBigQuery] error querying db with query %s: %s", query, err.Error())
+		return err
+	}
+
+	if len(result) == 0 {
+		log.Printf("[NetworkTransaction.SaveBigQuery] creating new NetworkTransaction %s", nt.Uid)
+		err = lib.InsertRowsBigQuery(datasetId, tableId, nt)
+	} else {
+		log.Printf("[NetworkTransaction.SaveBigQuery] updating NetworkTransaction %s", nt.Uid)
+		updatedFields := make(map[string]interface{})
+		updatedFields["status"] = nt.Status
+		updatedFields["statusHistory"] = nt.StatusHistory
+		updatedFields["isPay"] = nt.IsPay
+		updatedFields["isConfirmed"] = nt.IsConfirmed
+		updatedFields["isDelete"] = nt.IsDelete
+		if nt.PayDate.Valid {
+			updatedFields["payDate"] = nt.PayDate
+		}
+		if nt.TransactionDate.Valid {
+			updatedFields["transactionDate"] = nt.TransactionDate
+		}
+		if nt.ConfirmationDate.Valid {
+			updatedFields["confirmationDate"] = nt.ConfirmationDate
+		}
+		if nt.DeletionDate.Valid {
+			updatedFields["deletionDate"] = nt.DeletionDate
+		}
+
+		err = lib.UpdateRowBigQueryV2(datasetId, tableId, updatedFields, "WHERE "+whereClause)
+	}
+
+	if err != nil {
+		log.Printf("[NetworkTransaction.SaveBigQuery] error saving to db: %s", err.Error())
+		return err
+	}
+
+	log.Println("[NetworkTransaction.SaveBigQuery] NetworkTransaction saved!")
+	return nil
+}
+
+func networkNodeBigQuerySave(nn models.NetworkNode) error {
+	log.Println("[networkNodeSaveBigQuery]")
+
+	nnJson, _ := json.Marshal(nn)
+
+	nn.Data = string(nnJson)
+	nn.BigCreationDate = lib.GetBigQueryNullDateTime(nn.CreationDate)
+	nn.BigUpdatedDate = lib.GetBigQueryNullDateTime(nn.UpdatedDate)
+	nn.Agent = parseBigQueryAgentNode(nn.Agent)
+	nn.AreaManager = parseBigQueryAgentNode(nn.AreaManager)
+	nn.Agency = parseBigQueryAgencyNode(nn.Agency)
+	nn.Broker = parseBigQueryAgencyNode(nn.Broker)
+
+	for _, p := range nn.Products {
+		companies := make([]models.NodeCompany, 0)
+		for _, c := range p.Companies {
+			companies = append(companies, models.NodeCompany{
+				Name:         c.Name,
+				ProducerCode: c.ProducerCode,
+			})
+		}
+		nn.BigProducts = append(nn.BigProducts, models.NodeProduct{
+			Name:      p.Name,
+			Companies: companies,
+		})
+	}
+
+	err := lib.InsertRowsBigQuery(models.WoptaDataset, fmt.Sprintf("import-%s", models.NetworkNodesCollection), nn)
+	return err
+}
+
+func parseBigQueryAgentNode(agent *models.AgentNode) *models.AgentNode {
+	if agent == nil {
+		return nil
+	}
+
+	if agent.BirthDate != "" {
+		birthDate, _ := time.Parse(time.RFC3339, agent.BirthDate)
+		agent.BigBirthDate = lib.GetBigQueryNullDateTime(birthDate)
+	}
+	if agent.Residence != nil {
+		agent.Residence.BigLocation = lib.GetBigQueryNullGeography(
+			agent.Residence.Location.Lng,
+			agent.Residence.Location.Lat,
+		)
+	}
+	if agent.Domicile != nil {
+		agent.Domicile.BigLocation = lib.GetBigQueryNullGeography(
+			agent.Domicile.Location.Lng,
+			agent.Domicile.Location.Lat,
+		)
+	}
+	agent.BigRuiRegistration = lib.GetBigQueryNullDateTime(agent.RuiRegistration)
+
+	return agent
+}
+
+func parseBigQueryAgencyNode(agency *models.AgencyNode) *models.AgencyNode {
+	if agency == nil {
+		return nil
+	}
+
+	if agency.Address != nil {
+		agency.Address.BigLocation = lib.GetBigQueryNullGeography(
+			agency.Address.Location.Lng,
+			agency.Address.Location.Lat,
+		)
+	}
+	agency.Manager = parseBigQueryAgentNode(agency.Manager)
+	agency.BigRuiRegistration = lib.GetBigQueryNullDateTime(agency.RuiRegistration)
+
+	return agency
+}
+
+func userBigQuerySave(user models.User) error {
+	table := lib.GetDatasetByEnv("", fmt.Sprintf("import-%s", models.UserCollection))
+
+	user, err := initBigqueryData(user)
+	if err != nil {
+		return err
+	}
+
+	log.Println("user save big query: " + user.Uid)
+
+	return lib.InsertRowsBigQuery(models.WoptaDataset, table, user)
+}
+
+func initBigqueryData(user models.User) (models.User, error) {
+	userJson, err := json.Marshal(user)
+	if err != nil {
+		return models.User{}, err
+	}
+	user.Data = string(userJson)
+
+	if user.BirthDate != "" {
+		birthDate, err := time.Parse(time.RFC3339, user.BirthDate)
+		if err != nil {
+			return models.User{}, err
+		}
+		user.BigBirthDate = lib.GetBigQueryNullDateTime(birthDate)
+	}
+
+	if user.Residence != nil {
+		user.BigResidenceStreetName = user.Residence.StreetName
+		user.BigResidenceStreetNumber = user.Residence.StreetNumber
+		user.BigResidenceCity = user.Residence.City
+		user.BigResidencePostalCode = user.Residence.PostalCode
+		user.BigResidenceLocality = user.Residence.Locality
+		user.BigResidenceCityCode = user.Residence.CityCode
+	}
+
+	if user.Domicile != nil {
+		user.BigDomicileStreetName = user.Domicile.StreetName
+		user.BigDomicileStreetNumber = user.Domicile.StreetNumber
+		user.BigDomicileCity = user.Domicile.City
+		user.BigDomicilePostalCode = user.Domicile.PostalCode
+		user.BigDomicileLocality = user.Domicile.Locality
+		user.BigDomicileCityCode = user.Domicile.CityCode
+	}
+
+	user.BigLocation = bigquery.NullGeography{
+		// TODO: Check if correct: Geography type uses the WKT format for geometry
+		GeographyVal: fmt.Sprintf("POINT (%f %f)", user.Location.Lng, user.Location.Lat),
+		Valid:        true,
+	}
+	user.BigCreationDate = lib.GetBigQueryNullDateTime(user.CreationDate)
+	user.BigUpdatedDate = lib.GetBigQueryNullDateTime(user.UpdatedDate)
+
+	return user, nil
 }
