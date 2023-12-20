@@ -19,6 +19,16 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
+type ResultStruct struct {
+	Policy       models.Policy                 `json:"policy"`
+	Transactions map[string]TransactionsOutput `json:"transactions"`
+}
+
+type TransactionsOutput struct {
+	Transaction         models.Transaction           `json:"transaction"`
+	NetworkTransactions []*models.NetworkTransaction `json:"networkTransactions"`
+}
+
 func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	const (
 		slide       int = -1
@@ -32,7 +42,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		missingProducers         = make([]string, 0)
 		wrongFiscalCodePolicies  = make([]string, 0)
 		monthlyPolicies          = make(map[string]map[string][][]string, 0)
-		result                   = make(map[string]map[string]interface{}, 0)
+		result                   = make(map[string]ResultStruct, 0)
 		codes                    map[string]map[string]string
 	)
 
@@ -337,23 +347,24 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			continue
 		}
 
-		result[codeCompany] = map[string]interface{}{
-			"policy":              policy,
-			"transactions":        []models.Transaction{},
-			"networkTransactions": []*models.NetworkTransaction{},
-		}
+		transactionsOutput := make(map[string]TransactionsOutput, 0)
 
 		// create transactions and network node transactions
 
-		transactions := make([]models.Transaction, 0)
-		networkTransactions := make([]*models.NetworkTransaction, 0)
+		scheduleDate := policy.StartDate
+		transactionPayDate := policy.StartDate
+		tr := createTransaction(policy, mgaProducts[policy.ProductVersion], "", scheduleDate, transactionPayDate, policy.PriceGrossMonthly, policy.PriceNettMonthly, true)
+
+		transactionsOutput = map[string]TransactionsOutput{
+			scheduleDate.Format(models.TimeDateOnly): {
+				Transaction:         tr,
+				NetworkTransactions: createNetworkTransactions(&policy, &tr, networkNode, mgaProducts[policy.ProductVersion]),
+			},
+		}
+
+		// if monthly create remaining transactions and network transactions if transaction is paid
 
 		if monthlyPolicies[policy.CodeCompany] != nil {
-			scheduleDate := policy.EmitDate
-			transactionPayDate := policy.StartDate
-			tr := createTransaction(policy, mgaProducts[policy.ProductVersion], "", scheduleDate, transactionPayDate, policy.PriceGrossMonthly, policy.PriceNettMonthly, true)
-			transactions = append(transactions, tr)
-			networkTransactions = append(networkTransactions, createNetworkTransactions(&policy, &tr, networkNode, mgaProducts[policy.ProductVersion])...)
 			for i := 1; i < 12; i++ {
 				transactionPayDate = time.Time{}
 				scheduleDate = scheduleDate.AddDate(0, 1, 0)
@@ -364,20 +375,26 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 					transactionPayDate = scheduleDate
 				}
 				tr = createTransaction(policy, mgaProducts[policy.ProductVersion], "", scheduleDate, transactionPayDate, policy.PriceGrossMonthly, policy.PriceNettMonthly, isPay)
-				transactions = append(transactions, tr)
+				sc := scheduleDate.Format(models.TimeDateOnly)
+
 				if isPay {
-					networkTransactions = append(networkTransactions, createNetworkTransactions(&policy, &tr, networkNode, mgaProducts[policy.ProductVersion])...)
+					transactionsOutput[sc] = TransactionsOutput{
+						Transaction:         tr,
+						NetworkTransactions: createNetworkTransactions(&policy, &tr, networkNode, mgaProducts[policy.ProductVersion]),
+					}
+				} else {
+					transactionsOutput[sc] = TransactionsOutput{
+						Transaction:         tr,
+						NetworkTransactions: []*models.NetworkTransaction{},
+					}
 				}
 			}
-		} else {
-			tr := createTransaction(policy, mgaProducts[policy.ProductVersion], "", policy.EmitDate, policy.EmitDate, policy.PriceGross, policy.PriceNett, true)
-			transactions = append(transactions, tr)
-			networkTransactions = append(networkTransactions, createNetworkTransactions(&policy, &tr, networkNode, mgaProducts[policy.ProductVersion])...)
-
 		}
 
-		result[codeCompany]["transactions"] = transactions
-		result[codeCompany]["networkTransactions"] = networkTransactions
+		result[codeCompany] = ResultStruct{
+			Policy:       policy,
+			Transactions: transactionsOutput,
+		}
 
 		// update node portfolio
 
@@ -386,13 +403,51 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 		// save policy firestore
 
+		err := lib.SetFirestoreErr(fmt.Sprintf("import-%s", models.PolicyCollection), policy.Uid, policy)
+		if err != nil {
+			log.Printf("error saving policy firestore: %s", err.Error())
+			continue
+		}
+
 		// save policy bigquery
 
+		// save transactions firestore
+
+		for _, res := range transactionsOutput {
+			err := lib.SetFirestoreErr(fmt.Sprintf("import-%s", models.TransactionsCollection), res.Transaction.Uid, res.Transaction)
+			if err != nil {
+				log.Printf("error saving transaction firestore: %s", err.Error())
+				continue
+			}
+
+			// save transactions bigquery
+
+			/*for _, nt := range res.NetworkTransactions {
+				// save network transactions bigquery
+			}*/
+		}
+
+		// save user firestore
+
+		err = lib.SetFirestoreErr(fmt.Sprintf("import-%s", models.UserCollection), policy.Contractor.Uid, policy.Contractor)
+		if err != nil {
+			log.Printf("error saving contractor firestore: %s", err.Error())
+			continue
+		}
+
+		// save user bigquery
+
+		// save network node firestore
+
+		err = lib.SetFirestoreErr(fmt.Sprintf("import-%s", models.NetworkNodesCollection), networkNode.Uid, networkNode)
+		if err != nil {
+			log.Printf("error saving network node firestore: %s", err.Error())
+			continue
+		}
+
+		// save network node bigquery
+
 		// save single guarantees into bigquery
-
-		// save contractor firestore
-
-		// save contractor bigquery
 
 		//log.Println("LifeIn policy:", policy)
 		b, e := json.Marshal(policy)
@@ -459,42 +514,6 @@ func calculateMonthlyPrices(policy *models.Policy) {
 		policy.OffersPrices["default"][string(models.PaySplitMonthly)].Net = lib.RoundFloat(policy.OffersPrices["default"][string(models.PaySplitMonthly)].Net/12, 2)
 		policy.OffersPrices["default"][string(models.PaySplitMonthly)].Tax = lib.RoundFloat(policy.OffersPrices["default"][string(models.PaySplitMonthly)].Tax/12, 2)
 	}
-
-	/*if paymentSplit == string(models.PaySplitMonthly) {
-		policy.PriceGrossMonthly = lib.RoundFloat(policy.PriceGross, 2)
-		policy.PriceGross = lib.RoundFloat(policy.PriceGross*12, 2)
-	} else {
-		policy.PriceGrossMonthly = lib.RoundFloat(policy.PriceGross/12, 2)
-		policy.PriceGross = lib.RoundFloat(policy.PriceGross, 2)
-	}
-
-	if policy.CodeCompany == "0000073" {
-		log.Printf("hello")
-	}
-
-	for index, guarantee := range policy.Assets[0].Guarantees {
-		if paymentSplit == string(models.PaySplitMonthly) {
-			policy.Assets[0].Guarantees[index].Value.PremiumGrossMonthly = lib.RoundFloat(guarantee.Value.PremiumGrossYearly, 2)
-			policy.Assets[0].Guarantees[index].Value.PremiumTaxAmountMonthly = lib.RoundFloat(policy.Assets[0].Guarantees[index].Value.PremiumGrossMonthly*taxesByGuarantee[guarantee.Slug], 2)
-			policy.Assets[0].Guarantees[index].Value.PremiumNetMonthly = lib.RoundFloat(policy.Assets[0].Guarantees[index].Value.PremiumGrossMonthly-policy.Assets[0].Guarantees[index].Value.PremiumTaxAmountMonthly, 2)
-			policy.TaxAmountMonthly += lib.RoundFloat(policy.Assets[0].Guarantees[index].Value.PremiumTaxAmountMonthly, 2)
-			policy.PriceNettMonthly += lib.RoundFloat(policy.Assets[0].Guarantees[index].Value.PremiumNetMonthly, 2)
-
-			policy.Assets[0].Guarantees[index].Value.PremiumGrossYearly = lib.RoundFloat(guarantee.Value.PremiumGrossYearly*12, 2)
-		} else {
-			policy.Assets[0].Guarantees[index].Value.PremiumGrossMonthly = lib.RoundFloat(guarantee.Value.PremiumGrossYearly/12, 2)
-			policy.Assets[0].Guarantees[index].Value.PremiumTaxAmountMonthly = lib.RoundFloat(policy.Assets[0].Guarantees[index].Value.PremiumGrossMonthly/12*taxesByGuarantee[guarantee.Slug], 2)
-			policy.Assets[0].Guarantees[index].Value.PremiumNetMonthly = lib.RoundFloat(policy.Assets[0].Guarantees[index].Value.PremiumGrossMonthly-policy.Assets[0].Guarantees[index].Value.PremiumTaxAmountMonthly, 2)
-			policy.TaxAmountMonthly += lib.RoundFloat(policy.Assets[0].Guarantees[index].Value.PremiumTaxAmountMonthly, 2)
-			policy.PriceNettMonthly += lib.RoundFloat(policy.Assets[0].Guarantees[index].Value.PremiumNetMonthly, 2)
-
-			policy.Assets[0].Guarantees[index].Value.PremiumGrossYearly = lib.RoundFloat(guarantee.Value.PremiumGrossYearly, 2)
-		}
-		policy.Assets[0].Guarantees[index].Value.PremiumTaxAmountYearly = lib.RoundFloat(policy.Assets[0].Guarantees[index].Value.PremiumGrossYearly*taxesByGuarantee[guarantee.Slug], 2)
-		policy.Assets[0].Guarantees[index].Value.PremiumNetYearly = lib.RoundFloat(policy.Assets[0].Guarantees[index].Value.PremiumGrossYearly-policy.Assets[0].Guarantees[index].Value.PremiumTaxAmountYearly, 2)
-		policy.TaxAmount = lib.RoundFloat(policy.TaxAmount+policy.Assets[0].Guarantees[index].Value.PremiumTaxAmountYearly, 2)
-		policy.PriceNett += lib.RoundFloat(policy.PriceNett+policy.Assets[0].Guarantees[index].Value.PremiumNetYearly, 2)
-	}*/
 }
 
 var identityDocumentMap map[string]string = map[string]string{
