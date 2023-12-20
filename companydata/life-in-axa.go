@@ -29,6 +29,8 @@ type TransactionsOutput struct {
 	NetworkTransactions []*models.NetworkTransaction `json:"networkTransactions"`
 }
 
+const dryRun = true
+
 func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	const (
 		slide       int = -1
@@ -322,6 +324,32 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		policy.Contractor = *insured
 		policy.Contractor.Uid = lib.NewDoc(models.UserCollection)
 
+		// check if user is already present
+
+		/*query := fmt.Sprintf(
+			"SELECT * FROM `%s.%s` WHERE isDelete = false AND JSON_VALUE(data, '$.contractor.fiscalCode') = '%s'",
+			models.WoptaDataset,
+			models.PoliciesViewCollection,
+			insured.FiscalCode,
+		)
+		retrievedPolicies, err := lib.QueryRowsBigQuery[models.Policy](query)
+		if err != nil {
+			log.Printf("error retrieving policies bigquery: %s", err.Error())
+			continue
+		}
+		for _, rp := range retrievedPolicies {
+			if rp.Name == models.LifeProduct {
+				log.Printf("error user already has a life policy")
+				return "", nil, nil
+			}
+		}
+
+		if len(retrievedPolicies) > 0 {
+			policy.Contractor.Uid = retrievedPolicies[0].Contractor.Uid
+		} else {
+			policy.Contractor.Uid = lib.NewDoc(models.UserCollection)
+		}*/
+
 		// check fiscalcode
 		var usr models.User
 		_, usr, err = user.CalculateFiscalCode(*insured)
@@ -401,53 +429,55 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		networkNode.Policies = append(networkNode.Policies, policy.Uid)
 		networkNode.Users = append(networkNode.Users, policy.Contractor.Uid)
 
-		// save policy firestore
+		if !dryRun {
+			// save policy firestore
 
-		err := lib.SetFirestoreErr(fmt.Sprintf("import-%s", models.PolicyCollection), policy.Uid, policy)
-		if err != nil {
-			log.Printf("error saving policy firestore: %s", err.Error())
-			continue
-		}
-
-		// save policy bigquery
-
-		// save transactions firestore
-
-		for _, res := range transactionsOutput {
-			err := lib.SetFirestoreErr(fmt.Sprintf("import-%s", models.TransactionsCollection), res.Transaction.Uid, res.Transaction)
+			err := lib.SetFirestoreErr(fmt.Sprintf("import-%s", models.PolicyCollection), policy.Uid, policy)
 			if err != nil {
-				log.Printf("error saving transaction firestore: %s", err.Error())
+				log.Printf("error saving policy firestore: %s", err.Error())
 				continue
 			}
 
-			// save transactions bigquery
+			// save policy bigquery
 
-			/*for _, nt := range res.NetworkTransactions {
-				// save network transactions bigquery
-			}*/
+			// save transactions firestore
+
+			for _, res := range transactionsOutput {
+				err := lib.SetFirestoreErr(fmt.Sprintf("import-%s", models.TransactionsCollection), res.Transaction.Uid, res.Transaction)
+				if err != nil {
+					log.Printf("error saving transaction firestore: %s", err.Error())
+					continue
+				}
+
+				// save transactions bigquery
+
+				/*for _, nt := range res.NetworkTransactions {
+					// save network transactions bigquery
+				}*/
+			}
+
+			// save user firestore
+
+			err = lib.SetFirestoreErr(fmt.Sprintf("import-%s", models.UserCollection), policy.Contractor.Uid, policy.Contractor)
+			if err != nil {
+				log.Printf("error saving contractor firestore: %s", err.Error())
+				continue
+			}
+
+			// save user bigquery
+
+			// save network node firestore
+
+			err = lib.SetFirestoreErr(fmt.Sprintf("import-%s", models.NetworkNodesCollection), networkNode.Uid, networkNode)
+			if err != nil {
+				log.Printf("error saving network node firestore: %s", err.Error())
+				continue
+			}
+
+			// save network node bigquery
+
+			// save single guarantees into bigquery
 		}
-
-		// save user firestore
-
-		err = lib.SetFirestoreErr(fmt.Sprintf("import-%s", models.UserCollection), policy.Contractor.Uid, policy.Contractor)
-		if err != nil {
-			log.Printf("error saving contractor firestore: %s", err.Error())
-			continue
-		}
-
-		// save user bigquery
-
-		// save network node firestore
-
-		err = lib.SetFirestoreErr(fmt.Sprintf("import-%s", models.NetworkNodesCollection), networkNode.Uid, networkNode)
-		if err != nil {
-			log.Printf("error saving network node firestore: %s", err.Error())
-			continue
-		}
-
-		// save network node bigquery
-
-		// save single guarantees into bigquery
 
 		//log.Println("LifeIn policy:", policy)
 		b, e := json.Marshal(policy)
@@ -714,16 +744,6 @@ func createNetworkTransaction(
 		ConfirmationDate: lib.GetBigQueryNullDateTime(time.Time{}),
 		DeletionDate:     lib.GetBigQueryNullDateTime(time.Time{}),
 	}
-
-	//jsonLog, _ := json.Marshal(&netTransaction)
-
-	/*err := netTransaction.SaveBigQuery()
-	if err != nil {
-		log.Printf("[createNetworkTransaction] error saving network transaction to bigquery: %s", err.Error())
-		return nil, err
-	}*/
-
-	//log.Printf("[createNetworkTransaction] network transaction created! %s", string(jsonLog))
 
 	return &netTransaction, nil
 }
