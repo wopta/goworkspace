@@ -383,18 +383,19 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 		scheduleDate := policy.StartDate
 		transactionPayDate := policy.StartDate
-		tr := createTransaction(policy, mgaProducts[policy.ProductVersion], "", scheduleDate, transactionPayDate, policy.PriceGrossMonthly, policy.PriceNettMonthly, true)
-
-		transactionsOutput = map[string]TransactionsOutput{
-			scheduleDate.Format(models.TimeDateOnly): {
-				Transaction:         tr,
-				NetworkTransactions: createNetworkTransactions(&policy, &tr, networkNode, mgaProducts[policy.ProductVersion]),
-			},
-		}
 
 		// if monthly create remaining transactions and network transactions if transaction is paid
 
 		if monthlyPolicies[policy.CodeCompany] != nil {
+			tr := createTransaction(policy, mgaProducts[policy.ProductVersion], "", scheduleDate, transactionPayDate, policy.PriceGrossMonthly, policy.PriceNettMonthly, true)
+
+			transactionsOutput = map[string]TransactionsOutput{
+				scheduleDate.Format(models.TimeDateOnly): {
+					Transaction:         tr,
+					NetworkTransactions: createNetworkTransactions(&policy, &tr, networkNode, mgaProducts[policy.ProductVersion]),
+				},
+			}
+
 			for i := 1; i < 12; i++ {
 				transactionPayDate = time.Time{}
 				scheduleDate = scheduleDate.AddDate(0, 1, 0)
@@ -418,6 +419,15 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 						NetworkTransactions: []*models.NetworkTransaction{},
 					}
 				}
+			}
+		} else {
+			tr := createTransaction(policy, mgaProducts[policy.ProductVersion], "", scheduleDate, transactionPayDate, policy.PriceGross, policy.PriceNett, true)
+
+			transactionsOutput = map[string]TransactionsOutput{
+				scheduleDate.Format(models.TimeDateOnly): {
+					Transaction:         tr,
+					NetworkTransactions: createNetworkTransactions(&policy, &tr, networkNode, mgaProducts[policy.ProductVersion]),
+				},
 			}
 		}
 
