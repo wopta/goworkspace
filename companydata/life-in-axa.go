@@ -239,7 +239,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			FiscalCode:    strings.TrimSpace(strings.ToUpper(row[27])),
 			Gender:        strings.TrimSpace(strings.ToUpper(row[25])),
 			BirthDate:     ParseDateDDMMYYYY(row[26]).Format(time.RFC3339),
-			Phone:         strings.ReplaceAll(row[72], " ", ""),
+			Phone:         strings.TrimSpace(strings.ReplaceAll(row[72], " ", "")),
 			BirthCity:     strings.TrimSpace(lib.Capitalize(row[73])),
 			BirthProvince: strings.TrimSpace(strings.ToUpper(row[74])),
 			Residence: &models.Address{
@@ -705,7 +705,7 @@ func ParseAxaBeneficiary(r []string, base int) *models.Beneficiary {
 				Surname:    strings.TrimSpace(lib.Capitalize(r[83+rangeCell])),
 				FiscalCode: strings.TrimSpace(strings.ToUpper(r[85+rangeCell])),
 				Mail:       strings.TrimSpace(strings.ToLower(r[91+rangeCell])),
-				Phone:      strings.ReplaceAll(r[86+rangeCell], " ", ""),
+				Phone:      strings.TrimSpace(strings.ReplaceAll(r[86+rangeCell], " ", "")),
 				Residence: &models.Address{
 					StreetName: strings.TrimSpace(lib.Capitalize(r[87+rangeCell])),
 					City:       strings.TrimSpace(lib.Capitalize(r[88+rangeCell])),
