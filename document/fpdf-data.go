@@ -81,16 +81,19 @@ func loadLifeBeneficiariesInfo(policy *models.Policy) ([]map[string]string, stri
 func loadProponentInfo(networkNode *models.NetworkNode) map[string]string {
 	policyProponent := make(map[string]string)
 
-	if networkNode == nil || networkNode.IsMgaProponent {
+	if networkNode == nil || networkNode.Type == models.PartnershipNetworkNodeType || networkNode.IsMgaProponent {
 		policyProponent["address"] = "Galleria del Corso, 1 - 20122 MILANO (MI)"
 		policyProponent["phone"] = "02.91.24.03.46"
 		policyProponent["email"] = "info@wopta.it"
 		policyProponent["pec"] = "woptaassicurazioni@legalmail.it"
 		policyProponent["website"] = "wopta.it"
 	} else {
-		proponentNode := network.GetNetworkNodeByUid(networkNode.WorksForUid)
-		if proponentNode == nil {
-			panic("could not find node for proponent with uid " + networkNode.WorksForUid)
+		proponentNode := networkNode
+		if networkNode.WorksForUid != "" {
+			proponentNode = network.GetNetworkNodeByUid(networkNode.WorksForUid)
+			if proponentNode == nil {
+				panic("could not find node for proponent with uid " + networkNode.WorksForUid)
+			}
 		}
 
 		policyProponent["address"] = "====="
@@ -144,10 +147,10 @@ func loadProducerInfo(origin string, networkNode *models.NetworkNode) map[string
 		policyProducer["ruiCode"] = networkNode.Agent.RuiCode
 		policyProducer["ruiRegistration"] = networkNode.Agent.RuiRegistration.Format("02.01.2006")
 	case models.AgencyNetworkNodeType:
-		policyProducer["name"] = strings.ToUpper(networkNode.Agency.Name)
-		policyProducer["ruiSection"] = networkNode.Agency.RuiSection
-		policyProducer["ruiCode"] = networkNode.Agency.RuiCode
-		policyProducer["ruiRegistration"] = networkNode.Agency.RuiRegistration.Format("02.01.2006")
+		policyProducer["name"] = strings.ToUpper(networkNode.Agency.Manager.Name) + " " + strings.ToUpper(networkNode.Agency.Manager.Surname)
+		policyProducer["ruiSection"] = networkNode.Agency.Manager.RuiSection
+		policyProducer["ruiCode"] = networkNode.Agency.Manager.RuiCode
+		policyProducer["ruiRegistration"] = networkNode.Agency.Manager.RuiRegistration.Format("02.01.2006")
 	}
 
 	jsonProducer, _ := json.Marshal(policyProducer)
@@ -172,7 +175,10 @@ func loadDesignation(networkNode *models.NetworkNode) string {
 		if networkNode.WorksForUid == models.WorksForMgaUid {
 			designation = fmt.Sprintf(mgaProponentDirectDesignationFormat, networkNode.Designation, mgaRuiInfo)
 		} else {
-			worksForNode := network.GetNetworkNodeByUid(networkNode.WorksForUid)
+			worksForNode := networkNode
+			if networkNode.WorksForUid != "" {
+				worksForNode = network.GetNetworkNodeByUid(networkNode.WorksForUid)
+			}
 			designation = fmt.Sprintf(
 				mgaProponentIndirectDesignationFormat,
 				networkNode.Designation,
@@ -183,7 +189,10 @@ func loadDesignation(networkNode *models.NetworkNode) string {
 			)
 		}
 	} else {
-		worksForNode := network.GetNetworkNodeByUid(networkNode.WorksForUid)
+		worksForNode := networkNode
+		if networkNode.WorksForUid != "" {
+			worksForNode = network.GetNetworkNodeByUid(networkNode.WorksForUid)
+		}
 		designation = fmt.Sprintf(
 			mgaEmitterDesignationFormat,
 			networkNode.Designation,
@@ -335,7 +344,10 @@ func loadAnnex4Section1Info(policy *models.Policy, networkNode *models.NetworkNo
 			companyMap[policy.Company],
 		)
 	} else {
-		worksForNode := network.GetNetworkNodeByUid(networkNode.WorksForUid)
+		worksForNode := networkNode
+		if networkNode.WorksForUid != "" {
+			worksForNode = network.GetNetworkNodeByUid(networkNode.WorksForUid)
+		}
 		section1Info = fmt.Sprintf(
 			mgaEmitterFormat,
 			worksForNode.Agency.Name,

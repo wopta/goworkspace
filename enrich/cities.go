@@ -8309,6 +8309,7 @@ func getCity() []byte {
 	615;Perù;EE;;;;Z611;;
 	920;Polinesia francese;EE;;;;Z723;;
 	233;Polonia;EE;;;;Z127;;
+	531;Porto Rico;EE;;;;Z518;;
 	234;Portogallo;EE;;;;Z128;;
 	345;Qatar;EE;;;;Z237;;
 	219;Regno Unito;EE;;;;Z114;;

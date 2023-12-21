@@ -319,7 +319,12 @@ func setAdvance(policy *models.Policy, origin string) {
 	policy.IsPay = true
 	policy.Status = models.PolicyStatusPay
 	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusToPay, models.PolicyStatusPay)
-	policy.PaymentSplit = paymentSplit
+
+	//TODO: fix me someday in the future
+	if paymentSplit != "" && policy.PaymentSplit == "" {
+		policy.PaymentSplit = paymentSplit
+
+	}
 
 	tr := transaction.PutByPolicy(*policy, "", origin, "", "", policy.PriceGross, policy.PriceNett, "", models.PayMethodRemittance, true, mgaProduct)
 

@@ -27,6 +27,7 @@ func PaymentV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 
 	policyUid := r.URL.Query().Get("uid")
 	origin = r.URL.Query().Get("origin")
+	trSchedule = r.URL.Query().Get("schedule")
 
 	request := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
@@ -49,6 +50,7 @@ func PaymentV2Fx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	if policyUid == "" || origin == "" {
 		ext := strings.Split(fabrickCallback.ExternalID, "_")
 		policyUid = ext[0]
+		trSchedule = ext[1]
 		origin = ext[3]
 	}
 
@@ -75,7 +77,7 @@ func fabrickPayment(origin, policyUid, providerId string) error {
 
 	policy := plc.GetPolicyByUid(policyUid, origin)
 
-	transaction, err := tr.GetTransactionByPolicyUidAndProviderId(policy.Uid, providerId, origin)
+	transaction, err := tr.GetTransactionToBePaid(policy.Uid, providerId, trSchedule, origin)
 	if err != nil {
 		log.Printf("[fabrickPayment] ERROR getting transaction: %s", err.Error())
 		return err

@@ -26,7 +26,7 @@ func (*ByAssetPerson) isCovered(w *PolicyReservedWrapper) (bool, []models.Policy
 
 	query := fmt.Sprintf(
 		"SELECT %s FROM `%s.%s` WHERE name = @name AND companyEmit = true AND "+
-			"(isDeleted = false OR isDelete IS NULL) AND "+
+			"(isDeleted = false OR isDeleted IS NULL) AND "+
 			"((@startDate >= startDate AND @startDate <= endDate) OR (@endDate >= startDate AND @endDate <= endDate)) AND "+
 			"LOWER(JSON_VALUE(data, '$.assets[0].person.fiscalCode')) = LOWER(@fiscalCode) ORDER BY JSON_VALUE(data, '$.creationDate') ASC",
 		"uid, data.creationDate as creationDate, startDate, endDate, codeCompany, paymentSplit, companyEmit, isPay, name, isDeleted",
