@@ -188,6 +188,10 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 				Order:          mgaProducts[productVersion].Companies[0].GuaranteesMap[slug].Order,
 			}
 
+			if guarante.Slug == "temporary-disability" {
+				guarante.Value.SumInsuredLimitOfIndemnity = lib.RoundFloat(ParseAxaFloat(r[10]), 0)
+			}
+
 			sumPriceTaxAmount += guarante.Value.PremiumTaxAmountYearly
 			sumPriceNett += guarante.Value.PremiumNetYearly
 			sumPriceTaxAmountMonthly += guarante.Value.PremiumTaxAmountMonthly
