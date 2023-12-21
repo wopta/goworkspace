@@ -31,7 +31,10 @@ type TransactionsOutput struct {
 	NetworkTransactions []*models.NetworkTransaction `json:"networkTransactions"`
 }
 
-const dryRun = true
+const (
+	collectionPrefix = "import-"
+	dryRun           = true
+)
 
 func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	const (
@@ -464,7 +467,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		if !dryRun {
 			// save policy firestore
 
-			err := lib.SetFirestoreErr(fmt.Sprintf("import-%s", models.PolicyCollection), policy.Uid, policy)
+			err := lib.SetFirestoreErr(fmt.Sprintf("%s%s", collectionPrefix, models.PolicyCollection), policy.Uid, policy)
 			if err != nil {
 				log.Printf("error saving policy firestore: %s", err.Error())
 				continue
@@ -477,7 +480,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			// save transactions firestore
 
 			for _, res := range transactionsOutput {
-				err := lib.SetFirestoreErr(fmt.Sprintf("import-%s", models.TransactionsCollection), res.Transaction.Uid, res.Transaction)
+				err := lib.SetFirestoreErr(fmt.Sprintf("%s%s", collectionPrefix, models.TransactionsCollection), res.Transaction.Uid, res.Transaction)
 				if err != nil {
 					log.Printf("error saving transaction firestore: %s", err.Error())
 					continue
@@ -495,7 +498,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 			// save user firestore
 
-			err = lib.SetFirestoreErr(fmt.Sprintf("import-%s", models.UserCollection), policy.Contractor.Uid, policy.Contractor)
+			err = lib.SetFirestoreErr(fmt.Sprintf("%s%s", collectionPrefix, models.UserCollection), policy.Contractor.Uid, policy.Contractor)
 			if err != nil {
 				log.Printf("error saving contractor firestore: %s", err.Error())
 				continue
@@ -507,7 +510,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 			// save network node firestore
 
-			err = lib.SetFirestoreErr(fmt.Sprintf("import-%s", models.NetworkNodesCollection), networkNode.Uid, networkNode)
+			err = lib.SetFirestoreErr(fmt.Sprintf("%s%s", collectionPrefix, models.NetworkNodesCollection), networkNode.Uid, networkNode)
 			if err != nil {
 				log.Printf("error saving network node firestore: %s", err.Error())
 				continue
@@ -913,7 +916,7 @@ func getPaymentType(transaction *models.Transaction, policy *models.Policy, prod
 func policyBigquerySave(policy models.Policy) {
 	log.Printf("[policyBigquerySave] parsing data for policy %s", policy.Uid)
 
-	policyBig := lib.GetDatasetByEnv("", fmt.Sprintf("import-%s", models.PolicyCollection))
+	policyBig := lib.GetDatasetByEnv("", fmt.Sprintf("%s%s", collectionPrefix, models.PolicyCollection))
 	policyJson, err := policy.Marshal()
 	if err != nil {
 		log.Printf("[policy.BigquerySave] error marshaling policy: %s", err.Error())
@@ -941,7 +944,7 @@ func policyBigquerySave(policy models.Policy) {
 }
 
 func transactionBigQuerySave(transaction models.Transaction) {
-	fireTransactions := lib.GetDatasetByEnv("", fmt.Sprintf("import-%s", models.TransactionsCollection))
+	fireTransactions := lib.GetDatasetByEnv("", fmt.Sprintf("%s%s", collectionPrefix, models.TransactionsCollection))
 
 	transaction.BigPayDate = lib.GetBigQueryNullDateTime(transaction.PayDate)
 	transaction.BigTransactionDate = lib.GetBigQueryNullDateTime(transaction.TransactionDate)
@@ -964,7 +967,7 @@ func networkTransactionBigQuerySave(nt models.NetworkTransaction) error {
 	var (
 		err       error
 		datasetId = models.WoptaDataset
-		tableId   = fmt.Sprintf("import-%s", models.NetworkTransactionCollection)
+		tableId   = fmt.Sprintf("%s%s", collectionPrefix, models.NetworkTransactionCollection)
 	)
 
 	baseQuery := fmt.Sprintf("SELECT * FROM `%s.%s` WHERE ", datasetId, tableId)
@@ -1040,7 +1043,7 @@ func networkNodeBigQuerySave(nn models.NetworkNode) error {
 		})
 	}
 
-	err := lib.InsertRowsBigQuery(models.WoptaDataset, fmt.Sprintf("import-%s", models.NetworkNodesCollection), nn)
+	err := lib.InsertRowsBigQuery(models.WoptaDataset, fmt.Sprintf("%s%s", collectionPrefix, models.NetworkNodesCollection), nn)
 	return err
 }
 
@@ -1088,7 +1091,7 @@ func parseBigQueryAgencyNode(agency *models.AgencyNode) *models.AgencyNode {
 }
 
 func userBigQuerySave(user models.User) error {
-	table := lib.GetDatasetByEnv("", fmt.Sprintf("import-%s", models.UserCollection))
+	table := lib.GetDatasetByEnv("", fmt.Sprintf("%s%s", collectionPrefix, models.UserCollection))
 
 	user, err := initBigqueryData(user)
 	if err != nil {
