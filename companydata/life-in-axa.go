@@ -139,7 +139,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			if slug == "death" {
 				if r[82] == "GE" {
 					beneficiaries = append(beneficiaries, models.Beneficiary{
-						BeneficiaryType: "legalAndWillSuccessor",
+						BeneficiaryType: models.BeneficiaryLegalAndWillSuccessors,
 					})
 				} else {
 					benef1 := ParseAxaBeneficiary(r, 0)
@@ -196,6 +196,8 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 			if guarante.Slug == "temporary-disability" {
 				guarante.Value.SumInsuredLimitOfIndemnity = lib.RoundFloat(ParseAxaFloat(r[10]), 0)
+			} else if guarante.Slug == "death" {
+				guarante.BeneficiaryOptions = mgaProducts[productVersion].Companies[0].GuaranteesMap["death"].BeneficiaryOptions
 			}
 
 			sumPriceTaxAmount += guarante.Value.PremiumTaxAmountYearly
@@ -678,7 +680,7 @@ func ParseAxaBeneficiary(r []string, base int) *models.Beneficiary {
 
 	if r[82] == "GE" {
 		benef = &models.Beneficiary{
-			BeneficiaryType: "legalAndWillSuccessor",
+			BeneficiaryType: models.BeneficiaryLegalAndWillSuccessors,
 		}
 	}
 	if r[82] == "NM" {
@@ -697,7 +699,7 @@ func ParseAxaBeneficiary(r []string, base int) *models.Beneficiary {
 		}
 
 		benef = &models.Beneficiary{
-			BeneficiaryType: "chosenBeneficiary",
+			BeneficiaryType: models.BeneficiaryChosenBeneficiary,
 			User: models.User{
 				Name:       strings.TrimSpace(lib.Capitalize(r[84+rangeCell])),
 				Surname:    strings.TrimSpace(lib.Capitalize(r[83+rangeCell])),
