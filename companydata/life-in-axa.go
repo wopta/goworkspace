@@ -689,13 +689,13 @@ func ParseAxaBeneficiary(r []string, base int) *models.Beneficiary {
 		}
 
 		isFamilyMember := false
-		isContactable := false
+		isContactable := true
 		if strings.TrimSpace(strings.ToUpper(r[92+rangeCell])) == "SI" {
 			isFamilyMember = true
 		}
 
-		if strings.TrimSpace(strings.ToUpper(r[93+rangeCell])) == "NO" {
-			isContactable = true
+		if strings.TrimSpace(strings.ToUpper(r[93+rangeCell])) == "SI" {
+			isContactable = false
 		}
 
 		benef = &models.Beneficiary{
