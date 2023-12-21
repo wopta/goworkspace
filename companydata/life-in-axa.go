@@ -671,6 +671,16 @@ func ParseAxaBeneficiary(r []string, base int) *models.Beneficiary {
 			return nil
 		}
 
+		isFamilyMember := false
+		isContactable := false
+		if strings.TrimSpace(strings.ToUpper(r[92+rangeCell])) == "SI" {
+			isFamilyMember = true
+		}
+
+		if strings.TrimSpace(strings.ToUpper(r[93+rangeCell])) == "NO" {
+			isContactable = true
+		}
+
 		benef = &models.Beneficiary{
 			BeneficiaryType: "chosenBeneficiary",
 			User: models.User{
@@ -678,6 +688,7 @@ func ParseAxaBeneficiary(r []string, base int) *models.Beneficiary {
 				Surname:    strings.TrimSpace(lib.Capitalize(r[83+rangeCell])),
 				FiscalCode: strings.TrimSpace(strings.ToUpper(r[85+rangeCell])),
 				Mail:       strings.TrimSpace(strings.ToLower(r[91+rangeCell])),
+				Phone:      strings.ReplaceAll(r[86+rangeCell], " ", ""),
 				Residence: &models.Address{
 					StreetName: strings.TrimSpace(lib.Capitalize(r[87+rangeCell])),
 					City:       strings.TrimSpace(lib.Capitalize(r[88+rangeCell])),
@@ -686,6 +697,8 @@ func ParseAxaBeneficiary(r []string, base int) *models.Beneficiary {
 					Locality:   strings.TrimSpace(lib.Capitalize(r[88+rangeCell])),
 				},
 			},
+			IsContactable:  isContactable,
+			IsFamilyMember: isFamilyMember,
 		}
 	}
 	return benef
