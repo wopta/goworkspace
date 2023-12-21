@@ -32,8 +32,8 @@ type TransactionsOutput struct {
 }
 
 const (
-	collectionPrefix = "import-"
-	dryRun           = true
+	collectionPrefix = ""
+	dryRun           = false
 )
 
 func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -51,7 +51,10 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		monthlyPolicies          = make(map[string]map[string][][]string, 0)
 		result                   = make(map[string]ResultStruct, 0)
 		codes                    map[string]map[string]string
+		startDateJob, endDateJob time.Time
 	)
+
+	startDateJob = time.Now().UTC()
 
 	taxesByGuarantee := map[string]float64{
 		"death":                0,
@@ -169,7 +172,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 				Group:                      mgaProducts[productVersion].Companies[0].GuaranteesMap[slug].Group,
 				Type:                       mgaProducts[productVersion].Companies[0].GuaranteesMap[slug].Type,
 				Name:                       mgaProducts[productVersion].Companies[0].GuaranteesMap[slug].Name,
-				CompanyName:                mgaProducts[productVersion].Companies[0].GuaranteesMap[slug].Name,
+				CompanyName:                mgaProducts[productVersion].Companies[0].GuaranteesMap[slug].CompanyName,
 				SumInsuredLimitOfIndemnity: 0,
 				Beneficiaries:              &beneficiaries,
 				Value: &models.GuaranteValue{
@@ -554,6 +557,11 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	if err != nil {
 		log.Printf("error: %s", err.Error())
 	}
+
+	endDateJob = time.Now().UTC()
+
+	log.Printf("Script started at %s", startDateJob.String())
+	log.Printf("Script ended at %s", endDateJob.String())
 
 	return "", nil, e
 }
