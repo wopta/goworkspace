@@ -46,57 +46,6 @@ type NetworkNode struct {
 	WorksForUid         string                `json:"worksForUid" firestore:"worksForUid" bigquery:"-"`
 }
 
-type PartnershipNode struct {
-	Name string `json:"name" firestore:"name" bigquery:"name"`
-	Skin *Skin  `json:"skin,omitempty" firestore:"skin,omitempty" bigquery:"-"`
-}
-
-type AgencyNode struct {
-	Name               string                `json:"name" firestore:"name" bigquery:"name"`
-	VatCode            string                `json:"vatCode,omitempty" firestore:"vatCode,omitempty" bigquery:"vatCode"`
-	Phone              string                `json:"phone,omitempty" firestore:"phone,omitempty" bigquery:"phone"`
-	Address            *NodeAddress          `json:"address,omitempty" firestore:"address,omitempty" bigquery:"-"`
-	Manager            *AgentNode            `json:"manager,omitempty" firestore:"manager,omitempty" bigquery:"manager"`
-	RuiCode            string                `json:"ruiCode" firestore:"ruiCode" bigquery:"ruiCode"`
-	RuiSection         string                `json:"ruiSection" firestore:"ruiSection" bigquery:"ruiSection"`
-	RuiRegistration    time.Time             `json:"ruiRegistration" firestore:"ruiRegistration" bigquery:"-"`
-	BigRuiRegistration bigquery.NullDateTime `json:"-" firestore:"-" bigquery:"ruiRegistration"`
-	Skin               *Skin                 `json:"skin,omitempty" firestore:"skin,omitempty" bigquery:"-"`
-	Pec                string                `json:"pec,omitempty" firestore:"pec,omitempty" bigquery:"-"`
-	Website            string                `json:"website,omitempty" firestore:"website,omitempty" bigquery:"-"`
-}
-
-type AgentNode struct {
-	Name               string                `json:"name" firestore:"name" bigquery:"name"`
-	Surname            string                `json:"surname,omitempty" firestore:"surname,omitempty" bigquery:"surname"`
-	FiscalCode         string                `json:"fiscalCode,omitempty" firestore:"fiscalCode,omitempty" bigquery:"fiscalCode"`
-	VatCode            string                `json:"vatCode,omitempty" firestore:"vatCode,omitempty" bigquery:"vatCode"`
-	Phone              string                `json:"phone,omitempty" firestore:"phone,omitempty" bigquery:"phone"`
-	BirthDate          string                `json:"birthDate,omitempty" firestore:"birthDate,omitempty" bigquery:"-"`
-	BigBirthDate       bigquery.NullDateTime `json:"-" firestore:"-" bigquery:"birthDate"`
-	BirthCity          string                `json:"birthCity,omitempty" firestore:"birthCity,omitempty" bigquery:"birthCity"`
-	BirthProvince      string                `json:"birthProvince,omitempty" firestore:"birthProvince,omitempty" bigquery:"birthProvince"`
-	Residence          *NodeAddress          `json:"residence,omitempty" firestore:"residence,omitempty" bigquery:"residence"`
-	Domicile           *NodeAddress          `json:"domicile,omitempty" firestore:"domicile,omitempty" bigquery:"domicile"`
-	RuiCode            string                `json:"ruiCode" firestore:"ruiCode" bigquery:"ruiCode"`
-	RuiSection         string                `json:"ruiSection" firestore:"ruiSection" bigquery:"ruiSection"`
-	RuiRegistration    time.Time             `json:"ruiRegistration" firestore:"ruiRegistration" bigquery:"-"`
-	BigRuiRegistration bigquery.NullDateTime `json:"-" firestore:"-" bigquery:"ruiRegistration"`
-}
-
-// Check if it's worth updating the Address model used by User
-type NodeAddress struct {
-	StreetName   string                 `json:"streetName,omitempty" firestore:"streetName" bigquery:"streetName"`
-	StreetNumber string                 `json:"streetNumber,omitempty" firestore:"streetNumber,omitempty" bigquery:"streetNumber"`
-	City         string                 `json:"city,omitempty" firestore:"city" bigquery:"city"`
-	PostalCode   string                 `json:"postalCode,omitempty" firestore:"postalCode" bigquery:"postalCode"`
-	Locality     string                 `json:"locality,omitempty" firestore:"locality" bigquery:"locality"`
-	CityCode     string                 `json:"cityCode,omitempty" firestore:"cityCode" bigquery:"cityCode"`
-	Area         string                 `json:"area,omitempty" firestore:"area,omitempty" bigquery:"area"`
-	Location     Location               `json:"location,omitempty" firestore:"location,omitempty" bigquery:"-"`
-	BigLocation  bigquery.NullGeography `json:"-" firestore:"-" bigquery:"location"`
-}
-
 type NodeProduct struct {
 	Name      string        `json:"-" firestore:"-" bigquery:"name"`
 	Companies []NodeCompany `json:"-" firestore:"-" bigquery:"companies"`
@@ -109,6 +58,37 @@ type NodeCompany struct {
 
 func (nn *NetworkNode) Marshal() ([]byte, error) {
 	return json.Marshal(nn)
+}
+
+func (nn *NetworkNode) Sanitize() {
+	nn.Code = lib.ToLower(nn.Code)
+	nn.ExternalNetworkCode = lib.ToLower(nn.Code)
+	nn.Type = lib.TrimSpace(nn.Type)
+	nn.Role = lib.TrimSpace(nn.Role)
+	nn.Mail = lib.ToLower(nn.Mail)
+	nn.Warrant = lib.ToLower(nn.Warrant)
+	nn.ParentUid = lib.TrimSpace(nn.ParentUid)
+	nn.Designation = lib.TrimSpace(nn.Designation)
+	nn.WorksForUid = lib.TrimSpace(nn.WorksForUid)
+
+	switch nn.Type {
+	case AgentNetworkNodeType:
+		nn.Agent.Sanitize()
+	case AgencyNetworkNodeType:
+		nn.Agency.Sanitize()
+	case BrokerNetworkNodeType:
+		nn.Broker.Sanitize()
+	case AreaManagerNetworkNodeType:
+		nn.AreaManager.Sanitize()
+	}
+}
+
+func (nn *NetworkNode) SaveFirestore() error {
+	err := lib.SetFirestoreErr(NetworkNodesCollection, nn.Uid, nn)
+	if err != nil {
+		log.Printf("[NetworkNode.SaveFirestore] error: %s", err.Error())
+	}
+	return err
 }
 
 func (nn *NetworkNode) SaveBigQuery(origin string) error {
@@ -142,63 +122,20 @@ func (nn *NetworkNode) SaveBigQuery(origin string) error {
 	return err
 }
 
-func parseBigQueryAgentNode(agent *AgentNode) *AgentNode {
-	if agent == nil {
-		return nil
-	}
-
-	if agent.BirthDate != "" {
-		birthDate, _ := time.Parse(time.RFC3339, agent.BirthDate)
-		agent.BigBirthDate = lib.GetBigQueryNullDateTime(birthDate)
-	}
-	if agent.Residence != nil {
-		agent.Residence.BigLocation = lib.GetBigQueryNullGeography(
-			agent.Residence.Location.Lng,
-			agent.Residence.Location.Lat,
-		)
-	}
-	if agent.Domicile != nil {
-		agent.Domicile.BigLocation = lib.GetBigQueryNullGeography(
-			agent.Domicile.Location.Lng,
-			agent.Domicile.Location.Lat,
-		)
-	}
-	agent.BigRuiRegistration = lib.GetBigQueryNullDateTime(agent.RuiRegistration)
-
-	return agent
-}
-
-func parseBigQueryAgencyNode(agency *AgencyNode) *AgencyNode {
-	if agency == nil {
-		return nil
-	}
-
-	if agency.Address != nil {
-		agency.Address.BigLocation = lib.GetBigQueryNullGeography(
-			agency.Address.Location.Lng,
-			agency.Address.Location.Lat,
-		)
-	}
-	agency.Manager = parseBigQueryAgentNode(agency.Manager)
-	agency.BigRuiRegistration = lib.GetBigQueryNullDateTime(agency.RuiRegistration)
-
-	return agency
-}
-
 func (nn *NetworkNode) GetName() string {
 	var name string
 
 	switch nn.Type {
 	case AgentNetworkNodeType:
-		name = nn.Agent.Name + " " + nn.Agent.Surname
+		name = fmt.Sprintf("%s %s", lib.Capitalize(nn.Agent.Name), lib.Capitalize(nn.Agent.Surname))
 	case AgencyNetworkNodeType:
-		name = nn.Agency.Name
+		name = lib.Capitalize(nn.Agency.Name)
 	case BrokerNetworkNodeType:
-		name = nn.Broker.Name
+		name = lib.Capitalize(nn.Broker.Name)
 	case PartnershipNetworkNodeType:
-		name = nn.Partnership.Name
+		name = lib.Capitalize(nn.Partnership.Name)
 	case AreaManagerNetworkNodeType:
-		name = nn.AreaManager.Name + " " + nn.AreaManager.Surname
+		name = fmt.Sprintf("%s %s", nn.AreaManager.Name, nn.AreaManager.Surname)
 	}
 
 	return name
