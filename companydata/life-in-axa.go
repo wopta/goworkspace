@@ -33,7 +33,7 @@ type TransactionsOutput struct {
 
 const (
 	collectionPrefix = ""
-	dryRun           = false
+	dryRun           = true
 )
 
 func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
