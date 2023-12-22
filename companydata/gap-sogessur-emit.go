@@ -1,8 +1,11 @@
 package companydata
 
 import (
+	"encoding/base64"
 	"errors"
 	"fmt"
+	"github.com/wopta/goworkspace/mail"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -53,7 +56,15 @@ var (
 )
 
 func GapSogessurEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	now := time.Now()
+	/*now := time.Now()
+	prevMonth := lib.GetPreviousMonth(now)
+	from := lib.GetFirstDay(prevMonth)
+	to := lib.GetFirstDay(now)*/
+
+	req := lib.ErrorByte(io.ReadAll(r.Body))
+	defer r.Body.Close()
+
+	now, upload := getRequestData(req)
 	prevMonth := lib.GetPreviousMonth(now)
 	from := lib.GetFirstDay(prevMonth)
 	to := lib.GetFirstDay(now)
@@ -77,8 +88,27 @@ func GapSogessurEmit(w http.ResponseWriter, r *http.Request) (string, interface{
 
 	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), storagePath+filename, source)
 	// TODO: SftUpload
+	if upload {
+		// TODO: send email to Bea
+		mail.SendMail(mail.MailRequest{
+			FromAddress: mail.Address{Name: "Wopta", Address: os.Getenv("EMAIL_USERNAME")},
+			Attachments: &[]mail.Attachment{
+				{
+					Name:        fmt.Sprintf("Tracciato GAP.csv"),
+					Byte:        base64.StdEncoding.EncodeToString(source),
+					FileName:    fmt.Sprintf("Tracciato GAP"),
+					ContentType: "application/csv",
+				},
+			},
+			IsHtml:       true,
+			IsAttachment: true,
+			To:           []string{os.Getenv("GAP_TO_ADDRESS")},
+			Message:      fmt.Sprintf("Ciao, in allegato trovi il tracciato GAP del mese %s", from.String()),
+			Subject:      fmt.Sprintf("Tracciato GAP %s", from.String()),
+		})
+	}
 
-	setCompanyEmitted(policies)
+	//setCompanyEmitted(policies)
 
 	return "", nil, e
 }
