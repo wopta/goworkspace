@@ -71,6 +71,38 @@ func GetPolicyTransactions(origin string, policyUid string) []models.Transaction
 	return transactions
 }
 
+func GetPolicyActiveTransactions(origin, policyUid string) []models.Transaction {
+	var transactions Transactions
+
+	fireTransactions := lib.GetDatasetByEnv(origin, "transactions")
+
+	q := lib.Firequeries{
+		Queries: []lib.Firequery{
+			{
+				Field:      "policyUid",
+				Operator:   "==",
+				QueryValue: policyUid,
+			},
+			{
+				Field:      "isDelete",
+				Operator:   "==",
+				QueryValue: false,
+			},
+		},
+	}
+	docsnap, err := q.FirestoreWherefields(fireTransactions)
+	if err != nil {
+		log.Printf("[GetPolicyActiveTransactions] query error: %s", err.Error())
+		return transactions
+	}
+
+	transactions = models.TransactionToListData(docsnap)
+
+	sort.Sort(transactions)
+
+	return transactions
+}
+
 func (t Transactions) Len() int      { return len(t) }
 func (t Transactions) Swap(i, j int) { t[i], t[j] = t[j], t[i] }
 func (t Transactions) Less(i, j int) bool {
