@@ -57,11 +57,6 @@ var (
 )
 
 func GapSogessurEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	/*now := time.Now()
-	prevMonth := lib.GetPreviousMonth(now)
-	from := lib.GetFirstDay(prevMonth)
-	to := lib.GetFirstDay(now)*/
-
 	req := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 
