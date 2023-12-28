@@ -7,7 +7,7 @@ replace github.com/wopta/goworkspace/network => ./
 require (
 	cloud.google.com/go/firestore v1.9.0
 	github.com/wopta/goworkspace/lib v1.0.94
-	github.com/wopta/goworkspace/models v1.1.72
+	github.com/wopta/goworkspace/models v1.1.73
 )
 
 require (
