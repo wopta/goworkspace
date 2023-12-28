@@ -85,7 +85,7 @@ func lifeReservedHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 	pdf.SetY(pdf.GetY() + 18)
 
 	setBlackBoldFont(pdf, 20)
-	pdf.MultiCell(0, 3, "RAPPORTO DI VISITA MEDICA", "", fpdf.AlignCenter, false)
+	pdf.MultiCell(0, 3, "SCHEDA RAPPORTO VISITA MEDICA", "", fpdf.AlignCenter, false)
 	pdf.Ln(5)
 	setPinkBoldFont(pdf, 20)
 	pdf.MultiCell(0, 3, policy.NameDesc, "", fpdf.AlignCenter, false)
@@ -135,8 +135,8 @@ func lifeReservedInstructionsSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	setBlackDrawColor(pdf)
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3.5, "", "LTR", fpdf.AlignCenter, false)
-	pdf.MultiCell(0, 3.5, "Da restituire alla compagnia assicurativa, unitamente alle schede "+
-		"“dati Polizza”,\n“Questionario Medico” e “Antiriciclaggio” compilate e sottoscritte in ogni sua parte", "LR", fpdf.AlignCenter, false)
+	pdf.MultiCell(0, 3.5, "Da restituire alla compagnia assicurativa, unitamente al Rapporto Visita "+
+		"Medica compilato e firmato da te e da un medico", "LR", fpdf.AlignCenter, false)
 
 	for _, contact := range policy.ReservedInfo.Contacts {
 		setBlackBoldFont(pdf, standardTextSize)
