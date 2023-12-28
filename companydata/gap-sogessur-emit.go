@@ -112,7 +112,7 @@ func GapSogessurEmit(w http.ResponseWriter, r *http.Request) (string, interface{
 		})
 	}
 
-	//setCompanyEmitted(policies)
+	setCompanyEmitted(policies)
 
 	return "", nil, e
 }
