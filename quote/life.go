@@ -158,8 +158,9 @@ func Life(data models.Policy, channel string, networkNode *models.NetworkNode, w
 
 	log.Println("[Life] calculate guarantees and offers prices")
 
-	for _, asset := range data.Assets {
-		for _, guarantee := range asset.Guarantees {
+	for assetIndex, asset := range data.Assets {
+		for guaranteeIndex, _ := range asset.Guarantees {
+			guarantee := &data.Assets[assetIndex].Guarantees[guaranteeIndex]
 			base, baseTax := getMultipliersIndex(guarantee.Slug)
 
 			offset := getOffset(guarantee.Value.Duration.Year)
@@ -169,7 +170,7 @@ func Life(data models.Policy, channel string, networkNode *models.NetworkNode, w
 			calculateGuaranteePrices(guarantee, baseFloat, taxFloat, *ruleProduct)
 
 			if guarantee.IsSelected && guarantee.IsSellable {
-				calculateOfferPrices(data, guarantee)
+				calculateOfferPrices(data, *guarantee)
 			}
 		}
 
@@ -367,7 +368,7 @@ func getMultipliers(selectRow []string, offset int, base int, baseTax int) (floa
 	return baseFloat, taxFloat
 }
 
-func calculateGuaranteePrices(guarantee models.Guarante, baseFloat, taxFloat float64, product models.Product) {
+func calculateGuaranteePrices(guarantee *models.Guarante, baseFloat, taxFloat float64, product models.Product) {
 	if guarantee.Slug != temporaryDisabilityGuarantee {
 		guarantee.Value.PremiumNetYearly = lib.RoundFloat(guarantee.Value.SumInsuredLimitOfIndemnity*baseFloat, 2)
 		guarantee.Value.PremiumGrossYearly = lib.RoundFloat(guarantee.Value.SumInsuredLimitOfIndemnity*taxFloat, 2)
@@ -382,8 +383,14 @@ func calculateGuaranteePrices(guarantee models.Guarante, baseFloat, taxFloat flo
 		guarantee.Value.PremiumGrossMonthly = lib.RoundFloat(guarantee.Value.SumInsuredLimitOfIndemnity*taxFloat, 2)
 	}
 
+	hasZeroYearlyPrice := guarantee.Value.PremiumGrossYearly == 0
 	hasNotMinimumYearlyPrice := guarantee.Value.PremiumGrossYearly < product.Companies[0].GuaranteesMap[guarantee.Slug].Config.MinimumGrossYearly
-	if hasNotMinimumYearlyPrice {
+
+	if hasZeroYearlyPrice {
+		guarantee.IsSelected = false
+		guarantee.IsSellable = false
+		return
+	} else if hasNotMinimumYearlyPrice {
 		guarantee.Value.PremiumGrossYearly = 10
 		if guarantee.Slug == deathGuarantee {
 			guarantee.Value.PremiumNetYearly = 10
