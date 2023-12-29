@@ -196,6 +196,11 @@ const (
 	RuiSectionB    = "B"
 )
 
+const (
+	ContractorIndividual  = "individual"
+	ContractorLegalEntity = "legalEntity"
+)
+
 func GetProponentRuiSections() []string {
 	return []string{RuiSectionE}
 }

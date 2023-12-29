@@ -245,8 +245,13 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 		// create contractor
 
+		contractorType := models.ContractorIndividual
+		if row[22] == "PG" {
+			contractorType = models.ContractorLegalEntity
+		}
+
 		contractor := &models.User{
-			Type:          row[22],
+			Type:          contractorType,
 			Name:          strings.TrimSpace(lib.Capitalize(row[24])),
 			Surname:       strings.TrimSpace(lib.Capitalize(row[23])),
 			FiscalCode:    strings.TrimSpace(strings.ToUpper(row[27])),
@@ -303,7 +308,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			// create insured
 
 			insured = &models.User{
-				Type:          row[22],
+				Type:          models.ContractorIndividual,
 				Name:          strings.TrimSpace(lib.Capitalize(row[35])),
 				Surname:       strings.TrimSpace(lib.Capitalize(row[34])),
 				FiscalCode:    strings.TrimSpace(strings.ToUpper(row[38])),
