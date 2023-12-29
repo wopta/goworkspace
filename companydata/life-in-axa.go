@@ -38,8 +38,9 @@ const (
 
 func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	const (
-		slide       int = -1
-		headervalue     = "N° adesione individuale univoco"
+		slide            int = -1
+		headervalue          = "N° adesione individuale univoco"
+		titleHeaderValue     = "DATI DEL CONTRATTO DI ASSICURAZIONE"
 	)
 	var (
 		policies                 = make([]models.Policy, 0)
@@ -101,7 +102,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			maxDuration                                                         int
 		)
 
-		if pol[0][2] == headervalue {
+		if pol[0][2] == headervalue || pol[0][1] == titleHeaderValue || pol[0][1] == "1" {
 			continue
 		}
 		if strings.TrimSpace(pol[0][13]) == "W1" || strings.TrimSpace(pol[0][22]) == "PG" {
@@ -526,6 +527,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			networkNodeBigQuerySave(*networkNode)
 
 			// save single guarantees into bigquery
+			models.SetGuaranteBigquery(policy, "emit", models.GuaranteeCollection)
 		}
 
 		//log.Println("LifeIn policy:", policy)
