@@ -105,7 +105,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		if pol[0][2] == headervalue || pol[0][1] == titleHeaderValue || pol[0][1] == "1" {
 			continue
 		}
-		if strings.TrimSpace(pol[0][13]) == "W1" || strings.TrimSpace(pol[0][22]) == "PG" {
+		if strings.TrimSpace(pol[0][22]) == "PG" {
 			skippedPolicies = append(skippedPolicies, fmt.Sprintf("%07s", strings.TrimSpace(pol[0][2])))
 			continue
 		}
@@ -220,7 +220,11 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		//1998-09-27T00:00:00Z RFC3339
 
 		_, _, version, paymentSplit := LifeMapCodecCompanyAxaRevert(row[1])
-		networkNode := network.GetNetworkNodeByCode(strings.TrimSpace(strings.ToUpper(row[13])))
+		nodeCode := strings.TrimSpace(strings.ToUpper(row[13]))
+		if nodeCode == "W1" {
+			nodeCode = "DIRAgent"
+		}
+		networkNode := network.GetNetworkNodeByCode(nodeCode)
 		if networkNode == nil {
 			log.Println("node not found!")
 			missingProducerPolicies = append(missingProducerPolicies, codeCompany)
@@ -393,6 +397,8 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 				_, usr, err = user.CalculateFiscalCode(*insured)
 
 				missingBirthCityPolicies = append(missingBirthCityPolicies, policy.CodeCompany)
+				skippedPolicies = append(skippedPolicies, policy.CodeCompany)
+				continue
 			} else {
 				log.Printf("error: %s", err.Error())
 				continue
