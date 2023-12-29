@@ -257,6 +257,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			FiscalCode:    strings.TrimSpace(strings.ToUpper(row[27])),
 			Gender:        strings.TrimSpace(strings.ToUpper(row[25])),
 			BirthDate:     ParseDateDDMMYYYY(row[26]).Format(time.RFC3339),
+			Mail:          strings.TrimSpace(strings.ToLower(row[32])),
 			Phone:         fmt.Sprintf("+39%s", strings.TrimSpace(strings.ReplaceAll(row[33], " ", ""))),
 			BirthCity:     strings.TrimSpace(lib.Capitalize(row[50])),
 			BirthProvince: strings.TrimSpace(strings.ToUpper(row[51])),
