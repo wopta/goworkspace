@@ -240,7 +240,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			FiscalCode:    strings.TrimSpace(strings.ToUpper(row[27])),
 			Gender:        strings.TrimSpace(strings.ToUpper(row[25])),
 			BirthDate:     ParseDateDDMMYYYY(row[26]).Format(time.RFC3339),
-			Phone:         strings.TrimSpace(strings.ReplaceAll(row[72], " ", "")),
+			Phone:         fmt.Sprintf("+39%s", strings.TrimSpace(strings.ReplaceAll(row[33], " ", ""))),
 			BirthCity:     strings.TrimSpace(lib.Capitalize(row[73])),
 			BirthProvince: strings.TrimSpace(strings.ToUpper(row[74])),
 			Residence: &models.Address{
@@ -313,6 +313,10 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			},
 		}
 
+		// setting email
+
+		insured.Mail = strings.TrimSpace(strings.ToLower(row[32]))
+
 		calculateMonthlyPrices(&policy)
 
 		if policy.HasGuarantee("death") {
@@ -334,10 +338,6 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 				insured.IdentityDocuments[index].ExpiryDate = insured.IdentityDocuments[0].DateOfIssue.AddDate(10, 0, 0)
 				insured.IdentityDocuments[index].LastUpdate = policy.EmitDate
 			}
-
-			// setting email
-
-			insured.Mail = strings.TrimSpace(strings.ToLower(row[71]))
 
 			// setting domicile
 
