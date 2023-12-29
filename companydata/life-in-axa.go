@@ -386,30 +386,37 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		}*/
 
 		// check fiscalcode
+
 		var usr models.User
 		_, usr, err = user.CalculateFiscalCode(*insured)
 		if err != nil {
 			if strings.ToLower(err.Error()) == "invalid birth city" {
 				_, extractedUser, _ := ExtractUserDataFromFiscalCode(insured.FiscalCode, codes)
-				insured.BirthCity = extractedUser.BirthCity
-				insured.BirthProvince = extractedUser.BirthProvince
+
+				policy.Contractor.BirthCity = extractedUser.BirthCity
+				policy.Contractor.BirthProvince = extractedUser.BirthProvince
+				policy.Assets[0].Person.BirthCity = extractedUser.BirthCity
+				policy.Assets[0].Person.BirthProvince = extractedUser.BirthProvince
 
 				_, usr, err = user.CalculateFiscalCode(*insured)
 
 				missingBirthCityPolicies = append(missingBirthCityPolicies, policy.CodeCompany)
-				skippedPolicies = append(skippedPolicies, policy.CodeCompany)
-				continue
+				//skippedPolicies = append(skippedPolicies, policy.CodeCompany)
+				//continue
 			} else {
 				log.Printf("error: %s", err.Error())
+				skippedPolicies = append(skippedPolicies, policy.CodeCompany)
 				continue
 			}
 
 		}
 
 		if strings.ToUpper(usr.FiscalCode) != strings.ToUpper(insured.FiscalCode) {
+			policy.Assets[0].Person.FiscalCode = usr.FiscalCode
+			policy.Contractor.FiscalCode = usr.FiscalCode
 			wrongFiscalCodePolicies = append(wrongFiscalCodePolicies, policy.CodeCompany)
-			skippedPolicies = append(skippedPolicies, policy.CodeCompany)
-			continue
+			//skippedPolicies = append(skippedPolicies, policy.CodeCompany)
+			//continue
 		}
 
 		transactionsOutput := make(map[string]TransactionsOutput, 0)
