@@ -1,12 +1,16 @@
 package companydata
 
 import (
+	"encoding/base64"
 	"errors"
 	"fmt"
+	"github.com/wopta/goworkspace/mail"
+	"io"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/dustin/go-humanize"
@@ -53,7 +57,10 @@ var (
 )
 
 func GapSogessurEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	now := time.Now()
+	req := lib.ErrorByte(io.ReadAll(r.Body))
+	defer r.Body.Close()
+
+	now, upload := getRequestData(req)
 	prevMonth := lib.GetPreviousMonth(now)
 	from := lib.GetFirstDay(prevMonth)
 	to := lib.GetFirstDay(now)
@@ -77,6 +84,33 @@ func GapSogessurEmit(w http.ResponseWriter, r *http.Request) (string, interface{
 
 	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), storagePath+filename, source)
 	// TODO: SftUpload
+
+	if upload {
+		rawReceiver := os.Getenv("GAP_TO_ADDRESS")
+		receivers := []string{rawReceiver}
+		if strings.Contains(rawReceiver, ",") {
+			receivers = strings.Split(rawReceiver, ",")
+		}
+
+		mail.SendMail(mail.MailRequest{
+			FromAddress: mail.Address{Name: "Wopta", Address: os.Getenv("EMAIL_USERNAME")},
+			Attachments: &[]mail.Attachment{
+				{
+					Name:        fmt.Sprintf("Tracciato GAP %s %d.csv", from.Month(), from.Year()),
+					Byte:        base64.StdEncoding.EncodeToString(source),
+					FileName:    fmt.Sprintf("Tracciato GAP %s %d", from.Month(), from.Year()),
+					ContentType: "application/csv",
+				},
+			},
+			Title:        fmt.Sprintf("Tracciato GAP %s %d", from.Month(), from.Year()),
+			IsHtml:       true,
+			IsAttachment: true,
+			To:           receivers,
+			Message: fmt.Sprintf("<p style=\"Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:17px;color:#000000;font-size:14px\">Ciao,</p>"+
+				"<p style=\"Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:17px;color:#000000;font-size:14px\">in allegato trovi il tracciato GAP del mese %s %d.</p><p style=\"Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:17px;color:#000000;font-size:14px\">Buona giornata.</p>", from.Month(), from.Year()),
+			Subject: fmt.Sprintf("Tracciato GAP %s/%d", from.Month(), from.Year()),
+		})
+	}
 
 	setCompanyEmitted(policies)
 

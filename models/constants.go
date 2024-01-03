@@ -170,8 +170,8 @@ const (
 	FlowFileFormat                = "flows/%s.json"
 	ContractDocumentFormat        = "%s_Contratto_%s.pdf"
 	ProposalDocumentFormat        = "%s_Proposta_%d.pdf"
-	RvmInstructionsDocumentFormat = "%s_Proposta_%d_RVM_Istruzioni.pdf"
-	RvmSurveyDocumentFormat       = "%s_Proposta_%d_RVM_Questionario.pdf"
+	RvmInstructionsDocumentFormat = "Scheda_Rapporto_Visita_Medica_Proposta_%d.pdf"
+	RvmSurveyDocumentFormat       = "Rapporto_Visita_Medica_Proposta_%d.pdf"
 	WarrantFormat                 = "warrants/%s.json"
 	WarrantsFolder                = "warrants/"
 )
@@ -185,8 +185,8 @@ const (
 	InformationSetAttachmentName  = "Precontrattuale"
 	ProposalAttachmentName        = "Proposta"
 	ContractAttachmentName        = "Contratto"
-	RvmInstructionsAttachmentName = "RVM Istruzioni"
-	RvmSurveyAttachmentName       = "RVM Questionario"
+	RvmInstructionsAttachmentName = "Scheda Rapporto Visita Medica"
+	RvmSurveyAttachmentName       = "Rapporto Visita Medica"
 )
 
 const (
