@@ -2,6 +2,7 @@ package rules
 
 import (
 	"encoding/json"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -13,11 +14,334 @@ import (
 	"github.com/go-gota/gota/dataframe"
 	"github.com/go-gota/gota/series"
 	"github.com/mohae/deepcopy"
-	lib "github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib"
 	q "github.com/wopta/goworkspace/quote"
 )
 
+type PmiAllriskRequest struct {
+	Vat                  string  `json:"vat"`
+	Address              string  `json:"address"`
+	PostCode             string  `json:"postcode"`
+	Province             string  `json:"province"`
+	Revenue              float64 `json:"revenue"`
+	Ateco                string  `json:"ateco"`
+	ConstructionMaterial string  `json:"constructionMaterial"`
+	BuildingType         string  `json:"buildingType"`
+	Floor                string  `json:"floor"`
+	BuildingYear         string  `json:"buildingYear"`
+	SquareMeters         float64 `json:"squareMeters"`
+	Employer             int     `json:"employer"`
+	IsAlarm              bool    `json:"isAllarm"`
+	IsPra                bool    `json:"isPra"`
+	IsHolder             bool    `json:"isHolder"`
+}
+
 func PmiAllrisk(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	log.Println("[PmiAllrisk] Handler start ----------------------------------")
+
+	var (
+		err                   error
+		request               PmiAllriskRequest
+		coverages             map[string]*Coverage = make(map[string]*Coverage)
+		munichReQuoteResponse q.MunichReQuoteResponse
+		status                int64
+	)
+
+	body := lib.ErrorByte(io.ReadAll(r.Body))
+	defer r.Body.Close()
+	log.Printf("[PmiAllrisk] request: %s", string(body))
+	err = json.Unmarshal(body, &request)
+	if err != nil {
+		log.Printf("[PmiAllrisk] request error: %s", err.Error())
+		return "", "", err
+	}
+
+	rulesBytes := lib.GetFilesByEnv("grules/pmi-allrisk.json")
+	enrichBytes := getEnrichBytes(request.Ateco)
+	log.Printf("[PmiAllrisk] enrich: %s", string(enrichBytes))
+
+	_, rulesOutput := lib.RulesFromJson(rulesBytes, initCoverage(), body, enrichBytes)
+	rulesOutputBytes, err := json.Marshal(rulesOutput)
+	if err != nil {
+		log.Printf("[PmiAllrisk] rules output error: %s", err.Error())
+		return "", "", err
+	}
+	log.Printf("[PmiAllrisk] rulesOutput: %v", string(rulesOutputBytes))
+	err = json.Unmarshal(rulesOutputBytes, &coverages)
+	if err != nil {
+		log.Printf("[PmiAllrisk] coverages error: %s", err.Error())
+		return "", "", err
+	}
+
+	munichReQuoteRequest := getMunichReQuoteRequest(request, coverages)
+	munichReQuoteRequestBytes, err := json.Marshal(munichReQuoteRequest)
+	if err != nil {
+		log.Printf("[PmiAllrisk] MunichRE Quote request error: %s", err.Error())
+		return "", "", err
+	}
+	log.Printf("[PmiAllrisk] MunichRE Quote request: %s", string(munichReQuoteRequestBytes))
+
+	munichReQuoteResponseBytes := <-q.PmiMunich(munichReQuoteRequestBytes)
+	log.Printf("[PmiAllrisk] MunichRE Quote response: %s", munichReQuoteResponseBytes)
+
+	err = json.Unmarshal([]byte(munichReQuoteResponseBytes), &munichReQuoteResponse)
+	if err != nil {
+		log.Printf("[PmiAllrisk] MunichRE Quote response error: %s", err.Error())
+		return "", "", err
+	}
+
+	if !lib.StructIsEmpty(munichReQuoteResponse) {
+		fillCoveragesValues(coverages, munichReQuoteResponse)
+	}
+
+	responseBytes, _ := json.Marshal(coverages)
+	requestQuote, _ := json.Marshal(munichReQuoteRequest)
+	responseQuote, _ := json.Marshal(munichReQuoteResponse)
+
+	if lib.StructIsEmpty(munichReQuoteResponse) {
+		status = 500
+	} else {
+		status = 200
+	}
+	err = saveQuoteBigQuery(coverages, status, string(body), string(responseBytes), string(requestQuote), string(responseQuote))
+
+	log.Println("[PmiAllrisk] Handler end ------------------------------------")
+
+	return string(responseBytes), rulesOutput, err
+}
+
+type MunichReQuoteRequest struct {
+	SME SME `json:"sme"`
+}
+
+type SME struct {
+	Ateco        string                 `json:"ateco"`
+	SubproductID int64                  `json:"subproductId"`
+	UWRole       string                 `json:"UW_role"`
+	Company      map[string]interface{} `json:"company"`
+	Answers      q.Answers              `json:"answers"`
+}
+
+func saveQuoteBigQuery(coverages map[string]*Coverage, status int64, requestRules, responseRules, requestQuote, responseQuote string) error {
+	var sumBase, sumY, sumP int
+
+	if status == 200 {
+		for _, t := range coverages {
+			if t.IsBase {
+				sumBase = sumBase + int(t.PriceGross)
+			}
+			if t.IsYuor || t.IsYour {
+				sumY = sumY + int(t.PriceGross)
+			}
+			if t.IsPremium {
+				sumP = sumP + int(t.PriceGross)
+			}
+		}
+	}
+
+	dwh := q.MunichReQuotePmiDWHCall{
+		Status:            status,
+		CreationDate:      civil.DateTimeOf(time.Now()),
+		RequestRules:      requestRules,
+		ResponseRules:     responseRules,
+		RequestQuote:      requestQuote,
+		ResponseQuote:     responseQuote,
+		RequestRulesJson:  requestRules,
+		ResponseRulesJson: responseRules,
+		RequestQuoteJson:  requestQuote,
+		ResponseQuoteJson: responseQuote,
+		Base:              int64(sumBase),
+		Your:              int64(sumY),
+		Premium:           int64(sumP),
+	}
+
+	return lib.InsertRowsBigQuery("wopta", "policy-rules-log", dwh)
+}
+
+func fillCoveragesValues(coverages map[string]*Coverage, response q.MunichReQuoteResponse) {
+	for _, r := range response.Result.Answers.Step1 {
+		coverages[r.Slug].PriceNett = r.Value.PremiumNet
+		if coverages[r.Slug].Tax == 0 {
+			var taxsum float64
+			for _, t := range coverages[r.Slug].Taxes {
+				premiumPerc := ((r.Value.PremiumNet * t.Percentage) / 100)
+				taxsum = taxsum + ((premiumPerc * t.Tax) / 100)
+			}
+			coverages[r.Slug].PriceGross = taxsum
+		} else {
+			coverages[r.Slug].PriceGross = r.Value.PremiumNet + ((r.Value.PremiumNet * coverages[r.Slug].Tax) / 100)
+		}
+
+	}
+	for _, r := range response.Result.Answers.Step2[0].Value {
+		coverages[r.Slug].PriceNett = r.Value.PremiumNet
+		if coverages[r.Slug].Tax == 0 {
+			var taxsum float64
+			for _, t := range coverages[r.Slug].Taxes {
+				premiumPerc := ((r.Value.PremiumNet * t.Percentage) / 100)
+				taxsum = taxsum + ((premiumPerc * t.Tax) / 100)
+			}
+			coverages[r.Slug].PriceGross = taxsum
+		} else {
+			coverages[r.Slug].PriceGross = r.Value.PremiumNet + ((r.Value.PremiumNet * coverages[r.Slug].Tax) / 100)
+		}
+	}
+}
+
+// copied from enrich/munich-vat to avoid unnecessary dependency with enrich
+func munichReEnrichVat(vat string) (bytes []byte) {
+	var (
+		urlstring = os.Getenv("MUNICHREBASEURL") + "/api/company/vat/" + vat
+		response  []byte
+	)
+
+	client := lib.ClientCredentials(os.Getenv("MUNICHRECLIENTID"),
+		os.Getenv("MUNICHRECLIENTSECRET"), os.Getenv("MUNICHRESCOPE"), os.Getenv("MUNICHRETOKENENDPOINT"))
+	req, _ := http.NewRequest("GET", urlstring, nil)
+	req.Header.Set("Ocp-Apim-Subscription-Key", os.Getenv("MUNICHRESUBSCRIPTIONKEY"))
+	res, err := client.Do(req)
+	lib.CheckError(err)
+	if res != nil {
+		response, err = io.ReadAll(res.Body)
+		defer res.Body.Close()
+		lib.CheckError(err)
+	}
+
+	return response
+}
+
+func getMunichReQuoteRequest(r PmiAllriskRequest, coverages map[string]*Coverage) (request MunichReQuoteRequest) {
+	var company map[string]interface{}
+
+	companyBytes := munichReEnrichVat(r.Vat)
+	err := json.Unmarshal(companyBytes, &company)
+	lib.CheckError(err)
+
+	ateco := strings.ReplaceAll(r.Ateco, ".", "")
+	alarm := "no"
+	if r.IsAlarm {
+		alarm = "yes"
+	}
+
+	request = MunichReQuoteRequest{
+		SME: SME{
+			SubproductID: 35.0,
+			UWRole:       "Agent",
+			Ateco:        ateco,
+			Company:      company,
+			Answers: q.Answers{
+				Step1: []q.Step1{},
+				Step2: []q.Step2{{
+					BuildingID: "2",
+					Value: q.Step2Value{
+						BuildingType:     r.ConstructionMaterial,
+						NumberOfFloors:   r.Floor,
+						ConstructionYear: r.BuildingYear,
+						Alarm:            alarm,
+						TypeOfInsurance:  "namedPerils",
+						Ateco:            ateco,
+						Postcode:         r.PostCode,
+						Province:         r.Province,
+					},
+				}},
+			},
+		},
+	}
+
+	for _, v := range coverages {
+		var typeOfSumInsured string
+		if v.TypeOfSumInsured == "" {
+			if r.IsPra {
+				typeOfSumInsured = "firstLoss"
+			} else {
+				typeOfSumInsured = "replacementValue"
+			}
+		} else {
+			typeOfSumInsured = v.TypeOfSumInsured
+		}
+
+		st1value := q.Value{}
+		if v.Slug == "legal-defence" {
+			st1value.LegalDefence = &v.LegalDefence
+		} else if v.Slug == "assistance" {
+			yes := "yes"
+			st1value.Assistance = &yes
+		} else {
+			st1value.TypeOfSumInsured = &typeOfSumInsured
+			st1value.Deductible = &v.Deductible
+			st1value.SumInsuredLimitOfIndemnity = &v.SumInsuredLimitOfIndemnity
+			st1value.Deductible = &v.Deductible
+			if v.Slug == "business-interruption" {
+				st1value.DailyAllowance = &v.DailyAllowance
+			}
+			if v.SelfInsurance != "" {
+				st1value.SelfInsurance = &v.SelfInsurance
+			}
+		}
+
+		if v.Type == "company" {
+			if v.IsPremium {
+				request.SME.Answers.Step1 = append(request.SME.Answers.Step1, q.Step1{Slug: v.Slug, Value: st1value})
+			}
+		}
+
+		if v.Type == "building" {
+			if v.IsPremium {
+				request.SME.Answers.Step2[0].Value.Answer = append(request.SME.Answers.Step2[0].Value.Answer, q.Answer{Slug: v.Slug, Value: st1value})
+			}
+		}
+	}
+
+	return request
+}
+
+func getEnrichBytes(ateco string) (bytes []byte) {
+	var result = []byte(`{}`)
+
+	atecoListBytes := lib.GetFilesByEnv("data/rules/Riclassificazione_Ateco.csv")
+
+	df := lib.CsvToDataframe(atecoListBytes)
+	fil := df.Filter(
+		dataframe.F{Colidx: 5, Colname: "Codice Ateco 2007", Comparator: series.Eq, Comparando: ateco},
+	)
+
+	if fil.Nrow() > 0 {
+		result = []byte(`{
+		"RcpRD":"` + strings.ToUpper(fil.Elem(0, 13).String()) + `",
+		"RcoRD":"` + strings.ToUpper(fil.Elem(0, 12).String()) + `",
+		"RctRD":"` + strings.ToUpper(fil.Elem(0, 11).String()) + `",
+		"theft500":"` + strings.ToUpper(fil.Elem(0, 8).String()) + `",
+		"fire500":"` + strings.ToUpper(fil.Elem(0, 6).String()) + `",
+		"atecoMacro":"` + strings.ToUpper(fil.Elem(0, 0).String()) + `",
+		"atecoSub":"` + strings.ToUpper(fil.Elem(0, 1).String()) + `",
+		"atecoDesc":"` + strings.ToUpper(fil.Elem(0, 2).String()) + `",
+		"businessSector":"` + strings.ToUpper(fil.Elem(0, 3).String()) + `",
+		"fire":"` + strings.ToUpper(fil.Elem(0, 14).String()) + `",
+		"fireLow500k":"` + strings.ToUpper(fil.Elem(0, 5).String()) + `",
+		"fireUp500k":"` + strings.ToUpper(fil.Elem(0, 6).String()) + `",
+		"theft":"` + strings.ToUpper(fil.Elem(0, 15).String()) + `",
+		"thefteLow500k ":"` + strings.ToUpper(fil.Elem(0, 8).String()) + `",
+		"theftUp500k":"` + strings.ToUpper(fil.Elem(0, 9).String()) + `",
+		"rct":"` + strings.ToUpper(fil.Elem(0, 16).String()) + `",
+		"rco":"` + strings.ToUpper(fil.Elem(0, 17).String()) + `",
+		"rcoProd":"` + strings.ToUpper(fil.Elem(0, 18).String()) + `",
+		"rcVehicle":"` + strings.ToUpper(fil.Elem(0, 19).String()) + `",
+		"rcpo":"` + strings.ToUpper(fil.Elem(0, 20).String()) + `",
+		"rcp12":"` + strings.ToUpper(strings.ToUpper(fil.Elem(0, 21).String())) + `",
+		"rcp2008":"` + strings.ToUpper(fil.Elem(0, 22).String()) + `",
+		"damageTheft":"` + strings.ToUpper(fil.Elem(0, 23).String()) + `",
+		"damageThing":"` + strings.ToUpper(fil.Elem(0, 24).String()) + `",
+		"rcCostruction":"` + strings.ToUpper(fil.Elem(0, 25).String()) + `",
+		"eletronic":"` + strings.ToUpper(fil.Elem(0, 27).String()) + `",
+		"machineFaliure":"` + strings.ToUpper(fil.Elem(0, 28).String()) + `"}`)
+	}
+
+	return result
+}
+
+// DEPRECATED
+// MunichRE changed the DTO for the Company object on their Quote request
+func PmiAllriskDeprecated(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		result   map[string]interface{}
 		groule   []byte
