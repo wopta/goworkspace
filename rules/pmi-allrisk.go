@@ -92,17 +92,15 @@ func PmiAllrisk(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 
 	if !lib.StructIsEmpty(munichReQuoteResponse) {
 		fillCoveragesValues(coverages, munichReQuoteResponse)
+		status = 200
+	} else {
+		status = 500
 	}
 
 	responseBytes, _ := json.Marshal(coverages)
 	requestQuoteBytes, _ := json.Marshal(munichReQuoteRequest)
 	responseQuoteBytes, _ := json.Marshal(munichReQuoteResponse)
 
-	if lib.StructIsEmpty(munichReQuoteResponse) {
-		status = 500
-	} else {
-		status = 200
-	}
 	err = saveQuoteBigQuery(coverages, status, string(body), string(responseBytes), string(requestQuoteBytes), string(responseQuoteBytes))
 
 	log.Println("[PmiAllrisk] Handler end ------------------------------------")
