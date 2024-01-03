@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -34,6 +35,25 @@ type PmiAllriskRequest struct {
 	IsAlarm              bool    `json:"isAllarm"`
 	IsPra                bool    `json:"isPra"`
 	IsHolder             bool    `json:"isHolder"`
+}
+
+func PmiAllriskHandler(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	// Copied from lib.GetBoolEnv to avoid updating rules/go.mod
+	// since it will soon be deprecated as a module
+	getBoolEnv := func(key string) bool {
+		flag, err := strconv.ParseBool(os.Getenv(key))
+		if err != nil {
+			log.Printf("error loading %s environment variable", key)
+			return false
+		}
+		return flag
+	}
+
+	if getBoolEnv("MUNICHRE_V2") {
+		return PmiAllrisk(w, r)
+	}
+
+	return PmiAllriskDeprecated(w, r)
 }
 
 func PmiAllrisk(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
