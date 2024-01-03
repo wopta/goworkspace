@@ -105,7 +105,7 @@ func AxaFleetTway(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 					DATAIMMATRICOLAZIONE = row[4].(string)
 					TARGA = row[2].(string)
 					MODELLO = row[3].(string)
-					DATAFINECOPERTURA = "31/12/2023"
+					DATAFINECOPERTURA = "31/12/2024"
 					sequence++
 
 				} else {
