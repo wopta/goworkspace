@@ -2,11 +2,11 @@ package policy
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
 
+	"github.com/pkg/errors"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
@@ -15,11 +15,9 @@ func GetPortfolioPoliciesFx(w http.ResponseWriter, r *http.Request) (string, int
 	var (
 		request    GetPoliciesReq
 		response   GetPoliciesResp
-		fieldName  = "producerUid"
-		limitValue = 25
 	)
 
-	log.Println("[GetPortfolioPoliciesFx]")
+	log.Println("[GetPortfolioPoliciesFx] Handler start ----------------------------------------")
 
 	idToken := r.Header.Get("Authorization")
 
@@ -27,26 +25,14 @@ func GetPortfolioPoliciesFx(w http.ResponseWriter, r *http.Request) (string, int
 	lib.CheckError(err)
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
+	defer r.Body.Close()
+
+	log.Printf("[GetPortfolioPoliciesFx] Request: %s", string(body))
+
 	err = json.Unmarshal(body, &request)
 	lib.CheckError(err)
 
-	if request.Limit != 0 {
-		limitValue = request.Limit
-	}
-
-	for _, q := range request.Queries {
-		if q.Field == fieldName {
-			return "", nil, fmt.Errorf("field name is not allowed: %s", fieldName)
-		}
-	}
-
-	request.Queries = append(request.Queries, models.Query{
-		Field: fieldName,
-		Op:    "==",
-		Value: authToken.UserID,
-	})
-
-	response.Policies, err = GetPoliciesByQueriesBigQuery(models.WoptaDataset, models.PoliciesViewCollection, request.Queries, limitValue)
+	response.Policies, err = getPortfolioPolicies(authToken.UserID, request.Queries, request.Limit)
 	if err != nil {
 		log.Println("[GetPortfolioPoliciesFx] query error: ", err.Error())
 		return "", nil, err
@@ -54,5 +40,42 @@ func GetPortfolioPoliciesFx(w http.ResponseWriter, r *http.Request) (string, int
 	log.Printf("[GetPortfolioPoliciesFx]: found %d policies", len(response.Policies))
 
 	jsonOut, err := json.Marshal(response)
+
+	log.Println("[GetPortfolioPoliciesFx] Response: ", string(jsonOut))
+	log.Println("[GetPortfolioPoliciesFx] Handler end ----------------------------------------")
+
 	return string(jsonOut), response, err
+}
+
+func getPortfolioPolicies(producerUid string, requestQueries []models.Query, limit int) (policies []models.Policy, err error) {
+	if len(requestQueries) == 0 {
+		err = errors.New("no query specified")
+		return
+	}
+
+	var (
+		fieldName  = "producerUid"
+		limitValue = 25
+		queries []models.Query
+	)
+	if limit != 0 {
+		limitValue = limit
+	}
+
+	for _, q := range requestQueries {
+		if q.Field == fieldName {
+			log.Println("[getPortfolioPolicies] WARNING query with following field will be ignored: ", fieldName)
+			continue
+		} else {
+			queries = append(queries, q)
+		}
+	}
+
+	queries = append(queries, models.Query{
+		Field: fieldName,
+		Op:    "==",
+		Value: producerUid,
+	})
+
+	return GetPoliciesByQueriesBigQuery(models.WoptaDataset, models.PoliciesViewCollection, queries, limitValue)
 }
