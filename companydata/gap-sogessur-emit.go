@@ -4,7 +4,6 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
-	"github.com/wopta/goworkspace/mail"
 	"io"
 	"log"
 	"net/http"
@@ -14,8 +13,8 @@ import (
 	"time"
 
 	"github.com/dustin/go-humanize"
-
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -96,9 +95,9 @@ func GapSogessurEmit(w http.ResponseWriter, r *http.Request) (string, interface{
 			FromAddress: mail.Address{Name: "Wopta", Address: os.Getenv("EMAIL_USERNAME")},
 			Attachments: &[]mail.Attachment{
 				{
-					Name:        fmt.Sprintf("Tracciato GAP %s %d.csv", from.Month(), from.Year()),
+					Name:        filename,
 					Byte:        base64.StdEncoding.EncodeToString(source),
-					FileName:    fmt.Sprintf("Tracciato GAP %s %d", from.Month(), from.Year()),
+					FileName:    filename,
 					ContentType: "application/csv",
 				},
 			},
