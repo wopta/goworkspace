@@ -31,7 +31,7 @@ type PmiAllriskRequest struct {
 	Floor                string  `json:"floor"`
 	BuildingYear         string  `json:"buildingYear"`
 	SquareMeters         float64 `json:"squareMeters"`
-	Employer             int     `json:"employer"`
+	Employer             float64 `json:"employer"`
 	IsAlarm              bool    `json:"isAllarm"`
 	IsPra                bool    `json:"isPra"`
 	IsHolder             bool    `json:"isHolder"`
@@ -240,6 +240,10 @@ func getMunichReQuoteRequest(r PmiAllriskRequest, coverages map[string]*Coverage
 	if r.IsAlarm {
 		alarm = "yes"
 	}
+
+	company["turnover"] = r.Revenue
+	company["atecoCode"] = ateco
+	company["numberOfEmployees"] = r.Employer
 
 	request = MunichReQuoteRequest{
 		SME: SME{
