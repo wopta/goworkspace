@@ -2,19 +2,19 @@ package policy
 
 import (
 	"encoding/json"
+	"errors"
 	"io"
 	"log"
 	"net/http"
 
-	"github.com/pkg/errors"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
 
 func GetPortfolioPoliciesFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		request    GetPoliciesReq
-		response   GetPoliciesResp
+		request  GetPoliciesReq
+		response GetPoliciesResp
 	)
 
 	log.Println("[GetPortfolioPoliciesFx] Handler start ----------------------------------------")
@@ -56,7 +56,7 @@ func getPortfolioPolicies(producerUid string, requestQueries []models.Query, lim
 	var (
 		fieldName  = "producerUid"
 		limitValue = 25
-		queries []models.Query
+		queries    []models.Query
 	)
 	if limit != 0 {
 		limitValue = limit
