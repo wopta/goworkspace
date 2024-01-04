@@ -46,9 +46,15 @@ func Policy(w http.ResponseWriter, r *http.Request) {
 			},
 			{
 				Route:   "v1",
-				Handler: GetPoliciesByQueryFx, // Broker.GetPoliciesFx,
+				Handler: GetPoliciesByQueryFx,
 				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
+			},
+			{
+				Route:   "/portfolio/v1",
+				Method:  http.MethodPost,
+				Handler: GetPortfolioPoliciesFx,
+				Roles:   []string{models.UserRoleAgent, models.UserRoleAgency},
 			},
 		},
 	}
