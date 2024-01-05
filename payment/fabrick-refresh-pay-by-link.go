@@ -172,7 +172,7 @@ func fabrickRefreshPayByLinkMultiRate(
 	// add all unpaid transactions to to be deleted array
 	for _, tr := range allTransactions {
 		// TODO: check control flow
-		if (tr.IsPay && !tr.IsDelete) || (!tr.IsPay || tr.IsDelete) {
+		if (tr.IsPay && !tr.IsDelete) || (!tr.IsPay && tr.IsDelete) {
 			continue
 		}
 		scheduleDate, err := time.Parse(models.TimeDateOnly, tr.ScheduleDate)
@@ -180,6 +180,7 @@ func fabrickRefreshPayByLinkMultiRate(
 			log.Printf("error parsing schedule date '%s' of transaction '%s': %s", tr.ScheduleDate, tr.Uid, err.Error())
 			return nil, nil, err
 		}
+		log.Printf("adding transcation with schedule date '%s' to be deleted and recreated", tr.ScheduleDate)
 		refreshScheduleDates = append(refreshScheduleDates, scheduleDate)
 		toBeDeletedTransactions = append(toBeDeletedTransactions, tr)
 	}
@@ -200,7 +201,7 @@ func fabrickMultiRatePayment(
 
 	customerId := uuid.New().String()
 	// first transaction schedule date == now
-	firstres := <-FabrickPayObj(policy, true, "", "", customerId, policy.PriceGrossMonthly, policy.PriceNettMonthly, origin, paymentMethods, mgaProduct)
+	firstres := <-FabrickPayObj(policy, true, time.Now().UTC().Format(models.TimeDateOnly), "", customerId, policy.PriceGrossMonthly, policy.PriceNettMonthly, origin, paymentMethods, mgaProduct)
 	time.Sleep(100)
 
 	// we skip the first element since it is always created with todays date
