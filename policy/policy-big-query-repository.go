@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/google/uuid"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
@@ -46,7 +45,7 @@ func buildQuery(datasetID string, tableID string, queries []models.Query, limit 
 		}
 
 		// value parameter should be a random string of only letters
-		valueParameter := paramRegexp.ReplaceAllString(uuid.New().String(), "")
+		valueParameter := paramRegexp.ReplaceAllString(q.Field, "")
 		params[valueParameter] = q.Value
 
 		op, err := getWhitelistedOperator(q.Op)
@@ -90,9 +89,11 @@ func addQuery(query *bytes.Buffer, q models.Query, op, valueParameter string) {
 	case "dateTime":
 		query.WriteString(fmt.Sprintf(" JSON_VALUE(data.%s) %s @%s", q.Field, op, valueParameter))
 	case "bool", "boolean":
-		query.WriteString(fmt.Sprintf(" BOOL(data.%s) %s @%s", q.Field, op, valueParameter))
 		if q.Value == false {
-			query.WriteString(fmt.Sprintf(" OR BOOL(data.%s) IS NULL", q.Field))
+			query.WriteString(fmt.Sprintf(" (BOOL(data.%s) %s @%s", q.Field, op, valueParameter))
+			query.WriteString(fmt.Sprintf(" OR BOOL(data.%s) IS NULL)", q.Field))
+		} else {
+			query.WriteString(fmt.Sprintf(" BOOL(data.%s) %s @%s", q.Field, op, valueParameter))
 		}
 	case "double":
 		query.WriteString(fmt.Sprintf(" FLOAT64(data.%s) %s @%s", q.Field, op, valueParameter))
