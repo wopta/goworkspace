@@ -196,7 +196,7 @@ func fabrickMultiRatePayment(
 	mgaProduct *models.Product,
 	rateScheduleDates []time.Time,
 ) *FabrickPaymentResponse {
-	log.Printf("creating payments for %d trnsactions", len(rateScheduleDates))
+	log.Printf("creating payments for %d transactions", len(rateScheduleDates))
 
 	customerId := uuid.New().String()
 	// first transaction schedule date == now

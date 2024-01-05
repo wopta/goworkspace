@@ -28,9 +28,8 @@ func DeleteTransactionFx(w http.ResponseWriter, r *http.Request) (string, interf
 	if err != nil {
 		log.Printf("could not delete transaction '%s'", transactionUid)
 		return "", "", err
-	} else {
-		log.Printf("transaction '%s' successfully deleted", transactionUid)
 	}
+	log.Printf("transaction '%s' successfully deleted", transactionUid)
 
 	models.CreateAuditLog(r, "")
 
@@ -48,7 +47,7 @@ func DeleteTransaction(transaction *models.Transaction, origin, note string) err
 	transaction.Status = models.TransactionStatusDeleted
 	transaction.StatusHistory = append(transaction.StatusHistory, transaction.Status)
 	transaction.UpdateDate = now
-	transaction.ExpirationDate = now.AddDate(0, 0, 1).Format(models.TimeDateOnly)
+	transaction.ExpirationDate = now.AddDate(0, 0, -1).Format(models.TimeDateOnly)
 	transaction.PaymentNote = note
 
 	fireTransactions := lib.GetDatasetByEnv(origin, models.TransactionsCollection)
