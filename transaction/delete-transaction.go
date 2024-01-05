@@ -24,7 +24,7 @@ func DeleteTransactionFx(w http.ResponseWriter, r *http.Request) (string, interf
 		return "", "", fmt.Errorf(errMessage)
 	}
 
-	err := deleteTransaction(transaction, origin)
+	err := DeleteTransaction(transaction, origin, "Cancellata manualmente")
 	if err != nil {
 		log.Printf("could not delete transaction '%s'", transactionUid)
 		return "", "", err
@@ -39,13 +39,17 @@ func DeleteTransactionFx(w http.ResponseWriter, r *http.Request) (string, interf
 	return "", "", nil
 }
 
-func deleteTransaction(transaction *models.Transaction, origin string) error {
+func DeleteTransaction(transaction *models.Transaction, origin, note string) error {
 	log.Printf("deleting transaction '%s'...", transaction.Uid)
+
+	now := time.Now().UTC()
 
 	transaction.IsDelete = true
 	transaction.Status = models.TransactionStatusDeleted
 	transaction.StatusHistory = append(transaction.StatusHistory, transaction.Status)
-	transaction.UpdateDate = time.Now().UTC()
+	transaction.UpdateDate = now
+	transaction.ExpirationDate = now.AddDate(0, 0, 1).Format(models.TimeDateOnly)
+	transaction.PaymentNote = note
 
 	fireTransactions := lib.GetDatasetByEnv(origin, models.TransactionsCollection)
 
