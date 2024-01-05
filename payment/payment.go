@@ -26,7 +26,7 @@ func Payment(w http.ResponseWriter, r *http.Request) {
 		Routes: []lib.Route{
 			{
 				Route:   "/v1/fabrick/recreate",
-				Handler: FabrickRecreateFx,
+				Handler: FabrickRefreshPayByLinkFx,
 				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},

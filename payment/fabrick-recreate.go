@@ -17,10 +17,7 @@ import (
 	tr "github.com/wopta/goworkspace/transaction"
 )
 
-type FabrickRefreshPayByLinkRequest struct {
-	PolicyUid string `json:"policyUid"`
-}
-
+// DEPRECATED
 func FabrickRecreateFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println("[FabrickRecreateFx] Handler start ---------------------------")
 
@@ -82,6 +79,7 @@ func FabrickRecreateFx(w http.ResponseWriter, r *http.Request) (string, interfac
 	return `{"success":true}`, `{"success":true}`, nil
 }
 
+// DEPRECATED
 func FabrickRecreate(policyUid, origin string) (*models.Policy, error) {
 	log.Println("[FabrickRecreate]")
 	var (
