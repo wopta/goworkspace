@@ -45,7 +45,7 @@ func Policy(w http.ResponseWriter, r *http.Request) {
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
-				Route:   "/portfolio/v1",
+				Route:   "portfolio/v1",
 				Handler: GetPortfolioPoliciesFx,
 				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAgent, models.UserRoleAgency},
@@ -55,12 +55,6 @@ func Policy(w http.ResponseWriter, r *http.Request) {
 				Handler: GetPoliciesByQueryFx,
 				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
-			},
-			{
-				Route:   "/portfolio/v1",
-				Handler: GetPortfolioPoliciesFx,
-				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAgent, models.UserRoleAgency},
 			},
 		},
 	}
