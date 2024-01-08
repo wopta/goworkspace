@@ -62,5 +62,18 @@ func DeleteTransaction(transaction *models.Transaction, origin, note string) err
 	log.Println("saving transaction to bigquery...")
 	transaction.BigQuerySave(origin)
 
+	if transaction.IsPay {
+		// TODO: decide how to handle errors on subsequent calls
+		// log and ignore, or refresh data as it was before changes
+		nts := GetNetworkTransactionsByTransactionUid(transaction.Uid)
+		for _, nt := range nts {
+			err := DeleteNetworkTransaction(&nt)
+			if err != nil {
+				log.Printf("error deleting network transaction '%s': %s", nt.Uid, err.Error())
+				break
+			}
+		}
+	}
+
 	return nil
 }
