@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"regexp"
+	"time"
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
@@ -34,7 +36,6 @@ func GetPoliciesByQueriesBigQuery(datasetID string, tableID string, queries []mo
 func buildQuery(datasetID string, tableID string, queries []models.Query, limit int) (string, map[string]interface{}, error) {
 	var query bytes.Buffer
 	params := make(map[string]interface{})
-	paramRegexp := regexp.MustCompile("[^a-zA-Z]")
 	fieldRegexp := regexp.MustCompile("^[a-zA-Z0-9.]*$")
 
 	for index, q := range queries {
@@ -45,7 +46,7 @@ func buildQuery(datasetID string, tableID string, queries []models.Query, limit 
 		}
 
 		// value parameter should be a random string of only letters
-		valueParameter := paramRegexp.ReplaceAllString(q.Field, "")
+		valueParameter := randomString(12)
 		params[valueParameter] = q.Value
 
 		op, err := getWhitelistedOperator(q.Op)
@@ -65,6 +66,17 @@ func buildQuery(datasetID string, tableID string, queries []models.Query, limit 
 	}
 
 	return query.String(), params, nil
+}
+
+func randomString(length int) string {
+    var letters = []rune("abcdefghijklmnopqrstuvwxyz")
+	rand.Seed(time.Now().UnixNano())
+
+    s := make([]rune, length)
+    for i := range s {
+        s[i] = letters[rand.Intn(len(letters))]
+    }
+    return string(s)
 }
 
 func getWhitelistedOperator(queryOp string) (string, error) {
