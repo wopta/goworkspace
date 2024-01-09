@@ -71,7 +71,6 @@ go_modules = [
     USER,
 ]
 changed_modules = [
-    BROKER
 ]
 updateable_modules = [
     BROKER,
@@ -96,7 +95,7 @@ updateable_modules = [
 
 increment_version_key = PATCH
 environment = DEV  # Replace with your desired environment
-dry_run = False
+dry_run = True
 google_repository = "google"
 github_repository = "origin"
 
