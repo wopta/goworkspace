@@ -180,9 +180,12 @@ func fabrickRefreshPayByLinkMultiRate(
 			log.Printf("error parsing schedule date '%s' of transaction '%s': %s", tr.ScheduleDate, tr.Uid, err.Error())
 			return nil, nil, err
 		}
-		log.Printf("adding transcation with schedule date '%s' to be deleted and recreated", tr.ScheduleDate)
+		log.Printf("adding transcation with schedule date '%s' to be recreated", tr.ScheduleDate)
 		refreshScheduleDates = append(refreshScheduleDates, scheduleDate)
-		toBeDeletedTransactions = append(toBeDeletedTransactions, tr)
+		if !tr.IsDelete {
+			log.Printf("adding transcation with schedule date '%s' to be deleted", tr.ScheduleDate)
+			toBeDeletedTransactions = append(toBeDeletedTransactions, tr)
+		}
 	}
 	// create (totalRates - n paid transactions)
 	payRes := fabrickMultiRatePayment(*policy, origin, paymentMethods, mgaProduct, refreshScheduleDates)
