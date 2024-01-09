@@ -57,9 +57,7 @@ func QueryRowsBigQuery[T any](query string) ([]T, error) {
 		}
 
 		res = append(res, row)
-
 	}
-
 }
 
 func QueryParametrizedRowsBigQuery[T any](query string, params map[string]interface{}) ([]T, error) {
@@ -86,15 +84,13 @@ func QueryParametrizedRowsBigQuery[T any](query string, params map[string]interf
 		var row T
 		e := iter.Next(&row)
 		if e == iterator.Done {
-			return res, e
+			return res, nil
 		}
 		if e != nil {
 			return res, e
 		}
 		res = append(res, row)
-
 	}
-
 }
 
 func UpdateRowBigQuery(datasetID string, tableID string, params map[string]string, condiction string) error {
