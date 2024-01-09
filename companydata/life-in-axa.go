@@ -687,10 +687,10 @@ func parseIndividualContractor(codeCompany string, row []string, codes map[strin
 func parseEnterpriseContractor(row []string) *models.User {
 	contractor := &models.User{
 		Type:    models.UserLegalEntity, // TODO: check if is correct to use legalEntity (Persona Giuridica) or if it's better to introduce enterprise type and change constants names to begin with User instead of Contractor
-		Name:    strings.TrimSpace(lib.Capitalize(row[22])),
-		VatCode: strings.TrimSpace(strings.ToUpper(row[27])),
+		Name:    strings.TrimSpace(lib.Capitalize(row[23])),
+		VatCode: fmt.Sprintf("%011s", strings.TrimSpace(row[27])),
 		Mail:    strings.TrimSpace(strings.ToLower(row[32])),
-		Phone:   fmt.Sprintf("+39%s", strings.TrimSpace(strings.ReplaceAll(row[33], " ", ""))),
+		Phone:   fmt.Sprintf("+39%s", strings.TrimSpace(strings.ReplaceAll(strings.ReplaceAll(row[33], " ", ""), " ", ""))),
 		Residence: &models.Address{
 			StreetName: strings.TrimSpace(lib.Capitalize(row[28])),
 			City:       strings.TrimSpace(lib.Capitalize(row[30])),
