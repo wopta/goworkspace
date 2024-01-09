@@ -17,8 +17,11 @@ func init() {
 }
 
 func Transaction(w http.ResponseWriter, r *http.Request) {
+	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
+
 	log.Println("Transaction")
 	lib.EnableCors(&w, r)
+
 	route := lib.RouteData{
 		Routes: []lib.Route{
 			{
@@ -31,6 +34,12 @@ func Transaction(w http.ResponseWriter, r *http.Request) {
 					models.UserRoleAgency,
 					models.UserRoleAgent,
 				},
+			},
+			{
+				Route:   "v1/:transactionUid",
+				Handler: DeleteTransactionFx,
+				Method:  http.MethodDelete,
+				Roles:   []string{models.UserRoleAdmin},
 			},
 		},
 	}
