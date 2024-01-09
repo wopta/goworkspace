@@ -24,6 +24,12 @@ func DeleteTransactionFx(w http.ResponseWriter, r *http.Request) (string, interf
 		return "", "", fmt.Errorf(errMessage)
 	}
 
+	if transaction.IsDelete {
+		errMessage := fmt.Sprintf("transaction with uid '%s' already deleted", transactionUid)
+		log.Println(errMessage)
+		return "", "", fmt.Errorf(errMessage)
+	}
+
 	err := DeleteTransaction(transaction, origin, "Cancellata manualmente")
 	if err != nil {
 		log.Printf("could not delete transaction '%s'", transactionUid)
