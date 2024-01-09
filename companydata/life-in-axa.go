@@ -36,6 +36,17 @@ const (
 	dryRun           = true
 )
 
+var (
+	skippedPolicies                    = make([]string, 0)
+	missingContractorBirthCityPolicies = make([]string, 0)
+	missingInsuredBirthCityPolicies    = make([]string, 0)
+	missingProducerPolicies            = make([]string, 0)
+	missingProducers                   = make([]string, 0)
+	wrongContractorFiscalCodePolicies  = make([]string, 0)
+	wrongInsuredFiscalCodePolicies     = make([]string, 0)
+	monthlyPolicies                    = make(map[string]map[string][][]string, 0)
+)
+
 func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	const (
 		slide            int = -1
@@ -43,20 +54,12 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		titleHeaderValue     = "DATI DEL CONTRATTO DI ASSICURAZIONE"
 	)
 	var (
-		policies                           = make([]models.Policy, 0)
-		skippedPolicies                    = make([]string, 0)
-		missingContractorBirthCityPolicies = make([]string, 0)
-		missingInsuredBirthCityPolicies    = make([]string, 0)
-		missingProducerPolicies            = make([]string, 0)
-		missingProducers                   = make([]string, 0)
-		wrongContractorFiscalCodePolicies  = make([]string, 0)
-		wrongInsuredFiscalCodePolicies     = make([]string, 0)
-		monthlyPolicies                    = make(map[string]map[string][][]string, 0)
-		result                             = make(map[string]ResultStruct, 0)
-		codes                              map[string]map[string]string
-		startDateJob, endDateJob           time.Time
-		contractorEqualInsured             bool
-		insured                            *models.User
+		policies                 = make([]models.Policy, 0)
+		result                   = make(map[string]ResultStruct, 0)
+		codes                    map[string]map[string]string
+		startDateJob, endDateJob time.Time
+		contractorEqualInsured   bool
+		insured                  *models.User
 	)
 
 	startDateJob = time.Now().UTC()
@@ -109,10 +112,10 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		if pol[0][2] == headervalue || pol[0][1] == titleHeaderValue || pol[0][1] == "1" {
 			continue
 		}
-		if strings.TrimSpace(pol[0][22]) == "PG" {
+		/*if strings.TrimSpace(pol[0][22]) == "PG" {
 			skippedPolicies = append(skippedPolicies, fmt.Sprintf("%07s", strings.TrimSpace(pol[0][2])))
 			continue
-		}
+		}*/
 
 		row = pol[0]
 
@@ -145,6 +148,15 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 				if r[82] == "GE" {
 					beneficiaries = append(beneficiaries, models.Beneficiary{
 						BeneficiaryType: models.BeneficiaryLegalAndWillSuccessors,
+					})
+				} else if r[82] == "PG" {
+					// TODO: handle case beneficiary is the company
+					beneficiaries = append(beneficiaries, models.Beneficiary{
+						User:                   models.User{},
+						IsFamilyMember:         false,
+						IsContactable:          false,
+						IsLegitimateSuccessors: false,
+						BeneficiaryType:        models.BeneficiaryLegalEntity,
 					})
 				} else {
 					benef1 := ParseAxaBeneficiary(r, 0)
@@ -245,124 +257,30 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 		// create contractor
 
-		contractorType := models.ContractorIndividual
-		if row[22] == "PG" {
-			contractorType = models.ContractorLegalEntity
-		}
+		isLegalEntity := row[22] == "PG"
 
-		contractor := &models.User{
-			Type:          contractorType,
-			Name:          strings.TrimSpace(lib.Capitalize(row[24])),
-			Surname:       strings.TrimSpace(lib.Capitalize(row[23])),
-			FiscalCode:    strings.TrimSpace(strings.ToUpper(row[27])),
-			Gender:        strings.TrimSpace(strings.ToUpper(row[25])),
-			BirthDate:     ParseDateDDMMYYYY(row[26]).Format(time.RFC3339),
-			Mail:          strings.TrimSpace(strings.ToLower(row[32])),
-			Phone:         fmt.Sprintf("+39%s", strings.TrimSpace(strings.ReplaceAll(row[33], " ", ""))),
-			BirthCity:     strings.TrimSpace(lib.Capitalize(row[50])),
-			BirthProvince: strings.TrimSpace(strings.ToUpper(row[51])),
-			Residence: &models.Address{
-				StreetName: strings.TrimSpace(lib.Capitalize(row[28])),
-				City:       strings.TrimSpace(lib.Capitalize(row[30])),
-				CityCode:   strings.TrimSpace(strings.ToUpper(row[31])),
-				PostalCode: row[29],
-				Locality:   strings.TrimSpace(lib.Capitalize(row[30])),
-			},
-			CreationDate: ParseDateDDMMYYYY(row[4]),
-			UpdatedDate:  time.Now().UTC(),
-			Consens: &[]models.Consens{
-				{
-					Title:        "Privacy",
-					Consens:      "Il sottoscritto, letta e compresa l'informativa sul trattamento dei dati personali, ACCONSENTE al trattamento dei propri dati personali da parte di Wopta Assicurazioni per l'invio di comunicazioni e proposte commerciali e di marketing, incluso l'invio di newsletter e ricerche di mercato, attraverso strumenti automatizzati (sms, mms, e-mail, ecc.) e non (posta cartacea e telefono con operatore).",
-					Key:          2,
-					Answer:       false,
-					CreationDate: ParseDateDDMMYYYY(row[4]),
-				},
-			},
-		}
+		var contractor *models.User
+		if isLegalEntity {
+			contractor = parseEnterpriseContractor(row)
+			if contractor == nil {
+				continue
+			}
 
-		var usr models.User
-		_, usr, err = user.CalculateFiscalCode(*contractor)
-		if err != nil {
-			if strings.ToLower(err.Error()) == "invalid birth city" {
-				_, extractedUser, _ := ExtractUserDataFromFiscalCode(contractor.FiscalCode, codes)
+			// TODO: add parsing esecutore
 
-				contractor.BirthCity = extractedUser.BirthCity
-				contractor.BirthProvince = extractedUser.BirthProvince
-
-				_, usr, err = user.CalculateFiscalCode(*contractor)
-
-				missingContractorBirthCityPolicies = append(missingContractorBirthCityPolicies, codeCompany)
-			} else {
-				log.Printf("error: %s", err.Error())
-				skippedPolicies = append(skippedPolicies, codeCompany)
+			// TODO: add parsing titolari effettivi
+		} else {
+			contractor = parseIndividualContractor(codeCompany, row, codes)
+			if contractor == nil {
 				continue
 			}
 		}
 
-		if strings.ToUpper(usr.FiscalCode) != strings.ToUpper(contractor.FiscalCode) {
-			contractor.FiscalCode = usr.FiscalCode
-			wrongContractorFiscalCodePolicies = append(wrongContractorFiscalCodePolicies, codeCompany)
-		}
-
 		if !contractorEqualInsured {
 			// create insured
-
-			insured = &models.User{
-				Type:          models.ContractorIndividual,
-				Name:          strings.TrimSpace(lib.Capitalize(row[35])),
-				Surname:       strings.TrimSpace(lib.Capitalize(row[34])),
-				FiscalCode:    strings.TrimSpace(strings.ToUpper(row[38])),
-				Gender:        strings.TrimSpace(strings.ToUpper(row[36])),
-				BirthDate:     ParseDateDDMMYYYY(row[37]).Format(time.RFC3339),
-				Phone:         fmt.Sprintf("+39%s", strings.TrimSpace(strings.ReplaceAll(row[72], " ", ""))),
-				BirthCity:     strings.TrimSpace(lib.Capitalize(row[73])),
-				BirthProvince: strings.TrimSpace(strings.ToUpper(row[74])),
-				Residence: &models.Address{
-					StreetName: strings.TrimSpace(lib.Capitalize(row[63])),
-					City:       strings.TrimSpace(lib.Capitalize(row[65])),
-					CityCode:   strings.TrimSpace(strings.ToUpper(row[66])),
-					PostalCode: row[64],
-					Locality:   strings.TrimSpace(lib.Capitalize(row[65])),
-				},
-				CreationDate: ParseDateDDMMYYYY(row[4]),
-				UpdatedDate:  time.Now().UTC(),
-				Consens: &[]models.Consens{
-					{
-						Title:        "Privacy",
-						Consens:      "Il sottoscritto, letta e compresa l'informativa sul trattamento dei dati personali, ACCONSENTE al trattamento dei propri dati personali da parte di Wopta Assicurazioni per l'invio di comunicazioni e proposte commerciali e di marketing, incluso l'invio di newsletter e ricerche di mercato, attraverso strumenti automatizzati (sms, mms, e-mail, ecc.) e non (posta cartacea e telefono con operatore).",
-						Key:          2,
-						Answer:       false,
-						CreationDate: ParseDateDDMMYYYY(row[4]),
-					},
-				},
-			}
-
-			// check fiscalcode
-
-			_, usr, err = user.CalculateFiscalCode(*insured)
-			if err != nil {
-				if strings.ToLower(err.Error()) == "invalid birth city" {
-					_, extractedUser, _ := ExtractUserDataFromFiscalCode(insured.FiscalCode, codes)
-
-					insured.BirthCity = extractedUser.BirthCity
-					insured.BirthProvince = extractedUser.BirthProvince
-
-					_, usr, err = user.CalculateFiscalCode(*insured)
-
-					missingInsuredBirthCityPolicies = append(missingInsuredBirthCityPolicies, codeCompany)
-				} else {
-					log.Printf("error: %s", err.Error())
-					skippedPolicies = append(skippedPolicies, codeCompany)
-					continue
-				}
-			}
-
-			if strings.ToUpper(usr.FiscalCode) != strings.ToUpper(insured.FiscalCode) {
-				insured.FiscalCode = usr.FiscalCode
-				wrongInsuredFiscalCodePolicies = append(wrongInsuredFiscalCodePolicies, codeCompany)
-				//skippedPolicies = append(skippedPolicies, policy.CodeCompany)
-				//continue
+			insured = parseInsured(codeCompany, row, codes)
+			if insured == nil {
+				continue
 			}
 		} else {
 			insured = contractor
@@ -418,44 +336,76 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			},
 		}
 
-		// setting email
-
-		insured.Mail = strings.TrimSpace(strings.ToLower(row[32]))
+		// get monthly prices
 
 		calculateMonthlyPrices(&policy)
 
+		// enrich contractor data if guarantee death present
+
 		if policy.HasGuarantee("death") {
 
-			// setting contractor identity document
+			// TODO: need to split case individual contractor and legalEntity contractor
 
-			tmpCode, _ := strconv.Atoi(strings.TrimSpace(row[56]))
-			identityDocumentCode := fmt.Sprintf("%02d", tmpCode)
-			contractor.IdentityDocuments = []*models.IdentityDocument{{
-				Number:           strings.TrimSpace(strings.ToUpper(row[57])),
-				Code:             identityDocumentCode,
-				Type:             identityDocumentMap[identityDocumentCode],
-				DateOfIssue:      ParseDateDDMMYYYY(row[58]),
-				ExpiryDate:       ParseDateDDMMYYYY(row[58]).AddDate(10, 0, 0),
-				IssuingAuthority: strings.TrimSpace(lib.Capitalize(row[59])),
-				PlaceOfIssue:     strings.TrimSpace(lib.Capitalize(row[59])),
-				LastUpdate:       policy.EmitDate,
-			}}
+			if !isLegalEntity {
+				// setting contractor identity document
 
-			// setting contractor domicile
+				tmpCode, _ := strconv.Atoi(strings.TrimSpace(row[56]))
+				identityDocumentCode := fmt.Sprintf("%02d", tmpCode)
+				contractor.IdentityDocuments = []*models.IdentityDocument{{
+					Number:           strings.TrimSpace(strings.ToUpper(row[57])),
+					Code:             identityDocumentCode,
+					Type:             identityDocumentMap[identityDocumentCode],
+					DateOfIssue:      ParseDateDDMMYYYY(row[58]),
+					ExpiryDate:       ParseDateDDMMYYYY(row[58]).AddDate(10, 0, 0),
+					IssuingAuthority: strings.TrimSpace(lib.Capitalize(row[59])),
+					PlaceOfIssue:     strings.TrimSpace(lib.Capitalize(row[59])),
+					LastUpdate:       policy.EmitDate,
+				}}
 
-			contractor.Domicile = &models.Address{
-				StreetName: strings.TrimSpace(lib.Capitalize(row[46])),
-				City:       strings.TrimSpace(lib.Capitalize(row[48])),
-				CityCode:   strings.TrimSpace(strings.ToUpper(row[49])),
-				PostalCode: row[47],
-				Locality:   strings.TrimSpace(lib.Capitalize(row[48])),
-			}
+				// setting contractor domicile
 
-			if !contractorEqualInsured {
+				contractor.Domicile = &models.Address{
+					StreetName: strings.TrimSpace(lib.Capitalize(row[46])),
+					City:       strings.TrimSpace(lib.Capitalize(row[48])),
+					CityCode:   strings.TrimSpace(strings.ToUpper(row[49])),
+					PostalCode: row[47],
+					Locality:   strings.TrimSpace(lib.Capitalize(row[48])),
+				}
+
+				if !contractorEqualInsured {
+					// setting insured identity documents
+
+					tmpCode, _ = strconv.Atoi(strings.TrimSpace(row[76]))
+					identityDocumentCode = fmt.Sprintf("%02d", tmpCode)
+					insured.IdentityDocuments = []*models.IdentityDocument{{
+						Number:           strings.TrimSpace(strings.ToUpper(row[77])),
+						Code:             identityDocumentCode,
+						Type:             identityDocumentMap[identityDocumentCode],
+						DateOfIssue:      ParseDateDDMMYYYY(row[78]),
+						ExpiryDate:       ParseDateDDMMYYYY(row[78]).AddDate(10, 0, 0),
+						IssuingAuthority: strings.TrimSpace(lib.Capitalize(row[79])),
+						PlaceOfIssue:     strings.TrimSpace(lib.Capitalize(row[79])),
+						LastUpdate:       policy.EmitDate,
+					}}
+
+					// setting insured domicile
+
+					insured.Domicile = &models.Address{
+						StreetName: strings.TrimSpace(lib.Capitalize(row[67])),
+						City:       strings.TrimSpace(lib.Capitalize(row[69])),
+						CityCode:   strings.TrimSpace(strings.ToUpper(row[70])),
+						PostalCode: row[68],
+						Locality:   strings.TrimSpace(lib.Capitalize(row[69])),
+					}
+				} else {
+					insured.IdentityDocuments = contractor.IdentityDocuments
+					insured.Domicile = contractor.Domicile
+				}
+			} else {
 				// setting insured identity documents
 
-				tmpCode, _ = strconv.Atoi(strings.TrimSpace(row[76]))
-				identityDocumentCode = fmt.Sprintf("%02d", tmpCode)
+				tmpCode, _ := strconv.Atoi(strings.TrimSpace(row[76]))
+				identityDocumentCode := fmt.Sprintf("%02d", tmpCode)
 				insured.IdentityDocuments = []*models.IdentityDocument{{
 					Number:           strings.TrimSpace(strings.ToUpper(row[77])),
 					Code:             identityDocumentCode,
@@ -476,11 +426,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 					PostalCode: row[68],
 					Locality:   strings.TrimSpace(lib.Capitalize(row[69])),
 				}
-			} else {
-				insured.IdentityDocuments = contractor.IdentityDocuments
-				insured.Domicile = contractor.Domicile
 			}
-
 		}
 
 		policy.Assets[0].Person = insured
@@ -677,6 +623,154 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	log.Printf("Script ended at %s", endDateJob.String())
 
 	return "", nil, e
+}
+
+func parseIndividualContractor(codeCompany string, row []string, codes map[string]map[string]string) *models.User {
+	contractor := &models.User{
+		Type:          models.UserIndividual,
+		Name:          strings.TrimSpace(lib.Capitalize(row[24])),
+		Surname:       strings.TrimSpace(lib.Capitalize(row[23])),
+		FiscalCode:    strings.TrimSpace(strings.ToUpper(row[27])),
+		Gender:        strings.TrimSpace(strings.ToUpper(row[25])),
+		BirthDate:     ParseDateDDMMYYYY(row[26]).Format(time.RFC3339),
+		Mail:          strings.TrimSpace(strings.ToLower(row[32])),
+		Phone:         fmt.Sprintf("+39%s", strings.TrimSpace(strings.ReplaceAll(row[33], " ", ""))),
+		BirthCity:     strings.TrimSpace(lib.Capitalize(row[50])),
+		BirthProvince: strings.TrimSpace(strings.ToUpper(row[51])),
+		Residence: &models.Address{
+			StreetName: strings.TrimSpace(lib.Capitalize(row[28])),
+			City:       strings.TrimSpace(lib.Capitalize(row[30])),
+			CityCode:   strings.TrimSpace(strings.ToUpper(row[31])),
+			PostalCode: row[29],
+			Locality:   strings.TrimSpace(lib.Capitalize(row[30])),
+		},
+		CreationDate: ParseDateDDMMYYYY(row[4]),
+		UpdatedDate:  time.Now().UTC(),
+		Consens: &[]models.Consens{
+			{
+				Title:        "Privacy",
+				Consens:      "Il sottoscritto, letta e compresa l'informativa sul trattamento dei dati personali, ACCONSENTE al trattamento dei propri dati personali da parte di Wopta Assicurazioni per l'invio di comunicazioni e proposte commerciali e di marketing, incluso l'invio di newsletter e ricerche di mercato, attraverso strumenti automatizzati (sms, mms, e-mail, ecc.) e non (posta cartacea e telefono con operatore).",
+				Key:          2,
+				Answer:       false,
+				CreationDate: ParseDateDDMMYYYY(row[4]),
+			},
+		},
+	}
+
+	var usr models.User
+	_, usr, err := user.CalculateFiscalCode(*contractor)
+	if err != nil {
+		if strings.ToLower(err.Error()) == "invalid birth city" {
+			_, extractedUser, _ := ExtractUserDataFromFiscalCode(contractor.FiscalCode, codes)
+
+			contractor.BirthCity = extractedUser.BirthCity
+			contractor.BirthProvince = extractedUser.BirthProvince
+
+			_, usr, err = user.CalculateFiscalCode(*contractor)
+
+			missingContractorBirthCityPolicies = append(missingContractorBirthCityPolicies, codeCompany)
+		} else {
+			log.Printf("error: %s", err.Error())
+			skippedPolicies = append(skippedPolicies, codeCompany)
+			return nil
+		}
+	}
+
+	if strings.ToUpper(usr.FiscalCode) != strings.ToUpper(contractor.FiscalCode) {
+		contractor.FiscalCode = usr.FiscalCode
+		wrongContractorFiscalCodePolicies = append(wrongContractorFiscalCodePolicies, codeCompany)
+	}
+
+	return contractor
+}
+
+func parseEnterpriseContractor(row []string) *models.User {
+	contractor := &models.User{
+		Type:    models.UserLegalEntity, // TODO: check if is correct to use legalEntity (Persona Giuridica) or if it's better to introduce enterprise type and change constants names to begin with User instead of Contractor
+		Name:    strings.TrimSpace(lib.Capitalize(row[22])),
+		VatCode: strings.TrimSpace(strings.ToUpper(row[27])),
+		Mail:    strings.TrimSpace(strings.ToLower(row[32])),
+		Phone:   fmt.Sprintf("+39%s", strings.TrimSpace(strings.ReplaceAll(row[33], " ", ""))),
+		Residence: &models.Address{
+			StreetName: strings.TrimSpace(lib.Capitalize(row[28])),
+			City:       strings.TrimSpace(lib.Capitalize(row[30])),
+			CityCode:   strings.TrimSpace(strings.ToUpper(row[31])),
+			PostalCode: row[29],
+			Locality:   strings.TrimSpace(lib.Capitalize(row[30])),
+		},
+		CreationDate: ParseDateDDMMYYYY(row[4]),
+		UpdatedDate:  time.Now().UTC(),
+		Consens: &[]models.Consens{
+			{
+				Title:        "Privacy",
+				Consens:      "Il sottoscritto, letta e compresa l'informativa sul trattamento dei dati personali, ACCONSENTE al trattamento dei propri dati personali da parte di Wopta Assicurazioni per l'invio di comunicazioni e proposte commerciali e di marketing, incluso l'invio di newsletter e ricerche di mercato, attraverso strumenti automatizzati (sms, mms, e-mail, ecc.) e non (posta cartacea e telefono con operatore).",
+				Key:          2,
+				Answer:       false,
+				CreationDate: ParseDateDDMMYYYY(row[4]),
+			},
+		},
+	}
+	return contractor
+}
+
+func parseInsured(codeCompany string, row []string, codes map[string]map[string]string) *models.User {
+	insured := &models.User{
+		Type:          models.UserIndividual,
+		Name:          strings.TrimSpace(lib.Capitalize(row[35])),
+		Surname:       strings.TrimSpace(lib.Capitalize(row[34])),
+		FiscalCode:    strings.TrimSpace(strings.ToUpper(row[38])),
+		Gender:        strings.TrimSpace(strings.ToUpper(row[36])),
+		BirthDate:     ParseDateDDMMYYYY(row[37]).Format(time.RFC3339),
+		Phone:         fmt.Sprintf("+39%s", strings.TrimSpace(strings.ReplaceAll(row[72], " ", ""))),
+		BirthCity:     strings.TrimSpace(lib.Capitalize(row[73])),
+		BirthProvince: strings.TrimSpace(strings.ToUpper(row[74])),
+		Residence: &models.Address{
+			StreetName: strings.TrimSpace(lib.Capitalize(row[63])),
+			City:       strings.TrimSpace(lib.Capitalize(row[65])),
+			CityCode:   strings.TrimSpace(strings.ToUpper(row[66])),
+			PostalCode: row[64],
+			Locality:   strings.TrimSpace(lib.Capitalize(row[65])),
+		},
+		CreationDate: ParseDateDDMMYYYY(row[4]),
+		UpdatedDate:  time.Now().UTC(),
+		Consens: &[]models.Consens{
+			{
+				Title:        "Privacy",
+				Consens:      "Il sottoscritto, letta e compresa l'informativa sul trattamento dei dati personali, ACCONSENTE al trattamento dei propri dati personali da parte di Wopta Assicurazioni per l'invio di comunicazioni e proposte commerciali e di marketing, incluso l'invio di newsletter e ricerche di mercato, attraverso strumenti automatizzati (sms, mms, e-mail, ecc.) e non (posta cartacea e telefono con operatore).",
+				Key:          2,
+				Answer:       false,
+				CreationDate: ParseDateDDMMYYYY(row[4]),
+			},
+		},
+	}
+
+	// check fiscalcode
+
+	_, usr, err := user.CalculateFiscalCode(*insured)
+	if err != nil {
+		if strings.ToLower(err.Error()) == "invalid birth city" {
+			_, extractedUser, _ := ExtractUserDataFromFiscalCode(insured.FiscalCode, codes)
+
+			insured.BirthCity = extractedUser.BirthCity
+			insured.BirthProvince = extractedUser.BirthProvince
+
+			_, usr, err = user.CalculateFiscalCode(*insured)
+
+			missingInsuredBirthCityPolicies = append(missingInsuredBirthCityPolicies, codeCompany)
+		} else {
+			log.Printf("error: %s", err.Error())
+			skippedPolicies = append(skippedPolicies, codeCompany)
+			return nil
+		}
+	}
+
+	if strings.ToUpper(usr.FiscalCode) != strings.ToUpper(insured.FiscalCode) {
+		insured.FiscalCode = usr.FiscalCode
+		wrongInsuredFiscalCodePolicies = append(wrongInsuredFiscalCodePolicies, codeCompany)
+		//skippedPolicies = append(skippedPolicies, policy.CodeCompany)
+		//continue
+	}
+	return insured
 }
 
 func calculateMonthlyPrices(policy *models.Policy) {

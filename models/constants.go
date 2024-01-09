@@ -108,6 +108,7 @@ const (
 const (
 	BeneficiaryLegalAndWillSuccessors string = "legalAndWillSuccessors"
 	BeneficiaryChosenBeneficiary      string = "chosenBeneficiary"
+	BeneficiaryLegalEntity            string = "legalEntity"
 )
 
 const (
@@ -197,8 +198,8 @@ const (
 )
 
 const (
-	ContractorIndividual  = "individual"
-	ContractorLegalEntity = "legalEntity"
+	UserIndividual  = "individual"
+	UserLegalEntity = "legalEntity"
 )
 
 func GetProponentRuiSections() []string {
