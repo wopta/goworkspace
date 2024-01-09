@@ -1,30 +1,18 @@
 package models
 
 import (
+	"cloud.google.com/go/bigquery"
+	"cloud.google.com/go/firestore"
 	"encoding/json"
 	"fmt"
-	"log"
-	"time"
-
-	"cloud.google.com/go/bigquery"
-	"cloud.google.com/go/civil"
-	"cloud.google.com/go/firestore"
 	"github.com/wopta/goworkspace/lib"
 	"google.golang.org/api/iterator"
-	latlng "google.golang.org/genproto/googleapis/type/latlng"
+	"google.golang.org/genproto/googleapis/type/latlng"
+	"log"
+	"time"
 )
 
-func UnmarshalUser(data []byte) (Claim, error) {
-	var r Claim
-	err := json.Unmarshal(data, &r)
-	return r, err
-}
-
-func (r *User) Marshal() ([]byte, error) {
-	return json.Marshal(r)
-}
-
-type User struct {
+type Contractor struct {
 	EmailVerified            bool                   `firestore:"emailVerified"               json:"emailVerified,omitempty"     bigquery:"-"`
 	Uid                      string                 `firestore:"uid"                         json:"uid,omitempty"               bigquery:"uid"`
 	Status                   string                 `firestore:"status,omitempty"            json:"status,omitempty"            bigquery:"-"`
@@ -86,103 +74,83 @@ type User struct {
 	AuthId                   string                 `firestore:"authId,omitempty"            json:"authId,omitempty"            bigquery:"-"`
 	Statements               []*Statement           `firestore:"statements,omitempty"        json:"statements,omitempty"        bigquery:"-"`
 	IsLegalPerson            bool                   `firestore:"isLegalPerson,omitempty"     json:"isLegalPerson,omitempty"     bigquery:"-"`
+	CompanyAddress           *Address               `firestore:"companyAddress,omitempty" json:"companyAddress,omitempty" bigquery:"-"`
 	Data                     string                 `firestore:"-"                           json:"-"                           bigquery:"data"`
 }
 
-type Consens struct {
-	UserUid         string         `json:"useruid,omitempty" firestore:"useruid" bigquery:"-"`
-	Title           string         `json:"title,omitempty" firestore:"title,omitempty" bigquery:"-"`
-	Consens         string         `json:"consens,omitempty" firestore:"consens,omitempty" bigquery:"-"`
-	Key             int64          `json:"key,omitempty" firestore:"key,omitempty" bigquery:"-"`
-	Answer          bool           `json:"answer" firestore:"answer" bigquery:"-"`
-	CreationDate    time.Time      `json:"creationDate,omitempty" firestore:"creationDate,omitempty" bigquery:"-"`
-	BigCreationDate civil.DateTime `json:"-" firestore:"-" bigquery:"-"`
-	Mail            string         `json:"-" firestore:"-" bigquery:"-"`
-}
+func (c *Contractor) ToUser() *User {
+	var user User
 
-type Address struct {
-	StreetName   string `json:"streetName" firestore:"streetName" bigquery:"-"`
-	StreetNumber string `json:"streetNumber" firestore:"streetNumber" bigquery:"-"`
-	City         string `json:"city" firestore:"city" bigquery:"-"`
-	PostalCode   string `json:"postalCode" firestore:"postalCode" bigquery:"-"`
-	Locality     string `json:"locality" firestore:"locality" bigquery:"-"`
-	CityCode     string `json:"cityCode" firestore:"cityCode" bigquery:"-"`
-	Area         string `json:"area" firestore:"area" bigquery:"-"`
-}
-
-func (user *User) ToContractor() *Contractor {
-	var contractor Contractor
-
-	rawContractor, err := json.Marshal(user)
+	rawUser, err := json.Marshal(c)
 	if err != nil {
 		return nil
 	}
 
-	err = json.Unmarshal(rawContractor, &contractor)
+	err = json.Unmarshal(rawUser, &user)
 	if err != nil {
 		return nil
 	}
 
-	return &contractor
+	return &user
 }
 
-func (user *User) initBigqueryData() error {
-	userJson, err := json.Marshal(user)
+func (c *Contractor) initBigqueryData() error {
+	rawContractor, err := json.Marshal(c)
 	if err != nil {
 		return err
 	}
-	user.Data = string(userJson)
+	c.Data = string(rawContractor)
 
-	if user.BirthDate != "" {
-		birthDate, err := time.Parse(time.RFC3339, user.BirthDate)
+	if c.BirthDate != "" {
+		birthDate, err := time.Parse(time.RFC3339, c.BirthDate)
 		if err != nil {
 			return err
 		}
-		user.BigBirthDate = lib.GetBigQueryNullDateTime(birthDate)
+		c.BigBirthDate = lib.GetBigQueryNullDateTime(birthDate)
 	}
 
-	if user.Residence != nil {
-		user.BigResidenceStreetName = user.Residence.StreetName
-		user.BigResidenceStreetNumber = user.Residence.StreetNumber
-		user.BigResidenceCity = user.Residence.City
-		user.BigResidencePostalCode = user.Residence.PostalCode
-		user.BigResidenceLocality = user.Residence.Locality
-		user.BigResidenceCityCode = user.Residence.CityCode
+	if c.Residence != nil {
+		c.BigResidenceStreetName = c.Residence.StreetName
+		c.BigResidenceStreetNumber = c.Residence.StreetNumber
+		c.BigResidenceCity = c.Residence.City
+		c.BigResidencePostalCode = c.Residence.PostalCode
+		c.BigResidenceLocality = c.Residence.Locality
+		c.BigResidenceCityCode = c.Residence.CityCode
 	}
 
-	if user.Domicile != nil {
-		user.BigDomicileStreetName = user.Domicile.StreetName
-		user.BigDomicileStreetNumber = user.Domicile.StreetNumber
-		user.BigDomicileCity = user.Domicile.City
-		user.BigDomicilePostalCode = user.Domicile.PostalCode
-		user.BigDomicileLocality = user.Domicile.Locality
-		user.BigDomicileCityCode = user.Domicile.CityCode
+	if c.Domicile != nil {
+		c.BigDomicileStreetName = c.Domicile.StreetName
+		c.BigDomicileStreetNumber = c.Domicile.StreetNumber
+		c.BigDomicileCity = c.Domicile.City
+		c.BigDomicilePostalCode = c.Domicile.PostalCode
+		c.BigDomicileLocality = c.Domicile.Locality
+		c.BigDomicileCityCode = c.Domicile.CityCode
 	}
 
-	user.BigLocation = bigquery.NullGeography{
+	c.BigLocation = bigquery.NullGeography{
 		// TODO: Check if correct: Geography type uses the WKT format for geometry
-		GeographyVal: fmt.Sprintf("POINT (%f %f)", user.Location.Lng, user.Location.Lat),
+		GeographyVal: fmt.Sprintf("POINT (%f %f)", c.Location.Lng, c.Location.Lat),
 		Valid:        true,
 	}
-	user.BigCreationDate = lib.GetBigQueryNullDateTime(user.CreationDate)
-	user.BigUpdatedDate = lib.GetBigQueryNullDateTime(user.UpdatedDate)
+	c.BigCreationDate = lib.GetBigQueryNullDateTime(c.CreationDate)
+	c.BigUpdatedDate = lib.GetBigQueryNullDateTime(c.UpdatedDate)
 
 	return nil
 }
 
-func (user *User) BigquerySave(origin string) error {
+func (c *Contractor) BigquerySave(origin string) error {
 	table := lib.GetDatasetByEnv(origin, UserCollection)
 
-	if err := user.initBigqueryData(); err != nil {
+	if err := c.initBigqueryData(); err != nil {
 		return err
 	}
 
-	log.Println("user save big query: " + user.Uid)
+	log.Println("user save big query: " + c.Uid)
 
-	return lib.InsertRowsBigQuery(WoptaDataset, table, user)
+	return lib.InsertRowsBigQuery(WoptaDataset, table, c)
 }
 
-func (u *User) GetIdentityDocument() *IdentityDocument {
+func (c *Contractor) GetIdentityDocument() *IdentityDocument {
 	var (
 		lastUpdate       time.Time
 		selectedDocument *IdentityDocument
@@ -190,7 +158,7 @@ func (u *User) GetIdentityDocument() *IdentityDocument {
 	now := time.Now()
 	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
 
-	for _, identityDocument := range u.IdentityDocuments {
+	for _, identityDocument := range c.IdentityDocuments {
 		if identityDocument.LastUpdate.After(lastUpdate) && identityDocument.ExpiryDate.After(today) {
 			selectedDocument = identityDocument
 			lastUpdate = identityDocument.LastUpdate
@@ -199,8 +167,8 @@ func (u *User) GetIdentityDocument() *IdentityDocument {
 	return selectedDocument
 }
 
-func FirestoreDocumentToUser(query *firestore.DocumentIterator) (User, error) {
-	var result User
+func FirestoreDocumentToContractor(query *firestore.DocumentIterator) (Contractor, error) {
+	var result Contractor
 	userDocumentSnapshot, err := query.Next()
 
 	if err == iterator.Done && userDocumentSnapshot == nil {
@@ -219,101 +187,4 @@ func FirestoreDocumentToUser(query *firestore.DocumentIterator) (User, error) {
 	}
 
 	return result, e
-}
-
-func GetUserUIDByFiscalCode(origin string, fiscalCode string) (string, bool, error) {
-	usersFire := lib.GetDatasetByEnv(origin, "users")
-	docSnap := lib.WhereFirestore(usersFire, "fiscalCode", "==", fiscalCode)
-	retrievedUser, err := FirestoreDocumentToUser(docSnap)
-	if err != nil && err.Error() != "no user found" {
-		return "", false, err
-	}
-	if retrievedUser.Uid != "" {
-		return retrievedUser.Uid, false, nil
-	}
-	return lib.NewDoc(usersFire), true, nil
-}
-
-func UpdateUserByFiscalCode(origin string, user User) (string, error) {
-	var err error
-	fireUser := lib.GetDatasetByEnv(origin, UserCollection)
-	docSnap := lib.WhereFirestore(fireUser, "fiscalCode", "==", user.FiscalCode)
-	retrievedUser, err := FirestoreDocumentToUser(docSnap)
-
-	if retrievedUser.Uid != "" {
-		retrievedUser.IdentityDocuments = append(retrievedUser.IdentityDocuments, user.IdentityDocuments...)
-		retrievedUser.Consens = updateUserConsens(retrievedUser.Consens, user.Consens)
-		retrievedUser.Address = user.Address
-		retrievedUser.PostalCode = user.PostalCode
-		retrievedUser.City = user.City
-		retrievedUser.Locality = user.Locality
-		retrievedUser.CityCode = user.CityCode
-		retrievedUser.StreetNumber = user.StreetNumber
-		retrievedUser.Location = user.Location
-		retrievedUser.Residence = user.Residence
-		retrievedUser.Domicile = user.Domicile
-		retrievedUser.Phone = user.Phone
-		retrievedUser.UpdatedDate = time.Now().UTC()
-		if user.Height != 0 {
-			retrievedUser.Height = user.Height
-		}
-		if user.Weight != 0 {
-			retrievedUser.Weight = user.Weight
-		}
-		err = lib.SetFirestoreErr(fireUser, retrievedUser.Uid, retrievedUser)
-		if err != nil {
-			return "", fmt.Errorf("[UpdateUserByFiscalCode] error saving user %s into firestore %s", retrievedUser.Uid,
-				err.Error())
-		}
-
-		err = retrievedUser.BigquerySave(origin)
-		return retrievedUser.Uid, err
-	}
-	return "", fmt.Errorf("no user found with this fiscal code")
-}
-
-func updateUserConsens(oldConsens *[]Consens, newConsens *[]Consens) *[]Consens {
-	if newConsens == nil {
-		return oldConsens
-	}
-	if oldConsens == nil {
-		return newConsens
-	}
-	for _, consens := range *newConsens {
-		found := false
-		for index, savedConsens := range *oldConsens {
-			if consens.Key == savedConsens.Key {
-				(*oldConsens)[index].Answer = consens.Answer
-				(*oldConsens)[index].Title = consens.Title
-				found = true
-			}
-		}
-		if !found {
-			*oldConsens = append(*oldConsens, consens)
-		}
-	}
-	return oldConsens
-}
-
-func UsersToListData(query *firestore.DocumentIterator) []User {
-	result := make([]User, 0)
-	for {
-		d, err := query.Next()
-		if err != nil {
-			log.Println("error")
-			if err == iterator.Done {
-				log.Println("iterator.Done")
-				break
-			}
-			break
-		} else {
-			var value User
-			e := d.DataTo(&value)
-			log.Println("todata")
-			lib.CheckError(e)
-			result = append(result, value)
-			log.Printf("len result: %d\n", len(result))
-		}
-	}
-	return result
 }

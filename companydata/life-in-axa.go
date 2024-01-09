@@ -259,7 +259,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 		isLegalEntity := row[22] == "PG"
 
-		var contractor *models.User
+		var contractor *models.Contractor
 		if isLegalEntity {
 			contractor = parseEnterpriseContractor(row)
 			if contractor == nil {
@@ -283,7 +283,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 				continue
 			}
 		} else {
-			insured = contractor
+			insured = contractor.ToUser()
 		}
 
 		policy := models.Policy{
@@ -565,7 +565,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 			// save user bigquery
 
-			userBigQuerySave(policy.Contractor)
+			contractorBigQuerySave(&policy.Contractor)
 
 			// save network node firestore
 
@@ -625,8 +625,8 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	return "", nil, e
 }
 
-func parseIndividualContractor(codeCompany string, row []string, codes map[string]map[string]string) *models.User {
-	contractor := &models.User{
+func parseIndividualContractor(codeCompany string, row []string, codes map[string]map[string]string) *models.Contractor {
+	contractor := &models.Contractor{
 		Type:          models.UserIndividual,
 		Name:          strings.TrimSpace(lib.Capitalize(row[24])),
 		Surname:       strings.TrimSpace(lib.Capitalize(row[23])),
@@ -658,7 +658,7 @@ func parseIndividualContractor(codeCompany string, row []string, codes map[strin
 	}
 
 	var usr models.User
-	_, usr, err := user.CalculateFiscalCode(*contractor)
+	_, usr, err := user.CalculateFiscalCode(*contractor.ToUser())
 	if err != nil {
 		if strings.ToLower(err.Error()) == "invalid birth city" {
 			_, extractedUser, _ := ExtractUserDataFromFiscalCode(contractor.FiscalCode, codes)
@@ -666,7 +666,7 @@ func parseIndividualContractor(codeCompany string, row []string, codes map[strin
 			contractor.BirthCity = extractedUser.BirthCity
 			contractor.BirthProvince = extractedUser.BirthProvince
 
-			_, usr, err = user.CalculateFiscalCode(*contractor)
+			_, usr, err = user.CalculateFiscalCode(*contractor.ToUser())
 
 			missingContractorBirthCityPolicies = append(missingContractorBirthCityPolicies, codeCompany)
 		} else {
@@ -684,20 +684,13 @@ func parseIndividualContractor(codeCompany string, row []string, codes map[strin
 	return contractor
 }
 
-func parseEnterpriseContractor(row []string) *models.User {
-	contractor := &models.User{
-		Type:    models.UserLegalEntity, // TODO: check if is correct to use legalEntity (Persona Giuridica) or if it's better to introduce enterprise type and change constants names to begin with User instead of Contractor
-		Name:    strings.TrimSpace(lib.Capitalize(row[23])),
-		VatCode: fmt.Sprintf("%011s", strings.TrimSpace(row[27])),
-		Mail:    strings.TrimSpace(strings.ToLower(row[32])),
-		Phone:   fmt.Sprintf("+39%s", strings.TrimSpace(strings.ReplaceAll(strings.ReplaceAll(row[33], " ", ""), " ", ""))),
-		Residence: &models.Address{
-			StreetName: strings.TrimSpace(lib.Capitalize(row[28])),
-			City:       strings.TrimSpace(lib.Capitalize(row[30])),
-			CityCode:   strings.TrimSpace(strings.ToUpper(row[31])),
-			PostalCode: row[29],
-			Locality:   strings.TrimSpace(lib.Capitalize(row[30])),
-		},
+func parseEnterpriseContractor(row []string) *models.Contractor {
+	contractor := &models.Contractor{
+		Type:         models.UserLegalEntity, // TODO: check if is correct to use legalEntity (Persona Giuridica) or if it's better to introduce enterprise type and change constants names to begin with User instead of Contractor
+		Name:         strings.TrimSpace(lib.Capitalize(row[23])),
+		VatCode:      fmt.Sprintf("%011s", strings.TrimSpace(row[27])),
+		Mail:         strings.TrimSpace(strings.ToLower(row[32])),
+		Phone:        fmt.Sprintf("+39%s", strings.TrimSpace(strings.ReplaceAll(strings.ReplaceAll(row[33], " ", ""), " ", ""))),
 		CreationDate: ParseDateDDMMYYYY(row[4]),
 		UpdatedDate:  time.Now().UTC(),
 		Consens: &[]models.Consens{
@@ -709,7 +702,15 @@ func parseEnterpriseContractor(row []string) *models.User {
 				CreationDate: ParseDateDDMMYYYY(row[4]),
 			},
 		},
+		CompanyAddress: &models.Address{
+			StreetName: strings.TrimSpace(lib.Capitalize(row[28])),
+			City:       strings.TrimSpace(lib.Capitalize(row[30])),
+			CityCode:   strings.TrimSpace(strings.ToUpper(row[31])),
+			PostalCode: row[29],
+			Locality:   strings.TrimSpace(lib.Capitalize(row[30])),
+		},
 	}
+
 	return contractor
 }
 
@@ -1305,59 +1306,59 @@ func parseBigQueryAgencyNode(agency *models.AgencyNode) *models.AgencyNode {
 	return agency
 }
 
-func userBigQuerySave(user models.User) error {
+func contractorBigQuerySave(contractor *models.Contractor) error {
 	table := lib.GetDatasetByEnv("", fmt.Sprintf("%s%s", collectionPrefix, models.UserCollection))
 
-	user, err := initBigqueryData(user)
+	result, err := initBigqueryData(contractor)
 	if err != nil {
 		return err
 	}
 
-	log.Println("user save big query: " + user.Uid)
+	log.Println("user save big query: " + result.Uid)
 
-	return lib.InsertRowsBigQuery(models.WoptaDataset, table, user)
+	return lib.InsertRowsBigQuery(models.WoptaDataset, table, contractor)
 }
 
-func initBigqueryData(user models.User) (models.User, error) {
-	userJson, err := json.Marshal(user)
+func initBigqueryData(contractor *models.Contractor) (*models.Contractor, error) {
+	rawContractor, err := json.Marshal(contractor)
 	if err != nil {
-		return models.User{}, err
+		return nil, err
 	}
-	user.Data = string(userJson)
+	contractor.Data = string(rawContractor)
 
-	if user.BirthDate != "" {
-		birthDate, err := time.Parse(time.RFC3339, user.BirthDate)
+	if contractor.BirthDate != "" {
+		birthDate, err := time.Parse(time.RFC3339, contractor.BirthDate)
 		if err != nil {
-			return models.User{}, err
+			return nil, err
 		}
-		user.BigBirthDate = lib.GetBigQueryNullDateTime(birthDate)
+		contractor.BigBirthDate = lib.GetBigQueryNullDateTime(birthDate)
 	}
 
-	if user.Residence != nil {
-		user.BigResidenceStreetName = user.Residence.StreetName
-		user.BigResidenceStreetNumber = user.Residence.StreetNumber
-		user.BigResidenceCity = user.Residence.City
-		user.BigResidencePostalCode = user.Residence.PostalCode
-		user.BigResidenceLocality = user.Residence.Locality
-		user.BigResidenceCityCode = user.Residence.CityCode
+	if contractor.Residence != nil {
+		contractor.BigResidenceStreetName = contractor.Residence.StreetName
+		contractor.BigResidenceStreetNumber = contractor.Residence.StreetNumber
+		contractor.BigResidenceCity = contractor.Residence.City
+		contractor.BigResidencePostalCode = contractor.Residence.PostalCode
+		contractor.BigResidenceLocality = contractor.Residence.Locality
+		contractor.BigResidenceCityCode = contractor.Residence.CityCode
 	}
 
-	if user.Domicile != nil {
-		user.BigDomicileStreetName = user.Domicile.StreetName
-		user.BigDomicileStreetNumber = user.Domicile.StreetNumber
-		user.BigDomicileCity = user.Domicile.City
-		user.BigDomicilePostalCode = user.Domicile.PostalCode
-		user.BigDomicileLocality = user.Domicile.Locality
-		user.BigDomicileCityCode = user.Domicile.CityCode
+	if contractor.Domicile != nil {
+		contractor.BigDomicileStreetName = contractor.Domicile.StreetName
+		contractor.BigDomicileStreetNumber = contractor.Domicile.StreetNumber
+		contractor.BigDomicileCity = contractor.Domicile.City
+		contractor.BigDomicilePostalCode = contractor.Domicile.PostalCode
+		contractor.BigDomicileLocality = contractor.Domicile.Locality
+		contractor.BigDomicileCityCode = contractor.Domicile.CityCode
 	}
 
-	user.BigLocation = bigquery.NullGeography{
+	contractor.BigLocation = bigquery.NullGeography{
 		// TODO: Check if correct: Geography type uses the WKT format for geometry
-		GeographyVal: fmt.Sprintf("POINT (%f %f)", user.Location.Lng, user.Location.Lat),
+		GeographyVal: fmt.Sprintf("POINT (%f %f)", contractor.Location.Lng, contractor.Location.Lat),
 		Valid:        true,
 	}
-	user.BigCreationDate = lib.GetBigQueryNullDateTime(user.CreationDate)
-	user.BigUpdatedDate = lib.GetBigQueryNullDateTime(user.UpdatedDate)
+	contractor.BigCreationDate = lib.GetBigQueryNullDateTime(contractor.CreationDate)
+	contractor.BigUpdatedDate = lib.GetBigQueryNullDateTime(contractor.UpdatedDate)
 
-	return user, nil
+	return contractor, err
 }

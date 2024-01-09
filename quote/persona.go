@@ -175,7 +175,7 @@ func initOfferPrices(policy *models.Policy, personProduct *models.Product) {
 	}
 }
 
-func calculateIPIPrices(contractor models.User, guarantee *models.Guarante, personaTassi map[string]json.RawMessage) {
+func calculateIPIPrices(contractor models.Contractor, guarantee *models.Guarante, personaTassi map[string]json.RawMessage) {
 	var (
 		tassi map[string]map[string]map[string]map[string]float64
 	)
@@ -199,7 +199,7 @@ func calculateIPIPrices(contractor models.User, guarantee *models.Guarante, pers
 
 }
 
-func calculateDPrices(contractor models.User, guarantee *models.Guarante, personaTassi map[string]json.RawMessage) {
+func calculateDPrices(contractor models.Contractor, guarantee *models.Guarante, personaTassi map[string]json.RawMessage) {
 	var (
 		tassi map[string]map[string]float64
 	)
@@ -222,7 +222,7 @@ func calculateDPrices(contractor models.User, guarantee *models.Guarante, person
 
 }
 
-func calculateDRGPrices(contractor models.User, guarantee *models.Guarante, personaTassi map[string]json.RawMessage) {
+func calculateDRGPrices(contractor models.Contractor, guarantee *models.Guarante, personaTassi map[string]json.RawMessage) {
 	var (
 		tassi map[string]map[string]float64
 	)
@@ -245,7 +245,7 @@ func calculateDRGPrices(contractor models.User, guarantee *models.Guarante, pers
 
 }
 
-func calculateITIPrices(contractor models.User, guarantee *models.Guarante, personaTassi map[string]json.RawMessage) {
+func calculateITIPrices(contractor models.Contractor, guarantee *models.Guarante, personaTassi map[string]json.RawMessage) {
 	var (
 		tassi map[string]map[string]float64
 	)
@@ -268,7 +268,7 @@ func calculateITIPrices(contractor models.User, guarantee *models.Guarante, pers
 
 }
 
-func calculateDCPrices(contractor models.User, guarantee *models.Guarante, personaTassi map[string]json.RawMessage) {
+func calculateDCPrices(contractor models.Contractor, guarantee *models.Guarante, personaTassi map[string]json.RawMessage) {
 	var (
 		tassi map[string]map[string]float64
 	)
@@ -291,7 +291,7 @@ func calculateDCPrices(contractor models.User, guarantee *models.Guarante, perso
 
 }
 
-func calculateRSCPrices(contractor models.User, guarantee *models.Guarante, personaTassi map[string]json.RawMessage) {
+func calculateRSCPrices(contractor models.Contractor, guarantee *models.Guarante, personaTassi map[string]json.RawMessage) {
 	var (
 		tassi map[string]map[string]map[string]float64
 	)

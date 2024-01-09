@@ -118,7 +118,11 @@ func SetUserIntoPolicyContractor(policy *models.Policy, origin string) error {
 		return policy.Contractor.BigquerySave(origin)
 	}
 
-	_, err = models.UpdateUserByFiscalCode(origin, policy.Contractor)
+	user := policy.Contractor.ToUser()
+	if user == nil {
+		return fmt.Errorf("invalid user")
+	}
+	_, err = models.UpdateUserByFiscalCode(origin, *user)
 	return err
 }
 

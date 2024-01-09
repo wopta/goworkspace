@@ -163,6 +163,11 @@ func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.T
 			priceGrossFormat := fmt.Sprintf("%013d", intNum) // 000000001220
 			log.Println("LifeAxalEmit: ", priceGrossFormat)
 
+			user := policy.Contractor.ToUser()
+			if user == nil {
+				return nil
+			}
+
 			r, m := getIndennity(g)
 			log.Println(e)
 			row := []string{
@@ -211,16 +216,16 @@ func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.T
 				"PAS",                                                                                    //Scopo del rapporto
 				"BO",                                                                                     //Modalità di pagamento del premio assicurativo (all'intermediario)
 				"SI",                                                                                     //contraente = Assicurato?
-				ChekDomicilie(policy.Contractor).StreetName + ", " + ChekDomicilie(policy.Contractor).StreetNumber, //Indirizzo di domicilio contraente
-				ChekDomicilie(policy.Contractor).PostalCode,                                                        //C.A.P. Di domicilio
-				ChekDomicilie(policy.Contractor).Locality,                                                          //Comune di domicilio
-				ChekDomicilie(policy.Contractor).CityCode,                                                          //Provincia di domicilio
-				policy.Contractor.BirthCity,                                                                        //Luogo di nascita dell’contraente persona fisica
-				policy.Contractor.BirthProvince,                                                                    //Provincia di nascita dell’contraente persona fisica
-				"086",                                                                                              //Stato di residenza dell’contraente
-				residenceCab,                                                                                       //Cab della città di residenza dell’contraente
-				"600",                                                                                              //Sottogruppo attività economica
-				"600",                                                                                              //Ramo gruppo attività economica
+				ChekDomicilie(*user).StreetName + ", " + ChekDomicilie(*user).StreetNumber, //Indirizzo di domicilio contraente
+				ChekDomicilie(*user).PostalCode,                                            //C.A.P. Di domicilio
+				ChekDomicilie(*user).Locality,                                              //Comune di domicilio
+				ChekDomicilie(*user).CityCode,                                              //Provincia di domicilio
+				policy.Contractor.BirthCity,                                                //Luogo di nascita dell’contraente persona fisica
+				policy.Contractor.BirthProvince,                                            //Provincia di nascita dell’contraente persona fisica
+				"086",                                                                      //Stato di residenza dell’contraente
+				residenceCab,                                                               //Cab della città di residenza dell’contraente
+				"600",                                                                      //Sottogruppo attività economica
+				"600",                                                                      //Ramo gruppo attività economica
 				ExistIdentityDocument(policy.Contractor.IdentityDocuments).Code,                                                                                                //Tipo documento dell'contraente persona fisica
 				ExistIdentityDocument(policy.Contractor.IdentityDocuments).Number,                                                                                              //Numero documento dell'contraente persona fisica
 				getFormatdate(ExistIdentityDocument(policy.Contractor.IdentityDocuments).DateOfIssue),                                                                          //Data rilascio documento dell'contraente persona fisica
