@@ -145,27 +145,13 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 			companyCodec, slug, version, _ := LifeMapCodecCompanyAxaRevert(r[1])
 			if slug == "death" {
-				if r[82] == "GE" {
-					beneficiaries = append(beneficiaries, models.Beneficiary{
-						BeneficiaryType: models.BeneficiaryLegalAndWillSuccessors,
-					})
-				} else if r[82] == "PG" {
-					// TODO: handle case beneficiary is the company
-					beneficiaries = append(beneficiaries, models.Beneficiary{
-						User:                   models.User{},
-						IsFamilyMember:         false,
-						IsContactable:          false,
-						IsLegitimateSuccessors: false,
-						BeneficiaryType:        models.BeneficiaryLegalEntity,
-					})
-				} else {
-					benef1 := ParseAxaBeneficiary(r, 0)
-					benef2 := ParseAxaBeneficiary(r, 1)
-					if benef1 != nil {
-						beneficiaries = append(beneficiaries, *benef1)
-					}
-					if benef2 != nil {
-						beneficiaries = append(beneficiaries, *benef2)
+				for i := 0; i < 2; i++ {
+					benef := ParseAxaBeneficiary(r, i)
+					if benef != nil {
+						beneficiaries = append(beneficiaries, *benef)
+						if lib.SliceContains([]string{models.BeneficiarySelfLegalEntity, models.BeneficiaryLegalAndWillSuccessors}, benef.BeneficiaryType) {
+							break
+						}
 					}
 				}
 			}
@@ -886,10 +872,10 @@ func ParseAxaBeneficiary(r []string, base int) *models.Beneficiary {
 
 	if r[82] == "GE" {
 		benef = &models.Beneficiary{
-			BeneficiaryType: models.BeneficiaryLegalAndWillSuccessors,
+			IsLegitimateSuccessors: true,
+			BeneficiaryType:        models.BeneficiaryLegalAndWillSuccessors,
 		}
-	}
-	if r[82] == "NM" {
+	} else if r[82] == "NM" {
 		if strings.TrimSpace(strings.ToUpper(r[85+rangeCell])) == "" || strings.TrimSpace(strings.ToUpper(r[85+rangeCell])) == "0" {
 			return nil
 		}
@@ -906,22 +892,35 @@ func ParseAxaBeneficiary(r []string, base int) *models.Beneficiary {
 
 		benef = &models.Beneficiary{
 			BeneficiaryType: models.BeneficiaryChosenBeneficiary,
-			User: models.User{
-				Name:       strings.TrimSpace(lib.Capitalize(r[84+rangeCell])),
-				Surname:    strings.TrimSpace(lib.Capitalize(r[83+rangeCell])),
-				FiscalCode: strings.TrimSpace(strings.ToUpper(r[85+rangeCell])),
-				Mail:       strings.TrimSpace(strings.ToLower(r[91+rangeCell])),
-				Phone:      strings.TrimSpace(strings.ReplaceAll(r[86+rangeCell], " ", "")),
-				Residence: &models.Address{
-					StreetName: strings.TrimSpace(lib.Capitalize(r[87+rangeCell])),
-					City:       strings.TrimSpace(lib.Capitalize(r[88+rangeCell])),
-					CityCode:   strings.TrimSpace(strings.ToUpper(r[90+rangeCell])),
-					PostalCode: strings.TrimSpace(r[89+rangeCell]),
-					Locality:   strings.TrimSpace(lib.Capitalize(r[88+rangeCell])),
-				},
+			Name:            strings.TrimSpace(lib.Capitalize(r[84+rangeCell])),
+			Surname:         strings.TrimSpace(lib.Capitalize(r[83+rangeCell])),
+			FiscalCode:      strings.TrimSpace(strings.ToUpper(r[85+rangeCell])),
+			Mail:            strings.TrimSpace(strings.ToLower(r[91+rangeCell])),
+			Phone:           strings.TrimSpace(strings.ReplaceAll(r[86+rangeCell], " ", "")),
+			Residence: &models.Address{
+				StreetName: strings.TrimSpace(lib.Capitalize(r[87+rangeCell])),
+				City:       strings.TrimSpace(lib.Capitalize(r[88+rangeCell])),
+				CityCode:   strings.TrimSpace(strings.ToUpper(r[90+rangeCell])),
+				PostalCode: strings.TrimSpace(r[89+rangeCell]),
+				Locality:   strings.TrimSpace(lib.Capitalize(r[88+rangeCell])),
 			},
 			IsContactable:  isContactable,
 			IsFamilyMember: isFamilyMember,
+		}
+	} else if r[82] == "PG" {
+		benef = &models.Beneficiary{
+			BeneficiaryType: models.BeneficiarySelfLegalEntity,
+			Name:            strings.TrimSpace(lib.Capitalize(r[23])),
+			VatCode:         fmt.Sprintf("%011s", strings.TrimSpace(r[27])),
+			Mail:            strings.TrimSpace(strings.ToLower(r[32])),
+			Phone:           fmt.Sprintf("+39%s", strings.TrimSpace(strings.ReplaceAll(strings.ReplaceAll(r[33], " ", ""), " ", ""))),
+			CompanyAddress: &models.Address{
+				StreetName: strings.TrimSpace(lib.Capitalize(r[28])),
+				City:       strings.TrimSpace(lib.Capitalize(r[30])),
+				CityCode:   strings.TrimSpace(strings.ToUpper(r[31])),
+				PostalCode: r[29],
+				Locality:   strings.TrimSpace(lib.Capitalize(r[30])),
+			},
 		}
 	}
 	return benef

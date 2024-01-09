@@ -109,6 +109,7 @@ const (
 	BeneficiaryLegalAndWillSuccessors string = "legalAndWillSuccessors"
 	BeneficiaryChosenBeneficiary      string = "chosenBeneficiary"
 	BeneficiaryLegalEntity            string = "legalEntity"
+	BeneficiarySelfLegalEntity        string = "selfLegalEntity"
 )
 
 const (

@@ -572,7 +572,7 @@ func mapBeneficiary(g models.Guarante, b int) (string, models.Beneficiary, strin
 		result2     string
 		resulStruct models.Beneficiary
 	)
-	resulStructDefault := models.Beneficiary{User: models.User{Residence: &models.Address{}}}
+	resulStructDefault := models.Beneficiary{Residence: &models.Address{}}
 	resulStruct = resulStructDefault
 	if g.Beneficiaries != nil {
 
