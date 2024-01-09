@@ -14,12 +14,12 @@ require (
 	github.com/wopta/goworkspace/mail v1.0.75
 	github.com/wopta/goworkspace/models v1.1.76
 	github.com/wopta/goworkspace/network v1.0.29
-	github.com/wopta/goworkspace/payment v1.0.144
+	github.com/wopta/goworkspace/payment v1.0.145
 	github.com/wopta/goworkspace/policy v1.0.62
 	github.com/wopta/goworkspace/product v1.0.75
 	github.com/wopta/goworkspace/question v1.0.23
-	github.com/wopta/goworkspace/reserved v1.0.62
-	github.com/wopta/goworkspace/transaction v1.0.37
+	github.com/wopta/goworkspace/reserved v1.0.63
+	github.com/wopta/goworkspace/transaction v1.0.38
 	github.com/wopta/goworkspace/wiseproxy v1.0.3
 )
 
