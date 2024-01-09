@@ -41,7 +41,7 @@ func DeleteTransactionFx(w http.ResponseWriter, r *http.Request) (string, interf
 
 	log.Println("Handler end -------------------------------------------------")
 
-	return "", "", nil
+	return "{}", "", nil
 }
 
 func DeleteTransaction(transaction *models.Transaction, origin, note string) error {
