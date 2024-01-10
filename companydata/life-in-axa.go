@@ -248,50 +248,19 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		var contractor *models.Contractor
 		contractors := new([]models.User)
 		if isLegalEntity {
+			// parsing contractor
+
 			contractor = parseEnterpriseContractor(row)
 			if contractor == nil {
 				continue
 			}
 
-			rawDocumentCode, _ := strconv.Atoi(strings.TrimSpace(row[238]))
-			identityDocumentCode := fmt.Sprintf("%02d", rawDocumentCode)
-			esecutore := models.User{
-				Type:          models.UserLegalEntity,
-				Name:          strings.TrimSpace(lib.Capitalize(row[221])),
-				Surname:       strings.TrimSpace(lib.Capitalize(row[220])),
-				FiscalCode:    strings.TrimSpace(strings.ToUpper(row[224])),
-				Gender:        strings.TrimSpace(strings.ToUpper(row[222])),
-				Phone:         fmt.Sprintf("+39%s", strings.TrimSpace(strings.ReplaceAll(row[233], " ", ""))),
-				BirthDate:     ParseDateDDMMYYYY(row[223]).Format(time.RFC3339),
-				BirthCity:     strings.TrimSpace(lib.Capitalize(row[235])),
-				BirthProvince: strings.TrimSpace(strings.ToUpper(row[236])),
-				Residence: &models.Address{
-					StreetName: strings.TrimSpace(lib.Capitalize(row[225])),
-					City:       strings.TrimSpace(lib.Capitalize(row[227])),
-					CityCode:   strings.TrimSpace(strings.ToUpper(row[228])),
-					PostalCode: row[226],
-					Locality:   strings.TrimSpace(lib.Capitalize(row[227])),
-				},
-				Domicile: &models.Address{
-					StreetName: strings.TrimSpace(lib.Capitalize(row[229])),
-					City:       strings.TrimSpace(lib.Capitalize(row[231])),
-					CityCode:   strings.TrimSpace(strings.ToUpper(row[232])),
-					PostalCode: row[230],
-					Locality:   strings.TrimSpace(lib.Capitalize(row[231])),
-				},
-				IdentityDocuments: []*models.IdentityDocument{{
-					Number:           strings.TrimSpace(strings.ToUpper(row[239])),
-					Code:             identityDocumentCode,
-					Type:             identityDocumentMap[identityDocumentCode],
-					DateOfIssue:      ParseDateDDMMYYYY(row[240]),
-					ExpiryDate:       ParseDateDDMMYYYY(row[240]).AddDate(10, 0, 0),
-					IssuingAuthority: strings.TrimSpace(lib.Capitalize(row[241])),
-					PlaceOfIssue:     strings.TrimSpace(lib.Capitalize(row[241])),
-				}},
-				CompanyRole:     strings.TrimSpace(lib.Capitalize(row[244])),
-				LegalEntityType: models.Esecutore,
-			}
+			// parsing esecutore info
+
+			esecutore := parseEsecutore(row)
 			*contractors = append(*contractors, esecutore)
+
+			// parsing titolare effettivo info
 
 			offset := 26
 			titolariEffettivi := make([]models.User, 0)
@@ -299,44 +268,8 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 				if strings.TrimSpace(strings.ToUpper(row[116+(offset*i)])) == "" || strings.TrimSpace(strings.ToUpper(row[116+(offset*i)])) == "NO" {
 					break
 				}
-				rawDocumentCode, _ = strconv.Atoi(strings.TrimSpace(row[136+(offset*i)]))
-				identityDocumentCode = fmt.Sprintf("%02d", rawDocumentCode)
-				titolariEffettivi = append(titolariEffettivi, models.User{
-					Type:          models.UserLegalEntity,
-					Name:          strings.TrimSpace(lib.Capitalize(row[118+(offset*i)])),
-					Surname:       strings.TrimSpace(lib.Capitalize(row[117+(offset*i)])),
-					FiscalCode:    strings.TrimSpace(strings.ToUpper(row[121+(offset*i)])),
-					Gender:        strings.TrimSpace(strings.ToUpper(row[119+(offset*i)])),
-					BirthDate:     ParseDateDDMMYYYY(row[120+(offset*i)]).Format(time.RFC3339),
-					Phone:         fmt.Sprintf("+39%s", strings.TrimSpace(strings.ReplaceAll(row[72], " ", ""))),
-					BirthCity:     strings.TrimSpace(lib.Capitalize(row[133+(offset*i)])),
-					BirthProvince: strings.TrimSpace(strings.ToUpper(row[134+(offset*i)])),
-					Residence: &models.Address{
-						StreetName: strings.TrimSpace(lib.Capitalize(row[122+(offset*i)])),
-						City:       strings.TrimSpace(lib.Capitalize(row[124+(offset*i)])),
-						CityCode:   strings.TrimSpace(strings.ToUpper(row[125+(offset*i)])),
-						PostalCode: row[123+(offset*i)],
-						Locality:   strings.TrimSpace(lib.Capitalize(row[124+(offset*i)])),
-					},
-					Domicile: &models.Address{
-						StreetName: strings.TrimSpace(lib.Capitalize(row[126+(offset*i)])),
-						City:       strings.TrimSpace(lib.Capitalize(row[128+(offset*i)])),
-						CityCode:   strings.TrimSpace(strings.ToUpper(row[129+(offset*i)])),
-						PostalCode: row[127+(offset*i)],
-						Locality:   strings.TrimSpace(lib.Capitalize(row[128+(offset*i)])),
-					},
-					IdentityDocuments: []*models.IdentityDocument{{
-						Number:           strings.TrimSpace(strings.ToUpper(row[137+(offset*i)])),
-						Code:             identityDocumentCode,
-						Type:             identityDocumentMap[identityDocumentCode],
-						DateOfIssue:      ParseDateDDMMYYYY(row[138+(offset*i)]),
-						ExpiryDate:       ParseDateDDMMYYYY(row[138+(offset*i)]).AddDate(10, 0, 0),
-						IssuingAuthority: strings.TrimSpace(lib.Capitalize(row[139+(offset*i)])),
-						PlaceOfIssue:     strings.TrimSpace(lib.Capitalize(row[139+(offset*i)])),
-					}},
-					Work:            strings.TrimSpace(lib.Capitalize(row[130+(offset*i)])),
-					LegalEntityType: models.TitolareEffettivo,
-				})
+				titolareEffettivo := parsingTitolareEffettivo(row, offset, i)
+				titolariEffettivi = append(titolariEffettivi, titolareEffettivo)
 			}
 			*contractors = append(*contractors, titolariEffettivi...)
 		} else {
@@ -694,6 +627,91 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	log.Printf("Script ended at %s", endDateJob.String())
 
 	return "", nil, e
+}
+
+func parsingTitolareEffettivo(row []string, offset int, i int) models.User {
+	rawDocumentCode, _ := strconv.Atoi(strings.TrimSpace(row[136+(offset*i)]))
+	identityDocumentCode := fmt.Sprintf("%02d", rawDocumentCode)
+	titolareEffettivo := models.User{
+		Type:          models.UserLegalEntity,
+		Name:          strings.TrimSpace(lib.Capitalize(row[118+(offset*i)])),
+		Surname:       strings.TrimSpace(lib.Capitalize(row[117+(offset*i)])),
+		FiscalCode:    strings.TrimSpace(strings.ToUpper(row[121+(offset*i)])),
+		Gender:        strings.TrimSpace(strings.ToUpper(row[119+(offset*i)])),
+		BirthDate:     ParseDateDDMMYYYY(row[120+(offset*i)]).Format(time.RFC3339),
+		Phone:         fmt.Sprintf("+39%s", strings.TrimSpace(strings.ReplaceAll(row[72], " ", ""))),
+		BirthCity:     strings.TrimSpace(lib.Capitalize(row[133+(offset*i)])),
+		BirthProvince: strings.TrimSpace(strings.ToUpper(row[134+(offset*i)])),
+		Residence: &models.Address{
+			StreetName: strings.TrimSpace(lib.Capitalize(row[122+(offset*i)])),
+			City:       strings.TrimSpace(lib.Capitalize(row[124+(offset*i)])),
+			CityCode:   strings.TrimSpace(strings.ToUpper(row[125+(offset*i)])),
+			PostalCode: row[123+(offset*i)],
+			Locality:   strings.TrimSpace(lib.Capitalize(row[124+(offset*i)])),
+		},
+		Domicile: &models.Address{
+			StreetName: strings.TrimSpace(lib.Capitalize(row[126+(offset*i)])),
+			City:       strings.TrimSpace(lib.Capitalize(row[128+(offset*i)])),
+			CityCode:   strings.TrimSpace(strings.ToUpper(row[129+(offset*i)])),
+			PostalCode: row[127+(offset*i)],
+			Locality:   strings.TrimSpace(lib.Capitalize(row[128+(offset*i)])),
+		},
+		IdentityDocuments: []*models.IdentityDocument{{
+			Number:           strings.TrimSpace(strings.ToUpper(row[137+(offset*i)])),
+			Code:             identityDocumentCode,
+			Type:             identityDocumentMap[identityDocumentCode],
+			DateOfIssue:      ParseDateDDMMYYYY(row[138+(offset*i)]),
+			ExpiryDate:       ParseDateDDMMYYYY(row[138+(offset*i)]).AddDate(10, 0, 0),
+			IssuingAuthority: strings.TrimSpace(lib.Capitalize(row[139+(offset*i)])),
+			PlaceOfIssue:     strings.TrimSpace(lib.Capitalize(row[139+(offset*i)])),
+		}},
+		Work:            strings.TrimSpace(lib.Capitalize(row[130+(offset*i)])),
+		LegalEntityType: models.TitolareEffettivo,
+	}
+	return titolareEffettivo
+}
+
+func parseEsecutore(row []string) models.User {
+	rawDocumentCode, _ := strconv.Atoi(strings.TrimSpace(row[238]))
+	identityDocumentCode := fmt.Sprintf("%02d", rawDocumentCode)
+
+	esecutore := models.User{
+		Type:          models.UserLegalEntity,
+		Name:          strings.TrimSpace(lib.Capitalize(row[221])),
+		Surname:       strings.TrimSpace(lib.Capitalize(row[220])),
+		FiscalCode:    strings.TrimSpace(strings.ToUpper(row[224])),
+		Gender:        strings.TrimSpace(strings.ToUpper(row[222])),
+		Phone:         fmt.Sprintf("+39%s", strings.TrimSpace(strings.ReplaceAll(row[233], " ", ""))),
+		BirthDate:     ParseDateDDMMYYYY(row[223]).Format(time.RFC3339),
+		BirthCity:     strings.TrimSpace(lib.Capitalize(row[235])),
+		BirthProvince: strings.TrimSpace(strings.ToUpper(row[236])),
+		Residence: &models.Address{
+			StreetName: strings.TrimSpace(lib.Capitalize(row[225])),
+			City:       strings.TrimSpace(lib.Capitalize(row[227])),
+			CityCode:   strings.TrimSpace(strings.ToUpper(row[228])),
+			PostalCode: row[226],
+			Locality:   strings.TrimSpace(lib.Capitalize(row[227])),
+		},
+		Domicile: &models.Address{
+			StreetName: strings.TrimSpace(lib.Capitalize(row[229])),
+			City:       strings.TrimSpace(lib.Capitalize(row[231])),
+			CityCode:   strings.TrimSpace(strings.ToUpper(row[232])),
+			PostalCode: row[230],
+			Locality:   strings.TrimSpace(lib.Capitalize(row[231])),
+		},
+		IdentityDocuments: []*models.IdentityDocument{{
+			Number:           strings.TrimSpace(strings.ToUpper(row[239])),
+			Code:             identityDocumentCode,
+			Type:             identityDocumentMap[identityDocumentCode],
+			DateOfIssue:      ParseDateDDMMYYYY(row[240]),
+			ExpiryDate:       ParseDateDDMMYYYY(row[240]).AddDate(10, 0, 0),
+			IssuingAuthority: strings.TrimSpace(lib.Capitalize(row[241])),
+			PlaceOfIssue:     strings.TrimSpace(lib.Capitalize(row[241])),
+		}},
+		CompanyRole:     strings.TrimSpace(lib.Capitalize(row[244])),
+		LegalEntityType: models.Esecutore,
+	}
+	return esecutore
 }
 
 func parseIndividualContractor(codeCompany string, row []string, codes map[string]map[string]string) *models.Contractor {
