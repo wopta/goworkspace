@@ -793,6 +793,7 @@ func parseInsured(codeCompany string, row []string, codes map[string]map[string]
 		FiscalCode:    strings.TrimSpace(strings.ToUpper(row[38])),
 		Gender:        strings.TrimSpace(strings.ToUpper(row[36])),
 		BirthDate:     ParseDateDDMMYYYY(row[37]).Format(time.RFC3339),
+		Mail:          strings.TrimSpace(strings.ToLower(row[71])),
 		Phone:         fmt.Sprintf("+39%s", strings.TrimSpace(strings.ReplaceAll(row[72], " ", ""))),
 		BirthCity:     strings.TrimSpace(lib.Capitalize(row[73])),
 		BirthProvince: strings.TrimSpace(strings.ToUpper(row[74])),
