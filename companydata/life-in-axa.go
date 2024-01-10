@@ -1053,6 +1053,7 @@ func createTransaction(policy models.Policy, mgaProduct *models.Product, custome
 		IsPay:           isPay,
 		PayDate:         payDate,
 		TransactionDate: payDate,
+		IsEmit:          isPay,
 		Name:            policy.Contractor.Name + " " + policy.Contractor.Surname,
 		Company:         policy.Company,
 		IsDelete:        false,
