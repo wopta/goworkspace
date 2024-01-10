@@ -630,6 +630,10 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 }
 
 func parsingTitolareEffettivo(row []string, offset int, i int) models.User {
+	phone := strings.TrimSpace(strings.ReplaceAll(strings.ReplaceAll(row[132], " ", ""), " ", ""))
+	if phone != "" {
+		phone = fmt.Sprintf("+39%s", phone)
+	}
 	rawDocumentCode, _ := strconv.Atoi(strings.TrimSpace(row[136+(offset*i)]))
 	identityDocumentCode := fmt.Sprintf("%02d", rawDocumentCode)
 	titolareEffettivo := models.User{
@@ -639,7 +643,8 @@ func parsingTitolareEffettivo(row []string, offset int, i int) models.User {
 		FiscalCode:    strings.TrimSpace(strings.ToUpper(row[121+(offset*i)])),
 		Gender:        strings.TrimSpace(strings.ToUpper(row[119+(offset*i)])),
 		BirthDate:     ParseDateDDMMYYYY(row[120+(offset*i)]).Format(time.RFC3339),
-		Phone:         fmt.Sprintf("+39%s", strings.TrimSpace(strings.ReplaceAll(row[72], " ", ""))),
+		Mail:          strings.TrimSpace(strings.ToLower(row[131+(offset*i)])),
+		Phone:         phone,
 		BirthCity:     strings.TrimSpace(lib.Capitalize(row[133+(offset*i)])),
 		BirthProvince: strings.TrimSpace(strings.ToUpper(row[134+(offset*i)])),
 		Residence: &models.Address{
@@ -675,13 +680,19 @@ func parseEsecutore(row []string) models.User {
 	rawDocumentCode, _ := strconv.Atoi(strings.TrimSpace(row[238]))
 	identityDocumentCode := fmt.Sprintf("%02d", rawDocumentCode)
 
+	phone := strings.TrimSpace(strings.ReplaceAll(strings.ReplaceAll(row[234], " ", ""), " ", ""))
+	if phone != "" {
+		phone = fmt.Sprintf("+39%s", phone)
+	}
+
 	esecutore := models.User{
 		Type:          models.UserLegalEntity,
 		Name:          strings.TrimSpace(lib.Capitalize(row[221])),
 		Surname:       strings.TrimSpace(lib.Capitalize(row[220])),
 		FiscalCode:    strings.TrimSpace(strings.ToUpper(row[224])),
 		Gender:        strings.TrimSpace(strings.ToUpper(row[222])),
-		Phone:         fmt.Sprintf("+39%s", strings.TrimSpace(strings.ReplaceAll(row[233], " ", ""))),
+		Mail:          strings.TrimSpace(strings.ToLower(row[233])),
+		Phone:         phone,
 		BirthDate:     ParseDateDDMMYYYY(row[223]).Format(time.RFC3339),
 		BirthCity:     strings.TrimSpace(lib.Capitalize(row[235])),
 		BirthProvince: strings.TrimSpace(strings.ToUpper(row[236])),
@@ -715,6 +726,11 @@ func parseEsecutore(row []string) models.User {
 }
 
 func parseIndividualContractor(codeCompany string, row []string, codes map[string]map[string]string) *models.Contractor {
+	phone := strings.TrimSpace(strings.TrimSpace(strings.ReplaceAll(strings.ReplaceAll(row[33], " ", ""), " ", "")))
+	if phone != "" {
+		phone = fmt.Sprintf("+39%s", phone)
+	}
+
 	contractor := &models.Contractor{
 		Type:          models.UserIndividual,
 		Name:          strings.TrimSpace(lib.Capitalize(row[24])),
@@ -723,7 +739,7 @@ func parseIndividualContractor(codeCompany string, row []string, codes map[strin
 		Gender:        strings.TrimSpace(strings.ToUpper(row[25])),
 		BirthDate:     ParseDateDDMMYYYY(row[26]).Format(time.RFC3339),
 		Mail:          strings.TrimSpace(strings.ToLower(row[32])),
-		Phone:         fmt.Sprintf("+39%s", strings.TrimSpace(strings.ReplaceAll(row[33], " ", ""))),
+		Phone:         phone,
 		BirthCity:     strings.TrimSpace(lib.Capitalize(row[50])),
 		BirthProvince: strings.TrimSpace(strings.ToUpper(row[51])),
 		Residence: &models.Address{
@@ -774,12 +790,17 @@ func parseIndividualContractor(codeCompany string, row []string, codes map[strin
 }
 
 func parseEnterpriseContractor(row []string) *models.Contractor {
+	phone := strings.TrimSpace(strings.TrimSpace(strings.ReplaceAll(strings.ReplaceAll(row[33], " ", ""), " ", "")))
+	if phone != "" {
+		phone = fmt.Sprintf("+39%s", phone)
+	}
+
 	contractor := &models.Contractor{
 		Type:         models.UserLegalEntity,
 		Name:         strings.TrimSpace(lib.Capitalize(row[23])),
 		VatCode:      fmt.Sprintf("%011s", strings.TrimSpace(row[27])),
 		Mail:         strings.TrimSpace(strings.ToLower(row[32])),
-		Phone:        fmt.Sprintf("+39%s", strings.TrimSpace(strings.ReplaceAll(strings.ReplaceAll(row[33], " ", ""), " ", ""))),
+		Phone:        phone,
 		CreationDate: ParseDateDDMMYYYY(row[4]),
 		UpdatedDate:  time.Now().UTC(),
 		Consens: &[]models.Consens{
