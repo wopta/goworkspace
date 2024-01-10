@@ -326,7 +326,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 						Locality:   strings.TrimSpace(lib.Capitalize(row[128+(offset*i)])),
 					},
 					IdentityDocuments: []*models.IdentityDocument{{
-						Number:           strings.TrimSpace(strings.ToUpper(row[239])),
+						Number:           strings.TrimSpace(strings.ToUpper(row[137+(offset*i)])),
 						Code:             identityDocumentCode,
 						Type:             identityDocumentMap[identityDocumentCode],
 						DateOfIssue:      ParseDateDDMMYYYY(row[138+(offset*i)]),
