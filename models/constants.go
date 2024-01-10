@@ -203,6 +203,11 @@ const (
 	UserLegalEntity = "legalEntity"
 )
 
+const (
+	Esecutore         = "esecutore"
+	TitolareEffettivo = "titolareEffettivo"
+)
+
 func GetProponentRuiSections() []string {
 	return []string{RuiSectionE}
 }

@@ -288,7 +288,8 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 					IssuingAuthority: strings.TrimSpace(lib.Capitalize(row[241])),
 					PlaceOfIssue:     strings.TrimSpace(lib.Capitalize(row[241])),
 				}},
-				CompanyRole: strings.TrimSpace(lib.Capitalize(row[244])),
+				CompanyRole:     strings.TrimSpace(lib.Capitalize(row[244])),
+				LegalEntityType: models.Esecutore,
 			}
 			*contractors = append(*contractors, esecutore)
 
@@ -333,7 +334,8 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 						IssuingAuthority: strings.TrimSpace(lib.Capitalize(row[139+(offset*i)])),
 						PlaceOfIssue:     strings.TrimSpace(lib.Capitalize(row[139+(offset*i)])),
 					}},
-					Work: strings.TrimSpace(lib.Capitalize(row[130+(offset*i)])), // TODO: check is work is correct or if we need to use CompanyRole
+					Work:            strings.TrimSpace(lib.Capitalize(row[130+(offset*i)])),
+					LegalEntityType: models.TitolareEffettivo,
 				})
 			}
 			*contractors = append(*contractors, titolariEffettivi...)
@@ -418,8 +420,8 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			if !isLegalEntity {
 				// setting contractor identity document
 
-				tmpCode, _ := strconv.Atoi(strings.TrimSpace(row[56]))
-				identityDocumentCode := fmt.Sprintf("%02d", tmpCode)
+				rawCode, _ := strconv.Atoi(strings.TrimSpace(row[56]))
+				identityDocumentCode := fmt.Sprintf("%02d", rawCode)
 				contractor.IdentityDocuments = []*models.IdentityDocument{{
 					Number:           strings.TrimSpace(strings.ToUpper(row[57])),
 					Code:             identityDocumentCode,
@@ -444,8 +446,8 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 				if !contractorEqualInsured {
 					// setting insured identity documents
 
-					tmpCode, _ = strconv.Atoi(strings.TrimSpace(row[76]))
-					identityDocumentCode = fmt.Sprintf("%02d", tmpCode)
+					rawCode, _ = strconv.Atoi(strings.TrimSpace(row[76]))
+					identityDocumentCode = fmt.Sprintf("%02d", rawCode)
 					insured.IdentityDocuments = []*models.IdentityDocument{{
 						Number:           strings.TrimSpace(strings.ToUpper(row[77])),
 						Code:             identityDocumentCode,
@@ -473,8 +475,8 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			} else {
 				// setting insured identity documents
 
-				tmpCode, _ := strconv.Atoi(strings.TrimSpace(row[76]))
-				identityDocumentCode := fmt.Sprintf("%02d", tmpCode)
+				rawCode, _ := strconv.Atoi(strings.TrimSpace(row[76]))
+				identityDocumentCode := fmt.Sprintf("%02d", rawCode)
 				insured.IdentityDocuments = []*models.IdentityDocument{{
 					Number:           strings.TrimSpace(strings.ToUpper(row[77])),
 					Code:             identityDocumentCode,
@@ -755,7 +757,7 @@ func parseIndividualContractor(codeCompany string, row []string, codes map[strin
 
 func parseEnterpriseContractor(row []string) *models.Contractor {
 	contractor := &models.Contractor{
-		Type:         models.UserLegalEntity, // TODO: check if is correct to use legalEntity (Persona Giuridica) or if it's better to introduce enterprise type and change constants names to begin with User instead of Contractor
+		Type:         models.UserLegalEntity,
 		Name:         strings.TrimSpace(lib.Capitalize(row[23])),
 		VatCode:      fmt.Sprintf("%011s", strings.TrimSpace(row[27])),
 		Mail:         strings.TrimSpace(strings.ToLower(row[32])),
