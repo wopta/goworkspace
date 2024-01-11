@@ -91,7 +91,7 @@ func PutClaim(idToken string, origin string, claim *models.Claim) (string, inter
 		}
 		gsLink := lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "assets/users/"+user.Uid+"/claims/"+
 			claim.ClaimUid+"/"+doc.FileName, byteFile)
-		att = append(att, mail.Attachment{Byte: doc.Byte, Name: doc.Name, FileName: doc.FileName, ContentType: doc.ContentType})
+		att = append(att, mail.Attachment{Byte: doc.Byte, Name: strings.ReplaceAll(doc.Name, "_", " "), FileName: doc.FileName, ContentType: doc.ContentType})
 		claim.Documents[i].Byte = ""
 		claim.Documents[i].Link = gsLink
 	}
