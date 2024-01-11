@@ -69,11 +69,22 @@ func UpdateUserEmail(uid, email string) (*auth.UserRecord, error) {
 	return userRecord, err
 }
 
+func HandleUserAuthenticationStatus(uid string, disabled bool) error {
+	client, ctx := getClient()
+	params := (&auth.UserToUpdate{}).
+		Disabled(disabled)
+	userRecord, err := client.UpdateUser(ctx, uid, params)
+	if err != nil {
+		log.Printf("[UpdateUserEmail] error updating user: %v\n", err)
+		return err
+	}
+	log.Printf("[UpdateUserEmail] successfully updated user: %v\n", userRecord)
+	return err
+}
+
 func VerifyUserIdToken(idToken string) (*auth.Token, error) {
 	client, ctx := getClient()
-
-	token, err := client.VerifyIDToken(ctx, strings.ReplaceAll(idToken, "Bearer ", ""))
-
+	token, err := client.VerifyIDTokenAndCheckRevoked(ctx, strings.ReplaceAll(idToken, "Bearer ", ""))
 	return token, err
 }
 
@@ -82,7 +93,6 @@ func GetUserIdFromIdToken(idToken string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
 	return token.Claims["user_id"].(string), err
 }
 

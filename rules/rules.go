@@ -22,7 +22,7 @@ func Rules(w http.ResponseWriter, r *http.Request) {
 		Routes: []lib.Route{
 			{
 				Route:   "/risk/pmi",
-				Handler: PmiAllrisk,
+				Handler: PmiAllriskHandler,
 				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAll},
 			},

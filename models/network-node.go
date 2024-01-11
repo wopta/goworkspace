@@ -1,8 +1,10 @@
 package models
 
 import (
+	"cloud.google.com/go/firestore"
 	"encoding/json"
 	"fmt"
+	"google.golang.org/api/iterator"
 	"log"
 	"time"
 
@@ -105,6 +107,26 @@ type NodeProduct struct {
 type NodeCompany struct {
 	Name         string `json:"-" firestore:"-" bigquery:"name"`
 	ProducerCode string `json:"-" firestore:"-" bigquery:"producerCode"`
+}
+
+func NetworkNodeToListData(query *firestore.DocumentIterator) []NetworkNode {
+	result := make([]NetworkNode, 0)
+	for {
+		d, err := query.Next()
+		if err != nil {
+		}
+		if err != nil {
+			if err == iterator.Done {
+				break
+			}
+		}
+		var value NetworkNode
+		e := d.DataTo(&value)
+		value.Uid = d.Ref.ID
+		lib.CheckError(e)
+		result = append(result, value)
+	}
+	return result
 }
 
 func (nn *NetworkNode) Marshal() ([]byte, error) {

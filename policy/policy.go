@@ -34,7 +34,7 @@ func Policy(w http.ResponseWriter, r *http.Request) {
 			},
 			{
 				Route:   "v1/:uid",
-				Handler: DeletePolicyFx, // Broker.DeletePolicy
+				Handler: DeletePolicyFx,
 				Method:  http.MethodDelete,
 				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},
@@ -45,8 +45,14 @@ func Policy(w http.ResponseWriter, r *http.Request) {
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
-				Route:   "v1",
-				Handler: GetPoliciesByQueryFx, // Broker.GetPoliciesFx,
+				Route:   "/portfolio/v1",
+				Handler: GetPortfolioPoliciesFx,
+				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAgent, models.UserRoleAgency},
+			},
+			{
+				Route:   "/v1",
+				Handler: GetPoliciesByQueryFx,
 				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},

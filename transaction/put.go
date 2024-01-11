@@ -29,7 +29,7 @@ func PutByPolicy(
 	log.Printf("[PutByPolicy] Policy %s", policy.Uid)
 
 	if scheduleDate == "" {
-		sd = time.Now().UTC().Format(models.TimeDateOnly)
+		sd = policy.StartDate.Format(models.TimeDateOnly)
 	} else {
 		sd = scheduleDate
 	}

@@ -5,36 +5,70 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
 
-type PolicyDeleteReq struct {
-	DeleteDesc string `json:"deleteDesc,omitempty"`
+type PolicyDeleteRequest struct {
+	Date        time.Time `json:"date"`
+	Description string    `json:"description"`
+	Code        string    `json:"code"`
 }
 
 func DeletePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	log.SetPrefix("[DeletePolicyFx] ")
+
 	var (
-		err       error
-		policy    models.Policy
-		policyUID string
-		request   PolicyDeleteReq
+		err     error
+		request PolicyDeleteRequest
 	)
-	log.Println("DeletePolicy")
-	guaranteFire := lib.GetDatasetByEnv(r.Header.Get("origin"), "guarante")
-	req := lib.ErrorByte(io.ReadAll(r.Body))
-	json.Unmarshal(req, &request)
-	firePolicy := lib.GetDatasetByEnv(r.Header.Get("origin"), "policy")
-	policyUID = r.Header.Get("uid")
-	docsnap := lib.GetFirestore(firePolicy, string(policyUID))
-	docsnap.DataTo(&policy)
-	policy.IsDeleted = true
-	policy.DeleteDesc = request.DeleteDesc
-	policy.Status = models.PolicyStatusDeleted
-	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusDeleted)
-	lib.SetFirestore(firePolicy, policyUID, policy)
-	policy.BigquerySave(r.Header.Get("origin"))
+
+	log.Println("Handler start -----------------------------------------------")
+
+	origin := r.Header.Get("Origin")
+	policyUid := r.Header.Get("uid")
+	body := lib.ErrorByte(io.ReadAll(r.Body))
+	defer r.Body.Close()
+	err = json.Unmarshal(body, &request)
+	if err != nil {
+		log.Printf("error unmarshaling request: %s", err.Error())
+		return "", nil, err
+	}
+
+	policy := GetPolicyByUid(policyUid, origin)
+
+	deletePolicy(&policy, request)
+
+	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
+
+	log.Println("setting policy to delete in firestore...")
+	err = lib.SetFirestoreErr(firePolicy, policyUid, policy)
+	if err != nil {
+		log.Printf("error saving policy to firestore: %s", err.Error())
+		return "", nil, err
+	}
+	log.Println("policy set to deleted in firestore")
+
+	log.Println("setting policy to delete in bigquery...")
+	policy.BigquerySave(origin)
+
+	guaranteFire := lib.GetDatasetByEnv(origin, models.GuaranteeCollection)
+	log.Println("updating policy's guarantees to delete in bigquery...")
 	models.SetGuaranteBigquery(policy, "delete", guaranteFire)
-	return `{"uid":"` + policyUID + `", "success":true}`, `{"uid":"` + policyUID + `", "success":true}`, err
+
+	models.CreateAuditLog(r, string(body))
+
+	log.Println("Handler end -------------------------------------------------")
+	return "{}", nil, nil
+}
+
+func deletePolicy(p *models.Policy, request PolicyDeleteRequest) {
+	p.IsDeleted = true
+	p.DeleteDesc = request.Description
+	p.DeleteDate = request.Date
+	p.DeleteCode = request.Code
+	p.Status = models.PolicyStatusDeleted
+	p.StatusHistory = append(p.StatusHistory, p.Status)
 }

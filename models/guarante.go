@@ -73,11 +73,11 @@ type GuaranteValue struct {
 	Tax                        float64             `firestore:"tax" json:"tax"`
 	Percentage                 float64             `firestore:"percentage" json:"percentage"`
 	PremiumNetYearly           float64             `firestore:"premiumNetYearly,omitempty" json:"premiumNetYearly"`
-	PremiumTaxAmountYearly     float64             `firestore:"premiumTaxAmountYearly,omitempty" json:"premiumTaxAmountYearly,omitempty"`
-	PremiumGrossYearly         float64             `firestore:"premiumGrossYearly,omitempty" json:"premiumGrossYearly,omitempty"`
+	PremiumTaxAmountYearly     float64             `firestore:"premiumTaxAmountYearly,omitempty" json:"premiumTaxAmountYearly"`
+	PremiumGrossYearly         float64             `firestore:"premiumGrossYearly,omitempty" json:"premiumGrossYearly"`
 	PremiumNetMonthly          float64             `firestore:"premiumNetMonthly,omitempty" json:"premiumNetMonthly,omitempty"`
-	PremiumTaxAmountMonthly    float64             `firestore:"premiumTaxAmountMonthly,omitempty" json:"premiumTaxAmountMonthly,omitempty"`
-	PremiumGrossMonthly        float64             `firestore:"premiumGrossMonthly,omitempty" json:"premiumGrossMonthly,omitempty"`
+	PremiumTaxAmountMonthly    float64             `firestore:"premiumTaxAmountMonthly,omitempty" json:"premiumTaxAmountMonthly"`
+	PremiumGrossMonthly        float64             `firestore:"premiumGrossMonthly,omitempty" json:"premiumGrossMonthly"`
 	MinimumGrossMonthly        float64             `firestore:"minimumGrossMonthly,omitempty" json:"minimumGrossMonthly,omitempty"`
 	MinimumGrossYearly         float64             `firestore:"minimumGrossYearly,omitempty" json:"minimumGrossYearly,omitempty"`
 }
