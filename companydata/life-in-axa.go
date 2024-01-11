@@ -224,7 +224,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		_, _, version, paymentSplit := LifeMapCodecCompanyAxaRevert(row[1])
 		nodeCode := strings.TrimSpace(strings.ToUpper(row[13]))
 		if nodeCode == "W1" {
-			nodeCode = "DIRAgent"
+			nodeCode = "W1.DIRAgent"
 		}
 		networkNode := network.GetNetworkNodeByCode(nodeCode)
 		if networkNode == nil {
