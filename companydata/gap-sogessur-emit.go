@@ -101,7 +101,7 @@ func GapSogessurEmit(w http.ResponseWriter, r *http.Request) (string, interface{
 					ContentType: "application/csv",
 				},
 			},
-			Title:        fmt.Sprintf("Tracciato GAP %s %d", from.Month(), from.Year()),
+			Title:        fmt.Sprintf("Tracciato GAP %02d %4d", from.Month(), from.Year()),
 			IsHtml:       true,
 			IsAttachment: true,
 			To:           receivers,
@@ -111,7 +111,7 @@ func GapSogessurEmit(w http.ResponseWriter, r *http.Request) (string, interface{
 		})
 	}
 
-	setCompanyEmitted(policies)
+	//setCompanyEmitted(policies)
 
 	return "", nil, e
 }
