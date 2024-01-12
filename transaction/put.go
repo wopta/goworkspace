@@ -16,6 +16,7 @@ func PutByPolicy(
 	providerId, paymentMethod string,
 	isPay bool,
 	mgaProduct *models.Product,
+	effectiveDate time.Time,
 ) *models.Transaction {
 	var (
 		sd              string
@@ -34,6 +35,14 @@ func PutByPolicy(
 		sd = scheduleDate
 	}
 
+	if effectiveDate.IsZero() {
+		ed, err := time.Parse(models.TimeDateOnly, sd)
+		if err != nil {
+			log.Printf("[PutByPolicy] error parsing effective date %s", err.Error())
+			ed = time.Time{}
+		}
+		effectiveDate = ed
+	}
 	now := time.Now().UTC()
 
 	if isPay {
@@ -79,6 +88,7 @@ func PutByPolicy(
 		AgencyUid:       policy.AgencyUid,
 		PaymentMethod:   paymentMethod,
 		Commissions:     commissionMga,
+		EffectiveDate:   effectiveDate,
 	}
 
 	log.Println("[PutByPolicy] saving transaction to firestore...")
