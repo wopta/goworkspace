@@ -204,7 +204,7 @@ func fabrickMultiRatePayment(
 
 	customerId := uuid.New().String()
 	// first transaction schedule date == now
-	firstres := <-FabrickPayObj(policy, true, time.Now().UTC().Format(models.TimeDateOnly), "", customerId, policy.PriceGrossMonthly, policy.PriceNettMonthly, origin, paymentMethods, mgaProduct)
+	firstres := <-FabrickPayObj(policy, true, "", "", customerId, policy.PriceGrossMonthly, policy.PriceNettMonthly, origin, paymentMethods, mgaProduct)
 	time.Sleep(100)
 
 	// we skip the first element since it is always created with todays date
