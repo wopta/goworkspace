@@ -29,10 +29,14 @@ func PutByPolicy(
 	log.Println("[PutByPolicy] start -----------------------------------------")
 	log.Printf("[PutByPolicy] Policy %s", policy.Uid)
 
-	if scheduleDate == "" {
-		sd = policy.StartDate.Format(models.TimeDateOnly)
-	} else {
+	now := time.Now().UTC()
+
+	if scheduleDate != "" {
 		sd = scheduleDate
+	} else if now.After(policy.StartDate) {
+		sd = now.Format(models.TimeDateOnly)
+	} else {
+		sd = policy.StartDate.Format(models.TimeDateOnly)
 	}
 
 	if effectiveDate.IsZero() {
@@ -43,7 +47,6 @@ func PutByPolicy(
 		}
 		effectiveDate = ed
 	}
-	now := time.Now().UTC()
 
 	if isPay {
 		status = models.TransactionStatusPay
