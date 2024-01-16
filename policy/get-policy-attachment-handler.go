@@ -57,7 +57,7 @@ func GetAttachmentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 			if strings.EqualFold(att.FileName, req.Filename) {
 				rawDoc, err := downloadAttachment(att.Link)
 				if err != nil {
-					log.Printf("error downloading attacchment %s from Google Bucket: %s", att.FileName, err.Error())
+					log.Printf("error downloading attacchment %s from Google Bucket: %s", req.Filename, err.Error())
 					return "", nil, err
 				}
 				resp = GetAttachmentResp{
@@ -66,6 +66,34 @@ func GetAttachmentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 				rawResp, err := json.Marshal(resp)
 				return string(rawResp), rawResp, err
 			}
+		}
+	}
+
+	for _, doc := range policy.Contractor.IdentityDocuments {
+		if strings.EqualFold(doc.FrontMedia.FileName, req.Filename) {
+			rawDoc, err := downloadAttachment(doc.FrontMedia.Link)
+			if err != nil {
+				log.Printf("error downloading attacchment %s from Google Bucket: %s", req.Filename, err.Error())
+				return "", nil, err
+			}
+			resp = GetAttachmentResp{
+				RawDoc: rawDoc,
+			}
+			rawResp, err := json.Marshal(resp)
+			return string(rawResp), rawResp, err
+		}
+
+		if doc.BackMedia != nil {
+			rawDoc, err := downloadAttachment(doc.BackMedia.Link)
+			if err != nil {
+				log.Printf("error downloading attacchment %s from Google Bucket: %s", req.Filename, err.Error())
+				return "", nil, err
+			}
+			resp = GetAttachmentResp{
+				RawDoc: rawDoc,
+			}
+			rawResp, err := json.Marshal(resp)
+			return string(rawResp), rawResp, err
 		}
 	}
 	return "", nil, err
