@@ -97,6 +97,9 @@ func GetPolicyMediaFx(w http.ResponseWriter, r *http.Request) (string, interface
 			return rawResp, resp, err
 		}
 	}
+
+	log.Println("Handler end -------------------------------------------------")
+
 	return "", nil, err
 }
 
