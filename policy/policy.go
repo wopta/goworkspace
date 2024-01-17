@@ -52,9 +52,9 @@ func Policy(w http.ResponseWriter, r *http.Request) {
 			},
 			{
 				Route:   "/media/v1",
-				Handler: GetAttachmentFx,
+				Handler: GetPolicyMediaFx,
 				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
+				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager, models.UserRoleAgent, models.UserRoleAgency},
 			},
 			{
 				Route:   "/v1",
