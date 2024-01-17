@@ -10,4 +10,5 @@ type Attachment struct {
 	ContentType string `firestore:"contentType,omitempty" json:"contentType,omitempty"`
 	IsPrivate   bool   `firestore:"isPrivate" json:"isPrivate"`
 	Section     string `firestore:"section" json:"section"`
+	Note        string `firestore:"note,omitempty" json:"note"`
 }
