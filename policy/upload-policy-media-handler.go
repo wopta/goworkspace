@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 )
 
 type UploadPolicyMediaReq struct {
@@ -43,6 +44,9 @@ func UploadPolicyMediaFx(w http.ResponseWriter, r *http.Request) (string, interf
 		log.Printf("error unmarshaling request: %s", err.Error())
 		return "", nil, err
 	}
+
+	now := time.Now().UTC()
+	req.Filename = fmt.Sprintf("%s_%s", req.Filename, now)
 
 	log.Printf("getting policy %s from Firestore...")
 
