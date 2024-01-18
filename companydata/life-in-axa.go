@@ -177,7 +177,7 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 			guarante := models.Guarante{
 				Slug:                       slug,
 				CompanyCodec:               companyCodec,
-				Description:                networkProducts[productVersion].Companies[0].GuaranteesMap[slug].Description,
+				Description:                mgaProducts[productVersion].Companies[0].GuaranteesMap[slug].Description,
 				Group:                      mgaProducts[productVersion].Companies[0].GuaranteesMap[slug].Group,
 				Type:                       mgaProducts[productVersion].Companies[0].GuaranteesMap[slug].Type,
 				Name:                       mgaProducts[productVersion].Companies[0].GuaranteesMap[slug].Name,
