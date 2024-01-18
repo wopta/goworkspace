@@ -197,8 +197,8 @@ const (
 )
 
 const (
-	DocumentSectionContracts        = "contracts"
-	DocumentSectionIdentityDocument = "identity-documents"
+	DocumentSectionContracts        = "contract"
+	DocumentSectionIdentityDocument = "identity-document"
 	DocumentSectionReserved         = "reserved"
 	DocumentSectionOther            = "other"
 )
