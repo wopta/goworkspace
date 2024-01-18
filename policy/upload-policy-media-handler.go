@@ -1,28 +1,27 @@
 package policy
 
 import (
-	"encoding/base64"
-	"encoding/json"
 	"fmt"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
 	"io"
 	"log"
 	"net/http"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 )
 
 type UploadPolicyMediaReq struct {
-	PolicyUid string `json:"policyUid"`
-	Filename  string `json:"filename"`
-	Base64    string `json:"base64"`
-	MimeType  string `json:"mimeType"`
-	Name      string `json:"name"`
-	Section   string `json:"section"`
-	IsPrivate bool   `json:"isPrivate"`
-	Note      string `json:"note"`
+	PolicyUid string
+	Filename  string
+	Bytes     []byte
+	MimeType  string
+	Name      string
+	Section   string
+	IsPrivate bool
+	Note      string
 }
 
 func UploadPolicyMediaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -36,12 +35,29 @@ func UploadPolicyMediaFx(w http.ResponseWriter, r *http.Request) (string, interf
 
 	log.Println("Handler start -----------------------------------------------")
 
-	body := lib.ErrorByte(io.ReadAll(r.Body))
-	defer r.Body.Close()
-	log.Printf("request body: %s", string(body))
-	err = json.Unmarshal(body, &req)
+	err = r.ParseMultipartForm(32 << 20)
 	if err != nil {
-		log.Printf("error unmarshaling request: %s", err.Error())
+		log.Printf("error parsing multipart form: %s", err.Error())
+		return "", nil, err
+	}
+	req.PolicyUid = r.PostFormValue("policyUid")
+	req.Filename = r.PostFormValue("filename")
+	req.MimeType = r.PostFormValue("mimeType")
+	req.Name = r.PostFormValue("name")
+	req.Section = r.PostFormValue("section")
+	req.IsPrivate = r.PostFormValue("isPrivate") == "true"
+	req.Note = r.PostFormValue("note")
+	file, _, err := r.FormFile("bytes")
+
+	if err != nil {
+		log.Printf("error getting file from request: %s", err.Error())
+		return "", nil, err
+	}
+	defer file.Close()
+
+	req.Bytes, err = io.ReadAll(file)
+	if err != nil {
+		log.Printf("error reading file from request: %s", err.Error())
 		return "", nil, err
 	}
 
@@ -77,13 +93,10 @@ func putAttachment(policy *models.Policy, req UploadPolicyMediaReq) error {
 	}
 	filename += fmt.Sprintf("_%d.%s", time.Now().UTC().Unix(), splittedFilename[len(splittedFilename)-1])
 
-	log.Printf("converting base64 to []byte")
-	rawDoc, err := base64.StdEncoding.DecodeString(req.Base64)
-
 	log.Printf("uploading %s to asset/users/%s in Google Bucket", filename, policy.Contractor.Uid)
 
 	gsLink, err := lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), fmt.Sprintf("assets/users/%s/%s",
-		policy.Contractor.Uid, filename), rawDoc)
+		policy.Contractor.Uid, filename), req.Bytes)
 	if err != nil {
 		log.Printf("error uploading %s to Google Bucket: %s", filename, err.Error())
 		return err
