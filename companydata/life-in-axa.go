@@ -1,14 +1,8 @@
 package companydata
 
 import (
-	"cloud.google.com/go/bigquery"
-	"cloud.google.com/go/civil"
 	"encoding/json"
 	"fmt"
-	"github.com/google/uuid"
-	"github.com/wopta/goworkspace/network"
-	"github.com/wopta/goworkspace/product"
-	"github.com/wopta/goworkspace/user"
 	"io"
 	"log"
 	"net/http"
@@ -17,9 +11,15 @@ import (
 	"strings"
 	"time"
 
+	"cloud.google.com/go/bigquery"
+	"cloud.google.com/go/civil"
 	"github.com/go-gota/gota/dataframe"
+	"github.com/google/uuid"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
+	"github.com/wopta/goworkspace/product"
+	"github.com/wopta/goworkspace/user"
 )
 
 type ResultStruct struct {
@@ -357,8 +357,6 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 
 		if policy.HasGuarantee("death") {
 
-			// TODO: need to split case individual contractor and legalEntity contractor
-
 			if !isLegalEntity {
 				// setting contractor identity document
 
@@ -381,7 +379,7 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 					StreetName: strings.TrimSpace(lib.Capitalize(row[46])),
 					City:       strings.TrimSpace(lib.Capitalize(row[48])),
 					CityCode:   strings.TrimSpace(strings.ToUpper(row[49])),
-					PostalCode: row[47],
+					PostalCode: strings.TrimSpace(row[47]),
 					Locality:   strings.TrimSpace(lib.Capitalize(row[48])),
 				}
 
@@ -407,7 +405,7 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 						StreetName: strings.TrimSpace(lib.Capitalize(row[67])),
 						City:       strings.TrimSpace(lib.Capitalize(row[69])),
 						CityCode:   strings.TrimSpace(strings.ToUpper(row[70])),
-						PostalCode: row[68],
+						PostalCode: strings.TrimSpace(row[68]),
 						Locality:   strings.TrimSpace(lib.Capitalize(row[69])),
 					}
 				} else {
@@ -436,7 +434,7 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 					StreetName: strings.TrimSpace(lib.Capitalize(row[67])),
 					City:       strings.TrimSpace(lib.Capitalize(row[69])),
 					CityCode:   strings.TrimSpace(strings.ToUpper(row[70])),
-					PostalCode: row[68],
+					PostalCode: strings.TrimSpace(row[68]),
 					Locality:   strings.TrimSpace(lib.Capitalize(row[69])),
 				}
 			}
@@ -577,7 +575,7 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 
 			// save user firestore
 
-			err = lib.SetFirestoreErr(fmt.Sprintf("%s%s", collectionPrefix, models.UserCollection), policy.Contractor.Uid, policy.Contractor)
+			err = lib.SetFirestoreErr(fmt.Sprintf("%s%s", collectionPrefix, models.UserCollection), policy.Contractor.Uid, policy.Contractor.ToUser())
 			if err != nil {
 				log.Printf("error saving contractor firestore: %s", err.Error())
 				continue
@@ -667,14 +665,14 @@ func parsingTitolareEffettivo(row []string, offset int, i int) models.User {
 			StreetName: strings.TrimSpace(lib.Capitalize(row[122+(offset*i)])),
 			City:       strings.TrimSpace(lib.Capitalize(row[124+(offset*i)])),
 			CityCode:   strings.TrimSpace(strings.ToUpper(row[125+(offset*i)])),
-			PostalCode: row[123+(offset*i)],
+			PostalCode: strings.TrimSpace(row[123+(offset*i)]),
 			Locality:   strings.TrimSpace(lib.Capitalize(row[124+(offset*i)])),
 		},
 		Domicile: &models.Address{
 			StreetName: strings.TrimSpace(lib.Capitalize(row[126+(offset*i)])),
 			City:       strings.TrimSpace(lib.Capitalize(row[128+(offset*i)])),
 			CityCode:   strings.TrimSpace(strings.ToUpper(row[129+(offset*i)])),
-			PostalCode: row[127+(offset*i)],
+			PostalCode: strings.TrimSpace(row[127+(offset*i)]),
 			Locality:   strings.TrimSpace(lib.Capitalize(row[128+(offset*i)])),
 		},
 		IdentityDocuments: []*models.IdentityDocument{{
@@ -716,14 +714,14 @@ func parseEsecutore(row []string) models.User {
 			StreetName: strings.TrimSpace(lib.Capitalize(row[225])),
 			City:       strings.TrimSpace(lib.Capitalize(row[227])),
 			CityCode:   strings.TrimSpace(strings.ToUpper(row[228])),
-			PostalCode: row[226],
+			PostalCode: strings.TrimSpace(row[226]),
 			Locality:   strings.TrimSpace(lib.Capitalize(row[227])),
 		},
 		Domicile: &models.Address{
 			StreetName: strings.TrimSpace(lib.Capitalize(row[229])),
 			City:       strings.TrimSpace(lib.Capitalize(row[231])),
 			CityCode:   strings.TrimSpace(strings.ToUpper(row[232])),
-			PostalCode: row[230],
+			PostalCode: strings.TrimSpace(row[230]),
 			Locality:   strings.TrimSpace(lib.Capitalize(row[231])),
 		},
 		IdentityDocuments: []*models.IdentityDocument{{
@@ -762,7 +760,7 @@ func parseIndividualContractor(codeCompany string, row []string, codes map[strin
 			StreetName: strings.TrimSpace(lib.Capitalize(row[28])),
 			City:       strings.TrimSpace(lib.Capitalize(row[30])),
 			CityCode:   strings.TrimSpace(strings.ToUpper(row[31])),
-			PostalCode: row[29],
+			PostalCode: strings.TrimSpace(row[29]),
 			Locality:   strings.TrimSpace(lib.Capitalize(row[30])),
 		},
 		CreationDate: ParseDateDDMMYYYY(row[4]),
@@ -832,7 +830,7 @@ func parseEnterpriseContractor(row []string) *models.Contractor {
 			StreetName: strings.TrimSpace(lib.Capitalize(row[28])),
 			City:       strings.TrimSpace(lib.Capitalize(row[30])),
 			CityCode:   strings.TrimSpace(strings.ToUpper(row[31])),
-			PostalCode: row[29],
+			PostalCode: strings.TrimSpace(row[29]),
 			Locality:   strings.TrimSpace(lib.Capitalize(row[30])),
 		},
 	}
@@ -841,6 +839,11 @@ func parseEnterpriseContractor(row []string) *models.Contractor {
 }
 
 func parseInsured(codeCompany string, row []string, codes map[string]map[string]string) *models.User {
+	phone := strings.TrimSpace(strings.TrimSpace(strings.ReplaceAll(strings.ReplaceAll(row[72], " ", ""), " ", "")))
+	if phone != "" {
+		phone = fmt.Sprintf("+39%s", phone)
+	}
+
 	insured := &models.User{
 		Type:          models.UserIndividual,
 		Name:          strings.TrimSpace(lib.Capitalize(row[35])),
@@ -849,14 +852,14 @@ func parseInsured(codeCompany string, row []string, codes map[string]map[string]
 		Gender:        strings.TrimSpace(strings.ToUpper(row[36])),
 		BirthDate:     ParseDateDDMMYYYY(row[37]).Format(time.RFC3339),
 		Mail:          strings.TrimSpace(strings.ToLower(row[71])),
-		Phone:         fmt.Sprintf("+39%s", strings.TrimSpace(strings.ReplaceAll(row[72], " ", ""))),
+		Phone:         phone,
 		BirthCity:     strings.TrimSpace(lib.Capitalize(row[73])),
 		BirthProvince: strings.TrimSpace(strings.ToUpper(row[74])),
 		Residence: &models.Address{
 			StreetName: strings.TrimSpace(lib.Capitalize(row[63])),
 			City:       strings.TrimSpace(lib.Capitalize(row[65])),
 			CityCode:   strings.TrimSpace(strings.ToUpper(row[66])),
-			PostalCode: row[64],
+			PostalCode: strings.TrimSpace(row[64]),
 			Locality:   strings.TrimSpace(lib.Capitalize(row[65])),
 		},
 		CreationDate: ParseDateDDMMYYYY(row[4]),
@@ -1031,13 +1034,18 @@ func ParseAxaBeneficiary(r []string, base int) *models.Beneficiary {
 			isContactable = false
 		}
 
+		phone := strings.TrimSpace(strings.TrimSpace(strings.ReplaceAll(strings.ReplaceAll(r[86+rangeCell], " ", ""), " ", "")))
+		if phone != "" {
+			phone = fmt.Sprintf("+39%s", phone)
+		}
+
 		benef = &models.Beneficiary{
 			BeneficiaryType: models.BeneficiaryChosenBeneficiary,
 			Name:            strings.TrimSpace(lib.Capitalize(r[84+rangeCell])),
 			Surname:         strings.TrimSpace(lib.Capitalize(r[83+rangeCell])),
 			FiscalCode:      strings.TrimSpace(strings.ToUpper(r[85+rangeCell])),
 			Mail:            strings.TrimSpace(strings.ToLower(r[91+rangeCell])),
-			Phone:           strings.TrimSpace(strings.ReplaceAll(r[86+rangeCell], " ", "")),
+			Phone:           phone,
 			Residence: &models.Address{
 				StreetName: strings.TrimSpace(lib.Capitalize(r[87+rangeCell])),
 				City:       strings.TrimSpace(lib.Capitalize(r[88+rangeCell])),
@@ -1049,17 +1057,22 @@ func ParseAxaBeneficiary(r []string, base int) *models.Beneficiary {
 			IsFamilyMember: isFamilyMember,
 		}
 	} else if r[82] == "PG" {
+		phone := strings.TrimSpace(strings.TrimSpace(strings.ReplaceAll(strings.ReplaceAll(r[33], " ", ""), " ", "")))
+		if phone != "" {
+			phone = fmt.Sprintf("+39%s", phone)
+		}
+
 		benef = &models.Beneficiary{
 			BeneficiaryType: models.BeneficiarySelfLegalEntity,
 			Name:            strings.TrimSpace(lib.Capitalize(r[23])),
 			VatCode:         fmt.Sprintf("%011s", strings.TrimSpace(r[27])),
 			Mail:            strings.TrimSpace(strings.ToLower(r[32])),
-			Phone:           fmt.Sprintf("+39%s", strings.TrimSpace(strings.ReplaceAll(strings.ReplaceAll(r[33], " ", ""), " ", ""))),
+			Phone:           phone,
 			CompanyAddress: &models.Address{
 				StreetName: strings.TrimSpace(lib.Capitalize(r[28])),
 				City:       strings.TrimSpace(lib.Capitalize(r[30])),
 				CityCode:   strings.TrimSpace(strings.ToUpper(r[31])),
-				PostalCode: r[29],
+				PostalCode: strings.TrimSpace(r[29]),
 				Locality:   strings.TrimSpace(lib.Capitalize(r[30])),
 			},
 		}
@@ -1196,10 +1209,6 @@ func createNetworkTransactions(
 	var err error
 
 	networkTransactions := make([]*models.NetworkTransaction, 0)
-
-	if policy.CodeCompany == "0000071" {
-		log.Printf("hello")
-	}
 
 	nt, err := createCompanyNetworkTransaction(policy, transaction, producerNode, mgaProduct)
 	if err != nil {
@@ -1457,7 +1466,7 @@ func contractorBigQuerySave(contractor *models.Contractor, collectionPrefix stri
 
 	log.Println("user save big query: " + result.Uid)
 
-	return lib.InsertRowsBigQuery(models.WoptaDataset, table, contractor)
+	return lib.InsertRowsBigQuery(models.WoptaDataset, table, contractor.ToUser())
 }
 
 func initBigqueryData(contractor *models.Contractor) (*models.Contractor, error) {
@@ -1494,7 +1503,6 @@ func initBigqueryData(contractor *models.Contractor) (*models.Contractor, error)
 	}
 
 	contractor.BigLocation = bigquery.NullGeography{
-		// TODO: Check if correct: Geography type uses the WKT format for geometry
 		GeographyVal: fmt.Sprintf("POINT (%f %f)", contractor.Location.Lng, contractor.Location.Lat),
 		Valid:        true,
 	}
