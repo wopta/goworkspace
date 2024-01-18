@@ -27,9 +27,10 @@ type UploadPolicyMediaReq struct {
 
 func UploadPolicyMediaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		err    error
-		policy *models.Policy
-		req    UploadPolicyMediaReq
+		err      error
+		filename string
+		policy   *models.Policy
+		req      UploadPolicyMediaReq
 	)
 
 	log.SetPrefix("[UploadPolicyMediaFx]")
@@ -45,11 +46,15 @@ func UploadPolicyMediaFx(w http.ResponseWriter, r *http.Request) (string, interf
 		return "", nil, err
 	}
 
-	filenamePart := strings.Split(req.Filename, ".")
-	now := time.Now().UTC().Unix()
-	req.Filename = fmt.Sprintf("%s_%d.%s", filenamePart[0], now, strings.Join(filenamePart[1:], ""))
+	splittedFilename := strings.Split(req.Filename, ".")
+	if len(splittedFilename) > 2 {
+		filename = strings.Join(splittedFilename[:len(splittedFilename)-1], ".")
+	} else {
+		filename = splittedFilename[0]
+	}
+	filename += fmt.Sprintf("_%d.%s", time.Now().UTC().Unix(), splittedFilename[len(splittedFilename)-1])
 
-	log.Printf("getting policy %s from Firestore...")
+	log.Printf("getting policy %s from Firestore...", req.PolicyUid)
 
 	docSnap, err := lib.GetFirestoreErr(models.PolicyCollection, req.PolicyUid)
 	if err != nil {
@@ -62,7 +67,7 @@ func UploadPolicyMediaFx(w http.ResponseWriter, r *http.Request) (string, interf
 		return "", nil, err
 	}
 
-	err = putAttachment(policy, req)
+	err = putAttachment(policy, filename, req)
 
 	log.Println("Handler end -------------------------------------------------")
 	log.SetPrefix("")
@@ -70,23 +75,23 @@ func UploadPolicyMediaFx(w http.ResponseWriter, r *http.Request) (string, interf
 	return "", nil, err
 }
 
-func putAttachment(policy *models.Policy, req UploadPolicyMediaReq) error {
+func putAttachment(policy *models.Policy, filename string, req UploadPolicyMediaReq) error {
 	log.Printf("converting base64 to []byte")
 	rawDoc, err := base64.StdEncoding.DecodeString(req.Base64)
 
-	log.Printf("uploading %s to asset/users/%s in Google Bucket", req.Filename, policy.Contractor.Uid)
+	log.Printf("uploading %s to asset/users/%s in Google Bucket", filename, policy.Contractor.Uid)
 
 	gsLink, err := lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), fmt.Sprintf("assets/users/%s/%s",
-		policy.Contractor.Uid, req.Filename), rawDoc)
+		policy.Contractor.Uid, filename), rawDoc)
 	if err != nil {
-		log.Printf("error uploading %s to Google Bucket: %s", req.Filename, err.Error())
+		log.Printf("error uploading %s to Google Bucket: %s", filename, err.Error())
 		return err
 	}
 
 	att := models.Attachment{
-		Name:      strings.Split(req.Name, ".")[0],
+		Name:      req.Name,
 		Link:      gsLink,
-		FileName:  req.Filename,
+		FileName:  filename,
 		MimeType:  req.MimeType,
 		IsPrivate: req.IsPrivate,
 		Section:   req.Section,
