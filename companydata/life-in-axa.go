@@ -44,7 +44,7 @@ var (
 )
 
 type LifeInReq struct {
-	DryRun           bool   `json:"dryRun"`
+	DryRun           *bool  `json:"dryRun"`
 	CollectionPrefix string `json:"collectionPrefix"`
 }
 
@@ -533,7 +533,11 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 		networkNode.Policies = append(networkNode.Policies, policy.Uid)
 		networkNode.Users = append(networkNode.Users, policy.Contractor.Uid)
 
-		dryRun := req.DryRun
+		dryRun := true
+		if req.DryRun != nil {
+			dryRun = *req.DryRun
+		}
+		log.Printf("dryRun: %v", dryRun)
 		if !dryRun {
 			collectionPrefix := req.CollectionPrefix
 
