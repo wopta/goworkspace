@@ -101,13 +101,13 @@ func GapSogessurEmit(w http.ResponseWriter, r *http.Request) (string, interface{
 					ContentType: "application/csv",
 				},
 			},
-			Title:        fmt.Sprintf("Tracciato GAP %s %d", from.Month(), from.Year()),
+			Title:        fmt.Sprintf("Tracciato GAP %02d/%4d", prevMonth.Month(), prevMonth.Year()),
 			IsHtml:       true,
 			IsAttachment: true,
 			To:           receivers,
 			Message: fmt.Sprintf("<p style=\"Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:17px;color:#000000;font-size:14px\">Ciao,</p>"+
-				"<p style=\"Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:17px;color:#000000;font-size:14px\">in allegato trovi il tracciato GAP del mese %s %d.</p><p style=\"Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:17px;color:#000000;font-size:14px\">Buona giornata.</p>", from.Month(), from.Year()),
-			Subject: fmt.Sprintf("Tracciato GAP %s/%d", from.Month(), from.Year()),
+				"<p style=\"Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:17px;color:#000000;font-size:14px\">in allegato trovi il tracciato GAP del mese %02d/%4d.</p><p style=\"Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:17px;color:#000000;font-size:14px\">Buona giornata.</p>", prevMonth.Month(), prevMonth.Year()),
+			Subject: fmt.Sprintf("Tracciato GAP %02d/%4d", prevMonth.Month(), prevMonth.Year()),
 		})
 	}
 
