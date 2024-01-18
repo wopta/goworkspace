@@ -27,10 +27,9 @@ type UploadPolicyMediaReq struct {
 
 func UploadPolicyMediaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		err      error
-		filename string
-		policy   *models.Policy
-		req      UploadPolicyMediaReq
+		err    error
+		policy *models.Policy
+		req    UploadPolicyMediaReq
 	)
 
 	log.SetPrefix("[UploadPolicyMediaFx]")
@@ -46,14 +45,6 @@ func UploadPolicyMediaFx(w http.ResponseWriter, r *http.Request) (string, interf
 		return "", nil, err
 	}
 
-	splittedFilename := strings.Split(req.Filename, ".")
-	if len(splittedFilename) > 2 {
-		filename = strings.Join(splittedFilename[:len(splittedFilename)-1], ".")
-	} else {
-		filename = splittedFilename[0]
-	}
-	filename += fmt.Sprintf("_%d.%s", time.Now().UTC().Unix(), splittedFilename[len(splittedFilename)-1])
-
 	log.Printf("getting policy %s from Firestore...", req.PolicyUid)
 
 	docSnap, err := lib.GetFirestoreErr(models.PolicyCollection, req.PolicyUid)
@@ -67,7 +58,7 @@ func UploadPolicyMediaFx(w http.ResponseWriter, r *http.Request) (string, interf
 		return "", nil, err
 	}
 
-	err = putAttachment(policy, filename, req)
+	err = putAttachment(policy, req)
 
 	log.Println("Handler end -------------------------------------------------")
 	log.SetPrefix("")
@@ -75,7 +66,17 @@ func UploadPolicyMediaFx(w http.ResponseWriter, r *http.Request) (string, interf
 	return "", nil, err
 }
 
-func putAttachment(policy *models.Policy, filename string, req UploadPolicyMediaReq) error {
+func putAttachment(policy *models.Policy, req UploadPolicyMediaReq) error {
+	var filename string
+
+	splittedFilename := strings.Split(req.Filename, ".")
+	if len(splittedFilename) > 2 {
+		filename = strings.Join(splittedFilename[:len(splittedFilename)-1], ".")
+	} else {
+		filename = splittedFilename[0]
+	}
+	filename += fmt.Sprintf("_%d.%s", time.Now().UTC().Unix(), splittedFilename[len(splittedFilename)-1])
+
 	log.Printf("converting base64 to []byte")
 	rawDoc, err := base64.StdEncoding.DecodeString(req.Base64)
 
