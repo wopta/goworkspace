@@ -9,6 +9,7 @@ import (
 	"github.com/wopta/goworkspace/network"
 	"github.com/wopta/goworkspace/product"
 	"github.com/wopta/goworkspace/user"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -31,11 +32,6 @@ type TransactionsOutput struct {
 	NetworkTransactions []*models.NetworkTransaction `json:"networkTransactions"`
 }
 
-const (
-	collectionPrefix = ""
-	dryRun           = true
-)
-
 var (
 	skippedPolicies                    = make([]string, 0)
 	missingContractorBirthCityPolicies = make([]string, 0)
@@ -47,7 +43,12 @@ var (
 	monthlyPolicies                    = make(map[string]map[string][][]string, 0)
 )
 
-func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+type LifeInReq struct {
+	DryRun           bool   `json:"dryRun"`
+	CollectionPrefix string `json:"collectionPrefix"`
+}
+
+func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	const (
 		slide            int = -1
 		headervalue          = "N° adesione individuale univoco"
@@ -60,6 +61,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		startDateJob, endDateJob time.Time
 		contractorEqualInsured   bool
 		insured                  *models.User
+		req                      LifeInReq
 	)
 
 	startDateJob = time.Now().UTC()
@@ -71,6 +73,14 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		"temporary-disability": 0.025,
 	}
 
+	body := lib.ErrorByte(io.ReadAll(r.Body))
+	defer r.Body.Close()
+	err := json.Unmarshal(body, &req)
+	if err != nil {
+		log.Printf("error unmrashalling request body")
+		return "", nil, err
+	}
+
 	b, err := os.ReadFile(lib.GetAssetPathByEnv("companyData") + "/reverse-codes.json")
 	err = json.Unmarshal(b, &codes)
 	if err != nil {
@@ -80,9 +90,9 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	data, _ := os.ReadFile("./companydata/track_in_life.csv")
 	//data := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/life/life.csv", "")
 	df := lib.CsvToDataframe(data)
-	//log.Println("LifeIn  df.Describe: ", df.Describe())
-	log.Println("LifeIn  row", df.Nrow())
-	log.Println("LifeIn  col", df.Ncol())
+	//log.Println("LifeInFx  df.Describe: ", df.Describe())
+	log.Println("LifeInFx  row", df.Nrow())
+	log.Println("LifeInFx  col", df.Ncol())
 	//group := df.GroupBy("N\xb0 adesione individuale univoco")
 	group := GroupBy(df, 2)
 
@@ -112,10 +122,6 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		if pol[0][2] == headervalue || pol[0][1] == titleHeaderValue || pol[0][1] == "1" {
 			continue
 		}
-		/*if strings.TrimSpace(pol[0][22]) == "PG" {
-			skippedPolicies = append(skippedPolicies, fmt.Sprintf("%07s", strings.TrimSpace(pol[0][2])))
-			continue
-		}*/
 
 		row = pol[0]
 
@@ -127,8 +133,8 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 				beneficiaries []models.Beneficiary
 			)
 
-			log.Println("LifeIn  i: ", i)
-			log.Println("LifeIn  pol: ", r)
+			log.Println("LifeInFx  i: ", i)
+			log.Println("LifeInFx  pol: ", r)
 
 			payDate = fmt.Sprintf("%08s", strings.TrimSpace(r[5]))
 
@@ -211,14 +217,14 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 			guarantees = append(guarantees, guarante)
 		}
 
-		log.Println("LifeIn  value", v)
-		log.Println("LifeIn  row", len(row))
-		//log.Println("LifeIn  col", len(row))
-		//log.Println("LifeIn  pol: ", pol)
-		log.Println("LifeIn  elemets (0-0 ): ", row[0])
-		log.Println("LifeIn  elemets (0-1 ): ", row[1])
-		log.Println("LifeIn  elemets (0-2 ): ", row[2])
-		log.Println("LifeIn  elemets (0-3 ): ", row[3])
+		log.Println("LifeInFx  value", v)
+		log.Println("LifeInFx  row", len(row))
+		//log.Println("LifeInFx  col", len(row))
+		//log.Println("LifeInFx  pol: ", pol)
+		log.Println("LifeInFx  elemets (0-0 ): ", row[0])
+		log.Println("LifeInFx  elemets (0-1 ): ", row[1])
+		log.Println("LifeInFx  elemets (0-2 ): ", row[2])
+		log.Println("LifeInFx  elemets (0-3 ): ", row[3])
 		//1998-09-27T00:00:00Z RFC3339
 
 		_, _, version, paymentSplit := LifeMapCodecCompanyAxaRevert(row[1])
@@ -527,7 +533,10 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		networkNode.Policies = append(networkNode.Policies, policy.Uid)
 		networkNode.Users = append(networkNode.Users, policy.Contractor.Uid)
 
+		dryRun := req.DryRun
 		if !dryRun {
+			collectionPrefix := req.CollectionPrefix
+
 			// save policy firestore
 
 			err := lib.SetFirestoreErr(fmt.Sprintf("%s%s", collectionPrefix, models.PolicyCollection), policy.Uid, policy)
@@ -538,7 +547,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 			// save policy bigquery
 
-			policyBigquerySave(policy)
+			policyBigquerySave(policy, collectionPrefix)
 
 			// save transactions firestore
 
@@ -551,11 +560,11 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 				// save transactions bigquery
 
-				transactionBigQuerySave(res.Transaction)
+				transactionBigQuerySave(res.Transaction, collectionPrefix)
 
 				for _, nt := range res.NetworkTransactions {
 					// save network transactions bigquery
-					networkTransactionBigQuerySave(*nt)
+					networkTransactionBigQuerySave(*nt, collectionPrefix)
 				}
 			}
 
@@ -569,7 +578,7 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 			// save user bigquery
 
-			contractorBigQuerySave(&policy.Contractor)
+			contractorBigQuerySave(&policy.Contractor, collectionPrefix)
 
 			// save network node firestore
 
@@ -581,24 +590,24 @@ func LifeIn(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 			// save network node bigquery
 
-			networkNodeBigQuerySave(*networkNode)
+			networkNodeBigQuerySave(*networkNode, collectionPrefix)
 
 			// save single guarantees into bigquery
-			models.SetGuaranteBigquery(policy, "emit", models.GuaranteeCollection)
+			models.SetGuaranteBigquery(policy, "emit", fmt.Sprintf("%s%s", collectionPrefix, models.GuaranteeCollection))
 		}
 
-		//log.Println("LifeIn policy:", policy)
+		//log.Println("LifeInFx policy:", policy)
 		b, e := json.Marshal(policy)
-		log.Println("LifeIn policy:", e)
-		log.Println("LifeIn policy:", string(b))
+		log.Println("LifeInFx policy:", e)
+		log.Println("LifeInFx policy:", string(b))
 		policies = append(policies, policy)
 		// docref, _, _ := lib.PutFirestoreErr("test-policy", policy)
-		// log.Println("LifeIn doc id: ", docref.ID)
+		// log.Println("LifeInFx doc id: ", docref.ID)
 
 		//_, e = models.UpdateUserByFiscalCode("uat", policy.Contractor)
-		//log.Println("LifeIn policy:", policy)
+		//log.Println("LifeInFx policy:", policy)
 		//tr := transaction.PutByPolicy(policy, "", "uat", "", "", sumPriseGross, 0, "", "manual", true)
-		//	log.Println("LifeIn transactionpolicy:",tr)
+		//	log.Println("LifeInFx transactionpolicy:",tr)
 		//accounting.CreateNetworkTransaction(tr, "uat")
 
 	}
@@ -924,7 +933,7 @@ var identityDocumentMap map[string]string = map[string]string{
 }
 
 func LifeMapCodecCompanyAxaRevert(g string) (string, string, string, string) {
-	log.Println("LifeIn LifeMapCodecCompanyAxaRevert:", g)
+	log.Println("LifeInFx LifeMapCodecCompanyAxaRevert:", g)
 	var result, pay, slug, version string
 	version = g[:1]
 	code := g[2:3]
@@ -953,8 +962,8 @@ func LifeMapCodecCompanyAxaRevert(g string) (string, string, string, string) {
 		result = "CI"
 		slug = "serious-ill"
 	}
-	log.Println("LifeIn LifeMapCodecCompanyAxaRevert:", version)
-	log.Println("LifeIn LifeMapCodecCompanyAxaRevert:", code)
+	log.Println("LifeInFx LifeMapCodecCompanyAxaRevert:", version)
+	log.Println("LifeInFx LifeMapCodecCompanyAxaRevert:", code)
 	return result, slug, version, pay
 }
 
@@ -962,8 +971,8 @@ func ParseDateDDMMYYYY(date string) time.Time {
 	var (
 		res time.Time
 	)
-	log.Println("LifeIn ParseDateDDMMYYYY date:", date)
-	log.Println("LifeIn ParseDateDDMMYYYY len(date):", len(date))
+	log.Println("LifeInFx ParseDateDDMMYYYY date:", date)
+	log.Println("LifeInFx ParseDateDDMMYYYY len(date):", len(date))
 	if len(date) == 7 {
 		date = "0" + date
 	}
@@ -975,10 +984,10 @@ func ParseDateDDMMYYYY(date string) time.Time {
 		res = time.Date(y, time.Month(m),
 			d, 0, 0, 0, 0, time.UTC)
 		log.Println(e)
-		log.Println("LifeIn ParseDateDDMMYYYY d:", d)
-		log.Println("LifeIn ParseDateDDMMYYYY m:", m)
-		log.Println("LifeIn ParseDateDDMMYYYY y:", y)
-		log.Println("LifeIn ParseDateDDMMYYYY res:", res)
+		log.Println("LifeInFx ParseDateDDMMYYYY d:", d)
+		log.Println("LifeInFx ParseDateDDMMYYYY m:", m)
+		log.Println("LifeInFx ParseDateDDMMYYYY y:", y)
+		log.Println("LifeInFx ParseDateDDMMYYYY res:", res)
 	}
 	return res
 
@@ -1254,7 +1263,7 @@ func getPaymentType(transaction *models.Transaction, policy *models.Policy, prod
 	return models.PaymentTypeCommission
 }
 
-func policyBigquerySave(policy models.Policy) {
+func policyBigquerySave(policy models.Policy, collectionPrefix string) {
 	log.Printf("[policyBigquerySave] parsing data for policy %s", policy.Uid)
 
 	policyBig := lib.GetDatasetByEnv("", fmt.Sprintf("%s%s", collectionPrefix, models.PolicyCollection))
@@ -1284,7 +1293,7 @@ func policyBigquerySave(policy models.Policy) {
 	log.Println("[policyBigquerySave] bigquery saved!")
 }
 
-func transactionBigQuerySave(transaction models.Transaction) {
+func transactionBigQuerySave(transaction models.Transaction, collectionPrefix string) {
 	fireTransactions := lib.GetDatasetByEnv("", fmt.Sprintf("%s%s", collectionPrefix, models.TransactionsCollection))
 
 	transaction.BigPayDate = lib.GetBigQueryNullDateTime(transaction.PayDate)
@@ -1302,7 +1311,7 @@ func transactionBigQuerySave(transaction models.Transaction) {
 	log.Println("Transaction BigQuery saved!")
 }
 
-func networkTransactionBigQuerySave(nt models.NetworkTransaction) error {
+func networkTransactionBigQuerySave(nt models.NetworkTransaction, collectionPrefix string) error {
 	log.Println("[NetworkTransaction.SaveBigQuery]")
 
 	var (
@@ -1357,7 +1366,7 @@ func networkTransactionBigQuerySave(nt models.NetworkTransaction) error {
 	return nil
 }
 
-func networkNodeBigQuerySave(nn models.NetworkNode) error {
+func networkNodeBigQuerySave(nn models.NetworkNode, collectionPrefix string) error {
 	log.Println("[networkNodeSaveBigQuery]")
 
 	nnJson, _ := json.Marshal(nn)
@@ -1431,7 +1440,7 @@ func parseBigQueryAgencyNode(agency *models.AgencyNode) *models.AgencyNode {
 	return agency
 }
 
-func contractorBigQuerySave(contractor *models.Contractor) error {
+func contractorBigQuerySave(contractor *models.Contractor, collectionPrefix string) error {
 	table := lib.GetDatasetByEnv("", fmt.Sprintf("%s%s", collectionPrefix, models.UserCollection))
 
 	result, err := initBigqueryData(contractor)
