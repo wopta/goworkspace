@@ -258,6 +258,7 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 
 			contractor = parseEnterpriseContractor(row)
 			if contractor == nil {
+				skippedPolicies = append(skippedPolicies, fmt.Sprintf("%07s", strings.TrimSpace(row[2])))
 				continue
 			}
 
@@ -281,6 +282,7 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 		} else {
 			contractor = parseIndividualContractor(codeCompany, row, codes)
 			if contractor == nil {
+				skippedPolicies = append(skippedPolicies, fmt.Sprintf("%07s", strings.TrimSpace(row[2])))
 				continue
 			}
 		}
@@ -289,6 +291,7 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 			// create insured
 			insured = parseInsured(codeCompany, row, codes)
 			if insured == nil {
+				skippedPolicies = append(skippedPolicies, fmt.Sprintf("%07s", strings.TrimSpace(row[2])))
 				continue
 			}
 		} else {
