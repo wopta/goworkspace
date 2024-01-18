@@ -196,6 +196,13 @@ const (
 	RuiSectionB    = "B"
 )
 
+const (
+	DocumentSectionContracts        = "contracts"
+	DocumentSectionIdentityDocument = "identity-document"
+	DocumentSectionReserved         = "reserved"
+	DocumentSectionOther            = "other"
+)
+
 func GetProponentRuiSections() []string {
 	return []string{RuiSectionE}
 }

@@ -45,7 +45,7 @@ func UploadPolicyMediaFx(w http.ResponseWriter, r *http.Request) (string, interf
 		return "", nil, err
 	}
 
-	now := time.Now().UTC()
+	now := time.Now().UTC().Unix()
 	req.Filename = fmt.Sprintf("%s_%s", req.Filename, now)
 
 	log.Printf("getting policy %s from Firestore...")

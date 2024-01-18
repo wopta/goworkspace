@@ -3,6 +3,7 @@ package policy
 import (
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"io"
@@ -15,6 +16,7 @@ import (
 type GetPolicyMediaReq struct {
 	PolicyUid string `json:"policyUid"`
 	Filename  string `json:"filename"`
+	Section   string `json:"section"`
 }
 
 type GetPolicyMediaResp struct {
@@ -23,9 +25,11 @@ type GetPolicyMediaResp struct {
 
 func GetPolicyMediaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		err    error
-		policy models.Policy
-		req    GetPolicyMediaReq
+		err     error
+		rawResp string
+		policy  models.Policy
+		req     GetPolicyMediaReq
+		resp    GetPolicyMediaResp
 	)
 
 	log.SetPrefix("[GetPolicyMediaFx]")
@@ -51,68 +55,37 @@ func GetPolicyMediaFx(w http.ResponseWriter, r *http.Request) (string, interface
 
 	log.Println("checking if requested attachment is present...")
 
-	if policy.Attachments != nil {
-		for _, att := range *policy.Attachments {
-			if strings.EqualFold(att.FileName, req.Filename) {
-				rawResp, resp, err := downloadAttachment(att.Link)
-				if err != nil {
-					log.Printf("error downloading media %s from Google Bucket: %s", req.Filename, err.Error())
-					return "", nil, err
-				}
-				return rawResp, resp, err
-			}
-		}
-	}
-
-	if policy.ReservedInfo != nil {
-		for _, doc := range policy.ReservedInfo.Documents {
-			if strings.EqualFold(doc.FileName, req.Filename) {
-				rawResp, resp, err := downloadAttachment(doc.Link)
-				if err != nil {
-					log.Printf("error downloading media %s from Google Bucket: %s", req.Filename, err.Error())
-					return "", nil, err
-				}
-				return rawResp, resp, err
-			}
-		}
-	}
-
-	for _, doc := range policy.Contractor.IdentityDocuments {
-		if strings.EqualFold(doc.FrontMedia.FileName, req.Filename) {
-			rawResp, resp, err := downloadAttachment(doc.FrontMedia.Link)
-			if err != nil {
-				log.Printf("error downloading media %s from Google Bucket: %s", req.Filename, err.Error())
-				return "", nil, err
-			}
-			return rawResp, resp, err
-		}
-
-		if doc.BackMedia != nil && strings.EqualFold(doc.BackMedia.FileName, req.Filename) {
-			rawResp, resp, err := downloadAttachment(doc.BackMedia.Link)
-			if err != nil {
-				log.Printf("error downloading media %s from Google Bucket: %s", req.Filename, err.Error())
-				return "", nil, err
-			}
-
-			return rawResp, resp, err
-		}
+	switch req.Section {
+	case models.DocumentSectionReserved:
+		rawResp, resp, err = retrieveMediaFromReservedInfo(policy, req)
+	case models.DocumentSectionIdentityDocument:
+		rawResp, resp, err = retrieveMediaFromIdentityDocuments(policy, req)
+	default:
+		rawResp, resp, err = retrievedMediaFromAttachments(policy, req)
 	}
 
 	log.Println("Handler end -------------------------------------------------")
+	log.SetPrefix("")
 
-	return "", nil, err
+	return rawResp, resp, err
 }
 
 func downloadAttachment(gsLink string) (string, GetPolicyMediaResp, error) {
+	if gsLink == "" {
+		log.Printf("empty gsLink")
+		return "", GetPolicyMediaResp{}, fmt.Errorf("media not found")
+	}
 	if !strings.Contains(gsLink, "gs://") {
 		gsLink = "gs://" + os.Getenv("GOOGLE_STORAGE_BUCKET") + "/" + gsLink
 	}
+
+	log.Printf("gsLink: %s", gsLink)
+
 	rawDoc, err := lib.ReadFileFromGoogleStorage(gsLink)
 	if err != nil {
 		log.Printf("error reading document from Google Storage: %s", err.Error())
 		return "", GetPolicyMediaResp{}, err
 	}
-	log.Printf("document found")
 
 	resp := GetPolicyMediaResp{
 		RawDoc: base64.StdEncoding.EncodeToString(rawDoc),
@@ -120,4 +93,65 @@ func downloadAttachment(gsLink string) (string, GetPolicyMediaResp, error) {
 
 	rawResp, err := json.Marshal(resp)
 	return string(rawResp), resp, err
+}
+
+func retrievedMediaFromAttachments(policy models.Policy, req GetPolicyMediaReq) (string, GetPolicyMediaResp, error) {
+	if policy.Attachments == nil {
+		log.Printf("policy %s has no attachment", req.PolicyUid)
+		return "", GetPolicyMediaResp{}, fmt.Errorf("no media found")
+	}
+	for _, att := range *policy.Attachments {
+		if strings.EqualFold(att.FileName, req.Filename) {
+			rawResp, resp, err := downloadAttachment(att.Link)
+			if err != nil {
+				log.Printf("error downloading media %s from Google Bucket: %s", req.Filename, err.Error())
+				return "", GetPolicyMediaResp{}, err
+			}
+			return rawResp, resp, err
+		}
+	}
+	log.Printf("media not found")
+	return "", GetPolicyMediaResp{}, fmt.Errorf("no media found")
+}
+
+func retrieveMediaFromReservedInfo(policy models.Policy, req GetPolicyMediaReq) (string, GetPolicyMediaResp, error) {
+	if policy.ReservedInfo == nil {
+		log.Printf("policy %s has no reserved info", req.PolicyUid)
+		return "", GetPolicyMediaResp{}, fmt.Errorf("no media found")
+	}
+	for _, doc := range policy.ReservedInfo.Documents {
+		if strings.EqualFold(doc.FileName, req.Filename) {
+			rawResp, resp, err := downloadAttachment(doc.Link)
+			if err != nil {
+				log.Printf("error downloading media %s from Google Bucket: %s", req.Filename, err.Error())
+				return "", GetPolicyMediaResp{}, err
+			}
+			return rawResp, resp, err
+		}
+	}
+	log.Printf("media not found")
+	return "", GetPolicyMediaResp{}, fmt.Errorf("no media found")
+}
+
+func retrieveMediaFromIdentityDocuments(policy models.Policy, req GetPolicyMediaReq) (string, GetPolicyMediaResp, error) {
+	for _, doc := range policy.Contractor.IdentityDocuments {
+		if doc.FrontMedia != nil && strings.EqualFold(doc.FrontMedia.FileName, req.Filename) {
+			rawResp, resp, err := downloadAttachment(doc.FrontMedia.Link)
+			if err != nil {
+				log.Printf("error downloading media %s from Google Bucket: %s", req.Filename, err.Error())
+				return "", GetPolicyMediaResp{}, err
+			}
+			return rawResp, resp, err
+		}
+		if doc.BackMedia != nil && strings.EqualFold(doc.BackMedia.FileName, req.Filename) {
+			rawResp, resp, err := downloadAttachment(doc.BackMedia.Link)
+			if err != nil {
+				log.Printf("error downloading media %s from Google Bucket: %s", req.Filename, err.Error())
+				return "", GetPolicyMediaResp{}, err
+			}
+			return rawResp, resp, err
+		}
+	}
+	log.Printf("media not found")
+	return "", GetPolicyMediaResp{}, fmt.Errorf("no media found")
 }
