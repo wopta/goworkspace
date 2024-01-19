@@ -53,8 +53,16 @@ func UploadPolicyMediaFx(w http.ResponseWriter, r *http.Request) (string, interf
 		log.Printf("error getting file from request: %s", err.Error())
 		return "", nil, err
 	}
-	defer file.Close()
 
+	log.Printf("policyUid: %s", req.PolicyUid)
+	log.Printf("filename: %s", req.Filename)
+	log.Printf("mimeType: %s", req.MimeType)
+	log.Printf("name: %s", req.Name)
+	log.Printf("section: %s", req.Section)
+	log.Printf("isPrivate: %t", req.IsPrivate)
+	log.Printf("note: %s", req.Note)
+
+	defer file.Close()
 	req.Bytes, err = io.ReadAll(file)
 	if err != nil {
 		log.Printf("error reading file from request: %s", err.Error())
