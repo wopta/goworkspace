@@ -108,13 +108,18 @@ func fabrickRefreshPayByLink(policy *models.Policy, origin string) error {
 
 	// loop all to be deleted transactions
 	for _, tr := range toBeDeletedTransactions {
+		// delete on Fabrick
+		err = fabrickExpireBill(tr.ProviderId)
+		if err != nil {
+			log.Printf("error with fabrick: %s", err.Error())
+			return err
+		}
 		// delete
 		err = transaction.DeleteTransaction(&tr, origin, "Cancellata per ricreazione link di pagamento")
 		if err != nil {
 			log.Printf("error deleting transaction '%s': %s", tr.Uid, err.Error())
 			return err
 		}
-		// TODO: delete on Fabrick
 	}
 
 	// save policy firestore
