@@ -2,6 +2,7 @@ package payment
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -9,8 +10,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"cloud.google.com/go/civil"
 
 	"github.com/google/uuid"
 	"github.com/wopta/goworkspace/lib"
@@ -30,7 +29,7 @@ func getFabrickClient(urlstring string, req *http.Request) (*http.Response, erro
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("x-auth-token", os.Getenv("FABRICK_PERSISTENT_KEY"))
 	req.Header.Set("Accept", "application/json")
-	log.Println("[GetFabrickClient]", req)
+	log.Println("[getFabrickClient]", req)
 
 	return client.Do(req)
 }
@@ -261,37 +260,84 @@ func getFabrickPayments(data models.Policy, firstSchedule bool, scheduleDate str
 	return result
 }
 
-func FabrickExpireBill(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func FabrickExpireBillFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var transaction models.Transaction
-	const expirationTimeSuffix = " 00:00:00"
-	//layout := "2006-01-02T15:04:05.000Z"
-	layout2 := "2006-01-02"
 
-	log.Println(r.Header.Get("uid"))
+	log.SetPrefix("[FabrickExpireBillFx] ")
+
+	log.Println("Handler start -----------------------------------------------")
+
+	origin := r.Header.Get("Origin")
+	fireTransactions := lib.GetDatasetByEnv(origin, models.TransactionsCollection)
 	uid := r.Header.Get("uid")
-	fireTransactions := lib.GetDatasetByEnv(r.Header.Get("origin"), "transactions")
-	docsnap, e := lib.GetFirestoreErr(fireTransactions, uid)
-	docsnap.DataTo(&transaction)
-	expirationDate := time.Now().UTC().AddDate(0, 0, -1).Format(layout2)
-	var urlstring = os.Getenv("FABRICK_BASEURL") + "api/fabrick/pace/v4.0/mods/back/v1.0/payments/expirationDate"
+	log.Printf("getting from firestore transaction '%s'", uid)
 
-	req, _ := http.NewRequest(http.MethodPut, urlstring, strings.NewReader(`{"id":"`+transaction.ProviderId+`","newExpirationDate":"`+expirationDate+expirationTimeSuffix+`"}`))
-	res, e := getFabrickClient(urlstring, req)
-
-	respBody, e := io.ReadAll(res.Body)
-	log.Println("Fabrick res body: ", string(respBody))
-	if res.StatusCode != http.StatusOK {
-		log.Printf("ExpireBill: fabrick error response status code: %s", res.Status)
-		return `{"success":false}`, `{"success":false}`, nil
+	docsnap, err := lib.GetFirestoreErr(fireTransactions, uid)
+	if err != nil {
+		log.Printf("error getting transaction from firestore: %s", err.Error())
+		return "", nil, err
 	}
-	transaction.ExpirationDate = expirationDate
-	transaction.Status = models.PolicyStatusDeleted
-	transaction.StatusHistory = append(transaction.StatusHistory, models.PolicyStatusDeleted)
-	transaction.IsDelete = true
-	transaction.BigCreationDate = civil.DateTimeOf(transaction.CreationDate)
-	transaction.BigStatusHistory = strings.Join(transaction.StatusHistory, ",")
-	lib.SetFirestore(fireTransactions, uid, transaction)
-	e = lib.InsertRowsBigQuery("wopta", fireTransactions, transaction)
+	if err := docsnap.DataTo(&transaction); err != nil {
+		log.Printf("error converting transaction %s data: %s", uid, err.Error())
+		return "", nil, err
+	}
 
-	return `{"success":true}`, `{"success":true}`, e
+	bytes, _ := json.Marshal(transaction)
+	log.Printf("found transaction: %s", string(bytes))
+
+	if err = fabrickExpireBill(transaction.ProviderId); err != nil {
+		log.Printf("error integrating with fabrick: %s", err.Error())
+		return "", nil, err
+	}
+
+	if err = tr.DeleteTransaction(&transaction, origin, "Cancellata manualmente"); err != nil {
+		log.Printf("error deleting transaction on DBs: %s", err.Error())
+		return "", nil, err
+	}
+
+	log.Println("Handler end -------------------------------------------------")
+
+	log.SetPrefix("")
+
+	return "{}", nil, nil
+}
+
+func fabrickExpireBill(providerId string) error {
+	log.Println("starting fabrick expire bill request...")
+	var urlstring = os.Getenv("FABRICK_BASEURL") + "api/fabrick/pace/v4.0/mods/back/v1.0/payments/expirationDate"
+	const expirationTimeSuffix = "00:00:00"
+
+	expirationDate := fmt.Sprintf(
+		"%s %s",
+		time.Now().UTC().AddDate(0, 0, -1).Format(models.TimeDateOnly),
+		expirationTimeSuffix,
+	)
+	requestBody := fmt.Sprintf(`{"id":"%s","newExpirationDate":"%s"}`, providerId, expirationDate)
+	log.Printf("fabrick expire bill request body: %s", requestBody)
+
+	req, err := http.NewRequest(http.MethodPut, urlstring, strings.NewReader(requestBody))
+	if err != nil {
+		log.Printf("error creating request: %s", err.Error())
+		return err
+	}
+	res, err := getFabrickClient(urlstring, req)
+	if err != nil {
+		log.Printf("error getting response: %s", err.Error())
+		return err
+	}
+
+	respBody, err := io.ReadAll(res.Body)
+	if err != nil {
+		log.Printf("fabrick expire bill response error: %s", err.Error())
+		return err
+	}
+	log.Println("fabrick expire bill response body: ", string(respBody))
+	if res.StatusCode != http.StatusOK {
+		log.Printf("fabrick expire bill error status %s", res.Status)
+		return fmt.Errorf("fabrick expire bill error status %s", res.Status)
+	}
+
+	log.Println("fabrick expire bill completed!")
+
+	return nil
 }
