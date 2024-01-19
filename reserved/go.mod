@@ -11,7 +11,7 @@ require (
 	github.com/wopta/goworkspace/models v1.1.79
 	github.com/wopta/goworkspace/policy v1.0.64
 	github.com/wopta/goworkspace/product v1.0.77
-	github.com/wopta/goworkspace/transaction v1.0.41
+	github.com/wopta/goworkspace/transaction v1.0.42
 )
 
 require (
