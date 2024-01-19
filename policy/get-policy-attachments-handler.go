@@ -15,7 +15,7 @@ import (
 	"github.com/wopta/goworkspace/wiseproxy"
 )
 
-func GetPolicyAttachmentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func GetPolicyAttachmentsFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	w.Header().Set("Access-Control-Allow-Methods", "GET")
 
 	var (

@@ -40,7 +40,7 @@ func Policy(w http.ResponseWriter, r *http.Request) {
 			},
 			{
 				Route:   "attachment/v1/:uid",
-				Handler: GetPolicyAttachmentFx,
+				Handler: GetPolicyAttachmentsFx,
 				Method:  http.MethodGet,
 				Roles:   []string{models.UserRoleAll},
 			},
@@ -49,6 +49,18 @@ func Policy(w http.ResponseWriter, r *http.Request) {
 				Handler: GetPortfolioPoliciesFx,
 				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAgent, models.UserRoleAgency},
+			},
+			{
+				Route:   "/media/v1",
+				Handler: GetPolicyMediaFx,
+				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager, models.UserRoleAgent, models.UserRoleAgency},
+			},
+			{
+				Route:   "/media/v1",
+				Handler: UploadPolicyMediaFx,
+				Method:  http.MethodPut,
+				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},
 			{
 				Route:   "/v1",
