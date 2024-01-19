@@ -89,6 +89,8 @@ type User struct {
 	Data                     string                 `firestore:"-"                           json:"-"                           bigquery:"data"`
 	CompanyRole              string                 `firestore:"companyRole,omitempty" json:"companyRole,omitempty" bigquery:"-"`
 	LegalEntityType          string                 `firestore:"legalEntityType,omitempty" json:"legalEntityType,omitempty" bigquery:"-"`
+	IsSignatory              bool                   `firestore:"isSignatory" json:"isSignatory" bigquery:"-"`
+	IsPayer                  bool                   `firestore:"isPayer" json:"isPayer" bigquery:"-"`
 }
 
 type Consens struct {

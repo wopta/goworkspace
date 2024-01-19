@@ -204,7 +204,6 @@ const (
 )
 
 const (
-	Esecutore         = "esecutore"
 	TitolareEffettivo = "titolareEffettivo"
 )
 

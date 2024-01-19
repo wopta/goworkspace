@@ -264,8 +264,8 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 
 			// parsing esecutore info
 
-			esecutore := parseEsecutore(row)
-			*contractors = append(*contractors, esecutore)
+			//esecutore := parseEsecutore(row)
+			//*contractors = append(*contractors, esecutore)
 
 			// parsing titolare effettivo info
 
@@ -573,17 +573,35 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 				}
 			}
 
-			// save user firestore
+			if !isLegalEntity {
+				// save user firestore
 
-			err = lib.SetFirestoreErr(fmt.Sprintf("%s%s", collectionPrefix, models.UserCollection), policy.Contractor.Uid, policy.Contractor.ToUser())
-			if err != nil {
-				log.Printf("error saving contractor firestore: %s", err.Error())
-				continue
+				err = lib.SetFirestoreErr(fmt.Sprintf("%s%s", collectionPrefix, models.UserCollection), policy.Contractor.Uid, policy.Contractor.ToUser())
+				if err != nil {
+					log.Printf("error saving contractor firestore: %s", err.Error())
+					continue
+				}
+
+				// save user bigquery
+
+				userBigQuerySave(*policy.Contractor.ToUser(), collectionPrefix)
+			} else {
+				if policy.Contractors != nil {
+					for _, usr := range *policy.Contractors {
+						// save user firestore
+
+						err = lib.SetFirestoreErr(fmt.Sprintf("%s%s", collectionPrefix, models.UserCollection), usr.Uid, usr)
+						if err != nil {
+							log.Printf("error saving contractor firestore: %s", err.Error())
+							continue
+						}
+
+						// save user bigquery
+
+						userBigQuerySave(usr, collectionPrefix)
+					}
+				}
 			}
-
-			// save user bigquery
-
-			contractorBigQuerySave(&policy.Contractor, collectionPrefix)
 
 			// save network node firestore
 
@@ -644,6 +662,8 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 }
 
 func parsingTitolareEffettivo(row []string, offset int, i int) models.User {
+	isExecutor := strings.TrimSpace(strings.ToUpper(row[224])) == strings.TrimSpace(strings.ToUpper(row[121+(offset*i)]))
+
 	phone := strings.TrimSpace(strings.ReplaceAll(strings.ReplaceAll(row[132], " ", ""), " ", ""))
 	if phone != "" {
 		phone = fmt.Sprintf("+39%s", phone)
@@ -651,10 +671,12 @@ func parsingTitolareEffettivo(row []string, offset int, i int) models.User {
 	rawDocumentCode, _ := strconv.Atoi(strings.TrimSpace(row[136+(offset*i)]))
 	identityDocumentCode := fmt.Sprintf("%02d", rawDocumentCode)
 	titolareEffettivo := models.User{
+		Uid:           lib.NewDoc(models.UserCollection),
 		Type:          models.UserLegalEntity,
 		Name:          strings.TrimSpace(lib.Capitalize(row[118+(offset*i)])),
 		Surname:       strings.TrimSpace(lib.Capitalize(row[117+(offset*i)])),
 		FiscalCode:    strings.TrimSpace(strings.ToUpper(row[121+(offset*i)])),
+		VatCode:       fmt.Sprintf("%011s", strings.TrimSpace(row[27])),
 		Gender:        strings.TrimSpace(strings.ToUpper(row[119+(offset*i)])),
 		BirthDate:     ParseDateDDMMYYYY(row[120+(offset*i)]).Format(time.RFC3339),
 		Mail:          strings.TrimSpace(strings.ToLower(row[131+(offset*i)])),
@@ -686,10 +708,13 @@ func parsingTitolareEffettivo(row []string, offset int, i int) models.User {
 		}},
 		Work:            strings.TrimSpace(lib.Capitalize(row[130+(offset*i)])),
 		LegalEntityType: models.TitolareEffettivo,
+		IsSignatory:     isExecutor,
+		IsPayer:         isExecutor,
 	}
 	return titolareEffettivo
 }
 
+// DEPRECATED
 func parseEsecutore(row []string) models.User {
 	rawDocumentCode, _ := strconv.Atoi(strings.TrimSpace(row[238]))
 	identityDocumentCode := fmt.Sprintf("%02d", rawDocumentCode)
@@ -733,8 +758,7 @@ func parseEsecutore(row []string) models.User {
 			IssuingAuthority: strings.TrimSpace(lib.Capitalize(row[241])),
 			PlaceOfIssue:     strings.TrimSpace(lib.Capitalize(row[241])),
 		}},
-		CompanyRole:     strings.TrimSpace(lib.Capitalize(row[244])),
-		LegalEntityType: models.Esecutore,
+		CompanyRole: strings.TrimSpace(lib.Capitalize(row[244])),
 	}
 	return esecutore
 }
@@ -1456,58 +1480,58 @@ func parseBigQueryAgencyNode(agency *models.AgencyNode) *models.AgencyNode {
 	return agency
 }
 
-func contractorBigQuerySave(contractor *models.Contractor, collectionPrefix string) error {
+func userBigQuerySave(user models.User, collectionPrefix string) error {
 	table := lib.GetDatasetByEnv("", fmt.Sprintf("%s%s", collectionPrefix, models.UserCollection))
 
-	result, err := initBigqueryData(contractor)
+	result, err := initBigqueryData(&user)
 	if err != nil {
 		return err
 	}
 
 	log.Println("user save big query: " + result.Uid)
 
-	return lib.InsertRowsBigQuery(models.WoptaDataset, table, contractor.ToUser())
+	return lib.InsertRowsBigQuery(models.WoptaDataset, table, user)
 }
 
-func initBigqueryData(contractor *models.Contractor) (*models.Contractor, error) {
-	rawContractor, err := json.Marshal(contractor)
+func initBigqueryData(user *models.User) (*models.User, error) {
+	rawContractor, err := json.Marshal(user)
 	if err != nil {
 		return nil, err
 	}
-	contractor.Data = string(rawContractor)
+	user.Data = string(rawContractor)
 
-	if contractor.BirthDate != "" {
-		birthDate, err := time.Parse(time.RFC3339, contractor.BirthDate)
+	if user.BirthDate != "" {
+		birthDate, err := time.Parse(time.RFC3339, user.BirthDate)
 		if err != nil {
 			return nil, err
 		}
-		contractor.BigBirthDate = lib.GetBigQueryNullDateTime(birthDate)
+		user.BigBirthDate = lib.GetBigQueryNullDateTime(birthDate)
 	}
 
-	if contractor.Residence != nil {
-		contractor.BigResidenceStreetName = contractor.Residence.StreetName
-		contractor.BigResidenceStreetNumber = contractor.Residence.StreetNumber
-		contractor.BigResidenceCity = contractor.Residence.City
-		contractor.BigResidencePostalCode = contractor.Residence.PostalCode
-		contractor.BigResidenceLocality = contractor.Residence.Locality
-		contractor.BigResidenceCityCode = contractor.Residence.CityCode
+	if user.Residence != nil {
+		user.BigResidenceStreetName = user.Residence.StreetName
+		user.BigResidenceStreetNumber = user.Residence.StreetNumber
+		user.BigResidenceCity = user.Residence.City
+		user.BigResidencePostalCode = user.Residence.PostalCode
+		user.BigResidenceLocality = user.Residence.Locality
+		user.BigResidenceCityCode = user.Residence.CityCode
 	}
 
-	if contractor.Domicile != nil {
-		contractor.BigDomicileStreetName = contractor.Domicile.StreetName
-		contractor.BigDomicileStreetNumber = contractor.Domicile.StreetNumber
-		contractor.BigDomicileCity = contractor.Domicile.City
-		contractor.BigDomicilePostalCode = contractor.Domicile.PostalCode
-		contractor.BigDomicileLocality = contractor.Domicile.Locality
-		contractor.BigDomicileCityCode = contractor.Domicile.CityCode
+	if user.Domicile != nil {
+		user.BigDomicileStreetName = user.Domicile.StreetName
+		user.BigDomicileStreetNumber = user.Domicile.StreetNumber
+		user.BigDomicileCity = user.Domicile.City
+		user.BigDomicilePostalCode = user.Domicile.PostalCode
+		user.BigDomicileLocality = user.Domicile.Locality
+		user.BigDomicileCityCode = user.Domicile.CityCode
 	}
 
-	contractor.BigLocation = bigquery.NullGeography{
-		GeographyVal: fmt.Sprintf("POINT (%f %f)", contractor.Location.Lng, contractor.Location.Lat),
+	user.BigLocation = bigquery.NullGeography{
+		GeographyVal: fmt.Sprintf("POINT (%f %f)", user.Location.Lng, user.Location.Lat),
 		Valid:        true,
 	}
-	contractor.BigCreationDate = lib.GetBigQueryNullDateTime(contractor.CreationDate)
-	contractor.BigUpdatedDate = lib.GetBigQueryNullDateTime(contractor.UpdatedDate)
+	user.BigCreationDate = lib.GetBigQueryNullDateTime(user.CreationDate)
+	user.BigUpdatedDate = lib.GetBigQueryNullDateTime(user.UpdatedDate)
 
-	return contractor, err
+	return user, err
 }
