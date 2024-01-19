@@ -442,7 +442,6 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 
 		policy.Assets[0].Person = insured
 		policy.Contractor = *contractor
-		policy.Contractor.Uid = lib.NewDoc(models.UserCollection)
 
 		// check if user is already present
 
@@ -770,6 +769,7 @@ func parseIndividualContractor(codeCompany string, row []string, codes map[strin
 	}
 
 	contractor := &models.Contractor{
+		Uid:           lib.NewDoc(models.UserCollection),
 		Type:          models.UserIndividual,
 		Name:          strings.TrimSpace(lib.Capitalize(row[24])),
 		Surname:       strings.TrimSpace(lib.Capitalize(row[23])),
@@ -833,10 +833,12 @@ func parseEnterpriseContractor(row []string) *models.Contractor {
 		phone = fmt.Sprintf("+39%s", phone)
 	}
 
+	vatCode := fmt.Sprintf("%011s", strings.TrimSpace(row[27]))
 	contractor := &models.Contractor{
+		Uid:          vatCode,
 		Type:         models.UserLegalEntity,
 		Name:         strings.TrimSpace(lib.Capitalize(row[23])),
-		VatCode:      fmt.Sprintf("%011s", strings.TrimSpace(row[27])),
+		VatCode:      vatCode,
 		Mail:         strings.TrimSpace(strings.ToLower(row[32])),
 		Phone:        phone,
 		CreationDate: ParseDateDDMMYYYY(row[4]),
