@@ -51,16 +51,16 @@ func Policy(w http.ResponseWriter, r *http.Request) {
 				Roles:   []string{models.UserRoleAgent, models.UserRoleAgency},
 			},
 			{
+				Route:   "/media/upload/v1",
+				Handler: UploadPolicyMediaFx,
+				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
+			},
+			{
 				Route:   "/media/v1",
 				Handler: GetPolicyMediaFx,
 				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager, models.UserRoleAgent, models.UserRoleAgency},
-			},
-			{
-				Route:   "/media/v1",
-				Handler: UploadPolicyMediaFx,
-				Method:  http.MethodPut,
-				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},
 			{
 				Route:   "/v1",
