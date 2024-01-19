@@ -35,12 +35,6 @@ func Transaction(w http.ResponseWriter, r *http.Request) {
 					models.UserRoleAgent,
 				},
 			},
-			{
-				Route:   "v1/:transactionUid",
-				Handler: DeleteTransactionFx,
-				Method:  http.MethodDelete,
-				Roles:   []string{models.UserRoleAdmin},
-			},
 		},
 	}
 	route.Router(w, r)
