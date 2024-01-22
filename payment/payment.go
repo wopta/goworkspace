@@ -49,8 +49,8 @@ func Payment(w http.ResponseWriter, r *http.Request) {
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
-				Route:   "/fabrick/v1/:uid",
-				Handler: FabrickExpireBillFx,
+				Route:   "/v1/:uid",
+				Handler: DeleteTransactionFx,
 				Method:  http.MethodDelete,
 				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},
