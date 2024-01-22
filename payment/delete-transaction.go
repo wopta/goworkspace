@@ -35,7 +35,7 @@ func DeleteTransactionFx(w http.ResponseWriter, r *http.Request) (string, interf
 		err = fmt.Errorf("payment provider not implemented: %s", transaction.ProviderName)
 	}
 	if err != nil {
-		log.Printf(">>>>>> error deleting transaction on provider")
+		log.Printf(">>>>>> error deleting transaction on provider: %s", err.Error())
 	}
 
 	log.Printf("deleting transaction on DBs...")
