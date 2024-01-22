@@ -55,14 +55,24 @@ func GetPolicyMediaFx(w http.ResponseWriter, r *http.Request) (string, interface
 
 	log.Println("checking if requested attachment is present...")
 
-	switch req.Section {
-	case models.DocumentSectionReserved:
-		rawResp, resp, err = retrieveMediaFromReservedInfo(policy, req)
-	case models.DocumentSectionIdentityDocument:
-		rawResp, resp, err = retrieveMediaFromIdentityDocuments(policy, req)
-	default:
-		rawResp, resp, err = retrievedMediaFromAttachments(policy, req)
+	// TODO: improve me
+	rawResp, resp, err = retrievedMediaFromAttachments(policy, req)
+	if rawResp != "" {
+		log.Println("Handler end ---------------------------------------------")
+		log.SetPrefix("")
+
+		return rawResp, resp, err
 	}
+
+	rawResp, resp, err = retrieveMediaFromIdentityDocuments(policy, req)
+	if rawResp != "" {
+		log.Println("Handler end ---------------------------------------------")
+		log.SetPrefix("")
+
+		return rawResp, resp, err
+	}
+
+	rawResp, resp, err = retrieveMediaFromReservedInfo(policy, req)
 
 	log.Println("Handler end -------------------------------------------------")
 	log.SetPrefix("")
