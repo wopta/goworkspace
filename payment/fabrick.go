@@ -260,48 +260,6 @@ func getFabrickPayments(data models.Policy, firstSchedule bool, scheduleDate str
 	return result
 }
 
-func FabrickExpireBillFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	var transaction models.Transaction
-
-	log.SetPrefix("[FabrickExpireBillFx] ")
-
-	log.Println("Handler start -----------------------------------------------")
-
-	origin := r.Header.Get("Origin")
-	fireTransactions := lib.GetDatasetByEnv(origin, models.TransactionsCollection)
-	uid := r.Header.Get("uid")
-	log.Printf("getting from firestore transaction '%s'", uid)
-
-	docsnap, err := lib.GetFirestoreErr(fireTransactions, uid)
-	if err != nil {
-		log.Printf("error getting transaction from firestore: %s", err.Error())
-		return "", nil, err
-	}
-	if err := docsnap.DataTo(&transaction); err != nil {
-		log.Printf("error converting transaction %s data: %s", uid, err.Error())
-		return "", nil, err
-	}
-
-	bytes, _ := json.Marshal(transaction)
-	log.Printf("found transaction: %s", string(bytes))
-
-	if err = fabrickExpireBill(transaction.ProviderId); err != nil {
-		log.Printf("error integrating with fabrick: %s", err.Error())
-		return "", nil, err
-	}
-
-	if err = tr.DeleteTransaction(&transaction, origin, "Cancellata manualmente"); err != nil {
-		log.Printf("error deleting transaction on DBs: %s", err.Error())
-		return "", nil, err
-	}
-
-	log.Println("Handler end -------------------------------------------------")
-
-	log.SetPrefix("")
-
-	return "{}", nil, nil
-}
-
 func fabrickExpireBill(providerId string) error {
 	log.Println("starting fabrick expire bill request...")
 	var urlstring = os.Getenv("FABRICK_BASEURL") + "api/fabrick/pace/v4.0/mods/back/v1.0/payments/expirationDate"
