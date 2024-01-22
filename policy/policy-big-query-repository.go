@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math/rand"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/wopta/goworkspace/lib"
@@ -111,6 +112,17 @@ func addQuery(query *bytes.Buffer, q models.Query, op, valueParameter string) {
 		query.WriteString(fmt.Sprintf(" FLOAT64(data.%s) %s @%s", q.Field, op, valueParameter))
 	case "int":
 		query.WriteString(fmt.Sprintf(" INT64(data.%s) %s @%s", q.Field, op, valueParameter))
+	case "array":
+        // Assuming q.Field is in format 'arrayFieldName.elementFieldName'
+        fields := strings.Split(q.Field, ".")
+
+        arrayField, elementField := fields[0], strings.Join(fields[1:], ".")
+		query.WriteString(fmt.Sprintf(" EXISTS(SELECT 1 FROM UNNEST(JSON_EXTRACT_ARRAY(data.%s)) AS array_element WHERE", arrayField))
+		if op == "like" {
+			query.WriteString(fmt.Sprintf(" REGEXP_CONTAINS(LOWER(JSON_EXTRACT_SCALAR(array_element, '$.%s')), LOWER(@%s)))", elementField, valueParameter))
+		} else {
+			query.WriteString(fmt.Sprintf(" JSON_EXTRACT_SCALAR(array_element, '$.%s') %s @%s)", elementField, op, valueParameter))
+		}
 	default:
 		if op == "like" {
 			query.WriteString(fmt.Sprintf(" REGEXP_CONTAINS(LOWER(JSON_VALUE(data.%s)), LOWER(@%s))", q.Field, valueParameter))
