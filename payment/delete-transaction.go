@@ -23,6 +23,7 @@ func DeleteTransactionFx(w http.ResponseWriter, r *http.Request) (string, interf
 	transaction := tr.GetTransactionByUid(uid, origin)
 	if transaction == nil {
 		log.Printf("transaction '%s' not found", uid)
+		log.SetPrefix("")
 		return "", nil, fmt.Errorf("transaction '%s' not found", uid)
 	}
 	bytes, _ := json.Marshal(transaction)
@@ -41,11 +42,11 @@ func DeleteTransactionFx(w http.ResponseWriter, r *http.Request) (string, interf
 	log.Printf("deleting transaction on DBs...")
 	if err = tr.DeleteTransaction(transaction, origin, "Cancellata manualmente"); err != nil {
 		log.Printf("error deleting transaction on DBs: %s", err.Error())
-		return "", nil, err
+	} else {
+		log.Printf("transaction deleted!")
 	}
-	log.Printf("transaction deleted!")
 
 	log.Println("Handler end -------------------------------------------------")
 	log.SetPrefix("")
-	return "{}", nil, nil
+	return "{}", nil, err
 }
