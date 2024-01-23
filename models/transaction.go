@@ -96,30 +96,35 @@ func SetTransactionPolicy(policy Policy, id string, amount float64, schedule str
 	}
 }
 
-func (transaction *Transaction) BigQuerySave(origin string) {
+func (t *Transaction) Sanitize() {
+	t.Name = lib.TrimSpace(t.Name)
+	t.PaymentNote = lib.ToUpper(t.PaymentNote)
+}
+
+func (t *Transaction) BigQuerySave(origin string) {
 	fireTransactions := lib.GetDatasetByEnv(origin, TransactionsCollection)
-	transactionJson, err := json.Marshal(transaction)
+	transactionJson, err := json.Marshal(t)
 	if err != nil {
-		log.Println("ERROR Transaction "+transaction.Uid+" Marshal: ", err)
+		log.Println("ERROR Transaction "+t.Uid+" Marshal: ", err)
 		return
 	}
-	log.Println("Transaction: "+transaction.Uid, string(transactionJson))
-	transaction.BigPayDate = lib.GetBigQueryNullDateTime(transaction.PayDate)
-	transaction.BigTransactionDate = lib.GetBigQueryNullDateTime(transaction.TransactionDate)
-	transaction.BigCreationDate = civil.DateTimeOf(transaction.CreationDate)
-	transaction.BigStatusHistory = strings.Join(transaction.StatusHistory, ",")
-	transaction.BigUpdateDate = lib.GetBigQueryNullDateTime(transaction.UpdateDate)
-	transaction.BigEffectiveDate = lib.GetBigQueryNullDateTime(transaction.EffectiveDate)
-	log.Println("Transaction save BigQuery: " + transaction.Uid)
+	log.Println("Transaction: "+t.Uid, string(transactionJson))
+	t.BigPayDate = lib.GetBigQueryNullDateTime(t.PayDate)
+	t.BigTransactionDate = lib.GetBigQueryNullDateTime(t.TransactionDate)
+	t.BigCreationDate = civil.DateTimeOf(t.CreationDate)
+	t.BigStatusHistory = strings.Join(t.StatusHistory, ",")
+	t.BigUpdateDate = lib.GetBigQueryNullDateTime(t.UpdateDate)
+	t.BigEffectiveDate = lib.GetBigQueryNullDateTime(t.EffectiveDate)
+	log.Println("Transaction save BigQuery: " + t.Uid)
 
-	err = lib.InsertRowsBigQuery(WoptaDataset, fireTransactions, transaction)
+	err = lib.InsertRowsBigQuery(WoptaDataset, fireTransactions, t)
 	if err != nil {
-		log.Println("ERROR Transaction "+transaction.Uid+" save BigQuery: ", err)
+		log.Println("ERROR Transaction "+t.Uid+" save BigQuery: ", err)
 		return
 	}
 	log.Println("Transaction BigQuery saved!")
 }
 
-func (tr *Transaction) IsLate(limit time.Time) bool {
-	return tr.PayDate.After(limit)
+func (t *Transaction) IsLate(limit time.Time) bool {
+	return t.PayDate.After(limit)
 }
