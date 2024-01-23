@@ -3,6 +3,7 @@ package broker
 import (
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -99,6 +100,12 @@ func GetPolicyAttachments(policyUid string, origin string) ([]models.Attachment,
 
 	expr, err := regexp.Compile("gs://(?P<bucketName>(?:[^/])*)/(?P<fileName>((?:[^/]*/)*)(.*))")
 	log.Printf("Found %d attachment(s) for policy %s", len(*policy.Attachments), policy.Uid)
+
+	if policy.Attachments == nil {
+		log.Printf("No attachments found for policy %s", policy.Uid)
+		return make([]models.Attachment, 0), errors.New("no attachments found for policy " + policy.Uid)
+	}
+
 	for _, attachment := range *policy.Attachments {
 		if attachment.IsPrivate {
 			log.Printf("Attachment %s is private, skipping", attachment.FileName)
