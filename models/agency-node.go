@@ -22,8 +22,8 @@ type AgencyNode struct {
 }
 
 func (an *AgencyNode) Sanitize() {
-	an.Name = lib.ToLower(an.Name)
-	an.VatCode = lib.ToLower(an.VatCode)
+	an.Name = lib.ToUpper(an.Name)
+	an.VatCode = lib.ToUpper(an.VatCode)
 	an.Phone = lib.TrimSpace(an.Phone)
 	if an.Address != nil {
 		an.Address.Sanitize()
@@ -31,10 +31,10 @@ func (an *AgencyNode) Sanitize() {
 	if an.Manager != nil {
 		an.Manager.Sanitize()
 	}
-	an.RuiCode = lib.ToLower(an.RuiCode)
-	an.RuiSection = lib.ToLower(an.RuiSection)
-	an.Pec = lib.ToLower(an.Pec)
-	an.Website = lib.ToLower(an.Website)
+	an.RuiCode = lib.ToUpper(an.RuiCode)
+	an.RuiSection = lib.ToUpper(an.RuiSection)
+	an.Pec = lib.ToUpper(an.Pec)
+	an.Website = lib.ToUpper(an.Website)
 }
 
 func parseBigQueryAgencyNode(agency *AgencyNode) *AgencyNode {

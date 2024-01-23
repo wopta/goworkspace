@@ -61,12 +61,12 @@ func (nn *NetworkNode) Marshal() ([]byte, error) {
 }
 
 func (nn *NetworkNode) Sanitize() {
-	nn.Code = lib.ToLower(nn.Code)
-	nn.ExternalNetworkCode = lib.ToLower(nn.Code)
+	nn.Code = lib.ToUpper(nn.Code)
+	nn.ExternalNetworkCode = lib.ToUpper(nn.Code)
 	nn.Type = lib.TrimSpace(nn.Type)
 	nn.Role = lib.TrimSpace(nn.Role)
-	nn.Mail = lib.ToLower(nn.Mail)
-	nn.Warrant = lib.ToLower(nn.Warrant)
+	nn.Mail = lib.ToUpper(nn.Mail)
+	nn.Warrant = lib.ToUpper(nn.Warrant)
 	nn.ParentUid = lib.TrimSpace(nn.ParentUid)
 	nn.Designation = lib.TrimSpace(nn.Designation)
 	nn.WorksForUid = lib.TrimSpace(nn.WorksForUid)

@@ -25,17 +25,17 @@ type AgentNode struct {
 }
 
 func (an *AgentNode) Sanitize() {
-	an.Name = lib.ToLower(an.Name)
-	an.Surname = lib.ToLower(an.Surname)
-	an.FiscalCode = lib.ToLower(an.FiscalCode)
-	an.VatCode = lib.ToLower(an.VatCode)
-	an.BirthCity = lib.ToLower(an.BirthCity)
-	an.BirthProvince = lib.ToLower(an.BirthProvince)
+	an.Name = lib.ToUpper(an.Name)
+	an.Surname = lib.ToUpper(an.Surname)
+	an.FiscalCode = lib.ToUpper(an.FiscalCode)
+	an.VatCode = lib.ToUpper(an.VatCode)
+	an.BirthCity = lib.ToUpper(an.BirthCity)
+	an.BirthProvince = lib.ToUpper(an.BirthProvince)
 	an.Residence.Sanitize()
 	an.Domicile.Sanitize()
 	an.Phone = lib.TrimSpace(an.Phone)
-	an.RuiCode = lib.ToLower(an.RuiCode)
-	an.RuiSection = lib.ToLower(an.RuiSection)
+	an.RuiCode = lib.ToUpper(an.RuiCode)
+	an.RuiSection = lib.ToUpper(an.RuiSection)
 }
 
 func parseBigQueryAgentNode(agent *AgentNode) *AgentNode {
