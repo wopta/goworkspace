@@ -5,22 +5,20 @@ import (
 	"fmt"
 	"log"
 	"strings"
-	"time"
 
 	"github.com/wopta/goworkspace/document"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	prd "github.com/wopta/goworkspace/product"
-	trn "github.com/wopta/goworkspace/transaction"
 )
 
 type ByAssetPerson struct{}
 
 func (*ByAssetPerson) isCovered(w *PolicyReservedWrapper) (bool, []models.Policy, error) {
 	var (
-		result              = false
-		coveredPolicies     = make([]models.Policy, 0)
-		lastPaidTransaction *models.Transaction
+		result          = false
+		coveredPolicies = make([]models.Policy, 0)
+		//lastPaidTransaction *models.Transaction
 	)
 	log.Println("[ByAssetPerson.isCovered] start -----------------------------")
 
@@ -48,32 +46,39 @@ func (*ByAssetPerson) isCovered(w *PolicyReservedWrapper) (bool, []models.Policy
 	}
 	log.Printf("[ByAssetPerson.isCovered] found %d policies", len(policies))
 
-	lateDate := time.Now().UTC().AddDate(0, 2, 0)
+	if len(policies) > 0 {
+		result = true
+		coveredPolicies = policies
+	}
 
-	for _, policy := range policies {
-		log.Printf("[ByAssetPerson.isCovered] checking policy %s", policy.Uid)
-		if policy.PaymentSplit == string(models.PaySplitYearly) || policy.PaymentSplit == string(models.PaySplitYear) {
-			log.Printf("[ByAssetPerson.isCovered] Yearly pay: found a match! %s - %s", policy.Uid, policy.CodeCompany)
-			// As of now, we have only one transaction for annual policies, so no extra control is needed
-			// TODO: check behaviour when will have policy renewal
-			result = true
-			coveredPolicies = append(coveredPolicies, policy)
-			continue
-		}
+	/*
+		lateDate := time.Now().UTC().AddDate(0, 2, 0)
 
-		// TODO: remove me when we have a job for deleting policies that have not been paid for X months
-		transactions := trn.GetPolicyTransactions(w.Origin, policy.Uid)
-		for _, tr := range transactions {
-			if tr.IsPay {
-				lastPaidTransaction = &tr
+		for _, policy := range policies {
+			log.Printf("[ByAssetPerson.isCovered] checking policy %s", policy.Uid)
+			if policy.PaymentSplit == string(models.PaySplitYearly) || policy.PaymentSplit == string(models.PaySplitYear) {
+				log.Printf("[ByAssetPerson.isCovered] Yearly pay: found a match! %s - %s", policy.Uid, policy.CodeCompany)
+				// As of now, we have only one transaction for annual policies, so no extra control is needed
+				// TODO: check behaviour when will have policy renewal
+				result = true
+				coveredPolicies = append(coveredPolicies, policy)
+				continue
+			}
+
+			// TODO: remove me when we have a job for deleting policies that have not been paid for X months
+			transactions := trn.GetPolicyTransactions(w.Origin, policy.Uid)
+			for _, tr := range transactions {
+				if tr.IsPay {
+					lastPaidTransaction = &tr
+				}
+			}
+			if lastPaidTransaction != nil  && !lastPaidTransaction.IsLate(lateDate) && w.Policy.StartDate.Before(policy.EndDate) {
+				log.Printf("[ByAssetPerson.isCovered] Monthly pay: found a match! %s - %s", policy.Uid, policy.CodeCompany)
+				result = true
+				coveredPolicies = append(coveredPolicies, policy)
 			}
 		}
-		if !lastPaidTransaction.IsLate(lateDate) && w.Policy.StartDate.Before(policy.EndDate) {
-			log.Printf("[ByAssetPerson.isCovered] Monthly pay: found a match! %s - %s", policy.Uid, policy.CodeCompany)
-			result = true
-			coveredPolicies = append(coveredPolicies, policy)
-		}
-	}
+	*/
 
 	log.Printf("[ByAssetPerson.isCovered] result '%t'", result)
 	log.Println("[ByAssetPerson.isCovered] end -------------------------------")
@@ -178,21 +183,21 @@ func setLifeReservedDocument(policy *models.Policy, product *models.Product) {
 	docInfo := document.Reserved(policy, product)
 
 	attachments = append(attachments, models.Attachment{
-		Name: models.RvmInstructionsAttachmentName,
-		FileName: strings.ReplaceAll(fmt.Sprintf(models.RvmInstructionsDocumentFormat, policy.NameDesc,
-			policy.ProposalNumber), " ", "_"),
+		Name:        models.RvmInstructionsAttachmentName,
+		FileName:    strings.ReplaceAll(fmt.Sprintf(models.RvmInstructionsDocumentFormat, policy.ProposalNumber), " ", "_"),
 		Link:        docInfo.LinkGcs,
 		ContentType: "application/pdf",
+		Section:     models.DocumentSectionReserved,
 	})
 
 	rvmLink := "gs://documents-public-dev/medical-report/" + policy.Name + "/" + policy.ProductVersion + "/rvm-life.pdf"
 
 	attachments = append(attachments, models.Attachment{
-		Name: models.RvmSurveyAttachmentName,
-		FileName: strings.ReplaceAll(fmt.Sprintf(models.RvmSurveyDocumentFormat, policy.NameDesc,
-			policy.ProposalNumber), " ", "_"),
+		Name:        models.RvmSurveyAttachmentName,
+		FileName:    strings.ReplaceAll(fmt.Sprintf(models.RvmSurveyDocumentFormat, policy.ProposalNumber), " ", "_"),
 		Link:        fmt.Sprintf("%s", rvmLink),
 		ContentType: "application/pdf",
+		Section:     models.DocumentSectionReserved,
 	})
 
 	policy.ReservedInfo.Documents = attachments

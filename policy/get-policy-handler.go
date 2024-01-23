@@ -33,7 +33,7 @@ func GetPolicy(uid string, origin string) (models.Policy, error) {
 		policy models.Policy
 		err    error
 	)
-	firePolicy := lib.GetDatasetByEnv(origin, "policy")
+	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 	docsnap, err := lib.GetFirestoreErr(firePolicy, uid)
 	if err != nil {
 		return policy, err

@@ -17,8 +17,11 @@ func init() {
 }
 
 func Transaction(w http.ResponseWriter, r *http.Request) {
+	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
+
 	log.Println("Transaction")
 	lib.EnableCors(&w, r)
+
 	route := lib.RouteData{
 		Routes: []lib.Route{
 			{

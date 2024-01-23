@@ -34,19 +34,37 @@ func Policy(w http.ResponseWriter, r *http.Request) {
 			},
 			{
 				Route:   "v1/:uid",
-				Handler: DeletePolicyFx, // Broker.DeletePolicy
+				Handler: DeletePolicyFx,
 				Method:  http.MethodDelete,
 				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},
 			{
 				Route:   "attachment/v1/:uid",
-				Handler: GetPolicyAttachmentFx,
+				Handler: GetPolicyAttachmentsFx,
 				Method:  http.MethodGet,
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
-				Route:   "v1",
-				Handler: GetPoliciesByQueryFx, // Broker.GetPoliciesFx,
+				Route:   "/portfolio/v1",
+				Handler: GetPortfolioPoliciesFx,
+				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAgent, models.UserRoleAgency},
+			},
+			{
+				Route:   "/media/upload/v1",
+				Handler: UploadPolicyMediaFx,
+				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
+			},
+			{
+				Route:   "/media/v1",
+				Handler: GetPolicyMediaFx,
+				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager, models.UserRoleAgent, models.UserRoleAgency},
+			},
+			{
+				Route:   "/v1",
+				Handler: GetPoliciesByQueryFx,
 				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},

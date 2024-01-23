@@ -19,13 +19,14 @@ type GetPolicyTransactionsResp struct {
 type Transactions []models.Transaction
 
 func GetTransactionsByPolicyUidFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.Println("[GetTransactionsByPolicyUidFx] Handler start ---------------------")
+	log.SetPrefix("[GetTransactionsByPolicyUidFx] ")
+	log.Println("Handler start -----------------------------------------------")
 
 	var response GetPolicyTransactionsResp
 
 	policyUid := r.Header.Get("policyUid")
 
-	log.Printf("[GetTransactionsByPolicyUidFx] policyUid %s", policyUid)
+	log.Printf("policyUid %s", policyUid)
 
 	idToken := r.Header.Get("Authorization")
 	authToken, err := models.GetAuthTokenFromIdToken(idToken)
@@ -36,12 +37,12 @@ func GetTransactionsByPolicyUidFx(w http.ResponseWriter, r *http.Request) (strin
 	switch authToken.Role {
 	case models.UserRoleAgent:
 		if !models.IsPolicyInAgentPortfolio(userUid, policyUid) {
-			log.Printf("[GetTransactionsByPolicyUidFx] policy %s is not included in agent %s", policyUid, userUid)
+			log.Printf("policy %s is not included in agent %s", policyUid, userUid)
 			return "", response, fmt.Errorf("agent %s unauthorized for policy %s", userUid, policyUid)
 		}
 	case models.UserRoleAgency:
 		if !models.IsPolicyInAgencyPortfolio(userUid, policyUid) {
-			log.Printf("[GetTransactionsByPolicyUidFx] policy %s is not included in agency %s", policyUid, userUid)
+			log.Printf("policy %s is not included in agency %s", policyUid, userUid)
 			return "", response, fmt.Errorf("agency %s unauthorized for policy %s", userUid, policyUid)
 		}
 	}
@@ -52,7 +53,7 @@ func GetTransactionsByPolicyUidFx(w http.ResponseWriter, r *http.Request) (strin
 
 	jsonOut, err := json.Marshal(response)
 
-	log.Printf("[GetTransactionsByPolicyUidFx] response: %s", string(jsonOut))
+	log.Printf("response: %s", string(jsonOut))
 
 	return string(jsonOut), response, err
 }
@@ -60,11 +61,43 @@ func GetTransactionsByPolicyUidFx(w http.ResponseWriter, r *http.Request) (strin
 func GetPolicyTransactions(origin string, policyUid string) []models.Transaction {
 	var transactions Transactions
 
-	fireTransactions := lib.GetDatasetByEnv(origin, "transactions")
+	fireTransactions := lib.GetDatasetByEnv(origin, models.TransactionsCollection)
 
 	res := lib.WhereFirestore(fireTransactions, "policyUid", "==", policyUid)
 
 	transactions = models.TransactionToListData(res)
+
+	sort.Sort(transactions)
+
+	return transactions
+}
+
+func GetPolicyActiveTransactions(origin, policyUid string) []models.Transaction {
+	var transactions Transactions
+
+	fireTransactions := lib.GetDatasetByEnv(origin, models.TransactionsCollection)
+
+	q := lib.Firequeries{
+		Queries: []lib.Firequery{
+			{
+				Field:      "policyUid",
+				Operator:   "==",
+				QueryValue: policyUid,
+			},
+			{
+				Field:      "isDelete",
+				Operator:   "==",
+				QueryValue: false,
+			},
+		},
+	}
+	docsnap, err := q.FirestoreWherefields(fireTransactions)
+	if err != nil {
+		log.Printf("[GetPolicyActiveTransactions] query error: %s", err.Error())
+		return transactions
+	}
+
+	transactions = models.TransactionToListData(docsnap)
 
 	sort.Sort(transactions)
 

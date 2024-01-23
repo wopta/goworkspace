@@ -16,14 +16,17 @@ func init() {
 }
 
 func Payment(w http.ResponseWriter, r *http.Request) {
+	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
+
 	log.Println("Payment")
 	lib.EnableCors(&w, r)
 	w.Header().Set("Access-Control-Allow-Methods", "POST")
+
 	route := lib.RouteData{
 		Routes: []lib.Route{
 			{
 				Route:   "/v1/fabrick/recreate",
-				Handler: FabrickRecreateFx,
+				Handler: FabrickRefreshPayByLinkFx,
 				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},
@@ -47,7 +50,7 @@ func Payment(w http.ResponseWriter, r *http.Request) {
 			},
 			{
 				Route:   "/v1/:uid",
-				Handler: FabrickExpireBill,
+				Handler: DeleteTransactionFx,
 				Method:  http.MethodDelete,
 				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},

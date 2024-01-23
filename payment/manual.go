@@ -1,6 +1,7 @@
 package payment
 
 import (
+	"encoding/json"
 	"io"
 	"log"
 	"net/http"
@@ -26,26 +27,34 @@ type ManualPaymentPayload struct {
 func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		payload     ManualPaymentPayload
+		transaction models.Transaction
+		policy      models.Policy
 		flowName    string
 		networkNode *models.NetworkNode
 		warrant     *models.Warrant
 		cc          = mail.Address{}
 	)
 
-	log.Println("[ManualPaymentFx] Handler start -----------------------------------------")
+	log.SetPrefix("[ManualPaymentFx] ")
+
+	log.Println("Handler start -----------------------------------------------")
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
+
 	err := lib.CheckPayload[ManualPaymentPayload](body, &payload, []string{"paymentMethod", "payDate", "transactionDate"})
 	if err != nil {
 		return "", nil, err
 	}
 
+	payloadStr, _ := json.Marshal(payload)
+	log.Printf("request: %s", payloadStr)
+
 	methods := models.GetAllPaymentMethods()
 	isMethodAllowed := lib.SliceContains[string](methods, payload.PaymentMethod)
 
 	if !isMethodAllowed {
-		log.Printf("[ManualPaymentFx] ERROR %s", errPaymentMethodNotAllowed)
+		log.Printf("ERROR %s", errPaymentMethodNotAllowed)
 		errorMessage := `{"success":false, "errorMessage":"` + errPaymentMethodNotAllowed + `"}`
 		return errorMessage, errorMessage, nil
 	}
@@ -55,30 +64,33 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 	fireTransactions := lib.GetDatasetByEnv(origin, models.TransactionsCollection)
 	firePolicies := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 
-	var transaction models.Transaction
-	var policy models.Policy
-
 	docsnap, err := lib.GetFirestoreErr(fireTransactions, transactionUid)
 	if err != nil {
-		log.Printf("[ManualPaymentFx] ERROR get transaction from firestore: %s", err.Error())
+		log.Printf("ERROR get transaction from firestore: %s", err.Error())
 		return `{"success":false}`, `{"success":false}`, nil
 	}
 	err = docsnap.DataTo(&transaction)
 	lib.CheckError(err)
 
 	if transaction.IsPay {
-		log.Printf("[ManualPaymentFx] ERROR %s", errTransactionPaid)
+		log.Printf("ERROR %s", errTransactionPaid)
 		errorMessage := `{"success":false, "errorMessage":"` + errTransactionPaid + `"}`
 		return errorMessage, errorMessage, nil
 	}
 
-	firePolicyTransactions := trn.GetPolicyTransactions(origin, transaction.PolicyUid)
-	log.Printf("[ManualPaymentFx] Found transactions %v", firePolicyTransactions)
+	if transaction.IsDelete {
+		log.Printf("ERROR %s", errTransactionDeleted)
+		errorMessage := `{"success":false, "errorMessage":"` + errTransactionDeleted + `"}`
+		return errorMessage, errorMessage, nil
+	}
+
+	firePolicyTransactions := trn.GetPolicyActiveTransactions(origin, transaction.PolicyUid)
+	log.Printf("Found transactions %v", firePolicyTransactions)
 	canPayTransaction := false
 
 	for _, t := range firePolicyTransactions {
 		if !t.IsPay && t.Uid != transactionUid {
-			log.Printf("[ManualPaymentFx] Next transaction to be paid should be %s", t.Uid)
+			log.Printf("Next transaction to be paid should be %s", t.Uid)
 			break
 		}
 		if t.Uid == transactionUid {
@@ -88,26 +100,31 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 	}
 
 	if !canPayTransaction {
-		log.Printf("[ManualPaymentFx] ERROR %s", errTransactionOutOfOrder)
+		log.Printf("ERROR %s", errTransactionOutOfOrder)
 		errorMessage := `{"success":false, "errorMessage":"` + errTransactionOutOfOrder + `"}`
 		return errorMessage, errorMessage, nil
 	}
 
 	docsnap, err = lib.GetFirestoreErr(firePolicies, transaction.PolicyUid)
 	if err != nil {
-		log.Printf("[ManualPaymentFx] ERROR get policy from firestore: %s", err.Error())
+		log.Printf("ERROR get policy from firestore: %s", err.Error())
 		return `{"success":false}`, `{"success":false}`, nil
 	}
 	err = docsnap.DataTo(&policy)
 	lib.CheckError(err)
 
 	if !policy.IsSign {
-		log.Printf("[ManualPaymentFx] ERROR %s", errPolicyNotSigned)
+		log.Printf("ERROR %s", errPolicyNotSigned)
 		errorMessage := `{"success":false, "errorMessage":"` + errPolicyNotSigned + `"}`
 		return errorMessage, errorMessage, nil
 	}
 
-	ManualPayment(&transaction, origin, &payload)
+	err = manualPayment(&transaction, origin, &payload)
+	if err != nil {
+		log.Printf("ERROR %s", errPaymentFailed)
+		errorMessage := `{"success":false, "errorMessage":"` + errPaymentFailed + `"}`
+		return errorMessage, errorMessage, nil
+	}
 
 	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
 	if networkNode != nil {
@@ -115,7 +132,7 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		cc = mail.GetNetworkNodeEmail(networkNode)
 	}
 	flowName, _ = policy.GetFlow(networkNode, warrant)
-	log.Printf("[runBrokerBpmn] flowName '%s'", flowName)
+	log.Printf("flowName '%s'", flowName)
 
 	mgaProduct := prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
 
@@ -129,7 +146,7 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		// Add contract to policy
 		err = plc.AddContract(&policy, origin)
 		if err != nil {
-			log.Printf("[ManualPaymentFx] ERROR add contract to policy: %s", err.Error())
+			log.Printf("ERROR add contract to policy: %s", err.Error())
 			return `{"success":false}`, `{"success":false}`, nil
 		}
 
@@ -147,10 +164,12 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		)
 	}
 
+	log.Println("Handler end -------------------------------------------------")
+
 	return `{"success":true}`, `{"success":true}`, nil
 }
 
-func ManualPayment(transaction *models.Transaction, origin string, payload *ManualPaymentPayload) {
+func manualPayment(transaction *models.Transaction, origin string, payload *ManualPaymentPayload) error {
 	fireTransactions := lib.GetDatasetByEnv(origin, models.TransactionsCollection)
 
 	transaction.ProviderName = models.ManualPaymentProvider
@@ -164,6 +183,13 @@ func ManualPayment(transaction *models.Transaction, origin string, payload *Manu
 	transaction.Status = models.TransactionStatusPay
 	transaction.StatusHistory = append(transaction.StatusHistory, models.TransactionStatusPay)
 
-	lib.SetFirestore(fireTransactions, transaction.Uid, transaction)
+	err := lib.SetFirestoreErr(fireTransactions, transaction.Uid, transaction)
+	if err != nil {
+		log.Printf("error saving transaction to firestore: %s", err.Error())
+		return err
+	}
+
 	transaction.BigQuerySave(origin)
+
+	return nil
 }

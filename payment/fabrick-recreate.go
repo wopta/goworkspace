@@ -17,10 +17,7 @@ import (
 	tr "github.com/wopta/goworkspace/transaction"
 )
 
-type FabrickRefreshPayByLinkRequest struct {
-	PolicyUid string `json:"policyUid"`
-}
-
+// DEPRECATED
 func FabrickRecreateFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println("[FabrickRecreateFx] Handler start ---------------------------")
 
@@ -44,7 +41,7 @@ func FabrickRecreateFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		return "", nil, err
 	}
 
-	policy, err = FabrickRecreate(request.PolicyUid, origin, networkNode, warrant)
+	policy, err = FabrickRecreate(request.PolicyUid, origin)
 	if err != nil {
 		log.Printf("[FabrickRecreateFx] error recreating payment: %s", err.Error())
 		return "", nil, err
@@ -82,7 +79,8 @@ func FabrickRecreateFx(w http.ResponseWriter, r *http.Request) (string, interfac
 	return `{"success":true}`, `{"success":true}`, nil
 }
 
-func FabrickRecreate(policyUid, origin string, networkNode *models.NetworkNode, warrant *models.Warrant) (*models.Policy, error) {
+// DEPRECATED
+func FabrickRecreate(policyUid, origin string) (*models.Policy, error) {
 	log.Println("[FabrickRecreate]")
 	var (
 		err    error
@@ -97,10 +95,10 @@ func FabrickRecreate(policyUid, origin string, networkNode *models.NetworkNode, 
 
 	mgaProduct := prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
 
-	oldTransactions := tr.GetPolicyTransactions(origin, policy.Uid)
+	oldTransactions := tr.GetPolicyActiveTransactions(origin, policy.Uid)
 
 	log.Println("[FabrickRecreate] recreating payment...")
-	product := prd.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, networkNode, warrant)
+	product := prd.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, nil, nil)
 	payUrl, err := PaymentController(origin, &policy, product, mgaProduct)
 	if err != nil {
 		log.Printf("[FabrickRecreate] error creating payment: %s", err.Error())
@@ -118,7 +116,7 @@ func FabrickRecreate(policyUid, origin string, networkNode *models.NetworkNode, 
 		log.Printf("[FabrickRecreate] deleting transaction %s", transaction.Uid)
 		transaction.IsDelete = true
 		transaction.UpdateDate = now
-		transaction.ExpirationDate = now.AddDate(0, 0, 1).Format(models.TimeDateOnly)
+		transaction.ExpirationDate = now.AddDate(0, 0, -1).Format(models.TimeDateOnly)
 		transaction.Status = models.PolicyStatusDeleted
 		transaction.StatusHistory = append(transaction.StatusHistory, transaction.Status)
 		transaction.PaymentNote = "Cancellata per ricreazione titoli"

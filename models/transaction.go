@@ -52,6 +52,8 @@ type Transaction struct {
 	NetworkCommissions map[string]float64    `json:"networkCommissions,omitempty" firestore:"networkCommissions,omitempty" bigquery:"-"` // DEPRECATED
 	UpdateDate         time.Time             `json:"updateDate" firestore:"updateDate" bigquery:"-"`
 	BigUpdateDate      bigquery.NullDateTime `json:"-" firestore:"-" bigquery:"updateDate"`
+	EffectiveDate      time.Time             `json:"effectiveDate,omitempty" firestore:"effectiveDate,omitempty" bigquery:"-"`
+	BigEffectiveDate   bigquery.NullDateTime `json:"-" firestore:"-" bigquery:"effectiveDate"`
 }
 
 func TransactionToListData(query *firestore.DocumentIterator) []Transaction {
@@ -107,6 +109,7 @@ func (transaction *Transaction) BigQuerySave(origin string) {
 	transaction.BigCreationDate = civil.DateTimeOf(transaction.CreationDate)
 	transaction.BigStatusHistory = strings.Join(transaction.StatusHistory, ",")
 	transaction.BigUpdateDate = lib.GetBigQueryNullDateTime(transaction.UpdateDate)
+	transaction.BigEffectiveDate = lib.GetBigQueryNullDateTime(transaction.EffectiveDate)
 	log.Println("Transaction save BigQuery: " + transaction.Uid)
 
 	err = lib.InsertRowsBigQuery(WoptaDataset, fireTransactions, transaction)
