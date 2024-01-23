@@ -35,6 +35,8 @@ func CreateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 
 	log.Println("creating network node into Firestore...")
 
+	request.Sanitize()
+
 	node, err := network.CreateNode(*request)
 	if err != nil {
 		log.Println("error creating network node into Firestore...")

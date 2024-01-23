@@ -22,11 +22,11 @@ func (na *NodeAddress) Sanitize() {
 	if na == nil {
 		return
 	}
-	na.StreetName = lib.ToLower(na.StreetName)
-	na.StreetNumber = lib.ToLower(na.StreetNumber)
-	na.City = lib.ToLower(na.City)
+	na.StreetName = lib.ToUpper(na.StreetName)
+	na.StreetNumber = lib.ToUpper(na.StreetNumber)
+	na.City = lib.ToUpper(na.City)
 	na.PostalCode = lib.TrimSpace(na.PostalCode)
-	na.Locality = lib.ToLower(na.Locality)
-	na.CityCode = lib.ToLower(na.CityCode)
-	na.Area = lib.ToLower(na.Area)
+	na.Locality = lib.ToUpper(na.Locality)
+	na.CityCode = lib.ToUpper(na.CityCode)
+	na.Area = lib.ToUpper(na.Area)
 }
