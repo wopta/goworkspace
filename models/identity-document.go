@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"github.com/wopta/goworkspace/lib"
+	"time"
+)
 
 type IdentityDocument struct {
 	Code             string    `json:"code" firestore:"code" bigquery:"-"`
@@ -23,9 +26,29 @@ type Media struct {
 	Base64Bytes    string `json:"base64Bytes,omitempty" firestore:"-" bigquery:"-"`
 }
 
+func (id *IdentityDocument) Sanitize() {
+	id.Code = lib.TrimSpace(id.Code)
+	id.Type = lib.TrimSpace(id.Type)
+	id.Number = lib.TrimSpace(id.Number)
+	id.IssuingAuthority = lib.TrimSpace(id.IssuingAuthority)
+	id.PlaceOfIssue = lib.ToUpper(id.PlaceOfIssue)
+	if id.FrontMedia != nil {
+		id.FrontMedia.Sanitize()
+	}
+	if id.BackMedia != nil {
+		id.BackMedia.Sanitize()
+	}
+}
+
 func (id *IdentityDocument) IsExpired() bool {
 	now := time.Now()
 	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
 
 	return id.ExpiryDate.UTC().Before(today)
+}
+
+func (m *Media) Sanitize() {
+	m.FileName = lib.TrimSpace(m.FileName)
+	m.SourceFileName = lib.TrimSpace(m.SourceFileName)
+	m.MimeType = lib.TrimSpace(m.MimeType)
 }
