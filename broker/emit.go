@@ -50,18 +50,19 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		responseEmit EmitResponse
 	)
 
-	log.Println("[EmitFx] Handler start --------------------------------------")
+	log.SetPrefix("")
+	log.Println("Handler start -----------------------------------------------")
 
-	log.Println("[EmitFx] loading authToken from idToken...")
+	log.Println("loading authToken from idToken...")
 
 	token := r.Header.Get("Authorization")
 	authToken, err := models.GetAuthTokenFromIdToken(token)
 	if err != nil {
-		log.Printf("[EmitFx] error getting authToken")
+		log.Printf("error getting authToken")
 		return "", nil, err
 	}
 	log.Printf(
-		"[EmitFx] authToken - type: '%s' role: '%s' uid: '%s' email: '%s'",
+		"authToken - type: '%s' role: '%s' uid: '%s' email: '%s'",
 		authToken.Type,
 		authToken.Role,
 		authToken.UserID,
@@ -72,24 +73,24 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 
-	log.Printf("[EmitFx] Request: %s", string(body))
+	log.Printf("Request: %s", string(body))
 	err = json.Unmarshal([]byte(body), &request)
 	if err != nil {
-		log.Printf("[EmitFx] error unmarshaling policy: %s", err.Error())
+		log.Printf("error unmarshaling policy: %s", err.Error())
 		return "", nil, err
 	}
 
 	uid := request.Uid
-	log.Printf("[EmitFx] Uid: %s", uid)
+	log.Printf("Uid: %s", uid)
 
 	paymentSplit = request.PaymentSplit
-	log.Printf("[EmitFx] paymentSplit: %s", paymentSplit)
+	log.Printf("paymentSplit: %s", paymentSplit)
 
 	policy, err = plc.GetPolicy(uid, origin)
 	lib.CheckError(err)
 
 	policyJsonLog, _ := policy.Marshal()
-	log.Printf("[EmitFx] Policy %s JSON: %s", uid, string(policyJsonLog))
+	log.Printf("Policy %s JSON: %s", uid, string(policyJsonLog))
 
 	if request.SendEmail == nil {
 		sendEmail = true
@@ -106,7 +107,7 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	if lib.GetBoolEnv("PROPOSAL_V2") {
 		if policy.IsReserved && policy.Status != models.PolicyStatusApproved {
-			log.Printf("[EmitFx] cannot emit policy uid %s with status %s and isReserved %t", policy.Uid, policy.Status, policy.IsReserved)
+			log.Printf("cannot emit policy uid %s with status %s and isReserved %t", policy.Uid, policy.Status, policy.IsReserved)
 			return "", nil, fmt.Errorf("cannot emit policy uid %s with status %s and isReserved %t", policy.Uid, policy.Status, policy.IsReserved)
 		}
 		responseEmit = emitV2(authToken, &policy, request, origin)
@@ -115,8 +116,9 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	}
 	b, e := json.Marshal(responseEmit)
 
-	log.Println("[EmitFx] Response: ", string(b))
-	log.Println("[EmitFx] Handler end ----------------------------------------")
+	log.Println("Response: ", string(b))
+	log.Println("Handler end ----------------------------------------")
+	log.SetPrefix("")
 
 	return string(b), responseEmit, e
 }
