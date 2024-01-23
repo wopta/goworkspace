@@ -13,6 +13,7 @@ import (
 	"google.golang.org/api/iterator"
 )
 
+// DEPRECATED
 type Agent struct {
 	Uid                      string                 `json:"uid" firestore:"uid" bigquery:"uid"`
 	Code                     string                 `json:"code" firestore:"code" bigquery:"code"`
