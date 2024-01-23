@@ -87,8 +87,8 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 		return "", nil, err
 	}
 
-	data, _ := os.ReadFile("./companydata/track_in_life.csv")
-	//data := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/life/life.csv", "")
+	//data, _ := os.ReadFile("./companydata/in.csv")
+	data := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/life/life.csv", "")
 	df := lib.CsvToDataframe(data)
 	//log.Println("LifeInFx  df.Describe: ", df.Describe())
 	log.Println("LifeInFx  row", df.Nrow())
@@ -228,7 +228,7 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 		//1998-09-27T00:00:00Z RFC3339
 
 		_, _, version, paymentSplit := LifeMapCodecCompanyAxaRevert(row[1])
-		nodeCode := strings.TrimSpace(strings.ToUpper(row[13]))
+		nodeCode := strings.TrimSpace(row[13])
 		if nodeCode == "W1" {
 			nodeCode = "W1.DIRAgent"
 		}
@@ -648,6 +648,8 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 		log.Printf("error: %s", err.Error())
 	}
 	err = os.WriteFile("./companydata/result.json", out, 0777)
+
+	_, err = lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/life/result.json", out)
 	if err != nil {
 		log.Printf("error: %s", err.Error())
 	}
@@ -924,8 +926,6 @@ func parseInsured(codeCompany string, row []string, codes map[string]map[string]
 	if strings.ToUpper(usr.FiscalCode) != strings.ToUpper(insured.FiscalCode) {
 		insured.FiscalCode = usr.FiscalCode
 		wrongInsuredFiscalCodePolicies = append(wrongInsuredFiscalCodePolicies, codeCompany)
-		//skippedPolicies = append(skippedPolicies, policy.CodeCompany)
-		//continue
 	}
 	return insured
 }
@@ -1104,8 +1104,8 @@ func ParseAxaBeneficiary(r []string, base int) *models.Beneficiary {
 		}
 	}
 	return benef
-
 }
+
 func GroupBy(df dataframe.DataFrame, col int) map[string][][]string {
 	log.Println("GroupBy")
 	res := make(map[string][][]string)
