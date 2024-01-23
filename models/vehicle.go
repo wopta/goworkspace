@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"github.com/wopta/goworkspace/lib"
+	"time"
+)
 
 type Vehicle struct {
 	Plate              string    `firestore:"plate,omitempty"              json:"plate,omitempty"              bigquery:"-"` // TARGA
@@ -29,4 +32,10 @@ type Vehicle struct {
 	// HasTowHook         bool      `firestore:"hasTowHook,omitempty"         json:"hasTowHook,omitempty"         bigquery:"-"` // PRESENZA GANCIO TRAINO
 	// KmPerYear          int64     `firestore:"kmPerYear,omitempty"          json:"kmPerYear,omitempty"          bigquery:"-"` // KM ANNUI
 	// OvernightShelter   string    `firestore:"overnightShelter,omitempty"   json:"overnightShelter,omitempty"   bigquery:"-"` // RICOVERO NOTTURNO (box privato/garage pubblico/area recintata privata/in strada)
+}
+
+func (v *Vehicle) Sanitize() {
+	v.Plate = lib.ToUpper(v.Plate)
+	v.Model = lib.ToUpper(v.Model)
+	v.Manufacturer = lib.TrimSpace(v.Manufacturer)
 }
