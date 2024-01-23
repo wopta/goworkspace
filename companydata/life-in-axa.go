@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"reflect"
 	"strconv"
 	"strings"
 	"time"
@@ -117,6 +118,8 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 			sumPriceGross, sumPriceTaxAmount, sumPriceNett                      float64
 			sumPriceGrossMonthly, sumPriceTaxAmountMonthly, sumPriceNettMonthly float64
 			maxDuration                                                         int
+			writeContractorToDB                                                 bool
+			writeContractorsToDB                                                = make([]bool, 0)
 		)
 
 		if pol[0][2] == headervalue || pol[0][1] == titleHeaderValue || pol[0][1] == "1" {
@@ -272,11 +275,13 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 			offset := 26
 			titolariEffettivi := make([]models.User, 0)
 			for i := 0; i < 3; i++ {
+				var writeToDB bool
 				if strings.TrimSpace(strings.ToUpper(row[116+(offset*i)])) == "" || strings.TrimSpace(strings.ToUpper(row[116+(offset*i)])) == "NO" {
 					break
 				}
 				titolareEffettivo := parsingTitolareEffettivo(row, offset, i)
-				titolariEffettivi = append(titolariEffettivi, titolareEffettivo)
+				titolareEffettivo.Uid, writeToDB = searchUserInDBByFiscalCode(titolareEffettivo.FiscalCode)
+				writeContractorsToDB = append(writeContractorsToDB, writeToDB)
 			}
 			*contractors = append(*contractors, titolariEffettivi...)
 		} else {
@@ -285,6 +290,8 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 				skippedPolicies = append(skippedPolicies, fmt.Sprintf("%07s", strings.TrimSpace(row[2])))
 				continue
 			}
+
+			contractor.Uid, writeContractorToDB = searchUserInDBByFiscalCode(contractor.FiscalCode)
 		}
 
 		if !contractorEqualInsured {
@@ -572,7 +579,7 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 				}
 			}
 
-			if !isLegalEntity {
+			if !isLegalEntity && writeContractorToDB {
 				// save user firestore
 
 				err = lib.SetFirestoreErr(fmt.Sprintf("%s%s", collectionPrefix, models.UserCollection), policy.Contractor.Uid, policy.Contractor.ToUser())
@@ -586,7 +593,10 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 				userBigQuerySave(*policy.Contractor.ToUser(), collectionPrefix)
 			} else {
 				if policy.Contractors != nil {
-					for _, usr := range *policy.Contractors {
+					for index, usr := range *policy.Contractors {
+						if !writeContractorsToDB[index] {
+							continue
+						}
 						// save user firestore
 
 						err = lib.SetFirestoreErr(fmt.Sprintf("%s%s", collectionPrefix, models.UserCollection), usr.Uid, usr)
@@ -649,7 +659,7 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	}
 	err = os.WriteFile("./companydata/result.json", out, 0777)
 
-	_, err = lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/life/result.json", out)
+	//_, err = lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/life/result.json", out)
 	if err != nil {
 		log.Printf("error: %s", err.Error())
 	}
@@ -662,6 +672,14 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	return "", nil, e
 }
 
+func searchUserInDBByFiscalCode(fiscalCode string) (string, bool) {
+	retrievedUser, _ := user.GetUserByFiscalCode(fiscalCode)
+	if reflect.ValueOf(retrievedUser).IsZero() {
+		return lib.NewDoc(models.UserCollection), true
+	}
+	return retrievedUser.Uid, false
+}
+
 func parsingTitolareEffettivo(row []string, offset int, i int) models.User {
 	isExecutor := strings.TrimSpace(strings.ToUpper(row[224])) == strings.TrimSpace(strings.ToUpper(row[121+(offset*i)]))
 
@@ -672,7 +690,7 @@ func parsingTitolareEffettivo(row []string, offset int, i int) models.User {
 	rawDocumentCode, _ := strconv.Atoi(strings.TrimSpace(row[136+(offset*i)]))
 	identityDocumentCode := fmt.Sprintf("%02d", rawDocumentCode)
 	titolareEffettivo := models.User{
-		Uid:           lib.NewDoc(models.UserCollection),
+		//Uid:           lib.NewDoc(models.UserCollection),
 		Type:          models.UserLegalEntity,
 		Name:          strings.TrimSpace(lib.Capitalize(row[118+(offset*i)])),
 		Surname:       strings.TrimSpace(lib.Capitalize(row[117+(offset*i)])),
@@ -771,7 +789,7 @@ func parseIndividualContractor(codeCompany string, row []string, codes map[strin
 	}
 
 	contractor := &models.Contractor{
-		Uid:           lib.NewDoc(models.UserCollection),
+		//Uid:           lib.NewDoc(models.UserCollection),
 		Type:          models.UserIndividual,
 		Name:          strings.TrimSpace(lib.Capitalize(row[24])),
 		Surname:       strings.TrimSpace(lib.Capitalize(row[23])),
