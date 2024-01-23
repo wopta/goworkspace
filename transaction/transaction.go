@@ -17,28 +17,57 @@ func init() {
 }
 
 func Transaction(w http.ResponseWriter, r *http.Request) {
-	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
-
-	log.Println("Transaction")
-	lib.EnableCors(&w, r)
-
-	route := lib.RouteData{
+	router := lib.RouteData{
 		Routes: []lib.Route{
 			{
-				Route:   "policy/v1/:policyUid",
-				Handler: GetTransactionsByPolicyUidFx, // Broker.GetPolicyTransactions,
+				Route:   "/:transactionUid/network/:ntUid/update",
+				Handler: TestHandlerFx,
 				Method:  http.MethodGet,
-				Roles: []string{
-					models.UserRoleAdmin,
-					models.UserRoleManager,
-					models.UserRoleAgency,
-					models.UserRoleAgent,
-				},
+				Roles:   []string{},
 			},
 		},
 	}
-	route.Router(w, r)
+
+	router.RouterV3(w, r)
 }
+
+func TestHandlerFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	params := r.Context().Value(lib.ParamsKey{}).(lib.Params)
+	queries := r.Context().Value(lib.QueryParamsKey{}).(lib.Params)
+
+	for _, param := range params {
+		log.Printf("Found param key '%s' with value '%s'", param.Key, param.Value)
+	}
+	for _, query := range queries {
+		log.Printf("Found query key '%s' with value '%s'", query.Key, query.Value)
+	}
+
+	return "", nil, nil
+}
+
+// func Transaction(w http.ResponseWriter, r *http.Request) {
+// 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
+
+// 	log.Println("Transaction")
+// 	lib.EnableCors(&w, r)
+
+// 	route := lib.RouteData{
+// 		Routes: []lib.Route{
+// 			{
+// 				Route:   "policy/v1/:policyUid",
+// 				Handler: GetTransactionsByPolicyUidFx, // Broker.GetPolicyTransactions,
+// 				Method:  http.MethodGet,
+// 				Roles: []string{
+// 					models.UserRoleAdmin,
+// 					models.UserRoleManager,
+// 					models.UserRoleAgency,
+// 					models.UserRoleAgent,
+// 				},
+// 			},
+// 		},
+// 	}
+// 	route.Router(w, r)
+// }
 
 func SetPolicyFirstTransactionPaid(policyUid string, scheduleDate string, origin string) {
 	q := lib.Firequeries{
