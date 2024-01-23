@@ -167,6 +167,18 @@ type Price struct {
 	Discount float64 `firestore:"discount" json:"discount" bigquery:"-"`
 }
 
+func (p *Policy) Sanitize() {
+	p.Contractor.Sanitize()
+	if p.Contractors != nil {
+		for index, _ := range *p.Contractors {
+			(*p.Contractors)[index].Sanitize()
+		}
+	}
+	for index, _ := range p.Assets {
+		p.Assets[index].Sanitize()
+	}
+}
+
 func (policy *Policy) CalculateContractorAge() (int, error) {
 	var startDate time.Time
 	if policy.StartDate.IsZero() {
