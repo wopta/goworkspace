@@ -37,6 +37,7 @@ func PolicyFiscalcode(w http.ResponseWriter, r *http.Request) (string, interface
 	}
 
 	policies = GetPoliciesFromFirebase(fiscalCode, policyFire)
+	policies = filterPrivateAttachments(policies)
 
 	wiseToken, wiseSimplePolicies, e = getAllSimplePoliciesForUserFromWise(fiscalCode)
 
@@ -53,6 +54,23 @@ func PolicyFiscalcode(w http.ResponseWriter, r *http.Request) (string, interface
 	fmt.Printf("Found %d policies for this fiscal code: %s", len(policies), fiscalCode)
 
 	return string(res), response, nil
+}
+
+func filterPrivateAttachments(policies []models.Policy) []models.Policy {
+	for i, policy := range policies {
+		attachments := policy.Attachments
+
+		if attachments == nil {
+			continue
+		}
+
+		filteredAttachments := lib.SliceFilter(*attachments, func(attachment models.Attachment) bool {
+			return !attachment.IsPrivate
+		})
+
+		policies[i].Attachments = &filteredAttachments
+	}
+	return policies
 }
 
 func getCompletePoliciesFromWise(simplePolicies []WiseSimplePolicy, wiseToken *string) []models.Policy {

@@ -100,6 +100,10 @@ func GetPolicyAttachments(policyUid string, origin string) ([]models.Attachment,
 	expr, err := regexp.Compile("gs://(?P<bucketName>(?:[^/])*)/(?P<fileName>((?:[^/]*/)*)(.*))")
 	log.Printf("Found %d attachment(s) for policy %s", len(*policy.Attachments), policy.Uid)
 	for _, attachment := range *policy.Attachments {
+		if attachment.IsPrivate {
+			log.Printf("Attachment %s is private, skipping", attachment.FileName)
+			continue
+		}
 		var responseAttachment models.Attachment
 		if len(attachment.Link) == 0 {
 			log.Printf("Attachment %s has empty link, skipping", attachment.FileName)
