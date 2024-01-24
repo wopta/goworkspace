@@ -235,7 +235,13 @@ func SetUserIntoPolicyContractor(policy *models.Policy, origin string) {
 		}
 		return
 	}
-	_, err = models.UpdateUserByFiscalCode(origin, policy.Contractor)
+
+	user := policy.Contractor.ToUser()
+	if user == nil {
+		return
+	}
+
+	_, err = models.UpdateUserByFiscalCode(origin, *user)
 	lib.CheckError(err)
 }
 

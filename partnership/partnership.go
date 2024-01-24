@@ -225,7 +225,7 @@ func beProfPartnership(jwtData string, policy *models.Policy, product *models.Pr
 			person = personData
 		}
 
-		policy.Contractor = person
+		policy.Contractor = *person.ToContractor()
 		asset.Person = &person
 		policy.OfferlName = "default"
 
@@ -267,7 +267,7 @@ func facilePartnership(jwtData string, policy *models.Policy, product *models.Pr
 	person.BirthDate = birthDate.Format(time.RFC3339)
 	person.Phone = fmt.Sprintf("+39%s", claims.Mobile)
 	person.Gender = claims.Gender
-	policy.Contractor = person
+	policy.Contractor = *person.ToContractor()
 	asset.Person = &person
 	policy.OfferlName = "default"
 

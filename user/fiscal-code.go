@@ -34,7 +34,7 @@ func FiscalCode(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 
 	switch operation {
 	case "encode":
-		outJson, user, err = calculateFiscalCode(user)
+		outJson, user, err = CalculateFiscalCode(user)
 	case "decode":
 		outJson, user, err = ExtractUserDataFromFiscalCode(user)
 	}
@@ -42,7 +42,7 @@ func FiscalCode(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 	return outJson, user, err
 }
 
-func calculateFiscalCode(user models.User) (string, models.User, error) {
+func CalculateFiscalCode(user models.User) (string, models.User, error) {
 	log.Println("Encode")
 	name := strings.ToUpper(strings.ReplaceAll(user.Name, " ", ""))
 	surname := strings.ToUpper(strings.ReplaceAll(user.Surname, " ", ""))

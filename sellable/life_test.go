@@ -14,7 +14,7 @@ func getPolicyByContractorAge(age int) models.Policy {
 	return models.Policy{
 		Name:           models.LifeProduct,
 		ProductVersion: models.ProductV2,
-		Contractor: models.User{
+		Contractor: models.Contractor{
 			BirthDate: time.Now().UTC().AddDate(-age, 0, 0).Format(time.RFC3339),
 		},
 	}

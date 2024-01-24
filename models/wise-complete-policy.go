@@ -30,7 +30,7 @@ func (wisePolicy *WiseCompletePolicy) ToDomain() Policy {
 	updatePolicyEndDate(&policy, wisePolicy)
 
 	policy.Uid = fmt.Sprintf("wise:%d", wisePolicy.Id)
-	policy.Contractor = *wisePolicy.Contractors[0].Registry.ToDomain()
+	policy.Contractor = *wisePolicy.Contractors[0].Registry.ToDomain().ToContractor()
 	policy.CodeCompany = wisePolicy.PolicyNumber
 
 	updatePolicyPrice(&policy, wisePolicy)
