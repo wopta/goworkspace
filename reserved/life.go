@@ -187,6 +187,7 @@ func setLifeReservedDocument(policy *models.Policy, product *models.Product) {
 		FileName:    strings.ReplaceAll(fmt.Sprintf(models.RvmInstructionsDocumentFormat, policy.ProposalNumber), " ", "_"),
 		Link:        docInfo.LinkGcs,
 		ContentType: "application/pdf",
+		Section:     models.DocumentSectionReserved,
 	})
 
 	rvmLink := "gs://documents-public-dev/medical-report/" + policy.Name + "/" + policy.ProductVersion + "/rvm-life.pdf"
@@ -196,6 +197,7 @@ func setLifeReservedDocument(policy *models.Policy, product *models.Product) {
 		FileName:    strings.ReplaceAll(fmt.Sprintf(models.RvmSurveyDocumentFormat, policy.ProposalNumber), " ", "_"),
 		Link:        fmt.Sprintf("%s", rvmLink),
 		ContentType: "application/pdf",
+		Section:     models.DocumentSectionReserved,
 	})
 
 	policy.ReservedInfo.Documents = attachments

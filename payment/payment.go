@@ -50,7 +50,7 @@ func Payment(w http.ResponseWriter, r *http.Request) {
 			},
 			{
 				Route:   "/v1/:uid",
-				Handler: FabrickExpireBill,
+				Handler: DeleteTransactionFx,
 				Method:  http.MethodDelete,
 				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},

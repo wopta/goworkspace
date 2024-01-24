@@ -108,13 +108,18 @@ func fabrickRefreshPayByLink(policy *models.Policy, origin string) error {
 
 	// loop all to be deleted transactions
 	for _, tr := range toBeDeletedTransactions {
+		// delete on Fabrick
+		err = fabrickExpireBill(tr.ProviderId)
+		if err != nil {
+			log.Printf("error with fabrick: %s", err.Error())
+			return err
+		}
 		// delete
 		err = transaction.DeleteTransaction(&tr, origin, "Cancellata per ricreazione link di pagamento")
 		if err != nil {
 			log.Printf("error deleting transaction '%s': %s", tr.Uid, err.Error())
 			return err
 		}
-		// TODO: delete on Fabrick
 	}
 
 	// save policy firestore
@@ -204,7 +209,7 @@ func fabrickMultiRatePayment(
 
 	customerId := uuid.New().String()
 	// first transaction schedule date == now
-	firstres := <-FabrickPayObj(policy, true, time.Now().UTC().Format(models.TimeDateOnly), "", customerId, policy.PriceGrossMonthly, policy.PriceNettMonthly, origin, paymentMethods, mgaProduct)
+	firstres := <-FabrickPayObj(policy, true, "", "", customerId, policy.PriceGrossMonthly, policy.PriceNettMonthly, origin, paymentMethods, mgaProduct, rateScheduleDates[0])
 	time.Sleep(100)
 
 	// we skip the first element since it is always created with todays date
@@ -212,7 +217,7 @@ func fabrickMultiRatePayment(
 		// other transactions same schedule date as before to respect policy.StartDate/EndDate
 		expireDate := sd.AddDate(10, 0, 0)
 
-		res := <-FabrickPayObj(policy, false, sd.Format(models.TimeDateOnly), expireDate.Format(models.TimeDateOnly), customerId, policy.PriceGrossMonthly, policy.PriceNettMonthly, origin, paymentMethods, mgaProduct)
+		res := <-FabrickPayObj(policy, false, sd.Format(models.TimeDateOnly), expireDate.Format(models.TimeDateOnly), customerId, policy.PriceGrossMonthly, policy.PriceNettMonthly, origin, paymentMethods, mgaProduct, sd)
 		log.Printf("ScheduleDate: '%s' - response: %v", sd, res)
 		time.Sleep(100)
 	}

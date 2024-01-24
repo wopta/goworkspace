@@ -2,6 +2,7 @@ package payment
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -9,8 +10,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"cloud.google.com/go/civil"
 
 	"github.com/google/uuid"
 	"github.com/wopta/goworkspace/lib"
@@ -30,7 +29,7 @@ func getFabrickClient(urlstring string, req *http.Request) (*http.Response, erro
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("x-auth-token", os.Getenv("FABRICK_PERSISTENT_KEY"))
 	req.Header.Set("Accept", "application/json")
-	log.Println("[GetFabrickClient]", req)
+	log.Println("[getFabrickClient]", req)
 
 	return client.Do(req)
 }
@@ -70,7 +69,7 @@ func FabrickPayFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	paymentMethods := getPaymentMethods(data, product)
 
 	resultPay := <-FabrickPayObj(data, false, "", data.StartDate.AddDate(10, 0, 0).Format(models.TimeDateOnly), "", data.PriceGross,
-		data.PriceNett, getOrigin(r.Header.Get("origin")), paymentMethods, mgaProduct)
+		data.PriceNett, getOrigin(r.Header.Get("origin")), paymentMethods, mgaProduct, data.StartDate)
 
 	log.Println(resultPay)
 	return "", nil, err
@@ -112,6 +111,7 @@ func FabrickPayObj(
 	origin string,
 	paymentMethods []string,
 	mgaProduct *models.Product,
+	effectiveDate time.Time,
 ) <-chan FabrickPaymentResponse {
 	r := make(chan FabrickPaymentResponse)
 
@@ -148,7 +148,7 @@ func FabrickPayObj(
 			json.Unmarshal([]byte(body), &result)
 			defer res.Body.Close()
 
-			tr.PutByPolicy(data, scheduleDate, origin, expireDate, customerId, amount, amountNet, *result.Payload.PaymentID, "", false, mgaProduct)
+			tr.PutByPolicy(data, scheduleDate, origin, expireDate, customerId, amount, amountNet, *result.Payload.PaymentID, "", false, mgaProduct, effectiveDate)
 
 			r <- result
 		}
@@ -160,13 +160,13 @@ func FabrickMonthlyPay(data models.Policy, origin string, paymentMethods []strin
 	log.Printf("[FabrickMonthlyPay] Policy %s", data.Uid)
 
 	customerId := uuid.New().String()
-	firstres := <-FabrickPayObj(data, true, "", "", customerId, data.PriceGrossMonthly, data.PriceNettMonthly, origin, paymentMethods, mgaProduct)
+	firstres := <-FabrickPayObj(data, true, "", "", customerId, data.PriceGrossMonthly, data.PriceNettMonthly, origin, paymentMethods, mgaProduct, data.StartDate)
 	time.Sleep(100)
 
 	for i := 1; i <= 11; i++ {
 		date := data.StartDate.AddDate(0, i, 0)
 		expireDate := date.AddDate(10, 0, 0)
-		res := <-FabrickPayObj(data, false, date.Format(models.TimeDateOnly), expireDate.Format(models.TimeDateOnly), customerId, data.PriceGrossMonthly, data.PriceNettMonthly, origin, paymentMethods, mgaProduct)
+		res := <-FabrickPayObj(data, false, date.Format(models.TimeDateOnly), expireDate.Format(models.TimeDateOnly), customerId, data.PriceGrossMonthly, data.PriceNettMonthly, origin, paymentMethods, mgaProduct, date)
 		log.Printf("[FabrickMonthlyPay] Policy %s - Index %d - response: %v", data.Uid, i, res)
 		time.Sleep(100)
 	}
@@ -178,7 +178,7 @@ func FabrickYearPay(data models.Policy, origin string, paymentMethods []string, 
 	log.Printf("[FabrickYearPay] Policy %s", data.Uid)
 
 	customerId := uuid.New().String()
-	res := <-FabrickPayObj(data, false, "", data.StartDate.AddDate(10, 0, 0).Format(models.TimeDateOnly), customerId, data.PriceGross, data.PriceNett, origin, paymentMethods, mgaProduct)
+	res := <-FabrickPayObj(data, false, "", data.StartDate.AddDate(10, 0, 0).Format(models.TimeDateOnly), customerId, data.PriceGross, data.PriceNett, origin, paymentMethods, mgaProduct, data.StartDate)
 
 	return res
 }
@@ -260,37 +260,42 @@ func getFabrickPayments(data models.Policy, firstSchedule bool, scheduleDate str
 	return result
 }
 
-func FabrickExpireBill(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	var transaction models.Transaction
-	const expirationTimeSuffix = " 00:00:00"
-	//layout := "2006-01-02T15:04:05.000Z"
-	layout2 := "2006-01-02"
-
-	log.Println(r.Header.Get("uid"))
-	uid := r.Header.Get("uid")
-	fireTransactions := lib.GetDatasetByEnv(r.Header.Get("origin"), "transactions")
-	docsnap, e := lib.GetFirestoreErr(fireTransactions, uid)
-	docsnap.DataTo(&transaction)
-	expirationDate := time.Now().UTC().AddDate(0, 0, -1).Format(layout2)
+func fabrickExpireBill(providerId string) error {
+	log.Println("starting fabrick expire bill request...")
 	var urlstring = os.Getenv("FABRICK_BASEURL") + "api/fabrick/pace/v4.0/mods/back/v1.0/payments/expirationDate"
+	const expirationTimeSuffix = "00:00:00"
 
-	req, _ := http.NewRequest(http.MethodPut, urlstring, strings.NewReader(`{"id":"`+transaction.ProviderId+`","newExpirationDate":"`+expirationDate+expirationTimeSuffix+`"}`))
-	res, e := getFabrickClient(urlstring, req)
+	expirationDate := fmt.Sprintf(
+		"%s %s",
+		time.Now().UTC().AddDate(0, 0, -1).Format(models.TimeDateOnly),
+		expirationTimeSuffix,
+	)
+	requestBody := fmt.Sprintf(`{"id":"%s","newExpirationDate":"%s"}`, providerId, expirationDate)
+	log.Printf("fabrick expire bill request body: %s", requestBody)
 
-	respBody, e := io.ReadAll(res.Body)
-	log.Println("Fabrick res body: ", string(respBody))
-	if res.StatusCode != http.StatusOK {
-		log.Printf("ExpireBill: fabrick error response status code: %s", res.Status)
-		return `{"success":false}`, `{"success":false}`, nil
+	req, err := http.NewRequest(http.MethodPut, urlstring, strings.NewReader(requestBody))
+	if err != nil {
+		log.Printf("error creating request: %s", err.Error())
+		return err
 	}
-	transaction.ExpirationDate = expirationDate
-	transaction.Status = models.PolicyStatusDeleted
-	transaction.StatusHistory = append(transaction.StatusHistory, models.PolicyStatusDeleted)
-	transaction.IsDelete = true
-	transaction.BigCreationDate = civil.DateTimeOf(transaction.CreationDate)
-	transaction.BigStatusHistory = strings.Join(transaction.StatusHistory, ",")
-	lib.SetFirestore(fireTransactions, uid, transaction)
-	e = lib.InsertRowsBigQuery("wopta", fireTransactions, transaction)
+	res, err := getFabrickClient(urlstring, req)
+	if err != nil {
+		log.Printf("error getting response: %s", err.Error())
+		return err
+	}
 
-	return `{"success":true}`, `{"success":true}`, e
+	respBody, err := io.ReadAll(res.Body)
+	if err != nil {
+		log.Printf("fabrick expire bill response error: %s", err.Error())
+		return err
+	}
+	log.Println("fabrick expire bill response body: ", string(respBody))
+	if res.StatusCode != http.StatusOK {
+		log.Printf("fabrick expire bill error status %s", res.Status)
+		return fmt.Errorf("fabrick expire bill error status %s", res.Status)
+	}
+
+	log.Println("fabrick expire bill completed!")
+
+	return nil
 }

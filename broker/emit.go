@@ -326,7 +326,7 @@ func setAdvance(policy *models.Policy, origin string) {
 
 	}
 
-	tr := transaction.PutByPolicy(*policy, "", origin, "", "", policy.PriceGross, policy.PriceNett, "", models.PayMethodRemittance, true, mgaProduct)
+	tr := transaction.PutByPolicy(*policy, "", origin, "", "", policy.PriceGross, policy.PriceNett, "", models.PayMethodRemittance, true, mgaProduct, policy.StartDate)
 
 	transaction.CreateNetworkTransactions(policy, tr, networkNode, mgaProduct)
 }

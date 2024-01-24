@@ -207,6 +207,13 @@ const (
 	TitolareEffettivo = "titolareEffettivo"
 )
 
+const(
+  DocumentSectionContracts        = "contract"
+	DocumentSectionIdentityDocument = "identity-document"
+	DocumentSectionReserved         = "reserved"
+	DocumentSectionOther            = "other"
+)
+
 func GetProponentRuiSections() []string {
 	return []string{RuiSectionE}
 }

@@ -135,6 +135,7 @@ func AddContract(policy *models.Policy, origin string) error {
 		Name:     models.ContractAttachmentName,
 		Link:     gsLink,
 		FileName: filename,
+		Section:  models.DocumentSectionContracts,
 	})
 	policy.Updated = time.Now().UTC()
 
@@ -192,5 +193,6 @@ func AddProposalDoc(origin string, policy *models.Policy, networkNode *models.Ne
 		Name:     models.ProposalAttachmentName,
 		Link:     result.LinkGcs,
 		FileName: filename,
+		Section:  models.DocumentSectionContracts,
 	})
 }
