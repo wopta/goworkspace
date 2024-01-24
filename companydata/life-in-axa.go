@@ -88,7 +88,7 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 		return "", nil, err
 	}
 
-	//data, _ := os.ReadFile("./companydata/in.csv")
+	//data, _ := os.ReadFile("./companydata/life.csv")
 	data := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/life/life.csv", "")
 	df := lib.CsvToDataframe(data)
 	//log.Println("LifeInFx  df.Describe: ", df.Describe())
@@ -628,20 +628,10 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 			models.SetGuaranteBigquery(policy, "emit", fmt.Sprintf("%s%s", collectionPrefix, models.GuaranteeCollection))
 		}
 
-		//log.Println("LifeInFx policy:", policy)
 		b, e := json.Marshal(policy)
 		log.Println("LifeInFx policy:", e)
 		log.Println("LifeInFx policy:", string(b))
 		policies = append(policies, policy)
-		// docref, _, _ := lib.PutFirestoreErr("test-policy", policy)
-		// log.Println("LifeInFx doc id: ", docref.ID)
-
-		//_, e = models.UpdateUserByFiscalCode("uat", policy.Contractor)
-		//log.Println("LifeInFx policy:", policy)
-		//tr := transaction.PutByPolicy(policy, "", "uat", "", "", sumPriseGross, 0, "", "manual", true)
-		//	log.Println("LifeInFx transactionpolicy:",tr)
-		//accounting.CreateNetworkTransaction(tr, "uat")
-
 	}
 
 	log.Printf("Skipped %d policies: %v\n", len(skippedPolicies), skippedPolicies)
@@ -657,9 +647,9 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	if err != nil {
 		log.Printf("error: %s", err.Error())
 	}
-	err = os.WriteFile("./companydata/result.json", out, 0777)
+	//err = os.WriteFile("./companydata/result.json", out, 0777)
 
-	//_, err = lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/life/result.json", out)
+	_, err = lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/life/result.json", out)
 	if err != nil {
 		log.Printf("error: %s", err.Error())
 	}
@@ -733,55 +723,6 @@ func parsingTitolareEffettivo(row []string, offset int, i int) models.User {
 	return titolareEffettivo
 }
 
-// DEPRECATED
-func parseEsecutore(row []string) models.User {
-	rawDocumentCode, _ := strconv.Atoi(strings.TrimSpace(row[238]))
-	identityDocumentCode := fmt.Sprintf("%02d", rawDocumentCode)
-
-	phone := strings.TrimSpace(strings.ReplaceAll(strings.ReplaceAll(row[234], " ", ""), " ", ""))
-	if phone != "" {
-		phone = fmt.Sprintf("+39%s", phone)
-	}
-
-	esecutore := models.User{
-		Type:          models.UserLegalEntity,
-		Name:          strings.TrimSpace(lib.Capitalize(row[221])),
-		Surname:       strings.TrimSpace(lib.Capitalize(row[220])),
-		FiscalCode:    strings.TrimSpace(strings.ToUpper(row[224])),
-		Gender:        strings.TrimSpace(strings.ToUpper(row[222])),
-		Mail:          strings.TrimSpace(strings.ToLower(row[233])),
-		Phone:         phone,
-		BirthDate:     ParseDateDDMMYYYY(row[223]).Format(time.RFC3339),
-		BirthCity:     strings.TrimSpace(lib.Capitalize(row[235])),
-		BirthProvince: strings.TrimSpace(strings.ToUpper(row[236])),
-		Residence: &models.Address{
-			StreetName: strings.TrimSpace(lib.Capitalize(row[225])),
-			City:       strings.TrimSpace(lib.Capitalize(row[227])),
-			CityCode:   strings.TrimSpace(strings.ToUpper(row[228])),
-			PostalCode: strings.TrimSpace(row[226]),
-			Locality:   strings.TrimSpace(lib.Capitalize(row[227])),
-		},
-		Domicile: &models.Address{
-			StreetName: strings.TrimSpace(lib.Capitalize(row[229])),
-			City:       strings.TrimSpace(lib.Capitalize(row[231])),
-			CityCode:   strings.TrimSpace(strings.ToUpper(row[232])),
-			PostalCode: strings.TrimSpace(row[230]),
-			Locality:   strings.TrimSpace(lib.Capitalize(row[231])),
-		},
-		IdentityDocuments: []*models.IdentityDocument{{
-			Number:           strings.TrimSpace(strings.ToUpper(row[239])),
-			Code:             identityDocumentCode,
-			Type:             identityDocumentMap[identityDocumentCode],
-			DateOfIssue:      ParseDateDDMMYYYY(row[240]),
-			ExpiryDate:       ParseDateDDMMYYYY(row[240]).AddDate(10, 0, 0),
-			IssuingAuthority: strings.TrimSpace(lib.Capitalize(row[241])),
-			PlaceOfIssue:     strings.TrimSpace(lib.Capitalize(row[241])),
-		}},
-		CompanyRole: strings.TrimSpace(lib.Capitalize(row[244])),
-	}
-	return esecutore
-}
-
 func parseIndividualContractor(codeCompany string, row []string, codes map[string]map[string]string) *models.Contractor {
 	phone := strings.TrimSpace(strings.TrimSpace(strings.ReplaceAll(strings.ReplaceAll(row[33], " ", ""), " ", "")))
 	if phone != "" {
@@ -789,7 +730,6 @@ func parseIndividualContractor(codeCompany string, row []string, codes map[strin
 	}
 
 	contractor := &models.Contractor{
-		//Uid:           lib.NewDoc(models.UserCollection),
 		Type:          models.UserIndividual,
 		Name:          strings.TrimSpace(lib.Capitalize(row[24])),
 		Surname:       strings.TrimSpace(lib.Capitalize(row[23])),
