@@ -94,6 +94,16 @@ type Consens struct {
 	Mail            string         `json:"-" firestore:"-" bigquery:"-"`
 }
 
+func UnmarshalUser(data []byte) (Claim, error) {
+	var r Claim
+	err := json.Unmarshal(data, &r)
+	return r, err
+}
+
+func (u *User) Marshal() ([]byte, error) {
+	return json.Marshal(u)
+}
+
 func (u *User) Sanitize() {
 	u.Name = lib.ToUpper(u.Name)
 	u.Surname = lib.ToUpper(u.Surname)
