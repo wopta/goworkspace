@@ -18,61 +18,65 @@ type UpdatePolicyResponse struct {
 }
 
 func UpdatePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.Println("[UpdatePolicyFx] Handler start ------------------------------")
 	var (
-		err      error
-		request  models.Policy
-		response UpdatePolicyResponse
+		err         error
+		inputPolicy models.Policy
+		response    UpdatePolicyResponse
 	)
+
+	log.SetPrefix("[UpdatePolicyFx]")
+	log.Println("Handler start ------------------------------")
 
 	origin := r.Header.Get("Origin")
 	policyUid := r.Header.Get("uid")
 	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
-	err = json.Unmarshal(body, &request)
+	err = json.Unmarshal(body, &inputPolicy)
 	if err != nil {
-		log.Printf("[UpdatePolicyFx] error unable to unmarshal request body: %s", err.Error())
+		log.Printf("error unable to unmarshal request body: %s", err.Error())
 		return "", nil, err
 	}
 
-	log.Printf("[UpdatePolicyFx] request body: %s", string(body))
+	log.Printf("request body: %s", string(body))
+
+	inputPolicy.Sanitize()
 
 	originalPolicy, err := plc.GetPolicy(policyUid, origin)
 	if err != nil {
-		log.Printf("[UpdatePolicyFx] error unable to retrieve original policy: %s", err.Error())
+		log.Printf("error unable to retrieve original policy: %s", err.Error())
 		return "", nil, err
 	}
 	originalPolicyBytes, _ := json.Marshal(originalPolicy)
-	log.Printf("[UpdatePolicyFx] original policy: %s", string(originalPolicyBytes))
+	log.Printf("original policy: %s", string(originalPolicyBytes))
 
 	mergedInput := make(map[string]interface{})
-	input := plc.UpdatePolicy(&request)
+	input := plc.UpdatePolicy(&inputPolicy)
 	for k, v := range input {
 		mergedInput[k] = v
 	}
-	inputReserved := reserved.UpdatePolicyReserved(&request)
+	inputReserved := reserved.UpdatePolicyReserved(&inputPolicy)
 	for k, v := range inputReserved {
 		mergedInput[k] = v
 	}
 
 	inputJson, err := json.Marshal(mergedInput)
 	if err != nil {
-		log.Printf("[UpdatePolicyFx] error unable to marshal input result: %s", err.Error())
+		log.Printf("error unable to marshal input result: %s", err.Error())
 		return "", nil, err
 	}
-	log.Printf("[UpdatePolicyFx] modified policy values: %v", string(inputJson))
+	log.Printf("modified policy values: %v", string(inputJson))
 
 	_, err = lib.FireUpdate(firePolicy, policyUid, mergedInput)
 	if err != nil {
-		log.Printf("[UpdatePolicyFx] error updating policy in firestore: %s", err.Error())
+		log.Printf("error updating policy in firestore: %s", err.Error())
 		return "", nil, err
 	}
 
 	// TODO: improve me
 	updatedPolicy, err := plc.GetPolicy(policyUid, origin)
 	if err != nil {
-		log.Printf("[UpdatePolicyFx] error unable to retrieve updated policy: %s", err.Error())
+		log.Printf("error unable to retrieve updated policy: %s", err.Error())
 		return "", nil, err
 	}
 	response.Policy = &updatedPolicy
@@ -80,7 +84,8 @@ func UpdatePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 
 	updatedPolicy.BigquerySave(origin)
 
-	log.Printf("[UpdatePolicyFx] response: %s", string(responseJson))
+	log.Printf("response: %s", string(responseJson))
+	log.SetPrefix("")
 
 	return string(responseJson), response, err
 }
