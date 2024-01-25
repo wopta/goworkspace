@@ -91,10 +91,8 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	//data, _ := os.ReadFile("./companydata/life.csv")
 	data := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/life/life.csv", "")
 	df := lib.CsvToDataframe(data)
-	//log.Println("LifeInFx  df.Describe: ", df.Describe())
 	log.Println("LifeInFx  row", df.Nrow())
 	log.Println("LifeInFx  col", df.Ncol())
-	//group := df.GroupBy("N\xb0 adesione individuale univoco")
 	group := GroupBy(df, 2)
 
 	mgaProducts := map[string]*models.Product{
@@ -141,7 +139,9 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 
 			payDate = fmt.Sprintf("%08s", strings.TrimSpace(r[5]))
 
-			if strings.TrimSpace(r[3]) == "R" {
+			companyCodec, slug, version, paymentSplit := LifeMapCodecCompanyAxaRevert(r[1])
+
+			if paymentSplit == string(models.PaySplitMonthly) && strings.TrimSpace(r[3]) == "R" {
 				if monthlyPolicies[codeCompany] == nil {
 					monthlyPolicies[codeCompany] = make(map[string][][]string, 0)
 				}
@@ -152,7 +152,6 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 				continue
 			}
 
-			companyCodec, slug, version, _ := LifeMapCodecCompanyAxaRevert(r[1])
 			if slug == "death" {
 				for i := 0; i < 2; i++ {
 					benef := ParseAxaBeneficiary(r, i)
@@ -485,7 +484,7 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 
 		// if monthly create remaining transactions and network transactions if transaction is paid
 
-		if monthlyPolicies[policy.CodeCompany] != nil {
+		if policy.PaymentSplit == string(models.PaySplitMonthly) {
 			tr := createTransaction(policy, mgaProducts[policy.ProductVersion], "", scheduleDate, transactionPayDate, policy.PriceGrossMonthly, policy.PriceNettMonthly, true)
 
 			transactionsOutput = map[string]TransactionsOutput{
@@ -647,15 +646,17 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	if err != nil {
 		log.Printf("error: %s", err.Error())
 	}
-	//err = os.WriteFile("./companydata/result.json", out, 0777)
 
-	_, err = lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/life/result.json", out)
-	if err != nil {
-		log.Printf("error: %s", err.Error())
+	if req.DryRun != nil && *req.DryRun {
+		err = os.WriteFile("./companydata/result.json", out, 0777)
+	} else {
+		_, err = lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/life/result.json", out)
+		if err != nil {
+			log.Printf("error: %s", err.Error())
+		}
 	}
 
 	endDateJob = time.Now().UTC()
-
 	log.Printf("Script started at %s", startDateJob.String())
 	log.Printf("Script ended at %s", endDateJob.String())
 
