@@ -13,8 +13,8 @@ import (
 
 func CreateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		request *models.NetworkNode
-		err     error
+		inputNode *models.NetworkNode
+		err       error
 	)
 
 	log.SetPrefix("[CreateNetworkNodeFx] ")
@@ -24,7 +24,7 @@ func CreateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 	origin := r.Header.Get("Origin")
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	log.Printf("request body: %s", string(body))
-	err = json.Unmarshal(body, &request)
+	err = json.Unmarshal(body, &inputNode)
 	if err != nil {
 		log.Printf("error unmarshaling request: %s", err.Error())
 		return "", "", err
@@ -35,9 +35,9 @@ func CreateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 
 	log.Println("creating network node into Firestore...")
 
-	request.Sanitize()
+	inputNode.Sanitize()
 
-	node, err := network.CreateNode(*request)
+	node, err := network.CreateNode(*inputNode)
 	if err != nil {
 		log.Println("error creating network node into Firestore...")
 		return "", "", err

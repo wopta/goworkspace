@@ -8,6 +8,7 @@ import (
 	"cloud.google.com/go/firestore"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"google.golang.org/api/iterator"
 )
 
 func GetNodeByUid(uid string) (*models.NetworkNode, error) {
@@ -347,4 +348,34 @@ func addWorksForUid(originalNode, inputNode *models.NetworkNode) error {
 
 	originalNode.WorksForUid = inputNode.WorksForUid
 	return nil
+}
+
+func GetNetworkNodeByCode(code string) *models.NetworkNode {
+	var node *models.NetworkNode
+
+	if code == "" {
+		log.Println("[GetNetworkNodeByCode] code empty")
+		return nil
+	}
+
+	iter := lib.WhereFirestore(models.NetworkNodesCollection, "code", "==", code)
+	nodeDocSnapshot, err := iter.Next()
+
+	if err == iterator.Done && nodeDocSnapshot == nil {
+		log.Println("[GetNetworkNodeByCode] node not found")
+		return nil
+	}
+
+	if err != iterator.Done && err != nil {
+		log.Printf("[GetNetworkNodeByCode] error getting node: %s", err.Error())
+		return nil
+	}
+
+	err = nodeDocSnapshot.DataTo(&node)
+	if node == nil || err != nil {
+		log.Printf("[GetNetworkNodeByCode] could not parse node: %s", err)
+		return nil
+	}
+
+	return node
 }

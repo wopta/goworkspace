@@ -87,7 +87,7 @@ type Policy struct {
 	PriceNettMonthly  float64                      `json:"priceNettMonthly,omitempty" firestore:"priceNettMonthly,omitempty" bigquery:"priceNettMonthly"`
 	PriceGrossMonthly float64                      `json:"priceGrossMonthly,omitempty" firestore:"priceGrossMonthly,omitempty" bigquery:"priceGrossMonthly"`
 	Agent             *User                        `firestore:"agent,omitempty" json:"agent,omitempty" bigquery:"-"`
-	Contractor        User                         `firestore:"contractor,omitempty" json:"contractor,omitempty" bigquery:"-"`
+	Contractor        Contractor                   `firestore:"contractor,omitempty" json:"contractor,omitempty" bigquery:"-"`
 	Contractors       *[]User                      `firestore:"contractors,omitempty" json:"contractors,omitempty" bigquery:"-"`
 	DocumentName      string                       `firestore:"documentName,omitempty" json:"documentName,omitempty" bigquery:"-"`
 	Statements        *[]Statement                 `firestore:"statements,omitempty" json:"statements,omitempty" bigquery:"-"`

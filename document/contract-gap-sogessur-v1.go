@@ -234,7 +234,7 @@ func gapVehicleDataTableV1(pdf *fpdf.Fpdf, vehicle *models.Vehicle) {
 	pdf.Ln(5)
 }
 
-func gapPersonalInfoTableV1(pdf *fpdf.Fpdf, contractor, vehicleOwner models.User) {
+func gapPersonalInfoTableV1(pdf *fpdf.Fpdf, contractor models.Contractor, vehicleOwner models.User) {
 	setWhiteBoldFont(pdf, standardTextSize)
 	pdf.SetFillColor(229, 9, 117)
 	pdf.SetDrawColor(229, 9, 117)

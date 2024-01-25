@@ -69,7 +69,7 @@ func Callback(w http.ResponseWriter, r *http.Request) {
 			},
 			{
 				Route:   "/v1/in/life",
-				Handler: LifeIn,
+				Handler: LifeInFx,
 				Method:  http.MethodPost,
 				Roles:   []string{},
 			},

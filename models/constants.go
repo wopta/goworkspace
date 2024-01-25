@@ -108,6 +108,8 @@ const (
 const (
 	BeneficiaryLegalAndWillSuccessors string = "legalAndWillSuccessors"
 	BeneficiaryChosenBeneficiary      string = "chosenBeneficiary"
+	BeneficiaryLegalEntity            string = "legalEntity"
+	BeneficiarySelfLegalEntity        string = "selfLegalEntity"
 )
 
 const (
@@ -197,7 +199,16 @@ const (
 )
 
 const (
-	DocumentSectionContracts        = "contract"
+	UserIndividual  = "individual"
+	UserLegalEntity = "legalEntity"
+)
+
+const (
+	TitolareEffettivo = "titolareEffettivo"
+)
+
+const(
+  DocumentSectionContracts        = "contract"
 	DocumentSectionIdentityDocument = "identity-document"
 	DocumentSectionReserved         = "reserved"
 	DocumentSectionOther            = "other"

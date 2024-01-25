@@ -224,7 +224,8 @@ func beProfPartnership(jwtData string, policy *models.Policy, product *models.Pr
 		if _, personData, err := user.ExtractUserDataFromFiscalCode(person); err == nil {
 			person = personData
 		}
-		policy.Contractor = person
+
+		policy.Contractor = *person.ToContractor()
 		asset.Person = &person
 		policy.OfferlName = "default"
 
@@ -269,7 +270,7 @@ func facilePartnership(jwtData string, policy *models.Policy, product *models.Pr
 
 	person.Sanitize()
 
-	policy.Contractor = person
+	policy.Contractor = *person.ToContractor()
 	asset.Person = &person
 	policy.OfferlName = "default"
 

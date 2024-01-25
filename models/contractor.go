@@ -1,20 +1,18 @@
 package models
 
 import (
+	"cloud.google.com/go/bigquery"
+	"cloud.google.com/go/firestore"
 	"encoding/json"
 	"fmt"
-	"log"
-	"time"
-
-	"cloud.google.com/go/bigquery"
-	"cloud.google.com/go/civil"
-	"cloud.google.com/go/firestore"
 	"github.com/wopta/goworkspace/lib"
 	"google.golang.org/api/iterator"
-	latlng "google.golang.org/genproto/googleapis/type/latlng"
+	"google.golang.org/genproto/googleapis/type/latlng"
+	"log"
+	"time"
 )
 
-type User struct {
+type Contractor struct {
 	EmailVerified            bool                   `firestore:"emailVerified"               json:"emailVerified,omitempty"     bigquery:"-"`
 	Uid                      string                 `firestore:"uid"                         json:"uid,omitempty"               bigquery:"uid"`
 	Status                   string                 `firestore:"status,omitempty"            json:"status,omitempty"            bigquery:"-"`
@@ -76,122 +74,110 @@ type User struct {
 	AuthId                   string                 `firestore:"authId,omitempty"            json:"authId,omitempty"            bigquery:"-"`
 	Statements               []*Statement           `firestore:"statements,omitempty"        json:"statements,omitempty"        bigquery:"-"`
 	IsLegalPerson            bool                   `firestore:"isLegalPerson,omitempty"     json:"isLegalPerson,omitempty"     bigquery:"-"`
+	CompanyAddress           *Address               `firestore:"companyAddress,omitempty" json:"companyAddress,omitempty" bigquery:"-"`
 	Data                     string                 `firestore:"-"                           json:"-"                           bigquery:"data"`
-	CompanyRole              string                 `firestore:"companyRole,omitempty" json:"companyRole,omitempty" bigquery:"-"`
-	LegalEntityType          string                 `firestore:"legalEntityType,omitempty" json:"legalEntityType,omitempty" bigquery:"-"`
-	IsSignatory              bool                   `firestore:"isSignatory" json:"isSignatory" bigquery:"-"`
-	IsPayer                  bool                   `firestore:"isPayer" json:"isPayer" bigquery:"-"`
 }
 
-type Consens struct {
-	UserUid         string         `json:"useruid,omitempty" firestore:"useruid" bigquery:"-"`
-	Title           string         `json:"title,omitempty" firestore:"title,omitempty" bigquery:"-"`
-	Consens         string         `json:"consens,omitempty" firestore:"consens,omitempty" bigquery:"-"`
-	Key             int64          `json:"key,omitempty" firestore:"key,omitempty" bigquery:"-"`
-	Answer          bool           `json:"answer" firestore:"answer" bigquery:"-"`
-	CreationDate    time.Time      `json:"creationDate,omitempty" firestore:"creationDate,omitempty" bigquery:"-"`
-	BigCreationDate civil.DateTime `json:"-" firestore:"-" bigquery:"-"`
-	Mail            string         `json:"-" firestore:"-" bigquery:"-"`
-}
-
-func (u *User) Sanitize() {
-	u.Name = lib.ToUpper(u.Name)
-	u.Surname = lib.ToUpper(u.Surname)
-	u.Gender = lib.ToUpper(u.Gender)
-	u.FiscalCode = lib.ToUpper(u.FiscalCode)
-	u.VatCode = lib.ToUpper(u.VatCode)
-	u.Mail = lib.ToUpper(u.Mail)
-	u.Phone = lib.TrimSpace(u.Phone)
-	if u.Residence != nil {
-		u.Residence.Sanitize()
+func (c *Contractor) Sanitize() {
+	c.Name = lib.ToUpper(c.Name)
+	c.Surname = lib.ToUpper(c.Surname)
+	c.Gender = lib.ToUpper(c.Gender)
+	c.Mail = lib.ToUpper(c.Mail)
+	c.Phone = lib.TrimSpace(c.Phone)
+	c.FiscalCode = lib.ToUpper(c.FiscalCode)
+	c.VatCode = lib.ToUpper(c.VatCode)
+	c.BirthProvince = lib.ToUpper(c.BirthProvince)
+	c.BirthCity = lib.ToUpper(c.BirthCity)
+	if c.Residence != nil {
+		c.Residence.Sanitize()
 	}
-	if u.Domicile != nil {
-		u.Domicile.Sanitize()
+	if c.Domicile != nil {
+		c.Domicile.Sanitize()
 	}
-	u.BirthDate = lib.TrimSpace(u.BirthDate)
-	u.BirthCity = lib.ToUpper(u.BirthCity)
-	u.BirthProvince = lib.ToUpper(u.BirthProvince)
-	u.Work = lib.TrimSpace(u.Work)
-	u.WorkType = lib.TrimSpace(u.WorkType)
-	u.WorkStatus = lib.TrimSpace(u.WorkStatus)
-	for index, _ := range u.IdentityDocuments {
-		u.IdentityDocuments[index].Sanitize()
+	if c.CompanyAddress != nil {
+		c.CompanyAddress.Sanitize()
+	}
+	c.Work = lib.TrimSpace(c.Work)
+	c.WorkType = lib.TrimSpace(c.WorkType)
+	c.WorkStatus = lib.TrimSpace(c.WorkStatus)
+	for index, _ := range c.IdentityDocuments {
+		c.IdentityDocuments[index].Sanitize()
 	}
 }
 
-func (u *User) ToContractor() *Contractor {
-	var contractor Contractor
+func (c *Contractor) ToUser() *User {
+	var user User
 
-	rawContractor, err := json.Marshal(u)
+	rawUser, err := json.Marshal(c)
 	if err != nil {
 		return nil
 	}
 
-	err = json.Unmarshal(rawContractor, &contractor)
+	err = json.Unmarshal(rawUser, &user)
 	if err != nil {
 		return nil
 	}
 
-	return &contractor
+	return &user
 }
 
-func (u *User) initBigqueryData() error {
-	userJson, err := json.Marshal(u)
+func (c *Contractor) initBigqueryData() error {
+	rawContractor, err := json.Marshal(c)
 	if err != nil {
 		return err
 	}
-	u.Data = string(userJson)
+	c.Data = string(rawContractor)
 
-	if u.BirthDate != "" {
-		birthDate, err := time.Parse(time.RFC3339, u.BirthDate)
+	if c.BirthDate != "" {
+		birthDate, err := time.Parse(time.RFC3339, c.BirthDate)
 		if err != nil {
 			return err
 		}
-		u.BigBirthDate = lib.GetBigQueryNullDateTime(birthDate)
+		c.BigBirthDate = lib.GetBigQueryNullDateTime(birthDate)
 	}
 
-	if u.Residence != nil {
-		u.BigResidenceStreetName = u.Residence.StreetName
-		u.BigResidenceStreetNumber = u.Residence.StreetNumber
-		u.BigResidenceCity = u.Residence.City
-		u.BigResidencePostalCode = u.Residence.PostalCode
-		u.BigResidenceLocality = u.Residence.Locality
-		u.BigResidenceCityCode = u.Residence.CityCode
+	if c.Residence != nil {
+		c.BigResidenceStreetName = c.Residence.StreetName
+		c.BigResidenceStreetNumber = c.Residence.StreetNumber
+		c.BigResidenceCity = c.Residence.City
+		c.BigResidencePostalCode = c.Residence.PostalCode
+		c.BigResidenceLocality = c.Residence.Locality
+		c.BigResidenceCityCode = c.Residence.CityCode
 	}
 
-	if u.Domicile != nil {
-		u.BigDomicileStreetName = u.Domicile.StreetName
-		u.BigDomicileStreetNumber = u.Domicile.StreetNumber
-		u.BigDomicileCity = u.Domicile.City
-		u.BigDomicilePostalCode = u.Domicile.PostalCode
-		u.BigDomicileLocality = u.Domicile.Locality
-		u.BigDomicileCityCode = u.Domicile.CityCode
+	if c.Domicile != nil {
+		c.BigDomicileStreetName = c.Domicile.StreetName
+		c.BigDomicileStreetNumber = c.Domicile.StreetNumber
+		c.BigDomicileCity = c.Domicile.City
+		c.BigDomicilePostalCode = c.Domicile.PostalCode
+		c.BigDomicileLocality = c.Domicile.Locality
+		c.BigDomicileCityCode = c.Domicile.CityCode
 	}
 
-	u.BigLocation = bigquery.NullGeography{
+	c.BigLocation = bigquery.NullGeography{
 		// TODO: Check if correct: Geography type uses the WKT format for geometry
-		GeographyVal: fmt.Sprintf("POINT (%f %f)", u.Location.Lng, u.Location.Lat),
+		GeographyVal: fmt.Sprintf("POINT (%f %f)", c.Location.Lng, c.Location.Lat),
 		Valid:        true,
 	}
-	u.BigCreationDate = lib.GetBigQueryNullDateTime(u.CreationDate)
-	u.BigUpdatedDate = lib.GetBigQueryNullDateTime(u.UpdatedDate)
+	c.BigCreationDate = lib.GetBigQueryNullDateTime(c.CreationDate)
+	c.BigUpdatedDate = lib.GetBigQueryNullDateTime(c.UpdatedDate)
 
 	return nil
 }
 
-func (u *User) BigquerySave(origin string) error {
+func (c *Contractor) BigquerySave(origin string) error {
 	table := lib.GetDatasetByEnv(origin, UserCollection)
 
-	if err := u.initBigqueryData(); err != nil {
+	if err := c.initBigqueryData(); err != nil {
 		return err
 	}
 
-	log.Println("user save big query: " + u.Uid)
+	log.Println("user save big query: " + c.Uid)
 
-	return lib.InsertRowsBigQuery(WoptaDataset, table, u)
+	return lib.InsertRowsBigQuery(WoptaDataset, table, c)
 }
 
-func (u *User) GetIdentityDocument() *IdentityDocument {
+func (c *Contractor) GetIdentityDocument() *IdentityDocument {
 	var (
 		lastUpdate       time.Time
 		selectedDocument *IdentityDocument
@@ -199,7 +185,7 @@ func (u *User) GetIdentityDocument() *IdentityDocument {
 	now := time.Now()
 	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
 
-	for _, identityDocument := range u.IdentityDocuments {
+	for _, identityDocument := range c.IdentityDocuments {
 		if identityDocument.LastUpdate.After(lastUpdate) && identityDocument.ExpiryDate.After(today) {
 			selectedDocument = identityDocument
 			lastUpdate = identityDocument.LastUpdate
@@ -208,8 +194,8 @@ func (u *User) GetIdentityDocument() *IdentityDocument {
 	return selectedDocument
 }
 
-func FirestoreDocumentToUser(query *firestore.DocumentIterator) (User, error) {
-	var result User
+func FirestoreDocumentToContractor(query *firestore.DocumentIterator) (Contractor, error) {
+	var result Contractor
 	userDocumentSnapshot, err := query.Next()
 
 	if err == iterator.Done && userDocumentSnapshot == nil {
@@ -228,101 +214,4 @@ func FirestoreDocumentToUser(query *firestore.DocumentIterator) (User, error) {
 	}
 
 	return result, e
-}
-
-func GetUserUIDByFiscalCode(origin string, fiscalCode string) (string, bool, error) {
-	usersFire := lib.GetDatasetByEnv(origin, "users")
-	docSnap := lib.WhereFirestore(usersFire, "fiscalCode", "==", fiscalCode)
-	retrievedUser, err := FirestoreDocumentToUser(docSnap)
-	if err != nil && err.Error() != "no user found" {
-		return "", false, err
-	}
-	if retrievedUser.Uid != "" {
-		return retrievedUser.Uid, false, nil
-	}
-	return lib.NewDoc(usersFire), true, nil
-}
-
-func UpdateUserByFiscalCode(origin string, user User) (string, error) {
-	var err error
-	fireUser := lib.GetDatasetByEnv(origin, UserCollection)
-	docSnap := lib.WhereFirestore(fireUser, "fiscalCode", "==", user.FiscalCode)
-	retrievedUser, err := FirestoreDocumentToUser(docSnap)
-
-	if retrievedUser.Uid != "" {
-		retrievedUser.IdentityDocuments = append(retrievedUser.IdentityDocuments, user.IdentityDocuments...)
-		retrievedUser.Consens = updateUserConsens(retrievedUser.Consens, user.Consens)
-		retrievedUser.Address = user.Address
-		retrievedUser.PostalCode = user.PostalCode
-		retrievedUser.City = user.City
-		retrievedUser.Locality = user.Locality
-		retrievedUser.CityCode = user.CityCode
-		retrievedUser.StreetNumber = user.StreetNumber
-		retrievedUser.Location = user.Location
-		retrievedUser.Residence = user.Residence
-		retrievedUser.Domicile = user.Domicile
-		retrievedUser.Phone = user.Phone
-		retrievedUser.UpdatedDate = time.Now().UTC()
-		if user.Height != 0 {
-			retrievedUser.Height = user.Height
-		}
-		if user.Weight != 0 {
-			retrievedUser.Weight = user.Weight
-		}
-		err = lib.SetFirestoreErr(fireUser, retrievedUser.Uid, retrievedUser)
-		if err != nil {
-			return "", fmt.Errorf("[UpdateUserByFiscalCode] error saving user %s into firestore %s", retrievedUser.Uid,
-				err.Error())
-		}
-
-		err = retrievedUser.BigquerySave(origin)
-		return retrievedUser.Uid, err
-	}
-	return "", fmt.Errorf("no user found with this fiscal code")
-}
-
-func updateUserConsens(oldConsens *[]Consens, newConsens *[]Consens) *[]Consens {
-	if newConsens == nil {
-		return oldConsens
-	}
-	if oldConsens == nil {
-		return newConsens
-	}
-	for _, consens := range *newConsens {
-		found := false
-		for index, savedConsens := range *oldConsens {
-			if consens.Key == savedConsens.Key {
-				(*oldConsens)[index].Answer = consens.Answer
-				(*oldConsens)[index].Title = consens.Title
-				found = true
-			}
-		}
-		if !found {
-			*oldConsens = append(*oldConsens, consens)
-		}
-	}
-	return oldConsens
-}
-
-func UsersToListData(query *firestore.DocumentIterator) []User {
-	result := make([]User, 0)
-	for {
-		d, err := query.Next()
-		if err != nil {
-			log.Println("error")
-			if err == iterator.Done {
-				log.Println("iterator.Done")
-				break
-			}
-			break
-		} else {
-			var value User
-			e := d.DataTo(&value)
-			log.Println("todata")
-			lib.CheckError(e)
-			result = append(result, value)
-			log.Printf("len result: %d\n", len(result))
-		}
-	}
-	return result
 }
