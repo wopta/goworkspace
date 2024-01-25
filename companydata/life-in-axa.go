@@ -82,6 +82,11 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 		return "", nil, err
 	}
 
+	dryRun := true
+	if req.DryRun != nil {
+		dryRun = *req.DryRun
+	}
+
 	b, err := os.ReadFile(lib.GetAssetPathByEnv("companyData") + "/reverse-codes.json")
 	err = json.Unmarshal(b, &codes)
 	if err != nil {
@@ -539,10 +544,6 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 		networkNode.Policies = append(networkNode.Policies, policy.Uid)
 		networkNode.Users = append(networkNode.Users, policy.Contractor.Uid)
 
-		dryRun := true
-		if req.DryRun != nil {
-			dryRun = *req.DryRun
-		}
 		log.Printf("dryRun: %v", dryRun)
 		if !dryRun {
 			collectionPrefix := req.CollectionPrefix
@@ -647,7 +648,7 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 		log.Printf("error: %s", err.Error())
 	}
 
-	if req.DryRun != nil && *req.DryRun {
+	if dryRun {
 		err = os.WriteFile("./companydata/result.json", out, 0777)
 	} else {
 		_, err = lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/life/result.json", out)
