@@ -1,9 +1,10 @@
 package _script
 
 import (
+	"log"
+
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	"log"
 )
 
 func DisableAllNodes() {
