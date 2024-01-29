@@ -16,7 +16,7 @@ func (a *Address) Sanitize() {
 	a.StreetName = lib.ToUpper(a.StreetName)
 	a.StreetNumber = lib.ToUpper(a.StreetNumber)
 	a.City = lib.ToUpper(a.City)
-	a.PostalCode = lib.TrimSpace(a.PostalCode)
+	a.PostalCode = lib.ToUpper(a.PostalCode)
 	a.Locality = lib.ToUpper(a.Locality)
 	a.CityCode = lib.ToUpper(a.CityCode)
 	a.Area = lib.ToUpper(a.Area)
