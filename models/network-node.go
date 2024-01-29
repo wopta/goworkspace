@@ -157,7 +157,7 @@ func (nn *NetworkNode) GetName() string {
 	case PartnershipNetworkNodeType:
 		name = lib.Capitalize(nn.Partnership.Name)
 	case AreaManagerNetworkNodeType:
-		name = fmt.Sprintf("%s %s", nn.AreaManager.Name, nn.AreaManager.Surname)
+		name = fmt.Sprintf("%s %s", lib.Capitalize(nn.AreaManager.Name), lib.Capitalize(nn.AreaManager.Surname))
 	}
 
 	return name
