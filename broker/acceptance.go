@@ -36,7 +36,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	authToken, err := models.GetAuthTokenFromIdToken(token)
 	if err != nil {
 		log.Printf("error getting authToken: %s", err.Error())
-		return `{"success":false}`, `{"success":false}`, nil
+		return "", nil, err
 	}
 	log.Printf(
 		"authToken - type: '%s' role: '%s' uid: '%s' email: '%s'",
