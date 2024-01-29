@@ -272,8 +272,8 @@ func replaceGapDates(product *models.Product, channel string) error {
 
 	log.Printf("[replaceGapDates] minContractorAge: %d minAssetPersonAge: %d", minContractorAgeValue, minAssetPersonAgeValue)
 
-	maxContractorBirthDate := time.Now().AddDate(-minContractorAgeValue, 0, 1).Format(models.TimeDateOnly)
-	maxAssetPersonBirthDate := time.Now().AddDate(-minAssetPersonAgeValue, 0, 1).Format(models.TimeDateOnly)
+	maxContractorBirthDate := time.Now().AddDate(-minContractorAgeValue, 0, 0).Format(models.TimeDateOnly)
+	maxAssetPersonBirthDate := time.Now().AddDate(-minAssetPersonAgeValue, 0, 0).Format(models.TimeDateOnly)
 
 	regexMaxContractorBirthDate := regexp.MustCompile("{{MAX_CONTRACTOR_BIRTH_DATE}}")
 	regexMaxAssetPersonBirthDate := regexp.MustCompile("{{MAX_ASSET_PERSON_BIRTH_DATE}}")
