@@ -60,6 +60,8 @@ func GetQuestionsFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 		return "", nil, err
 	}
 
+	policy.Sanitize()
+
 	switch questionType {
 	case statements:
 		log.Printf("[GetQuestionsFx] loading statements for %s product", policy.Name)
