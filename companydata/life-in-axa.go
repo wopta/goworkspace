@@ -277,7 +277,7 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 			// parsing titolare effettivo info
 
 			offset := 26
-			titolariEffettivi := make([]models.User, 0)
+			//titolariEffettivi := make([]models.User, 0)
 			for i := 0; i < 3; i++ {
 				var writeToDB bool
 				if strings.TrimSpace(strings.ToUpper(row[116+(offset*i)])) == "" || strings.TrimSpace(strings.ToUpper(row[116+(offset*i)])) == "NO" {
@@ -286,8 +286,9 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 				titolareEffettivo := parsingTitolareEffettivo(row, offset, i)
 				titolareEffettivo.Uid, writeToDB = searchUserInDBByFiscalCode(titolareEffettivo.FiscalCode)
 				writeContractorsToDB = append(writeContractorsToDB, writeToDB)
+				*contractors = append(*contractors, titolareEffettivo)
 			}
-			*contractors = append(*contractors, titolariEffettivi...)
+			//*contractors = append(*contractors, titolariEffettivi...)
 		} else {
 			contractor = parseIndividualContractor(codeCompany, row, codes)
 			if contractor == nil {
@@ -716,11 +717,14 @@ func parsingTitolareEffettivo(row []string, offset int, i int) models.User {
 			ExpiryDate:       ParseDateDDMMYYYY(row[138+(offset*i)]).AddDate(10, 0, 0),
 			IssuingAuthority: strings.TrimSpace(lib.Capitalize(row[139+(offset*i)])),
 			PlaceOfIssue:     strings.TrimSpace(lib.Capitalize(row[139+(offset*i)])),
+			LastUpdate:       ParseDateDDMMYYYY(row[4]),
 		}},
 		Work:            strings.TrimSpace(lib.Capitalize(row[130+(offset*i)])),
 		LegalEntityType: models.TitolareEffettivo,
 		IsSignatory:     isExecutor,
 		IsPayer:         isExecutor,
+		CreationDate:    ParseDateDDMMYYYY(row[4]),
+		UpdatedDate:     time.Now().UTC(),
 	}
 	return titolareEffettivo
 }
