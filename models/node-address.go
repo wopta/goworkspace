@@ -19,13 +19,10 @@ type NodeAddress struct {
 }
 
 func (na *NodeAddress) Sanitize() {
-	if na == nil {
-		return
-	}
 	na.StreetName = lib.ToUpper(na.StreetName)
 	na.StreetNumber = lib.ToUpper(na.StreetNumber)
 	na.City = lib.ToUpper(na.City)
-	na.PostalCode = lib.TrimSpace(na.PostalCode)
+	na.PostalCode = lib.ToUpper(na.PostalCode)
 	na.Locality = lib.ToUpper(na.Locality)
 	na.CityCode = lib.ToUpper(na.CityCode)
 	na.Area = lib.ToUpper(na.Area)
