@@ -190,6 +190,20 @@ func GetLifeAgeInfo(productName, productVersion, channel string) (int, int) {
 	return 0, 0
 }
 
+func getGapAgeInfo(productName, productVersion, channel string) (minContractorAge, minAssetPersonAge int) {
+	var ageMap map[string]map[string]int
+
+	rawMap := lib.GetFilesByEnv(fmt.Sprintf("products-v2/%s/%s/age_info.json", productName, productVersion))
+	err := json.Unmarshal(rawMap, &ageMap)
+	if err != nil {
+		return 0, 0
+	}
+	if ageMap[channel] != nil {
+		return ageMap[channel]["minContractorAge"], ageMap[channel]["minAssetPersonAge"]
+	}
+	return 0, 0
+}
+
 func replaceDatesInProduct(product *models.Product, channel string) error {
 	if product == nil {
 		return fmt.Errorf("no product found")
@@ -202,6 +216,8 @@ func replaceDatesInProduct(product *models.Product, channel string) error {
 	switch product.Name {
 	case models.LifeProduct:
 		err = replaceLifeDates(product, channel)
+	case models.GapProduct:
+		err = replaceGapDates(product, channel)
 	default:
 		log.Printf("[replaceDatesInProduct] product %s does not have dates to be replaced", product.Name)
 	}
@@ -244,9 +260,28 @@ func replaceLifeDates(product *models.Product, channel string) error {
 	return json.Unmarshal([]byte(productJson), &product)
 }
 
-	log.Println("[replaceDatesInProduct] function end -------------------")
+func replaceGapDates(product *models.Product, channel string) error {
+	jsonOut, err := product.Marshal()
+	if err != nil {
+		return err
+	}
 
-	return err
+	productJson := string(jsonOut)
+
+	minContractorAgeValue, minAssetPersonAgeValue := getGapAgeInfo(product.Name, product.Version, channel)
+
+	log.Printf("[replaceGapDates] minContractorAge: %d minAssetPersonAge: %d", minContractorAgeValue, minAssetPersonAgeValue)
+
+	minContractorBirthDate := time.Now().AddDate(-minContractorAgeValue, 0, 1).Format(models.TimeDateOnly)
+	minAssetPersonBirthDate := time.Now().AddDate(-minAssetPersonAgeValue, 0, 1).Format(models.TimeDateOnly)
+
+	regexMinContractorBirthDate := regexp.MustCompile("{{MIN_CONTRACTOR_BIRTH_DATE}}")
+	regexMinAssetPersonBirthDate := regexp.MustCompile("{{MIN_ASSET_PERSON_BIRTH_DATE}}")
+
+	productJson = regexMinContractorBirthDate.ReplaceAllString(productJson, minContractorBirthDate)
+	productJson = regexMinAssetPersonBirthDate.ReplaceAllString(productJson, minAssetPersonBirthDate)
+
+	return json.Unmarshal([]byte(productJson), &product)
 }
 
 func overrideProductInfo(product *models.Product, networkNode *models.NetworkNode, warrant *models.Warrant, channel string) {
