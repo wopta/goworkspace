@@ -50,7 +50,7 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		responseEmit EmitResponse
 	)
 
-	log.SetPrefix("")
+	log.SetPrefix("[EmitFx]")
 	log.Println("Handler start -----------------------------------------------")
 
 	log.Println("loading authToken from idToken...")
