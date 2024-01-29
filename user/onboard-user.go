@@ -11,19 +11,29 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
-func OnboardUserFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.Println("[OnboardUserFx] Handler start -------------------------------")
+type OnboardUserDto struct {
+	FiscalCode string `json:"fiscalCode"`
+	Email      string `json:"email"`
+	Password   string `json:"password"`
+}
 
+func OnboardUserFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		onboardUserRequest OnboardUserDto
 		user               *models.User
 	)
+
+	log.SetPrefix("[OnboardUserFx]")
+	log.Println("Handler start -------------------------------")
+
 	resp.Header().Set("Access-Control-Allow-Methods", "POST")
 
 	reqBytes := lib.ErrorByte(io.ReadAll(r.Body))
 	json.Unmarshal(reqBytes, &onboardUserRequest)
-	log.Printf("[OnboardUserFx] Request email: '%s'", onboardUserRequest.Email)
-	log.Printf("[OnboardUserFx] Request fiscalCode: %s", onboardUserRequest.FiscalCode)
+	onboardUserRequest.Email = lib.ToUpper(onboardUserRequest.Email)
+	onboardUserRequest.FiscalCode = lib.ToUpper(onboardUserRequest.FiscalCode)
+	log.Printf("Request email: '%s'", onboardUserRequest.Email)
+	log.Printf("Request fiscalCode: %s", onboardUserRequest.FiscalCode)
 
 	origin := r.Header.Get("Origin")
 	fireUser := lib.GetDatasetByEnv(origin, models.UserCollection)
@@ -43,8 +53,8 @@ func OnboardUserFx(resp http.ResponseWriter, r *http.Request) (string, interface
 	dbEmailNormalized := strings.ToLower(strings.TrimSpace(*email))
 	requestEmailNormalized := strings.ToLower(strings.TrimSpace(onboardUserRequest.Email))
 	areEmailsEqual := strings.EqualFold(dbEmailNormalized, requestEmailNormalized)
-	log.Printf("[OnboardUserFx] request email '%s' - db email '%s'", onboardUserRequest.Email, *email)
-	log.Printf("[OnboardUserFx] normalized: request email '%s' - db email '%s' - equal %t", requestEmailNormalized, dbEmailNormalized, areEmailsEqual)
+	log.Printf("request email '%s' - db email '%s'", onboardUserRequest.Email, *email)
+	log.Printf("normalized: request email '%s' - db email '%s' - equal %t", requestEmailNormalized, dbEmailNormalized, areEmailsEqual)
 
 	if !areEmailsEqual {
 		log.Printf("User with fiscalCode %s cannot register: emails doesn't match", onboardUserRequest.FiscalCode)
@@ -53,19 +63,19 @@ func OnboardUserFx(resp http.ResponseWriter, r *http.Request) (string, interface
 
 	dbUser, e := lib.CreateUserWithEmailAndPassword(requestEmailNormalized, onboardUserRequest.Password, userId)
 	if e != nil {
-		log.Printf("[OnboardUserFx] error creating auth user: %s", e.Error())
+		log.Printf("error creating auth user: %s", e.Error())
 		return `{"success": false}`, `{"success": false}`, nil
 	}
 
 	if userId != nil {
-		log.Printf("[OnboardUserFx] User with fiscalCode %s is being updated", onboardUserRequest.FiscalCode)
+		log.Printf("User with fiscalCode %s is being updated", onboardUserRequest.FiscalCode)
 		e := lib.UpdateFirestoreErr(fireUser, dbUser.UID, map[string]interface{}{"authId": dbUser.UID,
 			"role": models.UserRoleCustomer})
 		if e != nil {
-			log.Printf("[OnboardUserFx] error updating user: %s", e.Error())
+			log.Printf("error updating user: %s", e.Error())
 		}
 	} else {
-		log.Printf("[OnboardUserFx] User with fiscalCode %s is being created", onboardUserRequest.FiscalCode)
+		log.Printf("User with fiscalCode %s is being created", onboardUserRequest.FiscalCode)
 		user.Uid = dbUser.UID
 		user.AuthId = dbUser.UID
 		user.Role = models.UserRoleCustomer
@@ -77,16 +87,13 @@ func OnboardUserFx(resp http.ResponseWriter, r *http.Request) (string, interface
 		log.Printf("[OnBoardUser] error save user %s bigquery: %s", user.Uid, err.Error())
 	}
 
-	log.Println("[OnboardUserFx] updating claims for user")
+	log.Println("updating claims for user")
 	lib.SetCustomClaimForUser(dbUser.UID, map[string]interface{}{
 		"role": models.UserRoleCustomer,
 	})
 
-	return `{"success": true}`, `{"success": true}`, nil
-}
+	log.Println("Handler end -------------------------------------------------")
+	log.SetPrefix("")
 
-type OnboardUserDto struct {
-	FiscalCode string `json:"fiscalCode"`
-	Email      string `json:"email"`
-	Password   string `json:"password"`
+	return `{"success": true}`, `{"success": true}`, nil
 }
