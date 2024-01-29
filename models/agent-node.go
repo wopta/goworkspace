@@ -31,8 +31,12 @@ func (an *AgentNode) Sanitize() {
 	an.VatCode = lib.ToUpper(an.VatCode)
 	an.BirthCity = lib.ToUpper(an.BirthCity)
 	an.BirthProvince = lib.ToUpper(an.BirthProvince)
-	an.Residence.Sanitize()
-	an.Domicile.Sanitize()
+	if an.Residence != nil {
+		an.Residence.Sanitize()
+	}
+	if an.Domicile != nil {
+		an.Domicile.Sanitize()
+	}
 	an.Phone = lib.TrimSpace(an.Phone)
 	an.RuiCode = lib.ToUpper(an.RuiCode)
 	an.RuiSection = lib.ToUpper(an.RuiSection)
