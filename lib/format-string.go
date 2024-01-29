@@ -31,7 +31,3 @@ func ToLower(s string) string {
 func ReplaceAll(s, old, new string) string {
 	return strings.ReplaceAll(s, old, new)
 }
-
-func Replace(s, old, new string, n int) string {
-	return strings.Replace(s, old, new, n)
-}
