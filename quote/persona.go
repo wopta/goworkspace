@@ -32,6 +32,8 @@ func PersonaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 		return "", nil, err
 	}
 
+	policy.Sanitize()
+
 	authToken, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
 	if err != nil {
 		log.Printf("[PersonaFx] error getting authToken from idToken: %s", err.Error())
