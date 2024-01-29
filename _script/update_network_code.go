@@ -1,8 +1,6 @@
 package _script
 
 import (
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 	"log"
 )
@@ -20,7 +18,7 @@ func UpdateAgentRuiCode(nodeUid, ruiCode string) {
 
 	log.Printf("new ruiCode: %s", networkNode.Agent.RuiCode)
 
-	err = lib.SetFirestoreErr(models.NetworkNodesCollection, nodeUid, networkNode)
+	err = networkNode.SaveFirestore()
 	if err != nil {
 		log.Printf("error: %s", err.Error())
 		return

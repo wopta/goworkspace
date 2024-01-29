@@ -46,7 +46,7 @@ func JwtFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 			if node[0].AuthId == "" {
 				userfire, _ := lib.CreateUserWithEmailAndPassword(node[0].Mail, os.Getenv("DEFAULT_PSW"), &node[0].Uid)
 				node[0].AuthId = userfire.UID
-				e = lib.SetFirestoreErr(models.NetworkNodesCollection, node[0].Uid, node[0])
+				e = node[0].SaveFirestore()
 				if e != nil {
 					log.Printf("[JwtFx] error updating node %s in Firestore: %s", node[0].Uid, e.Error())
 					return "", nil, e

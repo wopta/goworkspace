@@ -3,7 +3,6 @@ package _script
 import (
 	"cloud.google.com/go/firestore"
 	"context"
-	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"google.golang.org/api/iterator"
 	"log"
@@ -99,7 +98,7 @@ func UpdateNetworkNodesCodes() {
 		}
 		nn.ExternalNetworkCode = nn.Code
 		nn.UpdatedDate = time.Now().UTC()
-		err := lib.SetFirestoreErr(models.NetworkNodesCollection, nn.Uid, nn)
+		err := nn.SaveFirestore()
 		if err != nil {
 			log.Println(err.Error())
 		}
