@@ -176,7 +176,7 @@ func GetLatestActiveProduct(productName, channel string, networkNode *models.Net
 	return product
 }
 
-func GetAgeInfo(productName, productVersion, channel string) (int, int) {
+func GetLifeAgeInfo(productName, productVersion, channel string) (int, int) {
 	var ageMap map[string]map[string]int
 
 	rawMap := lib.GetFilesByEnv(fmt.Sprintf("products-v2/%s/%s/age_info.json", productName, productVersion))
@@ -195,26 +195,33 @@ func replaceDatesInProduct(product *models.Product, channel string) error {
 		return fmt.Errorf("no product found")
 	}
 
-	filePath := fmt.Sprintf("products-v2/%s/%s/age_info.json", product.Name, product.Version)
-	if !lib.CheckFileExistence(filePath) {
-		log.Printf("[replaceDatesInProduct] file not found: %s", filePath)
-		return nil
+	var err error
+
+	log.Println("[replaceDatesInProduct] function start ----------------------")
+
+	switch product.Name {
+	case models.LifeProduct:
+		err = replaceLifeDates(product, channel)
+	default:
+		log.Printf("[replaceDatesInProduct] product %s does not have dates to be replaced", product.Name)
 	}
 
+	log.Println("[replaceDatesInProduct] function end ------------------------")
+
+	return err
+}
+
+func replaceLifeDates(product *models.Product, channel string) error {
 	jsonOut, err := product.Marshal()
 	if err != nil {
 		return err
 	}
 
-	log.Println("[replaceDatesInProduct] function start -------------------")
-
-	log.Printf("[replaceDatesInProduct] channel: %s", channel)
-
 	productJson := string(jsonOut)
 
-	minAgeValue, minReservedAgeValue := GetAgeInfo(product.Name, product.Version, channel)
+	minAgeValue, minReservedAgeValue := GetLifeAgeInfo(product.Name, product.Version, channel)
 
-	log.Printf("[replaceDatesInProduct] minAge: %d minReservedAge: %d", minAgeValue, minReservedAgeValue)
+	log.Printf("[replaceLifeDates] minAge: %d minReservedAge: %d", minAgeValue, minReservedAgeValue)
 
 	initialDate := time.Now().AddDate(-18, 0, 0).Format(models.TimeDateOnly)
 	minDate := time.Now().AddDate(-minAgeValue, 0, 1).Format(models.TimeDateOnly)
@@ -234,7 +241,8 @@ func replaceDatesInProduct(product *models.Product, channel string) error {
 	productJson = regexStartDate.ReplaceAllString(productJson, startDate)
 	productJson = regexMaxStartDate.ReplaceAllString(productJson, maxStartDate)
 
-	err = json.Unmarshal([]byte(productJson), &product)
+	return json.Unmarshal([]byte(productJson), &product)
+}
 
 	log.Println("[replaceDatesInProduct] function end -------------------")
 
