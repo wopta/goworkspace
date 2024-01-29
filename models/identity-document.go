@@ -29,7 +29,7 @@ type Media struct {
 func (id *IdentityDocument) Sanitize() {
 	id.Code = lib.TrimSpace(id.Code)
 	id.Type = lib.TrimSpace(id.Type)
-	id.Number = lib.TrimSpace(id.Number)
+	id.Number = lib.ToUpper(id.Number)
 	id.IssuingAuthority = lib.TrimSpace(id.IssuingAuthority)
 	id.PlaceOfIssue = lib.ToUpper(id.PlaceOfIssue)
 	if id.FrontMedia != nil {
