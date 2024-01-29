@@ -272,14 +272,14 @@ func replaceGapDates(product *models.Product, channel string) error {
 
 	log.Printf("[replaceGapDates] minContractorAge: %d minAssetPersonAge: %d", minContractorAgeValue, minAssetPersonAgeValue)
 
-	minContractorBirthDate := time.Now().AddDate(-minContractorAgeValue, 0, 1).Format(models.TimeDateOnly)
-	minAssetPersonBirthDate := time.Now().AddDate(-minAssetPersonAgeValue, 0, 1).Format(models.TimeDateOnly)
+	maxContractorBirthDate := time.Now().AddDate(-minContractorAgeValue, 0, 1).Format(models.TimeDateOnly)
+	maxAssetPersonBirthDate := time.Now().AddDate(-minAssetPersonAgeValue, 0, 1).Format(models.TimeDateOnly)
 
-	regexMinContractorBirthDate := regexp.MustCompile("{{MIN_CONTRACTOR_BIRTH_DATE}}")
-	regexMinAssetPersonBirthDate := regexp.MustCompile("{{MIN_ASSET_PERSON_BIRTH_DATE}}")
+	regexMaxContractorBirthDate := regexp.MustCompile("{{MAX_CONTRACTOR_BIRTH_DATE}}")
+	regexMaxAssetPersonBirthDate := regexp.MustCompile("{{MAX_ASSET_PERSON_BIRTH_DATE}}")
 
-	productJson = regexMinContractorBirthDate.ReplaceAllString(productJson, minContractorBirthDate)
-	productJson = regexMinAssetPersonBirthDate.ReplaceAllString(productJson, minAssetPersonBirthDate)
+	productJson = regexMaxContractorBirthDate.ReplaceAllString(productJson, maxContractorBirthDate)
+	productJson = regexMaxAssetPersonBirthDate.ReplaceAllString(productJson, maxAssetPersonBirthDate)
 
 	return json.Unmarshal([]byte(productJson), &product)
 }
