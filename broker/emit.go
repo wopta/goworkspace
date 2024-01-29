@@ -51,6 +51,8 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	)
 
 	log.SetPrefix("[EmitFx]")
+	defer log.SetPrefix("")
+
 	log.Println("Handler start -----------------------------------------------")
 
 	log.Println("loading authToken from idToken...")
@@ -118,7 +120,6 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	log.Println("Response: ", string(b))
 	log.Println("Handler end ----------------------------------------")
-	log.SetPrefix("")
 
 	return string(b), responseEmit, e
 }

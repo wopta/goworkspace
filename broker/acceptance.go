@@ -27,6 +27,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	)
 
 	log.SetPrefix("[AcceptanceFx]")
+	defer log.SetPrefix("")
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -132,7 +133,6 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	models.CreateAuditLog(r, string(body))
 
 	log.Println("Handler end ----------------------------------")
-	log.SetPrefix("")
 
 	return `{"success":true}`, `{"success":true}`, nil
 }

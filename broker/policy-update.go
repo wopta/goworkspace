@@ -25,6 +25,8 @@ func UpdatePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	)
 
 	log.SetPrefix("[UpdatePolicyFx]")
+	defer log.SetPrefix("")
+
 	log.Println("Handler start ------------------------------")
 
 	origin := r.Header.Get("Origin")
@@ -85,7 +87,6 @@ func UpdatePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	updatedPolicy.BigquerySave(origin)
 
 	log.Printf("response: %s", string(responseJson))
-	log.SetPrefix("")
 
 	return string(responseJson), response, err
 }

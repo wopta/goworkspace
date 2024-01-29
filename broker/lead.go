@@ -21,6 +21,8 @@ func LeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	)
 
 	log.SetPrefix("[LeadFx]")
+	defer log.SetPrefix("")
+
 	log.Println("Handler start --------------------------------------")
 
 	w.Header().Add("content-type", "application/json")
@@ -68,7 +70,6 @@ func LeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	log.Printf("response: %s", string(resp))
 	log.Println("Handler end ----------------------------------------")
-	log.SetPrefix("")
 
 	return string(resp), &policy, err
 }

@@ -11,10 +11,12 @@ import (
 )
 
 func DeleteTransactionFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.SetPrefix("[DeleteTransactionFx] ")
-	log.Println("Handler start -----------------------------------------------")
-
 	var err error
+
+	log.SetPrefix("[DeleteTransactionFx] ")
+	defer log.SetPrefix("")
+
+	log.Println("Handler start -----------------------------------------------")
 
 	origin := r.Header.Get("Origin")
 	uid := r.Header.Get("uid")
@@ -23,7 +25,6 @@ func DeleteTransactionFx(w http.ResponseWriter, r *http.Request) (string, interf
 	transaction := tr.GetTransactionByUid(uid, origin)
 	if transaction == nil {
 		log.Printf("transaction '%s' not found", uid)
-		log.SetPrefix("")
 		return "", nil, fmt.Errorf("transaction '%s' not found", uid)
 	}
 	bytes, _ := json.Marshal(transaction)
@@ -47,6 +48,6 @@ func DeleteTransactionFx(w http.ResponseWriter, r *http.Request) (string, interf
 	}
 
 	log.Println("Handler end -------------------------------------------------")
-	log.SetPrefix("")
+
 	return "{}", nil, err
 }

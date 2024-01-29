@@ -24,6 +24,8 @@ func OnboardUserFx(resp http.ResponseWriter, r *http.Request) (string, interface
 	)
 
 	log.SetPrefix("[OnboardUserFx]")
+	defer log.SetPrefix("")
+
 	log.Println("Handler start -------------------------------")
 
 	resp.Header().Set("Access-Control-Allow-Methods", "POST")
@@ -93,7 +95,6 @@ func OnboardUserFx(resp http.ResponseWriter, r *http.Request) (string, interface
 	})
 
 	log.Println("Handler end -------------------------------------------------")
-	log.SetPrefix("")
 
 	return `{"success": true}`, `{"success": true}`, nil
 }

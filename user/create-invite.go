@@ -58,6 +58,8 @@ func CreateInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	var createInviteRequest CreateInviteRequest
 
 	log.SetPrefix("[CreateInviteFx]")
+	defer log.SetPrefix("")
+
 	log.Println("Handler start -----------------------------------------------")
 
 	reqBytes := lib.ErrorByte(io.ReadAll(r.Body))
@@ -80,7 +82,6 @@ func CreateInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 
 	mail.SendInviteMail(inviteUid, createInviteRequest.Email, false)
 
-	log.SetPrefix("")
 	log.Println("Handler end -------------------------------------------------")
 
 	return `{"success": true}`, `{"success": true}`, nil
