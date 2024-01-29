@@ -88,7 +88,10 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 
 	log.Println("saving to firestore...")
 	err = lib.SetFirestoreErr(firePolicy, policy.Uid, &policy)
-	lib.CheckError(err)
+	if err != nil {
+		log.Printf("error saving policy to firestore: %s", err.Error())
+		return `{"success":false}`, `{"success":false}`, nil
+	}
 	log.Println("firestore saved!")
 
 	policy.BigquerySave(origin)
