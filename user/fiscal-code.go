@@ -32,6 +32,8 @@ func FiscalCode(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 		return "", nil, err
 	}
 
+	user.Sanitize()
+
 	switch operation {
 	case "encode":
 		outJson, user, err = CalculateFiscalCode(user)
