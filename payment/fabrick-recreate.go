@@ -76,7 +76,7 @@ func FabrickRecreateFx(w http.ResponseWriter, r *http.Request) (string, interfac
 
 	models.CreateAuditLog(r, string(body))
 
-	return `{"success":true}`, `{"success":true}`, nil
+	return "{}", nil, nil
 }
 
 // DEPRECATED

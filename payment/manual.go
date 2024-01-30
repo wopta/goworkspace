@@ -2,6 +2,7 @@ package payment
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -55,8 +56,7 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 
 	if !isMethodAllowed {
 		log.Printf("ERROR %s", errPaymentMethodNotAllowed)
-		errorMessage := `{"success":false, "errorMessage":"` + errPaymentMethodNotAllowed + `"}`
-		return errorMessage, errorMessage, nil
+		return "", nil, fmt.Errorf(errPaymentMethodNotAllowed)
 	}
 
 	origin := r.Header.Get("Origin")
@@ -67,21 +67,19 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 	docsnap, err := lib.GetFirestoreErr(fireTransactions, transactionUid)
 	if err != nil {
 		log.Printf("ERROR get transaction from firestore: %s", err.Error())
-		return `{"success":false}`, `{"success":false}`, nil
+		return "{}", nil, err
 	}
 	err = docsnap.DataTo(&transaction)
 	lib.CheckError(err)
 
 	if transaction.IsPay {
 		log.Printf("ERROR %s", errTransactionPaid)
-		errorMessage := `{"success":false, "errorMessage":"` + errTransactionPaid + `"}`
-		return errorMessage, errorMessage, nil
+		return "", nil, fmt.Errorf(errTransactionPaid)
 	}
 
 	if transaction.IsDelete {
 		log.Printf("ERROR %s", errTransactionDeleted)
-		errorMessage := `{"success":false, "errorMessage":"` + errTransactionDeleted + `"}`
-		return errorMessage, errorMessage, nil
+		return "", nil, fmt.Errorf(errTransactionDeleted)
 	}
 
 	firePolicyTransactions := trn.GetPolicyActiveTransactions(origin, transaction.PolicyUid)
@@ -101,29 +99,26 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 
 	if !canPayTransaction {
 		log.Printf("ERROR %s", errTransactionOutOfOrder)
-		errorMessage := `{"success":false, "errorMessage":"` + errTransactionOutOfOrder + `"}`
-		return errorMessage, errorMessage, nil
+		return "", nil, fmt.Errorf(errTransactionOutOfOrder)
 	}
 
 	docsnap, err = lib.GetFirestoreErr(firePolicies, transaction.PolicyUid)
 	if err != nil {
 		log.Printf("ERROR get policy from firestore: %s", err.Error())
-		return `{"success":false}`, `{"success":false}`, nil
+		return "", nil, err
 	}
 	err = docsnap.DataTo(&policy)
 	lib.CheckError(err)
 
 	if !policy.IsSign {
 		log.Printf("ERROR %s", errPolicyNotSigned)
-		errorMessage := `{"success":false, "errorMessage":"` + errPolicyNotSigned + `"}`
-		return errorMessage, errorMessage, nil
+		return "", nil, fmt.Errorf(errPolicyNotSigned)
 	}
 
 	err = manualPayment(&transaction, origin, &payload)
 	if err != nil {
 		log.Printf("ERROR %s", errPaymentFailed)
-		errorMessage := `{"success":false, "errorMessage":"` + errPaymentFailed + `"}`
-		return errorMessage, errorMessage, nil
+		return "", nil, fmt.Errorf(errPaymentFailed)
 	}
 
 	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
@@ -147,7 +142,7 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		err = plc.AddContract(&policy, origin)
 		if err != nil {
 			log.Printf("ERROR add contract to policy: %s", err.Error())
-			return `{"success":false}`, `{"success":false}`, nil
+			return "", nil, err
 		}
 
 		// Update Policy as paid
@@ -166,7 +161,7 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 
 	log.Println("Handler end -------------------------------------------------")
 
-	return `{"success":true}`, `{"success":true}`, nil
+	return "{}", nil, nil
 }
 
 func manualPayment(transaction *models.Transaction, origin string, payload *ManualPaymentPayload) error {

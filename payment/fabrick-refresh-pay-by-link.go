@@ -59,7 +59,7 @@ func FabrickRefreshPayByLinkFx(w http.ResponseWriter, r *http.Request) (string, 
 
 	log.Println("Handler end -------------------------------------------------")
 
-	return `{"success":true}`, `{"success":true}`, nil
+	return "{}", nil, nil
 }
 
 func fabrickRefreshPayByLink(policy *models.Policy, origin string) error {
