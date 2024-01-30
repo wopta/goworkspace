@@ -40,19 +40,19 @@ func PutClaim(idToken string, origin string, claim *models.Claim) (string, inter
 	userAuthID, err := lib.GetUserIdFromIdToken(idToken)
 	if err != nil {
 		log.Printf("[PutClaim] invalid idToken, error %s", err.Error())
-		return `{"success":false}`, `{"success":false}`, nil
+		return "", nil, err
 	}
 
 	fireUsers := lib.GetDatasetByEnv(origin, models.UserCollection)
 	docsnap, err := lib.GetFirestoreErr(fireUsers, userAuthID)
 	if err != nil {
 		log.Printf("[PutClaim] get user from DB error %s", err.Error())
-		return `{"success":false}`, `{"success":false}`, nil
+		return "", nil, err
 	}
 	err = docsnap.DataTo(&user)
 	if err != nil {
 		log.Printf("[PutClaim] data to DB error %s", err.Error())
-		return `{"success":false}`, `{"success":false}`, nil
+		return "", nil, err
 	}
 	log.Println("[PutClaim] User: ", user)
 
@@ -87,7 +87,7 @@ func PutClaim(idToken string, origin string, claim *models.Claim) (string, inter
 		byteFile, err := base64.StdEncoding.DecodeString(doc.Byte)
 		if err != nil {
 			log.Println("[PutClaim] error decoding base64 document encoding")
-			return `{"success":false}`, `{"success":false}`, nil
+			return "", nil, err
 		}
 		gsLink := lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "assets/users/"+user.Uid+"/claims/"+
 			claim.ClaimUid+"/"+doc.FileName, byteFile)
@@ -110,7 +110,7 @@ func PutClaim(idToken string, origin string, claim *models.Claim) (string, inter
 	})
 	if err != nil {
 		log.Println("[PutClaim] error during user update")
-		return `{"success":false}`, `{"success":false}`, nil
+		return "", nil, err
 	}
 
 	mail.SendMail(obj)
@@ -120,5 +120,5 @@ func PutClaim(idToken string, origin string, claim *models.Claim) (string, inter
 		log.Printf("[PutClaim] error bigquery save claim %s", claim.ClaimUid)
 	}
 
-	return `{"success":true}`, `{"success":true}`, nil
+	return "{}", nil, nil
 }
