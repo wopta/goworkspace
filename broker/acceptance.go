@@ -67,7 +67,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	policy, err = plc.GetPolicy(policyUid, origin)
 	if err != nil {
 		log.Printf("error retrieving policy %s from Firestore: %s", policyUid, err.Error())
-		return `{"success":false}`, `{"success":false}`, nil
+		return "", nil, err
 	}
 
 	if !lib.SliceContains(models.GetWaitForApprovalStatusList(), policy.Status) {
@@ -91,7 +91,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	err = lib.SetFirestoreErr(firePolicy, policy.Uid, &policy)
 	if err != nil {
 		log.Printf("error saving policy to firestore: %s", err.Error())
-		return `{"success":false}`, `{"success":false}`, nil
+		return "", nil, err
 	}
 	log.Println("firestore saved!")
 
