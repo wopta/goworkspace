@@ -15,7 +15,7 @@ type Attachment struct {
 	Note        string `firestore:"note,omitempty" json:"note"`
 }
 
-func (a *Attachment) Sanitize() {
+func (a *Attachment) Normalize() {
 	a.Name = lib.TrimSpace(a.Name)
 	a.FileName = lib.TrimSpace(a.FileName)
 	a.Section = lib.TrimSpace(a.Section)

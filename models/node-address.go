@@ -18,7 +18,7 @@ type NodeAddress struct {
 	BigLocation  bigquery.NullGeography `json:"-" firestore:"-" bigquery:"location"`
 }
 
-func (na *NodeAddress) Sanitize() {
+func (na *NodeAddress) Normalize() {
 	na.StreetName = lib.ToUpper(na.StreetName)
 	na.StreetNumber = lib.ToUpper(na.StreetNumber)
 	na.City = lib.ToUpper(na.City)

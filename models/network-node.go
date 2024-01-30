@@ -82,7 +82,7 @@ func (nn *NetworkNode) Marshal() ([]byte, error) {
 	return json.Marshal(nn)
 }
 
-func (nn *NetworkNode) Sanitize() {
+func (nn *NetworkNode) Normalize() {
 	nn.Code = lib.TrimSpace(nn.Code)
 	nn.ExternalNetworkCode = lib.TrimSpace(nn.Code)
 	nn.Type = lib.TrimSpace(nn.Type)
@@ -95,13 +95,13 @@ func (nn *NetworkNode) Sanitize() {
 
 	switch nn.Type {
 	case AgentNetworkNodeType:
-		nn.Agent.Sanitize()
+		nn.Agent.Normalize()
 	case AgencyNetworkNodeType:
-		nn.Agency.Sanitize()
+		nn.Agency.Normalize()
 	case BrokerNetworkNodeType:
-		nn.Broker.Sanitize()
+		nn.Broker.Normalize()
 	case AreaManagerNetworkNodeType:
-		nn.AreaManager.Sanitize()
+		nn.AreaManager.Normalize()
 	}
 }
 

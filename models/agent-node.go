@@ -24,7 +24,7 @@ type AgentNode struct {
 	BigRuiRegistration bigquery.NullDateTime `json:"-" firestore:"-" bigquery:"ruiRegistration"`
 }
 
-func (an *AgentNode) Sanitize() {
+func (an *AgentNode) Normalize() {
 	an.Name = lib.ToUpper(an.Name)
 	an.Surname = lib.ToUpper(an.Surname)
 	an.FiscalCode = lib.ToUpper(an.FiscalCode)
@@ -32,10 +32,10 @@ func (an *AgentNode) Sanitize() {
 	an.BirthCity = lib.ToUpper(an.BirthCity)
 	an.BirthProvince = lib.ToUpper(an.BirthProvince)
 	if an.Residence != nil {
-		an.Residence.Sanitize()
+		an.Residence.Normalize()
 	}
 	if an.Domicile != nil {
-		an.Domicile.Sanitize()
+		an.Domicile.Normalize()
 	}
 	an.Phone = lib.TrimSpace(an.Phone)
 	an.RuiCode = lib.ToUpper(an.RuiCode)

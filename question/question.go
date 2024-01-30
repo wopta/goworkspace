@@ -60,7 +60,7 @@ func GetQuestionsFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 		return "", nil, err
 	}
 
-	policy.Sanitize()
+	policy.Normalize()
 
 	switch questionType {
 	case statements:

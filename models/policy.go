@@ -167,15 +167,15 @@ type Price struct {
 	Discount float64 `firestore:"discount" json:"discount" bigquery:"-"`
 }
 
-func (p *Policy) Sanitize() {
-	p.Contractor.Sanitize()
+func (p *Policy) Normalize() {
+	p.Contractor.Normalize()
 	if p.Contractors != nil {
 		for index, _ := range *p.Contractors {
-			(*p.Contractors)[index].Sanitize()
+			(*p.Contractors)[index].Normalize()
 		}
 	}
 	for index, _ := range p.Assets {
-		p.Assets[index].Sanitize()
+		p.Assets[index].Normalize()
 	}
 }
 

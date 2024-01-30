@@ -32,7 +32,7 @@ func FiscalCode(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 		return "", nil, err
 	}
 
-	user.Sanitize()
+	user.Normalize()
 
 	switch operation {
 	case "encode":

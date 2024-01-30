@@ -28,7 +28,7 @@ type CreateInviteRequest struct {
 	Products        []models.Product `json:"products,omitempty"`
 }
 
-func (c *CreateInviteRequest) Sanitize() {
+func (c *CreateInviteRequest) Normalize() {
 	c.FiscalCode = lib.ToUpper(c.FiscalCode)
 	c.VatCode = lib.TrimSpace(c.VatCode)
 	c.Name = lib.ToUpper(c.Name)
@@ -66,7 +66,7 @@ func CreateInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	err := json.Unmarshal(reqBytes, &createInviteRequest)
 	lib.CheckError(err)
 
-	createInviteRequest.Sanitize()
+	createInviteRequest.Normalize()
 
 	creatorUid, err := lib.GetUserIdFromIdToken(r.Header.Get("Authorization"))
 	if err != nil {

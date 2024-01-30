@@ -26,17 +26,17 @@ type Media struct {
 	Base64Bytes    string `json:"base64Bytes,omitempty" firestore:"-" bigquery:"-"`
 }
 
-func (id *IdentityDocument) Sanitize() {
+func (id *IdentityDocument) Normalize() {
 	id.Code = lib.TrimSpace(id.Code)
 	id.Type = lib.TrimSpace(id.Type)
 	id.Number = lib.ToUpper(id.Number)
 	id.IssuingAuthority = lib.TrimSpace(id.IssuingAuthority)
 	id.PlaceOfIssue = lib.ToUpper(id.PlaceOfIssue)
 	if id.FrontMedia != nil {
-		id.FrontMedia.Sanitize()
+		id.FrontMedia.Normalize()
 	}
 	if id.BackMedia != nil {
-		id.BackMedia.Sanitize()
+		id.BackMedia.Normalize()
 	}
 }
 
@@ -47,7 +47,7 @@ func (id *IdentityDocument) IsExpired() bool {
 	return id.ExpiryDate.UTC().Before(today)
 }
 
-func (m *Media) Sanitize() {
+func (m *Media) Normalize() {
 	m.FileName = lib.TrimSpace(m.FileName)
 	m.SourceFileName = lib.TrimSpace(m.SourceFileName)
 	m.MimeType = lib.TrimSpace(m.MimeType)

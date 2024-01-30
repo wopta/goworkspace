@@ -14,7 +14,7 @@ type ReservedInfo struct {
 	AcceptanceDate time.Time    `json:"acceptanceDate,omitempty" firestore:"acceptanceDate,omitempty" bigquery:"-"`
 }
 
-func (ri *ReservedInfo) Sanitize() {
+func (ri *ReservedInfo) Normalize() {
 	ri.AcceptanceNote = lib.ToUpper(ri.AcceptanceNote)
 }
 

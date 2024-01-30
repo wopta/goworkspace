@@ -34,7 +34,7 @@ type Vehicle struct {
 	// OvernightShelter   string    `firestore:"overnightShelter,omitempty"   json:"overnightShelter,omitempty"   bigquery:"-"` // RICOVERO NOTTURNO (box privato/garage pubblico/area recintata privata/in strada)
 }
 
-func (v *Vehicle) Sanitize() {
+func (v *Vehicle) Normalize() {
 	v.Plate = lib.ToUpper(v.Plate)
 	v.Model = lib.ToUpper(v.Model)
 	v.Manufacturer = lib.TrimSpace(v.Manufacturer)

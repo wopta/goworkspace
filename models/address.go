@@ -12,7 +12,7 @@ type Address struct {
 	Area         string `json:"area" firestore:"area" bigquery:"-"`
 }
 
-func (a *Address) Sanitize() {
+func (a *Address) Normalize() {
 	a.StreetName = lib.ToUpper(a.StreetName)
 	a.StreetNumber = lib.ToUpper(a.StreetNumber)
 	a.City = lib.ToUpper(a.City)

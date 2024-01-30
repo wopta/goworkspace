@@ -42,7 +42,7 @@ func UpdatePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 
 	log.Printf("request body: %s", string(body))
 
-	inputPolicy.Sanitize()
+	inputPolicy.Normalize()
 
 	originalPolicy, err := plc.GetPolicy(policyUid, origin)
 	if err != nil {

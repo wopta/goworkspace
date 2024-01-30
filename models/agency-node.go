@@ -21,15 +21,15 @@ type AgencyNode struct {
 	Website            string                `json:"website,omitempty" firestore:"website,omitempty" bigquery:"-"`
 }
 
-func (an *AgencyNode) Sanitize() {
+func (an *AgencyNode) Normalize() {
 	an.Name = lib.ToUpper(an.Name)
 	an.VatCode = lib.ToUpper(an.VatCode)
 	an.Phone = lib.TrimSpace(an.Phone)
 	if an.Address != nil {
-		an.Address.Sanitize()
+		an.Address.Normalize()
 	}
 	if an.Manager != nil {
-		an.Manager.Sanitize()
+		an.Manager.Normalize()
 	}
 	an.RuiCode = lib.ToUpper(an.RuiCode)
 	an.RuiSection = lib.ToUpper(an.RuiSection)

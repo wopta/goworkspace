@@ -54,7 +54,7 @@ func LeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		return "", nil, err
 	}
 
-	policy.Sanitize()
+	policy.Normalize()
 
 	err = lead(authToken, &policy)
 	if err != nil {

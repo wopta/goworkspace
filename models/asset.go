@@ -73,11 +73,11 @@ type Location struct {
 	Lng float64 `firestore:"lng,omitempty" json:"lng,omitempty"`
 }
 
-func (a *Asset) Sanitize() {
+func (a *Asset) Normalize() {
 	if a.Person != nil {
-		a.Person.Sanitize()
+		a.Person.Normalize()
 	}
 	if a.Vehicle != nil {
-		a.Vehicle.Sanitize()
+		a.Vehicle.Normalize()
 	}
 }

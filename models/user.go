@@ -104,7 +104,7 @@ func (u *User) Marshal() ([]byte, error) {
 	return json.Marshal(u)
 }
 
-func (u *User) Sanitize() {
+func (u *User) Normalize() {
 	u.Name = lib.ToUpper(u.Name)
 	u.Surname = lib.ToUpper(u.Surname)
 	u.Gender = lib.ToUpper(u.Gender)
@@ -113,10 +113,10 @@ func (u *User) Sanitize() {
 	u.Mail = lib.ToUpper(u.Mail)
 	u.Phone = lib.TrimSpace(u.Phone)
 	if u.Residence != nil {
-		u.Residence.Sanitize()
+		u.Residence.Normalize()
 	}
 	if u.Domicile != nil {
-		u.Domicile.Sanitize()
+		u.Domicile.Normalize()
 	}
 	u.BirthDate = lib.TrimSpace(u.BirthDate)
 	u.BirthCity = lib.ToUpper(u.BirthCity)
@@ -125,7 +125,7 @@ func (u *User) Sanitize() {
 	u.WorkType = lib.TrimSpace(u.WorkType)
 	u.WorkStatus = lib.TrimSpace(u.WorkStatus)
 	for index, _ := range u.IdentityDocuments {
-		u.IdentityDocuments[index].Sanitize()
+		u.IdentityDocuments[index].Normalize()
 	}
 }
 

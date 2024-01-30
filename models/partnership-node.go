@@ -7,6 +7,6 @@ type PartnershipNode struct {
 	Skin *Skin  `json:"skin,omitempty" firestore:"skin,omitempty" bigquery:"-"`
 }
 
-func (pn *PartnershipNode) Sanitize() {
+func (pn *PartnershipNode) Normalize() {
 	pn.Name = lib.ToLower(pn.Name)
 }

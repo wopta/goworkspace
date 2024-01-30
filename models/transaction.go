@@ -96,7 +96,7 @@ func SetTransactionPolicy(policy Policy, id string, amount float64, schedule str
 	}
 }
 
-func (t *Transaction) Sanitize() {
+func (t *Transaction) Normalize() {
 	t.Name = lib.TrimSpace(t.Name)
 	t.PaymentNote = lib.ToUpper(t.PaymentNote)
 }

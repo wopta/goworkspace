@@ -31,7 +31,7 @@ func GapFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 	err := json.Unmarshal(req, &policy)
 	lib.CheckError(err)
 
-	policy.Sanitize()
+	policy.Normalize()
 
 	authToken, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
 	lib.CheckError(err)
