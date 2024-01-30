@@ -1,6 +1,7 @@
 package broker
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -57,7 +58,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	err = lib.CheckPayload[AcceptancePayload](body, &payload, []string{"action"})
 	if err != nil {
 		log.Printf("[AcceptanceFx] ERROR: %s", err.Error())
-		return `{"success":false}`, `{"success":false}`, nil
+		return "", nil, err
 	}
 
 	policy, err = plc.GetPolicy(policyUid, origin)
@@ -65,7 +66,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 
 	if !lib.SliceContains(models.GetWaitForApprovalStatusList(), policy.Status) {
 		log.Printf("[AcceptanceFx] Policy Uid %s: wrong status %s", policy.Uid, policy.Status)
-		return `{"success":false}`, `{"success":false}`, nil
+		return "", nil, fmt.Errorf("policy uid '%s': wrong status '%s'", policy.Uid, policy.Status)
 	}
 
 	switch payload.Action {
@@ -75,7 +76,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		approvePolicy(&policy, payload.Reasons)
 	default:
 		log.Printf("[AcceptanceFx] Unhandled action %s", payload.Action)
-		return `{"success":false}`, `{"success":false}`, nil
+		return "", nil, fmt.Errorf("unhandled action %s", payload.Action)
 	}
 
 	policy.Updated = time.Now().UTC()
@@ -128,7 +129,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 
 	log.Println("[AcceptanceFx] Handler end ----------------------------------")
 
-	return `{"success":true}`, `{"success":true}`, nil
+	return "{}", nil, nil
 }
 
 func rejectPolicy(policy *models.Policy, reasons string) {

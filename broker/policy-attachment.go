@@ -20,19 +20,12 @@ import (
 func GetPolicyAttachmentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	w.Header().Set("Access-Control-Allow-Methods", "GET")
 
-	var (
-		response GetPolicyAttachmentsResponse
-		e        error
-	)
-
-	if e != nil {
-		return "{}", nil, nil
-	}
+	var response GetPolicyAttachmentsResponse
 
 	attachments, err := GetPolicyAttachments(r.Header.Get("policyUid"), r.Header.Get("origin"))
 	if err != nil {
 		log.Println("GetPolicyAttachments Error: " + err.Error())
-		return "{}", nil, nil
+		return "{}", nil, err
 	}
 
 	response.Attachments = attachments
@@ -41,7 +34,7 @@ func GetPolicyAttachmentFx(w http.ResponseWriter, r *http.Request) (string, inte
 		log.Println("AttachmentsMarshal Error: " + err.Error())
 	}
 
-	return string(res), nil, nil
+	return string(res), nil, err
 }
 
 func GetPolicyAttachments(policyUid string, origin string) ([]models.Attachment, error) {
