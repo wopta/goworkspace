@@ -32,6 +32,8 @@ func PersonaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 		return "", nil, err
 	}
 
+	policy.Normalize()
+
 	authToken, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
 	lib.CheckError(err)
 

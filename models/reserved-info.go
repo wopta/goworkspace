@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"github.com/wopta/goworkspace/lib"
+	"time"
+)
 
 type ReservedInfo struct {
 	RequiredExams  []string     `json:"requiredExams,omitempty" firestore:"requiredExams,omitempty" bigquery:"-"`
@@ -9,6 +12,10 @@ type ReservedInfo struct {
 	Reasons        []string     `json:"reasons,omitempty" firestore:"reasons,omitempty" bigquery:"-"`
 	AcceptanceNote string       `json:"acceptanceNote,omitempty" firestore:"acceptanceNote,omitempty" bigquery:"-"`
 	AcceptanceDate time.Time    `json:"acceptanceDate,omitempty" firestore:"acceptanceDate,omitempty" bigquery:"-"`
+}
+
+func (ri *ReservedInfo) Normalize() {
+	ri.AcceptanceNote = lib.ToUpper(ri.AcceptanceNote)
 }
 
 type Contact struct {

@@ -31,6 +31,8 @@ func UpdateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 		return "", "", err
 	}
 
+	inputNode.Normalize()
+
 	err = network.UpdateNode(inputNode)
 	if err != nil {
 		log.Printf("error updating network node %s", inputNode.Uid)

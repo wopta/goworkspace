@@ -33,6 +33,7 @@ func GetPolicyMediaFx(w http.ResponseWriter, r *http.Request) (string, interface
 	)
 
 	log.SetPrefix("[GetPolicyMediaFx]")
+	defer log.SetPrefix("")
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -59,24 +60,18 @@ func GetPolicyMediaFx(w http.ResponseWriter, r *http.Request) (string, interface
 	rawResp, resp, err = retrievedMediaFromAttachments(policy, req)
 	if rawResp != "" {
 		log.Println("Handler end ---------------------------------------------")
-		log.SetPrefix("")
-
 		return rawResp, resp, err
 	}
 
 	rawResp, resp, err = retrieveMediaFromIdentityDocuments(policy, req)
 	if rawResp != "" {
 		log.Println("Handler end ---------------------------------------------")
-		log.SetPrefix("")
-
 		return rawResp, resp, err
 	}
 
 	rawResp, resp, err = retrieveMediaFromReservedInfo(policy, req)
 
 	log.Println("Handler end -------------------------------------------------")
-	log.SetPrefix("")
-
 	return rawResp, resp, err
 }
 

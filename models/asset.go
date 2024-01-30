@@ -11,6 +11,7 @@ type Asset struct {
 	Guarantees   []Guarante  `firestore:"guarantees,omitempty" json:"guarantees,omitempty"`
 	Vehicle      *Vehicle    `firestore:"vehicle,omitempty" json:"vehicle,omitempty"`
 }
+
 type Building struct {
 	Name             string   `firestore:"name,omitempty" json:"name,omitempty"`
 	Address          string   `firestore:"address,omitempty" json:"address,omitempty"`
@@ -34,6 +35,7 @@ type Building struct {
 	Costruction      string   `firestore:"costruction,omitempty" json:"costruction,omitempty"`
 	IsHolder         bool     `firestore:"isHolder,omitempty" json:"isHolder,omitempty"`
 }
+
 type Enterprise struct {
 	Name         string   `firestore:"name,omitempty" json:"name,omitempty"`
 	Address      string   `firestore:"address,omitempty" json:"address,omitempty"`
@@ -53,6 +55,7 @@ type Enterprise struct {
 	Revenue      string   `firestore:"revenue,omitempty" json:"revenue,omitempty"`
 	Employer     int64    `firestore:"employer,omitempty" json:"employer,omitempty"`
 }
+
 type Ateco struct {
 	Name       string `firestore:"name,omitempty" json:"name,omitempty"`
 	Type       string `firestore:"type,omitempty" json:"type,omitempty"`
@@ -64,7 +67,17 @@ type Ateco struct {
 	Class      string `firestore:"class" json:"class,omitempty"`
 	Sector     string `firestore:"sector,omitempty" json:"sector,omitempty"`
 }
+
 type Location struct {
 	Lat float64 `firestore:"lat,omitempty" json:"lat,omitempty"`
 	Lng float64 `firestore:"lng,omitempty" json:"lng,omitempty"`
+}
+
+func (a *Asset) Normalize() {
+	if a.Person != nil {
+		a.Person.Normalize()
+	}
+	if a.Vehicle != nil {
+		a.Vehicle.Normalize()
+	}
 }

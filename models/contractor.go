@@ -78,6 +78,33 @@ type Contractor struct {
 	Data                     string                 `firestore:"-"                           json:"-"                           bigquery:"data"`
 }
 
+func (c *Contractor) Normalize() {
+	c.Name = lib.ToUpper(c.Name)
+	c.Surname = lib.ToUpper(c.Surname)
+	c.Gender = lib.ToUpper(c.Gender)
+	c.Mail = lib.ToUpper(c.Mail)
+	c.Phone = lib.TrimSpace(c.Phone)
+	c.FiscalCode = lib.ToUpper(c.FiscalCode)
+	c.VatCode = lib.ToUpper(c.VatCode)
+	c.BirthProvince = lib.ToUpper(c.BirthProvince)
+	c.BirthCity = lib.ToUpper(c.BirthCity)
+	if c.Residence != nil {
+		c.Residence.Normalize()
+	}
+	if c.Domicile != nil {
+		c.Domicile.Normalize()
+	}
+	if c.CompanyAddress != nil {
+		c.CompanyAddress.Normalize()
+	}
+	c.Work = lib.TrimSpace(c.Work)
+	c.WorkType = lib.TrimSpace(c.WorkType)
+	c.WorkStatus = lib.TrimSpace(c.WorkStatus)
+	for index, _ := range c.IdentityDocuments {
+		c.IdentityDocuments[index].Normalize()
+	}
+}
+
 func (c *Contractor) ToUser() *User {
 	var user User
 

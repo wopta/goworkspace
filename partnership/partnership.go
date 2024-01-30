@@ -54,7 +54,6 @@ func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, inter
 	log.Printf("[LifePartnershipFx] partnershipUid: %s jwt: %s", partnershipUid, jwtData)
 
 	policy, product, node, err := LifePartnership(partnershipUid, jwtData, r.Header.Get("Origin"))
-
 	if err != nil {
 		log.Printf("[LifePartnershipFx] error: %s", err.Error())
 		return "", response, err
@@ -134,7 +133,6 @@ func LifePartnership(partnershipUid, jwtData, origin string) (models.Policy, mod
 	}
 
 	policy, err = quote.Life(policy, models.ECommerceChannel, partnershipNode, warrant, models.ECommerceFlow)
-
 	if err != nil {
 		return policy, *productLife, partnershipNode, err
 	}
@@ -221,6 +219,8 @@ func beProfPartnership(jwtData string, policy *models.Policy, product *models.Pr
 		person.Work = claims.UserEmploymentSector
 		person.VatCode = claims.UserPiva
 
+		person.Normalize()
+
 		if _, personData, err := user.ExtractUserDataFromFiscalCode(person); err == nil {
 			person = personData
 		}
@@ -267,6 +267,9 @@ func facilePartnership(jwtData string, policy *models.Policy, product *models.Pr
 	person.BirthDate = birthDate.Format(time.RFC3339)
 	person.Phone = fmt.Sprintf("+39%s", claims.Mobile)
 	person.Gender = claims.Gender
+
+	person.Normalize()
+
 	policy.Contractor = *person.ToContractor()
 	asset.Person = &person
 	policy.OfferlName = "default"

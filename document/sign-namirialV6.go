@@ -282,7 +282,11 @@ func getPrepareV6(id string) string {
 }
 
 func getSendV6(id string, data models.Policy, prepare string, origin string, sendEmail bool) string {
-	var preparePointer PrepareResponse
+	var (
+		preparePointer PrepareResponse
+		redirectUrl    string
+	)
+
 	json.Unmarshal([]byte(prepare), &preparePointer)
 	unassignedElements := preparePointer.UnassignedElements
 	elements := preparePointer.Activities[0].Action.Sign.Elements
@@ -302,36 +306,22 @@ func getSendV6(id string, data models.Policy, prepare string, origin string, sen
 			  "Code": "test"
 			}, `
 	}
-	var redirectUrl string
-	if data.Name == models.GapProduct && data.Channel != models.MgaChannel {
-		var baseUrl string = "https://www.wopta.it"
-		if os.Getenv("env") != "prod" {
-			baseUrl = "https://dev.wopta.it"
-		}
-		redirectUrl = `
-		"FinishActionConfiguration": {
-			"SignAnyWhereViewer": {
-				"RedirectUri": "` + baseUrl + `/it/quote/gap/thank-you"
-			}
-		},
-		`
-	}
 
 	nn := network.GetNetworkNodeByUid(data.ProducerUid)
-	if nn != nil {
+	if data.Channel == models.NetworkChannel && nn != nil {
 		warrant := nn.GetWarrant()
 		if warrant != nil {
 			flow := warrant.GetFlowName(data.Name)
-			if flow != "" {
-				if data.Name == models.LifeProduct && data.Channel == models.NetworkChannel && flow == models.RemittanceMgaFlow {
-					var baseUrl string = "https://www.wopta.it"
-					if os.Getenv("env") != "prod" {
-						baseUrl = "https://dev.wopta.it"
-					}
+			if flow == models.RemittanceMgaFlow {
+				var baseUrl string = "https://www.wopta.it"
+				if os.Getenv("env") != "prod" {
+					baseUrl = "https://dev.wopta.it"
+				}
+				if lib.SliceContains([]string{models.LifeProduct, models.GapProduct}, data.Name) {
 					redirectUrl = `
 					"FinishActionConfiguration": {
 						"SignAnyWhereViewer": {
-							"RedirectUri": "` + baseUrl + `/it/quote/life/thank-you"
+							"RedirectUri": "` + baseUrl + `/it/quote/` + data.Name + `/thank-you"
 						}
 					},
 					`

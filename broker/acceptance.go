@@ -27,18 +27,21 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		toAddress mail.Address
 	)
 
-	log.Println("[AcceptanceFx] Handler start --------------------------------")
+	log.SetPrefix("[AcceptanceFx]")
+	defer log.SetPrefix("")
 
-	log.Println("[AcceptanceFx] loading authToken from idToken...")
+	log.Println("Handler start -----------------------------------------------")
+
+	log.Println("loading authToken from idToken...")
 
 	token := r.Header.Get("Authorization")
 	authToken, err := models.GetAuthTokenFromIdToken(token)
 	if err != nil {
-		log.Printf("[AcceptanceFx] error getting authToken")
+		log.Printf("error getting authToken: %s", err.Error())
 		return "", nil, err
 	}
 	log.Printf(
-		"[AcceptanceFx] authToken - type: '%s' role: '%s' uid: '%s' email: '%s'",
+		"authToken - type: '%s' role: '%s' uid: '%s' email: '%s'",
 		authToken.Type,
 		authToken.Role,
 		authToken.UserID,
@@ -49,52 +52,58 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	policyUid := r.Header.Get("policyUid")
 	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 
-	log.Printf("[AcceptanceFx] Policy Uid %s", policyUid)
+	log.Printf("Policy Uid %s", policyUid)
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
-	log.Printf("[AcceptanceFx] Payload: %s", string(body))
+	log.Printf("Request Payload: %s", string(body))
 
 	err = lib.CheckPayload[AcceptancePayload](body, &payload, []string{"action"})
 	if err != nil {
-		log.Printf("[AcceptanceFx] ERROR: %s", err.Error())
+		log.Printf("ERROR: %s", err.Error())
 		return "", nil, err
 	}
 
 	policy, err = plc.GetPolicy(policyUid, origin)
-	lib.CheckError(err)
+	if err != nil {
+		log.Printf("error retrieving policy %s from Firestore: %s", policyUid, err.Error())
+		return `{"success":false}`, `{"success":false}`, nil
+	}
 
 	if !lib.SliceContains(models.GetWaitForApprovalStatusList(), policy.Status) {
-		log.Printf("[AcceptanceFx] Policy Uid %s: wrong status %s", policy.Uid, policy.Status)
+		log.Printf("policy Uid %s: wrong status %s", policy.Uid, policy.Status)
 		return "", nil, fmt.Errorf("policy uid '%s': wrong status '%s'", policy.Uid, policy.Status)
 	}
 
 	switch payload.Action {
 	case models.PolicyStatusRejected:
-		rejectPolicy(&policy, payload.Reasons)
+		rejectPolicy(&policy, lib.ToUpper(payload.Reasons))
 	case models.PolicyStatusApproved:
-		approvePolicy(&policy, payload.Reasons)
+		approvePolicy(&policy, lib.ToUpper(payload.Reasons))
 	default:
-		log.Printf("[AcceptanceFx] Unhandled action %s", payload.Action)
+		log.Printf("Unhandled action %s", payload.Action)
 		return "", nil, fmt.Errorf("unhandled action %s", payload.Action)
 	}
 
 	policy.Updated = time.Now().UTC()
 
-	log.Println("[AcceptanceFx] saving to firestore...")
+	log.Println("saving to firestore...")
 	err = lib.SetFirestoreErr(firePolicy, policy.Uid, &policy)
-	lib.CheckError(err)
-	log.Println("[AcceptanceFx] firestore saved!")
+	if err != nil {
+		log.Printf("error saving policy to firestore: %s", err.Error())
+		return `{"success":false}`, `{"success":false}`, nil
+	}
+	log.Println("firestore saved!")
 
 	policy.BigquerySave(origin)
 
 	policyJsonLog, err := policy.Marshal()
 	if err != nil {
-		log.Printf("[AcceptanceFx] error marshaling policy: %s", err.Error())
+		log.Printf("error marshaling policy: %s", err.Error())
 	}
-	log.Printf("[AcceptanceFx] Policy: %s", string(policyJsonLog))
+	log.Printf("Policy: %s", string(policyJsonLog))
 
-	log.Println("[AcceptanceFx] sending acceptance email...")
+	log.Println("sending acceptance email...")
 
 	// TODO: port acceptance into bpmn to keep code centralized and dynamic
 	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
@@ -102,7 +111,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		warrant = networkNode.GetWarrant()
 	}
 	flowName, _ = policy.GetFlow(networkNode, warrant)
-	log.Printf("[AcceptanceFx] flowName '%s'", flowName)
+	log.Printf("flowName '%s'", flowName)
 
 	switch policy.Channel {
 	case models.MgaChannel:
@@ -115,7 +124,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		toAddress = mail.GetContractorEmail(&policy)
 	}
 
-	log.Printf("[AcceptanceFx] toAddress '%s'", toAddress.String())
+	log.Printf("toAddress '%s'", toAddress.String())
 
 	mail.SendMailReservedResult(
 		policy,
@@ -127,23 +136,23 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 
 	models.CreateAuditLog(r, string(body))
 
-	log.Println("[AcceptanceFx] Handler end ----------------------------------")
+	log.Println("Handler end ----------------------------------")
 
 	return "{}", nil, nil
 }
 
 func rejectPolicy(policy *models.Policy, reasons string) {
-	log.Printf("[rejectPolicy] Policy Uid %s REJECTED", policy.Uid)
 	policy.Status = models.PolicyStatusRejected
 	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
 	policy.ReservedInfo.AcceptanceNote = reasons
 	policy.ReservedInfo.AcceptanceDate = time.Now().UTC()
+	log.Printf("Policy Uid %s REJECTED", policy.Uid)
 }
 
 func approvePolicy(policy *models.Policy, reasons string) {
-	log.Printf("[approvePolicy] Policy Uid %s APPROVED", policy.Uid)
 	policy.Status = models.PolicyStatusApproved
 	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
 	policy.ReservedInfo.AcceptanceNote = reasons
 	policy.ReservedInfo.AcceptanceDate = time.Now().UTC()
+	log.Printf("Policy Uid %s APPROVED", policy.Uid)
 }

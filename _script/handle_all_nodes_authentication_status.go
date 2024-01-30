@@ -1,9 +1,10 @@
 package _script
 
 import (
+	"log"
+
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	"log"
 )
 
 func DisableAllNodes() {
@@ -35,7 +36,7 @@ func EnableAllNodes() {
 	networkNodes = models.NetworkNodeToListData(docsnap)
 
 	for _, nn := range networkNodes {
-		if nn.AuthId != "" {
+		if nn.AuthId != "" && nn.IsActive {
 			log.Printf("NetworkNode Code: %s", nn.Code)
 			err := lib.HandleUserAuthenticationStatus(nn.Uid, false)
 			if err != nil {

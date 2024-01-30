@@ -46,6 +46,8 @@ func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		return "", nil, err
 	}
 
+	data.Normalize()
+
 	authToken, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
 	if err != nil {
 		log.Printf("[LifeFx] error getting authToken from idToken: %s", err.Error())

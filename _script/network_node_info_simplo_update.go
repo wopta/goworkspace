@@ -3,7 +3,6 @@ package _script
 import (
 	"cloud.google.com/go/firestore"
 	"context"
-	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"log"
 	"os"
@@ -26,7 +25,7 @@ func UpdateNetworkNodeInfoSimplo() {
 			nn.Designation = "Addetto Attività intermediazione al di fuori dei locali"
 			nn.WorksForUid = models.WorksForMgaUid
 
-			err := lib.SetFirestoreErr(models.NetworkNodesCollection, nn.Uid, nn)
+			err := nn.SaveFirestore()
 			if err != nil {
 				log.Printf("error updating network node %s: %s", nn.Code, err.Error())
 				continue

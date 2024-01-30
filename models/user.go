@@ -14,16 +14,6 @@ import (
 	latlng "google.golang.org/genproto/googleapis/type/latlng"
 )
 
-func UnmarshalUser(data []byte) (Claim, error) {
-	var r Claim
-	err := json.Unmarshal(data, &r)
-	return r, err
-}
-
-func (r *User) Marshal() ([]byte, error) {
-	return json.Marshal(r)
-}
-
 type User struct {
 	EmailVerified            bool                   `firestore:"emailVerified"               json:"emailVerified,omitempty"     bigquery:"-"`
 	Uid                      string                 `firestore:"uid"                         json:"uid,omitempty"               bigquery:"uid"`
@@ -104,20 +94,45 @@ type Consens struct {
 	Mail            string         `json:"-" firestore:"-" bigquery:"-"`
 }
 
-type Address struct {
-	StreetName   string `json:"streetName" firestore:"streetName" bigquery:"-"`
-	StreetNumber string `json:"streetNumber" firestore:"streetNumber" bigquery:"-"`
-	City         string `json:"city" firestore:"city" bigquery:"-"`
-	PostalCode   string `json:"postalCode" firestore:"postalCode" bigquery:"-"`
-	Locality     string `json:"locality" firestore:"locality" bigquery:"-"`
-	CityCode     string `json:"cityCode" firestore:"cityCode" bigquery:"-"`
-	Area         string `json:"area" firestore:"area" bigquery:"-"`
+func UnmarshalUser(data []byte) (Claim, error) {
+	var r Claim
+	err := json.Unmarshal(data, &r)
+	return r, err
 }
 
-func (user *User) ToContractor() *Contractor {
+func (u *User) Marshal() ([]byte, error) {
+	return json.Marshal(u)
+}
+
+func (u *User) Normalize() {
+	u.Name = lib.ToUpper(u.Name)
+	u.Surname = lib.ToUpper(u.Surname)
+	u.Gender = lib.ToUpper(u.Gender)
+	u.FiscalCode = lib.ToUpper(u.FiscalCode)
+	u.VatCode = lib.ToUpper(u.VatCode)
+	u.Mail = lib.ToUpper(u.Mail)
+	u.Phone = lib.TrimSpace(u.Phone)
+	if u.Residence != nil {
+		u.Residence.Normalize()
+	}
+	if u.Domicile != nil {
+		u.Domicile.Normalize()
+	}
+	u.BirthDate = lib.TrimSpace(u.BirthDate)
+	u.BirthCity = lib.ToUpper(u.BirthCity)
+	u.BirthProvince = lib.ToUpper(u.BirthProvince)
+	u.Work = lib.TrimSpace(u.Work)
+	u.WorkType = lib.TrimSpace(u.WorkType)
+	u.WorkStatus = lib.TrimSpace(u.WorkStatus)
+	for index, _ := range u.IdentityDocuments {
+		u.IdentityDocuments[index].Normalize()
+	}
+}
+
+func (u *User) ToContractor() *Contractor {
 	var contractor Contractor
 
-	rawContractor, err := json.Marshal(user)
+	rawContractor, err := json.Marshal(u)
 	if err != nil {
 		return nil
 	}
@@ -130,60 +145,60 @@ func (user *User) ToContractor() *Contractor {
 	return &contractor
 }
 
-func (user *User) initBigqueryData() error {
-	userJson, err := json.Marshal(user)
+func (u *User) initBigqueryData() error {
+	userJson, err := json.Marshal(u)
 	if err != nil {
 		return err
 	}
-	user.Data = string(userJson)
+	u.Data = string(userJson)
 
-	if user.BirthDate != "" {
-		birthDate, err := time.Parse(time.RFC3339, user.BirthDate)
+	if u.BirthDate != "" {
+		birthDate, err := time.Parse(time.RFC3339, u.BirthDate)
 		if err != nil {
 			return err
 		}
-		user.BigBirthDate = lib.GetBigQueryNullDateTime(birthDate)
+		u.BigBirthDate = lib.GetBigQueryNullDateTime(birthDate)
 	}
 
-	if user.Residence != nil {
-		user.BigResidenceStreetName = user.Residence.StreetName
-		user.BigResidenceStreetNumber = user.Residence.StreetNumber
-		user.BigResidenceCity = user.Residence.City
-		user.BigResidencePostalCode = user.Residence.PostalCode
-		user.BigResidenceLocality = user.Residence.Locality
-		user.BigResidenceCityCode = user.Residence.CityCode
+	if u.Residence != nil {
+		u.BigResidenceStreetName = u.Residence.StreetName
+		u.BigResidenceStreetNumber = u.Residence.StreetNumber
+		u.BigResidenceCity = u.Residence.City
+		u.BigResidencePostalCode = u.Residence.PostalCode
+		u.BigResidenceLocality = u.Residence.Locality
+		u.BigResidenceCityCode = u.Residence.CityCode
 	}
 
-	if user.Domicile != nil {
-		user.BigDomicileStreetName = user.Domicile.StreetName
-		user.BigDomicileStreetNumber = user.Domicile.StreetNumber
-		user.BigDomicileCity = user.Domicile.City
-		user.BigDomicilePostalCode = user.Domicile.PostalCode
-		user.BigDomicileLocality = user.Domicile.Locality
-		user.BigDomicileCityCode = user.Domicile.CityCode
+	if u.Domicile != nil {
+		u.BigDomicileStreetName = u.Domicile.StreetName
+		u.BigDomicileStreetNumber = u.Domicile.StreetNumber
+		u.BigDomicileCity = u.Domicile.City
+		u.BigDomicilePostalCode = u.Domicile.PostalCode
+		u.BigDomicileLocality = u.Domicile.Locality
+		u.BigDomicileCityCode = u.Domicile.CityCode
 	}
 
-	user.BigLocation = bigquery.NullGeography{
+	u.BigLocation = bigquery.NullGeography{
 		// TODO: Check if correct: Geography type uses the WKT format for geometry
-		GeographyVal: fmt.Sprintf("POINT (%f %f)", user.Location.Lng, user.Location.Lat),
+		GeographyVal: fmt.Sprintf("POINT (%f %f)", u.Location.Lng, u.Location.Lat),
 		Valid:        true,
 	}
-	user.BigCreationDate = lib.GetBigQueryNullDateTime(user.CreationDate)
-	user.BigUpdatedDate = lib.GetBigQueryNullDateTime(user.UpdatedDate)
+	u.BigCreationDate = lib.GetBigQueryNullDateTime(u.CreationDate)
+	u.BigUpdatedDate = lib.GetBigQueryNullDateTime(u.UpdatedDate)
 
 	return nil
 }
 
-func (user *User) BigquerySave(origin string) error {
+func (u *User) BigquerySave(origin string) error {
 	table := lib.GetDatasetByEnv(origin, UserCollection)
 
-	if err := user.initBigqueryData(); err != nil {
+	if err := u.initBigqueryData(); err != nil {
 		return err
 	}
 
-	log.Println("user save big query: " + user.Uid)
+	log.Println("user save big query: " + u.Uid)
 
-	return lib.InsertRowsBigQuery(WoptaDataset, table, user)
+	return lib.InsertRowsBigQuery(WoptaDataset, table, u)
 }
 
 func (u *User) GetIdentityDocument() *IdentityDocument {

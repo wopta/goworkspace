@@ -168,7 +168,7 @@ func getInputData(policy *models.Policy) []byte {
 func getReservedData(policy *models.Policy) []byte {
 	data := make(map[string]interface{})
 
-	_, reservedAge := prd.GetAgeInfo(policy.Name, policy.ProductVersion, policy.Channel)
+	_, reservedAge := prd.GetLifeAgeInfo(policy.Name, policy.ProductVersion, policy.Channel)
 	data["reservedAge"] = int64(reservedAge)
 
 	ret, err := json.Marshal(data)
