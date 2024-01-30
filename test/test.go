@@ -97,7 +97,7 @@ func TestPostFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 		return "", nil, GetErrorJson(400, "Bad Request", "Testing error POST")
 	}
 
-	return `{"success":true}`, `{"success":true}`, nil
+	return "{}", nil, nil
 }
 
 func TestGetFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -107,7 +107,7 @@ func TestGetFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 		return "", nil, GetErrorJson(401, "Bad Request", "Testing error POST")
 	}
 
-	return `{"success":true}`, `{"success":true}`, nil
+	return "{}", nil, nil
 }
 
 func GetErrorJson(code int, typeEr string, message string) error {
