@@ -28,14 +28,16 @@ func ConsumeInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{
 	err := json.Unmarshal(reqBytes, &ConsumeInviteRequest)
 	if err != nil {
 		log.Printf("[ConsumeInviteFx] error unmarshaling request: %s", err.Error())
-		return `{"success": false}`, `{"success": false}`, nil
+		return "", nil, err
 	}
 
-	if ok, _ := ConsumeInvite(ConsumeInviteRequest.InviteUid, ConsumeInviteRequest.Password, r.Header.Get("Origin")); ok {
-		return `{"success": true}`, `{"success": true}`, nil
+	_, err = ConsumeInvite(ConsumeInviteRequest.InviteUid, ConsumeInviteRequest.Password, r.Header.Get("Origin"))
+	if err != nil {
+		log.Printf("[ConsumeInviteFx] error consuming invite: %s", err.Error())
+		return "", nil, err
 	}
 
-	return `{"success": false}`, `{"success": false}`, nil
+	return "{}", nil, nil
 }
 
 func ConsumeInvite(inviteUid, password, origin string) (bool, error) {

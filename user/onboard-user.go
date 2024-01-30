@@ -2,6 +2,7 @@ package user
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -43,13 +44,15 @@ func OnboardUserFx(resp http.ResponseWriter, r *http.Request) (string, interface
 	canRegister, user, userId, email := CanUserRegisterUseCase(onboardUserRequest.FiscalCode)
 
 	if !canRegister {
-		log.Printf("User with fiscalCode %s cannot register", onboardUserRequest.FiscalCode)
-		return `{"success": false}`, `{"success": false}`, nil
+		err := fmt.Errorf("User with fiscalCode %s cannot register", onboardUserRequest.FiscalCode)
+		log.Println(err.Error())
+		return "", nil, err
 	}
 
 	if email == nil {
-		log.Printf("User with fiscalCode %s cannot register - email not found", onboardUserRequest.FiscalCode)
-		return `{"success": false}`, `{"success": false}`, nil
+		err := fmt.Errorf("User with fiscalCode %s cannot register - email not found", onboardUserRequest.FiscalCode)
+		log.Println(err.Error())
+		return "", nil, err
 	}
 
 	dbEmailNormalized := strings.ToLower(strings.TrimSpace(*email))
@@ -59,14 +62,15 @@ func OnboardUserFx(resp http.ResponseWriter, r *http.Request) (string, interface
 	log.Printf("normalized: request email '%s' - db email '%s' - equal %t", requestEmailNormalized, dbEmailNormalized, areEmailsEqual)
 
 	if !areEmailsEqual {
-		log.Printf("User with fiscalCode %s cannot register: emails doesn't match", onboardUserRequest.FiscalCode)
-		return `{"success": false}`, `{"success": false}`, nil
+		err := fmt.Errorf("User with fiscalCode %s cannot register: emails doesn't match", onboardUserRequest.FiscalCode)
+		log.Println(err.Error())
+		return "", nil, err
 	}
 
 	dbUser, e := lib.CreateUserWithEmailAndPassword(requestEmailNormalized, onboardUserRequest.Password, userId)
 	if e != nil {
 		log.Printf("error creating auth user: %s", e.Error())
-		return `{"success": false}`, `{"success": false}`, nil
+		return "", nil, e
 	}
 
 	if userId != nil {
@@ -96,5 +100,5 @@ func OnboardUserFx(resp http.ResponseWriter, r *http.Request) (string, interface
 
 	log.Println("Handler end -------------------------------------------------")
 
-	return `{"success": true}`, `{"success": true}`, nil
+	return "{}", nil, nil
 }

@@ -71,20 +71,20 @@ func CreateInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	creatorUid, err := lib.GetUserIdFromIdToken(r.Header.Get("Authorization"))
 	if err != nil {
 		log.Println("Invalid auth token")
-		return `{"success": false}`, `{"success": false}`, nil
+		return "", nil, err
 	}
 
 	inviteUid, err := CreateInvite(createInviteRequest, r.Header.Get("Origin"), creatorUid)
 	if err != nil {
 		log.Printf("error: %s", err.Error())
-		return `{"success": false}`, `{"success": false}`, err
+		return "", nil, err
 	}
 
 	mail.SendInviteMail(inviteUid, createInviteRequest.Email, false)
 
 	log.Println("Handler end -------------------------------------------------")
 
-	return `{"success": true}`, `{"success": true}`, nil
+	return "{}", nil, nil
 }
 
 func CreateInvite(inviteRequest CreateInviteRequest, origin, creatorUid string) (string, error) {

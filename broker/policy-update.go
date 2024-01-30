@@ -106,7 +106,7 @@ func PatchPolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	err = json.Unmarshal(b, &updateValues)
 	if err != nil {
 		log.Println("PatchPolicy: unable to unmarshal request body")
-		return `{"uid":"` + policyUID + `", "success":false}`, `{"uid":"` + policyUID + `", "success":false}`, nil
+		return "", nil, err
 	}
 
 	updateValues["updated"] = time.Now().UTC()
@@ -114,10 +114,10 @@ func PatchPolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	err = lib.UpdateFirestoreErr(firePolicy, policyUID, updateValues)
 	if err != nil {
 		log.Println("PatchPolicy: error during policy update in firestore")
-		return `{"uid":"` + policyUID + `", "success":false}`, `{"uid":"` + policyUID + `", "success":false}`, nil
+		return "", nil, err
 	}
 
-	return `{"uid":"` + policyUID + `", "success":true}`, `{"uid":"` + policyUID + `", "success":true}`, err
+	return `{"uid":"` + policyUID + `"}`, `{"uid":"` + policyUID + `"}`, err
 }
 
 func DeletePolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -134,14 +134,14 @@ func DeletePolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	err = json.Unmarshal(req, &request)
 	if err != nil {
 		log.Printf("DeletePolicy: unable to delete policy %s", policyUID)
-		return `{"uid":"` + policyUID + `", "success":false}`, `{"uid":"` + policyUID + `", "success":false}`, nil
+		return "", nil, err
 	}
 	firePolicy := lib.GetDatasetByEnv(r.Header.Get("origin"), "policy")
 	docsnap := lib.GetFirestore(firePolicy, policyUID)
 	docsnap.DataTo(&policy)
 	if policy.IsDeleted || !policy.CompanyEmit {
 		log.Printf("DeletePolicy: can't delete policy %s", policyUID)
-		return `{"uid":"` + policyUID + `", "success":false}`, `{"uid":"` + policyUID + `", "success":false}`, nil
+		return "", nil, err
 
 	}
 	policy.IsDeleted = true
@@ -154,7 +154,7 @@ func DeletePolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	lib.SetFirestore(firePolicy, policyUID, policy)
 	policy.BigquerySave(r.Header.Get("origin"))
 	models.SetGuaranteBigquery(policy, "delete", guaranteFire)
-	return `{"uid":"` + policyUID + `", "success":true}`, `{"uid":"` + policyUID + `", "success":true}`, err
+	return `{"uid":"` + policyUID + `"}`, `{"uid":"` + policyUID + `"}`, err
 }
 
 type PolicyDeleteReq struct {

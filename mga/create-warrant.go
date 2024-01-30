@@ -11,17 +11,11 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
-type CreateWarrantResponse struct {
-	Success bool `json:"success"`
-}
-
 func CreateWarrantFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	var (
-		response CreateWarrantResponse
-		warrant  models.Warrant
-	)
+	var warrant models.Warrant
 
 	log.SetPrefix("[CreateWarrantFx] ")
+	defer log.SetPrefix("")
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -29,35 +23,27 @@ func CreateWarrantFx(w http.ResponseWriter, r *http.Request) (string, interface{
 	defer r.Body.Close()
 	if err != nil {
 		log.Printf("error reading request body: %s", err.Error())
-		return "", "", err
+		return "", nil, err
 	}
+	log.Printf("request: %s", string(bodyBytes))
 
 	err = json.Unmarshal(bodyBytes, &warrant)
 	if err != nil {
-		log.Printf("error marshaling request: %s", err.Error())
-		return "", "", err
+		log.Printf("error unmarshaling request: %s", err.Error())
+		return "", nil, err
 	}
 
+	log.Println("creating warrant...")
 	err = CreateWarrant(warrant)
 	if err != nil {
 		log.Printf("error creating warrant: %s", err.Error())
-		return "", response, err
+		return "", nil, err
 	}
 
-	response.Success = err == nil
-	if err == nil {
-		log.Printf("created warrant %s", warrant.Name)
-	}
-
-	responseBytes, err := json.Marshal(response)
-	if err != nil {
-		log.Printf("error marshaling response: %s", err.Error())
-		return "", response, err
-	}
-
+	log.Println("warrant created successfully!")
 	log.Println("Handler end -------------------------------------------------")
 
-	return string(responseBytes), response, err
+	return "{}", nil, err
 }
 
 func CreateWarrant(warrant models.Warrant) error {

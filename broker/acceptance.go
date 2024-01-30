@@ -1,6 +1,7 @@
 package broker
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -60,18 +61,18 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	err = lib.CheckPayload[AcceptancePayload](body, &payload, []string{"action"})
 	if err != nil {
 		log.Printf("ERROR: %s", err.Error())
-		return `{"success":false}`, `{"success":false}`, nil
+		return "", nil, err
 	}
 
 	policy, err = plc.GetPolicy(policyUid, origin)
 	if err != nil {
 		log.Printf("error retrieving policy %s from Firestore: %s", policyUid, err.Error())
-		return `{"success":false}`, `{"success":false}`, nil
+		return "", nil, err
 	}
 
 	if !lib.SliceContains(models.GetWaitForApprovalStatusList(), policy.Status) {
 		log.Printf("policy Uid %s: wrong status %s", policy.Uid, policy.Status)
-		return `{"success":false}`, `{"success":false}`, nil
+		return "", nil, fmt.Errorf("policy uid '%s': wrong status '%s'", policy.Uid, policy.Status)
 	}
 
 	switch payload.Action {
@@ -81,7 +82,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		approvePolicy(&policy, lib.ToUpper(payload.Reasons))
 	default:
 		log.Printf("Unhandled action %s", payload.Action)
-		return `{"success":false}`, `{"success":false}`, nil
+		return "", nil, fmt.Errorf("unhandled action %s", payload.Action)
 	}
 
 	policy.Updated = time.Now().UTC()
@@ -90,7 +91,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	err = lib.SetFirestoreErr(firePolicy, policy.Uid, &policy)
 	if err != nil {
 		log.Printf("error saving policy to firestore: %s", err.Error())
-		return `{"success":false}`, `{"success":false}`, nil
+		return "", nil, err
 	}
 	log.Println("firestore saved!")
 
@@ -137,7 +138,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 
 	log.Println("Handler end ----------------------------------")
 
-	return `{"success":true}`, `{"success":true}`, nil
+	return "{}", nil, nil
 }
 
 func rejectPolicy(policy *models.Policy, reasons string) {
