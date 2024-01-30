@@ -1,9 +1,13 @@
 package _script
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
 	"strings"
+	"time"
 
+	"github.com/mohae/deepcopy"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
@@ -120,4 +124,118 @@ func UpdateAreaManagerName() {
 
 	fmt.Printf("[UpdateAreaManagerName] modified network %d transactions %s\n", len(modifiedCounter), modifiedCounter)
 	fmt.Println("[UpdateAreaManagerName] script done")
+}
+
+type OutputNT struct {
+	Input  models.NetworkTransaction `json:"input"`
+	Output models.NetworkTransaction `json:"output"`
+}
+
+type OutputComplete struct {
+	Modified    []map[string]OutputNT `json:"modified"`
+	NotModified []string              `json:"notModified"`
+}
+
+/*
+Script used to update network transactions that were created with wrong data,
+caused by the manual payment. They we put in remittanceMga when should be
+commissions. The wrong fields were: paymentType, accountType, amount and
+amountNet.
+*/
+func UpdateManualPaymentNetworkTransactions(policyUids ...string) {
+	output := OutputComplete{
+		Modified:    make([]map[string]OutputNT, 0),
+		NotModified: make([]string, 0),
+	}
+
+	for _, policyUid := range policyUids {
+		fmt.Printf("[UpdateManualPaymentNetworkTransactions] quering %s", policyUid)
+		// get nettransaction by id
+		query := fmt.Sprintf(
+			"SELECT * FROM `%s.%s` WHERE policyUid = '%s' AND paymentType = '%s'",
+			models.WoptaDataset,
+			models.NetworkTransactionCollection,
+			policyUid,
+			models.PaymentTypeRemittanceMga,
+		)
+		netTransactions, err := lib.QueryRowsBigQuery[models.NetworkTransaction](query)
+		if err != nil {
+			fmt.Printf("[UpdateManualPaymentNetworkTransactions] error getting network transactions: %s", err.Error())
+			return
+		}
+		if len(netTransactions) != 1 {
+			fmt.Printf("[UpdateManualPaymentNetworkTransactions] expected 1 networkTransaction, got %d\n", len(netTransactions))
+			output.NotModified = append(output.NotModified, policyUid)
+			continue
+		}
+		fmt.Printf("[UpdateManualPaymentNetworkTransactions] found %d netTransactions\n", len(netTransactions))
+
+		originalNetTransaction := netTransactions[0]
+		modifiedNetTransaction := deepcopy.Copy(originalNetTransaction).(models.NetworkTransaction)
+
+		policy := plc.GetPolicyByUid(originalNetTransaction.PolicyUid, "")
+		networkNode := network.GetNetworkNodeByUid(policy.ProducerUid)
+		if networkNode == nil {
+			fmt.Println("[UpdateManualPaymentNetworkTransactions] error getting network node")
+			return
+		}
+		warrant := networkNode.GetWarrant()
+		if warrant == nil {
+			fmt.Println("[UpdateManualPaymentNetworkTransactions] error getting warrant")
+			return
+		}
+		prod := warrant.GetProduct(policy.Name)
+		isActive := policy.ProducerUid == originalNetTransaction.NetworkNodeUid
+
+		// update data
+		commission := product.GetCommissionByProduct(&policy, prod, isActive)
+
+		modifiedNetTransaction.PaymentType = models.PaymentTypeCommission
+		modifiedNetTransaction.AccountType = models.AccountTypePassive
+		modifiedNetTransaction.Amount = lib.RoundFloat(commission, 2)
+		modifiedNetTransaction.AmountNet = lib.RoundFloat(commission, 2)
+
+		output.Modified = append(output.Modified, map[string]OutputNT{
+			originalNetTransaction.Uid: {
+				Input:  originalNetTransaction,
+				Output: modifiedNetTransaction,
+			},
+		})
+
+		// save to bigquery
+		err = saveBigQuery(modifiedNetTransaction)
+		if err != nil {
+			fmt.Printf("[UpdateManualPaymentNetworkTransactions] error saving to db: %s", err.Error())
+			return
+		}
+		fmt.Println("[UpdateManualPaymentNetworkTransactions] NetworkTransaction saved!")
+	}
+
+	outputJson, err := json.Marshal(output)
+	if err != nil {
+		fmt.Printf("[UpdateManualPaymentNetworkTransactions] error marshaling output: %s", err.Error())
+	}
+
+	now := time.Now().UTC().Format(time.RFC3339)
+
+	err = os.WriteFile(fmt.Sprintf("./%s_update_nt_manual_payment.json", now), outputJson, 0777)
+	if err != nil {
+		fmt.Printf("[UpdateManualPaymentNetworkTransactions] error writing output: %s", err.Error())
+	}
+}
+
+func saveBigQuery(nt models.NetworkTransaction) error {
+	updatedFields := make(map[string]interface{})
+
+	updatedFields["paymentType"] = nt.PaymentType
+	updatedFields["accountType"] = nt.AccountType
+	updatedFields["amount"] = nt.Amount
+	updatedFields["amountNet"] = nt.AmountNet
+
+	return lib.UpdateRowBigQueryV2(
+		models.WoptaDataset,
+		models.NetworkTransactionCollection,
+		updatedFields,
+		fmt.Sprintf("WHERE uid = '%s'", nt.Uid),
+	)
 }
