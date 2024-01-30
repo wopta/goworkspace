@@ -2,12 +2,14 @@ package user
 
 import (
 	"encoding/json"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"strings"
+
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 )
 
 type updateUserReq struct {
@@ -41,8 +43,9 @@ func UpdateUserRoleFx(w http.ResponseWriter, r *http.Request) (string, interface
 		}
 	}
 	if userRole == "" {
-		log.Printf("UpdateUserRole: %s invalid user role", request.Role)
-		return `{"success":false}`, `{"success":false}`, nil
+		err := fmt.Errorf("UpdateUserRole: %s invalid user role", request.Role)
+		log.Println(err.Error())
+		return "", nil, err
 	}
 
 	log.Println("UpdateUserRole: get user from firestore")
@@ -62,10 +65,10 @@ func UpdateUserRoleFx(w http.ResponseWriter, r *http.Request) (string, interface
 	err = lib.SetFirestoreErr(fireUser, userUid, user)
 	if err != nil {
 		log.Printf("UpdateUserRole: error save user %s firestore: %s", user.Role, err.Error())
-		return `{"success":false}`, `{"success":false}`, nil
+		return "", nil, err
 	}
 
 	err = user.BigquerySave(origin)
 
-	return `{"success":true}`, `{"success":true}`, err
+	return "{}", nil, err
 }
