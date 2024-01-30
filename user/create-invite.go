@@ -28,6 +28,14 @@ type CreateInviteRequest struct {
 	Products        []models.Product `json:"products,omitempty"`
 }
 
+func (c *CreateInviteRequest) Normalize() {
+	c.FiscalCode = lib.ToUpper(c.FiscalCode)
+	c.VatCode = lib.TrimSpace(c.VatCode)
+	c.Name = lib.ToUpper(c.Name)
+	c.Surname = lib.ToUpper(c.Surname)
+	c.Email = lib.ToUpper(c.Email)
+}
+
 type UserInvite struct {
 	FiscalCode      string           `json:"fiscalCode,omitempty" firestore:"fiscalCode,omitempty"`
 	VatCode         string           `json:"vatCode,omitempty" firestore:"vatCode,omitempty"`
@@ -49,23 +57,33 @@ type UserInvite struct {
 func CreateInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var createInviteRequest CreateInviteRequest
 
+	log.SetPrefix("[CreateInviteFx]")
+	defer log.SetPrefix("")
+
+	log.Println("Handler start -----------------------------------------------")
+
 	reqBytes := lib.ErrorByte(io.ReadAll(r.Body))
 	err := json.Unmarshal(reqBytes, &createInviteRequest)
 	lib.CheckError(err)
 
+	createInviteRequest.Normalize()
+
 	creatorUid, err := lib.GetUserIdFromIdToken(r.Header.Get("Authorization"))
 	if err != nil {
-		log.Println("[CreateInvite] Invalid auth token")
+		log.Println("Invalid auth token")
 		return `{"success": false}`, `{"success": false}`, nil
 	}
 
 	inviteUid, err := CreateInvite(createInviteRequest, r.Header.Get("Origin"), creatorUid)
 	if err != nil {
-		log.Printf("[CreateInvite]: %s", err.Error())
+		log.Printf("error: %s", err.Error())
 		return `{"success": false}`, `{"success": false}`, err
 	}
 
 	mail.SendInviteMail(inviteUid, createInviteRequest.Email, false)
+
+	log.Println("Handler end -------------------------------------------------")
+
 	return `{"success": true}`, `{"success": true}`, nil
 }
 

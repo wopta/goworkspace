@@ -20,20 +20,23 @@ func LeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		policy models.Policy
 	)
 
-	log.Println("[LeadFx] Handler start --------------------------------------")
+	log.SetPrefix("[LeadFx]")
+	defer log.SetPrefix("")
+
+	log.Println("Handler start --------------------------------------")
 
 	w.Header().Add("content-type", "application/json")
 
-	log.Println("[LeadFx] loading authToken from idToken...")
+	log.Println("loading authToken from idToken...")
 
 	token := r.Header.Get("Authorization")
 	authToken, err := models.GetAuthTokenFromIdToken(token)
 	if err != nil {
-		log.Printf("[LeadFx] error getting authToken")
+		log.Printf("error getting authToken")
 		return "", nil, err
 	}
 	log.Printf(
-		"[LeadFx] authToken - type: '%s' role: '%s' uid: '%s' email: '%s'",
+		"authToken - type: '%s' role: '%s' uid: '%s' email: '%s'",
 		authToken.Type,
 		authToken.Role,
 		authToken.UserID,
@@ -44,27 +47,29 @@ func LeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 
-	log.Printf("[LeadFx] request: %s", string(body))
+	log.Printf("request: %s", string(body))
 	err = json.Unmarshal([]byte(body), &policy)
 	if err != nil {
-		log.Printf("[LeadFx] error unmarshaling policy: %s", err.Error())
+		log.Printf("error unmarshaling policy: %s", err.Error())
 		return "", nil, err
 	}
 
+	policy.Normalize()
+
 	err = lead(authToken, &policy)
 	if err != nil {
-		log.Printf("[LeadFx] error creating lead: %s", err.Error())
+		log.Printf("error creating lead: %s", err.Error())
 		return "", nil, err
 	}
 
 	resp, err := policy.Marshal()
 	if err != nil {
-		log.Printf("[LeadFx] error marshaling response: %s", err.Error())
+		log.Printf("error marshaling response: %s", err.Error())
 		return "", nil, err
 	}
 
-	log.Printf("[LeadFx] response: %s", string(resp))
-	log.Println("[LeadFx] Handler end ----------------------------------------")
+	log.Printf("response: %s", string(resp))
+	log.Println("Handler end ----------------------------------------")
 
 	return string(resp), &policy, err
 }

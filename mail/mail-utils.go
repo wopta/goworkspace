@@ -48,12 +48,14 @@ func setContractorBodyData(policy models.Policy, bodyData *BodyData) {
 	bodyData.ContractorFiscalCode = policy.Contractor.FiscalCode
 }
 
+// DEPRECATED
 func setAgentBodyData(agent models.Agent, bodyData *BodyData) {
 	bodyData.AgentName = agent.Name
 	bodyData.AgentSurname = agent.Surname
 	bodyData.AgentMail = agent.Mail
 }
 
+// DEPRECATED
 func setAgencyBodyData(agency models.Agency, bodyData *BodyData) {
 	bodyData.AgencyName = agency.Name
 	bodyData.AgencyMail = agency.Email

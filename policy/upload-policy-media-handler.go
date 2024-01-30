@@ -32,6 +32,7 @@ func UploadPolicyMediaFx(w http.ResponseWriter, r *http.Request) (string, interf
 	)
 
 	log.SetPrefix("[UploadPolicyMediaFx]")
+	defer log.SetPrefix("")
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -85,7 +86,6 @@ func UploadPolicyMediaFx(w http.ResponseWriter, r *http.Request) (string, interf
 	err = putAttachment(policy, req)
 
 	log.Println("Handler end -------------------------------------------------")
-	log.SetPrefix("")
 
 	return "", nil, err
 }
