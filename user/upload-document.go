@@ -23,6 +23,9 @@ func UploadDocumentFx(w http.ResponseWriter, r *http.Request) (string, interface
 	policyUID := r.Header.Get("policyUid")
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
+	defer r.Body.Close()
+	log.Printf("request: %s", string(body))
+
 	err := json.Unmarshal(body, &identityDocument)
 	if err != nil {
 		return "", nil, err
