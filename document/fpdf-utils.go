@@ -473,7 +473,7 @@ func indentedText(pdf *fpdf.Fpdf, content string) {
 func drawDynamicCell(pdf *fpdf.Fpdf, fontSize, cellHeight, cellWidth, rowLines, nextX float64, cellText,
 	innerCellBorder, outerCellBorder,
 	align string, rightMost bool) {
-	cellSplittedText := pdf.SplitText(cellText, cellWidth)
+	cellSplittedText := pdf.SplitText(cellText, cellWidth-1)
 	cellNumLines := float64(len(cellSplittedText))
 
 	setXY := func() {}
