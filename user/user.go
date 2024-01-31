@@ -23,6 +23,7 @@ func init() {
 }
 
 func User(w http.ResponseWriter, r *http.Request) {
+	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
 	log.Println("User")
 	lib.EnableCors(&w, r)

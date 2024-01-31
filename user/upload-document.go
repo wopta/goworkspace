@@ -18,9 +18,12 @@ import (
 func UploadDocumentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var identityDocument models.IdentityDocument
 
-	log.Println("Upload User IdentityDocument")
+	log.SetPrefix("[UploadDocumentFx] ")
+	defer log.SetPrefix("")
 
 	policyUID := r.Header.Get("policyUid")
+
+	log.Printf("upload user identityDocument for policy '%s'", policyUID)
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
@@ -47,6 +50,7 @@ func UploadDocumentFx(w http.ResponseWriter, r *http.Request) (string, interface
 
 func saveDocument(policyUID string, identityDocument *models.IdentityDocument) {
 	saveToStorage := func(policyUID string, documentSide, documentType string, media *models.Media) error {
+		log.Printf("saving document to storage - side '%s'", documentSide)
 		now := time.Now()
 		timestamp := strconv.FormatInt(now.Unix(), 10)
 
@@ -65,6 +69,9 @@ func saveDocument(policyUID string, identityDocument *models.IdentityDocument) {
 		gsLink, err := lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "temp/"+policyUID+"/"+
 			media.FileName, bytes)
 		media.Link = gsLink
+
+		log.Printf("document saved at '%s'", gsLink)
+
 		return err
 	}
 
