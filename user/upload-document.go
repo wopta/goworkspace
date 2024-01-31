@@ -68,10 +68,12 @@ func saveDocument(policyUID string, identityDocument *models.IdentityDocument) {
 	documentType, err := getDocumentType(identityDocument)
 	lib.CheckError(err)
 
-	err = saveToStorage(policyUID, "front", documentType, identityDocument.FrontMedia)
-	lib.CheckError(err)
+	if identityDocument.FrontMedia != nil && identityDocument.FrontMedia.Base64Bytes != "" {
+		err = saveToStorage(policyUID, "front", documentType, identityDocument.FrontMedia)
+		lib.CheckError(err)
+	}
 
-	if identityDocument.BackMedia != nil {
+	if identityDocument.BackMedia != nil && identityDocument.BackMedia.Base64Bytes != "" {
 		err = saveToStorage(policyUID, "back", documentType, identityDocument.BackMedia)
 		lib.CheckError(err)
 	}
