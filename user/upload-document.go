@@ -18,11 +18,17 @@ import (
 func UploadDocumentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var identityDocument models.IdentityDocument
 
-	log.Println("Upload User IdentityDocument")
+	log.SetPrefix("[UploadDocumentFx] ")
+	defer log.SetPrefix("")
 
 	policyUID := r.Header.Get("policyUid")
 
+	log.Printf("upload user identityDocument for policy '%s'", policyUID)
+
 	body := lib.ErrorByte(io.ReadAll(r.Body))
+	defer r.Body.Close()
+	log.Printf("request: %s", string(body))
+
 	err := json.Unmarshal(body, &identityDocument)
 	if err != nil {
 		return "", nil, err
@@ -44,6 +50,7 @@ func UploadDocumentFx(w http.ResponseWriter, r *http.Request) (string, interface
 
 func saveDocument(policyUID string, identityDocument *models.IdentityDocument) {
 	saveToStorage := func(policyUID string, documentSide, documentType string, media *models.Media) error {
+		log.Printf("saving document to storage - side '%s'", documentSide)
 		now := time.Now()
 		timestamp := strconv.FormatInt(now.Unix(), 10)
 
@@ -62,16 +69,21 @@ func saveDocument(policyUID string, identityDocument *models.IdentityDocument) {
 		gsLink, err := lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "temp/"+policyUID+"/"+
 			media.FileName, bytes)
 		media.Link = gsLink
+
+		log.Printf("document saved at '%s'", gsLink)
+
 		return err
 	}
 
 	documentType, err := getDocumentType(identityDocument)
 	lib.CheckError(err)
 
-	err = saveToStorage(policyUID, "front", documentType, identityDocument.FrontMedia)
-	lib.CheckError(err)
+	if identityDocument.FrontMedia != nil && identityDocument.FrontMedia.Base64Bytes != "" {
+		err = saveToStorage(policyUID, "front", documentType, identityDocument.FrontMedia)
+		lib.CheckError(err)
+	}
 
-	if identityDocument.BackMedia != nil {
+	if identityDocument.BackMedia != nil && identityDocument.BackMedia.Base64Bytes != "" {
 		err = saveToStorage(policyUID, "back", documentType, identityDocument.BackMedia)
 		lib.CheckError(err)
 	}
