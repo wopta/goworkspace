@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/wopta/goworkspace/models"
 	tr "github.com/wopta/goworkspace/transaction"
 )
 
@@ -30,16 +29,17 @@ func DeleteTransactionFx(w http.ResponseWriter, r *http.Request) (string, interf
 	bytes, _ := json.Marshal(transaction)
 	log.Printf("found transaction: %s", string(bytes))
 
-	switch transaction.ProviderName {
-	case models.FabrickPaymentProvider:
-		err = fabrickExpireBill(transaction.ProviderId)
-	default:
-		err = fmt.Errorf("payment provider not implemented: %s", transaction.ProviderName)
-	}
-	if err != nil {
-		log.Printf(">>>>>> error deleting transaction on provider: %s", err.Error())
-	}
-
+	/*
+		switch transaction.ProviderName {
+		case models.FabrickPaymentProvider:
+			err = fabrickExpireBill(transaction.ProviderId)
+		default:
+			err = fmt.Errorf("payment provider not implemented: %s", transaction.ProviderName)
+		}
+		if err != nil {
+			log.Printf(">>>>>> error deleting transaction on provider: %s", err.Error())
+		}
+	*/
 	log.Printf("deleting transaction on DBs...")
 	if err = tr.DeleteTransaction(transaction, origin, "Cancellata manualmente"); err != nil {
 		log.Printf("error deleting transaction on DBs: %s", err.Error())
