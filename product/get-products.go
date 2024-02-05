@@ -2,6 +2,7 @@ package product
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"sort"
 	"strings"
@@ -11,7 +12,8 @@ import (
 )
 
 const (
-	productFolderPath = "products-v2"
+	productFolderPath          = "products-v2"
+	externalProductsFolderPath = "external-products"
 )
 
 func GetProductsByChannel(channel string) []models.ProductInfo {
@@ -50,6 +52,14 @@ func GetNetworkNodeProducts(productList []string) []models.ProductInfo {
 	})
 
 	products = getProductsFromFileList(fileList)
+
+	if lib.SliceContains(productList, models.WiseExternalProducts) {
+		log.Println("[GetNetworkNodeProducts] appeding wise products...")
+		if wiseProduct := getExternalProduct(models.WiseExternalProducts); wiseProduct != nil {
+			products = append(products, *wiseProduct)
+			log.Println("[GetNetworkNodeProducts] wise products appended")
+		}
+	}
 
 	log.Printf("[GetNetworkNodeProducts] found %d products", len(products))
 	log.Println("[GetNetworkNodeProducts] function end -----------------------")
@@ -141,4 +151,17 @@ func getProductsFileList() []string {
 	}
 
 	return fileList
+}
+
+func getExternalProduct(prod string) *models.ProductInfo {
+	var wiseProduct models.ProductInfo
+	productBytes := lib.GetFilesByEnv(fmt.Sprintf("%s/%s.json", externalProductsFolderPath, prod))
+
+	err := json.Unmarshal(productBytes, &wiseProduct)
+	if err != nil {
+		log.Printf("[getExternalProduct] error unmarshaling productInfo: %s", err.Error())
+		return nil
+	}
+
+	return &wiseProduct
 }
