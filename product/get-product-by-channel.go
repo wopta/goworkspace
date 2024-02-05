@@ -215,6 +215,7 @@ func replaceDatesInProduct(product *models.Product, channel string) error {
 
 	switch product.Name {
 	case models.LifeProduct:
+	case models.PersonaProduct:
 		err = replaceLifeDates(product, channel)
 	case models.GapProduct:
 		err = replaceGapDates(product, channel)
