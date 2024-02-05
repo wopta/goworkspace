@@ -12,7 +12,7 @@ require (
 	github.com/ttacon/libphonenumber v1.2.1
 	github.com/wopta/goworkspace/lib v1.0.98
 	github.com/wopta/goworkspace/models v1.1.82
-	github.com/wopta/goworkspace/product v1.0.80
+	github.com/wopta/goworkspace/product v1.0.81
 )
 
 require (
