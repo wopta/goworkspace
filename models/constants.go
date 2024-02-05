@@ -120,6 +120,10 @@ const (
 )
 
 const (
+	WiseExternalProducts string = "__wise__"
+)
+
+const (
 	ECommerceChannel string = "e-commerce"
 	AgentChannel     string = "agent"  //DEPRECATED: remove this constant once product versioning is completed
 	AgencyChannel    string = "agency" //DEPRECATED: remove this constant once product versioning is completed
@@ -207,8 +211,8 @@ const (
 	TitolareEffettivo = "titolareEffettivo"
 )
 
-const(
-  DocumentSectionContracts        = "contract"
+const (
+	DocumentSectionContracts        = "contract"
 	DocumentSectionIdentityDocument = "identity-document"
 	DocumentSectionReserved         = "reserved"
 	DocumentSectionOther            = "other"
