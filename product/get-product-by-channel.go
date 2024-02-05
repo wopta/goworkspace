@@ -214,8 +214,7 @@ func replaceDatesInProduct(product *models.Product, channel string) error {
 	log.Println("[replaceDatesInProduct] function start ----------------------")
 
 	switch product.Name {
-	case models.LifeProduct:
-	case models.PersonaProduct:
+	case models.LifeProduct, models.PersonaProduct:
 		err = replaceLifeDates(product, channel)
 	case models.GapProduct:
 		err = replaceGapDates(product, channel)
