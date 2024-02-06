@@ -14,9 +14,14 @@ func ExcelFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 	return "", nil, nil
 }
 
+type InputCell struct {
+	cell  string
+	value interface{}
+}
+
 type QuoteExcel struct {
-	SheetName  string
-	InputCells int
+	SheetName, filename string
+	InputCells          []InputCell
 }
 
 func Excel() {
@@ -38,6 +43,7 @@ func Excel() {
 	cell, err := f.GetCellValue("Tabelle1", "E1")
 	fmt.Println(cell)
 	err = f.UpdateLinkedValue()
+	fmt.Println(err)
 	cell, err = f.GetCellValue("Tabelle1", "E1")
 	fmt.Println(cell)
 	f.Save()
