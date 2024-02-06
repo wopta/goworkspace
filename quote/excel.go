@@ -15,7 +15,7 @@ func ExcelFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 }
 
 type QuoteExcel struct {
-	SheetName string
+	SheetName  string
 	InputCells int
 }
 
@@ -35,7 +35,9 @@ func Excel() {
 	}()
 	f.SetCellValue("Tabelle1", "A1", 100)
 	// Get value from cell by given worksheet name and cell reference.
+	f.UpdateLinkedValue()
 	cell, err := f.GetCellValue("Tabelle1", "E1")
+
 	if err != nil {
 		fmt.Println(err)
 		return
