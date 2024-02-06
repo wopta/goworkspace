@@ -40,6 +40,8 @@ func Excel() {
 	err = f.UpdateLinkedValue()
 	cell, err = f.GetCellValue("Tabelle1", "E1")
 	fmt.Println(cell)
+	f.Save()
+	fmt.Println(cell)
 	if err != nil {
 		fmt.Println(err)
 		return
