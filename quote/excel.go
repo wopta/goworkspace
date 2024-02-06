@@ -35,7 +35,8 @@ func Excel() {
 	}()
 	f.SetCellValue("Tabelle1", "A1", 100)
 	// Get value from cell by given worksheet name and cell reference.
-	f.UpdateLinkedValue()
+
+	err = f.UpdateLinkedValue()
 	cell, err := f.GetCellValue("Tabelle1", "E1")
 
 	if err != nil {
