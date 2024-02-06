@@ -26,7 +26,7 @@ type QuoteExcel struct {
 
 func Excel() {
 	filePath := "quote/excel/testFx.xlsx"
-	filePathOut := "temp/temp.xlsx"
+	filePathOut := "../tmp/temp.xlsx"
 	excelBytes := lib.GetFilesByEnv(filePath)
 	xlsx, err := excelize.OpenReader(bytes.NewReader(excelBytes))
 	if err != nil {
