@@ -43,14 +43,17 @@ func Excel() {
 	xlsx.SetCellValue("Tabelle1", "A1", 100)
 	// Get value from cell by given worksheet name and cell reference.
 	cell, err := xlsx.GetCellValue("Tabelle1", "E1")
-	fmt.Println("excel get value. ", cell)
+	cell1, err := xlsx.GetCellValue("Tabelle1", "A1")
+	fmt.Println("excel get value E1: ", cell)
+	fmt.Println("excel get value A1: ", cell1)
 	err = xlsx.UpdateLinkedValue()
 
 	err = xlsx.SaveAs(filePathOut)
+	xlsx.Close()
 	fmt.Println(err)
 	fmt.Println("excel get value: ", cell)
 	xlsxOut, err := excelize.OpenFile(filePathOut)
-
+	fmt.Println(err)
 	cell, err = xlsxOut.GetCellValue("Tabelle1", "E1")
 	fmt.Println(err)
 	fmt.Println("excel get value out: ", cell)
