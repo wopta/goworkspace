@@ -26,28 +26,33 @@ type QuoteExcel struct {
 
 func Excel() {
 	filePath := "quote/excel/testFx.xlsx"
+	filePathOut := "temp/temp.xlsx"
 	excelBytes := lib.GetFilesByEnv(filePath)
-	f, err := excelize.OpenReader(bytes.NewReader(excelBytes))
+	xlsx, err := excelize.OpenReader(bytes.NewReader(excelBytes))
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 	defer func() {
 		// Close the spreadsheet.
-		if err := f.Close(); err != nil {
+		if err := xlsx.Close(); err != nil {
 			fmt.Println(err)
 		}
 	}()
-	f.SetCellValue("Tabelle1", "A1", 100)
+	xlsx.SetCellValue("Tabelle1", "A1", 100)
 	// Get value from cell by given worksheet name and cell reference.
-	cell, err := f.GetCellValue("Tabelle1", "E1")
+	cell, err := xlsx.GetCellValue("Tabelle1", "E1")
 	fmt.Println(cell)
-	err = f.UpdateLinkedValue()
+	err = xlsx.UpdateLinkedValue()
+
+	xlsx.SaveAs(filePathOut)
+	xlsxOut, err := excelize.OpenFile(filePathOut)
+
+	cell, err = xlsxOut.GetCellValue("Tabelle1", "E1")
 	fmt.Println(err)
-	cell, err = f.GetCellValue("Tabelle1", "E1")
+	cell, err = xlsx.GetCellValue("Tabelle1", "E1")
 	fmt.Println(cell)
-	f.Save()
-	fmt.Println(cell)
+
 	if err != nil {
 		fmt.Println(err)
 		return
