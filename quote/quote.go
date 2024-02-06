@@ -60,7 +60,7 @@ func Quote(w http.ResponseWriter, r *http.Request) {
 				Route:   "/v1/excel",
 				Handler: ExcelFx,
 				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAll},
+				Roles:   []string{},
 			},
 		},
 	}

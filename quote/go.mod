@@ -13,6 +13,7 @@ require (
 	github.com/wopta/goworkspace/models v1.1.82
 	github.com/wopta/goworkspace/network v1.0.34
 	github.com/wopta/goworkspace/sellable v1.0.61
+	github.com/xuri/excelize/v2 v2.7.0
 	modernc.org/mathutil v1.5.0
 )
 
@@ -70,7 +71,6 @@ require (
 	github.com/wopta/goworkspace/product v1.0.82 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
-	github.com/xuri/excelize/v2 v2.7.0 // indirect
 	github.com/xuri/nfp v0.0.0-20220409054826-5e722a1d9e22 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
 	go.opencensus.io v0.24.0 // indirect
@@ -94,6 +94,7 @@ require (
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1 // indirect
 	google.golang.org/grpc v1.55.0 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
+	gopkg.in/square/go-jose.v2 v2.6.0 // indirect
 	gopkg.in/src-d/go-billy.v4 v4.3.2 // indirect
 	gopkg.in/src-d/go-git.v4 v4.13.1 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
