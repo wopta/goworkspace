@@ -25,6 +25,7 @@ type QuoteExcel struct {
 }
 
 func Excel() {
+	fmt.Println("-------Excel---------")
 	filePath := "quote/excel/testFx.xlsx"
 	filePathOut := "../tmp/temp.xlsx"
 	excelBytes := lib.GetFilesByEnv(filePath)
@@ -42,16 +43,17 @@ func Excel() {
 	xlsx.SetCellValue("Tabelle1", "A1", 100)
 	// Get value from cell by given worksheet name and cell reference.
 	cell, err := xlsx.GetCellValue("Tabelle1", "E1")
-	fmt.Println(cell)
+	fmt.Println("excel get value. ", cell)
 	err = xlsx.UpdateLinkedValue()
 
-	xlsx.SaveAs(filePathOut)
+	err = xlsx.SaveAs(filePathOut)
+	fmt.Println(err)
+	fmt.Println("excel get value: ", cell)
 	xlsxOut, err := excelize.OpenFile(filePathOut)
 
 	cell, err = xlsxOut.GetCellValue("Tabelle1", "E1")
 	fmt.Println(err)
-	cell, err = xlsx.GetCellValue("Tabelle1", "E1")
-	fmt.Println(cell)
+	fmt.Println("excel get value out: ", cell)
 
 	if err != nil {
 		fmt.Println(err)
