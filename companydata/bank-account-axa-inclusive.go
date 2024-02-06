@@ -92,7 +92,7 @@ func setInclusiveRow(mov inclusive.BankAccountMovement, codes map[string]map[str
 	birthDate, _ := time.Parse("2006-01-02T15:04:05Z07:00", user.BirthDate)
 	startDate, _ := time.Parse("2006-01-02", mov.BigStartDate.Date.String())
 	row := []string{
-		"180623",                 // NUMERO POLIZZA
+		mov.PolicyNumber,         // NUMERO POLIZZA
 		"T",                      //    LOB
 		"C",                      //    TIPOLOGIA POLIZZA
 		"0548100",                //    CODICE CONFIGURAZIONE

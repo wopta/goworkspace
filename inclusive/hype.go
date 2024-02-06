@@ -170,16 +170,29 @@ func CheckData(r *http.Request) (BankAccountMovement, error) {
 	return obj, nil
 }
 func SetData(obj BankAccountMovement) BankAccountMovement {
+
 	obj.BigStartDate = civil.DateTimeOf(obj.StartDate)
 	obj.BigEndDate = civil.DateTimeOf(obj.EndDate)
-	obj.PolicyNumber = "180623"
-	obj.Uid = uuid.New().String()
-	obj.Customer = "hype"
-	obj.Company = "axa"
-	obj.PolicyType = ""
-	obj.PolicyUid = ""
-	obj.AssetType = ""
-	obj.PolicyName = "Hype Next"
+	if obj.GuaranteesCode == "next" {
+		obj.PolicyNumber = "180623"
+		obj.Uid = uuid.New().String()
+		obj.Customer = "hype"
+		obj.Company = "axa"
+		obj.PolicyType = ""
+		obj.PolicyUid = ""
+		obj.AssetType = ""
+		obj.PolicyName = "Hype Next"
+	}
+	if obj.GuaranteesCode == "premium" {
+		obj.PolicyNumber = "191123"
+		obj.Uid = uuid.New().String()
+		obj.Customer = "hype"
+		obj.Company = "axa"
+		obj.PolicyType = ""
+		obj.PolicyUid = ""
+		obj.AssetType = ""
+		obj.PolicyName = "Hype Premium"
+	}
 	obj.CustomerId = obj.HypeId
 	if obj.MovementType == "insert" {
 
