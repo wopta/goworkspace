@@ -25,6 +25,7 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		err           error
 		req           ImportNodesReq
 		startPipeline = false
+		warrants      []models.Warrant
 		dbNodes       []models.NetworkNode
 	)
 
@@ -63,6 +64,15 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	}
 	log.Printf("Network nodes fetched from Firestore, #node: %02d", len(dbNodes))
 
+	//load all warrant from Google Bucket
+	log.Printf("Loading all warrants from Google Bucket...")
+	warrants, err = getWarrants()
+	if err != nil {
+		log.Printf("Error loading warrants from Google Bucket: %s", err.Error())
+		return "", nil, err
+	}
+	log.Printf("Warrants loaded from Google Bucket, #warrants: %02d", len(warrants))
+
 	// load dataframe
 	df := lib.CsvToDataframe(data)
 	log.Printf("#rows: %02d #cols: %02d", df.Nrow(), df.Ncol())
@@ -96,4 +106,25 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	log.Println("Handler End -------------------------------------------------")
 
 	return "", nil, nil
+}
+
+func getWarrants() ([]models.Warrant, error) {
+	var (
+		err      error
+		warrants []models.Warrant
+	)
+
+	warrantsBytes := lib.GetFolderContentByEnv(models.WarrantsFolder)
+
+	for _, warrantBytes := range warrantsBytes {
+		var warrant models.Warrant
+		err = json.Unmarshal(warrantBytes, &warrant)
+		if err != nil {
+			log.Printf("[GetWarrants] error unmarshaling warrant: %s", err.Error())
+			return warrants, err
+		}
+
+		warrants = append(warrants, warrant)
+	}
+	return warrants, nil
 }
