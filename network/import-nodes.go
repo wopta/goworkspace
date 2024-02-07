@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 	"io"
 	"log"
 	"net/http"
@@ -24,6 +25,7 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		err           error
 		req           ImportNodesReq
 		startPipeline = false
+		dbNodes       []models.NetworkNode
 	)
 
 	log.SetPrefix("ImportNodesFx ")
@@ -52,19 +54,33 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		return "", nil, err
 	}
 
+	// load all nodes from Firestore
+	log.Printf("Fetching all network nodes from Firestore...")
+	dbNodes, err = GetAllNetworkNodes()
+	if err != nil {
+		log.Printf("Error fetching all network nodes from Firestore: %s", err.Error())
+		return "", nil, err
+	}
+	log.Printf("Network nodes fetched from Firestore, #node: %02d", len(dbNodes))
+
 	// load dataframe
 	df := lib.CsvToDataframe(data)
-	log.Printf("#row: %02d #col: %02d", df.Nrow(), df.Ncol())
-	for k, v := range df.Records() {
-		log.Printf("k: %d", k)
-		log.Printf("v: %s", v)
+	log.Printf("#rows: %02d #cols: %02d", df.Nrow(), df.Ncol())
+	for _, row := range df.Records()[1:] {
+		if row[2] == models.AgencyNetworkNodeType {
+			log.Printf(models.AgencyNetworkNodeType)
+		} else if row[2] == models.AgentNetworkNodeType {
+			log.Printf(models.AgentNetworkNodeType)
+		}
 	}
+
+	// load all nodes from Firestore
 
 	if req.StartPipeline != nil {
 		startPipeline = *req.StartPipeline
 	}
 
-	if !startPipeline {
+	if startPipeline {
 		log.Printf("Saving import file to Google Bucket...")
 		filePath := fmt.Sprintf("dataflow/in_network_node/%s", "prova.csv")
 		_, err = lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filePath, data)
