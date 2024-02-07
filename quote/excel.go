@@ -27,8 +27,10 @@ type QuoteExcel struct {
 
 func Excel() {
 	fmt.Println("-------Excel---------")
-	filePath := "quote/excel/testFx.xlsx"
+	filePath := "quote/excel/qbeRatingModel.xlsx"
 	filePathOut := "../tmp/temp.xlsx"
+	sheet := "Input dati Polizza"
+
 	excelBytes := lib.GetFilesByEnv(filePath)
 	xlsx, err := excelize.OpenReader(bytes.NewReader(excelBytes))
 	if err != nil {
@@ -36,25 +38,26 @@ func Excel() {
 		return
 	}
 	defer xlsx.Close()
-	xlsx.SetCellValue("Tabelle1", "A1", 100)
+	xlsx.SetCellValue(sheet, "C24", 20)
+
 	// Get value from cell by given worksheet name and cell reference.
-	cell, err := xlsx.GetCellValue("Tabelle1", "E1")
-	cell1, err := xlsx.GetCellValue("Tabelle1", "A1")
-	fmt.Println("excel get value E1: ", cell)
+
+	cell1, err := xlsx.GetCellValue(sheet, "C91")
+
 	fmt.Println("excel get value E1: ", cell1)
-	calc, err := xlsx.CalcCellValue("Tabelle1", "E1")
+
+	calc, err := xlsx.CalcCellValue(sheet, "C91")
 	fmt.Println("excel get calc value E1: ", calc)
-	cell, err = xlsx.GetCellValue("Tabelle1", "E1")
-	fmt.Println("excel get value E1: ", cell)
-	err = xlsx.UpdateLinkedValue()
-	<-SaveExcel(xlsx, filePathOut)
+
+	//err = xlsx.UpdateLinkedValue()
+	//<-SaveExcel(xlsx, filePathOut)
 	fmt.Println(err)
-	fmt.Println("excel get value: ", cell)
-	xlsxOut, err := excelize.OpenFile(filePathOut)
+
+	//xlsxOut, err := excelize.OpenFile(filePathOut)
 	fmt.Println(err)
-	cell, err = xlsxOut.GetCellValue("Tabelle1", "E1")
+
 	fmt.Println(err)
-	fmt.Println("excel get value out: ", cell)
+	//fmt.Println("excel get value out: ", cell)
 
 	if err != nil {
 		fmt.Println(err)
