@@ -27,6 +27,7 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		startPipeline = false
 		warrants      []models.Warrant
 		dbNodes       []models.NetworkNode
+		skippedRows   []int
 	)
 
 	log.SetPrefix("ImportNodesFx ")
@@ -76,18 +77,20 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	// load dataframe
 	df := lib.CsvToDataframe(data)
 	log.Printf("#rows: %02d #cols: %02d", df.Nrow(), df.Ncol())
-	for _, row := range df.Records()[1:] {
+	for rowIndex, row := range df.Records()[1:] {
 		if row[2] == models.AgencyNetworkNodeType {
 			log.Printf(models.AgencyNetworkNodeType)
 			err = validateRow(row, []int{1, 23, 24})
 			if err != nil {
 				log.Printf("Error validating agency: %s", err.Error())
+				skippedRows = append(skippedRows, rowIndex+1)
 			}
 		} else if row[2] == models.AgentNetworkNodeType {
 			log.Printf(models.AgentNetworkNodeType)
 			err = validateRow(row, []int{1, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 23, 24})
 			if err != nil {
 				log.Printf("Error validating agent: %s", err.Error())
+				skippedRows = append(skippedRows, rowIndex+1)
 			}
 		}
 	}
@@ -110,6 +113,8 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 
 		// TODO: start dataflow pipeline
 	}
+
+	log.Printf("Skipped Rows: %v", skippedRows)
 
 	log.Println("Handler End -------------------------------------------------")
 
