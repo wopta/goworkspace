@@ -41,9 +41,11 @@ func Excel() {
 	cell, err := xlsx.GetCellValue("Tabelle1", "E1")
 	cell1, err := xlsx.GetCellValue("Tabelle1", "A1")
 	fmt.Println("excel get value E1: ", cell)
-	fmt.Println("excel get value A1: ", cell1)
+	xlsx.CalcCellValue("Tabelle1", "A1")
+	fmt.Println("excel get value E1: ", cell1)
+	cell, err = xlsx.GetCellValue("Tabelle1", "E1")
+	fmt.Println("excel get value E1: ", cell)
 	err = xlsx.UpdateLinkedValue()
-
 	<-SaveExcel(xlsx, filePathOut)
 	fmt.Println(err)
 	fmt.Println("excel get value: ", cell)
