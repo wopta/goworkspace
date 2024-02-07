@@ -79,8 +79,16 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	for _, row := range df.Records()[1:] {
 		if row[2] == models.AgencyNetworkNodeType {
 			log.Printf(models.AgencyNetworkNodeType)
+			err = validateRow(row, []int{1, 23, 24})
+			if err != nil {
+				log.Printf("Error validating agency: %s", err.Error())
+			}
 		} else if row[2] == models.AgentNetworkNodeType {
 			log.Printf(models.AgentNetworkNodeType)
+			err = validateRow(row, []int{1, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 23, 24})
+			if err != nil {
+				log.Printf("Error validating agent: %s", err.Error())
+			}
 		}
 	}
 
@@ -127,4 +135,13 @@ func getWarrants() ([]models.Warrant, error) {
 		warrants = append(warrants, warrant)
 	}
 	return warrants, nil
+}
+
+func validateRow(row []string, optionalFields []int) error {
+	for rowIndex, rowValue := range row {
+		if (rowValue == "" || rowValue == "NaN") && !lib.SliceContains(optionalFields, rowIndex) {
+			return errors.New("missing required field")
+		}
+	}
+	return nil
 }
