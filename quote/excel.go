@@ -34,12 +34,7 @@ func Excel() {
 		fmt.Println(err)
 		return
 	}
-	defer func() {
-		// Close the spreadsheet.
-		if err := xlsx.Close(); err != nil {
-			fmt.Println(err)
-		}
-	}()
+	defer xlsx.Close()
 	xlsx.SetCellValue("Tabelle1", "A1", 100)
 	// Get value from cell by given worksheet name and cell reference.
 	cell, err := xlsx.GetCellValue("Tabelle1", "E1")
@@ -48,8 +43,7 @@ func Excel() {
 	fmt.Println("excel get value A1: ", cell1)
 	err = xlsx.UpdateLinkedValue()
 
-	err = xlsx.SaveAs(filePathOut)
-	xlsx.Close()
+	<-SaveExcel(xlsx, filePathOut)
 	fmt.Println(err)
 	fmt.Println("excel get value: ", cell)
 	xlsxOut, err := excelize.OpenFile(filePathOut)
@@ -65,4 +59,19 @@ func Excel() {
 	fmt.Println(cell)
 	// Get all the rows in the Sheet1.
 
+}
+func SaveExcel(xlsx *excelize.File, filePath string) <-chan []byte {
+	ch := make(chan []byte)
+	var err error
+
+	var resByte *bytes.Buffer
+	go func() {
+
+		//Save spreadsheet by the given path.
+		err = xlsx.SaveAs(filePath)
+		fmt.Println(err)
+		resByte, err = xlsx.WriteToBuffer()
+		ch <- resByte.Bytes()
+	}()
+	return ch
 }
