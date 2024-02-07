@@ -28,6 +28,7 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		warrants      []models.Warrant
 		dbNodes       []models.NetworkNode
 		skippedRows   []int
+		validatedRows [][]string
 	)
 
 	log.SetPrefix("ImportNodesFx ")
@@ -77,31 +78,48 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	// load dataframe
 	df := lib.CsvToDataframe(data)
 	log.Printf("#rows: %02d #cols: %02d", df.Nrow(), df.Ncol())
+
+	// TODO: load all nodes from Firestore
+
+	// TODO: build map[networkcode] = node
+
+	// validate csv rows
+
 	for rowIndex, row := range df.Records()[1:] {
+		// TODO: normalize cells content if err add to skipped rows
+
+		// check if all required fields have been compiled
+
+		optionalFields := []int{}
 		if row[2] == models.AgencyNetworkNodeType {
-			log.Printf(models.AgencyNetworkNodeType)
-			err = validateRow(row, []int{1, 23, 24})
-			if err != nil {
-				log.Printf("Error validating agency: %s", err.Error())
-				skippedRows = append(skippedRows, rowIndex+1)
-			}
+			optionalFields = []int{1, 23, 24}
 		} else if row[2] == models.AgentNetworkNodeType {
-			log.Printf(models.AgentNetworkNodeType)
-			err = validateRow(row, []int{1, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 23, 24})
-			if err != nil {
-				log.Printf("Error validating agent: %s", err.Error())
-				skippedRows = append(skippedRows, rowIndex+1)
-			}
+			optionalFields = []int{1, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 23, 24}
 		}
+		err = validateRow(row, optionalFields)
+		if err != nil {
+			log.Printf("Error validating row %02d: %s", rowIndex+1, err.Error())
+			skippedRows = append(skippedRows, rowIndex+1)
+			continue
+		}
+
+		// TODO: substitute values in row (e.g. father code with father uid) if err add to skipped rows
+
+		// TODO: get uid for current node from Firestore
+
+		// TODO: reshape row by adding at the beginning the uid generated at previous step
+
+		validatedRows = append(validatedRows, row)
 	}
 
-	// load all nodes from Firestore
+	// TODO: generate new csv containing validatedRows
 
 	if req.StartPipeline != nil {
 		startPipeline = *req.StartPipeline
 	}
 
 	if startPipeline {
+		// TODO: upload newly generated csv to Google Bucket
 		log.Printf("Saving import file to Google Bucket...")
 		filePath := fmt.Sprintf("dataflow/in_network_node/%s", req.Filename)
 		_, err = lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filePath, data)
