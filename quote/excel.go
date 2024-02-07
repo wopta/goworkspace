@@ -41,7 +41,7 @@ func Excel() {
 	cell, err := xlsx.GetCellValue("Tabelle1", "E1")
 	cell1, err := xlsx.GetCellValue("Tabelle1", "A1")
 	fmt.Println("excel get value E1: ", cell)
-	xlsx.CalcCellValue("Tabelle1", "A1")
+	xlsx.CalcCellValue("Tabelle1", "E1")
 	fmt.Println("excel get value E1: ", cell1)
 	cell, err = xlsx.GetCellValue("Tabelle1", "E1")
 	fmt.Println("excel get value E1: ", cell)
