@@ -92,7 +92,7 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 
 	if startPipeline {
 		log.Printf("Saving import file to Google Bucket...")
-		filePath := fmt.Sprintf("dataflow/in_network_node/%s", "prova.csv")
+		filePath := fmt.Sprintf("dataflow/in_network_node/%s", req.Filename)
 		_, err = lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filePath, data)
 		if err != nil {
 			log.Printf("Error saving import file to Google Bucket: %s", err.Error())
