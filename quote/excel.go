@@ -28,7 +28,7 @@ type QuoteExcel struct {
 func Excel() {
 	fmt.Println("-------Excel---------")
 	filePath := "quote/excel/qbeRatingModel.xlsx"
-	filePathOut := "../tmp/temp.xlsx"
+	//filePathOut := "../tmp/temp.xlsx"
 	sheet := "Input dati Polizza"
 
 	excelBytes := lib.GetFilesByEnv(filePath)
