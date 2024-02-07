@@ -71,6 +71,7 @@ func SaveExcel(xlsx *excelize.File, filePath string) <-chan []byte {
 		err = xlsx.SaveAs(filePath)
 		fmt.Println(err)
 		resByte, err = xlsx.WriteToBuffer()
+		fmt.Println("excel Saved Excel ")
 		ch <- resByte.Bytes()
 	}()
 	return ch
