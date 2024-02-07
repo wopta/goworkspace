@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/xuri/excelize/v2"
@@ -72,6 +73,7 @@ func SaveExcel(xlsx *excelize.File, filePath string) <-chan []byte {
 		fmt.Println(err)
 		resByte, err = xlsx.WriteToBuffer()
 		fmt.Println("excel Saved Excel ")
+		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "quote/excel/testout.xlsx", resByte.Bytes())
 		ch <- resByte.Bytes()
 	}()
 	return ch
