@@ -20,6 +20,14 @@ type ImportNodesReq struct {
 	StartPipeline *bool  `json:"startPipeline,omitempty"`
 }
 
+type nodeInfo struct {
+	Uid            string
+	Warrant        string
+	IsActive       bool
+	HasAnnex       bool
+	IsMgaProponent bool
+}
+
 func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err           error
@@ -27,6 +35,7 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		startPipeline = false
 		warrants      []models.Warrant
 		dbNodes       []models.NetworkNode
+		nodesMap      = make(map[string]nodeInfo)
 		skippedRows   []int
 		validatedRows [][]string
 	)
@@ -57,6 +66,10 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		return "", nil, err
 	}
 
+	// load dataframe
+	df := lib.CsvToDataframe(data)
+	log.Printf("#rows: %02d #cols: %02d", df.Nrow(), df.Ncol())
+
 	// load all nodes from Firestore
 	log.Printf("Fetching all network nodes from Firestore...")
 	dbNodes, err = GetAllNetworkNodes()
@@ -75,13 +88,18 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	}
 	log.Printf("Warrants loaded from Google Bucket, #warrants: %02d", len(warrants))
 
-	// load dataframe
-	df := lib.CsvToDataframe(data)
-	log.Printf("#rows: %02d #cols: %02d", df.Nrow(), df.Ncol())
+	// build map[networkcode] = nodeInfo with essentials node info
+	for _, nn := range dbNodes {
+		nodesMap[nn.Code] = nodeInfo{
+			Uid:            nn.Uid,
+			Warrant:        nn.Warrant,
+			IsActive:       nn.IsActive,
+			HasAnnex:       nn.HasAnnex,
+			IsMgaProponent: nn.IsMgaProponent,
+		}
+	}
 
-	// TODO: load all nodes from Firestore
-
-	// TODO: build map[networkcode] = node
+	// TODO: build map[warrant_name] = allowed sub warrants (needed??)
 
 	// validate csv rows
 
@@ -108,6 +126,8 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		// TODO: get uid for current node from Firestore
 
 		// TODO: reshape row by adding at the beginning the uid generated at previous step
+
+		// TODO: add node to nodeMap
 
 		validatedRows = append(validatedRows, row)
 	}
