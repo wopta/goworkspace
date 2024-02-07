@@ -63,7 +63,7 @@ func Excel() {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println(cell)
+	//fmt.Println(cell)
 	// Get all the rows in the Sheet1.
 
 }
