@@ -36,6 +36,7 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		warrants      []models.Warrant
 		dbNodes       []models.NetworkNode
 		nodesMap      = make(map[string]nodeInfo)
+		warrantsMap   = make(map[string][]string)
 		skippedRows   []int
 		validatedRows [][]string
 	)
@@ -99,7 +100,25 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		}
 	}
 
-	// TODO: build map[warrant_name] = allowed sub warrants (needed??)
+	// build map[warrant_name] = allowed sub warrants
+	// TODO: improve code quality
+	for _, outerWarrant := range warrants {
+		warrantsMap[outerWarrant.Name] = make([]string, 0)
+		for _, innerWarrant := range warrants {
+			compatibleProducts := 0
+			for _, innerProduct := range innerWarrant.Products {
+				for _, outerProduct := range outerWarrant.Products {
+					if innerProduct.Name == outerProduct.Name {
+						compatibleProducts++
+						break
+					}
+				}
+			}
+			if compatibleProducts == len(innerWarrant.Products) {
+				warrantsMap[outerWarrant.Name] = append(warrantsMap[outerWarrant.Name], innerWarrant.Name)
+			}
+		}
+	}
 
 	// validate csv rows
 
@@ -107,8 +126,7 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		// TODO: normalize cells content if err add to skipped rows
 
 		// check if all required fields have been compiled
-
-		optionalFields := []int{}
+		var optionalFields []int
 		if row[2] == models.AgencyNetworkNodeType {
 			optionalFields = []int{1, 23, 24}
 		} else if row[2] == models.AgentNetworkNodeType {
@@ -121,24 +139,26 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 			continue
 		}
 
-		// TODO: substitute values in row (e.g. father code with father uid) if err add to skipped rows
+		// TODO: check has annex compatibility with father
 
-		// TODO: get uid for current node from Firestore
+		// TODO: check is mga proponent with father
 
-		// TODO: reshape row by adding at the beginning the uid generated at previous step
+		// TODO: check warrant compatibility with father
 
 		// TODO: add node to nodeMap
 
 		validatedRows = append(validatedRows, row)
 	}
 
-	// TODO: generate new csv containing validatedRows
+	log.Printf("#validated rows: %02d", len(validatedRows))
 
 	if req.StartPipeline != nil {
 		startPipeline = *req.StartPipeline
 	}
 
-	if startPipeline {
+	if startPipeline && len(skippedRows) == 0 {
+		// TODO: generate new csv
+
 		// TODO: upload newly generated csv to Google Bucket
 		log.Printf("Saving import file to Google Bucket...")
 		filePath := fmt.Sprintf("dataflow/in_network_node/%s", req.Filename)
@@ -150,6 +170,8 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		log.Printf("Import file saved into Google Bucket")
 
 		// TODO: start dataflow pipeline
+	} else if len(skippedRows) > 0 {
+		// TODO: return error to frontend
 	}
 
 	log.Printf("Skipped Rows: %v", skippedRows)
