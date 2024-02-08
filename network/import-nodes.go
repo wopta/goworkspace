@@ -59,20 +59,20 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	err = json.Unmarshal(body, &req)
 	if err != nil {
 		log.Printf("Error unmarshiling request body: %s", err.Error())
-		return "", nil, err
+		return "{}", nil, err
 	}
 
 	// check file mimetype
 	if req.MimeType != "text/csv" {
 		log.Printf("File format %s not supported", req.MimeType)
-		return "", nil, errors.New("file format not supported")
+		return "{}", nil, errors.New("file format not supported")
 	}
 
 	// convert csv to bytes
 	data, err := base64.StdEncoding.DecodeString(req.Bytes)
 	if err != nil {
 		log.Printf("Error decoding file: %s", err.Error())
-		return "", nil, err
+		return "{}", nil, err
 	}
 
 	// load dataframe
@@ -86,7 +86,7 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	dbNodes, err = GetAllNetworkNodes()
 	if err != nil {
 		log.Printf("Error fetching all network nodes from Firestore: %s", err.Error())
-		return "", nil, err
+		return "{}", nil, err
 	}
 	log.Printf("Network nodes fetched from Firestore, #node: %02d", len(dbNodes))
 
@@ -95,7 +95,7 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	warrants, err = getWarrants()
 	if err != nil {
 		log.Printf("Error loading warrants from Google Bucket: %s", err.Error())
-		return "", nil, err
+		return "{}", nil, err
 	}
 	log.Printf("Warrants loaded from Google Bucket, #warrants: %02d", len(warrants))
 
@@ -284,7 +284,7 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		_, err = lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filePath, rawDoc)
 		if err != nil {
 			log.Printf("Error saving import file to Google Bucket: %s", err.Error())
-			return "", nil, err
+			return "{}", nil, err
 		}
 		log.Printf("Import file saved into Google Bucket")
 
@@ -297,7 +297,7 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 
 	log.Println("Handler End -------------------------------------------------")
 
-	return "", nil, nil
+	return "{}", nil, nil
 }
 
 func getWarrants() ([]models.Warrant, error) {
