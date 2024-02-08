@@ -99,6 +99,9 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	}
 	log.Printf("Warrants loaded from Google Bucket, #warrants: %02d", len(warrants))
 
+	// build map[warrant_name] = allowed sub warrants
+	warrantsMap = buildWarrantsCompatibilityMap(warrants)
+
 	// build map[networkcode] = nodeInfo with essentials node info
 	for _, nn := range dbNodes {
 		nodesMap[nn.Code] = nodeInfo{
@@ -108,26 +111,6 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 			HasAnnex:       nn.HasAnnex,
 			IsMgaProponent: nn.IsMgaProponent,
 			Type:           nn.Type,
-		}
-	}
-
-	// build map[warrant_name] = allowed sub warrants
-	// TODO: improve code quality
-	for _, outerWarrant := range warrants {
-		warrantsMap[outerWarrant.Name] = make([]string, 0)
-		for _, innerWarrant := range warrants {
-			compatibleProducts := 0
-			for _, innerProduct := range innerWarrant.Products {
-				for _, outerProduct := range outerWarrant.Products {
-					if innerProduct.Name == outerProduct.Name {
-						compatibleProducts++
-						break
-					}
-				}
-			}
-			if compatibleProducts == len(innerWarrant.Products) {
-				warrantsMap[outerWarrant.Name] = append(warrantsMap[outerWarrant.Name], innerWarrant.Name)
-			}
 		}
 	}
 
@@ -319,6 +302,28 @@ func getWarrants() ([]models.Warrant, error) {
 		warrants = append(warrants, warrant)
 	}
 	return warrants, nil
+}
+
+func buildWarrantsCompatibilityMap(warrants []models.Warrant) map[string][]string {
+	warrantsMap := make(map[string][]string)
+	for _, outerWarrant := range warrants {
+		warrantsMap[outerWarrant.Name] = make([]string, 0)
+		for _, innerWarrant := range warrants {
+			compatibleProducts := 0
+			for _, innerProduct := range innerWarrant.Products {
+				for _, outerProduct := range outerWarrant.Products {
+					if innerProduct.Name == outerProduct.Name {
+						compatibleProducts++
+						break
+					}
+				}
+			}
+			if compatibleProducts == len(innerWarrant.Products) {
+				warrantsMap[outerWarrant.Name] = append(warrantsMap[outerWarrant.Name], innerWarrant.Name)
+			}
+		}
+	}
+	return warrantsMap
 }
 
 func normalizeFields(row []string) []string {
