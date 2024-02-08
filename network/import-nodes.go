@@ -154,13 +154,18 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 
 	if validatedRows[models.AgencyNetworkNodeType] != nil {
 		for rowIndex, row := range validatedRows[models.AgencyNetworkNodeType] {
+			nodeCode := row[0]
+			warrantName := row[4]
+			fatherNodeCode := row[5]
+			isMgaProponent := boolMap[row[28]]
+			hasAnnex := boolMap[row[29]]
+
 			// get father
-			fatherNode := nodesMap[row[5]]
-			log.Printf("Father Node Uid: %s", fatherNode.Uid)
+			fatherNode := nodesMap[fatherNodeCode]
 
 			// check if parent is an agent, if so skip
 			if fatherNode.Type == models.AgentNetworkNodeType {
-				skippedRows[row[2]] = append(skippedRows[row[2]], row[0])
+				skippedRows[models.AgencyNetworkNodeType] = append(skippedRows[models.AgencyNetworkNodeType], nodeCode)
 				validatedRows[models.AgencyNetworkNodeType] = append(validatedRows[models.AgencyNetworkNodeType][:rowIndex], validatedRows[models.AgencyNetworkNodeType][rowIndex+1:]...)
 				continue
 			}
@@ -171,15 +176,31 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 				- check is mga proponent with father
 				- check warrant compatibility with father
 			*/
-			if fatherNode.HasAnnex != boolMap[row[29]] || fatherNode.IsMgaProponent != boolMap[row[28]] || lib.SliceContains(warrantsMap[fatherNode.Warrant], row[4]) {
-				skippedRows[row[2]] = append(skippedRows[row[2]], row[0])
+			if fatherNode.HasAnnex != hasAnnex {
+				skippedRows[models.AgencyNetworkNodeType] = append(skippedRows[models.AgencyNetworkNodeType], nodeCode)
+				validatedRows[models.AgencyNetworkNodeType] = append(validatedRows[models.AgencyNetworkNodeType][:rowIndex], validatedRows[models.AgencyNetworkNodeType][rowIndex+1:]...)
+				continue
+			}
+			if fatherNode.IsMgaProponent != isMgaProponent {
+				skippedRows[models.AgencyNetworkNodeType] = append(skippedRows[models.AgencyNetworkNodeType], nodeCode)
+				validatedRows[models.AgencyNetworkNodeType] = append(validatedRows[models.AgencyNetworkNodeType][:rowIndex], validatedRows[models.AgencyNetworkNodeType][rowIndex+1:]...)
+				continue
+			}
+			if !lib.SliceContains(warrantsMap[fatherNode.Warrant], warrantName) {
+				skippedRows[models.AgencyNetworkNodeType] = append(skippedRows[models.AgencyNetworkNodeType], nodeCode)
 				validatedRows[models.AgencyNetworkNodeType] = append(validatedRows[models.AgencyNetworkNodeType][:rowIndex], validatedRows[models.AgencyNetworkNodeType][rowIndex+1:]...)
 				continue
 			}
 
 			// TODO: check if fields are configured correctly
 
-			// TODO: add node to nodeMap
+			// add node to nodeMap
+			nodesMap[nodeCode] = nodeInfo{
+				Warrant:        warrantName,
+				HasAnnex:       hasAnnex,
+				IsMgaProponent: isMgaProponent,
+				Type:           models.AgencyNetworkNodeType,
+			}
 		}
 	}
 
