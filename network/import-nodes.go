@@ -79,6 +79,8 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	df := lib.CsvToDataframe(data)
 	log.Printf("#rows: %02d #cols: %02d", df.Nrow(), df.Ncol())
 
+	header := df.Records()[0]
+
 	// load all nodes from Firestore
 	log.Printf("Fetching all network nodes from Firestore...")
 	dbNodes, err = GetAllNetworkNodes()
@@ -164,7 +166,7 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 			// get father
 			fatherNode := nodesMap[fatherNodeCode]
 
-			// check if parent is an agent, if so skip
+			// check if parent is an agent or not present in nodesMap, if so skip
 			if reflect.ValueOf(fatherNode).IsZero() || fatherNode.Type == models.AgentNetworkNodeType {
 				skippedRows[models.AgencyNetworkNodeType] = append(skippedRows[models.AgencyNetworkNodeType], nodeCode)
 				validatedRows[models.AgencyNetworkNodeType] = append(validatedRows[models.AgencyNetworkNodeType][:rowIndex], validatedRows[models.AgencyNetworkNodeType][rowIndex+1:]...)
@@ -216,13 +218,19 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 			// get father
 			fatherNode := nodesMap[fatherNodeCode]
 
-			// check if parent is an agent, if so skip
+			// check if parent is an agent or not present in nodesMap, if so skip
 			if reflect.ValueOf(fatherNode).IsZero() || fatherNode.Type == models.AgentNetworkNodeType {
 				skippedRows[models.AgentNetworkNodeType] = append(skippedRows[models.AgentNetworkNodeType], nodeCode)
 				validatedRows[models.AgentNetworkNodeType] = append(validatedRows[models.AgentNetworkNodeType][:rowIndex], validatedRows[models.AgentNetworkNodeType][rowIndex+1:]...)
 				continue
 			}
 
+			/*
+				check current agent configuration against father configuration, with following checks:
+				- check has annex compatibility with father
+				- check is mga proponent with father
+				- check warrant compatibility with father
+			*/
 			if fatherNode.Type != models.AreaManagerNetworkNodeType && fatherNode.HasAnnex != hasAnnex {
 				skippedRows[models.AgentNetworkNodeType] = append(skippedRows[models.AgentNetworkNodeType], nodeCode)
 				validatedRows[models.AgentNetworkNodeType] = append(validatedRows[models.AgentNetworkNodeType][:rowIndex], validatedRows[models.AgentNetworkNodeType][rowIndex+1:]...)
@@ -258,10 +266,22 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	if startPipeline && len(skippedRows) == 0 {
 		// TODO: generate new csv
 
+		outputRows := [][]string{
+			header,
+		}
+		outputRows = append(outputRows, validatedRows[models.AgencyNetworkNodeType]...)
+		outputRows = append(outputRows, validatedRows[models.AgentNetworkNodeType]...)
+
+		lib.WriteCsv("../tmp/"+req.Filename, outputRows, ';')
+		rawDoc, err := os.ReadFile("../tmp/" + req.Filename)
+		if err != nil {
+			log.Printf("Error reading generated csv: %s", err.Error())
+		}
+
 		// TODO: upload newly generated csv to Google Bucket
 		log.Printf("Saving import file to Google Bucket...")
 		filePath := fmt.Sprintf("dataflow/in_network_node/%s", req.Filename)
-		_, err = lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filePath, data)
+		_, err = lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filePath, rawDoc)
 		if err != nil {
 			log.Printf("Error saving import file to Google Bucket: %s", err.Error())
 			return "", nil, err
