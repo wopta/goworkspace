@@ -123,7 +123,8 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	// validate csv rows
 
 	for rowIndex, row := range df.Records()[1:] {
-		// TODO: normalize cells content if err add to skipped rows
+		// normalize cells content if err add to skipped rows
+		row = normalizeFields(row)
 
 		// check if all required fields have been compiled
 		var optionalFields []int
@@ -200,6 +201,26 @@ func getWarrants() ([]models.Warrant, error) {
 		warrants = append(warrants, warrant)
 	}
 	return warrants, nil
+}
+
+func normalizeFields(row []string) []string {
+	trimFields := []int{0, 1, 5, 9, 10, 13, 23, 24, 31}
+	toUpperFields := []int{3, 6, 7, 8, 11, 12, 14, 15, 16, 17, 18, 19, 20, 21, 22, 25, 26, 28, 29, 32}
+	toLowerFields := []int{2, 4}
+
+	for _, fieldIndex := range trimFields {
+		row[fieldIndex] = lib.TrimSpace(row[fieldIndex])
+	}
+
+	for _, fieldIndex := range toLowerFields {
+		row[fieldIndex] = lib.ToLower(row[fieldIndex])
+	}
+
+	for _, fieldIndex := range toUpperFields {
+		row[fieldIndex] = lib.ToUpper(row[fieldIndex])
+	}
+
+	return row
 }
 
 func validateRow(row []string, optionalFields []int) error {
