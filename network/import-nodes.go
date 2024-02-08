@@ -224,8 +224,8 @@ func normalizeFields(row []string) []string {
 }
 
 func validateRow(row []string, optionalFields []int) error {
-	for rowIndex, rowValue := range row {
-		if (rowValue == "" || rowValue == "NaN") && !lib.SliceContains(optionalFields, rowIndex) {
+	for fieldIndex, fieldValue := range row {
+		if (fieldValue == "" || fieldValue == "NaN") && !lib.SliceContains(optionalFields, fieldIndex) {
 			return errors.New("missing required field")
 		}
 	}
