@@ -11,6 +11,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 )
 
 type ImportNodesReq struct {
@@ -208,6 +209,13 @@ func normalizeFields(row []string) []string {
 	toUpperFields := []int{3, 6, 7, 8, 11, 12, 14, 15, 16, 17, 18, 19, 20, 21, 22, 25, 26, 28, 29, 32}
 	toLowerFields := []int{2, 4}
 
+	row = lib.SliceMap(row, func(field string) string {
+		if strings.EqualFold(field, "NaN") {
+			return ""
+		}
+		return field
+	})
+
 	for _, fieldIndex := range trimFields {
 		row[fieldIndex] = lib.TrimSpace(row[fieldIndex])
 	}
@@ -225,7 +233,7 @@ func normalizeFields(row []string) []string {
 
 func validateRow(row []string, optionalFields []int) error {
 	for fieldIndex, fieldValue := range row {
-		if (fieldValue == "" || fieldValue == "NaN") && !lib.SliceContains(optionalFields, fieldIndex) {
+		if (fieldValue == "" || strings.EqualFold(fieldValue, "NaN")) && !lib.SliceContains(optionalFields, fieldIndex) {
 			return errors.New("missing required field")
 		}
 	}
