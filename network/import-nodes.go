@@ -27,6 +27,12 @@ type nodeInfo struct {
 	IsActive       bool
 	HasAnnex       bool
 	IsMgaProponent bool
+	Type           string
+}
+
+var boolMap = map[string]bool{
+	"NO": false,
+	"SI": true,
 }
 
 func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -38,8 +44,8 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		dbNodes       []models.NetworkNode
 		nodesMap      = make(map[string]nodeInfo)
 		warrantsMap   = make(map[string][]string)
-		skippedRows   []int
-		validatedRows [][]string
+		validatedRows = make(map[string][][]string)
+		skippedRows   = make(map[string][]string)
 	)
 
 	log.SetPrefix("ImportNodesFx ")
@@ -98,6 +104,7 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 			IsActive:       nn.IsActive,
 			HasAnnex:       nn.HasAnnex,
 			IsMgaProponent: nn.IsMgaProponent,
+			Type:           nn.Type,
 		}
 	}
 
@@ -137,22 +144,62 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		err = validateRow(row, optionalFields)
 		if err != nil {
 			log.Printf("Error validating row %02d: %s", rowIndex+1, err.Error())
-			skippedRows = append(skippedRows, rowIndex+1)
+			skippedRows[row[2]] = append(skippedRows[row[2]], row[0])
 			continue
 		}
 
-		// TODO: check has annex compatibility with father
-
-		// TODO: check is mga proponent with father
-
-		// TODO: check warrant compatibility with father
-
-		// TODO: add node to nodeMap
-
-		validatedRows = append(validatedRows, row)
+		// validated rows by node type
+		validatedRows[row[2]] = append(validatedRows[row[2]], row)
 	}
 
-	log.Printf("#validated rows: %02d", len(validatedRows))
+	if validatedRows[models.AgencyNetworkNodeType] != nil {
+		for rowIndex, row := range validatedRows[models.AgencyNetworkNodeType] {
+			// get father
+			fatherNode := nodesMap[row[5]]
+			log.Printf("Father Node Uid: %s", fatherNode.Uid)
+
+			// check if parent is an agent, if so skip
+			if fatherNode.Type == models.AgentNetworkNodeType {
+				skippedRows[row[2]] = append(skippedRows[row[2]], row[0])
+				validatedRows[models.AgencyNetworkNodeType] = append(validatedRows[models.AgencyNetworkNodeType][:rowIndex], validatedRows[models.AgencyNetworkNodeType][rowIndex+1:]...)
+				continue
+			}
+
+			/*
+				check current agency configuration against father configuration, with following checks:
+				- check has annex compatibility with father
+				- check is mga proponent with father
+				- check warrant compatibility with father
+			*/
+			if fatherNode.HasAnnex != boolMap[row[29]] || fatherNode.IsMgaProponent != boolMap[row[28]] || lib.SliceContains(warrantsMap[fatherNode.Warrant], row[4]) {
+				skippedRows[row[2]] = append(skippedRows[row[2]], row[0])
+				validatedRows[models.AgencyNetworkNodeType] = append(validatedRows[models.AgencyNetworkNodeType][:rowIndex], validatedRows[models.AgencyNetworkNodeType][rowIndex+1:]...)
+				continue
+			}
+
+			// TODO: check if fields are configured correctly
+
+			// TODO: add node to nodeMap
+		}
+	}
+
+	if validatedRows[models.AgentNetworkNodeType] != nil {
+		for _, row := range validatedRows[models.AgentNetworkNodeType] {
+			// TODO: get father
+			fatherNode := nodesMap[row[5]]
+			log.Printf("Father Node Uid: %s", fatherNode.Uid)
+
+			// TODO: check if parent is an agent, if so skip
+
+			// TODO: check has annex compatibility with father
+
+			// TODO: check is mga proponent with father
+
+			// TODO: check warrant compatibility with father
+
+			// TODO: add node to nodeMap
+		}
+	}
 
 	if req.StartPipeline != nil {
 		startPipeline = *req.StartPipeline
