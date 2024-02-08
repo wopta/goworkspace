@@ -103,16 +103,7 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	warrantsMap = buildWarrantsCompatibilityMap(warrants)
 
 	// build map[networkcode] = nodeInfo with essentials node info
-	for _, nn := range dbNodes {
-		nodesMap[nn.Code] = nodeInfo{
-			Uid:            nn.Uid,
-			Warrant:        nn.Warrant,
-			IsActive:       nn.IsActive,
-			HasAnnex:       nn.HasAnnex,
-			IsMgaProponent: nn.IsMgaProponent,
-			Type:           nn.Type,
-		}
-	}
+	nodesMap = buildNetworkNodesMap(dbNodes)
 
 	// validate csv rows
 
@@ -281,6 +272,21 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	log.Println("Handler End -------------------------------------------------")
 
 	return "{}", nil, nil
+}
+
+func buildNetworkNodesMap(dbNodes []models.NetworkNode) map[string]nodeInfo {
+	nodesMap := make(map[string]nodeInfo)
+	for _, nn := range dbNodes {
+		nodesMap[nn.Code] = nodeInfo{
+			Uid:            nn.Uid,
+			Warrant:        nn.Warrant,
+			IsActive:       nn.IsActive,
+			HasAnnex:       nn.HasAnnex,
+			IsMgaProponent: nn.IsMgaProponent,
+			Type:           nn.Type,
+		}
+	}
+	return nodesMap
 }
 
 func getWarrants() ([]models.Warrant, error) {
