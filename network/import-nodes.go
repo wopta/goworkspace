@@ -11,6 +11,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"reflect"
 	"strings"
 )
 
@@ -164,7 +165,7 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 			fatherNode := nodesMap[fatherNodeCode]
 
 			// check if parent is an agent, if so skip
-			if fatherNode.Type == models.AgentNetworkNodeType {
+			if reflect.ValueOf(fatherNode).IsZero() || fatherNode.Type == models.AgentNetworkNodeType {
 				skippedRows[models.AgencyNetworkNodeType] = append(skippedRows[models.AgencyNetworkNodeType], nodeCode)
 				validatedRows[models.AgencyNetworkNodeType] = append(validatedRows[models.AgencyNetworkNodeType][:rowIndex], validatedRows[models.AgencyNetworkNodeType][rowIndex+1:]...)
 				continue
@@ -176,12 +177,12 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 				- check is mga proponent with father
 				- check warrant compatibility with father
 			*/
-			if fatherNode.HasAnnex != hasAnnex {
+			if fatherNode.Type != models.AreaManagerNetworkNodeType && fatherNode.HasAnnex != hasAnnex {
 				skippedRows[models.AgencyNetworkNodeType] = append(skippedRows[models.AgencyNetworkNodeType], nodeCode)
 				validatedRows[models.AgencyNetworkNodeType] = append(validatedRows[models.AgencyNetworkNodeType][:rowIndex], validatedRows[models.AgencyNetworkNodeType][rowIndex+1:]...)
 				continue
 			}
-			if fatherNode.IsMgaProponent != isMgaProponent {
+			if fatherNode.Type != models.AreaManagerNetworkNodeType && fatherNode.IsMgaProponent != isMgaProponent {
 				skippedRows[models.AgencyNetworkNodeType] = append(skippedRows[models.AgencyNetworkNodeType], nodeCode)
 				validatedRows[models.AgencyNetworkNodeType] = append(validatedRows[models.AgencyNetworkNodeType][:rowIndex], validatedRows[models.AgencyNetworkNodeType][rowIndex+1:]...)
 				continue
@@ -192,7 +193,7 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 				continue
 			}
 
-			// TODO: check if fields are configured correctly
+			// TODO: check if fields for simplo are configured correctly
 
 			// add node to nodeMap
 			nodesMap[nodeCode] = nodeInfo{
@@ -205,20 +206,48 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	}
 
 	if validatedRows[models.AgentNetworkNodeType] != nil {
-		for _, row := range validatedRows[models.AgentNetworkNodeType] {
-			// TODO: get father
-			fatherNode := nodesMap[row[5]]
-			log.Printf("Father Node Uid: %s", fatherNode.Uid)
+		for rowIndex, row := range validatedRows[models.AgentNetworkNodeType] {
+			nodeCode := row[0]
+			warrantName := row[4]
+			fatherNodeCode := row[5]
+			isMgaProponent := boolMap[row[28]]
+			hasAnnex := boolMap[row[29]]
 
-			// TODO: check if parent is an agent, if so skip
+			// get father
+			fatherNode := nodesMap[fatherNodeCode]
 
-			// TODO: check has annex compatibility with father
+			// check if parent is an agent, if so skip
+			if reflect.ValueOf(fatherNode).IsZero() || fatherNode.Type == models.AgentNetworkNodeType {
+				skippedRows[models.AgentNetworkNodeType] = append(skippedRows[models.AgentNetworkNodeType], nodeCode)
+				validatedRows[models.AgentNetworkNodeType] = append(validatedRows[models.AgentNetworkNodeType][:rowIndex], validatedRows[models.AgentNetworkNodeType][rowIndex+1:]...)
+				continue
+			}
 
-			// TODO: check is mga proponent with father
+			if fatherNode.Type != models.AreaManagerNetworkNodeType && fatherNode.HasAnnex != hasAnnex {
+				skippedRows[models.AgentNetworkNodeType] = append(skippedRows[models.AgentNetworkNodeType], nodeCode)
+				validatedRows[models.AgentNetworkNodeType] = append(validatedRows[models.AgentNetworkNodeType][:rowIndex], validatedRows[models.AgentNetworkNodeType][rowIndex+1:]...)
+				continue
+			}
+			if fatherNode.Type != models.AreaManagerNetworkNodeType && fatherNode.IsMgaProponent != isMgaProponent {
+				skippedRows[models.AgentNetworkNodeType] = append(skippedRows[models.AgentNetworkNodeType], nodeCode)
+				validatedRows[models.AgentNetworkNodeType] = append(validatedRows[models.AgentNetworkNodeType][:rowIndex], validatedRows[models.AgentNetworkNodeType][rowIndex+1:]...)
+				continue
+			}
+			if !lib.SliceContains(warrantsMap[fatherNode.Warrant], warrantName) {
+				skippedRows[models.AgentNetworkNodeType] = append(skippedRows[models.AgentNetworkNodeType], nodeCode)
+				validatedRows[models.AgentNetworkNodeType] = append(validatedRows[models.AgentNetworkNodeType][:rowIndex], validatedRows[models.AgentNetworkNodeType][rowIndex+1:]...)
+				continue
+			}
 
-			// TODO: check warrant compatibility with father
+			// TODO: check if fields for simplo are configured correctly
 
-			// TODO: add node to nodeMap
+			// add node to nodeMap
+			nodesMap[nodeCode] = nodeInfo{
+				Warrant:        warrantName,
+				HasAnnex:       hasAnnex,
+				IsMgaProponent: isMgaProponent,
+				Type:           models.AgentNetworkNodeType,
+			}
 		}
 	}
 
