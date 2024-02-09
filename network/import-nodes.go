@@ -114,13 +114,7 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		row = normalizeFields(row)
 
 		// check if all required fields have been compiled
-		var optionalFields []int
-		if row[2] == models.AgencyNetworkNodeType {
-			optionalFields = []int{1, 23, 24}
-		} else if row[2] == models.AgentNetworkNodeType {
-			optionalFields = []int{1, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 23, 24}
-		}
-		err = validateRow(row, optionalFields)
+		err = searchMissingRequiredFields(row)
 		if err != nil {
 			log.Printf("Error validating row %02d: %s", rowIndex+1, err.Error())
 			skippedRows[row[2]] = append(skippedRows[row[2]], row[0])
@@ -174,6 +168,10 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 			}
 
 			// TODO: check if fields for simplo are configured correctly
+			if isMgaProponent && !hasAnnex {
+				skippedRows[models.AgencyNetworkNodeType] = append(skippedRows[models.AgencyNetworkNodeType], nodeCode)
+				continue
+			}
 
 			// add row to output matrix
 			outputRows = append(outputRows, row)
@@ -352,9 +350,30 @@ func normalizeFields(row []string) []string {
 	return row
 }
 
-func validateRow(row []string, optionalFields []int) error {
+func searchMissingRequiredFields(row []string) error {
+	var requiredFields []int
+	if row[2] == models.AgencyNetworkNodeType {
+		requiredFields = []int{0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 25, 26, 27, 28, 32}
+		isMgaProponent := boolMap[row[28]]
+		hasAnnex := boolMap[row[29]]
+		if isMgaProponent {
+			requiredFields = append(requiredFields, 29)
+			requiredFields = append(requiredFields, 30)
+		} else if !isMgaProponent && hasAnnex {
+			requiredFields = append(requiredFields, 29)
+		}
+	} else if row[2] == models.AgentNetworkNodeType {
+		requiredFields = []int{0, 2, 3, 4, 5, 20, 21, 22, 25, 26, 27, 28, 29, 32}
+		isMgaProponent := boolMap[row[28]]
+		hasAnnex := boolMap[row[29]]
+		if isMgaProponent || hasAnnex {
+			requiredFields = append(requiredFields, 30)
+			requiredFields = append(requiredFields, 31)
+		}
+	}
+
 	for fieldIndex, fieldValue := range row {
-		if (fieldValue == "" || strings.EqualFold(fieldValue, "NaN")) && !lib.SliceContains(optionalFields, fieldIndex) {
+		if (fieldValue == "" || strings.EqualFold(fieldValue, "NaN")) && lib.SliceContains(requiredFields, fieldIndex) {
 			return errors.New("missing required field")
 		}
 	}
