@@ -37,6 +37,10 @@ var (
 		"NO": false,
 		"SI": true,
 	}
+	nodeTypeList = []string{
+		models.AgentNetworkNodeType,
+		models.AgencyNetworkNodeType,
+	}
 	designationsList = []string{
 		"Addetto Attività intermediazione al di fuori dei locali",
 		"Addetto Attività intermediazione all'interno dei locali",
@@ -391,6 +395,10 @@ func normalizeFields(row []string) []string {
 }
 
 func validateRow(row []string) error {
+	if !lib.SliceContains(nodeTypeList, row[2]) {
+		return errors.New("invalid node type")
+	}
+
 	var requiredFields []int
 	if row[2] == models.AgencyNetworkNodeType {
 		requiredFields = []int{0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 25, 26, 27, 28, 32}
@@ -419,7 +427,7 @@ func validateRow(row []string) error {
 	}
 
 	if lib.SliceContains(requiredFields, 30) && !lib.SliceContains(designationsList, row[30]) {
-		return errors.New("designation not valid")
+		return errors.New("invalid designation")
 	}
 
 	var dateFieldsIndexes = []int{9, 27}
