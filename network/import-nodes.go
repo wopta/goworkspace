@@ -13,6 +13,7 @@ import (
 	"os"
 	"reflect"
 	"strings"
+	"time"
 )
 
 type ImportNodesReq struct {
@@ -193,6 +194,7 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 				HasAnnex:       hasAnnex,
 				IsMgaProponent: isMgaProponent,
 				Type:           models.AgencyNetworkNodeType,
+				RuiSection:     row[8],
 			}
 		}
 	}
@@ -259,6 +261,7 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 				HasAnnex:       hasAnnex,
 				IsMgaProponent: isMgaProponent,
 				Type:           models.AgentNetworkNodeType,
+				RuiSection:     row[26],
 			}
 		}
 	}
@@ -406,6 +409,18 @@ func searchMissingRequiredFields(row []string) error {
 			return errors.New("missing required field")
 		}
 	}
+
+	var dateFieldsIndexes = []int{9, 27}
+	for _, index := range dateFieldsIndexes {
+		if row[index] == "" && lib.SliceContains(requiredFields, index) {
+			return errors.New("missing required field")
+		}
+		_, err := time.Parse("02012006", fmt.Sprintf("%08s", row[index]))
+		if err != nil {
+			return errors.New("malformed date")
+		}
+	}
+
 	return nil
 }
 
