@@ -178,11 +178,6 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 				- check is mga proponent with father
 				- check warrant compatibility with father
 			*/
-			if parentNode.Type != models.AreaManagerNetworkNodeType && parentNode.HasAnnex != hasAnnex {
-				log.Printf("Error processing node %s: hasAnnex configuration not matching parent configuration", nodeCode)
-				skippedRows[models.AgencyNetworkNodeType] = append(skippedRows[models.AgencyNetworkNodeType], nodeCode)
-				continue
-			}
 			if parentNode.Type != models.AreaManagerNetworkNodeType && parentNode.IsMgaProponent != isMgaProponent {
 				log.Printf("Error processing node %s: isMgaProponent configuration not matching parent configuration", nodeCode)
 				skippedRows[models.AgencyNetworkNodeType] = append(skippedRows[models.AgencyNetworkNodeType], nodeCode)
@@ -254,15 +249,9 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 
 			/*
 				check current agent configuration against father configuration, with following checks:
-				- check has annex compatibility with father
 				- check is mga proponent with father
 				- check warrant compatibility with father
 			*/
-			if parentNode.Type != models.AreaManagerNetworkNodeType && parentNode.HasAnnex != hasAnnex {
-				log.Printf("Error processing node %s: hasAnnex configuration not matching parent configuration", nodeCode)
-				skippedRows[models.AgentNetworkNodeType] = append(skippedRows[models.AgentNetworkNodeType], nodeCode)
-				continue
-			}
 			if parentNode.Type != models.AreaManagerNetworkNodeType && parentNode.IsMgaProponent != isMgaProponent {
 				log.Printf("Error processing node %s: isMgaProponent configuration not matching parent configuration", nodeCode)
 				skippedRows[models.AgentNetworkNodeType] = append(skippedRows[models.AgentNetworkNodeType], nodeCode)
