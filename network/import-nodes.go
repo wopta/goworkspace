@@ -32,10 +32,18 @@ type nodeInfo struct {
 	RuiSection     string
 }
 
-var boolMap = map[string]bool{
-	"NO": false,
-	"SI": true,
-}
+var (
+	boolMap = map[string]bool{
+		"NO": false,
+		"SI": true,
+	}
+	designationsList = []string{
+		"Addetto Attività intermediazione al di fuori dei locali",
+		"Addetto Attività intermediazione all'interno dei locali",
+		"Responsabile dell'attività di distribuzione",
+		"Responsabile dell'attività di intermediazione",
+	}
+)
 
 func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
@@ -408,6 +416,10 @@ func searchMissingRequiredFields(row []string) error {
 		if (fieldValue == "" || strings.EqualFold(fieldValue, "NaN")) && lib.SliceContains(requiredFields, fieldIndex) {
 			return errors.New("missing required field")
 		}
+	}
+
+	if lib.SliceContains(requiredFields, 30) && !lib.SliceContains(designationsList, row[30]) {
+		return errors.New("designation not valid")
 	}
 
 	var dateFieldsIndexes = []int{9, 27}
