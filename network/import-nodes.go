@@ -28,6 +28,7 @@ type nodeInfo struct {
 	HasAnnex       bool
 	IsMgaProponent bool
 	Type           string
+	RuiSection     string
 }
 
 var boolMap = map[string]bool{
@@ -132,6 +133,8 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 			fatherNodeCode := row[5]
 			isMgaProponent := boolMap[row[28]]
 			hasAnnex := boolMap[row[29]]
+			designation := row[31]
+			worksForUid := row[31]
 
 			// check if node is not already present
 			if !reflect.ValueOf(nodesMap[nodeCode]).IsZero() {
@@ -167,8 +170,16 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 				continue
 			}
 
-			// TODO: check if fields for simplo are configured correctly
-			if isMgaProponent && !hasAnnex {
+			// check if fields for simplo are configured correctly
+			if worksForUid != "" {
+				skippedRows[models.AgencyNetworkNodeType] = append(skippedRows[models.AgencyNetworkNodeType], nodeCode)
+				continue
+			}
+
+			if isMgaProponent && (!hasAnnex || designation == "") {
+				skippedRows[models.AgencyNetworkNodeType] = append(skippedRows[models.AgencyNetworkNodeType], nodeCode)
+				continue
+			} else if !isMgaProponent && hasAnnex && designation == "" {
 				skippedRows[models.AgencyNetworkNodeType] = append(skippedRows[models.AgencyNetworkNodeType], nodeCode)
 				continue
 			}
@@ -193,6 +204,8 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 			fatherNodeCode := row[5]
 			isMgaProponent := boolMap[row[28]]
 			hasAnnex := boolMap[row[29]]
+			designation := row[31]
+			worksForUid := row[31]
 
 			// check if node is not already present
 			if !reflect.ValueOf(nodesMap[nodeCode]).IsZero() {
@@ -228,7 +241,14 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 				continue
 			}
 
-			// TODO: check if fields for simplo are configured correctly
+			// check if fields for simplo are configured correctly
+			if isMgaProponent && (!hasAnnex || designation == "" || worksForUid == "" || (worksForUid != "__wopta__" && nodesMap[worksForUid].RuiSection != "E")) {
+				skippedRows[models.AgentNetworkNodeType] = append(skippedRows[models.AgentNetworkNodeType], nodeCode)
+				continue
+			} else if !isMgaProponent && ((hasAnnex && designation == "" && lib.SliceContains([]string{"A", "B"}, nodesMap[worksForUid].RuiSection)) || (!hasAnnex && designation != "" && worksForUid != "")) {
+				skippedRows[models.AgentNetworkNodeType] = append(skippedRows[models.AgentNetworkNodeType], nodeCode)
+				continue
+			}
 
 			// add row to output matrix
 			outputRows = append(outputRows, row)
@@ -269,13 +289,22 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 func buildNetworkNodesMap(dbNodes []models.NetworkNode) map[string]nodeInfo {
 	nodesMap := make(map[string]nodeInfo)
 	for _, nn := range dbNodes {
+		var ruiSection string
+		if nn.Type == models.AgentNetworkNodeType {
+			ruiSection = nn.Agent.RuiSection
+		} else if nn.Type == models.AgencyNetworkNodeType {
+			ruiSection = nn.Agency.RuiSection
+		}
+
 		nodesMap[nn.Code] = nodeInfo{
 			Warrant:        nn.Warrant,
 			IsActive:       nn.IsActive,
 			HasAnnex:       nn.HasAnnex,
 			IsMgaProponent: nn.IsMgaProponent,
 			Type:           nn.Type,
+			RuiSection:     ruiSection,
 		}
+
 	}
 	return nodesMap
 }
