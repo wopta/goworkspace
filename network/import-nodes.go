@@ -54,6 +54,7 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	log.Println("Handler Start -----------------------------------------------")
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
+	defer r.Body.Close()
 	log.Printf("Request body: %s", string(body))
 	err = json.Unmarshal(body, &req)
 	if err != nil {
@@ -78,7 +79,9 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	df := lib.CsvToDataframe(data)
 	log.Printf("#rows: %02d #cols: %02d", df.Nrow(), df.Ncol())
 
-	header := df.Records()[0]
+	outputRows := [][]string{
+		df.Records()[0],
+	}
 
 	// load all nodes from Firestore
 	log.Printf("Fetching all network nodes from Firestore...")
@@ -129,12 +132,18 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	}
 
 	if validatedRows[models.AgencyNetworkNodeType] != nil {
-		for rowIndex, row := range validatedRows[models.AgencyNetworkNodeType] {
+		for _, row := range validatedRows[models.AgencyNetworkNodeType] {
 			nodeCode := row[0]
 			warrantName := row[4]
 			fatherNodeCode := row[5]
 			isMgaProponent := boolMap[row[28]]
 			hasAnnex := boolMap[row[29]]
+
+			// check if node is not already present
+			if !reflect.ValueOf(nodesMap[nodeCode]).IsZero() {
+				skippedRows[models.AgencyNetworkNodeType] = append(skippedRows[models.AgencyNetworkNodeType], nodeCode)
+				continue
+			}
 
 			// get father
 			fatherNode := nodesMap[fatherNodeCode]
@@ -142,7 +151,6 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 			// check if parent is an agent or not present in nodesMap, if so skip
 			if reflect.ValueOf(fatherNode).IsZero() || fatherNode.Type == models.AgentNetworkNodeType {
 				skippedRows[models.AgencyNetworkNodeType] = append(skippedRows[models.AgencyNetworkNodeType], nodeCode)
-				validatedRows[models.AgencyNetworkNodeType] = append(validatedRows[models.AgencyNetworkNodeType][:rowIndex], validatedRows[models.AgencyNetworkNodeType][rowIndex+1:]...)
 				continue
 			}
 
@@ -154,21 +162,21 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 			*/
 			if fatherNode.Type != models.AreaManagerNetworkNodeType && fatherNode.HasAnnex != hasAnnex {
 				skippedRows[models.AgencyNetworkNodeType] = append(skippedRows[models.AgencyNetworkNodeType], nodeCode)
-				validatedRows[models.AgencyNetworkNodeType] = append(validatedRows[models.AgencyNetworkNodeType][:rowIndex], validatedRows[models.AgencyNetworkNodeType][rowIndex+1:]...)
 				continue
 			}
 			if fatherNode.Type != models.AreaManagerNetworkNodeType && fatherNode.IsMgaProponent != isMgaProponent {
 				skippedRows[models.AgencyNetworkNodeType] = append(skippedRows[models.AgencyNetworkNodeType], nodeCode)
-				validatedRows[models.AgencyNetworkNodeType] = append(validatedRows[models.AgencyNetworkNodeType][:rowIndex], validatedRows[models.AgencyNetworkNodeType][rowIndex+1:]...)
 				continue
 			}
 			if !lib.SliceContains(warrantsMap[fatherNode.Warrant], warrantName) {
 				skippedRows[models.AgencyNetworkNodeType] = append(skippedRows[models.AgencyNetworkNodeType], nodeCode)
-				validatedRows[models.AgencyNetworkNodeType] = append(validatedRows[models.AgencyNetworkNodeType][:rowIndex], validatedRows[models.AgencyNetworkNodeType][rowIndex+1:]...)
 				continue
 			}
 
 			// TODO: check if fields for simplo are configured correctly
+
+			// add row to output matrix
+			outputRows = append(outputRows, row)
 
 			// add node to nodeMap
 			nodesMap[nodeCode] = nodeInfo{
@@ -181,12 +189,18 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	}
 
 	if validatedRows[models.AgentNetworkNodeType] != nil {
-		for rowIndex, row := range validatedRows[models.AgentNetworkNodeType] {
+		for _, row := range validatedRows[models.AgentNetworkNodeType] {
 			nodeCode := row[0]
 			warrantName := row[4]
 			fatherNodeCode := row[5]
 			isMgaProponent := boolMap[row[28]]
 			hasAnnex := boolMap[row[29]]
+
+			// check if node is not already present
+			if !reflect.ValueOf(nodesMap[nodeCode]).IsZero() {
+				skippedRows[models.AgentNetworkNodeType] = append(skippedRows[models.AgentNetworkNodeType], nodeCode)
+				continue
+			}
 
 			// get father
 			fatherNode := nodesMap[fatherNodeCode]
@@ -194,7 +208,6 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 			// check if parent is an agent or not present in nodesMap, if so skip
 			if reflect.ValueOf(fatherNode).IsZero() || fatherNode.Type == models.AgentNetworkNodeType {
 				skippedRows[models.AgentNetworkNodeType] = append(skippedRows[models.AgentNetworkNodeType], nodeCode)
-				validatedRows[models.AgentNetworkNodeType] = append(validatedRows[models.AgentNetworkNodeType][:rowIndex], validatedRows[models.AgentNetworkNodeType][rowIndex+1:]...)
 				continue
 			}
 
@@ -206,21 +219,21 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 			*/
 			if fatherNode.Type != models.AreaManagerNetworkNodeType && fatherNode.HasAnnex != hasAnnex {
 				skippedRows[models.AgentNetworkNodeType] = append(skippedRows[models.AgentNetworkNodeType], nodeCode)
-				validatedRows[models.AgentNetworkNodeType] = append(validatedRows[models.AgentNetworkNodeType][:rowIndex], validatedRows[models.AgentNetworkNodeType][rowIndex+1:]...)
 				continue
 			}
 			if fatherNode.Type != models.AreaManagerNetworkNodeType && fatherNode.IsMgaProponent != isMgaProponent {
 				skippedRows[models.AgentNetworkNodeType] = append(skippedRows[models.AgentNetworkNodeType], nodeCode)
-				validatedRows[models.AgentNetworkNodeType] = append(validatedRows[models.AgentNetworkNodeType][:rowIndex], validatedRows[models.AgentNetworkNodeType][rowIndex+1:]...)
 				continue
 			}
 			if !lib.SliceContains(warrantsMap[fatherNode.Warrant], warrantName) {
 				skippedRows[models.AgentNetworkNodeType] = append(skippedRows[models.AgentNetworkNodeType], nodeCode)
-				validatedRows[models.AgentNetworkNodeType] = append(validatedRows[models.AgentNetworkNodeType][:rowIndex], validatedRows[models.AgentNetworkNodeType][rowIndex+1:]...)
 				continue
 			}
 
 			// TODO: check if fields for simplo are configured correctly
+
+			// add row to output matrix
+			outputRows = append(outputRows, row)
 
 			// add node to nodeMap
 			nodesMap[nodeCode] = nodeInfo{
@@ -238,7 +251,7 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 
 	if startPipeline && len(skippedRows) == 0 {
 		// write csv to Google Bucket
-		err = writeCSVToBucket(header, validatedRows, req.Filename)
+		err = writeCSVToBucket(outputRows, req.Filename)
 		if err != nil {
 			return "{}", nil, err
 		}
@@ -348,20 +361,15 @@ func validateRow(row []string, optionalFields []int) error {
 	return nil
 }
 
-func writeCSVToBucket(header []string, validatedRows map[string][][]string, filename string) error {
+func writeCSVToBucket(outputRows [][]string, filename string) error {
+	tmpFilePath := fmt.Sprintf("../tmp/%s", filename)
 	// generate new csv
-	outputRows := [][]string{
-		header,
-	}
-	outputRows = append(outputRows, validatedRows[models.AgencyNetworkNodeType]...)
-	outputRows = append(outputRows, validatedRows[models.AgentNetworkNodeType]...)
-
-	err := lib.WriteCsv("../tmp/"+filename, outputRows, ';')
+	err := lib.WriteCsv(tmpFilePath, outputRows, ';')
 	if err != nil {
 		log.Printf("Error writing csv: %s", err.Error())
 		return err
 	}
-	rawDoc, err := os.ReadFile("../tmp/" + filename)
+	rawDoc, err := os.ReadFile(tmpFilePath)
 	if err != nil {
 		log.Printf("Error reading generated csv: %s", err.Error())
 		return err
