@@ -23,7 +23,6 @@ type ImportNodesReq struct {
 }
 
 type nodeInfo struct {
-	Uid            string
 	Warrant        string
 	IsActive       bool
 	HasAnnex       bool
@@ -260,7 +259,6 @@ func buildNetworkNodesMap(dbNodes []models.NetworkNode) map[string]nodeInfo {
 	nodesMap := make(map[string]nodeInfo)
 	for _, nn := range dbNodes {
 		nodesMap[nn.Code] = nodeInfo{
-			Uid:            nn.Uid,
 			Warrant:        nn.Warrant,
 			IsActive:       nn.IsActive,
 			HasAnnex:       nn.HasAnnex,
