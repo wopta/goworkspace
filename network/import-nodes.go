@@ -123,14 +123,14 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 
 	// validate csv rows
 
-	for rowIndex, row := range df.Records()[1:] {
+	for _, row := range df.Records()[1:] {
 		// normalize cells content if err add to skipped rows
 		row = normalizeFields(row)
 
 		// check if all required fields have been compiled
 		err = validateRow(row)
 		if err != nil {
-			log.Printf("Error validating row %02d: %s", rowIndex+1, err.Error())
+			log.Printf("Error processing node %s: %s", row[0], err.Error())
 			skippedRows[row[2]] = append(skippedRows[row[2]], row[0])
 			continue
 		}
@@ -143,7 +143,7 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		for _, row := range validatedRows[models.AgencyNetworkNodeType] {
 			nodeCode := row[0]
 			warrantName := row[4]
-			fatherNodeCode := row[5]
+			parentNodeCode := row[5]
 			isMgaProponent := boolMap[row[28]]
 			hasAnnex := boolMap[row[29]]
 			designation := row[31]
@@ -151,15 +151,23 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 
 			// check if node is not already present
 			if !reflect.ValueOf(nodesMap[nodeCode]).IsZero() {
+				log.Printf("Error processing node %s: duplicated node code", nodeCode)
 				skippedRows[models.AgencyNetworkNodeType] = append(skippedRows[models.AgencyNetworkNodeType], nodeCode)
 				continue
 			}
 
 			// get father
-			fatherNode := nodesMap[fatherNodeCode]
+			parentNode := nodesMap[parentNodeCode]
 
 			// check if parent is an agent or not present in nodesMap, if so skip
-			if reflect.ValueOf(fatherNode).IsZero() || fatherNode.Type == models.AgentNetworkNodeType {
+			if reflect.ValueOf(parentNode).IsZero() {
+				log.Printf("Error processing node %s: parent node not found", nodeCode)
+				skippedRows[models.AgencyNetworkNodeType] = append(skippedRows[models.AgencyNetworkNodeType], nodeCode)
+				continue
+			}
+
+			if parentNode.Type == models.AgentNetworkNodeType {
+				log.Printf("Error processing node %s: agency can't have parent node of type agent", nodeCode)
 				skippedRows[models.AgencyNetworkNodeType] = append(skippedRows[models.AgencyNetworkNodeType], nodeCode)
 				continue
 			}
@@ -170,29 +178,35 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 				- check is mga proponent with father
 				- check warrant compatibility with father
 			*/
-			if fatherNode.Type != models.AreaManagerNetworkNodeType && fatherNode.HasAnnex != hasAnnex {
+			if parentNode.Type != models.AreaManagerNetworkNodeType && parentNode.HasAnnex != hasAnnex {
+				log.Printf("Error processing node %s: hasAnnex configuration not matching parent configuration", nodeCode)
 				skippedRows[models.AgencyNetworkNodeType] = append(skippedRows[models.AgencyNetworkNodeType], nodeCode)
 				continue
 			}
-			if fatherNode.Type != models.AreaManagerNetworkNodeType && fatherNode.IsMgaProponent != isMgaProponent {
+			if parentNode.Type != models.AreaManagerNetworkNodeType && parentNode.IsMgaProponent != isMgaProponent {
+				log.Printf("Error processing node %s: isMgaProponent configuration not matching parent configuration", nodeCode)
 				skippedRows[models.AgencyNetworkNodeType] = append(skippedRows[models.AgencyNetworkNodeType], nodeCode)
 				continue
 			}
-			if !lib.SliceContains(warrantsMap[fatherNode.Warrant], warrantName) {
+			if !lib.SliceContains(warrantsMap[parentNode.Warrant], warrantName) {
+				log.Printf("Error processing node %s: warrant configuration not matching parent configuration", nodeCode)
 				skippedRows[models.AgencyNetworkNodeType] = append(skippedRows[models.AgencyNetworkNodeType], nodeCode)
 				continue
 			}
 
 			// check if fields for simplo are configured correctly
 			if worksForUid != "" {
+				log.Printf("Error processing node %s: not empty worksForUid", nodeCode)
 				skippedRows[models.AgencyNetworkNodeType] = append(skippedRows[models.AgencyNetworkNodeType], nodeCode)
 				continue
 			}
 
 			if isMgaProponent && (!hasAnnex || designation == "") {
+				log.Printf("Error processing node %s: invalid node configuration for isMgaProponent = true", nodeCode)
 				skippedRows[models.AgencyNetworkNodeType] = append(skippedRows[models.AgencyNetworkNodeType], nodeCode)
 				continue
 			} else if !isMgaProponent && hasAnnex && designation == "" {
+				log.Printf("Error processing node %s: invalid node configuration for isMgaProponent = false", nodeCode)
 				skippedRows[models.AgencyNetworkNodeType] = append(skippedRows[models.AgencyNetworkNodeType], nodeCode)
 				continue
 			}
@@ -215,7 +229,7 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		for _, row := range validatedRows[models.AgentNetworkNodeType] {
 			nodeCode := row[0]
 			warrantName := row[4]
-			fatherNodeCode := row[5]
+			parentNodeCode := row[5]
 			isMgaProponent := boolMap[row[28]]
 			hasAnnex := boolMap[row[29]]
 			designation := row[31]
@@ -223,15 +237,17 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 
 			// check if node is not already present
 			if !reflect.ValueOf(nodesMap[nodeCode]).IsZero() {
+				log.Printf("Error processing node %s: duplicated node code", nodeCode)
 				skippedRows[models.AgentNetworkNodeType] = append(skippedRows[models.AgentNetworkNodeType], nodeCode)
 				continue
 			}
 
 			// get father
-			fatherNode := nodesMap[fatherNodeCode]
+			parentNode := nodesMap[parentNodeCode]
 
 			// check if parent is an agent or not present in nodesMap, if so skip
-			if reflect.ValueOf(fatherNode).IsZero() || fatherNode.Type == models.AgentNetworkNodeType {
+			if reflect.ValueOf(parentNode).IsZero() || parentNode.Type == models.AgentNetworkNodeType {
+				log.Printf("Error processing node %s: parent node not found", nodeCode)
 				skippedRows[models.AgentNetworkNodeType] = append(skippedRows[models.AgentNetworkNodeType], nodeCode)
 				continue
 			}
@@ -242,24 +258,29 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 				- check is mga proponent with father
 				- check warrant compatibility with father
 			*/
-			if fatherNode.Type != models.AreaManagerNetworkNodeType && fatherNode.HasAnnex != hasAnnex {
+			if parentNode.Type != models.AreaManagerNetworkNodeType && parentNode.HasAnnex != hasAnnex {
+				log.Printf("Error processing node %s: hasAnnex configuration not matching parent configuration", nodeCode)
 				skippedRows[models.AgentNetworkNodeType] = append(skippedRows[models.AgentNetworkNodeType], nodeCode)
 				continue
 			}
-			if fatherNode.Type != models.AreaManagerNetworkNodeType && fatherNode.IsMgaProponent != isMgaProponent {
+			if parentNode.Type != models.AreaManagerNetworkNodeType && parentNode.IsMgaProponent != isMgaProponent {
+				log.Printf("Error processing node %s: isMgaProponent configuration not matching parent configuration", nodeCode)
 				skippedRows[models.AgentNetworkNodeType] = append(skippedRows[models.AgentNetworkNodeType], nodeCode)
 				continue
 			}
-			if !lib.SliceContains(warrantsMap[fatherNode.Warrant], warrantName) {
+			if !lib.SliceContains(warrantsMap[parentNode.Warrant], warrantName) {
+				log.Printf("Error processing node %s: warrant configuration not matching parent configuration", nodeCode)
 				skippedRows[models.AgentNetworkNodeType] = append(skippedRows[models.AgentNetworkNodeType], nodeCode)
 				continue
 			}
 
 			// check if fields for simplo are configured correctly
 			if isMgaProponent && (!hasAnnex || designation == "" || worksForUid == "" || (worksForUid != "__wopta__" && nodesMap[worksForUid].RuiSection != "E")) {
+				log.Printf("Error processing node %s: invalid node configuration for isMgaProponent = true", nodeCode)
 				skippedRows[models.AgentNetworkNodeType] = append(skippedRows[models.AgentNetworkNodeType], nodeCode)
 				continue
 			} else if !isMgaProponent && ((hasAnnex && designation == "" && lib.SliceContains([]string{"A", "B"}, nodesMap[worksForUid].RuiSection)) || (!hasAnnex && designation != "" && worksForUid != "")) {
+				log.Printf("Error processing node %s: invalid node configuration for isMgaProponent = false", nodeCode)
 				skippedRows[models.AgentNetworkNodeType] = append(skippedRows[models.AgentNetworkNodeType], nodeCode)
 				continue
 			}
@@ -422,7 +443,7 @@ func validateRow(row []string) error {
 
 	for fieldIndex, fieldValue := range row {
 		if (fieldValue == "" || strings.EqualFold(fieldValue, "NaN")) && lib.SliceContains(requiredFields, fieldIndex) {
-			return errors.New("missing required field")
+			return fmt.Errorf("missing required field at index: %02d", fieldIndex)
 		}
 	}
 
@@ -433,11 +454,11 @@ func validateRow(row []string) error {
 	var dateFieldsIndexes = []int{9, 27}
 	for _, index := range dateFieldsIndexes {
 		if row[index] == "" && lib.SliceContains(requiredFields, index) {
-			return errors.New("missing required field")
+			return fmt.Errorf("missing required field at index: %02d", index)
 		}
 		_, err := time.Parse("02012006", fmt.Sprintf("%08s", row[index]))
-		if err != nil {
-			return errors.New("malformed date")
+		if err != nil && lib.SliceContains(requiredFields, index) {
+			return fmt.Errorf("malformed date at index: %02d", index)
 		}
 	}
 
