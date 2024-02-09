@@ -256,32 +256,6 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	return "{}", nil, nil
 }
 
-func writeCSVToBucket(header []string, validatedRows map[string][][]string, filename string) error {
-	// generate new csv
-	outputRows := [][]string{
-		header,
-	}
-	outputRows = append(outputRows, validatedRows[models.AgencyNetworkNodeType]...)
-	outputRows = append(outputRows, validatedRows[models.AgentNetworkNodeType]...)
-
-	lib.WriteCsv("../tmp/"+filename, outputRows, ';')
-	rawDoc, err := os.ReadFile("../tmp/" + filename)
-	if err != nil {
-		log.Printf("Error reading generated csv: %s", err.Error())
-	}
-
-	// upload newly generated csv to Google Bucket
-	log.Printf("Saving import file to Google Bucket...")
-	filePath := fmt.Sprintf("dataflow/in_network_node/%s", filename)
-	_, err = lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filePath, rawDoc)
-	if err != nil {
-		log.Printf("Error saving import file to Google Bucket: %s", err.Error())
-		return err
-	}
-	log.Printf("Import file saved into Google Bucket")
-	return nil
-}
-
 func buildNetworkNodesMap(dbNodes []models.NetworkNode) map[string]nodeInfo {
 	nodesMap := make(map[string]nodeInfo)
 	for _, nn := range dbNodes {
@@ -373,5 +347,36 @@ func validateRow(row []string, optionalFields []int) error {
 			return errors.New("missing required field")
 		}
 	}
+	return nil
+}
+
+func writeCSVToBucket(header []string, validatedRows map[string][][]string, filename string) error {
+	// generate new csv
+	outputRows := [][]string{
+		header,
+	}
+	outputRows = append(outputRows, validatedRows[models.AgencyNetworkNodeType]...)
+	outputRows = append(outputRows, validatedRows[models.AgentNetworkNodeType]...)
+
+	err := lib.WriteCsv("../tmp/"+filename, outputRows, ';')
+	if err != nil {
+		log.Printf("Error writing csv: %s", err.Error())
+		return err
+	}
+	rawDoc, err := os.ReadFile("../tmp/" + filename)
+	if err != nil {
+		log.Printf("Error reading generated csv: %s", err.Error())
+		return err
+	}
+
+	// upload newly generated csv to Google Bucket
+	log.Printf("Saving import file to Google Bucket...")
+	filePath := fmt.Sprintf("dataflow/in_network_node/%s", filename)
+	_, err = lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filePath, rawDoc)
+	if err != nil {
+		log.Printf("Error saving import file to Google Bucket: %s", err.Error())
+		return err
+	}
+	log.Printf("Import file saved into Google Bucket")
 	return nil
 }
