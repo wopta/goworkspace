@@ -124,7 +124,7 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		row = normalizeFields(row)
 
 		// check if all required fields have been compiled
-		err = searchMissingRequiredFields(row)
+		err = validateRow(row)
 		if err != nil {
 			log.Printf("Error validating row %02d: %s", rowIndex+1, err.Error())
 			skippedRows[row[2]] = append(skippedRows[row[2]], row[0])
@@ -390,7 +390,7 @@ func normalizeFields(row []string) []string {
 	return row
 }
 
-func searchMissingRequiredFields(row []string) error {
+func validateRow(row []string) error {
 	var requiredFields []int
 	if row[2] == models.AgencyNetworkNodeType {
 		requiredFields = []int{0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 25, 26, 27, 28, 32}
