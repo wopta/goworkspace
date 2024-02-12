@@ -109,9 +109,7 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	df := lib.CsvToDataframe(data)
 	log.Printf("#rows: %02d #cols: %02d", df.Nrow(), df.Ncol())
 
-	outputRows := [][]string{
-		df.Records()[0],
-	}
+	outputRows := [][]string{df.Records()[0]}
 
 	// load all nodes from Firestore
 	log.Printf("Fetching all network nodes from Firestore...")
@@ -120,7 +118,7 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		log.Printf("Error fetching all network nodes from Firestore: %s", err.Error())
 		return "{}", nil, err
 	}
-	log.Printf("Network nodes fetched from Firestore, #node: %02d", len(dbNodes))
+	log.Printf("#Network nodes fetched from Firestore: %02d", len(dbNodes))
 
 	//load all warrant from Google Bucket
 	log.Printf("Loading all warrants from Google Bucket...")
@@ -129,7 +127,7 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		log.Printf("Error loading warrants from Google Bucket: %s", err.Error())
 		return "{}", nil, err
 	}
-	log.Printf("Warrants loaded from Google Bucket, #warrants: %02d", len(warrants))
+	log.Printf("#Warrants loaded from Google Bucket: %02d", len(warrants))
 
 	// build map[warrant_name] = allowed sub warrants
 	warrantsMap = buildWarrantsCompatibilityMap(warrants)
@@ -170,171 +168,23 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	}
 
 	if validatedRows[models.AgencyNetworkNodeType] != nil {
-		for _, row := range validatedRows[models.AgencyNetworkNodeType] {
-			nodeCode := row[0]
-			warrantName := row[4]
-			parentNodeCode := row[5]
-			isMgaProponent := boolMap[row[28]]
-			hasAnnex := boolMap[row[29]]
-			designation := row[31]
-			worksForUid := row[31]
-
-			// check if node is not already present
-			if !reflect.ValueOf(nodesMap[nodeCode]).IsZero() {
-				log.Printf("Error processing node %s: duplicated node code", nodeCode)
-				resp.ErrorNodes.DuplicatedNodes = append(resp.ErrorNodes.DuplicatedNodes, nodeCode)
-				resp.TotalErrorNodes++
-				continue
-			}
-
-			// get father
-			parentNode := nodesMap[parentNodeCode]
-
-			// check if parent is an agent or not present in nodesMap, if so skip
-			if reflect.ValueOf(parentNode).IsZero() {
-				log.Printf("Error processing node %s: parent node not found", nodeCode)
-				resp.ErrorNodes.InvalidConfigurationNodes = append(resp.ErrorNodes.InvalidConfigurationNodes, nodeCode)
-				resp.TotalErrorNodes++
-				continue
-			}
-
-			if parentNode.Type == models.AgentNetworkNodeType {
-				log.Printf("Error processing node %s: agency can't have parent node of type agent", nodeCode)
-				resp.ErrorNodes.InvalidConfigurationNodes = append(resp.ErrorNodes.InvalidConfigurationNodes, nodeCode)
-				resp.TotalErrorNodes++
-				continue
-			}
-
-			/*
-				check current agency configuration against father configuration, with following checks:
-				- check is mga proponent with father
-				- check warrant compatibility with father
-			*/
-			if parentNode.Type != models.AreaManagerNetworkNodeType && parentNode.IsMgaProponent != isMgaProponent {
-				log.Printf("Error processing node %s: isMgaProponent configuration not matching parent configuration", nodeCode)
-				resp.ErrorNodes.InvalidConfigurationNodes = append(resp.ErrorNodes.InvalidConfigurationNodes, nodeCode)
-				resp.TotalErrorNodes++
-				continue
-			}
-
-			if !lib.SliceContains(warrantsMap[parentNode.Warrant], warrantName) {
-				log.Printf("Error processing node %s: warrant configuration not matching parent configuration", nodeCode)
-				resp.ErrorNodes.InvalidConfigurationNodes = append(resp.ErrorNodes.InvalidConfigurationNodes, nodeCode)
-				resp.TotalErrorNodes++
-				continue
-			}
-
-			// check if fields for simplo are configured correctly
-			if worksForUid != "" {
-				log.Printf("Error processing node %s: not empty worksForUid", nodeCode)
-				resp.ErrorNodes.InvalidConfigurationNodes = append(resp.ErrorNodes.InvalidConfigurationNodes, nodeCode)
-				resp.TotalErrorNodes++
-				continue
-			}
-
-			if isMgaProponent && (!hasAnnex || designation == "") {
-				log.Printf("Error processing node %s: invalid node configuration for isMgaProponent = true", nodeCode)
-				resp.ErrorNodes.InvalidConfigurationNodes = append(resp.ErrorNodes.InvalidConfigurationNodes, nodeCode)
-				resp.TotalErrorNodes++
-				continue
-			} else if !isMgaProponent && hasAnnex && designation == "" {
-				log.Printf("Error processing node %s: invalid node configuration for isMgaProponent = false", nodeCode)
-				resp.ErrorNodes.InvalidConfigurationNodes = append(resp.ErrorNodes.InvalidConfigurationNodes, nodeCode)
-				resp.TotalErrorNodes++
-				continue
-			}
-
-			// add row to output matrix
-			outputRows = append(outputRows, row)
-			resp.ValidNodes = append(resp.ValidNodes, nodeCode)
-			resp.TotalValidNodes++
-
-			// add node to nodeMap
-			nodesMap[nodeCode] = nodeInfo{
-				Warrant:        warrantName,
-				HasAnnex:       hasAnnex,
-				IsMgaProponent: isMgaProponent,
-				Type:           models.AgencyNetworkNodeType,
-				RuiSection:     row[8],
-			}
-		}
+		duplicatedNodes, invalidNodes, validNodes, validRows := nodeConfigurationValidation(models.AgencyNetworkNodeType, validatedRows[models.AgencyNetworkNodeType], nodesMap, warrantsMap)
+		outputRows = append(outputRows, validRows...)
+		resp.ErrorNodes.DuplicatedNodes = append(resp.ErrorNodes.DuplicatedNodes, duplicatedNodes...)
+		resp.ErrorNodes.InvalidConfigurationNodes = append(resp.ErrorNodes.InvalidConfigurationNodes, invalidNodes...)
+		resp.ValidNodes = append(resp.ValidNodes, validNodes...)
 	}
 
 	if validatedRows[models.AgentNetworkNodeType] != nil {
-		for _, row := range validatedRows[models.AgentNetworkNodeType] {
-			nodeCode := row[0]
-			warrantName := row[4]
-			parentNodeCode := row[5]
-			isMgaProponent := boolMap[row[28]]
-			hasAnnex := boolMap[row[29]]
-			designation := row[31]
-			worksForUid := row[31]
-
-			// check if node is not already present
-			if !reflect.ValueOf(nodesMap[nodeCode]).IsZero() {
-				log.Printf("Error processing node %s: duplicated node code", nodeCode)
-				resp.ErrorNodes.DuplicatedNodes = append(resp.ErrorNodes.DuplicatedNodes, nodeCode)
-				resp.TotalErrorNodes++
-				continue
-			}
-
-			// get father
-			parentNode := nodesMap[parentNodeCode]
-
-			// check if parent is an agent or not present in nodesMap, if so skip
-			if reflect.ValueOf(parentNode).IsZero() || parentNode.Type == models.AgentNetworkNodeType {
-				log.Printf("Error processing node %s: parent node not found", nodeCode)
-				resp.ErrorNodes.InvalidConfigurationNodes = append(resp.ErrorNodes.InvalidConfigurationNodes, nodeCode)
-				resp.TotalErrorNodes++
-				continue
-			}
-
-			/*
-				check current agent configuration against father configuration, with following checks:
-				- check is mga proponent with father
-				- check warrant compatibility with father
-			*/
-			if parentNode.Type != models.AreaManagerNetworkNodeType && parentNode.IsMgaProponent != isMgaProponent {
-				log.Printf("Error processing node %s: isMgaProponent configuration not matching parent configuration", nodeCode)
-				resp.ErrorNodes.InvalidConfigurationNodes = append(resp.ErrorNodes.InvalidConfigurationNodes, nodeCode)
-				resp.TotalErrorNodes++
-				continue
-			}
-			if !lib.SliceContains(warrantsMap[parentNode.Warrant], warrantName) {
-				log.Printf("Error processing node %s: warrant configuration not matching parent configuration", nodeCode)
-				resp.ErrorNodes.InvalidConfigurationNodes = append(resp.ErrorNodes.InvalidConfigurationNodes, nodeCode)
-				resp.TotalErrorNodes++
-				continue
-			}
-
-			// check if fields for simplo are configured correctly
-			if isMgaProponent && (!hasAnnex || designation == "" || worksForUid == "" || (worksForUid != "__wopta__" && nodesMap[worksForUid].RuiSection != "E")) {
-				log.Printf("Error processing node %s: invalid node configuration for isMgaProponent = true", nodeCode)
-				resp.ErrorNodes.InvalidConfigurationNodes = append(resp.ErrorNodes.InvalidConfigurationNodes, nodeCode)
-				resp.TotalErrorNodes++
-				continue
-			} else if !isMgaProponent && ((hasAnnex && designation == "" && lib.SliceContains([]string{"A", "B"}, nodesMap[worksForUid].RuiSection)) || (!hasAnnex && designation != "" && worksForUid != "")) {
-				log.Printf("Error processing node %s: invalid node configuration for isMgaProponent = false", nodeCode)
-				resp.ErrorNodes.InvalidConfigurationNodes = append(resp.ErrorNodes.InvalidConfigurationNodes, nodeCode)
-				resp.TotalErrorNodes++
-				continue
-			}
-
-			// add row to output matrix
-			outputRows = append(outputRows, row)
-			resp.ValidNodes = append(resp.ValidNodes, nodeCode)
-			resp.TotalValidNodes++
-
-			// add node to nodeMap
-			nodesMap[nodeCode] = nodeInfo{
-				Warrant:        warrantName,
-				HasAnnex:       hasAnnex,
-				IsMgaProponent: isMgaProponent,
-				Type:           models.AgentNetworkNodeType,
-				RuiSection:     row[26],
-			}
-		}
+		duplicatedNodes, invalidNodes, validNodes, validRows := nodeConfigurationValidation(models.AgentNetworkNodeType, validatedRows[models.AgentNetworkNodeType], nodesMap, warrantsMap)
+		outputRows = append(outputRows, validRows...)
+		resp.ErrorNodes.DuplicatedNodes = append(resp.ErrorNodes.DuplicatedNodes, duplicatedNodes...)
+		resp.ErrorNodes.InvalidConfigurationNodes = append(resp.ErrorNodes.InvalidConfigurationNodes, invalidNodes...)
+		resp.ValidNodes = append(resp.ValidNodes, validNodes...)
 	}
+
+	resp.TotalValidNodes = len(resp.ValidNodes)
+	resp.TotalErrorNodes = len(resp.ErrorNodes.DuplicatedNodes) + len(resp.ErrorNodes.InvalidConfigurationNodes)
 
 	if req.StartPipeline != nil {
 		startPipeline = *req.StartPipeline
@@ -524,6 +374,109 @@ func validateRow(row []string) error {
 	}
 
 	return nil
+}
+
+func nodeConfigurationValidation(nodeType string, rows [][]string, nodesMap map[string]nodeInfo, warrantsMap map[string][]string) ([]string, []string, []string, [][]string) {
+	var (
+		duplicatedNodes           = make([]string, 0)
+		invalidConfigurationNodes = make([]string, 0)
+		validNodes                = make([]string, 0)
+		outputRows                = make([][]string, 0)
+	)
+
+	for _, row := range rows {
+		nodeCode := row[0]
+		warrantName := row[4]
+		parentNodeCode := row[5]
+		isMgaProponent := boolMap[row[28]]
+		hasAnnex := boolMap[row[29]]
+		designation := row[31]
+		worksForUid := row[31]
+
+		// check if node is not already present
+		if !reflect.ValueOf(nodesMap[nodeCode]).IsZero() {
+			log.Printf("Error processing node %s: duplicated node code", nodeCode)
+			duplicatedNodes = append(duplicatedNodes, nodeCode)
+			continue
+		}
+
+		// get father
+		parentNode := nodesMap[parentNodeCode]
+
+		// check if parent is present in nodesMap, if not skip
+		if reflect.ValueOf(parentNode).IsZero() {
+			log.Printf("Error processing node %s: parent node not found", nodeCode)
+			invalidConfigurationNodes = append(invalidConfigurationNodes, nodeCode)
+			continue
+		}
+
+		// check if parent is an agent in nodesMap, if not skip
+		if parentNode.Type == models.AgentNetworkNodeType {
+			log.Printf("Error processing node %s: agency can't have parent node of type agent", nodeCode)
+			invalidConfigurationNodes = append(invalidConfigurationNodes, nodeCode)
+			continue
+		}
+
+		/*
+			check current agency configuration against father configuration, with following checks:
+			- check is mga proponent with father
+			- check warrant compatibility with father
+		*/
+		if parentNode.Type != models.AreaManagerNetworkNodeType && parentNode.IsMgaProponent != isMgaProponent {
+			log.Printf("Error processing node %s: isMgaProponent configuration not matching parent configuration", nodeCode)
+			invalidConfigurationNodes = append(invalidConfigurationNodes, nodeCode)
+			continue
+		}
+
+		if !lib.SliceContains(warrantsMap[parentNode.Warrant], warrantName) {
+			log.Printf("Error processing node %s: warrant configuration not matching parent configuration", nodeCode)
+			invalidConfigurationNodes = append(invalidConfigurationNodes, nodeCode)
+			continue
+		}
+
+		if nodeType == models.AgencyNetworkNodeType {
+			// check if fields for simplo are configured correctly
+			if worksForUid != "" {
+				log.Printf("Error processing node %s: not empty worksForUid", nodeCode)
+				invalidConfigurationNodes = append(invalidConfigurationNodes, nodeCode)
+				continue
+			}
+
+			if isMgaProponent && (!hasAnnex || designation == "") {
+				log.Printf("Error processing node %s: invalid node configuration for isMgaProponent = true", nodeCode)
+				invalidConfigurationNodes = append(invalidConfigurationNodes, nodeCode)
+				continue
+			} else if !isMgaProponent && hasAnnex && designation == "" {
+				log.Printf("Error processing node %s: invalid node configuration for isMgaProponent = false", nodeCode)
+				invalidConfigurationNodes = append(invalidConfigurationNodes, nodeCode)
+				continue
+			}
+		} else if nodeType == models.AgentNetworkNodeType {
+			// check if fields for simplo are configured correctly
+			if isMgaProponent && (!hasAnnex || designation == "" || worksForUid == "" || (worksForUid != "__wopta__" && nodesMap[worksForUid].RuiSection != "E")) {
+				log.Printf("Error processing node %s: invalid node configuration for isMgaProponent = true", nodeCode)
+				invalidConfigurationNodes = append(invalidConfigurationNodes, nodeCode)
+				continue
+			} else if !isMgaProponent && ((hasAnnex && designation == "" && lib.SliceContains([]string{"A", "B"}, nodesMap[worksForUid].RuiSection)) || (!hasAnnex && designation != "" && worksForUid != "")) {
+				log.Printf("Error processing node %s: invalid node configuration for isMgaProponent = false", nodeCode)
+				invalidConfigurationNodes = append(invalidConfigurationNodes, nodeCode)
+				continue
+			}
+		}
+
+		validNodes = append(validNodes, nodeCode)
+		outputRows = append(outputRows, row)
+		// add node to nodeMap
+		nodesMap[nodeCode] = nodeInfo{
+			Warrant:        warrantName,
+			HasAnnex:       hasAnnex,
+			IsMgaProponent: isMgaProponent,
+			Type:           models.AgencyNetworkNodeType,
+			RuiSection:     row[8],
+		}
+	}
+
+	return duplicatedNodes, invalidConfigurationNodes, validNodes, outputRows
 }
 
 func writeCSVToBucket(outputRows [][]string, filename string) error {
