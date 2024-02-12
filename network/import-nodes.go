@@ -1,6 +1,8 @@
 package network
 
 import (
+	"cloud.google.com/go/pubsub"
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
@@ -62,13 +64,6 @@ var (
 		"Responsabile dell'attività di intermediazione",
 	}
 )
-
-/*const (
-	duplicatedNodes      = "duplicatedNodes"
-	notValidRows         = "notValidRows"
-	missingParent        = "missingParent"
-	invalidConfiguration = "invalidConfiguration"
-)*/
 
 func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
@@ -346,11 +341,25 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	}
 
 	if startPipeline && resp.TotalInputNodes == resp.TotalValidNodes {
+		filename := fmt.Sprintf("pubsub_%s", req.Filename)
 		// write csv to Google Bucket
-		err = writeCSVToBucket(outputRows, req.Filename)
+		err = writeCSVToBucket(outputRows, filename)
 		if err != nil {
 			return "{}", nil, err
 		}
+
+		pubSubClient, err := pubsub.NewClient(context.Background(), os.Getenv("GOOGLE_PROJECT_ID"))
+		if err != nil {
+			return "{}", nil, err
+		}
+		topic := pubSubClient.Topic("dataflow")
+		//topic.Publish(context.Background(), &pubsub.Message{Data: []byte(`{"message": {"attributes": {"filename": "` + filename + `"}}}`)})
+		topic.Publish(context.Background(), &pubsub.Message{
+			Attributes: map[string]string{
+				"filename": filename,
+			},
+		})
+		defer topic.Stop()
 	}
 
 	log.Printf("#Input Nodes: %d", resp.TotalInputNodes)
