@@ -190,8 +190,15 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		startPipeline = *req.StartPipeline
 	}
 
-	if startPipeline && resp.TotalInputNodes == resp.TotalValidNodes {
-		filename := fmt.Sprintf("pubsub_%s", req.Filename)
+	if true || startPipeline && resp.TotalInputNodes == resp.TotalValidNodes {
+		var filename string
+		splittedFilename := strings.Split(req.Filename, ".")
+		if len(splittedFilename) > 2 {
+			filename = strings.Join(splittedFilename[:len(splittedFilename)-1], ".")
+		} else {
+			filename = splittedFilename[0]
+		}
+		filename += fmt.Sprintf("_%d.%s", time.Now().UTC().Unix(), splittedFilename[len(splittedFilename)-1])
 		// write csv to Google Bucket
 		err = writeCSVToBucket(outputRows, filename)
 		if err != nil {
