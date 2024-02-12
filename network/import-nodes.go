@@ -23,12 +23,17 @@ type ImportNodesReq struct {
 	StartPipeline *bool  `json:"startPipeline,omitempty"`
 }
 
+type ErrorCategories struct {
+	DuplicatedNodes           []string `json:"duplicatedNodes"`
+	InvalidConfigurationNodes []string `json:"invalidConfigurationNodes"`
+}
+
 type ImportNodesResp struct {
-	TotalInputNodes int                 `json:"totalInputNodes"`
-	TotalErrorNodes int                 `json:"totalErrorNodes"`
-	TotalValidNodes int                 `json:"totalValidNodes"`
-	ErrorNodes      map[string][]string `json:"errorNodes"`
-	ValidNodes      []string            `json:"validNodes"`
+	TotalInputNodes int             `json:"totalInputNodes"`
+	TotalErrorNodes int             `json:"totalErrorNodes"`
+	TotalValidNodes int             `json:"totalValidNodes"`
+	ErrorNodes      ErrorCategories `json:"errorNodes"`
+	ValidNodes      []string        `json:"validNodes"`
 }
 
 type nodeInfo struct {
@@ -57,12 +62,12 @@ var (
 	}
 )
 
-const (
+/*const (
 	duplicatedNodes      = "duplicatedNodes"
 	notValidRows         = "notValidRows"
 	missingParent        = "missingParent"
 	invalidConfiguration = "invalidConfiguration"
-)
+)*/
 
 func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
@@ -75,7 +80,6 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		nodesMap      = make(map[string]nodeInfo)
 		warrantsMap   = make(map[string][]string)
 		validatedRows = make(map[string][][]string)
-		skippedRows   = make(map[string][]string)
 	)
 
 	log.SetPrefix("ImportNodesFx ")
@@ -143,11 +147,9 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		TotalInputNodes: len(df.Records()[1:]),
 		TotalErrorNodes: 0,
 		TotalValidNodes: 0,
-		ErrorNodes: map[string][]string{
-			duplicatedNodes:      make([]string, 0),
-			notValidRows:         make([]string, 0),
-			missingParent:        make([]string, 0),
-			invalidConfiguration: make([]string, 0),
+		ErrorNodes: ErrorCategories{
+			DuplicatedNodes:           make([]string, 0),
+			InvalidConfigurationNodes: make([]string, 0),
 		},
 		ValidNodes: make([]string, 0),
 	}
@@ -162,9 +164,8 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		err = validateRow(row)
 		if err != nil {
 			log.Printf("Error processing node %s: %s", row[0], err.Error())
-			resp.ErrorNodes[notValidRows] = append(resp.ErrorNodes[notValidRows], row[0])
+			resp.ErrorNodes.InvalidConfigurationNodes = append(resp.ErrorNodes.InvalidConfigurationNodes, row[0])
 			resp.TotalErrorNodes++
-			skippedRows[row[2]] = append(skippedRows[row[2]], row[0])
 			continue
 		}
 
@@ -185,9 +186,8 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 			// check if node is not already present
 			if !reflect.ValueOf(nodesMap[nodeCode]).IsZero() {
 				log.Printf("Error processing node %s: duplicated node code", nodeCode)
-				resp.ErrorNodes[duplicatedNodes] = append(resp.ErrorNodes[duplicatedNodes], nodeCode)
+				resp.ErrorNodes.DuplicatedNodes = append(resp.ErrorNodes.DuplicatedNodes, nodeCode)
 				resp.TotalErrorNodes++
-				skippedRows[models.AgencyNetworkNodeType] = append(skippedRows[models.AgencyNetworkNodeType], nodeCode)
 				continue
 			}
 
@@ -197,61 +197,54 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 			// check if parent is an agent or not present in nodesMap, if so skip
 			if reflect.ValueOf(parentNode).IsZero() {
 				log.Printf("Error processing node %s: parent node not found", nodeCode)
-				resp.ErrorNodes[missingParent] = append(resp.ErrorNodes[missingParent], nodeCode)
+				resp.ErrorNodes.InvalidConfigurationNodes = append(resp.ErrorNodes.InvalidConfigurationNodes, nodeCode)
 				resp.TotalErrorNodes++
-				skippedRows[models.AgencyNetworkNodeType] = append(skippedRows[models.AgencyNetworkNodeType], nodeCode)
 				continue
 			}
 
 			if parentNode.Type == models.AgentNetworkNodeType {
 				log.Printf("Error processing node %s: agency can't have parent node of type agent", nodeCode)
-				resp.ErrorNodes[invalidConfiguration] = append(resp.ErrorNodes[invalidConfiguration], nodeCode)
+				resp.ErrorNodes.InvalidConfigurationNodes = append(resp.ErrorNodes.InvalidConfigurationNodes, nodeCode)
 				resp.TotalErrorNodes++
-				skippedRows[models.AgencyNetworkNodeType] = append(skippedRows[models.AgencyNetworkNodeType], nodeCode)
 				continue
 			}
 
 			/*
 				check current agency configuration against father configuration, with following checks:
-				- check has annex compatibility with father
 				- check is mga proponent with father
 				- check warrant compatibility with father
 			*/
 			if parentNode.Type != models.AreaManagerNetworkNodeType && parentNode.IsMgaProponent != isMgaProponent {
 				log.Printf("Error processing node %s: isMgaProponent configuration not matching parent configuration", nodeCode)
-				resp.ErrorNodes[invalidConfiguration] = append(resp.ErrorNodes[invalidConfiguration], nodeCode)
+				resp.ErrorNodes.InvalidConfigurationNodes = append(resp.ErrorNodes.InvalidConfigurationNodes, nodeCode)
 				resp.TotalErrorNodes++
-				skippedRows[models.AgencyNetworkNodeType] = append(skippedRows[models.AgencyNetworkNodeType], nodeCode)
 				continue
 			}
+
 			if !lib.SliceContains(warrantsMap[parentNode.Warrant], warrantName) {
 				log.Printf("Error processing node %s: warrant configuration not matching parent configuration", nodeCode)
-				resp.ErrorNodes[invalidConfiguration] = append(resp.ErrorNodes[invalidConfiguration], nodeCode)
+				resp.ErrorNodes.InvalidConfigurationNodes = append(resp.ErrorNodes.InvalidConfigurationNodes, nodeCode)
 				resp.TotalErrorNodes++
-				skippedRows[models.AgencyNetworkNodeType] = append(skippedRows[models.AgencyNetworkNodeType], nodeCode)
 				continue
 			}
 
 			// check if fields for simplo are configured correctly
 			if worksForUid != "" {
 				log.Printf("Error processing node %s: not empty worksForUid", nodeCode)
-				resp.ErrorNodes[invalidConfiguration] = append(resp.ErrorNodes[invalidConfiguration], nodeCode)
+				resp.ErrorNodes.InvalidConfigurationNodes = append(resp.ErrorNodes.InvalidConfigurationNodes, nodeCode)
 				resp.TotalErrorNodes++
-				skippedRows[models.AgencyNetworkNodeType] = append(skippedRows[models.AgencyNetworkNodeType], nodeCode)
 				continue
 			}
 
 			if isMgaProponent && (!hasAnnex || designation == "") {
 				log.Printf("Error processing node %s: invalid node configuration for isMgaProponent = true", nodeCode)
-				resp.ErrorNodes[invalidConfiguration] = append(resp.ErrorNodes[invalidConfiguration], nodeCode)
+				resp.ErrorNodes.InvalidConfigurationNodes = append(resp.ErrorNodes.InvalidConfigurationNodes, nodeCode)
 				resp.TotalErrorNodes++
-				skippedRows[models.AgencyNetworkNodeType] = append(skippedRows[models.AgencyNetworkNodeType], nodeCode)
 				continue
 			} else if !isMgaProponent && hasAnnex && designation == "" {
 				log.Printf("Error processing node %s: invalid node configuration for isMgaProponent = false", nodeCode)
-				resp.ErrorNodes[invalidConfiguration] = append(resp.ErrorNodes[invalidConfiguration], nodeCode)
+				resp.ErrorNodes.InvalidConfigurationNodes = append(resp.ErrorNodes.InvalidConfigurationNodes, nodeCode)
 				resp.TotalErrorNodes++
-				skippedRows[models.AgencyNetworkNodeType] = append(skippedRows[models.AgencyNetworkNodeType], nodeCode)
 				continue
 			}
 
@@ -284,9 +277,8 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 			// check if node is not already present
 			if !reflect.ValueOf(nodesMap[nodeCode]).IsZero() {
 				log.Printf("Error processing node %s: duplicated node code", nodeCode)
-				resp.ErrorNodes[duplicatedNodes] = append(resp.ErrorNodes[duplicatedNodes], nodeCode)
+				resp.ErrorNodes.DuplicatedNodes = append(resp.ErrorNodes.DuplicatedNodes, nodeCode)
 				resp.TotalErrorNodes++
-				skippedRows[models.AgentNetworkNodeType] = append(skippedRows[models.AgentNetworkNodeType], nodeCode)
 				continue
 			}
 
@@ -296,9 +288,8 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 			// check if parent is an agent or not present in nodesMap, if so skip
 			if reflect.ValueOf(parentNode).IsZero() || parentNode.Type == models.AgentNetworkNodeType {
 				log.Printf("Error processing node %s: parent node not found", nodeCode)
-				resp.ErrorNodes[missingParent] = append(resp.ErrorNodes[missingParent], nodeCode)
+				resp.ErrorNodes.InvalidConfigurationNodes = append(resp.ErrorNodes.InvalidConfigurationNodes, nodeCode)
 				resp.TotalErrorNodes++
-				skippedRows[models.AgentNetworkNodeType] = append(skippedRows[models.AgentNetworkNodeType], nodeCode)
 				continue
 			}
 
@@ -309,31 +300,27 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 			*/
 			if parentNode.Type != models.AreaManagerNetworkNodeType && parentNode.IsMgaProponent != isMgaProponent {
 				log.Printf("Error processing node %s: isMgaProponent configuration not matching parent configuration", nodeCode)
-				resp.ErrorNodes[invalidConfiguration] = append(resp.ErrorNodes[invalidConfiguration], nodeCode)
+				resp.ErrorNodes.InvalidConfigurationNodes = append(resp.ErrorNodes.InvalidConfigurationNodes, nodeCode)
 				resp.TotalErrorNodes++
-				skippedRows[models.AgentNetworkNodeType] = append(skippedRows[models.AgentNetworkNodeType], nodeCode)
 				continue
 			}
 			if !lib.SliceContains(warrantsMap[parentNode.Warrant], warrantName) {
 				log.Printf("Error processing node %s: warrant configuration not matching parent configuration", nodeCode)
-				resp.ErrorNodes[invalidConfiguration] = append(resp.ErrorNodes[invalidConfiguration], nodeCode)
+				resp.ErrorNodes.InvalidConfigurationNodes = append(resp.ErrorNodes.InvalidConfigurationNodes, nodeCode)
 				resp.TotalErrorNodes++
-				skippedRows[models.AgentNetworkNodeType] = append(skippedRows[models.AgentNetworkNodeType], nodeCode)
 				continue
 			}
 
 			// check if fields for simplo are configured correctly
 			if isMgaProponent && (!hasAnnex || designation == "" || worksForUid == "" || (worksForUid != "__wopta__" && nodesMap[worksForUid].RuiSection != "E")) {
 				log.Printf("Error processing node %s: invalid node configuration for isMgaProponent = true", nodeCode)
-				resp.ErrorNodes[invalidConfiguration] = append(resp.ErrorNodes[invalidConfiguration], nodeCode)
+				resp.ErrorNodes.InvalidConfigurationNodes = append(resp.ErrorNodes.InvalidConfigurationNodes, nodeCode)
 				resp.TotalErrorNodes++
-				skippedRows[models.AgentNetworkNodeType] = append(skippedRows[models.AgentNetworkNodeType], nodeCode)
 				continue
 			} else if !isMgaProponent && ((hasAnnex && designation == "" && lib.SliceContains([]string{"A", "B"}, nodesMap[worksForUid].RuiSection)) || (!hasAnnex && designation != "" && worksForUid != "")) {
 				log.Printf("Error processing node %s: invalid node configuration for isMgaProponent = false", nodeCode)
-				resp.ErrorNodes[invalidConfiguration] = append(resp.ErrorNodes[invalidConfiguration], nodeCode)
+				resp.ErrorNodes.InvalidConfigurationNodes = append(resp.ErrorNodes.InvalidConfigurationNodes, nodeCode)
 				resp.TotalErrorNodes++
-				skippedRows[models.AgentNetworkNodeType] = append(skippedRows[models.AgentNetworkNodeType], nodeCode)
 				continue
 			}
 
@@ -357,21 +344,17 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		startPipeline = *req.StartPipeline
 	}
 
-	if startPipeline && len(skippedRows) == 0 {
+	if startPipeline && resp.TotalInputNodes == resp.TotalValidNodes {
 		// write csv to Google Bucket
 		err = writeCSVToBucket(outputRows, req.Filename)
 		if err != nil {
 			return "{}", nil, err
 		}
-
-		// TODO: start dataflow pipeline
 	}
 
-	log.Printf("Skipped Rows: %v", skippedRows)
-	log.Printf("Not Valid Rows: %d", len(resp.ErrorNodes[notValidRows]))
-	log.Printf("Missing Parent Nodes: %d", len(resp.ErrorNodes[missingParent]))
-	log.Printf("Invalid Configuration Nodes: %d", len(resp.ErrorNodes[invalidConfiguration]))
-	log.Printf("Imported Nodes: %d", len(resp.ValidNodes))
+	log.Printf("#Input Nodes: %d", resp.TotalInputNodes)
+	log.Printf("#Invalid Configuration Nodes: %d", resp.TotalErrorNodes)
+	log.Printf("#Valid Nodes: %d", resp.TotalValidNodes)
 
 	rawResp, err := json.Marshal(resp)
 
