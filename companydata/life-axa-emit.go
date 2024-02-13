@@ -91,13 +91,14 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 		var (
 			policy models.Policy
 		)
+
 		docsnap := lib.GetFirestore("policy", transaction.PolicyUid)
 		docsnap.DataTo(&policy)
-		result = append(result, setRowLifeEmit(policy, df, transaction, now)...)
-
-		transaction.IsEmit = true
-
-		lib.SetFirestore("transactions", transaction.Uid, transaction)
+		if policy.Contractor.Type != "legalEntity" {
+			result = append(result, setRowLifeEmit(policy, df, transaction, now)...)
+			transaction.IsEmit = true
+			lib.SetFirestore("transactions", transaction.Uid, transaction)
+		}
 
 	}
 
@@ -110,13 +111,24 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	}
 	return "", nil, e
 }
+func mapContractorTypeAxaPLife(policy models.Policy) (models.Contractor, string) {
+	contractor := policy.Contractor
+	typeContractorAxa := ""
+	if policy.Contractor.Type == "legalEntity" {
+		typeContractorAxa = "PG"
+	} else {
+		typeContractorAxa = "PF"
 
+	}
+	return contractor, typeContractorAxa
+}
 func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.Transaction, now time.Time) [][]string {
 	var (
 		result               [][]string
 		residenceCab         string
 		networkCode, channel string
 	)
+
 	log.Println("LifeAxalEmit:  policy.Uid: ", policy.Uid)
 	fil := df.Filter(
 		dataframe.F{Colidx: 4, Colname: "CAP", Comparator: series.Eq, Comparando: policy.Contractor.Residence.PostalCode},
