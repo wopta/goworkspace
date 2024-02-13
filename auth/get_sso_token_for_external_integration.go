@@ -15,8 +15,8 @@ import (
 
 func GetTokenForExternalIntegrationFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		e              error
-		b              []byte
+		e        error
+		b        []byte
 		response GetTokenForExternalIntegrationResponse
 	)
 
@@ -34,9 +34,15 @@ func GetTokenForExternalIntegrationFx(w http.ResponseWriter, r *http.Request) (s
 }
 
 func getTokenForExternalIntegration(productName string, userUid string) (string, error) {
+	var code string
+
 	log.Println("--------------------------getTokenForExternalIntegration-------------------------------------------")
 
 	node := network.GetNetworkNodeByUid(userUid)
+	code = node.ExternalNetworkCode
+	if code == "" {
+		code = node.Code
+	}
 
 	// verify if user has access to the product
 	warrant := node.GetWarrant()
@@ -55,7 +61,7 @@ func getTokenForExternalIntegration(productName string, userUid string) (string,
 
 	// Create the JWT token with claims
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS512, jwt.MapClaims{
-		"codSubAgent": node.Code,
+		"codSubAgent": code,
 		"name":        node.GetName(),
 		"email":       node.Mail,
 		"exp":         expirationTime.Unix(),
