@@ -43,7 +43,7 @@ func Auth(w http.ResponseWriter, r *http.Request) {
 				Roles:   []string{"internal"},
 			},
 			{
-				Route:   "/sso/external/:productName/v1",
+				Route:   "/sso/external/v1/:productName",
 				Handler: GetTokenForExternalIntegrationFx,
 				Method:  http.MethodGet,
 				Roles:   []string{models.UserRoleAgent, models.UserRoleAgency},
