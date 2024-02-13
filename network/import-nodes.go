@@ -190,7 +190,7 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		startPipeline = *req.StartPipeline
 	}
 
-	if true || startPipeline && resp.TotalInputNodes == resp.TotalValidNodes {
+	if startPipeline && resp.TotalInputNodes == resp.TotalValidNodes {
 		var filename string
 		splittedFilename := strings.Split(req.Filename, ".")
 		if len(splittedFilename) > 2 {
