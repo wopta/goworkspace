@@ -210,7 +210,6 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 			return "{}", nil, err
 		}
 		topic := pubSubClient.Topic("dataflow")
-		//topic.Publish(context.Background(), &pubsub.Message{Data: []byte(`{"message": {"attributes": {"filename": "` + filename + `"}}}`)})
 		topic.Publish(context.Background(), &pubsub.Message{
 			Attributes: map[string]string{
 				"filename": filename,
