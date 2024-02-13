@@ -173,7 +173,7 @@ func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.T
 			row := []string{
 				mapCodecCompany(policy, g.CompanyCodec),         //Codice schema
 				policy.CodeCompany,                              //N° adesione individuale univoco
-				getRenew(policy, now),                           //Tipo di Transazione
+				getTypeTransactionAR(policy, trans),             //Tipo di Transazione
 				getFormatdate(policy.StartDate),                 //Data di decorrenza
 				getFormatdate(getRenewDate(policy, trans, now)), //"Data di rinnovo"
 				mapCoverageDuration(policy),                     //"Durata copertura assicurativa"
@@ -490,21 +490,51 @@ func getRenew(p models.Policy, now time.Time) string {
 	log.Println("LifeAxalEmit : getRenew result", result)
 	return result
 }
+func getTypeTransactionAR(p models.Policy, tr models.Transaction) string {
+	var result string
+	if p.PaymentSplit == string(models.PaySplitYear) || p.PaymentSplit == string(models.PaySplitYearly) {
 
+		result = "A"
+	}
+
+	if p.PaymentSplit == string(models.PaySplitMonthly) {
+		trdate, e := time.Parse("2006-01-02", tr.ScheduleDate)
+		trMounthInt := int(trdate.Month())
+		log.Println("LifeAxalEmit : getTypeTransaction error", e)
+		policyStartMounth := int(p.StartDate.Month())
+		log.Println("LifeAxalEmit : getTypeTransaction policyStartMounth", policyStartMounth)
+		log.Println("LifeAxalEmit : getTypeTransaction trMounthInt", trMounthInt)
+		if policyStartMounth == trMounthInt {
+
+			result = "A"
+
+		} else {
+
+			result = "R"
+		}
+	}
+	log.Println("LifeAxalEmit : getTypeTransactionresult", result)
+	return result
+}
 func getRenewDate(p models.Policy, trans models.Transaction, now time.Time) time.Time {
 	var result time.Time
-	addMonth := p.StartDate.AddDate(0, 1, 0)
+
 	if p.PaymentSplit == "year" || p.PaymentSplit == string(models.PaySplitYearly) {
 		result = p.StartDate
 	}
 	if p.PaymentSplit == string(models.PaySplitMonthly) {
+		trdate, e := time.Parse("2006-01-02", trans.ScheduleDate)
+		trMounthInt := int(trdate.Month())
+		log.Println("LifeAxalEmit : getTypeTransaction error", e)
+		policyStartMounth := int(p.StartDate.Month())
+		log.Println("LifeAxalEmit : getTypeTransaction policyStartMounth", policyStartMounth)
+		log.Println("LifeAxalEmit : getTypeTransaction trMounthInt", trMounthInt)
+		if policyStartMounth == trMounthInt {
 
-		if now.Before(addMonth) {
 			result = p.StartDate
 		} else {
-			sdate, e := time.Parse("2006-01-02", trans.ScheduleDate)
-			log.Println(e)
-			result = sdate
+
+			result = trdate
 		}
 	}
 	return result
