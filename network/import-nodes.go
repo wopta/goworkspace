@@ -205,6 +205,15 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 			return "{}", nil, err
 		}
 
+		log.Println("Getting invoker address...")
+		authToken, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
+		if err != nil {
+			log.Printf("Error getting invoker authToken: %s", err.Error())
+			return "{}", nil, err
+		}
+		invokerAddress := authToken.Email
+		log.Printf("Invoker address: %s", invokerAddress)
+
 		pubSubClient, err := pubsub.NewClient(context.Background(), os.Getenv("GOOGLE_PROJECT_ID"))
 		if err != nil {
 			return "{}", nil, err
@@ -212,7 +221,8 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		topic := pubSubClient.Topic("dataflow")
 		topic.Publish(context.Background(), &pubsub.Message{
 			Attributes: map[string]string{
-				"filename": filename,
+				"filename":       filename,
+				"invokerAddress": invokerAddress,
 			},
 		})
 		defer topic.Stop()
