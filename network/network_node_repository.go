@@ -109,6 +109,7 @@ func UpdateNode(node models.NetworkNode) error {
 			return err
 		}
 	}
+	originalNode.ExternalNetworkCode = node.ExternalNetworkCode
 	originalNode.Mail = node.Mail
 	originalNode.Warrant = node.Warrant
 	originalNode.Products = node.Products
