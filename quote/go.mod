@@ -10,9 +10,9 @@ require (
 	github.com/dustin/go-humanize v1.0.1
 	github.com/go-gota/gota v0.12.0
 	github.com/wopta/goworkspace/lib v1.0.98
-	github.com/wopta/goworkspace/models v1.1.82
-	github.com/wopta/goworkspace/network v1.0.34
-	github.com/wopta/goworkspace/sellable v1.0.61
+	github.com/wopta/goworkspace/models v1.1.83
+	github.com/wopta/goworkspace/network v1.0.35
+	github.com/wopta/goworkspace/sellable v1.0.62
 	github.com/xuri/excelize/v2 v2.8.0
 	google.golang.org/api v0.122.0
 	modernc.org/mathutil v1.5.0
@@ -69,7 +69,7 @@ require (
 	github.com/sergi/go-diff v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
-	github.com/wopta/goworkspace/product v1.0.82 // indirect
+	github.com/wopta/goworkspace/product v1.0.83 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20230802181842-ad255f2331ca // indirect
 	github.com/xuri/nfp v0.0.0-20230819163627-dc951e3ffe1a // indirect
