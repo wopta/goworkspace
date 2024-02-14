@@ -65,6 +65,14 @@ var (
 	}
 )
 
+const (
+	expectedColumns        = 33
+	fiscalCodeRegexPattern = "^(?:[A-Z][AEIOU][AEIOUX]|[AEIOU]X{2}|[B-DF-HJ-NP-TV-Z]{2}[A-Z]){2}(?:[\\dLMNP-V]{2}(?:[" +
+		"A-EHLMPR-T](?:[04LQ][1-9MNP-V]|[15MR][\\dLMNP-V]|[26NS][0-8LMNP-U])|[DHPS][37PT][0L]|[ACELMRT][37PT][01LM]|[" +
+		"AC-EHLMPR-T][26NS][9V])|(?:[02468LNQSU][048LQU]|[13579MPRTV][26NS])B[26NS][9V])(?:[A-MZ][1-9MNP-V][\\dLMNP-V]" +
+		"{2}|[A-M][0L](?:[1-9MNP-V][\\dLMNP-V]|[0L][1-9MNP-V]))[A-Z]$"
+)
+
 func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err           error
@@ -108,6 +116,10 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	// load dataframe
 	df := lib.CsvToDataframe(data)
 	log.Printf("#rows: %02d #cols: %02d", df.Nrow(), df.Ncol())
+	if df.Ncol() != expectedColumns {
+		log.Printf("#columns isn't correct, expected %d got %s", expectedColumns, df.Ncol())
+		return "{}", nil, fmt.Errorf("invalid file content")
+	}
 
 	outputRows := [][]string{df.Records()[0]}
 
@@ -151,7 +163,7 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	// validate csv rows
 
 	for _, row := range df.Records()[1:] {
-		// normalize cells content if err add to skipped rows
+		// normalize cells content
 		row = normalizeFields(row)
 
 		// check if all required fields have been compiled
@@ -223,6 +235,7 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 			Attributes: map[string]string{
 				"filename":       filename,
 				"invokerAddress": invokerAddress,
+				"module":         "in_network_node",
 			},
 		})
 		defer topic.Stop()
@@ -359,11 +372,7 @@ func validateRow(row []string) error {
 	}
 
 	// check fiscalCode format
-	fiscalCodePattern := "^(?:[A-Z][AEIOU][AEIOUX]|[AEIOU]X{2}|[B-DF-HJ-NP-TV-Z]{2}[A-Z]){2}(?:[\\dLMNP-V]{2}(?:[" +
-		"A-EHLMPR-T](?:[04LQ][1-9MNP-V]|[15MR][\\dLMNP-V]|[26NS][0-8LMNP-U])|[DHPS][37PT][0L]|[ACELMRT][37PT][01LM]|[" +
-		"AC-EHLMPR-T][26NS][9V])|(?:[02468LNQSU][048LQU]|[13579MPRTV][26NS])B[26NS][9V])(?:[A-MZ][1-9MNP-V][\\dLMNP-V]" +
-		"{2}|[A-M][0L](?:[1-9MNP-V][\\dLMNP-V]|[0L][1-9MNP-V]))[A-Z]$"
-	regExp, _ := regexp.Compile(fiscalCodePattern)
+	regExp, _ := regexp.Compile(fiscalCodeRegexPattern)
 	if lib.SliceContains(requiredFields, 22) && !regExp.MatchString(row[22]) {
 		return errors.New("invalid fiscal code")
 	}
@@ -428,7 +437,7 @@ func nodeConfigurationValidation(nodeType string, rows [][]string, nodesMap map[
 
 		// check if parent is an agent in nodesMap, if not skip
 		if parentNode.Type == models.AgentNetworkNodeType {
-			log.Printf("Error processing node %s: agency can't have parent node of type agent", nodeCode)
+			log.Printf("Error processing node %s: node can't have parent node of type agent", nodeCode)
 			invalidConfigurationNodes = append(invalidConfigurationNodes, nodeCode)
 			continue
 		}
@@ -469,7 +478,7 @@ func nodeConfigurationValidation(nodeType string, rows [][]string, nodesMap map[
 			}
 		} else if nodeType == models.AgentNetworkNodeType {
 			// check if fields for simplo are configured correctly
-			if isMgaProponent && (!hasAnnex || designation == "" || worksForUid == "" || (worksForUid != "__wopta__" && nodesMap[worksForUid].RuiSection != "E")) {
+			if isMgaProponent && (!hasAnnex || designation == "" || worksForUid == "" || (worksForUid != models.WorksForMgaUid && nodesMap[worksForUid].RuiSection != "E")) {
 				log.Printf("Error processing node %s: invalid node configuration for isMgaProponent = true", nodeCode)
 				invalidConfigurationNodes = append(invalidConfigurationNodes, nodeCode)
 				continue
