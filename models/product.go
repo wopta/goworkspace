@@ -132,13 +132,15 @@ type AnnulmentCode struct {
 }
 
 type ProductInfo struct {
-	Name         string `json:"name"`
-	NameTitle    string `json:"nameTitle"`
-	NameSubtitle string `json:"nameSubtitle"`
-	NameDesc     string `json:"nameDesc"`
-	Logo         string `json:"logo"`
-	Version      string `json:"version"`
-	Company      string `json:"company"` // DEPRECATED
+	Name         string        `json:"name"`
+	NameTitle    string        `json:"nameTitle"`
+	NameSubtitle string        `json:"nameSubtitle"`
+	NameDesc     string        `json:"nameDesc"`
+	Logo         string        `json:"logo"`
+	Version      string        `json:"version"`
+	Company      string        `json:"company"`               // DEPRECATED
+	ExternalUrl  string        `json:"externalUrl,omitempty"` // external integration products
+	Products     []ProductInfo `json:"products,omitempty"`    // external integration products
 }
 
 func ProductToListData(query *firestore.DocumentIterator) []Product {

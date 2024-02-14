@@ -31,3 +31,7 @@ func (w *Warrant) GetFlowName(productName string) string {
 
 	return flowName
 }
+
+func (w *Warrant) HasProductByName(productName string) bool {
+	return w.GetProduct(productName) != nil
+}
