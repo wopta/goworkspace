@@ -50,6 +50,8 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 		i = i.AddDate(0, 0, 1)
 
 	}
+	fmt.Println("LifeAxalEmit: ", i.Format("2006-01-02"))
+	queryListdate = append(queryListdate, i.Format("2006-01-02"))
 
 	lifeAxaEmitQuery := lib.Firequeries{
 		Queries: []lib.Firequery{
@@ -122,6 +124,13 @@ func mapContractorTypeAxaPLife(policy models.Policy) (models.Contractor, string)
 	}
 	return contractor, typeContractorAxa
 }
+func fixImportedId(policy models.Policy) string {
+	result := policy.CodeCompany
+	if lib.SliceContains[string](policy.StatusHistory, "Imported") {
+		result = "000" + policy.CodeCompany
+	}
+	return result
+}
 func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.Transaction, now time.Time) [][]string {
 	var (
 		result               [][]string
@@ -184,7 +193,7 @@ func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.T
 			log.Println(e)
 			row := []string{
 				mapCodecCompany(policy, g.CompanyCodec),         //Codice schema
-				policy.CodeCompany,                              //N° adesione individuale univoco
+				fixImportedId(policy),                           //N° adesione individuale univoco
 				getTypeTransactionAR(policy, trans),             //Tipo di Transazione
 				getFormatdate(policy.StartDate),                 //Data di decorrenza
 				getFormatdate(getRenewDate(policy, trans, now)), //"Data di rinnovo"
