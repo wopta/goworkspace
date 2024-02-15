@@ -8,15 +8,15 @@ require (
 	cloud.google.com/go v0.110.7
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.4
 	github.com/google/uuid v1.3.0
-	github.com/wopta/goworkspace/document v1.1.51
-	github.com/wopta/goworkspace/lib v1.0.98
-	github.com/wopta/goworkspace/mail v1.0.82
-	github.com/wopta/goworkspace/models v1.1.83
-	github.com/wopta/goworkspace/network v1.0.35
-	github.com/wopta/goworkspace/policy v1.0.73
-	github.com/wopta/goworkspace/product v1.0.83
-	github.com/wopta/goworkspace/transaction v1.0.48
-	github.com/wopta/goworkspace/user v1.0.64
+	github.com/wopta/goworkspace/document v1.1.52
+	github.com/wopta/goworkspace/lib v1.0.99
+	github.com/wopta/goworkspace/mail v1.0.83
+	github.com/wopta/goworkspace/models v1.1.84
+	github.com/wopta/goworkspace/network v1.0.36
+	github.com/wopta/goworkspace/policy v1.0.74
+	github.com/wopta/goworkspace/product v1.0.84
+	github.com/wopta/goworkspace/transaction v1.0.49
+	github.com/wopta/goworkspace/user v1.0.65
 )
 
 require (
@@ -77,7 +77,7 @@ require (
 	github.com/src-d/gcfg v1.4.0 // indirect
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.2.1 // indirect
-	github.com/wopta/goworkspace/reserved v1.0.76 // indirect
+	github.com/wopta/goworkspace/reserved v1.0.77 // indirect
 	github.com/wopta/goworkspace/wiseproxy v1.0.3 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
