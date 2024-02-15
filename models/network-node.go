@@ -84,7 +84,7 @@ func (nn *NetworkNode) Marshal() ([]byte, error) {
 
 func (nn *NetworkNode) Normalize() {
 	nn.Code = lib.TrimSpace(nn.Code)
-	nn.ExternalNetworkCode = lib.TrimSpace(nn.Code)
+	nn.ExternalNetworkCode = lib.TrimSpace(nn.ExternalNetworkCode)
 	nn.Type = lib.TrimSpace(nn.Type)
 	nn.Role = lib.TrimSpace(nn.Role)
 	nn.Mail = lib.ToUpper(nn.Mail)
