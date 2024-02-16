@@ -52,7 +52,7 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	}
 	fmt.Println("LifeAxalEmit: ", i.Format("2006-01-02"))
 	queryListdate = append(queryListdate, i.Format("2006-01-02"))
-
+	fmt.Println("LifeAxalEmit:queryListdate ", queryListdate)
 	lifeAxaEmitQuery := lib.Firequeries{
 		Queries: []lib.Firequery{
 

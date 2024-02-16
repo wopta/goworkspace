@@ -10,7 +10,7 @@ require (
 	github.com/go-gota/gota v0.12.0
 	github.com/wopta/goworkspace/inclusive v0.0.0-20230719101556-99189b0ef4a8
 	github.com/wopta/goworkspace/lib v1.0.94
-	github.com/wopta/goworkspace/models v1.1.65
+	github.com/wopta/goworkspace/models v1.1.84
 	github.com/xuri/excelize/v2 v2.7.0
 )
 
