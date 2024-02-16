@@ -251,11 +251,14 @@ func sendMailSign(state *bpmn.State) error {
 }
 
 func sendMailInformationSet(state *bpmn.State) {
+	cc := mail.Address{}
 	log.Println("[sendMailInformationSet]")
 	policy := state.Data
 
 	to := mail.GetContractorEmail(policy)
-	cc := mail.GetNetworkNodeEmail(networkNode)
+	if policy.Channel == models.NetworkChannel {
+		cc = mail.GetNetworkNodeEmail(networkNode)
+	}
 	log.Printf(
 		"[sendLeadMail] from '%s', to '%s', cc '%s'",
 		fromAddress.String(),
