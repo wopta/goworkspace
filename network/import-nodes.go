@@ -117,7 +117,7 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	df := lib.CsvToDataframe(data)
 	log.Printf("#rows: %02d #cols: %02d", df.Nrow(), df.Ncol())
 	if df.Ncol() != expectedColumns {
-		log.Printf("#columns isn't correct, expected %d got %s", expectedColumns, df.Ncol())
+		log.Printf("#columns isn't correct, expected %02d got %02d", expectedColumns, df.Ncol())
 		return "{}", nil, fmt.Errorf("invalid file content")
 	}
 
@@ -415,7 +415,7 @@ func nodeConfigurationValidation(nodeType string, rows [][]string, nodesMap map[
 		parentNodeCode := row[5]
 		isMgaProponent := boolMap[row[28]]
 		hasAnnex := boolMap[row[29]]
-		designation := row[31]
+		designation := row[30]
 		worksForUid := row[31]
 
 		// check if node is not already present
