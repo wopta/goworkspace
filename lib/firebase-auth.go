@@ -110,37 +110,33 @@ func VerifyAuthorization(handler func(w http.ResponseWriter, r *http.Request) (s
 			return "", nil, fmt.Errorf("not found")
 		}
 
-		if len(roles) == 0 || os.Getenv("env") == "local" {
+		if len(roles) == 0 || os.Getenv("env") == "local" || SliceContains(roles, "internal") {
 			return handler(w, r)
 		}
 
-		if SliceContains(roles, "all") {
-			return VerifyAppcheck(handler)(w, r)
-		}
-		if SliceContains(roles, "internal") {
-			return handler(w, r)
-		}
-		idToken := strings.ReplaceAll(r.Header.Get("Authorization"), "Bearer ", "")
-		if idToken == "" {
-			return errorHandler(w)
+		if !SliceContains(roles, "all") {
+			idToken := strings.ReplaceAll(r.Header.Get("Authorization"), "Bearer ", "")
+			if idToken == "" {
+				return errorHandler(w)
+			}
+
+			token, err := VerifyUserIdToken(idToken)
+			if err != nil {
+				log.Println("VerifyAuthorization: verify id token error: ", err)
+				return errorHandler(w)
+			}
+
+			userRole := "customer"
+			if role, ok := token.Claims["role"].(string); ok {
+				userRole = role
+			}
+
+			if !SliceContains(roles, userRole) {
+				return errorHandler(w)
+			}
 		}
 
-		token, err := VerifyUserIdToken(idToken)
-		if err != nil {
-			log.Println("VerifyAuthorization: verify id token error: ", err)
-			return errorHandler(w)
-		}
-
-		userRole := "customer"
-		if role, ok := token.Claims["role"].(string); ok {
-			userRole = role
-		}
-
-		if !SliceContains(roles, userRole) {
-			return errorHandler(w)
-		}
-
-		return handler(w, r)
+		return VerifyAppcheck(handler)(w, r)
 	}
 
 	return wrappedHandler
