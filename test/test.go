@@ -6,12 +6,14 @@ package test
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"io"
 	"log"
 	"net/http"
+	"slices"
 )
 
 var (
@@ -92,6 +94,9 @@ func TestPostFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	json.Unmarshal([]byte(body), &request)
 	log.Printf("[TestPotFx] payload %v", request)
+
+	numbers := []int{0, 42, -10, 8}
+	fmt.Println(slices.Min(numbers))
 
 	if operation == "error" {
 		return "", nil, GetErrorJson(400, "Bad Request", "Testing error POST")
