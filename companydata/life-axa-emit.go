@@ -21,14 +21,15 @@ import (
 
 func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		from          time.Time
-		to            time.Time
-		filenamesplit string
-		cabCsv        []byte
-		result        [][]string
-		refMontly     time.Time
-		upload        bool
-		queryListdate []string
+		from           time.Time
+		to             time.Time
+		filenamesplit  string
+		cabCsv         []byte
+		result         [][]string
+		refMontly      time.Time
+		upload         bool
+		queryListdate  []string
+		queryListdate2 []string
 	)
 
 	log.Println("----------------LifeAxalEmit-----------------")
@@ -45,11 +46,18 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	log.Println("LifeAxalEmit to: " + to.String())
 	log.Println("LifeAxalEmit: " + filenamesplit)
 	i := from
+	count := 0
 	for next := true; next; next = i.Before(to) {
+		if count > 15 {
+			queryListdate = append(queryListdate, i.Format("2006-01-02"))
+		} else {
+			queryListdate = append(queryListdate2, i.Format("2006-01-02"))
+		}
 		fmt.Println("LifeAxalEmit: ", i.Format("2006-01-02"))
 		//2023-09-26
-		queryListdate = append(queryListdate, i.Format("2006-01-02"))
+	
 		i = i.AddDate(0, 0, 1)
+		count++
 
 	}
 	fmt.Println("LifeAxalEmit: ", i.Format("2006-01-02"))
@@ -83,6 +91,12 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 				Operator:   "in",           //
 				QueryValue: queryListdate,
 			},
+			{
+				Field:      "scheduleDate", //
+				Operator:   "in",           //
+				QueryValue: queryListdate2,
+			},
+		},
 		},
 	}
 	df := lib.CsvToDataframe(cabCsv)
@@ -690,6 +704,8 @@ func FirestoreToListData[T any](query *firestore.DocumentIterator) []T {
 					lib.CheckError(e)
 					result = append(result, value)
 					log.Println(len(result))
+				} else {
+					log.Println("TransactionToListData next d is nil ")
 				}
 
 			}
