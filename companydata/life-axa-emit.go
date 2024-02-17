@@ -714,6 +714,7 @@ func ExistIdentityDocument(docs []*models.IdentityDocument) *models.IdentityDocu
 
 func TransactionToListData(query *firestore.DocumentIterator) []models.Transaction {
 	result := make([]models.Transaction, 0)
+	log.Println("TransactionToListDatam start")
 	for {
 		d, err := query.Next()
 		if err != nil {
