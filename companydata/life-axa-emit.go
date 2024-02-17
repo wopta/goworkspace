@@ -55,7 +55,7 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 		}
 		fmt.Println("LifeAxalEmit: ", i.Format("2006-01-02"))
 		//2023-09-26
-	
+
 		i = i.AddDate(0, 0, 1)
 		count++
 
@@ -96,7 +96,6 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 				Operator:   "in",           //
 				QueryValue: queryListdate2,
 			},
-		},
 		},
 	}
 	df := lib.CsvToDataframe(cabCsv)
