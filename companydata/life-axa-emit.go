@@ -672,6 +672,7 @@ func ExistIdentityDocument(docs []*models.IdentityDocument) *models.IdentityDocu
 }
 
 func FirestoreToListData[T any](query *firestore.DocumentIterator) []models.Transaction {
+	log.Println("TransactionToListData next")
 	result := make([]models.Transaction, 0)
 	for {
 		d, err := query.Next()
@@ -682,10 +683,11 @@ func FirestoreToListData[T any](query *firestore.DocumentIterator) []models.Tran
 				break
 			}
 		}
-		log.Println("TransactionToListData next")
+
+		log.Println(d.Ref.ID)
 		var value models.Transaction
 		e := d.DataTo(&value)
-		log.Println(d.Ref.ID)
+
 		value.Uid = d.Ref.ID
 		lib.CheckError(e)
 		result = append(result, value)
