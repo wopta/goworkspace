@@ -681,7 +681,8 @@ func FirestoreToListData[T any](query *firestore.DocumentIterator) []T {
 			if err == iterator.Done {
 				break
 			} else {
-				log.Println("TransactionToListData next")
+				log.Println("TransactionToListData next", d.CreateTime)
+
 				log.Println(d.Ref.ID)
 				var value T
 				e := d.DataTo(&value)
