@@ -102,7 +102,7 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	query, e := lifeAxaEmitQuery.FirestoreWherefields("transactions")
 	log.Println("LifeAxalEmit error: ", e)
 
-	transactions := FirestoreToListData[models.Transaction](query)
+	transactions := models.TransactionToListData(query)
 	log.Println("LifeAxalEmit: transaction len: ", len(transactions))
 	//result = append(result, getHeader())
 	for _, transaction := range transactions {
