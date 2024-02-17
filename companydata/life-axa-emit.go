@@ -63,6 +63,7 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	fmt.Println("LifeAxalEmit: ", i.Format("2006-01-02"))
 	queryListdate = append(queryListdate, i.Format("2006-01-02"))
 	fmt.Println("LifeAxalEmit:queryListdate ", queryListdate)
+	fmt.Println("LifeAxalEmit:queryListdate ", queryListdate2)
 	lifeAxaEmitQuery := lib.Firequeries{
 		Queries: []lib.Firequery{
 
@@ -91,7 +92,6 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 				Operator:   "in",           //
 				QueryValue: queryListdate,
 			},
-		
 		},
 	}
 	lifeAxaEmitQuery2 := lib.Firequeries{
@@ -128,10 +128,9 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	query, e := lifeAxaEmitQuery.FirestoreWherefields("transactions")
 	query2, e := lifeAxaEmitQuery2.FirestoreWherefields("transactions")
 	log.Println("LifeAxalEmit error: ", e)
-
-	transactions := models.TransactionToListData(query)
-	transactions2 := models.TransactionToListData(query2)
-	transactionstot :=append(transactions,transactions2...) 
+	transactions := TransactionToListData(query)
+	transactions2 := TransactionToListData(query2)
+	transactionstot := append(transactions, transactions2...)
 	log.Println("LifeAxalEmit: transaction len: ", len(transactions))
 	//result = append(result, getHeader())
 	for _, transaction := range transactionstot {
@@ -713,31 +712,23 @@ func ExistIdentityDocument(docs []*models.IdentityDocument) *models.IdentityDocu
 	return result
 }
 
-func FirestoreToListData[T any](query *firestore.DocumentIterator) []T {
-	log.Println("TransactionToListData")
-	result := make([]T, 0)
+func TransactionToListData(query *firestore.DocumentIterator) []models.Transaction {
+	result := make([]models.Transaction, 0)
 	for {
 		d, err := query.Next()
-
+		if err != nil {
+		}
 		if err != nil {
 			if err == iterator.Done {
 				break
-			} else {
-				if d != nil {
-					log.Println("TransactionToListData next", d.CreateTime)
-					log.Println(d.Ref.ID)
-					var value T
-					e := d.DataTo(&value)
-					//value.Uid = d.Ref.ID
-					lib.CheckError(e)
-					result = append(result, value)
-					log.Println(len(result))
-				} else {
-					log.Println("TransactionToListData next d is nil ")
-				}
-
 			}
 		}
+		var value models.Transaction
+		log.Println("TransactionToListData ref id:", d.Ref.ID)
+		e := d.DataTo(&value)
+		value.Uid = d.Ref.ID
+		lib.CheckError(e)
+		result = append(result, value)
 
 	}
 	return result
