@@ -671,28 +671,30 @@ func ExistIdentityDocument(docs []*models.IdentityDocument) *models.IdentityDocu
 	return result
 }
 
-func FirestoreToListData[T any](query *firestore.DocumentIterator) []models.Transaction {
-	log.Println("TransactionToListData next")
-	result := make([]models.Transaction, 0)
+func FirestoreToListData[T any](query *firestore.DocumentIterator) []T {
+	log.Println("TransactionToListData")
+	result := make([]T, 0)
 	for {
 		d, err := query.Next()
-		if err != nil {
-		}
+
 		if err != nil {
 			if err == iterator.Done {
 				break
+			} else {
+				log.Println("TransactionToListData next")
+				log.Println(d.Ref.ID)
+				var value T
+				e := d.DataTo(&value)
+
+				//value.Uid = d.Ref.ID
+				lib.CheckError(e)
+				result = append(result, value)
+
+				log.Println(len(result))
+
 			}
 		}
 
-		log.Println(d.Ref.ID)
-		var value models.Transaction
-		e := d.DataTo(&value)
-
-		value.Uid = d.Ref.ID
-		lib.CheckError(e)
-		result = append(result, value)
-
-		log.Println(len(result))
 	}
 	return result
 }
