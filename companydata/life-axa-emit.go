@@ -11,10 +11,12 @@ import (
 	"strings"
 	"time"
 
+	"cloud.google.com/go/firestore"
 	"github.com/go-gota/gota/dataframe"
 	"github.com/go-gota/gota/series"
 	lib "github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"google.golang.org/api/iterator"
 )
 
 func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -85,8 +87,9 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	}
 	df := lib.CsvToDataframe(cabCsv)
 	query, e := lifeAxaEmitQuery.FirestoreWherefields("transactions")
-	log.Println("LifeAxalEmit: ", e)
-	transactions := models.TransactionToListData(query)
+	log.Println("LifeAxalEmit error: ", e)
+
+	transactions := FirestoreToListData[models.Transaction](query)
 	log.Println("LifeAxalEmit: transaction len: ", len(transactions))
 	//result = append(result, getHeader())
 	for _, transaction := range transactions {
@@ -664,6 +667,30 @@ func ExistIdentityDocument(docs []*models.IdentityDocument) *models.IdentityDocu
 
 		}
 
+	}
+	return result
+}
+
+func FirestoreToListData[T any](query *firestore.DocumentIterator) []models.Transaction {
+	result := make([]models.Transaction, 0)
+	for {
+		d, err := query.Next()
+		if err != nil {
+		}
+		if err != nil {
+			if err == iterator.Done {
+				break
+			}
+		}
+		log.Println("TransactionToListData next")
+		var value models.Transaction
+		e := d.DataTo(&value)
+		log.Println(d.Ref.ID)
+		value.Uid = d.Ref.ID
+		lib.CheckError(e)
+		result = append(result, value)
+
+		log.Println(len(result))
 	}
 	return result
 }
