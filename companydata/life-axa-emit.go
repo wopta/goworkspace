@@ -91,6 +91,32 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 				Operator:   "in",           //
 				QueryValue: queryListdate,
 			},
+		
+		},
+	}
+	lifeAxaEmitQuery2 := lib.Firequeries{
+		Queries: []lib.Firequery{
+
+			{
+				Field:      "isDelete", //
+				Operator:   "==",       //
+				QueryValue: false,
+			},
+			{
+				Field:      "isPay", //
+				Operator:   "==",    //
+				QueryValue: true,
+			},
+			{
+				Field:      "company", //
+				Operator:   "==",      //
+				QueryValue: "axa",
+			},
+			{
+				Field:      "policyName", //
+				Operator:   "==",         //
+				QueryValue: "life",
+			},
 			{
 				Field:      "scheduleDate", //
 				Operator:   "in",           //
@@ -100,12 +126,15 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	}
 	df := lib.CsvToDataframe(cabCsv)
 	query, e := lifeAxaEmitQuery.FirestoreWherefields("transactions")
+	query2, e := lifeAxaEmitQuery2.FirestoreWherefields("transactions")
 	log.Println("LifeAxalEmit error: ", e)
 
 	transactions := models.TransactionToListData(query)
+	transactions2 := models.TransactionToListData(query2)
+	transactionstot :=append(transactions,transactions2...) 
 	log.Println("LifeAxalEmit: transaction len: ", len(transactions))
 	//result = append(result, getHeader())
-	for _, transaction := range transactions {
+	for _, transaction := range transactionstot {
 		var (
 			policy models.Policy
 		)
