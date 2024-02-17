@@ -681,17 +681,16 @@ func FirestoreToListData[T any](query *firestore.DocumentIterator) []T {
 			if err == iterator.Done {
 				break
 			} else {
-				log.Println("TransactionToListData next", d.CreateTime)
-
-				log.Println(d.Ref.ID)
-				var value T
-				e := d.DataTo(&value)
-
-				//value.Uid = d.Ref.ID
-				lib.CheckError(e)
-				result = append(result, value)
-
-				log.Println(len(result))
+				if d != nil {
+					log.Println("TransactionToListData next", d.CreateTime)
+					log.Println(d.Ref.ID)
+					var value T
+					e := d.DataTo(&value)
+					//value.Uid = d.Ref.ID
+					lib.CheckError(e)
+					result = append(result, value)
+					log.Println(len(result))
+				}
 
 			}
 		}
