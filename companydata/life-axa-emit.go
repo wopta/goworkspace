@@ -45,7 +45,7 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	log.Println("LifeAxalEmit from: " + from.String())
 	log.Println("LifeAxalEmit to: " + to.String())
 	log.Println("LifeAxalEmit: " + filenamesplit)
-	
+
 	i := from
 	count := 0
 	for next := true; next; next = i.Before(to) {
@@ -56,7 +56,6 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 		}
 		fmt.Println("LifeAxalEmit: ", i.Format("2006-01-02"))
 		//2023-09-26
-
 		i = i.AddDate(0, 0, 1)
 		count++
 
@@ -65,6 +64,7 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	queryListdate = append(queryListdate, i.Format("2006-01-02"))
 	fmt.Println("LifeAxalEmit:queryListdate ", queryListdate)
 	fmt.Println("LifeAxalEmit:queryListdate ", queryListdate2)
+	
 	lifeAxaEmitQuery := lib.Firequeries{
 		Queries: []lib.Firequery{
 
@@ -129,6 +129,7 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	query, e := lifeAxaEmitQuery.FirestoreWherefields("transactions")
 	query2, e := lifeAxaEmitQuery2.FirestoreWherefields("transactions")
 	log.Println("LifeAxalEmit error: ", e)
+	
 	transactions := TransactionToListData(query)
 	transactions2 := TransactionToListData(query2)
 	transactionstot := append(transactions, transactions2...)
@@ -165,7 +166,6 @@ func mapContractorTypeAxaPLife(policy models.Policy) (models.Contractor, string)
 		typeContractorAxa = "PG"
 	} else {
 		typeContractorAxa = "PF"
-
 	}
 	return contractor, typeContractorAxa
 }
