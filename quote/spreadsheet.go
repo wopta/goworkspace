@@ -50,9 +50,11 @@ func (qs *QuoteSpreadsheet) Spreadsheets() {
 	sheetClient, e := GoogleClient[*sheets.Service](spreadsheet)
 	lib.CheckError(e)
 	fmt.Printf("sheetClient: %v\n", sheetClient)
-
 	f, e := driveClient.Svc.Files.Copy(qs.Id, file).Do()
-	fmt.Printf("file: %v\n", f)
+	sheet, e := sheetClient.Spreadsheets.Values.Get(f.Id, "A:J").Do()
+	fmt.Printf("file: %v\n", sheet.Values[99][3])
+	sheet.Values[40][2] = "10000000"
+	fmt.Printf("file: %v\n", sheet.Values[99][3])
 
 }
 
@@ -86,9 +88,7 @@ func (s *GoogleSpreadsheet) NewClient() (*sheets.Service, error) {
 func (s *GoogleDrive) NewClient() (*DriveService, error) {
 	var svc *drive.Service
 	var err error
-
 	svc, err = drive.NewService(s.Ctx, option.WithCredentialsJSON(s.CredentialsByte), option.WithScopes(drive.DriveScriptsScope))
-
 	if err != nil {
 		return nil, err
 	}
