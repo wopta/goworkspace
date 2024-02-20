@@ -26,11 +26,6 @@ type ImportNodesReq struct {
 	StartPipeline *bool  `json:"startPipeline,omitempty"`
 }
 
-type ErrorCategories struct {
-	DuplicatedNodes           []string `json:"duplicatedNodes"`
-	InvalidConfigurationNodes []string `json:"invalidConfigurationNodes"`
-}
-
 type ImportNodesResp struct {
 	TotalInputNodes int              `json:"totalInputNodes"`
 	TotalErrorNodes int              `json:"totalErrorNodes"`
@@ -232,46 +227,24 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	}
 
 	if startPipeline && resp.TotalInputNodes == resp.TotalValidNodes {
-		var filename string
-		splittedFilename := strings.Split(req.Filename, ".")
-		if len(splittedFilename) > 2 {
-			filename = strings.Join(splittedFilename[:len(splittedFilename)-1], ".")
-		} else {
-			filename = splittedFilename[0]
-		}
-		filename += fmt.Sprintf("_%d.%s", time.Now().UTC().Unix(), splittedFilename[len(splittedFilename)-1])
+		// generate csv filename
+		filename := getFilename(req.Filename)
+
 		// write csv to Google Bucket
 		err = writeCSVToBucket(outputRows, filename)
 		if err != nil {
 			return "{}", nil, err
 		}
 
-		log.Println("Getting invoker address...")
-		authToken, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
-		if err != nil {
-			log.Printf("Error getting invoker authToken: %s", err.Error())
-			return "{}", nil, err
-		}
-		invokerAddress := authToken.Email
-		log.Printf("Invoker address: %s", invokerAddress)
-
-		pubSubClient, err := pubsub.NewClient(context.Background(), os.Getenv("GOOGLE_PROJECT_ID"))
+		// trigger dataflow pipeline
+		err = triggerPipeline(r, filename)
 		if err != nil {
 			return "{}", nil, err
 		}
-		topic := pubSubClient.Topic("dataflow")
-		topic.Publish(context.Background(), &pubsub.Message{
-			Attributes: map[string]string{
-				"filename":       filename,
-				"invokerAddress": invokerAddress,
-				"module":         "in_network_node",
-			},
-		})
-		defer topic.Stop()
 	}
 
 	log.Printf("#Input Nodes: %d", resp.TotalInputNodes)
-	log.Printf("#Invalid Configuration Nodes: %d", resp.TotalErrorNodes)
+	log.Printf("#Error Nodes: %d", resp.TotalErrorNodes)
 	log.Printf("#Valid Nodes: %d", resp.TotalValidNodes)
 
 	rawResp, err := json.Marshal(resp)
@@ -595,5 +568,43 @@ func checkDuplicatedMails(emailsList []string, inputEmail string) error {
 			return errors.New("duplicated email")
 		}
 	}
+	return nil
+}
+
+func getFilename(inputFilename string) string {
+	var filename string
+	splittedFilename := strings.Split(inputFilename, ".")
+	if len(splittedFilename) > 2 {
+		filename = strings.Join(splittedFilename[:len(splittedFilename)-1], ".")
+	} else {
+		filename = splittedFilename[0]
+	}
+	filename += fmt.Sprintf("_%d.%s", time.Now().UTC().Unix(), splittedFilename[len(splittedFilename)-1])
+	return filename
+}
+
+func triggerPipeline(r *http.Request, filename string) error {
+	log.Println("Getting invoker address...")
+	authToken, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
+	if err != nil {
+		log.Printf("Error getting invoker authToken: %s", err.Error())
+		return err
+	}
+	invokerAddress := authToken.Email
+	log.Printf("Invoker address: %s", invokerAddress)
+
+	pubSubClient, err := pubsub.NewClient(context.Background(), os.Getenv("GOOGLE_PROJECT_ID"))
+	if err != nil {
+		return err
+	}
+	topic := pubSubClient.Topic("dataflow")
+	defer topic.Stop()
+	topic.Publish(context.Background(), &pubsub.Message{
+		Attributes: map[string]string{
+			"filename":       filename,
+			"invokerAddress": invokerAddress,
+			"module":         "in_network_node",
+		},
+	})
 	return nil
 }
