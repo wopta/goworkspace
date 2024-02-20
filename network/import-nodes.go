@@ -81,6 +81,7 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		startPipeline = false
 		warrants      []models.Warrant
 		dbNodes       []models.NetworkNode
+		emailsList    []string
 		nodesMap      = make(map[string]nodeInfo)
 		warrantsMap   = make(map[string][]string)
 		validatedRows = make(map[string][][]string)
@@ -145,7 +146,7 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	warrantsMap = buildWarrantsCompatibilityMap(warrants)
 
 	// build map[networkcode] = nodeInfo with essentials node info
-	nodesMap = buildNetworkNodesMap(dbNodes)
+	nodesMap, emailsList = buildNetworkNodesMap(dbNodes)
 
 	// init resp object
 
@@ -180,7 +181,7 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	}
 
 	if validatedRows[models.AgencyNetworkNodeType] != nil {
-		duplicatedNodes, invalidNodes, validNodes, validRows := nodeConfigurationValidation(models.AgencyNetworkNodeType, validatedRows[models.AgencyNetworkNodeType], nodesMap, warrantsMap)
+		duplicatedNodes, invalidNodes, validNodes, validRows := nodeConfigurationValidation(models.AgencyNetworkNodeType, validatedRows[models.AgencyNetworkNodeType], nodesMap, warrantsMap, emailsList)
 		outputRows = append(outputRows, validRows...)
 		resp.ErrorNodes.DuplicatedNodes = append(resp.ErrorNodes.DuplicatedNodes, duplicatedNodes...)
 		resp.ErrorNodes.InvalidConfigurationNodes = append(resp.ErrorNodes.InvalidConfigurationNodes, invalidNodes...)
@@ -188,7 +189,7 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	}
 
 	if validatedRows[models.AgentNetworkNodeType] != nil {
-		duplicatedNodes, invalidNodes, validNodes, validRows := nodeConfigurationValidation(models.AgentNetworkNodeType, validatedRows[models.AgentNetworkNodeType], nodesMap, warrantsMap)
+		duplicatedNodes, invalidNodes, validNodes, validRows := nodeConfigurationValidation(models.AgentNetworkNodeType, validatedRows[models.AgentNetworkNodeType], nodesMap, warrantsMap, emailsList)
 		outputRows = append(outputRows, validRows...)
 		resp.ErrorNodes.DuplicatedNodes = append(resp.ErrorNodes.DuplicatedNodes, duplicatedNodes...)
 		resp.ErrorNodes.InvalidConfigurationNodes = append(resp.ErrorNodes.InvalidConfigurationNodes, invalidNodes...)
@@ -252,8 +253,9 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	return string(rawResp), resp, err
 }
 
-func buildNetworkNodesMap(dbNodes []models.NetworkNode) map[string]nodeInfo {
+func buildNetworkNodesMap(dbNodes []models.NetworkNode) (map[string]nodeInfo, []string) {
 	nodesMap := make(map[string]nodeInfo)
+	emailsList := make([]string, 0)
 	for _, nn := range dbNodes {
 		var ruiSection string
 		if nn.Type == models.AgentNetworkNodeType {
@@ -271,8 +273,11 @@ func buildNetworkNodesMap(dbNodes []models.NetworkNode) map[string]nodeInfo {
 			RuiSection:     ruiSection,
 		}
 
+		if !lib.SliceContains(emailsList, nn.Mail) {
+			emailsList = append(emailsList, nn.Mail)
+		}
 	}
-	return nodesMap
+	return nodesMap, emailsList
 }
 
 func getWarrants() ([]models.Warrant, error) {
@@ -401,7 +406,7 @@ func validateRow(row []string) error {
 	return nil
 }
 
-func nodeConfigurationValidation(nodeType string, rows [][]string, nodesMap map[string]nodeInfo, warrantsMap map[string][]string) ([]string, []string, []string, [][]string) {
+func nodeConfigurationValidation(nodeType string, rows [][]string, nodesMap map[string]nodeInfo, warrantsMap map[string][]string, emailsList []string) ([]string, []string, []string, [][]string) {
 	var (
 		duplicatedNodes           = make([]string, 0)
 		invalidConfigurationNodes = make([]string, 0)
@@ -411,6 +416,7 @@ func nodeConfigurationValidation(nodeType string, rows [][]string, nodesMap map[
 
 	for _, row := range rows {
 		nodeCode := row[0]
+		email := row[3]
 		warrantName := row[4]
 		parentNodeCode := row[5]
 		isMgaProponent := boolMap[row[28]]
@@ -438,6 +444,14 @@ func nodeConfigurationValidation(nodeType string, rows [][]string, nodesMap map[
 		// check if parent is an agent in nodesMap, if not skip
 		if parentNode.Type == models.AgentNetworkNodeType {
 			log.Printf("Error processing node %s: node can't have parent node of type agent", nodeCode)
+			invalidConfigurationNodes = append(invalidConfigurationNodes, nodeCode)
+			continue
+		}
+
+		// check if node email is unique
+		err := checkDuplicatedMails(emailsList, email)
+		if err != nil {
+			log.Printf("Error processing node %s: email is not unique", nodeCode)
 			invalidConfigurationNodes = append(invalidConfigurationNodes, nodeCode)
 			continue
 		}
@@ -491,12 +505,13 @@ func nodeConfigurationValidation(nodeType string, rows [][]string, nodesMap map[
 
 		validNodes = append(validNodes, nodeCode)
 		outputRows = append(outputRows, row)
+		emailsList = append(emailsList, email)
 		// add node to nodeMap
 		nodesMap[nodeCode] = nodeInfo{
 			Warrant:        warrantName,
 			HasAnnex:       hasAnnex,
 			IsMgaProponent: isMgaProponent,
-			Type:           models.AgencyNetworkNodeType,
+			Type:           nodeType,
 			RuiSection:     row[8],
 		}
 	}
@@ -527,5 +542,14 @@ func writeCSVToBucket(outputRows [][]string, filename string) error {
 		return err
 	}
 	log.Printf("Import file saved into Google Bucket")
+	return nil
+}
+
+func checkDuplicatedMails(emailsList []string, inputEmail string) error {
+	for _, email := range emailsList {
+		if strings.EqualFold(email, inputEmail) {
+			return errors.New("duplicated email")
+		}
+	}
 	return nil
 }
