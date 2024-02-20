@@ -17,6 +17,7 @@ func GetWarrantsFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	var response GetWarrantsResponse
 
 	log.SetPrefix("[GetWarrantsFx] ")
+	defer log.SetPrefix("")
 
 	log.Println("Handler start -----------------------------------------------")
 
