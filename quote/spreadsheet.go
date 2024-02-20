@@ -59,9 +59,9 @@ func (qs *QuoteSpreadsheet) Spreadsheets() {
 	lib.CheckError(e)
 	fmt.Printf("sheetClient: %v\n", sheetClient)
 	f, e := driveClient.Svc.Files.Copy(qs.Id, &drive.File{}).Do()
-
-	sheet, e := sheetClient.Spreadsheets.Values.Get(f.Id, "A:J").Do()
 	fmt.Printf("f.Id: %v\n", f.Id)
+	sheet, e := sheetClient.Spreadsheets.Values.Get(f.Id, "A:J").Do()
+
 	sheet.Values[40][2] = "10000000"
 	fmt.Printf("file: %v\n", sheet.Values[99][3])
 
