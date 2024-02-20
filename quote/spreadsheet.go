@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"os"
 
 	"github.com/wopta/goworkspace/lib"
@@ -16,6 +17,12 @@ type QuoteSpreadsheet struct {
 	SheetName, filename string
 	Id                  string
 	InputCells          []InputCell
+}
+
+func SpreadsheetsFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	qs := QuoteSpreadsheet{}
+	qs.Spreadsheets()
+	return "", nil, nil
 }
 
 func (qs *QuoteSpreadsheet) Spreadsheets() {
