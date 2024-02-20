@@ -6,11 +6,13 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"cloud.google.com/go/storage"
@@ -359,4 +361,22 @@ func CheckFileExistence(filePath string) bool {
 		return false
 	}
 	return true
+}
+
+func ListLocalFolderContent(folderPath string) ([]string, error) {
+	var (
+		res      []string
+		basePath = "../function-data/dev/"
+	)
+
+	err := filepath.WalkDir(basePath+folderPath, func(path string, d fs.DirEntry, err error) error {
+		if d.IsDir() {
+			return nil
+		}
+
+		res = append(res, strings.ReplaceAll(path, basePath, ""))
+		return nil
+	})
+
+	return res, err
 }
