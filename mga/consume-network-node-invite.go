@@ -24,6 +24,7 @@ func ConsumeNetworkNodeInviteFx(w http.ResponseWriter, r *http.Request) (string,
 	)
 
 	log.SetPrefix("[ConsumeNetworkNodeInviteFx] ")
+	defer log.SetPrefix("")
 
 	log.Println("Handler start -----------------------------------------------")
 

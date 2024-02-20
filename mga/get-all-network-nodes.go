@@ -17,6 +17,7 @@ func GetAllNetworkNodesFx(w http.ResponseWriter, r *http.Request) (string, inter
 	var response GetAllNetworkNodesResponse
 
 	log.SetPrefix("[GetAllNetworkNodesFx] ")
+	defer log.SetPrefix("")
 
 	log.Println("Handler start -----------------------------------------------")
 
