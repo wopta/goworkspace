@@ -61,8 +61,8 @@ func (qs *QuoteSpreadsheet) Spreadsheets() {
 	sheet, e := sheetClient.Spreadsheets.Values.Get(f.Id, "A:J").Do()
 	fmt.Printf("file: %v\n", sheet.Values[99][3])
 	sheet.Values[40][2] = "10000000"
-	
 	fmt.Printf("file: %v\n", sheet.Values[99][3])
+	
 
 }
 
