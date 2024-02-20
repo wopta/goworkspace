@@ -32,11 +32,11 @@ type ErrorCategories struct {
 }
 
 type ImportNodesResp struct {
-	TotalInputNodes int             `json:"totalInputNodes"`
-	TotalErrorNodes int             `json:"totalErrorNodes"`
-	TotalValidNodes int             `json:"totalValidNodes"`
-	ErrorNodes      ErrorCategories `json:"errorNodes"`
-	ValidNodes      []string        `json:"validNodes"`
+	TotalInputNodes int              `json:"totalInputNodes"`
+	TotalErrorNodes int              `json:"totalErrorNodes"`
+	TotalValidNodes int              `json:"totalValidNodes"`
+	ErrorNodes      map[string][]int `json:"errorNodes"`
+	ValidNodes      []string         `json:"validNodes"`
 }
 
 type nodeInfo struct {
@@ -187,11 +187,8 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		TotalInputNodes: len(df.Records()[1:]),
 		TotalErrorNodes: 0,
 		TotalValidNodes: 0,
-		ErrorNodes: ErrorCategories{
-			DuplicatedNodes:           make([]string, 0),
-			InvalidConfigurationNodes: make([]string, 0),
-		},
-		ValidNodes: make([]string, 0),
+		ErrorNodes:      make(map[string][]int),
+		ValidNodes:      make([]string, 0),
 	}
 
 	// validate csv rows
@@ -201,10 +198,10 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		row = normalizeFields(row)
 
 		// check if all required fields have been compiled
-		err = validateRow(row)
-		if err != nil {
-			log.Printf("Error processing node %s: %s", row[codeCol], err.Error())
-			resp.ErrorNodes.InvalidConfigurationNodes = append(resp.ErrorNodes.InvalidConfigurationNodes, row[codeCol])
+		columnsErr := validateRow(row)
+		if len(columnsErr) > 0 {
+			log.Printf("Error processing node %s at indexes: %v", row[codeCol], columnsErr)
+			resp.ErrorNodes[row[codeCol]] = columnsErr
 			resp.TotalErrorNodes++
 			continue
 		}
@@ -214,23 +211,21 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	}
 
 	if validatedRows[models.AgencyNetworkNodeType] != nil {
-		duplicatedNodes, invalidNodes, validNodes, validRows := nodeConfigurationValidation(models.AgencyNetworkNodeType, validatedRows[models.AgencyNetworkNodeType], nodesMap, warrantsMap, emailsList)
+		validNodes, validRows := nodeConfigurationValidation(resp.ErrorNodes, models.AgencyNetworkNodeType,
+			validatedRows[models.AgencyNetworkNodeType], nodesMap, warrantsMap, emailsList)
 		outputRows = append(outputRows, validRows...)
-		resp.ErrorNodes.DuplicatedNodes = append(resp.ErrorNodes.DuplicatedNodes, duplicatedNodes...)
-		resp.ErrorNodes.InvalidConfigurationNodes = append(resp.ErrorNodes.InvalidConfigurationNodes, invalidNodes...)
 		resp.ValidNodes = append(resp.ValidNodes, validNodes...)
 	}
 
 	if validatedRows[models.AgentNetworkNodeType] != nil {
-		duplicatedNodes, invalidNodes, validNodes, validRows := nodeConfigurationValidation(models.AgentNetworkNodeType, validatedRows[models.AgentNetworkNodeType], nodesMap, warrantsMap, emailsList)
+		validNodes, validRows := nodeConfigurationValidation(resp.ErrorNodes, models.AgentNetworkNodeType,
+			validatedRows[models.AgentNetworkNodeType], nodesMap, warrantsMap, emailsList)
 		outputRows = append(outputRows, validRows...)
-		resp.ErrorNodes.DuplicatedNodes = append(resp.ErrorNodes.DuplicatedNodes, duplicatedNodes...)
-		resp.ErrorNodes.InvalidConfigurationNodes = append(resp.ErrorNodes.InvalidConfigurationNodes, invalidNodes...)
 		resp.ValidNodes = append(resp.ValidNodes, validNodes...)
 	}
 
 	resp.TotalValidNodes = len(resp.ValidNodes)
-	resp.TotalErrorNodes = len(resp.ErrorNodes.DuplicatedNodes) + len(resp.ErrorNodes.InvalidConfigurationNodes)
+	resp.TotalErrorNodes = len(resp.ErrorNodes)
 
 	if req.StartPipeline != nil {
 		startPipeline = *req.StartPipeline
@@ -387,9 +382,13 @@ func normalizeFields(row []string) []string {
 	return row
 }
 
-func validateRow(row []string) error {
+func validateRow(row []string) []int {
+	columnsError := make([]int, 0)
+	nodeCode := row[codeCol]
+
 	if !lib.SliceContains(nodeTypeList, row[typeCol]) {
-		return errors.New("invalid node type")
+		log.Printf("Error processing node %s: invalid node type %s", nodeCode, row[typeCol])
+		columnsError = append(columnsError, typeCol)
 	}
 
 	var requiredFields []int
@@ -422,39 +421,42 @@ func validateRow(row []string) error {
 	// check fiscalCode format
 	regExp, _ := regexp.Compile(fiscalCodeRegexPattern)
 	if lib.SliceContains(requiredFields, agentFiscalCodeCol) && !regExp.MatchString(row[agentFiscalCodeCol]) {
-		return errors.New("invalid fiscal code")
+		log.Printf("Error processing node %s: invalid fiscalCode %s", nodeCode, row[agentFiscalCodeCol])
+		columnsError = append(columnsError, agentFiscalCodeCol)
 	}
 
 	for fieldIndex, fieldValue := range row {
 		if (fieldValue == "" || strings.EqualFold(fieldValue, "NaN")) && lib.SliceContains(requiredFields, fieldIndex) {
-			return fmt.Errorf("missing required field at index: %02d", fieldIndex)
+			log.Printf("Error processing node %s: missing required field at index %02d", nodeCode, fieldIndex)
+			columnsError = append(columnsError, fieldIndex)
 		}
 	}
 
 	if lib.SliceContains(requiredFields, designationCol) && !lib.SliceContains(designationsList, row[designationCol]) {
-		return errors.New("invalid designation")
+		log.Printf("Error processing node %s: invalid designation %s", nodeCode, row[designationCol])
+		columnsError = append(columnsError, designationCol)
 	}
 
 	var dateFieldsIndexes = []int{agencyRuiRegistrationCol, agentRuiRegistrationCol}
 	for _, index := range dateFieldsIndexes {
 		if row[index] == "" && lib.SliceContains(requiredFields, index) {
-			return fmt.Errorf("missing required field at index: %02d", index)
+			log.Printf("Error processing node %s: missing required field at index %02d", nodeCode, index)
+			columnsError = append(columnsError, index)
 		}
 		_, err := time.Parse("02012006", fmt.Sprintf("%08s", row[index]))
 		if err != nil && lib.SliceContains(requiredFields, index) {
-			return fmt.Errorf("malformed date at index: %02d", index)
+			log.Printf("Error processing node %s: malformed date at index %02d", nodeCode, index)
+			columnsError = append(columnsError, index)
 		}
 	}
 
-	return nil
+	return columnsError
 }
 
-func nodeConfigurationValidation(nodeType string, rows [][]string, nodesMap map[string]nodeInfo, warrantsMap map[string][]string, emailsList []string) ([]string, []string, []string, [][]string) {
+func nodeConfigurationValidation(errorNodes map[string][]int, nodeType string, rows [][]string, nodesMap map[string]nodeInfo, warrantsMap map[string][]string, emailsList []string) ([]string, [][]string) {
 	var (
-		duplicatedNodes           = make([]string, 0)
-		invalidConfigurationNodes = make([]string, 0)
-		validNodes                = make([]string, 0)
-		outputRows                = make([][]string, 0)
+		validNodes = make([]string, 0)
+		outputRows = make([][]string, 0)
 	)
 
 	for _, row := range rows {
@@ -466,12 +468,12 @@ func nodeConfigurationValidation(nodeType string, rows [][]string, nodesMap map[
 		hasAnnex := boolMap[row[hasAnnexCol]]
 		designation := row[designationCol]
 		worksForUid := row[worksForUidCol]
+		columnsError := make([]int, 0)
 
 		// check if node is not already present
 		if !reflect.ValueOf(nodesMap[nodeCode]).IsZero() {
 			log.Printf("Error processing node %s: duplicated node code", nodeCode)
-			duplicatedNodes = append(duplicatedNodes, nodeCode)
-			continue
+			columnsError = append(columnsError, parentUidCol)
 		}
 
 		// get father
@@ -480,23 +482,20 @@ func nodeConfigurationValidation(nodeType string, rows [][]string, nodesMap map[
 		// check if parent is present in nodesMap, if not skip
 		if reflect.ValueOf(parentNode).IsZero() {
 			log.Printf("Error processing node %s: parent node not found", nodeCode)
-			invalidConfigurationNodes = append(invalidConfigurationNodes, nodeCode)
-			continue
+			columnsError = append(columnsError, parentUidCol)
 		}
 
 		// check if parent is an agent in nodesMap, if not skip
 		if parentNode.Type == models.AgentNetworkNodeType {
 			log.Printf("Error processing node %s: node can't have parent node of type agent", nodeCode)
-			invalidConfigurationNodes = append(invalidConfigurationNodes, nodeCode)
-			continue
+			columnsError = append(columnsError, parentUidCol)
 		}
 
 		// check if node email is unique
 		err := checkDuplicatedMails(emailsList, email)
 		if err != nil {
 			log.Printf("Error processing node %s: email is not unique", nodeCode)
-			invalidConfigurationNodes = append(invalidConfigurationNodes, nodeCode)
-			continue
+			columnsError = append(columnsError, mailCol)
 		}
 
 		/*
@@ -506,44 +505,46 @@ func nodeConfigurationValidation(nodeType string, rows [][]string, nodesMap map[
 		*/
 		if parentNode.Type != models.AreaManagerNetworkNodeType && parentNode.IsMgaProponent != isMgaProponent {
 			log.Printf("Error processing node %s: isMgaProponent configuration not matching parent configuration", nodeCode)
-			invalidConfigurationNodes = append(invalidConfigurationNodes, nodeCode)
-			continue
+			columnsError = append(columnsError, parentUidCol, isMgaProponentCol)
 		}
 
 		if !lib.SliceContains(warrantsMap[parentNode.Warrant], warrantName) {
 			log.Printf("Error processing node %s: warrant configuration not matching parent configuration", nodeCode)
-			invalidConfigurationNodes = append(invalidConfigurationNodes, nodeCode)
-			continue
+			columnsError = append(columnsError, warrantCol)
 		}
 
 		if nodeType == models.AgencyNetworkNodeType {
 			// check if fields for simplo are configured correctly
 			if worksForUid != "" {
 				log.Printf("Error processing node %s: not empty worksForUid", nodeCode)
-				invalidConfigurationNodes = append(invalidConfigurationNodes, nodeCode)
-				continue
+				columnsError = append(columnsError, worksForUidCol)
 			}
 
 			if isMgaProponent && (!hasAnnex || designation == "") {
 				log.Printf("Error processing node %s: invalid node configuration for isMgaProponent = true", nodeCode)
-				invalidConfigurationNodes = append(invalidConfigurationNodes, nodeCode)
-				continue
+				columnsError = append(columnsError, isMgaProponentCol, hasAnnexCol, designationCol)
 			} else if !isMgaProponent && hasAnnex && designation == "" {
 				log.Printf("Error processing node %s: invalid node configuration for isMgaProponent = false", nodeCode)
-				invalidConfigurationNodes = append(invalidConfigurationNodes, nodeCode)
-				continue
+				columnsError = append(columnsError, isMgaProponentCol, hasAnnexCol, designationCol)
 			}
 		} else if nodeType == models.AgentNetworkNodeType {
 			// check if fields for simplo are configured correctly
 			if isMgaProponent && (!hasAnnex || designation == "" || worksForUid == "" || (worksForUid != models.WorksForMgaUid && nodesMap[worksForUid].RuiSection != "E")) {
 				log.Printf("Error processing node %s: invalid node configuration for isMgaProponent = true", nodeCode)
-				invalidConfigurationNodes = append(invalidConfigurationNodes, nodeCode)
-				continue
+				columnsError = append(columnsError, isMgaProponentCol, hasAnnexCol, designationCol, worksForUidCol)
 			} else if !isMgaProponent && ((hasAnnex && designation == "" && lib.SliceContains([]string{"A", "B"}, nodesMap[worksForUid].RuiSection)) || (!hasAnnex && designation != "" && worksForUid != "")) {
 				log.Printf("Error processing node %s: invalid node configuration for isMgaProponent = false", nodeCode)
-				invalidConfigurationNodes = append(invalidConfigurationNodes, nodeCode)
-				continue
+				columnsError = append(columnsError, isMgaProponentCol, hasAnnexCol, designationCol, worksForUidCol)
 			}
+		}
+
+		if len(columnsError) != 0 {
+			if errorNodes[nodeCode] != nil {
+				errorNodes[nodeCode] = append(errorNodes[nodeCode], columnsError...)
+			} else {
+				errorNodes[nodeCode] = columnsError
+			}
+			continue
 		}
 
 		validNodes = append(validNodes, nodeCode)
@@ -559,7 +560,7 @@ func nodeConfigurationValidation(nodeType string, rows [][]string, nodesMap map[
 		}
 	}
 
-	return duplicatedNodes, invalidConfigurationNodes, validNodes, outputRows
+	return validNodes, outputRows
 }
 
 func writeCSVToBucket(outputRows [][]string, filename string) error {
