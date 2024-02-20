@@ -20,7 +20,7 @@ type QuoteSpreadsheet struct {
 }
 
 func SpreadsheetsFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	qs := QuoteSpreadsheet{}
+	qs := QuoteSpreadsheet{Id: "1NKi2qfoiRATcFcePK4p8elw3DjSzqQg8"}
 	qs.Spreadsheets()
 	return "", nil, nil
 }
@@ -62,7 +62,6 @@ func (qs *QuoteSpreadsheet) Spreadsheets() {
 	fmt.Printf("file: %v\n", sheet.Values[99][3])
 	sheet.Values[40][2] = "10000000"
 	fmt.Printf("file: %v\n", sheet.Values[99][3])
-	
 
 }
 
