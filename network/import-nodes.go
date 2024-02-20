@@ -71,6 +71,39 @@ const (
 		"A-EHLMPR-T](?:[04LQ][1-9MNP-V]|[15MR][\\dLMNP-V]|[26NS][0-8LMNP-U])|[DHPS][37PT][0L]|[ACELMRT][37PT][01LM]|[" +
 		"AC-EHLMPR-T][26NS][9V])|(?:[02468LNQSU][048LQU]|[13579MPRTV][26NS])B[26NS][9V])(?:[A-MZ][1-9MNP-V][\\dLMNP-V]" +
 		"{2}|[A-M][0L](?:[1-9MNP-V][\\dLMNP-V]|[0L][1-9MNP-V]))[A-Z]$"
+	codeCol                  int = 0
+	externalNetworkCodeCol   int = 1
+	typeCol                  int = 2
+	mailCol                  int = 3
+	warrantCol               int = 4
+	parentUidCol             int = 5
+	agencyNameCol            int = 6
+	agencyRuiCodeCol         int = 7
+	agencyRuiSectionCol      int = 8
+	agencyRuiRegistrationCol int = 9
+	agencyVatCodeCol         int = 10
+	agencyPecCol             int = 11
+	agencyWebsiteCol         int = 12
+	agencyPhoneCol           int = 13
+	agencyStreetNameCol      int = 14
+	agencyStreetNumberCol    int = 15
+	agencyLocalityCol        int = 16
+	agencyCityCol            int = 17
+	agencyPostalCodeCol      int = 18
+	agencyCityCodeCol        int = 19
+	agentNameCol             int = 20
+	agentSurnameCol          int = 21
+	agentFiscalCodeCol       int = 22
+	agentVatCodeCol          int = 23
+	agentPhoneCol            int = 24
+	agentRuiCodeCol          int = 25
+	agentRuiSectionCol       int = 26
+	agentRuiRegistrationCol  int = 27
+	isMgaProponentCol        int = 28
+	hasAnnexCol              int = 29
+	designationCol           int = 30
+	worksForUidCol           int = 31
+	isActiveCol              int = 32
 )
 
 func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -170,14 +203,14 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		// check if all required fields have been compiled
 		err = validateRow(row)
 		if err != nil {
-			log.Printf("Error processing node %s: %s", row[0], err.Error())
-			resp.ErrorNodes.InvalidConfigurationNodes = append(resp.ErrorNodes.InvalidConfigurationNodes, row[0])
+			log.Printf("Error processing node %s: %s", row[codeCol], err.Error())
+			resp.ErrorNodes.InvalidConfigurationNodes = append(resp.ErrorNodes.InvalidConfigurationNodes, row[codeCol])
 			resp.TotalErrorNodes++
 			continue
 		}
 
 		// validated rows by node type
-		validatedRows[row[2]] = append(validatedRows[row[2]], row)
+		validatedRows[row[typeCol]] = append(validatedRows[row[typeCol]], row)
 	}
 
 	if validatedRows[models.AgencyNetworkNodeType] != nil {
@@ -324,9 +357,13 @@ func buildWarrantsCompatibilityMap(warrants []models.Warrant) map[string][]strin
 }
 
 func normalizeFields(row []string) []string {
-	trimFields := []int{0, 1, 5, 9, 10, 13, 23, 24, 31}
-	toUpperFields := []int{3, 6, 7, 8, 11, 12, 14, 15, 16, 17, 18, 19, 20, 21, 22, 25, 26, 28, 29, 32}
-	toLowerFields := []int{2, 4}
+	trimFields := []int{codeCol, externalNetworkCodeCol, parentUidCol, agencyRuiRegistrationCol, agencyVatCodeCol,
+		agencyPhoneCol, agentVatCodeCol, agentPhoneCol, worksForUidCol}
+	toUpperFields := []int{mailCol, agencyNameCol, agencyRuiCodeCol, agencyRuiSectionCol, agencyPecCol,
+		agencyWebsiteCol, agencyStreetNameCol, agencyStreetNumberCol, agencyLocalityCol, agencyCityCol,
+		agencyPostalCodeCol, agencyCityCodeCol, agentNameCol, agentSurnameCol, agentFiscalCodeCol, agentRuiCodeCol,
+		agentRuiSectionCol, isMgaProponentCol, hasAnnexCol, isActiveCol}
+	toLowerFields := []int{typeCol, warrantCol}
 
 	row = lib.SliceMap(row, func(field string) string {
 		if strings.EqualFold(field, "NaN") {
@@ -351,34 +388,40 @@ func normalizeFields(row []string) []string {
 }
 
 func validateRow(row []string) error {
-	if !lib.SliceContains(nodeTypeList, row[2]) {
+	if !lib.SliceContains(nodeTypeList, row[typeCol]) {
 		return errors.New("invalid node type")
 	}
 
 	var requiredFields []int
-	if row[2] == models.AgencyNetworkNodeType {
-		requiredFields = []int{0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 25, 26, 27, 28, 32}
-		isMgaProponent := boolMap[row[28]]
-		hasAnnex := boolMap[row[29]]
+	if row[typeCol] == models.AgencyNetworkNodeType {
+		requiredFields = []int{codeCol, typeCol, mailCol, warrantCol, parentUidCol, agencyNameCol, agencyRuiCodeCol,
+			agencyRuiSectionCol, agencyRuiRegistrationCol, agencyVatCodeCol, agencyPecCol, agencyWebsiteCol,
+			agencyPhoneCol, agencyStreetNameCol, agencyStreetNumberCol, agencyLocalityCol, agencyCityCol,
+			agencyPostalCodeCol, agencyCityCodeCol, agentNameCol, agentSurnameCol, agentFiscalCodeCol,
+			agentRuiCodeCol, agentRuiSectionCol, agentRuiRegistrationCol, isMgaProponentCol, isActiveCol}
+		isMgaProponent := boolMap[row[isMgaProponentCol]]
+		hasAnnex := boolMap[row[hasAnnexCol]]
 		if isMgaProponent {
-			requiredFields = append(requiredFields, 29)
-			requiredFields = append(requiredFields, 30)
+			requiredFields = append(requiredFields, hasAnnexCol)
+			requiredFields = append(requiredFields, designationCol)
 		} else if !isMgaProponent && hasAnnex {
-			requiredFields = append(requiredFields, 29)
+			requiredFields = append(requiredFields, hasAnnexCol)
 		}
-	} else if row[2] == models.AgentNetworkNodeType {
-		requiredFields = []int{0, 2, 3, 4, 5, 20, 21, 22, 25, 26, 27, 28, 29, 32}
-		isMgaProponent := boolMap[row[28]]
-		hasAnnex := boolMap[row[29]]
+	} else if row[typeCol] == models.AgentNetworkNodeType {
+		requiredFields = []int{codeCol, typeCol, mailCol, warrantCol, parentUidCol, agentNameCol, agentSurnameCol,
+			agentFiscalCodeCol, agentRuiCodeCol, agentRuiSectionCol, agentRuiRegistrationCol, isMgaProponentCol,
+			hasAnnexCol, isActiveCol}
+		isMgaProponent := boolMap[row[isMgaProponentCol]]
+		hasAnnex := boolMap[row[hasAnnexCol]]
 		if isMgaProponent || hasAnnex {
-			requiredFields = append(requiredFields, 30)
-			requiredFields = append(requiredFields, 31)
+			requiredFields = append(requiredFields, designationCol)
+			requiredFields = append(requiredFields, worksForUidCol)
 		}
 	}
 
 	// check fiscalCode format
 	regExp, _ := regexp.Compile(fiscalCodeRegexPattern)
-	if lib.SliceContains(requiredFields, 22) && !regExp.MatchString(row[22]) {
+	if lib.SliceContains(requiredFields, agentFiscalCodeCol) && !regExp.MatchString(row[agentFiscalCodeCol]) {
 		return errors.New("invalid fiscal code")
 	}
 
@@ -388,11 +431,11 @@ func validateRow(row []string) error {
 		}
 	}
 
-	if lib.SliceContains(requiredFields, 30) && !lib.SliceContains(designationsList, row[30]) {
+	if lib.SliceContains(requiredFields, designationCol) && !lib.SliceContains(designationsList, row[designationCol]) {
 		return errors.New("invalid designation")
 	}
 
-	var dateFieldsIndexes = []int{9, 27}
+	var dateFieldsIndexes = []int{agencyRuiRegistrationCol, agentRuiRegistrationCol}
 	for _, index := range dateFieldsIndexes {
 		if row[index] == "" && lib.SliceContains(requiredFields, index) {
 			return fmt.Errorf("missing required field at index: %02d", index)
@@ -415,14 +458,14 @@ func nodeConfigurationValidation(nodeType string, rows [][]string, nodesMap map[
 	)
 
 	for _, row := range rows {
-		nodeCode := row[0]
-		email := row[3]
-		warrantName := row[4]
-		parentNodeCode := row[5]
-		isMgaProponent := boolMap[row[28]]
-		hasAnnex := boolMap[row[29]]
-		designation := row[30]
-		worksForUid := row[31]
+		nodeCode := row[codeCol]
+		email := row[mailCol]
+		warrantName := row[warrantCol]
+		parentNodeCode := row[parentUidCol]
+		isMgaProponent := boolMap[row[isMgaProponentCol]]
+		hasAnnex := boolMap[row[hasAnnexCol]]
+		designation := row[designationCol]
+		worksForUid := row[worksForUidCol]
 
 		// check if node is not already present
 		if !reflect.ValueOf(nodesMap[nodeCode]).IsZero() {
@@ -512,7 +555,7 @@ func nodeConfigurationValidation(nodeType string, rows [][]string, nodesMap map[
 			HasAnnex:       hasAnnex,
 			IsMgaProponent: isMgaProponent,
 			Type:           nodeType,
-			RuiSection:     row[8],
+			RuiSection:     row[agencyRuiSectionCol],
 		}
 	}
 
