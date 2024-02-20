@@ -28,9 +28,9 @@ func SpreadsheetsFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 func (qs *QuoteSpreadsheet) Spreadsheets() {
 	var (
 		path []byte
-		file *drive.File
+		//file *drive.File
 	)
-	file =
+
 	switch os.Getenv("env") {
 	case "local":
 		path = lib.ErrorByte(ioutil.ReadFile("function-data/sa/positive-apex-350507-33284d6fdd55.json"))
