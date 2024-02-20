@@ -30,6 +30,7 @@ func (qs *QuoteSpreadsheet) Spreadsheets() {
 		path []byte
 		file *drive.File
 	)
+	file =
 	switch os.Getenv("env") {
 	case "local":
 		path = lib.ErrorByte(ioutil.ReadFile("function-data/sa/positive-apex-350507-33284d6fdd55.json"))
@@ -57,7 +58,7 @@ func (qs *QuoteSpreadsheet) Spreadsheets() {
 	sheetClient, e := GoogleClient[*sheets.Service](spreadsheet)
 	lib.CheckError(e)
 	fmt.Printf("sheetClient: %v\n", sheetClient)
-	f, e := driveClient.Svc.Files.Copy(qs.Id, file).Do()
+	f, e := driveClient.Svc.Files.Copy(qs.Id, &drive.File{}).Do()
 
 	sheet, e := sheetClient.Spreadsheets.Values.Get(f.Id, "A:J").Do()
 	fmt.Printf("f.Id: %v\n", f.Id)
