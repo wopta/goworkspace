@@ -35,12 +35,6 @@ func Mga(w http.ResponseWriter, r *http.Request) {
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
-				Route:   "/products/channel/v1/:channel",
-				Handler: GetActiveProductsByChannelFx,
-				Method:  http.MethodGet,
-				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
-			},
-			{
 				Route:   "/network/node/v1/:uid",
 				Handler: GetNetworkNodeByUidFx,
 				Method:  http.MethodGet,
