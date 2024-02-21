@@ -161,7 +161,7 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		// Update NetworkNode Portfolio
 		err = network.UpdateNetworkNodePortfolio(origin, &policy, networkNode)
 		if err != nil {
-			log.Printf("[updatePolicy] error updating %s portfolio %s", networkNode.Type, err.Error())
+			log.Printf("ERROR updating %s portfolio %s", networkNode.Type, err.Error())
 			return "", nil, err
 		}
 
@@ -177,7 +177,7 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 
 		// Send mail with the contract to the user
 		log.Printf(
-			"[updatePolicy] from '%s', to '%s', cc '%s'",
+			"Sending email from '%s', to '%s', cc '%s'",
 			fromAddress.String(),
 			toAddress.String(),
 			ccAddress.String(),
