@@ -1,14 +1,12 @@
 module github.com/wopta/goworkspace/payment
 
-go 1.19
+go 1.21
 
 replace github.com/wopta/goworkspace/payment => ./
 
 require (
-	cloud.google.com/go v0.110.7
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.4
 	github.com/google/uuid v1.3.0
-	github.com/wopta/goworkspace/document v1.1.52
 	github.com/wopta/goworkspace/lib v1.0.99
 	github.com/wopta/goworkspace/mail v1.0.83
 	github.com/wopta/goworkspace/models v1.1.84
