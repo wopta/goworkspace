@@ -38,6 +38,7 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 	)
 
 	log.SetPrefix("[ManualPaymentFx] ")
+	defer log.SetPrefix("")
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -157,24 +158,21 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 			return "", nil, err
 		}
 
-		if networkNode != nil {
-			err = network.UpdateNetworkNodePortfolio(origin, &policy, networkNode)
-			if err != nil {
-				log.Printf("[updatePolicy] error updating %s portfolio %s", networkNode.Type, err.Error())
-				return "", nil, err
-			}
+		// Update NetworkNode Portfolio
+		err = network.UpdateNetworkNodePortfolio(origin, &policy, networkNode)
+		if err != nil {
+			log.Printf("[updatePolicy] error updating %s portfolio %s", networkNode.Type, err.Error())
+			return "", nil, err
 		}
 
 		policy.BigquerySave(origin)
 
 		// Send mail with the contract to the user
 		switch flowName {
-		case models.ProviderMgaFlow:
+		case models.ProviderMgaFlow, models.MgaFlow, models.ECommerceFlow:
 			toAddress = mail.GetContractorEmail(&policy)
 		case models.RemittanceMgaFlow:
 			toAddress = mail.GetNetworkNodeEmail(networkNode)
-		case models.MgaFlow, models.ECommerceFlow:
-			toAddress = mail.GetContractorEmail(&policy)
 		}
 
 		// Send mail with the contract to the user
@@ -185,7 +183,6 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 			ccAddress.String(),
 		)
 		mail.SendMailContract(policy, nil, fromAddress, toAddress, ccAddress, flowName)
-
 	}
 
 	log.Println("Handler end -------------------------------------------------")
