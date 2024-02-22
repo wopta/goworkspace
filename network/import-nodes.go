@@ -595,6 +595,7 @@ func triggerPipeline(r *http.Request, filename string) error {
 
 	pubSubClient, err := pubsub.NewClient(context.Background(), os.Getenv("GOOGLE_PROJECT_ID"))
 	if err != nil {
+		log.Printf("Error getting pub/sub client: %s", err.Error())
 		return err
 	}
 	topic := pubSubClient.Topic("dataflow")
