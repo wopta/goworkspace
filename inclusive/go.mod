@@ -6,14 +6,14 @@ replace github.com/wopta/goworkspace/inclusive => ./
 
 require (
 	cloud.google.com/go v0.110.2
+	cloud.google.com/go/bigquery v1.51.1
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
+	github.com/google/uuid v1.3.0
 	github.com/wopta/goworkspace/lib v1.0.89
-	github.com/wopta/goworkspace/models v1.0.99
 	google.golang.org/api v0.128.0
 )
 
 require (
-	cloud.google.com/go/bigquery v1.51.1 // indirect
 	cloud.google.com/go/compute v1.19.3 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
 	cloud.google.com/go/firestore v1.9.0 // indirect
@@ -40,7 +40,6 @@ require (
 	github.com/google/flatbuffers v2.0.8+incompatible // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/s2a-go v0.1.4 // indirect
-	github.com/google/uuid v1.3.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.2.4 // indirect
 	github.com/googleapis/gax-go/v2 v2.10.0 // indirect
 	github.com/hyperjumptech/grule-rule-engine v1.12.0 // indirect
