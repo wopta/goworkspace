@@ -1,12 +1,13 @@
 module github.com/wopta/goworkspace/companydata
 
-go 1.19
+go 1.21
 
 replace github.com/wopta/goworkspace/companydata => ./
 
 require (
 	cloud.google.com/go v0.110.2
 	cloud.google.com/go/bigquery v1.51.1
+	cloud.google.com/go/firestore v1.9.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.3
 	github.com/dustin/go-humanize v1.0.1
 	github.com/go-gota/gota v0.12.0
@@ -25,7 +26,6 @@ require (
 require (
 	cloud.google.com/go/compute v1.19.3 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
-	cloud.google.com/go/firestore v1.9.0 // indirect
 	cloud.google.com/go/iam v0.13.0 // indirect
 	cloud.google.com/go/longrunning v0.4.1 // indirect
 	cloud.google.com/go/pubsub v1.30.0 // indirect

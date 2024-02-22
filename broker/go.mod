@@ -1,6 +1,6 @@
 module github.com/wopta/goworkspace/broker
 
-go 1.19
+go 1.21
 
 replace github.com/wopta/goworkspace/broker => ./
 
@@ -9,17 +9,17 @@ require (
 	cloud.google.com/go/firestore v1.9.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.4
 	github.com/wopta/goworkspace/bpmn v1.0.16
-	github.com/wopta/goworkspace/document v1.1.52
-	github.com/wopta/goworkspace/lib v1.0.99
-	github.com/wopta/goworkspace/mail v1.0.83
-	github.com/wopta/goworkspace/models v1.1.84
-	github.com/wopta/goworkspace/network v1.0.36
-	github.com/wopta/goworkspace/payment v1.0.165
-	github.com/wopta/goworkspace/policy v1.0.74
-	github.com/wopta/goworkspace/product v1.0.84
-	github.com/wopta/goworkspace/question v1.0.30
-	github.com/wopta/goworkspace/reserved v1.0.77
-	github.com/wopta/goworkspace/transaction v1.0.49
+	github.com/wopta/goworkspace/document v1.1.53
+	github.com/wopta/goworkspace/lib v1.0.100
+	github.com/wopta/goworkspace/mail v1.0.84
+	github.com/wopta/goworkspace/models v1.1.85
+	github.com/wopta/goworkspace/network v1.0.37
+	github.com/wopta/goworkspace/payment v1.0.166
+	github.com/wopta/goworkspace/policy v1.0.75
+	github.com/wopta/goworkspace/product v1.0.85
+	github.com/wopta/goworkspace/question v1.0.31
+	github.com/wopta/goworkspace/reserved v1.0.78
+	github.com/wopta/goworkspace/transaction v1.0.50
 	github.com/wopta/goworkspace/wiseproxy v1.0.3
 )
 
@@ -29,6 +29,7 @@ require (
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
 	cloud.google.com/go/iam v0.13.0 // indirect
 	cloud.google.com/go/longrunning v0.4.1 // indirect
+	cloud.google.com/go/pubsub v1.30.0 // indirect
 	cloud.google.com/go/storage v1.30.1 // indirect
 	firebase.google.com/go v3.13.0+incompatible // indirect
 	firebase.google.com/go/v4 v4.10.0 // indirect
@@ -82,7 +83,7 @@ require (
 	github.com/src-d/gcfg v1.4.0 // indirect
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.2.1 // indirect
-	github.com/wopta/goworkspace/user v1.0.65 // indirect
+	github.com/wopta/goworkspace/user v1.0.66 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
 	github.com/xuri/excelize/v2 v2.7.0 // indirect
@@ -112,6 +113,7 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230530153820-e85fd2cbaebc // indirect
 	google.golang.org/grpc v1.55.0 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
+	gopkg.in/square/go-jose.v2 v2.6.0 // indirect
 	gopkg.in/src-d/go-billy.v4 v4.3.2 // indirect
 	gopkg.in/src-d/go-git.v4 v4.13.1 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect

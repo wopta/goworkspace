@@ -59,6 +59,7 @@ func (qs *QuoteSpreadsheet) Spreadsheets() {
 	lib.CheckError(e)
 	fmt.Printf("sheetClient: %v\n", sheetClient)
 	f, e := driveClient.Svc.Files.Copy(qs.Id, &drive.File{}).Do()
+	fmt.Printf("f.Id: %v\n", e)
 	fmt.Printf("f.Id: %v\n", f.Id)
 	sheet, e := sheetClient.Spreadsheets.Values.Get(f.Id, "A:J").Do()
 

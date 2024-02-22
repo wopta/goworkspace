@@ -1,6 +1,6 @@
 module github.com/wopta/goworkspace/models
 
-go 1.19
+go 1.21
 
 replace github.com/wopta/goworkspace/models => ./
 
@@ -8,7 +8,7 @@ require (
 	cloud.google.com/go v0.110.2
 	cloud.google.com/go/bigquery v1.51.1
 	cloud.google.com/go/firestore v1.9.0
-	github.com/wopta/goworkspace/lib v1.0.99
+	github.com/wopta/goworkspace/lib v1.0.100
 	google.golang.org/api v0.122.0
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1
 )

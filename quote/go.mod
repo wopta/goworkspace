@@ -1,6 +1,6 @@
 module github.com/wopta/goworkspace/quote
 
-go 1.19
+go 1.21
 
 replace github.com/wopta/goworkspace/quote => ./
 
@@ -9,10 +9,10 @@ require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.3
 	github.com/dustin/go-humanize v1.0.1
 	github.com/go-gota/gota v0.12.0
-	github.com/wopta/goworkspace/lib v1.0.99
-	github.com/wopta/goworkspace/models v1.1.84
-	github.com/wopta/goworkspace/network v1.0.36
-	github.com/wopta/goworkspace/sellable v1.0.63
+	github.com/wopta/goworkspace/lib v1.0.100
+	github.com/wopta/goworkspace/models v1.1.85
+	github.com/wopta/goworkspace/network v1.0.37
+	github.com/wopta/goworkspace/sellable v1.0.64
 	github.com/xuri/excelize/v2 v2.8.0
 	google.golang.org/api v0.122.0
 	modernc.org/mathutil v1.5.0
@@ -25,6 +25,7 @@ require (
 	cloud.google.com/go/firestore v1.9.0 // indirect
 	cloud.google.com/go/iam v0.13.0 // indirect
 	cloud.google.com/go/longrunning v0.4.1 // indirect
+	cloud.google.com/go/pubsub v1.30.0 // indirect
 	cloud.google.com/go/storage v1.29.0 // indirect
 	firebase.google.com/go v3.13.0+incompatible // indirect
 	firebase.google.com/go/v4 v4.10.0 // indirect
@@ -69,7 +70,7 @@ require (
 	github.com/sergi/go-diff v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
-	github.com/wopta/goworkspace/product v1.0.84 // indirect
+	github.com/wopta/goworkspace/product v1.0.85 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20230802181842-ad255f2331ca // indirect
 	github.com/xuri/nfp v0.0.0-20230819163627-dc951e3ffe1a // indirect

@@ -1,16 +1,16 @@
 module github.com/wopta/goworkspace/transaction
 
-go 1.19
+go 1.21
 
 replace github.com/wopta/goworkspace/transaction => ./
 
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.4
 	github.com/google/uuid v1.3.0
-	github.com/wopta/goworkspace/lib v1.0.99
-	github.com/wopta/goworkspace/models v1.1.84
-	github.com/wopta/goworkspace/network v1.0.36
-	github.com/wopta/goworkspace/product v1.0.84
+	github.com/wopta/goworkspace/lib v1.0.100
+	github.com/wopta/goworkspace/models v1.1.85
+	github.com/wopta/goworkspace/network v1.0.37
+	github.com/wopta/goworkspace/product v1.0.85
 )
 
 require (
@@ -21,6 +21,7 @@ require (
 	cloud.google.com/go/firestore v1.9.0 // indirect
 	cloud.google.com/go/iam v0.13.0 // indirect
 	cloud.google.com/go/longrunning v0.4.1 // indirect
+	cloud.google.com/go/pubsub v1.30.0 // indirect
 	cloud.google.com/go/storage v1.29.0 // indirect
 	firebase.google.com/go v3.13.0+incompatible // indirect
 	firebase.google.com/go/v4 v4.10.0 // indirect

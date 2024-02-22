@@ -1,13 +1,13 @@
 module github.com/wopta/goworkspace/product
 
-go 1.19
+go 1.21
 
 replace github.com/wopta/goworkspace/product => ./
 
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
-	github.com/wopta/goworkspace/lib v1.0.99
-	github.com/wopta/goworkspace/models v1.1.84
+	github.com/wopta/goworkspace/lib v1.0.100
+	github.com/wopta/goworkspace/models v1.1.85
 )
 
 require (
