@@ -60,7 +60,7 @@ steps:
     --source=/workspace/${strarr[0]} \
     --entry-point=${name_camel} \
     --trigger-http \
-    --runtime=go119 \
+    --runtime=go121 \
     --env-vars-file ${env}.yaml \
     --project=${project}
 
