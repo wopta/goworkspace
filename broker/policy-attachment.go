@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"regexp"
 	"strings"
 
@@ -91,7 +92,6 @@ func GetPolicyAttachments(policyUid string, origin string) ([]models.Attachment,
 		return make([]models.Attachment, 0), err
 	}
 
-	expr, err := regexp.Compile("gs://(?P<bucketName>(?:[^/])*)/(?P<fileName>((?:[^/]*/)*)(.*))")
 	log.Printf("Found %d attachment(s) for policy %s", len(*policy.Attachments), policy.Uid)
 
 	if policy.Attachments == nil {
@@ -109,9 +109,24 @@ func GetPolicyAttachments(policyUid string, origin string) ([]models.Attachment,
 			log.Printf("Attachment %s has empty link, skipping", attachment.FileName)
 			continue
 		}
-		matches := findNamedMatches(expr, attachment.Link)
-		log.Printf("Found %s with bucketName=%s and fileName=%s", attachment.FileName, matches["bucketName"], matches["fileName"])
-		fileData, _ := lib.GetFromStorageErr(matches["bucketName"], matches["fileName"], "")
+
+		gsLink := attachment.Link
+
+		if gsLink == "" {
+			log.Printf("empty gsLink")
+			continue
+		}
+		if !strings.Contains(gsLink, "gs://") {
+			gsLink = "gs://" + os.Getenv("GOOGLE_STORAGE_BUCKET") + "/" + gsLink
+		}
+
+		log.Printf("gsLink: %s", gsLink)
+
+		fileData, err := lib.ReadFileFromGoogleStorage(gsLink)
+		if err != nil {
+			log.Printf("error reading document from Google Storage: %s", err.Error())
+			return nil, err
+		}
 
 		responseAttachment.FileName = attachment.FileName
 		responseAttachment.ContentType = attachment.ContentType
