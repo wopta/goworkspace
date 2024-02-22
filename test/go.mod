@@ -1,17 +1,17 @@
 module github.com/wopta/goworkspace/test
 
-go 1.19
+go 1.21
 
 replace github.com/wopta/goworkspace/test => ./
 
 require (
-	cloud.google.com/go v0.110.2
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
 	github.com/wopta/goworkspace/lib v1.0.63
 	github.com/wopta/goworkspace/models v1.1.18
 )
 
 require (
+	cloud.google.com/go v0.110.2 // indirect
 	cloud.google.com/go/bigquery v1.51.1 // indirect
 	cloud.google.com/go/compute v1.19.0 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect

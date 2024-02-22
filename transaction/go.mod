@@ -1,6 +1,6 @@
 module github.com/wopta/goworkspace/transaction
 
-go 1.19
+go 1.21
 
 replace github.com/wopta/goworkspace/transaction => ./
 
@@ -21,6 +21,7 @@ require (
 	cloud.google.com/go/firestore v1.9.0 // indirect
 	cloud.google.com/go/iam v0.13.0 // indirect
 	cloud.google.com/go/longrunning v0.4.1 // indirect
+	cloud.google.com/go/pubsub v1.30.0 // indirect
 	cloud.google.com/go/storage v1.29.0 // indirect
 	firebase.google.com/go v3.13.0+incompatible // indirect
 	firebase.google.com/go/v4 v4.10.0 // indirect
