@@ -15,7 +15,6 @@ import (
 	plc "github.com/wopta/goworkspace/policy"
 	prd "github.com/wopta/goworkspace/product"
 	trn "github.com/wopta/goworkspace/transaction"
-	"github.com/wopta/goworkspace/user"
 )
 
 type ManualPaymentPayload struct {
@@ -33,10 +32,13 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		flowName    string
 		networkNode *models.NetworkNode
 		warrant     *models.Warrant
-		cc          = mail.Address{}
+		ccAddress   = mail.Address{}
+		fromAddress = mail.AddressAnna
+		toAddress   = mail.Address{}
 	)
 
 	log.SetPrefix("[ManualPaymentFx] ")
+	defer log.SetPrefix("")
 
 	log.Println("Handler start -----------------------------------------------")
 
@@ -124,7 +126,7 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
 	if networkNode != nil {
 		warrant = networkNode.GetWarrant()
-		cc = mail.GetNetworkNodeEmail(networkNode)
+		ccAddress = mail.GetNetworkNodeEmail(networkNode)
 	}
 	flowName, _ = policy.GetFlow(networkNode, warrant)
 	log.Printf("flowName '%s'", flowName)
@@ -136,7 +138,11 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 	// Update policy if needed
 	if !policy.IsPay {
 		// Create/Update document on user collection based on contractor fiscalCode
-		user.SetUserIntoPolicyContractor(&policy, origin)
+		err = plc.SetUserIntoPolicyContractor(&policy, origin)
+		if err != nil {
+			log.Printf("ERROR set user into policy contractor: %s", err.Error())
+			return "", nil, err
+		}
 
 		// Add contract to policy
 		err = plc.AddContract(&policy, origin)
@@ -146,17 +152,37 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		}
 
 		// Update Policy as paid
-		plc.SetPolicyPaid(&policy, origin)
+		err = plc.Pay(&policy, origin)
+		if err != nil {
+			log.Printf("ERROR policy pay: %s", err.Error())
+			return "", nil, err
+		}
+
+		// Update NetworkNode Portfolio
+		err = network.UpdateNetworkNodePortfolio(origin, &policy, networkNode)
+		if err != nil {
+			log.Printf("ERROR updating %s portfolio %s", networkNode.Type, err.Error())
+			return "", nil, err
+		}
+
+		policy.BigquerySave(origin)
 
 		// Send mail with the contract to the user
-		mail.SendMailContract(
-			policy,
-			nil,
-			mail.AddressAnna,
-			mail.GetContractorEmail(&policy),
-			cc,
-			flowName,
+		switch flowName {
+		case models.ProviderMgaFlow, models.MgaFlow, models.ECommerceFlow:
+			toAddress = mail.GetContractorEmail(&policy)
+		case models.RemittanceMgaFlow:
+			toAddress = mail.GetNetworkNodeEmail(networkNode)
+		}
+
+		// Send mail with the contract to the user
+		log.Printf(
+			"Sending email from '%s', to '%s', cc '%s'",
+			fromAddress.String(),
+			toAddress.String(),
+			ccAddress.String(),
 		)
+		mail.SendMailContract(policy, nil, fromAddress, toAddress, ccAddress, flowName)
 	}
 
 	log.Println("Handler end -------------------------------------------------")
