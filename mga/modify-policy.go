@@ -95,16 +95,20 @@ func lifeModifier(inputPolicy, originalPolicy models.Policy) (models.Policy, err
 		err                error
 		modifiedPolicy     models.Policy
 		modifiedContractor models.Contractor
-		modifiedInsured    *models.User
+		modifiedInsured    = new(models.User)
 	)
 
-	modifiedContractor, err = updateContractorInfo(inputPolicy.Contractor, originalPolicy.Contractor)
+	modifiedContractor, err = editContractorInfo(inputPolicy.Contractor, originalPolicy.Contractor)
 	if err != nil {
 		log.Printf("error modifying contractor %s info: %s", originalPolicy.Contractor.Uid, err.Error())
 		return models.Policy{}, err
 	}
 	if strings.EqualFold(inputPolicy.Contractor.FiscalCode, inputPolicy.Assets[0].Person.FiscalCode) {
 		modifiedInsured = modifiedContractor.ToUser()
+	} else {
+		*modifiedInsured, err = editInsuredInfo(*inputPolicy.Assets[0].Person, *originalPolicy.Assets[0].Person)
+		log.Printf("error editing insured for policy %s info: %s", originalPolicy.Uid, err.Error())
+		return models.Policy{}, err
 	}
 
 	modifiedPolicy.Contractor = modifiedContractor
@@ -112,7 +116,7 @@ func lifeModifier(inputPolicy, originalPolicy models.Policy) (models.Policy, err
 	return modifiedPolicy, err
 }
 
-func updateContractorInfo(inputContractor, originalContractor models.Contractor) (models.Contractor, error) {
+func editContractorInfo(inputContractor, originalContractor models.Contractor) (models.Contractor, error) {
 	var (
 		err                error
 		modifiedContractor = new(models.Contractor)
@@ -141,5 +145,41 @@ func updateContractorInfo(inputContractor, originalContractor models.Contractor)
 		return models.Contractor{}, errors.New("invalid fiscalCode")
 	}
 
+	log.Printf("contractor %s modified", originalContractor.Uid)
+
 	return *modifiedContractor, err
+}
+
+func editInsuredInfo(inputInsured, originalInsured models.User) (models.User, error) {
+	var (
+		err             error
+		modifiedInsured = new(models.User)
+	)
+
+	log.Println("editing insured info...")
+	*modifiedInsured = originalInsured
+
+	modifiedInsured.Name = inputInsured.Name
+	modifiedInsured.Surname = inputInsured.Surname
+	modifiedInsured.BirthDate = inputInsured.BirthDate
+	modifiedInsured.BirthCity = inputInsured.BirthCity
+	modifiedInsured.BirthProvince = inputInsured.BirthProvince
+	modifiedInsured.Gender = inputInsured.Gender
+	modifiedInsured.FiscalCode = inputInsured.FiscalCode
+
+	// TODO: handle omocodia
+	computedFiscalCode, _, err := usr.CalculateFiscalCode(*modifiedInsured)
+	if err != nil {
+		log.Printf("error computing fiscalCode for contractor %s: %s", modifiedInsured.Uid, err.Error())
+		return models.User{}, err
+	}
+	if !strings.EqualFold(modifiedInsured.FiscalCode, computedFiscalCode) {
+		log.Printf("computed fiscalCode %s not matching inputted fiscalCode %s", computedFiscalCode, modifiedInsured.FiscalCode)
+		return models.User{}, errors.New("invalid fiscalCode")
+	}
+
+	log.Printf("contractor %s modified", originalInsured.Uid)
+
+	log.Println("insured edited successfully")
+	return *modifiedInsured, err
 }
