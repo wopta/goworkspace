@@ -273,10 +273,7 @@ func buildNetworkNodesMap(dbNodes []models.NetworkNode) (map[string]nodeInfo, []
 			Type:           nn.Type,
 			RuiSection:     ruiSection,
 		}
-
-		if !lib.SliceContains(emailsList, nn.Mail) {
-			emailsList = append(emailsList, nn.Mail)
-		}
+		emailsList = append(emailsList, lib.ToUpper(nn.Mail))
 	}
 	return nodesMap, emailsList
 }
