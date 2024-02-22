@@ -411,15 +411,15 @@ func validateRow(row []string) []int {
 	}
 
 	var dateFieldsIndexes = []int{agencyRuiRegistrationCol, agentRuiRegistrationCol}
-	for _, index := range dateFieldsIndexes {
-		if row[index] == "" && lib.SliceContains(requiredFields, index) {
-			log.Printf("Error processing node %s: missing required field at index %02d", nodeCode, index)
-			columnsError = append(columnsError, index)
+	for _, colNumber := range dateFieldsIndexes {
+		if row[colNumber] == "" && lib.SliceContains(requiredFields, colNumber) {
+			log.Printf("Error processing node %s: missing required field at index %02d", nodeCode, colNumber)
+			columnsError = append(columnsError, colNumber)
 		}
-		_, err := time.Parse("02012006", fmt.Sprintf("%08s", row[index]))
-		if err != nil && lib.SliceContains(requiredFields, index) {
-			log.Printf("Error processing node %s: malformed date at index %02d", nodeCode, index)
-			columnsError = append(columnsError, index)
+		_, err := time.Parse("02012006", fmt.Sprintf("%08s", row[colNumber]))
+		if err != nil && lib.SliceContains(requiredFields, colNumber) {
+			log.Printf("Error processing node %s: malformed date at index %02d", nodeCode, colNumber)
+			columnsError = append(columnsError, colNumber)
 		}
 	}
 
