@@ -13,6 +13,7 @@ type BrokerBaseRequest struct {
 	PolicyUid    string `json:"policyUid"`
 	PaymentSplit string `json:"paymentSplit"`
 	Payment      string `json:"payment"`
+	PaymentMode  string `json:"paymentMode"`
 }
 
 func init() {

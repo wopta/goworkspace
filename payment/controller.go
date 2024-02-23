@@ -16,10 +16,11 @@ func PaymentController(origin string, policy *models.Policy, product, mgaProduct
 
 	log.Printf("init")
 
-	// TODO: fix me
-	if policy.Payment == "" || policy.Payment == "fabrik" {
-		policy.Payment = models.FabrickPaymentProvider
+	if err := checkPaymentConfiguration(policy); err != nil {
+		log.Printf("mismatched payment configuration: %s", err.Error())
+		return "", err
 	}
+
 	paymentMethods = getPaymentMethods(*policy, product)
 
 	log.Printf("generating payment URL")
@@ -61,9 +62,9 @@ func getPaymentMethods(policy models.Policy, product *models.Product) []string {
 
 	for _, provider := range product.PaymentProviders {
 		if provider.Name == policy.Payment {
-			for _, method := range provider.Methods {
-				if lib.SliceContains(method.Rates, policy.PaymentSplit) {
-					paymentMethods = append(paymentMethods, method.Name)
+			for _, config := range provider.Configs {
+				if config.Mode == policy.PaymentMode && config.Rate == policy.PaymentSplit {
+					paymentMethods = append(paymentMethods, config.Methods...)
 				}
 			}
 		}
@@ -71,4 +72,23 @@ func getPaymentMethods(policy models.Policy, product *models.Product) []string {
 
 	log.Printf("[GetPaymentMethods] found %v", paymentMethods)
 	return paymentMethods
+}
+
+func checkPaymentConfiguration(policy *models.Policy) error {
+	var allowedModes []string
+
+	switch policy.PaymentSplit {
+	case string(models.PaySplitMonthly):
+		allowedModes = models.GetAllowedMonthlyModes()
+	case string(models.PaySplitYearly):
+		allowedModes = models.GetAllowedYearlyModes()
+	case string(models.PaySplitSingleInstallment):
+		allowedModes = models.GetAllowedSingleInstallmentModes()
+	}
+
+	if !lib.SliceContains(allowedModes, policy.PaymentMode) {
+		return fmt.Errorf("mode '%s' is incompatible with split '%s'", policy.PaymentMode, policy.PaymentSplit)
+	}
+
+	return nil
 }

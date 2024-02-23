@@ -14,12 +14,12 @@ import (
 )
 
 var (
-	origin, flowName, paymentSplit    string
-	ccAddress, toAddress, fromAddress mail.Address
-	networkNode                       *models.NetworkNode
-	product, mgaProduct               *models.Product
-	warrant                           *models.Warrant
-	sendEmail                         bool
+	origin, flowName, paymentSplit, paymentMode string
+	ccAddress, toAddress, fromAddress           mail.Address
+	networkNode                                 *models.NetworkNode
+	product, mgaProduct                         *models.Product
+	warrant                                     *models.Warrant
+	sendEmail                                   bool
 )
 
 const (
