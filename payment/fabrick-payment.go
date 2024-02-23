@@ -124,22 +124,23 @@ func getTransactionScheduleDates(policy *models.Policy, origin string) []time.Ti
 			response = append(response, currentScheduleDate)
 		}
 	} else {
-		isFirstSchedule := true
-		for _, tr := range activeTransactions {
-			if tr.IsPay {
-				continue
-			}
-			if isFirstSchedule {
-				currentScheduleDate = time.Time{}
-				isFirstSchedule = false
-			}
-			currentScheduleDate, err := time.Parse(models.TimeDateOnly, tr.ScheduleDate)
-			if err != nil {
-				log.Printf("error parsing schedule date %s: %s", tr.ScheduleDate, err.Error())
-				return nil
-			}
-			response = append(response, currentScheduleDate)
-		}
+		// TODO: handle when policy already has created transactions
+		// isFirstSchedule := true
+		// for _, tr := range activeTransactions {
+		// 	if tr.IsPay {
+		// 		continue
+		// 	}
+		// 	if isFirstSchedule {
+		// 		currentScheduleDate = time.Time{}
+		// 		isFirstSchedule = false
+		// 	}
+		// 	currentScheduleDate, err := time.Parse(models.TimeDateOnly, tr.ScheduleDate)
+		// 	if err != nil {
+		// 		log.Printf("error parsing schedule date %s: %s", tr.ScheduleDate, err.Error())
+		// 		return nil
+		// 	}
+		// 	response = append(response, currentScheduleDate)
+		// }
 	}
 
 	return response
