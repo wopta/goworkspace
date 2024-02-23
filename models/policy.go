@@ -344,3 +344,18 @@ func (policy *Policy) GetFlow(networkNode *NetworkNode, warrant *Warrant) (strin
 
 	return flowName, &flowFile
 }
+
+func (policy *Policy) GetNumberOfRates() int {
+	switch policy.PaymentSplit {
+	case string(PaySplitYear), string(PaySplitYearly), string(PaySplitSingleInstallment):
+		return 1
+	case string(PaySplitMonthly):
+		return 12
+	default:
+		return 0
+	}
+}
+
+func (policy *Policy) GetDurationInYears() int {
+	return policy.EndDate.Year() - policy.StartDate.Year()
+}

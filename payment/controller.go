@@ -23,19 +23,10 @@ func PaymentController(origin string, policy *models.Policy, product, mgaProduct
 
 	paymentMethods = getPaymentMethods(*policy, product)
 
-	log.Printf("generating payment URL")
 	switch policy.Payment {
 	case models.FabrickPaymentProvider:
-		var payRes FabrickPaymentResponse
+		payRes := fabrickPayment(policy, origin, paymentMethods, mgaProduct)
 
-		switch policy.PaymentSplit {
-		case string(models.PaySplitYear), string(models.PaySplitYearly), string(models.PaySplitSingleInstallment):
-			log.Printf("fabrick yearly pay")
-			payRes = FabrickYearPay(*policy, origin, paymentMethods, mgaProduct)
-		case string(models.PaySplitMonthly):
-			log.Printf("fabrick monthly pay")
-			payRes = FabrickMonthlyPay(*policy, origin, paymentMethods, mgaProduct)
-		}
 		if payRes.Payload == nil || payRes.Payload.PaymentPageURL == nil {
 			log.Println("fabrick error payload or paymentUrl empty")
 			return "", fmt.Errorf("fabrick error: %v", payRes.Errors)
