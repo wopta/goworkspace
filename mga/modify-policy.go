@@ -10,6 +10,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"time"
 )
 
 func ModifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -23,6 +24,7 @@ func ModifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	log.Println("Handler start -----------------------------------------------")
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
+	defer r.Body.Close()
 	log.Printf("request body: %s", string(body))
 	err = json.Unmarshal(body, &inputPolicy)
 	if err != nil {
@@ -53,18 +55,6 @@ func ModifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	}
 	log.Printf("policy %s modified successfully", modifiedPolicy.Uid)
 
-	/*log.Printf("writing modified policy to Firestore...")
-	err = lib.SetFirestoreErr(models.PolicyCollection, modifiedPolicy.Uid, modifiedPolicy)
-	if err != nil {
-		log.Printf("error writing modified policy to Firestore: %s", err.Error())
-		return "{}", nil, err
-	}
-	log.Printf("policy %s written to Firestore", modifiedPolicy.Uid)
-
-	log.Printf("writing modified policy to BigQuery...")
-	modifiedPolicy.BigquerySave("")
-	log.Printf("policy %s written to BigQuery", modifiedPolicy.Uid)*/
-
 	rawPolicy, err = json.Marshal(modifiedPolicy)
 	log.Printf("modified policy: %s", string(rawPolicy))
 
@@ -86,6 +76,13 @@ func modifyController(originalPolicy, inputPolicy models.Policy) (models.Policy,
 		return models.Policy{}, errors.New("product not supported")
 	}
 
+	log.Printf("writing policy %s to DBs...")
+	err = writePolicyToDb(modifiedPolicy)
+	if err != nil {
+		return models.Policy{}, err
+	}
+	log.Printf("policy %s written into DBs", modifiedPolicy.Uid)
+
 	return modifiedPolicy, err
 }
 
@@ -99,23 +96,32 @@ func lifeModifier(inputPolicy, originalPolicy models.Policy) (models.Policy, err
 
 	modifiedPolicy = inputPolicy
 
-	modifiedContractor, err = editContractorInfo(inputPolicy.Contractor, originalPolicy.Contractor)
+	modifiedContractor, err = modifyContractorInfo(inputPolicy.Contractor, originalPolicy.Contractor)
 	if err != nil {
 		log.Printf("error modifying contractor %s info: %s", originalPolicy.Contractor.Uid, err.Error())
 		return models.Policy{}, err
 	}
-	modifiedInsured, err = editInsuredInfo(*inputPolicy.Assets[0].Person, *originalPolicy.Assets[0].Person)
+
+	modifiedInsured, err = modifyInsuredInfo(*inputPolicy.Assets[0].Person, *originalPolicy.Assets[0].Person)
 	if err != nil {
-		log.Printf("error editing insured for policy %s info: %s", originalPolicy.Uid, err.Error())
+		log.Printf("error modifying insured for policy %s info: %s", originalPolicy.Uid, err.Error())
 		return models.Policy{}, err
 	}
 
 	modifiedPolicy.Contractor = modifiedContractor
 	modifiedPolicy.Assets[0].Person = &modifiedInsured
+
+	log.Printf("writing user %s to DBs...")
+	err = writeUserToDB(modifiedPolicy.Contractor)
+	if err != nil {
+		return models.Policy{}, err
+	}
+	log.Printf("user %s written into DBs")
+
 	return modifiedPolicy, err
 }
 
-func editContractorInfo(inputContractor, originalContractor models.Contractor) (models.Contractor, error) {
+func modifyContractorInfo(inputContractor, originalContractor models.Contractor) (models.Contractor, error) {
 	var (
 		err                error
 		modifiedContractor = new(models.Contractor)
@@ -132,34 +138,24 @@ func editContractorInfo(inputContractor, originalContractor models.Contractor) (
 	modifiedContractor.Gender = inputContractor.Gender
 	modifiedContractor.FiscalCode = inputContractor.FiscalCode
 
-	// TODO: handle omocodia
 	user := modifiedContractor.ToUser()
 	err = usr.CheckFiscalCode(*user)
 	if err != nil {
 		return models.Contractor{}, err
 	}
-	/*computedFiscalCode, _, err := usr.CalculateFiscalCode(*user)
-	if err != nil {
-		log.Printf("error computing fiscalCode for contractor %s: %s", modifiedContractor.Uid, err.Error())
-		return models.Contractor{}, err
-	}
-	if !strings.EqualFold(modifiedContractor.FiscalCode, computedFiscalCode) {
-		log.Printf("computed fiscalCode %s not matching inputted fiscalCode %s", computedFiscalCode, modifiedContractor.FiscalCode)
-		return models.Contractor{}, errors.New("invalid fiscalCode")
-	}*/
 
 	log.Printf("contractor %s modified", originalContractor.Uid)
 
 	return *modifiedContractor, err
 }
 
-func editInsuredInfo(inputInsured, originalInsured models.User) (models.User, error) {
+func modifyInsuredInfo(inputInsured, originalInsured models.User) (models.User, error) {
 	var (
 		err             error
 		modifiedInsured = new(models.User)
 	)
 
-	log.Println("editing insured info...")
+	log.Println("modifying insured info...")
 	*modifiedInsured = originalInsured
 
 	modifiedInsured.Name = inputInsured.Name
@@ -170,23 +166,49 @@ func editInsuredInfo(inputInsured, originalInsured models.User) (models.User, er
 	modifiedInsured.Gender = inputInsured.Gender
 	modifiedInsured.FiscalCode = inputInsured.FiscalCode
 
-	// TODO: handle omocodia
 	err = usr.CheckFiscalCode(*modifiedInsured)
 	if err != nil {
 		return models.User{}, err
 	}
-	/*computedFiscalCode, _, err := usr.CalculateFiscalCode(*modifiedInsured)
-	if err != nil {
-		log.Printf("error computing fiscalCode for contractor %s: %s", modifiedInsured.Uid, err.Error())
-		return models.User{}, err
-	}
-	if !strings.EqualFold(modifiedInsured.FiscalCode, computedFiscalCode) {
-		log.Printf("computed fiscalCode %s not matching inputted fiscalCode %s", computedFiscalCode, modifiedInsured.FiscalCode)
-		return models.User{}, errors.New("invalid fiscalCode")
-	}*/
 
 	log.Printf("contractor %s modified", originalInsured.Uid)
 
-	log.Println("insured edited successfully")
+	log.Println("insured modified successfully")
 	return *modifiedInsured, err
+}
+
+func writePolicyToDb(modifiedPolicy models.Policy) error {
+	var err error
+
+	modifiedPolicy.Updated = time.Now().UTC()
+
+	err = lib.SetFirestoreErr(models.PolicyCollection, modifiedPolicy.Uid, modifiedPolicy)
+	if err != nil {
+		log.Printf("error writing modified policy to Firestore: %s", err.Error())
+		return err
+	}
+
+	modifiedPolicy.BigquerySave("")
+
+	return err
+}
+
+func writeUserToDB(modifiedContractor models.Contractor) error {
+	var err error
+
+	modifiedContractor.UpdatedDate = time.Now().UTC()
+
+	err = lib.SetFirestoreErr(models.UserCollection, modifiedContractor.Uid, modifiedContractor)
+	if err != nil {
+		log.Printf("error writing modified user to Firestore: %s", err.Error())
+		return err
+	}
+
+	err = modifiedContractor.BigquerySave("")
+	if err != nil {
+		log.Printf("error writing modified user to BigQuery: %s", err.Error())
+		return err
+	}
+
+	return err
 }
