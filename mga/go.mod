@@ -11,7 +11,7 @@ require (
 	github.com/wopta/goworkspace/models v1.1.86
 	github.com/wopta/goworkspace/network v1.0.38
 	github.com/wopta/goworkspace/product v1.0.86
-	github.com/wopta/goworkspace/user v1.0.87
+	github.com/wopta/goworkspace/user v1.0.67
 )
 
 require (
