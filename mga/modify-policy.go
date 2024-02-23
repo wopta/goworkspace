@@ -72,16 +72,16 @@ func modifyController(originalPolicy, inputPolicy models.Policy) (models.Policy,
 	switch originalPolicy.Name {
 	case models.LifeProduct:
 		modifiedPolicy, err = lifeModifier(inputPolicy, originalPolicy)
+	case models.GapProduct:
+		modifiedPolicy, err = gapModifier(inputPolicy, originalPolicy)
 	default:
 		return models.Policy{}, errors.New("product not supported")
 	}
 
-	log.Printf("writing policy %s to DBs...")
 	err = writePolicyToDb(modifiedPolicy)
 	if err != nil {
 		return models.Policy{}, err
 	}
-	log.Printf("policy %s written into DBs", modifiedPolicy.Uid)
 
 	return modifiedPolicy, err
 }
@@ -111,12 +111,35 @@ func lifeModifier(inputPolicy, originalPolicy models.Policy) (models.Policy, err
 	modifiedPolicy.Contractor = modifiedContractor
 	modifiedPolicy.Assets[0].Person = &modifiedInsured
 
-	log.Printf("writing user %s to DBs...")
 	err = writeUserToDB(modifiedPolicy.Contractor)
 	if err != nil {
 		return models.Policy{}, err
 	}
-	log.Printf("user %s written into DBs")
+
+	return modifiedPolicy, err
+}
+
+func gapModifier(inputPolicy, originalPolicy models.Policy) (models.Policy, error) {
+	var (
+		err                error
+		modifiedPolicy     models.Policy
+		modifiedContractor models.Contractor
+	)
+
+	modifiedPolicy = inputPolicy
+
+	modifiedContractor, err = modifyContractorInfo(inputPolicy.Contractor, originalPolicy.Contractor)
+	if err != nil {
+		log.Printf("error modifying contractor %s info: %s", originalPolicy.Contractor.Uid, err.Error())
+		return models.Policy{}, err
+	}
+
+	modifiedPolicy.Contractor = modifiedContractor
+
+	err = writeUserToDB(modifiedPolicy.Contractor)
+	if err != nil {
+		return models.Policy{}, err
+	}
 
 	return modifiedPolicy, err
 }
@@ -182,6 +205,8 @@ func writePolicyToDb(modifiedPolicy models.Policy) error {
 
 	modifiedPolicy.Updated = time.Now().UTC()
 
+	log.Printf("writing policy %s to DBs...", modifiedPolicy.Uid)
+
 	err = lib.SetFirestoreErr(models.PolicyCollection, modifiedPolicy.Uid, modifiedPolicy)
 	if err != nil {
 		log.Printf("error writing modified policy to Firestore: %s", err.Error())
@@ -190,6 +215,8 @@ func writePolicyToDb(modifiedPolicy models.Policy) error {
 
 	modifiedPolicy.BigquerySave("")
 
+	log.Printf("policy %s written into DBs", modifiedPolicy.Uid)
+
 	return err
 }
 
@@ -197,6 +224,8 @@ func writeUserToDB(modifiedContractor models.Contractor) error {
 	var err error
 
 	modifiedContractor.UpdatedDate = time.Now().UTC()
+
+	log.Printf("writing user %s to DBs...", modifiedContractor.Uid)
 
 	err = lib.SetFirestoreErr(models.UserCollection, modifiedContractor.Uid, modifiedContractor)
 	if err != nil {
@@ -209,6 +238,8 @@ func writeUserToDB(modifiedContractor models.Contractor) error {
 		log.Printf("error writing modified user to BigQuery: %s", err.Error())
 		return err
 	}
+
+	log.Printf("user %s written into DBs", modifiedContractor.Uid)
 
 	return err
 }
