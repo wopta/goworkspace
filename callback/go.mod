@@ -7,15 +7,15 @@ replace github.com/wopta/goworkspace/callback => ./
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.4
 	github.com/wopta/goworkspace/bpmn v1.0.16
-	github.com/wopta/goworkspace/document v1.1.53
-	github.com/wopta/goworkspace/lib v1.0.100
-	github.com/wopta/goworkspace/mail v1.0.84
-	github.com/wopta/goworkspace/models v1.1.85
-	github.com/wopta/goworkspace/network v1.0.37
-	github.com/wopta/goworkspace/policy v1.0.75
-	github.com/wopta/goworkspace/product v1.0.85
-	github.com/wopta/goworkspace/transaction v1.0.50
-	github.com/wopta/goworkspace/user v1.0.66
+	github.com/wopta/goworkspace/document v1.1.54
+	github.com/wopta/goworkspace/lib v1.0.101
+	github.com/wopta/goworkspace/mail v1.0.85
+	github.com/wopta/goworkspace/models v1.1.86
+	github.com/wopta/goworkspace/network v1.0.38
+	github.com/wopta/goworkspace/policy v1.0.76
+	github.com/wopta/goworkspace/product v1.0.86
+	github.com/wopta/goworkspace/transaction v1.0.51
+	github.com/wopta/goworkspace/user v1.0.67
 )
 
 require (
