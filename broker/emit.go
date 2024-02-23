@@ -266,7 +266,7 @@ func brokerUpdatePolicy(policy *models.Policy, request BrokerBaseRequest) {
 		policy.PaymentMode = request.PaymentMode
 	}
 	if policy.PaymentMode == "" {
-		if policy.PaymentSplit == string(models.PaySplitYearly) {
+		if policy.PaymentSplit == string(models.PaySplitYearly) || policy.PaymentSplit == string(models.PaySplitSingleInstallment) {
 			log.Println("[brokerUpdatePolicy] inject policy payment mode from fallback")
 			policy.PaymentMode = models.PaymentModeSingle
 		}
