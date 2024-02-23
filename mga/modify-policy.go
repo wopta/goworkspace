@@ -10,7 +10,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"strings"
 )
 
 func ModifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -95,7 +94,7 @@ func lifeModifier(inputPolicy, originalPolicy models.Policy) (models.Policy, err
 		err                error
 		modifiedPolicy     models.Policy
 		modifiedContractor models.Contractor
-		modifiedInsured    = new(models.User)
+		modifiedInsured    models.User
 	)
 
 	modifiedContractor, err = editContractorInfo(inputPolicy.Contractor, originalPolicy.Contractor)
@@ -103,16 +102,14 @@ func lifeModifier(inputPolicy, originalPolicy models.Policy) (models.Policy, err
 		log.Printf("error modifying contractor %s info: %s", originalPolicy.Contractor.Uid, err.Error())
 		return models.Policy{}, err
 	}
-	if strings.EqualFold(inputPolicy.Contractor.FiscalCode, inputPolicy.Assets[0].Person.FiscalCode) {
-		modifiedInsured = modifiedContractor.ToUser()
-	} else {
-		*modifiedInsured, err = editInsuredInfo(*inputPolicy.Assets[0].Person, *originalPolicy.Assets[0].Person)
+	modifiedInsured, err = editInsuredInfo(*inputPolicy.Assets[0].Person, *originalPolicy.Assets[0].Person)
+	if err != nil {
 		log.Printf("error editing insured for policy %s info: %s", originalPolicy.Uid, err.Error())
 		return models.Policy{}, err
 	}
 
 	modifiedPolicy.Contractor = modifiedContractor
-	modifiedPolicy.Assets[0].Person = modifiedInsured
+	modifiedPolicy.Assets[0].Person = &modifiedInsured
 	return modifiedPolicy, err
 }
 
@@ -135,7 +132,11 @@ func editContractorInfo(inputContractor, originalContractor models.Contractor) (
 
 	// TODO: handle omocodia
 	user := modifiedContractor.ToUser()
-	computedFiscalCode, _, err := usr.CalculateFiscalCode(*user)
+	err = usr.CheckFiscalCode(*user)
+	if err != nil {
+		return models.Contractor{}, err
+	}
+	/*computedFiscalCode, _, err := usr.CalculateFiscalCode(*user)
 	if err != nil {
 		log.Printf("error computing fiscalCode for contractor %s: %s", modifiedContractor.Uid, err.Error())
 		return models.Contractor{}, err
@@ -143,7 +144,7 @@ func editContractorInfo(inputContractor, originalContractor models.Contractor) (
 	if !strings.EqualFold(modifiedContractor.FiscalCode, computedFiscalCode) {
 		log.Printf("computed fiscalCode %s not matching inputted fiscalCode %s", computedFiscalCode, modifiedContractor.FiscalCode)
 		return models.Contractor{}, errors.New("invalid fiscalCode")
-	}
+	}*/
 
 	log.Printf("contractor %s modified", originalContractor.Uid)
 
@@ -168,7 +169,11 @@ func editInsuredInfo(inputInsured, originalInsured models.User) (models.User, er
 	modifiedInsured.FiscalCode = inputInsured.FiscalCode
 
 	// TODO: handle omocodia
-	computedFiscalCode, _, err := usr.CalculateFiscalCode(*modifiedInsured)
+	err = usr.CheckFiscalCode(*modifiedInsured)
+	if err != nil {
+		return models.User{}, err
+	}
+	/*computedFiscalCode, _, err := usr.CalculateFiscalCode(*modifiedInsured)
 	if err != nil {
 		log.Printf("error computing fiscalCode for contractor %s: %s", modifiedInsured.Uid, err.Error())
 		return models.User{}, err
@@ -176,7 +181,7 @@ func editInsuredInfo(inputInsured, originalInsured models.User) (models.User, er
 	if !strings.EqualFold(modifiedInsured.FiscalCode, computedFiscalCode) {
 		log.Printf("computed fiscalCode %s not matching inputted fiscalCode %s", computedFiscalCode, modifiedInsured.FiscalCode)
 		return models.User{}, errors.New("invalid fiscalCode")
-	}
+	}*/
 
 	log.Printf("contractor %s modified", originalInsured.Uid)
 
