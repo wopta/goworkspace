@@ -46,14 +46,14 @@ func ModifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	log.Printf("original policy: %s", string(rawPolicy))
 
 	log.Printf("modifying policy...")
-	modifiedPolicy, err = modifyController(originalPolicy, modifiedPolicy)
+	modifiedPolicy, err = modifyController(originalPolicy, inputPolicy)
 	if err != nil {
 		log.Printf("error during policy modification: %s", err.Error())
 		return "{}", nil, err
 	}
 	log.Printf("policy %s modified successfully", modifiedPolicy.Uid)
 
-	log.Printf("writing modified policy to Firestore...")
+	/*log.Printf("writing modified policy to Firestore...")
 	err = lib.SetFirestoreErr(models.PolicyCollection, modifiedPolicy.Uid, modifiedPolicy)
 	if err != nil {
 		log.Printf("error writing modified policy to Firestore: %s", err.Error())
@@ -63,7 +63,7 @@ func ModifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 
 	log.Printf("writing modified policy to BigQuery...")
 	modifiedPolicy.BigquerySave("")
-	log.Printf("policy %s written to BigQuery", modifiedPolicy.Uid)
+	log.Printf("policy %s written to BigQuery", modifiedPolicy.Uid)*/
 
 	rawPolicy, err = json.Marshal(modifiedPolicy)
 	log.Printf("modified policy: %s", string(rawPolicy))
@@ -96,6 +96,8 @@ func lifeModifier(inputPolicy, originalPolicy models.Policy) (models.Policy, err
 		modifiedContractor models.Contractor
 		modifiedInsured    models.User
 	)
+
+	modifiedPolicy = inputPolicy
 
 	modifiedContractor, err = editContractorInfo(inputPolicy.Contractor, originalPolicy.Contractor)
 	if err != nil {

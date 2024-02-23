@@ -340,16 +340,16 @@ func CheckFiscalCode(user models.User) error {
 		birthDayCode = strings.ReplaceAll(birthDayCode, string(char), strconv.Itoa(index))
 		birthPlaceCode = strings.ReplaceAll(birthPlaceCode, string(char), strconv.Itoa(index))
 	}
-	normalizedFiscalCode := user.FiscalCode[:6] + birthYearCode + string(user.FiscalCode[9]) + birthDayCode + string(user.FiscalCode[11]) + birthPlaceCode + string(user.FiscalCode[len(user.FiscalCode)-1])
+	normalizedFiscalCode := user.FiscalCode[:6] + birthYearCode + string(user.FiscalCode[8]) + birthDayCode + string(user.FiscalCode[11]) + birthPlaceCode + string(user.FiscalCode[len(user.FiscalCode)-1])
 
-	computedFiscalCode, _, err := CalculateFiscalCode(user)
+	_, computedUser, err := CalculateFiscalCode(user)
 	if err != nil {
 		log.Printf("errro computing user %s fiscalCode: %s", user.Uid, err.Error())
 		return err
 	}
 
-	if !strings.EqualFold(normalizedFiscalCode, computedFiscalCode) {
-		log.Printf("normalized fiscalcode %s doesn't match computed fiscalCode %s", normalizedFiscalCode, computedFiscalCode)
+	if !strings.EqualFold(normalizedFiscalCode, computedUser.FiscalCode) {
+		log.Printf("normalized fiscalcode %s doesn't match computed fiscalCode %s", normalizedFiscalCode, computedUser.FiscalCode)
 		return errors.New("invalid fiscalcode")
 	}
 
