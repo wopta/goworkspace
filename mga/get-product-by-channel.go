@@ -28,6 +28,7 @@ func GetProductByChannelFx(w http.ResponseWriter, r *http.Request) (string, inte
 	)
 
 	log.SetPrefix("[GetProductByChannelFx] ")
+	defer log.SetPrefix("")
 
 	log.Println("Handler start -----------------------------------------------")
 

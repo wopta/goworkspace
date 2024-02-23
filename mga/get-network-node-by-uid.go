@@ -9,6 +9,7 @@ import (
 
 func GetNetworkNodeByUidFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.SetPrefix("[GetNetworkNodeByUidFx] ")
+	defer log.SetPrefix("")
 
 	log.Println("Handler start -----------------------------------------------")
 

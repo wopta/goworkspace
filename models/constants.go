@@ -120,7 +120,9 @@ const (
 )
 
 const (
-	WiseExternalProducts string = "__wise__"
+	InternalProductType string = "internal"
+	ExternalProductType string = "external"
+	FormProductType     string = "form"
 )
 
 const (

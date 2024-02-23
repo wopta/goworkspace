@@ -13,6 +13,7 @@ func DeleteNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 	)
 
 	log.SetPrefix("[DeleteNetworkNodeFx] ")
+	defer log.SetPrefix("")
 
 	log.Println("Handler start -----------------------------------------------")
 

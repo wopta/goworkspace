@@ -138,9 +138,127 @@ type ProductInfo struct {
 	NameDesc     string        `json:"nameDesc"`
 	Logo         string        `json:"logo"`
 	Version      string        `json:"version"`
+	Type         string        `json:"type"`
 	Company      string        `json:"company"`               // DEPRECATED
 	ExternalUrl  string        `json:"externalUrl,omitempty"` // external integration products
 	Products     []ProductInfo `json:"products,omitempty"`    // external integration products
+}
+
+func (p *Product) ToProductInfo() ProductInfo {
+	return ProductInfo{
+		Name:         p.Name,
+		NameTitle:    p.NameTitle,
+		NameSubtitle: p.NameSubtitle,
+		NameDesc:     *p.NameDesc,
+		Logo:         p.Logo,
+		Version:      p.Version,
+		Type:         InternalProductType,
+	}
+}
+
+type FormProduct struct {
+	Type         string `json:"type"`
+	Name         string `json:"name"`
+	NameTitle    string `json:"nameTitle"`
+	NameSubtitle string `json:"nameSubtitle"`
+	NameDesc     string `json:"nameDesc"`
+	Logo         string `json:"logo"`
+	Version      string `json:"version"`
+	ExternalUrl  string `json:"externalUrl"`
+	IsActive     bool   `json:"isActive"`
+}
+
+func (p *FormProduct) ToProductInfo() ProductInfo {
+	return ProductInfo{
+		Name:         p.Name,
+		NameTitle:    p.NameTitle,
+		NameSubtitle: p.NameSubtitle,
+		NameDesc:     p.NameDesc,
+		Logo:         p.Logo,
+		Version:      p.Version,
+		ExternalUrl:  p.ExternalUrl,
+		Type:         FormProductType,
+	}
+}
+
+type ExternalProduct struct {
+	Type        string        `json:"type"`
+	Name        string        `json:"name"`
+	Version     string        `json:"version"`
+	ExternalUrl string        `json:"externalUrl"`
+	IsActive    bool          `json:"isActive"`
+	Products    []ProductInfo `json:"products"`
+}
+
+func (p *ExternalProduct) ToProductInfo() ProductInfo {
+	return ProductInfo{
+		Name:        p.Name,
+		Version:     p.Version,
+		ExternalUrl: p.ExternalUrl,
+		Products:    p.Products,
+		Type:        ExternalProductType,
+	}
+}
+
+type DynamicProduct struct {
+	Value interface{}
+}
+
+type BaseProduct struct {
+	Name     string         `json:"name"`
+	Type     string         `json:"type"`
+	Version  string         `json:"version"`
+	IsActive bool           `json:"isActive"`
+	Product  DynamicProduct `json:"dynamicProduct"`
+}
+
+func (b *BaseProduct) UnmarshalJSON(data []byte) error {
+	var dynamicType struct {
+		Type string `json:"type"`
+	}
+	if err := json.Unmarshal(data, &dynamicType); err != nil {
+		return err
+	}
+	switch dynamicType.Type {
+	case ExternalProductType:
+		b.Product.Value = new(ExternalProduct)
+		if err := json.Unmarshal(data, &b.Product.Value); err != nil {
+			return err
+		}
+		b.Name = (b.Product.Value).(*ExternalProduct).Name
+		b.Version = (b.Product.Value).(*ExternalProduct).Version
+		b.IsActive = (b.Product.Value).(*ExternalProduct).IsActive
+	case FormProductType:
+		b.Product.Value = new(FormProduct)
+		if err := json.Unmarshal(data, &b.Product.Value); err != nil {
+			return err
+		}
+		b.Name = (b.Product.Value).(*FormProduct).Name
+		b.Version = (b.Product.Value).(*FormProduct).Version
+		b.IsActive = (b.Product.Value).(*FormProduct).IsActive
+	default:
+		b.Product.Value = new(Product)
+		if err := json.Unmarshal(data, &b.Product.Value); err != nil {
+			return err
+		}
+		b.Name = (b.Product.Value).(*Product).Name
+		b.Version = (b.Product.Value).(*Product).Version
+		b.IsActive = (b.Product.Value).(*Product).IsActive
+	}
+	return nil
+}
+
+func (b *BaseProduct) ToProductInfo() ProductInfo {
+	var res ProductInfo
+	switch b.Product.Value.(type) {
+	case *ExternalProduct:
+		res = (b.Product.Value).(*ExternalProduct).ToProductInfo()
+	case *FormProduct:
+		res = (b.Product.Value).(*FormProduct).ToProductInfo()
+	default:
+		res = (b.Product.Value).(*Product).ToProductInfo()
+	}
+	return res
 }
 
 func ProductToListData(query *firestore.DocumentIterator) []Product {

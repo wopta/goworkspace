@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"sort"
 	"strings"
 
@@ -53,14 +54,6 @@ func GetNetworkNodeProducts(productList []string) []models.ProductInfo {
 
 	products = getProductsFromFileList(fileList)
 
-	if lib.SliceContains(productList, models.WiseExternalProducts) {
-		log.Println("[GetNetworkNodeProducts] appeding wise products...")
-		if wiseProduct := getExternalProduct(models.WiseExternalProducts); wiseProduct != nil {
-			products = append(products, *wiseProduct)
-			log.Println("[GetNetworkNodeProducts] wise products appended")
-		}
-	}
-
 	log.Printf("[GetNetworkNodeProducts] found %d products", len(products))
 	log.Println("[GetNetworkNodeProducts] function end -----------------------")
 
@@ -72,7 +65,7 @@ func getProductsFromFileList(fileList []string) []models.ProductInfo {
 		err            error
 		products       = make([]models.ProductInfo, 0)
 		fileChunks     = make([][]string, 0)
-		currentProduct models.Product
+		currentProduct models.BaseProduct
 	)
 
 	if len(fileList) == 0 {
@@ -121,14 +114,7 @@ func getProductsFromFileList(fileList []string) []models.ProductInfo {
 			}
 
 			if currentProduct.IsActive {
-				products = append(products, models.ProductInfo{
-					Name:         currentProduct.Name,
-					NameTitle:    currentProduct.NameTitle,
-					NameSubtitle: currentProduct.NameSubtitle,
-					NameDesc:     *currentProduct.NameDesc,
-					Logo:         currentProduct.Logo,
-					Version:      currentProduct.Version,
-				})
+				products = append(products, currentProduct.ToProductInfo())
 			}
 		}
 		if err != nil {
@@ -145,7 +131,13 @@ func getProductsFileList() []string {
 		fileList = make([]string, 0)
 	)
 
-	fileList, err = lib.ListGoogleStorageFolderContent(productFolderPath)
+	switch os.Getenv("env") {
+	case "local":
+		fileList, err = lib.ListLocalFolderContent(productFolderPath)
+	default:
+		fileList, err = lib.ListGoogleStorageFolderContent(productFolderPath)
+	}
+
 	if err != nil {
 		log.Printf("[GetNetworkNodeProducts] error getting file list: %s", err.Error())
 	}
