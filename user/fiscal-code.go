@@ -2,6 +2,7 @@ package user
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -321,4 +322,36 @@ func ExtractUserDataFromFiscalCode(user models.User) (string, models.User, error
 	lib.CheckError(err)
 
 	return string(outJson), user, nil
+}
+
+func CheckFiscalCode(user models.User) error {
+	var (
+		err error
+	)
+	const (
+		omocodia = "LMNPQRSTUV"
+	)
+
+	birthYearCode := user.FiscalCode[6:8]
+	birthDayCode := user.FiscalCode[9:11]
+	birthPlaceCode := user.FiscalCode[12:15]
+	for index, char := range []rune(omocodia) {
+		birthYearCode = strings.ReplaceAll(birthYearCode, string(char), strconv.Itoa(index))
+		birthDayCode = strings.ReplaceAll(birthDayCode, string(char), strconv.Itoa(index))
+		birthPlaceCode = strings.ReplaceAll(birthPlaceCode, string(char), strconv.Itoa(index))
+	}
+	normalizedFiscalCode := user.FiscalCode[:6] + birthYearCode + string(user.FiscalCode[8]) + birthDayCode + string(user.FiscalCode[11]) + birthPlaceCode + string(user.FiscalCode[len(user.FiscalCode)-1])
+
+	_, computedUser, err := CalculateFiscalCode(user)
+	if err != nil {
+		log.Printf("errro computing user %s fiscalCode: %s", user.Uid, err.Error())
+		return err
+	}
+
+	if !strings.EqualFold(normalizedFiscalCode, computedUser.FiscalCode) {
+		log.Printf("normalized fiscalcode %s doesn't match computed fiscalCode %s", normalizedFiscalCode, computedUser.FiscalCode)
+		return errors.New("invalid fiscalcode")
+	}
+
+	return err
 }
