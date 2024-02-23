@@ -23,6 +23,22 @@ func ModifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	defer log.SetPrefix("")
 	log.Println("Handler start -----------------------------------------------")
 
+	log.Println("loading authToken from idToken...")
+
+	token := r.Header.Get("Authorization")
+	authToken, err := models.GetAuthTokenFromIdToken(token)
+	if err != nil {
+		log.Printf("error getting authToken")
+		return "{}", nil, err
+	}
+	log.Printf(
+		"authToken - type: '%s' role: '%s' uid: '%s' email: '%s'",
+		authToken.Type,
+		authToken.Role,
+		authToken.UserID,
+		authToken.Email,
+	)
+
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 	log.Printf("request body: %s", string(body))
@@ -57,6 +73,8 @@ func ModifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 
 	rawPolicy, err = json.Marshal(modifiedPolicy)
 	log.Printf("modified policy: %s", string(rawPolicy))
+
+	models.CreateAuditLog(r, string(body))
 
 	log.Println("Handler end -------------------------------------------------")
 
