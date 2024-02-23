@@ -73,6 +73,7 @@ go_modules = [
 changed_modules = [
 ]
 updateable_modules = [
+    AUTH,
     BROKER,
     CALLBACK,
     DOCUMENT,
