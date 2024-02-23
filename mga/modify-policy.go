@@ -89,9 +89,9 @@ func modifyController(originalPolicy, inputPolicy models.Policy) (models.Policy,
 
 	switch originalPolicy.Name {
 	case models.LifeProduct:
-		modifiedPolicy, err = lifeModifier(inputPolicy, originalPolicy)
+		modifiedPolicy, err = lifeModifier(originalPolicy, inputPolicy)
 	case models.GapProduct:
-		modifiedPolicy, err = gapModifier(inputPolicy, originalPolicy)
+		modifiedPolicy, err = gapModifier(originalPolicy, inputPolicy)
 	default:
 		return models.Policy{}, errors.New("product not supported")
 	}
@@ -104,7 +104,7 @@ func modifyController(originalPolicy, inputPolicy models.Policy) (models.Policy,
 	return modifiedPolicy, err
 }
 
-func lifeModifier(inputPolicy, originalPolicy models.Policy) (models.Policy, error) {
+func lifeModifier(originalPolicy, inputPolicy models.Policy) (models.Policy, error) {
 	var (
 		err                error
 		modifiedPolicy     models.Policy
@@ -112,7 +112,7 @@ func lifeModifier(inputPolicy, originalPolicy models.Policy) (models.Policy, err
 		modifiedInsured    models.User
 	)
 
-	modifiedPolicy = inputPolicy
+	modifiedPolicy = originalPolicy
 
 	modifiedContractor, err = modifyContractorInfo(inputPolicy.Contractor, originalPolicy.Contractor)
 	if err != nil {
@@ -137,14 +137,14 @@ func lifeModifier(inputPolicy, originalPolicy models.Policy) (models.Policy, err
 	return modifiedPolicy, err
 }
 
-func gapModifier(inputPolicy, originalPolicy models.Policy) (models.Policy, error) {
+func gapModifier(originalPolicy, inputPolicy models.Policy) (models.Policy, error) {
 	var (
 		err                error
 		modifiedPolicy     models.Policy
 		modifiedContractor models.Contractor
 	)
 
-	modifiedPolicy = inputPolicy
+	modifiedPolicy = originalPolicy
 
 	modifiedContractor, err = modifyContractorInfo(inputPolicy.Contractor, originalPolicy.Contractor)
 	if err != nil {
