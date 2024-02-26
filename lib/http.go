@@ -9,10 +9,11 @@ import (
 	"net/http"
 	"time"
 )
-func Httpclient(req *http.Request)*http.Response{
-  
+
+func Httpclient(req *http.Request) *http.Response {
+
 	client := http.Client{
-	   Timeout: 30 * time.Second,
+		Timeout: 30 * time.Second,
 	}
 	res, err := client.Do(req)
 	if err != nil {
@@ -20,17 +21,23 @@ func Httpclient(req *http.Request)*http.Response{
 	}
 	return res
 }
-func RetryDo(req *http.Request, retry int) (*http.Response, error) {
+
+func RetryDo(req *http.Request, retry int, timeoutSeconds float64) (*http.Response, error) {
 	const (
 		maxRetry = 5
 	)
 	var (
-		resp *http.Response
-		err  error
+		err     error
+		timeout float64 = 10
+		resp    *http.Response
 	)
 
+	if timeoutSeconds > timeout {
+		timeout = timeoutSeconds
+	}
+
 	client := http.Client{
-		Timeout: time.Second * 10,
+		Timeout: time.Duration(time.Second.Seconds() * timeout),
 	}
 
 	for i := 0; i < retry && i < maxRetry; i++ {
