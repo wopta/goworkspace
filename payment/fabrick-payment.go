@@ -34,7 +34,13 @@ func fabrickPayment(
 		scheduleDate, expireDate string
 		priceGross               float64 = policy.PriceGross
 		priceNett                float64 = policy.PriceNett
+		grossAmounts             []float64
+		nettAmounts              []float64
 	)
+
+	durationInYears := policy.GetDurationInYears()
+	grossAmounts = make([]float64, durationInYears)
+	nettAmounts = make([]float64, durationInYears)
 
 	isRecurrent := policy.PaymentMode == models.PaymentModeRecurrent
 
@@ -47,6 +53,14 @@ func fabrickPayment(
 		priceNett = policy.PriceNettMonthly
 	}
 
+	if policy.PaymentSplit == string(models.PaySplitYearly) {
+		for _, guarantee := range policy.Assets[0].Guarantees {
+			for rateIndex := 0; rateIndex < guarantee.Value.Duration.Year; rateIndex++ {
+				grossAmounts[rateIndex] += guarantee.Value.PremiumGrossYearly
+				nettAmounts[rateIndex] += guarantee.Value.PremiumNetYearly
+			}
+		}
+	}
 	log.Printf("creating %d transaction(s)...", len(scheduleDates))
 
 	for index, sd := range scheduleDates {
@@ -60,7 +74,16 @@ func fabrickPayment(
 			expireDate = policy.StartDate.AddDate(10, 0, 0).Format(models.TimeDateOnly)
 		}
 		effectiveDate := policy.StartDate.AddDate(0, index, 0)
-		log.Printf("creating transaction with index '%d' and schedule date '%s'...", index, scheduleDate)
+
+		if policy.PaymentSplit == string(models.PaySplitYearly) {
+			priceGross = grossAmounts[index]
+			priceNett = nettAmounts[index]
+		}
+
+		priceGross = lib.RoundFloat(priceGross, 2)
+		priceNett = lib.RoundFloat(priceNett, 2)
+
+		log.Printf("creating transaction with index '%d' and schedule date '%s' and amount '%.2f' ...", index, scheduleDate, priceGross)
 
 		res := <-createFabrickTransaction(
 			policy,
