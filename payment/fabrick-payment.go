@@ -23,6 +23,8 @@ func fabrickPayment(
 	paymentMethods []string,
 	mgaProduct *models.Product,
 ) FabrickPaymentResponse {
+	// TODO: refactor me - all transactions calculations should be done
+	// beforehand and should be independent of the payment provider
 	log.Printf("generating fabrick payment...")
 	log.Printf("policy '%s' payment configuration", policy.Uid)
 	log.Printf("provider: %s", policy.Payment)
@@ -34,32 +36,22 @@ func fabrickPayment(
 		scheduleDate, expireDate string
 		priceGross               float64 = policy.PriceGross
 		priceNett                float64 = policy.PriceNett
-		grossAmounts             []float64
-		nettAmounts              []float64
 	)
-
-	durationInYears := policy.GetDurationInYears()
-	grossAmounts = make([]float64, durationInYears)
-	nettAmounts = make([]float64, durationInYears)
 
 	isRecurrent := policy.PaymentMode == models.PaymentModeRecurrent
 
 	customerId := uuid.New().String()
 
-	scheduleDates := getTransactionScheduleDates(policy, origin)
+	scheduleDates := transaction.GetTransactionScheduleDates(policy)
 
-	if policy.PaymentSplit == string(models.PaySplitMonthly) {
-		priceGross = policy.PriceGrossMonthly
-		priceNett = policy.PriceNettMonthly
+	grossAmounts, nettAmounts := transaction.GetTransactionsAmounts(policy)
+	if len(grossAmounts) == 0 || len(nettAmounts) == 0 {
+		log.Println("error creating fabrick transactions: empty amounts list")
+		return FabrickPaymentResponse{}
 	}
-
-	if policy.PaymentSplit == string(models.PaySplitYearly) {
-		for _, guarantee := range policy.Assets[0].Guarantees {
-			for rateIndex := 0; rateIndex < guarantee.Value.Duration.Year; rateIndex++ {
-				grossAmounts[rateIndex] += guarantee.Value.PremiumGrossYearly
-				nettAmounts[rateIndex] += guarantee.Value.PremiumNetYearly
-			}
-		}
+	if len(scheduleDates) != len(grossAmounts) || len(scheduleDates) != len(nettAmounts) {
+		log.Println("error creating fabrick transactions: schedule dates length doesn't match amounts lengths")
+		return FabrickPaymentResponse{}
 	}
 	log.Printf("creating %d transaction(s)...", len(scheduleDates))
 
@@ -75,13 +67,8 @@ func fabrickPayment(
 		}
 		effectiveDate := policy.StartDate.AddDate(0, index, 0)
 
-		if policy.PaymentSplit == string(models.PaySplitYearly) {
-			priceGross = grossAmounts[index]
-			priceNett = nettAmounts[index]
-		}
-
-		priceGross = lib.RoundFloat(priceGross, 2)
-		priceNett = lib.RoundFloat(priceNett, 2)
+		priceGross = lib.RoundFloat(grossAmounts[index], 2)
+		priceNett = lib.RoundFloat(nettAmounts[index], 2)
 
 		log.Printf("creating transaction with index '%d' and schedule date '%s' and amount '%.2f' ...", index, scheduleDate, priceGross)
 
@@ -112,59 +99,6 @@ func fabrickPayment(
 	}
 
 	log.Printf("payment generated: %v", response)
-
-	return response
-}
-
-func getTransactionScheduleDates(policy *models.Policy, origin string) []time.Time {
-	var (
-		currentScheduleDate time.Time
-		response            []time.Time = make([]time.Time, 0)
-		yearDuration        int         = 1
-	)
-
-	activeTransactions := transaction.GetPolicyActiveTransactions(origin, policy.Uid)
-
-	if len(activeTransactions) == 0 {
-		if policy.PaymentMode == models.PaymentModeRecurrent && policy.PaymentSplit == string(models.PaySplitYearly) {
-			yearDuration = policy.GetDurationInYears()
-		}
-
-		numberOfRates := policy.GetNumberOfRates() * yearDuration
-
-		for i := 0; i < numberOfRates; i++ {
-			if i > 0 {
-				switch policy.PaymentSplit {
-				case string(models.PaySplitYearly):
-					currentScheduleDate = policy.StartDate.AddDate(i, 0, 0)
-				case string(models.PaySplitMonthly):
-					currentScheduleDate = policy.StartDate.AddDate(0, i, 0)
-				default:
-					log.Printf("unhandled recurrent payment split: %s", policy.PaymentSplit)
-					return nil
-				}
-			}
-			response = append(response, currentScheduleDate)
-		}
-	} else {
-		// TODO: handle when policy already has created transactions
-		// isFirstSchedule := true
-		// for _, tr := range activeTransactions {
-		// 	if tr.IsPay {
-		// 		continue
-		// 	}
-		// 	if isFirstSchedule {
-		// 		currentScheduleDate = time.Time{}
-		// 		isFirstSchedule = false
-		// 	}
-		// 	currentScheduleDate, err := time.Parse(models.TimeDateOnly, tr.ScheduleDate)
-		// 	if err != nil {
-		// 		log.Printf("error parsing schedule date %s: %s", tr.ScheduleDate, err.Error())
-		// 		return nil
-		// 	}
-		// 	response = append(response, currentScheduleDate)
-		// }
-	}
 
 	return response
 }
