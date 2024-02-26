@@ -91,7 +91,7 @@ func Mga(w http.ResponseWriter, r *http.Request) {
 			{
 				Route:   "/policy/v1",
 				Handler: ModifyPolicyFx,
-				Method:  http.MethodPut,
+				Method:  http.MethodPatch,
 				Roles:   []string{models.UserRoleAdmin},
 			},
 		},
