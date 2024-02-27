@@ -88,6 +88,9 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	paymentSplit = request.PaymentSplit
 	log.Printf("paymentSplit: %s", paymentSplit)
 
+	paymentMode = request.PaymentMode
+	log.Printf("paymentMode: %s", paymentMode)
+
 	policy, err = plc.GetPolicy(uid, origin)
 	lib.CheckError(err)
 
@@ -193,8 +196,8 @@ func emitV2(authToken models.AuthToken, policy *models.Policy, request EmitReque
 	log.Printf("[Emit] Emitting - Policy Uid %s", policy.Uid)
 	log.Println("[Emit] starting bpmn flow...")
 	state := runBrokerBpmn(policy, emitFlowKey)
-	if state == nil || state.Data == nil {
-		log.Println("[Emit] error bpmn - state not set")
+	if state == nil || state.Data == nil || state.IsFailed {
+		log.Println("[Emit] error bpmn - state not set correctly")
 		return responseEmit
 	}
 	*policy = *state.Data
@@ -247,9 +250,30 @@ func brokerUpdatePolicy(policy *models.Policy, request BrokerBaseRequest) {
 		log.Println("[brokerUpdatePolicy] inject policy payment split from request")
 		policy.PaymentSplit = request.PaymentSplit
 	}
+	if policy.PaymentSplit == string(models.PaySplitYear) {
+		log.Println("[brokerUpdatePolicy] rectify paysplit year into yearly")
+		policy.PaymentSplit = string(models.PaySplitYearly)
+	}
 	if policy.Payment == "" {
 		log.Println("[brokerUpdatePolicy] inject policy payment provider from request")
 		policy.Payment = request.Payment
+	}
+	if policy.Payment == "" || policy.Payment == "fabrik" {
+		policy.Payment = models.FabrickPaymentProvider
+	}
+	if policy.PaymentMode == "" {
+		log.Println("[brokerUpdatePolicy] inject policy payment mode from request")
+		policy.PaymentMode = request.PaymentMode
+	}
+	if policy.PaymentMode == "" {
+		if policy.PaymentSplit == string(models.PaySplitYearly) || policy.PaymentSplit == string(models.PaySplitSingleInstallment) {
+			log.Println("[brokerUpdatePolicy] inject policy payment mode from fallback")
+			policy.PaymentMode = models.PaymentModeSingle
+		}
+		if policy.PaymentSplit == string(models.PaySplitMonthly) {
+			log.Println("[brokerUpdatePolicy] inject policy payment mode from fallback")
+			policy.PaymentMode = models.PaymentModeRecurrent
+		}
 	}
 	log.Println("[brokerUpdatePolicy] end --------------------------------------")
 }
@@ -326,7 +350,9 @@ func setAdvance(policy *models.Policy, origin string) {
 	//TODO: fix me someday in the future
 	if paymentSplit != "" && policy.PaymentSplit == "" {
 		policy.PaymentSplit = paymentSplit
-
+	}
+	if paymentMode != "" && policy.PaymentMode == "" {
+		policy.PaymentMode = paymentMode
 	}
 
 	tr := transaction.PutByPolicy(*policy, "", origin, "", "", policy.PriceGross, policy.PriceNett, "", models.PayMethodRemittance, true, mgaProduct, policy.StartDate)

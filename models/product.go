@@ -116,8 +116,15 @@ type Column struct {
 type PaymentProvider struct {
 	Name    string          `json:"name,omitempty" firestore:"name,omitempty" bigquery:"-"`
 	Flows   []string        `json:"flows,omitempty" firestore:"flows,omitempty" bigquery:"-"`
+	Configs []PaymentConfig `json:"configs,omitempty" firestore:"configs,omitempty" bigquery:"-"`
 	Methods []PaymentMethod `json:"methods,omitempty" firestore:"methods,omitempty" bigquery:"-"`
 	Rates   []string        `json:"rates,omitempty" firestore:"rates,omitempty" bigquery:"-"`
+}
+
+type PaymentConfig struct {
+	Rate    string   `json:"rate,omitempty" firestore:"rate,omitempty" bigquery:"-"`
+	Methods []string `json:"methods,omitempty" firestore:"methods,omitempty" bigquery:"-"`
+	Mode    string   `json:"mode,omitempty" firestore:"mode,omitempty" bigquery:"-"`
 }
 
 type PaymentMethod struct {

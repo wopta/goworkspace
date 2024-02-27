@@ -2,7 +2,6 @@ package payment
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -14,8 +13,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/network"
-	prd "github.com/wopta/goworkspace/product"
 	tr "github.com/wopta/goworkspace/transaction"
 )
 
@@ -44,63 +41,6 @@ func getOrigin(origin string) string {
 	log.Println(" getOrigin: name:", origin)
 	log.Println(" getOrigin result: ", result)
 	return result
-}
-
-func FabrickPayFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	req := lib.ErrorByte(io.ReadAll(r.Body))
-
-	var (
-		data    models.Policy
-		warrant *models.Warrant
-	)
-
-	defer r.Body.Close()
-	err := json.Unmarshal([]byte(req), &data)
-	log.Println(data.PriceGross)
-	lib.CheckError(err)
-
-	networkNode := network.GetNetworkNodeByUid(data.ProducerUid)
-	if networkNode != nil {
-		warrant = networkNode.GetWarrant()
-	}
-	product := prd.GetProductV2(data.Name, data.ProductVersion, data.Channel, networkNode, warrant)
-	mgaProduct := prd.GetProductV2(data.Name, data.ProductVersion, models.MgaChannel, nil, nil)
-
-	paymentMethods := getPaymentMethods(data, product)
-
-	resultPay := <-FabrickPayObj(data, false, "", data.StartDate.AddDate(10, 0, 0).Format(models.TimeDateOnly), "", data.PriceGross,
-		data.PriceNett, getOrigin(r.Header.Get("origin")), paymentMethods, mgaProduct, data.StartDate)
-
-	log.Println(resultPay)
-	return "", nil, err
-}
-
-func FabrickPayMonthlyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	req := lib.ErrorByte(io.ReadAll(r.Body))
-
-	var (
-		data    models.Policy
-		warrant *models.Warrant
-	)
-
-	defer r.Body.Close()
-	err := json.Unmarshal([]byte(req), &data)
-	log.Println(data.PriceGross)
-	lib.CheckError(err)
-
-	networkNode := network.GetNetworkNodeByUid(data.ProducerUid)
-	if networkNode != nil {
-		warrant = networkNode.GetWarrant()
-	}
-	product := prd.GetProductV2(data.Name, data.ProductVersion, data.Channel, networkNode, warrant)
-	mgaProduct := prd.GetProductV2(data.Name, data.ProductVersion, models.MgaChannel, nil, nil)
-
-	paymentMethods := getPaymentMethods(data, product)
-
-	resultPay := FabrickMonthlyPay(data, getOrigin(r.Header.Get("origin")), paymentMethods, mgaProduct)
-	b, err := json.Marshal(resultPay)
-	log.Println(resultPay)
-	return string(b), resultPay, err
 }
 
 func FabrickPayObj(
@@ -154,33 +94,6 @@ func FabrickPayObj(
 		}
 	}()
 	return r
-}
-
-func FabrickMonthlyPay(data models.Policy, origin string, paymentMethods []string, mgaProduct *models.Product) FabrickPaymentResponse {
-	log.Printf("[FabrickMonthlyPay] Policy %s", data.Uid)
-
-	customerId := uuid.New().String()
-	firstres := <-FabrickPayObj(data, true, "", "", customerId, data.PriceGrossMonthly, data.PriceNettMonthly, origin, paymentMethods, mgaProduct, data.StartDate)
-	time.Sleep(100)
-
-	for i := 1; i <= 11; i++ {
-		date := data.StartDate.AddDate(0, i, 0)
-		expireDate := date.AddDate(10, 0, 0)
-		res := <-FabrickPayObj(data, false, date.Format(models.TimeDateOnly), expireDate.Format(models.TimeDateOnly), customerId, data.PriceGrossMonthly, data.PriceNettMonthly, origin, paymentMethods, mgaProduct, date)
-		log.Printf("[FabrickMonthlyPay] Policy %s - Index %d - response: %v", data.Uid, i, res)
-		time.Sleep(100)
-	}
-
-	return firstres
-}
-
-func FabrickYearPay(data models.Policy, origin string, paymentMethods []string, mgaProduct *models.Product) FabrickPaymentResponse {
-	log.Printf("[FabrickYearPay] Policy %s", data.Uid)
-
-	customerId := uuid.New().String()
-	res := <-FabrickPayObj(data, false, "", data.StartDate.AddDate(10, 0, 0).Format(models.TimeDateOnly), customerId, data.PriceGross, data.PriceNett, origin, paymentMethods, mgaProduct, data.StartDate)
-
-	return res
 }
 
 func getFabrickPayments(data models.Policy, firstSchedule bool, scheduleDate string, expireDate string, customerId string, amount float64, origin string, paymentMethods []string) string {
@@ -258,44 +171,4 @@ func getFabrickPayments(data models.Policy, firstSchedule bool, scheduleDate str
 	result := strings.Replace(string(res), `\u0026`, `&`, -1)
 
 	return result
-}
-
-func fabrickExpireBill(providerId string) error {
-	log.Println("starting fabrick expire bill request...")
-	var urlstring = os.Getenv("FABRICK_BASEURL") + "api/fabrick/pace/v4.0/mods/back/v1.0/payments/expirationDate"
-	const expirationTimeSuffix = "00:00:00"
-
-	expirationDate := fmt.Sprintf(
-		"%s %s",
-		time.Now().UTC().AddDate(0, 0, -1).Format(models.TimeDateOnly),
-		expirationTimeSuffix,
-	)
-	requestBody := fmt.Sprintf(`{"id":"%s","newExpirationDate":"%s"}`, providerId, expirationDate)
-	log.Printf("fabrick expire bill request body: %s", requestBody)
-
-	req, err := http.NewRequest(http.MethodPut, urlstring, strings.NewReader(requestBody))
-	if err != nil {
-		log.Printf("error creating request: %s", err.Error())
-		return err
-	}
-	res, err := getFabrickClient(urlstring, req)
-	if err != nil {
-		log.Printf("error getting response: %s", err.Error())
-		return err
-	}
-
-	respBody, err := io.ReadAll(res.Body)
-	if err != nil {
-		log.Printf("fabrick expire bill response error: %s", err.Error())
-		return err
-	}
-	log.Println("fabrick expire bill response body: ", string(respBody))
-	if res.StatusCode != http.StatusOK {
-		log.Printf("fabrick expire bill error status %s", res.Status)
-		return fmt.Errorf("fabrick expire bill error status %s", res.Status)
-	}
-
-	log.Println("fabrick expire bill completed!")
-
-	return nil
 }

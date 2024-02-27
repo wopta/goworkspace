@@ -62,6 +62,23 @@ const (
 )
 
 const (
+	PaymentModeSingle    string = "single"
+	PaymentModeRecurrent string = "recurrent"
+)
+
+func GetAllowedMonthlyModes() []string {
+	return []string{PaymentModeRecurrent}
+}
+
+func GetAllowedYearlyModes() []string {
+	return []string{PaymentModeRecurrent, PaymentModeSingle}
+}
+
+func GetAllowedSingleInstallmentModes() []string {
+	return []string{PaymentModeSingle}
+}
+
+const (
 	PartnershipBeProf string = "beprof"
 	PartnershipFacile string = "facile"
 )

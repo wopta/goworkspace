@@ -64,6 +64,7 @@ type Policy struct {
 	Payment           string                       `firestore:"payment,omitempty" json:"payment,omitempty" bigquery:"payment"`
 	PaymentType       string                       `firestore:"paymentType,omitempty" json:"paymentType,omitempty" bigquery:"paymentType"`
 	PaymentSplit      string                       `firestore:"paymentSplit,omitempty" json:"paymentSplit,omitempty" bigquery:"paymentSplit"`
+	PaymentMode       string                       `json:"paymentMode,omitempty" firestore:"paymentMode,omitempty" bigquery:"paymentMode"`
 	DeleteCode        string                       `json:"deleteCode,omitempty" firestore:"deleteCode,omitempty" bigquery:"-"`
 	DeleteDesc        string                       `firestore:"deleteDesc,omitempty" json:"deleteDesc,omitempty" bigquery:"-"`
 	DeleteDate        time.Time                    `json:"deleteDate,omitempty" firestore:"deleteDate,omitempty" bigquery:"-"`
@@ -342,4 +343,19 @@ func (policy *Policy) GetFlow(networkNode *NetworkNode, warrant *Warrant) (strin
 	}
 
 	return flowName, &flowFile
+}
+
+func (policy *Policy) GetNumberOfRates() int {
+	switch policy.PaymentSplit {
+	case string(PaySplitYear), string(PaySplitYearly), string(PaySplitSingleInstallment):
+		return 1
+	case string(PaySplitMonthly):
+		return 12
+	default:
+		return 0
+	}
+}
+
+func (policy *Policy) GetDurationInYears() int {
+	return policy.EndDate.Year() - policy.StartDate.Year()
 }
