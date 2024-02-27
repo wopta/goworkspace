@@ -130,7 +130,7 @@ func createFabrickTransaction(
 		log.Printf("policy '%s' request headers: %s", policy.Uid, request.Header)
 		log.Printf("policy '%s' request body: %s", policy.Uid, request.Body)
 
-		res, err := lib.RetryDo(request, 5)
+		res, err := lib.RetryDo(request, 5, 10)
 		lib.CheckError(err)
 
 		if res != nil {
