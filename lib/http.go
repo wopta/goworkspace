@@ -37,7 +37,7 @@ func RetryDo(req *http.Request, retry int, timeoutSeconds float64) (*http.Respon
 	}
 
 	client := http.Client{
-		Timeout: time.Duration(time.Second.Seconds() * timeout),
+		Timeout: time.Duration(timeout) * time.Second,
 	}
 
 	for i := 0; i < retry && i < maxRetry; i++ {
