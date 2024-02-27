@@ -9,17 +9,17 @@ require (
 	cloud.google.com/go/firestore v1.9.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.7.4
 	github.com/wopta/goworkspace/bpmn v1.0.16
-	github.com/wopta/goworkspace/document v1.1.54
-	github.com/wopta/goworkspace/lib v1.0.101
-	github.com/wopta/goworkspace/mail v1.0.85
-	github.com/wopta/goworkspace/models v1.1.86
-	github.com/wopta/goworkspace/network v1.0.38
-	github.com/wopta/goworkspace/payment v1.0.167
-	github.com/wopta/goworkspace/policy v1.0.76
-	github.com/wopta/goworkspace/product v1.0.86
-	github.com/wopta/goworkspace/question v1.0.32
-	github.com/wopta/goworkspace/reserved v1.0.79
-	github.com/wopta/goworkspace/transaction v1.0.51
+	github.com/wopta/goworkspace/document v1.1.55
+	github.com/wopta/goworkspace/lib v1.0.102
+	github.com/wopta/goworkspace/mail v1.0.86
+	github.com/wopta/goworkspace/models v1.1.87
+	github.com/wopta/goworkspace/network v1.0.39
+	github.com/wopta/goworkspace/payment v1.0.168
+	github.com/wopta/goworkspace/policy v1.0.77
+	github.com/wopta/goworkspace/product v1.0.87
+	github.com/wopta/goworkspace/question v1.0.33
+	github.com/wopta/goworkspace/reserved v1.0.80
+	github.com/wopta/goworkspace/transaction v1.0.52
 	github.com/wopta/goworkspace/wiseproxy v1.0.3
 )
 
@@ -83,7 +83,7 @@ require (
 	github.com/src-d/gcfg v1.4.0 // indirect
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.2.1 // indirect
-	github.com/wopta/goworkspace/user v1.0.67 // indirect
+	github.com/wopta/goworkspace/user v1.0.68 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
 	github.com/xuri/excelize/v2 v2.7.0 // indirect
