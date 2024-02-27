@@ -297,7 +297,7 @@ type CountResponseModel struct {
 */
 func HypeImportMovementbankAccount() {
 	log.Println("---------------HypeImportMovementbankAccount -------------------------------")
-	data := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/inclusive/bank-account/hype/profile_accountInsurance_prod.csv", "")
+	data := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/inclusive/bank-account/hype/20240227_esportazione_wopta_premium.csv", "")
 	df := lib.CsvToDataframe(data)
 	log.Println("HypeImportMovementbankAccount  row", df.Nrow())
 	log.Println("HypeImportMovementbankAccount  col", df.Ncol())
@@ -317,14 +317,14 @@ func HypeImportMovementbankAccount() {
 				Name:           d[0],
 				Surname:        d[1],
 				FiscalCode:     d[2],
-				GuaranteesCode: "next",
+				GuaranteesCode: "premium",
 				HypeId:         d[3],
 				BigStartDate:   civil.DateTimeOf(start),
 				BigEndDate:     civil.DateTimeOf(start),
-				PolicyNumber:   "180623",
+				PolicyNumber:   "191123",
 				Customer:       "hype",
 				Company:        "axa",
-				PolicyName:     "Hype Next",
+				PolicyName:     "Hype Premium",
 			}
 			result = append(result, []string{d[0], d[1], d[2], d[3], d[4], uid})
 			movList = append(movList, mov)
@@ -344,7 +344,7 @@ func HypeImportMovementbankAccount() {
 	e := lib.InsertRowsBigQuery("wopta", dataMovement, movList)
 	e = lib.InsertRowsBigQuery("wopta", dataBanckAccount, movList)
 	log.Println("HypeImportMovementbankAccount error InsertRowsBigQuery: ", e)
-	filepath := "result_01.csv"
+	filepath := "result_02_premium.csv"
 	lib.WriteCsv("../tmp/"+filepath, result, ',')
 	source, _ := ioutil.ReadFile("../tmp/" + filepath)
 	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/inclusive/bank-account/hype/"+filepath, source)
