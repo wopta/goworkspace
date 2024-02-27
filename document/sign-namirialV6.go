@@ -91,7 +91,7 @@ func prepareEnvelopV6(id string) <-chan string {
 		req.Header.Set("apiToken", os.Getenv("ESIGN_TOKEN_API"))
 		req.Header.Set("Content-Type", "application/json")
 
-		res, err := lib.RetryDo(req, 10)
+		res, err := lib.RetryDo(req, 10, 30)
 		lib.CheckError(err)
 
 		if res != nil {
@@ -121,7 +121,7 @@ func sendEnvelopV6(id string, data models.Policy, unassigned string, origin stri
 		req.Header.Set("apiToken", os.Getenv("ESIGN_TOKEN_API"))
 		req.Header.Set("Content-Type", "application/json")
 
-		res, err := lib.RetryDo(req, 5)
+		res, err := lib.RetryDo(req, 5, 30)
 		lib.CheckError(err)
 
 		if res != nil {
@@ -153,7 +153,7 @@ func GetEnvelopV6(id string) <-chan string {
 		req.Header.Set("apiToken", os.Getenv("ESIGN_TOKEN_API"))
 		req.Header.Set("Content-Type", "application/json")
 
-		res, err := lib.RetryDo(req, 5)
+		res, err := lib.RetryDo(req, 5, 30)
 		lib.CheckError(err)
 
 		if res != nil {
@@ -190,7 +190,7 @@ func postDataV6(data []byte, productNameDesc string) <-chan string {
 		req.Header.Set("apiToken", os.Getenv("ESIGN_TOKEN_API"))
 		req.Header.Set("Content-Type", w.FormDataContentType())
 
-		res, err := lib.RetryDo(req, 5)
+		res, err := lib.RetryDo(req, 5, 30)
 		var result map[string]string
 		if res != nil {
 			resByte, err := io.ReadAll(res.Body)
@@ -221,7 +221,7 @@ func GetFileV6(policy models.Policy, uid string) chan string {
 		req.Header.Set("apiToken", os.Getenv("ESIGN_TOKEN_API"))
 		log.Println("url parse:", req.Header)
 
-		res, err := lib.RetryDo(req, 5)
+		res, err := lib.RetryDo(req, 5, 30)
 		lib.CheckError(err)
 		if res != nil {
 			body, _ := io.ReadAll(res.Body)
@@ -249,7 +249,7 @@ func GetFilesV6(envelopeId string) chan NamirialFiles {
 		req, _ := http.NewRequest(http.MethodGet, urlstring, nil)
 		req.Header.Set("apiToken", os.Getenv("ESIGN_TOKEN_API"))
 
-		res, err := lib.RetryDo(req, 5)
+		res, err := lib.RetryDo(req, 5, 30)
 		lib.CheckError(err)
 
 		if res != nil {

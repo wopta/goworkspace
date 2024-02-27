@@ -75,7 +75,7 @@ func FabrickPayObj(
 		log.Printf("[FabrickPayObj] Policy %s request headers: %s", data.Uid, req.Header)
 		log.Printf("[FabrickPayObj] Policy %s request body: %s", data.Uid, req.Body)
 
-		res, err := lib.RetryDo(req, 5)
+		res, err := lib.RetryDo(req, 5, 10)
 		lib.CheckError(err)
 
 		if res != nil {
