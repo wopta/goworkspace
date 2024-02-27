@@ -8,9 +8,9 @@ require (
 	cloud.google.com/go/firestore v1.9.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
 	github.com/google/uuid v1.3.0
-	github.com/wopta/goworkspace/lib v1.0.101
-	github.com/wopta/goworkspace/models v1.1.86
-	github.com/wopta/goworkspace/network v1.0.38
+	github.com/wopta/goworkspace/lib v1.0.102
+	github.com/wopta/goworkspace/models v1.1.87
+	github.com/wopta/goworkspace/network v1.0.39
 	google.golang.org/api v0.122.0
 )
 
