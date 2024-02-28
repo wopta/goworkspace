@@ -297,7 +297,6 @@ type CountResponseModel struct {
 */
 func HypeImportMovementbankAccount() {
 	log.Println("---------------HypeImportMovementbankAccount -------------------------------")
-https: //storage.cloud.google.com/function-data/track/in/bank-account/hype/20240227_esportazione_wopta_premium.csv
 	data := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/bank-account/hype/20240227_esportazione_wopta_premium.csv", "")
 	df := lib.CsvToDataframe(data)
 	log.Println("HypeImportMovementbankAccount  row", df.Nrow())
