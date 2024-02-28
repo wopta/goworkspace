@@ -3,6 +3,7 @@ package payment
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/google/uuid"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
@@ -23,9 +24,11 @@ type ChangePaymentProviderReq struct {
 
 func ChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		err    error
-		policy models.Policy
-		req    ChangePaymentProviderReq
+		err                 error
+		payUrl              string
+		policy              models.Policy
+		updatedTransactions []models.Transaction
+		req                 ChangePaymentProviderReq
 	)
 
 	log.SetPrefix("ChangePaymentProviderFx ")
@@ -53,74 +56,42 @@ func ChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, in
 		return "{}", nil, errors.New("unable to change payment method")
 	}
 
-	activeTransactions := transaction.GetPolicyUnpaidTransactions(policy.Uid)
-	if len(activeTransactions) == 0 {
+	unpaidTransactions := transaction.GetPolicyUnpaidTransactions(policy.Uid)
+	if len(unpaidTransactions) == 0 {
 		log.Printf("no active transactions found for policy %s", policy.Uid)
 		return "{}", nil, err
 	}
 
-	customerId := uuid.New().String()
+	policy.Payment = req.ProviderName
 	product := prd.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, nil, nil)
-	//mgaProduct := prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
 	paymentMethods := getPaymentMethods(policy, product)
-
-	now := time.Now().UTC()
-
-	for index, tr := range activeTransactions {
-		if index == 0 {
-			tr.ScheduleDate = now.Format(models.TimeDateOnly)
-			tr.ExpirationDate = now.AddDate(10, 0, 0).Format(models.TimeDateOnly)
-		}
-		b := getFabrickRequestBody(&policy, index == 0, tr.ScheduleDate, tr.ExpirationDate, customerId, tr.Amount,
-			origin, paymentMethods)
-		if b == "" {
-			return "{}", nil, errors.New("fabrick error")
-		}
-		request := getFabrickPaymentRequest(b)
-		if request == nil {
-			return "{}", nil, errors.New("fabrick error")
-		}
-		res, err := lib.RetryDo(request, 5, 10)
-		if err != nil {
-			return "", nil, err
-		}
-		if res != nil {
-			if res.StatusCode == http.StatusOK {
-				resBody, err := io.ReadAll(res.Body)
-				defer res.Body.Close()
-				if err != nil {
-					return "", nil, err
-				}
-				var result FabrickPaymentResponse
-				err = json.Unmarshal(resBody, &result)
-				if err != nil {
-					return "", nil, err
-				}
-
-				if index == 0 {
-					// TODO: handle nil pointer
-					policy.PayUrl = *result.Payload.PaymentPageURL
-					activeTransactions[index].ScheduleDate = now.Format(models.TimeDateOnly)
-				}
-
-				activeTransactions[index].ProviderName = models.FabrickPaymentProvider
-				// TODO: handle nil pointer
-				activeTransactions[index].ProviderId = *result.Payload.PaymentID
-				activeTransactions[index].UserToken = customerId // TODO: check if correct field
-				activeTransactions[index].UpdateDate = time.Now().UTC()
-
-				err = lib.SetFirestoreErr(models.TransactionsCollection, tr.Uid, activeTransactions[index])
-				if err != nil {
-					return "{}", nil, err
-				}
-
-				activeTransactions[index].BigQuerySave("")
-			}
-		}
-
+	if len(paymentMethods) == 0 {
+		log.Printf("no payment methods found for provider %s", req.ProviderName)
+		return "{}", nil, errors.New("no payment methods found")
 	}
 
-	policy.Payment = req.ProviderName
+	switch req.ProviderName {
+	case models.FabrickPaymentProvider:
+		payUrl, updatedTransactions, err = changePaymentProviderToFabrick(origin, policy, unpaidTransactions, paymentMethods)
+	default:
+		log.Printf("payment provider %s not supported", req.ProviderName)
+		return "{}", nil, errors.New("payment provider not supported")
+	}
+
+	if err != nil {
+		log.Printf("error changing payment provider to %s: %s", req.ProviderName, err.Error())
+		return "{}", nil, err
+	}
+
+	policy.PayUrl = payUrl
+	for _, tr := range updatedTransactions {
+		err = lib.SetFirestoreErr(models.TransactionsCollection, tr.Uid, tr)
+		if err != nil {
+			return "{}", nil, err
+		}
+
+		tr.BigQuerySave("")
+	}
 
 	err = lib.SetFirestoreErr(models.PolicyCollection, policy.Uid, policy)
 	if err != nil {
@@ -132,4 +103,67 @@ func ChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, in
 	log.Println("Handler End -------------------------------------------------")
 
 	return "{}", nil, err
+}
+
+func changePaymentProviderToFabrick(origin string, policy models.Policy, transactions []models.Transaction, paymentMethods []string) (string, []models.Transaction, error) {
+	var (
+		err    error
+		payUrl string
+	)
+
+	now := time.Now().UTC()
+	customerId := uuid.New().String()
+
+	for index, tr := range transactions {
+		if index == 0 {
+			tr.ScheduleDate = now.Format(models.TimeDateOnly)
+			tr.ExpirationDate = now.AddDate(10, 0, 0).Format(models.TimeDateOnly)
+		}
+		b := getFabrickRequestBody(&policy, index == 0, tr.ScheduleDate, tr.ExpirationDate, customerId, tr.Amount,
+			origin, paymentMethods)
+		if b == "" {
+			return "", nil, errors.New("unable to get fabrick request body")
+		}
+		request := getFabrickPaymentRequest(b)
+		if request == nil {
+			return "", nil, errors.New("unable to get fabrick request for policy")
+		}
+		res, err := lib.RetryDo(request, 5, 10)
+		if err != nil {
+			log.Printf("error retryDo fabrick request: %s", err.Error())
+			return "", nil, err
+		}
+		if res != nil && res.StatusCode == http.StatusOK {
+			resBody, err := io.ReadAll(res.Body)
+			if err != nil {
+				log.Printf("error reading fabrick response body policy %s: %s", policy.Uid, err.Error())
+				return "", nil, err
+			}
+			var result FabrickPaymentResponse
+			err = json.Unmarshal(resBody, &result)
+			if err != nil {
+				log.Printf("error unmarshaling fabrick response policy %s: %s", policy.Uid, err.Error())
+				return "", nil, err
+			}
+			res.Body.Close()
+
+			if index == 0 {
+				payUrl = *result.Payload.PaymentPageURL
+				transactions[index].ScheduleDate = now.Format(models.TimeDateOnly)
+			}
+
+			transactions[index].ProviderName = models.FabrickPaymentProvider
+			if result.Payload.PaymentID == nil {
+				log.Printf("error nil paymentID fabrick transaction %s", tr.Uid)
+				return "", nil, errors.New("error fabrick nil paymentID")
+			}
+			transactions[index].ProviderId = *result.Payload.PaymentID
+			transactions[index].UserToken = customerId
+			transactions[index].UpdateDate = time.Now().UTC()
+		} else {
+			return "", nil, fmt.Errorf("fabrick error: %s", res.Status)
+		}
+	}
+
+	return payUrl, transactions, err
 }
