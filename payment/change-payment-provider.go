@@ -13,6 +13,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 )
 
 type ChangePaymentProviderReq struct {
@@ -31,6 +32,7 @@ func ChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, in
 	defer log.SetPrefix("")
 	log.Println("Handler Start -----------------------------------------------")
 
+	origin := r.Header.Get("Origin")
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 	log.Printf("req body: %s", string(body))
@@ -51,7 +53,7 @@ func ChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, in
 		return "{}", nil, errors.New("unable to change payment method")
 	}
 
-	activeTransactions := transaction.GetPolicyActiveTransactions("", policy.Uid)
+	activeTransactions := transaction.GetPolicyUnpaidTransactions(policy.Uid)
 	if len(activeTransactions) == 0 {
 		log.Printf("no active transactions found for policy %s", policy.Uid)
 		return "{}", nil, err
@@ -62,9 +64,15 @@ func ChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, in
 	//mgaProduct := prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
 	paymentMethods := getPaymentMethods(policy, product)
 
+	now := time.Now().UTC()
+
 	for index, tr := range activeTransactions {
+		if index == 0 {
+			tr.ScheduleDate = now.Format(models.TimeDateOnly)
+			tr.ExpirationDate = now.AddDate(10, 0, 0).Format(models.TimeDateOnly)
+		}
 		b := getFabrickRequestBody(&policy, index == 0, tr.ScheduleDate, tr.ExpirationDate, customerId, tr.Amount,
-			"", paymentMethods)
+			origin, paymentMethods)
 		if b == "" {
 			return "{}", nil, errors.New("fabrick error")
 		}
@@ -92,11 +100,14 @@ func ChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, in
 				if index == 0 {
 					// TODO: handle nil pointer
 					policy.PayUrl = *result.Payload.PaymentPageURL
+					activeTransactions[index].ScheduleDate = now.Format(models.TimeDateOnly)
 				}
 
-				activeTransactions[index].ProviderName = req.ProviderName
+				activeTransactions[index].ProviderName = models.FabrickPaymentProvider
 				// TODO: handle nil pointer
 				activeTransactions[index].ProviderId = *result.Payload.PaymentID
+				activeTransactions[index].UserToken = customerId // TODO: check if correct field
+				activeTransactions[index].UpdateDate = time.Now().UTC()
 
 				err = lib.SetFirestoreErr(models.TransactionsCollection, tr.Uid, activeTransactions[index])
 				if err != nil {

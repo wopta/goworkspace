@@ -183,6 +183,7 @@ func getFabrickRequestBody(
 
 	if firstSchedule {
 		mandate = "true"
+		scheduleDate = ""
 	}
 
 	if customerId == "" {
