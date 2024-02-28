@@ -7,7 +7,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -208,10 +207,9 @@ func calculateBirthPlaceCode(cityOfBirth, provinceOfBirth string) (string, error
 		prefix = "foreign"
 	}
 
-	b, err := os.ReadFile(lib.GetAssetPathByEnv("user") + "/" + prefix + "-codes.json")
-	lib.CheckError(err)
+	b := lib.GetFilesByEnv("enrich/fiscalCode/" + prefix + "-codes.json")
 
-	err = json.Unmarshal(b, &codes)
+	err := json.Unmarshal(b, &codes)
 	lib.CheckError(err)
 
 	birthPlaceCode := codes[strings.ToLower(cityOfBirth)]["codFisc"]
@@ -295,10 +293,8 @@ func ExtractUserDataFromFiscalCode(user models.User) (string, models.User, error
 		return "", models.User{}, fmt.Errorf("invalid fiscal code")
 	}
 
-	b, err := os.ReadFile(lib.GetAssetPathByEnv("user") + "/reverse-codes.json")
-	lib.CheckError(err)
-
-	err = json.Unmarshal(b, &codes)
+	b := lib.GetFilesByEnv("enrich/fiscalCode/reverse-codes.json")
+	err := json.Unmarshal(b, &codes)
 	lib.CheckError(err)
 
 	day, _ := strconv.Atoi(user.FiscalCode[9:11])
