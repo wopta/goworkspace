@@ -297,7 +297,7 @@ type CountResponseModel struct {
 */
 func HypeImportMovementbankAccount() {
 	log.Println("---------------HypeImportMovementbankAccount -------------------------------")
-	core - 350507 - function - data/track/in/inclusive/bank - account/hype
+
 	data := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/inclusive/bank-account/hype/20240227_esportazione_wopta_premium.csv", "")
 	df := lib.CsvToDataframe(data)
 	log.Println("HypeImportMovementbankAccount  row", df.Nrow())
@@ -336,11 +336,8 @@ func HypeImportMovementbankAccount() {
 				e = lib.InsertRowsBigQuery("wopta", dataBanckAccount, movList)
 				log.Println("HypeImportMovementbankAccount error InsertRowsBigQuery: ", e)
 				movList = []BankAccountMovement{}
-
 			}
-
 		}
-
 	}
 	e := lib.InsertRowsBigQuery("wopta", dataMovement, movList)
 	e = lib.InsertRowsBigQuery("wopta", dataBanckAccount, movList)
