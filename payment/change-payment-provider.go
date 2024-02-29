@@ -22,6 +22,11 @@ type ChangePaymentProviderReq struct {
 	ProviderName string `json:"providerName"`
 }
 
+type ChangePaymentProviderResp struct {
+	Policy       models.Policy        `json:"policy"`
+	Transactions []models.Transaction `json:"transactions"`
+}
+
 func ChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err                 error
@@ -29,6 +34,7 @@ func ChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, in
 		policy              models.Policy
 		updatedTransactions []models.Transaction
 		req                 ChangePaymentProviderReq
+		resp                ChangePaymentProviderResp
 	)
 
 	log.SetPrefix("ChangePaymentProviderFx ")
@@ -84,6 +90,7 @@ func ChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, in
 	}
 
 	policy.PayUrl = payUrl
+
 	for _, tr := range updatedTransactions {
 		err = lib.SetFirestoreErr(models.TransactionsCollection, tr.Uid, tr)
 		if err != nil {
@@ -100,9 +107,17 @@ func ChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, in
 
 	policy.BigquerySave("")
 
+	resp.Policy = policy
+	resp.Transactions = updatedTransactions
+	rawResp, err := json.Marshal(resp)
+	if err != nil {
+		log.Printf("error marshaling response: %s", err.Error())
+		return "{}", nil, err
+	}
+
 	log.Println("Handler End -------------------------------------------------")
 
-	return "{}", nil, err
+	return string(rawResp), resp, err
 }
 
 func changePaymentProviderToFabrick(origin string, policy models.Policy, transactions []models.Transaction, paymentMethods []string) (string, []models.Transaction, error) {
