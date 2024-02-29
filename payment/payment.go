@@ -59,6 +59,12 @@ func Payment(w http.ResponseWriter, r *http.Request) {
 				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},
+			{
+				Route:   "/v1",
+				Handler: ChangePaymentProviderFx,
+				Method:  http.MethodPatch,
+				Roles:   []string{models.UserRoleAdmin},
+			},
 		},
 	}
 	route.Router(w, r)

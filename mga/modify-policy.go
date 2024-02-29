@@ -241,6 +241,10 @@ func writePolicyToDb(modifiedPolicy models.Policy) error {
 func writeUserToDB(modifiedContractor models.Contractor) error {
 	var err error
 
+	if modifiedContractor.Uid == "" {
+		return nil
+	}
+
 	modifiedContractor.UpdatedDate = time.Now().UTC()
 
 	log.Printf("writing user %s to DBs...", modifiedContractor.Uid)

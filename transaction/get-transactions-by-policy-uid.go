@@ -104,6 +104,41 @@ func GetPolicyActiveTransactions(origin, policyUid string) []models.Transaction 
 	return transactions
 }
 
+func GetPolicyUnpaidTransactions(policyUid string) []models.Transaction {
+	var transactions Transactions
+
+	q := lib.Firequeries{
+		Queries: []lib.Firequery{
+			{
+				Field:      "policyUid",
+				Operator:   "==",
+				QueryValue: policyUid,
+			},
+			{
+				Field:      "isDelete",
+				Operator:   "==",
+				QueryValue: false,
+			},
+			{
+				Field:      "isPay",
+				Operator:   "==",
+				QueryValue: false,
+			},
+		},
+	}
+	docsnap, err := q.FirestoreWherefields(models.TransactionsCollection)
+	if err != nil {
+		log.Printf("[GetPolicyActiveTransactions] query error: %s", err.Error())
+		return transactions
+	}
+
+	transactions = models.TransactionToListData(docsnap)
+
+	sort.Sort(transactions)
+
+	return transactions
+}
+
 func (t Transactions) Len() int      { return len(t) }
 func (t Transactions) Swap(i, j int) { t[i], t[j] = t[j], t[i] }
 func (t Transactions) Less(i, j int) bool {
