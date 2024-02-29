@@ -73,7 +73,7 @@ func ChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, in
 		unpaidTransactions = append(unpaidTransactions, tr)
 	}
 	if len(unpaidTransactions) == 0 {
-		log.Printf("no active transactions found for policy %s", policy.Uid)
+		log.Printf("no unpaid transactions found for policy %s", policy.Uid)
 		return "{}", nil, err
 	}
 
