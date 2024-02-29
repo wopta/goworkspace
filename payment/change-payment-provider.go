@@ -29,12 +29,14 @@ type ChangePaymentProviderResp struct {
 
 func ChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		err                 error
-		payUrl              string
-		policy              models.Policy
-		updatedTransactions []models.Transaction
-		req                 ChangePaymentProviderReq
-		resp                ChangePaymentProviderResp
+		err                  error
+		payUrl               string
+		policy               models.Policy
+		updatedTransactions  []models.Transaction
+		req                  ChangePaymentProviderReq
+		resp                 ChangePaymentProviderResp
+		responseTransactions = make([]models.Transaction, 0)
+		unpaidTransactions   = make([]models.Transaction, 0)
 	)
 
 	log.SetPrefix("ChangePaymentProviderFx ")
@@ -62,7 +64,14 @@ func ChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, in
 		return "{}", nil, errors.New("unable to change payment method")
 	}
 
-	unpaidTransactions := transaction.GetPolicyUnpaidTransactions(policy.Uid)
+	activeTransactions := transaction.GetPolicyActiveTransactions("", policy.Uid)
+	for _, tr := range activeTransactions {
+		if tr.IsPay {
+			responseTransactions = append(responseTransactions, tr)
+			continue
+		}
+		unpaidTransactions = append(unpaidTransactions, tr)
+	}
 	if len(unpaidTransactions) == 0 {
 		log.Printf("no active transactions found for policy %s", policy.Uid)
 		return "{}", nil, err
@@ -90,7 +99,7 @@ func ChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, in
 	}
 
 	policy.PayUrl = payUrl
-
+	responseTransactions = append(responseTransactions, updatedTransactions...)
 	for _, tr := range updatedTransactions {
 		err = lib.SetFirestoreErr(models.TransactionsCollection, tr.Uid, tr)
 		if err != nil {
@@ -108,7 +117,7 @@ func ChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, in
 	policy.BigquerySave("")
 
 	resp.Policy = policy
-	resp.Transactions = updatedTransactions
+	resp.Transactions = responseTransactions
 	rawResp, err := json.Marshal(resp)
 	if err != nil {
 		log.Printf("error marshaling response: %s", err.Error())
