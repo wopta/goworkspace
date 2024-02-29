@@ -63,7 +63,7 @@ func Payment(w http.ResponseWriter, r *http.Request) {
 				Route:   "/v1",
 				Handler: ChangePaymentProviderFx,
 				Method:  http.MethodPatch,
-				Roles:   []string{models.UserRoleAll},
+				Roles:   []string{models.UserRoleAdmin},
 			},
 		},
 	}
