@@ -98,6 +98,9 @@ func LifePartnership(partnershipUid, jwtData, origin string) (models.Policy, mod
 	case models.PartnershipFacile:
 		log.Println("[LifePartnership] call facileLifePartnership function")
 		err = facileLifePartnership(jwtData, &policy, productLife)
+	case models.PartnershipFpinsurance:
+		log.Println("[LifePartnership] call fpinsuranceLifePartnership function")
+		err = fpinsuranceLifePartnership(jwtData, &policy, productLife)
 	default:
 		log.Printf("[LifePartnership] could not find partnership with name %s", partnershipName)
 		err = fmt.Errorf("invalid partnership name: %s", partnershipName)
