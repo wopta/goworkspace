@@ -13,7 +13,6 @@ import (
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 	"github.com/wopta/goworkspace/product"
-	"github.com/wopta/goworkspace/quote"
 )
 
 func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -94,10 +93,10 @@ func LifePartnership(partnershipUid, jwtData, origin string) (models.Policy, mod
 	switch partnershipName {
 	case models.PartnershipBeProf:
 		log.Println("[LifePartnership] call beProfLifePartnership function")
-		err = beProfLifePartnership(jwtData, &policy, productLife)
+		err = beProfLifePartnership(jwtData, &policy, productLife, partnershipNode)
 	case models.PartnershipFacile:
 		log.Println("[LifePartnership] call facileLifePartnership function")
-		err = facileLifePartnership(jwtData, &policy, productLife)
+		err = facileLifePartnership(jwtData, &policy, productLife, partnershipNode)
 	case models.PartnershipFpinsurance:
 		log.Println("[LifePartnership] call fpinsuranceLifePartnership function")
 		err = fpinsuranceLifePartnership(jwtData, &policy, productLife)
@@ -106,11 +105,6 @@ func LifePartnership(partnershipUid, jwtData, origin string) (models.Policy, mod
 		err = fmt.Errorf("invalid partnership name: %s", partnershipName)
 	}
 
-	if err != nil {
-		return policy, *productLife, partnershipNode, err
-	}
-
-	policy, err = quote.Life(policy, models.ECommerceChannel, partnershipNode, warrant, models.ECommerceFlow)
 	if err != nil {
 		return policy, *productLife, partnershipNode, err
 	}

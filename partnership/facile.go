@@ -10,9 +10,10 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/quote"
 )
 
-func facileLifePartnership(jwtData string, policy *models.Policy, product *models.Product) error {
+func facileLifePartnership(jwtData string, policy *models.Policy, product *models.Product, partnershipNode *models.NetworkNode) error {
 	var (
 		person models.User
 		asset  models.Asset
@@ -61,6 +62,10 @@ func facileLifePartnership(jwtData string, policy *models.Policy, product *model
 
 	policy.Assets = append(policy.Assets, asset)
 	policy.PartnershipData = claims.ToMap()
+
+	quotedPolicy, err := quote.Life(*policy, models.ECommerceChannel, partnershipNode, nil, models.ECommerceFlow)
+	policy = &quotedPolicy
+
 	return err
 }
 

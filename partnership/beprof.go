@@ -10,10 +10,11 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/quote"
 	"github.com/wopta/goworkspace/user"
 )
 
-func beProfLifePartnership(jwtData string, policy *models.Policy, _ *models.Product) error {
+func beProfLifePartnership(jwtData string, policy *models.Policy, _ *models.Product, partnershipNode *models.NetworkNode) error {
 	var (
 		person models.User
 		asset  models.Asset
@@ -57,7 +58,10 @@ func beProfLifePartnership(jwtData string, policy *models.Policy, _ *models.Prod
 		policy.Assets = append(policy.Assets, asset)
 		policy.PartnershipData = claims.ToMap()
 
-		return nil
+		quotedPolicy, err := quote.Life(*policy, models.ECommerceChannel, partnershipNode, nil, models.ECommerceFlow)
+		policy = &quotedPolicy
+
+		return err
 	}
 
 	log.Printf("[beProfLifePartnership] could not validate beprof partnership JWT - %s", err.Error())
