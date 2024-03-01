@@ -1,7 +1,7 @@
 package _script
 
 import (
-	"log"
+	// "log"
 
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
@@ -10,15 +10,22 @@ import (
 var nameDesc string = "Wopta per te Vita"
 
 func CreatePartnerhipNodes() {
-	err := createBeprofNode()
-	if err != nil {
-		log.Println(err.Error())
-	}
+	// var err error
 
-	err = createFacileNode()
-	if err != nil {
-		log.Println(err.Error())
-	}
+	// err = createBeprofNode()
+	// if err != nil {
+	// 	log.Println(err.Error())
+	// }
+
+	// err = createFacileNode()
+	// if err != nil {
+	// 	log.Println(err.Error())
+	// }
+
+	// err = createFpinsuranceNode()
+	// if err != nil {
+	// 	log.Println(err.Error())
+	// }
 }
 
 func createBeprofNode() error {
@@ -215,4 +222,33 @@ func createFacileNode() error {
 	_, err := network.CreateNode(partnershipModel)
 
 	return err
+}
+
+func createFpinsuranceNode() error {
+	var (
+		err error
+		nn  *models.NetworkNode
+	)
+	partnershipModel := models.NetworkNode{
+		Uid:         models.PartnershipFpinsurance,
+		Code:        models.PartnershipFpinsurance,
+		Type:        models.PartnershipNetworkNodeType,
+		IsActive:    true,
+		Partnership: &models.PartnershipNode{Name: models.PartnershipFpinsurance},
+		Products: []models.Product{{
+			Name:         models.LifeProduct,
+			NameDesc:     &nameDesc,
+			Version:      models.ProductV2,
+			NameTitle:    "Wopta per te",
+			NameSubtitle: "Vita",
+			Companies:    []models.Company{{Name: "axa"}},
+		}},
+	}
+
+	nn, err = network.CreateNode(partnershipModel)
+	if err != nil {
+		return err
+	}
+
+	return nn.SaveBigQuery("")
 }
