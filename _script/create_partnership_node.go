@@ -1,14 +1,27 @@
 package _script
 
 import (
+	"log"
+
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
-	"log"
 )
 
-func createPartnerhipNodes() {
-	nameDesc := "Wopta per te Vita"
+var nameDesc string = "Wopta per te Vita"
 
+func CreatePartnerhipNodes() {
+	err := createBeprofNode()
+	if err != nil {
+		log.Println(err.Error())
+	}
+
+	err = createFacileNode()
+	if err != nil {
+		log.Println(err.Error())
+	}
+}
+
+func createBeprofNode() error {
 	partnershipModel := models.NetworkNode{
 		Uid:      "beprof",
 		Code:     "beprof",
@@ -102,11 +115,12 @@ func createPartnerhipNodes() {
 	}
 
 	_, err := network.CreateNode(partnershipModel)
-	if err != nil {
-		log.Println(err.Error())
-	}
 
-	partnershipModel = models.NetworkNode{
+	return err
+}
+
+func createFacileNode() error {
+	partnershipModel := models.NetworkNode{
 		Uid:      "facile",
 		Code:     "facile",
 		Type:     "partnership",
@@ -198,8 +212,7 @@ func createPartnerhipNodes() {
 		},
 	}
 
-	_, err = network.CreateNode(partnershipModel)
-	if err != nil {
-		log.Println(err.Error())
-	}
+	_, err := network.CreateNode(partnershipModel)
+
+	return err
 }
