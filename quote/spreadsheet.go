@@ -98,7 +98,7 @@ func (s *GoogleSpreadsheet) NewClient() (*sheets.Service, error) {
 func (s *GoogleDrive) NewClient() (*DriveService, error) {
 	var svc *drive.Service
 	var err error
-	svc, err = drive.NewService(s.Ctx, option.WithCredentialsJSON(s.CredentialsByte), option.WithScopes(drive.GoogleDrive))
+	svc, err = drive.NewService(s.Ctx, option.WithCredentialsJSON(s.CredentialsByte), option.WithScopes(drive.DriveScope))
 	if err != nil {
 		return nil, err
 	}
@@ -115,3 +115,5 @@ type GoogleService[T any] interface {
 func GoogleClient[T any](g GoogleService[T]) (T, error) {
 	return g.NewClient()
 }
+
+// Retrieve a token, saves the token, then returns the generated client.
