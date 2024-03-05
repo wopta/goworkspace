@@ -79,8 +79,9 @@ func GetAllowedSingleInstallmentModes() []string {
 }
 
 const (
-	PartnershipBeProf string = "beprof"
-	PartnershipFacile string = "facile"
+	PartnershipBeProf      string = "beprof"
+	PartnershipFacile      string = "facile"
+	PartnershipFpinsurance string = "fpinsurance"
 )
 
 const (
