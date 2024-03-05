@@ -262,16 +262,14 @@ func modifyUserInfo(inputUser models.User) (models.User, error) {
 	modifiedUser.FiscalCode = inputUser.FiscalCode
 	modifiedUser.Mail = inputUser.Mail
 
-	if !strings.EqualFold(modifiedUser.Mail, dbUser.Mail) {
-		if dbUser.AuthId != "" {
-			log.Printf("modifying user %s email from %s to %s...", modifiedUser.Uid, modifiedUser.Mail, dbUser.Mail)
-			_, err = lib.UpdateUserEmail(modifiedUser.Uid, modifiedUser.Mail)
-			if err != nil {
-				log.Printf("error modifying authentication email: %s", err.Error())
-				return models.User{}, err
-			}
-			log.Printf("mail modified successfully")
+	if !strings.EqualFold(modifiedUser.Mail, dbUser.Mail) && dbUser.AuthId != "" {
+		log.Printf("modifying user %s email from %s to %s...", modifiedUser.Uid, modifiedUser.Mail, dbUser.Mail)
+		_, err = lib.UpdateUserEmail(modifiedUser.Uid, modifiedUser.Mail)
+		if err != nil {
+			log.Printf("error modifying authentication email: %s", err.Error())
+			return models.User{}, err
 		}
+		log.Printf("mail modified successfully")
 	}
 
 	log.Printf("user %s modified successfully", modifiedUser.Uid)
