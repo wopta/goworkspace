@@ -1,14 +1,34 @@
 package _script
 
 import (
+	// "log"
+
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
-	"log"
 )
 
-func createPartnerhipNodes() {
-	nameDesc := "Wopta per te Vita"
+var nameDesc string = "Wopta per te Vita"
 
+func CreatePartnerhipNodes() {
+	// var err error
+
+	// err = createBeprofNode()
+	// if err != nil {
+	// 	log.Println(err.Error())
+	// }
+
+	// err = createFacileNode()
+	// if err != nil {
+	// 	log.Println(err.Error())
+	// }
+
+	// err = createFpinsuranceNode()
+	// if err != nil {
+	// 	log.Println(err.Error())
+	// }
+}
+
+func createBeprofNode() error {
 	partnershipModel := models.NetworkNode{
 		Uid:      "beprof",
 		Code:     "beprof",
@@ -102,11 +122,12 @@ func createPartnerhipNodes() {
 	}
 
 	_, err := network.CreateNode(partnershipModel)
-	if err != nil {
-		log.Println(err.Error())
-	}
 
-	partnershipModel = models.NetworkNode{
+	return err
+}
+
+func createFacileNode() error {
+	partnershipModel := models.NetworkNode{
 		Uid:      "facile",
 		Code:     "facile",
 		Type:     "partnership",
@@ -198,8 +219,36 @@ func createPartnerhipNodes() {
 		},
 	}
 
-	_, err = network.CreateNode(partnershipModel)
-	if err != nil {
-		log.Println(err.Error())
+	_, err := network.CreateNode(partnershipModel)
+
+	return err
+}
+
+func createFpinsuranceNode() error {
+	var (
+		err error
+		nn  *models.NetworkNode
+	)
+	partnershipModel := models.NetworkNode{
+		Uid:         models.PartnershipFpinsurance,
+		Code:        models.PartnershipFpinsurance,
+		Type:        models.PartnershipNetworkNodeType,
+		IsActive:    true,
+		Partnership: &models.PartnershipNode{Name: models.PartnershipFpinsurance},
+		Products: []models.Product{{
+			Name:         models.LifeProduct,
+			NameDesc:     &nameDesc,
+			Version:      models.ProductV2,
+			NameTitle:    "Wopta per te",
+			NameSubtitle: "Vita",
+			Companies:    []models.Company{{Name: "axa"}},
+		}},
 	}
+
+	nn, err = network.CreateNode(partnershipModel)
+	if err != nil {
+		return err
+	}
+
+	return nn.SaveBigQuery("")
 }
