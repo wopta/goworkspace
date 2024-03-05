@@ -116,4 +116,4 @@ func GoogleClient[T any](g GoogleService[T]) (T, error) {
 	return g.NewClient()
 }
 
-// Retrieve a token, saves the token, then returns the generated client.
+
