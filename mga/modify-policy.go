@@ -89,6 +89,11 @@ func modifyController(originalPolicy, inputPolicy models.Policy) (models.Policy,
 		modifiedUser   models.User
 	)
 
+	err = checkEmailUniqueness(inputPolicy.Contractor)
+	if err != nil {
+		return models.Policy{}, err
+	}
+
 	switch originalPolicy.Name {
 	case models.LifeProduct:
 		modifiedPolicy, modifiedUser, err = lifeModifier(originalPolicy, inputPolicy)
@@ -176,6 +181,19 @@ func gapModifier(originalPolicy, inputPolicy models.Policy) (models.Policy, mode
 	}
 
 	return modifiedPolicy, modifiedUser, err
+}
+
+func checkEmailUniqueness(contractor models.Contractor) error {
+	iterator := lib.WhereFirestore(models.UserCollection, "mail", "==", contractor.Mail)
+	users := models.UsersToListData(iterator)
+
+	for _, usr := range users {
+		if !strings.EqualFold(usr.FiscalCode, contractor.FiscalCode) {
+			return errors.New("mail duplicated")
+		}
+	}
+
+	return nil
 }
 
 func modifyContractorInfo(inputContractor, originalContractor models.Contractor) (models.Contractor, error) {
