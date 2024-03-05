@@ -10,6 +10,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -85,13 +86,19 @@ func modifyController(originalPolicy, inputPolicy models.Policy) (models.Policy,
 	var (
 		err            error
 		modifiedPolicy models.Policy
+		modifiedUser   models.User
 	)
+
+	err = checkEmailUniqueness(inputPolicy.Contractor)
+	if err != nil {
+		return models.Policy{}, err
+	}
 
 	switch originalPolicy.Name {
 	case models.LifeProduct:
-		modifiedPolicy, err = lifeModifier(originalPolicy, inputPolicy)
+		modifiedPolicy, modifiedUser, err = lifeModifier(originalPolicy, inputPolicy)
 	case models.GapProduct:
-		modifiedPolicy, err = gapModifier(originalPolicy, inputPolicy)
+		modifiedPolicy, modifiedUser, err = gapModifier(originalPolicy, inputPolicy)
 	default:
 		return models.Policy{}, errors.New("product not supported")
 	}
@@ -101,15 +108,20 @@ func modifyController(originalPolicy, inputPolicy models.Policy) (models.Policy,
 		return models.Policy{}, err
 	}
 
+	err = writeUserToDB(modifiedUser)
+	if err != nil {
+		return models.Policy{}, err
+	}
+
 	return modifiedPolicy, err
 }
 
-func lifeModifier(originalPolicy, inputPolicy models.Policy) (models.Policy, error) {
+func lifeModifier(originalPolicy, inputPolicy models.Policy) (models.Policy, models.User, error) {
 	var (
-		err                error
-		modifiedPolicy     models.Policy
-		modifiedContractor models.Contractor
-		modifiedInsured    models.User
+		err                           error
+		modifiedPolicy                models.Policy
+		modifiedContractor            models.Contractor
+		modifiedInsured, modifiedUser models.User
 	)
 
 	modifiedPolicy = originalPolicy
@@ -117,31 +129,36 @@ func lifeModifier(originalPolicy, inputPolicy models.Policy) (models.Policy, err
 	modifiedContractor, err = modifyContractorInfo(inputPolicy.Contractor, originalPolicy.Contractor)
 	if err != nil {
 		log.Printf("error modifying contractor %s info: %s", originalPolicy.Contractor.Uid, err.Error())
-		return models.Policy{}, err
+		return models.Policy{}, models.User{}, err
 	}
 
 	modifiedInsured, err = modifyInsuredInfo(*inputPolicy.Assets[0].Person, *originalPolicy.Assets[0].Person)
 	if err != nil {
 		log.Printf("error modifying insured for policy %s info: %s", originalPolicy.Uid, err.Error())
-		return models.Policy{}, err
+		return models.Policy{}, models.User{}, err
 	}
 
 	modifiedPolicy.Contractor = modifiedContractor
 	modifiedPolicy.Assets[0].Person = &modifiedInsured
 
-	err = writeUserToDB(modifiedPolicy.Contractor)
-	if err != nil {
-		return models.Policy{}, err
+	if modifiedContractor.Uid != "" {
+		tmpUser := modifiedContractor.ToUser()
+		modifiedUser, err = modifyUserInfo(*tmpUser)
+		if err != nil {
+			log.Printf("error modifying user %s info: %s", tmpUser.Uid, err.Error())
+			return models.Policy{}, models.User{}, err
+		}
 	}
 
-	return modifiedPolicy, err
+	return modifiedPolicy, modifiedUser, err
 }
 
-func gapModifier(originalPolicy, inputPolicy models.Policy) (models.Policy, error) {
+func gapModifier(originalPolicy, inputPolicy models.Policy) (models.Policy, models.User, error) {
 	var (
 		err                error
 		modifiedPolicy     models.Policy
 		modifiedContractor models.Contractor
+		modifiedUser       models.User
 	)
 
 	modifiedPolicy = originalPolicy
@@ -149,17 +166,34 @@ func gapModifier(originalPolicy, inputPolicy models.Policy) (models.Policy, erro
 	modifiedContractor, err = modifyContractorInfo(inputPolicy.Contractor, originalPolicy.Contractor)
 	if err != nil {
 		log.Printf("error modifying contractor %s info: %s", originalPolicy.Contractor.Uid, err.Error())
-		return models.Policy{}, err
+		return models.Policy{}, models.User{}, err
 	}
 
 	modifiedPolicy.Contractor = modifiedContractor
 
-	err = writeUserToDB(modifiedPolicy.Contractor)
-	if err != nil {
-		return models.Policy{}, err
+	if modifiedContractor.Uid != "" {
+		tmpUser := modifiedContractor.ToUser()
+		modifiedUser, err = modifyUserInfo(*tmpUser)
+		if err != nil {
+			log.Printf("error modifying user %s info: %s", tmpUser.Uid, err.Error())
+			return models.Policy{}, models.User{}, err
+		}
 	}
 
-	return modifiedPolicy, err
+	return modifiedPolicy, modifiedUser, err
+}
+
+func checkEmailUniqueness(contractor models.Contractor) error {
+	iterator := lib.WhereFirestore(models.UserCollection, "mail", "==", contractor.Mail)
+	users := models.UsersToListData(iterator)
+
+	for _, usr := range users {
+		if !strings.EqualFold(usr.FiscalCode, contractor.FiscalCode) {
+			return errors.New("mail duplicated")
+		}
+	}
+
+	return nil
 }
 
 func modifyContractorInfo(inputContractor, originalContractor models.Contractor) (models.Contractor, error) {
@@ -178,6 +212,7 @@ func modifyContractorInfo(inputContractor, originalContractor models.Contractor)
 	modifiedContractor.BirthProvince = inputContractor.BirthProvince
 	modifiedContractor.Gender = inputContractor.Gender
 	modifiedContractor.FiscalCode = inputContractor.FiscalCode
+	modifiedContractor.Mail = inputContractor.Mail
 
 	user := modifiedContractor.ToUser()
 	err = usr.CheckFiscalCode(*user)
@@ -206,16 +241,58 @@ func modifyInsuredInfo(inputInsured, originalInsured models.User) (models.User, 
 	modifiedInsured.BirthProvince = inputInsured.BirthProvince
 	modifiedInsured.Gender = inputInsured.Gender
 	modifiedInsured.FiscalCode = inputInsured.FiscalCode
+	modifiedInsured.Mail = inputInsured.Mail
 
 	err = usr.CheckFiscalCode(*modifiedInsured)
 	if err != nil {
 		return models.User{}, err
 	}
 
-	log.Printf("contractor %s modified", originalInsured.Uid)
+	log.Printf("insured %s modified", originalInsured.Uid)
 
 	log.Println("insured modified successfully")
 	return *modifiedInsured, err
+}
+
+func modifyUserInfo(inputUser models.User) (models.User, error) {
+	var (
+		err                  error
+		dbUser, modifiedUser models.User
+	)
+
+	log.Println("modifying user info...")
+
+	docsnap, err := lib.GetFirestoreErr(models.UserCollection, inputUser.Uid)
+	if err != nil {
+		log.Printf("error retrieving user %s from Firestore: %s", inputUser.Uid, err.Error())
+		return models.User{}, err
+	}
+	docsnap.DataTo(&dbUser)
+
+	modifiedUser = dbUser
+
+	modifiedUser.Name = inputUser.Name
+	modifiedUser.Surname = inputUser.Surname
+	modifiedUser.BirthDate = inputUser.BirthDate
+	modifiedUser.BirthCity = inputUser.BirthCity
+	modifiedUser.BirthProvince = inputUser.BirthProvince
+	modifiedUser.Gender = inputUser.Gender
+	modifiedUser.FiscalCode = inputUser.FiscalCode
+	modifiedUser.Mail = inputUser.Mail
+
+	if !strings.EqualFold(modifiedUser.Mail, dbUser.Mail) && dbUser.AuthId != "" {
+		log.Printf("modifying user %s email from %s to %s...", modifiedUser.Uid, modifiedUser.Mail, dbUser.Mail)
+		_, err = lib.UpdateUserEmail(modifiedUser.Uid, modifiedUser.Mail)
+		if err != nil {
+			log.Printf("error modifying authentication email: %s", err.Error())
+			return models.User{}, err
+		}
+		log.Printf("mail modified successfully")
+	}
+
+	log.Printf("user %s modified successfully", modifiedUser.Uid)
+
+	return modifiedUser, err
 }
 
 func writePolicyToDb(modifiedPolicy models.Policy) error {
@@ -238,30 +315,30 @@ func writePolicyToDb(modifiedPolicy models.Policy) error {
 	return err
 }
 
-func writeUserToDB(modifiedContractor models.Contractor) error {
+func writeUserToDB(user models.User) error {
 	var err error
 
-	if modifiedContractor.Uid == "" {
+	if user.Uid == "" {
 		return nil
 	}
 
-	modifiedContractor.UpdatedDate = time.Now().UTC()
+	user.UpdatedDate = time.Now().UTC()
 
-	log.Printf("writing user %s to DBs...", modifiedContractor.Uid)
+	log.Printf("writing user %s to DBs...", user.Uid)
 
-	err = lib.SetFirestoreErr(models.UserCollection, modifiedContractor.Uid, modifiedContractor)
+	err = lib.SetFirestoreErr(models.UserCollection, user.Uid, user)
 	if err != nil {
 		log.Printf("error writing modified user to Firestore: %s", err.Error())
 		return err
 	}
 
-	err = modifiedContractor.BigquerySave("")
+	err = user.BigquerySave("")
 	if err != nil {
 		log.Printf("error writing modified user to BigQuery: %s", err.Error())
 		return err
 	}
 
-	log.Printf("user %s written into DBs", modifiedContractor.Uid)
+	log.Printf("user %s written into DBs", user.Uid)
 
 	return err
 }
