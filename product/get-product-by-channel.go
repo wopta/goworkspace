@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io/fs"
 	"log"
 	"net/http"
 	"regexp"
@@ -73,6 +74,40 @@ func GetProductV2(productName, productVersion, channel string, networkNode *mode
 	err = replaceDatesInProduct(product, channel)
 	if err != nil {
 		log.Printf("[GetProductV2] error during replace dates in product: %s", err.Error())
+		return nil
+	}
+
+	overrideProductInfo(product, networkNode, warrant, channel)
+
+	return product
+}
+
+/*
+GetProductV2 version external provider
+*/
+func GetProductProvider(productName, productVersion, channel string, networkNode *models.NetworkNode, warrant *models.Warrant, provider fs.FS) *models.Product {
+	var (
+		product      *models.Product
+		productBytes []byte
+	)
+
+	filePath := fmt.Sprintf("%s/%s/%s/%s.json", "products-v2", productName, productVersion, channel)
+
+	productBytes, err := fs.ReadFile(provider, filePath)
+	if err != nil {
+		return nil
+	}
+
+	buffer := new(bytes.Buffer)
+	_ = json.Compact(buffer, productBytes)
+
+	err = json.Unmarshal(productBytes, &product)
+	if err != nil {
+		return nil
+	}
+
+	err = replaceDatesInProduct(product, channel)
+	if err != nil {
 		return nil
 	}
 

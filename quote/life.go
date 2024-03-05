@@ -91,8 +91,14 @@ func Life(data models.Policy, channel string, networkNode *models.NetworkNode, w
 	df := lib.CsvToDataframe(b)
 	var selectRow []string
 
+	fsProvider, err := lib.GetProviderByEnv()
+	if err != nil {
+		log.Printf("[Life] error in sellable: %s", err.Error())
+		return models.Policy{}, err
+	}
+
 	log.Printf("[Life] call sellable")
-	ruleProduct, err := sellable.Life(&data, channel, networkNode, warrant)
+	ruleProduct, err := sellable.GetProduct(&data, channel, networkNode, warrant, fsProvider)
 	if err != nil {
 		log.Printf("[Life] error in sellable: %s", err.Error())
 		return models.Policy{}, err

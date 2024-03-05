@@ -3,11 +3,13 @@ package lib
 import (
 	"encoding/json"
 	"fmt"
+	"io/fs"
+	"log"
+
 	"github.com/hyperjumptech/grule-rule-engine/ast"
 	"github.com/hyperjumptech/grule-rule-engine/builder"
 	"github.com/hyperjumptech/grule-rule-engine/engine"
 	"github.com/hyperjumptech/grule-rule-engine/pkg"
-	"log"
 )
 
 func RulesFromJsonV2(fx interface{}, groule []byte, out interface{}, in []byte, data []byte) (string, interface{}) {
@@ -71,4 +73,13 @@ func GetRulesFile(rulesFileName string) []byte {
 func GetRulesFileV2(productName, productVersion, rulesFileName string) []byte {
 	filePath := fmt.Sprintf("products-v2/%s/%s/%s_rules.json", productName, productVersion, rulesFileName)
 	return GetFilesByEnv(filePath)
+}
+
+func GetRulesFileProvider(productName, productVersion, rulesFileName string, provider fs.FS) []byte {
+	filePath := fmt.Sprintf("products-v2/%s/%s/%s_rules.json", productName, productVersion, rulesFileName)
+
+	bytes, err := fs.ReadFile(provider, filePath)
+	CheckError(err)
+
+	return bytes
 }

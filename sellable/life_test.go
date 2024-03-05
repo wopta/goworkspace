@@ -41,7 +41,7 @@ func TestLife(t *testing.T) {
 	for index, age := range inputs {
 		policy := getPolicyByContractorAge(age)
 		expected := outputs[index]
-		output, err = GetProduct(&policy, channel, nil, nil)
+		output, err = Life(&policy, channel, nil, nil)
 		if err != nil {
 			t.Fatalf("error on sellable age %d: %s", age, err.Error())
 		}

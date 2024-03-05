@@ -1,6 +1,7 @@
 package sellable_test
 
 import (
+	"io/fs"
 	"os"
 	"testing"
 	"time"
@@ -12,15 +13,14 @@ import (
 
 type SellableSuite struct {
 	suite.Suite
+	provider    fs.FS
 	policy      *models.Policy
 	channel     string
 	networkNode *models.NetworkNode
 	warrant     *models.Warrant
 }
 
-func (s *SellableSuite) SetupSuite() {
-	os.Setenv("env", "local-test")
-}
+func (s *SellableSuite) SetupSuite() {}
 
 func (s *SellableSuite) SetupTest() {}
 
@@ -29,6 +29,7 @@ func (s *SellableSuite) TearDownSuite() {}
 func (s *SellableSuite) BeforeTest(suiteName, testName string) {
 	switch testName {
 	case "TestGetProductLifeEcommerce":
+		s.provider = os.DirFS("/")
 		s.policy = getPolicyByContractorAge(18)
 		s.channel = models.ECommerceChannel
 		s.networkNode = nil
@@ -43,7 +44,8 @@ func TestSellable(t *testing.T) {
 }
 
 func (s *SellableSuite) TestGetProductLifeEcommerce() {
-	got, err := sellable.GetProduct(s.policy, s.channel, s.networkNode, s.warrant)
+	got, err := sellable.GetProduct(s.policy, s.channel, s.networkNode, s.warrant, s.provider)
+	// TODO
 	expected := &models.Product{}
 
 	s.Assert().Equal(got, expected)

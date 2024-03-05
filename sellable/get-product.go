@@ -2,6 +2,7 @@ package sellable
 
 import (
 	"fmt"
+	"io/fs"
 	"strings"
 
 	"github.com/wopta/goworkspace/lib"
@@ -10,6 +11,7 @@ import (
 )
 
 type SellableWrapper struct {
+	fsProvider  fs.FS
 	input       *models.Policy
 	baseProduct *models.Product
 	params      sellableParameters
@@ -25,11 +27,11 @@ type sellableParameters interface {
 	Validate(*SellableWrapper) error
 }
 
-func GetProduct(policy *models.Policy, channel string, networkNode *models.NetworkNode, warrant *models.Warrant) (product *models.Product, err error) {
+func GetProduct(policy *models.Policy, channel string, networkNode *models.NetworkNode, warrant *models.Warrant, provider fs.FS) (product *models.Product, err error) {
 	var wrapper *SellableWrapper
 
 	// load base product
-	product = prd.GetProductV2(policy.Name, policy.ProductVersion, channel, networkNode, warrant)
+	product = prd.GetProductProvider(policy.Name, policy.ProductVersion, channel, networkNode, warrant, provider)
 	if product == nil {
 		return nil, fmt.Errorf("no product found")
 	}
@@ -42,6 +44,7 @@ func GetProduct(policy *models.Policy, channel string, networkNode *models.Netwo
 			params:      &ByContractorAge{},
 			baseProduct: product,
 			fx:          sellableLife,
+			fsProvider:  provider,
 		}
 	case models.GapProduct:
 		wrapper = &SellableWrapper{
@@ -49,6 +52,7 @@ func GetProduct(policy *models.Policy, channel string, networkNode *models.Netwo
 			params:      &ByVehicleRegistrationDate{},
 			baseProduct: product,
 			fx:          sellableGap,
+			fsProvider:  provider,
 		}
 	default:
 		return nil, fmt.Errorf("product not implemented: '%s'", policy.Name)
@@ -58,7 +62,7 @@ func GetProduct(policy *models.Policy, channel string, networkNode *models.Netwo
 }
 
 func sellableLife(w *SellableWrapper) (*models.Product, error) {
-	rulesFile := lib.GetRulesFileV2(w.input.Name, w.input.ProductVersion, rulesFilename)
+	rulesFile := lib.GetRulesFileProvider(w.input.Name, w.input.ProductVersion, rulesFilename, w.fsProvider)
 
 	in, err := w.params.ExtractParams(w)
 	if err != nil {
