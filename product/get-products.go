@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	externalProductsFolderPath = "external-products"
+	externalProductsFolderPath = "external-products" // DEPRECATED
 )
 
 func GetProductsByChannel(channel string) []models.ProductInfo {
@@ -144,6 +144,7 @@ func getProductsFileList() []string {
 	return fileList
 }
 
+// DEPRECATED
 func getExternalProduct(prod string) *models.ProductInfo {
 	var wiseProduct models.ProductInfo
 	productBytes := lib.GetFilesByEnv(fmt.Sprintf("%s/%s.json", externalProductsFolderPath, prod))
