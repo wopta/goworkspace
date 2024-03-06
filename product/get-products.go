@@ -13,7 +13,6 @@ import (
 )
 
 const (
-	productFolderPath          = "products-v2"
 	externalProductsFolderPath = "external-products"
 )
 
@@ -133,9 +132,9 @@ func getProductsFileList() []string {
 
 	switch os.Getenv("env") {
 	case "local":
-		fileList, err = lib.ListLocalFolderContent(productFolderPath)
+		fileList, err = lib.ListLocalFolderContent(models.ProductsFolder)
 	default:
-		fileList, err = lib.ListGoogleStorageFolderContent(productFolderPath)
+		fileList, err = lib.ListGoogleStorageFolderContent(models.ProductsFolder)
 	}
 
 	if err != nil {

@@ -7,6 +7,7 @@ import (
 	"github.com/hyperjumptech/grule-rule-engine/builder"
 	"github.com/hyperjumptech/grule-rule-engine/engine"
 	"github.com/hyperjumptech/grule-rule-engine/pkg"
+	"github.com/wopta/goworkspace/models"
 	"log"
 )
 
@@ -69,6 +70,6 @@ func GetRulesFile(rulesFileName string) []byte {
 }
 
 func GetRulesFileV2(productName, productVersion, rulesFileName string) []byte {
-	filePath := fmt.Sprintf("products-v2/%s/%s/%s_rules.json", productName, productVersion, rulesFileName)
+	filePath := fmt.Sprintf("%s/%s/%s/%s_rules.json", models.ProductsFolder, productName, productVersion, rulesFileName)
 	return GetFilesByEnv(filePath)
 }
