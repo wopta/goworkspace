@@ -64,7 +64,7 @@ func facileLifePartnership(jwtData string, policy *models.Policy, product *model
 	policy.PartnershipData = claims.ToMap()
 
 	quotedPolicy, err := quote.Life(*policy, models.ECommerceChannel, partnershipNode, nil, models.ECommerceFlow)
-	policy = &quotedPolicy
+	*policy = quotedPolicy
 
 	return err
 }
