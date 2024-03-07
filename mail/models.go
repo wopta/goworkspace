@@ -26,6 +26,7 @@ type BodyData struct {
 	ProductSlug          string
 	SignUrl              string
 	PayUrl               string
+	PaymentSplit         string
 	InformationSetsUrl   string
 	ProposalNumber       int
 	ExtraContent         []string

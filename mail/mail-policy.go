@@ -74,9 +74,6 @@ func SendMailPay(policy models.Policy, from, to, cc Address, flowName string) {
 		SubTitle:    subtitle,
 		Subject:     subject,
 		IsHtml:      true,
-		IsLink:      true,
-		Link:        policy.PayUrl,
-		LinkLabel:   "Paga la tua polizza",
 	})
 }
 
