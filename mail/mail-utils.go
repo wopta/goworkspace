@@ -46,7 +46,7 @@ func setProductBodyData(policy models.Policy, bodyData *BodyData) {
 	bodyData.ProductSlug = policy.Name
 	bodyData.SignUrl = policy.SignUrl
 	bodyData.PayUrl = policy.PayUrl
-	bodyData.PaymentSplit = policy.PaymentSplit
+	bodyData.PaymentMode = policy.PaymentMode
 
 	switch policy.Name {
 	case models.PmiProduct:
