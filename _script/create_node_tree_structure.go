@@ -10,9 +10,10 @@ import (
 
 type nodeInfo struct {
 	Uid        string
+	Code       string
 	Level      int
 	BreadCrumb string
-	Parents    []string
+	Parents    []nodeInfo
 }
 
 func CreateNodeTreeStructure() {
@@ -43,9 +44,10 @@ func CreateNodeTreeStructure() {
 	for _, node := range firstLevelNodes {
 		toBeVisitedNodes = append(toBeVisitedNodes, nodeInfo{
 			Uid:        node.Uid,
+			Code:       node.Code,
 			Level:      1,
 			BreadCrumb: node.Code,
-			Parents:    []string{},
+			Parents:    []nodeInfo{},
 		})
 	}
 
@@ -56,10 +58,11 @@ func CreateNodeTreeStructure() {
 			return node.ParentUid == currentNode.Uid
 		})
 		toBeVisitedNodes = toBeVisitedNodes[:index]
-		parents := append(currentNode.Parents, currentNode.Uid)
+		parents := append(currentNode.Parents, currentNode)
 		for _, child := range children {
 			toBeVisitedNodes = append(toBeVisitedNodes, nodeInfo{
 				Uid:        child.Uid,
+				Code:       child.Code,
 				Level:      currentNode.Level + 1,
 				BreadCrumb: currentNode.BreadCrumb + " > " + child.Code,
 				Parents:    parents,
@@ -70,8 +73,16 @@ func CreateNodeTreeStructure() {
 	}
 
 	for _, nn := range visitedNodes {
-		log.Printf("uid: %s\tparents: %s\tbreadCrumb: %s\tlevel: %02d\n", nn.Uid,
-			strings.Join(nn.Parents, ", "), nn.BreadCrumb, nn.Level)
+		if len(nn.Parents) > 0 {
+			splittedBreadCrumb := strings.Split(nn.BreadCrumb, " > ")
+			for _, p := range nn.Parents {
+				log.Printf("child: %s\tparent: %s\t childLevel: %02d\tparentLevel: %02d\t relativeBreadCrumb: %s\tabsoluteBreadCrumb: %s\t\n", nn.Code, p.Code,
+					nn.Level, p.Level, strings.Join(splittedBreadCrumb[p.Level:], " > "), nn.BreadCrumb)
+			}
+		} else {
+			log.Printf("child: %s\tparent: %s\tbreadCrumb: %s\tlevel: %02d\n", nn.Code, "",
+				nn.BreadCrumb, nn.Level)
+		}
 	}
 
 	log.Println("function end ------------------------------------------------")
