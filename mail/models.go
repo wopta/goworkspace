@@ -23,6 +23,7 @@ type BodyData struct {
 	AgencyMail           string
 	ProductForm          string
 	ProductName          string
+	ProductSlug          string
 	InformationSetsUrl   string
 	ProposalNumber       int
 	ExtraContent         []string

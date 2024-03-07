@@ -63,6 +63,7 @@ func setAgencyBodyData(agency models.Agency, bodyData *BodyData) {
 
 func setProductBodyData(policy models.Policy, bodyData *BodyData) {
 	bodyData.ProductForm = "https://www.wopta.it/it/"
+	bodyData.ProductSlug = policy.Name
 
 	switch policy.Name {
 	case models.PmiProduct:
