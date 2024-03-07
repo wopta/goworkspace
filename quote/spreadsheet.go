@@ -57,7 +57,14 @@ func (qs *QuoteSpreadsheet) Spreadsheets() {
 	sheetClient, e := GoogleClient[*sheets.Service](spreadsheet)
 	lib.CheckError(e)
 	fmt.Printf("sheetClient: %v\n", sheetClient)
-	f, e := driveClient.Svc.Files.Copy(qs.Id, &drive.File{}).Do()
+	permission := &drive.Permission{
+		Type:         "user",
+		Role:         "writer",
+		EmailAddress: "woptaassicurazioni@gmail.com",
+	}
+	f, e := driveClient.Svc.Files.Copy(qs.Id, &drive.File{
+		Permissions: []*drive.Permission{permission},
+	}).Do()
 	fmt.Printf("f.Id: %v\n", e)
 	fmt.Printf("f.Id: %v\n", f.Id)
 	sheet, e := sheetClient.Spreadsheets.Values.Get(f.Id, "A:J").Do()
