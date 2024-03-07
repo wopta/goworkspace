@@ -16,7 +16,7 @@ const (
 	proposalTemplateType         = "proposal"
 	payTemplateType              = "pay"
 	signTemplateType             = "sign"
-	emittedTemplateType          = "emitted"
+	contractTemplateType         = "contract"
 	reservedTemplateType         = "reserved"
 	reservedApprovedTemplateType = "approved"
 	reservedRejectedTemplateType = "rejected"
@@ -111,7 +111,7 @@ func SendMailContract(policy models.Policy, at *[]Attachment, from, to, cc Addre
 
 	setBodyData(policy, &bodyData)
 
-	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", flowName, emittedTemplateType))
+	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", flowName, contractTemplateType))
 
 	messageBody := fillTemplate(templateFile, &bodyData)
 
@@ -146,6 +146,7 @@ func SendMailContract(policy models.Policy, at *[]Attachment, from, to, cc Addre
 		SubTitle:     subtitle,
 		Subject:      subject,
 		IsHtml:       true,
+		IsApp:        true,
 		IsAttachment: true,
 		Attachments:  at,
 	})
