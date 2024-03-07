@@ -234,6 +234,7 @@ func SendMailReservedResult(policy models.Policy, from, to, cc Address, flowName
 		bodyData.ContractorSurname,
 		bodyData.ContractorName,
 	)
+	// TODO: handle multiple products reserved subtitle
 	subtitle := "Esito valutazione medica assuntiva"
 	subject := fmt.Sprintf("%s - %s", title, subtitle)
 

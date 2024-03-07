@@ -16,11 +16,8 @@ type BodyData struct {
 	ContractorName       string
 	ContractorSurname    string
 	ContractorFiscalCode string
-	AgentName            string
-	AgentSurname         string
-	AgentMail            string
-	AgencyName           string
-	AgencyMail           string
+	NetworkNodeEmail     string
+	NetworkNodeName      string
 	ProductForm          string
 	ProductName          string
 	ProductSlug          string

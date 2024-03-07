@@ -31,34 +31,14 @@ func setBodyData(policy models.Policy, bodyData *BodyData) {
 }
 
 func setNetworkNodeBodyData(node *models.NetworkNode, bodyData *BodyData) {
-	if node.Type == models.AgentNetworkNodeType {
-		bodyData.AgentName = node.Agent.Name
-		bodyData.AgentSurname = node.Agent.Surname
-		bodyData.AgentMail = node.Mail
-	}
-	if node.Type == models.AgencyNetworkNodeType {
-		bodyData.AgencyName = node.Agency.Name
-		bodyData.AgencyMail = node.Mail
-	}
+	bodyData.NetworkNodeName = node.GetName()
+	bodyData.NetworkNodeEmail = node.Mail
 }
 
 func setContractorBodyData(policy models.Policy, bodyData *BodyData) {
 	bodyData.ContractorName = policy.Contractor.Name
 	bodyData.ContractorSurname = policy.Contractor.Surname
 	bodyData.ContractorFiscalCode = policy.Contractor.FiscalCode
-}
-
-// DEPRECATED
-func setAgentBodyData(agent models.Agent, bodyData *BodyData) {
-	bodyData.AgentName = agent.Name
-	bodyData.AgentSurname = agent.Surname
-	bodyData.AgentMail = agent.Mail
-}
-
-// DEPRECATED
-func setAgencyBodyData(agency models.Agency, bodyData *BodyData) {
-	bodyData.AgencyName = agency.Name
-	bodyData.AgencyMail = agency.Email
 }
 
 func setProductBodyData(policy models.Policy, bodyData *BodyData) {
