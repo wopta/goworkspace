@@ -25,7 +25,6 @@ const (
 
 func SendMailLead(policy models.Policy, from, to, cc Address, flowName string) {
 	var (
-		link     = fmt.Sprintf(linkFormat, policy.Name, policy.ProductVersion)
 		bodyData = BodyData{}
 	)
 
@@ -48,9 +47,6 @@ func SendMailLead(policy models.Policy, from, to, cc Address, flowName string) {
 		SubTitle:    subtitle,
 		Subject:     subject,
 		IsHtml:      true,
-		IsLink:      true,
-		Link:        link,
-		LinkLabel:   "Leggi documentazione",
 	})
 }
 
