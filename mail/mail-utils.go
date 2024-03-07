@@ -64,20 +64,22 @@ func setAgencyBodyData(agency models.Agency, bodyData *BodyData) {
 func setProductBodyData(policy models.Policy, bodyData *BodyData) {
 	bodyData.ProductForm = "https://www.wopta.it/it/"
 	bodyData.ProductSlug = policy.Name
+	bodyData.SignUrl = policy.SignUrl
+	bodyData.PayUrl = policy.PayUrl
 
 	switch policy.Name {
 	case models.PmiProduct:
 		bodyData.ProductName = "Artigiani & Imprese"
-		bodyData.ProductForm += "multi-rischio/"
+		bodyData.ProductForm += "multi-rischio#contact-us"
 	case models.PersonaProduct:
 		bodyData.ProductName = "Persona"
-		bodyData.ProductForm += "infortunio/"
+		bodyData.ProductForm += "infortunio#contact-us"
 	case models.LifeProduct:
 		bodyData.ProductName = "Vita"
-		bodyData.ProductForm += "vita/"
+		bodyData.ProductForm += "vita#contact-us"
 	case models.GapProduct:
 		bodyData.ProductName = "Auto Valore Protetto"
-		bodyData.ProductForm = ""
+		bodyData.ProductForm = "gap#contact-us"
 	}
 
 	bodyData.InformationSetsUrl = fmt.Sprintf(

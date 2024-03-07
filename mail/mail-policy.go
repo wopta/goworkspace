@@ -104,9 +104,6 @@ func SendMailSign(policy models.Policy, from, to, cc Address, flowName string) {
 		SubTitle:    subtitle,
 		Subject:     subject,
 		IsHtml:      true,
-		IsLink:      true,
-		Link:        policy.SignUrl,
-		LinkLabel:   "Firma la tua polizza",
 	})
 }
 
