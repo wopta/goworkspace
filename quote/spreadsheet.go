@@ -3,7 +3,6 @@ package quote
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 
@@ -33,7 +32,7 @@ func (qs *QuoteSpreadsheet) Spreadsheets() {
 
 	switch os.Getenv("env") {
 	case "local":
-		path = lib.ErrorByte(ioutil.ReadFile("function-data/sa/positive-apex-350507-33284d6fdd55.json"))
+		path = lib.ErrorByte(os.ReadFile("function-data/sa/positive-apex-350507-33284d6fdd55.json"))
 	case "dev":
 		path = lib.GetFromStorage("function-data", "sa/positive-apex-350507-33284d6fdd55.json", "")
 	case "prod":
@@ -62,7 +61,8 @@ func (qs *QuoteSpreadsheet) Spreadsheets() {
 	fmt.Printf("f.Id: %v\n", e)
 	fmt.Printf("f.Id: %v\n", f.Id)
 	sheet, e := sheetClient.Spreadsheets.Values.Get(f.Id, "A:J").Do()
-
+	lib.CheckError(e)
+	fmt.Printf("file: %v\n", sheet.Values)
 	sheet.Values[40][2] = "10000000"
 	fmt.Printf("file: %v\n", sheet.Values[99][3])
 
@@ -115,5 +115,3 @@ type GoogleService[T any] interface {
 func GoogleClient[T any](g GoogleService[T]) (T, error) {
 	return g.NewClient()
 }
-
-
