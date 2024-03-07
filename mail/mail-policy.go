@@ -162,7 +162,7 @@ func SendMailReserved(policy models.Policy, from, to, cc Address, flowName strin
 
 	setBodyData(policy, &bodyData)
 
-	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", flowName, reservedTemplateType))
+	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s-%s.html", flowName, reservedTemplateType, policy.Name))
 
 	messageBody := fillTemplate(templateFile, &bodyData)
 
