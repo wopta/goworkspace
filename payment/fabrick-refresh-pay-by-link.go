@@ -81,14 +81,14 @@ func fabrickRefreshPayByLink(policy *models.Policy, origin string) error {
 	paymentMethods = getPaymentMethods(*policy, product)
 
 	// check policy payment split
-	switch policy.PaymentSplit {
+	switch policy.PaymentMode {
 	// yearly/singleInstallment
-	case string(models.PaySplitYear), string(models.PaySplitYearly), string(models.PaySplitSingleInstallment):
+	case models.PaymentModeSingle:
 		fabrickResponse, toBeDeletedTransactions, err =
 			fabrickRefreshPayByLinkSingleRate(policy, origin, paymentMethods, mgaProduct)
-	case string(models.PaySplitMonthly):
+	case models.PaymentModeRecurrent:
 		fabrickResponse, toBeDeletedTransactions, err =
-			fabrickRefreshPayByLinkMultiRate(policy, origin, paymentMethods, mgaProduct, 12)
+			fabrickRefreshPayByLinkMultiRate(policy, origin, paymentMethods, mgaProduct)
 	default:
 		err = fmt.Errorf("unhandle payment split '%s'", policy.PaymentSplit)
 	}
@@ -170,13 +170,12 @@ func fabrickRefreshPayByLinkMultiRate(
 	origin string,
 	paymentMethods []string,
 	mgaProduct *models.Product,
-	totalRates int,
 ) (fabrickResponse *FabrickPaymentResponse, toBeDeletedTransactions []models.Transaction, err error) {
 	var refreshScheduleDates []time.Time = make([]time.Time, 0)
 
 	// get all transactions
 	allTransactions := transaction.GetPolicyTransactions(origin, policy.Uid)
-	// add all unpaid transactions to to be deleted array
+	// add all unpaid transactions to be deleted array
 	for _, tr := range allTransactions {
 		// TODO: check control flow
 		if (tr.IsPay && !tr.IsDelete) || (!tr.IsPay && tr.IsDelete) {
