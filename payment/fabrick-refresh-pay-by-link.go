@@ -43,6 +43,11 @@ func FabrickRefreshPayByLinkFx(w http.ResponseWriter, r *http.Request) (string, 
 
 	policy := plc.GetPolicyByUid(request.PolicyUid, origin)
 
+	if policy.PaymentMode == models.PaymentModeRecurrent && policy.PaymentSplit != string(models.PaySplitMonthly) {
+		log.Printf("payment mode %s not supported", policy.PaymentMode)
+		return "", nil, fmt.Errorf("payment mode not supported")
+	}
+
 	err = fabrickRefreshPayByLink(&policy, origin)
 	if err != nil {
 		log.Printf("error refreshing payment link: %s", err.Error())
@@ -210,6 +215,7 @@ func fabrickMultiRatePayment(
 
 	customerId := uuid.New().String()
 	// first transaction schedule date == now
+
 	firstres := <-FabrickPayObj(policy, true, "", "", customerId, policy.PriceGrossMonthly, policy.PriceNettMonthly, origin, paymentMethods, mgaProduct, rateScheduleDates[0])
 	time.Sleep(100)
 
