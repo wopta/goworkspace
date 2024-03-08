@@ -9,7 +9,7 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.4.2
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/wopta/goworkspace/lib v1.0.103
-	github.com/wopta/goworkspace/models v1.1.89
+	github.com/wopta/goworkspace/models v1.1.90
 	github.com/wopta/goworkspace/network v1.0.41
 	github.com/wopta/goworkspace/product v1.0.89
 	github.com/wopta/goworkspace/quote v1.0.47
