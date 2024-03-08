@@ -47,6 +47,7 @@ func setProductBodyData(policy models.Policy, bodyData *BodyData) {
 	bodyData.SignUrl = policy.SignUrl
 	bodyData.PayUrl = policy.PayUrl
 	bodyData.PaymentMode = policy.PaymentMode
+	bodyData.ProposalNumber = policy.ProposalNumber
 
 	switch policy.Name {
 	case models.PmiProduct:
@@ -69,7 +70,6 @@ func setProductBodyData(policy models.Policy, bodyData *BodyData) {
 }
 
 func setPolicyReservedBodyData(policy models.Policy, bodyData *BodyData) {
-	bodyData.ProposalNumber = policy.ProposalNumber
 	if policy.ReservedInfo != nil && len(policy.ReservedInfo.RequiredExams) > 0 {
 		bodyData.ExtraContent = policy.ReservedInfo.RequiredExams
 	}
