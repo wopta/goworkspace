@@ -145,6 +145,7 @@ func SendMailContract(policy models.Policy, at *[]Attachment, from, to, cc Addre
 		FromAddress:  from,
 		To:           []string{to.Address},
 		Cc:           cc.Address,
+		Bcc:          os.Getenv("BCC_CONTRACT_EMAIL"),
 		Message:      messageBody,
 		Title:        policy.NameDesc,
 		SubTitle:     subtitle,

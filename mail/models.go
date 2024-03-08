@@ -50,6 +50,7 @@ type MailRequest struct {
 	IsAttachment bool          `json:"isAttachment,omitempty"`
 	Attachments  *[]Attachment `json:"attachments,omitempty"`
 	Cc           string        `json:"cc,omitempty"`
+	Bcc          string        `json:"bcc,omitempty"`
 	TemplateName string        `json:"templateName,omitempty"`
 	Title        string        `json:"title,omitempty"`
 	SubTitle     string        `json:"subTitle,omitempty"`
