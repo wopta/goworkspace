@@ -10,7 +10,7 @@ require (
 	github.com/dustin/go-humanize v1.0.1
 	github.com/go-gota/gota v0.12.0
 	github.com/wopta/goworkspace/lib v1.0.103
-	github.com/wopta/goworkspace/models v1.1.89
+	github.com/wopta/goworkspace/models v1.1.90
 	github.com/wopta/goworkspace/network v1.0.41
 	github.com/wopta/goworkspace/sellable v1.0.68
 	github.com/xuri/excelize/v2 v2.8.0
