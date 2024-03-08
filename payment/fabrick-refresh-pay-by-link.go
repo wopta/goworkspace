@@ -43,6 +43,8 @@ func FabrickRefreshPayByLinkFx(w http.ResponseWriter, r *http.Request) (string, 
 
 	policy := plc.GetPolicyByUid(request.PolicyUid, origin)
 
+	policy.SanitizePaymentData()
+
 	if policy.PaymentMode == models.PaymentModeRecurrent && policy.PaymentSplit != string(models.PaySplitMonthly) {
 		log.Printf("payment mode %s not supported", policy.PaymentMode)
 		return "", nil, fmt.Errorf("payment mode not supported")

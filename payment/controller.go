@@ -46,19 +46,6 @@ func getPaymentMethods(policy models.Policy, product *models.Product) []string {
 
 	log.Printf("[GetPaymentMethods] loading available payment methods for %s payment provider", policy.Payment)
 
-	// TODO: remove me once established standard
-	if policy.PaymentSplit == string(models.PaySplitYear) {
-		policy.PaymentSplit = string(models.PaySplitYearly)
-	}
-
-	if policy.PaymentMode == "" {
-		if policy.PaymentSplit == string(models.PaySplitYearly) {
-			policy.PaymentMode = models.PaymentModeSingle
-		} else {
-			policy.PaymentMode = models.PaymentModeRecurrent
-		}
-	}
-
 	for _, provider := range product.PaymentProviders {
 		if provider.Name == policy.Payment {
 			for _, config := range provider.Configs {
