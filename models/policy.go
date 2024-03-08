@@ -359,3 +359,21 @@ func (policy *Policy) GetNumberOfRates() int {
 func (policy *Policy) GetDurationInYears() int {
 	return policy.EndDate.Year() - policy.StartDate.Year()
 }
+
+func (policy *Policy) CheckStartDateValidity() error {
+	if policy.CompanyEmit {
+		return nil
+	}
+
+	truncateDuration := 24 * time.Hour
+
+	now := time.Now().UTC().Truncate(truncateDuration)
+	lastValidDate := policy.StartDate.Truncate(truncateDuration).AddDate(0, 0, 7)
+
+	// TODO: consider moving validity period into product
+	if lastValidDate.Before(now) {
+		return fmt.Errorf("policy start date expired")
+	}
+
+	return nil
+}

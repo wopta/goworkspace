@@ -103,6 +103,10 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		sendEmail = *request.SendEmail
 	}
 
+	if err := policy.CheckStartDateValidity(); err != nil {
+		return "", "", err
+	}
+
 	emitUpdatePolicy(&policy, request)
 
 	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
