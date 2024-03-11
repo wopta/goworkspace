@@ -14,14 +14,19 @@ type nodeInfo struct {
 	Code       string
 	Level      int
 	BreadCrumb string
-	Parents    []nodeInfo
+	RootUid    string
+	ParentUid  string
+	Name       string
+	Ancestors  []nodeInfo
 }
 
 type bigQueryNodeInfo struct {
+	RootUid       string                `bigquery:"rootUid"`
+	ParentUid     string                `bigquery:"parentUid"`
 	ChildUid      string                `bigquery:"childUid"`
+	Name          string                `bigquery:"name"`
 	AbsoluteLevel int                   `bigquery:"absoluteLevel"`
 	RelativeLevel int                   `bigquery:"relativeLevel"`
-	ParentUid     string                `bigquery:"parentUid"`
 	CreationDate  bigquery.NullDateTime `bigquery:"creationDate"`
 }
 
@@ -50,10 +55,13 @@ func CreateNodeTreeStructure() {
 
 	for _, node := range firstLevelNodes {
 		toBeVisitedNodes = append(toBeVisitedNodes, nodeInfo{
-			Uid:     node.Uid,
-			Code:    node.Code,
-			Level:   1,
-			Parents: []nodeInfo{},
+			Uid:       node.Uid,
+			Code:      node.Code,
+			Level:     1,
+			RootUid:   node.Uid,
+			ParentUid: "",
+			Name:      node.GetName(),
+			Ancestors: []nodeInfo{},
 		})
 	}
 
@@ -64,13 +72,16 @@ func CreateNodeTreeStructure() {
 			return node.ParentUid == currentNode.Uid
 		})
 		toBeVisitedNodes = toBeVisitedNodes[:index]
-		parents := append(currentNode.Parents, currentNode)
+		parents := append(currentNode.Ancestors, currentNode)
 		for _, child := range children {
 			toBeVisitedNodes = append(toBeVisitedNodes, nodeInfo{
-				Uid:     child.Uid,
-				Code:    child.Code,
-				Level:   currentNode.Level + 1,
-				Parents: parents,
+				Uid:       child.Uid,
+				Code:      child.Code,
+				Level:     currentNode.Level + 1,
+				RootUid:   currentNode.RootUid,
+				ParentUid: currentNode.Uid,
+				Name:      child.GetName(),
+				Ancestors: parents,
 			})
 		}
 		visitedNodes = append(visitedNodes, currentNode)
@@ -78,20 +89,22 @@ func CreateNodeTreeStructure() {
 	}
 
 	for _, nn := range visitedNodes {
-		if len(nn.Parents) > 0 {
+		if len(nn.Ancestors) > 0 {
 			dbNode := bigQueryNodeInfo{
 				ChildUid:      nn.Uid,
 				AbsoluteLevel: nn.Level,
-				ParentUid:     "",
+				RootUid:       "",
+				ParentUid:     nn.ParentUid,
+				Name:          nn.Name,
 				CreationDate:  lib.GetBigQueryNullDateTime(time.Now().UTC()),
 			}
 
-			for _, p := range nn.Parents {
-				dbNode.ParentUid = p.Uid
+			for _, p := range nn.Ancestors {
+				dbNode.RootUid = p.Uid
 				dbNode.RelativeLevel = nn.Level - p.Level
 
-				log.Printf("child: %s\tparent: %s\t childLevel: %02d\tparentLevel: %02d\trelativeLevel: %02d\n", nn.Code, p.Code,
-					dbNode.AbsoluteLevel, p.Level, dbNode.RelativeLevel)
+				log.Printf("rootUid: %s\tparentUid: %s\tchildUid: %s\tchildLevel: %02d\tparentLevel: %02d\trelativeLevel: %02d\t\n",
+					dbNode.RootUid, dbNode.ParentUid, nn.Uid, dbNode.AbsoluteLevel, p.Level, dbNode.RelativeLevel)
 
 				err = lib.InsertRowsBigQuery("wopta", "node-tree-structure", dbNode)
 				if err != nil {
