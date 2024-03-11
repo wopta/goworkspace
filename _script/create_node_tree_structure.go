@@ -6,7 +6,6 @@ import (
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 	"log"
-	"strings"
 	"time"
 )
 
@@ -18,18 +17,16 @@ type nodeInfo struct {
 	Parents    []nodeInfo
 }
 
-type dbNodeInfo struct {
-	ChildUid     string                `bigquery:"childUid"`
-	Level        int                   `bigquery:"level"`
-	BreadCrumb   string                `bigquery:"breadCrumb"`
-	ParentUid    string                `bigquery:"parentUid"`
-	CreationDate bigquery.NullDateTime `bigquery:"creationDate"`
+type bigQueryNodeInfo struct {
+	ChildUid      string                `bigquery:"childUid"`
+	AbsoluteLevel int                   `bigquery:"absoluteLevel"`
+	RelativeLevel int                   `bigquery:"relativeLevel"`
+	ParentUid     string                `bigquery:"parentUid"`
+	CreationDate  bigquery.NullDateTime `bigquery:"creationDate"`
 }
 
 func CreateNodeTreeStructure() {
 	log.Println("function start ----------------------------------------------")
-
-	//nodesMap := make(map[string][]Child)
 
 	nodesList, err := getAllNodes()
 	if err != nil {
@@ -53,11 +50,10 @@ func CreateNodeTreeStructure() {
 
 	for _, node := range firstLevelNodes {
 		toBeVisitedNodes = append(toBeVisitedNodes, nodeInfo{
-			Uid:        node.Uid,
-			Code:       node.Code,
-			Level:      1,
-			BreadCrumb: node.Code,
-			Parents:    []nodeInfo{},
+			Uid:     node.Uid,
+			Code:    node.Code,
+			Level:   1,
+			Parents: []nodeInfo{},
 		})
 	}
 
@@ -71,11 +67,10 @@ func CreateNodeTreeStructure() {
 		parents := append(currentNode.Parents, currentNode)
 		for _, child := range children {
 			toBeVisitedNodes = append(toBeVisitedNodes, nodeInfo{
-				Uid:        child.Uid,
-				Code:       child.Code,
-				Level:      currentNode.Level + 1,
-				BreadCrumb: currentNode.BreadCrumb + " > " + child.Code,
-				Parents:    parents,
+				Uid:     child.Uid,
+				Code:    child.Code,
+				Level:   currentNode.Level + 1,
+				Parents: parents,
 			})
 		}
 		visitedNodes = append(visitedNodes, currentNode)
@@ -84,30 +79,27 @@ func CreateNodeTreeStructure() {
 
 	for _, nn := range visitedNodes {
 		if len(nn.Parents) > 0 {
-			dbNode := dbNodeInfo{
-				ChildUid:     nn.Uid,
-				Level:        nn.Level,
-				BreadCrumb:   "",
-				ParentUid:    "",
-				CreationDate: lib.GetBigQueryNullDateTime(time.Now().UTC()),
+			dbNode := bigQueryNodeInfo{
+				ChildUid:      nn.Uid,
+				AbsoluteLevel: nn.Level,
+				ParentUid:     "",
+				CreationDate:  lib.GetBigQueryNullDateTime(time.Now().UTC()),
 			}
-			splittedBreadCrumb := strings.Split(nn.BreadCrumb, " > ")
+
 			for _, p := range nn.Parents {
-				log.Printf("child: %s\tparent: %s\t childLevel: %02d\tparentLevel: %02d\t relativeBreadCrumb: %s\tabsoluteBreadCrumb: %s\t\n", nn.Code, p.Code,
-					nn.Level, p.Level, strings.Join(splittedBreadCrumb[p.Level:], " > "), nn.BreadCrumb)
 				dbNode.ParentUid = p.Uid
-				dbNode.BreadCrumb = strings.Join(splittedBreadCrumb[p.Level:], " > ")
+				dbNode.RelativeLevel = nn.Level - p.Level
+
+				log.Printf("child: %s\tparent: %s\t childLevel: %02d\tparentLevel: %02d\trelativeLevel: %02d\n", nn.Code, p.Code,
+					dbNode.AbsoluteLevel, p.Level, dbNode.RelativeLevel)
+
 				err = lib.InsertRowsBigQuery("wopta", "node-tree-structure", dbNode)
 				if err != nil {
 					log.Printf("insert error: %s", err.Error())
 					return
 				}
 			}
-		} /*else {
-			log.Printf("child: %s\tparent: %s\tbreadCrumb: %s\tlevel: %02d\n", nn.Code, "",
-				nn.BreadCrumb, nn.Level)
-			lib.InsertRowsBigQuery("wopta", "node-tree-structure", nn)
-		}*/
+		}
 	}
 
 	log.Println("function end ------------------------------------------------")
