@@ -23,7 +23,13 @@ func Network(w http.ResponseWriter, r *http.Request) {
 				Route:   "/import/v1",
 				Method:  http.MethodPost,
 				Handler: ImportNodesFx,
-				Roles:   []string{models.UserRoleAll}, // TODO: set to admin once development completed
+				Roles:   []string{models.UserRoleAdmin},
+			},
+			{
+				Route:   "/subtree/v1/:nodeUid",
+				Method:  http.MethodGet,
+				Handler: NodeSubnetworkFx,
+				Roles:   []string{models.UserRoleAll},
 			},
 		},
 	}
