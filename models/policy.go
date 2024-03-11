@@ -360,6 +360,24 @@ func (policy *Policy) GetDurationInYears() int {
 	return policy.EndDate.Year() - policy.StartDate.Year()
 }
 
+func (policy *Policy) SanitizePaymentData() {
+	if policy.Payment == "" || policy.Payment == "fabrik" {
+		policy.Payment = FabrickPaymentProvider
+	}
+
+	if policy.PaymentSplit == string(PaySplitYear) {
+		policy.PaymentSplit = string(PaySplitYearly)
+	}
+
+	if policy.PaymentMode == "" {
+		if policy.PaymentSplit == string(PaySplitYearly) {
+			policy.PaymentMode = PaymentModeSingle
+		} else {
+			policy.PaymentMode = PaymentModeRecurrent
+		}
+	}
+}
+
 func (policy *Policy) CheckStartDateValidity() error {
 	if policy.CompanyEmit {
 		return nil

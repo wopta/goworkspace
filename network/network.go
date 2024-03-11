@@ -1,11 +1,12 @@
 package network
 
 import (
+	"log"
+	"net/http"
+
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	"log"
-	"net/http"
 )
 
 func init() {
@@ -23,7 +24,7 @@ func Network(w http.ResponseWriter, r *http.Request) {
 				Route:   "/import/v1",
 				Method:  http.MethodPost,
 				Handler: ImportNodesFx,
-				Roles:   []string{models.UserRoleAll}, // TODO: set to admin once development completed
+				Roles:   []string{models.UserRoleAdmin},
 			},
 		},
 	}
