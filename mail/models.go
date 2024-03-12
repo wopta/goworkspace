@@ -14,7 +14,6 @@ type Data struct {
 
 type BodyData struct {
 	ContractorName       string
-	ContractorSurname    string
 	ContractorFiscalCode string
 	NetworkNodeEmail     string
 	NetworkNodeName      string

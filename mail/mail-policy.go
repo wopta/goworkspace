@@ -233,10 +233,9 @@ func SendMailReservedResult(policy models.Policy, from, to, cc Address, flowName
 	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", flowName, template))
 
 	title := fmt.Sprintf(
-		"Wopta per te %s - Proposta %d di %s %s",
+		"Wopta per te %s - Proposta %d di %s",
 		bodyData.ProductName,
 		policy.ProposalNumber,
-		bodyData.ContractorSurname,
 		bodyData.ContractorName,
 	)
 	// TODO: handle multiple products reserved subtitle
@@ -261,7 +260,7 @@ func SendMailProposal(policy models.Policy, from, to, cc Address, flowName strin
 	var (
 		at       []Attachment
 		bodyData = BodyData{}
-		link     = fmt.Sprintf(linkFormat, policy.Name, policy.ProductVersion)
+		// link     = fmt.Sprintf(linkFormat, policy.Name, policy.ProductVersion)
 	)
 
 	setBodyData(policy, &bodyData)
@@ -287,8 +286,8 @@ func SendMailProposal(policy models.Policy, from, to, cc Address, flowName strin
 		IsHtml:       true,
 		IsAttachment: true,
 		Attachments:  &at,
-		IsLink:       true,
-		Link:         link,
-		LinkLabel:    "Leggi documentazione",
+		// IsLink:       true,
+		// Link:         link,
+		// LinkLabel:    "Leggi documentazione",
 	})
 }

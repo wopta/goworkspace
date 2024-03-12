@@ -36,8 +36,7 @@ func setNetworkNodeBodyData(node *models.NetworkNode, bodyData *BodyData) {
 }
 
 func setContractorBodyData(policy models.Policy, bodyData *BodyData) {
-	bodyData.ContractorName = policy.Contractor.Name
-	bodyData.ContractorSurname = policy.Contractor.Surname
+	bodyData.ContractorName = lib.TrimSpace(fmt.Sprintf("%s %s", policy.Contractor.Name, policy.Contractor.Surname))
 	bodyData.ContractorFiscalCode = policy.Contractor.FiscalCode
 }
 
