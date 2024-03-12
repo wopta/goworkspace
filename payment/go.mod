@@ -8,13 +8,13 @@ require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	github.com/google/uuid v1.4.0
 	github.com/wopta/goworkspace/lib v1.0.103
-	github.com/wopta/goworkspace/mail v1.0.90
+	github.com/wopta/goworkspace/mail v1.0.91
 	github.com/wopta/goworkspace/models v1.1.91
 	github.com/wopta/goworkspace/network v1.0.43
 	github.com/wopta/goworkspace/policy v1.0.81
 	github.com/wopta/goworkspace/product v1.0.91
 	github.com/wopta/goworkspace/transaction v1.0.58
-	github.com/wopta/goworkspace/user v1.0.73
+	github.com/wopta/goworkspace/user v1.0.74
 )
 
 require (
