@@ -28,7 +28,7 @@ func Network(w http.ResponseWriter, r *http.Request) {
 			{
 				Route:   "/subtree/v1/:nodeUid",
 				Method:  http.MethodGet,
-				Handler: NodeSubnetworkFx,
+				Handler: NodeSubTreeFx,
 				Roles:   []string{models.UserRoleAll},
 			},
 		},
