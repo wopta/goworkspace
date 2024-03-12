@@ -114,7 +114,7 @@ func sendLeadMail(state *bpmn.State) error {
 		toAddress.String(),
 		ccAddress.String(),
 	)
-	mail.SendMailLead(*policy, fromAddress, toAddress, ccAddress, flowName)
+	mail.SendMailLead(*policy, fromAddress, toAddress, ccAddress, flowName, []string{})
 	return nil
 }
 
@@ -129,6 +129,11 @@ func addProposalHandlers(state *bpmn.State) {
 
 func setProposalBpm(state *bpmn.State) error {
 	policy := state.Data
+
+	if policy.ProposalNumber != 0 {
+		log.Printf("[setProposalData] policy '%s' already has proposal with number '%d'", policy.Uid, policy.ProposalNumber)
+		return nil
+	}
 
 	setProposalData(policy)
 
@@ -206,12 +211,14 @@ func sendRequestApprovalMail(state *bpmn.State) error {
 //	======================================
 
 func addEmitHandlers(state *bpmn.State) {
+	state.AddTaskHandler("setProposalData", setProposalBpm)
 	state.AddTaskHandler("emitData", emitData)
 	state.AddTaskHandler("sendMailSign", sendMailSign)
 	state.AddTaskHandler("sign", sign)
 	state.AddTaskHandler("pay", pay)
 	state.AddTaskHandler("setAdvice", setAdvanceBpm)
 	state.AddTaskHandler("putUser", updateUserAndNetworkNode)
+	state.AddTaskHandler("sendMailInformationSet", sendMailInformationSet)
 }
 
 func emitData(state *bpmn.State) error {
@@ -223,11 +230,6 @@ func emitData(state *bpmn.State) error {
 
 func sendMailSign(state *bpmn.State) error {
 	policy := state.Data
-
-	// TODO smelly control flow
-	if policy.Channel != models.ECommerceChannel && flowName != models.RemittanceMgaFlow {
-		sendMailInformationSet(state)
-	}
 
 	switch flowName {
 	case models.ProviderMgaFlow, models.RemittanceMgaFlow:
@@ -251,19 +253,29 @@ func sendMailSign(state *bpmn.State) error {
 	return nil
 }
 
-func sendMailInformationSet(state *bpmn.State) {
+func sendMailInformationSet(state *bpmn.State) error {
 	log.Println("[sendMailInformationSet]")
 	policy := state.Data
 
-	to := mail.GetContractorEmail(policy)
-	cc := mail.GetNetworkNodeEmail(networkNode)
+	var attachmentNames []string = make([]string, 0)
+
+	if policy.ProposalNumber != 0 {
+		attachmentNames = append(attachmentNames, models.ProposalAttachmentName)
+	}
+
+	toAddress = mail.GetContractorEmail(policy)
+	switch flowName {
+	case models.ProviderMgaFlow, models.RemittanceMgaFlow:
+		ccAddress = mail.GetNetworkNodeEmail(networkNode)
+	}
 	log.Printf(
-		"[sendLeadMail] from '%s', to '%s', cc '%s'",
+		"[sendMailInformationSet] from '%s', to '%s', cc '%s'",
 		fromAddress.String(),
-		to.String(),
-		cc.String(),
+		toAddress.String(),
+		ccAddress.String(),
 	)
-	mail.SendMailLead(*policy, fromAddress, to, cc, flowName)
+	mail.SendMailLead(*policy, fromAddress, toAddress, ccAddress, flowName, attachmentNames)
+	return nil
 }
 
 func sign(state *bpmn.State) error {

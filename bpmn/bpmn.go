@@ -15,7 +15,7 @@ import (
 var origin string
 
 func init() {
-	log.Println("INIT AppcheckProxy")
+	log.Println("INIT Bpmn")
 	functions.HTTP("Bpmn", Bpmn)
 }
 

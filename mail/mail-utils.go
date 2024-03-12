@@ -31,15 +31,8 @@ func setBodyData(policy models.Policy, bodyData *BodyData) {
 }
 
 func setNetworkNodeBodyData(node *models.NetworkNode, bodyData *BodyData) {
-	if node.Type == models.AgentNetworkNodeType {
-		bodyData.AgentName = node.Agent.Name
-		bodyData.AgentSurname = node.Agent.Surname
-		bodyData.AgentMail = node.Mail
-	}
-	if node.Type == models.AgencyNetworkNodeType {
-		bodyData.AgencyName = node.Agency.Name
-		bodyData.AgencyMail = node.Mail
-	}
+	bodyData.NetworkNodeName = node.GetName()
+	bodyData.NetworkNodeEmail = node.Mail
 }
 
 func setContractorBodyData(policy models.Policy, bodyData *BodyData) {
@@ -48,35 +41,27 @@ func setContractorBodyData(policy models.Policy, bodyData *BodyData) {
 	bodyData.ContractorFiscalCode = policy.Contractor.FiscalCode
 }
 
-// DEPRECATED
-func setAgentBodyData(agent models.Agent, bodyData *BodyData) {
-	bodyData.AgentName = agent.Name
-	bodyData.AgentSurname = agent.Surname
-	bodyData.AgentMail = agent.Mail
-}
-
-// DEPRECATED
-func setAgencyBodyData(agency models.Agency, bodyData *BodyData) {
-	bodyData.AgencyName = agency.Name
-	bodyData.AgencyMail = agency.Email
-}
-
 func setProductBodyData(policy models.Policy, bodyData *BodyData) {
 	bodyData.ProductForm = "https://www.wopta.it/it/"
+	bodyData.ProductSlug = policy.Name
+	bodyData.SignUrl = policy.SignUrl
+	bodyData.PayUrl = policy.PayUrl
+	bodyData.PaymentMode = policy.PaymentMode
+	bodyData.ProposalNumber = policy.ProposalNumber
 
 	switch policy.Name {
 	case models.PmiProduct:
 		bodyData.ProductName = "Artigiani & Imprese"
-		bodyData.ProductForm += "multi-rischio/"
+		bodyData.ProductForm += "multi-rischio#contact-us"
 	case models.PersonaProduct:
 		bodyData.ProductName = "Persona"
-		bodyData.ProductForm += "infortunio/"
+		bodyData.ProductForm += "infortunio#contact-us"
 	case models.LifeProduct:
 		bodyData.ProductName = "Vita"
-		bodyData.ProductForm += "vita/"
+		bodyData.ProductForm += "vita#contact-us"
 	case models.GapProduct:
 		bodyData.ProductName = "Auto Valore Protetto"
-		bodyData.ProductForm = ""
+		bodyData.ProductForm = "gap#contact-us"
 	}
 
 	bodyData.InformationSetsUrl = fmt.Sprintf(
@@ -85,7 +70,6 @@ func setProductBodyData(policy models.Policy, bodyData *BodyData) {
 }
 
 func setPolicyReservedBodyData(policy models.Policy, bodyData *BodyData) {
-	bodyData.ProposalNumber = policy.ProposalNumber
 	if policy.ReservedInfo != nil && len(policy.ReservedInfo.RequiredExams) > 0 {
 		bodyData.ExtraContent = policy.ReservedInfo.RequiredExams
 	}
