@@ -22,7 +22,8 @@ type NodeSubTree struct {
 
 func NodeSubTreeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		err error
+		err  error
+		root NodeSubTree
 	)
 
 	log.SetPrefix("NodeSubTreeFx ")
@@ -32,11 +33,26 @@ func NodeSubTreeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	nodeUid := r.Header.Get("nodeUid")
 	log.Printf("Node Uid: %s", nodeUid)
 
+	root, err = GetNodeSubTree(nodeUid)
+
+	rawRoot, err := json.Marshal(root)
+
+	log.Println("Handler end -------------------------------------------------")
+
+	return string(rawRoot), root, err
+}
+
+func GetNodeSubTree(nodeUid string) (NodeSubTree, error) {
+	var (
+		err  error
+		root NodeSubTree
+	)
+
 	log.Printf("Fetching node from Firestore...")
 	node := GetNetworkNodeByUid(nodeUid)
 	if node == nil {
 		log.Printf("no node found with uid %s", nodeUid)
-		return "", nil, errors.New("node not found")
+		return root, errors.New("node not found")
 	}
 	log.Printf("Node found")
 
@@ -49,10 +65,10 @@ func NodeSubTreeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	subNetwork, err := lib.QueryRowsBigQuery[NodeSubTree](query)
 	if err != nil {
 		log.Printf("error fetching children from BigQuery for node %s: %s", nodeUid, err.Error())
-		return "", nil, err
+		return root, err
 	}
 
-	root := NodeSubTree{
+	root = NodeSubTree{
 		NodeUid:   node.Uid,
 		Name:      node.GetName(),
 		ParentUid: node.ParentUid,
@@ -60,18 +76,18 @@ func NodeSubTreeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 
 	root = visitNode(root, subNetwork)
 
-	rawRoot, err := json.Marshal(root)
-
-	log.Println("Handler end -------------------------------------------------")
-
-	return string(rawRoot), root, err
+	return root, err
 }
 
 func visitNode(node NodeSubTree, allNodes []NodeSubTree) NodeSubTree {
-	node.Children = make([]NodeSubTree, 0)
 	children := lib.SliceFilter(allNodes, func(structure NodeSubTree) bool {
 		return structure.ParentUid == node.NodeUid
 	})
+	if len(children) == 0 {
+		return node
+	}
+
+	node.Children = make([]NodeSubTree, 0)
 	for _, child := range children {
 		res := visitNode(child, allNodes)
 		node.Children = append(node.Children, res)
