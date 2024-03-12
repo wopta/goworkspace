@@ -33,6 +33,14 @@ func NodeSubTreeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	nodeUid := r.Header.Get("nodeUid")
 	log.Printf("Node Uid: %s", nodeUid)
 
+	log.Println("loading authToken from idToken...")
+
+	idToken := r.Header.Get("Authorization")
+	err = checkAccess(idToken, nodeUid)
+	if err != nil {
+		return "", nil, err
+	}
+
 	root, err = GetNodeSubTree(nodeUid)
 
 	rawRoot, err := json.Marshal(root)
@@ -77,6 +85,36 @@ func GetNodeSubTree(nodeUid string) (NodeSubTree, error) {
 	root = visitNode(root, subNetwork)
 
 	return root, err
+}
+
+func checkAccess(idToken, nodeUid string) error {
+	authToken, err := models.GetAuthTokenFromIdToken(idToken)
+	if err != nil {
+		log.Printf("error getting authToken")
+		return err
+	}
+	log.Printf(
+		"authToken - type: '%s' role: '%s' uid: '%s' email: '%s'",
+		authToken.Type,
+		authToken.Role,
+		authToken.UserID,
+		authToken.Email,
+	)
+	if authToken.Role != models.UserRoleAdmin && authToken.UserID != nodeUid {
+		baseQuery := fmt.Sprintf("SELECT * FROM `%s.%s` WHERE ", models.WoptaDataset, "node-tree-structure")
+		whereClause := fmt.Sprintf("rootUid = '%s' AND childUid = '%s'", authToken.UserID, nodeUid)
+		query := fmt.Sprintf("%s %s", baseQuery, whereClause)
+		result, err := lib.QueryRowsBigQuery[NodeSubTree](query)
+		if err != nil {
+			log.Printf("error fetching children from BigQuery for node %s: %s", nodeUid, err.Error())
+			return err
+		}
+		if len(result) == 0 {
+			log.Printf("node %s not autorized to access subtree with root uid %s", authToken.UserID, nodeUid)
+			return errors.New("cannot access subtree")
+		}
+	}
+	return nil
 }
 
 func visitNode(node NodeSubTree, allNodes []NodeSubTree) NodeSubTree {
