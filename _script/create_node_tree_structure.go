@@ -8,15 +8,12 @@ import (
 	"time"
 )
 
-type nodeInfo struct {
-	models.NetworkTreeElement
-	Ancestors []nodeInfo
-}
-
 func CreateNodeTreeStructure() {
-	log.Println("function start ----------------------------------------------")
+	var (
+		visitedNodes = make([]models.NetworkTreeElement, 0)
+	)
 
-	creationDate := lib.GetBigQueryNullDateTime(time.Now().UTC())
+	log.Println("function start ----------------------------------------------")
 
 	nodesList, err := getAllNodes()
 	if err != nil {
@@ -31,54 +28,33 @@ func CreateNodeTreeStructure() {
 		return node.ParentUid == ""
 	})
 
-	firstLevelNodes := lib.SliceMap(dbNodes, func(node models.NetworkNode) models.NetworkNode {
-		return node
+	toBeVisitedNodes := lib.SliceMap(dbNodes, func(node models.NetworkNode) models.NetworkTreeElement {
+		return models.NetworkTreeElement{
+			RootUid:       node.Uid,
+			ParentUid:     "",
+			NodeUid:       node.Uid,
+			Name:          node.GetName(),
+			AbsoluteLevel: 1,
+			RelativeLevel: 0,
+			CreationDate:  lib.GetBigQueryNullDateTime(time.Now().UTC()),
+			Ancestors:     []models.NetworkTreeElement{},
+		}
 	})
-
-	toBeVisitedNodes := make([]nodeInfo, 0)
-	visitedNodes := make([]nodeInfo, 0)
-
-	for _, node := range firstLevelNodes {
-		toBeVisitedNodes = append(toBeVisitedNodes, nodeInfo{
-			NetworkTreeElement: models.NetworkTreeElement{
-				RootUid:       node.Uid,
-				ParentUid:     "",
-				NodeUid:       node.Uid,
-				Name:          node.GetName(),
-				AbsoluteLevel: 1,
-				RelativeLevel: 0,
-				CreationDate:  creationDate,
-			},
-			Ancestors: []nodeInfo{},
-		})
-	}
 
 	for len(toBeVisitedNodes) > 0 {
 		index := len(toBeVisitedNodes) - 1
 		currentNode := toBeVisitedNodes[index]
-		children := lib.SliceFilter(nodesList, func(node models.NetworkNode) bool {
-			return node.ParentUid == currentNode.NodeUid
-		})
 		toBeVisitedNodes = toBeVisitedNodes[:index]
-		parents := append(currentNode.Ancestors, currentNode)
-		for _, child := range children {
-			toBeVisitedNodes = append(toBeVisitedNodes, nodeInfo{
-				NetworkTreeElement: models.NetworkTreeElement{
-					RootUid:       currentNode.RootUid,
-					ParentUid:     currentNode.NodeUid,
-					NodeUid:       child.Uid,
-					Name:          child.GetName(),
-					AbsoluteLevel: currentNode.AbsoluteLevel + 1,
-					CreationDate:  creationDate,
-				},
-				Ancestors: parents,
-			})
-		}
+		toBeVisitedNodes = append(toBeVisitedNodes, visitNode(currentNode, nodesList)...)
 		visitedNodes = append(visitedNodes, currentNode)
-
 	}
 
+	spreadedNodes := make([]models.NetworkTreeElement, 0)
 	for _, nn := range visitedNodes {
+		spreadedNodes = append(spreadedNodes, spreadNodeByAncestors(nn)...)
+	}
+
+	for _, nn := range spreadedNodes {
 		err = writeNodeToBigQuery(nn)
 		if err != nil {
 			log.Printf("error writing node %s to BigQuery: %s", nn.NodeUid, err.Error())
@@ -103,29 +79,48 @@ func getAllNodes() ([]models.NetworkNode, error) {
 	return filteredNodes, nil
 }
 
-func writeNodeToBigQuery(node nodeInfo) error {
-	if len(node.Ancestors) > 0 {
-		dbNode := models.NetworkTreeElement{
-			NodeUid:       node.NodeUid,
-			AbsoluteLevel: node.AbsoluteLevel,
-			ParentUid:     node.ParentUid,
-			Name:          node.Name,
+func visitNode(currentNode models.NetworkTreeElement, nodesList []models.NetworkNode) []models.NetworkTreeElement {
+	toBeVisitedNodes := make([]models.NetworkTreeElement, 0)
+
+	children := lib.SliceFilter(nodesList, func(node models.NetworkNode) bool {
+		return node.ParentUid == currentNode.NodeUid
+	})
+	if len(children) == 0 {
+		return toBeVisitedNodes
+	}
+
+	parents := append(currentNode.Ancestors, currentNode)
+	for _, child := range children {
+		toBeVisitedNodes = append(toBeVisitedNodes, models.NetworkTreeElement{
+			RootUid:       currentNode.RootUid,
+			ParentUid:     currentNode.NodeUid,
+			NodeUid:       child.Uid,
+			Name:          child.GetName(),
+			AbsoluteLevel: currentNode.AbsoluteLevel + 1,
 			CreationDate:  lib.GetBigQueryNullDateTime(time.Now().UTC()),
-		}
+			Ancestors:     parents,
+		})
+	}
+	return toBeVisitedNodes
+}
 
-		for _, p := range node.Ancestors {
-			dbNode.RootUid = p.NodeUid
-			dbNode.RelativeLevel = node.AbsoluteLevel - p.AbsoluteLevel
+func spreadNodeByAncestors(node models.NetworkTreeElement) []models.NetworkTreeElement {
+	ancestors := make([]models.NetworkTreeElement, 0)
+	for _, a := range node.Ancestors {
+		node.RootUid = a.NodeUid
+		node.RelativeLevel = node.AbsoluteLevel - a.AbsoluteLevel
+		log.Printf("rootUid: %s\tparentUid: %s\tnodeUid: %s\tchildLevel: %02d\tparentLevel: %02d\trelativeLevel: %02d\t\n",
+			node.RootUid, node.ParentUid, node.NodeUid, node.AbsoluteLevel, a.AbsoluteLevel, node.RelativeLevel)
+		ancestors = append(ancestors, node)
+	}
+	return ancestors
+}
 
-			log.Printf("rootUid: %s\tparentUid: %s\tnodeUid: %s\tchildLevel: %02d\tparentLevel: %02d\trelativeLevel: %02d\t\n",
-				dbNode.RootUid, dbNode.ParentUid, node.NodeUid, dbNode.AbsoluteLevel, p.AbsoluteLevel, dbNode.RelativeLevel)
-
-			err := lib.InsertRowsBigQuery(models.WoptaDataset, models.NetworkTreeStructureTable, dbNode)
-			if err != nil {
-				log.Printf("insert error: %s", err.Error())
-				return err
-			}
-		}
+func writeNodeToBigQuery(node models.NetworkTreeElement) error {
+	err := lib.InsertRowsBigQuery(models.WoptaDataset, models.NetworkTreeStructureTable, node)
+	if err != nil {
+		log.Printf("insert error: %s", err.Error())
+		return err
 	}
 	return nil
 }
