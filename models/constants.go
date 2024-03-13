@@ -117,6 +117,7 @@ const (
 	EmergencyNumbersCollection   string = "emergencyNumbers"
 	PoliciesViewCollection       string = "policiesView"
 	TransactionsViewCollection   string = "transactionsView"
+	NetworkTreeStructureTable    string = "network-tree-structure"
 )
 
 const (
