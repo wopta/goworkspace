@@ -9,5 +9,6 @@ type NetworkTreeElement struct {
 	Name          string                `json:"name" bigquery:"name"`
 	AbsoluteLevel int                   `json:"absoluteLevel" bigquery:"absoluteLevel"`
 	RelativeLevel int                   `json:"relativeLevel" bigquery:"relativeLevel"`
-	CreationDate  bigquery.NullDateTime `bigquery:"creationDate"`
+	CreationDate  bigquery.NullDateTime `json:"-" bigquery:"creationDate"`
+	Ancestors     []NetworkTreeElement  `json:"ancestors,omitempty" bigquery:"-"`
 }
