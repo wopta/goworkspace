@@ -10,20 +10,10 @@ import (
 	"net/http"
 )
 
-type NodeSubTree struct {
-	NodeUid       string        `json:"nodeUid" bigquery:"childUid"`
-	Name          string        `json:"name" bigquery:"name"`
-	ParentUid     string        `json:"parentUid" bigquery:"parentUid"`
-	RootUid       string        `json:"rootUid" bigquery:"rootUid"`
-	AbsoluteLevel int           `json:"absoluteLevel" bigquery:"absoluteLevel"`
-	RelativeLevel int           `json:"relativeLevel" bigquery:"relativeLevel"`
-	Children      []NodeSubTree `json:"children"`
-}
-
 func NodeSubTreeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err  error
-		root NodeSubTree
+		root models.NetworkTreeElement
 	)
 
 	log.SetPrefix("NodeSubTreeFx ")
@@ -50,10 +40,10 @@ func NodeSubTreeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	return string(rawRoot), root, err
 }
 
-func GetNodeSubTree(nodeUid string) (NodeSubTree, error) {
+func GetNodeSubTree(nodeUid string) (models.NetworkTreeElement, error) {
 	var (
 		err  error
-		root NodeSubTree
+		root models.NetworkTreeElement
 	)
 
 	log.Printf("Fetching node from Firestore...")
@@ -66,20 +56,20 @@ func GetNodeSubTree(nodeUid string) (NodeSubTree, error) {
 
 	log.Printf("Fetching children for node %s", nodeUid)
 
-	baseQuery := fmt.Sprintf("SELECT rootUid, parentUid, childUid, absoluteLevel, relativeLevel, name "+
-		"FROM `%s.%s` WHERE ", models.WoptaDataset, "node-tree-structure")
+	baseQuery := fmt.Sprintf("SELECT * FROM `%s.%s` WHERE ", models.WoptaDataset, models.NetworkTreeStructureTable)
 	whereClause := fmt.Sprintf("rootUid = '%s'", nodeUid)
 	query := fmt.Sprintf("%s %s %s", baseQuery, whereClause, "ORDER BY absoluteLevel")
-	subNetwork, err := lib.QueryRowsBigQuery[NodeSubTree](query)
+	subNetwork, err := lib.QueryRowsBigQuery[models.NetworkTreeElement](query)
 	if err != nil {
 		log.Printf("error fetching children from BigQuery for node %s: %s", nodeUid, err.Error())
 		return root, err
 	}
 
-	root = NodeSubTree{
+	root = models.NetworkTreeElement{
+		RootUid:   node.Uid,
 		NodeUid:   node.Uid,
-		Name:      node.GetName(),
 		ParentUid: node.ParentUid,
+		Name:      node.GetName(),
 	}
 
 	root = visitNode(root, subNetwork)
@@ -101,10 +91,10 @@ func checkAccess(idToken, nodeUid string) error {
 		authToken.Email,
 	)
 	if authToken.Role != models.UserRoleAdmin && authToken.UserID != nodeUid {
-		baseQuery := fmt.Sprintf("SELECT * FROM `%s.%s` WHERE ", models.WoptaDataset, "node-tree-structure")
+		baseQuery := fmt.Sprintf("SELECT * FROM `%s.%s` WHERE ", models.WoptaDataset, models.NetworkTreeStructureTable)
 		whereClause := fmt.Sprintf("rootUid = '%s' AND childUid = '%s'", authToken.UserID, nodeUid)
 		query := fmt.Sprintf("%s %s", baseQuery, whereClause)
-		result, err := lib.QueryRowsBigQuery[NodeSubTree](query)
+		result, err := lib.QueryRowsBigQuery[models.NetworkTreeElement](query)
 		if err != nil {
 			log.Printf("error fetching children from BigQuery for node %s: %s", nodeUid, err.Error())
 			return err
@@ -117,15 +107,15 @@ func checkAccess(idToken, nodeUid string) error {
 	return nil
 }
 
-func visitNode(node NodeSubTree, allNodes []NodeSubTree) NodeSubTree {
-	children := lib.SliceFilter(allNodes, func(structure NodeSubTree) bool {
+func visitNode(node models.NetworkTreeElement, allNodes []models.NetworkTreeElement) models.NetworkTreeElement {
+	children := lib.SliceFilter(allNodes, func(structure models.NetworkTreeElement) bool {
 		return structure.ParentUid == node.NodeUid
 	})
 	if len(children) == 0 {
 		return node
 	}
 
-	node.Children = make([]NodeSubTree, 0)
+	node.Children = make([]models.NetworkTreeElement, 0)
 	for _, child := range children {
 		res := visitNode(child, allNodes)
 		node.Children = append(node.Children, res)
