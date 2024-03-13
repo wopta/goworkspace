@@ -54,7 +54,7 @@ func Policy(w http.ResponseWriter, r *http.Request) {
 				Route:   "/subtree/portfolio/v2",
 				Handler: GetSubtreePortfolioFx,
 				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAgent, models.UserRoleAgency},
+				Roles:   []string{models.UserRoleManager, models.UserRoleAgent, models.UserRoleAgency},
 			},
 			{
 				Route:   "/media/upload/v1",
