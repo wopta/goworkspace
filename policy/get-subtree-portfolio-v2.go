@@ -3,9 +3,9 @@ package policy
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
 	"io"
 	"log"
 	"net/http"
@@ -60,18 +60,12 @@ func GetSubtreePortfolioFx(w http.ResponseWriter, r *http.Request) (string, inte
 		return "", nil, err
 	}
 
-	producers := make([]string, 0)
-	if authToken.Role != models.UserRoleAdmin {
-		producers = append(producers, authToken.UserID)
-		children, err := getNodeChildren(authToken.UserID)
-		if err != nil {
-			log.Printf("error fetching node %s children: %s", authToken.UserID, err.Error())
-			return "", nil, err
-		}
-		producers = append(producers, children...)
+	producersMap, err := getProducersMap(authToken.Role, authToken.UserID)
+	if err != nil {
+		return "", nil, err
 	}
 
-	resp.Policies, err = getPortfolioPoliciesV2(producers, req.Queries, req.Limit)
+	resp.Policies, err = getPortfolioPoliciesV2(producersMap, req.Queries, req.Limit)
 	if err != nil {
 		log.Printf("error query: %s", err.Error())
 		return "", nil, err
@@ -86,29 +80,35 @@ func GetSubtreePortfolioFx(w http.ResponseWriter, r *http.Request) (string, inte
 	return string(rawResp), resp, err
 }
 
-type Child struct {
-	Uid string `bigquery:"nodeUid"`
+func getProducersMap(role string, nodeUid string) (map[string]models.NetworkTreeElement, error) {
+	producersMap := make(map[string]models.NetworkTreeElement)
+	if role != models.UserRoleAdmin {
+		node, err := network.GetNodeByUid(nodeUid)
+		if err != nil {
+			log.Printf("error fetching node %s from Firestore: %s", nodeUid, err.Error())
+			return nil, err
+		}
+
+		children, err := node.GetChildren()
+		if err != nil {
+			log.Printf("error fetching node %s children: %s", node.Uid, err.Error())
+			return nil, err
+		}
+
+		producersMap[nodeUid] = models.NetworkTreeElement{
+			ParentUid: node.ParentUid,
+			NodeUid:   node.Uid,
+			Name:      node.GetName(),
+		}
+
+		for _, child := range children {
+			producersMap[child.NodeUid] = child
+		}
+	}
+	return producersMap, nil
 }
 
-func getNodeChildren(nodeUid string) ([]string, error) {
-	baseQuery := fmt.Sprintf("SELECT nodeUid FROM `%s.%s` WHERE ", models.WoptaDataset, models.NetworkTreeStructureTable)
-	whereClause := fmt.Sprintf("rootUid = '%s'", nodeUid)
-	query := fmt.Sprintf("%s %s", baseQuery, whereClause)
-	result, err := lib.QueryRowsBigQuery[Child](query)
-	if err != nil {
-		log.Printf("error fetching children from BigQuery for node %s: %s", nodeUid, err.Error())
-		return nil, err
-	}
-
-	ch := make([]string, 0)
-	for _, r := range result {
-		ch = append(ch, r.Uid)
-	}
-
-	return ch, nil
-}
-
-func getPortfolioPoliciesV2(producersUid []string, requestQueries []models.Query, limit int) ([]PolicyInfo, error) {
+func getPortfolioPoliciesV2(producersMap map[string]models.NetworkTreeElement, requestQueries []models.Query, limit int) ([]PolicyInfo, error) {
 	var (
 		err error
 	)
@@ -135,7 +135,7 @@ func getPortfolioPoliciesV2(producersUid []string, requestQueries []models.Query
 	}
 
 	values := make([]interface{}, 0)
-	for _, p := range producersUid {
+	for _, p := range lib.GetMapKeys(producersMap) {
 		values = append(values, p)
 	}
 
@@ -164,7 +164,7 @@ func getPortfolioPoliciesV2(producersUid []string, requestQueries []models.Query
 			PriceMonthly:   policy.PriceGrossMonthly,
 			StartDate:      policy.StartDate,
 			EndDate:        policy.EndDate,
-			Producer:       policy.ProducerCode,
+			Producer:       producersMap[policy.ProducerUid].Name,
 			PaymentSplit:   policy.PaymentSplit,
 		})
 	}
