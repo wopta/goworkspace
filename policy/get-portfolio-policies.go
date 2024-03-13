@@ -11,6 +11,7 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
+// DEPRECATED
 func GetPortfolioPoliciesFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		request  GetPoliciesReq
