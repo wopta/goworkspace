@@ -137,6 +137,7 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 
 	// Update policy if needed
 	if !policy.IsPay {
+		policy.SanitizePaymentData()
 		// Create/Update document on user collection based on contractor fiscalCode
 		err = plc.SetUserIntoPolicyContractor(&policy, origin)
 		if err != nil {

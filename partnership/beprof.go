@@ -59,7 +59,7 @@ func beProfLifePartnership(jwtData string, policy *models.Policy, _ *models.Prod
 		policy.PartnershipData = claims.ToMap()
 
 		quotedPolicy, err := quote.Life(*policy, models.ECommerceChannel, partnershipNode, nil, models.ECommerceFlow)
-		policy = &quotedPolicy
+		*policy = quotedPolicy
 
 		return err
 	}

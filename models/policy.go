@@ -359,3 +359,39 @@ func (policy *Policy) GetNumberOfRates() int {
 func (policy *Policy) GetDurationInYears() int {
 	return policy.EndDate.Year() - policy.StartDate.Year()
 }
+
+func (policy *Policy) SanitizePaymentData() {
+	if policy.Payment == "" || policy.Payment == "fabrik" {
+		policy.Payment = FabrickPaymentProvider
+	}
+
+	if policy.PaymentSplit == string(PaySplitYear) {
+		policy.PaymentSplit = string(PaySplitYearly)
+	}
+
+	if policy.PaymentMode == "" {
+		if policy.PaymentSplit == string(PaySplitYearly) {
+			policy.PaymentMode = PaymentModeSingle
+		} else {
+			policy.PaymentMode = PaymentModeRecurrent
+		}
+	}
+}
+
+func (policy *Policy) CheckStartDateValidity() error {
+	if policy.CompanyEmit {
+		return nil
+	}
+
+	truncateDuration := 24 * time.Hour
+
+	now := time.Now().UTC().Truncate(truncateDuration)
+	lastValidDate := policy.StartDate.Truncate(truncateDuration).AddDate(0, 0, 7)
+
+	// TODO: consider moving validity period into product
+	if lastValidDate.Before(now) {
+		return fmt.Errorf("policy start date expired")
+	}
+
+	return nil
+}

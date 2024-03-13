@@ -145,6 +145,7 @@ func SendMail(obj MailRequest) {
 		headers["To"] = _to
 		headers["Subject"] = subj
 		headers["Cc"] = obj.Cc
+		headers["Bcc"] = obj.Bcc
 
 		// Setup message
 		message := ""
@@ -221,6 +222,13 @@ func SendMail(obj MailRequest) {
 			// TODO: in the future we might need to handle multiple Ccs
 			log.Printf("[SendMail] setting cc to: %s", obj.Cc)
 			err = c.Rcpt(obj.Cc)
+			lib.CheckError(err)
+		}
+
+		if obj.Bcc != "" {
+			// TODO: in the future we might need to handle multiple Bccs
+			log.Printf("[SendMail] setting bcc to: %s", obj.Bcc)
+			err = c.Rcpt(obj.Bcc)
 			lib.CheckError(err)
 		}
 

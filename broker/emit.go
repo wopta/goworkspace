@@ -103,6 +103,10 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		sendEmail = *request.SendEmail
 	}
 
+	if err := policy.CheckStartDateValidity(); err != nil {
+		return "", "", err
+	}
+
 	emitUpdatePolicy(&policy, request)
 
 	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
@@ -250,31 +254,19 @@ func brokerUpdatePolicy(policy *models.Policy, request BrokerBaseRequest) {
 		log.Println("[brokerUpdatePolicy] inject policy payment split from request")
 		policy.PaymentSplit = request.PaymentSplit
 	}
-	if policy.PaymentSplit == string(models.PaySplitYear) {
-		log.Println("[brokerUpdatePolicy] rectify paysplit year into yearly")
-		policy.PaymentSplit = string(models.PaySplitYearly)
-	}
+
 	if policy.Payment == "" {
 		log.Println("[brokerUpdatePolicy] inject policy payment provider from request")
 		policy.Payment = request.Payment
 	}
-	if policy.Payment == "" || policy.Payment == "fabrik" {
-		policy.Payment = models.FabrickPaymentProvider
-	}
+
 	if policy.PaymentMode == "" {
 		log.Println("[brokerUpdatePolicy] inject policy payment mode from request")
 		policy.PaymentMode = request.PaymentMode
 	}
-	if policy.PaymentMode == "" {
-		if policy.PaymentSplit == string(models.PaySplitYearly) || policy.PaymentSplit == string(models.PaySplitSingleInstallment) {
-			log.Println("[brokerUpdatePolicy] inject policy payment mode from fallback")
-			policy.PaymentMode = models.PaymentModeSingle
-		}
-		if policy.PaymentSplit == string(models.PaySplitMonthly) {
-			log.Println("[brokerUpdatePolicy] inject policy payment mode from fallback")
-			policy.PaymentMode = models.PaymentModeRecurrent
-		}
-	}
+
+	policy.SanitizePaymentData()
+
 	log.Println("[brokerUpdatePolicy] end --------------------------------------")
 }
 

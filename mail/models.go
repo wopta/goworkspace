@@ -14,15 +14,15 @@ type Data struct {
 
 type BodyData struct {
 	ContractorName       string
-	ContractorSurname    string
 	ContractorFiscalCode string
-	AgentName            string
-	AgentSurname         string
-	AgentMail            string
-	AgencyName           string
-	AgencyMail           string
+	NetworkNodeEmail     string
+	NetworkNodeName      string
 	ProductForm          string
 	ProductName          string
+	ProductSlug          string
+	SignUrl              string
+	PayUrl               string
+	PaymentMode          string
 	InformationSetsUrl   string
 	ProposalNumber       int
 	ExtraContent         []string
@@ -49,6 +49,7 @@ type MailRequest struct {
 	IsAttachment bool          `json:"isAttachment,omitempty"`
 	Attachments  *[]Attachment `json:"attachments,omitempty"`
 	Cc           string        `json:"cc,omitempty"`
+	Bcc          string        `json:"bcc,omitempty"`
 	TemplateName string        `json:"templateName,omitempty"`
 	Title        string        `json:"title,omitempty"`
 	SubTitle     string        `json:"subTitle,omitempty"`

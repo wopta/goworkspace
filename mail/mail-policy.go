@@ -16,16 +16,15 @@ const (
 	proposalTemplateType         = "proposal"
 	payTemplateType              = "pay"
 	signTemplateType             = "sign"
-	emittedTemplateType          = "emitted"
+	contractTemplateType         = "contract"
 	reservedTemplateType         = "reserved"
 	reservedApprovedTemplateType = "approved"
 	reservedRejectedTemplateType = "rejected"
 	linkFormat                   = "https://storage.googleapis.com/documents-public-dev/information-sets/%s/%s/Precontrattuale.pdf"
 )
 
-func SendMailLead(policy models.Policy, from, to, cc Address, flowName string) {
+func SendMailLead(policy models.Policy, from, to, cc Address, flowName string, attachmentNames []string) {
 	var (
-		link     = fmt.Sprintf(linkFormat, policy.Name, policy.ProductVersion)
 		bodyData = BodyData{}
 	)
 
@@ -39,18 +38,19 @@ func SendMailLead(policy models.Policy, from, to, cc Address, flowName string) {
 	subtitle := "Documenti precontrattuali"
 	subject := fmt.Sprintf("%s %s", title, subtitle)
 
+	at := getMailAttachments(policy, attachmentNames)
+
 	SendMail(MailRequest{
-		FromAddress: from,
-		To:          []string{to.Address},
-		Cc:          cc.Address,
-		Message:     messageBody,
-		Title:       title,
-		SubTitle:    subtitle,
-		Subject:     subject,
-		IsHtml:      true,
-		IsLink:      true,
-		Link:        link,
-		LinkLabel:   "Leggi documentazione",
+		FromAddress:  from,
+		To:           []string{to.Address},
+		Cc:           cc.Address,
+		Message:      messageBody,
+		Title:        title,
+		SubTitle:     subtitle,
+		Subject:      subject,
+		IsHtml:       true,
+		IsAttachment: len(at) > 0,
+		Attachments:  &at,
 	})
 }
 
@@ -78,9 +78,6 @@ func SendMailPay(policy models.Policy, from, to, cc Address, flowName string) {
 		SubTitle:    subtitle,
 		Subject:     subject,
 		IsHtml:      true,
-		IsLink:      true,
-		Link:        policy.PayUrl,
-		LinkLabel:   "Paga la tua polizza",
 	})
 }
 
@@ -108,9 +105,6 @@ func SendMailSign(policy models.Policy, from, to, cc Address, flowName string) {
 		SubTitle:    subtitle,
 		Subject:     subject,
 		IsHtml:      true,
-		IsLink:      true,
-		Link:        policy.SignUrl,
-		LinkLabel:   "Firma la tua polizza",
 	})
 }
 
@@ -121,7 +115,7 @@ func SendMailContract(policy models.Policy, at *[]Attachment, from, to, cc Addre
 
 	setBodyData(policy, &bodyData)
 
-	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", flowName, emittedTemplateType))
+	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", flowName, contractTemplateType))
 
 	messageBody := fillTemplate(templateFile, &bodyData)
 
@@ -151,11 +145,13 @@ func SendMailContract(policy models.Policy, at *[]Attachment, from, to, cc Addre
 		FromAddress:  from,
 		To:           []string{to.Address},
 		Cc:           cc.Address,
+		Bcc:          os.Getenv("BCC_CONTRACT_EMAIL"),
 		Message:      messageBody,
 		Title:        policy.NameDesc,
 		SubTitle:     subtitle,
 		Subject:      subject,
 		IsHtml:       true,
+		IsApp:        true,
 		IsAttachment: true,
 		Attachments:  at,
 	})
@@ -171,7 +167,7 @@ func SendMailReserved(policy models.Policy, from, to, cc Address, flowName strin
 
 	setBodyData(policy, &bodyData)
 
-	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", flowName, reservedTemplateType))
+	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s-%s.html", flowName, reservedTemplateType, policy.Name))
 
 	messageBody := fillTemplate(templateFile, &bodyData)
 
@@ -237,12 +233,12 @@ func SendMailReservedResult(policy models.Policy, from, to, cc Address, flowName
 	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", flowName, template))
 
 	title := fmt.Sprintf(
-		"Wopta per te %s - Proposta %d di %s %s",
+		"Wopta per te %s - Proposta %d di %s",
 		bodyData.ProductName,
 		policy.ProposalNumber,
-		bodyData.ContractorSurname,
 		bodyData.ContractorName,
 	)
+	// TODO: handle multiple products reserved subtitle
 	subtitle := "Esito valutazione medica assuntiva"
 	subject := fmt.Sprintf("%s - %s", title, subtitle)
 
@@ -264,7 +260,7 @@ func SendMailProposal(policy models.Policy, from, to, cc Address, flowName strin
 	var (
 		at       []Attachment
 		bodyData = BodyData{}
-		link     = fmt.Sprintf(linkFormat, policy.Name, policy.ProductVersion)
+		// link     = fmt.Sprintf(linkFormat, policy.Name, policy.ProductVersion)
 	)
 
 	setBodyData(policy, &bodyData)
@@ -290,8 +286,8 @@ func SendMailProposal(policy models.Policy, from, to, cc Address, flowName strin
 		IsHtml:       true,
 		IsAttachment: true,
 		Attachments:  &at,
-		IsLink:       true,
-		Link:         link,
-		LinkLabel:    "Leggi documentazione",
+		// IsLink:       true,
+		// Link:         link,
+		// LinkLabel:    "Leggi documentazione",
 	})
 }
