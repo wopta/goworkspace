@@ -103,6 +103,7 @@ func sendLeadMail(state *bpmn.State) error {
 	policy := state.Data
 
 	toAddress = mail.GetContractorEmail(policy)
+	ccAddress = mail.Address{}
 	switch flowName {
 	case models.ProviderMgaFlow, models.RemittanceMgaFlow:
 		ccAddress = mail.GetNetworkNodeEmail(networkNode)
@@ -151,6 +152,7 @@ func sendProposalMail(state *bpmn.State) error {
 	}
 
 	toAddress = mail.GetContractorEmail(policy)
+	ccAddress = mail.Address{}
 	switch flowName {
 	case models.ProviderMgaFlow, models.RemittanceMgaFlow:
 		ccAddress = mail.GetNetworkNodeEmail(networkNode)
@@ -194,6 +196,7 @@ func sendRequestApprovalMail(state *bpmn.State) error {
 	}
 
 	toAddress = mail.GetContractorEmail(policy)
+	ccAddress = mail.Address{}
 	switch flowName {
 	case models.ProviderMgaFlow, models.RemittanceMgaFlow:
 		ccAddress = mail.GetNetworkNodeEmail(networkNode)
@@ -231,6 +234,7 @@ func emitData(state *bpmn.State) error {
 func sendMailSign(state *bpmn.State) error {
 	policy := state.Data
 
+	ccAddress = mail.Address{}
 	switch flowName {
 	case models.ProviderMgaFlow, models.RemittanceMgaFlow:
 		if sendEmail {
@@ -264,6 +268,7 @@ func sendMailInformationSet(state *bpmn.State) error {
 	}
 
 	toAddress = mail.GetContractorEmail(policy)
+	ccAddress = mail.Address{}
 	switch flowName {
 	case models.ProviderMgaFlow, models.RemittanceMgaFlow:
 		ccAddress = mail.GetNetworkNodeEmail(networkNode)
