@@ -23,13 +23,13 @@ func Policy(w http.ResponseWriter, r *http.Request) {
 			{
 				Route:   "fiscalcode/v1/:fiscalcode",
 				Handler: GetPolicyByFiscalCodeFx, // Broker.PolicyFiscalcode
-				Method:  "GET",
+				Method:  http.MethodGet,
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
 				Route:   "v1/:uid",
 				Handler: GetPolicyFx,
-				Method:  "GET",
+				Method:  http.MethodGet,
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
@@ -45,16 +45,22 @@ func Policy(w http.ResponseWriter, r *http.Request) {
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
+				Route:   "/node/v1",
+				Handler: GetNodePoliciesFx,
+				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager, models.UserRoleAgent, models.UserRoleAgency},
+			},
+			{
+				Route:   "/subtree/portfolio/v1",
+				Handler: GetSubtreePortfolioFx,
+				Method:  http.MethodPost,
+				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager, models.UserRoleAgent, models.UserRoleAgency},
+			},
+			{
 				Route:   "/portfolio/v1",
 				Handler: GetPortfolioPoliciesFx,
 				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAgent, models.UserRoleAgency},
-			},
-			{
-				Route:   "/subtree/portfolio/v2",
-				Handler: GetSubtreePortfolioFx,
-				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleManager, models.UserRoleAgent, models.UserRoleAgency},
 			},
 			{
 				Route:   "/media/upload/v1",
