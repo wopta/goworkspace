@@ -9,12 +9,32 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"time"
 )
+
+type PolicyInfo struct {
+	Uid            string    `json:"uid" bigquery:"uid"`
+	ProductName    string    `json:"productName" bigquery:"productName"`
+	CodeCompany    string    `json:"codeCompany" bigquery:"codeCompany"`
+	ProposalNumber int       `json:"proposalNumber" bigquery:"proposalNumber"`
+	NameDesc       string    `json:"nameDesc" bigquery:"nameDesc"`
+	Status         string    `json:"status" bigquery:"status"`
+	Contractor     string    `json:"contractor" bigquery:"contractor"`
+	Price          float64   `json:"price" bigquery:"price"`
+	PriceMonthly   float64   `json:"priceMonthly" bigquery:"priceMonthly"`
+	StartDate      time.Time `json:"startDate" bigquery:"startDate"`
+	EndDate        time.Time `json:"endDate" bigquery:"endDate"`
+	PaymentSplit   string    `json:"paymentSplit" bigquery:"paymentSplit"`
+}
+
+type GetSubtreePortfolioResp struct {
+	Policies []PolicyInfo `json:"policies"`
+}
 
 func GetSubtreePortfolioFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		req  GetPoliciesReq
-		resp GetPoliciesResp
+		resp GetSubtreePortfolioResp
 	)
 
 	log.SetPrefix("[GetSubtreePortfolioFx] ")
@@ -70,7 +90,7 @@ type Children struct {
 }
 
 func getNodeChildren(nodeUid string) ([]string, error) {
-	baseQuery := fmt.Sprintf("SELECT childUid FROM `%s.%s` WHERE ", models.WoptaDataset, "node-tree-structure")
+	baseQuery := fmt.Sprintf("SELECT nodeUid FROM `%s.%s` WHERE ", models.WoptaDataset, models.NetworkTreeStructureTable)
 	whereClause := fmt.Sprintf("rootUid = '%s'", nodeUid)
 	query := fmt.Sprintf("%s %s", baseQuery, whereClause)
 	result, err := lib.QueryRowsBigQuery[Children](query)
@@ -87,10 +107,12 @@ func getNodeChildren(nodeUid string) ([]string, error) {
 	return ch, nil
 }
 
-func getPortfolioPoliciesV2(producerUid []string, requestQueries []models.Query, limit int) (policies []models.Policy, err error) {
+func getPortfolioPoliciesV2(producerUid []string, requestQueries []models.Query, limit int) ([]PolicyInfo, error) {
+	var (
+		err error
+	)
 	if len(requestQueries) == 0 {
-		err = errors.New("no query specified")
-		return
+		return nil, errors.New("no query specified")
 	}
 
 	var (
@@ -122,5 +144,28 @@ func getPortfolioPoliciesV2(producerUid []string, requestQueries []models.Query,
 		Values: values,
 	})
 
-	return GetPoliciesByQueriesBigQuery(models.WoptaDataset, models.PoliciesViewCollection, queries, limitValue)
+	policies, err := GetPoliciesByQueriesBigQuery(models.WoptaDataset, models.PoliciesViewCollection, queries, limitValue)
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]PolicyInfo, 0)
+	for _, policy := range policies {
+		result = append(result, PolicyInfo{
+			Uid:            policy.Uid,
+			ProductName:    policy.Name,
+			CodeCompany:    policy.CodeCompany,
+			ProposalNumber: policy.ProposalNumber,
+			NameDesc:       policy.NameDesc,
+			Status:         policy.Status,
+			Contractor:     policy.Contractor.Name + " " + policy.Contractor.Surname,
+			Price:          policy.PriceGross,
+			PriceMonthly:   policy.PriceGrossMonthly,
+			StartDate:      policy.StartDate,
+			EndDate:        policy.EndDate,
+			PaymentSplit:   policy.PaymentSplit,
+		})
+	}
+
+	return result, err
 }
