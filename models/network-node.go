@@ -257,8 +257,6 @@ func (nn *NetworkNode) GetAncestors() ([]NetworkTreeElement, error) {
 		err error
 	)
 
-	log.Printf("Fetching ancestors for node %s", nn.Uid)
-
 	baseQuery := fmt.Sprintf("SELECT * FROM `%s.%s` WHERE ", WoptaDataset, NetworkTreeStructureTable)
 	whereClause := fmt.Sprintf("nodeUid = '%s'", nn.Uid)
 	query := fmt.Sprintf("%s %s %s", baseQuery, whereClause, "ORDER BY absoluteLevel")
@@ -276,8 +274,6 @@ func (nn *NetworkNode) GetChildren() ([]NetworkTreeElement, error) {
 		err error
 	)
 
-	log.Printf("Fetching children for node %s", nn.Uid)
-
 	baseQuery := fmt.Sprintf("SELECT * FROM `%s.%s` WHERE ", WoptaDataset, NetworkTreeStructureTable)
 	whereClause := fmt.Sprintf("rootUid = '%s'", nn.Uid)
 	query := fmt.Sprintf("%s %s %s", baseQuery, whereClause, "ORDER BY absoluteLevel")
@@ -288,4 +284,11 @@ func (nn *NetworkNode) GetChildren() ([]NetworkTreeElement, error) {
 	}
 
 	return children, nil
+}
+
+func (nn *NetworkNode) IsParentOf(nodeUid string) bool {
+	children, _ := nn.GetChildren()
+	return len(lib.SliceFilter(children, func(child NetworkTreeElement) bool {
+		return child.NodeUid == nodeUid
+	})) == 1
 }
