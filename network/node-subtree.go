@@ -92,7 +92,7 @@ func checkAccess(idToken, nodeUid string) error {
 	)
 	if authToken.Role != models.UserRoleAdmin && authToken.UserID != nodeUid {
 		baseQuery := fmt.Sprintf("SELECT * FROM `%s.%s` WHERE ", models.WoptaDataset, models.NetworkTreeStructureTable)
-		whereClause := fmt.Sprintf("rootUid = '%s' AND childUid = '%s'", authToken.UserID, nodeUid)
+		whereClause := fmt.Sprintf("rootUid = '%s' AND nodeUid = '%s'", authToken.UserID, nodeUid)
 		query := fmt.Sprintf("%s %s", baseQuery, whereClause)
 		result, err := lib.QueryRowsBigQuery[models.NetworkTreeElement](query)
 		if err != nil {
