@@ -22,6 +22,7 @@ type PolicyInfo struct {
 	Contractor     string    `json:"contractor" bigquery:"contractor"`
 	Price          float64   `json:"price" bigquery:"price"`
 	PriceMonthly   float64   `json:"priceMonthly" bigquery:"priceMonthly"`
+	Producer       string    `json:"producer" bigquery:"producer"`
 	StartDate      time.Time `json:"startDate" bigquery:"startDate"`
 	EndDate        time.Time `json:"endDate" bigquery:"endDate"`
 	PaymentSplit   string    `json:"paymentSplit" bigquery:"paymentSplit"`
@@ -85,15 +86,15 @@ func GetSubtreePortfolioFx(w http.ResponseWriter, r *http.Request) (string, inte
 	return string(rawResp), resp, err
 }
 
-type Children struct {
-	Uid string `bigquery:"childUid"`
+type Child struct {
+	Uid string `bigquery:"nodeUid"`
 }
 
 func getNodeChildren(nodeUid string) ([]string, error) {
 	baseQuery := fmt.Sprintf("SELECT nodeUid FROM `%s.%s` WHERE ", models.WoptaDataset, models.NetworkTreeStructureTable)
 	whereClause := fmt.Sprintf("rootUid = '%s'", nodeUid)
 	query := fmt.Sprintf("%s %s", baseQuery, whereClause)
-	result, err := lib.QueryRowsBigQuery[Children](query)
+	result, err := lib.QueryRowsBigQuery[Child](query)
 	if err != nil {
 		log.Printf("error fetching children from BigQuery for node %s: %s", nodeUid, err.Error())
 		return nil, err
@@ -107,7 +108,7 @@ func getNodeChildren(nodeUid string) ([]string, error) {
 	return ch, nil
 }
 
-func getPortfolioPoliciesV2(producerUid []string, requestQueries []models.Query, limit int) ([]PolicyInfo, error) {
+func getPortfolioPoliciesV2(producersUid []string, requestQueries []models.Query, limit int) ([]PolicyInfo, error) {
 	var (
 		err error
 	)
@@ -134,7 +135,7 @@ func getPortfolioPoliciesV2(producerUid []string, requestQueries []models.Query,
 	}
 
 	values := make([]interface{}, 0)
-	for _, p := range producerUid {
+	for _, p := range producersUid {
 		values = append(values, p)
 	}
 
@@ -163,6 +164,7 @@ func getPortfolioPoliciesV2(producerUid []string, requestQueries []models.Query,
 			PriceMonthly:   policy.PriceGrossMonthly,
 			StartDate:      policy.StartDate,
 			EndDate:        policy.EndDate,
+			Producer:       policy.ProducerCode,
 			PaymentSplit:   policy.PaymentSplit,
 		})
 	}
