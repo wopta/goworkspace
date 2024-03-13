@@ -11,4 +11,5 @@ type NetworkTreeElement struct {
 	RelativeLevel int                   `json:"relativeLevel" bigquery:"relativeLevel"`
 	CreationDate  bigquery.NullDateTime `json:"-" bigquery:"creationDate"`
 	Ancestors     []NetworkTreeElement  `json:"ancestors,omitempty" bigquery:"-"`
+	Children      []NetworkTreeElement  `json:"children,omitempty" bigquery:"-"`
 }
