@@ -251,3 +251,41 @@ func (nn *NetworkNode) GetAddress() string {
 
 	return address
 }
+
+func (nn *NetworkNode) GetAncestors() ([]NetworkTreeElement, error) {
+	var (
+		err error
+	)
+
+	log.Printf("Fetching ancestors for node %s", nn.Uid)
+
+	baseQuery := fmt.Sprintf("SELECT * FROM `%s.%s` WHERE ", WoptaDataset, NetworkTreeStructureTable)
+	whereClause := fmt.Sprintf("nodeUid = '%s'", nn.Uid)
+	query := fmt.Sprintf("%s %s %s", baseQuery, whereClause, "ORDER BY absoluteLevel")
+	ancestors, err := lib.QueryRowsBigQuery[NetworkTreeElement](query)
+	if err != nil {
+		log.Printf("error fetching ancestors from BigQuery for node %s: %s", nn.Uid, err.Error())
+		return nil, err
+	}
+
+	return ancestors, nil
+}
+
+func (nn *NetworkNode) GetChildren() ([]NetworkTreeElement, error) {
+	var (
+		err error
+	)
+
+	log.Printf("Fetching children for node %s", nn.Uid)
+
+	baseQuery := fmt.Sprintf("SELECT * FROM `%s.%s` WHERE ", WoptaDataset, NetworkTreeStructureTable)
+	whereClause := fmt.Sprintf("rootUid = '%s'", nn.Uid)
+	query := fmt.Sprintf("%s %s %s", baseQuery, whereClause, "ORDER BY absoluteLevel")
+	children, err := lib.QueryRowsBigQuery[NetworkTreeElement](query)
+	if err != nil {
+		log.Printf("error fetching children from BigQuery for node %s: %s", nn.Uid, err.Error())
+		return nil, err
+	}
+
+	return children, nil
+}
