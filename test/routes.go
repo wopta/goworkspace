@@ -4,14 +4,14 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
+	"github.com/GoogleCloudPlatform/functions-framework-go/funcframework"
 )
 
 var mux = newMux()
 
 func init() {
 	log.Println("INIT Test")
-	functions.HTTP("Test", mux.ServeHTTP)
+	funcframework.RegisterHTTPFunction("Test", mux.ServeHTTP)
 }
 
 func newMux() *http.ServeMux {
