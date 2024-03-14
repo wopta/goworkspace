@@ -3,12 +3,11 @@ package policy
 import (
 	"encoding/json"
 	"errors"
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 	"io"
 	"log"
 	"net/http"
-
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
 )
 
 // DEPRECATED
@@ -33,12 +32,16 @@ func GetPortfolioPoliciesFx(w http.ResponseWriter, r *http.Request) (string, int
 	err = json.Unmarshal(body, &request)
 	lib.CheckError(err)
 
-	response.Policies, err = getPortfolioPolicies(authToken.UserID, request.Queries, request.Limit)
+	policies, err := getPortfolioPolicies(authToken.UserID, request.Queries, request.Limit)
 	if err != nil {
 		log.Println("[GetPortfolioPoliciesFx] query error: ", err.Error())
 		return "", nil, err
 	}
 	log.Printf("[GetPortfolioPoliciesFx]: found %d policies", len(response.Policies))
+
+	response.Policies = lib.SliceMap(policies, func(policy models.Policy) PolicyInfo {
+		return policyToPolicyInfo(policy, "")
+	})
 
 	jsonOut, err := json.Marshal(response)
 

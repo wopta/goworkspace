@@ -19,13 +19,14 @@ type GetPoliciesReq struct {
 }
 
 type GetPoliciesResp struct {
-	Policies []models.Policy `json:"policies"`
+	Policies []PolicyInfo `json:"policies"`
 }
 
 func GetPoliciesByQueryFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		req        GetPoliciesReq
-		response   GetPoliciesResp
+		req      GetPoliciesReq
+		response GetPoliciesResp
+		policies []models.Policy
 	)
 	log.Println("[GetPoliciesByQueryFx] Handler start ----------------------------------------")
 
@@ -36,12 +37,20 @@ func GetPoliciesByQueryFx(w http.ResponseWriter, r *http.Request) (string, inter
 	err := json.Unmarshal(body, &req)
 	lib.CheckError(err)
 
-	response.Policies, err = getPoliciesByQuery(req.Queries, req.Limit)
+	policies, err = getPoliciesByQuery(req.Queries, req.Limit)
 	if err != nil {
 		log.Println("[GetPoliciesByQueryFx] query error: ", err.Error())
 		return "", nil, errors.New("query error")
 	}
 	log.Printf("[GetPoliciesByQueryFx]: found %d policies", len(response.Policies))
+
+	for _, p := range policies {
+		response.Policies = append(response.Policies, policyToPolicyInfo(p, ""))
+	}
+
+	response.Policies = lib.SliceMap(policies, func(p models.Policy) PolicyInfo {
+		return policyToPolicyInfo(p, "")
+	})
 
 	jsonOut, err := json.Marshal(response)
 

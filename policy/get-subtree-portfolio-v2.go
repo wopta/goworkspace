@@ -23,6 +23,7 @@ type PolicyInfo struct {
 	Price          float64   `json:"price" bigquery:"price"`
 	PriceMonthly   float64   `json:"priceMonthly" bigquery:"priceMonthly"`
 	Producer       string    `json:"producer" bigquery:"producer"`
+	ProducerCode   string    `json:"producerCode" bigquery:"-"`
 	StartDate      time.Time `json:"startDate" bigquery:"startDate"`
 	EndDate        time.Time `json:"endDate" bigquery:"endDate"`
 	PaymentSplit   string    `json:"paymentSplit" bigquery:"paymentSplit"`

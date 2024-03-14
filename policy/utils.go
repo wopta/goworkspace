@@ -209,6 +209,7 @@ func policyToPolicyInfo(policy models.Policy, producerName string) PolicyInfo {
 		Price:          policy.PriceGross,
 		PriceMonthly:   policy.PriceGrossMonthly,
 		Producer:       producerName,
+		ProducerCode:   policy.ProducerCode,
 		StartDate:      policy.StartDate,
 		EndDate:        policy.EndDate,
 		PaymentSplit:   policy.PaymentSplit,
