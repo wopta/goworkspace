@@ -7,7 +7,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
+	// "github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
@@ -18,10 +18,10 @@ var (
 	signatureID = 0
 )
 
-func init() {
-	log.Println("INIT Test")
-	functions.HTTP("Test", Test)
-}
+// func init() {
+// 	log.Println("INIT Test")
+// 	functions.HTTP("Test", Test)
+// }
 
 func Test(w http.ResponseWriter, r *http.Request) {
 	log.Println("Test")
