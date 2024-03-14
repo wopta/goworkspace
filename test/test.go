@@ -23,7 +23,7 @@ var (
 // 	functions.HTTP("Test", Test)
 // }
 
-func Test(w http.ResponseWriter, r *http.Request) {
+func TestOld(w http.ResponseWriter, r *http.Request) {
 	log.Println("Test")
 	lib.EnableCors(&w, r)
 
