@@ -336,7 +336,15 @@ func CheckFiscalCode(user models.User) error {
 		birthDayCode = strings.ReplaceAll(birthDayCode, string(char), strconv.Itoa(index))
 		birthPlaceCode = strings.ReplaceAll(birthPlaceCode, string(char), strconv.Itoa(index))
 	}
-	normalizedFiscalCode := user.FiscalCode[:6] + birthYearCode + string(user.FiscalCode[8]) + birthDayCode + string(user.FiscalCode[11]) + birthPlaceCode + string(user.FiscalCode[len(user.FiscalCode)-1])
+	normalizedFiscalCode := user.FiscalCode[:6] + birthYearCode + string(user.FiscalCode[8]) + birthDayCode +
+		string(user.FiscalCode[11]) + birthPlaceCode
+	controlCharacter, err := calculateControlCharacter(normalizedFiscalCode[:3], normalizedFiscalCode[3:6],
+		normalizedFiscalCode[6:11], normalizedFiscalCode[11:])
+	if err != nil {
+		log.Printf("error getting control character: %s", err.Error())
+		return err
+	}
+	normalizedFiscalCode += controlCharacter
 
 	_, computedUser, err := CalculateFiscalCode(user)
 	if err != nil {
