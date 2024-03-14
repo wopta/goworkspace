@@ -110,17 +110,15 @@ func getProducersMap(role string, nodeUid string) (map[string]models.NetworkTree
 
 func getPortfolioPoliciesV2(producersMap map[string]models.NetworkTreeElement, requestQueries []models.Query, limit int) ([]PolicyInfo, error) {
 	var (
-		err error
+		err        error
+		fieldName  = "producerUid"
+		limitValue = 25
+		queries    []models.Query
 	)
 	if len(requestQueries) == 0 {
 		return nil, errors.New("no query specified")
 	}
 
-	var (
-		fieldName  = "producerUid"
-		limitValue = 25
-		queries    []models.Query
-	)
 	if limit != 0 {
 		limitValue = limit
 	}
