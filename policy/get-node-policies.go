@@ -12,7 +12,10 @@ import (
 )
 
 type GetNodePoliciesReq struct {
-	NodeUid string `json:"nodeUid"`
+	NodeUid string         `json:"nodeUid"`
+	Queries []models.Query `json:"queries,omitempty"`
+	Limit   int            `json:"limit"`
+	Page    int            `json:"page"`
 }
 
 func GetNodePoliciesFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -48,31 +51,22 @@ func GetNodePoliciesFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		return "", nil, err
 	}
 
+	reqNode, err := network.GetNodeByUid(req.NodeUid)
+	if err != nil {
+		log.Printf("error fetching node %s from Firestore: %s", authToken.UserID, err.Error())
+		return "", nil, err
+	}
+
 	if authToken.Role != models.UserRoleAdmin && authToken.UserID != req.NodeUid && !node.IsParentOf(req.NodeUid) {
 		log.Printf("cannot access to node %s policies", req.NodeUid)
 		return "", nil, errors.New("cannot access to node policies")
 	}
 
-	// TODO: implement query on BigQuery
-	docsnap := lib.WhereFirestore(models.PolicyCollection, "producerUid", "==", req.NodeUid)
-	tmpPolicies := models.PolicyToListData(docsnap)
+	result, err := getPortfolioPoliciesV2([]string{req.NodeUid}, req.Queries, req.Limit)
 
-	for _, p := range tmpPolicies {
-		policies = append(policies, PolicyInfo{
-			Uid:            p.Uid,
-			ProductName:    p.Name,
-			CodeCompany:    p.CodeCompany,
-			ProposalNumber: p.ProposalNumber,
-			NameDesc:       p.NameDesc,
-			Status:         p.Status,
-			Contractor:     p.Contractor.Name + " " + p.Contractor.Surname,
-			Price:          p.PriceGross,
-			PriceMonthly:   p.PriceGrossMonthly,
-			Producer:       node.GetName(),
-			StartDate:      p.StartDate,
-			EndDate:        p.EndDate,
-			PaymentSplit:   p.PaymentSplit,
-		})
+	producerName := reqNode.GetName()
+	for _, p := range result {
+		policies = append(policies, policyToPolicyInfo(p, producerName))
 	}
 
 	rawPolices, err := json.Marshal(policies)

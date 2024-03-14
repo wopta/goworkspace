@@ -65,12 +65,16 @@ func GetSubtreePortfolioFx(w http.ResponseWriter, r *http.Request) (string, inte
 		return "", nil, err
 	}
 
-	resp.Policies, err = getPortfolioPoliciesV2(producersMap, req.Queries, req.Limit)
+	result, err := getPortfolioPoliciesV2(lib.GetMapKeys(producersMap), req.Queries, req.Limit)
 	if err != nil {
 		log.Printf("error query: %s", err.Error())
 		return "", nil, err
 	}
 	log.Printf("found %02d policies", len(resp.Policies))
+
+	for _, policy := range result {
+		resp.Policies = append(resp.Policies, policyToPolicyInfo(policy, producersMap[policy.ProducerUid].Name))
+	}
 
 	rawResp, err := json.Marshal(resp)
 
@@ -108,7 +112,7 @@ func getProducersMap(role string, nodeUid string) (map[string]models.NetworkTree
 	return producersMap, nil
 }
 
-func getPortfolioPoliciesV2(producersMap map[string]models.NetworkTreeElement, requestQueries []models.Query, limit int) ([]PolicyInfo, error) {
+func getPortfolioPoliciesV2(producers []string, requestQueries []models.Query, limit int) ([]models.Policy, error) {
 	var (
 		err        error
 		fieldName  = "producerUid"
@@ -133,7 +137,7 @@ func getPortfolioPoliciesV2(producersMap map[string]models.NetworkTreeElement, r
 	}
 
 	values := make([]interface{}, 0)
-	for _, p := range lib.GetMapKeys(producersMap) {
+	for _, p := range producers {
 		values = append(values, p)
 	}
 
@@ -148,24 +152,5 @@ func getPortfolioPoliciesV2(producersMap map[string]models.NetworkTreeElement, r
 		return nil, err
 	}
 
-	result := make([]PolicyInfo, 0)
-	for _, policy := range policies {
-		result = append(result, PolicyInfo{
-			Uid:            policy.Uid,
-			ProductName:    policy.Name,
-			CodeCompany:    policy.CodeCompany,
-			ProposalNumber: policy.ProposalNumber,
-			NameDesc:       policy.NameDesc,
-			Status:         policy.Status,
-			Contractor:     policy.Contractor.Name + " " + policy.Contractor.Surname,
-			Price:          policy.PriceGross,
-			PriceMonthly:   policy.PriceGrossMonthly,
-			StartDate:      policy.StartDate,
-			EndDate:        policy.EndDate,
-			Producer:       producersMap[policy.ProducerUid].Name,
-			PaymentSplit:   policy.PaymentSplit,
-		})
-	}
-
-	return result, err
+	return policies, err
 }
