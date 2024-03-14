@@ -5,8 +5,6 @@ import (
 	"net/http"
 )
 
-var mux = newMux()
-
 func newMux() *http.ServeMux {
 	log.Println("Creating Test mux...")
 	mux := http.NewServeMux()
@@ -16,6 +14,7 @@ func newMux() *http.ServeMux {
 }
 
 func Test(w http.ResponseWriter, r *http.Request) {
+	mux := newMux()
 	mux.ServeHTTP(w, r)
 }
 
