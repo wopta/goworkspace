@@ -72,7 +72,7 @@ func GetNodeSubTree(nodeUid string) (models.NetworkTreeElement, error) {
 		Name:      node.GetName(),
 	}
 
-	root = visitNode(root, subNetwork)
+	root = getNodeChildren(root, subNetwork)
 
 	return root, err
 }
@@ -107,7 +107,7 @@ func checkAccess(idToken, nodeUid string) error {
 	return nil
 }
 
-func visitNode(node models.NetworkTreeElement, allNodes []models.NetworkTreeElement) models.NetworkTreeElement {
+func getNodeChildren(node models.NetworkTreeElement, allNodes []models.NetworkTreeElement) models.NetworkTreeElement {
 	children := lib.SliceFilter(allNodes, func(structure models.NetworkTreeElement) bool {
 		return structure.ParentUid == node.NodeUid
 	})
@@ -117,7 +117,7 @@ func visitNode(node models.NetworkTreeElement, allNodes []models.NetworkTreeElem
 
 	node.Children = make([]models.NetworkTreeElement, 0)
 	for _, child := range children {
-		res := visitNode(child, allNodes)
+		res := getNodeChildren(child, allNodes)
 		node.Children = append(node.Children, res)
 	}
 	return node
