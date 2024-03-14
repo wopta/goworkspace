@@ -17,8 +17,8 @@ func init() {
 func newMux() *http.ServeMux {
 	log.Println("Creating Test mux...")
 	mux := http.NewServeMux()
-	mux.HandleFunc("/test1", test1)
-	mux.HandleFunc("/test2/param", test2)
+	mux.HandleFunc("/test/test1", test1)
+	mux.HandleFunc("/test/test2/param", test2)
 	return mux
 }
 
