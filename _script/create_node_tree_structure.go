@@ -20,15 +20,11 @@ func CreateNodeTreeStructure() {
 		panic(err)
 	}
 
-	nodesList = lib.SliceFilter(nodesList, func(node models.NetworkNode) bool {
-		return node.Type != models.PartnershipNetworkNodeType
-	})
-
-	dbNodes := lib.SliceFilter(nodesList, func(node models.NetworkNode) bool {
+	rootNodes := lib.SliceFilter(nodesList, func(node models.NetworkNode) bool {
 		return node.ParentUid == ""
 	})
 
-	toBeVisitedNodes := lib.SliceMap(dbNodes, func(node models.NetworkNode) models.NetworkTreeElement {
+	toBeVisitedNodes := lib.SliceMap(rootNodes, func(node models.NetworkNode) models.NetworkTreeElement {
 		return models.NetworkTreeElement{
 			RootUid:       node.Uid,
 			ParentUid:     "",
@@ -49,12 +45,12 @@ func CreateNodeTreeStructure() {
 		visitedNodes = append(visitedNodes, currentNode)
 	}
 
-	spreadedNodes := make([]models.NetworkTreeElement, 0)
+	treeElementRelations := make([]models.NetworkTreeElement, 0)
 	for _, nn := range visitedNodes {
-		spreadedNodes = append(spreadedNodes, spreadNodeByAncestors(nn)...)
+		treeElementRelations = append(treeElementRelations, getNodeTreeRelations(nn)...)
 	}
 
-	for _, nn := range spreadedNodes {
+	for _, nn := range treeElementRelations {
 		err = writeNodeToBigQuery(nn)
 		if err != nil {
 			log.Printf("error writing node %s to BigQuery: %s", nn.NodeUid, err.Error())
@@ -104,7 +100,7 @@ func visitNode(currentNode models.NetworkTreeElement, nodesList []models.Network
 	return toBeVisitedNodes
 }
 
-func spreadNodeByAncestors(node models.NetworkTreeElement) []models.NetworkTreeElement {
+func getNodeTreeRelations(node models.NetworkTreeElement) []models.NetworkTreeElement {
 	ancestors := make([]models.NetworkTreeElement, 0)
 	for _, a := range node.Ancestors {
 		node.RootUid = a.NodeUid
