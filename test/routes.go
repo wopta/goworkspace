@@ -35,7 +35,7 @@ func Test(w http.ResponseWriter, r *http.Request) {
 func test1(w http.ResponseWriter, r *http.Request) {
 	log.Println("test1 handler!")
 	log.Printf("Request: %s", r.RequestURI)
-	w.Write([]byte("SUCCESS!"))
+	w.Write([]byte(`{}`))
 }
 
 func test2(w http.ResponseWriter, r *http.Request) {
