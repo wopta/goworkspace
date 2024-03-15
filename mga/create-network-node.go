@@ -2,7 +2,7 @@ package mga
 
 import (
 	"encoding/json"
-	"github.com/pkg/errors"
+	"errors"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
