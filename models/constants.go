@@ -85,12 +85,13 @@ const (
 )
 
 const (
-	UserRoleAll      string = "all"
-	UserRoleCustomer string = "customer"
-	UserRoleAdmin    string = "admin"
-	UserRoleManager  string = "manager"
-	UserRoleAgent    string = "agent"
-	UserRoleAgency   string = "agency"
+	UserRoleAll         string = "all"
+	UserRoleCustomer    string = "customer"
+	UserRoleAdmin       string = "admin"
+	UserRoleManager     string = "manager"
+	UserRoleAgent       string = "agent"
+	UserRoleAgency      string = "agency"
+	UserRoleAreaManager string = "area-manager"
 )
 
 func GetAllRoles() []string {
