@@ -53,7 +53,7 @@ func GetNodePoliciesFx(w http.ResponseWriter, r *http.Request) (string, interfac
 
 	reqNode, err := network.GetNodeByUid(req.NodeUid)
 	if err != nil {
-		log.Printf("error fetching node %s from Firestore: %s", authToken.UserID, err.Error())
+		log.Printf("error fetching node %s from Firestore: %s", reqNode.Uid, err.Error())
 		return "", nil, err
 	}
 
