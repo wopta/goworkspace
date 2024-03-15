@@ -48,13 +48,13 @@ func Policy(w http.ResponseWriter, r *http.Request) {
 				Route:   "/node/v1",
 				Handler: GetNodePoliciesFx,
 				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager, models.UserRoleAgent, models.UserRoleAgency},
+				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager, models.UserRoleAreaManager, models.UserRoleAgent, models.UserRoleAgency},
 			},
 			{
 				Route:   "/subtree/portfolio/v1",
 				Handler: GetSubtreePortfolioFx,
 				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager, models.UserRoleAgent, models.UserRoleAgency},
+				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager, models.UserRoleAreaManager, models.UserRoleAgent, models.UserRoleAgency},
 			},
 			{
 				Route:   "/portfolio/v1",
