@@ -1,8 +1,11 @@
 package network
 
 import (
+	"cloud.google.com/go/bigquery"
+	"context"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"cloud.google.com/go/firestore"
@@ -113,7 +116,6 @@ func UpdateNode(node models.NetworkNode) error {
 	originalNode.Mail = node.Mail
 	originalNode.Warrant = node.Warrant
 	originalNode.Products = node.Products
-	originalNode.ParentUid = node.ParentUid
 	if originalNode.AuthId != "" && originalNode.IsActive != node.IsActive {
 		err = lib.HandleUserAuthenticationStatus(originalNode.Uid, !node.IsActive)
 		if err != nil {
@@ -132,6 +134,79 @@ func UpdateNode(node models.NetworkNode) error {
 	if originalNode.IsMgaProponent {
 		originalNode.HasAnnex = true
 	}
+
+	if originalNode.ParentUid != node.ParentUid {
+		ctx := context.Background()
+		client, err := bigquery.NewClient(ctx, os.Getenv("GOOGLE_PROJECT_ID"))
+		if err != nil {
+			log.Printf("error getting BigQuery client: %s", err.Error())
+			return err
+		}
+		defer client.Close()
+		table := fmt.Sprintf("%s.%s.%s", os.Getenv("GOOGLE_PROJECT_ID"), models.WoptaDataset, models.NetworkTreeStructureTable)
+		// Construct the query with parameters.
+		query := client.Query(`DELETE FROM ` + "`" + table + "`" + `
+        WHERE nodeUid IN (SELECT nodeUid FROM ` + "`" + table + "`" + ` WHERE rootUid = @rootUid)
+        AND rootUid NOT IN (SELECT nodeUid FROM ` + "`" + table + "`" + ` WHERE rootUid = @rootUid);`)
+
+		// Set query parameters.
+		query.Parameters = []bigquery.QueryParameter{
+			{Name: "rootUid", Value: node.Uid},
+		}
+
+		// Execute the query.
+		job, err := query.Run(ctx)
+		if err != nil {
+			log.Fatalf("Failed to run query: %v", err)
+		}
+
+		// Wait for the query to complete and print any errors.
+		status, err := job.Wait(ctx)
+		if err != nil {
+			log.Fatalf("Failed to wait for job completion: %v", err)
+		}
+		if err := status.Err(); err != nil {
+			log.Fatalf("Query execution error: %v", err)
+		}
+
+		fmt.Println("Query executed successfully.")
+
+		// Construct the query with parameters.
+		query = client.Query(`INSERT INTO ` + "`" + table + "`" + ` (rootUid, parentUid, nodeUid, name, 
+		absoluteLevel, relativeLevel, creationDate) 
+		SELECT supertree.rootUid, subtree.parentUid, subtree.nodeUid, subtree.name, subtree.absoluteLevel, 
+		subtree.absoluteLevel - supertree.absoluteLevel, CURRENT_DATETIME()
+        FROM ` + "`" + table + "`" + ` AS supertree 
+        CROSS JOIN ` + "`" + table + "`" + ` AS subtree
+        WHERE subtree.rootUid = @rootUid
+        AND supertree.nodeUid = @nodeUid;
+    `)
+
+		// Set query parameters.
+		query.Parameters = []bigquery.QueryParameter{
+			{Name: "rootUid", Value: node.Uid},
+			{Name: "nodeUid", Value: node.ParentUid},
+		}
+
+		// Execute the query.
+		job, err = query.Run(ctx)
+		if err != nil {
+			log.Fatalf("Failed to run query: %v", err)
+		}
+
+		// Wait for the query to complete and print any errors.
+		status, err = job.Wait(ctx)
+		if err != nil {
+			log.Fatalf("Failed to wait for job completion: %v", err)
+		}
+		if err := status.Err(); err != nil {
+			log.Fatalf("Query execution error: %v", err)
+		}
+
+		fmt.Println("Query executed successfully.")
+	}
+	originalNode.ParentUid = node.ParentUid
+
 	err = addWorksForUid(originalNode, &node)
 	if err != nil {
 		log.Printf("[UpdateNode] error updating WorksForUid '%s' in network node '%s': %s", originalNode.WorksForUid, originalNode.Uid, err.Error())
