@@ -73,7 +73,8 @@ func Persona(policy *models.Policy, channel string, networkNode *models.NetworkN
 
 	availableRate := getAvailableRates(personProduct, flow)
 
-	b := lib.GetFilesByEnv(fmt.Sprintf("products-v2/%s/%s/taxes.json", policy.Name, policy.ProductVersion))
+	b := lib.GetFilesByEnv(fmt.Sprintf("%s/%s/%s/taxes.json", models.ProductsFolder,
+		policy.Name, policy.ProductVersion))
 	err := json.Unmarshal(b, &personaRates)
 	if err != nil {
 		log.Printf("[Persona] error unmarshaling persona rates: %s", err.Error())
