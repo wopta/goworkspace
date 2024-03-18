@@ -211,6 +211,36 @@ func UpdateRowBigQueryV2(datasetId, tableId string, params map[string]interface{
 	return err
 }
 
+func ExecuteQueryBigQuery(inputQuery string, params []bigquery.QueryParameter) error {
+	client := getBigqueryClient()
+	defer client.Close()
+
+	// Construct the query with parameters.
+	query := client.Query(inputQuery)
+
+	// Set query parameters.
+	query.Parameters = params
+
+	// Execute the query.
+	ctx := context.Background()
+	job, err := query.Run(ctx)
+	if err != nil {
+		log.Printf("error running query: %s", err.Error())
+		return err
+	}
+
+	// Wait for the query to complete and print any errors.
+	status, err := job.Wait(ctx)
+	if err != nil {
+		log.Printf("Failed to wait for job completion: %v", err)
+	}
+	if err = status.Err(); err != nil {
+		log.Printf("Query execution error: %v", err)
+	}
+
+	return nil
+}
+
 func GetBigQueryNullDateTime(date time.Time) bigquery.NullDateTime {
 	nilTime := time.Time{}
 	return bigquery.NullDateTime{
