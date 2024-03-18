@@ -6,6 +6,8 @@ import (
 	"os"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 )
 
 // for local testing only
@@ -27,8 +29,28 @@ func newMux() *http.ServeMux {
 	return mux
 }
 
+func newChiMux(module string, routes []struct{}) *chi.Mux {
+	prefix := ""
+
+	if os.Getenv("env") == "local" {
+		prefix = "/test"
+	}
+
+	mux := chi.NewRouter()
+	mux.Use(middleware.Logger)
+	mux.Get(prefix+"/test1", test1)
+	mux.Get(prefix+"/test2/{param}", test2)
+
+	mux.Route("/articles", func(r chi.Router) {
+		r.Use(middleware.BasicAuth("", map[string]string{}))
+		r.Get("/", test1)
+	})
+
+	return mux
+}
+
 func Test(w http.ResponseWriter, r *http.Request) {
-	mux := newMux()
+	mux := newChiMux("test", nil)
 	mux.ServeHTTP(w, r)
 }
 
