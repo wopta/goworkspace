@@ -102,6 +102,15 @@ func visitNode(currentNode models.NetworkTreeElement, nodesList []models.Network
 
 func getNodeTreeRelations(node models.NetworkTreeElement) []models.NetworkTreeElement {
 	ancestors := make([]models.NetworkTreeElement, 0)
+	ancestors = append(ancestors, models.NetworkTreeElement{
+		RootUid:       node.NodeUid,
+		ParentUid:     node.NodeUid,
+		NodeUid:       node.NodeUid,
+		Name:          node.Name,
+		AbsoluteLevel: node.AbsoluteLevel,
+		RelativeLevel: 0,
+		CreationDate:  node.CreationDate,
+	})
 	for _, a := range node.Ancestors {
 		node.RootUid = a.NodeUid
 		node.RelativeLevel = node.AbsoluteLevel - a.AbsoluteLevel
