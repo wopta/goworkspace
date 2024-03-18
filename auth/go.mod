@@ -7,9 +7,9 @@ replace github.com/wopta/goworkspace/auth => ./
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.0
 	github.com/golang-jwt/jwt/v5 v5.1.0
-	github.com/wopta/goworkspace/lib v1.0.103
-	github.com/wopta/goworkspace/models v1.1.91
-	github.com/wopta/goworkspace/network v1.0.43
+	github.com/wopta/goworkspace/lib v1.0.105
+	github.com/wopta/goworkspace/models v1.1.92
+	github.com/wopta/goworkspace/network v1.0.44
 )
 
 require (
