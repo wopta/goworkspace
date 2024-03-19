@@ -202,10 +202,9 @@ func updateNodeTreeRelations(node models.NetworkNode) error {
 		return err
 	}
 
-	query = `INSERT INTO ` + "`" + table + "`" + ` (rootUid, parentUid, nodeUid, name, 
-		absoluteLevel, relativeLevel, creationDate) 
-		SELECT supertree.rootUid, subtree.parentUid, subtree.nodeUid, subtree.name, subtree.absoluteLevel, 
-		subtree.absoluteLevel - supertree.absoluteLevel, CURRENT_DATETIME()
+	query = `INSERT INTO ` + "`" + table + "`" + ` (rootUid, parentUid, nodeUid, relativeLevel, creationDate) 
+		SELECT supertree.rootUid, subtree.parentUid, subtree.nodeUid, 
+		supertree.relativeLevel + subtree.relativeLevel + 1, CURRENT_DATETIME()
         FROM ` + "`" + table + "`" + ` AS supertree 
         CROSS JOIN ` + "`" + table + "`" + ` AS subtree
         WHERE subtree.rootUid = @rootUid
@@ -214,6 +213,7 @@ func updateNodeTreeRelations(node models.NetworkNode) error {
 	params = []bigquery.QueryParameter{
 		{Name: "rootUid", Value: node.Uid},
 		{Name: "nodeUid", Value: node.ParentUid},
+		{Name: "newName", Value: node.GetName()},
 	}
 
 	err = lib.ExecuteQueryBigQuery(query, params)
