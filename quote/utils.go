@@ -21,7 +21,11 @@ func getAvailableRates(product *models.Product, flow string) []string {
 	availableRates := make([]string, 0)
 	for _, paymentProvider := range product.PaymentProviders {
 		if lib.SliceContains(paymentProvider.Flows, flow) {
-			availableRates = append(availableRates, paymentProvider.Rates...)
+			for _, config := range paymentProvider.Configs {
+				if !lib.SliceContains(availableRates, config.Rate) {
+					availableRates = append(availableRates, config.Rate)
+				}
+			}
 		}
 	}
 	return availableRates
