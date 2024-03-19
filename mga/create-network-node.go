@@ -83,12 +83,11 @@ func createNodeRelation(node models.NetworkNode) error {
 	if len(ancestorsTreeRelation) > 0 {
 		parentAbsoluteLevel = ancestorsTreeRelation[0].AbsoluteLevel
 	}
-	nodeName := node.GetName()
+
 	parentRelation := models.NetworkTreeElement{
 		RootUid:       parentNode.Uid,
 		ParentUid:     parentNode.Uid,
 		NodeUid:       node.Uid,
-		Name:          nodeName,
 		AbsoluteLevel: parentAbsoluteLevel + 1,
 		RelativeLevel: 1,
 		CreationDate:  lib.GetBigQueryNullDateTime(time.Now().UTC()),
@@ -104,7 +103,6 @@ func createNodeRelation(node models.NetworkNode) error {
 			RootUid:       relation.RootUid,
 			ParentUid:     node.ParentUid,
 			NodeUid:       node.Uid,
-			Name:          nodeName,
 			AbsoluteLevel: parentAbsoluteLevel + 1,
 			RelativeLevel: relation.RelativeLevel + 1,
 			CreationDate:  lib.GetBigQueryNullDateTime(time.Now().UTC()),
