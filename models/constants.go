@@ -119,6 +119,7 @@ const (
 	PoliciesViewCollection       string = "policiesView"
 	TransactionsViewCollection   string = "transactionsView"
 	NetworkTreeStructureTable    string = "network-tree-structure"
+	NetworkNodesView             string = "networkNodesView"
 )
 
 const (
