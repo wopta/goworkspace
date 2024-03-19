@@ -26,7 +26,7 @@ func Test(w http.ResponseWriter, r *http.Request) {
 	prefix := "/"
 
 	if os.Getenv("env") == "local" {
-		prefix = "/test/"
+		prefix = "/test"
 	}
 
 	mux := chi.NewRouter()
