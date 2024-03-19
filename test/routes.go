@@ -38,10 +38,10 @@ func Test(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-type", "application/json")
 
 	mux.Route(prefix, func(r chi.Router) {
-		r.Mount("public", publicRouter())
-		r.Mount("network", networkRouter())
-		r.Mount("internal", internalRouter())
-		r.Mount("admin", adminRouter())
+		r.Mount("/public", publicRouter())
+		r.Mount("/network", networkRouter())
+		r.Mount("/internal", internalRouter())
+		r.Mount("/admin", adminRouter())
 	})
 
 	mux.ServeHTTP(w, r)
