@@ -187,14 +187,14 @@ func updateNodeTreeRelations(node models.NetworkNode) error {
 		return err
 	}
 	defer client.Close()
-	table := fmt.Sprintf("%s.%s.%s", os.Getenv("GOOGLE_PROJECT_ID"), models.WoptaDataset, models.NetworkTreeStructureTable)
+	table := fmt.Sprintf("%s.%s", models.WoptaDataset, models.NetworkTreeStructureTable)
 
 	query := `DELETE FROM ` + "`" + table + "`" + `
         WHERE nodeUid IN (SELECT nodeUid FROM ` + "`" + table + "`" + ` WHERE rootUid = @rootUid)
         AND rootUid NOT IN (SELECT nodeUid FROM ` + "`" + table + "`" + ` WHERE rootUid = @rootUid);`
 
-	params := []bigquery.QueryParameter{
-		{Name: "rootUid", Value: node.Uid},
+	params := map[string]interface{}{
+		"rootUid": node.Uid,
 	}
 
 	err = lib.ExecuteQueryBigQuery(query, params)
@@ -210,10 +210,10 @@ func updateNodeTreeRelations(node models.NetworkNode) error {
         WHERE subtree.rootUid = @rootUid
         AND supertree.nodeUid = @nodeUid;`
 
-	params = []bigquery.QueryParameter{
-		{Name: "rootUid", Value: node.Uid},
-		{Name: "nodeUid", Value: node.ParentUid},
-		{Name: "newName", Value: node.GetName()},
+	params = map[string]interface{}{
+		"rootUid": node.Uid,
+		"nodeUid": node.ParentUid,
+		"newName": node.GetName(),
 	}
 
 	err = lib.ExecuteQueryBigQuery(query, params)

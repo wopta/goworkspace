@@ -211,7 +211,7 @@ func UpdateRowBigQueryV2(datasetId, tableId string, params map[string]interface{
 	return err
 }
 
-func ExecuteQueryBigQuery(inputQuery string, params []bigquery.QueryParameter) error {
+func ExecuteQueryBigQuery(inputQuery string, params map[string]interface{}) error {
 	client := getBigqueryClient()
 	defer client.Close()
 
@@ -219,7 +219,9 @@ func ExecuteQueryBigQuery(inputQuery string, params []bigquery.QueryParameter) e
 	query := client.Query(inputQuery)
 
 	// Set query parameters.
-	query.Parameters = params
+	for name, value := range params {
+		query.Parameters = append(query.Parameters, bigquery.QueryParameter{Name: name, Value: value})
+	}
 
 	// Execute the query.
 	ctx := context.Background()
