@@ -44,7 +44,7 @@ func CreateNodeTreeStructure() {
 		visitedNodes = append(visitedNodes, currentNode)
 	}
 
-	treeElementRelations := make([]models.NetworkTreeElement, 0)
+	treeElementRelations := make([]models.NetworkTreeRelation, 0)
 	for _, nn := range visitedNodes {
 		treeElementRelations = append(treeElementRelations, getNodeTreeRelations(nn)...)
 	}
@@ -98,27 +98,20 @@ func visitNode(currentNode models.NetworkTreeElement, nodesList []models.Network
 	return toBeVisitedNodes
 }
 
-func getNodeTreeRelations(node models.NetworkTreeElement) []models.NetworkTreeElement {
-	ancestors := make([]models.NetworkTreeElement, 0)
-	ancestors = append(ancestors, models.NetworkTreeElement{
-		RootUid:       node.NodeUid,
-		ParentUid:     node.NodeUid,
-		NodeUid:       node.NodeUid,
-		AbsoluteLevel: node.AbsoluteLevel,
-		RelativeLevel: 0,
-		CreationDate:  node.CreationDate,
-	})
+func getNodeTreeRelations(node models.NetworkTreeElement) []models.NetworkTreeRelation {
+	ancestors := make([]models.NetworkTreeRelation, 0)
+	ancestors = append(ancestors, node.ToNetworkTreeRelation())
 	for _, a := range node.Ancestors {
 		node.RootUid = a.NodeUid
 		node.RelativeLevel = node.AbsoluteLevel - a.AbsoluteLevel
 		log.Printf("rootUid: %s\tparentUid: %s\tnodeUid: %s\tchildLevel: %02d\tparentLevel: %02d\trelativeLevel: %02d\t\n",
 			node.RootUid, node.ParentUid, node.NodeUid, node.AbsoluteLevel, a.AbsoluteLevel, node.RelativeLevel)
-		ancestors = append(ancestors, node)
+		ancestors = append(ancestors, node.ToNetworkTreeRelation())
 	}
 	return ancestors
 }
 
-func writeNodeToBigQuery(node models.NetworkTreeElement) error {
+func writeNodeToBigQuery(node models.NetworkTreeRelation) error {
 	err := lib.InsertRowsBigQuery(models.WoptaDataset, models.NetworkTreeStructureTable, node)
 	if err != nil {
 		log.Printf("insert error: %s", err.Error())
