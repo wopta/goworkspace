@@ -56,14 +56,23 @@ func GetNodeSubTree(nodeUid string) (models.NetworkTreeElement, error) {
 
 	log.Printf("Fetching children for node %s", nodeUid)
 
-	baseQuery := fmt.Sprintf("SELECT * FROM `%s.%s` WHERE ", models.WoptaDataset, models.NetworkTreeStructureTable)
-	whereClause := fmt.Sprintf("rootUid = '%s'", nodeUid)
-	query := fmt.Sprintf("%s %s %s", baseQuery, whereClause, "ORDER BY absoluteLevel")
-	subNetwork, err := lib.QueryRowsBigQuery[models.NetworkTreeElement](query)
+	query := fmt.Sprintf("SELECT rootUid, ntr.parentUid, nodeUid, nnv.name AS name, relativeLevel, ntr.creationDate "+
+		"FROM `%s.%s` AS ntr "+
+		"INNER JOIN `%s.%s` nnv ON ntr.nodeUid = nnv.uid "+
+		"WHERE ntr.rootUid = @rootUid AND ntr.nodeUid != @rootUid",
+		models.WoptaDataset, models.NetworkTreeStructureTable, models.WoptaDataset, models.NetworkNodesView)
+
+	params := map[string]interface{}{
+		"rootUid": nodeUid,
+	}
+
+	subNetwork, err := lib.QueryParametrizedRowsBigQuery[models.NetworkTreeElement](query, params)
 	if err != nil {
 		log.Printf("error fetching children from BigQuery for node %s: %s", nodeUid, err.Error())
 		return root, err
 	}
+
+	log.Printf("Found %02d children for node %s", len(subNetwork), nodeUid)
 
 	root = models.NetworkTreeElement{
 		RootUid:   node.Uid,
@@ -91,10 +100,16 @@ func checkAccess(idToken, nodeUid string) error {
 		authToken.Email,
 	)
 	if authToken.Role != models.UserRoleAdmin && authToken.UserID != nodeUid {
-		baseQuery := fmt.Sprintf("SELECT * FROM `%s.%s` WHERE ", models.WoptaDataset, models.NetworkTreeStructureTable)
-		whereClause := fmt.Sprintf("rootUid = '%s' AND nodeUid = '%s'", authToken.UserID, nodeUid)
-		query := fmt.Sprintf("%s %s", baseQuery, whereClause)
-		result, err := lib.QueryRowsBigQuery[models.NetworkTreeElement](query)
+		query := fmt.Sprintf("SELECT rootUid, parentUid, nodeUid, relativeLevel, creationDate "+
+			"FROM `%s.%s`"+
+			"WHERE rootUid = @rootUid AND nodeUid = @nodeUid", models.WoptaDataset, models.NetworkTreeStructureTable)
+
+		params := map[string]interface{}{
+			"rootUid": authToken.UserID,
+			"nodeUid": nodeUid,
+		}
+
+		result, err := lib.QueryParametrizedRowsBigQuery[models.NetworkTreeElement](query, params)
 		if err != nil {
 			log.Printf("error fetching children from BigQuery for node %s: %s", nodeUid, err.Error())
 			return err
