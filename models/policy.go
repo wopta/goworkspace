@@ -180,6 +180,11 @@ func (p *Policy) Normalize() {
 	}
 }
 
+func isLeapYear(year int) bool {
+	// A leap year is either divisible by 400 or divisible by 4 but not by 100.
+	return year%400 == 0 || (year%4 == 0 && year%100 != 0)
+}
+
 func (policy *Policy) CalculateContractorAge() (int, error) {
 	var startDate time.Time
 	if policy.StartDate.IsZero() {
@@ -192,7 +197,12 @@ func (policy *Policy) CalculateContractorAge() (int, error) {
 	age := startDate.Year() - birthdate.Year()
 	log.Printf("[CalculateContractorAge] startDate.YearDay %d - birthdate.YearDay %d", startDate.YearDay(), birthdate.YearDay())
 
-	if startDate.YearDay() < birthdate.YearDay() && !(startDate.Month() == birthdate.Month() && startDate.Day() == birthdate.Day()) {
+	startDateYearDay := startDate.YearDay()
+	if isLeapYear(startDate.Year()) {
+		startDateYearDay -= 1
+	}
+
+	if startDateYearDay < birthdate.YearDay() && !(startDate.Month() == birthdate.Month() && startDate.Day() == birthdate.Day()) {
 		age--
 	}
 	return age, e
