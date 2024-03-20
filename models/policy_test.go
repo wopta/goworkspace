@@ -77,18 +77,6 @@ func TestCalculateAgeStartDateLeapBirthDateNonLeap(t *testing.T) {
 		}},
 	}
 
-	/*inputs := [][]int{
-		// START DATE LEAP/BIRTH DATE LEAP
-		{21, 3, 1980, 20, 3, 2024},
-		{21, 3, 1980, 21, 3, 2024},
-		{21, 3, 1980, 05, 1, 2024},
-		{21, 1, 1980, 05, 1, 2024},
-		// START DATE NON LEAP/BIRTH DATE NON LEAP
-		{07, 10, 1994, 20, 3, 2023},
-		{27, 9, 1998, 15, 6, 2023},
-		{12, 3, 1987, 10, 4, 2023},
-	}*/
-
 	output := []int{54, 55, 54, 55} //43, 44, 43, 43, 28, 24, 36}
 
 	for index, in := range inputs {
