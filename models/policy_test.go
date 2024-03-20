@@ -37,47 +37,26 @@ func calculateContractorAge(t *testing.T, in calculateContractorAgeInput, expect
 }
 
 func TestCalculateAgeStartDateLeapBirthDateNonLeap(t *testing.T) {
-	// START DATE LEAP/BIRTH DATE NON LEAP
 	inputs := []calculateContractorAgeInput{
-		{birthDate: dateInput{
-			day:   21,
-			month: 3,
-			year:  1969,
-		}, startDate: dateInput{
-			day:   20,
-			month: 3,
-			year:  2024,
-		}},
-		{birthDate: dateInput{
-			day:   21,
-			month: 3,
-			year:  1969,
-		}, startDate: dateInput{
-			day:   21,
-			month: 3,
-			year:  2024,
-		}},
-		{birthDate: dateInput{
-			day:   21,
-			month: 3,
-			year:  1969,
-		}, startDate: dateInput{
-			day:   5,
-			month: 1,
-			year:  2024,
-		}},
-		{birthDate: dateInput{
-			day:   21,
-			month: 1,
-			year:  1969,
-		}, startDate: dateInput{
-			day:   5,
-			month: 3,
-			year:  2024,
-		}},
+		{
+			birthDate: dateInput{day: 21, month: 3, year: 1969},
+			startDate: dateInput{day: 20, month: 3, year: 2024},
+		},
+		{
+			birthDate: dateInput{day: 21, month: 3, year: 1969},
+			startDate: dateInput{day: 21, month: 3, year: 2024},
+		},
+		{
+			birthDate: dateInput{day: 21, month: 3, year: 1969},
+			startDate: dateInput{day: 5, month: 1, year: 2024},
+		},
+		{
+			birthDate: dateInput{day: 21, month: 1, year: 1969},
+			startDate: dateInput{day: 5, month: 3, year: 2024},
+		},
 	}
 
-	output := []int{54, 55, 54, 55} //43, 44, 43, 43, 28, 24, 36}
+	output := []int{54, 55, 54, 55}
 
 	for index, in := range inputs {
 		calculateContractorAge(t, in, output[index])
@@ -85,44 +64,23 @@ func TestCalculateAgeStartDateLeapBirthDateNonLeap(t *testing.T) {
 }
 
 func TestCalculateAgeStartDateLeapBirthDateLeap(t *testing.T) {
-	// START DATE LEAP/BIRTH DATE NON LEAP
 	inputs := []calculateContractorAgeInput{
-		{birthDate: dateInput{
-			day:   21,
-			month: 3,
-			year:  1980,
-		}, startDate: dateInput{
-			day:   20,
-			month: 3,
-			year:  2024,
-		}},
-		{birthDate: dateInput{
-			day:   21,
-			month: 3,
-			year:  1980,
-		}, startDate: dateInput{
-			day:   21,
-			month: 3,
-			year:  2024,
-		}},
-		{birthDate: dateInput{
-			day:   21,
-			month: 3,
-			year:  1980,
-		}, startDate: dateInput{
-			day:   5,
-			month: 1,
-			year:  2024,
-		}},
-		{birthDate: dateInput{
-			day:   21,
-			month: 1,
-			year:  1980,
-		}, startDate: dateInput{
-			day:   5,
-			month: 3,
-			year:  2024,
-		}},
+		{
+			birthDate: dateInput{day: 21, month: 3, year: 1980},
+			startDate: dateInput{day: 20, month: 3, year: 2024},
+		},
+		{
+			birthDate: dateInput{day: 21, month: 3, year: 1980},
+			startDate: dateInput{day: 21, month: 3, year: 2024},
+		},
+		{
+			birthDate: dateInput{day: 21, month: 3, year: 1980},
+			startDate: dateInput{day: 5, month: 1, year: 2024},
+		},
+		{
+			birthDate: dateInput{day: 21, month: 1, year: 1980},
+			startDate: dateInput{day: 5, month: 3, year: 2024},
+		},
 	}
 
 	output := []int{43, 44, 43, 44}
@@ -132,39 +90,54 @@ func TestCalculateAgeStartDateLeapBirthDateLeap(t *testing.T) {
 	}
 }
 
-func TestCalculateAgeStartDateNonLeapBirthDateNonLeap(t *testing.T) {
-	// START DATE NON LEAP/BIRTH DATE NON LEAP
+func TestCalculateAgeStartDateNonLeapBirthDateLeap(t *testing.T) {
 	inputs := []calculateContractorAgeInput{
-		{birthDate: dateInput{
-			day:   7,
-			month: 10,
-			year:  1994,
-		}, startDate: dateInput{
-			day:   20,
-			month: 3,
-			year:  2023,
-		}},
-		{birthDate: dateInput{
-			day:   27,
-			month: 9,
-			year:  1998,
-		}, startDate: dateInput{
-			day:   15,
-			month: 6,
-			year:  2023,
-		}},
-		{birthDate: dateInput{
-			day:   12,
-			month: 3,
-			year:  1987,
-		}, startDate: dateInput{
-			day:   10,
-			month: 4,
-			year:  2023,
-		}},
+		{
+			birthDate: dateInput{day: 21, month: 3, year: 1980},
+			startDate: dateInput{day: 20, month: 3, year: 2023},
+		},
+		{
+			birthDate: dateInput{day: 21, month: 3, year: 1980},
+			startDate: dateInput{day: 21, month: 3, year: 2023},
+		},
+		{
+			birthDate: dateInput{day: 21, month: 3, year: 1980},
+			startDate: dateInput{day: 5, month: 1, year: 2023},
+		},
+		{
+			birthDate: dateInput{day: 21, month: 1, year: 1980},
+			startDate: dateInput{day: 5, month: 3, year: 2023},
+		},
 	}
 
-	output := []int{28, 24, 36}
+	output := []int{42, 43, 42, 43}
+
+	for index, in := range inputs {
+		calculateContractorAge(t, in, output[index])
+	}
+}
+
+func TestCalculateAgeStartDateNonLeapBirthDateNonLeap(t *testing.T) {
+	inputs := []calculateContractorAgeInput{
+		{
+			birthDate: dateInput{day: 7, month: 10, year: 1994},
+			startDate: dateInput{day: 20, month: 3, year: 2023},
+		},
+		{
+			birthDate: dateInput{day: 27, month: 9, year: 1998},
+			startDate: dateInput{day: 15, month: 6, year: 2023},
+		},
+		{
+			birthDate: dateInput{day: 12, month: 3, year: 1987},
+			startDate: dateInput{day: 10, month: 4, year: 2023},
+		},
+		{
+			birthDate: dateInput{day: 14, month: 2, year: 2022},
+			startDate: dateInput{day: 10, month: 4, year: 2023},
+		},
+	}
+
+	output := []int{28, 24, 36, 1}
 
 	for index, in := range inputs {
 		calculateContractorAge(t, in, output[index])
