@@ -116,7 +116,8 @@ func getAreaByProvince(province string) string {
 }
 
 func getGapMatrix(productName, productVersion, offerName string) dataframe.DataFrame {
-	return lib.CsvToDataframe(lib.GetFilesByEnv(fmt.Sprintf("products-v2/%s/%s/taxes_%s.csv", productName, productVersion, offerName)))
+	return lib.CsvToDataframe(lib.GetFilesByEnv(fmt.Sprintf("%s/%s/%s/taxes_%s.csv", models.ProductsFolder,
+		productName, productVersion, offerName)))
 }
 
 // Getting the first tax, and assuming every others are the same

@@ -2,7 +2,6 @@ package product
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"os"
 	"sort"
@@ -10,11 +9,6 @@ import (
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-)
-
-const (
-	productFolderPath          = "products-v2"
-	externalProductsFolderPath = "external-products"
 )
 
 func GetProductsByChannel(channel string) []models.ProductInfo {
@@ -133,9 +127,9 @@ func getProductsFileList() []string {
 
 	switch os.Getenv("env") {
 	case "local":
-		fileList, err = lib.ListLocalFolderContent(productFolderPath)
+		fileList, err = lib.ListLocalFolderContent(models.ProductsFolder)
 	default:
-		fileList, err = lib.ListGoogleStorageFolderContent(productFolderPath)
+		fileList, err = lib.ListGoogleStorageFolderContent(models.ProductsFolder)
 	}
 
 	if err != nil {
@@ -143,17 +137,4 @@ func getProductsFileList() []string {
 	}
 
 	return fileList
-}
-
-func getExternalProduct(prod string) *models.ProductInfo {
-	var wiseProduct models.ProductInfo
-	productBytes := lib.GetFilesByEnv(fmt.Sprintf("%s/%s.json", externalProductsFolderPath, prod))
-
-	err := json.Unmarshal(productBytes, &wiseProduct)
-	if err != nil {
-		log.Printf("[getExternalProduct] error unmarshaling productInfo: %s", err.Error())
-		return nil
-	}
-
-	return &wiseProduct
 }

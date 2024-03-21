@@ -3,7 +3,6 @@ package quote
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/wopta/goworkspace/network"
 	"io"
 	"log"
 	"math"
@@ -16,6 +15,7 @@ import (
 	"github.com/dustin/go-humanize"
 	lib "github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
 	"github.com/wopta/goworkspace/sellable"
 	"modernc.org/mathutil"
 )
@@ -87,7 +87,8 @@ func Life(data models.Policy, channel string, networkNode *models.NetworkNode, w
 
 	log.Printf("[Life] contractor age: %d", contractorAge)
 
-	b := lib.GetFilesByEnv(fmt.Sprintf("products-v2/%s/%s/taxes.csv", data.Name, data.ProductVersion))
+	b := lib.GetFilesByEnv(fmt.Sprintf("%s/%s/%s/taxes.csv", models.ProductsFolder,
+		data.Name, data.ProductVersion))
 	df := lib.CsvToDataframe(b)
 	var selectRow []string
 
@@ -307,7 +308,7 @@ func updatePolicyStartEndDate(policy *models.Policy) {
 	policy.StartDate = lib.SetDateToStartOfDay(policy.StartDate)
 	maxDuration := 0
 	for _, guarantee := range policy.Assets[0].Guarantees {
-		if guarantee.Value.Duration.Year > maxDuration {
+		if guarantee.IsSelected && guarantee.Value.Duration.Year > maxDuration {
 			maxDuration = guarantee.Value.Duration.Year
 		}
 	}

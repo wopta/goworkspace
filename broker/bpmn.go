@@ -205,7 +205,7 @@ func sendRequestApprovalMail(state *bpmn.State) error {
 	}
 
 	mail.SendMailReserved(*policy, fromAddress, toAddress, ccAddress, flowName,
-		[]string{models.InformationSetAttachmentName, models.ProposalAttachmentName})
+		[]string{models.ProposalAttachmentName})
 	return nil
 }
 
@@ -221,7 +221,7 @@ func addEmitHandlers(state *bpmn.State) {
 	state.AddTaskHandler("pay", pay)
 	state.AddTaskHandler("setAdvice", setAdvanceBpm)
 	state.AddTaskHandler("putUser", updateUserAndNetworkNode)
-	state.AddTaskHandler("sendMailInformationSet", sendMailInformationSet)
+	state.AddTaskHandler("sendEmitProposalMail", sendEmitProposalMail)
 }
 
 func emitData(state *bpmn.State) error {
@@ -257,32 +257,6 @@ func sendMailSign(state *bpmn.State) error {
 	return nil
 }
 
-func sendMailInformationSet(state *bpmn.State) error {
-	log.Println("[sendMailInformationSet]")
-	policy := state.Data
-
-	var attachmentNames []string = make([]string, 0)
-
-	if policy.ProposalNumber != 0 {
-		attachmentNames = append(attachmentNames, models.ProposalAttachmentName)
-	}
-
-	toAddress = mail.GetContractorEmail(policy)
-	ccAddress = mail.Address{}
-	switch flowName {
-	case models.ProviderMgaFlow, models.RemittanceMgaFlow:
-		ccAddress = mail.GetNetworkNodeEmail(networkNode)
-	}
-	log.Printf(
-		"[sendMailInformationSet] from '%s', to '%s', cc '%s'",
-		fromAddress.String(),
-		toAddress.String(),
-		ccAddress.String(),
-	)
-	mail.SendMailLead(*policy, fromAddress, toAddress, ccAddress, flowName, attachmentNames)
-	return nil
-}
-
 func sign(state *bpmn.State) error {
 	policy := state.Data
 	emitSign(policy, origin)
@@ -313,4 +287,29 @@ func updateUserAndNetworkNode(state *bpmn.State) error {
 		return err
 	}
 	return network.UpdateNetworkNodePortfolio(origin, policy, networkNode)
+}
+
+func sendEmitProposalMail(state *bpmn.State) error {
+	policy := state.Data
+
+	if policy.IsReserved {
+		return nil
+	}
+
+	toAddress = mail.GetContractorEmail(policy)
+	ccAddress = mail.Address{}
+	switch flowName {
+	case models.ProviderMgaFlow, models.RemittanceMgaFlow:
+		ccAddress = mail.GetNetworkNodeEmail(networkNode)
+	}
+
+	log.Printf(
+		"[sendEmitProposalMail] from '%s', to '%s', cc '%s'",
+		fromAddress.String(),
+		toAddress.String(),
+		ccAddress.String(),
+	)
+
+	mail.SendMailProposal(*policy, fromAddress, toAddress, ccAddress, flowName, []string{models.ProposalAttachmentName})
+	return nil
 }
