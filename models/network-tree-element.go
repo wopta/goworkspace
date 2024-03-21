@@ -6,6 +6,7 @@ type NetworkTreeElement struct {
 	RootUid       string                `json:"rootUid" bigquery:"rootUid"`
 	ParentUid     string                `json:"parentUid" bigquery:"parentUid"`
 	NodeUid       string                `json:"nodeUid" bigquery:"nodeUid"`
+	Code          string                `json:"code" bigquery:"code"`
 	Name          string                `json:"name" bigquery:"name"`
 	AbsoluteLevel int                   `json:"-" bigquery:"-"`
 	RelativeLevel int                   `json:"relativeLevel" bigquery:"relativeLevel"`

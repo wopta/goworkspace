@@ -56,7 +56,7 @@ func GetNodeSubTree(nodeUid string) (models.NetworkTreeElement, error) {
 
 	log.Printf("Fetching children for node %s", nodeUid)
 
-	query := fmt.Sprintf("SELECT rootUid, ntr.parentUid, nodeUid, nnv.name AS name, relativeLevel, ntr.creationDate "+
+	query := fmt.Sprintf("SELECT rootUid, ntr.parentUid, nodeUid, nnv.name AS name, nnv.code AS code, relativeLevel, ntr.creationDate "+
 		"FROM `%s.%s` AS ntr "+
 		"INNER JOIN `%s.%s` nnv ON ntr.nodeUid = nnv.uid "+
 		"WHERE ntr.rootUid = @rootUid AND ntr.nodeUid != @rootUid",
@@ -79,6 +79,7 @@ func GetNodeSubTree(nodeUid string) (models.NetworkTreeElement, error) {
 		NodeUid:   node.Uid,
 		ParentUid: node.ParentUid,
 		Name:      node.GetName(),
+		Code:      node.Code,
 	}
 
 	root = getNodeChildren(root, subNetwork)
