@@ -65,6 +65,7 @@ func GetNodePoliciesFx(w http.ResponseWriter, r *http.Request) (string, interfac
 
 	rawPolices, err := json.Marshal(policies)
 
+	log.Printf("response: %s", string(rawPolices))
 	log.Println("Handler End -------------------------------------------------")
 
 	return string(rawPolices), policies, err
