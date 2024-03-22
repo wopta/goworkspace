@@ -11,10 +11,15 @@ import (
 	"net/http"
 )
 
+type GetNodePoliciesResp struct {
+	Policies []PolicyInfo `json:"policies"`
+}
+
 func GetNodePoliciesFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err      error
 		req      GetPoliciesReq
+		resp     GetNodePoliciesResp
 		policies = make([]PolicyInfo, 0)
 	)
 
@@ -59,11 +64,12 @@ func GetNodePoliciesFx(w http.ResponseWriter, r *http.Request) (string, interfac
 	result, err := getPortfolioPolicies([]string{nodeUid}, req.Queries, req.Limit)
 
 	producerName := reqNode.GetName()
+	resp.Policies = make([]PolicyInfo, 0)
 	for _, p := range result {
-		policies = append(policies, policyToPolicyInfo(p, producerName))
+		resp.Policies = append(resp.Policies, policyToPolicyInfo(p, producerName))
 	}
 
-	rawPolices, err := json.Marshal(policies)
+	rawPolices, err := json.Marshal(resp)
 
 	log.Printf("response: %s", string(rawPolices))
 	log.Println("Handler End -------------------------------------------------")
