@@ -19,7 +19,7 @@ import (
 // for local testing only
 func init() {
 	log.Println("INIT Test")
-	functions.HTTP("Test", Test)
+	functions.HTTP("Test", Mga)
 }
 
 func Test(w http.ResponseWriter, r *http.Request) {
@@ -218,7 +218,7 @@ func CheckEntitlement(next http.Handler) http.Handler {
 		roles := ctx.Value("roles").([]string)
 		log.Printf("CheckEntitlement roles: %v", roles)
 
-		if /*len(roles) == 0 || os.Getenv("env") == "local" ||*/ slices.Contains(roles, "internal") || slices.Contains(roles, "all") {
+		if len(roles) == 0 || os.Getenv("env") == "local" || slices.Contains(roles, "internal") || slices.Contains(roles, "all") {
 			next.ServeHTTP(w, r)
 			return
 		}

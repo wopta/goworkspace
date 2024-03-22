@@ -27,6 +27,7 @@ require (
 	cloud.google.com/go/storage v1.30.1 // indirect
 	firebase.google.com/go v3.13.0+incompatible // indirect
 	github.com/MicahParks/keyfunc v1.5.1 // indirect
+	github.com/ajg/form v1.5.1 // indirect
 	github.com/andybalholm/brotli v1.0.4 // indirect
 	github.com/antlr/antlr4/runtime/Go/antlr v0.0.0-20220527190237-ee62e23da966 // indirect
 	github.com/apache/arrow/go/v12 v12.0.0 // indirect
@@ -36,6 +37,8 @@ require (
 	github.com/cloudevents/sdk-go/v2 v2.14.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
+	github.com/go-chi/docgen v1.2.0 // indirect
+	github.com/go-chi/render v1.0.3 // indirect
 	github.com/go-gota/gota v0.12.0 // indirect
 	github.com/go-pdf/fpdf v0.8.0 // indirect
 	github.com/goccy/go-json v0.9.11 // indirect
