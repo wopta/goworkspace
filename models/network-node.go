@@ -257,7 +257,7 @@ func (nn *NetworkNode) GetAncestors() ([]NetworkTreeElement, error) {
 		err error
 	)
 
-	query := fmt.Sprintf("SELECT rootUid, ntr.parentUid, nodeUid, nnv.name AS name, relativeLevel, "+
+	query := fmt.Sprintf("SELECT rootUid, ntr.parentUid, nodeUid, COALESCE(nnv.name, '') AS name, relativeLevel, "+
 		"ntr.creationDate  FROM `%s.%s` ntr INNER JOIN `%s.%s` nnv ON ntr.nodeUid = nnv.uid  "+
 		"WHERE nodeUid = @nodeUid ORDER BY relativeLevel", WoptaDataset,
 		NetworkTreeStructureTable, WoptaDataset, NetworkNodesView)
@@ -279,7 +279,7 @@ func (nn *NetworkNode) GetChildren() ([]NetworkTreeElement, error) {
 		err error
 	)
 
-	query := fmt.Sprintf("SELECT rootUid, ntr.parentUid, nodeUid, nnv.name AS name, relativeLevel, "+
+	query := fmt.Sprintf("SELECT rootUid, ntr.parentUid, nodeUid, COALESCE(nnv.name, '') AS name, relativeLevel, "+
 		"ntr.creationDate  FROM `%s.%s` ntr INNER JOIN `%s.%s` nnv ON ntr.nodeUid = nnv.uid  "+
 		"WHERE rootUid = @rootUid ORDER BY relativeLevel", WoptaDataset,
 		NetworkTreeStructureTable, WoptaDataset, NetworkNodesView)
