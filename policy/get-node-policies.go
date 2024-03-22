@@ -11,17 +11,10 @@ import (
 	"net/http"
 )
 
-type GetNodePoliciesReq struct {
-	NodeUid string         `json:"nodeUid"`
-	Queries []models.Query `json:"queries,omitempty"`
-	Limit   int            `json:"limit"`
-	Page    int            `json:"page"`
-}
-
 func GetNodePoliciesFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err      error
-		req      GetNodePoliciesReq
+		req      GetPoliciesReq
 		policies = make([]PolicyInfo, 0)
 	)
 
@@ -51,18 +44,19 @@ func GetNodePoliciesFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		return "", nil, err
 	}
 
-	reqNode, err := network.GetNodeByUid(req.NodeUid)
+	nodeUid := r.Header.Get("nodeUid")
+	reqNode, err := network.GetNodeByUid(nodeUid)
 	if err != nil {
 		log.Printf("error fetching node %s from Firestore: %s", reqNode.Uid, err.Error())
 		return "", nil, err
 	}
 
-	if authToken.Role != models.UserRoleAdmin && authToken.UserID != req.NodeUid && !node.IsParentOf(req.NodeUid) {
-		log.Printf("cannot access to node %s policies", req.NodeUid)
+	if authToken.Role != models.UserRoleAdmin && authToken.UserID != nodeUid && !node.IsParentOf(nodeUid) {
+		log.Printf("cannot access to node %s policies", nodeUid)
 		return "", nil, errors.New("cannot access to node policies")
 	}
 
-	result, err := getPortfolioPolicies([]string{req.NodeUid}, req.Queries, req.Limit)
+	result, err := getPortfolioPolicies([]string{nodeUid}, req.Queries, req.Limit)
 
 	producerName := reqNode.GetName()
 	for _, p := range result {

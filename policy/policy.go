@@ -45,7 +45,7 @@ func Policy(w http.ResponseWriter, r *http.Request) {
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
-				Route:   "/node/v1",
+				Route:   "/node/v1/:nodeUid",
 				Handler: GetNodePoliciesFx,
 				Method:  http.MethodPost,
 				Roles: []string{models.UserRoleAdmin, models.UserRoleManager, models.UserRoleAreaManager,
