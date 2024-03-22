@@ -196,3 +196,22 @@ func AddProposalDoc(origin string, policy *models.Policy, networkNode *models.Ne
 		Section:  models.DocumentSectionContracts,
 	})
 }
+
+func policyToPolicyInfo(policy models.Policy, producerName string) PolicyInfo {
+	return PolicyInfo{
+		Uid:            policy.Uid,
+		ProductName:    policy.Name,
+		CodeCompany:    policy.CodeCompany,
+		ProposalNumber: policy.ProposalNumber,
+		NameDesc:       policy.NameDesc,
+		Status:         policy.Status,
+		Contractor:     policy.Contractor.Name + " " + policy.Contractor.Surname,
+		Price:          policy.PriceGross,
+		PriceMonthly:   policy.PriceGrossMonthly,
+		Producer:       producerName,
+		ProducerCode:   policy.ProducerCode,
+		StartDate:      policy.StartDate,
+		EndDate:        policy.EndDate,
+		PaymentSplit:   policy.PaymentSplit,
+	}
+}

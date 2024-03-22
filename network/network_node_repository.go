@@ -1,8 +1,11 @@
 package network
 
 import (
+	"cloud.google.com/go/bigquery"
+	"context"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"cloud.google.com/go/firestore"
@@ -113,7 +116,6 @@ func UpdateNode(node models.NetworkNode) error {
 	originalNode.Mail = node.Mail
 	originalNode.Warrant = node.Warrant
 	originalNode.Products = node.Products
-	originalNode.ParentUid = node.ParentUid
 	if originalNode.AuthId != "" && originalNode.IsActive != node.IsActive {
 		err = lib.HandleUserAuthenticationStatus(originalNode.Uid, !node.IsActive)
 		if err != nil {
@@ -132,6 +134,15 @@ func UpdateNode(node models.NetworkNode) error {
 	if originalNode.IsMgaProponent {
 		originalNode.HasAnnex = true
 	}
+
+	if originalNode.ParentUid != node.ParentUid {
+		err = updateNodeTreeRelations(node)
+		if err != nil {
+			return err
+		}
+	}
+	originalNode.ParentUid = node.ParentUid
+
 	err = addWorksForUid(originalNode, &node)
 	if err != nil {
 		log.Printf("[UpdateNode] error updating WorksForUid '%s' in network node '%s': %s", originalNode.WorksForUid, originalNode.Uid, err.Error())
@@ -166,6 +177,50 @@ func UpdateNode(node models.NetworkNode) error {
 	log.Printf("[UpdateNode] writing network node %s in BigQuery...", originalNode.Uid)
 
 	return originalNode.SaveBigQuery("")
+}
+
+func updateNodeTreeRelations(node models.NetworkNode) error {
+	ctx := context.Background()
+	client, err := bigquery.NewClient(ctx, os.Getenv("GOOGLE_PROJECT_ID"))
+	if err != nil {
+		log.Printf("error getting BigQuery client: %s", err.Error())
+		return err
+	}
+	defer client.Close()
+	table := fmt.Sprintf("%s.%s", models.WoptaDataset, models.NetworkTreeStructureTable)
+
+	query := `DELETE FROM ` + "`" + table + "`" + `
+        WHERE nodeUid IN (SELECT nodeUid FROM ` + "`" + table + "`" + ` WHERE rootUid = @rootUid)
+        AND rootUid NOT IN (SELECT nodeUid FROM ` + "`" + table + "`" + ` WHERE rootUid = @rootUid);`
+
+	params := map[string]interface{}{
+		"rootUid": node.Uid,
+	}
+
+	err = lib.ExecuteQueryBigQuery(query, params)
+	if err != nil {
+		return err
+	}
+
+	query = `INSERT INTO ` + "`" + table + "`" + ` (rootUid, parentUid, nodeUid, relativeLevel, creationDate) 
+		SELECT supertree.rootUid, subtree.parentUid, subtree.nodeUid, 
+		supertree.relativeLevel + subtree.relativeLevel + 1, CURRENT_DATETIME()
+        FROM ` + "`" + table + "`" + ` AS supertree 
+        CROSS JOIN ` + "`" + table + "`" + ` AS subtree
+        WHERE subtree.rootUid = @rootUid
+        AND supertree.nodeUid = @nodeUid;`
+
+	params = map[string]interface{}{
+		"rootUid": node.Uid,
+		"nodeUid": node.ParentUid,
+		"newName": node.GetName(),
+	}
+
+	err = lib.ExecuteQueryBigQuery(query, params)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func GetNetworkNodeByUid(nodeUid string) *models.NetworkNode {

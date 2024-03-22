@@ -26,6 +26,13 @@ func Network(w http.ResponseWriter, r *http.Request) {
 				Handler: ImportNodesFx,
 				Roles:   []string{models.UserRoleAdmin},
 			},
+			{
+				Route:   "/subtree/v1/:nodeUid",
+				Method:  http.MethodGet,
+				Handler: NodeSubTreeFx,
+				Roles: []string{models.UserRoleAdmin, models.UserRoleManager, models.UserRoleAreaManager, models.UserRoleAgent,
+					models.UserRoleAgency},
+			},
 		},
 	}
 	route.Router(w, r)
