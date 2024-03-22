@@ -3,6 +3,7 @@ package policy
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
@@ -27,6 +28,12 @@ type PolicyInfo struct {
 	StartDate      time.Time `json:"startDate" bigquery:"startDate"`
 	EndDate        time.Time `json:"endDate" bigquery:"endDate"`
 	PaymentSplit   string    `json:"paymentSplit" bigquery:"paymentSplit"`
+}
+
+type GetPoliciesReq struct {
+	Queries []models.Query `json:"queries,omitempty"`
+	Limit   int            `json:"limit"`
+	Page    int            `json:"page"`
 }
 
 type GetPortfolioPoliciesResp struct {
@@ -61,7 +68,24 @@ func GetPortfolioPoliciesFx(w http.ResponseWriter, r *http.Request) (string, int
 		return "", nil, err
 	}
 
-	producersMap, err := getProducersMap(authToken.Role, authToken.UserID)
+	var nodeUid string
+	if authToken.Role != models.UserRoleAdmin {
+		nodeUid = authToken.UserID
+	} else {
+		toBeRemoveIndex := -1
+		for index, query := range req.Queries {
+			if query.Field == "producerUid" {
+				nodeUid = query.Value.(string)
+				toBeRemoveIndex = index
+				break
+			}
+		}
+		if toBeRemoveIndex != -1 {
+			req.Queries = append(req.Queries[:toBeRemoveIndex], req.Queries[toBeRemoveIndex+1:]...)
+		}
+	}
+
+	producersMap, err := getProducersMap(nodeUid)
 	if err != nil {
 		return "", nil, err
 	}
@@ -85,30 +109,31 @@ func GetPortfolioPoliciesFx(w http.ResponseWriter, r *http.Request) (string, int
 	return string(rawResp), resp, err
 }
 
-func getProducersMap(role string, nodeUid string) (map[string]models.NetworkTreeElement, error) {
+func getProducersMap(nodeUid string) (map[string]models.NetworkTreeElement, error) {
 	producersMap := make(map[string]models.NetworkTreeElement)
-	if role != models.UserRoleAdmin {
-		node, err := network.GetNodeByUid(nodeUid)
-		if err != nil {
-			log.Printf("error fetching node %s from Firestore: %s", nodeUid, err.Error())
-			return nil, err
-		}
+	if nodeUid == "" {
+		return producersMap, nil
+	}
+	node, err := network.GetNodeByUid(nodeUid)
+	if err != nil {
+		log.Printf("error fetching node %s from Firestore: %s", nodeUid, err.Error())
+		return nil, err
+	}
 
-		children, err := node.GetChildren()
-		if err != nil {
-			log.Printf("error fetching node %s children: %s", node.Uid, err.Error())
-			return nil, err
-		}
+	children, err := node.GetChildren()
+	if err != nil {
+		log.Printf("error fetching node %s children: %s", node.Uid, err.Error())
+		return nil, err
+	}
 
-		producersMap[nodeUid] = models.NetworkTreeElement{
-			ParentUid: node.ParentUid,
-			NodeUid:   node.Uid,
-			Name:      node.GetName(),
-		}
+	producersMap[nodeUid] = models.NetworkTreeElement{
+		ParentUid: node.ParentUid,
+		NodeUid:   node.Uid,
+		Name:      node.GetName(),
+	}
 
-		for _, child := range children {
-			producersMap[child.NodeUid] = child
-		}
+	for _, child := range children {
+		producersMap[child.NodeUid] = child
 	}
 	return producersMap, nil
 }
@@ -137,16 +162,18 @@ func getPortfolioPolicies(producers []string, requestQueries []models.Query, lim
 		}
 	}
 
-	values := make([]interface{}, 0)
-	for _, p := range producers {
-		values = append(values, p)
-	}
+	if len(producers) != 0 {
+		values := make([]interface{}, 0)
+		for _, p := range producers {
+			values = append(values, p)
+		}
 
-	queries = append(queries, models.Query{
-		Field:  fieldName,
-		Op:     "in",
-		Values: values,
-	})
+		queries = append(queries, models.Query{
+			Field:  fieldName,
+			Op:     "in",
+			Values: values,
+		})
+	}
 
 	policies, err := GetPoliciesByQueriesBigQuery(models.WoptaDataset, models.PoliciesViewCollection, queries, limitValue)
 	if err != nil {
@@ -154,4 +181,18 @@ func getPortfolioPolicies(producers []string, requestQueries []models.Query, lim
 	}
 
 	return policies, err
+}
+
+func getPoliciesByQuery(queries []models.Query, limit int) (policies []models.Policy, err error) {
+	if len(queries) == 0 {
+		err = fmt.Errorf("no query specified")
+		return
+	}
+
+	var limitValue = 10
+	if limit != 0 {
+		limitValue = limit
+	}
+
+	return GetPoliciesByQueriesBigQuery(models.WoptaDataset, models.PoliciesViewCollection, queries, limitValue)
 }

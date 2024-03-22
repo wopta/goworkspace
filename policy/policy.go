@@ -48,13 +48,15 @@ func Policy(w http.ResponseWriter, r *http.Request) {
 				Route:   "/node/v1",
 				Handler: GetNodePoliciesFx,
 				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager, models.UserRoleAreaManager, models.UserRoleAgent, models.UserRoleAgency},
+				Roles: []string{models.UserRoleAdmin, models.UserRoleManager, models.UserRoleAreaManager,
+					models.UserRoleAgent, models.UserRoleAgency},
 			},
 			{
 				Route:   "/portfolio/v1",
 				Handler: GetPortfolioPoliciesFx,
 				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager, models.UserRoleAreaManager, models.UserRoleAgent, models.UserRoleAgency},
+				Roles: []string{models.UserRoleAdmin, models.UserRoleManager, models.UserRoleAreaManager,
+					models.UserRoleAgent, models.UserRoleAgency},
 			},
 			{
 				Route:   "/media/upload/v1",
@@ -67,12 +69,6 @@ func Policy(w http.ResponseWriter, r *http.Request) {
 				Handler: GetPolicyMediaFx,
 				Method:  http.MethodPost,
 				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager, models.UserRoleAgent, models.UserRoleAgency},
-			},
-			{
-				Route:   "/v1",
-				Handler: GetPoliciesByQueryFx,
-				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},
 		},
 	}
