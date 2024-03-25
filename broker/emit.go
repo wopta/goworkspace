@@ -2,8 +2,8 @@ package broker
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
-	"github.com/pkg/errors"
 	"io"
 	"log"
 	"net/http"
