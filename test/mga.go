@@ -7,7 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"reflect"
+	// "reflect"
 	"slices"
 
 	"github.com/go-chi/chi/v5"
@@ -24,12 +24,12 @@ var mgaRoutes []Route = []Route{
 		Roles:   []string{models.UserRoleAdmin},
 	},
 	{
-		Route:       "/products/v1",
-		Handler:     handlerWrapper(mga.GetProductByChannelFx),
-		Method:      http.MethodPost,
-		Roles:       []string{models.UserRoleAll},
-		Middlewares: nil,
-		RequestType: &ProductRequest{},
+		Route:   "/products/v1",
+		Handler: handlerWrapper(mga.GetProductByChannelFx),
+		Method:  http.MethodPost,
+		Roles:   []string{models.UserRoleAll},
+		// Middlewares: nil,
+		// RequestType: &ProductRequest{},
 	},
 	{
 		Route:   "/network/node/v1/{uid}",
@@ -38,11 +38,11 @@ var mgaRoutes []Route = []Route{
 		Roles:   []string{models.UserRoleAll},
 	},
 	{
-		Route:       "/network/node/v1",
-		Handler:     handlerWrapper(mga.CreateNetworkNodeFx),
-		Method:      http.MethodPost,
-		Roles:       []string{models.UserRoleAdmin, models.UserRoleManager},
-		RequestType: &NodeRequest{},
+		Route:   "/network/node/v1",
+		Handler: handlerWrapper(mga.CreateNetworkNodeFx),
+		Method:  http.MethodPost,
+		Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
+		// RequestType: &NodeRequest{},
 	},
 	{
 		Route:   "/network/node/v1",
@@ -106,7 +106,7 @@ type Route struct {
 	Handler     http.HandlerFunc
 	Middlewares []func(http.Handler) http.Handler
 	Roles       []string
-	RequestType RouteRequest
+	// RequestType RouteRequest
 }
 
 func handlerWrapper(handler func(w http.ResponseWriter, r *http.Request) (string, any, error)) func(w http.ResponseWriter, r *http.Request) {
@@ -134,15 +134,16 @@ func getModuleRouter(module string, routes []Route) *chi.Mux {
 	mux.Use(middleware.Recoverer)
 	mux.Use(middleware.SetHeader("Content-type", "application/json"))
 	mux.Use(CorsMiddleware)
+	mux.Use(LogRequestObMiddleware)
 
 	for _, route := range routes {
 		mw := make([]func(http.Handler) http.Handler, 0)
-		if route.RequestType != nil {
-			mw = append(mw,
-				middleware.WithValue("requestType", route.RequestType),
-				LogRequestMiddleware,
-			)
-		}
+		// if route.RequestType != nil {
+		// 	mw = append(mw,
+		// 		middleware.WithValue("requestType", route.RequestType),
+		// 		LogRequestMiddleware,
+		// 	)
+		// }
 		mw = append(mw,
 			middleware.WithValue("roles", route.Roles),
 			AppCheckMiddleware,
@@ -162,209 +163,145 @@ func getModuleRouter(module string, routes []Route) *chi.Mux {
 
 func AuditLogMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		t2 := r.Context().Value("requestType")
+		body, _ := io.ReadAll(r.Body)
+		defer r.Body.Close()
 
-		if t2 != nil {
-			t := t2.(RouteRequest)
-			req, temp := t.Parse(r)
+		var t map[string]any
 
-			request := RemoveObfuscated(temp)
-			defer func() {
-				models.CreateAuditLog(r, string(request))
-			}()
-
-			// rewrite body to request since it is a stream
-			r.Body = io.NopCloser(bytes.NewReader(req))
-		} else {
-			defer func() {
-				models.CreateAuditLog(r, "")
-			}()
-		}
-
-		next.ServeHTTP(w, r)
-
-		/*
-			body, err := io.ReadAll(r.Body)
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
+		json.Unmarshal(body, &t)
+		for _, key := range []string{"password", "pwd"} {
+			if _, ok := t[key]; ok {
+				t[key] = "**********"
 			}
-			defer func() {
-				models.CreateAuditLog(r, string(body))
-			}()
-			// rewrite body to request since it is a stream
-			r.Body = io.NopCloser(bytes.NewReader(body))
-			next.ServeHTTP(w, r)
-		*/
-	})
-}
+		}
+		bb, _ := json.Marshal(t)
 
-type RouteRequest interface {
-	Parse(*http.Request) ([]byte, any)
-}
-
-type ProductRequest struct {
-	ProductName string `json:"name" obfuscate:"true"`
-	CompanyName string `json:"company"` // DEPRECATED
-	Version     string `json:"version"` // DEPRECATED
-}
-
-func (r *ProductRequest) Parse(req *http.Request) ([]byte, any) {
-	bytes, _ := io.ReadAll(req.Body)
-	defer req.Body.Close()
-
-	var value ProductRequest
-
-	json.Unmarshal(bytes, &value)
-
-	return bytes, value
-}
-
-type NodeRequest struct {
-	Code string `json:"code"`
-	Mail string `json:"mail" obfuscate:"true"`
-}
-
-func (r *NodeRequest) Parse(req *http.Request) ([]byte, any) {
-	bytes, _ := io.ReadAll(req.Body)
-	defer req.Body.Close()
-
-	var value NodeRequest
-
-	json.Unmarshal(bytes, &value)
-
-	return bytes, value
-}
-
-func LogRequestMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		t := r.Context().Value("requestType").(RouteRequest)
-
-		req, temp := t.Parse(r)
-
-		request := RemoveObfuscated(temp)
-		log.Printf("Request: %s", string(request))
+		defer func() {
+			models.CreateAuditLog(r, string(bb))
+		}()
 
 		// rewrite body to request since it is a stream
-		r.Body = io.NopCloser(bytes.NewReader(req))
+		r.Body = io.NopCloser(bytes.NewReader(body))
 		next.ServeHTTP(w, r)
 	})
 }
 
-func RemoveObfuscated[T any](data T) []byte {
-	val := reflect.ValueOf(&data).Elem()
-	overridableCopy := reflect.New(val.Elem().Type()).Elem()
+// func AuditLogMiddleware(next http.Handler) http.Handler {
+// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+// 		t2 := r.Context().Value("requestType")
 
-	overridableCopy.Set(val.Elem())
-	for i := 0; i < overridableCopy.NumField(); i++ {
-		field := overridableCopy.Field(i)
-		fieldType := overridableCopy.Type().Field(i)
+// 		if t2 != nil {
+// 			t := t2.(RouteRequest)
+// 			req, temp := t.Parse(r)
 
-		tag := fieldType.Tag.Get("obfuscate")
+// 			request := RemoveObfuscated(temp)
+// 			defer func() {
+// 				models.CreateAuditLog(r, string(request))
+// 			}()
 
-		if tag != "" {
-			field.SetString("*******")
-		}
-	}
-	val.Set(overridableCopy)
+// 			// rewrite body to request since it is a stream
+// 			r.Body = io.NopCloser(bytes.NewReader(req))
+// 		} else {
+// 			defer func() {
+// 				models.CreateAuditLog(r, "")
+// 			}()
+// 		}
 
-	bytes, _ := json.Marshal(data)
-	return bytes
-}
+// 		next.ServeHTTP(w, r)
+// 	})
+// }
 
-/*
-type ErrResponse struct {
-	Err            error `json:"-"` // low-level runtime error
-	HTTPStatusCode int   `json:"-"` // http response status code
+// type RouteRequest interface {
+// 	Parse(*http.Request) ([]byte, any)
+// }
 
-	StatusText string `json:"status"`          // user-level status message
-	AppCode    int64  `json:"code,omitempty"`  // application-specific error code
-	ErrorText  string `json:"error,omitempty"` // application-level error message, for debugging
-}
+// type ProductRequest struct {
+// 	ProductName string `json:"name" obfuscate:"true"`
+// 	CompanyName string `json:"company"` // DEPRECATED
+// 	Version     string `json:"version"` // DEPRECATED
+// }
 
-func (e *ErrResponse) Render(w http.ResponseWriter, r *http.Request) error {
-	render.Status(r, e.HTTPStatusCode)
-	return nil
-}
+// func (r *ProductRequest) Parse(req *http.Request) ([]byte, any) {
+// 	bytes, _ := io.ReadAll(req.Body)
+// 	defer req.Body.Close()
 
-func LogRequestMiddleware(next http.Handler) http.Handler {
+// 	var value ProductRequest
+
+// 	json.Unmarshal(bytes, &value)
+
+// 	return bytes, value
+// }
+
+// type NodeRequest struct {
+// 	Code string `json:"code"`
+// 	Mail string `json:"mail" obfuscate:"true"`
+// }
+
+// func (r *NodeRequest) Parse(req *http.Request) ([]byte, any) {
+// 	bytes, _ := io.ReadAll(req.Body)
+// 	defer req.Body.Close()
+
+// 	var value NodeRequest
+
+// 	json.Unmarshal(bytes, &value)
+
+// 	return bytes, value
+// }
+
+// func LogRequestMiddleware(next http.Handler) http.Handler {
+// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+// 		t := r.Context().Value("requestType").(RouteRequest)
+
+// 		req, temp := t.Parse(r)
+
+// 		request := RemoveObfuscated(temp)
+// 		log.Printf("Request: %s", string(request))
+
+// 		// rewrite body to request since it is a stream
+// 		r.Body = io.NopCloser(bytes.NewReader(req))
+// 		next.ServeHTTP(w, r)
+// 	})
+// }
+
+// func RemoveObfuscated[T any](data T) []byte {
+// 	val := reflect.ValueOf(&data).Elem()
+// 	overridableCopy := reflect.New(val.Elem().Type()).Elem()
+
+// 	overridableCopy.Set(val.Elem())
+// 	for i := 0; i < overridableCopy.NumField(); i++ {
+// 		field := overridableCopy.Field(i)
+// 		fieldType := overridableCopy.Type().Field(i)
+
+// 		tag := fieldType.Tag.Get("obfuscate")
+
+// 		if tag != "" {
+// 			field.SetString("*******")
+// 		}
+// 	}
+// 	val.Set(overridableCopy)
+
+// 	bytes, _ := json.Marshal(data)
+// 	return bytes
+// }
+
+func LogRequestObMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// check dynamic casting
-		t := r.Context().Value("requestType").(BaseRequest)
+		body, _ := io.ReadAll(r.Body)
+		defer r.Body.Close()
 
-		req, _ := io.ReadAll(r.Body)
-		json.Unmarshal(req, &t)
+		var t map[string]any
 
-		// req := t
-		// if err := render.Bind(r, req); err != nil {
-		// 	render.Render(w, r, &ErrResponse{
-		// 		Err:            err,
-		// 		HTTPStatusCode: 400,
-		// 		StatusText:     "Invalid request.",
-		// 		ErrorText:      err.Error(),
-		// 	})
-		// 	return
-		// }
-
-		// body, _ := json.Marshal(req)
-
-		request := RemoveObfuscated(t)
-		fmt.Printf("Request: %s", string(request))
+		json.Unmarshal(body, &t)
+		for _, key := range []string{"password", "pwd"} {
+			if _, ok := t[key]; ok {
+				t[key] = "**********"
+			}
+		}
+		bb, _ := json.Marshal(t)
+		log.Printf("Request: %v", string(bb))
 
 		// rewrite body to request since it is a stream
-		r.Body = io.NopCloser(bytes.NewReader(req))
+		r.Body = io.NopCloser(bytes.NewReader(body))
 		next.ServeHTTP(w, r)
 	})
 }
-
-type Request struct {
-	*BaseRequest
-}
-
-func (hr *Request) Bind(r *http.Request) error {
-	if hr.BaseRequest == nil {
-		return fmt.Errorf("missing request")
-	}
-	return nil
-}
-
-type BaseRequest struct {
-	ProductName string `json:"name" obfuscate:"true"`
-	CompanyName string `json:"company"` // DEPRECATED
-	Version     string `json:"version"` // DEPRECATED
-}
-
-func LogRequest(body interface{}) {
-	val := reflect.ValueOf(&body).Elem()
-	for i := 0; i < val.NumField(); i++ {
-		field := val.Field(i)
-		fieldType := val.Type().Field(i)
-
-		tag := fieldType.Tag.Get("json")
-
-		if tag == "password" {
-			field.SetString("*******")
-		}
-	}
-
-	bytes, _ := json.Marshal(body)
-	log.Printf("Request: %s", string(bytes))
-}
-
-func RemoveObfuscated[T any](data T) []byte {
-	val := reflect.ValueOf(&data).Elem()
-	for i := 0; i < val.NumField(); i++ {
-		field := val.Field(i)
-		fieldType := val.Type().Field(i)
-
-		tag := fieldType.Tag.Get("obfuscate")
-
-		if tag != "" {
-			field.SetString("*******")
-		}
-	}
-
-	bytes, _ := json.Marshal(data)
-	return bytes
-}
-*/
