@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/network"
 	plc "github.com/wopta/goworkspace/policy"
 	"github.com/wopta/goworkspace/transaction"
 	"log"
@@ -43,7 +42,7 @@ func GetPolicyTransactionsFx(w http.ResponseWriter, r *http.Request) (string, in
 
 	userUid := authToken.UserID
 
-	if authToken.Role != models.UserRoleAdmin && policy.ProducerUid != userUid && !network.IsParentOf(authToken.UserID, policy.ProducerUid) {
+	if !plc.CanBeAccessedBy(authToken.Role, policy.ProducerUid, authToken.UserID) {
 		log.Printf("[GetPolicyTransactionsFx] policy %s is not included in %s %s portfolio", policyUid, authToken.Role, userUid)
 		return "", response, fmt.Errorf("%s %s unauthorized for policy %s", authToken.Role, userUid, policyUid)
 	}

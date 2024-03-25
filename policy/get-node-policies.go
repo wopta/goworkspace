@@ -50,7 +50,7 @@ func GetNodePoliciesFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		return "", nil, err
 	}
 
-	if authToken.Role != models.UserRoleAdmin && authToken.UserID != nodeUid && !network.IsParentOf(authToken.UserID, nodeUid) {
+	if !CanBeAccessedBy(authToken.Role, nodeUid, authToken.UserID) {
 		log.Printf("cannot access to node %s policies", nodeUid)
 		return "", nil, errors.New("cannot access to node policies")
 	}
