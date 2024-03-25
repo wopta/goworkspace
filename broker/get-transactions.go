@@ -3,15 +3,12 @@ package broker
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/wopta/goworkspace/network"
-	"log"
-	"net/http"
-	"strings"
-
-	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
 	plc "github.com/wopta/goworkspace/policy"
 	"github.com/wopta/goworkspace/transaction"
+	"log"
+	"net/http"
 )
 
 type GetPolicyTransactionsResp struct {
@@ -23,23 +20,30 @@ type Transactions []models.Transaction
 func GetPolicyTransactionsFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var response GetPolicyTransactionsResp
 
-	log.Println("[GetPolicyTransactionsFx] Handler start ---------------------")
+	log.SetPrefix("[GetPolicyTransactionsFx] ")
+	defer log.SetPrefix("")
+	log.Println("Handler start -----------------------------------------------")
 
 	policyUid := r.Header.Get("policyUid")
 
-	log.Printf("[GetPolicyTransactionsFx] policyUid %s", policyUid)
+	log.Printf("policyUid %s", policyUid)
 
 	idToken := r.Header.Get("Authorization")
 	authToken, err := models.GetAuthTokenFromIdToken(idToken)
-	lib.CheckError(err)
+	if err != nil {
+		log.Printf("error getting authToken: %s", err.Error())
+		return "", nil, err
+	}
 
 	policy, err := plc.GetPolicy(policyUid, origin)
-	lib.CheckError(err)
+	if err != nil {
+		log.Printf("error fetching policy %s from Firestore: %s", policyUid, err.Error())
+		return "", nil, err
+	}
 
 	userUid := authToken.UserID
 
-	isAgentOrAgency := strings.EqualFold(authToken.Role, models.UserRoleAgent) || strings.EqualFold(authToken.Role, models.UserRoleAgency)
-	if isAgentOrAgency && (policy.ProducerUid != userUid && !network.IsParentOf(authToken.UserID, policy.ProducerUid)) {
+	if authToken.Role != models.UserRoleAdmin && policy.ProducerUid != userUid && !network.IsParentOf(authToken.UserID, policy.ProducerUid) {
 		log.Printf("[GetPolicyTransactionsFx] policy %s is not included in %s %s portfolio", policyUid, authToken.Role, userUid)
 		return "", response, fmt.Errorf("%s %s unauthorized for policy %s", authToken.Role, userUid, policyUid)
 	}
