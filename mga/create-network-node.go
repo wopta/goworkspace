@@ -48,12 +48,10 @@ func CreateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 
 	node.SaveBigQuery(origin)
 
-	if node.ParentUid != "" {
-		err = createNodeRelation(*node)
-		if err != nil {
-			log.Printf("error creating node %s network relations: %s", node.Uid, err.Error())
-			return "", nil, err
-		}
+	err = createNodeRelation(*node)
+	if err != nil {
+		log.Printf("error creating node %s network relations: %s", node.Uid, err.Error())
+		return "", nil, err
 	}
 
 	log.Println("network node successfully created!")
@@ -66,37 +64,39 @@ func CreateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 }
 
 func createNodeRelation(node models.NetworkNode) error {
-	ancestorsTreeRelation, err := network.GetNodeAncestors(node.ParentUid)
-	if err != nil {
-		log.Printf("error getting node %s ancestors: %s", node.Uid, err.Error())
-		return err
-	}
-
-	parentRelation := models.NetworkTreeRelation{
-		RootUid:       node.ParentUid,
-		ParentUid:     node.ParentUid,
+	selfRelation := models.NetworkTreeRelation{
+		RootUid:       node.Uid,
+		ParentUid:     node.Uid,
 		NodeUid:       node.Uid,
-		RelativeLevel: 1,
+		RelativeLevel: 0,
 		CreationDate:  lib.GetBigQueryNullDateTime(time.Now().UTC()),
 	}
-	err = lib.InsertRowsBigQuery(models.WoptaDataset, models.NetworkTreeStructureTable, parentRelation)
+	err := lib.InsertRowsBigQuery(models.WoptaDataset, models.NetworkTreeStructureTable, selfRelation)
 	if err != nil {
 		log.Printf("insert error: %s", err.Error())
 		return err
 	}
 
-	for _, relation := range ancestorsTreeRelation {
-		treeRelation := models.NetworkTreeRelation{
-			RootUid:       relation.RootUid,
-			ParentUid:     node.ParentUid,
-			NodeUid:       node.Uid,
-			RelativeLevel: relation.RelativeLevel + 1,
-			CreationDate:  lib.GetBigQueryNullDateTime(time.Now().UTC()),
-		}
-		err = lib.InsertRowsBigQuery(models.WoptaDataset, models.NetworkTreeStructureTable, treeRelation)
+	if node.ParentUid != "" {
+		ancestorsTreeRelation, err := network.GetNodeAncestors(node.ParentUid)
 		if err != nil {
-			log.Printf("insert error: %s", err.Error())
+			log.Printf("error getting node %s ancestors: %s", node.Uid, err.Error())
 			return err
+		}
+
+		for _, relation := range ancestorsTreeRelation {
+			treeRelation := models.NetworkTreeRelation{
+				RootUid:       relation.RootUid,
+				ParentUid:     node.ParentUid,
+				NodeUid:       node.Uid,
+				RelativeLevel: relation.RelativeLevel + 1,
+				CreationDate:  lib.GetBigQueryNullDateTime(time.Now().UTC()),
+			}
+			err = lib.InsertRowsBigQuery(models.WoptaDataset, models.NetworkTreeStructureTable, treeRelation)
+			if err != nil {
+				log.Printf("insert error: %s", err.Error())
+				return err
+			}
 		}
 	}
 	return nil
