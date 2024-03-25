@@ -3,6 +3,7 @@ package broker
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/wopta/goworkspace/network"
 	"log"
 	"net/http"
 	"strings"
@@ -20,9 +21,9 @@ type GetPolicyTransactionsResp struct {
 type Transactions []models.Transaction
 
 func GetPolicyTransactionsFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.Println("[GetPolicyTransactionsFx] Handler start ---------------------")
-
 	var response GetPolicyTransactionsResp
+
+	log.Println("[GetPolicyTransactionsFx] Handler start ---------------------")
 
 	policyUid := r.Header.Get("policyUid")
 
@@ -38,7 +39,7 @@ func GetPolicyTransactionsFx(w http.ResponseWriter, r *http.Request) (string, in
 	userUid := authToken.UserID
 
 	isAgentOrAgency := strings.EqualFold(authToken.Role, models.UserRoleAgent) || strings.EqualFold(authToken.Role, models.UserRoleAgency)
-	if isAgentOrAgency && policy.ProducerUid != userUid {
+	if isAgentOrAgency && (policy.ProducerUid != userUid && !network.IsParentOf(authToken.UserID, policy.ProducerUid)) {
 		log.Printf("[GetPolicyTransactionsFx] policy %s is not included in %s %s portfolio", policyUid, authToken.Role, userUid)
 		return "", response, fmt.Errorf("%s %s unauthorized for policy %s", authToken.Role, userUid, policyUid)
 	}
