@@ -3,6 +3,7 @@ package policy
 import (
 	"errors"
 	"fmt"
+	"github.com/wopta/goworkspace/network"
 	"log"
 	"strings"
 	"time"
@@ -214,4 +215,8 @@ func policyToPolicyInfo(policy models.Policy, producerName string) PolicyInfo {
 		EndDate:        policy.EndDate,
 		PaymentSplit:   policy.PaymentSplit,
 	}
+}
+
+func CanBeAccessedBy(role, producerUid, nodeUid string) bool {
+	return role == models.UserRoleAdmin || producerUid == nodeUid || network.IsParentOf(nodeUid, producerUid)
 }

@@ -43,12 +43,6 @@ func GetNodePoliciesFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		return "", nil, err
 	}
 
-	node, err := network.GetNodeByUid(authToken.UserID)
-	if err != nil {
-		log.Printf("error fetching node %s from Firestore: %s", authToken.UserID, err.Error())
-		return "", nil, err
-	}
-
 	nodeUid := r.Header.Get("nodeUid")
 	reqNode, err := network.GetNodeByUid(nodeUid)
 	if err != nil {
@@ -56,7 +50,7 @@ func GetNodePoliciesFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		return "", nil, err
 	}
 
-	if authToken.Role != models.UserRoleAdmin && authToken.UserID != nodeUid && !node.IsParentOf(nodeUid) {
+	if !CanBeAccessedBy(authToken.Role, nodeUid, authToken.UserID) {
 		log.Printf("cannot access to node %s policies", nodeUid)
 		return "", nil, errors.New("cannot access to node policies")
 	}
