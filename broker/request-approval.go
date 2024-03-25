@@ -62,6 +62,12 @@ func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		return "", nil, err
 	}
 
+	if policy.ProducerUid != authToken.UserID {
+		log.Printf("user %s cannot request approval for policy %s because producer not equal to request user",
+			authToken.UserID, policy.Uid)
+		return "", nil, errors.New("operation not allowed")
+	}
+
 	allowedStatus := []string{models.PolicyStatusInitLead, models.PolicyStatusNeedsApproval}
 
 	if !policy.IsReserved || !lib.SliceContains(allowedStatus, policy.Status) {
