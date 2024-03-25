@@ -97,6 +97,7 @@ func GetPortfolioPoliciesFx(w http.ResponseWriter, r *http.Request) (string, int
 	}
 	log.Printf("found %02d policies", len(resp.Policies))
 
+	resp.Policies = make([]PolicyInfo, 0)
 	for _, policy := range result {
 		resp.Policies = append(resp.Policies, policyToPolicyInfo(policy, producersMap[policy.ProducerUid].Name))
 	}
