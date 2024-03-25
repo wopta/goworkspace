@@ -120,7 +120,7 @@ func getProducersMap(nodeUid string) (map[string]models.NetworkTreeElement, erro
 		return nil, err
 	}
 
-	children, err := node.GetChildren()
+	children, err := network.GetNodeChildren(nodeUid)
 	if err != nil {
 		log.Printf("error fetching node %s children: %s", node.Uid, err.Error())
 		return nil, err

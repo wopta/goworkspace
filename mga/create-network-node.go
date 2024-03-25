@@ -2,7 +2,6 @@ package mga
 
 import (
 	"encoding/json"
-	"errors"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
@@ -67,21 +66,15 @@ func CreateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 }
 
 func createNodeRelation(node models.NetworkNode) error {
-	parentNode := network.GetNetworkNodeByUid(node.ParentUid)
-	if parentNode == nil {
-		log.Printf("parent node with uid %s not found", node.ParentUid)
-		return errors.New("parent node not found")
-	}
-
-	ancestorsTreeRelation, err := parentNode.GetAncestors()
+	ancestorsTreeRelation, err := network.GetNodeAncestors(node.ParentUid)
 	if err != nil {
 		log.Printf("error getting node %s ancestors: %s", node.Uid, err.Error())
 		return err
 	}
 
 	parentRelation := models.NetworkTreeRelation{
-		RootUid:       parentNode.Uid,
-		ParentUid:     parentNode.Uid,
+		RootUid:       node.ParentUid,
+		ParentUid:     node.ParentUid,
 		NodeUid:       node.Uid,
 		RelativeLevel: 1,
 		CreationDate:  lib.GetBigQueryNullDateTime(time.Now().UTC()),
