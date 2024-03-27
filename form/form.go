@@ -1,9 +1,10 @@
 package form
 
 import (
-	"github.com/wopta/goworkspace/models"
 	"log"
 	"net/http"
+
+	"github.com/wopta/goworkspace/models"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	lib "github.com/wopta/goworkspace/lib"
@@ -31,6 +32,12 @@ func Form(w http.ResponseWriter, r *http.Request) {
 				Route:   "/v1/:uid",
 				Handler: GetFx,
 				Method:  "GET",
+				Roles:   []string{models.UserRoleAll},
+			},
+			{
+				Route:   "test/v1",
+				Handler: GetFx,
+				Method:  "POST",
 				Roles:   []string{models.UserRoleAll},
 			},
 		},
