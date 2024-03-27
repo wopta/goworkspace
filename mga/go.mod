@@ -9,7 +9,7 @@ require (
 	github.com/wopta/goworkspace/lib v1.0.106
 	github.com/wopta/goworkspace/mail v1.0.94
 	github.com/wopta/goworkspace/models v1.1.95
-	github.com/wopta/goworkspace/network v1.0.48
+	github.com/wopta/goworkspace/network v1.0.49
 	github.com/wopta/goworkspace/policy v1.0.85
 	github.com/wopta/goworkspace/product v1.0.94
 	github.com/wopta/goworkspace/user v1.0.79
