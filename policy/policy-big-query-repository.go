@@ -111,7 +111,7 @@ func getWhitelistedOperator(queryOp string) (string, error) {
 func addQuery(query *bytes.Buffer, q models.Query, op string, valuesParameter []string) {
 	switch q.Type {
 	case "dateTime":
-		query.WriteString(fmt.Sprintf(" JSON_VALUE(data.%s) %s (@%s", q.Field, op, valuesParameter[0]))
+		query.WriteString(fmt.Sprintf(" JSON_VALUE(data.%s) %s @%s", q.Field, op, valuesParameter[0]))
 	case "bool", "boolean":
 		if q.Value == false {
 			query.WriteString(fmt.Sprintf(" (BOOL(data.%s) %s @%s", q.Field, op, valuesParameter[0]))
