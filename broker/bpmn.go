@@ -131,6 +131,11 @@ func addProposalHandlers(state *bpmn.State) {
 func setProposalBpm(state *bpmn.State) error {
 	policy := state.Data
 
+	// TODO: remove when a proper solution to handle PMI is found
+	if policy.Name == models.PmiProduct {
+		return nil
+	}
+
 	if policy.ProposalNumber != 0 {
 		log.Printf("[setProposalData] policy '%s' already has proposal with number '%d'", policy.Uid, policy.ProposalNumber)
 		return nil
@@ -146,6 +151,11 @@ func setProposalBpm(state *bpmn.State) error {
 
 func sendProposalMail(state *bpmn.State) error {
 	policy := state.Data
+
+	// TODO: remove when a proper solution to handle PMI is found
+	if policy.Name == models.PmiProduct {
+		return nil
+	}
 
 	if !sendEmail || policy.IsReserved {
 		return nil
