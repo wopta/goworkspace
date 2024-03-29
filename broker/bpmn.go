@@ -302,6 +302,11 @@ func updateUserAndNetworkNode(state *bpmn.State) error {
 func sendEmitProposalMail(state *bpmn.State) error {
 	policy := state.Data
 
+	// TODO: remove when a proper solution to handle PMI is found
+	if policy.Name == models.PmiProduct {
+		return nil
+	}
+
 	if policy.IsReserved {
 		return nil
 	}
