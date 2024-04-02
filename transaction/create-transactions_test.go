@@ -1,44 +1,62 @@
 package transaction_test
 
 import (
-	"fmt"
-	"github.com/google/uuid"
-	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/product"
 	"github.com/wopta/goworkspace/transaction"
-	"math/rand"
 	"os"
 	"testing"
 	"time"
 )
 
-func getPolicy(paymentSplit, paymentProvider, contractorName, contractorSurname string, priceGross, priceNet,
-	priceGrossMonthly, priceNetMonthly float64, startDate, endDate time.Time) models.Policy {
+type dateInfo struct {
+	ScheduleDate   string
+	ExpirationDate string
+	EffectiveDate  time.Time
+}
+
+func getPolicy(paymentSplit string, startDate, endDate time.Time) models.Policy {
 	return models.Policy{
-		Uid:  uuid.New().String(),
-		Name: models.LifeProduct,
+		Uid:  "uuid",
+		Name: "productName",
 		Contractor: models.Contractor{
-			Name:    contractorName,
-			Surname: contractorSurname,
+			Name:    "Test",
+			Surname: "Test",
 		},
-		Company:           models.AxaCompany,
-		CodeCompany:       fmt.Sprintf("%07d", rand.Intn(100-1)+1),
-		Payment:           paymentProvider,
+		Company:           "company",
+		CodeCompany:       "1234567",
+		Payment:           "paymentProvider",
 		PaymentSplit:      paymentSplit,
-		PriceGross:        priceGross,
-		PriceNett:         priceNet,
-		PriceGrossMonthly: priceGrossMonthly,
-		PriceNettMonthly:  priceNetMonthly,
+		PriceGross:        100,
+		PriceNett:         89.2,
+		PriceGrossMonthly: 8.33,
+		PriceNettMonthly:  7.43,
 		StartDate:         startDate,
 		EndDate:           endDate,
 	}
 }
 
+func outputGenerator(numOutput int, startDate time.Time) []dateInfo {
+	output := make([]dateInfo, 0)
+
+	i := 0
+	for i < numOutput {
+		effectiveDate := startDate.AddDate(0, i, 0)
+		output = append(output, dateInfo{
+			ScheduleDate:   effectiveDate.Format(time.DateOnly),
+			ExpirationDate: effectiveDate.AddDate(10, 0, 0).Format(time.DateOnly),
+			EffectiveDate:  effectiveDate,
+		})
+		i++
+	}
+	return output
+}
+
 func TestCreateTransactionsMonthly(t *testing.T) {
-	now := time.Now().UTC()
-	policy := getPolicy(string(models.PaySplitMonthly), models.FabrickPaymentProvider, "Test", "Test", 100, 89.2,
-		8.33, 7.43, now, now.AddDate(20, 0, 0))
+	startDate := time.Date(2023, 03, 14, 0, 0, 0, 0, time.UTC)
+	policy := getPolicy(string(models.PaySplitMonthly), startDate, startDate.AddDate(20, 0, 0))
+
+	output := outputGenerator(12, startDate)
 
 	os.Setenv("env", "local-test")
 	mgaProduct := product.GetProductV2(models.LifeProduct, models.ProductV2, models.MgaChannel, nil, nil)
@@ -50,25 +68,24 @@ func TestCreateTransactionsMonthly(t *testing.T) {
 	}
 
 	for index, tr := range transactions {
-		if tr.PolicyName != models.LifeProduct {
-			t.Fatalf("expected: %s product got: %s", models.LifeProduct, tr.PolicyName)
+		if tr.PolicyName != "productName" {
+			t.Fatalf("expected: %s product got: %s", "productName", tr.PolicyName)
 		}
 
-		expectedName := lib.TrimSpace(fmt.Sprintf("%s %s", policy.Contractor.Name, policy.Contractor.Surname))
-		if tr.Name != expectedName {
-			t.Fatalf("expected: %s contractor name got: %s", expectedName, tr.Name)
+		if tr.Name != "Test Test" {
+			t.Fatalf("expected: %s contractor name got: %s", "Test Test", tr.Name)
 		}
 
-		if tr.Company != models.AxaCompany {
-			t.Fatalf("expected: %s product got: %s", models.AxaCompany, tr.Company)
+		if tr.Company != "company" {
+			t.Fatalf("expected: %s product got: %s", "company", tr.Company)
 		}
 
-		if tr.NumberCompany != policy.CodeCompany {
-			t.Fatalf("expected: %s codeCompany got: %s", policy.CodeCompany, tr.NumberCompany)
+		if tr.NumberCompany != "1234567" {
+			t.Fatalf("expected: %s codeCompany got: %s", "1234567", tr.NumberCompany)
 		}
 
-		if tr.ProviderName != policy.Payment {
-			t.Fatalf("expected: %s provider name got: %s", policy.Payment, tr.ProviderName)
+		if tr.ProviderName != "paymentProvider" {
+			t.Fatalf("expected: %s provider name got: %s", "paymentProvider", tr.ProviderName)
 		}
 
 		if tr.Status != models.TransactionStatusToPay {
@@ -83,19 +100,19 @@ func TestCreateTransactionsMonthly(t *testing.T) {
 			t.Fatalf("expected: %.2f price net got: %.2f", policy.PriceGrossMonthly, tr.AmountNet)
 		}
 
-		expectedScheduleDate := policy.StartDate.AddDate(0, index, 0).Format(time.DateOnly)
+		expectedScheduleDate := output[index].ScheduleDate
 		if tr.ScheduleDate != expectedScheduleDate {
 			t.Fatalf("expected: %s schedule date got: %s", expectedScheduleDate, tr.ScheduleDate)
 		}
 
-		expectedExpirationDate := policy.StartDate.AddDate(10, index, 0).Format(time.DateOnly)
+		expectedExpirationDate := output[index].ExpirationDate
 		if tr.ExpirationDate != expectedExpirationDate {
-			t.Fatalf("expected: %s schedule date got: %s", expectedExpirationDate, tr.ExpirationDate)
+			t.Fatalf("expected: %s expiration date got: %s", expectedExpirationDate, tr.ExpirationDate)
 		}
 
-		expectedEffectiveDate := policy.StartDate.AddDate(0, index, 0)
+		expectedEffectiveDate := output[index].EffectiveDate
 		if tr.EffectiveDate != expectedEffectiveDate {
-			t.Fatalf("expected: %s schedule date got: %s", expectedEffectiveDate.String(), tr.EffectiveDate.String())
+			t.Fatalf("expected: %s effective date got: %s", expectedEffectiveDate.String(), tr.EffectiveDate.String())
 		}
 	}
 }
