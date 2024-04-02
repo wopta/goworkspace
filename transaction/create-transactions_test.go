@@ -3,6 +3,7 @@ package transaction_test
 import (
 	"fmt"
 	"github.com/google/uuid"
+	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/product"
 	"github.com/wopta/goworkspace/transaction"
@@ -14,8 +15,12 @@ import (
 
 func getPolicy() models.Policy {
 	return models.Policy{
-		Uid:               uuid.New().String(),
-		Name:              models.LifeProduct,
+		Uid:  uuid.New().String(),
+		Name: models.LifeProduct,
+		Contractor: models.Contractor{
+			Name:    "Test",
+			Surname: "Test",
+		},
 		Company:           models.AxaCompany,
 		CodeCompany:       fmt.Sprintf("%07d", rand.Intn(100-1)+1),
 		Payment:           models.FabrickPaymentProvider,
@@ -42,6 +47,11 @@ func TestCreateTransactionsMonthly(t *testing.T) {
 	for index, tr := range transactions {
 		if tr.PolicyName != models.LifeProduct {
 			t.Fatalf("expected: %s product got: %s", models.LifeProduct, tr.PolicyName)
+		}
+
+		expectedName := lib.TrimSpace(fmt.Sprintf("%s %s", policy.Contractor.Name, policy.Contractor.Surname))
+		if tr.Name != expectedName {
+			t.Fatalf("expected: %s contractor name got: %s", expectedName, tr.Name)
 		}
 
 		if tr.Company != models.AxaCompany {
