@@ -13,27 +13,32 @@ import (
 	"time"
 )
 
-func getPolicy() models.Policy {
+func getPolicy(paymentSplit, paymentProvider, contractorName, contractorSurname string, priceGross, priceNet,
+	priceGrossMonthly, priceNetMonthly float64, startDate, endDate time.Time) models.Policy {
 	return models.Policy{
 		Uid:  uuid.New().String(),
 		Name: models.LifeProduct,
 		Contractor: models.Contractor{
-			Name:    "Test",
-			Surname: "Test",
+			Name:    contractorName,
+			Surname: contractorSurname,
 		},
 		Company:           models.AxaCompany,
 		CodeCompany:       fmt.Sprintf("%07d", rand.Intn(100-1)+1),
-		Payment:           models.FabrickPaymentProvider,
-		PaymentSplit:      string(models.PaySplitMonthly),
-		PriceNettMonthly:  12,
-		PriceGrossMonthly: 18.50,
-		StartDate:         time.Now().UTC(),
-		EndDate:           time.Now().UTC().AddDate(20, 0, 0),
+		Payment:           paymentProvider,
+		PaymentSplit:      paymentSplit,
+		PriceGross:        priceGross,
+		PriceNett:         priceNet,
+		PriceGrossMonthly: priceGrossMonthly,
+		PriceNettMonthly:  priceNetMonthly,
+		StartDate:         startDate,
+		EndDate:           endDate,
 	}
 }
 
 func TestCreateTransactionsMonthly(t *testing.T) {
-	policy := getPolicy()
+	now := time.Now().UTC()
+	policy := getPolicy(string(models.PaySplitMonthly), models.FabrickPaymentProvider, "Test", "Test", 100, 89.2,
+		8.33, 7.43, now, now.AddDate(20, 0, 0))
 
 	os.Setenv("env", "local-test")
 	mgaProduct := product.GetProductV2(models.LifeProduct, models.ProductV2, models.MgaChannel, nil, nil)
@@ -93,5 +98,4 @@ func TestCreateTransactionsMonthly(t *testing.T) {
 			t.Fatalf("expected: %s schedule date got: %s", expectedEffectiveDate.String(), tr.EffectiveDate.String())
 		}
 	}
-
 }
