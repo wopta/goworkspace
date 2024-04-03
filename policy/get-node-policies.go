@@ -57,11 +57,13 @@ func GetNodePoliciesFx(w http.ResponseWriter, r *http.Request) (string, interfac
 
 	result, err := getPortfolioPolicies([]string{nodeUid}, req.Queries, req.Limit)
 
-	producerName := reqNode.GetName()
+	/*producerName := reqNode.GetName()
 	resp.Policies = make([]PolicyInfo, 0)
 	for _, p := range result {
 		resp.Policies = append(resp.Policies, policyToPolicyInfo(p, producerName))
-	}
+	}*/
+
+	resp.Policies = result
 
 	rawPolices, err := json.Marshal(resp)
 

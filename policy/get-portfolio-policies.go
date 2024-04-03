@@ -10,25 +10,7 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"time"
 )
-
-type PolicyInfo struct {
-	Uid            string    `json:"uid" bigquery:"uid"`
-	ProductName    string    `json:"productName" bigquery:"productName"`
-	CodeCompany    string    `json:"codeCompany" bigquery:"codeCompany"`
-	ProposalNumber int       `json:"proposalNumber" bigquery:"proposalNumber"`
-	NameDesc       string    `json:"nameDesc" bigquery:"nameDesc"`
-	Status         string    `json:"status" bigquery:"status"`
-	Contractor     string    `json:"contractor" bigquery:"contractor"`
-	Price          float64   `json:"price" bigquery:"price"`
-	PriceMonthly   float64   `json:"priceMonthly" bigquery:"priceMonthly"`
-	Producer       string    `json:"producer" bigquery:"producer"`
-	ProducerCode   string    `json:"producerCode" bigquery:"-"`
-	StartDate      time.Time `json:"startDate" bigquery:"startDate"`
-	EndDate        time.Time `json:"endDate" bigquery:"endDate"`
-	PaymentSplit   string    `json:"paymentSplit" bigquery:"paymentSplit"`
-}
 
 type GetPoliciesReq struct {
 	Queries []models.Query `json:"queries,omitempty"`
@@ -97,10 +79,10 @@ func GetPortfolioPoliciesFx(w http.ResponseWriter, r *http.Request) (string, int
 	}
 	log.Printf("found %02d policies", len(resp.Policies))
 
-	resp.Policies = make([]PolicyInfo, 0)
-	for _, policy := range result {
+	resp.Policies = result
+	/*for _, policy := range result {
 		resp.Policies = append(resp.Policies, policyToPolicyInfo(policy, producersMap[policy.ProducerUid].Name))
-	}
+	}*/
 
 	rawResp, err := json.Marshal(resp)
 
@@ -139,7 +121,7 @@ func getProducersMap(nodeUid string) (map[string]models.NetworkTreeElement, erro
 	return producersMap, nil
 }
 
-func getPortfolioPolicies(producers []string, requestQueries []models.Query, limit int) ([]models.Policy, error) {
+func getPortfolioPolicies(producers []string, requestQueries []models.Query, limit int) ([]PolicyInfo, error) {
 	var (
 		err        error
 		fieldName  = "producerUid"
@@ -176,7 +158,7 @@ func getPortfolioPolicies(producers []string, requestQueries []models.Query, lim
 		})
 	}
 
-	policies, err := GetPoliciesByQueriesBigQuery(models.WoptaDataset, models.PoliciesViewCollection, queries, limitValue)
+	policies, err := getPoliciesInfoQueriesBigQuery(models.WoptaDataset, models.PoliciesViewCollection, queries, limitValue)
 	if err != nil {
 		return nil, err
 	}
