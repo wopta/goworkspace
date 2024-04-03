@@ -62,7 +62,7 @@ func QueryRowsBigQuery[T any](query string) ([]T, error) {
 
 func QueryParametrizedRowsBigQuery[T any](query string, params map[string]interface{}) ([]T, error) {
 	var (
-		res  []T
+		res  = make([]T, 0)
 		e    error
 		iter *bigquery.RowIterator
 	)
