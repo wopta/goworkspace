@@ -67,8 +67,8 @@ func FieldNames(Struct interface{}, m map[string]interface{}) {
 	}
 }
 func collectFieldNames(t reflect.Type, m map[string]interface{}) {
+    
 	if t.Kind() == reflect.Ptr {
-
 		t = t.Elem()
 	}
 	if t.Kind() != reflect.Struct {
