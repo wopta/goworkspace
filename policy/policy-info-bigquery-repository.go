@@ -84,7 +84,7 @@ func buildPolicyInfoQuery(datasetID string, tableID string, queries []models.Que
 			return "", nil, fmt.Errorf("field name is not allowed: %s", q.Field)
 		}
 
-		addQueryV2(&query, q, op, valuesParameters)
+		buildWhereClause(&query, q, op, valuesParameters)
 	}
 
 	if limit != 0 {
@@ -94,7 +94,7 @@ func buildPolicyInfoQuery(datasetID string, tableID string, queries []models.Que
 	return query.String(), params, nil
 }
 
-func addQueryV2(query *bytes.Buffer, q models.Query, op string, valuesParameter []string) {
+func buildWhereClause(query *bytes.Buffer, q models.Query, op string, valuesParameter []string) {
 	switch q.Type {
 	case "dateTime":
 		query.WriteString(fmt.Sprintf(" JSON_VALUE(p.data.%s) %s @%s", q.Field, op, valuesParameter[0]))
