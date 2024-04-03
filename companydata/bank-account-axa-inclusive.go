@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -32,24 +32,36 @@ type BankAccountAxaInclusiveReq struct {
 
 func BankAccountAxaInclusive(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		result [][]string
-		now    time.Time
-		refDay time.Time
+		now time.Time
 		upload bool
 	)
 	log.Println("----------------BankAccountAxaInclusive-----------------")
-	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
+	req := lib.ErrorByte(io.ReadAll(r.Body))
 	log.Println(r.Header)
 	log.Println(string(req))
 	var obj BankAccountAxaInclusiveReq
 	defer r.Body.Close()
 	json.Unmarshal([]byte(req), &obj)
 	now, upload = getRequestData(req)
+	setPolicy("180623", now, upload)
+	setPolicy("191123", now, upload)
+	log.Println("---------------------end------------------------------")
+	return "", nil, e
+}
+
+func setPolicy(code string, now time.Time, upload bool) {
+	var (
+		result [][]string
+
+		refDay time.Time
+	)
+
+	log.Println("----------------BankAccountAxaInclusive setPolicy-----------------")
 	refDay = now.AddDate(0, 0, -1)
 	log.Println("BankAccountAxaInclusive refMontly: ", refDay)
 	//from, e = time.Parse("2006-01-02", strconv.Itoa(now.Year())+"-"+fmt.Sprintf("%02d", int(now.Month()))+"-"+fmt.Sprintf("%02d", 1))
 	//query := "select * from `wopta." + dataMovement + "` where _PARTITIONTIME >'" + from.Format(layoutQuery) + " 00:00:00" + "' and _PARTITIONTIME <'" + to.Format(layoutQuery) + " 23:59:00" + "'"
-	query := "select * from `wopta." + dataMovement + "` where _PARTITIONTIME ='" + refDay.Format(layoutQuery) + "'"
+	query := "select * from `wopta." + dataMovement + "` where _PARTITIONTIME ='" + refDay.Format(layoutQuery) + "' and policyNumber='" + code + "'"
 	log.Println("BankAccountAxaInclusive bigquery query: ", query)
 	bankaccountlist, e := QueryRowsBigQuery[inclusive.BankAccountMovement](query)
 	log.Println("BankAccountAxaInclusive bigquery error: ", e)
@@ -57,6 +69,7 @@ func BankAccountAxaInclusive(w http.ResponseWriter, r *http.Request) (string, in
 	//result = append(result, getHeader())
 	result = append(result, getHeaderInclusiveBank())
 	b, err := os.ReadFile(lib.GetAssetPathByEnv("companyData") + "/reverse-codes.json")
+	lib.CheckError(err)
 	var codes map[string]map[string]string
 	err = json.Unmarshal(b, &codes)
 	lib.CheckError(err)
@@ -66,19 +79,18 @@ func BankAccountAxaInclusive(w http.ResponseWriter, r *http.Request) (string, in
 
 	}
 
-	filepath := "180623_" + strconv.Itoa(refDay.Year()) + fmt.Sprintf("%02d", int(refDay.Month())) + fmt.Sprintf("%02d", refDay.Day())
+	filepath := code + "_" + strconv.Itoa(refDay.Year()) + fmt.Sprintf("%02d", int(refDay.Month())) + fmt.Sprintf("%02d", refDay.Day())
 	CreateExcel(result, "../tmp/"+filepath+".xlsx")
 	lib.WriteCsv("../tmp/"+filepath+".csv", result, ';')
-	source, _ := ioutil.ReadFile("../tmp/" + filepath + ".xlsx")
-	sourceCsv, _ := ioutil.ReadFile("../tmp/" + filepath + ".csv")
+	source, _ := os.ReadFile("../tmp/" + filepath + ".xlsx")
+	sourceCsv, _ := os.ReadFile("../tmp/" + filepath + ".csv")
 	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/axa/inclusive/hype/"+strconv.Itoa(refDay.Year())+"/"+fmt.Sprintf("%02d", int(refDay.Month()))+"/"+filepath+".xlsx", source)
 	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/axa/inclusive/hype/"+strconv.Itoa(refDay.Year())+"/"+fmt.Sprintf("%02d", int(refDay.Month()))+"/"+filepath+".csv", sourceCsv)
 	if upload {
 
 		AxaSftpUpload(filepath+".xlsx", "HYPE/IN/")
 	}
-	log.Println("---------------------end------------------------------")
-	return "", nil, e
+
 }
 func setInclusiveRow(mov inclusive.BankAccountMovement, codes map[string]map[string]string) [][]string {
 	var (
