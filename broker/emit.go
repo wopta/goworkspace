@@ -336,7 +336,23 @@ func emitPay(policy *models.Policy, origin string) {
 	log.Printf("[emitPay] Policy Uid %s", policy.Uid)
 
 	policy.IsPay = false
-	policy.PayUrl, _ = payment.PaymentController(origin, policy, product, mgaProduct)
+	transactions := transaction.CreateTransactions(*policy, *mgaProduct, func() string { return lib.NewDoc(models.TransactionsCollection) })
+	payUrl, updatedTransactions, err := payment.PaymentControllerV2(policy, *product, *mgaProduct, transactions)
+	if err != nil {
+		log.Printf("error emitPay policy %s: %s", policy.Uid, err.Error())
+		return
+	}
+
+	for _, tr := range updatedTransactions {
+		err = lib.SetFirestoreErr(models.TransactionsCollection, tr.Uid, tr)
+		if err != nil {
+			log.Printf("error saving transaction %s to firestore: %s", tr.Uid, err.Error())
+			return
+		}
+		tr.BigQuerySave("")
+	}
+
+	policy.PayUrl = payUrl
 }
 
 func setAdvance(policy *models.Policy, origin string) {
