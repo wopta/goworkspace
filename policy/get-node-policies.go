@@ -55,13 +55,12 @@ func GetNodePoliciesFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		return "", nil, errors.New("cannot access to node policies")
 	}
 
-	result, err := getPortfolioPolicies([]string{nodeUid}, req.Queries, req.Limit)
-
-	producerName := reqNode.GetName()
-	resp.Policies = make([]PolicyInfo, 0)
-	for _, p := range result {
-		resp.Policies = append(resp.Policies, policyToPolicyInfo(p, producerName))
+	resp.Policies, err = getPortfolioPolicies([]string{nodeUid}, req.Queries, req.Limit)
+	if err != nil {
+		log.Printf("error query: %s", err.Error())
+		return "", nil, err
 	}
+	log.Printf("found %02d policies", len(resp.Policies))
 
 	rawPolices, err := json.Marshal(resp)
 

@@ -8,8 +8,8 @@ require (
 	cloud.google.com/go/firestore v1.12.0
 	cloud.google.com/go/pubsub v1.33.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
-	github.com/wopta/goworkspace/lib v1.0.106
-	github.com/wopta/goworkspace/models v1.1.95
+	github.com/wopta/goworkspace/lib v1.0.107
+	github.com/wopta/goworkspace/models v1.1.96
 	google.golang.org/api v0.128.0
 )
 

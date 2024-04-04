@@ -7,14 +7,14 @@ replace github.com/wopta/goworkspace/payment => ./
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	github.com/google/uuid v1.4.0
-	github.com/wopta/goworkspace/lib v1.0.106
-	github.com/wopta/goworkspace/mail v1.0.94
-	github.com/wopta/goworkspace/models v1.1.95
-	github.com/wopta/goworkspace/network v1.0.49
-	github.com/wopta/goworkspace/policy v1.0.88
-	github.com/wopta/goworkspace/product v1.0.94
-	github.com/wopta/goworkspace/transaction v1.0.61
-	github.com/wopta/goworkspace/user v1.0.79
+	github.com/wopta/goworkspace/lib v1.0.107
+	github.com/wopta/goworkspace/mail v1.0.98
+	github.com/wopta/goworkspace/models v1.1.96
+	github.com/wopta/goworkspace/network v1.0.50
+	github.com/wopta/goworkspace/policy v1.0.89
+	github.com/wopta/goworkspace/product v1.0.96
+	github.com/wopta/goworkspace/transaction v1.0.65
+	github.com/wopta/goworkspace/user v1.0.83
 )
 
 require (
@@ -76,7 +76,7 @@ require (
 	github.com/src-d/gcfg v1.4.0 // indirect
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.2.1 // indirect
-	github.com/wopta/goworkspace/document v1.1.62 // indirect
+	github.com/wopta/goworkspace/document v1.1.66 // indirect
 	github.com/wopta/goworkspace/wiseproxy v1.0.3 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect

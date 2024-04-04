@@ -2,7 +2,7 @@ package companydata
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -33,7 +33,7 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	)
 
 	log.Println("----------------LifeAxalEmit-----------------")
-	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
+	req := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 	log.Println("LifeAxalEmit: ", r.Header)
 	log.Println("LifeAxalEmit: ", string(req))
@@ -152,7 +152,7 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 
 	filepath := "WOPTAKEYweb_NB" + filenamesplit + "_" + strconv.Itoa(refMontly.Year()) + fmt.Sprintf("%02d", int(refMontly.Month())) + "_" + fmt.Sprintf("%02d", now.Day()) + fmt.Sprintf("%02d", int(now.Month())) + ".txt"
 	lib.WriteCsv("../tmp/"+filepath, result, ';')
-	source, _ := ioutil.ReadFile("../tmp/" + filepath)
+	source, _ := os.ReadFile("../tmp/" + filepath)
 	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/axa/life/"+strconv.Itoa(refMontly.Year())+"/"+filepath, source)
 	if upload {
 		AxaPartnersSftpUpload(filepath)
@@ -223,12 +223,10 @@ func setRowLifeEmit(policy models.Policy, df dataframe.DataFrame, trans models.T
 			} else {
 				price = g.Value.PremiumGrossYearly
 			}
-
 			log.Println("LifeAxalEmit: ", price)
 			var intNum = int(price * 100)
 			priceGrossFormat := fmt.Sprintf("%013d", intNum) // 000000001220
 			log.Println("LifeAxalEmit: ", priceGrossFormat)
-
 			user := policy.Contractor.ToUser()
 			if user == nil {
 				return nil

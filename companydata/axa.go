@@ -38,6 +38,7 @@ func AxaPartnersSftpUpload(filePath string) {
 	defer destination.Close()
 	log.Println("Upload local file to a remote location as in 1MB (byte) chunks.")
 	info, e := source.Stat()
+	lib.CheckError(e)
 	log.Println(info.Size())
 	// Upload local file to a remote location as in 1MB (byte) chunks.
 	e = client.Upload(source, destination, int(info.Size()))
@@ -87,8 +88,8 @@ func AxaSftpUpload(filePath string, basePath string) {
 	destination, e := client.Create("IN/" + basePath + filePath)
 	lib.CheckError(e)
 	defer destination.Close()
-	log.Println("Upload local file to a remote location as in 1MB (byte) chunks.")
 	info, e := source.Stat()
+	log.Println("Upload local file to a remote location as in 1MB (byte) chunks.")
 	log.Println(info.Size())
 	// Upload local file to a remote location as in 1MB (byte) chunks.
 	e = client.Upload(source, destination, int(info.Size()))
