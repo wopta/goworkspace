@@ -125,7 +125,7 @@ func getPortfolioPolicies(producers []string, requestQueries []models.Query, lim
 		})
 	}
 
-	policies, err := getPoliciesInfoQueriesBigQuery(models.WoptaDataset, models.PoliciesViewCollection, queries, limitValue)
+	policies, err := getPoliciesInfoQueriesBigQuery(queries, limitValue)
 
 	return policies, err
 }
