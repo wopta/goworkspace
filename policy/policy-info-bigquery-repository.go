@@ -63,19 +63,12 @@ func buildPolicyInfoQuery(queries []models.Query, limit int) (string, map[string
 			query.WriteString(" AND")
 		}
 
-		valuesParameters := make([]string, 0)
+		paramsKeys := make([]string, 0)
+		values := []interface{}{q.Value}
 		if len(q.Values) > 0 {
-			for _, v := range q.Values {
-				valueParameter := randomString(12)
-				params[valueParameter] = v
-				valuesParameters = append(valuesParameters, valueParameter)
-			}
-		} else {
-			// value parameter should be a random string of only letters
-			valueParameter := randomString(12)
-			params[valueParameter] = q.Value
-			valuesParameters = append(valuesParameters, valueParameter)
+			values = q.Values
 		}
+		paramsKeys = buildParams(params, values)
 
 		op, err := getWhitelistedOperator(q.Op)
 		if err != nil {
@@ -86,7 +79,7 @@ func buildPolicyInfoQuery(queries []models.Query, limit int) (string, map[string
 			return "", nil, fmt.Errorf("field name is not allowed: %s", q.Field)
 		}
 
-		buildWhereClause(&query, q, op, valuesParameters, "p")
+		buildWhereClause(&query, q, op, paramsKeys, "p")
 	}
 
 	if limit != 0 {
@@ -105,6 +98,16 @@ func randomString(length int) string {
 		s[i] = letters[rand.Intn(len(letters))]
 	}
 	return string(s)
+}
+
+func buildParams(params map[string]interface{}, values []interface{}) []string {
+	valuesParameters := make([]string, 0)
+	for _, v := range values {
+		valueParameter := randomString(12)
+		params[valueParameter] = v
+		valuesParameters = append(valuesParameters, valueParameter)
+	}
+	return valuesParameters
 }
 
 func getWhitelistedOperator(queryOp string) (string, error) {
