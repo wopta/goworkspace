@@ -6,8 +6,8 @@ replace github.com/wopta/goworkspace/product => ./
 
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
-	github.com/wopta/goworkspace/lib v1.0.106
-	github.com/wopta/goworkspace/models v1.1.95
+	github.com/wopta/goworkspace/lib v1.0.107
+	github.com/wopta/goworkspace/models v1.1.96
 )
 
 require (
