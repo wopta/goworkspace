@@ -22,7 +22,7 @@ var mgaRoutes []lib.ChiRoute = []lib.ChiRoute{
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
-		Route:   "/network/node/v1/:uid",
+		Route:   "/network/node/v1/{uid}",
 		Handler: lib.ResponseLoggerWrapper(GetNetworkNodeByUidFx),
 		Method:  http.MethodGet,
 		Roles:   []string{lib.UserRoleAll},
@@ -46,7 +46,7 @@ var mgaRoutes []lib.ChiRoute = []lib.ChiRoute{
 		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleManager},
 	},
 	{
-		Route:   "/network/node/v1/:uid",
+		Route:   "/network/node/v1/{uid}",
 		Handler: lib.ResponseLoggerWrapper(DeleteNetworkNodeFx),
 		Method:  http.MethodDelete,
 		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleManager},
@@ -93,5 +93,8 @@ func Mga(w http.ResponseWriter, r *http.Request) {
 	log.Println("Mga Router")
 
 	router := lib.GetChiRouter("mga", mgaRoutes)
+	for _, route := range router.Routes() {
+		log.Printf("Route - %s", route.Pattern)
+	}
 	router.ServeHTTP(w, r)
 }
