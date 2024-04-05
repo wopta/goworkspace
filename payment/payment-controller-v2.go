@@ -10,6 +10,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"time"
 )
 
 func PaymentControllerV2(policy models.Policy, product models.Product, transactions []models.Transaction) (string, []models.Transaction, error) {
@@ -50,6 +51,7 @@ func remittanceIntegration(transactions []models.Transaction) (payUrl string, up
 
 func fabrickIntegration(transactions []models.Transaction, paymentMethods []string, policy models.Policy) (payUrl string, updatedTransactions []models.Transaction, err error) {
 	customerId := uuid.New().String()
+	now := time.Now().UTC()
 
 	for index, tr := range transactions {
 		isFirstRate := index == 0
@@ -67,6 +69,22 @@ func fabrickIntegration(transactions []models.Transaction, paymentMethods []stri
 		}
 		tr.ProviderId = *res.Payload.PaymentID
 		tr.UserToken = customerId
+
+		/*
+			operation that has to be done if transaction has been already paid and canceled.
+			Is it correct to do them here?
+		*/
+		tr.ProviderName = models.FabrickPaymentProvider
+		tr.IsPay = false
+		tr.IsDelete = false
+		tr.PaymentNote = ""
+		tr.PaymentMethod = ""
+		tr.PayDate = time.Time{}
+		tr.TransactionDate = time.Time{}
+		tr.Status = models.TransactionStatusToPay
+		tr.StatusHistory = append(tr.StatusHistory, models.TransactionStatusToPay)
+
+		tr.UpdateDate = now
 		updatedTransactions = append(updatedTransactions, tr)
 	}
 
