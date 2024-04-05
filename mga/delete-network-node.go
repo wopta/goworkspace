@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/go-chi/chi"
 	"github.com/wopta/goworkspace/network"
 )
 
@@ -18,7 +19,7 @@ func DeleteNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 	log.Println("Handler start -----------------------------------------------")
 
 	origin := r.Header.Get("Origin")
-	nodeUid := r.Header.Get("uid")
+	nodeUid := chi.URLParam(r, "uid")
 
 	log.Printf("deleting node %s from firestore...", nodeUid)
 
