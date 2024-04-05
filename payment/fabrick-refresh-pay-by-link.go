@@ -43,33 +43,28 @@ func FabrickRefreshPayByLinkFx(w http.ResponseWriter, r *http.Request) (string, 
 
 	policy.SanitizePaymentData()
 
+	// TODO: check if it holds also for renewed policy
 	if policy.PaymentMode == models.PaymentModeRecurrent && policy.PaymentSplit != string(models.PaySplitMonthly) {
 		log.Printf("payment mode %s not supported", policy.PaymentMode)
 		return "", nil, fmt.Errorf("payment mode not supported")
 	}
 
-	unpaidTransactions := transaction.GetPolicyUnpaidTransactions(policy.Uid)
-	if len(unpaidTransactions) == 0 {
-		log.Printf("no unpaid transactions found for policy %s", policy.Uid)
-		return "", nil, errors.New("no unpaid transactions found")
+	transactions, err := getTransactionsList(policy.Uid)
+	if err != nil {
+		return "", nil, err
 	}
-	log.Printf("found %02d unpaid transactions for policy %s", len(unpaidTransactions), policy.Uid)
 
 	product := prd.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, nil, nil)
 
-	payUrl, updatedTransactions, err := PaymentControllerV2(policy, *product, unpaidTransactions)
+	payUrl, updatedTransactions, err := PaymentControllerV2(policy, *product, transactions)
 	if err != nil {
 		log.Printf("error scheduling transactions on fabrick: %s", err.Error())
 		return "", nil, err
 	}
 
-	for _, tr := range updatedTransactions {
-		err = lib.SetFirestoreErr(models.TransactionsCollection, tr.Uid, tr)
-		if err != nil {
-			return "{}", nil, err
-		}
-
-		tr.BigQuerySave("")
+	err = saveTransactionsToDB(updatedTransactions)
+	if err != nil {
+		return "", nil, err
 	}
 
 	policy.PayUrl = payUrl
@@ -78,7 +73,6 @@ func FabrickRefreshPayByLinkFx(w http.ResponseWriter, r *http.Request) (string, 
 	if err != nil {
 		return "{}", nil, err
 	}
-
 	policy.BigquerySave("")
 
 	models.CreateAuditLog(r, string(body))
@@ -92,6 +86,31 @@ func FabrickRefreshPayByLinkFx(w http.ResponseWriter, r *http.Request) (string, 
 	log.Println("Handler end -------------------------------------------------")
 
 	return "{}", nil, nil
+}
+
+func getTransactionsList(policyUid string) ([]models.Transaction, error) {
+	transactions := transaction.GetPolicyTransactions("", policyUid)
+	transactions = lib.SliceFilter(transactions, func(tr models.Transaction) bool {
+		return (!tr.IsPay && !tr.IsDelete) || (tr.IsPay && tr.IsDelete)
+	})
+	if len(transactions) == 0 {
+		log.Printf("no transactions to be recreated found for policy %s", policyUid)
+		return nil, errors.New("no transactions to be recreated found")
+	}
+	log.Printf("found %02d transactions for policy %s", len(transactions), policyUid)
+	return transactions, nil
+}
+
+func saveTransactionsToDB(transactions []models.Transaction) error {
+	for _, tr := range transactions {
+		err := lib.SetFirestoreErr(models.TransactionsCollection, tr.Uid, tr)
+		if err != nil {
+			log.Printf("error saving transactions to db: %s", err.Error())
+			return err
+		}
+		tr.BigQuerySave("")
+	}
+	return nil
 }
 
 func sendPayByLinkEmail(policy models.Policy) error {
