@@ -347,7 +347,7 @@ func GetAssetPathByEnvV2() string {
 }
 
 func CheckFileExistence(filePath string) bool {
-	if os.Getenv("env") == "local" {
+	if IsLocal() {
 		_, err := os.OpenFile("../function-data/dev/"+filePath, os.O_RDWR, 0755)
 		if errors.Is(err, os.ErrNotExist) {
 			return false
