@@ -8,14 +8,23 @@ import (
 	"time"
 )
 
+var numTransactionsMap = map[string]int{
+	string(models.PaySplitMonthly):           12,
+	string(models.PaySplitYear):              1,
+	string(models.PaySplitYearly):            1,
+	string(models.PaySplitSingleInstallment): 1,
+	string(models.PaySplitSemestral):         2,
+}
+
 func CreateTransactions(policy models.Policy, mgaProduct models.Product, uidGenerator func() string) []models.Transaction {
 	var (
-		transactions = make([]models.Transaction, 0)
+		numTransactions int
+		transactions    = make([]models.Transaction, 0)
 	)
 
-	numTransactions := 1
-	if policy.PaymentSplit == string(models.PaySplitMonthly) {
-		numTransactions = 12
+	numTransactions = numTransactionsMap[policy.PaymentSplit]
+	if numTransactions == 0 {
+		return transactions
 	}
 
 	i := 0
