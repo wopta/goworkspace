@@ -337,7 +337,7 @@ func emitPay(policy *models.Policy, origin string) {
 
 	policy.IsPay = false
 	transactions := transaction.CreateTransactions(*policy, *mgaProduct, func() string { return lib.NewDoc(models.TransactionsCollection) })
-	payUrl, updatedTransactions, err := payment.PaymentControllerV2(policy, *product, *mgaProduct, transactions)
+	payUrl, updatedTransactions, err := payment.PaymentControllerV2(*policy, *product, transactions)
 	if err != nil {
 		log.Printf("error emitPay policy %s: %s", policy.Uid, err.Error())
 		return

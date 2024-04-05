@@ -12,7 +12,7 @@ import (
 	"os"
 )
 
-func PaymentControllerV2(policy *models.Policy, product, mgaProduct models.Product, transactions []models.Transaction) (string, []models.Transaction, error) {
+func PaymentControllerV2(policy models.Policy, product models.Product, transactions []models.Transaction) (string, []models.Transaction, error) {
 	var (
 		err                error
 		payUrl             string
@@ -22,16 +22,16 @@ func PaymentControllerV2(policy *models.Policy, product, mgaProduct models.Produ
 
 	log.Printf("init")
 
-	if err = checkPaymentModes(*policy); err != nil {
+	if err = checkPaymentModes(policy); err != nil {
 		log.Printf("mismatched payment configuration: %s", err.Error())
 		return "", nil, err
 	}
 
-	paymentMethods = getPaymentMethodsV2(*policy, product)
+	paymentMethods = getPaymentMethodsV2(policy, product)
 
 	switch policy.Payment {
 	case models.FabrickPaymentProvider:
-		payUrl, updatedTransaction, err = fabrickIntegration(transactions, paymentMethods, *policy)
+		payUrl, updatedTransaction, err = fabrickIntegration(transactions, paymentMethods, policy)
 	case models.ManualPaymentProvider:
 		payUrl, updatedTransaction, err = remittanceIntegration(transactions)
 	default:
