@@ -71,7 +71,7 @@ func fabrickIntegration(transactions []models.Transaction, paymentMethods []stri
 		tr.UserToken = customerId
 
 		/*
-			operation that has to be done if transaction has been already paid and canceled.
+			Operations that have to be done if transaction has been already paid and canceled.
 			Is it correct to do them here?
 		*/
 		tr.ProviderName = models.FabrickPaymentProvider
