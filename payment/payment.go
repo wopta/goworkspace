@@ -30,18 +30,6 @@ func Payment(w http.ResponseWriter, r *http.Request) {
 				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 			},
 			{
-				Route:   "/v1/fabrick",
-				Handler: FabrickPayFx,
-				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAll},
-			},
-			{
-				Route:   "/v1/fabrick/montly",
-				Handler: FabrickPayMonthlyFx,
-				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAll},
-			},
-			{
 				Route:   "/v1/cripto",
 				Handler: CriptoPay,
 				Method:  http.MethodPost,
