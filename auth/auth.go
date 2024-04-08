@@ -5,9 +5,35 @@ import (
 	"net/http"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
-	lib "github.com/wopta/goworkspace/lib"
-	models "github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/lib"
 )
+
+var authRoutes []lib.ChiRoute = []lib.ChiRoute{
+	{
+		Route:   "/authorize/v1",
+		Handler: lib.ResponseLoggerWrapper(AuthorizeFx),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAll},
+	},
+	{
+		Route:   "/token/v1",
+		Handler: lib.ResponseLoggerWrapper(TokenFx),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAll},
+	},
+	{
+		Route:   "/sso/jwt/aua/v1",
+		Handler: lib.ResponseLoggerWrapper(JwtFx),
+		Method:  http.MethodGet,
+		Roles:   []string{lib.UserRoleInternal},
+	},
+	{
+		Route:   "/sso/external/v1/:productName",
+		Handler: lib.ResponseLoggerWrapper(GetTokenForExternalIntegrationFx),
+		Method:  http.MethodGet,
+		Roles:   []string{lib.UserRoleAgent, lib.UserRoleAgency},
+	},
+}
 
 var origin string
 
@@ -17,39 +43,8 @@ func init() {
 }
 
 func Auth(w http.ResponseWriter, r *http.Request) {
-	log.Println("Auth")
-	lib.EnableCors(&w, r)
-	w.Header().Set("Access-Control-Allow-Methods", "POST")
-	route := lib.RouteData{
-		Routes: []lib.Route{
+	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
-			{
-				Route:   "/authorize/v1",
-				Handler: AuthorizeFx,
-				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAll},
-			},
-
-			{
-				Route:   "/token/v1",
-				Handler: TokenFx,
-				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAll},
-			},
-			{
-				Route:   "/sso/jwt/aua/v1",
-				Handler: JwtFx,
-				Method:  http.MethodGet,
-				Roles:   []string{"internal"},
-			},
-			{
-				Route:   "/sso/external/v1/:productName",
-				Handler: GetTokenForExternalIntegrationFx,
-				Method:  http.MethodGet,
-				Roles:   []string{models.UserRoleAgent, models.UserRoleAgency},
-			},
-		},
-	}
-	route.Router(w, r)
-
+	router := lib.GetChiRouter("auth", authRoutes)
+	router.ServeHTTP(w, r)
 }

@@ -8,8 +8,8 @@ import (
 	"os"
 
 	jwt "github.com/golang-jwt/jwt/v5"
-	lib "github.com/wopta/goworkspace/lib"
-	models "github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 )
 
 func JwtFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -21,11 +21,13 @@ func JwtFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 		responseSsoJwt ResponseSsoJwt
 	)
 
-	log.Println("--------------------------JwtFx-------------------------------------------")
+	log.SetPrefix("[JwtFx] ")
+	defer log.SetPrefix("")
+
+	log.Println("Handler start -----------------------------------------------")
 
 	origin = r.Header.Get("Origin")
 	tokenReq := r.URL.Query().Get("jwt")
-	defer r.Body.Close()
 
 	log.Println("JwtFx request token:", tokenReq)
 
@@ -66,6 +68,8 @@ func JwtFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 			b, e = json.Marshal(responseSsoJwt)
 		}
 	}
+
+	log.Println("Handler end -------------------------------------------------")
 
 	return string(b), responseSsoJwt, e
 }
