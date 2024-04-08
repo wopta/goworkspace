@@ -3,11 +3,14 @@ package broker
 import (
 	"encoding/json"
 	"fmt"
+	"log"
+	"net/http"
+
+	"github.com/go-chi/chi"
+	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	plc "github.com/wopta/goworkspace/policy"
 	"github.com/wopta/goworkspace/transaction"
-	"log"
-	"net/http"
 )
 
 type GetPolicyTransactionsResp struct {
@@ -23,12 +26,12 @@ func GetPolicyTransactionsFx(w http.ResponseWriter, r *http.Request) (string, in
 	defer log.SetPrefix("")
 	log.Println("Handler start -----------------------------------------------")
 
-	policyUid := r.Header.Get("policyUid")
+	policyUid := chi.URLParam(r, "policyUid")
 
 	log.Printf("policyUid %s", policyUid)
 
 	idToken := r.Header.Get("Authorization")
-	authToken, err := models.GetAuthTokenFromIdToken(idToken)
+	authToken, err := lib.GetAuthTokenFromIdToken(idToken)
 	if err != nil {
 		log.Printf("error getting authToken: %s", err.Error())
 		return "", nil, err
@@ -43,17 +46,17 @@ func GetPolicyTransactionsFx(w http.ResponseWriter, r *http.Request) (string, in
 	userUid := authToken.UserID
 
 	if !plc.CanBeAccessedBy(authToken.Role, policy.ProducerUid, authToken.UserID) {
-		log.Printf("[GetPolicyTransactionsFx] policy %s is not included in %s %s portfolio", policyUid, authToken.Role, userUid)
+		log.Printf("policy %s is not included in %s %s portfolio", policyUid, authToken.Role, userUid)
 		return "", response, fmt.Errorf("%s %s unauthorized for policy %s", authToken.Role, userUid, policyUid)
 	}
 
-	transactions := transaction.GetPolicyTransactions(r.Header.Get("origin"), policyUid)
+	transactions := transaction.GetPolicyTransactions(r.Header.Get("Origin"), policyUid)
 
 	response.Transactions = transactions
 
 	jsonOut, err := json.Marshal(response)
 
-	log.Printf("[GetPolicyTransactionsFx] response: %s", string(jsonOut))
+	log.Println("Handler end -------------------------------------------------")
 
 	return string(jsonOut), response, err
 }

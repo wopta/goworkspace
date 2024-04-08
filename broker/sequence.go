@@ -19,14 +19,14 @@ func GetSequenceByCompany(name string, firePolicy string) (string, int, int) {
 		number              int
 	)
 	switch name {
-	case "global":
+	case models.GlobalCompany:
 		companyDefault = 1
 		companyPrefix = "WB"
 		companyPrefixLenght = `%07d`
-	case "axa":
+	case models.AxaCompany:
 		companyDefault = 100001
 		companyPrefixLenght = `%06d`
-	case "sogessur":
+	case models.SogessurCompany:
 		companyDefault = 1
 		companyPrefixLenght = `%07d`
 		companyPrefix = "G"
