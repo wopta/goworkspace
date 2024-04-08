@@ -33,8 +33,7 @@ func GetProductByChannelFx(w http.ResponseWriter, r *http.Request) (string, inte
 	log.Println("Handler start -----------------------------------------------")
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
-
-	log.Printf("body req: %s", string(body))
+	defer r.Body.Close()
 
 	err := json.Unmarshal(body, &req)
 	if err != nil {

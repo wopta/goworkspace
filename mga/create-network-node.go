@@ -2,13 +2,14 @@ package mga
 
 import (
 	"encoding/json"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/network"
 	"io"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
 )
 
 func CreateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -25,7 +26,7 @@ func CreateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 	origin := r.Header.Get("Origin")
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
-	log.Printf("request body: %s", string(body))
+
 	err = json.Unmarshal(body, &inputNode)
 	if err != nil {
 		log.Printf("error unmarshaling request: %s", err.Error())
@@ -55,9 +56,6 @@ func CreateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 	}
 
 	log.Println("network node successfully created!")
-
-	models.CreateAuditLog(r, string(body))
-
 	log.Println("Handler end -------------------------------------------------")
 
 	return "{}", "", err

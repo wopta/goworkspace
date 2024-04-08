@@ -19,12 +19,13 @@ func UpdateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 	)
 
 	log.SetPrefix("[UpdateNetworkNodeFx] ")
+	defer log.SetPrefix("")
 
 	log.Println("Handler start -----------------------------------------------")
 
 	body = lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
-	log.Printf("request body: %s", string(body))
+
 	err = json.Unmarshal(body, &inputNode)
 	if err != nil {
 		log.Printf("error unmarshaling request: %s", err.Error())
@@ -40,8 +41,6 @@ func UpdateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 	}
 
 	log.Printf("network node %s updated successfully", inputNode.Uid)
-
-	models.CreateAuditLog(r, string(body))
 
 	log.Println("Handler end -------------------------------------------------")
 

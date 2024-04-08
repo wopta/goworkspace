@@ -29,6 +29,8 @@ func ConsumeNetworkNodeInviteFx(w http.ResponseWriter, r *http.Request) (string,
 	log.Println("Handler start -----------------------------------------------")
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
+	defer r.Body.Close()
+
 	origin := r.Header.Get("Origin")
 
 	err := json.Unmarshal(body, &req)
