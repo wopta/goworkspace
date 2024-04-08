@@ -54,6 +54,10 @@ func FabrickRefreshPayByLinkFx(w http.ResponseWriter, r *http.Request) (string, 
 	if err != nil {
 		return "", nil, err
 	}
+	transactions = lib.SliceMap(transactions, func(tr models.Transaction) models.Transaction {
+		transaction.ReinitializePaymentInfo(&tr)
+		return tr
+	})
 
 	product := prd.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, nil, nil)
 

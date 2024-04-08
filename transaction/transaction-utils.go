@@ -6,6 +6,9 @@ import (
 )
 
 func ReinitializePaymentInfo(tr *models.Transaction) {
+	if tr.IsPay && !tr.IsDelete {
+		return
+	}
 	tr.IsPay = false
 	tr.IsDelete = false
 	tr.PaymentNote = ""
@@ -13,7 +16,7 @@ func ReinitializePaymentInfo(tr *models.Transaction) {
 	tr.PayDate = time.Time{}
 	tr.TransactionDate = time.Time{}
 	tr.Status = models.TransactionStatusToPay
-	tr.StatusHistory = append(tr.StatusHistory, models.TransactionStatusToPay)
+	tr.StatusHistory = append(tr.StatusHistory, "Reinitialized", models.TransactionStatusToPay)
 }
 
 func getMonthlyAmountsFlat(policy *models.Policy) (grossAmounts []float64, nettAmounts []float64) {

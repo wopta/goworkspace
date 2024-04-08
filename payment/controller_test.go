@@ -146,8 +146,8 @@ func TestControllerFabrickYearlySingle(t *testing.T) {
 	}
 
 	for index, tr := range updatedTransactions {
-		if index == 0 && tr.ScheduleDate != "" {
-			t.Fatalf("expected: empty ScheduleDate got: %s", tr.ScheduleDate)
+		if tr.ScheduleDate == "" {
+			t.Fatalf("expected: non-empty ScheduleDate")
 		}
 
 		if tr.ProviderId != "local" {
@@ -189,8 +189,8 @@ func TestControllerFabrickYearlyRecurrent(t *testing.T) {
 	}
 
 	for index, tr := range updatedTransactions {
-		if index == 0 && tr.ScheduleDate != "" {
-			t.Fatalf("expected: empty ScheduleDate got: %s", tr.ScheduleDate)
+		if tr.ScheduleDate == "" {
+			t.Fatalf("expected: non-empty ScheduleDate")
 		}
 
 		if tr.ProviderId != "local" {
@@ -232,8 +232,8 @@ func TestControllerFabrickMonthly(t *testing.T) {
 	}
 
 	for index, tr := range updatedTransactions {
-		if index == 0 && tr.ScheduleDate != "" {
-			t.Fatalf("expected: empty ScheduleDate got: %s", tr.ScheduleDate)
+		if tr.ScheduleDate == "" {
+			t.Fatalf("expected: non-empty ScheduleDate")
 		}
 
 		if tr.ProviderId != "local" {

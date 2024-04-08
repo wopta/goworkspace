@@ -6,7 +6,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/transaction"
 	"log"
 	"time"
 )
@@ -52,9 +51,6 @@ func fabrickIntegration(transactions []models.Transaction, paymentMethods []stri
 	for index, tr := range transactions {
 		isFirstRate := index == 0
 		createMandate := (policy.PaymentMode == models.PaymentModeRecurrent) && isFirstRate
-		if isFirstRate {
-			tr.ScheduleDate = ""
-		}
 
 		tr.ProviderName = models.FabrickPaymentProvider
 
@@ -68,13 +64,6 @@ func fabrickIntegration(transactions []models.Transaction, paymentMethods []stri
 
 		tr.ProviderId = *res.Payload.PaymentID
 		tr.UserToken = customerId
-
-		/*
-			Operations that have to be done if transaction has been already paid and canceled.
-			Is it correct to do them here?
-		*/
-		transaction.ReinitializePaymentInfo(&tr)
-
 		tr.UpdateDate = now
 		updatedTransactions = append(updatedTransactions, tr)
 	}
