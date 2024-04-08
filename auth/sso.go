@@ -43,7 +43,7 @@ func JwtFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 				},
 			},
 		}
-		node, e = q.FireQuery(models.NetworkNodesCollection)
+		node, e = q.FireQuery(lib.NetworkNodesCollection)
 		if len(node) > 0 {
 			if node[0].AuthId == "" {
 				userfire, _ := lib.CreateUserWithEmailAndPassword(node[0].Mail, os.Getenv("DEFAULT_PSW"), &node[0].Uid)
