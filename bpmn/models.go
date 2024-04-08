@@ -3,7 +3,7 @@ package bpmn
 import (
 	"time"
 
-	models "github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/models"
 )
 
 type ProcessType string
