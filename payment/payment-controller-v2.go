@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/transaction"
 	"io"
 	"log"
 	"os"
@@ -60,6 +61,8 @@ func fabrickIntegration(transactions []models.Transaction, paymentMethods []stri
 			tr.ScheduleDate = ""
 		}
 
+		tr.ProviderName = models.FabrickPaymentProvider
+
 		res := <-createFabrickTransactionV2(&policy, tr, isFirstRate, createMandate, customerId, paymentMethods)
 		if res.Payload == nil || res.Payload.PaymentPageURL == nil {
 			return "", nil, errors.New("error creating transaction on Fabrick")
@@ -67,6 +70,7 @@ func fabrickIntegration(transactions []models.Transaction, paymentMethods []stri
 		if isFirstRate {
 			payUrl = *res.Payload.PaymentPageURL
 		}
+
 		tr.ProviderId = *res.Payload.PaymentID
 		tr.UserToken = customerId
 
@@ -74,15 +78,7 @@ func fabrickIntegration(transactions []models.Transaction, paymentMethods []stri
 			Operations that have to be done if transaction has been already paid and canceled.
 			Is it correct to do them here?
 		*/
-		tr.ProviderName = models.FabrickPaymentProvider
-		tr.IsPay = false
-		tr.IsDelete = false
-		tr.PaymentNote = ""
-		tr.PaymentMethod = ""
-		tr.PayDate = time.Time{}
-		tr.TransactionDate = time.Time{}
-		tr.Status = models.TransactionStatusToPay
-		tr.StatusHistory = append(tr.StatusHistory, models.TransactionStatusToPay)
+		transaction.ReinitializePaymentInfo(&tr)
 
 		tr.UpdateDate = now
 		updatedTransactions = append(updatedTransactions, tr)

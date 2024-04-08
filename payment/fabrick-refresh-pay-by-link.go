@@ -21,13 +21,14 @@ type FabrickRefreshPayByLinkRequest struct {
 }
 
 func FabrickRefreshPayByLinkFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.SetPrefix("[FabrickRefreshPayByLinkFx] ")
-	log.Println("Handler start -----------------------------------------------")
-
 	var (
 		request FabrickRefreshPayByLinkRequest
 		err     error
 	)
+
+	log.SetPrefix("[FabrickRefreshPayByLinkFx] ")
+	defer log.SetPrefix("")
+	log.Println("Handler start -----------------------------------------------")
 
 	origin := r.Header.Get("Origin")
 	body := lib.ErrorByte(io.ReadAll(r.Body))
