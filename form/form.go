@@ -4,12 +4,30 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/wopta/goworkspace/models"
-
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
-	lib "github.com/wopta/goworkspace/lib"
-	//"google.golang.org/api/firebaseappcheck/v1"
+	"github.com/wopta/goworkspace/lib"
 )
+
+var formRoutes []lib.ChiRoute = []lib.ChiRoute{
+	{
+		Route:   "/axafleet",
+		Handler: lib.ResponseLoggerWrapper(AxaFleetTway),
+		Method:  http.MethodGet,
+		Roles:   []string{lib.UserRoleAll},
+	},
+	{
+		Route:   "/v1/{uid}",
+		Handler: lib.ResponseLoggerWrapper(GetFx),
+		Method:  http.MethodGet,
+		Roles:   []string{lib.UserRoleAll},
+	},
+	{
+		Route:   "test/v1",
+		Handler: lib.ResponseLoggerWrapper(GetFx),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAll},
+	},
+}
 
 func init() {
 	log.Println("INIT Form")
@@ -17,31 +35,8 @@ func init() {
 }
 
 func Form(w http.ResponseWriter, r *http.Request) {
-	log.Println("Product")
-	lib.EnableCors(&w, r)
-	w.Header().Set("Access-Control-Allow-Methods", "POST")
-	route := lib.RouteData{
-		Routes: []lib.Route{
-			{
-				Route:   "/axafleet",
-				Handler: AxaFleetTway,
-				Method:  "GET",
-				Roles:   []string{models.UserRoleAll},
-			},
-			{
-				Route:   "/v1/:uid",
-				Handler: GetFx,
-				Method:  "GET",
-				Roles:   []string{models.UserRoleAll},
-			},
-			{
-				Route:   "test/v1",
-				Handler: GetFx,
-				Method:  "POST",
-				Roles:   []string{models.UserRoleAll},
-			},
-		},
-	}
-	route.Router(w, r)
+	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
+	router := lib.GetChiRouter("form", formRoutes)
+	router.ServeHTTP(w, r)
 }
