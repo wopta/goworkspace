@@ -6,6 +6,7 @@ replace github.com/wopta/goworkspace/mga => ./
 
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
+	github.com/go-chi/chi v1.5.5
 	github.com/wopta/goworkspace/lib v1.0.108
 	github.com/wopta/goworkspace/mail v1.0.98
 	github.com/wopta/goworkspace/models v1.1.97
@@ -37,7 +38,6 @@ require (
 	github.com/cloudevents/sdk-go/v2 v2.14.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
-	github.com/go-chi/chi v1.5.5 // indirect
 	github.com/go-chi/cors v1.2.1 // indirect
 	github.com/go-gota/gota v0.12.0 // indirect
 	github.com/go-pdf/fpdf v0.8.0 // indirect
