@@ -1,19 +1,53 @@
 package document
 
-/*
-
- */
 import (
-	"github.com/wopta/goworkspace/models"
 	"log"
 	"net/http"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/johnfercher/maroto/pkg/color"
 	"github.com/johnfercher/maroto/pkg/props"
-	lib "github.com/wopta/goworkspace/lib"
-	//model "github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/lib"
 )
+
+var documentRoutes []lib.ChiRoute = []lib.ChiRoute{
+	{
+		Route:   "/v1/proposal",
+		Handler: lib.ResponseLoggerWrapper(ContractFx),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAll},
+	},
+	{
+		Route:   "/v1/contract",
+		Handler: lib.ResponseLoggerWrapper(ContractFx),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAll},
+	},
+	{
+		Route:   "/v1/proposal",
+		Handler: lib.ResponseLoggerWrapper(ProposalFx),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAll},
+	},
+	{
+		Route:   "/v1/reserved",
+		Handler: lib.ResponseLoggerWrapper(ReservedFx),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAll},
+	},
+	{
+		Route:   "/v1/sign",
+		Handler: lib.ResponseLoggerWrapper(SignNamirial),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAll},
+	},
+	{
+		Route:   "/v2/sign",
+		Handler: lib.ResponseLoggerWrapper(SignNamirialV6),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAll},
+	},
+}
 
 func init() {
 	log.Println("INIT Document")
@@ -21,50 +55,9 @@ func init() {
 }
 
 func Document(w http.ResponseWriter, r *http.Request) {
-	log.Println("Document")
-	lib.EnableCors(&w, r)
-	w.Header().Set("Access-Control-Allow-Methods", "POST")
-	route := lib.RouteData{
-		Routes: []lib.Route{
-			{
-				Route:   "/v1/proposal",
-				Handler: ContractFx,
-				Roles:   []string{models.UserRoleAll},
-			},
-			{
-				Route:   "/v1/contract",
-				Handler: ContractFx,
-				Method:  "POST",
-				Roles:   []string{models.UserRoleAll},
-			},
-			{
-				Route:   "/v1/proposal",
-				Handler: ProposalFx,
-				Method:  "POST",
-				Roles:   []string{models.UserRoleAll},
-			},
-			{
-				Route:   "/v1/reserved",
-				Handler: ReservedFx,
-				Method:  "POST",
-				Roles:   []string{models.UserRoleAll},
-			},
-			{
-				Route:   "/v1/sign/",
-				Handler: SignNamirial,
-				Method:  "POST",
-				Roles:   []string{models.UserRoleAll},
-			},
-			{
-				Route:   "/v2/sign",
-				Handler: SignNamirialV6,
-				Method:  "POST",
-				Roles:   []string{models.UserRoleAll},
-			},
-		},
-	}
-	route.Router(w, r)
-
+	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
+	router := lib.GetChiRouter("document", documentRoutes)
+	router.ServeHTTP(w, r)
 }
 
 type Kv struct {
