@@ -14,7 +14,6 @@ require (
 	github.com/wopta/goworkspace/policy v1.0.89
 	github.com/wopta/goworkspace/product v1.0.96
 	github.com/wopta/goworkspace/transaction v1.0.65
-	github.com/wopta/goworkspace/user v1.0.83
 )
 
 require (
@@ -88,6 +87,7 @@ require (
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.21.0 // indirect
 	golang.org/x/crypto v0.14.0 // indirect
+	golang.org/x/exp v0.0.0-20230801115018-d63ba01acd4b // indirect
 	golang.org/x/mod v0.11.0 // indirect
 	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/oauth2 v0.11.0 // indirect
