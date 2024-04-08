@@ -196,7 +196,7 @@ func createFabrickTransaction(
 		log.Printf("policy '%s' request headers: %s", policy.Uid, request.Header)
 		log.Printf("policy '%s' request body: %s", policy.Uid, request.Body)
 
-		if os.Getenv("env") == "local" {
+		if os.Getenv("env") == "local" || os.Getenv("env") == "local-test" {
 			status := "200"
 			local := "local"
 			url := "www.dev.wopta.it"
