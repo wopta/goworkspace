@@ -1,14 +1,11 @@
 package network
 
 import (
-	"cloud.google.com/go/pubsub"
 	"context"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
 	"io"
 	"log"
 	"net/http"
@@ -17,6 +14,10 @@ import (
 	"regexp"
 	"strings"
 	"time"
+
+	"cloud.google.com/go/pubsub"
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 )
 
 type ImportNodesReq struct {
@@ -115,14 +116,14 @@ func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		validatedRows = make(map[string][][]string)
 	)
 
-	log.SetPrefix("ImportNodesFx ")
+	log.SetPrefix("[ImportNodesFx] ")
 	defer log.SetPrefix("")
 
 	log.Println("Handler Start -----------------------------------------------")
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
-	log.Printf("Request body: %s", string(body))
+
 	err = json.Unmarshal(body, &req)
 	if err != nil {
 		log.Printf("Error unmarshiling request body: %s", err.Error())
