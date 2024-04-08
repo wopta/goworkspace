@@ -21,27 +21,32 @@ const (
 )
 
 func SignFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.Println("[SignFx] Handler start --------------------------------------")
+	log.SetPrefix("[SignFx] ")
+	defer log.SetPrefix("")
+
+	log.Println("Handler start -----------------------------------------------")
 
 	policyUid := r.URL.Query().Get("uid")
 	envelope := r.URL.Query().Get("envelope")
 	action := r.URL.Query().Get("action")
 	origin = r.URL.Query().Get("origin")
 	sendEmailParam := r.URL.Query().Get("sendEmail")
-	log.Printf("[SignFx] Uid: '%s', Envelope: '%s', Action: '%s', SendEmailParam: '%s'", policyUid, envelope, action, sendEmailParam)
+	log.Printf("Uid: '%s', Envelope: '%s', Action: '%s', SendEmailParam: '%s'", policyUid, envelope, action, sendEmailParam)
 
 	if v, err := strconv.ParseBool(sendEmailParam); err == nil {
 		sendEmail = v
 	} else {
 		sendEmail = true
 	}
-	log.Printf("[SignFx] sendEmail: %t", sendEmail)
+	log.Printf("sendEmail: %t", sendEmail)
 
 	switch action {
 	case namirialFinished:
 		namirialStepFinished(origin, policyUid)
 	default:
 	}
+
+	log.Println("Handler end -------------------------------------------------")
 
 	return "", nil, nil
 }
@@ -53,7 +58,7 @@ func namirialStepFinished(origin, policyUid string) {
 		err    error
 	)
 
-	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
+	firePolicy := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
 
 	docSnap, err := lib.GetFirestoreErr(firePolicy, policyUid)
 	if err != nil {
