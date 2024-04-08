@@ -35,7 +35,7 @@ func Form(w http.ResponseWriter, r *http.Request) {
 				Roles:   []string{models.UserRoleAll},
 			},
 			{
-				Route:   "test/v1",
+				Route:   "fleet/assistance/v1",
 				Handler: GetFx,
 				Method:  "POST",
 				Roles:   []string{models.UserRoleAll},

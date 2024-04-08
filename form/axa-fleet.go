@@ -3,6 +3,7 @@ package form
 import (
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -19,6 +20,10 @@ import (
 )
 
 func GetFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+
+	body,e := io.ReadAll(r.Body)
+	log.Println(e)
+	log.Println(body)
 
 	return "", nil, nil
 }
@@ -161,7 +166,6 @@ func AxaFleetTway(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		}
 	}
 
-	
 	if toEmit {
 
 		now := time.Now()
@@ -228,6 +232,7 @@ func SftpUpload(filePath string) {
 	defer destination.Close()
 	log.Println("Upload local file to a remote location as in 1MB (byte) chunks.")
 	info, e := source.Stat()
+	lib.CheckError(e)
 	log.Println(info.Size())
 	// Upload local file to a remote location as in 1MB (byte) chunks.
 	e = client.Upload(source, destination, int(info.Size()))
@@ -261,6 +266,7 @@ func CreateExcel(sheet [][]interface{}, filePath string) ([]byte, error) {
 	alfabet := []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"}
 	// Create a new sheet.
 	index, err := f.NewSheet("Sheet1")
+	lib.CheckError(err)
 	for x, row := range sheet {
 		for i, cel := range row {
 
