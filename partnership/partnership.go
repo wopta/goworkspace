@@ -9,24 +9,25 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
+var partnershipRoutes []lib.ChiRoute = []lib.ChiRoute{
+	{
+		Route:   "/v1/life/{partnershipUid}",
+		Handler: lib.ResponseLoggerWrapper(LifePartnershipFx),
+		Method:  http.MethodGet,
+		Roles:   []string{models.UserRoleAll},
+	},
+}
+
 func init() {
 	log.Println("INIT Partnership")
 	functions.HTTP("Partnership", Partnership)
 }
 
 func Partnership(w http.ResponseWriter, r *http.Request) {
-	lib.EnableCors(&w, r)
-	route := lib.RouteData{
-		Routes: []lib.Route{
-			{
-				Route:   "/v1/life/:partnershipUid",
-				Handler: LifePartnershipFx,
-				Method:  "GET",
-				Roles:   []string{models.UserRoleAll},
-			},
-		},
-	}
-	route.Router(w, r)
+	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
+
+	router := lib.GetChiRouter("partnership", partnershipRoutes)
+	router.ServeHTTP(w, r)
 }
 
 type PartnershipResponse struct {
