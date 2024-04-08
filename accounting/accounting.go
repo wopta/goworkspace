@@ -6,8 +6,28 @@ import (
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
 )
+
+var accountingRoutes []lib.ChiRoute = []lib.ChiRoute{
+	{
+		Route:   "/network/transactions/v1/transaction/{transactionUid}",
+		Handler: lib.ResponseLoggerWrapper(GetNetworkTransactionsFx),
+		Method:  http.MethodGet,
+		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleManager},
+	},
+	{
+		Route:   "/network/transactions/v1/{uid}",
+		Handler: lib.ResponseLoggerWrapper(PutNetworkTransactionFx),
+		Method:  http.MethodPut,
+		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleManager},
+	},
+	{
+		Route:   "/network/transactions/v1/transaction/{transactionUid}",
+		Handler: lib.ResponseLoggerWrapper(CreateNetworkTransactionFx),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleManager},
+	},
+}
 
 func init() {
 	log.Println("INIT Accounting")
@@ -15,31 +35,8 @@ func init() {
 }
 
 func Accounting(w http.ResponseWriter, r *http.Request) {
-	log.Println("Accounting")
-	lib.EnableCors(&w, r)
+	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
-	route := lib.RouteData{
-		Routes: []lib.Route{
-			{
-				Route:   "/network/transactions/v1/transaction/:transactionUid",
-				Handler: GetNetworkTransactionsFx,
-				Method:  http.MethodGet,
-				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
-			},
-			{
-				Route:   "/network/transactions/v1/:uid",
-				Handler: PutNetworkTransactionFx,
-				Method:  http.MethodPut,
-				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
-			},
-			{
-				Route:   "/network/transactions/v1/transaction/:transactionUid",
-				Handler: CreateNetworkTransactionFx,
-				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
-			},
-		},
-	}
-
-	route.Router(w, r)
+	router := lib.GetChiRouter("accounting", accountingRoutes)
+	router.ServeHTTP(w, r)
 }

@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/go-chi/chi"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/transaction"
 )
@@ -15,13 +16,16 @@ type GetNetworkTransactionsResponse struct {
 }
 
 func GetNetworkTransactionsFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
-	log.Println("[GetNetworkTransactionsFx] Handler start ---------------------")
-
 	var response GetNetworkTransactionsResponse
 
-	transactionUid := r.Header.Get("transactionUid")
+	log.SetPrefix("[GetNetworkTransactionsFx] ")
+	defer log.SetPrefix("")
 
-	log.Printf("[GetNetworkTransactionsFx] transactionUid %s", transactionUid)
+	log.Println("Handler start -----------------------------------------------")
+
+	transactionUid := chi.URLParam(r, "transactionUid")
+
+	log.Printf("transactionUid %s", transactionUid)
 
 	netTranscations := transaction.GetNetworkTransactionsByTransactionUid(transactionUid)
 	if len(netTranscations) == 0 {
@@ -31,9 +35,11 @@ func GetNetworkTransactionsFx(w http.ResponseWriter, r *http.Request) (string, a
 	response.NetworkTransactions = netTranscations
 	responseByte, err := json.Marshal(response)
 	if err != nil {
-		log.Printf("[GetNetworkTransactionsFx] error marshaling response: %s", err.Error())
+		log.Printf("error marshaling response: %s", err.Error())
 		return "", "", err
 	}
+
+	log.Println("Handler end -------------------------------------------------")
 
 	return string(responseByte), response, nil
 }
