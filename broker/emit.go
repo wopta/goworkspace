@@ -341,7 +341,7 @@ func emitPay(policy *models.Policy, origin string) {
 		log.Println("no transactions created")
 		return
 	}
-	payUrl, updatedTransactions, err := payment.PaymentControllerV2(*policy, *product, transactions)
+	payUrl, updatedTransactions, err := payment.Controller(*policy, *product, transactions)
 	if err != nil {
 		log.Printf("error emitPay policy %s: %s", policy.Uid, err.Error())
 		return
@@ -378,7 +378,7 @@ func setAdvance(policy *models.Policy, origin string) {
 		log.Println("no transactions created")
 		return
 	}
-	_, updatedTransactions, err := payment.PaymentControllerV2(*policy, *product, transactions)
+	_, updatedTransactions, err := payment.Controller(*policy, *product, transactions)
 	if err != nil {
 		log.Printf("error emitPay policy %s: %s", policy.Uid, err.Error())
 		return

@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func PaymentControllerV2(policy models.Policy, product models.Product, transactions []models.Transaction) (string, []models.Transaction, error) {
+func Controller(policy models.Policy, product models.Product, transactions []models.Transaction) (string, []models.Transaction, error) {
 	var (
 		err                error
 		payUrl             string

@@ -57,7 +57,7 @@ func FabrickRefreshPayByLinkFx(w http.ResponseWriter, r *http.Request) (string, 
 
 	product := prd.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, nil, nil)
 
-	payUrl, updatedTransactions, err := PaymentControllerV2(policy, *product, transactions)
+	payUrl, updatedTransactions, err := Controller(policy, *product, transactions)
 	if err != nil {
 		log.Printf("error scheduling transactions on fabrick: %s", err.Error())
 		return "", nil, err
