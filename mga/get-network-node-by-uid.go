@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/go-chi/chi"
 	"github.com/wopta/goworkspace/network"
 )
 
@@ -13,7 +14,7 @@ func GetNetworkNodeByUidFx(w http.ResponseWriter, r *http.Request) (string, inte
 
 	log.Println("Handler start -----------------------------------------------")
 
-	nodeUid := r.Header.Get("uid")
+	nodeUid := chi.URLParam(r, "uid")
 	log.Printf("Uid %s", nodeUid)
 
 	networkNode := network.GetNetworkNodeByUid(nodeUid)
