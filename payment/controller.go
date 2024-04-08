@@ -83,19 +83,22 @@ func fabrickIntegration(transactions []models.Transaction, paymentMethods []stri
 }
 
 func remittanceIntegration(transactions []models.Transaction) (payUrl string, updatedTransaction []models.Transaction, err error) {
-	for index, _ := range transactions {
+	updatedTransaction = make([]models.Transaction, 0)
+
+	for index, tr := range transactions {
 		now := time.Now().UTC()
 		if index == 0 {
-			transactions[index].IsPay = true
-			transactions[index].Status = models.TransactionStatusPay
-			transactions[index].StatusHistory = append(transactions[index].StatusHistory, models.TransactionStatusPay)
-			transactions[index].PayDate = now
-			transactions[index].TransactionDate = now
+			tr.IsPay = true
+			tr.Status = models.TransactionStatusPay
+			tr.StatusHistory = append(tr.StatusHistory, models.TransactionStatusPay)
+			tr.PayDate = now
+			tr.TransactionDate = now
 		}
-		transactions[index].PaymentMethod = models.PayMethodRemittance
-		transactions[index].UpdateDate = now
+		tr.PaymentMethod = models.PayMethodRemittance
+		tr.UpdateDate = now
+		updatedTransaction = append(updatedTransaction, tr)
 	}
-	return "", transactions, nil
+	return "", updatedTransaction, nil
 }
 
 func getPaymentMethodsV2(policy models.Policy, product models.Product) []string {
