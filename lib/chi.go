@@ -44,10 +44,10 @@ func ResponseLoggerWrapper(handler func(w http.ResponseWriter, r *http.Request) 
 }
 
 func GetChiRouter(module string, routes []ChiRoute) *chi.Mux {
-	prefix := "/"
+	var prefix string
 
 	if IsLocal() {
-		prefix += module
+		prefix = "/" + module
 	}
 
 	mux := chi.NewRouter()
