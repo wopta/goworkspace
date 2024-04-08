@@ -21,6 +21,11 @@ func Controller(policy models.Policy, product models.Product, transactions []mod
 
 	log.Printf("init")
 
+	if len(transactions) == 0 {
+		log.Printf("%02d is an invalid number of transactions", len(transactions))
+		return "", nil, errors.New("no valid transactions")
+	}
+
 	if err = checkPaymentModes(policy); err != nil {
 		log.Printf("mismatched payment configuration: %s", err.Error())
 		return "", nil, err
