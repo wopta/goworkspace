@@ -67,7 +67,14 @@ func ChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, in
 		return "{}", nil, errors.New("unable to change payment method")
 	}
 
-	unpaidTransactions = transaction.GetPolicyUnpaidTransactions(policy.Uid)
+	activeTransactions := transaction.GetPolicyActiveTransactions("", policy.Uid)
+	for _, tr := range activeTransactions {
+		if tr.IsPay {
+			responseTransactions = append(responseTransactions, tr)
+			continue
+		}
+		unpaidTransactions = append(unpaidTransactions, tr)
+	}
 	if len(unpaidTransactions) == 0 {
 		log.Printf("no unpaid transactions found for policy %s", policy.Uid)
 		return "{}", nil, err
