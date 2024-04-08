@@ -241,7 +241,7 @@ func checkEntitlement(next http.Handler) http.Handler {
 		ctx := r.Context()
 		roles := ctx.Value("roles").([]string)
 
-		if len(roles) == 0 || IsLocal() || slices.Contains(roles, UserRoleInternal) || slices.Contains(roles, UserRoleAll) {
+		if len(roles) == 0 || slices.Contains(roles, UserRoleInternal) || slices.Contains(roles, UserRoleAll) {
 			next.ServeHTTP(w, r)
 			return
 		}
