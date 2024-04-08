@@ -84,13 +84,10 @@ func ChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, in
 
 	policy.PayUrl = payUrl
 	responseTransactions = append(responseTransactions, updatedTransactions...)
-	for _, tr := range updatedTransactions {
-		err = lib.SetFirestoreErr(models.TransactionsCollection, tr.Uid, tr)
-		if err != nil {
-			return "{}", nil, err
-		}
 
-		tr.BigQuerySave("")
+	err = saveTransactionsToDB(updatedTransactions)
+	if err != nil {
+		return "{}", nil, err
 	}
 
 	err = lib.SetFirestoreErr(models.PolicyCollection, policy.Uid, policy)
