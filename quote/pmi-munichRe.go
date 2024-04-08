@@ -3,18 +3,27 @@ package quote
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
 
 	"cloud.google.com/go/civil"
-	lib "github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib"
 )
 
 func PmiMunichFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	jsonData, err := ioutil.ReadAll(r.Body)
+	log.SetPrefix("[PmiMunichFx] ")
+	defer log.SetPrefix("")
+
+	log.Println("Handler start -----------------------------------------------")
+
+	jsonData, err := io.ReadAll(r.Body)
+	defer r.Body.Close()
 	res := <-PmiMunich(jsonData)
+
+	log.Println("Handler end -------------------------------------------------")
+
 	return res, nil, err
 
 }
@@ -32,7 +41,7 @@ func PmiMunich(r []byte) <-chan string {
 		lib.CheckError(err)
 
 		if res != nil {
-			body, err := ioutil.ReadAll(res.Body)
+			body, err := io.ReadAll(res.Body)
 			lib.CheckError(err)
 			res.Body.Close()
 			log.Println("quote res")

@@ -1,9 +1,10 @@
 package quote
 
 import (
+	"log"
+
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	"log"
 )
 
 func removeOfferRate(policy *models.Policy, availableRates []string) {

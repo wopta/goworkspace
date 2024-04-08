@@ -3,13 +3,49 @@ package quote
 import (
 	"log"
 	"net/http"
-	"strings"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
-
 	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
 )
+
+var quoteRoutes []lib.ChiRoute = []lib.ChiRoute{
+	{
+		Route:   "/pmi/munichre",
+		Handler: lib.ResponseLoggerWrapper(PmiMunichFx),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAll},
+	},
+	{
+		Route:   "/incident",
+		Handler: lib.ResponseLoggerWrapper(PmiMunichFx),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAll},
+	},
+	{
+		Route:   "/v1/life",
+		Handler: lib.ResponseLoggerWrapper(LifeFx),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAll},
+	},
+	{
+		Route:   "/v1/person",
+		Handler: lib.ResponseLoggerWrapper(PersonaFx),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAll},
+	},
+	{
+		Route:   "/v1/gap",
+		Handler: lib.ResponseLoggerWrapper(GapFx),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAll},
+	},
+	{
+		Route:   "/v1/excel",
+		Handler: lib.ResponseLoggerWrapper(SpreadsheetsFx),
+		Method:  http.MethodPost,
+		Roles:   []string{},
+	},
+}
 
 func init() {
 	log.Println("INIT Quote")
@@ -17,52 +53,8 @@ func init() {
 }
 
 func Quote(w http.ResponseWriter, r *http.Request) {
-	lib.EnableCors(&w, r)
-	w.Header().Set("Access-Control-Allow-Methods", "POST")
-	vat := strings.Split(r.RequestURI, "/")
-	log.Println(vat)
-	log.Println(len(vat))
-	log.Println("QuoteAllrisk")
+	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
-	route := lib.RouteData{
-		Routes: []lib.Route{
-			{
-				Route:   "/pmi/munichre",
-				Handler: PmiMunichFx,
-				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAll},
-			},
-			{
-				Route:   "/incident",
-				Handler: PmiMunichFx,
-				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAll},
-			},
-			{
-				Route:   "/v1/life",
-				Handler: LifeFx,
-				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAll},
-			},
-			{
-				Route:   "/v1/person",
-				Handler: PersonaFx,
-				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAll},
-			},
-			{
-				Route:   "/v1/gap",
-				Handler: GapFx,
-				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAll},
-			},
-			{
-				Route:   "/v1/excel",
-				Handler: SpreadsheetsFx,
-				Method:  http.MethodPost,
-				Roles:   []string{},
-			},
-		},
-	}
-	route.Router(w, r)
+	router := lib.GetChiRouter("quote", quoteRoutes)
+	router.ServeHTTP(w, r)
 }

@@ -3,6 +3,7 @@ package quote
 import (
 	"bytes"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 
@@ -11,7 +12,14 @@ import (
 )
 
 func ExcelFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	log.SetPrefix("[ExcelFx] ")
+	defer log.SetPrefix("")
+	log.Println("Handler start -----------------------------------------------")
+
 	Excel()
+
+	log.Println("Handler end -------------------------------------------------")
+
 	return "", nil, nil
 }
 
