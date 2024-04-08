@@ -52,6 +52,20 @@ func outputGenerator(numOutput int, startDate time.Time) []dateInfo {
 	return output
 }
 
+func TestCreateTransactionsInvalidPaymentSplit(t *testing.T) {
+	startDate := time.Date(2023, 03, 14, 0, 0, 0, 0, time.UTC)
+	policy := getPolicy("invalid_payment_split", startDate, startDate.AddDate(5, 0, 0))
+
+	os.Setenv("env", "local-test")
+	mgaProduct := product.GetProductV2(models.LifeProduct, models.ProductV2, models.MgaChannel, nil, nil)
+
+	transactions := transaction.CreateTransactions(policy, *mgaProduct, func() string { return "aaaaa" })
+
+	if len(transactions) != 0 {
+		t.Fatalf("expected: %02d transactions got: %02d", 0, len(transactions))
+	}
+}
+
 func TestCreateTransactionsMonthly(t *testing.T) {
 	startDate := time.Date(2023, 03, 14, 0, 0, 0, 0, time.UTC)
 	policy := getPolicy(string(models.PaySplitMonthly), startDate, startDate.AddDate(20, 0, 0))
