@@ -336,26 +336,10 @@ func emitPay(policy *models.Policy, origin string) {
 	log.Printf("[emitPay] Policy Uid %s", policy.Uid)
 
 	policy.IsPay = false
-	transactions := transaction.CreateTransactions(*policy, *mgaProduct, func() string { return lib.NewDoc(models.TransactionsCollection) })
-	if len(transactions) == 0 {
-		log.Println("no transactions created")
-		return
-	}
-	payUrl, updatedTransactions, err := payment.Controller(*policy, *product, transactions)
+	payUrl, err := createPolicyTransactions(policy)
 	if err != nil {
-		log.Printf("error emitPay policy %s: %s", policy.Uid, err.Error())
 		return
 	}
-
-	for _, tr := range updatedTransactions {
-		err = lib.SetFirestoreErr(models.TransactionsCollection, tr.Uid, tr)
-		if err != nil {
-			log.Printf("error saving transaction %s to firestore: %s", tr.Uid, err.Error())
-			return
-		}
-		tr.BigQuerySave("")
-	}
-
 	policy.PayUrl = payUrl
 }
 
@@ -373,29 +357,39 @@ func setAdvance(policy *models.Policy, origin string) {
 		policy.PaymentMode = paymentMode
 	}
 
+	_, err := createPolicyTransactions(policy)
+	if err != nil {
+		return
+	}
+}
+
+func createPolicyTransactions(policy *models.Policy) (string, error) {
 	transactions := transaction.CreateTransactions(*policy, *mgaProduct, func() string { return lib.NewDoc(models.TransactionsCollection) })
 	if len(transactions) == 0 {
 		log.Println("no transactions created")
-		return
+		return "", errors.New("no transactions created")
 	}
-	_, updatedTransactions, err := payment.Controller(*policy, *product, transactions)
+	payUrl, updatedTransactions, err := payment.Controller(*policy, *product, transactions)
 	if err != nil {
 		log.Printf("error emitPay policy %s: %s", policy.Uid, err.Error())
-		return
+		return "", err
 	}
 
-	for _, tr := range updatedTransactions {
+	for index, tr := range updatedTransactions {
 		err = lib.SetFirestoreErr(models.TransactionsCollection, tr.Uid, tr)
 		if err != nil {
 			log.Printf("error saving transaction %s to firestore: %s", tr.Uid, err.Error())
-			return
+			return "", err
 		}
 		tr.BigQuerySave("")
-	}
 
-	err = transaction.CreateNetworkTransactions(policy, &updatedTransactions[0], networkNode, mgaProduct)
-	if err != nil {
-		log.Printf("error creating network transactions: %s", err.Error())
-		return
+		if tr.IsPay {
+			err = transaction.CreateNetworkTransactions(policy, &updatedTransactions[index], networkNode, mgaProduct)
+			if err != nil {
+				log.Printf("error creating network transactions: %s", err.Error())
+				return "", err
+			}
+		}
 	}
+	return payUrl, err
 }
