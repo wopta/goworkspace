@@ -373,7 +373,29 @@ func setAdvance(policy *models.Policy, origin string) {
 		policy.PaymentMode = paymentMode
 	}
 
-	tr := transaction.PutByPolicy(*policy, "", origin, "", "", policy.PriceGross, policy.PriceNett, "", models.PayMethodRemittance, true, mgaProduct, policy.StartDate)
+	transactions := transaction.CreateTransactions(*policy, *mgaProduct, func() string { return lib.NewDoc(models.TransactionsCollection) })
+	if len(transactions) == 0 {
+		log.Println("no transactions created")
+		return
+	}
+	_, updatedTransactions, err := payment.PaymentControllerV2(*policy, *product, transactions)
+	if err != nil {
+		log.Printf("error emitPay policy %s: %s", policy.Uid, err.Error())
+		return
+	}
 
-	transaction.CreateNetworkTransactions(policy, tr, networkNode, mgaProduct)
+	for _, tr := range updatedTransactions {
+		err = lib.SetFirestoreErr(models.TransactionsCollection, tr.Uid, tr)
+		if err != nil {
+			log.Printf("error saving transaction %s to firestore: %s", tr.Uid, err.Error())
+			return
+		}
+		tr.BigQuerySave("")
+	}
+
+	err = transaction.CreateNetworkTransactions(policy, &updatedTransactions[0], networkNode, mgaProduct)
+	if err != nil {
+		log.Printf("error creating network transactions: %s", err.Error())
+		return
+	}
 }

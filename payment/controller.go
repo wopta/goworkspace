@@ -1,16 +1,13 @@
 package payment
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/transaction"
-	"io"
 	"log"
-	"os"
 	"time"
 )
 
@@ -43,13 +40,6 @@ func PaymentControllerV2(policy models.Policy, product models.Product, transacti
 	return payUrl, updatedTransaction, nil
 }
 
-func remittanceIntegration(transactions []models.Transaction) (payUrl string, updatedTransaction []models.Transaction, err error) {
-	for index, _ := range transactions {
-		transactions[index].PaymentMethod = models.PayMethodRemittance
-	}
-	return "", transactions, nil
-}
-
 func fabrickIntegration(transactions []models.Transaction, paymentMethods []string, policy models.Policy) (payUrl string, updatedTransactions []models.Transaction, err error) {
 	customerId := uuid.New().String()
 	now := time.Now().UTC()
@@ -63,7 +53,7 @@ func fabrickIntegration(transactions []models.Transaction, paymentMethods []stri
 
 		tr.ProviderName = models.FabrickPaymentProvider
 
-		res := <-createFabrickTransactionV2(&policy, tr, isFirstRate, createMandate, customerId, paymentMethods)
+		res := <-createFabrickTransaction(&policy, tr, isFirstRate, createMandate, customerId, paymentMethods)
 		if res.Payload == nil || res.Payload.PaymentPageURL == nil {
 			return "", nil, errors.New("error creating transaction on Fabrick")
 		}
@@ -87,76 +77,20 @@ func fabrickIntegration(transactions []models.Transaction, paymentMethods []stri
 	return payUrl, updatedTransactions, nil
 }
 
-func createFabrickTransactionV2(
-	policy *models.Policy,
-	transaction models.Transaction,
-	firstSchedule, createMandate bool,
-	customerId string,
-	paymentMethods []string,
-) <-chan FabrickPaymentResponse {
-	r := make(chan FabrickPaymentResponse)
-
-	go func() {
-		defer close(r)
-
-		body := getFabrickRequestBody(policy, firstSchedule, transaction.ScheduleDate, transaction.ExpirationDate,
-			customerId, transaction.Amount, "", paymentMethods)
-		if body == "" {
-			return
+func remittanceIntegration(transactions []models.Transaction) (payUrl string, updatedTransaction []models.Transaction, err error) {
+	for index, _ := range transactions {
+		now := time.Now().UTC()
+		if index == 0 {
+			transactions[index].IsPay = true
+			transactions[index].Status = models.TransactionStatusPay
+			transactions[index].StatusHistory = append(transactions[index].StatusHistory, models.TransactionStatusPay)
+			transactions[index].PayDate = now
+			transactions[index].TransactionDate = now
 		}
-		request := getFabrickPaymentRequest(body)
-		if request == nil {
-			return
-		}
-
-		log.Printf("policy '%s' request headers: %s", policy.Uid, request.Header)
-		log.Printf("policy '%s' request body: %s", policy.Uid, request.Body)
-
-		if os.Getenv("env") == "local" {
-			status := "200"
-			local := "local"
-			url := "www.dev.wopta.it"
-			r <- FabrickPaymentResponse{
-				Status: &status,
-				Errors: nil,
-				Payload: &Payload{
-					ExternalID:        &local,
-					PaymentID:         &local,
-					MerchantID:        &local,
-					PaymentPageURL:    &url,
-					PaymentPageURLB2B: &url,
-					TokenB2B:          &local,
-					Coupon:            &local,
-				},
-			}
-		} else {
-
-			res, err := lib.RetryDo(request, 5, 10)
-			lib.CheckError(err)
-
-			if res != nil {
-				log.Printf("policy '%s' response headers: %s", policy.Uid, res.Header)
-				body, err := io.ReadAll(res.Body)
-				defer res.Body.Close()
-				lib.CheckError(err)
-				log.Printf("policy '%s' response body: %s", policy.Uid, string(body))
-
-				var result FabrickPaymentResponse
-
-				if res.StatusCode != 200 {
-					log.Printf("exiting with statusCode: %d", res.StatusCode)
-					result.Errors = append(result.Errors, res.Status, res.StatusCode)
-				} else {
-					err = json.Unmarshal([]byte(body), &result)
-					lib.CheckError(err)
-				}
-
-				r <- result
-			}
-		}
-	}()
-
-	return r
+		transactions[index].PaymentMethod = models.PayMethodRemittance
+		transactions[index].UpdateDate = now
+	}
+	return "", transactions, nil
 }
 
 func getPaymentMethodsV2(policy models.Policy, product models.Product) []string {
