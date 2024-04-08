@@ -1,6 +1,7 @@
 package payment
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -168,6 +169,78 @@ func getFabrickPaymentRequest(body string) *http.Request {
 	request.Header.Set("Accept", "application/json")
 
 	return request
+}
+
+func createFabrickTransaction(
+	policy *models.Policy,
+	transaction models.Transaction,
+	firstSchedule, createMandate bool,
+	customerId string,
+	paymentMethods []string,
+) <-chan FabrickPaymentResponse {
+	r := make(chan FabrickPaymentResponse)
+
+	go func() {
+		defer close(r)
+
+		body := getFabrickRequestBody(policy, firstSchedule, transaction.ScheduleDate, transaction.ExpirationDate,
+			customerId, transaction.Amount, "", paymentMethods)
+		if body == "" {
+			return
+		}
+		request := getFabrickPaymentRequest(body)
+		if request == nil {
+			return
+		}
+
+		log.Printf("policy '%s' request headers: %s", policy.Uid, request.Header)
+		log.Printf("policy '%s' request body: %s", policy.Uid, request.Body)
+
+		if os.Getenv("env") == "local" {
+			status := "200"
+			local := "local"
+			url := "www.dev.wopta.it"
+			r <- FabrickPaymentResponse{
+				Status: &status,
+				Errors: nil,
+				Payload: &Payload{
+					ExternalID:        &local,
+					PaymentID:         &local,
+					MerchantID:        &local,
+					PaymentPageURL:    &url,
+					PaymentPageURLB2B: &url,
+					TokenB2B:          &local,
+					Coupon:            &local,
+				},
+			}
+		} else {
+
+			res, err := lib.RetryDo(request, 5, 10)
+			lib.CheckError(err)
+
+			if res != nil {
+				log.Printf("policy '%s' response headers: %s", policy.Uid, res.Header)
+				body, err := io.ReadAll(res.Body)
+				defer res.Body.Close()
+				lib.CheckError(err)
+				log.Printf("policy '%s' response body: %s", policy.Uid, string(body))
+
+				var result FabrickPaymentResponse
+
+				if res.StatusCode != 200 {
+					log.Printf("exiting with statusCode: %d", res.StatusCode)
+					result.Errors = append(result.Errors, res.Status, res.StatusCode)
+				} else {
+					err = json.Unmarshal([]byte(body), &result)
+					lib.CheckError(err)
+				}
+
+				r <- result
+			}
+		}
+	}()
+
+	return r
 }
 
 func fabrickExpireBill(providerId string) error {
