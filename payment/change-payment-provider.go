@@ -73,6 +73,7 @@ func ChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, in
 			responseTransactions = append(responseTransactions, tr)
 			continue
 		}
+		transaction.ReinitializePaymentInfo(&tr)
 		unpaidTransactions = append(unpaidTransactions, tr)
 	}
 	if len(unpaidTransactions) == 0 {
