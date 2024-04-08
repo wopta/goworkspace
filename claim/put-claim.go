@@ -17,11 +17,13 @@ import (
 )
 
 func PutClaimFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.Println("[PutClaimFx]")
+	log.SetPrefix("[PutClaimFx] ")
+	defer log.SetPrefix("")
+
+	log.Println("Handler start -----------------------------------------------")
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
-	log.Println("[PutClaimFx] " + string(body))
 
 	claim, err := models.UnmarshalClaim(body)
 	lib.CheckError(err)
@@ -43,7 +45,7 @@ func PutClaim(idToken string, origin string, claim *models.Claim) (string, inter
 		return "", nil, err
 	}
 
-	fireUsers := lib.GetDatasetByEnv(origin, models.UserCollection)
+	fireUsers := lib.GetDatasetByEnv(origin, lib.UserCollection)
 	docsnap, err := lib.GetFirestoreErr(fireUsers, userAuthID)
 	if err != nil {
 		log.Printf("[PutClaim] get user from DB error %s", err.Error())

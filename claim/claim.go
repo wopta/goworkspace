@@ -6,8 +6,22 @@ import (
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
 )
+
+var claimRoutes []lib.ChiRoute = []lib.ChiRoute{
+	{
+		Route:   "/v1",
+		Handler: lib.ResponseLoggerWrapper(PutClaimFx),
+		Method:  http.MethodPut,
+		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleManager, lib.UserRoleCustomer},
+	},
+	{
+		Route:   "/document/v1/{claimUid}",
+		Handler: lib.ResponseLoggerWrapper(GetClaimDocumentFx),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleManager, lib.UserRoleCustomer},
+	},
+}
 
 func init() {
 	log.Println("INIT Claim")
@@ -15,23 +29,8 @@ func init() {
 }
 
 func Claim(w http.ResponseWriter, r *http.Request) {
-	log.Println("Claim")
-	lib.EnableCors(&w, r)
-	route := lib.RouteData{
-		Routes: []lib.Route{
-			{
-				Route:   "/v1",
-				Handler: PutClaimFx,
-				Method:  http.MethodPut,
-				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager, models.UserRoleCustomer},
-			},
-			{
-				Route:   "/document/v1/:claimUid",
-				Handler: GetClaimDocumentFx,
-				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager, models.UserRoleCustomer},
-			},
-		},
-	}
-	route.Router(w, r)
+	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
+
+	router := lib.GetChiRouter("claim", claimRoutes)
+	router.ServeHTTP(w, r)
 }
