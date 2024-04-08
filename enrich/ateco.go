@@ -1,50 +1,47 @@
 package enrich
 
 import (
-	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"strings"
 
+	"github.com/go-chi/chi"
 	"github.com/go-gota/gota/dataframe"
 	"github.com/go-gota/gota/series"
-	lib "github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib"
 )
 
-func Ateco(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	// Set CORS headers for the main request.
-	log.Println(" Ateco")
-	log.Println(r.Header.Get("ateco"))
-	ateco := r.Header.Get("ateco")
+func AtecoFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		ricAteco []byte
+		ricAteco   []byte
+		enrichByte []byte
 	)
 
-	w.Header().Set("Access-Control-Allow-Methods", "GET")
-	log.Println("Ateco")
-	w.Header().Set("Content-Type", "application/json")
+	log.SetPrefix("[AtecoFx] ")
+	defer log.SetPrefix("")
+
+	log.Println("Handler start -----------------------------------------------")
+
+	ateco := chi.URLParam(r, "ateco")
+	log.Println(ateco)
+
 	switch os.Getenv("env") {
 	case "local":
-
-		ricAteco = lib.ErrorByte(ioutil.ReadFile("function-data/data/rules/Riclassificazione_Ateco.csv"))
+		ricAteco = lib.ErrorByte(os.ReadFile("function-data/data/rules/Riclassificazione_Ateco.csv"))
 	case "dev":
-
 		ricAteco = lib.GetFromStorage("function-data", "data/rules/Riclassificazione_Ateco.csv", "")
 	case "prod":
-
 		ricAteco = lib.GetFromStorage("core-350507-function-data", "data/rules/Riclassificazione_Ateco.csv", "")
 	default:
-
 	}
+
 	df := lib.CsvToDataframe(ricAteco)
 	fil := df.Filter(
 		dataframe.F{Colidx: 5, Colname: "Codice Ateco 2007", Comparator: series.Eq, Comparando: ateco},
 	)
 	log.Println("filtered row", fil.Nrow())
 	log.Println("filtered col", fil.Ncol())
-	var enrichByte []byte
 
 	if fil.Nrow() > 0 {
 		enrichByte = []byte(`{	"atecoMacro":"` + strings.ToUpper(fil.Elem(0, 0).String()) + `",
@@ -73,8 +70,7 @@ func Ateco(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 		enrichByte = []byte(`{}`)
 	}
 
-	log.Println(string(enrichByte))
-	reader := strings.NewReader("{\"ateco\":" + string(enrichByte) + "}")
-	io.Copy(w, reader)
+	log.Println("Handler end -------------------------------------------------")
+
 	return "{\"ateco\":" + string(enrichByte) + "}", nil, nil
 }

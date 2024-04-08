@@ -1,23 +1,27 @@
 package enrich
 
 import (
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
 	"os"
 
-	lib "github.com/wopta/goworkspace/lib"
+	"github.com/go-chi/chi"
+	"github.com/wopta/goworkspace/lib"
 )
 
-func MunichVat(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	// Set CORS headers for the main request.
-	log.Println("Munich Enrich Vat")
-	log.Println(r.Header.Get("vat"))
-	w.Header().Set("Access-Control-Allow-Methods", "GET")
+func MunichVatFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	log.SetPrefix("[MunichVatFx] ")
+	defer log.SetPrefix("")
+
+	log.Println("Handler start -----------------------------------------------")
+
 	var body []byte
-	w.Header().Set("Content-Type", "application/json")
-	vat := r.Header.Get("vat")
+
+	vat := chi.URLParam(r, "vat")
+	log.Println(vat)
+
 	var urlstring = os.Getenv("MUNICHREBASEURL") + "/api/company/vat/" + vat
 	u, err := url.Parse(urlstring)
 	lib.CheckError(err)
@@ -28,13 +32,13 @@ func MunichVat(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	req.Header.Set("Ocp-Apim-Subscription-Key", os.Getenv("MUNICHRESUBSCRIPTIONKEY"))
 	res, err := client.Do(req)
 	lib.CheckError(err)
-	if res != nil {
-		body, err = ioutil.ReadAll(res.Body)
-		lib.CheckError(err)
-		res.Body.Close()
-		log.Println("response body: ", string(body))
 
+	if res != nil {
+		body = lib.ErrorByte(io.ReadAll(res.Body))
+		defer res.Body.Close()
 	}
-	log.Println("Header", w.Header())
+
+	log.Println("Handler end -------------------------------------------------")
+
 	return string(body), nil, err
 }
