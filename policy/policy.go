@@ -3,12 +3,63 @@ package policy
 import (
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
 )
+
+var policyRoutes []lib.ChiRoute = []lib.ChiRoute{
+	{
+		Route:   "fiscalcode/v1/{fiscalcode}",
+		Handler: lib.ResponseLoggerWrapper(GetPolicyByFiscalCodeFx), // Broker.PolicyFiscalcode
+		Method:  http.MethodGet,
+		Roles:   []string{lib.UserRoleAll},
+	},
+	{
+		Route:   "v1/{uid}",
+		Handler: lib.ResponseLoggerWrapper(GetPolicyFx),
+		Method:  http.MethodGet,
+		Roles:   []string{lib.UserRoleAll},
+	},
+	{
+		Route:   "v1/{uid}",
+		Handler: lib.ResponseLoggerWrapper(DeletePolicyFx),
+		Method:  http.MethodDelete,
+		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleManager},
+	},
+	{
+		Route:   "attachment/v1/{uid}",
+		Handler: lib.ResponseLoggerWrapper(GetPolicyAttachmentsFx),
+		Method:  http.MethodGet,
+		Roles:   []string{lib.UserRoleAll},
+	},
+	{
+		Route:   "/node/v1/{nodeUid}",
+		Handler: lib.ResponseLoggerWrapper(GetNodePoliciesFx),
+		Method:  http.MethodPost,
+		Roles: []string{lib.UserRoleAdmin, lib.UserRoleManager, lib.UserRoleAreaManager,
+			lib.UserRoleAgent, lib.UserRoleAgency},
+	},
+	{
+		Route:   "/portfolio/v1",
+		Handler: lib.ResponseLoggerWrapper(GetPortfolioPoliciesFx),
+		Method:  http.MethodPost,
+		Roles: []string{lib.UserRoleAdmin, lib.UserRoleManager, lib.UserRoleAreaManager,
+			lib.UserRoleAgent, lib.UserRoleAgency},
+	},
+	{
+		Route:   "/media/upload/v1",
+		Handler: lib.ResponseLoggerWrapper(UploadPolicyMediaFx),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleManager},
+	},
+	{
+		Route:   "/media/v1",
+		Handler: lib.ResponseLoggerWrapper(GetPolicyMediaFx),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleManager, lib.UserRoleAgent, lib.UserRoleAgency},
+	},
+}
 
 func init() {
 	log.Println("INIT Policy")
@@ -16,84 +67,8 @@ func init() {
 }
 
 func Policy(w http.ResponseWriter, r *http.Request) {
-	log.Println("Policy")
-	lib.EnableCors(&w, r)
-	route := lib.RouteData{
-		Routes: []lib.Route{
-			{
-				Route:   "fiscalcode/v1/:fiscalcode",
-				Handler: GetPolicyByFiscalCodeFx, // Broker.PolicyFiscalcode
-				Method:  http.MethodGet,
-				Roles:   []string{models.UserRoleAll},
-			},
-			{
-				Route:   "v1/:uid",
-				Handler: GetPolicyFx,
-				Method:  http.MethodGet,
-				Roles:   []string{models.UserRoleAll},
-			},
-			{
-				Route:   "v1/:uid",
-				Handler: DeletePolicyFx,
-				Method:  http.MethodDelete,
-				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
-			},
-			{
-				Route:   "attachment/v1/:uid",
-				Handler: GetPolicyAttachmentsFx,
-				Method:  http.MethodGet,
-				Roles:   []string{models.UserRoleAll},
-			},
-			{
-				Route:   "/node/v1/:nodeUid",
-				Handler: GetNodePoliciesFx,
-				Method:  http.MethodPost,
-				Roles: []string{models.UserRoleAdmin, models.UserRoleManager, models.UserRoleAreaManager,
-					models.UserRoleAgent, models.UserRoleAgency},
-			},
-			{
-				Route:   "/portfolio/v1",
-				Handler: GetPortfolioPoliciesFx,
-				Method:  http.MethodPost,
-				Roles: []string{models.UserRoleAdmin, models.UserRoleManager, models.UserRoleAreaManager,
-					models.UserRoleAgent, models.UserRoleAgency},
-			},
-			{
-				Route:   "/media/upload/v1",
-				Handler: UploadPolicyMediaFx,
-				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
-			},
-			{
-				Route:   "/media/v1",
-				Handler: GetPolicyMediaFx,
-				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager, models.UserRoleAgent, models.UserRoleAgency},
-			},
-		},
-	}
-	route.Router(w, r)
-}
+	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
-func GetPolicyByUid(policyUid string, origin string) models.Policy {
-	firePolicy := lib.GetDatasetByEnv(origin, "policy")
-	policyF := lib.GetFirestore(firePolicy, policyUid)
-	var policy models.Policy
-	policyF.DataTo(&policy)
-	policyM, _ := policy.Marshal()
-	log.Println("GetPolicyByUid: Policy "+policyUid+" found: ", string(policyM))
-
-	return policy
-}
-
-func SetPolicyPaid(policy *models.Policy, origin string) {
-	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
-
-	// Update payment fields
-	policy.IsPay = true
-	policy.Updated = time.Now().UTC()
-	policy.Status = models.PolicyStatusPay
-	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusPay)
-	lib.SetFirestore(firePolicy, policy.Uid, policy)
-	policy.BigquerySave(origin)
+	router := lib.GetChiRouter("policy", policyRoutes)
+	router.ServeHTTP(w, r)
 }

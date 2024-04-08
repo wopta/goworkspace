@@ -31,7 +31,7 @@ func UploadPolicyMediaFx(w http.ResponseWriter, r *http.Request) (string, interf
 		req    UploadPolicyMediaReq
 	)
 
-	log.SetPrefix("[UploadPolicyMediaFx]")
+	log.SetPrefix("[UploadPolicyMediaFx] ")
 	defer log.SetPrefix("")
 
 	log.Println("Handler start -----------------------------------------------")
@@ -72,7 +72,7 @@ func UploadPolicyMediaFx(w http.ResponseWriter, r *http.Request) (string, interf
 
 	log.Printf("getting policy %s from Firestore...", req.PolicyUid)
 
-	docSnap, err := lib.GetFirestoreErr(models.PolicyCollection, req.PolicyUid)
+	docSnap, err := lib.GetFirestoreErr(lib.PolicyCollection, req.PolicyUid)
 	if err != nil {
 		log.Printf("error getting policy %s from Firestore: %s", req.PolicyUid, err.Error())
 		return "", nil, err
@@ -127,7 +127,7 @@ func putAttachment(policy *models.Policy, req UploadPolicyMediaReq) error {
 
 	log.Printf("saving policy %s to Firestore...", policy.Uid)
 
-	err = lib.SetFirestoreErr(models.PolicyCollection, policy.Uid, policy)
+	err = lib.SetFirestoreErr(lib.PolicyCollection, policy.Uid, policy)
 	if err != nil {
 		log.Printf("error saving policy %s to Firestore: %s", policy.Uid, err.Error())
 		return err
