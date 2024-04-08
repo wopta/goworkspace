@@ -21,9 +21,9 @@ import (
 
 func GetFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 
-	body,e := io.ReadAll(r.Body)
+	body, e := io.ReadAll(r.Body)
 	log.Println(e)
-	log.Println(body)
+	log.Println(string(body))
 
 	return "", nil, nil
 }
