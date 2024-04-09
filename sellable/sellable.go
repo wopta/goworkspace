@@ -6,37 +6,35 @@ import (
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
 )
 
 const (
 	rulesFilename = "sellable"
 )
 
+var sellableRoutes []lib.ChiRoute = []lib.ChiRoute{
+	{
+		Route:   "/v1/sales/life",
+		Handler: lib.ResponseLoggerWrapper(LifeFx),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAll},
+	},
+	{
+		Route:   "/v1/risk/person",
+		Handler: lib.ResponseLoggerWrapper(PersonaFx),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAll},
+	},
+}
+
 func init() {
 	log.Println("INIT Sellable")
-
 	functions.HTTP("Sellable", Sellable)
 }
 
 func Sellable(w http.ResponseWriter, r *http.Request) {
-	lib.EnableCors(&w, r)
-	w.Header().Set("Access-Control-Allow-Methods", "POST")
-	route := lib.RouteData{
-		Routes: []lib.Route{
-			{
-				Route:   "/v1/sales/life",
-				Handler: LifeFx,
-				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAll},
-			},
-			{
-				Route:   "/v1/risk/person",
-				Handler: PersonaFx,
-				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAll},
-			},
-		},
-	}
-	route.Router(w, r)
+	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
+
+	router := lib.GetChiRouter("sellable", sellableRoutes)
+	router.ServeHTTP(w, r)
 }
