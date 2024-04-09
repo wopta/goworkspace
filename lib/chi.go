@@ -199,7 +199,7 @@ func appCheckMiddleware(next http.Handler) http.Handler {
 		ctx := r.Context()
 		roles := ctx.Value("roles").([]string)
 
-		if IsLocal() || slices.Contains(roles, UserRoleInternal) {
+		if len(roles) == 0 || IsLocal() || slices.Contains(roles, UserRoleInternal) {
 			next.ServeHTTP(w, r)
 			return
 		}
