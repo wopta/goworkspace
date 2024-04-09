@@ -29,7 +29,7 @@ func ModifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	log.Println("loading authToken from idToken...")
 
 	token := r.Header.Get("Authorization")
-	authToken, err := models.GetAuthTokenFromIdToken(token)
+	authToken, err := lib.GetAuthTokenFromIdToken(token)
 	if err != nil {
 		log.Printf("error getting authToken")
 		return "{}", nil, err
