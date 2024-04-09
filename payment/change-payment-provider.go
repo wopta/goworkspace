@@ -47,7 +47,7 @@ func ChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, in
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
-	log.Printf("req body: %s", string(body))
+
 	err = json.Unmarshal(body, &req)
 	if err != nil {
 		log.Printf("error unmarshaling request body: %s", string(body))

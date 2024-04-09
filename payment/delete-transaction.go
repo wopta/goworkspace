@@ -3,6 +3,7 @@ package payment
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/go-chi/chi"
 	"log"
 	"net/http"
 
@@ -18,7 +19,7 @@ func DeleteTransactionFx(w http.ResponseWriter, r *http.Request) (string, interf
 	log.Println("Handler start -----------------------------------------------")
 
 	origin := r.Header.Get("Origin")
-	uid := r.Header.Get("uid")
+	uid := chi.URLParam(r, "uid")
 	log.Printf("getting from firestore transaction '%s'", uid)
 
 	transaction := tr.GetTransactionByUid(uid, origin)

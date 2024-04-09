@@ -33,7 +33,7 @@ func FabrickRefreshPayByLinkFx(w http.ResponseWriter, r *http.Request) (string, 
 	origin := r.Header.Get("Origin")
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
-	log.Printf("request body: %s", string(body))
+
 	err = json.Unmarshal(body, &request)
 	if err != nil {
 		log.Printf("error unmarshaling body: %s", err.Error())
@@ -79,8 +79,6 @@ func FabrickRefreshPayByLinkFx(w http.ResponseWriter, r *http.Request) (string, 
 		return "{}", nil, err
 	}
 	policy.BigquerySave("")
-
-	models.CreateAuditLog(r, string(body))
 
 	err = sendPayByLinkEmail(policy)
 	if err != nil {
