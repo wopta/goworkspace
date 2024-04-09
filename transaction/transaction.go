@@ -13,7 +13,7 @@ import (
 
 var transactionRoutes []lib.ChiRoute = []lib.ChiRoute{
 	{
-		Route:   "policy/v1/{policyUid}",
+		Route:   "/policy/v1/{policyUid}",
 		Handler: lib.ResponseLoggerWrapper(GetTransactionsByPolicyUidFx), // Broker.GetPolicyTransactions,
 		Method:  http.MethodGet,
 		Roles: []string{
