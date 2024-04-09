@@ -10,25 +10,25 @@ import (
 
 var policyRoutes []lib.ChiRoute = []lib.ChiRoute{
 	{
-		Route:   "fiscalcode/v1/{fiscalcode}",
+		Route:   "/fiscalcode/v1/{fiscalcode}",
 		Handler: lib.ResponseLoggerWrapper(GetPolicyByFiscalCodeFx), // Broker.PolicyFiscalcode
 		Method:  http.MethodGet,
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
-		Route:   "v1/{uid}",
+		Route:   "/v1/{uid}",
 		Handler: lib.ResponseLoggerWrapper(GetPolicyFx),
 		Method:  http.MethodGet,
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
-		Route:   "v1/{uid}",
+		Route:   "/v1/{uid}",
 		Handler: lib.ResponseLoggerWrapper(DeletePolicyFx),
 		Method:  http.MethodDelete,
 		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleManager},
 	},
 	{
-		Route:   "attachment/v1/{uid}",
+		Route:   "/attachment/v1/{uid}",
 		Handler: lib.ResponseLoggerWrapper(GetPolicyAttachmentsFx),
 		Method:  http.MethodGet,
 		Roles:   []string{lib.UserRoleAll},
