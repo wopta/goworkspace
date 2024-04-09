@@ -5,6 +5,8 @@ import (
 	"time"
 )
 
+const transactionStatusReinitialized string = "Reinitialized"
+
 func ReinitializePaymentInfo(tr *models.Transaction) {
 	if tr.IsPay && !tr.IsDelete {
 		return
@@ -16,7 +18,7 @@ func ReinitializePaymentInfo(tr *models.Transaction) {
 	tr.PayDate = time.Time{}
 	tr.TransactionDate = time.Time{}
 	tr.Status = models.TransactionStatusToPay
-	tr.StatusHistory = append(tr.StatusHistory, "Reinitialized", models.TransactionStatusToPay)
+	tr.StatusHistory = append(tr.StatusHistory, transactionStatusReinitialized, models.TransactionStatusToPay)
 }
 
 func getMonthlyAmountsFlat(policy *models.Policy) (grossAmounts []float64, nettAmounts []float64) {
