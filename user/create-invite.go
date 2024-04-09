@@ -57,12 +57,14 @@ type UserInvite struct {
 func CreateInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var createInviteRequest CreateInviteRequest
 
-	log.SetPrefix("[CreateInviteFx]")
+	log.SetPrefix("[CreateInviteFx] ")
 	defer log.SetPrefix("")
 
 	log.Println("Handler start -----------------------------------------------")
 
 	reqBytes := lib.ErrorByte(io.ReadAll(r.Body))
+	defer r.Body.Close()
+
 	err := json.Unmarshal(reqBytes, &createInviteRequest)
 	lib.CheckError(err)
 
@@ -90,7 +92,7 @@ func CreateInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 func CreateInvite(inviteRequest CreateInviteRequest, origin, creatorUid string) (string, error) {
 	log.Printf("[CreateInvite] Creating invite for user %s with role %s", inviteRequest.Email, inviteRequest.Role)
 
-	collectionName := lib.GetDatasetByEnv(origin, invitesCollection)
+	collectionName := lib.GetDatasetByEnv(origin, lib.InvitesCollection)
 	inviteUid := lib.NewDoc(collectionName)
 
 	oneWeek := time.Hour * 168

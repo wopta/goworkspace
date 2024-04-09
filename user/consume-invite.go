@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"firebase.google.com/go/v4/auth"
-
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
@@ -20,22 +19,29 @@ type ConsumeInviteReq struct {
 }
 
 func ConsumeInviteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.Println("[ConsumeInviteFx] Handler start -----------------------------")
 	var ConsumeInviteRequest ConsumeInviteReq
 
+	log.Println("[ConsumeInviteFx] ")
+	defer log.SetPrefix("")
+
+	log.Println("Handler start -----------------------------------------------")
+
 	reqBytes := lib.ErrorByte(io.ReadAll(r.Body))
-	log.Printf("[ConsumeInviteFx] request body: %s", string(reqBytes))
+	defer r.Body.Close()
+
 	err := json.Unmarshal(reqBytes, &ConsumeInviteRequest)
 	if err != nil {
-		log.Printf("[ConsumeInviteFx] error unmarshaling request: %s", err.Error())
+		log.Printf("error unmarshaling request: %s", err.Error())
 		return "", nil, err
 	}
 
 	_, err = ConsumeInvite(ConsumeInviteRequest.InviteUid, ConsumeInviteRequest.Password, r.Header.Get("Origin"))
 	if err != nil {
-		log.Printf("[ConsumeInviteFx] error consuming invite: %s", err.Error())
+		log.Printf("error consuming invite: %s", err.Error())
 		return "", nil, err
 	}
+
+	log.Println("Handler end -------------------------------------------------")
 
 	return "{}", nil, nil
 }
@@ -44,7 +50,7 @@ func ConsumeInvite(inviteUid, password, origin string) (bool, error) {
 	log.Printf("[ConsumeInvite] Consuming invite %s", inviteUid)
 
 	// Get the invite
-	collection := lib.GetDatasetByEnv(origin, invitesCollection)
+	collection := lib.GetDatasetByEnv(origin, lib.InvitesCollection)
 	docSnapshot, err := lib.GetFirestoreErr(collection, inviteUid)
 	if err != nil {
 		log.Printf("[ConsumeInvite] error retrieving data from firestore: %s", err.Error())
@@ -84,7 +90,7 @@ func ConsumeInvite(inviteUid, password, origin string) (bool, error) {
 		}
 		createAgency(collection, origin, agencyRecord, invite)
 	default:
-		collection = lib.GetDatasetByEnv(origin, usersCollection)
+		collection = lib.GetDatasetByEnv(origin, lib.UserCollection)
 		userRecord, err := lib.CreateUserWithEmailAndPassword(invite.Email, password, &docUid)
 		if err != nil {
 			return false, err
@@ -94,7 +100,7 @@ func ConsumeInvite(inviteUid, password, origin string) (bool, error) {
 
 	// update the invite to consumed
 	invite.Consumed = true
-	invitesCollectionName := lib.GetDatasetByEnv(origin, invitesCollection)
+	invitesCollectionName := lib.GetDatasetByEnv(origin, lib.InvitesCollection)
 	lib.SetFirestore(invitesCollectionName, invite.Uid, invite)
 
 	log.Printf("[ConsumeInvite] Consumed invite with uid %s", invite.Uid)
