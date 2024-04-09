@@ -11,6 +11,20 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
+var transactionRoutes []lib.ChiRoute = []lib.ChiRoute{
+	{
+		Route:   "policy/v1/{policyUid}",
+		Handler: lib.ResponseLoggerWrapper(GetTransactionsByPolicyUidFx), // Broker.GetPolicyTransactions,
+		Method:  http.MethodGet,
+		Roles: []string{
+			models.UserRoleAdmin,
+			models.UserRoleManager,
+			models.UserRoleAgency,
+			models.UserRoleAgent,
+		},
+	},
+}
+
 func init() {
 	log.Println("INIT Transaction")
 	functions.HTTP("Transaction", Transaction)
@@ -19,25 +33,8 @@ func init() {
 func Transaction(w http.ResponseWriter, r *http.Request) {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
-	log.Println("Transaction")
-	lib.EnableCors(&w, r)
-
-	route := lib.RouteData{
-		Routes: []lib.Route{
-			{
-				Route:   "policy/v1/:policyUid",
-				Handler: GetTransactionsByPolicyUidFx, // Broker.GetPolicyTransactions,
-				Method:  http.MethodGet,
-				Roles: []string{
-					models.UserRoleAdmin,
-					models.UserRoleManager,
-					models.UserRoleAgency,
-					models.UserRoleAgent,
-				},
-			},
-		},
-	}
-	route.Router(w, r)
+	router := lib.GetChiRouter("transaction", transactionRoutes)
+	router.ServeHTTP(w, r)
 }
 
 func SetPolicyFirstTransactionPaid(policyUid string, scheduleDate string, origin string) {
