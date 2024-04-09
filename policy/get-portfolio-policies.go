@@ -3,12 +3,13 @@ package policy
 import (
 	"encoding/json"
 	"errors"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/network"
 	"io"
 	"log"
 	"net/http"
+
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
 )
 
 type GetPoliciesReq struct {
@@ -27,6 +28,7 @@ func GetPortfolioPoliciesFx(w http.ResponseWriter, r *http.Request) (string, int
 		resp = GetPortfolioPoliciesResp{
 			Policies: make([]PolicyInfo, 0),
 		}
+		nodeUid string
 	)
 
 	log.SetPrefix("[GetSubtreePortfolioFx] ")
@@ -34,7 +36,7 @@ func GetPortfolioPoliciesFx(w http.ResponseWriter, r *http.Request) (string, int
 	log.Println("Handler Start -----------------------------------------------")
 
 	idToken := r.Header.Get("Authorization")
-	authToken, err := models.GetAuthTokenFromIdToken(idToken)
+	authToken, err := lib.GetAuthTokenFromIdToken(idToken)
 	if err != nil {
 		log.Printf("error getting authToken: %s", err.Error())
 		return "", nil, err
@@ -43,15 +45,12 @@ func GetPortfolioPoliciesFx(w http.ResponseWriter, r *http.Request) (string, int
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 
-	log.Printf("request: %s", string(body))
-
 	err = json.Unmarshal(body, &req)
 	if err != nil {
 		log.Printf("error unmarshiling request: %s", err.Error())
 		return "", nil, err
 	}
 
-	var nodeUid string
 	if authToken.Role != models.UserRoleAdmin {
 		nodeUid = authToken.UserID
 	} else {
@@ -82,7 +81,6 @@ func GetPortfolioPoliciesFx(w http.ResponseWriter, r *http.Request) (string, int
 
 	rawResp, err := json.Marshal(resp)
 
-	log.Printf("response: %s", string(rawResp))
 	log.Println("Handler end -------------------------------------------------")
 
 	return string(rawResp), resp, err

@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/dustin/go-humanize"
-	lib "github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 	"github.com/wopta/goworkspace/sellable"
@@ -33,16 +33,17 @@ func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		warrant *models.Warrant
 	)
 
-	log.Println("[LifeFx] handler start ----------------------")
+	log.SetPrefix("[LifeFx] ")
+	defer log.SetPrefix("")
+
+	log.Println("Handler start -----------------------------------------------")
 
 	req := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 
-	log.Println("[LifeFx] body: ", string(req))
-
 	err := json.Unmarshal(req, &data)
 	if err != nil {
-		log.Printf("[LifeFx] error unmarshaling body: %s", err.Error())
+		log.Printf("error unmarshaling body: %s", err.Error())
 		return "", nil, err
 	}
 
@@ -50,13 +51,13 @@ func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	authToken, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
 	if err != nil {
-		log.Printf("[LifeFx] error getting authToken from idToken: %s", err.Error())
+		log.Printf("error getting authToken from idToken: %s", err.Error())
 		return "", nil, err
 	}
 
 	flow := authToken.GetChannelByRoleV2()
 
-	log.Println("[LifeFx] loading network node")
+	log.Println("loading network node")
 	networkNode := network.GetNetworkNodeByUid(authToken.UserID)
 	if networkNode != nil {
 		warrant = networkNode.GetWarrant()
@@ -65,14 +66,12 @@ func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		}
 	}
 
-	log.Println("[LifeFx] start quoting")
+	log.Println("start quoting")
 
 	result, err := Life(data, authToken.GetChannelByRoleV2(), networkNode, warrant, flow)
 	jsonOut, err := json.Marshal(result)
 
-	log.Printf("[LifeFx] response: %s", string(jsonOut))
-
-	log.Println("[LifeFx] handler end ---------------------------------------")
+	log.Println("Handler end -------------------------------------------------")
 
 	return string(jsonOut), result, err
 

@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-chi/chi"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/transaction"
@@ -24,29 +25,31 @@ type PutNetworkTransactionRequest struct {
 }
 
 func PutNetworkTransactionFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
-	log.Println("[PutNetworkTransactionFx] Handler start ---------------------")
-
 	var (
 		err     error
 		request PutNetworkTransactionRequest
 	)
 
-	uid := r.Header.Get("uid")
+	log.SetPrefix("[PutNetworkTransactionFx] ")
+	defer log.SetPrefix("")
 
-	log.Printf("[PutNetworkTransactionFx] uid %s", uid)
+	log.Println("Handler start -----------------------------------------------")
+
+	uid := chi.URLParam(r, "uid")
+	log.Printf("uid %s", uid)
 
 	networkTransaction := transaction.GetNetworkTransactionByUid(uid)
 	if networkTransaction == nil {
-		log.Println("[PutNetworkTransactionFx] error network transaction not found")
+		log.Println("error network transaction not found")
 		return "", "", fmt.Errorf("no network transaction found for uid %s", uid)
 	}
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
-	log.Printf("[PutNetworkTransactionFx] Request: %s", string(body))
+
 	err = json.Unmarshal(body, &request)
 	if err != nil {
-		log.Printf("[PutNetworkTransactionFx] error unmarshaling request: %s", err.Error())
+		log.Printf("error unmarshaling request: %s", err.Error())
 		return "", "", err
 	}
 
@@ -54,7 +57,9 @@ func PutNetworkTransactionFx(w http.ResponseWriter, r *http.Request) (string, an
 
 	err = networkTransaction.SaveBigQuery()
 
-	return "", "", err
+	log.Println("Handler end -------------------------------------------------")
+
+	return "{}", "", err
 }
 
 func updateNetworkTransaction(original *models.NetworkTransaction, update *PutNetworkTransactionRequest) {

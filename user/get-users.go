@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-chi/chi"
 	lib "github.com/wopta/goworkspace/lib"
 	models "github.com/wopta/goworkspace/models"
 )
@@ -28,9 +29,15 @@ func GetUsersFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 		response   GetUsersResp
 		limitValue = 10
 	)
-	log.Println("GetUsers")
+
+	log.SetPrefix("[GetUsersFx] ")
+	defer log.SetPrefix("")
+
+	log.Println("Handler start -----------------------------------------------")
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
+	defer r.Body.Close()
+
 	err := json.Unmarshal(body, &req)
 	lib.CheckError(err)
 
@@ -42,7 +49,7 @@ func GetUsersFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 		limitValue = req.Limit
 	}
 
-	fireUser := lib.GetDatasetByEnv(r.Header.Get("origin"), usersCollection)
+	fireUser := lib.GetDatasetByEnv(r.Header.Get("origin"), lib.UserCollection)
 
 	fireQueries := lib.Firequeries{
 		Queries: make([]lib.Firequery, 0),
@@ -70,5 +77,86 @@ func GetUsersFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 	log.Printf("GetUsers: found %d users\n", len(response.Users))
 
 	jsonOut, err := json.Marshal(response)
+
+	log.Println("Handler end -------------------------------------------------")
+
 	return string(jsonOut), response, err
+}
+
+func GetUserByAuthIdFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	log.SetPrefix("[GetUserByAuthIdFx] ")
+	defer log.SetPrefix("")
+
+	log.Println("Handler start -----------------------------------------------")
+
+	authId := chi.URLParam(r, "authId")
+	log.Println(authId)
+
+	user, e := GetUserByAuthId(r.Header.Get("Origin"), authId)
+	jsonString, e := user.Marshal()
+
+	log.Println("Handler end -------------------------------------------------")
+
+	return string(jsonString), user, e
+}
+
+func GetUserByAuthId(origin, authId string) (models.User, error) {
+	fireUsers := lib.GetDatasetByEnv(origin, lib.UserCollection)
+	userFirebase := lib.WhereLimitFirestore(fireUsers, "authId", "==", authId, 1)
+	return models.FirestoreDocumentToUser(userFirebase)
+}
+
+func GetUserByFiscalCodeFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	log.SetPrefix("[GetUserByFiscalCodeFx] ")
+	defer log.SetPrefix("")
+
+	log.Println("Handler start -----------------------------------------------")
+
+	fiscalCode := chi.URLParam(r, "fiscalCode")
+	log.Println(fiscalCode)
+
+	p, e := GetUserByFiscalCode(fiscalCode)
+	jsonString, e := p.Marshal()
+
+	log.Println("Handler end -------------------------------------------------")
+
+	return string(jsonString), p, e
+}
+
+func GetUserByFiscalCode(fiscalCode string) (models.User, error) {
+	userFirebase := lib.WhereLimitFirestore(lib.UserCollection, "fiscalCode", "==", fiscalCode, 1)
+	return models.FirestoreDocumentToUser(userFirebase)
+}
+
+func GetUserByMailFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	log.SetPrefix("[GetUserByMailFx] ")
+	defer log.SetPrefix("")
+
+	log.Println("Handler start -----------------------------------------------")
+
+	mail := chi.URLParam(r, "mail")
+	log.Println(mail)
+
+	p, e := GetUserByMail(mail)
+	jsonString, e := p.Marshal()
+
+	log.Println("Handler end -------------------------------------------------")
+
+	return string(jsonString), p, e
+}
+
+func GetUserByMail(mail string) (models.User, error) {
+	userFirebase := lib.WhereLimitFirestore(lib.UserCollection, "mail", "==", mail, 1)
+	return models.FirestoreDocumentToUser(userFirebase)
+}
+
+func GetAuthUserByMail(origin, mail string) (models.User, error) {
+	var user models.User
+
+	authId, err := lib.GetAuthUserIdByEmail(mail)
+	if err != nil {
+		return user, err
+	}
+
+	return GetUserByAuthId(origin, authId)
 }

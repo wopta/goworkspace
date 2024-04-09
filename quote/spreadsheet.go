@@ -3,6 +3,7 @@ package quote
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 
@@ -19,8 +20,16 @@ type QuoteSpreadsheet struct {
 }
 
 func SpreadsheetsFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	log.SetPrefix("[SpreadsheetsFx] ")
+	defer log.SetPrefix("")
+
+	log.Println("Handler start -----------------------------------------------")
+
 	qs := QuoteSpreadsheet{Id: "1GMtY4EIR2qeyylTOoCfNLFWVNam0H6MF1Is8yD2DiWI"}
 	qs.Spreadsheets()
+
+	log.Println("Handler end -------------------------------------------------")
+
 	return "", nil, nil
 }
 

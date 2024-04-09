@@ -24,22 +24,20 @@ func OnboardUserFx(resp http.ResponseWriter, r *http.Request) (string, interface
 		user               *models.User
 	)
 
-	log.SetPrefix("[OnboardUserFx]")
+	log.SetPrefix("[OnboardUserFx] ")
 	defer log.SetPrefix("")
 
-	log.Println("Handler start -------------------------------")
-
-	resp.Header().Set("Access-Control-Allow-Methods", "POST")
+	log.Println("Handler start -----------------------------------------------")
 
 	reqBytes := lib.ErrorByte(io.ReadAll(r.Body))
+	defer r.Body.Close()
+
 	json.Unmarshal(reqBytes, &onboardUserRequest)
 	onboardUserRequest.Email = lib.ToUpper(onboardUserRequest.Email)
 	onboardUserRequest.FiscalCode = lib.ToUpper(onboardUserRequest.FiscalCode)
-	log.Printf("Request email: '%s'", onboardUserRequest.Email)
-	log.Printf("Request fiscalCode: %s", onboardUserRequest.FiscalCode)
 
 	origin := r.Header.Get("Origin")
-	fireUser := lib.GetDatasetByEnv(origin, models.UserCollection)
+	fireUser := lib.GetDatasetByEnv(origin, lib.UserCollection)
 
 	canRegister, user, userId, email := CanUserRegisterUseCase(onboardUserRequest.FiscalCode)
 
@@ -90,7 +88,7 @@ func OnboardUserFx(resp http.ResponseWriter, r *http.Request) (string, interface
 
 	err := user.BigquerySave(origin)
 	if err != nil {
-		log.Printf("[OnBoardUser] error save user %s bigquery: %s", user.Uid, err.Error())
+		log.Printf("error save user %s bigquery: %s", user.Uid, err.Error())
 	}
 
 	log.Println("updating claims for user")

@@ -5,18 +5,20 @@ import (
 	"log"
 	"net/http"
 
-	lib "github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib"
 )
 
-func Cities(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	// Set CORS headers for the main request.
+func CitiesFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		cities []byte
 		result []City
 	)
-	w.Header().Set("Access-Control-Allow-Methods", "GET")
-	log.Println("Work")
-	w.Header().Set("Content-Type", "application/json")
+
+	log.SetPrefix("[CitiesFx] ")
+	defer log.SetPrefix("")
+
+	log.Println("Handler start -----------------------------------------------")
+
 	cities = getCity()
 
 	df := lib.CsvToDataframe(cities)
@@ -42,9 +44,10 @@ func Cities(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	b, err := json.Marshal(result)
 	lib.CheckError(err)
-	log.Println(string(b))
-	return "{\"cities\":" + string(b) + "}", nil, nil
 
+	log.Println("Handler end -------------------------------------------------")
+
+	return "{\"cities\":" + string(b) + "}", nil, nil
 }
 
 type City struct {

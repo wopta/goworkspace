@@ -11,20 +11,25 @@ import (
 	"time"
 
 	jwt "github.com/golang-jwt/jwt/v5"
-	lib "github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib"
 )
 
 func AuthorizeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.Println("--------------------------AuthorizeFx-------------------------------------------")
 	var (
 		serviceAccountReq  ServiceAccount
 		serviceAccountList []ServiceAccount
 		tokenString        string
 		e                  error
 	)
-	origin = r.Header.Get("Origin")
 
+	log.SetPrefix("[AuthorizeFx] ")
+	defer log.SetPrefix("")
+
+	log.Println("Handler start -----------------------------------------------")
+
+	origin = r.Header.Get("Origin")
 	rBody := lib.ErrorByte(io.ReadAll(r.Body))
+	defer r.Body.Close()
 
 	e = json.Unmarshal(rBody, &serviceAccountReq)
 	credByte := lib.GetFilesByEnv("auth/clients-credential")
@@ -41,22 +46,31 @@ func AuthorizeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 		}
 	}
 
-	//log.Println("Proposal request proposal: ", string(j))
-	defer r.Body.Close()
+	log.Println("Handler end -------------------------------------------------")
+
 	return tokenString, nil, e
 }
+
 func TokenFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.Println("--------------------------TokenFx-------------------------------------------")
 	var (
 		e error
 	)
+
+	log.SetPrefix("[TokenFx] ")
+	defer log.SetPrefix("")
+
+	log.Println("Handler start -----------------------------------------------")
+
 	origin = r.Header.Get("Origin")
 	tokenreq := r.Header.Get("Auth")
 
 	token, v, e := Token(tokenreq)
-	defer r.Body.Close()
+
+	log.Println("Handler end -------------------------------------------------")
+
 	return token, v, e
 }
+
 func Token(tokenReq string) (string, interface{}, error) {
 	log.Println("--------------------------Token-------------------------------------------")
 	var (

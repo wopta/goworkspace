@@ -4,20 +4,18 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"regexp"
 	"strings"
 
-	lib "github.com/wopta/goworkspace/lib"
-	models "github.com/wopta/goworkspace/models"
-	wiseProxy "github.com/wopta/goworkspace/wiseproxy"
+	"github.com/go-chi/chi"
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/wiseproxy"
 )
 
 func GetPolicyByFiscalCodeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	w.Header().Set("Access-Control-Allow-Methods", "GET")
-
 	var (
 		policies           []models.Policy
 		wiseToken          *string = nil
@@ -26,10 +24,13 @@ func GetPolicyByFiscalCodeFx(w http.ResponseWriter, r *http.Request) (string, in
 		response           GetPolicesByFiscalCodeResponse
 	)
 
-	log.Println("GetPolicyByFiscalCode")
-	log.Println(r.RequestURI)
-	policyFire := lib.GetDatasetByEnv(r.Header.Get("origin"), "policy")
-	fiscalCode := r.Header.Get("fiscalcode")
+	log.SetPrefix("[GetPolicyByFiscalCodeFx] ")
+	defer log.SetPrefix("")
+
+	log.Println("Handler start -----------------------------------------------")
+
+	policyFire := lib.GetDatasetByEnv(r.Header.Get("origin"), lib.PolicyCollection)
+	fiscalCode := chi.URLParam(r, "fiscalcode")
 	fiscalCodeRegex, _ := regexp.Compile("^(?:[A-Z][AEIOU][AEIOUX]|[AEIOU]X{2}|[B-DF-HJ-NP-TV-Z]{2}[A-Z]){2}(?:[\\dLMNP-V]{2}(?:[A-EHLMPR-T](?:[04LQ][1-9MNP-V]|[15MR][\\dLMNP-V]|[26NS][0-8LMNP-U])|[DHPS][37PT][0L]|[ACELMRT][37PT][01LM]|[AC-EHLMPR-T][26NS][9V])|(?:[02468LNQSU][048LQU]|[13579MPRTV][26NS])B[26NS][9V])(?:[A-MZ][1-9MNP-V][\\dLMNP-V]{2}|[A-M][0L](?:[1-9MNP-V][\\dLMNP-V]|[0L][1-9MNP-V]))[A-Z]$")
 
 	if !fiscalCodeRegex.Match([]byte(fiscalCode)) {
@@ -52,6 +53,8 @@ func GetPolicyByFiscalCodeFx(w http.ResponseWriter, r *http.Request) (string, in
 
 	fmt.Printf("Found %d policies for this fiscal code: %s", len(policies), fiscalCode)
 
+	log.Println("Handler end -------------------------------------------------")
+
 	return string(res), response, nil
 }
 
@@ -72,8 +75,8 @@ func getCompletePoliciesFromWise(simplePolicies []WiseSimplePolicy, wiseToken *s
 		wiseProxyInputs,
 		2,
 		func(input WiseProxyInput) models.Policy {
-			responseReader, wiseToken = wiseProxy.WiseBatch(input.Endpoint, input.Request, input.Method, wiseToken)
-			jsonData, _ := ioutil.ReadAll(responseReader)
+			responseReader, wiseToken = wiseproxy.WiseBatch(input.Endpoint, input.Request, input.Method, wiseToken)
+			jsonData, _ := io.ReadAll(responseReader)
 
 			_ = json.Unmarshal(jsonData, &wiseCompletePolicyResponse)
 			return wiseCompletePolicyResponse.Policy.ToDomain()
@@ -94,8 +97,8 @@ func getAllSimplePoliciesForUserFromWise(fiscalCode string) (*string, *[]WiseSim
 		"cdLingua": "it"
 	}`)
 
-	responseReader, wiseToken = wiseProxy.WiseBatch("WebApiProduct/Api/RicercaPolizzaCliente", request, "POST", nil)
-	jsonData, e := ioutil.ReadAll(responseReader)
+	responseReader, wiseToken = wiseproxy.WiseBatch("WebApiProduct/Api/RicercaPolizzaCliente", request, "POST", nil)
+	jsonData, e := io.ReadAll(responseReader)
 
 	if e != nil {
 		return nil, nil, e

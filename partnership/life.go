@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-chi/chi"
 	"github.com/mohae/deepcopy"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
@@ -17,19 +18,20 @@ import (
 
 func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var response PartnershipResponse
-	resp.Header().Set("Access-Control-Allow-Methods", "GET")
-	resp.Header().Set("Content-Type", "application/json")
 
-	log.Println("[LifePartnershipFx] handler start ----------------------------")
+	log.SetPrefix("[LifePartnershipFx] ")
+	defer log.SetPrefix("")
 
-	partnershipUid := strings.ToLower(r.Header.Get("partnershipUid"))
+	log.Println("Handler start -----------------------------------------------")
+
+	partnershipUid := strings.ToLower(chi.URLParam(r, "partnershipUid"))
 	jwtData := r.URL.Query().Get("jwt")
 
-	log.Printf("[LifePartnershipFx] partnershipUid: %s jwt: %s", partnershipUid, jwtData)
+	log.Printf("partnershipUid: %s jwt: %s", partnershipUid, jwtData)
 
 	policy, product, node, err := LifePartnership(partnershipUid, jwtData, r.Header.Get("Origin"))
 	if err != nil {
-		log.Printf("[LifePartnershipFx] error: %s", err.Error())
+		log.Printf("error: %s", err.Error())
 		return "", response, err
 	}
 
@@ -39,7 +41,7 @@ func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, inter
 
 	responseJson, err := json.Marshal(response)
 
-	log.Printf("[LifePartnershipFx] response: %s", string(responseJson))
+	log.Println("Handler end -------------------------------------------------")
 
 	return string(responseJson), response, err
 }
@@ -129,7 +131,7 @@ func savePartnershipLead(policy *models.Policy, node *models.NetworkNode, origin
 
 	log.Println("[savePartnershipLead] start --------------------------------------------")
 
-	policyFire := lib.GetDatasetByEnv(origin, models.PolicyCollection)
+	policyFire := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
 
 	policy.Channel = models.ECommerceChannel
 	now := time.Now().UTC()

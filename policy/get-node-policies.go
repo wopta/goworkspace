@@ -3,12 +3,13 @@ package policy
 import (
 	"encoding/json"
 	"errors"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/network"
 	"io"
 	"log"
 	"net/http"
+
+	"github.com/go-chi/chi"
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/network"
 )
 
 type GetNodePoliciesResp struct {
@@ -28,22 +29,22 @@ func GetNodePoliciesFx(w http.ResponseWriter, r *http.Request) (string, interfac
 	log.Println("Handler Start -----------------------------------------------")
 
 	idToken := r.Header.Get("Authorization")
-	authToken, err := models.GetAuthTokenFromIdToken(idToken)
+	authToken, err := lib.GetAuthTokenFromIdToken(idToken)
 	if err != nil {
 		log.Printf("error fetching authToken: %s", err.Error())
 		return "", nil, err
 	}
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
-	log.Printf("request: %s", string(body))
 	defer r.Body.Close()
+
 	err = json.Unmarshal(body, &req)
 	if err != nil {
 		log.Printf("error unmarshaling request: %s", err.Error())
 		return "", nil, err
 	}
 
-	nodeUid := r.Header.Get("nodeUid")
+	nodeUid := chi.URLParam(r, "nodeUid")
 	reqNode, err := network.GetNodeByUid(nodeUid)
 	if err != nil {
 		log.Printf("error fetching node %s from Firestore: %s", reqNode.Uid, err.Error())
@@ -64,7 +65,6 @@ func GetNodePoliciesFx(w http.ResponseWriter, r *http.Request) (string, interfac
 
 	rawPolices, err := json.Marshal(resp)
 
-	log.Printf("response: %s", string(rawPolices))
 	log.Println("Handler End -------------------------------------------------")
 
 	return string(rawPolices), policies, err

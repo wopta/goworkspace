@@ -23,14 +23,12 @@ func LeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	log.SetPrefix("[LeadFx]")
 	defer log.SetPrefix("")
 
-	log.Println("Handler start --------------------------------------")
-
-	w.Header().Add("content-type", "application/json")
+	log.Println("Handler start -----------------------------------------------")
 
 	log.Println("loading authToken from idToken...")
 
 	token := r.Header.Get("Authorization")
-	authToken, err := models.GetAuthTokenFromIdToken(token)
+	authToken, err := lib.GetAuthTokenFromIdToken(token)
 	if err != nil {
 		log.Printf("error getting authToken")
 		return "", nil, err
@@ -47,7 +45,6 @@ func LeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 
-	log.Printf("request: %s", string(body))
 	err = json.Unmarshal([]byte(body), &policy)
 	if err != nil {
 		log.Printf("error unmarshaling policy: %s", err.Error())
@@ -68,8 +65,7 @@ func LeadFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		return "", nil, err
 	}
 
-	log.Printf("response: %s", string(resp))
-	log.Println("Handler end ----------------------------------------")
+	log.Println("Handler end -------------------------------------------------")
 
 	return string(resp), &policy, err
 }
@@ -79,8 +75,8 @@ func lead(authToken models.AuthToken, policy *models.Policy) error {
 
 	log.Println("[lead] start ------------------------------------------------")
 
-	policyFire := lib.GetDatasetByEnv(origin, models.PolicyCollection)
-	guaranteFire := lib.GetDatasetByEnv(origin, models.GuaranteeCollection)
+	policyFire := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
+	guaranteFire := lib.GetDatasetByEnv(origin, lib.GuaranteeCollection)
 
 	if policy.Uid != "" {
 		if err = checkIfPolicyIsLead(policy); err != nil {
@@ -118,13 +114,13 @@ func lead(authToken models.AuthToken, policy *models.Policy) error {
 	log.Println("[lead] saving guarantees to bigquery...")
 	models.SetGuaranteBigquery(*policy, "lead", guaranteFire)
 
-	log.Println("[lead] end ----------------------------------------------")
+	log.Println("[lead] end --------------------------------------------------")
 	return err
 }
 
 func checkIfPolicyIsLead(policy *models.Policy) error {
 	var recoveredPolicy models.Policy
-	policyDoc, err := lib.GetFirestoreErr(models.PolicyCollection, policy.Uid)
+	policyDoc, err := lib.GetFirestoreErr(lib.PolicyCollection, policy.Uid)
 	if err != nil {
 		log.Printf("[checkIfPolicyIsLead] error getting policy %s from firebase: %s", policy.Uid, err.Error())
 		return nil

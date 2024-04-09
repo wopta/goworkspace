@@ -51,7 +51,7 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		responseEmit EmitResponse
 	)
 
-	log.SetPrefix("[EmitFx]")
+	log.SetPrefix("[EmitFx] ")
 	defer log.SetPrefix("")
 
 	log.Println("Handler start -----------------------------------------------")
@@ -59,7 +59,7 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	log.Println("loading authToken from idToken...")
 
 	token := r.Header.Get("Authorization")
-	authToken, err := models.GetAuthTokenFromIdToken(token)
+	authToken, err := lib.GetAuthTokenFromIdToken(token)
 	if err != nil {
 		log.Printf("error getting authToken")
 		return "", nil, err
@@ -76,7 +76,6 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 
-	log.Printf("Request: %s", string(body))
 	err = json.Unmarshal([]byte(body), &request)
 	if err != nil {
 		log.Printf("error unmarshaling policy: %s", err.Error())
@@ -131,8 +130,7 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	}
 	b, e := json.Marshal(responseEmit)
 
-	log.Println("Response: ", string(b))
-	log.Println("Handler end ----------------------------------------")
+	log.Println("Handler end -------------------------------------------------")
 
 	return string(b), responseEmit, e
 }
@@ -141,8 +139,8 @@ func emit(authToken models.AuthToken, policy *models.Policy, request EmitRequest
 	log.Println("[Emit] start ------------------------------------------------")
 	var responseEmit EmitResponse
 
-	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
-	fireGuarantee := lib.GetDatasetByEnv(origin, models.GuaranteeCollection)
+	firePolicy := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
+	fireGuarantee := lib.GetDatasetByEnv(origin, lib.GuaranteeCollection)
 
 	emitType := getEmitTypeFromPolicy(policy)
 	switch emitType {
@@ -200,8 +198,8 @@ func emitV2(authToken models.AuthToken, policy *models.Policy, request EmitReque
 	log.Println("[Emit] start ------------------------------------------------")
 	var responseEmit EmitResponse
 
-	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
-	fireGuarantee := lib.GetDatasetByEnv(origin, models.GuaranteeCollection)
+	firePolicy := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
+	fireGuarantee := lib.GetDatasetByEnv(origin, lib.GuaranteeCollection)
 
 	log.Printf("[Emit] Emitting - Policy Uid %s", policy.Uid)
 	log.Println("[Emit] starting bpmn flow...")
@@ -299,7 +297,7 @@ func emitApproval(policy *models.Policy) {
 
 func emitBase(policy *models.Policy, origin string) {
 	log.Printf("[emitBase] Policy Uid %s", policy.Uid)
-	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
+	firePolicy := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
 	now := time.Now().UTC()
 
 	policy.CompanyEmit = true

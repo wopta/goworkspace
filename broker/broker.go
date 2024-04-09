@@ -6,7 +6,6 @@ import (
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
 )
 
 type BrokerBaseRequest struct {
@@ -16,105 +15,105 @@ type BrokerBaseRequest struct {
 	PaymentMode  string `json:"paymentMode"`
 }
 
+var brokerRoutes []lib.ChiRoute = []lib.ChiRoute{
+	{
+		Route:   "/v1/policies/fiscalcode/{fiscalcode}",
+		Handler: lib.ResponseLoggerWrapper(PolicyFiscalcodeFx),
+		Method:  http.MethodGet,
+		Roles:   []string{lib.UserRoleAll},
+	},
+	{
+		Route:   "/v1/policy/{uid}",
+		Handler: lib.ResponseLoggerWrapper(GetPolicyFx),
+		Method:  http.MethodGet,
+		Roles:   []string{lib.UserRoleAll},
+	},
+	{
+		Route:   "/v1/policy/lead",
+		Handler: lib.ResponseLoggerWrapper(LeadFx),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAll},
+	},
+	{
+		Route:   "/v1/policy/proposal",
+		Handler: lib.ResponseLoggerWrapper(ProposalFx),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAll},
+	},
+	{
+		Route:   "/policy/reserved/v1",
+		Handler: lib.ResponseLoggerWrapper(RequestApprovalFx),
+		Method:  http.MethodPost,
+		Roles: []string{
+			lib.UserRoleAdmin,
+			lib.UserRoleManager,
+			lib.UserRoleAgent,
+			lib.UserRoleAgency,
+		},
+	},
+	{
+		Route:   "/v1/policy/emit",
+		Handler: lib.ResponseLoggerWrapper(EmitFx),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAll},
+	},
+	{
+		Route:   "policy/v1/{uid}",
+		Handler: lib.ResponseLoggerWrapper(UpdatePolicyFx),
+		Method:  http.MethodPatch,
+		Roles:   []string{lib.UserRoleAll},
+	},
+	{
+		Route:   "policy/v1/{uid}",
+		Handler: lib.ResponseLoggerWrapper(DeletePolicyFx),
+		Method:  http.MethodDelete,
+		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleManager},
+	},
+	{
+		Route:   "attachment/v1/{policyUid}",
+		Handler: lib.ResponseLoggerWrapper(GetPolicyAttachmentFx),
+		Method:  http.MethodGet,
+		Roles:   []string{lib.UserRoleAll},
+	},
+	{
+		Route:   "policies/v1",
+		Handler: lib.ResponseLoggerWrapper(GetPoliciesFx),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleManager},
+	},
+	{
+		Route:   "policy/transactions/v1/{policyUid}",
+		Handler: lib.ResponseLoggerWrapper(GetPolicyTransactionsFx),
+		Method:  http.MethodGet,
+		Roles: []string{
+			lib.UserRoleAdmin,
+			lib.UserRoleManager,
+			lib.UserRoleAgency,
+			lib.UserRoleAgent,
+		},
+	},
+	{
+		Route:   "/policy/reserved/v1/{policyUid}",
+		Handler: lib.ResponseLoggerWrapper(AcceptanceFx),
+		Method:  http.MethodPut,
+		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleManager},
+	},
+	{
+		Route:   "/policies/auth/v1",
+		Handler: lib.ResponseLoggerWrapper(GetPoliciesByAuthFx),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAgent, lib.UserRoleAgency},
+	},
+}
+
 func init() {
 	log.Println("INIT Broker")
 	functions.HTTP("Broker", Broker)
 }
 
 func Broker(w http.ResponseWriter, r *http.Request) {
-	log.Println("Broker")
-	lib.EnableCors(&w, r)
-	route := lib.RouteData{
-		Routes: []lib.Route{
-			{
-				Route:   "/v1/policies/fiscalcode/:fiscalcode",
-				Handler: PolicyFiscalcode,
-				Method:  http.MethodGet,
-				Roles:   []string{models.UserRoleAll},
-			},
-			{
-				Route:   "/v1/policy/:uid",
-				Handler: GetPolicyFx,
-				Method:  http.MethodGet,
-				Roles:   []string{models.UserRoleAll},
-			},
-			{
-				Route:   "/v1/policy/lead",
-				Handler: LeadFx,
-				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAll},
-			},
-			{
-				Route:   "/v1/policy/proposal",
-				Handler: ProposalFx,
-				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAll},
-			},
-			{
-				Route:   "/policy/reserved/v1",
-				Handler: RequestApprovalFx,
-				Method:  http.MethodPost,
-				Roles: []string{
-					models.UserRoleAdmin,
-					models.UserRoleManager,
-					models.UserRoleAgent,
-					models.UserRoleAgency,
-				},
-			},
-			{
-				Route:   "/v1/policy/emit",
-				Handler: EmitFx,
-				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAll},
-			},
-			{
-				Route:   "policy/v1/:uid",
-				Handler: UpdatePolicyFx,
-				Method:  http.MethodPatch,
-				Roles:   []string{models.UserRoleAll},
-			},
-			{
-				Route:   "policy/v1/:uid",
-				Handler: DeletePolicy,
-				Method:  http.MethodDelete,
-				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
-			},
-			{
-				Route:   "attachment/v1/:policyUid",
-				Handler: GetPolicyAttachmentFx,
-				Method:  http.MethodGet,
-				Roles:   []string{models.UserRoleAll},
-			},
-			{
-				Route:   "policies/v1",
-				Handler: GetPoliciesFx,
-				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
-			},
-			{
-				Route:   "policy/transactions/v1/:policyUid",
-				Handler: GetPolicyTransactionsFx,
-				Method:  http.MethodGet,
-				Roles: []string{
-					models.UserRoleAdmin,
-					models.UserRoleManager,
-					models.UserRoleAgency,
-					models.UserRoleAgent,
-				},
-			},
-			{
-				Route:   "/policy/reserved/v1/:policyUid",
-				Handler: AcceptanceFx,
-				Method:  http.MethodPut,
-				Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
-			},
-			{
-				Route:   "/policies/auth/v1",
-				Handler: GetPoliciesByAuthFx,
-				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAgent, models.UserRoleAgency},
-			},
-		},
-	}
-	route.Router(w, r)
+	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
+
+	router := lib.GetChiRouter("broker", brokerRoutes)
+	router.ServeHTTP(w, r)
 }

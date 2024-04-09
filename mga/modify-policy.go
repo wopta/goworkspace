@@ -3,15 +3,16 @@ package mga
 import (
 	"encoding/json"
 	"errors"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
-	plc "github.com/wopta/goworkspace/policy"
-	usr "github.com/wopta/goworkspace/user"
 	"io"
 	"log"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
+	plc "github.com/wopta/goworkspace/policy"
+	usr "github.com/wopta/goworkspace/user"
 )
 
 func ModifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -22,6 +23,7 @@ func ModifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 
 	log.SetPrefix("[ModifyPolicyFx] ")
 	defer log.SetPrefix("")
+
 	log.Println("Handler start -----------------------------------------------")
 
 	log.Println("loading authToken from idToken...")
@@ -42,7 +44,7 @@ func ModifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
-	log.Printf("request body: %s", string(body))
+
 	err = json.Unmarshal(body, &inputPolicy)
 	if err != nil {
 		log.Printf("error unmarshaling request body: %s", err.Error())
@@ -73,9 +75,6 @@ func ModifyPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	log.Printf("policy %s modified successfully", modifiedPolicy.Uid)
 
 	rawPolicy, err = json.Marshal(modifiedPolicy)
-	log.Printf("modified policy: %s", string(rawPolicy))
-
-	models.CreateAuditLog(r, string(body))
 
 	log.Println("Handler end -------------------------------------------------")
 

@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-chi/chi"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
@@ -18,19 +19,21 @@ type PolicyDeleteRequest struct {
 }
 
 func DeletePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.SetPrefix("[DeletePolicyFx] ")
-
 	var (
 		err     error
 		request PolicyDeleteRequest
 	)
 
+	log.SetPrefix("[DeletePolicyFx] ")
+	defer log.SetPrefix("")
+
 	log.Println("Handler start -----------------------------------------------")
 
 	origin := r.Header.Get("Origin")
-	policyUid := r.Header.Get("uid")
+	policyUid := chi.URLParam(r, "uid")
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
+
 	err = json.Unmarshal(body, &request)
 	if err != nil {
 		log.Printf("error unmarshaling request: %s", err.Error())
@@ -41,7 +44,7 @@ func DeletePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 
 	deletePolicy(&policy, request)
 
-	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
+	firePolicy := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
 
 	log.Println("setting policy to delete in firestore...")
 	err = lib.SetFirestoreErr(firePolicy, policyUid, policy)
@@ -54,11 +57,9 @@ func DeletePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	log.Println("setting policy to delete in bigquery...")
 	policy.BigquerySave(origin)
 
-	guaranteFire := lib.GetDatasetByEnv(origin, models.GuaranteeCollection)
+	guaranteFire := lib.GetDatasetByEnv(origin, lib.GuaranteeCollection)
 	log.Println("updating policy's guarantees to delete in bigquery...")
 	models.SetGuaranteBigquery(policy, "delete", guaranteFire)
-
-	models.CreateAuditLog(r, string(body))
 
 	log.Println("Handler end -------------------------------------------------")
 	return "{}", nil, nil

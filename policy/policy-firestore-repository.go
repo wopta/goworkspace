@@ -9,7 +9,7 @@ import (
 )
 
 func GetPoliciesByQueries(origin string, queries []models.Query, limitValue int) ([]models.Policy, error) {
-	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
+	firePolicy := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
 
 	fireQueries := lib.Firequeries{
 		Queries: make([]lib.Firequery, 0),

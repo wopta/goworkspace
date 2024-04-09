@@ -6,13 +6,14 @@ replace github.com/wopta/goworkspace/mga => ./
 
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
-	github.com/wopta/goworkspace/lib v1.0.107
-	github.com/wopta/goworkspace/mail v1.0.98
-	github.com/wopta/goworkspace/models v1.1.96
-	github.com/wopta/goworkspace/network v1.0.50
-	github.com/wopta/goworkspace/policy v1.0.89
-	github.com/wopta/goworkspace/product v1.0.96
-	github.com/wopta/goworkspace/user v1.0.83
+	github.com/go-chi/chi v1.5.5
+	github.com/wopta/goworkspace/lib v1.0.109
+	github.com/wopta/goworkspace/mail v1.0.99
+	github.com/wopta/goworkspace/models v1.1.98
+	github.com/wopta/goworkspace/network v1.0.51
+	github.com/wopta/goworkspace/policy v1.0.90
+	github.com/wopta/goworkspace/product v1.0.97
+	github.com/wopta/goworkspace/user v1.0.84
 )
 
 require (
@@ -37,6 +38,7 @@ require (
 	github.com/cloudevents/sdk-go/v2 v2.14.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
+	github.com/go-chi/cors v1.2.1 // indirect
 	github.com/go-gota/gota v0.12.0 // indirect
 	github.com/go-pdf/fpdf v0.8.0 // indirect
 	github.com/goccy/go-json v0.9.11 // indirect
@@ -75,7 +77,7 @@ require (
 	github.com/src-d/gcfg v1.4.0 // indirect
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.2.1 // indirect
-	github.com/wopta/goworkspace/document v1.1.66 // indirect
+	github.com/wopta/goworkspace/document v1.1.67 // indirect
 	github.com/wopta/goworkspace/wiseproxy v1.0.3 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect

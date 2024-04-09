@@ -1,13 +1,34 @@
 package product
 
 import (
-	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
 	"log"
 	"net/http"
+
+	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
+	"github.com/wopta/goworkspace/lib"
 	//"google.golang.org/api/firebaseappcheck/v1"
 )
+
+var productRoutes []lib.ChiRoute = []lib.ChiRoute{
+	{
+		Route:   "/v1/{name}",
+		Handler: lib.ResponseLoggerWrapper(GetNameFx),
+		Method:  http.MethodGet,
+		Roles:   []string{lib.UserRoleAll},
+	},
+	{
+		Route:   "/v1/name/{name}",
+		Handler: lib.ResponseLoggerWrapper(GetNameFx),
+		Method:  http.MethodGet,
+		Roles:   []string{lib.UserRoleAll},
+	},
+	{
+		Route:   "/v1",
+		Handler: lib.ResponseLoggerWrapper(PutFx),
+		Method:  http.MethodPut,
+		Roles:   []string{lib.UserRoleAll},
+	},
+}
 
 func init() {
 	log.Println("INIT Product")
@@ -15,32 +36,8 @@ func init() {
 }
 
 func Product(w http.ResponseWriter, r *http.Request) {
+	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
-	log.Println("Product")
-	lib.EnableCors(&w, r)
-	w.Header().Set("Access-Control-Allow-Methods", "POST")
-	route := lib.RouteData{
-		Routes: []lib.Route{
-			{
-				Route:   "/v1/:name",
-				Handler: GetNameFx,
-				Method:  "GET",
-				Roles:   []string{models.UserRoleAll},
-			},
-			{
-				Route:   "/v1/name/:name",
-				Handler: GetNameFx,
-				Method:  "GET",
-				Roles:   []string{models.UserRoleAll},
-			},
-			{
-				Route:   "/v1",
-				Handler: PutFx,
-				Method:  "PUT",
-				Roles:   []string{models.UserRoleAll},
-			},
-		},
-	}
-	route.Router(w, r)
-
+	router := lib.GetChiRouter("product", productRoutes)
+	router.ServeHTTP(w, r)
 }

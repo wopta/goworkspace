@@ -3,10 +3,13 @@ package mail
 import (
 	"bytes"
 	"crypto/tls"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"net"
+	"net/http"
 	"net/mail"
 	"net/smtp"
 	"os"
@@ -44,6 +47,25 @@ func (a *loginAuth) Next(fromServer []byte, more bool) ([]byte, error) {
 		}
 	}
 	return nil, nil
+}
+
+func SendFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	var obj MailRequest
+
+	log.SetPrefix("[SendFx] ")
+	defer log.SetPrefix("")
+
+	log.Println("Handler start -----------------------------------------------")
+
+	req := lib.ErrorByte(io.ReadAll(r.Body))
+	defer r.Body.Close()
+
+	json.Unmarshal(req, &obj)
+	SendMail(obj)
+
+	log.Println("Handler end -------------------------------------------------")
+
+	return `{"message":"Success send "}`, nil, nil
 }
 
 func addAttachment(message, filename, contentType, data string) string {

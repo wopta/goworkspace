@@ -67,8 +67,6 @@ func GetProductsListByChannelFx(w http.ResponseWriter, r *http.Request) (string,
 		return "", "", err
 	}
 
-	log.Printf("found products: %s", string(responseBytes))
-
 	log.Println("Handler end -------------------------------------------------")
 
 	return string(responseBytes), response, nil

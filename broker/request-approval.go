@@ -26,18 +26,21 @@ func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		policy models.Policy
 	)
 
-	log.Println("[RequestApprovalFx] Handler start ---------------------------")
+	log.SetPrefix("[RequestApprovalFx] ")
+	defer log.SetPrefix("")
 
-	log.Println("[RequestApprovalFx] loading authToken from idToken...")
+	log.Println("Handler start -----------------------------------------------")
+
+	log.Println("loading authToken from idToken...")
 
 	token := r.Header.Get("Authorization")
-	authToken, err := models.GetAuthTokenFromIdToken(token)
+	authToken, err := lib.GetAuthTokenFromIdToken(token)
 	if err != nil {
-		log.Printf("[RequestApprovalFx] error getting authToken")
+		log.Printf("error getting authToken")
 		return "", nil, err
 	}
 	log.Printf(
-		"[RequestApprovalFx] authToken - type: '%s' role: '%s' uid: '%s' email: '%s'",
+		"authToken - type: '%s' role: '%s' uid: '%s' email: '%s'",
 		authToken.Type,
 		authToken.Role,
 		authToken.UserID,
@@ -48,17 +51,16 @@ func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 
-	log.Printf("[RequestApprovalFx] request body: %s", string(body))
 	err = json.Unmarshal(body, &req)
 	if err != nil {
-		log.Printf("[RequestApprovalFx] error unmarshaling request body: %s", err.Error())
+		log.Printf("error unmarshaling request body: %s", err.Error())
 		return "", nil, err
 	}
 
-	log.Printf("[RequestApprovalFx] fetching policy %s from Firestore...", req.PolicyUid)
+	log.Printf("fetching policy %s from Firestore...", req.PolicyUid)
 	policy, err = plc.GetPolicy(req.PolicyUid, origin)
 	if err != nil {
-		log.Printf("[RequestApprovalFx] error fetching policy %s from Firestore...", req.PolicyUid)
+		log.Printf("error fetching policy %s from Firestore...", req.PolicyUid)
 		return "", nil, err
 	}
 
@@ -71,7 +73,7 @@ func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 	allowedStatus := []string{models.PolicyStatusInitLead, models.PolicyStatusNeedsApproval}
 
 	if !policy.IsReserved || !lib.SliceContains(allowedStatus, policy.Status) {
-		log.Printf("[RequestApprovalFx] cannot request approval for policy with status %s and isReserved %t", policy.Status, policy.IsReserved)
+		log.Printf("cannot request approval for policy with status %s and isReserved %t", policy.Status, policy.IsReserved)
 		return "", nil, fmt.Errorf("cannot request approval for policy with status %s and isReserved %t", policy.Status, policy.IsReserved)
 	}
 
@@ -79,14 +81,13 @@ func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 
 	err = requestApproval(&policy)
 	if err != nil {
-		log.Printf("[RequestApprovalFx] error request approval: %s", err.Error())
+		log.Printf("error request approval: %s", err.Error())
 		return "", nil, err
 	}
 
 	jsonOut, err := policy.Marshal()
 
-	log.Printf("[RequestApprovalFx] response: %s", string(jsonOut))
-	log.Println("[RequestApprovalFx] Handler end -----------------------------")
+	log.Println("Handler end -------------------------------------------------")
 
 	return string(jsonOut), policy, err
 }

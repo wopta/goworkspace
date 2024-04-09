@@ -4,13 +4,14 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
 	"io"
 	"log"
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 )
 
 type GetPolicyMediaReq struct {
@@ -32,14 +33,14 @@ func GetPolicyMediaFx(w http.ResponseWriter, r *http.Request) (string, interface
 		resp    GetPolicyMediaResp
 	)
 
-	log.SetPrefix("[GetPolicyMediaFx]")
+	log.SetPrefix("[GetPolicyMediaFx] ")
 	defer log.SetPrefix("")
 
 	log.Println("Handler start -----------------------------------------------")
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
-	log.Printf("request body: %s", string(body))
+
 	err = json.Unmarshal(body, &req)
 	if err != nil {
 		log.Printf("error unmarshaling request: %s", err.Error())

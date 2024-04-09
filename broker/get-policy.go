@@ -5,18 +5,26 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/go-chi/chi"
 	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
 	plc "github.com/wopta/goworkspace/policy"
 )
 
 func GetPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	firePolicy := lib.GetDatasetByEnv(r.Header.Get("origin"), models.PolicyCollection)
-	log.Println("GetPolicy")
-	log.Println(r.RequestURI)
-	policyUid := r.Header.Get("uid")
-	log.Println(policyUid)
+	log.SetPrefix("[GetPolicyFx] ")
+	defer log.SetPrefix("")
+
+	log.Println("Handler start -----------------------------------------------")
+
+	policyUid := chi.URLParam(r, "uid")
+	log.Printf("policyUid: %s", policyUid)
+
+	firePolicy := lib.GetDatasetByEnv(r.Header.Get("Origin"), lib.PolicyCollection)
+
 	policy, _ := plc.GetPolicy(policyUid, firePolicy)
 	res, err := json.Marshal(policy)
+
+	log.Println("Handler end -------------------------------------------------")
+
 	return string(res), policy, err
 }

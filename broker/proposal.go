@@ -30,18 +30,21 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 		req    ProposalReq
 	)
 
-	log.Println("[ProposalFx] Handler start ----------------------------------")
+	log.SetPrefix("[ProposalFx] ")
+	defer log.SetPrefix("")
 
-	log.Println("[ProposalFx] loading authToken from idToken...")
+	log.Println("Handler start -----------------------------------------------")
+
+	log.Println("loading authToken from idToken...")
 
 	token := r.Header.Get("Authorization")
-	authToken, err := models.GetAuthTokenFromIdToken(token)
+	authToken, err := lib.GetAuthTokenFromIdToken(token)
 	if err != nil {
-		log.Printf("[ProposalFx] error getting authToken")
+		log.Printf("error getting authToken")
 		return "", nil, err
 	}
 	log.Printf(
-		"[ProposalFx] authToken - type: '%s' role: '%s' uid: '%s' email: '%s'",
+		"authToken - type: '%s' role: '%s' uid: '%s' email: '%s'",
 		authToken.Type,
 		authToken.Role,
 		authToken.UserID,
@@ -52,12 +55,10 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 
-	log.Printf("[ProposalFx] Request: %s", string(body))
-
 	if lib.GetBoolEnv("PROPOSAL_V2") {
-		err = json.Unmarshal([]byte(body), &req)
+		err = json.Unmarshal(body, &req)
 		if err != nil {
-			log.Printf("[ProposalFx] error proposal body: %s", err.Error())
+			log.Printf("error proposal body: %s", err.Error())
 			return "", nil, err
 		}
 
@@ -69,12 +70,12 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 
 		policy, err = plc.GetPolicy(req.PolicyUid, origin)
 		if err != nil {
-			log.Printf("[ProposalFx] error fetching policy %s from Firestore...: %s", req.PolicyUid, err.Error())
+			log.Printf("error fetching policy %s from Firestore...: %s", req.PolicyUid, err.Error())
 			return "", nil, err
 		}
 
 		if policy.Status != models.PolicyStatusInitLead {
-			log.Printf("[ProposalFx] cannot save proposal for policy with status %s", policy.Status)
+			log.Printf("cannot save proposal for policy with status %s", policy.Status)
 			return "", nil, fmt.Errorf("cannot save proposal for policy with status %s", policy.Status)
 		}
 
@@ -82,19 +83,19 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 
 		err = proposal(&policy)
 		if err != nil {
-			log.Printf("[ProposalFx] error creating proposal: %s", err.Error())
+			log.Printf("error creating proposal: %s", err.Error())
 			return "", nil, err
 		}
 	} else {
-		err = json.Unmarshal([]byte(body), &policy)
+		err = json.Unmarshal(body, &policy)
 		if err != nil {
-			log.Printf("[ProposalFx] error unmarshaling policy: %s", err.Error())
+			log.Printf("error unmarshaling policy: %s", err.Error())
 			return "", nil, err
 		}
 
 		err = lead(authToken, &policy)
 		if err != nil {
-			log.Printf("[ProposalFx] error creating lead: %s", err.Error())
+			log.Printf("error creating lead: %s", err.Error())
 			return "", nil, err
 		}
 		setProposalNumber(&policy)
@@ -103,12 +104,11 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 
 	resp, err := policy.Marshal()
 	if err != nil {
-		log.Printf("[ProposalFx] error marshaling response: %s", err.Error())
+		log.Printf("error marshaling response: %s", err.Error())
 		return "", nil, err
 	}
 
-	log.Printf("[ProposalFx] response: %s", string(resp))
-	log.Println("[ProposalFx] Handler end ------------------------------------")
+	log.Println("Handler end -------------------------------------------------")
 
 	return string(resp), &policy, err
 }
@@ -189,7 +189,7 @@ func setProposalNumber(policy *models.Policy) {
 	}
 
 	log.Println("[setProposalNumber] setting proposal number...")
-	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
+	firePolicy := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
 	policy.ProposalNumber = GetSequenceProposal("", firePolicy)
 	log.Printf("[setProposalNumber] proposal number %d", policy.ProposalNumber)
 }

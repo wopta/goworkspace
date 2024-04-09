@@ -12,21 +12,27 @@ import (
 	"time"
 	"unicode"
 
+	"github.com/go-chi/chi"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
 
-func FiscalCode(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func FiscalCodeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		user    models.User
 		outJson string
 	)
 
-	log.Println("Fiscal Code")
+	log.SetPrefix("[FiscalCodeFx] ")
+	defer log.SetPrefix("")
 
-	operation := r.Header.Get("operation")
+	log.Println("Handler start -----------------------------------------------")
+
+	operation := chi.URLParam(r, "operation")
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
+	defer r.Body.Close()
+
 	err := json.Unmarshal(body, &user)
 	if err != nil {
 		return "", nil, err
@@ -40,6 +46,8 @@ func FiscalCode(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 	case "decode":
 		outJson, user, err = ExtractUserDataFromFiscalCode(user)
 	}
+
+	log.Println("Handler end -------------------------------------------------")
 
 	return outJson, user, err
 }

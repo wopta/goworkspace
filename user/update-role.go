@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/go-chi/chi"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
@@ -24,14 +25,17 @@ func UpdateUserRoleFx(w http.ResponseWriter, r *http.Request) (string, interface
 		request           updateUserReq
 	)
 
-	log.Println("Update User Role")
+	log.SetPrefix("[UpdateUserRoleFx] ")
+	defer log.SetPrefix("")
 
-	defer r.Body.Close()
+	log.Println("Handler start -----------------------------------------------")
 
-	userUid = r.Header.Get("userUid")
-	origin := r.Header.Get("origin")
+	userUid = chi.URLParam(r, "userUid")
+	origin := r.Header.Get("Origin")
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
+	defer r.Body.Close()
+
 	err = json.Unmarshal(body, &request)
 	lib.CheckError(err)
 
@@ -43,32 +47,34 @@ func UpdateUserRoleFx(w http.ResponseWriter, r *http.Request) (string, interface
 		}
 	}
 	if userRole == "" {
-		err := fmt.Errorf("UpdateUserRole: %s invalid user role", request.Role)
+		err := fmt.Errorf("%s invalid user role", request.Role)
 		log.Println(err.Error())
 		return "", nil, err
 	}
 
-	log.Println("UpdateUserRole: get user from firestore")
-	fireUser := lib.GetDatasetByEnv(origin, usersCollection)
+	log.Println("get user from firestore")
+	fireUser := lib.GetDatasetByEnv(origin, lib.UserCollection)
 	docsnap, err := lib.GetFirestoreErr(fireUser, userUid)
 	lib.CheckError(err)
 	err = docsnap.DataTo(&user)
 	lib.CheckError(err)
 
-	log.Println("UpdateUserRole: set user role claim")
+	log.Println("set user role claim")
 	lib.SetCustomClaimForUser(userUid, map[string]interface{}{
 		"role": request.Role,
 	})
 
-	log.Println("UpdateUserRole: updating user role in DB")
+	log.Println("updating user role in DB")
 	user.Role = request.Role
 	err = lib.SetFirestoreErr(fireUser, userUid, user)
 	if err != nil {
-		log.Printf("UpdateUserRole: error save user %s firestore: %s", user.Role, err.Error())
+		log.Printf("error save user %s firestore: %s", user.Role, err.Error())
 		return "", nil, err
 	}
 
 	err = user.BigquerySave(origin)
+
+	log.Println("Handler end -------------------------------------------------")
 
 	return "{}", nil, err
 }

@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-chi/chi"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
@@ -335,7 +336,7 @@ func loadProductSteps(product *models.Product) []models.Step {
 
 // DEPRECATED
 func GetNameFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	name := r.Header.Get("name")
+	name := chi.URLParam(r, "name")
 	origin := r.Header.Get("origin")
 
 	log.Println(r.RequestURI)

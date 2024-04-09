@@ -3,7 +3,6 @@ package policy
 import (
 	"errors"
 	"fmt"
-	"github.com/wopta/goworkspace/network"
 	"log"
 	"strings"
 	"time"
@@ -11,10 +10,11 @@ import (
 	"github.com/wopta/goworkspace/document"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
 )
 
 func FillAttachments(policy *models.Policy, origin string) error {
-	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
+	firePolicy := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
 
 	if policy.Attachments == nil {
 		policy.Attachments = new([]models.Attachment)
@@ -29,7 +29,7 @@ func Sign(policy *models.Policy, origin string) error {
 		return errors.New("policy has not been set to be signed")
 	}
 
-	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
+	firePolicy := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
 
 	policy.IsSign = true
 	policy.Status = models.PolicyStatusSign
@@ -40,7 +40,7 @@ func Sign(policy *models.Policy, origin string) error {
 }
 
 func SetToPay(policy *models.Policy, origin string) error {
-	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
+	firePolicy := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
 
 	policy.Status = models.PolicyStatusToPay
 	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusToPay)
@@ -80,7 +80,7 @@ func promoteContractorDocumentsToUser(policy *models.Policy, origin string) erro
 	}
 	policy.Updated = time.Now().UTC()
 
-	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
+	firePolicy := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
 
 	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
 }
@@ -109,7 +109,7 @@ func SetUserIntoPolicyContractor(policy *models.Policy, origin string) error {
 	if newUser {
 		policy.Contractor.CreationDate = time.Now().UTC()
 		policy.Contractor.UpdatedDate = policy.Contractor.CreationDate
-		fireUsers := lib.GetDatasetByEnv(origin, models.UserCollection)
+		fireUsers := lib.GetDatasetByEnv(origin, lib.UserCollection)
 		err = lib.SetFirestoreErr(fireUsers, userUid, policy.Contractor)
 		if err != nil {
 			log.Printf("[setUserIntoPolicyContractor] ERROR creating/updating user %s: %s", policy.Contractor.Uid,
@@ -140,13 +140,13 @@ func AddContract(policy *models.Policy, origin string) error {
 	})
 	policy.Updated = time.Now().UTC()
 
-	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
+	firePolicy := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
 
 	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
 }
 
 func Pay(policy *models.Policy, origin string) error {
-	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
+	firePolicy := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
 
 	policy.IsPay = true
 	policy.Status = models.PolicyStatusPay

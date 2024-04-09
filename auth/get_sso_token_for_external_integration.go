@@ -8,8 +8,9 @@ import (
 	"os"
 	"time"
 
+	"github.com/go-chi/chi"
 	jwt "github.com/golang-jwt/jwt/v5"
-	models "github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/network"
 )
 
@@ -20,16 +21,22 @@ func GetTokenForExternalIntegrationFx(w http.ResponseWriter, r *http.Request) (s
 		response GetTokenForExternalIntegrationResponse
 	)
 
-	log.Println("--------------------------GetTokenForExternalIntegrationFx-------------------------------------------")
+	log.SetPrefix("[GetTokenForExternalIntegrationFx] ")
+	defer log.SetPrefix("")
+
+	log.Println("Handler start -----------------------------------------------")
 
 	origin = r.Header.Get("Origin")
-	productName := r.Header.Get("productName")
+	productName := chi.URLParam(r, "productName")
 	token := r.Header.Get("Authorization")
-	authToken, e := models.GetAuthTokenFromIdToken(token)
+	authToken, e := lib.GetAuthTokenFromIdToken(token)
 
 	response.Token, e = getTokenForExternalIntegration(productName, authToken.UserID)
 
 	b, e = json.Marshal(response)
+
+	log.Println("Handler end -------------------------------------------------")
+
 	return string(b), response, e
 }
 

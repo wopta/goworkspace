@@ -1,13 +1,13 @@
 package network
 
 import (
-	"cloud.google.com/go/bigquery"
 	"context"
 	"fmt"
 	"log"
 	"os"
 	"time"
 
+	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/firestore"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
@@ -16,7 +16,7 @@ import (
 
 func GetNodeByUid(uid string) (*models.NetworkNode, error) {
 	var node *models.NetworkNode
-	docSnapshot, err := lib.GetFirestoreErr(models.NetworkNodesCollection, uid)
+	docSnapshot, err := lib.GetFirestoreErr(lib.NetworkNodesCollection, uid)
 
 	if err != nil {
 		return nil, fmt.Errorf("could not fetch node: %s", err.Error())
@@ -31,7 +31,7 @@ func GetNodeByUid(uid string) (*models.NetworkNode, error) {
 
 func initNode(node *models.NetworkNode) error {
 	if len(node.Uid) == 0 {
-		node.Uid = lib.NewDoc(models.NetworkNodesCollection)
+		node.Uid = lib.NewDoc(lib.NetworkNodesCollection)
 	}
 	now := time.Now().UTC()
 	node.CreationDate, node.UpdatedDate = now, now
@@ -238,7 +238,7 @@ func GetNetworkNodeByUid(nodeUid string) *models.NetworkNode {
 
 func GetAllNetworkNodes() ([]models.NetworkNode, error) {
 	var nodes []models.NetworkNode
-	docIterator := lib.OrderFirestore(models.NetworkNodesCollection, "code", firestore.Asc)
+	docIterator := lib.OrderFirestore(lib.NetworkNodesCollection, "code", firestore.Asc)
 
 	snapshots, err := docIterator.GetAll()
 	if err != nil {
@@ -265,7 +265,7 @@ func DeleteNetworkNodeByUid(origin, nodeUid string) error {
 		return fmt.Errorf("no nodeUid specified")
 	}
 
-	fireNetwork := lib.GetDatasetByEnv(origin, models.NetworkNodesCollection)
+	fireNetwork := lib.GetDatasetByEnv(origin, lib.NetworkNodesCollection)
 	_, err := lib.DeleteFirestoreErr(fireNetwork, nodeUid)
 	return err
 }
@@ -288,7 +288,7 @@ func UpdateNetworkNodePortfolio(origin string, policy *models.Policy, networkNod
 	networkNode.UpdatedDate = time.Now().UTC()
 
 	log.Printf("[UpdateNetworkNodePortfolio] saving networkNode %s to Firestore...", networkNode.Uid)
-	fireNetwork := lib.GetDatasetByEnv(origin, models.NetworkNodesCollection)
+	fireNetwork := lib.GetDatasetByEnv(origin, lib.NetworkNodesCollection)
 	err := lib.SetFirestoreErr(fireNetwork, networkNode.Uid, networkNode)
 	if err != nil {
 		log.Printf("[UpdateNetworkNodePortfolio] error saving networkNode %s to Firestore: %s", networkNode.Uid, err.Error())
@@ -303,7 +303,7 @@ func UpdateNetworkNodePortfolio(origin string, policy *models.Policy, networkNod
 
 func GetNodeByUidBigQuery(uid string) (models.NetworkNode, error) {
 	query := "select * from `%s.%s` where uid = @uid limit 1"
-	query = fmt.Sprintf(query, models.WoptaDataset, models.NetworkNodesCollection)
+	query = fmt.Sprintf(query, models.WoptaDataset, lib.NetworkNodesCollection)
 	params := map[string]interface{}{"uid": uid}
 	nodes, err := lib.QueryParametrizedRowsBigQuery[models.NetworkNode](query, params)
 
@@ -315,7 +315,7 @@ func GetNodeByUidBigQuery(uid string) (models.NetworkNode, error) {
 
 func CreateNodeBigQuery(node models.NetworkNode) error {
 	initNode(&node)
-	return lib.InsertRowsBigQuery(models.WoptaDataset, models.NetworkNodesCollection, node)
+	return lib.InsertRowsBigQuery(models.WoptaDataset, lib.NetworkNodesCollection, node)
 }
 
 func GetAllSubNodesFromNodeBigQuery(uid string) ([]models.NetworkNode, error) {
@@ -342,7 +342,7 @@ func GetAllSubNodesFromNodeBigQuery(uid string) ([]models.NetworkNode, error) {
 	network n
   WHERE
 	uid <> @uid`
-	query = fmt.Sprintf(query, models.WoptaDataset, models.NetworkNodesCollection, models.WoptaDataset, models.NetworkNodesCollection)
+	query = fmt.Sprintf(query, models.WoptaDataset, lib.NetworkNodesCollection, models.WoptaDataset, models.NetworkNodesCollection)
 	params := map[string]interface{}{"uid": uid}
 	nodes, err := lib.QueryParametrizedRowsBigQuery[models.NetworkNode](query, params)
 
@@ -376,7 +376,7 @@ func GetAllParentNodesFromNodeBigQuery(uid string) ([]models.NetworkNode, error)
 	network n
   WHERE
 	uid <> @uid`
-	query = fmt.Sprintf(query, models.WoptaDataset, models.NetworkNodesCollection, models.WoptaDataset, models.NetworkNodesCollection)
+	query = fmt.Sprintf(query, models.WoptaDataset, lib.NetworkNodesCollection, models.WoptaDataset, models.NetworkNodesCollection)
 	params := map[string]interface{}{"uid": uid}
 	nodes, err := lib.QueryParametrizedRowsBigQuery[models.NetworkNode](query, params)
 
@@ -421,7 +421,7 @@ func GetNetworkNodeByCode(code string) *models.NetworkNode {
 		return nil
 	}
 
-	iter := lib.WhereFirestore(models.NetworkNodesCollection, "code", "==", code)
+	iter := lib.WhereFirestore(lib.NetworkNodesCollection, "code", "==", code)
 	nodeDocSnapshot, err := iter.Next()
 
 	if err == iterator.Done && nodeDocSnapshot == nil {

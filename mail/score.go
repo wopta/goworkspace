@@ -2,7 +2,7 @@ package mail
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -10,44 +10,62 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	lib "github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib"
 )
+
+func ScoreFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	var result map[string]string
+
+	log.SetPrefix("[ScoreFx] ")
+	defer log.SetPrefix("")
+
+	log.Println("Handler start -----------------------------------------------")
+
+	req := lib.ErrorByte(io.ReadAll(r.Body))
+	defer r.Body.Close()
+
+	json.Unmarshal(req, &result)
+	ScoreFido(result["email"])
+
+	log.Println("Handler end -------------------------------------------------")
+
+	return `{"message":"Success send "}`, nil, nil
+}
 
 func ScoreFido(data string) <-chan EmailFidoResp {
 	r := make(chan EmailFidoResp)
 	go func() {
 		defer close(r)
 		log.Println("ValidateFido")
-		//var b bytes.Buffer
-		//fileReader := bytes.NewReader([]byte())
+
 		var urlstring = "https://api.fido.id/1.0/email"
 		client := &http.Client{
 			Timeout: time.Second * 10,
 		}
 		log.Println(getFidoEmailRequest(data))
-		//log.Println(getFabrickPay(data))
+
 		req, _ := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(getFidoEmailRequest(data)))
 		req.Header.Set("x-api-key", os.Getenv("FIDO_TOKEN_API"))
 		req.Header.Set("Accept", "application/json")
 		req.Header.Set("Content-Type", "application/json")
-		//header('Content-Length: ' . filesize($pdf));
 
 		res, err := client.Do(req)
 		lib.CheckError(err)
 
 		if res != nil {
-			body, err := ioutil.ReadAll(res.Body)
-			lib.CheckError(err)
-			var result EmailFidoResp
-			json.Unmarshal([]byte(body), &result)
-			res.Body.Close()
-			log.Println("body:", string(body))
-			r <- result
+			body := lib.ErrorByte(io.ReadAll(res.Body))
+			defer res.Body.Close()
 
+			var result EmailFidoResp
+			json.Unmarshal(body, &result)
+			log.Println("body:", string(body))
+
+			r <- result
 		}
 	}()
 	return r
 }
+
 func getFidoEmailRequest(data string) string {
 	id := uuid.New()
 	return `{
