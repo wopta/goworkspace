@@ -8,7 +8,7 @@ import (
 	"github.com/wopta/goworkspace/lib"
 )
 
-var inclusiveRoutes []lib.ChiRoute = []lib.ChiRoute{
+var inclusiveRoutes []lib.Route = []lib.Route{
 	{
 		Route:   "/bankaccount/v1/hype",
 		Handler: lib.ResponseLoggerWrapper(BankAccountHypeFx),
@@ -37,6 +37,6 @@ func init() {
 func InclusiveFx(w http.ResponseWriter, r *http.Request) {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
-	router := lib.GetChiRouter("inclusive", inclusiveRoutes)
+	router := lib.GetRouter("inclusive", inclusiveRoutes)
 	router.ServeHTTP(w, r)
 }

@@ -8,7 +8,7 @@ import (
 	"github.com/wopta/goworkspace/lib"
 )
 
-var policyRoutes []lib.ChiRoute = []lib.ChiRoute{
+var policyRoutes []lib.Route = []lib.Route{
 	{
 		Route:   "/fiscalcode/v1/{fiscalcode}",
 		Handler: lib.ResponseLoggerWrapper(GetPolicyByFiscalCodeFx), // Broker.PolicyFiscalcode
@@ -69,6 +69,6 @@ func init() {
 func Policy(w http.ResponseWriter, r *http.Request) {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
-	router := lib.GetChiRouter("policy", policyRoutes)
+	router := lib.GetRouter("policy", policyRoutes)
 	router.ServeHTTP(w, r)
 }

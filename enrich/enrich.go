@@ -8,7 +8,7 @@ import (
 	"github.com/wopta/goworkspace/lib"
 )
 
-var enrichRoutes []lib.ChiRoute = []lib.ChiRoute{
+var enrichRoutes []lib.Route = []lib.Route{
 	{
 		Route:   "/vat/munichre/{vat}",
 		Handler: lib.ResponseLoggerWrapper(MunichVatFx),
@@ -45,6 +45,6 @@ func init() {
 func Enrich(w http.ResponseWriter, r *http.Request) {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
-	router := lib.GetChiRouter("enrich", enrichRoutes)
+	router := lib.GetRouter("enrich", enrichRoutes)
 	router.ServeHTTP(w, r)
 }

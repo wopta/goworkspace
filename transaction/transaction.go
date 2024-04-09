@@ -11,7 +11,7 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
-var transactionRoutes []lib.ChiRoute = []lib.ChiRoute{
+var transactionRoutes []lib.Route = []lib.Route{
 	{
 		Route:   "/policy/v1/{policyUid}",
 		Handler: lib.ResponseLoggerWrapper(GetTransactionsByPolicyUidFx), // Broker.GetPolicyTransactions,
@@ -33,7 +33,7 @@ func init() {
 func Transaction(w http.ResponseWriter, r *http.Request) {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
-	router := lib.GetChiRouter("transaction", transactionRoutes)
+	router := lib.GetRouter("transaction", transactionRoutes)
 	router.ServeHTTP(w, r)
 }
 

@@ -12,7 +12,7 @@ const (
 	rulesFilename = "sellable"
 )
 
-var sellableRoutes []lib.ChiRoute = []lib.ChiRoute{
+var sellableRoutes []lib.Route = []lib.Route{
 	{
 		Route:   "/v1/sales/life",
 		Handler: lib.ResponseLoggerWrapper(LifeFx),
@@ -35,6 +35,6 @@ func init() {
 func Sellable(w http.ResponseWriter, r *http.Request) {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
-	router := lib.GetChiRouter("sellable", sellableRoutes)
+	router := lib.GetRouter("sellable", sellableRoutes)
 	router.ServeHTTP(w, r)
 }

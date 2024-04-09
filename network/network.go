@@ -8,7 +8,7 @@ import (
 	"github.com/wopta/goworkspace/lib"
 )
 
-var networkRoutes []lib.ChiRoute = []lib.ChiRoute{
+var networkRoutes []lib.Route = []lib.Route{
 	{
 		Route:   "/import/v1",
 		Method:  http.MethodPost,
@@ -37,6 +37,6 @@ func init() {
 func Network(w http.ResponseWriter, r *http.Request) {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
-	router := lib.GetChiRouter("network", networkRoutes)
+	router := lib.GetRouter("network", networkRoutes)
 	router.ServeHTTP(w, r)
 }

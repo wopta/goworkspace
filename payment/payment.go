@@ -9,7 +9,7 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
-var paymentRoutes []lib.ChiRoute = []lib.ChiRoute{
+var paymentRoutes []lib.Route = []lib.Route{
 	{
 		Route:   "/v1/fabrick/recreate",
 		Handler: lib.ResponseLoggerWrapper(FabrickRefreshPayByLinkFx),
@@ -50,7 +50,7 @@ func init() {
 func Payment(w http.ResponseWriter, r *http.Request) {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
-	router := lib.GetChiRouter("payment", paymentRoutes)
+	router := lib.GetRouter("payment", paymentRoutes)
 	router.ServeHTTP(w, r)
 }
 

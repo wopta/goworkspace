@@ -18,7 +18,7 @@ const (
 	surveys    = "surveys"
 )
 
-var questionRoutes []lib.ChiRoute = []lib.ChiRoute{
+var questionRoutes []lib.Route = []lib.Route{
 	{
 		Route:   "/v1/{questionType}",
 		Handler: lib.ResponseLoggerWrapper(GetQuestionsFx),
@@ -35,7 +35,7 @@ func init() {
 func Question(w http.ResponseWriter, r *http.Request) {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
-	router := lib.GetChiRouter("question", questionRoutes)
+	router := lib.GetRouter("question", questionRoutes)
 	router.ServeHTTP(w, r)
 }
 

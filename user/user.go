@@ -11,7 +11,7 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
-var userRoutes []lib.ChiRoute = []lib.ChiRoute{
+var userRoutes []lib.Route = []lib.Route{
 	{
 		Route:   "/fiscalCode/v1/{fiscalcode}",
 		Handler: lib.ResponseLoggerWrapper(GetUserByFiscalCodeFx),
@@ -82,7 +82,7 @@ func init() {
 func User(w http.ResponseWriter, r *http.Request) {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
-	router := lib.GetChiRouter("user", userRoutes)
+	router := lib.GetRouter("user", userRoutes)
 	router.ServeHTTP(w, r)
 }
 
