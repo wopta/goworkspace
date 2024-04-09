@@ -61,7 +61,7 @@ func fabrickIntegration(transactions []models.Transaction, paymentMethods []stri
 		if isFirstRate {
 			payUrl = *res.Payload.PaymentPageURL
 		}
-		log.Printf("transaction %02d payUrl: %s", index, payUrl)
+		log.Printf("transaction %02d payUrl: %s", index+1, *res.Payload.PaymentPageURL)
 
 		tr.ProviderId = *res.Payload.PaymentID
 		tr.UserToken = customerId
