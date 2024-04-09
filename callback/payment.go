@@ -2,175 +2,106 @@ package callback
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"strings"
 
-	"github.com/wopta/goworkspace/document"
 	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/mail"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/policy"
-	"github.com/wopta/goworkspace/transaction"
-	"github.com/wopta/goworkspace/user"
+	plc "github.com/wopta/goworkspace/policy"
+	tr "github.com/wopta/goworkspace/transaction"
 )
 
-// DEPRECATED
+const fabrickBillPaid string = "PAID"
+
 func PaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.Println("Payment")
-	var response string
-	var e error
-	var fabrickCallback FabrickCallback
-	uid := r.URL.Query().Get("uid")
-	schedule := r.URL.Query().Get("schedule")
+	var (
+		responseFormat  string = `{"result":%t,"requestPayload":%s,"locale": "it"}`
+		err             error
+		fabrickCallback FabrickCallback
+	)
+
+	log.SetPrefix("[PaymentFx] ")
+	defer log.SetPrefix("")
+
+	log.Println("Handler start -----------------------------------------------")
+
+	policyUid := r.URL.Query().Get("uid")
+	origin = r.URL.Query().Get("origin")
+	trSchedule = r.URL.Query().Get("schedule")
+
 	request := lib.ErrorByte(io.ReadAll(r.Body))
-	origin := r.URL.Query().Get("origin")
+	defer r.Body.Close()
 
-	log.Println(string(request))
-	log.Println(string(r.RequestURI))
-	json.Unmarshal([]byte(request), &fabrickCallback)
-
-	// Unmarshal or Decode the JSON to the interface.
-	if fabrickCallback.Bill.Status == "PAID" {
-		if uid == "" || origin == "" {
-			ext := strings.Split(fabrickCallback.ExternalID, "_")
-			uid = ext[0]
-			schedule = ext[1]
-			origin = ext[2]
-		}
-		log.Println("Payment::uid: " + uid)
-		log.Println("Payment::schedule: " + schedule)
-
-		p := policy.GetPolicyByUid(uid, origin)
-		if !p.IsPay && p.Status == models.PolicyStatusToPay {
-			// Create/Update document on user collection based on contractor fiscalCode
-			user.SetUserIntoPolicyContractor(&p, origin)
-
-			// Get Policy contract
-			gsLink := <-document.GetFileV6(p, uid)
-			log.Println("Payment::contractGsLink: ", gsLink)
-
-			// Update Policy as paid
-			policy.SetPolicyPaid(&p, origin)
-
-			// Update the first transaction in policy as paid
-			transaction.SetPolicyFirstTransactionPaid(uid, schedule, origin)
-
-			// Update agency if present
-			if p.AgencyUid != "" {
-				var agency models.Agency
-				fireAgency := lib.GetDatasetByEnv(origin, models.AgencyCollection)
-				docsnap, err := lib.GetFirestoreErr(fireAgency, p.AgentUid)
-				lib.CheckError(err)
-				docsnap.DataTo(&agency)
-				agency.Policies = append(agency.Policies, p.Uid)
-				found := false
-				for _, contractorUid := range agency.Users {
-					if contractorUid == p.Contractor.Uid {
-						found = true
-						break
-					}
-				}
-				if !found {
-					agency.Users = append(agency.Users, p.Contractor.Uid)
-				}
-				err = lib.SetFirestoreErr(fireAgency, agency.Uid, agency)
-				lib.CheckError(err)
-			}
-
-			// Update agent if present
-			if p.AgentUid != "" {
-				var agent models.Agent
-				fireAgent := lib.GetDatasetByEnv(origin, models.AgentCollection)
-				docsnap, err := lib.GetFirestoreErr(fireAgent, p.AgentUid)
-				lib.CheckError(err)
-				docsnap.DataTo(&agent)
-				agent.Policies = append(agent.Policies, p.Uid)
-				found := false
-				for _, contractorUid := range agent.Users {
-					if contractorUid == p.Contractor.Uid {
-						found = true
-						break
-					}
-				}
-				if !found {
-					agent.Users = append(agent.Users, p.Contractor.Uid)
-				}
-				err = lib.SetFirestoreErr(fireAgent, agent.Uid, agent)
-				lib.CheckError(err)
-			}
-
-			// Send mail with the contract to the user
-			mail.SendMailContract(
-				p,
-				nil,
-				mail.AddressAnna,
-				mail.GetContractorEmail(&p),
-				mail.Address{},
-				models.ECommerceFlow, // only for compiling - not used
-			)
-
-			response = `{
-				"result": true,
-				"requestPayload": ` + string(request) + `,
-				"locale": "it"
-			}`
-			log.Println(response)
-		}
+	err = json.Unmarshal([]byte(request), &fabrickCallback)
+	if err != nil {
+		log.Printf("ERROR unmarshaling request (%s): %s", string(request), err.Error())
+		return fmt.Sprintf(responseFormat, false, string(request)), nil, nil
 	}
-	return response, nil, e
+
+	if fabrickCallback.PaymentID == nil {
+		log.Printf("ERROR no providerId found: %s", err.Error())
+		return "", nil, fmt.Errorf("no providerId found")
+	}
+	providerId = *fabrickCallback.PaymentID
+
+	log.Printf("uid %s, providerId %s", policyUid, providerId)
+
+	if policyUid == "" || origin == "" {
+		ext := strings.Split(fabrickCallback.ExternalID, "_")
+		policyUid = ext[0]
+		trSchedule = ext[1]
+		origin = ext[3]
+	}
+
+	switch fabrickCallback.Bill.Status {
+	case fabrickBillPaid:
+		paymentMethod = strings.ToLower(*fabrickCallback.Bill.Transactions[0].PaymentMethod)
+		err = fabrickPayment(origin, policyUid, providerId)
+	default:
+	}
+
+	if err != nil {
+		log.Printf("ERROR request (%s): %s", string(request), err.Error())
+		return fmt.Sprintf(responseFormat, false, string(request)), nil, nil
+	}
+
+	response := fmt.Sprintf(responseFormat, true, string(request))
+
+	log.Println("Handler end -------------------------------------------------")
+
+	return response, nil, nil
 }
 
-func UnmarshalFabrickCallback(data []byte) (FabrickCallback, error) {
-	var r FabrickCallback
-	err := json.Unmarshal(data, &r)
-	return r, err
-}
+func fabrickPayment(origin, policyUid, providerId string) error {
+	log.Printf("[fabrickPayment] Policy %s", policyUid)
 
-func (r *FabrickCallback) Marshal() ([]byte, error) {
-	return json.Marshal(r)
-}
+	policy := plc.GetPolicyByUid(policyUid, origin)
 
-type FabrickCallback struct {
-	ExternalID string  `json:"externalId,omitempty"`
-	PaymentID  *string `json:"paymentId,omitempty"`
-	Bill       *Bill   `json:"bill,omitempty"`
-}
+	policy.SanitizePaymentData()
 
-type Bill struct {
-	ExternalID     *string       `json:"externalId,omitempty"`
-	BillID         *string       `json:"billId,omitempty"`
-	Amount         *float64      `json:"amount,omitempty"`
-	Currency       *string       `json:"currency,omitempty"`
-	Description    *string       `json:"description,omitempty"`
-	ReservedAmount *float64      `json:"reservedAmount,omitempty"`
-	ResidualAmount *float64      `json:"residualAmount,omitempty"`
-	RefundedAmount *float64      `json:"refundedAmount,omitempty"`
-	PaidAmout      *float64      `json:"paidAmout,omitempty"`
-	Items          []Item        `json:"items,omitempty"`
-	Status         string        `json:"status,omitempty"`
-	Transactions   []Transaction `json:"transactions,omitempty"`
-}
+	transaction, err := tr.GetTransactionToBePaid(policy.Uid, providerId, trSchedule, origin)
+	if err != nil {
+		log.Printf("[fabrickPayment] ERROR getting transaction: %s", err.Error())
+		return err
+	}
 
-type Item struct {
-	ExternalID  *string     `json:"externalId,omitempty"`
-	ItemID      *string     `json:"itemId,omitempty"`
-	Amount      *float64    `json:"amount,omitempty"`
-	Currency    *string     `json:"currency,omitempty"`
-	Description *string     `json:"description,omitempty"`
-	XInfo       interface{} `json:"xInfo"`
-	Status      *string     `json:"status,omitempty"`
-	Xinfo       interface{} `json:"xinfo"`
-}
+	if transaction.IsPay {
+		log.Printf("[fabrickPayment] ERROR Policy %s with transaction %s already paid", policy.Uid, transaction.Uid)
+		return errors.New("transaction already paid")
+	}
 
-type Transaction struct {
-	TransactionID       *string     `json:"transactionId,omitempty"`
-	TransactionDateTime interface{} `json:"transactionDateTime"`
-	Amount              *float64    `json:"amount,omitempty"`
-	Currency            *string     `json:"currency,omitempty"`
-	GatewayID           interface{} `json:"gatewayId"`
-	AcquirerID          interface{} `json:"acquirerId"`
-	Status              *string     `json:"status,omitempty"`
-	PaymentMethod       *string     `json:"paymentMethod,omitempty"`
+	state := runCallbackBpmn(&policy, payFlowKey)
+	if state == nil || state.Data == nil {
+		log.Println("[fabrickPayment] error bpmn - state not set")
+		return nil
+	}
+	if state.IsFailed {
+		log.Println("[fabrickPayment] error bpmn - state failed")
+		return nil
+	}
+
+	return nil
 }

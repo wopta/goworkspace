@@ -4,10 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
 	"log"
 	"net/http"
+
+	"github.com/go-chi/chi"
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 )
 
 func NodeSubTreeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -16,11 +18,11 @@ func NodeSubTreeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		root models.NetworkTreeElement
 	)
 
-	log.SetPrefix("NodeSubTreeFx ")
+	log.SetPrefix("[NodeSubTreeFx] ")
 	defer log.SetPrefix("")
 	log.Println("Handler start -----------------------------------------------")
 
-	nodeUid := r.Header.Get("nodeUid")
+	nodeUid := chi.URLParam(r, "nodeUid")
 	log.Printf("Node Uid: %s", nodeUid)
 
 	log.Println("loading authToken from idToken...")

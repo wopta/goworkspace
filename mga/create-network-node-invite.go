@@ -41,8 +41,7 @@ func CreateNetworkNodeInviteFx(w http.ResponseWriter, r *http.Request) (string, 
 	origin := r.Header.Get("Origin")
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
-
-	log.Printf("request body %s", string(body))
+	defer r.Body.Close()
 
 	err := json.Unmarshal(body, &req)
 	if err != nil {

@@ -5,18 +5,20 @@ import (
 	"log"
 	"net/http"
 
-	lib "github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib"
 )
 
-func Works(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func WorksFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		works  []byte
 		result []Work
 	)
-	// Set CORS headers for the main request.
-	w.Header().Set("Access-Control-Allow-Methods", "GET")
-	log.Println("Work")
-	w.Header().Set("Content-Type", "application/json")
+
+	log.SetPrefix("[WorksFx] ")
+	defer log.SetPrefix("")
+
+	log.Println("Handler start -----------------------------------------------")
+
 	works = lib.GetFilesByEnv("enrich/works.csv")
 
 	df := lib.CsvToDataframe(works)
@@ -30,8 +32,6 @@ func Works(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 			class        string
 		)
 
-		//log.Println(v)
-		//log.Println(k)
 		if k > 0 {
 
 			if v[2] == "x" {
@@ -65,9 +65,10 @@ func Works(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 	}
 	b, err := json.Marshal(result)
 	lib.CheckError(err)
-	//log.Println(string(b))
-	return "{\"works\":" + string(b) + "}", nil, nil
 
+	log.Println("Handler end -------------------------------------------------")
+
+	return "{\"works\":" + string(b) + "}", nil, nil
 }
 
 type Work struct {

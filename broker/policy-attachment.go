@@ -12,6 +12,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/go-chi/chi"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	plc "github.com/wopta/goworkspace/policy"
@@ -19,11 +20,14 @@ import (
 )
 
 func GetPolicyAttachmentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	w.Header().Set("Access-Control-Allow-Methods", "GET")
-
 	var response GetPolicyAttachmentsResponse
 
-	attachments, err := GetPolicyAttachments(r.Header.Get("policyUid"), r.Header.Get("origin"))
+	log.SetPrefix("[GetPolicyAttachmentFx] ")
+	defer log.SetPrefix("")
+
+	log.Println("Handler start -----------------------------------------------")
+
+	attachments, err := GetPolicyAttachments(chi.URLParam(r, "policyUid"), r.Header.Get("Origin"))
 	if err != nil {
 		log.Println("GetPolicyAttachments Error: " + err.Error())
 		return "{}", nil, err
@@ -34,6 +38,8 @@ func GetPolicyAttachmentFx(w http.ResponseWriter, r *http.Request) (string, inte
 	if err != nil {
 		log.Println("AttachmentsMarshal Error: " + err.Error())
 	}
+
+	log.Println("Handler end -------------------------------------------------")
 
 	return string(res), nil, err
 }

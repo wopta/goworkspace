@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-chi/chi"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	plc "github.com/wopta/goworkspace/policy"
@@ -24,23 +25,22 @@ func UpdatePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 		response    UpdatePolicyResponse
 	)
 
-	log.SetPrefix("[UpdatePolicyFx]")
+	log.SetPrefix("[UpdatePolicyFx] ")
 	defer log.SetPrefix("")
 
-	log.Println("Handler start ------------------------------")
+	log.Println("Handler start -----------------------------------------------")
 
 	origin := r.Header.Get("Origin")
-	policyUid := r.Header.Get("uid")
-	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
+	policyUid := chi.URLParam(r, "uid")
+	firePolicy := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
+	defer r.Body.Close()
 	err = json.Unmarshal(body, &inputPolicy)
 	if err != nil {
 		log.Printf("error unable to unmarshal request body: %s", err.Error())
 		return "", nil, err
 	}
-
-	log.Printf("request body: %s", string(body))
 
 	inputPolicy.Normalize()
 
@@ -86,26 +86,32 @@ func UpdatePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 
 	updatedPolicy.BigquerySave(origin)
 
-	log.Printf("response: %s", string(responseJson))
+	log.Println("Handler end -------------------------------------------------")
 
 	return string(responseJson), response, err
 }
 
-func PatchPolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func PatchPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err          error
 		policyUID    string
 		updateValues map[string]interface{}
 	)
-	log.Println("UpdatePolicy")
 
-	firePolicy := lib.GetDatasetByEnv(r.Header.Get("origin"), "policy")
-	policyUID = r.Header.Get("uid")
+	log.SetPrefix("[PatchPolicyFx] ")
+	defer log.SetPrefix("")
+
+	log.Println("Handler start -----------------------------------------------")
+
+	firePolicy := lib.GetDatasetByEnv(r.Header.Get("Origin"), lib.PolicyCollection)
+	policyUID = chi.URLParam(r, "uid")
 
 	b := lib.ErrorByte(io.ReadAll(r.Body))
+	defer r.Body.Close()
+
 	err = json.Unmarshal(b, &updateValues)
 	if err != nil {
-		log.Println("PatchPolicy: unable to unmarshal request body")
+		log.Println("unable to unmarshal request body")
 		return "", nil, err
 	}
 
@@ -113,30 +119,39 @@ func PatchPolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 
 	err = lib.UpdateFirestoreErr(firePolicy, policyUID, updateValues)
 	if err != nil {
-		log.Println("PatchPolicy: error during policy update in firestore")
+		log.Println("error during policy update in firestore")
 		return "", nil, err
 	}
+
+	log.Println("Handler end -------------------------------------------------")
 
 	return `{"uid":"` + policyUID + `"}`, `{"uid":"` + policyUID + `"}`, err
 }
 
-func DeletePolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func DeletePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err       error
 		policy    models.Policy
 		policyUID string
 		request   PolicyDeleteReq
 	)
-	log.Println("DeletePolicy")
-	policyUID = r.Header.Get("uid")
-	guaranteFire := lib.GetDatasetByEnv(r.Header.Get("origin"), "guarante")
+
+	log.SetPrefix("[DeletePolicyFx] ")
+	defer log.SetPrefix("")
+
+	log.Println("Handler start -----------------------------------------------")
+
+	policyUID = chi.URLParam(r, "uid")
+	guaranteFire := lib.GetDatasetByEnv(r.Header.Get("Origin"), lib.GuaranteeCollection)
 	req := lib.ErrorByte(io.ReadAll(r.Body))
+	defer r.Body.Close()
+
 	err = json.Unmarshal(req, &request)
 	if err != nil {
 		log.Printf("DeletePolicy: unable to delete policy %s", policyUID)
 		return "", nil, err
 	}
-	firePolicy := lib.GetDatasetByEnv(r.Header.Get("origin"), "policy")
+	firePolicy := lib.GetDatasetByEnv(r.Header.Get("Origin"), lib.PolicyCollection)
 	docsnap := lib.GetFirestore(firePolicy, policyUID)
 	docsnap.DataTo(&policy)
 	if policy.IsDeleted || !policy.CompanyEmit {
@@ -152,8 +167,11 @@ func DeletePolicy(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	policy.Status = models.PolicyStatusDeleted
 	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusDeleted)
 	lib.SetFirestore(firePolicy, policyUID, policy)
-	policy.BigquerySave(r.Header.Get("origin"))
+	policy.BigquerySave(r.Header.Get("Origin"))
 	models.SetGuaranteBigquery(policy, "delete", guaranteFire)
+
+	log.Println("Handler end -------------------------------------------------")
+
 	return `{"uid":"` + policyUID + `"}`, `{"uid":"` + policyUID + `"}`, err
 }
 

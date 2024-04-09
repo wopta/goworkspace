@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-chi/chi"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
@@ -35,7 +36,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	log.Println("loading authToken from idToken...")
 
 	token := r.Header.Get("Authorization")
-	authToken, err := models.GetAuthTokenFromIdToken(token)
+	authToken, err := lib.GetAuthTokenFromIdToken(token)
 	if err != nil {
 		log.Printf("error getting authToken: %s", err.Error())
 		return "", nil, err
@@ -49,14 +50,13 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	)
 
 	origin := r.Header.Get("origin")
-	policyUid := r.Header.Get("policyUid")
-	firePolicy := lib.GetDatasetByEnv(origin, models.PolicyCollection)
+	policyUid := chi.URLParam(r, "policyUid")
+	firePolicy := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
 
 	log.Printf("Policy Uid %s", policyUid)
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
-	log.Printf("Request Payload: %s", string(body))
 
 	err = lib.CheckPayload[AcceptancePayload](body, &payload, []string{"action"})
 	if err != nil {
@@ -134,9 +134,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		flowName,
 	)
 
-	models.CreateAuditLog(r, string(body))
-
-	log.Println("Handler end ----------------------------------")
+	log.Println("Handler end -------------------------------------------------")
 
 	return "{}", nil, nil
 }

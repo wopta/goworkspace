@@ -8,9 +8,9 @@ import (
 
 	"golang.org/x/exp/slices"
 
-	lib "github.com/wopta/goworkspace/lib"
-	models "github.com/wopta/goworkspace/models"
-	wiseProxy "github.com/wopta/goworkspace/wiseproxy"
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/wiseproxy"
 )
 
 func CanUserRegisterUseCase(fiscalCode string) (bool, *models.User, *string, *string) {
@@ -53,7 +53,7 @@ func userHasDataInWise(fiscalCode string, wiseResponse *models.WiseUserRegistryR
 		"cdLingua": "it"
 	}`)
 
-	responseReader := wiseProxy.WiseProxyObj("WebApiProduct/Api/RicercaAnagSemplice", request, "POST")
+	responseReader := wiseproxy.WiseProxyObj("WebApiProduct/Api/RicercaAnagSemplice", request, "POST")
 	jsonData, e := io.ReadAll(responseReader)
 
 	if e != nil {
@@ -79,7 +79,7 @@ func userHasDataInWise(fiscalCode string, wiseResponse *models.WiseUserRegistryR
 		"idSoggetto": "` + fmt.Sprint(subjectId) + `",
 		"cdLingua": "it"
 	}`)
-	responseReader = wiseProxy.WiseProxyObj("WebApiProduct/Api/RicercaAnagCompleta", request, "POST")
+	responseReader = wiseproxy.WiseProxyObj("WebApiProduct/Api/RicercaAnagCompleta", request, "POST")
 	jsonData, e = io.ReadAll(responseReader)
 	e = json.Unmarshal(jsonData, &wiseResponse)
 	lib.CheckError(e)

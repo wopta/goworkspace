@@ -3,7 +3,7 @@ package mail
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -13,13 +13,18 @@ import (
 	"google.golang.org/api/iterator"
 )
 
-func Validate(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func ValidateFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var result map[string]string
 
-	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
-	log.Println("request: ", string(req))
-	json.Unmarshal([]byte(req), &result)
+	log.SetPrefix("[ValidateFx] ")
+	defer log.SetPrefix("")
+
+	log.Println("Handler start -----------------------------------------------")
+
+	req := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
+
+	json.Unmarshal(req, &result)
 	resObj := MailValidate{
 		Mail:      result["email"],
 		FidoScore: 0,
@@ -37,7 +42,6 @@ func Validate(resp http.ResponseWriter, r *http.Request) (string, interface{}, e
 			res, _ := json.Marshal(objmail[0])
 			return string(res), res, nil
 		}
-
 	} else {
 		fido := <-ScoreFido(result["email"])
 		log.Println(fido.Email.Score)
@@ -55,12 +59,13 @@ func Validate(resp http.ResponseWriter, r *http.Request) (string, interface{}, e
 			lib.PutFirestore("mail", resObj)
 			VerifyEmail(result["email"])
 		}
-
 	}
 
 	res, e := json.Marshal(resObj)
 	lib.CheckError(e)
-	log.Println(string(res))
+
+	log.Println("Handler end -------------------------------------------------")
+
 	return string(res), res, nil
 }
 

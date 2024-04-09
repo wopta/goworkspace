@@ -3,16 +3,17 @@ package quote
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/network"
-	"github.com/wopta/goworkspace/sellable"
 	"io"
 	"log"
 	"math"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
+	"github.com/wopta/goworkspace/sellable"
 )
 
 func PersonaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -21,14 +22,16 @@ func PersonaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 		warrant *models.Warrant
 	)
 
-	log.Println("[PersonaFx] handler start ----------------------------------")
+	log.Println("[PersonaFx] ")
+	defer log.SetPrefix("")
+	log.Println("Handler start -----------------------------------------------")
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
-	log.Printf("[PersonaFx] body: %s", string(body))
+	defer r.Body.Close()
 
 	err := json.Unmarshal(body, &policy)
 	if err != nil {
-		log.Printf("[PersonaFx] error unmarshaling body: %s", err.Error())
+		log.Printf("error unmarshaling body: %s", err.Error())
 		return "", nil, err
 	}
 
@@ -36,13 +39,13 @@ func PersonaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 
 	authToken, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
 	if err != nil {
-		log.Printf("[PersonaFx] error getting authToken from idToken: %s", err.Error())
+		log.Printf("error getting authToken from idToken: %s", err.Error())
 		return "", nil, err
 	}
 
 	flow := authToken.GetChannelByRoleV2()
 
-	log.Println("[PersonaFx] loading network node")
+	log.Println("loading network node")
 	networkNode := network.GetNetworkNodeByUid(authToken.UserID)
 	if networkNode != nil {
 		warrant = networkNode.GetWarrant()
@@ -51,15 +54,13 @@ func PersonaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 		}
 	}
 
-	log.Println("[PersonaFx] start quoting")
+	log.Println("start quoting")
 
 	err = Persona(&policy, authToken.GetChannelByRoleV2(), networkNode, warrant, flow)
 
 	policyJson, err := policy.Marshal()
 
-	log.Printf("[PersonaFx] response: %s", string(policyJson))
-
-	log.Println("[PersonaFx] handler end ------------------------------------")
+	log.Println("Handler end -------------------------------------------------")
 
 	return string(policyJson), policy, err
 }

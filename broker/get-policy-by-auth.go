@@ -19,15 +19,20 @@ func GetPoliciesByAuthFx(w http.ResponseWriter, r *http.Request) (string, interf
 		limitValue = 25
 	)
 
-	log.Println("[GetPoliciesByAuth]")
+	log.SetPrefix("[GetPoliciesByAuthFx] ")
+	defer log.SetPrefix("")
+
+	log.Println("Handler start -----------------------------------------------")
 
 	origin := r.Header.Get("Origin")
 	idToken := r.Header.Get("Authorization")
 
-	authToken, err := models.GetAuthTokenFromIdToken(idToken)
+	authToken, err := lib.GetAuthTokenFromIdToken(idToken)
 	lib.CheckError(err)
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
+	defer r.Body.Close()
+
 	err = json.Unmarshal(body, &req)
 	lib.CheckError(err)
 
@@ -43,11 +48,14 @@ func GetPoliciesByAuthFx(w http.ResponseWriter, r *http.Request) (string, interf
 
 	resp.Policies, err = plc.GetPoliciesByQueries(origin, req.Queries, limitValue)
 	if err != nil {
-		log.Println("[GetPoliciesByAuth] query error: ", err.Error())
+		log.Println("query error: ", err.Error())
 		return "", nil, err
 	}
-	log.Printf("[GetPoliciesByAuth]: found %d policies", len(resp.Policies))
+	log.Printf("found %d policies", len(resp.Policies))
 
 	jsonOut, err := json.Marshal(resp)
+
+	log.Println("Handler end -------------------------------------------------")
+
 	return string(jsonOut), resp, err
 }

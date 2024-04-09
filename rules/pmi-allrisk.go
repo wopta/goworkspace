@@ -57,8 +57,6 @@ func PmiAllriskHandler(w http.ResponseWriter, r *http.Request) (string, interfac
 }
 
 func PmiAllrisk(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.Println("[PmiAllrisk] Handler start ----------------------------------")
-
 	var (
 		err                   error
 		request               PmiAllriskRequest
@@ -67,46 +65,50 @@ func PmiAllrisk(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 		status                int64
 	)
 
+	log.SetPrefix("[PmiAllrisk] ")
+	defer log.SetPrefix("")
+	log.Println("Handler start -----------------------------------------------")
+
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
-	log.Printf("[PmiAllrisk] request: %s", string(body))
+
 	err = json.Unmarshal(body, &request)
 	if err != nil {
-		log.Printf("[PmiAllrisk] request error: %s", err.Error())
+		log.Printf("request error: %s", err.Error())
 		return "", "", err
 	}
 
 	rulesBytes := lib.GetFilesByEnv("grules/pmi-allrisk.json")
 	enrichBytes := getEnrichBytes(request.Ateco)
-	log.Printf("[PmiAllrisk] enrich: %s", string(enrichBytes))
+	log.Printf("enrich: %s", string(enrichBytes))
 
 	_, rulesOutput := lib.RulesFromJson(rulesBytes, initCoverage(), body, enrichBytes)
 	rulesOutputBytes, err := json.Marshal(rulesOutput)
 	if err != nil {
-		log.Printf("[PmiAllrisk] rules output error: %s", err.Error())
+		log.Printf("rules output error: %s", err.Error())
 		return "", "", err
 	}
-	log.Printf("[PmiAllrisk] rulesOutput: %v", string(rulesOutputBytes))
+	log.Printf("rulesOutput: %v", string(rulesOutputBytes))
 	err = json.Unmarshal(rulesOutputBytes, &coverages)
 	if err != nil {
-		log.Printf("[PmiAllrisk] coverages error: %s", err.Error())
+		log.Printf("coverages error: %s", err.Error())
 		return "", "", err
 	}
 
 	munichReQuoteRequest := getMunichReQuoteRequest(request, coverages)
 	munichReQuoteRequestBytes, err := json.Marshal(munichReQuoteRequest)
 	if err != nil {
-		log.Printf("[PmiAllrisk] MunichRE Quote request error: %s", err.Error())
+		log.Printf("MunichRE Quote request error: %s", err.Error())
 		return "", "", err
 	}
-	log.Printf("[PmiAllrisk] MunichRE Quote request: %s", string(munichReQuoteRequestBytes))
+	log.Printf("MunichRE Quote request: %s", string(munichReQuoteRequestBytes))
 
 	munichReQuoteResponseBytes := <-q.PmiMunich(munichReQuoteRequestBytes)
-	log.Printf("[PmiAllrisk] MunichRE Quote response: %s", munichReQuoteResponseBytes)
+	log.Printf("MunichRE Quote response: %s", munichReQuoteResponseBytes)
 
 	err = json.Unmarshal([]byte(munichReQuoteResponseBytes), &munichReQuoteResponse)
 	if err != nil {
-		log.Printf("[PmiAllrisk] MunichRE Quote response error: %s", err.Error())
+		log.Printf("MunichRE Quote response error: %s", err.Error())
 		return "", "", err
 	}
 
@@ -123,7 +125,7 @@ func PmiAllrisk(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 
 	err = saveQuoteBigQuery(coverages, status, string(body), string(responseBytes), string(requestQuoteBytes), string(responseQuoteBytes))
 
-	log.Println("[PmiAllrisk] Handler end ------------------------------------")
+	log.Println("Handler end -------------------------------------------------")
 
 	return string(responseBytes), rulesOutput, err
 }

@@ -413,7 +413,7 @@ func getGapPolicies(from time.Time, to time.Time) []models.Policy {
 		},
 	}
 
-	iter, err := queries.FirestoreWherefields(models.PolicyCollection)
+	iter, err := queries.FirestoreWherefields(lib.PolicyCollection)
 	if err != nil {
 		log.Println(err.Error())
 	}
@@ -427,7 +427,7 @@ func getGapPolicies(from time.Time, to time.Time) []models.Policy {
 func getGapTransactions(policies []models.Policy) []models.Transaction {
 	transactions := make([]models.Transaction, len(policies))
 	for i, policy := range policies {
-		iter := lib.WhereFirestore(models.TransactionsCollection, "policyUid", "==", policy.Uid)
+		iter := lib.WhereFirestore(lib.TransactionsCollection, "policyUid", "==", policy.Uid)
 		transactionsBuffer := models.TransactionToListData(iter)
 		if len(transactionsBuffer) == 0 {
 			panic(errors.New("no transcations found"))
@@ -441,7 +441,7 @@ func setCompanyEmitted(policies []models.Policy) {
 	for _, policy := range policies {
 		policy.CompanyEmitted = true
 		policy.Updated = time.Now().UTC()
-		lib.SetFirestore(models.PolicyCollection, policy.Uid, policy)
+		lib.SetFirestore(lib.PolicyCollection, policy.Uid, policy)
 		policy.BigquerySave("")
 	}
 }

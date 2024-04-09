@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/go-chi/chi"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
@@ -21,13 +22,14 @@ func UploadDocumentFx(w http.ResponseWriter, r *http.Request) (string, interface
 	log.SetPrefix("[UploadDocumentFx] ")
 	defer log.SetPrefix("")
 
-	policyUID := r.Header.Get("policyUid")
+	log.Println("Handler start -----------------------------------------------")
+
+	policyUID := chi.URLParam(r, "policyUid")
 
 	log.Printf("upload user identityDocument for policy '%s'", policyUID)
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
-	log.Printf("request: %s", string(body))
 
 	err := json.Unmarshal(body, &identityDocument)
 	if err != nil {
@@ -44,6 +46,8 @@ func UploadDocumentFx(w http.ResponseWriter, r *http.Request) (string, interface
 	saveDocument(policyUID, &identityDocument)
 
 	outJson, err := json.Marshal(identityDocument)
+
+	log.Println("Handler end -------------------------------------------------")
 
 	return string(outJson), identityDocument, err
 }

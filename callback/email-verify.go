@@ -8,8 +8,12 @@ import (
 	"github.com/wopta/goworkspace/mail"
 )
 
-func EmailVerify(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.Println("EmailVerify")
+func EmailVerifyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+	log.SetPrefix("[EmailVerifyFx] ")
+	defer log.SetPrefix("")
+
+	log.Println("Handler start -----------------------------------------------")
+
 	log.Println("GET params were:", r.URL.Query())
 	email := r.URL.Query().Get("email")
 	token := r.URL.Query().Get("token")
@@ -22,6 +26,8 @@ func EmailVerify(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 		objmail[0].IsValid = true
 		lib.SetFirestore("mail", uid[0], objmail[0])
 	}
+
+	log.Println("Handler end -------------------------------------------------")
 
 	return getResponse("<p>Grazie la tua mail è stata validata poi continuare l'acquisto</p>", "Validazione Mail", email), nil, nil
 }

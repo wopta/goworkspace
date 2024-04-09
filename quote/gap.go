@@ -23,7 +23,10 @@ func GapFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 		warrant *models.Warrant
 	)
 
-	log.Println("[GapFx] handler start --------------------------------------")
+	log.SetPrefix("[GapFx] ")
+	defer log.SetPrefix("")
+
+	log.Println("Handler start -----------------------------------------------")
 
 	req := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
@@ -38,7 +41,7 @@ func GapFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 
 	flow := authToken.GetChannelByRoleV2()
 
-	log.Println("[GapFx] load network node")
+	log.Println("load network node")
 	networkNode := network.GetNetworkNodeByUid(authToken.UserID)
 	if networkNode != nil {
 		warrant = networkNode.GetWarrant()
@@ -50,9 +53,7 @@ func GapFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 	Gap(policy, authToken.GetChannelByRoleV2(), networkNode, warrant, flow)
 	policyJson, err := policy.Marshal()
 
-	log.Printf("[GapFx] response: %s", string(policyJson))
-
-	log.Println("[GapFx] handler end --------------------------------------")
+	log.Println("Handler end -------------------------------------------------")
 
 	return string(policyJson), policy, err
 }

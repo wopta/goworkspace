@@ -29,8 +29,6 @@ type ChiRoute struct {
 	Roles       []string
 }
 
-// This wrapper should be used while the old handler still returns data
-// instead of writting directly to the response writer
 func ResponseLoggerWrapper(handler func(w http.ResponseWriter, r *http.Request) (string, any, error)) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		str, _, err := handler(w, r)
@@ -44,10 +42,10 @@ func ResponseLoggerWrapper(handler func(w http.ResponseWriter, r *http.Request) 
 }
 
 func GetChiRouter(module string, routes []ChiRoute) *chi.Mux {
-	prefix := "/"
+	var prefix string
 
 	if IsLocal() {
-		prefix += module
+		prefix = "/" + module
 	}
 
 	mux := chi.NewRouter()
@@ -242,9 +240,8 @@ func checkEntitlement(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		roles := ctx.Value("roles").([]string)
-		log.Printf("entitlement roles: %v", roles)
 
-		if len(roles) == 0 || IsLocal() || slices.Contains(roles, UserRoleInternal) || slices.Contains(roles, UserRoleAll) {
+		if len(roles) == 0 || slices.Contains(roles, UserRoleInternal) || slices.Contains(roles, UserRoleAll) {
 			next.ServeHTTP(w, r)
 			return
 		}

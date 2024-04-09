@@ -35,8 +35,6 @@ func GetWarrantsFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		return "", "", err
 	}
 
-	log.Printf("found warrants: %s", string(responseBytes))
-
 	log.Println("Handler end -------------------------------------------------")
 
 	return string(responseBytes), response, nil

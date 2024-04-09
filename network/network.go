@@ -6,8 +6,28 @@ import (
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
 )
+
+var networkRoutes []lib.ChiRoute = []lib.ChiRoute{
+	{
+		Route:   "/import/v1",
+		Method:  http.MethodPost,
+		Handler: lib.ResponseLoggerWrapper(ImportNodesFx),
+		Roles:   []string{lib.UserRoleAdmin},
+	},
+	{
+		Route:   "/subtree/v1/{nodeUid}",
+		Method:  http.MethodGet,
+		Handler: lib.ResponseLoggerWrapper(NodeSubTreeFx),
+		Roles: []string{
+			lib.UserRoleAdmin,
+			lib.UserRoleManager,
+			lib.UserRoleAreaManager,
+			lib.UserRoleAgent,
+			lib.UserRoleAgency,
+		},
+	},
+}
 
 func init() {
 	log.Println("INIT Network")
@@ -16,24 +36,7 @@ func init() {
 
 func Network(w http.ResponseWriter, r *http.Request) {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
-	log.Println("Network")
-	lib.EnableCors(&w, r)
-	route := lib.RouteData{
-		Routes: []lib.Route{
-			{
-				Route:   "/import/v1",
-				Method:  http.MethodPost,
-				Handler: ImportNodesFx,
-				Roles:   []string{models.UserRoleAdmin},
-			},
-			{
-				Route:   "/subtree/v1/:nodeUid",
-				Method:  http.MethodGet,
-				Handler: NodeSubTreeFx,
-				Roles: []string{models.UserRoleAdmin, models.UserRoleManager, models.UserRoleAreaManager, models.UserRoleAgent,
-					models.UserRoleAgency},
-			},
-		},
-	}
-	route.Router(w, r)
+
+	router := lib.GetChiRouter("network", networkRoutes)
+	router.ServeHTTP(w, r)
 }

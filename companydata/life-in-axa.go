@@ -311,7 +311,7 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 		}
 
 		policy := models.Policy{
-			Uid:               lib.NewDoc(models.PolicyCollection),
+			Uid:               lib.NewDoc(lib.PolicyCollection),
 			Status:            models.PolicyStatusPay,
 			StatusHistory:     []string{"Imported", models.PolicyStatusInitLead, models.PolicyStatusContact, models.PolicyStatusToSign, models.PolicyStatusSign, models.NetworkTransactionStatusToPay, models.PolicyStatusPay},
 			Name:              models.LifeProduct,
@@ -551,7 +551,7 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 
 			// save policy firestore
 
-			err := lib.SetFirestoreErr(fmt.Sprintf("%s%s", collectionPrefix, models.PolicyCollection), policy.Uid, policy)
+			err := lib.SetFirestoreErr(fmt.Sprintf("%s%s", collectionPrefix, lib.PolicyCollection), policy.Uid, policy)
 			if err != nil {
 				log.Printf("error saving policy firestore: %s", err.Error())
 				continue
@@ -564,7 +564,7 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 			// save transactions firestore
 
 			for _, res := range transactionsOutput {
-				err := lib.SetFirestoreErr(fmt.Sprintf("%s%s", collectionPrefix, models.TransactionsCollection), res.Transaction.Uid, res.Transaction)
+				err := lib.SetFirestoreErr(fmt.Sprintf("%s%s", collectionPrefix, lib.TransactionsCollection), res.Transaction.Uid, res.Transaction)
 				if err != nil {
 					log.Printf("error saving transaction firestore: %s", err.Error())
 					continue
@@ -583,7 +583,7 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 			if !isLegalEntity && writeContractorToDB {
 				// save user firestore
 
-				err = lib.SetFirestoreErr(fmt.Sprintf("%s%s", collectionPrefix, models.UserCollection), policy.Contractor.Uid, policy.Contractor.ToUser())
+				err = lib.SetFirestoreErr(fmt.Sprintf("%s%s", collectionPrefix, lib.UserCollection), policy.Contractor.Uid, policy.Contractor.ToUser())
 				if err != nil {
 					log.Printf("error saving contractor firestore: %s", err.Error())
 					continue
@@ -600,7 +600,7 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 						}
 						// save user firestore
 
-						err = lib.SetFirestoreErr(fmt.Sprintf("%s%s", collectionPrefix, models.UserCollection), usr.Uid, usr)
+						err = lib.SetFirestoreErr(fmt.Sprintf("%s%s", collectionPrefix, lib.UserCollection), usr.Uid, usr)
 						if err != nil {
 							log.Printf("error saving contractor firestore: %s", err.Error())
 							continue
@@ -615,7 +615,7 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 
 			// save network node firestore
 
-			err = lib.SetFirestoreErr(fmt.Sprintf("%s%s", collectionPrefix, models.NetworkNodesCollection), networkNode.Uid, networkNode)
+			err = lib.SetFirestoreErr(fmt.Sprintf("%s%s", collectionPrefix, lib.NetworkNodesCollection), networkNode.Uid, networkNode)
 			if err != nil {
 				log.Printf("error saving network node firestore: %s", err.Error())
 				continue
@@ -668,7 +668,7 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 func searchUserInDBByFiscalCode(fiscalCode string) (string, bool) {
 	retrievedUser, _ := user.GetUserByFiscalCode(fiscalCode)
 	if reflect.ValueOf(retrievedUser).IsZero() {
-		return lib.NewDoc(models.UserCollection), true
+		return lib.NewDoc(lib.UserCollection), true
 	}
 	return retrievedUser.Uid, false
 }
@@ -1099,7 +1099,7 @@ func createTransaction(policy models.Policy, mgaProduct *models.Product, custome
 	return models.Transaction{
 		Amount:          priceGross,
 		AmountNet:       priceNett,
-		Uid:             lib.NewDoc(models.TransactionsCollection),
+		Uid:             lib.NewDoc(lib.TransactionsCollection),
 		PolicyName:      policy.Name,
 		PolicyUid:       policy.Uid,
 		CreationDate:    policy.EmitDate,
@@ -1272,7 +1272,7 @@ func getPaymentType(transaction *models.Transaction, policy *models.Policy, prod
 func policyBigquerySave(policy models.Policy, collectionPrefix string) {
 	log.Printf("[policyBigquerySave] parsing data for policy %s", policy.Uid)
 
-	policyBig := lib.GetDatasetByEnv("", fmt.Sprintf("%s%s", collectionPrefix, models.PolicyCollection))
+	policyBig := lib.GetDatasetByEnv("", fmt.Sprintf("%s%s", collectionPrefix, lib.PolicyCollection))
 	policyJson, err := policy.Marshal()
 	if err != nil {
 		log.Printf("[policy.BigquerySave] error marshaling policy: %s", err.Error())
@@ -1300,7 +1300,7 @@ func policyBigquerySave(policy models.Policy, collectionPrefix string) {
 }
 
 func transactionBigQuerySave(transaction models.Transaction, collectionPrefix string) {
-	fireTransactions := lib.GetDatasetByEnv("", fmt.Sprintf("%s%s", collectionPrefix, models.TransactionsCollection))
+	fireTransactions := lib.GetDatasetByEnv("", fmt.Sprintf("%s%s", collectionPrefix, lib.TransactionsCollection))
 
 	transaction.BigPayDate = lib.GetBigQueryNullDateTime(transaction.PayDate)
 	transaction.BigTransactionDate = lib.GetBigQueryNullDateTime(transaction.TransactionDate)
@@ -1323,7 +1323,7 @@ func networkTransactionBigQuerySave(nt models.NetworkTransaction, collectionPref
 	var (
 		err       error
 		datasetId = models.WoptaDataset
-		tableId   = fmt.Sprintf("%s%s", collectionPrefix, models.NetworkTransactionCollection)
+		tableId   = fmt.Sprintf("%s%s", collectionPrefix, lib.NetworkTransactionCollection)
 	)
 
 	baseQuery := fmt.Sprintf("SELECT * FROM `%s.%s` WHERE ", datasetId, tableId)
@@ -1447,7 +1447,7 @@ func parseBigQueryAgencyNode(agency *models.AgencyNode) *models.AgencyNode {
 }
 
 func userBigQuerySave(user models.User, collectionPrefix string) error {
-	table := lib.GetDatasetByEnv("", fmt.Sprintf("%s%s", collectionPrefix, models.UserCollection))
+	table := lib.GetDatasetByEnv("", fmt.Sprintf("%s%s", collectionPrefix, lib.UserCollection))
 
 	result, err := initBigqueryData(&user)
 	if err != nil {

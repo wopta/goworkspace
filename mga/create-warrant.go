@@ -19,15 +19,10 @@ func CreateWarrantFx(w http.ResponseWriter, r *http.Request) (string, interface{
 
 	log.Println("Handler start -----------------------------------------------")
 
-	bodyBytes, err := io.ReadAll(r.Body)
+	bodyBytes := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
-	if err != nil {
-		log.Printf("error reading request body: %s", err.Error())
-		return "", nil, err
-	}
-	log.Printf("request: %s", string(bodyBytes))
 
-	err = json.Unmarshal(bodyBytes, &warrant)
+	err := json.Unmarshal(bodyBytes, &warrant)
 	if err != nil {
 		log.Printf("error unmarshaling request: %s", err.Error())
 		return "", nil, err

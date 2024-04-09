@@ -3,12 +3,14 @@ package question
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
 	"io"
 	"log"
 	"net/http"
+
+	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
+	"github.com/go-chi/chi"
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 )
 
 const (
@@ -16,27 +18,25 @@ const (
 	surveys    = "surveys"
 )
 
+var questionRoutes []lib.ChiRoute = []lib.ChiRoute{
+	{
+		Route:   "/v1/{questionType}",
+		Handler: lib.ResponseLoggerWrapper(GetQuestionsFx),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAll},
+	},
+}
+
 func init() {
 	log.Println("INIT Question")
-
 	functions.HTTP("Question", Question)
 }
 
 func Question(w http.ResponseWriter, r *http.Request) {
-	lib.EnableCors(&w, r)
-	w.Header().Set("Access-Control-Allow-Methods", "POST")
-	route := lib.RouteData{
-		Routes: []lib.Route{
-			{
-				Route:   "/v1/:questionType",
-				Handler: GetQuestionsFx,
-				Method:  http.MethodPost,
-				Roles:   []string{models.UserRoleAll},
-			},
-		},
-	}
-	route.Router(w, r)
+	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
+	router := lib.GetChiRouter("question", questionRoutes)
+	router.ServeHTTP(w, r)
 }
 
 func GetQuestionsFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -45,18 +45,20 @@ func GetQuestionsFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 		policy *models.Policy
 	)
 
-	log.Println("[GetQuestionsFx] handler start -------------------")
+	log.SetPrefix("[GetQuestionsFx] ")
+	defer log.SetPrefix("")
 
-	questionType := r.Header.Get("questionType")
-	log.Printf("[GetQuestionsFx] questions: %s", questionType)
+	log.Println("Handler start -----------------------------------------------")
+
+	questionType := chi.URLParam(r, "questionType")
+	log.Printf("questions: %s", questionType)
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
-
-	log.Printf("[GetQuestionsFx] req body: %s", string(body))
+	defer r.Body.Close()
 
 	err := json.Unmarshal(body, &policy)
 	if err != nil {
-		log.Printf("[GetQuestionsFx] error unmarshaling request body: %s", err.Error())
+		log.Printf("error unmarshaling request body: %s", err.Error())
 		return "", nil, err
 	}
 
@@ -64,26 +66,24 @@ func GetQuestionsFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 
 	switch questionType {
 	case statements:
-		log.Printf("[GetQuestionsFx] loading statements for %s product", policy.Name)
+		log.Printf("loading statements for %s product", policy.Name)
 		result, err = GetStatements(policy)
 	case surveys:
-		log.Printf("[GetQuestionsFx] loading surveys for %s product", policy.Name)
+		log.Printf("loading surveys for %s product", policy.Name)
 		result, err = GetSurveys(policy)
 	default:
-		log.Printf("[GetQuestionsFx] questionType %s not allowed", questionType)
+		log.Printf("questionType %s not allowed", questionType)
 		return "", nil, fmt.Errorf("questionType %s not allowed", questionType)
 	}
 
 	if err != nil {
-		log.Printf("[GetQuestionsFx] error: %s", err.Error())
+		log.Printf("error: %s", err.Error())
 		return "", nil, err
 	}
 
 	jsonOut, err := json.Marshal(result)
 
-	log.Printf("[GetQuestionsFx] response: %s", string(jsonOut))
-
-	log.Println("[GetQuestionsFx] handler end -------------------")
+	log.Println("handler end -------------------------------------------------")
 
 	return `{"` + questionType + `": ` + string(jsonOut) + `}`, result, err
 }
