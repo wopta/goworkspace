@@ -28,7 +28,7 @@ var authRoutes []lib.ChiRoute = []lib.ChiRoute{
 		Roles:   []string{lib.UserRoleInternal},
 	},
 	{
-		Route:   "/sso/external/v1/:productName",
+		Route:   "/sso/external/v1/{productName}",
 		Handler: lib.ResponseLoggerWrapper(GetTokenForExternalIntegrationFx),
 		Method:  http.MethodGet,
 		Roles:   []string{lib.UserRoleAgent, lib.UserRoleAgency},

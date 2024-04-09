@@ -46,7 +46,6 @@ func AuthorizeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 		}
 	}
 
-	//log.Println("Proposal request proposal: ", string(j))
 	log.Println("Handler end -------------------------------------------------")
 
 	return tokenString, nil, e
