@@ -22,7 +22,7 @@ var formRoutes []lib.ChiRoute = []lib.ChiRoute{
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
-		Route:   "test/v1",
+		Route:   "fleet/assistance/v1",
 		Handler: lib.ResponseLoggerWrapper(GetFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
