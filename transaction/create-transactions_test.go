@@ -1,9 +1,8 @@
-package transaction_test
+package transaction
 
 import (
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/product"
-	"github.com/wopta/goworkspace/transaction"
 	"os"
 	"testing"
 	"time"
@@ -59,7 +58,7 @@ func TestCreateTransactionsInvalidPaymentSplit(t *testing.T) {
 	os.Setenv("env", "local-test")
 	mgaProduct := product.GetProductV2(models.LifeProduct, models.ProductV2, models.MgaChannel, nil, nil)
 
-	transactions := transaction.CreateTransactions(policy, *mgaProduct, func() string { return "aaaaa" })
+	transactions := CreateTransactions(policy, *mgaProduct, func() string { return "aaaaa" })
 
 	if len(transactions) != 0 {
 		t.Fatalf("expected: %02d transactions got: %02d", 0, len(transactions))
@@ -75,7 +74,7 @@ func TestCreateTransactionsMonthly(t *testing.T) {
 	os.Setenv("env", "local-test")
 	mgaProduct := product.GetProductV2(models.LifeProduct, models.ProductV2, models.MgaChannel, nil, nil)
 
-	transactions := transaction.CreateTransactions(policy, *mgaProduct, func() string { return "aaaaa" })
+	transactions := CreateTransactions(policy, *mgaProduct, func() string { return "aaaaa" })
 
 	if len(transactions) < 12 {
 		t.Fatalf("expected: %02d transactions got: %02d", 12, len(transactions))
@@ -140,7 +139,7 @@ func TestCreateTransactionsYearly(t *testing.T) {
 	os.Setenv("env", "local-test")
 	mgaProduct := product.GetProductV2(models.LifeProduct, models.ProductV2, models.MgaChannel, nil, nil)
 
-	transactions := transaction.CreateTransactions(policy, *mgaProduct, func() string { return "aaaaa" })
+	transactions := CreateTransactions(policy, *mgaProduct, func() string { return "aaaaa" })
 
 	if len(transactions) != 1 {
 		t.Fatalf("expected: %02d transactions got: %02d", 1, len(transactions))
@@ -205,7 +204,7 @@ func TestCreateTransactionsSingleInstallment(t *testing.T) {
 	os.Setenv("env", "local-test")
 	mgaProduct := product.GetProductV2(models.LifeProduct, models.ProductV2, models.MgaChannel, nil, nil)
 
-	transactions := transaction.CreateTransactions(policy, *mgaProduct, func() string { return "aaaaa" })
+	transactions := CreateTransactions(policy, *mgaProduct, func() string { return "aaaaa" })
 
 	if len(transactions) != 1 {
 		t.Fatalf("expected: %02d transactions got: %02d", 1, len(transactions))
