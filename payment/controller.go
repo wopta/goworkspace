@@ -1,47 +1,97 @@
 package payment
 
 import (
+	"errors"
 	"fmt"
-	"log"
-
+	"github.com/google/uuid"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"log"
+	"time"
 )
 
-func PaymentController(origin string, policy *models.Policy, product, mgaProduct *models.Product) (string, error) {
+func Controller(policy models.Policy, product models.Product, transactions []models.Transaction) (string, []models.Transaction, error) {
 	var (
-		payUrl         string
-		paymentMethods []string
+		err                error
+		payUrl             string
+		paymentMethods     []string
+		updatedTransaction []models.Transaction
 	)
 
 	log.Printf("init")
 
-	if err := checkPaymentConfiguration(policy); err != nil {
-		log.Printf("mismatched payment configuration: %s", err.Error())
-		return "", err
+	if len(transactions) == 0 {
+		log.Printf("%02d is an invalid number of transactions", len(transactions))
+		return "", nil, errors.New("no valid transactions")
 	}
 
-	paymentMethods = getPaymentMethods(*policy, product)
+	if err = checkPaymentModes(policy); err != nil {
+		log.Printf("mismatched payment configuration: %s", err.Error())
+		return "", nil, err
+	}
+
+	paymentMethods = getPaymentMethods(policy, product)
 
 	switch policy.Payment {
 	case models.FabrickPaymentProvider:
-		payRes := fabrickPayment(policy, origin, paymentMethods, mgaProduct)
-
-		if payRes.Payload == nil || payRes.Payload.PaymentPageURL == nil {
-			log.Println("fabrick error payload or paymentUrl empty")
-			return "", fmt.Errorf("fabrick error: %v", payRes.Errors)
-		}
-		payUrl = *payRes.Payload.PaymentPageURL
+		payUrl, updatedTransaction, err = fabrickIntegration(transactions, paymentMethods, policy)
+	case models.ManualPaymentProvider:
+		payUrl, updatedTransaction, err = remittanceIntegration(transactions)
 	default:
-		return "", fmt.Errorf("payment provider %s not supported", policy.Payment)
+		return "", nil, fmt.Errorf("payment provider %s not supported", policy.Payment)
 	}
 
-	log.Printf("payUrl: %s", payUrl)
-
-	return payUrl, nil
+	return payUrl, updatedTransaction, nil
 }
 
-func getPaymentMethods(policy models.Policy, product *models.Product) []string {
+func fabrickIntegration(transactions []models.Transaction, paymentMethods []string, policy models.Policy) (payUrl string, updatedTransactions []models.Transaction, err error) {
+	customerId := uuid.New().String()
+	now := time.Now().UTC()
+
+	for index, tr := range transactions {
+		isFirstRate := index == 0
+		createMandate := (policy.PaymentMode == models.PaymentModeRecurrent) && isFirstRate
+
+		tr.ProviderName = models.FabrickPaymentProvider
+
+		res := <-createFabrickTransaction(&policy, tr, isFirstRate, createMandate, customerId, paymentMethods)
+		if res.Payload == nil || res.Payload.PaymentPageURL == nil {
+			return "", nil, errors.New("error creating transaction on Fabrick")
+		}
+		if isFirstRate {
+			payUrl = *res.Payload.PaymentPageURL
+		}
+		log.Printf("transaction %02d payUrl: %s", index, payUrl)
+
+		tr.ProviderId = *res.Payload.PaymentID
+		tr.UserToken = customerId
+		tr.UpdateDate = now
+		updatedTransactions = append(updatedTransactions, tr)
+	}
+
+	return payUrl, updatedTransactions, nil
+}
+
+func remittanceIntegration(transactions []models.Transaction) (payUrl string, updatedTransaction []models.Transaction, err error) {
+	updatedTransaction = make([]models.Transaction, 0)
+
+	for index, tr := range transactions {
+		now := time.Now().UTC()
+		if index == 0 {
+			tr.IsPay = true
+			tr.Status = models.TransactionStatusPay
+			tr.StatusHistory = append(tr.StatusHistory, models.TransactionStatusPay)
+			tr.PayDate = now
+			tr.TransactionDate = now
+		}
+		tr.PaymentMethod = models.PayMethodRemittance
+		tr.UpdateDate = now
+		updatedTransaction = append(updatedTransaction, tr)
+	}
+	return "", updatedTransaction, nil
+}
+
+func getPaymentMethods(policy models.Policy, product models.Product) []string {
 	var paymentMethods = make([]string, 0)
 
 	log.Printf("[GetPaymentMethods] loading available payment methods for %s payment provider", policy.Payment)
@@ -60,7 +110,7 @@ func getPaymentMethods(policy models.Policy, product *models.Product) []string {
 	return paymentMethods
 }
 
-func checkPaymentConfiguration(policy *models.Policy) error {
+func checkPaymentModes(policy models.Policy) error {
 	var allowedModes []string
 
 	switch policy.PaymentSplit {

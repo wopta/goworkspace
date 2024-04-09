@@ -334,7 +334,11 @@ func emitPay(policy *models.Policy, origin string) {
 	log.Printf("[emitPay] Policy Uid %s", policy.Uid)
 
 	policy.IsPay = false
-	policy.PayUrl, _ = payment.PaymentController(origin, policy, product, mgaProduct)
+	payUrl, err := createPolicyTransactions(policy)
+	if err != nil {
+		return
+	}
+	policy.PayUrl = payUrl
 }
 
 func setAdvance(policy *models.Policy, origin string) {
@@ -351,7 +355,36 @@ func setAdvance(policy *models.Policy, origin string) {
 		policy.PaymentMode = paymentMode
 	}
 
-	tr := transaction.PutByPolicy(*policy, "", origin, "", "", policy.PriceGross, policy.PriceNett, "", models.PayMethodRemittance, true, mgaProduct, policy.StartDate)
+	createPolicyTransactions(policy)
+}
 
-	transaction.CreateNetworkTransactions(policy, tr, networkNode, mgaProduct)
+func createPolicyTransactions(policy *models.Policy) (string, error) {
+	transactions := transaction.CreateTransactions(*policy, *mgaProduct, func() string { return lib.NewDoc(models.TransactionsCollection) })
+	if len(transactions) == 0 {
+		log.Println("no transactions created")
+		return "", errors.New("no transactions created")
+	}
+	payUrl, updatedTransactions, err := payment.Controller(*policy, *product, transactions)
+	if err != nil {
+		log.Printf("error emitPay policy %s: %s", policy.Uid, err.Error())
+		return "", err
+	}
+
+	for index, tr := range updatedTransactions {
+		err = lib.SetFirestoreErr(models.TransactionsCollection, tr.Uid, tr)
+		if err != nil {
+			log.Printf("error saving transaction %s to firestore: %s", tr.Uid, err.Error())
+			return "", err
+		}
+		tr.BigQuerySave("")
+
+		if tr.IsPay {
+			err = transaction.CreateNetworkTransactions(policy, &updatedTransactions[index], networkNode, mgaProduct)
+			if err != nil {
+				log.Printf("error creating network transactions: %s", err.Error())
+				return "", err
+			}
+		}
+	}
+	return payUrl, err
 }

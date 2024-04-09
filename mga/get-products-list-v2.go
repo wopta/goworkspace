@@ -27,7 +27,7 @@ func GetProductsListByChannelFx(w http.ResponseWriter, r *http.Request) (string,
 
 	log.Println("Handler start -----------------------------------------------")
 
-	authToken, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
+	authToken, err := lib.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
 	if err != nil {
 		log.Printf("error extracting auth token: %s", err.Error())
 		return "", "", err
