@@ -95,6 +95,8 @@ func TestPostFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 
 	if operation == "error" {
 		return "", nil, GetErrorJson(400, "Bad Request", "Testing error POST")
+	} else if operation == "fabrick" {
+		return fabrickSpike()
 	}
 
 	return "{}", nil, nil
