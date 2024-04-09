@@ -14,7 +14,13 @@ var partnershipRoutes []lib.ChiRoute = []lib.ChiRoute{
 		Route:   "/v1/life/{partnershipUid}",
 		Handler: lib.ResponseLoggerWrapper(LifePartnershipFx),
 		Method:  http.MethodGet,
-		Roles:   []string{models.UserRoleAll},
+		Roles:   []string{lib.UserRoleAll},
+	},
+	{
+		Route:   "/v1/auth/{partnershipName}",
+		Handler: lib.ResponseLoggerWrapper(GetPartnershipNodeAndProductsFx),
+		Method:  http.MethodGet,
+		Roles:   []string{lib.UserRoleAll},
 	},
 }
 
