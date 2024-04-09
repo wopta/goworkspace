@@ -30,7 +30,7 @@ func Controller(policy models.Policy, product models.Product, transactions []mod
 		return "", nil, err
 	}
 
-	paymentMethods = getPaymentMethodsV2(policy, product)
+	paymentMethods = getPaymentMethods(policy, product)
 
 	switch policy.Payment {
 	case models.FabrickPaymentProvider:
@@ -90,7 +90,7 @@ func remittanceIntegration(transactions []models.Transaction) (payUrl string, up
 	return "", updatedTransaction, nil
 }
 
-func getPaymentMethodsV2(policy models.Policy, product models.Product) []string {
+func getPaymentMethods(policy models.Policy, product models.Product) []string {
 	var paymentMethods = make([]string, 0)
 
 	log.Printf("[GetPaymentMethods] loading available payment methods for %s payment provider", policy.Payment)

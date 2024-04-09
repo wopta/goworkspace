@@ -27,8 +27,7 @@ func CreateTransactions(policy models.Policy, mgaProduct models.Product, uidGene
 		return transactions
 	}
 
-	i := 0
-	for i < numTransactions {
+	for i := 0; i < numTransactions; i++ {
 		// create transaction
 		tr := createTransaction(policy, uidGenerator)
 
@@ -45,7 +44,6 @@ func CreateTransactions(policy models.Policy, mgaProduct models.Product, uidGene
 		tr.Commissions = commissionMga
 
 		transactions = append(transactions, tr)
-		i++
 	}
 
 	return transactions

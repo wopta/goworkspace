@@ -357,10 +357,7 @@ func setAdvance(policy *models.Policy, origin string) {
 		policy.PaymentMode = paymentMode
 	}
 
-	_, err := createPolicyTransactions(policy)
-	if err != nil {
-		return
-	}
+	createPolicyTransactions(policy)
 }
 
 func createPolicyTransactions(policy *models.Policy) (string, error) {
