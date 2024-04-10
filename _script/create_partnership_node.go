@@ -1,7 +1,7 @@
 package _script
 
 import (
-	"log"
+	// "log"
 
 	"github.com/go-jose/go-jose/v4"
 	"github.com/wopta/goworkspace/lib"
@@ -12,7 +12,7 @@ import (
 var nameDesc string = "Wopta per te Vita"
 
 func CreatePartnerhipNodes() {
-	var err error
+	// var err error
 
 	// err = createBeprofNode()
 	// if err != nil {
@@ -29,10 +29,10 @@ func CreatePartnerhipNodes() {
 	// 	log.Println(err.Error())
 	// }
 
-	err = createMultiTestNode()
-	if err != nil {
-		log.Println(err.Error())
-	}
+	// err = createMultiTestNode()
+	// if err != nil {
+	// 	log.Println(err.Error())
+	// }
 }
 
 func createBeprofNode() error {
