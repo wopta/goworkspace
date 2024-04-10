@@ -1,11 +1,11 @@
 package partnership
 
 import (
-	b64 "encoding/base64"
 	"encoding/json"
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/wopta/goworkspace/lib"
@@ -18,53 +18,50 @@ func beProfLifePartnership(jwtData string, policy *models.Policy, _ *models.Prod
 	var (
 		person models.User
 		asset  models.Asset
+		claims BeprofClaims
 	)
 
 	log.Println("[beProfLifePartnership] decoding jwt")
 
-	token, err := jwt.ParseWithClaims(jwtData, &BeprofClaims{}, func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
-		}
-
-		key, e := b64.StdEncoding.DecodeString(os.Getenv("BEPROF_SIGNING_KEY"))
-
-		return []byte(key), e
-	})
-
-	if claims, ok := token.Claims.(*BeprofClaims); ok && token.Valid {
-		log.Println("[beProfLifePartnership] setting person info")
-		person.Name = claims.UserFirstname
-		person.Surname = claims.UserLastname
-		person.Mail = claims.UserEmail
-		person.FiscalCode = claims.UserFiscalcode
-		person.Address = claims.UserAddress
-		person.PostalCode = claims.UserPostalcode
-		person.City = claims.UserCity
-		person.CityCode = claims.UserMunicipalityCode
-		person.Work = claims.UserEmploymentSector
-		person.VatCode = claims.UserPiva
-
-		person.Normalize()
-
-		if _, personData, err := user.ExtractUserDataFromFiscalCode(person); err == nil {
-			person = personData
-		}
-
-		policy.Contractor = *person.ToContractor()
-		asset.Person = &person
-		policy.OfferlName = "default"
-
-		policy.Assets = append(policy.Assets, asset)
-		policy.PartnershipData = claims.ToMap()
-
-		quotedPolicy, err := quote.Life(*policy, models.ECommerceChannel, partnershipNode, nil, models.ECommerceFlow)
-		*policy = quotedPolicy
-
+	err := lib.ParseJwtClaims(jwtData, os.Getenv("BEPROF_SIGNING_KEY"), partnershipNode.Partnership.JwtConfig, &claims)
+	if err != nil {
+		log.Printf("[beProfLifePartnership] could not validate beprof partnership JWT - %s", err.Error())
 		return err
 	}
 
-	log.Printf("[beProfLifePartnership] could not validate beprof partnership JWT - %s", err.Error())
+	if claims.ExpiresAt.Before(time.Now()) {
+		log.Printf("[beProfLifePartnership] jwt expired")
+		return fmt.Errorf("jwt expired")
+	}
+
+	log.Println("[beProfLifePartnership] setting person info")
+	person.Name = claims.UserFirstname
+	person.Surname = claims.UserLastname
+	person.Mail = claims.UserEmail
+	person.FiscalCode = claims.UserFiscalcode
+	person.Address = claims.UserAddress
+	person.PostalCode = claims.UserPostalcode
+	person.City = claims.UserCity
+	person.CityCode = claims.UserMunicipalityCode
+	person.Work = claims.UserEmploymentSector
+	person.VatCode = claims.UserPiva
+
+	person.Normalize()
+
+	if _, personData, err := user.ExtractUserDataFromFiscalCode(person); err == nil {
+		person = personData
+	}
+
+	policy.Contractor = *person.ToContractor()
+	asset.Person = &person
+	policy.OfferlName = "default"
+
+	policy.Assets = append(policy.Assets, asset)
+	policy.PartnershipData = claims.ToMap()
+
+	quotedPolicy, err := quote.Life(*policy, models.ECommerceChannel, partnershipNode, nil, models.ECommerceFlow)
+	*policy = quotedPolicy
+
 	return err
 }
 

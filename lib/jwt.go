@@ -7,34 +7,12 @@ import (
 	"log"
 
 	"github.com/go-jose/go-jose/v4"
-	oldJose "gopkg.in/square/go-jose.v2"
 )
 
 type JwtConfig struct {
 	KeyAlgorithm       jose.KeyAlgorithm       `json:"keyAlgorithm,omitempty" firestore:"keyAlgorithm,omitempty" bigquery:"-"`
 	ContentEncryption  jose.ContentEncryption  `json:"contentEncryption,omitempty" firestore:"contentEncryption,omitempty" bigquery:"-"`
 	SignatureAlgorithm jose.SignatureAlgorithm `json:"signatureAlgorithm,omitempty" firestore:"signatureAlgorithm,omitempty" bigquery:"-"`
-}
-
-func DecryptJwt[T interface{}](jwtData, key string, claims *T) error {
-	object, err := oldJose.ParseEncrypted(jwtData)
-	if err != nil {
-		log.Printf("[DecryptJwt] could not parse jwt - %s", err.Error())
-		return fmt.Errorf("could not parse jwt")
-	}
-
-	decryptionKey, err := b64.StdEncoding.DecodeString(key)
-	if err != nil {
-		log.Printf("[DecryptJwt] could not decode signing key - %s", err.Error())
-		return fmt.Errorf("could not decode jwt key")
-	}
-	decrypted, err := object.Decrypt(decryptionKey)
-	if err != nil {
-		log.Printf("[DecryptJwt] could not decrypt jwt - %s", err.Error())
-		return fmt.Errorf("could not decrypt jwt")
-	}
-
-	return json.Unmarshal(decrypted, &claims)
 }
 
 func ParseJwtClaims[T any](jwt, key string, jwtConfig JwtConfig, claims *T) error {

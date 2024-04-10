@@ -37,7 +37,7 @@ func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, inter
 
 	response.Policy = policy
 	response.Product = product
-	response.Partnership = *node.Partnership
+	response.Partnership = PartnershipNode{node.Partnership.Name, node.Partnership.Skin}
 
 	responseJson, err := json.Marshal(response)
 

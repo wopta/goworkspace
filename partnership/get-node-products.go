@@ -14,14 +14,9 @@ import (
 	"github.com/wopta/goworkspace/product"
 )
 
-type PartnershipNodeResponse struct {
-	Name string       `json:"name"`
-	Skin *models.Skin `json:"skin,omitempty"`
-}
-
 type Response struct {
-	Partnership PartnershipNodeResponse `json:"partnership"`
-	Products    []models.ProductInfo    `json:"products"`
+	Partnership PartnershipNode      `json:"partnership"`
+	Products    []models.ProductInfo `json:"products"`
 }
 
 func GetPartnershipNodeAndProductsFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
@@ -56,7 +51,7 @@ func GetPartnershipNodeAndProductsFx(w http.ResponseWriter, r *http.Request) (st
 	productList := lib.SliceMap(node.Products, func(p models.Product) string { return p.Name })
 	productInfos := product.GetProductsByChannel(productList, lib.ECommerceChannel)
 
-	response.Partnership = PartnershipNodeResponse{node.Partnership.Name, node.Partnership.Skin}
+	response.Partnership = PartnershipNode{node.Partnership.Name, node.Partnership.Skin}
 	response.Products = productInfos
 
 	responseJson, err := json.Marshal(response)
