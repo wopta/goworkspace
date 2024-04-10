@@ -23,8 +23,7 @@ func beProfLifePartnership(jwtData string, policy *models.Policy, _ *models.Prod
 
 	log.Println("[beProfLifePartnership] decoding jwt")
 
-	err := lib.ParseJwtClaims(jwtData, os.Getenv("BEPROF_SIGNING_KEY"), partnershipNode.Partnership.JwtConfig, &claims)
-	if err != nil {
+	if err := partnershipNode.Partnership.DecryptJwtClaims(jwtData, os.Getenv("BEPROF_SIGNING_KEY"), &claims); err != nil {
 		log.Printf("[beProfLifePartnership] could not validate beprof partnership JWT - %s", err.Error())
 		return err
 	}

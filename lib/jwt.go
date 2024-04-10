@@ -2,7 +2,6 @@ package lib
 
 import (
 	b64 "encoding/base64"
-	"encoding/json"
 	"fmt"
 	"log"
 
@@ -13,14 +12,6 @@ type JwtConfig struct {
 	KeyAlgorithm       jose.KeyAlgorithm       `json:"keyAlgorithm,omitempty" firestore:"keyAlgorithm,omitempty" bigquery:"-"`
 	ContentEncryption  jose.ContentEncryption  `json:"contentEncryption,omitempty" firestore:"contentEncryption,omitempty" bigquery:"-"`
 	SignatureAlgorithm jose.SignatureAlgorithm `json:"signatureAlgorithm,omitempty" firestore:"signatureAlgorithm,omitempty" bigquery:"-"`
-}
-
-func ParseJwtClaims[T any](jwt, key string, jwtConfig JwtConfig, claims *T) error {
-	bytes, err := ParseJwt(jwt, key, jwtConfig)
-	if err != nil {
-		return err
-	}
-	return json.Unmarshal(bytes, &claims)
 }
 
 func ParseJwt(jwt, key string, jwtConfig JwtConfig) (bytes []byte, err error) {

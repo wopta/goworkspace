@@ -22,6 +22,7 @@ type Response struct {
 func GetPartnershipNodeAndProductsFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	var (
 		response Response
+		node     *models.NetworkNode
 		err      error
 	)
 
@@ -30,22 +31,18 @@ func GetPartnershipNodeAndProductsFx(w http.ResponseWriter, r *http.Request) (st
 
 	log.Println("Handler start -----------------------------------------------")
 
-	affinity := chi.URLParam(r, "partnershipName")
+	affinity := chi.URLParam(r, "partnershipUid")
 	jwtData := r.URL.Query().Get("jwt")
 	key := lib.ToUpper(fmt.Sprintf("%s_SIGNING_KEY", affinity))
 
-	node, err := network.GetNodeByUid(affinity)
-	if err != nil {
+	if node, err = network.GetNodeByUid(affinity); err != nil {
 		log.Printf("error getting node '%s': %s", affinity, err.Error())
 		return "", nil, err
 	}
 
-	if node.Partnership.IsJwtProtected() {
-		_, err = lib.ParseJwt(jwtData, os.Getenv(key), node.Partnership.JwtConfig)
-		if err != nil {
-			log.Printf("error decoding jwt: %s", err.Error())
-			return "", nil, err
-		}
+	if _, err := node.Partnership.DecryptJwt(jwtData, os.Getenv(key)); err != nil {
+		log.Printf("error decoding jwt: %s", err.Error())
+		return "", nil, err
 	}
 
 	productList := lib.SliceMap(node.Products, func(p models.Product) string { return p.Name })

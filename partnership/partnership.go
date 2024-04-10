@@ -16,7 +16,7 @@ var partnershipRoutes []lib.ChiRoute = []lib.ChiRoute{
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
-		Route:   "/v1/auth/{partnershipName}",
+		Route:   "/v1/auth/{partnershipUid}",
 		Handler: lib.ResponseLoggerWrapper(GetPartnershipNodeAndProductsFx),
 		Method:  http.MethodGet,
 		Roles:   []string{lib.UserRoleAll},

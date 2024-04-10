@@ -22,8 +22,7 @@ func facileLifePartnership(jwtData string, policy *models.Policy, product *model
 
 	log.Println("[facileLifePartnership] decoding jwt")
 
-	err := lib.ParseJwtClaims(jwtData, os.Getenv("FACILE_SIGNING_KEY"), partnershipNode.Partnership.JwtConfig, &claims)
-	if err != nil {
+	if err := partnershipNode.Partnership.DecryptJwtClaims(jwtData, os.Getenv("FACILE_SIGNING_KEY"), &claims); err != nil {
 		log.Printf("[facileLifePartnership] could not validate facile partnership JWT - %s", err.Error())
 		return err
 	}
