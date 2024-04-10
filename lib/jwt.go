@@ -10,6 +10,12 @@ import (
 	oldJose "gopkg.in/square/go-jose.v2"
 )
 
+type JwtConfig struct {
+	KeyAlgorithm       jose.KeyAlgorithm       `json:"keyAlgorithm,omitempty" firestore:"keyAlgorithm,omitempty" bigquery:"-"`
+	ContentEncryption  jose.ContentEncryption  `json:"contentEncryption,omitempty" firestore:"contentEncryption,omitempty" bigquery:"-"`
+	SignatureAlgorithm jose.SignatureAlgorithm `json:"signatureAlgorithm,omitempty" firestore:"signatureAlgorithm,omitempty" bigquery:"-"`
+}
+
 func DecryptJwt[T interface{}](jwtData, key string, claims *T) error {
 	object, err := oldJose.ParseEncrypted(jwtData)
 	if err != nil {
@@ -31,26 +37,26 @@ func DecryptJwt[T interface{}](jwtData, key string, claims *T) error {
 	return json.Unmarshal(decrypted, &claims)
 }
 
-func ParseJwtClaims[T any](jwt, key string, isEncrypted bool, claims *T) error {
-	bytes, err := ParseJwt(jwt, key, isEncrypted)
+func ParseJwtClaims[T any](jwt, key string, jwtConfig JwtConfig, claims *T) error {
+	bytes, err := ParseJwt(jwt, key, jwtConfig)
 	if err != nil {
 		return err
 	}
 	return json.Unmarshal(bytes, &claims)
 }
 
-func ParseJwt(jwt, key string, isEncrypted bool) (bytes []byte, err error) {
-	if isEncrypted {
-		return decryptJwt(jwt, key)
+func ParseJwt(jwt, key string, jwtConfig JwtConfig) (bytes []byte, err error) {
+	if jwtConfig.KeyAlgorithm != "" {
+		return decryptJwt(jwt, key, jwtConfig.KeyAlgorithm, jwtConfig.ContentEncryption)
 	}
-	return parseSigned(jwt, key)
+	return parseSigned(jwt, key, jwtConfig.SignatureAlgorithm)
 }
 
-func decryptJwt(jwt, key string) ([]byte, error) {
+func decryptJwt(jwt, key string, keyAlgorithm jose.KeyAlgorithm, contentEncription jose.ContentEncryption) ([]byte, error) {
 	object, err := jose.ParseEncrypted(
 		jwt,
-		[]jose.KeyAlgorithm{jose.DIRECT},
-		[]jose.ContentEncryption{jose.A128CBC_HS256},
+		[]jose.KeyAlgorithm{keyAlgorithm},
+		[]jose.ContentEncryption{contentEncription},
 	)
 	if err != nil {
 		log.Printf("[decryptJwt] could not parse jwt - %s", err.Error())
@@ -66,8 +72,8 @@ func decryptJwt(jwt, key string) ([]byte, error) {
 	return object.Decrypt(decryptionKey)
 }
 
-func parseSigned(jwt, key string) ([]byte, error) {
-	object, err := jose.ParseSigned(jwt, []jose.SignatureAlgorithm{jose.HS256})
+func parseSigned(jwt, key string, algorithm jose.SignatureAlgorithm) ([]byte, error) {
+	object, err := jose.ParseSigned(jwt, []jose.SignatureAlgorithm{algorithm})
 	if err != nil {
 		log.Printf("[DecryptJwt] could not parse jwt - %s", err.Error())
 		return nil, fmt.Errorf("could not parse jwt")

@@ -1,8 +1,10 @@
 package _script
 
 import (
-	// "log"
+	"log"
 
+	"github.com/go-jose/go-jose/v4"
+	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 )
@@ -10,7 +12,7 @@ import (
 var nameDesc string = "Wopta per te Vita"
 
 func CreatePartnerhipNodes() {
-	// var err error
+	var err error
 
 	// err = createBeprofNode()
 	// if err != nil {
@@ -26,6 +28,11 @@ func CreatePartnerhipNodes() {
 	// if err != nil {
 	// 	log.Println(err.Error())
 	// }
+
+	err = createMultiTestNode()
+	if err != nil {
+		log.Println(err.Error())
+	}
 }
 
 func createBeprofNode() error {
@@ -41,84 +48,72 @@ func createBeprofNode() error {
 				SecondaryColor: "#f1bd12",
 				LogoUrl:        "assets/images/logo-beprof-trasp-72dpi.png",
 			},
-		},
-		Products: []models.Product{
-			models.Product{
-				Name:         "life",
-				NameDesc:     &nameDesc,
-				Version:      "v2",
-				NameTitle:    "Wopta per te",
-				NameSubtitle: "Vita",
-				Companies: []models.Company{
-					models.Company{
-						Name: "axa",
-					},
-				},
-				Steps: []models.Step{
-					models.Step{
-						Children: []models.Child{
-							{
-								Attributes: map[string]interface{}{
-									"consens": "Il sottoscritto, letta e compresa l'informativa sul trattamento dei dati personali, ACCONSENTE al trattamento dei propri dati personali da parte di Wopta Assicurazioni per l'invio di comunicazioni e proposte commerciali e di marketing, incluso l'invio di newsletter e ricerche di mercato, attraverso strumenti automatizzati (sms, mms, e-mail, ecc.) e non (posta cartacea e telefono con operatore).",
-									"key":     2,
-									"title":   "Privacy",
-								},
-								Widget: "privacyConsent",
-							}},
-						Widget: "guaranteeconfigurationstep",
-					},
-					models.Step{
-						Attributes: map[string]interface{}{
-							"companyPrivacy":      "PRESTO IL CONSENSO al trattamento dei miei dati personali ad AXA France VIE S.A. – Rappresentanza Generale per l’Italia, ivi inclusi quelli eventualmente da me conferiti in riferimento al mio stato di salute, per le finalità indicate nell’informativa, consultabile all’interno dei documenti precontrattuali (ricevuti via mail o consultabili al link nella pagina che precede), nonché alla loro comunicazione, per successivo trattamento, da parte dei soggetti indicati nella informativa predetta.",
-							"companyPrivacyTitle": "Privacy Assicurativa",
-							"statementsEndpoint":  "question/v1/surveys",
-						},
-						Widget: "quotersurvey",
-					},
-					models.Step{
-						Attributes: map[string]interface{}{
-							"statementsEndpoint": "question/v1/statements",
-						},
-						Widget: "quoterstatements",
-					},
-					models.Step{
-						Attributes: map[string]interface{}{
-							"beneficiaryText":              "Per procedere indicare chi sono i beneficiari della polizza in caso di decesso dell'assicurato.\\nPuoi indicare genericamente i tuoi eredi legittimi e/o testamentari. Oppure inserire in maniera puntuale i nomi dei Beneficiari (Massimo due).",
-							"guaranteeSlug":                "death",
-							"maximumNumberOfBeneficiaries": 2,
-							"thirdPartyReferenceText":      "In caso di specifiche esigenze di riservatezza, potrai indicare il nominativo ed i dati di recapito (inluso email e/o telefono) di un soggetto terno (diverso dal Beneficiario) a cui l'impresa di Assicurazione potrà rivolgersi in caso di decesso dell'Assicurato al fine di contattare il Beneficiario.",
-						},
-						Widget: "quoterbeneficiary",
-					},
-					models.Step{
-						Widget: "quotercontractordata",
-					},
-					models.Step{
-						Attributes: map[string]interface{}{
-							"guaranteeSlug": "death",
-						},
-						Widget: "quoteruploaddocuments",
-					},
-					models.Step{
-						Attributes: map[string]interface{}{
-							"showDuration":   false,
-							"showEndDate":    true,
-							"showGuarantees": true,
-						},
-						Widget: "quoterrecap",
-					},
-					models.Step{
-						Widget: "quotersignpay",
-					},
-					models.Step{
-						Attributes: map[string]interface{}{
-							"productLogo": "assets/images/wopta-logo-vita-magenta.png",
-						},
-						Widget: "quoterthankyou",
-					},
-				},
+			JwtConfig: lib.JwtConfig{
+				SignatureAlgorithm: jose.HS256,
 			},
 		},
+		Products: []models.Product{{
+			Name:         "life",
+			NameDesc:     &nameDesc,
+			Version:      "v2",
+			NameTitle:    "Wopta per te",
+			NameSubtitle: "Vita",
+			Companies: []models.Company{{
+				Name: "axa",
+			}},
+			Steps: []models.Step{{
+				Children: []models.Child{{
+					Attributes: map[string]interface{}{
+						"consens": "Il sottoscritto, letta e compresa l'informativa sul trattamento dei dati personali, ACCONSENTE al trattamento dei propri dati personali da parte di Wopta Assicurazioni per l'invio di comunicazioni e proposte commerciali e di marketing, incluso l'invio di newsletter e ricerche di mercato, attraverso strumenti automatizzati (sms, mms, e-mail, ecc.) e non (posta cartacea e telefono con operatore).",
+						"key":     2,
+						"title":   "Privacy",
+					},
+					Widget: "privacyConsent",
+				}},
+				Widget: "guaranteeconfigurationstep",
+			}, {
+				Attributes: map[string]interface{}{
+					"companyPrivacy":      "PRESTO IL CONSENSO al trattamento dei miei dati personali ad AXA France VIE S.A. – Rappresentanza Generale per l’Italia, ivi inclusi quelli eventualmente da me conferiti in riferimento al mio stato di salute, per le finalità indicate nell’informativa, consultabile all’interno dei documenti precontrattuali (ricevuti via mail o consultabili al link nella pagina che precede), nonché alla loro comunicazione, per successivo trattamento, da parte dei soggetti indicati nella informativa predetta.",
+					"companyPrivacyTitle": "Privacy Assicurativa",
+					"statementsEndpoint":  "question/v1/surveys",
+				},
+				Widget: "quotersurvey",
+			}, {
+				Attributes: map[string]interface{}{
+					"statementsEndpoint": "question/v1/statements",
+				},
+				Widget: "quoterstatements",
+			}, {
+				Attributes: map[string]interface{}{
+					"beneficiaryText":              "Per procedere indicare chi sono i beneficiari della polizza in caso di decesso dell'assicurato.\\nPuoi indicare genericamente i tuoi eredi legittimi e/o testamentari. Oppure inserire in maniera puntuale i nomi dei Beneficiari (Massimo due).",
+					"guaranteeSlug":                "death",
+					"maximumNumberOfBeneficiaries": 2,
+					"thirdPartyReferenceText":      "In caso di specifiche esigenze di riservatezza, potrai indicare il nominativo ed i dati di recapito (inluso email e/o telefono) di un soggetto terno (diverso dal Beneficiario) a cui l'impresa di Assicurazione potrà rivolgersi in caso di decesso dell'Assicurato al fine di contattare il Beneficiario.",
+				},
+				Widget: "quoterbeneficiary",
+			}, {
+				Widget: "quotercontractordata",
+			}, {
+				Attributes: map[string]interface{}{
+					"guaranteeSlug": "death",
+				},
+				Widget: "quoteruploaddocuments",
+			}, {
+				Attributes: map[string]interface{}{
+					"showDuration":   false,
+					"showEndDate":    true,
+					"showGuarantees": true,
+				},
+				Widget: "quoterrecap",
+			}, {
+				Widget: "quotersignpay",
+			}, {
+				Attributes: map[string]interface{}{
+					"productLogo": "assets/images/wopta-logo-vita-magenta.png",
+				},
+				Widget: "quoterthankyou",
+			}},
+		}},
 	}
 
 	_, err := network.CreateNode(partnershipModel)
@@ -139,84 +134,74 @@ func createFacileNode() error {
 				SecondaryColor: "",
 				LogoUrl:        "https://upload.wikimedia.org/wikipedia/commons/7/78/Logo_facile_%28azienda%29.png",
 			},
-		},
-		Products: []models.Product{
-			models.Product{
-				Name:         "life",
-				NameDesc:     &nameDesc,
-				Version:      "v2",
-				NameTitle:    "Wopta per te",
-				NameSubtitle: "Vita",
-				Companies: []models.Company{
-					models.Company{
-						Name: "axa",
-					},
-				},
-				Steps: []models.Step{
-					models.Step{
-						Children: []models.Child{
-							{
-								Attributes: map[string]interface{}{
-									"consens": "Il sottoscritto, letta e compresa l'informativa sul trattamento dei dati personali, ACCONSENTE al trattamento dei propri dati personali da parte di Wopta Assicurazioni per l'invio di comunicazioni e proposte commerciali e di marketing, incluso l'invio di newsletter e ricerche di mercato, attraverso strumenti automatizzati (sms, mms, e-mail, ecc.) e non (posta cartacea e telefono con operatore).",
-									"key":     2,
-									"title":   "Privacy",
-								},
-								Widget: "privacyConsent",
-							}},
-						Widget: "guaranteeconfigurationstep",
-					},
-					models.Step{
-						Attributes: map[string]interface{}{
-							"companyPrivacy":      "PRESTO IL CONSENSO al trattamento dei miei dati personali ad AXA France VIE S.A. – Rappresentanza Generale per l’Italia, ivi inclusi quelli eventualmente da me conferiti in riferimento al mio stato di salute, per le finalità indicate nell’informativa, consultabile all’interno dei documenti precontrattuali (ricevuti via mail o consultabili al link nella pagina che precede), nonché alla loro comunicazione, per successivo trattamento, da parte dei soggetti indicati nella informativa predetta.",
-							"companyPrivacyTitle": "Privacy Assicurativa",
-							"statementsEndpoint":  "question/v1/surveys",
-						},
-						Widget: "quotersurvey",
-					},
-					models.Step{
-						Attributes: map[string]interface{}{
-							"statementsEndpoint": "question/v1/statements",
-						},
-						Widget: "quoterstatements",
-					},
-					models.Step{
-						Attributes: map[string]interface{}{
-							"beneficiaryText":              "Per procedere indicare chi sono i beneficiari della polizza in caso di decesso dell'assicurato.\\nPuoi indicare genericamente i tuoi eredi legittimi e/o testamentari. Oppure inserire in maniera puntuale i nomi dei Beneficiari (Massimo due).",
-							"guaranteeSlug":                "death",
-							"maximumNumberOfBeneficiaries": 2,
-							"thirdPartyReferenceText":      "In caso di specifiche esigenze di riservatezza, potrai indicare il nominativo ed i dati di recapito (inluso email e/o telefono) di un soggetto terno (diverso dal Beneficiario) a cui l'impresa di Assicurazione potrà rivolgersi in caso di decesso dell'Assicurato al fine di contattare il Beneficiario.",
-						},
-						Widget: "quoterbeneficiary",
-					},
-					models.Step{
-						Widget: "quotercontractordata",
-					},
-					models.Step{
-						Attributes: map[string]interface{}{
-							"guaranteeSlug": "death",
-						},
-						Widget: "quoteruploaddocuments",
-					},
-					models.Step{
-						Attributes: map[string]interface{}{
-							"showDuration":   false,
-							"showEndDate":    true,
-							"showGuarantees": true,
-						},
-						Widget: "quoterrecap",
-					},
-					models.Step{
-						Widget: "quotersignpay",
-					},
-					models.Step{
-						Attributes: map[string]interface{}{
-							"productLogo": "assets/images/wopta-logo-vita-magenta.png",
-						},
-						Widget: "quoterthankyou",
-					},
-				},
+			JwtConfig: lib.JwtConfig{
+				KeyAlgorithm:      jose.DIRECT,
+				ContentEncryption: jose.A128CBC_HS256,
 			},
 		},
+		Products: []models.Product{{
+			Name:         "life",
+			NameDesc:     &nameDesc,
+			Version:      "v2",
+			NameTitle:    "Wopta per te",
+			NameSubtitle: "Vita",
+			Companies: []models.Company{{
+				Name: "axa",
+			}},
+			Steps: []models.Step{{
+				Children: []models.Child{
+					{
+						Attributes: map[string]interface{}{
+							"consens": "Il sottoscritto, letta e compresa l'informativa sul trattamento dei dati personali, ACCONSENTE al trattamento dei propri dati personali da parte di Wopta Assicurazioni per l'invio di comunicazioni e proposte commerciali e di marketing, incluso l'invio di newsletter e ricerche di mercato, attraverso strumenti automatizzati (sms, mms, e-mail, ecc.) e non (posta cartacea e telefono con operatore).",
+							"key":     2,
+							"title":   "Privacy",
+						},
+						Widget: "privacyConsent",
+					}},
+				Widget: "guaranteeconfigurationstep",
+			}, {
+				Attributes: map[string]interface{}{
+					"companyPrivacy":      "PRESTO IL CONSENSO al trattamento dei miei dati personali ad AXA France VIE S.A. – Rappresentanza Generale per l’Italia, ivi inclusi quelli eventualmente da me conferiti in riferimento al mio stato di salute, per le finalità indicate nell’informativa, consultabile all’interno dei documenti precontrattuali (ricevuti via mail o consultabili al link nella pagina che precede), nonché alla loro comunicazione, per successivo trattamento, da parte dei soggetti indicati nella informativa predetta.",
+					"companyPrivacyTitle": "Privacy Assicurativa",
+					"statementsEndpoint":  "question/v1/surveys",
+				},
+				Widget: "quotersurvey",
+			}, {
+				Attributes: map[string]interface{}{
+					"statementsEndpoint": "question/v1/statements",
+				},
+				Widget: "quoterstatements",
+			}, {
+				Attributes: map[string]interface{}{
+					"beneficiaryText":              "Per procedere indicare chi sono i beneficiari della polizza in caso di decesso dell'assicurato.\\nPuoi indicare genericamente i tuoi eredi legittimi e/o testamentari. Oppure inserire in maniera puntuale i nomi dei Beneficiari (Massimo due).",
+					"guaranteeSlug":                "death",
+					"maximumNumberOfBeneficiaries": 2,
+					"thirdPartyReferenceText":      "In caso di specifiche esigenze di riservatezza, potrai indicare il nominativo ed i dati di recapito (inluso email e/o telefono) di un soggetto terno (diverso dal Beneficiario) a cui l'impresa di Assicurazione potrà rivolgersi in caso di decesso dell'Assicurato al fine di contattare il Beneficiario.",
+				},
+				Widget: "quoterbeneficiary",
+			}, {
+				Widget: "quotercontractordata",
+			}, {
+				Attributes: map[string]interface{}{
+					"guaranteeSlug": "death",
+				},
+				Widget: "quoteruploaddocuments",
+			}, {
+				Attributes: map[string]interface{}{
+					"showDuration":   false,
+					"showEndDate":    true,
+					"showGuarantees": true,
+				},
+				Widget: "quoterrecap",
+			}, {
+				Widget: "quotersignpay",
+			}, {
+				Attributes: map[string]interface{}{
+					"productLogo": "assets/images/wopta-logo-vita-magenta.png",
+				},
+				Widget: "quoterthankyou",
+			}},
+		}},
 	}
 
 	_, err := network.CreateNode(partnershipModel)
@@ -251,4 +236,38 @@ func createFpinsuranceNode() error {
 	}
 
 	return nn.SaveBigQuery("")
+}
+
+func createMultiTestNode() error {
+	var (
+		err             error
+		partnershipName string = "multi-test"
+		nameDesc2       string = "Wopta per te Persona"
+	)
+
+	partnershipModel := models.NetworkNode{
+		Uid:         partnershipName,
+		Code:        partnershipName,
+		Type:        models.PartnershipNetworkNodeType,
+		IsActive:    true,
+		Partnership: &models.PartnershipNode{Name: partnershipName},
+		Products: []models.Product{{
+			Name:         models.LifeProduct,
+			NameDesc:     &nameDesc,
+			Version:      models.ProductV2,
+			NameTitle:    "Wopta per te",
+			NameSubtitle: "Vita",
+			Companies:    []models.Company{{Name: "axa"}},
+		}, {
+			Name:         models.PersonaProduct,
+			NameDesc:     &nameDesc2,
+			Version:      models.ProductV1,
+			NameTitle:    "Wopta per te",
+			NameSubtitle: "Persona",
+			Companies:    []models.Company{{Name: "global"}},
+		}},
+	}
+
+	_, err = network.CreateNode(partnershipModel)
+	return err
 }

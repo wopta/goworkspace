@@ -14,13 +14,21 @@ import (
 	"github.com/wopta/goworkspace/product"
 )
 
+type PartnershipNodeResponse struct {
+	Name string       `json:"name"`
+	Skin *models.Skin `json:"skin,omitempty"`
+}
+
 type Response struct {
-	Partnership models.PartnershipNode `json:"partnership"`
-	Products    []models.ProductInfo   `json:"products"`
+	Partnership PartnershipNodeResponse `json:"partnership"`
+	Products    []models.ProductInfo    `json:"products"`
 }
 
 func GetPartnershipNodeAndProductsFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
-	var response Response
+	var (
+		response Response
+		err      error
+	)
 
 	log.SetPrefix("[GetPartnershipNodeAndProductsFx] ")
 	defer log.SetPrefix("")
@@ -31,21 +39,25 @@ func GetPartnershipNodeAndProductsFx(w http.ResponseWriter, r *http.Request) (st
 	jwtData := r.URL.Query().Get("jwt")
 	key := lib.ToUpper(fmt.Sprintf("%s_SIGNING_KEY", affinity))
 
-	_, err := lib.ParseJwt(jwtData, os.Getenv(key), encryptedPartnerships[affinity])
-	if err != nil {
-		log.Printf("error decoding jwt: %s", err.Error())
-		return "", nil, err
-	}
-
 	node, err := network.GetNodeByUid(affinity)
 	if err != nil {
 		log.Printf("error getting node '%s': %s", affinity, err.Error())
 		return "", nil, err
 	}
-	response.Partnership = *node.Partnership
+
+	if node.Partnership.IsJwtProtected() {
+		_, err = lib.ParseJwt(jwtData, os.Getenv(key), node.Partnership.JwtConfig)
+		if err != nil {
+			log.Printf("error decoding jwt: %s", err.Error())
+			return "", nil, err
+		}
+	}
 
 	productList := lib.SliceMap(node.Products, func(p models.Product) string { return p.Name })
-	response.Products = product.GetProductsByChannel(productList, lib.ECommerceChannel)
+	productInfos := product.GetProductsByChannel(productList, lib.ECommerceChannel)
+
+	response.Partnership = PartnershipNodeResponse{node.Partnership.Name, node.Partnership.Skin}
+	response.Products = productInfos
 
 	responseJson, err := json.Marshal(response)
 
