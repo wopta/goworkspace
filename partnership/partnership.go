@@ -6,7 +6,6 @@ import (
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
 )
 
 var partnershipRoutes []lib.ChiRoute = []lib.ChiRoute{
@@ -34,15 +33,4 @@ func Partnership(w http.ResponseWriter, r *http.Request) {
 
 	router := lib.GetChiRouter("partnership", partnershipRoutes)
 	router.ServeHTTP(w, r)
-}
-
-type PartnershipNode struct {
-	Name string       `json:"name"`
-	Skin *models.Skin `json:"skin,omitempty"`
-}
-
-type PartnershipResponse struct {
-	Policy      models.Policy   `json:"policy"`
-	Partnership PartnershipNode `json:"partnership"`
-	Product     models.Product  `json:"product"`
 }

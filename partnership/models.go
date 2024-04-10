@@ -2,8 +2,13 @@ package partnership
 
 import "github.com/wopta/goworkspace/models"
 
-var encryptedPartnerships map[string]bool = map[string]bool{
-	models.PartnershipBeProf:      false,
-	models.PartnershipFacile:      true,
-	models.PartnershipFpinsurance: false,
+type PartnershipNode struct {
+	Name string       `json:"name"`
+	Skin *models.Skin `json:"skin,omitempty"`
+}
+
+type PartnershipResponse struct {
+	Policy      models.Policy   `json:"policy"`
+	Partnership PartnershipNode `json:"partnership"`
+	Product     models.Product  `json:"product"`
 }
