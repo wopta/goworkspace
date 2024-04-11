@@ -54,6 +54,15 @@ func fabrickIntegration(transactions []models.Transaction, paymentMethods []stri
 
 		tr.ProviderName = models.FabrickPaymentProvider
 
+		scheduleDate, err := time.Parse(time.DateOnly, tr.ScheduleDate)
+		if err != nil {
+			log.Printf("error parsing scheduleDate: %s", err.Error())
+			return "", nil, err
+		}
+		if scheduleDate.Before(now) {
+			tr.ScheduleDate = now.Format(time.DateOnly)
+		}
+
 		res := <-createFabrickTransaction(&policy, tr, isFirstRate, createMandate, customerId, paymentMethods)
 		if res.Payload == nil || res.Payload.PaymentPageURL == nil {
 			return "", nil, errors.New("error creating transaction on Fabrick")
