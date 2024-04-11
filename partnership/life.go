@@ -14,7 +14,215 @@ import (
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 	"github.com/wopta/goworkspace/product"
+	"github.com/wopta/goworkspace/quote"
+	"github.com/wopta/goworkspace/user"
 )
+
+func LifePartnershipV2Fx(w http.ResponseWriter, r *http.Request) (string, any, error) {
+	var (
+		response        PartnershipResponse
+		partnershipNode *models.NetworkNode
+		policy          models.Policy
+		productLife     *models.Product
+		err             error
+	)
+
+	log.SetPrefix("[LifePartnershipV2Fx] ")
+	defer log.SetPrefix("")
+
+	log.Println("Handler start -----------------------------------------------")
+
+	partnershipUid := strings.ToLower(chi.URLParam(r, "partnershipUid"))
+	jwtData := r.URL.Query().Get("jwt")
+	key := lib.ToUpper(fmt.Sprintf("%s_SIGNING_KEY", partnershipUid))
+
+	log.Printf("partnershipUid: %s jwt: %s", partnershipUid, jwtData)
+
+	if partnershipNode, err = network.GetNodeByUid(partnershipUid); err != nil {
+		log.Printf("error getting node: %s", err.Error())
+		return "", nil, err
+	}
+
+	if partnershipNode == nil {
+		log.Printf("no partnership found")
+		return "", nil, err
+	}
+
+	if !partnershipNode.IsActive {
+		log.Printf("partnership is not active")
+		return "", nil, err
+	}
+
+	partnershipName := partnershipNode.Partnership.Name
+
+	log.Printf("loading latest life product")
+	productLife = product.GetLatestActiveProduct(models.LifeProduct, models.ECommerceChannel, partnershipNode, nil)
+	if productLife == nil {
+		log.Printf("no product found")
+		return "", nil, fmt.Errorf("no product found")
+	}
+
+	log.Printf("setting policy basic info")
+	policy.Name = productLife.Name
+	policy.NameDesc = *productLife.NameDesc
+	policy.ProductVersion = productLife.Version
+	policy.Company = productLife.Companies[0].Name
+	policy.ProducerUid = partnershipUid
+	policy.ProducerCode = partnershipName
+	policy.PartnershipName = partnershipName
+	policy.ProducerType = partnershipNode.Type
+
+	var claims models.LifeClaims
+
+	if claims, err = partnershipNode.Partnership.DecryptJwtClaims2(jwtData, key, LifeClaimsExtractor(partnershipUid)); err != nil {
+		log.Printf("could not validate partnership JWT - %s", err.Error())
+		return "", nil, err
+	}
+
+	injectClaimsIntoPolicy(&policy, claims)
+
+	quotedPolicy, err := quote.Life(policy, models.ECommerceChannel, partnershipNode, nil, models.ECommerceFlow)
+	if err != nil {
+		log.Printf("error quoting for partnership: %s", err.Error())
+		return "", nil, err
+	}
+	policy = quotedPolicy
+
+	err = savePartnershipLead(&policy, partnershipNode, "")
+	if err != nil {
+		log.Printf("error saving lead: %s", err.Error())
+		return "", nil, err
+	}
+
+	response.Policy = policy
+	response.Product = *productLife
+	response.Partnership = PartnershipNode{partnershipNode.Partnership.Name, partnershipNode.Partnership.Skin}
+
+	responseJson, err := json.Marshal(response)
+
+	log.Println("Handler end -------------------------------------------------")
+
+	return string(responseJson), response, err
+}
+
+func LifeClaimsExtractor(partnershipUid string) func([]byte) (models.LifeClaims, error) {
+	switch partnershipUid {
+	case models.PartnershipBeProf:
+		return BeprofLifeClaimsExtractor
+	case models.PartnershipFacile:
+		return FacileLifeClaimsExtractor
+	default:
+		return func(b []byte) (models.LifeClaims, error) {
+			return models.LifeClaims{}, nil
+		}
+	}
+}
+
+func FacileLifeClaimsExtractor(b []byte) (models.LifeClaims, error) {
+	fCl := &FacileClaims{}
+	json.Unmarshal(b, fCl)
+	adapter := FacileLifeClaimsAdapter{
+		facileClaims: fCl,
+	}
+	c := adapter.ExtractClaims()
+
+	return c, nil
+}
+
+type FacileLifeClaimsAdapter struct {
+	facileClaims *FacileClaims
+}
+
+func (a *FacileLifeClaimsAdapter) ExtractClaims() models.LifeClaims {
+	data := make(map[string]interface{})
+	b, _ := json.Marshal(a.facileClaims)
+	json.Unmarshal(b, &data)
+
+	birthDate, _ := time.Parse(models.TimeDateOnly, a.facileClaims.CustomerBirthDate)
+
+	return models.LifeClaims{
+		Name:      a.facileClaims.CustomerName,
+		Surname:   a.facileClaims.CustomerFamilyName,
+		Email:     a.facileClaims.Email,
+		BirthDate: birthDate.Format(time.RFC3339),
+		Phone:     fmt.Sprintf("+39%s", a.facileClaims.Mobile),
+		Gender:    a.facileClaims.Gender,
+		Guarantees: map[string]struct {
+			Duration                   int
+			SumInsuredLimitOfIndemnity float64
+		}{
+			"death": {a.facileClaims.Duration, float64(a.facileClaims.InsuredCapital)},
+		},
+		Data: data,
+	}
+}
+
+func BeprofLifeClaimsExtractor(b []byte) (models.LifeClaims, error) {
+	bCl := &BeprofClaims{}
+	json.Unmarshal(b, bCl)
+	adapter := BeprofLifeClaimsAdapter{
+		beprofClaims: bCl,
+	}
+	c := adapter.ExtractClaims()
+
+	return c, nil
+}
+
+type BeprofLifeClaimsAdapter struct {
+	beprofClaims *BeprofClaims
+}
+
+func (a *BeprofLifeClaimsAdapter) ExtractClaims() models.LifeClaims {
+	data := make(map[string]interface{})
+	b, _ := json.Marshal(a.beprofClaims)
+	json.Unmarshal(b, &data)
+
+	return models.LifeClaims{
+		Name:       a.beprofClaims.UserFirstname,
+		Surname:    a.beprofClaims.UserLastname,
+		Email:      a.beprofClaims.UserEmail,
+		FiscalCode: a.beprofClaims.UserFiscalcode,
+		Address:    a.beprofClaims.UserAddress,
+		Postalcode: a.beprofClaims.UserPostalcode,
+		City:       a.beprofClaims.UserCity,
+		CityCode:   a.beprofClaims.UserMunicipalityCode,
+		Work:       a.beprofClaims.UserEmploymentSector,
+		VatCode:    a.beprofClaims.UserPiva,
+		Data:       data,
+	}
+}
+
+func injectClaimsIntoPolicy(policy *models.Policy, claims models.LifeClaims) {
+	var (
+		person models.User
+		asset  models.Asset
+	)
+
+	log.Println("[beProfLifePartnership] setting person info")
+	person.Name = claims.Name
+	person.Surname = claims.Surname
+	person.Mail = claims.Email
+	person.FiscalCode = claims.FiscalCode
+	person.Address = claims.Address
+	person.PostalCode = claims.Postalcode
+	person.City = claims.City
+	person.CityCode = claims.CityCode
+	person.Work = claims.Work
+	person.VatCode = claims.VatCode
+
+	person.Normalize()
+
+	if _, personData, err := user.ExtractUserDataFromFiscalCode(person); err == nil {
+		person = personData
+	}
+
+	policy.Contractor = *person.ToContractor()
+	asset.Person = &person
+	policy.OfferlName = "default"
+
+	policy.Assets = append(policy.Assets, asset)
+	policy.PartnershipData = claims.Data
+}
 
 func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var response PartnershipResponse
