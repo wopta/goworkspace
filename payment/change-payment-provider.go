@@ -15,8 +15,9 @@ import (
 )
 
 type ChangePaymentProviderReq struct {
-	PolicyUid    string `json:"policyUid"`
-	ProviderName string `json:"providerName"`
+	PolicyUid         string `json:"policyUid"`
+	ProviderName      string `json:"providerName"`
+	ScheduleFirstRate bool   `json:"scheduleFirstRate"`
 }
 
 type ChangePaymentProviderResp struct {
@@ -84,7 +85,7 @@ func ChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, in
 	policy.Payment = req.ProviderName
 	product := prd.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, nil, nil)
 
-	payUrl, updatedTransactions, err = Controller(policy, *product, unpaidTransactions)
+	payUrl, updatedTransactions, err = Controller(policy, *product, unpaidTransactions, req.ScheduleFirstRate)
 	if err != nil {
 		log.Printf("error changing payment provider to %s: %s", req.ProviderName, err.Error())
 		return "{}", nil, err
