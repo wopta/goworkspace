@@ -60,7 +60,11 @@ func fabrickIntegration(transactions []models.Transaction, paymentMethods []stri
 			return "", nil, err
 		}
 		if scheduleDate.Before(now) {
-			tr.ScheduleDate = now.Format(time.DateOnly)
+			/*
+				sets schedule date to today + 1 in order to avoid corner case in which fabrick is not able to
+				execute transaction when recreated at the end of the day
+			*/
+			tr.ScheduleDate = now.AddDate(0, 0, 1).Format(time.DateOnly)
 		}
 
 		res := <-createFabrickTransaction(&policy, tr, isFirstRate, createMandate, customerId, paymentMethods)
