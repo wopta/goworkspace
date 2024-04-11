@@ -40,7 +40,7 @@ func getFabrickClient(urlstring string, req *http.Request) (*http.Response, erro
 
 func getFabrickRequestBody(
 	policy *models.Policy,
-	firstSchedule bool,
+	createMandate, scheduleFirstRate bool,
 	scheduleDate, expireDate, customerId string,
 	amount float64,
 	origin string,
@@ -48,13 +48,15 @@ func getFabrickRequestBody(
 ) string {
 	var (
 		mandate             string    = "false"
-		now                 time.Time = time.Now() // should we use .UTC()?
+		now                 time.Time = time.Now().UTC()
 		requestScheduleDate string    = scheduleDate
 	)
 
-	if firstSchedule {
+	if createMandate {
 		mandate = "true"
-		scheduleDate = ""
+		if !scheduleFirstRate {
+			scheduleDate = ""
+		}
 	}
 
 	if customerId == "" {
@@ -174,7 +176,7 @@ func getFabrickPaymentRequest(body string) *http.Request {
 func createFabrickTransaction(
 	policy *models.Policy,
 	transaction models.Transaction,
-	firstSchedule, createMandate bool,
+	createMandate, scheduleFirstRate bool,
 	customerId string,
 	paymentMethods []string,
 ) <-chan FabrickPaymentResponse {
@@ -183,7 +185,7 @@ func createFabrickTransaction(
 	go func() {
 		defer close(r)
 
-		body := getFabrickRequestBody(policy, firstSchedule, transaction.ScheduleDate, transaction.ExpirationDate,
+		body := getFabrickRequestBody(policy, createMandate, scheduleFirstRate, transaction.ScheduleDate, transaction.ExpirationDate,
 			customerId, transaction.Amount, "", paymentMethods)
 		if body == "" {
 			return
