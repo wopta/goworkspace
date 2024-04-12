@@ -68,13 +68,15 @@ func ChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, in
 		return "{}", nil, errors.New("unable to change payment method")
 	}
 
+	policy.Payment = req.ProviderName
+
 	activeTransactions := transaction.GetPolicyActiveTransactions("", policy.Uid)
 	for _, tr := range activeTransactions {
 		if tr.IsPay {
 			responseTransactions = append(responseTransactions, tr)
 			continue
 		}
-		transaction.ReinitializePaymentInfo(&tr)
+		transaction.ReinitializePaymentInfo(&tr, policy.Payment)
 		unpaidTransactions = append(unpaidTransactions, tr)
 	}
 	if len(unpaidTransactions) == 0 {
@@ -82,7 +84,6 @@ func ChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, in
 		return "{}", nil, err
 	}
 
-	policy.Payment = req.ProviderName
 	product := prd.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, nil, nil)
 
 	payUrl, updatedTransactions, err = Controller(policy, *product, unpaidTransactions, req.ScheduleFirstRate)

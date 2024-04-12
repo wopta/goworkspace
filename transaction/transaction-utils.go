@@ -7,18 +7,22 @@ import (
 
 const transactionStatusReinitialized string = "Reinitialized"
 
-func ReinitializePaymentInfo(tr *models.Transaction) {
+func ReinitializePaymentInfo(tr *models.Transaction, providerName string) {
 	if tr.IsPay && !tr.IsDelete {
 		return
 	}
+	tr.ProviderName = providerName
 	tr.IsPay = false
 	tr.IsDelete = false
 	tr.PaymentNote = ""
 	tr.PaymentMethod = ""
 	tr.PayDate = time.Time{}
 	tr.TransactionDate = time.Time{}
+	tr.ScheduleDate = tr.EffectiveDate.Format(time.DateOnly)
+	tr.ExpirationDate = tr.EffectiveDate.AddDate(10, 0, 0).Format(time.DateOnly)
 	tr.Status = models.TransactionStatusToPay
 	tr.StatusHistory = append(tr.StatusHistory, transactionStatusReinitialized, models.TransactionStatusToPay)
+	tr.UpdateDate = time.Now().UTC()
 }
 
 func getMonthlyAmountsFlat(policy *models.Policy) (grossAmounts []float64, nettAmounts []float64) {

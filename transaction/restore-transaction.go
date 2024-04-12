@@ -6,9 +6,9 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	plc "github.com/wopta/goworkspace/policy"
 	"log"
 	"net/http"
-	"time"
 )
 
 func RestoreTransactionFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -29,9 +29,13 @@ func RestoreTransactionFx(w http.ResponseWriter, r *http.Request) (string, inter
 		return "", nil, errors.New("no transaction found")
 	}
 
-	ReinitializePaymentInfo(transaction)
-	transaction.ScheduleDate = transaction.EffectiveDate.Format(time.DateOnly)
-	transaction.ExpirationDate = transaction.EffectiveDate.AddDate(10, 0, 0).Format(time.DateOnly)
+	policy, err := plc.GetPolicy(transaction.PolicyUid, "")
+	if err != nil {
+		log.Printf("error fetching policy %s from Firestore: %s", transaction.PolicyUid, err)
+		return "", nil, err
+	}
+
+	ReinitializePaymentInfo(transaction, policy.Payment)
 
 	err = lib.SetFirestoreErr(models.TransactionsCollection, transaction.Uid, transaction)
 	if err != nil {

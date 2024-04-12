@@ -97,6 +97,8 @@ func remittanceIntegration(transactions []models.Transaction) (payUrl string, up
 			tr.PayDate = now
 			tr.TransactionDate = now
 		}
+		tr.ProviderId = ""
+		tr.UserToken = ""
 		tr.PaymentMethod = models.PayMethodRemittance
 		tr.UpdateDate = now
 		updatedTransaction = append(updatedTransaction, tr)
