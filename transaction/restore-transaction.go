@@ -31,6 +31,7 @@ func RestoreTransactionFx(w http.ResponseWriter, r *http.Request) (string, inter
 
 	ReinitializePaymentInfo(transaction)
 	transaction.ScheduleDate = transaction.EffectiveDate.Format(time.DateOnly)
+	transaction.ExpirationDate = transaction.EffectiveDate.AddDate(10, 0, 0).Format(time.DateOnly)
 
 	err = lib.SetFirestoreErr(models.TransactionsCollection, transaction.Uid, transaction)
 	if err != nil {
