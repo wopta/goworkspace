@@ -67,3 +67,7 @@ type LifeClaims struct {
 	Data map[string]any `json:"data"`
 	jwt.RegisteredClaims
 }
+
+func (c *LifeClaims) IsEmpty() bool {
+	return c.Data == nil
+}

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -24,6 +25,7 @@ func LifePartnershipV2Fx(w http.ResponseWriter, r *http.Request) (string, any, e
 		partnershipNode *models.NetworkNode
 		policy          models.Policy
 		productLife     *models.Product
+		claims          models.LifeClaims
 		err             error
 	)
 
@@ -53,40 +55,34 @@ func LifePartnershipV2Fx(w http.ResponseWriter, r *http.Request) (string, any, e
 		return "", nil, err
 	}
 
-	partnershipName := partnershipNode.Partnership.Name
-
 	log.Printf("loading latest life product")
 	productLife = product.GetLatestActiveProduct(models.LifeProduct, models.ECommerceChannel, partnershipNode, nil)
 	if productLife == nil {
 		log.Printf("no product found")
 		return "", nil, fmt.Errorf("no product found")
 	}
+	policy = setPolicyPartnershipInfo(policy, productLife, partnershipNode)
 
-	log.Printf("setting policy basic info")
-	policy.Name = productLife.Name
-	policy.NameDesc = *productLife.NameDesc
-	policy.ProductVersion = productLife.Version
-	policy.Company = productLife.Companies[0].Name
-	policy.ProducerUid = partnershipUid
-	policy.ProducerCode = partnershipName
-	policy.PartnershipName = partnershipName
-	policy.ProducerType = partnershipNode.Type
-
-	var claims models.LifeClaims
-
-	if claims, err = partnershipNode.Partnership.DecryptJwtClaims2(jwtData, key, LifeClaimsExtractor(partnershipUid)); err != nil {
+	if claims, err = partnershipNode.Partnership.DecryptJwtClaims2(jwtData, os.Getenv(key), LifeClaimsExtractor(partnershipUid)); err != nil {
 		log.Printf("could not validate partnership JWT - %s", err.Error())
 		return "", nil, err
 	}
 
-	injectClaimsIntoPolicy(&policy, claims)
+	if !claims.IsEmpty() {
+		policy, err = setClaimsIntoPolicy(policy, productLife, claims)
 
-	quotedPolicy, err := quote.Life(policy, models.ECommerceChannel, partnershipNode, nil, models.ECommerceFlow)
-	if err != nil {
-		log.Printf("error quoting for partnership: %s", err.Error())
-		return "", nil, err
+		if err != nil {
+			log.Printf("error extracting data from claims: %s", err.Error())
+			return "", nil, err
+		}
+
+		quotedPolicy, err := quote.Life(policy, models.ECommerceChannel, partnershipNode, nil, models.ECommerceFlow)
+		if err != nil {
+			log.Printf("error quoting for partnership: %s", err.Error())
+			return "", nil, err
+		}
+		policy = quotedPolicy
 	}
-	policy = quotedPolicy
 
 	err = savePartnershipLead(&policy, partnershipNode, "")
 	if err != nil {
@@ -103,6 +99,19 @@ func LifePartnershipV2Fx(w http.ResponseWriter, r *http.Request) (string, any, e
 	log.Println("Handler end -------------------------------------------------")
 
 	return string(responseJson), response, err
+}
+
+func setPolicyPartnershipInfo(policy models.Policy, product *models.Product, node *models.NetworkNode) models.Policy {
+	policy.Name = product.Name
+	policy.NameDesc = *product.NameDesc
+	policy.ProductVersion = product.Version
+	policy.Company = product.Companies[0].Name
+	policy.ProducerUid = node.Uid
+	policy.ProducerCode = node.Partnership.Name
+	policy.PartnershipName = node.Partnership.Name
+	policy.ProducerType = node.Type
+
+	return policy
 }
 
 func LifeClaimsExtractor(partnershipUid string) func([]byte) (models.LifeClaims, error) {
@@ -192,7 +201,7 @@ func (a *BeprofLifeClaimsAdapter) ExtractClaims() models.LifeClaims {
 	}
 }
 
-func injectClaimsIntoPolicy(policy *models.Policy, claims models.LifeClaims) {
+func setClaimsIntoPolicy(policy models.Policy, product *models.Product, claims models.LifeClaims) (models.Policy, error) {
 	var (
 		person models.User
 		asset  models.Asset
@@ -201,6 +210,8 @@ func injectClaimsIntoPolicy(policy *models.Policy, claims models.LifeClaims) {
 	log.Println("[beProfLifePartnership] setting person info")
 	person.Name = claims.Name
 	person.Surname = claims.Surname
+	person.BirthDate = claims.BirthDate
+	person.Gender = claims.Gender
 	person.Mail = claims.Email
 	person.FiscalCode = claims.FiscalCode
 	person.Address = claims.Address
@@ -210,18 +221,38 @@ func injectClaimsIntoPolicy(policy *models.Policy, claims models.LifeClaims) {
 	person.Work = claims.Work
 	person.VatCode = claims.VatCode
 
-	person.Normalize()
-
-	if _, personData, err := user.ExtractUserDataFromFiscalCode(person); err == nil {
+	if person.FiscalCode != "" {
+		_, personData, err := user.ExtractUserDataFromFiscalCode(person)
+		if err != nil {
+			return models.Policy{}, err
+		}
 		person = personData
 	}
+
+	person.Normalize()
 
 	policy.Contractor = *person.ToContractor()
 	asset.Person = &person
 	policy.OfferlName = "default"
 
+	if claims.Guarantees != nil {
+		asset.Guarantees = make([]models.Guarante, 0)
+		for slug, value := range claims.Guarantees {
+			g := product.Companies[0].GuaranteesMap[slug]
+			g.Value = &models.GuaranteValue{
+				Duration: &models.Duration{
+					Year: value.Duration,
+				},
+				SumInsuredLimitOfIndemnity: value.SumInsuredLimitOfIndemnity,
+			}
+			asset.Guarantees = append(asset.Guarantees, *g)
+		}
+	}
+
 	policy.Assets = append(policy.Assets, asset)
 	policy.PartnershipData = claims.Data
+
+	return policy, nil
 }
 
 func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -341,7 +372,7 @@ func savePartnershipLead(policy *models.Policy, node *models.NetworkNode, origin
 
 	policyFire := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
 
-	policy.Channel = models.ECommerceChannel
+	policy.Channel = lib.ECommerceChannel
 	now := time.Now().UTC()
 
 	policy.CreationDate = now
