@@ -70,18 +70,19 @@ func LifePartnershipV2Fx(w http.ResponseWriter, r *http.Request) (string, any, e
 
 	if !claims.IsEmpty() {
 		policy, err = setClaimsIntoPolicy(policy, productLife, claims)
-
 		if err != nil {
 			log.Printf("error extracting data from claims: %s", err.Error())
 			return "", nil, err
 		}
 
-		quotedPolicy, err := quote.Life(policy, models.ECommerceChannel, partnershipNode, nil, models.ECommerceFlow)
-		if err != nil {
-			log.Printf("error quoting for partnership: %s", err.Error())
-			return "", nil, err
+		if policy.Contractor.BirthDate != "" {
+			quotedPolicy, err := quote.Life(policy, models.ECommerceChannel, partnershipNode, nil, models.ECommerceFlow)
+			if err != nil {
+				log.Printf("error quoting for partnership: %s", err.Error())
+				return "", nil, err
+			}
+			policy = quotedPolicy
 		}
-		policy = quotedPolicy
 	}
 
 	err = savePartnershipLead(&policy, partnershipNode, "")
