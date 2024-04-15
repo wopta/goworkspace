@@ -14,6 +14,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"time"
 )
 
 type FabrickRefreshPayByLinkRequest struct {
@@ -50,10 +51,12 @@ func FabrickRefreshPayByLinkFx(w http.ResponseWriter, r *http.Request) (string, 
 		return "", nil, err
 	}
 
-	transactions = lib.SliceMap(transactions, func(tr models.Transaction) models.Transaction {
-		transaction.ReinitializePaymentInfo(&tr, policy.Payment)
-		return tr
-	})
+	for index, _ := range transactions {
+		transaction.ReinitializePaymentInfo(&transactions[index], policy.Payment)
+		if !request.ScheduleFirstRate && index == 0 {
+			transactions[index].ScheduleDate = time.Now().UTC().Format(time.DateOnly)
+		}
+	}
 
 	product := prd.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, nil, nil)
 

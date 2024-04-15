@@ -18,8 +18,10 @@ func ReinitializePaymentInfo(tr *models.Transaction, providerName string) {
 	tr.PaymentMethod = ""
 	tr.PayDate = time.Time{}
 	tr.TransactionDate = time.Time{}
-	tr.ScheduleDate = tr.EffectiveDate.Format(time.DateOnly)
-	tr.ExpirationDate = tr.EffectiveDate.AddDate(10, 0, 0).Format(time.DateOnly)
+	if !tr.EffectiveDate.IsZero() {
+		tr.ScheduleDate = tr.EffectiveDate.Format(time.DateOnly)
+		tr.ExpirationDate = tr.EffectiveDate.AddDate(10, 0, 0).Format(time.DateOnly)
+	}
 	tr.Status = models.TransactionStatusToPay
 	tr.StatusHistory = append(tr.StatusHistory, transactionStatusReinitialized, models.TransactionStatusToPay)
 	tr.UpdateDate = time.Now().UTC()
