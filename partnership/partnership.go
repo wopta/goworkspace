@@ -11,7 +11,7 @@ import (
 var partnershipRoutes []lib.ChiRoute = []lib.ChiRoute{
 	{
 		Route:   "/v1/life/{partnershipUid}",
-		Handler: lib.ResponseLoggerWrapper(LifePartnershipV2Fx),
+		Handler: lib.ResponseLoggerWrapper(LifePartnershipFx),
 		Method:  http.MethodGet,
 		Roles:   []string{lib.UserRoleAll},
 	},

@@ -19,7 +19,7 @@ import (
 	"github.com/wopta/goworkspace/user"
 )
 
-func LifePartnershipV2Fx(w http.ResponseWriter, r *http.Request) (string, any, error) {
+func LifePartnershipFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	var (
 		response        PartnershipResponse
 		partnershipNode *models.NetworkNode
@@ -63,7 +63,7 @@ func LifePartnershipV2Fx(w http.ResponseWriter, r *http.Request) (string, any, e
 	}
 	policy = setPolicyPartnershipInfo(policy, productLife, partnershipNode)
 
-	if claims, err = partnershipNode.Partnership.DecryptJwtClaims2(jwtData, os.Getenv(key), LifeClaimsExtractor(partnershipUid)); err != nil {
+	if claims, err = partnershipNode.Partnership.DecryptJwtClaims(jwtData, os.Getenv(key), LifeClaimsExtractor(partnershipUid)); err != nil {
 		log.Printf("could not validate partnership JWT - %s", err.Error())
 		return "", nil, err
 	}
@@ -254,106 +254,6 @@ func setClaimsIntoPolicy(policy models.Policy, product *models.Product, claims m
 	policy.PartnershipData = claims.Data
 
 	return policy, nil
-}
-
-func LifePartnershipFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	var response PartnershipResponse
-
-	log.SetPrefix("[LifePartnershipFx] ")
-	defer log.SetPrefix("")
-
-	log.Println("Handler start -----------------------------------------------")
-
-	partnershipUid := strings.ToLower(chi.URLParam(r, "partnershipUid"))
-	jwtData := r.URL.Query().Get("jwt")
-
-	log.Printf("partnershipUid: %s jwt: %s", partnershipUid, jwtData)
-
-	policy, product, node, err := LifePartnership(partnershipUid, jwtData, r.Header.Get("Origin"))
-	if err != nil {
-		log.Printf("error: %s", err.Error())
-		return "", response, err
-	}
-
-	response.Policy = policy
-	response.Product = product
-	response.Partnership = PartnershipNode{node.Partnership.Name, node.Partnership.Skin}
-
-	responseJson, err := json.Marshal(response)
-
-	log.Println("Handler end -------------------------------------------------")
-
-	return string(responseJson), response, err
-}
-
-func LifePartnership(partnershipUid, jwtData, origin string) (models.Policy, models.Product, *models.NetworkNode, error) {
-	var (
-		policy          models.Policy
-		productLife     *models.Product
-		partnershipNode *models.NetworkNode
-		err             error
-	)
-
-	log.Printf("[LifePartnership]")
-
-	if partnershipNode, err = network.GetNodeByUid(partnershipUid); err != nil {
-		return policy, *productLife, partnershipNode, err
-	}
-
-	if partnershipNode == nil {
-		log.Printf("[LifePartnership] no partnership found")
-		return policy, *productLife, partnershipNode, fmt.Errorf("no partnership found")
-	}
-
-	if !partnershipNode.IsActive {
-		log.Printf("[LifePartnership] partnership is not active")
-		return policy, *productLife, partnershipNode, fmt.Errorf("partnership is not active")
-	}
-
-	partnershipName := partnershipNode.Partnership.Name
-
-	log.Printf("[LifePartnership] loading latest life product")
-
-	warrant := partnershipNode.GetWarrant()
-	productLife = product.GetLatestActiveProduct(models.LifeProduct, models.ECommerceChannel, partnershipNode, warrant)
-	if productLife == nil {
-		log.Printf("[LifePartnership] no product found")
-		return policy, models.Product{}, partnershipNode, fmt.Errorf("no product found")
-	}
-
-	log.Printf("[LifePartnership] setting policy basic info")
-
-	policy.Name = productLife.Name
-	policy.NameDesc = *productLife.NameDesc
-	policy.ProductVersion = productLife.Version
-	policy.Company = productLife.Companies[0].Name
-	policy.ProducerUid = partnershipUid
-	policy.ProducerCode = partnershipName
-	policy.PartnershipName = partnershipName
-	policy.ProducerType = partnershipNode.Type
-
-	switch partnershipName {
-	case models.PartnershipBeProf:
-		log.Println("[LifePartnership] call beProfLifePartnership function")
-		err = beProfLifePartnership(jwtData, &policy, productLife, partnershipNode)
-	case models.PartnershipFacile:
-		log.Println("[LifePartnership] call facileLifePartnership function")
-		err = facileLifePartnership(jwtData, &policy, productLife, partnershipNode)
-	case models.PartnershipFpinsurance:
-		log.Println("[LifePartnership] call fpinsuranceLifePartnership function")
-		err = fpinsuranceLifePartnership(jwtData, &policy, productLife)
-	default:
-		log.Printf("[LifePartnership] could not find partnership with name %s", partnershipName)
-		err = fmt.Errorf("invalid partnership name: %s", partnershipName)
-	}
-
-	if err != nil {
-		return policy, *productLife, partnershipNode, err
-	}
-
-	err = savePartnershipLead(&policy, partnershipNode, origin)
-
-	return policy, *productLife, partnershipNode, err
 }
 
 func removeUnselectedGuarantees(policy *models.Policy) models.Policy {

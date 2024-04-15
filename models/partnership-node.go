@@ -1,8 +1,6 @@
 package models
 
 import (
-	"encoding/json"
-
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/wopta/goworkspace/lib"
 )
@@ -30,15 +28,7 @@ func (pn *PartnershipNode) DecryptJwt(jwtData, key string) ([]byte, error) {
 	return lib.ParseJwt(jwtData, key, pn.JwtConfig)
 }
 
-func (pn PartnershipNode) DecryptJwtClaims(jwtData, key string, claims any) error {
-	bytes, err := pn.DecryptJwt(jwtData, key)
-	if err != nil {
-		return err
-	}
-	return json.Unmarshal(bytes, &claims)
-}
-
-func (pn PartnershipNode) DecryptJwtClaims2(jwtData, key string, unmarshaler func([]byte) (LifeClaims, error)) (LifeClaims, error) {
+func (pn PartnershipNode) DecryptJwtClaims(jwtData, key string, unmarshaler func([]byte) (LifeClaims, error)) (LifeClaims, error) {
 	bytes, err := pn.DecryptJwt(jwtData, key)
 	if err != nil {
 		return LifeClaims{}, err
