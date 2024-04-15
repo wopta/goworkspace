@@ -67,10 +67,9 @@ func createTransaction(policy models.Policy, uidGenerator func() string) models.
 func setDateInfo(index int, transaction models.Transaction, policy models.Policy) models.Transaction {
 	now := time.Now().UTC()
 
-	startDate := policy.StartDate
-	transaction.EffectiveDate = startDate.AddDate(0, index, 0)
+	transaction.EffectiveDate = policy.StartDate.AddDate(0, index, 0)
 	transaction.ScheduleDate = transaction.EffectiveDate.Format(time.DateOnly)
-	transaction.ExpirationDate = startDate.AddDate(10, index, 0).Format(time.DateOnly)
+	transaction.ExpirationDate = transaction.EffectiveDate.AddDate(10, 0, 0).Format(time.DateOnly)
 	transaction.CreationDate = now
 	transaction.UpdateDate = now
 

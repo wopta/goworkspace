@@ -52,10 +52,10 @@ func buildPolicyInfoQuery(queries []models.Query, limit int) (string, map[string
 	query.WriteString(fmt.Sprintf("SELECT p.uid, p.name AS productName, p.codeCompany, CAST(p.proposalNumber AS INT64) AS proposalNumber, " +
 		"p.nameDesc,p.status, RTRIM(COALESCE(JSON_VALUE(p.data, '$.contractor.name'), '') || ' ' || " +
 		"COALESCE(JSON_VALUE(p.data, '$.contractor.surname'), '')) AS contractor, " +
-		"p.priceGross AS price, p.priceGrossMonthly AS priceMonthly, nn.name AS producer, p.producerCode, p.startDate, " +
+		"p.priceGross AS price, p.priceGrossMonthly AS priceMonthly, COALESCE(nn.name, '') AS producer, p.producerCode, p.startDate, " +
 		"p.endDate, p.paymentSplit " +
 		"FROM `wopta.policiesView` p " +
-		"INNER JOIN `wopta.networkNodesView` nn ON nn.uid = p.producerUid " +
+		"LEFT JOIN `wopta.networkNodesView` nn ON nn.uid = p.producerUid " +
 		"WHERE"))
 
 	for index, q := range queries {

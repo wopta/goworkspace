@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func Controller(policy models.Policy, product models.Product, transactions []models.Transaction) (string, []models.Transaction, error) {
+func Controller(policy models.Policy, product models.Product, transactions []models.Transaction, scheduleFirstRate bool) (string, []models.Transaction, error) {
 	var (
 		err                error
 		payUrl             string
@@ -34,7 +34,7 @@ func Controller(policy models.Policy, product models.Product, transactions []mod
 
 	switch policy.Payment {
 	case models.FabrickPaymentProvider:
-		payUrl, updatedTransaction, err = fabrickIntegration(transactions, paymentMethods, policy)
+		payUrl, updatedTransaction, err = fabrickIntegration(transactions, paymentMethods, policy, scheduleFirstRate)
 	case models.ManualPaymentProvider:
 		payUrl, updatedTransaction, err = remittanceIntegration(transactions)
 	default:
@@ -44,7 +44,7 @@ func Controller(policy models.Policy, product models.Product, transactions []mod
 	return payUrl, updatedTransaction, nil
 }
 
-func fabrickIntegration(transactions []models.Transaction, paymentMethods []string, policy models.Policy) (payUrl string, updatedTransactions []models.Transaction, err error) {
+func fabrickIntegration(transactions []models.Transaction, paymentMethods []string, policy models.Policy, scheduleFirstRate bool) (payUrl string, updatedTransactions []models.Transaction, err error) {
 	customerId := uuid.New().String()
 	now := time.Now().UTC()
 
@@ -54,7 +54,20 @@ func fabrickIntegration(transactions []models.Transaction, paymentMethods []stri
 
 		tr.ProviderName = models.FabrickPaymentProvider
 
-		res := <-createFabrickTransaction(&policy, tr, isFirstRate, createMandate, customerId, paymentMethods)
+		scheduleDate, err := time.Parse(time.DateOnly, tr.ScheduleDate)
+		if err != nil {
+			log.Printf("error parsing scheduleDate: %s", err.Error())
+			return "", nil, err
+		}
+		if scheduleFirstRate && scheduleDate.Before(now) {
+			/*
+				sets schedule date to today + 1 in order to avoid corner case in which fabrick is not able to
+				execute transaction when recreated at the end of the day
+			*/
+			tr.ScheduleDate = now.AddDate(0, 0, 1).Format(time.DateOnly)
+		}
+
+		res := <-createFabrickTransaction(&policy, tr, createMandate, scheduleFirstRate, customerId, paymentMethods)
 		if res.Payload == nil || res.Payload.PaymentPageURL == nil {
 			return "", nil, errors.New("error creating transaction on Fabrick")
 		}
@@ -84,6 +97,8 @@ func remittanceIntegration(transactions []models.Transaction) (payUrl string, up
 			tr.PayDate = now
 			tr.TransactionDate = now
 		}
+		tr.ProviderId = ""
+		tr.UserToken = ""
 		tr.PaymentMethod = models.PayMethodRemittance
 		tr.UpdateDate = now
 		updatedTransaction = append(updatedTransaction, tr)

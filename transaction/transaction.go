@@ -23,6 +23,12 @@ var transactionRoutes []lib.Route = []lib.Route{
 			models.UserRoleAgent,
 		},
 	},
+	{
+		Route:   "/restore/v1/{transactionUid}",
+		Handler: lib.ResponseLoggerWrapper(RestoreTransactionFx),
+		Method:  http.MethodPost,
+		Roles:   []string{models.UserRoleAdmin},
+	},
 }
 
 func init() {

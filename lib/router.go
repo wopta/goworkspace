@@ -180,15 +180,16 @@ func corsMiddleware(next http.Handler) http.Handler {
 		}
 
 		if r.Method == http.MethodOptions {
-			options.AllowedMethods = []string{"*"}
+			options.AllowedMethods = []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete}
 			options.AllowCredentials = true
 			options.MaxAge = 3600
-			w.WriteHeader(http.StatusNoContent)
 		} else {
 			options.AllowCredentials = false
 		}
 
-		cors.Handler(options)(next).ServeHTTP(w, r)
+		c := cors.New(options)
+		handler := c.Handler(next)
+		handler.ServeHTTP(w, r)
 	})
 }
 
