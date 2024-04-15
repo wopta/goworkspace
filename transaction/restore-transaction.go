@@ -35,7 +35,11 @@ func RestoreTransactionFx(w http.ResponseWriter, r *http.Request) (string, inter
 		return "", nil, err
 	}
 
-	ReinitializePaymentInfo(transaction, policy.Payment)
+	err = ReinitializePaymentInfo(transaction, policy.Payment)
+	if err != nil {
+		log.Printf("error reinitializing payment info: %s", err)
+		return "", nil, err
+	}
 
 	err = lib.SetFirestoreErr(models.TransactionsCollection, transaction.Uid, transaction)
 	if err != nil {

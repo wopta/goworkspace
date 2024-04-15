@@ -1,15 +1,16 @@
 package transaction
 
 import (
+	"errors"
 	"github.com/wopta/goworkspace/models"
 	"time"
 )
 
 const transactionStatusReinitialized string = "Reinitialized"
 
-func ReinitializePaymentInfo(tr *models.Transaction, providerName string) {
+func ReinitializePaymentInfo(tr *models.Transaction, providerName string) error {
 	if tr.IsPay && !tr.IsDelete {
-		return
+		return errors.New("cannot reinitialize paid transaction")
 	}
 	tr.ProviderName = providerName
 	tr.IsPay = false
@@ -25,6 +26,7 @@ func ReinitializePaymentInfo(tr *models.Transaction, providerName string) {
 	tr.Status = models.TransactionStatusToPay
 	tr.StatusHistory = append(tr.StatusHistory, transactionStatusReinitialized, models.TransactionStatusToPay)
 	tr.UpdateDate = time.Now().UTC()
+	return nil
 }
 
 func getMonthlyAmountsFlat(policy *models.Policy) (grossAmounts []float64, nettAmounts []float64) {
