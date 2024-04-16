@@ -14,14 +14,14 @@ import (
 	"github.com/wopta/goworkspace/product"
 )
 
-type Response struct {
+type GetPartnershipNodeAndProductsResp struct {
 	Partnership PartnershipNode      `json:"partnership"`
 	Products    []models.ProductInfo `json:"products"`
 }
 
 func GetPartnershipNodeAndProductsFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	var (
-		response Response
+		response GetPartnershipNodeAndProductsResp
 		node     *models.NetworkNode
 		err      error
 	)
@@ -31,12 +31,12 @@ func GetPartnershipNodeAndProductsFx(w http.ResponseWriter, r *http.Request) (st
 
 	log.Println("Handler start -----------------------------------------------")
 
-	affinity := chi.URLParam(r, "partnershipUid")
+	partnershipUid := chi.URLParam(r, "partnershipUid")
 	jwtData := r.URL.Query().Get("jwt")
-	key := lib.ToUpper(fmt.Sprintf("%s_SIGNING_KEY", affinity))
+	key := lib.ToUpper(fmt.Sprintf("%s_SIGNING_KEY", partnershipUid))
 
-	if node, err = network.GetNodeByUid(affinity); err != nil {
-		log.Printf("error getting node '%s': %s", affinity, err.Error())
+	if node, err = network.GetNodeByUid(partnershipUid); err != nil {
+		log.Printf("error getting node '%s': %s", partnershipUid, err.Error())
 		return "", nil, err
 	}
 

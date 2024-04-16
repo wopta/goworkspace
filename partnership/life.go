@@ -29,7 +29,7 @@ func LifePartnershipFx(w http.ResponseWriter, r *http.Request) (string, any, err
 		err             error
 	)
 
-	log.SetPrefix("[LifePartnershipV2Fx] ")
+	log.SetPrefix("[LifePartnershipFx] ")
 	defer log.SetPrefix("")
 
 	log.Println("Handler start -----------------------------------------------")
@@ -63,7 +63,8 @@ func LifePartnershipFx(w http.ResponseWriter, r *http.Request) (string, any, err
 	}
 	policy = setPolicyPartnershipInfo(policy, productLife, partnershipNode)
 
-	if claims, err = partnershipNode.Partnership.DecryptJwtClaims(jwtData, os.Getenv(key), LifeClaimsExtractor(partnershipUid)); err != nil {
+	if claims, err = partnershipNode.Partnership.DecryptJwtClaims(
+		jwtData, os.Getenv(key), lifeClaimsExtractor(partnershipNode.Partnership)); err != nil {
 		log.Printf("could not validate partnership JWT - %s", err.Error())
 		return "", nil, err
 	}
@@ -115,91 +116,65 @@ func setPolicyPartnershipInfo(policy models.Policy, product *models.Product, nod
 	return policy
 }
 
-func LifeClaimsExtractor(partnershipUid string) func([]byte) (models.LifeClaims, error) {
-	switch partnershipUid {
+func lifeClaimsExtractor(node *models.PartnershipNode) func([]byte) (models.LifeClaims, error) {
+	switch node.Name {
 	case models.PartnershipBeProf:
-		return BeprofLifeClaimsExtractor
+		return beprofLifeClaimsExtractor
 	case models.PartnershipFacile:
-		return FacileLifeClaimsExtractor
-	default:
-		return func(b []byte) (models.LifeClaims, error) {
-			return models.LifeClaims{}, nil
-		}
+		return facileLifeClaimsExtractor
+	}
+
+	if node.IsJwtProtected() {
+		return defaultLifeClaimsExtractor
+	}
+
+	return func(b []byte) (models.LifeClaims, error) {
+		return models.LifeClaims{}, nil
 	}
 }
 
-func FacileLifeClaimsExtractor(b []byte) (models.LifeClaims, error) {
-	fCl := &FacileClaims{}
-	json.Unmarshal(b, fCl)
+func defaultLifeClaimsExtractor(b []byte) (models.LifeClaims, error) {
+	claims := &models.LifeClaims{}
+	err := json.Unmarshal(b, claims)
+	if err != nil {
+		return models.LifeClaims{}, err
+	}
+
+	data := make(map[string]interface{})
+	dataBytes, _ := json.Marshal(b)
+	err = json.Unmarshal(dataBytes, &data)
+	if err != nil {
+		return models.LifeClaims{}, err
+	}
+
+	claims.Data = data
+	return *claims, nil
+}
+
+func facileLifeClaimsExtractor(b []byte) (models.LifeClaims, error) {
+	facileClaims := &FacileClaims{}
+	err := json.Unmarshal(b, facileClaims)
+	if err != nil {
+		return models.LifeClaims{}, err
+	}
+
 	adapter := FacileLifeClaimsAdapter{
-		facileClaims: fCl,
+		facileClaims: facileClaims,
 	}
-	c := adapter.ExtractClaims()
-
-	return c, nil
+	return adapter.ExtractClaims()
 }
 
-type FacileLifeClaimsAdapter struct {
-	facileClaims *FacileClaims
-}
-
-func (a *FacileLifeClaimsAdapter) ExtractClaims() models.LifeClaims {
-	data := make(map[string]interface{})
-	b, _ := json.Marshal(a.facileClaims)
-	json.Unmarshal(b, &data)
-
-	birthDate, _ := time.Parse(models.TimeDateOnly, a.facileClaims.CustomerBirthDate)
-
-	return models.LifeClaims{
-		Name:      a.facileClaims.CustomerName,
-		Surname:   a.facileClaims.CustomerFamilyName,
-		Email:     a.facileClaims.Email,
-		BirthDate: birthDate.Format(time.RFC3339),
-		Phone:     fmt.Sprintf("+39%s", a.facileClaims.Mobile),
-		Gender:    a.facileClaims.Gender,
-		Guarantees: map[string]struct {
-			Duration                   int
-			SumInsuredLimitOfIndemnity float64
-		}{
-			"death": {a.facileClaims.Duration, float64(a.facileClaims.InsuredCapital)},
-		},
-		Data: data,
+func beprofLifeClaimsExtractor(b []byte) (models.LifeClaims, error) {
+	beprofClaims := &BeprofClaims{}
+	err := json.Unmarshal(b, beprofClaims)
+	if err != nil {
+		return models.LifeClaims{}, err
 	}
-}
 
-func BeprofLifeClaimsExtractor(b []byte) (models.LifeClaims, error) {
-	bCl := &BeprofClaims{}
-	json.Unmarshal(b, bCl)
 	adapter := BeprofLifeClaimsAdapter{
-		beprofClaims: bCl,
+		beprofClaims: beprofClaims,
 	}
-	c := adapter.ExtractClaims()
-
-	return c, nil
-}
-
-type BeprofLifeClaimsAdapter struct {
-	beprofClaims *BeprofClaims
-}
-
-func (a *BeprofLifeClaimsAdapter) ExtractClaims() models.LifeClaims {
-	data := make(map[string]interface{})
-	b, _ := json.Marshal(a.beprofClaims)
-	json.Unmarshal(b, &data)
-
-	return models.LifeClaims{
-		Name:       a.beprofClaims.UserFirstname,
-		Surname:    a.beprofClaims.UserLastname,
-		Email:      a.beprofClaims.UserEmail,
-		FiscalCode: a.beprofClaims.UserFiscalcode,
-		Address:    a.beprofClaims.UserAddress,
-		Postalcode: a.beprofClaims.UserPostalcode,
-		City:       a.beprofClaims.UserCity,
-		CityCode:   a.beprofClaims.UserMunicipalityCode,
-		Work:       a.beprofClaims.UserEmploymentSector,
-		VatCode:    a.beprofClaims.UserPiva,
-		Data:       data,
-	}
+	return adapter.ExtractClaims()
 }
 
 func setClaimsIntoPolicy(policy models.Policy, product *models.Product, claims models.LifeClaims) (models.Policy, error) {
@@ -208,7 +183,6 @@ func setClaimsIntoPolicy(policy models.Policy, product *models.Product, claims m
 		asset  models.Asset
 	)
 
-	log.Println("[beProfLifePartnership] setting person info")
 	person.Name = claims.Name
 	person.Surname = claims.Surname
 	person.BirthDate = claims.BirthDate
