@@ -8,7 +8,7 @@ import (
 	"github.com/wopta/goworkspace/lib"
 )
 
-var mgaRoutes []lib.ChiRoute = []lib.ChiRoute{
+var mgaRoutes []lib.Route = []lib.Route{
 	{
 		Route:   "/products/v1",
 		Handler: lib.ResponseLoggerWrapper(GetProductsListByChannelFx),
@@ -91,6 +91,6 @@ func init() {
 func Mga(w http.ResponseWriter, r *http.Request) {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
-	router := lib.GetChiRouter("mga", mgaRoutes)
+	router := lib.GetRouter("mga", mgaRoutes)
 	router.ServeHTTP(w, r)
 }

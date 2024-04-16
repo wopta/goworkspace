@@ -9,7 +9,7 @@ import (
 	//"google.golang.org/api/firebaseappcheck/v1"
 )
 
-var productRoutes []lib.ChiRoute = []lib.ChiRoute{
+var productRoutes []lib.Route = []lib.Route{
 	{
 		Route:   "/v1/{name}",
 		Handler: lib.ResponseLoggerWrapper(GetNameFx),
@@ -38,6 +38,6 @@ func init() {
 func Product(w http.ResponseWriter, r *http.Request) {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
-	router := lib.GetChiRouter("product", productRoutes)
+	router := lib.GetRouter("product", productRoutes)
 	router.ServeHTTP(w, r)
 }

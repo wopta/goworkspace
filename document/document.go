@@ -10,7 +10,7 @@ import (
 	"github.com/wopta/goworkspace/lib"
 )
 
-var documentRoutes []lib.ChiRoute = []lib.ChiRoute{
+var documentRoutes []lib.Route = []lib.Route{
 	{
 		Route:   "/v1/proposal",
 		Handler: lib.ResponseLoggerWrapper(ContractFx),
@@ -56,7 +56,7 @@ func init() {
 
 func Document(w http.ResponseWriter, r *http.Request) {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
-	router := lib.GetChiRouter("document", documentRoutes)
+	router := lib.GetRouter("document", documentRoutes)
 	router.ServeHTTP(w, r)
 }
 
