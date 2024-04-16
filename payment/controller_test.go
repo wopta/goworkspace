@@ -101,7 +101,7 @@ func TestControllerInvalidNumTransactions(t *testing.T) {
 	product := getProduct()
 	transactions := getTransactions(0, models.FabrickPaymentProvider)
 
-	_, updatedTransactions, err := Controller(policy, product, transactions)
+	_, updatedTransactions, err := Controller(policy, product, transactions, false)
 	if err == nil {
 		t.Fatalf("expected: %02d transactions got: %02d", 0, len(updatedTransactions))
 	}
@@ -114,7 +114,7 @@ func TestControllerInvalidPaymentConfiguration(t *testing.T) {
 	product := getProduct()
 	transactions := getTransactions(1, models.FabrickPaymentProvider)
 
-	_, _, err := Controller(policy, product, transactions)
+	_, _, err := Controller(policy, product, transactions, false)
 	if err == nil {
 		t.Fatalf("expected: non-nil error")
 	}
@@ -127,7 +127,7 @@ func TestControllerFabrickYearlySingle(t *testing.T) {
 	product := getProduct()
 	transactions := getTransactions(1, models.FabrickPaymentProvider)
 
-	payUrl, updatedTransactions, err := Controller(policy, product, transactions)
+	payUrl, updatedTransactions, err := Controller(policy, product, transactions, false)
 	if err != nil {
 		t.Fatalf("expected: nil error got: %s", err.Error())
 	}
@@ -170,7 +170,7 @@ func TestControllerFabrickYearlyRecurrent(t *testing.T) {
 	product := getProduct()
 	transactions := getTransactions(1, models.FabrickPaymentProvider)
 
-	payUrl, updatedTransactions, err := Controller(policy, product, transactions)
+	payUrl, updatedTransactions, err := Controller(policy, product, transactions, false)
 	if err != nil {
 		t.Fatalf("expected: nil error got: %s", err.Error())
 	}
@@ -213,7 +213,7 @@ func TestControllerFabrickMonthly(t *testing.T) {
 	product := getProduct()
 	transactions := getTransactions(12, models.FabrickPaymentProvider)
 
-	payUrl, updatedTransactions, err := Controller(policy, product, transactions)
+	payUrl, updatedTransactions, err := Controller(policy, product, transactions, false)
 	if err != nil {
 		t.Fatalf("expected: nil error got: %s", err.Error())
 	}
@@ -256,7 +256,7 @@ func TestControllerRemittance(t *testing.T) {
 	product := getProduct()
 	transactions := getTransactions(1, models.FabrickPaymentProvider)
 
-	payUrl, updatedTransactions, err := Controller(policy, product, transactions)
+	payUrl, updatedTransactions, err := Controller(policy, product, transactions, false)
 	if err != nil {
 		t.Fatalf("expected: nil error got: %s", err.Error())
 	}

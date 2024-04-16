@@ -99,7 +99,7 @@ func GetAllRoles() []string {
 }
 
 const (
-	TimeDateOnly string = "2006-01-02"
+	TimeDateOnly string = "2006-01-02" //  DEPRECATED use time.DateOnly
 )
 
 const (

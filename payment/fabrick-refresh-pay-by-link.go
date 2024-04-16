@@ -14,16 +14,18 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"time"
 )
 
 type FabrickRefreshPayByLinkRequest struct {
-	PolicyUid string `json:"policyUid"`
+	PolicyUid         string `json:"policyUid"`
+	ScheduleFirstRate bool   `json:"scheduleFirstRate"`
 }
 
 func FabrickRefreshPayByLinkFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		request FabrickRefreshPayByLinkRequest
 		err     error
+		request FabrickRefreshPayByLinkRequest
 	)
 
 	log.SetPrefix("[FabrickRefreshPayByLinkFx] ")
@@ -44,24 +46,21 @@ func FabrickRefreshPayByLinkFx(w http.ResponseWriter, r *http.Request) (string, 
 
 	policy.SanitizePaymentData()
 
-	// TODO: check if it holds also for renewed policy
-	if policy.PaymentMode == models.PaymentModeRecurrent && policy.PaymentSplit != string(models.PaySplitMonthly) {
-		log.Printf("payment mode %s not supported", policy.PaymentMode)
-		return "", nil, fmt.Errorf("payment mode not supported")
-	}
-
 	transactions, err := getTransactionsList(policy.Uid)
 	if err != nil {
 		return "", nil, err
 	}
-	transactions = lib.SliceMap(transactions, func(tr models.Transaction) models.Transaction {
-		transaction.ReinitializePaymentInfo(&tr)
-		return tr
-	})
+
+	for index, _ := range transactions {
+		transaction.ReinitializePaymentInfo(&transactions[index], policy.Payment)
+		if !request.ScheduleFirstRate && index == 0 {
+			transactions[index].ScheduleDate = time.Now().UTC().Format(time.DateOnly)
+		}
+	}
 
 	product := prd.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, nil, nil)
 
-	payUrl, updatedTransactions, err := Controller(policy, *product, transactions)
+	payUrl, updatedTransactions, err := Controller(policy, *product, transactions, request.ScheduleFirstRate)
 	if err != nil {
 		log.Printf("error scheduling transactions on fabrick: %s", err.Error())
 		return "", nil, err
