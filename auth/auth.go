@@ -8,7 +8,7 @@ import (
 	"github.com/wopta/goworkspace/lib"
 )
 
-var authRoutes []lib.ChiRoute = []lib.ChiRoute{
+var authRoutes []lib.Route = []lib.Route{
 	{
 		Route:   "/authorize/v1",
 		Handler: lib.ResponseLoggerWrapper(AuthorizeFx),
@@ -45,6 +45,6 @@ func init() {
 func Auth(w http.ResponseWriter, r *http.Request) {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
-	router := lib.GetChiRouter("auth", authRoutes)
+	router := lib.GetRouter("auth", authRoutes)
 	router.ServeHTTP(w, r)
 }

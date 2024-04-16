@@ -9,7 +9,7 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
-var partnershipRoutes []lib.ChiRoute = []lib.ChiRoute{
+var partnershipRoutes []lib.Route = []lib.Route{
 	{
 		Route:   "/v1/life/{partnershipUid}",
 		Handler: lib.ResponseLoggerWrapper(LifePartnershipFx),
@@ -26,7 +26,7 @@ func init() {
 func Partnership(w http.ResponseWriter, r *http.Request) {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
-	router := lib.GetChiRouter("partnership", partnershipRoutes)
+	router := lib.GetRouter("partnership", partnershipRoutes)
 	router.ServeHTTP(w, r)
 }
 

@@ -8,7 +8,7 @@ import (
 	"github.com/wopta/goworkspace/lib"
 )
 
-var accountingRoutes []lib.ChiRoute = []lib.ChiRoute{
+var accountingRoutes []lib.Route = []lib.Route{
 	{
 		Route:   "/network/transactions/v1/transaction/{transactionUid}",
 		Handler: lib.ResponseLoggerWrapper(GetNetworkTransactionsFx),
@@ -37,6 +37,6 @@ func init() {
 func Accounting(w http.ResponseWriter, r *http.Request) {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
-	router := lib.GetChiRouter("accounting", accountingRoutes)
+	router := lib.GetRouter("accounting", accountingRoutes)
 	router.ServeHTTP(w, r)
 }

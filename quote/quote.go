@@ -8,7 +8,7 @@ import (
 	"github.com/wopta/goworkspace/lib"
 )
 
-var quoteRoutes []lib.ChiRoute = []lib.ChiRoute{
+var quoteRoutes []lib.Route = []lib.Route{
 	{
 		Route:   "/pmi/munichre",
 		Handler: lib.ResponseLoggerWrapper(PmiMunichFx),
@@ -55,6 +55,6 @@ func init() {
 func Quote(w http.ResponseWriter, r *http.Request) {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
-	router := lib.GetChiRouter("quote", quoteRoutes)
+	router := lib.GetRouter("quote", quoteRoutes)
 	router.ServeHTTP(w, r)
 }

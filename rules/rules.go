@@ -8,7 +8,7 @@ import (
 	"github.com/wopta/goworkspace/lib"
 )
 
-var rulesRoutes []lib.ChiRoute = []lib.ChiRoute{
+var rulesRoutes []lib.Route = []lib.Route{
 	{
 		Route:   "/risk/pmi",
 		Handler: lib.ResponseLoggerWrapper(PmiAllriskHandler),
@@ -25,6 +25,6 @@ func init() {
 func Rules(w http.ResponseWriter, r *http.Request) {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
-	router := lib.GetChiRouter("rules", rulesRoutes)
+	router := lib.GetRouter("rules", rulesRoutes)
 	router.ServeHTTP(w, r)
 }

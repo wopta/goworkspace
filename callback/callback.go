@@ -8,7 +8,7 @@ import (
 	"github.com/wopta/goworkspace/lib"
 )
 
-var callbackRoutes []lib.ChiRoute = []lib.ChiRoute{
+var callbackRoutes []lib.Route = []lib.Route{
 	{
 		Route:   "/v1/sign",
 		Handler: lib.ResponseLoggerWrapper(SignFx),
@@ -37,6 +37,6 @@ func init() {
 func Callback(w http.ResponseWriter, r *http.Request) {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
-	router := lib.GetChiRouter("callback", callbackRoutes)
+	router := lib.GetRouter("callback", callbackRoutes)
 	router.ServeHTTP(w, r)
 }
