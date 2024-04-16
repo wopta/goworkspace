@@ -77,6 +77,7 @@ func fabrickIntegration(transactions []models.Transaction, paymentMethods []stri
 		log.Printf("transaction %02d payUrl: %s", index+1, *res.Payload.PaymentPageURL)
 
 		tr.ProviderId = *res.Payload.PaymentID
+		tr.PayUrl = *res.Payload.PaymentPageURL
 		tr.UserToken = customerId
 		tr.UpdateDate = now
 		updatedTransactions = append(updatedTransactions, tr)
