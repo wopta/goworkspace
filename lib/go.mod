@@ -12,7 +12,7 @@ require (
 	firebase.google.com/go v3.13.0+incompatible
 	firebase.google.com/go/v4 v4.10.0
 	github.com/dustin/go-humanize v1.0.1
-	github.com/go-chi/chi v1.5.5
+	github.com/go-chi/chi/v5 v5.0.12
 	github.com/go-chi/cors v1.2.1
 	github.com/go-gota/gota v0.12.0
 	github.com/go-jose/go-jose/v4 v4.0.1

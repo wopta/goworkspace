@@ -14,8 +14,8 @@ import (
 
 	"cloud.google.com/go/civil"
 	firebase "firebase.google.com/go/v4"
-	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 )
 

@@ -5,7 +5,7 @@ go 1.21
 replace github.com/wopta/goworkspace/bpmn => ./
 
 require (
-	github.com/maja42/goval v1.3.1
+	github.com/maja42/goval v1.4.0
 	github.com/wopta/goworkspace/models v1.1.38
 )
 

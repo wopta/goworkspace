@@ -3,7 +3,7 @@ package payment
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
 	"log"
 	"net/http"
 

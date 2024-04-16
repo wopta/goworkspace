@@ -8,7 +8,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
 	jwt "github.com/golang-jwt/jwt/v5"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/network"
