@@ -116,3 +116,49 @@ func (a *FacileLifeClaimsAdapter) ExtractClaims() (models.LifeClaims, error) {
 		Data: data,
 	}, nil
 }
+
+type ELeadsClaims struct {
+	Name                       string `json:"name"`
+	Surname                    string `json:"surname"`
+	Email                      string `json:"email"`
+	Phone                      string `json:"phone"`
+	FiscalCode                 string `json:"fiscalCode"`
+	BirthDate                  string `json:"birthDate"`
+	SumInsuredLimitOfIndemnity int    `json:"sumInsuredLimitOfIndemnity"`
+	Duration                   int    `json:"duration"`
+	jwt.RegisteredClaims
+}
+
+type ELeadsLifeClaimsAdapter struct {
+	eLeadsClaims *ELeadsClaims
+}
+
+func (a *ELeadsLifeClaimsAdapter) ExtractClaims() (models.LifeClaims, error) {
+	data := make(map[string]interface{})
+	b, err := json.Marshal(a.eLeadsClaims)
+	if err != nil {
+		return models.LifeClaims{}, err
+	}
+	err = json.Unmarshal(b, &data)
+	if err != nil {
+		return models.LifeClaims{}, err
+	}
+
+	birthDate, _ := time.Parse(models.TimeDateOnly, a.eLeadsClaims.BirthDate)
+
+	return models.LifeClaims{
+		Name:       a.eLeadsClaims.Name,
+		Surname:    a.eLeadsClaims.Surname,
+		Email:      a.eLeadsClaims.Email,
+		BirthDate:  birthDate.Format(time.RFC3339),
+		Phone:      fmt.Sprintf("+39%s", a.eLeadsClaims.Phone),
+		FiscalCode: a.eLeadsClaims.FiscalCode,
+		Guarantees: map[string]models.ClaimsGuarantee{
+			"death": {
+				Duration:                   a.eLeadsClaims.Duration,
+				SumInsuredLimitOfIndemnity: float64(a.eLeadsClaims.SumInsuredLimitOfIndemnity),
+			},
+		},
+		Data: data,
+	}, nil
+}
