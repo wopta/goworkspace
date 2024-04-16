@@ -122,6 +122,8 @@ func lifeClaimsExtractor(node *models.PartnershipNode) func([]byte) (models.Life
 		return beprofLifeClaimsExtractor
 	case models.PartnershipFacile:
 		return facileLifeClaimsExtractor
+	case models.PartnershipELeads:
+		return eLeadsLifeClaimsExtractor
 	}
 
 	if node.IsJwtProtected() {
@@ -173,6 +175,19 @@ func beprofLifeClaimsExtractor(b []byte) (models.LifeClaims, error) {
 
 	adapter := BeprofLifeClaimsAdapter{
 		beprofClaims: beprofClaims,
+	}
+	return adapter.ExtractClaims()
+}
+
+func eLeadsLifeClaimsExtractor(b []byte) (models.LifeClaims, error) {
+	eLeadsClaims := &ELeadsClaims{}
+	err := json.Unmarshal(b, eLeadsClaims)
+	if err != nil {
+		return models.LifeClaims{}, err
+	}
+
+	adapter := ELeadsLifeClaimsAdapter{
+		eLeadsClaims: eLeadsClaims,
 	}
 	return adapter.ExtractClaims()
 }
