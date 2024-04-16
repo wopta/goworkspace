@@ -33,6 +33,11 @@ func CreatePartnerhipNodes() {
 	// if err != nil {
 	// 	log.Println(err.Error())
 	// }
+
+	// err = createELeadsNode()
+	// if err != nil {
+	// 	log.Println(err.Error())
+	// }
 }
 
 func createBeprofNode() error {
@@ -269,5 +274,93 @@ func createMultiTestNode() error {
 	}
 
 	_, err = network.CreateNode(partnershipModel)
+	return err
+}
+
+func createELeadsNode() error {
+	partnershipModel := models.NetworkNode{
+		Uid:      "eleads",
+		Code:     "eleads",
+		Type:     "partnership",
+		IsActive: true,
+		Partnership: &models.PartnershipNode{
+			Name: "eleads",
+			Skin: &models.Skin{
+				PrimaryColor:   "",
+				SecondaryColor: "",
+				LogoUrl:        "https://upload.wikimedia.org/wikipedia/commons/7/78/Logo_facile_%28azienda%29.png",
+			},
+			JwtConfig: lib.JwtConfig{
+				KeyAlgorithm:      jose.DIRECT,
+				ContentEncryption: jose.A128CBC_HS256,
+			},
+		},
+		Products: []models.Product{{
+			Name:         "life",
+			NameDesc:     &nameDesc,
+			Version:      "v2",
+			NameTitle:    "Wopta per te",
+			NameSubtitle: "Vita",
+			Companies: []models.Company{{
+				Name: "axa",
+			}},
+			Steps: []models.Step{{
+				Children: []models.Child{
+					{
+						Attributes: map[string]interface{}{
+							"consens": "Il sottoscritto, letta e compresa l'informativa sul trattamento dei dati personali, ACCONSENTE al trattamento dei propri dati personali da parte di Wopta Assicurazioni per l'invio di comunicazioni e proposte commerciali e di marketing, incluso l'invio di newsletter e ricerche di mercato, attraverso strumenti automatizzati (sms, mms, e-mail, ecc.) e non (posta cartacea e telefono con operatore).",
+							"key":     2,
+							"title":   "Privacy",
+						},
+						Widget: "privacyConsent",
+					}},
+				Widget: "guaranteeconfigurationstep",
+			}, {
+				Attributes: map[string]interface{}{
+					"companyPrivacy":      "PRESTO IL CONSENSO al trattamento dei miei dati personali ad AXA France VIE S.A. – Rappresentanza Generale per l’Italia, ivi inclusi quelli eventualmente da me conferiti in riferimento al mio stato di salute, per le finalità indicate nell’informativa, consultabile all’interno dei documenti precontrattuali (ricevuti via mail o consultabili al link nella pagina che precede), nonché alla loro comunicazione, per successivo trattamento, da parte dei soggetti indicati nella informativa predetta.",
+					"companyPrivacyTitle": "Privacy Assicurativa",
+					"statementsEndpoint":  "question/v1/surveys",
+				},
+				Widget: "quotersurvey",
+			}, {
+				Attributes: map[string]interface{}{
+					"statementsEndpoint": "question/v1/statements",
+				},
+				Widget: "quoterstatements",
+			}, {
+				Attributes: map[string]interface{}{
+					"beneficiaryText":              "Per procedere indicare chi sono i beneficiari della polizza in caso di decesso dell'assicurato.\\nPuoi indicare genericamente i tuoi eredi legittimi e/o testamentari. Oppure inserire in maniera puntuale i nomi dei Beneficiari (Massimo due).",
+					"guaranteeSlug":                "death",
+					"maximumNumberOfBeneficiaries": 2,
+					"thirdPartyReferenceText":      "In caso di specifiche esigenze di riservatezza, potrai indicare il nominativo ed i dati di recapito (inluso email e/o telefono) di un soggetto terno (diverso dal Beneficiario) a cui l'impresa di Assicurazione potrà rivolgersi in caso di decesso dell'Assicurato al fine di contattare il Beneficiario.",
+				},
+				Widget: "quoterbeneficiary",
+			}, {
+				Widget: "quotercontractordata",
+			}, {
+				Attributes: map[string]interface{}{
+					"guaranteeSlug": "death",
+				},
+				Widget: "quoteruploaddocuments",
+			}, {
+				Attributes: map[string]interface{}{
+					"showDuration":   false,
+					"showEndDate":    true,
+					"showGuarantees": true,
+				},
+				Widget: "quoterrecap",
+			}, {
+				Widget: "quotersignpay",
+			}, {
+				Attributes: map[string]interface{}{
+					"productLogo": "assets/images/wopta-logo-vita-magenta.png",
+				},
+				Widget: "quoterthankyou",
+			}},
+		}},
+	}
+
+	_, err := network.CreateNode(partnershipModel)
+
 	return err
 }
