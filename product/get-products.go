@@ -11,8 +11,8 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
-func GetProductsByChannel(channel string) []models.ProductInfo {
-	log.Println("[GetProductsByChannel] function start -----------------------")
+func GetAllProductsByChannel(channel string) []models.ProductInfo {
+	log.Println("[GetAllProductsByChannel] function start -----------------------")
 
 	var products = make([]models.ProductInfo, 0)
 
@@ -26,13 +26,13 @@ func GetProductsByChannel(channel string) []models.ProductInfo {
 
 	products = getProductsFromFileList(fileList)
 
-	log.Printf("[GetProductsByChannel] found %d products", len(products))
-	log.Println("[GetProductsByChannel] function end -------------------------")
+	log.Printf("[GetAllProductsByChannel] found %d products", len(products))
+	log.Println("[GetAllProductsByChannel] function end -------------------------")
 
 	return products
 }
 
-func GetNetworkNodeProducts(productList []string) []models.ProductInfo {
+func GetProductsByChannel(productList []string, channel string) []models.ProductInfo {
 	log.Println("[GetNetworkNodeProducts] function start ---------------------")
 
 	var products = make([]models.ProductInfo, 0)
@@ -42,7 +42,7 @@ func GetNetworkNodeProducts(productList []string) []models.ProductInfo {
 	// filter only the files for the network channel present on the product list
 	fileList = lib.SliceFilter(fileList, func(file string) bool {
 		filenameParts := strings.SplitN(file, "/", 4)
-		return strings.HasPrefix(filenameParts[3], models.NetworkChannel) &&
+		return strings.HasPrefix(filenameParts[3], channel) &&
 			lib.SliceContains[string](productList, filenameParts[1])
 	})
 
