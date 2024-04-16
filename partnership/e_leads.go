@@ -23,7 +23,7 @@ func eLeadsLifePartnership(jwtData string, policy *models.Policy, product *model
 
 	log.Println("[eLeadsLifePartnership] decoding jwt")
 
-	err := lib.DecryptJwt(jwtData, os.Getenv("E_LEADS_SIGNING_KEY"), &claims)
+	err := lib.DecryptJwt(jwtData, os.Getenv("ELEADS_SIGNING_KEY"), &claims)
 	if err != nil {
 		log.Printf("[eLeadsLifePartnership] could not validate eLeads partnership JWT - %s", err.Error())
 		return err
@@ -35,13 +35,13 @@ func eLeadsLifePartnership(jwtData string, policy *models.Policy, product *model
 	}
 
 	log.Println("[eLeadsLifePartnership] setting person info")
-	person.Name = claims.ContractorName
-	person.Surname = claims.ContractorSurname
-	person.Mail = claims.ContractorEmail
-	birthDate, _ := time.Parse(models.TimeDateOnly, claims.ContractorBirthDate)
+	person.Name = claims.Name
+	person.Surname = claims.Surname
+	person.Mail = claims.Email
+	birthDate, _ := time.Parse(models.TimeDateOnly, claims.BirthDate)
 	person.BirthDate = birthDate.Format(time.RFC3339)
-	person.Phone = fmt.Sprintf("+39%s", claims.ContractorPhone)
-	person.FiscalCode = claims.ContractorFiscalCode
+	person.Phone = fmt.Sprintf("+39%s", claims.Phone)
+	person.FiscalCode = claims.FiscalCode
 
 	if _, personData, err := user.ExtractUserDataFromFiscalCode(person); err == nil {
 		person = personData
@@ -60,7 +60,7 @@ func eLeadsLifePartnership(jwtData string, policy *models.Policy, product *model
 		Duration: &models.Duration{
 			Year: claims.Duration,
 		},
-		SumInsuredLimitOfIndemnity: float64(claims.InsuredCapital),
+		SumInsuredLimitOfIndemnity: float64(claims.SumInsuredLimitOfIndemnity),
 	}
 	asset.Guarantees = make([]models.Guarante, 0)
 	asset.Guarantees = append(asset.Guarantees, *deathGuarantee)
@@ -75,14 +75,14 @@ func eLeadsLifePartnership(jwtData string, policy *models.Policy, product *model
 }
 
 type ELeadsClaims struct {
-	ContractorName       string `json:"name"`
-	ContractorSurname    string `json:"surname"`
-	ContractorEmail      string `json:"email"`
-	ContractorPhone      string `json:"phone"`
-	ContractorFiscalCode string `json:"fiscalCode"`
-	ContractorBirthDate  string `json:"birthDate"`
-	InsuredCapital       int    `json:"sumInsuredLimitOfIndemnity"`
-	Duration             int    `json:"duration"`
+	Name                       string `json:"name"`
+	Surname                    string `json:"surname"`
+	Email                      string `json:"email"`
+	Phone                      string `json:"phone"`
+	FiscalCode                 string `json:"fiscalCode"`
+	BirthDate                  string `json:"birthDate"`
+	SumInsuredLimitOfIndemnity int    `json:"sumInsuredLimitOfIndemnity"`
+	Duration                   int    `json:"duration"`
 	jwt.RegisteredClaims
 }
 

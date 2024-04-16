@@ -82,7 +82,7 @@ const (
 	PartnershipBeProf      string = "beprof"
 	PartnershipFacile      string = "facile"
 	PartnershipFpinsurance string = "fpinsurance"
-	PartnershipELeads      string = "e-leads"
+	PartnershipELeads      string = "eleads"
 )
 
 const (
