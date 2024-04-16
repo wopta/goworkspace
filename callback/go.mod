@@ -6,7 +6,7 @@ replace github.com/wopta/goworkspace/callback => ./
 
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
-	github.com/wopta/goworkspace/bpmn v1.0.16
+	github.com/wopta/goworkspace/bpmn v1.0.17
 	github.com/wopta/goworkspace/lib v1.0.114
 	github.com/wopta/goworkspace/mail v1.0.103
 	github.com/wopta/goworkspace/models v1.1.103
@@ -38,7 +38,7 @@ require (
 	github.com/cloudevents/sdk-go/v2 v2.14.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
-	github.com/go-chi/chi v1.5.5 // indirect
+	github.com/go-chi/chi/v5 v5.0.12 // indirect
 	github.com/go-chi/cors v1.2.1 // indirect
 	github.com/go-gota/gota v0.12.0 // indirect
 	github.com/go-jose/go-jose/v4 v4.0.1 // indirect
@@ -63,7 +63,7 @@ require (
 	github.com/klauspost/compress v1.15.9 // indirect
 	github.com/klauspost/cpuid/v2 v2.0.9 // indirect
 	github.com/kr/fs v0.1.0 // indirect
-	github.com/maja42/goval v1.3.1 // indirect
+	github.com/maja42/goval v1.4.0 // indirect
 	github.com/minio/asm2plan9s v0.0.0-20200509001527-cdd76441f9d8 // indirect
 	github.com/minio/c2goasm v0.0.0-20190812172519-36a3d3bbc4f3 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
@@ -92,7 +92,6 @@ require (
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.21.0 // indirect
 	golang.org/x/crypto v0.19.0 // indirect
-	golang.org/x/exp v0.0.0-20230801115018-d63ba01acd4b // indirect
 	golang.org/x/mod v0.11.0 // indirect
 	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/oauth2 v0.11.0 // indirect
