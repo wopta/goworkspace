@@ -18,6 +18,7 @@ func ReinitializePaymentInfo(tr *models.Transaction, providerName string) error 
 	tr.PaymentNote = ""
 	tr.PaymentMethod = ""
 	tr.PayDate = time.Time{}
+	tr.PayUrl = ""
 	tr.TransactionDate = time.Time{}
 	if !tr.EffectiveDate.IsZero() {
 		tr.ScheduleDate = tr.EffectiveDate.Format(time.DateOnly)
