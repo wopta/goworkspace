@@ -3,7 +3,6 @@ package form
 import (
 	"context"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"os"
@@ -19,14 +18,9 @@ import (
 	//"google.golang.org/api/firebaseappcheck/v1"
 )
 
-func GetFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+// {"responses":{"TIPO MOVIMENTO":"Inserimento","Targa Inserimento":"test","MODELLO VEICOLO":"test mod","DATA IMMATRICOLAZIONE":"1212-12-02","DATA INIZIO VALIDITA' COPERTURA":"1212-12-12"}}
+// {"responses":{"TIPO MOVIMENTO":"Annullo","Targa Annullo":"targa","DATA FINE VALIDITA' COPERTURA":"0009-09-09"},"mail":"test@gmail.com"}
 
-	body, e := io.ReadAll(r.Body)
-	log.Println(e)
-	log.Println(string(body))
-
-	return "", nil, nil
-}
 func AxaFleetTway(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.Println("AxaFleetEmit")
 	log.Println(os.Getenv("env"))

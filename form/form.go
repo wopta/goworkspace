@@ -17,13 +17,13 @@ var formRoutes []lib.ChiRoute = []lib.ChiRoute{
 	},
 	{
 		Route:   "/v1/{uid}",
-		Handler: lib.ResponseLoggerWrapper(GetFx),
+		Handler: lib.ResponseLoggerWrapper(FleetAssistenceInclusiveMovement),
 		Method:  http.MethodGet,
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
 		Route:   "fleet/assistance/v1",
-		Handler: lib.ResponseLoggerWrapper(GetFx),
+		Handler: lib.ResponseLoggerWrapper(FleetAssistenceInclusiveMovement),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
 	},
