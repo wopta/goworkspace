@@ -123,6 +123,7 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 			maxDuration                                                         int
 			writeContractorToDB                                                 bool
 			writeContractorsToDB                                                = make([]bool, 0)
+			paymentMode                                                         = models.PaymentModeSingle
 		)
 
 		if pol[0][2] == headervalue || pol[0][1] == titleHeaderValue || pol[0][1] == "1" {
@@ -235,6 +236,9 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 		//1998-09-27T00:00:00Z RFC3339
 
 		_, _, version, paymentSplit := LifeMapCodecCompanyAxaRevert(row[1])
+		if paymentSplit == string(models.PaySplitMonthly) {
+			paymentMode = models.PaymentModeRecurrent
+		}
 		nodeCode := strings.TrimSpace(row[13])
 		if nodeCode == "W1" {
 			nodeCode = "W1.DIRAgent"
@@ -324,7 +328,6 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 			CompanyEmit:       true,
 			CompanyEmitted:    true,
 			Channel:           models.NetworkChannel,
-			PaymentSplit:      paymentSplit,
 			CreationDate:      ParseDateDDMMYYYY(row[4]),
 			EmitDate:          ParseDateDDMMYYYY(row[4]),
 			StartDate:         ParseDateDDMMYYYY(row[4]),
@@ -337,6 +340,8 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 			PriceNettMonthly:  lib.RoundFloat(sumPriceNettMonthly, 2),
 			TaxAmountMonthly:  lib.RoundFloat(sumPriceTaxAmountMonthly, 2),
 			Payment:           models.ManualPaymentProvider,
+			PaymentMode:       paymentMode,
+			PaymentSplit:      paymentSplit,
 			FundsOrigin:       "Proprie risorse economiche",
 			ProducerCode:      networkNode.Code,
 			ProducerUid:       networkNode.Uid,
