@@ -285,11 +285,6 @@ func createELeadsNode() error {
 		IsActive: true,
 		Partnership: &models.PartnershipNode{
 			Name: "eleads",
-			Skin: &models.Skin{
-				PrimaryColor:   "",
-				SecondaryColor: "",
-				LogoUrl:        "https://upload.wikimedia.org/wikipedia/commons/7/78/Logo_facile_%28azienda%29.png",
-			},
 			JwtConfig: lib.JwtConfig{
 				KeyAlgorithm:      jose.DIRECT,
 				ContentEncryption: jose.A128CBC_HS256,
