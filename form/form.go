@@ -8,7 +8,7 @@ import (
 	"github.com/wopta/goworkspace/lib"
 )
 
-var formRoutes []lib.ChiRoute = []lib.ChiRoute{
+var formRoutes []lib.Route = []lib.Route{
 	{
 		Route:   "/axafleet",
 		Handler: lib.ResponseLoggerWrapper(AxaFleetTway),
@@ -37,6 +37,6 @@ func init() {
 func Form(w http.ResponseWriter, r *http.Request) {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
-	router := lib.GetChiRouter("form", formRoutes)
+	router := lib.GetRouter("form", formRoutes)
 	router.ServeHTTP(w, r)
 }

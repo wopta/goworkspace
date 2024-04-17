@@ -7,7 +7,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
@@ -90,7 +90,7 @@ func GetNodeSubTree(nodeUid string) (models.NetworkTreeElement, error) {
 }
 
 func checkAccess(idToken, nodeUid string) error {
-	authToken, err := models.GetAuthTokenFromIdToken(idToken)
+	authToken, err := lib.GetAuthTokenFromIdToken(idToken)
 	if err != nil {
 		log.Printf("error getting authToken")
 		return err

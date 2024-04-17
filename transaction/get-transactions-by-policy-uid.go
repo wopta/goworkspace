@@ -3,6 +3,7 @@ package transaction
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/go-chi/chi/v5"
 	"log"
 	"net/http"
 	"sort"
@@ -24,12 +25,12 @@ func GetTransactionsByPolicyUidFx(w http.ResponseWriter, r *http.Request) (strin
 
 	var response GetPolicyTransactionsResp
 
-	policyUid := r.Header.Get("policyUid")
+	policyUid := chi.URLParam(r, "policyUid")
 
 	log.Printf("policyUid %s", policyUid)
 
 	idToken := r.Header.Get("Authorization")
-	authToken, err := models.GetAuthTokenFromIdToken(idToken)
+	authToken, err := lib.GetAuthTokenFromIdToken(idToken)
 	lib.CheckError(err)
 
 	userUid := authToken.UserID
@@ -52,8 +53,6 @@ func GetTransactionsByPolicyUidFx(w http.ResponseWriter, r *http.Request) (strin
 	response.Transactions = transactions
 
 	jsonOut, err := json.Marshal(response)
-
-	log.Printf("response: %s", string(jsonOut))
 
 	return string(jsonOut), response, err
 }

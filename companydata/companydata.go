@@ -8,7 +8,7 @@ import (
 	"github.com/wopta/goworkspace/lib"
 )
 
-var companydataRoutes []lib.ChiRoute = []lib.ChiRoute{
+var companydataRoutes []lib.Route = []lib.Route{
 	{
 		Route:   "/v1/global/transactions",
 		Handler: lib.ResponseLoggerWrapper(GlobalTransaction),
@@ -73,6 +73,6 @@ func init() {
 func Callback(w http.ResponseWriter, r *http.Request) {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
-	router := lib.GetChiRouter("companydata", companydataRoutes)
+	router := lib.GetRouter("companydata", companydataRoutes)
 	router.ServeHTTP(w, r)
 }

@@ -8,19 +8,19 @@ require (
 	cloud.google.com/go v0.110.8
 	cloud.google.com/go/firestore v1.12.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
-	github.com/go-chi/chi v1.5.5
-	github.com/wopta/goworkspace/bpmn v1.0.16
-	github.com/wopta/goworkspace/document v1.1.66
-	github.com/wopta/goworkspace/lib v1.0.107
-	github.com/wopta/goworkspace/mail v1.0.98
-	github.com/wopta/goworkspace/models v1.1.96
-	github.com/wopta/goworkspace/network v1.0.50
-	github.com/wopta/goworkspace/payment v1.0.185
-	github.com/wopta/goworkspace/policy v1.0.89
-	github.com/wopta/goworkspace/product v1.0.96
-	github.com/wopta/goworkspace/question v1.0.42
-	github.com/wopta/goworkspace/reserved v1.0.92
-	github.com/wopta/goworkspace/transaction v1.0.65
+	github.com/go-chi/chi/v5 v5.0.12
+	github.com/wopta/goworkspace/bpmn v1.0.17
+	github.com/wopta/goworkspace/document v1.1.71
+	github.com/wopta/goworkspace/lib v1.0.114
+	github.com/wopta/goworkspace/mail v1.0.103
+	github.com/wopta/goworkspace/models v1.1.103
+	github.com/wopta/goworkspace/network v1.0.55
+	github.com/wopta/goworkspace/payment v1.0.196
+	github.com/wopta/goworkspace/policy v1.0.95
+	github.com/wopta/goworkspace/product v1.0.101
+	github.com/wopta/goworkspace/question v1.0.47
+	github.com/wopta/goworkspace/reserved v1.0.98
+	github.com/wopta/goworkspace/transaction v1.0.74
 	github.com/wopta/goworkspace/wiseproxy v1.0.3
 )
 
@@ -44,7 +44,9 @@ require (
 	github.com/cloudevents/sdk-go/v2 v2.14.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
+	github.com/go-chi/cors v1.2.1 // indirect
 	github.com/go-gota/gota v0.12.0 // indirect
+	github.com/go-jose/go-jose/v4 v4.0.1 // indirect
 	github.com/go-pdf/fpdf v0.8.0 // indirect
 	github.com/goccy/go-json v0.9.11 // indirect
 	github.com/golang-jwt/jwt/v4 v4.4.2 // indirect
@@ -66,7 +68,7 @@ require (
 	github.com/klauspost/compress v1.15.9 // indirect
 	github.com/klauspost/cpuid/v2 v2.0.9 // indirect
 	github.com/kr/fs v0.1.0 // indirect
-	github.com/maja42/goval v1.3.1 // indirect
+	github.com/maja42/goval v1.4.0 // indirect
 	github.com/minio/asm2plan9s v0.0.0-20200509001527-cdd76441f9d8 // indirect
 	github.com/minio/c2goasm v0.0.0-20190812172519-36a3d3bbc4f3 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
@@ -92,13 +94,13 @@ require (
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.21.0 // indirect
-	golang.org/x/crypto v0.14.0 // indirect
+	golang.org/x/crypto v0.19.0 // indirect
 	golang.org/x/mod v0.11.0 // indirect
 	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/oauth2 v0.11.0 // indirect
 	golang.org/x/sync v0.3.0 // indirect
-	golang.org/x/sys v0.13.0 // indirect
-	golang.org/x/text v0.13.0 // indirect
+	golang.org/x/sys v0.17.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	golang.org/x/tools v0.10.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
@@ -111,7 +113,6 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230822172742-b8732ec3820d // indirect
 	google.golang.org/grpc v1.59.0 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
-	gopkg.in/square/go-jose.v2 v2.6.0 // indirect
 	gopkg.in/src-d/go-billy.v4 v4.3.2 // indirect
 	gopkg.in/src-d/go-git.v4 v4.13.1 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect

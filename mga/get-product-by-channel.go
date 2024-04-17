@@ -42,7 +42,7 @@ func GetProductByChannelFx(w http.ResponseWriter, r *http.Request) (string, inte
 	}
 
 	token := r.Header.Get("Authorization")
-	authToken, err := models.GetAuthTokenFromIdToken(token)
+	authToken, err := lib.GetAuthTokenFromIdToken(token)
 	if err != nil {
 		log.Printf("error: %s", err.Error())
 		return "", nil, err

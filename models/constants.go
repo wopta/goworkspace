@@ -82,8 +82,10 @@ const (
 	PartnershipBeProf      string = "beprof"
 	PartnershipFacile      string = "facile"
 	PartnershipFpinsurance string = "fpinsurance"
+	PartnershipELeads      string = "eleads"
 )
 
+// DEPRECATED - use lib version instead
 const (
 	UserRoleAll         string = "all"
 	UserRoleCustomer    string = "customer"
@@ -94,14 +96,16 @@ const (
 	UserRoleAreaManager string = "area-manager"
 )
 
+// DEPRECATED - use lib version instead
 func GetAllRoles() []string {
 	return []string{UserRoleAll, UserRoleCustomer, UserRoleAdmin, UserRoleManager, UserRoleAgent, UserRoleAgency}
 }
 
 const (
-	TimeDateOnly string = "2006-01-02"
+	TimeDateOnly string = "2006-01-02" //  DEPRECATED use time.DateOnly
 )
 
+// DEPRECATED - use lib version instead
 const (
 	AgentCollection              string = "agents"
 	AgencyCollection             string = "agencies"
@@ -146,6 +150,7 @@ const (
 	FormProductType     string = "form"
 )
 
+// DEPRECATED - use lib version instead
 const (
 	ECommerceChannel string = "e-commerce"
 	AgentChannel     string = "agent"  //DEPRECATED: remove this constant once product versioning is completed

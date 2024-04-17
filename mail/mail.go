@@ -8,7 +8,7 @@ import (
 	"github.com/wopta/goworkspace/lib"
 )
 
-var mailRoutes []lib.ChiRoute = []lib.ChiRoute{
+var mailRoutes []lib.Route = []lib.Route{
 	{
 		Route:   "/v1/send",
 		Handler: lib.ResponseLoggerWrapper(SendFx),
@@ -37,6 +37,6 @@ func init() {
 func Mail(w http.ResponseWriter, r *http.Request) {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
-	router := lib.GetChiRouter("mail", mailRoutes)
+	router := lib.GetRouter("mail", mailRoutes)
 	router.ServeHTTP(w, r)
 }

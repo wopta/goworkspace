@@ -6,9 +6,9 @@ replace github.com/wopta/goworkspace/enrich => ./
 
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
+	github.com/go-chi/chi/v5 v5.0.12
 	github.com/go-gota/gota v0.12.0
 	github.com/wopta/goworkspace/lib v1.0.68
-	github.com/wopta/goworkspace/models v1.1.42
 )
 
 require (

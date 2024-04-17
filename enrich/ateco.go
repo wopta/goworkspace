@@ -6,7 +6,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
+
 	"github.com/go-gota/gota/dataframe"
 	"github.com/go-gota/gota/series"
 	"github.com/wopta/goworkspace/lib"

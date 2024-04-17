@@ -1,8 +1,8 @@
 package payment
 
 import (
-	"encoding/json"
 	"fmt"
+	"github.com/go-chi/chi/v5"
 	"io"
 	"log"
 	"net/http"
@@ -50,9 +50,6 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		return "", nil, err
 	}
 
-	payloadStr, _ := json.Marshal(payload)
-	log.Printf("request: %s", payloadStr)
-
 	methods := models.GetAllPaymentMethods()
 	isMethodAllowed := lib.SliceContains[string](methods, payload.PaymentMethod)
 
@@ -62,7 +59,7 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 	}
 
 	origin := r.Header.Get("Origin")
-	transactionUid := r.Header.Get("transactionUid")
+	transactionUid := chi.URLParam(r, "transactionUid")
 	fireTransactions := lib.GetDatasetByEnv(origin, models.TransactionsCollection)
 	firePolicies := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 

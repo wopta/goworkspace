@@ -8,7 +8,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
+
 	lib "github.com/wopta/goworkspace/lib"
 	models "github.com/wopta/goworkspace/models"
 )

@@ -8,7 +8,7 @@ import (
 	"github.com/wopta/goworkspace/lib"
 )
 
-var claimRoutes []lib.ChiRoute = []lib.ChiRoute{
+var claimRoutes []lib.Route = []lib.Route{
 	{
 		Route:   "/v1",
 		Handler: lib.ResponseLoggerWrapper(PutClaimFx),
@@ -31,6 +31,6 @@ func init() {
 func Claim(w http.ResponseWriter, r *http.Request) {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
-	router := lib.GetChiRouter("claim", claimRoutes)
+	router := lib.GetRouter("claim", claimRoutes)
 	router.ServeHTTP(w, r)
 }

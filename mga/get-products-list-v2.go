@@ -27,7 +27,7 @@ func GetProductsListByChannelFx(w http.ResponseWriter, r *http.Request) (string,
 
 	log.Println("Handler start -----------------------------------------------")
 
-	authToken, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
+	authToken, err := lib.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
 	if err != nil {
 		log.Printf("error extracting auth token: %s", err.Error())
 		return "", "", err
@@ -37,10 +37,10 @@ func GetProductsListByChannelFx(w http.ResponseWriter, r *http.Request) (string,
 	switch channel {
 	case models.MgaChannel:
 		log.Println("getting mga products")
-		response.Products = product.GetProductsByChannel(models.MgaChannel)
+		response.Products = product.GetAllProductsByChannel(models.MgaChannel)
 	case models.ECommerceChannel:
 		log.Println("getting e-commerce products")
-		response.Products = product.GetProductsByChannel(models.ECommerceChannel)
+		response.Products = product.GetAllProductsByChannel(models.ECommerceChannel)
 	case models.NetworkChannel:
 		log.Println("getting network products")
 		networkNode := network.GetNetworkNodeByUid(authToken.UserID)
@@ -55,7 +55,7 @@ func GetProductsListByChannelFx(w http.ResponseWriter, r *http.Request) (string,
 		}
 		productList := lib.SliceMap[models.Product, string](warrant.Products, func(p models.Product) string { return p.Name })
 		log.Printf("product list '%s'", productList)
-		response.Products = product.GetNetworkNodeProducts(productList)
+		response.Products = product.GetProductsByChannel(productList, channel)
 	default:
 		log.Printf("error channel %s unaavailable", channel)
 		return "", "", fmt.Errorf("unavailable channel")

@@ -5,8 +5,8 @@ go 1.21
 replace github.com/wopta/goworkspace/bpmn => ./
 
 require (
-	github.com/maja42/goval v1.3.1
-	github.com/wopta/goworkspace/models v1.1.38
+	github.com/maja42/goval v1.4.0
+	github.com/wopta/goworkspace/models v1.1.103
 )
 
 require (
@@ -28,7 +28,10 @@ require (
 	github.com/bmatcuk/doublestar v1.3.2 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
+	github.com/go-chi/chi/v5 v5.0.12 // indirect
+	github.com/go-chi/cors v1.2.1 // indirect
 	github.com/go-gota/gota v0.12.0 // indirect
+	github.com/go-jose/go-jose/v4 v4.0.1 // indirect
 	github.com/goccy/go-json v0.9.11 // indirect
 	github.com/golang-jwt/jwt/v4 v4.4.2 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
@@ -47,7 +50,6 @@ require (
 	github.com/klauspost/compress v1.15.9 // indirect
 	github.com/klauspost/cpuid/v2 v2.0.9 // indirect
 	github.com/kr/fs v0.1.0 // indirect
-	github.com/kr/text v0.2.0 // indirect
 	github.com/minio/asm2plan9s v0.0.0-20200509001527-cdd76441f9d8 // indirect
 	github.com/minio/c2goasm v0.0.0-20190812172519-36a3d3bbc4f3 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
@@ -59,7 +61,7 @@ require (
 	github.com/sergi/go-diff v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
-	github.com/wopta/goworkspace/lib v1.0.68 // indirect
+	github.com/wopta/goworkspace/lib v1.0.114 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
 	github.com/xuri/excelize/v2 v2.7.0 // indirect
@@ -69,14 +71,14 @@ require (
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.6.0 // indirect
 	go.uber.org/zap v1.21.0 // indirect
-	golang.org/x/crypto v0.7.0 // indirect
+	golang.org/x/crypto v0.19.0 // indirect
 	golang.org/x/mod v0.8.0 // indirect
-	golang.org/x/net v0.9.0 // indirect
+	golang.org/x/net v0.10.0 // indirect
 	golang.org/x/oauth2 v0.7.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
-	golang.org/x/sys v0.7.0 // indirect
-	golang.org/x/text v0.9.0 // indirect
-	golang.org/x/time v0.3.0 // indirect
+	golang.org/x/sys v0.17.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
+	golang.org/x/time v0.1.0 // indirect
 	golang.org/x/tools v0.6.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	gonum.org/v1/gonum v0.11.0 // indirect

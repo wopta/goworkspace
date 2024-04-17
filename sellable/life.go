@@ -33,7 +33,7 @@ func LifeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	policy.Normalize()
 
-	authToken, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
+	authToken, err := lib.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
 	lib.CheckError(err)
 
 	log.Println("[LifeFx] loading network node")

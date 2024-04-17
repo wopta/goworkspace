@@ -8,27 +8,27 @@ import (
 	"github.com/wopta/goworkspace/lib"
 )
 
-var policyRoutes []lib.ChiRoute = []lib.ChiRoute{
+var policyRoutes []lib.Route = []lib.Route{
 	{
-		Route:   "fiscalcode/v1/{fiscalcode}",
+		Route:   "/fiscalcode/v1/{fiscalcode}",
 		Handler: lib.ResponseLoggerWrapper(GetPolicyByFiscalCodeFx), // Broker.PolicyFiscalcode
 		Method:  http.MethodGet,
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
-		Route:   "v1/{uid}",
+		Route:   "/v1/{uid}",
 		Handler: lib.ResponseLoggerWrapper(GetPolicyFx),
 		Method:  http.MethodGet,
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
-		Route:   "v1/{uid}",
+		Route:   "/v1/{uid}",
 		Handler: lib.ResponseLoggerWrapper(DeletePolicyFx),
 		Method:  http.MethodDelete,
 		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleManager},
 	},
 	{
-		Route:   "attachment/v1/{uid}",
+		Route:   "/attachment/v1/{uid}",
 		Handler: lib.ResponseLoggerWrapper(GetPolicyAttachmentsFx),
 		Method:  http.MethodGet,
 		Roles:   []string{lib.UserRoleAll},
@@ -69,6 +69,6 @@ func init() {
 func Policy(w http.ResponseWriter, r *http.Request) {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
-	router := lib.GetChiRouter("policy", policyRoutes)
+	router := lib.GetRouter("policy", policyRoutes)
 	router.ServeHTTP(w, r)
 }

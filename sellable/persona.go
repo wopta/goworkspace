@@ -34,7 +34,7 @@ func PersonaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 
 	policy.Normalize()
 
-	authToken, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
+	authToken, err := lib.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
 	lib.CheckError(err)
 
 	log.Println("[PersonaFx] loading network node")

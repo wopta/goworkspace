@@ -15,7 +15,7 @@ type BrokerBaseRequest struct {
 	PaymentMode  string `json:"paymentMode"`
 }
 
-var brokerRoutes []lib.ChiRoute = []lib.ChiRoute{
+var brokerRoutes []lib.Route = []lib.Route{
 	{
 		Route:   "/v1/policies/fiscalcode/{fiscalcode}",
 		Handler: lib.ResponseLoggerWrapper(PolicyFiscalcodeFx),
@@ -58,31 +58,31 @@ var brokerRoutes []lib.ChiRoute = []lib.ChiRoute{
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
-		Route:   "policy/v1/{uid}",
+		Route:   "/policy/v1/{uid}",
 		Handler: lib.ResponseLoggerWrapper(UpdatePolicyFx),
 		Method:  http.MethodPatch,
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
-		Route:   "policy/v1/{uid}",
+		Route:   "/policy/v1/{uid}",
 		Handler: lib.ResponseLoggerWrapper(DeletePolicyFx),
 		Method:  http.MethodDelete,
 		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleManager},
 	},
 	{
-		Route:   "attachment/v1/{policyUid}",
+		Route:   "/attachment/v1/{policyUid}",
 		Handler: lib.ResponseLoggerWrapper(GetPolicyAttachmentFx),
 		Method:  http.MethodGet,
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
-		Route:   "policies/v1",
+		Route:   "/policies/v1",
 		Handler: lib.ResponseLoggerWrapper(GetPoliciesFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleManager},
 	},
 	{
-		Route:   "policy/transactions/v1/{policyUid}",
+		Route:   "/policy/transactions/v1/{policyUid}",
 		Handler: lib.ResponseLoggerWrapper(GetPolicyTransactionsFx),
 		Method:  http.MethodGet,
 		Roles: []string{
@@ -114,6 +114,6 @@ func init() {
 func Broker(w http.ResponseWriter, r *http.Request) {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
 
-	router := lib.GetChiRouter("broker", brokerRoutes)
+	router := lib.GetRouter("broker", brokerRoutes)
 	router.ServeHTTP(w, r)
 }

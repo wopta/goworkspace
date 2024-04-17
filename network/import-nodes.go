@@ -583,7 +583,7 @@ func getFilename(inputFilename string) string {
 
 func triggerPipeline(r *http.Request, filename string) error {
 	log.Println("Getting invoker address...")
-	authToken, err := models.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
+	authToken, err := lib.GetAuthTokenFromIdToken(r.Header.Get("Authorization"))
 	if err != nil {
 		log.Printf("Error getting invoker authToken: %s", err.Error())
 		return err
