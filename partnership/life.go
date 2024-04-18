@@ -204,6 +204,7 @@ func setClaimsIntoPolicy(policy models.Policy, product *models.Product, claims m
 	person.BirthDate = claims.BirthDate
 	person.Gender = claims.Gender
 	person.Mail = claims.Email
+	person.Phone = claims.Phone
 	person.FiscalCode = claims.FiscalCode
 	person.Address = claims.Address
 	person.PostalCode = claims.Postalcode
