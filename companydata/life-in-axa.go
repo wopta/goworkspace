@@ -540,6 +540,7 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 			}
 		}
 
+		policy.Normalize()
 		result[codeCompany] = ResultStruct{
 			Policy:       policy,
 			Transactions: transactionsOutput,
