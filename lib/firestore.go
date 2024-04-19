@@ -224,6 +224,35 @@ func (queries *FireGenericQueries[T]) FireQuery(collection string) ([]T, error) 
 	return result, err
 }
 
+func (queries *FireGenericQueries[T]) FireQueryUid(collection string) ([]T, []string, error) {
+	ctx := context.Background()
+	var query firestore.Query
+	client, err := firestore.NewClient(ctx, os.Getenv("GOOGLE_PROJECT_ID"))
+	col := client.Collection(collection)
+	query = col.Where(queries.Queries[0].Field, queries.Queries[0].Operator, queries.Queries[0].QueryValue)
+	for i := 1; i <= len(queries.Queries)-1; i++ {
+		query = query.Where(queries.Queries[i].Field, queries.Queries[i].Operator, queries.Queries[i].QueryValue)
+	}
+	q := query.Documents(ctx)
+	result := make([]T, 0)
+	uids := make([]string, 0)
+	for {
+		d, err := q.Next()
+		if err != nil {
+			if err == iterator.Done {
+				break
+			}
+		}
+		var value T
+		e := d.DataTo(&value)
+		CheckError(e)
+		result = append(result, value)
+		uids = append(uids, d.Ref.ID)
+		log.Println(len(result))
+	}
+	return result, uids, err
+}
+
 func (queries *Firequeries) FirestoreWhereLimitFields(collection string, limit int) (*firestore.DocumentIterator, error) {
 	ctx := context.Background()
 	var query firestore.Query
