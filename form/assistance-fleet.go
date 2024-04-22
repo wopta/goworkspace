@@ -5,14 +5,12 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"time"
 
 	"cloud.google.com/go/bigquery"
 	lib "github.com/wopta/goworkspace/lib"
 	//"google.golang.org/api/firebaseappcheck/v1"
 )
-
-// {"responses":{"TIPO MOVIMENTO":"Inserimento","Targa Inserimento":"test","MODELLO VEICOLO":"test mod","DATA IMMATRICOLAZIONE":"1212-12-02","DATA INIZIO VALIDITA' COPERTURA":"1212-12-12"}}
-// {"responses":{"TIPO MOVIMENTO":"Annullo","Targa Annullo":"targa","DATA FINE VALIDITA' COPERTURA":"0009-09-09"},"mail":"test@gmail.com"}
 
 type FleetAssistenceInclusiveMovements struct {
 	PolicyNumber            string                `json:"-" firestore:"-" bigquery:"policyNumber"`
@@ -47,25 +45,26 @@ type FleetAssistenceInclusiveMovements struct {
 	UpdatedDate             bigquery.NullDateTime `json:"-" firestore:"-" bigquery:"UpdatedDate "`
 }
 
+var tway = FleetAssistenceInclusiveMovements{
+	PolicyNumber:      "191222",
+	Lob:               "A",
+	PolicyType:        "C",
+	CodeSetting:       "1",
+	AssetType:         "2",
+	Address:           "Piazza Walther Von Der Vogelweide, 22",
+	Name:              "T-WAY SPA",
+	FleetName:         "T-WAY SPA",
+	VatCodeFiscalcode: "3682240043",
+	Company:           "AXA",
+	Cap:               "39100",
+	City:              "BZ",
+	Locality:          "Bolzano",
+	TypeVehicle:       "3",
+	WeightVehicle:     "4",
+}
+
 func FleetAssistenceInclusiveMovement(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 
-	var tway = FleetAssistenceInclusiveMovements{
-		PolicyNumber:      "191222",
-		Lob:               "A",
-		PolicyType:        "C",
-		CodeSetting:       "1",
-		AssetType:         "2",
-		Address:           "Piazza Walther Von Der Vogelweide, 22",
-		Name:              "T-WAY SPA",
-		FleetName: "T-WAY SPA",
-		VatCodeFiscalcode: "3682240043",
-		Company:           "AXA",
-		Cap: "39100",
-		City: "BZ",
-		Locality:"Bolzano" ,
-		TypeVehicle: "3",
-		WeightVehicle: "4",
-	}
 	var users = map[string]FleetAssistenceInclusiveMovements{
 		"elisabetta.lainatiassicura@gmail.com": tway,
 	}
@@ -79,8 +78,9 @@ func FleetAssistenceInclusiveMovement(w http.ResponseWriter, r *http.Request) (s
 	data, ok := users[fleetAssistenceInclusiveMovement.Mail]
 
 	if ok {
+		setRequestData(fleetAssistenceInclusiveMovement, &data)
 		if fleetAssistenceInclusiveMovement.MovementType == "Inserimento" {
-			setRequestData(fleetAssistenceInclusiveMovement, &data)
+
 			lib.InsertRowsBigQuery("wopta", "fleetAssistenceInclusiveMovements", data)
 		} else {
 			checkPlate, e := lib.QueryRowsBigQuery[FleetAssistenceInclusiveMovements]("")
@@ -98,11 +98,18 @@ func FleetAssistenceInclusiveMovement(w http.ResponseWriter, r *http.Request) (s
 
 	return "", nil, nil
 }
-func setRequestData(req *FleetAssistenceInclusiveMovements, data *FleetAssistenceInclusiveMovements) {
+func setRequestData(req *FleetAssistenceInclusiveMovements, data *FleetAssistenceInclusiveMovements) *FleetAssistenceInclusiveMovements {
+	formatdate := "2006-01-02"
+	startdate, e := time.Parse(formatdate, req.CoverageStartDateString)
+	log.Println(e)
+	enddate, e := time.Parse(formatdate, req.CoverageEndDateString)
+	log.Println(e)
 	data.PlateVehicle = req.PlateVehicle
 	data.ModelVehicle = req.ModelVehicle
-	
-
-	data.PlateVehicle = req.PlateVehicle
-	data.PlateVehicle = req.PlateVehicle
+	data.CreationDate = lib.GetBigQueryNullDateTime(time.Now())
+	data.CoverageStartDate = lib.GetBigQueryNullDateTime(startdate)
+	data.CoverageEndDate = lib.GetBigQueryNullDateTime(enddate)
+	data.UpdatedDate = lib.GetBigQueryNullDateTime(enddate)
+	data.MovementType = req.MovementType
+	return data
 }
