@@ -1,6 +1,7 @@
 package transaction
 
 import (
+	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/product"
 	"os"
@@ -38,15 +39,13 @@ func getPolicy(paymentSplit string, startDate, endDate time.Time) models.Policy 
 func outputGenerator(numOutput int, startDate time.Time) []dateInfo {
 	output := make([]dateInfo, 0)
 
-	i := 0
-	for i < numOutput {
-		effectiveDate := startDate.AddDate(0, i, 0)
+	for i := 0; i < numOutput; i++ {
+		effectiveDate := lib.AddMonths(startDate, i)
 		output = append(output, dateInfo{
 			ScheduleDate:   effectiveDate.Format(time.DateOnly),
 			ExpirationDate: effectiveDate.AddDate(10, 0, 0).Format(time.DateOnly),
 			EffectiveDate:  effectiveDate,
 		})
-		i++
 	}
 	return output
 }
@@ -66,7 +65,7 @@ func TestCreateTransactionsInvalidPaymentSplit(t *testing.T) {
 }
 
 func TestCreateTransactionsMonthly(t *testing.T) {
-	startDate := time.Date(2023, 03, 14, 0, 0, 0, 0, time.UTC)
+	startDate := time.Date(2024, 03, 31, 0, 0, 0, 0, time.UTC)
 	policy := getPolicy(string(models.PaySplitMonthly), startDate, startDate.AddDate(20, 0, 0))
 
 	output := outputGenerator(12, startDate)
