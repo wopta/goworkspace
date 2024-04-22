@@ -6,6 +6,7 @@ import (
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/transaction"
 	"log"
+	"time"
 )
 
 func getAllPolicies() ([]models.Policy, error) {
@@ -49,11 +50,13 @@ func PolicyTransactionsUpdate() {
 		} else {
 			p.IsRenewable = false
 		}
+		p.Updated = time.Now().UTC()
 		m[models.PolicyCollection][p.Uid] = p
 
 		transactions := transaction.GetPolicyTransactions("", p.Uid)
 		for _, t := range transactions {
 			t.Annuity = 0
+			t.UpdateDate = time.Now()
 			m[models.TransactionsCollection][t.Uid] = t
 		}
 
@@ -67,9 +70,9 @@ func PolicyTransactionsUpdate() {
 
 		p.BigquerySave("")
 
-		for _, t := range transactions {
-			t.Annuity = 0
-			t.BigQuerySave("")
+		for _, t := range m[models.TransactionsCollection] {
+			tr := t.(models.Transaction)
+			tr.BigQuerySave("")
 		}
 	}
 
