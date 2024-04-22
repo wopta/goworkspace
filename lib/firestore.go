@@ -344,17 +344,22 @@ func SetBatchFirestoreErr[T any](operations map[string]map[string]T) error {
 		return err
 	}
 
-	batch := client.Batch()
+	bulk := client.BulkWriter(ctx)
+
 	for collection, values := range operations {
 		c := client.Collection(collection)
 
 		for k, v := range values {
 			col := c.Doc(k)
-			batch.Set(col, v)
+			_, err = bulk.Set(col, v)
+			if err != nil {
+				log.Printf("error batch firestore: %s", err.Error())
+				return err
+			}
 		}
 	}
 
-	_, err = batch.Commit(ctx)
+	bulk.End()
 
-	return err
+	return nil
 }
