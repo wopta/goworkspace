@@ -115,6 +115,8 @@ type Policy struct {
 	NetworkUid        string                       `json:"networkUid" firestore:"networkUid" bigquery:"networkUid"`
 	ProducerUid       string                       `json:"producerUid" firestore:"producerUid" bigquery:"producerUid"`
 	ProducerType      string                       `json:"producerType" firestore:"producerType" bigquery:"producerType"`
+	Annuity           int                          `json:"annuity" firestore:"annuity" bigquery:"annuity"`
+	IsRenewable       bool                         `json:"isRenewable" firestore:"isRenewable" bigquery:"isRenewable"`
 }
 
 type RenewHistory struct {
