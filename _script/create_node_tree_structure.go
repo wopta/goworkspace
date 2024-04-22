@@ -49,6 +49,11 @@ func CreateNodeTreeStructure() {
 		treeElementRelations = append(treeElementRelations, getNodeTreeRelations(nn)...)
 	}
 
+	for _, tr := range treeElementRelations {
+		log.Printf("rootUid: %s\tparentUid: %s\tnodeUid: %s\trelativeLevel: %02d\t\n",
+			tr.RootUid, tr.ParentUid, tr.NodeUid, tr.RelativeLevel)
+	}
+
 	for _, nn := range treeElementRelations {
 		err = writeNodeToBigQuery(nn)
 		if err != nil {
@@ -87,7 +92,7 @@ func visitNode(currentNode models.NetworkTreeElement, nodesList []models.Network
 	parents := append(currentNode.Ancestors, currentNode)
 	for _, child := range children {
 		toBeVisitedNodes = append(toBeVisitedNodes, models.NetworkTreeElement{
-			RootUid:       currentNode.RootUid,
+			RootUid:       currentNode.NodeUid, // should be currentNode.NodeUid ???
 			ParentUid:     currentNode.NodeUid,
 			NodeUid:       child.Uid,
 			AbsoluteLevel: currentNode.AbsoluteLevel + 1,
@@ -100,12 +105,18 @@ func visitNode(currentNode models.NetworkTreeElement, nodesList []models.Network
 
 func getNodeTreeRelations(node models.NetworkTreeElement) []models.NetworkTreeRelation {
 	ancestors := make([]models.NetworkTreeRelation, 0)
-	ancestors = append(ancestors, node.ToNetworkTreeRelation())
+	ancestors = append(ancestors, models.NetworkTreeRelation{
+		RootUid:       node.NodeUid,
+		ParentUid:     node.NodeUid,
+		NodeUid:       node.NodeUid,
+		RelativeLevel: 0,
+		CreationDate:  lib.GetBigQueryNullDateTime(time.Now().UTC()),
+	})
 	for _, a := range node.Ancestors {
 		node.RootUid = a.NodeUid
 		node.RelativeLevel = node.AbsoluteLevel - a.AbsoluteLevel
-		log.Printf("rootUid: %s\tparentUid: %s\tnodeUid: %s\tchildLevel: %02d\tparentLevel: %02d\trelativeLevel: %02d\t\n",
-			node.RootUid, node.ParentUid, node.NodeUid, node.AbsoluteLevel, a.AbsoluteLevel, node.RelativeLevel)
+		//log.Printf("rootUid: %s\tparentUid: %s\tnodeUid: %s\tchildLevel: %02d\tparentLevel: %02d\trelativeLevel: %02d\t\n",
+		//	node.RootUid, node.ParentUid, node.NodeUid, node.AbsoluteLevel, a.AbsoluteLevel, node.RelativeLevel)
 		ancestors = append(ancestors, node.ToNetworkTreeRelation())
 	}
 	return ancestors
