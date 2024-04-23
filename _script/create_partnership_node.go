@@ -121,9 +121,12 @@ func createBeprofNode() error {
 		}},
 	}
 
-	_, err := network.CreateNode(partnershipModel)
+	nn, err := network.CreateNode(partnershipModel)
+	if err != nil {
+		return err
+	}
 
-	return err
+	return nn.SaveBigQuery("")
 }
 
 func createFacileNode() error {
@@ -209,9 +212,12 @@ func createFacileNode() error {
 		}},
 	}
 
-	_, err := network.CreateNode(partnershipModel)
+	nn, err := network.CreateNode(partnershipModel)
+	if err != nil {
+		return err
+	}
 
-	return err
+	return nn.SaveBigQuery("")
 }
 
 func createFpinsuranceNode() error {
@@ -273,8 +279,12 @@ func createMultiTestNode() error {
 		}},
 	}
 
-	_, err = network.CreateNode(partnershipModel)
-	return err
+	nn, err := network.CreateNode(partnershipModel)
+	if err != nil {
+		return err
+	}
+
+	return nn.SaveBigQuery("")
 }
 
 func createELeadsNode() error {
@@ -355,7 +365,10 @@ func createELeadsNode() error {
 		}},
 	}
 
-	_, err := network.CreateNode(partnershipModel)
+	nn, err := network.CreateNode(partnershipModel)
+	if err != nil {
+		return err
+	}
 
-	return err
+	return nn.SaveBigQuery("")
 }

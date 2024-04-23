@@ -55,6 +55,7 @@ type Transaction struct {
 	EffectiveDate      time.Time             `json:"effectiveDate,omitempty" firestore:"effectiveDate,omitempty" bigquery:"-"`
 	BigEffectiveDate   bigquery.NullDateTime `json:"-" firestore:"-" bigquery:"effectiveDate"`
 	PayUrl             string                `json:"payUrl,omitempty" firestore:"payUrl,omitempty" bigquery:"payUrl"`
+	Annuity            int                   `json:"annuity,omitempty" firestore:"annuity,omitempty" bigquery:"annuity"`
 }
 
 func TransactionToListData(query *firestore.DocumentIterator) []Transaction {

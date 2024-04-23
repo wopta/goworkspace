@@ -41,6 +41,7 @@ type Product struct {
 	PaymentProviders  []PaymentProvider `json:"paymentProviders,omitempty" firestore:"paymentProviders,omitempty" bigquery:"-"`
 	Flow              string            `json:"flow,omitempty" firestore:"flow,omitempty" bigquery:"-"` // the name of the flow file to be used
 	IsActive          bool              `json:"isActive" firestore:"isActive" bigquery:"-"`
+	RenewOffset       int               `json:"renewOffset" firestore:"renewOffset" bigquery:"renewOffset"`
 }
 
 type Company struct {
