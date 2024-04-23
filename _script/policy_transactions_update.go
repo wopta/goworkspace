@@ -1,11 +1,15 @@
 package _script
 
 import (
+	"cloud.google.com/go/civil"
 	"cloud.google.com/go/firestore"
+	"fmt"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/product"
 	"github.com/wopta/goworkspace/transaction"
 	"log"
+	"strings"
 	"time"
 )
 
@@ -33,6 +37,14 @@ func getAllPolicies() ([]models.Policy, error) {
 }
 
 func PolicyTransactionsUpdate() {
+	productsMap := make(map[string]models.Product)
+
+	productsInfo := product.GetAllProductsByChannel(models.MgaChannel)
+	for _, pr := range productsInfo {
+		prd := product.GetProductV2(pr.Name, pr.Version, models.MgaChannel, nil, nil)
+		productsMap[fmt.Sprintf("%s-%s", prd.Name, prd.Version)] = *prd
+	}
+
 	policies, err := getAllPolicies()
 	if err != nil {
 		return
@@ -43,36 +55,43 @@ func PolicyTransactionsUpdate() {
 			models.PolicyCollection:       make(map[string]interface{}),
 			models.TransactionsCollection: make(map[string]interface{}),
 		}
+		transactionsList := make([]models.Transaction, 0)
+
+		productIdentifier := fmt.Sprintf("%s-%s", p.Name, p.ProductVersion)
 
 		p.Annuity = 0
-		if p.Name == models.LifeProduct {
-			p.IsRenewable = true
-		} else {
-			p.IsRenewable = false
-		}
+		p.IsAutoRenew = productsMap[productIdentifier].IsAutoRenew
+		p.IsRenewable = productsMap[productIdentifier].IsRenewable
+		p.QuoteType = productsMap[productIdentifier].QuoteType
+		p.PolicyType = productsMap[productIdentifier].PolicyType
 		p.Updated = time.Now().UTC()
 		m[models.PolicyCollection][p.Uid] = p
 
 		transactions := transaction.GetPolicyTransactions("", p.Uid)
 		for _, t := range transactions {
 			t.Annuity = 0
-			t.UpdateDate = time.Now()
+			t.UpdateDate = time.Now().UTC()
+			t.BigPayDate = lib.GetBigQueryNullDateTime(t.PayDate)
+			t.BigTransactionDate = lib.GetBigQueryNullDateTime(t.TransactionDate)
+			t.BigCreationDate = civil.DateTimeOf(t.CreationDate)
+			t.BigStatusHistory = strings.Join(t.StatusHistory, ",")
+			t.BigUpdateDate = lib.GetBigQueryNullDateTime(t.UpdateDate)
+			t.BigEffectiveDate = lib.GetBigQueryNullDateTime(t.EffectiveDate)
 			m[models.TransactionsCollection][t.Uid] = t
+			transactionsList = append(transactionsList, t)
 		}
-
-		log.Printf("%v", m)
 
 		err = lib.SetBatchFirestoreErr(m)
 		if err != nil {
-			log.Printf("error saving policy with uid %s into firestore: %s", p.Uid, err.Error())
+			log.Printf("error saving policy and transactiosn into firestore: %s", err.Error())
 			continue
 		}
 
 		p.BigquerySave("")
 
-		for _, t := range m[models.TransactionsCollection] {
-			tr := t.(models.Transaction)
-			tr.BigQuerySave("")
+		err = lib.InsertRowsBigQuery(lib.WoptaDataset, lib.TransactionsCollection, transactionsList)
+		if err != nil {
+			log.Println("error saving transactions into BigQuery", err)
 		}
 	}
 
