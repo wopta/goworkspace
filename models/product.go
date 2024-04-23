@@ -43,7 +43,6 @@ type Product struct {
 	IsRenewable      bool              `json:"isRenewable" firestore:"isRenewable" bigquery:"isRenewable"`
 	PolicyType       string            `json:"policyType,omitempty" firestore:"policyType,omitempty" bigquery:"policyType"`
 	QuoteType        string            `json:"quoteType" firestore:"quoteType" bigquery:"quoteType"`
-	RenewType        string            `json:"renewType" firestore:"renewType" bigquery:"renewType"`
 
 	// DEPRECATED FIELDS
 
