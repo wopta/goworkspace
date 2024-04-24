@@ -9,7 +9,7 @@ require (
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/wopta/goworkspace/lib v1.0.113
 	github.com/wopta/goworkspace/mail v1.0.102
-	github.com/wopta/goworkspace/models v1.1.102
+	github.com/wopta/goworkspace/models v1.1.104-renew
 	github.com/wopta/goworkspace/policy v1.0.94
 )
 
