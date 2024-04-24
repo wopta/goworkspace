@@ -4,51 +4,116 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
+	"os"
 	"sync"
 	"time"
 
-	"cloud.google.com/go/firestore"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/transaction"
 )
+
+type PromoteReq struct {
+	Date string `json:"date"`
+}
+
+type PromoteResp struct {
+	Success []RenewReport `json:"success"`
+	Failure []RenewReport `json:"failure"`
+}
+
+type RenewReport struct {
+	Policy       models.Policy        `json:"policy"`
+	Transactions []models.Transaction `json:"transactions"`
+	Error        string               `json:"error,omitempty"`
+}
 
 func PromoteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		err      error
-		response struct{} // TODO
+		err        error
+		targetDate time.Time = time.Now().UTC()
+		request    PromoteReq
+		response   PromoteResp
 	)
 
 	log.SetPrefix("[PromoteFx] ")
+	defer log.Println("Handler end -------------------------------------------")
 	defer log.SetPrefix("")
 
 	log.Println("Handler start -----------------------------------------------")
 
-	// select all policies from renew draft collection where startDate + 1 year == now
-	now := time.Now().UTC()
-	query, params := buildQuery(now)
+	reqBytes := lib.ErrorByte(io.ReadAll(r.Body))
+	err = json.Unmarshal(reqBytes, &request)
+	if err != nil {
+		log.Printf("error unmarshalling request: %s", err.Error())
+		return "", nil, err
+	}
 
-	policies, err := lib.QueryParametrizedRowsBigQuery[models.Policy](query, params)
+	if request.Date != "" {
+		if targetDate, err = time.Parse(time.DateOnly, request.Date); err != nil {
+			log.Printf("error parsing request.Date: %s", err.Error())
+			return "", nil, err
+		}
+	}
+
+	response, err = Promote(targetDate)
 	if err != nil {
 		return "", nil, err
 	}
 
+	responseJson, err := json.Marshal(response)
+	if err != nil {
+		return "", nil, err
+	}
+	_, err = lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), fmt.Sprintf("renew/promote/promote-%d.json", time.Now().Unix()), responseJson)
+	if err != nil {
+		return "", nil, err
+	}
+
+	return string(responseJson), response, err
+}
+
+func Promote(targetDate time.Time) (PromoteResp, error) {
+	var (
+		err       error
+		okChannel chan RenewReport = make(chan RenewReport)
+		koChannel chan RenewReport = make(chan RenewReport)
+		wg        sync.WaitGroup
+		response  PromoteResp
+	)
+
+	query, params := buildQuery(targetDate)
+	policies, err := lib.QueryParametrizedRowsBigQuery[models.Policy](query, params)
+	if err != nil {
+		log.Printf("error querying bigquery: %s", err.Error())
+		return PromoteResp{}, err
+	}
+
+	wg.Add(len(policies))
 	for _, p := range policies {
 		if p.IsPay {
-			promoteRenewPolicyDraftIntoPolicy(p)
-			promoteRenewDraftTransactionIntoTransaction(p)
+			go promotePolicyData(p, okChannel, koChannel, &wg)
 		} else {
-			setPolicyNotPaid(p)
+			go setPolicyNotPaid(p, okChannel, koChannel, &wg)
 		}
 	}
 
-	responseJson, err := json.Marshal(response)
+	go func() {
+		wg.Wait()
+		close(okChannel)
+		close(koChannel)
+	}()
 
-	log.Println("Handler end -------------------------------------------------")
+	for res := range okChannel {
+		response.Success = append(response.Success, res)
+	}
+	for res := range koChannel {
+		response.Failure = append(response.Failure, res)
+	}
 
-	return string(responseJson), response, err
+	return response, err
 }
 
 func buildQuery(date time.Time) (string, map[string]interface{}) {
@@ -58,336 +123,116 @@ func buildQuery(date time.Time) (string, map[string]interface{}) {
 	)
 
 	// SELECT * FROM `wopta.renewPolicyDraft` WHERE EXTRACT(MONTH FROM startDate) = @date.Month() AND EXTRACT(DAY FROM startDate) = @date.Day()
-	params["month"] = date.Month()
-	params["day"] = date.Day()
+	params["month"] = int64(date.Month())
+	params["day"] = int64(date.Day())
 
-	query.WriteString(fmt.Sprintf("SELECT * FROM `wopta.renewPolicyDraft` WHERE "+
-		"EXTRACT(MONTH FROM startDate) = @%d AND "+
-		"EXTRACT(DAY FROM startDate) = @%d",
-		params["month"],
-		params["day"]))
+	query.WriteString("SELECT * FROM `wopta.policiesView` WHERE " +
+		"EXTRACT(MONTH FROM startDate) = @month AND " +
+		"EXTRACT(DAY FROM startDate) = @day")
 
 	return query.String(), params
 }
 
-func promoteRenewPolicyDraftIntoPolicy(policy models.Policy) error {
-	policy.Updated = time.Now().UTC()
-	// // // save draft in policy
-	err := lib.SetFirestoreErr(models.PolicyCollection, policy.Uid, policy)
-	policy.BigquerySave("")
+func promotePolicyData(p models.Policy, okChannel, koChannel chan<- RenewReport, wg *sync.WaitGroup) {
+	defer wg.Done()
 
-	// // // delete draft
-	_, err = lib.DeleteFirestoreErr("renewPolicyDraft", policy.Uid)
-	// TODO: DELETE from bigquery
-
-	return err
-}
-
-func promoteRenewDraftTransactionIntoTransaction(policy models.Policy) error {
-	// // // save draft-transactions in
-	var err error
-	trs := transaction.GetPolicyTransactions("", policy.Uid) // TODO: get only next annuity - create function
-
-	for _, tr := range trs {
-		err = lib.SetFirestoreErr(models.TransactionsCollection, tr.Uid, tr)
-		tr.BigQuerySave("")
-
-		_, err = lib.DeleteFirestoreErr("renewTransactionDraft", tr.Uid)
-		// TODO: DELETE from bigquery
+	r := RenewReport{
+		Policy: p,
 	}
 
-	return err
-}
-
-func setPolicyNotPaid(policy models.Policy) error {
-	policy.Status = "INSOLUTO"
-	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
-	policy.Updated = time.Now().UTC()
-
-	return nil
-}
-
-func POCRoutine2Fx() {
-	var (
-		policies      = make([]models.Policy, 0)
-		paidWg        sync.WaitGroup
-		paidChannel   = make(chan models.Policy)
-		unpaidWg      sync.WaitGroup
-		unpaidChannel = make(chan models.Policy)
-	)
-
-	docIterator := lib.OrderFirestore(lib.PolicyCollection, "creationDate", firestore.Asc)
-	snapshots, err := docIterator.GetAll()
+	trs, err := GetTransactionsByPolicyAnnuity(p.Uid, p.Annuity)
 	if err != nil {
-		log.Println(err.Error())
+		log.Printf("error: %s", err.Error())
+		r.Error = err.Error()
+		koChannel <- r
 		return
 	}
-	for _, sp := range snapshots {
-		var policy models.Policy
-		sp.DataTo(&policy)
-		policies = append(policies, policy)
 
+	r.Transactions = trs
+	p.Status = "RENEWED"
+	p.StatusHistory = append(p.StatusHistory, p.Status)
+	p.Updated = time.Now().UTC()
+
+	fireBatch := map[string]map[string]interface{}{
+		"policyRenewedTest": {
+			p.Uid: p,
+		},
+		"transactionsRenewdTest": {},
 	}
-	log.Printf("Got %d policies", len(policies))
-
-	for _, p := range policies {
-		if p.IsPay {
-			paidWg.Add(1)
-			go func(uid string) {
-				paidChannel <- payPolicy(p)
-			}(p.Uid)
-			paidWg.Done()
-		} else {
-			unpaidWg.Add(1)
-			go func(uid string) {
-				unpaidChannel <- demotedPolicy(p)
-			}(p.Uid)
-			unpaidWg.Done()
-		}
+	for idx, tr := range trs {
+		tr.UpdateDate = time.Now().UTC()
+		tr.BigQueryParse()
+		fireBatch["transactionsRenewdTest"][tr.Uid] = tr
+		trs[idx] = tr
 	}
 
-	go func() {
-		paidWg.Wait()
-		close(paidChannel)
-	}()
-
-	go func() {
-		unpaidWg.Wait()
-		close(unpaidChannel)
-	}()
-
-	for p := range paidChannel {
-		log.Printf("=== paid policy %s", p.Uid)
-	}
-
-	for p := range unpaidChannel {
-		log.Printf("--- demoted policy %s", p.Uid)
-	}
-}
-
-func demotedPolicy(p models.Policy) models.Policy {
-	time.Sleep(time.Millisecond * 3000)
-	return p
-}
-
-func payPolicy(p models.Policy) models.Policy {
-	time.Sleep(time.Millisecond * 2000)
-	payTransactions(p.Uid)
-	return p
-}
-
-func payTransactions(policyUid string) {
-	var trWg sync.WaitGroup
-	promotedTransactions := make(chan models.Transaction)
-	trs := transaction.GetPolicyTransactions("", policyUid) // TODO: get only next annuity - create function
-
-	for _, tr := range trs {
-		trWg.Add(1)
-		go func(t models.Transaction) {
-			time.Sleep(time.Millisecond * 1500)
-			promotedTransactions <- t
-		}(tr)
-		trWg.Done()
-	}
-
-	go func() {
-		trWg.Wait()
-		close(promotedTransactions)
-	}()
-
-	for tr := range promotedTransactions {
-		log.Printf("promoted transaction %s", tr.Uid)
-	}
-}
-
-func POCRoutineFx() {
-
-	pChannel := policyChannel()
-	defer close(pChannel)
-
-	paidChannel := make(chan string)
-	unpaidChannel := make(chan string)
-
-	paidCount := 0
-	unpaidCount := 0
-
-	for p := range pChannel {
-		log.Println("-------------------------- " + p.Uid)
-		if p.IsPay {
-			go func(uid string) {
-				paidChannel <- branch1(uid)
-			}(p.Uid)
-		} else {
-			go func(uid string) {
-				unpaidChannel <- branch2(uid)
-			}(p.Uid)
-		}
-	}
-
-	for p := range paidChannel {
-		paidCount++
-		log.Printf("%s - %d", p, paidCount)
-	}
-
-	for p := range unpaidChannel {
-		unpaidCount++
-		log.Printf("%s - %d", p, unpaidCount)
-	}
-}
-
-func policyChannel() chan models.Policy {
-	pChannel := make(chan models.Policy)
-
-	log.Println("query start....")
-	docIterator := lib.OrderFirestore(lib.PolicyCollection, "creationDate", firestore.Asc)
-	log.Println("iterator start....")
-	snapshots, err := docIterator.GetAll()
+	err = lib.SetBatchFirestoreErr(fireBatch)
 	if err != nil {
-		log.Println(err.Error())
-		return pChannel
-	}
-	log.Printf("looping %d snapshots....", len(snapshots))
-	for idx, sp := range snapshots {
-		var policy models.Policy
-		sp.DataTo(&policy)
-		go func(isLast bool) {
-			pChannel <- policy
-			if isLast {
-				close(pChannel)
-			}
-		}(idx+1 == len(snapshots))
-	}
-
-	return pChannel
-}
-
-func branch1(uid string) string {
-	msg := fmt.Sprintf("branch1! promoting policy %s at %d", uid, time.Now().UnixMilli())
-	time.Sleep(time.Millisecond * 2000)
-	nestedBranch(uid)
-	return msg
-}
-
-func branch2(uid string) string {
-	msg := fmt.Sprintf("branch2! %s INSOLUTO at %d", uid, time.Now().UnixMilli())
-
-	time.Sleep(time.Millisecond * 2500)
-	return msg
-}
-
-func nestedBranch(uid string) {
-	nestedChannel := make(chan string)
-	trs := transaction.GetPolicyTransactions("", uid)
-
-	for _, tr := range trs {
-		go func(uid, policyUid string) {
-			nestedChannel <- branch3(uid, policyUid)
-		}(tr.Uid, uid)
-	}
-
-	for n := range nestedChannel {
-		log.Println(n)
-	}
-}
-
-func branch3(uid, policyUid string) string {
-	msg := fmt.Sprintf("branch3! promoting transaction %s - policy %s", uid, policyUid)
-	time.Sleep(time.Millisecond * 1500)
-
-	return msg
-}
-
-var (
-	wg sync.WaitGroup
-)
-
-// ///////////
-func POC() {
-	var (
-		policies       []models.Policy
-		resultsChannel chan string = make(chan string)
-		startTime                  = time.Now().UTC().UnixMilli()
-	)
-
-	log.Printf("Start at %d", startTime)
-
-	policies = getAllPolicies()
-
-	log.Printf("found %d policies", len(policies))
-
-	wg.Add(len(policies))
-	for _, p := range policies {
-		if p.IsPay {
-			// log.Printf("promoting %s ....", p.Uid)
-			go promoPolicy(p, resultsChannel)
-		} else {
-			// log.Printf("demoting %s ....", p.Uid)
-			go demotePolicy(p, resultsChannel)
-		}
-	}
-
-	go func() {
-		wg.Wait()
-		log.Println("closing channel ...........")
-		close(resultsChannel)
-	}()
-
-	for res := range resultsChannel {
-		log.Println(res)
-	}
-
-	endTime := time.Now().UTC().UnixMilli()
-
-	log.Printf("End at %d - duration %d", endTime, endTime-startTime)
-}
-
-func getAllPolicies() (policies []models.Policy) {
-	docIterator := lib.OrderFirestore(lib.PolicyCollection, "creationDate", firestore.Asc)
-	snapshots, err := docIterator.GetAll()
-	if err != nil {
-		log.Println(err.Error())
+		r.Error = err.Error()
+		koChannel <- r
 		return
 	}
-	for _, sp := range snapshots {
-		var policy models.Policy
-		sp.DataTo(&policy)
-		policies = append(policies, policy)
+
+	// err = lib.InsertRowsBigQuery(models.WoptaDataset, models.PolicyCollection, p)
+	// if err != nil {
+	// 	koChannel <- r
+	// 	return
+	// }
+
+	// err = lib.InsertRowsBigQuery(models.WoptaDataset, models.TransactionsCollection, trs)
+	// if err != nil {
+	// 	koChannel <- r
+	// 	return
+	// }
+
+	okChannel <- r
+}
+
+func setPolicyNotPaid(p models.Policy, okChannel, koChannel chan<- RenewReport, wg *sync.WaitGroup) {
+	defer wg.Done()
+	p.Status = "INSOLUTO"
+	p.StatusHistory = append(p.StatusHistory, p.Status)
+	p.Updated = time.Now().UTC()
+
+	r := RenewReport{
+		Policy: p,
 	}
-	return policies
-}
-
-func demotePolicy(p models.Policy, c chan<- string) {
-	// log.Printf("demotion start %s", p.Uid)
-	defer wg.Done()
-
-	// do business logic
-	time.Sleep(3000)
-
-	c <- fmt.Sprintf("------ demoted policy %s", p.Uid)
-}
-
-func promoPolicy(p models.Policy, c chan<- string) {
-	// log.Printf("promotion start %s", p.Uid)
-	defer wg.Done()
-
-	trs := transaction.GetPolicyTransactions("", p.Uid) // TODO: get only next annuity - create function
-
-	wg.Add(len(trs))
-	for _, tr := range trs {
-		go promoTr(tr, c)
+	fireBatch := map[string]map[string]interface{}{
+		"policyRenewedTest": {
+			p.Uid: p,
+		},
 	}
 
-	// do business logic
-	time.Sleep(2000)
+	err := lib.SetBatchFirestoreErr(fireBatch)
+	if err != nil {
+		r.Error = err.Error()
+		koChannel <- r
+		return
+	}
 
-	c <- fmt.Sprintf("++++++ promoted policy %s", p.Uid)
+	// err = lib.InsertRowsBigQuery(models.WoptaDataset, models.PolicyCollection, p)
+	// if err != nil {
+	// 	koChannel <- r
+	// 	return
+	// }
+
+	okChannel <- r
 }
 
-func promoTr(tr models.Transaction, c chan<- string) {
-	defer wg.Done()
+// transactions
+func GetTransactionsByPolicyAnnuity(policyUid string, annuity int) ([]models.Transaction, error) {
+	var (
+		query  bytes.Buffer
+		params = make(map[string]interface{})
+	)
 
-	// do business logic
-	time.Sleep(1500)
+	// SELECT * FROM `wopta.renewTransactionsDraft` WHERE policyUid = '@policyUid' AND annuity = @annuity
+	params["policyUid"] = policyUid
+	params["annuity"] = annuity
 
-	c <- fmt.Sprintf("******* promoted transaction %s", tr.Uid)
+	query.WriteString("SELECT * FROM `wopta.transactionsView` WHERE " +
+		"policyUid = '@policyUid' AND " +
+		"annuity = @annuity")
+
+	return lib.QueryParametrizedRowsBigQuery[models.Transaction](query.String(), params)
 }
