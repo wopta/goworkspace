@@ -1,4 +1,4 @@
-gmodule github.com/wopta/goworkspace/models
+module github.com/wopta/goworkspace/models
 
 go 1.21
 
