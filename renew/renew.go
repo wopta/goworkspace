@@ -8,7 +8,14 @@ import (
 	"github.com/wopta/goworkspace/lib"
 )
 
-var routes []lib.Route = []lib.Route{}
+var routes []lib.Route = []lib.Route{
+	{
+		Route:   "/v1/draft",
+		Method:  http.MethodPost,
+		Handler: lib.ResponseLoggerWrapper(RenewPolicyFx),
+		Roles:   []string{},
+	},
+}
 
 func init() {
 	log.Println("INIT Renew")
