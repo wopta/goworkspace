@@ -130,12 +130,15 @@ func getPolicies(policyUid string, products map[string]models.Product) ([]models
 			productVersionKey := fmt.Sprintf("%sProductVersion", product.Version)
 			targetMonthKey := fmt.Sprintf("%s%sMonth", product.Name, product.Version)
 			targetDayKey := fmt.Sprintf("%s%sDay", product.Name, product.Version)
+			isRenewableKey := "isRenewable"
 			params[productNameKey] = product.Name
 			params[productVersionKey] = product.Version
+			params[isRenewableKey] = true
 			params[targetMonthKey] = int64(targetDate.Month())
 			params[targetDayKey] = int64(targetDate.Day())
 			query.WriteString("(name = @" + productNameKey)
 			query.WriteString(" AND productVersion = @" + productVersionKey)
+			query.WriteString(" AND isRenewable = @" + isRenewableKey)
 			query.WriteString(" AND EXTRACT(MONTH FROM startDate) = @" + targetMonthKey)
 			query.WriteString(" AND EXTRACT(DAY FROM startDate) = @" + targetDayKey + ")")
 		}
@@ -167,6 +170,8 @@ func draft(policy models.Policy, product models.Product, ch chan<- RenewReport, 
 		wg.Done()
 	}()
 
+	// TODO: check if need to remove expiredGuarantee
+
 	policy.IsPay = false
 	policy.Annuity = policy.Annuity + 1
 	policy.Status = "Rinnovo in corso" // TODO: find status name
@@ -186,5 +191,9 @@ func draft(policy models.Policy, product models.Product, ch chan<- RenewReport, 
 	policy.PayUrl = payUrl
 	r.Policy = policy
 	r.Transactions = transactions
+
+	// TODO save policy and transactions to Firestore
+
+	// TODO: save policy and transaction to BigQuery
 
 }
