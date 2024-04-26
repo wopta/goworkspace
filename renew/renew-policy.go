@@ -172,6 +172,8 @@ func draft(policy models.Policy, product models.Product, ch chan<- RenewReport, 
 
 	// TODO: check if need to remove expiredGuarantee
 
+	// TODO: call quote to get new prices
+
 	policy.IsPay = false
 	policy.Annuity = policy.Annuity + 1
 	policy.Status = "Rinnovo in corso" // TODO: find status name
