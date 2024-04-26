@@ -55,6 +55,7 @@ func createTransaction(policy models.Policy, uidGenerator func() string) models.
 		Uid:           uidGenerator(),
 		PolicyName:    policy.Name,
 		Name:          contractorName,
+		Annuity:       policy.Annuity,
 		PolicyUid:     policy.Uid,
 		Company:       policy.Company,
 		NumberCompany: policy.CodeCompany,
@@ -67,7 +68,8 @@ func createTransaction(policy models.Policy, uidGenerator func() string) models.
 func setDateInfo(index int, transaction models.Transaction, policy models.Policy) models.Transaction {
 	now := time.Now().UTC()
 
-	transaction.EffectiveDate = lib.AddMonths(policy.StartDate, index)
+	startDate := lib.AddMonths(policy.StartDate, 12*transaction.Annuity)
+	transaction.EffectiveDate = lib.AddMonths(startDate, index)
 	transaction.ScheduleDate = transaction.EffectiveDate.Format(time.DateOnly)
 	transaction.ExpirationDate = transaction.EffectiveDate.AddDate(10, 0, 0).Format(time.DateOnly)
 	transaction.CreationDate = now
