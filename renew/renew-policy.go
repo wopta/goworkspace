@@ -9,6 +9,7 @@ import (
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/payment"
+	"github.com/wopta/goworkspace/quote"
 	"github.com/wopta/goworkspace/transaction"
 	"io"
 	"log"
@@ -170,12 +171,28 @@ func draft(policy models.Policy, product models.Product, ch chan<- RenewReport, 
 		wg.Done()
 	}()
 
+	//policy.Annuity = policy.Annuity + 1
+	policy.Annuity = policy.Annuity + 50
+	guarantees := make([]models.Guarante, 0)
 	// TODO: check if need to remove expiredGuarantee
+	for _, guarantee := range guarantees {
+		if policy.Annuity < guarantee.Value.Duration.Year {
+			guarantees = append(guarantees, guarantee)
+		}
+	}
+	policy.Assets[0].Guarantees = lib.SliceFilter(guarantees, func(guarante models.Guarante) bool {
+		return guarante.IsSelected == true
+	})
 
 	// TODO: call quote to get new prices
+	// quote seems not ready to be used for policy renewal
+	policy, err := quote.Life(policy, policy.Channel, nil, nil, "")
+	if err != nil {
+		r.Error = err.Error()
+		return
+	}
 
 	policy.IsPay = false
-	policy.Annuity = policy.Annuity + 1
 	policy.Status = "Rinnovo in corso" // TODO: find status name
 	policy.StatusHistory = append(policy.StatusHistory, models.TransactionStatusToPay, "Rinnovo in corso")
 
