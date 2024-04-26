@@ -8,9 +8,12 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/payment"
+	"github.com/wopta/goworkspace/transaction"
 	"io"
 	"log"
 	"net/http"
+	"sync"
 	"time"
 )
 
@@ -32,11 +35,13 @@ type RenewPolicyResp struct {
 func RenewPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err  error
+		wg   = new(sync.WaitGroup)
 		req  RenewPolicyReq
 		resp = RenewPolicyResp{
 			Success: make([]RenewReport, 0),
 			Failure: make([]RenewReport, 0),
 		}
+		productsMap = make(map[string]models.Product)
 	)
 
 	log.SetPrefix("[RenewPolicyFx] ")
@@ -63,18 +68,42 @@ func RenewPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	}
 
 	// TODO: solve issue that non active products are not fetched
-	products := getProductsByPolicyType(policyType)
+	productsMap = getProductsMapByPolicyType(policyType)
 
-	policies, err := getPolicies(req.PolicyUid, products)
-
+	policies, err := getPolicies(req.PolicyUid, productsMap)
+	if err != nil {
+		log.Printf("error getting policies: %v", err)
+		return "", nil, err
+	}
 	log.Printf("found %02d policies", len(policies))
+
+	ch := make(chan RenewReport, len(policies))
+
+	for _, policy := range policies {
+		wg.Add(1)
+		key := fmt.Sprintf("%s-%s", policy.Name, policy.ProductVersion)
+		go draft(policy, productsMap[key], ch, wg)
+	}
+
+	go func() {
+		wg.Wait()
+		close(ch)
+	}()
+
+	for res := range ch {
+		if res.Error != "" {
+			resp.Failure = append(resp.Failure, res)
+			continue
+		}
+		resp.Success = append(resp.Success, res)
+	}
 
 	rawResp, err := json.Marshal(resp)
 
 	return string(rawResp), resp, err
 }
 
-func getPolicies(policyUid string, products []models.Product) ([]models.Policy, error) {
+func getPolicies(policyUid string, products map[string]models.Product) ([]models.Policy, error) {
 	var (
 		err      error
 		query    bytes.Buffer
@@ -89,7 +118,8 @@ func getPolicies(policyUid string, products []models.Product) ([]models.Policy, 
 		params["policyUid"] = policyUid
 	} else if len(products) > 1 {
 		//today := time.Now().UTC()
-		for index, product := range products {
+		tmpProducts := lib.GetMapValues(products)
+		for index, product := range tmpProducts {
 			if index != 0 {
 				query.WriteString(" OR ")
 			}
@@ -117,5 +147,44 @@ func getPolicies(policyUid string, products []models.Product) ([]models.Policy, 
 		return nil, err
 	}
 
+	policies = lib.SliceMap(policies, func(p models.Policy) models.Policy {
+		// TODO: check if is it better to do so or is better to convert all bigquery fields to json fields
+		var tmpPolicy models.Policy
+		err = json.Unmarshal([]byte(p.Data), &tmpPolicy)
+		return tmpPolicy
+	})
+
 	return policies, nil
+}
+
+func draft(policy models.Policy, product models.Product, ch chan<- RenewReport, wg *sync.WaitGroup) {
+	r := RenewReport{
+		Policy: policy,
+	}
+
+	defer func() {
+		ch <- r
+		wg.Done()
+	}()
+
+	policy.IsPay = false
+	policy.Annuity = policy.Annuity + 1
+	policy.Status = "Rinnovo in corso" // TODO: find status name
+	policy.StatusHistory = append(policy.StatusHistory, models.TransactionStatusToPay, "Rinnovo in corso")
+
+	transactions := transaction.CreateTransactions(policy, product, func() string {
+		return lib.NewDoc(models.TransactionsCollection)
+	})
+
+	// TODO: value of scheduleFirstRate depends on if customer has an active "mandato"
+	payUrl, transactions, err := payment.Controller(policy, product, transactions, false)
+	if err != nil {
+		r.Error = err.Error()
+		return
+	}
+
+	policy.PayUrl = payUrl
+	r.Policy = policy
+	r.Transactions = transactions
+
 }
