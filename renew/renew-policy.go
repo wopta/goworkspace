@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/go-chi/chi/v5"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/payment"
@@ -56,10 +55,9 @@ func RenewPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 
-	policyType := chi.URLParam(r, "policyType")
-	if policyType == "" {
-		log.Printf("no policyType specified")
-		return "", "", errors.New("no policyType specified")
+	policyType, quoteType, err := getQueryParameters(r)
+	if err != nil {
+		return "", nil, err
 	}
 
 	err = json.Unmarshal(body, &req)
@@ -69,9 +67,9 @@ func RenewPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	}
 
 	// TODO: solve issue that non active products are not fetched
-	productsMap = getProductsMapByPolicyType(policyType)
+	productsMap = getProductsMapByPolicyType(policyType, quoteType)
 
-	policies, err := getPolicies(req.PolicyUid, productsMap)
+	policies, err := getPolicies(req.PolicyUid, policyType, quoteType, productsMap)
 	if err != nil {
 		log.Printf("error getting policies: %v", err)
 		return "", nil, err
@@ -104,7 +102,22 @@ func RenewPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	return string(rawResp), resp, err
 }
 
-func getPolicies(policyUid string, products map[string]models.Product) ([]models.Policy, error) {
+func getQueryParameters(r *http.Request) (string, string, error) {
+	policyType := r.URL.Query().Get("policyType")
+	if policyType == "" {
+		log.Printf("no policyType specified")
+		return "", "", errors.New("no policyType specified")
+	}
+
+	quoteType := r.URL.Query().Get("quoteType")
+	if quoteType == "" {
+		log.Printf("no quoteType specified")
+		return "", "", errors.New("no quoteType specified")
+	}
+	return policyType, quoteType, nil
+}
+
+func getPolicies(policyUid, policyType, quoteType string, products map[string]models.Product) ([]models.Policy, error) {
 	var (
 		err      error
 		query    bytes.Buffer
@@ -117,9 +130,14 @@ func getPolicies(policyUid string, products map[string]models.Product) ([]models
 	if policyUid != "" {
 		query.WriteString(" uid = @policyUid ")
 		params["policyUid"] = policyUid
-	} else if len(products) > 1 {
+
+	} else if len(products) > 0 {
 		//today := time.Now().UTC()
 		tmpProducts := lib.GetMapValues(products)
+		params["isRenewable"] = true
+		params["policyType"] = policyType
+		params["quoteType"] = quoteType
+
 		for index, product := range tmpProducts {
 			if index != 0 {
 				query.WriteString(" OR ")
@@ -131,15 +149,15 @@ func getPolicies(policyUid string, products map[string]models.Product) ([]models
 			productVersionKey := fmt.Sprintf("%sProductVersion", product.Version)
 			targetMonthKey := fmt.Sprintf("%s%sMonth", product.Name, product.Version)
 			targetDayKey := fmt.Sprintf("%s%sDay", product.Name, product.Version)
-			isRenewableKey := "isRenewable"
 			params[productNameKey] = product.Name
 			params[productVersionKey] = product.Version
-			params[isRenewableKey] = true
 			params[targetMonthKey] = int64(targetDate.Month())
 			params[targetDayKey] = int64(targetDate.Day())
 			query.WriteString("(name = @" + productNameKey)
 			query.WriteString(" AND productVersion = @" + productVersionKey)
-			query.WriteString(" AND isRenewable = @" + isRenewableKey)
+			query.WriteString(" AND isRenewable = @isRenewable")
+			query.WriteString(" AND policyType = @policyType")
+			query.WriteString(" AND quoteType = @quoteType")
 			query.WriteString(" AND EXTRACT(MONTH FROM startDate) = @" + targetMonthKey)
 			query.WriteString(" AND EXTRACT(DAY FROM startDate) = @" + targetDayKey + ")")
 		}
