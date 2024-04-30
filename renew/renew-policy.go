@@ -8,7 +8,6 @@ import (
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/payment"
-	"github.com/wopta/goworkspace/quote"
 	"github.com/wopta/goworkspace/transaction"
 	"io"
 	"log"
@@ -132,12 +131,21 @@ func getPolicies(policyUid, policyType, quoteType string, products map[string]mo
 		params["policyUid"] = policyUid
 
 	} else if len(products) > 0 {
-		//today := time.Now().UTC()
+		today := time.Now().UTC()
+
 		tmpProducts := lib.GetMapValues(products)
 		params["isRenewable"] = true
 		params["policyType"] = policyType
 		params["quoteType"] = quoteType
+		params["isPay"] = true
+		params["year"] = int64(today.Year())
 
+		query.WriteString("isRenewable = @isRenewable")
+		query.WriteString(" AND policyType = @policyType")
+		query.WriteString(" AND quoteType = @quoteType")
+		query.WriteString(" AND isPay = @isPay")
+		query.WriteString(" AND EXTRACT(YEAR FROM DATE_ADD(endDate, INTERVAL 1 YEAR)) != @year")
+		query.WriteString(" AND (")
 		for index, product := range tmpProducts {
 			if index != 0 {
 				query.WriteString(" OR ")
@@ -145,22 +153,24 @@ func getPolicies(policyUid, policyType, quoteType string, products map[string]mo
 			//targetDate := today.AddDate(0, 0, product.RenewOffset)
 			// TODO: restore commented lines
 			targetDate := time.Date(2024, 03, 21, 0, 0, 0, 0, time.UTC)
+
 			productNameKey := fmt.Sprintf("%sProductName", product.Name)
 			productVersionKey := fmt.Sprintf("%sProductVersion", product.Version)
+			targetYearKey := fmt.Sprintf("%s%sYear", product.Name, product.Version)
 			targetMonthKey := fmt.Sprintf("%s%sMonth", product.Name, product.Version)
 			targetDayKey := fmt.Sprintf("%s%sDay", product.Name, product.Version)
 			params[productNameKey] = product.Name
 			params[productVersionKey] = product.Version
+			params[targetYearKey] = int64(targetDate.Year())
 			params[targetMonthKey] = int64(targetDate.Month())
 			params[targetDayKey] = int64(targetDate.Day())
 			query.WriteString("(name = @" + productNameKey)
 			query.WriteString(" AND productVersion = @" + productVersionKey)
-			query.WriteString(" AND isRenewable = @isRenewable")
-			query.WriteString(" AND policyType = @policyType")
-			query.WriteString(" AND quoteType = @quoteType")
+
 			query.WriteString(" AND EXTRACT(MONTH FROM startDate) = @" + targetMonthKey)
 			query.WriteString(" AND EXTRACT(DAY FROM startDate) = @" + targetDayKey + ")")
 		}
+		query.WriteString(")")
 	}
 
 	policies, err = lib.QueryParametrizedRowsBigQuery[models.Policy](query.String(), params)
@@ -191,23 +201,36 @@ func draft(policy models.Policy, product models.Product, ch chan<- RenewReport, 
 
 	//policy.Annuity = policy.Annuity + 1
 	policy.Annuity = policy.Annuity + 50
-	guarantees := make([]models.Guarante, 0)
-	// TODO: check if need to remove expiredGuarantee
-	for _, guarantee := range guarantees {
-		if policy.Annuity < guarantee.Value.Duration.Year {
-			guarantees = append(guarantees, guarantee)
-		}
-	}
-	policy.Assets[0].Guarantees = lib.SliceFilter(guarantees, func(guarante models.Guarante) bool {
-		return guarante.IsSelected == true
-	})
 
-	// TODO: call quote to get new prices
-	// quote seems not ready to be used for policy renewal
-	policy, err := quote.Life(policy, policy.Channel, nil, nil, "")
-	if err != nil {
-		r.Error = err.Error()
-		return
+	// TODO: check if need to remove expiredGuarantee
+	var priceGross, priceNett, taxAmount, priceGrossMonthly, priceNettMonthly, taxAmountMonthly float64
+	for index, guarantee := range policy.Assets[0].Guarantees {
+		if policy.Annuity > guarantee.Value.Duration.Year {
+			policy.Assets[0].Guarantees[index].IsDeleted = true
+			continue
+		}
+
+		priceGross += guarantee.Value.PremiumGrossYearly
+		priceNett += guarantee.Value.PremiumNetYearly
+		taxAmount += guarantee.Value.PremiumTaxAmountYearly
+		priceGrossMonthly += guarantee.Value.PremiumGrossMonthly
+		priceNettMonthly += guarantee.Value.PremiumNetMonthly
+		taxAmountMonthly += guarantee.Value.PremiumTaxAmountMonthly
+	}
+	policy.PriceGross = priceGross
+	policy.PriceNett = priceNett
+	policy.TaxAmount = taxAmount
+	policy.PriceGrossMonthly = priceGrossMonthly
+	policy.PriceNettMonthly = priceNettMonthly
+	policy.TaxAmountMonthly = taxAmountMonthly
+	policy.OffersPrices[policy.OfferlName][policy.PaymentSplit].Tax = policy.TaxAmount
+	policy.OffersPrices[policy.OfferlName][policy.PaymentSplit].Net = policy.PriceNett
+	policy.OffersPrices[policy.OfferlName][policy.PaymentSplit].Gross = policy.PriceGross
+
+	if policy.PaymentSplit == string(models.PaySplitMonthly) {
+		policy.OffersPrices[policy.OfferlName][policy.PaymentSplit].Tax = policy.TaxAmountMonthly
+		policy.OffersPrices[policy.OfferlName][policy.PaymentSplit].Net = policy.PriceNettMonthly
+		policy.OffersPrices[policy.OfferlName][policy.PaymentSplit].Gross = policy.PriceGrossMonthly
 	}
 
 	policy.IsPay = false
