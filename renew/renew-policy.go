@@ -138,13 +138,14 @@ func getPolicies(policyUid, policyType, quoteType string, products map[string]mo
 		params["policyType"] = policyType
 		params["quoteType"] = quoteType
 		params["isPay"] = true
+		params["isDeleted"] = false
 		params["year"] = int64(today.Year())
 
 		query.WriteString("isRenewable = @isRenewable")
 		query.WriteString(" AND policyType = @policyType")
 		query.WriteString(" AND quoteType = @quoteType")
 		query.WriteString(" AND isPay = @isPay")
-		query.WriteString(" AND EXTRACT(YEAR FROM DATE_ADD(endDate, INTERVAL 1 YEAR)) != @year")
+		query.WriteString(" AND isDeleted = @isDeleted")
 		query.WriteString(" AND (")
 		for index, product := range tmpProducts {
 			if index != 0 {
@@ -154,19 +155,21 @@ func getPolicies(policyUid, policyType, quoteType string, products map[string]mo
 			// TODO: restore commented lines
 			targetDate := time.Date(2024, 03, 21, 0, 0, 0, 0, time.UTC)
 
-			productNameKey := fmt.Sprintf("%sProductName", product.Name)
-			productVersionKey := fmt.Sprintf("%sProductVersion", product.Version)
+			productNameKey := fmt.Sprintf("%s%sProductName", product.Name, product.Version)
+			productVersionKey := fmt.Sprintf("%s%sProductVersion", product.Name, product.Version)
 			targetYearKey := fmt.Sprintf("%s%sYear", product.Name, product.Version)
 			targetMonthKey := fmt.Sprintf("%s%sMonth", product.Name, product.Version)
 			targetDayKey := fmt.Sprintf("%s%sDay", product.Name, product.Version)
+			targetDateKey := fmt.Sprintf("%s%sDate", product.Name, product.Version)
 			params[productNameKey] = product.Name
 			params[productVersionKey] = product.Version
 			params[targetYearKey] = int64(targetDate.Year())
 			params[targetMonthKey] = int64(targetDate.Month())
 			params[targetDayKey] = int64(targetDate.Day())
+			params[targetDateKey] = lib.GetBigQueryNullDateTime(targetDate)
 			query.WriteString("(name = @" + productNameKey)
 			query.WriteString(" AND productVersion = @" + productVersionKey)
-
+			query.WriteString(" AND endDate != @" + targetDateKey)
 			query.WriteString(" AND EXTRACT(MONTH FROM startDate) = @" + targetMonthKey)
 			query.WriteString(" AND EXTRACT(DAY FROM startDate) = @" + targetDayKey + ")")
 		}
