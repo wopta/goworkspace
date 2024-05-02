@@ -207,7 +207,10 @@ func draft(policy models.Policy, product models.Product, ch chan<- RenewReport, 
 
 	policy.Annuity = policy.Annuity + 1
 
-	calculatePrices(&policy)
+	err = calculatePrices(&policy)
+	if err != nil {
+		return
+	}
 
 	policy.IsPay = false
 	policy.Status = models.TransactionStatusToPay
@@ -233,8 +236,12 @@ func draft(policy models.Policy, product models.Product, ch chan<- RenewReport, 
 
 }
 
-func calculatePrices(policy *models.Policy) {
+func calculatePrices(policy *models.Policy) error {
 	var priceGross, priceNett, taxAmount, priceGrossMonthly, priceNettMonthly, taxAmountMonthly float64
+
+	if policy.Name != models.LifeProduct {
+		return errors.New("product not supported")
+	}
 
 	for index, guarantee := range policy.Assets[0].Guarantees {
 		if policy.Annuity > guarantee.Value.Duration.Year {
@@ -264,4 +271,6 @@ func calculatePrices(policy *models.Policy) {
 		policy.OffersPrices[policy.OfferlName][policy.PaymentSplit].Net = policy.PriceNettMonthly
 		policy.OffersPrices[policy.OfferlName][policy.PaymentSplit].Gross = policy.PriceGrossMonthly
 	}
+
+	return nil
 }
