@@ -193,20 +193,51 @@ func getPolicies(policyUid, policyType, quoteType string, products map[string]mo
 }
 
 func draft(policy models.Policy, product models.Product, ch chan<- RenewReport, wg *sync.WaitGroup) {
-	r := RenewReport{
-		Policy: policy,
-	}
+	var (
+		err          error
+		r            RenewReport
+		transactions []models.Transaction
+	)
 
 	defer func() {
+		r.Policy = policy
+		r.Transactions = transactions
+		r.Error = err.Error()
 		ch <- r
 		wg.Done()
 	}()
 
-	//policy.Annuity = policy.Annuity + 1
-	policy.Annuity = policy.Annuity + 50
+	policy.Annuity = policy.Annuity + 1
 
-	// TODO: check if need to remove expiredGuarantee
+	calculatePrices(&policy)
+
+	policy.IsPay = false
+	policy.Status = models.TransactionStatusToPay
+	policy.StatusHistory = append(policy.StatusHistory, models.PolicyDraftRenew, models.TransactionStatusToPay)
+
+	transactions = transaction.CreateTransactions(policy, product, func() string {
+		return lib.NewDoc(models.TransactionsCollection)
+	})
+
+	// TODO: value of scheduleFirstRate depends on if customer has an active "mandato"
+	payUrl, transactions, err := payment.Controller(policy, product, transactions, false)
+	if err != nil {
+		return
+	}
+
+	policy.PayUrl = payUrl
+	policy.Updated = time.Now().UTC()
+	policy.IsRenew = true
+
+	// TODO save policy and transactions to Firestore
+
+	// TODO: save policy and transaction to BigQuery
+
+}
+
+func calculatePrices(policy *models.Policy) {
 	var priceGross, priceNett, taxAmount, priceGrossMonthly, priceNettMonthly, taxAmountMonthly float64
+
 	for index, guarantee := range policy.Assets[0].Guarantees {
 		if policy.Annuity > guarantee.Value.Duration.Year {
 			policy.Assets[0].Guarantees[index].IsDeleted = true
@@ -235,28 +266,4 @@ func draft(policy models.Policy, product models.Product, ch chan<- RenewReport, 
 		policy.OffersPrices[policy.OfferlName][policy.PaymentSplit].Net = policy.PriceNettMonthly
 		policy.OffersPrices[policy.OfferlName][policy.PaymentSplit].Gross = policy.PriceGrossMonthly
 	}
-
-	policy.IsPay = false
-	policy.Status = "Rinnovo in corso" // TODO: find status name
-	policy.StatusHistory = append(policy.StatusHistory, models.TransactionStatusToPay, "Rinnovo in corso")
-
-	transactions := transaction.CreateTransactions(policy, product, func() string {
-		return lib.NewDoc(models.TransactionsCollection)
-	})
-
-	// TODO: value of scheduleFirstRate depends on if customer has an active "mandato"
-	payUrl, transactions, err := payment.Controller(policy, product, transactions, false)
-	if err != nil {
-		r.Error = err.Error()
-		return
-	}
-
-	policy.PayUrl = payUrl
-	r.Policy = policy
-	r.Transactions = transactions
-
-	// TODO save policy and transactions to Firestore
-
-	// TODO: save policy and transaction to BigQuery
-
 }
