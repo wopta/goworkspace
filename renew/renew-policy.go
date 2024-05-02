@@ -19,7 +19,7 @@ import (
 type RenewReport struct {
 	Policy       models.Policy        `json:"policy"`
 	Transactions []models.Transaction `json:"transactions"`
-	Error        string               `json:"error,omitempty"`
+	Error        error                `json:"error,omitempty"`
 }
 
 type RenewPolicyReq struct {
@@ -89,7 +89,7 @@ func RenewPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	}()
 
 	for res := range ch {
-		if res.Error != "" {
+		if res.Error != nil {
 			resp.Failure = append(resp.Failure, res)
 			continue
 		}
@@ -202,7 +202,7 @@ func draft(policy models.Policy, product models.Product, ch chan<- RenewReport, 
 	defer func() {
 		r.Policy = policy
 		r.Transactions = transactions
-		r.Error = err.Error()
+		r.Error = err
 		ch <- r
 		wg.Done()
 	}()
