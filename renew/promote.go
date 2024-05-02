@@ -15,12 +15,6 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
-// TODO: remove me
-const (
-	policyRenewedTestCollection      string = "policyRenewedTest"
-	transactionRenewedTestCollection string = "transactionRenewedTest"
-)
-
 type PromoteReq struct {
 	Date string `json:"date"`
 }
@@ -130,7 +124,7 @@ func getRenewingPolicies(renewDate time.Time) ([]models.Policy, error) {
 		"EXTRACT(MONTH FROM startDate) = @month AND "+
 		"EXTRACT(DAY FROM startDate) = @day",
 		models.WoptaDataset,
-		models.PoliciesViewCollection)) // TODO: change to renewPolicyCollection
+		renewPolicyCollection))
 
 	policies, err := lib.QueryParametrizedRowsBigQuery[models.Policy](query.String(), params)
 	if err != nil {
@@ -155,7 +149,7 @@ func getTransactionsByPolicyAnnuity(policyUid string, annuity int) ([]models.Tra
 		{field: "annuity", operator: "==", queryValue: annuity},
 	}
 
-	return firestoreWhere[models.Transaction](models.TransactionsCollection, queries)
+	return firestoreWhere[models.Transaction](renewTransactionCollection, queries)
 }
 
 func promotePolicyData(p models.Policy, promoteChannel chan<- RenewReport, wg *sync.WaitGroup, saveFn func(map[string]map[string]interface{}) error) {
@@ -174,7 +168,7 @@ func promotePolicyData(p models.Policy, promoteChannel chan<- RenewReport, wg *s
 		wg.Done()
 	}()
 
-	if transactions, err = getTransactionsByPolicyAnnuity(p.Uid, p.Annuity); err != nil { // TODO: change to renewTransactionCollection
+	if transactions, err = getTransactionsByPolicyAnnuity(p.Uid, p.Annuity); err != nil {
 		return
 	}
 

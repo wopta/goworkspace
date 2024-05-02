@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"log"
 	"os"
 	"time"
 
@@ -12,6 +11,12 @@ import (
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"google.golang.org/api/iterator"
+)
+
+// TODO: remove me
+const (
+	policyRenewedTestCollection      string = "policyRenewedTest"
+	transactionRenewedTestCollection string = "transactionRenewedTest"
 )
 
 func createSaveBatch(policy models.Policy, transactions []models.Transaction) map[string]map[string]interface{} {
@@ -91,7 +96,6 @@ func firestoreWhere[T any](collection string, queries []firestoreQuery) (documen
 			break
 		}
 		if err != nil {
-			log.Printf("error: %s", err.Error())
 			return nil, err
 		}
 		err = snapshot.DataTo(&document)
@@ -119,7 +123,7 @@ func GetTransactionsByPolicyAnnuity(policyUid string, annuity int) ([]models.Tra
 		"policyUid = '@policyUid' AND "+
 		"annuity = @annuity",
 		models.WoptaDataset,
-		models.TransactionsViewCollection)) // TODO: renewTransactionCollection
+		renewTransactionCollection))
 
 	return lib.QueryParametrizedRowsBigQuery[models.Transaction](query.String(), params)
 }
