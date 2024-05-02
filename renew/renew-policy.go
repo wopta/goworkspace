@@ -65,7 +65,6 @@ func RenewPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		return "", nil, err
 	}
 
-	// TODO: solve issue that non active products are not fetched
 	productsMap = getProductsMapByPolicyType(policyType, quoteType)
 
 	policies, err := getPolicies(req.PolicyUid, policyType, quoteType, productsMap)
@@ -151,9 +150,9 @@ func getPolicies(policyUid, policyType, quoteType string, products map[string]mo
 			if index != 0 {
 				query.WriteString(" OR ")
 			}
-			//targetDate := today.AddDate(0, 0, product.RenewOffset)
-			// TODO: restore commented lines
-			targetDate := time.Date(2024, 03, 21, 0, 0, 0, 0, time.UTC)
+			targetDate := today.AddDate(0, 0, product.RenewOffset)
+			// TODO: remove comment
+			//targetDate := time.Date(2024, 03, 21, 0, 0, 0, 0, time.UTC)
 
 			productNameKey := fmt.Sprintf("%s%sProductName", product.Name, product.Version)
 			productVersionKey := fmt.Sprintf("%s%sProductVersion", product.Name, product.Version)
@@ -183,7 +182,6 @@ func getPolicies(policyUid, policyType, quoteType string, products map[string]mo
 	}
 
 	policies = lib.SliceMap(policies, func(p models.Policy) models.Policy {
-		// TODO: check if is it better to do so or is better to convert all bigquery fields to json fields
 		var tmpPolicy models.Policy
 		err = json.Unmarshal([]byte(p.Data), &tmpPolicy)
 		return tmpPolicy
