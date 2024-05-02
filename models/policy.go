@@ -250,17 +250,17 @@ func (policy *Policy) GuaranteesToMap() map[string]Guarante {
 	return m
 }
 
-func (policy *Policy) BigquerySave(origin string) {
-	log.Printf("[policy.BigquerySave] parsing data for policy %s", policy.Uid)
+func (policy *Policy) BigQueryParse() {
+	var (
+		data []byte
+		err  error
+	)
 
-	policyBig := lib.GetDatasetByEnv(origin, PolicyCollection)
-	policyJson, err := policy.Marshal()
-	if err != nil {
-		log.Printf("[policy.BigquerySave] error marshaling policy: %s", err.Error())
+	if data, err = policy.Marshal(); err != nil {
+		return
 	}
-	log.Printf("[policy.BigquerySave] policy data: %s", string(policyJson))
 
-	policy.Data = string(policyJson)
+	policy.Data = string(data)
 	policy.BigStartDate = civil.DateTimeOf(policy.StartDate)
 	policy.BigRenewDate = civil.DateTimeOf(policy.RenewDate)
 	policy.BigEndDate = civil.DateTimeOf(policy.EndDate)
@@ -271,10 +271,17 @@ func (policy *Policy) BigquerySave(origin string) {
 		policy.BigAcceptanceNote = policy.ReservedInfo.AcceptanceNote
 		policy.BigAcceptanceDate = lib.GetBigQueryNullDateTime(policy.ReservedInfo.AcceptanceDate)
 	}
+}
+
+func (policy *Policy) BigquerySave(origin string) {
+	log.Printf("[policy.BigquerySave] parsing data for policy %s", policy.Uid)
+
+	policyBig := lib.GetDatasetByEnv(origin, PolicyCollection)
+
+	policy.BigQueryParse()
 
 	log.Println("[policy.BigquerySave] saving to bigquery...")
-	err = lib.InsertRowsBigQuery(WoptaDataset, policyBig, policy)
-	if err != nil {
+	if err := lib.InsertRowsBigQuery(WoptaDataset, policyBig, policy); err != nil {
 		log.Println("[policy.BigquerySave] error saving policy to bigquery: ", err.Error())
 		return
 	}
