@@ -23,8 +23,6 @@ func init() {
 }
 
 func Renew(w http.ResponseWriter, r *http.Request) {
-	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
-
 	router := lib.GetRouter("renew", routes)
 	router.ServeHTTP(w, r)
 }
