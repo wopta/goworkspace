@@ -15,6 +15,12 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
+// TODO: remove me
+const (
+	policyRenewedTestCollection      string = "policyRenewedTest"
+	transactionRenewedTestCollection string = "transactionRenewedTest"
+)
+
 type PromoteReq struct {
 	Date string `json:"date"`
 }
@@ -27,7 +33,7 @@ type PromoteResp struct {
 type RenewReport struct {
 	Policy       models.Policy        `json:"policy"`
 	Transactions []models.Transaction `json:"transactions"`
-	Error        string               `json:"error,omitempty"`
+	Error        error                `json:"error,omitempty"`
 }
 
 func PromoteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -39,9 +45,6 @@ func PromoteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	)
 
 	log.SetPrefix("[PromoteFx] ")
-	defer log.Println("Handler end -------------------------------------------")
-	defer log.SetPrefix("")
-
 	log.Println("Handler start -----------------------------------------------")
 
 	reqBytes := lib.ErrorByte(io.ReadAll(r.Body))
@@ -58,7 +61,13 @@ func PromoteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 		}
 	}
 
-	response, err = Promote(targetDate)
+	policies, err := getRenewingPolicies(targetDate)
+	if err != nil {
+		log.Printf("error querying bigquery: %s", err.Error())
+		return "", nil, err
+	}
+
+	response, err = Promote(policies, saveToDatabases)
 	if err != nil {
 		return "", nil, err
 	}
@@ -75,164 +84,127 @@ func PromoteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	return string(responseJson), response, err
 }
 
-func Promote(targetDate time.Time) (PromoteResp, error) {
+func Promote(policies []models.Policy, saveFn func(map[string]map[string]interface{}) error) (PromoteResp, error) {
 	var (
-		err       error
-		okChannel chan RenewReport = make(chan RenewReport)
-		koChannel chan RenewReport = make(chan RenewReport)
-		wg        sync.WaitGroup
-		response  PromoteResp
+		err            error
+		promoteChannel chan RenewReport = make(chan RenewReport, len(policies))
+		wg             sync.WaitGroup
+		response       PromoteResp
 	)
-
-	query, params := buildQuery(targetDate)
-	policies, err := lib.QueryParametrizedRowsBigQuery[models.Policy](query, params)
-	if err != nil {
-		log.Printf("error querying bigquery: %s", err.Error())
-		return PromoteResp{}, err
-	}
 
 	wg.Add(len(policies))
 	for _, p := range policies {
 		if p.IsPay {
-			go promotePolicyData(p, okChannel, koChannel, &wg)
+			go promotePolicyData(p, promoteChannel, &wg, saveFn)
 		} else {
-			go setPolicyNotPaid(p, okChannel, koChannel, &wg)
+			go setPolicyNotPaid(p, promoteChannel, &wg, saveFn)
 		}
 	}
 
 	go func() {
 		wg.Wait()
-		close(okChannel)
-		close(koChannel)
+		close(promoteChannel)
 	}()
 
-	for res := range okChannel {
-		response.Success = append(response.Success, res)
-	}
-	for res := range koChannel {
-		response.Failure = append(response.Failure, res)
+	for res := range promoteChannel {
+		if res.Error != nil {
+			response.Failure = append(response.Failure, res)
+		} else {
+			response.Success = append(response.Success, res)
+		}
 	}
 
 	return response, err
 }
 
-func buildQuery(date time.Time) (string, map[string]interface{}) {
+func getRenewingPolicies(renewDate time.Time) ([]models.Policy, error) {
 	var (
 		query  bytes.Buffer
 		params = make(map[string]interface{})
 	)
 
-	// SELECT * FROM `wopta.renewPolicyDraft` WHERE EXTRACT(MONTH FROM startDate) = @date.Month() AND EXTRACT(DAY FROM startDate) = @date.Day()
-	params["month"] = int64(date.Month())
-	params["day"] = int64(date.Day())
+	params["month"] = int64(renewDate.Month())
+	params["day"] = int64(renewDate.Day())
 
-	query.WriteString("SELECT * FROM `wopta.policiesView` WHERE " +
-		"EXTRACT(MONTH FROM startDate) = @month AND " +
-		"EXTRACT(DAY FROM startDate) = @day")
+	query.WriteString(fmt.Sprintf("SELECT * FROM `%s.%s` WHERE "+
+		"EXTRACT(MONTH FROM startDate) = @month AND "+
+		"EXTRACT(DAY FROM startDate) = @day",
+		models.WoptaDataset,
+		models.PoliciesViewCollection)) // TODO: change to renewPolicyCollection
 
-	return query.String(), params
+	policies, err := lib.QueryParametrizedRowsBigQuery[models.Policy](query.String(), params)
+	if err != nil {
+		return nil, err
+	}
+
+	for index, policy := range policies {
+		var temp models.Policy
+		err := json.Unmarshal([]byte(policy.Data), &temp)
+		if err != nil {
+			return nil, err
+		}
+		policies[index] = temp
+	}
+
+	return policies, nil
 }
 
-func promotePolicyData(p models.Policy, okChannel, koChannel chan<- RenewReport, wg *sync.WaitGroup) {
-	defer wg.Done()
-
-	r := RenewReport{
-		Policy: p,
+func getTransactionsByPolicyAnnuity(policyUid string, annuity int) ([]models.Transaction, error) {
+	queries := []firestoreQuery{
+		{field: "policyUid", operator: "==", queryValue: policyUid},
+		{field: "annuity", operator: "==", queryValue: annuity},
 	}
 
-	trs, err := GetTransactionsByPolicyAnnuity(p.Uid, p.Annuity)
-	if err != nil {
-		log.Printf("error: %s", err.Error())
-		r.Error = err.Error()
-		koChannel <- r
-		return
-	}
-
-	r.Transactions = trs
-	p.Status = "RENEWED"
-	p.StatusHistory = append(p.StatusHistory, p.Status)
-	p.Updated = time.Now().UTC()
-
-	fireBatch := map[string]map[string]interface{}{
-		"policyRenewedTest": {
-			p.Uid: p,
-		},
-		"transactionsRenewdTest": {},
-	}
-	for idx, tr := range trs {
-		tr.UpdateDate = time.Now().UTC()
-		tr.BigQueryParse()
-		fireBatch["transactionsRenewdTest"][tr.Uid] = tr
-		trs[idx] = tr
-	}
-
-	err = lib.SetBatchFirestoreErr(fireBatch)
-	if err != nil {
-		r.Error = err.Error()
-		koChannel <- r
-		return
-	}
-
-	// err = lib.InsertRowsBigQuery(models.WoptaDataset, models.PolicyCollection, p)
-	// if err != nil {
-	// 	koChannel <- r
-	// 	return
-	// }
-
-	// err = lib.InsertRowsBigQuery(models.WoptaDataset, models.TransactionsCollection, trs)
-	// if err != nil {
-	// 	koChannel <- r
-	// 	return
-	// }
-
-	okChannel <- r
+	return firestoreWhere[models.Transaction](models.TransactionsCollection, queries)
 }
 
-func setPolicyNotPaid(p models.Policy, okChannel, koChannel chan<- RenewReport, wg *sync.WaitGroup) {
-	defer wg.Done()
-	p.Status = "INSOLUTO"
-	p.StatusHistory = append(p.StatusHistory, p.Status)
-	p.Updated = time.Now().UTC()
-
-	r := RenewReport{
-		Policy: p,
-	}
-	fireBatch := map[string]map[string]interface{}{
-		"policyRenewedTest": {
-			p.Uid: p,
-		},
-	}
-
-	err := lib.SetBatchFirestoreErr(fireBatch)
-	if err != nil {
-		r.Error = err.Error()
-		koChannel <- r
-		return
-	}
-
-	// err = lib.InsertRowsBigQuery(models.WoptaDataset, models.PolicyCollection, p)
-	// if err != nil {
-	// 	koChannel <- r
-	// 	return
-	// }
-
-	okChannel <- r
-}
-
-// transactions
-func GetTransactionsByPolicyAnnuity(policyUid string, annuity int) ([]models.Transaction, error) {
+func promotePolicyData(p models.Policy, promoteChannel chan<- RenewReport, wg *sync.WaitGroup, saveFn func(map[string]map[string]interface{}) error) {
 	var (
-		query  bytes.Buffer
-		params = make(map[string]interface{})
+		err          error
+		transactions []models.Transaction
 	)
 
-	// SELECT * FROM `wopta.renewTransactionsDraft` WHERE policyUid = '@policyUid' AND annuity = @annuity
-	params["policyUid"] = policyUid
-	params["annuity"] = annuity
+	defer func() {
+		promoteChannel <- RenewReport{
+			Policy:       p,
+			Transactions: transactions,
+			Error:        err,
+		}
 
-	query.WriteString("SELECT * FROM `wopta.transactionsView` WHERE " +
-		"policyUid = '@policyUid' AND " +
-		"annuity = @annuity")
+		wg.Done()
+	}()
 
-	return lib.QueryParametrizedRowsBigQuery[models.Transaction](query.String(), params)
+	if transactions, err = getTransactionsByPolicyAnnuity(p.Uid, p.Annuity); err != nil { // TODO: change to renewTransactionCollection
+		return
+	}
+
+	p.Status = policyStatusRenewed
+	p.StatusHistory = append(p.StatusHistory, p.Status)
+	p.Updated = time.Now().UTC()
+
+	batch := createSaveBatch(p, transactions)
+
+	err = saveFn(batch)
+}
+
+func setPolicyNotPaid(p models.Policy, promoteChannel chan<- RenewReport, wg *sync.WaitGroup, saveFn func(map[string]map[string]interface{}) error) {
+	var (
+		err error
+	)
+
+	defer func() {
+		promoteChannel <- RenewReport{
+			Policy: p,
+			Error:  err,
+		}
+		wg.Done()
+	}()
+
+	p.Status = policyStatusPaymentUnsolved
+	p.StatusHistory = append(p.StatusHistory, p.Status)
+	p.Updated = time.Now().UTC()
+
+	batch := createSaveBatch(p, nil)
+
+	err = saveFn(batch)
 }
