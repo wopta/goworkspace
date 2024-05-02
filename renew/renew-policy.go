@@ -12,6 +12,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 )
@@ -45,8 +46,11 @@ func RenewPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 
 	log.SetPrefix("[RenewPolicyFx] ")
 	defer func() {
-		log.SetPrefix("")
+		if err != nil {
+			log.Printf("error: %s", err.Error())
+		}
 		log.Println("Handler end -------------------------------------------------")
+		log.SetPrefix("")
 	}()
 
 	log.Println("Handler start -----------------------------------------------")
@@ -61,15 +65,14 @@ func RenewPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 
 	err = json.Unmarshal(body, &req)
 	if err != nil {
-		log.Printf("error unmarshalling body: %v", err)
 		return "", nil, err
 	}
 
 	productsMap = getProductsMapByPolicyType(policyType, quoteType)
+	log.Printf("products: %s", strings.Join(lib.GetMapKeys(productsMap), ", "))
 
 	policies, err := getPolicies(req.PolicyUid, policyType, quoteType, productsMap)
 	if err != nil {
-		log.Printf("error getting policies: %v", err)
 		return "", nil, err
 	}
 	log.Printf("found %02d policies", len(policies))
