@@ -17,34 +17,28 @@ import (
 	"time"
 )
 
-type RenewReport struct {
-	Policy       models.Policy        `json:"policy"`
-	Transactions []models.Transaction `json:"transactions"`
-	Error        error                `json:"error,omitempty"`
-}
-
-type RenewPolicyReq struct {
+type DraftReq struct {
 	PolicyUid string `json:"policyUid"`
 }
 
-type RenewPolicyResp struct {
+type DraftResp struct {
 	Success []RenewReport `json:"success"`
 	Failure []RenewReport `json:"failure"`
 }
 
-func RenewPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err  error
 		wg   = new(sync.WaitGroup)
-		req  RenewPolicyReq
-		resp = RenewPolicyResp{
+		req  DraftReq
+		resp = DraftResp{
 			Success: make([]RenewReport, 0),
 			Failure: make([]RenewReport, 0),
 		}
 		productsMap = make(map[string]models.Product)
 	)
 
-	log.SetPrefix("[RenewPolicyFx] ")
+	log.SetPrefix("[DraftFx] ")
 	defer func() {
 		if err != nil {
 			log.Printf("error: %s", err.Error())
