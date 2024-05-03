@@ -1,7 +1,6 @@
 package renew
 
 import (
-	"bytes"
 	"context"
 	"encoding/base64"
 	"encoding/json"
@@ -22,6 +21,7 @@ func createSaveBatch(policy models.Policy, transactions []models.Transaction, co
 		trsCollection string = collectionPrefix + lib.TransactionsCollection
 	)
 
+	policy.Updated = time.Now().UTC()
 	policy.BigQueryParse()
 	batch := map[string]map[string]interface{}{
 		polCollection: {
@@ -112,23 +112,23 @@ func firestoreWhere[T any](collection string, queries []firestoreQuery) (documen
 
 // In case we need to get the data from BigQuery. Shouldn't be used now
 // because bigquery does not have all data
-func GetTransactionsByPolicyAnnuity(policyUid string, annuity int) ([]models.Transaction, error) {
-	var (
-		query  bytes.Buffer
-		params = make(map[string]interface{})
-	)
+// func getTransactionsByPolicyAnnuity(policyUid string, annuity int) ([]models.Transaction, error) {
+// 	var (
+// 		query  bytes.Buffer
+// 		params = make(map[string]interface{})
+// 	)
 
-	params["policyUid"] = policyUid
-	params["annuity"] = annuity
+// 	params["policyUid"] = policyUid
+// 	params["annuity"] = annuity
 
-	query.WriteString(fmt.Sprintf("SELECT * FROM `%s.%s` WHERE "+
-		"policyUid = '@policyUid' AND "+
-		"annuity = @annuity",
-		models.WoptaDataset,
-		lib.RenewTransactionCollection))
+// 	query.WriteString(fmt.Sprintf("SELECT * FROM `%s.%s` WHERE "+
+// 		"policyUid = '@policyUid' AND "+
+// 		"annuity = @annuity",
+// 		models.WoptaDataset,
+// 		lib.RenewTransactionCollection))
 
-	return lib.QueryParametrizedRowsBigQuery[models.Transaction](query.String(), params)
-}
+// 	return lib.QueryParametrizedRowsBigQuery[models.Transaction](query.String(), params)
+// }
 
 func sendReportMail(date time.Time, report RenewResp, isDraft bool) {
 	var (
