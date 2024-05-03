@@ -19,17 +19,6 @@ type PromoteReq struct {
 	Date string `json:"date"`
 }
 
-type RenewResp struct {
-	Success []RenewReport `json:"success"`
-	Failure []RenewReport `json:"failure"`
-}
-
-type RenewReport struct {
-	Policy       models.Policy        `json:"policy"`
-	Transactions []models.Transaction `json:"transactions"`
-	Error        error                `json:"error,omitempty"`
-}
-
 func PromoteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err        error
