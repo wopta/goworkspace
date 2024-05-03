@@ -49,6 +49,6 @@ const (
 	NetworkTreeStructureTable    string = "network-tree-structure" // only for bigquery
 	NetworkNodesView             string = "networkNodesView"       // only for bigquery
 	MailCollection               string = "mail"                   // only for firestore
-	RenewPolicyCollection        string = "renewPolicyDraft"       // firestore and bigquery
-	RenewTransactionCollection   string = "renewTransactionDraft"  // firestore and bigquery
+	RenewPolicyCollection        string = "renewPolicy"            // firestore and bigquery
+	RenewTransactionCollection   string = "renewTransactions"      // firestore and bigquery
 )

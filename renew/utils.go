@@ -16,25 +16,24 @@ import (
 	"google.golang.org/api/iterator"
 )
 
-// TODO: remove me
-const (
-	policyRenewedTestCollection      string = "policyRenewedTest"
-	transactionRenewedTestCollection string = "transactionRenewedTest"
-)
+func createSaveBatch(policy models.Policy, transactions []models.Transaction, collectionPrefix string) map[string]map[string]interface{} {
+	var (
+		polCollection string = collectionPrefix + lib.PolicyCollection
+		trsCollection string = collectionPrefix + lib.TransactionsCollection
+	)
 
-func createSaveBatch(policy models.Policy, transactions []models.Transaction) map[string]map[string]interface{} {
 	policy.BigQueryParse()
 	batch := map[string]map[string]interface{}{
-		policyRenewedTestCollection: { // TODO: change to lib.PolicyCollection
+		polCollection: {
 			policy.Uid: policy,
 		},
-		transactionRenewedTestCollection: {}, // TODO: change to lib.TransactionCollection
+		trsCollection: {},
 	}
 
 	for idx, tr := range transactions {
 		tr.UpdateDate = time.Now().UTC()
 		tr.BigQueryParse()
-		batch[transactionRenewedTestCollection][tr.Uid] = tr // TODO: change to lib.TransactionCollection
+		batch[trsCollection][tr.Uid] = tr
 		transactions[idx] = tr
 	}
 

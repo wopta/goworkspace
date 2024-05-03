@@ -16,11 +16,14 @@ import (
 )
 
 type PromoteReq struct {
-	Date string `json:"date"`
+	Date             string `json:"date"`
+	DryRun           *bool  `json:"dryRun"`
+	CollectionPrefix string `json:"collectionPrefix"`
 }
 
 func PromoteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
+		dryRun     bool = true
 		err        error
 		targetDate time.Time = time.Now().UTC()
 		request    PromoteReq
@@ -43,6 +46,9 @@ func PromoteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 			return "", nil, err
 		}
 	}
+	if request.DryRun != nil {
+		dryRun = *request.DryRun
+	}
 
 	policies, err := getRenewingPolicies(targetDate)
 	if err != nil {
@@ -50,7 +56,17 @@ func PromoteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 		return "", nil, err
 	}
 
-	response, err = Promote(policies, saveToDatabases)
+	saveFn := func(p models.Policy, trs []models.Transaction) error {
+		data := createSaveBatch(p, trs, request.CollectionPrefix)
+
+		if !dryRun {
+			return saveToDatabases(data)
+		}
+
+		return nil
+	}
+
+	response, err = Promote(policies, saveFn)
 	if err != nil {
 		return "", nil, err
 	}
@@ -59,9 +75,11 @@ func PromoteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	if err != nil {
 		return "", nil, err
 	}
-	_, err = lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), fmt.Sprintf("renew/promote/promote-%d.json", time.Now().Unix()), responseJson)
-	if err != nil {
-		return "", nil, err
+	if !dryRun {
+		_, err = lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), fmt.Sprintf("renew/promote/promote-%d.json", time.Now().Unix()), responseJson)
+		if err != nil {
+			return "", nil, err
+		}
 	}
 
 	sendReportMail(targetDate, response, false)
@@ -69,7 +87,7 @@ func PromoteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	return string(responseJson), response, err
 }
 
-func Promote(policies []models.Policy, saveFn func(map[string]map[string]interface{}) error) (RenewResp, error) {
+func Promote(policies []models.Policy, saveFn func(models.Policy, []models.Transaction) error) (RenewResp, error) {
 	var (
 		err            error
 		promoteChannel chan RenewReport = make(chan RenewReport, len(policies))
@@ -143,7 +161,7 @@ func getTransactionsByPolicyAnnuity(policyUid string, annuity int) ([]models.Tra
 	return firestoreWhere[models.Transaction](lib.RenewTransactionCollection, queries)
 }
 
-func promotePolicyData(p models.Policy, promoteChannel chan<- RenewReport, wg *sync.WaitGroup, saveFn func(map[string]map[string]interface{}) error) {
+func promotePolicyData(p models.Policy, promoteChannel chan<- RenewReport, wg *sync.WaitGroup, saveFn func(models.Policy, []models.Transaction) error) {
 	var (
 		err          error
 		transactions []models.Transaction
@@ -167,12 +185,10 @@ func promotePolicyData(p models.Policy, promoteChannel chan<- RenewReport, wg *s
 	p.StatusHistory = append(p.StatusHistory, p.Status)
 	p.Updated = time.Now().UTC()
 
-	batch := createSaveBatch(p, transactions)
-
-	err = saveFn(batch)
+	err = saveFn(p, transactions)
 }
 
-func setPolicyNotPaid(p models.Policy, promoteChannel chan<- RenewReport, wg *sync.WaitGroup, saveFn func(map[string]map[string]interface{}) error) {
+func setPolicyNotPaid(p models.Policy, promoteChannel chan<- RenewReport, wg *sync.WaitGroup, saveFn func(models.Policy, []models.Transaction) error) {
 	var (
 		err error
 	)
@@ -189,7 +205,5 @@ func setPolicyNotPaid(p models.Policy, promoteChannel chan<- RenewReport, wg *sy
 	p.StatusHistory = append(p.StatusHistory, p.Status)
 	p.Updated = time.Now().UTC()
 
-	batch := createSaveBatch(p, nil)
-
-	err = saveFn(batch)
+	err = saveFn(p, nil)
 }
