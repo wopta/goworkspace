@@ -3,12 +3,15 @@ package renew
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"os"
 	"time"
 
 	"cloud.google.com/go/firestore"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
 	"google.golang.org/api/iterator"
 )
@@ -126,4 +129,46 @@ func GetTransactionsByPolicyAnnuity(policyUid string, annuity int) ([]models.Tra
 		renewTransactionCollection))
 
 	return lib.QueryParametrizedRowsBigQuery[models.Transaction](query.String(), params)
+}
+
+func sendReportMail(date time.Time, report RenewResp, isDraft bool) {
+	var (
+		message string = fmt.Sprintf(`
+		<p>Quietanzamento del %s</p>
+		<p>Con successo: %d</p>
+		<p>Con errori: %d</p>
+		<p>Per report completo vedere file json in allegato.</p>
+		`, date.Format(time.DateOnly), len(report.Success), len(report.Failure))
+		title   string = "Report quietanzamento"
+		subject string = fmt.Sprintf("Report quietanzamento del %s", date.Format(time.DateOnly))
+	)
+
+	if isDraft {
+		title = "Report quietanzamento provvisorio"
+		subject = fmt.Sprintf("Report quietanzamento provvisorio del %s", date.Format(time.DateOnly))
+		message = fmt.Sprintf(`
+		<p>Quietanzamento provvisorio del %s</p>
+		<p>Con successo: %d</p>
+		<p>Con errori: %d</p>
+		<p>Per report completo vedere file json in allegato.</p>
+		`, date.Format(time.DateOnly), len(report.Success), len(report.Failure))
+	}
+
+	responseJson, _ := json.Marshal(report)
+
+	mail.SendMail(mail.MailRequest{
+		FromAddress:  mail.AddressAnna,
+		To:           []string{mail.AddressTechnology.Address},
+		Message:      message,
+		Title:        title,
+		Subject:      subject,
+		IsHtml:       true,
+		IsAttachment: true,
+		Attachments: &[]mail.Attachment{{
+			Name:        fmt.Sprintf("report-%s-%d.json", date.Format(time.DateOnly), time.Now().Unix()),
+			Byte:        base64.StdEncoding.EncodeToString(responseJson),
+			FileName:    fmt.Sprintf("report-%s-%d.json", date.Format(time.DateOnly), time.Now().Unix()),
+			ContentType: "application/json",
+		}},
+	})
 }

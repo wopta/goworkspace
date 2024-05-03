@@ -19,7 +19,7 @@ type PromoteReq struct {
 	Date string `json:"date"`
 }
 
-type PromoteResp struct {
+type RenewResp struct {
 	Success []RenewReport `json:"success"`
 	Failure []RenewReport `json:"failure"`
 }
@@ -35,7 +35,7 @@ func PromoteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 		err        error
 		targetDate time.Time = time.Now().UTC()
 		request    PromoteReq
-		response   PromoteResp
+		response   RenewResp
 	)
 
 	log.SetPrefix("[PromoteFx] ")
@@ -75,15 +75,17 @@ func PromoteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 		return "", nil, err
 	}
 
+	sendReportMail(targetDate, response, false)
+
 	return string(responseJson), response, err
 }
 
-func Promote(policies []models.Policy, saveFn func(map[string]map[string]interface{}) error) (PromoteResp, error) {
+func Promote(policies []models.Policy, saveFn func(map[string]map[string]interface{}) error) (RenewResp, error) {
 	var (
 		err            error
 		promoteChannel chan RenewReport = make(chan RenewReport, len(policies))
 		wg             sync.WaitGroup
-		response       PromoteResp
+		response       RenewResp
 	)
 
 	wg.Add(len(policies))
