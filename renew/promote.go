@@ -126,7 +126,7 @@ func getRenewingPolicies(renewDate time.Time) ([]models.Policy, error) {
 		"EXTRACT(MONTH FROM startDate) = @month AND "+
 		"EXTRACT(DAY FROM startDate) = @day",
 		models.WoptaDataset,
-		renewPolicyCollection))
+		lib.RenewPolicyCollection))
 
 	policies, err := lib.QueryParametrizedRowsBigQuery[models.Policy](query.String(), params)
 	if err != nil {
@@ -151,7 +151,7 @@ func getTransactionsByPolicyAnnuity(policyUid string, annuity int) ([]models.Tra
 		{field: "annuity", operator: "==", queryValue: annuity},
 	}
 
-	return firestoreWhere[models.Transaction](renewTransactionCollection, queries)
+	return firestoreWhere[models.Transaction](lib.RenewTransactionCollection, queries)
 }
 
 func promotePolicyData(p models.Policy, promoteChannel chan<- RenewReport, wg *sync.WaitGroup, saveFn func(map[string]map[string]interface{}) error) {

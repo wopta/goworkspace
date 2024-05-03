@@ -126,7 +126,7 @@ func GetTransactionsByPolicyAnnuity(policyUid string, annuity int) ([]models.Tra
 		"policyUid = '@policyUid' AND "+
 		"annuity = @annuity",
 		models.WoptaDataset,
-		renewTransactionCollection))
+		lib.RenewTransactionCollection))
 
 	return lib.QueryParametrizedRowsBigQuery[models.Transaction](query.String(), params)
 }
