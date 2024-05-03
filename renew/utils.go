@@ -121,7 +121,32 @@ func getProductsFromFileList(fileList []string) []models.Product {
 	return products
 }
 
-func createSaveBatch(policy models.Policy, transactions []models.Transaction, collectionPrefix string) map[string]map[string]interface{} {
+func createDraftSaveBatch(policy models.Policy, transactions []models.Transaction, collectionPrefix string) map[string]map[string]interface{} {
+	var (
+		polCollection = collectionPrefix + lib.RenewPolicyCollection
+		trsCollection = collectionPrefix + lib.RenewTransactionCollection
+	)
+
+	policy.Updated = time.Now().UTC()
+	policy.BigQueryParse()
+	batch := map[string]map[string]interface{}{
+		polCollection: {
+			policy.Uid: policy,
+		},
+		trsCollection: {},
+	}
+
+	for idx, tr := range transactions {
+		tr.UpdateDate = time.Now().UTC()
+		tr.BigQueryParse()
+		batch[trsCollection][tr.Uid] = tr
+		transactions[idx] = tr
+	}
+
+	return batch
+}
+
+func createPromoteSaveBatch(policy models.Policy, transactions []models.Transaction, collectionPrefix string) map[string]map[string]interface{} {
 	var (
 		polCollection string = collectionPrefix + lib.PolicyCollection
 		trsCollection string = collectionPrefix + lib.TransactionsCollection

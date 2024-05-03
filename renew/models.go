@@ -10,5 +10,5 @@ type RenewResp struct {
 type RenewReport struct {
 	Policy       models.Policy        `json:"policy"`
 	Transactions []models.Transaction `json:"transactions"`
-	Error        error                `json:"error,omitempty"`
+	Error        string               `json:"error,omitempty"`
 }

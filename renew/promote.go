@@ -57,7 +57,7 @@ func PromoteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	}
 
 	saveFn := func(p models.Policy, trs []models.Transaction) error {
-		data := createSaveBatch(p, trs, request.CollectionPrefix)
+		data := createPromoteSaveBatch(p, trs, request.CollectionPrefix)
 
 		if !dryRun {
 			return saveToDatabases(data)
@@ -110,7 +110,7 @@ func Promote(policies []models.Policy, saveFn func(models.Policy, []models.Trans
 	}()
 
 	for res := range promoteChannel {
-		if res.Error != nil {
+		if res.Error != "" {
 			response.Failure = append(response.Failure, res)
 		} else {
 			response.Success = append(response.Success, res)
@@ -168,11 +168,14 @@ func promotePolicyData(p models.Policy, promoteChannel chan<- RenewReport, wg *s
 	)
 
 	defer func() {
-		promoteChannel <- RenewReport{
-			Policy:       p,
-			Transactions: transactions,
-			Error:        err,
+		var r RenewReport
+
+		r.Policy = p
+		r.Transactions = transactions
+		if err != nil {
+			r.Error = err.Error()
 		}
+		promoteChannel <- r
 
 		wg.Done()
 	}()
@@ -194,10 +197,13 @@ func setPolicyNotPaid(p models.Policy, promoteChannel chan<- RenewReport, wg *sy
 	)
 
 	defer func() {
-		promoteChannel <- RenewReport{
-			Policy: p,
-			Error:  err,
+		var r RenewReport
+
+		r.Policy = p
+		if err != nil {
+			r.Error = err.Error()
 		}
+		promoteChannel <- r
 		wg.Done()
 	}()
 

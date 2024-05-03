@@ -33,7 +33,7 @@ type DraftResp struct {
 func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err    error
-		dryRun bool
+		dryRun = true
 		wg     = new(sync.WaitGroup)
 		req    DraftReq
 		resp   = RenewResp{
@@ -57,6 +57,10 @@ func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
+	err = json.Unmarshal(body, &req)
+	if err != nil {
+		return "", nil, err
+	}
 
 	if req.Date != "" {
 		tmpDate, err := time.Parse("2006-01-02", req.Date)
@@ -71,7 +75,7 @@ func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 	}
 
 	saveFn := func(p models.Policy, trs []models.Transaction) error {
-		data := createSaveBatch(p, trs, req.CollectionPrefix)
+		data := createDraftSaveBatch(p, trs, req.CollectionPrefix)
 
 		if !dryRun {
 			return saveToDatabases(data)
@@ -113,7 +117,7 @@ func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 	}()
 
 	for res := range ch {
-		if res.Error != nil {
+		if res.Error != "" {
 			resp.Failure = append(resp.Failure, res)
 			continue
 		}
@@ -233,7 +237,9 @@ func draft(policy models.Policy, product models.Product, ch chan<- RenewReport, 
 	defer func() {
 		r.Policy = policy
 		r.Transactions = transactions
-		r.Error = err
+		if err != nil {
+			r.Error = err.Error()
+		}
 		ch <- r
 		wg.Done()
 	}()
