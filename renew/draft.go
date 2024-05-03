@@ -12,13 +12,17 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 	"sync"
 	"time"
 )
 
 type DraftReq struct {
-	PolicyUid string `json:"policyUid"`
+	PolicyUid        string `json:"policyUid"`
+	Date             string `json:"date"`
+	DryRun           *bool  `json:"dryRun"`
+	CollectionPrefix string `json:"collectionPrefix"`
 }
 
 type DraftResp struct {
@@ -28,13 +32,15 @@ type DraftResp struct {
 
 func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		err  error
-		wg   = new(sync.WaitGroup)
-		req  DraftReq
-		resp = DraftResp{
+		err    error
+		dryRun bool
+		wg     = new(sync.WaitGroup)
+		req    DraftReq
+		resp   = RenewResp{
 			Success: make([]RenewReport, 0),
 			Failure: make([]RenewReport, 0),
 		}
+		today       = time.Now().UTC()
 		productsMap = make(map[string]models.Product)
 	)
 
@@ -52,6 +58,28 @@ func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 
+	if req.Date != "" {
+		tmpDate, err := time.Parse("2006-01-02", req.Date)
+		if err != nil {
+			log.Printf("error parsing request date: %s", err.Error())
+			return "", nil, err
+		}
+		today = tmpDate
+	}
+	if req.DryRun != nil {
+		dryRun = *req.DryRun
+	}
+
+	saveFn := func(p models.Policy, trs []models.Transaction) error {
+		data := createSaveBatch(p, trs, req.CollectionPrefix)
+
+		if !dryRun {
+			return saveToDatabases(data)
+		}
+
+		return nil
+	}
+
 	policyType, quoteType, err := getQueryParameters(r)
 	if err != nil {
 		return "", nil, err
@@ -65,7 +93,7 @@ func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 	productsMap = getProductsMapByPolicyType(policyType, quoteType)
 	log.Printf("products: %s", strings.Join(lib.GetMapKeys(productsMap), ", "))
 
-	policies, err := getPolicies(req.PolicyUid, policyType, quoteType, productsMap)
+	policies, err := getPolicies(req.PolicyUid, policyType, quoteType, productsMap, today)
 	if err != nil {
 		return "", nil, err
 	}
@@ -76,7 +104,7 @@ func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 	for _, policy := range policies {
 		wg.Add(1)
 		key := fmt.Sprintf("%s-%s", policy.Name, policy.ProductVersion)
-		go draft(policy, productsMap[key], ch, wg)
+		go draft(policy, productsMap[key], ch, wg, saveFn)
 	}
 
 	go func() {
@@ -93,6 +121,18 @@ func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 	}
 
 	rawResp, err := json.Marshal(resp)
+	if err != nil {
+		return "", nil, err
+	}
+
+	if !dryRun {
+		filename := fmt.Sprintf("renew/promote/report-%s-%d.json", today.Format(time.DateOnly), time.Now().Unix())
+		if _, err = lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, rawResp); err != nil {
+			return "", nil, err
+		}
+	}
+
+	sendReportMail(today, resp, true)
 
 	return string(rawResp), resp, err
 }
@@ -112,7 +152,7 @@ func getQueryParameters(r *http.Request) (string, string, error) {
 	return policyType, quoteType, nil
 }
 
-func getPolicies(policyUid, policyType, quoteType string, products map[string]models.Product) ([]models.Policy, error) {
+func getPolicies(policyUid, policyType, quoteType string, products map[string]models.Product, today time.Time) ([]models.Policy, error) {
 	var (
 		err      error
 		query    bytes.Buffer
@@ -127,8 +167,6 @@ func getPolicies(policyUid, policyType, quoteType string, products map[string]mo
 		params["policyUid"] = policyUid
 
 	} else if len(products) > 0 {
-		today := time.Now().UTC()
-
 		tmpProducts := lib.GetMapValues(products)
 		params["isRenewable"] = true
 		params["policyType"] = policyType
@@ -148,8 +186,6 @@ func getPolicies(policyUid, policyType, quoteType string, products map[string]mo
 				query.WriteString(" OR ")
 			}
 			targetDate := today.AddDate(0, 0, product.RenewOffset)
-			// TODO: remove comment
-			//targetDate := time.Date(2024, 03, 21, 0, 0, 0, 0, time.UTC)
 
 			productNameKey := fmt.Sprintf("%s%sProductName", product.Name, product.Version)
 			productVersionKey := fmt.Sprintf("%s%sProductVersion", product.Name, product.Version)
@@ -187,7 +223,7 @@ func getPolicies(policyUid, policyType, quoteType string, products map[string]mo
 	return policies, nil
 }
 
-func draft(policy models.Policy, product models.Product, ch chan<- RenewReport, wg *sync.WaitGroup) {
+func draft(policy models.Policy, product models.Product, ch chan<- RenewReport, wg *sync.WaitGroup, save func(models.Policy, []models.Transaction) error) {
 	var (
 		err          error
 		r            RenewReport
@@ -227,10 +263,10 @@ func draft(policy models.Policy, product models.Product, ch chan<- RenewReport, 
 	policy.Updated = time.Now().UTC()
 	policy.IsRenew = true
 
-	// TODO save policy and transactions to Firestore
-
-	// TODO: save policy and transaction to BigQuery
-
+	err = save(policy, transactions)
+	if err != nil {
+		return
+	}
 }
 
 func calculatePrices(policy *models.Policy) error {
