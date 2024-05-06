@@ -171,6 +171,31 @@ func createPromoteSaveBatch(policy models.Policy, transactions []models.Transact
 	return batch
 }
 
+func createPromoteDeleteBatch(policy models.Policy, transactions []models.Transaction) map[string]map[string]interface{} {
+	var (
+		polCollection = collectionPrefix + lib.RenewPolicyCollection
+		trsCollection = collectionPrefix + lib.RenewTransactionCollection
+	)
+
+	policy.Updated = time.Now().UTC()
+	policy.BigQueryParse()
+	batch := map[string]map[string]interface{}{
+		polCollection: {
+			policy.Uid: policy,
+		},
+		trsCollection: {},
+	}
+
+	for idx, tr := range transactions {
+		tr.UpdateDate = time.Now().UTC()
+		tr.BigQueryParse()
+		batch[trsCollection][tr.Uid] = tr
+		transactions[idx] = tr
+	}
+
+	return batch
+}
+
 func saveToDatabases(data map[string]map[string]interface{}) error {
 	err := lib.SetBatchFirestoreErr(data)
 	if err != nil {
@@ -183,6 +208,27 @@ func saveToDatabases(data map[string]map[string]interface{}) error {
 			dataToSave = append(dataToSave, value)
 		}
 		err = lib.InsertRowsBigQuery(models.WoptaDataset, collection, dataToSave)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func deleteFromDatabases(data map[string]map[string]interface{}) error {
+	err := lib.DeleteBatchFirestoreErr(data)
+	if err != nil {
+		return err
+	}
+
+	for collection, values := range data {
+		uids := lib.GetMapKeys(values)
+		if len(uids) == 0 {
+			continue
+		}
+		whereClause := "WHERE uid IN ('" + strings.Join(uids, "', '") + "')"
+		err = lib.DeleteRowBigQuery(models.WoptaDataset, collection, whereClause)
 		if err != nil {
 			return err
 		}
