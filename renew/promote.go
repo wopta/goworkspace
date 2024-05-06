@@ -49,6 +49,7 @@ func PromoteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	if request.DryRun != nil {
 		dryRun = *request.DryRun
 	}
+	collectionPrefix = request.CollectionPrefix
 
 	policies, err := getRenewingPolicies(targetDate)
 	if err != nil {
@@ -57,7 +58,7 @@ func PromoteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	}
 
 	saveFn := func(p models.Policy, trs []models.Transaction) error {
-		data := createPromoteSaveBatch(p, trs, request.CollectionPrefix)
+		data := createPromoteSaveBatch(p, trs)
 
 		if !dryRun {
 			return saveToDatabases(data)
@@ -133,7 +134,7 @@ func getRenewingPolicies(renewDate time.Time) ([]models.Policy, error) {
 		"EXTRACT(MONTH FROM startDate) = @month AND "+
 		"EXTRACT(DAY FROM startDate) = @day",
 		models.WoptaDataset,
-		lib.RenewPolicyCollection))
+		collectionPrefix+lib.RenewPolicyCollection))
 
 	policies, err := lib.QueryParametrizedRowsBigQuery[models.Policy](query.String(), params)
 	if err != nil {
@@ -158,7 +159,7 @@ func getTransactionsByPolicyAnnuity(policyUid string, annuity int) ([]models.Tra
 		{field: "annuity", operator: "==", queryValue: annuity},
 	}
 
-	return firestoreWhere[models.Transaction](lib.RenewTransactionCollection, queries)
+	return firestoreWhere[models.Transaction](collectionPrefix+lib.RenewTransactionCollection, queries)
 }
 
 func promotePolicyData(p models.Policy, promoteChannel chan<- RenewReport, wg *sync.WaitGroup, saveFn func(models.Policy, []models.Transaction) error) {

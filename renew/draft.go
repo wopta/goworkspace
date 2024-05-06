@@ -46,6 +46,7 @@ func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 
 	log.SetPrefix("[DraftFx] ")
 	defer func() {
+		collectionPrefix = ""
 		if err != nil {
 			log.Printf("error: %s", err.Error())
 		}
@@ -73,9 +74,10 @@ func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 	if req.DryRun != nil {
 		dryRun = *req.DryRun
 	}
+	collectionPrefix = req.CollectionPrefix
 
 	saveFn := func(p models.Policy, trs []models.Transaction) error {
-		data := createDraftSaveBatch(p, trs, req.CollectionPrefix)
+		data := createDraftSaveBatch(p, trs)
 
 		if !dryRun {
 			return saveToDatabases(data)
@@ -246,7 +248,7 @@ func draft(policy models.Policy, product models.Product, ch chan<- RenewReport, 
 
 	policy.Annuity = policy.Annuity + 1
 
-	err = calculatePrices(&policy)
+	err = calculatePricesByGuarantees(&policy)
 	if err != nil {
 		return
 	}
@@ -275,7 +277,7 @@ func draft(policy models.Policy, product models.Product, ch chan<- RenewReport, 
 	}
 }
 
-func calculatePrices(policy *models.Policy) error {
+func calculatePricesByGuarantees(policy *models.Policy) error {
 	var priceGross, priceNett, taxAmount, priceGrossMonthly, priceNettMonthly, taxAmountMonthly float64
 
 	if policy.Name != models.LifeProduct {

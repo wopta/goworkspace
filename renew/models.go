@@ -2,6 +2,8 @@ package renew
 
 import "github.com/wopta/goworkspace/models"
 
+var collectionPrefix string
+
 type RenewResp struct {
 	Success []RenewReport `json:"success"`
 	Failure []RenewReport `json:"failure"`
