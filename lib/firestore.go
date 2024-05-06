@@ -363,3 +363,30 @@ func SetBatchFirestoreErr[T any](operations map[string]map[string]T) error {
 
 	return nil
 }
+
+func DeleteBatchFirestoreErr[T any](operations map[string]map[string]T) error {
+	ctx := context.Background()
+	client, err := firestore.NewClient(ctx, os.Getenv("GOOGLE_PROJECT_ID"))
+	if err != nil {
+		return err
+	}
+
+	bulk := client.BulkWriter(ctx)
+
+	for collection, values := range operations {
+		c := client.Collection(collection)
+
+		for k := range values {
+			col := c.Doc(k)
+			_, err = bulk.Delete(col)
+			if err != nil {
+				log.Printf("error batch firestore: %s", err.Error())
+				return err
+			}
+		}
+	}
+
+	bulk.End()
+
+	return nil
+}
