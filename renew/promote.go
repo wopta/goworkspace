@@ -61,7 +61,14 @@ func PromoteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 		data := createPromoteSaveBatch(p, trs)
 
 		if !dryRun {
-			return saveToDatabases(data)
+			err = saveToDatabases(data)
+			if err != nil {
+				return err
+			}
+
+			dataDelete := createPromoteDeleteBatch(p, trs)
+
+			return deleteFromDatabases(dataDelete)
 		}
 
 		return nil
@@ -181,7 +188,8 @@ func promotePolicyData(p models.Policy, promoteChannel chan<- RenewReport, wg *s
 		wg.Done()
 	}()
 
-	if transactions, err = getTransactionsByPolicyAnnuity(p.Uid, p.Annuity); err != nil {
+	transactions, err = getTransactionsByPolicyAnnuity(p.Uid, p.Annuity)
+	if err != nil {
 		return
 	}
 
@@ -194,13 +202,15 @@ func promotePolicyData(p models.Policy, promoteChannel chan<- RenewReport, wg *s
 
 func setPolicyNotPaid(p models.Policy, promoteChannel chan<- RenewReport, wg *sync.WaitGroup, saveFn func(models.Policy, []models.Transaction) error) {
 	var (
-		err error
+		err          error
+		transactions []models.Transaction
 	)
 
 	defer func() {
 		var r RenewReport
 
 		r.Policy = p
+		r.Transactions = transactions
 		if err != nil {
 			r.Error = err.Error()
 		}
@@ -208,9 +218,18 @@ func setPolicyNotPaid(p models.Policy, promoteChannel chan<- RenewReport, wg *sy
 		wg.Done()
 	}()
 
+	transactions, err = getTransactionsByPolicyAnnuity(p.Uid, p.Annuity)
+	if err != nil {
+		return
+	}
+	transactions = lib.SliceMap(transactions, func(t models.Transaction) models.Transaction {
+		t.UpdateDate = time.Now().UTC()
+		return t
+	})
+
 	p.Status = policyStatusPaymentUnsolved
 	p.StatusHistory = append(p.StatusHistory, p.Status)
 	p.Updated = time.Now().UTC()
 
-	err = saveFn(p, nil)
+	err = saveFn(p, transactions)
 }
