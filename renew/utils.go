@@ -269,26 +269,6 @@ func firestoreWhere[T any](collection string, queries []firestoreQuery) (documen
 	return documents, nil
 }
 
-// In case we need to get the data from BigQuery. Shouldn't be used now
-// because bigquery does not have all data
-// func getTransactionsByPolicyAnnuity(policyUid string, annuity int) ([]models.Transaction, error) {
-// 	var (
-// 		query  bytes.Buffer
-// 		params = make(map[string]interface{})
-// 	)
-
-// 	params["policyUid"] = policyUid
-// 	params["annuity"] = annuity
-
-// 	query.WriteString(fmt.Sprintf("SELECT * FROM `%s.%s` WHERE "+
-// 		"policyUid = '@policyUid' AND "+
-// 		"annuity = @annuity",
-// 		models.WoptaDataset,
-// 		lib.RenewTransactionCollection))
-
-// 	return lib.QueryParametrizedRowsBigQuery[models.Transaction](query.String(), params)
-// }
-
 func sendReportMail(date time.Time, report RenewResp, isDraft bool) {
 	var (
 		message string = fmt.Sprintf(`
