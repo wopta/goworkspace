@@ -206,6 +206,9 @@ func getPolicies(policyUid, policyType, quoteType string, products map[string]mo
 		query.WriteString(")")
 	}
 
+	log.Printf("query: %s", query.String())
+	log.Printf("params: %v", params)
+
 	policies, err = lib.QueryParametrizedRowsBigQuery[models.Policy](query.String(), params)
 	if err != nil {
 		log.Printf("error getting policies: %v", err)
