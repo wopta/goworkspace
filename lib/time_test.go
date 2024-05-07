@@ -51,7 +51,7 @@ func TestAddMonth(t *testing.T) {
 	}
 
 	for _, input := range inputs {
-		calculatedDate := lib.AddMonths(input.input, 1)
+		calculatedDate := AddMonths(input.input, 1)
 		if calculatedDate != input.output {
 			t.Fatalf("expected %v got %v", input.output, calculatedDate)
 		}
@@ -61,7 +61,7 @@ func TestAddMonth(t *testing.T) {
 func TestAddTwoMonths(t *testing.T) {
 	startDate := time.Date(2024, time.March, 31, 0, 0, 0, 0, time.UTC)
 	expectedDate := time.Date(2024, time.May, 31, 0, 0, 0, 0, time.UTC)
-	calculatedDate := lib.AddMonths(startDate, 2)
+	calculatedDate := AddMonths(startDate, 2)
 
 	if calculatedDate != expectedDate {
 		t.Fatalf("expected %v got %v", expectedDate, calculatedDate)
@@ -69,7 +69,7 @@ func TestAddTwoMonths(t *testing.T) {
 
 	startDate = time.Date(2024, time.February, 29, 0, 0, 0, 0, time.UTC)
 	expectedDate = time.Date(2024, time.April, 29, 0, 0, 0, 0, time.UTC)
-	calculatedDate = lib.AddMonths(startDate, 2)
+	calculatedDate = AddMonths(startDate, 2)
 
 	if calculatedDate != expectedDate {
 		t.Fatalf("expected %v got %v", expectedDate, calculatedDate)
@@ -79,7 +79,7 @@ func TestAddTwoMonths(t *testing.T) {
 func TestAddOneYear(t *testing.T) {
 	startDate := time.Date(2024, time.February, 29, 0, 0, 0, 0, time.UTC)
 	expectedDate := time.Date(2025, time.February, 28, 0, 0, 0, 0, time.UTC)
-	calculatedDate := lib.AddMonths(startDate, 12)
+	calculatedDate := AddMonths(startDate, 12)
 
 	if calculatedDate != expectedDate {
 		t.Fatalf("expected %v got %v", expectedDate, calculatedDate)
@@ -89,7 +89,7 @@ func TestAddOneYear(t *testing.T) {
 func TestAddOneYearOneMonth(t *testing.T) {
 	startDate := time.Date(2024, time.February, 29, 0, 0, 0, 0, time.UTC)
 	expectedDate := time.Date(2025, time.March, 29, 0, 0, 0, 0, time.UTC)
-	calculatedDate := lib.AddMonths(startDate, 13)
+	calculatedDate := AddMonths(startDate, 13)
 
 	if calculatedDate != expectedDate {
 		t.Fatalf("expected %v got %v", expectedDate, calculatedDate)
