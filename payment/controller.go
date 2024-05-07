@@ -3,11 +3,12 @@ package payment
 import (
 	"errors"
 	"fmt"
+	"log"
+	"time"
+
 	"github.com/google/uuid"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	"log"
-	"time"
 )
 
 func Controller(policy models.Policy, product models.Product, transactions []models.Transaction, scheduleFirstRate bool) (string, []models.Transaction, error) {
@@ -91,7 +92,7 @@ func remittanceIntegration(transactions []models.Transaction) (payUrl string, up
 
 	for index, tr := range transactions {
 		now := time.Now().UTC()
-		if index == 0 {
+		if index == 0 && tr.Annuity == 0 {
 			tr.IsPay = true
 			tr.Status = models.TransactionStatusPay
 			tr.StatusHistory = append(tr.StatusHistory, models.TransactionStatusPay)
