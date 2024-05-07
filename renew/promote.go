@@ -27,7 +27,10 @@ func PromoteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 		err        error
 		targetDate time.Time = time.Now().UTC()
 		request    PromoteReq
-		response   RenewResp
+		response   = RenewResp{
+			Success: make([]RenewReport, 0),
+			Failure: make([]RenewReport, 0),
+		}
 	)
 
 	log.SetPrefix("[PromoteFx] ")
