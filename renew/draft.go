@@ -47,7 +47,6 @@ func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 			log.Printf("error: %s", err.Error())
 		}
 		log.Println("Handler end -------------------------------------------------")
-		log.SetPrefix("")
 	}()
 
 	log.Println("Handler start -----------------------------------------------")

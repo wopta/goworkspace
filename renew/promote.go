@@ -31,6 +31,14 @@ func PromoteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	)
 
 	log.SetPrefix("[PromoteFx] ")
+	defer func() {
+		collectionPrefix = ""
+		if err != nil {
+			log.Printf("error: %s", err.Error())
+		}
+		log.Println("Handler end -------------------------------------------------")
+	}()
+
 	log.Println("Handler start -----------------------------------------------")
 
 	reqBytes := lib.ErrorByte(io.ReadAll(r.Body))
