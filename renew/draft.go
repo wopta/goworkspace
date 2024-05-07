@@ -25,11 +25,6 @@ type DraftReq struct {
 	CollectionPrefix string `json:"collectionPrefix"`
 }
 
-type DraftResp struct {
-	Success []RenewReport `json:"success"`
-	Failure []RenewReport `json:"failure"`
-}
-
 func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err    error
