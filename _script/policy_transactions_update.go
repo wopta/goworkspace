@@ -1,17 +1,16 @@
 package _script
 
 import (
-	"cloud.google.com/go/civil"
-	"cloud.google.com/go/firestore"
 	"fmt"
+	"log"
+	"sync"
+	"time"
+
+	"cloud.google.com/go/firestore"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/product"
 	"github.com/wopta/goworkspace/transaction"
-	"log"
-	"strings"
-	"sync"
-	"time"
 )
 
 func getAllPolicies() ([]models.Policy, error) {
@@ -83,12 +82,7 @@ func PolicyTransactionsUpdate() {
 			for _, t := range transactions {
 				t.Annuity = 0
 				t.UpdateDate = time.Now().UTC()
-				t.BigPayDate = lib.GetBigQueryNullDateTime(t.PayDate)
-				t.BigTransactionDate = lib.GetBigQueryNullDateTime(t.TransactionDate)
-				t.BigCreationDate = civil.DateTimeOf(t.CreationDate)
-				t.BigStatusHistory = strings.Join(t.StatusHistory, ",")
-				t.BigUpdateDate = lib.GetBigQueryNullDateTime(t.UpdateDate)
-				t.BigEffectiveDate = lib.GetBigQueryNullDateTime(t.EffectiveDate)
+				t.BigQueryParse()
 				m[models.TransactionsCollection][t.Uid] = t
 				transactionsList = append(transactionsList, t)
 			}
