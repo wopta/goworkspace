@@ -5,10 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/payment"
-	"github.com/wopta/goworkspace/transaction"
 	"io"
 	"log"
 	"net/http"
@@ -16,6 +12,11 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/payment"
+	"github.com/wopta/goworkspace/transaction"
 )
 
 type DraftReq struct {
@@ -161,7 +162,7 @@ func getPolicies(policyUid, policyType, quoteType string, products map[string]mo
 		policies []models.Policy
 	)
 
-	query.WriteString("SELECT * FROM `wopta.policiesView` WHERE ")
+	query.WriteString(fmt.Sprintf("SELECT * FROM `%s.%s` WHERE ", lib.WoptaDataset, lib.PoliciesViewCollection))
 
 	if policyUid != "" {
 		query.WriteString(" uid = @policyUid ")

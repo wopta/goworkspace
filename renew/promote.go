@@ -66,9 +66,9 @@ func PromoteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 				return err
 			}
 
-			dataDelete := createPromoteDeleteBatch(p, trs)
+			dataDelete := createPromoteProcessedBatch(p, trs)
 
-			return deleteFromDatabases(dataDelete)
+			return saveToDatabases(dataDelete)
 		}
 
 		return nil
@@ -136,12 +136,16 @@ func getRenewingPolicies(renewDate time.Time) ([]models.Policy, error) {
 
 	params["month"] = int64(renewDate.Month())
 	params["day"] = int64(renewDate.Day())
+	params["isDeleted"] = false
+	params["isRenewable"] = true
 
 	query.WriteString(fmt.Sprintf("SELECT * FROM `%s.%s` WHERE "+
 		"EXTRACT(MONTH FROM startDate) = @month AND "+
-		"EXTRACT(DAY FROM startDate) = @day",
+		"EXTRACT(DAY FROM startDate) = @day AND "+
+		"isDeleted = @isDeleted AND "+
+		"isRenewable = @isRenewable",
 		models.WoptaDataset,
-		collectionPrefix+lib.RenewPolicyCollection))
+		collectionPrefix+lib.RenewPolicyViewCollection))
 
 	policies, err := lib.QueryParametrizedRowsBigQuery[models.Policy](query.String(), params)
 	if err != nil {
@@ -164,6 +168,7 @@ func getTransactionsByPolicyAnnuity(policyUid string, annuity int) ([]models.Tra
 	queries := []firestoreQuery{
 		{field: "policyUid", operator: "==", queryValue: policyUid},
 		{field: "annuity", operator: "==", queryValue: annuity},
+		{field: "isDelete", operator: "==", queryValue: false},
 	}
 
 	return firestoreWhere[models.Transaction](collectionPrefix+lib.RenewTransactionCollection, queries)

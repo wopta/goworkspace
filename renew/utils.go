@@ -1,20 +1,21 @@
 package renew
 
 import (
-	"cloud.google.com/go/firestore"
 	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/mail"
-	"github.com/wopta/goworkspace/models"
-	"google.golang.org/api/iterator"
 	"log"
 	"os"
 	"sort"
 	"strings"
 	"time"
+
+	"cloud.google.com/go/firestore"
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/mail"
+	"github.com/wopta/goworkspace/models"
+	"google.golang.org/api/iterator"
 )
 
 func getProductsMapByPolicyType(policyType, quoteType string) map[string]models.Product {
@@ -171,12 +172,13 @@ func createPromoteSaveBatch(policy models.Policy, transactions []models.Transact
 	return batch
 }
 
-func createPromoteDeleteBatch(policy models.Policy, transactions []models.Transaction) map[string]map[string]interface{} {
+func createPromoteProcessedBatch(policy models.Policy, transactions []models.Transaction) map[string]map[string]interface{} {
 	var (
 		polCollection = collectionPrefix + lib.RenewPolicyCollection
 		trsCollection = collectionPrefix + lib.RenewTransactionCollection
 	)
 
+	policy.IsDeleted = true
 	policy.Updated = time.Now().UTC()
 	policy.BigQueryParse()
 	batch := map[string]map[string]interface{}{
@@ -187,6 +189,7 @@ func createPromoteDeleteBatch(policy models.Policy, transactions []models.Transa
 	}
 
 	for idx, tr := range transactions {
+		tr.IsDelete = true
 		tr.UpdateDate = time.Now().UTC()
 		tr.BigQueryParse()
 		batch[trsCollection][tr.Uid] = tr
@@ -208,27 +211,6 @@ func saveToDatabases(data map[string]map[string]interface{}) error {
 			dataToSave = append(dataToSave, value)
 		}
 		err = lib.InsertRowsBigQuery(models.WoptaDataset, collection, dataToSave)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func deleteFromDatabases(data map[string]map[string]interface{}) error {
-	err := lib.DeleteBatchFirestoreErr(data)
-	if err != nil {
-		return err
-	}
-
-	for collection, values := range data {
-		uids := lib.GetMapKeys(values)
-		if len(uids) == 0 {
-			continue
-		}
-		whereClause := "WHERE uid IN ('" + strings.Join(uids, "', '") + "')"
-		err = lib.DeleteRowBigQuery(models.WoptaDataset, collection, whereClause)
 		if err != nil {
 			return err
 		}
