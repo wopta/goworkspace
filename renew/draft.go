@@ -59,7 +59,7 @@ func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 	}
 
 	if req.Date != "" {
-		tmpDate, err := time.Parse("2006-01-02", req.Date)
+		tmpDate, err := time.Parse(time.DateOnly, req.Date)
 		if err != nil {
 			log.Printf("error parsing request date: %s", err.Error())
 			return "", nil, err
