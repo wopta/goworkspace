@@ -161,7 +161,7 @@ func getPolicies(policyUid, policyType, quoteType string, products map[string]mo
 		policies []models.Policy
 	)
 
-	query.WriteString(fmt.Sprintf("SELECT * FROM `%s.%s` WHERE ", lib.WoptaDataset, lib.PoliciesViewCollection))
+	query.WriteString(fmt.Sprintf("SELECT * FROM `%s.%s` p WHERE ", lib.WoptaDataset, lib.PoliciesViewCollection))
 
 	if policyUid != "" {
 		query.WriteString(" uid = @policyUid ")
@@ -203,7 +203,10 @@ func getPolicies(policyUid, policyType, quoteType string, products map[string]mo
 			query.WriteString(" AND EXTRACT(MONTH FROM startDate) = @" + targetMonthKey)
 			query.WriteString(" AND EXTRACT(DAY FROM startDate) = @" + targetDayKey + ")")
 		}
-		query.WriteString(")")
+		query.WriteString(") AND ")
+		query.WriteString(fmt.Sprintf("(EXISTS(SELECT uid FROM `%s.%s` "+
+			"WHERE uid = p.uid AND annuity = p.annuity + 1 AND isDeleted = false)) = false",
+			lib.WoptaDataset, lib.RenewPolicyViewCollection))
 	}
 
 	log.Printf("query: %s", query.String())
