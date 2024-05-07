@@ -1,7 +1,6 @@
-package lib_test
+package lib
 
 import (
-	"github.com/wopta/goworkspace/lib"
 	"testing"
 	"time"
 )
