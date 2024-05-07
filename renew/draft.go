@@ -138,14 +138,14 @@ func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 	return string(rawResp), resp, err
 }
 
-func getQueryParameters(r *http.Request) (string, string, error) {
-	policyType := r.URL.Query().Get("policyType")
+func getQueryParameters(r *http.Request) (policyType, quoteType string, err error) {
+	policyType = r.URL.Query().Get("policyType")
 	if policyType == "" {
 		log.Printf("no policyType specified")
 		return "", "", errors.New("no policyType specified")
 	}
 
-	quoteType := r.URL.Query().Get("quoteType")
+	quoteType = r.URL.Query().Get("quoteType")
 	if quoteType == "" {
 		log.Printf("no quoteType specified")
 		return "", "", errors.New("no quoteType specified")
