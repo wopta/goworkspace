@@ -50,5 +50,6 @@ const (
 	NetworkNodesView             string = "networkNodesView"       // only for bigquery
 	MailCollection               string = "mail"                   // only for firestore
 	RenewPolicyCollection        string = "renewPolicy"            // firestore and bigquery
+	RenewPolicyViewCollection    string = "renewPolicyView"        // bigquery
 	RenewTransactionCollection   string = "renewTransactions"      // firestore and bigquery
 )
