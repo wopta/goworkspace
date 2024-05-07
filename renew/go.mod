@@ -5,11 +5,11 @@ go 1.21
 require (
 	cloud.google.com/go/firestore v1.15.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
-	github.com/wopta/goworkspace/lib v1.0.119
-	github.com/wopta/goworkspace/mail v1.0.105
-	github.com/wopta/goworkspace/models v1.1.106
-	github.com/wopta/goworkspace/payment v1.0.198
-	github.com/wopta/goworkspace/transaction v1.0.76
+	github.com/wopta/goworkspace/lib v1.0.120-renew
+	github.com/wopta/goworkspace/mail v1.0.106-renew
+	github.com/wopta/goworkspace/models v1.1.107-renew
+	github.com/wopta/goworkspace/payment v1.0.199-renew
+	github.com/wopta/goworkspace/transaction v1.0.77-renew
 	google.golang.org/api v0.177.0
 )
 
