@@ -1,19 +1,22 @@
-package _script
+package test
 
 import (
-	"fmt"
-	"log"
-	"sync"
-	"time"
-
+	"cloud.google.com/go/civil"
 	"cloud.google.com/go/firestore"
+	"context"
+	"fmt"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/product"
 	"github.com/wopta/goworkspace/transaction"
+	"log"
+	"os"
+	"strings"
+	"sync"
+	"time"
 )
 
-func getAllPolicies() ([]models.Policy, error) {
+func getAllPolicies(numPolicies int) ([]models.Policy, error) {
 	var policies = make([]models.Policy, 0)
 	docIterator := lib.OrderFirestore(lib.PolicyCollection, "uid", firestore.Asc)
 
@@ -33,10 +36,10 @@ func getAllPolicies() ([]models.Policy, error) {
 		}
 	}
 
-	return policies, nil
+	return policies[:numPolicies], nil
 }
 
-func PolicyTransactionsUpdate() {
+func policyTransactionsUpdate(request int) {
 	var (
 		wg          sync.WaitGroup
 		productsMap = make(map[string]models.Product)
@@ -48,7 +51,7 @@ func PolicyTransactionsUpdate() {
 		productsMap[fmt.Sprintf("%s-%s", prd.Name, prd.Version)] = *prd
 	}
 
-	policies, err := getAllPolicies()
+	policies, err := getAllPolicies(request)
 	if err != nil {
 		return
 	}
@@ -82,12 +85,17 @@ func PolicyTransactionsUpdate() {
 			for _, t := range transactions {
 				t.Annuity = 0
 				t.UpdateDate = time.Now().UTC()
-				t.BigQueryParse()
+				t.BigPayDate = lib.GetBigQueryNullDateTime(t.PayDate)
+				t.BigTransactionDate = lib.GetBigQueryNullDateTime(t.TransactionDate)
+				t.BigCreationDate = civil.DateTimeOf(t.CreationDate)
+				t.BigStatusHistory = strings.Join(t.StatusHistory, ",")
+				t.BigUpdateDate = lib.GetBigQueryNullDateTime(t.UpdateDate)
+				t.BigEffectiveDate = lib.GetBigQueryNullDateTime(t.EffectiveDate)
 				m[models.TransactionsCollection][t.Uid] = t
 				transactionsList = append(transactionsList, t)
 			}
 
-			err = lib.SetBatchFirestoreErr(m)
+			err = setBatchFirestoreErr(m)
 			if err != nil {
 				log.Printf("error saving policy and transactiosn into firestore: %s", err.Error())
 				return
@@ -108,4 +116,31 @@ func PolicyTransactionsUpdate() {
 	endDate := time.Now().UTC()
 	log.Printf("End at %s duration %s", endDate.String(), endDate.Sub(startDate).String())
 
+}
+
+func setBatchFirestoreErr[T any](operations map[string]map[string]T) error {
+	ctx := context.Background()
+	client, err := firestore.NewClient(ctx, os.Getenv("GOOGLE_PROJECT_ID"))
+	if err != nil {
+		return err
+	}
+
+	bulk := client.BulkWriter(ctx)
+
+	for collection, values := range operations {
+		c := client.Collection(collection)
+
+		for k, v := range values {
+			col := c.Doc(k)
+			_, err = bulk.Set(col, v)
+			if err != nil {
+				log.Printf("error batch firestore: %s", err.Error())
+				return err
+			}
+		}
+	}
+
+	bulk.End()
+
+	return nil
 }

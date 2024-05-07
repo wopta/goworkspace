@@ -27,6 +27,9 @@ func TestPostFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 
 	if operation == "error" {
 		return "", nil, GetErrorJson(400, "Bad Request", "Testing error POST")
+	} else if operation == "policy-update" {
+		policyTransactionsUpdate(int(request.(float64)))
+		return "{}", nil, nil
 	}
 
 	log.Println("Handler end -------------------------------------------------")

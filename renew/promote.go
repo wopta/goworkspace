@@ -27,10 +27,21 @@ func PromoteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 		err        error
 		targetDate time.Time = time.Now().UTC()
 		request    PromoteReq
-		response   RenewResp
+		response   = RenewResp{
+			Success: make([]RenewReport, 0),
+			Failure: make([]RenewReport, 0),
+		}
 	)
 
 	log.SetPrefix("[PromoteFx] ")
+	defer func() {
+		collectionPrefix = ""
+		if err != nil {
+			log.Printf("error: %s", err.Error())
+		}
+		log.Println("Handler end -------------------------------------------------")
+	}()
+
 	log.Println("Handler start -----------------------------------------------")
 
 	reqBytes := lib.ErrorByte(io.ReadAll(r.Body))
@@ -49,6 +60,7 @@ func PromoteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	if request.DryRun != nil {
 		dryRun = *request.DryRun
 	}
+	collectionPrefix = request.CollectionPrefix
 
 	policies, err := getRenewingPolicies(targetDate)
 	if err != nil {
@@ -57,10 +69,17 @@ func PromoteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	}
 
 	saveFn := func(p models.Policy, trs []models.Transaction) error {
-		data := createSaveBatch(p, trs, request.CollectionPrefix)
+		data := createPromoteSaveBatch(p, trs)
 
 		if !dryRun {
-			return saveToDatabases(data)
+			err = saveToDatabases(data)
+			if err != nil {
+				return err
+			}
+
+			dataDelete := createPromoteProcessedBatch(p, trs)
+
+			return saveToDatabases(dataDelete)
 		}
 
 		return nil
@@ -110,7 +129,7 @@ func Promote(policies []models.Policy, saveFn func(models.Policy, []models.Trans
 	}()
 
 	for res := range promoteChannel {
-		if res.Error != nil {
+		if res.Error != "" {
 			response.Failure = append(response.Failure, res)
 		} else {
 			response.Success = append(response.Success, res)
@@ -128,12 +147,16 @@ func getRenewingPolicies(renewDate time.Time) ([]models.Policy, error) {
 
 	params["month"] = int64(renewDate.Month())
 	params["day"] = int64(renewDate.Day())
+	params["isDeleted"] = false
+	params["isRenewable"] = true
 
 	query.WriteString(fmt.Sprintf("SELECT * FROM `%s.%s` WHERE "+
 		"EXTRACT(MONTH FROM startDate) = @month AND "+
-		"EXTRACT(DAY FROM startDate) = @day",
+		"EXTRACT(DAY FROM startDate) = @day AND "+
+		"isDeleted = @isDeleted AND "+
+		"isRenewable = @isRenewable",
 		models.WoptaDataset,
-		lib.RenewPolicyCollection))
+		collectionPrefix+lib.RenewPolicyViewCollection))
 
 	policies, err := lib.QueryParametrizedRowsBigQuery[models.Policy](query.String(), params)
 	if err != nil {
@@ -156,9 +179,10 @@ func getTransactionsByPolicyAnnuity(policyUid string, annuity int) ([]models.Tra
 	queries := []firestoreQuery{
 		{field: "policyUid", operator: "==", queryValue: policyUid},
 		{field: "annuity", operator: "==", queryValue: annuity},
+		{field: "isDelete", operator: "==", queryValue: false},
 	}
 
-	return firestoreWhere[models.Transaction](lib.RenewTransactionCollection, queries)
+	return firestoreWhere[models.Transaction](collectionPrefix+lib.RenewTransactionCollection, queries)
 }
 
 func promotePolicyData(p models.Policy, promoteChannel chan<- RenewReport, wg *sync.WaitGroup, saveFn func(models.Policy, []models.Transaction) error) {
@@ -168,16 +192,20 @@ func promotePolicyData(p models.Policy, promoteChannel chan<- RenewReport, wg *s
 	)
 
 	defer func() {
-		promoteChannel <- RenewReport{
-			Policy:       p,
-			Transactions: transactions,
-			Error:        err,
+		var r RenewReport
+
+		r.Policy = p
+		r.Transactions = transactions
+		if err != nil {
+			r.Error = err.Error()
 		}
+		promoteChannel <- r
 
 		wg.Done()
 	}()
 
-	if transactions, err = getTransactionsByPolicyAnnuity(p.Uid, p.Annuity); err != nil {
+	transactions, err = getTransactionsByPolicyAnnuity(p.Uid, p.Annuity)
+	if err != nil {
 		return
 	}
 
@@ -190,20 +218,34 @@ func promotePolicyData(p models.Policy, promoteChannel chan<- RenewReport, wg *s
 
 func setPolicyNotPaid(p models.Policy, promoteChannel chan<- RenewReport, wg *sync.WaitGroup, saveFn func(models.Policy, []models.Transaction) error) {
 	var (
-		err error
+		err          error
+		transactions []models.Transaction
 	)
 
 	defer func() {
-		promoteChannel <- RenewReport{
-			Policy: p,
-			Error:  err,
+		var r RenewReport
+
+		r.Policy = p
+		r.Transactions = transactions
+		if err != nil {
+			r.Error = err.Error()
 		}
+		promoteChannel <- r
 		wg.Done()
 	}()
+
+	transactions, err = getTransactionsByPolicyAnnuity(p.Uid, p.Annuity)
+	if err != nil {
+		return
+	}
+	transactions = lib.SliceMap(transactions, func(t models.Transaction) models.Transaction {
+		t.UpdateDate = time.Now().UTC()
+		return t
+	})
 
 	p.Status = policyStatusPaymentUnsolved
 	p.StatusHistory = append(p.StatusHistory, p.Status)
 	p.Updated = time.Now().UTC()
 
-	err = saveFn(p, nil)
+	err = saveFn(p, transactions)
 }

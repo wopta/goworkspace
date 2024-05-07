@@ -114,7 +114,7 @@ type Policy struct {
 	Annuity           int                          `json:"annuity" firestore:"annuity" bigquery:"annuity"`
 	IsAutoRenew       bool                         `json:"isAutoRenew" firestore:"isAutoRenew" bigquery:"isAutoRenew"`
 	IsRenewable       bool                         `json:"isRenewable" firestore:"isRenewable" bigquery:"isRenewable"`
-	PolicyType        string                       `json:"policyType,omitempty" firestore:"policyType,omitempty" bigquery:"policyType"`
+	PolicyType        string                       `json:"policyType" firestore:"policyType" bigquery:"policyType"`
 	QuoteType         string                       `json:"quoteType" firestore:"quoteType" bigquery:"quoteType"`
 
 	// DEPRECATED FIELDS
