@@ -285,7 +285,7 @@ func calculatePricesByGuarantees(policy *models.Policy) error {
 	}
 
 	for index, guarantee := range policy.Assets[0].Guarantees {
-		if policy.Annuity > guarantee.Value.Duration.Year {
+		if policy.Annuity > guarantee.Value.Duration.Year || guarantee.IsDeleted {
 			policy.Assets[0].Guarantees[index].IsDeleted = true
 			continue
 		}
