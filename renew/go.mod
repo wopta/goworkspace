@@ -5,11 +5,11 @@ go 1.21
 require (
 	cloud.google.com/go/firestore v1.12.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
-	github.com/wopta/goworkspace/lib v1.0.117-renew
-	github.com/wopta/goworkspace/mail v1.0.104-renew
-	github.com/wopta/goworkspace/models v1.1.105-renew
-	github.com/wopta/goworkspace/payment v1.0.197-renew
-	github.com/wopta/goworkspace/transaction v1.0.75-renew
+	github.com/wopta/goworkspace/lib v1.0.120-renew-renew
+	github.com/wopta/goworkspace/mail v1.0.106-renew-renew
+	github.com/wopta/goworkspace/models v1.1.107-renew-renew
+	github.com/wopta/goworkspace/payment v1.0.199-renew-renew
+	github.com/wopta/goworkspace/transaction v1.0.77-renew-renew
 	google.golang.org/api v0.128.0
 )
 
@@ -75,10 +75,10 @@ require (
 	github.com/src-d/gcfg v1.4.0 // indirect
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.2.1 // indirect
-	github.com/wopta/goworkspace/document v1.1.72-renew // indirect
-	github.com/wopta/goworkspace/network v1.0.56-renew // indirect
-	github.com/wopta/goworkspace/policy v1.0.96-renew // indirect
-	github.com/wopta/goworkspace/product v1.0.102-renew // indirect
+	github.com/wopta/goworkspace/document v1.1.74-renew-renew // indirect
+	github.com/wopta/goworkspace/network v1.0.58-renew-renew // indirect
+	github.com/wopta/goworkspace/policy v1.0.98-renew-renew // indirect
+	github.com/wopta/goworkspace/product v1.0.104-renew-renew // indirect
 	github.com/wopta/goworkspace/wiseproxy v1.0.3 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
