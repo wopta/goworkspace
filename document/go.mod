@@ -10,10 +10,10 @@ require (
 	github.com/go-pdf/fpdf v0.8.0
 	github.com/johnfercher/maroto v0.42.0
 	github.com/ttacon/libphonenumber v1.2.1
-	github.com/wopta/goworkspace/lib v1.0.117-renew
-	github.com/wopta/goworkspace/models v1.1.105-renew
-	github.com/wopta/goworkspace/network v1.0.56-renew
-	github.com/wopta/goworkspace/product v1.0.102-renew
+	github.com/wopta/goworkspace/lib v1.0.119
+	github.com/wopta/goworkspace/models v1.1.106
+	github.com/wopta/goworkspace/network v1.0.57
+	github.com/wopta/goworkspace/product v1.0.103
 )
 
 require (

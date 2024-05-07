@@ -76,14 +76,15 @@ func FleetAssistenceInclusiveMovement(w http.ResponseWriter, r *http.Request) (s
 	log.Println(string(body))
 	json.Unmarshal(body, &fleetAssistenceInclusiveMovement)
 	data, ok := users[fleetAssistenceInclusiveMovement.Mail]
-
 	if ok {
 		setRequestData(fleetAssistenceInclusiveMovement, &data)
 		if fleetAssistenceInclusiveMovement.MovementType == "Inserimento" {
 
 			lib.InsertRowsBigQuery("wopta", "fleetAssistenceInclusiveMovements", data)
 		} else {
-			checkPlate, e := lib.QueryRowsBigQuery[FleetAssistenceInclusiveMovements]("")
+			query := "select * from `wopta.fleetAssistenceInclusiveMovements` where plateVehicle='" + fleetAssistenceInclusiveMovement.PlateVehicle + "'"
+			log.Println("BankAccountAxaInclusive bigquery query: ", query)
+			checkPlate, e := lib.QueryRowsBigQuery[FleetAssistenceInclusiveMovements](query)
 			log.Println(e)
 			if len(checkPlate) > 0 {
 				lib.InsertRowsBigQuery("wopta", "fleetAssistenceInclusiveMovements", data)
