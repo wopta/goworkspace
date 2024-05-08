@@ -6,12 +6,13 @@ import (
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/payment"
 )
 
 var testRoutes []lib.Route = []lib.Route{
 	{
 		Route:   "/{operation}",
-		Handler: lib.ResponseLoggerWrapper(TestPostFx),
+		Handler: lib.ResponseLoggerWrapper(payment.DeleteTransactionFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAdmin},
 	},
