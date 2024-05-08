@@ -2,6 +2,7 @@ package payment
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -152,13 +153,19 @@ func getFabrickRequestBody(
 	return strings.Replace(string(res), `\u0026`, `&`, -1)
 }
 
-func getFabrickPaymentRequest(body string) *http.Request {
+func getFabrickPaymentRequest(body string, isDelete bool) *http.Request {
 	var (
+		method    = http.MethodPost
 		urlstring = os.Getenv("FABRICK_BASEURL") + "api/fabrick/pace/v4.0/mods/back/v1.0/payments"
 		token     = os.Getenv("FABRICK_TOKEN_BACK_API")
 	)
 
-	request, err := http.NewRequest(http.MethodPost, urlstring, strings.NewReader(body))
+	if isDelete {
+		urlstring += "/expirationDate"
+		method = http.MethodDelete
+	}
+
+	request, err := http.NewRequest(method, urlstring, strings.NewReader(body))
 	if err != nil {
 		log.Printf("error generating fabrick payment request: %s", err.Error())
 		return nil
@@ -190,7 +197,7 @@ func createFabrickTransaction(
 		if body == "" {
 			return
 		}
-		request := getFabrickPaymentRequest(body)
+		request := getFabrickPaymentRequest(body, false)
 		if request == nil {
 			return
 		}
@@ -246,7 +253,7 @@ func createFabrickTransaction(
 }
 
 func fabrickExpireBill(providerId string) error {
-	var urlstring = os.Getenv("FABRICK_BASEURL") + "api/fabrick/pace/v4.0/mods/back/v1.0/payments/expirationDate"
+	//var urlstring = os.Getenv("FABRICK_BASEURL") + "api/fabrick/pace/v4.0/mods/back/v1.0/payments/expirationDate"
 	const expirationTimeSuffix = "00:00:00"
 
 	log.Println("starting fabrick expire bill request...")
@@ -257,17 +264,16 @@ func fabrickExpireBill(providerId string) error {
 		expirationTimeSuffix,
 	)
 
-	requestBody := fmt.Sprintf(`{"id":"%s","newExpirationDate":"%s"}`, providerId, expirationDate)
-	log.Printf("fabrick expire bill request body: %s", requestBody)
+	body := fmt.Sprintf(`{"id":"%s","newExpirationDate":"%s"}`, providerId, expirationDate)
+	log.Printf("fabrick expire bill request body: %s", body)
 
-	req, err := http.NewRequest(http.MethodPut, urlstring, strings.NewReader(requestBody))
-	if err != nil {
-		log.Printf("error creating request: %s", err.Error())
-		return err
+	request := getFabrickPaymentRequest(body, true)
+	if request == nil {
+		return errors.New("error generating fabrick expire bill request")
 	}
-	res, err := getFabrickClient(urlstring, req)
+
+	res, err := lib.RetryDo(request, 5, 10)
 	if err != nil {
-		log.Printf("error getting response: %s", err.Error())
 		return err
 	}
 
