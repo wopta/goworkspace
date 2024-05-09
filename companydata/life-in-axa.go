@@ -350,6 +350,7 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 			Assets: []models.Asset{{
 				Guarantees: guarantees,
 			}},
+			OfferlName: "default",
 			OffersPrices: map[string]map[string]*models.Price{
 				"default": {
 					string(models.PaySplitMonthly): &models.Price{
