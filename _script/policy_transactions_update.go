@@ -3,6 +3,7 @@ package _script
 import (
 	"fmt"
 	"log"
+	"strings"
 	"sync"
 	"time"
 
@@ -69,6 +70,10 @@ func PolicyTransactionsUpdate() {
 			transactionsList := make([]models.Transaction, 0)
 
 			productIdentifier := fmt.Sprintf("%s-%s", p.Name, p.ProductVersion)
+
+			if strings.EqualFold(p.Name, models.LifeProduct) {
+				p.OfferlName = "default"
+			}
 
 			p.Annuity = 0
 			p.IsAutoRenew = productsMap[productIdentifier].IsAutoRenew
