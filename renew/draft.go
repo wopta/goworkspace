@@ -284,6 +284,14 @@ func calculatePricesByGuarantees(policy *models.Policy) error {
 		return errors.New("product not supported")
 	}
 
+	if policy.OffersPrices[policy.OfferlName] == nil {
+		return errors.New("invalid offer name")
+	}
+
+	if policy.OffersPrices[policy.OfferlName][policy.PaymentSplit] == nil {
+		return errors.New("no offer found for payment split")
+	}
+
 	for index, guarantee := range policy.Assets[0].Guarantees {
 		if policy.Annuity > guarantee.Value.Duration.Year || guarantee.IsDeleted {
 			policy.Assets[0].Guarantees[index].IsDeleted = true
@@ -297,15 +305,15 @@ func calculatePricesByGuarantees(policy *models.Policy) error {
 		priceNettMonthly += guarantee.Value.PremiumNetMonthly
 		taxAmountMonthly += guarantee.Value.PremiumTaxAmountMonthly
 	}
-	policy.PriceGross = priceGross
-	policy.PriceNett = priceNett
-	policy.TaxAmount = taxAmount
-	policy.PriceGrossMonthly = priceGrossMonthly
-	policy.PriceNettMonthly = priceNettMonthly
-	policy.TaxAmountMonthly = taxAmountMonthly
-	policy.OffersPrices[policy.OfferlName][policy.PaymentSplit].Tax = policy.TaxAmount
-	policy.OffersPrices[policy.OfferlName][policy.PaymentSplit].Net = policy.PriceNett
-	policy.OffersPrices[policy.OfferlName][policy.PaymentSplit].Gross = policy.PriceGross
+	policy.PriceGross = lib.RoundFloat(priceGross, 2)
+	policy.PriceNett = lib.RoundFloat(priceNett, 2)
+	policy.TaxAmount = lib.RoundFloat(taxAmount, 2)
+	policy.PriceGrossMonthly = lib.RoundFloat(priceGrossMonthly, 2)
+	policy.PriceNettMonthly = lib.RoundFloat(priceNettMonthly, 2)
+	policy.TaxAmountMonthly = lib.RoundFloat(taxAmountMonthly, 2)
+	policy.OffersPrices[policy.OfferlName][policy.PaymentSplit].Tax = lib.RoundFloat(policy.TaxAmount, 2)
+	policy.OffersPrices[policy.OfferlName][policy.PaymentSplit].Net = lib.RoundFloat(policy.PriceNett, 2)
+	policy.OffersPrices[policy.OfferlName][policy.PaymentSplit].Gross = lib.RoundFloat(policy.PriceGross, 2)
 
 	if policy.PaymentSplit == string(models.PaySplitMonthly) {
 		policy.OffersPrices[policy.OfferlName][policy.PaymentSplit].Tax = policy.TaxAmountMonthly
