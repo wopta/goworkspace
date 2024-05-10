@@ -83,6 +83,7 @@ const (
 	PartnershipFacile      string = "facile"
 	PartnershipFpinsurance string = "fpinsurance"
 	PartnershipELeads      string = "eleads"
+	PartnershipSegugio     string = "segugio"
 )
 
 // DEPRECATED - use lib version instead
