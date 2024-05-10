@@ -94,7 +94,7 @@ func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 	productsMap = getProducts(policyType, quoteType)
 	log.Printf("products: %s", strings.Join(lib.GetMapKeys(productsMap), ", "))
 
-	policies, err := getPolicies(req.PolicyUid, policyType, quoteType, productsMap, today)
+	policies, err := getPolicies(req.PolicyUid, policyType, quoteType, productsMap[models.MgaChannel], today)
 	if err != nil {
 		return "", nil, err
 	}
@@ -153,7 +153,7 @@ func getQueryParameters(r *http.Request) (policyType, quoteType string, err erro
 	return policyType, quoteType, nil
 }
 
-func getPolicies(policyUid, policyType, quoteType string, products map[string]map[string]models.Product, today time.Time) ([]models.Policy, error) {
+func getPolicies(policyUid, policyType, quoteType string, products map[string]models.Product, today time.Time) ([]models.Policy, error) {
 	var (
 		err      error
 		query    bytes.Buffer
@@ -168,7 +168,7 @@ func getPolicies(policyUid, policyType, quoteType string, products map[string]ma
 		params["policyUid"] = policyUid
 
 	} else if len(products) > 0 {
-		tmpProducts := lib.GetMapValues(products[models.MgaChannel])
+		tmpProducts := lib.GetMapValues(products)
 		params["isRenewable"] = true
 		params["policyType"] = policyType
 		params["quoteType"] = quoteType
