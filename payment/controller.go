@@ -98,10 +98,10 @@ func remittanceIntegration(transactions []models.Transaction) (payUrl string, up
 			tr.StatusHistory = append(tr.StatusHistory, models.TransactionStatusPay)
 			tr.PayDate = now
 			tr.TransactionDate = now
+			tr.PaymentMethod = models.PayMethodRemittance
 		}
 		tr.ProviderId = ""
 		tr.UserToken = ""
-		tr.PaymentMethod = models.PayMethodRemittance
 		tr.UpdateDate = now
 		updatedTransaction = append(updatedTransaction, tr)
 	}
