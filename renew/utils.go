@@ -18,33 +18,34 @@ import (
 	"google.golang.org/api/iterator"
 )
 
-func getProductsMapByPolicyType(policyType, quoteType string) map[string]models.Product {
-	products := make(map[string]models.Product)
-
-	productsList := getProducts()
-
-	for _, prd := range productsList {
-		if strings.EqualFold(prd.PolicyType, policyType) && strings.EqualFold(prd.QuoteType, quoteType) {
-			key := fmt.Sprintf("%s-%s", prd.Name, prd.Version)
-			products[key] = prd
-		}
-	}
-
-	return products
-}
-
-func getProducts() []models.Product {
-	const channel = models.MgaChannel
-	var products = make([]models.Product, 0)
+func getProducts(policyType, quoteType string) map[string]map[string]models.Product {
+	var (
+		products = make(map[string]map[string]models.Product)
+		channels = []string{models.MgaChannel, models.NetworkChannel, models.ECommerceChannel}
+	)
 
 	fileList := getProductsFileList()
 
-	fileList = lib.SliceFilter(fileList, func(file string) bool {
-		filenameParts := strings.SplitN(file, "/", 4)
-		return strings.HasPrefix(filenameParts[3], channel)
-	})
+	getProductsByChannel := func(channel string) {
+		filteredFileList := lib.SliceFilter(fileList, func(file string) bool {
+			filenameParts := strings.SplitN(file, "/", 4)
+			return strings.HasPrefix(filenameParts[3], channel)
+		})
 
-	products = getProductsFromFileList(fileList)
+		products[channel] = make(map[string]models.Product)
+		channelProducts := getProductsFromFileList(filteredFileList)
+
+		for _, prd := range channelProducts {
+			if strings.EqualFold(prd.PolicyType, policyType) && strings.EqualFold(prd.QuoteType, quoteType) {
+				key := fmt.Sprintf("%s-%s", prd.Name, prd.Version)
+				products[channel][key] = prd
+			}
+		}
+	}
+
+	for _, channel := range channels {
+		getProductsByChannel(channel)
+	}
 
 	return products
 }
@@ -63,7 +64,7 @@ func getProductsFileList() []string {
 	}
 
 	if err != nil {
-		log.Printf("[GetNetworkNodeProducts] error getting file list: %s", err.Error())
+		log.Printf("error getting file list: %s", err.Error())
 	}
 
 	return fileList

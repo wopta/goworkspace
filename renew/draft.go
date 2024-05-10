@@ -37,7 +37,7 @@ func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 			Failure: make([]RenewReport, 0),
 		}
 		today       = time.Now().UTC()
-		productsMap = make(map[string]models.Product)
+		productsMap = make(map[string]map[string]models.Product)
 	)
 
 	log.SetPrefix("[DraftFx] ")
@@ -91,7 +91,7 @@ func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 		return "", nil, err
 	}
 
-	productsMap = getProductsMapByPolicyType(policyType, quoteType)
+	productsMap = getProducts(policyType, quoteType)
 	log.Printf("products: %s", strings.Join(lib.GetMapKeys(productsMap), ", "))
 
 	policies, err := getPolicies(req.PolicyUid, policyType, quoteType, productsMap, today)
@@ -105,7 +105,7 @@ func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 	for _, policy := range policies {
 		wg.Add(1)
 		key := fmt.Sprintf("%s-%s", policy.Name, policy.ProductVersion)
-		go draft(policy, productsMap[key], ch, wg, saveFn)
+		go draft(policy, productsMap[policy.Channel][key], ch, wg, saveFn)
 	}
 
 	go func() {
@@ -153,7 +153,7 @@ func getQueryParameters(r *http.Request) (policyType, quoteType string, err erro
 	return policyType, quoteType, nil
 }
 
-func getPolicies(policyUid, policyType, quoteType string, products map[string]models.Product, today time.Time) ([]models.Policy, error) {
+func getPolicies(policyUid, policyType, quoteType string, products map[string]map[string]models.Product, today time.Time) ([]models.Policy, error) {
 	var (
 		err      error
 		query    bytes.Buffer
@@ -168,7 +168,7 @@ func getPolicies(policyUid, policyType, quoteType string, products map[string]mo
 		params["policyUid"] = policyUid
 
 	} else if len(products) > 0 {
-		tmpProducts := lib.GetMapValues(products)
+		tmpProducts := lib.GetMapValues(products[models.MgaChannel])
 		params["isRenewable"] = true
 		params["policyType"] = policyType
 		params["quoteType"] = quoteType
