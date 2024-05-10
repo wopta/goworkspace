@@ -24,6 +24,8 @@ func TestFabrickFx(w http.ResponseWriter, r *http.Request) (string, any, error) 
 
 	operation := chi.URLParam(r, "operation")
 
+	log.Printf("operation: %s", operation)
+
 	switch operation {
 	case "delete":
 		return fabrickDelete(r)
