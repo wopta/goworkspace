@@ -72,4 +72,5 @@ func deletePolicy(p *models.Policy, request PolicyDeleteRequest) {
 	p.DeleteCode = request.Code
 	p.Status = models.PolicyStatusDeleted
 	p.StatusHistory = append(p.StatusHistory, p.Status)
+	p.Updated = time.Now().UTC()
 }
