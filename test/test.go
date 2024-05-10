@@ -21,6 +21,12 @@ var testRoutes []lib.Route = []lib.Route{
 		Method:  http.MethodGet,
 		Roles:   []string{lib.UserRoleAll},
 	},
+	{
+		Route:   "/fabrick/{operation}",
+		Handler: lib.ResponseLoggerWrapper(TestFabrickFx),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAll},
+	},
 }
 
 func init() {
