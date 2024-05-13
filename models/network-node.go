@@ -1,16 +1,15 @@
 package models
 
 import (
-	"cloud.google.com/go/firestore"
 	"encoding/json"
 	"fmt"
-	"google.golang.org/api/iterator"
 	"log"
 	"time"
 
 	"cloud.google.com/go/bigquery"
-
+	"cloud.google.com/go/firestore"
 	"github.com/wopta/goworkspace/lib"
+	"google.golang.org/api/iterator"
 )
 
 type NetworkNode struct {
@@ -46,6 +45,7 @@ type NetworkNode struct {
 	Designation         string                `json:"designation" firestore:"designation" bigquery:"designation"`
 	IsMgaProponent      bool                  `json:"isMgaProponent" firestore:"isMgaProponent" bigquery:"-"`
 	WorksForUid         string                `json:"worksForUid" firestore:"worksForUid" bigquery:"-"`
+	CallbackConfig      *CallbackConfig       `json:"callbackConfig,omitempty" firestore:"callbackConfig,omitempty" bigquery:"-"`
 }
 
 type NodeProduct struct {
@@ -56,6 +56,10 @@ type NodeProduct struct {
 type NodeCompany struct {
 	Name         string `json:"-" firestore:"-" bigquery:"name"`
 	ProducerCode string `json:"-" firestore:"-" bigquery:"producerCode"`
+}
+
+type CallbackConfig struct {
+	FxName string `json:"fxName" firestore:"fxName" bigquery:"-"`
 }
 
 func NetworkNodeToListData(query *firestore.DocumentIterator) []NetworkNode {
