@@ -42,6 +42,8 @@ func fabrickDelete(r *http.Request) (string, any, error) {
 	fabrickRequest.Header.Set("x-auth-token", request.XAuthToken)
 	fabrickRequest.Header.Set("Accept", request.Accept)
 
+	log.Printf("request: %v", fabrickRequest)
+
 	res, err := lib.RetryDo(fabrickRequest, 5, 10)
 	if err != nil {
 		log.Printf("error getting response: %s", err.Error())
@@ -50,7 +52,11 @@ func fabrickDelete(r *http.Request) (string, any, error) {
 
 	log.Printf("reponse: %+v", res)
 
-	respBody := lib.ErrorByte(io.ReadAll(res.Body))
+	respBody, err := io.ReadAll(res.Body)
+	defer res.Body.Close()
+	if err != nil {
+		return "", nil, err
+	}
 
 	return string(respBody), nil, nil
 }
