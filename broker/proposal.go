@@ -136,6 +136,8 @@ func proposal(policy *models.Policy) error {
 	log.Printf("[proposal] saving proposal n. %d to bigquery...", policy.ProposalNumber)
 	policy.BigquerySave(origin)
 
+	network.ExecuteCallback(networkNode, *policy)
+
 	return nil
 }
 

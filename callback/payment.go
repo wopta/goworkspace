@@ -10,6 +10,8 @@ import (
 	"strings"
 
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
 	plc "github.com/wopta/goworkspace/policy"
 	tr "github.com/wopta/goworkspace/transaction"
 )
@@ -56,10 +58,12 @@ func PaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 		origin = ext[3]
 	}
 
+	policy := plc.GetPolicyByUid(policyUid, origin)
+
 	switch fabrickCallback.Bill.Status {
 	case fabrickBillPaid:
 		paymentMethod = strings.ToLower(*fabrickCallback.Bill.Transactions[0].PaymentMethod)
-		err = fabrickPayment(origin, policyUid, providerId)
+		err = fabrickPayment(origin, providerId, policy)
 	default:
 	}
 
@@ -68,6 +72,8 @@ func PaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 		return fmt.Sprintf(responseFormat, false, string(request)), nil, nil
 	}
 
+	network.ExecuteCallback(networkNode, policy)
+
 	response := fmt.Sprintf(responseFormat, true, string(request))
 
 	log.Println("Handler end -------------------------------------------------")
@@ -75,10 +81,8 @@ func PaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	return response, nil, nil
 }
 
-func fabrickPayment(origin, policyUid, providerId string) error {
-	log.Printf("[fabrickPayment] Policy %s", policyUid)
-
-	policy := plc.GetPolicyByUid(policyUid, origin)
+func fabrickPayment(origin, providerId string, policy models.Policy) error {
+	log.Printf("[fabrickPayment] Policy %s", policy.Uid)
 
 	policy.SanitizePaymentData()
 
