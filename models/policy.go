@@ -405,3 +405,15 @@ func (policy *Policy) CheckStartDateValidity() error {
 
 	return nil
 }
+
+func (policy *Policy) HasPrivacyConsens() bool {
+	if policy.Contractor.Consens != nil {
+		for _, v := range *policy.Contractor.Consens {
+			if v.Key == 2 {
+				return v.Answer
+			}
+		}
+	}
+
+	return false
+}
