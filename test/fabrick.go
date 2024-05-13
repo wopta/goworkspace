@@ -9,12 +9,6 @@ import (
 )
 
 func TestFabrickFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
-	var (
-		err     error
-		rawResp string
-		resp    interface{}
-	)
-
 	log.SetPrefix("[TestFabrickFx] ")
 	defer func() {
 		log.Printf("Handler end ----------------------------------------------")
@@ -30,10 +24,10 @@ func TestFabrickFx(w http.ResponseWriter, r *http.Request) (string, any, error) 
 	case "delete":
 		return fabrickDelete(r)
 	case "payment-instrument":
-		rawResp, resp, err = fabrickPaymentInstrument(r)
+		return fabrickPaymentInstrument(r)
+	case "token":
+		return fabrickPersistentToken(r)
 	default:
 		return "", nil, fmt.Errorf("unhandled operation")
 	}
-
-	return rawResp, resp, err
 }
