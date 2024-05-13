@@ -14,7 +14,7 @@ require (
 )
 
 require (
-	github.com/go-chi/chi v1.5.5 // indirect
+	github.com/go-chi/chi/v5 v5.0.12 // indirect
 	github.com/go-jose/go-jose/v4 v4.0.1 // indirect
 )
 
