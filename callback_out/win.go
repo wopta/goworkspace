@@ -1,4 +1,4 @@
-package callbackout
+package callback_out
 
 import "github.com/wopta/goworkspace/models"
 

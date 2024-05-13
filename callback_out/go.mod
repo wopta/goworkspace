@@ -1,8 +1,8 @@
-module github.com/wopta/goworkspace/callback-out
+module github.com/wopta/goworkspace/callback_out
 
 go 1.21
 
-replace github.com/wopta/goworkspace/callback-out => ./
+replace github.com/wopta/goworkspace/callback_out => ./
 
 require github.com/wopta/goworkspace/models v1.1.106
 
