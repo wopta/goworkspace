@@ -70,6 +70,8 @@ func fabrickPersistentToken(r *http.Request) (string, interface{}, error) {
 		return "", nil, err
 	}
 
+	log.Printf("rawResp: %+v", string(rawResp))
+
 	log.Println("Handler End -------------------------------------------------")
 
 	return string(rawResp), res, nil
