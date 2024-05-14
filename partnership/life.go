@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
@@ -37,7 +36,6 @@ func LifePartnershipFx(w http.ResponseWriter, r *http.Request) (string, any, err
 
 	partnershipUid := strings.ToLower(chi.URLParam(r, "partnershipUid"))
 	jwtData := r.URL.Query().Get("jwt")
-	key := lib.ToUpper(fmt.Sprintf("%s_SIGNING_KEY", partnershipUid))
 
 	log.Printf("partnershipUid: %s jwt: %s", partnershipUid, jwtData)
 
@@ -64,8 +62,8 @@ func LifePartnershipFx(w http.ResponseWriter, r *http.Request) (string, any, err
 	}
 	policy = setPolicyPartnershipInfo(policy, productLife, partnershipNode)
 
-	if claims, err = partnershipNode.Partnership.DecryptJwtClaims(
-		jwtData, os.Getenv(key), lifeClaimsExtractor(partnershipNode.Partnership)); err != nil {
+	if claims, err = partnershipNode.DecryptJwtClaims(
+		jwtData, lifeClaimsExtractor(partnershipNode)); err != nil {
 		log.Printf("could not validate partnership JWT - %s", err.Error())
 		return "", nil, err
 	}
@@ -117,8 +115,8 @@ func setPolicyPartnershipInfo(policy models.Policy, product *models.Product, nod
 	return policy
 }
 
-func lifeClaimsExtractor(node *models.PartnershipNode) func([]byte) (models.LifeClaims, error) {
-	switch node.Name {
+func lifeClaimsExtractor(node *models.NetworkNode) func([]byte) (models.LifeClaims, error) {
+	switch node.Partnership.Name {
 	case models.PartnershipBeProf:
 		return beprofLifeClaimsExtractor
 	case models.PartnershipFacile:

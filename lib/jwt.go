@@ -9,16 +9,17 @@ import (
 )
 
 type JwtConfig struct {
+	KeyName            string                  `json:"keyName,omitempty" firestore:"keyName,omitempty" bigquery:"-"`
 	KeyAlgorithm       jose.KeyAlgorithm       `json:"keyAlgorithm,omitempty" firestore:"keyAlgorithm,omitempty" bigquery:"-"`
 	ContentEncryption  jose.ContentEncryption  `json:"contentEncryption,omitempty" firestore:"contentEncryption,omitempty" bigquery:"-"`
 	SignatureAlgorithm jose.SignatureAlgorithm `json:"signatureAlgorithm,omitempty" firestore:"signatureAlgorithm,omitempty" bigquery:"-"`
 }
 
-func ParseJwt(jwt, key string, jwtConfig JwtConfig) (bytes []byte, err error) {
+func ParseJwt(jwt string, jwtConfig JwtConfig) (bytes []byte, err error) {
 	if jwtConfig.KeyAlgorithm != "" {
-		return decryptJwt(jwt, key, jwtConfig.KeyAlgorithm, jwtConfig.ContentEncryption)
+		return decryptJwt(jwt, jwtConfig.KeyName, jwtConfig.KeyAlgorithm, jwtConfig.ContentEncryption)
 	}
-	return parseSigned(jwt, key, jwtConfig.SignatureAlgorithm)
+	return parseSigned(jwt, jwtConfig.KeyName, jwtConfig.SignatureAlgorithm)
 }
 
 func decryptJwt(jwt, key string, keyAlgorithm jose.KeyAlgorithm, contentEncription jose.ContentEncryption) ([]byte, error) {

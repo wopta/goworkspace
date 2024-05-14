@@ -8,6 +8,7 @@ import (
 
 	"cloud.google.com/go/bigquery"
 	"cloud.google.com/go/firestore"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/wopta/goworkspace/lib"
 	"google.golang.org/api/iterator"
 )
@@ -46,6 +47,7 @@ type NetworkNode struct {
 	IsMgaProponent      bool                  `json:"isMgaProponent" firestore:"isMgaProponent" bigquery:"-"`
 	WorksForUid         string                `json:"worksForUid" firestore:"worksForUid" bigquery:"-"`
 	CallbackConfig      *CallbackConfig       `json:"callbackConfig,omitempty" firestore:"callbackConfig,omitempty" bigquery:"-"`
+	JwtConfig           lib.JwtConfig         `json:"jwtConfig,omitempty" firestore:"jwtConfig,omitempty" bigquery:"-"`
 }
 
 type NodeProduct struct {
@@ -254,4 +256,53 @@ func (nn *NetworkNode) GetAddress() string {
 	}
 
 	return address
+}
+
+func (nn *NetworkNode) IsJwtProtected() bool {
+	c := nn.JwtConfig
+	return (c.KeyAlgorithm != "" && c.ContentEncryption != "") || c.SignatureAlgorithm != ""
+}
+
+func (nn *NetworkNode) DecryptJwt(jwtData string) ([]byte, error) {
+	if !nn.IsJwtProtected() {
+		return nil, nil
+	}
+
+	return lib.ParseJwt(jwtData, nn.JwtConfig)
+}
+
+func (nn NetworkNode) DecryptJwtClaims(jwtData string, unmarshaler func([]byte) (LifeClaims, error)) (LifeClaims, error) {
+	bytes, err := nn.DecryptJwt(jwtData)
+	if err != nil {
+		return LifeClaims{}, err
+	}
+	return unmarshaler(bytes)
+}
+
+type ClaimsGuarantee struct {
+	Duration                   int     `json:"duration"`
+	SumInsuredLimitOfIndemnity float64 `json:"sumInsuredLimitOfIndemnity"`
+}
+
+type LifeClaims struct {
+	Name       string                     `json:"name"`
+	Surname    string                     `json:"surname"`
+	BirthDate  string                     `json:"birthDate"`
+	Gender     string                     `json:"gender"`
+	FiscalCode string                     `json:"fiscalCode"`
+	VatCode    string                     `json:"vatCode"`
+	Email      string                     `json:"email"`
+	Phone      string                     `json:"phone"`
+	Address    string                     `json:"address"`
+	Postalcode string                     `json:"postalCode"`
+	City       string                     `json:"city"`
+	CityCode   string                     `json:"cityCode"`
+	Work       string                     `json:"work"`
+	Guarantees map[string]ClaimsGuarantee `json:"guarantees"`
+	Data       map[string]any             `json:"data"`
+	jwt.RegisteredClaims
+}
+
+func (c *LifeClaims) IsEmpty() bool {
+	return c.Data == nil
 }

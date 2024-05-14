@@ -58,9 +58,10 @@ func createBeprofNode() error {
 				SecondaryColor: "#f1bd12",
 				LogoUrl:        "assets/images/logo-beprof-trasp-72dpi.png",
 			},
-			JwtConfig: lib.JwtConfig{
-				SignatureAlgorithm: jose.HS256,
-			},
+		},
+		JwtConfig: lib.JwtConfig{
+			KeyName:            "BEPROF_SIGNING_KEY",
+			SignatureAlgorithm: jose.HS256,
 		},
 		Products: []models.Product{{
 			Name:         "life",
@@ -147,10 +148,11 @@ func createFacileNode() error {
 				SecondaryColor: "",
 				LogoUrl:        "https://upload.wikimedia.org/wikipedia/commons/7/78/Logo_facile_%28azienda%29.png",
 			},
-			JwtConfig: lib.JwtConfig{
-				KeyAlgorithm:      jose.DIRECT,
-				ContentEncryption: jose.A128CBC_HS256,
-			},
+		},
+		JwtConfig: lib.JwtConfig{
+			KeyName:           "FACILE_SIGNING_KEY",
+			KeyAlgorithm:      jose.DIRECT,
+			ContentEncryption: jose.A128CBC_HS256,
 		},
 		Products: []models.Product{{
 			Name:         "life",
@@ -329,10 +331,11 @@ func createELeadsNode() error {
 		IsActive: true,
 		Partnership: &models.PartnershipNode{
 			Name: "eleads",
-			JwtConfig: lib.JwtConfig{
-				KeyAlgorithm:      jose.DIRECT,
-				ContentEncryption: jose.A128CBC_HS256,
-			},
+		},
+		JwtConfig: lib.JwtConfig{
+			KeyName:           "ELEADS_SIGNING_KEY",
+			KeyAlgorithm:      jose.DIRECT,
+			ContentEncryption: jose.A128CBC_HS256,
 		},
 		Products: []models.Product{{
 			Name:         "life",
