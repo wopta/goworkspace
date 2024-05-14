@@ -127,7 +127,6 @@ func UpdateNode(node models.NetworkNode) error {
 	originalNode.IsActive = node.IsActive
 	originalNode.Designation = node.Designation
 	originalNode.HasAnnex = node.HasAnnex
-	originalNode.CallbackConfig = node.CallbackConfig
 	originalNode.UpdatedDate = time.Now().UTC()
 
 	originalNode.IsMgaProponent = node.IsMgaProponent
