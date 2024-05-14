@@ -1,6 +1,7 @@
 package win
 
 import (
+	"bytes"
 	"encoding/json"
 	"log"
 	"time"
@@ -52,7 +53,7 @@ func emitCallback(policy models.Policy) error {
 	client := &winClient{
 		path: "/restba/extquote/emissione",
 	}
-	res, err := client.Post(body)
+	res, err := client.Post(bytes.NewReader(body))
 
 	// TODO: should we do somethoing with the response?
 

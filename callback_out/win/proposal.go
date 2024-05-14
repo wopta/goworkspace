@@ -8,5 +8,5 @@ import (
 
 func proposalCallback(policy models.Policy) error {
 	log.Println("win proposal calback...")
-	return nil
+	return emitCallback(policy)
 }
