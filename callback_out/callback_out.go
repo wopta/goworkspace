@@ -3,11 +3,12 @@ package callback_out
 import (
 	"errors"
 
+	"github.com/wopta/goworkspace/callback_out/win"
 	"github.com/wopta/goworkspace/models"
 )
 
 var handlerMap map[string]func(models.Policy) error = map[string]func(models.Policy) error{
-	"winCallbackHandler": winCallbackHandler,
+	"winCallbackHandler": win.CallbackHandler,
 }
 var ErrCallbackNotSet = errors.New("callback not set")
 
