@@ -13,6 +13,13 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
+type ContractReq struct {
+	File         []byte `json:"file"`
+	IdPratica    int    `json:"idPratica"`
+	Utente       string `json:"utente"`
+	TipoAllegato string `json:"tipoAllegato"`
+}
+
 func contractCallback(policy models.Policy) error {
 	log.Println("win contract calback...")
 
@@ -22,6 +29,9 @@ func contractCallback(policy models.Policy) error {
 		return err
 	}
 
+	wp := policyDto(policy)
+	payload := ContractReq{contractbyte, wp.IdPratica, wp.Utente, "POLIZZA"}
+
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 	defer writer.Close()
@@ -29,14 +39,14 @@ func contractCallback(policy models.Policy) error {
 	fileField, _ := writer.CreateFormFile("file", filepath.Base(bucketFilepath))
 	fileField.Write(contractbyte)
 	idPraticaField, _ := writer.CreateFormField("idPratica")
-	idPraticaField.Write([]byte(strconv.Itoa(policy.NumberCompany)))
+	idPraticaField.Write([]byte(strconv.Itoa(payload.IdPratica)))
 	tipoAllegatoField, _ := writer.CreateFormField("tipoAllegato")
-	tipoAllegatoField.Write([]byte("POLIZZA"))
+	tipoAllegatoField.Write([]byte(payload.TipoAllegato))
 	utenteField, _ := writer.CreateFormField("utente")
-	utenteField.Write([]byte(policy.Contractor.Name + " " + policy.Contractor.Surname))
+	utenteField.Write([]byte(payload.Utente))
 
 	client := &winClient{
-		path: "/restba/extquote/emissione",
+		path: "/restba/extquote/upload",
 		headers: map[string]string{
 			"Content-Type": writer.FormDataContentType(),
 		},

@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"log"
-	"time"
 
 	"github.com/wopta/goworkspace/models"
 )
@@ -31,19 +30,8 @@ type EmitReq struct {
 func emitCallback(policy models.Policy) error {
 	log.Println("win emit calback...")
 
-	var payload EmitReq
-	payload.DtEmissione = policy.EmitDate.Format(time.DateOnly)
-	payload.IdPratica = policy.NumberCompany
-	payload.LuogoEmissione = "Italia"
-	payload.NumOriginali = 0
-	payload.NumPol = policy.CodeCompany
-	payload.Ramo = policy.Channel
-	payload.Utente = policy.Contractor.Name + " " + policy.Contractor.Surname
-	payload.PerAss.BaseAnno = "ANNO_SOLARE" // map paymentSplit
-	payload.PerAss.DataEffetto = policy.StartDate.Format(time.DateOnly)
-	payload.PerAss.DataPrimaScadenza = policy.StartDate.AddDate(1, 0, 0).Format(time.DateOnly) // base on paymentsplit
-	payload.PerAss.DataScadenza = policy.EndDate.Format(time.DateOnly)
-	payload.PerAss.Frazionamento = policy.PaymentSplit // map
+	winPolicy := policyDto(policy)
+	payload := EmitReq(winPolicy)
 
 	body, err := json.Marshal(payload)
 	if err != nil {

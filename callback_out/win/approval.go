@@ -16,9 +16,8 @@ type ApprovalReq struct {
 func approvalCallback(policy models.Policy) error {
 	log.Println("win wait for approval calback...")
 
-	var payload ApprovalReq
-	payload.IdPratica = policy.NumberCompany
-	payload.Utente = policy.Contractor.Name + " " + policy.Contractor.Surname
+	wp := policyDto(policy)
+	payload := ApprovalReq{wp.IdPratica, wp.Utente}
 
 	body, err := json.Marshal(payload)
 	if err != nil {
