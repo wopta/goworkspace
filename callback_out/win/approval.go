@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"log"
+	"net/http"
 
 	"github.com/wopta/goworkspace/models"
 )
@@ -13,7 +14,7 @@ type ApprovalReq struct {
 	Utente    string `json:"utente"`
 }
 
-func approvalCallback(policy models.Policy) error {
+func approvalCallback(policy models.Policy) (*http.Request, *http.Response, error) {
 	log.Println("win wait for approval calback...")
 
 	wp := policyDto(policy)
@@ -21,17 +22,11 @@ func approvalCallback(policy models.Policy) error {
 
 	body, err := json.Marshal(payload)
 	if err != nil {
-		return err
+		return nil, nil, err
 	}
 
 	client := &winClient{
 		path: "/restba/extquote/richemissione",
 	}
-	res, err := client.Post(bytes.NewReader(body))
-
-	// TODO: should we do somethoing with the response?
-
-	log.Println(res)
-
-	return err
+	return client.Post(bytes.NewReader(body))
 }

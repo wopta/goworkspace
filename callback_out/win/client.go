@@ -13,10 +13,10 @@ type winClient struct {
 	headers map[string]string
 }
 
-func (c *winClient) Post(body io.Reader) (*http.Response, error) {
+func (c *winClient) Post(body io.Reader) (*http.Request, *http.Response, error) {
 	req, err := http.NewRequest(http.MethodPost, c.path, body)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	req.Header.Set("key", "value")
@@ -26,5 +26,9 @@ func (c *winClient) Post(body io.Reader) (*http.Response, error) {
 
 	log.Printf("win request: %v", req)
 
-	return lib.RetryDo(req, 5, 10)
+	res, err := lib.RetryDo(req, 5, 10)
+
+	log.Printf("win response: %v", res)
+
+	return req, res, err
 }

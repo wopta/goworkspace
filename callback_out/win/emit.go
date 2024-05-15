@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"log"
+	"net/http"
 
 	"github.com/wopta/goworkspace/models"
 )
@@ -27,7 +28,7 @@ type EmitReq struct {
 	Utente string `json:"utente"`
 }
 
-func emitCallback(policy models.Policy) error {
+func emitCallback(policy models.Policy) (*http.Request, *http.Response, error) {
 	log.Println("win emit calback...")
 
 	winPolicy := policyDto(policy)
@@ -35,17 +36,11 @@ func emitCallback(policy models.Policy) error {
 
 	body, err := json.Marshal(payload)
 	if err != nil {
-		return err
+		return nil, nil, err
 	}
 
 	client := &winClient{
 		path: "/restba/extquote/emissione",
 	}
-	res, err := client.Post(bytes.NewReader(body))
-
-	// TODO: should we do somethoing with the response?
-
-	log.Println(res)
-
-	return err
+	return client.Post(bytes.NewReader(body))
 }

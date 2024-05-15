@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"mime/multipart"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -20,13 +21,13 @@ type ContractReq struct {
 	TipoAllegato string `json:"tipoAllegato"`
 }
 
-func contractCallback(policy models.Policy) error {
+func contractCallback(policy models.Policy) (*http.Request, *http.Response, error) {
 	log.Println("win contract calback...")
 
 	bucketFilepath := fmt.Sprintf("assets/users/%s/"+models.ContractDocumentFormat, policy.Contractor.Uid, policy.NameDesc, policy.CodeCompany)
 	contractbyte, err := lib.GetFromGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), bucketFilepath)
 	if err != nil {
-		return err
+		return nil, nil, err
 	}
 
 	wp := policyDto(policy)
@@ -51,11 +52,5 @@ func contractCallback(policy models.Policy) error {
 			"Content-Type": writer.FormDataContentType(),
 		},
 	}
-	res, err := client.Post(body)
-
-	// TODO: should we do somethoing with the response?
-
-	log.Println(res)
-
-	return err
+	return client.Post(body)
 }
