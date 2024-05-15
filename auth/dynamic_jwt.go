@@ -37,7 +37,7 @@ func DynamicJwtFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 		return JwtAuaFx(w, r)
 	}
 
-	key := os.Getenv(fmt.Sprintf("%s_SIGNING_KEY", strings.ToUpper(provider)))
+	key := os.Getenv(fmt.Sprintf("%s_SIGNING_KEY", lib.ToUpper(provider)))
 
 	if key == "" {
 		log.Printf("unhandled provider: %s", provider)
