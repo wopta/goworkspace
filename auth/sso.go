@@ -65,6 +65,8 @@ func JwtAuaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 				Token:    tokenString,
 				Producer: node[0],
 			}
+			responseSsoJwt.Producer.JwtConfig = lib.JwtConfig{} // Do not expose inner configs to frontend
+			responseSsoJwt.Producer.CallbackConfig = nil        // Do not expose inner configs to frontend
 			b, e = json.Marshal(responseSsoJwt)
 		}
 	}
