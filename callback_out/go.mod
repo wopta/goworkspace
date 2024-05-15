@@ -4,7 +4,10 @@ go 1.21
 
 replace github.com/wopta/goworkspace/callback_out => ./
 
-require github.com/wopta/goworkspace/models v1.1.106
+require (
+	github.com/wopta/goworkspace/lib v1.0.119
+	github.com/wopta/goworkspace/models v1.1.106
+)
 
 require (
 	cloud.google.com/go v0.110.2 // indirect
@@ -58,7 +61,6 @@ require (
 	github.com/sergi/go-diff v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
-	github.com/wopta/goworkspace/lib v1.0.119 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
 	github.com/xuri/excelize/v2 v2.7.0 // indirect
