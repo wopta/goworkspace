@@ -12,7 +12,7 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
-func JwtFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func JwtAuaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		tokenString    string
 		e              error
@@ -21,7 +21,7 @@ func JwtFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) 
 		responseSsoJwt ResponseSsoJwt
 	)
 
-	log.SetPrefix("[JwtFx] ")
+	log.SetPrefix("[JwtAuaFx] ")
 	defer log.SetPrefix("")
 
 	log.Println("Handler start -----------------------------------------------")
