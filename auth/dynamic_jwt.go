@@ -33,6 +33,7 @@ func DynamicJwtFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	jwt := r.URL.Query().Get("jwt")
 	provider := chi.URLParam(r, "provider")
 
+	// TODO: remove me when all AUA nodes have their own jwtConfig
 	if strings.EqualFold(provider, "aua") {
 		return JwtAuaFx(w, r)
 	}

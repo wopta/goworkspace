@@ -58,7 +58,10 @@ func getTokenForExternalIntegration(productName string, userUid string) (string,
 	}
 
 	// Define the signing key
-	signingKey := []byte(os.Getenv("AUAJWTSIGNKEY"))
+	signingKey := []byte(os.Getenv(fmt.Sprintf("%s_EXTERNAL_SIGNING_KEY", lib.ToUpper(productName))))
+	if len(signingKey) == 0 {
+		return "", fmt.Errorf("signing key not found")
+	}
 
 	// Set the expiration time
 	expirationTime := time.Now().Add(30 * time.Minute)
