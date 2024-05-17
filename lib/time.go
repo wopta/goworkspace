@@ -86,3 +86,11 @@ func ParseDateDDMMYYYY(date string) time.Time {
 func SetDateToStartOfDay(date time.Time) time.Time {
 	return date.Truncate(24 * time.Hour)
 }
+
+func AddMonths(t time.Time, m int) time.Time {
+	x := t.AddDate(0, m, 0)
+	if d := x.Day(); d != t.Day() {
+		return x.AddDate(0, 0, -d)
+	}
+	return x
+}

@@ -111,6 +111,7 @@ func SendMailSign(policy models.Policy, from, to, cc Address, flowName string) {
 func SendMailContract(policy models.Policy, at *[]Attachment, from, to, cc Address, flowName string) {
 	var (
 		bodyData = BodyData{}
+		bcc      string
 	)
 
 	setBodyData(policy, &bodyData)
@@ -141,11 +142,15 @@ func SendMailContract(policy models.Policy, at *[]Attachment, from, to, cc Addre
 	subtitle := fmt.Sprintf("Contratto n° %s", policy.CodeCompany)
 	subject := fmt.Sprintf("%s %s", title, subtitle)
 
+	if policy.HasPrivacyConsens() {
+		bcc = os.Getenv("BCC_CONTRACT_EMAIL")
+	}
+
 	SendMail(MailRequest{
 		FromAddress:  from,
 		To:           []string{to.Address},
 		Cc:           cc.Address,
-		Bcc:          os.Getenv("BCC_CONTRACT_EMAIL"),
+		Bcc:          bcc,
 		Message:      messageBody,
 		Title:        policy.NameDesc,
 		SubTitle:     subtitle,

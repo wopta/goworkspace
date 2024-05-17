@@ -70,7 +70,6 @@ type Policy struct {
 	DeleteDate        time.Time                    `json:"deleteDate,omitempty" firestore:"deleteDate,omitempty" bigquery:"-"`
 	RefundType        string                       `json:"refundType,omitempty" firestore:"refundType,omitempty" bigquery:"-"`
 	IsPay             bool                         `firestore:"isPay" json:"isPay,omitempty" bigquery:"isPay"`
-	IsAutoRenew       bool                         `firestore:"isAutoRenew,omitempty" json:"isAutoRenew,omitempty" bigquery:"isAutoRenew"`
 	IsRenew           bool                         `firestore:"isRenew" json:"isRenew,omitempty" bigquery:"isRenew"`
 	IsSign            bool                         `firestore:"isSign" json:"isSign,omitempty" bigquery:"isSign"`
 	IsDeleted         bool                         `firestore:"isDeleted" json:"isDeleted,omitempty" bigquery:"isDeleted"`
@@ -102,10 +101,7 @@ type Policy struct {
 	PartnershipName   string                       `json:"partnershipName" firestore:"partnershipName" bigquery:"partnershipName"`
 	PartnershipData   map[string]interface{}       `json:"partnershipData" firestore:"partnershipData" bigquery:"-"`
 	IsReserved        bool                         `json:"isReserved" firestore:"isReserved" bigquery:"-"`
-	RejectReasons     string                       `json:"rejectReasons,omitempty" firestore:"rejectReasons,omitempty" bigquery:"-"` // DEPRECATED
 	FundsOrigin       string                       `json:"fundsOrigin,omitempty" firestore:"fundsOrigin,omitempty" bigquery:"-"`
-	AgentUid          string                       `json:"agentUid,omitempty" firestore:"agentUid,omitempty" bigquery:"agentUid"`    // DEPRECATED
-	AgencyUid         string                       `json:"agencyUid,omitempty" firestore:"agencyUid,omitempty" bigquery:"agencyUid"` // DEPRECATED
 	ReservedInfo      *ReservedInfo                `json:"reservedInfo,omitempty" firestore:"reservedInfo,omitempty" bigquery:"-"`
 	BigReasons        string                       `json:"-" firestore:"-" bigquery:"reasons"`
 	BigAcceptanceNote string                       `json:"-" firestore:"-" bigquery:"acceptanceNote"`
@@ -115,6 +111,17 @@ type Policy struct {
 	NetworkUid        string                       `json:"networkUid" firestore:"networkUid" bigquery:"networkUid"`
 	ProducerUid       string                       `json:"producerUid" firestore:"producerUid" bigquery:"producerUid"`
 	ProducerType      string                       `json:"producerType" firestore:"producerType" bigquery:"producerType"`
+	Annuity           int                          `json:"annuity" firestore:"annuity" bigquery:"annuity"`
+	IsAutoRenew       bool                         `json:"isAutoRenew" firestore:"isAutoRenew" bigquery:"isAutoRenew"`
+	IsRenewable       bool                         `json:"isRenewable" firestore:"isRenewable" bigquery:"isRenewable"`
+	PolicyType        string                       `json:"policyType" firestore:"policyType" bigquery:"policyType"`
+	QuoteType         string                       `json:"quoteType" firestore:"quoteType" bigquery:"quoteType"`
+
+	// DEPRECATED FIELDS
+
+	RejectReasons string `json:"rejectReasons,omitempty" firestore:"rejectReasons,omitempty" bigquery:"-"` // DEPRECATED
+	AgentUid      string `json:"agentUid,omitempty" firestore:"agentUid,omitempty" bigquery:"agentUid"`    // DEPRECATED
+	AgencyUid     string `json:"agencyUid,omitempty" firestore:"agencyUid,omitempty" bigquery:"agencyUid"` // DEPRECATED
 }
 
 type RenewHistory struct {
@@ -243,17 +250,17 @@ func (policy *Policy) GuaranteesToMap() map[string]Guarante {
 	return m
 }
 
-func (policy *Policy) BigquerySave(origin string) {
-	log.Printf("[policy.BigquerySave] parsing data for policy %s", policy.Uid)
+func (policy *Policy) BigQueryParse() {
+	var (
+		data []byte
+		err  error
+	)
 
-	policyBig := lib.GetDatasetByEnv(origin, PolicyCollection)
-	policyJson, err := policy.Marshal()
-	if err != nil {
-		log.Printf("[policy.BigquerySave] error marshaling policy: %s", err.Error())
+	if data, err = policy.Marshal(); err != nil {
+		return
 	}
-	log.Printf("[policy.BigquerySave] policy data: %s", string(policyJson))
 
-	policy.Data = string(policyJson)
+	policy.Data = string(data)
 	policy.BigStartDate = civil.DateTimeOf(policy.StartDate)
 	policy.BigRenewDate = civil.DateTimeOf(policy.RenewDate)
 	policy.BigEndDate = civil.DateTimeOf(policy.EndDate)
@@ -264,10 +271,17 @@ func (policy *Policy) BigquerySave(origin string) {
 		policy.BigAcceptanceNote = policy.ReservedInfo.AcceptanceNote
 		policy.BigAcceptanceDate = lib.GetBigQueryNullDateTime(policy.ReservedInfo.AcceptanceDate)
 	}
+}
+
+func (policy *Policy) BigquerySave(origin string) {
+	log.Printf("[policy.BigquerySave] parsing data for policy %s", policy.Uid)
+
+	policyBig := lib.GetDatasetByEnv(origin, PolicyCollection)
+
+	policy.BigQueryParse()
 
 	log.Println("[policy.BigquerySave] saving to bigquery...")
-	err = lib.InsertRowsBigQuery(WoptaDataset, policyBig, policy)
-	if err != nil {
+	if err := lib.InsertRowsBigQuery(WoptaDataset, policyBig, policy); err != nil {
 		log.Println("[policy.BigquerySave] error saving policy to bigquery: ", err.Error())
 		return
 	}
@@ -404,4 +418,16 @@ func (policy *Policy) CheckStartDateValidity() error {
 	}
 
 	return nil
+}
+
+func (policy *Policy) HasPrivacyConsens() bool {
+	if policy.Contractor.Consens != nil {
+		for _, v := range *policy.Contractor.Consens {
+			if v.Key == 2 {
+				return v.Answer
+			}
+		}
+	}
+
+	return false
 }

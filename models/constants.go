@@ -27,6 +27,7 @@ const (
 	PolicyStatusPS                 = "Pay&Sign"
 	PolicyStatusCompanyEmit        = "CompanyEmited"
 	PolicyStatusDeleted            = "Deleted"
+	PolicyDraftRenew               = "DraftRenew"
 )
 
 func GetWaitForApprovalStatusList() []string {
@@ -84,6 +85,7 @@ const (
 	PartnershipFpinsurance string = "fpinsurance"
 	PartnershipELeads      string = "eleads"
 	PartnershipSegugio     string = "segugio"
+	PartnershipSwitcho     string = "switcho"
 )
 
 // DEPRECATED - use lib version instead
@@ -255,3 +257,14 @@ func GetProponentRuiSections() []string {
 func GetIssuerRuiSections() []string {
 	return []string{RuiSectionA, RuiSectionB}
 }
+
+const (
+	PolicyTypeMultiYear         = "multiYear"
+	PolicyTypeYearly            = "yearly"
+	PolicyTypeSingleInstallment = "singleInstallment"
+)
+
+const (
+	QuoteTypeFixed    = "fixed"
+	QuoteTypeVariable = "variable"
+)

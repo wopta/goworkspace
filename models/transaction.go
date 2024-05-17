@@ -55,6 +55,7 @@ type Transaction struct {
 	EffectiveDate      time.Time             `json:"effectiveDate,omitempty" firestore:"effectiveDate,omitempty" bigquery:"-"`
 	BigEffectiveDate   bigquery.NullDateTime `json:"-" firestore:"-" bigquery:"effectiveDate"`
 	PayUrl             string                `json:"payUrl,omitempty" firestore:"payUrl,omitempty" bigquery:"payUrl"`
+	Annuity            int                   `json:"annuity" firestore:"annuity" bigquery:"annuity"`
 }
 
 func TransactionToListData(query *firestore.DocumentIterator) []Transaction {
@@ -102,6 +103,15 @@ func (t *Transaction) Normalize() {
 	t.PaymentNote = lib.ToUpper(t.PaymentNote)
 }
 
+func (t *Transaction) BigQueryParse() {
+	t.BigPayDate = lib.GetBigQueryNullDateTime(t.PayDate)
+	t.BigTransactionDate = lib.GetBigQueryNullDateTime(t.TransactionDate)
+	t.BigCreationDate = civil.DateTimeOf(t.CreationDate)
+	t.BigStatusHistory = strings.Join(t.StatusHistory, ",")
+	t.BigUpdateDate = lib.GetBigQueryNullDateTime(t.UpdateDate)
+	t.BigEffectiveDate = lib.GetBigQueryNullDateTime(t.EffectiveDate)
+}
+
 func (t *Transaction) BigQuerySave(origin string) {
 	fireTransactions := lib.GetDatasetByEnv(origin, TransactionsCollection)
 	transactionJson, err := json.Marshal(t)
@@ -110,12 +120,7 @@ func (t *Transaction) BigQuerySave(origin string) {
 		return
 	}
 	log.Println("Transaction: "+t.Uid, string(transactionJson))
-	t.BigPayDate = lib.GetBigQueryNullDateTime(t.PayDate)
-	t.BigTransactionDate = lib.GetBigQueryNullDateTime(t.TransactionDate)
-	t.BigCreationDate = civil.DateTimeOf(t.CreationDate)
-	t.BigStatusHistory = strings.Join(t.StatusHistory, ",")
-	t.BigUpdateDate = lib.GetBigQueryNullDateTime(t.UpdateDate)
-	t.BigEffectiveDate = lib.GetBigQueryNullDateTime(t.EffectiveDate)
+	t.BigQueryParse()
 	log.Println("Transaction save BigQuery: " + t.Uid)
 
 	err = lib.InsertRowsBigQuery(WoptaDataset, fireTransactions, t)
