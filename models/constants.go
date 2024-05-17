@@ -27,6 +27,7 @@ const (
 	PolicyStatusPS                 = "Pay&Sign"
 	PolicyStatusCompanyEmit        = "CompanyEmited"
 	PolicyStatusDeleted            = "Deleted"
+	PolicyDraftRenew               = "DraftRenew"
 )
 
 func GetWaitForApprovalStatusList() []string {
@@ -255,3 +256,14 @@ func GetProponentRuiSections() []string {
 func GetIssuerRuiSections() []string {
 	return []string{RuiSectionA, RuiSectionB}
 }
+
+const (
+	PolicyTypeMultiYear         = "multiYear"
+	PolicyTypeYearly            = "yearly"
+	PolicyTypeSingleInstallment = "singleInstallment"
+)
+
+const (
+	QuoteTypeFixed    = "fixed"
+	QuoteTypeVariable = "variable"
+)

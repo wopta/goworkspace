@@ -152,14 +152,7 @@ func checkIfPolicyIsLead(policy *models.Policy) error {
 	return nil
 }
 
-func setPolicyProducerNode(policy *models.Policy, node *models.NetworkNode) {
-	policy.ProducerUid = node.Uid
-	policy.ProducerCode = node.Code
-	policy.ProducerType = node.Type
-	policy.NetworkUid = node.NetworkUid
-}
-
-func setLeadData(policy *models.Policy) {
+func setLeadData(policy *models.Policy, product models.Product) {
 	log.Println("[setLeadData] start -----------------------------------------")
 
 	now := time.Now().UTC()
@@ -189,6 +182,8 @@ func setLeadData(policy *models.Policy) {
 		policy.ProductVersion = "v1"
 	}
 
+	setRenewInfo(policy, product)
+
 	log.Println("[setLeadData] add information set")
 	policy.Attachments = &[]models.Attachment{{
 		Name:     "Precontrattuale",
@@ -200,4 +195,19 @@ func setLeadData(policy *models.Policy) {
 		),
 	}}
 	log.Println("[setLeadData] end -------------------------------------------")
+}
+
+func setPolicyProducerNode(policy *models.Policy, node *models.NetworkNode) {
+	policy.ProducerUid = node.Uid
+	policy.ProducerCode = node.Code
+	policy.ProducerType = node.Type
+	policy.NetworkUid = node.NetworkUid
+}
+
+func setRenewInfo(policy *models.Policy, product models.Product) {
+	policy.Annuity = 0
+	policy.IsRenewable = product.IsRenewable
+	policy.IsAutoRenew = product.IsAutoRenew
+	policy.PolicyType = product.PolicyType
+	policy.QuoteType = product.QuoteType
 }

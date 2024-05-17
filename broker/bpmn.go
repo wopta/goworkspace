@@ -95,7 +95,7 @@ func addLeadHandlers(state *bpmn.State) {
 
 func setLeadBpmn(state *bpmn.State) error {
 	policy := state.Data
-	setLeadData(policy)
+	setLeadData(policy, *mgaProduct)
 	return nil
 }
 

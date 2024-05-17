@@ -258,3 +258,35 @@ func GetBigQueryNullGeography(latitude, longitude float64) bigquery.NullGeograph
 		Valid:        true,
 	}
 }
+
+func DeleteRowBigQuery(datasetId, tableId, whereClause string) error {
+	var (
+		b bytes.Buffer
+	)
+
+	client := getBigqueryClient()
+	ctx := context.Background()
+	defer client.Close()
+
+	b.WriteString(fmt.Sprintf("DELETE FROM `%s.%s` %s", datasetId, tableId, whereClause))
+	log.Printf("[DeleteRowBigQuery] query: %s", b.String())
+
+	query := client.Query(b.String())
+	job, err := query.Run(ctx)
+	if err != nil {
+		log.Printf("[DeleteRowBigQuery] error running query: %s", err.Error())
+		return err
+	}
+	status, err := job.Wait(ctx)
+	if err != nil {
+		log.Printf("[DeleteRowBigQuery] error waiting for job to run: %s", err.Error())
+		return err
+	}
+	if err := status.Err(); err != nil {
+		log.Printf("[DeleteRowBigQuery] error on job: %s", err.Error())
+		return err
+	}
+
+	return err
+
+}

@@ -47,6 +47,7 @@ func GetRouter(module string, routes []Route) *chi.Mux {
 	}
 
 	mux := chi.NewRouter()
+	mux.Use(loggerConfig)
 	mux.Use(middleware.RequestID)
 	mux.Use(middleware.RealIP)
 	mux.Use(middleware.Logger)
@@ -75,6 +76,18 @@ func GetRouter(module string, routes []Route) *chi.Mux {
 }
 
 // MIDDLEWARES
+
+func loggerConfig(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile | log.Lmsgprefix)
+
+		defer func() {
+			log.SetPrefix("")
+		}()
+
+		next.ServeHTTP(w, r)
+	})
+}
 
 func auditLogMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

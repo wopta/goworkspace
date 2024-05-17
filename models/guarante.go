@@ -52,6 +52,7 @@ type Guarante struct {
 	Order                      int64                      `json:"order,omitempty" firestore:"order,omitempty" bigquery:"-"`
 	Commissions                *Commissions               `json:"commissions,omitempty" firestore:"commissions,omitempty" bigquery:"-"`
 	IsSelected                 bool                       `json:"isSelected" firestore:"isSelected" bigquery:"-"`
+	IsDeleted                  bool                       `json:"isDeleted" firestore:"isDeleted" bigquery:"-"`
 }
 
 type GuaranteValue struct {
