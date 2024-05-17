@@ -7,11 +7,11 @@ replace github.com/wopta/goworkspace/reserved => ./
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	github.com/go-chi/chi/v5 v5.0.12
-	github.com/wopta/goworkspace/document v1.1.74-renew
-	github.com/wopta/goworkspace/lib v1.0.120-renew
-	github.com/wopta/goworkspace/models v1.1.107-renew
-	github.com/wopta/goworkspace/policy v1.0.98-renew
-	github.com/wopta/goworkspace/product v1.0.104-renew
+	github.com/wopta/goworkspace/document v1.1.75-renew
+	github.com/wopta/goworkspace/lib v1.0.121-renew
+	github.com/wopta/goworkspace/models v1.1.108-renew
+	github.com/wopta/goworkspace/policy v1.0.99-renew
+	github.com/wopta/goworkspace/product v1.0.105-renew
 )
 
 require (
@@ -76,7 +76,7 @@ require (
 	github.com/src-d/gcfg v1.4.0 // indirect
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.2.1 // indirect
-	github.com/wopta/goworkspace/network v1.0.58-renew // indirect
+	github.com/wopta/goworkspace/network v1.0.59-renew // indirect
 	github.com/wopta/goworkspace/wiseproxy v1.0.3 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
