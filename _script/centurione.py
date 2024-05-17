@@ -33,6 +33,7 @@ SELLABLE = "sellable"
 TRANSACTION = "transaction"
 USER = "user"
 RENEW = "renew"
+CALLBACK_OUT = "callback_out"
 
 # semver consts
 MAJOR = "major"
@@ -71,6 +72,7 @@ go_modules = [
     TRANSACTION,
     USER,
     RENEW,
+    CALLBACK_OUT,
 ]
 changed_modules = [
 ]
@@ -95,6 +97,7 @@ updateable_modules = [
     TRANSACTION,
     USER,
     RENEW,
+    CALLBACK_OUT,
 ]
 
 increment_version_key = PATCH
