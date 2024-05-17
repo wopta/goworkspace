@@ -38,11 +38,11 @@ type Product struct {
 	PaymentProviders []PaymentProvider `json:"paymentProviders,omitempty" firestore:"paymentProviders,omitempty" bigquery:"-"`
 	Flow             string            `json:"flow,omitempty" firestore:"flow,omitempty" bigquery:"-"` // the name of the flow file to be used
 	IsActive         bool              `json:"isActive" firestore:"isActive" bigquery:"-"`
-	RenewOffset      int               `json:"renewOffset" firestore:"renewOffset" bigquery:"renewOffset"`
-	IsAutoRenew      bool              `json:"isAutoRenew" firestore:"isAutoRenew" bigquery:"isAutoRenew"`
-	IsRenewable      bool              `json:"isRenewable" firestore:"isRenewable" bigquery:"isRenewable"`
-	PolicyType       string            `json:"policyType,omitempty" firestore:"policyType,omitempty" bigquery:"policyType"`
-	QuoteType        string            `json:"quoteType" firestore:"quoteType" bigquery:"quoteType"`
+	RenewOffset      int               `json:"renewOffset" firestore:"renewOffset" bigquery:"-"`
+	IsAutoRenew      bool              `json:"isAutoRenew" firestore:"isAutoRenew" bigquery:"-"`
+	IsRenewable      bool              `json:"isRenewable" firestore:"isRenewable" bigquery:"-"`
+	PolicyType       string            `json:"policyType,omitempty" firestore:"policyType,omitempty" bigquery:"-"`
+	QuoteType        string            `json:"quoteType" firestore:"quoteType" bigquery:"-"`
 
 	// DEPRECATED FIELDS
 
