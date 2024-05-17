@@ -104,10 +104,10 @@ func verifyJwt(jwtData, key string) (claims *Claims, isValid bool, err error) {
 		return []byte(key), nil
 	})
 	if claims, ok := token.Claims.(*Claims); ok && token.Valid {
-		fmt.Println(claims)
+		log.Printf("parsed claims: %+v", claims)
 		return claims, token.Valid, e
 	} else {
-		fmt.Println(e)
+		log.Printf("claims error: %s", e.Error())
 	}
 
 	return nil, token.Valid, e
