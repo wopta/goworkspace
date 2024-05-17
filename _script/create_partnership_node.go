@@ -38,6 +38,11 @@ func CreatePartnerhipNodes() {
 	// if err != nil {
 	// 	log.Println(err.Error())
 	// }
+
+	// err := createSegugioNode()
+	// if err != nil {
+	//	log.Println(err.Error())
+	// }
 }
 
 func createBeprofNode() error {
@@ -231,6 +236,35 @@ func createFpinsuranceNode() error {
 		Type:        models.PartnershipNetworkNodeType,
 		IsActive:    true,
 		Partnership: &models.PartnershipNode{Name: models.PartnershipFpinsurance},
+		Products: []models.Product{{
+			Name:         models.LifeProduct,
+			NameDesc:     &nameDesc,
+			Version:      models.ProductV2,
+			NameTitle:    "Wopta per te",
+			NameSubtitle: "Vita",
+			Companies:    []models.Company{{Name: "axa"}},
+		}},
+	}
+
+	nn, err = network.CreateNode(partnershipModel)
+	if err != nil {
+		return err
+	}
+
+	return nn.SaveBigQuery("")
+}
+
+func createSegugioNode() error {
+	var (
+		err error
+		nn  *models.NetworkNode
+	)
+	partnershipModel := models.NetworkNode{
+		Uid:         models.PartnershipSegugio,
+		Code:        models.PartnershipSegugio,
+		Type:        models.PartnershipNetworkNodeType,
+		IsActive:    true,
+		Partnership: &models.PartnershipNode{Name: models.PartnershipSegugio},
 		Products: []models.Product{{
 			Name:         models.LifeProduct,
 			NameDesc:     &nameDesc,

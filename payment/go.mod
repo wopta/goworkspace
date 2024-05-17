@@ -17,11 +17,6 @@ require (
 )
 
 require (
-	github.com/go-chi/chi v1.5.5 // indirect
-	github.com/go-jose/go-jose/v4 v4.0.1 // indirect
-)
-
-require (
 	cloud.google.com/go v0.110.8 // indirect
 	cloud.google.com/go/bigquery v1.53.0 // indirect
 	cloud.google.com/go/compute v1.23.0 // indirect
@@ -47,6 +42,7 @@ require (
 	// indirect
 	github.com/go-chi/cors v1.2.1 // indirect
 	github.com/go-gota/gota v0.12.0 // indirect
+	github.com/go-jose/go-jose/v4 v4.0.1 // indirect
 	github.com/go-pdf/fpdf v0.8.0 // indirect
 	github.com/goccy/go-json v0.9.11 // indirect
 	github.com/golang-jwt/jwt/v4 v4.4.2 // indirect
