@@ -63,7 +63,7 @@ func PaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	switch fabrickCallback.Bill.Status {
 	case fabrickBillPaid:
 		paymentMethod = strings.ToLower(*fabrickCallback.Bill.Transactions[0].PaymentMethod)
-		err = fabrickPayment(origin, providerId, policy)
+		err = fabrickPayment(origin, providerId, &policy)
 	default:
 	}
 
@@ -81,7 +81,7 @@ func PaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	return response, nil, nil
 }
 
-func fabrickPayment(origin, providerId string, policy models.Policy) error {
+func fabrickPayment(origin, providerId string, policy *models.Policy) error {
 	log.Printf("[fabrickPayment] Policy %s", policy.Uid)
 
 	policy.SanitizePaymentData()
@@ -97,7 +97,7 @@ func fabrickPayment(origin, providerId string, policy models.Policy) error {
 		return errors.New("transaction already paid")
 	}
 
-	state := runCallbackBpmn(&policy, payFlowKey)
+	state := runCallbackBpmn(policy, payFlowKey)
 	if state == nil || state.Data == nil {
 		log.Println("[fabrickPayment] error bpmn - state not set")
 		return nil
@@ -106,6 +106,8 @@ func fabrickPayment(origin, providerId string, policy models.Policy) error {
 		log.Println("[fabrickPayment] error bpmn - state failed")
 		return nil
 	}
+
+	*policy = *state.Data
 
 	return nil
 }
