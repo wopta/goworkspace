@@ -5,8 +5,8 @@ go 1.21
 replace github.com/wopta/goworkspace/callback_out => ./
 
 require (
-	github.com/wopta/goworkspace/lib v1.0.119
-	github.com/wopta/goworkspace/models v1.1.106
+	github.com/wopta/goworkspace/lib v1.0.124
+	github.com/wopta/goworkspace/models v1.1.113
 )
 
 require (
