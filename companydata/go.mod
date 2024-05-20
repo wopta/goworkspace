@@ -13,7 +13,7 @@ require (
 	github.com/go-gota/gota v0.12.0
 	github.com/google/uuid v1.3.0
 	github.com/wopta/goworkspace/inclusive v0.0.0-20230719101556-99189b0ef4a8
-	github.com/wopta/goworkspace/lib v1.0.99
+	github.com/wopta/goworkspace/lib v1.0.124
 	github.com/wopta/goworkspace/mail v1.0.83
 	github.com/wopta/goworkspace/models v1.1.84
 	github.com/wopta/goworkspace/network v1.0.36
