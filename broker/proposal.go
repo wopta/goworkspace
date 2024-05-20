@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/wopta/goworkspace/callback_out"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
@@ -136,7 +137,7 @@ func proposal(policy *models.Policy) error {
 	log.Printf("[proposal] saving proposal n. %d to bigquery...", policy.ProposalNumber)
 	policy.BigquerySave(origin)
 
-	network.ExecuteCallback(networkNode, *policy)
+	callback_out.Execute(networkNode, *policy)
 
 	return nil
 }

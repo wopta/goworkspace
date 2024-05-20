@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/civil"
+	"github.com/wopta/goworkspace/callback_out"
 	"github.com/wopta/goworkspace/document"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/mail"
@@ -232,7 +233,7 @@ func emitV2(authToken models.AuthToken, policy *models.Policy, request EmitReque
 	log.Println("[Emit] saving guarantees to bigquery...")
 	models.SetGuaranteBigquery(*policy, "emit", fireGuarantee)
 
-	network.ExecuteCallback(networkNode, *policy)
+	callback_out.Execute(networkNode, *policy)
 
 	log.Println("[Emit] end --------------------------------------------------")
 	return responseEmit

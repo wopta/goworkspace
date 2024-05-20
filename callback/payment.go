@@ -9,9 +9,9 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/wopta/goworkspace/callback_out"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/network"
 	plc "github.com/wopta/goworkspace/policy"
 	tr "github.com/wopta/goworkspace/transaction"
 )
@@ -72,7 +72,7 @@ func PaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 		return fmt.Sprintf(responseFormat, false, string(request)), nil, nil
 	}
 
-	network.ExecuteCallback(networkNode, policy)
+	callback_out.Execute(networkNode, policy)
 
 	response := fmt.Sprintf(responseFormat, true, string(request))
 

@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/wopta/goworkspace/callback_out"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
@@ -121,7 +122,7 @@ func requestApproval(policy *models.Policy) error {
 	log.Printf("[requestApproval] saving policy with uid %s to bigquery...", policy.Uid)
 	policy.BigquerySave(origin)
 
-	network.ExecuteCallback(networkNode, *policy)
+	callback_out.Execute(networkNode, *policy)
 
 	log.Println("[requestApproval] end ---------------------------------------")
 
