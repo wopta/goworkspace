@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 	"time"
-
+	"github.com/wopta/goworkspace/mail"
 	"cloud.google.com/go/bigquery"
 	lib "github.com/wopta/goworkspace/lib"
 	//"google.golang.org/api/firebaseappcheck/v1"
@@ -89,7 +89,8 @@ func FleetAssistenceInclusiveMovement(w http.ResponseWriter, r *http.Request) (s
 			if len(checkPlate) > 0 {
 				lib.InsertRowsBigQuery("wopta", "fleetAssistenceInclusiveMovements", data)
 			} else {
-
+				mail.SendMail((getMailObj("<p>Opss.. qualcosa è andato storto</p><p>Il servizio di aggiornamento istenza flotte di Wopta non è stato in grado di trovare la targa: "+row[2].(string)+"</p><p>Non ti preoccupare questa operazione è stata gia annullata devi solo rieffetuare la richiesta dall' apposito form con la targa corretta</p>",
+				fleetAssistenceInclusiveMovement.Mail)))
 			}
 		}
 

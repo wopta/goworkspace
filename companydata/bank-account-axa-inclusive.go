@@ -32,7 +32,7 @@ type BankAccountAxaInclusiveReq struct {
 
 func BankAccountAxaInclusive(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		now time.Time
+		now    time.Time
 		upload bool
 	)
 	log.Println("----------------BankAccountAxaInclusive-----------------")
@@ -128,15 +128,17 @@ func setInclusiveRow(mov inclusive.BankAccountMovement, codes map[string]map[str
 			"suspended": "E",
 		}), //    TIPO MOVIMENTO
 	}
-	layout := "2006-01-02"
-	if mov.MovementType == "delete" || mov.MovementType == "suspended" {
-		e = lib.UpdateRowBigQuery("wopta", dataBanckAccount, map[string]string{
-			"status":  mov.Status,
-			"endDate": mov.EndDate.Format(layout) + " 00:00:00",
-		}, "fiscalCode='"+mov.FiscalCode+"' and guaranteesCode='"+mov.GuaranteesCode+"'")
 
-	}
+	/*
+		layout := "2006-01-02"
+		if mov.MovementType == "delete" || mov.MovementType == "suspended" {
+			e = lib.UpdateRowBigQuery("wopta", dataBanckAccount, map[string]string{
+				"status":  mov.Status,
+				"endDate": mov.EndDate.Format(layout) + " 00:00:00",
+			}, "fiscalCode='"+mov.FiscalCode+"' and guaranteesCode='"+mov.GuaranteesCode+"'")
 
+		}
+	*/
 	result = append(result, row)
 
 	return result
