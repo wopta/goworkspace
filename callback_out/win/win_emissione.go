@@ -7,15 +7,15 @@ import (
 )
 
 type emissioneReq struct {
-	DtEmissione    string    `json:"dtEmissione"`
-	IdPratica      int       `json:"idPratica"`
-	LuogoEmissione string    `json:"luogoEmissione"`
-	NumOriginali   int       `json:"numOriginali"`
-	NumPol         string    `json:"numPol"`
-	NumPolSost     string    `json:"numPolSost"`
-	Ramo           string    `json:"ramo"`
-	PerAss         WinPerAss `json:"perAss"`
-	Utente         string    `json:"utente"`
+	DtEmissione    string `json:"dtEmissione"`
+	IdPratica      int    `json:"idPratica"`
+	LuogoEmissione string `json:"luogoEmissione"`
+	NumOriginali   int    `json:"numOriginali"`
+	NumPol         string `json:"numPol"`
+	NumPolSost     string `json:"numPolSost"`
+	Ramo           string `json:"ramo"`
+	PerAss         perAss `json:"perAss"`
+	Utente         string `json:"utente"`
 }
 
 func emissione(policy models.Policy) ([]byte, error) {

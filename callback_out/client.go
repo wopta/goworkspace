@@ -18,20 +18,13 @@ type CallbackClient interface {
 	// Rejected(models.Policy) (*http.Request, *http.Response, error)
 }
 
-var clientMap map[string]CallbackClient = map[string]CallbackClient{
-	"winClient": &win.Client{},
-}
 var ErrCallbackClientNotSet = errors.New("callback client not set")
 
 func newClient(node *models.NetworkNode) (CallbackClient, error) {
-	var (
-		client CallbackClient
-		ok     bool
-	)
-
-	if client, ok = clientMap[node.CallbackConfig.FxName]; !ok {
+	switch node.CallbackConfig.FxName {
+	case "winClient":
+		return win.NewClient(), nil
+	default:
 		return nil, ErrCallbackClientNotSet
 	}
-
-	return client, nil
 }

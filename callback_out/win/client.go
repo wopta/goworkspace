@@ -2,6 +2,7 @@ package win
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"net/http"
 
@@ -10,13 +11,20 @@ import (
 )
 
 type Client struct {
-	path    string
-	headers map[string]string
+	basePath string
+	path     string
+	headers  map[string]string
+}
+
+func NewClient() *Client {
+	return &Client{
+		basePath: "https://www.google.com",
+	}
 }
 
 func (c *Client) post(body io.Reader) (*http.Request, *http.Response, error) {
-	// inject fixed base url
-	req, err := http.NewRequest(http.MethodPost, c.path, body)
+	path := fmt.Sprintf("%s/%s", c.basePath, c.path)
+	req, err := http.NewRequest(http.MethodPost, path, body)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -31,7 +39,7 @@ func (c *Client) post(body io.Reader) (*http.Request, *http.Response, error) {
 }
 
 func (c *Client) Emit(policy models.Policy) (*http.Request, *http.Response, error) {
-	c.path = "/restba/extquote/inspratica"
+	c.path = "restba/extquote/inspratica"
 
 	body, err := inspratica(policy, "QUOTAZIONE_ACCETTATA")
 	if err != nil {
@@ -42,7 +50,7 @@ func (c *Client) Emit(policy models.Policy) (*http.Request, *http.Response, erro
 }
 
 func (c *Client) RequestApproval(policy models.Policy) (*http.Request, *http.Response, error) {
-	c.path = "/restba/extquote/inspratica"
+	c.path = "restba/extquote/inspratica"
 
 	body, err := inspratica(policy, "RICHIESTA_QUOTAZIONE")
 	if err != nil {
@@ -53,7 +61,7 @@ func (c *Client) RequestApproval(policy models.Policy) (*http.Request, *http.Res
 }
 
 func (c *Client) Paid(policy models.Policy) (*http.Request, *http.Response, error) {
-	c.path = "/restba/extquote/emissione"
+	c.path = "restba/extquote/emissione"
 
 	body, err := emissione(policy)
 	if err != nil {

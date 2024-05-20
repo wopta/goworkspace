@@ -7,16 +7,16 @@ import (
 )
 
 type inspraticaReq struct {
-	Anagrafica   WinAnagrafica `json:"anagrafica"`
-	Garanzie     []WinGarancy  `json:"garanzie"`
-	IdPratica    int           `json:"idPratica"`
-	PerAss       WinPerAss     `json:"perAss"`
-	Prodotto     string        `json:"prodotto"`
-	TotaleAnnuo  WinTotal      `json:"totaleAnnuo"`
-	TotaleFirma  WinTotal      `json:"totaleFirma"`
-	TotaleFutura WinTotal      `json:"totaleFutura"`
-	Utente       string        `json:"utente"`
-	StatoPratica string        `json:"statoPratica"` // "QUOTAZIONE_ACCETTATA", "RICHIESTA_QUOTAZIONE"
+	Anagrafica   anagrafica `json:"anagrafica"`
+	Garanzie     []garanzia `json:"garanzie"`
+	IdPratica    int        `json:"idPratica"`
+	PerAss       perAss     `json:"perAss"`
+	Prodotto     string     `json:"prodotto"`
+	TotaleAnnuo  totale     `json:"totaleAnnuo"`
+	TotaleFirma  totale     `json:"totaleFirma"`
+	TotaleFutura totale     `json:"totaleFutura"`
+	Utente       string     `json:"utente"`
+	StatoPratica string     `json:"statoPratica"` // "QUOTAZIONE_ACCETTATA", "RICHIESTA_QUOTAZIONE"
 }
 
 func inspratica(policy models.Policy, state string) ([]byte, error) {
