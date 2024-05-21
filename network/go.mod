@@ -10,7 +10,6 @@ require (
 	cloud.google.com/go/pubsub v1.38.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	github.com/go-chi/chi/v5 v5.0.12
-	github.com/wopta/goworkspace/callback_out v1.0.1
 	github.com/wopta/goworkspace/lib v1.0.124
 	github.com/wopta/goworkspace/models v1.1.113
 	google.golang.org/api v0.181.0
