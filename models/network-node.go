@@ -61,7 +61,7 @@ type NodeCompany struct {
 }
 
 type CallbackConfig struct {
-	FxName string `json:"fxName" firestore:"fxName" bigquery:"-"`
+	Name string `json:"name" firestore:"name" bigquery:"-"`
 }
 
 func NetworkNodeToListData(query *firestore.DocumentIterator) []NetworkNode {

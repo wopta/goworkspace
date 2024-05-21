@@ -21,7 +21,7 @@ type CallbackClient interface {
 var ErrCallbackClientNotSet = errors.New("callback client not set")
 
 func newClient(node *models.NetworkNode) (CallbackClient, error) {
-	switch node.CallbackConfig.FxName {
+	switch node.CallbackConfig.Name {
 	case "winClient":
 		return win.NewClient(), nil
 	default:
