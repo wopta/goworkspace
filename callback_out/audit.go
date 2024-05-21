@@ -15,15 +15,15 @@ const CallbackOutTableId string = "callback-out"
 
 func saveAudit(node *models.NetworkNode, action CallbackoutAction, req *http.Request, res *http.Response) {
 	var audit struct {
-		creationDate civil.DateTime
-		client       string
-		nodeUid      string
-		action       string
-		reqMethod    string
-		reqPath      string
-		reqBody      string
-		resStatus    string
-		resBody      string
+		creationDate civil.DateTime `bigquery:"creationDate"`
+		client       string         `bigquery:"client"`
+		nodeUid      string         `bigquery:"nodeUid"`
+		action       string         `bigquery:"action"`
+		reqMethod    string         `bigquery:"reqMethod"`
+		reqPath      string         `bigquery:"reqPath"`
+		reqBody      string         `bigquery:"reqBody"`
+		resStatus    string         `bigquery:"resStatus"`
+		resBody      string         `bigquery:"resBody"`
 	}
 
 	reqBody, _ := io.ReadAll(req.Body)
