@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/network"
 )
 
@@ -18,6 +19,10 @@ func GetNetworkNodeByUidFx(w http.ResponseWriter, r *http.Request) (string, inte
 	log.Printf("Uid %s", nodeUid)
 
 	networkNode := network.GetNetworkNodeByUid(nodeUid)
+
+	// DO NOT EXPOSE CONFIGS
+	networkNode.JwtConfig = lib.JwtConfig{}
+	networkNode.CallbackConfig = nil
 
 	jsonOut, err := networkNode.Marshal()
 

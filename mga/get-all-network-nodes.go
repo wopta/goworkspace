@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 )
@@ -25,6 +26,12 @@ func GetAllNetworkNodesFx(w http.ResponseWriter, r *http.Request) (string, inter
 	if err != nil {
 		log.Printf("error getting network nodes: %s", err.Error())
 		return "", nil, err
+	}
+
+	// DO NOT EXPOSE CONFIGS
+	for i := range networkNodes {
+		networkNodes[i].JwtConfig = lib.JwtConfig{}
+		networkNodes[i].CallbackConfig = nil
 	}
 
 	response.NetworkNodes = networkNodes
