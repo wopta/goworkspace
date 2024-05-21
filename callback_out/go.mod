@@ -6,7 +6,7 @@ replace github.com/wopta/goworkspace/callback_out => ./
 
 require (
 	github.com/wopta/goworkspace/lib v1.0.124
-	github.com/wopta/goworkspace/models v1.1.113
+	github.com/wopta/goworkspace/models v1.1.114
 )
 
 require (
