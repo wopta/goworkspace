@@ -23,7 +23,7 @@ func Execute(node *models.NetworkNode, policy models.Policy, action CallbackoutA
 	)
 
 	if node == nil || node.CallbackConfig == nil {
-		log.Println("no node or calback config available")
+		log.Println("no node or callback config available")
 		return
 	}
 
@@ -50,5 +50,6 @@ func Execute(node *models.NetworkNode, policy models.Policy, action CallbackoutA
 	log.Printf("Callback request: %v", req)
 	log.Printf("Callback response: %v", res)
 	log.Printf("Callback error: %s", err)
-	// TODO: save
+
+	saveAudit(node, action, req, res)
 }
