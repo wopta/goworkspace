@@ -14,7 +14,7 @@ import (
 const CallbackOutTableId string = "callback-out"
 
 func saveAudit(node *models.NetworkNode, action CallbackoutAction, req *http.Request, res *http.Response) {
-	var audit struct {
+	type auditBQ struct {
 		creationDate civil.DateTime `bigquery:"creationDate"`
 		client       string         `bigquery:"client"`
 		nodeUid      string         `bigquery:"nodeUid"`
@@ -25,6 +25,8 @@ func saveAudit(node *models.NetworkNode, action CallbackoutAction, req *http.Req
 		resStatus    string         `bigquery:"resStatus"`
 		resBody      string         `bigquery:"resBody"`
 	}
+
+	var audit auditBQ
 
 	reqBody, _ := io.ReadAll(req.Body)
 	resBody, _ := io.ReadAll(res.Body)
