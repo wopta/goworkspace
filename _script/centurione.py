@@ -105,6 +105,7 @@ environment = DEV  # Replace with your desired environment
 dry_run = True
 google_repository = "google"
 github_repository = "origin"
+working_branch = "master"
 
 commands = []
 
@@ -323,7 +324,7 @@ def updateDependencies(dependency_map, updateable_modules, modules, updated_modu
                 else:
                     print("Dry run, not updating module")
                 commands.append(Command(CommandType.UPDATE_MODULE, dependant,
-                                f"git add {dependant}/go.mod && git commit -m \"Updating {dependency_to_update.module} in {dependant}\" && git push {github_repository} master && git push {google_repository} master"))
+                                f"git add {dependant}/go.mod && git commit -m \"Updating {dependency_to_update.module} in {dependant}\" && git push {github_repository} {working_branch} && git push {google_repository} {working_branch}"))
                 print()
 
             # clean module in other dependencies
