@@ -72,7 +72,7 @@ func PaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 		return fmt.Sprintf(responseFormat, false, string(request)), nil, nil
 	}
 
-	callback_out.Execute(networkNode, policy)
+	callback_out.Execute(networkNode, policy, callback_out.Paid)
 
 	response := fmt.Sprintf(responseFormat, true, string(request))
 

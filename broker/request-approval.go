@@ -122,7 +122,7 @@ func requestApproval(policy *models.Policy) error {
 	log.Printf("[requestApproval] saving policy with uid %s to bigquery...", policy.Uid)
 	policy.BigquerySave(origin)
 
-	callback_out.Execute(networkNode, *policy)
+	callback_out.Execute(networkNode, *policy, callback_out.RequestApproval)
 
 	log.Println("[requestApproval] end ---------------------------------------")
 

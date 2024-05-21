@@ -3,12 +3,19 @@ package callback_out
 import (
 	"log"
 	"net/http"
-	"slices"
 
 	"github.com/wopta/goworkspace/models"
 )
 
-func Execute(node *models.NetworkNode, policy models.Policy) {
+type CallbackoutAction = string
+
+var (
+	RequestApproval CallbackoutAction = "RequestApproval"
+	Emit            CallbackoutAction = "Emit"
+	Paid            CallbackoutAction = "Paid"
+)
+
+func Execute(node *models.NetworkNode, policy models.Policy, action CallbackoutAction) {
 	var (
 		client CallbackClient
 		err    error
@@ -16,27 +23,28 @@ func Execute(node *models.NetworkNode, policy models.Policy) {
 	)
 
 	if node == nil || node.CallbackConfig == nil {
+		log.Println("no node or calback config available")
 		return
 	}
 
 	if client, err = newClient(node); err != nil {
+		log.Println(err)
 		return
 	}
 
-	if slices.Contains([]string{models.PolicyStatusWaitForApproval, models.PolicyStatusWaitForApprovalMga}, policy.Status) {
+	switch action {
+	case RequestApproval:
 		fx = client.RequestApproval
-	}
-	if policy.IsPay {
-		fx = client.Paid
-	}
-	if policy.CompanyEmit {
+	case Emit:
 		fx = client.Emit
-	}
-
-	if fx == nil {
-		log.Printf("status '%s' not handled by callback", policy.Status)
+	case Paid:
+		fx = client.Paid
+	default:
+		log.Printf("unhandled callback action '%s'", action)
 		return
 	}
+
+	log.Printf("executing action '%s'", action)
 
 	req, res, err := fx(policy)
 	log.Printf("Callback request: %v", req)
