@@ -14,11 +14,11 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/wopta/goworkspace/inclusive v0.0.4
 	github.com/wopta/goworkspace/lib v1.0.124
-	github.com/wopta/goworkspace/mail v1.0.112
-	github.com/wopta/goworkspace/models v1.1.113
-	github.com/wopta/goworkspace/network v1.0.64
-	github.com/wopta/goworkspace/product v1.0.110
-	github.com/wopta/goworkspace/user v1.0.97
+	github.com/wopta/goworkspace/mail v1.0.113
+	github.com/wopta/goworkspace/models v1.1.115
+	github.com/wopta/goworkspace/network v1.0.66
+	github.com/wopta/goworkspace/product v1.0.112
+	github.com/wopta/goworkspace/user v1.0.98
 	github.com/xuri/excelize/v2 v2.8.1
 	google.golang.org/api v0.181.0
 )
@@ -71,7 +71,6 @@ require (
 	github.com/sergi/go-diff v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
-	github.com/wopta/goworkspace/callback_out v1.0.1 // indirect
 	github.com/wopta/goworkspace/wiseproxy v1.0.3 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20231025114914-d1ff6096ae53 // indirect
