@@ -13,18 +13,20 @@ import (
 
 const CallbackOutTableId string = "callback-out"
 
+type auditSchema struct {
+	CreationDate bigquery.NullDateTime `bigquery:"creationDate"`
+	Client       string                `bigquery:"client"`
+	NodeUid      string                `bigquery:"nodeUid"`
+	Action       string                `bigquery:"action"`
+	ReqMethod    string                `bigquery:"reqMethod"`
+	ReqPath      string                `bigquery:"reqPath"`
+	ReqBody      string                `bigquery:"reqBody"`
+	ResStatus    string                `bigquery:"resStatus"`
+	ResBody      string                `bigquery:"resBody"`
+}
+
 func saveAudit(node *models.NetworkNode, action CallbackoutAction, req *http.Request, res *http.Response) {
-	var audit struct {
-		CreationDate bigquery.NullDateTime `bigquery:"creationDate"`
-		Client       string                `bigquery:"client"`
-		NodeUid      string                `bigquery:"nodeUid"`
-		Action       string                `bigquery:"action"`
-		ReqMethod    string                `bigquery:"reqMethod"`
-		ReqPath      string                `bigquery:"reqPath"`
-		ReqBody      string                `bigquery:"reqBody"`
-		ResStatus    string                `bigquery:"resStatus"`
-		ResBody      string                `bigquery:"resBody"`
-	}
+	var audit auditSchema
 
 	reqBody, _ := io.ReadAll(req.Body)
 	resBody, _ := io.ReadAll(res.Body)
