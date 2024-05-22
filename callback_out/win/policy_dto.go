@@ -92,7 +92,7 @@ func policyDto(p models.Policy) policy {
 	)
 
 	// Map contractor data
-	an.Cap = p.Contractor.PostalCode
+	an.Cap = p.Contractor.Residence.PostalCode
 	an.Cf = p.Contractor.FiscalCode
 	an.CodRagSoc = "" // ?
 	an.Cognome = p.Contractor.Surname
@@ -120,12 +120,12 @@ func policyDto(p models.Policy) policy {
 	for _, guarantee := range p.Assets[0].Guarantees {
 		var g garanzia
 		g.Garanzia = guarantee.Slug
-		g.Imposte = int(guarantee.Value.Tax)
-		g.SommaAssicurata = int(guarantee.Value.SumInsuredLimitOfIndemnity)
+		g.SommaAssicurata = int(100 * guarantee.Value.SumInsuredLimitOfIndemnity)
+		g.PremioImponibile = int(100 * guarantee.Value.PremiumNetYearly)
+		g.Imposte = int(100 * guarantee.Value.PremiumTaxAmountYearly)
 		if p.PaymentSplit == string(models.PaySplitMonthly) {
-			g.PremioImponibile = int(guarantee.Value.PremiumNetMonthly)
-		} else {
-			g.PremioImponibile = int(guarantee.Value.PremiumNetYearly)
+			g.PremioImponibile = int(100 * guarantee.Value.PremiumNetMonthly)
+			g.Imposte = int(100 * guarantee.Value.PremiumTaxAmountMonthly)
 		}
 		wp.Garanzie = append(wp.Garanzie, g)
 	}
@@ -134,10 +134,9 @@ func policyDto(p models.Policy) policy {
 
 	pa.BaseAnno = "ANNO_SOLARE"
 	pa.DataEffetto = p.StartDate.Format(time.DateOnly)
+	pa.DataPrimaScadenza = lib.AddMonths(p.StartDate, 12).Format(time.DateOnly)
 	if p.PaymentSplit == string(models.PaySplitMonthly) {
 		pa.DataPrimaScadenza = lib.AddMonths(p.StartDate, 1).Format(time.DateOnly)
-	} else {
-		pa.DataPrimaScadenza = lib.AddMonths(p.StartDate, 12).Format(time.DateOnly)
 	}
 	pa.DataScadenza = p.EndDate.Format(time.DateOnly)
 	pa.DurataIniziale = p.GetDurationInYears()
@@ -148,16 +147,16 @@ func policyDto(p models.Policy) policy {
 	wp.Prodotto = p.Name
 
 	// Map totals
-	totale.Imposte = int(p.TaxAmount)
-	totale.PremioImponibile = int(p.PriceNett)
-	totale.Totale = int(p.PriceGross)
+	totale.Imposte = int(100 * p.TaxAmount)
+	totale.PremioImponibile = int(100 * p.PriceNett)
+	totale.Totale = int(100 * p.PriceGross)
 	totale.TotaliGaranzie = make([]totaleGaranzia, 0)
 	for _, g := range wp.Garanzie {
 		totale.TotaliGaranzie = append(totale.TotaliGaranzie, totaleGaranzia{
 			Garanzia:         g.Garanzia,
 			Imposte:          g.Imposte,
 			PremioImponibile: g.PremioImponibile,
-			Totale:           g.SommaAssicurata,
+			Totale:           g.Imposte + g.PremioImponibile,
 		})
 	}
 	wp.TotaleAnnuo = totale
