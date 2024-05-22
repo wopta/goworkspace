@@ -41,6 +41,7 @@ func saveAudit(node *models.NetworkNode, action CallbackoutAction, res internal.
 	audit.ReqBody = string(res.RequestBody)
 	audit.ResStatusCode = res.Response.StatusCode
 	audit.ResBody = string(resBody)
+	audit.Error = res.Error.Error()
 
 	if err := lib.InsertRowsBigQuery(lib.WoptaDataset, CallbackOutTableId, audit); err != nil {
 		log.Printf("error saving audit: %s", err)
