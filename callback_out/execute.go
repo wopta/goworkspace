@@ -2,8 +2,8 @@ package callback_out
 
 import (
 	"log"
-	"net/http"
 
+	"github.com/wopta/goworkspace/callback_out/internal"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -19,7 +19,7 @@ func Execute(node *models.NetworkNode, policy models.Policy, action CallbackoutA
 	var (
 		client CallbackClient
 		err    error
-		fx     func(models.Policy) (*http.Request, *http.Response, error)
+		fx     func(models.Policy) internal.CallbackInfo
 	)
 
 	if node == nil || node.CallbackConfig == nil {
@@ -46,10 +46,10 @@ func Execute(node *models.NetworkNode, policy models.Policy, action CallbackoutA
 
 	log.Printf("executing action '%s'", action)
 
-	req, res, err := fx(policy)
-	log.Printf("Callback request: %v", req)
-	log.Printf("Callback response: %v", res)
-	log.Printf("Callback error: %s", err)
+	res := fx(policy)
+	log.Printf("Callback request: %v", res.Request)
+	log.Printf("Callback response: %v", res.Response)
+	log.Printf("Callback error: %s", res.Error)
 
-	saveAudit(node, action, req, nil, res)
+	saveAudit(node, action, res)
 }

@@ -2,20 +2,20 @@ package callback_out
 
 import (
 	"errors"
-	"net/http"
 
+	"github.com/wopta/goworkspace/callback_out/internal"
 	"github.com/wopta/goworkspace/callback_out/win"
 	"github.com/wopta/goworkspace/models"
 )
 
 type CallbackClient interface {
-	// Proposal(models.Policy) (*http.Request, *http.Response, error)
-	Emit(models.Policy) (*http.Request, *http.Response, error)
-	// Signed(models.Policy) (*http.Request, *http.Response, error)
-	Paid(models.Policy) (*http.Request, *http.Response, error)
-	RequestApproval(models.Policy) (*http.Request, *http.Response, error)
-	// Approved(models.Policy) (*http.Request, *http.Response, error)
-	// Rejected(models.Policy) (*http.Request, *http.Response, error)
+	// Proposal(models.Policy) internal.CallbackInfo
+	Emit(models.Policy) internal.CallbackInfo
+	// Signed(models.Policy) internal.CallbackInfo
+	Paid(models.Policy) internal.CallbackInfo
+	RequestApproval(models.Policy) internal.CallbackInfo
+	// Approved(models.Policy) internal.CallbackInfo
+	// Rejected(models.Policy) internal.CallbackInfo
 }
 
 var ErrCallbackClientNotSet = errors.New("callback client not set")

@@ -3,10 +3,10 @@ package callback_out
 import (
 	"io"
 	"log"
-	"net/http"
 	"time"
 
 	"cloud.google.com/go/bigquery"
+	"github.com/wopta/goworkspace/callback_out/internal"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
@@ -26,20 +26,20 @@ type auditSchema struct {
 	Error         string                `bigquery:"error"`
 }
 
-func saveAudit(node *models.NetworkNode, action CallbackoutAction, req *http.Request, reqBody []byte, res *http.Response) {
+func saveAudit(node *models.NetworkNode, action CallbackoutAction, res internal.CallbackInfo) {
 	var audit auditSchema
 
-	resBody, _ := io.ReadAll(res.Body)
-	defer res.Body.Close()
+	resBody, _ := io.ReadAll(res.Response.Body)
+	defer res.Response.Body.Close()
 
 	audit.CreationDate = lib.GetBigQueryNullDateTime(time.Now().UTC())
 	audit.Client = node.CallbackConfig.Name
 	audit.NodeUid = node.Uid
 	audit.Action = action
-	audit.ReqMethod = req.Method
-	audit.ReqPath = req.Host + req.URL.RequestURI()
-	audit.ReqBody = string(reqBody)
-	audit.ResStatusCode = res.StatusCode
+	audit.ReqMethod = res.Request.Method
+	audit.ReqPath = res.Request.Host + res.Request.URL.RequestURI()
+	audit.ReqBody = string(res.RequestBody)
+	audit.ResStatusCode = res.Response.StatusCode
 	audit.ResBody = string(resBody)
 
 	if err := lib.InsertRowsBigQuery(lib.WoptaDataset, CallbackOutTableId, audit); err != nil {
