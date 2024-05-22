@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"cloud.google.com/go/civil"
+	"cloud.google.com/go/bigquery"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
@@ -14,19 +14,17 @@ import (
 const CallbackOutTableId string = "callback-out"
 
 func saveAudit(node *models.NetworkNode, action CallbackoutAction, req *http.Request, res *http.Response) {
-	type auditBQ struct {
-		creationDate civil.DateTime `bigquery:"creationDate"`
-		client       string         `bigquery:"client"`
-		nodeUid      string         `bigquery:"nodeUid"`
-		action       string         `bigquery:"action"`
-		reqMethod    string         `bigquery:"reqMethod"`
-		reqPath      string         `bigquery:"reqPath"`
-		reqBody      string         `bigquery:"reqBody"`
-		resStatus    string         `bigquery:"resStatus"`
-		resBody      string         `bigquery:"resBody"`
+	var audit struct {
+		CreationDate bigquery.NullDateTime `bigquery:"creationDate"`
+		Client       string                `bigquery:"client"`
+		NodeUid      string                `bigquery:"nodeUid"`
+		Action       string                `bigquery:"action"`
+		ReqMethod    string                `bigquery:"reqMethod"`
+		ReqPath      string                `bigquery:"reqPath"`
+		ReqBody      string                `bigquery:"reqBody"`
+		ResStatus    string                `bigquery:"resStatus"`
+		ResBody      string                `bigquery:"resBody"`
 	}
-
-	var audit auditBQ
 
 	reqBody, _ := io.ReadAll(req.Body)
 	resBody, _ := io.ReadAll(res.Body)
@@ -35,15 +33,15 @@ func saveAudit(node *models.NetworkNode, action CallbackoutAction, req *http.Req
 		res.Body.Close()
 	}()
 
-	audit.creationDate = civil.DateTimeOf(time.Now().UTC())
-	audit.client = node.CallbackConfig.Name
-	audit.nodeUid = node.Uid
-	audit.action = action
-	audit.reqMethod = req.Method
-	audit.reqPath = req.URL.RequestURI()
-	audit.reqBody = string(reqBody)
-	audit.resStatus = res.Status
-	audit.resBody = string(resBody)
+	audit.CreationDate = lib.GetBigQueryNullDateTime(time.Now().UTC())
+	audit.Client = node.CallbackConfig.Name
+	audit.NodeUid = node.Uid
+	audit.Action = action
+	audit.ReqMethod = req.Method
+	audit.ReqPath = req.URL.RequestURI()
+	audit.ReqBody = string(reqBody)
+	audit.ResStatus = res.Status
+	audit.ResBody = string(resBody)
 
 	if err := lib.InsertRowsBigQuery(lib.WoptaDataset, CallbackOutTableId, audit); err != nil {
 		log.Printf("error saving audit: %s", err)
