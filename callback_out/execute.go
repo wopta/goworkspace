@@ -51,5 +51,5 @@ func Execute(node *models.NetworkNode, policy models.Policy, action CallbackoutA
 	log.Printf("Callback response: %v", res)
 	log.Printf("Callback error: %s", err)
 
-	saveAudit(node, action, req, res)
+	saveAudit(node, action, req, nil, res)
 }
