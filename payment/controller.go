@@ -11,7 +11,7 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
-func Controller(policy models.Policy, product models.Product, transactions []models.Transaction, scheduleFirstRate bool) (string, []models.Transaction, error) {
+func Controller(policy models.Policy, product models.Product, transactions []models.Transaction, scheduleFirstRate bool, customerId string) (string, []models.Transaction, error) {
 	var (
 		err                error
 		payUrl             string
@@ -35,7 +35,7 @@ func Controller(policy models.Policy, product models.Product, transactions []mod
 
 	switch policy.Payment {
 	case models.FabrickPaymentProvider:
-		payUrl, updatedTransaction, err = fabrickIntegration(transactions, paymentMethods, policy, scheduleFirstRate)
+		payUrl, updatedTransaction, err = fabrickIntegration(transactions, paymentMethods, policy, scheduleFirstRate, customerId)
 	case models.ManualPaymentProvider:
 		payUrl, updatedTransaction, err = remittanceIntegration(transactions)
 	default:
@@ -45,8 +45,11 @@ func Controller(policy models.Policy, product models.Product, transactions []mod
 	return payUrl, updatedTransaction, nil
 }
 
-func fabrickIntegration(transactions []models.Transaction, paymentMethods []string, policy models.Policy, scheduleFirstRate bool) (payUrl string, updatedTransactions []models.Transaction, err error) {
-	customerId := uuid.New().String()
+func fabrickIntegration(transactions []models.Transaction, paymentMethods []string, policy models.Policy, scheduleFirstRate bool, customerId string) (payUrl string, updatedTransactions []models.Transaction, err error) {
+	if customerId == "" {
+		customerId = uuid.New().String()
+	}
+
 	now := time.Now().UTC()
 
 	for index, tr := range transactions {

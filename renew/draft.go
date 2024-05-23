@@ -262,7 +262,7 @@ func draft(policy models.Policy, product models.Product, ch chan<- RenewReport, 
 	})
 
 	// TODO: value of scheduleFirstRate depends on if customer has an active "mandato"
-	payUrl, transactions, err := payment.Controller(policy, product, transactions, false)
+	payUrl, transactions, err := payment.Controller(policy, product, transactions, false, "")
 	if err != nil {
 		return
 	}

@@ -86,7 +86,7 @@ func ChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, in
 
 	product := prd.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, nil, nil)
 
-	payUrl, updatedTransactions, err = Controller(policy, *product, unpaidTransactions, req.ScheduleFirstRate)
+	payUrl, updatedTransactions, err = Controller(policy, *product, unpaidTransactions, req.ScheduleFirstRate, "")
 	if err != nil {
 		log.Printf("error changing payment provider to %s: %s", req.ProviderName, err.Error())
 		return "{}", nil, err
