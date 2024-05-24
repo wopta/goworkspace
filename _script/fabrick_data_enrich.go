@@ -1,13 +1,15 @@
 package _script
 
 import (
-	"github.com/go-gota/gota/dataframe"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
 	"log"
 	"os"
 	"sort"
 	"strings"
+
+	"github.com/go-gota/gota/dataframe"
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/transaction"
 )
 
 const (
@@ -70,6 +72,10 @@ func FabrickDataEnrich() {
 	// parse rows into struct
 	parsedRows := make(map[string][]rowStruct)
 	for key, rows := range filteredData {
+		if len(rows) == 0 {
+			continue
+		}
+
 		output := make([]rowStruct, 0)
 		for _, row := range rows {
 			var out rowStruct
@@ -96,10 +102,28 @@ func FabrickDataEnrich() {
 			output = append(output, out)
 		}
 
+		if len(output) == 0 {
+			continue
+		}
+
 		sort.Slice(output, func(i, j int) bool {
 			return output[i].scheduleDate < output[j].scheduleDate
 		})
 		parsedRows[key] = output
+	}
+
+	for _, rows := range parsedRows {
+		policyUid := rows[len(rows)-1].policyUid
+		userToken := rows[len(rows)-1].userToken
+
+		log.Printf("PolicyUid: %s - UserToken: %s", policyUid, userToken)
+
+		transactions := transaction.GetPolicyActiveTransactions("", policyUid)
+		if len(transactions) == 0 {
+			log.Printf("no transactions found for policy %s", policyUid)
+			continue
+		}
+
 	}
 
 }
