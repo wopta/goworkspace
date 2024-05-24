@@ -78,4 +78,8 @@ var (
 		Name:    "Assunzione",
 		Address: "assunzione@wopta.it",
 	}
+	AddressTechnology = Address{
+		Name:    "Technology",
+		Address: "technology@wopta.it",
+	}
 )

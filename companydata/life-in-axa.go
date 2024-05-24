@@ -365,6 +365,10 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 					},
 				},
 			},
+			PolicyType:  mgaProducts["v"+version].PolicyType,
+			QuoteType:   mgaProducts["v"+version].QuoteType,
+			IsRenewable: mgaProducts["v"+version].IsRenewable,
+			Annuity:     0,
 		}
 
 		// get monthly prices

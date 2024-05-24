@@ -8,8 +8,8 @@ require (
 	cloud.google.com/go v0.110.2
 	cloud.google.com/go/bigquery v1.51.1
 	github.com/GoogleCloudPlatform/functions-framework-go v1.6.1
-	github.com/google/uuid v1.3.0
-	github.com/wopta/goworkspace/lib v1.0.89
+	github.com/google/uuid v1.6.0
+	github.com/wopta/goworkspace/lib v1.0.122
 	google.golang.org/api v0.128.0
 )
 

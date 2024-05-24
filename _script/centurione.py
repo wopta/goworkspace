@@ -32,6 +32,7 @@ RULES = "rules"
 SELLABLE = "sellable"
 TRANSACTION = "transaction"
 USER = "user"
+RENEW = "renew"
 
 # semver consts
 MAJOR = "major"
@@ -69,6 +70,7 @@ go_modules = [
     SELLABLE,
     TRANSACTION,
     USER,
+    RENEW,
 ]
 changed_modules = [
 ]
@@ -92,6 +94,7 @@ updateable_modules = [
     SELLABLE,
     TRANSACTION,
     USER,
+    RENEW,
 ]
 
 increment_version_key = PATCH

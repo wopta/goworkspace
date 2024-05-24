@@ -43,6 +43,11 @@ func CreatePartnerhipNodes() {
 	// if err != nil {
 	//	log.Println(err.Error())
 	// }
+
+	// err := createSwitchoNode()
+	// if err != nil {
+	// 	log.Println(err.Error())
+	// }
 }
 
 func createBeprofNode() error {
@@ -400,6 +405,35 @@ func createELeadsNode() error {
 	}
 
 	nn, err := network.CreateNode(partnershipModel)
+	if err != nil {
+		return err
+	}
+
+	return nn.SaveBigQuery("")
+}
+
+func createSwitchoNode() error {
+	var (
+		err error
+		nn  *models.NetworkNode
+	)
+	partnershipModel := models.NetworkNode{
+		Uid:         models.PartnershipSwitcho,
+		Code:        models.PartnershipSwitcho,
+		Type:        models.PartnershipNetworkNodeType,
+		IsActive:    true,
+		Partnership: &models.PartnershipNode{Name: models.PartnershipSwitcho},
+		Products: []models.Product{{
+			Name:         models.LifeProduct,
+			NameDesc:     &nameDesc,
+			Version:      models.ProductV2,
+			NameTitle:    "Wopta per te",
+			NameSubtitle: "Vita",
+			Companies:    []models.Company{{Name: "axa"}},
+		}},
+	}
+
+	nn, err = network.CreateNode(partnershipModel)
 	if err != nil {
 		return err
 	}
