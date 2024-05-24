@@ -85,8 +85,7 @@ func FetchAllPoliciesData() {
 
 func ImportPoliciesData() {
 	var (
-		data        []policyInfo
-		toBeWritten = make(map[string]map[string]map[string]interface{})
+		data []policyInfo
 	)
 
 	rawFile, err := os.ReadFile(filePath)
@@ -100,35 +99,49 @@ func ImportPoliciesData() {
 	}
 
 	dirAgent := network.GetNetworkNodeByCode("W1.DIRAgent")
+	if dirAgent == nil {
+		log.Fatal("nil dirAgent")
+	}
+
+	var wg sync.WaitGroup
 
 	for _, d := range data {
+		wg.Add(1)
+
 		go func(d policyInfo) {
+			defer wg.Done()
 			oldCodeCompany := d.Policy.CodeCompany
 
-			d.Policy.CodeCompany = "PROD" + d.Policy.CodeCompany
+			d.Policy.CodeCompany = "PROD" + oldCodeCompany
 			d.Policy.SignUrl = "www.wopta.it"
 			d.Policy.PayUrl = "www.wopta.it"
 			if d.Policy.Channel == "network" {
 				d.Policy.ProducerUid = dirAgent.Uid
 				d.Policy.ProducerCode = dirAgent.Code
 			}
+			d.Policy.Attachments = nil
 
 			d.Policy.Contractor.Mail = "yousef.hammar+" + oldCodeCompany + "@wopta.it"
 			d.Policy.Contractor.Phone = "+393334455667"
 			d.Policy.Contractor.IdentityDocuments = nil
 
-			for _, g := range d.Policy.Assets[0].Guarantees {
-				if g.Slug == "death" && g.Beneficiaries != nil {
-					for benIndex, _ := range *g.Beneficiaries {
-						(*g.Beneficiaries)[benIndex].Mail = "mail@wopta.it"
-						(*g.Beneficiaries)[benIndex].Phone = "+393334455667"
+			for assetIndex, _ := range d.Policy.Assets {
+				for guaranteeIndex, g := range d.Policy.Assets[assetIndex].Guarantees {
+					if g.Beneficiaries != nil {
+						for benIndex, ben := range *g.Beneficiaries {
+							if ben.BeneficiaryType == models.BeneficiaryChosenBeneficiary {
+								(*d.Policy.Assets[assetIndex].Guarantees[guaranteeIndex].Beneficiaries)[benIndex].Mail = "mail@wopta.it"
+								(*d.Policy.Assets[assetIndex].Guarantees[guaranteeIndex].Beneficiaries)[benIndex].Phone = "+393334455667"
+							}
+
+						}
 					}
 				}
-			}
 
-			d.Policy.Assets[0].Person.Mail = "yousef.hammar+" + oldCodeCompany + "@wopta.it"
-			d.Policy.Assets[0].Person.Phone = "+393334455667"
-			d.Policy.Assets[0].Person.IdentityDocuments = nil
+				d.Policy.Assets[assetIndex].Person.Mail = "yousef.hammar+" + oldCodeCompany + "@wopta.it"
+				d.Policy.Assets[assetIndex].Person.Phone = "+393334455667"
+				d.Policy.Assets[assetIndex].Person.IdentityDocuments = nil
+			}
 
 			if d.Policy.Contractors != nil {
 				for contractorIndex, _ := range *d.Policy.Contractors {
@@ -138,13 +151,17 @@ func ImportPoliciesData() {
 				}
 			}
 
+			toBeWritten := make(map[string]map[string]interface{})
 			trMap := make(map[string]interface{})
 			for trIndex, tr := range d.Transactions {
+				d.Transactions[trIndex].BigQueryParse()
 				d.Transactions[trIndex].PayUrl = "www.wopta.it"
 				trMap[tr.Uid] = d.Transactions[trIndex]
 			}
 
-			toBeWritten[d.Policy.Uid] = map[string]map[string]interface{}{
+			d.Policy.BigQueryParse()
+
+			toBeWritten = map[string]map[string]interface{}{
 				lib.PolicyCollection: {
 					d.Policy.Uid: d.Policy,
 				},
@@ -159,15 +176,19 @@ func ImportPoliciesData() {
 
 			err = lib.InsertRowsBigQuery(lib.WoptaDataset, lib.PolicyCollection, d.Policy)
 			if err != nil {
-				log.Printf("error inserting rows %v", err)
+				log.Printf("error inserting policy rows %v", err)
 				return
 			}
 
 			err = lib.InsertRowsBigQuery(lib.WoptaDataset, lib.TransactionsCollection, d.Transactions)
 			if err != nil {
-				log.Printf("error inserting rows %v", err)
+				log.Printf("error inserting transactions rows %v", err)
 				return
 			}
 		}(d)
 	}
+
+	wg.Wait()
+
+	log.Println("Done...")
 }
