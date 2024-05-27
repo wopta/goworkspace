@@ -13,10 +13,8 @@ import (
 
 func Controller(policy models.Policy, product models.Product, transactions []models.Transaction, scheduleFirstRate bool, customerId string) (string, []models.Transaction, error) {
 	var (
-		err                error
-		payUrl             string
-		paymentMethods     []string
-		updatedTransaction []models.Transaction
+		err            error
+		paymentMethods []string
 	)
 
 	log.Printf("init")
@@ -35,26 +33,33 @@ func Controller(policy models.Policy, product models.Product, transactions []mod
 
 	switch policy.Payment {
 	case models.FabrickPaymentProvider:
-		payUrl, updatedTransaction, err = fabrickIntegration(transactions, paymentMethods, policy, scheduleFirstRate, customerId)
+		return fabrickIntegration(transactions, paymentMethods, policy, scheduleFirstRate, customerId)
 	case models.ManualPaymentProvider:
-		payUrl, updatedTransaction, err = remittanceIntegration(transactions)
+		return remittanceIntegration(transactions)
 	default:
 		return "", nil, fmt.Errorf("payment provider %s not supported", policy.Payment)
 	}
-
-	return payUrl, updatedTransaction, nil
 }
 
 func fabrickIntegration(transactions []models.Transaction, paymentMethods []string, policy models.Policy, scheduleFirstRate bool, customerId string) (payUrl string, updatedTransactions []models.Transaction, err error) {
+	var shouldCreateMandate bool
+
 	if customerId == "" {
 		customerId = uuid.New().String()
+		shouldCreateMandate = true
+	} else {
+		found, err := fabrickHasMandate(customerId)
+		if err != nil {
+			log.Printf("error checking mandate: %s", err.Error())
+		}
+		shouldCreateMandate = !found
 	}
 
 	now := time.Now().UTC()
 
 	for index, tr := range transactions {
-		isFirstRate := index == 0
-		createMandate := (policy.PaymentMode == models.PaymentModeRecurrent) && isFirstRate
+		isFirstRate := policy.StartDate.Truncate(time.Hour * 24).Equal(tr.EffectiveDate.Truncate(time.Hour * 24))
+		createMandate := (policy.PaymentMode == models.PaymentModeRecurrent) && (isFirstRate || shouldCreateMandate)
 
 		tr.ProviderName = models.FabrickPaymentProvider
 
@@ -75,7 +80,7 @@ func fabrickIntegration(transactions []models.Transaction, paymentMethods []stri
 		if res.Payload == nil || res.Payload.PaymentPageURL == nil {
 			return "", nil, errors.New("error creating transaction on Fabrick")
 		}
-		if isFirstRate {
+		if isFirstRate || createMandate {
 			payUrl = *res.Payload.PaymentPageURL
 		}
 		log.Printf("transaction %02d payUrl: %s", index+1, *res.Payload.PaymentPageURL)

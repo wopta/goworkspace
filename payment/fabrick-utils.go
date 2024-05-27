@@ -286,3 +286,75 @@ func fabrickExpireBill(providerId string) error {
 
 	return nil
 }
+
+func fabrickHasMandate(userToken string) (bool, error) {
+	var response fabrickPaymentInstrumentRes
+	var found bool
+
+	url := fmt.Sprintf("%s/api/fabrick/pace/v4.0/mods/back/v1.0/payment-instruments?merchantId=%s&subjectXId=%s&status=ACTIVE", os.Getenv("FABRICK_BASEURL"),
+		os.Getenv("FABRICK_MERCHANT_ID"), userToken)
+
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return false, err
+	}
+
+	if os.Getenv("env") == "local" || os.Getenv("env") == "local-test" {
+		payload := make([]paymentInstrument, 0)
+		payload = append(payload, paymentInstrument{
+			Status: "ACTIVE",
+		})
+		response = fabrickPaymentInstrumentRes{
+			Status:  "200",
+			Errors:  nil,
+			Payload: payload,
+		}
+	} else {
+		res, err := getFabrickClient("", req)
+		if err != nil {
+			log.Printf("error getting response: %s", err.Error())
+			return false, err
+		}
+
+		if res.StatusCode != http.StatusOK {
+			log.Printf("error status %s", res.Status)
+			return false, fmt.Errorf("error status %s", res.Status)
+		}
+
+		err = json.NewDecoder(res.Body).Decode(&response)
+		defer res.Body.Close()
+		if err != nil {
+			log.Printf("response error: %s", err.Error())
+			return false, err
+		}
+		log.Printf("response: %+v", response)
+	}
+
+	for _, p := range response.Payload {
+		if p.Status == "ACTIVE" {
+			found = true
+			break
+		}
+	}
+
+	return found, nil
+}
+
+type fabrickPaymentInstrumentRes struct {
+	Status  string              `json:"status"`
+	Errors  []any               `json:"errors"`
+	Payload []paymentInstrument `json:"payload"`
+}
+
+type paymentInstrument struct {
+	Type              string    `json:"type"`
+	CreationDate      time.Time `json:"creationDate"`
+	ExpiryDate        string    `json:"expiryDate"`
+	Status            string    `json:"status"`
+	Alias             string    `json:"alias"`
+	MakeDefault       bool      `json:"makeDefault"`
+	SubjectId         string    `json:"subjectId"`
+	SubjectXId        string    `json:"subjectXId"`
+	MatchedDossierXId []any     `json:"matchedDossierXId"`
+	Xid               string    `json:"xid"`
+}
