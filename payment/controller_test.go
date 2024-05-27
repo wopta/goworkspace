@@ -1,6 +1,7 @@
 package payment
 
 import (
+	"fmt"
 	"os"
 	"testing"
 	"time"
@@ -87,7 +88,7 @@ func getTransactions(numTransactions int, providerName string, annuity int, star
 			Name:           "Test Test",
 			ScheduleDate:   startDate.AddDate(0, i, 0).Format(time.DateOnly),
 			ExpirationDate: startDate.AddDate(10, i, 0).Format(time.DateOnly),
-			Uid:            "local",
+			Uid:            fmt.Sprintf("local-%02d", i),
 			PolicyUid:      "fjn32onw",
 			Company:        "local",
 			NumberCompany:  "11111",
@@ -148,8 +149,8 @@ func TestControllerFabrickYearlySingle(t *testing.T) {
 		t.Fatalf("expected: non-empty payUrl got: %s", payUrl)
 	}
 
-	if payUrl != "www.dev.wopta.it" {
-		t.Fatalf("expected: www.dev.wopta.it, got: %s", payUrl)
+	if payUrl != "www.dev.wopta.it/local-00" {
+		t.Fatalf("expected: www.dev.wopta.it/local-00, got: %s", payUrl)
 	}
 
 	for index, tr := range updatedTransactions {
@@ -191,8 +192,8 @@ func TestControllerFabrickYearlyRecurrent(t *testing.T) {
 		t.Fatalf("expected: non-empty payUrl got: %s", payUrl)
 	}
 
-	if payUrl != "www.dev.wopta.it" {
-		t.Fatalf("expected: www.dev.wopta.it, got: %s", payUrl)
+	if payUrl != "www.dev.wopta.it/local-00" {
+		t.Fatalf("expected: www.dev.wopta.it/local-00, got: %s", payUrl)
 	}
 
 	for index, tr := range updatedTransactions {
@@ -234,8 +235,8 @@ func TestControllerFabrickMonthly(t *testing.T) {
 		t.Fatalf("expected: non-empty payUrl got: %s", payUrl)
 	}
 
-	if payUrl != "www.dev.wopta.it" {
-		t.Fatalf("expected: www.dev.wopta.it, got: %s", payUrl)
+	if payUrl != "www.dev.wopta.it/local-00" {
+		t.Fatalf("expected: www.dev.wopta.it/local-00, got: %s", payUrl)
 	}
 
 	for index, tr := range updatedTransactions {
@@ -352,7 +353,7 @@ func TestControllerRenewMonthly(t *testing.T) {
 
 	policy := getPolicy(models.FabrickPaymentProvider, models.PaymentModeRecurrent, string(models.PaySplitMonthly), 1)
 	product := getProduct()
-	transactions := getTransactions(1, models.FabrickPaymentProvider, 1, globalDate.AddDate(1, 0, 0))
+	transactions := getTransactions(12, models.FabrickPaymentProvider, 1, globalDate.AddDate(1, 0, 0))
 
 	payUrl, updatedTransactions, err := Controller(policy, product, transactions, false, "")
 	if err != nil {
@@ -362,7 +363,7 @@ func TestControllerRenewMonthly(t *testing.T) {
 		t.Fatalf("isPay error - expected: false got: %v", updatedTransactions[0].IsPay)
 	}
 	if updatedTransactions[0].PayUrl != payUrl {
-		t.Fatalf("payUrl error - expected: \"\" got: %s", updatedTransactions[0].PayUrl)
+		t.Fatalf("payUrl error - expected: %s  got: %s", updatedTransactions[0].PayUrl, payUrl)
 	}
 }
 
@@ -373,7 +374,7 @@ func TestControllerRenewMonthlyWithExistingMandate(t *testing.T) {
 	product := getProduct()
 	transactions := getTransactions(1, models.FabrickPaymentProvider, 1, globalDate.AddDate(1, 0, 0))
 
-	payUrl, updatedTransactions, err := Controller(policy, product, transactions, true, "an-user-token")
+	payUrl, updatedTransactions, err := Controller(policy, product, transactions, true, "user-has-token")
 	if err != nil {
 		t.Fatalf("expected: nil error got: %s", err.Error())
 	}
@@ -382,5 +383,24 @@ func TestControllerRenewMonthlyWithExistingMandate(t *testing.T) {
 	}
 	if payUrl != "" {
 		t.Fatalf("payUrl error - expected: \"\" got: %s", payUrl)
+	}
+}
+
+func TestControllerRecreatePayLink(t *testing.T) {
+	os.Setenv("env", "local-test")
+
+	policy := getPolicy(models.FabrickPaymentProvider, models.PaymentModeRecurrent, string(models.PaySplitMonthly), 0)
+	product := getProduct()
+	transactions := getTransactions(12, models.FabrickPaymentProvider, 0, time.Time{})
+
+	payUrl, updatedTransactions, err := Controller(policy, product, transactions[5:], false, "")
+	if err != nil {
+		t.Fatalf("expected: nil error got: %s", err.Error())
+	}
+	if payUrl != "www.dev.wopta.it/local-05" {
+		t.Fatalf("wrong payUrl - expected: www.dev.wopta.it/local-05, got: %s", payUrl)
+	}
+	if updatedTransactions[0].ScheduleDate != globalDate.AddDate(0, 5, 0).Format(time.DateOnly) {
+		t.Fatalf("wrong schedule date - expected: %s - got: %s", globalDate.AddDate(0, 5, 0).Format(time.DateOnly), updatedTransactions[0].ScheduleDate)
 	}
 }

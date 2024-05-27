@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
+	"github.com/wopta/goworkspace/callback/payment"
 	"github.com/wopta/goworkspace/lib"
 )
 
@@ -18,6 +19,18 @@ var callbackRoutes []lib.Route = []lib.Route{
 	{
 		Route:   "/v1/payment",
 		Handler: lib.ResponseLoggerWrapper(PaymentFx),
+		Method:  http.MethodPost,
+		Roles:   []string{},
+	},
+	{
+		Route:   "/v1/payment/fabrick/first-rate",
+		Handler: lib.ResponseLoggerWrapper(payment.AnnuityFirstRateFx),
+		Method:  http.MethodPost,
+		Roles:   []string{},
+	},
+	{
+		Route:   "/v1/payment/fabrick/single-rate",
+		Handler: lib.ResponseLoggerWrapper(payment.AnnuitySingleRateFx),
 		Method:  http.MethodPost,
 		Roles:   []string{},
 	},

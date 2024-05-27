@@ -42,24 +42,22 @@ func Controller(policy models.Policy, product models.Product, transactions []mod
 }
 
 func fabrickIntegration(transactions []models.Transaction, paymentMethods []string, policy models.Policy, scheduleFirstRate bool, customerId string) (payUrl string, updatedTransactions []models.Transaction, err error) {
-	var shouldCreateMandate bool
+	hasMandate := false
+	now := time.Now().UTC()
+
+	if hasMandate, err = fabrickHasMandate(customerId); err != nil {
+		log.Printf("error checking mandate: %s", err.Error())
+	}
 
 	if customerId == "" {
 		customerId = uuid.New().String()
-		shouldCreateMandate = true
-	} else {
-		found, err := fabrickHasMandate(customerId)
-		if err != nil {
-			log.Printf("error checking mandate: %s", err.Error())
-		}
-		shouldCreateMandate = !found
 	}
 
-	now := time.Now().UTC()
-
 	for index, tr := range transactions {
-		isFirstRate := policy.StartDate.Truncate(time.Hour * 24).Equal(tr.EffectiveDate.Truncate(time.Hour * 24))
-		createMandate := (policy.PaymentMode == models.PaymentModeRecurrent) && (isFirstRate || shouldCreateMandate)
+		isFirstOfBatch := index == 0
+		isFirstRateOfAnnuity := policy.StartDate.Month() == tr.EffectiveDate.Month()
+
+		createMandate := shouldCreateMandate(policy, tr, isFirstOfBatch, isFirstRateOfAnnuity, hasMandate)
 
 		tr.ProviderName = models.FabrickPaymentProvider
 
@@ -76,11 +74,11 @@ func fabrickIntegration(transactions []models.Transaction, paymentMethods []stri
 			tr.ScheduleDate = now.AddDate(0, 0, 1).Format(time.DateOnly)
 		}
 
-		res := <-createFabrickTransaction(&policy, tr, createMandate, scheduleFirstRate, customerId, paymentMethods)
+		res := <-createFabrickTransaction(&policy, tr, createMandate, scheduleFirstRate, isFirstRateOfAnnuity, customerId, paymentMethods)
 		if res.Payload == nil || res.Payload.PaymentPageURL == nil {
 			return "", nil, errors.New("error creating transaction on Fabrick")
 		}
-		if isFirstRate || createMandate {
+		if isFirstOfBatch && (!hasMandate || createMandate) {
 			payUrl = *res.Payload.PaymentPageURL
 		}
 		log.Printf("transaction %02d payUrl: %s", index+1, *res.Payload.PaymentPageURL)
@@ -152,4 +150,11 @@ func checkPaymentModes(policy models.Policy) error {
 	}
 
 	return nil
+}
+
+func shouldCreateMandate(p models.Policy, tr models.Transaction, isFirstTransaction, isFirstRateOfAnnuity, hasMandate bool) bool {
+	isFirstRateOfPolicy := p.StartDate.Truncate(time.Hour * 24).Equal(tr.EffectiveDate.Truncate(time.Hour * 24))
+
+	return p.PaymentMode == models.PaymentModeRecurrent && isFirstTransaction &&
+		(isFirstRateOfPolicy || (isFirstRateOfAnnuity && !hasMandate))
 }

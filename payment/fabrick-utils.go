@@ -40,13 +40,15 @@ func getFabrickClient(urlstring string, req *http.Request) (*http.Response, erro
 
 func getFabrickRequestBody(
 	policy *models.Policy,
-	createMandate, scheduleFirstRate bool,
+	createMandate, scheduleFirstRate, isFirstRate bool,
 	scheduleDate, expireDate, customerId string,
 	amount float64,
 	origin string,
 	paymentMethods []string,
 ) string {
 	var (
+		callbackFormat      string    = "https://europe-west1-%s.cloudfunctions.net/callback/v1/payment/fabrick/%s?uid=%s&schedule=%s&token=%s&origin=%s"
+		callbackEndpoint    string    = "single-rate"
 		mandate             string    = "false"
 		now                 time.Time = time.Now().UTC()
 		requestScheduleDate string    = scheduleDate
@@ -67,6 +69,10 @@ func getFabrickRequestBody(
 		requestScheduleDate = now.Format(models.TimeDateOnly)
 	}
 
+	if isFirstRate {
+		callbackEndpoint = "first-rate"
+	}
+
 	externalId := strings.Join([]string{
 		policy.Uid,
 		requestScheduleDate,
@@ -76,8 +82,9 @@ func getFabrickRequestBody(
 	}, "_")
 
 	callbackUrl := fmt.Sprintf(
-		"https://europe-west1-%s.cloudfunctions.net/callback/v1/payment?uid=%s&schedule=%s&token=%s&origin=%s",
+		callbackFormat,
 		os.Getenv("GOOGLE_PROJECT_ID"),
+		callbackEndpoint,
 		policy.Uid,
 		requestScheduleDate,
 		os.Getenv("WOPTA_TOKEN_API"),
@@ -176,7 +183,7 @@ func getFabrickPaymentRequest(body string) *http.Request {
 func createFabrickTransaction(
 	policy *models.Policy,
 	transaction models.Transaction,
-	createMandate, scheduleFirstRate bool,
+	createMandate, scheduleFirstRate, isFirstRate bool,
 	customerId string,
 	paymentMethods []string,
 ) <-chan FabrickPaymentResponse {
@@ -185,7 +192,7 @@ func createFabrickTransaction(
 	go func() {
 		defer close(r)
 
-		body := getFabrickRequestBody(policy, createMandate, scheduleFirstRate, transaction.ScheduleDate, transaction.ExpirationDate,
+		body := getFabrickRequestBody(policy, createMandate, scheduleFirstRate, isFirstRate, transaction.ScheduleDate, transaction.ExpirationDate,
 			customerId, transaction.Amount, "", paymentMethods)
 		if body == "" {
 			return
@@ -201,7 +208,7 @@ func createFabrickTransaction(
 		if os.Getenv("env") == "local" || os.Getenv("env") == "local-test" {
 			status := "200"
 			local := "local"
-			url := "www.dev.wopta.it"
+			url := fmt.Sprintf("www.dev.wopta.it/%s", transaction.Uid)
 			r <- FabrickPaymentResponse{
 				Status: &status,
 				Errors: nil,
@@ -288,11 +295,16 @@ func fabrickExpireBill(providerId string) error {
 }
 
 func fabrickHasMandate(userToken string) (bool, error) {
-	var response fabrickPaymentInstrumentRes
-	var found bool
+	if userToken == "" {
+		return false, nil
+	}
 
-	url := fmt.Sprintf("%s/api/fabrick/pace/v4.0/mods/back/v1.0/payment-instruments?merchantId=%s&subjectXId=%s&status=ACTIVE", os.Getenv("FABRICK_BASEURL"),
-		os.Getenv("FABRICK_MERCHANT_ID"), userToken)
+	var (
+		urlFormat string = "%s/api/fabrick/pace/v4.0/mods/back/v1.0/payment-instruments?merchantId=%s&subjectXId=%s&status=ACTIVE"
+		response  fabrickPaymentInstrumentRes
+		found     bool
+		url       string = fmt.Sprintf(urlFormat, os.Getenv("FABRICK_BASEURL"), os.Getenv("FABRICK_MERCHANT_ID"), userToken)
+	)
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
@@ -300,9 +312,13 @@ func fabrickHasMandate(userToken string) (bool, error) {
 	}
 
 	if os.Getenv("env") == "local" || os.Getenv("env") == "local-test" {
+		st := "INACTIVE"
+		if userToken == "user-has-token" {
+			st = "ACTIVE"
+		}
 		payload := make([]paymentInstrument, 0)
 		payload = append(payload, paymentInstrument{
-			Status: "ACTIVE",
+			Status: st,
 		})
 		response = fabrickPaymentInstrumentRes{
 			Status:  "200",
