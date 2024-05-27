@@ -52,7 +52,7 @@ func AnnuityFirstRateFx(_ http.ResponseWriter, r *http.Request) (string, any, er
 	response.RequestPayload = strPayload
 
 	if request.PaymentID == "" {
-		log.Printf("error no providerId found: %s", err.Error())
+		log.Println(ErrProviderIdNotSet)
 		return "", nil, ErrProviderIdNotSet
 	}
 	providerId = request.PaymentID
