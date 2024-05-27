@@ -70,7 +70,7 @@ func ChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, in
 
 	policy.Payment = req.ProviderName
 
-	activeTransactions := transaction.GetPolicyActiveTransactions("", policy.Uid)
+	activeTransactions := transaction.GetPolicyValidTransactions(policy.Uid, nil)
 	for _, tr := range activeTransactions {
 		if tr.IsPay {
 			responseTransactions = append(responseTransactions, tr)

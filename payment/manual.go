@@ -81,7 +81,7 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		return "", nil, fmt.Errorf(errTransactionDeleted)
 	}
 
-	firePolicyTransactions := trn.GetPolicyActiveTransactions(origin, transaction.PolicyUid)
+	firePolicyTransactions := trn.GetPolicyValidTransactions(transaction.PolicyUid, nil)
 	log.Printf("Found transactions %v", firePolicyTransactions)
 	canPayTransaction := false
 
