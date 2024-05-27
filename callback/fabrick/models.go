@@ -1,4 +1,4 @@
-package payment
+package fabrick
 
 import (
 	"encoding/json"
