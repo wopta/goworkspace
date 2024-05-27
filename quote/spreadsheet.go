@@ -76,7 +76,8 @@ func (qs *QuoteSpreadsheet) Spreadsheets() {
 	}).Do()
 	fmt.Printf("f.Id: %v\n", e)
 	fmt.Printf("f.Id: %v\n", f.Id)
-	sheet, e := sheetClient.Spreadsheets.Values.Get(f.Id, "A:J").Do()
+	sheet, e := sheetClient.Spreadsheets.Values.Get(qs.Id, "A:J").Do()
+	fmt.Printf("file: %v\n", sheet.Values[99][3])
 	lib.CheckError(e)
 	fmt.Printf("file: %v\n", sheet.Values)
 	sheet.Values[40][2] = "10000000"

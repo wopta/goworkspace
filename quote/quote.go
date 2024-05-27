@@ -41,7 +41,7 @@ var quoteRoutes []lib.Route = []lib.Route{
 	},
 	{
 		Route:   "/v1/excel",
-		Handler: lib.ResponseLoggerWrapper(ExcelFx),
+		Handler: lib.ResponseLoggerWrapper(SpreadsheetsFx),
 		Method:  http.MethodPost,
 		Roles:   []string{},
 	},
