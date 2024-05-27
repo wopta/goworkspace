@@ -3,12 +3,12 @@ package transaction
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/go-chi/chi/v5"
 	"log"
 	"net/http"
 	"sort"
 	"time"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
@@ -145,4 +145,43 @@ func (t Transactions) Less(i, j int) bool {
 	secondDate, _ := time.Parse(models.TimeDateOnly, t[j].ScheduleDate)
 
 	return firstDate.Before(secondDate)
+}
+
+func GetPolicyValidTransactions(policyUid string, isPaid *bool) []models.Transaction {
+	var transactions Transactions
+
+	q := lib.Firequeries{
+		Queries: []lib.Firequery{
+			{
+				Field:      "policyUid",
+				Operator:   "==",
+				QueryValue: policyUid,
+			},
+			{
+				Field:      "isDelete",
+				Operator:   "==",
+				QueryValue: false,
+			},
+		},
+	}
+
+	if isPaid != nil {
+		q.Queries = append(q.Queries, lib.Firequery{
+			Field:      "isPay",
+			Operator:   "==",
+			QueryValue: *isPaid,
+		})
+	}
+
+	docsnap, err := q.FirestoreWherefields(models.TransactionsCollection)
+	if err != nil {
+		log.Printf("[GetPolicyValidTransactions] query error: %s", err.Error())
+		return transactions
+	}
+
+	transactions = models.TransactionToListData(docsnap)
+
+	sort.Sort(transactions)
+
+	return transactions
 }

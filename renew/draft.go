@@ -231,9 +231,11 @@ func getPolicies(policyUid, policyType, quoteType string, products map[string]mo
 
 func draft(policy models.Policy, product models.Product, ch chan<- RenewReport, wg *sync.WaitGroup, save func(models.Policy, []models.Transaction) error) {
 	var (
-		err          error
-		r            RenewReport
-		transactions []models.Transaction
+		err               error
+		r                 RenewReport
+		transactions      []models.Transaction
+		isTransactionPaid bool = true
+		customerId        string
 	)
 
 	defer func() {
@@ -261,8 +263,12 @@ func draft(policy models.Policy, product models.Product, ch chan<- RenewReport, 
 		return lib.NewDoc(models.TransactionsCollection)
 	})
 
-	// TODO: value of scheduleFirstRate depends on if customer has an active "mandato"
-	payUrl, transactions, err := payment.Controller(policy, product, transactions, false, "")
+	if policy.Payment == models.FabrickPaymentProvider {
+		trs := transaction.GetPolicyValidTransactions(policy.Uid, &isTransactionPaid)
+		customerId = trs[len(trs)-1].UserToken
+	}
+
+	payUrl, transactions, err := payment.Controller(policy, product, transactions, customerId != "", customerId)
 	if err != nil {
 		return
 	}
