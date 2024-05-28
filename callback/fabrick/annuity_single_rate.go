@@ -91,7 +91,7 @@ func annuitySingleRate(policyUid, providerId, trSchedule, paymentMethod string) 
 
 	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
 
-	if transaction, err = payTransaction(policyUid, providerId, trSchedule, paymentMethod, networkNode); err != nil {
+	if transaction, err = payTransaction(policy, providerId, trSchedule, paymentMethod, networkNode); err != nil {
 		return err
 	}
 

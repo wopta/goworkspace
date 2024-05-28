@@ -98,7 +98,7 @@ func annuityFirstRate(policyUid, providerId, trSchedule, paymentMethod string) e
 		warrant = networkNode.GetWarrant()
 	}
 
-	if transaction, err = payTransaction(policyUid, providerId, trSchedule, paymentMethod, networkNode); err != nil {
+	if transaction, err = payTransaction(policy, providerId, trSchedule, paymentMethod, networkNode); err != nil {
 		return err
 	}
 
