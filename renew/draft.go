@@ -273,7 +273,9 @@ func draft(policy models.Policy, product models.Product, ch chan<- RenewReport, 
 		return
 	}
 
-	policy.PayUrl = payUrl
+	if payUrl != "" {
+		policy.PayUrl = payUrl
+	}
 	policy.Updated = time.Now().UTC()
 	policy.IsRenew = true
 
