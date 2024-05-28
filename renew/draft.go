@@ -231,11 +231,10 @@ func getPolicies(policyUid, policyType, quoteType string, products map[string]mo
 
 func draft(policy models.Policy, product models.Product, ch chan<- RenewReport, wg *sync.WaitGroup, save func(models.Policy, []models.Transaction) error) {
 	var (
-		err               error
-		r                 RenewReport
-		transactions      []models.Transaction
-		isTransactionPaid bool = true
-		customerId        string
+		err          error
+		r            RenewReport
+		transactions []models.Transaction
+		customerId   string
 	)
 
 	defer func() {
@@ -264,6 +263,7 @@ func draft(policy models.Policy, product models.Product, ch chan<- RenewReport, 
 	})
 
 	if policy.Payment == models.FabrickPaymentProvider {
+		var isTransactionPaid bool = true
 		trs := transaction.GetPolicyValidTransactions(policy.Uid, &isTransactionPaid)
 		customerId = trs[len(trs)-1].UserToken
 	}
