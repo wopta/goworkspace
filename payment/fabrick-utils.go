@@ -47,7 +47,7 @@ func getFabrickRequestBody(
 	paymentMethods []string,
 ) string {
 	var (
-		callbackFormat      string    = "https://europe-west1-%s.cloudfunctions.net/callback/v1/payment/fabrick/%s?uid=%s&schedule=%s&token=%s&origin=%s"
+		callbackFormat      string    = "%scallback/v1/payment/fabrick/%s?uid=%s&schedule=%s&token=%s&origin=%s"
 		callbackEndpoint    string    = "single-rate"
 		mandate             string    = "false"
 		now                 time.Time = time.Now().UTC()
@@ -83,7 +83,7 @@ func getFabrickRequestBody(
 
 	callbackUrl := fmt.Sprintf(
 		callbackFormat,
-		os.Getenv("GOOGLE_PROJECT_ID"),
+		os.Getenv("WOPTA_BASE_URL"),
 		callbackEndpoint,
 		policy.Uid,
 		requestScheduleDate,
