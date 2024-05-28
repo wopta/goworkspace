@@ -49,6 +49,16 @@ func fabrickIntegration(transactions []models.Transaction, paymentMethods []stri
 		log.Printf("error checking mandate: %s", err.Error())
 	}
 
+	// TODO: this might change in the future. It works as following:
+	// - if no customerId is previously provided, scheduleFirstRate will have the
+	// inputed value as the true value
+	// - if there is a provided customerId, scheduleFirstRate will follow the fact
+	// that the user has or not an active mandate
+	// - currently the second case is used only in renew.
+	if customerId != "" {
+		scheduleFirstRate = hasMandate
+	}
+
 	if customerId == "" {
 		customerId = uuid.New().String()
 	}
