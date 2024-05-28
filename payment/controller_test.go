@@ -169,6 +169,10 @@ func TestControllerFabrickYearlySingle(t *testing.T) {
 		if tr.UserToken == "" {
 			t.Fatalf("expected: non-empty UserToken")
 		}
+
+		if tr.ProviderName != policy.Payment {
+			t.Fatalf("expected providers to match, got transaction: '%s' and policy: '%s'", tr.ProviderName, policy.Payment)
+		}
 	}
 }
 
@@ -212,6 +216,10 @@ func TestControllerFabrickYearlyRecurrent(t *testing.T) {
 		if tr.UserToken == "" {
 			t.Fatalf("expected: non-empty UserToken")
 		}
+
+		if tr.ProviderName != policy.Payment {
+			t.Fatalf("expected providers to match, got transaction: '%s' and policy: '%s'", tr.ProviderName, policy.Payment)
+		}
 	}
 }
 
@@ -254,6 +262,10 @@ func TestControllerFabrickMonthly(t *testing.T) {
 
 		if tr.UserToken == "" {
 			t.Fatalf("expected: non-empty UserToken")
+		}
+
+		if tr.ProviderName != policy.Payment {
+			t.Fatalf("expected providers to match, got transaction: '%s' and policy: '%s'", tr.ProviderName, policy.Payment)
 		}
 	}
 }
@@ -306,6 +318,9 @@ func TestControllerRemittance(t *testing.T) {
 			t.Fatalf("expected: %s UpdateDate got: %s", transactions[index].UpdateDate, tr.UpdateDate)
 		}
 
+		if tr.ProviderName != policy.Payment {
+			t.Fatalf("expected providers to match, got transaction: '%s' and policy: '%s'", tr.ProviderName, policy.Payment)
+		}
 	}
 }
 
@@ -321,12 +336,15 @@ func TestControllerReuseCustomerId(t *testing.T) {
 	if err != nil {
 		t.Fatalf("expected: nil error got: %s", err.Error())
 	}
-	for _, trn := range updatedTransactions {
-		if trn.UserToken != customerId {
-			t.Fatalf("mismatched customerID. Expected: %s - got: %s", customerId, trn.UserToken)
+	for _, tr := range updatedTransactions {
+		if tr.UserToken != customerId {
+			t.Fatalf("mismatched customerID. Expected: %s - got: %s", customerId, tr.UserToken)
+		}
+
+		if tr.ProviderName != policy.Payment {
+			t.Fatalf("expected providers to match, got transaction: '%s' and policy: '%s'", tr.ProviderName, policy.Payment)
 		}
 	}
-
 }
 
 func TestControllerRenewYearly(t *testing.T) {
@@ -345,6 +363,9 @@ func TestControllerRenewYearly(t *testing.T) {
 	}
 	if updatedTransactions[0].IsPay {
 		t.Fatalf("isPay error - expected: false got: %v", updatedTransactions[0].IsPay)
+	}
+	if updatedTransactions[0].ProviderName != policy.Payment {
+		t.Fatalf("expected providers to match, got transaction: '%s' and policy: '%s'", updatedTransactions[0].ProviderName, policy.Payment)
 	}
 }
 
@@ -365,6 +386,9 @@ func TestControllerRenewMonthly(t *testing.T) {
 	if updatedTransactions[0].PayUrl != payUrl {
 		t.Fatalf("payUrl error - expected: %s  got: %s", updatedTransactions[0].PayUrl, payUrl)
 	}
+	if updatedTransactions[0].ProviderName != policy.Payment {
+		t.Fatalf("expected providers to match, got transaction: '%s' and policy: '%s'", updatedTransactions[0].ProviderName, policy.Payment)
+	}
 }
 
 func TestControllerRenewMonthlyWithExistingMandate(t *testing.T) {
@@ -384,6 +408,9 @@ func TestControllerRenewMonthlyWithExistingMandate(t *testing.T) {
 	if payUrl != "" {
 		t.Fatalf("payUrl error - expected: \"\" got: %s", payUrl)
 	}
+	if updatedTransactions[0].ProviderName != policy.Payment {
+		t.Fatalf("expected providers to match, got transaction: '%s' and policy: '%s'", updatedTransactions[0].ProviderName, policy.Payment)
+	}
 }
 
 func TestControllerRecreatePayLink(t *testing.T) {
@@ -402,5 +429,8 @@ func TestControllerRecreatePayLink(t *testing.T) {
 	}
 	if updatedTransactions[0].ScheduleDate != globalDate.AddDate(0, 5, 0).Format(time.DateOnly) {
 		t.Fatalf("wrong schedule date - expected: %s - got: %s", globalDate.AddDate(0, 5, 0).Format(time.DateOnly), updatedTransactions[0].ScheduleDate)
+	}
+	if updatedTransactions[0].ProviderName != policy.Payment {
+		t.Fatalf("expected providers to match, got transaction: '%s' and policy: '%s'", updatedTransactions[0].ProviderName, policy.Payment)
 	}
 }
