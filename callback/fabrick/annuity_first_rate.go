@@ -24,7 +24,7 @@ func AnnuityFirstRateFx(_ http.ResponseWriter, r *http.Request) (string, any, er
 	var (
 		err            error
 		requestPayload FabrickRequestPayload
-		request        *FabrickRequest
+		request        = new(FabrickRequest)
 		response       = FabrickResponse{Result: true, Locale: "it"}
 	)
 
