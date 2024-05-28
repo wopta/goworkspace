@@ -83,9 +83,10 @@ func (qs *QuoteSpreadsheet) Spreadsheets() {
 		Values: [][]interface{}{{"10000000"}},
 	}
 	_, e = sheetClient.Spreadsheets.Values.Update(qs.Id, "C41:C41", cel).ValueInputOption("USER_ENTERED").Context(ctx).Do()
-
+	lib.CheckError(e)
+	sheet, e = sheetClient.Spreadsheets.Values.Get(qs.Id, "A:J").Do()
 	fmt.Printf("file: %v\n", sheet.Values[99][3])
-
+	lib.CheckError(e)
 }
 
 type DriveService struct {
