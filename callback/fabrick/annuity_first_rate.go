@@ -29,7 +29,10 @@ func AnnuityFirstRateFx(_ http.ResponseWriter, r *http.Request) (string, any, er
 	)
 
 	log.SetPrefix("[AnnuityFirstRateFx] ")
-	defer log.SetPrefix("")
+	defer func() {
+		log.Println("Handler end ---------------------------------------------")
+		log.SetPrefix("")
+	}()
 
 	log.Println("Handler start -----------------------------------------------")
 
