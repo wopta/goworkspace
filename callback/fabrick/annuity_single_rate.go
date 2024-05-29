@@ -10,6 +10,8 @@ import (
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 	plc "github.com/wopta/goworkspace/policy"
+	prd "github.com/wopta/goworkspace/product"
+	tr "github.com/wopta/goworkspace/transaction"
 )
 
 /*
@@ -84,6 +86,7 @@ func annuitySingleRate(policyUid, providerId, trSchedule, paymentMethod string) 
 		policy      models.Policy
 		transaction models.Transaction
 		networkNode *models.NetworkNode
+		mgaProduct  *models.Product
 		err         error
 	)
 
@@ -108,5 +111,7 @@ func annuitySingleRate(policyUid, providerId, trSchedule, paymentMethod string) 
 	}
 	transaction.BigQuerySave("")
 
-	return nil
+	mgaProduct = prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
+
+	return tr.CreateNetworkTransactions(&policy, &transaction, networkNode, mgaProduct)
 }
