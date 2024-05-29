@@ -40,13 +40,15 @@ func getFabrickClient(urlstring string, req *http.Request) (*http.Response, erro
 
 func getFabrickRequestBody(
 	policy *models.Policy,
-	createMandate, scheduleFirstRate bool,
+	createMandate, scheduleFirstRate, isFirstRate bool,
 	scheduleDate, expireDate, customerId string,
 	amount float64,
 	origin string,
 	paymentMethods []string,
 ) string {
 	var (
+		callbackFormat      string    = os.Getenv("WOPTA_BASEURL") + "callback/v1/payment/fabrick/%s?uid=%s&schedule=%s&token=%s&origin=%s"
+		callbackEndpoint    string    = "single-rate"
 		mandate             string    = "false"
 		now                 time.Time = time.Now().UTC()
 		requestScheduleDate string    = scheduleDate
@@ -67,6 +69,10 @@ func getFabrickRequestBody(
 		requestScheduleDate = now.Format(models.TimeDateOnly)
 	}
 
+	if isFirstRate {
+		callbackEndpoint = "first-rate"
+	}
+
 	externalId := strings.Join([]string{
 		policy.Uid,
 		requestScheduleDate,
@@ -76,8 +82,8 @@ func getFabrickRequestBody(
 	}, "_")
 
 	callbackUrl := fmt.Sprintf(
-		"https://europe-west1-%s.cloudfunctions.net/callback/v1/payment?uid=%s&schedule=%s&token=%s&origin=%s",
-		os.Getenv("GOOGLE_PROJECT_ID"),
+		callbackFormat,
+		callbackEndpoint,
 		policy.Uid,
 		requestScheduleDate,
 		os.Getenv("WOPTA_TOKEN_API"),
@@ -176,7 +182,7 @@ func getFabrickPaymentRequest(body string) *http.Request {
 func createFabrickTransaction(
 	policy *models.Policy,
 	transaction models.Transaction,
-	createMandate, scheduleFirstRate bool,
+	createMandate, scheduleFirstRate, isFirstRate bool,
 	customerId string,
 	paymentMethods []string,
 ) <-chan FabrickPaymentResponse {
@@ -185,7 +191,7 @@ func createFabrickTransaction(
 	go func() {
 		defer close(r)
 
-		body := getFabrickRequestBody(policy, createMandate, scheduleFirstRate, transaction.ScheduleDate, transaction.ExpirationDate,
+		body := getFabrickRequestBody(policy, createMandate, scheduleFirstRate, isFirstRate, transaction.ScheduleDate, transaction.ExpirationDate,
 			customerId, transaction.Amount, "", paymentMethods)
 		if body == "" {
 			return
@@ -201,7 +207,7 @@ func createFabrickTransaction(
 		if os.Getenv("env") == "local" || os.Getenv("env") == "local-test" {
 			status := "200"
 			local := "local"
-			url := "www.dev.wopta.it"
+			url := fmt.Sprintf("www.dev.wopta.it/%s", transaction.Uid)
 			r <- FabrickPaymentResponse{
 				Status: &status,
 				Errors: nil,
@@ -285,4 +291,85 @@ func fabrickExpireBill(providerId string) error {
 	log.Println("fabrick expire bill completed!")
 
 	return nil
+}
+
+func fabrickHasMandate(userToken string) (bool, error) {
+	if userToken == "" {
+		return false, nil
+	}
+
+	var (
+		urlFormat string = "%s/api/fabrick/pace/v4.0/mods/back/v1.0/payment-instruments?merchantId=%s&subjectXId=%s&status=ACTIVE"
+		response  fabrickPaymentInstrumentRes
+		found     bool
+		url       string = fmt.Sprintf(urlFormat, os.Getenv("FABRICK_BASEURL"), os.Getenv("FABRICK_MERCHANT_ID"), userToken)
+	)
+
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return false, err
+	}
+
+	if os.Getenv("env") == "local" || os.Getenv("env") == "local-test" {
+		st := "INACTIVE"
+		if userToken == "user-has-token" {
+			st = "ACTIVE"
+		}
+		payload := make([]paymentInstrument, 0)
+		payload = append(payload, paymentInstrument{
+			Status: st,
+		})
+		response = fabrickPaymentInstrumentRes{
+			Status:  "200",
+			Errors:  nil,
+			Payload: payload,
+		}
+	} else {
+		res, err := getFabrickClient("", req)
+		if err != nil {
+			log.Printf("error getting response: %s", err.Error())
+			return false, err
+		}
+
+		if res.StatusCode != http.StatusOK {
+			log.Printf("error status %s", res.Status)
+			return false, fmt.Errorf("error status %s", res.Status)
+		}
+
+		err = json.NewDecoder(res.Body).Decode(&response)
+		defer res.Body.Close()
+		if err != nil {
+			log.Printf("response error: %s", err.Error())
+			return false, err
+		}
+		log.Printf("response: %+v", response)
+	}
+
+	for _, p := range response.Payload {
+		if p.Status == "ACTIVE" {
+			found = true
+			break
+		}
+	}
+
+	return found, nil
+}
+
+type fabrickPaymentInstrumentRes struct {
+	Status  string              `json:"status"`
+	Errors  []any               `json:"errors"`
+	Payload []paymentInstrument `json:"payload"`
+}
+
+type paymentInstrument struct {
+	Type              string    `json:"type"`
+	CreationDate      time.Time `json:"creationDate"`
+	ExpiryDate        string    `json:"expiryDate"`
+	Status            string    `json:"status"`
+	Alias             string    `json:"alias"`
+	MakeDefault       bool      `json:"makeDefault"`
+	SubjectId         string    `json:"subjectId"`
+	SubjectXId        string    `json:"subjectXId"`
+	MatchedDossierXId []any     `json:"matchedDossierXId"`
+	Xid               string    `json:"xid"`
 }

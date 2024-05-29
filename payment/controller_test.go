@@ -1,14 +1,18 @@
 package payment
 
 import (
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
+	"fmt"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 )
 
-func getPolicy(paymentProvider, paymentMode, paymentSplit string) models.Policy {
+var globalDate = time.Date(2023, 03, 14, 0, 0, 0, 0, time.UTC)
+
+func getPolicy(paymentProvider, paymentMode, paymentSplit string, annuity int) models.Policy {
 	return models.Policy{
 		Payment:           paymentProvider,
 		PaymentMode:       paymentMode,
@@ -17,6 +21,8 @@ func getPolicy(paymentProvider, paymentMode, paymentSplit string) models.Policy 
 		PriceNett:         89.2,
 		PriceGrossMonthly: 8.33,
 		PriceNettMonthly:  7.43,
+		Annuity:           annuity,
+		StartDate:         globalDate,
 	}
 }
 
@@ -59,9 +65,11 @@ func getProduct() models.Product {
 	}
 }
 
-func getTransactions(numTransactions int, providerName string) []models.Transaction {
+func getTransactions(numTransactions int, providerName string, annuity int, startDate time.Time) []models.Transaction {
 	transactions := make([]models.Transaction, 0)
-	startDate := time.Date(2023, 03, 14, 0, 0, 0, 0, time.UTC)
+	if startDate.IsZero() {
+		startDate = globalDate
+	}
 
 	if numTransactions == 0 {
 		return transactions
@@ -80,7 +88,7 @@ func getTransactions(numTransactions int, providerName string) []models.Transact
 			Name:           "Test Test",
 			ScheduleDate:   startDate.AddDate(0, i, 0).Format(time.DateOnly),
 			ExpirationDate: startDate.AddDate(10, i, 0).Format(time.DateOnly),
-			Uid:            "local",
+			Uid:            fmt.Sprintf("local-%02d", i),
 			PolicyUid:      "fjn32onw",
 			Company:        "local",
 			NumberCompany:  "11111",
@@ -89,6 +97,7 @@ func getTransactions(numTransactions int, providerName string) []models.Transact
 			EffectiveDate:  startDate.AddDate(0, i, 0),
 			CreationDate:   startDate,
 			UpdateDate:     startDate,
+			Annuity:        annuity,
 		})
 	}
 	return transactions
@@ -97,11 +106,11 @@ func getTransactions(numTransactions int, providerName string) []models.Transact
 func TestControllerInvalidNumTransactions(t *testing.T) {
 	os.Setenv("env", "local-test")
 
-	policy := getPolicy(models.FabrickPaymentProvider, models.PaymentModeRecurrent, string(models.PaySplitMonthly))
+	policy := getPolicy(models.FabrickPaymentProvider, models.PaymentModeRecurrent, string(models.PaySplitMonthly), 0)
 	product := getProduct()
-	transactions := getTransactions(0, models.FabrickPaymentProvider)
+	transactions := getTransactions(0, models.FabrickPaymentProvider, 0, time.Time{})
 
-	_, updatedTransactions, err := Controller(policy, product, transactions, false)
+	_, updatedTransactions, err := Controller(policy, product, transactions, false, "")
 	if err == nil {
 		t.Fatalf("expected: %02d transactions got: %02d", 0, len(updatedTransactions))
 	}
@@ -110,11 +119,11 @@ func TestControllerInvalidNumTransactions(t *testing.T) {
 func TestControllerInvalidPaymentConfiguration(t *testing.T) {
 	os.Setenv("env", "local-test")
 
-	policy := getPolicy(models.FabrickPaymentProvider, models.PaymentModeSingle, string(models.PaySplitMonthly))
+	policy := getPolicy(models.FabrickPaymentProvider, models.PaymentModeSingle, string(models.PaySplitMonthly), 0)
 	product := getProduct()
-	transactions := getTransactions(1, models.FabrickPaymentProvider)
+	transactions := getTransactions(1, models.FabrickPaymentProvider, 0, time.Time{})
 
-	_, _, err := Controller(policy, product, transactions, false)
+	_, _, err := Controller(policy, product, transactions, false, "")
 	if err == nil {
 		t.Fatalf("expected: non-nil error")
 	}
@@ -123,11 +132,11 @@ func TestControllerInvalidPaymentConfiguration(t *testing.T) {
 func TestControllerFabrickYearlySingle(t *testing.T) {
 	os.Setenv("env", "local-test")
 
-	policy := getPolicy(models.FabrickPaymentProvider, models.PaymentModeSingle, string(models.PaySplitYearly))
+	policy := getPolicy(models.FabrickPaymentProvider, models.PaymentModeSingle, string(models.PaySplitYearly), 0)
 	product := getProduct()
-	transactions := getTransactions(1, models.FabrickPaymentProvider)
+	transactions := getTransactions(1, models.FabrickPaymentProvider, 0, time.Time{})
 
-	payUrl, updatedTransactions, err := Controller(policy, product, transactions, false)
+	payUrl, updatedTransactions, err := Controller(policy, product, transactions, false, "")
 	if err != nil {
 		t.Fatalf("expected: nil error got: %s", err.Error())
 	}
@@ -140,8 +149,8 @@ func TestControllerFabrickYearlySingle(t *testing.T) {
 		t.Fatalf("expected: non-empty payUrl got: %s", payUrl)
 	}
 
-	if payUrl != "www.dev.wopta.it" {
-		t.Fatalf("expected: www.dev.wopta.it, got: %s", payUrl)
+	if payUrl != "www.dev.wopta.it/local-00" {
+		t.Fatalf("expected: www.dev.wopta.it/local-00, got: %s", payUrl)
 	}
 
 	for index, tr := range updatedTransactions {
@@ -159,6 +168,10 @@ func TestControllerFabrickYearlySingle(t *testing.T) {
 
 		if tr.UserToken == "" {
 			t.Fatalf("expected: non-empty UserToken")
+		}
+
+		if tr.ProviderName != policy.Payment {
+			t.Fatalf("expected providers to match, got transaction: '%s' and policy: '%s'", tr.ProviderName, policy.Payment)
 		}
 	}
 }
@@ -166,11 +179,11 @@ func TestControllerFabrickYearlySingle(t *testing.T) {
 func TestControllerFabrickYearlyRecurrent(t *testing.T) {
 	os.Setenv("env", "local-test")
 
-	policy := getPolicy(models.FabrickPaymentProvider, models.PaymentModeRecurrent, string(models.PaySplitYearly))
+	policy := getPolicy(models.FabrickPaymentProvider, models.PaymentModeRecurrent, string(models.PaySplitYearly), 0)
 	product := getProduct()
-	transactions := getTransactions(1, models.FabrickPaymentProvider)
+	transactions := getTransactions(1, models.FabrickPaymentProvider, 0, time.Time{})
 
-	payUrl, updatedTransactions, err := Controller(policy, product, transactions, false)
+	payUrl, updatedTransactions, err := Controller(policy, product, transactions, false, "")
 	if err != nil {
 		t.Fatalf("expected: nil error got: %s", err.Error())
 	}
@@ -183,8 +196,8 @@ func TestControllerFabrickYearlyRecurrent(t *testing.T) {
 		t.Fatalf("expected: non-empty payUrl got: %s", payUrl)
 	}
 
-	if payUrl != "www.dev.wopta.it" {
-		t.Fatalf("expected: www.dev.wopta.it, got: %s", payUrl)
+	if payUrl != "www.dev.wopta.it/local-00" {
+		t.Fatalf("expected: www.dev.wopta.it/local-00, got: %s", payUrl)
 	}
 
 	for index, tr := range updatedTransactions {
@@ -202,6 +215,10 @@ func TestControllerFabrickYearlyRecurrent(t *testing.T) {
 
 		if tr.UserToken == "" {
 			t.Fatalf("expected: non-empty UserToken")
+		}
+
+		if tr.ProviderName != policy.Payment {
+			t.Fatalf("expected providers to match, got transaction: '%s' and policy: '%s'", tr.ProviderName, policy.Payment)
 		}
 	}
 }
@@ -209,11 +226,11 @@ func TestControllerFabrickYearlyRecurrent(t *testing.T) {
 func TestControllerFabrickMonthly(t *testing.T) {
 	os.Setenv("env", "local-test")
 
-	policy := getPolicy(models.FabrickPaymentProvider, models.PaymentModeRecurrent, string(models.PaySplitMonthly))
+	policy := getPolicy(models.FabrickPaymentProvider, models.PaymentModeRecurrent, string(models.PaySplitMonthly), 0)
 	product := getProduct()
-	transactions := getTransactions(12, models.FabrickPaymentProvider)
+	transactions := getTransactions(12, models.FabrickPaymentProvider, 0, time.Time{})
 
-	payUrl, updatedTransactions, err := Controller(policy, product, transactions, false)
+	payUrl, updatedTransactions, err := Controller(policy, product, transactions, false, "")
 	if err != nil {
 		t.Fatalf("expected: nil error got: %s", err.Error())
 	}
@@ -226,8 +243,8 @@ func TestControllerFabrickMonthly(t *testing.T) {
 		t.Fatalf("expected: non-empty payUrl got: %s", payUrl)
 	}
 
-	if payUrl != "www.dev.wopta.it" {
-		t.Fatalf("expected: www.dev.wopta.it, got: %s", payUrl)
+	if payUrl != "www.dev.wopta.it/local-00" {
+		t.Fatalf("expected: www.dev.wopta.it/local-00, got: %s", payUrl)
 	}
 
 	for index, tr := range updatedTransactions {
@@ -246,17 +263,21 @@ func TestControllerFabrickMonthly(t *testing.T) {
 		if tr.UserToken == "" {
 			t.Fatalf("expected: non-empty UserToken")
 		}
+
+		if tr.ProviderName != policy.Payment {
+			t.Fatalf("expected providers to match, got transaction: '%s' and policy: '%s'", tr.ProviderName, policy.Payment)
+		}
 	}
 }
 
 func TestControllerRemittance(t *testing.T) {
 	os.Setenv("env", "local-test")
 
-	policy := getPolicy(models.ManualPaymentProvider, models.PaymentModeSingle, string(models.PaySplitYearly))
+	policy := getPolicy(models.ManualPaymentProvider, models.PaymentModeSingle, string(models.PaySplitYearly), 0)
 	product := getProduct()
-	transactions := getTransactions(1, models.FabrickPaymentProvider)
+	transactions := getTransactions(1, models.ManualPaymentProvider, 0, time.Time{})
 
-	payUrl, updatedTransactions, err := Controller(policy, product, transactions, false)
+	payUrl, updatedTransactions, err := Controller(policy, product, transactions, false, "")
 	if err != nil {
 		t.Fatalf("expected: nil error got: %s", err.Error())
 	}
@@ -297,5 +318,119 @@ func TestControllerRemittance(t *testing.T) {
 			t.Fatalf("expected: %s UpdateDate got: %s", transactions[index].UpdateDate, tr.UpdateDate)
 		}
 
+		if tr.ProviderName != policy.Payment {
+			t.Fatalf("expected providers to match, got transaction: '%s' and policy: '%s'", tr.ProviderName, policy.Payment)
+		}
+	}
+}
+
+func TestControllerReuseCustomerId(t *testing.T) {
+	os.Setenv("env", "local-test")
+
+	customerId := "a-random-custumer-id"
+	policy := getPolicy(models.FabrickPaymentProvider, models.PaymentModeRecurrent, string(models.PaySplitMonthly), 0)
+	product := getProduct()
+	transactions := getTransactions(12, models.FabrickPaymentProvider, 0, time.Time{})
+
+	_, updatedTransactions, err := Controller(policy, product, transactions, false, customerId)
+	if err != nil {
+		t.Fatalf("expected: nil error got: %s", err.Error())
+	}
+	for _, tr := range updatedTransactions {
+		if tr.UserToken != customerId {
+			t.Fatalf("mismatched customerID. Expected: %s - got: %s", customerId, tr.UserToken)
+		}
+
+		if tr.ProviderName != policy.Payment {
+			t.Fatalf("expected providers to match, got transaction: '%s' and policy: '%s'", tr.ProviderName, policy.Payment)
+		}
+	}
+}
+
+func TestControllerRenewYearly(t *testing.T) {
+	os.Setenv("env", "local-test")
+
+	policy := getPolicy(models.ManualPaymentProvider, models.PaymentModeSingle, string(models.PaySplitYearly), 1)
+	product := getProduct()
+	transactions := getTransactions(1, models.ManualPaymentProvider, 1, globalDate.AddDate(1, 0, 0))
+
+	_, updatedTransactions, err := Controller(policy, product, transactions, false, "")
+	if err != nil {
+		t.Fatalf("expected: nil error got: %s", err.Error())
+	}
+	if len(updatedTransactions) != 1 {
+		t.Fatalf("expected: 1 got: %d", len(updatedTransactions))
+	}
+	if updatedTransactions[0].IsPay {
+		t.Fatalf("isPay error - expected: false got: %v", updatedTransactions[0].IsPay)
+	}
+	if updatedTransactions[0].ProviderName != policy.Payment {
+		t.Fatalf("expected providers to match, got transaction: '%s' and policy: '%s'", updatedTransactions[0].ProviderName, policy.Payment)
+	}
+}
+
+func TestControllerRenewMonthly(t *testing.T) {
+	os.Setenv("env", "local-test")
+
+	policy := getPolicy(models.FabrickPaymentProvider, models.PaymentModeRecurrent, string(models.PaySplitMonthly), 1)
+	product := getProduct()
+	transactions := getTransactions(12, models.FabrickPaymentProvider, 1, globalDate.AddDate(1, 0, 0))
+
+	payUrl, updatedTransactions, err := Controller(policy, product, transactions, false, "")
+	if err != nil {
+		t.Fatalf("expected: nil error got: %s", err.Error())
+	}
+	if updatedTransactions[0].IsPay {
+		t.Fatalf("isPay error - expected: false got: %v", updatedTransactions[0].IsPay)
+	}
+	if updatedTransactions[0].PayUrl != payUrl {
+		t.Fatalf("payUrl error - expected: %s  got: %s", updatedTransactions[0].PayUrl, payUrl)
+	}
+	if updatedTransactions[0].ProviderName != policy.Payment {
+		t.Fatalf("expected providers to match, got transaction: '%s' and policy: '%s'", updatedTransactions[0].ProviderName, policy.Payment)
+	}
+}
+
+func TestControllerRenewMonthlyWithExistingMandate(t *testing.T) {
+	os.Setenv("env", "local-test")
+
+	policy := getPolicy(models.FabrickPaymentProvider, models.PaymentModeRecurrent, string(models.PaySplitMonthly), 1)
+	product := getProduct()
+	transactions := getTransactions(1, models.FabrickPaymentProvider, 1, globalDate.AddDate(1, 0, 0))
+
+	payUrl, updatedTransactions, err := Controller(policy, product, transactions, true, "user-has-token")
+	if err != nil {
+		t.Fatalf("expected: nil error got: %s", err.Error())
+	}
+	if updatedTransactions[0].IsPay {
+		t.Fatalf("isPay error - expected: false got: %v", updatedTransactions[0].IsPay)
+	}
+	if payUrl != "" {
+		t.Fatalf("payUrl error - expected: \"\" got: %s", payUrl)
+	}
+	if updatedTransactions[0].ProviderName != policy.Payment {
+		t.Fatalf("expected providers to match, got transaction: '%s' and policy: '%s'", updatedTransactions[0].ProviderName, policy.Payment)
+	}
+}
+
+func TestControllerRecreatePayLink(t *testing.T) {
+	os.Setenv("env", "local-test")
+
+	policy := getPolicy(models.FabrickPaymentProvider, models.PaymentModeRecurrent, string(models.PaySplitMonthly), 0)
+	product := getProduct()
+	transactions := getTransactions(12, models.FabrickPaymentProvider, 0, time.Time{})
+
+	payUrl, updatedTransactions, err := Controller(policy, product, transactions[5:], false, "")
+	if err != nil {
+		t.Fatalf("expected: nil error got: %s", err.Error())
+	}
+	if payUrl != "www.dev.wopta.it/local-05" {
+		t.Fatalf("wrong payUrl - expected: www.dev.wopta.it/local-05, got: %s", payUrl)
+	}
+	if updatedTransactions[0].ScheduleDate != globalDate.AddDate(0, 5, 0).Format(time.DateOnly) {
+		t.Fatalf("wrong schedule date - expected: %s - got: %s", globalDate.AddDate(0, 5, 0).Format(time.DateOnly), updatedTransactions[0].ScheduleDate)
+	}
+	if updatedTransactions[0].ProviderName != policy.Payment {
+		t.Fatalf("expected providers to match, got transaction: '%s' and policy: '%s'", updatedTransactions[0].ProviderName, policy.Payment)
 	}
 }
