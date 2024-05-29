@@ -43,6 +43,9 @@ func PolicyTransactionsUpdate() {
 		productsMap = make(map[string]models.Product)
 	)
 
+	// ATTENTION: the function needs an manual override at product/get-product.go:110
+	// otherwise if will filter out old versions of a given product and won't updated
+	// the needed policies for life/v1 renewal. Remove the isActive check
 	productsInfo := product.GetAllProductsByChannel(models.MgaChannel)
 	for _, pr := range productsInfo {
 		prd := product.GetProductV2(pr.Name, pr.Version, models.MgaChannel, nil, nil)
