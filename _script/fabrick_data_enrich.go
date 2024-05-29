@@ -141,9 +141,9 @@ func FabrickDataEnrich() {
 	wg.Wait()
 
 	// save transactions
-	// if err := saveData(trToBeSaved); err != nil {
-	// 	log.Fatalf("error saving data: %s", err)
-	// }
+	if err := saveData(trToBeSaved); err != nil {
+		log.Fatalf("error saving data: %s", err)
+	}
 
 	// save report
 	if err = saveReport(trToBeSaved, notFound, noMatch); err != nil {
