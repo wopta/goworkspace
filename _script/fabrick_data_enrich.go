@@ -1,6 +1,7 @@
 package _script
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -29,17 +30,17 @@ const (
 )
 
 type rowStruct struct {
-	policyUid           string
-	policyCode          string
-	scheduleDate        string
-	externalId          string
-	providerName        string
-	providerId          string
-	paymentMethod       string
-	paymentDate         time.Time
-	payUrl              string
-	userToken           string
-	paymentInstrumentId string
+	PolicyUid           string    `json:"policyUid"`
+	PolicyCode          string    `json:"policyCode"`
+	ScheduleDate        string    `json:"scheduleDate"`
+	ExternalId          string    `json:"externalId"`
+	ProviderName        string    `json:"providerName"`
+	ProviderId          string    `json:"providerId"`
+	PaymentMethod       string    `json:"paymentMethod"`
+	PaymentDate         time.Time `json:"paymentDate"`
+	PayUrl              string    `json:"payUrl"`
+	UserToken           string    `json:"userToken"`
+	PaymentInstrumentId string    `json:"paymentInstrumentId"`
 }
 
 /*
@@ -78,17 +79,19 @@ func FabrickDataEnrich() {
 
 	// enrich transactions
 	trToBeSaved := make([]models.Transaction, 0)
+	notFound := make([]string, 0)
+	noMatch := make([]rowStruct, 0)
 	for _, rows := range parsedRows {
 		wg.Add(1)
 		go func(rows []rowStruct) {
 			defer wg.Done()
 
-			policyUid := rows[len(rows)-1].policyUid
-			userToken := rows[len(rows)-1].userToken
+			policyUid := rows[len(rows)-1].PolicyUid
+			userToken := rows[len(rows)-1].UserToken
 
 			transactions := transaction.GetPolicyActiveTransactions("", policyUid)
 			if len(transactions) == 0 {
-				log.Printf("no transactions found for policy: %s", policyUid)
+				notFound = append(notFound, policyUid)
 				return
 			}
 
@@ -97,13 +100,14 @@ func FabrickDataEnrich() {
 					tr.UserToken = userToken
 					tr.UpdateDate = time.Now().UTC()
 				}
+				tr.BigQueryParse()
 				return tr
 			})
 
 			for _, row := range rows {
 				index := -1
 				for trIndex, tr := range transactions {
-					if tr.ScheduleDate == row.scheduleDate {
+					if tr.ScheduleDate == row.ScheduleDate || tr.ProviderId == row.ProviderId {
 						index = trIndex
 						break
 					}
@@ -111,22 +115,23 @@ func FabrickDataEnrich() {
 
 				if index == -1 {
 					// TODO: handle error
-					log.Printf("transaction not found: %+v", row)
+					noMatch = append(noMatch, row)
 					continue
 				}
 
-				transactions[index].ProviderName = row.providerName
+				transactions[index].ProviderName = row.ProviderName
 				if transactions[index].ProviderId == "" {
-					transactions[index].ProviderId = row.providerId
+					transactions[index].ProviderId = row.ProviderId
 				}
 				if transactions[index].PaymentMethod == "" {
-					transactions[index].PaymentMethod = row.paymentMethod
+					transactions[index].PaymentMethod = row.PaymentMethod
 				}
 				if transactions[index].TransactionDate.IsZero() {
-					transactions[index].TransactionDate = row.paymentDate
+					transactions[index].TransactionDate = row.PaymentDate
 				}
-				transactions[index].PayUrl = row.payUrl
+				transactions[index].PayUrl = row.PayUrl
 				transactions[index].UpdateDate = time.Now().UTC()
+				transactions[index].BigQueryParse()
 			}
 
 			trToBeSaved = append(trToBeSaved, transactions...)
@@ -136,22 +141,16 @@ func FabrickDataEnrich() {
 	wg.Wait()
 
 	// save transactions
-	// trMap := make(map[string]models.Transaction)
-	// for _, tr := range trToBeSaved {
-	// 	trMap[tr.Uid] = tr
+	// if err := saveData(trToBeSaved); err != nil {
+	// 	log.Fatalf("error saving data: %s", err)
 	// }
-	// firestoreBatch := map[string]map[string]models.Transaction{
-	// 	lib.TransactionsCollection: trMap,
-	// }
-	// err = lib.SetBatchFirestoreErr(firestoreBatch)
-	// if err != nil {
-	// 	log.Fatalf("error saving transactions to firestore: %s", err)
-	// }
-	// err = lib.InsertRowsBigQuery(lib.WoptaDataset, lib.TransactionsCollection, trToBeSaved)
-	// if err != nil {
-	// 	log.Fatalf("error saving transactions to bigquery: %s", err)
-	// }
-	log.Println("Done enriching transaction with fabrick data")
+
+	// save report
+	if err = saveReport(trToBeSaved, notFound, noMatch); err != nil {
+		log.Printf("error saving report : %s", err.Error())
+	}
+
+	log.Println("Script done enriching transaction with fabrick data")
 }
 
 func groupBy(df dataframe.DataFrame, col int) map[string][][]string {
@@ -224,17 +223,17 @@ func parseRows(data map[string][][]string) map[string][]rowStruct {
 				continue
 			}
 
-			out.policyUid = lib.TrimSpace(splittedExternalId[0])
-			out.policyCode = lib.TrimSpace(splittedExternalId[2])
-			out.scheduleDate = lib.TrimSpace(splittedExternalId[1])
-			out.externalId = lib.TrimSpace(row[externalIdCol])
-			out.providerName = models.FabrickPaymentProvider
-			out.providerId = lib.TrimSpace(row[providerIdCol])
-			out.paymentMethod = lib.ToLower(row[paymentInstrumentTypeCol])
-			out.paymentDate = payDate
-			out.payUrl = os.Getenv("FABRICK_BASEURL") + fmt.Sprintf(payByLinkFormatDev, lib.TrimSpace(row[providerIdCol]))
-			out.userToken = lib.TrimSpace(row[customerIdCol])
-			out.paymentInstrumentId = lib.TrimSpace(row[paymentInstrumentIdCol])
+			out.PolicyUid = lib.TrimSpace(splittedExternalId[0])
+			out.PolicyCode = lib.TrimSpace(splittedExternalId[2])
+			out.ScheduleDate = lib.TrimSpace(splittedExternalId[1])
+			out.ExternalId = lib.TrimSpace(row[externalIdCol])
+			out.ProviderName = models.FabrickPaymentProvider
+			out.ProviderId = lib.TrimSpace(row[providerIdCol])
+			out.PaymentMethod = lib.ToLower(row[paymentInstrumentTypeCol])
+			out.PaymentDate = payDate
+			out.PayUrl = os.Getenv("FABRICK_BASEURL") + fmt.Sprintf(payByLinkFormatDev, lib.TrimSpace(row[providerIdCol]))
+			out.UserToken = lib.TrimSpace(row[customerIdCol])
+			out.PaymentInstrumentId = lib.TrimSpace(row[paymentInstrumentIdCol])
 
 			output = append(output, out)
 		}
@@ -244,10 +243,47 @@ func parseRows(data map[string][][]string) map[string][]rowStruct {
 		}
 
 		sort.Slice(output, func(i, j int) bool {
-			return output[i].scheduleDate < output[j].scheduleDate
+			return output[i].ScheduleDate < output[j].ScheduleDate
 		})
 		parsedRows[key] = output
 	}
 
 	return parsedRows
+}
+
+func saveData(trToBeSaved []models.Transaction) error {
+	trMap := make(map[string]models.Transaction)
+	for _, tr := range trToBeSaved {
+		trMap[tr.Uid] = tr
+	}
+	firestoreBatch := map[string]map[string]models.Transaction{
+		lib.TransactionsCollection: trMap,
+	}
+	if err := lib.SetBatchFirestoreErr(firestoreBatch); err != nil {
+		return err
+	}
+	return lib.InsertRowsBigQuery(lib.WoptaDataset, lib.TransactionsCollection, trToBeSaved)
+}
+
+func saveReport(trToBeSaved []models.Transaction, notFound []string, noMatch []rowStruct) error {
+	var (
+		rawOutput []byte
+		err       error
+	)
+
+	report := struct {
+		Success  []models.Transaction `json:"success"`
+		NotFound []string             `json:"notFound"`
+		NoMatch  []rowStruct          `json:"noMatch"`
+	}{
+		Success:  trToBeSaved,
+		NotFound: notFound,
+		NoMatch:  noMatch,
+	}
+
+	if rawOutput, err = json.Marshal(report); err != nil {
+		return err
+	}
+
+	return os.WriteFile("./import_fabrick_data_report.json", rawOutput, 777)
 }
