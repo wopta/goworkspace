@@ -90,6 +90,14 @@ func PolicyTransactionsUpdate() {
 				p.PaymentMode = models.PaymentModeRecurrent
 			}
 
+			if p.Payment == "" {
+				p.Payment = models.FabrickPaymentProvider
+			}
+
+			if p.Channel == "" {
+				p.Channel = models.ECommerceChannel
+			}
+
 			p.Annuity = 0
 			p.IsAutoRenew = productsMap[productIdentifier].IsAutoRenew
 			p.IsRenewable = productsMap[productIdentifier].IsRenewable
