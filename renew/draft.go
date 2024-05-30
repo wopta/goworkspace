@@ -265,7 +265,9 @@ func draft(policy models.Policy, product models.Product, ch chan<- RenewReport, 
 	if policy.Payment == models.FabrickPaymentProvider {
 		var isTransactionPaid bool = true
 		trs := transaction.GetPolicyValidTransactions(policy.Uid, &isTransactionPaid)
-		customerId = trs[len(trs)-1].UserToken
+		if len(trs) > 0 {
+			customerId = trs[len(trs)-1].UserToken
+		}
 	}
 
 	payUrl, transactions, err := payment.Controller(policy, product, transactions, customerId != "", customerId)
