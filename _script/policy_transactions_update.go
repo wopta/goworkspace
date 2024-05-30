@@ -82,6 +82,14 @@ func PolicyTransactionsUpdate() {
 				p.PaymentSplit = string(models.PaySplitYearly)
 			}
 
+			if strings.EqualFold(p.PaymentSplit, string(models.PaySplitYearly)) && p.PaymentMode == "" {
+				p.PaymentMode = models.PaymentModeSingle
+			}
+
+			if strings.EqualFold(p.PaymentSplit, string(models.PaySplitMonthly)) && p.PaymentMode == "" {
+				p.PaymentMode = models.PaymentModeRecurrent
+			}
+
 			p.Annuity = 0
 			p.IsAutoRenew = productsMap[productIdentifier].IsAutoRenew
 			p.IsRenewable = productsMap[productIdentifier].IsRenewable
