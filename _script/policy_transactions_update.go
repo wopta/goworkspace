@@ -78,6 +78,10 @@ func PolicyTransactionsUpdate() {
 				p.OfferlName = "default"
 			}
 
+			if strings.EqualFold(p.PaymentSplit, string(models.PaySplitYear)) {
+				p.PaymentSplit = string(models.PaySplitYearly)
+			}
+
 			p.Annuity = 0
 			p.IsAutoRenew = productsMap[productIdentifier].IsAutoRenew
 			p.IsRenewable = productsMap[productIdentifier].IsRenewable
