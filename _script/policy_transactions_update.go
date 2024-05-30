@@ -78,6 +78,26 @@ func PolicyTransactionsUpdate() {
 				p.OfferlName = "default"
 			}
 
+			if strings.EqualFold(p.PaymentSplit, string(models.PaySplitYear)) {
+				p.PaymentSplit = string(models.PaySplitYearly)
+			}
+
+			if strings.EqualFold(p.PaymentSplit, string(models.PaySplitYearly)) && p.PaymentMode == "" {
+				p.PaymentMode = models.PaymentModeSingle
+			}
+
+			if strings.EqualFold(p.PaymentSplit, string(models.PaySplitMonthly)) && p.PaymentMode == "" {
+				p.PaymentMode = models.PaymentModeRecurrent
+			}
+
+			if p.Payment == "" {
+				p.Payment = models.FabrickPaymentProvider
+			}
+
+			if p.Channel == "" {
+				p.Channel = models.ECommerceChannel
+			}
+
 			p.Annuity = 0
 			p.IsAutoRenew = productsMap[productIdentifier].IsAutoRenew
 			p.IsRenewable = productsMap[productIdentifier].IsRenewable
