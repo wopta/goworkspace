@@ -2,13 +2,12 @@ package win
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/wopta/goworkspace/callback_out/internal"
-	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -25,17 +24,22 @@ func NewClient() *Client {
 }
 
 func (c *Client) post(body io.Reader) (*http.Request, *http.Response, error) {
-	path := fmt.Sprintf("%s/%s", c.basePath, c.path)
+	path := c.basePath + c.path
 	req, err := http.NewRequest(http.MethodPost, path, body)
 	if err != nil {
 		return nil, nil, err
 	}
 
+	req.SetBasicAuth(os.Getenv("WIN_CALLBACK_AUTH_USER"), os.Getenv("WIN_CALLBACK_AUTH_PASS"))
+
 	for key, value := range c.headers {
 		req.Header.Set(key, value)
 	}
 
-	res, err := lib.RetryDo(req, 5, 10)
+	client := http.Client{
+		Timeout: 30 * time.Second,
+	}
+	res, err := client.Do(req)
 
 	return req, res, err
 }
