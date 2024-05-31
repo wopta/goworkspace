@@ -18,8 +18,8 @@ type emissioneReq struct {
 	Utente         string `json:"utente"`
 }
 
-func emissione(policy models.Policy) ([]byte, error) {
-	winPolicy := policyDto(policy)
+func emissione(policy models.Policy, producer string) ([]byte, error) {
+	winPolicy := policyDto(policy, producer)
 	payload := emissioneReq{
 		DtEmissione:    winPolicy.DtEmissione,
 		IdPratica:      winPolicy.IdPratica,

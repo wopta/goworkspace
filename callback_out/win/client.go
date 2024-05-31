@@ -13,13 +13,15 @@ import (
 
 type Client struct {
 	basePath string
+	producer string
 	path     string
 	headers  map[string]string
 }
 
-func NewClient() *Client {
+func NewClient(producer string) *Client {
 	return &Client{
 		basePath: os.Getenv("WIN_CALLBACK_ENDPOINT"),
+		producer: producer,
 	}
 }
 
@@ -51,7 +53,7 @@ func (c *Client) Proposal(policy models.Policy) internal.CallbackInfo {
 func (c *Client) Emit(policy models.Policy) internal.CallbackInfo {
 	c.path = "restba/extquote/inspratica"
 
-	body, err := inspratica(policy, "QUOTAZIONE_ACCETTATA")
+	body, err := inspratica(policy, "QUOTAZIONE_ACCETTATA", c.producer)
 	if err != nil {
 		return internal.CallbackInfo{
 			Request:     nil,
@@ -73,7 +75,7 @@ func (c *Client) Emit(policy models.Policy) internal.CallbackInfo {
 func (c *Client) RequestApproval(policy models.Policy) internal.CallbackInfo {
 	c.path = "restba/extquote/inspratica"
 
-	body, err := inspratica(policy, "RICHIESTA_QUOTAZIONE")
+	body, err := inspratica(policy, "RICHIESTA_QUOTAZIONE", c.producer)
 	if err != nil {
 		return internal.CallbackInfo{
 			Request:     nil,
@@ -95,7 +97,7 @@ func (c *Client) RequestApproval(policy models.Policy) internal.CallbackInfo {
 func (c *Client) Paid(policy models.Policy) internal.CallbackInfo {
 	c.path = "restba/extquote/emissione"
 
-	body, err := emissione(policy)
+	body, err := emissione(policy, c.producer)
 	if err != nil {
 		return internal.CallbackInfo{
 			Request:     nil,
