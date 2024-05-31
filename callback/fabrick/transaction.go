@@ -7,13 +7,13 @@ import (
 	tr "github.com/wopta/goworkspace/transaction"
 )
 
-func payTransaction(policy models.Policy, providerId, trSchedule, paymentMethod string, networkNode *models.NetworkNode) (models.Transaction, error) {
+func payTransaction(policy models.Policy, providerId, trSchedule, paymentMethod, collection string, networkNode *models.NetworkNode) (models.Transaction, error) {
 	var (
 		transaction models.Transaction
 		err         error
 	)
 
-	if transaction, err = tr.GetTransactionToBePaid(policy.Uid, providerId, trSchedule, ""); err != nil {
+	if transaction, err = tr.GetTransactionToBePaid(policy.Uid, providerId, trSchedule, collection); err != nil {
 		return models.Transaction{}, err
 	}
 	transaction.IsDelete = false

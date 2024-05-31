@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/wopta/goworkspace/callback/internal"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
@@ -86,17 +87,25 @@ func AnnuityFirstRateFx(_ http.ResponseWriter, r *http.Request) (string, any, er
 
 func annuityFirstRate(policyUid, providerId, trSchedule, paymentMethod string) error {
 	var (
-		policy      models.Policy
-		transaction models.Transaction
-		networkNode *models.NetworkNode
-		mgaProduct  *models.Product
-		warrant     *models.Warrant
-		err         error
+		policy                 models.Policy
+		renewPolicy            models.Policy
+		transaction            models.Transaction
+		networkNode            *models.NetworkNode
+		mgaProduct             *models.Product
+		warrant                *models.Warrant
+		err                    error
+		policyCollection       string = lib.PolicyCollection
+		transactionsCollection string = lib.TransactionsCollection
 	)
 
-	policy = plc.GetPolicyByUid(policyUid, "")
-	if policy.Uid == "" {
+	if policy, err = internal.GetPolicyByUidAndCollection(policyUid, lib.PolicyCollection); err != nil {
 		return ErrPolicyNotFound
+	}
+
+	if renewPolicy, err = internal.GetPolicyByUidAndCollection(policyUid, lib.RenewPolicyCollection); err == nil && renewPolicy.Uid == policyUid {
+		policy = renewPolicy
+		policyCollection = lib.RenewPolicyCollection
+		transactionsCollection = lib.RenewTransactionCollection
 	}
 
 	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
@@ -104,7 +113,7 @@ func annuityFirstRate(policyUid, providerId, trSchedule, paymentMethod string) e
 		warrant = networkNode.GetWarrant()
 	}
 
-	if transaction, err = payTransaction(policy, providerId, trSchedule, paymentMethod, networkNode); err != nil {
+	if transaction, err = payTransaction(policy, providerId, trSchedule, paymentMethod, transactionsCollection, networkNode); err != nil {
 		return err
 	}
 
@@ -112,6 +121,9 @@ func annuityFirstRate(policyUid, providerId, trSchedule, paymentMethod string) e
 	policy.Status = models.PolicyStatusPay
 	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusPay)
 	policy.Updated = time.Now().UTC()
+
+	policy.BigQueryParse()
+	transaction.BigQueryParse()
 
 	if policy.Annuity == 0 {
 		// TODO: all methods save the data, they shouldn't to avoid data corruption
@@ -146,18 +158,22 @@ func annuityFirstRate(policyUid, providerId, trSchedule, paymentMethod string) e
 	}
 
 	firestoreBatch := map[string]map[string]interface{}{
-		lib.PolicyCollection: {
+		policyCollection: {
 			policy.Uid: policy,
 		},
-		lib.TransactionsCollection: {
+		transactionsCollection: {
 			transaction.Uid: transaction,
 		},
 	}
 	if err = lib.SetBatchFirestoreErr(firestoreBatch); err != nil {
 		return err
 	}
-	policy.BigquerySave("")
-	transaction.BigQuerySave("")
+	if err = lib.InsertRowsBigQuery(lib.WoptaDataset, policyCollection, policy); err != nil {
+		return err
+	}
+	if err = lib.InsertRowsBigQuery(lib.WoptaDataset, transactionsCollection, transaction); err != nil {
+		return err
+	}
 
 	mgaProduct = prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
 

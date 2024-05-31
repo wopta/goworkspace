@@ -73,22 +73,20 @@ func SetPolicyFirstTransactionPaid(policyUid string, scheduleDate string, origin
 	transaction.BigQuerySave(origin)
 }
 
-func GetTransactionToBePaid(policyUid, providerId, scheduleDate, origin string) (models.Transaction, error) {
+func GetTransactionToBePaid(policyUid, providerId, scheduleDate, collection string) (models.Transaction, error) {
 	var (
 		transactions []models.Transaction
 		err          error
 	)
 
-	fireTransactions := lib.GetDatasetByEnv(origin, models.TransactionsCollection)
-
-	transactions, err = getTransactionByPolicyUidAndProviderId(policyUid, providerId, fireTransactions)
+	transactions, err = getTransactionByPolicyUidAndProviderId(policyUid, providerId, collection)
 	if err != nil {
 		log.Printf("[GetPolicyFirstTransaction] ERROR By ProviderId %s", err.Error())
 		return models.Transaction{}, err
 	}
 
 	if len(transactions) == 0 {
-		transactions, err = getTransactionByPolicyUidAndScheduleDate(policyUid, scheduleDate, fireTransactions)
+		transactions, err = getTransactionByPolicyUidAndScheduleDate(policyUid, scheduleDate, collection)
 		if err != nil {
 			log.Printf("[GetPolicyFirstTransaction] ERROR By ScheduleDate %s", err.Error())
 			return models.Transaction{}, err
