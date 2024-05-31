@@ -6,8 +6,10 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 	"google.golang.org/api/drive/v2"
 	"google.golang.org/api/option"
 	"google.golang.org/api/sheets/v4"
@@ -16,7 +18,8 @@ import (
 type QuoteSpreadsheet struct {
 	SheetName, filename string
 	Id                  string
-	InputCells          []InputCell
+	InputCells          []Cell
+	OutputCells         []Cell
 }
 
 func SpreadsheetsFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -33,10 +36,11 @@ func SpreadsheetsFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	return "", nil, nil
 }
 
-func (qs *QuoteSpreadsheet) Spreadsheets() {
+func (qs *QuoteSpreadsheet) Spreadsheets() []Cell {
 	var (
 		path []byte
 		//file *drive.File
+		res []Cell
 	)
 
 	switch os.Getenv("env") {
@@ -76,17 +80,34 @@ func (qs *QuoteSpreadsheet) Spreadsheets() {
 	}).Do()
 	fmt.Printf("f.Id: %v\n", e)
 	fmt.Printf("f.Id: %v\n", f.Id)
-	sheet, e := sheetClient.Spreadsheets.Values.Get(qs.Id, "A:J").Do()
-	fmt.Printf("file: %v\n", sheet.Values[99][3])
-	lib.CheckError(e)
-	cel := &sheets.ValueRange{
-		Values: [][]interface{}{{"10000000"}},
+
+
+	for k, cell := range qs.InputCells {
+		fmt.Printf("%s -> %s\n", k, cell)
+		cel := &sheets.ValueRange{
+			Values: [][]interface{}{{cell.Value}},
+		}
+		_, e = sheetClient.Spreadsheets.Values.Update(qs.Id, cell.Cell+":"+cell.Cell, cel).ValueInputOption("USER_ENTERED").Context(ctx).Do()
+
 	}
-	_, e = sheetClient.Spreadsheets.Values.Update(qs.Id, "C41:C41", cel).ValueInputOption("USER_ENTERED").Context(ctx).Do()
+
+	for k, cell := range qs.OutputCells {
+		fmt.Printf("%s -> %s\n", k, cell)
+
+		sheet, e := sheetClient.Spreadsheets.Values.Get(qs.Id, string(cell.Cell[0])+":"+string(cell.Cell[0])).Do()
+		lib.CheckError(e)
+		row, e := strconv.Atoi(string(string(cell.Cell[1:])))
+		lib.CheckError(e)
+		fmt.Printf("file: %v\n", sheet.Values[row][0])
+		rescell := Cell{
+			Cell:  cell.Cell,
+			Value: sheet.Values[row][0],
+		}
+		res = append(res, rescell)
+
+	}
 	lib.CheckError(e)
-	sheet, e = sheetClient.Spreadsheets.Values.Get(qs.Id, "A:J").Do()
-	fmt.Printf("file: %v\n", sheet.Values[99][3])
-	lib.CheckError(e)
+	return res
 }
 
 type DriveService struct {
@@ -135,4 +156,10 @@ type GoogleService[T any] interface {
 
 func GoogleClient[T any](g GoogleService[T]) (T, error) {
 	return g.NewClient()
+}
+
+func getProductMock() (models.Product, error) {
+
+	prod := models.Product{}
+	return prod, nil
 }
