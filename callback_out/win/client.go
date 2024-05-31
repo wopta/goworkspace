@@ -40,6 +40,10 @@ func (c *Client) post(body io.Reader) (*http.Request, *http.Response, error) {
 	return req, res, err
 }
 
+func (c *Client) Proposal(policy models.Policy) internal.CallbackInfo {
+	return c.Emit(policy)
+}
+
 func (c *Client) Emit(policy models.Policy) internal.CallbackInfo {
 	c.path = "restba/extquote/inspratica"
 

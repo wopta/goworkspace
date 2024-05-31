@@ -9,7 +9,7 @@ import (
 )
 
 type CallbackClient interface {
-	// Proposal(models.Policy) internal.CallbackInfo
+	Proposal(models.Policy) internal.CallbackInfo
 	Emit(models.Policy) internal.CallbackInfo
 	// Signed(models.Policy) internal.CallbackInfo
 	Paid(models.Policy) internal.CallbackInfo
