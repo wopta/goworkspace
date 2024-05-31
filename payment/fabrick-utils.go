@@ -362,14 +362,14 @@ type fabrickPaymentInstrumentRes struct {
 }
 
 type paymentInstrument struct {
-	Type              string    `json:"type"`
-	CreationDate      time.Time `json:"creationDate"`
-	ExpiryDate        string    `json:"expiryDate"`
-	Status            string    `json:"status"`
-	Alias             string    `json:"alias"`
-	MakeDefault       bool      `json:"makeDefault"`
-	SubjectId         string    `json:"subjectId"`
-	SubjectXId        string    `json:"subjectXId"`
-	MatchedDossierXId []any     `json:"matchedDossierXId"`
-	Xid               string    `json:"xid"`
+	Type              string `json:"type"`
+	CreationDate      string `json:"creationDate"` // YYYY-MM-DD HH:MM:SS
+	ExpiryDate        string `json:"expiryDate"`
+	Status            string `json:"status"`
+	Alias             string `json:"alias"`
+	MakeDefault       bool   `json:"makeDefault"`
+	SubjectId         string `json:"subjectId"`
+	SubjectXId        string `json:"subjectXId"`
+	MatchedDossierXId []any  `json:"matchedDossierXId"`
+	Xid               string `json:"xid"`
 }
