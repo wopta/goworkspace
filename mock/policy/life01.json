@@ -1,0 +1,337 @@
+{
+  "uid": "NlYwN85rN0fdCeAdcztG",
+  "productVersion": "v2",
+  "offerName": "default",
+  "status": "Lead",
+  "statusHistory": ["Lead"],
+  "company": "axa",
+  "name": "life",
+  "nameDesc": "Wopta per te Vita",
+  "emitDate": "0001-01-01T00:00:00Z",
+  "startDate": "2024-05-28T00:00:00Z",
+  "renewDate": "0001-01-01T00:00:00Z",
+  "endDate": "2034-05-28T00:00:00Z",
+  "creationDate": "2024-05-28T09:55:23.362278Z",
+  "updated": "2024-05-28T09:55:35.386553319Z",
+  "nextPay": "0001-01-01T00:00:00Z",
+  "deleteDate": "0001-01-01T00:00:00Z",
+  "channel": "e-commerce",
+  "priceNett": 67.49,
+  "priceGross": 68.37,
+  "contractor": {
+    "birthDate": "1996-05-28T00:00:00.000Z",
+    "location": {},
+    "mail": "LUCA.PROVREBIO@WOPTA.IT",
+    "vatCode": "",
+    "creationDate": "0001-01-01T00:00:00Z",
+    "updatedDate": "0001-01-01T00:00:00Z",
+    "consens": [
+      {
+        "title": "Privacy",
+        "consens": "Il sottoscritto, letta e compresa l'informativa sul trattamento dei dati personali, ACCONSENTE al trattamento dei propri dati personali da parte di Wopta Assicurazioni per l'invio di comunicazioni e proposte commerciali e di marketing, incluso l'invio di newsletter e ricerche di mercato, attraverso strumenti automatizzati (sms, mms, e-mail, ecc.) e non (posta cartacea e telefono con operatore).",
+        "key": 2,
+        "answer": true,
+        "creationDate": "0001-01-01T00:00:00Z"
+      }
+    ],
+    "height": 0,
+    "weight": 0
+  },
+  "statements": [],
+  "surveys": [],
+  "attachments": [
+    {
+      "name": "Precontrattuale",
+      "link": "gs://documents-public-dev/information-sets/life/v2/Precontrattuale.pdf",
+      "fileName": "Precontrattuale.pdf",
+      "isPrivate": false,
+      "section": "",
+      "note": ""
+    }
+  ],
+  "assets": [
+    {
+      "guarantees": [
+        {
+          "type": "person",
+          "beneficiaryOptions": {
+            "chosenBeneficiary": "Beneficiario a scelta",
+            "legalAndWillSuccessors": "Eredi legittimi e testamentali"
+          },
+          "description": "Cosa significa amare le persone a te più care? Scegli il sostegno di un capitale, a disposizione di chi resta, per affrontare «il dopo» di un drammatico imprevisto, con una certezza economica in più.",
+          "companyCodec": "D",
+          "companyName": "Decesso",
+          "group": "DEATH",
+          "value": {
+            "deductibleValues": {},
+            "sumInsuredLimitOfIndemnity": 100000,
+            "sumInsuredValues": {},
+            "selfInsuranceValues": {},
+            "duration": { "year": 10 },
+            "tax": 0,
+            "percentage": 0,
+            "premiumNetYearly": 32.02,
+            "premiumTaxAmountYearly": 0,
+            "premiumGrossYearly": 32.02,
+            "premiumNetMonthly": 2.67,
+            "premiumTaxAmountMonthly": 0,
+            "premiumGrossMonthly": 2.67
+          },
+          "config": {
+            "deductibleValues": {},
+            "sumInsuredValues": { "min": 50000, "max": 300000, "step": 25000 },
+            "selfInsuranceValues": {},
+            "durationValues": { "min": 5, "max": 20, "step": 5 },
+            "tax": 0,
+            "percentage": 0,
+            "premiumNetYearly": 0,
+            "premiumTaxAmountYearly": 0,
+            "premiumGrossYearly": 0,
+            "premiumTaxAmountMonthly": 0,
+            "premiumGrossMonthly": 0
+          },
+          "offer": {
+            "default": {
+              "deductibleValues": {},
+              "sumInsuredLimitOfIndemnity": 100000,
+              "sumInsuredValues": {},
+              "selfInsuranceValues": {},
+              "duration": { "year": 10 },
+              "tax": 0,
+              "percentage": 0,
+              "premiumNetYearly": 0,
+              "premiumTaxAmountYearly": 0,
+              "premiumGrossYearly": 0,
+              "premiumTaxAmountMonthly": 0,
+              "premiumGrossMonthly": 0
+            }
+          },
+          "slug": "death",
+          "isMandatory": true,
+          "isExtension": false,
+          "name": "morte",
+          "tax": 10,
+          "isSellable": true,
+          "isConfigurable": true,
+          "subtitle": "Durata: 10 anni - Capitale: 100.000€",
+          "reserved": false,
+          "order": 1,
+          "isSelected": true,
+          "isDeleted": false
+        },
+        {
+          "type": "person",
+          "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+          "companyCodec": "PTD",
+          "companyName": "Invalidità Totale Permanente",
+          "group": "DEATH",
+          "value": {
+            "deductibleValues": {},
+            "sumInsuredLimitOfIndemnity": 100000,
+            "sumInsuredValues": {},
+            "selfInsuranceValues": {},
+            "duration": { "year": 10 },
+            "tax": 0,
+            "percentage": 0,
+            "premiumNetYearly": 9.76,
+            "premiumTaxAmountYearly": 0.24,
+            "premiumGrossYearly": 10,
+            "premiumNetMonthly": 0.81,
+            "premiumTaxAmountMonthly": 0.02,
+            "premiumGrossMonthly": 0.83
+          },
+          "config": {
+            "deductibleValues": {},
+            "sumInsuredValues": { "min": 50000, "max": 300000, "step": 25000 },
+            "selfInsuranceValues": {},
+            "durationValues": { "min": 5, "max": 20, "step": 5 },
+            "tax": 0,
+            "percentage": 0,
+            "premiumNetYearly": 0,
+            "premiumTaxAmountYearly": 0,
+            "premiumGrossYearly": 0,
+            "premiumTaxAmountMonthly": 0,
+            "premiumGrossMonthly": 0
+          },
+          "offer": {
+            "default": {
+              "deductibleValues": {},
+              "sumInsuredLimitOfIndemnity": 50000,
+              "sumInsuredValues": {},
+              "selfInsuranceValues": {},
+              "duration": { "year": 5 },
+              "tax": 0,
+              "percentage": 0,
+              "premiumNetYearly": 0,
+              "premiumTaxAmountYearly": 0,
+              "premiumGrossYearly": 0,
+              "premiumTaxAmountMonthly": 0,
+              "premiumGrossMonthly": 0
+            }
+          },
+          "slug": "permanent-disability",
+          "isMandatory": false,
+          "isExtension": false,
+          "name": "invalidità totale permanente",
+          "tax": 10,
+          "isSellable": true,
+          "isConfigurable": false,
+          "subtitle": "Durata: 10 anni - Capitale: 100.000€",
+          "reserved": false,
+          "order": 2,
+          "isSelected": true,
+          "isDeleted": false
+        },
+        {
+          "type": "person",
+          "description": "Cancro, Ictus, Infarto, Chirurgia aorto-coronarica, Insufficienza renale, Trapianto di organi principali. Parole che spaventano, ma con il giusto capitale in tasca si affrontano . . . e si superano.",
+          "companyCodec": "CI",
+          "companyName": "Malattia Grave",
+          "group": "DEATH",
+          "value": {
+            "deductibleValues": {},
+            "sumInsuredLimitOfIndemnity": 5000,
+            "sumInsuredValues": {},
+            "selfInsuranceValues": {},
+            "duration": { "year": 10 },
+            "tax": 0,
+            "percentage": 0,
+            "premiumNetYearly": 15.11,
+            "premiumTaxAmountYearly": 0.37,
+            "premiumGrossYearly": 15.48,
+            "premiumNetMonthly": 1.26,
+            "premiumTaxAmountMonthly": 0.03,
+            "premiumGrossMonthly": 1.29
+          },
+          "config": {
+            "deductibleValues": {},
+            "sumInsuredValues": { "min": 5000, "max": 100000, "step": 5000 },
+            "selfInsuranceValues": {},
+            "durationValues": { "min": 5, "max": 10, "step": 5 },
+            "tax": 0,
+            "percentage": 0,
+            "premiumNetYearly": 0,
+            "premiumTaxAmountYearly": 0,
+            "premiumGrossYearly": 0,
+            "premiumTaxAmountMonthly": 0,
+            "premiumGrossMonthly": 0
+          },
+          "offer": {
+            "default": {
+              "deductibleValues": {},
+              "sumInsuredLimitOfIndemnity": 50000,
+              "sumInsuredValues": {},
+              "selfInsuranceValues": {},
+              "duration": { "year": 5 },
+              "tax": 0,
+              "percentage": 0,
+              "premiumNetYearly": 0,
+              "premiumTaxAmountYearly": 0,
+              "premiumGrossYearly": 0,
+              "premiumTaxAmountMonthly": 0,
+              "premiumGrossMonthly": 0
+            }
+          },
+          "slug": "serious-ill",
+          "isMandatory": false,
+          "isExtension": false,
+          "name": "malattia grave",
+          "tax": 10,
+          "isSellable": true,
+          "isConfigurable": false,
+          "subtitle": "Durata: 10 anni - Capitale: 5.000€",
+          "reserved": false,
+          "order": 4,
+          "isSelected": true,
+          "isDeleted": false
+        },
+        {
+          "type": "person",
+          "description": "Un banale infortunio o malattia possono anche impedirti di lavorare per un certo periodo. Una somma mensile in sostituzione del tuo reddito aiuterebbe?",
+          "companyCodec": "TTD",
+          "companyName": "Inabilità Totale Temporanea",
+          "group": "DEATH",
+          "value": {
+            "deductibleValues": {},
+            "sumInsuredLimitOfIndemnity": 1000,
+            "sumInsuredValues": {},
+            "selfInsuranceValues": {},
+            "duration": { "year": 10 },
+            "tax": 0,
+            "percentage": 0,
+            "premiumNetYearly": 10.6,
+            "premiumTaxAmountYearly": 0.27,
+            "premiumGrossYearly": 10.87,
+            "premiumNetMonthly": 0.88,
+            "premiumTaxAmountMonthly": 0.03,
+            "premiumGrossMonthly": 0.91
+          },
+          "config": {
+            "deductibleValues": {},
+            "sumInsuredValues": { "min": 250, "max": 3000, "step": 250 },
+            "selfInsuranceValues": {},
+            "durationValues": { "min": 5, "max": 10, "step": 5 },
+            "tax": 0,
+            "percentage": 0,
+            "premiumNetYearly": 0,
+            "premiumTaxAmountYearly": 0,
+            "premiumGrossYearly": 0,
+            "premiumTaxAmountMonthly": 0,
+            "premiumGrossMonthly": 0
+          },
+          "offer": {
+            "default": {
+              "deductibleValues": {},
+              "sumInsuredLimitOfIndemnity": 1000,
+              "sumInsuredValues": {},
+              "selfInsuranceValues": {},
+              "duration": { "year": 5 },
+              "tax": 0,
+              "percentage": 0,
+              "premiumNetYearly": 0,
+              "premiumTaxAmountYearly": 0,
+              "premiumGrossYearly": 0,
+              "premiumTaxAmountMonthly": 0,
+              "premiumGrossMonthly": 0
+            }
+          },
+          "slug": "temporary-disability",
+          "isMandatory": false,
+          "isExtension": false,
+          "name": "inabilità totale temporanea",
+          "tax": 10,
+          "isSellable": true,
+          "isConfigurable": false,
+          "subtitle": "Durata: 10 anni - Capitale: 1.000€",
+          "reserved": false,
+          "order": 3,
+          "isSelected": true,
+          "isDeleted": false
+        }
+      ]
+    }
+  ],
+  "offersPrices": {
+    "default": {
+      "yearly": {
+        "net": 67.49,
+        "tax": 0.88,
+        "gross": 68.37,
+        "delta": 0,
+        "discount": 0
+      }
+    }
+  },
+  "partnershipName": "",
+  "partnershipData": null,
+  "isReserved": false,
+  "step": "guaranteeconfigurationstep",
+  "networkUid": "",
+  "producerUid": "",
+  "producerType": "",
+  "annuity": 0,
+  "isAutoRenew": false,
+  "isRenewable": true,
+  "policyType": "multiYear",
+  "quoteType": "fixed"
+}

@@ -248,7 +248,6 @@ func getBigqueryClient() *bigquery.Client {
 	return client
 }
 
-// https://api.stg.hype.it/external/wopta/v1/{guaranteesCode}/amount/{fromDate}/{endDate}
 func HypeCount(date string, fiscalCode string, guaranteesCode string) {
 	var (
 		countResponseModel CountResponseModel
@@ -279,7 +278,6 @@ func HypeCount(date string, fiscalCode string, guaranteesCode string) {
 
 }
 
-// https://api.stg.hype.it/external/wopta/v1/reconciliation
 func HypeReconciliation(date string, fiscalCode string, guaranteesCode string) {
 
 }

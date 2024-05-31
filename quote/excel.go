@@ -23,14 +23,14 @@ func ExcelFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 	return "", nil, nil
 }
 
-type InputCell struct {
-	cell  string
-	value interface{}
+type Cell struct {
+	Cell  string
+	Value interface{}
 }
 
 type QuoteExcel struct {
 	SheetName, filename string
-	InputCells          []InputCell
+	InputCells          []Cell
 }
 
 func Excel() {
@@ -51,15 +51,22 @@ func Excel() {
 	// Get value from cell by given worksheet name and cell reference.
 
 	cell1, err := xlsx.GetCellValue(sheet, "C91")
-
+	// <-SaveExcel(xlsx, filePathOut)
+	fmt.Println(err)
 	fmt.Println("excel get value E1: ", cell1)
-
+	err = xlsx.UpdateLinkedValue()
+	fmt.Println(err)
+	cell1, err = xlsx.GetCellValue(sheet, "C91")
+	// <-SaveExcel(xlsx, filePathOut)
+	fmt.Println(err)
+	fmt.Println("excel get value UpdateLinkedValue E1: ", cell1)
 	calc, err := xlsx.CalcCellValue(sheet, "C91")
-	fmt.Println("excel get calc value E1: ", calc)
-
-	//err = xlsx.UpdateLinkedValue()
 	//<-SaveExcel(xlsx, filePathOut)
 	fmt.Println(err)
+
+	fmt.Println("excel get calc value E1: ", calc)
+
+	//
 
 	//xlsxOut, err := excelize.OpenFile(filePathOut)
 	fmt.Println(err)

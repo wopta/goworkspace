@@ -1,0 +1,299 @@
+
+{
+    "companies": [
+        {
+            "agentCode": "",
+            "code": "2",
+            "commission": 0.35,
+            "commissionRenew": 0.35,
+            "commissionsSetting": {
+                "commissions": {
+                    "newBusiness": 0.35,
+                    "newBusinessPassive": 0.35,
+                    "renew": 0.35,
+                    "renewPassive": 0.35
+                },
+                "isByGuarantee": false,
+                "isByOffer": false,
+                "isFlat": true
+            },
+            "discountLimit": 0,
+            "emitTrack": {
+                "columns": [
+                    {
+                        "format": ".csv",
+                        "name": "axa",
+                        "type": "",
+                        "value": "csv"
+                    }
+                ],
+                "format": ".csv",
+                "name": "axa",
+                "type": "csv"
+            },
+            "guaranteesMap": {
+                "fabbricato": {
+                    "type": "building",
+                    "slug": "fabbricato",
+                    "isSelected": true,
+                    "isSellable": false,
+                    "isMandatory": true,
+                    "companyName": "Fabbricato",
+                    "subtitle": "",
+                    "reserved": false,
+                    "isConfigurable": true,
+                    "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+                    "value": {
+                        "premiumGrossYearly": 2
+                    },
+                    "config": {
+                        "durationValues": {},
+                        "dropdownValues": {},
+                        "sumInsuredValues": {
+                          "max": 30,
+                          "min": 5,
+                          "step": 10
+                        },
+                        "minimumGrossYearly": 10,
+                        "percentage": 0,
+                        "premiumGrossMonthly": 0,
+                        "premiumGrossYearly": 0,
+                        "premiumNetYearly": 0,
+                        "premiumTaxAmountMonthly": 0,
+                        "premiumTaxAmountYearly": 0,
+                        "selfInsuranceValues": {},
+                        "tax": 0
+                    }
+                },
+                "fenomeno": {
+                    "type": "building",
+                    "slug": "fenomeno",
+                    "isSelected": false,
+                    "isSellable": true,
+                    "isMandatory": false,
+                    "companyName": "Fenomeno Elettrico (in aumento a 10.000 - A/23)",
+                    "subtitle": "",
+                    "reserved": false,
+                    "isConfigurable": false,
+                    "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+                    "value": {
+                        "premiumGrossYearly": 2
+                    },
+                    "config": {
+                        "durationValues": {},
+                        "dropdownValues": {},
+                        "sumInsuredValues": {},
+                        "minimumGrossYearly": 10,
+                        "percentage": 0,
+                        "premiumGrossMonthly": 0,
+                        "premiumGrossYearly": 0,
+                        "premiumNetYearly": 0,
+                        "premiumTaxAmountMonthly": 0,
+                        "premiumTaxAmountYearly": 0,
+                        "selfInsuranceValues": {},
+                        "tax": 0
+                    }
+                },
+                "merci-refrigerazione": {
+                    "type": "enterprise",
+                    "slug": "merci-refrigerazione",
+                    "isSelected": true,
+                    "isSellable": false,
+                    "isMandatory": true,
+                    "companyName": "Merci in refrigerazione",
+                    "subtitle": "",
+                    "reserved": false,
+                    "isConfigurable": true,
+                    "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+                    "value": {
+                        "premiumGrossYearly": 2
+                    },
+                    "config": {
+                        "durationValues": {},
+                        "dropdownValues": {
+                          "max": 20,
+                          "min": 5,
+                          "step": 5,
+                          "values": [1,2,3,4,5]
+                        },
+                        "sumInsuredValues": {
+                          "max": 30,
+                          "min": 5,
+                          "step": 10
+                        },
+                        "minimumGrossYearly": 10,
+                        "percentage": 0,
+                        "premiumGrossMonthly": 0,
+                        "premiumGrossYearly": 0,
+                        "premiumNetYearly": 0,
+                        "premiumTaxAmountMonthly": 0,
+                        "premiumTaxAmountYearly": 0,
+                        "selfInsuranceValues": {},
+                        "tax": 0
+                    }
+                },
+                "guasti": {
+                    "type": "enterprise",
+                    "slug": "guasti",
+                    "isSelected": true,
+                    "isSellable": false,
+                    "isMandatory": true,
+                    "companyName": "Guasti alle macchine (in aumento a 50.000 - A/27)",
+                    "subtitle": "",
+                    "reserved": false,
+                    "isConfigurable": true,
+                    "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+                    "value": {
+                        "premiumGrossYearly": 2
+                    },
+                    "config": {
+                        "durationValues": {
+                          "max": 20,
+                          "min": 5,
+                          "step": 5
+                        },
+                        "dropdownValues": {},
+                        "sumInsuredValues": {},
+                        "minimumGrossYearly": 10,
+                        "percentage": 0,
+                        "premiumGrossMonthly": 0,
+                        "premiumGrossYearly": 0,
+                        "premiumNetYearly": 0,
+                        "premiumTaxAmountMonthly": 0,
+                        "premiumTaxAmountYearly": 0,
+                        "selfInsuranceValues": {},
+                        "tax": 0
+                    }
+                },
+                "apparecchiature": {
+                    "type": "enterprise",
+                    "slug": "apparecchiature",
+                    "isSelected": false,
+                    "isSellable": true,
+                    "isMandatory": false,
+                    "companyName": "Apparecchiature Elettroniche (in aumento a 50.000 - A/26)",
+                    "subtitle": "",
+                    "reserved": false,
+                    "isConfigurable": false,
+                    "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+                    "value": {
+                        "premiumGrossYearly": 2
+                    },
+                    "config": {
+                        "durationValues": {
+                          "max": 20,
+                          "min": 5,
+                          "step": 5
+                        },
+                        "dropdownValues": {},
+                        "sumInsuredValues": {
+                          "max": 20,
+                          "min": 5,
+                          "step": 5
+                        },
+                        "minimumGrossYearly": 10,
+                        "percentage": 0,
+                        "premiumGrossMonthly": 0,
+                        "premiumGrossYearly": 0,
+                        "premiumNetYearly": 0,
+                        "premiumTaxAmountMonthly": 0,
+                        "premiumTaxAmountYearly": 0,
+                        "selfInsuranceValues": {},
+                        "tax": 0
+                    }
+                },
+                "furto": {
+                    "type": "enterprise",
+                    "slug": "furto",
+                    "isSelected": false,
+                    "isSellable": true,
+                    "isMandatory": false,
+                    "companyName": "Furto, rapina, estorsione (in aumento a 20.000 - C/1)",
+                    "subtitle": "",
+                    "reserved": false,
+                    "isConfigurable": false,
+                    "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+                    "value": {
+                        "premiumGrossYearly": 2
+                    },
+                    "config": {
+                        "durationValues": {},
+                        "dropdownValues": {},
+                        "sumInsuredValues": {},
+                        "minimumGrossYearly": 10,
+                        "percentage": 0,
+                        "premiumGrossMonthly": 0,
+                        "premiumGrossYearly": 0,
+                        "premiumNetYearly": 0,
+                        "premiumTaxAmountMonthly": 0,
+                        "premiumTaxAmountYearly": 0,
+                        "selfInsuranceValues": {},
+                        "tax": 0
+                    }
+                }
+            }
+        }
+    ],
+    "isActive": true,
+    "isAgencyActive": false,
+    "isAgentActive": false,
+    "isAutoRenew": false,
+    "isEcommerceActive": false,
+    "isRenewable": true,
+    "logo": "assets/images/wopta-logo-vita-magenta.png",
+    "name": "life",
+    "nameDesc": "Wopta per te Vita",
+    "nameSubtitle": "Vita",
+    "nameTitle": "Wopta per te",
+    "paymentProviders": [
+        {
+            "configs": [
+                {
+                    "methods": [
+                        "creditCard"
+                    ],
+                    "mode": "recurrent",
+                    "rate": "monthly"
+                },
+                {
+                    "methods": [
+                        "creditCard"
+                    ],
+                    "mode": "recurrent",
+                    "rate": "yearly"
+                }
+            ],
+            "flows": [
+                "e-commerce"
+            ],
+            "name": "fabrick"
+        }
+    ],
+    "policyType": "multiYear",
+    "quoteType": "fixed",
+    "renewOffset": 45,
+    "steps": [
+       {
+            "attributes": {},
+            "children": [],
+            "flows": [],
+            "widget": "qbestep",
+            "showPrivacy": true
+        },
+        {
+            "attributes": {},
+            "children": [],
+            "flows": [],
+            "widget": "qbeguaranteestep",
+            "showPrivacy": true
+        },
+                {
+            "attributes": {},
+            "children": [],
+            "flows": [],
+            "widget": "qberecap",
+            "showPrivacy": true
+        }
+    ],
+    "version": "v2"
+}

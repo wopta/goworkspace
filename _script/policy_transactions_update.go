@@ -43,6 +43,9 @@ func PolicyTransactionsUpdate() {
 		productsMap = make(map[string]models.Product)
 	)
 
+	// ATTENTION: the function needs an manual override at product/get-product.go:110
+	// otherwise if will filter out old versions of a given product and won't updated
+	// the needed policies for life/v1 renewal. Remove the isActive check
 	productsInfo := product.GetAllProductsByChannel(models.MgaChannel)
 	for _, pr := range productsInfo {
 		prd := product.GetProductV2(pr.Name, pr.Version, models.MgaChannel, nil, nil)
@@ -73,6 +76,26 @@ func PolicyTransactionsUpdate() {
 
 			if strings.EqualFold(p.Name, models.LifeProduct) {
 				p.OfferlName = "default"
+			}
+
+			if strings.EqualFold(p.PaymentSplit, string(models.PaySplitYear)) {
+				p.PaymentSplit = string(models.PaySplitYearly)
+			}
+
+			if strings.EqualFold(p.PaymentSplit, string(models.PaySplitYearly)) && p.PaymentMode == "" {
+				p.PaymentMode = models.PaymentModeSingle
+			}
+
+			if strings.EqualFold(p.PaymentSplit, string(models.PaySplitMonthly)) && p.PaymentMode == "" {
+				p.PaymentMode = models.PaymentModeRecurrent
+			}
+
+			if p.Payment == "" {
+				p.Payment = models.FabrickPaymentProvider
+			}
+
+			if p.Channel == "" {
+				p.Channel = models.ECommerceChannel
 			}
 
 			p.Annuity = 0
