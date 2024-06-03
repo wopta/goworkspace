@@ -23,7 +23,7 @@ var ErrCallbackClientNotSet = errors.New("callback client not set")
 func newClient(node *models.NetworkNode) (CallbackClient, error) {
 	switch node.CallbackConfig.Name {
 	case "winClient":
-		return win.NewClient(node.Mail), nil
+		return win.NewClient(node.ExternalNetworkCode), nil
 	default:
 		return nil, ErrCallbackClientNotSet
 	}
