@@ -33,7 +33,7 @@ type garanzia struct {
 	Garanzia         string `json:"garanzia"`
 	Imposte          int    `json:"imposte"`
 	PremioImponibile int    `json:"premioImponibile"`
-	SommaAssicurata  int    `json:"sommaAssicurata"`
+	SommaAssicurata  int    `json:"sommaAssicurare"`
 }
 
 type perAss struct {
