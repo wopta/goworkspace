@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/wopta/goworkspace/callback/internal"
+	"github.com/wopta/goworkspace/callback_out"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
@@ -155,6 +156,8 @@ func annuityFirstRate(policyUid, providerId, trSchedule, paymentMethod string) e
 		}
 
 		mail.SendMailContract(policy, nil, fromAddress, toAddress, ccAddress, flowName)
+
+		defer callback_out.Execute(networkNode, policy, callback_out.Paid)
 	}
 
 	firestoreBatch := map[string]map[string]interface{}{
