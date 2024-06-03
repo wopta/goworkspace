@@ -23,14 +23,14 @@ func ExcelFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 	return "", nil, nil
 }
 
-type InputCell struct {
-	cell  string
-	value interface{}
+type Cell struct {
+	Cell  string
+	Value interface{}
 }
 
 type QuoteExcel struct {
 	SheetName, filename string
-	InputCells          []InputCell
+	InputCells          []Cell
 }
 
 func Excel() {

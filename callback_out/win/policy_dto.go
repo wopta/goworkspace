@@ -2,6 +2,7 @@ package win
 
 import (
 	"fmt"
+	"slices"
 	"time"
 
 	"github.com/wopta/goworkspace/lib"
@@ -9,23 +10,23 @@ import (
 )
 
 type anagrafica struct {
-	Cap              string `json:"cap"`              // min: 0, max: 5
-	Cf               string `json:"cf"`               // min:0, max: 16
-	CodRagSoc        string `json:"codRagSoc"`        // "CONDOMINIO", "COOPERATIVA", "DITTA INDIVIDUALE", "IMPRESA FAMIGLIARE", "ONLUS", "SAPA", "SAS", "SNC", "SPA", "SRL"
-	Cognome          string `json:"cognome"`          // min: 0, max: 40
-	Comune           string `json:"comune"`           // min: 0, max: 50
-	DataNascita      string `json:"dataNascita"`      // time.DateOnly
-	Descrizione      string `json:"descrizione"`      // min: 0, max: 80
-	Indirizzo        string `json:"indirizzo"`        // min: 0, max: 80
-	LuogoNascita     string `json:"luogoNascita"`     // min: 0, max: 50
-	Nazione          string `json:"nazione"`          // min: 0, max: 2
-	NazioneNascita   string `json:"nazioneNascita"`   // min: 0, max: 2
-	Nome             string `json:"nome"`             // min: 0, max: 40
-	Pfg              string `json:"pfg"`              // "F", "G"
-	Piva             string `json:"piva"`             // min: 0, max: 11
-	Provincia        string `json:"provincia"`        // min: 0, max: 3
-	ProvinciaNascita string `json:"provinciaNascita"` // min: 0, max: 3
-	Sesso            string `json:"sesso"`            // min: 0, max: 1
+	Cap              string `json:"cap"`                   // min: 0, max: 5
+	Cf               string `json:"cf"`                    // min:0, max: 16
+	CodRagSoc        string `json:"codRagSoc,omitempty"`   // "CONDOMINIO", "COOPERATIVA", "DITTA INDIVIDUALE", "IMPRESA FAMIGLIARE", "ONLUS", "SAPA", "SAS", "SNC", "SPA", "SRL"
+	Cognome          string `json:"cognome"`               // min: 0, max: 40
+	Comune           string `json:"comune"`                // min: 0, max: 50
+	DataNascita      string `json:"dataNascita"`           // time.DateOnly
+	Descrizione      string `json:"descrizione,omitempty"` // min: 0, max: 80
+	Indirizzo        string `json:"indirizzo"`             // min: 0, max: 80
+	LuogoNascita     string `json:"luogoNascita"`          // min: 0, max: 50
+	Nazione          string `json:"nazione"`               // min: 0, max: 2
+	NazioneNascita   string `json:"nazioneNascita"`        // min: 0, max: 2
+	Nome             string `json:"nome"`                  // min: 0, max: 40
+	Pfg              string `json:"pfg"`                   // "F", "G"
+	Piva             string `json:"piva,omitempty"`        // min: 0, max: 11
+	Provincia        string `json:"provincia"`             // min: 0, max: 3
+	ProvinciaNascita string `json:"provinciaNascita"`      // min: 0, max: 3
+	Sesso            string `json:"sesso"`                 // min: 0, max: 1
 }
 
 type garanzia struct {
@@ -40,8 +41,8 @@ type perAss struct {
 	DataEffetto       string `json:"dataEffetto"`       // time.DateOnly
 	DataPrimaScadenza string `json:"dataPrimaScadenza"` // time.DateOnly
 	DataScadenza      string `json:"dataScadenza"`      // time.DateOnly
-	DurataIniziale    int    `json:"durataIniziale"`
-	Frazionamento     string `json:"frazionamento"` // "ANNUALE", "SEMESTRALE", "QUADRIMESTRALE", "TRIMESTRALE", "BIMESTRALE", "MENSILE", "Unica_soluzione"
+	DurataIniziale    int    `json:"durataIniziale"`    // DataPrimaScadenza - DataEffetto in days
+	Frazionamento     string `json:"frazionamento"`     // "ANNUALE", "SEMESTRALE", "QUADRIMESTRALE", "TRIMESTRALE", "BIMESTRALE", "MENSILE", "Unica_soluzione"
 }
 
 type totaleGaranzia struct {
@@ -72,16 +73,23 @@ type policy struct {
 	LuogoEmissione string     `json:"luogoEmissione"`
 	NumOriginali   int        `json:"numOriginali"`
 	NumPol         string     `json:"numPol"`
-	NumPolSost     string     `json:"numPolSost"`
+	NumPolSost     string     `json:"numPolSost,omitempty"`
 	Ramo           string     `json:"ramo"`
 }
 
-var paymentSplitMap map[string]string = map[string]string{
-	string(models.PaySplitYearly):  "ANNUALE",
-	string(models.PaySplitMonthly): "MENSILE",
+// var paymentSplitMap map[string]string = map[string]string{
+// 	string(models.PaySplitYearly):  "ANNUALE",
+// 	string(models.PaySplitMonthly): "MENSILE",
+// }
+
+var guaranteeMap = map[string]string{
+	"death":                "VITA",
+	"permanent-disability": "INVALIDITA",
+	"temporary-disability": "INABILITA",
+	"serious-ill":          "MALATTIA",
 }
 
-func policyDto(p models.Policy) policy {
+func policyDto(p models.Policy, producer string) policy {
 	var (
 		wp                  policy
 		an                  anagrafica
@@ -94,21 +102,18 @@ func policyDto(p models.Policy) policy {
 	// Map contractor data
 	an.Cap = p.Contractor.Residence.PostalCode
 	an.Cf = p.Contractor.FiscalCode
-	an.CodRagSoc = "" // ?
 	an.Cognome = p.Contractor.Surname
 	an.Comune = p.Contractor.Residence.City
 	if contractorBirthDate, err = time.Parse(time.RFC3339, p.Contractor.BirthDate); err != nil {
 		return policy{}
 	}
 	an.DataNascita = contractorBirthDate.Format(time.DateOnly)
-	an.Descrizione = ""
 	an.Indirizzo = lib.TrimSpace(fmt.Sprintf("%s, %s", p.Contractor.Residence.StreetName, p.Contractor.Residence.StreetNumber))
 	an.LuogoNascita = p.Contractor.BirthCity
 	an.Nazione = "IT"
-	an.NazioneNascita = ""
+	an.NazioneNascita = "IT" // for now we'll hardcode it. To enrich based on fiscalCode
 	an.Nome = p.Contractor.Name
 	an.Pfg = "F"
-	an.Piva = ""
 	an.Provincia = p.Contractor.Residence.CityCode
 	an.ProvinciaNascita = p.Contractor.BirthProvince
 	an.Sesso = p.Contractor.Gender
@@ -117,34 +122,38 @@ func policyDto(p models.Policy) policy {
 
 	// Map guarantees
 	wp.Garanzie = make([]garanzia, 0)
-	for _, guarantee := range p.Assets[0].Guarantees {
+	for woptaSlug, winSlug := range guaranteeMap {
 		var g garanzia
-		g.Garanzia = guarantee.Slug
-		g.SommaAssicurata = int(100 * guarantee.Value.SumInsuredLimitOfIndemnity)
-		g.PremioImponibile = int(100 * guarantee.Value.PremiumNetYearly)
-		g.Imposte = int(100 * guarantee.Value.PremiumTaxAmountYearly)
-		if p.PaymentSplit == string(models.PaySplitMonthly) {
-			g.PremioImponibile = int(100 * guarantee.Value.PremiumNetMonthly)
-			g.Imposte = int(100 * guarantee.Value.PremiumTaxAmountMonthly)
+		g.Garanzia = winSlug
+		index := slices.IndexFunc(p.Assets[0].Guarantees, func(item models.Guarante) bool {
+			return item.Slug == woptaSlug
+		})
+		if index != -1 {
+			guarantee := p.Assets[0].Guarantees[index]
+			g.SommaAssicurata = int(100 * guarantee.Value.SumInsuredLimitOfIndemnity)
+			g.PremioImponibile = int(100 * guarantee.Value.PremiumNetYearly)
+			g.Imposte = int(100 * guarantee.Value.PremiumTaxAmountYearly)
 		}
 		wp.Garanzie = append(wp.Garanzie, g)
 	}
 
-	wp.IdPratica = p.NumberCompany
+	wp.IdPratica = p.ProposalNumber
+
+	firstExpiryDate := lib.AddMonths(p.StartDate, 12)
+	if p.PaymentSplit == string(models.PaySplitMonthly) {
+		firstExpiryDate = lib.AddMonths(p.StartDate, 1)
+	}
 
 	pa.BaseAnno = "ANNO_SOLARE"
 	pa.DataEffetto = p.StartDate.Format(time.DateOnly)
-	pa.DataPrimaScadenza = lib.AddMonths(p.StartDate, 12).Format(time.DateOnly)
-	if p.PaymentSplit == string(models.PaySplitMonthly) {
-		pa.DataPrimaScadenza = lib.AddMonths(p.StartDate, 1).Format(time.DateOnly)
-	}
+	pa.DataPrimaScadenza = firstExpiryDate.Format(time.DateOnly)
 	pa.DataScadenza = p.EndDate.Format(time.DateOnly)
-	pa.DurataIniziale = p.GetDurationInYears()
-	pa.Frazionamento = paymentSplitMap[p.PaymentSplit]
+	pa.DurataIniziale = int(firstExpiryDate.Sub(p.StartDate).Hours() / 24)
+	pa.Frazionamento = "ANNUALE"
 
 	wp.PerAss = pa
 
-	wp.Prodotto = p.Name
+	wp.Prodotto = "WOPTA_VITA"
 
 	// Map totals
 	totale.Imposte = int(100 * p.TaxAmount)
@@ -163,17 +172,37 @@ func policyDto(p models.Policy) policy {
 	wp.TotaleFirma = totale
 	wp.TotaleFutura = totale
 
-	wp.Utente = lib.TrimSpace(fmt.Sprintf("%s %s", p.Contractor.Name, p.Contractor.Surname))
+	if p.PaymentSplit == string(models.PaySplitMonthly) {
+		wp.TotaleFirma.Imposte = int(100 * p.TaxAmountMonthly)
+		wp.TotaleFirma.PremioImponibile = int(100 * p.PriceNettMonthly)
+		wp.TotaleFirma.Totale = int(100 * p.PriceGrossMonthly)
+		for i := range wp.TotaleFirma.TotaliGaranzie {
+			wp.TotaleFirma.TotaliGaranzie[i].Imposte /= 12
+			wp.TotaleFirma.TotaliGaranzie[i].PremioImponibile /= 12
+			wp.TotaleFirma.TotaliGaranzie[i].Totale = wp.TotaleFirma.TotaliGaranzie[i].Imposte + wp.TotaleFirma.TotaliGaranzie[i].PremioImponibile
+		}
+
+		wp.TotaleFutura.Imposte = wp.TotaleAnnuo.Imposte - wp.TotaleFirma.Imposte
+		wp.TotaleFutura.PremioImponibile = wp.TotaleAnnuo.PremioImponibile - wp.TotaleFirma.PremioImponibile
+		wp.TotaleFutura.Totale = wp.TotaleAnnuo.Totale - wp.TotaleFirma.Totale
+		for i := range wp.TotaleFutura.TotaliGaranzie {
+			wp.TotaleFutura.TotaliGaranzie[i].Imposte = wp.TotaleAnnuo.TotaliGaranzie[i].Imposte - wp.TotaleFirma.TotaliGaranzie[i].Imposte
+			wp.TotaleFutura.TotaliGaranzie[i].PremioImponibile = wp.TotaleAnnuo.TotaliGaranzie[i].PremioImponibile - wp.TotaleFirma.TotaliGaranzie[i].PremioImponibile
+			wp.TotaleFutura.TotaliGaranzie[i].Totale = wp.TotaleAnnuo.TotaliGaranzie[i].Totale - wp.TotaleFirma.TotaliGaranzie[i].Totale
+		}
+	}
+
+	wp.Utente = producer
 
 	wp.DtEmissione = p.EmitDate.Format(time.DateOnly)
 
 	wp.LuogoEmissione = "Italia"
 
-	wp.NumOriginali = 0
+	wp.NumOriginali = 1
 
 	wp.NumPol = p.CodeCompany
 
-	wp.Ramo = p.Channel
+	wp.Ramo = "01"
 
 	return wp
 }

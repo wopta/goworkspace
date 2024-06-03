@@ -2,48 +2,58 @@ package win
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/wopta/goworkspace/callback_out/internal"
-	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
 
 type Client struct {
 	basePath string
+	producer string
 	path     string
 	headers  map[string]string
 }
 
-func NewClient() *Client {
+func NewClient(producer string) *Client {
 	return &Client{
 		basePath: os.Getenv("WIN_CALLBACK_ENDPOINT"),
+		producer: producer,
 	}
 }
 
 func (c *Client) post(body io.Reader) (*http.Request, *http.Response, error) {
-	path := fmt.Sprintf("%s/%s", c.basePath, c.path)
+	path := c.basePath + c.path
 	req, err := http.NewRequest(http.MethodPost, path, body)
 	if err != nil {
 		return nil, nil, err
 	}
 
+	req.SetBasicAuth(os.Getenv("WIN_CALLBACK_AUTH_USER"), os.Getenv("WIN_CALLBACK_AUTH_PASS"))
+
 	for key, value := range c.headers {
 		req.Header.Set(key, value)
 	}
 
-	res, err := lib.RetryDo(req, 5, 10)
+	client := http.Client{
+		Timeout: 30 * time.Second,
+	}
+	res, err := client.Do(req)
 
 	return req, res, err
+}
+
+func (c *Client) Proposal(policy models.Policy) internal.CallbackInfo {
+	return c.Emit(policy)
 }
 
 func (c *Client) Emit(policy models.Policy) internal.CallbackInfo {
 	c.path = "restba/extquote/inspratica"
 
-	body, err := inspratica(policy, "QUOTAZIONE_ACCETTATA")
+	body, err := inspratica(policy, "QUOTAZIONE_ACCETTATA", c.producer)
 	if err != nil {
 		return internal.CallbackInfo{
 			Request:     nil,
@@ -65,7 +75,7 @@ func (c *Client) Emit(policy models.Policy) internal.CallbackInfo {
 func (c *Client) RequestApproval(policy models.Policy) internal.CallbackInfo {
 	c.path = "restba/extquote/inspratica"
 
-	body, err := inspratica(policy, "RICHIESTA_QUOTAZIONE")
+	body, err := inspratica(policy, "RICHIESTA_QUOTAZIONE", c.producer)
 	if err != nil {
 		return internal.CallbackInfo{
 			Request:     nil,
@@ -87,7 +97,7 @@ func (c *Client) RequestApproval(policy models.Policy) internal.CallbackInfo {
 func (c *Client) Paid(policy models.Policy) internal.CallbackInfo {
 	c.path = "restba/extquote/emissione"
 
-	body, err := emissione(policy)
+	body, err := emissione(policy, c.producer)
 	if err != nil {
 		return internal.CallbackInfo{
 			Request:     nil,

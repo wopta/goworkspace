@@ -19,8 +19,8 @@ type inspraticaReq struct {
 	StatoPratica string     `json:"statoPratica"` // "QUOTAZIONE_ACCETTATA", "RICHIESTA_QUOTAZIONE"
 }
 
-func inspratica(policy models.Policy, state string) ([]byte, error) {
-	winPolicy := policyDto(policy)
+func inspratica(policy models.Policy, state, producer string) ([]byte, error) {
+	winPolicy := policyDto(policy, producer)
 	payload := inspraticaReq{
 		Anagrafica:   winPolicy.Anagrafica,
 		Garanzie:     winPolicy.Garanzie,

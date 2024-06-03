@@ -10,6 +10,7 @@ import (
 type CallbackoutAction = string
 
 var (
+	Proposal        CallbackoutAction = "Proposal"
 	RequestApproval CallbackoutAction = "RequestApproval"
 	Emit            CallbackoutAction = "Emit"
 	Paid            CallbackoutAction = "Paid"
@@ -33,6 +34,8 @@ func Execute(node *models.NetworkNode, policy models.Policy, action CallbackoutA
 	}
 
 	switch action {
+	case Proposal:
+		fx = client.Proposal
 	case RequestApproval:
 		fx = client.RequestApproval
 	case Emit:
