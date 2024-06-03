@@ -33,6 +33,7 @@ func (c *Client) post(body io.Reader) (*http.Request, *http.Response, error) {
 	}
 
 	req.SetBasicAuth(os.Getenv("WIN_CALLBACK_AUTH_USER"), os.Getenv("WIN_CALLBACK_AUTH_PASS"))
+	req.Header.Set("Content-Type", "application/json")
 
 	for key, value := range c.headers {
 		req.Header.Set(key, value)
