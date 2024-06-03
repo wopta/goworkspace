@@ -11,12 +11,10 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
-func Controller(policy models.Policy, product models.Product, transactions []models.Transaction, scheduleFirstRate bool) (string, []models.Transaction, error) {
+func Controller(policy models.Policy, product models.Product, transactions []models.Transaction, scheduleFirstRate bool, customerId string) (string, []models.Transaction, error) {
 	var (
-		err                error
-		payUrl             string
-		paymentMethods     []string
-		updatedTransaction []models.Transaction
+		err            error
+		paymentMethods []string
 	)
 
 	log.Printf("init")
@@ -35,23 +33,41 @@ func Controller(policy models.Policy, product models.Product, transactions []mod
 
 	switch policy.Payment {
 	case models.FabrickPaymentProvider:
-		payUrl, updatedTransaction, err = fabrickIntegration(transactions, paymentMethods, policy, scheduleFirstRate)
+		return fabrickIntegration(transactions, paymentMethods, policy, scheduleFirstRate, customerId)
 	case models.ManualPaymentProvider:
-		payUrl, updatedTransaction, err = remittanceIntegration(transactions)
+		return remittanceIntegration(transactions)
 	default:
 		return "", nil, fmt.Errorf("payment provider %s not supported", policy.Payment)
 	}
-
-	return payUrl, updatedTransaction, nil
 }
 
-func fabrickIntegration(transactions []models.Transaction, paymentMethods []string, policy models.Policy, scheduleFirstRate bool) (payUrl string, updatedTransactions []models.Transaction, err error) {
-	customerId := uuid.New().String()
+func fabrickIntegration(transactions []models.Transaction, paymentMethods []string, policy models.Policy, scheduleFirstRate bool, customerId string) (payUrl string, updatedTransactions []models.Transaction, err error) {
+	hasMandate := false
 	now := time.Now().UTC()
 
+	if hasMandate, err = fabrickHasMandate(customerId); err != nil {
+		log.Printf("error checking mandate: %s", err.Error())
+	}
+
+	// TODO: this might change in the future. It works as following:
+	// - if no customerId is previously provided, scheduleFirstRate will have the
+	// inputed value as the true value
+	// - if there is a provided customerId, scheduleFirstRate will follow the fact
+	// that the user has or not an active mandate
+	// - currently the second case is used only in renew.
+	if customerId != "" {
+		scheduleFirstRate = hasMandate
+	}
+
+	if customerId == "" {
+		customerId = uuid.New().String()
+	}
+
 	for index, tr := range transactions {
-		isFirstRate := index == 0
-		createMandate := (policy.PaymentMode == models.PaymentModeRecurrent) && isFirstRate
+		isFirstOfBatch := index == 0
+		isFirstRateOfAnnuity := policy.StartDate.Month() == tr.EffectiveDate.Month()
+
+		createMandate := shouldCreateMandate(policy, tr, isFirstOfBatch, isFirstRateOfAnnuity, hasMandate)
 
 		tr.ProviderName = models.FabrickPaymentProvider
 
@@ -68,11 +84,11 @@ func fabrickIntegration(transactions []models.Transaction, paymentMethods []stri
 			tr.ScheduleDate = now.AddDate(0, 0, 1).Format(time.DateOnly)
 		}
 
-		res := <-createFabrickTransaction(&policy, tr, createMandate, scheduleFirstRate, customerId, paymentMethods)
+		res := <-createFabrickTransaction(&policy, tr, createMandate, scheduleFirstRate, isFirstRateOfAnnuity, customerId, paymentMethods)
 		if res.Payload == nil || res.Payload.PaymentPageURL == nil {
 			return "", nil, errors.New("error creating transaction on Fabrick")
 		}
-		if isFirstRate {
+		if isFirstOfBatch && (!hasMandate || createMandate) {
 			payUrl = *res.Payload.PaymentPageURL
 		}
 		log.Printf("transaction %02d payUrl: %s", index+1, *res.Payload.PaymentPageURL)
@@ -144,4 +160,11 @@ func checkPaymentModes(policy models.Policy) error {
 	}
 
 	return nil
+}
+
+func shouldCreateMandate(p models.Policy, tr models.Transaction, isFirstTransaction, isFirstRateOfAnnuity, hasMandate bool) bool {
+	isFirstRateOfPolicy := p.StartDate.Truncate(time.Hour * 24).Equal(tr.EffectiveDate.Truncate(time.Hour * 24))
+
+	return p.PaymentMode == models.PaymentModeRecurrent && isFirstTransaction &&
+		(isFirstRateOfPolicy || (isFirstRateOfAnnuity && !hasMandate))
 }

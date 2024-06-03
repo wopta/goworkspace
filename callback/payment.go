@@ -86,7 +86,7 @@ func fabrickPayment(origin, providerId string, policy *models.Policy) error {
 
 	policy.SanitizePaymentData()
 
-	transaction, err := tr.GetTransactionToBePaid(policy.Uid, providerId, trSchedule, origin)
+	transaction, err := tr.GetTransactionToBePaid(policy.Uid, providerId, trSchedule, lib.TransactionsCollection)
 	if err != nil {
 		log.Printf("[fabrickPayment] ERROR getting transaction: %s", err.Error())
 		return err
