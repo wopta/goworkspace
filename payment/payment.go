@@ -7,6 +7,7 @@ import (
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/payment/fabrick"
 )
 
 var paymentRoutes []lib.Route = []lib.Route{
@@ -39,6 +40,12 @@ var paymentRoutes []lib.Route = []lib.Route{
 		Handler: lib.ResponseLoggerWrapper(ChangePaymentProviderFx),
 		Method:  http.MethodPatch,
 		Roles:   []string{models.UserRoleAdmin},
+	},
+	{
+		Route:   "/v1/fabrick/refresh-token",
+		Handler: lib.ResponseLoggerWrapper(fabrick.RefreshTokenFx),
+		Method:  http.MethodPost,
+		Roles:   []string{},
 	},
 }
 
