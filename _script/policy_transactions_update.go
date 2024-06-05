@@ -39,8 +39,8 @@ func getAllPolicies() ([]models.Policy, error) {
 
 func PolicyTransactionsUpdate() {
 	var (
-		wg          sync.WaitGroup
-		productsMap = make(map[string]models.Product)
+		wg          *sync.WaitGroup = new(sync.WaitGroup)
+		productsMap                 = make(map[string]models.Product)
 	)
 
 	// ATTENTION: the function needs an manual override at product/get-product.go:110
@@ -60,9 +60,9 @@ func PolicyTransactionsUpdate() {
 	startDate := time.Now().UTC()
 	log.Printf("Started at %s", startDate.String())
 
-	wg.Add(len(policies))
-
+	// TODO: split policies in batch es.: 1000
 	for _, p := range policies {
+		wg.Add(1)
 		go func(p models.Policy) {
 			defer wg.Done()
 
@@ -135,5 +135,5 @@ func PolicyTransactionsUpdate() {
 
 	endDate := time.Now().UTC()
 	log.Printf("End at %s duration %s", endDate.String(), endDate.Sub(startDate).String())
-
+	log.Printf("N policies %d", len(policies))
 }
