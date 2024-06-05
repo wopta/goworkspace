@@ -20,13 +20,13 @@ func CsvToDataframe(data []byte) dataframe.DataFrame {
 	log.Println(df.Error())
 	return df
 }
-func CsvToDataframeV2(data []byte,delimiter rune,hasHeader bool ) (dataframe.DataFrame,error) {
+func CsvToDataframeV2(data []byte, delimiter rune, hasHeader bool) (dataframe.DataFrame, error) {
 	reader := bytes.NewReader(data)
 	df := dataframe.ReadCSV(reader,
 		dataframe.WithDelimiter(delimiter),
-		dataframe.HasHeader(true),
+		dataframe.HasHeader(hasHeader),
 		dataframe.NaNValues(nil))
-	return df,df.Error()
+	return df, df.Error()
 }
 
 // TODO error mng
@@ -72,11 +72,11 @@ func GroupBy(df dataframe.DataFrame, col int) map[string][][]string {
 		res map[string][][]string
 	)
 	for _, k := range df.Records() {
-			if resFound, found := res[k[col]]; found {
-				resFound = append(resFound, k)
-			}else{
-				res[k[col]] = [][]string{k}
-			}		
+		if resFound, found := res[k[col]]; found {
+			resFound = append(resFound, k)
+		} else {
+			res[k[col]] = [][]string{k}
+		}
 
 	}
 	return res

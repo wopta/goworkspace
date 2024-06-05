@@ -13,4 +13,5 @@ function-data/
 .DS_Store
 *.code-workspace
 document/*.pdf
-
+_script/*.csv
+_script/*.json
