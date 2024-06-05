@@ -2,14 +2,15 @@ package _script
 
 import (
 	"encoding/json"
+	"log"
+	"os"
+	"sync"
+
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 	"github.com/wopta/goworkspace/transaction"
 	"google.golang.org/api/iterator"
-	"log"
-	"os"
-	"sync"
 )
 
 const filePath = "./_script/prod_data.json"
@@ -62,7 +63,7 @@ func FetchAllPoliciesData() {
 		wg.Add(1)
 		go func(p models.Policy) {
 			defer wg.Done()
-			transactions := transaction.GetPolicyActiveTransactions("", p.Uid)
+			transactions := transaction.GetPolicyValidTransactions(p.Uid, nil)
 			data.mux.Lock()
 			data.Data = append(data.Data, policyInfo{p, transactions})
 			data.mux.Unlock()

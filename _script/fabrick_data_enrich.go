@@ -89,7 +89,7 @@ func FabrickDataEnrich() {
 			policyUid := rows[len(rows)-1].PolicyUid
 			userToken := rows[len(rows)-1].UserToken
 
-			transactions := transaction.GetPolicyActiveTransactions("", policyUid)
+			transactions := transaction.GetPolicyValidTransactions(policyUid, nil)
 			if len(transactions) == 0 {
 				notFound = append(notFound, policyUid)
 				return
