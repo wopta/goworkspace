@@ -22,8 +22,8 @@ var authRoutes []lib.Route = []lib.Route{
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
-		Route:   "/sso/jwt/aua/v1",
-		Handler: lib.ResponseLoggerWrapper(JwtFx),
+		Route:   "/sso/jwt/{provider}/v1",
+		Handler: lib.ResponseLoggerWrapper(DynamicJwtFx),
 		Method:  http.MethodGet,
 		Roles:   []string{lib.UserRoleInternal},
 	},
