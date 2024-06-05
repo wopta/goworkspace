@@ -81,7 +81,7 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		return "", nil, fmt.Errorf(errTransactionDeleted)
 	}
 
-	firePolicyTransactions := trn.GetPolicyActiveTransactions(origin, transaction.PolicyUid)
+	firePolicyTransactions := trn.GetPolicyValidTransactions(transaction.PolicyUid, nil)
 	log.Printf("Found transactions %v", firePolicyTransactions)
 	canPayTransaction := false
 
@@ -133,7 +133,7 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 	trn.CreateNetworkTransactions(&policy, &transaction, networkNode, mgaProduct)
 
 	// Update policy if needed
-	if !policy.IsPay {
+	if !policy.IsPay && policy.Annuity == 0 {
 		policy.SanitizePaymentData()
 		// Create/Update document on user collection based on contractor fiscalCode
 		err = plc.SetUserIntoPolicyContractor(&policy, origin)

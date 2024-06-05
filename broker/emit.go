@@ -364,7 +364,7 @@ func createPolicyTransactions(policy *models.Policy) (string, error) {
 		log.Println("no transactions created")
 		return "", errors.New("no transactions created")
 	}
-	payUrl, updatedTransactions, err := payment.Controller(*policy, *product, transactions, false)
+	payUrl, updatedTransactions, err := payment.Controller(*policy, *product, transactions, false, "")
 	if err != nil {
 		log.Printf("error emitPay policy %s: %s", policy.Uid, err.Error())
 		return "", err
