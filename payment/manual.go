@@ -133,7 +133,7 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 	trn.CreateNetworkTransactions(&policy, &transaction, networkNode, mgaProduct)
 
 	// Update policy if needed
-	if !policy.IsPay {
+	if !policy.IsPay && policy.Annuity == 0 {
 		policy.SanitizePaymentData()
 		// Create/Update document on user collection based on contractor fiscalCode
 		err = plc.SetUserIntoPolicyContractor(&policy, origin)
