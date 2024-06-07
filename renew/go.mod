@@ -8,7 +8,7 @@ require (
 	github.com/wopta/goworkspace/lib v1.0.126
 	github.com/wopta/goworkspace/mail v1.0.115
 	github.com/wopta/goworkspace/models v1.1.117
-	github.com/wopta/goworkspace/payment v1.0.214
+	github.com/wopta/goworkspace/payment v1.0.215
 	github.com/wopta/goworkspace/transaction v1.0.87
 	google.golang.org/api v0.181.0
 )
