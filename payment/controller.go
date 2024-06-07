@@ -67,7 +67,8 @@ func fabrickIntegration(transactions []models.Transaction, paymentMethods []stri
 		isFirstOfBatch := index == 0
 		isFirstRateOfAnnuity := policy.StartDate.Month() == tr.EffectiveDate.Month()
 
-		createMandate := shouldCreateMandate(policy, tr, isFirstOfBatch, isFirstRateOfAnnuity, hasMandate)
+		createMandate := shouldCreateMandate(policy, tr, isFirstOfBatch, isFirstRateOfAnnuity, hasMandate, len(transactions))
+		log.Printf("shouldCreateMandate result: %v", createMandate)
 
 		tr.ProviderName = models.FabrickPaymentProvider
 
@@ -162,9 +163,11 @@ func checkPaymentModes(policy models.Policy) error {
 	return nil
 }
 
-func shouldCreateMandate(p models.Policy, tr models.Transaction, isFirstTransaction, isFirstRateOfAnnuity, hasMandate bool) bool {
+func shouldCreateMandate(p models.Policy, tr models.Transaction, isFirstTransaction, isFirstRateOfAnnuity, hasMandate bool, numberOfRates int) bool {
 	isFirstRateOfPolicy := p.StartDate.Truncate(time.Hour * 24).Equal(tr.EffectiveDate.Truncate(time.Hour * 24))
 
+	isRefresh := p.PaymentSplit == string(models.PaySplitMonthly) && numberOfRates < 12
+
 	return p.PaymentMode == models.PaymentModeRecurrent && isFirstTransaction &&
-		(isFirstRateOfPolicy || (isFirstRateOfAnnuity && !hasMandate))
+		(isFirstRateOfPolicy || (isFirstRateOfAnnuity && !hasMandate) || isRefresh)
 }

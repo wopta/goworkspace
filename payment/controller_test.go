@@ -396,7 +396,7 @@ func TestControllerRenewMonthlyWithExistingMandate(t *testing.T) {
 
 	policy := getPolicy(models.FabrickPaymentProvider, models.PaymentModeRecurrent, string(models.PaySplitMonthly), 1)
 	product := getProduct()
-	transactions := getTransactions(1, models.FabrickPaymentProvider, 1, globalDate.AddDate(1, 0, 0))
+	transactions := getTransactions(12, models.FabrickPaymentProvider, 1, globalDate.AddDate(1, 0, 0))
 
 	payUrl, updatedTransactions, err := Controller(policy, product, transactions, true, "user-has-token")
 	if err != nil {
