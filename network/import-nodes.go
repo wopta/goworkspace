@@ -62,7 +62,7 @@ var (
 )
 
 const (
-	expectedColumns        = 33
+	expectedColumns        = 38
 	fiscalCodeRegexPattern = "^(?:[A-Z][AEIOU][AEIOUX]|[AEIOU]X{2}|[B-DF-HJ-NP-TV-Z]{2}[A-Z]){2}(?:[\\dLMNP-V]{2}(?:[" +
 		"A-EHLMPR-T](?:[04LQ][1-9MNP-V]|[15MR][\\dLMNP-V]|[26NS][0-8LMNP-U])|[DHPS][37PT][0L]|[ACELMRT][37PT][01LM]|[" +
 		"AC-EHLMPR-T][26NS][9V])|(?:[02468LNQSU][048LQU]|[13579MPRTV][26NS])B[26NS][9V])(?:[A-MZ][1-9MNP-V][\\dLMNP-V]" +
@@ -100,6 +100,11 @@ const (
 	designationCol           int = 30
 	worksForUidCol           int = 31
 	isActiveCol              int = 32
+	callbackClientCol        int = 33
+	jwtKeyNameCol            int = 34
+	jwtKeyAlgorithmCol       int = 35
+	jwtEncryptionCol         int = 36
+	jwtSignatureCol          int = 37
 )
 
 func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -324,11 +329,12 @@ func buildWarrantsCompatibilityMap(warrants []models.Warrant) map[string][]strin
 
 func normalizeFields(row []string) []string {
 	trimFields := []int{codeCol, externalNetworkCodeCol, parentUidCol, agencyRuiRegistrationCol, agencyVatCodeCol,
-		agencyPhoneCol, agentVatCodeCol, agentPhoneCol, worksForUidCol}
+		agencyPhoneCol, agentVatCodeCol, agentPhoneCol, worksForUidCol, callbackClientCol, jwtKeyAlgorithmCol,
+		jwtEncryptionCol, jwtSignatureCol}
 	toUpperFields := []int{mailCol, agencyNameCol, agencyRuiCodeCol, agencyRuiSectionCol, agencyPecCol,
 		agencyWebsiteCol, agencyStreetNameCol, agencyStreetNumberCol, agencyLocalityCol, agencyCityCol,
 		agencyPostalCodeCol, agencyCityCodeCol, agentNameCol, agentSurnameCol, agentFiscalCodeCol, agentRuiCodeCol,
-		agentRuiSectionCol, isMgaProponentCol, hasAnnexCol, isActiveCol}
+		agentRuiSectionCol, isMgaProponentCol, hasAnnexCol, isActiveCol, jwtKeyNameCol}
 	toLowerFields := []int{typeCol, warrantCol}
 
 	row = lib.SliceMap(row, func(field string) string {
