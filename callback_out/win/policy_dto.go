@@ -30,10 +30,10 @@ type anagrafica struct {
 }
 
 type garanzia struct {
-	Garanzia         string `json:"garanzia"`
-	Imposte          int    `json:"imposte"`
-	PremioImponibile int    `json:"premioImponibile"`
-	SommaAssicurata  int    `json:"sommaAssicurare"`
+	Garanzia         string  `json:"garanzia"`
+	Imposte          float64 `json:"imposte"`
+	PremioImponibile float64 `json:"premioImponibile"`
+	SommaAssicurata  float64 `json:"sommaAssicurare"`
 }
 
 type perAss struct {
@@ -46,16 +46,16 @@ type perAss struct {
 }
 
 type totaleGaranzia struct {
-	Garanzia         string `json:"garanzia"`
-	Imposte          int    `json:"imposte"`
-	PremioImponibile int    `json:"premioImponibile"`
-	Totale           int    `json:"totale"`
+	Garanzia         string  `json:"garanzia"`
+	Imposte          float64 `json:"imposte"`
+	PremioImponibile float64 `json:"premioImponibile"`
+	Totale           float64 `json:"totale"`
 }
 
 type totale struct {
-	Imposte          int              `json:"imposte"`
-	PremioImponibile int              `json:"premioImponibile"`
-	Totale           int              `json:"totale"`
+	Imposte          float64          `json:"imposte"`
+	PremioImponibile float64          `json:"premioImponibile"`
+	Totale           float64          `json:"totale"`
 	TotaliGaranzie   []totaleGaranzia `json:"totaliGaranzie"`
 }
 
@@ -130,9 +130,9 @@ func policyDto(p models.Policy, producer string) policy {
 		})
 		if index != -1 {
 			guarantee := p.Assets[0].Guarantees[index]
-			g.SommaAssicurata = int(100 * guarantee.Value.SumInsuredLimitOfIndemnity)
-			g.PremioImponibile = int(100 * guarantee.Value.PremiumNetYearly)
-			g.Imposte = int(100 * guarantee.Value.PremiumTaxAmountYearly)
+			g.SommaAssicurata = guarantee.Value.SumInsuredLimitOfIndemnity
+			g.PremioImponibile = guarantee.Value.PremiumNetYearly
+			g.Imposte = guarantee.Value.PremiumTaxAmountYearly
 		}
 		wp.Garanzie = append(wp.Garanzie, g)
 	}
@@ -156,9 +156,9 @@ func policyDto(p models.Policy, producer string) policy {
 	wp.Prodotto = "WOPTA_VITA"
 
 	// Map totals
-	totale.Imposte = int(100 * p.TaxAmount)
-	totale.PremioImponibile = int(100 * p.PriceNett)
-	totale.Totale = int(100 * p.PriceGross)
+	totale.Imposte = p.TaxAmount
+	totale.PremioImponibile = p.PriceNett
+	totale.Totale = p.PriceGross
 	totale.TotaliGaranzie = make([]totaleGaranzia, 0)
 	for _, g := range wp.Garanzie {
 		totale.TotaliGaranzie = append(totale.TotaliGaranzie, totaleGaranzia{
@@ -173,9 +173,9 @@ func policyDto(p models.Policy, producer string) policy {
 	wp.TotaleFutura = totale
 
 	if p.PaymentSplit == string(models.PaySplitMonthly) {
-		wp.TotaleFirma.Imposte = int(100 * p.TaxAmountMonthly)
-		wp.TotaleFirma.PremioImponibile = int(100 * p.PriceNettMonthly)
-		wp.TotaleFirma.Totale = int(100 * p.PriceGrossMonthly)
+		wp.TotaleFirma.Imposte = p.TaxAmountMonthly
+		wp.TotaleFirma.PremioImponibile = p.PriceNettMonthly
+		wp.TotaleFirma.Totale = p.PriceGrossMonthly
 		for i := range wp.TotaleFirma.TotaliGaranzie {
 			wp.TotaleFirma.TotaliGaranzie[i].Imposte /= 12
 			wp.TotaleFirma.TotaliGaranzie[i].PremioImponibile /= 12
