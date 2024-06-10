@@ -421,11 +421,16 @@ func createSwitchoNode() error {
 		nn  *models.NetworkNode
 	)
 	partnershipModel := models.NetworkNode{
-		Uid:         models.PartnershipSwitcho,
-		Code:        models.PartnershipSwitcho,
-		Type:        models.PartnershipNetworkNodeType,
-		IsActive:    true,
-		Partnership: &models.PartnershipNode{Name: models.PartnershipSwitcho},
+		Uid:      models.PartnershipSwitcho,
+		Code:     models.PartnershipSwitcho,
+		Type:     models.PartnershipNetworkNodeType,
+		IsActive: true,
+		Partnership: &models.PartnershipNode{
+			Name: models.PartnershipSwitcho,
+			Skin: &models.Skin{
+				LogoUrl: "https://storage.googleapis.com/wopta-public-assets/logo_switcho.png",
+			},
+		},
 		Products: []models.Product{{
 			Name:         models.LifeProduct,
 			NameDesc:     &nameDesc,
