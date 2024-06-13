@@ -47,6 +47,7 @@ var (
 type LifeInReq struct {
 	DryRun           *bool  `json:"dryRun"`
 	CollectionPrefix string `json:"collectionPrefix"`
+	Filename         string `json:"filename"`
 }
 
 func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -94,7 +95,7 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	}
 
 	//data, _ := os.ReadFile("./companydata/life.csv")
-	data := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/life/life.csv", "")
+	data := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/life/in/"+req.Filename, "")
 	df := lib.CsvToDataframe(data)
 	log.Println("LifeInFx  row", df.Nrow())
 	log.Println("LifeInFx  col", df.Ncol())
@@ -660,13 +661,10 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 		log.Printf("error: %s", err.Error())
 	}
 
-	if dryRun {
-		err = os.WriteFile("./companydata/result.json", out, 0777)
-	} else {
-		_, err = lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/life/result.json", out)
-		if err != nil {
-			log.Printf("error: %s", err.Error())
-		}
+	_, err = lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"),
+		"track/in/life/out/result_"+startDateJob.Format(time.DateOnly)+".json", out)
+	if err != nil {
+		log.Printf("error: %s", err.Error())
 	}
 
 	endDateJob = time.Now().UTC()
