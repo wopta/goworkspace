@@ -671,7 +671,7 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	}
 
 	_, err = lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"),
-		"track/in/life/out/result_"+startDateJob.Format(time.DateOnly)+".json", out)
+		"track/in/life/out/result_"+startDateJob.Format(time.RFC3339)+".json", out)
 	if err != nil {
 		log.Printf("error: %s", err.Error())
 	}
