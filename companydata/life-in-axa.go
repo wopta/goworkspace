@@ -66,6 +66,15 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 		req                      LifeInReq
 	)
 
+	skippedPolicies = make([]string, 0)
+	missingContractorBirthCityPolicies = make([]string, 0)
+	missingInsuredBirthCityPolicies = make([]string, 0)
+	missingProducerPolicies = make([]string, 0)
+	missingProducers = make([]string, 0)
+	wrongContractorFiscalCodePolicies = make([]string, 0)
+	wrongInsuredFiscalCodePolicies = make([]string, 0)
+	monthlyPolicies = make(map[string]map[string][][]string, 0)
+
 	startDateJob = time.Now().UTC()
 
 	taxesByGuarantee := map[string]float64{
