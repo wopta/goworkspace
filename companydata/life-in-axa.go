@@ -671,7 +671,7 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 	log.Printf("Script started at %s", startDateJob.String())
 	log.Printf("Script ended at %s", endDateJob.String())
 
-	return "", nil, e
+	return "{}", nil, e
 }
 
 func searchUserInDBByFiscalCode(fiscalCode string) (string, bool) {
