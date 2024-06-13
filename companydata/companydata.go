@@ -6,6 +6,7 @@ import (
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 )
 
 var companydataRoutes []lib.Route = []lib.Route{
@@ -61,7 +62,7 @@ var companydataRoutes []lib.Route = []lib.Route{
 		Route:   "/v1/in/life",
 		Handler: lib.ResponseLoggerWrapper(LifeInFx),
 		Method:  http.MethodPost,
-		Roles:   []string{},
+		Roles:   []string{models.UserRoleAdmin},
 	},
 }
 
