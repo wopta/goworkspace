@@ -8,6 +8,7 @@ import (
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/payment/fabrick"
+	"github.com/wopta/goworkspace/payment/manual"
 )
 
 var paymentRoutes []lib.Route = []lib.Route{
@@ -31,7 +32,7 @@ var paymentRoutes []lib.Route = []lib.Route{
 	},
 	{
 		Route:   "/manual/v1/{transactionUid}",
-		Handler: lib.ResponseLoggerWrapper(ManualPaymentFx),
+		Handler: lib.ResponseLoggerWrapper(manual.ManualPaymentFx),
 		Method:  http.MethodPost,
 		Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 	},

@@ -1,4 +1,4 @@
-package payment
+package manual
 
 import (
 	"fmt"
