@@ -10,6 +10,7 @@ import (
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/payment/common"
 	plc "github.com/wopta/goworkspace/policy"
 	prd "github.com/wopta/goworkspace/product"
 	"github.com/wopta/goworkspace/transaction"
@@ -97,7 +98,7 @@ func ChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, in
 	policy.PayUrl = payUrl
 	responseTransactions = append(responseTransactions, updatedTransactions...)
 
-	err = saveTransactionsToDB(updatedTransactions)
+	err = common.SaveTransactionsToDB(updatedTransactions)
 	if err != nil {
 		return "{}", nil, err
 	}

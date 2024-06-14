@@ -13,7 +13,7 @@ import (
 var paymentRoutes []lib.Route = []lib.Route{
 	{
 		Route:   "/v1/fabrick/recreate",
-		Handler: lib.ResponseLoggerWrapper(FabrickRefreshPayByLinkFx),
+		Handler: lib.ResponseLoggerWrapper(fabrick.RefreshPayByLinkFx),
 		Method:  http.MethodPost,
 		Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 	},
