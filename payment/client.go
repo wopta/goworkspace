@@ -13,7 +13,7 @@ import (
 type Client interface {
 	NewBusiness() (string, []models.Transaction, error)
 	Renew() (string, []models.Transaction, error)
-	Refresh() (string, []models.Transaction, error)
+	Update() (string, []models.Transaction, error)
 }
 
 func NewClient(client string, policy models.Policy, product models.Product, transactions []models.Transaction, scheduleFirstRate bool, customerId string) Client {
@@ -154,7 +154,7 @@ func (c FabrickClient) Renew() (string, []models.Transaction, error) {
 
 	return payUrl, updatedTransactions, nil
 }
-func (c FabrickClient) Refresh() (string, []models.Transaction, error) {
+func (c FabrickClient) Update() (string, []models.Transaction, error) {
 	paymentMethods, err := getFabrickPaymentMethods(c)
 	if err != nil {
 		return "", nil, err
@@ -242,8 +242,8 @@ func (c *ManualClient) NewBusiness() (string, []models.Transaction, error) {
 func (c *ManualClient) Renew() (string, []models.Transaction, error) {
 	return manualIntegration(c)
 }
-func (c *ManualClient) Refresh() (string, []models.Transaction, error) {
-	return "", nil, fmt.Errorf("manual integration does not have refresh")
+func (c *ManualClient) Update() (string, []models.Transaction, error) {
+	return "", nil, fmt.Errorf("manual integration does not have update")
 }
 
 func manualIntegration(c *ManualClient) (string, []models.Transaction, error) {

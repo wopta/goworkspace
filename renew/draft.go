@@ -270,7 +270,8 @@ func draft(policy models.Policy, product models.Product, ch chan<- RenewReport, 
 		}
 	}
 
-	payUrl, transactions, err := payment.Controller(policy, product, transactions, customerId != "", customerId)
+	client := payment.NewClient(policy.Payment, policy, product, transactions, customerId != "", customerId)
+	payUrl, transactions, err := client.Renew()
 	if err != nil {
 		return
 	}

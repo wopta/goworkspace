@@ -4,6 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"log"
+	"net/http"
+	"time"
+
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
@@ -11,10 +16,6 @@ import (
 	plc "github.com/wopta/goworkspace/policy"
 	prd "github.com/wopta/goworkspace/product"
 	"github.com/wopta/goworkspace/transaction"
-	"io"
-	"log"
-	"net/http"
-	"time"
 )
 
 type FabrickRefreshPayByLinkRequest struct {
@@ -60,7 +61,8 @@ func FabrickRefreshPayByLinkFx(w http.ResponseWriter, r *http.Request) (string, 
 
 	product := prd.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, nil, nil)
 
-	payUrl, updatedTransactions, err := Controller(policy, *product, transactions, request.ScheduleFirstRate, "")
+	client := NewClient(policy.Payment, policy, *product, transactions, request.ScheduleFirstRate, "")
+	payUrl, updatedTransactions, err := client.Update()
 	if err != nil {
 		log.Printf("error scheduling transactions on fabrick: %s", err.Error())
 		return "", nil, err

@@ -3,15 +3,16 @@ package payment
 import (
 	"encoding/json"
 	"errors"
+	"io"
+	"log"
+	"net/http"
+	"strings"
+
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	plc "github.com/wopta/goworkspace/policy"
 	prd "github.com/wopta/goworkspace/product"
 	"github.com/wopta/goworkspace/transaction"
-	"io"
-	"log"
-	"net/http"
-	"strings"
 )
 
 type ChangePaymentProviderReq struct {
@@ -86,7 +87,8 @@ func ChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, in
 
 	product := prd.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, nil, nil)
 
-	payUrl, updatedTransactions, err = Controller(policy, *product, unpaidTransactions, req.ScheduleFirstRate, "")
+	client := NewClient(policy.Payment, policy, *product, unpaidTransactions, req.ScheduleFirstRate, "")
+	payUrl, updatedTransactions, err = client.Update()
 	if err != nil {
 		log.Printf("error changing payment provider to %s: %s", req.ProviderName, err.Error())
 		return "{}", nil, err
