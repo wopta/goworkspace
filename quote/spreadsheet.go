@@ -20,6 +20,7 @@ type QuoteSpreadsheet struct {
 	Id                  string
 	InputCells          []Cell
 	OutputCells         []Cell
+	InitCells           []Cell
 }
 
 func SpreadsheetsFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -28,9 +29,9 @@ func SpreadsheetsFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 
 	log.Println("Handler start -----------------------------------------------")
 
-	qs := QuoteSpreadsheet{Id: "1GMtY4EIR2qeyylTOoCfNLFWVNam0H6MF1Is8yD2DiWI"}
-	qs.Spreadsheets()
-
+	qs := QuoteSpreadsheet{Id: "tn0Jqce-r_JKdecExFOFVEJdGUaPYdGo31A9FOgvt-Y"}
+	res := qs.Spreadsheets()
+	log.Println(res)
 	log.Println("Handler end -------------------------------------------------")
 
 	return "", nil, nil
@@ -81,6 +82,14 @@ func (qs *QuoteSpreadsheet) Spreadsheets() []Cell {
 	fmt.Printf("f.Id: %v\n", e)
 	fmt.Printf("f.Id: %v\n", f.Id)
 
+	for k, cell := range qs.InitCells {
+		fmt.Printf("%s -> %s\n", k, cell)
+		cel := &sheets.ValueRange{
+			Values: [][]interface{}{{cell.Value}},
+		}
+		_, e = sheetClient.Spreadsheets.Values.Update(qs.Id, cell.Cell+":"+cell.Cell, cel).ValueInputOption("USER_ENTERED").Context(ctx).Do()
+
+	}
 
 	for k, cell := range qs.InputCells {
 		fmt.Printf("%s -> %s\n", k, cell)

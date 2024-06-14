@@ -1,0 +1,963 @@
+{
+    "annuity": 0,
+    "assets": [
+        {
+            "guarantees": [
+                {
+                    "beneficiaries": [
+                        {
+                            "beneficiaryType": "chosenBeneficiary",
+                            "fiscalCode": "GRBGPP80A01F205V",
+                            "isContactable": true,
+                            "isFamilyMember": false,
+                            "isLegitimateSuccessors": false,
+                            "mail": "test@test.test",
+                            "name": "Giuseppe",
+                            "phone": "3322244567",
+                            "residence": {
+                                "area": "",
+                                "city": "Milano",
+                                "cityCode": "MI",
+                                "locality": "Milano",
+                                "postalCode": "20122",
+                                "streetName": "Galleria del Corso",
+                                "streetNumber": "1"
+                            },
+                            "surname": "Garibaldi"
+                        }
+                    ],
+                    "beneficiaryOptions": {
+                        "chosenBeneficiary": "Beneficiario a scelta",
+                        "legalAndWillSuccessors": "Eredi legittimi e testamentali"
+                    },
+                    "beneficiaryReference": {
+                        "creationDate": "0001-01-01T00:00:00Z",
+                        "fiscalCode": "GRBNTA80A41F205C",
+                        "height": 0,
+                        "isPayer": false,
+                        "isSignatory": false,
+                        "location": {},
+                        "mail": "test@test.test",
+                        "name": "Anita",
+                        "phone": "3322245678",
+                        "residence": {
+                            "area": "",
+                            "city": "Milano",
+                            "cityCode": "MI",
+                            "locality": "Milano",
+                            "postalCode": "20122",
+                            "streetName": "Galleria del Corso",
+                            "streetNumber": "1"
+                        },
+                        "surname": "Garibaldi",
+                        "updatedDate": "0001-01-01T00:00:00Z",
+                        "vatCode": "",
+                        "weight": 0
+                    },
+                    "companyCodec": "D",
+                    "companyName": "Decesso",
+                    "config": {
+                        "deductibleValues": {},
+                        "durationValues": {
+                            "max": 20,
+                            "min": 5,
+                            "step": 5
+                        },
+                        "percentage": 0,
+                        "premiumGrossMonthly": 0,
+                        "premiumGrossYearly": 0,
+                        "premiumNetYearly": 0,
+                        "premiumTaxAmountMonthly": 0,
+                        "premiumTaxAmountYearly": 0,
+                        "selfInsuranceValues": {},
+                        "sumInsuredValues": {
+                            "max": 500000,
+                            "min": 50000,
+                            "step": 25000
+                        },
+                        "tax": 0
+                    },
+                    "description": "Cosa significa amare le persone a te più care? Scegli il sostegno di un capitale, a disposizione di chi resta, per affrontare «il dopo» di un drammatico imprevisto, con una certezza economica in più.",
+                    "group": "DEATH",
+                    "isConfigurable": true,
+                    "isDeleted": false,
+                    "isExtension": false,
+                    "isMandatory": false,
+                    "isSelected": true,
+                    "isSellable": true,
+                    "name": "morte",
+                    "offer": {
+                        "default": {
+                            "deductibleValues": {},
+                            "duration": {
+                                "year": 10
+                            },
+                            "percentage": 0,
+                            "premiumGrossMonthly": 0,
+                            "premiumGrossYearly": 0,
+                            "premiumNetYearly": 0,
+                            "premiumTaxAmountMonthly": 0,
+                            "premiumTaxAmountYearly": 0,
+                            "selfInsuranceValues": {},
+                            "sumInsuredLimitOfIndemnity": 100000,
+                            "sumInsuredValues": {},
+                            "tax": 0
+                        }
+                    },
+                    "order": 1,
+                    "reserved": false,
+                    "slug": "death",
+                    "subtitle": "Durata: 20 anni - Capitale: 300.000€",
+                    "tax": 10,
+                    "type": "person",
+                    "value": {
+                        "deductibleValues": {},
+                        "duration": {
+                            "year": 20
+                        },
+                        "percentage": 0,
+                        "premiumGrossMonthly": 34.63,
+                        "premiumGrossYearly": 415.56,
+                        "premiumNetMonthly": 34.63,
+                        "premiumNetYearly": 415.56,
+                        "premiumTaxAmountMonthly": 0,
+                        "premiumTaxAmountYearly": 0,
+                        "selfInsuranceValues": {},
+                        "sumInsuredLimitOfIndemnity": 300000,
+                        "sumInsuredValues": {},
+                        "tax": 0
+                    }
+                },
+                {
+                    "companyCodec": "PTD",
+                    "companyName": "Invalidità Totale Permanente",
+                    "config": {
+                        "deductibleValues": {},
+                        "durationValues": {
+                            "max": 20,
+                            "min": 5,
+                            "step": 5
+                        },
+                        "percentage": 0,
+                        "premiumGrossMonthly": 0,
+                        "premiumGrossYearly": 0,
+                        "premiumNetYearly": 0,
+                        "premiumTaxAmountMonthly": 0,
+                        "premiumTaxAmountYearly": 0,
+                        "selfInsuranceValues": {},
+                        "sumInsuredValues": {
+                            "max": 500000,
+                            "min": 50000,
+                            "step": 25000
+                        },
+                        "tax": 0
+                    },
+                    "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+                    "group": "DEATH",
+                    "isConfigurable": true,
+                    "isDeleted": false,
+                    "isExtension": false,
+                    "isMandatory": false,
+                    "isSelected": true,
+                    "isSellable": true,
+                    "name": "invalidità totale permanente",
+                    "offer": {
+                        "default": {
+                            "deductibleValues": {},
+                            "duration": {
+                                "year": 5
+                            },
+                            "percentage": 0,
+                            "premiumGrossMonthly": 0,
+                            "premiumGrossYearly": 0,
+                            "premiumNetYearly": 0,
+                            "premiumTaxAmountMonthly": 0,
+                            "premiumTaxAmountYearly": 0,
+                            "selfInsuranceValues": {},
+                            "sumInsuredLimitOfIndemnity": 100000,
+                            "sumInsuredValues": {},
+                            "tax": 0
+                        }
+                    },
+                    "order": 2,
+                    "reserved": false,
+                    "slug": "permanent-disability",
+                    "subtitle": "Durata: 20 anni - Capitale: 300.000€",
+                    "tax": 10,
+                    "type": "person",
+                    "value": {
+                        "deductibleValues": {},
+                        "duration": {
+                            "year": 20
+                        },
+                        "percentage": 0,
+                        "premiumGrossMonthly": 4.26,
+                        "premiumGrossYearly": 51.12,
+                        "premiumNetMonthly": 4.16,
+                        "premiumNetYearly": 49.86,
+                        "premiumTaxAmountMonthly": 0.1,
+                        "premiumTaxAmountYearly": 1.26,
+                        "selfInsuranceValues": {},
+                        "sumInsuredLimitOfIndemnity": 300000,
+                        "sumInsuredValues": {},
+                        "tax": 0
+                    }
+                },
+                {
+                    "companyCodec": "CI",
+                    "companyName": "Malattia Grave",
+                    "config": {
+                        "deductibleValues": {},
+                        "durationValues": {
+                            "max": 10,
+                            "min": 5,
+                            "step": 5
+                        },
+                        "percentage": 0,
+                        "premiumGrossMonthly": 0,
+                        "premiumGrossYearly": 0,
+                        "premiumNetYearly": 0,
+                        "premiumTaxAmountMonthly": 0,
+                        "premiumTaxAmountYearly": 0,
+                        "selfInsuranceValues": {},
+                        "sumInsuredValues": {
+                            "max": 100000,
+                            "min": 5000,
+                            "step": 2500
+                        },
+                        "tax": 0
+                    },
+                    "description": "Cancro, Ictus, Infarto, Chirurgia aorto-coronarica, Insufficienza renale, Trapianto di organi principali. Parole che spaventano, ma con il giusto capitale in tasca si affrontano . . . e si superano.",
+                    "group": "DEATH",
+                    "isConfigurable": true,
+                    "isDeleted": false,
+                    "isExtension": false,
+                    "isMandatory": false,
+                    "isSelected": true,
+                    "isSellable": true,
+                    "name": "malattia grave",
+                    "offer": {
+                        "default": {
+                            "deductibleValues": {},
+                            "duration": {
+                                "year": 5
+                            },
+                            "percentage": 0,
+                            "premiumGrossMonthly": 0,
+                            "premiumGrossYearly": 0,
+                            "premiumNetYearly": 0,
+                            "premiumTaxAmountMonthly": 0,
+                            "premiumTaxAmountYearly": 0,
+                            "selfInsuranceValues": {},
+                            "sumInsuredLimitOfIndemnity": 10000,
+                            "sumInsuredValues": {},
+                            "tax": 0
+                        }
+                    },
+                    "order": 4,
+                    "reserved": false,
+                    "slug": "serious-ill",
+                    "subtitle": "Durata: 10 anni - Capitale: 100.000€",
+                    "tax": 10,
+                    "type": "person",
+                    "value": {
+                        "deductibleValues": {},
+                        "duration": {
+                            "year": 10
+                        },
+                        "percentage": 0,
+                        "premiumGrossMonthly": 67.14,
+                        "premiumGrossYearly": 805.69,
+                        "premiumNetMonthly": 65.5,
+                        "premiumNetYearly": 786.04,
+                        "premiumTaxAmountMonthly": 1.64,
+                        "premiumTaxAmountYearly": 19.65,
+                        "selfInsuranceValues": {},
+                        "sumInsuredLimitOfIndemnity": 100000,
+                        "sumInsuredValues": {},
+                        "tax": 0
+                    }
+                },
+                {
+                    "companyCodec": "TTD",
+                    "companyName": "Inabilità Totale Temporanea",
+                    "config": {
+                        "deductibleValues": {},
+                        "durationValues": {
+                            "max": 10,
+                            "min": 5,
+                            "step": 5
+                        },
+                        "percentage": 0,
+                        "premiumGrossMonthly": 0,
+                        "premiumGrossYearly": 0,
+                        "premiumNetYearly": 0,
+                        "premiumTaxAmountMonthly": 0,
+                        "premiumTaxAmountYearly": 0,
+                        "selfInsuranceValues": {},
+                        "sumInsuredValues": {
+                            "max": 3000,
+                            "min": 250,
+                            "step": 250
+                        },
+                        "tax": 0
+                    },
+                    "description": "Un banale infortunio o malattia possono anche impedirti di lavorare per un certo periodo. Una somma mensile in sostituzione del tuo reddito aiuterebbe?",
+                    "group": "DEATH",
+                    "isConfigurable": true,
+                    "isDeleted": false,
+                    "isExtension": false,
+                    "isMandatory": false,
+                    "isSelected": true,
+                    "isSellable": true,
+                    "name": "inabilità totale temporanea",
+                    "offer": {
+                        "default": {
+                            "deductibleValues": {},
+                            "duration": {
+                                "year": 5
+                            },
+                            "percentage": 0,
+                            "premiumGrossMonthly": 0,
+                            "premiumGrossYearly": 0,
+                            "premiumNetYearly": 0,
+                            "premiumTaxAmountMonthly": 0,
+                            "premiumTaxAmountYearly": 0,
+                            "selfInsuranceValues": {},
+                            "sumInsuredLimitOfIndemnity": 1000,
+                            "sumInsuredValues": {},
+                            "tax": 0
+                        }
+                    },
+                    "order": 3,
+                    "reserved": false,
+                    "slug": "temporary-disability",
+                    "subtitle": "Durata: 10 anni - Capitale: 3.000€",
+                    "tax": 10,
+                    "type": "person",
+                    "value": {
+                        "deductibleValues": {},
+                        "duration": {
+                            "year": 10
+                        },
+                        "percentage": 0,
+                        "premiumGrossMonthly": 5.02,
+                        "premiumGrossYearly": 60.27,
+                        "premiumNetMonthly": 4.9,
+                        "premiumNetYearly": 58.8,
+                        "premiumTaxAmountMonthly": 0.12,
+                        "premiumTaxAmountYearly": 1.47,
+                        "selfInsuranceValues": {},
+                        "sumInsuredLimitOfIndemnity": 3000,
+                        "sumInsuredValues": {},
+                        "tax": 0
+                    }
+                }
+            ],
+            "isContractor": true,
+            "person": {
+                "birthCity": "SERRA DE' CONTI",
+                "birthDate": "1984-05-23T00:00:00.000Z",
+                "birthProvince": "AN",
+                "consens": [
+                    {
+                        "answer": false,
+                        "consens": "Il sottoscritto, letta e compresa l'informativa sul trattamento dei dati personali, ACCONSENTE al trattamento dei propri dati personali da parte di Wopta Assicurazioni per l'invio di comunicazioni e proposte commerciali e di marketing, incluso l'invio di newsletter e ricerche di mercato, attraverso strumenti automatizzati (sms, mms, e-mail, ecc.) e non (posta cartacea e telefono con operatore).",
+                        "creationDate": "0001-01-01T00:00:00Z",
+                        "key": 2,
+                        "title": "Privacy"
+                    }
+                ],
+                "creationDate": "0001-01-01T00:00:00Z",
+                "fiscalCode": "RSSMRA84E23I643D",
+                "gender": "M",
+                "height": 0,
+                "identityDocuments": [
+                    {
+                        "code": "01",
+                        "dateOfIssue": "2015-05-06T00:00:00Z",
+                        "expiryDate": "2034-05-03T00:00:00Z",
+                        "frontMedia": {
+                            "fileName": "identity_document_front_1717061753.png",
+                            "link": "gs://function-data/temp/qnlksay7r816YpH9JsFh/identity_document_front_1717061753.png",
+                            "mimeType": "image/png",
+                            "sourceFileName": "Test.png"
+                        },
+                        "issuingAuthority": "Motorizzazione MCTC",
+                        "lastUpdate": "2024-05-30T09:35:53.646Z",
+                        "number": "A12343",
+                        "placeOfIssue": "ROMA",
+                        "type": "Carta di Identità"
+                    }
+                ],
+                "isPayer": false,
+                "isSignatory": false,
+                "location": {},
+                "mail": "TEST@TEST.TEST",
+                "name": "MARIO",
+                "phone": "+393322223333",
+                "residence": {
+                    "area": "",
+                    "city": "MILANO",
+                    "cityCode": "MI",
+                    "locality": "MILANO",
+                    "postalCode": "20122",
+                    "streetName": "GALLERIA DEL CORSO",
+                    "streetNumber": "1"
+                },
+                "statements": [
+                    {
+                        "answer": true,
+                        "companySign": false,
+                        "contractorSign": false,
+                        "expectedAnswer": true,
+                        "hasAnswer": true,
+                        "id": 1000,
+                        "title": "Di non essere una Persona Politicamente Esposta"
+                    },
+                    {
+                        "answer": true,
+                        "companySign": false,
+                        "contractorSign": false,
+                        "expectedAnswer": true,
+                        "hasAnswer": true,
+                        "id": 1001,
+                        "title": "Di non essere destinatario di misurare di congelamento dei fondi e risorse economiche"
+                    },
+                    {
+                        "answer": true,
+                        "companySign": false,
+                        "contractorSign": false,
+                        "expectedAnswer": true,
+                        "hasAnswer": true,
+                        "id": 1002,
+                        "title": "Di non essere sottoposto a procedimenti o di non aver subito condanne per reati in materia economica/finanziaria/tributaria/societaria"
+                    },
+                    {
+                        "answer": true,
+                        "companySign": false,
+                        "contractorSign": false,
+                        "expectedAnswer": true,
+                        "hasAnswer": true,
+                        "id": 1003,
+                        "title": "Di essere una persona fisica che agisce in nome e per conto proprio, di essere il soggetto Contraente/Assicurato, e quindi che non esiste il titolare effettivo"
+                    }
+                ],
+                "surname": "ROSSI",
+                "updatedDate": "0001-01-01T00:00:00Z",
+                "vatCode": "",
+                "weight": 0,
+                "workStatus": "Lavoratore Dipendente"
+            }
+        }
+    ],
+    "attachments": [
+        {
+            "fileName": "Precontrattuale.pdf",
+            "isPrivate": false,
+            "link": "gs://documents-public-dev/information-sets/life/v2/Precontrattuale.pdf",
+            "name": "Precontrattuale",
+            "note": "",
+            "section": ""
+        },
+        {
+            "fileName": "Wopta_per_te_Vita_Proposta_886.pdf",
+            "isPrivate": false,
+            "link": "temp/qnlksay7r816YpH9JsFh/Wopta_per_te_Vita_Proposta_886.pdf",
+            "name": "Proposta",
+            "note": "",
+            "section": "contract"
+        }
+    ],
+    "channel": "network",
+    "company": "axa",
+    "contractor": {
+        "birthCity": "SERRA DE' CONTI",
+        "birthDate": "1984-05-23T00:00:00.000Z",
+        "birthProvince": "AN",
+        "consens": [
+            {
+                "answer": false,
+                "consens": "Il sottoscritto, letta e compresa l'informativa sul trattamento dei dati personali, ACCONSENTE al trattamento dei propri dati personali da parte di Wopta Assicurazioni per l'invio di comunicazioni e proposte commerciali e di marketing, incluso l'invio di newsletter e ricerche di mercato, attraverso strumenti automatizzati (sms, mms, e-mail, ecc.) e non (posta cartacea e telefono con operatore).",
+                "creationDate": "0001-01-01T00:00:00Z",
+                "key": 2,
+                "title": "Privacy"
+            }
+        ],
+        "creationDate": "0001-01-01T00:00:00Z",
+        "fiscalCode": "RSSMRA84E23I643D",
+        "gender": "M",
+        "height": 0,
+        "identityDocuments": [
+            {
+                "code": "01",
+                "dateOfIssue": "2015-05-06T00:00:00Z",
+                "expiryDate": "2034-05-03T00:00:00Z",
+                "frontMedia": {
+                    "fileName": "identity_document_front_1717061753.png",
+                    "link": "gs://function-data/temp/qnlksay7r816YpH9JsFh/identity_document_front_1717061753.png",
+                    "mimeType": "image/png",
+                    "sourceFileName": "Lomazzi1.png"
+                },
+                "issuingAuthority": "Motorizzazione MCTC",
+                "lastUpdate": "2024-05-30T09:35:53.646Z",
+                "number": "A12343",
+                "placeOfIssue": "ROMA",
+                "type": "Carta di Identità"
+            }
+        ],
+        "location": {},
+        "mail": "TEST@TEST.TEST",
+        "name": "MARIO",
+        "phone": "+393322223333",
+        "residence": {
+            "area": "",
+            "city": "MILANO",
+            "cityCode": "MI",
+            "locality": "MILANO",
+            "postalCode": "20122",
+            "streetName": "GALLERIA DEL CORSO",
+            "streetNumber": "1"
+        },
+        "statements": [
+            {
+                "answer": true,
+                "companySign": false,
+                "contractorSign": false,
+                "expectedAnswer": true,
+                "hasAnswer": true,
+                "id": 1000,
+                "title": "Di non essere una Persona Politicamente Esposta"
+            },
+            {
+                "answer": true,
+                "companySign": false,
+                "contractorSign": false,
+                "expectedAnswer": true,
+                "hasAnswer": true,
+                "id": 1001,
+                "title": "Di non essere destinatario di misurare di congelamento dei fondi e risorse economiche"
+            },
+            {
+                "answer": true,
+                "companySign": false,
+                "contractorSign": false,
+                "expectedAnswer": true,
+                "hasAnswer": true,
+                "id": 1002,
+                "title": "Di non essere sottoposto a procedimenti o di non aver subito condanne per reati in materia economica/finanziaria/tributaria/societaria"
+            },
+            {
+                "answer": true,
+                "companySign": false,
+                "contractorSign": false,
+                "expectedAnswer": true,
+                "hasAnswer": true,
+                "id": 1003,
+                "title": "Di essere una persona fisica che agisce in nome e per conto proprio, di essere il soggetto Contraente/Assicurato, e quindi che non esiste il titolare effettivo"
+            }
+        ],
+        "surname": "ROSSI",
+        "updatedDate": "0001-01-01T00:00:00Z",
+        "vatCode": "",
+        "weight": 0,
+        "workStatus": "Lavoratore Dipendente"
+    },
+    "creationDate": "2024-05-30T09:30:46.459226Z",
+    "deleteDate": "0001-01-01T00:00:00Z",
+    "emitDate": "0001-01-01T00:00:00Z",
+    "endDate": "2044-05-30T00:00:00Z",
+    "fundsOrigin": "Proprie risorse economiche",
+    "isAutoRenew": false,
+    "isRenewable": true,
+    "isReserved": false,
+    "name": "life",
+    "nameDesc": "Wopta per te Vita",
+    "networkUid": "",
+    "nextPay": "0001-01-01T00:00:00Z",
+    "offerName": "default",
+    "offersPrices": {
+        "default": {
+            "monthly": {
+                "delta": 0,
+                "discount": 0,
+                "gross": 111.05,
+                "net": 109.19,
+                "tax": 1.86
+            },
+            "yearly": {
+                "delta": 0,
+                "discount": 0,
+                "gross": 1332.64,
+                "net": 1310.26,
+                "tax": 22.38
+            }
+        }
+    },
+    "partnershipData": null,
+    "partnershipName": "",
+    "payment": "fabrick",
+    "paymentMode": "recurrent",
+    "paymentSplit": "monthly",
+    "policyType": "multiYear",
+    "priceGross": 1332.64,
+    "priceGrossMonthly": 111.05,
+    "priceNett": 1310.26,
+    "priceNettMonthly": 109.19,
+    "producerCode": "W1.AgentA",
+    "producerType": "agent",
+    "producerUid": "CdbctTibnaZlvs7Ck1cO",
+    "productVersion": "v2",
+    "proposalNumber": 886,
+    "quoteType": "fixed",
+    "renewDate": "0001-01-01T00:00:00Z",
+    "reservedInfo": {
+        "acceptanceDate": "0001-01-01T00:00:00Z"
+    },
+    "startDate": "2024-05-30T00:00:00Z",
+    "statements": [
+        {
+            "companySign": false,
+            "contractorSign": false,
+            "hasAnswer": false,
+            "id": 1,
+            "subtitle": "Presta attenzione alle seguenti dichiarazioni e condizioni, importanti per l’efficacia della tua polizza",
+            "title": "DICHIARAZIONI E ADEGUATEZZA"
+        },
+        {
+            "answer": true,
+            "companySign": false,
+            "contractorSign": true,
+            "expectedAnswer": true,
+            "hasAnswer": true,
+            "id": 2,
+            "questions": [
+                {
+                    "hasAnswer": false,
+                    "id": 0,
+                    "isBold": true,
+                    "question": "Si prende e si dà atto tra le Parti che, il contratto viene sottoscritto con Firma Elettronica Avanzata, redatto in un unico esemplare. Pertanto:"
+                },
+                {
+                    "hasAnswer": false,
+                    "id": 0,
+                    "indent": true,
+                    "question": "1. DICHIARO di aver ricevuto, preso visione, conoscere ed accettare le \"Condizioni Generali di Servizio per l'utilizzazione della Firma Elettronica Avanzata\" prevista da Wopta e l'annessa \"Scheda Tecnica Illustrativa\""
+                },
+                {
+                    "hasAnswer": false,
+                    "id": 0,
+                    "indent": true,
+                    "question": "2. CONFERMO la veridicità dei dati forniti, la titolarità del numero di cellulare e dell'indirizzo mail, acconsentendo al trattamento di tali dati per questa specifica finalità;"
+                },
+                {
+                    "hasAnswer": false,
+                    "id": 0,
+                    "indent": true,
+                    "question": "3. DICHIARO altresì di avere titolo a richiedere l'attivazione e l'uso del Servizio per la sottoscrizione del presente contratto"
+                }
+            ],
+            "title": "1) SCELTA FIRMA ELETTRONICA"
+        },
+        {
+            "answer": true,
+            "companySign": false,
+            "contractorSign": true,
+            "expectedAnswer": true,
+            "hasAnswer": true,
+            "id": 3,
+            "questions": [
+                {
+                    "hasAnswer": false,
+                    "id": 0,
+                    "isBold": true,
+                    "question": "Dichiaro che quanto indicato di seguito corrisponde alle informazioni ottenute dall’intermediario, sia attraverso i documenti resi disponibili e/o inviati che nelle pagine web del sito wopta.it."
+                },
+                {
+                    "hasAnswer": false,
+                    "id": 0,
+                    "question": "Hai effettuato dichiarazioni relative al rischio da assicurare e scelto prestazioni e garanzie tra quelle proposte. Sulla base di tali dichiarazioni, delle tue esigenze e richieste, le soluzioni assicurative individuate in coerenza con esse, sono:"
+                },
+                {
+                    "hasAnswer": false,
+                    "id": 0,
+                    "indent": true,
+                    "question": "- tutelare dei soggetti cari, in caso di decesso dell’Assicurato nel corso della durata della copertura, attraverso un sostegno economico indennizzato ai Beneficiari, che sono stati indicati dal Contraente;"
+                },
+                {
+                    "hasAnswer": false,
+                    "id": 0,
+                    "indent": true,
+                    "question": "- difendere il proprio reddito, potendo beneficiare di un capitale in caso di perdita, da parte dell’Assicurato, definitiva ed irrimediabile, da Infortunio o Malattia, della capacità di attendere a un qualsiasi lavoro proficuo, in misura totale (almeno del 60%);"
+                },
+                {
+                    "hasAnswer": false,
+                    "id": 0,
+                    "indent": true,
+                    "question": "- difendere il proprio reddito attraverso una indennità mensile, in caso di perdita totale, ma in via temporanea, delle capacità dell’Assicurato di attendere alla propria professione o attività lavorativa a seguito di Infortunio o Malattia"
+                },
+                {
+                    "hasAnswer": false,
+                    "id": 0,
+                    "indent": true,
+                    "question": "- tutelare la propria salute attraverso una indennità in caso di diagnosi, in capo all’Assicurato, di una delle seguenti malattie: cancro, attacco cardiaco (infarto del miocardio), chirurgia aorto-coronarica (bypass), ictus, insufficienza renale (fase finale di malattia renale), trapianto di organi principali (cuore, polmone, fegato, pancreas, rene o midollo osseo);"
+                },
+                {
+                    "hasAnswer": false,
+                    "id": 0,
+                    "indent": true,
+                    "question": "- le coperture operano con un orizzonte l’orizzonte temporale di 20 anni per Decesso; 20 anni per Invalidità Totale Permanente; 10 anni per Inabilità Totale Temporanea; 10 anni per Malattia Grave;"
+                },
+                {
+                    "hasAnswer": false,
+                    "id": 0,
+                    "question": "non rilevando interesse per altre eventuali coperture previste dal prodotto, ma non incluse in questa Polizza. Sono informato che la Polizza può prevedere, in relazione alle garanzie che precedono, l’applicazione di Scoperti, Franchigie, Limiti di indennizzo ed esclusioni, meglio riportate nelle Condizioni Generali di Assicurazione, da me valutati in linea con la capacità finanziaria di sostenere in proprio tale livello di danno e rischio."
+                }
+            ],
+            "title": "2) PER NOI QUESTA POLIZZA FA AL CASO TUO"
+        },
+        {
+            "answer": true,
+            "companySign": true,
+            "contractorSign": true,
+            "expectedAnswer": true,
+            "hasAnswer": true,
+            "id": 4,
+            "questions": [
+                {
+                    "hasAnswer": false,
+                    "id": 0,
+                    "question": "Scelgo la ricezione della seguente documentazione via e-mail al seguente indirizzo: TEST@TEST.TEST nonché all’utilizzo della stessa per l’invio delle comunicazioni in corso di contratto da parte di Wopta e della Compagnia. Sono a conoscenza che, qualora volessi modificare questa mia scelta, potrò farlo scrivendo alla Compagnia, con le modalità previste nelle Condizioni di Assicurazione."
+                },
+                {
+                    "hasAnswer": false,
+                    "id": 0,
+                    "isBold": true,
+                    "question": "Confermo quindi di aver ricevuto e preso visione, prima della conclusione del contratto:"
+                },
+                {
+                    "hasAnswer": false,
+                    "id": 0,
+                    "indent": true,
+                    "isBold": true,
+                    "question": "1. degli Allegati 3, 4 e 4-ter, di cui al Regolamento IVASS n. 40/2018, relativi agli obblighi informativi e di comportamento dell’Intermediario, inclusa l’informativa privacy dell’intermediario (ai sensi dell’art. 13 del regolamento UE n. 2016/679);"
+                },
+                {
+                    "hasAnswer": false,
+                    "id": 0,
+                    "indent": true,
+                    "isBold": true,
+                    "question": "2. del Set informativo, identificato dal modello AX01.1023, contenente: 1) Documento informativo precontrattuale per i prodotti assicurativi vita diversi dai prodotti d’investimento assicurativi (DIP Vita), Documento informativo per i prodotti assicurativi danni (DIP Danni), Documento informativo precontrattuale aggiuntivo per i prodotti assicurativi multirischi (DIP aggiuntivo Multirischi), di cui al Regolamento IVASS n. 41/2018; 2) Condizioni di Assicurazione comprensive di Glossario, che dichiaro altresì di conoscere ed accettare."
+                }
+            ],
+            "title": "3) SCELTA COMUNICAZIONI VIA MAIL E ACCETTAZIONE POLIZZA"
+        }
+    ],
+    "status": "Proposal",
+    "statusHistory": [
+        "Lead",
+        "Proposal"
+    ],
+    "step": "quoteruploaddocuments",
+    "surveys": [
+        {
+            "companySign": false,
+            "contractorSign": false,
+            "hasAnswer": false,
+            "id": 1,
+            "questions": [
+                {
+                    "hasAnswer": false,
+                    "id": 0,
+                    "isBold": true,
+                    "question": "L’Assicurato è tenuto a rispondere alle domande di un Questionario Medico. Si avverte l’Assicurato che:"
+                },
+                {
+                    "hasAnswer": false,
+                    "id": 0,
+                    "isBold": true,
+                    "question": "a) le dichiarazioni non veritiere, inesatte o reticenti compromettono il diritto alla prestazione;"
+                },
+                {
+                    "hasAnswer": false,
+                    "id": 0,
+                    "isBold": true,
+                    "question": "b) è necessario verificare l’esattezza e la rispondenza a verità delle risposte al Questionario Medico prima della sua sottoscrizione;"
+                },
+                {
+                    "hasAnswer": false,
+                    "id": 0,
+                    "isBold": true,
+                    "question": "c) anche nei casi non previsti dalla Compagnia, l’Aderente/Assicurato può chiedere di essere sottoposto a visita medica, per certificare lo stato di salute. Il costo di tale visita medica sarà a suo carico."
+                },
+                {
+                    "hasAnswer": false,
+                    "id": 0,
+                    "isBold": true,
+                    "question": "Sono assicurabili solo i soggetti che rispondono “NO” a tutte le domande incluse nel Questionario Medico. In caso anche di una sola risposta positiva, ovvero in caso di somme assicurate per le garanzie Decesso e/o Invalidità Totale Permanente da Infortunio o Malattia superiori a 300.000€, è richiesto che l'Assicurato si sottoponga a visita medica come indicato nelle formalità di ammissione all'interno delle condizioni di assicurazione"
+                }
+            ],
+            "subtitle": "INFORMAZIONI SULLO STATO DI SALUTE - AVVERTENZE SULLA COMPILAZIONE DEL QUESTIONARIO MEDICO"
+        },
+        {
+            "companySign": false,
+            "contractorSign": false,
+            "hasAnswer": false,
+            "hasMultipleAnswers": true,
+            "id": 2,
+            "questions": [
+                {
+                    "answer": false,
+                    "expectedAnswer": false,
+                    "hasAnswer": true,
+                    "id": 0,
+                    "indent": true,
+                    "question": "1. Ipertensione arteriosa (pressione superiore a 145/90 o trattamento con 2 o più medicinali)"
+                },
+                {
+                    "answer": false,
+                    "expectedAnswer": false,
+                    "hasAnswer": true,
+                    "id": 0,
+                    "indent": true,
+                    "question": "2. Ictus, attacco ischemico transitorio (mini-ictus), emorragia cerebrale"
+                },
+                {
+                    "answer": false,
+                    "expectedAnswer": false,
+                    "hasAnswer": true,
+                    "id": 0,
+                    "indent": true,
+                    "question": "3. Infarto, cardiopatia ischemica/coronarica, arteriosclerosi"
+                },
+                {
+                    "answer": false,
+                    "expectedAnswer": false,
+                    "hasAnswer": true,
+                    "id": 0,
+                    "indent": true,
+                    "question": "4. Aritmia cardiaca tale da richiedere un trattamento farmacologico e/o controlli periodici"
+                },
+                {
+                    "answer": false,
+                    "expectedAnswer": false,
+                    "hasAnswer": true,
+                    "id": 0,
+                    "indent": true,
+                    "question": "5. Qualsiasi forma di neoplasia maligna, inclusi cancro alla pelle (melanoma), leucemie, linfomi, mieloma, tumore del midollo osseo ed inoltre meningioma, nonché cisti o crescita benigna delle meningi all’interno del cervello o della spina dorsale"
+                },
+                {
+                    "answer": false,
+                    "expectedAnswer": false,
+                    "hasAnswer": true,
+                    "id": 0,
+                    "indent": true,
+                    "question": "6. Immunodeficienza acquisita (AIDS) e qualsiasi altra immunopatologia che comporti deficit del sistema immunitario"
+                },
+                {
+                    "answer": false,
+                    "expectedAnswer": false,
+                    "hasAnswer": true,
+                    "id": 0,
+                    "indent": true,
+                    "question": "7. Sclerosi laterale amiotrofica, sclerosi multipla, morbo di Alzheimer, morbo di Parkinson e tutte le malattie neurogenerative"
+                },
+                {
+                    "answer": false,
+                    "expectedAnswer": false,
+                    "hasAnswer": true,
+                    "id": 0,
+                    "indent": true,
+                    "question": "8. Discopatia osteoartrite o artrite infiammatoria estesa ad una o più articolazioni"
+                },
+                {
+                    "answer": false,
+                    "expectedAnswer": false,
+                    "hasAnswer": true,
+                    "id": 0,
+                    "indent": true,
+                    "question": "9. Broncopneumopatia cronica ostruttiva, l’asma moderato/severo, la sarcoidosi e l’enfisema"
+                },
+                {
+                    "answer": false,
+                    "expectedAnswer": false,
+                    "hasAnswer": true,
+                    "id": 0,
+                    "indent": true,
+                    "question": "10. Insufficienza renale acuta o cronica, malattie infiammatorie croniche intestinali, pancreatite cronica"
+                },
+                {
+                    "answer": false,
+                    "expectedAnswer": false,
+                    "hasAnswer": true,
+                    "id": 0,
+                    "indent": true,
+                    "question": "11. Ogni forma di diabete"
+                },
+                {
+                    "answer": false,
+                    "expectedAnswer": false,
+                    "hasAnswer": true,
+                    "id": 0,
+                    "indent": true,
+                    "question": "12. Cirrosi da qualsiasi causa, epatite B e C e steatosi epatica o qualsiasi epatopatia"
+                },
+                {
+                    "answer": false,
+                    "expectedAnswer": false,
+                    "hasAnswer": true,
+                    "id": 0,
+                    "indent": true,
+                    "question": "13. Le seguenti Malattie o malformazioni congenite/ereditarie: idrocefalo, pneumopatia fibrocistica, cardiopatie congenite, spina bifida, atresie di organi addominali, trisomie, agenesie renali, malformazioni vascolari endocraniche, malformazioni dell’apparato urinario non corrette chirurgicamente, malformazioni dei grossi vasi"
+                }
+            ],
+            "subtitle": "A. Ha ricevuto, negli ultimi 5 anni, una diagnosi o prescrizione di esami, trattamenti, subito interventi chirurgici o assunto farmaci in merito alle seguenti patologie?"
+        },
+        {
+            "answer": false,
+            "companySign": false,
+            "contractorSign": false,
+            "expectedAnswer": false,
+            "hasAnswer": true,
+            "id": 3,
+            "subtitle": "B. È a conoscenza di essere affetto da una delle malattie di cui al punto A, o di una loro possibile insorgenza, di essere in attesa di risultati di consulti medici, esami medici o ricoveri ospedalieri (o in istituti di cura) sempre in riferimento alle patologie elencate al punto A?"
+        },
+        {
+            "answer": false,
+            "companySign": false,
+            "contractorSign": false,
+            "expectedAnswer": false,
+            "hasAnswer": true,
+            "id": 4,
+            "subtitle": "C. È titolare di una pensione di invalidità o inabilità (parziale o totale) o ha in corso pratiche per il relativo riconoscimento?"
+        },
+        {
+            "companySign": false,
+            "contractorSign": true,
+            "hasAnswer": false,
+            "id": 5,
+            "questions": [
+                {
+                    "hasAnswer": false,
+                    "id": 0,
+                    "isBold": true,
+                    "question": "L'assicurato dichiara:"
+                },
+                {
+                    "hasAnswer": false,
+                    "id": 0,
+                    "isBold": true,
+                    "question": "- che le informazioni fornite e le risposte date - anche se materialmente scritte da altri - sono veritiere ed esatte e di non aver taciuto, omesso o alterato alcuna circostanza;"
+                },
+                {
+                    "hasAnswer": false,
+                    "id": 0,
+                    "isBold": true,
+                    "question": "- di essere consapevole che le dichiarazioni inesatte, non veritiere o le reticenze dell'Assicurando possono comportare la perdita totale o parziale del diritto all'indennizzo, oltre alla cessazione dell'assicurazione stessa, ai sensi degli Artt. 1892, 1893, 1894 e 1895 del Codice Civile"
+                }
+            ]
+        }
+    ],
+    "uid": "qnlksay7r816YpH9JsFh",
+    "updated": "2024-05-30T09:36:20.72001Z"
+}
