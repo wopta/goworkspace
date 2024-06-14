@@ -70,11 +70,16 @@ func RefreshTokenFx(w http.ResponseWriter, r *http.Request) (string, any, error)
 		Timeout: time.Second * 15,
 	}
 
+	log.Printf("executing request: %+v", req)
+
 	res, err := client.Do(req)
 	if err != nil {
 		log.Printf("error triggering request: %s", err.Error())
 		return "", nil, err
 	}
+
+	log.Printf("got response: %+v", res)
+
 	if res.StatusCode != http.StatusCreated {
 		log.Printf("error status code - expected %d, got %d", http.StatusCreated, res.StatusCode)
 		return "", nil, fmt.Errorf("response status code: %d", res.StatusCode)
