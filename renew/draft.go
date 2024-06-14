@@ -263,6 +263,7 @@ func draft(policy models.Policy, product models.Product, ch chan<- RenewReport, 
 	})
 
 	if policy.Payment == models.FabrickPaymentProvider {
+		policy.PaymentMode = models.PaymentModeRecurrent
 		var isTransactionPaid bool = true
 		trs := transaction.GetPolicyValidTransactions(policy.Uid, &isTransactionPaid)
 		if len(trs) > 0 {
