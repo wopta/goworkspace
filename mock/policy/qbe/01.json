@@ -1,0 +1,318 @@
+{
+    "productVersion": "v1",
+    "name": "combined",
+    "nameDesc": "Wopta per te Impresa",
+    "isDeleted": false,
+    "assets": [
+      {
+        "uuid": "4db1ff00-772e-1024-8f96-ff2b10b4daa2",
+        "enterprise": {
+          "name": "Luca & Elizabeth",
+          "vatCode": "12121212121",
+          "employer": 2000,
+          "address": {
+            "streetName": "Galleria del Corso",
+            "streetNumber": "1",
+            "city": "Milano",
+            "postalCode": "20122",
+            "locality": "Milano",
+            "cityCode": "MI"
+          },
+          "workEmployersRemuneration": "200000",
+          "totalBilled": "20000000",
+          "northAmericanMarket": "200000"
+        },
+        "isContractor": false,
+        "guarantees": [
+          {
+            "type": "enterprise",
+            "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+            "companyName": "Fenomeno Elettrico (in aumento a 10.000 - A/23)",
+            "slug": "electrical-phenomenon",
+            "isSelected": false,
+            "subtitle": "",
+            "value": {
+              "sumInsuredLimitOfIndemnity": 7000000
+            },
+            "isSellable": true,
+            "isConfigurable": true,
+            "isMandatory": false,
+            "reserved": false
+          },
+          {
+            "type": "enterprise",
+            "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+            "companyName": "Merci in refrigerazione",
+            "slug": "refrigeration-goods",
+            "isSelected": false,
+            "subtitle": "",
+            "value": {
+              "sumInsuredLimitOfIndemnity": 6980000,
+              "sumInsuredDropdown": "3"
+            },
+            "isSellable": true,
+            "isConfigurable": true,
+            "isMandatory": false,
+            "reserved": false
+          },
+          {
+            "type": "enterprise",
+            "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+            "companyName": "Guasti alle macchine (in aumento a 50.000 - A/27)",
+            "slug": "machinery-breakdown",
+            "isSelected": false,
+            "subtitle": "",
+            "value": {
+              "sumInsuredLimitOfIndemnity": 4210000
+            },
+            "isSellable": true,
+            "isConfigurable": true,
+            "isMandatory": false,
+            "reserved": false
+          },
+          {
+            "type": "enterprise",
+            "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+            "companyName": "Apparecchiature Elettroniche (in aumento a 50.000 - A/26)",
+            "slug": "electronic-equipment",
+            "isSelected": false,
+            "subtitle": "",
+            "value": {
+              "sumInsuredLimitOfIndemnity": 2590000
+            },
+            "isSellable": true,
+            "isConfigurable": false,
+            "isMandatory": false,
+            "reserved": false
+          },
+          {
+            "type": "enterprise",
+            "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+            "companyName": "Furto, rapina, estorsione (in aumento a 20.000 - C/1)",
+            "slug": "theft",
+            "isSelected": false,
+            "subtitle": "",
+            "value": {
+              "sumInsuredLimitOfIndemnity": 100000
+            },
+            "isSellable": true,
+            "isConfigurable": false,
+            "isMandatory": false,
+            "reserved": false
+          },
+          {
+            "type": "enterprise",
+            "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+            "companyName": "Resp. Civile Prodotti (RCP)",
+            "slug": "product-liability",
+            "isSelected": false,
+            "subtitle": "",
+            "value": {},
+            "isSellable": true,
+            "isConfigurable": false,
+            "isMandatory": false,
+            "reserved": false
+          },
+          {
+            "type": "enterprise",
+            "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+            "companyName": "Resp. Civile Terzi e Prestatori Lavoro (RCT/O)",
+            "slug": "third-party-liability-work-providers",
+            "isSelected": false,
+            "subtitle": "",
+            "value": {
+              "sumInsuredDropdown": "5000000"
+            },
+            "isSellable": true,
+            "isConfigurable": false,
+            "isMandatory": false,
+            "reserved": false
+          },
+          {
+            "type": "enterprise",
+            "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+            "companyName": "Ricorso Terzi (in aumento a 250.000 - A/25)",
+            "slug": "third-party-recourse",
+            "isSelected": false,
+            "subtitle": "",
+            "value": {},
+            "isSellable": true,
+            "isConfigurable": false,
+            "isMandatory": false,
+            "reserved": false
+          },
+          {
+            "type": "enterprise",
+            "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+            "companyName": "Maggiori costi",
+            "slug": "increased-cost",
+            "isSelected": false,
+            "subtitle": "",
+            "value": {},
+            "isSellable": true,
+            "isConfigurable": false,
+            "isMandatory": false,
+            "reserved": false
+          },
+          {
+            "type": "enterprise",
+            "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+            "companyName": "Perdita pigioni",
+            "slug": "loss-rent",
+            "isSelected": false,
+            "subtitle": "",
+            "value": {},
+            "isSellable": true,
+            "isConfigurable": false,
+            "isMandatory": false,
+            "reserved": false
+          },
+          {
+            "type": "enterprise",
+            "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+            "companyName": "Diaria Giornaliera",
+            "slug": "daily-allowance",
+            "isSelected": false,
+            "subtitle": "",
+            "value": {},
+            "isSellable": true,
+            "isConfigurable": false,
+            "isMandatory": false,
+            "reserved": false
+          },
+          {
+            "type": "enterprise",
+            "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+            "companyName": "Cyber",
+            "slug": "cyber",
+            "isSelected": false,
+            "subtitle": "",
+            "value": {},
+            "isSellable": true,
+            "isConfigurable": false,
+            "isMandatory": false,
+            "reserved": false
+          },
+          {
+            "type": "enterprise",
+            "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+            "companyName": "Resp. Amministratori Sindaci Dirigenti (D&O)",
+            "slug": "management-organization",
+            "isSelected": false,
+            "subtitle": "",
+            "value": {},
+            "isSellable": true,
+            "isConfigurable": false,
+            "isMandatory": false,
+            "reserved": false
+          }
+        ]
+      },
+      {
+        "uuid": "237d3300-7768-1024-8f96-ff2b10b4daa2",
+        "building": {
+          "address": {
+            "streetName": "Galleria del Corso",
+            "streetNumber": "1",
+            "city": "Milano",
+            "postalCode": "20122",
+            "locality": "Milano",
+            "cityCode": "MI"
+          },
+          "buildingYear": "2001",
+          "isAllarm": true,
+          "activtyDetail": "Attività 1",
+          "activityCategory": "Attività 1",
+          "naics": "1234",
+          "hasSandwitchPanel": true,
+          "hasSprinkler": false
+        },
+        "isContractor": false,
+        "guarantees": [
+          {
+            "type": "building",
+            "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+            "companyName": "Fabbricato",
+            "slug": "building",
+            "isSelected": false,
+            "subtitle": "",
+            "value": {
+              "sumInsuredLimitOfIndemnity": 7560000
+            },
+            "isSellable": true,
+            "isConfigurable": true,
+            "isMandatory": false,
+            "reserved": false
+          },
+          {
+            "type": "building",
+            "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+            "companyName": "Rischio locativo",
+            "slug": "rental-risk",
+            "isSelected": false,
+            "subtitle": "",
+            "value": {
+              "sumInsuredLimitOfIndemnity": 100000
+            },
+            "isSellable": true,
+            "isConfigurable": true,
+            "isMandatory": false,
+            "reserved": false
+          },
+          {
+            "type": "building",
+            "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+            "companyName": "Merci",
+            "slug": "goods",
+            "isSelected": false,
+            "subtitle": "",
+            "value": {
+              "sumInsuredLimitOfIndemnity": 6000000
+            },
+            "isSellable": true,
+            "isConfigurable": true,
+            "isMandatory": false,
+            "reserved": false
+          },
+          {
+            "type": "building",
+            "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+            "companyName": "Macchinari",
+            "slug": "machinery",
+            "isSelected": false,
+            "subtitle": "",
+            "value": {
+              "sumInsuredLimitOfIndemnity": 5920000
+            },
+            "isSellable": true,
+            "isConfigurable": true,
+            "isMandatory": false,
+            "reserved": false
+          },
+          {
+            "type": "building",
+            "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+            "companyName": "Merci (Aumento temporaneo A/29)",
+            "slug": "goods-temporary-increase",
+            "isSelected": false,
+            "subtitle": "",
+            "value": {
+              "sumInsuredLimitOfIndemnity": 5000000,
+              "duration": {
+                "day": 150
+              },
+              "startDate": "2025-06-12 00:00:00.000"
+            },
+            "isSellable": true,
+            "isConfigurable": true,
+            "isMandatory": false,
+            "reserved": false
+          }
+        ]
+      }
+    ],
+    "attachments": [],
+    "statements": [],
+    "surveys": [],
+    "isReserved": false
+  } 

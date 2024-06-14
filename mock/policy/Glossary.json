@@ -1,0 +1,59 @@
+{
+    "annuity": 0,
+    "assets": [
+        {
+            "guarantees": [],
+            "isContractor": true,
+            "person": {}
+        }
+    ],
+    "attachments": [],
+    "channel": "network",
+    "company": "axa",
+    "contractor": {},
+    "creationDate": "2024-05-30T09:30:46.459226Z",
+    "deleteDate": "0001-01-01T00:00:00Z",
+    "emitDate": "0001-01-01T00:00:00Z",
+    "endDate": "2044-05-30T00:00:00Z",
+    "fundsOrigin": "Proprie risorse economiche",
+    "isAutoRenew": false,
+    "isRenewable": true,
+    "isReserved": false,
+    "name": "life",
+    "nameDesc": "Wopta per te Vita",
+    "networkUid": "",
+    "nextPay": "0001-01-01T00:00:00Z",
+    "offerName": "default",
+    "offersPrices": {},
+    "partnershipData": null,
+    "partnershipName": "",
+    "payment": "fabrick",
+    "paymentMode": "recurrent",
+    "paymentSplit": "monthly",
+    "policyType": "multiYear",
+    "priceGross": 1332.64,
+    "priceGrossMonthly": 111.05,
+    "priceNett": 1310.26,
+    "priceNettMonthly": 109.19,
+    "producerCode": "W1.AgentA",
+    "producerType": "agent",
+    "producerUid": "CdbctTibnaZlvs7Ck1cO",
+    "productVersion": "v2",
+    "proposalNumber": 886,
+    "quoteType": "fixed",
+    "renewDate": "0001-01-01T00:00:00Z",
+    "reservedInfo": {
+        "acceptanceDate": "0001-01-01T00:00:00Z"
+    },
+    "startDate": "2024-05-30T00:00:00Z",
+    "statements": [],
+    "status": "Proposal",
+    "statusHistory": [
+        "Lead",
+        "Proposal"
+    ],
+    "step": "quoteruploaddocuments",
+    "surveys": [],
+    "uid": "qnlksay7r816YpH9JsFh",
+    "updated": "2024-05-30T09:36:20.72001Z"
+}

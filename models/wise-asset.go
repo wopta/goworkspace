@@ -34,7 +34,7 @@ func (wiseAsset *WiseAsset) ToDomain(wisePolicy *WiseCompletePolicy) Asset {
 	case "UBICAZIONE":
 		// fabbricato
 		var building Building
-		building.Address = wiseAsset.Location.Address.Description
+		building.Address.StreetName = wiseAsset.Location.Address.Description
 		building.Ateco = wiseAsset.Location.ActivityCode
 		building.AtecoDesc = wiseAsset.Location.Activity
 		building.City = wiseAsset.Location.Address.Municipality
