@@ -10,10 +10,15 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
+var (
+	errInvalidTransactions = errors.New("invalid number of transactions")
+)
+
 type Client interface {
 	NewBusiness() (string, []models.Transaction, error)
 	Renew() (string, []models.Transaction, error)
 	Update() (string, []models.Transaction, error)
+	Validate() error
 }
 
 func NewClient(client string, policy models.Policy, product models.Product, transactions []models.Transaction, scheduleFirstRate bool, customerId string) Client {
@@ -36,6 +41,8 @@ func NewClient(client string, policy models.Policy, product models.Product, tran
 	}
 }
 
+// FABRICK CLIENT
+
 type FabrickClient struct {
 	Policy            models.Policy
 	Product           models.Product
@@ -44,15 +51,45 @@ type FabrickClient struct {
 	CustomerId        string
 }
 
+func (c *FabrickClient) Validate() error {
+	if len(c.Transactions) == 0 {
+		return errInvalidTransactions
+	}
+
+	if err := checkPaymentModes(c.Policy); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c *FabrickClient) getPaymentMethods() []string {
+	var paymentMethods = make([]string, 0)
+
+	for _, provider := range c.Product.PaymentProviders {
+		if provider.Name == c.Policy.Payment {
+			for _, config := range provider.Configs {
+				if config.Mode == c.Policy.PaymentMode && config.Rate == c.Policy.PaymentSplit {
+					paymentMethods = append(paymentMethods, config.Methods...)
+				}
+			}
+		}
+	}
+
+	log.Printf("[FabrickClient.getPaymentMethods] found %v", paymentMethods)
+	return paymentMethods
+}
+
 func (c FabrickClient) NewBusiness() (string, []models.Transaction, error) {
-	paymentMethods, err := getFabrickPaymentMethods(c)
-	if err != nil {
+	log.Println("client fabrick: new business integration")
+
+	if err := c.Validate(); err != nil {
 		return "", nil, err
 	}
 
-	var (
-		updatedTransactions = make([]models.Transaction, 0)
-	)
+	var updatedTransactions = make([]models.Transaction, 0)
+
+	paymentMethods := c.getPaymentMethods()
 	now := time.Now().UTC()
 	c.CustomerId = uuid.New().String()
 
@@ -85,14 +122,19 @@ func (c FabrickClient) NewBusiness() (string, []models.Transaction, error) {
 	return updatedTransactions[0].PayUrl, updatedTransactions, nil
 }
 func (c FabrickClient) Renew() (string, []models.Transaction, error) {
-	paymentMethods, err := getFabrickPaymentMethods(c)
-	if err != nil {
+	log.Println("client fabrick: renew integration")
+
+	if err := c.Validate(); err != nil {
 		return "", nil, err
 	}
 
-	var payUrl string
-	var updatedTransactions = make([]models.Transaction, 0)
+	var (
+		updatedTransactions = make([]models.Transaction, 0)
+		payUrl              string
+		err                 error
+	)
 
+	paymentMethods := c.getPaymentMethods()
 	hasMandate := false
 	now := time.Now().UTC()
 
@@ -155,15 +197,15 @@ func (c FabrickClient) Renew() (string, []models.Transaction, error) {
 	return payUrl, updatedTransactions, nil
 }
 func (c FabrickClient) Update() (string, []models.Transaction, error) {
-	paymentMethods, err := getFabrickPaymentMethods(c)
-	if err != nil {
+	log.Println("client fabrick: update integration")
+
+	if err := c.Validate(); err != nil {
 		return "", nil, err
 	}
 
-	var (
-		updatedTransactions = make([]models.Transaction, 0)
-	)
+	var updatedTransactions = make([]models.Transaction, 0)
 
+	paymentMethods := c.getPaymentMethods()
 	now := time.Now().UTC()
 	c.CustomerId = uuid.New().String()
 
@@ -210,26 +252,7 @@ func (c FabrickClient) Update() (string, []models.Transaction, error) {
 	return updatedTransactions[0].PayUrl, updatedTransactions, nil
 }
 
-func getFabrickPaymentMethods(c FabrickClient) ([]string, error) {
-	var (
-		err            error
-		paymentMethods []string
-	)
-
-	if len(c.Transactions) == 0 {
-		log.Printf("%02d is an invalid number of transactions", len(c.Transactions))
-		return nil, errors.New("no valid transactions")
-	}
-
-	if err = checkPaymentModes(c.Policy); err != nil {
-		log.Printf("mismatched payment configuration: %s", err.Error())
-		return nil, err
-	}
-
-	paymentMethods = getPaymentMethods(c.Policy, c.Product)
-
-	return paymentMethods, nil
-}
+// MANUAL CLIENT
 
 type ManualClient struct {
 	Policy       models.Policy
@@ -237,55 +260,34 @@ type ManualClient struct {
 }
 
 func (c *ManualClient) NewBusiness() (string, []models.Transaction, error) {
-	return manualIntegration(c)
-}
-func (c *ManualClient) Renew() (string, []models.Transaction, error) {
-	return manualIntegration(c)
-}
-func (c *ManualClient) Update() (string, []models.Transaction, error) {
-	return "", nil, fmt.Errorf("manual integration does not have update")
-}
+	log.Println("client manual: new business integration")
 
-func manualIntegration(c *ManualClient) (string, []models.Transaction, error) {
-	var (
-		err error
-	)
-
-	log.Printf("init")
-
-	if len(c.Transactions) == 0 {
-		log.Printf("%02d is an invalid number of transactions", len(c.Transactions))
-		return "", nil, errors.New("no valid transactions")
-	}
-
-	if err = checkPaymentModes(c.Policy); err != nil {
-		log.Printf("mismatched payment configuration: %s", err.Error())
+	if err := c.Validate(); err != nil {
 		return "", nil, err
 	}
 
 	return remittanceIntegration(c.Transactions)
 }
+func (c *ManualClient) Renew() (string, []models.Transaction, error) {
+	log.Println("client manual: renew integration")
 
-/*
-	fasdf(mode string, isFirst, hasMandate bool)
-	CASE 1: New Business
-		true if p.PaymentMode == models.PaymentModeRecurrent && isFirstTransaction
-	CASE 2: Refresh Link
-		true if p.PaymentMode == models.PaymentModeRecurrent && isFirstTransaction
-	CASE 3: Renew
-		true if p.PaymentMode == models.PaymentModeRecurrent && isFirstTransaction && !hasMandate
-	CASE 4: Refresh Link Renewed
-		true if p.PaymentMode == models.PaymentModeRecurrent && isFirstTransaction
-
-
-
-	tmp := p.PaymentMode == models.PaymentModeRecurrent && isFirstTransaction
-
-	if !temp {
-		return false
+	if err := c.Validate(); err != nil {
+		return "", nil, err
 	}
-	if isRenew {
-		return  !hasMandate
+
+	return remittanceIntegration(c.Transactions)
+}
+func (c *ManualClient) Update() (string, []models.Transaction, error) {
+	return "", nil, fmt.Errorf("manual integration does not have update")
+}
+func (c *ManualClient) Validate() error {
+	if len(c.Transactions) == 0 {
+		return errInvalidTransactions
 	}
-	return true
-*/
+
+	if err := checkPaymentModes(c.Policy); err != nil {
+		return err
+	}
+
+	return nil
+}
