@@ -44,6 +44,15 @@ func RefreshTokenFx(w http.ResponseWriter, r *http.Request) (string, any, error)
 		log.SetPrefix("")
 	}()
 
+	err := refreshToken()
+	if err != nil {
+		log.Printf("error: %s", err)
+	}
+
+	return "", nil, err
+}
+
+func refreshToken() error {
 	var (
 		urlstring = os.Getenv("FABRICK_BASEURL") + "api/fabrick/pace/v4.0/mods/back/v1.0/sessions/createSession"
 		body      []byte
@@ -51,14 +60,12 @@ func RefreshTokenFx(w http.ResponseWriter, r *http.Request) (string, any, error)
 	)
 
 	if body, err = json.Marshal(requestBody); err != nil {
-		log.Printf("error marshaling request: %s", err)
-		return "", nil, err
+		return err
 	}
 
 	req, err := http.NewRequest(http.MethodPost, urlstring, bytes.NewBuffer(body))
 	if err != nil {
-		log.Printf("error creating request: %s", err.Error())
-		return "", nil, err
+		return err
 	}
 
 	req.Header.Set("api-key", os.Getenv("FABRICK_TOKEN_BACK_API"))
@@ -74,16 +81,14 @@ func RefreshTokenFx(w http.ResponseWriter, r *http.Request) (string, any, error)
 
 	res, err := client.Do(req)
 	if err != nil {
-		log.Printf("error triggering request: %s", err.Error())
-		return "", nil, err
+		return err
 	}
 
 	log.Printf("got response: %+v", res)
 
 	if res.StatusCode != http.StatusCreated {
-		log.Printf("error status code - expected %d, got %d", http.StatusCreated, res.StatusCode)
-		return "", nil, fmt.Errorf("response status code: %d", res.StatusCode)
+		return fmt.Errorf("response status code: %d", res.StatusCode)
 	}
 
-	return "", nil, nil
+	return nil
 }
