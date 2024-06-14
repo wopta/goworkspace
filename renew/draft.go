@@ -71,11 +71,17 @@ func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 	}
 	collectionPrefix = req.CollectionPrefix
 
-	saveFn := func(p models.Policy, trs []models.Transaction) error {
+	saveFn := func(p models.Policy, trs []models.Transaction, hasMandate bool) error {
 		data := createDraftSaveBatch(p, trs)
 
 		if !dryRun {
-			return saveToDatabases(data)
+			if err := saveToDatabases(data); err != nil {
+				return err
+			}
+
+			log.Println("send mandate creation email...")
+			// mail.SendRenewDraft(policy models.Policy, from, to, cc Address, flowName string)
+			return nil
 		}
 
 		return nil
@@ -99,6 +105,16 @@ func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 		return "", nil, err
 	}
 	log.Printf("found %02d policies", len(policies))
+
+	// TODO: create map with all nodes and flow for a single policy
+	/*
+		ex.: map[string]any{
+			"uid-policy": {
+				"node": NetworkNode,
+				"flowName": "a-flow",
+			}
+		}
+	*/
 
 	ch := make(chan RenewReport, len(policies))
 
@@ -229,12 +245,13 @@ func getPolicies(policyUid, policyType, quoteType string, products map[string]mo
 	return policies, nil
 }
 
-func draft(policy models.Policy, product models.Product, ch chan<- RenewReport, wg *sync.WaitGroup, save func(models.Policy, []models.Transaction) error) {
+func draft(policy models.Policy, product models.Product, ch chan<- RenewReport, wg *sync.WaitGroup, save func(models.Policy, []models.Transaction, bool) error) {
 	var (
 		err          error
 		r            RenewReport
 		transactions []models.Transaction
 		customerId   string
+		hasMandate   bool
 	)
 
 	defer func() {
@@ -279,11 +296,12 @@ func draft(policy models.Policy, product models.Product, ch chan<- RenewReport, 
 
 	if payUrl != "" {
 		policy.PayUrl = payUrl
+		hasMandate = true
 	}
 	policy.Updated = time.Now().UTC()
 	policy.IsRenew = true
 
-	err = save(policy, transactions)
+	err = save(policy, transactions, hasMandate)
 	if err != nil {
 		return
 	}
