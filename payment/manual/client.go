@@ -1,0 +1,69 @@
+package manual
+
+import (
+	"fmt"
+	"log"
+	"time"
+
+	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/payment/common"
+)
+
+type Client struct {
+	Policy       models.Policy
+	Transactions []models.Transaction
+}
+
+func (c *Client) NewBusiness() (string, []models.Transaction, error) {
+	log.Println("client manual: new business integration")
+
+	if err := c.Validate(); err != nil {
+		return "", nil, err
+	}
+
+	return remittanceIntegration(c.Transactions)
+}
+func (c *Client) Renew() (string, []models.Transaction, error) {
+	log.Println("client manual: renew integration")
+
+	if err := c.Validate(); err != nil {
+		return "", nil, err
+	}
+
+	return remittanceIntegration(c.Transactions)
+}
+func (c *Client) Update() (string, []models.Transaction, error) {
+	return "", nil, fmt.Errorf("manual integration does not have update")
+}
+func (c *Client) Validate() error {
+	if len(c.Transactions) == 0 {
+		return common.ErrInvalidTransactions
+	}
+
+	if err := common.CheckPaymentModes(c.Policy); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func remittanceIntegration(transactions []models.Transaction) (payUrl string, updatedTransaction []models.Transaction, err error) {
+	updatedTransaction = make([]models.Transaction, 0)
+
+	for index, tr := range transactions {
+		now := time.Now().UTC()
+		if index == 0 && tr.Annuity == 0 {
+			tr.IsPay = true
+			tr.Status = models.TransactionStatusPay
+			tr.StatusHistory = append(tr.StatusHistory, models.TransactionStatusPay)
+			tr.PayDate = now
+			tr.TransactionDate = now
+			tr.PaymentMethod = models.PayMethodRemittance
+		}
+		tr.ProviderId = ""
+		tr.UserToken = ""
+		tr.UpdateDate = now
+		updatedTransaction = append(updatedTransaction, tr)
+	}
+	return "", updatedTransaction, nil
+}
