@@ -150,7 +150,7 @@ func (c Client) Renew() (string, []models.Transaction, error) {
 		if res.Payload == nil || res.Payload.PaymentPageURL == nil {
 			return "", nil, errors.New("error creating transaction on Fabrick")
 		}
-		if isFirstOfBatch && (!hasMandate || createMandate) {
+		if (isFirstOfBatch && c.Policy.PaymentMode != models.PaymentModeRecurrent) || createMandate {
 			payUrl = *res.Payload.PaymentPageURL
 		}
 		log.Printf("transaction %02d payUrl: %s", index+1, *res.Payload.PaymentPageURL)

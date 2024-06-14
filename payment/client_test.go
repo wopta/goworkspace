@@ -384,7 +384,7 @@ func renewFabrickYearlySingle(t *testing.T) {
 		t.Fatalf("isPay error - expected: false got: %v", updatedTransactions[0].IsPay)
 	}
 	if payUrl == "" {
-		t.Fatalf("payUrl error - expected: %s got: \"\"", payUrl)
+		t.Fatalf("payUrl error - expected: \"\" got: %s", payUrl)
 	}
 	if updatedTransactions[0].ProviderName != policy.Payment {
 		t.Fatalf("expected providers to match, got transaction: '%s' and policy: '%s'", updatedTransactions[0].ProviderName, policy.Payment)
