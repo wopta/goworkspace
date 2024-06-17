@@ -48,7 +48,7 @@
             "subtitle": "",
             "value": {
               "sumInsuredLimitOfIndemnity": 6980000,
-              "sumInsuredDropdown": "3"
+      
             },
             "isSellable": true,
             "isConfigurable": true,
