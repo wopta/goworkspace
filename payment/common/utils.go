@@ -28,13 +28,23 @@ func CheckPaymentModes(policy models.Policy) error {
 }
 
 func SaveTransactionsToDB(transactions []models.Transaction) error {
-	for _, tr := range transactions {
-		err := lib.SetFirestoreErr(models.TransactionsCollection, tr.Uid, tr)
-		if err != nil {
-			log.Printf("error saving transactions to db: %s", err.Error())
-			return err
-		}
-		tr.BigQuerySave("")
+	batch := make(map[string]map[string]models.Transaction)
+	batch[lib.TransactionsCollection] = make(map[string]models.Transaction)
+
+	for idx := range transactions {
+		transactions[idx].BigQueryParse()
+		batch[lib.TransactionsCollection][transactions[idx].Uid] = transactions[idx]
 	}
+
+	if err := lib.SetBatchFirestoreErr(batch); err != nil {
+		log.Printf("error saving transactions to firestore: %s", err.Error())
+		return err
+	}
+
+	if err := lib.InsertRowsBigQuery(lib.WoptaDataset, lib.TransactionsCollection, transactions); err != nil {
+		log.Printf("error saving transactions to bigquery: %s", err.Error())
+		return err
+	}
+
 	return nil
 }
