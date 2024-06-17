@@ -27,7 +27,7 @@ type BodyData struct {
 	ProposalNumber       int
 	ExtraContent         []string
 	RenewDate            string
-	PriceGross           float64
+	PriceGross           string
 	HasMandate           bool
 }
 

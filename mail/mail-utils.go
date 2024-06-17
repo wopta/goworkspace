@@ -9,6 +9,7 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/dustin/go-humanize"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
@@ -86,7 +87,7 @@ func getPolicyRenewDraftBodyData(policy models.Policy, hasMandate bool) BodyData
 
 	bodyData := getBodyData(policy)
 	bodyData.HasMandate = hasMandate
-	bodyData.PriceGross = priceGross
+	bodyData.PriceGross = humanize.FormatFloat("#.###,##", priceGross)
 	bodyData.RenewDate = policy.StartDate.AddDate(policy.Annuity, 0, 0).Format("02/01/2006")
 
 	return bodyData
