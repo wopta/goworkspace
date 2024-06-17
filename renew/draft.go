@@ -14,7 +14,9 @@ import (
 	"time"
 
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
 	"github.com/wopta/goworkspace/payment"
 	"github.com/wopta/goworkspace/transaction"
 )
@@ -24,6 +26,11 @@ type DraftReq struct {
 	Date             string `json:"date"`
 	DryRun           *bool  `json:"dryRun"`
 	CollectionPrefix string `json:"collectionPrefix"`
+}
+
+type NodeFlowRelation struct {
+	Node models.NetworkNode
+	Flow string
 }
 
 func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -71,22 +78,6 @@ func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 	}
 	collectionPrefix = req.CollectionPrefix
 
-	saveFn := func(p models.Policy, trs []models.Transaction, hasMandate bool) error {
-		data := createDraftSaveBatch(p, trs)
-
-		if !dryRun {
-			if err := saveToDatabases(data); err != nil {
-				return err
-			}
-
-			log.Println("send mandate creation email...")
-			// mail.SendRenewDraft(policy models.Policy, from, to, cc Address, flowName string)
-			return nil
-		}
-
-		return nil
-	}
-
 	policyType, quoteType, err := getQueryParameters(r)
 	if err != nil {
 		return "", nil, err
@@ -106,15 +97,42 @@ func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 	}
 	log.Printf("found %02d policies", len(policies))
 
-	// TODO: create map with all nodes and flow for a single policy
-	/*
-		ex.: map[string]any{
-			"uid-policy": {
-				"node": NetworkNode,
-				"flowName": "a-flow",
+	policyMailDataMap := getPolicyMailDataMap(policies)
+
+	saveFn := func(p models.Policy, trs []models.Transaction, hasMandate bool) error {
+		data := createDraftSaveBatch(p, trs)
+
+		if !dryRun {
+			if err := saveToDatabases(data); err != nil {
+				return err
 			}
+
+			// Do not send email for network with active mandate
+			if p.Channel == models.NetworkChannel && hasMandate {
+				return nil
+			}
+
+			from := mail.AddressAnna
+			to := mail.GetContractorEmail(&p)
+			flowName := models.ECommerceFlow
+			if p.Channel == models.NetworkChannel {
+				relation := policyMailDataMap[p.Uid]
+				to = mail.GetNetworkNodeEmail(&relation.Node)
+				flowName = relation.Flow
+			}
+
+			// Do not send email for remittance flow
+			if flowName == models.RemittanceMgaFlow {
+				return nil
+			}
+			// TODO: remove log, only for compile error while function is not available
+			log.Printf("sending from: %s to: %s with flow: %s with hasMandate: %v", from, to, flowName, hasMandate)
+			// mail.SendRenewDraft(p models.Policy, from, to, cc mail.Address, flowName string, hasMandate bool)
+			return nil
 		}
-	*/
+
+		return nil
+	}
 
 	ch := make(chan RenewReport, len(policies))
 
@@ -352,4 +370,47 @@ func calculatePricesByGuarantees(policy *models.Policy) error {
 	}
 
 	return nil
+}
+
+func getPolicyMailDataMap(ps []models.Policy) map[string]NodeFlowRelation {
+	var (
+		policyNodeFlowMap = make(map[string]NodeFlowRelation)
+		nodeMap           = make(map[string]models.NetworkNode)
+		warrants          []models.Warrant
+		warrantMap        = make(map[string]models.Warrant)
+		err               error
+	)
+
+	if warrants, err = network.GetWarrants(); err != nil {
+		log.Printf("error loading warrants: %s", err)
+		return nil
+	}
+
+	for _, w := range warrants {
+		warrantMap[w.Name] = w
+	}
+
+	for _, p := range ps {
+		if p.ProducerUid == "" {
+			continue
+		}
+		currentNode := nodeMap[p.ProducerUid]
+		if _, ok := nodeMap[p.ProducerUid]; !ok {
+			nn := network.GetNetworkNodeByUid(p.ProducerUid)
+			if nn == nil {
+				log.Printf("error loading networkNode: %s", p.ProducerUid)
+				return nil
+			}
+			currentNode = *nn
+		}
+		w := warrantMap[currentNode.Warrant]
+		flowName := w.GetFlowName(p.Name)
+
+		policyNodeFlowMap[p.Uid] = NodeFlowRelation{
+			Node: currentNode,
+			Flow: flowName,
+		}
+	}
+
+	return policyNodeFlowMap
 }
