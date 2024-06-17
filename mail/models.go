@@ -26,6 +26,9 @@ type BodyData struct {
 	InformationSetsUrl   string
 	ProposalNumber       int
 	ExtraContent         []string
+	RenewDate            string
+	PriceGross           float64
+	HasMandate           bool
 }
 
 type Attachment struct {
