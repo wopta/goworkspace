@@ -230,7 +230,8 @@
                 "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
                 "config": {
                     "durationValuesSlider": {},
-                    "sumInsuredValuesSliderdropdown": {
+
+                    "sumInsedValuesDropdownur": {
                       "label":"",
                       "values": [1,2,3,4,5]
                     },
