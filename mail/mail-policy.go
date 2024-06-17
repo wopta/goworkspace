@@ -291,10 +291,6 @@ func SendMailProposal(policy models.Policy, from, to, cc Address, flowName strin
 func SendMailRenewDraft(policy models.Policy, from, to, cc Address, flowName string, hasMandate bool) {
 	var bodyData BodyData
 
-	if flowName == models.RemittanceMgaFlow {
-		return
-	}
-
 	bodyData = getPolicyRenewDraftBodyData(policy, hasMandate)
 
 	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", flowName, renewDraftTemplateType))
