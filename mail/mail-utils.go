@@ -74,6 +74,22 @@ func setPolicyReservedBodyData(policy models.Policy, bodyData *BodyData) {
 	}
 }
 
+func getPolicyRenewDraftBodyData(policy models.Policy, hasMandate bool) BodyData {
+	var bodyData BodyData
+
+	priceGross := policy.PriceGross
+	if policy.PaymentSplit == string(models.PaySplitMonthly) {
+		priceGross = policy.PriceGrossMonthly
+	}
+
+	setBodyData(policy, &bodyData)
+	bodyData.HasMandate = hasMandate
+	bodyData.PriceGross = priceGross
+	bodyData.RenewDate = policy.StartDate.AddDate(policy.Annuity, 0, 0).Format("02/01/2006")
+
+	return bodyData
+}
+
 func fillTemplate(htmlTemplate []byte, bodyData *BodyData) string {
 	tpl := new(bytes.Buffer)
 	tmplt := template.New("htmlTemplate")
