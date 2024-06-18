@@ -16,11 +16,11 @@ import (
 )
 
 type QuoteSpreadsheet struct {
-	SheetName, filename string
-	Id                  string
-	InputCells          []Cell
-	OutputCells         []Cell
-	InitCells           []Cell
+	SheetName   string
+	Id          string
+	InputCells  []Cell
+	OutputCells []Cell
+	InitCells   []Cell
 }
 
 func SpreadsheetsFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -60,46 +60,50 @@ func (qs *QuoteSpreadsheet) Spreadsheets() []Cell {
 		CredentialsByte: path,
 		Ctx:             ctx,
 	}
-	googleDrive := &GoogleDrive{
-		CredentialsByte: path,
-		Ctx:             ctx,
-	}
 
-	driveClient, e := GoogleClient[*DriveService](googleDrive)
-	lib.CheckError(e)
-	fmt.Printf("driveClient: %v\n", driveClient)
 	sheetClient, e := GoogleClient[*sheets.Service](spreadsheet)
 	lib.CheckError(e)
 	fmt.Printf("sheetClient: %v\n", sheetClient)
-	permission := &drive.Permission{
-		Type:         "user",
-		Role:         "writer",
-		EmailAddress: "woptaassicurazioni@gmail.com",
+
+	rb := &sheets.BatchUpdateValuesRequest{
+		ValueInputOption: "USER_ENTERED",
 	}
-	f, e := driveClient.Svc.Files.Copy(qs.Id, &drive.File{
-		Permissions: []*drive.Permission{permission},
-	}).Do()
-	fmt.Printf("f.Id: %v\n", e)
-	fmt.Printf("f.Id: %v\n", f.Id)
 
 	for k, cell := range qs.InitCells {
 		fmt.Printf("%s -> %s\n", k, cell)
-		cel := &sheets.ValueRange{
+		/*
+			cel := &sheets.ValueRange{
+				Values: [][]interface{}{{cell.Value}},
+			}
+			_, e = sheetClient.Spreadsheets.Values.Update(qs.Id, cell.Cell+":"+cell.Cell, cel).ValueInputOption("USER_ENTERED").Context(ctx).Do()
+		*/
+		rangeData := qs.SheetName + "!" + cell.Cell + ":" + cell.Cell
+		rb.Data = append(rb.Data, &sheets.ValueRange{
+			Range:  rangeData,
 			Values: [][]interface{}{{cell.Value}},
-		}
-		_, e = sheetClient.Spreadsheets.Values.Update(qs.Id, cell.Cell+":"+cell.Cell, cel).ValueInputOption("USER_ENTERED").Context(ctx).Do()
+		})
 
 	}
-
+	_, e = sheetClient.Spreadsheets.Values.BatchUpdate(qs.Id, rb).Context(ctx).Do()
+	lib.CheckError(e)
+	rb = &sheets.BatchUpdateValuesRequest{
+		ValueInputOption: "USER_ENTERED",
+	}
 	for k, cell := range qs.InputCells {
 		fmt.Printf("%s -> %s\n", k, cell)
-		cel := &sheets.ValueRange{
+		/*cel := &sheets.ValueRange{
 			Values: [][]interface{}{{cell.Value}},
 		}
 		_, e = sheetClient.Spreadsheets.Values.Update(qs.Id, cell.Cell+":"+cell.Cell, cel).ValueInputOption("USER_ENTERED").Context(ctx).Do()
-
+		*/
+		rangeData := qs.SheetName + "!" + cell.Cell + ":" + cell.Cell
+		rb.Data = append(rb.Data, &sheets.ValueRange{
+			Range:  rangeData,
+			Values: [][]interface{}{{cell.Value}},
+		})
 	}
-
+	_, e = sheetClient.Spreadsheets.Values.BatchUpdate(qs.Id, rb).Context(ctx).Do()
+	lib.CheckError(e)
 	for k, cell := range qs.OutputCells {
 		fmt.Printf("%s -> %s\n", k, cell)
 
@@ -171,4 +175,25 @@ func getProductMock() (models.Product, error) {
 
 	prod := models.Product{}
 	return prod, nil
+}
+func CopySpreadsheet(path []byte, ctx context.Context, id string) (string, error) {
+	googleDrive := &GoogleDrive{
+		CredentialsByte: path,
+		Ctx:             ctx,
+	}
+
+	driveClient, e := GoogleClient[*DriveService](googleDrive)
+	lib.CheckError(e)
+	fmt.Printf("driveClient: %v\n", driveClient)
+	permission := &drive.Permission{
+		Type:         "user",
+		Role:         "writer",
+		EmailAddress: "woptaassicurazioni@gmail.com",
+	}
+	f, e := driveClient.Svc.Files.Copy(id, &drive.File{
+		Permissions: []*drive.Permission{permission},
+	}).Do()
+	fmt.Printf("f.Id: %v\n", e)
+	fmt.Printf("f.Id: %v\n", f.Id)
+	return f.Id, nil
 }

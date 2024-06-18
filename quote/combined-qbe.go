@@ -32,6 +32,7 @@ func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		InputCells:  inputCells,
 		OutputCells: setOutputCell(),
 		InitCells:   setInitCells(),
+		SheetName:   "Input dati Polizza",
 	}
 	qs.Spreadsheets()
 
@@ -95,6 +96,9 @@ func setInputCell(policy *models.Policy) []Cell {
 	assEnterprise := getAssetByType(policy, "enterprise")
 	assBuildings := getAssetByType(policy, "building")
 
+	inputCells = append(inputCells, Cell{Cell: "C10", Value: policy.StartDate.Format("02-01-2006")})
+	inputCells = append(inputCells, Cell{Cell: "C11", Value: policy.EndDate.Format("02-01-2006")})
+	inputCells = append(inputCells, setEnterpriseCell(assEnterprise[0])...)
 	for _, eg := range assEnterprise[0].Guarantees {
 		inputCells = append(inputCells, getEnterpriseGuaranteCellsBySlug(eg)...)
 	}
@@ -109,13 +113,8 @@ func setInputCell(policy *models.Policy) []Cell {
 func setEnterpriseCell(assets models.Asset) []Cell {
 	var inputCells []Cell
 
-	inputCells = append(inputCells, Cell{Cell: "C21", Value: assets.Enterprise.Ateco})
-	inputCells = append(inputCells, Cell{Cell: "C21", Value: assets.Enterprise.Ateco})
-	inputCells = append(inputCells, Cell{Cell: "C21", Value: assets.Enterprise.Ateco})
-	inputCells = append(inputCells, Cell{Cell: "C21", Value: assets.Enterprise.Ateco})
-	inputCells = append(inputCells, Cell{Cell: "C21", Value: assets.Enterprise.Ateco})
-	inputCells = append(inputCells, Cell{Cell: "C21", Value: assets.Enterprise.Ateco})
-	inputCells = append(inputCells, Cell{Cell: "C21", Value: assets.Enterprise.Ateco})
+	inputCells = append(inputCells, Cell{Cell: "E6", Value: assets.Enterprise.VatCode})
+	inputCells = append(inputCells, Cell{Cell: "C5", Value: assets.Enterprise.Name})
 
 	return inputCells
 }
@@ -291,7 +290,7 @@ func getBuildingGuaranteCellsBySlug(guarante models.Guarante, colum int) []Cell 
 	return cells
 }
 func setInitCells() []Cell {
-	
+
 	cells := []Cell{
 		{
 			Cell:  "C4",

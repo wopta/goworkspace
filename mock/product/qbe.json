@@ -33,14 +33,18 @@
             "building": {
                 "type": "building",
                 "slug": "building",
-                "isSelected": true,
-                "isSellable": true,
-                "isMandatory": true,
+                "childrens":["rental-risk","third-party-recourse","product-liability","management-organization","cyber","daily-allowance","increased-cost","loss-rent","electrical-phenomenon","additional-compensation"],
+                "selectedEsclude":[],
+                "depends":["third-party-liability-work-providers"],
+                "dependsOr":[],
+                "isSelected": false,
+                "isSellable": false,
+                "isMandatory": false,
                 "companyName": "Fabbricato",
                 "subtitle": "",
                 "reserved": false,
                 "isConfigurable": true,
-                "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+                "description": " ",
                 "config": {
                     "durationValuesSlider": {},
                     "sumInsuredValuesDropdown": {},
@@ -50,12 +54,7 @@
                       "step": 10000
                     },
                     "minimumGrossYearly": 10,
-                    "percentage": 0,
-                    "premiumGrossMonthly": 0,
-                    "premiumGrossYearly": 0,
-                    "premiumNetYearly": 0,
-                    "premiumTaxAmountMonthly": 0,
-                    "premiumTaxAmountYearly": 0,
+                    
                     "selfInsuranceValues": {},
                     "tax": 0
                 }
@@ -63,14 +62,16 @@
             "rental-risk": {
                 "type": "building",
                 "slug": "rental-risk",
-                "isSelected": true,
-                "isSellable": true,
-                "isMandatory": true,
+                "depends":[],
+                "dependsOr":["stock","machinery","building"],
+                "isSelected": false,
+                "isSellable": false,
+                "isMandatory": false,
                 "companyName": "Rischio locativo",
                 "subtitle": "",
                 "reserved": false,
                 "isConfigurable": true,
-                "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+                "description": " ",
                 "config": {
                     "durationValuesSlider": {},
                     "sumInsuredValuesDropdown": {},
@@ -80,12 +81,7 @@
                         "step": 10000
                       },
                     "minimumGrossYearly": 10,
-                    "percentage": 0,
-                    "premiumGrossMonthly": 0,
-                    "premiumGrossYearly": 0,
-                    "premiumNetYearly": 0,
-                    "premiumTaxAmountMonthly": 0,
-                    "premiumTaxAmountYearly": 0,
+                    
                     "selfInsuranceValues": {},
                     "tax": 0
                 }
@@ -93,14 +89,18 @@
             "machinery": {
                 "type": "building",
                 "slug": "machinery",
-                "isSelected": true,
-                "isSellable": true,
-                "isMandatory": true,
+                "childrens":["rental-risk","third-party-recourse","product-liability","management-organization","cyber","daily-allowance","increased-cost","loss-rent","electrical-phenomenon","additional-compensation","theft","machinery-breakdown","electronic-equipment"],
+                "selectedEsclude":[],
+                "depends":["third-party-liability-work-providers"],
+                "dependsOr":[],
+                "isSelected": false,
+                "isSellable": false,
+                "isMandatory": false,
                 "companyName": "Macchinari",
                 "subtitle": "",
                 "reserved": false,
                 "isConfigurable": true,
-                "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+                "description": " ",
                 "config": {
                     "durationValuesSlider": {},
                     "sumInsuredValuesDropdown": {},
@@ -110,27 +110,26 @@
                         "step": 10000
                       },
                     "minimumGrossYearly": 10,
-                    "percentage": 0,
-                    "premiumGrossMonthly": 0,
-                    "premiumGrossYearly": 0,
-                    "premiumNetYearly": 0,
-                    "premiumTaxAmountMonthly": 0,
-                    "premiumTaxAmountYearly": 0,
+                    
                     "selfInsuranceValues": {},
                     "tax": 0
                 }
             },
-            "goods": {
+            "stock": {
                 "type": "building",
-                "slug": "goods",
-                "isSelected": true,
-                "isSellable": true,
-                "isMandatory": true,
+                "slug": "stock",
+                "childrens":["rental-risk","third-party-recourse","product-liability","management-organization","cyber","daily-allowance","increased-cost","loss-rent","refrigeration-stock","additional-compensation","stock-temporary-increase","theft"],
+                "selectedEsclude":[],
+                "depends":["third-party-liability-work-providers"],
+                "dependsOr":[],
+                "isSelected": false,
+                "isSellable": false,
+                "isMandatory": false,
                 "companyName": "Merci",
                 "subtitle": "",
                 "reserved": false,
                 "isConfigurable": true,
-                "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+                "description": " ",
                 "config": {
                     "durationValuesSlider": {},
                     "sumInsuredValuesDropdown": {},
@@ -140,35 +139,34 @@
                         "step": 10000
                       },
                     "minimumGrossYearly": 10,
-                    "percentage": 0,
-                    "premiumGrossMonthly": 0,
-                    "premiumGrossYearly": 0,
-                    "premiumNetYearly": 0,
-                    "premiumTaxAmountMonthly": 0,
-                    "premiumTaxAmountYearly": 0,
+                    
                     "selfInsuranceValues": {},
                     "tax": 0
                 }
             },
-            "goods-temporary-increase": {
+            "stock-temporary-increase": {
                 "type": "building",
-                "slug": "goods-temporary-increase",
-                "isSelected": true,
-                "isSellable": true,
-                "isMandatory": true,
+                "slug": "stock-temporary-increase",
+                "depends":["stock"],
+                "dependsOr":[],
+                "isSelected": false,
+                "isSellable": false,
+                "isMandatory": false,
                 "companyName": "Merci (Aumento temporaneo A/29)",
                 "subtitle": "",
                 "reserved": false,
                 "isConfigurable": true,
-                "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+                "description": " ",
                 "config": {
                     "durationValuesSlider": {},
                     "sumInsuredValuesDropdown": {},
-                    "durationRange": {
-                        "label":"",
-                        "start": "now",
-                        "end": ""
-                    
+                    "durationRangeSlider": {
+                        "startDate": "",
+                        "min": 30,
+                        "max": 180,
+                        "step": 30,
+                        "label": "Merci",
+                        "description": "assicura la tua Merci"
                       },
                     "sumInsuredValuesSlider": {
                       "max": 5000000,
@@ -176,12 +174,7 @@
                       "step": 10
                     },
                     "minimumGrossYearly": 10,
-                    "percentage": 0,
-                    "premiumGrossMonthly": 0,
-                    "premiumGrossYearly": 0,
-                    "premiumNetYearly": 0,
-                    "premiumTaxAmountMonthly": 0,
-                    "premiumTaxAmountYearly": 0,
+                    
                     "selfInsuranceValues": {},
                     "tax": 0
                 }
@@ -190,13 +183,13 @@
                 "type": "enterprise",
                 "slug": "electrical-phenomenon",
                 "isSelected": false,
-                "isSellable": true,
+                "isSellable": false,
                 "isMandatory": false,
                 "companyName": "Fenomeno Elettrico (in aumento a 10.000 - A/23)",
                 "subtitle": "",
                 "reserved": false,
                 "isConfigurable": false,
-                "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+                "description": " ",
                 
                 "config": {
                     "durationValuesSlider": {},
@@ -207,27 +200,26 @@
                         "step": 10000
                       },
                     "minimumGrossYearly": 10,
-                    "percentage": 0,
-                    "premiumGrossMonthly": 0,
-                    "premiumGrossYearly": 0,
-                    "premiumNetYearly": 0,
-                    "premiumTaxAmountMonthly": 0,
-                    "premiumTaxAmountYearly": 0,
+                    
                     "selfInsuranceValues": {},
                     "tax": 0
                 }
             },
-            "refrigeration-goods": {
+            "refrigeration-stock": {
                 "type": "enterprise",
-                "slug": "refrigeration-goods",
-                "isSelected": true,
-                "isSellable": true,
-                "isMandatory": true,
+                "slug": "refrigeration-stock",
+                "childrens":[],
+                "selectedEsclude":[],
+                "depends":["stock"],
+                "dependsOr":[],
+                "isSelected": false,
+                "isSellable": false,
+                "isMandatory": false,
                 "companyName": "Merci in refrigerazione",
                 "subtitle": "",
                 "reserved": false,
                 "isConfigurable": true,
-                "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+                "description": " ",
                 "config": {
                     "durationValuesSlider": {},
 
@@ -241,12 +233,7 @@
                         "step": 10000
                       },
                     "minimumGrossYearly": 10,
-                    "percentage": 0,
-                    "premiumGrossMonthly": 0,
-                    "premiumGrossYearly": 0,
-                    "premiumNetYearly": 0,
-                    "premiumTaxAmountMonthly": 0,
-                    "premiumTaxAmountYearly": 0,
+                    
                     "selfInsuranceValues": {},
                     "tax": 0
                 }
@@ -254,14 +241,16 @@
             "machinery-breakdown": {
                 "type": "enterprise",
                 "slug": "machinery-breakdown",
-                "isSelected": true,
-                "isSellable": true,
-                "isMandatory": true,
+                "depends":["machinery"],
+                "dependsOr":[],
+                "isSelected": false,
+                "isSellable": false,
+                "isMandatory": false,
                 "companyName": "Guasti alle macchine (in aumento a 50.000 - A/27)",
                 "subtitle": "",
                 "reserved": false,
                 "isConfigurable": true,
-                "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+                "description": " ",
            
                 "config": {
                     "durationValuesSlider": {},
@@ -272,12 +261,7 @@
                         "step": 10000
                       },
                     "minimumGrossYearly": 10,
-                    "percentage": 0,
-                    "premiumGrossMonthly": 0,
-                    "premiumGrossYearly": 0,
-                    "premiumNetYearly": 0,
-                    "premiumTaxAmountMonthly": 0,
-                    "premiumTaxAmountYearly": 0,
+                    
                     "selfInsuranceValues": {},
                     "tax": 0
                 }
@@ -285,14 +269,16 @@
             "electronic-equipment": {
                 "type": "enterprise",
                 "slug": "electronic-equipment",
+                "depends":["machinery"],
+                "dependsOr":[],
                 "isSelected": false,
-                "isSellable": true,
+                "isSellable": false,
                 "isMandatory": false,
                 "companyName": "Apparecchiature Elettroniche (in aumento a 50.000 - A/26)",
                 "subtitle": "",
                 "reserved": false,
                 "isConfigurable": false,
-                "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+                "description": " ",
           
                 "config": {
                     "durationValuesSlider": {},
@@ -303,12 +289,7 @@
                         "step": 10000
                       },
                     "minimumGrossYearly": 10,
-                    "percentage": 0,
-                    "premiumGrossMonthly": 0,
-                    "premiumGrossYearly": 0,
-                    "premiumNetYearly": 0,
-                    "premiumTaxAmountMonthly": 0,
-                    "premiumTaxAmountYearly": 0,
+                    
                     "selfInsuranceValues": {},
                     "tax": 0
                 }
@@ -316,14 +297,16 @@
             "theft": {
                 "type": "enterprise",
                 "slug": "theft",
+                "depends":[],
+                "dependsOr":["stock","machinery"],
                 "isSelected": false,
-                "isSellable": true,
+                "isSellable": false,
                 "isMandatory": false,
                 "companyName": "Furto, rapina, estorsione (in aumento a 20.000 - C/1)",
                 "subtitle": "",
                 "reserved": false,
                 "isConfigurable": false,
-                "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+                "description": " ",
                 "config": {
                     "durationValuesSlider": {},
                     "sumInsuredValuesDropdown": {},
@@ -333,12 +316,7 @@
                         "step": 10000
                       },
                     "minimumGrossYearly": 10,
-                    "percentage": 0,
-                    "premiumGrossMonthly": 0,
-                    "premiumGrossYearly": 0,
-                    "premiumNetYearly": 0,
-                    "premiumTaxAmountMonthly": 0,
-                    "premiumTaxAmountYearly": 0,
+                    
                     "selfInsuranceValues": {},
                     "tax": 0
                 }
@@ -347,24 +325,19 @@
                 "type": "enterprise",
                 "slug": "third-party-recourse",
                 "isSelected": false,
-                "isSellable": true,
+                "isSellable": false,
                 "isMandatory": false,
                 "companyName": "Ricorso Terzi (in aumento a 250.000 - A/25)",
                 "subtitle": "",
                 "reserved": false,
                 "isConfigurable": false,
-                "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+                "description": " ",
                 "config": {
                     "durationValuesSlider": {},
                     "sumInsuredValuesDropdown": {},
                     "sumInsuredValuesSlider": {},
                     "minimumGrossYearly": 10,
-                    "percentage": 0,
-                    "premiumGrossMonthly": 0,
-                    "premiumGrossYearly": 0,
-                    "premiumNetYearly": 0,
-                    "premiumTaxAmountMonthly": 0,
-                    "premiumTaxAmountYearly": 0,
+                    
                     "selfInsuranceValues": {},
                     "tax": 0
                 }
@@ -372,14 +345,16 @@
             "third-party-liability-work-providers": {
                 "type": "enterprise",
                 "slug": "third-party-liability-work-providers",
+                "childrens":["stock","machinery","building"],
+                "selectedEsclude":[],
                 "isSelected": false,
-                "isSellable": true,
-                "isMandatory": false,
+                "isSellable": false,
+                "isMandatory": true,
                 "companyName": "Resp. Civile Terzi e Prestatori Lavoro (RCT/O)",
                 "subtitle": "",
                 "reserved": false,
                 "isConfigurable": false,
-                "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+                "description": " ",
                 "config": {
                     "durationValuesSlider": {},
                     "sumInsuredValuesSliderdropdown": {
@@ -388,12 +363,7 @@
                       },
                     "sumInsuredValuesSlider": {},
                     "minimumGrossYearly": 10,
-                    "percentage": 0,
-                    "premiumGrossMonthly": 0,
-                    "premiumGrossYearly": 0,
-                    "premiumNetYearly": 0,
-                    "premiumTaxAmountMonthly": 0,
-                    "premiumTaxAmountYearly": 0,
+                    
                     "selfInsuranceValues": {},
                     "tax": 0
                 }
@@ -401,25 +371,86 @@
             "product-liability": {
                 "type": "enterprise",
                 "slug": "product-liability",
+                "childrens":["product-liability-retroactive","product-liability-retroactive-usacan"],
+                "selectedEsclude":[],
+                "depends":[],
+                "dependsOr":["stock","machinery","building"],
                 "isSelected": false,
-                "isSellable": true,
+                "isSellable": false,
                 "isMandatory": false,
                 "companyName": "Resp. Civile Prodotti (RCP)",
                 "subtitle": "",
                 "reserved": false,
                 "isConfigurable": false,
-                "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+                "description": " ",
                 "config": {
                     "durationValuesSlider": {},
                     "sumInsuredValuesDropdown": {},
                     "sumInsuredValuesSlider": {},
                     "minimumGrossYearly": 10,
-                    "percentage": 0,
-                    "premiumGrossMonthly": 0,
-                    "premiumGrossYearly": 0,
-                    "premiumNetYearly": 0,
-                    "premiumTaxAmountMonthly": 0,
-                    "premiumTaxAmountYearly": 0,
+                    
+                    "selfInsuranceValues": {},
+                    "tax": 0
+                }
+            },
+            "product-liability-retroactive": {
+                "type": "enterprise",
+                "slug": "product-liability-retroactive",
+                "isSelected": false,
+                "isSellable": false,
+                "isMandatory": false,
+                "companyName": "Retroattivita Resp. Civile Prodotti",
+                "subtitle": "",
+                "reserved": false,
+                "isConfigurable": false,
+                "description": " ",
+                "config": {
+                    "durationValuesSlider": {},
+                    "sumInsuredValuesDropdown": {},
+                    "sumInsuredValuesSlider": {},
+                    "minimumGrossYearly": 10,
+                    
+                    "selfInsuranceValues": {},
+                    "tax": 0
+                }
+            },
+            "product-liability-retroactive-usacan": {
+                "type": "enterprise",
+                "slug": "product-liability-retroactive-usacan",
+                "isSelected": false,
+                "isSellable": false,
+                "isMandatory": false,
+                "companyName": "Retroattivita Resp. Civile Prodotti Usa Canada",
+                "subtitle": "",
+                "reserved": false,
+                "isConfigurable": false,
+                "description": " ",
+                "config": {
+                    "durationValuesSlider": {},
+                    "sumInsuredValuesDropdown": {},
+                    "sumInsuredValuesSlider": {},
+                    "minimumGrossYearly": 10,
+                    "selfInsuranceValues": {},
+                    "tax": 0
+                }
+            },
+            "product-withdrawal": {
+                "type": "enterprise",
+                "slug": "product-withdrawal",
+                "isSelected": false,
+                "isSellable": false,
+                "isMandatory": false,
+                "companyName": "Ritiro Prodotti",
+                "subtitle": "",
+                "reserved": false,
+                "isConfigurable": false,
+                "description": " ",
+                "config": {
+                    "durationValuesSlider": {},
+                    "sumInsuredValuesDropdown": {},
+                    "sumInsuredValuesSlider": {},
+                    "minimumGrossYearly": 10,
+                    
                     "selfInsuranceValues": {},
                     "tax": 0
                 }
@@ -428,24 +459,19 @@
                 "type": "enterprise",
                 "slug": "management-organization",
                 "isSelected": false,
-                "isSellable": true,
+                "isSellable": false,
                 "isMandatory": false,
                 "companyName": "Resp. Amministratori Sindaci Dirigenti (D&O)",
                 "subtitle": "",
                 "reserved": false,
                 "isConfigurable": false,
-                "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+                "description": " ",
                 "config": {
                     "durationValuesSlider": {},
                     "sumInsuredValuesDropdown": {},
                     "sumInsuredValuesSlider": {},
                     "minimumGrossYearly": 10,
-                    "percentage": 0,
-                    "premiumGrossMonthly": 0,
-                    "premiumGrossYearly": 0,
-                    "premiumNetYearly": 0,
-                    "premiumTaxAmountMonthly": 0,
-                    "premiumTaxAmountYearly": 0,
+                    
                     "selfInsuranceValues": {},
                     "tax": 0
                 }
@@ -454,24 +480,19 @@
                 "type": "enterprise",
                 "slug": "cyber",
                 "isSelected": false,
-                "isSellable": true,
+                "isSellable": false,
                 "isMandatory": false,
                 "companyName": "Cyber",
                 "subtitle": "",
                 "reserved": false,
                 "isConfigurable": false,
-                "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+                "description": " ",
                 "config": {
                     "durationValuesSlider": {},
                     "sumInsuredValuesDropdown": {},
                     "sumInsuredValuesSlider": {},
                     "minimumGrossYearly": 10,
-                    "percentage": 0,
-                    "premiumGrossMonthly": 0,
-                    "premiumGrossYearly": 0,
-                    "premiumNetYearly": 0,
-                    "premiumTaxAmountMonthly": 0,
-                    "premiumTaxAmountYearly": 0,
+                    
                     "selfInsuranceValues": {},
                     "tax": 0
                 }
@@ -479,25 +500,21 @@
             "daily-allowance": {
                 "type": "enterprise",
                 "slug": "daily-allowance",
+                "childrens":[],
+                "selectedEsclude":["increased-cost","additional-compensation"],
                 "isSelected": false,
-                "isSellable": true,
+                "isSellable": false,
                 "isMandatory": false,
                 "companyName": "Diaria Giornaliera",
                 "subtitle": "",
                 "reserved": false,
                 "isConfigurable": false,
-                "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+                "description": " ",
                 "config": {
                     "durationValuesSlider": {},
                     "sumInsuredValuesDropdown": {},
                     "sumInsuredValuesSlider": {},
                     "minimumGrossYearly": 10,
-                    "percentage": 0,
-                    "premiumGrossMonthly": 0,
-                    "premiumGrossYearly": 0,
-                    "premiumNetYearly": 0,
-                    "premiumTaxAmountMonthly": 0,
-                    "premiumTaxAmountYearly": 0,
                     "selfInsuranceValues": {},
                     "tax": 0
                 }
@@ -505,25 +522,45 @@
             "increased-cost": {
                 "type": "enterprise",
                 "slug": "increased-cost",
+                "childrens":[],
+                "selectedEsclude":["additional-compensation","daily-allowance"],
                 "isSelected": false,
-                "isSellable": true,
+                "isSellable": false,
                 "isMandatory": false,
                 "companyName": "Maggiori costi",
                 "subtitle": "",
                 "reserved": false,
                 "isConfigurable": false,
-                "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+                "description": " ",
                 "config": {
                     "durationValuesSlider": {},
                     "sumInsuredValuesDropdown": {},
                     "sumInsuredValuesSlider": {},
                     "minimumGrossYearly": 10,
-                    "percentage": 0,
-                    "premiumGrossMonthly": 0,
-                    "premiumGrossYearly": 0,
-                    "premiumNetYearly": 0,
-                    "premiumTaxAmountMonthly": 0,
-                    "premiumTaxAmountYearly": 0,
+                    
+                    "selfInsuranceValues": {},
+                    "tax": 0
+                }
+            },
+            "additional-compensation": {
+                "type": "enterprise",
+                "slug": "additional-compensation",
+                "childrens":[],
+                "selectedEsclude":["increased-cost","daily-allowance"],
+                "isSelected": false,
+                "isSellable": false,
+                "isMandatory": false,
+                "companyName": "Indennità aggiuntiva",
+                "subtitle": "",
+                "reserved": false,
+                "isConfigurable": false,
+                "description": " ",
+                "config": {
+                    "durationValuesSlider": {},
+                    "sumInsuredValuesDropdown": {},
+                    "sumInsuredValuesSlider": {},
+                    "minimumGrossYearly": 10,
+                    
                     "selfInsuranceValues": {},
                     "tax": 0
                 }
@@ -532,24 +569,19 @@
                 "type": "enterprise",
                 "slug": "loss-rent",
                 "isSelected": false,
-                "isSellable": true,
+                "isSellable": false,
                 "isMandatory": false,
                 "companyName": "Perdita pigioni",
                 "subtitle": "",
                 "reserved": false,
                 "isConfigurable": false,
-                "description": "Un grave infortunio o malattia possono avere conseguenze anche sulla tua capacità di produrre reddito. Hai mai pensato che un capitale per te, in questo caso, preserva il tenore di vita tuo e delle persone a te care?",
+                "description": " ",
                 "config": {
                     "durationValuesSlider": {},
                     "sumInsuredValuesDropdown": {},
                     "sumInsuredValuesSlider": {},
                     "minimumGrossYearly": 10,
-                    "percentage": 0,
-                    "premiumGrossMonthly": 0,
-                    "premiumGrossYearly": 0,
-                    "premiumNetYearly": 0,
-                    "premiumTaxAmountMonthly": 0,
-                    "premiumTaxAmountYearly": 0,
+                    
                     "selfInsuranceValues": {},
                     "tax": 0
                 }
