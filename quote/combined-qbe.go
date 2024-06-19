@@ -28,7 +28,7 @@ func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	lib.CheckError(err)
 	inputCells = append(inputCells, setInputCell(policy)...)
 	qs := QuoteSpreadsheet{
-		Id:          "tn0Jqce-r_JKdecExFOFVEJdGUaPYdGo31A9FOgvt-Y",
+		Id:          "1tn0Jqce-r_JKdecExFOFVEJdGUaPYdGo31A9FOgvt-Y",
 		InputCells:  inputCells,
 		OutputCells: setOutputCell(),
 		InitCells:   setInitCells(),

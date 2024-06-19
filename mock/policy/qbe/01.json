@@ -1,11 +1,12 @@
 {
     "productVersion": "v1",
-    "name": "combined",
-    "nameDesc": "Wopta per te Impresa",
+    "name": "commercial-combined",
+    "nameDesc": "Wopta per te Industria",
     "isDeleted": false,
     "assets": [
       {
         "uuid": "4db1ff00-772e-1024-8f96-ff2b10b4daa2",
+        "type": "enterprise",
         "enterprise": {
           "name": "Luca & Elizabeth",
           "vatCode": "12121212121",
@@ -18,9 +19,11 @@
             "locality": "Milano",
             "cityCode": "MI"
           },
+         
           "workEmployersRemuneration": "200000",
           "totalBilled": "20000000",
           "northAmericanMarket": "200000"
+        
         },
         "isContractor": false,
         "guarantees": [
@@ -210,6 +213,7 @@
       },
       {
         "uuid": "237d3300-7768-1024-8f96-ff2b10b4daa2",
+        "type": "building",
         "building": {
           "address": {
             "streetName": "Galleria del Corso",
@@ -219,6 +223,7 @@
             "locality": "Milano",
             "cityCode": "MI"
           },
+          
           "buildingYear": "2001",
           "isAllarm": true,
           "activtyDetail": "Attività 1",

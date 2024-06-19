@@ -597,9 +597,9 @@
 "isRenewable": true,
 "isQuoteByExcel": true,
 "logo": "assets/images/wopta-logo-vita-magenta.png",
-"name": "combined",
-"nameDesc": "Wopta per te Impresa",
-"nameSubtitle": "Vita",
+"name": "commercial-combined",
+"nameDesc": "Wopta per te Industria",
+"nameSubtitle": "Industria",
 "nameTitle": "Wopta per te",
 "paymentProviders": [
     {
