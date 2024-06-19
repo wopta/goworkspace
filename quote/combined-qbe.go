@@ -336,37 +336,37 @@ func setInitCells() []Cell {
 			Value: "0",
 		}, {
 			Cell:  "C19",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "C20",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "D19",
 			Value: "0",
 		}, {
 			Cell:  "D20",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "E19",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "E20",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "F19",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "F20",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "G19",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "G20",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "C21",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "C29",
 			Value: "0",
@@ -406,7 +406,7 @@ func setInitCells() []Cell {
 		},
 		{
 			Cell:  "D21",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "D29",
 			Value: "0",
@@ -447,7 +447,7 @@ func setInitCells() []Cell {
 
 		{
 			Cell:  "E21",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "E29",
 			Value: "0",
