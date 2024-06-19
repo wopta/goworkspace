@@ -104,19 +104,22 @@ func (qs *QuoteSpreadsheet) Spreadsheets() []Cell {
 	}
 	_, e = sheetClient.Spreadsheets.Values.BatchUpdate(qs.Id, rb).Context(ctx).Do()
 	lib.CheckError(e)
+	col := map[string]int{"A": 0, "B": 1, "C": 2, "E": 3, "F": 4, "G": 5}
+	sheet, e := sheetClient.Spreadsheets.Values.Get(qs.Id, "A:G").Do()
+	lib.CheckError(e)
 	for k, cell := range qs.OutputCells {
 		fmt.Printf("%s -> %s\n", k, cell)
-
-		sheet, e := sheetClient.Spreadsheets.Values.Get(qs.Id, string(cell.Cell[0])+":"+string(cell.Cell[0])).Do()
-		lib.CheckError(e)
 		row, e := strconv.Atoi(string(string(cell.Cell[1:])))
+		colum := cell.Cell[0:1]
 		lib.CheckError(e)
 		fmt.Printf("len(sheet.Values): %v\n", len(sheet.Values))
+		fmt.Printf("len(sheet.Values): %v\n", sheet.Values)
 		fmt.Printf("row: %v\n", row)
-		fmt.Printf("value: %v\n", sheet.Values[row][0])
+		fmt.Printf("row: %v\n", colum)
+		fmt.Printf("value: %v\n", sheet.Values[row][col[colum]])
 		rescell := Cell{
 			Cell:  cell.Cell,
-			Value: sheet.Values[row][0],
+			Value: sheet.Values[row][col[colum]],
 		}
 		res = append(res, rescell)
 
