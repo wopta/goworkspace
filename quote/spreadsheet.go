@@ -40,8 +40,6 @@ func SpreadsheetsFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 func (qs *QuoteSpreadsheet) Spreadsheets() []Cell {
 	var (
 		path []byte
-		//file *drive.File
-		res []Cell
 	)
 
 	switch os.Getenv("env") {
@@ -64,6 +62,11 @@ func (qs *QuoteSpreadsheet) Spreadsheets() []Cell {
 	sheetClient, e := GoogleClient[*sheets.Service](spreadsheet)
 	lib.CheckError(e)
 	fmt.Printf("sheetClient: %v\n", sheetClient)
+	qs.setInitCells(sheetClient,ctx)
+	qs.setInputCells(sheetClient,ctx)
+	return qs.getOutput(sheetClient)
+}
+func (qs *QuoteSpreadsheet) setInitCells(sheetClient *sheets.Service, ctx context.Context) {
 
 	rb := &sheets.BatchUpdateValuesRequest{
 		ValueInputOption: "USER_ENTERED",
@@ -84,11 +87,15 @@ func (qs *QuoteSpreadsheet) Spreadsheets() []Cell {
 		})
 
 	}
-	_, e = sheetClient.Spreadsheets.Values.BatchUpdate(qs.Id, rb).Context(ctx).Do()
+	_, e := sheetClient.Spreadsheets.Values.BatchUpdate(qs.Id, rb).Context(ctx).Do()
 	lib.CheckError(e)
-	rb = &sheets.BatchUpdateValuesRequest{
+}
+func (qs *QuoteSpreadsheet) setInputCells(sheetClient *sheets.Service, ctx context.Context) {
+
+	rb := &sheets.BatchUpdateValuesRequest{
 		ValueInputOption: "USER_ENTERED",
 	}
+
 	for k, cell := range qs.InputCells {
 		fmt.Printf("%s -> %s\n", k, cell)
 		/*cel := &sheets.ValueRange{
@@ -102,10 +109,15 @@ func (qs *QuoteSpreadsheet) Spreadsheets() []Cell {
 			Values: [][]interface{}{{cell.Value}},
 		})
 	}
-	_, e = sheetClient.Spreadsheets.Values.BatchUpdate(qs.Id, rb).Context(ctx).Do()
+	_, e := sheetClient.Spreadsheets.Values.BatchUpdate(qs.Id, rb).Context(ctx).Do()
 	lib.CheckError(e)
+}
+func (qs *QuoteSpreadsheet) getOutput(sheetClient *sheets.Service) []Cell {
+	var (
+		res []Cell
+	)
 	col := map[string]int{"A": 0, "B": 1, "C": 2, "E": 3, "F": 4, "G": 5}
-	sheet, e := sheetClient.Spreadsheets.Values.Get(qs.Id, "A:G").Do()
+	sheet, e := sheetClient.Spreadsheets.Values.Get(qs.Id, qs.SheetName+"!A:G").Do()
 	lib.CheckError(e)
 	for k, cell := range qs.OutputCells {
 		fmt.Printf("%s -> %s\n", k, cell)
