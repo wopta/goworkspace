@@ -111,7 +111,9 @@ func (qs *QuoteSpreadsheet) Spreadsheets() []Cell {
 		lib.CheckError(e)
 		row, e := strconv.Atoi(string(string(cell.Cell[1:])))
 		lib.CheckError(e)
-		fmt.Printf("file: %v\n", sheet.Values[row][0])
+		fmt.Printf("len(sheet.Values): %v\n", len(sheet.Values))
+		fmt.Printf("row: %v\n", row)
+		fmt.Printf("value: %v\n", sheet.Values[row][0])
 		rescell := Cell{
 			Cell:  cell.Cell,
 			Value: sheet.Values[row][0],
@@ -119,7 +121,7 @@ func (qs *QuoteSpreadsheet) Spreadsheets() []Cell {
 		res = append(res, rescell)
 
 	}
-	lib.CheckError(e)
+
 	return res
 }
 
