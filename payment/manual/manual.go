@@ -2,12 +2,12 @@ package manual
 
 import (
 	"fmt"
-	"github.com/go-chi/chi/v5"
 	"io"
 	"log"
 	"net/http"
 	"time"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
@@ -181,6 +181,15 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 			ccAddress.String(),
 		)
 		mail.SendMailContract(policy, nil, fromAddress, toAddress, ccAddress, flowName)
+	} else if !policy.IsPay && policy.Annuity > 0 && areDatesEqual(policy.StartDate.AddDate(policy.Annuity, 0, 0), transaction.EffectiveDate) {
+		policy.SanitizePaymentData()
+		// Update Policy as paid
+		err = plc.Pay(&policy, origin)
+		if err != nil {
+			log.Printf("ERROR policy pay: %s", err.Error())
+			return "", nil, err
+		}
+		policy.BigquerySave(origin)
 	}
 
 	log.Println("Handler end -------------------------------------------------")
@@ -211,4 +220,9 @@ func manualPayment(transaction *models.Transaction, origin string, payload *Manu
 	transaction.BigQuerySave(origin)
 
 	return nil
+}
+
+// TODO: move elsewhere
+func areDatesEqual(d1, d2 time.Time) bool {
+	return d1.Truncate(time.Hour * 24).Equal(d2.Truncate(time.Hour * 24))
 }
