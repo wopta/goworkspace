@@ -86,6 +86,7 @@ type Policy struct {
 	TaxAmountMonthly  float64                      `json:"taxAmountMonthly,omitempty" firestore:"taxAmountMonthly,omitempty" bigquery:"taxAmountMonthly"`
 	PriceNettMonthly  float64                      `json:"priceNettMonthly,omitempty" firestore:"priceNettMonthly,omitempty" bigquery:"priceNettMonthly"`
 	PriceGrossMonthly float64                      `json:"priceGrossMonthly,omitempty" firestore:"priceGrossMonthly,omitempty" bigquery:"priceGrossMonthly"`
+	PriceGroup        []Price                      `json:"priceGroup,omitempty" firestore:"priceGroup,omitempty" bigquery:"-"`
 	Agent             *User                        `firestore:"agent,omitempty" json:"agent,omitempty" bigquery:"-"`
 	Contractor        Contractor                   `firestore:"contractor,omitempty" json:"contractor,omitempty" bigquery:"-"`
 	Contractors       *[]User                      `firestore:"contractors,omitempty" json:"contractors,omitempty" bigquery:"-"`
@@ -130,7 +131,15 @@ type RenewHistory struct {
 	EndDate      time.Time `firestore:"endDate,omitempty" json:"endDate,omitempty"`
 	CreationDate time.Time `firestore:"creationDate,omitempty" json:"creationDate,omitempty"`
 }
-
+type PriceGroup struct {
+	Name              string  `firestore:"name,omitempty" json:"name,omitempty" bigquery:"name"`
+	TaxAmount         float64 `firestore:"taxAmount,omitempty" json:"taxAmount,omitempty" bigquery:"taxAmount"`
+	PriceNett         float64 `firestore:"priceNett,omitempty" json:"priceNett,omitempty" bigquery:"priceNett"`
+	PriceGross        float64 `firestore:"priceGross,omitempty" json:"priceGross,omitempty" bigquery:"priceGross"`
+	TaxAmountMonthly  float64 `json:"taxAmountMonthly,omitempty" firestore:"taxAmountMonthly,omitempty" bigquery:"taxAmountMonthly"`
+	PriceNettMonthly  float64 `json:"priceNettMonthly,omitempty" firestore:"priceNettMonthly,omitempty" bigquery:"priceNettMonthly"`
+	PriceGrossMonthly float64 `json:"priceGrossMonthly,omitempty" firestore:"priceGrossMonthly,omitempty" bigquery:"priceGrossMonthly"`
+}
 type Survey struct {
 	Id                 int64       `json:"id" firestore:"id"`
 	Title              string      `firestore:"title,omitempty" json:"title,omitempty"`
@@ -168,11 +177,14 @@ type Question struct {
 }
 
 type Price struct {
-	Net      float64 `firestore:"net" json:"net" bigquery:"-"`
-	Tax      float64 `firestore:"tax" json:"tax" bigquery:"-"`
-	Gross    float64 `firestore:"gross" json:"gross" bigquery:"-"`
-	Delta    float64 `firestore:"delta" json:"delta" bigquery:"-"`
-	Discount float64 `firestore:"discount" json:"discount" bigquery:"-"`
+	Name         string  `firestore:"name,omitempty" json:"name,omitempty" bigquery:"-"`
+	Net          float64 `firestore:"net" json:"net" bigquery:"-"`
+	Tax          float64 `firestore:"tax" json:"tax" bigquery:"-"`
+	Gross        float64 `firestore:"gross" json:"gross" bigquery:"-"`
+	Delta        float64 `firestore:"delta" json:"delta" bigquery:"-"`
+	Discount     float64 `firestore:"discount" json:"discount" bigquery:"-"`
+	NettMonthly  float64 `json:"nettMonthly,omitempty" firestore:"nettMonthly,omitempty" bigquery:"-"`
+	GrossMonthly float64 `json:"grossMonthly,omitempty" firestore:"grossMonthly,omitempty" bigquery:"-"`
 }
 
 func (p *Policy) Normalize() {

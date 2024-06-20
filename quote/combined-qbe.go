@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
@@ -34,7 +35,8 @@ func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		InitCells:   setInitCells(),
 		SheetName:   "Input dati Polizza",
 	}
-	qs.Spreadsheets()
+	outCells := qs.Spreadsheets()
+	mapCellPolicy(policy, outCells)
 
 	policyJson, err := policy.Marshal()
 
@@ -84,12 +86,142 @@ func setOutputCell() []Cell {
 		Cell: "C99",
 	}, {
 		Cell: "C100",
-	}, {
-		Cell: "C101",
 	},
 	}
 
 	return res
+}
+func mapCellPolicy(policy *models.Policy, cells []Cell) {
+	var priceGroup []models.Price
+	for _, cell := range cells {
+
+		switch cell.Cell {
+		case "C81":
+			s, err := strconv.ParseFloat(cell.Value.(string), 64)
+			lib.CheckError(err)
+			priceGroup = append(priceGroup, models.Price{
+				Name: "Fabbricato",
+				Net:  s,
+			})
+		case "C82":
+			s, err := strconv.ParseFloat(cell.Value.(string), 64)
+			lib.CheckError(err)
+			priceGroup = append(priceGroup, models.Price{
+				Name: "Contenuto (Merci e Macchinari)",
+				Net:  s,
+			})
+		case "C83":
+			s, err := strconv.ParseFloat(cell.Value.(string), 64)
+			lib.CheckError(err)
+			priceGroup = append(priceGroup, models.Price{
+				Name: "Merci (aumento temporaneo)",
+				Net:  s,
+			})
+		case "C84":
+			s, err := strconv.ParseFloat(cell.Value.(string), 64)
+			lib.CheckError(err)
+			priceGroup = append(priceGroup, models.Price{
+				Name: "Furto, rapina, estorsione (in aumento)",
+				Net:  s,
+			})
+		case "C85":
+			s, err := strconv.ParseFloat(cell.Value.(string), 64)
+			lib.CheckError(err)
+			priceGroup = append(priceGroup, models.Price{
+				Name: "Rischio locativo (in aumento)",
+				Net:  s,
+			})
+		case "C86":
+			s, err := strconv.ParseFloat(cell.Value.(string), 64)
+			lib.CheckError(err)
+			priceGroup = append(priceGroup, models.Price{
+				Name: "Altre garanzie su Contenuto",
+				Net:  s,
+			})
+		case "C87":
+			s, err := strconv.ParseFloat(cell.Value.(string), 64)
+			lib.CheckError(err)
+			priceGroup = append(priceGroup, models.Price{
+				Name: "Ricorso terzi (in aumento)",
+				Net:  s,
+			})
+		case "C88":
+			s, err := strconv.ParseFloat(cell.Value.(string), 64)
+			lib.CheckError(err)
+			priceGroup = append(priceGroup, models.Price{
+				Name: "Danni indiretti",
+				Net:  s,
+			})
+		case "C89":
+			s, err := strconv.ParseFloat(cell.Value.(string), 64)
+			lib.CheckError(err)
+			priceGroup = append(priceGroup, models.Price{
+				Name: "Perdita Pigioni",
+				Net:  s,
+			})
+		case "C90":
+			s, err := strconv.ParseFloat(cell.Value.(string), 64)
+			lib.CheckError(err)
+			priceGroup = append(priceGroup, models.Price{
+				Name: "Responsabilità civile terzi",
+				Net:  s,
+			})
+		case "C91":
+			s, err := strconv.ParseFloat(cell.Value.(string), 64)
+			lib.CheckError(err)
+			priceGroup = append(priceGroup, models.Price{
+				Name: "Responsabilità civile prestatori lavoro",
+				Net:  s,
+			})
+		case "C92":
+			s, err := strconv.ParseFloat(cell.Value.(string), 64)
+			lib.CheckError(err)
+			priceGroup = append(priceGroup, models.Price{
+				Name: "Responsabilità civile prodotti",
+				Net:  s,
+			})
+		case "C93":
+			s, err := strconv.ParseFloat(cell.Value.(string), 64)
+			lib.CheckError(err)
+			priceGroup = append(priceGroup, models.Price{
+				Name: "Ritiro Prodotti",
+				Net:  s,
+			})
+		case "C94":
+			s, err := strconv.ParseFloat(cell.Value.(string), 64)
+			lib.CheckError(err)
+			priceGroup = append(priceGroup, models.Price{
+				Name: "Resp. Amministratori Sindaci Dirigenti (D&O)",
+				Net:  s,
+			})
+		case "C95":
+			s, err := strconv.ParseFloat(cell.Value.(string), 64)
+			lib.CheckError(err)
+			priceGroup = append(priceGroup, models.Price{
+				Name: "Cyber",
+				Net:  s,
+			})
+		case "C96":
+			s, err := strconv.ParseFloat(cell.Value.(string), 64)
+			lib.CheckError(err)
+			policy.PriceNett = s
+		case "C97":
+			s, err := strconv.ParseFloat(cell.Value.(string), 64)
+			lib.CheckError(err)
+			policy.TaxAmount = s
+		case "C98":
+			s, err := strconv.ParseFloat(cell.Value.(string), 64)
+			lib.CheckError(err)
+			policy.PriceGross = s
+		case "C99":
+
+		case "C100":
+
+		default:
+
+		}
+	}
+	policy.PriceGroup = priceGroup
 }
 func setInputCell(policy *models.Policy) []Cell {
 	var inputCells []Cell
@@ -103,7 +235,13 @@ func setInputCell(policy *models.Policy) []Cell {
 		inputCells = append(inputCells, getEnterpriseGuaranteCellsBySlug(eg)...)
 	}
 	for i, build := range assBuildings {
+		col := map[int]string{0: "C", 1: "D", 2: "E", 3: "F", 4: "G"}
 		for _, bg := range build.Guarantees {
+			inputCells = append(inputCells, Cell{Cell: col[i] + "29", Value: build.Building.Address.PostalCode})
+			inputCells = append(inputCells, Cell{Cell: col[i] + "30", Value: build.Building.Address.Locality})
+			inputCells = append(inputCells, Cell{Cell: col[i] + "31", Value: build.Building.Address.City})
+			inputCells = append(inputCells, Cell{Cell: col[i] + "32", Value: build.Building.Address.StreetName})
+
 			inputCells = append(inputCells, getBuildingGuaranteCellsBySlug(bg, i)...)
 		}
 
@@ -342,7 +480,7 @@ func setInitCells() []Cell {
 			Value: "",
 		}, {
 			Cell:  "D19",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "D20",
 			Value: "",
@@ -369,19 +507,19 @@ func setInitCells() []Cell {
 			Value: "",
 		}, {
 			Cell:  "C29",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "C30",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "C31",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "C32",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "C33",
-			Value: "0",
+			Value: "Sconosciuto",
 		}, {
 			Cell:  "C34",
 			Value: "NO",
@@ -409,19 +547,19 @@ func setInitCells() []Cell {
 			Value: "",
 		}, {
 			Cell:  "D29",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "D30",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "D31",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "D32",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "D33",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "D34",
 			Value: "NO",
@@ -450,19 +588,19 @@ func setInitCells() []Cell {
 			Value: "",
 		}, {
 			Cell:  "E29",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "E30",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "E31",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "E32",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "E33",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "E34",
 			Value: "NO",
@@ -488,22 +626,22 @@ func setInitCells() []Cell {
 
 		{
 			Cell:  "F21",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "F29",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "F30",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "F31",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "F32",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "F33",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "F34",
 			Value: "NO",
@@ -529,22 +667,22 @@ func setInitCells() []Cell {
 
 		{
 			Cell:  "G21",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "G29",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "G30",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "G31",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "G32",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "G33",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "G34",
 			Value: "NO",
