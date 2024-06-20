@@ -67,6 +67,7 @@ func PromoteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 		log.Printf("error querying bigquery: %s", err.Error())
 		return "", nil, err
 	}
+	log.Printf("found %02d policies", len(policies))
 
 	saveFn := func(p models.Policy, trs []models.Transaction) error {
 		data := createPromoteSaveBatch(p, trs)
@@ -157,6 +158,9 @@ func getRenewingPolicies(renewDate time.Time) ([]models.Policy, error) {
 		"isRenewable = @isRenewable",
 		models.WoptaDataset,
 		collectionPrefix+lib.RenewPolicyViewCollection))
+
+	log.Printf("query: %s", query.String())
+	log.Printf("params: %v", params)
 
 	policies, err := lib.QueryParametrizedRowsBigQuery[models.Policy](query.String(), params)
 	if err != nil {
