@@ -181,12 +181,17 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 			ccAddress.String(),
 		)
 		mail.SendMailContract(policy, nil, fromAddress, toAddress, ccAddress, flowName)
-	} else if !policy.IsPay && policy.Annuity > 0 && areDatesEqual(policy.StartDate.AddDate(policy.Annuity, 0, 0), transaction.EffectiveDate) {
+	} else if !policy.IsPay && policy.Annuity > 0 && lib.IsEqual(policy.StartDate.AddDate(policy.Annuity, 0, 0), transaction.EffectiveDate) {
 		policy.SanitizePaymentData()
-		// Update Policy as paid
-		err = plc.Pay(&policy, origin)
+		// Update Policy as paid and renewed
+		policy.IsPay = true
+		policy.Status = models.PolicyStatusRenewed
+		policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusPay, policy.Status)
+		policy.Updated = time.Now().UTC()
+
+		err = lib.SetFirestoreErr(lib.PolicyCollection, policy.Uid, policy)
 		if err != nil {
-			log.Printf("ERROR policy pay: %s", err.Error())
+			log.Printf("ERROR saving policy %s to Firestore: %s", policy.Uid, err.Error())
 			return "", nil, err
 		}
 		policy.BigquerySave(origin)
@@ -220,9 +225,4 @@ func manualPayment(transaction *models.Transaction, origin string, payload *Manu
 	transaction.BigQuerySave(origin)
 
 	return nil
-}
-
-// TODO: move elsewhere
-func areDatesEqual(d1, d2 time.Time) bool {
-	return d1.Truncate(time.Hour * 24).Equal(d2.Truncate(time.Hour * 24))
 }

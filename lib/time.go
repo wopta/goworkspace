@@ -94,3 +94,7 @@ func AddMonths(t time.Time, m int) time.Time {
 	}
 	return x
 }
+
+func IsEqual(d1, d2 time.Time) bool {
+	return d1.Truncate(time.Hour * 24).Equal(d2.Truncate(time.Hour * 24))
+}

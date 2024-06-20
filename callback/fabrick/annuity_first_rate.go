@@ -121,6 +121,12 @@ func annuityFirstRate(policyUid, providerId, trSchedule, paymentMethod string) e
 	policy.IsPay = true
 	policy.Status = models.PolicyStatusPay
 	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusPay)
+
+	if policy.Annuity > 0 {
+		policy.Status = models.PolicyStatusRenewed
+		policy.StatusHistory = append(policy.StatusHistory, policy.Status)
+	}
+
 	policy.Updated = time.Now().UTC()
 
 	policy.BigQueryParse()
