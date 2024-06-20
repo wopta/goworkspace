@@ -432,46 +432,46 @@ func setInitCells() []Cell {
 	cells := []Cell{
 		{
 			Cell:  "C4",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "C5",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "E6",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "G6",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "C7",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "C8",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "C9",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "D9",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "G9",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "G10",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "G11",
 			Value: "NO",
 		}, {
 			Cell:  "C10",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "C11",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "C12",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "C19",
 			Value: "",
