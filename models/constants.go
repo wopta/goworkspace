@@ -27,7 +27,9 @@ const (
 	PolicyStatusPS                 = "Pay&Sign"
 	PolicyStatusCompanyEmit        = "CompanyEmited"
 	PolicyStatusDeleted            = "Deleted"
-	PolicyDraftRenew               = "DraftRenew"
+	PolicyStatusDraftRenew         = "DraftRenew"
+	PolicyStatusRenewed            = "Renewed"
+	PolicyStatusUnsolved           = "Unsolved"
 )
 
 func GetWaitForApprovalStatusList() []string {

@@ -209,7 +209,7 @@ func promotePolicyData(p models.Policy, promoteChannel chan<- RenewReport, wg *s
 		return
 	}
 
-	p.Status = policyStatusRenewed
+	p.Status = models.PolicyStatusRenewed
 	p.StatusHistory = append(p.StatusHistory, p.Status)
 	p.Updated = time.Now().UTC()
 
@@ -243,7 +243,7 @@ func setPolicyNotPaid(p models.Policy, promoteChannel chan<- RenewReport, wg *sy
 		return t
 	})
 
-	p.Status = policyStatusPaymentUnsolved
+	p.Status = models.PolicyStatusUnsolved
 	p.StatusHistory = append(p.StatusHistory, p.Status)
 	p.Updated = time.Now().UTC()
 

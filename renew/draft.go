@@ -291,7 +291,7 @@ func draft(policy models.Policy, product models.Product, ch chan<- RenewReport, 
 
 	policy.IsPay = false
 	policy.Status = models.PolicyStatusToPay
-	policy.StatusHistory = append(policy.StatusHistory, models.PolicyDraftRenew, models.PolicyStatusToPay)
+	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusDraftRenew, models.PolicyStatusToPay)
 
 	transactions = transaction.CreateTransactions(policy, product, func() string {
 		return lib.NewDoc(models.TransactionsCollection)
