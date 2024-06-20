@@ -20,15 +20,14 @@ const (
 	reservedTemplateType         = "reserved"
 	reservedApprovedTemplateType = "approved"
 	reservedRejectedTemplateType = "rejected"
+	renewDraftTemplateType       = "renew-draft"
 	linkFormat                   = "https://storage.googleapis.com/documents-public-dev/information-sets/%s/%s/Precontrattuale.pdf"
 )
 
 func SendMailLead(policy models.Policy, from, to, cc Address, flowName string, attachmentNames []string) {
-	var (
-		bodyData = BodyData{}
-	)
+	var bodyData BodyData
 
-	setBodyData(policy, &bodyData)
+	bodyData = getBodyData(policy)
 
 	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", flowName, leadTemplateType))
 
@@ -55,11 +54,9 @@ func SendMailLead(policy models.Policy, from, to, cc Address, flowName string, a
 }
 
 func SendMailPay(policy models.Policy, from, to, cc Address, flowName string) {
-	var (
-		bodyData = BodyData{}
-	)
+	var bodyData BodyData
 
-	setBodyData(policy, &bodyData)
+	bodyData = getBodyData(policy)
 
 	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", flowName, payTemplateType))
 
@@ -82,11 +79,9 @@ func SendMailPay(policy models.Policy, from, to, cc Address, flowName string) {
 }
 
 func SendMailSign(policy models.Policy, from, to, cc Address, flowName string) {
-	var (
-		bodyData = BodyData{}
-	)
+	var bodyData BodyData
 
-	setBodyData(policy, &bodyData)
+	bodyData = getBodyData(policy)
 
 	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", flowName, signTemplateType))
 
@@ -110,11 +105,11 @@ func SendMailSign(policy models.Policy, from, to, cc Address, flowName string) {
 
 func SendMailContract(policy models.Policy, at *[]Attachment, from, to, cc Address, flowName string) {
 	var (
-		bodyData = BodyData{}
+		bodyData BodyData
 		bcc      string
 	)
 
-	setBodyData(policy, &bodyData)
+	bodyData = getBodyData(policy)
 
 	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", flowName, contractTemplateType))
 
@@ -165,12 +160,12 @@ func SendMailContract(policy models.Policy, at *[]Attachment, from, to, cc Addre
 func SendMailReserved(policy models.Policy, from, to, cc Address, flowName string, attachmentNames []string) {
 	var (
 		at       []Attachment
-		bodyData = BodyData{}
+		bodyData BodyData
 		rawDoc   []byte
 		err      error
 	)
 
-	setBodyData(policy, &bodyData)
+	bodyData = getBodyData(policy)
 
 	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s-%s.html", flowName, reservedTemplateType, policy.Name))
 
@@ -223,7 +218,7 @@ func SendMailReserved(policy models.Policy, from, to, cc Address, flowName strin
 
 func SendMailReservedResult(policy models.Policy, from, to, cc Address, flowName string) {
 	var (
-		bodyData = BodyData{}
+		bodyData BodyData
 		template string
 	)
 
@@ -233,7 +228,7 @@ func SendMailReservedResult(policy models.Policy, from, to, cc Address, flowName
 		template = reservedRejectedTemplateType
 	}
 
-	setBodyData(policy, &bodyData)
+	bodyData = getBodyData(policy)
 
 	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", flowName, template))
 
@@ -264,11 +259,10 @@ func SendMailReservedResult(policy models.Policy, from, to, cc Address, flowName
 func SendMailProposal(policy models.Policy, from, to, cc Address, flowName string, attachmentNames []string) {
 	var (
 		at       []Attachment
-		bodyData = BodyData{}
-		// link     = fmt.Sprintf(linkFormat, policy.Name, policy.ProductVersion)
+		bodyData BodyData
 	)
 
-	setBodyData(policy, &bodyData)
+	bodyData = getBodyData(policy)
 
 	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", flowName, proposalTemplateType))
 
@@ -291,8 +285,35 @@ func SendMailProposal(policy models.Policy, from, to, cc Address, flowName strin
 		IsHtml:       true,
 		IsAttachment: true,
 		Attachments:  &at,
-		// IsLink:       true,
-		// Link:         link,
-		// LinkLabel:    "Leggi documentazione",
+	})
+}
+
+func SendMailRenewDraft(policy models.Policy, from, to, cc Address, flowName string, hasMandate bool) {
+	var bodyData BodyData
+
+	bodyData = getPolicyRenewDraftBodyData(policy, hasMandate)
+
+	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", flowName, renewDraftTemplateType))
+
+	messageBody := fillTemplate(templateFile, &bodyData)
+
+	title := policy.NameDesc
+	subtitle := fmt.Sprintf("La tua polizza n° %s si rinnova il %s, provvedi al pagamento.", policy.CodeCompany,
+		bodyData.RenewDate)
+	if hasMandate {
+		subtitle = fmt.Sprintf("La tua polizza n° %s si rinnova il %s, pagamento senza pensieri.",
+			policy.CodeCompany, bodyData.RenewDate)
+	}
+	subject := fmt.Sprintf("%s - %s", title, subtitle)
+
+	SendMail(MailRequest{
+		FromAddress: from,
+		To:          []string{to.Address},
+		Cc:          cc.Address,
+		Message:     messageBody,
+		Title:       title,
+		SubTitle:    subtitle,
+		Subject:     subject,
+		IsHtml:      true,
 	})
 }

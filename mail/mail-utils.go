@@ -9,25 +9,30 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/dustin/go-humanize"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 )
 
-func setBodyData(policy models.Policy, bodyData *BodyData) {
-	setProductBodyData(policy, bodyData)
+func getBodyData(policy models.Policy) BodyData {
+	var bodyData BodyData
 
-	setContractorBodyData(policy, bodyData)
+	setProductBodyData(policy, &bodyData)
+
+	setContractorBodyData(policy, &bodyData)
 
 	if policy.IsReserved {
-		setPolicyReservedBodyData(policy, bodyData)
+		setPolicyReservedBodyData(policy, &bodyData)
 	}
 
 	node := network.GetNetworkNodeByUid(policy.ProducerUid)
 
 	if node != nil {
-		setNetworkNodeBodyData(node, bodyData)
+		setNetworkNodeBodyData(node, &bodyData)
 	}
+
+	return bodyData
 }
 
 func setNetworkNodeBodyData(node *models.NetworkNode, bodyData *BodyData) {
@@ -72,6 +77,20 @@ func setPolicyReservedBodyData(policy models.Policy, bodyData *BodyData) {
 	if policy.ReservedInfo != nil && len(policy.ReservedInfo.RequiredExams) > 0 {
 		bodyData.ExtraContent = policy.ReservedInfo.RequiredExams
 	}
+}
+
+func getPolicyRenewDraftBodyData(policy models.Policy, hasMandate bool) BodyData {
+	priceGross := policy.PriceGross
+	if policy.PaymentSplit == string(models.PaySplitMonthly) {
+		priceGross = policy.PriceGrossMonthly
+	}
+
+	bodyData := getBodyData(policy)
+	bodyData.HasMandate = hasMandate
+	bodyData.PriceGross = humanize.FormatFloat("#.###,##", priceGross)
+	bodyData.RenewDate = policy.StartDate.AddDate(policy.Annuity, 0, 0).Format("02/01/2006")
+
+	return bodyData
 }
 
 func fillTemplate(htmlTemplate []byte, bodyData *BodyData) string {
