@@ -14,12 +14,14 @@ import (
 
 func TriggerRenew(dryRun bool, appCheckToken string) {
 	baseUrl := "https://api.dev.wopta.it/"
-	/*if os.Getenv("env") == "prod" {
-		baseUrl = "https://api.wopta.it/"
-	}*/
+	filePrefix := "dev"
+	if os.Getenv("env") == "prod" {
+		baseUrl = "https://api.prod.wopta.it/"
+		filePrefix = "prod"
+	}
 
 	var dates []string
-	b, err := os.ReadFile("./_script/dev-dates.json")
+	b, err := os.ReadFile(fmt.Sprintf("./_script/%s-dates.json", filePrefix))
 	lib.CheckError(err)
 	err = json.Unmarshal(b, &dates)
 	lib.CheckError(err)
