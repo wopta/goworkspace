@@ -226,8 +226,3 @@ func manualPayment(transaction *models.Transaction, origin string, payload *Manu
 
 	return nil
 }
-
-// TODO: move elsewhere
-func areDatesEqual(d1, d2 time.Time) bool {
-	return d1.Truncate(time.Hour * 24).Equal(d2.Truncate(time.Hour * 24))
-}
