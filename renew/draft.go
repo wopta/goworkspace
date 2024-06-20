@@ -14,7 +14,9 @@ import (
 	"time"
 
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
 	"github.com/wopta/goworkspace/payment"
 	"github.com/wopta/goworkspace/transaction"
 )
@@ -24,6 +26,11 @@ type DraftReq struct {
 	Date             string `json:"date"`
 	DryRun           *bool  `json:"dryRun"`
 	CollectionPrefix string `json:"collectionPrefix"`
+}
+
+type NodeFlowRelation struct {
+	Node models.NetworkNode
+	Flow string
 }
 
 func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -71,16 +78,6 @@ func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 	}
 	collectionPrefix = req.CollectionPrefix
 
-	saveFn := func(p models.Policy, trs []models.Transaction) error {
-		data := createDraftSaveBatch(p, trs)
-
-		if !dryRun {
-			return saveToDatabases(data)
-		}
-
-		return nil
-	}
-
 	policyType, quoteType, err := getQueryParameters(r)
 	if err != nil {
 		return "", nil, err
@@ -99,6 +96,39 @@ func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 		return "", nil, err
 	}
 	log.Printf("found %02d policies", len(policies))
+
+	policyMailDataMap := getPolicyMailDataMap(policies)
+
+	saveFn := func(p models.Policy, trs []models.Transaction, hasMandate bool) error {
+		data := createDraftSaveBatch(p, trs)
+
+		if !dryRun {
+			if err := saveToDatabases(data); err != nil {
+				return err
+			}
+
+			if p.Channel == models.NetworkChannel && hasMandate {
+				return nil
+			}
+
+			from := mail.AddressAnna
+			to := mail.GetContractorEmail(&p)
+			flowName := models.ECommerceFlow
+			if p.Channel == models.NetworkChannel {
+				relation := policyMailDataMap[p.Uid]
+				to = mail.GetNetworkNodeEmail(&relation.Node)
+				flowName = relation.Flow
+			}
+
+			if flowName == models.RemittanceMgaFlow {
+				return nil
+			}
+			mail.SendMailRenewDraft(p, from, to, mail.Address{}, flowName, hasMandate)
+			return nil
+		}
+
+		return nil
+	}
 
 	ch := make(chan RenewReport, len(policies))
 
@@ -229,12 +259,13 @@ func getPolicies(policyUid, policyType, quoteType string, products map[string]mo
 	return policies, nil
 }
 
-func draft(policy models.Policy, product models.Product, ch chan<- RenewReport, wg *sync.WaitGroup, save func(models.Policy, []models.Transaction) error) {
+func draft(policy models.Policy, product models.Product, ch chan<- RenewReport, wg *sync.WaitGroup, save func(models.Policy, []models.Transaction, bool) error) {
 	var (
 		err          error
 		r            RenewReport
 		transactions []models.Transaction
 		customerId   string
+		hasMandate   bool
 	)
 
 	defer func() {
@@ -255,14 +286,15 @@ func draft(policy models.Policy, product models.Product, ch chan<- RenewReport, 
 	}
 
 	policy.IsPay = false
-	policy.Status = models.TransactionStatusToPay
-	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusDraftRenew, models.TransactionStatusToPay)
+	policy.Status = models.PolicyStatusToPay
+	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusDraftRenew, models.PolicyStatusToPay)
 
 	transactions = transaction.CreateTransactions(policy, product, func() string {
 		return lib.NewDoc(models.TransactionsCollection)
 	})
 
 	if policy.Payment == models.FabrickPaymentProvider {
+		policy.PaymentMode = models.PaymentModeRecurrent
 		var isTransactionPaid bool = true
 		trs := transaction.GetPolicyValidTransactions(policy.Uid, &isTransactionPaid)
 		if len(trs) > 0 {
@@ -270,18 +302,20 @@ func draft(policy models.Policy, product models.Product, ch chan<- RenewReport, 
 		}
 	}
 
-	payUrl, transactions, err := payment.Controller(policy, product, transactions, customerId != "", customerId)
+	client := payment.NewClient(policy.Payment, policy, product, transactions, customerId != "", customerId)
+	payUrl, transactions, err := client.Renew()
 	if err != nil {
 		return
 	}
 
 	if payUrl != "" {
 		policy.PayUrl = payUrl
+		hasMandate = true
 	}
 	policy.Updated = time.Now().UTC()
 	policy.IsRenew = true
 
-	err = save(policy, transactions)
+	err = save(policy, transactions, hasMandate)
 	if err != nil {
 		return
 	}
@@ -332,4 +366,47 @@ func calculatePricesByGuarantees(policy *models.Policy) error {
 	}
 
 	return nil
+}
+
+func getPolicyMailDataMap(ps []models.Policy) map[string]NodeFlowRelation {
+	var (
+		policyNodeFlowMap = make(map[string]NodeFlowRelation)
+		nodeMap           = make(map[string]models.NetworkNode)
+		warrants          []models.Warrant
+		warrantMap        = make(map[string]models.Warrant)
+		err               error
+	)
+
+	if warrants, err = network.GetWarrants(); err != nil {
+		log.Printf("error loading warrants: %s", err)
+		return nil
+	}
+
+	for _, w := range warrants {
+		warrantMap[w.Name] = w
+	}
+
+	for _, p := range ps {
+		if p.ProducerUid == "" {
+			continue
+		}
+		currentNode := nodeMap[p.ProducerUid]
+		if _, ok := nodeMap[p.ProducerUid]; !ok {
+			nn := network.GetNetworkNodeByUid(p.ProducerUid)
+			if nn == nil {
+				log.Printf("error loading networkNode: %s", p.ProducerUid)
+				return nil
+			}
+			currentNode = *nn
+		}
+		w := warrantMap[currentNode.Warrant]
+		flowName := w.GetFlowName(p.Name)
+
+		policyNodeFlowMap[p.Uid] = NodeFlowRelation{
+			Node: currentNode,
+			Flow: flowName,
+		}
+	}
+
+	return policyNodeFlowMap
 }

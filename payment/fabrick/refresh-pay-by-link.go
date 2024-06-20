@@ -1,34 +1,36 @@
-package payment
+package fabrick
 
 import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/mail"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/network"
-	plc "github.com/wopta/goworkspace/policy"
-	prd "github.com/wopta/goworkspace/product"
-	"github.com/wopta/goworkspace/transaction"
 	"io"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/mail"
+	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
+	"github.com/wopta/goworkspace/payment/common"
+	plc "github.com/wopta/goworkspace/policy"
+	prd "github.com/wopta/goworkspace/product"
+	"github.com/wopta/goworkspace/transaction"
 )
 
-type FabrickRefreshPayByLinkRequest struct {
+type RefreshPayByLinkRequest struct {
 	PolicyUid         string `json:"policyUid"`
 	ScheduleFirstRate bool   `json:"scheduleFirstRate"`
 }
 
-func FabrickRefreshPayByLinkFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func RefreshPayByLinkFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err     error
-		request FabrickRefreshPayByLinkRequest
+		request RefreshPayByLinkRequest
 	)
 
-	log.SetPrefix("[FabrickRefreshPayByLinkFx] ")
+	log.SetPrefix("[RefreshPayByLinkFx] ")
 	defer log.SetPrefix("")
 	log.Println("Handler start -----------------------------------------------")
 
@@ -60,13 +62,20 @@ func FabrickRefreshPayByLinkFx(w http.ResponseWriter, r *http.Request) (string, 
 
 	product := prd.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, nil, nil)
 
-	payUrl, updatedTransactions, err := Controller(policy, *product, transactions, request.ScheduleFirstRate, "")
+	client := &Client{
+		Policy:            policy,
+		Product:           *product,
+		Transactions:      transactions,
+		ScheduleFirstRate: request.ScheduleFirstRate,
+		CustomerId:        "",
+	}
+	payUrl, updatedTransactions, err := client.Update()
 	if err != nil {
 		log.Printf("error scheduling transactions on fabrick: %s", err.Error())
 		return "", nil, err
 	}
 
-	err = saveTransactionsToDB(updatedTransactions)
+	err = common.SaveTransactionsToDB(updatedTransactions)
 	if err != nil {
 		return "", nil, err
 	}
@@ -101,18 +110,6 @@ func getTransactionsList(policyUid string) ([]models.Transaction, error) {
 	}
 	log.Printf("found %02d transactions for policy %s", len(transactions), policyUid)
 	return transactions, nil
-}
-
-func saveTransactionsToDB(transactions []models.Transaction) error {
-	for _, tr := range transactions {
-		err := lib.SetFirestoreErr(models.TransactionsCollection, tr.Uid, tr)
-		if err != nil {
-			log.Printf("error saving transactions to db: %s", err.Error())
-			return err
-		}
-		tr.BigQuerySave("")
-	}
-	return nil
 }
 
 func sendPayByLinkEmail(policy models.Policy) error {

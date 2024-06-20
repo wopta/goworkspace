@@ -5,8 +5,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
 )
 
 type GetWarrantsResponse struct {
@@ -21,7 +21,7 @@ func GetWarrantsFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 
 	log.Println("Handler start -----------------------------------------------")
 
-	warrants, err := GetWarrants()
+	warrants, err := network.GetWarrants()
 	if err != nil {
 		log.Printf("error getting warrants: %s", err.Error())
 		return "", "", err
@@ -38,25 +38,4 @@ func GetWarrantsFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	log.Println("Handler end -------------------------------------------------")
 
 	return string(responseBytes), response, nil
-}
-
-func GetWarrants() ([]models.Warrant, error) {
-	var (
-		err      error
-		warrants []models.Warrant
-	)
-
-	warrantsBytes := lib.GetFolderContentByEnv(models.WarrantsFolder)
-
-	for _, warrantBytes := range warrantsBytes {
-		var warrant models.Warrant
-		err = json.Unmarshal(warrantBytes, &warrant)
-		if err != nil {
-			log.Printf("[GetWarrants] error unmarshaling warrant: %s", err.Error())
-			return warrants, err
-		}
-
-		warrants = append(warrants, warrant)
-	}
-	return warrants, nil
 }

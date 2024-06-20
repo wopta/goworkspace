@@ -1,4 +1,4 @@
-package payment
+package manual
 
 const (
 	errTransactionPaid         = "MPTR001: Transaction already paid"

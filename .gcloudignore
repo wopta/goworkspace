@@ -8,3 +8,4 @@ main.go
 *.ppk
 sa_key_frontend.json
 .vscode/
+**/*_test.go
