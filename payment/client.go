@@ -8,7 +8,7 @@ import (
 
 type Client interface {
 	NewBusiness() (string, []models.Transaction, error)
-	Renew() (string, []models.Transaction, error)
+	Renew() (string, bool, []models.Transaction, error)
 	Update() (string, []models.Transaction, error)
 	Validate() error
 }

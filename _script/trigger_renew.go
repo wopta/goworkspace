@@ -1,38 +1,35 @@
 package _script
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"strings"
 	"time"
-
-	"github.com/wopta/goworkspace/lib"
 )
 
 func TriggerRenew(dryRun bool, appCheckToken string) {
 	baseUrl := "https://api.dev.wopta.it/"
-	filePrefix := "dev"
+	//filePrefix := "dev"
 	if os.Getenv("env") == "prod" {
 		baseUrl = "https://api.prod.wopta.it/"
-		filePrefix = "prod"
+		//filePrefix = "prod"
 	}
 
-	var dates []string
+	/*var dates []string
 	b, err := os.ReadFile(fmt.Sprintf("./_script/%s-dates.json", filePrefix))
 	lib.CheckError(err)
 	err = json.Unmarshal(b, &dates)
-	lib.CheckError(err)
+	lib.CheckError(err)*/
 
 	endpointUrl := baseUrl + "renew/v1/draft?policyType=multiYear&quoteType=fixed"
-	for _, date := range dates {
+	for _, date := range []string{"2024-07-03"} {
 		parsedDate, _ := time.Parse(time.DateOnly, date)
 		targetDate := parsedDate.AddDate(1, 0, -45).Format(time.DateOnly)
 
 		fmt.Printf("startDate: %s - targetDate: %s\n", date, targetDate)
-		body := strings.NewReader(fmt.Sprintf(`{"dryRun": %v, "date":"%s"}`, dryRun, targetDate))
+		body := strings.NewReader(fmt.Sprintf(`{"dryRun": %v, "policyUid":"%s"}`, dryRun, "4kjHg19CnIQfgrLux3QA"))
 
 		req, err := http.NewRequest(http.MethodPost, endpointUrl, body)
 		if err != nil {

@@ -21,13 +21,14 @@ func (c *Client) NewBusiness() (string, []models.Transaction, error) {
 		return "", nil, err
 	}
 
-	return remittanceIntegration(c.Transactions)
+	payUrl, _, transactions, err := remittanceIntegration(c.Transactions)
+	return payUrl, transactions, err
 }
-func (c *Client) Renew() (string, []models.Transaction, error) {
+func (c *Client) Renew() (string, bool, []models.Transaction, error) {
 	log.Println("client manual: renew integration")
 
 	if err := c.Validate(); err != nil {
-		return "", nil, err
+		return "", false, nil, err
 	}
 
 	return remittanceIntegration(c.Transactions)
@@ -47,7 +48,7 @@ func (c *Client) Validate() error {
 	return nil
 }
 
-func remittanceIntegration(transactions []models.Transaction) (payUrl string, updatedTransaction []models.Transaction, err error) {
+func remittanceIntegration(transactions []models.Transaction) (payUrl string, hasMandate bool, updatedTransaction []models.Transaction, err error) {
 	updatedTransaction = make([]models.Transaction, 0)
 
 	for index, tr := range transactions {
@@ -65,5 +66,5 @@ func remittanceIntegration(transactions []models.Transaction) (payUrl string, up
 		tr.UpdateDate = now
 		updatedTransaction = append(updatedTransaction, tr)
 	}
-	return "", updatedTransaction, nil
+	return "", false, updatedTransaction, nil
 }

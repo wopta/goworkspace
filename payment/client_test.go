@@ -271,7 +271,7 @@ func renewManualRemittance(t *testing.T) {
 	transactions := getTransactions(1, models.ManualPaymentProvider, 1, globalDate.AddDate(1, 0, 0))
 
 	c := payment.NewClient(models.ManualPaymentProvider, policy, product, transactions, false, "")
-	_, updatedTransactions, err := c.Renew()
+	_, _, updatedTransactions, err := c.Renew()
 	if err != nil {
 		t.Fatalf("expected: nil error got: %s", err.Error())
 	}
@@ -292,7 +292,7 @@ func renewFabrickMonthlyWithoutMandate(t *testing.T) {
 	transactions := getTransactions(12, models.FabrickPaymentProvider, 1, globalDate.AddDate(1, 0, 0))
 
 	c := payment.NewClient(models.FabrickPaymentProvider, policy, product, transactions, false, "")
-	payUrl, updatedTransactions, err := c.Renew()
+	payUrl, _, updatedTransactions, err := c.Renew()
 	if err != nil {
 		t.Fatalf("expected: nil error got: %s", err.Error())
 	}
@@ -313,7 +313,7 @@ func renewFabrickMonthlyWithMandate(t *testing.T) {
 	transactions := getTransactions(12, models.FabrickPaymentProvider, 1, globalDate.AddDate(1, 0, 0))
 
 	c := payment.NewClient(models.FabrickPaymentProvider, policy, product, transactions, true, "user-has-token")
-	payUrl, updatedTransactions, err := c.Renew()
+	payUrl, _, updatedTransactions, err := c.Renew()
 	if err != nil {
 		t.Fatalf("expected: nil error got: %s", err.Error())
 	}
@@ -334,7 +334,7 @@ func renewFabrickYearlyRecurrentWithoutMandate(t *testing.T) {
 	transactions := getTransactions(1, models.FabrickPaymentProvider, 1, globalDate.AddDate(1, 0, 0))
 
 	c := payment.NewClient(models.FabrickPaymentProvider, policy, product, transactions, false, "")
-	payUrl, updatedTransactions, err := c.Renew()
+	payUrl, _, updatedTransactions, err := c.Renew()
 	if err != nil {
 		t.Fatalf("expected: nil error got: %s", err.Error())
 	}
@@ -355,7 +355,7 @@ func renewFabrickYearlyRecurrentWithMandate(t *testing.T) {
 	transactions := getTransactions(1, models.FabrickPaymentProvider, 1, globalDate.AddDate(1, 0, 0))
 
 	c := payment.NewClient(models.FabrickPaymentProvider, policy, product, transactions, true, "user-has-token")
-	payUrl, updatedTransactions, err := c.Renew()
+	payUrl, _, updatedTransactions, err := c.Renew()
 	if err != nil {
 		t.Fatalf("expected: nil error got: %s", err.Error())
 	}
@@ -376,7 +376,7 @@ func renewFabrickYearlySingle(t *testing.T) {
 	transactions := getTransactions(1, models.FabrickPaymentProvider, 1, globalDate.AddDate(1, 0, 0))
 
 	c := payment.NewClient(models.FabrickPaymentProvider, policy, product, transactions, false, "")
-	payUrl, updatedTransactions, err := c.Renew()
+	payUrl, _, updatedTransactions, err := c.Renew()
 	if err != nil {
 		t.Fatalf("expected: nil error got: %s", err.Error())
 	}

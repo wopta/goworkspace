@@ -9,7 +9,6 @@ import (
 	"os"
 
 	"github.com/go-chi/chi/v5"
-
 	"github.com/wopta/goworkspace/lib"
 )
 
@@ -32,7 +31,19 @@ func TestPostFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 	} else if operation == "policy-update" {
 		policyTransactionsUpdate(int(request.(float64)))
 		return "{}", nil, nil
-	}
+	} /* else if operation == "mail" {
+		policy, _ := plc.GetPolicy("qfE4xTg9bjrf0zUH9ImD", "")
+		mail.SendMailRenewDraft(
+			policy,
+			mail.AddressAnna,
+			mail.Address{
+				Address: policy.Contractor.Mail,
+				Name:    policy.Contractor.Name + " " + policy.Contractor.Surname,
+			},
+			mail.Address{},
+			"e-commerce",
+			true)
+	}*/
 
 	if operation == "fabrick-01" {
 		var req fabrickTestRequest

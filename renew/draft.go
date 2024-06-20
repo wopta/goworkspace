@@ -265,7 +265,6 @@ func draft(policy models.Policy, product models.Product, ch chan<- RenewReport, 
 		r            RenewReport
 		transactions []models.Transaction
 		customerId   string
-		hasMandate   bool
 	)
 
 	defer func() {
@@ -303,14 +302,13 @@ func draft(policy models.Policy, product models.Product, ch chan<- RenewReport, 
 	}
 
 	client := payment.NewClient(policy.Payment, policy, product, transactions, customerId != "", customerId)
-	payUrl, transactions, err := client.Renew()
+	payUrl, hasMandate, transactions, err := client.Renew()
 	if err != nil {
 		return
 	}
 
 	if payUrl != "" {
 		policy.PayUrl = payUrl
-		hasMandate = true
 	}
 	policy.Updated = time.Now().UTC()
 	policy.IsRenew = true

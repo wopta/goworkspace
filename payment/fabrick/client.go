@@ -89,11 +89,12 @@ func (c Client) NewBusiness() (string, []models.Transaction, error) {
 
 	return updatedTransactions[0].PayUrl, updatedTransactions, nil
 }
-func (c Client) Renew() (string, []models.Transaction, error) {
+
+func (c Client) Renew() (string, bool, []models.Transaction, error) {
 	log.Println("client fabrick: renew integration")
 
 	if err := c.Validate(); err != nil {
-		return "", nil, err
+		return "", false, nil, err
 	}
 
 	var (
@@ -136,7 +137,7 @@ func (c Client) Renew() (string, []models.Transaction, error) {
 		scheduleDate, err := time.Parse(time.DateOnly, tr.ScheduleDate)
 		if err != nil {
 			log.Printf("error parsing scheduleDate: %s", err.Error())
-			return "", nil, err
+			return "", false, nil, err
 		}
 		if c.ScheduleFirstRate && scheduleDate.Before(now) {
 			/*
@@ -148,7 +149,7 @@ func (c Client) Renew() (string, []models.Transaction, error) {
 
 		res := <-createFabrickTransaction(&c.Policy, tr, createMandate, c.ScheduleFirstRate, isFirstRateOfAnnuity, c.CustomerId, paymentMethods)
 		if res.Payload == nil || res.Payload.PaymentPageURL == nil {
-			return "", nil, errors.New("error creating transaction on Fabrick")
+			return "", false, nil, errors.New("error creating transaction on Fabrick")
 		}
 		if (isFirstOfBatch && c.Policy.PaymentMode != models.PaymentModeRecurrent) || createMandate {
 			payUrl = *res.Payload.PaymentPageURL
@@ -162,7 +163,7 @@ func (c Client) Renew() (string, []models.Transaction, error) {
 		updatedTransactions = append(updatedTransactions, tr)
 	}
 
-	return payUrl, updatedTransactions, nil
+	return payUrl, hasMandate, updatedTransactions, nil
 }
 func (c Client) Update() (string, []models.Transaction, error) {
 	log.Println("client fabrick: update integration")
