@@ -107,7 +107,6 @@ func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 				return err
 			}
 
-			// Do not send email for network with active mandate
 			if p.Channel == models.NetworkChannel && hasMandate {
 				return nil
 			}
@@ -121,13 +120,10 @@ func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 				flowName = relation.Flow
 			}
 
-			// Do not send email for remittance flow
 			if flowName == models.RemittanceMgaFlow {
 				return nil
 			}
-			// TODO: remove log, only for compile error while function is not available
-			log.Printf("sending from: %s to: %s with flow: %s with hasMandate: %v", from, to, flowName, hasMandate)
-			// mail.SendRenewDraft(p models.Policy, from, to, cc mail.Address, flowName string, hasMandate bool)
+			mail.SendMailRenewDraft(p, from, to, mail.Address{}, flowName, hasMandate)
 			return nil
 		}
 
