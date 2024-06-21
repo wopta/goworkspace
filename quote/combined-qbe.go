@@ -98,121 +98,242 @@ func mapCellPolicy(policy *models.Policy, cells []Cell) {
 		switch cell.Cell {
 		case "C81":
 			s, err := strconv.ParseFloat(cell.Value.(string), 64)
-			lib.CheckError(err)
-			priceGroup = append(priceGroup, models.Price{
-				Name: "Fabbricato",
-				Net:  s,
-			})
+			log.Println(err)
+			if err != nil {
+				priceGroup = append(priceGroup, models.Price{
+					Name: "Fabbricato",
+					Net:  s,
+				})
+			} else {
+				priceGroup = append(priceGroup, models.Price{
+					Name:        "Fabbricato",
+					Description: cell.Value.(string),
+				})
+			}
+
 		case "C82":
 			s, err := strconv.ParseFloat(cell.Value.(string), 64)
-			lib.CheckError(err)
-			priceGroup = append(priceGroup, models.Price{
-				Name: "Contenuto (Merci e Macchinari)",
-				Net:  s,
-			})
+			log.Println(err)
+			if err != nil {
+				priceGroup = append(priceGroup, models.Price{
+					Name: "Contenuto (Merci e Macchinari)",
+					Net:  s,
+				})
+			} else {
+				priceGroup = append(priceGroup, models.Price{
+					Name:        "Contenuto (Merci e Macchinari)",
+					Description: cell.Value.(string),
+				})
+			}
+
 		case "C83":
 			s, err := strconv.ParseFloat(cell.Value.(string), 64)
-			lib.CheckError(err)
-			priceGroup = append(priceGroup, models.Price{
-				Name: "Merci (aumento temporaneo)",
-				Net:  s,
-			})
+			log.Println(err)
+			if err != nil {
+				priceGroup = append(priceGroup, models.Price{
+					Name: "Merci (aumento temporaneo)",
+					Net:  s,
+				})
+			} else {
+				priceGroup = append(priceGroup, models.Price{
+					Name:        "Merci (aumento temporaneo)",
+					Description: cell.Value.(string),
+				})
+			}
+
 		case "C84":
 			s, err := strconv.ParseFloat(cell.Value.(string), 64)
-			lib.CheckError(err)
-			priceGroup = append(priceGroup, models.Price{
-				Name: "Furto, rapina, estorsione (in aumento)",
-				Net:  s,
-			})
+			log.Println(err)
+			if err != nil {
+				priceGroup = append(priceGroup, models.Price{
+					Name: "Furto, rapina, estorsione (in aumento)",
+					Net:  s,
+				})
+			} else {
+				priceGroup = append(priceGroup, models.Price{
+					Name:        "Furto, rapina, estorsione (in aumento)",
+					Description: cell.Value.(string),
+				})
+			}
+
 		case "C85":
 			s, err := strconv.ParseFloat(cell.Value.(string), 64)
-			lib.CheckError(err)
-			priceGroup = append(priceGroup, models.Price{
-				Name: "Rischio locativo (in aumento)",
-				Net:  s,
-			})
+			log.Println(err)
+			if err != nil {
+				priceGroup = append(priceGroup, models.Price{
+					Name: "Rischio locativo (in aumento)",
+					Net:  s,
+				})
+			} else {
+				priceGroup = append(priceGroup, models.Price{
+					Name:        "Rischio locativo (in aumento)",
+					Description: cell.Value.(string),
+				})
+			}
+
 		case "C86":
 			s, err := strconv.ParseFloat(cell.Value.(string), 64)
-			lib.CheckError(err)
-			priceGroup = append(priceGroup, models.Price{
-				Name: "Altre garanzie su Contenuto",
-				Net:  s,
-			})
+			log.Println(err)
+			if err != nil {
+				priceGroup = append(priceGroup, models.Price{
+					Name: "Altre garanzie su Contenuto",
+					Net:  s,
+				})
+			} else {
+				priceGroup = append(priceGroup, models.Price{
+					Name:        "Altre garanzie su Contenuto",
+					Description: cell.Value.(string),
+				})
+			}
+
 		case "C87":
 			s, err := strconv.ParseFloat(cell.Value.(string), 64)
-			lib.CheckError(err)
-			priceGroup = append(priceGroup, models.Price{
-				Name: "Ricorso terzi (in aumento)",
-				Net:  s,
-			})
+			log.Println(err)
+			if err != nil {
+				priceGroup = append(priceGroup, models.Price{
+					Name: "Ricorso terzi (in aumento)",
+					Net:  s,
+				})
+			} else {
+				priceGroup = append(priceGroup, models.Price{
+					Name:        "Ricorso terzi (in aumento)",
+					Description: cell.Value.(string),
+				})
+			}
+
 		case "C88":
 			s, err := strconv.ParseFloat(cell.Value.(string), 64)
-			lib.CheckError(err)
-			priceGroup = append(priceGroup, models.Price{
-				Name: "Danni indiretti",
-				Net:  s,
-			})
+			log.Println(err)
+			if err != nil {
+				priceGroup = append(priceGroup, models.Price{
+					Name: "Danni indiretti",
+					Net:  s,
+				})
+			} else {
+				priceGroup = append(priceGroup, models.Price{
+					Name:        "Danni indiretti",
+					Description: cell.Value.(string),
+				})
+			}
+
 		case "C89":
 			s, err := strconv.ParseFloat(cell.Value.(string), 64)
-			lib.CheckError(err)
+			log.Println(err)
 			priceGroup = append(priceGroup, models.Price{
 				Name: "Perdita Pigioni",
 				Net:  s,
 			})
 		case "C90":
 			s, err := strconv.ParseFloat(cell.Value.(string), 64)
-			lib.CheckError(err)
-			priceGroup = append(priceGroup, models.Price{
-				Name: "Responsabilità civile terzi",
-				Net:  s,
-			})
+			log.Println(err)
+			if err != nil {
+				priceGroup = append(priceGroup, models.Price{
+					Name: "Responsabilità civile terzi",
+					Net:  s,
+				})
+			} else {
+				priceGroup = append(priceGroup, models.Price{
+					Name:        "Responsabilità civile terzi",
+					Description: cell.Value.(string),
+				})
+			}
+
 		case "C91":
 			s, err := strconv.ParseFloat(cell.Value.(string), 64)
-			lib.CheckError(err)
-			priceGroup = append(priceGroup, models.Price{
-				Name: "Responsabilità civile prestatori lavoro",
-				Net:  s,
-			})
+			log.Println(err)
+			if err != nil {
+				priceGroup = append(priceGroup, models.Price{
+					Name: "Responsabilità civile prestatori lavoro",
+					Net:  s,
+				})
+			} else {
+				priceGroup = append(priceGroup, models.Price{
+					Name:        "Responsabilità civile prestatori lavoro",
+					Description: cell.Value.(string),
+				})
+			}
+
 		case "C92":
 			s, err := strconv.ParseFloat(cell.Value.(string), 64)
-			lib.CheckError(err)
-			priceGroup = append(priceGroup, models.Price{
-				Name: "Responsabilità civile prodotti",
-				Net:  s,
-			})
+			log.Println(err)
+			if err != nil {
+				priceGroup = append(priceGroup, models.Price{
+					Name: "Responsabilità civile prodotti",
+					Net:  s,
+				})
+			} else {
+				priceGroup = append(priceGroup, models.Price{
+					Name:        "Responsabilità civile prodotti",
+					Description: cell.Value.(string),
+				})
+			}
+
 		case "C93":
 			s, err := strconv.ParseFloat(cell.Value.(string), 64)
-			lib.CheckError(err)
-			priceGroup = append(priceGroup, models.Price{
-				Name: "Ritiro Prodotti",
-				Net:  s,
-			})
+			log.Println(err)
+			if err != nil {
+				priceGroup = append(priceGroup, models.Price{
+					Name: "Ritiro Prodotti",
+					Net:  s,
+				})
+			} else {
+				priceGroup = append(priceGroup, models.Price{
+					Name:        "Ritiro Prodotti",
+					Description: cell.Value.(string),
+				})
+			}
+
 		case "C94":
 			s, err := strconv.ParseFloat(cell.Value.(string), 64)
-			lib.CheckError(err)
-			priceGroup = append(priceGroup, models.Price{
-				Name: "Resp. Amministratori Sindaci Dirigenti (D&O)",
-				Net:  s,
-			})
+			log.Println(err)
+			if err != nil {
+				priceGroup = append(priceGroup, models.Price{
+					Name: "Resp. Amministratori Sindaci Dirigenti (D&O)",
+					Net:  s,
+				})
+			} else {
+				priceGroup = append(priceGroup, models.Price{
+					Name:        "Resp. Amministratori Sindaci Dirigenti (D&O)",
+					Description: cell.Value.(string),
+				})
+			}
+
 		case "C95":
 			s, err := strconv.ParseFloat(cell.Value.(string), 64)
-			lib.CheckError(err)
-			priceGroup = append(priceGroup, models.Price{
-				Name: "Cyber",
-				Net:  s,
-			})
+			log.Println(err)
+			if err != nil {
+				priceGroup = append(priceGroup, models.Price{
+					Name: "Cyber",
+					Net:  s,
+				})
+			} else {
+				priceGroup = append(priceGroup, models.Price{
+					Name:        "Cyber",
+					Description: cell.Value.(string),
+				})
+			}
+
 		case "C96":
 			s, err := strconv.ParseFloat(cell.Value.(string), 64)
-			lib.CheckError(err)
-			policy.PriceNett = s
+			log.Println(err)
+			if err != nil {
+				policy.PriceNett = s
+			}
+
 		case "C97":
 			s, err := strconv.ParseFloat(cell.Value.(string), 64)
-			lib.CheckError(err)
-			policy.TaxAmount = s
+			log.Println(err)
+			if err != nil {
+				policy.TaxAmount = s
+			}
+
 		case "C98":
 			s, err := strconv.ParseFloat(cell.Value.(string), 64)
-			lib.CheckError(err)
-			policy.PriceGross = s
+			log.Println(err)
+			if err != nil {
+				policy.PriceGross = s
+			}
+
 		case "C99":
 
 		case "C100":
@@ -241,7 +362,7 @@ func setInputCell(policy *models.Policy) []Cell {
 			inputCells = append(inputCells, Cell{Cell: col[i] + "30", Value: build.Building.Address.Locality})
 			inputCells = append(inputCells, Cell{Cell: col[i] + "31", Value: build.Building.Address.City})
 			inputCells = append(inputCells, Cell{Cell: col[i] + "32", Value: build.Building.Address.StreetName})
-
+			inputCells = append(inputCells, Cell{Cell: col[i] + "32", Value: build.Building.Naics})
 			inputCells = append(inputCells, getBuildingGuaranteCellsBySlug(bg, i)...)
 		}
 
@@ -746,20 +867,23 @@ func setInitCells() []Cell {
 			Value: "0",
 		}, {
 			Cell:  "F66",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "F67",
-			Value: "0",
+			Value: "",
 		}, {
 			Cell:  "F68",
-			Value: "0",
+			Value: "",
 		},
 		{
 			Cell:  "F69",
 			Value: "NO",
 		}, {
 			Cell:  "F70",
-			Value: "0",
+			Value: "",
+		}, {
+			Cell:  "C74",
+			Value: "NO",
 		},
 	}
 	return cells

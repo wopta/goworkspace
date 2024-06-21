@@ -178,6 +178,7 @@ type Question struct {
 
 type Price struct {
 	Name         string  `firestore:"name,omitempty" json:"name,omitempty" bigquery:"-"`
+	Description  string  `firestore:"description,omitempty" json:"description,omitempty" bigquery:"-"`
 	Net          float64 `firestore:"net" json:"net" bigquery:"-"`
 	Tax          float64 `firestore:"tax" json:"tax" bigquery:"-"`
 	Gross        float64 `firestore:"gross" json:"gross" bigquery:"-"`
