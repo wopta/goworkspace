@@ -39,7 +39,7 @@ func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	mapCellPolicy(policy, outCells)
 
 	policyJson, err := policy.Marshal()
-
+log.Println(policyJson)
 	log.Println("Handler end -------------------------------------------------")
 
 	return string(policyJson), policy, err
