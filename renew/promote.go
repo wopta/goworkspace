@@ -62,6 +62,8 @@ func PromoteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	}
 	collectionPrefix = request.CollectionPrefix
 
+	log.Printf("running pipeline with set config. TargetDate: %v, DryRun: %v", targetDate, dryRun)
+
 	policies, err := getRenewingPolicies(targetDate)
 	if err != nil {
 		log.Printf("error querying bigquery: %s", err.Error())
