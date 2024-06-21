@@ -13,10 +13,10 @@ require (
 	github.com/wopta/goworkspace/callback_out v1.0.12
 	github.com/wopta/goworkspace/document v1.1.85
 	github.com/wopta/goworkspace/lib v1.0.127
-	github.com/wopta/goworkspace/mail v1.0.117
+	github.com/wopta/goworkspace/mail v1.0.118
 	github.com/wopta/goworkspace/models v1.1.121
 	github.com/wopta/goworkspace/network v1.0.70
-	github.com/wopta/goworkspace/payment v1.0.218
+	github.com/wopta/goworkspace/payment v1.0.219
 	github.com/wopta/goworkspace/policy v1.0.109
 	github.com/wopta/goworkspace/product v1.0.115
 	github.com/wopta/goworkspace/question v1.0.61
