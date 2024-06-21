@@ -138,7 +138,7 @@ func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 			return nil
 		}
 
-		log.Printf("dryRun active - not saving to DB and not sending mail")
+		log.Println("dryRun active - not saving to DB and not sending mail")
 
 		return nil
 	}
