@@ -26,6 +26,7 @@ type DraftReq struct {
 	Date             string `json:"date"`
 	DryRun           *bool  `json:"dryRun"`
 	CollectionPrefix string `json:"collectionPrefix"`
+	SendMail         *bool  `json:"sendMail"`
 }
 
 type NodeFlowRelation struct {
@@ -45,6 +46,7 @@ func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 		}
 		today       = time.Now().UTC()
 		productsMap = make(map[string]map[string]models.Product)
+		sendMail    = false
 	)
 
 	log.SetPrefix("[DraftFx] ")
@@ -76,7 +78,12 @@ func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 	if req.DryRun != nil {
 		dryRun = *req.DryRun
 	}
+	if req.SendMail != nil {
+		sendMail = *req.SendMail
+	}
 	collectionPrefix = req.CollectionPrefix
+
+	log.Printf("running pipeline with set config. Today as: %v, DryRun: %v, SendMail: %v", today, dryRun, sendMail)
 
 	policyType, quoteType, err := getQueryParameters(r)
 	if err != nil {
@@ -107,6 +114,10 @@ func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 				return err
 			}
 
+			if !sendMail {
+				return nil
+			}
+
 			if p.Channel == models.NetworkChannel && hasMandate {
 				return nil
 			}
@@ -126,6 +137,8 @@ func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 			mail.SendMailRenewDraft(p, from, to, mail.Address{}, flowName, hasMandate)
 			return nil
 		}
+
+		log.Println("dryRun active - not saving to DB and not sending mail")
 
 		return nil
 	}
