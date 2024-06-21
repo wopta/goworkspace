@@ -85,6 +85,8 @@ func PromoteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 			return saveToDatabases(dataDelete)
 		}
 
+		log.Printf("dryRun active - not saving to DB")
+
 		return nil
 	}
 
