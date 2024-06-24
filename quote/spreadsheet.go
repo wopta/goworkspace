@@ -128,10 +128,11 @@ func (qs *QuoteSpreadsheet) getOutput(sheetClient *sheets.Service) []Cell {
 		fmt.Printf("len(sheet.Values): %v\n", sheet.Values)
 		fmt.Printf("row: %v\n", row)
 		fmt.Printf("row: %v\n", colum)
+
 		fmt.Printf("value: %v\n", sheet.Values[row-1][col[colum]])
 		rescell := Cell{
 			Cell:  cell.Cell,
-			Value: sheet.Values[row][col[colum]],
+			Value: sheet.Values[row-1][col[colum]],
 		}
 		res = append(res, rescell)
 

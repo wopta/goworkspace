@@ -25,7 +25,7 @@ func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 
 	req := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
-	log.Println("Request: ", req)
+	log.Println("Request: ", string(req))
 	err := json.Unmarshal(req, &policy)
 	lib.CheckError(err)
 	inputCells = append(inputCells, setInputCell(policy)...)
