@@ -13,8 +13,7 @@
   "priceGroup": [
     {
       "name": "Fabbricato",
-      "description": " Errore - verifica dati",
-      "net": 0,
+      "net": 96,
       "tax": 0,
       "gross": 0,
       "delta": 0,
@@ -22,24 +21,6 @@
     },
     {
       "name": "Contenuto (Merci e Macchinari)",
-      "description": " Errore - verifica dati",
-      "net": 0,
-      "tax": 0,
-      "gross": 0,
-      "delta": 0,
-      "discount": 0
-    },
-    {
-      "name": "Merci (aumento temporaneo)",
-      "description": " Errore - verifica dati",
-      "net": 0,
-      "tax": 0,
-      "gross": 0,
-      "delta": 0,
-      "discount": 0
-    },
-    {
-      "name": "Furto, rapina, estorsione (in aumento)",
       "description": "  -   ",
       "net": 0,
       "tax": 0,
@@ -48,8 +29,8 @@
       "discount": 0
     },
     {
-      "name": "Rischio locativo (in aumento)",
-      "description": " Errore - verifica dati",
+      "name": "Merci (aumento temporaneo)",
+      "description": "  -   ",
       "net": 0,
       "tax": 0,
       "gross": 0,
@@ -57,8 +38,24 @@
       "discount": 0
     },
     {
+      "name": "Furto, rapina, estorsione (in aumento)",
+      "net": 52.1,
+      "tax": 0,
+      "gross": 0,
+      "delta": 0,
+      "discount": 0
+    },
+    {
+      "name": "Rischio locativo (in aumento)",
+      "net": 1551.04,
+      "tax": 0,
+      "gross": 0,
+      "delta": 0,
+      "discount": 0
+    },
+    {
       "name": "Altre garanzie su Contenuto",
-      "description": " Errore - verifica dati",
+      "description": "  -   ",
       "net": 0,
       "tax": 0,
       "gross": 0,
@@ -85,7 +82,7 @@
     },
     {
       "name": "Perdita Pigioni",
-      "net": 42.32,
+      "net": 79.94,
       "tax": 0,
       "gross": 0,
       "delta": 0,
@@ -93,8 +90,7 @@
     },
     {
       "name": "Responsabilità civile terzi",
-      "description": "  473.400,00 ",
-      "net": 0,
+      "net": 1104.15,
       "tax": 0,
       "gross": 0,
       "delta": 0,
@@ -159,24 +155,24 @@
   "assets": [
     {
       "type": "enterprise",
-      "uuid": "3d3d1d80-b291-1049-925b-63bb25566fe3",
+      "uuid": "446db480-cd84-1049-9659-fbbfe6ea1fb1",
       "enterprise": {
         "name": "luca",
         "address": {
-          "streetName": "Via Stella, Verona, VR, Italia",
+          "streetName": "Via Stella",
           "streetNumber": "12",
-          "city": "Verona",
-          "postalCode": "37121",
-          "locality": "Verona",
-          "cityCode": "VR",
+          "city": "Napoli",
+          "postalCode": "80137",
+          "locality": "Napoli",
+          "cityCode": "NA",
           "area": ""
         },
         "location": {},
         "vatCode": "11111111111",
-        "employer": 10000,
-        "workEmployersRemuneration": "2000000",
-        "totalBilled": "200000000",
-        "northAmericanMarket": "20000"
+        "employer": 12,
+        "workEmployersRemuneration": "12000",
+        "totalBilled": "200000",
+        "northAmericanMarket": "2000"
       },
       "guarantees": [
         {
@@ -209,63 +205,10 @@
         {
           "type": "enterprise",
           "description": " ",
-          "companyName": "Maggiori costi",
-          "value": {
-            "deductibleValues": {},
-            "sumInsuredValues": {},
-            "selfInsuranceValues": {},
-            "tax": 0,
-            "percentage": 0,
-            "premiumNetYearly": 0,
-            "premiumTaxAmountYearly": 0,
-            "premiumGrossYearly": 0,
-            "premiumTaxAmountMonthly": 0,
-            "premiumGrossMonthly": 0
-          },
-          "slug": "increased-cost",
-          "isMandatory": false,
-          "isExtension": false,
-          "isSellable": true,
-          "isConfigurable": false,
-          "subtitle": "",
-          "reserved": false,
-          "isSelected": false,
-          "isDeleted": false
-        },
-        {
-          "type": "enterprise",
-          "description": " ",
-          "companyName": "Fenomeno Elettrico (in aumento a 10.000 - A/23)",
-          "value": {
-            "deductibleValues": {},
-            "sumInsuredLimitOfIndemnity": 10540000,
-            "sumInsuredValues": {},
-            "selfInsuranceValues": {},
-            "tax": 0,
-            "percentage": 0,
-            "premiumNetYearly": 0,
-            "premiumTaxAmountYearly": 0,
-            "premiumGrossYearly": 0,
-            "premiumTaxAmountMonthly": 0,
-            "premiumGrossMonthly": 0
-          },
-          "slug": "electrical-phenomenon",
-          "isMandatory": false,
-          "isExtension": false,
-          "isSellable": true,
-          "isConfigurable": false,
-          "subtitle": "",
-          "reserved": false,
-          "isSelected": false,
-          "isDeleted": false
-        },
-        {
-          "type": "enterprise",
-          "description": " ",
           "companyName": "Guasti alle macchine (in aumento a 50.000 - A/27)",
           "value": {
             "deductibleValues": {},
-            "sumInsuredLimitOfIndemnity": 6230000,
+            "sumInsuredLimitOfIndemnity": 100000,
             "sumInsuredValues": {},
             "selfInsuranceValues": {},
             "tax": 0,
@@ -312,28 +255,106 @@
           "reserved": false,
           "isSelected": false,
           "isDeleted": false
+        },
+        {
+          "type": "enterprise",
+          "description": " ",
+          "companyName": "Fenomeno Elettrico (in aumento a 10.000 - A/23)",
+          "value": {
+            "deductibleValues": {},
+            "sumInsuredLimitOfIndemnity": 100000,
+            "sumInsuredValues": {},
+            "selfInsuranceValues": {},
+            "tax": 0,
+            "percentage": 0,
+            "premiumNetYearly": 0,
+            "premiumTaxAmountYearly": 0,
+            "premiumGrossYearly": 0,
+            "premiumTaxAmountMonthly": 0,
+            "premiumGrossMonthly": 0
+          },
+          "slug": "electrical-phenomenon",
+          "isMandatory": false,
+          "isExtension": false,
+          "isSellable": true,
+          "isConfigurable": false,
+          "subtitle": "",
+          "reserved": false,
+          "isSelected": false,
+          "isDeleted": false
+        },
+        {
+          "type": "enterprise",
+          "description": " ",
+          "companyName": "Cyber",
+          "value": {
+            "deductibleValues": {},
+            "sumInsuredValues": {},
+            "selfInsuranceValues": {},
+            "tax": 0,
+            "percentage": 0,
+            "premiumNetYearly": 0,
+            "premiumTaxAmountYearly": 0,
+            "premiumGrossYearly": 0,
+            "premiumTaxAmountMonthly": 0,
+            "premiumGrossMonthly": 0
+          },
+          "slug": "cyber",
+          "isMandatory": false,
+          "isExtension": false,
+          "isSellable": true,
+          "isConfigurable": false,
+          "subtitle": "",
+          "reserved": false,
+          "isSelected": false,
+          "isDeleted": false
+        },
+        {
+          "type": "enterprise",
+          "description": " ",
+          "companyName": "Indennità aggiuntiva",
+          "value": {
+            "deductibleValues": {},
+            "sumInsuredValues": {},
+            "selfInsuranceValues": {},
+            "tax": 0,
+            "percentage": 0,
+            "premiumNetYearly": 0,
+            "premiumTaxAmountYearly": 0,
+            "premiumGrossYearly": 0,
+            "premiumTaxAmountMonthly": 0,
+            "premiumGrossMonthly": 0
+          },
+          "slug": "additional-compensation",
+          "isMandatory": false,
+          "isExtension": false,
+          "isSellable": true,
+          "isConfigurable": false,
+          "subtitle": "",
+          "reserved": false,
+          "isSelected": false,
+          "isDeleted": false
         }
       ]
     },
     {
       "type": "building",
-      "uuid": "d3863900-b2bb-1049-925b-63bb25566fe3",
+      "uuid": "96481780-cd4f-1049-9659-fbbfe6ea1fb1",
       "building": {
         "location": {},
         "address": {
           "streetName": "Via Stella",
-          "streetNumber": "1",
-          "city": "Verona",
-          "postalCode": "37121",
-          "locality": "Verona",
-          "cityCode": "VR",
+          "streetNumber": "12",
+          "city": "Napoli",
+          "postalCode": "80137",
+          "locality": "Napoli",
+          "cityCode": "NA",
           "area": ""
         },
         "buildingYear": "2024",
-        "activtyDetail": "Attività 1",
-        "activityCategory": "Attività 2",
-        "naics": "124",
-        "hasSprinkler": true
+        "activtyDetail": "Produzione di bevande analcoliche",
+        "activityCategory": "Produzione di bevande e tabacco",
+        "naics": "312111"
       },
       "guarantees": [
         {
@@ -342,7 +363,7 @@
           "companyName": "Fabbricato",
           "value": {
             "deductibleValues": {},
-            "sumInsuredLimitOfIndemnity": 7000000,
+            "sumInsuredLimitOfIndemnity": 100000,
             "sumInsuredValues": {},
             "selfInsuranceValues": {},
             "tax": 0,
@@ -366,10 +387,10 @@
         {
           "type": "building",
           "description": " ",
-          "companyName": "Macchinari",
+          "companyName": "Rischio locativo",
           "value": {
             "deductibleValues": {},
-            "sumInsuredLimitOfIndemnity": 3200000,
+            "sumInsuredLimitOfIndemnity": 100000,
             "sumInsuredValues": {},
             "selfInsuranceValues": {},
             "tax": 0,
@@ -380,7 +401,7 @@
             "premiumTaxAmountMonthly": 0,
             "premiumGrossMonthly": 0
           },
-          "slug": "machinery",
+          "slug": "rental-risk",
           "isMandatory": false,
           "isExtension": false,
           "isSellable": true,
@@ -393,10 +414,10 @@
         {
           "type": "building",
           "description": " ",
-          "companyName": "Rischio locativo",
+          "companyName": "Macchinari",
           "value": {
             "deductibleValues": {},
-            "sumInsuredLimitOfIndemnity": 7250000,
+            "sumInsuredLimitOfIndemnity": 100000,
             "sumInsuredValues": {},
             "selfInsuranceValues": {},
             "tax": 0,
@@ -407,7 +428,7 @@
             "premiumTaxAmountMonthly": 0,
             "premiumGrossMonthly": 0
           },
-          "slug": "rental-risk",
+          "slug": "machinery",
           "isMandatory": false,
           "isExtension": false,
           "isSellable": true,

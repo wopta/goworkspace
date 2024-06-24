@@ -62,8 +62,8 @@ func (qs *QuoteSpreadsheet) Spreadsheets() []Cell {
 	sheetClient, e := GoogleClient[*sheets.Service](spreadsheet)
 	lib.CheckError(e)
 	fmt.Printf("sheetClient: %v\n", sheetClient)
-	qs.setInitCells(sheetClient,ctx)
-	qs.setInputCells(sheetClient,ctx)
+	qs.setInitCells(sheetClient, ctx)
+	qs.setInputCells(sheetClient, ctx)
 	return qs.getOutput(sheetClient)
 }
 func (qs *QuoteSpreadsheet) setInitCells(sheetClient *sheets.Service, ctx context.Context) {
@@ -128,7 +128,7 @@ func (qs *QuoteSpreadsheet) getOutput(sheetClient *sheets.Service) []Cell {
 		fmt.Printf("len(sheet.Values): %v\n", sheet.Values)
 		fmt.Printf("row: %v\n", row)
 		fmt.Printf("row: %v\n", colum)
-		fmt.Printf("value: %v\n", sheet.Values[row][col[colum]])
+		fmt.Printf("value: %v\n", sheet.Values[row-1][col[colum]])
 		rescell := Cell{
 			Cell:  cell.Cell,
 			Value: sheet.Values[row][col[colum]],
