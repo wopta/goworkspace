@@ -24,7 +24,7 @@ func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 
 	req := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
-
+	log.Println(req)
 	err := json.Unmarshal(req, &policy)
 	lib.CheckError(err)
 	inputCells = append(inputCells, setInputCell(policy)...)
@@ -39,7 +39,7 @@ func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	mapCellPolicy(policy, outCells)
 
 	policyJson, err := policy.Marshal()
-log.Println(policyJson)
+	log.Println(policyJson)
 	log.Println("Handler end -------------------------------------------------")
 
 	return string(policyJson), policy, err
