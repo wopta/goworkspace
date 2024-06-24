@@ -336,6 +336,8 @@ func setInputCell(policy *models.Policy) []Cell {
 			inputCells = append(inputCells, Cell{Cell: col[i] + "30", Value: build.Building.Address.Locality})
 			inputCells = append(inputCells, Cell{Cell: col[i] + "31", Value: build.Building.Address.City})
 			inputCells = append(inputCells, Cell{Cell: col[i] + "32", Value: build.Building.Address.StreetName})
+			inputCells = append(inputCells, Cell{Cell: col[i] + "19", Value: build.Building.NaicsCategory})
+			inputCells = append(inputCells, Cell{Cell: col[i] + "20", Value: build.Building.NaicsDetail})
 			inputCells = append(inputCells, Cell{Cell: col[i] + "21", Value: build.Building.Naics})
 			inputCells = append(inputCells, getBuildingGuaranteCellsBySlug(bg, i)...)
 		}
