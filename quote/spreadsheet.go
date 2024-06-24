@@ -96,8 +96,7 @@ func (qs *QuoteSpreadsheet) setInputCells(sheetClient *sheets.Service, ctx conte
 		ValueInputOption: "USER_ENTERED",
 	}
 
-	for k, cell := range qs.InputCells {
-		fmt.Printf("%s -> %s\n", k, cell)
+	for _, cell := range qs.InputCells {
 		/*cel := &sheets.ValueRange{
 			Values: [][]interface{}{{cell.Value}},
 		}
@@ -119,8 +118,8 @@ func (qs *QuoteSpreadsheet) getOutput(sheetClient *sheets.Service) []Cell {
 	col := map[string]int{"A": 0, "B": 1, "C": 2, "E": 3, "F": 4, "G": 5}
 	sheet, e := sheetClient.Spreadsheets.Values.Get(qs.Id, qs.SheetName+"!A:G").Do()
 	lib.CheckError(e)
-	for k, cell := range qs.OutputCells {
-		fmt.Printf("%s -> %s\n", k, cell)
+	for _, cell := range qs.OutputCells {
+
 		row, e := strconv.Atoi(string(string(cell.Cell[1:])))
 		colum := cell.Cell[0:1]
 		lib.CheckError(e)

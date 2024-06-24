@@ -41,6 +41,7 @@ type Building struct {
 	HasSprinkler      bool     `firestore:"hasSprinkler,omitempty" json:"hasSprinkler,omitempty"`
 }
 
+
 type Enterprise struct {
 	Name                      string   `firestore:"name,omitempty" json:"name,omitempty"`
 	Address                   *Address `firestore:"address,omitempty"         json:"address,omitempty"         bigquery:"-"`

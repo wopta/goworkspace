@@ -1,108 +1,94 @@
 {
+  "productVersion": "v1",
+  "name": "combined",
+  "nameDesc": "Wopta per te Impresa",
+  "startDate": "2006-06-19T00:00:00.000Z",
+  "isDeleted": false,
   "assets": [
     {
+      "uuid": "982b0700-0473-104a-a97c-ab1037d08af3",
       "enterprise": {
-        "address": {
-          "city": "Napoli",
-          "cityCode": "NA",
-          "locality": "Napoli",
-          "postalCode": "80137",
-          "streetName": "Via Stella",
-          "streetNumber": "12"
-        },
-        "employer": 12,
-        "name": "ciao",
-        "northAmericanMarket": "12",
-        "totalBilled": "12",
+        "name": "luca inizio",
         "vatCode": "11111111111",
-        "workEmployersRemuneration": "12"
+        "employer": 10,
+        "address": {
+          "streetName": "Via Stella",
+          "streetNumber": "12",
+          "city": "Napoli",
+          "postalCode": "80137",
+          "locality": "Napoli",
+          "cityCode": "NA"
+        },
+        "workEmployersRemuneration": "120000",
+        "totalBilled": "2000000",
+        "northAmericanMarket": "20000"
       },
+      "type": "enterprise",
+      "isContractor": false,
       "guarantees": [
         {
-          "childrens": ["stock", "machinery", "building"],
-          "companyName": "Resp. Civile Terzi e Prestatori Lavoro (RCT/O)",
-          "config": {
-            "durationValuesSlider": {},
-            "selfInsuranceValues": {},
-            "sumInsuredValuesSlider": {},
-            "sumInsuredValuesSliderdropdown": {
-              "label": "Somma da assicurare",
-              "values": [3000000, 5000000]
-            }
-          },
-          "depends": [],
-          "dependsOr": [],
+          "type": "enterprise",
           "description": " ",
+          "companyName": "Resp. Civile Terzi e Prestatori Lavoro (RCT/O)",
+          "slug": "third-party-liability-work-providers",
+          "isSelected": false,
+          "subtitle": "",
+          "value": { "sumInsuredLimitOfIndemnity": 3000000 },
+          "config": {
+            "selfInsuranceValues": {},
+            "durationValuesSlider": {},
+            "sumInsuredValuesSliderdropdown": {
+              "values": [3000000, 5000000],
+              "label": "Somma da assicurare"
+            },
+            "sumInsuredValuesSlider": {}
+          },
+          "isSellable": true,
           "isConfigurable": false,
           "isMandatory": true,
-          "isSelected": false,
-          "isSellable": true,
           "reserved": false,
           "selectedEsclude": [],
-          "slug": "third-party-liability-work-providers",
-          "subtitle": "",
-          "type": "enterprise",
-          "value": { "sumInsuredLimitOfIndemnity": 3000000 }
-        },
-        {
-          "childrens": [],
-          "companyName": "Fenomeno Elettrico (in aumento a 10.000 - A/23)",
+          "childrens": ["stock", "machinery", "building"],
           "depends": [],
-          "dependsOr": ["stock", "machinery", "building"],
-          "description": " ",
-          "isConfigurable": false,
-          "isMandatory": false,
-          "isSelected": false,
-          "isSellable": true,
-          "reserved": false,
-          "selectedEsclude": [],
-          "slug": "electrical-phenomenon",
-          "subtitle": "",
-          "type": "enterprise",
-          "value": { "sumInsuredLimitOfIndemnity": 100000 }
-        },
-        {
-          "childrens": [],
-          "companyName": "Ricorso Terzi (in aumento a 250.000 - A/25)",
-          "depends": [],
-          "dependsOr": ["stock", "machinery", "building"],
-          "description": " ",
-          "isConfigurable": false,
-          "isMandatory": false,
-          "isSelected": false,
-          "isSellable": true,
-          "reserved": false,
-          "selectedEsclude": [],
-          "slug": "third-party-recourse",
-          "subtitle": "",
-          "type": "enterprise",
-          "value": {}
+          "dependsOr": []
         }
-      ],
-      "isContractor": false,
-      "type": "enterprise",
-      "uuid": "e1c4c480-d671-1049-b17c-35a3f5f05cbc"
+      ]
     },
     {
+      "uuid": "18ba2980-04ad-104a-a97c-ab1037d08af3",
       "building": {
-        "activityCategory": "Produzione di bevande e tabacco",
-        "activtyDetail": "Produzione di bevande analcoliche",
         "address": {
-          "city": "Napoli",
-          "cityCode": "NA",
-          "locality": "Napoli",
-          "postalCode": "80137",
           "streetName": "Via Stella",
-          "streetNumber": "12"
+          "streetNumber": "12",
+          "city": "Napoli",
+          "postalCode": "80137",
+          "locality": "Napoli",
+          "cityCode": "NA"
         },
         "buildingYear": "2024",
-        "hasSandwitchPanel": false,
-        "hasSprinkler": false,
         "isAllarm": false,
-        "naics": "312111"
+        "activtyDetail": "Produzione di bevande analcoliche",
+        "activityCategory": "Produzione di bevande e tabacco",
+        "naics": "312111",
+        "hasSandwitchPanel": false,
+        "hasSprinkler": false
       },
+      "type": "building",
+      "isContractor": false,
       "guarantees": [
         {
+          "type": "building",
+          "description": " ",
+          "companyName": "Fabbricato",
+          "slug": "building",
+          "isSelected": false,
+          "subtitle": "",
+          "value": { "sumInsuredLimitOfIndemnity": 100000 },
+          "isSellable": true,
+          "isConfigurable": true,
+          "isMandatory": false,
+          "reserved": false,
+          "selectedEsclude": [],
           "childrens": [
             "rental-risk",
             "third-party-recourse",
@@ -115,52 +101,15 @@
             "electrical-phenomenon",
             "additional-compensation"
           ],
-          "companyName": "Fabbricato",
           "depends": ["third-party-liability-work-providers"],
-          "dependsOr": [],
-          "description": " ",
-          "isConfigurable": true,
-          "isMandatory": false,
-          "isSelected": false,
-          "isSellable": true,
-          "reserved": false,
-          "selectedEsclude": [],
-          "slug": "building",
-          "subtitle": "",
-          "type": "building",
-          "value": { "sumInsuredLimitOfIndemnity": 100000 }
-        },
-        {
-          "childrens": [],
-          "companyName": "Rischio locativo",
-          "depends": [],
-          "dependsOr": ["stock", "machinery", "building"],
-          "description": " ",
-          "isConfigurable": true,
-          "isMandatory": false,
-          "isSelected": false,
-          "isSellable": true,
-          "reserved": false,
-          "selectedEsclude": [],
-          "slug": "rental-risk",
-          "subtitle": "",
-          "type": "building",
-          "value": { "sumInsuredLimitOfIndemnity": 100000 }
+          "dependsOr": []
         }
-      ],
-      "isContractor": false,
-      "type": "building",
-      "uuid": "c1176180-d6a7-1049-b17c-35a3f5f05cbc"
+      ]
     }
   ],
   "attachments": [],
-  "isDeleted": false,
-  "isReserved": false,
-  "name": "combined",
-  "nameDesc": "Wopta per te Impresa",
-  "priceGroup": [],
-  "productVersion": "v1",
-  "startDate": "1996-06-19T00:00:00.000Z",
   "statements": [],
-  "surveys": []
+  "surveys": [],
+  "isReserved": false,
+  "priceGroup": []
 }

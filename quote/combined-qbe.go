@@ -291,6 +291,7 @@ func mapCellPolicy(policy *models.Policy, cells []Cell) {
 
 		case "C96":
 			if err == nil {
+				policy.OffersPrices["default"]["yearly"].Net = s
 				policy.PriceNett = s
 			}
 
@@ -301,7 +302,7 @@ func mapCellPolicy(policy *models.Policy, cells []Cell) {
 
 		case "C98":
 			if err == nil {
-				policy.PriceGross = s
+				policy.OffersPrices["default"]["yearly"].Gross = s
 			}
 
 		case "C99":
@@ -871,7 +872,7 @@ func setInitCells() []Cell {
 			Value: "",
 		}, {
 			Cell:  "C74",
-			Value: "NO",
+			Value: "No",
 		},
 	}
 	return cells
