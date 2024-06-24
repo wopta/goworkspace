@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
@@ -24,7 +25,7 @@ func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 
 	req := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
-	log.Println(req)
+	log.Println("Request: ", req)
 	err := json.Unmarshal(req, &policy)
 	lib.CheckError(err)
 	inputCells = append(inputCells, setInputCell(policy)...)
@@ -39,7 +40,7 @@ func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	mapCellPolicy(policy, outCells)
 
 	policyJson, err := policy.Marshal()
-	log.Println(string(policyJson))
+	log.Println("Response: ", string(policyJson))
 	log.Println("Handler end -------------------------------------------------")
 
 	return string(policyJson), policy, err
@@ -97,9 +98,9 @@ func mapCellPolicy(policy *models.Policy, cells []Cell) {
 
 		switch cell.Cell {
 		case "C81":
-			s, err := strconv.ParseFloat(cell.Value.(string), 64)
+			s, err := strconv.ParseFloat(strings.Trim(strings.Replace(cell.Value.(string), ",", ".", -1), " "), 64)
 			log.Println(err)
-			if err != nil {
+			if err == nil {
 				priceGroup = append(priceGroup, models.Price{
 					Name: "Fabbricato",
 					Net:  s,
@@ -112,9 +113,9 @@ func mapCellPolicy(policy *models.Policy, cells []Cell) {
 			}
 
 		case "C82":
-			s, err := strconv.ParseFloat(cell.Value.(string), 64)
+			s, err := strconv.ParseFloat(strings.Trim(strings.Replace(cell.Value.(string), ",", ".", -1), " "), 64)
 			log.Println(err)
-			if err != nil {
+			if err == nil {
 				priceGroup = append(priceGroup, models.Price{
 					Name: "Contenuto (Merci e Macchinari)",
 					Net:  s,
@@ -127,9 +128,9 @@ func mapCellPolicy(policy *models.Policy, cells []Cell) {
 			}
 
 		case "C83":
-			s, err := strconv.ParseFloat(cell.Value.(string), 64)
+			s, err := strconv.ParseFloat(strings.Trim(strings.Replace(cell.Value.(string), ",", ".", -1), " "), 64)
 			log.Println(err)
-			if err != nil {
+			if err == nil {
 				priceGroup = append(priceGroup, models.Price{
 					Name: "Merci (aumento temporaneo)",
 					Net:  s,
@@ -142,9 +143,9 @@ func mapCellPolicy(policy *models.Policy, cells []Cell) {
 			}
 
 		case "C84":
-			s, err := strconv.ParseFloat(cell.Value.(string), 64)
+			s, err := strconv.ParseFloat(strings.Trim(strings.Replace(cell.Value.(string), ",", ".", -1), " "), 64)
 			log.Println(err)
-			if err != nil {
+			if err == nil {
 				priceGroup = append(priceGroup, models.Price{
 					Name: "Furto, rapina, estorsione (in aumento)",
 					Net:  s,
@@ -157,9 +158,9 @@ func mapCellPolicy(policy *models.Policy, cells []Cell) {
 			}
 
 		case "C85":
-			s, err := strconv.ParseFloat(cell.Value.(string), 64)
+			s, err := strconv.ParseFloat(strings.Trim(strings.Replace(cell.Value.(string), ",", ".", -1), " "), 64)
 			log.Println(err)
-			if err != nil {
+			if err == nil {
 				priceGroup = append(priceGroup, models.Price{
 					Name: "Rischio locativo (in aumento)",
 					Net:  s,
@@ -172,9 +173,9 @@ func mapCellPolicy(policy *models.Policy, cells []Cell) {
 			}
 
 		case "C86":
-			s, err := strconv.ParseFloat(cell.Value.(string), 64)
+			s, err := strconv.ParseFloat(strings.Trim(strings.Replace(cell.Value.(string), ",", ".", -1), " "), 64)
 			log.Println(err)
-			if err != nil {
+			if err == nil {
 				priceGroup = append(priceGroup, models.Price{
 					Name: "Altre garanzie su Contenuto",
 					Net:  s,
@@ -187,9 +188,9 @@ func mapCellPolicy(policy *models.Policy, cells []Cell) {
 			}
 
 		case "C87":
-			s, err := strconv.ParseFloat(cell.Value.(string), 64)
+			s, err := strconv.ParseFloat(strings.Trim(strings.Replace(cell.Value.(string), ",", ".", -1), " "), 64)
 			log.Println(err)
-			if err != nil {
+			if err == nil {
 				priceGroup = append(priceGroup, models.Price{
 					Name: "Ricorso terzi (in aumento)",
 					Net:  s,
@@ -202,9 +203,9 @@ func mapCellPolicy(policy *models.Policy, cells []Cell) {
 			}
 
 		case "C88":
-			s, err := strconv.ParseFloat(cell.Value.(string), 64)
+			s, err := strconv.ParseFloat(strings.Trim(strings.Replace(cell.Value.(string), ",", ".", -1), " "), 64)
 			log.Println(err)
-			if err != nil {
+			if err == nil {
 				priceGroup = append(priceGroup, models.Price{
 					Name: "Danni indiretti",
 					Net:  s,
@@ -217,16 +218,16 @@ func mapCellPolicy(policy *models.Policy, cells []Cell) {
 			}
 
 		case "C89":
-			s, err := strconv.ParseFloat(cell.Value.(string), 64)
+			s, err := strconv.ParseFloat(strings.Trim(strings.Replace(cell.Value.(string), ",", ".", -1), " "), 64)
 			log.Println(err)
 			priceGroup = append(priceGroup, models.Price{
 				Name: "Perdita Pigioni",
 				Net:  s,
 			})
 		case "C90":
-			s, err := strconv.ParseFloat(cell.Value.(string), 64)
+			s, err := strconv.ParseFloat(strings.Trim(strings.Replace(cell.Value.(string), ",", ".", -1), " "), 64)
 			log.Println(err)
-			if err != nil {
+			if err == nil {
 				priceGroup = append(priceGroup, models.Price{
 					Name: "Responsabilità civile terzi",
 					Net:  s,
@@ -239,9 +240,9 @@ func mapCellPolicy(policy *models.Policy, cells []Cell) {
 			}
 
 		case "C91":
-			s, err := strconv.ParseFloat(cell.Value.(string), 64)
+			s, err := strconv.ParseFloat(strings.Trim(strings.Replace(cell.Value.(string), ",", ".", -1), " "), 64)
 			log.Println(err)
-			if err != nil {
+			if err == nil {
 				priceGroup = append(priceGroup, models.Price{
 					Name: "Responsabilità civile prestatori lavoro",
 					Net:  s,
@@ -254,9 +255,9 @@ func mapCellPolicy(policy *models.Policy, cells []Cell) {
 			}
 
 		case "C92":
-			s, err := strconv.ParseFloat(cell.Value.(string), 64)
+			s, err := strconv.ParseFloat(strings.Trim(strings.Replace(cell.Value.(string), ",", ".", -1), " "), 64)
 			log.Println(err)
-			if err != nil {
+			if err == nil {
 				priceGroup = append(priceGroup, models.Price{
 					Name: "Responsabilità civile prodotti",
 					Net:  s,
@@ -269,9 +270,9 @@ func mapCellPolicy(policy *models.Policy, cells []Cell) {
 			}
 
 		case "C93":
-			s, err := strconv.ParseFloat(cell.Value.(string), 64)
+			s, err := strconv.ParseFloat(strings.Trim(strings.Replace(cell.Value.(string), ",", ".", -1), " "), 64)
 			log.Println(err)
-			if err != nil {
+			if err == nil {
 				priceGroup = append(priceGroup, models.Price{
 					Name: "Ritiro Prodotti",
 					Net:  s,
@@ -284,9 +285,9 @@ func mapCellPolicy(policy *models.Policy, cells []Cell) {
 			}
 
 		case "C94":
-			s, err := strconv.ParseFloat(cell.Value.(string), 64)
+			s, err := strconv.ParseFloat(strings.Trim(strings.Replace(cell.Value.(string), ",", ".", -1), " "), 64)
 			log.Println(err)
-			if err != nil {
+			if err == nil {
 				priceGroup = append(priceGroup, models.Price{
 					Name: "Resp. Amministratori Sindaci Dirigenti (D&O)",
 					Net:  s,
@@ -299,9 +300,9 @@ func mapCellPolicy(policy *models.Policy, cells []Cell) {
 			}
 
 		case "C95":
-			s, err := strconv.ParseFloat(cell.Value.(string), 64)
+			s, err := strconv.ParseFloat(strings.Trim(strings.Replace(cell.Value.(string), ",", ".", -1), " "), 64)
 			log.Println(err)
-			if err != nil {
+			if err == nil {
 				priceGroup = append(priceGroup, models.Price{
 					Name: "Cyber",
 					Net:  s,
@@ -314,23 +315,23 @@ func mapCellPolicy(policy *models.Policy, cells []Cell) {
 			}
 
 		case "C96":
-			s, err := strconv.ParseFloat(cell.Value.(string), 64)
+			s, err := strconv.ParseFloat(strings.Trim(strings.Replace(cell.Value.(string), ",", ".", -1), " "), 64)
 			log.Println(err)
-			if err != nil {
+			if err == nil {
 				policy.PriceNett = s
 			}
 
 		case "C97":
-			s, err := strconv.ParseFloat(cell.Value.(string), 64)
+			s, err := strconv.ParseFloat(strings.Trim(strings.Replace(cell.Value.(string), ",", ".", -1), " "), 64)
 			log.Println(err)
-			if err != nil {
+			if err == nil {
 				policy.TaxAmount = s
 			}
 
 		case "C98":
-			s, err := strconv.ParseFloat(cell.Value.(string), 64)
+			s, err := strconv.ParseFloat(strings.Trim(strings.Replace(cell.Value.(string), ",", ".", -1), " "), 64)
 			log.Println(err)
-			if err != nil {
+			if err == nil {
 				policy.PriceGross = s
 			}
 
