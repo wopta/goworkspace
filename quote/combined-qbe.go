@@ -351,9 +351,13 @@ func setInputCell(policy *models.Policy) []Cell {
 	assBuildings := getAssetByType(policy, "building")
 
 	inputCells = append(inputCells, Cell{Cell: "C10", Value: policy.StartDate.Format("02-01-2006")})
-	inputCells = append(inputCells, Cell{Cell: "C11", Value: policy.EndDate.Format("02-01-2006")})
+	inputCells = append(inputCells, Cell{Cell: "C11", Value: policy.StartDate.AddDate(1, 0, 0).Format("02-01-2006")})
 	inputCells = append(inputCells, setEnterpriseCell(assEnterprise[0])...)
+	inputCells = append(inputCells, Cell{Cell: "C24", Value: assEnterprise[0].Enterprise.Employer})
+	inputCells = append(inputCells, Cell{Cell: "C25", Value: assEnterprise[0].Enterprise.WorkEmployersRemuneration})
+	inputCells = append(inputCells, Cell{Cell: "C26", Value: assEnterprise[0].Enterprise.TotalBilled})
 	for _, eg := range assEnterprise[0].Guarantees {
+
 		inputCells = append(inputCells, getEnterpriseGuaranteCellsBySlug(eg)...)
 	}
 	for i, build := range assBuildings {
@@ -363,7 +367,7 @@ func setInputCell(policy *models.Policy) []Cell {
 			inputCells = append(inputCells, Cell{Cell: col[i] + "30", Value: build.Building.Address.Locality})
 			inputCells = append(inputCells, Cell{Cell: col[i] + "31", Value: build.Building.Address.City})
 			inputCells = append(inputCells, Cell{Cell: col[i] + "32", Value: build.Building.Address.StreetName})
-			inputCells = append(inputCells, Cell{Cell: col[i] + "32", Value: build.Building.Naics})
+			inputCells = append(inputCells, Cell{Cell: col[i] + "21", Value: build.Building.Naics})
 			inputCells = append(inputCells, getBuildingGuaranteCellsBySlug(bg, i)...)
 		}
 
@@ -600,7 +604,8 @@ func setInitCells() []Cell {
 		}, {
 			Cell:  "C20",
 			Value: "",
-		}, {
+		},
+		{
 			Cell:  "D19",
 			Value: "",
 		}, {
@@ -627,6 +632,17 @@ func setInitCells() []Cell {
 		}, {
 			Cell:  "C21",
 			Value: "",
+		},
+		{
+			Cell:  "C24",
+			Value: "0",
+		}, {
+			Cell:  "C25",
+			Value: "0",
+		},
+		{
+			Cell:  "C26",
+			Value: "0",
 		}, {
 			Cell:  "C29",
 			Value: "",
