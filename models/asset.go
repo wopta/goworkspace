@@ -3,6 +3,7 @@ package models
 type Asset struct {
 	Name         string      `firestore:"name,omitempty" json:"name,omitempty"`
 	Type         string      `firestore:"type,omitempty" json:"type,omitempty"`
+	Uuid         string      `firestore:"uuid,omitempty" json:"uuid,omitempty"`
 	Building     *Building   `firestore:"building,omitempty" json:"building,omitempty"`
 	Person       *User       `firestore:"person,omitempty" json:"person,omitempty"`
 	Enterprise   *Enterprise `firestore:"enterprise,omitempty" json:"enterprise,omitempty"`
