@@ -12,3 +12,5 @@ function-data/
 document/*.pdf
 _script/*.csv
 _script/*.json
+.env
+.secrets
