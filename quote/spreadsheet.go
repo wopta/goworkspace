@@ -72,8 +72,8 @@ func (qs *QuoteSpreadsheet) setInitCells(sheetClient *sheets.Service, ctx contex
 		ValueInputOption: "USER_ENTERED",
 	}
 
-	for k, cell := range qs.InitCells {
-		fmt.Printf("%s -> %s\n", k, cell)
+	for _, cell := range qs.InitCells {
+
 		/*
 			cel := &sheets.ValueRange{
 				Values: [][]interface{}{{cell.Value}},
@@ -123,11 +123,6 @@ func (qs *QuoteSpreadsheet) getOutput(sheetClient *sheets.Service) []Cell {
 		row, e := strconv.Atoi(string(string(cell.Cell[1:])))
 		colum := cell.Cell[0:1]
 		lib.CheckError(e)
-		fmt.Printf("len(sheet.Values): %v\n", len(sheet.Values))
-		fmt.Printf("len(sheet.Values): %v\n", sheet.Values)
-		fmt.Printf("row: %v\n", row)
-		fmt.Printf("row: %v\n", colum)
-
 		fmt.Printf("value: %v\n", sheet.Values[row-1][col[colum]])
 		rescell := Cell{
 			Cell:  cell.Cell,

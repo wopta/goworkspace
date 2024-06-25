@@ -28,6 +28,9 @@ func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	log.Println("Request: ", string(req))
 	err := json.Unmarshal(req, &policy)
 	lib.CheckError(err)
+	b,err:=json.Marshal(policy)
+	log.Println("Request Marshal: ", string(b))
+	lib.CheckError(err)
 	inputCells = append(inputCells, setInputCell(policy)...)
 	qs := QuoteSpreadsheet{
 		Id:          "1tn0Jqce-r_JKdecExFOFVEJdGUaPYdGo31A9FOgvt-Y",
