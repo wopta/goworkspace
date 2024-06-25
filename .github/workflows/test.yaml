@@ -1,0 +1,25 @@
+name: GoWorkspace - Run Test
+on:
+  pull_request:
+    types: [ opened, edited, ready_for_review ]
+jobs:
+  run_test:
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21.7' # The Go version to download (if necessary) and use.
+
+      - name: Go Version
+        run: go version
+
+      - name: Run Tests
+        run: go test github.com/wopta/goworkspace/...
