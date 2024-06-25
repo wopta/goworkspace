@@ -94,7 +94,12 @@ func setOutputCell() []Cell {
 }
 func mapCellPolicy(policy *models.Policy, cells []Cell) {
 	var priceGroup []models.Price
-	policy.OffersPrices = make(map[string]map[string]*models.Price)
+	policy.OffersPrices = map[string]map[string]*models.Price{
+		"default": {
+			"yearly":  &models.Price{},
+			"monthly": &models.Price{},
+		},
+	}
 	for _, cell := range cells {
 		s, err := strconv.ParseFloat(strings.Trim(strings.Replace(strings.Replace(cell.Value.(string), ".", "", -1), ",", ".", -1), " "), 64)
 		log.Println(err)
