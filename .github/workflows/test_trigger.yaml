@@ -2,8 +2,8 @@ name: GoWorkspace - Run Test
 on:
   pull_request:
     types: [ opened, reopened, synchronize ]
-    #paths:
-    #  - '**.go'
+    paths:
+      - '**.go'
 jobs:
   run_test:
     permissions:
