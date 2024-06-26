@@ -31,7 +31,7 @@ import (
 func main() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading env variables file")
+		log.Fatal("Error loading .env file")
 	}
 
 	// Use PORT environment variable, or default to 8080.
