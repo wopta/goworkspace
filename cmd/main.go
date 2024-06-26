@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/funcframework"
+	"github.com/joho/godotenv"
 	_ "github.com/wopta/goworkspace/auth"
 	_ "github.com/wopta/goworkspace/broker"
 	_ "github.com/wopta/goworkspace/callback"
@@ -25,8 +26,6 @@ import (
 	_ "github.com/wopta/goworkspace/sellable"
 	_ "github.com/wopta/goworkspace/test"
 	_ "github.com/wopta/goworkspace/user"
-
-	"github.com/joho/godotenv"
 )
 
 func main() {
