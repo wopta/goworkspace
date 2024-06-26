@@ -25,8 +25,11 @@ func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 
 	req := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
-	log.Println("Request: ", req)
+	log.Println("Request: ", string(req))
 	err := json.Unmarshal(req, &policy)
+	lib.CheckError(err)
+	b,err:=json.Marshal(policy)
+	log.Println("Request Marshal: ", string(b))
 	lib.CheckError(err)
 	inputCells = append(inputCells, setInputCell(policy)...)
 	qs := QuoteSpreadsheet{
@@ -94,12 +97,17 @@ func setOutputCell() []Cell {
 }
 func mapCellPolicy(policy *models.Policy, cells []Cell) {
 	var priceGroup []models.Price
+	policy.OffersPrices = map[string]map[string]*models.Price{
+		"default": {
+			"yearly":  &models.Price{},
+			"monthly": &models.Price{},
+		},
+	}
 	for _, cell := range cells {
-
+		s, err := strconv.ParseFloat(strings.Trim(strings.Replace(strings.Replace(cell.Value.(string), ".", "", -1), ",", ".", -1), " "), 64)
+		log.Println(err)
 		switch cell.Cell {
 		case "C81":
-			s, err := strconv.ParseFloat(strings.Trim(strings.Replace(cell.Value.(string), ",", ".", -1), " "), 64)
-			log.Println(err)
 			if err == nil {
 				priceGroup = append(priceGroup, models.Price{
 					Name: "Fabbricato",
@@ -113,8 +121,6 @@ func mapCellPolicy(policy *models.Policy, cells []Cell) {
 			}
 
 		case "C82":
-			s, err := strconv.ParseFloat(strings.Trim(strings.Replace(cell.Value.(string), ",", ".", -1), " "), 64)
-			log.Println(err)
 			if err == nil {
 				priceGroup = append(priceGroup, models.Price{
 					Name: "Contenuto (Merci e Macchinari)",
@@ -128,8 +134,6 @@ func mapCellPolicy(policy *models.Policy, cells []Cell) {
 			}
 
 		case "C83":
-			s, err := strconv.ParseFloat(strings.Trim(strings.Replace(cell.Value.(string), ",", ".", -1), " "), 64)
-			log.Println(err)
 			if err == nil {
 				priceGroup = append(priceGroup, models.Price{
 					Name: "Merci (aumento temporaneo)",
@@ -143,8 +147,6 @@ func mapCellPolicy(policy *models.Policy, cells []Cell) {
 			}
 
 		case "C84":
-			s, err := strconv.ParseFloat(strings.Trim(strings.Replace(cell.Value.(string), ",", ".", -1), " "), 64)
-			log.Println(err)
 			if err == nil {
 				priceGroup = append(priceGroup, models.Price{
 					Name: "Furto, rapina, estorsione (in aumento)",
@@ -158,8 +160,6 @@ func mapCellPolicy(policy *models.Policy, cells []Cell) {
 			}
 
 		case "C85":
-			s, err := strconv.ParseFloat(strings.Trim(strings.Replace(cell.Value.(string), ",", ".", -1), " "), 64)
-			log.Println(err)
 			if err == nil {
 				priceGroup = append(priceGroup, models.Price{
 					Name: "Rischio locativo (in aumento)",
@@ -173,7 +173,7 @@ func mapCellPolicy(policy *models.Policy, cells []Cell) {
 			}
 
 		case "C86":
-			s, err := strconv.ParseFloat(strings.Trim(strings.Replace(cell.Value.(string), ",", ".", -1), " "), 64)
+
 			log.Println(err)
 			if err == nil {
 				priceGroup = append(priceGroup, models.Price{
@@ -188,8 +188,6 @@ func mapCellPolicy(policy *models.Policy, cells []Cell) {
 			}
 
 		case "C87":
-			s, err := strconv.ParseFloat(strings.Trim(strings.Replace(cell.Value.(string), ",", ".", -1), " "), 64)
-			log.Println(err)
 			if err == nil {
 				priceGroup = append(priceGroup, models.Price{
 					Name: "Ricorso terzi (in aumento)",
@@ -203,8 +201,6 @@ func mapCellPolicy(policy *models.Policy, cells []Cell) {
 			}
 
 		case "C88":
-			s, err := strconv.ParseFloat(strings.Trim(strings.Replace(cell.Value.(string), ",", ".", -1), " "), 64)
-			log.Println(err)
 			if err == nil {
 				priceGroup = append(priceGroup, models.Price{
 					Name: "Danni indiretti",
@@ -218,15 +214,13 @@ func mapCellPolicy(policy *models.Policy, cells []Cell) {
 			}
 
 		case "C89":
-			s, err := strconv.ParseFloat(strings.Trim(strings.Replace(cell.Value.(string), ",", ".", -1), " "), 64)
+
 			log.Println(err)
 			priceGroup = append(priceGroup, models.Price{
 				Name: "Perdita Pigioni",
 				Net:  s,
 			})
 		case "C90":
-			s, err := strconv.ParseFloat(strings.Trim(strings.Replace(cell.Value.(string), ",", ".", -1), " "), 64)
-			log.Println(err)
 			if err == nil {
 				priceGroup = append(priceGroup, models.Price{
 					Name: "Responsabilità civile terzi",
@@ -240,8 +234,6 @@ func mapCellPolicy(policy *models.Policy, cells []Cell) {
 			}
 
 		case "C91":
-			s, err := strconv.ParseFloat(strings.Trim(strings.Replace(cell.Value.(string), ",", ".", -1), " "), 64)
-			log.Println(err)
 			if err == nil {
 				priceGroup = append(priceGroup, models.Price{
 					Name: "Responsabilità civile prestatori lavoro",
@@ -255,8 +247,6 @@ func mapCellPolicy(policy *models.Policy, cells []Cell) {
 			}
 
 		case "C92":
-			s, err := strconv.ParseFloat(strings.Trim(strings.Replace(cell.Value.(string), ",", ".", -1), " "), 64)
-			log.Println(err)
 			if err == nil {
 				priceGroup = append(priceGroup, models.Price{
 					Name: "Responsabilità civile prodotti",
@@ -270,8 +260,6 @@ func mapCellPolicy(policy *models.Policy, cells []Cell) {
 			}
 
 		case "C93":
-			s, err := strconv.ParseFloat(strings.Trim(strings.Replace(cell.Value.(string), ",", ".", -1), " "), 64)
-			log.Println(err)
 			if err == nil {
 				priceGroup = append(priceGroup, models.Price{
 					Name: "Ritiro Prodotti",
@@ -285,8 +273,6 @@ func mapCellPolicy(policy *models.Policy, cells []Cell) {
 			}
 
 		case "C94":
-			s, err := strconv.ParseFloat(strings.Trim(strings.Replace(cell.Value.(string), ",", ".", -1), " "), 64)
-			log.Println(err)
 			if err == nil {
 				priceGroup = append(priceGroup, models.Price{
 					Name: "Resp. Amministratori Sindaci Dirigenti (D&O)",
@@ -300,8 +286,6 @@ func mapCellPolicy(policy *models.Policy, cells []Cell) {
 			}
 
 		case "C95":
-			s, err := strconv.ParseFloat(strings.Trim(strings.Replace(cell.Value.(string), ",", ".", -1), " "), 64)
-			log.Println(err)
 			if err == nil {
 				priceGroup = append(priceGroup, models.Price{
 					Name: "Cyber",
@@ -315,24 +299,20 @@ func mapCellPolicy(policy *models.Policy, cells []Cell) {
 			}
 
 		case "C96":
-			s, err := strconv.ParseFloat(strings.Trim(strings.Replace(cell.Value.(string), ",", ".", -1), " "), 64)
-			log.Println(err)
 			if err == nil {
+
+				policy.OffersPrices["default"]["yearly"].Net = s
 				policy.PriceNett = s
 			}
 
 		case "C97":
-			s, err := strconv.ParseFloat(strings.Trim(strings.Replace(cell.Value.(string), ",", ".", -1), " "), 64)
-			log.Println(err)
 			if err == nil {
 				policy.TaxAmount = s
 			}
 
 		case "C98":
-			s, err := strconv.ParseFloat(strings.Trim(strings.Replace(cell.Value.(string), ",", ".", -1), " "), 64)
-			log.Println(err)
 			if err == nil {
-				policy.PriceGross = s
+				policy.OffersPrices["default"]["yearly"].Gross = s
 			}
 
 		case "C99":
@@ -351,9 +331,13 @@ func setInputCell(policy *models.Policy) []Cell {
 	assBuildings := getAssetByType(policy, "building")
 
 	inputCells = append(inputCells, Cell{Cell: "C10", Value: policy.StartDate.Format("02-01-2006")})
-	inputCells = append(inputCells, Cell{Cell: "C11", Value: policy.EndDate.Format("02-01-2006")})
+	inputCells = append(inputCells, Cell{Cell: "C11", Value: policy.StartDate.AddDate(1, 0, 0).Format("02-01-2006")})
 	inputCells = append(inputCells, setEnterpriseCell(assEnterprise[0])...)
+	inputCells = append(inputCells, Cell{Cell: "C24", Value: assEnterprise[0].Enterprise.Employer})
+	inputCells = append(inputCells, Cell{Cell: "C25", Value: assEnterprise[0].Enterprise.WorkEmployersRemuneration})
+	inputCells = append(inputCells, Cell{Cell: "C26", Value: assEnterprise[0].Enterprise.TotalBilled})
 	for _, eg := range assEnterprise[0].Guarantees {
+
 		inputCells = append(inputCells, getEnterpriseGuaranteCellsBySlug(eg)...)
 	}
 	for i, build := range assBuildings {
@@ -363,7 +347,9 @@ func setInputCell(policy *models.Policy) []Cell {
 			inputCells = append(inputCells, Cell{Cell: col[i] + "30", Value: build.Building.Address.Locality})
 			inputCells = append(inputCells, Cell{Cell: col[i] + "31", Value: build.Building.Address.City})
 			inputCells = append(inputCells, Cell{Cell: col[i] + "32", Value: build.Building.Address.StreetName})
-			inputCells = append(inputCells, Cell{Cell: col[i] + "32", Value: build.Building.Naics})
+			inputCells = append(inputCells, Cell{Cell: col[i] + "19", Value: build.Building.NaicsCategory})
+			inputCells = append(inputCells, Cell{Cell: col[i] + "20", Value: build.Building.NaicsDetail})
+			inputCells = append(inputCells, Cell{Cell: col[i] + "21", Value: build.Building.Naics})
 			inputCells = append(inputCells, getBuildingGuaranteCellsBySlug(bg, i)...)
 		}
 
@@ -413,91 +399,91 @@ func getEnterpriseGuaranteCellsBySlug(guarante models.Guarante) []Cell {
 		cells = []Cell{
 			{
 				Cell:  "C48",
-				Value: guarante.SumInsuredLimitOfIndemnity,
+				Value: guarante.Value.SumInsuredLimitOfIndemnity,
 			},
 		}
 	case "refrigeration-goods":
 		cells = []Cell{
 			{
 				Cell:  "C49",
-				Value: guarante.SumInsuredLimitOfIndemnity,
+				Value: guarante.Value.SumInsuredLimitOfIndemnity,
 			},
 		}
 	case "machinery-breakdown":
 		cells = []Cell{
 			{
 				Cell:  "C50",
-				Value: guarante.SumInsuredLimitOfIndemnity,
+				Value: guarante.Value.SumInsuredLimitOfIndemnity,
 			},
 		}
 	case "electronic-equipment":
 		cells = []Cell{
 			{
 				Cell:  "C51",
-				Value: guarante.SumInsuredLimitOfIndemnity,
+				Value: guarante.Value.SumInsuredLimitOfIndemnity,
 			},
 		}
 	case "theft":
 		cells = []Cell{
 			{
 				Cell:  "C52",
-				Value: guarante.SumInsuredLimitOfIndemnity,
+				Value: guarante.Value.SumInsuredLimitOfIndemnity,
 			},
 		}
 	case "third-party-recourse":
 		cells = []Cell{
 			{
 				Cell:  "C47",
-				Value: guarante.SumInsuredLimitOfIndemnity,
+				Value: guarante.Value.SumInsuredLimitOfIndemnity,
 			},
 		}
 	case "third-party-liability-work-providers":
 		cells = []Cell{
 			{
 				Cell:  "C66",
-				Value: guarante.SumInsuredLimitOfIndemnity,
+				Value: guarante.Value.SumInsuredLimitOfIndemnity,
 			},
 		}
 	case "product-liability":
 		cells = []Cell{
 			{
 				Cell:  "C67",
-				Value: guarante.SumInsuredLimitOfIndemnity,
+				Value: guarante.Value.SumInsuredLimitOfIndemnity,
 			},
 		}
 	case "management-organization":
 		cells = []Cell{
 			{
 				Cell:  "C68",
-				Value: guarante.SumInsuredLimitOfIndemnity,
+				Value: guarante.Value.SumInsuredLimitOfIndemnity,
 			},
 		}
 	case "cyber":
 		cells = []Cell{
 			{
 				Cell:  "C74",
-				Value: guarante.SumInsuredLimitOfIndemnity,
+				Value: guarante.Value.SumInsuredLimitOfIndemnity,
 			},
 		}
 	case "daily-allowance":
 		cells = []Cell{
 			{
 				Cell:  "C58",
-				Value: guarante.SumInsuredLimitOfIndemnity,
+				Value: guarante.Value.SumInsuredLimitOfIndemnity,
 			},
 		}
 	case "increased-cost":
 		cells = []Cell{
 			{
 				Cell:  "C59",
-				Value: guarante.SumInsuredLimitOfIndemnity,
+				Value: guarante.Value.SumInsuredLimitOfIndemnity,
 			},
 		}
 	case "loss-rent":
 		cells = []Cell{
 			{
 				Cell:  "C61",
-				Value: guarante.SumInsuredLimitOfIndemnity,
+				Value: guarante.Value.SumInsuredLimitOfIndemnity,
 			},
 		}
 	}
@@ -521,28 +507,28 @@ func getBuildingGuaranteCellsBySlug(guarante models.Guarante, colum int) []Cell 
 		cells = []Cell{
 			{
 				Cell:  col[colum] + "42",
-				Value: guarante.SumInsuredLimitOfIndemnity,
+				Value: guarante.Value.SumInsuredLimitOfIndemnity,
 			},
 		}
 	case "machinery":
 		cells = []Cell{
 			{
 				Cell:  col[colum] + "43",
-				Value: guarante.SumInsuredLimitOfIndemnity,
+				Value: guarante.Value.SumInsuredLimitOfIndemnity,
 			},
 		}
 	case "goods":
 		cells = []Cell{
 			{
 				Cell:  col[colum] + "44",
-				Value: guarante.SumInsuredLimitOfIndemnity,
+				Value: guarante.Value.SumInsuredLimitOfIndemnity,
 			},
 		}
 	case "goods-temporary-increase":
 		cells = []Cell{
 			{
 				Cell:  col[colum] + "45",
-				Value: guarante.SumInsuredLimitOfIndemnity,
+				Value: guarante.Value.SumInsuredLimitOfIndemnity,
 			},
 		}
 
@@ -600,7 +586,8 @@ func setInitCells() []Cell {
 		}, {
 			Cell:  "C20",
 			Value: "",
-		}, {
+		},
+		{
 			Cell:  "D19",
 			Value: "",
 		}, {
@@ -627,6 +614,17 @@ func setInitCells() []Cell {
 		}, {
 			Cell:  "C21",
 			Value: "",
+		},
+		{
+			Cell:  "C24",
+			Value: "0",
+		}, {
+			Cell:  "C25",
+			Value: "0",
+		},
+		{
+			Cell:  "C26",
+			Value: "0",
 		}, {
 			Cell:  "C29",
 			Value: "",
@@ -884,7 +882,7 @@ func setInitCells() []Cell {
 			Value: "",
 		}, {
 			Cell:  "C74",
-			Value: "NO",
+			Value: "No",
 		},
 	}
 	return cells

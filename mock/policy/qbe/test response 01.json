@@ -1,0 +1,342 @@
+{
+  "productVersion": "v1",
+  "name": "combined",
+  "nameDesc": "Wopta per te Impresa",
+  "emitDate": "0001-01-01T00:00:00Z",
+  "startDate": "2030-06-19T00:00:00Z",
+  "renewDate": "0001-01-01T00:00:00Z",
+  "endDate": "0001-01-01T00:00:00Z",
+  "creationDate": "0001-01-01T00:00:00Z",
+  "updated": "0001-01-01T00:00:00Z",
+  "nextPay": "0001-01-01T00:00:00Z",
+  "deleteDate": "0001-01-01T00:00:00Z",
+  "priceGroup": [
+    {
+      "name": "Fabbricato",
+      "description": "  -   ",
+      "net": 0,
+      "tax": 0,
+      "gross": 0,
+      "delta": 0,
+      "discount": 0
+    },
+    {
+      "name": "Contenuto (Merci e Macchinari)",
+      "net": 96,
+      "tax": 0,
+      "gross": 0,
+      "delta": 0,
+      "discount": 0
+    },
+    {
+      "name": "Merci (aumento temporaneo)",
+      "description": "  -   ",
+      "net": 0,
+      "tax": 0,
+      "gross": 0,
+      "delta": 0,
+      "discount": 0
+    },
+    {
+      "name": "Furto, rapina, estorsione (in aumento)",
+      "description": "  -   ",
+      "net": 0,
+      "tax": 0,
+      "gross": 0,
+      "delta": 0,
+      "discount": 0
+    },
+    {
+      "name": "Rischio locativo (in aumento)",
+      "description": "  -   ",
+      "net": 0,
+      "tax": 0,
+      "gross": 0,
+      "delta": 0,
+      "discount": 0
+    },
+    {
+      "name": "Altre garanzie su Contenuto",
+      "description": "  -   ",
+      "net": 0,
+      "tax": 0,
+      "gross": 0,
+      "delta": 0,
+      "discount": 0
+    },
+    {
+      "name": "Ricorso terzi (in aumento)",
+      "description": "  -   ",
+      "net": 0,
+      "tax": 0,
+      "gross": 0,
+      "delta": 0,
+      "discount": 0
+    },
+    {
+      "name": "Danni indiretti",
+      "description": "  -   ",
+      "net": 0,
+      "tax": 0,
+      "gross": 0,
+      "delta": 0,
+      "discount": 0
+    },
+    {
+      "name": "Perdita Pigioni",
+      "net": 0,
+      "tax": 0,
+      "gross": 0,
+      "delta": 0,
+      "discount": 0
+    },
+    {
+      "name": "Responsabilità civile terzi",
+      "net": 92.56,
+      "tax": 0,
+      "gross": 0,
+      "delta": 0,
+      "discount": 0
+    },
+    {
+      "name": "Responsabilità civile prestatori lavoro",
+      "net": 669.73,
+      "tax": 0,
+      "gross": 0,
+      "delta": 0,
+      "discount": 0
+    },
+    {
+      "name": "Responsabilità civile prodotti",
+      "description": "  -   ",
+      "net": 0,
+      "tax": 0,
+      "gross": 0,
+      "delta": 0,
+      "discount": 0
+    },
+    {
+      "name": "Ritiro Prodotti",
+      "net": 0,
+      "tax": 0,
+      "gross": 0,
+      "delta": 0,
+      "discount": 0
+    },
+    {
+      "name": "Resp. Amministratori Sindaci Dirigenti (D\u0026O)",
+      "description": "  -   ",
+      "net": 0,
+      "tax": 0,
+      "gross": 0,
+      "delta": 0,
+      "discount": 0
+    },
+    {
+      "name": "Cyber",
+      "description": " Errore - verifica dati",
+      "net": 0,
+      "tax": 0,
+      "gross": 0,
+      "delta": 0,
+      "discount": 0
+    }
+  ],
+  "contractor": {
+    "location": {},
+    "vatCode": "",
+    "creationDate": "0001-01-01T00:00:00Z",
+    "updatedDate": "0001-01-01T00:00:00Z",
+    "height": 0,
+    "weight": 0
+  },
+  "statements": [],
+  "surveys": [],
+  "attachments": [],
+  "assets": [
+    {
+      "type": "enterprise",
+      "uuid": "8b9f6900-0f8d-104c-ab93-754aef8bf14c",
+      "enterprise": {
+        "name": "luca",
+        "address": {
+          "streetName": "Via Stella",
+          "streetNumber": "12",
+          "city": "Napoli",
+          "postalCode": "80137",
+          "locality": "Napoli",
+          "cityCode": "NA",
+          "area": ""
+        },
+        "location": {},
+        "vatCode": "11111111111",
+        "employer": 7,
+        "workEmployersRemuneration": "2000000",
+        "totalBilled": "200000000",
+        "northAmericanMarket": "120000"
+      },
+      "guarantees": [
+        {
+          "type": "enterprise",
+          "description": " ",
+          "companyName": "Resp. Civile Terzi e Prestatori Lavoro (RCT/O)",
+          "value": {
+            "deductibleValues": {},
+            "sumInsuredLimitOfIndemnity": 3000000,
+            "sumInsuredValues": {},
+            "selfInsuranceValues": {},
+            "tax": 0,
+            "percentage": 0,
+            "premiumNetYearly": 0,
+            "premiumTaxAmountYearly": 0,
+            "premiumGrossYearly": 0,
+            "premiumTaxAmountMonthly": 0,
+            "premiumGrossMonthly": 0
+          },
+          "config": {
+            "deductibleValues": {},
+            "sumInsuredValues": {},
+            "selfInsuranceValues": {},
+            "tax": 0,
+            "percentage": 0,
+            "premiumNetYearly": 0,
+            "premiumTaxAmountYearly": 0,
+            "premiumGrossYearly": 0,
+            "premiumTaxAmountMonthly": 0,
+            "premiumGrossMonthly": 0
+          },
+          "slug": "third-party-liability-work-providers",
+          "isMandatory": true,
+          "isExtension": false,
+          "isSellable": true,
+          "isConfigurable": false,
+          "subtitle": "",
+          "reserved": false,
+          "isSelected": false,
+          "isDeleted": false
+        }
+      ]
+    },
+    {
+      "type": "building",
+      "uuid": "d20ebb00-0fc1-104c-ab93-754aef8bf14c",
+      "building": {
+        "location": {},
+        "address": {
+          "streetName": "Via Stella, Verona, VR, Italia",
+          "streetNumber": "12",
+          "city": "Verona",
+          "postalCode": "37121",
+          "locality": "Verona",
+          "cityCode": "VR",
+          "area": ""
+        },
+        "buildingYear": "2024",
+        "activtyDetail": "Produzione di bevande analcoliche",
+        "activityCategory": "Produzione di bevande e tabacco",
+        "naics": "312111"
+      },
+      "guarantees": [
+        {
+          "type": "building",
+          "description": "questa è una descrizione",
+          "companyName": "Fabbricato",
+          "value": {
+            "deductibleValues": {},
+            "sumInsuredLimitOfIndemnity": 100000,
+            "sumInsuredValues": {},
+            "selfInsuranceValues": {},
+            "tax": 0,
+            "percentage": 0,
+            "premiumNetYearly": 0,
+            "premiumTaxAmountYearly": 0,
+            "premiumGrossYearly": 0,
+            "premiumTaxAmountMonthly": 0,
+            "premiumGrossMonthly": 0
+          },
+          "slug": "building",
+          "isMandatory": false,
+          "isExtension": false,
+          "isSellable": true,
+          "isConfigurable": true,
+          "subtitle": "",
+          "reserved": false,
+          "isSelected": false,
+          "isDeleted": false
+        },
+        {
+          "type": "building",
+          "description": " ",
+          "companyName": "Merci",
+          "value": {
+            "deductibleValues": {},
+            "sumInsuredLimitOfIndemnity": 100000,
+            "sumInsuredValues": {},
+            "selfInsuranceValues": {},
+            "tax": 0,
+            "percentage": 0,
+            "premiumNetYearly": 0,
+            "premiumTaxAmountYearly": 0,
+            "premiumGrossYearly": 0,
+            "premiumTaxAmountMonthly": 0,
+            "premiumGrossMonthly": 0
+          },
+          "slug": "stock",
+          "isMandatory": false,
+          "isExtension": false,
+          "isSellable": true,
+          "isConfigurable": true,
+          "subtitle": "",
+          "reserved": false,
+          "isSelected": false,
+          "isDeleted": false
+        },
+        {
+          "type": "building",
+          "description": " ",
+          "companyName": "Merci (Aumento temporaneo A/29)",
+          "value": {
+            "deductibleValues": {},
+            "sumInsuredLimitOfIndemnity": 1000000,
+            "sumInsuredValues": {},
+            "selfInsuranceValues": {},
+            "duration": {},
+            "tax": 0,
+            "percentage": 0,
+            "premiumNetYearly": 0,
+            "premiumTaxAmountYearly": 0,
+            "premiumGrossYearly": 0,
+            "premiumTaxAmountMonthly": 0,
+            "premiumGrossMonthly": 0
+          },
+          "slug": "stock-temporary-increase",
+          "isMandatory": false,
+          "isExtension": false,
+          "isSellable": true,
+          "isConfigurable": true,
+          "subtitle": "",
+          "reserved": false,
+          "isSelected": false,
+          "isDeleted": false
+        }
+      ]
+    }
+  ],
+  "offersPrices": {
+    "default": {
+      "monthly": { "net": 0, "tax": 0, "gross": 0, "delta": 0, "discount": 0 },
+      "yearly": { "net": 0, "tax": 0, "gross": 0, "delta": 0, "discount": 0 }
+    }
+  },
+  "partnershipName": "",
+  "partnershipData": null,
+  "isReserved": false,
+  "networkUid": "",
+  "producerUid": "",
+  "producerType": "",
+  "annuity": 0,
+  "isAutoRenew": false,
+  "isRenewable": false,
+  "policyType": "",
+  "quoteType": ""
+}
