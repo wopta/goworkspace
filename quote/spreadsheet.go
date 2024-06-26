@@ -62,8 +62,8 @@ func (qs *QuoteSpreadsheet) Spreadsheets() []Cell {
 	sheetClient, e := GoogleClient[*sheets.Service](spreadsheet)
 	lib.CheckError(e)
 	fmt.Printf("sheetClient: %v\n", sheetClient)
-	qs.setInitCells(sheetClient,ctx)
-	qs.setInputCells(sheetClient,ctx)
+	qs.setInitCells(sheetClient, ctx)
+	qs.setInputCells(sheetClient, ctx)
 	return qs.getOutput(sheetClient)
 }
 func (qs *QuoteSpreadsheet) setInitCells(sheetClient *sheets.Service, ctx context.Context) {
@@ -73,7 +73,7 @@ func (qs *QuoteSpreadsheet) setInitCells(sheetClient *sheets.Service, ctx contex
 	}
 
 	for k, cell := range qs.InitCells {
-		fmt.Printf("%s -> %s\n", k, cell)
+		fmt.Printf("%d -> %s\n", k, cell)
 		/*
 			cel := &sheets.ValueRange{
 				Values: [][]interface{}{{cell.Value}},
@@ -97,7 +97,7 @@ func (qs *QuoteSpreadsheet) setInputCells(sheetClient *sheets.Service, ctx conte
 	}
 
 	for k, cell := range qs.InputCells {
-		fmt.Printf("%s -> %s\n", k, cell)
+		fmt.Printf("%d -> %s\n", k, cell)
 		/*cel := &sheets.ValueRange{
 			Values: [][]interface{}{{cell.Value}},
 		}
@@ -120,7 +120,7 @@ func (qs *QuoteSpreadsheet) getOutput(sheetClient *sheets.Service) []Cell {
 	sheet, e := sheetClient.Spreadsheets.Values.Get(qs.Id, qs.SheetName+"!A:G").Do()
 	lib.CheckError(e)
 	for k, cell := range qs.OutputCells {
-		fmt.Printf("%s -> %s\n", k, cell)
+		fmt.Printf("%d -> %s\n", k, cell)
 		row, e := strconv.Atoi(string(string(cell.Cell[1:])))
 		colum := cell.Cell[0:1]
 		lib.CheckError(e)
