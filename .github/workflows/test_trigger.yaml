@@ -3,6 +3,10 @@ on:
   pull_request:
     types: [ opened, reopened, synchronize ]
     paths-ignore:
+      - '*.mod'
+      - '*.md'
+      - '*.yaml'
+      - '*.yml'
       - '**/*.mod'
       - '**/*.md'
       - '**/*.yaml'
