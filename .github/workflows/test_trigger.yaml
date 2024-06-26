@@ -3,7 +3,7 @@ on:
   pull_request:
     types: [ opened, reopened, synchronize ]
     paths:
-      - '**.go'
+      - '**/*.go'
 jobs:
   run_test:
     permissions:
