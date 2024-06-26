@@ -2,15 +2,15 @@
   "productVersion": "v1",
   "name": "combined",
   "nameDesc": "Wopta per te Impresa",
-  "startDate": "2006-06-19T00:00:00.000Z",
+  "startDate": "2030-06-19T00:00:00.000Z",
   "isDeleted": false,
   "assets": [
     {
-      "uuid": "982b0700-0473-104a-a97c-ab1037d08af3",
+      "uuid": "5515f800-1883-104c-893e-d3044068eff6",
       "enterprise": {
-        "name": "luca inizio",
+        "name": "bai",
         "vatCode": "11111111111",
-        "employer": 10,
+        "employer": 12,
         "address": {
           "streetName": "Via Stella",
           "streetNumber": "12",
@@ -19,9 +19,9 @@
           "locality": "Napoli",
           "cityCode": "NA"
         },
-        "workEmployersRemuneration": "120000",
-        "totalBilled": "2000000",
-        "northAmericanMarket": "20000"
+        "workEmployersRemuneration": "12",
+        "totalBilled": "12",
+        "northAmericanMarket": "12"
       },
       "type": "enterprise",
       "isContractor": false,
@@ -55,15 +55,15 @@
       ]
     },
     {
-      "uuid": "18ba2980-04ad-104a-a97c-ab1037d08af3",
+      "uuid": "258bdd80-18cd-104c-893e-d3044068eff6",
       "building": {
         "address": {
-          "streetName": "Via Stella",
+          "streetName": "Via Quintino Sella",
           "streetNumber": "12",
-          "city": "Napoli",
-          "postalCode": "80137",
-          "locality": "Napoli",
-          "cityCode": "NA"
+          "city": "Firenze",
+          "postalCode": "50136",
+          "locality": "Firenze",
+          "cityCode": "FI"
         },
         "buildingYear": "2024",
         "isAllarm": false,
@@ -78,7 +78,7 @@
       "guarantees": [
         {
           "type": "building",
-          "description": " ",
+          "description": "questa è una descrizione",
           "companyName": "Fabbricato",
           "slug": "building",
           "isSelected": false,

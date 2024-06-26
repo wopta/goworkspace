@@ -26,7 +26,7 @@ type Building struct {
 	BuildingMaterial  string   `firestore:"buildingMaterial,omitempty" json:"buildingMaterial,omitempty"`
 	BuildingYear      string   `firestore:"buildingYear,omitempty" json:"buildingYear,omitempty"`
 	Employer          int64    `firestore:"employer,omitempty" json:"employer,omitempty"`
-	IsAllarm          bool     `firestore:"isAllarm,omitempty" json:"isAllarm,omitempty"`
+	IsAllarm          bool     `firestore:"isAllarm" json:"isAllarm"`
 	Floor             string   `firestore:"floor,omitempty" json:"floor,omitempty"`
 	Ateco             string   `firestore:"ateco,omitempty" json:"ateco,omitempty"`
 	AtecoDesc         string   `firestore:"atecoDesc,omitempty" json:"atecoDesc,omitempty"`
@@ -37,8 +37,8 @@ type Building struct {
 	NaicsDetail       string   `firestore:"activtyDetail,omitempty" json:"activtyDetail,omitempty"`
 	NaicsCategory     string   `firestore:"activityCategory,omitempty" json:"activityCategory,omitempty"`
 	Naics             string   `firestore:"naics,omitempty" json:"naics,omitempty"`
-	HasSandwitchPanel bool     `firestore:"hasSandwitchPanel,omitempty" json:"hasSandwitchPanel,omitempty"`
-	HasSprinkler      bool     `firestore:"hasSprinkler,omitempty" json:"hasSprinkler,omitempty"`
+	HasSandwitchPanel bool     `firestore:"hasSandwitchPanel" json:"hasSandwitchPanel"`
+	HasSprinkler      bool     `firestore:"hasSprinkler" json:"hasSprinkler"`
 }
 
 

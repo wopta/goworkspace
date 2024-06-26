@@ -28,7 +28,7 @@ func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	log.Println("Request: ", string(req))
 	err := json.Unmarshal(req, &policy)
 	lib.CheckError(err)
-	b,err:=json.Marshal(policy)
+	b, err := json.Marshal(policy)
 	log.Println("Request Marshal: ", string(b))
 	lib.CheckError(err)
 	inputCells = append(inputCells, setInputCell(policy)...)
@@ -97,6 +97,7 @@ func setOutputCell() []Cell {
 }
 func mapCellPolicy(policy *models.Policy, cells []Cell) {
 	var priceGroup []models.Price
+	policy.IsReserved = true
 	policy.OffersPrices = map[string]map[string]*models.Price{
 		"default": {
 			"yearly":  &models.Price{},
@@ -402,7 +403,7 @@ func getEnterpriseGuaranteCellsBySlug(guarante models.Guarante) []Cell {
 				Value: guarante.Value.SumInsuredLimitOfIndemnity,
 			},
 		}
-	case "refrigeration-goods":
+	case "refrigeration-stock":
 		cells = []Cell{
 			{
 				Cell:  "C49",
@@ -499,7 +500,7 @@ func getBuildingGuaranteCellsBySlug(guarante models.Guarante, colum int) []Cell 
 		cells = []Cell{
 			{
 				Cell:  col[colum] + "41",
-				Value: guarante.Value.SumInsured,
+				Value: guarante.Value.SumInsuredLimitOfIndemnity,
 			},
 		}
 
@@ -517,14 +518,14 @@ func getBuildingGuaranteCellsBySlug(guarante models.Guarante, colum int) []Cell 
 				Value: guarante.Value.SumInsuredLimitOfIndemnity,
 			},
 		}
-	case "goods":
+	case "stock":
 		cells = []Cell{
 			{
 				Cell:  col[colum] + "44",
 				Value: guarante.Value.SumInsuredLimitOfIndemnity,
 			},
 		}
-	case "goods-temporary-increase":
+	case "stock-temporary-increase":
 		cells = []Cell{
 			{
 				Cell:  col[colum] + "45",
