@@ -2,17 +2,19 @@ name: GoWorkspace - Run Test
 on:
   pull_request:
     types: [ opened, reopened, synchronize ]
-    paths-ignore:
-      - '*.mod'
-      - '*.md'
-      - '*.yaml'
-      - '*.yml'
-      - '**/*.mod'
-      - '**/*.md'
-      - '**/*.yaml'
-      - '**/*.yml'
+    #paths-ignore:
+    #  - '*.mod'
+    #  - '*.md'
+    #  - '*.yaml'
+    #  - '*.yml'
+    #  - '**/*.mod'
+    #  - '**/*.md'
+    #  - '**/*.yaml'
+    #  - '**/*.yml'
+
 jobs:
   run_test:
+    if: "!contains(github.event.pull_request.changed_files, '*.mod,*.md,*.yaml,*.yml')"
     permissions:
       contents: 'read'
       id-token: 'write'
