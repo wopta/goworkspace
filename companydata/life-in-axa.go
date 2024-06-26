@@ -103,7 +103,6 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 		return "", nil, err
 	}
 
-	//data, _ := os.ReadFile("./companydata/life.csv")
 	data := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/life/in/"+req.Filename, "")
 	df := lib.CsvToDataframe(data)
 	log.Println("LifeInFx  row", df.Nrow())
@@ -237,13 +236,11 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 
 		log.Println("LifeInFx  value", v)
 		log.Println("LifeInFx  row", len(row))
-		//log.Println("LifeInFx  col", len(row))
-		//log.Println("LifeInFx  pol: ", pol)
+
 		log.Println("LifeInFx  elemets (0-0 ): ", row[0])
 		log.Println("LifeInFx  elemets (0-1 ): ", row[1])
 		log.Println("LifeInFx  elemets (0-2 ): ", row[2])
 		log.Println("LifeInFx  elemets (0-3 ): ", row[3])
-		//1998-09-27T00:00:00Z RFC3339
 
 		_, _, version, paymentSplit := LifeMapCodecCompanyAxaRevert(row[1])
 		if paymentSplit == string(models.PaySplitMonthly) {
