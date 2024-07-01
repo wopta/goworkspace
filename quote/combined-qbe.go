@@ -97,8 +97,10 @@ func setOutputCell() []Cell {
 }
 func mapCellPolicy(policy *models.Policy, cells []Cell) {
 	var priceGroup []models.Price
+
 	policy.IsReserved = true
 	policy.Channel = "network"
+
 	policy.OffersPrices = map[string]map[string]*models.Price{
 		"default": {
 			"yearly":  &models.Price{},
@@ -329,6 +331,11 @@ func mapCellPolicy(policy *models.Policy, cells []Cell) {
 }
 func setInputCell(policy *models.Policy) []Cell {
 	var inputCells []Cell
+	paymentSplits := map[string]string{
+
+		"yearly":    "Annuale",
+		"semestral": "Semestrale",
+	}
 	assEnterprise := getAssetByType(policy, "enterprise")
 	assBuildings := getAssetByType(policy, "building")
 
@@ -338,6 +345,7 @@ func setInputCell(policy *models.Policy) []Cell {
 	inputCells = append(inputCells, Cell{Cell: "C24", Value: assEnterprise[0].Enterprise.Employer})
 	inputCells = append(inputCells, Cell{Cell: "C25", Value: assEnterprise[0].Enterprise.WorkEmployersRemuneration})
 	inputCells = append(inputCells, Cell{Cell: "C26", Value: assEnterprise[0].Enterprise.TotalBilled})
+	inputCells = append(inputCells, Cell{Cell: "C16", Value: paymentSplits[policy.PaymentSplit]})
 	for _, eg := range assEnterprise[0].Guarantees {
 
 		inputCells = append(inputCells, getEnterpriseGuaranteCellsBySlug(eg)...)
@@ -514,7 +522,7 @@ func getEnterpriseGuaranteCellsBySlug(guarante models.Guarante) []Cell {
 	case "management-organization-continuity":
 		cells = []Cell{
 			{
-				Cell:  "C70",
+				Cell:  "F70",
 				Value: guarante.Value.StartDate.Format("02-01-2006"),
 			},
 		}
@@ -522,7 +530,7 @@ func getEnterpriseGuaranteCellsBySlug(guarante models.Guarante) []Cell {
 	case "product-liability-retroactive":
 		cells = []Cell{
 			{
-				Cell:  "C67",
+				Cell:  "F67",
 				Value: guarante.Value.StartDate.Format("02-01-2006"),
 			},
 		}
@@ -530,14 +538,14 @@ func getEnterpriseGuaranteCellsBySlug(guarante models.Guarante) []Cell {
 	case "product-liability-retroactive-usacan":
 		cells = []Cell{
 			{
-				Cell:  "C68",
+				Cell:  "F68",
 				Value: guarante.Value.StartDate.Format("02-01-2006"),
 			},
 		}
 	case "product-withdrawal":
 		cells = []Cell{
 			{
-				Cell:  "E69",
+				Cell:  "F69",
 				Value: "SI",
 			},
 		}
