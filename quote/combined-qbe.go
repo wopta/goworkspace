@@ -456,8 +456,16 @@ func getEnterpriseGuaranteCellsBySlug(guarante models.Guarante) []Cell {
 	case "management-organization":
 		cells = []Cell{
 			{
-				Cell:  "C68",
+				Cell:  "C69",
 				Value: guarante.Value.SumInsuredLimitOfIndemnity,
+			},
+			{
+				Cell:  "C70",
+				Value: guarante.Value.SumInsured,
+			},
+			{
+				Cell:  "C68",
+				Value: "SI",
 			},
 		}
 	case "cyber":
