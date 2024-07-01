@@ -1,9 +1,6 @@
-cmd/
+cmd/_main.go
 sa/
 env/
-/main.go
-./main.go
-main.go
 *.sum
 *.ppk
 sa_key_frontend.json
@@ -15,3 +12,5 @@ function-data/
 document/*.pdf
 _script/*.csv
 _script/*.json
+.env
+.secrets
