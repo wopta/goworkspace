@@ -532,7 +532,7 @@ func getEnterpriseGuaranteCellsBySlug(guarante models.Guarante) []Cell {
 				Value: "SI",
 			},
 		}
-	
+
 	}
 
 	return cells
