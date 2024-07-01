@@ -589,12 +589,24 @@ func getBuildingGuaranteCellsBySlug(guarante models.Guarante, colum int) []Cell 
 			},
 			{
 				Cell:  "C46",
-				Value: guarante.Value.SumInsuredLimitOfIndemnity,
+				Value: guarante.Value.StartDateString,
 			},
 			{
-				Cell:  "C47",
-				Value: guarante.Value.Duration.Da,
+				Cell:  "E46",
+				Value: guarante.Value.Duration.Day,
 			},
+		}
+		if guarante.Value.StartDateString != "" {
+			cells = append(cells, []Cell{
+
+				{
+					Cell:  "C46",
+					Value: guarante.Value.StartDateString,
+				},
+				{
+					Cell:  "C47",
+					Value: guarante.Value.Duration.Day,
+				}}...)
 		}
 
 	}
