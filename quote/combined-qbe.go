@@ -492,6 +492,10 @@ func getEnterpriseGuaranteCellsBySlug(guarante models.Guarante) []Cell {
 				Cell:  "C57",
 				Value: "Diaria Giornaliera",
 			},
+			{
+				Cell:  "E58",
+				Value: guarante.Value.Duration.Day,
+			},
 		}
 	case "additional-compensation":
 		cells = []Cell{
