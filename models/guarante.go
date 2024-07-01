@@ -106,6 +106,7 @@ type Tax struct {
 
 type Duration struct {
 	Year int `firestore:"year,omitempty" json:"year,omitempty"`
+	Day  int `firestore:"day,omitempty" json:"day,omitempty"`
 }
 
 type ReservedLimits struct {
