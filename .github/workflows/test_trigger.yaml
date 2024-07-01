@@ -46,7 +46,3 @@ jobs:
 
       - name: Run Tests
         run: go test github.com/wopta/goworkspace/...
-
-      - name: Clean up
-        run: |
-          rm -f key.json
