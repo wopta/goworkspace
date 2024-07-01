@@ -98,6 +98,7 @@ func setOutputCell() []Cell {
 func mapCellPolicy(policy *models.Policy, cells []Cell) {
 	var priceGroup []models.Price
 	policy.IsReserved = true
+	policy.Channel = "network"
 	policy.OffersPrices = map[string]map[string]*models.Price{
 		"default": {
 			"yearly":  &models.Price{},
