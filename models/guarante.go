@@ -2,11 +2,12 @@ package models
 
 import (
 	"log"
+	"time"
 
 	"github.com/wopta/goworkspace/lib"
 )
 
-type Guarante struct {
+type  Guarante struct {
 	Status                     string                     `firestore:"status,omitempty" json:"status,omitempty" bigquery:"status"`
 	PolicyUid                  string                     `firestore:"-" json:"-"  bigquery:"policyUid"`
 	DailyAllowance             string                     `firestore:"dailyAllowance" json:"dailyAllowance,omitempty"  bigquery:"-"`
@@ -56,6 +57,7 @@ type Guarante struct {
 }
 
 type GuaranteValue struct {
+	StartDate         time.Time                    `firestore:"startDate,omitempty" json:"startDate,omitempty" bigquery:"-"`
 	TypeOfSumInsured           string              `firestore:"typeOfSumInsured,omitempty" json:"typeOfSumInsured,omitempty"`
 	Deductible                 string              `firestore:"deductible,omitempty" json:"deductible,omitempty"`
 	DeductibleValues           GuaranteFieldValue  `firestore:"deductibleValues,omitempty" json:"deductibleValues,omitempty"`
