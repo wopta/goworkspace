@@ -12,6 +12,10 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
+const (
+	dateFormat = "02/01/2006"
+)
+
 func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		policy     *models.Policy
@@ -339,8 +343,8 @@ func setInputCell(policy *models.Policy) []Cell {
 	assEnterprise := getAssetByType(policy, "enterprise")
 	assBuildings := getAssetByType(policy, "building")
 
-	inputCells = append(inputCells, Cell{Cell: "C10", Value: policy.StartDate.Format("02-01-2006")})
-	inputCells = append(inputCells, Cell{Cell: "C11", Value: policy.StartDate.AddDate(1, 0, 0).Format("02-01-2006")})
+	inputCells = append(inputCells, Cell{Cell: "C10", Value: policy.StartDate.Format(dateFormat)})
+	inputCells = append(inputCells, Cell{Cell: "C11", Value: policy.StartDate.AddDate(1, 0, 0).Format(dateFormat)})
 	inputCells = append(inputCells, setEnterpriseCell(assEnterprise[0])...)
 	inputCells = append(inputCells, Cell{Cell: "C24", Value: assEnterprise[0].Enterprise.Employer})
 	inputCells = append(inputCells, Cell{Cell: "C25", Value: assEnterprise[0].Enterprise.WorkEmployersRemuneration})
@@ -527,7 +531,7 @@ func getEnterpriseGuaranteCellsBySlug(guarante models.Guarante) []Cell {
 		cells = []Cell{
 			{
 				Cell:  "F70",
-				Value: guarante.Value.StartDate.Format("02-01-2006"),
+				Value: guarante.Value.StartDate.Format(dateFormat),
 			},
 		}
 
@@ -535,7 +539,7 @@ func getEnterpriseGuaranteCellsBySlug(guarante models.Guarante) []Cell {
 		cells = []Cell{
 			{
 				Cell:  "F67",
-				Value: guarante.Value.StartDate.Format("02-01-2006"),
+				Value: guarante.Value.StartDate.Format(dateFormat),
 			},
 		}
 
@@ -543,7 +547,7 @@ func getEnterpriseGuaranteCellsBySlug(guarante models.Guarante) []Cell {
 		cells = []Cell{
 			{
 				Cell:  "F68",
-				Value: guarante.Value.StartDate.Format("02-01-2006"),
+				Value: guarante.Value.StartDate.Format(dateFormat),
 			},
 		}
 	case "product-withdrawal":
