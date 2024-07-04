@@ -100,7 +100,7 @@ func PromoteFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 		return "", nil, err
 	}
 	if !dryRun {
-		filename := fmt.Sprintf("renew/promote/report-%s-%d.json", targetDate.Format(time.DateOnly), time.Now().Unix())
+		filename := fmt.Sprintf("renew/promote/report-promote-%s-%d.json", targetDate.Format(time.DateOnly), time.Now().Unix())
 		if _, err = lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, responseJson); err != nil {
 			return "", nil, err
 		}
