@@ -1,7 +1,9 @@
 package renew
 
 import (
+	"fmt"
 	"log"
+	"strings"
 
 	"github.com/wopta/goworkspace/lib"
 )
@@ -14,8 +16,8 @@ var (
 		},
 	}
 	paramsQuery = map[string]string{
-		"codeCompany":       "(JSON_VALUE(p.data, '$.codeCompany') = '%s')",
-		"insuredFiscalCode": "(JSON_VALUE(p.data, '$.assets[0].person.fiscalCode) = '%s')",
+		"codeCompany":       "(JSON_VALUE(p.data, '$.codeCompany') = \"%s\")",
+		"insuredFiscalCode": "(JSON_VALUE(p.data, '$.assets[0].person.fiscalCode') = \"%s\")",
 	}
 )
 
@@ -44,5 +46,16 @@ func (qb *BigQueryQueryBuilder) BuildQuery(params map[string]string) string {
 
 	log.Println(allowedParams)
 
-	return ""
+	for _, key := range paramsKeys {
+		if !lib.SliceContains(allowedParams, key) {
+			delete(params, key)
+		}
+	}
+
+	queries := make([]string, 0)
+	for k, v := range params {
+		queries = append(queries, fmt.Sprintf(paramsQuery[k], v))
+	}
+
+	return strings.Join(queries, " AND ")
 }
