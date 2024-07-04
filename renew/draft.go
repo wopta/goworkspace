@@ -170,7 +170,7 @@ func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 	}
 
 	if !dryRun {
-		filename := fmt.Sprintf("renew/promote/report-%s-%d.json", today.Format(time.DateOnly), time.Now().Unix())
+		filename := fmt.Sprintf("renew/draft/report-draft-%s-%d.json", today.Format(time.DateOnly), time.Now().Unix())
 		if _, err = lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, rawResp); err != nil {
 			return "", nil, err
 		}
