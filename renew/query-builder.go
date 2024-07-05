@@ -47,7 +47,7 @@ type QueryBuilder interface {
 
 type BigQueryQueryBuilder struct{}
 
-func NewQueryBuilder() BigQueryQueryBuilder {
+func NewBigQueryQueryBuilder() BigQueryQueryBuilder {
 	return BigQueryQueryBuilder{}
 }
 

@@ -8,7 +8,7 @@ import (
 )
 
 func TestQueryBuilder(t *testing.T) {
-	qb := renew.NewQueryBuilder()
+	qb := renew.NewBigQueryQueryBuilder()
 
 	t.Run("codeCompany overcome everything", func(t *testing.T) {
 		params := map[string]string{
