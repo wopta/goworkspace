@@ -16,15 +16,17 @@ var (
 		{"contractorName": []string{"contractorName", "contractorSurname"}},
 		{"contractorSurname": []string{"contractorName", "contractorSurname"}},
 
-		{"startDateFrom": []string{"startDateFrom", "startDateTo", "company", "product", "producerCode", "reserved"}},
-		{"startDateTo": []string{"startDateFrom", "startDateTo", "company", "product", "producerCode", "reserved"}},
-		{"company": []string{"startDateFrom", "startDateTo", "company", "product", "producerCode", "reserved"}},
-		{"product": []string{"startDateFrom", "startDateTo", "company", "product", "producerCode", "reserved"}},
-		{"producerCode": []string{"startDateFrom", "startDateTo", "company", "product", "producerCode", "reserved"}},
-		{"reserved": []string{"startDateFrom", "startDateTo", "company", "product", "producerCode", "reserved"}},
+		{"startDateFrom": []string{"startDateFrom", "startDateTo", "company", "product", "producerCode", "reserved", "status", "payment"}},
+		{"startDateTo": []string{"startDateFrom", "startDateTo", "company", "product", "producerCode", "reserved", "status", "payment"}},
+		{"company": []string{"startDateFrom", "startDateTo", "company", "product", "producerCode", "reserved", "status", "payment"}},
+		{"product": []string{"startDateFrom", "startDateTo", "company", "product", "producerCode", "reserved", "status", "payment"}},
+		{"producerCode": []string{"startDateFrom", "startDateTo", "company", "product", "producerCode", "reserved", "status", "payment"}},
+		{"reserved": []string{"startDateFrom", "startDateTo", "company", "product", "producerCode", "reserved", "status", "payment"}},
+		{"status": []string{"startDateFrom", "startDateTo", "company", "product", "producerCode", "reserved", "status", "payment"}},
+		{"payment": []string{"startDateFrom", "startDateTo", "company", "product", "producerCode", "reserved", "status", "payment"}},
 	}
 
-	paramsQuery = map[string]string{
+	paramsWhereClause = map[string]string{
 		"codeCompany": "(JSON_VALUE(p.data, '$.codeCompany') = \"%s\")",
 
 		"insuredFiscalCode": "(JSON_VALUE(p.data, '$.assets[0].person.fiscalCode') = \"%s\")",
@@ -38,7 +40,13 @@ var (
 		"product":       "(JSON_VALUE(p.data, '$.product') = LOWER(\"%s\"))",
 		"producerCode":  "(JSON_VALUE(p.data, '$.producerCode') = \"%s\")",
 		"reserved":      "(JSON_VALUE(p.data, '$.reserved') = %s)",
+		"paid":          "((isDeleted = false OR IS NULL) AND (isPay = true))",
+		"unpaid":        "((isDeleted = false OR IS NULL) AND (isPay = false))",
+		"recurrent":     "((isDeleted = false OR IS NULL) AND (hasMandate = true))",
+		"notRecurrent":  "((isDeleted = false OR IS NULL) AND (hasMandate = false))",
 	}
+
+	orClauses = []string{"status", "payment"}
 )
 
 type QueryBuilder interface {
@@ -75,7 +83,7 @@ func (qb *BigQueryQueryBuilder) filterParams(params map[string]string, allowedPa
 
 func (qb *BigQueryQueryBuilder) BuildQuery(params map[string]string) string {
 	var (
-		queries       = make([]string, 0)
+		whereClauses  = make([]string, 0)
 		allowedParams = make([]string, 0)
 	)
 
@@ -87,9 +95,23 @@ func (qb *BigQueryQueryBuilder) BuildQuery(params map[string]string) string {
 
 	filteredParams := qb.filterParams(params, allowedParams)
 
-	for k, v := range filteredParams {
-		queries = append(queries, fmt.Sprintf(paramsQuery[k], v))
+	keys := lib.GetMapKeys(params)
+	for _, paramKey := range allowedParams {
+		if !lib.SliceContains(keys, paramKey) || filteredParams[paramKey] == "" {
+			continue
+		}
+		whereClause := ""
+		if lib.SliceContains(orClauses, paramKey) {
+			tmp := make([]string, 0)
+			statusList := strings.Split(filteredParams[paramKey], ",")
+			for _, status := range statusList {
+				tmp = append(tmp, paramsWhereClause[status])
+			}
+			whereClause = "(" + strings.Join(tmp, " OR ") + ")"
+		} else {
+			whereClause = fmt.Sprintf(paramsWhereClause[paramKey], filteredParams[paramKey])
+		}
+		whereClauses = append(whereClauses, whereClause)
 	}
-
-	return strings.Join(queries, " AND ")
+	return strings.Join(whereClauses, " AND ")
 }

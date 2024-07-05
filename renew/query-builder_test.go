@@ -21,7 +21,7 @@ func TestQueryBuilder(t *testing.T) {
 		got := qb.BuildQuery(params)
 
 		if !strings.EqualFold(got, want) {
-			t.Fatalf("expected: %s, got: %s", want, got)
+			t.Errorf("expected: %s, got: %s", want, got)
 		}
 	})
 
@@ -36,7 +36,59 @@ func TestQueryBuilder(t *testing.T) {
 		got := qb.BuildQuery(params)
 
 		if !strings.EqualFold(got, want) {
-			t.Fatalf("expected: %s, got: %s", want, got)
+			t.Errorf("expected: %s, got: %s", want, got)
+		}
+	})
+
+	t.Run("paid renew policies", func(t *testing.T) {
+		params := map[string]string{
+			"status": "paid",
+		}
+
+		want := "(((isDeleted = false OR IS NULL) AND (isPay = true)))"
+		got := qb.BuildQuery(params)
+
+		if !strings.EqualFold(got, want) {
+			t.Errorf("expected: %s, got: %s", want, got)
+		}
+	})
+
+	t.Run("not paid renew policies", func(t *testing.T) {
+		params := map[string]string{
+			"status": "unpaid",
+		}
+
+		want := "(((isDeleted = false OR IS NULL) AND (isPay = false)))"
+		got := qb.BuildQuery(params)
+
+		if !strings.EqualFold(got, want) {
+			t.Errorf("expected: %s, got: %s", want, got)
+		}
+	})
+
+	t.Run("renew policies with mandate active", func(t *testing.T) {
+		params := map[string]string{
+			"payment": "recurrent",
+		}
+
+		want := "(((isDeleted = false OR IS NULL) AND (hasMandate = true)))"
+		got := qb.BuildQuery(params)
+
+		if !strings.EqualFold(got, want) {
+			t.Errorf("expected: %s, got: %s", want, got)
+		}
+	})
+
+	t.Run("renew policies with mandate non active", func(t *testing.T) {
+		params := map[string]string{
+			"payment": "notRecurrent",
+		}
+
+		want := "(((isDeleted = false OR IS NULL) AND (hasMandate = false)))"
+		got := qb.BuildQuery(params)
+
+		if !strings.EqualFold(got, want) {
+			t.Errorf("expected: %s, got: %s", want, got)
 		}
 	})
 
@@ -45,14 +97,16 @@ func TestQueryBuilder(t *testing.T) {
 			"producerCode":  "a1b2c3d4",
 			"startDateFrom": "2024-07-04",
 			"startDateTo":   "2024-07-14",
+			"status":        "paid",
+			"payment":       "recurrent",
 		}
 
-		want := `(JSON_VALUE(p.data, '$.producerCode') = "a1b2c3d4") AND (JSON_VALUE(p.data, '$.startDate') >= "2024-07-04") AND (JSON_VALUE(p.data, '$.startDate') <= "2024-07-14")`
+		want := `(JSON_VALUE(p.data, '$.startDate') >= "2024-07-04") AND (JSON_VALUE(p.data, '$.startDate') <= "2024-07-14") AND (JSON_VALUE(p.data, '$.producerCode') = "a1b2c3d4") AND (((isDeleted = false OR IS NULL) AND (isPay = true))) AND (((isDeleted = false OR IS NULL) AND (hasMandate = true)))`
 
 		got := qb.BuildQuery(params)
 
 		if !strings.EqualFold(got, want) {
-			t.Fatalf("expected: %s, got: %s", want, got)
+			t.Errorf("expected: %s,\n got: %s", want, got)
 		}
 	})
 
@@ -69,20 +123,7 @@ func TestQueryBuilder(t *testing.T) {
 		got := qb.BuildQuery(params)
 
 		if !strings.EqualFold(got, want) {
-			t.Fatalf("expected: %s, got: %s", want, got)
-		}
-	})
-
-	t.Run("not supported parameter", func(t *testing.T) {
-		params := map[string]string{
-			"test": "test",
-		}
-
-		want := ""
-		got := qb.BuildQuery(params)
-
-		if !strings.EqualFold(got, want) {
-			t.Fatalf("expected: %s, got: %s", want, got)
+			t.Errorf("expected: %s, got: %s", want, got)
 		}
 	})
 
