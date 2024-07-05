@@ -11,16 +11,6 @@ type CallbackInfo struct {
 
 type CallbackoutAction = string
 
-// Externally available types
-var (
-	ExtProposal        CallbackoutAction = "ExtProposal"
-	ExtRequestApproval CallbackoutAction = "ExtRequestApproval"
-	ExtEmit            CallbackoutAction = "ExtEmit"
-	ExtPaid            CallbackoutAction = "ExtPaid"
-	ExtEmitRemittance  CallbackoutAction = "ExtEmitRemittance"
-)
-
-// Internal use only
 var (
 	Proposal        CallbackoutAction = "Proposal"
 	RequestApproval CallbackoutAction = "RequestApproval"
