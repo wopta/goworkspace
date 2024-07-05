@@ -16,7 +16,7 @@ var (
 	Paid            CallbackoutAction = "Paid"
 )
 
-func Execute(node *models.NetworkNode, policy models.Policy, action CallbackoutAction) {
+func Execute(node *models.NetworkNode, policy models.Policy, actions ...CallbackoutAction) {
 	var (
 		client CallbackClient
 		err    error
@@ -33,26 +33,28 @@ func Execute(node *models.NetworkNode, policy models.Policy, action CallbackoutA
 		return
 	}
 
-	switch action {
-	case Proposal:
-		fx = client.Proposal
-	case RequestApproval:
-		fx = client.RequestApproval
-	case Emit:
-		fx = client.Emit
-	case Paid:
-		fx = client.Paid
-	default:
-		log.Printf("unhandled callback action '%s'", action)
-		return
+	for _, action := range actions {
+		switch action {
+		case Proposal:
+			fx = client.Proposal
+		case RequestApproval:
+			fx = client.RequestApproval
+		case Emit:
+			fx = client.Emit
+		case Paid:
+			fx = client.Paid
+		default:
+			log.Printf("unhandled callback action '%s'", action)
+			return
+		}
+
+		log.Printf("executing action '%s'", action)
+
+		res := fx(policy)
+		log.Printf("Callback request: %v", res.Request)
+		log.Printf("Callback response: %v", res.Response)
+		log.Printf("Callback error: %s", res.Error)
+
+		saveAudit(node, action, res)
 	}
-
-	log.Printf("executing action '%s'", action)
-
-	res := fx(policy)
-	log.Printf("Callback request: %v", res.Request)
-	log.Printf("Callback response: %v", res.Response)
-	log.Printf("Callback error: %s", res.Error)
-
-	saveAudit(node, action, res)
 }
