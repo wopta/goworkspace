@@ -7,16 +7,15 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
-type CallbackoutAction = string
-
 var (
-	Proposal        CallbackoutAction = "Proposal"
-	RequestApproval CallbackoutAction = "RequestApproval"
-	Emit            CallbackoutAction = "Emit"
-	Paid            CallbackoutAction = "Paid"
+	Proposal        internal.CallbackoutAction = internal.ExtProposal
+	RequestApproval internal.CallbackoutAction = internal.ExtRequestApproval
+	Emit            internal.CallbackoutAction = internal.ExtEmit
+	Paid            internal.CallbackoutAction = internal.ExtPaid
+	EmitRemittance  internal.CallbackoutAction = internal.ExtEmitRemittance
 )
 
-func Execute(node *models.NetworkNode, policy models.Policy, actions ...CallbackoutAction) {
+func Execute(node *models.NetworkNode, policy models.Policy, rawAction internal.CallbackoutAction) {
 	var (
 		client CallbackClient
 		err    error
@@ -32,6 +31,8 @@ func Execute(node *models.NetworkNode, policy models.Policy, actions ...Callback
 		log.Println(err)
 		return
 	}
+
+	actions := client.DecodeAction(rawAction)
 
 	for _, action := range actions {
 		switch action {
