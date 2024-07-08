@@ -1,6 +1,8 @@
 package renew
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"log"
 	"net/http"
 )
@@ -20,7 +22,13 @@ func GetRenewPoliciesFx(w http.ResponseWriter, r *http.Request) (string, interfa
 		log.Printf("key: %s, value: %s", key, value)
 	}
 
-	queryBuilder := NewBigQueryQueryBuilder()
+	queryBuilder := NewBigQueryQueryBuilder(func() string {
+		b := make([]byte, 8)
+		if _, err := rand.Read(b); err != nil {
+			log.Fatalf("Failed to generate random string: %v", err)
+		}
+		return hex.EncodeToString(b)
+	})
 	q, _ := queryBuilder.BuildQuery(params)
 
 	log.Printf("resulting query: %s", q)

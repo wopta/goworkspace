@@ -8,7 +8,9 @@ import (
 )
 
 func TestQueryBuilder(t *testing.T) {
-	qb := renew.NewBigQueryQueryBuilder()
+	qb := renew.NewBigQueryQueryBuilder(func() string {
+		return "test"
+	})
 	var testCases = []struct {
 		name   string
 		params map[string]string
@@ -20,7 +22,7 @@ func TestQueryBuilder(t *testing.T) {
 				"codeCompany":       "100100",
 				"insuredFiscalCode": "LLLRRR85E05R94Z330F",
 			},
-			`(JSON_VALUE(p.data, '$.codeCompany') = "100100")`,
+			`(codeCompany = "@test")`,
 		},
 		{
 			"fiscalCode overcome third-level parameters",
@@ -28,7 +30,7 @@ func TestQueryBuilder(t *testing.T) {
 				"insuredFiscalCode": "LLLRRR85E05R94Z330F",
 				"producerCode":      "a1b2c3d4",
 			},
-			`(JSON_VALUE(p.data, '$.assets[0].person.fiscalCode') = "LLLRRR85E05R94Z330F")`,
+			`(JSON_VALUE(p.data, '$.assets[0].person.fiscalCode') = "@test")`,
 		},
 		{
 			"paid renew policies",
@@ -67,7 +69,7 @@ func TestQueryBuilder(t *testing.T) {
 				"status":        "paid",
 				"payment":       "recurrent",
 			},
-			`(JSON_VALUE(p.data, '$.startDate') >= "2024-07-04") AND (JSON_VALUE(p.data, '$.startDate') <= "2024-07-14") AND (JSON_VALUE(p.data, '$.producerCode') = "a1b2c3d4") AND (((isDeleted = false OR IS NULL) AND (isPay = true))) AND (((isDeleted = false OR IS NULL) AND (hasMandate = true)))`,
+			`(startDate >= "@test") AND (startDate <= "@test") AND (producerCode = "@test") AND (((isDeleted = false OR IS NULL) AND (isPay = true))) AND (((isDeleted = false OR IS NULL) AND (hasMandate = true)))`,
 		},
 		{
 			"combine parameters from differents level",
@@ -77,7 +79,7 @@ func TestQueryBuilder(t *testing.T) {
 				"startDateTo":   "2024-07-14",
 				"codeCompany":   "100100",
 			},
-			`(JSON_VALUE(p.data, '$.codeCompany') = "100100")`,
+			`(codeCompany = "@test")`,
 		},
 	}
 

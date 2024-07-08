@@ -11,7 +11,7 @@ import (
 	"github.com/wopta/goworkspace/lib"
 )
 
-type bigQueryWhereClauseBuilder func(value string) (string, bigquery.QueryParameter)
+type bigQueryWhereClauseBuilder func(string, func() string) (string, bigquery.QueryParameter)
 
 var (
 	paramsHierarchy = []map[string][]string{
@@ -32,85 +32,86 @@ var (
 	}
 
 	paramsWhereClause = map[string]bigQueryWhereClauseBuilder{
-		"codeCompany": func(value string) (string, bigquery.QueryParameter) {
-			rnd := generateRandomString()
+		"codeCompany": func(value string, generator func() string) (string, bigquery.QueryParameter) {
+			rnd := generator()
 			return fmt.Sprintf(`(codeCompany = "@%s")`, rnd), bigquery.QueryParameter{
 				Name:  rnd,
 				Value: value,
 			}
 		},
 
-		"insuredFiscalCode": func(value string) (string, bigquery.QueryParameter) {
-			rnd := generateRandomString()
-			return fmt.Sprintf(`(JSON_VALUE(p.data, '$.assets[0].person.fiscalCode' = "@%s")`, rnd), bigquery.QueryParameter{
+		"insuredFiscalCode": func(value string, generator func() string) (string, bigquery.QueryParameter) {
+			rnd := generator()
+			return fmt.Sprintf(`(JSON_VALUE(p.data, '$.assets[0].person.fiscalCode') = "@%s")`, rnd), bigquery.QueryParameter{
 				Name:  rnd,
 				Value: value,
 			}
 		},
 
-		"contractorName": func(value string) (string, bigquery.QueryParameter) {
-			rnd := generateRandomString()
+		"contractorName": func(value string, generator func() string) (string, bigquery.QueryParameter) {
+			rnd := generator()
 			return fmt.Sprintf(`(REGEXP_CONTAINS(LOWER(JSON_VALUE(p.data, '$.contractor.name')), LOWER(@%s))`, rnd), bigquery.QueryParameter{
 				Name:  rnd,
 				Value: value,
 			}
 		},
-		"contractorSurname": func(value string) (string, bigquery.QueryParameter) {
-			rnd := generateRandomString()
+		"contractorSurname": func(value string, generator func() string) (string, bigquery.QueryParameter) {
+			rnd := generator()
 			return fmt.Sprintf(`(REGEXP_CONTAINS(LOWER(JSON_VALUE(p.data, '$.contractor.surname')), LOWER(@%s))`, rnd), bigquery.QueryParameter{
 				Name:  rnd,
 				Value: value,
 			}
 		},
 
-		"startDateFrom": func(value string) (string, bigquery.QueryParameter) {
-			rnd := generateRandomString()
+		"startDateFrom": func(value string, generator func() string) (string, bigquery.QueryParameter) {
+			rnd := generator()
 			return fmt.Sprintf(`(startDate >= "@%s")`, rnd), bigquery.QueryParameter{
 				Name:  rnd,
 				Value: value,
 			}
 		},
-		"startDateTo": func(value string) (string, bigquery.QueryParameter) {
-			rnd := generateRandomString()
+		"startDateTo": func(value string, generator func() string) (string, bigquery.QueryParameter) {
+			rnd := generator()
 			return fmt.Sprintf(`(startDate <= "@%s")`, rnd), bigquery.QueryParameter{
 				Name:  rnd,
 				Value: value,
 			}
 		},
-		"company": func(value string) (string, bigquery.QueryParameter) {
-			rnd := generateRandomString()
+		"company": func(value string, generator func() string) (string, bigquery.QueryParameter) {
+			rnd := generator()
 			return fmt.Sprintf(`(company = LOWER(@%s))`, rnd), bigquery.QueryParameter{
 				Name:  rnd,
 				Value: value,
 			}
 		},
-		"product": func(value string) (string, bigquery.QueryParameter) {
-			rnd := generateRandomString()
+		"product": func(value string, generator func() string) (string, bigquery.QueryParameter) {
+			rnd := generator()
 			return fmt.Sprintf(`(product = LOWER(@%s))`, rnd), bigquery.QueryParameter{
 				Name:  rnd,
 				Value: value,
 			}
 		},
-		"producerCode": func(value string) (string, bigquery.QueryParameter) {
-			rnd := generateRandomString()
+		"producerCode": func(value string, generator func() string) (string, bigquery.QueryParameter) {
+			rnd := generator()
 			return fmt.Sprintf(`(producerCode = "@%s")`, rnd), bigquery.QueryParameter{
 				Name:  rnd,
 				Value: value,
 			}
 		},
-		"paid": func(value string) (string, bigquery.QueryParameter) {
+		"paid": func(value string, generator func() string) (string, bigquery.QueryParameter) {
 			return fmt.Sprintf(`((isDeleted = false OR IS NULL) AND (isPay = true))`), bigquery.QueryParameter{}
 		},
-		"unpaid": func(value string) (string, bigquery.QueryParameter) {
+		"unpaid": func(value string, _ func() string) (string, bigquery.QueryParameter) {
 			return fmt.Sprintf(`((isDeleted = false OR IS NULL) AND (isPay = false))`), bigquery.QueryParameter{}
 		},
-		"recurrent": func(value string) (string, bigquery.QueryParameter) {
+		"recurrent": func(value string, _ func() string) (string, bigquery.QueryParameter) {
 			return fmt.Sprintf(`((isDeleted = false OR IS NULL) AND (hasMandate = true))`), bigquery.QueryParameter{}
 		},
-		"notRecurrent": func(value string) (string, bigquery.QueryParameter) {
+		"notRecurrent": func(value string, _ func() string) (string, bigquery.QueryParameter) {
 			return fmt.Sprintf(`((isDeleted = false OR IS NULL) AND (hasMandate = false))`), bigquery.QueryParameter{}
 		},
 	}
+
 	orClauses = []string{"status", "payment"}
 )
 
@@ -126,10 +127,16 @@ type QueryBuilder interface {
 	BuildQuery(map[string]string) string
 }
 
-type BigQueryQueryBuilder struct{}
+type BigQueryQueryBuilder struct {
+	// TableName string
+	// TableAlias string
+	IdentifierGenerator func() string
+}
 
-func NewBigQueryQueryBuilder() BigQueryQueryBuilder {
-	return BigQueryQueryBuilder{}
+func NewBigQueryQueryBuilder(identifierGenerator func() string) BigQueryQueryBuilder {
+	return BigQueryQueryBuilder{
+		IdentifierGenerator: identifierGenerator,
+	}
 }
 
 func (qb *BigQueryQueryBuilder) getAllowedParams(params map[string]string) []string {
@@ -169,7 +176,7 @@ func (qb *BigQueryQueryBuilder) BuildQuery(params map[string]string) (string, []
 
 	filteredParams := qb.filterParams(params, allowedParams)
 
-	paramsKeys := lib.GetMapKeys(params)
+	paramsKeys := lib.GetMapKeys(filteredParams)
 	for _, paramKey := range allowedParams {
 		if !lib.SliceContains(paramsKeys, paramKey) || filteredParams[paramKey] == "" {
 			continue
@@ -178,13 +185,13 @@ func (qb *BigQueryQueryBuilder) BuildQuery(params map[string]string) (string, []
 			tmpWhereClauses := make([]string, 0)
 			statusList := strings.Split(filteredParams[paramKey], ",")
 			for _, status := range statusList {
-				whereClause, queryParam := paramsWhereClause[status]("")
+				whereClause, _ := paramsWhereClause[status]("", nil)
 				tmpWhereClauses = append(tmpWhereClauses, whereClause)
-				queryParams = append(queryParams, queryParam)
+				//queryParams = append(queryParams, queryParam)
 			}
 			whereClauses = append(whereClauses, "("+strings.Join(tmpWhereClauses, " OR ")+")")
 		} else {
-			whereClause, queryParam := paramsWhereClause[paramKey](filteredParams[paramKey])
+			whereClause, queryParam := paramsWhereClause[paramKey](filteredParams[paramKey], qb.IdentifierGenerator)
 			whereClauses = append(whereClauses, whereClause)
 			queryParams = append(queryParams, queryParam)
 		}
