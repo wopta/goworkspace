@@ -8,7 +8,7 @@ import (
 )
 
 func TestQueryBuilder(t *testing.T) {
-	qb := renew.NewBigQueryQueryBuilder(func() string {
+	qb := renew.NewBigQueryQueryBuilder("renewPoliciesView", "rp", func() string {
 		return "test"
 	})
 	var testCases = []struct {
@@ -22,7 +22,7 @@ func TestQueryBuilder(t *testing.T) {
 				"codeCompany":       "100100",
 				"insuredFiscalCode": "LLLRRR85E05R94Z330F",
 			},
-			`(codeCompany = "@test")`,
+			`(codeCompany = "@test") LIMIT 10`,
 		},
 		{
 			"fiscalCode overcome third-level parameters",
@@ -30,35 +30,35 @@ func TestQueryBuilder(t *testing.T) {
 				"insuredFiscalCode": "LLLRRR85E05R94Z330F",
 				"producerCode":      "a1b2c3d4",
 			},
-			`(JSON_VALUE(p.data, '$.assets[0].person.fiscalCode') = "@test")`,
+			`(JSON_VALUE(p.data, '$.assets[0].person.fiscalCode') = "@test") LIMIT 10`,
 		},
 		{
 			"paid renew policies",
 			map[string]string{
 				"status": "paid",
 			},
-			"(((isDeleted = false OR IS NULL) AND (isPay = true)))",
+			"(((isDeleted = false OR IS NULL) AND (isPay = true))) LIMIT 10",
 		},
 		{
 			"not paid renew policies",
 			map[string]string{
 				"status": "unpaid",
 			},
-			"(((isDeleted = false OR IS NULL) AND (isPay = false)))",
+			"(((isDeleted = false OR IS NULL) AND (isPay = false))) LIMIT 10",
 		},
 		{
 			"renew policies with mandate active",
 			map[string]string{
 				"payment": "recurrent",
 			},
-			"(((isDeleted = false OR IS NULL) AND (hasMandate = true)))",
+			"(((isDeleted = false OR IS NULL) AND (hasMandate = true))) LIMIT 10",
 		},
 		{
 			"renew policies with mandate non active",
 			map[string]string{
 				"payment": "notRecurrent",
 			},
-			"(((isDeleted = false OR IS NULL) AND (hasMandate = false)))",
+			"(((isDeleted = false OR IS NULL) AND (hasMandate = false))) LIMIT 10",
 		},
 		{
 			"combine third-level parameters",
@@ -69,7 +69,7 @@ func TestQueryBuilder(t *testing.T) {
 				"status":        "paid",
 				"payment":       "recurrent",
 			},
-			`(startDate >= "@test") AND (startDate <= "@test") AND (producerCode = "@test") AND (((isDeleted = false OR IS NULL) AND (isPay = true))) AND (((isDeleted = false OR IS NULL) AND (hasMandate = true)))`,
+			`(startDate >= "@test") AND (startDate <= "@test") AND (producerCode = "@test") AND (((isDeleted = false OR IS NULL) AND (isPay = true))) AND (((isDeleted = false OR IS NULL) AND (hasMandate = true))) LIMIT 10`,
 		},
 		{
 			"combine parameters from differents level",
@@ -79,7 +79,7 @@ func TestQueryBuilder(t *testing.T) {
 				"startDateTo":   "2024-07-14",
 				"codeCompany":   "100100",
 			},
-			`(codeCompany = "@test")`,
+			`(codeCompany = "@test") LIMIT 10`,
 		},
 	}
 
@@ -87,8 +87,10 @@ func TestQueryBuilder(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			got, _ := qb.BuildQuery(tc.params)
 
-			if !strings.EqualFold(got, tc.want) {
-				t.Errorf("expected: %s, got: %s", tc.want, got)
+			whereClauses := strings.TrimSpace(strings.Split(got, "WHERE ")[1])
+
+			if !strings.EqualFold(whereClauses, tc.want) {
+				t.Errorf("expected: %s, got: %s", tc.want, whereClauses)
 			}
 		})
 	}

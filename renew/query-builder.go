@@ -1,10 +1,12 @@
 package renew
 
 import (
+	"bytes"
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
 
 	"cloud.google.com/go/bigquery"
@@ -16,6 +18,8 @@ type bigQueryWhereClauseBuilder func(string, func() string) (string, bigquery.Qu
 var (
 	paramsHierarchy = []map[string][]string{
 		{"codeCompany": []string{"codeCompany"}},
+
+		{"proposalNumber": []string{"proposalNumber"}},
 
 		{"insuredFiscalCode": []string{"insuredFiscalCode"}},
 
@@ -31,85 +35,25 @@ var (
 		{"payment": []string{"startDateFrom", "startDateTo", "company", "product", "producerCode", "reserved", "status", "payment"}},
 	}
 
-	paramsWhereClause = map[string]bigQueryWhereClauseBuilder{
-		"codeCompany": func(value string, generator func() string) (string, bigquery.QueryParameter) {
-			rnd := generator()
-			return fmt.Sprintf(`(codeCompany = "@%s")`, rnd), bigquery.QueryParameter{
-				Name:  rnd,
-				Value: value,
-			}
-		},
+	paramsWhereClause = map[string]string{
+		"codeCompany": "(codeCompany = @%s)",
 
-		"insuredFiscalCode": func(value string, generator func() string) (string, bigquery.QueryParameter) {
-			rnd := generator()
-			return fmt.Sprintf(`(JSON_VALUE(p.data, '$.assets[0].person.fiscalCode') = "@%s")`, rnd), bigquery.QueryParameter{
-				Name:  rnd,
-				Value: value,
-			}
-		},
+		"proposalNumber": "(proposalNumber = @%s)",
 
-		"contractorName": func(value string, generator func() string) (string, bigquery.QueryParameter) {
-			rnd := generator()
-			return fmt.Sprintf(`(REGEXP_CONTAINS(LOWER(JSON_VALUE(p.data, '$.contractor.name')), LOWER(@%s))`, rnd), bigquery.QueryParameter{
-				Name:  rnd,
-				Value: value,
-			}
-		},
-		"contractorSurname": func(value string, generator func() string) (string, bigquery.QueryParameter) {
-			rnd := generator()
-			return fmt.Sprintf(`(REGEXP_CONTAINS(LOWER(JSON_VALUE(p.data, '$.contractor.surname')), LOWER(@%s))`, rnd), bigquery.QueryParameter{
-				Name:  rnd,
-				Value: value,
-			}
-		},
+		"insuredFiscalCode": "(JSON_VALUE(p.data, '$.assets[0].person.fiscalCode') = @%s)",
 
-		"startDateFrom": func(value string, generator func() string) (string, bigquery.QueryParameter) {
-			rnd := generator()
-			return fmt.Sprintf(`(startDate >= "@%s")`, rnd), bigquery.QueryParameter{
-				Name:  rnd,
-				Value: value,
-			}
-		},
-		"startDateTo": func(value string, generator func() string) (string, bigquery.QueryParameter) {
-			rnd := generator()
-			return fmt.Sprintf(`(startDate <= "@%s")`, rnd), bigquery.QueryParameter{
-				Name:  rnd,
-				Value: value,
-			}
-		},
-		"company": func(value string, generator func() string) (string, bigquery.QueryParameter) {
-			rnd := generator()
-			return fmt.Sprintf(`(company = LOWER(@%s))`, rnd), bigquery.QueryParameter{
-				Name:  rnd,
-				Value: value,
-			}
-		},
-		"product": func(value string, generator func() string) (string, bigquery.QueryParameter) {
-			rnd := generator()
-			return fmt.Sprintf(`(product = LOWER(@%s))`, rnd), bigquery.QueryParameter{
-				Name:  rnd,
-				Value: value,
-			}
-		},
-		"producerCode": func(value string, generator func() string) (string, bigquery.QueryParameter) {
-			rnd := generator()
-			return fmt.Sprintf(`(producerCode = "@%s")`, rnd), bigquery.QueryParameter{
-				Name:  rnd,
-				Value: value,
-			}
-		},
-		"paid": func(value string, generator func() string) (string, bigquery.QueryParameter) {
-			return fmt.Sprintf(`((isDeleted = false OR IS NULL) AND (isPay = true))`), bigquery.QueryParameter{}
-		},
-		"unpaid": func(value string, _ func() string) (string, bigquery.QueryParameter) {
-			return fmt.Sprintf(`((isDeleted = false OR IS NULL) AND (isPay = false))`), bigquery.QueryParameter{}
-		},
-		"recurrent": func(value string, _ func() string) (string, bigquery.QueryParameter) {
-			return fmt.Sprintf(`((isDeleted = false OR IS NULL) AND (hasMandate = true))`), bigquery.QueryParameter{}
-		},
-		"notRecurrent": func(value string, _ func() string) (string, bigquery.QueryParameter) {
-			return fmt.Sprintf(`((isDeleted = false OR IS NULL) AND (hasMandate = false))`), bigquery.QueryParameter{}
-		},
+		"contractorName":    "(REGEXP_CONTAINS(LOWER(JSON_VALUE(p.data, '$.contractor.name')), LOWER(@%s)))",
+		"contractorSurname": "(REGEXP_CONTAINS(LOWER(JSON_VALUE(p.data, '$.contractor.surname')), LOWER(@%s)))",
+
+		"startDateFrom": "(startDate >= @%s)",
+		"startDateTo":   "(startDate <= @%s)",
+		"company":       "(company = LOWER(@%s))",
+		"product":       "(product = LOWER(@%s))",
+		"producerCode":  "(producerCode = @%s)",
+		"paid":          "((isDeleted = false OR isDeleted IS NULL) AND (isPay = true))",
+		"unpaid":        "((isDeleted = false OR isDeleted IS NULL) AND (isPay = false))",
+		"recurrent":     "((isDeleted = false OR isDeleted IS NULL) AND (hasMandate = true))",
+		"notRecurrent":  "((isDeleted = false OR isDeleted IS NULL) AND (hasMandate = false OR hasMandate IS NULL))",
 	}
 
 	orClauses = []string{"status", "payment"}
@@ -124,17 +68,19 @@ func generateRandomString() string {
 }
 
 type QueryBuilder interface {
-	BuildQuery(map[string]string) string
+	BuildQuery(map[string]string) (string, map[string]interface{})
 }
 
 type BigQueryQueryBuilder struct {
-	// TableName string
-	// TableAlias string
+	TableName           string
+	TableAlias          string
 	IdentifierGenerator func() string
 }
 
-func NewBigQueryQueryBuilder(identifierGenerator func() string) BigQueryQueryBuilder {
+func NewBigQueryQueryBuilder(tableName, tableAlias string, identifierGenerator func() string) BigQueryQueryBuilder {
 	return BigQueryQueryBuilder{
+		TableName:           tableName,
+		TableAlias:          tableAlias,
 		IdentifierGenerator: identifierGenerator,
 	}
 }
@@ -161,12 +107,34 @@ func (qb *BigQueryQueryBuilder) filterParams(params map[string]string, allowedPa
 	return params
 }
 
-func (qb *BigQueryQueryBuilder) BuildQuery(params map[string]string) (string, []bigquery.QueryParameter) {
+func (qb *BigQueryQueryBuilder) BuildQuery(params map[string]string) (string, map[string]interface{}) {
 	var (
-		queryParams   = make([]bigquery.QueryParameter, 0)
+		err           error
+		limit         = 10
+		query         bytes.Buffer
+		queryParams   = make(map[string]interface{})
 		whereClauses  = make([]string, 0)
 		allowedParams = make([]string, 0)
 	)
+
+	// TODO: handle table alias
+	query.WriteString(fmt.Sprintf("SELECT p.uid, p.name AS productName, p.codeCompany, CAST(p.proposalNumber AS INT64) AS proposalNumber, "+
+		"p.nameDesc,p.status, RTRIM(COALESCE(JSON_VALUE(p.data, '$.contractor.name'), '') || ' ' || "+
+		"COALESCE(JSON_VALUE(p.data, '$.contractor.surname'), '')) AS contractor, "+
+		"p.priceGross AS price, p.priceGrossMonthly AS priceMonthly, COALESCE(nn.name, '') AS producer, COALESCE(p.producerCode, '') AS producerCode, p.startDate, "+
+		"p.endDate, p.paymentSplit "+
+		"FROM `wopta.%s` %s "+
+		"LEFT JOIN `wopta.networkNodesView` nn ON nn.uid = p.producerUid "+
+		"WHERE ", qb.TableName, qb.TableAlias))
+
+	if val, ok := params["limit"]; ok {
+		limit, err = strconv.Atoi(val)
+		if err != nil {
+			log.Printf("Failed to parse limit: %v", err)
+			return "", nil
+		}
+		delete(params, "limit")
+	}
 
 	allowedParams = qb.getAllowedParams(params)
 	if allowedParams == nil {
@@ -176,25 +144,36 @@ func (qb *BigQueryQueryBuilder) BuildQuery(params map[string]string) (string, []
 
 	filteredParams := qb.filterParams(params, allowedParams)
 
-	paramsKeys := lib.GetMapKeys(filteredParams)
 	for _, paramKey := range allowedParams {
-		if !lib.SliceContains(paramsKeys, paramKey) || filteredParams[paramKey] == "" {
-			continue
-		}
-		if lib.SliceContains(orClauses, paramKey) {
-			tmpWhereClauses := make([]string, 0)
-			statusList := strings.Split(filteredParams[paramKey], ",")
-			for _, status := range statusList {
-				whereClause, _ := paramsWhereClause[status]("", nil)
-				tmpWhereClauses = append(tmpWhereClauses, whereClause)
-				//queryParams = append(queryParams, queryParam)
+		if val, ok := filteredParams[paramKey]; ok && val != "" {
+			if lib.SliceContains(orClauses, paramKey) {
+				tmpWhereClauses := make([]string, 0)
+				statusList := strings.Split(filteredParams[paramKey], ",")
+				for _, status := range statusList {
+					tmpWhereClauses = append(tmpWhereClauses, paramsWhereClause[status])
+				}
+				whereClauses = append(whereClauses, "("+strings.Join(tmpWhereClauses, " OR ")+")")
+				continue
 			}
-			whereClauses = append(whereClauses, "("+strings.Join(tmpWhereClauses, " OR ")+")")
-		} else {
-			whereClause, queryParam := paramsWhereClause[paramKey](filteredParams[paramKey], qb.IdentifierGenerator)
+
+			identifier := qb.IdentifierGenerator()
+			format := paramsWhereClause[paramKey]
+			whereClause := fmt.Sprintf(format, identifier)
 			whereClauses = append(whereClauses, whereClause)
-			queryParams = append(queryParams, queryParam)
+			if paramKey == "proposalNumber" {
+				parsedValue, err := strconv.ParseInt(filteredParams[paramKey], 10, 64)
+				if err != nil {
+					log.Printf("Failed to parse proposalNumber: %v", err)
+				}
+				queryParams[identifier] = parsedValue
+				continue
+			}
+			queryParams[identifier] = filteredParams[paramKey]
 		}
 	}
-	return strings.Join(whereClauses, " AND "), queryParams
+
+	query.WriteString(strings.Join(whereClauses, " AND "))
+	query.WriteString(fmt.Sprintf(" LIMIT %d", limit))
+
+	return query.String(), queryParams
 }
