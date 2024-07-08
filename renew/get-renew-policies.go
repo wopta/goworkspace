@@ -2,9 +2,7 @@ package renew
 
 import (
 	"encoding/json"
-	"math/rand"
 	"net/http"
-	"time"
 
 	"cloud.google.com/go/civil"
 	"github.com/wopta/goworkspace/lib"
@@ -43,20 +41,7 @@ func GetRenewPoliciesFx(w http.ResponseWriter, r *http.Request) (string, interfa
 		paramsMap[key] = values[0]
 	}
 
-	queryBuilder := NewBigQueryQueryBuilder("renewPolicyView", "p", func() string {
-		var (
-			letters  = []rune("abcdefghijklmnopqrstuvwxyz")
-			alphanum = []rune("123456789abcdefghijklmnopqrstuvwxyz")
-		)
-		rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
-
-		s := make([]rune, 12)
-		s[0] = letters[rnd.Intn(len(letters))]
-		for i := range s[1:] {
-			s[i+1] = alphanum[rnd.Intn(len(alphanum))]
-		}
-		return string(s)
-	})
+	queryBuilder := NewBigQueryQueryBuilder(lib.RenewPolicyViewCollection, "p")
 	query, queryParams := queryBuilder.BuildQuery(paramsMap)
 
 	policies, err := lib.QueryParametrizedRowsBigQuery[PolicyInfo](query, queryParams)

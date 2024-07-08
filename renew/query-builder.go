@@ -36,20 +36,20 @@ var (
 	}
 
 	paramsWhereClause = map[string]string{
-		"codeCompany": "(codeCompany = @%s)",
+		"codeCompany": "(codeCompany = @codeCompany)",
 
-		"proposalNumber": "(proposalNumber = @%s)",
+		"proposalNumber": "(proposalNumber = @proposalNumber)",
 
-		"insuredFiscalCode": "(JSON_VALUE(p.data, '$.assets[0].person.fiscalCode') = @%s)",
+		"insuredFiscalCode": "(JSON_VALUE(p.data, '$.assets[0].person.fiscalCode') = @insuredFiscalCode)",
 
-		"contractorName":    "(REGEXP_CONTAINS(LOWER(JSON_VALUE(p.data, '$.contractor.name')), LOWER(@%s)))",
-		"contractorSurname": "(REGEXP_CONTAINS(LOWER(JSON_VALUE(p.data, '$.contractor.surname')), LOWER(@%s)))",
+		"contractorName":    "(REGEXP_CONTAINS(LOWER(JSON_VALUE(p.data, '$.contractor.name')), LOWER(@contractorName)))",
+		"contractorSurname": "(REGEXP_CONTAINS(LOWER(JSON_VALUE(p.data, '$.contractor.surname')), LOWER(@contractorSurname)))",
 
-		"startDateFrom": "(startDate >= @%s)",
-		"startDateTo":   "(startDate <= @%s)",
-		"company":       "(company = LOWER(@%s))",
-		"product":       "(product = LOWER(@%s))",
-		"producerCode":  "(producerCode = @%s)",
+		"startDateFrom": "(startDate >= @startDateFrom)",
+		"startDateTo":   "(startDate <= @startDateTo)",
+		"company":       "(company = LOWER(@company))",
+		"product":       "(product = LOWER(@product))",
+		"producerCode":  "(producerCode = @producerCode)",
 		"paid":          "((isDeleted = false OR isDeleted IS NULL) AND (isPay = true))",
 		"unpaid":        "((isDeleted = false OR isDeleted IS NULL) AND (isPay = false))",
 		"recurrent":     "((isDeleted = false OR isDeleted IS NULL) AND (hasMandate = true))",
@@ -72,16 +72,15 @@ type QueryBuilder interface {
 }
 
 type BigQueryQueryBuilder struct {
-	TableName           string
-	TableAlias          string
-	IdentifierGenerator func() string
+	tableName           string
+	tableAlias          string
+	identifierGenerator func() string
 }
 
-func NewBigQueryQueryBuilder(tableName, tableAlias string, identifierGenerator func() string) BigQueryQueryBuilder {
+func NewBigQueryQueryBuilder(tableName, tableAlias string) BigQueryQueryBuilder {
 	return BigQueryQueryBuilder{
-		TableName:           tableName,
-		TableAlias:          tableAlias,
-		IdentifierGenerator: identifierGenerator,
+		tableName:  tableName,
+		tableAlias: tableAlias,
 	}
 }
 
@@ -125,7 +124,7 @@ func (qb *BigQueryQueryBuilder) BuildQuery(params map[string]string) (string, ma
 		"p.endDate, p.paymentSplit "+
 		"FROM `wopta.%s` %s "+
 		"LEFT JOIN `wopta.networkNodesView` nn ON nn.uid = p.producerUid "+
-		"WHERE ", qb.TableName, qb.TableAlias))
+		"WHERE ", qb.tableName, qb.tableAlias))
 
 	if val, ok := params["limit"]; ok {
 		limit, err = strconv.Atoi(val)
@@ -153,22 +152,18 @@ func (qb *BigQueryQueryBuilder) BuildQuery(params map[string]string) (string, ma
 					tmpWhereClauses = append(tmpWhereClauses, paramsWhereClause[status])
 				}
 				whereClauses = append(whereClauses, "("+strings.Join(tmpWhereClauses, " OR ")+")")
-				continue
-			}
-
-			identifier := qb.IdentifierGenerator()
-			format := paramsWhereClause[paramKey]
-			whereClause := fmt.Sprintf(format, identifier)
-			whereClauses = append(whereClauses, whereClause)
-			if paramKey == "proposalNumber" {
-				parsedValue, err := strconv.ParseInt(filteredParams[paramKey], 10, 64)
-				if err != nil {
-					log.Printf("Failed to parse proposalNumber: %v", err)
+			} else {
+				var value interface{} = val
+				whereClauses = append(whereClauses, paramsWhereClause[paramKey])
+				if paramKey == "proposalNumber" {
+					parsedValue, err := strconv.ParseInt(filteredParams[paramKey], 10, 64)
+					if err != nil {
+						log.Printf("Failed to parse proposalNumber: %v", err)
+					}
+					value = parsedValue
 				}
-				queryParams[identifier] = parsedValue
-				continue
+				queryParams[paramKey] = value
 			}
-			queryParams[identifier] = filteredParams[paramKey]
 		}
 	}
 
