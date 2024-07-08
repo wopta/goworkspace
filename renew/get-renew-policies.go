@@ -1,11 +1,10 @@
 package renew
 
 import (
-	"crypto/rand"
-	"encoding/hex"
 	"encoding/json"
-	"log"
+	"math/rand"
 	"net/http"
+	"time"
 
 	"cloud.google.com/go/civil"
 	"github.com/wopta/goworkspace/lib"
@@ -45,16 +44,24 @@ func GetRenewPoliciesFx(w http.ResponseWriter, r *http.Request) (string, interfa
 	}
 
 	queryBuilder := NewBigQueryQueryBuilder("renewPolicyView", "p", func() string {
-		b := make([]byte, 8)
-		if _, err := rand.Read(b); err != nil {
-			log.Fatalf("Failed to generate random string: %v", err)
+		var (
+			letters  = []rune("abcdefghijklmnopqrstuvwxyz")
+			alphanum = []rune("123456789abcdefghijklmnopqrstuvwxyz")
+		)
+		rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
+
+		s := make([]rune, 12)
+		s[0] = letters[rnd.Intn(len(letters))]
+		for i := range s[1:] {
+			s[i+1] = alphanum[rnd.Intn(len(alphanum))]
 		}
-		return hex.EncodeToString(b)
+		return string(s)
 	})
 	query, queryParams := queryBuilder.BuildQuery(paramsMap)
 
 	policies, err := lib.QueryParametrizedRowsBigQuery[PolicyInfo](query, queryParams)
 	if err != nil {
+
 		return "", nil, err
 	}
 
