@@ -57,7 +57,7 @@ func TestQueryBuilder(t *testing.T) {
 				whereClause string
 				params      map[string]interface{}
 			}{
-				whereClause: "(JSON_VALUE(p.data, '$.assets[0].person.fiscalCode') = @insuredFiscalCode) LIMIT 10",
+				whereClause: "(JSON_VALUE(rp.data, '$.assets[0].person.fiscalCode') = @insuredFiscalCode) LIMIT 10",
 				params:      map[string]interface{}{"insuredFiscalCode": "LLLRRR85E05R94Z330F"}},
 		},
 		{

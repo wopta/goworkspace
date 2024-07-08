@@ -2,18 +2,13 @@ package renew
 
 import (
 	"bytes"
-	"crypto/rand"
-	"encoding/hex"
 	"fmt"
 	"log"
 	"strconv"
 	"strings"
 
-	"cloud.google.com/go/bigquery"
 	"github.com/wopta/goworkspace/lib"
 )
-
-type bigQueryWhereClauseBuilder func(string, func() string) (string, bigquery.QueryParameter)
 
 var (
 	paramsHierarchy = []map[string][]string{
@@ -40,10 +35,10 @@ var (
 
 		"proposalNumber": "(proposalNumber = @proposalNumber)",
 
-		"insuredFiscalCode": "(JSON_VALUE(p.data, '$.assets[0].person.fiscalCode') = @insuredFiscalCode)",
+		"insuredFiscalCode": "(JSON_VALUE(**tableAlias**.data, '$.assets[0].person.fiscalCode') = @insuredFiscalCode)",
 
-		"contractorName":    "(REGEXP_CONTAINS(LOWER(JSON_VALUE(p.data, '$.contractor.name')), LOWER(@contractorName)))",
-		"contractorSurname": "(REGEXP_CONTAINS(LOWER(JSON_VALUE(p.data, '$.contractor.surname')), LOWER(@contractorSurname)))",
+		"contractorName":    "(REGEXP_CONTAINS(LOWER(JSON_VALUE(**tableAlias**.data, '$.contractor.name')), LOWER(@contractorName)))",
+		"contractorSurname": "(REGEXP_CONTAINS(LOWER(JSON_VALUE(**tableAlias**.data, '$.contractor.surname')), LOWER(@contractorSurname)))",
 
 		"startDateFrom": "(startDate >= @startDateFrom)",
 		"startDateTo":   "(startDate <= @startDateTo)",
@@ -59,22 +54,13 @@ var (
 	orClauses = []string{"status", "payment"}
 )
 
-func generateRandomString() string {
-	b := make([]byte, 8)
-	if _, err := rand.Read(b); err != nil {
-		log.Fatalf("Failed to generate random string: %v", err)
-	}
-	return hex.EncodeToString(b)
-}
-
 type QueryBuilder interface {
 	BuildQuery(map[string]string) (string, map[string]interface{})
 }
 
 type BigQueryQueryBuilder struct {
-	tableName           string
-	tableAlias          string
-	identifierGenerator func() string
+	tableName  string
+	tableAlias string
 }
 
 func NewBigQueryQueryBuilder(tableName, tableAlias string) BigQueryQueryBuilder {
@@ -110,21 +96,21 @@ func (qb *BigQueryQueryBuilder) BuildQuery(params map[string]string) (string, ma
 	var (
 		err           error
 		limit         = 10
-		query         bytes.Buffer
+		rawQuery      bytes.Buffer
 		queryParams   = make(map[string]interface{})
 		whereClauses  = make([]string, 0)
 		allowedParams = make([]string, 0)
 	)
 
 	// TODO: handle table alias
-	query.WriteString(fmt.Sprintf("SELECT p.uid, p.name AS productName, p.codeCompany, CAST(p.proposalNumber AS INT64) AS proposalNumber, "+
-		"p.nameDesc,p.status, RTRIM(COALESCE(JSON_VALUE(p.data, '$.contractor.name'), '') || ' ' || "+
-		"COALESCE(JSON_VALUE(p.data, '$.contractor.surname'), '')) AS contractor, "+
-		"p.priceGross AS price, p.priceGrossMonthly AS priceMonthly, COALESCE(nn.name, '') AS producer, COALESCE(p.producerCode, '') AS producerCode, p.startDate, "+
-		"p.endDate, p.paymentSplit "+
-		"FROM `wopta.%s` %s "+
-		"LEFT JOIN `wopta.networkNodesView` nn ON nn.uid = p.producerUid "+
-		"WHERE ", qb.tableName, qb.tableAlias))
+	rawQuery.WriteString("SELECT **tableAlias**.uid, **tableAlias**.name AS productName, **tableAlias**.codeCompany, CAST(**tableAlias**.proposalNumber AS INT64) AS proposalNumber, " +
+		"**tableAlias**.nameDesc,**tableAlias**.status, RTRIM(COALESCE(JSON_VALUE(**tableAlias**.data, '$.contractor.name'), '') || ' ' || " +
+		"COALESCE(JSON_VALUE(**tableAlias**.data, '$.contractor.surname'), '')) AS contractor, " +
+		"**tableAlias**.priceGross AS price, **tableAlias**.priceGrossMonthly AS priceMonthly, COALESCE(nn.name, '') AS producer, COALESCE(**tableAlias**.producerCode, '') AS producerCode, **tableAlias**.startDate, " +
+		"**tableAlias**.endDate, **tableAlias**.paymentSplit " +
+		"FROM `wopta.**tableName**` **tableAlias** " +
+		"LEFT JOIN `wopta.networkNodesView` nn ON nn.uid = **tableAlias**.producerUid " +
+		"WHERE ")
 
 	if val, ok := params["limit"]; ok {
 		limit, err = strconv.Atoi(val)
@@ -167,8 +153,11 @@ func (qb *BigQueryQueryBuilder) BuildQuery(params map[string]string) (string, ma
 		}
 	}
 
-	query.WriteString(strings.Join(whereClauses, " AND "))
-	query.WriteString(fmt.Sprintf(" LIMIT %d", limit))
+	rawQuery.WriteString(strings.Join(whereClauses, " AND "))
+	rawQuery.WriteString(fmt.Sprintf(" LIMIT %d", limit))
 
-	return query.String(), queryParams
+	query := strings.ReplaceAll(rawQuery.String(), "**tableName**", qb.tableName)
+	query = strings.ReplaceAll(query, "**tableAlias**", qb.tableAlias)
+
+	return query, queryParams
 }
