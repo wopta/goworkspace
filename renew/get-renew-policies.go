@@ -21,7 +21,7 @@ func GetRenewPoliciesFx(w http.ResponseWriter, r *http.Request) (string, interfa
 	}
 
 	queryBuilder := NewBigQueryQueryBuilder()
-	q := queryBuilder.BuildQuery(params)
+	q, _ := queryBuilder.BuildQuery(params)
 
 	log.Printf("resulting query: %s", q)
 

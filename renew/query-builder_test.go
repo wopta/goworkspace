@@ -83,7 +83,7 @@ func TestQueryBuilder(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			got := qb.BuildQuery(tc.params)
+			got, _ := qb.BuildQuery(tc.params)
 
 			if !strings.EqualFold(got, tc.want) {
 				t.Errorf("expected: %s, got: %s", tc.want, got)
