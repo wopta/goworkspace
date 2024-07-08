@@ -102,7 +102,6 @@ func (qb *BigQueryQueryBuilder) BuildQuery(params map[string]string) (string, ma
 		allowedParams = make([]string, 0)
 	)
 
-	// TODO: handle table alias
 	rawQuery.WriteString("SELECT **tableAlias**.uid, **tableAlias**.name AS productName, **tableAlias**.codeCompany, CAST(**tableAlias**.proposalNumber AS INT64) AS proposalNumber, " +
 		"**tableAlias**.nameDesc,**tableAlias**.status, RTRIM(COALESCE(JSON_VALUE(**tableAlias**.data, '$.contractor.name'), '') || ' ' || " +
 		"COALESCE(JSON_VALUE(**tableAlias**.data, '$.contractor.surname'), '')) AS contractor, " +
