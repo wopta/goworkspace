@@ -135,46 +135,9 @@ func (qb *BigQueryQueryBuilder) processProducerUidParam(paramKey, paramValue str
 	return fmt.Sprintf(paramsWhereClause[paramKey], strings.Join(tmp, ", "))
 }
 
-func (qb *BigQueryQueryBuilder) BuildQuery(params map[string]string) (string, map[string]interface{}) {
-	var (
-		err           error
-		limit         = 10
-		rawQuery      bytes.Buffer
-		queryParams   = make(map[string]interface{})
-		whereClauses  = make([]string, 0)
-		allowedParams = make([]string, 0)
-	)
-
-	rawQuery.WriteString("SELECT **tableAlias**.uid, **tableAlias**.name AS productName, " +
-		"**tableAlias**.codeCompany, CAST(**tableAlias**.proposalNumber AS INT64) AS proposalNumber, " +
-		"**tableAlias**.nameDesc,**tableAlias**.status, RTRIM(COALESCE(JSON_VALUE(**tableAlias**.data, " +
-		"'$.contractor.name'), '') || ' ' || " +
-		"COALESCE(JSON_VALUE(**tableAlias**.data, '$.contractor.surname'), '')) AS contractor, " +
-		"**tableAlias**.priceGross AS price, **tableAlias**.priceGrossMonthly AS priceMonthly, " +
-		"COALESCE(nn.name, '') AS producer, COALESCE(**tableAlias**.producerCode, '') AS producerCode, " +
-		"**tableAlias**.startDate, **tableAlias**.endDate, **tableAlias**.paymentSplit " +
-		"FROM `wopta.**tableName**` **tableAlias** " +
-		"LEFT JOIN `wopta.networkNodesView` nn ON nn.uid = **tableAlias**.producerUid " +
-		"WHERE ")
-
-	if val, ok := params["limit"]; ok {
-		limit, err = strconv.Atoi(val)
-		if err != nil {
-			log.Printf("Failed to parse limit: %v", err)
-			return "", nil
-		}
-		delete(params, "limit")
-	}
-
-	allowedParams = qb.getAllowedParams(params)
-	if allowedParams == nil {
-		return "", nil
-	}
-
-	filteredParams := qb.filterParams(params, allowedParams)
-	if len(filteredParams) == 0 {
-		return "", nil
-	}
+func (qb *BigQueryQueryBuilder) processParams(allowedParams []string, filteredParams map[string]string) ([]string, map[string]interface{}) {
+	whereClauses := make([]string, 0)
+	queryParams := make(map[string]interface{})
 
 	for _, paramKey := range allowedParams {
 		paramValue, exists := filteredParams[paramKey]
@@ -195,7 +158,52 @@ func (qb *BigQueryQueryBuilder) BuildQuery(params map[string]string) (string, ma
 		}
 
 	}
+	return whereClauses, queryParams
+}
 
+func (qb *BigQueryQueryBuilder) BuildQuery(params map[string]string) (string, map[string]interface{}) {
+	const queryPrefix = "SELECT **tableAlias**.uid, **tableAlias**.name AS productName, " +
+		"**tableAlias**.codeCompany, CAST(**tableAlias**.proposalNumber AS INT64) AS proposalNumber, " +
+		"**tableAlias**.nameDesc,**tableAlias**.status, RTRIM(COALESCE(JSON_VALUE(**tableAlias**.data, " +
+		"'$.contractor.name'), '') || ' ' || " +
+		"COALESCE(JSON_VALUE(**tableAlias**.data, '$.contractor.surname'), '')) AS contractor, " +
+		"**tableAlias**.priceGross AS price, **tableAlias**.priceGrossMonthly AS priceMonthly, " +
+		"COALESCE(nn.name, '') AS producer, COALESCE(**tableAlias**.producerCode, '') AS producerCode, " +
+		"**tableAlias**.startDate, **tableAlias**.endDate, **tableAlias**.paymentSplit " +
+		"FROM `wopta.**tableName**` **tableAlias** " +
+		"LEFT JOIN `wopta.networkNodesView` nn ON nn.uid = **tableAlias**.producerUid " +
+		"WHERE "
+	var (
+		err           error
+		limit         = 10
+		rawQuery      bytes.Buffer
+		queryParams   = make(map[string]interface{})
+		whereClauses  = make([]string, 0)
+		allowedParams = make([]string, 0)
+	)
+
+	if val, ok := params["limit"]; ok {
+		limit, err = strconv.Atoi(val)
+		if err != nil {
+			log.Printf("Failed to parse limit: %v", err)
+			return "", nil
+		}
+		delete(params, "limit")
+	}
+
+	allowedParams = qb.getAllowedParams(params)
+	if allowedParams == nil {
+		return "", nil
+	}
+
+	filteredParams := qb.filterParams(params, allowedParams)
+	if len(filteredParams) == 0 {
+		return "", nil
+	}
+
+	whereClauses, queryParams = qb.processParams(allowedParams, filteredParams)
+
+	rawQuery.WriteString(queryPrefix)
 	rawQuery.WriteString(strings.Join(whereClauses, " AND "))
 	rawQuery.WriteString(fmt.Sprintf(" LIMIT %d", limit))
 
