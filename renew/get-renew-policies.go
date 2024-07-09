@@ -39,6 +39,9 @@ func GetRenewPoliciesFx(w http.ResponseWriter, r *http.Request) (string, interfa
 	)
 
 	paramsMap := extractQueryParams(r)
+	if len(paramsMap) == 0 {
+		return "", nil, errors.New("no query params")
+	}
 
 	if paramsMap["producerUid"] == "" {
 		children, err := getNodeChildren(r)
