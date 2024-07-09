@@ -104,6 +104,14 @@ func TestQueryBuilder(t *testing.T) {
 			},
 			"(producerUid IN ('@test', '@test')) LIMIT 10",
 		},
+		{
+			"limit different from default",
+			map[string]string{
+				"producerUid": "aaa,bbb",
+				"limit":       "50",
+			},
+			"(producerUid IN ('@test', '@test')) LIMIT 50",
+		},
 	}
 
 	for _, tc := range testCases {
