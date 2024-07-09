@@ -12,6 +12,7 @@ import (
 	"github.com/wopta/goworkspace/network"
 )
 
+// TODO: check whether move this struct in models or move the handler in policy domain
 type PolicyInfo struct {
 	Uid            string         `json:"uid" bigquery:"uid"`
 	ProductName    string         `json:"productName" bigquery:"productName"`
