@@ -36,7 +36,7 @@ var (
 	paramsWhereClause = map[string]string{
 		"codeCompany": "(codeCompany = @%s)",
 
-		"proposalNumber": "(proposalNumber = @%s)",
+		"proposalNumber": "(proposalNumber = CAST(@%s AS INTEGER))",
 
 		"insuredFiscalCode": "(JSON_VALUE(**tableAlias**.data, '$.assets[0].person.fiscalCode') = @%s)",
 
@@ -48,6 +48,7 @@ var (
 		"company":       "(company = LOWER(@%s))",
 		"product":       "(product = LOWER(@%s))",
 		"producerUid":   "(producerUid IN (%s))",
+		"renewMonth":    "((isDeleted = false OR isDeleted IS NULL) AND (EXTRACT(MONTH FROM startDate) = CAST(@%s AS INTEGER)))",
 		"paid":          "((isDeleted = false OR isDeleted IS NULL) AND (isPay = true))",
 		"unpaid":        "((isDeleted = false OR isDeleted IS NULL) AND (isPay = false))",
 		"recurrent":     "((isDeleted = false OR isDeleted IS NULL) AND (hasMandate = true))",
@@ -182,13 +183,6 @@ func (qb *BigQueryQueryBuilder) BuildQuery(params map[string]string) (string, ma
 			var value interface{} = paramValue
 			randomIdentifier := qb.randomGenerator()
 			whereClauses = append(whereClauses, fmt.Sprintf(paramsWhereClause[paramKey], randomIdentifier))
-			if paramKey == "proposalNumber" {
-				value, err = strconv.ParseInt(filteredParams[paramKey], 10, 64)
-				if err != nil {
-					log.Printf("Failed to parse proposalNumber: %v", err)
-					return "", nil
-				}
-			}
 			queryParams[randomIdentifier] = value
 		}
 	}
