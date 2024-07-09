@@ -41,7 +41,7 @@ func GetRenewPoliciesFx(w http.ResponseWriter, r *http.Request) (string, interfa
 		paramsMap[key] = values[0]
 	}
 
-	queryBuilder := NewBigQueryQueryBuilder(lib.RenewPolicyViewCollection, "rp")
+	queryBuilder := NewBigQueryQueryBuilder(lib.RenewPolicyViewCollection, "rp", nil)
 	query, queryParams := queryBuilder.BuildQuery(paramsMap)
 
 	policies, err := lib.QueryParametrizedRowsBigQuery[PolicyInfo](query, queryParams)

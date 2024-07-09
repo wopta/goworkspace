@@ -8,29 +8,14 @@ import (
 	"github.com/wopta/goworkspace/renew"
 )
 
-func areMapsEqual(m1, m2 map[string]interface{}) bool {
-	if len(m1) != len(m2) {
-		return false
-	}
-
-	for key, value1 := range m1 {
-		if value2, exists := m2[key]; !exists || value1 != value2 {
-			return false
-		}
-	}
-
-	return true
-}
-
 func TestQueryBuilder(t *testing.T) {
-	qb := renew.NewBigQueryQueryBuilder(lib.RenewPolicyViewCollection, "rp")
+	qb := renew.NewBigQueryQueryBuilder(lib.RenewPolicyViewCollection, "rp", func() string {
+		return "test"
+	})
 	var testCases = []struct {
 		name   string
 		params map[string]string
-		want   struct {
-			whereClause string
-			params      map[string]interface{}
-		}
+		want   string
 	}{
 		{
 			"codeCompany overcome everything",
@@ -38,14 +23,7 @@ func TestQueryBuilder(t *testing.T) {
 				"codeCompany":       "100100",
 				"insuredFiscalCode": "LLLRRR85E05R94Z330F",
 			},
-			struct {
-				whereClause string
-				params      map[string]interface{}
-			}{
-				whereClause: "(codeCompany = @codeCompany) LIMIT 10",
-				params: map[string]interface{}{
-					"codeCompany": "100100",
-				}},
+			"(codeCompany = @test) LIMIT 10",
 		},
 		{
 			"fiscalCode overcome third-level parameters",
@@ -53,64 +31,35 @@ func TestQueryBuilder(t *testing.T) {
 				"insuredFiscalCode": "LLLRRR85E05R94Z330F",
 				"producerCode":      "a1b2c3d4",
 			},
-			struct {
-				whereClause string
-				params      map[string]interface{}
-			}{
-				whereClause: "(JSON_VALUE(rp.data, '$.assets[0].person.fiscalCode') = @insuredFiscalCode) LIMIT 10",
-				params:      map[string]interface{}{"insuredFiscalCode": "LLLRRR85E05R94Z330F"}},
+			"(JSON_VALUE(rp.data, '$.assets[0].person.fiscalCode') = @test) LIMIT 10",
 		},
 		{
 			"paid renew policies",
 			map[string]string{
 				"status": "paid",
 			},
-			struct {
-				whereClause string
-				params      map[string]interface{}
-			}{
-				whereClause: "(((isDeleted = false OR isDeleted IS NULL) AND " +
-					"(isPay = true))) LIMIT 10",
-				params: map[string]interface{}{}},
+			"(((isDeleted = false OR isDeleted IS NULL) AND (isPay = true))) LIMIT 10",
 		},
 		{
 			"not paid renew policies",
 			map[string]string{
 				"status": "unpaid",
 			},
-			struct {
-				whereClause string
-				params      map[string]interface{}
-			}{
-				whereClause: "(((isDeleted = false OR isDeleted IS NULL) AND " +
-					"(isPay = false))) LIMIT 10",
-				params: map[string]interface{}{}},
+			"(((isDeleted = false OR isDeleted IS NULL) AND (isPay = false))) LIMIT 10",
 		},
 		{
 			"renew policies with mandate active",
 			map[string]string{
 				"payment": "recurrent",
 			},
-			struct {
-				whereClause string
-				params      map[string]interface{}
-			}{
-				whereClause: "(((isDeleted = false OR isDeleted IS NULL) AND " +
-					"(hasMandate = true))) LIMIT 10",
-				params: map[string]interface{}{}},
+			"(((isDeleted = false OR isDeleted IS NULL) AND (hasMandate = true))) LIMIT 10",
 		},
 		{
 			"renew policies with mandate non active",
 			map[string]string{
 				"payment": "notRecurrent",
 			},
-			struct {
-				whereClause string
-				params      map[string]interface{}
-			}{
-				whereClause: "(((isDeleted = false OR isDeleted IS NULL) AND " +
-					"(hasMandate = false OR hasMandate IS NULL))) LIMIT 10",
-				params: map[string]interface{}{}},
+			"(((isDeleted = false OR isDeleted IS NULL) AND (hasMandate = false OR hasMandate IS NULL))) LIMIT 10",
 		},
 		{
 			"combine third-level parameters",
@@ -120,20 +69,10 @@ func TestQueryBuilder(t *testing.T) {
 				"startDateTo":   "2024-07-14",
 				"status":        "paid",
 				"payment":       "recurrent",
-			}, struct {
-				whereClause string
-				params      map[string]interface{}
-			}{
-				whereClause: "(startDate >= @startDateFrom) AND (startDate <= @startDateTo) AND " +
-					"(producerCode = @producerCode) AND (((isDeleted = false OR isDeleted IS NULL) AND " +
-					"(isPay = true))) AND (((isDeleted = false OR isDeleted IS NULL) AND " +
-					"(hasMandate = true))) LIMIT 10",
-				params: map[string]interface{}{
-					"startDateFrom": "2024-07-04",
-					"startDateTo":   "2024-07-14",
-					"producerCode":  "a1b2c3d4",
-				},
-			},
+			}, "(startDate >= @test) AND (startDate <= @test) AND " +
+				"(producerCode = @test) AND (((isDeleted = false OR isDeleted IS NULL) AND " +
+				"(isPay = true))) AND (((isDeleted = false OR isDeleted IS NULL) AND " +
+				"(hasMandate = true))) LIMIT 10",
 		},
 		{
 			"combine parameters from differents level",
@@ -142,29 +81,18 @@ func TestQueryBuilder(t *testing.T) {
 				"startDateFrom": "2024-07-04",
 				"startDateTo":   "2024-07-14",
 				"codeCompany":   "100100",
-			}, struct {
-				whereClause string
-				params      map[string]interface{}
-			}{
-				whereClause: "(codeCompany = @codeCompany) LIMIT 10",
-				params:      map[string]interface{}{"codeCompany": "100100"}},
+			}, "(codeCompany = @test) LIMIT 10",
 		},
 	}
 
-	//less := func(a, b string) bool { return a < b }
-
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			gotQuery, gotParams := qb.BuildQuery(tc.params)
+			got, _ := qb.BuildQuery(tc.params)
 
-			whereClauses := strings.TrimSpace(strings.Split(gotQuery, "WHERE ")[1])
+			whereClauses := strings.TrimSpace(strings.Split(got, "WHERE ")[1])
 
-			if !strings.EqualFold(whereClauses, tc.want.whereClause) {
-				t.Errorf("expected: %s, got: %s", tc.want.whereClause, whereClauses)
-			}
-
-			if !areMapsEqual(gotParams, tc.want.params) {
-				t.Errorf("expected: %+v, got: %+v", tc.want.params, gotParams)
+			if !strings.EqualFold(whereClauses, tc.want) {
+				t.Errorf("expected: %s, got: %s", tc.want, whereClauses)
 			}
 		})
 	}

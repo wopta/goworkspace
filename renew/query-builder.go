@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"fmt"
 	"log"
+	"math/rand"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/wopta/goworkspace/lib"
 )
@@ -31,20 +33,20 @@ var (
 	}
 
 	paramsWhereClause = map[string]string{
-		"codeCompany": "(codeCompany = @codeCompany)",
+		"codeCompany": "(codeCompany = @%s)",
 
-		"proposalNumber": "(proposalNumber = @proposalNumber)",
+		"proposalNumber": "(proposalNumber = @%s)",
 
-		"insuredFiscalCode": "(JSON_VALUE(**tableAlias**.data, '$.assets[0].person.fiscalCode') = @insuredFiscalCode)",
+		"insuredFiscalCode": "(JSON_VALUE(**tableAlias**.data, '$.assets[0].person.fiscalCode') = @%s)",
 
-		"contractorName":    "(REGEXP_CONTAINS(LOWER(JSON_VALUE(**tableAlias**.data, '$.contractor.name')), LOWER(@contractorName)))",
-		"contractorSurname": "(REGEXP_CONTAINS(LOWER(JSON_VALUE(**tableAlias**.data, '$.contractor.surname')), LOWER(@contractorSurname)))",
+		"contractorName":    "(REGEXP_CONTAINS(LOWER(JSON_VALUE(**tableAlias**.data, '$.contractor.name')), LOWER(@%s)))",
+		"contractorSurname": "(REGEXP_CONTAINS(LOWER(JSON_VALUE(**tableAlias**.data, '$.contractor.surname')), LOWER(@%s)))",
 
-		"startDateFrom": "(startDate >= @startDateFrom)",
-		"startDateTo":   "(startDate <= @startDateTo)",
-		"company":       "(company = LOWER(@company))",
-		"product":       "(product = LOWER(@product))",
-		"producerCode":  "(producerCode = @producerCode)",
+		"startDateFrom": "(startDate >= @%s)",
+		"startDateTo":   "(startDate <= @%s)",
+		"company":       "(company = LOWER(@%s))",
+		"product":       "(product = LOWER(@%s))",
+		"producerCode":  "(producerCode = @%s)",
 		"paid":          "((isDeleted = false OR isDeleted IS NULL) AND (isPay = true))",
 		"unpaid":        "((isDeleted = false OR isDeleted IS NULL) AND (isPay = false))",
 		"recurrent":     "((isDeleted = false OR isDeleted IS NULL) AND (hasMandate = true))",
@@ -59,14 +61,32 @@ type QueryBuilder interface {
 }
 
 type BigQueryQueryBuilder struct {
-	tableName  string
-	tableAlias string
+	tableName       string
+	tableAlias      string
+	randomGenerator func() string
 }
 
-func NewBigQueryQueryBuilder(tableName, tableAlias string) BigQueryQueryBuilder {
+func NewBigQueryQueryBuilder(tableName, tableAlias string, randomGenerator func() string) BigQueryQueryBuilder {
+	if randomGenerator == nil {
+		randomGenerator = func() string {
+			var (
+				letters  = []rune("abcdefghijklmnopqrstuvwxyz")
+				alphanum = []rune("123456789abcdefghijklmnopqrstuvwxyz")
+			)
+			rnd := rand.New(rand.NewSource(time.Now().UnixNano()))
+
+			s := make([]rune, 12)
+			s[0] = letters[rnd.Intn(len(letters))]
+			for i := range s[1:] {
+				s[i+1] = alphanum[rnd.Intn(len(alphanum))]
+			}
+			return string(s)
+		}
+	}
 	return BigQueryQueryBuilder{
-		tableName:  tableName,
-		tableAlias: tableAlias,
+		tableName:       tableName,
+		tableAlias:      tableAlias,
+		randomGenerator: randomGenerator,
 	}
 }
 
@@ -139,7 +159,8 @@ func (qb *BigQueryQueryBuilder) BuildQuery(params map[string]string) (string, ma
 				whereClauses = append(whereClauses, "("+strings.Join(tmpWhereClauses, " OR ")+")")
 			} else {
 				var value interface{} = val
-				whereClauses = append(whereClauses, paramsWhereClause[paramKey])
+				randomIdentifier := qb.randomGenerator()
+				whereClauses = append(whereClauses, fmt.Sprintf(paramsWhereClause[paramKey], randomIdentifier))
 				if paramKey == "proposalNumber" {
 					parsedValue, err := strconv.ParseInt(filteredParams[paramKey], 10, 64)
 					if err != nil {
@@ -147,7 +168,7 @@ func (qb *BigQueryQueryBuilder) BuildQuery(params map[string]string) (string, ma
 					}
 					value = parsedValue
 				}
-				queryParams[paramKey] = value
+				queryParams[randomIdentifier] = value
 			}
 		}
 	}
