@@ -23,13 +23,14 @@ var (
 		{"contractorName": []string{"contractorName", "contractorSurname"}},
 		{"contractorSurname": []string{"contractorName", "contractorSurname"}},
 
-		{"startDateFrom": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "reserved", "status", "payment"}},
-		{"startDateTo": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "reserved", "status", "payment"}},
-		{"company": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "reserved", "status", "payment"}},
-		{"product": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "reserved", "status", "payment"}},
-		{"producerUid": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "reserved", "status", "payment"}},
-		{"status": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "reserved", "status", "payment"}},
-		{"payment": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "reserved", "status", "payment"}},
+		{"startDateFrom": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "reserved", "status", "payment", "renewMonth"}},
+		{"startDateTo": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "reserved", "status", "payment", "renewMonth"}},
+		{"company": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "reserved", "status", "payment", "renewMonth"}},
+		{"product": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "reserved", "status", "payment", "renewMonth"}},
+		{"producerUid": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "reserved", "status", "payment", "renewMonth"}},
+		{"status": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "reserved", "status", "payment", "renewMonth"}},
+		{"payment": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "reserved", "status", "payment", "renewMonth"}},
+		{"renewMonth": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "reserved", "status", "payment", "renewMonth"}},
 	}
 
 	paramsWhereClause = map[string]string{
@@ -142,11 +143,13 @@ func (qb *BigQueryQueryBuilder) BuildQuery(params map[string]string) (string, ma
 
 	allowedParams = qb.getAllowedParams(params)
 	if allowedParams == nil {
-		// TODO: handle error
 		return "", nil
 	}
 
 	filteredParams := qb.filterParams(params, allowedParams)
+	if len(filteredParams) == 0 {
+		return "", nil
+	}
 
 	for _, paramKey := range allowedParams {
 		if val, ok := filteredParams[paramKey]; ok && val != "" {
@@ -176,6 +179,7 @@ func (qb *BigQueryQueryBuilder) BuildQuery(params map[string]string) (string, ma
 					parsedValue, err := strconv.ParseInt(filteredParams[paramKey], 10, 64)
 					if err != nil {
 						log.Printf("Failed to parse proposalNumber: %v", err)
+						return "", nil
 					}
 					value = parsedValue
 				}
