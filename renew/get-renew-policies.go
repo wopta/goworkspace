@@ -2,6 +2,7 @@ package renew
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"cloud.google.com/go/civil"
@@ -44,9 +45,11 @@ func GetRenewPoliciesFx(w http.ResponseWriter, r *http.Request) (string, interfa
 	queryBuilder := NewBigQueryQueryBuilder(lib.RenewPolicyViewCollection, "rp", nil)
 	query, queryParams := queryBuilder.BuildQuery(paramsMap)
 
+	log.Printf("query: %s\nqueryParams: %+v", query, queryParams)
+
 	policies, err := lib.QueryParametrizedRowsBigQuery[PolicyInfo](query, queryParams)
 	if err != nil {
-
+		log.Printf("error executing query: %s", err.Error())
 		return "", nil, err
 	}
 
