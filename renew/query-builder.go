@@ -23,13 +23,13 @@ var (
 		{"contractorName": []string{"contractorName", "contractorSurname"}},
 		{"contractorSurname": []string{"contractorName", "contractorSurname"}},
 
-		{"startDateFrom": []string{"startDateFrom", "startDateTo", "company", "product", "producerCode", "reserved", "status", "payment"}},
-		{"startDateTo": []string{"startDateFrom", "startDateTo", "company", "product", "producerCode", "reserved", "status", "payment"}},
-		{"company": []string{"startDateFrom", "startDateTo", "company", "product", "producerCode", "reserved", "status", "payment"}},
-		{"product": []string{"startDateFrom", "startDateTo", "company", "product", "producerCode", "reserved", "status", "payment"}},
-		{"producerCode": []string{"startDateFrom", "startDateTo", "company", "product", "producerCode", "reserved", "status", "payment"}},
-		{"status": []string{"startDateFrom", "startDateTo", "company", "product", "producerCode", "reserved", "status", "payment"}},
-		{"payment": []string{"startDateFrom", "startDateTo", "company", "product", "producerCode", "reserved", "status", "payment"}},
+		{"startDateFrom": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "reserved", "status", "payment"}},
+		{"startDateTo": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "reserved", "status", "payment"}},
+		{"company": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "reserved", "status", "payment"}},
+		{"product": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "reserved", "status", "payment"}},
+		{"producerUid": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "reserved", "status", "payment"}},
+		{"status": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "reserved", "status", "payment"}},
+		{"payment": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "reserved", "status", "payment"}},
 	}
 
 	paramsWhereClause = map[string]string{
@@ -46,7 +46,7 @@ var (
 		"startDateTo":   "(startDate <= @%s)",
 		"company":       "(company = LOWER(@%s))",
 		"product":       "(product = LOWER(@%s))",
-		"producerCode":  "(producerCode = @%s)",
+		"producerUid":   "(producerUid IN (%s))",
 		"paid":          "((isDeleted = false OR isDeleted IS NULL) AND (isPay = true))",
 		"unpaid":        "((isDeleted = false OR isDeleted IS NULL) AND (isPay = false))",
 		"recurrent":     "((isDeleted = false OR isDeleted IS NULL) AND (hasMandate = true))",
@@ -154,9 +154,20 @@ func (qb *BigQueryQueryBuilder) BuildQuery(params map[string]string) (string, ma
 				tmpWhereClauses := make([]string, 0)
 				statusList := strings.Split(filteredParams[paramKey], ",")
 				for _, status := range statusList {
-					tmpWhereClauses = append(tmpWhereClauses, paramsWhereClause[status])
+					if val, ok := paramsWhereClause[status]; ok && val != "" {
+						tmpWhereClauses = append(tmpWhereClauses, val)
+					}
 				}
 				whereClauses = append(whereClauses, "("+strings.Join(tmpWhereClauses, " OR ")+")")
+			} else if paramKey == "producerUid" {
+				tmp := make([]string, 0)
+				uidList := strings.Split(filteredParams[paramKey], ",")
+				for _, uid := range uidList {
+					randomIdentifier := qb.randomGenerator()
+					queryParams[randomIdentifier] = uid
+					tmp = append(tmp, fmt.Sprintf("'@%s'", randomIdentifier))
+				}
+				whereClauses = append(whereClauses, fmt.Sprintf(paramsWhereClause[paramKey], strings.Join(tmp, ", ")))
 			} else {
 				var value interface{} = val
 				randomIdentifier := qb.randomGenerator()

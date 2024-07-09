@@ -64,13 +64,13 @@ func TestQueryBuilder(t *testing.T) {
 		{
 			"combine third-level parameters",
 			map[string]string{
-				"producerCode":  "a1b2c3d4",
+				"producerUid":   "a1b2c3d4",
 				"startDateFrom": "2024-07-04",
 				"startDateTo":   "2024-07-14",
 				"status":        "paid",
 				"payment":       "recurrent",
 			}, "(startDate >= @test) AND (startDate <= @test) AND " +
-				"(producerCode = @test) AND (((isDeleted = false OR isDeleted IS NULL) AND " +
+				"(producerUid IN ('@test')) AND (((isDeleted = false OR isDeleted IS NULL) AND " +
 				"(isPay = true))) AND (((isDeleted = false OR isDeleted IS NULL) AND " +
 				"(hasMandate = true))) LIMIT 10",
 		},
@@ -82,6 +82,27 @@ func TestQueryBuilder(t *testing.T) {
 				"startDateTo":   "2024-07-14",
 				"codeCompany":   "100100",
 			}, "(codeCompany = @test) LIMIT 10",
+		},
+		{
+			"invalid status",
+			map[string]string{
+				"status": "invalidValue,unpaid",
+			},
+			"(((isDeleted = false OR isDeleted IS NULL) AND (isPay = false))) LIMIT 10",
+		},
+		{
+			"single producer uid",
+			map[string]string{
+				"producerUid": "aaaa",
+			},
+			"(producerUid IN ('@test')) LIMIT 10",
+		},
+		{
+			"multiple producer uid",
+			map[string]string{
+				"producerUid": "aaa,bbb",
+			},
+			"(producerUid IN ('@test', '@test')) LIMIT 10",
 		},
 	}
 
