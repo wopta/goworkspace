@@ -54,7 +54,7 @@ var (
 		"notRecurrent":  "((isDeleted = false OR isDeleted IS NULL) AND (hasMandate = false OR hasMandate IS NULL))",
 	}
 
-	orClauses = []string{"status", "payment"}
+	orClausesKeys = []string{"status", "payment"}
 )
 
 type QueryBuilder interface {
@@ -123,11 +123,14 @@ func (qb *BigQueryQueryBuilder) BuildQuery(params map[string]string) (string, ma
 		allowedParams = make([]string, 0)
 	)
 
-	rawQuery.WriteString("SELECT **tableAlias**.uid, **tableAlias**.name AS productName, **tableAlias**.codeCompany, CAST(**tableAlias**.proposalNumber AS INT64) AS proposalNumber, " +
-		"**tableAlias**.nameDesc,**tableAlias**.status, RTRIM(COALESCE(JSON_VALUE(**tableAlias**.data, '$.contractor.name'), '') || ' ' || " +
+	rawQuery.WriteString("SELECT **tableAlias**.uid, **tableAlias**.name AS productName, " +
+		"**tableAlias**.codeCompany, CAST(**tableAlias**.proposalNumber AS INT64) AS proposalNumber, " +
+		"**tableAlias**.nameDesc,**tableAlias**.status, RTRIM(COALESCE(JSON_VALUE(**tableAlias**.data, " +
+		"'$.contractor.name'), '') || ' ' || " +
 		"COALESCE(JSON_VALUE(**tableAlias**.data, '$.contractor.surname'), '')) AS contractor, " +
-		"**tableAlias**.priceGross AS price, **tableAlias**.priceGrossMonthly AS priceMonthly, COALESCE(nn.name, '') AS producer, COALESCE(**tableAlias**.producerCode, '') AS producerCode, **tableAlias**.startDate, " +
-		"**tableAlias**.endDate, **tableAlias**.paymentSplit " +
+		"**tableAlias**.priceGross AS price, **tableAlias**.priceGrossMonthly AS priceMonthly, " +
+		"COALESCE(nn.name, '') AS producer, COALESCE(**tableAlias**.producerCode, '') AS producerCode, " +
+		"**tableAlias**.startDate, **tableAlias**.endDate, **tableAlias**.paymentSplit " +
 		"FROM `wopta.**tableName**` **tableAlias** " +
 		"LEFT JOIN `wopta.networkNodesView` nn ON nn.uid = **tableAlias**.producerUid " +
 		"WHERE ")
@@ -152,8 +155,8 @@ func (qb *BigQueryQueryBuilder) BuildQuery(params map[string]string) (string, ma
 	}
 
 	for _, paramKey := range allowedParams {
-		if val, ok := filteredParams[paramKey]; ok && val != "" {
-			if lib.SliceContains(orClauses, paramKey) {
+		if paramValue, ok := filteredParams[paramKey]; ok && paramValue != "" {
+			if lib.SliceContains(orClausesKeys, paramKey) {
 				tmpWhereClauses := make([]string, 0)
 				statusList := strings.Split(filteredParams[paramKey], ",")
 				for _, status := range statusList {
@@ -162,29 +165,31 @@ func (qb *BigQueryQueryBuilder) BuildQuery(params map[string]string) (string, ma
 					}
 				}
 				whereClauses = append(whereClauses, "("+strings.Join(tmpWhereClauses, " OR ")+")")
-			} else if paramKey == "producerUid" {
+				continue
+			}
+
+			if paramKey == "producerUid" {
 				tmp := make([]string, 0)
-				uidList := strings.Split(filteredParams[paramKey], ",")
-				for _, uid := range uidList {
+				for _, uid := range strings.Split(filteredParams[paramKey], ",") {
 					randomIdentifier := qb.randomGenerator()
 					queryParams[randomIdentifier] = uid
 					tmp = append(tmp, fmt.Sprintf("'@%s'", randomIdentifier))
 				}
 				whereClauses = append(whereClauses, fmt.Sprintf(paramsWhereClause[paramKey], strings.Join(tmp, ", ")))
-			} else {
-				var value interface{} = val
-				randomIdentifier := qb.randomGenerator()
-				whereClauses = append(whereClauses, fmt.Sprintf(paramsWhereClause[paramKey], randomIdentifier))
-				if paramKey == "proposalNumber" {
-					parsedValue, err := strconv.ParseInt(filteredParams[paramKey], 10, 64)
-					if err != nil {
-						log.Printf("Failed to parse proposalNumber: %v", err)
-						return "", nil
-					}
-					value = parsedValue
-				}
-				queryParams[randomIdentifier] = value
+				continue
 			}
+
+			var value interface{} = paramValue
+			randomIdentifier := qb.randomGenerator()
+			whereClauses = append(whereClauses, fmt.Sprintf(paramsWhereClause[paramKey], randomIdentifier))
+			if paramKey == "proposalNumber" {
+				value, err = strconv.ParseInt(filteredParams[paramKey], 10, 64)
+				if err != nil {
+					log.Printf("Failed to parse proposalNumber: %v", err)
+					return "", nil
+				}
+			}
+			queryParams[randomIdentifier] = value
 		}
 	}
 
