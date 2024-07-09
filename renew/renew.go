@@ -25,7 +25,7 @@ var routes []lib.Route = []lib.Route{
 		Route:   "/v1/policies",
 		Method:  http.MethodGet,
 		Handler: lib.ResponseLoggerWrapper(GetRenewPoliciesFx),
-		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleManager, lib.UserRoleAgent, lib.UserRoleAgency},
+		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleManager, lib.UserRoleAgency, lib.UserRoleAgent},
 	},
 }
 
