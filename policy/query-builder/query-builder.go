@@ -208,6 +208,7 @@ func (qb *BigQueryQueryBuilder) BuildQuery(params map[string]string) (string, ma
 
 	rawQuery.WriteString(queryPrefix)
 	rawQuery.WriteString(strings.Join(whereClauses, " AND "))
+	rawQuery.WriteString(fmt.Sprintf(" ORDER BY **tableAlias**.updateDate DESC"))
 	rawQuery.WriteString(fmt.Sprintf(" LIMIT %d", limit))
 
 	query := strings.ReplaceAll(rawQuery.String(), "**tableName**", qb.tableName)
