@@ -188,6 +188,9 @@ func (qb *BigQueryQueryBuilder) BuildQuery(params map[string]string) (string, ma
 			log.Printf("Failed to parse limit: %v", err)
 			return "", nil
 		}
+		if limit > 100 {
+			limit = 100
+		}
 		delete(params, "limit")
 	}
 
