@@ -21,12 +21,6 @@ var routes []lib.Route = []lib.Route{
 		Handler: lib.ResponseLoggerWrapper(PromoteFx),
 		Roles:   []string{},
 	},
-	{
-		Route:   "/v1/policies",
-		Method:  http.MethodGet,
-		Handler: lib.ResponseLoggerWrapper(GetRenewPoliciesFx),
-		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleManager, lib.UserRoleAgency, lib.UserRoleAgent},
-	},
 }
 
 func init() {

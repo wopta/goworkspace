@@ -7,34 +7,17 @@ import (
 	"net/http"
 	"strings"
 
-	"cloud.google.com/go/civil"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/network"
+	md "github.com/wopta/goworkspace/policy/models"
+	"github.com/wopta/goworkspace/policy/query-builder"
 )
 
-// TODO: check whether move this struct in models or move the handler in policy domain
-type PolicyInfo struct {
-	Uid            string         `json:"uid" bigquery:"uid"`
-	ProductName    string         `json:"productName" bigquery:"productName"`
-	CodeCompany    string         `json:"codeCompany" bigquery:"codeCompany"`
-	ProposalNumber int            `json:"proposalNumber" bigquery:"proposalNumber"`
-	NameDesc       string         `json:"nameDesc" bigquery:"nameDesc"`
-	Status         string         `json:"status" bigquery:"status"`
-	Contractor     string         `json:"contractor" bigquery:"contractor"`
-	Price          float64        `json:"price" bigquery:"price"`
-	PriceMonthly   float64        `json:"priceMonthly" bigquery:"priceMonthly"`
-	Producer       string         `json:"producer" bigquery:"producer"`
-	ProducerCode   string         `json:"producerCode" bigquery:"producerCode"`
-	StartDate      civil.DateTime `json:"startDate" bigquery:"startDate"`
-	EndDate        civil.DateTime `json:"endDate" bigquery:"endDate"`
-	PaymentSplit   string         `json:"paymentSplit" bigquery:"paymentSplit"`
+type GetRenewedPoliciesResp struct {
+	RenewedPolicies []md.PolicyInfo `json:"renewedPolicies"`
 }
 
-type GetRenewPoliciesResp struct {
-	RenewPolicies []PolicyInfo `json:"renewPolicies"`
-}
-
-func GetRenewPoliciesFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func GetRenewedPoliciesFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err error
 	)
@@ -51,7 +34,7 @@ func GetRenewPoliciesFx(w http.ResponseWriter, r *http.Request) (string, interfa
 		}
 	}
 
-	queryBuilder := NewBigQueryQueryBuilder(lib.RenewPolicyViewCollection, "rp", nil)
+	queryBuilder := query_builder.NewBigQueryQueryBuilder(lib.RenewPolicyViewCollection, "rp", nil)
 	query, queryParams := queryBuilder.BuildQuery(paramsMap)
 	if query == "" {
 		log.Print("error generating query")
@@ -60,14 +43,14 @@ func GetRenewPoliciesFx(w http.ResponseWriter, r *http.Request) (string, interfa
 
 	log.Printf("query: %s\nqueryParams: %+v", query, queryParams)
 
-	policies, err := lib.QueryParametrizedRowsBigQuery[PolicyInfo](query, queryParams)
+	policies, err := lib.QueryParametrizedRowsBigQuery[md.PolicyInfo](query, queryParams)
 	if err != nil {
 		log.Printf("error executing query: %s", err.Error())
 		return "", nil, err
 	}
 
-	resp := &GetRenewPoliciesResp{
-		RenewPolicies: policies,
+	resp := &GetRenewedPoliciesResp{
+		RenewedPolicies: policies,
 	}
 
 	rawResp, err := json.Marshal(resp)
