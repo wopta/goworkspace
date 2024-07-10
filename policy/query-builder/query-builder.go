@@ -23,14 +23,14 @@ var (
 		{"contractorName": []string{"contractorName", "contractorSurname"}},
 		{"contractorSurname": []string{"contractorName", "contractorSurname"}},
 
-		{"startDateFrom": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "reserved", "status", "payment", "renewMonth"}},
-		{"startDateTo": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "reserved", "status", "payment", "renewMonth"}},
-		{"company": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "reserved", "status", "payment", "renewMonth"}},
-		{"product": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "reserved", "status", "payment", "renewMonth"}},
-		{"producerUid": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "reserved", "status", "payment", "renewMonth"}},
-		{"status": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "reserved", "status", "payment", "renewMonth"}},
-		{"payment": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "reserved", "status", "payment", "renewMonth"}},
-		{"renewMonth": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "reserved", "status", "payment", "renewMonth"}},
+		{"startDateFrom": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "payment", "renewMonth"}},
+		{"startDateTo": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "payment", "renewMonth"}},
+		{"company": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "payment", "renewMonth"}},
+		{"product": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "payment", "renewMonth"}},
+		{"producerUid": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "payment", "renewMonth"}},
+		{"status": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "payment", "renewMonth"}},
+		{"payment": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "payment", "renewMonth"}},
+		{"renewMonth": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "payment", "renewMonth"}},
 	}
 
 	paramsWhereClause = map[string]string{
