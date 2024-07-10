@@ -30,7 +30,7 @@ type PolicyInfo struct {
 	PaymentSplit   string         `json:"paymentSplit" bigquery:"paymentSplit"`
 }
 
-type GetRenewPolicies struct {
+type GetRenewPoliciesResp struct {
 	RenewPolicies []PolicyInfo `json:"renewPolicies"`
 }
 
@@ -66,7 +66,7 @@ func GetRenewPoliciesFx(w http.ResponseWriter, r *http.Request) (string, interfa
 		return "", nil, err
 	}
 
-	resp := &GetRenewPolicies{
+	resp := &GetRenewPoliciesResp{
 		RenewPolicies: policies,
 	}
 
