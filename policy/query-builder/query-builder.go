@@ -116,23 +116,23 @@ func (qb *BigQueryQueryBuilder) filterParams(params map[string]string, allowedPa
 
 func (qb *BigQueryQueryBuilder) processOrClauseParam(paramValue string) string {
 	whereClauses := make([]string, 0)
-	statusList := strings.Split(paramValue, ",")
-	for _, status := range statusList {
-		if val, ok := paramsWhereClause[lib.ToLower(status)]; ok && val != "" {
+	paramsValueList := strings.Split(paramValue, ",")
+	for _, status := range paramsValueList {
+		if val, ok := paramsWhereClause[lib.TrimSpace(status)]; ok && val != "" {
 			whereClauses = append(whereClauses, val)
 		}
 	}
 	return "(" + strings.Join(whereClauses, " OR ") + ")"
 }
 
-func (qb *BigQueryQueryBuilder) processProducerUidParam(paramKey, paramValue string, queryParams map[string]interface{}) string {
+func (qb *BigQueryQueryBuilder) processProducerUidParam(paramValue string, queryParams map[string]interface{}) string {
 	tmp := make([]string, 0)
 	for _, uid := range strings.Split(paramValue, ",") {
 		randomIdentifier := qb.randomGenerator()
 		queryParams[randomIdentifier] = uid
 		tmp = append(tmp, fmt.Sprintf("'@%s'", randomIdentifier))
 	}
-	return fmt.Sprintf(paramsWhereClause[paramKey], strings.Join(tmp, ", "))
+	return fmt.Sprintf(paramsWhereClause["producerUid"], strings.Join(tmp, ", "))
 }
 
 func (qb *BigQueryQueryBuilder) processParams(allowedParams []string, filteredParams map[string]string) ([]string, map[string]interface{}) {
@@ -149,7 +149,7 @@ func (qb *BigQueryQueryBuilder) processParams(allowedParams []string, filteredPa
 			whereClause := qb.processOrClauseParam(filteredParams[paramKey])
 			whereClauses = append(whereClauses, whereClause)
 		} else if paramKey == "producerUid" {
-			whereClause := qb.processProducerUidParam(paramKey, paramValue, queryParams)
+			whereClause := qb.processProducerUidParam(paramValue, queryParams)
 			whereClauses = append(whereClauses, whereClause)
 		} else {
 			randomIdentifier := qb.randomGenerator()

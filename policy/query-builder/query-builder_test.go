@@ -4,12 +4,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/wopta/goworkspace/lib"
 	query_builder "github.com/wopta/goworkspace/policy/query-builder"
 )
 
 func TestQueryBuilder(t *testing.T) {
-	qb := query_builder.NewBigQueryQueryBuilder(lib.RenewPolicyViewCollection, "rp", func() string {
+	qb := query_builder.NewBigQueryQueryBuilder("test-collection", "rp", func() string {
 		return "test"
 	})
 	var testCases = []struct {
@@ -128,7 +127,7 @@ func TestQueryBuilder(t *testing.T) {
 }
 
 func TestQueryBuilderFail(t *testing.T) {
-	qb := query_builder.NewBigQueryQueryBuilder(lib.RenewPolicyViewCollection, "rp", func() string {
+	qb := query_builder.NewBigQueryQueryBuilder("test-collection", "rp", func() string {
 		return "test"
 	})
 	var testCases = []struct {
