@@ -9,22 +9,14 @@ import (
 	"time"
 )
 
-func TriggerRenew(dryRun bool, appCheckToken string) {
+func TriggerRenewDraft(dryRun bool, appCheckToken string) {
 	baseUrl := "https://api.dev.wopta.it/"
-	//filePrefix := "dev"
 	if os.Getenv("env") == "prod" {
 		baseUrl = "https://api.prod.wopta.it/"
-		//filePrefix = "prod"
 	}
 
-	/*var dates []string
-	b, err := os.ReadFile(fmt.Sprintf("./_script/%s-dates.json", filePrefix))
-	lib.CheckError(err)
-	err = json.Unmarshal(b, &dates)
-	lib.CheckError(err)*/
-
 	endpointUrl := baseUrl + "renew/v1/draft?policyType=multiYear&quoteType=fixed"
-	for _, date := range []string{"2024-07-03"} {
+	for _, date := range []string{} {
 		parsedDate, _ := time.Parse(time.DateOnly, date)
 		targetDate := parsedDate.AddDate(1, 0, -45).Format(time.DateOnly)
 
@@ -46,7 +38,40 @@ func TriggerRenew(dryRun bool, appCheckToken string) {
 
 		if res.StatusCode != http.StatusOK {
 			log.Printf("Failed to renew draft in date %s due to status code %d", date, res.StatusCode)
-			continue
+		}
+
+		fmt.Println("Press the Enter Key to continue")
+		fmt.Scanln() // wait for Enter Key
+	}
+
+}
+
+func TriggerRenewPromote(dryRun bool, appCheckToken string) {
+	baseUrl := "https://api.dev.wopta.it/"
+	if os.Getenv("env") == "prod" {
+		baseUrl = "https://api.prod.wopta.it/"
+	}
+
+	endpointUrl := baseUrl + "renew/v1/promote"
+	for _, date := range []string{} {
+		fmt.Printf("date: %s\n", date)
+		body := strings.NewReader(fmt.Sprintf(`{"dryRun": %v, "date": "%s"}`, dryRun, date))
+
+		req, err := http.NewRequest(http.MethodPost, endpointUrl, body)
+		if err != nil {
+			panic(err)
+		}
+
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("X-Firebase-Appcheck", appCheckToken)
+
+		res, err := http.DefaultClient.Do(req)
+		if err != nil {
+			panic(err)
+		}
+
+		if res.StatusCode != http.StatusOK {
+			log.Printf("Failed to renew draft in date %s due to status code %d", date, res.StatusCode)
 		}
 
 		fmt.Println("Press the Enter Key to continue")

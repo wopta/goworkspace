@@ -35,7 +35,7 @@ func fabrickPersistentToken(r *http.Request) (string, interface{}, error) {
 	defer r.Body.Close()
 	err = json.Unmarshal(rawBody, &body)
 	if err != nil {
-		log.Println("Error Unmarshal Request Body: %s", err.Error())
+		log.Printf("Error Unmarshal Request Body: %s\n", err.Error())
 		return "", nil, err
 	}
 
@@ -43,7 +43,7 @@ func fabrickPersistentToken(r *http.Request) (string, interface{}, error) {
 
 	req, err := http.NewRequest(http.MethodPost, urlstring, bytes.NewBuffer([]byte(body.Body)))
 	if err != nil {
-		log.Println("Error request body: %s", err.Error())
+		log.Printf("Error request body: %s\n", err.Error())
 		return "", nil, err
 	}
 
@@ -57,7 +57,7 @@ func fabrickPersistentToken(r *http.Request) (string, interface{}, error) {
 
 	res, err := lib.RetryDo(req, 5, 10)
 	if err != nil {
-		log.Println("Error getting response: %s", err.Error())
+		log.Printf("Error getting response: %s\n", err.Error())
 		return "", nil, err
 	}
 
@@ -66,7 +66,7 @@ func fabrickPersistentToken(r *http.Request) (string, interface{}, error) {
 	rawResp, err := io.ReadAll(res.Body)
 	defer res.Body.Close()
 	if err != nil {
-		log.Println("Error Read Response Body: %s", err.Error())
+		log.Printf("Error Read Response Body: %s\n", err.Error())
 		return "", nil, err
 	}
 
