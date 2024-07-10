@@ -59,6 +59,12 @@ var policyRoutes []lib.Route = []lib.Route{
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleManager, lib.UserRoleAgent, lib.UserRoleAgency},
 	},
+	{
+		Route:   "/renew/v1/{uid}",
+		Handler: lib.ResponseLoggerWrapper(GetRenewPolicyByUidFx),
+		Method:  http.MethodGet,
+		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleManager, lib.UserRoleAgent, lib.UserRoleAgency},
+	},
 }
 
 func init() {
