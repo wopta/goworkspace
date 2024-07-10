@@ -10,6 +10,7 @@ import (
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
+	md "github.com/wopta/goworkspace/policy/models"
 )
 
 type GetPoliciesReq struct {
@@ -19,14 +20,14 @@ type GetPoliciesReq struct {
 }
 
 type GetPortfolioPoliciesResp struct {
-	Policies []PolicyInfo `json:"policies"`
+	Policies []md.PolicyInfo `json:"policies"`
 }
 
 func GetPortfolioPoliciesFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		req  GetPoliciesReq
 		resp = GetPortfolioPoliciesResp{
-			Policies: make([]PolicyInfo, 0),
+			Policies: make([]md.PolicyInfo, 0),
 		}
 		nodeUid string
 	)
@@ -86,7 +87,7 @@ func GetPortfolioPoliciesFx(w http.ResponseWriter, r *http.Request) (string, int
 	return string(rawResp), resp, err
 }
 
-func getPortfolioPolicies(producers []string, requestQueries []models.Query, limit int) ([]PolicyInfo, error) {
+func getPortfolioPolicies(producers []string, requestQueries []models.Query, limit int) ([]md.PolicyInfo, error) {
 	var (
 		err        error
 		fieldName  = "producerUid"

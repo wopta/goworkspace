@@ -8,13 +8,13 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
-
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/network"
+	"github.com/wopta/goworkspace/policy/models"
 )
 
 type GetNodePoliciesResp struct {
-	Policies []PolicyInfo `json:"policies"`
+	Policies []models.PolicyInfo `json:"policies"`
 }
 
 func GetNodePoliciesFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -22,7 +22,7 @@ func GetNodePoliciesFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		err      error
 		req      GetPoliciesReq
 		resp     GetNodePoliciesResp
-		policies = make([]PolicyInfo, 0)
+		policies = make([]models.PolicyInfo, 0)
 	)
 
 	log.SetPrefix("[GetNodePoliciesFx] ")
