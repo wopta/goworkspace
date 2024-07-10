@@ -72,8 +72,8 @@ func (qs *QuoteSpreadsheet) setInitCells(sheetClient *sheets.Service, ctx contex
 		ValueInputOption: "USER_ENTERED",
 	}
 
-	for _, cell := range qs.InitCells {
 
+	for _, cell := range qs.InitCells {
 		/*
 			cel := &sheets.ValueRange{
 				Values: [][]interface{}{{cell.Value}},
@@ -118,8 +118,8 @@ func (qs *QuoteSpreadsheet) getOutput(sheetClient *sheets.Service) []Cell {
 	col := map[string]int{"A": 0, "B": 1, "C": 2, "E": 3, "F": 4, "G": 5}
 	sheet, e := sheetClient.Spreadsheets.Values.Get(qs.Id, qs.SheetName+"!A:G").Do()
 	lib.CheckError(e)
-	for _, cell := range qs.OutputCells {
 
+	for _, cell := range qs.OutputCells {
 		row, e := strconv.Atoi(string(string(cell.Cell[1:])))
 		colum := cell.Cell[0:1]
 		lib.CheckError(e)
