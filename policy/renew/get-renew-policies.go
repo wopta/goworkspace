@@ -14,7 +14,7 @@ import (
 )
 
 type GetRenewedPoliciesResp struct {
-	RenewedPolicies []md.PolicyInfo `json:"renewedPolicies"`
+	RenewedPolicies []md.PolicyInfo `json:"policies"`
 }
 
 func GetRenewedPoliciesFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
