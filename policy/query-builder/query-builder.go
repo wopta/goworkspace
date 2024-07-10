@@ -118,7 +118,7 @@ func (qb *BigQueryQueryBuilder) processOrClauseParam(paramValue string) string {
 	whereClauses := make([]string, 0)
 	statusList := strings.Split(paramValue, ",")
 	for _, status := range statusList {
-		if val, ok := paramsWhereClause[status]; ok && val != "" {
+		if val, ok := paramsWhereClause[lib.ToLower(status)]; ok && val != "" {
 			whereClauses = append(whereClauses, val)
 		}
 	}
