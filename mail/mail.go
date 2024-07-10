@@ -27,6 +27,12 @@ var mailRoutes []lib.Route = []lib.Route{
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
 	},
+	{
+		Route:   "/v1/renew-notice",
+		Method:  http.MethodPost,
+		Handler: lib.ResponseLoggerWrapper(RenewNoticeFx),
+		Roles:   []string{},
+	},
 }
 
 func init() {
