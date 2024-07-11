@@ -55,6 +55,8 @@ steps:
       gsutil -m cp -r gs://core-350507-function-data/assets/documents/** /workspace/${strarr[0]}/tmp/assets
     fi
     
+    cp /workspace/.gcloudignore /workspace/${strarr[0]}/.gcloudignore 
+    
     gcloud functions deploy ${strarr[0]} \
     --region=europe-west1 \
     --source=/workspace/${strarr[0]} \
