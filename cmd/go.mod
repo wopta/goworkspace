@@ -1,20 +1,55 @@
-module github.com/wopta/goworkspace/callback
+module github.com/wopta/goworkspace/cmd
 
 go 1.21
 
-replace github.com/wopta/goworkspace/callback => ./
+toolchain go1.21.7
+
+replace (
+	github.com/wopta/goworkspace/auth => ../auth
+	github.com/wopta/goworkspace/broker => ../broker
+	github.com/wopta/goworkspace/callback => ../callback
+	github.com/wopta/goworkspace/claim => ../claim
+	github.com/wopta/goworkspace/companydata => ../companydata
+	github.com/wopta/goworkspace/document => ../document
+	github.com/wopta/goworkspace/enrich => ../enrich
+	github.com/wopta/goworkspace/form => ../form
+	github.com/wopta/goworkspace/mail => ../mail
+	github.com/wopta/goworkspace/mga => ../mga
+	github.com/wopta/goworkspace/partnership => ../partnership
+	github.com/wopta/goworkspace/policy => ../policy
+	github.com/wopta/goworkspace/question => ../question
+	github.com/wopta/goworkspace/quote => ../quote
+	github.com/wopta/goworkspace/renew => ../renew
+	github.com/wopta/goworkspace/reserved => ../reserved
+	github.com/wopta/goworkspace/rules => ../rules
+	github.com/wopta/goworkspace/sellable => ../sellable
+	github.com/wopta/goworkspace/test => ../test
+	github.com/wopta/goworkspace/user => ../user
+)
 
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
-	github.com/wopta/goworkspace/bpmn v1.0.18
-	github.com/wopta/goworkspace/callback_out v1.0.12
-	github.com/wopta/goworkspace/lib v1.0.127
+	github.com/joho/godotenv v1.5.1
+	github.com/wopta/goworkspace/auth v0.0.0-00010101000000-000000000000
+	github.com/wopta/goworkspace/broker v0.0.0-00010101000000-000000000000
+	github.com/wopta/goworkspace/callback v0.0.0-00010101000000-000000000000
+	github.com/wopta/goworkspace/claim v0.0.0-00010101000000-000000000000
+	github.com/wopta/goworkspace/companydata v0.0.0-00010101000000-000000000000
+	github.com/wopta/goworkspace/document v1.1.85
+	github.com/wopta/goworkspace/enrich v0.0.0-00010101000000-000000000000
+	github.com/wopta/goworkspace/form v0.0.0-00010101000000-000000000000
 	github.com/wopta/goworkspace/mail v1.0.118
-	github.com/wopta/goworkspace/models v1.1.121
-	github.com/wopta/goworkspace/network v1.0.70
-	github.com/wopta/goworkspace/policy v1.0.110
-	github.com/wopta/goworkspace/product v1.0.115
-	github.com/wopta/goworkspace/transaction v1.0.90
+	github.com/wopta/goworkspace/mga v0.0.0-00010101000000-000000000000
+	github.com/wopta/goworkspace/partnership v0.0.0-00010101000000-000000000000
+	github.com/wopta/goworkspace/policy v1.0.109
+	github.com/wopta/goworkspace/question v1.0.61
+	github.com/wopta/goworkspace/quote v1.0.77
+	github.com/wopta/goworkspace/renew v0.0.0-00010101000000-000000000000
+	github.com/wopta/goworkspace/reserved v1.0.112
+	github.com/wopta/goworkspace/rules v0.0.0-00010101000000-000000000000
+	github.com/wopta/goworkspace/sellable v1.0.96
+	github.com/wopta/goworkspace/test v0.0.0-00010101000000-000000000000
+	github.com/wopta/goworkspace/user v1.0.103
 )
 
 require (
@@ -24,6 +59,7 @@ require (
 	cloud.google.com/go/bigquery v1.61.0 // indirect
 	cloud.google.com/go/compute/metadata v0.3.0 // indirect
 	cloud.google.com/go/firestore v1.15.0 // indirect
+	cloud.google.com/go/functions v1.16.2 // indirect
 	cloud.google.com/go/iam v1.1.8 // indirect
 	cloud.google.com/go/longrunning v0.5.7 // indirect
 	cloud.google.com/go/pubsub v1.38.0 // indirect
@@ -48,6 +84,7 @@ require (
 	github.com/go-pdf/fpdf v0.6.0 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
+	github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/flatbuffers v23.5.26+incompatible // indirect
@@ -71,20 +108,29 @@ require (
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/pierrec/lz4/v4 v4.1.18 // indirect
 	github.com/pkg/sftp v1.13.5 // indirect
+	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/richardlehane/mscfb v1.0.4 // indirect
 	github.com/richardlehane/msoleps v1.0.3 // indirect
 	github.com/ruudk/golang-pdf417 v0.0.0-20201230142125-a7e3863a1245 // indirect
 	github.com/sergi/go-diff v1.0.0 // indirect
-	github.com/sirupsen/logrus v1.8.1 // indirect
+	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/src-d/gcfg v1.4.0 // indirect
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.2.1 // indirect
-	github.com/wopta/goworkspace/document v1.1.85 // indirect
+	github.com/wopta/goworkspace/bpmn v1.0.18 // indirect
+	github.com/wopta/goworkspace/callback_out v1.0.12 // indirect
+	github.com/wopta/goworkspace/inclusive v0.0.4 // indirect
+	github.com/wopta/goworkspace/lib v1.0.127 // indirect
+	github.com/wopta/goworkspace/models v1.1.124 // indirect
+	github.com/wopta/goworkspace/network v1.0.70 // indirect
+	github.com/wopta/goworkspace/payment v1.0.219 // indirect
+	github.com/wopta/goworkspace/product v1.0.115 // indirect
+	github.com/wopta/goworkspace/transaction v1.0.89 // indirect
 	github.com/wopta/goworkspace/wiseproxy v1.0.3 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
-	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect
-	github.com/xuri/excelize/v2 v2.7.0 // indirect
-	github.com/xuri/nfp v0.0.0-20220409054826-5e722a1d9e22 // indirect
+	github.com/xuri/efp v0.0.0-20231025114914-d1ff6096ae53 // indirect
+	github.com/xuri/excelize/v2 v2.8.1 // indirect
+	github.com/xuri/nfp v0.0.0-20230919160717-d98342af3f05 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.49.0 // indirect
@@ -118,4 +164,5 @@ require (
 	gopkg.in/src-d/go-billy.v4 v4.3.2 // indirect
 	gopkg.in/src-d/go-git.v4 v4.13.1 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
+	modernc.org/mathutil v1.5.0 // indirect
 )

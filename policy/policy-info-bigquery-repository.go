@@ -2,40 +2,24 @@ package policy
 
 import (
 	"bytes"
-	"cloud.google.com/go/civil"
 	"fmt"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
 	"math/rand"
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
+	md "github.com/wopta/goworkspace/policy/models"
 )
 
-type PolicyInfo struct {
-	Uid            string         `json:"uid" bigquery:"uid"`
-	ProductName    string         `json:"productName" bigquery:"productName"`
-	CodeCompany    string         `json:"codeCompany" bigquery:"codeCompany"`
-	ProposalNumber int            `json:"proposalNumber" bigquery:"proposalNumber"`
-	NameDesc       string         `json:"nameDesc" bigquery:"nameDesc"`
-	Status         string         `json:"status" bigquery:"status"`
-	Contractor     string         `json:"contractor" bigquery:"contractor"`
-	Price          float64        `json:"price" bigquery:"price"`
-	PriceMonthly   float64        `json:"priceMonthly" bigquery:"priceMonthly"`
-	Producer       string         `json:"producer" bigquery:"producer"`
-	ProducerCode   string         `json:"producerCode" bigquery:"producerCode"`
-	StartDate      civil.DateTime `json:"startDate" bigquery:"startDate"`
-	EndDate        civil.DateTime `json:"endDate" bigquery:"endDate"`
-	PaymentSplit   string         `json:"paymentSplit" bigquery:"paymentSplit"`
-}
-
-func getPoliciesInfoQueriesBigQuery(queries []models.Query, limit int) ([]PolicyInfo, error) {
+func getPoliciesInfoQueriesBigQuery(queries []models.Query, limit int) ([]md.PolicyInfo, error) {
 	query, params, err := buildPolicyInfoQuery(queries, limit)
 	if err != nil {
 		return nil, err
 	}
 
-	policies, err := lib.QueryParametrizedRowsBigQuery[PolicyInfo](query, params)
+	policies, err := lib.QueryParametrizedRowsBigQuery[md.PolicyInfo](query, params)
 	if err != nil {
 		return nil, err
 	}

@@ -6,6 +6,7 @@ import (
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/policy/renew"
 )
 
 var policyRoutes []lib.Route = []lib.Route{
@@ -58,6 +59,12 @@ var policyRoutes []lib.Route = []lib.Route{
 		Handler: lib.ResponseLoggerWrapper(GetPolicyMediaFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleManager, lib.UserRoleAgent, lib.UserRoleAgency},
+	},
+	{
+		Route:   "/renewed/v1",
+		Handler: lib.ResponseLoggerWrapper(renew.GetRenewedPoliciesFx),
+		Method:  http.MethodGet,
+		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleManager, lib.UserRoleAgency, lib.UserRoleAgent},
 	},
 	{
 		Route:   "/renew/v1/{uid}",
