@@ -4,16 +4,16 @@ import (
 	"log"
 
 	"github.com/wopta/goworkspace/callback_out/internal"
-	"github.com/wopta/goworkspace/callback_out/types"
+	md "github.com/wopta/goworkspace/callback_out/models"
 	"github.com/wopta/goworkspace/models"
 )
 
 var (
-	Proposal        internal.CallbackoutAction = types.Proposal
-	RequestApproval internal.CallbackoutAction = types.RequestApproval
-	Emit            internal.CallbackoutAction = types.Emit
-	Paid            internal.CallbackoutAction = types.Paid
-	EmitRemittance  internal.CallbackoutAction = types.EmitRemittance
+	Proposal        internal.CallbackoutAction = md.Proposal
+	RequestApproval internal.CallbackoutAction = md.RequestApproval
+	Emit            internal.CallbackoutAction = md.Emit
+	Paid            internal.CallbackoutAction = md.Paid
+	EmitRemittance  internal.CallbackoutAction = md.EmitRemittance
 )
 
 func Execute(node *models.NetworkNode, policy models.Policy, rawAction internal.CallbackoutAction) {

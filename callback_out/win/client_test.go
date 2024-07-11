@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/wopta/goworkspace/callback_out/internal"
-	"github.com/wopta/goworkspace/callback_out/types"
+	md "github.com/wopta/goworkspace/callback_out/models"
 	"github.com/wopta/goworkspace/callback_out/win"
 )
 
@@ -12,7 +12,7 @@ func TestWinDecodeAction(t *testing.T) {
 	mockNodeCode := "Test.001"
 	mockClient := win.NewClient(mockNodeCode)
 
-	res := mockClient.DecodeAction(types.Paid)
+	res := mockClient.DecodeAction(md.Paid)
 	if len(res) != 1 {
 		t.Fatalf("expected 1 action for paid but got: %d (%v)", len(res), res)
 	}
@@ -20,7 +20,7 @@ func TestWinDecodeAction(t *testing.T) {
 		t.Fatalf("expected %s action but got: %s", internal.Paid, res[0])
 	}
 
-	res = mockClient.DecodeAction(types.Proposal)
+	res = mockClient.DecodeAction(md.Proposal)
 	if len(res) != 1 {
 		t.Fatalf("expected 1 action for proposal but got: %d (%v)", len(res), res)
 	}
@@ -28,7 +28,7 @@ func TestWinDecodeAction(t *testing.T) {
 		t.Fatalf("expected %s action but got: %s", internal.Proposal, res[0])
 	}
 
-	res = mockClient.DecodeAction(types.RequestApproval)
+	res = mockClient.DecodeAction(md.RequestApproval)
 	if len(res) != 1 {
 		t.Fatalf("expected 1 action for request approval but got: %d (%v)", len(res), res)
 	}
@@ -36,7 +36,7 @@ func TestWinDecodeAction(t *testing.T) {
 		t.Fatalf("expected %s action but got: %s", internal.RequestApproval, res[0])
 	}
 
-	res = mockClient.DecodeAction(types.Emit)
+	res = mockClient.DecodeAction(md.Emit)
 	if len(res) != 1 {
 		t.Fatalf("expected 1 action for emit but got: %d (%v)", len(res), res)
 	}
@@ -44,7 +44,7 @@ func TestWinDecodeAction(t *testing.T) {
 		t.Fatalf("expected %s action but got: %s", internal.Emit, res[0])
 	}
 
-	res = mockClient.DecodeAction(types.EmitRemittance)
+	res = mockClient.DecodeAction(md.EmitRemittance)
 	if len(res) != 2 {
 		t.Fatalf("expected 2 actions for emit remittance but got: %d (%v)", len(res), res)
 	}

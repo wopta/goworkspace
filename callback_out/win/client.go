@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/wopta/goworkspace/callback_out/internal"
-	"github.com/wopta/goworkspace/callback_out/types"
+	md "github.com/wopta/goworkspace/callback_out/models"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -121,11 +121,11 @@ func (c *Client) Paid(policy models.Policy) internal.CallbackInfo {
 func (c *Client) DecodeAction(rawAction string) []string {
 	decodedActions := make([]string, 0)
 	availableActions := map[string][]string{
-		types.Proposal:        {internal.Proposal},
-		types.RequestApproval: {internal.RequestApproval},
-		types.Emit:            {internal.Emit},
-		types.Paid:            {internal.Paid},
-		types.EmitRemittance:  {internal.Emit, internal.Paid},
+		md.Proposal:        {internal.Proposal},
+		md.RequestApproval: {internal.RequestApproval},
+		md.Emit:            {internal.Emit},
+		md.Paid:            {internal.Paid},
+		md.EmitRemittance:  {internal.Emit, internal.Paid},
 	}
 
 	decodedActions = availableActions[rawAction]
