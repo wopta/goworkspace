@@ -22,7 +22,7 @@ func TestQueryBuilder(t *testing.T) {
 				"codeCompany":       "100100",
 				"insuredFiscalCode": "LLLRRR85E05R94Z330F",
 			},
-			"(codeCompany = @test) LIMIT 10",
+			"(codeCompany = @test) ORDER BY rp.updateDate DESC LIMIT 10",
 		},
 		{
 			"fiscalCode overcome third-level parameters",
@@ -30,35 +30,35 @@ func TestQueryBuilder(t *testing.T) {
 				"insuredFiscalCode": "LLLRRR85E05R94Z330F",
 				"producerCode":      "a1b2c3d4",
 			},
-			"(JSON_VALUE(rp.data, '$.assets[0].person.fiscalCode') = @test) LIMIT 10",
+			"(JSON_VALUE(rp.data, '$.assets[0].person.fiscalCode') = @test) ORDER BY rp.updateDate DESC LIMIT 10",
 		},
 		{
 			"paid renew policies",
 			map[string]string{
 				"status": "paid",
 			},
-			"(((isDeleted = false OR isDeleted IS NULL) AND (isPay = true))) LIMIT 10",
+			"(((isDeleted = false OR isDeleted IS NULL) AND (isPay = true))) ORDER BY rp.updateDate DESC LIMIT 10",
 		},
 		{
 			"not paid renew policies",
 			map[string]string{
 				"status": "unpaid",
 			},
-			"(((isDeleted = false OR isDeleted IS NULL) AND (isPay = false))) LIMIT 10",
+			"(((isDeleted = false OR isDeleted IS NULL) AND (isPay = false))) ORDER BY rp.updateDate DESC LIMIT 10",
 		},
 		{
 			"renew policies with mandate active",
 			map[string]string{
 				"payment": "recurrent",
 			},
-			"(((isDeleted = false OR isDeleted IS NULL) AND (hasMandate = true))) LIMIT 10",
+			"(((isDeleted = false OR isDeleted IS NULL) AND (hasMandate = true))) ORDER BY rp.updateDate DESC LIMIT 10",
 		},
 		{
 			"renew policies with mandate non active",
 			map[string]string{
 				"payment": "notRecurrent",
 			},
-			"(((isDeleted = false OR isDeleted IS NULL) AND (hasMandate = false OR hasMandate IS NULL))) LIMIT 10",
+			"(((isDeleted = false OR isDeleted IS NULL) AND (hasMandate = false OR hasMandate IS NULL))) ORDER BY rp.updateDate DESC LIMIT 10",
 		},
 		{
 			"combine third-level parameters",
@@ -71,7 +71,7 @@ func TestQueryBuilder(t *testing.T) {
 			}, "(startDate >= @test) AND (startDate <= @test) AND " +
 				"(producerUid IN ('@test')) AND (((isDeleted = false OR isDeleted IS NULL) AND " +
 				"(isPay = true))) AND (((isDeleted = false OR isDeleted IS NULL) AND " +
-				"(hasMandate = true))) LIMIT 10",
+				"(hasMandate = true))) ORDER BY rp.updateDate DESC LIMIT 10",
 		},
 		{
 			"combine parameters from differents level",
@@ -80,28 +80,28 @@ func TestQueryBuilder(t *testing.T) {
 				"startDateFrom": "2024-07-04",
 				"startDateTo":   "2024-07-14",
 				"codeCompany":   "100100",
-			}, "(codeCompany = @test) LIMIT 10",
+			}, "(codeCompany = @test) ORDER BY rp.updateDate DESC LIMIT 10",
 		},
 		{
 			"invalid status",
 			map[string]string{
 				"status": "invalidValue,unpaid",
 			},
-			"(((isDeleted = false OR isDeleted IS NULL) AND (isPay = false))) LIMIT 10",
+			"(((isDeleted = false OR isDeleted IS NULL) AND (isPay = false))) ORDER BY rp.updateDate DESC LIMIT 10",
 		},
 		{
 			"single producer uid",
 			map[string]string{
 				"producerUid": "aaaa",
 			},
-			"(producerUid IN ('@test')) LIMIT 10",
+			"(producerUid IN ('@test')) ORDER BY rp.updateDate DESC LIMIT 10",
 		},
 		{
 			"multiple producer uid",
 			map[string]string{
 				"producerUid": "aaa,bbb",
 			},
-			"(producerUid IN ('@test', '@test')) LIMIT 10",
+			"(producerUid IN ('@test', '@test')) ORDER BY rp.updateDate DESC LIMIT 10",
 		},
 		{
 			"limit different from default",
@@ -109,7 +109,7 @@ func TestQueryBuilder(t *testing.T) {
 				"producerUid": "aaa,bbb",
 				"limit":       "50",
 			},
-			"(producerUid IN ('@test', '@test')) LIMIT 50",
+			"(producerUid IN ('@test', '@test')) ORDER BY rp.updateDate DESC LIMIT 50",
 		},
 	}
 
