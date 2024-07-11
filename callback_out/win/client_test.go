@@ -12,51 +12,54 @@ func TestWinDecodeAction(t *testing.T) {
 	mockNodeCode := "Test.001"
 	mockClient := win.NewClient(mockNodeCode)
 
-	res := mockClient.DecodeAction(md.Paid)
-	if len(res) != 1 {
-		t.Fatalf("expected 1 action for paid but got: %d (%v)", len(res), res)
-	}
-	if res[0] != internal.Paid {
-		t.Fatalf("expected %s action but got: %s", internal.Paid, res[0])
-	}
-
-	res = mockClient.DecodeAction(md.Proposal)
-	if len(res) != 1 {
-		t.Fatalf("expected 1 action for proposal but got: %d (%v)", len(res), res)
-	}
-	if res[0] != internal.Proposal {
-		t.Fatalf("expected %s action but got: %s", internal.Proposal, res[0])
-	}
-
-	res = mockClient.DecodeAction(md.RequestApproval)
-	if len(res) != 1 {
-		t.Fatalf("expected 1 action for request approval but got: %d (%v)", len(res), res)
-	}
-	if res[0] != internal.RequestApproval {
-		t.Fatalf("expected %s action but got: %s", internal.RequestApproval, res[0])
-	}
-
-	res = mockClient.DecodeAction(md.Emit)
-	if len(res) != 1 {
-		t.Fatalf("expected 1 action for emit but got: %d (%v)", len(res), res)
-	}
-	if res[0] != internal.Emit {
-		t.Fatalf("expected %s action but got: %s", internal.Emit, res[0])
-	}
-
-	res = mockClient.DecodeAction(md.EmitRemittance)
-	if len(res) != 2 {
-		t.Fatalf("expected 2 actions for emit remittance but got: %d (%v)", len(res), res)
-	}
-	if res[0] != internal.Emit {
-		t.Fatalf("expected %s action but got: %s", internal.Emit, res[0])
-	}
-	if res[1] != internal.Paid {
-		t.Fatalf("expected %s action but got: %s", internal.Paid, res[1])
+	var testCases = []struct {
+		name  string
+		input string
+		want  []string
+	}{
+		{
+			name:  "Paid",
+			input: md.Paid,
+			want:  []string{internal.Paid},
+		},
+		{
+			name:  "Proposal",
+			input: md.Proposal,
+			want:  []string{internal.Proposal},
+		},
+		{
+			name:  "RequestApproval",
+			input: md.RequestApproval,
+			want:  []string{internal.RequestApproval},
+		},
+		{
+			name:  "Emit",
+			input: md.Emit,
+			want:  []string{internal.Emit},
+		},
+		{
+			name:  "EmitRemittance",
+			input: md.EmitRemittance,
+			want:  []string{internal.Emit, internal.Paid},
+		},
+		{
+			name:  "Unhandled action",
+			input: "NON_EXISTING",
+			want:  []string{},
+		},
 	}
 
-	res = mockClient.DecodeAction("WRONG_ACTION")
-	if len(res) != 0 {
-		t.Fatalf("expected 0 actions for WRONG_ACTION but got: %d (%v)", len(res), res)
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			got := mockClient.DecodeAction(tc.input)
+			if len(got) != len(tc.want) {
+				t.Fatalf("expected %d action for paid but got: %d (%v)", len(tc.want), len(got), got)
+			}
+			for idx, action := range got {
+				if action != tc.want[idx] {
+					t.Fatalf("expected %s action but got: %s", tc.want[idx], action)
+				}
+			}
+		})
 	}
 }
