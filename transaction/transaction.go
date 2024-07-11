@@ -9,6 +9,7 @@ import (
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/transaction/renew"
 )
 
 var transactionRoutes []lib.Route = []lib.Route{
@@ -28,6 +29,17 @@ var transactionRoutes []lib.Route = []lib.Route{
 		Handler: lib.ResponseLoggerWrapper(RestoreTransactionFx),
 		Method:  http.MethodPost,
 		Roles:   []string{models.UserRoleAdmin},
+	},
+	{
+		Route:   "/policy/renew/v1/{policyUid}",
+		Handler: lib.ResponseLoggerWrapper(renew.GetRenewTransactionsByPolicyUidFx),
+		Method:  http.MethodGet,
+		Roles: []string{
+			models.UserRoleAdmin,
+			models.UserRoleManager,
+			models.UserRoleAgency,
+			models.UserRoleAgent,
+		},
 	},
 }
 
