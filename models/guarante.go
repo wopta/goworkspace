@@ -92,6 +92,8 @@ type GuaranteValue struct {
 type GuaranteConfig struct {
 	StartDate                              *time.Time           `firestore:"startDate,omitempty" json:"startDate,omitempty" bigquery:"-"`
 	StartDateString                        string               `firestore:"startDateString,omitempty" json:"startDateString,omitempty" bigquery:"-"`
+	RetroactiveDate                        *time.Time           `firestore:"retroactiveDate ,omitempty" json:"retroactiveDate,omitempty" bigquery:"-"`
+	RetroactiveUsaCanDate                  *time.Time           `firestore:"retroactiveUsaCanDate,omitempty" json:"retroactiveUsaCanDate,omitempty" bigquery:"-"`
 	TypeOfSumInsured                       string               `firestore:"typeOfSumInsured,omitempty" json:"typeOfSumInsured,omitempty"`
 	Deductible                             string               `firestore:"deductible,omitempty" json:"deductible,omitempty"`
 	DeductibleValues                       GuaranteFieldValue   `firestore:"deductibleValues,omitempty" json:"deductibleValues,omitempty"`
@@ -123,6 +125,8 @@ type GuaranteConfig struct {
 	SumInsuredLimitOfIndemnityTextField    *GuaranteFieldConfig `firestore:"sumInsuredLimitOfIndemnityTextField,omitempty" json:"sumInsuredLimitOfIndemnityTextField,omitempty"`
 	SumInsuredTextField                    *GuaranteFieldConfig `firestore:"sumInsuredTextField,omitempty" json:"sumInsuredTextField,omitempty"`
 	DurationStartDateStringSliderTextField *GuaranteFieldConfig `firestore:"durationStartDateStringSliderTextField,omitempty" json:"durationStartDateStringSliderTextField,omitempty"`
+	RetroactiveDatePicker                  *GuaranteFieldConfig `firestore:"retroactiveDatePicker,omitempty" json:"retroactiveDatePicker,omitempty"`
+	RetroactiveUsaCanDatePicker            *GuaranteFieldConfig `firestore:"retroactiveUsaCanDatePicker,omitempty" json:"retroactiveUsaCanDatePicker,omitempty"`
 }
 type GuaranteFieldValue struct {
 	Min    float64   `firestore:"min,omitempty" json:"min,omitempty"`
@@ -133,9 +137,12 @@ type GuaranteFieldValue struct {
 type GuaranteFieldConfig struct {
 	Min            float64   `firestore:"min,omitempty" json:"min,omitempty"`
 	Max            float64   `firestore:"max,omitempty" json:"max,omitempty"`
+	DurationMin    float64   `firestore:"durationMin,omitempty" json:"durationMin,omitempty"`
+	DurationMax    float64   `firestore:"durationMax,omitempty" json:"durationMax,omitempty"`
 	Step           float64   `firestore:"step,omitempty" json:"step,omitempty"`
 	Values         []float64 `firestore:"values,omitempty" json:"values,omitempty"`
 	Label          string    `firestore:"label,omitempty" json:"label,omitempty"`
+	DefaultValue   string    `firestore:"defaultValue,omitempty" json:"defaultValue,omitempty"`
 	Description    string    `firestore:"description,omitempty" json:"description,omitempty"`
 	TextFieldLabel string    `firestore:"textFieldLabel,omitempty" json:"textFieldLabel,omitempty"`
 }
@@ -152,8 +159,9 @@ type Tax struct {
 }
 
 type Duration struct {
-	Year int `firestore:"year,omitempty" json:"year,omitempty"`
-	Day  int `firestore:"day,omitempty" json:"day,omitempty"`
+	Year    int `firestore:"year,omitempty" json:"year,omitempty"`
+	Day     int `firestore:"day,omitempty" json:"day,omitempty"`
+	Monthly int `firestore:"monthly,omitempty" json:"monthly,omitempty"`
 }
 
 type ReservedLimits struct {
