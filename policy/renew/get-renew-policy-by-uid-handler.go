@@ -33,7 +33,7 @@ func GetRenewPolicyByUidFx(w http.ResponseWriter, r *http.Request) (string, any,
 
 	uid := chi.URLParam(r, "uid")
 
-	if policy, err = getRenewPolicyByUid(uid); err != nil {
+	if policy, err = GetRenewPolicyByUid(uid); err != nil {
 		log.Printf("error getting policy with uid: '%s'", uid)
 		return "", nil, err
 	}
@@ -47,7 +47,7 @@ func GetRenewPolicyByUidFx(w http.ResponseWriter, r *http.Request) (string, any,
 	return string(bytes), policy, nil
 }
 
-func getRenewPolicyByUid(uid string) (models.Policy, error) {
+func GetRenewPolicyByUid(uid string) (models.Policy, error) {
 	var policy models.Policy
 
 	snapshot, err := lib.GetFirestoreErr(lib.RenewPolicyCollection, uid)
