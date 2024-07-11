@@ -67,8 +67,8 @@ var policyRoutes []lib.Route = []lib.Route{
 		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleManager, lib.UserRoleAgency, lib.UserRoleAgent},
 	},
 	{
-		Route:   "/renew/v1/{uid}",
-		Handler: lib.ResponseLoggerWrapper(GetRenewPolicyByUidFx),
+		Route:   "/renewed/v1/{uid}",
+		Handler: lib.ResponseLoggerWrapper(renew.GetRenewPolicyByUidFx),
 		Method:  http.MethodGet,
 		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleManager, lib.UserRoleAgent, lib.UserRoleAgency},
 	},
