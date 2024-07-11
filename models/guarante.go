@@ -137,8 +137,8 @@ type GuaranteFieldValue struct {
 type GuaranteFieldConfig struct {
 	Min            float64   `firestore:"min,omitempty" json:"min,omitempty"`
 	Max            float64   `firestore:"max,omitempty" json:"max,omitempty"`
-	DurationMin    float64   `firestore:"durationMin,omitempty" json:"min,omitempty"`
-	DurationMax    float64   `firestore:"durationMax,omitempty" json:"max,omitempty"`
+	DurationMin    float64   `firestore:"durationMin,omitempty" json:"durationMin,omitempty"`
+	DurationMax    float64   `firestore:"durationMax,omitempty" json:"durationMax,omitempty"`
 	Step           float64   `firestore:"step,omitempty" json:"step,omitempty"`
 	Values         []float64 `firestore:"values,omitempty" json:"values,omitempty"`
 	Label          string    `firestore:"label,omitempty" json:"label,omitempty"`
