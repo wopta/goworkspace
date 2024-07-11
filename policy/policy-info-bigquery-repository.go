@@ -66,6 +66,8 @@ func buildPolicyInfoQuery(queries []models.Query, limit int) (string, map[string
 		buildWhereClause(&query, q, op, paramsKeys, "p")
 	}
 
+	query.WriteString(" ORDER BY JSON_VALUE(p.data, '$.updated') DESC")
+
 	if limit != 0 {
 		query.WriteString(fmt.Sprintf(" LIMIT %d", limit))
 	}
