@@ -10,7 +10,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	plc "github.com/wopta/goworkspace/policy"
+	"github.com/wopta/goworkspace/policy/renew"
+	"github.com/wopta/goworkspace/policy/utils"
 	"google.golang.org/api/iterator"
 )
 
@@ -46,13 +47,12 @@ func GetRenewTransactionsByPolicyUidFx(w http.ResponseWriter, r *http.Request) (
 	userUid := authToken.UserID
 	policyUid := chi.URLParam(r, "policyUid")
 
-	// TODO: change into renewpolicy
-	if policy, err = plc.GetPolicy(policyUid, ""); err != nil {
+	if policy, err = renew.GetRenewPolicyByUid(policyUid); err != nil {
 		log.Printf("error fetching policy '%s'", policyUid)
 		return "", nil, err
 	}
 
-	if !plc.CanBeAccessedBy(authToken.Role, policy.ProducerUid, authToken.UserID) {
+	if !utils.CanBeAccessedBy(authToken.Role, policy.ProducerUid, authToken.UserID) {
 		log.Printf("policy %s is not included in %s %s portfolio", policyUid, authToken.Role, userUid)
 		return "", nil, errUnauthorized
 	}
