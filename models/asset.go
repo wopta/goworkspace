@@ -41,7 +41,6 @@ type Building struct {
 	HasSprinkler      bool     `firestore:"hasSprinkler" json:"hasSprinkler"`
 }
 
-
 type Enterprise struct {
 	Name                      string   `firestore:"name,omitempty" json:"name,omitempty"`
 	Address                   *Address `firestore:"address,omitempty"         json:"address,omitempty"         bigquery:"-"`
@@ -52,6 +51,7 @@ type Enterprise struct {
 	City                      string   `firestore:"city,omitempty" json:"city,omitempty"`
 	Locality                  string   `firestore:"locality" json:"locality,omitempty"`
 	VatCode                   string   `firestore:"vatCode,omitempty" json:"vatCode,omitempty"`
+	FiscalCode                string   `firestore:"fiscalCode" json:"fiscalCode,omitempty"`
 	Ateco                     string   `firestore:"ateco,omitempty" json:"ateco,omitempty"`
 	AtecoDesc                 string   `firestore:"atecoDesc,omitempty" json:"atecoDesc,omitempty"`
 	AtecoMacro                string   `firestore:"atecoMacro,omitempty" json:"atecoMacro,omitempty"`
