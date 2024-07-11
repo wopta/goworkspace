@@ -46,7 +46,7 @@ var (
 		"startDateFrom": "(startDate >= @%s)",
 		"startDateTo":   "(startDate <= @%s)",
 		"company":       "(company = LOWER(@%s))",
-		"product":       "(product = LOWER(@%s))",
+		"product":       "(name = LOWER(@%s))",
 		"producerUid":   "(producerUid IN (%s))",
 		"renewMonth":    "((isDeleted = false OR isDeleted IS NULL) AND (EXTRACT(MONTH FROM startDate) = CAST(@%s AS INTEGER)))",
 		"paid":          "((isDeleted = false OR isDeleted IS NULL) AND (isPay = true))",

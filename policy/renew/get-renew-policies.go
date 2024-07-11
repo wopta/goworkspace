@@ -13,14 +13,24 @@ import (
 	"github.com/wopta/goworkspace/policy/query-builder"
 )
 
-type GetRenewedPoliciesResp struct {
-	RenewedPolicies []md.PolicyInfo `json:"policies"`
+type GetRenewPoliciesResp struct {
+	RenewPolicies []md.PolicyInfo `json:"policies"`
 }
 
-func GetRenewedPoliciesFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func GetRenewPoliciesFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err error
 	)
+
+	log.SetPrefix("[GetRenewPoliciesFx] ")
+	defer func() {
+		if err != nil {
+			log.Printf("error: %s", err)
+		}
+		log.Println("Handler end ---------------------------------------------")
+		log.SetPrefix("")
+	}()
+	log.Println("Handler start -----------------------------------------------")
 
 	paramsMap := extractQueryParams(r)
 	if len(paramsMap) == 0 {
@@ -49,8 +59,8 @@ func GetRenewedPoliciesFx(w http.ResponseWriter, r *http.Request) (string, inter
 		return "", nil, err
 	}
 
-	resp := &GetRenewedPoliciesResp{
-		RenewedPolicies: policies,
+	resp := &GetRenewPoliciesResp{
+		RenewPolicies: policies,
 	}
 
 	rawResp, err := json.Marshal(resp)

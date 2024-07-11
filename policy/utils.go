@@ -10,7 +10,6 @@ import (
 	"github.com/wopta/goworkspace/document"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/network"
 )
 
 func FillAttachments(policy *models.Policy, origin string) error {
@@ -196,8 +195,4 @@ func AddProposalDoc(origin string, policy *models.Policy, networkNode *models.Ne
 		FileName: filename,
 		Section:  models.DocumentSectionContracts,
 	})
-}
-
-func CanBeAccessedBy(role, producerUid, nodeUid string) bool {
-	return role == models.UserRoleAdmin || producerUid == nodeUid || network.IsParentOf(nodeUid, producerUid)
 }
