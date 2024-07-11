@@ -324,6 +324,7 @@ func draft(policy models.Policy, product models.Product, ch chan<- RenewReport, 
 		policy.PayUrl = payUrl
 	}
 	policy.Updated = time.Now().UTC()
+	policy.HasMandate = hasMandate
 	policy.IsRenew = true
 
 	err = save(policy, transactions, hasMandate)
