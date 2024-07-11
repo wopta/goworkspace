@@ -92,13 +92,14 @@ type GuaranteValue struct {
 type GuaranteConfig struct {
 	StartDate                              *time.Time           `firestore:"startDate,omitempty" json:"startDate,omitempty" bigquery:"-"`
 	StartDateString                        string               `firestore:"startDateString,omitempty" json:"startDateString,omitempty" bigquery:"-"`
+	RetroactiveDate                        *time.Time           `firestore:"retroactiveDate ,omitempty" json:"retroactiveDate,omitempty" bigquery:"-"`
+	RetroactiveUsaCanDate                  *time.Time           `firestore:"retroactiveUsaCanDate,omitempty" json:"retroactiveUsaCanDate,omitempty" bigquery:"-"`
 	TypeOfSumInsured                       string               `firestore:"typeOfSumInsured,omitempty" json:"typeOfSumInsured,omitempty"`
 	Deductible                             string               `firestore:"deductible,omitempty" json:"deductible,omitempty"`
 	DeductibleValues                       GuaranteFieldValue   `firestore:"deductibleValues,omitempty" json:"deductibleValues,omitempty"`
 	DeductibleType                         string               `firestore:"deductibleType,omitempty" json:"deductibleType,omitempty"`
 	DeductibleUnit                         string               `firestore:"deductibleUnit,omitempty" json:"deductibleUnit,omitempty"`
 	SumInsuredLimitOfIndemnity             float64              `json:"sumInsuredLimitOfIndemnity,omitempty" json:"sumInsuredLimitOfIndemnity,omitempty"`
-	SumInsured                             float64              `json:"sumInsured,omitempty" json:"sumInsured,omitempty"`
 	LimitOfIndemnity                       float64              `json:"limitOfIndemnity,omitempty" json:"limitOfIndemnity,omitempty"`
 	SelfInsurance                          string               `firestore:"selfInsurance,omitempty" json:"selfInsurance,omitempty"`
 	SumInsuredValues                       GuaranteFieldValue   `firestore:"sumInsuredValues,omitempty" json:"sumInsuredValues,omitempty"`
@@ -121,8 +122,11 @@ type GuaranteConfig struct {
 	SumInsuredLimitOfIndemnityDropdown     *GuaranteFieldConfig `firestore:"sumInsuredLimitOfIndemnityDropdown,omitempty" json:"sumInsuredLimitOfIndemnityDropdown,omitempty"`
 	StartDatePicker                        *GuaranteFieldConfig `firestore:"startDatePicker,omitempty" json:"startDatePicker,omitempty"`
 	SumInsuredLimitOfIndemnityTextField    *GuaranteFieldConfig `firestore:"sumInsuredLimitOfIndemnityTextField,omitempty" json:"sumInsuredLimitOfIndemnityTextField,omitempty"`
+	LimitOfIndemnityTextField              *GuaranteFieldConfig `firestore:"limitOfIndemnityTextField,omitempty" json:"limitOfIndemnityTextField,omitempty"`
 	SumInsuredTextField                    *GuaranteFieldConfig `firestore:"sumInsuredTextField,omitempty" json:"sumInsuredTextField,omitempty"`
 	DurationStartDateStringSliderTextField *GuaranteFieldConfig `firestore:"durationStartDateStringSliderTextField,omitempty" json:"durationStartDateStringSliderTextField,omitempty"`
+	RetroactiveDatePicker                  *GuaranteFieldConfig `firestore:"retroactiveDatePicker,omitempty" json:"retroactiveDatePicker,omitempty"`
+	RetroactiveUsaCanDatePicker            *GuaranteFieldConfig `firestore:"retroactiveUsaCanDatePicker,omitempty" json:"retroactiveUsaCanDatePicker,omitempty"`
 }
 type GuaranteFieldValue struct {
 	Min    float64   `firestore:"min,omitempty" json:"min,omitempty"`
@@ -133,9 +137,12 @@ type GuaranteFieldValue struct {
 type GuaranteFieldConfig struct {
 	Min            float64   `firestore:"min,omitempty" json:"min,omitempty"`
 	Max            float64   `firestore:"max,omitempty" json:"max,omitempty"`
+	DurationMin    *Duration `firestore:"durationMin,omitempty" json:"durationMin,omitempty"`
+	DurationMax    *Duration `firestore:"durationMax,omitempty" json:"durationMax,omitempty"`
 	Step           float64   `firestore:"step,omitempty" json:"step,omitempty"`
 	Values         []float64 `firestore:"values,omitempty" json:"values,omitempty"`
 	Label          string    `firestore:"label,omitempty" json:"label,omitempty"`
+	DefaultValue   string    `firestore:"defaultValue,omitempty" json:"defaultValue,omitempty"`
 	Description    string    `firestore:"description,omitempty" json:"description,omitempty"`
 	TextFieldLabel string    `firestore:"textFieldLabel,omitempty" json:"textFieldLabel,omitempty"`
 }
@@ -152,8 +159,9 @@ type Tax struct {
 }
 
 type Duration struct {
-	Year int `firestore:"year,omitempty" json:"year,omitempty"`
-	Day  int `firestore:"day,omitempty" json:"day,omitempty"`
+	Year    int `firestore:"year,omitempty" json:"year,omitempty"`
+	Day     int `firestore:"day,omitempty" json:"day,omitempty"`
+	Monthly int `firestore:"monthly,omitempty" json:"monthly,omitempty"`
 }
 
 type ReservedLimits struct {

@@ -16,6 +16,9 @@ type CallbackClient interface {
 	RequestApproval(models.Policy) internal.CallbackInfo
 	// Approved(models.Policy) internal.CallbackInfo
 	// Rejected(models.Policy) internal.CallbackInfo
+
+	// This method is temporary while we do not settle on the config for the node
+	DecodeAction(string) []string
 }
 
 var ErrCallbackClientNotSet = errors.New("callback client not set")

@@ -6,6 +6,7 @@ import (
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/policy/renew"
 )
 
 var policyRoutes []lib.Route = []lib.Route{
@@ -38,14 +39,14 @@ var policyRoutes []lib.Route = []lib.Route{
 		Handler: lib.ResponseLoggerWrapper(GetNodePoliciesFx),
 		Method:  http.MethodPost,
 		Roles: []string{lib.UserRoleAdmin, lib.UserRoleManager, lib.UserRoleAreaManager,
-			lib.UserRoleAgent, lib.UserRoleAgency},
+			lib.UserRoleAgency, lib.UserRoleAgent},
 	},
 	{
 		Route:   "/portfolio/v1",
 		Handler: lib.ResponseLoggerWrapper(GetPortfolioPoliciesFx),
 		Method:  http.MethodPost,
 		Roles: []string{lib.UserRoleAdmin, lib.UserRoleManager, lib.UserRoleAreaManager,
-			lib.UserRoleAgent, lib.UserRoleAgency},
+			lib.UserRoleAgency, lib.UserRoleAgent},
 	},
 	{
 		Route:   "/media/upload/v1",
@@ -57,7 +58,19 @@ var policyRoutes []lib.Route = []lib.Route{
 		Route:   "/media/v1",
 		Handler: lib.ResponseLoggerWrapper(GetPolicyMediaFx),
 		Method:  http.MethodPost,
-		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleManager, lib.UserRoleAgent, lib.UserRoleAgency},
+		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleManager, lib.UserRoleAgency, lib.UserRoleAgent},
+	},
+	{
+		Route:   "/renewed/v1",
+		Handler: lib.ResponseLoggerWrapper(renew.GetRenewedPoliciesFx),
+		Method:  http.MethodGet,
+		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleManager, lib.UserRoleAgency, lib.UserRoleAgent},
+	},
+	{
+		Route:   "/renewed/v1/{uid}",
+		Handler: lib.ResponseLoggerWrapper(renew.GetRenewPolicyByUidFx),
+		Method:  http.MethodGet,
+		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleManager, lib.UserRoleAgency, lib.UserRoleAgent},
 	},
 }
 
