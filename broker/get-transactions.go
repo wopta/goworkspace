@@ -10,6 +10,7 @@ import (
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	plc "github.com/wopta/goworkspace/policy"
+	plcUtils "github.com/wopta/goworkspace/policy/utils"
 	"github.com/wopta/goworkspace/transaction"
 )
 
@@ -45,7 +46,7 @@ func GetPolicyTransactionsFx(w http.ResponseWriter, r *http.Request) (string, in
 
 	userUid := authToken.UserID
 
-	if !plc.CanBeAccessedBy(authToken.Role, policy.ProducerUid, authToken.UserID) {
+	if !plcUtils.CanBeAccessedBy(authToken.Role, policy.ProducerUid, authToken.UserID) {
 		log.Printf("policy %s is not included in %s %s portfolio", policyUid, authToken.Role, userUid)
 		return "", response, fmt.Errorf("%s %s unauthorized for policy %s", authToken.Role, userUid, policyUid)
 	}

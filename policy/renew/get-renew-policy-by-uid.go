@@ -9,11 +9,15 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/policy/utils"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
-var errRenewPolicyNotFoud = errors.New("renew policy not found")
+var (
+	errRenewPolicyNotFound = errors.New("renew policy not found")
+	errUnauthorized        = errors.New("unauthorized")
+)
 
 func GetRenewPolicyByUidFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	var (
@@ -31,16 +35,26 @@ func GetRenewPolicyByUidFx(w http.ResponseWriter, r *http.Request) (string, any,
 	}()
 	log.Println("Handler start -----------------------------------------------")
 
-	uid := chi.URLParam(r, "uid")
-
-	if policy, err = GetRenewPolicyByUid(uid); err != nil {
-		log.Printf("error getting policy with uid: '%s'", uid)
+	idToken := r.Header.Get("Authorization")
+	authToken, err := lib.GetAuthTokenFromIdToken(idToken)
+	if err != nil {
 		return "", nil, err
+	}
+
+	policyUid := chi.URLParam(r, "uid")
+	if policy, err = GetRenewPolicyByUid(policyUid); err != nil {
+		log.Printf("error getting policy with uid: '%s'", policyUid)
+		return "", nil, err
+	}
+
+	if !utils.CanBeAccessedBy(authToken.Role, policy.ProducerUid, authToken.UserID) {
+		log.Printf("policy %s is not included in %s %s portfolio", policyUid, authToken.Role, authToken.UserID)
+		return "", nil, errUnauthorized
 	}
 
 	bytes, err := json.Marshal(policy)
 	if err != nil {
-		log.Printf("error marshaling policy with uid: '%s'", uid)
+		log.Printf("error marshaling policy with uid: '%s'", policyUid)
 		return "", nil, err
 	}
 
@@ -52,7 +66,7 @@ func GetRenewPolicyByUid(uid string) (models.Policy, error) {
 
 	snapshot, err := lib.GetFirestoreErr(lib.RenewPolicyCollection, uid)
 	if status.Code(err) == codes.NotFound {
-		return models.Policy{}, errRenewPolicyNotFoud
+		return models.Policy{}, errRenewPolicyNotFound
 	}
 	if err != nil {
 		return models.Policy{}, err

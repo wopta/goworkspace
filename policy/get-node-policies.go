@@ -11,6 +11,7 @@ import (
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/network"
 	"github.com/wopta/goworkspace/policy/models"
+	"github.com/wopta/goworkspace/policy/utils"
 )
 
 type GetNodePoliciesResp struct {
@@ -52,7 +53,7 @@ func GetNodePoliciesFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		return "", nil, err
 	}
 
-	if !CanBeAccessedBy(authToken.Role, nodeUid, authToken.UserID) {
+	if !utils.CanBeAccessedBy(authToken.Role, nodeUid, authToken.UserID) {
 		log.Printf("cannot access to node %s policies", nodeUid)
 		return "", nil, errors.New("cannot access to node policies")
 	}
