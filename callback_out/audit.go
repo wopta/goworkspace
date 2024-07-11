@@ -26,7 +26,7 @@ type auditSchema struct {
 	Error         string                `bigquery:"error"`
 }
 
-func saveAudit(node *models.NetworkNode, action CallbackoutAction, res internal.CallbackInfo) {
+func saveAudit(node *models.NetworkNode, action internal.CallbackoutAction, res internal.CallbackInfo) {
 	var audit auditSchema
 
 	resBody, _ := io.ReadAll(res.Response.Body)

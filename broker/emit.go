@@ -233,7 +233,12 @@ func emitV2(authToken models.AuthToken, policy *models.Policy, request EmitReque
 	log.Println("[Emit] saving guarantees to bigquery...")
 	models.SetGuaranteBigquery(*policy, "emit", fireGuarantee)
 
-	callback_out.Execute(networkNode, *policy, callback_out.Emit)
+	callbackAction := callback_out.Emit
+	if warrant != nil && warrant.GetFlowName(policy.Name) == models.RemittanceMgaFlow {
+		callbackAction = callback_out.EmitRemittance
+	}
+
+	callback_out.Execute(networkNode, *policy, callbackAction)
 
 	log.Println("[Emit] end --------------------------------------------------")
 	return responseEmit
