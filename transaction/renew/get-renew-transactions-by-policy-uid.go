@@ -57,7 +57,7 @@ func GetRenewTransactionsByPolicyUidFx(w http.ResponseWriter, r *http.Request) (
 		return "", nil, errUnauthorized
 	}
 
-	transactions, err := getRenewTransactionsByPolicyUid(policyUid, policy.Annuity)
+	transactions, err := GetRenewTransactionsByPolicyUid(policyUid, policy.Annuity)
 	if err != nil {
 		return "", nil, err
 	}
@@ -69,7 +69,7 @@ func GetRenewTransactionsByPolicyUidFx(w http.ResponseWriter, r *http.Request) (
 	return string(bytes), nil, err
 }
 
-func getRenewTransactionsByPolicyUid(policyUid string, annuity int) ([]models.Transaction, error) {
+func GetRenewTransactionsByPolicyUid(policyUid string, annuity int) ([]models.Transaction, error) {
 	result := make([]models.Transaction, 0)
 	q := lib.Firequeries{
 		Queries: []lib.Firequery{
