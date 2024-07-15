@@ -75,7 +75,7 @@ func RefreshPayByLinkFx(w http.ResponseWriter, r *http.Request) (string, interfa
 		return "", nil, err
 	}
 
-	err = common.SaveTransactionsToDB(updatedTransactions)
+	err = common.SaveTransactionsToDB(updatedTransactions, transactionCollection)
 	if err != nil {
 		return "", nil, err
 	}
