@@ -12,7 +12,7 @@ import (
 
 func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		policy models.Policy
+		policy *models.Policy
 	)
 
 	e := json.Unmarshal([]byte(getpolicymock()), &policy)

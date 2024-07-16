@@ -457,12 +457,24 @@ func getEnterpriseGuaranteCellsBySlug(guarante models.Guarante) []Cell {
 				Cell:  "C66",
 				Value: guarante.Value.SumInsuredLimitOfIndemnity,
 			},
+			{
+				Cell:  "F66",
+				Value: guarante.Value.RetroactiveDate.Format(dateFormat),
+			},
 		}
 	case "product-liability":
 		cells = []Cell{
 			{
 				Cell:  "C67",
 				Value: guarante.Value.SumInsuredLimitOfIndemnity,
+			},
+			{
+				Cell:  "F67",
+				Value: guarante.Value.RetroactiveDate.Format(dateFormat),
+			},
+			{
+				Cell:  "F68",
+				Value: guarante.Value.RetroactiveUsaCanDate.Format(dateFormat),
 			},
 		}
 	case "management-organization":
@@ -474,10 +486,17 @@ func getEnterpriseGuaranteCellsBySlug(guarante models.Guarante) []Cell {
 			{
 				Cell:  "C70",
 				Value: guarante.Value.SumInsured,
+			},{
+				Cell:  "C69",
+				Value: guarante.Value.LimitOfIndemnity,
 			},
 			{
 				Cell:  "C68",
 				Value: "SI",
+			},
+			{
+				Cell:  "F70",
+				Value: guarante.Value.StartDate.Format(dateFormat),
 			},
 		}
 	case "cyber":

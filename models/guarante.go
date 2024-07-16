@@ -65,6 +65,8 @@ type GuaranteValue struct {
 	StartDateString            string              `firestore:"startDateString,omitempty" json:"startDateString,omitempty" bigquery:"-"`
 	TypeOfSumInsured           string              `firestore:"typeOfSumInsured,omitempty" json:"typeOfSumInsured,omitempty"`
 	Deductible                 string              `firestore:"deductible,omitempty" json:"deductible,omitempty"`
+	RetroactiveDate            *time.Time          `firestore:"retroactiveDate ,omitempty" json:"retroactiveDate,omitempty" bigquery:"-"`
+	RetroactiveUsaCanDate      *time.Time          `firestore:"retroactiveUsaCanDate,omitempty" json:"retroactiveUsaCanDate,omitempty" bigquery:"-"`
 	DeductibleValues           GuaranteFieldValue  `firestore:"deductibleValues,omitempty" json:"deductibleValues,omitempty"`
 	DeductibleType             string              `firestore:"deductibleType,omitempty" json:"deductibleType,omitempty"`
 	DeductibleUnit             string              `firestore:"deductibleUnit,omitempty" json:"deductibleUnit,omitempty"`
@@ -90,10 +92,7 @@ type GuaranteValue struct {
 	MinimumGrossYearly         float64             `firestore:"minimumGrossYearly,omitempty" json:"minimumGrossYearly,omitempty"`
 }
 type GuaranteConfig struct {
-	StartDate                              *time.Time           `firestore:"startDate,omitempty" json:"startDate,omitempty" bigquery:"-"`
-	StartDateString                        string               `firestore:"startDateString,omitempty" json:"startDateString,omitempty" bigquery:"-"`
-	RetroactiveDate                        *time.Time           `firestore:"retroactiveDate ,omitempty" json:"retroactiveDate,omitempty" bigquery:"-"`
-	RetroactiveUsaCanDate                  *time.Time           `firestore:"retroactiveUsaCanDate,omitempty" json:"retroactiveUsaCanDate,omitempty" bigquery:"-"`
+
 	TypeOfSumInsured                       string               `firestore:"typeOfSumInsured,omitempty" json:"typeOfSumInsured,omitempty"`
 	Deductible                             string               `firestore:"deductible,omitempty" json:"deductible,omitempty"`
 	DeductibleValues                       GuaranteFieldValue   `firestore:"deductibleValues,omitempty" json:"deductibleValues,omitempty"`
@@ -110,12 +109,6 @@ type GuaranteConfig struct {
 	DurationValues                         *DurationFieldValue  `firestore:"durationValues,omitempty" json:"durationValues,omitempty"`
 	Tax                                    float64              `firestore:"tax" json:"tax"`
 	Percentage                             float64              `firestore:"percentage" json:"percentage"`
-	PremiumNetYearly                       float64              `firestore:"premiumNetYearly,omitempty" json:"premiumNetYearly"`
-	PremiumTaxAmountYearly                 float64              `firestore:"premiumTaxAmountYearly,omitempty" json:"premiumTaxAmountYearly"`
-	PremiumGrossYearly                     float64              `firestore:"premiumGrossYearly,omitempty" json:"premiumGrossYearly"`
-	PremiumNetMonthly                      float64              `firestore:"premiumNetMonthly,omitempty" json:"premiumNetMonthly,omitempty"`
-	PremiumTaxAmountMonthly                float64              `firestore:"premiumTaxAmountMonthly,omitempty" json:"premiumTaxAmountMonthly"`
-	PremiumGrossMonthly                    float64              `firestore:"premiumGrossMonthly,omitempty" json:"premiumGrossMonthly"`
 	MinimumGrossMonthly                    float64              `firestore:"minimumGrossMonthly,omitempty" json:"minimumGrossMonthly,omitempty"`
 	MinimumGrossYearly                     float64              `firestore:"minimumGrossYearly,omitempty" json:"minimumGrossYearly,omitempty"`
 	DurationSlider                         *GuaranteFieldConfig `firestore:"durationSlider,omitempty" json:"durationSlider,omitempty"`
