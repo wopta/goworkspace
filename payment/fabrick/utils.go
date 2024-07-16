@@ -263,10 +263,10 @@ func FabrickExpireBill(providerId string) error {
 		expirationTimeSuffix,
 	)
 
-	requestBody := fmt.Sprintf(`{"id":"%s","newExpirationDate":"%s"}`, providerId, expirationDate)
-	log.Printf("fabrick expire bill request body: %s", requestBody)
+	reqBody := fmt.Sprintf(`{"id":"%s","newExpirationDate":"%s"}`, providerId, expirationDate)
+	log.Printf("fabrick expire bill request body: %s", reqBody)
 
-	req, err := http.NewRequest(http.MethodPut, urlstring, strings.NewReader(requestBody))
+	req, err := http.NewRequest(http.MethodPut, urlstring, strings.NewReader(reqBody))
 	if err != nil {
 		log.Printf("error creating request: %s", err.Error())
 		return err
