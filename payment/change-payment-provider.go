@@ -83,7 +83,7 @@ func ChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, in
 	}
 	if len(unpaidTransactions) == 0 {
 		log.Printf("no unpaid transactions found for policy %s", policy.Uid)
-		return "{}", nil, err
+		return "{}", nil, errors.New("no unpaid transactions to update")
 	}
 
 	product := prd.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, nil, nil)
