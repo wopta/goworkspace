@@ -117,6 +117,7 @@ type Policy struct {
 	IsRenewable       bool                         `json:"isRenewable" firestore:"isRenewable" bigquery:"isRenewable"`
 	PolicyType        string                       `json:"policyType" firestore:"policyType" bigquery:"policyType"`
 	QuoteType         string                       `json:"quoteType" firestore:"quoteType" bigquery:"quoteType"`
+	HasMandate        bool                         `json:"hasMandate" firestore:"hasMandate" bigquery:"hasMandate"`
 
 	// DEPRECATED FIELDS
 
