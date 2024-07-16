@@ -25,7 +25,7 @@ var paymentRoutes []lib.Route = []lib.Route{
 		Roles:   []string{models.UserRoleAll},
 	},
 	{
-		Route:   "/v1/{uid}",
+		Route:   "/v1/{uid}/:isRenew",
 		Handler: lib.ResponseLoggerWrapper(DeleteTransactionFx),
 		Method:  http.MethodDelete,
 		Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},

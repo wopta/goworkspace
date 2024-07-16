@@ -3,52 +3,95 @@ package payment
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/go-chi/chi/v5"
 	"log"
 	"net/http"
+	"strconv"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/payment/fabrick"
+	trxRenew "github.com/wopta/goworkspace/transaction/renew"
 
 	tr "github.com/wopta/goworkspace/transaction"
 )
 
 func DeleteTransactionFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	var err error
+	var (
+		err         error
+		isRenew     bool
+		transaction *models.Transaction
+		collection  = lib.TransactionsCollection
+	)
+
+	defer func() {
+		if err != nil {
+			log.Printf("error: %s", err.Error())
+		}
+		log.Println("Handler end -------------------------------------------------")
+	}()
 
 	log.SetPrefix("[DeleteTransactionFx] ")
-	defer log.SetPrefix("")
-
 	log.Println("Handler start -----------------------------------------------")
 
-	origin := r.Header.Get("Origin")
 	uid := chi.URLParam(r, "uid")
-	log.Printf("getting from firestore transaction '%s'", uid)
+	rawIsRenew := r.URL.Query().Get("isRenew")
+	if isRenew, err = strconv.ParseBool(rawIsRenew); rawIsRenew != "" && err != nil {
+		log.Printf("error: %s", err.Error())
+		return "", nil, err
+	}
 
-	transaction := tr.GetTransactionByUid(uid, origin)
+	if !isRenew {
+		transaction = tr.GetTransactionByUid(uid, "")
+	} else {
+		collection = lib.RenewTransactionCollection
+		transaction = trxRenew.GetRenewTransactionByUid(uid)
+	}
+
 	if transaction == nil {
 		log.Printf("transaction '%s' not found", uid)
 		return "", nil, fmt.Errorf("transaction '%s' not found", uid)
 	}
+
+	log.Printf("getting from firestore transaction '%s'", uid)
+
 	bytes, _ := json.Marshal(transaction)
 	log.Printf("found transaction: %s", string(bytes))
 
-	/*
-		switch transaction.ProviderName {
-		case models.FabrickPaymentProvider:
-			err = fabrickExpireBill(transaction.ProviderId)
-		default:
-			err = fmt.Errorf("payment provider not implemented: %s", transaction.ProviderName)
-		}
+	if transaction.ProviderName == models.FabrickPaymentProvider {
+		err = fabrick.FabrickExpireBill(transaction.ProviderId)
 		if err != nil {
-			log.Printf(">>>>>> error deleting transaction on provider: %s", err.Error())
+			log.Printf("error deleting transaction on fabrick: %s", err.Error())
+			return "", nil, err
 		}
-	*/
-	log.Printf("deleting transaction on DBs...")
-	if err = tr.DeleteTransaction(transaction, origin, "Cancellata manualmente"); err != nil {
-		log.Printf("error deleting transaction on DBs: %s", err.Error())
-	} else {
-		log.Printf("transaction deleted!")
 	}
 
-	log.Println("Handler end -------------------------------------------------")
+	tr.DeleteTransaction(transaction, "Cancellata manualmente")
+
+	err = saveTransaction(transaction, collection)
+	if err != nil {
+		log.Printf("%s", err.Error())
+		return "", nil, err
+	}
 
 	return "{}", nil, err
+}
+
+func saveTransaction(transaction *models.Transaction, collection string) error {
+	var (
+		err error
+	)
+
+	transaction.BigQueryParse()
+	err = lib.SetFirestoreErr(collection, transaction.Uid, transaction)
+	if err != nil {
+		return fmt.Errorf("error saving transaction %s in Firestore: %v", transaction.Uid, err.Error())
+	}
+
+	err = lib.InsertRowsBigQuery(lib.WoptaDataset, collection, transaction)
+	if err != nil {
+		log.Printf("error saving transaction %s in BigQuery: %v", transaction.Uid, err.Error())
+		return err
+	}
+	return nil
 }
