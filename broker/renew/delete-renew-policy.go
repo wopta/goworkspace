@@ -1,6 +1,7 @@
 package renew
 
 import (
+	"errors"
 	"log"
 	"net/http"
 	"time"
@@ -36,6 +37,11 @@ func DeleteRenewPolicyFx(w http.ResponseWriter, r *http.Request) (string, interf
 		return "", nil, err
 	}
 
+	if policy.IsPay {
+		log.Printf("cannot delete renew policy %s already paid", policy.Uid)
+		return "", nil, errors.New("cannot delete renew policy")
+	}
+
 	transactions, err := trxRenew.GetRenewTransactionsByPolicyUid(policy.Uid, policy.Annuity)
 	if err != nil {
 		log.Printf("error getting renew transactions %v", err)
@@ -62,15 +68,12 @@ func DeleteRenewPolicyFx(w http.ResponseWriter, r *http.Request) (string, interf
 	return "{}", nil, nil
 }
 
-func providerDeleteTransactions(proivderName string, transactions []models.Transaction) error {
-	if proivderName != models.FabrickPaymentProvider {
+func providerDeleteTransactions(providerName string, transactions []models.Transaction) error {
+	if providerName != models.FabrickPaymentProvider {
 		return nil
 	}
 
-	unpaidTransactions := lib.SliceFilter(transactions, func(transaction models.Transaction) bool {
-		return transaction.IsPay == false
-	})
-	for _, trx := range unpaidTransactions {
+	for _, trx := range transactions {
 		err := fabrick.FabrickExpireBill(trx.ProviderId)
 		if err != nil {
 			return err
@@ -84,6 +87,7 @@ func deleteRenewPolicy(p models.Policy) models.Policy {
 	p.IsDeleted = true
 	p.Status = models.PolicyStatusDeleted
 	p.StatusHistory = append(p.StatusHistory, p.Status)
+	p.DeleteDesc = "Cancellata per annullo quietanza"
 	p.Updated = time.Now().UTC()
 	return p
 }
@@ -95,6 +99,7 @@ func deleteRenewTransactions(transactions []models.Transaction) []models.Transac
 		tr.Status = models.TransactionStatusDeleted
 		tr.StatusHistory = append(tr.StatusHistory, tr.Status)
 		tr.UpdateDate = time.Now().UTC()
+		tr.PaymentNote = "Cancellata per annullo quietanza"
 		deletedTransactions = append(deletedTransactions, tr)
 	}
 	return deletedTransactions
