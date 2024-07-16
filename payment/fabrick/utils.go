@@ -251,7 +251,7 @@ func createFabrickTransaction(
 	return r
 }
 
-func fabrickExpireBill(providerId string) error {
+func FabrickExpireBill(providerId string) error {
 	var urlstring = os.Getenv("FABRICK_BASEURL") + "api/fabrick/pace/v4.0/mods/back/v1.0/payments/expirationDate"
 	const expirationTimeSuffix = "00:00:00"
 
