@@ -11,9 +11,8 @@ import (
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/payment/fabrick"
-	trxRenew "github.com/wopta/goworkspace/transaction/renew"
-
 	tr "github.com/wopta/goworkspace/transaction"
+	trxRenew "github.com/wopta/goworkspace/transaction/renew"
 )
 
 func DeleteTransactionFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -29,6 +28,7 @@ func DeleteTransactionFx(w http.ResponseWriter, r *http.Request) (string, interf
 			log.Printf("error: %s", err.Error())
 		}
 		log.Println("Handler end -------------------------------------------------")
+		log.SetPrefix("")
 	}()
 
 	log.SetPrefix("[DeleteTransactionFx] ")
@@ -52,8 +52,6 @@ func DeleteTransactionFx(w http.ResponseWriter, r *http.Request) (string, interf
 		log.Printf("transaction '%s' not found", uid)
 		return "", nil, fmt.Errorf("transaction '%s' not found", uid)
 	}
-
-	log.Printf("getting from firestore transaction '%s'", uid)
 
 	bytes, _ := json.Marshal(transaction)
 	log.Printf("found transaction: %s", string(bytes))
