@@ -298,6 +298,7 @@ func sendReportMail(date time.Time, report RenewResp, isDraft bool) {
 	mail.SendMail(mail.MailRequest{
 		FromAddress:  mail.AddressAnna,
 		To:           []string{mail.AddressTechnology.Address},
+		Cc:           mail.AddressOperations.Address,
 		Message:      message,
 		Title:        title,
 		Subject:      subject,
