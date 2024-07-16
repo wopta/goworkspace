@@ -114,7 +114,8 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		return "", nil, fmt.Errorf(errPolicyNotSigned)
 	}
 
-	err = manualPayment(&transaction, origin, &payload)
+	manualPayment(&transaction, &payload)
+	err = saveTransaction(lib.TransactionsCollection, transaction)
 	if err != nil {
 		log.Printf("ERROR %s", errPaymentFailed)
 		return "", nil, fmt.Errorf(errPaymentFailed)
@@ -202,9 +203,7 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 	return "{}", nil, nil
 }
 
-func manualPayment(transaction *models.Transaction, origin string, payload *ManualPaymentPayload) error {
-	fireTransactions := lib.GetDatasetByEnv(origin, models.TransactionsCollection)
-
+func manualPayment(transaction *models.Transaction, payload *ManualPaymentPayload) {
 	transaction.ProviderName = models.ManualPaymentProvider
 	transaction.PaymentMethod = payload.PaymentMethod
 	transaction.PaymentNote = payload.Note
@@ -215,14 +214,15 @@ func manualPayment(transaction *models.Transaction, origin string, payload *Manu
 	transaction.UpdateDate = time.Now().UTC()
 	transaction.Status = models.TransactionStatusPay
 	transaction.StatusHistory = append(transaction.StatusHistory, models.TransactionStatusPay)
+}
 
-	err := lib.SetFirestoreErr(fireTransactions, transaction.Uid, transaction)
+func saveTransaction(collection string, transaction models.Transaction) error {
+	err := lib.SetFirestoreErr(collection, transaction.Uid, transaction)
 	if err != nil {
 		log.Printf("error saving transaction to firestore: %s", err.Error())
 		return err
 	}
 
-	transaction.BigQuerySave(origin)
-
+	transaction.BigQuerySave("")
 	return nil
 }
