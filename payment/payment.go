@@ -9,6 +9,7 @@ import (
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/payment/fabrick"
 	"github.com/wopta/goworkspace/payment/manual"
+	"github.com/wopta/goworkspace/payment/renew"
 )
 
 var paymentRoutes []lib.Route = []lib.Route{
@@ -44,9 +45,9 @@ var paymentRoutes []lib.Route = []lib.Route{
 	},
 	{
 		Route:   "/v1/renew",
-		Handler: lib.ResponseLoggerWrapper(RenewChangePaymentProviderFx),
+		Handler: lib.ResponseLoggerWrapper(renew.RenewChangePaymentProviderFx),
 		Method:  http.MethodPatch,
-		Roles:   []string{models.UserRoleAdmin},
+		Roles:   []string{lib.UserRoleAdmin},
 	},
 	{
 		Route:   "/v1/fabrick/refresh-token",
