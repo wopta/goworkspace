@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
+	"github.com/wopta/goworkspace/broker/renew"
 	"github.com/wopta/goworkspace/lib"
 )
 
@@ -103,6 +104,12 @@ var brokerRoutes []lib.Route = []lib.Route{
 		Handler: lib.ResponseLoggerWrapper(GetPoliciesByAuthFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAgent, lib.UserRoleAgency},
+	},
+	{
+		Route:   "/policy/renew/v1/{uid}",
+		Handler: lib.ResponseLoggerWrapper(renew.DeleteRenewPolicyFx),
+		Method:  http.MethodDelete,
+		Roles:   []string{lib.UserRoleAdmin},
 	},
 }
 
