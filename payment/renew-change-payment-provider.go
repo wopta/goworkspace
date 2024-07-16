@@ -1,4 +1,4 @@
-package renew
+package payment
 
 import (
 	"encoding/json"
@@ -10,7 +10,6 @@ import (
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/payment"
 	"github.com/wopta/goworkspace/payment/common"
 	plcRenew "github.com/wopta/goworkspace/policy/renew"
 	prd "github.com/wopta/goworkspace/product"
@@ -30,8 +29,8 @@ func RenewChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (strin
 		policy               models.Policy
 		activeTransactions   []models.Transaction
 		updatedTransactions  []models.Transaction
-		req                  payment.ChangePaymentProviderReq
-		resp                 payment.ChangePaymentProviderResp
+		req                  ChangePaymentProviderReq
+		resp                 ChangePaymentProviderResp
 		responseTransactions = make([]models.Transaction, 0)
 		unpaidTransactions   = make([]models.Transaction, 0)
 	)
@@ -84,7 +83,7 @@ func RenewChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (strin
 
 	product := prd.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, nil, nil)
 
-	client := payment.NewClient(policy.Payment, policy, *product, unpaidTransactions, req.ScheduleFirstRate, "")
+	client := NewClient(policy.Payment, policy, *product, unpaidTransactions, req.ScheduleFirstRate, "")
 	payUrl, updatedTransactions, err = client.Update()
 	if err != nil {
 		log.Printf("error changing payment provider to %s: %s", req.ProviderName, err.Error())
