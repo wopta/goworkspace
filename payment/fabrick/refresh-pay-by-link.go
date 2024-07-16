@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"time"
@@ -15,43 +14,62 @@ import (
 	"github.com/wopta/goworkspace/network"
 	"github.com/wopta/goworkspace/payment/common"
 	plc "github.com/wopta/goworkspace/policy"
+	plcRenew "github.com/wopta/goworkspace/policy/renew"
 	prd "github.com/wopta/goworkspace/product"
 	"github.com/wopta/goworkspace/transaction"
+	trRenew "github.com/wopta/goworkspace/transaction/renew"
 )
 
 type RefreshPayByLinkRequest struct {
 	PolicyUid         string `json:"policyUid"`
 	ScheduleFirstRate bool   `json:"scheduleFirstRate"`
+	IsRenew           bool   `json:"isRenew"`
 }
 
 func RefreshPayByLinkFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		err     error
-		request RefreshPayByLinkRequest
+		err                   error
+		request               RefreshPayByLinkRequest
+		policy                models.Policy
+		policyCollection      = lib.PolicyCollection
+		transactions          []models.Transaction
+		transactionCollection = lib.TransactionsCollection
 	)
 
 	log.SetPrefix("[RefreshPayByLinkFx] ")
-	defer log.SetPrefix("")
-	log.Println("Handler start -----------------------------------------------")
+	defer func() {
+		if err != nil {
+			log.Printf("error: %s", err)
+		}
+		log.Println("Handler end ---------------------------------------------")
+		log.SetPrefix("")
+	}()
 
-	origin := r.Header.Get("Origin")
-	body := lib.ErrorByte(io.ReadAll(r.Body))
-	defer r.Body.Close()
-
-	err = json.Unmarshal(body, &request)
-	if err != nil {
-		log.Printf("error unmarshaling body: %s", err.Error())
+	if err = json.NewDecoder(r.Body).Decode(&request); err != nil {
+		log.Println("error unmarshaling body")
 		return "", nil, err
 	}
 
-	policy := plc.GetPolicyByUid(request.PolicyUid, origin)
+	if request.IsRenew {
+		policyCollection = lib.RenewPolicyCollection
+		transactionCollection = lib.RenewTransactionCollection
+		if policy, err = plcRenew.GetRenewPolicyByUid(request.PolicyUid); err != nil {
+			log.Println("error getting renew policy")
+			return "", nil, err
+		}
+		if transactions, err = trRenew.GetRenewTransactionsByPolicyUid(policy.Uid, policy.Annuity); err != nil {
+			log.Println("error getting renew transactions")
+			return "", nil, err
+		}
+	} else {
+		policy = plc.GetPolicyByUid(request.PolicyUid, "")
+		if transactions, err = getTransactionsList(policy.Uid); err != nil {
+			log.Println("error getting transactions")
+			return "", nil, err
+		}
+	}
 
 	policy.SanitizePaymentData()
-
-	transactions, err := getTransactionsList(policy.Uid)
-	if err != nil {
-		return "", nil, err
-	}
 
 	for index, _ := range transactions {
 		transaction.ReinitializePaymentInfo(&transactions[index], policy.Payment)
@@ -75,26 +93,27 @@ func RefreshPayByLinkFx(w http.ResponseWriter, r *http.Request) (string, interfa
 		return "", nil, err
 	}
 
-	err = common.SaveTransactionsToDB(updatedTransactions)
+	err = common.SaveTransactionsToDB(updatedTransactions, transactionCollection)
 	if err != nil {
 		return "", nil, err
 	}
 
 	policy.PayUrl = payUrl
+	policy.BigQueryParse()
 
-	err = lib.SetFirestoreErr(models.PolicyCollection, policy.Uid, policy)
-	if err != nil {
-		return "{}", nil, err
+	if err = lib.SetFirestoreErr(policyCollection, policy.Uid, policy); err != nil {
+		log.Println("error saving policy to firestore")
+		return "", nil, err
 	}
-	policy.BigquerySave("")
-
-	err = sendPayByLinkEmail(policy)
-	if err != nil {
-		log.Printf("error sending payment email: %s", err.Error())
+	if err = lib.InsertRowsBigQuery(lib.WoptaDataset, policyCollection, policy); err != nil {
+		log.Println("error saving policy to bigquery")
 		return "", nil, err
 	}
 
-	log.Println("Handler end -------------------------------------------------")
+	if err = sendPayByLinkEmail(policy); err != nil {
+		log.Println("error sending payment email")
+		return "", nil, err
+	}
 
 	return "{}", nil, nil
 }

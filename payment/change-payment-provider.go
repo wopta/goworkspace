@@ -98,7 +98,7 @@ func ChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, in
 	policy.PayUrl = payUrl
 	responseTransactions = append(responseTransactions, updatedTransactions...)
 
-	err = common.SaveTransactionsToDB(updatedTransactions)
+	err = common.SaveTransactionsToDB(updatedTransactions, lib.TransactionsCollection)
 	if err != nil {
 		return "{}", nil, err
 	}

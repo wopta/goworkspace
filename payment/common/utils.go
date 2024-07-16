@@ -27,13 +27,13 @@ func CheckPaymentModes(policy models.Policy) error {
 	return nil
 }
 
-func SaveTransactionsToDB(transactions []models.Transaction) error {
+func SaveTransactionsToDB(transactions []models.Transaction, collection string) error {
 	batch := make(map[string]map[string]models.Transaction)
-	batch[lib.TransactionsCollection] = make(map[string]models.Transaction)
+	batch[collection] = make(map[string]models.Transaction)
 
 	for idx := range transactions {
 		transactions[idx].BigQueryParse()
-		batch[lib.TransactionsCollection][transactions[idx].Uid] = transactions[idx]
+		batch[collection][transactions[idx].Uid] = transactions[idx]
 	}
 
 	if err := lib.SetBatchFirestoreErr(batch); err != nil {
@@ -41,7 +41,7 @@ func SaveTransactionsToDB(transactions []models.Transaction) error {
 		return err
 	}
 
-	if err := lib.InsertRowsBigQuery(lib.WoptaDataset, lib.TransactionsCollection, transactions); err != nil {
+	if err := lib.InsertRowsBigQuery(lib.WoptaDataset, collection, transactions); err != nil {
 		log.Printf("error saving transactions to bigquery: %s", err.Error())
 		return err
 	}
