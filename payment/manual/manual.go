@@ -223,6 +223,6 @@ func saveTransaction(collection string, transaction models.Transaction) error {
 		return err
 	}
 
-	transaction.BigQuerySave("")
-	return nil
+	transaction.BigQueryParse()
+	return lib.InsertRowsBigQuery(lib.WoptaDataset, collection, transaction)
 }
