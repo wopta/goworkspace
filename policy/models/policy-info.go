@@ -17,4 +17,5 @@ type PolicyInfo struct {
 	StartDate      civil.DateTime `json:"startDate" bigquery:"startDate"`
 	EndDate        civil.DateTime `json:"endDate" bigquery:"endDate"`
 	PaymentSplit   string         `json:"paymentSplit" bigquery:"paymentSplit"`
+	HasMandate     bool           `json:"hasMandate" bigquery:"hasMandate"`
 }
