@@ -37,6 +37,12 @@ var paymentRoutes []lib.Route = []lib.Route{
 		Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 	},
 	{
+		Route:   "/manual/v1/renew/{transactionUid}",
+		Handler: lib.ResponseLoggerWrapper(manual.RenewManualPaymentFx),
+		Method:  http.MethodPost,
+		Roles:   []string{models.UserRoleAdmin},
+	},
+	{
 		Route:   "/v1",
 		Handler: lib.ResponseLoggerWrapper(ChangePaymentProviderFx),
 		Method:  http.MethodPatch,

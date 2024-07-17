@@ -12,10 +12,11 @@ import (
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
+	"github.com/wopta/goworkspace/payment/common"
 	plcRenew "github.com/wopta/goworkspace/policy/renew"
 	prd "github.com/wopta/goworkspace/product"
 	tr "github.com/wopta/goworkspace/transaction"
-	trRenew "github.com/wopta/goworkspace/transaction/renew"
+	trxRenew "github.com/wopta/goworkspace/transaction/renew"
 )
 
 func RenewManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -51,7 +52,7 @@ func RenewManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, inter
 	}
 
 	transactionUid := chi.URLParam(r, "transactionUid")
-	transaction = trRenew.GetRenewTransactionByUid(transactionUid)
+	transaction = trxRenew.GetRenewTransactionByUid(transactionUid)
 	if transaction == nil {
 		return "", nil, errors.New("no renew transaction found")
 	}
@@ -85,7 +86,7 @@ func RenewManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, inter
 		return "", nil, err
 	}
 
-	err = saveTransaction(lib.RenewTransactionCollection, *transaction)
+	err = common.SaveTransactionsToDB([]models.Transaction{*transaction}, lib.RenewTransactionCollection)
 	if err != nil {
 		return "", nil, fmt.Errorf(errPaymentFailed)
 	}
@@ -100,8 +101,6 @@ func RenewManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, inter
 	if err != nil {
 		return "", nil, err
 	}
-
-	// TODO: needed other operations like send mail incasso
 
 	return "", nil, err
 }

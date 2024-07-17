@@ -12,6 +12,7 @@ import (
 	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
+	"github.com/wopta/goworkspace/payment/common"
 	plc "github.com/wopta/goworkspace/policy"
 	prd "github.com/wopta/goworkspace/product"
 	trn "github.com/wopta/goworkspace/transaction"
@@ -115,7 +116,8 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 	}
 
 	manualPayment(&transaction, &payload)
-	err = saveTransaction(lib.TransactionsCollection, transaction)
+
+	err = common.SaveTransactionsToDB([]models.Transaction{transaction}, lib.TransactionsCollection)
 	if err != nil {
 		log.Printf("ERROR %s", errPaymentFailed)
 		return "", nil, fmt.Errorf(errPaymentFailed)
@@ -214,15 +216,4 @@ func manualPayment(transaction *models.Transaction, payload *ManualPaymentPayloa
 	transaction.UpdateDate = time.Now().UTC()
 	transaction.Status = models.TransactionStatusPay
 	transaction.StatusHistory = append(transaction.StatusHistory, models.TransactionStatusPay)
-}
-
-func saveTransaction(collection string, transaction models.Transaction) error {
-	err := lib.SetFirestoreErr(collection, transaction.Uid, transaction)
-	if err != nil {
-		log.Printf("error saving transaction to firestore: %s", err.Error())
-		return err
-	}
-
-	transaction.BigQueryParse()
-	return lib.InsertRowsBigQuery(lib.WoptaDataset, collection, transaction)
 }
