@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/wopta/goworkspace/lib"
@@ -23,7 +24,6 @@ import (
 type RefreshPayByLinkRequest struct {
 	PolicyUid         string `json:"policyUid"`
 	ScheduleFirstRate bool   `json:"scheduleFirstRate"`
-	IsRenew           bool   `json:"isRenew"`
 }
 
 func RefreshPayByLinkFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -34,6 +34,7 @@ func RefreshPayByLinkFx(w http.ResponseWriter, r *http.Request) (string, interfa
 		policyCollection      = lib.PolicyCollection
 		transactions          []models.Transaction
 		transactionCollection = lib.TransactionsCollection
+		isRenew               bool
 	)
 
 	log.SetPrefix("[RefreshPayByLinkFx] ")
@@ -50,7 +51,13 @@ func RefreshPayByLinkFx(w http.ResponseWriter, r *http.Request) (string, interfa
 		return "", nil, err
 	}
 
-	if request.IsRenew {
+	isRenewParam := r.URL.Query().Get("isRenew")
+	if isRenew, err = strconv.ParseBool(isRenewParam); err != nil && isRenewParam != "" {
+		log.Printf("error parsing isRenew param '%s'", isRenewParam)
+		return "", nil, err
+	}
+
+	if isRenew {
 		policyCollection = lib.RenewPolicyCollection
 		transactionCollection = lib.RenewTransactionCollection
 		if policy, err = plcRenew.GetRenewPolicyByUid(request.PolicyUid); err != nil {
