@@ -37,6 +37,12 @@ var paymentRoutes []lib.Route = []lib.Route{
 		Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
 	},
 	{
+		Route:   "/manual/v1/renew/{transactionUid}",
+		Handler: lib.ResponseLoggerWrapper(manual.RenewManualPaymentFx),
+		Method:  http.MethodPost,
+		Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
+	},
+	{
 		Route:   "/v1",
 		Handler: lib.ResponseLoggerWrapper(ChangePaymentProviderFx),
 		Method:  http.MethodPatch,
@@ -46,7 +52,7 @@ var paymentRoutes []lib.Route = []lib.Route{
 		Route:   "/v1/renew",
 		Handler: lib.ResponseLoggerWrapper(RenewChangePaymentProviderFx),
 		Method:  http.MethodPatch,
-		Roles:   []string{models.UserRoleAdmin},
+		Roles:   []string{lib.UserRoleAdmin},
 	},
 	{
 		Route:   "/v1/fabrick/refresh-token",
