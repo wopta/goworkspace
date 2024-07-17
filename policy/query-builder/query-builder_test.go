@@ -22,7 +22,7 @@ func TestQueryBuilder(t *testing.T) {
 				"codeCompany":       "100100",
 				"insuredFiscalCode": "LLLRRR85E05R94Z330F",
 			},
-			"(codeCompany = @test) ORDER BY rp.updateDate DESC LIMIT 10",
+			"(rp.codeCompany = @test) ORDER BY rp.updateDate DESC LIMIT 10",
 		},
 		{
 			"fiscalCode overcome third-level parameters",
@@ -37,28 +37,28 @@ func TestQueryBuilder(t *testing.T) {
 			map[string]string{
 				"status": "paid",
 			},
-			"(((isDeleted = false OR isDeleted IS NULL) AND (isPay = true))) ORDER BY rp.updateDate DESC LIMIT 10",
+			"(((rp.isDeleted = false OR rp.isDeleted IS NULL) AND (rp.isPay = true))) ORDER BY rp.updateDate DESC LIMIT 10",
 		},
 		{
 			"not paid renew policies",
 			map[string]string{
 				"status": "unpaid",
 			},
-			"(((isDeleted = false OR isDeleted IS NULL) AND (isPay = false))) ORDER BY rp.updateDate DESC LIMIT 10",
+			"(((rp.isDeleted = false OR rp.isDeleted IS NULL) AND (rp.isPay = false))) ORDER BY rp.updateDate DESC LIMIT 10",
 		},
 		{
 			"renew policies with mandate active",
 			map[string]string{
 				"payment": "recurrent",
 			},
-			"(((isDeleted = false OR isDeleted IS NULL) AND (hasMandate = true))) ORDER BY rp.updateDate DESC LIMIT 10",
+			"(((rp.isDeleted = false OR rp.isDeleted IS NULL) AND (rp.hasMandate = true))) ORDER BY rp.updateDate DESC LIMIT 10",
 		},
 		{
 			"renew policies with mandate non active",
 			map[string]string{
 				"payment": "notRecurrent",
 			},
-			"(((isDeleted = false OR isDeleted IS NULL) AND (hasMandate = false OR hasMandate IS NULL))) ORDER BY rp.updateDate DESC LIMIT 10",
+			"(((rp.isDeleted = false OR rp.isDeleted IS NULL) AND (rp.hasMandate = false OR rp.hasMandate IS NULL))) ORDER BY rp.updateDate DESC LIMIT 10",
 		},
 		{
 			"combine third-level parameters",
@@ -68,10 +68,10 @@ func TestQueryBuilder(t *testing.T) {
 				"startDateTo":   "2024-07-14",
 				"status":        "paid",
 				"payment":       "recurrent",
-			}, "(startDate >= @test) AND (startDate <= @test) AND " +
-				"(producerUid IN ('@test')) AND (((isDeleted = false OR isDeleted IS NULL) AND " +
-				"(isPay = true))) AND (((isDeleted = false OR isDeleted IS NULL) AND " +
-				"(hasMandate = true))) ORDER BY rp.updateDate DESC LIMIT 10",
+			}, "(rp.startDate >= @test) AND (rp.startDate <= @test) AND " +
+				"(rp.producerUid IN ('@test')) AND (((rp.isDeleted = false OR rp.isDeleted IS NULL) AND " +
+				"(rp.isPay = true))) AND (((rp.isDeleted = false OR rp.isDeleted IS NULL) AND " +
+				"(rp.hasMandate = true))) ORDER BY rp.updateDate DESC LIMIT 10",
 		},
 		{
 			"combine parameters from differents level",
@@ -80,28 +80,28 @@ func TestQueryBuilder(t *testing.T) {
 				"startDateFrom": "2024-07-04",
 				"startDateTo":   "2024-07-14",
 				"codeCompany":   "100100",
-			}, "(codeCompany = @test) ORDER BY rp.updateDate DESC LIMIT 10",
+			}, "(rp.codeCompany = @test) ORDER BY rp.updateDate DESC LIMIT 10",
 		},
 		{
 			"invalid status",
 			map[string]string{
 				"status": "invalidValue,unpaid",
 			},
-			"(((isDeleted = false OR isDeleted IS NULL) AND (isPay = false))) ORDER BY rp.updateDate DESC LIMIT 10",
+			"(((rp.isDeleted = false OR rp.isDeleted IS NULL) AND (rp.isPay = false))) ORDER BY rp.updateDate DESC LIMIT 10",
 		},
 		{
 			"single producer uid",
 			map[string]string{
 				"producerUid": "aaaa",
 			},
-			"(producerUid IN ('@test')) ORDER BY rp.updateDate DESC LIMIT 10",
+			"(rp.producerUid IN ('@test')) ORDER BY rp.updateDate DESC LIMIT 10",
 		},
 		{
 			"multiple producer uid",
 			map[string]string{
 				"producerUid": "aaa,bbb",
 			},
-			"(producerUid IN ('@test', '@test')) ORDER BY rp.updateDate DESC LIMIT 10",
+			"(rp.producerUid IN ('@test', '@test')) ORDER BY rp.updateDate DESC LIMIT 10",
 		},
 		{
 			"limit different from default",
@@ -109,7 +109,7 @@ func TestQueryBuilder(t *testing.T) {
 				"producerUid": "aaa,bbb",
 				"limit":       "50",
 			},
-			"(producerUid IN ('@test', '@test')) ORDER BY rp.updateDate DESC LIMIT 50",
+			"(rp.producerUid IN ('@test', '@test')) ORDER BY rp.updateDate DESC LIMIT 50",
 		},
 	}
 

@@ -34,25 +34,25 @@ var (
 	}
 
 	paramsWhereClause = map[string]string{
-		"codeCompany": "(codeCompany = @%s)",
+		"codeCompany": "(**tableAlias**.codeCompany = @%s)",
 
-		"proposalNumber": "(proposalNumber = CAST(@%s AS INTEGER))",
+		"proposalNumber": "(**tableAlias**.proposalNumber = CAST(@%s AS INTEGER))",
 
 		"insuredFiscalCode": "(JSON_VALUE(**tableAlias**.data, '$.assets[0].person.fiscalCode') = @%s)",
 
 		"contractorName":    "(REGEXP_CONTAINS(LOWER(JSON_VALUE(**tableAlias**.data, '$.contractor.name')), LOWER(@%s)))",
 		"contractorSurname": "(REGEXP_CONTAINS(LOWER(JSON_VALUE(**tableAlias**.data, '$.contractor.surname')), LOWER(@%s)))",
 
-		"startDateFrom": "(startDate >= @%s)",
-		"startDateTo":   "(startDate <= @%s)",
-		"company":       "(company = LOWER(@%s))",
-		"product":       "(name = LOWER(@%s))",
-		"producerUid":   "(producerUid IN (%s))",
-		"renewMonth":    "((isDeleted = false OR isDeleted IS NULL) AND (EXTRACT(MONTH FROM startDate) = CAST(@%s AS INTEGER)))",
-		"paid":          "((isDeleted = false OR isDeleted IS NULL) AND (isPay = true))",
-		"unpaid":        "((isDeleted = false OR isDeleted IS NULL) AND (isPay = false))",
-		"recurrent":     "((isDeleted = false OR isDeleted IS NULL) AND (hasMandate = true))",
-		"notRecurrent":  "((isDeleted = false OR isDeleted IS NULL) AND (hasMandate = false OR hasMandate IS NULL))",
+		"startDateFrom": "(**tableAlias**.startDate >= @%s)",
+		"startDateTo":   "(**tableAlias**.startDate <= @%s)",
+		"company":       "(**tableAlias**.company = LOWER(@%s))",
+		"product":       "(**tableAlias**.name = LOWER(@%s))",
+		"producerUid":   "(**tableAlias**.producerUid IN (%s))",
+		"renewMonth":    "((**tableAlias**.isDeleted = false OR **tableAlias**.isDeleted IS NULL) AND (EXTRACT(MONTH FROM **tableAlias**.startDate) = CAST(@%s AS INTEGER)))",
+		"paid":          "((**tableAlias**.isDeleted = false OR **tableAlias**.isDeleted IS NULL) AND (**tableAlias**.isPay = true))",
+		"unpaid":        "((**tableAlias**.isDeleted = false OR **tableAlias**.isDeleted IS NULL) AND (**tableAlias**.isPay = false))",
+		"recurrent":     "((**tableAlias**.isDeleted = false OR **tableAlias**.isDeleted IS NULL) AND (**tableAlias**.hasMandate = true))",
+		"notRecurrent":  "((**tableAlias**.isDeleted = false OR **tableAlias**.isDeleted IS NULL) AND (**tableAlias**.hasMandate = false OR **tableAlias**.hasMandate IS NULL))",
 	}
 
 	orClausesKeys = []string{"status", "payment"}
@@ -169,7 +169,8 @@ func (qb *BigQueryQueryBuilder) BuildQuery(params map[string]string) (string, ma
 		"COALESCE(JSON_VALUE(**tableAlias**.data, '$.contractor.surname'), '')) AS contractor, " +
 		"**tableAlias**.priceGross AS price, **tableAlias**.priceGrossMonthly AS priceMonthly, " +
 		"COALESCE(nn.name, '') AS producer, COALESCE(**tableAlias**.producerCode, '') AS producerCode, " +
-		"**tableAlias**.startDate, **tableAlias**.endDate, **tableAlias**.paymentSplit " +
+		"**tableAlias**.startDate, **tableAlias**.endDate, **tableAlias**.paymentSplit, " +
+		"**tableAlias**.hasMandate AS hasMandate " +
 		"FROM `wopta.**tableName**` **tableAlias** " +
 		"LEFT JOIN `wopta.networkNodesView` nn ON nn.uid = **tableAlias**.producerUid " +
 		"WHERE "
