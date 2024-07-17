@@ -443,6 +443,10 @@ func getEnterpriseGuaranteCellsBySlug(guarante models.Guarante) []Cell {
 				Cell:  "C52",
 				Value: guarante.Value.SumInsuredLimitOfIndemnity,
 			},
+			{
+				Cell:  "G81",
+				Value: guarante.Value.Discount,
+			},
 		}
 	case "third-party-recourse":
 		cells = []Cell{
@@ -460,6 +464,10 @@ func getEnterpriseGuaranteCellsBySlug(guarante models.Guarante) []Cell {
 			{
 				Cell:  "F66",
 				Value: guarante.Value.RetroactiveDate.Format(dateFormat),
+			},
+			{
+				Cell:  "G82",
+				Value: guarante.Value.Discount,
 			},
 		}
 	case "product-liability":
@@ -554,26 +562,16 @@ func getEnterpriseGuaranteCellsBySlug(guarante models.Guarante) []Cell {
 			},
 		}
 
-	case "product-liability-retroactive":
-		cells = []Cell{
-			{
-				Cell:  "F67",
-				Value: guarante.Value.StartDate.Format(dateFormat),
-			},
-		}
 
-	case "product-liability-retroactive-usacan":
-		cells = []Cell{
-			{
-				Cell:  "F68",
-				Value: guarante.Value.StartDate.Format(dateFormat),
-			},
-		}
 	case "product-withdrawal":
 		cells = []Cell{
 			{
 				Cell:  "F69",
 				Value: "SI",
+			},
+			{
+				Cell:  "C93",
+				Value: guarante.Value.SumInsuredLimitOfIndemnity,
 			},
 		}
 
@@ -592,6 +590,10 @@ func getBuildingGuaranteCellsBySlug(guarante models.Guarante, colum int) []Cell 
 			{
 				Cell:  col[colum] + "41",
 				Value: guarante.Value.SumInsuredLimitOfIndemnity,
+			},
+			{
+				Cell:  "G80",
+				Value: guarante.Value.Discount,
 			},
 		}
 
@@ -987,6 +989,13 @@ func setInitCells() []Cell {
 		}, {
 			Cell:  "C74",
 			Value: "No",
+		},
+		{
+			Cell:  "C93",
+			Value: "",
+		},{
+			Cell:  "G69",
+			Value: "",
 		},
 	}
 	return cells
