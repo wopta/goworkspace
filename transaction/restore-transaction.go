@@ -8,12 +8,12 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi/v5"
-	plcRenew "github.com/wopta/goworkspace/policy/renew"
-	trxRenew "github.com/wopta/goworkspace/transaction/renew"
-
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/payment/common"
 	plc "github.com/wopta/goworkspace/policy"
+	plcRenew "github.com/wopta/goworkspace/policy/renew"
+	trxRenew "github.com/wopta/goworkspace/transaction/renew"
 )
 
 func RestoreTransactionFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -69,7 +69,7 @@ func RestoreTransactionFx(w http.ResponseWriter, r *http.Request) (string, inter
 		return "", nil, err
 	}
 
-	err = saveTransactionToDb(collection, *transaction)
+	err = common.SaveTransactionsToDB([]models.Transaction{*transaction}, collection)
 	if err != nil {
 		log.Printf("error saving transaction: %s", err)
 		return "", nil, err
@@ -78,15 +78,4 @@ func RestoreTransactionFx(w http.ResponseWriter, r *http.Request) (string, inter
 	rawResp, err := json.Marshal(transaction)
 
 	return string(rawResp), transaction, err
-}
-
-func saveTransactionToDb(collection string, transaction models.Transaction) error {
-	err := lib.SetFirestoreErr(collection, transaction.Uid, transaction)
-	if err != nil {
-		return err
-	}
-
-	transaction.BigQueryParse()
-	err = lib.InsertRowsBigQuery(lib.WoptaDataset, collection, transaction)
-	return err
 }
