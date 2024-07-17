@@ -93,7 +93,7 @@ func deleteRenewPolicy(p models.Policy) models.Policy {
 }
 
 func deleteRenewTransactions(transactions []models.Transaction) []models.Transaction {
-	deletedTransactions := make([]models.Transaction, len(transactions))
+	deletedTransactions := make([]models.Transaction, 0)
 	for _, tr := range transactions {
 		tr.IsDelete = true
 		tr.Status = models.TransactionStatusDeleted
@@ -117,7 +117,7 @@ func createBatch(policy models.Policy, transactions []models.Transaction) map[st
 		polCollection: {
 			policy.Uid: policy,
 		},
-		trsCollection: {},
+		trsCollection: make(map[string]interface{}),
 	}
 
 	for idx, tr := range transactions {
