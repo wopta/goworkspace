@@ -146,7 +146,7 @@ type DiscountConfig struct {
 	Max          float64 `firestore:"max,omitempty" json:"max,omitempty"`
 	Step         float64 `firestore:"step,omitempty" json:"step,omitempty"`
 	Label        string  `firestore:"label,omitempty" json:"label,omitempty"`
-	DefaultValue string  `firestore:"defaultValue,omitempty" json:"defaultValue,omitempty"`
+	DefaultValue float64 `firestore:"defaultValue,omitempty" json:"defaultValue,omitempty"`
 	Description  string  `firestore:"description,omitempty" json:"description,omitempty"`
 }
 type DurationFieldValue struct {
