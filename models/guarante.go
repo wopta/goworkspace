@@ -29,6 +29,7 @@ type Guarante struct {
 	CompanyCodec               string                     `firestore:"companyCodec,omitempty" json:"companyCodec,omitempty"  bigquery:"-"`
 	CompanyName                string                     `firestore:"companyName,omitempty" json:"companyName,omitempty"  bigquery:"companyName"`
 	Group                      string                     `firestore:"group,omitempty" json:"group,omitempty"  bigquery:"group"`
+	Section                    string                     `firestore:"section,omitempty" json:"section,omitempty"  bigquery:"-"`
 	Value                      *GuaranteValue             `firestore:"value,omitempty" json:"value,omitempty"  bigquery:"-"`
 	Config                     *GuaranteConfig            `firestore:"config,omitempty" json:"config,omitempty"  bigquery:"-"`
 	ExtraValue                 string                     `firestore:"extraValue,omitempty" json:"extraValue,omitempty"  bigquery:"-"`
@@ -66,6 +67,7 @@ type GuaranteValue struct {
 	TypeOfSumInsured           string              `firestore:"typeOfSumInsured,omitempty" json:"typeOfSumInsured,omitempty"`
 	Deductible                 string              `firestore:"deductible,omitempty" json:"deductible,omitempty"`
 	RetroactiveDate            *time.Time          `firestore:"retroactiveDate ,omitempty" json:"retroactiveDate,omitempty" bigquery:"-"`
+	Discount                   float64             `firestore:"discount,omitempty" json:"discount,omitempty"  bigquery:"-"`
 	RetroactiveUsaCanDate      *time.Time          `firestore:"retroactiveUsaCanDate,omitempty" json:"retroactiveUsaCanDate,omitempty" bigquery:"-"`
 	DeductibleValues           GuaranteFieldValue  `firestore:"deductibleValues,omitempty" json:"deductibleValues,omitempty"`
 	DeductibleType             string              `firestore:"deductibleType,omitempty" json:"deductibleType,omitempty"`
@@ -92,7 +94,6 @@ type GuaranteValue struct {
 	MinimumGrossYearly         float64             `firestore:"minimumGrossYearly,omitempty" json:"minimumGrossYearly,omitempty"`
 }
 type GuaranteConfig struct {
-
 	TypeOfSumInsured                       string               `firestore:"typeOfSumInsured,omitempty" json:"typeOfSumInsured,omitempty"`
 	Deductible                             string               `firestore:"deductible,omitempty" json:"deductible,omitempty"`
 	DeductibleValues                       GuaranteFieldValue   `firestore:"deductibleValues,omitempty" json:"deductibleValues,omitempty"`
@@ -105,6 +106,7 @@ type GuaranteConfig struct {
 	DeductibleDesc                         string               `firestore:"deductibleDesc,omitempty" json:"deductibleDesc,omitempty"`
 	SelfInsuranceValues                    GuaranteFieldValue   `firestore:"selfInsuranceValues,omitempty" json:"selfInsuranceValues,omitempty"`
 	SelfInsuranceDesc                      string               `firestore:"selfInsuranceDesc,omitempty" json:"selfInsuranceDesc,omitempty"`
+	DiscountConfig                         *DiscountConfig      `firestore:"discountConfig,omitempty" json:"discountConfig,omitempty"  bigquery:"-"`
 	Duration                               *Duration            `firestore:"duration,omitempty" json:"duration,omitempty"`
 	DurationValues                         *DurationFieldValue  `firestore:"durationValues,omitempty" json:"durationValues,omitempty"`
 	Tax                                    float64              `firestore:"tax" json:"tax"`
@@ -139,7 +141,14 @@ type GuaranteFieldConfig struct {
 	Description    string    `firestore:"description,omitempty" json:"description,omitempty"`
 	TextFieldLabel string    `firestore:"textFieldLabel,omitempty" json:"textFieldLabel,omitempty"`
 }
-
+type DiscountConfig struct {
+	Min          float64 `firestore:"min,omitempty" json:"min,omitempty"`
+	Max          float64 `firestore:"max,omitempty" json:"max,omitempty"`
+	Step         float64 `firestore:"step,omitempty" json:"step,omitempty"`
+	Label        string  `firestore:"label,omitempty" json:"label,omitempty"`
+	DefaultValue string  `firestore:"defaultValue,omitempty" json:"defaultValue,omitempty"`
+	Description  string  `firestore:"description,omitempty" json:"description,omitempty"`
+}
 type DurationFieldValue struct {
 	Min  int `firestore:"min,omitempty" json:"min,omitempty"`
 	Max  int `firestore:"max,omitempty" json:"max,omitempty"`
