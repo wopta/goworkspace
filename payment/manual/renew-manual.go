@@ -37,7 +37,7 @@ func RenewManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, inter
 		log.Printf("Handler end -----------------------------------------------")
 		log.SetPrefix("")
 	}()
-	log.SetPrefix("Handler start ----------------------------------------------")
+	log.Printf("Handler start ----------------------------------------------")
 
 	err = json.NewDecoder(r.Body).Decode(&payload)
 	if err != nil {
@@ -65,7 +65,7 @@ func RenewManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, inter
 		return "", nil, err
 	}
 
-	isFirstTransactionAnnuity := policy.StartDate.AddDate(policy.Annuity, 0, 0) != transaction.EffectiveDate
+	isFirstTransactionAnnuity := lib.IsEqual(policy.StartDate.AddDate(policy.Annuity, 0, 0), transaction.EffectiveDate)
 	if !isFirstTransactionAnnuity {
 		return "", nil, errors.New("cannot pay transaction that is not the first")
 	}
@@ -102,5 +102,5 @@ func RenewManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, inter
 		return "", nil, err
 	}
 
-	return "", nil, err
+	return "{}", nil, err
 }
