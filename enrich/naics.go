@@ -44,12 +44,17 @@ func NaicsFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 			result = append(result, sub)
 		}
 	}
-	b, err := json.Marshal(result)
-	lib.CheckError(err)
+	
+	a := make(map[string][]Naics)
+	for _, v := range result {
+		a[v.Category]=append(a[v.Category], v)
 
+	}
+	b, err := json.Marshal(a)
+	lib.CheckError(err)
 	log.Println("Handler end -------------------------------------------------")
 
-	return "{\"naics\":" + string(b) + "}", nil, nil
+	return "{\"naicsMap\":" + string(b) + "}", nil, err
 }
 
 type Naics struct {
