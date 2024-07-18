@@ -350,6 +350,7 @@ func setInputCell(policy *models.Policy) []Cell {
 	inputCells = append(inputCells, Cell{Cell: "C25", Value: assEnterprise[0].Enterprise.WorkEmployersRemuneration})
 	inputCells = append(inputCells, Cell{Cell: "C26", Value: assEnterprise[0].Enterprise.TotalBilled})
 	inputCells = append(inputCells, Cell{Cell: "C16", Value: paymentSplits[policy.PaymentSplit]})
+
 	for _, eg := range assEnterprise[0].Guarantees {
 
 		inputCells = append(inputCells, getEnterpriseGuaranteCellsBySlug(eg)...)
@@ -364,6 +365,16 @@ func setInputCell(policy *models.Policy) []Cell {
 			inputCells = append(inputCells, Cell{Cell: col[i] + "19", Value: build.Building.NaicsCategory})
 			inputCells = append(inputCells, Cell{Cell: col[i] + "20", Value: build.Building.NaicsDetail})
 			inputCells = append(inputCells, Cell{Cell: col[i] + "21", Value: build.Building.Naics})
+			inputCells = append(inputCells, Cell{Cell: col[i] + "33", Value: build.Building.BuildingMaterial})
+			if build.Building.IsAllarm {
+				inputCells = append(inputCells, Cell{Cell: col[i] + "35", Value: "SI"})
+			}
+			if build.Building.HasSandwitchPanel {
+				inputCells = append(inputCells, Cell{Cell: col[i] + "34", Value: "SI"})
+			}
+			if build.Building.HasSprinkler {
+				inputCells = append(inputCells, Cell{Cell: col[i] + "35", Value: "SI"})
+			}
 			inputCells = append(inputCells, getBuildingGuaranteCellsBySlug(bg, i)...)
 		}
 
@@ -445,7 +456,7 @@ func getEnterpriseGuaranteCellsBySlug(guarante models.Guarante) []Cell {
 			},
 			{
 				Cell:  "G81",
-				Value: guarante.Value.Discount,
+				Value: int(guarante.Value.Discount),
 			},
 		}
 	case "third-party-recourse":
@@ -467,7 +478,7 @@ func getEnterpriseGuaranteCellsBySlug(guarante models.Guarante) []Cell {
 			},
 			{
 				Cell:  "G82",
-				Value: guarante.Value.Discount,
+				Value: int(guarante.Value.Discount),
 			},
 		}
 	case "product-liability":
@@ -494,7 +505,7 @@ func getEnterpriseGuaranteCellsBySlug(guarante models.Guarante) []Cell {
 			{
 				Cell:  "C70",
 				Value: guarante.Value.SumInsured,
-			},{
+			}, {
 				Cell:  "C69",
 				Value: guarante.Value.LimitOfIndemnity,
 			},
@@ -562,7 +573,6 @@ func getEnterpriseGuaranteCellsBySlug(guarante models.Guarante) []Cell {
 			},
 		}
 
-
 	case "product-withdrawal":
 		cells = []Cell{
 			{
@@ -593,7 +603,7 @@ func getBuildingGuaranteCellsBySlug(guarante models.Guarante, colum int) []Cell 
 			},
 			{
 				Cell:  "G80",
-				Value: guarante.Value.Discount,
+				Value: int(guarante.Value.Discount),
 			},
 		}
 
@@ -993,8 +1003,12 @@ func setInitCells() []Cell {
 		{
 			Cell:  "C93",
 			Value: "",
-		},{
+		}, {
 			Cell:  "G69",
+			Value: "",
+		},
+		{
+			Cell:  "E46",
 			Value: "",
 		},
 	}

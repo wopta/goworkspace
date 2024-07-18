@@ -35,6 +35,12 @@ var enrichRoutes []lib.Route = []lib.Route{
 		Method:  http.MethodGet,
 		Roles:   []string{lib.UserRoleAll},
 	},
+	{
+		Route:   "/naics",
+		Handler: lib.ResponseLoggerWrapper(NaicsFx),
+		Method:  http.MethodGet,
+		Roles:   []string{lib.UserRoleAll},
+	},
 }
 
 func init() {

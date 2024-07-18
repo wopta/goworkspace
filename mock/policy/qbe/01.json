@@ -1,150 +1,17 @@
 {
   "productVersion": "v1",
-  "name": "combined",
+  "company": "qbe",
+  "name": "commercial-combined",
   "nameDesc": "Wopta per te Industria e servizi",
   "emitDate": "0001-01-01T00:00:00Z",
-  "startDate": "2024-07-02T09:36:00.384Z",
+  "startDate": "2024-07-17T18:14:54.81Z",
   "renewDate": "0001-01-01T00:00:00Z",
-  "endDate": "2025-07-02T00:00:00Z",
+  "endDate": "2025-07-17T00:00:00Z",
   "creationDate": "0001-01-01T00:00:00Z",
   "updated": "0001-01-01T00:00:00Z",
   "nextPay": "0001-01-01T00:00:00Z",
-  "paymentSplit": "year",
+  "paymentSplit": "yearly",
   "deleteDate": "0001-01-01T00:00:00Z",
-  "channel": "network",
-  "priceGroup": [
-    {
-      "name": "Fabbricato",
-      "description": " Errore - verifica dati",
-      "net": 0,
-      "tax": 0,
-      "gross": 0,
-      "delta": 0,
-      "discount": 0
-    },
-    {
-      "name": "Contenuto (Merci e Macchinari)",
-      "description": " Errore - verifica dati",
-      "net": 0,
-      "tax": 0,
-      "gross": 0,
-      "delta": 0,
-      "discount": 0
-    },
-    {
-      "name": "Merci (aumento temporaneo)",
-      "description": " Errore - verifica dati",
-      "net": 0,
-      "tax": 0,
-      "gross": 0,
-      "delta": 0,
-      "discount": 0
-    },
-    {
-      "name": "Furto, rapina, estorsione (in aumento)",
-      "description": "  -   ",
-      "net": 0,
-      "tax": 0,
-      "gross": 0,
-      "delta": 0,
-      "discount": 0
-    },
-    {
-      "name": "Rischio locativo (in aumento)",
-      "description": "  -   ",
-      "net": 0,
-      "tax": 0,
-      "gross": 0,
-      "delta": 0,
-      "discount": 0
-    },
-    {
-      "name": "Altre garanzie su Contenuto",
-      "description": " Errore - verifica dati",
-      "net": 0,
-      "tax": 0,
-      "gross": 0,
-      "delta": 0,
-      "discount": 0
-    },
-    {
-      "name": "Ricorso terzi (in aumento)",
-      "description": " Errore - verifica dati",
-      "net": 0,
-      "tax": 0,
-      "gross": 0,
-      "delta": 0,
-      "discount": 0
-    },
-    {
-      "name": "Danni indiretti",
-      "description": "  -   ",
-      "net": 0,
-      "tax": 0,
-      "gross": 0,
-      "delta": 0,
-      "discount": 0
-    },
-    {
-      "name": "Perdita Pigioni",
-      "net": 0,
-      "tax": 0,
-      "gross": 0,
-      "delta": 0,
-      "discount": 0
-    },
-    {
-      "name": "Responsabilità civile terzi",
-      "net": 79.94,
-      "tax": 0,
-      "gross": 0,
-      "delta": 0,
-      "discount": 0
-    },
-    {
-      "name": "Responsabilità civile prestatori lavoro",
-      "net": 1104.15,
-      "tax": 0,
-      "gross": 0,
-      "delta": 0,
-      "discount": 0
-    },
-    {
-      "name": "Responsabilità civile prodotti",
-      "description": "  -   ",
-      "net": 0,
-      "tax": 0,
-      "gross": 0,
-      "delta": 0,
-      "discount": 0
-    },
-    {
-      "name": "Ritiro Prodotti",
-      "net": 0,
-      "tax": 0,
-      "gross": 0,
-      "delta": 0,
-      "discount": 0
-    },
-    {
-      "name": "Resp. Amministratori Sindaci Dirigenti (D\u0026O)",
-      "description": "  -   ",
-      "net": 0,
-      "tax": 0,
-      "gross": 0,
-      "delta": 0,
-      "discount": 0
-    },
-    {
-      "name": "Cyber",
-      "description": "  -   ",
-      "net": 0,
-      "tax": 0,
-      "gross": 0,
-      "delta": 0,
-      "discount": 0
-    }
-  ],
   "contractor": {
     "location": {},
     "vatCode": "",
@@ -159,9 +26,9 @@
   "assets": [
     {
       "type": "enterprise",
-      "uuid": "2f0c9f00-71d4-1061-9f1a-41cabc021873",
+      "uuid": "ab4ab780-9808-1090-8dbf-3d3f7a010461",
       "enterprise": {
-        "name": "12",
+        "name": "ciao",
         "address": {
           "streetName": "Via Stella",
           "streetNumber": "12",
@@ -173,6 +40,7 @@
         },
         "location": {},
         "vatCode": "11111111111",
+        "fiscalCode": "12",
         "employer": 12,
         "workEmployersRemuneration": "12",
         "totalBilled": "12",
@@ -180,14 +48,15 @@
       },
       "guarantees": [
         {
+          "childrens": ["stock", "machinery", "building"],
           "type": "enterprise",
           "description": "questa è una descrizione",
           "companyName": "Resp. Civile Terzi e Prestatori Lavoro (RCT/O)",
+          "section": "RESPONSABILITA' CIVILE",
           "value": {
-            "startDate": "0001-01-01T00:00:00Z",
+            "retroactiveDate": "2024-07-17T18:15:55.83Z",
             "deductibleValues": {},
             "sumInsuredLimitOfIndemnity": 3000000,
-            "sumInsured": 5000000,
             "sumInsuredValues": {},
             "selfInsuranceValues": {},
             "tax": 0,
@@ -197,6 +66,28 @@
             "premiumGrossYearly": 0,
             "premiumTaxAmountMonthly": 0,
             "premiumGrossMonthly": 0
+          },
+          "config": {
+            "deductibleValues": {},
+            "sumInsuredValues": {},
+            "selfInsuranceValues": {},
+            "discountConfig": {
+              "min": -30,
+              "max": 100,
+              "label": "Variazione tariffaria"
+            },
+            "tax": 0,
+            "percentage": 0,
+            "sumInsuredLimitOfIndemnityDropdown": {
+              "values": [3000000, 5000000],
+              "label": "Somma da assicurare"
+            },
+            "retroactiveDatePicker": {
+              "durationMin": { "day": 60 },
+              "durationMax": {},
+              "label": "Seleziona una data retroattività malattia",
+              "defaultValue": "startDate"
+            }
           },
           "slug": "third-party-liability-work-providers",
           "isMandatory": true,
@@ -212,7 +103,7 @@
     },
     {
       "type": "building",
-      "uuid": "d0591c80-71f7-1061-9f1a-41cabc021873",
+      "uuid": "677f9e80-9858-1090-8dbf-3d3f7a010461",
       "building": {
         "location": {},
         "address": {
@@ -224,55 +115,19 @@
           "cityCode": "NA",
           "area": ""
         },
-        "buildingMaterial": "Calcestruzzo armato prefabbricato",
+        "buildingMaterial": "Muratura strutturale",
         "isAllarm": false,
         "activtyDetail": "Produzione di bevande analcoliche",
         "activityCategory": "Produzione di bevande e tabacco",
         "naics": "312111",
         "hasSandwitchPanel": false,
         "hasSprinkler": false
-      },
-      "guarantees": [
-        {
-          "type": "building",
-          "description": "questa è una descrizione",
-          "companyName": "Fabbricato",
-          "value": {
-            "startDate": "0001-01-01T00:00:00Z",
-            "deductibleValues": {},
-            "sumInsured": 10000,
-            "sumInsuredValues": {},
-            "selfInsuranceValues": {},
-            "tax": 0,
-            "percentage": 0,
-            "premiumNetYearly": 0,
-            "premiumTaxAmountYearly": 0,
-            "premiumGrossYearly": 0,
-            "premiumTaxAmountMonthly": 0,
-            "premiumGrossMonthly": 0
-          },
-          "slug": "building",
-          "isMandatory": false,
-          "isExtension": false,
-          "isSellable": true,
-          "isConfigurable": true,
-          "subtitle": "",
-          "reserved": false,
-          "isSelected": false,
-          "isDeleted": false
-        }
-      ]
+      }
     }
   ],
-  "offersPrices": {
-    "default": {
-      "monthly": { "net": 0, "tax": 0, "gross": 0, "delta": 0, "discount": 0 },
-      "yearly": { "net": 0, "tax": 0, "gross": 0, "delta": 0, "discount": 0 }
-    }
-  },
   "partnershipName": "",
   "partnershipData": null,
-  "isReserved": true,
+  "isReserved": false,
   "networkUid": "",
   "producerUid": "",
   "producerType": "",
@@ -280,5 +135,6 @@
   "isAutoRenew": false,
   "isRenewable": false,
   "policyType": "",
-  "quoteType": ""
+  "quoteType": "",
+  "hasMandate": false
 }
