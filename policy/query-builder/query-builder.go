@@ -170,7 +170,7 @@ func (qb *BigQueryQueryBuilder) BuildQuery(params map[string]string) (string, ma
 		"**tableAlias**.priceGross AS price, **tableAlias**.priceGrossMonthly AS priceMonthly, " +
 		"COALESCE(nn.name, '') AS producer, COALESCE(**tableAlias**.producerCode, '') AS producerCode, " +
 		"**tableAlias**.startDate, **tableAlias**.endDate, **tableAlias**.paymentSplit, " +
-		"**tableAlias**.hasMandate AS hasMandate " +
+		"COALESCE(**tableAlias**.hasMandate, false) AS hasMandate " +
 		"FROM `wopta.**tableName**` **tableAlias** " +
 		"LEFT JOIN `wopta.networkNodesView` nn ON nn.uid = **tableAlias**.producerUid " +
 		"WHERE "
