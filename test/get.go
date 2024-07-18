@@ -139,6 +139,24 @@ func TestGetFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	logger.Warn("This is a warn log", "env", os.Getenv("env"))
 	logger.Error("This is an error log", "env", os.Getenv("env"))
 
+	log.SetFlags(0)
+	log.SetPrefix("")
+
+	log.Println(Entry{
+		Severity: logging.Notice.String(),
+		Message:  "This is a notice message",
+	})
+
+	log.Println(Entry{
+		Severity: logging.Warning.String(),
+		Message:  "This is a warning message",
+	})
+
+	log.Println(Entry{
+		Severity: logging.Error.String(),
+		Message:  "This is an error message",
+	})
+
 	return "{}", nil, nil
 }
 
