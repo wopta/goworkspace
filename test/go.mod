@@ -7,12 +7,11 @@ replace github.com/wopta/goworkspace/test => ./
 require (
 	cloud.google.com/go v0.113.0
 	cloud.google.com/go/firestore v1.15.0
+	cloud.google.com/go/logging v1.9.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/wopta/goworkspace/lib v1.0.124
-	github.com/wopta/goworkspace/mail v1.0.113
 	github.com/wopta/goworkspace/models v1.1.115
-	github.com/wopta/goworkspace/policy v1.0.105
 	github.com/wopta/goworkspace/product v1.0.112
 	github.com/wopta/goworkspace/transaction v1.0.84
 )
@@ -77,6 +76,7 @@ require (
 	github.com/ttacon/libphonenumber v1.2.1 // indirect
 	github.com/wopta/goworkspace/document v1.1.81 // indirect
 	github.com/wopta/goworkspace/network v1.0.66 // indirect
+	github.com/wopta/goworkspace/policy v1.0.105 // indirect
 	github.com/wopta/goworkspace/wiseproxy v1.0.3 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect

@@ -78,7 +78,7 @@ func getFabrickRequestBody(
 		requestScheduleDate,
 		policy.CodeCompany,
 		strings.ReplaceAll(origin, "https://", ""),
-		strconv.FormatInt(now.Unix(), 10),
+		strconv.FormatInt(now.UnixNano(), 10),
 	}, "_")
 
 	callbackUrl := fmt.Sprintf(
