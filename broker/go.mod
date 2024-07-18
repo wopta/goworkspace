@@ -16,7 +16,7 @@ require (
 	github.com/wopta/goworkspace/mail v1.0.119
 	github.com/wopta/goworkspace/models v1.2.3
 	github.com/wopta/goworkspace/network v1.0.71
-	github.com/wopta/goworkspace/payment v1.0.226
+	github.com/wopta/goworkspace/payment v1.0.227
 	github.com/wopta/goworkspace/policy v1.0.114
 	github.com/wopta/goworkspace/product v1.1.2
 	github.com/wopta/goworkspace/question v1.0.62
