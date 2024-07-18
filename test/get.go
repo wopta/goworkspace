@@ -1,10 +1,13 @@
 package test
 
 import (
+	"encoding/json"
 	"log"
 	"log/slog"
 	"net/http"
 	"os"
+
+	"cloud.google.com/go/logging"
 )
 
 // func TestGetFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -109,7 +112,23 @@ import (
 // }
 
 func TestGetFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+
+	log.Println(Entry{
+		Severity: logging.Notice.String(),
+		Message:  "This is a notice message",
+	})
+
 	log.SetPrefix("[TestGetFx] ")
+
+	log.Println(Entry{
+		Severity: logging.Warning.String(),
+		Message:  "This is a warning message",
+	})
+
+	log.Println(Entry{
+		Severity: logging.Error.String(),
+		Message:  "This is an error message",
+	})
 
 	logger := slog.Default().With(
 		slog.String("handler", "TestGetFx"),
@@ -121,4 +140,26 @@ func TestGetFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	logger.Error("This is an error log", "env", os.Getenv("env"))
 
 	return "{}", nil, nil
+}
+
+// Entry defines a log entry.
+type Entry struct {
+	Message  string `json:"message"`
+	Severity string `json:"severity,omitempty"`
+	Trace    string `json:"logging.googleapis.com/trace,omitempty"`
+
+	// Logs Explorer allows filtering and display of this as `jsonPayload.component`.
+	Component string `json:"component,omitempty"`
+}
+
+// String renders an entry structure to the JSON format expected by Cloud Logging.
+func (e Entry) String() string {
+	if e.Severity == "" {
+		e.Severity = "INFO"
+	}
+	out, err := json.Marshal(e)
+	if err != nil {
+		log.Printf("json.Marshal: %v", err)
+	}
+	return string(out)
 }
