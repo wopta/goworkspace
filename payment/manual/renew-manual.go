@@ -3,7 +3,6 @@ package manual
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -34,10 +33,10 @@ func RenewManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, inter
 		if err != nil {
 			log.Printf("error: %s", err)
 		}
-		log.Printf("Handler end -----------------------------------------------")
+		log.Println("Handler end -----------------------------------------------")
 		log.SetPrefix("")
 	}()
-	log.Printf("Handler start ----------------------------------------------")
+	log.Println("Handler start ----------------------------------------------")
 
 	err = json.NewDecoder(r.Body).Decode(&payload)
 	if err != nil {
@@ -48,16 +47,19 @@ func RenewManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, inter
 	isMethodAllowed := lib.SliceContains(methods, payload.PaymentMethod)
 
 	if !isMethodAllowed {
-		return "", nil, errors.New(errPaymentMethodNotAllowed)
+		err = errors.New(errPaymentMethodNotAllowed)
+		return "", nil, err
 	}
 
 	transactionUid := chi.URLParam(r, "transactionUid")
 	transaction = trxRenew.GetRenewTransactionByUid(transactionUid)
 	if transaction == nil {
-		return "", nil, errors.New("no renew transaction found")
+		err = errors.New("no renew transaction found")
+		return "", nil, err
 	}
 	if transaction.IsPay {
-		return "", nil, errors.New(errTransactionPaid)
+		err = errors.New(errTransactionPaid)
+		return "", nil, err
 	}
 
 	policy, err = plcRenew.GetRenewPolicyByUid(transaction.PolicyUid)
@@ -67,7 +69,8 @@ func RenewManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, inter
 
 	isFirstTransactionAnnuity := lib.IsEqual(policy.StartDate.AddDate(policy.Annuity, 0, 0), transaction.EffectiveDate)
 	if !isFirstTransactionAnnuity {
-		return "", nil, errors.New("cannot pay transaction that is not the first")
+		err = errors.New("cannot pay transaction that is not the first")
+		return "", nil, err
 	}
 
 	manualPayment(transaction, &payload)
@@ -88,7 +91,7 @@ func RenewManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, inter
 
 	err = common.SaveTransactionsToDB([]models.Transaction{*transaction}, lib.RenewTransactionCollection)
 	if err != nil {
-		return "", nil, fmt.Errorf(errPaymentFailed)
+		return "", nil, err
 	}
 
 	err = lib.SetFirestoreErr(lib.RenewPolicyCollection, policy.Uid, policy)
