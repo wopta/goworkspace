@@ -1,6 +1,7 @@
 package test
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 	"log/slog"
@@ -156,6 +157,15 @@ func TestGetFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 		Severity: logging.Error.String(),
 		Message:  "This is an error message",
 	})
+
+	jsonLogger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+
+	ctx := context.Background()
+
+	jsonLogger.Log(ctx, slog.Level(logging.Notice), "This is a notice message from slog")
+	jsonLogger.Log(ctx, slog.Level(logging.Warning), "This is a Warning message from slog")
+	jsonLogger.Log(ctx, slog.Level(logging.Error), "This is a Error message from slog")
+	jsonLogger.Log(ctx, slog.Level(logging.Critical), "This is a Critical message from slog")
 
 	return "{}", nil, nil
 }
