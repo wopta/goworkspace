@@ -48,11 +48,11 @@ var (
 		"company":       "(**tableAlias**.company = LOWER(@%s))",
 		"product":       "(**tableAlias**.name = LOWER(@%s))",
 		"producerUid":   "(**tableAlias**.producerUid IN (%s))",
-		"renewMonth":    "((**tableAlias**.isDeleted = false OR **tableAlias**.isDeleted IS NULL) AND (EXTRACT(MONTH FROM **tableAlias**.startDate) = CAST(@%s AS INTEGER)))",
-		"paid":          "((**tableAlias**.isDeleted = false OR **tableAlias**.isDeleted IS NULL) AND (**tableAlias**.isPay = true))",
-		"unpaid":        "((**tableAlias**.isDeleted = false OR **tableAlias**.isDeleted IS NULL) AND (**tableAlias**.isPay = false))",
-		"recurrent":     "((**tableAlias**.isDeleted = false OR **tableAlias**.isDeleted IS NULL) AND (**tableAlias**.hasMandate = true))",
-		"notRecurrent":  "((**tableAlias**.isDeleted = false OR **tableAlias**.isDeleted IS NULL) AND (**tableAlias**.hasMandate = false OR **tableAlias**.hasMandate IS NULL))",
+		"renewMonth":    "(EXTRACT(MONTH FROM **tableAlias**.startDate) = CAST(@%s AS INTEGER))",
+		"paid":          "(**tableAlias**.isPay = true)",
+		"unpaid":        "(**tableAlias**.isPay = false)",
+		"recurrent":     "(**tableAlias**.hasMandate = true)",
+		"notRecurrent":  "(**tableAlias**.hasMandate = false OR **tableAlias**.hasMandate IS NULL)",
 	}
 
 	orClausesKeys = []string{"status", "payment"}
@@ -206,6 +206,8 @@ func (qb *BigQueryQueryBuilder) BuildQuery(params map[string]string) (string, ma
 	}
 
 	whereClauses, queryParams = qb.processParams(allowedParams, filteredParams)
+
+	whereClauses = append(whereClauses, "(**tableAlias**.isDeleted = false OR **tableAlias**.isDeleted IS NULL)")
 
 	rawQuery.WriteString(queryPrefix)
 	rawQuery.WriteString(strings.Join(whereClauses, " AND "))
