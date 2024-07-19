@@ -69,7 +69,7 @@ func TestQueryBuilder(t *testing.T) {
 				"status":        "paid",
 				"payment":       "recurrent",
 			}, "(rp.startDate >= @test) AND (rp.startDate <= @test) AND " +
-				"(rp.producerUid IN ('@test')) AND (((rp.isDeleted = false OR rp.isDeleted IS NULL) AND " +
+				"(rp.producerUid IN (@test)) AND (((rp.isDeleted = false OR rp.isDeleted IS NULL) AND " +
 				"(rp.isPay = true))) AND (((rp.isDeleted = false OR rp.isDeleted IS NULL) AND " +
 				"(rp.hasMandate = true))) ORDER BY rp.updateDate DESC LIMIT 10",
 		},
@@ -94,14 +94,14 @@ func TestQueryBuilder(t *testing.T) {
 			map[string]string{
 				"producerUid": "aaaa",
 			},
-			"(rp.producerUid IN ('@test')) ORDER BY rp.updateDate DESC LIMIT 10",
+			"(rp.producerUid IN (@test)) ORDER BY rp.updateDate DESC LIMIT 10",
 		},
 		{
 			"multiple producer uid",
 			map[string]string{
 				"producerUid": "aaa,bbb",
 			},
-			"(rp.producerUid IN ('@test', '@test')) ORDER BY rp.updateDate DESC LIMIT 10",
+			"(rp.producerUid IN (@test, @test)) ORDER BY rp.updateDate DESC LIMIT 10",
 		},
 		{
 			"limit different from default",
@@ -109,7 +109,7 @@ func TestQueryBuilder(t *testing.T) {
 				"producerUid": "aaa,bbb",
 				"limit":       "50",
 			},
-			"(rp.producerUid IN ('@test', '@test')) ORDER BY rp.updateDate DESC LIMIT 50",
+			"(rp.producerUid IN (@test, @test)) ORDER BY rp.updateDate DESC LIMIT 50",
 		},
 	}
 

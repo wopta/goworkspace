@@ -129,8 +129,8 @@ func (qb *BigQueryQueryBuilder) processProducerUidParam(paramValue string, query
 	tmp := make([]string, 0)
 	for _, uid := range strings.Split(paramValue, ",") {
 		randomIdentifier := qb.randomGenerator()
-		queryParams[randomIdentifier] = uid
-		tmp = append(tmp, fmt.Sprintf("'@%s'", randomIdentifier))
+		queryParams[randomIdentifier] = lib.TrimSpace(uid)
+		tmp = append(tmp, fmt.Sprintf("@%s", randomIdentifier))
 	}
 	return fmt.Sprintf(paramsWhereClause["producerUid"], strings.Join(tmp, ", "))
 }
