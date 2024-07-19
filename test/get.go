@@ -3,10 +3,12 @@ package test
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"log/slog"
 	"net/http"
 	"os"
+	"runtime"
 	"strings"
 
 	"cloud.google.com/go/logging"
@@ -213,11 +215,22 @@ type DefaultLogger struct {
 }
 
 func (l *DefaultLogger) parse(severity, message string) string {
+	_, file, line, _ := runtime.Caller(2)
+	short := file
+	for i := len(file) - 1; i > 0; i-- {
+		if file[i] == '/' {
+			short = file[i+1:]
+			break
+		}
+	}
+	file = short
+	prefix := strings.Join([]string{fmt.Sprintf("%s:%d", file, line), l.Prefix}, " ")
+
 	entry := struct {
 		Message  string `json:"message"`
 		Severity string `json:"severity,omitempty"`
 	}{
-		strings.Join([]string{l.Prefix, message}, " | "),
+		strings.Join([]string{prefix, message}, " | "),
 		severity,
 	}
 	out, err := json.Marshal(entry)
