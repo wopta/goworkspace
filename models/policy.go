@@ -216,16 +216,20 @@ func (policy *Policy) CalculateContractorAge() (int, error) {
 
 	birthdate, e := time.Parse(time.RFC3339, policy.Contractor.BirthDate)
 	age := startDate.Year() - birthdate.Year()
-	log.Printf("[CalculateContractorAge] startDate.YearDay %d - birthdate.YearDay %d", startDate.YearDay(), birthdate.YearDay())
 
 	startDateYearDay := startDate.YearDay()
 	if isLeapYear(startDate.Year()) {
 		startDateYearDay -= 1
 	}
 
+	log.Printf("[CalculateContractorAge] startDate.YearDay %d - birthdate.YearDay %d", startDateYearDay, birthdate.YearDay())
+
 	if startDateYearDay < birthdate.YearDay() && !(startDate.Month() == birthdate.Month() && startDate.Day() == birthdate.Day()) {
 		age--
 	}
+
+	log.Printf("[CalculateContractorAge] age: %d", age)
+
 	return age, e
 }
 

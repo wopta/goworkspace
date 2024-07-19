@@ -3,10 +3,13 @@ package test
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"log/slog"
 	"net/http"
 	"os"
+	"runtime"
+	"strings"
 
 	"cloud.google.com/go/logging"
 )
@@ -167,6 +170,13 @@ func TestGetFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 	jsonLogger.Log(ctx, slog.Level(logging.Error), "This is a Error message from slog")
 	jsonLogger.Log(ctx, slog.Level(logging.Critical), "This is a Critical message from slog")
 
+	myLogger := NewLogger("TestGetFx")
+
+	myLogger.Debug("This is a debug message from my custom logger")
+	myLogger.Info("This is an info message from my custom logger")
+	myLogger.Warn("This is a warning message from my custom logger")
+	myLogger.Error("This is an error message from my custom logger")
+
 	return "{}", nil, nil
 }
 
@@ -190,4 +200,72 @@ func (e Entry) String() string {
 		log.Printf("json.Marshal: %v", err)
 	}
 	return string(out)
+}
+
+// /
+type Logger interface {
+	Debug(string)
+	Info(string)
+	Warn(string)
+	Error(string)
+}
+
+type DefaultLogger struct {
+	Prefix string
+}
+
+func (l *DefaultLogger) parse(severity, message string) string {
+	_, file, line, _ := runtime.Caller(2)
+	short := file
+	for i := len(file) - 1; i > 0; i-- {
+		if file[i] == '/' {
+			short = file[i+1:]
+			break
+		}
+	}
+	file = short
+	prefix := strings.Join([]string{fmt.Sprintf("%s:%d", file, line), l.Prefix}, " ")
+
+	entry := struct {
+		Message  string `json:"message"`
+		Severity string `json:"severity,omitempty"`
+	}{
+		strings.Join([]string{prefix, message}, " | "),
+		severity,
+	}
+	out, err := json.Marshal(entry)
+	if err != nil {
+		log.Printf("json.Marshal: %v", err)
+	}
+	return string(out)
+}
+
+func (l *DefaultLogger) Debug(msg string) {
+	if msg = l.parse("Debug", msg); msg != "" {
+		log.Println(msg)
+	}
+}
+
+func (l *DefaultLogger) Info(msg string) {
+	if msg = l.parse("Info", msg); msg != "" {
+		log.Println(msg)
+	}
+}
+
+func (l *DefaultLogger) Warn(msg string) {
+	if msg = l.parse("Warning", msg); msg != "" {
+		log.Println(msg)
+	}
+}
+
+func (l *DefaultLogger) Error(msg string) {
+	if msg = l.parse("Error", msg); msg != "" {
+		log.Println(msg)
+	}
+}
+
+func NewLogger(prefix string) Logger {
+	return &DefaultLogger{
+		Prefix: prefix,
+	}
 }
