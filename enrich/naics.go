@@ -44,10 +44,10 @@ func NaicsFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 			result = append(result, sub)
 		}
 	}
-	
+
 	a := make(map[string][]Naics)
 	for _, v := range result {
-		a[v.Category]=append(a[v.Category], v)
+		a[v.Category] = append(a[v.Category], v)
 
 	}
 	b, err := json.Marshal(a)
@@ -59,7 +59,7 @@ func NaicsFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 
 type Naics struct {
 	Category      string `json:"category"`
-	Detail        string `json:"detail "`
-	Code          string `json:"code "`
+	Detail        string `json:"detail"`
+	Code          string `json:"code"`
 	IsQbeSellable bool   `json:"isQbeSellable"`
 }
