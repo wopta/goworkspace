@@ -55,7 +55,7 @@ func GetRenewTransactionsByPolicyUidFx(w http.ResponseWriter, r *http.Request) (
 		return "", nil, errUnauthorized
 	}
 
-	transactions, err := GetRenewActiveTransactionsByPolicyUid(policyUid, policy.Annuity)
+	transactions, err := GetRenewTransactionsByPolicyUid(policyUid, policy.Annuity)
 	if err != nil {
 		return "", nil, err
 	}
