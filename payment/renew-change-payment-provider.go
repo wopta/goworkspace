@@ -59,7 +59,7 @@ func RenewChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (strin
 		return "", nil, errors.New("unable to change payment method")
 	}
 
-	if activeTransactions, err = trsRenew.GetRenewTransactionsByPolicyUid(policy.Uid, policy.Annuity); err != nil {
+	if activeTransactions, err = trsRenew.GetRenewActiveTransactionsByPolicyUid(policy.Uid, policy.Annuity); err != nil {
 		log.Println("error getting renew transactions")
 		return "", nil, err
 	}
