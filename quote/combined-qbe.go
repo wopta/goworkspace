@@ -350,7 +350,12 @@ func setInputCell(policy *models.Policy) []Cell {
 	inputCells = append(inputCells, Cell{Cell: "C25", Value: assEnterprise[0].Enterprise.WorkEmployersRemuneration})
 	inputCells = append(inputCells, Cell{Cell: "C26", Value: assEnterprise[0].Enterprise.TotalBilled})
 	inputCells = append(inputCells, Cell{Cell: "C16", Value: paymentSplits[policy.PaymentSplit]})
-
+	if policy.PaymentSplit == "semestral" {
+		inputCells = append(inputCells, Cell{Cell: "C16", Value: "Semestrale"})
+	}
+	if policy.PaymentSplit == "yearly" {
+		inputCells = append(inputCells, Cell{Cell: "C16", Value: "Annuale"})
+	}
 	for _, eg := range assEnterprise[0].Guarantees {
 
 		inputCells = append(inputCells, getEnterpriseGuaranteCellsBySlug(eg)...)
@@ -582,6 +587,10 @@ func getEnterpriseGuaranteCellsBySlug(guarante models.Guarante) []Cell {
 			{
 				Cell:  "C93",
 				Value: guarante.Value.SumInsuredLimitOfIndemnity,
+			},
+			{
+				Cell:  "G69",
+				Value: guarante.Value.StartDate.Format(dateFormat),
 			},
 		}
 
