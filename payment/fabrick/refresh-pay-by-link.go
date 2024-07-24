@@ -64,7 +64,7 @@ func RefreshPayByLinkFx(w http.ResponseWriter, r *http.Request) (string, interfa
 			log.Println("error getting renew policy")
 			return "", nil, err
 		}
-		if transactions, err = trRenew.GetRenewTransactionsByPolicyUid(policy.Uid, policy.Annuity); err != nil {
+		if transactions, err = trRenew.GetRenewActiveTransactionsByPolicyUid(policy.Uid, policy.Annuity); err != nil {
 			log.Println("error getting renew transactions")
 			return "", nil, err
 		}

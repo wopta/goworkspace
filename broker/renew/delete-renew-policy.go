@@ -42,7 +42,7 @@ func DeleteRenewPolicyFx(w http.ResponseWriter, r *http.Request) (string, interf
 		return "", nil, errors.New("cannot delete renew policy")
 	}
 
-	transactions, err := trxRenew.GetRenewTransactionsByPolicyUid(policy.Uid, policy.Annuity)
+	transactions, err := trxRenew.GetRenewActiveTransactionsByPolicyUid(policy.Uid, policy.Annuity)
 	if err != nil {
 		log.Printf("error getting renew transactions %v", err)
 		return "", nil, err
