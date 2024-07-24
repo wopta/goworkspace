@@ -2,11 +2,15 @@ package transaction
 
 import (
 	"errors"
-	"github.com/wopta/goworkspace/models"
 	"time"
+
+	"github.com/wopta/goworkspace/models"
 )
 
-const transactionStatusReinitialized string = "Reinitialized"
+const (
+	transactionStatusReinitialized string = "Reinitialized"
+	policyStatusReinitialized      string = "Reinitialized"
+)
 
 func ReinitializePaymentInfo(tr *models.Transaction, providerName string) error {
 	if tr.IsPay && !tr.IsDelete {
