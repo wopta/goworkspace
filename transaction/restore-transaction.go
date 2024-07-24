@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/wopta/goworkspace/lib"
@@ -18,11 +19,12 @@ import (
 
 func RestoreTransactionFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		err         error
-		isRenew     bool
-		policy      models.Policy
-		transaction *models.Transaction
-		collection  = lib.TransactionsCollection
+		err                   error
+		isRenew               bool
+		policy                models.Policy
+		transaction           *models.Transaction
+		policyCollection      = lib.PolicyCollection
+		transactionCollection = lib.TransactionsCollection
 	)
 
 	log.SetPrefix("[RestoreTransactionFx] ")
@@ -52,7 +54,8 @@ func RestoreTransactionFx(w http.ResponseWriter, r *http.Request) (string, inter
 			return "", nil, err
 		}
 	} else {
-		collection = lib.RenewTransactionCollection
+		policyCollection = lib.RenewPolicyCollection
+		transactionCollection = lib.RenewTransactionCollection
 		if transaction = trxRenew.GetRenewTransactionByUid(transactionUid); transaction == nil {
 			log.Printf("no renew transaction found with uid: %s", transactionUid)
 			return "", nil, errors.New("no transaction found")
@@ -69,7 +72,25 @@ func RestoreTransactionFx(w http.ResponseWriter, r *http.Request) (string, inter
 		return "", nil, err
 	}
 
-	err = common.SaveTransactionsToDB([]models.Transaction{*transaction}, collection)
+	if lib.IsEqual(transaction.EffectiveDate, policy.StartDate.AddDate(policy.Annuity, 0, 0)) {
+		policy.IsPay = false
+		policy.Status = models.PolicyStatusToPay
+		policy.StatusHistory = append(policy.StatusHistory, policyStatusReinitialized, policy.Status)
+		policy.Updated = time.Now().UTC()
+		policy.BigQueryParse()
+
+		err = lib.SetFirestoreErr(policyCollection, policy.Uid, policy)
+		if err != nil {
+			return "", nil, err
+		}
+
+		err = lib.InsertRowsBigQuery(lib.WoptaDataset, policyCollection, policy)
+		if err != nil {
+			return "", nil, err
+		}
+	}
+
+	err = common.SaveTransactionsToDB([]models.Transaction{*transaction}, transactionCollection)
 	if err != nil {
 		log.Printf("error saving transaction: %s", err)
 		return "", nil, err
