@@ -38,7 +38,7 @@ type Guarante struct {
 	Slug                       string                     `firestore:"slug" json:"slug,omitempty"  bigquery:"slug"`
 	IsMandatory                bool                       `firestore:"isMandatory" json:"isMandatory"  bigquery:"-"`
 	IsExtension                bool                       `firestore:"isExtension" json:"isExtension"  bigquery:"-"`
-	Discount                   float64                    `firestore:"discount,omitempty" json:"discount,omitempty"  bigquery:"-"`
+	Discount                   float64                    `firestore:"discount" json:"discount"  bigquery:"-"`
 	Name                       string                     `firestore:"name,omitempty" json:"name,omitempty"  bigquery:"name"`
 	SumInsuredLimitOfIndemnity float64                    `firestore:"sumInsuredLimitOfIndemnity" json:"sumInsuredLimitOfIndemnity,omitempty"  bigquery:"sumInsuredLimitOfIndemnity"`
 	Deductible                 string                     `firestore:"deductible" json:"deductible,omitempty"  bigquery:"deductible"`
