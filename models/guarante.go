@@ -67,7 +67,7 @@ type GuaranteValue struct {
 	TypeOfSumInsured           string              `firestore:"typeOfSumInsured,omitempty" json:"typeOfSumInsured,omitempty"`
 	Deductible                 string              `firestore:"deductible,omitempty" json:"deductible,omitempty"`
 	RetroactiveDate            *time.Time          `firestore:"retroactiveDate ,omitempty" json:"retroactiveDate,omitempty" bigquery:"-"`
-	Discount                   float64             `firestore:"discount,omitempty" json:"discount,omitempty"  bigquery:"-"`
+	Discount                   float64             `firestore:"discount" json:"discount"  bigquery:"-"`
 	RetroactiveUsaCanDate      *time.Time          `firestore:"retroactiveUsaCanDate,omitempty" json:"retroactiveUsaCanDate,omitempty" bigquery:"-"`
 	DeductibleValues           GuaranteFieldValue  `firestore:"deductibleValues,omitempty" json:"deductibleValues,omitempty"`
 	DeductibleType             string              `firestore:"deductibleType,omitempty" json:"deductibleType,omitempty"`
@@ -146,7 +146,7 @@ type DiscountConfig struct {
 	Max          float64 `firestore:"max,omitempty" json:"max,omitempty"`
 	Step         float64 `firestore:"step,omitempty" json:"step,omitempty"`
 	Label        string  `firestore:"label,omitempty" json:"label,omitempty"`
-	DefaultValue float64 `firestore:"defaultValue,omitempty" json:"defaultValue,omitempty"`
+	DefaultValue float64 `firestore:"defaultValue" json:"defaultValue"`
 	Description  string  `firestore:"description,omitempty" json:"description,omitempty"`
 }
 type DurationFieldValue struct {

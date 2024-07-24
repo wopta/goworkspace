@@ -3,14 +3,19 @@ package companydata
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"reflect"
+	"strconv"
+	"strings"
+
+	"github.com/oliveagle/jsonpath"
 
 	lib "github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
 
-func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func EmitProdoctFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		policy *models.Policy
 	)
@@ -25,6 +30,57 @@ func Emit(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 
 	return "", nil, e
 }
+func EmitProductTrack(policy *models.Policy, productName string, track Track) {
+	var (
+		json_data interface{}
+		result    [][]string
+		cells     []string
+		err       error
+	)
+	json.Unmarshal([]byte(getpolicymock()), &json_data)
+	for _, asset := range policy.Assets {
+		for indexG, _ := range asset.Guarantees {
+
+			for _, column := range track.Emit {
+				var (
+					res   interface{}
+					value string
+				)
+				value = column.Value
+				res = column.Value
+				if strings.Contains(column.Value, "$.") {
+					if strings.Contains(column.Value, "$.assets.guarantees[*]") {
+						value = strings.Replace(value, "*", strconv.Itoa(indexG), 1)
+
+					}
+					res, err = jsonpath.JsonPathLookup(json_data, value)
+					lib.CheckError(err)
+					log.Println(res)
+				}
+
+				cells = append(cells, res.(string))
+
+			}
+		}
+        result = append(result, cells)
+	}
+	
+	switch track.Type {
+	case "csv":
+		filepath := "WOPTAKEYweb_NB"
+		lib.WriteCsv("../tmp/"+filepath, result, ';')
+		//source, _ := os.ReadFile("../tmp/" + filepath)
+
+		//lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/axa/life/"+strconv.Itoa(refMontly.Year())+"/"+filepath, source)
+
+	}
+
+	//or reuse lookup pattern
+	//pat, _ := jsonpath.Compile(`$.store.book[?(@.price < $.expensive)].price`)
+	//res, err := pat.Lookup(json_data)
+	lib.CheckError(err)
+}
+
 func getFieldValue(v interface{}, field string) string {
 	r := reflect.ValueOf(v)
 
@@ -67,7 +123,7 @@ func FieldNames(Struct interface{}, m map[string]interface{}) {
 	}
 }
 func collectFieldNames(t reflect.Type, m map[string]interface{}) {
-    
+
 	if t.Kind() == reflect.Ptr {
 		t = t.Elem()
 	}

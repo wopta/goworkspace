@@ -112,6 +112,8 @@ type Track struct {
 	Name    string   `firestore:"name,omitempty" json:"name,omitempty"`
 	Type    string   `firestore:"type,omitempty" json:"type"`
 	Format  string   `firestore:"format,omitempty" json:"format,omitempty"`
+	Emit    []Column `firestore:"emit,omitempty" json:"Emit,omitempty"`
+	
 }
 
 type Column struct {
@@ -119,6 +121,8 @@ type Column struct {
 	Name   string `firestore:"name,omitempty" json:"name,omitempty"`
 	Type   string `firestore:"type,omitempty" json:"type"`
 	Format string `firestore:"format,omitempty" json:"format,omitempty"`
+	MapFx  string `firestore:"mapFx,omitempty" json:"mapFx,omitempty"`
+	Frame  string `firestore:"frame,omitempty" json:"frame,omitempty"`
 }
 
 type PaymentProvider struct {
