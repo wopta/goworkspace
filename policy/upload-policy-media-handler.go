@@ -87,7 +87,7 @@ func UploadPolicyMediaFx(w http.ResponseWriter, r *http.Request) (string, interf
 
 	log.Println("Handler end -------------------------------------------------")
 
-	return "", nil, err
+	return "{}", nil, err
 }
 
 func putAttachment(policy *models.Policy, req UploadPolicyMediaReq) error {
