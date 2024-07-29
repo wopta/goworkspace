@@ -81,6 +81,12 @@ var mgaRoutes []lib.Route = []lib.Route{
 		Method:  http.MethodPatch,
 		Roles:   []string{lib.UserRoleAdmin},
 	},
+	{
+		Route:   "/quoter/life/v1",
+		Handler: lib.ResponseLoggerWrapper(GetQuoterFileFx),
+		Method:  http.MethodGet,
+		Roles:   []string{lib.UserRoleManager, lib.UserRoleAgency, lib.UserRoleAgent},
+	},
 }
 
 func init() {
