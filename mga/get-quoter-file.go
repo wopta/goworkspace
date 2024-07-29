@@ -3,7 +3,6 @@ package mga
 import (
 	"encoding/base64"
 	"encoding/json"
-	"errors"
 	"log"
 	"net/http"
 	"os"
@@ -27,12 +26,6 @@ func GetQuoterFileFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		log.Printf("Handler end -----------------------------------------------")
 		log.SetPrefix("")
 	}()
-
-	if authToken, err := lib.GetAuthTokenFromIdToken(r.Header.Get("Authorization")); err != nil || !authToken.IsNetworkNode {
-		log.Printf("error validating token")
-		err = errors.New("invalid token")
-		return "", nil, err
-	}
 
 	rawDoc := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), basePath+filename, "")
 
