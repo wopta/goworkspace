@@ -12,8 +12,8 @@ import (
 
 func GetQuoterFileFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	const (
-		basePath = "products/life/v2/"
-		filename = "wopta-per-te-vita-pg.xltx"
+		filePath = "products/life/v2/wopta-per-te-vita-v42.xltx"
+		filename = "Wopta per te. Vita - V4.2.xltx"
 	)
 	var err error
 
@@ -27,7 +27,7 @@ func GetQuoterFileFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		log.SetPrefix("")
 	}()
 
-	rawDoc := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), basePath+filename, "")
+	rawDoc := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filePath, "")
 
 	outMap := map[string]string{
 		"filename": filename,
