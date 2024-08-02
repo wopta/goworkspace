@@ -255,7 +255,7 @@ func personaOfferResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 			{
 				"Annuale",
 				lib.HumanaizePriceEuro(policy.PriceNettMonthly * 12),
-				lib.HumanaizePriceEuro(policy.PriceGrossMonthly - policy.PriceNettMonthly*12),
+				lib.HumanaizePriceEuro((policy.PriceGrossMonthly - policy.PriceNettMonthly) * 12),
 				lib.HumanaizePriceEuro(policy.PriceGrossMonthly * 12),
 			},
 			{
@@ -271,7 +271,7 @@ func personaOfferResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 				lib.HumanaizePriceEuro(policy.PriceGrossMonthly),
 			},
 		}
-	case string(models.PaySplitYear):
+	case string(models.PaySplitYear), string(models.PaySplitYearly):
 		tableInfo = [][]string{
 			{
 				"Annuale firma della polizza",
