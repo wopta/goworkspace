@@ -2,11 +2,12 @@ package document
 
 import (
 	"fmt"
+	"strings"
+	"time"
+
 	"github.com/go-pdf/fpdf"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	"strings"
-	"time"
 )
 
 type keyValue struct {
@@ -135,6 +136,9 @@ func personaMainHeaderV1(pdf *fpdf.Fpdf, policy *models.Policy, networkNode *mod
 }
 
 func personaInsuredInfoSection(pdf *fpdf.Fpdf, policy *models.Policy) {
+	var (
+		insured *models.User
+	)
 	coverageTypeMap := map[string]string{
 		"24h":   "Professionale ed Extraprofessionale",
 		"prof":  "Professionale",
@@ -144,24 +148,30 @@ func personaInsuredInfoSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 	getParagraphTitle(pdf, "La tua assicurazione è operante per il seguente Assicurato e Garanzie")
 	drawPinkHorizontalLine(pdf, thickLineWidth)
 	pdf.Ln(2)
-	contractorInfo := []keyValue{
-		{key: "Assicurato: ", value: "1"},
-		{key: "Cognome e Nome: ", value: policy.Contractor.Surname + " " + policy.Contractor.Name},
-		{key: "Codice Fiscale: ", value: policy.Contractor.FiscalCode},
-		{key: "Professione: ", value: policy.Contractor.Work},
-		{key: "Tipo Professione: ", value: strings.ToUpper(policy.Contractor.WorkType[:1]) + policy.Contractor.WorkType[1:]},
-		{key: "Classe rischio: ", value: "Classe " + policy.Contractor.RiskClass},
+
+	if policy.Assets[0].Person == nil {
+		return
+	}
+	insured = policy.Assets[0].Person
+
+	insuredInfo := []keyValue{
+		{key: "Assicurato: ", value: fmt.Sprintf("%d", len(policy.Assets))},
+		{key: "Cognome e Nome: ", value: insured.Surname + " " + insured.Name},
+		{key: "Codice Fiscale: ", value: insured.FiscalCode},
+		{key: "Professione: ", value: insured.Work},
+		{key: "Tipo Professione: ", value: strings.ToUpper(insured.WorkType[:1]) + insured.WorkType[1:]},
+		{key: "Classe rischio: ", value: "Classe " + insured.RiskClass},
 		{key: "Forma di copertura: ", value: coverageTypeMap[policy.Assets[0].Guarantees[0].Type]},
 	}
 
 	maxLength := 0
-	for _, info := range contractorInfo {
+	for _, info := range insuredInfo {
 		if len(info.key) > maxLength {
 			maxLength = len(info.key)
 		}
 	}
 
-	for _, info := range contractorInfo {
+	for _, info := range insuredInfo {
 		setBlackBoldFont(pdf, standardTextSize)
 		pdf.CellFormat(40, 4, info.key, "B", 0, fpdf.AlignRight, false, 0, "")
 		setBlackRegularFont(pdf, standardTextSize)
@@ -242,7 +252,7 @@ func personaOfferResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 			{
 				"Annuale",
 				lib.HumanaizePriceEuro(policy.PriceNettMonthly * 12),
-				lib.HumanaizePriceEuro(policy.PriceGrossMonthly - policy.PriceNettMonthly*12),
+				lib.HumanaizePriceEuro((policy.PriceGrossMonthly - policy.PriceNettMonthly) * 12),
 				lib.HumanaizePriceEuro(policy.PriceGrossMonthly * 12),
 			},
 			{
@@ -258,7 +268,7 @@ func personaOfferResumeSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 				lib.HumanaizePriceEuro(policy.PriceGrossMonthly),
 			},
 		}
-	case string(models.PaySplitYear):
+	case string(models.PaySplitYear), string(models.PaySplitYearly):
 		tableInfo = [][]string{
 			{
 				"Annuale firma della polizza",
