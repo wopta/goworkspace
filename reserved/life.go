@@ -223,36 +223,3 @@ func setLifeReservedInfo(policy *models.Policy, product *models.Product) {
 		setLifeReservedDocument(policy, product)
 	}
 }
-
-func lifeReservedByCoverage(wrapper *PolicyReservedWrapper) (bool, *models.ReservedInfo, error) {
-	log.Println("[lifeReservedByCoverage] start ------------------------------")
-
-	var output = ReservedRuleOutput{
-		IsReserved:   wrapper.Policy.IsReserved,
-		ReservedInfo: wrapper.Policy.ReservedInfo,
-	}
-
-	if output.ReservedInfo == nil {
-		output.ReservedInfo = &models.ReservedInfo{
-			Reasons: make([]string, 0),
-		}
-	}
-
-	isCovered, coveredPolicies, err := wrapper.AlreadyCovered.isCovered(wrapper)
-	if err != nil {
-		log.Printf("[lifeReservedByCoverage] error calculating coverage: %s", err.Error())
-		return false, nil, err
-	}
-
-	if isCovered {
-		policies := lib.SliceMap[models.Policy](coveredPolicies, func(p models.Policy) string { return p.CodeCompany })
-		reason := fmt.Sprintf("Cliente già assicurato con le polizze numero %v", policies)
-		output.IsReserved = isCovered
-		output.ReservedInfo.Reasons = append(output.ReservedInfo.Reasons, reason)
-	}
-	jsonLog, _ := json.Marshal(output)
-	log.Printf("[lifeReservedByCoverage] result: %v", string(jsonLog))
-
-	log.Println("[lifeReservedByCoverage] end --------------------------------")
-	return output.IsReserved, output.ReservedInfo, nil
-}
