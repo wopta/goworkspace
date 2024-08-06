@@ -22,9 +22,7 @@ func GetReservedInfoByCoverage(policy *models.Policy, origin string) (bool, *mod
 	var wrapper *PolicyReservedWrapper
 
 	switch policy.Name {
-	case models.LifeProduct:
-		wrapper = initWrapper(policy, &ByAssetPerson{}, personAssetExecutor, origin)
-	case models.PersonaProduct:
+	case models.LifeProduct, models.PersonaProduct:
 		wrapper = initWrapper(policy, &ByAssetPerson{}, personAssetExecutor, origin)
 	}
 
