@@ -11,7 +11,7 @@ require (
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/wopta/goworkspace/bpmn v1.0.18
 	github.com/wopta/goworkspace/callback_out v1.0.14
-	github.com/wopta/goworkspace/document v1.1.87
+	github.com/wopta/goworkspace/document v1.1.88
 	github.com/wopta/goworkspace/lib v1.0.127
 	github.com/wopta/goworkspace/mail v1.0.119
 	github.com/wopta/goworkspace/models v1.2.3
