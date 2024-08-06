@@ -19,6 +19,8 @@ func GetReservedInfoByCoverage(policy *models.Policy, origin string) (bool, *mod
 	switch policy.Name {
 	case models.LifeProduct:
 		wrapper = initWrapper(policy, &ByAssetPerson{}, lifeReservedByCoverage, origin)
+	case models.PersonaProduct:
+		wrapper = initWrapper(policy, &ByAssetPerson{}, lifeReservedByCoverage, origin)
 	}
 
 	if wrapper == nil {
