@@ -2,12 +2,13 @@ package document
 
 import (
 	"fmt"
+	"strings"
+	"time"
+
 	"github.com/dustin/go-humanize"
 	"github.com/go-pdf/fpdf"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	"strings"
-	"time"
 )
 
 func mainHeader(pdf *fpdf.Fpdf, policy *models.Policy, isProposal bool) {
@@ -245,7 +246,7 @@ func woptaFooter(pdf *fpdf.Fpdf) {
 			"20122 - Milano (MI)", "", 0, "", false, 0, "")
 		pdf.CellFormat(20, 3, "", "", 0, "", false, 0, "")
 		pdf.CellFormat(pdf.GetStringWidth("Numero REA: MI 2638708"), 3,
-			"Capitale Sociale: €120.000,00", "", 0, "", false, 0, "")
+			"Capitale Sociale: € 204.839,26 i.v.", "", 0, "", false, 0, "")
 		pdf.CellFormat(20, 3, "", "", 0, "", false, 0, "")
 		pdf.CellFormat(pdf.GetStringWidth("CF | P.IVA | n. iscr. Registro Imprese:"), 3,
 			"12072020964", "", 0, "", false, 0, "")
