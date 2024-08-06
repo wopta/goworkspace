@@ -186,6 +186,7 @@ func corsMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		options := cors.Options{
 			AllowedHeaders: []string{"*"},
+			AllowedMethods: []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete},
 		}
 
 		if r.Method == http.MethodOptions || IsLocal() {
