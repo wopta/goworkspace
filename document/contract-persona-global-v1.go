@@ -145,17 +145,14 @@ func personaInsuredInfoSection(pdf *fpdf.Fpdf, policy *models.Policy) {
 		"extra": "Extraprofessionale",
 	}
 
-	if policy.Assets[0].Person != nil {
-		insured = policy.Assets[0].Person
-	}
-
 	getParagraphTitle(pdf, "La tua assicurazione è operante per il seguente Assicurato e Garanzie")
 	drawPinkHorizontalLine(pdf, thickLineWidth)
 	pdf.Ln(2)
 
-	if insured == nil {
+	if policy.Assets[0].Person == nil {
 		return
 	}
+	insured = policy.Assets[0].Person
 
 	insuredInfo := []keyValue{
 		{key: "Assicurato: ", value: fmt.Sprintf("%d", len(policy.Assets))},
