@@ -23,9 +23,9 @@ func GetReservedInfoByCoverage(policy *models.Policy, origin string) (bool, *mod
 
 	switch policy.Name {
 	case models.LifeProduct:
-		wrapper = initWrapper(policy, &ByAssetPerson{}, lifeReservedByCoverage, origin)
+		wrapper = initWrapper(policy, &ByAssetPerson{}, personAssetExecutor, origin)
 	case models.PersonaProduct:
-		wrapper = initWrapper(policy, &ByAssetPerson{}, lifeReservedByCoverage, origin)
+		wrapper = initWrapper(policy, &ByAssetPerson{}, personAssetExecutor, origin)
 	}
 
 	if wrapper == nil {
@@ -35,8 +35,8 @@ func GetReservedInfoByCoverage(policy *models.Policy, origin string) (bool, *mod
 	return wrapper.evaluate()
 }
 
-func lifeReservedByCoverage(wrapper *PolicyReservedWrapper) (bool, *models.ReservedInfo, error) {
-	log.Println("[lifeReservedByCoverage] start ------------------------------")
+func personAssetExecutor(wrapper *PolicyReservedWrapper) (bool, *models.ReservedInfo, error) {
+	log.Println("[personAssetExecutor] start ------------------------------")
 
 	var output = ReservedRuleOutput{
 		IsReserved:   wrapper.Policy.IsReserved,
@@ -51,7 +51,7 @@ func lifeReservedByCoverage(wrapper *PolicyReservedWrapper) (bool, *models.Reser
 
 	isCovered, coveredPolicies, err := wrapper.AlreadyCovered.isCovered(wrapper)
 	if err != nil {
-		log.Printf("[lifeReservedByCoverage] error calculating coverage: %s", err.Error())
+		log.Printf("[personAssetExecutor] error calculating coverage: %s", err.Error())
 		return false, nil, err
 	}
 
@@ -62,8 +62,8 @@ func lifeReservedByCoverage(wrapper *PolicyReservedWrapper) (bool, *models.Reser
 		output.ReservedInfo.Reasons = append(output.ReservedInfo.Reasons, reason)
 	}
 	jsonLog, _ := json.Marshal(output)
-	log.Printf("[lifeReservedByCoverage] result: %v", string(jsonLog))
+	log.Printf("[personAssetExecutor] result: %v", string(jsonLog))
 
-	log.Println("[lifeReservedByCoverage] end --------------------------------")
+	log.Println("[personAssetExecutor] end --------------------------------")
 	return output.IsReserved, output.ReservedInfo, nil
 }
