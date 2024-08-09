@@ -104,8 +104,6 @@ func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 	}
 	log.Printf("found %02d policies", len(policies))
 
-	policyMailDataMap := getPolicyMailDataMap(policies)
-
 	saveFn := func(p models.Policy, trs []models.Transaction, hasMandate bool) error {
 		data := createDraftSaveBatch(p, trs)
 
@@ -114,26 +112,14 @@ func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 				return err
 			}
 
-			if !sendMail {
-				return nil
-			}
-
-			if p.Channel == models.NetworkChannel && hasMandate {
+			if !sendMail || p.Channel != models.ECommerceChannel {
 				return nil
 			}
 
 			from := mail.AddressAnna
 			to := mail.GetContractorEmail(&p)
 			flowName := models.ECommerceFlow
-			if p.Channel == models.NetworkChannel {
-				relation := policyMailDataMap[p.Uid]
-				to = mail.GetNetworkNodeEmail(&relation.Node)
-				flowName = relation.Flow
-			}
 
-			if flowName == models.RemittanceMgaFlow {
-				return nil
-			}
 			mail.SendMailRenewDraft(p, from, to, mail.Address{}, flowName, hasMandate)
 			return nil
 		}
