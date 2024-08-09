@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	prd "github.com/wopta/goworkspace/product"
 	"io"
 	"log"
 	"net/http"
@@ -109,7 +110,8 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		sendEmail = *request.SendEmail
 	}
 
-	if err := policy.CheckStartDateValidity(); err != nil {
+	productConfig := prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
+	if err = policy.CheckStartDateValidity(productConfig.EmitMaxElapsedDays); err != nil {
 		return "", "", err
 	}
 
