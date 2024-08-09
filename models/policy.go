@@ -430,7 +430,6 @@ func (policy *Policy) CheckStartDateValidity(maxElapsedDays uint) error {
 	now := time.Now().UTC().Truncate(truncateDuration)
 	lastValidDate := policy.StartDate.Truncate(truncateDuration).AddDate(0, 0, int(maxElapsedDays))
 
-	// TODO: consider moving validity period into product
 	if lastValidDate.Before(now) {
 		return fmt.Errorf("policy start date expired")
 	}
