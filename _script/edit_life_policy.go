@@ -4,33 +4,36 @@ import (
 	"log"
 	"os"
 
-	"github.com/go-gota/gota/dataframe"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 )
 
 func EditLifePolicy(policyUid string) {
-	rawData, err := os.ReadFile("./_script/policy_80.csv")
+	rawData, err := os.ReadFile("./_script/policy_80.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	df, err := lib.CsvToDataframeV2(rawData, ';', true)
+	df, err := lib.CsvToDataframeV2(rawData, ';', false)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	for _, v := range df.Records() {
-		for index, col := range v {
-			log.Printf("index: %02d, value: %v", index, col)
-		}
+	groups := groupBy(df, 2)
+	delete(groups, "X2")
+
+	for _, rawPolicy := range groups {
+		log.Printf("%v", rawPolicy)
+
+		// TODO: implementare estrazione dati contraente persona giuridica
+		// TODO: implementare estrazione dati 3 titolari effettivi
+		// TODO: implementare estrazione dati assicurato
 	}
 
 }
 
-func groupByColumn(df dataframe.DataFrame, col int) map[string][][]string {
-	res := make(map[string][][]string)
-	for _, k := range df.Records() {
-		res[k[col]] = append(res[k[col]], k)
-	}
-	return res
+func extractContractorData(rawPolicy []string) models.Contractor {
+	contractor := models.Contractor{}
+
+	return contractor
 }
