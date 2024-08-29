@@ -32,13 +32,15 @@ func EditLifePolicy(policyUid string) {
 	groups := groupBy(df, 2)
 	delete(groups, "X2")
 
+	policy := fetchPolicy(policyUid)
+
 	for _, rawPolicy := range groups {
 		log.Printf("%v", rawPolicy)
 
 		// TODO: implementare estrazione dati contraente persona giuridica
 		contractor := extractContractorData(rawPolicy[0])
 		// TODO: implementare estrazione dati assicurato
-		insured := extractInsuredData(rawPolicy[0], "test")
+		insured := extractInsuredData(rawPolicy[0], policy)
 		// TODO: implementare estrazione dati 3 titolari effettivi
 
 		log.Printf("contractor: %+v", contractor)
@@ -47,6 +49,19 @@ func EditLifePolicy(policyUid string) {
 
 }
 
+func fetchPolicy(policyUid string) models.Policy {
+	var policy models.Policy
+
+	docsnap, err := lib.GetFirestoreErr(lib.PolicyCollection, policyUid)
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = docsnap.DataTo(&policy)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return policy
+}
 func extractContractorData(rawPolicy []string) models.Contractor {
 	contractor := models.Contractor{}
 
@@ -85,7 +100,7 @@ func extractContractorData(rawPolicy []string) models.Contractor {
 	return contractor
 }
 
-func extractInsuredData(rawPolicy []string, insuredUid string) models.User {
+func extractInsuredData(rawPolicy []string, policy models.Policy) models.User {
 	insured := models.User{}
 
 	now := time.Now().UTC()
@@ -99,7 +114,7 @@ func extractInsuredData(rawPolicy []string, insuredUid string) models.User {
 	}
 	identityDocumentCode := fmt.Sprintf("%02d", rawCode)
 
-	insured.Uid = insuredUid
+	insured.Uid = policy.Assets[0].Person.Uid
 	insured.Type = models.UserIndividual
 	insured.Name = strings.TrimSpace(lib.Capitalize(rawPolicy[35]))
 	insured.Surname = strings.TrimSpace(lib.Capitalize(rawPolicy[34]))
@@ -142,7 +157,7 @@ func extractInsuredData(rawPolicy []string, insuredUid string) models.User {
 			ExpiryDate:       parseDate(rawPolicy[78]).AddDate(10, 0, 0),
 			IssuingAuthority: strings.TrimSpace(lib.Capitalize(rawPolicy[79])),
 			PlaceOfIssue:     strings.TrimSpace(lib.Capitalize(rawPolicy[79])),
-			LastUpdate:       now, // TODO: change with policy emit date
+			LastUpdate:       policy.EmitDate,
 		},
 	}
 	insured.CreationDate = now
