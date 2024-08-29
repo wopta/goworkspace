@@ -42,11 +42,13 @@ func EditLifePolicy(policyUid string) {
 		// TODO: implementare estrazione dati assicurato
 		insured := extractInsuredData(rawPolicy[0], policy)
 		// TODO: implementare estrazione dati 3 titolari effettivi
+		contractors := extractContractorsData(rawPolicy[0])
 
 		log.Printf("contractor: %+v", contractor)
 		log.Printf("insured: %+v", insured)
+		log.Printf("contractors: %+v", contractors)
+		log.Println()
 	}
-
 }
 
 func fetchPolicy(policyUid string) models.Policy {
@@ -164,6 +166,77 @@ func extractInsuredData(rawPolicy []string, policy models.Policy) models.User {
 	insured.UpdatedDate = now
 	insured.Normalize()
 	return insured
+}
+
+func extractContractorsData(rawPolicy []string) []models.User {
+	const offset = 26
+	contractors := make([]models.User, 0)
+
+	for i := 0; i < 3; i++ {
+		if strings.TrimSpace(strings.ToUpper(rawPolicy[116+(offset*i)])) == "" || strings.TrimSpace(strings.ToUpper(rawPolicy[116+(offset*i)])) == "NO" {
+			break
+		}
+		titolareEffettivo := parsingTitolareEffettivo(rawPolicy, offset, i)
+		titolareEffettivo.Normalize()
+		contractors = append(contractors, titolareEffettivo)
+	}
+	return contractors
+}
+
+func parsingTitolareEffettivo(row []string, offset int, i int) models.User {
+	isExecutor := strings.TrimSpace(strings.ToUpper(row[224])) == strings.TrimSpace(strings.ToUpper(row[121+(offset*i)]))
+	now := time.Now().UTC()
+	phone := strings.TrimSpace(strings.ReplaceAll(strings.ReplaceAll(row[132], " ", ""), " ", ""))
+	if phone != "" {
+		phone = fmt.Sprintf("+39%s", phone)
+	}
+	rawDocumentCode, _ := strconv.Atoi(strings.TrimSpace(row[136+(offset*i)]))
+	identityDocumentCode := fmt.Sprintf("%02d", rawDocumentCode)
+	titolareEffettivo := models.User{
+		//Uid:           lib.NewDoc(models.UserCollection),
+		Type:          models.UserLegalEntity,
+		Name:          strings.TrimSpace(lib.Capitalize(row[118+(offset*i)])),
+		Surname:       strings.TrimSpace(lib.Capitalize(row[117+(offset*i)])),
+		FiscalCode:    strings.TrimSpace(strings.ToUpper(row[121+(offset*i)])),
+		VatCode:       fmt.Sprintf("%011s", strings.TrimSpace(row[27])),
+		Gender:        strings.TrimSpace(strings.ToUpper(row[119+(offset*i)])),
+		BirthDate:     parseDate(row[120+(offset*i)]).Format(time.RFC3339),
+		Mail:          strings.TrimSpace(strings.ToLower(row[131+(offset*i)])),
+		Phone:         phone,
+		BirthCity:     strings.TrimSpace(lib.Capitalize(row[133+(offset*i)])),
+		BirthProvince: strings.TrimSpace(strings.ToUpper(row[134+(offset*i)])),
+		Residence: &models.Address{
+			StreetName: strings.TrimSpace(lib.Capitalize(row[122+(offset*i)])),
+			City:       strings.TrimSpace(lib.Capitalize(row[124+(offset*i)])),
+			CityCode:   strings.TrimSpace(strings.ToUpper(row[125+(offset*i)])),
+			PostalCode: strings.TrimSpace(row[123+(offset*i)]),
+			Locality:   strings.TrimSpace(lib.Capitalize(row[124+(offset*i)])),
+		},
+		Domicile: &models.Address{
+			StreetName: strings.TrimSpace(lib.Capitalize(row[126+(offset*i)])),
+			City:       strings.TrimSpace(lib.Capitalize(row[128+(offset*i)])),
+			CityCode:   strings.TrimSpace(strings.ToUpper(row[129+(offset*i)])),
+			PostalCode: strings.TrimSpace(row[127+(offset*i)]),
+			Locality:   strings.TrimSpace(lib.Capitalize(row[128+(offset*i)])),
+		},
+		IdentityDocuments: []*models.IdentityDocument{{
+			Number:           strings.TrimSpace(strings.ToUpper(row[137+(offset*i)])),
+			Code:             identityDocumentCode,
+			Type:             identityDocumentMap[identityDocumentCode],
+			DateOfIssue:      parseDate(row[138+(offset*i)]),
+			ExpiryDate:       parseDate(row[138+(offset*i)]).AddDate(10, 0, 0),
+			IssuingAuthority: strings.TrimSpace(lib.Capitalize(row[139+(offset*i)])),
+			PlaceOfIssue:     strings.TrimSpace(lib.Capitalize(row[139+(offset*i)])),
+			LastUpdate:       now,
+		}},
+		Work:            strings.TrimSpace(lib.Capitalize(row[130+(offset*i)])),
+		LegalEntityType: models.TitolareEffettivo,
+		IsSignatory:     isExecutor,
+		IsPayer:         isExecutor,
+		CreationDate:    parseDate(row[4]),
+		UpdatedDate:     time.Now().UTC(),
+	}
+	return titolareEffettivo
 }
 
 func parseDate(rawDate string) time.Time {
