@@ -2,12 +2,13 @@ package companydata
 
 import (
 	"encoding/json"
-	"fmt"
+	"io"
 	"log"
 	"net/http"
-	"reflect"
+	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/oliveagle/jsonpath"
 
@@ -15,166 +16,160 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
-func EmitProdoctFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func EmitProdoctTrackFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		policy *models.Policy
+		from         time.Time
+		to           time.Time
+		procuctTrack Track
+		result       [][]string
 	)
+	req := lib.ErrorByte(io.ReadAll(r.Body))
+	defer r.Body.Close()
 
-	e := json.Unmarshal([]byte(getpolicymock()), &policy)
-	m := make(map[string]interface{})
-	FieldNames(policy, m)
-	for name, v := range m {
-		fmt.Println(name)
-		fmt.Println(v)
+	now, upload, reqData := getCompanyDataReq(req)
+	procuctTrackByte := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "products/"+reqData.Name+"/track.json", "")
+	json.Unmarshal(procuctTrackByte, &procuctTrack)
+	from, to = procuctTrack.frequency(now)
+	for _, transaction := range procuctTrack.query(from, to) {
+		var (
+			policy *models.Policy
+		)
+
+		docsnap := lib.GetFirestore("policy", transaction.PolicyUid)
+		docsnap.DataTo(&policy)
+		result = append(result, procuctTrack.EmitProductTrack(policy)...)
+
 	}
 
+	if upload {
+
+	}
 	return "", nil, e
 }
-func EmitProductTrack(policy *models.Policy, productName string, track Track) {
-	var (
-		json_data interface{}
-		result    [][]string
-		cells     []string
-		err       error
+func (track Track) EmitProductTrack(policy *models.Policy) [][]string {
+    var (
+		result [][]string
+		
+		err    error
 	)
-	json.Unmarshal([]byte(getpolicymock()), &json_data)
-	for _, asset := range policy.Assets {
-		for indexG, _ := range asset.Guarantees {
+    if track.IsAssetFlat{
+        result=track.assetRow(policy)
+    }else{
+        result=track.assetRow(policy)
+    }
 
-			for _, column := range track.Emit {
-				var (
-					res   interface{}
-					value string
-				)
-				value = column.Value
-				res = column.Value
-				if strings.Contains(column.Value, "$.") {
-					if strings.Contains(column.Value, "$.assets.guarantees[*]") {
-						value = strings.Replace(value, "*", strconv.Itoa(indexG), 1)
-
-					}
-					res, err = jsonpath.JsonPathLookup(json_data, value)
-					lib.CheckError(err)
-					log.Println(res)
-				}
-
-				cells = append(cells, res.(string))
-
-			}
-		}
-        result = append(result, cells)
-	}
-	
+	lib.CheckError(err)
+	return result
+}
+func (track Track) saveFile(matrix [][]string) {
 	switch track.Type {
 	case "csv":
-		filepath := "WOPTAKEYweb_NB"
-		lib.WriteCsv("../tmp/"+filepath, result, ';')
+		filepath := "WOPTAKEYweb_NB.csv"
+		lib.WriteCsv("../tmp/"+filepath, matrix, ';')
 		//source, _ := os.ReadFile("../tmp/" + filepath)
 
 		//lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/axa/life/"+strconv.Itoa(refMontly.Year())+"/"+filepath, source)
 
 	}
 
-	//or reuse lookup pattern
-	//pat, _ := jsonpath.Compile(`$.store.book[?(@.price < $.expensive)].price`)
-	//res, err := pat.Lookup(json_data)
-	lib.CheckError(err)
 }
+func (track Track) assetRow(policy *models.Policy)[][]string {
+    var (
+		result [][]string
+		cells  []string
+		err    error
+	)
+	//json.Unmarshal([]byte(getpolicymock()), &json_data)
 
-func getFieldValue(v interface{}, field string) string {
-	r := reflect.ValueOf(v)
+	for indexAsset, asset := range policy.Assets {
+		for indexG, _ := range asset.Guarantees {
 
-	f := reflect.Indirect(r).FieldByName(field)
+			for _, column := range track.Emit {
+				var (
+					resPath interface{}
+					value   string
+				)
+				value = column.Value
+				resPath = column.Value
+				if strings.Contains(column.Value, "$.") {
+					if strings.Contains(column.Value, "$.assets[*].guarantees[*]") {
+						value = strings.Replace(value, "guarantees[*]", "guarantees["+strconv.Itoa(indexG)+"]", 1)
+						value = strings.Replace(value, "assets[*]", "assets["+strconv.Itoa(indexAsset)+"]", 1)
+					}
+					resPath, err = jsonpath.JsonPathLookup(policy, value)
+					lib.CheckError(err)
+					log.Println(resPath)
+				}
 
-	return f.String()
-}
-func GetStructFieldName(Struct interface{}, StructField ...interface{}) (fields map[int]string) {
-	fields = make(map[int]string)
-	s := reflect.ValueOf(Struct).Elem()
-
-	for r := range StructField {
-		f := reflect.ValueOf(StructField[r]).Elem()
-
-		for i := 0; i < s.NumField(); i++ {
-			valueField := s.Field(i)
-			if valueField.Addr().Interface() == f.Addr().Interface() {
-				fields[i] = s.Type().Field(i).Name
-			}
-		}
-	}
-	return fields
-}
-func FieldNames(Struct interface{}, m map[string]interface{}) {
-	v := reflect.ValueOf((Struct))
-	t := reflect.TypeOf((Struct))
-	//element:=v.Elem()
-	if t.Kind() == reflect.Struct {
-		for i := 0; i < t.NumField(); i++ {
-			fieldValue := v.Field(i)
-			typeValue := t.Field(i)
-			fmt.Println(typeValue.Name)
-			fmt.Println(typeValue.Type)
-			fmt.Println(fieldValue.Interface())
-			if typeValue.Type.Kind() == reflect.Struct {
-				FieldNames(fieldValue.Interface(), m)
+				if column.MapFx != "" {
+					resPath = GetMapFx(column.MapFx, column.Value)
+				}
+				if column.MapStatic != nil {
+					resPath = column.MapStatic[column.Value]
+				}
+				cells = append(cells, resPath.(string))
 
 			}
 		}
+		result = append(result, cells)
 	}
-}
-func collectFieldNames(t reflect.Type, m map[string]interface{}) {
+    return result
 
-	if t.Kind() == reflect.Ptr {
-		t = t.Elem()
-	}
-	if t.Kind() != reflect.Struct {
-		return
-	}
-	for i := 0; i < t.NumField(); i++ {
-		sf := t.Field(i)
-		m[sf.Name] = t.Field(i)
-		if sf.Anonymous {
-			collectFieldNames(sf.Type, m)
-		}
-	}
 }
-func identify(output map[string]interface{}) {
-	fmt.Printf("%T", output)
-	for _, b := range output {
-		switch bb := b.(type) {
-		case string:
-			fmt.Println(bb)
-			fmt.Println("This is a string")
-		case float64:
-			fmt.Println("this is a float")
-		case bool:
-			fmt.Println("this is a boolean")
-		case []interface{}:
-		// Access the values in the JSON object and place them in an Item
+func (track Track) upload(matrix [][]string) {
 
-		default:
-			return
-		}
-	}
 }
-func getPolicy() []models.Policy {
+func (track Track) frequency(now time.Time) (time.Time, time.Time) {
 
-	q := lib.Firequeries{
-		Queries: []lib.Firequery{{
-			Field:      "companyEmit", //
-			Operator:   "==",          //
-			QueryValue: true,
-		},
+	switch track.Frequency {
+	case "monthly":
+		prevMonth := lib.GetPreviousMonth(now)
+		from = lib.GetFirstDay(prevMonth)
+		to = lib.GetFirstDay(now)
+	case "daily":
+		prevDay := now.AddDate(0, 0, -1)
+		from = time.Date(prevDay.Year(), prevDay.Month(), prevDay.Day(), 0, 0, 0, 0, nil)
+		to = time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, nil)
+	}
+	return from, to
+}
+func (track Track) query(from time.Time, to time.Time) []models.Transaction {
+	firequery := lib.Firequeries{
+		Queries: []lib.Firequery{
+
 			{
-				Field:      "companyEmitted", //
-				Operator:   "==",             //
+				Field:      "isDelete", //
+				Operator:   "==",       //
 				QueryValue: false,
+			},
+			{
+				Field:      "isPay", //
+				Operator:   "==",    //
+				QueryValue: true,
+			},
+
+			{
+				Field:      "policyName", //
+				Operator:   "==",         //
+				QueryValue: track.Name,
+			},
+			{
+				Field:      "effectiveDate", //
+				Operator:   ">=",            //
+				QueryValue: from,
+			},
+			{
+				Field:      "effectiveDate", //
+				Operator:   "<=",            //
+				QueryValue: to,
 			},
 		},
 	}
-	query, _ := q.FirestoreWherefields("policy")
-	policies := models.PolicyToListData(query)
-	return policies
+
+	query, e := firequery.FirestoreWherefields("transactions")
+	lib.CheckError(e)
+	transactions := TransactionToListData(query)
+	return transactions
 }
 
 func getpolicymock() string {
