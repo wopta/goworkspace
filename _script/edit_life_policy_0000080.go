@@ -2,7 +2,6 @@ package _script
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -39,26 +38,40 @@ func EditLifePolicy0000080(policyUid string) {
 
 	rawPolicy := groups["80"][0]
 
-	// TODO: implementare estrazione dati contraente persona giuridica
 	contractor := extractContractorData(rawPolicy)
-	// TODO: implementare estrazione dati assicurato
 	insured := extractInsuredData(rawPolicy, policy)
-	// TODO: implementare estrazione dati 3 titolari effettivi
 	contractors := extractContractorsData(rawPolicy)
 
 	policy.Contractor = contractor
 	policy.Contractors = &contractors
 	policy.Assets[0].Person = &insured
 
-	b, err := json.Marshal(policy)
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = os.WriteFile("./_script/policy_80_result.txt", b, 0644)
+	err = saveUser(&insured)
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	err = saveUser(policy.Contractor.ToUser())
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, contr := range contractors {
+		user := contr
+		err = saveUser(&user)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	policy.Updated = time.Now().UTC()
+
+	err = lib.SetFirestoreErr(lib.PolicyCollection, policy.Uid, policy)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	policy.BigquerySave("")
 }
 
 func csvToDataframe(data []byte, delimiter rune, hasHeader bool) (dataframe.DataFrame, error) {
@@ -214,7 +227,7 @@ func parsingTitolareEffettivo(row []string, offset int, i int) models.User {
 	rawDocumentCode, _ := strconv.Atoi(strings.TrimSpace(row[136+(offset*i)]))
 	identityDocumentCode := fmt.Sprintf("%02d", rawDocumentCode)
 	titolareEffettivo := models.User{
-		//Uid:           lib.NewDoc(models.UserCollection),
+		Uid:           lib.NewDoc(models.UserCollection),
 		Type:          models.UserLegalEntity,
 		Name:          strings.TrimSpace(lib.Capitalize(row[118+(offset*i)])),
 		Surname:       strings.TrimSpace(lib.Capitalize(row[117+(offset*i)])),
@@ -268,4 +281,14 @@ func parseDate(rawDate string) time.Time {
 	date := time.Date(year, time.Month(month), day, 0, 0, 0, 0, time.UTC)
 
 	return date
+}
+
+func saveUser(user *models.User) error {
+	err := lib.SetFirestoreErr(lib.UserCollection, user.Uid, user)
+	if err != nil {
+		return err
+	}
+
+	err = user.BigquerySave("")
+	return err
 }
