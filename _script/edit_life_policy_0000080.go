@@ -1,6 +1,8 @@
 package _script
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -8,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-gota/gota/dataframe"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
@@ -18,13 +21,13 @@ var identityDocumentMap = map[string]string{
 	"03": "Passaporto",
 }
 
-func EditLifePolicy(policyUid string) {
+func EditLifePolicy0000080(policyUid string) {
 	rawData, err := os.ReadFile("./_script/policy_80.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	df, err := lib.CsvToDataframeV2(rawData, ';', false)
+	df, err := csvToDataframe(rawData, ';', false)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -34,21 +37,38 @@ func EditLifePolicy(policyUid string) {
 
 	policy := fetchPolicy(policyUid)
 
-	for _, rawPolicy := range groups {
-		log.Printf("%v", rawPolicy)
+	rawPolicy := groups["80"][0]
 
-		// TODO: implementare estrazione dati contraente persona giuridica
-		contractor := extractContractorData(rawPolicy[0])
-		// TODO: implementare estrazione dati assicurato
-		insured := extractInsuredData(rawPolicy[0], policy)
-		// TODO: implementare estrazione dati 3 titolari effettivi
-		contractors := extractContractorsData(rawPolicy[0])
+	// TODO: implementare estrazione dati contraente persona giuridica
+	contractor := extractContractorData(rawPolicy)
+	// TODO: implementare estrazione dati assicurato
+	insured := extractInsuredData(rawPolicy, policy)
+	// TODO: implementare estrazione dati 3 titolari effettivi
+	contractors := extractContractorsData(rawPolicy)
 
-		log.Printf("contractor: %+v", contractor)
-		log.Printf("insured: %+v", insured)
-		log.Printf("contractors: %+v", contractors)
-		log.Println()
+	policy.Contractor = contractor
+	policy.Contractors = &contractors
+	policy.Assets[0].Person = &insured
+
+	b, err := json.Marshal(policy)
+	if err != nil {
+		log.Fatal(err)
 	}
+	err = os.WriteFile("./_script/policy_80_result.txt", b, 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+}
+
+func csvToDataframe(data []byte, delimiter rune, hasHeader bool) (dataframe.DataFrame, error) {
+	reader := bytes.NewReader(data)
+	df := dataframe.ReadCSV(reader,
+		dataframe.WithDelimiter(delimiter),
+		dataframe.HasHeader(hasHeader),
+		dataframe.NaNValues(nil),
+		dataframe.DetectTypes(false))
+	return df, df.Error()
 }
 
 func fetchPolicy(policyUid string) models.Policy {
@@ -64,6 +84,7 @@ func fetchPolicy(policyUid string) models.Policy {
 	}
 	return policy
 }
+
 func extractContractorData(rawPolicy []string) models.Contractor {
 	contractor := models.Contractor{}
 
