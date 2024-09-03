@@ -27,7 +27,7 @@ func EmitProdoctTrackFx(w http.ResponseWriter, r *http.Request) (string, interfa
 	defer r.Body.Close()
 
 	now, upload, reqData := getCompanyDataReq(req)
-	procuctTrackByte := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "products/"+reqData.Name+"/track.json", "")
+	procuctTrackByte := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "products/"+reqData.Name+"/v1/track.json", "")
 	json.Unmarshal(procuctTrackByte, &procuctTrack)
 	from, to = procuctTrack.frequency(now)
 	for _, transaction := range procuctTrack.query(from, to) {
@@ -47,16 +47,16 @@ func EmitProdoctTrackFx(w http.ResponseWriter, r *http.Request) (string, interfa
 	return "", nil, e
 }
 func (track Track) EmitProductTrack(policy *models.Policy) [][]string {
-    var (
+	var (
 		result [][]string
-		
-		err    error
+
+		err error
 	)
-    if track.IsAssetFlat{
-        result=track.assetRow(policy)
-    }else{
-        result=track.assetRow(policy)
-    }
+	if track.IsAssetFlat {
+		result = track.assetRow(policy)
+	} else {
+		result = track.assetRow(policy)
+	}
 
 	lib.CheckError(err)
 	return result
@@ -73,8 +73,8 @@ func (track Track) saveFile(matrix [][]string) {
 	}
 
 }
-func (track Track) assetRow(policy *models.Policy)[][]string {
-    var (
+func (track Track) assetRow(policy *models.Policy) [][]string {
+	var (
 		result [][]string
 		cells  []string
 		err    error
@@ -113,7 +113,7 @@ func (track Track) assetRow(policy *models.Policy)[][]string {
 		}
 		result = append(result, cells)
 	}
-    return result
+	return result
 
 }
 func (track Track) upload(matrix [][]string) {
@@ -131,6 +131,7 @@ func (track Track) frequency(now time.Time) (time.Time, time.Time) {
 		from = time.Date(prevDay.Year(), prevDay.Month(), prevDay.Day(), 0, 0, 0, 0, nil)
 		to = time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, nil)
 	}
+	log.Println(from, to)
 	return from, to
 }
 func (track Track) query(from time.Time, to time.Time) []models.Transaction {
