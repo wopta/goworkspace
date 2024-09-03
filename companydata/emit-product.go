@@ -75,12 +75,17 @@ func (track Track) saveFile(matrix [][]string) {
 }
 func (track Track) assetRow(policy *models.Policy) [][]string {
 	var (
-		result [][]string
-		cells  []string
-		err    error
+		json_data interface{}
+		result    [][]string
+		cells     []string
+		err       error
 	)
 	//json.Unmarshal([]byte(getpolicymock()), &json_data)
 
+	b, err := json.Marshal(policy)
+	lib.CheckError(err)
+	json.Unmarshal(b, &json_data)
+	log.Println(string(b))
 	for indexAsset, asset := range policy.Assets {
 		for indexG, _ := range asset.Guarantees {
 
@@ -98,7 +103,7 @@ func (track Track) assetRow(policy *models.Policy) [][]string {
 						value = strings.Replace(value, "assets[*]", "assets["+strconv.Itoa(indexAsset)+"]", 1)
 					}
 					log.Println(value)
-					resPath, err = jsonpath.JsonPathLookup(policy, value)
+					resPath, err = jsonpath.JsonPathLookup(json_data, value)
 					lib.CheckError(err)
 					log.Println(resPath)
 				}
