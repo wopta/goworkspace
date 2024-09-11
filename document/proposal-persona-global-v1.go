@@ -50,6 +50,14 @@ func personaGlobalProposalV1(pdf *fpdf.Fpdf, policy *models.Policy, networkNode 
 
 	generatePolicyAnnex(pdf, "", networkNode, policy)
 
+	globalHeader(pdf)
+
+	pdf.AddPage()
+
+	globalFooter(pdf)
+
+	globalPrivacySection(pdf)
+
 	filename, out := saveProposal(pdf, policy)
 	return filename, out
 }

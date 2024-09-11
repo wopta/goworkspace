@@ -60,6 +60,14 @@ func personaGlobalContractV1(pdf *fpdf.Fpdf, policy *models.Policy, networkNode 
 
 	generatePolicyAnnex(pdf, "", networkNode, policy)
 
+	globalHeader(pdf)
+
+	pdf.AddPage()
+
+	globalFooter(pdf)
+
+	globalPrivacySection(pdf)
+
 	filename, out := saveContract(pdf, policy)
 	return filename, out
 }
