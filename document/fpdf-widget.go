@@ -291,7 +291,7 @@ func globalFooter(pdf *fpdf.Fpdf) {
 	})
 }
 
-func globalPrivacySection(pdf *fpdf.Fpdf) {
+func globalPrivacySection(pdf *fpdf.Fpdf, survey models.Survey) {
 	type row struct {
 		text   string
 		isBold bool
@@ -574,11 +574,25 @@ func globalPrivacySection(pdf *fpdf.Fpdf) {
 
 	pdf.AddPage()
 
+	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3.75, "Qui di seguito esprimo il mio consenso al trattamento dei dati personali "+
 		"particolari per le finalità sopra indicate, in conformità con quanto previsto all’interno dell’informativa: ",
 		"", fpdf.AlignLeft, false)
 
 	pdf.Ln(3)
+
+	privacyConsent := [][]string{
+		{"", "X"},
+		{"", "X"},
+	}
+
+	questions := survey.Questions[len(survey.Questions)-2:]
+	for questionIndex, question := range questions {
+		if question.Answer != nil && *question.Answer {
+			privacyConsent[questionIndex][0] = "X"
+			privacyConsent[questionIndex][1] = ""
+		}
+	}
 
 	table := [][]tableCell{
 		{
@@ -593,7 +607,7 @@ func globalPrivacySection(pdf *fpdf.Fpdf) {
 				border:    "",
 			},
 			{
-				text:      "X",
+				text:      privacyConsent[0][0],
 				height:    5,
 				width:     5,
 				textBold:  true,
@@ -613,7 +627,7 @@ func globalPrivacySection(pdf *fpdf.Fpdf) {
 				border:    "",
 			},
 			{
-				text:      "X",
+				text:      privacyConsent[0][1],
 				height:    5,
 				width:     5,
 				textBold:  true,
@@ -653,7 +667,7 @@ func globalPrivacySection(pdf *fpdf.Fpdf) {
 				border:    "",
 			},
 			{
-				text:      "X",
+				text:      privacyConsent[1][0],
 				height:    5,
 				width:     5,
 				textBold:  true,
@@ -673,7 +687,7 @@ func globalPrivacySection(pdf *fpdf.Fpdf) {
 				border:    "",
 			},
 			{
-				text:      "X",
+				text:      privacyConsent[1][1],
 				height:    5,
 				width:     5,
 				textBold:  true,

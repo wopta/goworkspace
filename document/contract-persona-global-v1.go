@@ -66,7 +66,7 @@ func personaGlobalContractV1(pdf *fpdf.Fpdf, policy *models.Policy, networkNode 
 
 	globalFooter(pdf)
 
-	globalPrivacySection(pdf)
+	globalPrivacySection(pdf, (*policy.Surveys)[len(*policy.Surveys)-1])
 
 	filename, out := saveContract(pdf, policy)
 	return filename, out
