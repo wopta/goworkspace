@@ -2,25 +2,13 @@ package product
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"log"
 	"os"
-	"regexp"
 	"sort"
 	"strings"
-	"time"
 )
-
-func printSlice(stringSlice []string) int {
-	tot := 0
-	for _, v := range stringSlice {
-		fmt.Printf("%v\n", v)
-		tot++
-	}
-	return tot
-}
 
 func GetAllProductsByChannel(channel string) []models.ProductInfo {
 	log.Println("[GetAllProductsByChannel] function start -----------------------")
@@ -147,48 +135,21 @@ func getProductsFileList() []string {
 		log.Printf("[GetNetworkNodeProducts] error getting file list: %s", err.Error())
 	}
 
-	/*
-		COUNT SEPARATORS
-	*/
+	checkedList := removeOutOfPathFiles(fileList)
+
+	return checkedList
+}
+
+func removeOutOfPathFiles(fileList []string) []string {
 	var filteredFileList []string
-	var removedElements []string
-	log.Println("=== ORIGINAL LIST ===")
-	tot := printSlice(fileList)
-	log.Printf("There are %d elements", tot)
-	start := time.Now()
+
+	// Correct path is: products/{{product_dir}}/{{version_number}}/{{filename.extension}}
+	// but this function supports further nesting
 	for _, s := range fileList {
-		if strings.Count(s, "/") == 3 {
+		if strings.Count(s, "/") >= 3 {
 			filteredFileList = append(filteredFileList, s)
-		} else {
-			removedElements = append(removedElements, s)
 		}
 	}
-	elapsed := time.Since(start)
-	log.Println("=== COUNT SEPARATORS FILTERED LIST ===")
-	tot = printSlice(filteredFileList)
-	log.Printf("There are %d elements", tot)
-	log.Printf("### ==> COUNT SEPARATORS took %s", elapsed)
-
-	/*
-		REGEXP
-	*/
-	pattern := regexp.MustCompile(`/v[1-9]+/`)
-	filteredFileList = nil
-	removedElements = nil
-	start = time.Now()
-	for _, s := range fileList {
-		if pattern.MatchString(s) {
-			filteredFileList = append(filteredFileList, s)
-		} else {
-			removedElements = append(removedElements, s)
-		}
-	}
-
-	elapsed = time.Since(start)
-	log.Println("=== REGEXP FILTERED LIST ===")
-	tot = printSlice(filteredFileList)
-	log.Printf("There are %d elements", tot)
-	log.Printf("### ==> REGEXP took %s", elapsed)
 
 	return filteredFileList
 }
