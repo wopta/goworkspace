@@ -229,7 +229,10 @@ func personaGuaranteesTable(pdf *fpdf.Fpdf, guaranteesMap map[string]map[string]
 }
 
 func personaSurveySection(pdf *fpdf.Fpdf, policy *models.Policy, isProposal bool) {
-	surveys := *policy.Surveys
+	const tutelaPrivacySurveyID = 4
+	surveys := lib.SliceFilter(*policy.Surveys, func(survey models.Survey) bool {
+		return survey.Id != tutelaPrivacySurveyID
+	})
 
 	getParagraphTitle(pdf, "Dichiarazioni da leggere con attenzione prima di firmare")
 	err := printSurvey(pdf, surveys[0], policy.Company, isProposal)
