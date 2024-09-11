@@ -58,6 +58,8 @@ func personaGlobalContractV1(pdf *fpdf.Fpdf, policy *models.Policy, networkNode 
 
 	personalDataHandlingSection(pdf, policy, false)
 
+	generatePolicyAnnex(pdf, "", networkNode, policy)
+
 	filename, out := saveContract(pdf, policy)
 	return filename, out
 }
