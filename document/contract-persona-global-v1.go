@@ -48,6 +48,14 @@ func personaGlobalContractV1(pdf *fpdf.Fpdf, policy *models.Policy, networkNode 
 
 	companiesDescriptionSection(pdf, policy.Company)
 
+	woptaHeader(pdf, false)
+
+	pdf.AddPage()
+
+	woptaFooter(pdf)
+
+	woptaPrivacySection(pdf)
+
 	personalDataHandlingSection(pdf, policy, false)
 
 	filename, out := saveContract(pdf, policy)
