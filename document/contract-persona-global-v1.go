@@ -144,10 +144,10 @@ func personaMainHeaderV1(pdf *fpdf.Fpdf, policy *models.Policy, networkNode *mod
 		pdf.MultiCell(0, 3.5, policyInfo, "", "", false)
 
 		setBlackBoldFont(pdf, standardTextSize)
-		pdf.SetXY(-75, 20)
+		pdf.SetXY(-95, 20)
 		pdf.Cell(0, 3, "I tuoi dati")
 		setBlackRegularFont(pdf, standardTextSize)
-		pdf.SetXY(-75, pdf.GetY()+3)
+		pdf.SetXY(-95, pdf.GetY()+3)
 		pdf.MultiCell(0, 3.5, contractorInfo, "", "", false)
 		pdf.Ln(5)
 	})
