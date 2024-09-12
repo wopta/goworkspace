@@ -268,7 +268,7 @@ func globalHeader(pdf *fpdf.Fpdf) {
 		pdf.SetXY(-30, 7)
 		opt.ImageType = "png"
 		pdf.ImageOptions(lib.GetAssetPathByEnvV2()+"logo_global_02.png", 180, 7, 0, 15, false, opt, 0, "")
-		pdf.Ln(15)
+		pdf.Ln(17)
 	})
 }
 
