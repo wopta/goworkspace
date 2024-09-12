@@ -28,11 +28,28 @@ const (
 	proposal         = "PROPOSTA"
 )
 
-var companyMap map[string]string = map[string]string{
-	models.AxaCompany:      "AXA FRANCE VIE S.A.",
-	models.SogessurCompany: "Sogessur SA",
-	models.GlobalCompany:   "Global Assistance",
-}
+var (
+	companyMap map[string]string = map[string]string{
+		models.AxaCompany:      "AXA FRANCE VIE S.A.",
+		models.SogessurCompany: "Sogessur SA",
+		models.GlobalCompany:   "Global Assistance",
+	}
+	colorWhite = rgbColor{
+		r: 255,
+		g: 255,
+		b: 255,
+	}
+	blueColor = rgbColor{
+		r: 142,
+		g: 170,
+		b: 218,
+	}
+	lightBlueColor = rgbColor{
+		r: 217,
+		g: 226,
+		b: 243,
+	}
+)
 
 func initFpdf() *fpdf.Fpdf {
 	pdf := fpdf.New(fpdf.OrientationPortrait, fpdf.UnitMillimeter, fpdf.PageSizeA4, "")
@@ -573,4 +590,45 @@ func getProducerName(networkNode *models.NetworkNode) string {
 		producerName = strings.ToUpper(fmt.Sprintf("%s", networkNode.Broker.Name))
 	}
 	return producerName
+}
+
+func tableDrawer(pdf *fpdf.Fpdf, table [][]tableCell) {
+	for _, row := range table {
+		maxNumLines := 1
+		for _, cell := range row {
+			setBlackRegularFont(pdf, standardTextSize)
+			if cell.textBold {
+				setBlackBoldFont(pdf, standardTextSize)
+			}
+			numLines := len(pdf.SplitText(cell.text, cell.width))
+			if numLines > maxNumLines {
+				maxNumLines = numLines
+			}
+		}
+
+		for index, cell := range row {
+			numLines := len(pdf.SplitText(cell.text, cell.width))
+			currentX, currentY := pdf.GetXY()
+			pdf.SetFont("Montserrat", "", 8)
+			pdf.SetFillColor(colorWhite.r, colorWhite.g, colorWhite.b)
+			if cell.fill {
+				pdf.SetFillColor(cell.fillColor.r, cell.fillColor.g, cell.fillColor.b)
+			}
+			if cell.textBold {
+				pdf.SetFont("Montserrat", "B", 8)
+			}
+
+			pdf.MultiCell(cell.width, cell.height, cell.text, cell.border, cell.align, cell.fill)
+
+			for i := numLines; i < maxNumLines; i++ {
+				pdf.SetX(currentX)
+				pdf.MultiCell(cell.width, cell.height, "", "", fpdf.AlignCenter, cell.fill)
+			}
+
+			if index < len(row)-1 {
+				pdf.SetXY(currentX+cell.width, currentY)
+			}
+		}
+
+	}
 }

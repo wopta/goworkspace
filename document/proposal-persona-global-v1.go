@@ -36,7 +36,27 @@ func personaGlobalProposalV1(pdf *fpdf.Fpdf, policy *models.Policy, networkNode 
 
 	companiesDescriptionSection(pdf, policy.Company)
 
+	woptaHeader(pdf, true)
+
+	pdf.AddPage()
+
+	woptaFooter(pdf)
+
+	woptaPrivacySection(pdf)
+
 	personalDataHandlingSection(pdf, policy, true)
+
+	pdf.AddPage()
+
+	generatePolicyAnnex(pdf, "", networkNode, policy)
+
+	globalHeader(pdf)
+
+	pdf.AddPage()
+
+	globalFooter(pdf)
+
+	globalPrivacySection(pdf, (*policy.Surveys)[len(*policy.Surveys)-1])
 
 	filename, out := saveProposal(pdf, policy)
 	return filename, out

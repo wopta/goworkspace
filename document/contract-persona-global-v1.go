@@ -48,7 +48,25 @@ func personaGlobalContractV1(pdf *fpdf.Fpdf, policy *models.Policy, networkNode 
 
 	companiesDescriptionSection(pdf, policy.Company)
 
+	woptaHeader(pdf, false)
+
+	pdf.AddPage()
+
+	woptaFooter(pdf)
+
+	woptaPrivacySection(pdf)
+
 	personalDataHandlingSection(pdf, policy, false)
+
+	generatePolicyAnnex(pdf, "", networkNode, policy)
+
+	globalHeader(pdf)
+
+	pdf.AddPage()
+
+	globalFooter(pdf)
+
+	globalPrivacySection(pdf, (*policy.Surveys)[len(*policy.Surveys)-1])
 
 	filename, out := saveContract(pdf, policy)
 	return filename, out
@@ -126,10 +144,10 @@ func personaMainHeaderV1(pdf *fpdf.Fpdf, policy *models.Policy, networkNode *mod
 		pdf.MultiCell(0, 3.5, policyInfo, "", "", false)
 
 		setBlackBoldFont(pdf, standardTextSize)
-		pdf.SetXY(-75, 20)
+		pdf.SetXY(-95, 20)
 		pdf.Cell(0, 3, "I tuoi dati")
 		setBlackRegularFont(pdf, standardTextSize)
-		pdf.SetXY(-75, pdf.GetY()+3)
+		pdf.SetXY(-95, pdf.GetY()+3)
 		pdf.MultiCell(0, 3.5, contractorInfo, "", "", false)
 		pdf.Ln(5)
 	})
@@ -219,7 +237,10 @@ func personaGuaranteesTable(pdf *fpdf.Fpdf, guaranteesMap map[string]map[string]
 }
 
 func personaSurveySection(pdf *fpdf.Fpdf, policy *models.Policy, isProposal bool) {
-	surveys := *policy.Surveys
+	const tutelaPrivacySurveyID = 4
+	surveys := lib.SliceFilter(*policy.Surveys, func(survey models.Survey) bool {
+		return survey.Id != tutelaPrivacySurveyID
+	})
 
 	getParagraphTitle(pdf, "Dichiarazioni da leggere con attenzione prima di firmare")
 	err := printSurvey(pdf, surveys[0], policy.Company, isProposal)

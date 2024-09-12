@@ -268,7 +268,7 @@ func globalHeader(pdf *fpdf.Fpdf) {
 		pdf.SetXY(-30, 7)
 		opt.ImageType = "png"
 		pdf.ImageOptions(lib.GetAssetPathByEnvV2()+"logo_global_02.png", 180, 7, 0, 15, false, opt, 0, "")
-		pdf.Ln(15)
+		pdf.Ln(17)
 	})
 }
 
@@ -289,6 +289,432 @@ func globalFooter(pdf *fpdf.Fpdf) {
 		pdf.SetY(-7)
 		pageNumber(pdf)
 	})
+}
+
+func globalPrivacySection(pdf *fpdf.Fpdf, survey models.Survey) {
+	type row struct {
+		text   string
+		isBold bool
+	}
+
+	pages := [][][]row{
+		{
+			{
+				{
+					text: "Informativa resa all’interessato per il trattamento assicurativo di dati personali comuni, particolari " +
+						"e dei dati relativi a condanne penali e reati",
+					isBold: true,
+				},
+				{
+					text: "Ai sensi dell’art. 13 del Regolamento Europeo n. 2016/679 " +
+						"(General Data Protection Regulation – GDPR) ed in relazione ai dati personali che si " +
+						"intendono trattare, La informiamo di quanto segue:",
+					isBold: false,
+				},
+			},
+			{
+				{
+					text:   "1. CATEGORIE DI DATI PERSONALI TRATTATI",
+					isBold: true,
+				},
+				{
+					text: "Il \"dato personale\" è \"qualsiasi informazione riguardante una persona fisica identificata o " +
+						"identificabile (\"interessato\")”. Ai fini della presente Informativa il Titolare tratta i seguenti " +
+						"dati personali: nome, cognome, indirizzo, e-mail, numero telefonico, codice fiscale o P. IVA " +
+						"dell’interessato e dei soggetti da lui indicati per la copertura assicurativa. Oltre alle categorie " +
+						"di dati indicati potranno anche essere trattati, previo consenso espresso dell’interessato, anche " +
+						"per conto degli altri soggetti inclusi nella copertura assicurativa, dati particolari di cui all’art. " +
+						"9 del GDPR (dati sanitari) e dati relativi a condanne penali e reati di cui all’art. 10 del GDPR.",
+					isBold: false,
+				},
+			},
+			{
+				{
+					text:   "2. FINALITÀ DEL TRATTAMENTO DEI DATI",
+					isBold: true,
+				},
+				{
+					text: "Il trattamento è diretto all’espletamento da parte del Titolare delle seguenti finalità:\n" +
+						"- Procedere all’elaborazione di preventivi Assicurativi, sulla base delle informazioni ricevute;\n" +
+						"- Procedere alla valutazione dei requisiti per l’assicurabilità dei soggetti interessati alla " +
+						"stipula del contratto;\n" +
+						"- Procedere alla conclusione, gestione ed esecuzione di contratti assicurativi e gestione e " +
+						"liquidazione dei sinistri relativi ai medesimi contratti;\n" +
+						"- Adempiere ad eventuali obblighi previsti dalla legge, da regolamenti, dalla normativa " +
+						"comunitaria o da un ordine dell’Autorità;\n" +
+						"- Esercitare i diritti del Titolare, ad esempio il diritto di difesa in giudizio;\n" +
+						"- Perfezionare le offerte contrattuali sulla base dell’analisi della domanda di mercato e " +
+						"delle caratteristiche degli assicurati e dei soggetti interessati " +
+						"alla stipula di prodotti assicurativi, elaborando tali informazioni anche in combinazione con " +
+						"informazioni provenienti da banche dati pubbliche.\n" +
+						"Il trattamento avviene nell’ambito di attività assicurativa e riassicurativa, a cui il Titolare è " +
+						"autorizzato ai sensi delle vigenti disposizioni di legge.",
+					isBold: false,
+				},
+			},
+			{
+				{
+					text:   "3. MODALITÀ DEL TRATTAMENTO DEI DATI",
+					isBold: true,
+				},
+				{
+					text: "Il trattamento dei Vostri dati personali, inclusi i dati particolari ai sensi degli artt. " +
+						"9 e 10 GDPR, è realizzato per mezzo delle operazioni indicate all’art. 4 comma 1 n. 2) del GDPR " +
+						"e precisamente: raccolta, registrazione, organizzazione, conservazione, consultazione, " +
+						"elaborazione, modificazione, selezione, estrazione, raffronto, utilizzo, interconnessione, " +
+						"blocco, comunicazione, cancellazione e distruzione dei dati. I Vostri dati personali sono " +
+						"sottoposti a trattamento in formato sia cartaceo che elettronico.",
+					isBold: false,
+				},
+			},
+			{
+				{
+					text:   "4. NATURA DEL CONFERIMENTO DEI DATI E CONSEGUENZE DEL RIFIUTO",
+					isBold: true,
+				},
+				{
+					text: "Ferma l’autonomia personale dell’interessato, il conferimento dei dati può essere:\n" +
+						"a) Obbligatorio in base ad una legge, regolamento o normativa comunitaria (ad esempio " +
+						"Antiriciclaggio, Casellario Centrale Infortuni, Motorizzazione Civile);\n" +
+						"b) Strettamente necessario alla redazione di preventivi assicurativi;\n" +
+						"c) Strettamente necessario alla conclusione, gestione, ed esecuzione di contratti assicurativi " +
+						"e gestione e liquidazione dei sinistri relativi ai medesimi contratti\n" +
+						"L’eventuale rifiuto dell’interessato di conferire i dati personali in relazione alle finalità " +
+						"di trattamento a), b), c), d) ed e) di cui al punto 2 della presente informativa comporta " +
+						"l’impossibilità di procedere alla conclusione, gestione, ed esecuzione di contratti assicurativi " +
+						"e gestione e\nliquidazione dei sinistri relativi ai medesimi contratti.\n" +
+						"Il mancato consenso al trattamento dei dati sanitari comporterà l’impossibilità di includere la " +
+						"copertura del rischio infortuni all’interno del contratto e il mancato consenso al trattamento " +
+						"dei dati relativi a condanne penali o reati comporterà l’impossibilità di includere la " +
+						"copertura della Tutela Legale all’interno del contratto.",
+					isBold: false,
+				},
+			},
+			{
+				{
+					text:   "5. CONSERVAZIONE",
+					isBold: true,
+				},
+				{
+					text: "I dati personali conferiti per le finalità sopra esposte saranno conservati per il periodo di " +
+						"validità contrattuale assicurativa e successivamente per un periodo di 10 anni. Decorso tale " +
+						"termine i dati personali saranno cancellati.",
+					isBold: false,
+				},
+			},
+			{
+				{
+					text:   "6. ACCESSO AI DATI",
+					isBold: true,
+				},
+				{
+					text: "I Vostri dati personali potranno essere resi accessibili per le finalità di cui sopra:\n" +
+						"a) A dipendenti e collaboratori del Titolare, nella loro qualità di soggetti designati;\n" +
+						"b) A intermediari assicurativi per finalità di conclusione gestione, ed esecuzione di " +
+						"contratti assicurativi e gestione dei sinistri relativi ai medesimi contratti;\n" +
+						"c) A soggetti esterni che forniscono servizi in outsourcing al Titolare;\n" +
+						"d) A riassicuratori con i quali il Titolare sottoscriva specifici trattati per la copertura " +
+						"dei rischi riferiti al contratto assicurativo, tra cui espressamente la società Munich Re.",
+					isBold: false,
+				},
+			},
+			{
+				{
+					text:   "7. COMUNICAZIONE DEI DATI",
+					isBold: true,
+				},
+				{
+					text: "Il Titolare potrà comunicare i Vostri dati, per le finalità di cui al punto 2 precedente e " +
+						"per essere sottoposti a trattamenti aventi le medesime finalità o obbligatori per legge, a " +
+						"terzi soggetti operanti nel settore assicurativo, società di servizi informatici o società a " +
+						"cui il Titolare ha affidato attività in outsourcing o altri soggetti nei confronti dei quali la " +
+						"comunicazione è obbligatoria.",
+					isBold: false,
+				},
+			},
+		},
+		{
+			{
+				{
+					text:   "8. DIFFUSIONE",
+					isBold: true,
+				},
+				{
+					text:   "I dati personali di cui alla presente informativa non sono soggetti a diffusione.",
+					isBold: false,
+				},
+			},
+			{
+				{
+					text:   "9. TRASFERIMENTO DATI ALL’ESTERO",
+					isBold: true,
+				},
+				{
+					text: "La gestione e la conservazione dei dati personali avverranno su server ubicati all’interno " +
+						"del territorio italiano o comunque dell’Unione Europea. I dati non saranno oggetto di " +
+						"trasferimento all’esterno dell’Unione Europea.",
+					isBold: false,
+				},
+			},
+			{
+				{
+					text:   "10. DIRITTI DELL’INTERESSATO",
+					isBold: true,
+				},
+				{
+					text: "In qualità di interessati, avete i diritti riconosciuti dall’art. 15 del GDPR, in " +
+						"particolare di:\n" +
+						"a) Ottenere la conferma dell’esistenza o meno dei dati personali che vi riguardano;\n" +
+						"b) Ottenere l’indicazione: a) dell’origine dei dati personali; b) delle finalità e modalità " +
+						"del trattamento; c) della logica applicata in caso di trattamento effettuato con l’ausilio " +
+						"di strumenti elettronici; d) degli estremi identificativi del Titolare, degli eventuali " +
+						"responsabili e dell’eventuale\nrappresentante designati ai sensi dell’art. 3 comma 1 del " +
+						"GDPR; e) dei soggetti e delle categorie di soggetti ai quali i dati personali possono essere " +
+						"comunicati o che possono venirne a conoscenza in qualità di responsabili o incaricati; " +
+						"c) Ottenere: a) l’aggiornamento, la rettifica ovvero, quanto avete interesse, l’integrazione " +
+						"dei dati; b) la cancellazione, la trasformazione in forma anonima o il blocco dei dati " +
+						"trattati in violazione di legge, compresi quelli di cui non è necessaria la conservazione " +
+						"in relazione agli scopi per i quali i dati sono stati raccolti o successivamente trattati; " +
+						"c) l’attestazione che le operazioni di cui alle lettere a) e b) sono state portate a " +
+						"conoscenza, anche per quanto riguarda il loro contenuto, di coloro ai quali i dati son o " +
+						"stati comunicati o diffusi, eccettuato il caso in cui tale adempimento si " +
+						"riveli impossibile o comporti un impiego di mezzi manifestamente sproporzionato rispetto al " +
+						"diritto tutelato; " +
+						"d) Opporsi, in tutto o in parte: a) per motivi legittimi al trattamento dei dati personali " +
+						"che vi riguardano, ancorché pertinenti allo scopo della raccolta; b) al trattamento di " +
+						"dati personali che vi riguardano a fini di invio di materiale pubblicitario o di vendita " +
+						"diretta o per il compimento di ricerche di mercato o di comunicazione commerciale. Ove " +
+						"applicabili, avete altresì i diritti di cui agli articoli 16 – 21 del GDPR (Diritto di " +
+						"rettifica, diritto all’oblio, diritto di limitazione di trattamento, diritto alla " +
+						"portabilità dei dati contrattuali e grezzi di navigazione, diritto di opposizione), " +
+						"nonché il diritto di reclamo all’Autorità Garante.",
+					isBold: false,
+				},
+			},
+			{
+				{
+					text:   "11. TITOLARE DEL TRATTAMENTO",
+					isBold: true,
+				},
+				{
+					text: "Il titolare dei trattamenti per le finalità indicate al punto 2 della presente " +
+						"informativa è:\n" +
+						"Global Assistance Compagnia di Assicurazioni e Riassicurazioni S.p.A. (Global)\n" +
+						"Piazza Armando Diaz n. 6\n" +
+						"20123 – Milano\n" +
+						"E-mail: global.assistance@globalassistance.it\n" +
+						"PEC: globalassistancespa@legalmail.it\n" +
+						"Fax: 02/43335020\n" +
+						"Limitatamente alle finalità di cui alle lettere b) e f) del punto 2 della presente " +
+						"informativa è titolare del trattamento anche:\n" +
+						"Münchener Rückversicherungs-Gesellschaft (Munich Re)\n" +
+						"Rappresentanza Generale per l'Italia\n" +
+						"Via Pola, 9\n" +
+						"20124 - Milano\n" +
+						"E-mail: mritalia@munichre.com\n" +
+						"PEC: munchenerruck@legalmail.it",
+					isBold: false,
+				},
+			},
+			{
+				{
+					text:   "12. MODALITA’ DI ESERCIZIO DEI DIRITTI",
+					isBold: true,
+				},
+				{
+					text: "Potrete in qualsiasi momento esercitare i Vostri diritti inviando una e-mail, una PEC, " +
+						"un fax o una raccomandata A.R. all’indirizzo del Titolare.\n" +
+						"È possibile contattare direttamente il Responsabile della Protezione dei Dati– RPD o Data " +
+						"Protection Officer – DPO di Global al seguente indirizzo e-mail: info@lext.it.\n" +
+						"È possibile contattare direttamente il Responsabile della Protezione dei Dati– RPD o Data " +
+						"Protection Officer – DPO di Munich Re al seguente indirizzo e-mail: datenschutz@munichre.com.",
+					isBold: false,
+				},
+			},
+			{
+				{
+					text: "Informativa resa all’interessato per il trattamento assicurativo di dati personali comuni, " +
+						"particolari e dei dati relativi a condanne penali e reati.",
+					isBold: true,
+				},
+			},
+			{
+				{
+					text:   "DICHIARAZIONI E CONSENSI",
+					isBold: true,
+				},
+				{
+					text: "Io Sottoscritto, dichiaro di avere perso visione dell’Informativa Privacy ai sensi " +
+						"dell’art. 13 del GDPR (informativa resa all’interno del set documentale contenente anche la " +
+						"Documentazione Informativa Precontrattuale, il Glossario e le Condizioni di Assicurazione) e " +
+						"di averne compreso i contenuti.",
+					isBold: false,
+				},
+			},
+		},
+	}
+
+	for pageIndex, page := range pages {
+		for _, paragraph := range page {
+			for _, r := range paragraph {
+				setBlackRegularFont(pdf, standardTextSize)
+				if r.isBold {
+					setBlackBoldFont(pdf, standardTextSize)
+				}
+				pdf.MultiCell(0, 3.75, r.text, "", fpdf.AlignLeft, false)
+			}
+			pdf.Ln(2.5)
+		}
+		if pageIndex < len(pages)-1 {
+			pdf.AddPage()
+		}
+	}
+
+	drawSignatureForm(pdf)
+
+	pdf.AddPage()
+
+	setBlackRegularFont(pdf, standardTextSize)
+	pdf.MultiCell(0, 3.75, "Qui di seguito esprimo il mio consenso al trattamento dei dati personali "+
+		"particolari per le finalità sopra indicate, in conformità con quanto previsto all’interno dell’informativa: ",
+		"", fpdf.AlignLeft, false)
+
+	pdf.Ln(3)
+
+	privacyConsent := [][]string{
+		{"", "X"},
+		{"", "X"},
+	}
+
+	questions := survey.Questions[len(survey.Questions)-2:]
+	for questionIndex, question := range questions {
+		if question.Answer != nil && *question.Answer {
+			privacyConsent[questionIndex][0] = "X"
+			privacyConsent[questionIndex][1] = ""
+		}
+	}
+
+	table := [][]tableCell{
+		{
+			{
+				text:      "Consenso al trattamento dei miei dati particolari (sanitari) di cui all’art. 9 del GDPR:",
+				height:    3,
+				width:     160,
+				textBold:  true,
+				fill:      false,
+				fillColor: rgbColor{},
+				align:     fpdf.AlignLeft,
+				border:    "",
+			},
+			{
+				text:      privacyConsent[0][0],
+				height:    5,
+				width:     5,
+				textBold:  true,
+				fill:      false,
+				fillColor: rgbColor{},
+				align:     fpdf.AlignCenter,
+				border:    "1",
+			},
+			{
+				text:      "SI",
+				height:    5,
+				width:     10,
+				textBold:  false,
+				fill:      false,
+				fillColor: rgbColor{},
+				align:     fpdf.AlignCenter,
+				border:    "",
+			},
+			{
+				text:      privacyConsent[0][1],
+				height:    5,
+				width:     5,
+				textBold:  true,
+				fill:      false,
+				fillColor: rgbColor{},
+				align:     fpdf.AlignCenter,
+				border:    "1",
+			},
+			{
+				text:      "NO",
+				height:    5,
+				width:     10,
+				textBold:  false,
+				fill:      false,
+				fillColor: rgbColor{},
+				align:     fpdf.AlignCenter,
+				border:    "",
+			},
+		},
+	}
+
+	tableDrawer(pdf, table)
+
+	pdf.Ln(3)
+
+	table = [][]tableCell{
+		{
+			{
+				text: "Consenso al trattamento dei miei dati al fine di perfezionamento dell’offerta assicurativa " +
+					"e riassicurativa di cui alle lettere b) ed f) della presente informativa:",
+				height:    3,
+				width:     160,
+				textBold:  true,
+				fill:      false,
+				fillColor: rgbColor{},
+				align:     fpdf.AlignLeft,
+				border:    "",
+			},
+			{
+				text:      privacyConsent[1][0],
+				height:    5,
+				width:     5,
+				textBold:  true,
+				fill:      false,
+				fillColor: rgbColor{},
+				align:     fpdf.AlignCenter,
+				border:    "1",
+			},
+			{
+				text:      "SI",
+				height:    5,
+				width:     10,
+				textBold:  false,
+				fill:      false,
+				fillColor: rgbColor{},
+				align:     fpdf.AlignCenter,
+				border:    "",
+			},
+			{
+				text:      privacyConsent[1][1],
+				height:    5,
+				width:     5,
+				textBold:  true,
+				fill:      false,
+				fillColor: rgbColor{},
+				align:     fpdf.AlignCenter,
+				border:    "1",
+			},
+			{
+				text:      "NO",
+				height:    5,
+				width:     10,
+				textBold:  false,
+				fill:      false,
+				fillColor: rgbColor{},
+				align:     fpdf.AlignCenter,
+				border:    "",
+			},
+		},
+	}
+
+	tableDrawer(pdf, table)
+
+	pdf.Ln(7)
+
+	drawSignatureForm(pdf)
+
 }
 
 func paymentMethodSection(pdf *fpdf.Fpdf) {
