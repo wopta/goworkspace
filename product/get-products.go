@@ -2,12 +2,13 @@ package product
 
 import (
 	"encoding/json"
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
 	"log"
 	"os"
 	"sort"
 	"strings"
+
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 )
 
 func GetAllProductsByChannel(channel string) []models.ProductInfo {
@@ -135,21 +136,13 @@ func getProductsFileList() []string {
 		log.Printf("[GetNetworkNodeProducts] error getting file list: %s", err.Error())
 	}
 
-	checkedList := removeOutOfPathFiles(fileList)
+	checkedList := lib.SliceFilter(fileList, checkSlashes)
 
 	return checkedList
 }
 
-func removeOutOfPathFiles(fileList []string) []string {
-	var filteredFileList []string
-
+func checkSlashes(s string) bool {
 	// Correct path is: products/{{product_dir}}/{{version_number}}/{{filename.extension}}
 	// but this function supports further nesting
-	for _, s := range fileList {
-		if strings.Count(s, "/") >= 3 {
-			filteredFileList = append(filteredFileList, s)
-		}
-	}
-
-	return filteredFileList
+	return strings.Count(s, "/") >= 3
 }
