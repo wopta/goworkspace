@@ -27,7 +27,7 @@ changed_functions = [
     "pipppo"
 ]
 sprint_number = 0
-dry_run = True
+dry_run = False
 
 
 def main():
@@ -51,15 +51,17 @@ def main():
         last_tag = subprocess.check_output(command, shell=True, text=True)
 
         # TODO: implement checkout to last_tag
-        command = f"git checkout {last_tag}"
+        command = f"git checkout --quiet {last_tag}"
         subprocess.check_output(command, shell=True, text=True)
 
         # TODO: implement production tag creation
         production_tag = last_tag.replace(DEV, PROD)
-        print(production_tag)
+        if dry_run:
+            print(production_tag)
+            continue
+
         command = f"git tag -a {production_tag} -m \"Release Sprint {sprint_number}\""
         subprocess.check_output(command, shell=True, text=True)
-
 
 
         # TODO: implement push to GitHub and Cloud Repository, if DryRun = false
