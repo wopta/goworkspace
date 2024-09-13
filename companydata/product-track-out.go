@@ -157,7 +157,8 @@ func (track Track) upload(filePath string) {
 
 }
 func (track Track) frequency(now time.Time) (time.Time, time.Time) {
-
+	location, e := time.LoadLocation("Europe/Rome")
+	lib.CheckError(e)
 	switch track.Frequency {
 	case "monthly":
 		prevMonth := lib.GetPreviousMonth(now)
@@ -165,8 +166,8 @@ func (track Track) frequency(now time.Time) (time.Time, time.Time) {
 		to = lib.GetFirstDay(now)
 	case "daily":
 		prevDay := now.AddDate(0, 0, -1)
-		from = time.Date(prevDay.Year(), prevDay.Month(), prevDay.Day(), 0, 0, 0, 0, nil)
-		to = time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, nil)
+		from = time.Date(prevDay.Year(), prevDay.Month(), prevDay.Day(), 0, 0, 0, 0, location)
+		to = time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, location)
 	}
 	log.Println(from, to)
 	return from, to
