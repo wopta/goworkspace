@@ -10,7 +10,16 @@ GOOGLE_REPOSITORY = "google"
 GITHUB_REPOSITORY = "origin"
 RELEASE_MESSAGE_PREFIX = "Release Sprint"
 
-updatable_functions = []
+# functions
+BROKER = "broker"
+CALLBACK = "callback"
+MGA = "mga"
+
+updatable_functions = [
+    BROKER,
+    CALLBACK,
+    MGA
+]
 sprint_number = 0
 dry_run = True
 
@@ -25,6 +34,9 @@ def main():
         \/     \/ /_____/       \/                    \/ 
 """
           )
+
+    for function in updatable_functions:
+        print(function)
 
 
 if __name__ == "__main__":
