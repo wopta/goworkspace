@@ -29,7 +29,7 @@ changed_functions = [
     "pipppo"
 ]
 sprint_number = 0
-dry_run = False
+dry_run = True
 
 
 def main():
@@ -54,20 +54,15 @@ def main():
         tags = git.tag('--list', '--sort=-taggerdate', f'{function_name}/*.dev').splitlines()
         dev_tag = tags[0]
 
-        #command = "git tag --list --sort=-taggerdate '{}/*.dev' | head -1".format(
-        #    function_name)
-        #last_tag = subprocess.check_output(command, shell=True, text=True)
-
         # TODO: implement checkout to last_tag
         git.checkout(dev_tag)
-        #command = f"git checkout --quiet {last_tag}"
-        # subprocess.check_output(command, shell=True, text=True)
+
 
         # TODO: implement production tag creation
-        #production_tag = last_tag.replace(DEV, PROD)
-        #if dry_run:
-        #    print(production_tag)
-        #    continue
+        production_tag = dev_tag.replace(DEV, PROD)
+        if dry_run:
+            print(production_tag)
+            continue
 
         #command = f"git tag -a {production_tag} -m \"Release Sprint {sprint_number}\""
         #subprocess.check_output(command, shell=True, text=True)
@@ -77,6 +72,7 @@ def main():
 
 
     # TODO: return to master branch
+    git.checkout("NO-TG_legatus")
 
 
 if __name__ == "__main__":
