@@ -20,6 +20,10 @@ updatable_functions = [
     CALLBACK,
     MGA
 ]
+changed_functions = [
+    BROKER,
+    "pipppo"
+]
 sprint_number = 0
 dry_run = True
 
@@ -35,7 +39,10 @@ def main():
 """
           )
 
-    for function in updatable_functions:
+    for function in changed_functions:
+        if function not in updatable_functions:
+            print(f"ERROR: {function} unknown function...skipping")
+            continue
         print(function)
 
 
