@@ -10,19 +10,52 @@ RELEASE_MESSAGE_PREFIX = "Release Sprint"
 MASTER_BRANCH = "master"
 
 # functions
+AUTH = "auth"
 BROKER = "broker"
 CALLBACK = "callback"
+CLAIM = "claim"
+DOCUMENT = "document"
+ENRICH = "enrich"
+NETWORK = "network"
 MGA = "mga"
+MAIL = "mail"
+PARTNERSHIP = "partnership"
+PAYMENT = "payment"
+POLICY = "policy"
+PRODUCT = "product"
+QUESTION = "question"
+QUOTE = "quote"
+RENEW = "renew"
+RESERVED = "reserved"
+RULES = "rules"
+SELLABLE = "sellable"
+TRANSACTION = "transaction"
+USER = "user"
 
 updatable_functions = [
+    AUTH,
     BROKER,
     CALLBACK,
-    MGA
+    CLAIM,
+    DOCUMENT,
+    ENRICH,
+    NETWORK,
+    MGA,
+    MAIL,
+    PARTNERSHIP,
+    PAYMENT,
+    POLICY,
+    PRODUCT,
+    QUESTION,
+    QUOTE,
+    RENEW,
+    RESERVED,
+    RULES,
+    SELLABLE,
+    TRANSACTION,
+    USER
 ]
 changed_functions = [
-    BROKER,
-    CALLBACK,
-    "pipppo"
 ]
 sprint_number = 0
 dry_run = True
