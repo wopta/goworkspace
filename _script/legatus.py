@@ -8,7 +8,7 @@ from git import Repo
 #    versione specifica.
 
 DEV = "dev"
-PROD = "prod"
+PROD = "test"
 GOOGLE_REPOSITORY = "google"
 GITHUB_REPOSITORY = "origin"
 RELEASE_MESSAGE_PREFIX = "Release Sprint"
@@ -56,10 +56,8 @@ def main():
         tags = git.tag('--list', '--sort=-taggerdate', f'{function_name}/*.dev').splitlines()
         dev_tag = tags[0]
 
-        # TODO: implement checkout to last_tag
         git.checkout(dev_tag)
 
-        # TODO: implement production tag creation
         production_tag = dev_tag.replace(DEV, PROD)
         if dry_run:
             print(production_tag)
@@ -69,10 +67,9 @@ def main():
         created_tags.append(production_tag)
         print(f"Created tag {production_tag}")
 
-        # TODO: implement push to GitHub and Cloud Repository, if DryRun = false
-
-    #for t in created_tags:
-    #    repo.delete_tag(t)
+    if not dry_run:
+        repo.remote('origin').push(created_tags)
+        #repo.remote('google').push(created_tags)
 
     # TODO: return to master branch
     git.checkout("NO-TG_legatus")
