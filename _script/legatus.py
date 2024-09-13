@@ -8,10 +8,11 @@ from git import Repo
 #    versione specifica.
 
 DEV = "dev"
-PROD = "test"
-GOOGLE_REPOSITORY = "google"
-GITHUB_REPOSITORY = "origin"
+PROD = "prod"
+GOOGLE_REMOTE = "google"
+GITHUB_REMOTE = "origin"
 RELEASE_MESSAGE_PREFIX = "Release Sprint"
+MASTER_BRANCH = "master"
 
 # functions
 BROKER = "broker"
@@ -63,16 +64,20 @@ def main():
             print(production_tag)
             continue
 
-        repo.create_tag(production_tag, message=f"Release Sprint {sprint_number}")
+        repo.create_tag(production_tag, message=f"{RELEASE_MESSAGE_PREFIX} {sprint_number}")
         created_tags.append(production_tag)
         print(f"Created tag {production_tag}")
 
     if not dry_run:
-        repo.remote('origin').push(created_tags)
-        #repo.remote('google').push(created_tags)
+        print("Pushing to GitHub")
+        repo.remote(GITHUB_REMOTE).push(created_tags)
+        print("Push to GitHub completed\n")
 
-    # TODO: return to master branch
-    git.checkout("NO-TG_legatus")
+        print("Pushing to Cloud Repository")
+        repo.remote(GOOGLE_REMOTE).push(created_tags)
+        print("Push to Cloud Repository completed")
+
+    git.checkout(MASTER_BRANCH)
 
 
 if __name__ == "__main__":
