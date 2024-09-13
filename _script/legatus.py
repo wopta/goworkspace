@@ -1,11 +1,6 @@
-#    LEGATUS prenderà in input una lista di nomi di function (es. broker, callback). Confrontare le versioni presenti
-#    in DEV e PROD e aggiornare quelle di produzione.
 import os
 
 from git import Repo
-
-#    Se il nome della function contiene anche la versione, allora lo script dovrà aggiornare produzione con quella
-#    versione specifica.
 
 DEV = "dev"
 PROD = "prod"
