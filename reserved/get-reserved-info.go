@@ -13,6 +13,8 @@ func GetReservedInfo(policy *models.Policy) (bool, *models.ReservedInfo) {
 	switch policy.Name {
 	case models.LifeProduct:
 		return lifeReserved(policy)
+	case models.PersonaProduct:
+		return personaReserved(policy)
 	default:
 		return false, nil
 	}
