@@ -29,7 +29,7 @@ changed_functions = [
     "pipppo"
 ]
 sprint_number = 0
-dry_run = True
+dry_run = False
 
 
 def main():
@@ -46,6 +46,8 @@ def main():
     repo = Repo(os.curdir)
     git = repo.git
 
+    created_tags = []
+
     for function_name in changed_functions:
         if function_name not in updatable_functions:
             print(f"ERROR: {function_name} unknown function...skipping")
@@ -57,19 +59,20 @@ def main():
         # TODO: implement checkout to last_tag
         git.checkout(dev_tag)
 
-
         # TODO: implement production tag creation
         production_tag = dev_tag.replace(DEV, PROD)
         if dry_run:
             print(production_tag)
             continue
 
-        #command = f"git tag -a {production_tag} -m \"Release Sprint {sprint_number}\""
-        #subprocess.check_output(command, shell=True, text=True)
-
+        repo.create_tag(production_tag, message=f"Release Sprint {sprint_number}")
+        created_tags.append(production_tag)
+        print(f"Created tag {production_tag}")
 
         # TODO: implement push to GitHub and Cloud Repository, if DryRun = false
 
+    #for t in created_tags:
+    #    repo.delete_tag(t)
 
     # TODO: return to master branch
     git.checkout("NO-TG_legatus")
