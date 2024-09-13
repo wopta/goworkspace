@@ -25,7 +25,7 @@ changed_functions = [
     "pipppo"
 ]
 sprint_number = 0
-dry_run = False
+dry_run = True
 
 
 def main():
@@ -41,6 +41,9 @@ def main():
 
     repo = Repo(os.curdir)
     git = repo.git
+
+    repo.remote(GITHUB_REMOTE).fetch(tags=True)
+    repo.remote(GOOGLE_REMOTE).fetch(tags=True)
 
     created_tags = []
 
