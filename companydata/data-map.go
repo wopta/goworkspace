@@ -14,7 +14,7 @@ func GetMapFx(name string, value interface{}) interface{} {
 	res := map[string]fn{
 		"test": Test,
 		"formatDateDDMMYYYYSlash": formatDateDDMMYYYYSlash,
-		"formatBithdateDDMMYYYYSlash": formatBithdateDDMMYYYYSlash,
+		"formatBithdateDDMMYYYYSlash": formatISO8601toDDMMYYYYSlash,
 	}
 	return res[name](value)
 }
@@ -22,10 +22,10 @@ func Test(s interface{}) interface{} {
 	return ""
 }
 func formatDateDDMMYYYYSlash(s interface{}) interface{} {
-
+//2024-09-04T00:00:00Z
 	return s.(time.Time).Format("02/01/2006")
 }
-func formatBithdateDDMMYYYYSlash(d interface{}) interface{}{
+func formatISO8601toDDMMYYYYSlash(d interface{}) interface{}{
 	var res string
 	if d.(string) != "" {
 		splitD := strings.Split(d.(string), "-")

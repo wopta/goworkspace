@@ -43,14 +43,21 @@ type ExcelConfig struct {
 	Extension  string `firestore:"extension,omitempty" json:"extension,omitempty"`
 	SheetName  string `firestore:"sheetName,omitempty" json:"sheetName,omitempty"`
 }
+type Database struct {
+	Dataset    string  `firestore:"dataset,omitempty" json:"dataset,omitempty"`
+	Name       string  `firestore:"name,omitempty" json:"name,omitempty"`
+	Query      []Query `firestore:"query,omitempty" json:"query,omitempty"`
+	RelDataset string  `firestore:"relDataset,omitempty" json:"relDataset,omitempty"`
+	RelField   string  `firestore:"relField,omitempty" json:"relField,omitempty"`
+}
 type Query struct {
 	Field      string      `firestore:"field,omitempty" json:"field,omitempty"`
 	Operator   string      `firestore:"operator,omitempty" json:"operator,omitempty"`
 	QueryValue interface{} `firestore:"queryValue,omitempty" json:"queryValue,omitempty"`
 }
 type Event struct {
-	Event []Column `firestore:"event,omitempty" json:"event,omitempty"`
-	Query []Query  `firestore:"query,omitempty" json:"query,omitempty"`
+	Event    []Column `firestore:"event,omitempty" json:"event,omitempty"`
+	Database Database `firestore:"database,omitempty" json:"database,omitempty"`
 }
 type SftpConfig struct {
 	Username     string   `firestore:"username,omitempty" json:"username,omitempty"`

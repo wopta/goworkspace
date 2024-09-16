@@ -2,6 +2,7 @@ package companydata
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -23,7 +24,9 @@ func ProductTrackOutFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		procuctTrack Track
 		result       [][]string
 		event        []Column
-		query        []Query
+		db           Database
+		policies     []models.Policy
+		transactions []models.Transaction
 	)
 	req := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
@@ -36,44 +39,90 @@ func ProductTrackOutFx(w http.ResponseWriter, r *http.Request) (string, interfac
 	switch reqData.Event {
 
 	case "emit":
-		query = procuctTrack.Emit.Query
+		db = procuctTrack.Emit.Database
 		event = procuctTrack.Emit.Event
 	case "payment":
-		query = procuctTrack.Payment.Query
+		db = procuctTrack.Payment.Database
 		event = procuctTrack.Payment.Event
 	case "delete":
-		query = procuctTrack.Delete.Query
+		db = procuctTrack.Delete.Database
 		event = procuctTrack.Delete.Event
 
 	}
 
 	from, to = procuctTrack.frequency(now)
-	for _, transaction := range procuctTrack.query(from, to, query) {
-		var (
-			policy *models.Policy
-		)
-
-		docsnap := lib.GetFirestore("policy", transaction.PolicyUid)
-		docsnap.DataTo(&policy)
-		result = append(result, procuctTrack.ProductTrack(policy, event)...)
-
+	switch db.Dataset {
+	case "policy":
+		policies = query[models.Policy](from, to, db)
+		result = procuctTrack.PolicyProductTrack(policies, event)
+	case "transaction":
+		transactions = query[models.Transaction](from, to, db)
+		result = procuctTrack.TransactionProductTrack(transactions, event)
 	}
+
 	filepath := procuctTrack.saveFile(result, from, to, now)
+
 	if upload {
 		procuctTrack.upload(filepath)
 	}
 	return "", nil, e
 }
-func (track Track) ProductTrack(policy *models.Policy, event []Column) [][]string {
+func (track Track) PolicyProductTrack(policies []models.Policy, event []Column) [][]string {
 	var (
 		result [][]string
 
 		err error
 	)
-	if track.IsAssetFlat {
-		result = track.assetRow(policy, event)
-	} else {
-		result = track.assetRow(policy, event)
+
+	for _, policy := range policies {
+		if track.IsAssetFlat {
+			result = track.policyAssetRow(&policy, event)
+		} else {
+			result = track.policyAssetRow(&policy, event)
+		}
+		//docsnap := lib.GetFirestore("policy", transaction.PolicyUid)
+		//docsnap.DataTo(&policy)
+		//result = append(result, procuctTrack.ProductTrack(policy, event)...)
+
+	}
+
+	lib.CheckError(err)
+	return result
+}
+func (track Track) TransactionProductTrack(transactions []models.Transaction, event []Column) [][]string {
+	var (
+		result    [][]string
+		json_data interface{}
+
+		cells []string
+		err   error
+	)
+
+	for _, tr := range transactions {
+		b, err := json.Marshal(tr)
+		lib.CheckError(err)
+		json.Unmarshal(b, &json_data)
+		log.Println(string(b))
+		for _, column := range event {
+			var (
+				resPath interface{}
+				value   string
+			)
+			value = column.Value
+			resPath = column.Value
+			log.Println(column.Value)
+			log.Println(value)
+			resPath, err = jsonpath.JsonPathLookup(json_data, value)
+			lib.CheckError(err)
+			log.Println(resPath)
+
+			resPath = checkMap(column, value)
+			cells = append(cells, resPath.(string))
+
+		}
+
+		result = append(result, cells)
+
 	}
 
 	lib.CheckError(err)
@@ -98,7 +147,8 @@ func (track Track) saveFile(matrix [][]string, from time.Time, to time.Time, now
 	}
 	return filepath
 }
-func (track Track) assetRow(policy *models.Policy, event []Column) [][]string {
+
+func (track Track) policyAssetRow(policy *models.Policy, event []Column) [][]string {
 	var (
 		json_data interface{}
 		result    [][]string
@@ -132,13 +182,7 @@ func (track Track) assetRow(policy *models.Policy, event []Column) [][]string {
 					lib.CheckError(err)
 					log.Println(resPath)
 				}
-
-				if column.MapFx != "" {
-					resPath = GetMapFx(column.MapFx, column.Value)
-				}
-				if column.MapStatic != nil {
-					resPath = column.MapStatic[column.Value]
-				}
+				resPath = checkMap(column, value)
 				cells = append(cells, resPath.(string))
 
 			}
@@ -154,6 +198,17 @@ func (track Track) upload(filePath string) {
 
 		track.sftp(filePath)
 	}
+
+}
+func checkMap(column Column, value string) interface{} {
+	var res interface{}
+	if column.MapFx != "" {
+		res = GetMapFx(column.MapFx, value)
+	}
+	if column.MapStatic != nil {
+		res = column.MapStatic[value]
+	}
+	return res
 
 }
 func (track Track) frequency(now time.Time) (time.Time, time.Time) {
@@ -172,7 +227,7 @@ func (track Track) frequency(now time.Time) (time.Time, time.Time) {
 	log.Println(from, to)
 	return from, to
 }
-func (track Track) query(from time.Time, to time.Time, queryEvent []Query) []models.Transaction {
+func (track Track) query(from time.Time, to time.Time, queryEvent Database) []models.Transaction {
 	firequery := lib.Firequeries{
 		Queries: []lib.Firequery{
 
@@ -193,7 +248,7 @@ func (track Track) query(from time.Time, to time.Time, queryEvent []Query) []mod
 			},
 		},
 	}
-	for _, qe := range queryEvent {
+	for _, qe := range queryEvent.Query {
 
 		firequery.Queries = append(firequery.Queries,
 			lib.Firequery{
@@ -202,16 +257,57 @@ func (track Track) query(from time.Time, to time.Time, queryEvent []Query) []mod
 				QueryValue: qe.QueryValue,
 			})
 	}
-	query, e := firequery.FirestoreWherefields("transactions")
+	query, e := firequery.FirestoreWherefields(queryEvent.Dataset)
 	lib.CheckError(e)
 	transactions := TransactionToListData(query)
+
 	return transactions
+}
+func query[T any](from time.Time, to time.Time, db Database) []T {
+	var res []T
+	switch db.Name {
+
+	case "firestore":
+		res = firestoreQuery[T](from, to, db)
+
+	}
+
+	return res
+}
+func firestoreQuery[T any](from time.Time, to time.Time, queryEvent Database) []T {
+
+	firequery := lib.FireGenericQueries[T]{
+		Queries: []lib.Firequery{
+			{
+				Field:      "effectiveDate", //
+				Operator:   ">=",            //
+				QueryValue: from,
+			},
+			{
+				Field:      "effectiveDate", //
+				Operator:   "<=",            //
+				QueryValue: to,
+			},
+		},
+	}
+	for _, qe := range queryEvent.Query {
+
+		firequery.Queries = append(firequery.Queries,
+			lib.Firequery{
+				Field:      qe.Field,    //
+				Operator:   qe.Operator, //
+				QueryValue: qe.QueryValue,
+			})
+	}
+	res, e := firequery.FireQuery(queryEvent.Dataset)
+	lib.CheckError(e)
+	return res
 }
 
 func (track Track) formatFilename(filename string, from time.Time, to time.Time, now time.Time) string {
-	filename = strings.Replace(filename, "fdd", string(from.Day()), 1)
-	filename = strings.Replace(filename, "fmm", string(from.Month()), 1)
-	filename = strings.Replace(filename, "fyyyy", string(from.Year()), 1)
+	filename = strings.Replace(filename, "fdd", fmt.Sprint(from.Day()), 1)
+	filename = strings.Replace(filename, "fmm", fmt.Sprint(from.Month()), 1)
+	filename = strings.Replace(filename, "fyyyy", fmt.Sprint(from.Year()), 1)
 
 	return filename
 }
