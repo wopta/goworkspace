@@ -59,16 +59,6 @@ updatable_functions = [
 
 
 def main(sprint_number, changed_functions, dry_run=True):
-    print(r"""
-.____                                __                  
-|    |      ____     ____  _____   _/  |_  __ __   ______
-|    |    _/ __ \   / ___\ \__  \  \   __\|  |  \ /  ___/
-|    |___ \  ___/  / /_/  > / __ \_ |  |  |  |  / \___ \ 
-|_______ \ \___  > \___  / (____  / |__|  |____/ /____  >
-        \/     \/ /_____/       \/                    \/ 
-"""
-          )
-
     repo = Repo(os.curdir)
     git = repo.git
 
@@ -113,6 +103,16 @@ def main(sprint_number, changed_functions, dry_run=True):
 
 
 if __name__ == "__main__":
+    print(r"""
+.____                                __                  
+|    |      ____     ____  _____   _/  |_  __ __   ______
+|    |    _/ __ \   / ___\ \__  \  \   __\|  |  \ /  ___/
+|    |___ \  ___/  / /_/  > / __ \_ |  |  |  |  / \___ \ 
+|_______ \ \___  > \___  / (____  / |__|  |____/ /____  >
+        \/     \/ /_____/       \/                    \/ 
+"""
+          )
+
     parser = argparse.ArgumentParser(description='Release script')
     parser.add_argument("--prod", action="store_false", help='Release to production (disable dry run '
                                                              'mode, create and push tags)')
