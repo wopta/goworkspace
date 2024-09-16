@@ -78,27 +78,30 @@ def main(sprint_number, changed_functions, dry_run=True):
         git.checkout(dev_tag)
 
         production_tag = dev_tag.replace(DEV, PROD)
-        print(f"Tag to be created: {production_tag}")
+        #print(f"Tag to be created: {production_tag}")
         if dry_run:
-            print(f"Dry run on, skipping tag creation...")
+            created_tags.append(production_tag)
             continue
 
         repo.create_tag(production_tag, message=f"{RELEASE_MESSAGE_PREFIX} {sprint_number}")
         created_tags.append(production_tag)
-        print(f"Created tag {production_tag}")
 
-    if not dry_run:
-        print("Pushing to GitHub")
-        repo.remote(GITHUB_REMOTE).push(created_tags)
-        print("Push to GitHub completed\n")
+    print("\nCreated tags:")
+    [print(f"  '{tag}'") for tag in created_tags]
 
-        print("Pushing to Cloud Repository")
-        repo.remote(GOOGLE_REMOTE).push(created_tags)
-        print("Push to Cloud Repository completed")
+    if dry_run:
+        print("\nSkipping push to remotes...")
+        return
 
-        git.checkout(MASTER_BRANCH)
+    print("Pushing to GitHub")
+    repo.remote(GITHUB_REMOTE).push(created_tags)
+    print("Push to GitHub completed\n")
 
-    print("Skipping push to remotes...")
+    print("Pushing to Cloud Repository")
+    repo.remote(GOOGLE_REMOTE).push(created_tags)
+    print("Push to Cloud Repository completed")
+
+    git.checkout(MASTER_BRANCH)
 
 
 if __name__ == "__main__":
