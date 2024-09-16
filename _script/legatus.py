@@ -1,3 +1,4 @@
+import argparse
 import os
 
 from git import Repo
@@ -55,13 +56,9 @@ updatable_functions = [
     TRANSACTION,
     USER
 ]
-changed_functions = [
-]
-sprint_number = 0
-dry_run = True
 
 
-def main():
+def main(sprint_number, changed_functions, dry_run=True):
     print(r"""
 .____                                __                  
 |    |      ____     ____  _____   _/  |_  __ __   ______
@@ -116,4 +113,17 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description='Release script')
+    parser.add_argument("--prod", action="store_false", help='Release to production (disable dry run '
+                                                             'mode, create and push tags)')
+    parser.add_argument('sprint_number', type=int, help='Sprint number for the release')
+    parser.add_argument('changed_modules', nargs='+', help='List of changed modules to release')
+
+    args = parser.parse_args()
+
+    args.changed_modules = [function_name.lower() for function_name in args.changed_modules]
+
+    print(f"Arguments received:\n  Sprint Number: {args.sprint_number}\n  Changed Modules: {args.changed_modules}\n  "
+          f"Dry Run: {args.prod}")
+
+    main(sprint_number=args.sprint_number, changed_functions=args.changed_modules, dry_run=args.prod)
