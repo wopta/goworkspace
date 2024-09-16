@@ -109,10 +109,10 @@ def main():
         repo.remote(GOOGLE_REMOTE).push(created_tags)
         print("Push to Cloud Repository completed")
 
+    print("Skipping push to remotes...")
+
     if not dry_run:
         git.checkout(MASTER_BRANCH)
-
-    print("Skipping push to remotes...")
 
 
 if __name__ == "__main__":
