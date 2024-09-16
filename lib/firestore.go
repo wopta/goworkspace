@@ -208,9 +208,9 @@ func (queries *FireGenericQueries[T]) FireQuery(collection string) ([]T, error) 
 	result := make([]T, 0)
 	for {
 		d, err := q.Next()
+
 		if err != nil {
-		}
-		if err != nil {
+			CheckError(err)
 			if err == iterator.Done {
 				break
 			}

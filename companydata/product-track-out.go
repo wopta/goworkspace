@@ -227,42 +227,7 @@ func (track Track) frequency(now time.Time) (time.Time, time.Time) {
 	log.Println(from, to)
 	return from, to
 }
-func (track Track) query(from time.Time, to time.Time, queryEvent Database) []models.Transaction {
-	firequery := lib.Firequeries{
-		Queries: []lib.Firequery{
 
-			{
-				Field:      "policyName", //
-				Operator:   "==",         //
-				QueryValue: track.Name,
-			},
-			{
-				Field:      "effectiveDate", //
-				Operator:   ">=",            //
-				QueryValue: from,
-			},
-			{
-				Field:      "effectiveDate", //
-				Operator:   "<=",            //
-				QueryValue: to,
-			},
-		},
-	}
-	for _, qe := range queryEvent.Query {
-
-		firequery.Queries = append(firequery.Queries,
-			lib.Firequery{
-				Field:      qe.Field,    //
-				Operator:   qe.Operator, //
-				QueryValue: qe.QueryValue,
-			})
-	}
-	query, e := firequery.FirestoreWherefields(queryEvent.Dataset)
-	lib.CheckError(e)
-	transactions := TransactionToListData(query)
-
-	return transactions
-}
 func query[T any](from time.Time, to time.Time, db Database) []T {
 	var res []T
 	switch db.Name {
@@ -274,7 +239,7 @@ func query[T any](from time.Time, to time.Time, db Database) []T {
 
 	return res
 }
-func firestoreQuery[T any](from time.Time, to time.Time, queryEvent Database) []T {
+func firestoreQuery[T any](from time.Time, to time.Time, db Database) []T {
 
 	firequery := lib.FireGenericQueries[T]{
 		Queries: []lib.Firequery{
@@ -290,7 +255,7 @@ func firestoreQuery[T any](from time.Time, to time.Time, queryEvent Database) []
 			},
 		},
 	}
-	for _, qe := range queryEvent.Query {
+	for _, qe := range db.Query {
 
 		firequery.Queries = append(firequery.Queries,
 			lib.Firequery{
@@ -299,7 +264,7 @@ func firestoreQuery[T any](from time.Time, to time.Time, queryEvent Database) []
 				QueryValue: qe.QueryValue,
 			})
 	}
-	res, e := firequery.FireQuery(queryEvent.Dataset)
+	res, _, e := firequery.FireQueryUid(db.Dataset)
 	lib.CheckError(e)
 	return res
 }
