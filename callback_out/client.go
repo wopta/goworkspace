@@ -3,6 +3,7 @@ package callback_out
 import (
 	"errors"
 
+	"github.com/wopta/goworkspace/callback_out/base"
 	"github.com/wopta/goworkspace/callback_out/internal"
 	"github.com/wopta/goworkspace/callback_out/win"
 	"github.com/wopta/goworkspace/models"
@@ -27,6 +28,8 @@ func newClient(node *models.NetworkNode) (CallbackClient, error) {
 	switch node.CallbackConfig.Name {
 	case "winClient":
 		return win.NewClient(node.ExternalNetworkCode), nil
+	case "facileBrokerClient":
+		return base.NewClient(node, "facile-broker"), nil
 	default:
 		return nil, ErrCallbackClientNotSet
 	}

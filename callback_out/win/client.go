@@ -119,16 +119,8 @@ func (c *Client) Paid(policy models.Policy) internal.CallbackInfo {
 }
 
 func (c *Client) DecodeAction(rawAction string) []string {
-	decodedActions := make([]string, 0)
-	availableActions := map[string][]string{
-		md.Proposal:        {internal.Proposal},
-		md.RequestApproval: {internal.RequestApproval},
-		md.Emit:            {internal.Emit},
-		md.Paid:            {internal.Paid},
-		md.EmitRemittance:  {internal.Emit, internal.Paid},
-	}
-
-	decodedActions = availableActions[rawAction]
+	availableActions := md.GetAvailableActions()
+	decodedActions := availableActions[rawAction]
 
 	return decodedActions
 }
