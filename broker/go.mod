@@ -20,7 +20,7 @@ require (
 	github.com/wopta/goworkspace/policy v1.0.117
 	github.com/wopta/goworkspace/product v1.1.8
 	github.com/wopta/goworkspace/question v1.0.63
-	github.com/wopta/goworkspace/reserved v1.0.120
+	github.com/wopta/goworkspace/reserved v1.0.121
 	github.com/wopta/goworkspace/transaction v1.0.101
 	github.com/wopta/goworkspace/wiseproxy v1.0.3
 )
