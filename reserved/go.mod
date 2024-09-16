@@ -7,11 +7,11 @@ replace github.com/wopta/goworkspace/reserved => ./
 require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	github.com/go-chi/chi/v5 v5.0.12
-	github.com/wopta/goworkspace/document v1.1.90
+	github.com/wopta/goworkspace/document v1.1.91
 	github.com/wopta/goworkspace/lib v1.0.128
 	github.com/wopta/goworkspace/models v1.2.10
-	github.com/wopta/goworkspace/policy v1.0.115
-	github.com/wopta/goworkspace/product v1.1.7
+	github.com/wopta/goworkspace/policy v1.0.117
+	github.com/wopta/goworkspace/product v1.1.8
 )
 
 require (

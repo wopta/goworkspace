@@ -15,7 +15,6 @@ import (
 	"github.com/wopta/goworkspace/callback_out"
 	"github.com/wopta/goworkspace/document"
 	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 	"github.com/wopta/goworkspace/payment"
@@ -122,15 +121,12 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		warrant = networkNode.GetWarrant()
 	}
 
-	if lib.GetBoolEnv("PROPOSAL_V2") {
-		if policy.IsReserved && policy.Status != models.PolicyStatusApproved {
-			log.Printf("cannot emit policy uid %s with status %s and isReserved %t", policy.Uid, policy.Status, policy.IsReserved)
-			return "", nil, fmt.Errorf("cannot emit policy uid %s with status %s and isReserved %t", policy.Uid, policy.Status, policy.IsReserved)
-		}
-		responseEmit = emitV2(authToken, &policy, request, origin)
-	} else {
-		responseEmit = emit(authToken, &policy, request, origin)
+	if policy.IsReserved && policy.Status != models.PolicyStatusApproved {
+		log.Printf("cannot emit policy uid %s with status %s and isReserved %t", policy.Uid, policy.Status, policy.IsReserved)
+		return "", nil, fmt.Errorf("cannot emit policy uid %s with status %s and isReserved %t", policy.Uid, policy.Status, policy.IsReserved)
 	}
+	responseEmit = emit(&policy, request, origin)
+
 	b, e := json.Marshal(responseEmit)
 
 	log.Println("Handler end -------------------------------------------------")
@@ -138,66 +134,7 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 	return string(b), responseEmit, e
 }
 
-func emit(authToken models.AuthToken, policy *models.Policy, request EmitRequest, origin string) EmitResponse {
-	log.Println("[Emit] start ------------------------------------------------")
-	var responseEmit EmitResponse
-
-	firePolicy := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
-	fireGuarantee := lib.GetDatasetByEnv(origin, lib.GuaranteeCollection)
-
-	emitType := getEmitTypeFromPolicy(policy)
-	switch emitType {
-	case typeApprove:
-		log.Printf("[Emit] Wait for approval - Policy Uid %s", policy.Uid)
-		emitApproval(policy)
-		mail.SendMailReserved(
-			*policy,
-			mail.AddressAnna,
-			mail.GetContractorEmail(policy),
-			mail.GetAgentEmail(policy),
-			models.ProviderMgaFlow, // With PROPOSAL_V2 turned off, the only flow that should get here is the old agent
-			[]string{models.ProposalAttachmentName},
-		)
-	case typeEmit:
-		log.Printf("[Emit] Emitting - Policy Uid %s", policy.Uid)
-		log.Println("[Emit] starting bpmn flow...")
-		state := runBrokerBpmn(policy, emitFlowKey)
-		if state == nil || state.Data == nil {
-			log.Println("[Emit] error bpmn - state not set")
-			return responseEmit
-		}
-		*policy = *state.Data
-	default:
-		log.Printf("[Emit] ERROR cannot emit policy")
-		return responseEmit
-	}
-
-	responseEmit = EmitResponse{
-		UrlPay:       policy.PayUrl,
-		UrlSign:      policy.SignUrl,
-		ReservedInfo: policy.ReservedInfo,
-		Uid:          policy.Uid,
-	}
-
-	policy.Updated = time.Now().UTC()
-	policyJson, _ := policy.Marshal()
-	log.Printf("[Emit] Policy %s: %s", request.Uid, string(policyJson))
-
-	log.Println("[Emit] saving policy to firestore...")
-	err := lib.SetFirestoreErr(firePolicy, request.Uid, policy)
-	lib.CheckError(err)
-
-	log.Println("[Emit] saving policy to bigquery...")
-	policy.BigquerySave(origin)
-
-	log.Println("[Emit] saving guarantees to bigquery...")
-	models.SetGuaranteBigquery(*policy, "emit", fireGuarantee)
-
-	log.Println("[Emit] end --------------------------------------------------")
-	return responseEmit
-}
-
-func emitV2(authToken models.AuthToken, policy *models.Policy, request EmitRequest, origin string) EmitResponse {
+func emit(policy *models.Policy, request EmitRequest, origin string) EmitResponse {
 	log.Println("[Emit] start ------------------------------------------------")
 	var responseEmit EmitResponse
 
@@ -282,27 +219,6 @@ func brokerUpdatePolicy(policy *models.Policy, request BrokerBaseRequest) {
 	policy.SanitizePaymentData()
 
 	log.Println("[brokerUpdatePolicy] end --------------------------------------")
-}
-
-func getEmitTypeFromPolicy(policy *models.Policy) string {
-	if !policy.IsReserved || policy.Status == models.PolicyStatusApproved {
-		return typeEmit
-	}
-
-	deniedStatuses := []string{models.PolicyStatusDeleted, models.PolicyStatusRejected}
-
-	if policy.IsReserved && !lib.SliceContains(deniedStatuses, policy.Status) {
-		return typeApprove
-	}
-
-	log.Printf("[getEmitTypeFromPolicy] error no type found for isReserved '%t' and status '%s'", policy.IsReserved, policy.Status)
-	return ""
-}
-
-func emitApproval(policy *models.Policy) {
-	log.Printf("[emitApproval] Policy Uid %s: Reserved Flow", policy.Uid)
-	policy.Status = models.PolicyStatusWaitForApproval
-	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
 }
 
 func emitBase(policy *models.Policy, origin string) {

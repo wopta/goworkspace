@@ -48,7 +48,7 @@ var companydataRoutes []lib.Route = []lib.Route{
 	},
 	{
 		Route:   "/v1/emit",
-		Handler: lib.ResponseLoggerWrapper(EmitProdoctTrackFx),
+		Handler: lib.ResponseLoggerWrapper(ProductTrackOutFx),
 		Method:  http.MethodPost,
 		Roles:   []string{},
 	},
