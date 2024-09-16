@@ -16,9 +16,14 @@ func personaReserved(policy *models.Policy) (bool, *models.ReservedInfo) {
 	}
 
 	isReserved := false
-	reason := "BMI index out of range"
+	const reason = "BMI index out of range"
 
-	if len(policy.Assets) == 0 || policy.Assets[0].Person == nil || policy.Assets[0].Person.Weight == 0 || policy.Assets[0].Person.Height == 0 {
+	policyHasNoAsset := len(policy.Assets) == 0
+	assetHasNoPerson := policy.Assets[0].Person == nil
+	personHasNoWeight := policy.Assets[0].Person.Weight == 0
+	personHasNoHeight := policy.Assets[0].Person.Height == 0
+
+	if policyHasNoAsset || assetHasNoPerson || personHasNoWeight || personHasNoHeight {
 		return isReserved, reservedInfo
 	}
 
@@ -39,11 +44,13 @@ func checkOutOfRangeBMI(weight int, height int) (float64, bool) {
 		constant (called epsilon here)
 	*/
 	const epsilon = 1e-9
+	const bmiLowerLimit = 16
+	const bmiUpperLimit = 40
 	w := float64(weight)
 	h := float64(height)
 	bmi := w / math.Pow(h/100, 2)
 	isOutOfRange := false
-	if (bmi-16) < epsilon || (bmi-30) > epsilon {
+	if (bmi-bmiLowerLimit) < epsilon || (bmi-bmiUpperLimit) > epsilon {
 		isOutOfRange = true
 	}
 
