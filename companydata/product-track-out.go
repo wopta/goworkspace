@@ -240,28 +240,24 @@ func query[T any](from time.Time, to time.Time, db Database) []T {
 	return res
 }
 func firestoreQuery[T any](from time.Time, to time.Time, db Database) []T {
-
+	var value interface{}
 	firequery := lib.FireGenericQueries[T]{
-		Queries: []lib.Firequery{
-			{
-				Field:      "effectiveDate", //
-				Operator:   ">=",            //
-				QueryValue: from,
-			},
-			{
-				Field:      "effectiveDate", //
-				Operator:   "<=",            //
-				QueryValue: to,
-			},
-		},
+		Queries: []lib.Firequery{},
 	}
 	for _, qe := range db.Query {
+		value = qe.QueryValue
+		if qe.QueryValue == "from" {
+			value = from
+		}
+		if qe.QueryValue == "to" {
+			value = to
+		}
 
 		firequery.Queries = append(firequery.Queries,
 			lib.Firequery{
 				Field:      qe.Field,    //
 				Operator:   qe.Operator, //
-				QueryValue: qe.QueryValue,
+				QueryValue: value,
 			})
 	}
 	res, _, e := firequery.FireQueryUid(db.Dataset)
