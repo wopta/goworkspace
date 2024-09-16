@@ -10,20 +10,18 @@ import (
 func personaReserved(policy *models.Policy) (bool, *models.ReservedInfo) {
 	log.Println("[personaReserved]")
 
+	const reason = "BMI index out of range"
+
 	reservedInfo := &models.ReservedInfo{
 		Reasons:       make([]string, 0),
 		RequiredExams: make([]string, 0),
 	}
 
 	isReserved := false
-	const reason = "BMI index out of range"
 
-	policyHasNoAsset := len(policy.Assets) == 0
-	assetHasNoPerson := policy.Assets[0].Person == nil
-	personHasNoWeight := policy.Assets[0].Person.Weight == 0
-	personHasNoHeight := policy.Assets[0].Person.Height == 0
-
-	if policyHasNoAsset || assetHasNoPerson || personHasNoWeight || personHasNoHeight {
+	voidPolicy := len(policy.Assets) == 0 || policy.Assets[0].Person == nil
+	voidData := policy.Assets[0].Person.Weight == 0 || policy.Assets[0].Person.Height == 0
+	if voidPolicy || voidData {
 		return isReserved, reservedInfo
 	}
 

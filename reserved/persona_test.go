@@ -55,10 +55,10 @@ func TestCheckOutOfRangeBMI(t *testing.T) {
 		},
 	}
 
-	for i, test := range tests {
+	for _, test := range tests {
 		_, got := checkOutOfRangeBMI(test.weight, test.height)
 		if test.expected != got {
-			t.Errorf("error in test %s %d: expected %t, got %t", test.description, i+1, test.expected, got)
+			t.Errorf("error in test %s: expected %t, got %t", test.description, test.expected, got)
 		}
 	}
 }
