@@ -2,6 +2,7 @@ package companydata
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -209,9 +210,9 @@ func (track Track) query(from time.Time, to time.Time, queryEvent []Query) []mod
 }
 
 func (track Track) formatFilename(filename string, from time.Time, to time.Time, now time.Time) string {
-	filename = strings.Replace(filename, "fdd", string(from.Day()), 1)
-	filename = strings.Replace(filename, "fmm", string(from.Month()), 1)
-	filename = strings.Replace(filename, "fyyyy", string(from.Year()), 1)
+	filename = strings.Replace(filename, "fdd", fmt.Sprint(from.Day()), 1)
+	filename = strings.Replace(filename, "fmm", fmt.Sprint(from.Month()), 1)
+	filename = strings.Replace(filename, "fyyyy", fmt.Sprint(from.Year()), 1)
 
 	return filename
 }
