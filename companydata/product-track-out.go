@@ -30,7 +30,7 @@ func ProductTrackOutFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		policies     []models.Policy
 		transactions []models.Transaction
 	)
-	log.SetPrefix("ProductTrackOutFx")
+	log.SetPrefix("ProductTrackOutFx ")
 	req := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 
@@ -138,23 +138,24 @@ func (track Track) TransactionProductTrack(transactions []models.Transaction, ev
 	return result
 }
 func (track Track) saveFile(matrix [][]string, from time.Time, to time.Time, now time.Time) string {
-	filepath := track.formatFilename(track.FileName, from, to, now)
+
+	filename := track.formatFilename(track.FileName, from, to, now)
+	filepath := "track/" + track.Name + "/" + strconv.Itoa(from.Year()) + "/" + filename
+	log.Println("filepath: ", filepath)
 	switch track.Type {
 	case "csv":
-
 		sep := []rune(track.CsvConfig.Separator)
-		e :=lib.WriteCsv("../tmp/"+filepath, matrix, sep[0])
+		e := lib.WriteCsv("../tmp/"+filename, matrix, sep[0])
 		lib.CheckError(e)
 		source, e := os.ReadFile("../tmp/" + filepath)
 		lib.CheckError(e)
-		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/"+track.Name+"/"+strconv.Itoa(from.Year())+"/"+filepath, source)
+		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filepath, source)
 	case "excel":
-
 		_, e := lib.CreateExcel(matrix, filepath, "Risultato")
 		lib.CheckError(e)
-		source, e:= os.ReadFile("../tmp/" + filepath)
+		source, e := os.ReadFile("../tmp/" + filepath)
 		lib.CheckError(e)
-		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/"+track.Name+"/"+strconv.Itoa(from.Year())+"/"+filepath, source)
+		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filepath, source)
 
 	}
 	return filepath
