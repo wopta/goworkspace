@@ -37,8 +37,11 @@ func ProductTrackOutFx(w http.ResponseWriter, r *http.Request) (string, interfac
 	now, upload, reqData := getCompanyDataReq(req)
 
 	procuctTrackByte := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "products/"+reqData.Name+"/v1/track.json", "")
-	log.Print("Product track", string(procuctTrackByte))
+
 	err := json.Unmarshal(procuctTrackByte, &procuctTrack)
+	lib.CheckError(err)
+	jb, err := json.Marshal(procuctTrack)
+	log.Print("Product track: ", string(jb))
 	lib.CheckError(err)
 	switch reqData.Event {
 
@@ -206,6 +209,7 @@ func (track Track) upload(filePath string) {
 }
 func checkMap(column Column, value string) interface{} {
 	var res interface{}
+	res = value
 	if column.MapFx != "" {
 		res = GetMapFx(column.MapFx, value)
 	}
