@@ -147,13 +147,13 @@ func (track Track) saveFile(matrix [][]string, from time.Time, to time.Time, now
 		sep := []rune(track.CsvConfig.Separator)
 		e := lib.WriteCsv("../tmp/"+filename, matrix, sep[0])
 		lib.CheckError(e)
-		source, e := os.ReadFile("../tmp/" + filepath)
+		source, e := os.ReadFile("../tmp/" + filename)
 		lib.CheckError(e)
 		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filepath, source)
 	case "excel":
-		_, e := lib.CreateExcel(matrix, filepath, "Risultato")
+		_, e := lib.CreateExcel(matrix, filename, "Risultato")
 		lib.CheckError(e)
-		source, e := os.ReadFile("../tmp/" + filepath)
+		source, e := os.ReadFile("../tmp/" + filename)
 		lib.CheckError(e)
 		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filepath, source)
 
