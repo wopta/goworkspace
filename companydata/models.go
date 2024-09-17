@@ -7,12 +7,11 @@ type DataReq struct {
 	Event  string `firestore:"event,omitempty" json:"event,omitempty"`
 }
 type Track struct {
-	Columns     []Column    `firestore:"columns,omitempty" json:"columns"`
 	Name        string      `firestore:"name,omitempty" json:"name,omitempty"`
 	Frequency   string      `firestore:"frequency,omitempty" json:"frequency,omitempty"`
 	Type        string      `firestore:"type,omitempty" json:"type"`
 	UploadType  string      `firestore:"uploadType,omitempty" json:"uploadType,omitempty"`
-	Emit        Event       `firestore:"emit,omitempty" json:"Emit,omitempty"`
+	Emit        Event       `firestore:"emit,omitempty" json:"emit,omitempty"`
 	FileName    string      `firestore:"fileName,omitempty" json:"fileName,omitempty"`
 	FileNameFx  string      `firestore:"fileNameFx,omitempty" json:"fileNameFx,omitempty"`
 	Payment     Event       `firestore:"payment,omitempty" json:"payment,omitempty"`
@@ -21,6 +20,8 @@ type Track struct {
 	ExcelConfig ExcelConfig `firestore:"excelConfig,omitempty" json:"excelConfig,omitempty"`
 	FtpConfig   SftpConfig  `firestore:"ftpConfig,omitempty" json:"ftpConfig,omitempty"`
 	IsAssetFlat bool        `firestore:"isAssetFlat" json:"isAssetFlat"`
+	SendMail    bool        `firestore:"sendMail" json:"sendMail"`
+	MailConfig  MailConfig  `firestore:"mailConfig" json:"mailConfig"`
 }
 
 type Column struct {
@@ -67,4 +68,25 @@ type SftpConfig struct {
 	KeyExchanges []string `firestore:"keyExchanges,omitempty" json:"keyExchanges,omitempty"`
 	KeyPsw       string   `firestore:"keyPsw,omitempty" json:"keyPsw,omitempty"`
 	Timeout      int      `firestore:"timeout,omitempty" json:"timeout,omitempty"`
+}
+type MailConfig struct {
+	From     string `json:"from"`
+	FromName string `json:"fromName"`
+
+	To           []string `json:"to"`
+	Message      string   `json:"message"`
+	Subject      string   `json:"subject"`
+	IsHtml       bool     `json:"isHtml,omitempty"`
+	IsAttachment bool     `json:"isAttachment,omitempty"`
+
+	Cc           string `json:"cc,omitempty"`
+	Bcc          string `json:"bcc,omitempty"`
+	TemplateName string `json:"templateName,omitempty"`
+	Title        string `json:"title,omitempty"`
+	SubTitle     string `json:"subTitle,omitempty"`
+	Content      string `json:"content,omitempty"`
+	Link         string `json:"link,omitempty"`
+	LinkLabel    string `json:"linkLabel,omitempty"`
+	IsLink       bool   `json:"isLink,omitempty"`
+	IsApp        bool   `json:"isApp,omitempty"`
 }
