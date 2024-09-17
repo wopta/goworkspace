@@ -40,9 +40,8 @@ func ProductTrackOutFx(w http.ResponseWriter, r *http.Request) (string, interfac
 
 	err := json.Unmarshal(procuctTrackByte, &procuctTrack)
 	lib.CheckError(err)
-	jb, err := json.Marshal(procuctTrack)
-	log.Print("Product track: ", string(jb))
-	lib.CheckError(err)
+	log.Println("Product track: ", procuctTrack)
+
 	switch reqData.Event {
 
 	case "emit":
