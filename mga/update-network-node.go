@@ -2,7 +2,6 @@ package mga
 
 import (
 	"encoding/json"
-	"errors"
 	"io"
 	"log"
 	"net/http"
@@ -33,13 +32,8 @@ func UpdateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 		return "", "", err
 	}
 
-	_, err = network.GetNetworkNodeByCode(inputNode.Code)
-	if !errors.Is(err, network.ErrNodeNotFound) {
-		// If err is *not* ErrNodeNotFound, options are:
-		// - an error raised hitting the db
-		// - the node code is already present
-		// In both cases we must abort
-		log.Printf("error checking node code: %s", err.Error())
+	if err := network.TestNetworkNodeUniqueness(inputNode.Code); err != nil {
+		log.Println(err)
 		return "", "", err
 	}
 

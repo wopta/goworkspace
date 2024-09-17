@@ -445,3 +445,17 @@ func GetNetworkNodeByCode(code string) (*models.NetworkNode, error) {
 
 	return node, nil
 }
+
+func TestNetworkNodeUniqueness(nodeCode string) error {
+	_, err := GetNetworkNodeByCode(nodeCode)
+	// If err == nil, node found
+	if err == nil {
+		return errors.New("node already exists")
+	}
+	if !errors.Is(err, ErrNodeNotFound) {
+		// If err is *not* ErrNodeNotFound, an error raised hitting the db
+		log.Printf("error checking node code: %s", err.Error())
+		return err
+	}
+	return nil
+}
