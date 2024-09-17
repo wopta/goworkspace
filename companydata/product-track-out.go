@@ -188,15 +188,17 @@ func (track Track) policyAssetRow(policy *models.Policy, event []Column) [][]str
 					}
 					log.Println(value)
 					resPath, err = jsonpath.JsonPathLookup(json_data, value)
-					lib.CheckError(err)
+					log.Println(err)
+					//lib.CheckError(err)
 					log.Println(resPath)
 				}
 				resPath = checkMap(column, resPath)
 				cells = append(cells, resPath.(string))
 
 			}
+			result = append(result, cells)
 		}
-		result = append(result, cells)
+
 	}
 	return result
 
