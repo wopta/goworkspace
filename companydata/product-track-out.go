@@ -125,7 +125,7 @@ func (track Track) TransactionProductTrack(transactions []models.Transaction, ev
 			lib.CheckError(err)
 			log.Println(resPath)
 
-			resPath = checkMap(column, value)
+			resPath = checkMap(column, resPath)
 			cells = append(cells, resPath.(string))
 
 		}
@@ -137,7 +137,7 @@ func (track Track) TransactionProductTrack(transactions []models.Transaction, ev
 	lib.CheckError(err)
 	return result
 }
-func (track Track) saveFile(matrix [][]string, from time.Time, to time.Time, now time.Time) (string) {
+func (track Track) saveFile(matrix [][]string, from time.Time, to time.Time, now time.Time) string {
 	filepath := track.formatFilename(track.FileName, from, to, now)
 	switch track.Type {
 	case "csv":
@@ -191,7 +191,7 @@ func (track Track) policyAssetRow(policy *models.Policy, event []Column) [][]str
 					lib.CheckError(err)
 					log.Println(resPath)
 				}
-				resPath = checkMap(column, value)
+				resPath = checkMap(column, resPath)
 				cells = append(cells, resPath.(string))
 
 			}
@@ -209,15 +209,15 @@ func (track Track) upload(filePath string) {
 	}
 
 }
-func checkMap(column Column, value string) interface{} {
+func checkMap(column Column, value interface{}) interface{} {
 	var res interface{}
 	res = value
-	log.Println("column.MapFx: ",column.MapFx)
+	log.Println("column.MapFx: ", column.MapFx)
 	if column.MapFx != "" {
 		res = GetMapFx(column.MapFx, value)
 	}
 	if column.MapStatic != nil {
-		res = column.MapStatic[value]
+		res = column.MapStatic[value.(string)]
 	}
 	return res
 
@@ -317,7 +317,7 @@ func (track Track) sftp(filePath string) {
 	lib.CheckError(e)
 
 }
-func (track Track) sendMail( filename string) {
+func (track Track) sendMail(filename string) {
 	source, _ := os.ReadFile("../tmp/" + filename)
 
 	at := &[]mail.Attachment{{
