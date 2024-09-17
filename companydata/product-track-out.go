@@ -143,14 +143,17 @@ func (track Track) saveFile(matrix [][]string, from time.Time, to time.Time, now
 	case "csv":
 
 		sep := []rune(track.CsvConfig.Separator)
-		lib.WriteCsv("../tmp/"+filepath, matrix, sep[0])
-		source, _ := os.ReadFile("../tmp/" + filepath)
+		e :=lib.WriteCsv("../tmp/"+filepath, matrix, sep[0])
+		lib.CheckError(e)
+		source, e := os.ReadFile("../tmp/" + filepath)
+		lib.CheckError(e)
 		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/"+track.Name+"/"+strconv.Itoa(from.Year())+"/"+filepath, source)
 	case "excel":
 
 		_, e := lib.CreateExcel(matrix, filepath, "Risultato")
 		lib.CheckError(e)
-		source, _ := os.ReadFile("../tmp/" + filepath)
+		source, e:= os.ReadFile("../tmp/" + filepath)
+		lib.CheckError(e)
 		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/"+track.Name+"/"+strconv.Itoa(from.Year())+"/"+filepath, source)
 
 	}
@@ -222,6 +225,7 @@ func checkMap(column Column, value interface{}) interface{} {
 		res = GetMapFx(column.MapFx, value)
 	}
 	if column.MapStatic != nil {
+
 		res = column.MapStatic[value.(string)]
 	}
 	if res == nil {
