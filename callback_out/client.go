@@ -29,7 +29,7 @@ func newClient(node *models.NetworkNode) (CallbackClient, error) {
 	case "winClient":
 		return win.NewClient(node.ExternalNetworkCode), nil
 	case "facileBrokerClient":
-		return base.NewClient(node, "facile-broker"), nil
+		return base.NewClient(node, "facile_broker"), nil
 	default:
 		return nil, ErrCallbackClientNotSet
 	}
