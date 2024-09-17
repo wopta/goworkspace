@@ -221,6 +221,9 @@ func checkMap(column Column, value interface{}) interface{} {
 	if column.MapStatic != nil {
 		res = column.MapStatic[value.(string)]
 	}
+	if res == nil {
+		res = ""
+	}
 	return res
 
 }

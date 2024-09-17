@@ -7,6 +7,11 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/go-gota/gota/dataframe"
+	"github.com/go-gota/gota/series"
+	lib "github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 )
 
 type fn func(interface{}) interface{}
@@ -17,6 +22,7 @@ func GetMapFx(name string, value interface{}) interface{} {
 		"test":                         Test,
 		"formatDateDDMMYYYYSlash":      formatDateDDMMYYYYSlash,
 		"formatISO8601toDDMMYYYYSlash": formatISO8601toDDMMYYYYSlash,
+		"mapWorkCodeGlobal":            mapWorkCodeGlobal,
 	}
 	return res[name](value)
 }
@@ -51,6 +57,21 @@ func formatSplitPaymentNumber(s interface{}) interface{} {
 	if s == "yearly" {
 		res = "12"
 
+	}
+	return res
+}
+func mapWorkCodeGlobal(s interface{}) interface{} {
+	var res string
+
+	works := lib.GetFilesByEnv("enrich/works-code-global.csv")
+
+	df := lib.CsvToDataframe(works)
+	fil := df.Filter(
+		dataframe.F{Colidx: 1, Colname: "Settore", Comparator: series.Eq, Comparando: s.(models.User).WorkType},
+		dataframe.F{Colidx: 2, Colname: "Tipo", Comparator: series.Eq, Comparando: s.(models.User).Work},
+	)
+	if fil.Nrow() > 0 {
+		res = fil.Elem(0, 0).String()
 	}
 	return res
 }
