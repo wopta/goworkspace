@@ -1,6 +1,7 @@
 package companydata
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -14,6 +15,7 @@ import (
 	"github.com/oliveagle/jsonpath"
 
 	lib "github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -35,9 +37,9 @@ func ProductTrackOutFx(w http.ResponseWriter, r *http.Request) (string, interfac
 	now, upload, reqData := getCompanyDataReq(req)
 
 	procuctTrackByte := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "products/"+reqData.Name+"/v1/track.json", "")
-	log.Println("Product track", string(procuctTrackByte))
-	json.Unmarshal(procuctTrackByte, &procuctTrack)
-
+	log.Print("Product track", string(procuctTrackByte))
+	err := json.Unmarshal(procuctTrackByte, &procuctTrack)
+	lib.CheckError(err)
 	switch reqData.Event {
 
 	case "emit":
@@ -307,4 +309,24 @@ func (track Track) sftp(filePath string) {
 	e = client.Upload(source, destination, int(info.Size()))
 	lib.CheckError(e)
 
+}
+func (track Track) sendMail(filepath string, filename string) {
+	source, _ := os.ReadFile("../tmp/" + filepath)
+	at := &[]mail.Attachment{{
+		Byte:        base64.StdEncoding.EncodeToString(source),
+		ContentType: "application/pdf",
+		FileName:    filename,
+		Name:        strings.ReplaceAll(filename, "_", " "),
+	}}
+
+	mail.SendMail(mail.MailRequest{
+		From:    track.MailConfig.From,
+		To:      track.MailConfig.To,
+		Cc:      track.MailConfig.Cc,
+		Bcc:     track.MailConfig.Bcc,
+		Message: track.MailConfig.Message,
+
+		IsAttachment: true,
+		Attachments:  at,
+	})
 }
