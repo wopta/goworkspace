@@ -28,12 +28,14 @@ func ProductTrackOutFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		policies     []models.Policy
 		transactions []models.Transaction
 	)
+	log.SetPrefix("ProductTrackOutFx")
 	req := lib.ErrorByte(io.ReadAll(r.Body))
 	defer r.Body.Close()
 
 	now, upload, reqData := getCompanyDataReq(req)
 
 	procuctTrackByte := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "products/"+reqData.Name+"/v1/track.json", "")
+	log.Println("Product track", string(procuctTrackByte))
 	json.Unmarshal(procuctTrackByte, &procuctTrack)
 
 	switch reqData.Event {
@@ -155,20 +157,20 @@ func (track Track) policyAssetRow(policy *models.Policy, event []Column) [][]str
 		cells     []string
 		err       error
 	)
-	//json.Unmarshal([]byte(getpolicymock()), &json_data)
-
+	log.Println("policyAssetRow")
 	b, err := json.Marshal(policy)
 	lib.CheckError(err)
 	json.Unmarshal(b, &json_data)
 	log.Println(string(b))
 	for indexAsset, asset := range policy.Assets {
 		for indexG, _ := range asset.Guarantees {
-
-			for _, column := range event {
+			log.Println("index Guarantees: ", indexG)
+			for i, column := range event {
 				var (
 					resPath interface{}
 					value   string
 				)
+				log.Println("index event: ", i)
 				value = column.Value
 				resPath = column.Value
 				log.Println(column.Value)
