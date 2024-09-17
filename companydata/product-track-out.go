@@ -182,10 +182,10 @@ func (track Track) policyAssetRow(policy *models.Policy, event []Column) [][]str
 				resPath = column.Value
 				log.Println(column.Value)
 				if strings.Contains(column.Value, "$.") {
-					if strings.Contains(column.Value, "$.assets[*].guarantees[*]") {
-						value = strings.Replace(value, "guarantees[*]", "guarantees["+strconv.Itoa(indexG)+"]", 1)
-						value = strings.Replace(value, "assets[*]", "assets["+strconv.Itoa(indexAsset)+"]", 1)
-					}
+
+					value = strings.Replace(value, "guarantees[*]", "guarantees["+strconv.Itoa(indexG)+"]", 1)
+					value = strings.Replace(value, "assets[*]", "assets["+strconv.Itoa(indexAsset)+"]", 1)
+
 					log.Println(value)
 					resPath, err = jsonpath.JsonPathLookup(json_data, value)
 					log.Println(err)
