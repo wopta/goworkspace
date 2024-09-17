@@ -78,7 +78,6 @@ def main(sprint_number, changed_functions, dry_run=True):
         git.checkout(dev_tag)
 
         production_tag = dev_tag.replace(DEV, PROD)
-        #print(f"Tag to be created: {production_tag}")
         if dry_run:
             created_tags.append(production_tag)
             continue
