@@ -85,11 +85,12 @@ def main(sprint_number, changed_functions, dry_run=True):
         repo.create_tag(production_tag, message=f"{RELEASE_MESSAGE_PREFIX} {sprint_number}")
         created_tags.append(production_tag)
 
-    print("\nCreated tags:")
+    print("Created tags:")
     [print(f"  '{tag}'") for tag in created_tags]
+    print()
 
     if dry_run:
-        print("\nSkipping push to remotes...")
+        print("Skipping push to remotes...")
         return
 
     print("Pushing to GitHub")
@@ -125,6 +126,6 @@ if __name__ == "__main__":
     args.changed_modules = [function_name.lower() for function_name in args.changed_modules]
 
     print(f"Arguments received:\n  Sprint Number: {args.sprint_number}\n  Changed Modules: {args.changed_modules}\n  "
-          f"Dry Run: {args.prod}")
+          f"Dry Run: {args.prod}\n")
 
     main(sprint_number=args.sprint_number, changed_functions=args.changed_modules, dry_run=args.prod)
