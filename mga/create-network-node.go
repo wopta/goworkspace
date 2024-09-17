@@ -2,6 +2,7 @@ package mga
 
 import (
 	"encoding/json"
+	"errors"
 	"io"
 	"log"
 	"net/http"
@@ -33,8 +34,16 @@ func CreateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 		return "", "", err
 	}
 	// TODO: check node.Type in warrant.AllowedTypes
-	// TODO: check unique node.Code
 	// TODO: check unique companyCode for company
+	_, err = network.GetNetworkNodeByCode(inputNode.Code)
+	if !errors.Is(err, network.ErrNodeNotFound) {
+		// If err is *not* ErrNodeNotFound, options are:
+		// - an error raised hitting the db
+		// - the node code is already present
+		// In both cases we must abort
+		log.Printf("error checking node code: %s", err.Error())
+		return "", "", err
+	}
 
 	log.Println("creating network node into Firestore...")
 

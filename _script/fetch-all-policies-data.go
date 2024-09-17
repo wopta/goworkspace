@@ -99,7 +99,7 @@ func ImportPoliciesData() {
 		log.Fatal(err)
 	}
 
-	dirAgent := network.GetNetworkNodeByCode("W1.DIRAgent")
+	dirAgent, _ := network.GetNetworkNodeByCode("W1.DIRAgent")
 	if dirAgent == nil {
 		log.Fatal("nil dirAgent")
 	}

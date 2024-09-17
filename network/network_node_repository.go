@@ -2,6 +2,7 @@ package network
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -413,12 +414,14 @@ func addWorksForUid(originalNode, inputNode *models.NetworkNode) error {
 	return nil
 }
 
-func GetNetworkNodeByCode(code string) *models.NetworkNode {
+var ErrNodeNotFound = errors.New("node not found")
+
+func GetNetworkNodeByCode(code string) (*models.NetworkNode, error) {
 	var node *models.NetworkNode
 
 	if code == "" {
 		log.Println("[GetNetworkNodeByCode] code empty")
-		return nil
+		return nil, fmt.Errorf("empty code")
 	}
 
 	iter := lib.WhereFirestore(lib.NetworkNodesCollection, "code", "==", code)
@@ -426,19 +429,19 @@ func GetNetworkNodeByCode(code string) *models.NetworkNode {
 
 	if err == iterator.Done && nodeDocSnapshot == nil {
 		log.Println("[GetNetworkNodeByCode] node not found")
-		return nil
+		return nil, ErrNodeNotFound
 	}
 
 	if err != iterator.Done && err != nil {
 		log.Printf("[GetNetworkNodeByCode] error getting node: %s", err.Error())
-		return nil
+		return nil, err
 	}
 
 	err = nodeDocSnapshot.DataTo(&node)
 	if node == nil || err != nil {
 		log.Printf("[GetNetworkNodeByCode] could not parse node: %s", err)
-		return nil
+		return nil, err
 	}
 
-	return node
+	return node, nil
 }

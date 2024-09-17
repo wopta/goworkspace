@@ -250,7 +250,7 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 		if nodeCode == "W1" {
 			nodeCode = "W1.DIRAgent"
 		}
-		networkNode := network.GetNetworkNodeByCode(nodeCode)
+		networkNode, _ := network.GetNetworkNodeByCode(nodeCode)
 		if networkNode == nil {
 			log.Println("node not found!")
 			missingProducerPolicies = append(missingProducerPolicies, codeCompany)
