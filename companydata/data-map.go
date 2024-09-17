@@ -2,6 +2,8 @@ package companydata
 
 import (
 	"fmt"
+	"log"
+	"reflect"
 	"strconv"
 	"strings"
 	"time"
@@ -27,6 +29,8 @@ func formatDateDDMMYYYYSlash(s interface{}) interface{} {
 }
 func formatISO8601toDDMMYYYYSlash(d interface{}) interface{} {
 	var res string
+	log.Println("value d: ", d)
+	log.Println("value d: ", reflect.TypeOf(d))
 	if d.(string) != "" {
 		splitD := strings.Split(d.(string), "-")
 		split2 := strings.Split(splitD[2], "T")

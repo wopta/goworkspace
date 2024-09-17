@@ -66,10 +66,13 @@ func ProductTrackOutFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		result = procuctTrack.TransactionProductTrack(transactions, event)
 	}
 
-	filepath := procuctTrack.saveFile(result, from, to, now)
+	filename := procuctTrack.saveFile(result, from, to, now)
 
 	if upload {
-		procuctTrack.upload(filepath)
+		procuctTrack.upload(filename)
+	}
+	if procuctTrack.SendMail {
+		procuctTrack.sendMail(filename)
 	}
 	return "", nil, e
 }
@@ -134,7 +137,7 @@ func (track Track) TransactionProductTrack(transactions []models.Transaction, ev
 	lib.CheckError(err)
 	return result
 }
-func (track Track) saveFile(matrix [][]string, from time.Time, to time.Time, now time.Time) string {
+func (track Track) saveFile(matrix [][]string, from time.Time, to time.Time, now time.Time) (string) {
 	filepath := track.formatFilename(track.FileName, from, to, now)
 	switch track.Type {
 	case "csv":
@@ -209,6 +212,7 @@ func (track Track) upload(filePath string) {
 func checkMap(column Column, value string) interface{} {
 	var res interface{}
 	res = value
+	log.Println("column.MapFx: ",column.MapFx)
 	if column.MapFx != "" {
 		res = GetMapFx(column.MapFx, value)
 	}
@@ -313,8 +317,9 @@ func (track Track) sftp(filePath string) {
 	lib.CheckError(e)
 
 }
-func (track Track) sendMail(filepath string, filename string) {
-	source, _ := os.ReadFile("../tmp/" + filepath)
+func (track Track) sendMail( filename string) {
+	source, _ := os.ReadFile("../tmp/" + filename)
+
 	at := &[]mail.Attachment{{
 		Byte:        base64.StdEncoding.EncodeToString(source),
 		ContentType: "application/pdf",
