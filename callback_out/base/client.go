@@ -119,11 +119,9 @@ func (c *Client) DecodeAction(rawAction string) []string {
 func (c *Client) setAuth(req *http.Request) {
 	network := lib.ToUpper(c.network)
 	switch c.externalConfig.AuthType {
-	case "basicAuth":
+	case "basic":
 		req.SetBasicAuth(
 			os.Getenv(fmt.Sprintf("%s_CALLBACK_AUTH_USER", network)),
 			os.Getenv(fmt.Sprintf("%s_CALLBACK_AUTH_PASS", network)))
-	case "api-key":
-		req.Header.Add("Authorization", os.Getenv(fmt.Sprintf("%s_CALLBACK_AUTH_APIKEY", network)))
 	}
 }
