@@ -19,6 +19,9 @@ func UpdatePolicy(policy *models.Policy) map[string]interface{} {
 		input["statements"] = policy.Statements
 	}
 	input["step"] = policy.Step
+	if policy.OfferlName != "" {
+		input["offerName"] = policy.OfferlName
+	}
 	input["updated"] = time.Now().UTC()
 
 	return input
