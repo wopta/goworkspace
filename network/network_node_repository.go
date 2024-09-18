@@ -427,12 +427,12 @@ func GetNetworkNodeByCode(code string) (*models.NetworkNode, error) {
 	iter := lib.WhereFirestore(lib.NetworkNodesCollection, "code", "==", code)
 	nodeDocSnapshot, err := iter.Next()
 
-	if err == iterator.Done && nodeDocSnapshot == nil {
+	if errors.Is(err, iterator.Done) && nodeDocSnapshot == nil {
 		log.Println("[GetNetworkNodeByCode] node not found")
 		return nil, ErrNodeNotFound
 	}
 
-	if err != iterator.Done && err != nil {
+	if !errors.Is(err, iterator.Done) && err != nil {
 		log.Printf("[GetNetworkNodeByCode] error getting node: %s", err.Error())
 		return nil, err
 	}
