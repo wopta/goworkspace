@@ -102,8 +102,8 @@ func (track Track) TransactionProductTrack(transactions []models.Transaction, ev
 	var (
 		result    [][]string
 		json_data interface{}
-	
-		value   string
+
+		value string
 		cells []string
 		err   error
 	)
@@ -117,7 +117,7 @@ func (track Track) TransactionProductTrack(transactions []models.Transaction, ev
 
 			log.Println(column)
 			log.Println(value)
-			
+
 		}
 
 		result = append(result, cells)
@@ -157,7 +157,7 @@ func (track Track) policyAssetRow(policy *models.Policy, event []Column) [][]str
 		result    [][]string
 		cells     []string
 		err       error
-		resPaths []interface{}
+		resPaths  []interface{}
 	)
 	log.Println("policyAssetRow")
 	b, err := json.Marshal(policy)
@@ -169,19 +169,19 @@ func (track Track) policyAssetRow(policy *models.Policy, event []Column) [][]str
 			log.Println("index Guarantees: ", indexG)
 			for i, column := range event {
 				log.Println("index event: ", i)
-				
-				for _,value :=range column.Values{
-				log.Println("column value",value)
-				if strings.Contains(value, "$.") {
 
-					value = strings.Replace(value, "guarantees[*]", "guarantees["+strconv.Itoa(indexG)+"]", 1)
-					value = strings.Replace(value, "assets[*]", "assets["+strconv.Itoa(indexAsset)+"]", 1)
-					resPath, err := jsonpath.JsonPathLookup(json_data, value)
-					resPaths=append(resPaths, resPath)
-					log.Println(err)
-					log.Println(resPath)
+				for _, value := range column.Values {
+					log.Println("column value", value)
+					if strings.Contains(value, "$.") {
+
+						value = strings.Replace(value, "guarantees[*]", "guarantees["+strconv.Itoa(indexG)+"]", 1)
+						value = strings.Replace(value, "assets[*]", "assets["+strconv.Itoa(indexAsset)+"]", 1)
+						resPath, err := jsonpath.JsonPathLookup(json_data, value)
+						resPaths = append(resPaths, resPath)
+						log.Println(err)
+						log.Println(resPath)
+					}
 				}
-			}
 				resdata := checkMap(column, resPaths)
 				cells = append(cells, resdata.(string))
 
@@ -203,10 +203,6 @@ func (track Track) upload(filePath string) {
 }
 func checkMap(column Column, value []interface{}) interface{} {
 	var res interface{}
-	res = value
-	if value == nil {
-		value[0] = ""
-	}
 	log.Println("column.MapFx: ", column.MapFx)
 	if column.MapFx != "" {
 		res = GetMapFx(column.MapFx, value)
