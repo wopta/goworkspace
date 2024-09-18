@@ -25,7 +25,7 @@ type Track struct {
 }
 
 type Column struct {
-	Value     string            `firestore:"value,omitempty" json:"value"`
+	Values     []string          `firestore:"values,omitempty" json:"values"`
 	Name      string            `firestore:"name,omitempty" json:"name,omitempty"`
 	Type      string            `firestore:"type,omitempty" json:"type"`
 	AssetType string            `firestore:"assetType,omitempty" json:"assetType"`

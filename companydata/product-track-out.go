@@ -102,7 +102,8 @@ func (track Track) TransactionProductTrack(transactions []models.Transaction, ev
 	var (
 		result    [][]string
 		json_data interface{}
-
+	
+		value   string
 		cells []string
 		err   error
 	)
@@ -113,21 +114,10 @@ func (track Track) TransactionProductTrack(transactions []models.Transaction, ev
 		json.Unmarshal(b, &json_data)
 		log.Println(string(b))
 		for _, column := range event {
-			var (
-				resPath interface{}
-				value   string
-			)
-			value = column.Value
-			resPath = column.Value
-			log.Println(column.Value)
+
+			log.Println(column)
 			log.Println(value)
-			resPath, err = jsonpath.JsonPathLookup(json_data, value)
-			lib.CheckError(err)
-			log.Println(resPath)
-
-			resPath = checkMap(column, resPath)
-			cells = append(cells, resPath.(string))
-
+			
 		}
 
 		result = append(result, cells)
@@ -138,22 +128,22 @@ func (track Track) TransactionProductTrack(transactions []models.Transaction, ev
 	return result
 }
 func (track Track) saveFile(matrix [][]string, from time.Time, to time.Time, now time.Time) string {
-
+	const localBasePath = "../tmp/"
 	filename := track.formatFilename(track.FileName, from, to, now)
 	filepath := "track/" + track.Name + "/" + strconv.Itoa(from.Year()) + "/" + filename
 	log.Println("filepath: ", filepath)
 	switch track.Type {
 	case "csv":
 		sep := []rune(track.CsvConfig.Separator)
-		e := lib.WriteCsv("../tmp/"+filename, matrix, sep[0])
+		e := lib.WriteCsv(localBasePath+filename, matrix, sep[0])
 		lib.CheckError(e)
-		source, e := os.ReadFile("../tmp/" + filename)
+		source, e := os.ReadFile(localBasePath + filename)
 		lib.CheckError(e)
 		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filepath, source)
 	case "excel":
 		_, e := lib.CreateExcel(matrix, filename, "Risultato")
 		lib.CheckError(e)
-		source, e := os.ReadFile("../tmp/" + filename)
+		source, e := os.ReadFile(localBasePath + filename)
 		lib.CheckError(e)
 		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filepath, source)
 
@@ -167,6 +157,7 @@ func (track Track) policyAssetRow(policy *models.Policy, event []Column) [][]str
 		result    [][]string
 		cells     []string
 		err       error
+		resPaths []interface{}
 	)
 	log.Println("policyAssetRow")
 	b, err := json.Marshal(policy)
@@ -177,27 +168,22 @@ func (track Track) policyAssetRow(policy *models.Policy, event []Column) [][]str
 		for indexG, _ := range asset.Guarantees {
 			log.Println("index Guarantees: ", indexG)
 			for i, column := range event {
-				var (
-					resPath interface{}
-					value   string
-				)
 				log.Println("index event: ", i)
-				value = column.Value
-				resPath = column.Value
-				log.Println(column.Value)
-				if strings.Contains(column.Value, "$.") {
+				
+				for _,value :=range column.Values{
+				log.Println("column value",value)
+				if strings.Contains(value, "$.") {
 
 					value = strings.Replace(value, "guarantees[*]", "guarantees["+strconv.Itoa(indexG)+"]", 1)
 					value = strings.Replace(value, "assets[*]", "assets["+strconv.Itoa(indexAsset)+"]", 1)
-
-					log.Println(value)
-					resPath, err = jsonpath.JsonPathLookup(json_data, value)
+					resPath, err := jsonpath.JsonPathLookup(json_data, value)
+					resPaths=append(resPaths, resPath)
 					log.Println(err)
-					//lib.CheckError(err)
 					log.Println(resPath)
 				}
-				resPath = checkMap(column, resPath)
-				cells = append(cells, resPath.(string))
+			}
+				resdata := checkMap(column, resPaths)
+				cells = append(cells, resdata.(string))
 
 			}
 			result = append(result, cells)
@@ -215,11 +201,11 @@ func (track Track) upload(filePath string) {
 	}
 
 }
-func checkMap(column Column, value interface{}) interface{} {
+func checkMap(column Column, value []interface{}) interface{} {
 	var res interface{}
 	res = value
 	if value == nil {
-		value = ""
+		value[0] = ""
 	}
 	log.Println("column.MapFx: ", column.MapFx)
 	if column.MapFx != "" {
@@ -227,7 +213,7 @@ func checkMap(column Column, value interface{}) interface{} {
 	}
 	if column.MapStatic != nil {
 
-		res = column.MapStatic[value.(string)]
+		res = column.MapStatic[value[0].(string)]
 	}
 	if res == nil {
 		res = ""
