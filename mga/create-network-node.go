@@ -35,7 +35,7 @@ func CreateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 	// TODO: check node.Type in warrant.AllowedTypes
 	// TODO: check unique companyCode for company
 	if err := network.TestNetworkNodeUniqueness(inputNode.Code); err != nil {
-		log.Println(err)
+		log.Printf("error validating node code: %s", err)
 		return "", "", err
 	}
 
