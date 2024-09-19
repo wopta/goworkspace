@@ -218,7 +218,7 @@ func checkMap(column Column, value []interface{}) interface{} {
 	if column.MapFx != "" {
 		res = GetMapFx(column.MapFx, value)
 	}
-	if column.MapStatic != nil {
+	if column.MapStatic != nil && value[0] != nil {
 
 		res = column.MapStatic[value[0].(string)]
 	}
