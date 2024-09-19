@@ -60,15 +60,16 @@ func ExtractUserDataFromFiscalCode(fiscalCode string, codes map[string]map[strin
 
 	return string(outJson), user, nil
 }
-func CreateExcel(sheet [][]string, filePath string) ([]byte, error) {
+func CreateExcel(sheet [][]string, filePath string ,sheetname string) ([]byte, error) {
 	log.Println("CreateExcel")
 	f := excelize.NewFile()
 	alfabet := []string{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"}
 	// Create a new sheet.
-	index, err := f.NewSheet("Sheet1")
+	index, err := f.NewSheet(sheetname )
+	lib.CheckError(err)
 	for x, row := range sheet {
 		for i, cel := range row {
-			f.SetCellValue("Sheet1", alfabet[i]+""+strconv.Itoa(x+1), cel)
+			f.SetCellValue(sheetname , alfabet[i]+""+strconv.Itoa(x+1), cel)
 		}
 	}
 	//Set active sheet of the workbook.
@@ -76,7 +77,7 @@ func CreateExcel(sheet [][]string, filePath string) ([]byte, error) {
 
 	//Save spreadsheet by the given path.
 	err = f.SaveAs(filePath)
-
+	lib.CheckError(err)
 	resByte, err := f.WriteToBuffer()
 
 	return resByte.Bytes(), err

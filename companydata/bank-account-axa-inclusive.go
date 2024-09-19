@@ -80,7 +80,7 @@ func setPolicy(code string, now time.Time, upload bool) {
 	}
 
 	filepath := code + "_" + strconv.Itoa(refDay.Year()) + fmt.Sprintf("%02d", int(refDay.Month())) + fmt.Sprintf("%02d", refDay.Day())
-	CreateExcel(result, "../tmp/"+filepath+".xlsx")
+	CreateExcel(result, "../tmp/"+filepath+".xlsx","Sheet1")
 	lib.WriteCsv("../tmp/"+filepath+".csv", result, ';')
 	source, _ := os.ReadFile("../tmp/" + filepath + ".xlsx")
 	sourceCsv, _ := os.ReadFile("../tmp/" + filepath + ".csv")

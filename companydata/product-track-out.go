@@ -155,11 +155,11 @@ func (track Track) saveFile(matrix [][]string, from time.Time, to time.Time, now
 		lib.CheckError(e)
 		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filepath, source)
 	case "excel":
-		_, e := lib.CreateExcel(matrix, localBasePath+filename, "Risultato")
+		excel, e := CreateExcel(matrix, localBasePath+filename, track.ExcelConfig.SheetName)
 		lib.CheckError(e)
-		source, e := os.ReadFile(localBasePath + filename)
+		//source, e := os.ReadFile(localBasePath + filename)
 		lib.CheckError(e)
-		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filepath, source)
+		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filepath, excel)
 
 	}
 	return filepath
@@ -288,8 +288,8 @@ func firestoreQuery[T any](from time.Time, to time.Time, db Database) []T {
 }
 
 func stringTimeToken(filename string, from time.Time, to time.Time, now time.Time) string {
-	filename = strings.Replace(filename, "fdd", fmt.Sprint(from.Day()), 1)
-	filename = strings.Replace(filename, "fmm", fmt.Sprint(int(from.Month())), 1)
+	filename = strings.Replace(filename, "fdd", fmt.Sprintf("%02d", from.Day()), 1)
+	filename = strings.Replace(filename, "fmm", fmt.Sprintf("%02d", int(from.Month())), 1)
 	filename = strings.Replace(filename, "fyyyy", fmt.Sprint(from.Year()), 1)
 
 	return filename
@@ -316,7 +316,7 @@ func (track Track) sftp(filePath string) {
 	log.Println("Create remote file for writing:")
 	// Create remote file for writing.
 	lib.Files(localBasePath)
-	destination, e := client.Create( track.FtpConfig.Path+"/" + filePath)
+	destination, e := client.Create(track.FtpConfig.Path + "/" + filePath)
 	lib.CheckError(e)
 	defer destination.Close()
 	log.Println("Upload local file to a remote location as in 1MB (byte) chunks.")
