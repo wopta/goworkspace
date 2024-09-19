@@ -117,6 +117,18 @@ func (track Track) TransactionProductTrack(transactions []models.Transaction, ev
 
 			log.Println(column)
 			log.Println(value)
+			var resPaths []interface{}
+			for _, value := range column.Values {
+				log.Println("column value", value)
+				if strings.Contains(value, "$.") {
+					resPath, err := jsonpath.JsonPathLookup(json_data, value)
+					resPaths = append(resPaths, resPath)
+					log.Println(err)
+					log.Println(resPath)
+				}
+			}
+			resdata := checkMap(column, resPaths)
+			cells = append(cells, resdata.(string))
 
 		}
 
@@ -157,7 +169,6 @@ func (track Track) policyAssetRow(policy *models.Policy, event []Column) [][]str
 		result    [][]string
 		cells     []string
 		err       error
-		resPaths  []interface{}
 	)
 	log.Println("policyAssetRow")
 	b, err := json.Marshal(policy)
@@ -169,7 +180,7 @@ func (track Track) policyAssetRow(policy *models.Policy, event []Column) [][]str
 			log.Println("index Guarantees: ", indexG)
 			for i, column := range event {
 				log.Println("index event: ", i)
-
+				var resPaths []interface{}
 				for _, value := range column.Values {
 					log.Println("column value", value)
 					if strings.Contains(value, "$.") {
@@ -313,22 +324,29 @@ func (track Track) sftp(filePath string) {
 
 }
 func (track Track) sendMail(filename string) {
+	var contentType string
 	source, _ := os.ReadFile("../tmp/" + filename)
+	if track.Type == "csv" {
+		contentType = "text/csv"
+	}
+	if track.Type == "excel" {
+		contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+	}
 
 	at := &[]mail.Attachment{{
 		Byte:        base64.StdEncoding.EncodeToString(source),
-		ContentType: "application/pdf",
+		ContentType: contentType,
 		FileName:    filename,
 		Name:        strings.ReplaceAll(filename, "_", " "),
 	}}
 
 	mail.SendMail(mail.MailRequest{
-		From:    track.MailConfig.From,
-		To:      track.MailConfig.To,
-		Cc:      track.MailConfig.Cc,
-		Bcc:     track.MailConfig.Bcc,
-		Message: track.MailConfig.Message,
-
+		From:         track.MailConfig.From,
+		To:           track.MailConfig.To,
+		Cc:           track.MailConfig.Cc,
+		Bcc:          track.MailConfig.Bcc,
+		Message:      track.MailConfig.Message,
+		Subject:      track.MailConfig.Subject,
 		IsAttachment: true,
 		Attachments:  at,
 	})
