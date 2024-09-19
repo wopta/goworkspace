@@ -1,5 +1,7 @@
 package companydata
 
+import "time"
+
 type DataReq struct {
 	Day    string `firestore:"-" json:"day,omitempty" bigquery:"-"`
 	Upload bool   `firestore:"-" json:"upload,omitempty" bigquery:"-"`
@@ -22,10 +24,13 @@ type Track struct {
 	IsAssetFlat bool        `firestore:"isAssetFlat" json:"isAssetFlat"`
 	SendMail    bool        `firestore:"sendMail" json:"sendMail"`
 	MailConfig  MailConfig  `firestore:"mailConfig" json:"mailConfig"`
+	now         time.Time
+	from        time.Time
+	to          time.Time
 }
 
 type Column struct {
-	Values     []string          `firestore:"values,omitempty" json:"values"`
+	Values    []string          `firestore:"values,omitempty" json:"values"`
 	Name      string            `firestore:"name,omitempty" json:"name,omitempty"`
 	Type      string            `firestore:"type,omitempty" json:"type"`
 	AssetType string            `firestore:"assetType,omitempty" json:"assetType"`
@@ -68,6 +73,7 @@ type SftpConfig struct {
 	KeyExchanges []string `firestore:"keyExchanges,omitempty" json:"keyExchanges,omitempty"`
 	KeyPsw       string   `firestore:"keyPsw,omitempty" json:"keyPsw,omitempty"`
 	Timeout      int      `firestore:"timeout,omitempty" json:"timeout,omitempty"`
+	Path         string   `firestore:"path,omitempty" json:"path,omitempty"`
 }
 type MailConfig struct {
 	From     string `json:"from"`

@@ -24,6 +24,7 @@ type SftpConfig struct {
 	Server       string
 	KeyExchanges []string
 	KeyPsw       string
+	Path         string
 	Timeout      time.Duration
 }
 

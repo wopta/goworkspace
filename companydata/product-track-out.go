@@ -19,6 +19,8 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
+const localBasePath = "../tmp/"
+
 func ProductTrackOutFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		from         time.Time
@@ -140,8 +142,8 @@ func (track Track) TransactionProductTrack(transactions []models.Transaction, ev
 	return result
 }
 func (track Track) saveFile(matrix [][]string, from time.Time, to time.Time, now time.Time) string {
-	const localBasePath = "../tmp/"
-	filename := track.formatFilename(track.FileName, from, to, now)
+
+	filename := stringTimeToken(track.FileName, from, to, now)
 	filepath := "track/" + track.Name + "/" + strconv.Itoa(from.Year()) + "/" + filename
 	log.Println("filepath: ", filepath)
 	switch track.Type {
@@ -153,7 +155,7 @@ func (track Track) saveFile(matrix [][]string, from time.Time, to time.Time, now
 		lib.CheckError(e)
 		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filepath, source)
 	case "excel":
-		_, e := lib.CreateExcel(matrix, filename, "Risultato")
+		_, e := lib.CreateExcel(matrix, localBasePath+filename, "Risultato")
 		lib.CheckError(e)
 		source, e := os.ReadFile(localBasePath + filename)
 		lib.CheckError(e)
@@ -228,7 +230,7 @@ func checkMap(column Column, value []interface{}) interface{} {
 	return res
 
 }
-func (track Track) frequency(now time.Time) (time.Time, time.Time) {
+func (track *Track) frequency(now time.Time) (time.Time, time.Time) {
 	location, e := time.LoadLocation("Europe/Rome")
 	lib.CheckError(e)
 	switch track.Frequency {
@@ -242,6 +244,9 @@ func (track Track) frequency(now time.Time) (time.Time, time.Time) {
 		to = time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, location)
 	}
 	log.Println(from, to)
+	track.from = from
+	track.to = to
+	track.now = now
 	return from, to
 }
 
@@ -282,21 +287,21 @@ func firestoreQuery[T any](from time.Time, to time.Time, db Database) []T {
 	return res
 }
 
-func (track Track) formatFilename(filename string, from time.Time, to time.Time, now time.Time) string {
+func stringTimeToken(filename string, from time.Time, to time.Time, now time.Time) string {
 	filename = strings.Replace(filename, "fdd", fmt.Sprint(from.Day()), 1)
-	filename = strings.Replace(filename, "fmm", fmt.Sprint(from.Month()), 1)
+	filename = strings.Replace(filename, "fmm", fmt.Sprint(int(from.Month())), 1)
 	filename = strings.Replace(filename, "fyyyy", fmt.Sprint(from.Year()), 1)
 
 	return filename
 }
 func (track Track) sftp(filePath string) {
 
-	pk := lib.GetFromStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "env/axa-life.ppk", "")
+	pk := lib.GetFromStorage(os.Getenv(track.FtpConfig.PrivateKey), "env/axa-life.ppk", "")
 	config := lib.SftpConfig{
-		Username:     os.Getenv("AXA_LIFE_SFTP_USER"),
-		Password:     "",                                                                                                          // required only if password authentication is to be used
+		Username:     track.FtpConfig.Username,
+		Password:     track.FtpConfig.Password,                                                                                    // required only if password authentication is to be used
 		PrivateKey:   string(pk),                                                                                                  //                           // required only if private key authentication is to be used
-		Server:       os.Getenv("AXA_LIFE_SFTP_HOST") + ":10026",                                                                  //
+		Server:       track.FtpConfig.Server,                                                                                      //
 		KeyExchanges: []string{"diffie-hellman-group-exchange-sha1", "diffie-hellman-group1-sha1", "diffie-hellman-group14-sha1"}, // optional
 		Timeout:      time.Second * 30,
 		KeyPsw:       "", // 0 for not timeout
@@ -305,13 +310,13 @@ func (track Track) sftp(filePath string) {
 	lib.CheckError(e)
 	defer client.Close()
 	log.Println("Open local file for reading.:")
-	source, e := os.Open("../tmp/" + filePath)
+	source, e := os.Open(localBasePath + filePath)
 	lib.CheckError(e)
 	//defer source.Close()
 	log.Println("Create remote file for writing:")
 	// Create remote file for writing.
-	lib.Files("../tmp")
-	destination, e := client.Create("To_CLP/" + filePath)
+	lib.Files(localBasePath)
+	destination, e := client.Create( track.FtpConfig.Path+"/" + filePath)
 	lib.CheckError(e)
 	defer destination.Close()
 	log.Println("Upload local file to a remote location as in 1MB (byte) chunks.")
