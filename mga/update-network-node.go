@@ -32,6 +32,11 @@ func UpdateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 		return "", "", err
 	}
 
+	if err := network.TestNetworkNodeUniqueness(inputNode.Code); err != nil {
+		log.Printf("error validating node code: %s", err)
+		return "", "", err
+	}
+
 	inputNode.Normalize()
 
 	err = network.UpdateNode(inputNode)

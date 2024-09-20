@@ -33,8 +33,11 @@ func CreateNetworkNodeFx(w http.ResponseWriter, r *http.Request) (string, interf
 		return "", "", err
 	}
 	// TODO: check node.Type in warrant.AllowedTypes
-	// TODO: check unique node.Code
 	// TODO: check unique companyCode for company
+	if err := network.TestNetworkNodeUniqueness(inputNode.Code); err != nil {
+		log.Printf("error validating node code: %s", err)
+		return "", "", err
+	}
 
 	log.Println("creating network node into Firestore...")
 
