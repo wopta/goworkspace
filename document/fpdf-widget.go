@@ -262,13 +262,17 @@ func woptaFooter(pdf *fpdf.Fpdf) {
 	})
 }
 
-func globalHeader(pdf *fpdf.Fpdf) {
+func globalHeader(pdf *fpdf.Fpdf, isProposal bool) {
 	pdf.SetHeaderFunc(func() {
 		var opt fpdf.ImageOptions
 		pdf.SetXY(-30, 7)
 		opt.ImageType = "png"
 		pdf.ImageOptions(lib.GetAssetPathByEnvV2()+"logo_global_02.png", 180, 7, 0, 15, false, opt, 0, "")
 		pdf.Ln(17)
+
+		if isProposal {
+			insertWatermark(pdf, proposal)
+		}
 	})
 }
 

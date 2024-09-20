@@ -60,7 +60,7 @@ func personaGlobalContractV1(pdf *fpdf.Fpdf, policy *models.Policy, networkNode 
 
 	generatePolicyAnnex(pdf, "", networkNode, policy)
 
-	globalHeader(pdf)
+	globalHeader(pdf, false)
 
 	pdf.AddPage()
 
@@ -150,6 +150,10 @@ func personaMainHeaderV1(pdf *fpdf.Fpdf, policy *models.Policy, networkNode *mod
 		pdf.SetXY(-95, pdf.GetY()+3)
 		pdf.MultiCell(0, 3.5, contractorInfo, "", "", false)
 		pdf.Ln(5)
+
+		if isProposal {
+			insertWatermark(pdf, proposal)
+		}
 	})
 }
 
