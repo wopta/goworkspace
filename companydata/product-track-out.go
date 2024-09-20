@@ -169,8 +169,8 @@ func (track Track) policyAssetRow(policy *models.Policy, event []Column) [][]str
 	var (
 		json_data interface{}
 		result    [][]string
-		cells     []string
-		err       error
+
+		err error
 	)
 	log.Println("policyAssetRow")
 	b, err := json.Marshal(policy)
@@ -180,6 +180,7 @@ func (track Track) policyAssetRow(policy *models.Policy, event []Column) [][]str
 	for indexAsset, asset := range policy.Assets {
 		for indexG, _ := range asset.Guarantees {
 			log.Println("index Guarantees: ", indexG)
+			var cells []string
 			for i, column := range event {
 				log.Println("index event: ", i)
 				var resPaths []interface{}
