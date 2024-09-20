@@ -1,9 +1,11 @@
 package reserved
 
 import (
+	"errors"
 	"log"
 	"math"
 
+	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -19,10 +21,20 @@ func personaReserved(policy *models.Policy) (bool, *models.ReservedInfo) {
 
 	isReserved := false
 
-	voidPolicy := len(policy.Assets) == 0 || policy.Assets[0].Person == nil
-	voidData := policy.Assets[0].Person.Weight == 0 || policy.Assets[0].Person.Height == 0
-	if voidPolicy || voidData {
+	voidPolicy := len(policy.Assets) == 0 || policy.Assets[0].Person == nil || policy.Assets[0].Guarantees == nil
+	if voidPolicy {
 		return isReserved, reservedInfo
+	}
+
+	hasIpm := policy.HasGuarantee("IPM")
+	if !hasIpm {
+		return isReserved, reservedInfo
+	}
+	
+	// TODO: fix me - we should return an error instead of panicking
+	voidData := policy.Assets[0].Person.Weight == 0 || policy.Assets[0].Person.Height == 0
+	if voidData {
+		lib.CheckError(errors.New("invalid data"))
 	}
 
 	_, isOutOfRange := checkOutOfRangeBMI(policy.Assets[0].Person.Weight, policy.Assets[0].Person.Height)
