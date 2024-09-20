@@ -19,9 +19,14 @@ func personaReserved(policy *models.Policy) (bool, *models.ReservedInfo) {
 
 	isReserved := false
 
-	voidPolicy := len(policy.Assets) == 0 || policy.Assets[0].Person == nil
+	voidPolicy := len(policy.Assets) == 0 || policy.Assets[0].Person == nil || policy.Assets[0].Guarantees == nil
+	if voidPolicy || !policy.HasGuarantee("IPM") {
+		return isReserved, reservedInfo
+	}
+
 	voidData := policy.Assets[0].Person.Weight == 0 || policy.Assets[0].Person.Height == 0
-	if voidPolicy || voidData {
+	if voidData {
+		isReserved = true
 		return isReserved, reservedInfo
 	}
 
