@@ -23,12 +23,14 @@ func UpdatePolicy(policy *models.Policy) map[string]interface{} {
 		input["offerName"] = policy.OfferlName
 	}
 
-	input["taxAmount"] = policy.TaxAmount         
-	input["priceNett"] = policy.PriceNett         
-	input["priceGross"] = policy.PriceGross        
-	input["taxAmountMonthly"] = policy.TaxAmountMonthly  
-	input["priceNettMonthly"] = policy.PriceNettMonthly  
-	input["priceGrossMonthly"] = policy.PriceGrossMonthly 
+	if policy.Name == models.PersonaProduct {
+		input["taxAmount"] = policy.TaxAmount         
+		input["priceNett"] = policy.PriceNett         
+		input["priceGross"] = policy.PriceGross        
+		input["taxAmountMonthly"] = policy.TaxAmountMonthly  
+		input["priceNettMonthly"] = policy.PriceNettMonthly  
+		input["priceGrossMonthly"] = policy.PriceGrossMonthly 
+	}
 
 	input["updated"] = time.Now().UTC()
 
