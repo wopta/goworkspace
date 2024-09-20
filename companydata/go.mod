@@ -17,7 +17,7 @@ require (
 	github.com/wopta/goworkspace/lib v1.0.128
 	github.com/wopta/goworkspace/mail v1.0.120
 	github.com/wopta/goworkspace/models v1.2.11
-	github.com/wopta/goworkspace/network v1.0.72
+	github.com/wopta/goworkspace/network v1.0.73
 	github.com/wopta/goworkspace/product v1.1.7
 	github.com/wopta/goworkspace/user v1.0.105
 	github.com/xuri/excelize/v2 v2.8.1
