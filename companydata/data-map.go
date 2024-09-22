@@ -11,7 +11,6 @@ import (
 	"github.com/go-gota/gota/dataframe"
 	"github.com/go-gota/gota/series"
 	lib "github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
 )
 
 type fn func([]interface{}) interface{}
@@ -68,8 +67,8 @@ func mapWorkCodeGlobal(s []interface{}) interface{} {
 
 	df := lib.CsvToDataframe(works)
 	fil := df.Filter(
-		dataframe.F{Colidx: 1, Colname: "Settore", Comparator: series.Eq, Comparando: s[0].(models.User).WorkType},
-		dataframe.F{Colidx: 2, Colname: "Tipo", Comparator: series.Eq, Comparando: "Lavoratore " + s[0].(models.User).Work},
+		dataframe.F{Colidx: 1, Colname: "Settore", Comparator: series.Eq, Comparando: s[0].(map[string]interface{})["workType"]},
+		dataframe.F{Colidx: 2, Colname: "Tipo", Comparator: series.Eq, Comparando: "Lavoratore " + s[0].(map[string]interface{})["work"].(string)},
 	)
 	if fil.Nrow() > 0 {
 		res = fil.Elem(0, 0).String()
