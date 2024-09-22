@@ -329,7 +329,7 @@ func (track Track) sftp(filePath string) {
 	lib.CheckError(e)
 
 }
-func (track Track) sendMail(filename string) {
+func (track *Track) sendMail(filename string) {
 	var contentType string
 	source, _ := os.ReadFile("../tmp/" + filename)
 	if track.Type == "csv" {
