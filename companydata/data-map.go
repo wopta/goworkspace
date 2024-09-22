@@ -64,7 +64,7 @@ func formatSplitPaymentNumber(s []interface{}) interface{} {
 func mapWorkCodeGlobal(s []interface{}) interface{} {
 	var res string
 
-	works := lib.GetFilesByEnv("enrich/works-code-global.csv")
+	works := lib.GetFilesByEnv("enrich/work-code-global.csv")
 
 	df := lib.CsvToDataframe(works)
 	fil := df.Filter(
