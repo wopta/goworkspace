@@ -221,12 +221,12 @@ func (track Track) upload(filePath string) {
 }
 func checkMap(column Column, value []interface{}) interface{} {
 	var res interface{}
+	res = value
 	log.Println("column.MapFx: ", column.MapFx)
 	if column.MapFx != "" {
 		res = GetMapFx(column.MapFx, value)
 	}
 	if column.MapStatic != nil && value[0] != nil {
-
 		res = column.MapStatic[value[0].(string)]
 	}
 	if res == nil {
