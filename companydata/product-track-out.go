@@ -68,21 +68,20 @@ func ProductTrackOutFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		result = procuctTrack.TransactionProductTrack(transactions, event)
 	}
 
-	filename := procuctTrack.saveFile(result, from, to, now)
+	filename, byteArray := procuctTrack.saveFile(result, from, to, now)
 
 	if upload {
 		procuctTrack.upload(filename)
 	}
 	if procuctTrack.SendMail {
-		procuctTrack.sendMail(filename)
+		procuctTrack.sendMail(filename, byteArray)
 	}
 	return "", nil, e
 }
 func (track Track) PolicyProductTrack(policies []models.Policy, event []Column) [][]string {
 	var (
 		result [][]string
-
-		err error
+		err    error
 	)
 
 	for _, policy := range policies {
@@ -141,8 +140,8 @@ func (track Track) TransactionProductTrack(transactions []models.Transaction, ev
 	lib.CheckError(err)
 	return result
 }
-func (track Track) saveFile(matrix [][]string, from time.Time, to time.Time, now time.Time) string {
-
+func (track Track) saveFile(matrix [][]string, from time.Time, to time.Time, now time.Time) (string, []byte) {
+	var byteArray []byte
 	filename := stringTimeToken(track.FileName, from, to, now)
 	filepath := "track/" + track.Name + "/" + strconv.Itoa(from.Year()) + "/" + filename
 	log.Println("filepath: ", filepath)
@@ -155,14 +154,14 @@ func (track Track) saveFile(matrix [][]string, from time.Time, to time.Time, now
 		lib.CheckError(e)
 		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filepath, source)
 	case "excel":
-		excel, e := CreateExcel(matrix, localBasePath+filename, track.ExcelConfig.SheetName)
+		byteArray, e := CreateExcel(matrix, localBasePath+filename, track.ExcelConfig.SheetName)
 		lib.CheckError(e)
 		//source, e := os.ReadFile(localBasePath + filename)
 		lib.CheckError(e)
-		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filepath, excel)
+		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filepath, byteArray)
 
 	}
-	return filepath
+	return filename, byteArray
 }
 
 func (track Track) policyAssetRow(policy *models.Policy, event []Column) [][]string {
@@ -187,7 +186,6 @@ func (track Track) policyAssetRow(policy *models.Policy, event []Column) [][]str
 				for _, value := range column.Values {
 					log.Println("column value", value)
 					if strings.Contains(value, "$.") {
-
 						value = strings.Replace(value, "guarantees[*]", "guarantees["+strconv.Itoa(indexG)+"]", 1)
 						value = strings.Replace(value, "assets[*]", "assets["+strconv.Itoa(indexAsset)+"]", 1)
 						resPath, err := jsonpath.JsonPathLookup(json_data, value)
@@ -329,9 +327,15 @@ func (track Track) sftp(filePath string) {
 	lib.CheckError(e)
 
 }
-func (track *Track) sendMail(filename string) {
+func (track *Track) sendMail(filename string, byteArray []byte) {
+	log.Println("sendMail: ")
+	var source []byte
 	var contentType string
-	source, _ := os.ReadFile("../tmp/" + filename)
+	if byteArray != nil {
+		source = byteArray
+	} else {
+		source, _ = os.ReadFile("../tmp/" + filename)
+	}
 	if track.Type == "csv" {
 		contentType = "text/csv"
 	}
