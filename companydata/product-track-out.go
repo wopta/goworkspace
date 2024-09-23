@@ -221,7 +221,7 @@ func (track Track) upload(filePath string) {
 }
 func checkMap(column Column, value []interface{}) interface{} {
 	var res interface{}
-	res = value
+	res = value[0]
 	log.Println("column.MapFx: ", column.MapFx)
 	if column.MapFx != "" {
 		res = GetMapFx(column.MapFx, value)
@@ -291,7 +291,32 @@ func firestoreQuery[T any](from time.Time, to time.Time, db Database) []T {
 	lib.CheckError(e)
 	return res
 }
+func BigQuery[T any](from time.Time, to time.Time, db Database) []T {
+	var value interface{}
+	firequery := lib.FireGenericQueries[T]{
+		Queries: []lib.Firequery{},
+	}
 
+	for _, qe := range db.Query {
+		value = qe.QueryValue
+		if qe.QueryValue == "from" {
+			value = from
+		}
+		if qe.QueryValue == "to" {
+			value = to
+		}
+
+		firequery.Queries = append(firequery.Queries,
+			lib.Firequery{
+				Field:      qe.Field,    //
+				Operator:   qe.Operator, //
+				QueryValue: value,
+			})
+	}
+	res, _, e := firequery.FireQueryUid(db.Dataset)
+	lib.CheckError(e)
+	return res
+}
 func stringTimeToken(filename string, from time.Time, to time.Time, now time.Time) string {
 	filename = strings.Replace(filename, "fdd", fmt.Sprintf("%02d", from.Day()), 1)
 	filename = strings.Replace(filename, "fmm", fmt.Sprintf("%02d", int(from.Month())), 1)
