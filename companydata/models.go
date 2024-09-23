@@ -55,6 +55,7 @@ type ExcelConfig struct {
 type Database struct {
 	Dataset    string  `firestore:"dataset,omitempty" json:"dataset,omitempty"`
 	Name       string  `firestore:"name,omitempty" json:"name,omitempty"`
+	BigQuery   string  `firestore:"bigQuery,omitempty" json:"bigQuery,omitempty"`
 	Query      []Query `firestore:"query,omitempty" json:"query,omitempty"`
 	RelDataset string  `firestore:"relDataset,omitempty" json:"relDataset,omitempty"`
 	RelField   string  `firestore:"relField,omitempty" json:"relField,omitempty"`

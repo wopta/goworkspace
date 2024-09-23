@@ -201,7 +201,7 @@ func (track Track) policyAssetRow(policy *models.Policy, event []Column) [][]str
 
 				}
 				resdata := checkMap(column, resPaths)
-				cells = append(cells, resdata.(string))
+				cells = append(cells, checkType(resdata))
 
 			}
 			result = append(result, cells)
@@ -405,6 +405,21 @@ func (track *Track) makeHeader(event []Column, data [][]string, hasHeader bool) 
 		res = append(header, data...)
 	} else {
 		res = data
+	}
+	return res
+}
+func checkType(i interface{}) string {
+
+	var res string
+	switch v := i.(type) {
+	case int:
+		res = strconv.Itoa(i.(int))
+	case string:
+		res = i.(string)
+	case float64:
+		res = fmt.Sprint(i.(float64))
+	default:
+		fmt.Printf("I don't know about type %T!\n", v)
 	}
 	return res
 }
