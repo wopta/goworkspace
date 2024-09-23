@@ -33,6 +33,11 @@ func Execute(node *models.NetworkNode, policy models.Policy, rawAction internal.
 		return
 	}
 
+	if client == nil {
+		log.Println("client not found")
+		return
+	}
+
 	actions := client.DecodeAction(rawAction)
 
 	for _, action := range actions {

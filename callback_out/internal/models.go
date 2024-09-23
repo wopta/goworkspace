@@ -17,3 +17,8 @@ var (
 	Emit            CallbackoutAction = "Emit"
 	Paid            CallbackoutAction = "Paid"
 )
+
+type CallbackExternalConfig struct {
+	Events   map[string]bool `json:"events"`
+	AuthType string          `json:"authType"` // basic, api-key
+}

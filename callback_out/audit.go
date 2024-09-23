@@ -27,20 +27,29 @@ type auditSchema struct {
 }
 
 func saveAudit(node *models.NetworkNode, action internal.CallbackoutAction, res internal.CallbackInfo) {
-	var audit auditSchema
-
-	resBody, _ := io.ReadAll(res.Response.Body)
-	defer res.Response.Body.Close()
+	var (
+		audit   auditSchema
+		resBody []byte
+	)
 
 	audit.CreationDate = lib.GetBigQueryNullDateTime(time.Now().UTC())
 	audit.Client = node.CallbackConfig.Name
 	audit.NodeUid = node.Uid
 	audit.Action = action
-	audit.ReqMethod = res.Request.Method
-	audit.ReqPath = res.Request.Host + res.Request.URL.RequestURI()
+
 	audit.ReqBody = string(res.RequestBody)
-	audit.ResStatusCode = res.Response.StatusCode
-	audit.ResBody = string(resBody)
+	if res.Request != nil {
+		audit.ReqMethod = res.Request.Method
+		audit.ReqPath = res.Request.Host + res.Request.URL.RequestURI()
+	}
+
+	if res.Response != nil {
+		resBody, _ = io.ReadAll(res.Response.Body)
+		defer res.Response.Body.Close()
+		audit.ResStatusCode = res.Response.StatusCode
+		audit.ResBody = string(resBody)
+	}
+
 	if res.Error != nil {
 		audit.Error = res.Error.Error()
 	}
