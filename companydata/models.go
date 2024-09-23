@@ -12,6 +12,7 @@ type Track struct {
 	Name        string      `firestore:"name,omitempty" json:"name,omitempty"`
 	Frequency   string      `firestore:"frequency,omitempty" json:"frequency,omitempty"`
 	Type        string      `firestore:"type,omitempty" json:"type"`
+	HasHeader   bool        `firestore:"hasHeader" json:"hasHeader"`
 	UploadType  string      `firestore:"uploadType,omitempty" json:"uploadType,omitempty"`
 	Emit        Event       `firestore:"emit,omitempty" json:"emit,omitempty"`
 	FileName    string      `firestore:"fileName,omitempty" json:"fileName,omitempty"`
@@ -43,11 +44,13 @@ type CsvConfig struct {
 	FileNameFx string `firestore:"fileNameFx,omitempty" json:"fileNameFx,omitempty"`
 	Extension  string `firestore:"extension,omitempty" json:"extension,omitempty"`
 	Separator  string `firestore:"separator,omitempty" json:"separator,omitempty"`
+	HasHeader  bool   `firestore:"hasHeader" json:"hasHeader"`
 }
 type ExcelConfig struct {
 	FileNameFx string `firestore:"fileNameFx,omitempty" json:"fileNameFx,omitempty"`
 	Extension  string `firestore:"extension,omitempty" json:"extension,omitempty"`
 	SheetName  string `firestore:"sheetName,omitempty" json:"sheetName,omitempty"`
+	HasHeader  bool   `firestore:"hasHeader" json:"hasHeader"`
 }
 type Database struct {
 	Dataset    string  `firestore:"dataset,omitempty" json:"dataset,omitempty"`

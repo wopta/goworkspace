@@ -67,7 +67,7 @@ func ProductTrackOutFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		transactions = query[models.Transaction](from, to, db)
 		result = procuctTrack.TransactionProductTrack(transactions, event)
 	}
-
+	result = procuctTrack.makeHeader(event, result, procuctTrack.HasHeader)
 	filename, byteArray := procuctTrack.saveFile(result, from, to, now)
 
 	if upload {
@@ -147,6 +147,7 @@ func (track Track) saveFile(matrix [][]string, from time.Time, to time.Time, now
 	log.Println("filepath: ", filepath)
 	switch track.Type {
 	case "csv":
+
 		sep := []rune(track.CsvConfig.Separator)
 		e := lib.WriteCsv(localBasePath+filename, matrix, sep[0])
 		lib.CheckError(e)
@@ -183,8 +184,10 @@ func (track Track) policyAssetRow(policy *models.Policy, event []Column) [][]str
 			for i, column := range event {
 				log.Println("index event: ", i)
 				var resPaths []interface{}
+
 				for _, value := range column.Values {
 					log.Println("column value", value)
+
 					if strings.Contains(value, "$.") {
 						value = strings.Replace(value, "guarantees[*]", "guarantees["+strconv.Itoa(indexG)+"]", 1)
 						value = strings.Replace(value, "assets[*]", "assets["+strconv.Itoa(indexAsset)+"]", 1)
@@ -192,7 +195,10 @@ func (track Track) policyAssetRow(policy *models.Policy, event []Column) [][]str
 						resPaths = append(resPaths, resPath)
 						log.Println(err)
 						log.Println(resPath)
+					} else {
+						resPaths = append(resPaths, value)
 					}
+
 				}
 				resdata := checkMap(column, resPaths)
 				cells = append(cells, resdata.(string))
@@ -360,4 +366,20 @@ func (track *Track) sendMail(filename string, byteArray []byte) {
 		IsAttachment: true,
 		Attachments:  at,
 	})
+}
+func (track *Track) makeHeader(event []Column, data [][]string, hasHeader bool) [][]string {
+
+	var res [][]string
+	var header [][]string
+	var row []string
+	if hasHeader {
+		for _, colums := range event {
+			row = append(row, colums.Name)
+		}
+		header = append(res, row)
+		res = append(header, data...)
+	} else {
+		res = data
+	}
+	return res
 }
