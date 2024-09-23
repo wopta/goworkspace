@@ -102,6 +102,7 @@ func getRequestData(req []byte) (time.Time, bool) {
 		now = date
 		upload = obj.Upload
 	}
+	log.Println("end CreateExcel")
 	return now, upload
 }
 func getCompanyDataReq(req []byte) (time.Time, bool, DataReq) {
