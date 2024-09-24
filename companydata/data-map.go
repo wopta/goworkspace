@@ -23,6 +23,8 @@ func GetMapFx(name string, value []interface{}) interface{} {
 		"formatISO8601toDDMMYYYYSlash": formatISO8601toDDMMYYYYSlash,
 		"mapWorkCodeGlobal":            mapWorkCodeGlobal,
 		"combineValuesWithSpace":       combineValuesWithSpace,
+		"getNextPayDate":               getNextPayDate,
+		"getNextPayRate":               getNextPayRate,
 	}
 	return res[name](value)
 }
@@ -61,14 +63,15 @@ func formatSplitPaymentNumber(s []interface{}) interface{} {
 	return res
 }
 func mapWorkCodeGlobal(s []interface{}) interface{} {
+	log.Println("mapWorkCodeGlobal worktype: ", s[0].(map[string]interface{})["work"])
 	var res string
 
 	works := lib.GetFilesByEnv("enrich/work-code-global.csv")
 
 	df := lib.CsvToDataframe(works)
 	fil := df.Filter(
-		dataframe.F{Colidx: 1, Colname: "Settore", Comparator: series.Eq, Comparando: s[0].(map[string]interface{})["workType"]},
-		dataframe.F{Colidx: 2, Colname: "Tipo", Comparator: series.Eq, Comparando: "Lavoratore " + s[0].(map[string]interface{})["work"].(string)},
+		dataframe.F{Colidx: 1, Colname: "Settore", Comparator: series.Eq, Comparando: s[0].(map[string]interface{})["work"]},
+		dataframe.F{Colidx: 2, Colname: "Tipo", Comparator: series.Eq, Comparando: "Lavoratore " + s[0].(map[string]interface{})["workType"].(string)},
 	)
 	if fil.Nrow() > 0 {
 		res = fil.Elem(0, 0).String()
@@ -82,7 +85,7 @@ func combineValuesWithSpace(s []interface{}) interface{} {
 	}
 	return res
 }
-func getNextPayRate(s []interface{}) interface{} {
+func getNextPayDate(s []interface{}) interface{} {
 	var (
 		res     string
 		resTime time.Time
@@ -100,5 +103,19 @@ func getNextPayRate(s []interface{}) interface{} {
 		resTime = parseTime
 	}
 	res = resTime.Format("02/01/2006")
+	return res
+}
+func getNextPayRate(s []interface{}) interface{} {
+	var (
+		res interface{}
+	)
+
+	if s[1].(string) == "monthly" {
+		res = s[0].(map[string]interface{})["premiumGrossMonthly"]
+
+	} else {
+		res = s[0].(map[string]interface{})["premiumGrossYearly"]
+	}
+
 	return res
 }
