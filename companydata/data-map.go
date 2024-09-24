@@ -25,6 +25,7 @@ func GetMapFx(name string, value []interface{}) interface{} {
 		"combineValuesWithSpace":       combineValuesWithSpace,
 		"getNextPayDate":               getNextPayDate,
 		"getNextPayRate":               getNextPayRate,
+		"ifZeroEmpty":                  ifZeroEmpty,
 	}
 	return res[name](value)
 }
@@ -70,9 +71,11 @@ func mapWorkCodeGlobal(s []interface{}) interface{} {
 
 	df := lib.CsvToDataframe(works)
 	fil := df.Filter(
-		dataframe.F{Colidx: 1, Colname: "Settore", Comparator: series.Eq, Comparando: s[0].(map[string]interface{})["work"]},
-		dataframe.F{Colidx: 2, Colname: "Tipo", Comparator: series.Eq, Comparando: "Lavoratore " + s[0].(map[string]interface{})["workType"].(string)},
+		dataframe.F{Colname: "Settore", Comparator: series.Eq, Comparando: "Lavoratore " + s[0].(map[string]interface{})["workType"].(string)},
+		dataframe.F{Colname: "Tipo", Comparator: series.Eq, Comparando: s[0].(map[string]interface{})["work"].(string)},
 	)
+	log.Println("fil.Nrow(): ", fil.Nrow())
+	fmt.Printf("fil: %v\n", fil)
 	if fil.Nrow() > 0 {
 		res = fil.Elem(0, 0).String()
 	}
@@ -91,7 +94,7 @@ func getNextPayDate(s []interface{}) interface{} {
 		resTime time.Time
 	)
 
-	t := s[0].(string) 
+	t := s[0].(string)
 	//2024-09-13T00:00:00Z
 	//RFC3339	“2006-01-02T15:04:05Z07:00”
 	parseTime, err := time.Parse(time.RFC3339, t)
@@ -115,6 +118,21 @@ func getNextPayRate(s []interface{}) interface{} {
 
 	} else {
 		res = s[0].(map[string]interface{})["premiumGrossYearly"]
+	}
+
+	return res
+}
+func ifZeroEmpty(s []interface{}) interface{} {
+	var (
+		res interface{}
+	)
+
+	if s[0] == 0 {
+		res = " "
+
+	} else {
+
+		res = s[0]
 	}
 
 	return res
