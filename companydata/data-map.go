@@ -91,7 +91,7 @@ func getNextPayDate(s []interface{}) interface{} {
 		resTime time.Time
 	)
 
-	t := s[0].(string) + "00:00"
+	t := s[0].(string) 
 	//2024-09-13T00:00:00Z
 	//RFC3339	“2006-01-02T15:04:05Z07:00”
 	parseTime, err := time.Parse(time.RFC3339, t)
