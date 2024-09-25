@@ -84,7 +84,7 @@ func Persona(policy *models.Policy, channel string, networkNode *models.NetworkN
 	}
 
 	policy.StartDate = lib.SetDateToStartOfDay(time.Now().UTC())
-	policy.EndDate = policy.StartDate.AddDate(1, 0, 0)
+	policy.EndDate = lib.AddMonths(policy.StartDate, 12)
 
 	log.Println("[Persona] populating policy guarantees list")
 
@@ -140,8 +140,6 @@ func Persona(policy *models.Policy, channel string, networkNode *models.NetworkN
 
 	roundYearlyOfferPrices(policy, "IPI", "DRG")
 
-	roundOfferPrices(policy.OffersPrices)
-
 	roundToTwoDecimalPlaces(policy)
 
 	log.Println("[Persona] filter by minimum price")
@@ -166,14 +164,14 @@ func initOfferPrices(policy *models.Policy, personProduct *models.Product) {
 
 	for offerKey, _ := range personProduct.Offers {
 		policy.OffersPrices[offerKey] = map[string]*models.Price{
-			"monthly": {
+			string(models.PaySplitMonthly): {
 				Net:      0.0,
 				Tax:      0.0,
 				Gross:    0.0,
 				Delta:    0.0,
 				Discount: 0.0,
 			},
-			"yearly": {
+			string(models.PaySplitYearly): {
 				Net:      0.0,
 				Tax:      0.0,
 				Gross:    0.0,
@@ -194,16 +192,16 @@ func calculateIPIPrices(contractor models.Contractor, guarantee *models.Guarante
 
 	for offerKey, offer := range guarantee.Offer {
 		guarantee.Offer[offerKey].PremiumNetYearly =
-			(offer.SumInsuredLimitOfIndemnity / 1000.0) *
-				tassi[guarantee.Type][contractor.RiskClass][offer.DeductibleType][offer.Deductible]
+			lib.RoundFloat((offer.SumInsuredLimitOfIndemnity/1000.0)*
+				tassi[guarantee.Type][contractor.RiskClass][offer.DeductibleType][offer.Deductible], 2)
 		guarantee.Offer[offerKey].PremiumTaxAmountYearly =
-			(guarantee.Tax * guarantee.Offer[offerKey].PremiumNetYearly) / 100
+			lib.RoundFloat((guarantee.Tax*guarantee.Offer[offerKey].PremiumNetYearly)/100, 2)
 		guarantee.Offer[offerKey].PremiumGrossYearly =
-			guarantee.Offer[offerKey].PremiumTaxAmountYearly + guarantee.Offer[offerKey].PremiumNetYearly
+			lib.RoundFloat(guarantee.Offer[offerKey].PremiumTaxAmountYearly+guarantee.Offer[offerKey].PremiumNetYearly, 2)
 
-		guarantee.Offer[offerKey].PremiumNetMonthly = guarantee.Offer[offerKey].PremiumNetYearly / 12
-		guarantee.Offer[offerKey].PremiumTaxAmountMonthly = guarantee.Offer[offerKey].PremiumTaxAmountYearly / 12
-		guarantee.Offer[offerKey].PremiumGrossMonthly = guarantee.Offer[offerKey].PremiumGrossYearly / 12
+		guarantee.Offer[offerKey].PremiumNetMonthly = lib.RoundFloat(guarantee.Offer[offerKey].PremiumNetYearly/12, 2)
+		guarantee.Offer[offerKey].PremiumTaxAmountMonthly = lib.RoundFloat(guarantee.Offer[offerKey].PremiumTaxAmountYearly/12, 2)
+		guarantee.Offer[offerKey].PremiumGrossMonthly = lib.RoundFloat(guarantee.Offer[offerKey].PremiumGrossYearly/12, 2)
 	}
 
 }
@@ -218,15 +216,15 @@ func calculateDPrices(contractor models.Contractor, guarantee *models.Guarante, 
 
 	for offerKey, offer := range guarantee.Offer {
 		guarantee.Offer[offerKey].PremiumNetYearly =
-			(offer.SumInsuredLimitOfIndemnity / 1000.0) * tassi[guarantee.Type][contractor.RiskClass]
+			lib.RoundFloat((offer.SumInsuredLimitOfIndemnity/1000.0)*tassi[guarantee.Type][contractor.RiskClass], 2)
 		guarantee.Offer[offerKey].PremiumTaxAmountYearly =
-			(guarantee.Tax * guarantee.Offer[offerKey].PremiumNetYearly) / 100
+			lib.RoundFloat((guarantee.Tax*guarantee.Offer[offerKey].PremiumNetYearly)/100, 2)
 		guarantee.Offer[offerKey].PremiumGrossYearly =
-			guarantee.Offer[offerKey].PremiumTaxAmountYearly + guarantee.Offer[offerKey].PremiumNetYearly
+			lib.RoundFloat(guarantee.Offer[offerKey].PremiumTaxAmountYearly+guarantee.Offer[offerKey].PremiumNetYearly, 2)
 
-		guarantee.Offer[offerKey].PremiumNetMonthly = guarantee.Offer[offerKey].PremiumNetYearly / 12
-		guarantee.Offer[offerKey].PremiumTaxAmountMonthly = guarantee.Offer[offerKey].PremiumTaxAmountYearly / 12
-		guarantee.Offer[offerKey].PremiumGrossMonthly = guarantee.Offer[offerKey].PremiumGrossYearly / 12
+		guarantee.Offer[offerKey].PremiumNetMonthly = lib.RoundFloat(guarantee.Offer[offerKey].PremiumNetYearly/12, 2)
+		guarantee.Offer[offerKey].PremiumTaxAmountMonthly = lib.RoundFloat(guarantee.Offer[offerKey].PremiumTaxAmountYearly/12, 2)
+		guarantee.Offer[offerKey].PremiumGrossMonthly = lib.RoundFloat(guarantee.Offer[offerKey].PremiumGrossYearly/12, 2)
 	}
 
 }
@@ -241,15 +239,15 @@ func calculateDRGPrices(contractor models.Contractor, guarantee *models.Guarante
 
 	for offerKey, offer := range guarantee.Offer {
 		guarantee.Offer[offerKey].PremiumNetYearly =
-			offer.SumInsuredLimitOfIndemnity * tassi[guarantee.Type][contractor.RiskClass]
+			lib.RoundFloat(offer.SumInsuredLimitOfIndemnity*tassi[guarantee.Type][contractor.RiskClass], 2)
 		guarantee.Offer[offerKey].PremiumTaxAmountYearly =
-			(guarantee.Tax * guarantee.Offer[offerKey].PremiumNetYearly) / 100
+			lib.RoundFloat((guarantee.Tax*guarantee.Offer[offerKey].PremiumNetYearly)/100, 2)
 		guarantee.Offer[offerKey].PremiumGrossYearly =
-			guarantee.Offer[offerKey].PremiumTaxAmountYearly + guarantee.Offer[offerKey].PremiumNetYearly
+			lib.RoundFloat(guarantee.Offer[offerKey].PremiumTaxAmountYearly+guarantee.Offer[offerKey].PremiumNetYearly, 2)
 
-		guarantee.Offer[offerKey].PremiumNetMonthly = guarantee.Offer[offerKey].PremiumNetYearly / 12
-		guarantee.Offer[offerKey].PremiumTaxAmountMonthly = guarantee.Offer[offerKey].PremiumTaxAmountYearly / 12
-		guarantee.Offer[offerKey].PremiumGrossMonthly = guarantee.Offer[offerKey].PremiumGrossYearly / 12
+		guarantee.Offer[offerKey].PremiumNetMonthly = lib.RoundFloat(guarantee.Offer[offerKey].PremiumNetYearly/12, 2)
+		guarantee.Offer[offerKey].PremiumTaxAmountMonthly = lib.RoundFloat(guarantee.Offer[offerKey].PremiumTaxAmountYearly/12, 2)
+		guarantee.Offer[offerKey].PremiumGrossMonthly = lib.RoundFloat(guarantee.Offer[offerKey].PremiumGrossYearly/12, 2)
 	}
 
 }
@@ -264,15 +262,15 @@ func calculateITIPrices(contractor models.Contractor, guarantee *models.Guarante
 
 	for offerKey, offer := range guarantee.Offer {
 		guarantee.Offer[offerKey].PremiumNetYearly =
-			offer.SumInsuredLimitOfIndemnity * tassi[contractor.RiskClass][guarantee.Offer[offerKey].Deductible]
+			lib.RoundFloat(offer.SumInsuredLimitOfIndemnity*tassi[contractor.RiskClass][guarantee.Offer[offerKey].Deductible], 2)
 		guarantee.Offer[offerKey].PremiumTaxAmountYearly =
-			(guarantee.Tax * guarantee.Offer[offerKey].PremiumNetYearly) / 100
+			lib.RoundFloat((guarantee.Tax*guarantee.Offer[offerKey].PremiumNetYearly)/100, 2)
 		guarantee.Offer[offerKey].PremiumGrossYearly =
-			guarantee.Offer[offerKey].PremiumTaxAmountYearly + guarantee.Offer[offerKey].PremiumNetYearly
+			lib.RoundFloat(guarantee.Offer[offerKey].PremiumTaxAmountYearly+guarantee.Offer[offerKey].PremiumNetYearly, 2)
 
-		guarantee.Offer[offerKey].PremiumNetMonthly = guarantee.Offer[offerKey].PremiumNetYearly / 12
-		guarantee.Offer[offerKey].PremiumTaxAmountMonthly = guarantee.Offer[offerKey].PremiumTaxAmountYearly / 12
-		guarantee.Offer[offerKey].PremiumGrossMonthly = guarantee.Offer[offerKey].PremiumGrossYearly / 12
+		guarantee.Offer[offerKey].PremiumNetMonthly = lib.RoundFloat(guarantee.Offer[offerKey].PremiumNetYearly/12, 2)
+		guarantee.Offer[offerKey].PremiumTaxAmountMonthly = lib.RoundFloat(guarantee.Offer[offerKey].PremiumTaxAmountYearly/12, 2)
+		guarantee.Offer[offerKey].PremiumGrossMonthly = lib.RoundFloat(guarantee.Offer[offerKey].PremiumGrossYearly/12, 2)
 	}
 
 }
@@ -287,15 +285,15 @@ func calculateDCPrices(contractor models.Contractor, guarantee *models.Guarante,
 
 	for offerKey, offer := range guarantee.Offer {
 		guarantee.Offer[offerKey].PremiumNetYearly =
-			offer.SumInsuredLimitOfIndemnity * tassi[guarantee.Type][contractor.RiskClass]
+			lib.RoundFloat(offer.SumInsuredLimitOfIndemnity*tassi[guarantee.Type][contractor.RiskClass], 2)
 		guarantee.Offer[offerKey].PremiumTaxAmountYearly =
-			(guarantee.Tax * guarantee.Offer[offerKey].PremiumNetYearly) / 100
+			lib.RoundFloat((guarantee.Tax*guarantee.Offer[offerKey].PremiumNetYearly)/100, 2)
 		guarantee.Offer[offerKey].PremiumGrossYearly =
-			guarantee.Offer[offerKey].PremiumTaxAmountYearly + guarantee.Offer[offerKey].PremiumNetYearly
+			lib.RoundFloat(guarantee.Offer[offerKey].PremiumTaxAmountYearly+guarantee.Offer[offerKey].PremiumNetYearly, 2)
 
-		guarantee.Offer[offerKey].PremiumNetMonthly = guarantee.Offer[offerKey].PremiumNetYearly / 12
-		guarantee.Offer[offerKey].PremiumTaxAmountMonthly = guarantee.Offer[offerKey].PremiumTaxAmountYearly / 12
-		guarantee.Offer[offerKey].PremiumGrossMonthly = guarantee.Offer[offerKey].PremiumGrossYearly / 12
+		guarantee.Offer[offerKey].PremiumNetMonthly = lib.RoundFloat(guarantee.Offer[offerKey].PremiumNetYearly/12, 2)
+		guarantee.Offer[offerKey].PremiumTaxAmountMonthly = lib.RoundFloat(guarantee.Offer[offerKey].PremiumTaxAmountYearly/12, 2)
+		guarantee.Offer[offerKey].PremiumGrossMonthly = lib.RoundFloat(guarantee.Offer[offerKey].PremiumGrossYearly/12, 2)
 	}
 
 }
@@ -312,15 +310,15 @@ func calculateRSCPrices(contractor models.Contractor, guarantee *models.Guarante
 		strconv.FormatFloat(guarantee.Offer["premium"].SumInsuredLimitOfIndemnity, 'f', -1, 64)
 
 	guarantee.Offer["premium"].PremiumNetYearly =
-		tassi[guarantee.Type][contractor.RiskClass][sumInsuredLimitOfIndemnity]
+		lib.RoundFloat(tassi[guarantee.Type][contractor.RiskClass][sumInsuredLimitOfIndemnity], 2)
 	guarantee.Offer["premium"].PremiumTaxAmountYearly =
-		(guarantee.Tax * guarantee.Offer["premium"].PremiumNetYearly) / 100
+		lib.RoundFloat((guarantee.Tax*guarantee.Offer["premium"].PremiumNetYearly)/100, 2)
 	guarantee.Offer["premium"].PremiumGrossYearly =
-		guarantee.Offer["premium"].PremiumTaxAmountYearly + guarantee.Offer["premium"].PremiumNetYearly
+		lib.RoundFloat(guarantee.Offer["premium"].PremiumTaxAmountYearly+guarantee.Offer["premium"].PremiumNetYearly, 2)
 
-	guarantee.Offer["premium"].PremiumNetMonthly = guarantee.Offer["premium"].PremiumNetYearly / 12
-	guarantee.Offer["premium"].PremiumTaxAmountMonthly = guarantee.Offer["premium"].PremiumTaxAmountYearly / 12
-	guarantee.Offer["premium"].PremiumGrossMonthly = guarantee.Offer["premium"].PremiumGrossYearly / 12
+	guarantee.Offer["premium"].PremiumNetMonthly = lib.RoundFloat(guarantee.Offer["premium"].PremiumNetYearly/12, 2)
+	guarantee.Offer["premium"].PremiumTaxAmountMonthly = lib.RoundFloat(guarantee.Offer["premium"].PremiumTaxAmountYearly/12, 2)
+	guarantee.Offer["premium"].PremiumGrossMonthly = lib.RoundFloat(guarantee.Offer["premium"].PremiumGrossYearly/12, 2)
 
 }
 
@@ -336,15 +334,15 @@ func calculateIPMPrices(contractorAge int, guarantee *models.Guarante, personaTa
 
 	for offerKey, _ := range guarantee.Offer {
 		guarantee.Offer[offerKey].PremiumNetYearly =
-			(guarantee.Offer[offerKey].SumInsuredLimitOfIndemnity / 1000) * tassi[age]
+			lib.RoundFloat((guarantee.Offer[offerKey].SumInsuredLimitOfIndemnity/1000)*tassi[age], 2)
 		guarantee.Offer[offerKey].PremiumTaxAmountYearly =
-			(guarantee.Tax * guarantee.Offer[offerKey].PremiumNetYearly) / 100
-		guarantee.Offer[offerKey].PremiumGrossYearly = guarantee.Offer[offerKey].PremiumTaxAmountYearly +
-			guarantee.Offer[offerKey].PremiumNetYearly
+			lib.RoundFloat((guarantee.Tax*guarantee.Offer[offerKey].PremiumNetYearly)/100, 2)
+		guarantee.Offer[offerKey].PremiumGrossYearly = lib.RoundFloat(guarantee.Offer[offerKey].PremiumTaxAmountYearly+
+			guarantee.Offer[offerKey].PremiumNetYearly, 2)
 
-		guarantee.Offer[offerKey].PremiumNetMonthly = guarantee.Offer[offerKey].PremiumNetYearly / 12
-		guarantee.Offer[offerKey].PremiumTaxAmountMonthly = guarantee.Offer[offerKey].PremiumTaxAmountYearly / 12
-		guarantee.Offer[offerKey].PremiumGrossMonthly = guarantee.Offer[offerKey].PremiumGrossYearly / 12
+		guarantee.Offer[offerKey].PremiumNetMonthly = lib.RoundFloat(guarantee.Offer[offerKey].PremiumNetYearly/12, 2)
+		guarantee.Offer[offerKey].PremiumTaxAmountMonthly = lib.RoundFloat(guarantee.Offer[offerKey].PremiumTaxAmountYearly/12, 2)
+		guarantee.Offer[offerKey].PremiumGrossMonthly = lib.RoundFloat(guarantee.Offer[offerKey].PremiumGrossYearly/12, 2)
 	}
 
 }
@@ -401,37 +399,38 @@ func calculatePersonaOfferPrices(policy *models.Policy) {
 	for offerKey, _ := range policy.OffersPrices {
 		for _, guarantee := range policy.Assets[0].Guarantees {
 			if guarantee.Offer[offerKey] != nil {
-				policy.OffersPrices[offerKey]["monthly"].Net += guarantee.Offer[offerKey].PremiumNetMonthly
-				policy.OffersPrices[offerKey]["monthly"].Tax += guarantee.Offer[offerKey].PremiumTaxAmountMonthly
-				policy.OffersPrices[offerKey]["monthly"].Gross += guarantee.Offer[offerKey].PremiumGrossMonthly
-				policy.OffersPrices[offerKey]["yearly"].Net += guarantee.Offer[offerKey].PremiumNetYearly
-				policy.OffersPrices[offerKey]["yearly"].Tax += guarantee.Offer[offerKey].PremiumTaxAmountYearly
-				policy.OffersPrices[offerKey]["yearly"].Gross += guarantee.Offer[offerKey].PremiumGrossYearly
+				policy.OffersPrices[offerKey][string(models.PaySplitMonthly)].Net = lib.RoundFloat(policy.OffersPrices[offerKey][string(models.PaySplitMonthly)].Net+guarantee.Offer[offerKey].PremiumNetMonthly, 2)
+				policy.OffersPrices[offerKey][string(models.PaySplitMonthly)].Tax = lib.RoundFloat(policy.OffersPrices[offerKey][string(models.PaySplitMonthly)].Tax+guarantee.Offer[offerKey].PremiumTaxAmountMonthly, 2)
+				policy.OffersPrices[offerKey][string(models.PaySplitMonthly)].Gross = lib.RoundFloat(policy.OffersPrices[offerKey][string(models.PaySplitMonthly)].Gross+guarantee.Offer[offerKey].PremiumGrossMonthly, 2)
+				policy.OffersPrices[offerKey][string(models.PaySplitYearly)].Net = lib.RoundFloat(policy.OffersPrices[offerKey][string(models.PaySplitYearly)].Net+guarantee.Offer[offerKey].PremiumNetYearly, 2)
+				policy.OffersPrices[offerKey][string(models.PaySplitYearly)].Tax = lib.RoundFloat(policy.OffersPrices[offerKey][string(models.PaySplitYearly)].Tax+guarantee.Offer[offerKey].PremiumTaxAmountYearly, 2)
+				policy.OffersPrices[offerKey][string(models.PaySplitYearly)].Gross = lib.RoundFloat(policy.OffersPrices[offerKey][string(models.PaySplitYearly)].Gross+guarantee.Offer[offerKey].PremiumGrossYearly, 2)
 			}
 		}
 	}
+
 }
 
 func roundMonthlyOfferPrices(policy *models.Policy, roundingGuarantees ...string) {
 	guarantees := policy.GuaranteesToMap()
 
 	for offerKey, offer := range policy.OffersPrices {
-		nonRoundedGrossPrice := offer["yearly"].Gross
-		roundedMonthlyGrossPrice := math.Round(offer["monthly"].Gross)
+		nonRoundedGrossPrice := offer[string(models.PaySplitYearly)].Gross
+		roundedMonthlyGrossPrice := math.Round(offer[string(models.PaySplitMonthly)].Gross)
 		yearlyGrossPrice := roundedMonthlyGrossPrice * 12
-		offer["monthly"].Delta = (yearlyGrossPrice - nonRoundedGrossPrice) / 12
-		offer["monthly"].Gross = roundedMonthlyGrossPrice
+		offer[string(models.PaySplitMonthly)].Delta = (yearlyGrossPrice - nonRoundedGrossPrice) / 12
+		offer[string(models.PaySplitMonthly)].Gross = roundedMonthlyGrossPrice
 
 		for _, roundingGuarantee := range roundingGuarantees {
 			hasGuarantee := guarantees[roundingGuarantee].Offer[offerKey] != nil &&
 				guarantees[roundingGuarantee].Offer[offerKey].PremiumGrossMonthly > 0
 			if hasGuarantee {
-				guarantees[roundingGuarantee].Offer[offerKey].PremiumGrossMonthly += offer["monthly"].Delta
+				guarantees[roundingGuarantee].Offer[offerKey].PremiumGrossMonthly += offer[string(models.PaySplitMonthly)].Delta
 				newNetPrice := guarantees[roundingGuarantee].Offer[offerKey].PremiumGrossMonthly /
 					(1 + (guarantees[roundingGuarantee].Tax / 100))
 				newTax := guarantees[roundingGuarantee].Offer[offerKey].PremiumGrossMonthly - newNetPrice
-				offer["monthly"].Net += newNetPrice - guarantees[roundingGuarantee].Offer[offerKey].PremiumNetMonthly
-				offer["monthly"].Tax += newTax - guarantees[roundingGuarantee].Offer[offerKey].PremiumTaxAmountMonthly
+				offer[string(models.PaySplitMonthly)].Net += newNetPrice - guarantees[roundingGuarantee].Offer[offerKey].PremiumNetMonthly
+				offer[string(models.PaySplitMonthly)].Tax += newTax - guarantees[roundingGuarantee].Offer[offerKey].PremiumTaxAmountMonthly
 				guarantees[roundingGuarantee].Offer[offerKey].PremiumNetMonthly = newNetPrice
 				guarantees[roundingGuarantee].Offer[offerKey].PremiumTaxAmountMonthly = newTax
 				break
@@ -453,19 +452,19 @@ func roundYearlyOfferPrices(policy *models.Policy, roundingGuarantees ...string)
 	guarantees := policy.GuaranteesToMap()
 
 	for offerKey, offer := range policy.OffersPrices {
-		ceilGrossPrice := math.Ceil(offer["yearly"].Gross)
-		offer["yearly"].Delta = ceilGrossPrice - offer["yearly"].Gross
-		offer["yearly"].Gross = ceilGrossPrice
+		ceilGrossPrice := math.Ceil(offer[string(models.PaySplitYearly)].Gross)
+		offer[string(models.PaySplitYearly)].Delta = ceilGrossPrice - offer[string(models.PaySplitYearly)].Gross
+		offer[string(models.PaySplitYearly)].Gross = ceilGrossPrice
 		for _, roundingCoverage := range roundingGuarantees {
 			hasGuarantee := guarantees[roundingCoverage].Offer[offerKey] != nil &&
 				guarantees[roundingCoverage].Offer[offerKey].PremiumGrossYearly > 0
 			if hasGuarantee {
-				guarantees[roundingCoverage].Offer[offerKey].PremiumGrossYearly += offer["yearly"].Delta
+				guarantees[roundingCoverage].Offer[offerKey].PremiumGrossYearly += offer[string(models.PaySplitYearly)].Delta
 				newNetPrice := guarantees[roundingCoverage].Offer[offerKey].PremiumGrossYearly /
 					(1 + (guarantees[roundingCoverage].Tax / 100))
 				newTax := guarantees[roundingCoverage].Offer[offerKey].PremiumGrossYearly - newNetPrice
-				offer["yearly"].Net += newNetPrice - guarantees[roundingCoverage].Offer[offerKey].PremiumNetYearly
-				offer["yearly"].Tax += newTax - guarantees[roundingCoverage].Offer[offerKey].PremiumTaxAmountYearly
+				offer[string(models.PaySplitYearly)].Net += newNetPrice - guarantees[roundingCoverage].Offer[offerKey].PremiumNetYearly
+				offer[string(models.PaySplitYearly)].Tax += newTax - guarantees[roundingCoverage].Offer[offerKey].PremiumTaxAmountYearly
 				guarantees[roundingCoverage].Offer[offerKey].PremiumNetYearly = newNetPrice
 				guarantees[roundingCoverage].Offer[offerKey].PremiumTaxAmountYearly = newTax
 				break
@@ -517,8 +516,8 @@ func roundToTwoDecimalPlaces(policy *models.Policy) {
 
 func filterOffersByMinimumPrice(policy *models.Policy, yearlyPriceMinimum float64, monthlyPriceMinimum float64) {
 	for offerKey, offer := range policy.OffersPrices {
-		hasNotOfferMinimumYearlyPrice := offer["yearly"].Gross < yearlyPriceMinimum
-		hasNotOfferMinimumMonthlyPrice := offer["monthly"].Gross < monthlyPriceMinimum
+		hasNotOfferMinimumYearlyPrice := offer[string(models.PaySplitYearly)].Gross < yearlyPriceMinimum
+		hasNotOfferMinimumMonthlyPrice := offer[string(models.PaySplitMonthly)].Gross < monthlyPriceMinimum
 		if hasNotOfferMinimumMonthlyPrice && hasNotOfferMinimumYearlyPrice {
 			delete(policy.OffersPrices, offerKey)
 			for guaranteeIndex, _ := range policy.Assets[0].Guarantees {
@@ -527,7 +526,7 @@ func filterOffersByMinimumPrice(policy *models.Policy, yearlyPriceMinimum float6
 			continue
 		}
 		if hasNotOfferMinimumMonthlyPrice {
-			delete(policy.OffersPrices[offerKey], "monthly")
+			delete(policy.OffersPrices[offerKey], string(models.PaySplitMonthly))
 			for guaranteeIndex, _ := range policy.Assets[0].Guarantees {
 				if policy.Assets[0].Guarantees[guaranteeIndex].Offer[offerKey] != nil {
 					policy.Assets[0].Guarantees[guaranteeIndex].Offer[offerKey].PremiumNetMonthly = 0.0
@@ -537,7 +536,7 @@ func filterOffersByMinimumPrice(policy *models.Policy, yearlyPriceMinimum float6
 			}
 		}
 		if hasNotOfferMinimumYearlyPrice {
-			delete(policy.OffersPrices[offerKey], "yearly")
+			delete(policy.OffersPrices[offerKey], string(models.PaySplitYearly))
 			for guaranteeIndex, _ := range policy.Assets[0].Guarantees {
 				if policy.Assets[0].Guarantees[guaranteeIndex].Offer[offerKey] != nil {
 					policy.Assets[0].Guarantees[guaranteeIndex].Offer[offerKey].PremiumNetMonthly = 0.0
