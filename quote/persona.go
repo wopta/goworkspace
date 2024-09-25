@@ -7,6 +7,7 @@ import (
 	"log"
 	"math"
 	"net/http"
+	"slices"
 	"strconv"
 	"time"
 
@@ -143,7 +144,11 @@ func Persona(policy *models.Policy, channel string, networkNode *models.NetworkN
 
 	log.Println("[Persona] filter by minimum price")
 
-	filterOffersByMinimumPrice(policy, 120.0, 30.0)
+	companyIdx := slices.IndexFunc(personProduct.Companies, func(c models.Company) bool {
+		return c.Name == policy.Company
+	})
+
+	filterOffersByMinimumPrice(policy, personProduct.Companies[companyIdx].MinimumYearlyPrice, personProduct.Companies[companyIdx].MinimumMonthlyPrice)\
 
 	log.Println("[Persona] filtering available rates")
 

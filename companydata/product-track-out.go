@@ -187,10 +187,10 @@ func (track Track) policyAssetRow(policy *models.Policy, event []Column) [][]str
 
 				for _, value := range column.Values {
 					log.Println("column value", value)
-
 					if strings.Contains(value, "$.") {
 						value = strings.Replace(value, "guarantees[*]", "guarantees["+strconv.Itoa(indexG)+"]", 1)
 						value = strings.Replace(value, "assets[*]", "assets["+strconv.Itoa(indexAsset)+"]", 1)
+						log.Println("column value guarantee: ", value)
 						resPath, err := jsonpath.JsonPathLookup(json_data, value)
 						resPaths = append(resPaths, resPath)
 						log.Println(err)
@@ -214,7 +214,6 @@ func (track Track) policyAssetRow(policy *models.Policy, event []Column) [][]str
 func (track Track) upload(filePath string) {
 	switch track.UploadType {
 	case "sftp":
-
 		track.sftp(filePath)
 	}
 

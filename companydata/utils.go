@@ -68,7 +68,6 @@ func CreateExcel(sheet [][]string, filePath string, sheetname string) ([]byte, e
 		"BA", "BB", "BC", "BD", "BE", "BF", "BG", "BH", "BI", "BJ", "BK", "BL", "BM", "BN", "BO", "BP", "BQ", "BR", "BS", "BT", "BU", "BV", "BW", "BX", "BY", "BZ"}
 	// Create a new sheet.
 
-	f.DeleteSheet("Sheet1")
 	index, err := f.NewSheet(sheetname)
 	lib.CheckError(err)
 	for x, row := range sheet {
@@ -78,7 +77,8 @@ func CreateExcel(sheet [][]string, filePath string, sheetname string) ([]byte, e
 	}
 	//Set active sheet of the workbook.
 	f.SetActiveSheet(index)
-
+	err = f.DeleteSheet("Sheet1")
+	lib.CheckError(err)
 	//Save spreadsheet by the given path.
 	err = f.SaveAs(filePath)
 	lib.CheckError(err)
