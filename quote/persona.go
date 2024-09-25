@@ -148,7 +148,7 @@ func Persona(policy *models.Policy, channel string, networkNode *models.NetworkN
 		return c.Name == policy.Company
 	})
 
-	filterOffersByMinimumPrice(policy, personProduct.Companies[companyIdx].MinimumYearlyPrice, personProduct.Companies[companyIdx].MinimumMonthlyPrice)\
+	filterOffersByMinimumPrice(policy, personProduct.Companies[companyIdx].MinimumYearlyPrice, personProduct.Companies[companyIdx].MinimumMonthlyPrice)
 
 	log.Println("[Persona] filtering available rates")
 
