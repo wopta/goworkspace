@@ -26,7 +26,7 @@ func ProductTrackOutFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		from          time.Time
 		to            time.Time
 		procuctTrack  Track
-		result        [][]string
+	
 		event         []Column
 		db            Database
 		policies      []models.Policy
@@ -44,7 +44,9 @@ func ProductTrackOutFx(w http.ResponseWriter, r *http.Request) (string, interfac
 	err := json.Unmarshal(procuctTrackByte, &procuctTrack)
 	lib.CheckError(err)
 	log.Println("Product track: ", procuctTrack)
+	from, to = procuctTrack.frequency(now)
 	for _, ev := range reqData.Event {
+		var result        [][]string
 		log.Println("start len(result): ", len(result))
 		switch ev {
 
@@ -63,7 +65,7 @@ func ProductTrackOutFx(w http.ResponseWriter, r *http.Request) (string, interfac
 
 		}
 
-		from, to = procuctTrack.frequency(now)
+	
 		switch db.Dataset {
 		case "policy":
 			policies = query[models.Policy](from, to, db)
