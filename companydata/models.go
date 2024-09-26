@@ -6,7 +6,7 @@ type DataReq struct {
 	Day    string `firestore:"-" json:"day,omitempty" bigquery:"-"`
 	Upload bool   `firestore:"-" json:"upload,omitempty" bigquery:"-"`
 	Name   string `firestore:"name,omitempty" json:"name,omitempty"`
-	Event  string `firestore:"event,omitempty" json:"event,omitempty"`
+	Event  []string `firestore:"event,omitempty" json:"event,omitempty"`
 }
 type Track struct {
 	Name        string      `firestore:"name,omitempty" json:"name,omitempty"`
@@ -66,8 +66,10 @@ type Query struct {
 	QueryValue interface{} `firestore:"queryValue,omitempty" json:"queryValue,omitempty"`
 }
 type Event struct {
-	Event    []Column `firestore:"event,omitempty" json:"event,omitempty"`
-	Database Database `firestore:"database,omitempty" json:"database,omitempty"`
+	Event      []Column `firestore:"event,omitempty" json:"event,omitempty"`
+	Database   Database `firestore:"database,omitempty" json:"database,omitempty"`
+	FileName   string   `firestore:"fileName,omitempty" json:"fileName,omitempty"`
+	FileNameFx string   `firestore:"fileNameFx,omitempty" json:"fileNameFx,omitempty"`
 }
 type SftpConfig struct {
 	Username     string   `firestore:"username,omitempty" json:"username,omitempty"`

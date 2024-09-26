@@ -23,14 +23,15 @@ const localBasePath = "../tmp/"
 
 func ProductTrackOutFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		from         time.Time
-		to           time.Time
-		procuctTrack Track
-		result       [][]string
-		event        []Column
-		db           Database
-		policies     []models.Policy
-		transactions []models.Transaction
+		from          time.Time
+		to            time.Time
+		procuctTrack  Track
+		result        [][]string
+		event         []Column
+		db            Database
+		policies      []models.Policy
+		transactions  []models.Transaction
+		eventFilename string
 	)
 	log.SetPrefix("ProductTrackOutFx ")
 	req := lib.ErrorByte(io.ReadAll(r.Body))
@@ -43,38 +44,45 @@ func ProductTrackOutFx(w http.ResponseWriter, r *http.Request) (string, interfac
 	err := json.Unmarshal(procuctTrackByte, &procuctTrack)
 	lib.CheckError(err)
 	log.Println("Product track: ", procuctTrack)
+	for _, ev := range reqData.Event {
+		switch ev {
 
-	switch reqData.Event {
+		case "emit":
+			db = procuctTrack.Emit.Database
+			event = procuctTrack.Emit.Event
+			eventFilename = procuctTrack.Emit.FileName
+		case "payment":
+			db = procuctTrack.Payment.Database
+			event = procuctTrack.Payment.Event
+			eventFilename = procuctTrack.Payment.FileName
+		case "delete":
+			db = procuctTrack.Delete.Database
+			event = procuctTrack.Delete.Event
+			eventFilename = procuctTrack.Delete.FileName
 
-	case "emit":
-		db = procuctTrack.Emit.Database
-		event = procuctTrack.Emit.Event
-	case "payment":
-		db = procuctTrack.Payment.Database
-		event = procuctTrack.Payment.Event
-	case "delete":
-		db = procuctTrack.Delete.Database
-		event = procuctTrack.Delete.Event
+		}
 
-	}
+		from, to = procuctTrack.frequency(now)
+		switch db.Dataset {
+		case "policy":
+			policies = query[models.Policy](from, to, db)
+			result = procuctTrack.PolicyProductTrack(policies, event)
+		case "transaction":
+			transactions = query[models.Transaction](from, to, db)
+			result = procuctTrack.TransactionProductTrack(transactions, event)
+		}
+		result = procuctTrack.makeHeader(event, result, procuctTrack.HasHeader)
+		filename, byteArray := procuctTrack.saveFile(result, from, to, now, eventFilename)
+		log.Println("len(result): ", len(result))
+		if len(result) > 0 {
 
-	from, to = procuctTrack.frequency(now)
-	switch db.Dataset {
-	case "policy":
-		policies = query[models.Policy](from, to, db)
-		result = procuctTrack.PolicyProductTrack(policies, event)
-	case "transaction":
-		transactions = query[models.Transaction](from, to, db)
-		result = procuctTrack.TransactionProductTrack(transactions, event)
-	}
-	result = procuctTrack.makeHeader(event, result, procuctTrack.HasHeader)
-	filename, byteArray := procuctTrack.saveFile(result, from, to, now)
-
-	if upload {
-		procuctTrack.upload(filename)
-	}
-	if procuctTrack.SendMail {
-		procuctTrack.sendMail(filename, byteArray)
+			if upload {
+				procuctTrack.upload(filename)
+			}
+			if procuctTrack.SendMail {
+				procuctTrack.sendMail(filename, byteArray)
+			}
+		}
 	}
 	return "", nil, e
 }
@@ -103,46 +111,43 @@ func (track Track) TransactionProductTrack(transactions []models.Transaction, ev
 	var (
 		result    [][]string
 		json_data interface{}
-
-		value string
-		cells []string
-		err   error
+		err       error
 	)
 
-	for _, tr := range transactions {
-		b, err := json.Marshal(tr)
-		lib.CheckError(err)
-		json.Unmarshal(b, &json_data)
-		log.Println(string(b))
-		for _, column := range event {
-
-			log.Println(column)
-			log.Println(value)
+	for indexG, _ := range transactions {
+		log.Println("index transactions: ", indexG)
+		var cells []string
+		for i, column := range event {
+			log.Println("index event:", i)
 			var resPaths []interface{}
+
 			for _, value := range column.Values {
 				log.Println("column value", value)
 				if strings.Contains(value, "$.") {
+
+					log.Println("column value: ", value)
 					resPath, err := jsonpath.JsonPathLookup(json_data, value)
 					resPaths = append(resPaths, resPath)
 					log.Println(err)
 					log.Println(resPath)
+				} else {
+					resPaths = append(resPaths, value)
 				}
+
 			}
 			resdata := checkMap(column, resPaths)
-			cells = append(cells, resdata.(string))
+			cells = append(cells, checkType(resdata))
 
 		}
-
 		result = append(result, cells)
-
 	}
 
 	lib.CheckError(err)
 	return result
 }
-func (track Track) saveFile(matrix [][]string, from time.Time, to time.Time, now time.Time) (string, []byte) {
+func (track Track) saveFile(matrix [][]string, from time.Time, to time.Time, now time.Time, baseFilename string) (string, []byte) {
 	var byteArray []byte
-	filename := stringTimeToken(track.FileName, from, to, now)
+	filename := stringTimeToken(baseFilename, from, to, now)
 	filepath := "track/" + track.Name + "/" + strconv.Itoa(from.Year()) + "/" + filename
 	log.Println("filepath: ", filepath)
 	switch track.Type {
