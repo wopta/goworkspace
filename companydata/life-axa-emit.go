@@ -64,7 +64,7 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	queryListdate = append(queryListdate, i.Format("2006-01-02"))
 	fmt.Println("LifeAxalEmit:queryListdate ", queryListdate)
 	fmt.Println("LifeAxalEmit:queryListdate ", queryListdate2)
-	
+
 	lifeAxaEmitQuery := lib.Firequeries{
 		Queries: []lib.Firequery{
 
@@ -129,7 +129,7 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	query, e := lifeAxaEmitQuery.FirestoreWherefields("transactions")
 	query2, e := lifeAxaEmitQuery2.FirestoreWherefields("transactions")
 	log.Println("LifeAxalEmit error: ", e)
-	
+
 	transactions := TransactionToListData(query)
 	transactions2 := TransactionToListData(query2)
 	transactionstot := append(transactions, transactions2...)
@@ -172,7 +172,7 @@ func mapContractorTypeAxaPLife(policy models.Policy) (models.Contractor, string)
 func fixImportedId(policy models.Policy) string {
 	result := policy.CodeCompany
 	if lib.SliceContains[string](policy.StatusHistory, "Imported") {
-		result = "000" + policy.CodeCompany
+		result = "0000" + policy.CodeCompany
 	}
 	return result
 }
@@ -564,11 +564,13 @@ func getTypeTransactionAR(p models.Policy, tr models.Transaction) string {
 	if p.PaymentSplit == string(models.PaySplitMonthly) {
 		trdate, e := time.Parse("2006-01-02", tr.ScheduleDate)
 		trMounthInt := int(trdate.Month())
+		trYearInt := int(trdate.Year())
 		log.Println("LifeAxalEmit : getTypeTransaction error", e)
 		policyStartMounth := int(p.StartDate.Month())
+		policyStartYear := int(p.StartDate.Year())
 		log.Println("LifeAxalEmit : getTypeTransaction policyStartMounth", policyStartMounth)
 		log.Println("LifeAxalEmit : getTypeTransaction trMounthInt", trMounthInt)
-		if policyStartMounth == trMounthInt {
+		if policyStartMounth == trMounthInt && policyStartYear == trYearInt {
 
 			result = "A"
 
