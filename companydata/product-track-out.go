@@ -45,6 +45,7 @@ func ProductTrackOutFx(w http.ResponseWriter, r *http.Request) (string, interfac
 	lib.CheckError(err)
 	log.Println("Product track: ", procuctTrack)
 	for _, ev := range reqData.Event {
+		log.Println("start len(result): ", len(result))
 		switch ev {
 
 		case "emit":
@@ -71,10 +72,10 @@ func ProductTrackOutFx(w http.ResponseWriter, r *http.Request) (string, interfac
 			transactions = query[models.Transaction](from, to, db)
 			result = procuctTrack.TransactionProductTrack(transactions, event)
 		}
-		result = procuctTrack.makeHeader(event, result, procuctTrack.HasHeader)
-		filename, byteArray := procuctTrack.saveFile(result, from, to, now, eventFilename)
 		log.Println("len(result): ", len(result))
 		if len(result) > 0 {
+			result = procuctTrack.makeHeader(event, result, procuctTrack.HasHeader)
+			filename, byteArray := procuctTrack.saveFile(result, from, to, now, eventFilename)
 
 			if upload {
 				procuctTrack.upload(filename)
@@ -114,22 +115,23 @@ func (track Track) TransactionProductTrack(transactions []models.Transaction, ev
 		err       error
 	)
 
-	for indexG, _ := range transactions {
-		log.Println("index transactions: ", indexG)
+	for _, _ = range transactions {
+
 		var cells []string
-		for i, column := range event {
-			log.Println("index event:", i)
+		for _, column := range event {
+
 			var resPaths []interface{}
 
 			for _, value := range column.Values {
-				log.Println("column value", value)
 				if strings.Contains(value, "$.") {
 
 					log.Println("column value: ", value)
 					resPath, err := jsonpath.JsonPathLookup(json_data, value)
 					resPaths = append(resPaths, resPath)
-					log.Println(err)
-					log.Println(resPath)
+					if err != nil {
+						log.Println(err)
+					}
+					log.Printf("column value %v - resPath: %v\n", value, resPath)
 				} else {
 					resPaths = append(resPaths, value)
 				}
@@ -184,22 +186,24 @@ func (track Track) policyAssetRow(policy *models.Policy, event []Column) [][]str
 	log.Println(string(b))
 	for indexAsset, asset := range policy.Assets {
 		for indexG, _ := range asset.Guarantees {
-			log.Println("index Guarantees: ", indexG)
+
 			var cells []string
-			for i, column := range event {
-				log.Println("index event: ", i)
+			for _, column := range event {
+
 				var resPaths []interface{}
 
 				for _, value := range column.Values {
-					log.Println("column value", value)
+
 					if strings.Contains(value, "$.") {
 						value = strings.Replace(value, "guarantees[*]", "guarantees["+strconv.Itoa(indexG)+"]", 1)
 						value = strings.Replace(value, "assets[*]", "assets["+strconv.Itoa(indexAsset)+"]", 1)
 						log.Println("column value guarantee: ", value)
 						resPath, err := jsonpath.JsonPathLookup(json_data, value)
 						resPaths = append(resPaths, resPath)
-						log.Println(err)
-						log.Println(resPath)
+						if err != nil {
+							log.Println(err)
+						}
+						log.Printf("column value %v - resPath: %v\n", value, resPath)
 					} else {
 						resPaths = append(resPaths, value)
 					}
