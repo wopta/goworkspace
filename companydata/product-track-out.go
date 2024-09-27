@@ -23,10 +23,10 @@ const localBasePath = "../tmp/"
 
 func ProductTrackOutFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		from          time.Time
-		to            time.Time
-		procuctTrack  Track
-	
+		from         time.Time
+		to           time.Time
+		procuctTrack Track
+
 		event         []Column
 		db            Database
 		policies      []models.Policy
@@ -44,9 +44,9 @@ func ProductTrackOutFx(w http.ResponseWriter, r *http.Request) (string, interfac
 	err := json.Unmarshal(procuctTrackByte, &procuctTrack)
 	lib.CheckError(err)
 	log.Println("Product track: ", procuctTrack)
-	from, to = procuctTrack.frequency(now)
+	from, to = procuctTrack.setFrequency(now)
 	for _, ev := range reqData.Event {
-		var result        [][]string
+		var result [][]string
 		log.Println("start len(result): ", len(result))
 		switch ev {
 
@@ -65,7 +65,6 @@ func ProductTrackOutFx(w http.ResponseWriter, r *http.Request) (string, interfac
 
 		}
 
-	
 		switch db.Dataset {
 		case "policy":
 			policies = query[models.Policy](from, to, db)
@@ -245,7 +244,7 @@ func checkMap(column Column, value []interface{}) interface{} {
 	return res
 
 }
-func (track *Track) frequency(now time.Time) (time.Time, time.Time) {
+func (track *Track) setFrequency(now time.Time) (time.Time, time.Time) {
 	location, e := time.LoadLocation("Europe/Rome")
 	lib.CheckError(e)
 	switch track.Frequency {
@@ -258,7 +257,7 @@ func (track *Track) frequency(now time.Time) (time.Time, time.Time) {
 		from = time.Date(prevDay.Year(), prevDay.Month(), prevDay.Day(), 0, 0, 0, 0, location)
 		to = time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, location)
 	}
-	log.Println(from, to)
+	log.Println("setFrequency from: ", from, "to: ", to)
 	track.from = from
 	track.to = to
 	track.now = now

@@ -3,7 +3,6 @@ package companydata
 import (
 	"fmt"
 	"log"
-	"reflect"
 	"strconv"
 	"strings"
 	"time"
@@ -38,8 +37,6 @@ func formatDateDDMMYYYYSlash(s []interface{}) interface{} {
 }
 func formatISO8601toDDMMYYYYSlash(d []interface{}) interface{} {
 	var res string
-	log.Println("value d: ", d)
-	log.Println("value d: ", reflect.TypeOf(d))
 	if d[0].(string) != "" {
 		splitD := strings.Split(d[0].(string), "-")
 		split2 := strings.Split(splitD[2], "T")
@@ -51,32 +48,23 @@ func formatISO8601toDDMMYYYYSlash(d []interface{}) interface{} {
 	return res
 
 }
-func formatSplitPaymentNumber(s []interface{}) interface{} {
-	var res string
-	if s[0] == "monthly" {
-		res = "1"
-
-	}
-	if s[0] == "yearly" {
-		res = "12"
-
-	}
-	return res
-}
 func mapWorkCodeGlobal(s []interface{}) interface{} {
-	log.Println("mapWorkCodeGlobal worktype: ", s[0].(map[string]interface{})["work"])
 	var res string
 
 	works := lib.GetFilesByEnv("enrich/work-code-global.csv")
 
 	df := lib.CsvToDataframe(works)
 	fil := df.Filter(
-		dataframe.F{Colname: "Settore", Comparator: series.Eq, Comparando: "Lavoratore " + s[0].(map[string]interface{})["workType"].(string)},
-		dataframe.F{Colname: "Tipo", Comparator: series.Eq, Comparando: s[0].(map[string]interface{})["work"].(string)},
+		dataframe.F{Colidx: 1, Colname: "Settore", Comparator: series.Eq, Comparando: "Lavoratore " + s[0].(map[string]interface{})["workType"].(string)},
+	)
+	fil = fil.Filter(
+
+		dataframe.F{Colidx: 2, Colname: "Tipo", Comparator: series.Eq, Comparando: s[0].(map[string]interface{})["work"].(string)},
 	)
 	log.Println("fil.Nrow(): ", fil.Nrow())
-	fmt.Printf("fil: %v\n", fil)
+
 	if fil.Nrow() > 0 {
+
 		res = fil.Elem(0, 0).String()
 	}
 	return res
