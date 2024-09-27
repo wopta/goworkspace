@@ -116,8 +116,12 @@ func (track Track) TransactionProductTrack(transactions []models.Transaction, ev
 		err       error
 	)
 
-	for range transactions {
-
+	for _, transaction := range transactions {
+		log.Println("policyAssetRow")
+		b, err := json.Marshal(transaction)
+		lib.CheckError(err)
+		json.Unmarshal(b, &json_data)
+		log.Println(string(b))
 		var cells []string
 		for _, column := range event {
 
