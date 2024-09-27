@@ -43,7 +43,7 @@ func ProductTrackOutFx(w http.ResponseWriter, r *http.Request) (string, interfac
 
 	err := json.Unmarshal(procuctTrackByte, &procuctTrack)
 	lib.CheckError(err)
-	log.Println("Product track: ", procuctTrack)
+	log.Println("Product track json: ", procuctTrack)
 	from, to = procuctTrack.setFrequency(now)
 	for _, ev := range reqData.Event {
 		var result [][]string
@@ -69,7 +69,7 @@ func ProductTrackOutFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		case "policy":
 			policies = query[models.Policy](from, to, db)
 			result = procuctTrack.PolicyProductTrack(policies, event)
-		case "transaction":
+		case "transactions":
 			transactions = query[models.Transaction](from, to, db)
 			result = procuctTrack.TransactionProductTrack(transactions, event)
 		}
@@ -116,7 +116,7 @@ func (track Track) TransactionProductTrack(transactions []models.Transaction, ev
 		err       error
 	)
 
-	for _, _ = range transactions {
+	for range transactions {
 
 		var cells []string
 		for _, column := range event {
