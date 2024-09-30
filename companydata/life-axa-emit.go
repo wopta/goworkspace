@@ -570,7 +570,7 @@ func getTypeTransactionAR(p models.Policy, tr models.Transaction) string {
 		policyStartYear := int(p.StartDate.Year())
 		log.Println("LifeAxalEmit : getTypeTransaction policyStartMounth", policyStartMounth)
 		log.Println("LifeAxalEmit : getTypeTransaction trMounthInt", trMounthInt)
-		if policyStartMounth == trMounthInt && policyStartYear == trYearInt {
+		if policyStartMounth == trMounthInt && policyStartYear == trYearInt && !lib.SliceContains(p.StatusHistory, "Renewed") {
 
 			result = "A"
 
