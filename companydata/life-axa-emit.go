@@ -560,6 +560,10 @@ func getTypeTransactionAR(p models.Policy, tr models.Transaction) string {
 
 		result = "A"
 	}
+	if lib.SliceContains(p.StatusHistory, "Renewed") {
+
+		result = "R"
+	}
 
 	if p.PaymentSplit == string(models.PaySplitMonthly) {
 		trdate, e := time.Parse("2006-01-02", tr.ScheduleDate)
