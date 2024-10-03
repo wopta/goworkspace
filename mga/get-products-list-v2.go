@@ -55,7 +55,15 @@ func GetProductsListByChannelFx(w http.ResponseWriter, r *http.Request) (string,
 		}
 		productList := lib.SliceMap[models.Product, string](warrant.Products, func(p models.Product) string { return p.Name })
 		log.Printf("product list '%s'", productList)
-		response.Products = product.GetProductsByChannel(productList, channel)
+		retrievedProducts := product.GetProductsByChannel(productList, channel)
+		for index, prd := range retrievedProducts {
+			for _, warrantProduct := range warrant.Products {
+				if prd.Name == warrantProduct.Name {
+					retrievedProducts[index].IsActive = warrantProduct.IsActive
+				}
+			}
+		}
+		response.Products = retrievedProducts
 	default:
 		log.Printf("error channel %s unaavailable", channel)
 		return "", "", fmt.Errorf("unavailable channel")

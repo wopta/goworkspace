@@ -44,6 +44,7 @@ type Product struct {
 	PolicyType         string            `json:"policyType,omitempty" firestore:"policyType,omitempty" bigquery:"-"`
 	QuoteType          string            `json:"quoteType" firestore:"quoteType" bigquery:"-"`
 	EmitMaxElapsedDays uint              `json:"emitMaxElapsedDays" firestore:"-" bigquery:"-"`
+	Categories         []string          `json:"categories" firestore:"-" bigquery:"-"`
 
 	// DEPRECATED FIELDS
 
@@ -161,6 +162,8 @@ type ProductInfo struct {
 	Company      string        `json:"company"`               // DEPRECATED
 	ExternalUrl  string        `json:"externalUrl,omitempty"` // external integration products
 	Products     []ProductInfo `json:"products,omitempty"`    // external integration products
+	IsActive     bool          `json:"isActive"`
+	Categories   []string      `json:"categories"`
 }
 
 func (p *Product) ToProductInfo() ProductInfo {
@@ -172,19 +175,22 @@ func (p *Product) ToProductInfo() ProductInfo {
 		Logo:         p.Logo,
 		Version:      p.Version,
 		Type:         InternalProductType,
+		IsActive:     p.IsActive,
+		Categories:   p.Categories,
 	}
 }
 
 type FormProduct struct {
-	Type         string `json:"type"`
-	Name         string `json:"name"`
-	NameTitle    string `json:"nameTitle"`
-	NameSubtitle string `json:"nameSubtitle"`
-	NameDesc     string `json:"nameDesc"`
-	Logo         string `json:"logo"`
-	Version      string `json:"version"`
-	ExternalUrl  string `json:"externalUrl"`
-	IsActive     bool   `json:"isActive"`
+	Type         string   `json:"type"`
+	Name         string   `json:"name"`
+	NameTitle    string   `json:"nameTitle"`
+	NameSubtitle string   `json:"nameSubtitle"`
+	NameDesc     string   `json:"nameDesc"`
+	Logo         string   `json:"logo"`
+	Version      string   `json:"version"`
+	ExternalUrl  string   `json:"externalUrl"`
+	IsActive     bool     `json:"isActive"`
+	Categories   []string `json:"categories"`
 }
 
 func (p *FormProduct) ToProductInfo() ProductInfo {
@@ -197,6 +203,8 @@ func (p *FormProduct) ToProductInfo() ProductInfo {
 		Version:      p.Version,
 		ExternalUrl:  p.ExternalUrl,
 		Type:         FormProductType,
+		IsActive:     p.IsActive,
+		Categories:   p.Categories,
 	}
 }
 
@@ -207,6 +215,7 @@ type ExternalProduct struct {
 	ExternalUrl string        `json:"externalUrl"`
 	IsActive    bool          `json:"isActive"`
 	Products    []ProductInfo `json:"products"`
+	Categories  []string      `json:"categories"`
 }
 
 func (p *ExternalProduct) ToProductInfo() ProductInfo {
@@ -216,6 +225,8 @@ func (p *ExternalProduct) ToProductInfo() ProductInfo {
 		ExternalUrl: p.ExternalUrl,
 		Products:    p.Products,
 		Type:        ExternalProductType,
+		IsActive:    p.IsActive,
+		Categories:  p.Categories,
 	}
 }
 
