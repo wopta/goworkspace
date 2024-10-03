@@ -106,6 +106,14 @@ func UpdateNode(node models.NetworkNode) error {
 		return err
 	}
 
+	if originalNode.Code != node.Code {
+		err = TestNetworkNodeUniqueness(node.Code)
+		if err != nil {
+			log.Printf("[UpdateNode] error testing network node uniqueness: %s", err.Error())
+			return err
+		}
+	}
+
 	if originalNode.AuthId != "" && originalNode.Mail != node.Mail {
 		_, err := lib.UpdateUserEmail(node.Uid, node.Mail)
 		if err != nil {
