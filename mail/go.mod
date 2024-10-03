@@ -11,7 +11,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/wopta/goworkspace/lib v1.0.129
 	github.com/wopta/goworkspace/models v1.2.12
-	github.com/wopta/goworkspace/network v1.0.74
+	github.com/wopta/goworkspace/network v1.0.75
 	google.golang.org/api v0.181.0
 )
 
