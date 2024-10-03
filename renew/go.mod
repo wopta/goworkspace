@@ -74,7 +74,7 @@ require (
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.2.1 // indirect
 	github.com/wopta/goworkspace/document v1.1.94 // indirect
-	github.com/wopta/goworkspace/network v1.0.74 // indirect
+	github.com/wopta/goworkspace/network v1.0.75 // indirect
 	github.com/wopta/goworkspace/policy v1.0.123 // indirect
 	github.com/wopta/goworkspace/product v1.1.9 // indirect
 	github.com/wopta/goworkspace/wiseproxy v1.0.3 // indirect
