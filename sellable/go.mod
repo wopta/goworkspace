@@ -8,7 +8,7 @@ require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	github.com/wopta/goworkspace/lib v1.0.129
 	github.com/wopta/goworkspace/models v1.2.12
-	github.com/wopta/goworkspace/network v1.0.74
+	github.com/wopta/goworkspace/network v1.0.75
 	github.com/wopta/goworkspace/product v1.1.9
 )
 
