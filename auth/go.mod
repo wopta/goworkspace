@@ -10,7 +10,7 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/wopta/goworkspace/lib v1.0.129
 	github.com/wopta/goworkspace/models v1.2.12
-	github.com/wopta/goworkspace/network v1.0.74
+	github.com/wopta/goworkspace/network v1.0.75
 )
 
 require (
