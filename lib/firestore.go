@@ -2,6 +2,7 @@ package lib
 
 import (
 	"context"
+	"errors"
 	"log"
 	"os"
 
@@ -210,8 +211,7 @@ func (queries *FireGenericQueries[T]) FireQuery(collection string) ([]T, error) 
 		d, err := q.Next()
 
 		if err != nil {
-			CheckError(err)
-			if err == iterator.Done {
+			if errors.Is(err, iterator.Done) {
 				break
 			}
 		}
