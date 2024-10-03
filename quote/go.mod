@@ -11,7 +11,7 @@ require (
 	github.com/go-gota/gota v0.12.0
 	github.com/wopta/goworkspace/lib v1.0.129
 	github.com/wopta/goworkspace/models v1.2.12
-	github.com/wopta/goworkspace/network v1.0.74
+	github.com/wopta/goworkspace/network v1.0.75
 	github.com/wopta/goworkspace/sellable v1.0.101
 	github.com/xuri/excelize/v2 v2.8.1
 	google.golang.org/api v0.181.0
