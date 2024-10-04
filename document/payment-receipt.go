@@ -2,6 +2,7 @@ package document
 
 import (
 	"bytes"
+	"time"
 
 	"github.com/go-pdf/fpdf"
 )
@@ -103,7 +104,7 @@ func PaymentReceipt(info ReceiptInfo) ([]byte, error) {
 
 	pdf.Ln(5)
 
-	text = "Milano, il 03/10/2024"
+	text = "Milano, il " + time.Now().UTC().Format("02/01/2006")
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 4, text, "", fpdf.AlignLeft, false)
 
