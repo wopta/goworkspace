@@ -111,6 +111,12 @@ var brokerRoutes []lib.Route = []lib.Route{
 		Method:  http.MethodDelete,
 		Roles:   []string{lib.UserRoleAdmin},
 	},
+	{
+		Route:   "/transaction/v1/{uid}/receipt",
+		Handler: lib.ResponseLoggerWrapper(PaymentReceiptFx),
+		Method:  http.MethodGet,
+		Roles:   []string{},
+	},
 }
 
 func init() {
