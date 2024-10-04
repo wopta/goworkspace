@@ -2,40 +2,34 @@ package document
 
 import (
 	"bytes"
-	"encoding/base64"
-	"log"
-	"net/http"
 
 	"github.com/go-pdf/fpdf"
 )
 
-func PaymentReceiptFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	var (
-		err error
-	)
-
-	log.SetPrefix("[PaymentReceiptFx] ")
-	defer func() {
-		if err != nil {
-			log.Printf("error: %s", err.Error())
-		}
-		log.Println("Handler end -------------------------------------------------")
-	}()
-
-	doc, err := paymentReceipt()
-	if err != nil {
-		log.Printf("error: %s", err.Error())
-		return "", nil, err
-	}
-
-	rawDoc := base64.StdEncoding.EncodeToString(doc)
-
-	log.Println("Handler start -----------------------------------------------")
-
-	return rawDoc, rawDoc, nil
+type CustomerInfo struct {
+	Fullname   string
+	Address    string
+	PostalCode string
+	City       string
+	Province   string
+	Email      string
+	Phone      string
 }
 
-func paymentReceipt() ([]byte, error) {
+type TransactionInfo struct {
+	PolicyCode     string
+	EffectiveDate  string
+	ExpirationDate string
+	PriceGross     string
+	NextPayment    string
+}
+
+type ReceiptInfo struct {
+	CustomerInfo CustomerInfo
+	Transaction  TransactionInfo
+}
+
+func PaymentReceipt(info ReceiptInfo) ([]byte, error) {
 	var (
 		err error
 		buf bytes.Buffer
@@ -51,17 +45,17 @@ func paymentReceipt() ([]byte, error) {
 	pdf.SetX(130)
 
 	text := "Egr./Gent.le/Spett.le\n" +
-		"Mario Rossi\n" + // TODO: dynamic name and surname
-		"Galleria del corso 1\n" + // TODO: dynamic address
-		"20033 Milano (MI)\n" + // TODO: dynamic info
-		"test@wopta - +393334455667" //TODO: dynamic mail and phone
+		info.CustomerInfo.Fullname + "\n" +
+		info.CustomerInfo.Address + "\n" + // TODO: dynamic address
+		info.CustomerInfo.PostalCode + " " + info.CustomerInfo.City + " (" + info.CustomerInfo.Province + ")\n" +
+		info.CustomerInfo.Email + " - " + info.CustomerInfo.Phone
 
 	setBlackBoldFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 4, text, "", fpdf.AlignLeft, false)
 
 	pdf.Ln(15)
 
-	text = "Oggetto: Quietanza di pagamento polizza n. 100100" // TODO: dynamic policy companyCode
+	text = "Oggetto: Quietanza di pagamento polizza n. " + info.Transaction.PolicyCode
 
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 4, text, "", fpdf.AlignLeft, false)
@@ -96,13 +90,13 @@ func paymentReceipt() ([]byte, error) {
 
 	pdf.Ln(3)
 
-	text = "CONTRAENTE: Mario Rossi\n" + // TODO: dynamic contractor name
-		"N. POLIZZA: 100100\n" + // TODO: dynamic policy codeCompany
-		"EFFETTO COPERTURA: 03/10/2024\n" + // TODO: dynamic effective date
-		"SCADENZA COPERTURA: 03/11/2024\n" + // TODO: dynamic transaction end date
-		"PREMIO PAGATO: 100.00€\n" + // TODO: dynamic transaction priceGross
+	text = "CONTRAENTE: " + info.CustomerInfo.Fullname + "\n" +
+		"N. POLIZZA: " + info.Transaction.PolicyCode + "\n" +
+		"EFFETTO COPERTURA: " + info.Transaction.EffectiveDate + "\n" +
+		"SCADENZA COPERTURA: " + info.Transaction.ExpirationDate + "\n" +
+		"PREMIO PAGATO: " + info.Transaction.PriceGross + "\n" +
 		"VALUTA INCASSO: 03/10/2024\n" + // TODO: dynamic info
-		"PROSSIMO PAGAMENTO IL: 03/11/2024" // TODO: dynamic info
+		"PROSSIMO PAGAMENTO IL: " + info.Transaction.NextPayment
 
 	setBlackBoldFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 12, text, "", fpdf.AlignLeft, false)
