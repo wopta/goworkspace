@@ -115,7 +115,7 @@ var brokerRoutes []lib.Route = []lib.Route{
 		Route:   "/transaction/v1/{uid}/receipt",
 		Handler: lib.ResponseLoggerWrapper(PaymentReceiptFx),
 		Method:  http.MethodGet,
-		Roles:   []string{},
+		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleAreaManager, lib.UserRoleAgency, lib.UserRoleAgent},
 	},
 }
 
