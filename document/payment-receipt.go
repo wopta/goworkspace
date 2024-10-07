@@ -23,6 +23,7 @@ type TransactionInfo struct {
 	ExpirationDate string
 	PriceGross     string
 	NextPayment    string
+	PayDate        string
 }
 
 type ReceiptInfo struct {
@@ -47,7 +48,7 @@ func PaymentReceipt(info ReceiptInfo) ([]byte, error) {
 
 	text := "Egr./Gent.le/Spett.le\n" +
 		info.CustomerInfo.Fullname + "\n" +
-		info.CustomerInfo.Address + "\n" + // TODO: dynamic address
+		info.CustomerInfo.Address + "\n" +
 		info.CustomerInfo.PostalCode + " " + info.CustomerInfo.City + " (" + info.CustomerInfo.Province + ")\n" +
 		info.CustomerInfo.Email + " - " + info.CustomerInfo.Phone
 
@@ -96,7 +97,7 @@ func PaymentReceipt(info ReceiptInfo) ([]byte, error) {
 		"EFFETTO COPERTURA: " + info.Transaction.EffectiveDate + "\n" +
 		"SCADENZA COPERTURA: " + info.Transaction.ExpirationDate + "\n" +
 		"PREMIO PAGATO: " + info.Transaction.PriceGross + "\n" +
-		"VALUTA INCASSO: 03/10/2024\n" + // TODO: dynamic info
+		"VALUTA INCASSO: " + info.Transaction.PayDate + "\n" +
 		"PROSSIMO PAGAMENTO IL: " + info.Transaction.NextPayment
 
 	setBlackBoldFont(pdf, standardTextSize)

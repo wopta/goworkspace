@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/dustin/go-humanize"
 	"github.com/go-chi/chi/v5"
 	"github.com/wopta/goworkspace/document"
 	"github.com/wopta/goworkspace/lib"
@@ -133,12 +134,18 @@ func receiptInfoBuilder(policy models.Policy, transaction models.Transaction) do
 		nextPayment = lib.AddMonths(transaction.EffectiveDate, 1)
 	}
 
+	payDate := "======="
+	if !transaction.PayDate.IsZero() {
+		payDate = transaction.PayDate.Format("02/01/2006")
+	}
+
 	transactionInfo := document.TransactionInfo{
 		PolicyCode:     policy.CodeCompany,
 		EffectiveDate:  transaction.EffectiveDate.Format("02/01/2006"),
 		ExpirationDate: expirationDate.Format("02/01/2006"),
-		PriceGross:     fmt.Sprintf("%.2f", transaction.Amount),
+		PriceGross:     humanize.FormatFloat("#.###,##", transaction.Amount) + " €",
 		NextPayment:    nextPayment.Format("02/01/2006"),
+		PayDate:        payDate,
 	}
 
 	return document.ReceiptInfo{
