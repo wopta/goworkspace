@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 	"github.com/wopta/goworkspace/payment"
@@ -111,16 +110,6 @@ func DraftFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error
 			if err := saveToDatabases(data); err != nil {
 				return err
 			}
-
-			if !sendMail || p.Channel != models.ECommerceChannel {
-				return nil
-			}
-
-			from := mail.AddressAnna
-			to := mail.GetContractorEmail(&p)
-			flowName := models.ECommerceFlow
-
-			mail.SendMailRenewDraft(p, from, to, mail.Address{}, flowName, hasMandate)
 			return nil
 		}
 
