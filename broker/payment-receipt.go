@@ -17,6 +17,15 @@ import (
 	trx "github.com/wopta/goworkspace/transaction"
 )
 
+const (
+	filenameFormat = "Quietanza Pagamento Polizza %s rata %s %d"
+)
+
+type paymentReceiptResp struct {
+	Filename string `json:"filename"`
+	RawDoc   string `json:"rawDoc"`
+}
+
 func PaymentReceiptFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err error
@@ -39,7 +48,7 @@ func PaymentReceiptFx(w http.ResponseWriter, r *http.Request) (string, interface
 		return "", nil, err
 	}
 
-	transactionUid := chi.URLParam(r, "transactionUid")
+	transactionUid := chi.URLParam(r, "uid")
 	if transactionUid == "" {
 		return "", "", errors.New("transaction uid is empty")
 	}
@@ -53,6 +62,7 @@ func PaymentReceiptFx(w http.ResponseWriter, r *http.Request) (string, interface
 		return "", "", errors.New("transaction is not pay")
 	}
 
+	// TODO: what if transaction refers to a renewPolicy
 	policy, err := plc.GetPolicy(transaction.PolicyUid, "")
 	if err != nil {
 		return "", nil, err
@@ -83,8 +93,10 @@ func PaymentReceiptFx(w http.ResponseWriter, r *http.Request) (string, interface
 
 	rawDoc := base64.StdEncoding.EncodeToString(doc)
 
-	resp := map[string]string{
-		"rawDoc": rawDoc,
+	resp := paymentReceiptResp{
+		Filename: fmt.Sprintf(filenameFormat, policy.CodeCompany, lib.ExtractLocalMonth(transaction.EffectiveDate),
+			transaction.EffectiveDate.Year()),
+		RawDoc: rawDoc,
 	}
 
 	rawResp, err := json.Marshal(resp)
