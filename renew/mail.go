@@ -70,9 +70,9 @@ func RenewMailFx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	for _, policy := range policies {
 		from := mail.AddressAnna
 		to := mail.GetContractorEmail(&policy)
-		//flowName := models.ECommerceFlow
+		flowName := models.ECommerceFlow
 		log.Printf("Sending email from %s to %s", from, to)
-		//mail.SendMailRenewDraft(policy, from, to, mail.Address{}, flowName, policy.HasMandate)
+		mail.SendMailRenewDraft(policy, from, to, mail.Address{}, flowName, policy.HasMandate)
 	}
 
 	return "", nil, nil
