@@ -6,10 +6,11 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/go-chi/chi/v5"
-	jwt "github.com/golang-jwt/jwt/v5"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/network"
 )
@@ -58,7 +59,7 @@ func getTokenForExternalIntegration(productName string, userUid string) (string,
 	}
 
 	// Define the signing key
-	signingKey := []byte(os.Getenv(fmt.Sprintf("%s_EXTERNAL_SIGNING_KEY", lib.ToUpper(productName))))
+	signingKey := []byte(os.Getenv(fmt.Sprintf("%s_EXTERNAL_SIGNING_KEY", lib.ToUpper(strings.ReplaceAll(productName, "-", "_")))))
 	if len(signingKey) == 0 {
 		return "", fmt.Errorf("signing key not found")
 	}
