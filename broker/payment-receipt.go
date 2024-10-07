@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	filenameFormat = "Quietanza Pagamento Polizza %s rata %s %d"
+	filenameFormat = "Quietanza Pagamento Polizza %s rata %s %d.pdf"
 )
 
 type paymentReceiptResp struct {
