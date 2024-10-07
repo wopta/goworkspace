@@ -3,6 +3,7 @@ package lib
 import (
 	"log"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -97,4 +98,22 @@ func AddMonths(t time.Time, m int) time.Time {
 
 func IsEqual(d1, d2 time.Time) bool {
 	return d1.Truncate(time.Hour * 24).Equal(d2.Truncate(time.Hour * 24))
+}
+
+func ExtractLocalMonth(t time.Time) string {
+	month := map[string]string{
+		"january":   "Gennaio",
+		"february":  "Febbraio",
+		"march":     "Marzo",
+		"april":     "Aprile",
+		"may":       "Maggio",
+		"june":      "Giugno",
+		"july":      "Luglio",
+		"august":    "Agosto",
+		"september": "Settembre",
+		"october":   "Ottobre",
+		"november":  "Novembre",
+		"december":  "Dicembre",
+	}
+	return month[strings.ToLower(t.Month().String())]
 }
