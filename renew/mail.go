@@ -25,8 +25,6 @@ func RenewMailFx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 		err             error
 		date            = time.Now().UTC()
 		daysBeforeRenew = 10
-		query           bytes.Buffer
-		params          = make(map[string]interface{})
 		req             RenewReq
 	)
 
@@ -66,16 +64,38 @@ func RenewMailFx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	}
 
 	targetDate := date.AddDate(0, 0, daysBeforeRenew)
-	log.Printf("Date is: %v; targetDate is: %v", date, targetDate)
 
+	policies, err := getRenewPolicies(targetDate)
+
+	for _, policy := range policies {
+		from := mail.AddressAnna
+		to := mail.GetContractorEmail(&policy)
+		//flowName := models.ECommerceFlow
+		log.Printf("Sending email from %s to %s", from, to)
+		//mail.SendMailRenewDraft(policy, from, to, mail.Address{}, flowName, policy.HasMandate)
+	}
+
+	return "", nil, nil
+}
+
+func getRenewPolicies(targetDate time.Time) ([]models.Policy, error) {
+	var (
+		query  bytes.Buffer
+		params = make(map[string]interface{})
+		err    error
+	)
 	params["isRenewable"] = true
-	params["channel"] = models.ECommerceChannel
+	params["isDeleted"] = false
+	params["isPay"] = false
+	params["channel"] = lib.ECommerceChannel
 	params["targetYear"] = int64(targetDate.Year())
 	params["targetMonth"] = int64(targetDate.Month())
 	params["targetDay"] = int64(targetDate.Day())
 
 	query.WriteString(fmt.Sprintf("SELECT * FROM `%s.%s` WHERE", lib.WoptaDataset, lib.RenewPolicyViewCollection))
 	query.WriteString(" isRenewable = @isRenewable")
+	query.WriteString(" AND isDeleted = @isDeleted")
+	query.WriteString(" AND isPay = @isPay")
 	query.WriteString(" AND channel = @channel")
 	query.WriteString(" AND EXTRACT(YEAR FROM RenewDate) = @targetYear")
 	query.WriteString(" AND EXTRACT(MONTH FROM RenewDate) = @targetMonth")
@@ -84,7 +104,7 @@ func RenewMailFx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	policies, err := lib.QueryParametrizedRowsBigQuery[models.Policy](query.String(), params)
 	if err != nil {
 		log.Printf("error fetching policies from BigQuery: %s", err)
-		return "", nil, err
+		return nil, err
 	}
 
 	policies = lib.SliceMap(policies, func(p models.Policy) models.Policy {
@@ -93,13 +113,5 @@ func RenewMailFx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 		return tmpPolicy
 	})
 
-	for _, policy := range policies {
-		from := mail.AddressAnna
-		to := mail.GetContractorEmail(&policy)
-		flowName := models.ECommerceFlow
-		log.Printf("Sending email from %s to %s", from, to)
-		mail.SendMailRenewDraft(policy, from, to, mail.Address{}, flowName, policy.HasMandate)
-	}
-
-	return "", nil, nil
+	return policies, nil
 }
