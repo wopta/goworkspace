@@ -53,7 +53,24 @@ func PaymentReceiptFx(w http.ResponseWriter, r *http.Request) (string, interface
 		return "", "", errors.New("transaction uid is empty")
 	}
 
-	transaction := trx.GetTransactionByUid(transactionUid, "")
+	rawDoc, filename, err := paymentReceiptBuilder(transactionUid, authToken)
+	if err != nil {
+		log.Printf("error building raw doc: %s", err.Error())
+		return "", "", err
+	}
+
+	resp := paymentReceiptResp{
+		Filename: filename,
+		RawDoc:   rawDoc,
+	}
+
+	rawResp, err := json.Marshal(resp)
+
+	return string(rawResp), resp, err
+}
+
+func paymentReceiptBuilder(transactionUID string, authToken lib.AuthToken) (string, string, error) {
+	transaction := trx.GetTransactionByUid(transactionUID, "")
 	if transaction == nil {
 		return "", "", errors.New("transaction not found")
 	}
@@ -65,7 +82,7 @@ func PaymentReceiptFx(w http.ResponseWriter, r *http.Request) (string, interface
 	// TODO: what if transaction refers to a renewPolicy
 	policy, err := plc.GetPolicy(transaction.PolicyUid, "")
 	if err != nil {
-		return "", nil, err
+		return "", "", err
 	}
 
 	if authToken.Role != models.UserRoleAdmin {
@@ -88,20 +105,14 @@ func PaymentReceiptFx(w http.ResponseWriter, r *http.Request) (string, interface
 	doc, err := document.PaymentReceipt(receiptInfo)
 	if err != nil {
 		log.Printf("error: %s", err.Error())
-		return "", nil, err
+		return "", "", err
 	}
 
 	rawDoc := base64.StdEncoding.EncodeToString(doc)
+	filename := fmt.Sprintf(filenameFormat, policy.CodeCompany, lib.ExtractLocalMonth(transaction.EffectiveDate),
+		transaction.EffectiveDate.Year())
 
-	resp := paymentReceiptResp{
-		Filename: fmt.Sprintf(filenameFormat, policy.CodeCompany, lib.ExtractLocalMonth(transaction.EffectiveDate),
-			transaction.EffectiveDate.Year()),
-		RawDoc: rawDoc,
-	}
-
-	rawResp, err := json.Marshal(resp)
-
-	return string(rawResp), resp, err
+	return rawDoc, filename, nil
 }
 
 func receiptInfoBuilder(policy models.Policy, transaction models.Transaction) document.ReceiptInfo {
