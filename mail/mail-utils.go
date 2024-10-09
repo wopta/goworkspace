@@ -103,6 +103,20 @@ func fillTemplate(htmlTemplate []byte, bodyData *BodyData) string {
 	return tpl.String()
 }
 
+func fillTemplateV2(htmlTemplate []byte, bodyData *BodyData) (string, error) {
+	tpl := new(bytes.Buffer)
+	tmplt := template.New("htmlTemplate")
+	tmplt, err := tmplt.Parse(string(htmlTemplate))
+	if err != nil {
+		return "", err
+	}
+	err = tmplt.Execute(tpl, bodyData)
+	if err != nil {
+		return "", err
+	}
+	return tpl.String(), nil
+}
+
 func GetEmailByChannel(policy *models.Policy) Address {
 	var address Address
 

@@ -320,13 +320,22 @@ func SendMailRenewDraft(policy models.Policy, from, to, cc Address, flowName str
 }
 
 func SendMailRenewDraftV2(policy models.Policy, from, to, cc Address, flowName string, hasMandate bool) error {
-	var bodyData BodyData
+	var (
+		bodyData BodyData
+		err      error
+	)
 
 	bodyData = getPolicyRenewDraftBodyData(policy, hasMandate)
 
-	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", flowName, renewDraftTemplateType))
+	templateFile, err := lib.GetFilesByEnvV2(fmt.Sprintf("mail/%s/%s.html", flowName, renewDraftTemplateType))
+	if err != nil {
+		return err
+	}
 
-	messageBody := fillTemplate(templateFile, &bodyData)
+	messageBody, err := fillTemplateV2(templateFile, &bodyData)
+	if err != nil {
+		return err
+	}
 
 	title := policy.NameDesc
 	subtitle := fmt.Sprintf("La tua polizza n° %s si rinnova il %s, provvedi al pagamento.", policy.CodeCompany,
@@ -337,7 +346,7 @@ func SendMailRenewDraftV2(policy models.Policy, from, to, cc Address, flowName s
 	}
 	subject := fmt.Sprintf("%s - %s", title, subtitle)
 
-	SendMail(MailRequest{
+	err = SendMailV2(MailRequest{
 		FromAddress: from,
 		To:          []string{to.Address},
 		Cc:          cc.Address,
@@ -348,6 +357,9 @@ func SendMailRenewDraftV2(policy models.Policy, from, to, cc Address, flowName s
 		IsHtml:      true,
 		IsApp:       true,
 	})
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

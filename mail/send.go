@@ -271,3 +271,200 @@ func SendMail(obj MailRequest) {
 
 	log.Println("[SendMail] end ----------------------------------------------")
 }
+
+func SendMailV2(obj MailRequest) error {
+	log.Println("[SendMail] start --------------------------------------------")
+	var (
+		username = os.Getenv("EMAIL_USERNAME")
+		password = os.Getenv("EMAIL_PASSWORD")
+		from     = AddressAnna
+		file     []byte
+		tpl      bytes.Buffer
+		err      error
+	)
+
+	switch os.Getenv("env") {
+	case "local":
+		file, err = os.ReadFile("../function-data/dev/mail/mail_template.html")
+	case "dev":
+		file, err = lib.GetFromStorageV2("function-data", "mail/mail_template.html", "")
+	case "prod":
+		file, err = lib.GetFromStorageV2("core-350507-function-data", "mail/mail_template.html", "")
+	}
+
+	tmplt := template.New("action")
+	tmplt, err = tmplt.Parse(string(file))
+	if err != nil {
+		return err
+	}
+
+	data := Data{
+		Title:     obj.Title,
+		SubTitle:  obj.SubTitle,
+		IsLink:    obj.IsLink,
+		Link:      obj.Link,
+		LinkLabel: obj.LinkLabel,
+		IsApp:     obj.IsApp,
+		Content:   obj.Message,
+	}
+	err = tmplt.Execute(&tpl, data)
+	if err != nil {
+		return err
+	}
+
+	emptyAddress := mail.Address{}
+	if obj.FromAddress.String() != emptyAddress.String() {
+		from = obj.FromAddress
+	} else if obj.From != "" {
+		from.Address = obj.From
+		if obj.FromName != "" {
+			from.Name = obj.FromName
+		} else {
+			from.Name = obj.From
+		}
+	}
+
+	for _, _to := range obj.To {
+		to := mail.Address{Name: _to, Address: _to}
+		subj := obj.Subject
+		body := obj.Message
+
+		// Setup headers
+		headers := make(map[string]string)
+		headers["From"] = from.String()
+		headers["To"] = _to
+		headers["Subject"] = subj
+		headers["Cc"] = obj.Cc
+		headers["Bcc"] = obj.Bcc
+
+		// Setup message
+		message := ""
+		for k, v := range headers {
+			message += fmt.Sprintf("%s: %s\r\n", k, v)
+		}
+		message += "MIME-Version: 1.0\r\n"
+
+		if obj.IsAttachment {
+			message += fmt.Sprintf("Content-Type: multipart/mixed; boundary=\"%s\"\n", outerBoundary)
+			message += fmt.Sprintf("\r\n--%s\r\n", outerBoundary)
+		}
+
+		if obj.IsHtml {
+			message += "Content-Type: text/html; charset=\"UTF-8\"\r\n"
+			message += fmt.Sprintf("\r\n%s", tpl.String())
+
+			if obj.IsAttachment {
+				for _, v := range *obj.Attachments {
+					message = addAttachment(message, v.Name, v.ContentType, v.Byte)
+				}
+				message += fmt.Sprintf("\r\n--%s--\r\n", outerBoundary)
+			}
+		} else {
+			message += "Content-Type:text/plain; charset=\"UTF-8\"\r\n"
+			message += fmt.Sprintf("\r\n%s", body)
+
+			if obj.IsAttachment {
+				for _, v := range *obj.Attachments {
+					message = addAttachment(message, v.Name, v.ContentType, v.Byte)
+				}
+				message += fmt.Sprintf("\r\n\n--%s--\r\n", outerBoundary)
+			}
+		}
+
+		log.Println("[SendMail] sending message...")
+
+		// Connect to the SMTP Server
+		servername := "smtp.office365.com:587"
+		host, _, err := net.SplitHostPort(servername)
+		if err != nil {
+			return err
+		}
+
+		// TLS config
+		tlsconfig := &tls.Config{
+			ServerName: host,
+		}
+
+		// Here is the key, you need to call tls.Dial instead of smtp.Dial
+		// for smtp servers running on 465 that require an ssl connection
+		// from the very beginning (no starttls)40.99.214.146
+		conn, err := net.Dial("tcp", "smtp.office365.com:587")
+		if err != nil {
+			return err
+		}
+
+		c, err := smtp.NewClient(conn, host)
+		if err != nil {
+			return err
+		}
+
+		err = c.StartTLS(tlsconfig)
+		if err != nil {
+			return err
+		}
+
+		// Auth
+		err = c.Auth(LoginAuth(username, password))
+		if err != nil {
+			return err
+		}
+
+		// To, From and Cc
+		log.Printf("[SendMail] setting address from: %s", from.Address)
+		err = c.Mail(from.Address)
+		if err != nil {
+			return err
+		}
+
+		log.Printf("[SendMail] setting address to: %s", to.Address)
+		err = c.Rcpt(to.Address)
+		if err != nil {
+			return err
+		}
+
+		if obj.Cc != "" {
+			// TODO: in the future we might need to handle multiple Ccs
+			log.Printf("[SendMail] setting cc to: %s", obj.Cc)
+			err = c.Rcpt(obj.Cc)
+			if err != nil {
+				return err
+			}
+		}
+
+		if obj.Bcc != "" {
+			// TODO: in the future we might need to handle multiple Bccs
+			log.Printf("[SendMail] setting bcc to: %s", obj.Bcc)
+			err = c.Rcpt(obj.Bcc)
+			if err != nil {
+				return err
+			}
+		}
+
+		// Data
+		w, err := c.Data()
+		if err != nil {
+			return err
+		}
+
+		_, err = w.Write([]byte(message))
+		if err != nil {
+			return err
+		}
+
+		err = w.Close()
+		if err != nil {
+			return err
+		}
+
+		err = c.Quit()
+		if err != nil {
+			return err
+		}
+
+		log.Println("[SendMail] message sent")
+	}
+
+	log.Println("[SendMail] end ----------------------------------------------")
+
+	return nil
+}

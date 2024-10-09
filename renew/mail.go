@@ -42,6 +42,7 @@ func RenewMailFx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	defer r.Body.Close()
 	err = json.Unmarshal(body, &req)
 	if err != nil {
+		log.Printf("error unmarshaling request: %s", err.Error())
 		return "", nil, err
 	}
 
@@ -66,13 +67,21 @@ func RenewMailFx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	targetDate := date.AddDate(0, 0, daysBeforeRenew)
 
 	policies, err := getRenewPolicies(targetDate)
+	if err != nil {
+		log.Printf("error getting renew policies: %s", err.Error())
+		return "", nil, err
+	}
 
 	for _, policy := range policies {
 		from := mail.AddressAnna
 		to := mail.GetContractorEmail(&policy)
 		flowName := models.ECommerceFlow
 		log.Printf("Sending email from %s to %s", from, to)
-		mail.SendMailRenewDraft(policy, from, to, mail.Address{}, flowName, policy.HasMandate)
+		err = mail.SendMailRenewDraftV2(policy, from, to, mail.Address{}, flowName, policy.HasMandate)
+		if err != nil {
+			log.Printf("error sending mail: %s", err.Error())
+			return "", nil, err
+		}
 	}
 
 	return "", nil, nil
@@ -103,7 +112,7 @@ func getRenewPolicies(targetDate time.Time) ([]models.Policy, error) {
 
 	policies, err := lib.QueryParametrizedRowsBigQuery[models.Policy](query.String(), params)
 	if err != nil {
-		log.Printf("error fetching policies from BigQuery: %s", err)
+		log.Printf("error fetching policies from BigQuery: %s", err.Error())
 		return nil, err
 	}
 
