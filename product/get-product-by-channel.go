@@ -305,6 +305,19 @@ func overrideProductInfo(product *models.Product, networkNode *models.NetworkNod
 					}
 				}
 			}
+
+			// TODO: this need to be removed in the future
+			if lib.SliceContains([]string{"facile_agent"}, warrant.Name) {
+				for index, paymentProvider := range paymentProviders {
+					configs := make([]models.PaymentConfig, 0)
+					for _, config := range paymentProvider.Configs {
+						if config.Rate != string(models.PaySplitMonthly) {
+							configs = append(configs, config)
+						}
+					}
+					paymentProviders[index].Configs = configs
+				}
+			}
 			product.PaymentProviders = paymentProviders
 		}
 
