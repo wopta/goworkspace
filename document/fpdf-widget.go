@@ -1224,7 +1224,7 @@ func allegato4Section(pdf *fpdf.Fpdf, producerInfo, proponentInfo map[string]str
 	pdf.MultiCell(0, 3, "Indicare le modalità di pagamento ammesse ", "", "", false)
 	pdf.Ln(1)
 	setBlackRegularFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3, "Sono consentiti, nei confronti di Wopta, esclusivamente bonifico e strumenti di "+
+	pdf.MultiCell(0, 3, "Sono consentiti, nei confronti dell'intermediario, esclusivamente bonifico e strumenti di "+
 		"pagamento elettronico, quali ad esempio, carte di credito e/o carte di debito, incluse le carte "+
 		"prepagate.", "", "", false)
 	pdf.Ln(3)
