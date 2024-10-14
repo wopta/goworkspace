@@ -81,6 +81,8 @@ func loadLifeBeneficiariesInfo(policy *models.Policy) ([]map[string]string, stri
 func loadProponentInfo(networkNode *models.NetworkNode) map[string]string {
 	policyProponent := make(map[string]string)
 
+	policyProponent["name"] = "Wopta Assicurazioni Srl"
+
 	if networkNode == nil || networkNode.Type == models.PartnershipNetworkNodeType || networkNode.IsMgaProponent {
 		policyProponent["address"] = "Galleria del Corso, 1 - 20122 MILANO (MI)"
 		policyProponent["phone"] = "02.91.24.03.46"
@@ -101,6 +103,10 @@ func loadProponentInfo(networkNode *models.NetworkNode) map[string]string {
 		policyProponent["email"] = "====="
 		policyProponent["pec"] = "====="
 		policyProponent["website"] = "====="
+
+		if name := proponentNode.Agency.Name; name != "" {
+			policyProponent["name"] = name
+		}
 
 		if address := proponentNode.GetAddress(); address != "" {
 			policyProponent["address"] = address
