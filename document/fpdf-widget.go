@@ -1119,7 +1119,7 @@ func allegato3Section(pdf *fpdf.Fpdf, producerInfo, proponentInfo map[string]str
 	pdf.Ln(1)
 
 	setBlackRegularFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3, "La Wopta Assicurazioni Srl comunica di aver messo a disposizione nei propri "+
+	pdf.MultiCell(0, 3, proponentInfo["name"]+" comunica di aver messo a disposizione nei propri "+
 		"locali l’elenco degli obblighi di comportamento cui adempie, come indicati nell’allegato 4-ter del Regolamento"+
 		" IVASS n. 40/2018.", "", "", false)
 	pdf.Ln(1)
@@ -1132,7 +1132,7 @@ func allegato3Section(pdf *fpdf.Fpdf, producerInfo, proponentInfo map[string]str
 		"d’interessi", "", "", false)
 	pdf.Ln(1)
 	setBlackRegularFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3, "Wopta Assicurazioni Srl ed i soggetti che operano per la stessa non sono "+
+	pdf.MultiCell(0, 3, proponentInfo["name"]+" ed i soggetti che operano per la stessa non sono "+
 		"detentori di una partecipazione, diretta o indiretta, pari o superiore al 10% del capitale sociale o dei "+
 		"diritti di voto di alcuna Impresa di assicurazione.", "", "", false)
 	pdf.Ln(1)
@@ -1224,7 +1224,7 @@ func allegato4Section(pdf *fpdf.Fpdf, producerInfo, proponentInfo map[string]str
 	pdf.MultiCell(0, 3, "Indicare le modalità di pagamento ammesse ", "", "", false)
 	pdf.Ln(1)
 	setBlackRegularFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 3, "Sono consentiti, nei confronti di Wopta, esclusivamente bonifico e strumenti di "+
+	pdf.MultiCell(0, 3, "Sono consentiti, nei confronti dell'intermediario, esclusivamente bonifico e strumenti di "+
 		"pagamento elettronico, quali ad esempio, carte di credito e/o carte di debito, incluse le carte "+
 		"prepagate.", "", "", false)
 	pdf.Ln(3)
