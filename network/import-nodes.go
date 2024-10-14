@@ -59,6 +59,12 @@ var (
 		"Responsabile dell'attività di distribuzione",
 		"Responsabile dell'attività di intermediazione",
 	}
+	networkNameList = []string{
+		WoptaNetwork,
+		WinNetwork,
+		AuaNetwork,
+		FacileBrokerNetwork,
+	}
 )
 
 const (
@@ -100,11 +106,12 @@ const (
 	designationCol           int = 30
 	worksForUidCol           int = 31
 	isActiveCol              int = 32
-	callbackClientCol        int = 33
-	jwtKeyNameCol            int = 34
-	jwtKeyAlgorithmCol       int = 35
-	jwtEncryptionCol         int = 36
-	jwtSignatureCol          int = 37
+	networkNameCol           int = 33
+
+	WoptaNetwork        = "WOPTA"
+	WinNetwork          = "WIN"
+	AuaNetwork          = "AUA"
+	FacileBrokerNetwork = "FACILE-BROKER"
 )
 
 func ImportNodesFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -329,12 +336,11 @@ func buildWarrantsCompatibilityMap(warrants []models.Warrant) map[string][]strin
 
 func normalizeFields(row []string) []string {
 	trimFields := []int{codeCol, externalNetworkCodeCol, parentUidCol, agencyRuiRegistrationCol, agencyVatCodeCol,
-		agencyPhoneCol, agentVatCodeCol, agentPhoneCol, worksForUidCol, callbackClientCol, jwtKeyAlgorithmCol,
-		jwtEncryptionCol, jwtSignatureCol}
+		agencyPhoneCol, agentVatCodeCol, agentPhoneCol, worksForUidCol}
 	toUpperFields := []int{mailCol, agencyNameCol, agencyRuiCodeCol, agencyRuiSectionCol, agencyPecCol,
 		agencyWebsiteCol, agencyStreetNameCol, agencyStreetNumberCol, agencyLocalityCol, agencyCityCol,
 		agencyPostalCodeCol, agencyCityCodeCol, agentNameCol, agentSurnameCol, agentFiscalCodeCol, agentRuiCodeCol,
-		agentRuiSectionCol, isMgaProponentCol, hasAnnexCol, isActiveCol, jwtKeyNameCol}
+		agentRuiSectionCol, isMgaProponentCol, hasAnnexCol, isActiveCol, networkNameCol}
 	toLowerFields := []int{typeCol, warrantCol}
 
 	row = lib.SliceMap(row, func(field string) string {
@@ -374,7 +380,7 @@ func validateRow(row []string) []int {
 			agencyRuiSectionCol, agencyRuiRegistrationCol, agencyVatCodeCol, agencyPecCol, agencyWebsiteCol,
 			agencyPhoneCol, agencyStreetNameCol, agencyStreetNumberCol, agencyLocalityCol, agencyCityCol,
 			agencyPostalCodeCol, agencyCityCodeCol, agentNameCol, agentSurnameCol, agentFiscalCodeCol,
-			agentRuiCodeCol, agentRuiSectionCol, agentRuiRegistrationCol, isMgaProponentCol, isActiveCol}
+			agentRuiCodeCol, agentRuiSectionCol, agentRuiRegistrationCol, isMgaProponentCol, isActiveCol, networkNameCol}
 		isMgaProponent := boolMap[row[isMgaProponentCol]]
 		hasAnnex := boolMap[row[hasAnnexCol]]
 		if isMgaProponent {
@@ -386,7 +392,7 @@ func validateRow(row []string) []int {
 	} else if row[typeCol] == models.AgentNetworkNodeType {
 		requiredFields = []int{codeCol, typeCol, mailCol, warrantCol, parentUidCol, agentNameCol, agentSurnameCol,
 			agentFiscalCodeCol, agentRuiCodeCol, agentRuiSectionCol, agentRuiRegistrationCol, isMgaProponentCol,
-			hasAnnexCol, isActiveCol}
+			hasAnnexCol, isActiveCol, networkNameCol}
 		isMgaProponent := boolMap[row[isMgaProponentCol]]
 		hasAnnex := boolMap[row[hasAnnexCol]]
 		if isMgaProponent || hasAnnex {
@@ -513,6 +519,12 @@ func nodeConfigurationValidation(errorNodes map[string][]int, nodeType string, r
 				log.Printf("Error processing node %s: invalid node configuration for isMgaProponent = false", nodeCode)
 				columnsError = append(columnsError, isMgaProponentCol, hasAnnexCol, designationCol, worksForUidCol)
 			}
+		}
+
+		// check if node is part of a known network
+		if !lib.SliceContains(networkNameList, row[networkNameCol]) {
+			log.Printf("Error processing node %s: invalid network %s", nodeCode, row[networkNameCol])
+			columnsError = append(columnsError, networkNameCol)
 		}
 
 		if len(columnsError) != 0 {
