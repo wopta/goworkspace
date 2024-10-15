@@ -72,7 +72,7 @@ func lifeAxaContractV1(pdf *fpdf.Fpdf, origin string, policy *models.Policy, net
 
 	axaTablePart3Section(pdf)
 
-	generatePolicyAnnex(pdf, origin, networkNode, policy, emptyHeader(pdf, false))
+	generatePolicyAnnex(pdf, origin, networkNode, policy, setAnnexHeaderFooter(pdf, networkNode, false))
 
 	woptaHeader(pdf, false)
 

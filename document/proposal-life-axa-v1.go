@@ -66,7 +66,7 @@ func lifeAxaProposalV1(pdf *fpdf.Fpdf, origin string, policy *models.Policy, net
 
 	axaTablePart3Section(pdf)
 
-	generatePolicyAnnex(pdf, origin, networkNode, policy, emptyHeader(pdf, true))
+	generatePolicyAnnex(pdf, origin, networkNode, policy, setAnnexHeaderFooter(pdf, networkNode, true))
 
 	woptaHeader(pdf, true)
 

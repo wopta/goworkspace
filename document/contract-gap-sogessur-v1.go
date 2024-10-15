@@ -54,9 +54,7 @@ func gapSogessurContractV1(pdf *fpdf.Fpdf, origin string, policy *models.Policy,
 
 	printStatement(pdf, statements[len(statements)-1], policy.Company, false)
 
-	woptaHeader(pdf, false)
-
-	generatePolicyAnnex(pdf, origin, networkNode, policy, emptyHeader(pdf, false))
+	generatePolicyAnnex(pdf, origin, networkNode, policy, setAnnexHeaderFooter(pdf, networkNode, false))
 
 	woptaHeader(pdf, false)
 

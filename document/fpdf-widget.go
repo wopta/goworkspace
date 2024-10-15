@@ -295,15 +295,13 @@ func globalFooter(pdf *fpdf.Fpdf) {
 	})
 }
 
-func emptyHeader(pdf *fpdf.Fpdf, isProposal bool) func() {
-	return func() {
-		pdf.SetHeaderFunc(func() {
-			if isProposal {
-				insertWatermark(pdf, proposal)
-			}
-		})
-		pdf.SetFooterFunc(func() {})
-	}
+func emptyHeader(pdf *fpdf.Fpdf, isProposal bool) {
+	pdf.SetHeaderFunc(func() {
+		if isProposal {
+			insertWatermark(pdf, proposal)
+		}
+	})
+	pdf.SetFooterFunc(func() {})
 }
 
 func globalPrivacySection(pdf *fpdf.Fpdf, survey models.Survey) {
@@ -1296,13 +1294,9 @@ func generatePolicyAnnex(pdf *fpdf.Fpdf, origin string, networkNode *models.Netw
 		designation := loadDesignation(networkNode)
 		annex4Section1Info := loadAnnex4Section1Info(policy, networkNode)
 
-		if networkNode != nil && !networkNode.IsMgaProponent {
-			headerFunc()
-		}
+		headerFunc()
 
 		pdf.AddPage()
-
-		//woptaFooter(pdf)
 
 		allegato3Section(pdf, producerInfo, proponentInfo, designation)
 
@@ -1313,5 +1307,18 @@ func generatePolicyAnnex(pdf *fpdf.Fpdf, origin string, networkNode *models.Netw
 		pdf.AddPage()
 
 		allegato4TerSection(pdf, producerInfo, proponentInfo, designation)
+	}
+}
+
+func setAnnexHeaderFooter(pdf *fpdf.Fpdf, networkNode *models.NetworkNode, isProposal bool) func() {
+	if networkNode != nil && networkNode.IsMgaProponent {
+		return func() {
+			woptaHeader(pdf, isProposal)
+
+			woptaFooter(pdf)
+		}
+	}
+	return func() {
+		emptyHeader(pdf, isProposal)
 	}
 }
