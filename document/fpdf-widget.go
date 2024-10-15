@@ -1311,7 +1311,7 @@ func generatePolicyAnnex(pdf *fpdf.Fpdf, origin string, networkNode *models.Netw
 }
 
 func setAnnexHeaderFooter(pdf *fpdf.Fpdf, networkNode *models.NetworkNode, isProposal bool) func() {
-	if networkNode != nil && networkNode.IsMgaProponent {
+	if networkNode == nil || networkNode.Type == models.PartnershipNetworkNodeType || networkNode.IsMgaProponent {
 		return func() {
 			woptaHeader(pdf, isProposal)
 
