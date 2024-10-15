@@ -58,7 +58,7 @@ func personaGlobalContractV1(pdf *fpdf.Fpdf, policy *models.Policy, networkNode 
 
 	personalDataHandlingSection(pdf, policy, false)
 
-	generatePolicyAnnex(pdf, "", networkNode, policy)
+	generatePolicyAnnex(pdf, "", networkNode, policy, emptyHeader(pdf, false))
 
 	globalHeader(pdf, false)
 

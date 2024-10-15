@@ -56,9 +56,13 @@ func gapSogessurContractV1(pdf *fpdf.Fpdf, origin string, policy *models.Policy,
 
 	woptaHeader(pdf, false)
 
-	generatePolicyAnnex(pdf, origin, networkNode, policy)
+	generatePolicyAnnex(pdf, origin, networkNode, policy, emptyHeader(pdf, false))
+
+	woptaHeader(pdf, false)
 
 	pdf.AddPage()
+
+	woptaFooter(pdf)
 
 	woptaPrivacySection(pdf)
 

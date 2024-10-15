@@ -2,12 +2,13 @@ package document
 
 import (
 	"fmt"
+	"strings"
+	"time"
+
 	"github.com/dustin/go-humanize"
 	"github.com/go-pdf/fpdf"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
-	"strings"
-	"time"
 )
 
 func lifeAxaContractV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, networkNode *models.NetworkNode, product *models.Product) (string, []byte) {
@@ -78,11 +79,9 @@ func lifeAxaContractV2(pdf *fpdf.Fpdf, origin string, policy *models.Policy, net
 
 	axaTablePart3Section(pdf)
 
+	generatePolicyAnnex(pdf, origin, networkNode, policy, emptyHeader(pdf, false))
+
 	woptaHeader(pdf, false)
-
-	//woptaFooter(pdf)
-
-	generatePolicyAnnex(pdf, origin, networkNode, policy)
 
 	pdf.AddPage()
 
