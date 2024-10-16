@@ -52,4 +52,5 @@ const (
 	RenewPolicyCollection        string = "renewPolicy"            // firestore and bigquery
 	RenewPolicyViewCollection    string = "renewPolicyView"        // bigquery
 	RenewTransactionCollection   string = "renewTransactions"      // firestore and bigquery
+	MailReportCollection         string = "mail-report"            // only for bigquery
 )
