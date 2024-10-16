@@ -26,7 +26,9 @@ func InsertRowsBigQuery(datasetID string, tableID string, value interface{}) err
 	defer client.Close()
 	inserter := client.Dataset(datasetID).Table(tableID).Inserter()
 	e := inserter.Put(context.Background(), value)
-	log.Println(e)
+	if e != nil {
+		log.Println(e)
+	}
 	return e
 }
 
