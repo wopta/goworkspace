@@ -30,6 +30,7 @@ RENEW = "renew"
 RESERVED = "reserved"
 RULES = "rules"
 SELLABLE = "sellable"
+TEST = "test"
 TRANSACTION = "transaction"
 USER = "user"
 
@@ -53,6 +54,7 @@ updatable_functions = [
     RESERVED,
     RULES,
     SELLABLE,
+    TEST,
     TRANSACTION,
     USER
 ]
@@ -125,7 +127,7 @@ if __name__ == "__main__":
 
     args.changed_modules = [function_name.lower() for function_name in args.changed_modules]
 
-    print(f"Arguments received:\n  Sprint Number: {args.sprint_number}\n  Changed Modules: {args.changed_modules}\n  "
+    print(f"Arguments received:\n  Sprint Number: {args.sprint_number}\n  Changed Functions: {args.changed_modules}\n  "
           f"Dry Run: {args.prod}\n")
 
     main(sprint_number=args.sprint_number, changed_functions=args.changed_modules, dry_run=args.prod)
