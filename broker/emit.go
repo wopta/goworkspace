@@ -4,12 +4,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	prd "github.com/wopta/goworkspace/product"
 	"io"
 	"log"
 	"net/http"
 	"strings"
 	"time"
+
+	prd "github.com/wopta/goworkspace/product"
 
 	"cloud.google.com/go/civil"
 	"github.com/wopta/goworkspace/callback_out"
@@ -230,7 +231,7 @@ func emitBase(policy *models.Policy, origin string) {
 	policy.CompanyEmitted = false
 	policy.EmitDate = now
 	policy.BigEmitDate = civil.DateTimeOf(now)
-	company, numb, tot := GetSequenceByCompany(strings.ToLower(policy.Company), firePolicy)
+	company, numb, tot := GetSequenceByCompany(strings.ToLower(policy.Company), strings.ToLower(policy.Name), firePolicy)
 	log.Printf("[emitBase] codeCompany: %s", company)
 	log.Printf("[emitBase] numberCompany: %d", numb)
 	log.Printf("[emitBase] number: %d", tot)

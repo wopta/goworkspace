@@ -1,15 +1,17 @@
 package broker
 
 import (
+	"context"
 	"fmt"
 	"log"
+	"os"
 
 	"cloud.google.com/go/firestore"
-	lib "github.com/wopta/goworkspace/lib"
-	models "github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 )
 
-func GetSequenceByCompany(name string, firePolicy string) (string, int, int) {
+func GetSequenceByCompany(companyName, productName string, firePolicy string) (string, int, int) {
 	var (
 		codeCompany         string
 		companyDefault      int
@@ -18,7 +20,7 @@ func GetSequenceByCompany(name string, firePolicy string) (string, int, int) {
 		numberCompany       int
 		number              int
 	)
-	switch name {
+	switch companyName {
 	case models.GlobalCompany:
 		companyDefault = 1
 		companyPrefix = "WB"
@@ -32,10 +34,17 @@ func GetSequenceByCompany(name string, firePolicy string) (string, int, int) {
 		companyPrefix = "G"
 	}
 
-	rn, e := lib.OrderWhereLimitFirestoreErr(firePolicy, "company", "numberCompany", "==", name, firestore.Desc, 1)
-	log.Println(e)
+	ctx := context.Background()
+	client, err := firestore.NewClient(ctx, os.Getenv("GOOGLE_PROJECT_ID"))
+	lib.CheckError(err)
+	docSnap := client.Collection(lib.PolicyCollection).
+		Where("company", "==", companyName).
+		Where("name", "==", productName).
+		OrderBy("numberCompany", firestore.Desc).
+		Limit(1).
+		Documents(ctx)
 
-	policy := models.PolicyToListData(rn)
+	policy := models.PolicyToListData(docSnap)
 	log.Println("len(policy):", len(policy))
 	if len(policy) == 0 {
 		//WE0000001
