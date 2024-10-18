@@ -34,6 +34,11 @@ func main() {
 		log.Fatalf("Error loading .env file: %s", err)
 	}
 
+	/*os.Setenv("env", "prod")
+	os.Setenv("GOOGLE_PROJECT_ID", "core-350507")
+
+	_script.ExportPmiProduction()*/
+
 	// Use PORT environment variable, or default to 8080.
 	port := "8080"
 	if envPort := os.Getenv("PORT"); envPort != "" {
