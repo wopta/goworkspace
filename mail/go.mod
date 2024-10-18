@@ -10,8 +10,8 @@ require (
 	github.com/dustin/go-humanize v1.0.1
 	github.com/google/uuid v1.6.0
 	github.com/wopta/goworkspace/lib v1.0.130
-	github.com/wopta/goworkspace/models v1.2.13
-	github.com/wopta/goworkspace/network v1.0.78
+	github.com/wopta/goworkspace/models v1.2.14
+	github.com/wopta/goworkspace/network v1.0.79
 	google.golang.org/api v0.181.0
 )
 
