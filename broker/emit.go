@@ -231,7 +231,7 @@ func emitBase(policy *models.Policy, origin string) {
 	policy.CompanyEmitted = false
 	policy.EmitDate = now
 	policy.BigEmitDate = civil.DateTimeOf(now)
-	company, numb, tot := GetSequenceByCompany(strings.ToLower(policy.Company), strings.ToLower(policy.Name), firePolicy)
+	company, numb, tot := GetSequenceByCompany(strings.ToLower(policy.Company), firePolicy)
 	log.Printf("[emitBase] codeCompany: %s", company)
 	log.Printf("[emitBase] numberCompany: %d", numb)
 	log.Printf("[emitBase] number: %d", tot)

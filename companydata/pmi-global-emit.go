@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"time"
 
-	lib "github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -160,7 +160,7 @@ func getPmiData(policies []models.Policy) [][]string {
 						asset.Building.Locality,                                 //COMUNE UBICAZIONE
 						asset.Building.PostalCode,                               //CAP UBICAZIONE
 						"",                                                      //TOPONIMO UBICAZIONE
-						asset.Building.Address.StreetName,                                  //INDIRIZZO UBICAZIONE
+						asset.Building.Address,                                  //INDIRIZZO UBICAZIONE
 						asset.Building.StreetNumber,                             //NUMERO CIVICO UBICAZIONE
 						ateco,                                                   //CODICE ATTIVITA' – BENI
 						class,                                                   //CLASSE - SOLO BENI

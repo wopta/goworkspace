@@ -1,10 +1,11 @@
 package document
 
 import (
-	"github.com/dustin/go-humanize"
-	"github.com/wopta/goworkspace/lib"
 	"strconv"
 	"strings"
+
+	"github.com/dustin/go-humanize"
+	"github.com/wopta/goworkspace/lib"
 
 	"github.com/johnfercher/maroto/pkg/consts"
 	"github.com/johnfercher/maroto/pkg/pdf"
@@ -326,7 +327,7 @@ func (s Skin) GetPmi(data models.Policy, m pdf.Maroto) pdf.Maroto {
 				constructionMaterial = "Acciaio"
 			}
 			c = append(c, []string{"", "", "Sede "})
-			d = append(d, build.Address.StreetName+" "+build.StreetNumber+" - "+build.PostalCode+" "+build.City+" ("+build.CityCode+")")
+			d = append(d, build.Address+" "+build.StreetNumber+" - "+build.PostalCode+" "+build.City+" ("+build.CityCode+")")
 			d = append(d, "Fabbricato "+constructionMaterial+" construito "+constructionYear+", "+floor+", "+alarm+" antifurto, "+holder)
 			d = append(d, "Attività ATECO codice: "+ateco)
 
