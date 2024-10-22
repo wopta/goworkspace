@@ -21,6 +21,7 @@ const (
 	reservedApprovedTemplateType = "approved"
 	reservedRejectedTemplateType = "rejected"
 	renewDraftTemplateType       = "renew-draft"
+	renewNoticeTemplateType      = "renew_notice"
 	linkFormat                   = "https://storage.googleapis.com/documents-public-dev/information-sets/%s/%s/Precontrattuale.pdf"
 )
 
@@ -316,5 +317,30 @@ func SendMailRenewDraft(policy models.Policy, from, to, cc Address, flowName str
 		Subject:     subject,
 		IsHtml:      true,
 		IsApp:       true,
+	})
+}
+
+func SendMailRenewNotice(node models.NetworkNode, from, to, cc Address) {
+	var bodyData BodyData
+
+	setNetworkNodeBodyData(&node, &bodyData)
+
+	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s.html", renewNoticeTemplateType))
+
+	messageBody := fillTemplate(templateFile, &bodyData)
+
+	title := "Notifica quietanza"
+	subtitle := "Le tue quietanze sono pronte"
+	subject := fmt.Sprintf("%s - %s", title, subtitle)
+
+	SendMail(MailRequest{
+		FromAddress: from,
+		To:          []string{to.Address},
+		Cc:          cc.Address,
+		Message:     messageBody,
+		Title:       title,
+		SubTitle:    subtitle,
+		Subject:     subject,
+		IsHtml:      true,
 	})
 }
