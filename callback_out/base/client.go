@@ -42,7 +42,7 @@ func NewClient(networkNode *models.NetworkNode, network string) *Client {
 		externalConfig: internal.CallbackExternalConfig{
 			Events: map[string]bool{
 				md.Proposal:        true,
-				md.RequestApproval: false,
+				md.RequestApproval: true,
 				md.Emit:            true,
 				md.Paid:            true,
 				md.EmitRemittance:  false,
