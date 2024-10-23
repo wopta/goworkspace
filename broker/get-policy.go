@@ -34,8 +34,7 @@ func GetPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 		return "", nil, err
 	}
 
-	isNetworkNode := lib.SliceContains([]string{lib.UserRoleAreaManager, lib.UserRoleAgency, lib.UserRoleAgent}, authToken.Role)
-	if isNetworkNode && !utils.CanBeAccessedBy(authToken.Role, policy.ProducerUid, authToken.UserID) {
+	if authToken.IsNetworkNode && !utils.CanBeAccessedBy(authToken.Role, policy.ProducerUid, authToken.UserID) {
 		log.Printf("error fetching policy invalid producer uid: %s", authToken.UserID)
 		return "", nil, errors.New("invalid producer uid")
 	}
