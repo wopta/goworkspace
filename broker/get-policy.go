@@ -34,17 +34,10 @@ func GetPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 		return "", nil, err
 	}
 
-	switch authToken.Role {
-	case lib.UserRoleCustomer:
-		if policy.Contractor.Uid != authToken.UserID {
-			log.Printf("error fetching policy invalid user id: %s", authToken.UserID)
-			return "", nil, errors.New("invalid user id")
-		}
-	case lib.UserRoleAreaManager, lib.UserRoleAgency, lib.UserRoleAgent:
-		if !utils.CanBeAccessedBy(authToken.Role, policy.ProducerUid, authToken.UserID) {
-			log.Printf("error fetching policy invalid producer uid: %s", authToken.UserID)
-			return "", nil, errors.New("invalid producer uid")
-		}
+	isNetworkNode := lib.SliceContains([]string{lib.UserRoleAreaManager, lib.UserRoleAgency, lib.UserRoleAgent}, authToken.Role)
+	if isNetworkNode && !utils.CanBeAccessedBy(authToken.Role, policy.ProducerUid, authToken.UserID) {
+		log.Printf("error fetching policy invalid producer uid: %s", authToken.UserID)
+		return "", nil, errors.New("invalid producer uid")
 	}
 
 	res, err := json.Marshal(policy)
