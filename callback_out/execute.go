@@ -40,6 +40,11 @@ func Execute(node *models.NetworkNode, policy models.Policy, rawAction internal.
 
 	actions := client.DecodeAction(rawAction)
 
+	if len(actions) == 0 {
+		log.Printf("action '%s' not implemented for client", rawAction)
+		return
+	}
+
 	for _, action := range actions {
 		switch action {
 		case Proposal:
