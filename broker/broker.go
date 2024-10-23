@@ -27,7 +27,7 @@ var brokerRoutes []lib.Route = []lib.Route{
 		Route:   "/v1/policy/{uid}",
 		Handler: lib.ResponseLoggerWrapper(GetPolicyFx),
 		Method:  http.MethodGet,
-		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleAreaManager, lib.UserRoleAgency, lib.UserRoleAgent, lib.UserRoleCustomer},
+		Roles:   []string{lib.UserRoleAll},
 	},
 	{
 		Route:   "/v1/policy/lead",
