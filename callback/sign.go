@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/wopta/goworkspace/callback_out"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
@@ -92,4 +93,6 @@ func namirialStepFinished(origin, policyUid string) {
 	policy = *state.Data
 
 	policy.BigquerySave(origin)
+
+	callback_out.Execute(networkNode, policy, callback_out.Signed)
 }

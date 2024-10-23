@@ -6,8 +6,11 @@ var (
 	Proposal        internal.CallbackoutAction = "Proposal"
 	RequestApproval internal.CallbackoutAction = "RequestApproval"
 	Emit            internal.CallbackoutAction = "Emit"
+	Signed          internal.CallbackoutAction = "Signed"
 	Paid            internal.CallbackoutAction = "Paid"
 	EmitRemittance  internal.CallbackoutAction = "EmitRemittance"
+	Approved        internal.CallbackoutAction = "Approved"
+	Rejected        internal.CallbackoutAction = "Rejected"
 )
 
 func GetAvailableActions() map[string][]string {
