@@ -105,6 +105,18 @@ func (c *Client) Paid(policy models.Policy) internal.CallbackInfo {
 	return c.baseRequest(policy)
 }
 
+func (c *Client) Signed(policy models.Policy) internal.CallbackInfo {
+	return c.baseRequest(policy)
+}
+
+func (c *Client) Approved(policy models.Policy) internal.CallbackInfo {
+	return c.baseRequest(policy)
+}
+
+func (c *Client) Rejected(policy models.Policy) internal.CallbackInfo {
+	return c.baseRequest(policy)
+}
+
 func (c *Client) DecodeAction(rawAction string) []string {
 	actionEnabled, ok := c.externalConfig.Events[rawAction]
 	if !actionEnabled || !ok {

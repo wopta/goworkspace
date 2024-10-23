@@ -13,7 +13,10 @@ var (
 	RequestApproval internal.CallbackoutAction = md.RequestApproval
 	Emit            internal.CallbackoutAction = md.Emit
 	Paid            internal.CallbackoutAction = md.Paid
+	Signed            internal.CallbackoutAction = md.Signed
 	EmitRemittance  internal.CallbackoutAction = md.EmitRemittance
+	Approved  internal.CallbackoutAction = md.Approved
+	Rejected  internal.CallbackoutAction = md.Rejected
 )
 
 func Execute(node *models.NetworkNode, policy models.Policy, rawAction internal.CallbackoutAction) {

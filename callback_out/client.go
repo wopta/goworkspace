@@ -12,11 +12,11 @@ import (
 type CallbackClient interface {
 	Proposal(models.Policy) internal.CallbackInfo
 	Emit(models.Policy) internal.CallbackInfo
-	// Signed(models.Policy) internal.CallbackInfo
+	Signed(models.Policy) internal.CallbackInfo
 	Paid(models.Policy) internal.CallbackInfo
 	RequestApproval(models.Policy) internal.CallbackInfo
-	// Approved(models.Policy) internal.CallbackInfo
-	// Rejected(models.Policy) internal.CallbackInfo
+	Approved(models.Policy) internal.CallbackInfo
+	Rejected(models.Policy) internal.CallbackInfo
 
 	// This method is temporary while we do not settle on the config for the node
 	DecodeAction(string) []string
