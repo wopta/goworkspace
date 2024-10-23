@@ -8,8 +8,8 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/network"
 	plc "github.com/wopta/goworkspace/policy"
+	"github.com/wopta/goworkspace/policy/utils"
 )
 
 func GetPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -37,12 +37,12 @@ func GetPolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	switch authToken.Role {
 	case lib.UserRoleCustomer:
 		if policy.Contractor.Uid != authToken.UserID {
-			log.Printf("error fetching policy: invalid user id: %s", authToken.UserID)
+			log.Printf("error fetching policy invalid user id: %s", authToken.UserID)
 			return "", nil, errors.New("invalid user id")
 		}
 	case lib.UserRoleAreaManager, lib.UserRoleAgency, lib.UserRoleAgent:
-		if policy.ProducerUid != authToken.UserID && !network.IsChildOf(authToken.UserID, policy.ProducerUid) {
-			log.Printf("error fetching policy: invalid producer uid: %s", authToken.UserID)
+		if !utils.CanBeAccessedBy(authToken.Role, policy.ProducerUid, authToken.UserID) {
+			log.Printf("error fetching policy invalid producer uid: %s", authToken.UserID)
 			return "", nil, errors.New("invalid producer uid")
 		}
 	}
