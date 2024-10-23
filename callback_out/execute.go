@@ -56,8 +56,14 @@ func Execute(node *models.NetworkNode, policy models.Policy, rawAction internal.
 			fx = client.RequestApproval
 		case Emit:
 			fx = client.Emit
+		case Signed:
+			fx = client.Signed
 		case Paid:
 			fx = client.Paid
+		case Approved:
+			fx = client.Approved
+		case Rejected:
+			fx = client.Rejected
 		default:
 			log.Printf("unhandled callback action '%s'", action)
 			return
