@@ -15,7 +15,10 @@ var (
 	Proposal        CallbackoutAction = "Proposal"
 	RequestApproval CallbackoutAction = "RequestApproval"
 	Emit            CallbackoutAction = "Emit"
+	Signed          CallbackoutAction = "Signed"
 	Paid            CallbackoutAction = "Paid"
+	Approved        CallbackoutAction = "Approved"
+	Rejected        CallbackoutAction = "Rejected"
 )
 
 type CallbackExternalConfig struct {

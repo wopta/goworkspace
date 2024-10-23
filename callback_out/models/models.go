@@ -18,7 +18,10 @@ func GetAvailableActions() map[string][]string {
 		Proposal:        {internal.Proposal},
 		RequestApproval: {internal.RequestApproval},
 		Emit:            {internal.Emit},
+		Signed:          {internal.Signed},
 		Paid:            {internal.Paid},
 		EmitRemittance:  {internal.Emit, internal.Paid},
+		Approved:        {internal.Approved},
+		Rejected:        {internal.Rejected},
 	}
 }
