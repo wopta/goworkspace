@@ -103,7 +103,12 @@ func EmitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	policyJsonLog, _ := policy.Marshal()
 	log.Printf("Policy %s JSON: %s", uid, string(policyJsonLog))
-
+	
+	if policy.IsPay || policy.IsSign || policy.CompanyEmit || policy.CompanyEmitted || policy.IsDeleted {
+		log.Printf("cannot emit policy %s because state is not correct", policy.Uid)
+		return "", nil, errors.New("operation not allowed")
+	}
+	
 	if request.SendEmail == nil {
 		sendEmail = true
 	} else {
