@@ -210,7 +210,7 @@ func getPolicies(policyUid, policyType, quoteType string, products map[string]mo
 		query.WriteString(" AND quoteType = @quoteType")
 		query.WriteString(" AND isPay = @isPay")
 		query.WriteString(" AND isDeleted = @isDeleted")
-		query.WriteString(" AND EXTRACT(YEAR FROM startDate) < @year")
+		query.WriteString(" AND EXTRACT(YEAR FROM startDate) <= @year")
 		query.WriteString(" AND (")
 		for index, product := range tmpProducts {
 			if index != 0 {
