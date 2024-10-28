@@ -80,7 +80,7 @@ func PaymentReceipt(info ReceiptInfo) ([]byte, error) {
 
 	pdf.Ln(17)
 
-	text = "RICEVUTO DI PAGAMENTO DEL PREMIO"
+	text = "RICEVUTA DI PAGAMENTO DEL PREMIO"
 	setBlackBoldFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 4, text, "", fpdf.AlignCenter, false)
 

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/dustin/go-humanize"
 	"github.com/go-chi/chi/v5"
@@ -15,7 +16,10 @@ import (
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 	plc "github.com/wopta/goworkspace/policy"
+	plcRenew "github.com/wopta/goworkspace/policy/renew"
+	plcUtils "github.com/wopta/goworkspace/policy/utils"
 	trx "github.com/wopta/goworkspace/transaction"
+	trxRenew "github.com/wopta/goworkspace/transaction/renew"
 )
 
 const (
@@ -29,7 +33,8 @@ type paymentReceiptResp struct {
 
 func PaymentReceiptFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		err error
+		err     error
+		isRenew bool
 	)
 
 	log.SetPrefix("[PaymentReceiptFx] ")
@@ -54,7 +59,13 @@ func PaymentReceiptFx(w http.ResponseWriter, r *http.Request) (string, interface
 		return "", "", errors.New("transaction uid is empty")
 	}
 
-	rawDoc, filename, err := paymentReceiptBuilder(transactionUid, authToken)
+	param := r.URL.Query().Get("isRenew")
+	if isRenew, err = strconv.ParseBool(param); err != nil {
+		log.Printf("error parsing isRenew: %s", err.Error())
+		return "", "", err
+	}
+
+	rawDoc, filename, err := paymentReceiptBuilder(transactionUid, authToken, isRenew)
 	if err != nil {
 		log.Printf("error building raw doc: %s", err.Error())
 		return "", "", err
@@ -70,20 +81,37 @@ func PaymentReceiptFx(w http.ResponseWriter, r *http.Request) (string, interface
 	return string(rawResp), resp, err
 }
 
-func paymentReceiptBuilder(transactionUID string, authToken lib.AuthToken) (string, string, error) {
-	transaction := trx.GetTransactionByUid(transactionUID, "")
-	if transaction == nil {
-		return "", "", errors.New("transaction not found")
-	}
+func paymentReceiptBuilder(transactionUID string, authToken lib.AuthToken, isRenew bool) (string, string, error) {
+	var (
+		err         error
+		policy      models.Policy
+		transaction *models.Transaction
+	)
 
-	if !transaction.IsPay {
-		return "", "", errors.New("transaction is not pay")
-	}
-
-	// TODO: what if transaction refers to a renewPolicy
-	policy, err := plc.GetPolicy(transaction.PolicyUid, "")
-	if err != nil {
-		return "", "", err
+	if isRenew {
+		transaction = trxRenew.GetRenewTransactionByUid(transactionUID)
+		if transaction == nil {
+			return "", "", errors.New("transaction not found")
+		}
+		if !transaction.IsPay {
+			return "", "", errors.New("transaction is not paid")
+		}
+		policy, err = plcRenew.GetRenewPolicyByUid(transaction.PolicyUid)
+		if err != nil {
+			return "", "", err
+		}
+	} else {
+		transaction = trx.GetTransactionByUid(transactionUID, "")
+		if transaction == nil {
+			return "", "", errors.New("transaction not found")
+		}
+		if !transaction.IsPay {
+			return "", "", errors.New("transaction is not paid")
+		}
+		policy, err = plc.GetPolicy(transaction.PolicyUid, "")
+		if err != nil {
+			return "", "", err
+		}
 	}
 
 	if authToken.Role != models.UserRoleAdmin {
@@ -96,7 +124,7 @@ func paymentReceiptBuilder(transactionUID string, authToken lib.AuthToken) (stri
 			return "", "", errors.New("node not found")
 		}
 
-		if policy.ProducerUid != node.Uid && !network.IsChildOf(node.Uid, policy.ProducerUid) {
+		if !plcUtils.CanBeAccessedBy(authToken.Role, policy.ProducerUid, node.Uid) {
 			return "", "", fmt.Errorf("node %s cannot access policy %s", authToken.UserID, policy.Uid)
 		}
 	}
@@ -117,6 +145,8 @@ func paymentReceiptBuilder(transactionUID string, authToken lib.AuthToken) (stri
 }
 
 func receiptInfoBuilder(policy models.Policy, transaction models.Transaction) document.ReceiptInfo {
+	const dateFormat = "02/01/2006"
+
 	customerInfo := document.CustomerInfo{
 		Fullname:   policy.Contractor.Name + " " + policy.Contractor.Surname,
 		Address:    policy.Contractor.Residence.StreetName + " " + policy.Contractor.Residence.StreetNumber,
@@ -128,23 +158,27 @@ func receiptInfoBuilder(policy models.Policy, transaction models.Transaction) do
 	}
 
 	expirationDate := lib.AddMonths(transaction.EffectiveDate, 12)
-	nextPayment := lib.AddMonths(transaction.EffectiveDate, 12)
+	nextPayment := "====="
+	tmpNextPayment := lib.AddMonths(transaction.EffectiveDate, 12)
 	if policy.PaymentSplit == string(models.PaySplitMonthly) {
 		expirationDate = lib.AddMonths(transaction.EffectiveDate, 1).AddDate(0, 0, -1)
-		nextPayment = lib.AddMonths(transaction.EffectiveDate, 1)
+		tmpNextPayment = lib.AddMonths(transaction.EffectiveDate, 1)
+	}
+	if tmpNextPayment.Before(policy.EndDate) {
+		nextPayment = tmpNextPayment.Format(dateFormat)
 	}
 
 	payDate := "======="
 	if !transaction.PayDate.IsZero() {
-		payDate = transaction.PayDate.Format("02/01/2006")
+		payDate = transaction.PayDate.Format(dateFormat)
 	}
 
 	transactionInfo := document.TransactionInfo{
 		PolicyCode:     policy.CodeCompany,
-		EffectiveDate:  transaction.EffectiveDate.Format("02/01/2006"),
-		ExpirationDate: expirationDate.Format("02/01/2006"),
+		EffectiveDate:  transaction.EffectiveDate.Format(dateFormat),
+		ExpirationDate: expirationDate.Format(dateFormat),
 		PriceGross:     humanize.FormatFloat("#.###,##", transaction.Amount) + " €",
-		NextPayment:    nextPayment.Format("02/01/2006"),
+		NextPayment:    nextPayment,
 		PayDate:        payDate,
 	}
 
