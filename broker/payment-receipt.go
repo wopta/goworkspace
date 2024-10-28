@@ -157,14 +157,21 @@ func receiptInfoBuilder(policy models.Policy, transaction models.Transaction) do
 		Phone:      policy.Contractor.Phone,
 	}
 
-	expirationDate := lib.AddMonths(transaction.EffectiveDate, 12)
+	expirationDate := policy.EndDate.AddDate(0, 0, -1)
 	nextPayment := "====="
+
+	tmpExpirationDate := lib.AddMonths(transaction.EffectiveDate, 12)
 	tmpNextPayment := lib.AddMonths(transaction.EffectiveDate, 12)
+
 	if policy.PaymentSplit == string(models.PaySplitMonthly) {
-		expirationDate = lib.AddMonths(transaction.EffectiveDate, 1).AddDate(0, 0, -1)
+		tmpExpirationDate = lib.AddMonths(transaction.EffectiveDate, 1).AddDate(0, 0, -1)
 		tmpNextPayment = lib.AddMonths(transaction.EffectiveDate, 1)
 	}
-	if tmpNextPayment.Before(policy.EndDate) {
+
+	if !tmpExpirationDate.After(expirationDate) {
+		expirationDate = tmpExpirationDate
+	}
+	if !tmpNextPayment.After(policy.EndDate) {
 		nextPayment = tmpNextPayment.Format(dateFormat)
 	}
 
