@@ -23,7 +23,6 @@ type TransactionInfo struct {
 	ExpirationDate string
 	PriceGross     string
 	NextPayment    string
-	PayDate        string
 }
 
 type ReceiptInfo struct {
@@ -97,7 +96,6 @@ func PaymentReceipt(info ReceiptInfo) ([]byte, error) {
 		"EFFETTO COPERTURA: " + info.Transaction.EffectiveDate + "\n" +
 		"SCADENZA COPERTURA: " + info.Transaction.ExpirationDate + "\n" +
 		"PREMIO PAGATO: " + info.Transaction.PriceGross + "\n" +
-		"VALUTA INCASSO: " + info.Transaction.PayDate + "\n" +
 		"PROSSIMO PAGAMENTO IL: " + info.Transaction.NextPayment
 
 	setBlackBoldFont(pdf, standardTextSize)

@@ -175,18 +175,12 @@ func receiptInfoBuilder(policy models.Policy, transaction models.Transaction) do
 		nextPayment = tmpNextPayment.Format(dateFormat)
 	}
 
-	payDate := "======="
-	if !transaction.PayDate.IsZero() {
-		payDate = transaction.PayDate.Format(dateFormat)
-	}
-
 	transactionInfo := document.TransactionInfo{
 		PolicyCode:     policy.CodeCompany,
 		EffectiveDate:  transaction.EffectiveDate.Format(dateFormat),
 		ExpirationDate: expirationDate.Format(dateFormat),
 		PriceGross:     humanize.FormatFloat("#.###,##", transaction.Amount) + " €",
 		NextPayment:    nextPayment,
-		PayDate:        payDate,
 	}
 
 	return document.ReceiptInfo{
