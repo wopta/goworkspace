@@ -41,14 +41,15 @@ func NewClient(networkNode *models.NetworkNode, network string) *Client {
 		network:  network,
 		externalConfig: internal.CallbackExternalConfig{
 			Events: map[string]bool{
+
 				md.Proposal:        true,
 				md.RequestApproval: true,
 				md.Emit:            true,
-				md.Signed:          true,
+				md.Signed:          false,
 				md.Paid:            true,
 				md.EmitRemittance:  false,
-				md.Approved:        true,
-				md.Rejected:        true,
+				md.Approved:        false,
+				md.Rejected:        false,
 			},
 			AuthType: "basic",
 		},
