@@ -113,10 +113,6 @@ func paymentReceiptBuilder(transactionUID string, authToken lib.AuthToken, isRen
 		}
 	}
 
-	if policy.Payment == models.ManualPaymentProvider {
-		return "", "", errors.New("payment provider is manual")
-	}
-
 	if authToken.Role != models.UserRoleAdmin {
 		if policy.ProducerUid == "" {
 			return "", "", fmt.Errorf("node %s cannot access policy %s", authToken.UserID, policy.Uid)
