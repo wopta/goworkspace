@@ -11,7 +11,7 @@ type CallbackInfo struct {
 
 type CallbackoutAction = string
 
-var (
+const (
 	Proposal        CallbackoutAction = "Proposal"
 	RequestApproval CallbackoutAction = "RequestApproval"
 	Emit            CallbackoutAction = "Emit"
