@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/wopta/goworkspace/callback_out"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
@@ -167,6 +168,8 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		}
 
 		policy.BigquerySave(origin)
+
+		callback_out.Execute(networkNode, policy, callback_out.Paid)
 
 		// Send mail with the contract to the user
 		switch flowName {
