@@ -17,7 +17,6 @@ const (
 	Emit            CallbackoutAction = "Emit"
 	Signed          CallbackoutAction = "Signed"
 	Paid            CallbackoutAction = "Paid"
-	EmitRemittance  CallbackoutAction = "EmitRemittance"
 	Approved        CallbackoutAction = "Approved"
 	Rejected        CallbackoutAction = "Rejected"
 )
