@@ -28,7 +28,7 @@ func NewClient(networkNode *models.NetworkNode, network string) *Client {
 	}
 
 	var externalConfig internal.CallbackExternalConfig
-	configBytes := lib.GetFilesByEnv("/callback-out/base.json")
+	configBytes := lib.GetFilesByEnv("callback-out/base.json")
 	if err := json.Unmarshal(configBytes, &externalConfig); err != nil {
 		return nil
 	}
