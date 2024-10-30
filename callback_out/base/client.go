@@ -27,31 +27,17 @@ func NewClient(networkNode *models.NetworkNode, network string) *Client {
 		return nil
 	}
 
-	/*
-		var externalConfig internal.CallbackExternalConfig
-		configBytes := lib.GetFilesByEnv("/callback-out/base.json")
-		if err := json.Unmarshal(configBytes, &externalConfig); err != nil {
-			return nil
-		}
-	*/
+	var externalConfig internal.CallbackExternalConfig
+	configBytes := lib.GetFilesByEnv("/callback-out/base.json")
+	if err := json.Unmarshal(configBytes, &externalConfig); err != nil {
+		return nil
+	}
 
 	return &Client{
-		basePath: basePath,
-		producer: networkNode.Code,
-		network:  network,
-		externalConfig: internal.CallbackExternalConfig{
-			Events: map[string]bool{
-				md.Proposal:        true,
-				md.RequestApproval: true,
-				md.Emit:            true,
-				md.Signed:          false,
-				md.Paid:            true,
-				md.EmitRemittance:  false,
-				md.Approved:        false,
-				md.Rejected:        false,
-			},
-			AuthType: "basic",
-		},
+		basePath:       basePath,
+		producer:       networkNode.Code,
+		network:        network,
+		externalConfig: externalConfig,
 	}
 }
 
