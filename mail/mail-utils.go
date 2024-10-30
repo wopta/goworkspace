@@ -79,14 +79,14 @@ func setPolicyReservedBodyData(policy models.Policy, bodyData *BodyData) {
 	}
 }
 
-func getPolicyRenewDraftBodyData(policy models.Policy, hasMandate bool) BodyData {
+func getPolicyRenewDraftBodyData(policy models.Policy) BodyData {
 	priceGross := policy.PriceGross
 	if policy.PaymentSplit == string(models.PaySplitMonthly) {
 		priceGross = policy.PriceGrossMonthly
 	}
 
 	bodyData := getBodyData(policy)
-	bodyData.HasMandate = hasMandate
+	bodyData.HasMandate = policy.HasMandate
 	bodyData.PriceGross = humanize.FormatFloat("#.###,##", priceGross)
 	bodyData.RenewDate = policy.StartDate.AddDate(policy.Annuity, 0, 0).Format("02/01/2006")
 

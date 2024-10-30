@@ -291,7 +291,7 @@ func SendMailProposal(policy models.Policy, from, to, cc Address, flowName strin
 func SendMailRenewDraft(policy models.Policy, from, to, cc Address, flowName string, hasMandate bool) {
 	var bodyData BodyData
 
-	bodyData = getPolicyRenewDraftBodyData(policy, hasMandate)
+	bodyData = getPolicyRenewDraftBodyData(policy)
 
 	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", flowName, renewDraftTemplateType))
 
@@ -325,7 +325,7 @@ func SendMailRenewDraftV2(policy models.Policy, from, to, cc Address, flowName s
 		err      error
 	)
 
-	bodyData = getPolicyRenewDraftBodyData(policy, hasMandate)
+	bodyData = getPolicyRenewDraftBodyData(policy)
 
 	templateFile, err := lib.GetFilesByEnvV2(fmt.Sprintf("mail/%s/%s.html", flowName, renewDraftTemplateType))
 	if err != nil {
