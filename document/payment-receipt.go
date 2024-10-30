@@ -2,7 +2,7 @@ package document
 
 import (
 	"bytes"
-	"time"
+	"fmt"
 
 	"github.com/go-pdf/fpdf"
 )
@@ -43,7 +43,7 @@ func PaymentReceipt(info ReceiptInfo) ([]byte, error) {
 
 	pdf.AddPage()
 
-	pdf.SetX(130)
+	pdf.SetX(115)
 
 	text := "Egr./Gent.le/Spett.le\n" +
 		info.CustomerInfo.Fullname + "\n" +
@@ -54,14 +54,14 @@ func PaymentReceipt(info ReceiptInfo) ([]byte, error) {
 	setBlackBoldFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 4, text, "", fpdf.AlignLeft, false)
 
-	pdf.Ln(15)
+	pdf.Ln(20)
 
 	text = "Oggetto: Quietanza di pagamento polizza n. " + info.Transaction.PolicyCode
 
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 4, text, "", fpdf.AlignLeft, false)
 
-	pdf.Ln(5)
+	pdf.Ln(15)
 
 	text = "Gentile Cliente,"
 	pdf.MultiCell(0, 4, text, "", fpdf.AlignLeft, false)
@@ -77,7 +77,7 @@ func PaymentReceipt(info ReceiptInfo) ([]byte, error) {
 	text = "La ringraziamo e Le porgiamo i nostri più cordiali saluti."
 	pdf.MultiCell(0, 4, text, "", fpdf.AlignLeft, false)
 
-	pdf.Ln(17)
+	pdf.Ln(20)
 
 	text = "RICEVUTA DI PAGAMENTO DEL PREMIO"
 	setBlackBoldFont(pdf, standardTextSize)
@@ -89,21 +89,131 @@ func PaymentReceipt(info ReceiptInfo) ([]byte, error) {
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 4, text, "", fpdf.AlignLeft, false)
 
-	pdf.Ln(3)
-
-	text = "CONTRAENTE: " + info.CustomerInfo.Fullname + "\n" +
-		"N. POLIZZA: " + info.Transaction.PolicyCode + "\n" +
-		"EFFETTO COPERTURA: " + info.Transaction.EffectiveDate + "\n" +
-		"SCADENZA COPERTURA: " + info.Transaction.ExpirationDate + "\n" +
-		"PREMIO PAGATO: " + info.Transaction.PriceGross + "\n" +
-		"PROSSIMO PAGAMENTO IL: " + info.Transaction.NextPayment
+	pdf.Ln(15)
 
 	setBlackBoldFont(pdf, standardTextSize)
-	pdf.MultiCell(0, 12, text, "", fpdf.AlignLeft, false)
 
-	pdf.Ln(5)
+	table := [][]tableCell{
+		{
+			{
+				text:      "CONTRAENTE:",
+				height:    5,
+				width:     pdf.GetStringWidth("CONTRAENTE:"),
+				textBold:  true,
+				fill:      false,
+				fillColor: rgbColor{},
+				align:     fpdf.AlignLeft,
+				border:    "",
+			},
+			{
+				text:      info.CustomerInfo.Fullname,
+				height:    5,
+				width:     100 - pdf.GetStringWidth("CONTRAENTE:"),
+				textBold:  false,
+				fill:      false,
+				fillColor: rgbColor{},
+				align:     fpdf.AlignLeft,
+				border:    "",
+			},
+			{
+				text:      "N. POLIZZA:",
+				height:    5,
+				width:     pdf.GetStringWidth("N. POLIZZA:"),
+				textBold:  true,
+				fill:      false,
+				fillColor: rgbColor{},
+				align:     fpdf.AlignLeft,
+				border:    "",
+			},
+			{
+				text:      info.Transaction.PolicyCode,
+				height:    5,
+				width:     90 - pdf.GetStringWidth("N. POLIZZA:"),
+				textBold:  false,
+				fill:      false,
+				fillColor: rgbColor{},
+				align:     fpdf.AlignLeft,
+				border:    "",
+			},
+		},
+		{
+			{
+				text:      "DECORRENZA:",
+				height:    5,
+				width:     pdf.GetStringWidth("DECORRENZA:"),
+				textBold:  true,
+				fill:      false,
+				fillColor: rgbColor{},
+				align:     fpdf.AlignLeft,
+				border:    "",
+			},
+			{
+				text:      info.Transaction.EffectiveDate,
+				height:    5,
+				width:     100 - pdf.GetStringWidth("DECORRENZA:"),
+				textBold:  false,
+				fill:      false,
+				fillColor: rgbColor{},
+				align:     fpdf.AlignLeft,
+				border:    "",
+			},
+			{
+				text:      "VALIDITA’ COPERTURA FINO AL:",
+				height:    5,
+				width:     pdf.GetStringWidth("VALIDITA’ COPERTURA FINO AL: "),
+				textBold:  true,
+				fill:      false,
+				fillColor: rgbColor{},
+				align:     fpdf.AlignLeft,
+				border:    "",
+			},
+			{
+				text:      info.Transaction.ExpirationDate,
+				height:    5,
+				width:     90 - pdf.GetStringWidth("VALIDITA’ COPERTURA FINO AL: "),
+				textBold:  false,
+				fill:      false,
+				fillColor: rgbColor{},
+				align:     fpdf.AlignLeft,
+				border:    "",
+			},
+		},
+		{
+			{
+				text:      "PREMIO PAGATO:",
+				height:    5,
+				width:     pdf.GetStringWidth("PREMIO PAGATO:"),
+				textBold:  true,
+				fill:      false,
+				fillColor: rgbColor{},
+				align:     fpdf.AlignLeft,
+				border:    "",
+			},
+			{
+				text:      info.Transaction.PriceGross,
+				height:    5,
+				width:     190 - pdf.GetStringWidth("PREMIO PAGATO:"),
+				textBold:  false,
+				fill:      false,
+				fillColor: rgbColor{},
+				align:     fpdf.AlignLeft,
+				border:    "",
+			},
+		},
+	}
 
-	text = "Milano, il " + time.Now().UTC().Format("02/01/2006")
+	tableDrawer(pdf, table)
+
+	pdf.Ln(15)
+
+	text = fmt.Sprintf("Il premio relativo alla presente quietanza, pari a %s è stato incassato il "+
+		"_____._________._____ in ___________________", info.Transaction.PriceGross)
+	setBlackRegularFont(pdf, standardTextSize)
+	pdf.MultiCell(0, 4, text, "", fpdf.AlignLeft, false)
+
+	pdf.Ln(15)
+
+	text = "L'intermediario ______________________________"
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 4, text, "", fpdf.AlignLeft, false)
 
