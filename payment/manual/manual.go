@@ -169,6 +169,8 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 
 		policy.BigquerySave(origin)
 
+		callback_out.Execute(networkNode, policy, callback_out.Paid)
+
 		// Send mail with the contract to the user
 		switch flowName {
 		case models.ProviderMgaFlow, models.MgaFlow, models.ECommerceFlow:
@@ -176,8 +178,6 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		case models.RemittanceMgaFlow:
 			toAddress = mail.GetNetworkNodeEmail(networkNode)
 		}
-
-		callback_out.Execute(networkNode, policy, callback_out.Paid)
 
 		// Send mail with the contract to the user
 		log.Printf(
