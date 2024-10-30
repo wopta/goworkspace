@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/dustin/go-humanize"
 	"github.com/go-chi/chi/v5"
 	"github.com/wopta/goworkspace/document"
 	"github.com/wopta/goworkspace/lib"
@@ -161,30 +160,23 @@ func receiptInfoBuilder(policy models.Policy, transaction models.Transaction) do
 		Phone:      policy.Contractor.Phone,
 	}
 
-	expirationDate := policy.EndDate.AddDate(0, 0, -1)
-	nextPayment := "====="
+	expirationDate := policy.EndDate
 
 	tmpExpirationDate := lib.AddMonths(transaction.EffectiveDate, 12)
-	tmpNextPayment := lib.AddMonths(transaction.EffectiveDate, 12)
 
 	if policy.PaymentSplit == string(models.PaySplitMonthly) {
-		tmpExpirationDate = lib.AddMonths(transaction.EffectiveDate, 1).AddDate(0, 0, -1)
-		tmpNextPayment = lib.AddMonths(transaction.EffectiveDate, 1)
+		tmpExpirationDate = lib.AddMonths(transaction.EffectiveDate, 1)
 	}
 
 	if !tmpExpirationDate.After(expirationDate) {
 		expirationDate = tmpExpirationDate
-	}
-	if !tmpNextPayment.After(policy.EndDate) {
-		nextPayment = tmpNextPayment.Format(dateFormat)
 	}
 
 	transactionInfo := document.TransactionInfo{
 		PolicyCode:     policy.CodeCompany,
 		EffectiveDate:  transaction.EffectiveDate.Format(dateFormat),
 		ExpirationDate: expirationDate.Format(dateFormat),
-		PriceGross:     humanize.FormatFloat("#.###,##", transaction.Amount) + " €",
-		NextPayment:    nextPayment,
+		PriceGross:     transaction.Amount,
 	}
 
 	return document.ReceiptInfo{

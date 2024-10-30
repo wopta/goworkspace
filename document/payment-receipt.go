@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 
+	"github.com/dustin/go-humanize"
 	"github.com/go-pdf/fpdf"
 )
 
@@ -21,8 +22,7 @@ type TransactionInfo struct {
 	PolicyCode     string
 	EffectiveDate  string
 	ExpirationDate string
-	PriceGross     string
-	NextPayment    string
+	PriceGross     float64
 }
 
 type ReceiptInfo struct {
@@ -93,6 +93,7 @@ func PaymentReceipt(info ReceiptInfo) ([]byte, error) {
 
 	setBlackBoldFont(pdf, standardTextSize)
 
+	formattedPriceGross := "€ " + humanize.FormatFloat("#.###,##", info.Transaction.PriceGross)
 	table := [][]tableCell{
 		{
 			{
@@ -190,7 +191,7 @@ func PaymentReceipt(info ReceiptInfo) ([]byte, error) {
 				border:    "",
 			},
 			{
-				text:      info.Transaction.PriceGross,
+				text:      formattedPriceGross,
 				height:    5,
 				width:     190 - pdf.GetStringWidth("PREMIO PAGATO:"),
 				textBold:  false,
@@ -207,7 +208,7 @@ func PaymentReceipt(info ReceiptInfo) ([]byte, error) {
 	pdf.Ln(15)
 
 	text = fmt.Sprintf("Il premio relativo alla presente quietanza, pari a %s è stato incassato il "+
-		"_____._________._____ in ___________________", info.Transaction.PriceGross)
+		"_____._________._____ in ___________________", formattedPriceGross)
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 4, text, "", fpdf.AlignLeft, false)
 
