@@ -10,7 +10,6 @@ import (
 	"strconv"
 	"time"
 
-	"cloud.google.com/go/bigquery"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
@@ -19,14 +18,6 @@ import (
 type RenewReq struct {
 	Date            string `json:"date"`
 	DaysBeforeRenew string `json:"days_before_renew"`
-}
-
-type MailReport struct {
-	Policy       string                `bigquery:"policyUid"`
-	Name         string                `bigquery:"name"`
-	Email        string                `bigquery:"email"`
-	CreationDate bigquery.NullDateTime `bigquery:"creationDate"`
-	MailError    string                `bigquery:"mailError"`
 }
 
 func RenewMailFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -86,16 +77,8 @@ func RenewMailFx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 		to := mail.GetContractorEmail(&policy)
 		flowName := models.ECommerceFlow
 		log.Printf("Sending email from %s to %s", from, to)
-		//err = writeMailError(policy.Uid, to.Name, to.Address, lib.GetBigQueryNullDateTime(time.Now().UTC()), "test error")
-		err = mail.SendMailRenewDraftV2(policy, from, to, mail.Address{}, flowName, policy.HasMandate)
-		if err != nil {
-			log.Printf("error sending mail: %s", err.Error())
-			mailErr := writeMailError(policy.Uid, to.Name, to.Address, lib.GetBigQueryNullDateTime(time.Now().UTC()), err.Error())
-			if mailErr != nil {
-				log.Printf("error writing report: %s", mailErr.Error())
-				return "", nil, mailErr
-			}
-		}
+		mail.SendMailRenewDraft(policy, from, to, mail.Address{}, flowName, policy.HasMandate)
+
 	}
 
 	return "", nil, nil
@@ -137,14 +120,4 @@ func getRenewPolicies(targetDate time.Time) ([]models.Policy, error) {
 	})
 
 	return policies, nil
-}
-
-func writeMailError(policyId string, name string, address string, date bigquery.NullDateTime, message string) error {
-
-	report := MailReport{policyId, name, address, date, message}
-	err := lib.InsertRowsBigQuery(lib.WoptaDataset, lib.MailReportCollection, report)
-	if err != nil {
-		return err
-	}
-	return nil
 }
