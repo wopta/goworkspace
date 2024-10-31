@@ -22,7 +22,7 @@ var routes []lib.Route = []lib.Route{
 		Roles:   []string{},
 	},
 	{
-		Route:   "/v1/rename-me",
+		Route:   "/v1/renew-notice",
 		Method:  http.MethodPost,
 		Handler: lib.ResponseLoggerWrapper(RenewMailFx),
 		Roles:   []string{},
