@@ -103,7 +103,7 @@ func getRenewPolicies(targetDate time.Time) ([]models.Policy, error) {
 	query.WriteString(" AND isDeleted = @isDeleted")
 	query.WriteString(" AND isPay = @isPay")
 	query.WriteString(" AND channel = @channel")
-	query.WriteString(" AND EXTRACT(YEAR FROM RenewDate) = @targetYear")
+	query.WriteString(" AND EXTRACT(YEAR FROM RenewDate) <= @targetYear")
 	query.WriteString(" AND EXTRACT(MONTH FROM RenewDate) = @targetMonth")
 	query.WriteString(" AND EXTRACT(DAY FROM RenewDate) = @targetDay")
 
