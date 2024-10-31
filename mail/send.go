@@ -139,6 +139,13 @@ func sendmail(obj MailRequest) error {
 	case "prod":
 		file, err = lib.GetFromStorageV2("core-350507-function-data", "mail/mail_template.html", "")
 	}
+	if err != nil {
+		mailErr := writeMailReport(obj.FromName, "", lib.GetBigQueryNullDateTime(time.Now().UTC()), err.Error())
+		if mailErr != nil {
+			log.Printf("error writing report: %s", mailErr.Error())
+		}
+		return err
+	}
 
 	tmplt := template.New("action")
 	tmplt, err = tmplt.Parse(string(file))
