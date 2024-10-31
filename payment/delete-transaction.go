@@ -56,7 +56,7 @@ func DeleteTransactionFx(w http.ResponseWriter, r *http.Request) (string, interf
 	bytes, _ := json.Marshal(transaction)
 	log.Printf("found transaction: %s", string(bytes))
 
-	if transaction.ProviderName == models.FabrickPaymentProvider {
+	if transaction.ProviderName == models.FabrickPaymentProvider && transaction.ProviderId != "" {
 		err = fabrick.FabrickExpireBill(transaction.ProviderId)
 		if err != nil {
 			log.Printf("error deleting transaction on fabrick: %s", err.Error())
