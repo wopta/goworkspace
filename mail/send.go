@@ -140,20 +140,12 @@ func sendmail(obj MailRequest) error {
 		file, err = lib.GetFromStorageV2("core-350507-function-data", "mail/mail_template.html", "")
 	}
 	if err != nil {
-		mailErr := writeMailReport(obj.FromName, "", lib.GetBigQueryNullDateTime(time.Now().UTC()), err.Error())
-		if mailErr != nil {
-			log.Printf("error writing report: %s", mailErr.Error())
-		}
 		return err
 	}
 
 	tmplt := template.New("action")
 	tmplt, err = tmplt.Parse(string(file))
 	if err != nil {
-		mailErr := writeMailReport(obj.FromName, "", lib.GetBigQueryNullDateTime(time.Now().UTC()), err.Error())
-		if mailErr != nil {
-			log.Printf("error writing report: %s", mailErr.Error())
-		}
 		return err
 	}
 
@@ -168,10 +160,6 @@ func sendmail(obj MailRequest) error {
 	}
 	err = tmplt.Execute(&tpl, data)
 	if err != nil {
-		mailErr := writeMailReport(obj.FromName, "", lib.GetBigQueryNullDateTime(time.Now().UTC()), err.Error())
-		if mailErr != nil {
-			log.Printf("error writing report: %s", mailErr.Error())
-		}
 		return err
 	}
 
@@ -240,10 +228,6 @@ func sendmail(obj MailRequest) error {
 		servername := "smtp.office365.com:587"
 		host, _, err := net.SplitHostPort(servername)
 		if err != nil {
-			mailErr := writeMailReport(obj.FromName, _to, lib.GetBigQueryNullDateTime(time.Now().UTC()), err.Error())
-			if mailErr != nil {
-				log.Printf("error writing report: %s", mailErr.Error())
-			}
 			return err
 		}
 
@@ -257,38 +241,22 @@ func sendmail(obj MailRequest) error {
 		// from the very beginning (no starttls)40.99.214.146
 		conn, err := net.Dial("tcp", "smtp.office365.com:587")
 		if err != nil {
-			mailErr := writeMailReport(obj.FromName, _to, lib.GetBigQueryNullDateTime(time.Now().UTC()), err.Error())
-			if mailErr != nil {
-				log.Printf("error writing report: %s", mailErr.Error())
-			}
 			return err
 		}
 
 		c, err := smtp.NewClient(conn, host)
 		if err != nil {
-			mailErr := writeMailReport(obj.FromName, _to, lib.GetBigQueryNullDateTime(time.Now().UTC()), err.Error())
-			if mailErr != nil {
-				log.Printf("error writing report: %s", mailErr.Error())
-			}
 			return err
 		}
 
 		err = c.StartTLS(tlsconfig)
 		if err != nil {
-			mailErr := writeMailReport(obj.FromName, _to, lib.GetBigQueryNullDateTime(time.Now().UTC()), err.Error())
-			if mailErr != nil {
-				log.Printf("error writing report: %s", mailErr.Error())
-			}
 			return err
 		}
 
 		// Auth
 		err = c.Auth(LoginAuth(username, password))
 		if err != nil {
-			mailErr := writeMailReport(obj.FromName, _to, lib.GetBigQueryNullDateTime(time.Now().UTC()), err.Error())
-			if mailErr != nil {
-				log.Printf("error writing report: %s", mailErr.Error())
-			}
 			return err
 		}
 
@@ -296,20 +264,12 @@ func sendmail(obj MailRequest) error {
 		log.Printf("[SendMail] setting address from: %s", from.Address)
 		err = c.Mail(from.Address)
 		if err != nil {
-			mailErr := writeMailReport(obj.FromName, _to, lib.GetBigQueryNullDateTime(time.Now().UTC()), err.Error())
-			if mailErr != nil {
-				log.Printf("error writing report: %s", mailErr.Error())
-			}
 			return err
 		}
 
 		log.Printf("[SendMail] setting address to: %s", to.Address)
 		err = c.Rcpt(to.Address)
 		if err != nil {
-			mailErr := writeMailReport(obj.FromName, _to, lib.GetBigQueryNullDateTime(time.Now().UTC()), err.Error())
-			if mailErr != nil {
-				log.Printf("error writing report: %s", mailErr.Error())
-			}
 			return err
 		}
 
@@ -318,10 +278,6 @@ func sendmail(obj MailRequest) error {
 			log.Printf("[SendMail] setting cc to: %s", obj.Cc)
 			err = c.Rcpt(obj.Cc)
 			if err != nil {
-				mailErr := writeMailReport(obj.FromName, _to, lib.GetBigQueryNullDateTime(time.Now().UTC()), err.Error())
-				if mailErr != nil {
-					log.Printf("error writing report: %s", mailErr.Error())
-				}
 				return err
 			}
 		}
@@ -331,10 +287,6 @@ func sendmail(obj MailRequest) error {
 			log.Printf("[SendMail] setting bcc to: %s", obj.Bcc)
 			err = c.Rcpt(obj.Bcc)
 			if err != nil {
-				mailErr := writeMailReport(obj.FromName, _to, lib.GetBigQueryNullDateTime(time.Now().UTC()), err.Error())
-				if mailErr != nil {
-					log.Printf("error writing report: %s", mailErr.Error())
-				}
 				return err
 			}
 		}
@@ -342,45 +294,25 @@ func sendmail(obj MailRequest) error {
 		// Data
 		w, err := c.Data()
 		if err != nil {
-			mailErr := writeMailReport(obj.FromName, _to, lib.GetBigQueryNullDateTime(time.Now().UTC()), err.Error())
-			if mailErr != nil {
-				log.Printf("error writing report: %s", mailErr.Error())
-			}
 			return err
 		}
 
 		_, err = w.Write([]byte(message))
 		if err != nil {
-			mailErr := writeMailReport(obj.FromName, _to, lib.GetBigQueryNullDateTime(time.Now().UTC()), err.Error())
-			if mailErr != nil {
-				log.Printf("error writing report: %s", mailErr.Error())
-			}
 			return err
 		}
 
 		err = w.Close()
 		if err != nil {
-			mailErr := writeMailReport(obj.FromName, _to, lib.GetBigQueryNullDateTime(time.Now().UTC()), err.Error())
-			if mailErr != nil {
-				log.Printf("error writing report: %s", mailErr.Error())
-			}
 			return err
 		}
 
 		err = c.Quit()
 		if err != nil {
-			mailErr := writeMailReport(obj.FromName, _to, lib.GetBigQueryNullDateTime(time.Now().UTC()), err.Error())
-			if mailErr != nil {
-				log.Printf("error writing report: %s", mailErr.Error())
-			}
 			return err
 		}
 
 		log.Println("[SendMail] message sent")
-		mailErr := writeMailReport(obj.FromName, _to, lib.GetBigQueryNullDateTime(time.Now().UTC()), "")
-		if mailErr != nil {
-			log.Printf("error writing report: %s", mailErr.Error())
-		}
 	}
 
 	log.Println("[SendMail] end ----------------------------------------------")
@@ -389,18 +321,26 @@ func sendmail(obj MailRequest) error {
 }
 
 func SendMail(obj MailRequest) {
+	var (
+		reportError = ""
+		reportRecip = strings.Join(obj.To, ",")
+	)
 
 	err := sendmail(obj)
 
 	if err != nil {
 		log.Printf("error sending mail: %s", err.Error())
+		reportError = err.Error()
 	}
-
+	mailErr := writeMailReport(obj.FromName, reportRecip, lib.GetBigQueryNullDateTime(time.Now().UTC()), reportError)
+	if mailErr != nil {
+		log.Printf("error writing report: %s", mailErr.Error())
+	}
 }
 
-func writeMailReport(name string, address string, date bigquery.NullDateTime, message string) error {
+func writeMailReport(sender string, recipients string, date bigquery.NullDateTime, message string) error {
 
-	report := MailReport{"", name, address, date, message}
+	report := MailReport{"", sender, recipients, date, message}
 	err := lib.InsertRowsBigQuery(lib.WoptaDataset, lib.MailReportCollection, report)
 	if err != nil {
 		return err
