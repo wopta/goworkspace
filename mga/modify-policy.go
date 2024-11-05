@@ -88,18 +88,29 @@ func modifyController(originalPolicy, inputPolicy models.Policy) (models.Policy,
 		modifiedUser   models.User
 	)
 
+	modifiedPolicy = originalPolicy
+
 	err = checkEmailUniqueness(originalPolicy.Contractor, inputPolicy.Contractor)
 	if err != nil {
 		return models.Policy{}, err
 	}
 
-	switch originalPolicy.Name {
-	case models.LifeProduct, models.PersonaProduct:
-		modifiedPolicy, modifiedUser, err = lifeModifier(originalPolicy, inputPolicy)
-	case models.GapProduct:
-		modifiedPolicy, modifiedUser, err = gapModifier(originalPolicy, inputPolicy)
-	default:
-		return models.Policy{}, errors.New("product not supported")
+	modifiedPolicy.Contractor, err = modifyContractorInfo(inputPolicy.Contractor, originalPolicy.Contractor)
+	if err != nil {
+		return models.Policy{}, err
+	}
+
+	if modifiedPolicy.Contractor.Uid != "" {
+		tmpUser := modifiedPolicy.Contractor.ToUser()
+		modifiedUser, err = modifyUserInfo(*tmpUser)
+		if err != nil {
+			return models.Policy{}, err
+		}
+	}
+
+	modifiedPolicy.Assets, err = modifyAssets(modifiedPolicy, inputPolicy)
+	if err != nil {
+		return models.Policy{}, err
 	}
 
 	err = writePolicyToDb(modifiedPolicy)
@@ -113,73 +124,6 @@ func modifyController(originalPolicy, inputPolicy models.Policy) (models.Policy,
 	}
 
 	return modifiedPolicy, err
-}
-
-func lifeModifier(originalPolicy, inputPolicy models.Policy) (models.Policy, models.User, error) {
-	var (
-		err                           error
-		modifiedPolicy                models.Policy
-		modifiedContractor            models.Contractor
-		modifiedInsured, modifiedUser models.User
-	)
-
-	modifiedPolicy = originalPolicy
-
-	modifiedContractor, err = modifyContractorInfo(inputPolicy.Contractor, originalPolicy.Contractor)
-	if err != nil {
-		log.Printf("error modifying contractor %s info: %s", originalPolicy.Contractor.Uid, err.Error())
-		return models.Policy{}, models.User{}, err
-	}
-
-	modifiedInsured, err = modifyInsuredInfo(*inputPolicy.Assets[0].Person, *originalPolicy.Assets[0].Person)
-	if err != nil {
-		log.Printf("error modifying insured for policy %s info: %s", originalPolicy.Uid, err.Error())
-		return models.Policy{}, models.User{}, err
-	}
-
-	modifiedPolicy.Contractor = modifiedContractor
-	modifiedPolicy.Assets[0].Person = &modifiedInsured
-
-	if modifiedContractor.Uid != "" {
-		tmpUser := modifiedContractor.ToUser()
-		modifiedUser, err = modifyUserInfo(*tmpUser)
-		if err != nil {
-			log.Printf("error modifying user %s info: %s", tmpUser.Uid, err.Error())
-			return models.Policy{}, models.User{}, err
-		}
-	}
-
-	return modifiedPolicy, modifiedUser, err
-}
-
-func gapModifier(originalPolicy, inputPolicy models.Policy) (models.Policy, models.User, error) {
-	var (
-		err                error
-		modifiedPolicy     models.Policy
-		modifiedContractor models.Contractor
-		modifiedUser       models.User
-	)
-
-	modifiedPolicy = originalPolicy
-
-	modifiedContractor, err = modifyContractorInfo(inputPolicy.Contractor, originalPolicy.Contractor)
-	if err != nil {
-		log.Printf("error modifying contractor %s info: %s", originalPolicy.Contractor.Uid, err.Error())
-		return models.Policy{}, models.User{}, err
-	}
-
-	modifiedPolicy.Contractor = modifiedContractor
-
-	if modifiedContractor.Uid != "" {
-		tmpUser := modifiedContractor.ToUser()
-		modifiedUser, err = modifyUserInfo(*tmpUser)
-		if err != nil {
-			log.Printf("error modifying user %s info: %s", tmpUser.Uid, err.Error())
-			return models.Policy{}, models.User{}, err
-		}
-	}
-
-	return modifiedPolicy, modifiedUser, err
 }
 
 func checkEmailUniqueness(originalContractor, inputContractor models.Contractor) error {
@@ -242,7 +186,34 @@ func modifyContractorInfo(inputContractor, originalContractor models.Contractor)
 	return *modifiedContractor, err
 }
 
-func modifyInsuredInfo(inputInsured, originalInsured models.User) (models.User, error) {
+func modifyAssets(modifiedPolicy models.Policy, inputPolicy models.Policy) ([]models.Asset, error) {
+	assets := make([]models.Asset, 0, len(inputPolicy.Assets))
+
+	for index, asset := range inputPolicy.Assets {
+		var (
+			err           error
+			modifiedAsset models.Asset
+		)
+
+		modifiedAsset = modifiedPolicy.Assets[index]
+
+		if asset.Person != nil {
+			if asset.Person.FiscalCode == modifiedPolicy.Contractor.FiscalCode {
+				modifiedAsset.Person = modifiedPolicy.Contractor.ToUser()
+			} else {
+				modifiedAsset.Person, err = modifyInsuredInfo(*inputPolicy.Assets[0].Person, *modifiedPolicy.Assets[0].Person)
+				if err != nil {
+					return nil, err
+				}
+			}
+		}
+
+		assets = append(assets, modifiedAsset)
+	}
+	return assets, nil
+}
+
+func modifyInsuredInfo(inputInsured, originalInsured models.User) (*models.User, error) {
 	var (
 		err             error
 		modifiedInsured = new(models.User)
@@ -276,13 +247,13 @@ func modifyInsuredInfo(inputInsured, originalInsured models.User) (models.User, 
 
 	err = usr.CheckFiscalCode(*modifiedInsured)
 	if err != nil {
-		return models.User{}, err
+		return nil, err
 	}
 
 	log.Printf("insured %s modified", originalInsured.Uid)
 
 	log.Println("insured modified successfully")
-	return *modifiedInsured, err
+	return modifiedInsured, err
 }
 
 func modifyUserInfo(inputUser models.User) (models.User, error) {
