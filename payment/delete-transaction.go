@@ -68,6 +68,7 @@ func DeleteTransactionFx(w http.ResponseWriter, r *http.Request) (string, interf
 		policy, err = renew.GetRenewPolicyByUid(transaction.PolicyUid)
 	}
 	if err != nil {
+		log.Printf("policy '%s' not found", transaction.PolicyUid)
 		return "", nil, err
 	}
 
