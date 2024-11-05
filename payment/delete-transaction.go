@@ -92,7 +92,9 @@ func DeleteTransactionFx(w http.ResponseWriter, r *http.Request) (string, interf
 	}
 
 	if transaction.ProviderName == models.FabrickPaymentProvider && transaction.ProviderId == "" {
+		log.Printf("sending warning email...")
 		sendMail(authToken, policy, *transaction)
+		log.Printf("warning email sent")
 	}
 
 	return "{}", nil, err
