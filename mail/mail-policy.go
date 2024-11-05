@@ -316,5 +316,6 @@ func SendMailRenewDraft(policy models.Policy, from, to, cc Address, flowName str
 		Subject:     subject,
 		IsHtml:      true,
 		IsApp:       true,
+		Policy:      policy.Uid,
 	})
 }

@@ -332,15 +332,15 @@ func SendMail(obj MailRequest) {
 		log.Printf("error sending mail: %s", err.Error())
 		reportError = err.Error()
 	}
-	mailErr := writeMailReport(obj.FromName, reportRecip, lib.GetBigQueryNullDateTime(time.Now().UTC()), reportError)
+	mailErr := writeMailReport(obj.Policy, obj.From, reportRecip, lib.GetBigQueryNullDateTime(time.Now().UTC()), reportError)
 	if mailErr != nil {
 		log.Printf("error writing report: %s", mailErr.Error())
 	}
 }
 
-func writeMailReport(sender string, recipients string, date bigquery.NullDateTime, message string) error {
+func writeMailReport(policy string, sender string, recipients string, date bigquery.NullDateTime, message string) error {
 
-	report := MailReport{"", sender, recipients, date, message}
+	report := MailReport{policy, sender, recipients, date, message}
 	err := lib.InsertRowsBigQuery(lib.WoptaDataset, lib.MailReportCollection, report)
 	if err != nil {
 		return err

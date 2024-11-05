@@ -1,6 +1,8 @@
 package mail
 
-import m "net/mail"
+import (
+	m "net/mail"
+)
 
 type Data struct {
 	Title     string
@@ -61,6 +63,7 @@ type MailRequest struct {
 	LinkLabel    string        `json:"linkLabel,omitempty"`
 	IsLink       bool          `json:"isLink,omitempty"`
 	IsApp        bool          `json:"isApp,omitempty"`
+	Policy       string        `json:"policy,omitempty"`
 }
 
 type MailValidate struct {
