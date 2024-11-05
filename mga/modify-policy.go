@@ -94,7 +94,7 @@ func modifyController(originalPolicy, inputPolicy models.Policy) (models.Policy,
 	}
 
 	switch originalPolicy.Name {
-	case models.LifeProduct:
+	case models.LifeProduct, models.PersonaProduct:
 		modifiedPolicy, modifiedUser, err = lifeModifier(originalPolicy, inputPolicy)
 	case models.GapProduct:
 		modifiedPolicy, modifiedUser, err = gapModifier(originalPolicy, inputPolicy)
