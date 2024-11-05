@@ -216,6 +216,20 @@ func modifyContractorInfo(inputContractor, originalContractor models.Contractor)
 	modifiedContractor.Gender = inputContractor.Gender
 	modifiedContractor.FiscalCode = inputContractor.FiscalCode
 	modifiedContractor.Mail = inputContractor.Mail
+	modifiedContractor.Residence = inputContractor.Residence
+	if inputContractor.Consens != nil {
+		if modifiedContractor.Consens == nil {
+			modifiedContractor.Consens = inputContractor.Consens
+		} else {
+			for index, consensus := range *modifiedContractor.Consens {
+				for _, inputConsensus := range *inputContractor.Consens {
+					if inputConsensus.Key == consensus.Key {
+						(*modifiedContractor.Consens)[index].Answer = inputConsensus.Answer
+					}
+				}
+			}
+		}
+	}
 
 	user := modifiedContractor.ToUser()
 	err = usr.CheckFiscalCode(*user)
@@ -245,6 +259,20 @@ func modifyInsuredInfo(inputInsured, originalInsured models.User) (models.User, 
 	modifiedInsured.Gender = inputInsured.Gender
 	modifiedInsured.FiscalCode = inputInsured.FiscalCode
 	modifiedInsured.Mail = inputInsured.Mail
+	modifiedInsured.Residence = inputInsured.Residence
+	if inputInsured.Consens != nil {
+		if modifiedInsured.Consens == nil {
+			modifiedInsured.Consens = inputInsured.Consens
+		} else {
+			for index, consensus := range *modifiedInsured.Consens {
+				for _, inputConsensus := range *inputInsured.Consens {
+					if inputConsensus.Key == consensus.Key {
+						(*modifiedInsured.Consens)[index].Answer = inputConsensus.Answer
+					}
+				}
+			}
+		}
+	}
 
 	err = usr.CheckFiscalCode(*modifiedInsured)
 	if err != nil {
@@ -282,6 +310,20 @@ func modifyUserInfo(inputUser models.User) (models.User, error) {
 	modifiedUser.Gender = inputUser.Gender
 	modifiedUser.FiscalCode = inputUser.FiscalCode
 	modifiedUser.Mail = inputUser.Mail
+	modifiedUser.Residence = inputUser.Residence
+	if inputUser.Consens != nil {
+		if modifiedUser.Consens == nil {
+			modifiedUser.Consens = inputUser.Consens
+		} else {
+			for index, consensus := range *modifiedUser.Consens {
+				for _, inputConsensus := range *inputUser.Consens {
+					if inputConsensus.Key == consensus.Key {
+						(*modifiedUser.Consens)[index].Answer = inputConsensus.Answer
+					}
+				}
+			}
+		}
+	}
 
 	if !strings.EqualFold(modifiedUser.Mail, dbUser.Mail) && dbUser.AuthId != "" {
 		log.Printf("modifying user %s email from %s to %s...", modifiedUser.Uid, modifiedUser.Mail, dbUser.Mail)
