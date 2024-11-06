@@ -77,11 +77,12 @@ func InitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 
 	if channel == lib.NetworkChannel {
 		networkNode = network.GetNetworkNodeByUid(authToken.UserID)
-		if networkNode != nil {
-			policy.ProducerCode = networkNode.Code
-			policy.ProducerType = networkNode.Type
-			policy.ProducerUid = networkNode.Uid
+		if networkNode == nil {
+			return "", nil, fmt.Errorf("network node %s not found", authToken.UserID)
 		}
+		policy.ProducerCode = networkNode.Code
+		policy.ProducerType = networkNode.Type
+		policy.ProducerUid = networkNode.Uid
 	}
 
 	rawPolicy, err := json.Marshal(policy)
