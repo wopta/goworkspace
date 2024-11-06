@@ -307,6 +307,7 @@ func SendMailRenewDraft(policy models.Policy, from, to, cc Address, flowName str
 	subject := fmt.Sprintf("%s - %s", title, subtitle)
 
 	SendMail(MailRequest{
+		FromName:    from.Name,
 		FromAddress: from,
 		To:          []string{to.Address},
 		Cc:          cc.Address,

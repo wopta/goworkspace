@@ -29,14 +29,6 @@ type loginAuth struct {
 	username, password string
 }
 
-type MailReport struct {
-	Policy       string                `bigquery:"policyUid"`
-	Name         string                `bigquery:"name"`
-	Email        string                `bigquery:"email"`
-	CreationDate bigquery.NullDateTime `bigquery:"creationDate"`
-	MailError    string                `bigquery:"mailError"`
-}
-
 func LoginAuth(username, password string) smtp.Auth {
 	return &loginAuth{username, password}
 }
@@ -135,9 +127,9 @@ func sendmail(obj MailRequest) error {
 	case "local":
 		file, err = os.ReadFile("../function-data/dev/mail/mail_template.html")
 	case "dev":
-		file, err = lib.GetFromStorageV2("function-data", "mail/mail_template.html", "")
+		file, err = lib.GetFilesByEnvV2("mail/mail_template.html")
 	case "prod":
-		file, err = lib.GetFromStorageV2("core-350507-function-data", "mail/mail_template.html", "")
+		file, err = lib.GetFilesByEnvV2("mail/mail_template.html")
 	}
 	if err != nil {
 		return err
@@ -332,15 +324,15 @@ func SendMail(obj MailRequest) {
 		log.Printf("error sending mail: %s", err.Error())
 		reportError = err.Error()
 	}
-	mailErr := writeMailReport(obj.Policy, obj.From, reportRecip, lib.GetBigQueryNullDateTime(time.Now().UTC()), reportError)
+	mailErr := writeMailReport(obj.Policy, obj.FromName, reportRecip, lib.GetBigQueryNullDateTime(time.Now().UTC()), reportError)
 	if mailErr != nil {
 		log.Printf("error writing report: %s", mailErr.Error())
 	}
 }
 
-func writeMailReport(policy string, sender string, recipients string, date bigquery.NullDateTime, message string) error {
+func writeMailReport(policyUid string, senderName string, recipientAddress string, date bigquery.NullDateTime, message string) error {
 
-	report := MailReport{policy, sender, recipients, date, message}
+	report := MailReport{policyUid, senderName, recipientAddress, date, message}
 	err := lib.InsertRowsBigQuery(lib.WoptaDataset, lib.MailReportCollection, report)
 	if err != nil {
 		return err

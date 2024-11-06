@@ -2,6 +2,8 @@ package mail
 
 import (
 	m "net/mail"
+
+	"cloud.google.com/go/bigquery"
 )
 
 type Data struct {
@@ -71,6 +73,14 @@ type MailValidate struct {
 	IsValid   bool   `firestore:"isValid" json:"isValid"`
 	IsValidS  bool   `firestore:"-" json:"isValid "`
 	FidoScore int64  `firestore:"fidoScore" json:"fidoScore"`
+}
+
+type MailReport struct {
+	Policy         string                `bigquery:"policyUid"`
+	SenderName     string                `bigquery:"senderName"`
+	RecipientEmail string                `bigquery:"recipientEmail"`
+	CreationDate   bigquery.NullDateTime `bigquery:"creationDate"`
+	MailError      string                `bigquery:"mailError"`
 }
 
 type Address = m.Address
