@@ -5,7 +5,7 @@ type Roles string
 type PolicyStatus string
 
 const (
-	PolicyStatusInit               = "Inizialize"
+	PolicyStatusInit               = "Init"
 	PolicyStatusInitData           = "InizializeData"
 	PolicyStatusInitLead           = "Lead"
 	PolicyStatusPartnershipLead    = "PartnershipLead"
