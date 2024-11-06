@@ -160,8 +160,11 @@ func receiptInfoBuilder(policy models.Policy, transaction models.Transaction) do
 
 	tmpExpirationDate := lib.AddMonths(transaction.EffectiveDate, 12)
 
-	if policy.PaymentSplit == string(models.PaySplitMonthly) {
+	switch policy.PaymentSplit {
+	case string(models.PaySplitMonthly):
 		tmpExpirationDate = lib.AddMonths(transaction.EffectiveDate, 1)
+	case string(models.PaySplitSingleInstallment):
+		tmpExpirationDate = policy.EndDate
 	}
 
 	if !tmpExpirationDate.After(expirationDate) {
