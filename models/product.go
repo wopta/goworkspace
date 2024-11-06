@@ -92,6 +92,7 @@ type Mandate struct {
 
 type Step struct {
 	Widget     string      `firestore:"widget,omitempty" json:"widget"`
+	Title      string      `json:"title"`
 	Attributes interface{} `firestore:"attributes,omitempty" json:"attributes"`
 	Children   []Child     `firestore:"children,omitempty" json:"children,omitempty"`
 	Flows      []string    `json:"flows" firestore:"flows,omitempty"`
