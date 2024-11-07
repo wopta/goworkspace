@@ -306,22 +306,22 @@ func GetFilesByEnv(file string) []byte {
 
 func GetFilesByEnvV2(file string) ([]byte, error) {
 	var (
-		res1 []byte
-		err  error
+		res []byte
+		err error
 	)
 
 	switch os.Getenv("env") {
 	case "local":
-		res1, err = os.ReadFile("../function-data/dev/" + file)
+		res, err = os.ReadFile("../function-data/dev/" + file)
 	case "local-test":
-		res1, err = os.ReadFile("../../function-data/dev/" + file)
+		res, err = os.ReadFile("../../function-data/dev/" + file)
 	case "dev":
-		res1, err = GetFromStorageV2("function-data", file, "")
+		res, err = GetFromStorageV2("function-data", file, "")
 	case "prod":
-		res1, err = GetFromStorageV2("core-350507-function-data", file, "")
+		res, err = GetFromStorageV2("core-350507-function-data", file, "")
 	}
 
-	return res1, err
+	return res, err
 }
 
 func GetFolderContentByEnv(folderName string) [][]byte {

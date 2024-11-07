@@ -30,7 +30,6 @@ func RenewMailFx(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 
 	log.SetPrefix("[RenewMailFx] ")
 	defer func() {
-		collectionPrefix = ""
 		if err != nil {
 			log.Printf("error: %s", err.Error())
 		}
