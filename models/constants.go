@@ -143,10 +143,11 @@ const (
 )
 
 const (
-	LifeProduct    string = "life"
-	PmiProduct     string = "pmi"
-	PersonaProduct string = "persona"
-	GapProduct     string = "gap"
+	LifeProduct               string = "life"
+	PmiProduct                string = "pmi"
+	PersonaProduct            string = "persona"
+	GapProduct                string = "gap"
+	CommercialCombinedProduct string = "commercial-combined"
 )
 
 const (
