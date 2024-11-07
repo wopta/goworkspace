@@ -291,7 +291,7 @@ func SendMailProposal(policy models.Policy, from, to, cc Address, flowName strin
 func SendMailRenewDraft(policy models.Policy, from, to, cc Address, flowName string, hasMandate bool) {
 	var bodyData BodyData
 
-	bodyData = getPolicyRenewDraftBodyData(policy, hasMandate)
+	bodyData = getPolicyRenewDraftBodyData(policy)
 
 	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s/%s.html", flowName, renewDraftTemplateType))
 
@@ -307,6 +307,7 @@ func SendMailRenewDraft(policy models.Policy, from, to, cc Address, flowName str
 	subject := fmt.Sprintf("%s - %s", title, subtitle)
 
 	SendMail(MailRequest{
+		FromName:    from.Name,
 		FromAddress: from,
 		To:          []string{to.Address},
 		Cc:          cc.Address,
@@ -316,5 +317,6 @@ func SendMailRenewDraft(policy models.Policy, from, to, cc Address, flowName str
 		Subject:     subject,
 		IsHtml:      true,
 		IsApp:       true,
+		Policy:      policy.Uid,
 	})
 }

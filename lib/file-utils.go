@@ -103,13 +103,26 @@ func GetFromStorage(bucket string, file string, keyPath string) []byte {
 }
 
 func GetFromStorageErr(bucket string, file string, keyPath string) ([]byte, error) {
-	//var credential models.Credential
-	log.Println("start GetFromStorage")
+	var err error
+	log.Println("start GetFromStorageErr")
+	log.Println("File: " + file)
 	ctx := context.Background()
 	client, err := storage.NewClient(ctx)
+	if err != nil {
+		return nil, err
+	}
 	rc, err := client.Bucket(bucket).Object(file).NewReader(ctx)
-	slurp, err := ioutil.ReadAll(rc)
-	rc.Close()
+	if err != nil {
+		return nil, err
+	}
+	slurp, err := io.ReadAll(rc)
+	if err != nil {
+		return nil, err
+	}
+	err = rc.Close()
+	if err != nil {
+		return nil, err
+	}
 	return slurp, err
 }
 
@@ -278,6 +291,26 @@ func GetFilesByEnv(file string) []byte {
 	}
 
 	return res1
+}
+
+func GetFilesByEnvV2(file string) ([]byte, error) {
+	var (
+		res []byte
+		err error
+	)
+
+	switch os.Getenv("env") {
+	case "local":
+		res, err = os.ReadFile("../function-data/dev/" + file)
+	case "local-test":
+		res, err = os.ReadFile("../../function-data/dev/" + file)
+	case "dev":
+		res, err = GetFromStorageErr("function-data", file, "")
+	case "prod":
+		res, err = GetFromStorageErr("core-350507-function-data", file, "")
+	}
+
+	return res, err
 }
 
 func GetFolderContentByEnv(folderName string) [][]byte {
