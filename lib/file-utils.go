@@ -102,9 +102,9 @@ func GetFromStorage(bucket string, file string, keyPath string) []byte {
 	return slurp
 }
 
-func GetFromStorageV2(bucket string, file string, keyPath string) ([]byte, error) {
+func GetFromStorageErr(bucket string, file string, keyPath string) ([]byte, error) {
 	var err error
-	log.Println("start GetFromStorageV2")
+	log.Println("start GetFromStorageErr")
 	log.Println("File: " + file)
 	ctx := context.Background()
 	client, err := storage.NewClient(ctx)
@@ -123,17 +123,6 @@ func GetFromStorageV2(bucket string, file string, keyPath string) ([]byte, error
 	if err != nil {
 		return nil, err
 	}
-	return slurp, err
-}
-
-func GetFromStorageErr(bucket string, file string, keyPath string) ([]byte, error) {
-	//var credential models.Credential
-	log.Println("start GetFromStorage")
-	ctx := context.Background()
-	client, err := storage.NewClient(ctx)
-	rc, err := client.Bucket(bucket).Object(file).NewReader(ctx)
-	slurp, err := ioutil.ReadAll(rc)
-	rc.Close()
 	return slurp, err
 }
 
@@ -316,9 +305,9 @@ func GetFilesByEnvV2(file string) ([]byte, error) {
 	case "local-test":
 		res, err = os.ReadFile("../../function-data/dev/" + file)
 	case "dev":
-		res, err = GetFromStorageV2("function-data", file, "")
+		res, err = GetFromStorageErr("function-data", file, "")
 	case "prod":
-		res, err = GetFromStorageV2("core-350507-function-data", file, "")
+		res, err = GetFromStorageErr("core-350507-function-data", file, "")
 	}
 
 	return res, err
