@@ -123,14 +123,7 @@ func sendmail(obj MailRequest) error {
 		err      error
 	)
 
-	switch os.Getenv("env") {
-	case "local":
-		file, err = os.ReadFile("../function-data/dev/mail/mail_template.html")
-	case "dev":
-		file, err = lib.GetFilesByEnvV2("mail/mail_template.html")
-	case "prod":
-		file, err = lib.GetFilesByEnvV2("mail/mail_template.html")
-	}
+	file, err = lib.GetFilesByEnvV2("mail/mail_template.html")
 	if err != nil {
 		return err
 	}
