@@ -85,6 +85,13 @@ func InitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		policy.ProducerUid = networkNode.Uid
 	}
 
+	err = lib.SetFirestoreErr(lib.PolicyCollection, policy.Uid, policy)
+	if err != nil {
+		return "", nil, err
+	}
+
+	policy.BigquerySave("")
+
 	rawPolicy, err := json.Marshal(policy)
 
 	return string(rawPolicy), policy, err
