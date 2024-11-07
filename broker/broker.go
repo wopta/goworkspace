@@ -117,6 +117,12 @@ var brokerRoutes []lib.Route = []lib.Route{
 		Method:  http.MethodGet,
 		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleAreaManager, lib.UserRoleAgency, lib.UserRoleAgent},
 	},
+	{
+		Route:   "/policy/v1/init",
+		Handler: lib.ResponseLoggerWrapper(InitFx),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAll},
+	},
 }
 
 func init() {
