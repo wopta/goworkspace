@@ -65,6 +65,8 @@ func InitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		Channel:        channel,
 		Company:        product.Companies[0].Name,
 		CreationDate:   now,
+		IsAutoRenew:    product.IsAutoRenew,
+		IsRenewable:    product.IsRenewable,
 		Name:           product.Name,
 		NameDesc:       *product.NameDesc,
 		PolicyType:     product.PolicyType,
