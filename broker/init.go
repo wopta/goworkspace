@@ -51,7 +51,7 @@ func InitFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error)
 		return "", nil, err
 	}
 
-	product = prd.GetLatestActiveProduct(req.ProductName, lib.MgaChannel, nil, nil)
+	product = prd.GetLatestActiveProduct(req.ProductName, authToken.GetChannelByRoleV2(), nil, nil)
 	if product == nil {
 		return "", nil, fmt.Errorf("product %s not found", req.ProductName)
 	}
