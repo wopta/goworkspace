@@ -34,13 +34,15 @@ var paymentRoutes []lib.Route = []lib.Route{
 		Route:   "/manual/v1/{transactionUid}",
 		Handler: lib.ResponseLoggerWrapper(manual.ManualPaymentFx),
 		Method:  http.MethodPost,
-		Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
+		Roles: []string{models.UserRoleAdmin, models.UserRoleManager, models.UserRoleAreaManager,
+			models.UserRoleAgency, models.UserRoleAgent},
 	},
 	{
 		Route:   "/manual/v1/renew/{transactionUid}",
 		Handler: lib.ResponseLoggerWrapper(manual.RenewManualPaymentFx),
 		Method:  http.MethodPost,
-		Roles:   []string{models.UserRoleAdmin, models.UserRoleManager},
+		Roles: []string{models.UserRoleAdmin, models.UserRoleManager, models.UserRoleAreaManager,
+			models.UserRoleAgency, models.UserRoleAgent},
 	},
 	{
 		Route:   "/v1",
