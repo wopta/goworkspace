@@ -40,6 +40,9 @@ func GetNetworkNodeByUidFx(w http.ResponseWriter, r *http.Request) (string, inte
 	}
 
 	networkNode := network.GetNetworkNodeByUid(nodeUid)
+	if networkNode == nil {
+		return "", nil, errors.New("node not found")
+	}
 
 	// DO NOT EXPOSE CONFIGS
 	networkNode.JwtConfig = lib.JwtConfig{}
