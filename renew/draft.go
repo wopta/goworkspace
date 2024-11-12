@@ -182,9 +182,10 @@ func getPolicies(policyUid, policyType, quoteType string, products map[string]mo
 	query.WriteString(fmt.Sprintf("SELECT * FROM `%s.%s` p WHERE ", lib.WoptaDataset, lib.PoliciesViewCollection))
 
 	if policyUid != "" {
-		query.WriteString(" uid = @policyUid ")
 		params["policyUid"] = policyUid
 
+		query.WriteString(" uid = @policyUid ")
+		query.WriteString(" AND ")
 	} else if len(products) > 0 {
 		tmpProducts := lib.GetMapValues(products)
 		params["isRenewable"] = true
@@ -224,10 +225,11 @@ func getPolicies(policyUid, policyType, quoteType string, products map[string]mo
 			query.WriteString(" AND EXTRACT(DAY FROM startDate) = @" + targetDayKey + ")")
 		}
 		query.WriteString(") AND ")
-		query.WriteString(fmt.Sprintf("(EXISTS(SELECT uid FROM `%s.%s` "+
-			"WHERE uid = p.uid AND annuity = p.annuity + 1 AND isDeleted = false)) = false",
-			lib.WoptaDataset, lib.RenewPolicyViewCollection))
 	}
+
+	query.WriteString(fmt.Sprintf("(EXISTS(SELECT uid FROM `%s.%s` "+
+		"WHERE uid = p.uid AND annuity = p.annuity + 1 AND isDeleted = false)) = false",
+		lib.WoptaDataset, lib.RenewPolicyViewCollection))
 
 	log.Printf("query: %s", query.String())
 	log.Printf("params: %v", params)
