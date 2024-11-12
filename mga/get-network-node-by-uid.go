@@ -19,8 +19,8 @@ func GetNetworkNodeByUidFx(w http.ResponseWriter, r *http.Request) (string, inte
 		if err != nil {
 			log.Printf("error: %+v", err.Error())
 		}
-		log.SetPrefix("")
 		log.Println("Handler end -------------------------------------------------")
+		log.SetPrefix("")
 	}()
 
 	log.SetPrefix("[GetNetworkNodeByUidFx] ")
