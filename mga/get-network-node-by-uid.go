@@ -1,6 +1,7 @@
 package mga
 
 import (
+	"errors"
 	"log"
 	"net/http"
 
@@ -10,23 +11,44 @@ import (
 )
 
 func GetNetworkNodeByUidFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.SetPrefix("[GetNetworkNodeByUidFx] ")
-	defer log.SetPrefix("")
+	var (
+		err error
+	)
 
+	defer func() {
+		if err != nil {
+			log.Printf("error: %+v", err.Error())
+		}
+		log.Println("Handler end -------------------------------------------------")
+		log.SetPrefix("")
+	}()
+
+	log.SetPrefix("[GetNetworkNodeByUidFx] ")
 	log.Println("Handler start -----------------------------------------------")
+
+	idToken := r.Header.Get("Authorization")
+	authToken, err := lib.GetAuthTokenFromIdToken(idToken)
+	if err != nil {
+		return "", nil, err
+	}
 
 	nodeUid := chi.URLParam(r, "uid")
 	log.Printf("Uid %s", nodeUid)
 
+	if authToken.IsNetworkNode && !network.IsParentOf(authToken.UserID, nodeUid) {
+		return "", nil, errors.New("cannot access this node")
+	}
+
 	networkNode := network.GetNetworkNodeByUid(nodeUid)
+	if networkNode == nil {
+		return "", nil, errors.New("node not found")
+	}
 
 	// DO NOT EXPOSE CONFIGS
 	networkNode.JwtConfig = lib.JwtConfig{}
 	networkNode.CallbackConfig = nil
 
-	jsonOut, err := networkNode.Marshal()
+	rawResp, err := networkNode.Marshal()
 
-	log.Println("Handler end -------------------------------------------------")
-
-	return string(jsonOut), networkNode, err
+	return string(rawResp), networkNode, err
 }

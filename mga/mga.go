@@ -25,7 +25,8 @@ var mgaRoutes []lib.Route = []lib.Route{
 		Route:   "/network/node/v1/{uid}",
 		Handler: lib.ResponseLoggerWrapper(GetNetworkNodeByUidFx),
 		Method:  http.MethodGet,
-		Roles:   []string{lib.UserRoleAll},
+		Roles: []string{lib.UserRoleAdmin, lib.UserRoleManager, lib.UserRoleAreaManager, lib.UserRoleAgency,
+			lib.UserRoleAgent},
 	},
 	{
 		Route:   "/network/node/v1",
