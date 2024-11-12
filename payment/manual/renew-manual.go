@@ -3,6 +3,7 @@ package manual
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -50,6 +51,10 @@ func RenewManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, inter
 	}
 
 	methods := models.GetAvailableMethods(authToken.Role)
+	if len(methods) == 0 {
+		return "", nil, fmt.Errorf("no methods available for manual payment")
+	}
+
 	isMethodAllowed := lib.SliceContains(methods, payload.PaymentMethod)
 
 	if !isMethodAllowed {
