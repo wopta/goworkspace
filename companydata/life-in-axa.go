@@ -323,11 +323,9 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 
 		warrant := networkNode.GetWarrant()
 		flow := warrant.GetFlowName(models.LifeProduct)
-		payment := ""
+		payment := models.FabrickPaymentProvider
 		if flow == models.RemittanceMgaFlow {
 			payment = models.ManualPaymentProvider
-		} else {
-			payment = models.FabrickPaymentProvider
 		}
 
 		policy := models.Policy{
