@@ -67,7 +67,8 @@ var mgaRoutes []lib.Route = []lib.Route{
 		Route:   "/warrants/v1",
 		Handler: lib.ResponseLoggerWrapper(GetWarrantsFx),
 		Method:  http.MethodGet,
-		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleManager},
+		Roles: []string{lib.UserRoleAdmin, lib.UserRoleManager, lib.UserRoleAreaManager, lib.UserRoleAgency,
+			lib.UserRoleAgent},
 	},
 	{
 		Route:   "/warrant/v1",

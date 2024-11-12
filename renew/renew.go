@@ -21,6 +21,12 @@ var routes []lib.Route = []lib.Route{
 		Handler: lib.ResponseLoggerWrapper(PromoteFx),
 		Roles:   []string{},
 	},
+	{
+		Route:   "/v1/notice/e-commerce",
+		Method:  http.MethodPost,
+		Handler: lib.ResponseLoggerWrapper(RenewMailFx),
+		Roles:   []string{},
+	},
 }
 
 func init() {

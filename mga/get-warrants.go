@@ -9,33 +9,69 @@ import (
 	"github.com/wopta/goworkspace/network"
 )
 
-type GetWarrantsResponse struct {
-	Warrants []models.Warrant `json:"warrants"`
+type warrantProduct struct {
+	Name string `json:"name"`
+	Flow string `json:"flow"`
+}
+
+type warrant struct {
+	Name        string           `json:"name"`
+	Description string           `json:"description"`
+	Products    []warrantProduct `json:"products"`
+}
+
+func (w *warrant) fromDomain(input models.Warrant) {
+	w.Name = input.Name
+	w.Description = input.Description
+	products := make([]warrantProduct, 0, len(input.Products))
+	for _, p := range input.Products {
+		products = append(products, warrantProduct{
+			Name: p.Name,
+			Flow: p.Flow,
+		})
+	}
+	w.Products = products
+}
+
+type getWarrantsResponse struct {
+	Warrants []warrant `json:"warrants"`
 }
 
 func GetWarrantsFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	var response GetWarrantsResponse
+	var (
+		err  error
+		resp getWarrantsResponse
+	)
 
 	log.SetPrefix("[GetWarrantsFx] ")
-	defer log.SetPrefix("")
-
 	log.Println("Handler start -----------------------------------------------")
 
-	warrants, err := network.GetWarrants()
+	defer func() {
+		if err != nil {
+			log.Printf("error: %s", err.Error())
+		}
+		log.Println("Handler end -------------------------------------------------")
+		log.SetPrefix("")
+	}()
+
+	retrievedWarrant, err := network.GetWarrants()
 	if err != nil {
-		log.Printf("error getting warrants: %s", err.Error())
 		return "", "", err
 	}
 
-	response.Warrants = warrants
+	warrants := make([]warrant, 0, len(retrievedWarrant))
+	for _, war := range retrievedWarrant {
+		dto := new(warrant)
+		dto.fromDomain(war)
+		warrants = append(warrants, *dto)
+	}
 
-	responseBytes, err := json.Marshal(response)
+	resp.Warrants = warrants
+
+	rawResp, err := json.Marshal(resp)
 	if err != nil {
-		log.Printf("error marshaling response: %s", err.Error())
 		return "", "", err
 	}
 
-	log.Println("Handler end -------------------------------------------------")
-
-	return string(responseBytes), response, nil
+	return string(rawResp), resp, nil
 }

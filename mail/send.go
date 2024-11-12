@@ -15,7 +15,9 @@ import (
 	"os"
 	"strings"
 	"text/template"
+	"time"
 
+	"cloud.google.com/go/bigquery"
 	"github.com/wopta/goworkspace/lib"
 )
 
@@ -110,7 +112,7 @@ func getContentType(ext string) string {
 	return m[ext]
 }
 
-func SendMail(obj MailRequest) {
+func sendmail(obj MailRequest) error {
 	log.Println("[SendMail] start --------------------------------------------")
 	var (
 		username = os.Getenv("EMAIL_USERNAME")
@@ -118,20 +120,19 @@ func SendMail(obj MailRequest) {
 		from     = AddressAnna
 		file     []byte
 		tpl      bytes.Buffer
+		err      error
 	)
 
-	switch os.Getenv("env") {
-	case "local":
-		file = lib.ErrorByte(os.ReadFile("../function-data/dev/mail/mail_template.html"))
-	case "dev":
-		file = lib.GetFromStorage("function-data", "mail/mail_template.html", "")
-	case "prod":
-		file = lib.GetFromStorage("core-350507-function-data", "mail/mail_template.html", "")
+	file, err = lib.GetFilesByEnvV2("mail/mail_template.html")
+	if err != nil {
+		return err
 	}
 
 	tmplt := template.New("action")
-	tmplt, err := tmplt.Parse(string(file))
-	lib.CheckError(err)
+	tmplt, err = tmplt.Parse(string(file))
+	if err != nil {
+		return err
+	}
 
 	data := Data{
 		Title:     obj.Title,
@@ -142,7 +143,10 @@ func SendMail(obj MailRequest) {
 		IsApp:     obj.IsApp,
 		Content:   obj.Message,
 	}
-	tmplt.Execute(&tpl, data)
+	err = tmplt.Execute(&tpl, data)
+	if err != nil {
+		return err
+	}
 
 	emptyAddress := mail.Address{}
 	if obj.FromAddress.String() != emptyAddress.String() {
@@ -208,7 +212,9 @@ func SendMail(obj MailRequest) {
 		// Connect to the SMTP Server
 		servername := "smtp.office365.com:587"
 		host, _, err := net.SplitHostPort(servername)
-		lib.CheckError(err)
+		if err != nil {
+			return err
+		}
 
 		// TLS config
 		tlsconfig := &tls.Config{
@@ -219,55 +225,110 @@ func SendMail(obj MailRequest) {
 		// for smtp servers running on 465 that require an ssl connection
 		// from the very beginning (no starttls)40.99.214.146
 		conn, err := net.Dial("tcp", "smtp.office365.com:587")
-		lib.CheckError(err)
+		if err != nil {
+			return err
+		}
 
 		c, err := smtp.NewClient(conn, host)
-		lib.CheckError(err)
+		if err != nil {
+			return err
+		}
 
-		c.StartTLS(tlsconfig)
-		lib.CheckError(err)
+		err = c.StartTLS(tlsconfig)
+		if err != nil {
+			return err
+		}
 
 		// Auth
 		err = c.Auth(LoginAuth(username, password))
-		lib.CheckError(err)
+		if err != nil {
+			return err
+		}
 
 		// To, From and Cc
 		log.Printf("[SendMail] setting address from: %s", from.Address)
 		err = c.Mail(from.Address)
-		lib.CheckError(err)
+		if err != nil {
+			return err
+		}
 
 		log.Printf("[SendMail] setting address to: %s", to.Address)
 		err = c.Rcpt(to.Address)
-		lib.CheckError(err)
+		if err != nil {
+			return err
+		}
 
 		if obj.Cc != "" {
 			// TODO: in the future we might need to handle multiple Ccs
 			log.Printf("[SendMail] setting cc to: %s", obj.Cc)
 			err = c.Rcpt(obj.Cc)
-			lib.CheckError(err)
+			if err != nil {
+				return err
+			}
 		}
 
 		if obj.Bcc != "" {
 			// TODO: in the future we might need to handle multiple Bccs
 			log.Printf("[SendMail] setting bcc to: %s", obj.Bcc)
 			err = c.Rcpt(obj.Bcc)
-			lib.CheckError(err)
+			if err != nil {
+				return err
+			}
 		}
 
 		// Data
 		w, err := c.Data()
-		lib.CheckError(err)
+		if err != nil {
+			return err
+		}
 
 		_, err = w.Write([]byte(message))
-		lib.CheckError(err)
+		if err != nil {
+			return err
+		}
 
 		err = w.Close()
-		lib.CheckError(err)
+		if err != nil {
+			return err
+		}
 
-		c.Quit()
+		err = c.Quit()
+		if err != nil {
+			return err
+		}
 
 		log.Println("[SendMail] message sent")
 	}
 
 	log.Println("[SendMail] end ----------------------------------------------")
+
+	return nil
+}
+
+func SendMail(obj MailRequest) {
+	var (
+		reportError = ""
+		reportRecip = strings.Join(obj.To, ",")
+	)
+
+	err := sendmail(obj)
+
+	if err != nil {
+		log.Printf("error sending mail: %s", err.Error())
+		reportError = err.Error()
+	}
+	mailErr := writeMailReport(obj.Policy, obj.FromName, reportRecip, lib.GetBigQueryNullDateTime(time.Now().UTC()), reportError)
+	if mailErr != nil {
+		log.Printf("error writing report: %s", mailErr.Error())
+	}
+}
+
+func writeMailReport(policyUid string, senderName string, recipientAddress string, date bigquery.NullDateTime, message string) error {
+
+	report := MailReport{policyUid, senderName, recipientAddress, date, message}
+	err := lib.InsertRowsBigQuery(lib.WoptaDataset, lib.MailReportCollection, report)
+	if err != nil {
+		return err
+	}
+	return nil
 }

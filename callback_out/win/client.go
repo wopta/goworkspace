@@ -13,16 +13,31 @@ import (
 )
 
 type Client struct {
-	basePath string
-	producer string
-	path     string
-	headers  map[string]string
+	basePath       string
+	producer       string
+	path           string
+	headers        map[string]string
+	externalConfig internal.CallbackExternalConfig
 }
 
 func NewClient(producer string) *Client {
 	return &Client{
 		basePath: os.Getenv("WIN_CALLBACK_ENDPOINT"),
 		producer: producer,
+		// TODO: move me to external configuration
+		externalConfig: internal.CallbackExternalConfig{
+			Events: map[string]bool{
+				md.Proposal:        true,
+				md.RequestApproval: true,
+				md.Emit:            true,
+				md.Signed:          false,
+				md.Paid:            true,
+				md.EmitRemittance:  true,
+				md.Approved:        false,
+				md.Rejected:        false,
+			},
+			AuthType: "basic",
+		},
 	}
 }
 
@@ -118,7 +133,24 @@ func (c *Client) Paid(policy models.Policy) internal.CallbackInfo {
 	}
 }
 
+func (c *Client) Signed(models.Policy) internal.CallbackInfo {
+	return internal.CallbackInfo{}
+}
+
+func (c *Client) Approved(models.Policy) internal.CallbackInfo {
+	return internal.CallbackInfo{}
+}
+
+func (c *Client) Rejected(models.Policy) internal.CallbackInfo {
+	return internal.CallbackInfo{}
+}
+
 func (c *Client) DecodeAction(rawAction string) []string {
+	actionEnabled, ok := c.externalConfig.Events[rawAction]
+	if !actionEnabled || !ok {
+		return nil
+	}
+
 	availableActions := md.GetAvailableActions()
 	decodedActions := availableActions[rawAction]
 

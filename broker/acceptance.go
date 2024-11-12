@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/wopta/goworkspace/callback_out"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
@@ -22,10 +23,11 @@ type AcceptancePayload struct {
 
 func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		err       error
-		payload   AcceptancePayload
-		policy    models.Policy
-		toAddress mail.Address
+		err           error
+		payload       AcceptancePayload
+		policy        models.Policy
+		toAddress     mail.Address
+		callbackEvent string
 	)
 
 	log.SetPrefix("[AcceptanceFx]")
@@ -78,8 +80,10 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	switch payload.Action {
 	case models.PolicyStatusRejected:
 		rejectPolicy(&policy, lib.ToUpper(payload.Reasons))
+		callbackEvent = callback_out.Rejected
 	case models.PolicyStatusApproved:
 		approvePolicy(&policy, lib.ToUpper(payload.Reasons))
+		callbackEvent = callback_out.Approved
 	default:
 		log.Printf("Unhandled action %s", payload.Action)
 		return "", nil, fmt.Errorf("unhandled action %s", payload.Action)
@@ -133,6 +137,8 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 		mail.Address{},
 		flowName,
 	)
+
+	callback_out.Execute(networkNode, policy, callbackEvent)
 
 	log.Println("Handler end -------------------------------------------------")
 

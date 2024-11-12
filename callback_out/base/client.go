@@ -27,28 +27,17 @@ func NewClient(networkNode *models.NetworkNode, network string) *Client {
 		return nil
 	}
 
-	/*
-		var externalConfig internal.CallbackExternalConfig
-		configBytes := lib.GetFilesByEnv("/callback-out/base.json")
-		if err := json.Unmarshal(configBytes, &externalConfig); err != nil {
-			return nil
-		}
-	*/
+	var externalConfig internal.CallbackExternalConfig
+	configBytes := lib.GetFilesByEnv("callback-out/base.json")
+	if err := json.Unmarshal(configBytes, &externalConfig); err != nil {
+		return nil
+	}
 
 	return &Client{
-		basePath: basePath,
-		producer: networkNode.Code,
-		network:  network,
-		externalConfig: internal.CallbackExternalConfig{
-			Events: map[string]bool{
-				md.Proposal:        true,
-				md.RequestApproval: false,
-				md.Emit:            true,
-				md.Paid:            true,
-				md.EmitRemittance:  false,
-			},
-			AuthType: "basic",
-		},
+		basePath:       basePath,
+		producer:       networkNode.Code,
+		network:        network,
+		externalConfig: externalConfig,
 	}
 }
 
@@ -102,6 +91,18 @@ func (c *Client) RequestApproval(policy models.Policy) internal.CallbackInfo {
 }
 
 func (c *Client) Paid(policy models.Policy) internal.CallbackInfo {
+	return c.baseRequest(policy)
+}
+
+func (c *Client) Signed(policy models.Policy) internal.CallbackInfo {
+	return c.baseRequest(policy)
+}
+
+func (c *Client) Approved(policy models.Policy) internal.CallbackInfo {
+	return c.baseRequest(policy)
+}
+
+func (c *Client) Rejected(policy models.Policy) internal.CallbackInfo {
 	return c.baseRequest(policy)
 }
 
