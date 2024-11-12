@@ -187,7 +187,7 @@ const (
 	PayMethodRemittance = "remittance"
 )
 
-func GetAllPaymentMethods(role string) []string {
+func GetAvailableMethods(role string) []string {
 	switch role {
 	case UserRoleAdmin, UserRoleAreaManager, UserRoleManager:
 		return []string{PayMethodCard, PayMethodTransfer, PayMethodSdd}

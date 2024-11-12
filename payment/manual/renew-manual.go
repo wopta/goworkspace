@@ -49,7 +49,7 @@ func RenewManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, inter
 		return "", nil, err
 	}
 
-	methods := models.GetAllPaymentMethods(authToken.Role)
+	methods := models.GetAvailableMethods(authToken.Role)
 	isMethodAllowed := lib.SliceContains(methods, payload.PaymentMethod)
 
 	if !isMethodAllowed {

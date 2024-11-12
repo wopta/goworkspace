@@ -58,9 +58,8 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		return "", nil, err
 	}
 
-	methods := models.GetAllPaymentMethods(authToken.Role)
+	methods := models.GetAvailableMethods(authToken.Role)
 	isMethodAllowed := lib.SliceContains[string](methods, payload.PaymentMethod)
-
 	if !isMethodAllowed {
 		log.Printf("ERROR %s", errPaymentMethodNotAllowed)
 		return "", nil, fmt.Errorf(errPaymentMethodNotAllowed)
