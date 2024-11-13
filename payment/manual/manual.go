@@ -1,6 +1,7 @@
 package manual
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -71,16 +72,39 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 
 	origin := r.Header.Get("Origin")
 	transactionUid := chi.URLParam(r, "transactionUid")
-	fireTransactions := lib.GetDatasetByEnv(origin, models.TransactionsCollection)
-	firePolicies := lib.GetDatasetByEnv(origin, models.PolicyCollection)
 
-	docsnap, err := lib.GetFirestoreErr(fireTransactions, transactionUid)
+	docsnap, err := lib.GetFirestoreErr(lib.TransactionsCollection, transactionUid)
 	if err != nil {
 		log.Printf("ERROR get transaction from firestore: %s", err.Error())
 		return "{}", nil, err
 	}
 	err = docsnap.DataTo(&transaction)
-	lib.CheckError(err)
+	if err != nil {
+		return "", nil, err
+	}
+
+	docsnap, err = lib.GetFirestoreErr(lib.PolicyCollection, transaction.PolicyUid)
+	if err != nil {
+		log.Printf("ERROR get policy from firestore: %s", err.Error())
+		return "", nil, err
+	}
+	err = docsnap.DataTo(&policy)
+	if err != nil {
+		return "", nil, err
+	}
+
+	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
+	if networkNode != nil {
+		warrant = networkNode.GetWarrant()
+		ccAddress = mail.GetNetworkNodeEmail(networkNode)
+	}
+	flowName, _ = policy.GetFlow(networkNode, warrant)
+	log.Printf("flowName '%s'", flowName)
+
+	isOnlineProducer := authToken.UserID != policy.ProducerUid || flowName != models.RemittanceMgaFlow
+	if authToken.IsNetworkNode && isOnlineProducer {
+		return "", nil, errors.New("cannot access to transaction")
+	}
 
 	if transaction.IsPay {
 		log.Printf("ERROR %s", errTransactionPaid)
@@ -112,14 +136,6 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		return "", nil, fmt.Errorf(errTransactionOutOfOrder)
 	}
 
-	docsnap, err = lib.GetFirestoreErr(firePolicies, transaction.PolicyUid)
-	if err != nil {
-		log.Printf("ERROR get policy from firestore: %s", err.Error())
-		return "", nil, err
-	}
-	err = docsnap.DataTo(&policy)
-	lib.CheckError(err)
-
 	if !policy.IsSign {
 		log.Printf("ERROR %s", errPolicyNotSigned)
 		return "", nil, fmt.Errorf(errPolicyNotSigned)
@@ -132,14 +148,6 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		log.Printf("ERROR %s", errPaymentFailed)
 		return "", nil, fmt.Errorf(errPaymentFailed)
 	}
-
-	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
-	if networkNode != nil {
-		warrant = networkNode.GetWarrant()
-		ccAddress = mail.GetNetworkNodeEmail(networkNode)
-	}
-	flowName, _ = policy.GetFlow(networkNode, warrant)
-	log.Printf("flowName '%s'", flowName)
 
 	mgaProduct := prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
 
