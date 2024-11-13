@@ -29,6 +29,7 @@ type ManualPaymentPayload struct {
 
 func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
+		err         error
 		payload     ManualPaymentPayload
 		transaction models.Transaction
 		policy      models.Policy
@@ -41,14 +42,19 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 	)
 
 	log.SetPrefix("[ManualPaymentFx] ")
-	defer log.SetPrefix("")
-
+	defer func() {
+		if err != nil {
+			log.Printf("error: %s", err.Error())
+		}
+		defer r.Body.Close()
+		log.Println("Handler end -------------------------------------------------")
+		log.SetPrefix("")
+	}()
 	log.Println("Handler start -----------------------------------------------")
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
-	defer r.Body.Close()
 
-	err := lib.CheckPayload[ManualPaymentPayload](body, &payload, []string{"paymentMethod", "payDate", "transactionDate"})
+	err = lib.CheckPayload[ManualPaymentPayload](body, &payload, []string{"paymentMethod", "payDate", "transactionDate"})
 	if err != nil {
 		return "", nil, err
 	}
@@ -61,13 +67,14 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 
 	methods := models.GetAvailableMethods(authToken.Role)
 	if len(methods) == 0 {
-		return "", nil, fmt.Errorf("no methods available for manual payment")
+		err = fmt.Errorf("no methods available for manual payment")
+		return "", nil, err
 	}
 
 	isMethodAllowed := lib.SliceContains[string](methods, payload.PaymentMethod)
 	if !isMethodAllowed {
-		log.Printf("ERROR %s", errPaymentMethodNotAllowed)
-		return "", nil, fmt.Errorf(errPaymentMethodNotAllowed)
+		err = fmt.Errorf("ERROR %s", errPaymentMethodNotAllowed)
+		return "", nil, err
 	}
 
 	origin := r.Header.Get("Origin")
@@ -75,7 +82,6 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 
 	docsnap, err := lib.GetFirestoreErr(lib.TransactionsCollection, transactionUid)
 	if err != nil {
-		log.Printf("ERROR get transaction from firestore: %s", err.Error())
 		return "{}", nil, err
 	}
 	err = docsnap.DataTo(&transaction)
@@ -85,7 +91,6 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 
 	docsnap, err = lib.GetFirestoreErr(lib.PolicyCollection, transaction.PolicyUid)
 	if err != nil {
-		log.Printf("ERROR get policy from firestore: %s", err.Error())
 		return "", nil, err
 	}
 	err = docsnap.DataTo(&policy)
@@ -94,26 +99,29 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 	}
 
 	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
-	if networkNode != nil {
-		warrant = networkNode.GetWarrant()
-		ccAddress = mail.GetNetworkNodeEmail(networkNode)
+	if networkNode == nil {
+		err = errors.New("networkNode not found")
+		return "", nil, err
 	}
+	warrant = networkNode.GetWarrant()
+	ccAddress = mail.GetNetworkNodeEmail(networkNode)
 	flowName, _ = policy.GetFlow(networkNode, warrant)
 	log.Printf("flowName '%s'", flowName)
 
 	isOnlineProducer := authToken.UserID != policy.ProducerUid || flowName != models.RemittanceMgaFlow
 	if authToken.IsNetworkNode && isOnlineProducer {
-		return "", nil, errors.New("cannot access to transaction")
+		err = errors.New("cannot access to transaction")
+		return "", nil, err
 	}
 
 	if transaction.IsPay {
-		log.Printf("ERROR %s", errTransactionPaid)
-		return "", nil, fmt.Errorf(errTransactionPaid)
+		err = fmt.Errorf(errTransactionPaid)
+		return "", nil, err
 	}
 
 	if transaction.IsDelete {
-		log.Printf("ERROR %s", errTransactionDeleted)
-		return "", nil, fmt.Errorf(errTransactionDeleted)
+		err = fmt.Errorf(errTransactionDeleted)
+		return "", nil, err
 	}
 
 	firePolicyTransactions := trn.GetPolicyValidTransactions(transaction.PolicyUid, nil)
@@ -132,21 +140,21 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 	}
 
 	if !canPayTransaction {
-		log.Printf("ERROR %s", errTransactionOutOfOrder)
-		return "", nil, fmt.Errorf(errTransactionOutOfOrder)
+		err = fmt.Errorf(errTransactionOutOfOrder)
+		return "", nil, err
 	}
 
 	if !policy.IsSign {
-		log.Printf("ERROR %s", errPolicyNotSigned)
-		return "", nil, fmt.Errorf(errPolicyNotSigned)
+		err = fmt.Errorf(errPolicyNotSigned)
+		return "", nil, err
 	}
 
 	manualPayment(&transaction, &payload)
 
 	err = common.SaveTransactionsToDB([]models.Transaction{transaction}, lib.TransactionsCollection)
 	if err != nil {
-		log.Printf("ERROR %s", errPaymentFailed)
-		return "", nil, fmt.Errorf(errPaymentFailed)
+		err = fmt.Errorf(errPaymentFailed)
+		return "", nil, err
 	}
 
 	mgaProduct := prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
@@ -219,8 +227,6 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		}
 		policy.BigquerySave(origin)
 	}
-
-	log.Println("Handler end -------------------------------------------------")
 
 	return "{}", nil, nil
 }
