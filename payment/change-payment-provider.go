@@ -70,7 +70,11 @@ func ChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (string, in
 		return "{}", nil, errors.New("unable to change payment method")
 	}
 
-	policy.Payment = req.ProviderName
+	err = common.UpdatePaymentProvider(&policy, req.ProviderName)
+	if err != nil {
+		log.Printf("provider update failed: %s", err.Error())
+		return "{}", nil, err
+	}
 
 	activeTransactions := transaction.GetPolicyValidTransactions(policy.Uid, nil)
 	for _, tr := range activeTransactions {
