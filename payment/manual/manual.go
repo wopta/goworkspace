@@ -46,7 +46,7 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		if err != nil {
 			log.Printf("error: %s", err.Error())
 		}
-		defer r.Body.Close()
+		r.Body.Close()
 		log.Println("Handler end -------------------------------------------------")
 		log.SetPrefix("")
 	}()
@@ -77,7 +77,6 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		return "", nil, err
 	}
 
-	origin := r.Header.Get("Origin")
 	transactionUid := chi.URLParam(r, "transactionUid")
 
 	docsnap, err := lib.GetFirestoreErr(lib.TransactionsCollection, transactionUid)
@@ -108,19 +107,20 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 	flowName, _ = policy.GetFlow(networkNode, warrant)
 	log.Printf("flowName '%s'", flowName)
 
-	isOnlineProducer := authToken.UserID != policy.ProducerUid || flowName != models.RemittanceMgaFlow
-	if authToken.IsNetworkNode && isOnlineProducer {
-		err = errors.New("cannot access to transaction")
+	canUserAccessTransaction := authToken.Role == models.UserRoleAdmin || (authToken.IsNetworkNode &&
+		authToken.UserID == policy.ProducerUid && flowName == models.RemittanceMgaFlow)
+	if !canUserAccessTransaction {
+		err = errors.New("user cannot access transaction")
 		return "", nil, err
 	}
 
 	if transaction.IsPay {
-		err = fmt.Errorf(errTransactionPaid)
+		err = errTransactionPaid
 		return "", nil, err
 	}
 
 	if transaction.IsDelete {
-		err = fmt.Errorf(errTransactionDeleted)
+		err = errTransactionDeleted
 		return "", nil, err
 	}
 
@@ -140,12 +140,12 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 	}
 
 	if !canPayTransaction {
-		err = fmt.Errorf(errTransactionOutOfOrder)
+		err = errTransactionOutOfOrder
 		return "", nil, err
 	}
 
 	if !policy.IsSign {
-		err = fmt.Errorf(errPolicyNotSigned)
+		err = errPolicyNotSigned
 		return "", nil, err
 	}
 
@@ -153,7 +153,7 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 
 	err = common.SaveTransactionsToDB([]models.Transaction{transaction}, lib.TransactionsCollection)
 	if err != nil {
-		err = fmt.Errorf(errPaymentFailed)
+		err = errPaymentFailed
 		return "", nil, err
 	}
 
@@ -165,34 +165,34 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 	if !policy.IsPay && policy.Annuity == 0 {
 		policy.SanitizePaymentData()
 		// Create/Update document on user collection based on contractor fiscalCode
-		err = plc.SetUserIntoPolicyContractor(&policy, origin)
+		err = plc.SetUserIntoPolicyContractor(&policy, "")
 		if err != nil {
 			log.Printf("ERROR set user into policy contractor: %s", err.Error())
 			return "", nil, err
 		}
 
 		// Add contract to policy
-		err = plc.AddContract(&policy, origin)
+		err = plc.AddContract(&policy, "")
 		if err != nil {
 			log.Printf("ERROR add contract to policy: %s", err.Error())
 			return "", nil, err
 		}
 
 		// Update Policy as paid
-		err = plc.Pay(&policy, origin)
+		err = plc.Pay(&policy, "")
 		if err != nil {
 			log.Printf("ERROR policy pay: %s", err.Error())
 			return "", nil, err
 		}
 
 		// Update NetworkNode Portfolio
-		err = network.UpdateNetworkNodePortfolio(origin, &policy, networkNode)
+		err = network.UpdateNetworkNodePortfolio("", &policy, networkNode)
 		if err != nil {
 			log.Printf("ERROR updating %s portfolio %s", networkNode.Type, err.Error())
 			return "", nil, err
 		}
 
-		policy.BigquerySave(origin)
+		policy.BigquerySave("")
 
 		callback_out.Execute(networkNode, policy, callback_out.Paid)
 
@@ -225,7 +225,7 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 			log.Printf("ERROR saving policy %s to Firestore: %s", policy.Uid, err.Error())
 			return "", nil, err
 		}
-		policy.BigquerySave(origin)
+		policy.BigquerySave("")
 	}
 
 	return "{}", nil, nil
