@@ -51,6 +51,9 @@ func SaveTransactionsToDB(transactions []models.Transaction, collection string) 
 }
 
 func UpdatePaymentProvider(policy *models.Policy, provider string) error {
+	if policy.Channel != models.NetworkChannel {
+		return fmt.Errorf("channel must be %s ", models.NetworkChannel)
+	}
 	networkNode := network.GetNetworkNodeByUid(policy.ProducerUid)
 	if networkNode == nil {
 		return fmt.Errorf("can't find network node for policy %s ", policy.Uid)
