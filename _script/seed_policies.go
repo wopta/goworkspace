@@ -31,9 +31,13 @@ var (
 	surnameList   = []string{"ROSSO", "VERDE", "GIALLO", "NERO", "BLU", "LILLA", "BIANCO", "MARRONE", "ARANCIONE", "AZZURRO"}
 	birthDateList = []string{"1980-01-01T00:00:00Z", "1980-02-01T00:00:00Z", "1980-03-01T00:00:00Z", "1980-04-01T00:00:00Z", "1980-05-01T00:00:00Z", "1980-06-01T00:00:00Z", "1980-07-01T00:00:00Z", "1980-08-01T00:00:00Z", "1980-09-01T00:00:00Z", "1980-10-01"}
 	genderList    = []string{"M", "F"}
-	nodeList = []struct{Uid string; Code string; Type string}{
+	nodeList      = []struct {
+		Uid  string
+		Code string
+		Type string
+	}{
 		{"0aDBMMGM83xtRNE07ZYh", "W1.TestModifica", "agent"}, // mga_life_agent
-		{"qKSQI7AZgHzzS2EE0dWV", "DSC.REM", "agent"}, // mga_life_agent_remittance
+		{"qKSQI7AZgHzzS2EE0dWV", "DSC.REM", "agent"},         // mga_life_agent_remittance
 	}
 )
 
@@ -57,7 +61,11 @@ func getFakePerson() models.User {
 	return u
 }
 
-func getFakeProducer() struct{Uid string; Code string; Type string} {
+func getFakeProducer() struct {
+	Uid  string
+	Code string
+	Type string
+} {
 	producerIdx := rand.Int() % 2
 
 	return nodeList[producerIdx]
@@ -158,8 +166,11 @@ func anonimizePolicy(p models.Policy) models.Policy {
 func SeedPolicies(jsonFilepath string) error {
 	var (
 		filePolicies []models.Policy
-		transactions []models.Transaction
+		batch        map[string]map[string]any = make(map[string]map[string]any)
 	)
+
+	batch[lib.PolicyCollection] = make(map[string]any)
+	batch[lib.TransactionsCollection] = make(map[string]any)
 
 	now := time.Now().UTC()
 
@@ -171,8 +182,6 @@ func SeedPolicies(jsonFilepath string) error {
 	if err = json.NewDecoder(fileReader).Decode(&filePolicies); err != nil {
 		return err
 	}
-
-	anonPolicies := make([]models.Policy, 0, len(filePolicies))
 
 	mgaProducts := map[string]*models.Product{
 		models.ProductV1: product.GetProductV2(models.LifeProduct, models.ProductV1, models.MgaChannel, nil,
@@ -186,8 +195,9 @@ func SeedPolicies(jsonFilepath string) error {
 		p.CodeCompany = "99" + p.CodeCompany
 
 		p = anonimizePolicy(p)
+		p.BigQueryParse()
 
-		anonPolicies = append(anonPolicies, p)
+		batch[lib.PolicyCollection][p.Uid] = p
 
 		trs := transaction.CreateTransactions(p, *mgaProducts[p.ProductVersion], func() string { return lib.NewDoc(lib.TransactionsCollection) })
 		for i, tr := range trs {
@@ -198,24 +208,22 @@ func SeedPolicies(jsonFilepath string) error {
 				trs[i].Status = models.TransactionStatusPay
 				trs[i].StatusHistory = append(trs[i].StatusHistory, trs[i].Status)
 			}
+			trs[i].BigQueryParse()
+			batch[lib.TransactionsCollection][tr.Uid] = trs[i]
 		}
-		
-		transactions = append(transactions, trs...)
 	}
 
-	anonBytes, err := json.Marshal(anonPolicies)
-	if err != nil {
+	if err := lib.SetBatchFirestoreErr(batch); err != nil {
 		return err
 	}
 
-	trBytes, err := json.Marshal(transactions)
-	if err != nil {
-		return err
+	for col := range batch {
+		data := lib.GetMapValues(batch[col])
+
+		if err := lib.InsertRowsBigQuery(lib.WoptaDataset, col, data); err != nil {
+			return err
+		}
 	}
 
-	if err := os.WriteFile("./_script/transactions.json", trBytes, os.ModePerm); err != nil {
-		return err
-	}
-
-	return os.WriteFile("./_script/anonPolicies2.json", anonBytes, os.ModePerm)
+	return nil
 }
