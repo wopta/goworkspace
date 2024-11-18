@@ -3,11 +3,14 @@ package _script
 import (
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"os"
 	"time"
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/product"
+	"github.com/wopta/goworkspace/transaction"
 	"github.com/wopta/goworkspace/user"
 )
 
@@ -28,13 +31,17 @@ var (
 	surnameList   = []string{"ROSSO", "VERDE", "GIALLO", "NERO", "BLU", "LILLA", "BIANCO", "MARRONE", "ARANCIONE", "AZZURRO"}
 	birthDateList = []string{"1980-01-01T00:00:00Z", "1980-02-01T00:00:00Z", "1980-03-01T00:00:00Z", "1980-04-01T00:00:00Z", "1980-05-01T00:00:00Z", "1980-06-01T00:00:00Z", "1980-07-01T00:00:00Z", "1980-08-01T00:00:00Z", "1980-09-01T00:00:00Z", "1980-10-01"}
 	genderList    = []string{"M", "F"}
+	nodeList = []struct{Uid string; Code string; Type string}{
+		{"0aDBMMGM83xtRNE07ZYh", "W1.TestModifica", "agent"}, // mga_life_agent
+		{"qKSQI7AZgHzzS2EE0dWV", "DSC.REM", "agent"}, // mga_life_agent_remittance
+	}
 )
 
 func getFakePerson() models.User {
-	nameIdx := (counter + time.Now().Nanosecond()) % 10
-	surnameIdx := (counter + time.Now().Nanosecond()) % 10
-	dateOfBirthIdx := (counter + time.Now().Nanosecond()) % 10
-	genderIdx := (counter + time.Now().Nanosecond()) % 2
+	nameIdx := rand.Int() % 10
+	surnameIdx := rand.Int() % 10
+	dateOfBirthIdx := rand.Int() % 10
+	genderIdx := rand.Int() % 2
 
 	u := models.User{
 		Name:          nameList[nameIdx],
@@ -47,12 +54,14 @@ func getFakePerson() models.User {
 
 	_, u, _ = user.CalculateFiscalCode(u)
 
-	counter++
-
 	return u
 }
 
-var counter int
+func getFakeProducer() struct{Uid string; Code string; Type string} {
+	producerIdx := rand.Int() % 2
+
+	return nodeList[producerIdx]
+}
 
 func anonimizePolicy(p models.Policy) models.Policy {
 	fakeAddress := getFakeAddress()
@@ -115,7 +124,7 @@ func anonimizePolicy(p models.Policy) models.Policy {
 		p.Contractor.Domicile = fakeAddress
 		p.Contractor.Residence = fakeAddress
 	}
-	
+
 	p.Contractor.IdentityDocuments = nil
 	p.Contractor.Phone = "+393334455667"
 	p.Contractor.Mail = fmt.Sprintf("DIOGO.CARVALHO+SEED%s@WOPTA.IT", p.CodeCompany)
@@ -137,9 +146,11 @@ func anonimizePolicy(p models.Policy) models.Policy {
 		}
 	}
 
-	p.ProducerCode = ""
-	p.ProducerUid = ""
-	p.ProducerType = ""
+	producer := getFakeProducer()
+
+	p.ProducerCode = producer.Code
+	p.ProducerUid = producer.Uid
+	p.ProducerType = producer.Type
 
 	return p
 }
@@ -147,7 +158,10 @@ func anonimizePolicy(p models.Policy) models.Policy {
 func SeedPolicies(jsonFilepath string) error {
 	var (
 		filePolicies []models.Policy
+		transactions []models.Transaction
 	)
+
+	now := time.Now().UTC()
 
 	fileReader, err := os.Open(jsonFilepath)
 	if err != nil {
@@ -158,8 +172,15 @@ func SeedPolicies(jsonFilepath string) error {
 		return err
 	}
 
-	anonPolicies := make([]models.Policy, 0,len(filePolicies))
-	
+	anonPolicies := make([]models.Policy, 0, len(filePolicies))
+
+	mgaProducts := map[string]*models.Product{
+		models.ProductV1: product.GetProductV2(models.LifeProduct, models.ProductV1, models.MgaChannel, nil,
+			nil),
+		models.ProductV2: product.GetProductV2(models.LifeProduct, models.ProductV2, models.MgaChannel, nil,
+			nil),
+	}
+
 	for _, p := range filePolicies {
 		p.Uid = lib.NewDoc(lib.PolicyCollection)
 		p.CodeCompany = "99" + p.CodeCompany
@@ -167,6 +188,19 @@ func SeedPolicies(jsonFilepath string) error {
 		p = anonimizePolicy(p)
 
 		anonPolicies = append(anonPolicies, p)
+
+		trs := transaction.CreateTransactions(p, *mgaProducts[p.ProductVersion], func() string { return lib.NewDoc(lib.TransactionsCollection) })
+		for i, tr := range trs {
+			trs[i].IsPay = tr.EffectiveDate.Before(now)
+			if trs[i].IsPay {
+				trs[i].PayDate = now
+				trs[i].PaymentMethod = "import-seed"
+				trs[i].Status = models.TransactionStatusPay
+				trs[i].StatusHistory = append(trs[i].StatusHistory, trs[i].Status)
+			}
+		}
+		
+		transactions = append(transactions, trs...)
 	}
 
 	anonBytes, err := json.Marshal(anonPolicies)
@@ -174,5 +208,14 @@ func SeedPolicies(jsonFilepath string) error {
 		return err
 	}
 
-	return os.WriteFile("./_script/anonPolicies.json", anonBytes, os.ModePerm)
+	trBytes, err := json.Marshal(transactions)
+	if err != nil {
+		return err
+	}
+
+	if err := os.WriteFile("./_script/transactions.json", trBytes, os.ModePerm); err != nil {
+		return err
+	}
+
+	return os.WriteFile("./_script/anonPolicies2.json", anonBytes, os.ModePerm)
 }
