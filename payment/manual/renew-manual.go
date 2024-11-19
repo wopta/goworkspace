@@ -56,9 +56,8 @@ func RenewManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, inter
 	}
 
 	isMethodAllowed := lib.SliceContains(methods, payload.PaymentMethod)
-
 	if !isMethodAllowed {
-		err = errors.New(errPaymentMethodNotAllowed)
+		err = errPaymentMethodNotAllowed
 		return "", nil, err
 	}
 
@@ -69,7 +68,7 @@ func RenewManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, inter
 		return "", nil, err
 	}
 	if transaction.IsPay {
-		err = errors.New(errTransactionPaid)
+		err = errTransactionPaid
 		return "", nil, err
 	}
 
@@ -81,6 +80,22 @@ func RenewManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, inter
 	isFirstTransactionAnnuity := lib.IsEqual(policy.StartDate.AddDate(policy.Annuity, 0, 0), transaction.EffectiveDate)
 	if !isFirstTransactionAnnuity {
 		err = errors.New("cannot pay transaction that is not the first")
+		return "", nil, err
+	}
+
+	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
+	if networkNode == nil {
+		err = errors.New("networkNode not found")
+		return "", nil, err
+	}
+	warrant := networkNode.GetWarrant()
+	flowName, _ := policy.GetFlow(networkNode, warrant)
+	log.Printf("flowName '%s'", flowName)
+
+	canUserAccessTransaction := authToken.Role == models.UserRoleAdmin || (authToken.IsNetworkNode &&
+		authToken.UserID == policy.ProducerUid && flowName == models.RemittanceMgaFlow)
+	if !canUserAccessTransaction {
+		err = errors.New("user cannot access transaction")
 		return "", nil, err
 	}
 

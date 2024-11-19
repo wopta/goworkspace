@@ -1,10 +1,12 @@
 package manual
 
-const (
-	errTransactionPaid         = "MPTR001: Transaction already paid"
-	errTransactionOutOfOrder   = "MPTR002: Transaction is not next on schedule. Payment must be ordered"
-	errPolicyNotSigned         = "MPTR003: Policy not signed"
-	errPaymentMethodNotAllowed = "MPTR004: Payment method not allowed"
-	errPaymentFailed           = "MPTR005: Failed to update DB"
-	errTransactionDeleted      = "MPTR006: Transaction already deleted"
+import "errors"
+
+var (
+	errTransactionPaid         = errors.New("transaction already paid")
+	errTransactionOutOfOrder   = errors.New("transaction is not next on schedule. Payment must be ordered")
+	errPolicyNotSigned         = errors.New("policy not signed")
+	errPaymentMethodNotAllowed = errors.New("payment method not allowed")
+	errPaymentFailed           = errors.New("failed to update DB")
+	errTransactionDeleted      = errors.New("transaction already deleted")
 )
