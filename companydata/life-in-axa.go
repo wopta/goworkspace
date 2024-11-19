@@ -321,6 +321,13 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 			insured = contractor.ToUser()
 		}
 
+		warrant := networkNode.GetWarrant()
+		flow := warrant.GetFlowName(models.LifeProduct)
+		payment := models.FabrickPaymentProvider
+		if flow == models.RemittanceMgaFlow {
+			payment = models.ManualPaymentProvider
+		}
+
 		policy := models.Policy{
 			Uid:               lib.NewDoc(lib.PolicyCollection),
 			Status:            models.PolicyStatusPay,
@@ -346,7 +353,7 @@ func LifeInFx(w http.ResponseWriter, r *http.Request) (string, interface{}, erro
 			PriceGrossMonthly: lib.RoundFloat(sumPriceGrossMonthly, 2),
 			PriceNettMonthly:  lib.RoundFloat(sumPriceNettMonthly, 2),
 			TaxAmountMonthly:  lib.RoundFloat(sumPriceTaxAmountMonthly, 2),
-			Payment:           models.ManualPaymentProvider,
+			Payment:           payment,
 			PaymentMode:       paymentMode,
 			PaymentSplit:      paymentSplit,
 			FundsOrigin:       "Proprie risorse economiche",

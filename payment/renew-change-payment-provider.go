@@ -79,7 +79,12 @@ func RenewChangePaymentProviderFx(w http.ResponseWriter, r *http.Request) (strin
 	}
 
 	policy.SanitizePaymentData()
-	policy.Payment = req.ProviderName
+
+	err = common.UpdatePaymentProvider(&policy, req.ProviderName)
+	if err != nil {
+		log.Printf("provider update failed: %s", err.Error())
+		return "", nil, err
+	}
 
 	product := prd.GetProductV2(policy.Name, policy.ProductVersion, policy.Channel, nil, nil)
 

@@ -78,6 +78,13 @@ func RefreshPayByLinkFx(w http.ResponseWriter, r *http.Request) (string, interfa
 
 	policy.SanitizePaymentData()
 
+	if policy.Payment != models.FabrickPaymentProvider || policy.PaymentMode != models.PaymentModeRecurrent {
+		err = fmt.Errorf("error updating payment method for policy %s with provider %s and mode %s",
+			policy.Uid, policy.Payment, policy.PaymentMode)
+		log.Println(err.Error())
+		return "", nil, err
+	}
+
 	for index, _ := range transactions {
 		transaction.ReinitializePaymentInfo(&transactions[index], policy.Payment)
 		if !request.ScheduleFirstRate && index == 0 {
