@@ -27,6 +27,7 @@ func RenewManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, inter
 		transaction *models.Transaction
 		mgaProduct  *models.Product
 		networkNode *models.NetworkNode
+		flowName    string
 	)
 
 	log.SetPrefix("[RenewManualPaymentFx] ")
@@ -83,14 +84,16 @@ func RenewManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, inter
 		return "", nil, err
 	}
 
-	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
-	if networkNode == nil {
-		err = errors.New("networkNode not found")
-		return "", nil, err
+	if policy.Channel == lib.NetworkChannel {
+		networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
+		if networkNode == nil {
+			err = errors.New("networkNode not found")
+			return "", nil, err
+		}
+		warrant := networkNode.GetWarrant()
+		flowName, _ = policy.GetFlow(networkNode, warrant)
+		log.Printf("flowName '%s'", flowName)
 	}
-	warrant := networkNode.GetWarrant()
-	flowName, _ := policy.GetFlow(networkNode, warrant)
-	log.Printf("flowName '%s'", flowName)
 
 	canUserAccessTransaction := authToken.Role == models.UserRoleAdmin || (authToken.IsNetworkNode &&
 		authToken.UserID == policy.ProducerUid && flowName == models.RemittanceMgaFlow)

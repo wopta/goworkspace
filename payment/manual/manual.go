@@ -97,15 +97,17 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		return "", nil, err
 	}
 
-	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
-	if networkNode == nil {
-		err = errors.New("networkNode not found")
-		return "", nil, err
+	if policy.Channel == lib.NetworkChannel {
+		networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
+		if networkNode == nil {
+			err = errors.New("networkNode not found")
+			return "", nil, err
+		}
+		warrant = networkNode.GetWarrant()
+		ccAddress = mail.GetNetworkNodeEmail(networkNode)
+		flowName, _ = policy.GetFlow(networkNode, warrant)
+		log.Printf("flowName '%s'", flowName)
 	}
-	warrant = networkNode.GetWarrant()
-	ccAddress = mail.GetNetworkNodeEmail(networkNode)
-	flowName, _ = policy.GetFlow(networkNode, warrant)
-	log.Printf("flowName '%s'", flowName)
 
 	canUserAccessTransaction := authToken.Role == models.UserRoleAdmin || (authToken.IsNetworkNode &&
 		authToken.UserID == policy.ProducerUid && flowName == models.RemittanceMgaFlow)
