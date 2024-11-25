@@ -64,16 +64,13 @@ func RefreshPayByLinkFx(w http.ResponseWriter, r *http.Request) (string, interfa
 			log.Println("error getting renew policy")
 			return "", nil, err
 		}
-		if transactions, err = trRenew.GetRenewActiveTransactionsByPolicyUid(policy.Uid, policy.Annuity); err != nil {
-			log.Println("error getting renew transactions")
-			return "", nil, err
-		}
 	} else {
 		policy = plc.GetPolicyByUid(request.PolicyUid, "")
-		if transactions, err = getTransactionsList(policy.Uid); err != nil {
-			log.Println("error getting transactions")
-			return "", nil, err
-		}
+	}
+
+	if transactions, err = getTransactionsList(policy, isRenew); err != nil {
+		log.Println("error getting transactions")
+		return "", nil, err
 	}
 
 	policy.SanitizePaymentData()
@@ -132,16 +129,30 @@ func RefreshPayByLinkFx(w http.ResponseWriter, r *http.Request) (string, interfa
 	return "{}", nil, nil
 }
 
-func getTransactionsList(policyUid string) ([]models.Transaction, error) {
-	transactions := transaction.GetPolicyTransactions("", policyUid)
+func getTransactionsList(policy models.Policy, isRenew bool) ([]models.Transaction, error) {
+	var (
+		transactions []models.Transaction
+		err          error
+	)
+
+	if isRenew {
+		if transactions, err = trRenew.GetRenewActiveTransactionsByPolicyUid(policy.Uid, policy.Annuity); err != nil {
+			log.Println("error getting renew transactions")
+			return nil, err
+		}
+	} else {
+		transactions = transaction.GetPolicyTransactions("", policy.Uid)
+	}
+
 	transactions = lib.SliceFilter(transactions, func(tr models.Transaction) bool {
 		return (!tr.IsPay && !tr.IsDelete) || (tr.IsPay && tr.IsDelete)
 	})
 	if len(transactions) == 0 {
-		log.Printf("no transactions to be recreated found for policy %s", policyUid)
+		log.Printf("no transactions to be recreated found for policy %s", policy.Uid)
 		return nil, errors.New("no transactions to be recreated found")
 	}
-	log.Printf("found %02d transactions for policy %s", len(transactions), policyUid)
+
+	log.Printf("found %02d transactions for policy %s", len(transactions), policy.Uid)
 	return transactions, nil
 }
 
