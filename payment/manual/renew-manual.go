@@ -27,7 +27,7 @@ func RenewManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, inter
 		transaction *models.Transaction
 		mgaProduct  *models.Product
 		networkNode *models.NetworkNode
-		flowName    string
+		flowName    string = models.ECommerceFlow
 	)
 
 	log.SetPrefix("[RenewManualPaymentFx] ")

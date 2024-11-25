@@ -33,7 +33,7 @@ func ManualPaymentFx(w http.ResponseWriter, r *http.Request) (string, interface{
 		payload     ManualPaymentPayload
 		transaction models.Transaction
 		policy      models.Policy
-		flowName    string
+		flowName    string = models.ECommerceFlow
 		networkNode *models.NetworkNode
 		warrant     *models.Warrant
 		ccAddress   = mail.Address{}
