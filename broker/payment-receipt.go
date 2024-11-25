@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/wopta/goworkspace/document"
@@ -128,7 +129,11 @@ func paymentReceiptBuilder(transactionUID string, authToken lib.AuthToken, isRen
 		}
 	}
 
-	receiptInfo := receiptInfoBuilder(policy, *transaction)
+	receiptInfo, err := receiptInfoBuilder(policy, *transaction)
+	if err != nil {
+		log.Printf("error: %s", err.Error())
+		return "", "", err
+	}
 
 	doc, err := document.PaymentReceipt(receiptInfo)
 	if err != nil {
@@ -143,7 +148,7 @@ func paymentReceiptBuilder(transactionUID string, authToken lib.AuthToken, isRen
 	return rawDoc, filename, nil
 }
 
-func receiptInfoBuilder(policy models.Policy, transaction models.Transaction) document.ReceiptInfo {
+func receiptInfoBuilder(policy models.Policy, transaction models.Transaction) (document.ReceiptInfo, error) {
 	const dateFormat = "02/01/2006"
 
 	customerInfo := document.CustomerInfo{
@@ -157,12 +162,20 @@ func receiptInfoBuilder(policy models.Policy, transaction models.Transaction) do
 	}
 
 	expirationDate := policy.EndDate
+	effectiveDate := transaction.EffectiveDate
+	if effectiveDate.IsZero() {
+		tmp, err := time.Parse(time.DateOnly, transaction.ScheduleDate)
+		if err != nil {
+			return document.ReceiptInfo{}, err
+		}
+		effectiveDate = tmp
+	}
 
-	tmpExpirationDate := lib.AddMonths(transaction.EffectiveDate, 12)
+	tmpExpirationDate := lib.AddMonths(effectiveDate, 12)
 
 	switch policy.PaymentSplit {
 	case string(models.PaySplitMonthly):
-		tmpExpirationDate = lib.AddMonths(transaction.EffectiveDate, 1)
+		tmpExpirationDate = lib.AddMonths(effectiveDate, 1)
 	case string(models.PaySplitSingleInstallment):
 		tmpExpirationDate = policy.EndDate
 	}
@@ -173,7 +186,7 @@ func receiptInfoBuilder(policy models.Policy, transaction models.Transaction) do
 
 	transactionInfo := document.TransactionInfo{
 		PolicyCode:     policy.CodeCompany,
-		EffectiveDate:  transaction.EffectiveDate.Format(dateFormat),
+		EffectiveDate:  effectiveDate.Format(dateFormat),
 		ExpirationDate: expirationDate.Format(dateFormat),
 		PriceGross:     transaction.Amount,
 	}
@@ -181,5 +194,5 @@ func receiptInfoBuilder(policy models.Policy, transaction models.Transaction) do
 	return document.ReceiptInfo{
 		CustomerInfo: customerInfo,
 		Transaction:  transactionInfo,
-	}
+	}, nil
 }
