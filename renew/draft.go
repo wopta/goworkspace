@@ -290,6 +290,11 @@ func draft(policy models.Policy, product models.Product, ch chan<- RenewReport, 
 		}
 	}
 
+	// TODO: code smell
+	if policy.Channel == lib.ECommerceChannel {
+		policy.PaymentMode = models.PaymentModeRecurrent
+	}
+
 	client := payment.NewClient(policy.Payment, policy, product, transactions, customerId != "", customerId)
 	payUrl, hasMandate, transactions, err := client.Renew()
 	if err != nil {
