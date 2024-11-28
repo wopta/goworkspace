@@ -66,7 +66,7 @@ func getFabrickRequestBody(
 	}
 
 	if requestScheduleDate == "" {
-		requestScheduleDate = now.Format(models.TimeDateOnly)
+		requestScheduleDate = now.Format(time.DateOnly)
 	}
 
 	if isFirstRate {
@@ -92,7 +92,7 @@ func getFabrickRequestBody(
 	callbackUrl = strings.Replace(callbackUrl, `\u0026`, `&`, 1)
 
 	if expireDate != "" {
-		tmpExpireDate, err := time.Parse(models.TimeDateOnly, expireDate)
+		tmpExpireDate, err := time.Parse(time.DateOnly, expireDate)
 		if err != nil {
 			log.Printf("error parsing expireDate: %s", err.Error())
 			return ""
