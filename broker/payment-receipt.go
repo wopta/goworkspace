@@ -50,6 +50,7 @@ func PaymentReceiptFx(w http.ResponseWriter, r *http.Request) (string, interface
 			log.Printf("error: %s", err.Error())
 		}
 		log.Println("Handler end -------------------------------------------------")
+		log.SetPrefix("")
 	}()
 
 	log.Println("Handler start -----------------------------------------------")
