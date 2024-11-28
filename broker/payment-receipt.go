@@ -93,8 +93,8 @@ func paymentReceiptBuilder(transactionUID string, authToken lib.AuthToken, isRen
 		if transaction == nil {
 			return "", "", errors.New("transaction not found")
 		}
-		if !transaction.IsPay {
-			return "", "", errors.New("transaction is not paid")
+		if transaction.IsDelete {
+			return "", "", errors.New("transaction is deleted")
 		}
 		policy, err = plcRenew.GetRenewPolicyByUid(transaction.PolicyUid)
 		if err != nil {
@@ -105,8 +105,8 @@ func paymentReceiptBuilder(transactionUID string, authToken lib.AuthToken, isRen
 		if transaction == nil {
 			return "", "", errors.New("transaction not found")
 		}
-		if !transaction.IsPay {
-			return "", "", errors.New("transaction is not paid")
+		if transaction.IsDelete {
+			return "", "", errors.New("transaction is deleted")
 		}
 		policy, err = plc.GetPolicy(transaction.PolicyUid, "")
 		if err != nil {
