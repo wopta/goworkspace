@@ -23,7 +23,7 @@ const (
 	woptaMerchantId  string = "wop134b31-5926-4b26-1411-726bc9f0b111"
 )
 
-func getFabrickClient(urlstring string, req *http.Request) (*http.Response, error) {
+func callFabrickRequest(req *http.Request) (*http.Response, error) {
 	client := &http.Client{
 		Timeout: time.Second * 15,
 	}
@@ -271,7 +271,7 @@ func FabrickExpireBill(providerId string) error {
 		log.Printf("error creating request: %s", err.Error())
 		return err
 	}
-	res, err := getFabrickClient(urlstring, req)
+	res, err := callFabrickRequest(req)
 	if err != nil {
 		log.Printf("error getting response: %s", err.Error())
 		return err
@@ -325,7 +325,7 @@ func fabrickHasMandate(userToken string) (bool, error) {
 			Payload: payload,
 		}
 	} else {
-		res, err := getFabrickClient("", req)
+		res, err := callFabrickRequest(req)
 		if err != nil {
 			log.Printf("error getting response: %s", err.Error())
 			return false, err
