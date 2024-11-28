@@ -131,13 +131,11 @@ func paymentReceiptBuilder(transactionUID string, authToken lib.AuthToken, isRen
 
 	receiptInfo, err := receiptInfoBuilder(policy, *transaction)
 	if err != nil {
-		log.Printf("error: %s", err.Error())
 		return "", "", err
 	}
 
 	doc, err := document.PaymentReceipt(receiptInfo)
 	if err != nil {
-		log.Printf("error: %s", err.Error())
 		return "", "", err
 	}
 
