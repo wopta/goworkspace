@@ -26,6 +26,13 @@ const (
 	filenameFormat = "Quietanza Pagamento Polizza %s rata %s %d.pdf"
 )
 
+var (
+	errMissingParams       = errors.New("transaction uid param is empty")
+	errTransactionNotFound = errors.New("transaction not found")
+	errTransactionDeleted  = errors.New("transaction is deleted")
+	errNodeNotFound        = errors.New("node not found")
+)
+
 type paymentReceiptResp struct {
 	Filename string `json:"filename"`
 	RawDoc   string `json:"rawDoc"`
@@ -50,24 +57,24 @@ func PaymentReceiptFx(w http.ResponseWriter, r *http.Request) (string, interface
 	idToken := r.Header.Get("Authorization")
 	authToken, err := lib.GetAuthTokenFromIdToken(idToken)
 	if err != nil {
-		log.Printf("error fetching authToken: %s", err.Error())
+		log.Println("error fetching authToken")
 		return "", nil, err
 	}
 
 	transactionUid := chi.URLParam(r, "uid")
 	if transactionUid == "" {
-		return "", "", errors.New("transaction uid is empty")
+		return "", "", errMissingParams
 	}
 
 	param := r.URL.Query().Get("isRenew")
 	if isRenew, err = strconv.ParseBool(param); err != nil {
-		log.Printf("error parsing isRenew: %s", err.Error())
+		log.Println("error parsing isRenew")
 		return "", "", err
 	}
 
 	rawDoc, filename, err := paymentReceiptBuilder(transactionUid, authToken, isRenew)
 	if err != nil {
-		log.Printf("error building raw doc: %s", err.Error())
+		log.Println("error building raw doc")
 		return "", "", err
 	}
 
@@ -91,10 +98,10 @@ func paymentReceiptBuilder(transactionUID string, authToken lib.AuthToken, isRen
 	if isRenew {
 		transaction = trxRenew.GetRenewTransactionByUid(transactionUID)
 		if transaction == nil {
-			return "", "", errors.New("transaction not found")
+			return "", "", errTransactionNotFound
 		}
 		if transaction.IsDelete {
-			return "", "", errors.New("transaction is deleted")
+			return "", "", errTransactionDeleted
 		}
 		policy, err = plcRenew.GetRenewPolicyByUid(transaction.PolicyUid)
 		if err != nil {
@@ -103,10 +110,10 @@ func paymentReceiptBuilder(transactionUID string, authToken lib.AuthToken, isRen
 	} else {
 		transaction = trx.GetTransactionByUid(transactionUID, "")
 		if transaction == nil {
-			return "", "", errors.New("transaction not found")
+			return "", "", errTransactionNotFound
 		}
 		if transaction.IsDelete {
-			return "", "", errors.New("transaction is deleted")
+			return "", "", errTransactionDeleted
 		}
 		policy, err = plc.GetPolicy(transaction.PolicyUid, "")
 		if err != nil {
@@ -121,7 +128,7 @@ func paymentReceiptBuilder(transactionUID string, authToken lib.AuthToken, isRen
 
 		node := network.GetNetworkNodeByUid(policy.ProducerUid)
 		if node == nil {
-			return "", "", errors.New("node not found")
+			return "", "", errNodeNotFound
 		}
 
 		if !plcUtils.CanBeAccessedBy(authToken.Role, policy.ProducerUid, node.Uid) {
