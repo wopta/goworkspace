@@ -101,7 +101,7 @@ func getFabrickRequestBody(
 			tmpExpireDate.Year(), tmpExpireDate.Month(), tmpExpireDate.Day(), 2, 30, 30, 30, time.UTC,
 		).Format(expireDateFormat)
 	} else {
-		expireDate = time.Now().UTC().AddDate(10, 0, 0).Format(expireDateFormat)
+		expireDate = lib.AddMonths(time.Now().UTC(), 18).Format(expireDateFormat)
 	}
 
 	pay := FabrickPaymentsRequest{
