@@ -117,6 +117,30 @@ func createNetworkNode(userMail string, role string, parentUid string) models.Ne
 	return node
 }
 
+func generatePoliciesForThisUser(user woptaUser) []models.Policy {
+	/*
+		REMINDER for myself
+		- CustomerUser must be created on the fly with fake data and then attached to policies
+
+		TODO
+			Per ogni agency/agent creati al punto 1 procedere con creazione:
+			•	Polizza pagata
+			•	Polizza eliminata
+			•	Polizza da pagare (emessa attualmente)
+			•	Polizza da pagare (emessa X mesi precedenti)  caso insoluto
+			•	Polizza da firmare
+			•	Proposta da emettere
+			•	Proposta da emettere (con startDate 30 giorni nel passato)
+			•	Proposta in riservato
+			•	Proposta approvata
+			•	Proposta rifiutata
+			•	Quietanza (polizza in draft renew) da pagare con mandato
+			•	Quietanza da pagare senza mandato
+			•	Quietanza eliminata
+			•	Quietanza pagata
+	*/
+}
+
 func initDevEnvForThisUser(user woptaUser) userEnv {
 	ue := userEnv{}
 	ue.WoptaUser = user
@@ -143,9 +167,9 @@ func initDevEnvForThisUser(user woptaUser) userEnv {
 	ue.DevEnvUsers = append(ue.DevEnvUsers, agtRUsr)
 	aTRnn := createNetworkNode(agtRUsr.Mail, lib.UserRoleAgent, aYnn.Uid)
 	ue.NodeGraph = append(ue.NodeGraph, aTRnn)
-	// Customer
-	cstUsr := createUserWithRole(user, lib.UserRoleCustomer)
-	ue.DevEnvUsers = append(ue.DevEnvUsers, cstUsr)
+	//// Customer
+	//cstUsr := createUserWithRole(user, lib.UserRoleCustomer)
+	//ue.DevEnvUsers = append(ue.DevEnvUsers, cstUsr)
 
 	return ue
 }
