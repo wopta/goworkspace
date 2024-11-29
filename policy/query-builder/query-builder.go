@@ -14,14 +14,14 @@ import (
 
 var (
 	paramsHierarchy = []map[string][]string{
-		{"codeCompany": []string{"codeCompany"}},
+		{"codeCompany": []string{"codeCompany", "producerUid"}},
 
-		{"proposalNumber": []string{"proposalNumber"}},
+		{"proposalNumber": []string{"proposalNumber", "producerUid"}},
 
-		{"insuredFiscalCode": []string{"insuredFiscalCode"}},
+		{"insuredFiscalCode": []string{"insuredFiscalCode", "producerUid"}},
 
-		{"contractorName": []string{"contractorName", "contractorSurname"}},
-		{"contractorSurname": []string{"contractorName", "contractorSurname"}},
+		{"contractorName": []string{"contractorName", "contractorSurname", "producerUid"}},
+		{"contractorSurname": []string{"contractorName", "contractorSurname", "producerUid"}},
 
 		{"startDateFrom": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "payment", "renewMonth"}},
 		{"startDateTo": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "payment", "renewMonth"}},
