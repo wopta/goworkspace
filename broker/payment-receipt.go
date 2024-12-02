@@ -64,7 +64,8 @@ func PaymentReceiptFx(w http.ResponseWriter, r *http.Request) (string, interface
 
 	transactionUid := chi.URLParam(r, "uid")
 	if transactionUid == "" {
-		return "", "", errMissingParams
+		err = errMissingParams
+		return "", "", err
 	}
 
 	param := r.URL.Query().Get("isRenew")
