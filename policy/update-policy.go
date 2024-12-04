@@ -35,6 +35,9 @@ func UpdatePolicy(policy *models.Policy) map[string]interface{} {
 		input["startDate"] = policy.StartDate
 		input["endDate"] = policy.EndDate
 		input["declaredClaims"] = policy.DeclaredClaims
+		input["hasBond"] = policy.HasBond
+		input["bond"] = policy.Bond
+		input["clause"] = policy.Clause
 	}
 
 	input["updated"] = time.Now().UTC()

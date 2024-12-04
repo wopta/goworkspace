@@ -118,7 +118,10 @@ type Policy struct {
 	PolicyType        string                       `json:"policyType" firestore:"policyType" bigquery:"policyType"`
 	QuoteType         string                       `json:"quoteType" firestore:"quoteType" bigquery:"quoteType"`
 	HasMandate        bool                         `json:"hasMandate" firestore:"hasMandate" bigquery:"hasMandate"`
-	DeclaredClaims    []DeclaredClaim              `json:"declaredClaims" firestore:"declaredClaims" bigquery:"declaredClaims"`
+	DeclaredClaims    []DeclaredClaim              `json:"declaredClaims,omitempty" firestore:"declaredClaims,omitempty" bigquery:"declaredClaims,omitempty"`
+	HasBond           string                       `json:"hasBond,omitempty" firestore:"hasBond,omitempty" bigquery:"hasBond,omitempty"`
+	Bond              string                       `json:"bond,omitempty" firestore:"bond,omitempty" bigquery:"bond,omitempty"`
+	Clause            string                       `json:"clause,omitempty" firestore:"clause,omitempty" bigquery:"clause,omitempty"`
 
 	// DEPRECATED FIELDS
 
