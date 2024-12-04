@@ -486,5 +486,6 @@ func (fx *Fx) GetSignatoryMail(input map[string]interface{}) string {
 			}
 		}
 	}
+	lib.CheckError(fmt.Errorf("signatory not found"))
 	return ""
 }
