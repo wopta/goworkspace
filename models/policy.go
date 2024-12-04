@@ -118,10 +118,10 @@ type Policy struct {
 	PolicyType        string                       `json:"policyType" firestore:"policyType" bigquery:"policyType"`
 	QuoteType         string                       `json:"quoteType" firestore:"quoteType" bigquery:"quoteType"`
 	HasMandate        bool                         `json:"hasMandate" firestore:"hasMandate" bigquery:"hasMandate"`
-	DeclaredClaims    []DeclaredClaim              `json:"declaredClaims,omitempty" firestore:"declaredClaims,omitempty" bigquery:"declaredClaims,omitempty"`
-	HasBond           string                       `json:"hasBond,omitempty" firestore:"hasBond,omitempty" bigquery:"hasBond,omitempty"`
-	Bond              string                       `json:"bond,omitempty" firestore:"bond,omitempty" bigquery:"bond,omitempty"`
-	Clause            string                       `json:"clause,omitempty" firestore:"clause,omitempty" bigquery:"clause,omitempty"`
+	DeclaredClaims    []DeclaredClaims             `json:"declaredClaims,omitempty" firestore:"declaredClaims,omitempty" bigquery:"-"`
+	HasBond           string                       `json:"hasBond,omitempty" firestore:"hasBond,omitempty" bigquery:"-"`
+	Bond              string                       `json:"bond,omitempty" firestore:"bond,omitempty" bigquery:"-"`
+	Clause            string                       `json:"clause,omitempty" firestore:"clause,omitempty" bigquery:"-"`
 
 	// DEPRECATED FIELDS
 
@@ -130,11 +130,15 @@ type Policy struct {
 	AgencyUid     string `json:"agencyUid,omitempty" firestore:"agencyUid,omitempty" bigquery:"agencyUid"` // DEPRECATED
 }
 
-type DeclaredClaim struct {
+type DeclaredClaims struct {
 	GuaranteeSlug string          `json:"guaranteeSlug,omitempty" firestore:"guaranteeSlug,omitempty"`
-	Year          int16           `json:"year,omitempty" firestore:"year,omitempty"`
-	Total         int16           `json:"total,omitempty" firestore:"total,omitempty"`
 	History       []DeclaredClaim `json:"history,omitempty" firestore:"history,omitempty"`
+}
+
+type DeclaredClaim struct {
+	Year     int     `json:"year,omitempty" firestore:"year,omitempty"`
+	Quantity int     `json:"quantity,omitempty" firestore:"quantity,omitempty"`
+	Value    float64 `json:"value,omitempty" firestore:"value,omitempty"`
 }
 
 type RenewHistory struct {
