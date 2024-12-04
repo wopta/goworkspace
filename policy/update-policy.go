@@ -34,6 +34,7 @@ func UpdatePolicy(policy *models.Policy) map[string]interface{} {
 	case models.CommercialCombinedProduct:
 		input["startDate"] = policy.StartDate
 		input["endDate"] = policy.EndDate
+		input["declaredClaims"] = policy.DeclaredClaims
 	}
 
 	input["updated"] = time.Now().UTC()

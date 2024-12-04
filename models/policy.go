@@ -118,12 +118,20 @@ type Policy struct {
 	PolicyType        string                       `json:"policyType" firestore:"policyType" bigquery:"policyType"`
 	QuoteType         string                       `json:"quoteType" firestore:"quoteType" bigquery:"quoteType"`
 	HasMandate        bool                         `json:"hasMandate" firestore:"hasMandate" bigquery:"hasMandate"`
+	DeclaredClaims    []DeclaredClaim              `json:"declaredClaims" firestore:"declaredClaims" bigquery:"declaredClaims"`
 
 	// DEPRECATED FIELDS
 
 	RejectReasons string `json:"rejectReasons,omitempty" firestore:"rejectReasons,omitempty" bigquery:"-"` // DEPRECATED
 	AgentUid      string `json:"agentUid,omitempty" firestore:"agentUid,omitempty" bigquery:"agentUid"`    // DEPRECATED
 	AgencyUid     string `json:"agencyUid,omitempty" firestore:"agencyUid,omitempty" bigquery:"agencyUid"` // DEPRECATED
+}
+
+type DeclaredClaim struct {
+	GuaranteeSlug string          `json:"guaranteeSlug,omitempty" firestore:"guaranteeSlug,omitempty"`
+	Year          int16           `json:"year,omitempty" firestore:"year,omitempty"`
+	Total         int16           `json:"total,omitempty" firestore:"total,omitempty"`
+	History       []DeclaredClaim `json:"history,omitempty" firestore:"history,omitempty"`
 }
 
 type RenewHistory struct {
