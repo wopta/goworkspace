@@ -472,3 +472,19 @@ func (fx *Fx) HasGuaranteeInSlice(input map[string]interface{}, slugList... stri
 	}
 	return false
 }
+
+func (fx *Fx) GetSignatoryMail(input map[string]interface{}) string {
+	j, err := json.Marshal(input)
+	lib.CheckError(err)
+	var policy Policy
+	err = json.Unmarshal(j, &policy)
+	lib.CheckError(err)
+	if policy.Contractors != nil {
+		for _, c := range *policy.Contractors {
+			if c.IsSignatory {
+				return c.Mail
+			}
+		}
+	}
+	return ""
+}
