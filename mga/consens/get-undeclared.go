@@ -3,7 +3,6 @@ package consens
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -17,15 +16,11 @@ type key string
 
 const timestamp = key("timestamp")
 
-type UndeclaredConsensResp struct {
-	Consens []NetworkConsens `json:"consens"`
-}
-
 func GetUndeclaredConsensFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	var (
 		err           error
-		response      UndeclaredConsensResp
-		consens       []NetworkConsens
+		response      ConsensResp
+		consens       []SystemConsens
 		responseBytes []byte
 	)
 
@@ -57,33 +52,34 @@ func GetUndeclaredConsensFx(w http.ResponseWriter, r *http.Request) (string, any
 
 	product := r.URL.Query().Get("product")
 
-	consens, err = getUndeclaredConsens(product, &tempNode)
+	if consens, err = getUndeclaredConsens(product, &tempNode); err != nil {
+		return "", nil, err
+	}
 
 	response.Consens = consens
 
-	responseBytes, err = json.Marshal(response)
-	if err != nil {
+	if responseBytes, err = json.Marshal(response); err != nil {
 		return "", nil, err
 	}
 
 	return string(responseBytes), response, err
 }
 
-func getUndeclaredConsens(product string, networkNode *NodeWithConsens) ([]NetworkConsens, error) {
+func getUndeclaredConsens(product string, networkNode *NodeWithConsens) ([]SystemConsens, error) {
 	var (
 		err               error
 		fileList          = make([]string, 0)
-		folderPath        = fmt.Sprintf("consens/network/%s", product)
-		allProductConsens = make([]NetworkConsens, 0)
-		undeclaredConsens = make([]NetworkConsens, 0)
+		path              = folderPath + product
+		allProductConsens = make([]SystemConsens, 0)
+		undeclaredConsens = make([]SystemConsens, 0)
 		now               = time.Now().UTC()
 	)
 
 	switch os.Getenv("env") {
 	case "local":
-		fileList, err = lib.ListLocalFolderContent(folderPath)
+		fileList, err = lib.ListLocalFolderContent(path)
 	default:
-		fileList, err = lib.ListGoogleStorageFolderContent(folderPath)
+		fileList, err = lib.ListGoogleStorageFolderContent(path)
 	}
 
 	if err != nil {
@@ -93,10 +89,9 @@ func getUndeclaredConsens(product string, networkNode *NodeWithConsens) ([]Netwo
 	for _, file := range fileList {
 		var (
 			fileBytes []byte
-			c         NetworkConsens
+			c         SystemConsens
 		)
-		fileBytes, err = lib.GetFilesByEnvV2(file)
-		if err != nil {
+		if fileBytes, err = lib.GetFilesByEnvV2(file); err != nil {
 			return nil, err
 		}
 		if err = json.Unmarshal(fileBytes, &c); err != nil {

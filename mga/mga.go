@@ -72,6 +72,12 @@ var mgaRoutes []lib.Route = []lib.Route{
 		Roles:   []string{lib.UserRoleManager, lib.UserRoleAreaManager, lib.UserRoleAgency, lib.UserRoleAgent},
 	},
 	{
+		Route:   "/network/consens/v1",
+		Handler: lib.ResponseLoggerWrapper(consens.AcceptanceFx),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleManager, lib.UserRoleAreaManager, lib.UserRoleAgency, lib.UserRoleAgent},
+	},
+	{
 		Route:   "/warrants/v1",
 		Handler: lib.ResponseLoggerWrapper(GetWarrantsFx),
 		Method:  http.MethodGet,

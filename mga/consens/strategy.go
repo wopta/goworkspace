@@ -8,7 +8,12 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
-func newConsensStrategy(consens NetworkConsens, node NodeWithConsens) (NeedConsensAlgorithm, error) {
+const (
+	ruiSectionEStrategy = "rui_section_e"
+	allNodesStrategy    = "all_nodes"
+)
+
+func newConsensStrategy(consens SystemConsens, node NodeWithConsens) (NeedConsensAlgorithm, error) {
 	switch consens.Strategy {
 	case ruiSectionEStrategy:
 		return &RuisectionE{
@@ -29,7 +34,7 @@ type NeedConsensAlgorithm interface {
 }
 
 type RuisectionE struct {
-	consens NetworkConsens
+	consens SystemConsens
 	node    NodeWithConsens
 }
 
@@ -66,7 +71,7 @@ func (w *RuisectionE) Check(ctx context.Context) (bool, error) {
 }
 
 type AllNodes struct {
-	consens NetworkConsens
+	consens SystemConsens
 	node    NodeWithConsens
 }
 

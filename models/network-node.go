@@ -258,6 +258,70 @@ func (nn *NetworkNode) GetAddress() string {
 	return address
 }
 
+func (nn *NetworkNode) GetRuiCode() string {
+	var ruiCode string
+
+	switch nn.Type {
+	case AgentNetworkNodeType:
+		ruiCode = nn.Agent.RuiCode
+	case AgencyNetworkNodeType:
+		ruiCode = nn.Agency.RuiCode
+	case BrokerNetworkNodeType:
+		ruiCode = nn.Broker.RuiCode
+	case AreaManagerNetworkNodeType:
+		ruiCode = nn.AreaManager.RuiCode
+	}
+
+	return ruiCode
+}
+
+func (nn *NetworkNode) GetRuiRegistration() time.Time {
+	var ruiRegistration time.Time
+
+	switch nn.Type {
+	case AgentNetworkNodeType:
+		ruiRegistration = nn.Agent.RuiRegistration
+	case AgencyNetworkNodeType:
+		ruiRegistration = nn.Agency.RuiRegistration
+	case BrokerNetworkNodeType:
+		ruiRegistration = nn.Broker.RuiRegistration
+	case AreaManagerNetworkNodeType:
+		ruiRegistration = nn.AreaManager.RuiRegistration
+	}
+
+	return ruiRegistration
+}
+
+func (nn *NetworkNode) GetVatCode() string {
+	var vatCode string
+
+	switch nn.Type {
+	case AgentNetworkNodeType:
+		vatCode = nn.Agent.VatCode
+	case AgencyNetworkNodeType:
+		vatCode = nn.Agency.VatCode
+	case BrokerNetworkNodeType:
+		vatCode = nn.Broker.VatCode
+	case AreaManagerNetworkNodeType:
+		vatCode = nn.AreaManager.VatCode
+	}
+
+	return vatCode
+}
+
+func (nn *NetworkNode) GetFiscalCode() string {
+	var fiscalCode string
+
+	switch nn.Type {
+	case AgentNetworkNodeType:
+		fiscalCode = nn.Agent.FiscalCode
+	case AreaManagerNetworkNodeType:
+		fiscalCode = nn.AreaManager.FiscalCode
+	}
+
+	return fiscalCode
+}
+
 func (nn *NetworkNode) IsJwtProtected() bool {
 	c := nn.JwtConfig
 	return (c.KeyAlgorithm != "" && c.ContentEncryption != "") || c.SignatureAlgorithm != ""
