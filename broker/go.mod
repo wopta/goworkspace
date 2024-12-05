@@ -10,18 +10,18 @@ require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/wopta/goworkspace/bpmn v1.0.18
-	github.com/wopta/goworkspace/callback_out v1.0.31
-	github.com/wopta/goworkspace/document v1.1.108
+	github.com/wopta/goworkspace/callback_out v1.0.32
+	github.com/wopta/goworkspace/document v1.1.109
 	github.com/wopta/goworkspace/lib v1.0.132
-	github.com/wopta/goworkspace/mail v1.0.132
-	github.com/wopta/goworkspace/models v1.2.19
-	github.com/wopta/goworkspace/network v1.0.84
-	github.com/wopta/goworkspace/payment v1.0.261
-	github.com/wopta/goworkspace/policy v1.0.138
-	github.com/wopta/goworkspace/product v1.1.17
-	github.com/wopta/goworkspace/question v1.0.71
-	github.com/wopta/goworkspace/reserved v1.0.144
-	github.com/wopta/goworkspace/transaction v1.0.124
+	github.com/wopta/goworkspace/mail v1.0.133
+	github.com/wopta/goworkspace/models v1.2.20
+	github.com/wopta/goworkspace/network v1.0.85
+	github.com/wopta/goworkspace/payment v1.0.262
+	github.com/wopta/goworkspace/policy v1.0.139
+	github.com/wopta/goworkspace/product v1.1.18
+	github.com/wopta/goworkspace/question v1.0.72
+	github.com/wopta/goworkspace/reserved v1.0.145
+	github.com/wopta/goworkspace/transaction v1.0.125
 	github.com/wopta/goworkspace/wiseproxy v1.0.3
 )
 
