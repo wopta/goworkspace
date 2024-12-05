@@ -6,6 +6,7 @@ import (
 
 	"github.com/GoogleCloudPlatform/functions-framework-go/functions"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/mga/consens"
 )
 
 var mgaRoutes []lib.Route = []lib.Route{
@@ -63,6 +64,12 @@ var mgaRoutes []lib.Route = []lib.Route{
 		Handler: lib.ResponseLoggerWrapper(ConsumeNetworkNodeInviteFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
+	},
+	{
+		Route:   "/network/consens/v1",
+		Handler: lib.ResponseLoggerWrapper(consens.GetUndeclaredConsensFx),
+		Method:  http.MethodGet,
+		Roles:   []string{lib.UserRoleManager, lib.UserRoleAreaManager, lib.UserRoleAgency, lib.UserRoleAgent},
 	},
 	{
 		Route:   "/warrants/v1",

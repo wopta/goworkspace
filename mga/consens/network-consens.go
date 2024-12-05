@@ -1,4 +1,4 @@
-package mga
+package consens
 
 import (
 	"context"
@@ -11,7 +11,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
@@ -34,11 +33,20 @@ const (
 )
 
 type NetworkConsens struct {
-	Slug        string    `json:"slug"`
-	ExpireAt    time.Time `json:"expireAt"`
-	StartAt     time.Time `json:"startAt"`
-	AvailableAt time.Time `json:"availableAt"`
-	Strategy    string    `json:"strategy"`
+	Slug        string           `json:"slug"`
+	ExpireAt    time.Time        `json:"expireAt"`
+	StartAt     time.Time        `json:"startAt"`
+	AvailableAt time.Time        `json:"availableAt"`
+	Strategy    string           `json:"strategy"`
+	Title       string           `json:"title"`
+	Content     []ConsensContent `json:"content"`
+}
+
+type ConsensContent struct {
+	Text       string `json:"text"`
+	InputType  string `json:"inputType,omitempty"`
+	InputName  string `json:"inputName,omitempty"`
+	InputValue string `json:"inputValue,omitempty"`
 }
 
 // TODO: add the fields to the correct struct
@@ -47,9 +55,14 @@ type NodeWithConsens struct {
 	Consens []NetworkConsens `json:"networkConsens"`
 }
 
+type UndeclaredConsensResp struct {
+	Consens []NetworkConsens `json:"consens"`
+}
+
 func GetUndeclaredConsensFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	var (
 		err           error
+		response UndeclaredConsensResp
 		consens       []NetworkConsens
 		responseBytes []byte
 	)
@@ -80,16 +93,18 @@ func GetUndeclaredConsensFx(w http.ResponseWriter, r *http.Request) (string, any
 	var tempNode NodeWithConsens
 	json.Unmarshal(tempBytes, &tempNode)
 
-	product := chi.URLParam(r, "product")
+	product := r.URL.Query().Get("product")
 
 	consens, err = getUndeclaredConsens(product, &tempNode)
 
-	responseBytes, err = json.Marshal(consens)
+	response.Consens = consens
+
+	responseBytes, err = json.Marshal(response)
 	if err != nil {
 		return "", nil, err
 	}
 
-	return string(responseBytes), consens, err
+	return string(responseBytes), response, err
 }
 
 func getUndeclaredConsens(product string, networkNode *NodeWithConsens) ([]NetworkConsens, error) {
