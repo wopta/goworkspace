@@ -3,13 +3,14 @@ package models
 import "github.com/wopta/goworkspace/lib"
 
 type Address struct {
-	StreetName   string `json:"streetName" firestore:"streetName" bigquery:"-"`
-	StreetNumber string `json:"streetNumber" firestore:"streetNumber" bigquery:"-"`
-	City         string `json:"city" firestore:"city" bigquery:"-"`
-	PostalCode   string `json:"postalCode" firestore:"postalCode" bigquery:"-"`
-	Locality     string `json:"locality" firestore:"locality" bigquery:"-"`
-	CityCode     string `json:"cityCode" firestore:"cityCode" bigquery:"-"`
-	Area         string `json:"area" firestore:"area" bigquery:"-"`
+	StreetName    string `json:"streetName" firestore:"streetName" bigquery:"-"`
+	StreetNumber  string `json:"streetNumber" firestore:"streetNumber" bigquery:"-"`
+	City          string `json:"city" firestore:"city" bigquery:"-"`
+	PostalCode    string `json:"postalCode" firestore:"postalCode" bigquery:"-"`
+	Locality      string `json:"locality" firestore:"locality" bigquery:"-"`
+	CityCode      string `json:"cityCode" firestore:"cityCode" bigquery:"-"`
+	Area          string `json:"area" firestore:"area" bigquery:"-"`
+	IsManualInput bool   `json:"isManualInput" firestore:"isManualInput" bigquery:"-"`
 }
 
 func (a *Address) Normalize() {
