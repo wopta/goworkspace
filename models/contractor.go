@@ -76,6 +76,7 @@ type Contractor struct {
 	IsLegalPerson            bool                   `firestore:"isLegalPerson,omitempty"     json:"isLegalPerson,omitempty"     bigquery:"-"`
 	CompanyAddress           *Address               `firestore:"companyAddress,omitempty" json:"companyAddress,omitempty" bigquery:"-"`
 	Data                     string                 `firestore:"-"                           json:"-"                           bigquery:"data"`
+	YearOfEstablishment      int                    `firestore:"yearOfEstablishment,omitempty" json:"yearOfEstablishment,omitempty"`
 }
 
 func (c *Contractor) Normalize() {

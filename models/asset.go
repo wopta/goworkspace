@@ -16,7 +16,7 @@ type Building struct {
 	Name              string   `firestore:"name,omitempty" json:"name,omitempty"`
 	Type              string   `firestore:"type,omitempty" json:"type,omitempty"`
 	StreetNumber      string   `firestore:"streetNumber,omitempty" json:"streetNumber,omitempty"`
-	CityCode          string   `firestore:"cityCode" json:"cityCode,omitempty"`
+	CityCode          string   `firestore:"cityCode,omitempty" json:"cityCode,omitempty"`
 	PostalCode        string   `firestore:"postalCode" json:"postalCode,omitempty"`
 	City              string   `firestore:"city" json:"city,omitempty"`
 	Locality          string   `firestore:"locality" json:"locality,omitempty"`
@@ -39,6 +39,7 @@ type Building struct {
 	Naics             string   `firestore:"naics,omitempty" json:"naics,omitempty"`
 	HasSandwitchPanel bool     `firestore:"hasSandwitchPanel" json:"hasSandwitchPanel"`
 	HasSprinkler      bool     `firestore:"hasSprinkler" json:"hasSprinkler"`
+	BuildingAddress   *Address `firestore:"buildingAddress,omitempty" json:"buildingAddress,omitempty"`
 }
 
 type Enterprise struct {
@@ -49,6 +50,7 @@ type Enterprise struct {
 	Type                      string   `firestore:"type,omitempty" json:"type,omitempty"`
 	PostalCode                string   `firestore:"postalCode,omitempty" json:"postalCode,omitempty"`
 	City                      string   `firestore:"city,omitempty" json:"city,omitempty"`
+	CityCode                  string   `firestore:"cityCode,omitempty" json:"cityCode,omitempty"`
 	Locality                  string   `firestore:"locality" json:"locality,omitempty"`
 	VatCode                   string   `firestore:"vatCode,omitempty" json:"vatCode,omitempty"`
 	FiscalCode                string   `firestore:"fiscalCode" json:"fiscalCode,omitempty"`
@@ -63,6 +65,8 @@ type Enterprise struct {
 	WorkEmployersRemuneration string   `firestore:"workEmployersRemuneration,omitempty" json:"workEmployersRemuneration,omitempty"`
 	TotalBilled               string   `firestore:"totalBilled,omitempty" json:"totalBilled,omitempty"`
 	NorthAmericanMarket       string   `firestore:"northAmericanMarket,omitempty" json:"northAmericanMarket,omitempty"`
+	YearOfEstablishment       int      `firestore:"yearOfEstablishment,omitempty" json:"yearOfEstablishment,omitempty"`
+	EnterpriseAddress         *Address `firestore:"enterpriseAddress,omitempty" json:"enterpriseAddress,omitempty"`
 }
 
 type Ateco struct {
