@@ -71,12 +71,12 @@ type NodeConsensAudit struct {
 }
 
 func (c *NodeConsensAudit) Save() error {
-	c.Uid = lib.NewDoc(lib.NodeConsensAuditCollencion)
-	if err := lib.SetFirestoreErr(lib.NodeConsensAuditCollencion, c.Uid, c); err != nil {
+	c.Uid = lib.NewDoc(lib.NodeConsensAuditsCollencion)
+	if err := lib.SetFirestoreErr(lib.NodeConsensAuditsCollencion, c.Uid, c); err != nil {
 		return err
 	}
 
-	return lib.InsertRowsBigQuery(lib.WoptaDataset, lib.NodeConsensAuditCollencion, c.BigQueryParse())
+	return lib.InsertRowsBigQuery(lib.WoptaDataset, lib.NodeConsensAuditsCollencion, c.BigQueryParse())
 }
 
 func (c *NodeConsensAudit) BigQueryParse() NodeConsensAuditBQ {

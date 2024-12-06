@@ -53,5 +53,5 @@ const (
 	RenewPolicyViewCollection    string = "renewPolicyView"        // bigquery
 	RenewTransactionCollection   string = "renewTransactions"      // firestore and bigquery
 	MailReportCollection         string = "mailReport"             // only for bigquery
-	NodeConsensAuditCollencion   string = "nodeConsensAudit"       // firestore and bigquery
+	NodeConsensAuditsCollencion  string = "nodeConsensAudits"      // firestore and bigquery
 )
