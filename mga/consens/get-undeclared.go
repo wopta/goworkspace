@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 )
 
@@ -46,13 +47,10 @@ func GetUndeclaredConsensFx(w http.ResponseWriter, r *http.Request) (string, any
 		err = errNetworkNodeNotFound
 		return "", nil, err
 	}
-	tempBytes, _ := json.Marshal(networkNode)
-	var tempNode NodeWithConsens
-	json.Unmarshal(tempBytes, &tempNode)
 
 	product := r.URL.Query().Get("product")
 
-	if consens, err = getUndeclaredConsens(product, &tempNode); err != nil {
+	if consens, err = getUndeclaredConsens(product, networkNode); err != nil {
 		return "", nil, err
 	}
 
@@ -65,7 +63,7 @@ func GetUndeclaredConsensFx(w http.ResponseWriter, r *http.Request) (string, any
 	return string(responseBytes), response, err
 }
 
-func getUndeclaredConsens(product string, networkNode *NodeWithConsens) ([]SystemConsens, error) {
+func getUndeclaredConsens(product string, networkNode *models.NetworkNode) ([]SystemConsens, error) {
 	var (
 		err               error
 		fileList          = make([]string, 0)

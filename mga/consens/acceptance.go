@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 )
 
@@ -49,9 +50,6 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 		err = errNetworkNodeNotFound
 		return "", nil, err
 	}
-	tempBytes, _ := json.Marshal(networkNode)
-	var tempNode NodeWithConsens
-	json.Unmarshal(tempBytes, &tempNode)
 
 	err = json.NewDecoder(r.Body).Decode(&request)
 	defer r.Body.Close()
@@ -66,7 +64,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 		return "", nil, err
 	}
 
-	tempNode.Consens = append(tempNode.Consens, NodeConsens{
+	networkNode.Consens = append(networkNode.Consens, models.NodeConsens{
 		Slug:     consens.Slug,
 		ExpireAt: consens.ExpireAt,
 		StartAt:  consens.StartAt,
@@ -76,20 +74,19 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 		GivenAt:  now,
 	})
 
-	// save node
-	if err := tempNode.SaveFirestore(); err != nil {
+	if err := networkNode.SaveFirestore(); err != nil {
 		return "", nil, err
 	}
-	if err := tempNode.SaveBigQuery(""); err != nil {
+	if err := networkNode.SaveBigQuery(""); err != nil {
 		return "", nil, err
 	}
-	// save consens
+
 	audit := NodeConsensAudit{
-		Name:            tempNode.GetName(),
-		RuiCode:         tempNode.GetRuiCode(),
-		RuiRegistration: tempNode.GetRuiRegistration(),
-		FiscalCode:      tempNode.GetFiscalCode(),
-		VatCode:         tempNode.GetVatCode(),
+		Name:            networkNode.GetName(),
+		RuiCode:         networkNode.GetRuiCode(),
+		RuiRegistration: networkNode.GetRuiRegistration(),
+		FiscalCode:      networkNode.GetFiscalCode(),
+		VatCode:         networkNode.GetVatCode(),
 		Slug:            consens.Slug,
 		Title:           consens.Title,
 		Content:         consens.ToString(),
@@ -101,8 +98,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	}
 	// send mail
 
-	// get consens
-	if undeclaredConsens, err = getUndeclaredConsens(request.Product, &tempNode); err != nil {
+	if undeclaredConsens, err = getUndeclaredConsens(request.Product, networkNode); err != nil {
 		return "", nil, err
 	}
 

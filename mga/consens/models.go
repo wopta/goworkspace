@@ -7,7 +7,6 @@ import (
 
 	"cloud.google.com/go/bigquery"
 	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
 )
 
 var (
@@ -49,24 +48,8 @@ func (c SystemConsens) ToString() string {
 	return strings.Join(parts, " ")
 }
 
-// TODO: add the fields to the correct struct
-type NodeWithConsens struct {
-	models.NetworkNode
-	Consens []NodeConsens `json:"consens"`
-}
-
 type ConsensResp struct {
 	Consens []SystemConsens `json:"consens"`
-}
-
-type NodeConsens struct {
-	Slug     string    `json:"slug"`
-	ExpireAt time.Time `json:"expireAt"`
-	StartAt  time.Time `json:"startAt"`
-	Title    string    `json:"title"`
-	Content  string    `json:"content"`
-	Value    string    `json:"value"`
-	GivenAt  time.Time `json:"givenAt"`
 }
 
 type NodeConsensAudit struct {

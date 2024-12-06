@@ -13,7 +13,7 @@ const (
 	allNodesStrategy    = "all_nodes"
 )
 
-func newConsensStrategy(consens SystemConsens, node NodeWithConsens) (NeedConsensAlgorithm, error) {
+func newConsensStrategy(consens SystemConsens, node models.NetworkNode) (NeedConsensAlgorithm, error) {
 	switch consens.Strategy {
 	case ruiSectionEStrategy:
 		return &RuisectionE{
@@ -35,7 +35,7 @@ type NeedConsensAlgorithm interface {
 
 type RuisectionE struct {
 	consens SystemConsens
-	node    NodeWithConsens
+	node    models.NetworkNode
 }
 
 func (w *RuisectionE) Check(ctx context.Context) (bool, error) {
@@ -72,7 +72,7 @@ func (w *RuisectionE) Check(ctx context.Context) (bool, error) {
 
 type AllNodes struct {
 	consens SystemConsens
-	node    NodeWithConsens
+	node    models.NetworkNode
 }
 
 func (w *AllNodes) Check(ctx context.Context) (bool, error) {

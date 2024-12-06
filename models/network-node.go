@@ -48,6 +48,7 @@ type NetworkNode struct {
 	WorksForUid         string                `json:"worksForUid" firestore:"worksForUid" bigquery:"-"`
 	CallbackConfig      *CallbackConfig       `json:"callbackConfig,omitempty" firestore:"callbackConfig,omitempty" bigquery:"-"`
 	JwtConfig           lib.JwtConfig         `json:"jwtConfig,omitempty" firestore:"jwtConfig,omitempty" bigquery:"-"`
+	Consens             []NodeConsens         `json:"consens" firestore:"consens" bigquery:"-"`
 }
 
 type NodeProduct struct {
@@ -62,6 +63,17 @@ type NodeCompany struct {
 
 type CallbackConfig struct {
 	Name string `json:"name" firestore:"name" bigquery:"-"`
+}
+
+// TODO: consider saving only slug and value
+type NodeConsens struct {
+	Slug     string    `json:"slug" firestore:"slug" bigquery:"-"`
+	ExpireAt time.Time `json:"expireAt" firestore:"expireAt" bigquery:"-"`
+	StartAt  time.Time `json:"startAt" firestore:"startAt" bigquery:"-"`
+	Title    string    `json:"title" firestore:"title" bigquery:"-"`
+	Content  string    `json:"content" firestore:"content" bigquery:"-"`
+	Value    string    `json:"value" firestore:"value" bigquery:"-"`
+	GivenAt  time.Time `json:"givenAt" firestore:"givenAt" bigquery:"-"`
 }
 
 func NetworkNodeToListData(query *firestore.DocumentIterator) []NetworkNode {
