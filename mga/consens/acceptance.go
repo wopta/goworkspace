@@ -42,11 +42,13 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	idToken := r.Header.Get("Authorization")
 	authToken, err := lib.GetAuthTokenFromIdToken(idToken)
 	if err != nil {
+		log.Println("error extracting authToken")
 		return "", nil, err
 	}
 
 	networkNode := network.GetNetworkNodeByUid(authToken.UserID)
 	if networkNode == nil {
+		log.Println("error getting networkNode")
 		err = errNetworkNodeNotFound
 		return "", nil, err
 	}
@@ -54,13 +56,14 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	err = json.NewDecoder(r.Body).Decode(&request)
 	defer r.Body.Close()
 	if err != nil {
-		log.Printf("error decoding request body: %s", err)
+		log.Println("error decoding request body")
 		return "", nil, err
 	}
 
 	filepath := folderPath + request.Product + "/" + request.Slug
 	consens, err = getConsensByPath(filepath)
 	if err != nil {
+		log.Println("error getting consens")
 		return "", nil, err
 	}
 
@@ -75,9 +78,11 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	})
 
 	if err := networkNode.SaveFirestore(); err != nil {
+		log.Println("error saving networkNode in firestore")
 		return "", nil, err
 	}
 	if err := networkNode.SaveBigQuery(""); err != nil {
+		log.Println("error saving networkNode in bigquery")
 		return "", nil, err
 	}
 
@@ -94,17 +99,20 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 		GivenAt:         now,
 	}
 	if err := audit.Save(); err != nil {
+		log.Println("error saving consens audit")
 		return "", nil, err
 	}
 	// send mail
 
 	if undeclaredConsens, err = getUndeclaredConsens(request.Product, networkNode); err != nil {
+		log.Println("error getting undeclared consens")
 		return "", nil, err
 	}
 
 	response.Consens = undeclaredConsens
 
 	if responseBytes, err = json.Marshal(response); err != nil {
+		log.Println("error marshalling response")
 		return "", nil, err
 	}
 

@@ -39,11 +39,13 @@ func GetUndeclaredConsensFx(w http.ResponseWriter, r *http.Request) (string, any
 	idToken := r.Header.Get("Authorization")
 	authToken, err := lib.GetAuthTokenFromIdToken(idToken)
 	if err != nil {
+		log.Println("error extracting authToken")
 		return "", nil, err
 	}
 
 	networkNode := network.GetNetworkNodeByUid(authToken.UserID)
 	if networkNode == nil {
+		log.Println("error getting networkNode")
 		err = errNetworkNodeNotFound
 		return "", nil, err
 	}
@@ -51,12 +53,14 @@ func GetUndeclaredConsensFx(w http.ResponseWriter, r *http.Request) (string, any
 	product := r.URL.Query().Get("product")
 
 	if consens, err = getUndeclaredConsens(product, networkNode); err != nil {
+		log.Println("error getting undeclared consens")
 		return "", nil, err
 	}
 
 	response.Consens = consens
 
 	if responseBytes, err = json.Marshal(response); err != nil {
+		log.Println("error marshalling response")
 		return "", nil, err
 	}
 
@@ -84,6 +88,8 @@ func getUndeclaredConsens(product string, networkNode *models.NetworkNode) ([]Sy
 		return nil, err
 	}
 
+	log.Printf("found a total of %d consens", len(fileList))
+
 	for _, file := range fileList {
 		var (
 			fileBytes []byte
@@ -107,6 +113,7 @@ func getUndeclaredConsens(product string, networkNode *models.NetworkNode) ([]Sy
 
 	for _, c := range allProductConsens {
 		if lib.SliceContains(nodeConsensList, c.Slug) {
+			log.Printf("consent given for consens %s", c.Slug)
 			continue
 		}
 
@@ -123,6 +130,8 @@ func getUndeclaredConsens(product string, networkNode *models.NetworkNode) ([]Sy
 			undeclaredConsens = append(undeclaredConsens, c)
 		}
 	}
+
+	log.Printf("found a total of %d undeclared consens", len(undeclaredConsens))
 
 	return undeclaredConsens, err
 }
