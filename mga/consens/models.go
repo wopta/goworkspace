@@ -11,7 +11,7 @@ import (
 
 var (
 	errNetworkNodeNotFound = errors.New("network node not found")
-	errPartnershipNode     = errors.New("partnership node does not have rui registration nor consens")
+	errRuiSectionNotSet    = errors.New("node does not have rui section")
 	errStrategyNotFound    = errors.New("strategy not found")
 )
 

@@ -287,6 +287,23 @@ func (nn *NetworkNode) GetRuiCode() string {
 	return ruiCode
 }
 
+func (nn *NetworkNode) GetRuiSection() string {
+	var ruiSection string
+
+	switch nn.Type {
+	case AgentNetworkNodeType:
+		ruiSection = nn.Agent.RuiSection
+	case AgencyNetworkNodeType:
+		ruiSection = nn.Agency.RuiSection
+	case BrokerNetworkNodeType:
+		ruiSection = nn.Broker.RuiSection
+	case AreaManagerNetworkNodeType:
+		ruiSection = nn.AreaManager.RuiSection
+	}
+
+	return ruiSection
+}
+
 func (nn *NetworkNode) GetRuiRegistration() time.Time {
 	var ruiRegistration time.Time
 

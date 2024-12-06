@@ -112,15 +112,19 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 }
 
 func getConsensByPath(path string) (SystemConsens, error) {
-	var consens SystemConsens
-	fileBytes, err := lib.GetFilesByEnvV2(path)
-	if err != nil {
+	var (
+		fileBytes []byte
+		consens   SystemConsens
+		err       error
+	)
+
+	if fileBytes, err = lib.GetFilesByEnvV2(path); err != nil {
 		return SystemConsens{}, err
 	}
 
-	if err := json.Unmarshal(fileBytes, &consens); err != nil {
+	if err = json.Unmarshal(fileBytes, &consens); err != nil {
 		return SystemConsens{}, err
 	}
 
-	return consens, nil
+	return consens, err
 }

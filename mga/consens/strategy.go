@@ -2,6 +2,7 @@ package consens
 
 import (
 	"context"
+	"log"
 	"strings"
 	"time"
 
@@ -13,7 +14,7 @@ const (
 	allNodesStrategy    = "all_nodes"
 )
 
-func newConsensStrategy(consens SystemConsens, node models.NetworkNode) (NeedConsensAlgorithm, error) {
+func newConsensStrategy(consens SystemConsens, node models.NetworkNode) (NeedConsentAlgorithm, error) {
 	switch consens.Strategy {
 	case ruiSectionEStrategy:
 		return &RuisectionE{
@@ -29,7 +30,7 @@ func newConsensStrategy(consens SystemConsens, node models.NetworkNode) (NeedCon
 	return nil, errStrategyNotFound
 }
 
-type NeedConsensAlgorithm interface {
+type NeedConsentAlgorithm interface {
 	Check(context.Context) (bool, error)
 }
 
@@ -39,18 +40,9 @@ type RuisectionE struct {
 }
 
 func (w *RuisectionE) Check(ctx context.Context) (bool, error) {
-	var ruiSection string
-	switch w.node.Type {
-	case models.AgentNetworkNodeType:
-		ruiSection = w.node.Agent.RuiSection
-	case models.AgencyNetworkNodeType:
-		ruiSection = w.node.Agency.RuiSection
-	case models.BrokerNetworkNodeType:
-		ruiSection = w.node.Broker.RuiSection
-	case models.AreaManagerNetworkNodeType:
-		ruiSection = w.node.AreaManager.RuiSection
-	case models.PartnershipNetworkNodeType:
-		return false, errPartnershipNode
+	ruiSection := w.node.GetRuiSection()
+	if ruiSection == "" {
+		return false, errRuiSectionNotSet
 	}
 
 	if !strings.EqualFold(ruiSection, ruiSectionE) {
@@ -93,5 +85,6 @@ func getTimestamp(ctx context.Context) time.Time {
 	if rawTime := ctx.Value(timestamp); rawTime != nil {
 		return (rawTime).(time.Time)
 	}
-	return time.Time{}
+	log.Println("timestamp not set - defaulting to time.Now().UTC()")
+	return time.Now().UTC()
 }
