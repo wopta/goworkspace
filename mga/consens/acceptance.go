@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"slices"
 	"time"
 
 	"github.com/wopta/goworkspace/lib"
@@ -67,7 +68,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 		return "", nil, err
 	}
 
-	networkNode.Consens = append(networkNode.Consens, models.NodeConsens{
+	nodeConsens := models.NodeConsens{
 		Slug:     consens.Slug,
 		ExpireAt: consens.ExpireAt,
 		StartAt:  consens.StartAt,
@@ -75,7 +76,19 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 		Content:  consens.ToString(),
 		Value:    request.Value,
 		GivenAt:  now,
+	}
+
+	nodeConsensIndex := slices.IndexFunc(networkNode.Consens, func(c models.NodeConsens) bool {
+		return c.Slug == consens.Slug
 	})
+
+	if nodeConsensIndex == -1 {
+		log.Println("appending new consent")
+		networkNode.Consens = append(networkNode.Consens, nodeConsens)
+	} else {
+		log.Println("updating given consent")
+		networkNode.Consens[nodeConsensIndex] = nodeConsens
+	}
 
 	if err := networkNode.SaveFirestore(); err != nil {
 		log.Println("error saving networkNode in firestore")
