@@ -77,7 +77,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	}
 
 	ctx := context.WithValue(context.Background(), timestamp, now)
-	if err = consentMayBeGiven(ctx, consens, request); err != nil {
+	if err = consentMayBeGiven(ctx, consens, request, networkNode); err != nil {
 		log.Println("invalid consent")
 		return "", nil, err
 	}
@@ -167,8 +167,21 @@ func getConsensByPath(path string) (SystemConsens, error) {
 	return consens, err
 }
 
-func consentMayBeGiven(ctx context.Context, consens SystemConsens, request AcceptanceReq) error {
+func consentMayBeGiven(ctx context.Context, consens SystemConsens, request AcceptanceReq, networkNode *models.NetworkNode) error {
+	var (
+		availableConsens []SystemConsens
+		err              error
+	)
 	now := getTimestamp(ctx)
+
+	if availableConsens, err = getUndeclaredConsens(request.Product, networkNode); err != nil {
+		return err
+	}
+	availableConsensSlugs := lib.SliceMap(availableConsens, func(c SystemConsens) string { return c.Slug })
+
+	if !lib.SliceContains(availableConsensSlugs, request.Slug) {
+		return errInvalidConsensToBeGiven
+	}
 
 	if now.After(consens.ExpireAt) {
 		return errConsensExpired

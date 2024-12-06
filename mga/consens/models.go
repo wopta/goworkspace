@@ -11,15 +11,17 @@ import (
 )
 
 var (
-	errNetworkNodeNotFound = errors.New("network node not found")
-	errRuiSectionNotSet    = errors.New("node does not have rui section")
-	errStrategyNotFound    = errors.New("strategy not found")
-	errInvalidRequest      = errors.New("invalid request body")
-	errConsensExpired      = errors.New("consens already expired")
-	errInvalidConsentValue = errors.New("invalid consent value")
+	errNetworkNodeNotFound     = errors.New("network node not found")
+	errRuiSectionNotSet        = errors.New("node does not have rui section")
+	errStrategyNotFound        = errors.New("strategy not found")
+	errInvalidRequest          = errors.New("invalid request body")
+	errConsensExpired          = errors.New("consens already expired")
+	errInvalidConsentValue     = errors.New("invalid consent value")
+	errInvalidConsensToBeGiven = errors.New("invalid consens to be given")
 )
 
 const (
+	allProducts = "all"
 	ruiSectionE = "E"
 	folderPath  = "consens/network/"
 )
@@ -57,8 +59,8 @@ func (c SystemConsens) ToString() string {
 
 func (c SystemConsens) ToOutput() OutputConsens {
 	return OutputConsens{
-		Slug: c.Slug,
-		Title: c.Title,
+		Slug:    c.Slug,
+		Title:   c.Title,
 		Content: c.Content,
 	}
 }
@@ -68,9 +70,9 @@ type ConsensResp struct {
 }
 
 type OutputConsens struct {
-	Slug        string           `json:"slug"`
-	Title       string           `json:"title"`
-	Content     []ConsensContent `json:"content"`
+	Slug    string           `json:"slug"`
+	Title   string           `json:"title"`
+	Content []ConsensContent `json:"content"`
 }
 
 type NodeConsensAudit struct {

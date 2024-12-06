@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"sort"
 	"time"
 
 	"github.com/wopta/goworkspace/lib"
@@ -69,39 +70,16 @@ func GetUndeclaredConsensFx(w http.ResponseWriter, r *http.Request) (string, any
 func getUndeclaredConsens(product string, networkNode *models.NetworkNode) ([]SystemConsens, error) {
 	var (
 		err               error
-		fileList          = make([]string, 0)
-		path              = folderPath + product
-		allProductConsens = make([]SystemConsens, 0)
+		allProductConsens []SystemConsens
 		undeclaredConsens = make([]SystemConsens, 0)
 		now               = time.Now().UTC()
 	)
 
-	switch os.Getenv("env") {
-	case "local":
-		fileList, err = lib.ListLocalFolderContent(path)
-	default:
-		fileList, err = lib.ListGoogleStorageFolderContent(path)
-	}
-
-	if err != nil {
+	if allProductConsens, err = getProductConsens(product); err != nil {
 		return nil, err
 	}
 
-	log.Printf("found a total of %d consens", len(fileList))
-
-	for _, file := range fileList {
-		var (
-			fileBytes []byte
-			c         SystemConsens
-		)
-		if fileBytes, err = lib.GetFilesByEnvV2(file); err != nil {
-			return nil, err
-		}
-		if err = json.Unmarshal(fileBytes, &c); err != nil {
-			return nil, err
-		}
-		allProductConsens = append(allProductConsens, c)
-	}
+	log.Printf("found a total of %d consens for product %s", len(allProductConsens), product)
 
 	nodeConsensList := make([]string, 0, len(networkNode.Consens))
 	for _, c := range networkNode.Consens {
@@ -134,3 +112,85 @@ func getUndeclaredConsens(product string, networkNode *models.NetworkNode) ([]Sy
 
 	return undeclaredConsens, err
 }
+
+func getProductConsens(product string) ([]SystemConsens, error) {
+	var (
+		path              = folderPath + product
+		fileList          []string
+		allProductConsens []SystemConsens
+		err               error
+	)
+	switch os.Getenv("env") {
+	case "local":
+		fileList, err = lib.ListLocalFolderContent(path)
+	default:
+		fileList, err = lib.ListGoogleStorageFolderContent(path)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	log.Printf("found a total of %d consens", len(fileList))
+
+	switch product {
+	case allProducts:
+		allProductConsens, err = getAllAvailableConsens(fileList)
+	default:
+		allProductConsens, err = getLastestNeededConsens(fileList)
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	return allProductConsens, nil
+}
+
+func getAllAvailableConsens(fileList []string) ([]SystemConsens, error) {
+	var (
+		allProductConsens = make([]SystemConsens, 0, len(fileList))
+		err               error
+	)
+
+	for _, file := range fileList {
+		var (
+			fileBytes []byte
+			c         SystemConsens
+		)
+		if fileBytes, err = lib.GetFilesByEnvV2(file); err != nil {
+			return nil, err
+		}
+		if err = json.Unmarshal(fileBytes, &c); err != nil {
+			return nil, err
+		}
+		allProductConsens = append(allProductConsens, c)
+	}
+
+	return allProductConsens, err
+}
+
+func getLastestNeededConsens(fileList []string) ([]SystemConsens, error) {
+	var (
+		latestNeededConsens = make([]SystemConsens, 0, 1)
+		allProductConsens   MultipleConsens
+		temp                []SystemConsens
+		err                 error
+	)
+
+	if temp, err = getAllAvailableConsens(fileList); err != nil {
+		return nil, err
+	}
+
+	allProductConsens = append(allProductConsens, temp...)
+	sort.Sort(allProductConsens)
+
+	latestNeededConsens = append(latestNeededConsens, allProductConsens[0])
+
+	return latestNeededConsens, err
+}
+
+type MultipleConsens []SystemConsens
+
+func (c MultipleConsens) Len() int           { return len(c) }
+func (c MultipleConsens) Swap(i, j int)      { c[i], c[j] = c[j], c[i] }
+func (c MultipleConsens) Less(i, j int) bool { return c[i].StartAt.After(c[j].StartAt) }
