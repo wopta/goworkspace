@@ -53,28 +53,31 @@ type ConsensResp struct {
 }
 
 type NodeConsensAudit struct {
-	Name            string
-	RuiCode         string
-	RuiRegistration time.Time `json:"ruiRegistration" firestore:"ruiRegistration" bigquery:"-"`
-	FiscalCode      string
-	VatCode         string
-	Slug            string
-	Title           string
-	Content         string
-	Answer          string
-	GivenAt         time.Time
+	Uid             string    `json:"uid" firestore:"uid"`
+	Name            string    `json:"name" firestore:"name"`
+	RuiCode         string    `json:"ruiCode" firestore:"ruiCode"`
+	RuiRegistration time.Time `json:"ruiRegistration" firestore:"ruiRegistration"`
+	FiscalCode      string    `json:"fiscalCode" firestore:"fiscalCode"`
+	VatCode         string    `json:"vatCode" firestore:"vatCode"`
+	Slug            string    `json:"slug" firestore:"slug"`
+	Title           string    `json:"title" firestore:"title"`
+	Content         string    `json:"content" firestore:"content"`
+	Answer          string    `json:"answer" firestore:"answer"`
+	GivenAt         time.Time `json:"givenAt" firestore:"givenAt"`
 }
 
 func (c *NodeConsensAudit) Save() error {
-	if err := lib.SetFirestoreErr("", "", c); err != nil {
+	c.Uid = lib.NewDoc(lib.NodeConsensAuditCollencion)
+	if err := lib.SetFirestoreErr(lib.NodeConsensAuditCollencion, c.Uid, c); err != nil {
 		return err
 	}
 
-	return lib.InsertRowsBigQuery("", "", c.BigQueryParse())
+	return lib.InsertRowsBigQuery(lib.WoptaDataset, lib.NodeConsensAuditCollencion, c.BigQueryParse())
 }
 
 func (c *NodeConsensAudit) BigQueryParse() NodeConsensAuditBQ {
 	return NodeConsensAuditBQ{
+		Uid:             c.Uid,
 		Name:            c.Name,
 		RuiCode:         c.RuiCode,
 		RuiRegistration: lib.GetBigQueryNullDateTime(c.RuiRegistration),
@@ -89,14 +92,15 @@ func (c *NodeConsensAudit) BigQueryParse() NodeConsensAuditBQ {
 }
 
 type NodeConsensAuditBQ struct {
-	Name            string
-	RuiCode         string
-	RuiRegistration bigquery.NullDateTime `json:"-" firestore:"-" bigquery:"ruiRegistration"`
-	FiscalCode      string
-	VatCode         string
-	Slug            string
-	Title           string
-	Content         string
-	Answer          string
-	GivenAt         bigquery.NullDateTime
+	Uid             string                `bigquery:"uid"`
+	Name            string                `bigquery:"name"`
+	RuiCode         string                `bigquery:"ruiCode"`
+	RuiRegistration bigquery.NullDateTime `bigquery:"ruiRegistration"`
+	FiscalCode      string                `bigquery:"fiscalCode"`
+	VatCode         string                `bigquery:"vatCode"`
+	Slug            string                `bigquery:"slug"`
+	Title           string                `bigquery:"title"`
+	Content         string                `bigquery:"content"`
+	Answer          string                `bigquery:"answer"`
+	GivenAt         bigquery.NullDateTime `bigquery:"givenAt"`
 }
