@@ -129,7 +129,12 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 		log.Println("error saving consens audit")
 		return "", nil, err
 	}
-	// send mail
+	
+	if err := sendConsensMail(networkNode, nodeConsens); err != nil {
+		log.Printf("error while sending mail: %v", err)
+		log.Println("continuing acceptance process...")
+		err = nil
+	}
 
 	if undeclaredConsens, err = getUndeclaredConsens(request.Product, networkNode); err != nil {
 		log.Println("error getting undeclared consens")
