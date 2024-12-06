@@ -15,6 +15,8 @@ var (
 	errRuiSectionNotSet    = errors.New("node does not have rui section")
 	errStrategyNotFound    = errors.New("strategy not found")
 	errInvalidRequest      = errors.New("invalid request body")
+	errConsensExpired      = errors.New("consens already expired")
+	errInvalidConsentValue = errors.New("invalid consent value")
 )
 
 const (

@@ -2,9 +2,7 @@ package consens
 
 import (
 	"context"
-	"log"
 	"strings"
-	"time"
 
 	"github.com/wopta/goworkspace/models"
 )
@@ -79,12 +77,4 @@ func (w *AllNodes) Check(ctx context.Context) (bool, error) {
 	}
 
 	return true, nil
-}
-
-func getTimestamp(ctx context.Context) time.Time {
-	if rawTime := ctx.Value(timestamp); rawTime != nil {
-		return (rawTime).(time.Time)
-	}
-	log.Println("timestamp not set - defaulting to time.Now().UTC()")
-	return time.Now().UTC()
 }

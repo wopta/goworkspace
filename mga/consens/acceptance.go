@@ -1,6 +1,7 @@
 package consens
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -12,7 +13,7 @@ import (
 	"github.com/wopta/goworkspace/network"
 )
 
-type UpdateReq struct {
+type AcceptanceReq struct {
 	Slug    string `json:"slug"`
 	Product string `json:"product"`
 	Value   string `json:"value"`
@@ -21,7 +22,7 @@ type UpdateReq struct {
 func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	var (
 		err               error
-		request           UpdateReq
+		request           AcceptanceReq
 		consens           SystemConsens
 		undeclaredConsens []SystemConsens
 		response          ConsensResp
@@ -72,6 +73,12 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	consens, err = getConsensByPath(filepath)
 	if err != nil {
 		log.Println("error getting consens")
+		return "", nil, err
+	}
+
+	ctx := context.WithValue(context.Background(), timestamp, now)
+	if err = consentMayBeGiven(ctx, consens, request); err != nil {
+		log.Println("invalid consent")
 		return "", nil, err
 	}
 
@@ -155,4 +162,25 @@ func getConsensByPath(path string) (SystemConsens, error) {
 	}
 
 	return consens, err
+}
+
+func consentMayBeGiven(ctx context.Context, consens SystemConsens, request AcceptanceReq) error {
+	now := getTimestamp(ctx)
+
+	if now.After(consens.ExpireAt) {
+		return errConsensExpired
+	}
+
+	availableConsents := make([]string, 0)
+	for _, content := range consens.Content {
+		if content.InputValue != "" {
+			availableConsents = append(availableConsents, content.InputValue)
+		}
+	}
+
+	if !lib.SliceContains(availableConsents, request.Value) {
+		return errInvalidConsentValue
+	}
+
+	return nil
 }
