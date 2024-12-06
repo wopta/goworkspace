@@ -136,7 +136,10 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 		return "", nil, err
 	}
 
-	response.Consens = undeclaredConsens
+	response.Consens = make([]OutputConsens, 0, len(undeclaredConsens))
+	for _, c := range undeclaredConsens {
+		response.Consens = append(response.Consens, c.ToOutput())
+	}
 
 	if responseBytes, err = json.Marshal(response); err != nil {
 		log.Println("error marshalling response")

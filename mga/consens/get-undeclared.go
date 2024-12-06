@@ -13,10 +13,6 @@ import (
 	"github.com/wopta/goworkspace/network"
 )
 
-type key string
-
-const timestamp = key("timestamp")
-
 func GetUndeclaredConsensFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	var (
 		err           error
@@ -57,7 +53,10 @@ func GetUndeclaredConsensFx(w http.ResponseWriter, r *http.Request) (string, any
 		return "", nil, err
 	}
 
-	response.Consens = consens
+	response.Consens = make([]OutputConsens, 0, len(consens))
+	for _, c := range consens {
+		response.Consens = append(response.Consens, c.ToOutput())
+	}
 
 	if responseBytes, err = json.Marshal(response); err != nil {
 		log.Println("error marshalling response")

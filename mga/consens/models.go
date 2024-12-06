@@ -55,8 +55,22 @@ func (c SystemConsens) ToString() string {
 	return strings.Join(parts, "\n")
 }
 
+func (c SystemConsens) ToOutput() OutputConsens {
+	return OutputConsens{
+		Slug: c.Slug,
+		Title: c.Title,
+		Content: c.Content,
+	}
+}
+
 type ConsensResp struct {
-	Consens []SystemConsens `json:"consens"`
+	Consens []OutputConsens `json:"consens"`
+}
+
+type OutputConsens struct {
+	Slug        string           `json:"slug"`
+	Title       string           `json:"title"`
+	Content     []ConsensContent `json:"content"`
 }
 
 type NodeConsensAudit struct {
