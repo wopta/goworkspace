@@ -61,7 +61,14 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 		return "", nil, err
 	}
 
-	filepath := folderPath + request.Product + "/" + request.Slug
+	if request.Product == "" || request.Slug == "" || request.Value == "" {
+		err = errInvalidRequest
+		log.Printf("invalid request body - should not be empty: product: '%s' slug: '%s' value: '%s'",
+			request.Product, request.Slug, request.Value)
+		return "", nil, err
+	}
+
+	filepath := folderPath + request.Product + "/" + request.Slug + ".json"
 	consens, err = getConsensByPath(filepath)
 	if err != nil {
 		log.Println("error getting consens")

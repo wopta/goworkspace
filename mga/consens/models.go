@@ -14,6 +14,7 @@ var (
 	errNetworkNodeNotFound = errors.New("network node not found")
 	errRuiSectionNotSet    = errors.New("node does not have rui section")
 	errStrategyNotFound    = errors.New("strategy not found")
+	errInvalidRequest      = errors.New("invalid request body")
 )
 
 const (
