@@ -2,6 +2,7 @@ package consens
 
 import (
 	"errors"
+	"regexp"
 	"strings"
 	"time"
 
@@ -40,12 +41,15 @@ type ConsensContent struct {
 func (c SystemConsens) ToString() string {
 	var parts []string
 
+	// TODO: this is an oversimplification
+	markdown := regexp.MustCompile("[*_~`#]")
+
 	for _, cs := range c.Content {
-		// TODO: regex to remove markdown
-		parts = append(parts, cs.Text)
+		text := markdown.ReplaceAll([]byte(cs.Text), []byte(""))
+		parts = append(parts, string(text))
 	}
 
-	return strings.Join(parts, " ")
+	return strings.Join(parts, "\n")
 }
 
 type ConsensResp struct {
