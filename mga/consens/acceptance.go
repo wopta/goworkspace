@@ -14,9 +14,9 @@ import (
 )
 
 type AcceptanceReq struct {
-	Slug    string `json:"slug"`
-	Product string `json:"product"`
-	Value   string `json:"value"`
+	Slug    string            `json:"slug"`
+	Product string            `json:"product"`
+	Answers map[string]string `json:"answers"`
 }
 
 func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
@@ -62,10 +62,10 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 		return "", nil, err
 	}
 
-	if request.Product == "" || request.Slug == "" || request.Value == "" {
+	if request.Product == "" || request.Slug == "" || len(request.Answers) == 0 {
 		err = errInvalidRequest
-		log.Printf("invalid request body - should not be empty: product: '%s' slug: '%s' value: '%s'",
-			request.Product, request.Slug, request.Value)
+		log.Printf("invalid request body - should not be empty: product: '%s' slug: '%s' value: '%+v'",
+			request.Product, request.Slug, request.Answers)
 		return "", nil, err
 	}
 
@@ -88,7 +88,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 		StartAt:  consens.StartAt,
 		Title:    consens.Title,
 		Content:  consens.ToString(),
-		Value:    request.Value,
+		Answers:  request.Answers,
 		GivenAt:  now,
 	}
 
@@ -122,15 +122,15 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 		Slug:            consens.Slug,
 		Title:           consens.Title,
 		Content:         consens.ToString(),
-		Answer:          request.Value,
+		Answers:         request.Answers,
 		GivenAt:         now,
 	}
 	if err := audit.Save(); err != nil {
 		log.Println("error saving consens audit")
 		return "", nil, err
 	}
-	
-	if err := sendConsensMail(networkNode, nodeConsens); err != nil {
+
+	if err := sendConsensMail(networkNode, consens, nodeConsens); err != nil {
 		log.Printf("error while sending mail: %v", err)
 		log.Println("continuing acceptance process...")
 		err = nil
@@ -192,15 +192,20 @@ func consentMayBeGiven(ctx context.Context, consens SystemConsens, request Accep
 		return errConsensExpired
 	}
 
-	availableConsents := make([]string, 0)
+	availableConsents := make(map[string][]string)
 	for _, content := range consens.Content {
 		if content.InputValue != "" {
-			availableConsents = append(availableConsents, content.InputValue)
+			if _, ok := availableConsents[content.InputName]; !ok {
+				availableConsents[content.InputName] = make([]string, 0)
+			}
+			availableConsents[content.InputName] = append(availableConsents[content.InputName], content.InputValue)
 		}
 	}
 
-	if !lib.SliceContains(availableConsents, request.Value) {
-		return errInvalidConsentValue
+	for key, val := range availableConsents {
+		if v, ok := request.Answers[key]; !ok || !lib.SliceContains(val, v) {
+			return errInvalidConsentValue
+		}
 	}
 
 	return nil

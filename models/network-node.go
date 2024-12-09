@@ -67,13 +67,13 @@ type CallbackConfig struct {
 
 // TODO: consider saving only slug and value
 type NodeConsens struct {
-	Slug     string    `json:"slug" firestore:"slug" bigquery:"-"`
-	ExpireAt time.Time `json:"expireAt" firestore:"expireAt" bigquery:"-"`
-	StartAt  time.Time `json:"startAt" firestore:"startAt" bigquery:"-"`
-	Title    string    `json:"title" firestore:"title" bigquery:"-"`
-	Content  string    `json:"content" firestore:"content" bigquery:"-"`
-	Value    string    `json:"value" firestore:"value" bigquery:"-"`
-	GivenAt  time.Time `json:"givenAt" firestore:"givenAt" bigquery:"-"`
+	Slug     string            `json:"slug" firestore:"slug" bigquery:"-"`
+	ExpireAt time.Time         `json:"expireAt" firestore:"expireAt" bigquery:"-"`
+	StartAt  time.Time         `json:"startAt" firestore:"startAt" bigquery:"-"`
+	Title    string            `json:"title" firestore:"title" bigquery:"-"`
+	Content  string            `json:"content" firestore:"content" bigquery:"-"`
+	Answers  map[string]string `json:"answers" firestore:"answers" bigquery:"-"`
+	GivenAt  time.Time         `json:"givenAt" firestore:"givenAt" bigquery:"-"`
 }
 
 func NetworkNodeToListData(query *firestore.DocumentIterator) []NetworkNode {

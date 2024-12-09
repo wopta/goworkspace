@@ -76,17 +76,18 @@ type OutputConsens struct {
 }
 
 type NodeConsensAudit struct {
-	Uid             string    `json:"uid" firestore:"uid"`
-	Name            string    `json:"name" firestore:"name"`
-	RuiCode         string    `json:"ruiCode" firestore:"ruiCode"`
-	RuiRegistration time.Time `json:"ruiRegistration" firestore:"ruiRegistration"`
-	FiscalCode      string    `json:"fiscalCode" firestore:"fiscalCode"`
-	VatCode         string    `json:"vatCode" firestore:"vatCode"`
-	Slug            string    `json:"slug" firestore:"slug"`
-	Title           string    `json:"title" firestore:"title"`
-	Content         string    `json:"content" firestore:"content"`
-	Answer          string    `json:"answer" firestore:"answer"`
-	GivenAt         time.Time `json:"givenAt" firestore:"givenAt"`
+	Uid             string            `json:"uid" firestore:"uid"`
+	NetworkNodeUid  string            `json:"networkNodeUid" firestore:"networkNodeUid"`
+	Name            string            `json:"name" firestore:"name"`
+	RuiCode         string            `json:"ruiCode" firestore:"ruiCode"`
+	RuiRegistration time.Time         `json:"ruiRegistration" firestore:"ruiRegistration"`
+	FiscalCode      string            `json:"fiscalCode" firestore:"fiscalCode"`
+	VatCode         string            `json:"vatCode" firestore:"vatCode"`
+	Slug            string            `json:"slug" firestore:"slug"`
+	Title           string            `json:"title" firestore:"title"`
+	Content         string            `json:"content" firestore:"content"`
+	Answers         map[string]string `json:"answers" firestore:"answers"`
+	GivenAt         time.Time         `json:"givenAt" firestore:"givenAt"`
 }
 
 func (c *NodeConsensAudit) Save() error {
@@ -99,8 +100,17 @@ func (c *NodeConsensAudit) Save() error {
 }
 
 func (c *NodeConsensAudit) BigQueryParse() NodeConsensAuditBQ {
+	answers := make([]BigQueryConsens, 0, len(c.Answers))
+	for key, value := range c.Answers {
+		answers = append(answers, BigQueryConsens{
+			Key:   key,
+			Value: value,
+		})
+	}
+
 	return NodeConsensAuditBQ{
 		Uid:             c.Uid,
+		NetworkNodeUid:  c.NetworkNodeUid,
 		Name:            c.Name,
 		RuiCode:         c.RuiCode,
 		RuiRegistration: lib.GetBigQueryNullDateTime(c.RuiRegistration),
@@ -109,13 +119,19 @@ func (c *NodeConsensAudit) BigQueryParse() NodeConsensAuditBQ {
 		Slug:            c.Slug,
 		Title:           c.Title,
 		Content:         c.Content,
-		Answer:          c.Answer,
+		Answers:         answers,
 		GivenAt:         lib.GetBigQueryNullDateTime(c.GivenAt),
 	}
 }
 
+type BigQueryConsens struct {
+	Key   string `bigquery:"key"`
+	Value string `bigquery:"value"`
+}
+
 type NodeConsensAuditBQ struct {
 	Uid             string                `bigquery:"uid"`
+	NetworkNodeUid  string                `bigquery:"networkNodeUid"`
 	Name            string                `bigquery:"name"`
 	RuiCode         string                `bigquery:"ruiCode"`
 	RuiRegistration bigquery.NullDateTime `bigquery:"ruiRegistration"`
@@ -124,6 +140,6 @@ type NodeConsensAuditBQ struct {
 	Slug            string                `bigquery:"slug"`
 	Title           string                `bigquery:"title"`
 	Content         string                `bigquery:"content"`
-	Answer          string                `bigquery:"answer"`
+	Answers         []BigQueryConsens     `bigquery:"answers"`
 	GivenAt         bigquery.NullDateTime `bigquery:"givenAt"`
 }
