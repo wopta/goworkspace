@@ -3,6 +3,8 @@ package consens
 import (
 	"context"
 	"encoding/json"
+	"errors"
+	"io/fs"
 	"log"
 	"net/http"
 	"os"
@@ -127,11 +129,15 @@ func getProductConsens(product string) ([]SystemConsens, error) {
 		fileList, err = lib.ListGoogleStorageFolderContent(path)
 	}
 
-	if err != nil {
+	if err != nil && !errors.Is(err, fs.ErrNotExist) {
 		return nil, err
 	}
 
 	log.Printf("found a total of %d consens", len(fileList))
+
+	if len(fileList) == 0 {
+		return nil, nil
+	}
 
 	switch product {
 	case allProducts:
