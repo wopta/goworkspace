@@ -44,7 +44,7 @@ func (qs *QuoteSpreadsheet) Spreadsheets() []Cell {
 
 	switch os.Getenv("env") {
 	case "local":
-		path = lib.ErrorByte(os.ReadFile("function-data/sa/positive-apex-350507-33284d6fdd55.json"))
+		path = lib.ErrorByte(os.ReadFile("../function-data/dev/sa/positive-apex-350507-33284d6fdd55.json"))
 	case "dev":
 		path = lib.GetFromStorage("function-data", "sa/positive-apex-350507-33284d6fdd55.json", "")
 	case "prod":
@@ -71,7 +71,6 @@ func (qs *QuoteSpreadsheet) setInitCells(sheetClient *sheets.Service, ctx contex
 	rb := &sheets.BatchUpdateValuesRequest{
 		ValueInputOption: "USER_ENTERED",
 	}
-
 
 	for _, cell := range qs.InitCells {
 		/*
