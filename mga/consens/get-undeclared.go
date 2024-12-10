@@ -82,7 +82,9 @@ func getUndeclaredConsens(product string, networkNode *models.NetworkNode) ([]Sy
 		return nil, err
 	}
 
-	allProductConsens = enrichConsens(allProductConsens, networkNode)
+	for i, c := range allProductConsens {
+		allProductConsens[i] = enrichConsens(c, networkNode)
+	}
 
 	log.Printf("found a total of %d consens for product %s", len(allProductConsens), product)
 
@@ -204,26 +206,22 @@ func (c MultipleConsens) Len() int           { return len(c) }
 func (c MultipleConsens) Swap(i, j int)      { c[i], c[j] = c[j], c[i] }
 func (c MultipleConsens) Less(i, j int) bool { return c[i].StartAt.After(c[j].StartAt) }
 
-func enrichConsens(consens []SystemConsens, networkNode *models.NetworkNode) []SystemConsens {
-	enrichedConsens := make([]SystemConsens, 0, len(consens))
+func enrichConsens(consens SystemConsens, networkNode *models.NetworkNode) SystemConsens {
 	regexNodeName := regexp.MustCompile("{{NODE_NAME}}")
 	regexNodeRuiSection := regexp.MustCompile("{{NODE_RUI_SECTION}}")
 	regexNodeRuiCode := regexp.MustCompile("{{NODE_RUI_CODE}}")
 	regexNodeRuiRegistrationDate := regexp.MustCompile("{{NODE_RUI_REGISTRATION_DATE}}")
 	regexNodeDesignation := regexp.MustCompile("{{NODE_DESIGNATION}}")
 
-	for i, c := range consens {
-		for j, cont := range c.Content {
-			text := cont.Text
-			text = regexNodeName.ReplaceAllString(text, networkNode.GetName())
-			text = regexNodeRuiSection.ReplaceAllString(text, networkNode.GetRuiSection())
-			text = regexNodeRuiCode.ReplaceAllString(text, networkNode.GetRuiCode())
-			text = regexNodeRuiRegistrationDate.ReplaceAllString(text, networkNode.GetRuiRegistration().Format("02/01/2006"))
-			text = regexNodeDesignation.ReplaceAllString(text, networkNode.Designation)
-			consens[i].Content[j].Text = text
-		}
-		enrichedConsens = append(enrichedConsens, c)
+	for j, cont := range consens.Content {
+		text := cont.Text
+		text = regexNodeName.ReplaceAllString(text, networkNode.GetName())
+		text = regexNodeRuiSection.ReplaceAllString(text, networkNode.GetRuiSection())
+		text = regexNodeRuiCode.ReplaceAllString(text, networkNode.GetRuiCode())
+		text = regexNodeRuiRegistrationDate.ReplaceAllString(text, networkNode.GetRuiRegistration().Format("02/01/2006"))
+		text = regexNodeDesignation.ReplaceAllString(text, networkNode.Designation)
+		consens.Content[j].Text = text
 	}
 
-	return enrichedConsens
+	return consens
 }

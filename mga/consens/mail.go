@@ -2,8 +2,6 @@ package consens
 
 import (
 	"bytes"
-	"fmt"
-	"strings"
 	"text/template"
 	"time"
 
@@ -24,7 +22,7 @@ func sendConsensMail(networkNode *models.NetworkNode, consens SystemConsens, nod
 		tpl           = new(bytes.Buffer)
 		htmlTemplate  = template.New("consens-mail")
 		to            = mail.GetNetworkNodeEmail(networkNode)
-		err error
+		err           error
 	)
 
 	content := markdownParser(consens, nodeConsens)
@@ -47,14 +45,12 @@ func sendConsensMail(networkNode *models.NetworkNode, consens SystemConsens, nod
 		return err
 	}
 
-	title := fmt.Sprintf("Consenso: %s", nodeConsens.Title)
-
 	mailRequest := mail.MailRequest{
 		FromAddress: mail.AddressAnna,
 		To:          []string{to.Address},
 		Message:     tpl.String(),
-		Title:       title,
-		Subject:     title,
+		Title:       nodeConsens.Title,
+		Subject:     nodeConsens.Title,
 		IsHtml:      true,
 	}
 
@@ -73,23 +69,9 @@ const style = "-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-
 const checkmark = "presa_visione"
 
 func markdownParser(consens SystemConsens, nodeConsens models.NodeConsens) string {
-	textParts := make([]string, 0)
-	for _, c := range consens.Content {
-		content := c.Text
-		prefix := ""
-		if c.InputName != "" {
-			prefix = "**(NO)**"
-			if nodeConsens.Answers[c.InputName] == checkmark || nodeConsens.Answers[c.InputName] == c.InputValue {
-				prefix = "**(SI)**"
-			}
-		}
-		content = lib.TrimSpace(strings.Join([]string{prefix, content}, " "))
-		textParts = append(textParts, content)
-	}
+	fullText := ContentToString(consens.Content, nodeConsens.Answers, false)
 
-	fullText := strings.Join(textParts, "\n\n")
-
-	extensions := parser.CommonExtensions | parser.AutoHeadingIDs | parser.NoEmptyLineBeforeBlock
+	extensions := parser.CommonExtensions | parser.AutoHeadingIDs | parser.NoEmptyLineBeforeBlock | parser.HardLineBreak
 	p := parser.NewWithExtensions(extensions)
 	doc := p.Parse([]byte(fullText))
 

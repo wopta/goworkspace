@@ -75,6 +75,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 		log.Println("error getting consens")
 		return "", nil, err
 	}
+	consens = enrichConsens(consens, networkNode)
 
 	ctx := context.WithValue(context.Background(), timestamp, now)
 	if err = consentMayBeGiven(ctx, consens, request, networkNode); err != nil {
@@ -87,7 +88,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 		ExpireAt: consens.ExpireAt,
 		StartAt:  consens.StartAt,
 		Title:    consens.Title,
-		Content:  consens.ToString(),
+		Content:  ContentToString(consens.Content, request.Answers, true),
 		Answers:  request.Answers,
 		GivenAt:  now,
 	}
@@ -119,9 +120,9 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 		RuiRegistration: networkNode.GetRuiRegistration(),
 		FiscalCode:      networkNode.GetFiscalCode(),
 		VatCode:         networkNode.GetVatCode(),
-		Slug:            consens.Slug,
-		Title:           consens.Title,
-		Content:         consens.ToString(),
+		Slug:            nodeConsens.Slug,
+		Title:           nodeConsens.Title,
+		Content:         nodeConsens.Content,
 		Answers:         request.Answers,
 		GivenAt:         now,
 	}

@@ -40,21 +40,39 @@ type ConsensContent struct {
 	Text       string `json:"text"`
 	InputType  string `json:"inputType,omitempty"`
 	InputName  string `json:"inputName,omitempty"`
+	InputGroup string `json:"inputGroup,omitempty"`
 	InputValue string `json:"inputValue,omitempty"`
 }
 
-func (c SystemConsens) ToString() string {
-	var parts []string
-
-	// TODO: this is an oversimplification
+func ContentToString(content []ConsensContent, nodeConsens map[string]string, removeMarkdown bool) string {
+	textParts := make([]string, 0)
+	seenConsentGroups := make([]string, 0)
 	markdown := regexp.MustCompile("[*_~`#]")
 
-	for _, cs := range c.Content {
-		text := markdown.ReplaceAll([]byte(cs.Text), []byte(""))
-		parts = append(parts, string(text))
+	for _, cs := range content {
+		content := cs.Text
+
+		if cs.InputGroup != "" && cs.InputValue != "" {
+			if nodeConsens[cs.InputName] != cs.InputValue {
+				continue
+			}
+			seenConsentGroups = append(seenConsentGroups, cs.InputGroup)
+		}
+
+		if cs.InputGroup != "" && !lib.SliceContains(seenConsentGroups, cs.InputGroup) {
+			continue
+		}
+
+		if removeMarkdown {
+			bytes := markdown.ReplaceAll([]byte(content), []byte(""))
+			content = string(bytes)
+		}
+
+		textParts = append(textParts, content)
+		continue
 	}
 
-	return strings.Join(parts, "\n")
+	return strings.Join(textParts, "\n\n")
 }
 
 func (c SystemConsens) ToOutput() OutputConsens {
