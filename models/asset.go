@@ -37,6 +37,7 @@ type Building struct {
 	NaicsDetail       string   `firestore:"activtyDetail,omitempty" json:"activtyDetail,omitempty"`
 	NaicsCategory     string   `firestore:"activityCategory,omitempty" json:"activityCategory,omitempty"`
 	Naics             string   `firestore:"naics,omitempty" json:"naics,omitempty"`
+	IsNaicsSellable   bool     `firestore:"isNaicsSellable,omitempty" json:"isNaicsSellable,omitempty"`
 	HasSandwitchPanel bool     `firestore:"hasSandwitchPanel" json:"hasSandwitchPanel"`
 	HasSprinkler      bool     `firestore:"hasSprinkler" json:"hasSprinkler"`
 	BuildingAddress   *Address `firestore:"buildingAddress,omitempty" json:"buildingAddress,omitempty"`

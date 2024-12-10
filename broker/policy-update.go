@@ -53,7 +53,11 @@ func UpdatePolicyFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	log.Printf("original policy: %s", string(originalPolicyBytes))
 
 	mergedInput := make(map[string]interface{})
-	input := plc.UpdatePolicy(&inputPolicy)
+	input, err := plc.UpdatePolicy(&inputPolicy)
+	if err != nil {
+		log.Printf("unable to update policy: %s", err.Error())
+		return "", nil, err
+	}
 	for k, v := range input {
 		mergedInput[k] = v
 	}

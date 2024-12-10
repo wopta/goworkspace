@@ -119,7 +119,7 @@ type Policy struct {
 	QuoteType         string                       `json:"quoteType" firestore:"quoteType" bigquery:"quoteType"`
 	HasMandate        bool                         `json:"hasMandate" firestore:"hasMandate" bigquery:"hasMandate"`
 	DeclaredClaims    []DeclaredClaims             `json:"declaredClaims,omitempty" firestore:"declaredClaims,omitempty" bigquery:"-"`
-	HasBond           string                       `json:"hasBond,omitempty" firestore:"hasBond,omitempty" bigquery:"-"`
+	HasBond           bool                         `json:"hasBond,omitempty" firestore:"hasBond,omitempty" bigquery:"-"`
 	Bond              string                       `json:"bond,omitempty" firestore:"bond,omitempty" bigquery:"-"`
 	Clause            string                       `json:"clause,omitempty" firestore:"clause,omitempty" bigquery:"-"`
 
