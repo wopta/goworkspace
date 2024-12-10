@@ -60,6 +60,18 @@ func checkQbe(p *models.Policy, i map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
+	err = checkQbeBonds(p)
+	if err != nil {
+		return err
+	}
+	err = checkQbeStatements(p)
+	if err != nil {
+		return err
+	}
+	err = checkQbeSignatory(p)
+	if err != nil {
+		return err
+	}
 
 	i["startDate"] = p.StartDate
 	i["endDate"] = p.EndDate
@@ -67,6 +79,52 @@ func checkQbe(p *models.Policy, i map[string]interface{}) error {
 	i["hasBond"] = p.HasBond
 	i["bond"] = p.Bond
 	i["clause"] = p.Clause
+
+	return nil
+}
+
+func checkQbeSignatory(p *models.Policy) error {
+	if p.Contractors == nil || len(*p.Contractors) == 0 {
+		return fmt.Errorf("no signatory provided")
+	}
+	sgn := (*p.Contractors)[0]
+	if sgn.Name == "" {
+		return fmt.Errorf("empty signatory name")
+	}
+	if sgn.Surname == "" {
+		return fmt.Errorf("empty signatory surname")
+	}
+	if sgn.FiscalCode == "" {
+		return fmt.Errorf("empty signatory fiscal code")
+	}
+	if checkFiscalCode(sgn.FiscalCode) == false {
+		return fmt.Errorf("wrong signatory fiscal code")
+	}
+	if sgn.Phone == "" {
+		return fmt.Errorf("wrong signatory phone number")
+	}
+	if sgn.Mail == "" {
+		return fmt.Errorf("wrong signatory mail")
+	}
+	if sgn.Consens == nil || len(*sgn.Consens) == 0 {
+		return fmt.Errorf("empty signatory consens")
+	}
+
+	return nil
+}
+
+func checkQbeStatements(p *models.Policy) error {
+	if len(*p.Statements) != 5 {
+		return fmt.Errorf("there must be 5 signed statements")
+	}
+
+	return nil
+}
+
+func checkQbeBonds(p *models.Policy) error {
+	if (p.HasBond) && (p.Bond == "") {
+		return fmt.Errorf("empty bond")
+	}
 
 	return nil
 }
@@ -91,6 +149,7 @@ func checkQbeAssets(p *models.Policy) error {
 			}
 		}
 	}
+
 	return nil
 }
 
@@ -111,6 +170,7 @@ func checkEnterprise(e *models.Enterprise) error {
 	if e.Revenue == "" {
 		return fmt.Errorf("empty total revenue")
 	}
+
 	return nil
 }
 
@@ -131,6 +191,7 @@ func checkBuilding(b *models.Building) error {
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -144,8 +205,8 @@ func checkQbeContractor(p *models.Policy) error {
 	if len(p.Contractor.VatCode) != 11 {
 		return fmt.Errorf("contractor Vat code must have 11 digits")
 	}
-	if checkFiscalCode(p.Contractor) == false {
-		return fmt.Errorf("wrong fiscal code")
+	if checkFiscalCode(p.Contractor.FiscalCode) == false {
+		return fmt.Errorf("wrong contractor fiscal code")
 	}
 	if p.Contractor.Name == "" {
 		return fmt.Errorf("empty contractor name")
@@ -154,6 +215,7 @@ func checkQbeContractor(p *models.Policy) error {
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -176,10 +238,11 @@ func checkAddress(a *models.Address) error {
 	if a.CityCode == "" {
 		return fmt.Errorf("empty address: city code")
 	}
+
 	return nil
 }
 
-func checkFiscalCode(c models.Contractor) bool {
+func checkFiscalCode(fc string) bool {
 	return true
 }
 
@@ -192,5 +255,6 @@ func checkDeclaredClaims(d []models.DeclaredClaims) error {
 			return fmt.Errorf("guarantee history must contain at least one year")
 		}
 	}
+
 	return nil
 }
