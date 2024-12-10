@@ -5,8 +5,10 @@ go 1.21
 replace github.com/wopta/goworkspace/mga => ./
 
 require (
+	cloud.google.com/go/bigquery v1.61.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	github.com/go-chi/chi/v5 v5.0.12
+	github.com/gomarkdown/markdown v0.0.0-20241205020045-f7e15b2f3e62
 	github.com/wopta/goworkspace/lib v1.0.132
 	github.com/wopta/goworkspace/mail v1.0.133
 	github.com/wopta/goworkspace/models v1.2.20
@@ -20,7 +22,6 @@ require (
 	cloud.google.com/go v0.113.0 // indirect
 	cloud.google.com/go/auth v0.4.1 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.2 // indirect
-	cloud.google.com/go/bigquery v1.61.0 // indirect
 	cloud.google.com/go/compute/metadata v0.3.0 // indirect
 	cloud.google.com/go/firestore v1.15.0 // indirect
 	cloud.google.com/go/iam v1.1.8 // indirect

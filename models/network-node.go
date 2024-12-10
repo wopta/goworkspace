@@ -48,6 +48,7 @@ type NetworkNode struct {
 	WorksForUid         string                `json:"worksForUid" firestore:"worksForUid" bigquery:"-"`
 	CallbackConfig      *CallbackConfig       `json:"callbackConfig,omitempty" firestore:"callbackConfig,omitempty" bigquery:"-"`
 	JwtConfig           lib.JwtConfig         `json:"jwtConfig,omitempty" firestore:"jwtConfig,omitempty" bigquery:"-"`
+	Consens             []NodeConsens         `json:"consens" firestore:"consens" bigquery:"-"`
 }
 
 type NodeProduct struct {
@@ -62,6 +63,16 @@ type NodeCompany struct {
 
 type CallbackConfig struct {
 	Name string `json:"name" firestore:"name" bigquery:"-"`
+}
+
+type NodeConsens struct {
+	Slug     string            `json:"slug" firestore:"slug" bigquery:"-"`
+	ExpireAt time.Time         `json:"expireAt" firestore:"expireAt" bigquery:"-"`
+	StartAt  time.Time         `json:"startAt" firestore:"startAt" bigquery:"-"`
+	Title    string            `json:"title" firestore:"title" bigquery:"-"`
+	Content  string            `json:"content" firestore:"content" bigquery:"-"`
+	Answers  map[string]string `json:"answers" firestore:"answers" bigquery:"-"`
+	GivenAt  time.Time         `json:"givenAt" firestore:"givenAt" bigquery:"-"`
 }
 
 func NetworkNodeToListData(query *firestore.DocumentIterator) []NetworkNode {
@@ -256,6 +267,87 @@ func (nn *NetworkNode) GetAddress() string {
 	}
 
 	return address
+}
+
+func (nn *NetworkNode) GetRuiCode() string {
+	var ruiCode string
+
+	switch nn.Type {
+	case AgentNetworkNodeType:
+		ruiCode = nn.Agent.RuiCode
+	case AgencyNetworkNodeType:
+		ruiCode = nn.Agency.RuiCode
+	case BrokerNetworkNodeType:
+		ruiCode = nn.Broker.RuiCode
+	case AreaManagerNetworkNodeType:
+		ruiCode = nn.AreaManager.RuiCode
+	}
+
+	return ruiCode
+}
+
+func (nn *NetworkNode) GetRuiSection() string {
+	var ruiSection string
+
+	switch nn.Type {
+	case AgentNetworkNodeType:
+		ruiSection = nn.Agent.RuiSection
+	case AgencyNetworkNodeType:
+		ruiSection = nn.Agency.RuiSection
+	case BrokerNetworkNodeType:
+		ruiSection = nn.Broker.RuiSection
+	case AreaManagerNetworkNodeType:
+		ruiSection = nn.AreaManager.RuiSection
+	}
+
+	return ruiSection
+}
+
+func (nn *NetworkNode) GetRuiRegistration() time.Time {
+	var ruiRegistration time.Time
+
+	switch nn.Type {
+	case AgentNetworkNodeType:
+		ruiRegistration = nn.Agent.RuiRegistration
+	case AgencyNetworkNodeType:
+		ruiRegistration = nn.Agency.RuiRegistration
+	case BrokerNetworkNodeType:
+		ruiRegistration = nn.Broker.RuiRegistration
+	case AreaManagerNetworkNodeType:
+		ruiRegistration = nn.AreaManager.RuiRegistration
+	}
+
+	return ruiRegistration
+}
+
+func (nn *NetworkNode) GetVatCode() string {
+	var vatCode string
+
+	switch nn.Type {
+	case AgentNetworkNodeType:
+		vatCode = nn.Agent.VatCode
+	case AgencyNetworkNodeType:
+		vatCode = nn.Agency.VatCode
+	case BrokerNetworkNodeType:
+		vatCode = nn.Broker.VatCode
+	case AreaManagerNetworkNodeType:
+		vatCode = nn.AreaManager.VatCode
+	}
+
+	return vatCode
+}
+
+func (nn *NetworkNode) GetFiscalCode() string {
+	var fiscalCode string
+
+	switch nn.Type {
+	case AgentNetworkNodeType:
+		fiscalCode = nn.Agent.FiscalCode
+	case AreaManagerNetworkNodeType:
+		fiscalCode = nn.AreaManager.FiscalCode
+	}
+
+	return fiscalCode
 }
 
 func (nn *NetworkNode) IsJwtProtected() bool {
