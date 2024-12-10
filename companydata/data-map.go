@@ -3,6 +3,7 @@ package companydata
 import (
 	"fmt"
 	"log"
+	"reflect"
 	"strconv"
 	"strings"
 	"time"
@@ -25,6 +26,7 @@ func GetMapFx(name string, value []interface{}) interface{} {
 		"getNextPayDate":               getNextPayDate,
 		"getNextPayRate":               getNextPayRate,
 		"ifZeroEmpty":                  ifZeroEmpty,
+		"dotToComma":                   dotToComma,
 	}
 	return res[name](value)
 }
@@ -98,17 +100,21 @@ func getNextPayDate(s []interface{}) interface{} {
 }
 func getNextPayRate(s []interface{}) interface{} {
 	var (
-		res interface{}
+		res    interface{}
+		resOut interface{}
 	)
 
 	if s[1].(string) == "monthly" {
 		res = s[0].(map[string]interface{})["premiumGrossMonthly"]
-
 	} else {
 		res = s[0].(map[string]interface{})["premiumGrossYearly"]
 	}
 
-	return res
+	if reflect.TypeOf(s[0]).String() == "float64" {
+		s := fmt.Sprintf("%v", res.(float64))
+		resOut = strings.Replace(s, ".", ",", -1)
+	}
+	return resOut
 }
 func ifZeroEmpty(s []interface{}) interface{} {
 	var (
@@ -121,6 +127,18 @@ func ifZeroEmpty(s []interface{}) interface{} {
 	} else {
 
 		res = s[0]
+	}
+
+	return res
+}
+func dotToComma(s []interface{}) interface{} {
+	var (
+		res interface{}
+	)
+
+	if reflect.TypeOf(s[0]).String() == "float64" {
+		s := fmt.Sprintf("%v", s[0].(float64))
+		res = strings.Replace(s, ".", ",", -1)
 	}
 
 	return res

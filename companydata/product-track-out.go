@@ -48,6 +48,7 @@ func ProductTrackOutFx(w http.ResponseWriter, r *http.Request) (string, interfac
 	for _, ev := range reqData.Event {
 		var result [][]string
 		log.Println("start len(result): ", len(result))
+		log.Println("event: ", ev)
 		switch ev {
 
 		case "emit":
@@ -249,7 +250,7 @@ func checkMap(column Column, value []interface{}) interface{} {
 
 }
 func (track *Track) setFrequency(now time.Time) (time.Time, time.Time) {
-	location, e := time.LoadLocation("Europe/Rome")
+	location, e := time.LoadLocation("")
 	lib.CheckError(e)
 	switch track.Frequency {
 	case "monthly":
@@ -306,10 +307,6 @@ func firestoreQuery[T any](from time.Time, to time.Time, db Database) []T {
 }
 func BigQuery[T any](from time.Time, to time.Time, db Database) []T {
 	var value interface{}
-	firequery := lib.FireGenericQueries[T]{
-		Queries: []lib.Firequery{},
-	}
-
 	for _, qe := range db.Query {
 		value = qe.QueryValue
 		if qe.QueryValue == "from" {
@@ -319,14 +316,21 @@ func BigQuery[T any](from time.Time, to time.Time, db Database) []T {
 			value = to
 		}
 
-		firequery.Queries = append(firequery.Queries,
-			lib.Firequery{
-				Field:      qe.Field,    //
-				Operator:   qe.Operator, //
-				QueryValue: value,
-			})
 	}
-	res, _, e := firequery.FireQueryUid(db.Dataset)
+
+	query := fmt.Sprintf("SELECT rootUid, ntr.parentUid, nodeUid, COALESCE(nnv.name, '') AS name, relativeLevel, "+
+		"ntr.creationDate  FROM `%s.%s` ntr INNER JOIN `%s.%s` nnv ON ntr.nodeUid = nnv.uid  "+
+		"WHERE nodeUid = @nodeUid ORDER BY relativeLevel", models.WoptaDataset,
+		models.NetworkTreeStructureTable, models.WoptaDataset, models.NetworkNodesView)
+	params := map[string]interface{}{
+		"nodeUid": value,
+	}
+
+	res, err := lib.QueryParametrizedRowsBigQuery[T](query, params)
+	if err != nil {
+		log.Printf("error fetching ancestors from BigQuery for node %s: %s", value, err.Error())
+		return nil
+	}
 	lib.CheckError(e)
 	return res
 }
