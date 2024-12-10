@@ -258,10 +258,11 @@ func (track *Track) setFrequency(now time.Time) (time.Time, time.Time) {
 		from = lib.GetFirstDay(prevMonth)
 		to = lib.GetFirstDay(now)
 	case "daily":
-		prevDay := now.AddDate(0, 0, -1)
+		prevDay := now.AddDate(0, 0, -2)
 		from = time.Date(prevDay.Year(), prevDay.Month(), prevDay.Day(), 0, 0, 0, 0, location)
 		to = time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, location)
 	}
+
 	log.Println("setFrequency from: ", from, "to: ", to)
 	track.from = from
 	track.to = to
