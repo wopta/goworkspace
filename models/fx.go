@@ -442,3 +442,50 @@ func (fx *Fx) RemoveGuaranteesPriceZero(guarantees map[string]*Guarante) {
 func (fx *Fx) RemoveOfferPrice(offerPrice map[string]map[string]*Price, offerKey string) {
 	delete(offerPrice, offerKey)
 }
+
+func (fx *Fx) HasAssetType(input map[string]interface{}, assetType string) bool {
+	j, err := json.Marshal(input)
+	lib.CheckError(err)
+	var policy Policy
+	err = json.Unmarshal(j, &policy)
+	lib.CheckError(err)
+	for _, asset := range policy.Assets {
+		if asset.Type == assetType {
+			return true
+		}
+	}
+	return false
+}
+
+func (fx *Fx) HasGuaranteeInSlice(input map[string]interface{}, slugList... string) bool {
+	j, err := json.Marshal(input)
+	lib.CheckError(err)
+	var policy Policy
+	err = json.Unmarshal(j, &policy)
+	lib.CheckError(err)
+	for _, asset := range policy.Assets {
+		for _, guarantee := range asset.Guarantees {
+			if lib.SliceContains(slugList, guarantee.Slug) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func (fx *Fx) GetSignatoryMail(input map[string]interface{}) string {
+	j, err := json.Marshal(input)
+	lib.CheckError(err)
+	var policy Policy
+	err = json.Unmarshal(j, &policy)
+	lib.CheckError(err)
+	if policy.Contractors != nil {
+		for _, c := range *policy.Contractors {
+			if c.IsSignatory {
+				return c.Mail
+			}
+		}
+	}
+	lib.CheckError(fmt.Errorf("signatory not found"))
+	return ""
+}

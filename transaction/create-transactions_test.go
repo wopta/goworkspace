@@ -1,12 +1,13 @@
 package transaction
 
 import (
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/models"
-	"github.com/wopta/goworkspace/product"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/product"
 )
 
 type dateInfo struct {
@@ -43,7 +44,7 @@ func outputGenerator(numOutput int, startDate time.Time) []dateInfo {
 		effectiveDate := lib.AddMonths(startDate, i)
 		output = append(output, dateInfo{
 			ScheduleDate:   effectiveDate.Format(time.DateOnly),
-			ExpirationDate: effectiveDate.AddDate(10, 0, 0).Format(time.DateOnly),
+			ExpirationDate: lib.AddMonths(startDate, 18).Format(time.DateOnly),
 			EffectiveDate:  effectiveDate,
 		})
 	}
