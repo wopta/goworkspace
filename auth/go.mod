@@ -8,9 +8,9 @@ require (
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/golang-jwt/jwt/v5 v5.2.1
-	github.com/wopta/goworkspace/lib v1.0.132
-	github.com/wopta/goworkspace/models v1.2.20
-	github.com/wopta/goworkspace/network v1.0.85
+	github.com/wopta/goworkspace/lib v1.0.133
+	github.com/wopta/goworkspace/models v1.2.21
+	github.com/wopta/goworkspace/network v1.0.86
 )
 
 require (
