@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	ruiSectionEStrategy = "rui_section_e"
+	ruiSectionEStrategy = "rui_section_e_mga_proponent"
 	allNodesStrategy    = "all_nodes"
 )
 
@@ -44,6 +44,10 @@ func (w *RuisectionE) Check(ctx context.Context) (bool, error) {
 	}
 
 	if !strings.EqualFold(ruiSection, ruiSectionE) {
+		return true, nil
+	}
+
+	if !w.node.IsMgaProponent {
 		return true, nil
 	}
 
