@@ -10,17 +10,8 @@ import (
 
 func UpdatePolicy(policy *models.Policy) (map[string]interface{}, error) {
 	input := make(map[string]interface{}, 0)
-	var err error
 
-	err = checkQbeAssets(policy)
-	if err != nil {
-		return nil, err
-	}
 	input["assets"] = policy.Assets
-	err = checkQbeContractor(policy)
-	if err != nil {
-		return nil, err
-	}
 	input["contractor"] = policy.Contractor
 	input["fundsOrigin"] = policy.FundsOrigin
 	if policy.Surveys != nil {
@@ -43,16 +34,10 @@ func UpdatePolicy(policy *models.Policy) (map[string]interface{}, error) {
 		input["priceNettMonthly"] = policy.PriceNettMonthly
 		input["priceGrossMonthly"] = policy.PriceGrossMonthly
 	case models.CommercialCombinedProduct:
-		input["startDate"] = policy.StartDate
-		input["endDate"] = policy.EndDate
-		err = checkDeclaredClaims(policy.DeclaredClaims)
+		err := checkQbe(policy, input)
 		if err != nil {
 			return nil, err
 		}
-		input["declaredClaims"] = policy.DeclaredClaims
-		input["hasBond"] = policy.HasBond
-		input["bond"] = policy.Bond
-		input["clause"] = policy.Clause
 	}
 
 	input["updated"] = time.Now().UTC()
@@ -60,12 +45,35 @@ func UpdatePolicy(policy *models.Policy) (map[string]interface{}, error) {
 	return input, nil
 }
 
+func checkQbe(p *models.Policy, i map[string]interface{}) error {
+	var err error
+
+	err = checkQbeAssets(p)
+	if err != nil {
+		return err
+	}
+	err = checkQbeContractor(p)
+	if err != nil {
+		return err
+	}
+	err = checkDeclaredClaims(p.DeclaredClaims)
+	if err != nil {
+		return err
+	}
+
+	i["startDate"] = p.StartDate
+	i["endDate"] = p.EndDate
+	i["declaredClaims"] = p.DeclaredClaims
+	i["hasBond"] = p.HasBond
+	i["bond"] = p.Bond
+	i["clause"] = p.Clause
+
+	return nil
+}
+
 func checkQbeAssets(p *models.Policy) error {
 	var err error
 
-	if p.Name != models.CommercialCombinedProduct {
-		return nil
-	}
 	for _, v := range p.Assets {
 		if v.Uuid == "" {
 			return fmt.Errorf("empty Uuid for asset %s", v.Name)
@@ -127,9 +135,6 @@ func checkBuilding(b *models.Building) error {
 }
 
 func checkQbeContractor(p *models.Policy) error {
-	if p.Name != models.CommercialCombinedProduct {
-		return nil
-	}
 	if p.Contractor.Type != "legalEntity" {
 		return fmt.Errorf("invalid contractor type")
 	}
