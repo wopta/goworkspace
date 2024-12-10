@@ -61,11 +61,11 @@ type Enterprise struct {
 	AtecoSub                  string   `firestore:"atecoSub,omitempty" json:"atecoSub,omitempty"`
 	Class                     string   `firestore:"class" json:"class,omitempty"`
 	Sector                    string   `firestore:"sector,omitempty" json:"sector,omitempty"`
-	Revenue                   string   `firestore:"revenue,omitempty" json:"revenue,omitempty"`
+	Revenue                   float64  `firestore:"revenue,omitempty" json:"revenue,omitempty"`
 	Employer                  int64    `firestore:"employer,omitempty" json:"employer,omitempty"`
-	WorkEmployersRemuneration string   `firestore:"workEmployersRemuneration,omitempty" json:"workEmployersRemuneration,omitempty"`
-	TotalBilled               string   `firestore:"totalBilled,omitempty" json:"totalBilled,omitempty"`
-	NorthAmericanMarket       string   `firestore:"northAmericanMarket,omitempty" json:"northAmericanMarket,omitempty"`
+	WorkEmployersRemuneration float64  `firestore:"workEmployersRemuneration,omitempty" json:"workEmployersRemuneration,omitempty"`
+	TotalBilled               float64  `firestore:"totalBilled,omitempty" json:"totalBilled,omitempty"`
+	NorthAmericanMarket       float64  `firestore:"northAmericanMarket,omitempty" json:"northAmericanMarket,omitempty"`
 	YearOfEstablishment       int      `firestore:"yearOfEstablishment,omitempty" json:"yearOfEstablishment,omitempty"`
 	EnterpriseAddress         *Address `firestore:"enterpriseAddress,omitempty" json:"enterpriseAddress,omitempty"`
 }

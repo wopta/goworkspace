@@ -157,18 +157,11 @@ func checkEnterprise(e *models.Enterprise) error {
 	if e.Employer < 1 || e.Employer > 100 {
 		return fmt.Errorf("number of employers must be between 1 and 100")
 	}
-	if e.WorkEmployersRemuneration == "" {
-		return fmt.Errorf("empty employer remuneration")
-	}
-	num, err := strconv.Atoi(e.WorkEmployersRemuneration)
-	if err != nil {
-		return fmt.Errorf("employer remuneration must consist of digits only")
-	}
-	if num < 1 {
+	if e.WorkEmployersRemuneration < 1 {
 		return fmt.Errorf("employer remuneration must be greater than 1")
 	}
-	if e.Revenue == "" {
-		return fmt.Errorf("empty total revenue")
+	if e.Revenue == 0 {
+		return fmt.Errorf("revenue must be greater than 0")
 	}
 
 	return nil

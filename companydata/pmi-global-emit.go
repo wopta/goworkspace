@@ -83,7 +83,7 @@ func getPmiData(policies []models.Policy) [][]string {
 		result                                    [][]string
 		enterpriseName                            string
 		employer, class, sector, atecoDesc, ateco string
-		revenue                                   int
+		revenue                                   float64
 		sumlimitContentBuilding                   float64
 		e                                         error
 	)
@@ -101,7 +101,7 @@ func getPmiData(policies []models.Policy) [][]string {
 			if asset.Enterprise != nil {
 				enterpriseName = asset.Enterprise.Name
 				employer = fmt.Sprint(asset.Enterprise.Employer)
-				revenue, _ = strconv.Atoi(asset.Enterprise.Revenue)
+				revenue = asset.Enterprise.Revenue
 				sector = asset.Enterprise.AtecoMacro
 				class = asset.Enterprise.AtecoSub
 				atecoDesc = asset.Enterprise.AtecoDesc
