@@ -11,7 +11,7 @@ import (
 func UpdatePolicy(policy *models.Policy) (map[string]interface{}, error) {
 	input := make(map[string]interface{}, 0)
 	var err error
-	
+
 	err = checkQbeAssets(policy)
 	if err != nil {
 		return nil, err
@@ -183,8 +183,8 @@ func checkDeclaredClaims(d []models.DeclaredClaims) error {
 		if v.GuaranteeSlug == "" {
 			return fmt.Errorf("empty guarantee slug")
 		}
-		if len(v.History) < 2 {
-			return fmt.Errorf("guarantee history must contain at least two years")
+		if len(v.History) == 0 {
+			return fmt.Errorf("guarantee history must contain at least one year")
 		}
 	}
 	return nil
