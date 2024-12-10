@@ -76,6 +76,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 		return "", nil, err
 	}
 	consens = enrichConsens(consens, networkNode)
+	log.Printf("found consens: %+v", consens)
 
 	ctx := context.WithValue(context.Background(), timestamp, now)
 	if err = consentMayBeGiven(ctx, consens, request, networkNode); err != nil {
@@ -92,6 +93,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 		Answers:  request.Answers,
 		GivenAt:  now,
 	}
+	log.Printf("constructing consent: %+v", nodeConsens)
 
 	nodeConsensIndex := slices.IndexFunc(networkNode.Consens, func(c models.NodeConsens) bool {
 		return c.Slug == consens.Slug
@@ -105,6 +107,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 		networkNode.Consens[nodeConsensIndex] = nodeConsens
 	}
 
+	log.Println("saving networkNode to DBs...")
 	if err := networkNode.SaveFirestore(); err != nil {
 		log.Println("error saving networkNode in firestore")
 		return "", nil, err
@@ -126,17 +129,20 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 		Answers:         request.Answers,
 		GivenAt:         now,
 	}
+	log.Println("saving consens audit to BigQuery...")
 	if err := audit.Save(); err != nil {
 		log.Println("error saving consens audit")
 		return "", nil, err
 	}
 
+	log.Println("sending consens mail to networkNode...")
 	if err := sendConsensMail(networkNode, consens, nodeConsens); err != nil {
 		log.Printf("error while sending mail: %v", err)
 		log.Println("continuing acceptance process...")
 		err = nil
 	}
 
+	log.Println("fetching undeclared consens...")
 	if undeclaredConsens, err = getUndeclaredConsens(request.Product, networkNode); err != nil {
 		log.Println("error getting undeclared consens")
 		return "", nil, err

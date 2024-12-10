@@ -65,7 +65,6 @@ type CallbackConfig struct {
 	Name string `json:"name" firestore:"name" bigquery:"-"`
 }
 
-// TODO: consider saving only slug and value
 type NodeConsens struct {
 	Slug     string            `json:"slug" firestore:"slug" bigquery:"-"`
 	ExpireAt time.Time         `json:"expireAt" firestore:"expireAt" bigquery:"-"`

@@ -66,7 +66,6 @@ type BodyData struct {
 }
 
 const style = "-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:17px;color:#000000;font-size:14px"
-const checkmark = "presa_visione"
 
 func markdownParser(consens SystemConsens, nodeConsens models.NodeConsens) string {
 	fullText := ContentToString(consens.Content, nodeConsens.Answers, false)

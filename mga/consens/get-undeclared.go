@@ -52,6 +52,7 @@ func GetUndeclaredConsensFx(w http.ResponseWriter, r *http.Request) (string, any
 
 	product := r.URL.Query().Get("product")
 
+	log.Println("fetching undeclared consens...")
 	if consens, err = getUndeclaredConsens(product, networkNode); err != nil {
 		log.Println("error getting undeclared consens")
 		return "", nil, err
@@ -78,6 +79,7 @@ func getUndeclaredConsens(product string, networkNode *models.NetworkNode) ([]Sy
 		now               = time.Now().UTC()
 	)
 
+	log.Printf("retrieving product %s consens...", product)
 	if allProductConsens, err = getProductConsens(product); err != nil {
 		return nil, err
 	}
@@ -101,16 +103,19 @@ func getUndeclaredConsens(product string, networkNode *models.NetworkNode) ([]Sy
 			continue
 		}
 
+		log.Println("checking consens configuration...")
 		strategy, err := newConsensStrategy(c, *networkNode)
 		if err != nil {
 			return nil, err
 		}
+		log.Printf("executing strategy '%s'...", c.Strategy)
 		valid, err := strategy.Check(ctx)
 		if err != nil {
 			return nil, err
 		}
 
 		if !valid {
+			log.Printf("adding consens '%s' to undeclared list", c.Slug)
 			undeclaredConsens = append(undeclaredConsens, c)
 		}
 	}
