@@ -195,7 +195,7 @@ func getDeductableMap(key string) string {
 	}
 	return res
 }
-func getMapRevenue(key int) string {
+func getMapRevenue(key float64) string {
 	var res int
 
 	if key <= 200000 { // will be false if person is not in the map
