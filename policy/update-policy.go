@@ -85,7 +85,7 @@ func checkQbe(p *models.Policy, i map[string]interface{}) error {
 
 func checkQbeSignatory(p *models.Policy) error {
 	if p.Contractors == nil || len(*p.Contractors) == 0 {
-		return fmt.Errorf("no signatory provided")
+		return nil
 	}
 	sgn := (*p.Contractors)[0]
 	if sgn.Name == "" {
@@ -114,9 +114,6 @@ func checkQbeSignatory(p *models.Policy) error {
 }
 
 func checkQbeStatements(p *models.Policy) error {
-	if len(*p.Statements) != 5 {
-		return fmt.Errorf("there must be 5 signed statements")
-	}
 
 	return nil
 }
@@ -131,6 +128,10 @@ func checkQbeBonds(p *models.Policy) error {
 
 func checkQbeAssets(p *models.Policy) error {
 	var err error
+
+	if p.Assets == nil {
+		return nil
+	}
 
 	for _, v := range p.Assets {
 		if v.Uuid == "" {
@@ -160,7 +161,7 @@ func checkEnterprise(e *models.Enterprise) error {
 	if e.WorkEmployersRemuneration < 1 {
 		return fmt.Errorf("employer remuneration must be greater than 1")
 	}
-	if e.Revenue == 0 {
+	if e.Revenue < 1 {
 		return fmt.Errorf("revenue must be greater than 0")
 	}
 
@@ -189,6 +190,9 @@ func checkBuilding(b *models.Building) error {
 }
 
 func checkQbeContractor(p *models.Policy) error {
+	if p.Contractor.Name == "" {
+		return nil
+	}
 	if p.Contractor.Type != "legalEntity" {
 		return fmt.Errorf("invalid contractor type")
 	}
@@ -201,9 +205,6 @@ func checkQbeContractor(p *models.Policy) error {
 	if checkFiscalCode(p.Contractor.FiscalCode) == false {
 		return fmt.Errorf("wrong contractor fiscal code")
 	}
-	if p.Contractor.Name == "" {
-		return fmt.Errorf("empty contractor name")
-	}
 	err := checkAddress(p.Contractor.CompanyAddress)
 	if err != nil {
 		return err
@@ -213,6 +214,9 @@ func checkQbeContractor(p *models.Policy) error {
 }
 
 func checkAddress(a *models.Address) error {
+	if a == nil {
+		return fmt.Errorf("nil address")
+	}
 	if a.StreetName == "" {
 		return fmt.Errorf("empty address: street name")
 	}
@@ -240,6 +244,9 @@ func checkFiscalCode(fc string) bool {
 }
 
 func checkDeclaredClaims(d []models.DeclaredClaims) error {
+	if d == nil {
+		return nil
+	}
 	for _, v := range d {
 		if v.GuaranteeSlug == "" {
 			return fmt.Errorf("empty guarantee slug")
