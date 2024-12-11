@@ -27,7 +27,7 @@ func GetMapFx(name string, value []interface{}) interface{} {
 		"getNextPayRate":               getNextPayRate,
 		"ifZeroEmpty":                  ifZeroEmpty,
 		"dotToComma":                   dotToComma,
-		"personaDeductible":                   personaDeductible,
+		"personaDeductible":            personaDeductible,
 	}
 	return res[name](value)
 }
@@ -113,7 +113,7 @@ func getNextPayRate(s []interface{}) interface{} {
 		res = s[0].(map[string]interface{})["premiumGrossYearly"]
 	}
 
-	if reflect.TypeOf(s[0]).String() == "float64" {
+	if reflect.TypeOf(res).String() == "float64" {
 		s := fmt.Sprintf("%v", res.(float64))
 		resOut = strings.Replace(s, ".", ",", -1)
 	}
@@ -142,7 +142,6 @@ func personaDeductible(s []interface{}) interface{} {
 	deductibleType := s[0].(map[string]interface{})["deductibleType"]
 	if deductible == "5" && deductibleType == "absorbable" {
 		res = "1"
-
 	}
 	if deductible == "10" && deductibleType == "absorbable" {
 		res = "2"
