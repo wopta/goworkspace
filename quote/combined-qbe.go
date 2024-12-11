@@ -371,7 +371,7 @@ func setInputCell(policy *models.Policy) []Cell {
 			inputCells = append(inputCells, Cell{Cell: col[i] + "20", Value: build.Building.NaicsDetail})
 			inputCells = append(inputCells, Cell{Cell: col[i] + "21", Value: build.Building.Naics})
 			inputCells = append(inputCells, Cell{Cell: col[i] + "33", Value: build.Building.BuildingMaterial})
-			if build.Building.IsAlarm {
+			if build.Building.HasAlarm {
 				inputCells = append(inputCells, Cell{Cell: col[i] + "35", Value: "SI"})
 			}
 			if build.Building.HasSandwichPanel {

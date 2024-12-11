@@ -153,7 +153,7 @@ func getPmiData(policies []models.Policy) [][]string {
 						getMapBuildingYear(asset.Building.BuildingYear),         //ANNO DI COSTRUZIONE FABBRICATO
 						getMapBuildingMaterial(asset.Building.BuildingMaterial), //MATERIALE COSTRUZIONE
 						getMapBuildingFloor(asset.Building.Floor),               //NUMERO PIANI
-						getOneTwo(asset.Building.IsAlarm),                       //PRESENZA ALLARME
+						getOneTwo(asset.Building.HasAlarm),                      //PRESENZA ALLARME
 						"",                                                      //PRESENZA POLIZZA CONDOMINIALE
 						getOneTwo(asset.Building.IsHolder),                      //TIPOLOGIA FABBRICATO
 						asset.Building.CityCode,                                 //PROVINCIA UBICAZIONE

@@ -291,7 +291,7 @@ func (s Skin) GetPmi(data models.Policy, m pdf.Maroto) pdf.Maroto {
 			if build.IsHolder {
 				holder = "di proprietà "
 			}
-			if build.IsAlarm {
+			if build.HasAlarm {
 				alarm = "con"
 			} else {
 				alarm = "senza"

@@ -26,7 +26,7 @@ type Building struct {
 	BuildingMaterial string   `firestore:"buildingMaterial,omitempty" json:"buildingMaterial,omitempty"`
 	BuildingYear     string   `firestore:"buildingYear,omitempty" json:"buildingYear,omitempty"`
 	Employer         int64    `firestore:"employer,omitempty" json:"employer,omitempty"`
-	IsAlarm          bool     `firestore:"isAlarm" json:"isAlarm"`
+	HasAlarm         bool     `firestore:"hasAlarm" json:"hasAlarm"`
 	Floor            string   `firestore:"floor,omitempty" json:"floor,omitempty"`
 	Ateco            string   `firestore:"ateco,omitempty" json:"ateco,omitempty"`
 	AtecoDesc        string   `firestore:"atecoDesc,omitempty" json:"atecoDesc,omitempty"`
