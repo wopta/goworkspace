@@ -371,12 +371,12 @@ func setInputCell(policy *models.Policy) []Cell {
 			inputCells = append(inputCells, Cell{Cell: col[i] + "20", Value: build.Building.NaicsDetail})
 			inputCells = append(inputCells, Cell{Cell: col[i] + "21", Value: build.Building.Naics})
 			inputCells = append(inputCells, Cell{Cell: col[i] + "33", Value: build.Building.BuildingMaterial})
-			if build.Building.HasSandwitchPanel {
+			if build.Building.HasSandwichPanel {
 				inputCells = append(inputCells, Cell{Cell: col[i] + "34", Value: "SI"})
 			} else {
 				inputCells = append(inputCells, Cell{Cell: col[i] + "34", Value: "NO"})
 			}
-			if build.Building.IsAllarm {
+			if build.Building.HasAlarm {
 				inputCells = append(inputCells, Cell{Cell: col[i] + "35", Value: "SI"})
 			} else {
 				inputCells = append(inputCells, Cell{Cell: col[i] + "35", Value: "NO"})
@@ -544,7 +544,7 @@ func getEnterpriseGuaranteCellsBySlug(guarante models.Guarante) []Cell {
 	case "excluded-formula":
 		cells = []Cell{
 			{
-				Cell: "C57",
+				Cell:  "C57",
 				Value: "Esclusa",
 			},
 		}

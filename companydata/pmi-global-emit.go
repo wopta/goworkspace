@@ -83,7 +83,7 @@ func getPmiData(policies []models.Policy) [][]string {
 		result                                    [][]string
 		enterpriseName                            string
 		employer, class, sector, atecoDesc, ateco string
-		revenue                                   int
+		revenue                                   float64
 		sumlimitContentBuilding                   float64
 		e                                         error
 	)
@@ -101,7 +101,7 @@ func getPmiData(policies []models.Policy) [][]string {
 			if asset.Enterprise != nil {
 				enterpriseName = asset.Enterprise.Name
 				employer = fmt.Sprint(asset.Enterprise.Employer)
-				revenue, _ = strconv.Atoi(asset.Enterprise.Revenue)
+				revenue = asset.Enterprise.Revenue
 				sector = asset.Enterprise.AtecoMacro
 				class = asset.Enterprise.AtecoSub
 				atecoDesc = asset.Enterprise.AtecoDesc
@@ -153,7 +153,7 @@ func getPmiData(policies []models.Policy) [][]string {
 						getMapBuildingYear(asset.Building.BuildingYear),         //ANNO DI COSTRUZIONE FABBRICATO
 						getMapBuildingMaterial(asset.Building.BuildingMaterial), //MATERIALE COSTRUZIONE
 						getMapBuildingFloor(asset.Building.Floor),               //NUMERO PIANI
-						getOneTwo(asset.Building.IsAllarm),                      //PRESENZA ALLARME
+						getOneTwo(asset.Building.HasAlarm),                      //PRESENZA ALLARME
 						"",                                                      //PRESENZA POLIZZA CONDOMINIALE
 						getOneTwo(asset.Building.IsHolder),                      //TIPOLOGIA FABBRICATO
 						asset.Building.CityCode,                                 //PROVINCIA UBICAZIONE

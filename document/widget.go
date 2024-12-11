@@ -291,7 +291,7 @@ func (s Skin) GetPmi(data models.Policy, m pdf.Maroto) pdf.Maroto {
 			if build.IsHolder {
 				holder = "di proprietà "
 			}
-			if build.IsAllarm {
+			if build.HasAlarm {
 				alarm = "con"
 			} else {
 				alarm = "senza"
@@ -346,8 +346,7 @@ func (s Skin) GetPmi(data models.Policy, m pdf.Maroto) pdf.Maroto {
 		if A.Enterprise != nil {
 
 			e := A.Enterprise
-			rev, err := strconv.Atoi(e.Revenue)
-			lib.CheckError(err)
+			rev := e.Revenue
 			c = append(c, []string{"", "", "Attività"})
 			d = append(d, "Fatturato: € "+humanize.FormatInteger("#.###,", int(rev)))
 			d = append(d, "Addetti nr: "+strconv.Itoa(int(e.Employer)))

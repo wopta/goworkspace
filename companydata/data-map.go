@@ -27,6 +27,7 @@ func GetMapFx(name string, value []interface{}) interface{} {
 		"getNextPayRate":               getNextPayRate,
 		"ifZeroEmpty":                  ifZeroEmpty,
 		"dotToComma":                   dotToComma,
+		"personaDeductible":                   personaDeductible,
 	}
 	return res[name](value)
 }
@@ -103,7 +104,9 @@ func getNextPayRate(s []interface{}) interface{} {
 		res    interface{}
 		resOut interface{}
 	)
-
+	log.Println("getNextPayRate s[1].(string): ", s[1].(string))
+	log.Println("getNextPayRate premiumGrossMonthly: ", s[0].(map[string]interface{})["premiumGrossMonthly"])
+	log.Println("getNextPayRate premiumGrossYearly: ", s[0].(map[string]interface{})["premiumGrossYearly"])
 	if s[1].(string) == "monthly" {
 		res = s[0].(map[string]interface{})["premiumGrossMonthly"]
 	} else {
@@ -127,6 +130,35 @@ func ifZeroEmpty(s []interface{}) interface{} {
 	} else {
 
 		res = s[0]
+	}
+
+	return res
+}
+func personaDeductible(s []interface{}) interface{} {
+	var (
+		res interface{}
+	)
+	deductible := s[0].(map[string]interface{})["deductible"]
+	deductibleType := s[0].(map[string]interface{})["deductibleType"]
+	if deductible == "5" && deductibleType == "absorbable" {
+		res = "1"
+
+	}
+	if deductible == "10" && deductibleType == "absorbable" {
+		res = "2"
+
+	}
+	if deductible == "3" && deductibleType == "absolute" {
+		res = "3"
+
+	}
+	if deductible == "5" && deductibleType == "absolute" {
+		res = "4"
+
+	}
+	if deductible == "10" && deductibleType == "absolute" {
+		res = "5"
+
 	}
 
 	return res
