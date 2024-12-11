@@ -97,13 +97,13 @@ func (track Track) PolicyProductTrack(policies []models.Policy, event []Column) 
 
 	for _, policy := range policies {
 		if track.IsAssetFlat {
-			result = track.policyAssetRow(&policy, event)
+			result = append(result, track.policyAssetRow(&policy, event)...)
 		} else {
-			result = track.policyAssetRow(&policy, event)
+			result = append(result, track.policyAssetRow(&policy, event)...)
 		}
 		//docsnap := lib.GetFirestore("policy", transaction.PolicyUid)
 		//docsnap.DataTo(&policy)
-		//result = append(result, procuctTrack.ProductTrack(policy, event)...)
+		//result = append(result, procuctTrack.ProductTrack(&policy, event)...)
 
 	}
 
