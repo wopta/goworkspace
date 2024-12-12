@@ -1,11 +1,8 @@
 package policy
 
 import (
-	"fmt"
 	"os"
 	"testing"
-
-	"github.com/wopta/goworkspace/lib"
 )
 
 type test struct {
@@ -14,6 +11,8 @@ type test struct {
 }
 
 func TestVerifyManualAddress(t *testing.T) {
+	os.Setenv("env", "local-test")
+
 	var inputs = []test{
 		{"Polonghera", "12030", "CN", true},
 		{"Monta'", "12046", "CN", true},
@@ -22,18 +21,8 @@ func TestVerifyManualAddress(t *testing.T) {
 		{"Padoa", "35131", "PD", false},
 	}
 
-	fileName := "enrich/postal-codes.csv"
-	res, err := os.ReadFile("../../function-data/dev/" + fileName)
-	if err != nil {
-		fmt.Printf("error reading file %s: %v", fileName, err)
-	}
-	df, err := lib.CsvToDataframeV2(res, ';', true)
-	if err != nil {
-		fmt.Printf("==> error reading df: %v", err)
-	}
-
 	for _, input := range inputs {
-		err := verifyManualAddress(input.city, input.postalCode, input.cityCode, df)
+		err := verifyManualAddress(input.city, input.postalCode, input.cityCode)
 		if (err != nil) && (input.res != false) {
 			t.Fatalf("expected %v got %v", input.res, err)
 		}

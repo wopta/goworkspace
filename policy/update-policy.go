@@ -240,18 +240,7 @@ func checkAddress(a *models.Address) error {
 		return fmt.Errorf("empty address: city code")
 	}
 	if a.IsManualInput {
-		fileName := "enrich/postal-codes.csv"
-		file, err := lib.GetFilesByEnvV2(fileName)
-		if err != nil {
-			log.Printf("error reading file %s: %v", fileName, err)
-			return err
-		}
-		df, err := lib.CsvToDataframeV2(file, ';', true)
-		if err != nil {
-			log.Printf("error reading df %v", err)
-			return err
-		}
-		err = verifyManualAddress(a.City, a.PostalCode, a.CityCode, df)
+		err := verifyManualAddress(a.City, a.PostalCode, a.CityCode)
 		if err != nil {
 			return err
 		}
@@ -260,7 +249,19 @@ func checkAddress(a *models.Address) error {
 	return nil
 }
 
-func verifyManualAddress(city, postalCode, cityCode string, df dataframe.DataFrame) error {
+func verifyManualAddress(city, postalCode, cityCode string) error {
+	fileName := "enrich/postal-codes.csv"
+	file, err := lib.GetFilesByEnvV2(fileName)
+	if err != nil {
+		log.Printf("error reading file %s: %v", fileName, err)
+		return err
+	}
+	df, err := lib.CsvToDataframeV2(file, ';', true)
+	if err != nil {
+		log.Printf("error reading df %v", err)
+		return err
+	}
+
 	columns := []string{"postal code", "place name", "admin code2"}
 	sel := df.Select(columns)
 
