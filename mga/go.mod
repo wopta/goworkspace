@@ -5,22 +5,23 @@ go 1.21
 replace github.com/wopta/goworkspace/mga => ./
 
 require (
+	cloud.google.com/go/bigquery v1.61.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	github.com/go-chi/chi/v5 v5.0.12
-	github.com/wopta/goworkspace/lib v1.0.132
-	github.com/wopta/goworkspace/mail v1.0.133
-	github.com/wopta/goworkspace/models v1.2.20
-	github.com/wopta/goworkspace/network v1.0.85
-	github.com/wopta/goworkspace/policy v1.0.139
-	github.com/wopta/goworkspace/product v1.1.18
-	github.com/wopta/goworkspace/user v1.0.118
+	github.com/gomarkdown/markdown v0.0.0-20241205020045-f7e15b2f3e62
+	github.com/wopta/goworkspace/lib v1.0.134
+	github.com/wopta/goworkspace/mail v1.0.135
+	github.com/wopta/goworkspace/models v1.2.22
+	github.com/wopta/goworkspace/network v1.0.87
+	github.com/wopta/goworkspace/policy v1.0.141
+	github.com/wopta/goworkspace/product v1.1.20
+	github.com/wopta/goworkspace/user v1.0.120
 )
 
 require (
 	cloud.google.com/go v0.113.0 // indirect
 	cloud.google.com/go/auth v0.4.1 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.2 // indirect
-	cloud.google.com/go/bigquery v1.61.0 // indirect
 	cloud.google.com/go/compute/metadata v0.3.0 // indirect
 	cloud.google.com/go/firestore v1.15.0 // indirect
 	cloud.google.com/go/iam v1.1.8 // indirect
@@ -76,7 +77,7 @@ require (
 	github.com/src-d/gcfg v1.4.0 // indirect
 	github.com/ttacon/builder v0.0.0-20170518171403-c099f663e1c2 // indirect
 	github.com/ttacon/libphonenumber v1.2.1 // indirect
-	github.com/wopta/goworkspace/document v1.1.109 // indirect
+	github.com/wopta/goworkspace/document v1.1.111 // indirect
 	github.com/wopta/goworkspace/wiseproxy v1.0.3 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
 	github.com/xuri/efp v0.0.0-20220603152613-6918739fd470 // indirect

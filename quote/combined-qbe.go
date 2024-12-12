@@ -40,7 +40,7 @@ func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		Id:          "1tn0Jqce-r_JKdecExFOFVEJdGUaPYdGo31A9FOgvt-Y",
 		InputCells:  inputCells,
 		OutputCells: setOutputCell(),
-		InitCells:   setInitCells(),
+		InitCells:   resetCells(),
 		SheetName:   "Input dati Polizza",
 	}
 	outCells := qs.Spreadsheets()
@@ -378,12 +378,19 @@ func setInputCell(policy *models.Policy) []Cell {
 				inputCells = append(inputCells, Cell{Cell: col[i] + "34", Value: "SI"})
 			}
 			if build.Building.HasSprinkler {
-				inputCells = append(inputCells, Cell{Cell: col[i] + "35", Value: "SI"})
+				inputCells = append(inputCells, Cell{Cell: col[i] + "36", Value: "SI"})
+			} else {
+				inputCells = append(inputCells, Cell{Cell: col[i] + "36", Value: "NO"})
 			}
 			inputCells = append(inputCells, getBuildingGuaranteCellsBySlug(bg, i)...)
 		}
 
 	}
+
+	for _, c := range inputCells {
+		log.Printf("Cell: '%s' - Value: '%+v'", c.Cell, c.Value)
+	}
+
 	return inputCells
 }
 func setEnterpriseCell(assets models.Asset) []Cell {
@@ -530,6 +537,13 @@ func getEnterpriseGuaranteCellsBySlug(guarante models.Guarante) []Cell {
 				Value: guarante.Value.SumInsuredLimitOfIndemnity,
 			},
 		}
+	case "excluded-formula":
+		cells = []Cell{
+			{
+				Cell:  "C57",
+				Value: "Esclusa",
+			},
+		}
 	case "daily-allowance":
 		cells = []Cell{
 			{
@@ -660,366 +674,44 @@ func getBuildingGuaranteCellsBySlug(guarante models.Guarante, colum int) []Cell 
 	}
 	return cells
 }
-func setInitCells() []Cell {
 
-	cells := []Cell{
-		{
-			Cell:  "C4",
-			Value: "",
-		}, {
-			Cell:  "C5",
-			Value: "",
-		}, {
-			Cell:  "E6",
-			Value: "",
-		}, {
-			Cell:  "G6",
-			Value: "",
-		}, {
-			Cell:  "C7",
-			Value: "",
-		}, {
-			Cell:  "C8",
-			Value: "",
-		}, {
-			Cell:  "C9",
-			Value: "",
-		}, {
-			Cell:  "D9",
-			Value: "",
-		}, {
-			Cell:  "G9",
-			Value: "",
-		}, {
-			Cell:  "G10",
-			Value: "",
-		}, {
-			Cell:  "G11",
-			Value: "NO",
-		}, {
-			Cell:  "C10",
-			Value: "",
-		}, {
-			Cell:  "C11",
-			Value: "",
-		}, {
-			Cell:  "C12",
-			Value: "",
-		}, {
-			Cell:  "C19",
-			Value: "",
-		}, {
-			Cell:  "C20",
-			Value: "",
-		},
-		{
-			Cell:  "D19",
-			Value: "",
-		}, {
-			Cell:  "D20",
-			Value: "",
-		}, {
-			Cell:  "E19",
-			Value: "",
-		}, {
-			Cell:  "E20",
-			Value: "",
-		}, {
-			Cell:  "F19",
-			Value: "",
-		}, {
-			Cell:  "F20",
-			Value: "",
-		}, {
-			Cell:  "G19",
-			Value: "",
-		}, {
-			Cell:  "G20",
-			Value: "",
-		}, {
-			Cell:  "C21",
-			Value: "",
-		},
-		{
-			Cell:  "C24",
-			Value: "0",
-		}, {
-			Cell:  "C25",
-			Value: "0",
-		},
-		{
-			Cell:  "C26",
-			Value: "0",
-		}, {
-			Cell:  "C29",
-			Value: "",
-		}, {
-			Cell:  "C30",
-			Value: "",
-		}, {
-			Cell:  "C31",
-			Value: "",
-		}, {
-			Cell:  "C32",
-			Value: "",
-		}, {
-			Cell:  "C33",
-			Value: "Sconosciuto",
-		}, {
-			Cell:  "C34",
-			Value: "NO",
-		}, {
-			Cell:  "C35",
-			Value: "NO",
-		}, {
-			Cell:  "C36",
-			Value: "NO",
-		}, {
-			Cell:  "C41",
-			Value: "0",
-		}, {
-			Cell:  "C42",
-			Value: "0",
-		}, {
-			Cell:  "C43",
-			Value: "0",
-		}, {
-			Cell:  "C45",
-			Value: "0",
-		},
-		{
-			Cell:  "D21",
-			Value: "",
-		}, {
-			Cell:  "D29",
-			Value: "",
-		}, {
-			Cell:  "D30",
-			Value: "",
-		}, {
-			Cell:  "D31",
-			Value: "",
-		}, {
-			Cell:  "D32",
-			Value: "",
-		}, {
-			Cell:  "D33",
-			Value: "",
-		}, {
-			Cell:  "D34",
-			Value: "NO",
-		}, {
-			Cell:  "D35",
-			Value: "NO",
-		}, {
-			Cell:  "D36",
-			Value: "NO",
-		}, {
-			Cell:  "D41",
-			Value: "0",
-		}, {
-			Cell:  "D42",
-			Value: "0",
-		}, {
-			Cell:  "D43",
-			Value: "0",
-		}, {
-			Cell:  "D45",
-			Value: "0",
-		},
-
-		{
-			Cell:  "E21",
-			Value: "",
-		}, {
-			Cell:  "E29",
-			Value: "",
-		}, {
-			Cell:  "E30",
-			Value: "",
-		}, {
-			Cell:  "E31",
-			Value: "",
-		}, {
-			Cell:  "E32",
-			Value: "",
-		}, {
-			Cell:  "E33",
-			Value: "",
-		}, {
-			Cell:  "E34",
-			Value: "NO",
-		}, {
-			Cell:  "E35",
-			Value: "NO",
-		}, {
-			Cell:  "E36",
-			Value: "NO",
-		}, {
-			Cell:  "E41",
-			Value: "0",
-		}, {
-			Cell:  "E42",
-			Value: "0",
-		}, {
-			Cell:  "E43",
-			Value: "0",
-		}, {
-			Cell:  "E45",
-			Value: "0",
-		},
-
-		{
-			Cell:  "F21",
-			Value: "",
-		}, {
-			Cell:  "F29",
-			Value: "",
-		}, {
-			Cell:  "F30",
-			Value: "",
-		}, {
-			Cell:  "F31",
-			Value: "",
-		}, {
-			Cell:  "F32",
-			Value: "",
-		}, {
-			Cell:  "F33",
-			Value: "",
-		}, {
-			Cell:  "F34",
-			Value: "NO",
-		}, {
-			Cell:  "F35",
-			Value: "NO",
-		}, {
-			Cell:  "F36",
-			Value: "NO",
-		}, {
-			Cell:  "F41",
-			Value: "0",
-		}, {
-			Cell:  "F42",
-			Value: "0",
-		}, {
-			Cell:  "F43",
-			Value: "0",
-		}, {
-			Cell:  "F45",
-			Value: "0",
-		},
-
-		{
-			Cell:  "G21",
-			Value: "",
-		}, {
-			Cell:  "G29",
-			Value: "",
-		}, {
-			Cell:  "G30",
-			Value: "",
-		}, {
-			Cell:  "G31",
-			Value: "",
-		}, {
-			Cell:  "G32",
-			Value: "",
-		}, {
-			Cell:  "G33",
-			Value: "",
-		}, {
-			Cell:  "G34",
-			Value: "NO",
-		}, {
-			Cell:  "G35",
-			Value: "NO",
-		}, {
-			Cell:  "G36",
-			Value: "NO",
-		}, {
-			Cell:  "G41",
-			Value: "0",
-		}, {
-			Cell:  "G42",
-			Value: "0",
-		}, {
-			Cell:  "G43",
-			Value: "0",
-		}, {
-			Cell:  "G45",
-			Value: "0",
-		},
-		{
-			Cell:  "C46",
-			Value: "0",
-		}, {
-			Cell:  "C47",
-			Value: "0",
-		}, {
-			Cell:  "C48",
-			Value: "0",
-		}, {
-			Cell:  "C49",
-			Value: "0",
-		}, {
-			Cell:  "C50",
-			Value: "0",
-		}, {
-			Cell:  "C51",
-			Value: "0",
-		}, {
-			Cell:  "C52",
-			Value: "0",
-		}, {
-			Cell:  "C57",
-			Value: "Esclusa",
-		}, {
-			Cell:  "C61",
-			Value: "0",
-		}, {
-			Cell:  "C67",
-			Value: "NO",
-		}, {
-			Cell:  "C68",
-			Value: "NO",
-		}, {
-			Cell:  "C69",
-			Value: "0",
-		}, {
-			Cell:  "C70",
-			Value: "0",
-		}, {
-			Cell:  "F66",
-			Value: "",
-		}, {
-			Cell:  "F67",
-			Value: "",
-		}, {
-			Cell:  "F68",
-			Value: "",
-		},
-		{
-			Cell:  "F69",
-			Value: "NO",
-		}, {
-			Cell:  "F70",
-			Value: "",
-		}, {
-			Cell:  "C74",
-			Value: "No",
-		},
-		{
-			Cell:  "C93",
-			Value: "",
-		}, {
-			Cell:  "G69",
-			Value: "",
-		},
-		{
-			Cell:  "E46",
-			Value: "",
-		},
+func resetCells() []Cell {
+	headingCellList := []string{"C4", "C5", "C6", "C7", "C8", "C9", "C10", "C11", "C15", "D9", "E6", "G6", "G8", "G9", "G10"}
+	buildingsCellList := []string{
+		"C19", "C20", "C21", "C29", "C30", "C31", "C32", "C33", "C34", "C35", "C36", "C41", "C42", "C43", "C44", "C45",
+		"D19", "D20", "D21", "D29", "D30", "D31", "D32", "D33", "D34", "D35", "D36", "D41", "D42", "D43", "D44", "D45",
+		"E19", "E20", "E21", "E29", "E30", "E31", "E32", "E33", "E34", "E35", "E36", "E41", "E42", "E43", "E44", "E45",
+		"F19", "F20", "F21", "F29", "F30", "F31", "F32", "F33", "F34", "F35", "F36", "F41", "F42", "F43", "F44", "F45",
+		"G19", "G20", "G21", "G29", "G30", "G31", "G32", "G33", "G34", "G35", "G36", "G41", "G42", "G43", "G44", "G45",
 	}
-	return cells
+	enterpriseCellList := []string{
+		"C24", "C25", "C26", "C27",
+		"C46", "C47", "C48", "C49", "C50", "C51", "C52",
+		"C58", "C59", "C61", "E58",
+		"C66", "C69", "C70", "F66", "F67", "F68", "F70", "G69",
+	}
+	discountCellList := []string{"G80", "G81", "G82"}
+
+	allCells := make([]string, 0)
+	allCells = append(allCells, headingCellList...)
+	allCells = append(allCells, buildingsCellList...)
+	allCells = append(allCells, enterpriseCellList...)
+	allCells = append(allCells, discountCellList...)
+
+	initializedCells := []Cell{
+		{Cell: "C14", Value: "SI"},
+		{Cell: "C16", Value: "Annuale"},
+		{Cell: "G11", Value: "NO"},
+		{Cell: "C57", Value: "Esclusa"},
+		{Cell: "C67", Value: "NO"},
+		{Cell: "C68", Value: "NO"},
+		{Cell: "F69", Value: "NO"},
+		{Cell: "C74", Value: "NO"},
+	}
+
+	for _, cell := range allCells {
+		initializedCells = append(initializedCells, Cell{cell, ""})
+	}
+
+	return initializedCells
 }

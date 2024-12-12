@@ -403,6 +403,9 @@ func ListLocalFolderContent(folderPath string) ([]string, error) {
 	)
 
 	err := filepath.WalkDir(basePath+folderPath, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
 		if d.IsDir() {
 			return nil
 		}
