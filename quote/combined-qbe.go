@@ -363,10 +363,10 @@ func setInputCell(policy *models.Policy) []Cell {
 	for i, build := range assBuildings {
 		col := map[int]string{0: "C", 1: "D", 2: "E", 3: "F", 4: "G"}
 		for _, bg := range build.Guarantees {
-			inputCells = append(inputCells, Cell{Cell: col[i] + "29", Value: build.Building.PostalCode})
-			inputCells = append(inputCells, Cell{Cell: col[i] + "30", Value: build.Building.Locality})
-			inputCells = append(inputCells, Cell{Cell: col[i] + "31", Value: build.Building.City})
-			inputCells = append(inputCells, Cell{Cell: col[i] + "32", Value: build.Building.Address})
+			inputCells = append(inputCells, Cell{Cell: col[i] + "29", Value: build.Building.BuildingAddress.PostalCode})
+			inputCells = append(inputCells, Cell{Cell: col[i] + "30", Value: build.Building.BuildingAddress.Locality})
+			inputCells = append(inputCells, Cell{Cell: col[i] + "31", Value: build.Building.BuildingAddress.City})
+			inputCells = append(inputCells, Cell{Cell: col[i] + "32", Value: build.Building.BuildingAddress.StreetName})
 			inputCells = append(inputCells, Cell{Cell: col[i] + "19", Value: build.Building.NaicsCategory})
 			inputCells = append(inputCells, Cell{Cell: col[i] + "20", Value: build.Building.NaicsDetail})
 			inputCells = append(inputCells, Cell{Cell: col[i] + "21", Value: build.Building.Naics})
