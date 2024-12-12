@@ -79,6 +79,7 @@ func checkQbe(p *models.Policy, i map[string]interface{}) error {
 	i["hasBond"] = p.HasBond
 	i["bond"] = p.Bond
 	i["clause"] = p.Clause
+	i["contractors"] = p.Contractors
 
 	return nil
 }
