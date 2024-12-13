@@ -277,11 +277,40 @@ func verifyManualAddress(city, postalCode, cityCode string) error {
 		}
 	}
 	for _, v := range found {
-		if lib.ToUpper(v) == lib.ToUpper(city) {
+		if lib.ToUpper(normalizeString(v)) == lib.ToUpper(normalizeString(city)) {
 			return nil
 		}
 	}
 	return fmt.Errorf("city %s doesn't match any postal code %s and city code %s", city, postalCode, cityCode)
+}
+
+func normalizeString(in string) string {
+	var out string
+	for _, r := range in {
+		var s string
+
+		switch r {
+		case ' ', '\'', '.', '/', '_', '-', '’', '`', '‘', '´':
+			s = ""
+		case 'è', 'é':
+			s = "e"
+		case 'à', 'ä':
+			s = "a"
+		case 'ò', 'ö':
+			s = "o"
+		case 'ì':
+			s = "i"
+		case 'ù', 'ü':
+			s = "u"
+		case 'ß':
+			s = "ss"
+		default:
+			s = string(r)
+		}
+		out += s
+	}
+
+	return out
 }
 
 func checkFiscalCode(fc string) bool {
