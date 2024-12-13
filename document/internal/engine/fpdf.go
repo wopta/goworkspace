@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/go-pdf/fpdf"
+	"github.com/mohae/deepcopy"
 	"github.com/wopta/goworkspace/document/internal/constants"
 	"github.com/wopta/goworkspace/document/internal/domain"
 	"github.com/wopta/goworkspace/lib"
@@ -19,6 +20,7 @@ type Fpdf struct {
 	size        domain.FontSize
 	textColor   domain.Color
 	drawColor   domain.Color
+	fillColor   domain.Color
 }
 
 func NewFpdf() *Fpdf {
@@ -40,6 +42,7 @@ func NewFpdf() *Fpdf {
 		size:        constants.RegularFontsize,
 		textColor:   constants.BlackColor,
 		drawColor:   constants.BlackColor,
+		fillColor:   constants.WhiteColor,
 	}
 }
 
@@ -84,6 +87,11 @@ func (f *Fpdf) SetDrawColor(color domain.Color) {
 	f.pdf.SetDrawColor(int(f.drawColor.R), int(f.drawColor.G), int(f.drawColor.B))
 }
 
+func (f *Fpdf) SetFillColor(color domain.Color) {
+	f.fillColor = color
+	f.pdf.SetFillColor(int(f.fillColor.R), int(f.fillColor.G), int(f.fillColor.B))
+}
+
 func (f *Fpdf) DrawWatermark(text string) {
 	currentY := f.pdf.GetY()
 	markFontHt := 115.0
@@ -103,6 +111,63 @@ func (f *Fpdf) DrawWatermark(text string) {
 
 func (f *Fpdf) PageNumber() int {
 	return f.pdf.PageNo()
+}
+
+func (f *Fpdf) WriteText(cell domain.TableCell) {
+	oldFontStyle := f.style
+	oldFillColor := f.fillColor
+
+	if cell.Fill {
+		f.fillColor = cell.FillColor
+		f.SetFillColor(cell.FillColor)
+	}
+	if cell.TextBold {
+		f.style = constants.BoldFontStyle
+		f.SetFontStyle(constants.BoldFontStyle)
+	}
+
+	f.pdf.MultiCell(cell.Width, cell.Height, cell.Text, cell.Border, cell.Align, cell.Fill)
+
+	f.SetFillColor(oldFillColor)
+	f.SetFontStyle(oldFontStyle)
+}
+
+func (f *Fpdf) DrawTable(table [][]domain.TableCell) {
+	for _, row := range table {
+		maxNumLines := 1
+		for _, cell := range row {
+			f.SetFontStyle(constants.RegularFontStyle)
+			if cell.TextBold {
+				f.SetFontStyle(constants.BoldFontStyle)
+			}
+			numLines := len(f.pdf.SplitText(cell.Text, cell.Width))
+			if numLines > maxNumLines {
+				maxNumLines = numLines
+			}
+		}
+
+		for index, cell := range row {
+			numLines := len(f.pdf.SplitText(cell.Text, cell.Width))
+			currentX, currentY := f.pdf.GetXY()
+
+			f.SetFontFamily(constants.MontserratFont)
+
+			f.WriteText(cell)
+
+			emptyCell := deepcopy.Copy(cell).(domain.TableCell)
+			emptyCell.Text = ""
+			emptyCell.Border = ""
+
+			for i := numLines; i < maxNumLines; i++ {
+				f.pdf.SetX(currentX)
+				f.WriteText(emptyCell)
+			}
+
+			if index < len(row)-1 {
+				f.pdf.SetXY(currentX+cell.Width, currentY)
+			}
+		}
+	}
 }
 
 func (f *Fpdf) Save(filePath string) error {
