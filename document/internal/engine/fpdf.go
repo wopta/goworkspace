@@ -12,6 +12,14 @@ import (
 	"github.com/wopta/goworkspace/lib"
 )
 
+var (
+	alignmentMap = map[domain.TextAlign]string{
+		constants.LeftAlign:   fpdf.AlignLeft,
+		constants.CenterAlign: fpdf.AlignCenter,
+		constants.RightAlign:  fpdf.AlignRight,
+	}
+)
+
 type Fpdf struct {
 	pdf         *fpdf.Fpdf
 	signatureID int64
@@ -134,7 +142,7 @@ func (f *Fpdf) WriteText(cell domain.TableCell) {
 		f.SetFontStyle(constants.BoldFontStyle)
 	}
 
-	f.pdf.MultiCell(cell.Width, cell.Height, cell.Text, cell.Border, cell.Align, cell.Fill)
+	f.pdf.MultiCell(cell.Width, cell.Height, cell.Text, cell.Border, alignmentMap[cell.Align], cell.Fill)
 
 	f.SetFillColor(oldFillColor)
 	f.SetFontStyle(oldFontStyle)
@@ -186,4 +194,12 @@ func (f *Fpdf) Save(filePath string) error {
 	}
 	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filePath, out.Bytes())
 	return nil
+}
+
+func (f *Fpdf) SetHeader(header func()) {
+	f.pdf.SetHeaderFunc(header)
+}
+
+func (f *Fpdf) SetFooter(footer func()) {
+	f.pdf.SetFooterFunc(footer)
 }

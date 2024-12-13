@@ -7,6 +7,6 @@ type TableCell struct {
 	TextBold  bool
 	Fill      bool
 	FillColor Color
-	Align     string
+	Align     TextAlign
 	Border    string
 }
