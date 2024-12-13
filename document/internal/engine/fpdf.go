@@ -92,6 +92,14 @@ func (f *Fpdf) SetFillColor(color domain.Color) {
 	f.pdf.SetFillColor(int(f.fillColor.R), int(f.fillColor.G), int(f.fillColor.B))
 }
 
+func (f *Fpdf) SetX(x float64) {
+	f.pdf.SetX(x)
+}
+
+func (f *Fpdf) SetY(y float64) {
+	f.pdf.SetY(y)
+}
+
 func (f *Fpdf) DrawWatermark(text string) {
 	currentY := f.pdf.GetY()
 	markFontHt := 115.0
