@@ -260,19 +260,11 @@ func (qb *QBEGenerator) mainFooter() {
 	})
 }
 
-func (qb *QBEGenerator) Contract() ([]byte, error) {
-	qb.mainHeader()
-
-	qb.engine.NewPage()
-
-	qb.mainFooter()
-
-	qb.engine.NewLine(10)
-
+func (qb *QBEGenerator) introTable() {
 	introTable := [][]domain.TableCell{
 		{
 			{
-				Text:      " \nScheda di Polizza\n ",
+				Text:      " \nScheda di Polizza\n ", // TODO: find better solution
 				Height:    3.5,
 				Width:     95,
 				FontStyle: constants.BoldFontStyle,
@@ -298,9 +290,9 @@ func (qb *QBEGenerator) Contract() ([]byte, error) {
 		},
 	}
 	qb.engine.DrawTable(introTable)
+}
 
-	qb.engine.NewLine(10)
-
+func (qb *QBEGenerator) whoWeAreTable() {
 	whoWeAreTable := [][]domain.TableCell{
 		{
 			{
@@ -466,6 +458,22 @@ func (qb *QBEGenerator) Contract() ([]byte, error) {
 		},
 	}
 	qb.engine.DrawTable(whoWeAreTable)
+}
+
+func (qb *QBEGenerator) Contract() ([]byte, error) {
+	qb.mainHeader()
+
+	qb.engine.NewPage()
+
+	qb.mainFooter()
+
+	qb.engine.NewLine(10)
+
+	qb.introTable()
+
+	qb.engine.NewLine(10)
+
+	qb.whoWeAreTable()
 
 	qb.engine.NewLine(10)
 
