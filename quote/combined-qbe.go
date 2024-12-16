@@ -367,19 +367,19 @@ func setInputCell(policy *models.Policy) []Cell {
 			inputCells = append(inputCells, Cell{Cell: col[i] + "30", Value: build.Building.BuildingAddress.Locality})
 			inputCells = append(inputCells, Cell{Cell: col[i] + "31", Value: build.Building.BuildingAddress.City})
 			inputCells = append(inputCells, Cell{Cell: col[i] + "32", Value: build.Building.BuildingAddress.StreetName})
-			inputCells = append(inputCells, Cell{Cell: col[i] + "29", Value: build.Building.PostalCode})
-			inputCells = append(inputCells, Cell{Cell: col[i] + "30", Value: build.Building.Locality})
-			inputCells = append(inputCells, Cell{Cell: col[i] + "31", Value: build.Building.City})
-			inputCells = append(inputCells, Cell{Cell: col[i] + "32", Value: build.Building.Address})
 			inputCells = append(inputCells, Cell{Cell: col[i] + "19", Value: build.Building.NaicsCategory})
 			inputCells = append(inputCells, Cell{Cell: col[i] + "20", Value: build.Building.NaicsDetail})
 			inputCells = append(inputCells, Cell{Cell: col[i] + "21", Value: build.Building.Naics})
 			inputCells = append(inputCells, Cell{Cell: col[i] + "33", Value: build.Building.BuildingMaterial})
-			if build.Building.HasAlarm {
-				inputCells = append(inputCells, Cell{Cell: col[i] + "35", Value: "SI"})
-			}
 			if build.Building.HasSandwichPanel {
 				inputCells = append(inputCells, Cell{Cell: col[i] + "34", Value: "SI"})
+			} else {
+				inputCells = append(inputCells, Cell{Cell: col[i] + "34", Value: "NO"})
+			}
+			if build.Building.HasAlarm {
+				inputCells = append(inputCells, Cell{Cell: col[i] + "35", Value: "SI"})
+			} else {
+				inputCells = append(inputCells, Cell{Cell: col[i] + "35", Value: "NO"})
 			}
 			if build.Building.HasSprinkler {
 				inputCells = append(inputCells, Cell{Cell: col[i] + "36", Value: "SI"})
