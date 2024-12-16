@@ -2,7 +2,6 @@ package engine
 
 import (
 	"bytes"
-	"os"
 	"time"
 
 	"github.com/go-pdf/fpdf"
@@ -186,14 +185,13 @@ func (f *Fpdf) DrawTable(table [][]domain.TableCell) {
 	}
 }
 
-func (f *Fpdf) Save(filePath string) error {
+func (f *Fpdf) RawDoc() ([]byte, error) {
 	var out bytes.Buffer
 	err := f.pdf.Output(&out)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filePath, out.Bytes())
-	return nil
+	return out.Bytes(), nil
 }
 
 func (f *Fpdf) SetHeader(header func()) {
@@ -202,4 +200,17 @@ func (f *Fpdf) SetHeader(header func()) {
 
 func (f *Fpdf) SetFooter(footer func()) {
 	f.pdf.SetFooterFunc(footer)
+}
+
+func (f *Fpdf) InsertImage(imagePath string, x, y, width, height float64) {
+	var opt fpdf.ImageOptions
+
+	opt.ImageType = "png"
+	f.pdf.ImageOptions(imagePath, x, y, width, height, false, opt, 0, "")
+}
+
+func (f *Fpdf) DrawLine(startX, startY, endX, endY, lineWidth float64, color domain.Color) {
+	f.SetDrawColor(color)
+	f.pdf.SetLineWidth(lineWidth)
+	f.pdf.Line(startX, startY, endX, endY)
 }
