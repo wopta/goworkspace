@@ -136,10 +136,9 @@ func (f *Fpdf) WriteText(cell domain.TableCell) {
 		f.fillColor = cell.FillColor
 		f.SetFillColor(cell.FillColor)
 	}
-	if cell.TextBold {
-		f.style = constants.BoldFontStyle
-		f.SetFontStyle(constants.BoldFontStyle)
-	}
+
+	f.style = cell.FontStyle
+	f.SetFontStyle(f.style)
 
 	f.pdf.MultiCell(cell.Width, cell.Height, cell.Text, cell.Border, alignmentMap[cell.Align], cell.Fill)
 
@@ -151,10 +150,9 @@ func (f *Fpdf) DrawTable(table [][]domain.TableCell) {
 	for _, row := range table {
 		maxNumLines := 1
 		for _, cell := range row {
-			f.SetFontStyle(constants.RegularFontStyle)
-			if cell.TextBold {
-				f.SetFontStyle(constants.BoldFontStyle)
-			}
+			f.style = cell.FontStyle
+			f.SetFontStyle(f.style)
+
 			numLines := len(f.pdf.SplitText(cell.Text, cell.Width))
 			if numLines > maxNumLines {
 				maxNumLines = numLines

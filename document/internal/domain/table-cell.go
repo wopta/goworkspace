@@ -4,7 +4,8 @@ type TableCell struct {
 	Text      string
 	Height    float64
 	Width     float64
-	TextBold  bool
+	FontSize  FontSize
+	FontStyle FontStyle
 	Fill      bool
 	FillColor Color
 	Align     TextAlign

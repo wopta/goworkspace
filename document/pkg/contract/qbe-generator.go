@@ -26,7 +26,7 @@ func (qb *QBEGenerator) mainHeader() {
 				Text:      "I dati della tua Polizza nr. 100100", // TODO: add dynamic code company
 				Height:    constants.CellHeight,
 				Width:     115,
-				TextBold:  true,
+				FontStyle: constants.BoldFontStyle,
 				Fill:      false,
 				FillColor: domain.Color{},
 				Align:     constants.LeftAlign,
@@ -36,7 +36,7 @@ func (qb *QBEGenerator) mainHeader() {
 				Text:      "I tuoi dati",
 				Height:    constants.CellHeight,
 				Width:     75,
-				TextBold:  true,
+				FontStyle: constants.BoldFontStyle,
 				Fill:      false,
 				FillColor: domain.Color{},
 				Align:     constants.LeftAlign,
@@ -48,7 +48,7 @@ func (qb *QBEGenerator) mainHeader() {
 				Text:      "Decorre dal 13/12/2024 ore 24:00", // TODO: add dynamic startDate
 				Height:    constants.CellHeight,
 				Width:     115,
-				TextBold:  false,
+				FontStyle: constants.RegularFontStyle,
 				Fill:      false,
 				FillColor: domain.Color{},
 				Align:     constants.LeftAlign,
@@ -58,7 +58,7 @@ func (qb *QBEGenerator) mainHeader() {
 				Text:      "Contraente Wopta Assicurazioni S.R.L", // TODO: add dynamic contractor name
 				Height:    constants.CellHeight,
 				Width:     75,
-				TextBold:  false,
+				FontStyle: constants.RegularFontStyle,
 				Fill:      false,
 				FillColor: domain.Color{},
 				Align:     constants.LeftAlign,
@@ -70,7 +70,7 @@ func (qb *QBEGenerator) mainHeader() {
 				Text:      "Si rinnova a scadenza, salvo disdetta da inviare 30 giorni prima",
 				Height:    constants.CellHeight,
 				Width:     115,
-				TextBold:  false,
+				FontStyle: constants.RegularFontStyle,
 				Fill:      false,
 				FillColor: domain.Color{},
 				Align:     constants.LeftAlign,
@@ -80,7 +80,7 @@ func (qb *QBEGenerator) mainHeader() {
 				Text:      "P.IVA: 012345678910", // TODO: add dynamic vatCode
 				Height:    constants.CellHeight,
 				Width:     75,
-				TextBold:  false,
+				FontStyle: constants.RegularFontStyle,
 				Fill:      false,
 				FillColor: domain.Color{},
 				Align:     constants.LeftAlign,
@@ -92,17 +92,17 @@ func (qb *QBEGenerator) mainHeader() {
 				Text:      "Frazionamento: MENSILE", // TODO: add dynamic payment split
 				Height:    constants.CellHeight,
 				Width:     115,
-				TextBold:  false,
+				FontStyle: constants.RegularFontStyle,
 				Fill:      false,
 				FillColor: domain.Color{},
 				Align:     constants.LeftAlign,
 				Border:    "",
 			},
 			{
-				Text:      "Codice Fiscale: HMMYSF94R07D912M", // TODO: add dynamic fiscalCode
+				Text:      "Codice Fiscale: ZMKRBO98P06Z515L", // TODO: add dynamic fiscalCode
 				Height:    constants.CellHeight,
 				Width:     75,
-				TextBold:  false,
+				FontStyle: constants.RegularFontStyle,
 				Fill:      false,
 				FillColor: domain.Color{},
 				Align:     constants.LeftAlign,
@@ -114,7 +114,7 @@ func (qb *QBEGenerator) mainHeader() {
 				Text:      "Prossimo pagamento il: 16/12/2025", // TODO: add dynamic nextPayment date
 				Height:    constants.CellHeight,
 				Width:     115,
-				TextBold:  false,
+				FontStyle: constants.RegularFontStyle,
 				Fill:      false,
 				FillColor: domain.Color{},
 				Align:     constants.LeftAlign,
@@ -124,7 +124,7 @@ func (qb *QBEGenerator) mainHeader() {
 				Text:      "Indirizzo: Galleria del corso 1, Milano (MI)", // TODO: add dynamic address
 				Height:    constants.CellHeight,
 				Width:     75,
-				TextBold:  false,
+				FontStyle: constants.RegularFontStyle,
 				Fill:      false,
 				FillColor: domain.Color{},
 				Align:     constants.LeftAlign,
@@ -136,7 +136,7 @@ func (qb *QBEGenerator) mainHeader() {
 				Text:      "Presenza Vincolo: NO", // TODO: add dynamic hasBond
 				Height:    constants.CellHeight,
 				Width:     115,
-				TextBold:  false,
+				FontStyle: constants.RegularFontStyle,
 				Fill:      false,
 				FillColor: domain.Color{},
 				Align:     constants.LeftAlign,
@@ -146,7 +146,7 @@ func (qb *QBEGenerator) mainHeader() {
 				Text:      "Telefono: +393334455667", // TODO: add dynamic phone
 				Height:    constants.CellHeight,
 				Width:     75,
-				TextBold:  false,
+				FontStyle: constants.RegularFontStyle,
 				Fill:      false,
 				FillColor: domain.Color{},
 				Align:     constants.LeftAlign,
@@ -158,7 +158,7 @@ func (qb *QBEGenerator) mainHeader() {
 				Text:      "Sostituisce la Polizza: 1234567", // TODO: add dynamic old codeCompany
 				Height:    constants.CellHeight,
 				Width:     115,
-				TextBold:  false,
+				FontStyle: constants.RegularFontStyle,
 				Fill:      false,
 				FillColor: domain.Color{},
 				Align:     constants.LeftAlign,
@@ -168,7 +168,7 @@ func (qb *QBEGenerator) mainHeader() {
 				Text:      "Mail: wopta@wopta.it", // TODO: add dynamic mail
 				Height:    constants.CellHeight,
 				Width:     75,
-				TextBold:  false,
+				FontStyle: constants.RegularFontStyle,
 				Fill:      false,
 				FillColor: domain.Color{},
 				Align:     constants.LeftAlign,
@@ -180,7 +180,7 @@ func (qb *QBEGenerator) mainHeader() {
 				Text:      "Convenzione: NO",
 				Height:    constants.CellHeight,
 				Width:     190,
-				TextBold:  false,
+				FontStyle: constants.RegularFontStyle,
 				Fill:      false,
 				FillColor: domain.Color{},
 				Align:     constants.LeftAlign,
@@ -210,7 +210,7 @@ func (qb *QBEGenerator) mainFooter() {
 			Text:      text,
 			Height:    3,
 			Width:     190,
-			TextBold:  false,
+			FontStyle: constants.RegularFontStyle,
 			Fill:      false,
 			FillColor: domain.Color{},
 			Align:     constants.LeftAlign,
@@ -220,7 +220,7 @@ func (qb *QBEGenerator) mainFooter() {
 			Text:      fmt.Sprintf("%d", qb.engine.PageNumber()),
 			Height:    3,
 			Width:     0,
-			TextBold:  false,
+			FontStyle: constants.RegularFontStyle,
 			Fill:      false,
 			FillColor: domain.Color{},
 			Align:     constants.RightAlign,
@@ -235,6 +235,36 @@ func (qb *QBEGenerator) Contract() ([]byte, error) {
 	qb.engine.NewPage()
 
 	qb.mainFooter()
+
+	qb.engine.NewLine(10)
+
+	introTable := [][]domain.TableCell{
+		{
+			{
+				Text:      " \nScheda di Polizza\n ",
+				Height:    3.5,
+				Width:     95,
+				FontStyle: constants.BoldFontStyle,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.CenterAlign,
+				Border:    "TB",
+			},
+			{
+				Text:      "COMMERCIAL COMBINED\nAssicurazione Multigaranzia per le imprese\nSet informativo - Edizione 10/2022",
+				Height:    3.5,
+				Width:     95,
+				FontStyle: constants.BoldFontStyle,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.CenterAlign,
+				Border:    "TB",
+			},
+		},
+	}
+	qb.engine.DrawTable(introTable)
+
+	qb.engine.NewLine(10)
 
 	return qb.engine.RawDoc()
 }
