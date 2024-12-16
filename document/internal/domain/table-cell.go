@@ -6,6 +6,7 @@ type TableCell struct {
 	Width     float64
 	FontSize  FontSize
 	FontStyle FontStyle
+	FontColor Color
 	Fill      bool
 	FillColor Color
 	Align     TextAlign
