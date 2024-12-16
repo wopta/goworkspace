@@ -1,6 +1,8 @@
 package contract
 
 import (
+	"fmt"
+
 	"github.com/wopta/goworkspace/document/internal/constants"
 	"github.com/wopta/goworkspace/document/internal/domain"
 	"github.com/wopta/goworkspace/document/internal/engine"
@@ -197,11 +199,42 @@ func (qb *QBEGenerator) mainHeader() {
 }
 
 func (qb *QBEGenerator) mainFooter() {
+	text := "QBE Europe SA/NV, Rappresentanza Generale per l’Italia, Via Melchiorre Gioia 8 – 20124 Milano. R.E.A. MI-2538674. Codice fiscale/P.IVA 10532190963 Autorizzazione IVASS n. I.00147\n" +
+		"QBE Europe SA/NV è autorizzata dalla Banca Nazionale del Belgio con licenza numero 3093. Sede legale Place du Champ de Mars 5, BE 1050, Bruxelles, Belgio.   N. di registrazione 0690537456."
 
+	qb.engine.SetFooter(func() {
+		qb.engine.SetX(10)
+		qb.engine.SetY(-17)
+		qb.engine.SetFontSize(constants.SmallFontSize)
+		qb.engine.WriteText(domain.TableCell{
+			Text:      text,
+			Height:    3,
+			Width:     190,
+			TextBold:  false,
+			Fill:      false,
+			FillColor: domain.Color{},
+			Align:     constants.LeftAlign,
+			Border:    "",
+		})
+		qb.engine.WriteText(domain.TableCell{
+			Text:      fmt.Sprintf("%d", qb.engine.PageNumber()),
+			Height:    3,
+			Width:     0,
+			TextBold:  false,
+			Fill:      false,
+			FillColor: domain.Color{},
+			Align:     constants.RightAlign,
+			Border:    "",
+		})
+	})
 }
 
 func (qb *QBEGenerator) Contract() ([]byte, error) {
 	qb.mainHeader()
+
+	qb.engine.NewPage()
+
+	qb.mainFooter()
 
 	return qb.engine.RawDoc()
 }
