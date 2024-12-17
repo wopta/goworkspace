@@ -213,6 +213,7 @@ func (c MultipleConsens) Less(i, j int) bool { return c[i].StartAt.After(c[j].St
 
 func enrichConsens(consens SystemConsens, networkNode *models.NetworkNode) SystemConsens {
 	regexNodeName := regexp.MustCompile("{{NODE_NAME}}")
+	regexNodeFiscalCode := regexp.MustCompile("{{NODE_FISCALCODE}}")
 	regexNodeRuiSection := regexp.MustCompile("{{NODE_RUI_SECTION}}")
 	regexNodeRuiCode := regexp.MustCompile("{{NODE_RUI_CODE}}")
 	regexNodeRuiRegistrationDate := regexp.MustCompile("{{NODE_RUI_REGISTRATION_DATE}}")
@@ -221,6 +222,7 @@ func enrichConsens(consens SystemConsens, networkNode *models.NetworkNode) Syste
 	for j, cont := range consens.Content {
 		text := cont.Text
 		text = regexNodeName.ReplaceAllString(text, networkNode.GetName())
+		text = regexNodeFiscalCode.ReplaceAllString(text, networkNode.GetFiscalCode())
 		text = regexNodeRuiSection.ReplaceAllString(text, networkNode.GetRuiSection())
 		text = regexNodeRuiCode.ReplaceAllString(text, networkNode.GetRuiCode())
 		text = regexNodeRuiRegistrationDate.ReplaceAllString(text, networkNode.GetRuiRegistration().Format("02/01/2006"))

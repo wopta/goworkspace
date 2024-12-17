@@ -33,6 +33,7 @@ type SystemConsens struct {
 	AvailableAt time.Time        `json:"availableAt"`
 	Strategy    string           `json:"strategy"`
 	Title       string           `json:"title"`
+	Subtitle    string           `json:"subtitle"`
 	Content     []ConsensContent `json:"content"`
 }
 
@@ -45,12 +46,17 @@ type ConsensContent struct {
 }
 
 func ContentToString(content []ConsensContent, nodeConsens map[string]string, removeMarkdown bool) string {
+	const hiddenTextKey = "hidden_text"
 	textParts := make([]string, 0)
 	seenConsentGroups := make([]string, 0)
 	markdown := regexp.MustCompile("[*_~`#]")
 
 	for _, cs := range content {
-		content := cs.Text
+		if cs.InputName == hiddenTextKey {
+			continue
+		}
+
+		c := cs.Text
 
 		if cs.InputGroup != "" && cs.InputValue != "" {
 			if nodeConsens[cs.InputName] != cs.InputValue {
@@ -64,11 +70,11 @@ func ContentToString(content []ConsensContent, nodeConsens map[string]string, re
 		}
 
 		if removeMarkdown {
-			bytes := markdown.ReplaceAll([]byte(content), []byte(""))
-			content = string(bytes)
+			bytes := markdown.ReplaceAll([]byte(c), []byte(""))
+			c = string(bytes)
 		}
 
-		textParts = append(textParts, content)
+		textParts = append(textParts, c)
 		continue
 	}
 
@@ -77,9 +83,10 @@ func ContentToString(content []ConsensContent, nodeConsens map[string]string, re
 
 func (c SystemConsens) ToOutput() OutputConsens {
 	return OutputConsens{
-		Slug:    c.Slug,
-		Title:   c.Title,
-		Content: c.Content,
+		Slug:     c.Slug,
+		Title:    c.Title,
+		Subtitle: c.Subtitle,
+		Content:  c.Content,
 	}
 }
 
@@ -88,9 +95,10 @@ type ConsensResp struct {
 }
 
 type OutputConsens struct {
-	Slug    string           `json:"slug"`
-	Title   string           `json:"title"`
-	Content []ConsensContent `json:"content"`
+	Slug     string           `json:"slug"`
+	Title    string           `json:"title"`
+	Subtitle string           `json:"subtitle"`
+	Content  []ConsensContent `json:"content"`
 }
 
 type NodeConsensAudit struct {
@@ -103,6 +111,7 @@ type NodeConsensAudit struct {
 	VatCode         string            `json:"vatCode" firestore:"vatCode"`
 	Slug            string            `json:"slug" firestore:"slug"`
 	Title           string            `json:"title" firestore:"title"`
+	Subtitle        string            `json:"subtitle" firestore:"subtitle"`
 	Content         string            `json:"content" firestore:"content"`
 	Answers         map[string]string `json:"answers" firestore:"answers"`
 	GivenAt         time.Time         `json:"givenAt" firestore:"givenAt"`
@@ -136,6 +145,7 @@ func (c *NodeConsensAudit) BigQueryParse() NodeConsensAuditBQ {
 		VatCode:         c.VatCode,
 		Slug:            c.Slug,
 		Title:           c.Title,
+		Subtitle:        c.Subtitle,
 		Content:         c.Content,
 		Answers:         answers,
 		GivenAt:         lib.GetBigQueryNullDateTime(c.GivenAt),
@@ -157,6 +167,7 @@ type NodeConsensAuditBQ struct {
 	VatCode         string                `bigquery:"vatCode"`
 	Slug            string                `bigquery:"slug"`
 	Title           string                `bigquery:"title"`
+	Subtitle        string                `bigquery:"subtitle"`
 	Content         string                `bigquery:"content"`
 	Answers         []BigQueryConsens     `bigquery:"answers"`
 	GivenAt         bigquery.NullDateTime `bigquery:"givenAt"`

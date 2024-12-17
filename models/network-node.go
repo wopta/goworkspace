@@ -70,6 +70,7 @@ type NodeConsens struct {
 	ExpireAt time.Time         `json:"expireAt" firestore:"expireAt" bigquery:"-"`
 	StartAt  time.Time         `json:"startAt" firestore:"startAt" bigquery:"-"`
 	Title    string            `json:"title" firestore:"title" bigquery:"-"`
+	Subtitle string            `json:"subtitle" firestore:"subtitle" bigquery:"-"`
 	Content  string            `json:"content" firestore:"content" bigquery:"-"`
 	Answers  map[string]string `json:"answers" firestore:"answers" bigquery:"-"`
 	GivenAt  time.Time         `json:"givenAt" firestore:"givenAt" bigquery:"-"`
