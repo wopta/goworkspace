@@ -2,9 +2,13 @@ package policy
 
 import (
 	"fmt"
+	"log"
 	"strconv"
 	"time"
 
+	"github.com/go-gota/gota/dataframe"
+	"github.com/go-gota/gota/series"
+	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
 
@@ -79,6 +83,7 @@ func checkQbe(p *models.Policy, i map[string]interface{}) error {
 	i["hasBond"] = p.HasBond
 	i["bond"] = p.Bond
 	i["clause"] = p.Clause
+	i["contractors"] = p.Contractors
 
 	return nil
 }
@@ -235,8 +240,78 @@ func checkAddress(a *models.Address) error {
 	if a.CityCode == "" {
 		return fmt.Errorf("empty address: city code")
 	}
+	if a.IsManualInput {
+		err := verifyManualAddress(a.City, a.PostalCode, a.CityCode)
+		if err != nil {
+			return err
+		}
+	}
 
 	return nil
+}
+
+func verifyManualAddress(city, postalCode, cityCode string) error {
+	fileName := "enrich/postal-codes.csv"
+	file, err := lib.GetFilesByEnvV2(fileName)
+	if err != nil {
+		log.Printf("error reading file %s: %v", fileName, err)
+		return err
+	}
+	df, err := lib.CsvToDataframeV2(file, ';', true)
+	if err != nil {
+		log.Printf("error reading df %v", err)
+		return err
+	}
+
+	columns := []string{"postal code", "place name", "admin code2"}
+	sel := df.Select(columns)
+
+	fil := sel.Filter(dataframe.F{Colname: "admin code2", Comparator: series.Eq, Comparando: lib.ToUpper(cityCode)}).
+		Filter(dataframe.F{Colname: "postal code", Comparator: series.Eq, Comparando: postalCode})
+
+	var found []string
+	if fil.Nrow() == 0 {
+		return fmt.Errorf("can't find any city for postal code %s and city code %s", postalCode, cityCode)
+	} else {
+		for i := 0; i < fil.Nrow(); i++ {
+			found = append(found, fil.Elem(i, 1).String())
+		}
+	}
+	for _, v := range found {
+		if lib.ToUpper(normalizeString(v)) == lib.ToUpper(normalizeString(city)) {
+			return nil
+		}
+	}
+	return fmt.Errorf("city %s doesn't match any postal code %s and city code %s", city, postalCode, cityCode)
+}
+
+func normalizeString(in string) string {
+	var out string
+	for _, r := range in {
+		var s string
+
+		switch r {
+		case ' ', '\'', '.', '/', '_', '-', '’', '`', '‘', '´':
+			s = ""
+		case 'è', 'é':
+			s = "e"
+		case 'à', 'ä':
+			s = "a"
+		case 'ò', 'ö':
+			s = "o"
+		case 'ì':
+			s = "i"
+		case 'ù', 'ü':
+			s = "u"
+		case 'ß':
+			s = "ss"
+		default:
+			s = string(r)
+		}
+		out += s
+	}
+
+	return out
 }
 
 func checkFiscalCode(fc string) bool {

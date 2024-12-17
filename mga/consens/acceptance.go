@@ -119,6 +119,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	}
 
 	audit := NodeConsensAudit{
+		NetworkNodeUid:  networkNode.Uid,
 		Name:            networkNode.GetName(),
 		RuiCode:         networkNode.GetRuiCode(),
 		RuiRegistration: networkNode.GetRuiRegistration(),
