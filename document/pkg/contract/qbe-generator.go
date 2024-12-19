@@ -2,11 +2,13 @@ package contract
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/wopta/goworkspace/document/internal/constants"
 	"github.com/wopta/goworkspace/document/internal/domain"
 	"github.com/wopta/goworkspace/document/internal/engine"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 )
 
 type QBEGenerator struct {
@@ -19,11 +21,100 @@ func NewQBEGenerator(engine *engine.Fpdf, isProposal bool) *QBEGenerator {
 	}
 }
 
-func (qb *QBEGenerator) mainHeader() {
+func (qb *QBEGenerator) mainHeader(policy *models.Policy) {
+	type policyInfo struct {
+		code         string
+		startDate    string
+		endDate      string
+		paymentSplit string
+		nextPayment  string
+		hasBond      string
+	}
+
+	type contractorInfo struct {
+		name       string
+		fiscalCode string
+		vatCode    string
+		address    string
+		mail       string
+		phone      string
+	}
+
+	plcInfo := policyInfo{
+		code:         "=======",
+		startDate:    "=======",
+		endDate:      "=======",
+		paymentSplit: "=======",
+		nextPayment:  "=======",
+		hasBond:      "NO",
+	}
+
+	ctrInfo := contractorInfo{
+		name:       "=======",
+		fiscalCode: "=======",
+		vatCode:    "=======",
+		address:    "=======",
+		mail:       "=======",
+		phone:      "=======",
+	}
+
+	if policy.CodeCompany != "" {
+		plcInfo.code = policy.CodeCompany
+	}
+
+	if !policy.StartDate.IsZero() {
+		plcInfo.startDate = policy.StartDate.Format(constants.DayMonthYearFormat)
+	}
+
+	if !policy.EndDate.IsZero() {
+		plcInfo.endDate = policy.EndDate.Format(constants.DayMonthYearFormat)
+	}
+
+	if _, ok := constants.PaymentSplitMap[policy.PaymentSplit]; ok {
+		plcInfo.paymentSplit = constants.PaymentSplitMap[policy.PaymentSplit]
+	}
+
+	nextPayDate := lib.AddMonths(policy.StartDate.AddDate(policy.Annuity, 0, 0), 12)
+	if !nextPayDate.After(policy.EndDate) {
+		plcInfo.nextPayment = nextPayDate.Format(constants.DayMonthYearFormat)
+	} else {
+		plcInfo.nextPayment = plcInfo.endDate
+	}
+
+	if policy.HasBond {
+		plcInfo.hasBond = "SI"
+	}
+
+	if len(policy.Contractor.Name) != 0 {
+		ctrInfo.name = policy.Contractor.Name
+	}
+
+	if len(policy.Contractor.VatCode) != 0 {
+		ctrInfo.vatCode = policy.Contractor.VatCode
+	}
+
+	if len(policy.Contractor.FiscalCode) != 0 {
+		ctrInfo.fiscalCode = policy.Contractor.FiscalCode
+	}
+
+	if policy.Contractor.CompanyAddress != nil {
+		ctrInfo.address = fmt.Sprintf("%s %s\n%s %s (%s)", policy.Contractor.CompanyAddress.StreetName,
+			policy.Contractor.CompanyAddress.StreetNumber, policy.Contractor.CompanyAddress.PostalCode,
+			policy.Contractor.CompanyAddress.City, policy.Contractor.CompanyAddress.CityCode)
+	}
+
+	if len(policy.Contractor.Mail) != 0 {
+		ctrInfo.mail = policy.Contractor.Mail
+	}
+
+	if len(policy.Contractor.Phone) != 0 {
+		ctrInfo.phone = policy.Contractor.Phone
+	}
+
 	table := [][]domain.TableCell{
 		{
 			{
-				Text:      "I dati della tua Polizza nr. 100100", // TODO: add dynamic code company
+				Text:      "I dati della tua Polizza nr. " + plcInfo.code,
 				Height:    constants.CellHeight,
 				Width:     115,
 				FontStyle: constants.BoldFontStyle,
@@ -49,7 +140,7 @@ func (qb *QBEGenerator) mainHeader() {
 		},
 		{
 			{
-				Text:      "Decorre dal 13/12/2024 ore 24:00", // TODO: add dynamic startDate
+				Text:      "Decorre dal: " + plcInfo.startDate + " ore 24:00",
 				Height:    constants.CellHeight,
 				Width:     115,
 				FontStyle: constants.RegularFontStyle,
@@ -61,7 +152,33 @@ func (qb *QBEGenerator) mainHeader() {
 				Border:    "",
 			},
 			{
-				Text:      "Contraente Wopta Assicurazioni S.R.L", // TODO: add dynamic contractor name
+				Text:      "Contraente: " + ctrInfo.name,
+				Height:    constants.CellHeight,
+				Width:     75,
+				FontStyle: constants.RegularFontStyle,
+				FontColor: constants.BlackColor,
+				FontSize:  constants.RegularFontsize,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.LeftAlign,
+				Border:    "",
+			},
+		},
+		{
+			{
+				Text:      "Scade il: " + plcInfo.endDate + " ore 24:00",
+				Height:    constants.CellHeight,
+				Width:     115,
+				FontStyle: constants.RegularFontStyle,
+				FontColor: constants.BlackColor,
+				FontSize:  constants.RegularFontsize,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.LeftAlign,
+				Border:    "",
+			},
+			{
+				Text:      "P.IVA: " + ctrInfo.vatCode,
 				Height:    constants.CellHeight,
 				Width:     75,
 				FontStyle: constants.RegularFontStyle,
@@ -87,7 +204,7 @@ func (qb *QBEGenerator) mainHeader() {
 				Border:    "",
 			},
 			{
-				Text:      "P.IVA: 012345678910", // TODO: add dynamic vatCode
+				Text:      "Codice Fiscale: " + ctrInfo.fiscalCode,
 				Height:    constants.CellHeight,
 				Width:     75,
 				FontStyle: constants.RegularFontStyle,
@@ -101,7 +218,7 @@ func (qb *QBEGenerator) mainHeader() {
 		},
 		{
 			{
-				Text:      "Frazionamento: MENSILE", // TODO: add dynamic payment split
+				Text:      "Frazionamento: " + plcInfo.paymentSplit,
 				Height:    constants.CellHeight,
 				Width:     115,
 				FontStyle: constants.RegularFontStyle,
@@ -113,7 +230,7 @@ func (qb *QBEGenerator) mainHeader() {
 				Border:    "",
 			},
 			{
-				Text:      "Codice Fiscale: ZMKRBO98P06Z515L", // TODO: add dynamic fiscalCode
+				Text:      strings.Split("Indirizzo: "+ctrInfo.address, "\n")[0],
 				Height:    constants.CellHeight,
 				Width:     75,
 				FontStyle: constants.RegularFontStyle,
@@ -127,7 +244,7 @@ func (qb *QBEGenerator) mainHeader() {
 		},
 		{
 			{
-				Text:      "Prossimo pagamento il: 16/12/2025", // TODO: add dynamic nextPayment date
+				Text:      "Prossimo pagamento il: " + plcInfo.nextPayment,
 				Height:    constants.CellHeight,
 				Width:     115,
 				FontStyle: constants.RegularFontStyle,
@@ -139,7 +256,7 @@ func (qb *QBEGenerator) mainHeader() {
 				Border:    "",
 			},
 			{
-				Text:      "Indirizzo: Galleria del corso 1, Milano (MI)", // TODO: add dynamic address
+				Text:      strings.Split(ctrInfo.address, "\n")[1],
 				Height:    constants.CellHeight,
 				Width:     75,
 				FontStyle: constants.RegularFontStyle,
@@ -153,7 +270,7 @@ func (qb *QBEGenerator) mainHeader() {
 		},
 		{
 			{
-				Text:      "Presenza Vincolo: NO", // TODO: add dynamic hasBond
+				Text:      "Sostituisce la Polizza: ======",
 				Height:    constants.CellHeight,
 				Width:     115,
 				FontStyle: constants.RegularFontStyle,
@@ -165,7 +282,7 @@ func (qb *QBEGenerator) mainHeader() {
 				Border:    "",
 			},
 			{
-				Text:      "Telefono: +393334455667", // TODO: add dynamic phone
+				Text:      "Mail: " + ctrInfo.mail,
 				Height:    constants.CellHeight,
 				Width:     75,
 				FontStyle: constants.RegularFontStyle,
@@ -179,7 +296,7 @@ func (qb *QBEGenerator) mainHeader() {
 		},
 		{
 			{
-				Text:      "Sostituisce la Polizza: 1234567", // TODO: add dynamic old codeCompany
+				Text:      "Presenza Vincolo: " + plcInfo.hasBond + " Convenzione: NO",
 				Height:    constants.CellHeight,
 				Width:     115,
 				FontStyle: constants.RegularFontStyle,
@@ -191,23 +308,9 @@ func (qb *QBEGenerator) mainHeader() {
 				Border:    "",
 			},
 			{
-				Text:      "Mail: wopta@wopta.it", // TODO: add dynamic mail
+				Text:      "Telefono: " + ctrInfo.phone,
 				Height:    constants.CellHeight,
 				Width:     75,
-				FontStyle: constants.RegularFontStyle,
-				FontColor: constants.BlackColor,
-				FontSize:  constants.RegularFontsize,
-				Fill:      false,
-				FillColor: domain.Color{},
-				Align:     constants.LeftAlign,
-				Border:    "",
-			},
-		},
-		{
-			{
-				Text:      "Convenzione: NO",
-				Height:    constants.CellHeight,
-				Width:     190,
 				FontStyle: constants.RegularFontStyle,
 				FontColor: constants.BlackColor,
 				FontSize:  constants.RegularFontsize,
@@ -464,8 +567,8 @@ func (qb *QBEGenerator) whoWeAreTable() {
 	qb.engine.DrawTable(whoWeAreTable)
 }
 
-func (qb *QBEGenerator) Contract() ([]byte, error) {
-	qb.mainHeader()
+func (qb *QBEGenerator) Contract(policy *models.Policy) ([]byte, error) {
+	qb.mainHeader(policy)
 
 	qb.engine.NewPage()
 
