@@ -13,9 +13,9 @@ type QBEGenerator struct {
 	*baseGenerator
 }
 
-func NewQBEGenerator(engine *engine.Fpdf) *QBEGenerator {
+func NewQBEGenerator(engine *engine.Fpdf, isProposal bool) *QBEGenerator {
 	return &QBEGenerator{
-		&baseGenerator{engine: engine},
+		&baseGenerator{engine: engine, isProposal: isProposal},
 	}
 }
 
@@ -225,6 +225,10 @@ func (qb *QBEGenerator) mainHeader() {
 		qb.engine.InsertImage(lib.GetAssetPathByEnvV2()+"logo_wopta.png", 107.5, 5, 35, 12)
 		qb.engine.NewLine(7)
 		qb.engine.DrawTable(table)
+
+		if qb.isProposal {
+			qb.engine.DrawWatermark("PROPOSTA")
+		}
 	})
 }
 
