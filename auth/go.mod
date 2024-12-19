@@ -9,8 +9,8 @@ require (
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/wopta/goworkspace/lib v1.0.134
-	github.com/wopta/goworkspace/models v1.2.22
-	github.com/wopta/goworkspace/network v1.0.87
+	github.com/wopta/goworkspace/models v1.2.24
+	github.com/wopta/goworkspace/network v1.0.89
 )
 
 require (

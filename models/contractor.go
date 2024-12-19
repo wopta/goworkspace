@@ -1,15 +1,16 @@
 package models
 
 import (
-	"cloud.google.com/go/bigquery"
-	"cloud.google.com/go/firestore"
 	"encoding/json"
 	"fmt"
+	"log"
+	"time"
+
+	"cloud.google.com/go/bigquery"
+	"cloud.google.com/go/firestore"
 	"github.com/wopta/goworkspace/lib"
 	"google.golang.org/api/iterator"
 	"google.golang.org/genproto/googleapis/type/latlng"
-	"log"
-	"time"
 )
 
 type Contractor struct {
@@ -76,7 +77,7 @@ type Contractor struct {
 	IsLegalPerson            bool                   `firestore:"isLegalPerson,omitempty"     json:"isLegalPerson,omitempty"     bigquery:"-"`
 	CompanyAddress           *Address               `firestore:"companyAddress,omitempty" json:"companyAddress,omitempty" bigquery:"-"`
 	Data                     string                 `firestore:"-"                           json:"-"                           bigquery:"data"`
-	YearOfEstablishment      int                    `firestore:"yearOfEstablishment,omitempty" json:"yearOfEstablishment,omitempty"`
+	YearOfEstablishment      int                    `firestore:"yearOfEstablishment,omitempty" json:"yearOfEstablishment,omitempty" bigquery:"-"`
 }
 
 func (c *Contractor) Normalize() {

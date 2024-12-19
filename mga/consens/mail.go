@@ -50,6 +50,7 @@ func sendConsensMail(networkNode *models.NetworkNode, consens SystemConsens, nod
 		To:          []string{to.Address},
 		Message:     tpl.String(),
 		Title:       nodeConsens.Title,
+		SubTitle:    nodeConsens.Subtitle,
 		Subject:     nodeConsens.Title,
 		IsHtml:      true,
 	}

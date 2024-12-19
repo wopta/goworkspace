@@ -89,6 +89,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 		ExpireAt: consens.ExpireAt,
 		StartAt:  consens.StartAt,
 		Title:    consens.Title,
+		Subtitle: consens.Subtitle,
 		Content:  ContentToString(consens.Content, request.Answers, true),
 		Answers:  request.Answers,
 		GivenAt:  now,
@@ -118,6 +119,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 	}
 
 	audit := NodeConsensAudit{
+		NetworkNodeUid:  networkNode.Uid,
 		Name:            networkNode.GetName(),
 		RuiCode:         networkNode.GetRuiCode(),
 		RuiRegistration: networkNode.GetRuiRegistration(),
@@ -125,6 +127,7 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, any, error) {
 		VatCode:         networkNode.GetVatCode(),
 		Slug:            nodeConsens.Slug,
 		Title:           nodeConsens.Title,
+		Subtitle:        nodeConsens.Subtitle,
 		Content:         nodeConsens.Content,
 		Answers:         request.Answers,
 		GivenAt:         now,
