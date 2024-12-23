@@ -567,6 +567,240 @@ func (qb *QBEGenerator) whoWeAreTable() {
 	qb.engine.DrawTable(whoWeAreTable)
 }
 
+func (qb *QBEGenerator) insuredDetailsSection(policy *models.Policy) {
+	type buildingInfo struct {
+		address          string
+		buildingMaterial string
+		hasSandwichPanel string
+		hasAlarm         string
+		hasSprinkler     string
+		naics            string
+		naicsDetail      string
+	}
+
+	type enterpriseInfo struct {
+		revenue                  string
+		northAmericanMarket      string
+		employer                 string
+		workEmployerRemunaration string
+		totalBilled              string
+		ownerTotalBilled         string
+	}
+
+	newBuildingInfo := func() *buildingInfo {
+		return &buildingInfo{
+			address:          "======",
+			buildingMaterial: "======",
+			hasSandwichPanel: "======",
+			hasAlarm:         "======",
+			hasSprinkler:     "======",
+			naics:            "======",
+			naicsDetail:      "======",
+		}
+	}
+	newEnterpriseInfo := func() *enterpriseInfo {
+		return &enterpriseInfo{
+			revenue:                  "======",
+			northAmericanMarket:      "======",
+			employer:                 "======",
+			workEmployerRemunaration: "======",
+			totalBilled:              "======",
+			ownerTotalBilled:         "======",
+		}
+	}
+
+	buildings := make([]*buildingInfo, 5)
+	for i := 0; i < 5; i++ {
+		buildings[i] = newBuildingInfo()
+	}
+
+	enterprise := newEnterpriseInfo()
+
+	index := 0
+	for _, asset := range policy.Assets {
+		if asset.Building == nil {
+			continue
+		}
+
+		buildings[index].address = fmt.Sprintf("%s, %s - %s %s (%s)", asset.Building.Address,
+			asset.Building.StreetNumber, asset.Building.PostalCode, asset.Building.City, asset.Building.CityCode)
+		buildings[index].buildingMaterial = asset.Building.BuildingMaterial
+		buildings[index].hasSandwichPanel = "NO"
+		if asset.Building.HasSandwichPanel {
+			buildings[index].hasSandwichPanel = "SI"
+		}
+
+		buildings[index].hasAlarm = "NO"
+		if asset.Building.HasAlarm {
+			buildings[index].hasAlarm = "SI"
+		}
+
+		buildings[index].hasSprinkler = "NO"
+		if asset.Building.HasSprinkler {
+			buildings[index].hasSprinkler = "SI"
+		}
+
+		buildings[index].naics = asset.Building.Naics
+		buildings[index].naicsDetail = asset.Building.NaicsDetail
+
+		index++
+	}
+
+	for _, asset := range policy.Assets {
+		if asset.Enterprise == nil {
+			continue
+		}
+
+		if asset.Enterprise.Revenue != 0.0 {
+			enterprise.revenue = lib.HumanaizePriceEuro(asset.Enterprise.Revenue)
+		}
+
+		if asset.Enterprise.NorthAmericanMarket != 0.0 {
+			enterprise.northAmericanMarket = lib.HumanaizePriceEuro(asset.Enterprise.NorthAmericanMarket)
+		}
+
+		if asset.Enterprise.Employer != 0 {
+			enterprise.employer = fmt.Sprintf("%d", asset.Enterprise.Employer)
+		}
+
+		if asset.Enterprise.WorkEmployersRemuneration != 0.0 {
+			enterprise.workEmployerRemunaration = lib.HumanaizePriceEuro(asset.Enterprise.WorkEmployersRemuneration)
+		}
+
+		if asset.Enterprise.TotalBilled != 0.0 {
+			enterprise.totalBilled = lib.HumanaizePriceEuro(asset.Enterprise.TotalBilled)
+		}
+
+		// TODO: add check on OwnerTotalBilled field
+
+	}
+
+	table := make([][]domain.TableCell, 0)
+
+	titleRow := []domain.TableCell{
+		{
+			Text:      "L'assicurazione è prestata per",
+			Height:    3.5,
+			Width:     190,
+			FontSize:  constants.LargeFontSize,
+			FontStyle: constants.BoldFontStyle,
+			FontColor: constants.BlackColor,
+			Fill:      false,
+			FillColor: domain.Color{},
+			Align:     constants.LeftAlign,
+			Border:    "",
+		},
+	}
+	table = append(table, titleRow)
+
+	for i := 0; i < 5; i++ {
+		building := buildings[i]
+		border := "B"
+		if i == 0 {
+			border = "TB"
+		}
+
+		row := []domain.TableCell{
+			{
+				Text:      fmt.Sprintf(" \nSede %d\n ", i+1),
+				Height:    4.5,
+				Width:     40,
+				FontSize:  constants.RegularFontsize,
+				FontStyle: constants.BoldFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.CenterAlign,
+				Border:    border,
+			},
+			{
+				Text: fmt.Sprintf("Indirizzo: %s\nFabbricato in %s, "+
+					"pannelli sandwich: %s; Allarme antifurto: %s, Sprinkler: %s,"+
+					"\nAttività NAICS codice: %s Descrizione: %s",
+					building.address, building.buildingMaterial, building.hasSandwichPanel, building.hasAlarm,
+					building.hasSprinkler, building.naics, building.naicsDetail),
+				Height:    4.5,
+				Width:     150,
+				FontSize:  constants.RegularFontsize,
+				FontStyle: constants.RegularFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.LeftAlign,
+				Border:    border,
+			},
+		}
+		table = append(table, row)
+	}
+
+	activityRow := []domain.TableCell{
+		{
+			Text:      " \nAttività\n ",
+			Height:    4.5,
+			Width:     40,
+			FontSize:  constants.RegularFontsize,
+			FontStyle: constants.BoldFontStyle,
+			FontColor: constants.BlackColor,
+			Fill:      false,
+			FillColor: domain.Color{},
+			Align:     constants.CenterAlign,
+			Border:    "TB",
+		},
+		{
+			Text: fmt.Sprintf("Fatturato: %s di cui verso USA e Canada: %s\nPrestatori di lavoro nr: %s"+
+				" - Retribuzioni: %s\nTotal Asset: %s di cui capitale proprio: %s",
+				enterprise.revenue, enterprise.northAmericanMarket, enterprise.employer,
+				enterprise.workEmployerRemunaration, enterprise.totalBilled, enterprise.ownerTotalBilled),
+			Height:    4.5,
+			Width:     150,
+			FontSize:  constants.RegularFontsize,
+			FontStyle: constants.RegularFontStyle,
+			FontColor: constants.BlackColor,
+			Fill:      false,
+			FillColor: domain.Color{},
+			Align:     constants.LeftAlign,
+			Border:    "TB",
+		},
+	}
+	table = append(table, activityRow)
+
+	riskDescriptionRow := []domain.TableCell{
+		{
+			Text:      " \n \nDescrizione del rischio\n \n ",
+			Height:    4.5,
+			Width:     40,
+			FontSize:  constants.RegularFontsize,
+			FontStyle: constants.BoldFontStyle,
+			FontColor: constants.BlackColor,
+			Fill:      false,
+			FillColor: domain.Color{},
+			Align:     constants.CenterAlign,
+			Border:    "TB",
+		},
+		{
+			Text: "Stabilimento costituito da uno o più corpi di Fabbricati, " +
+				"prevalentemente costruiti in materiali incombustibili, " +
+				"nel quale i processi di lavorazione sono quelli che la tecnica inerente all’attività svolta insegna" +
+				" e consiglia di usare o che l'Assicurato intende adottare. " +
+				"S'intendono altresì compresi i depositi e tutte le dipendenze necessarie per la conduzione dell" +
+				"'attività, incluse le abitazioni e le attività di carattere assistenziale e/o commerciale.",
+			Height:    4.5,
+			Width:     150,
+			FontSize:  constants.RegularFontsize,
+			FontStyle: constants.RegularFontStyle,
+			FontColor: constants.BlackColor,
+			Fill:      false,
+			FillColor: domain.Color{},
+			Align:     constants.LeftAlign,
+			Border:    "TB",
+		},
+	}
+	table = append(table, riskDescriptionRow)
+
+	qb.engine.DrawTable(table)
+
+}
+
 func (qb *QBEGenerator) Contract(policy *models.Policy) ([]byte, error) {
 	qb.mainHeader(policy)
 
@@ -583,6 +817,8 @@ func (qb *QBEGenerator) Contract(policy *models.Policy) ([]byte, error) {
 	qb.whoWeAreTable()
 
 	qb.engine.NewLine(10)
+
+	qb.insuredDetailsSection(policy)
 
 	return qb.engine.RawDoc()
 }
