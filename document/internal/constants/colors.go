@@ -18,4 +18,9 @@ var (
 		G: 255,
 		B: 255,
 	}
+	GreyColor = domain.Color{
+		R: 217,
+		G: 217,
+		B: 217,
+	}
 )

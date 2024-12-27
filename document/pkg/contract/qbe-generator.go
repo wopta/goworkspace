@@ -11,6 +11,55 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
+const (
+	fabbricatoGuaranteeSlug             string = "fabbricato"
+	rischioLocativoGuaranteeSlug        string = "rischio locativo"
+	macchinariGuaranteeSlug             string = "macchinari"
+	merciGuaranteeSlug                  string = "merci"
+	merciAumentoGuaranteeSlug           string = "merci in aumento"
+	merciAumentoEnterpriseGuaranteeSlug string = "merci in aumento-enterprise"
+	ricorsoGuaranteeSlug                string = "ricorso"
+	fenomenoGuaranteeSlug               string = "fenomeno"
+	merciRefrigerazioneGuaranteeSlug    string = "merci-refri"
+	guastiGuaranteeSlug                 string = "guasti"
+	elettronicaGuaranteeSlug            string = "elettronica"
+	furtoGuaranteeSlug                  string = "furto"
+	formulaGuaranteeSlug                string = "formula"
+	diariaGuaranteeSlug                 string = "diaria"
+	maggioriGuaranteeSlug               string = "maggiori"
+	pigioniGuaranteeSlug                string = "pigioni"
+	rctoGuaranteeSlug                   string = "rcto"
+	rcpGuaranteeSlug                    string = "rcp"
+	deoGuaranteeSlug                    string = "deo"
+	cyberGuanrateeSlug                  string = "cyber"
+)
+
+var (
+	guaranteeNamesMap = map[string]string{
+		fabbricatoGuaranteeSlug:             "Fabbricato",
+		rischioLocativoGuaranteeSlug:        "Rischio Locativo (in aumento A/24)",
+		macchinariGuaranteeSlug:             "Macchinari",
+		merciGuaranteeSlug:                  "Merci (importi fissi)",
+		merciAumentoGuaranteeSlug:           "Merci (Aumento temporaneo A/29)",
+		merciAumentoEnterpriseGuaranteeSlug: "Merci (Aumento temporaneo A/29) - giorni",
+		ricorsoGuaranteeSlug:                "Ricordo Terzi (in aumento A/25)",
+		fenomenoGuaranteeSlug:               "Fenomeno Elettrico (in aumento A/23)",
+		merciRefrigerazioneGuaranteeSlug:    "Merci in refrigerazione",
+		guastiGuaranteeSlug:                 "Guasti alle macchine (in aumento A/27)",
+		elettronicaGuaranteeSlug:            "Apparecch.re Elettroniche (in aumento A/26)",
+		furtoGuaranteeSlug:                  "Furto, rapina, estorsione (in aumento C/1)",
+		formulaGuaranteeSlug:                "Danni indiretti - Formula",
+		diariaGuaranteeSlug:                 "Diaria Giornaliera",
+		maggioriGuaranteeSlug:               "Maggiori costi",
+		pigioniGuaranteeSlug:                "Perdita Pigioni",
+		rctoGuaranteeSlug: "Responsabilità Civile verso Terzi (" +
+			"RCT) e verso Prestatori di lavoro (RCO)",
+		rcpGuaranteeSlug:   "Responsabilità Civile Prodotti (RCP) Ritiro prodotti",
+		deoGuaranteeSlug:   "Responsabilitu Amministratori Sindaci Dirigenti(D&O)",
+		cyberGuanrateeSlug: "Cyber Response e Data Security",
+	}
+)
+
 type QBEGenerator struct {
 	*baseGenerator
 }
@@ -119,7 +168,7 @@ func (qb *QBEGenerator) mainHeader(policy *models.Policy) {
 				Width:     115,
 				FontStyle: constants.BoldFontStyle,
 				FontColor: constants.BlackColor,
-				FontSize:  constants.RegularFontsize,
+				FontSize:  constants.RegularFontSize,
 				Fill:      false,
 				FillColor: domain.Color{},
 				Align:     constants.LeftAlign,
@@ -131,7 +180,7 @@ func (qb *QBEGenerator) mainHeader(policy *models.Policy) {
 				Width:     75,
 				FontStyle: constants.BoldFontStyle,
 				FontColor: constants.BlackColor,
-				FontSize:  constants.RegularFontsize,
+				FontSize:  constants.RegularFontSize,
 				Fill:      false,
 				FillColor: domain.Color{},
 				Align:     constants.LeftAlign,
@@ -145,7 +194,7 @@ func (qb *QBEGenerator) mainHeader(policy *models.Policy) {
 				Width:     115,
 				FontStyle: constants.RegularFontStyle,
 				FontColor: constants.BlackColor,
-				FontSize:  constants.RegularFontsize,
+				FontSize:  constants.RegularFontSize,
 				Fill:      false,
 				FillColor: domain.Color{},
 				Align:     constants.LeftAlign,
@@ -157,7 +206,7 @@ func (qb *QBEGenerator) mainHeader(policy *models.Policy) {
 				Width:     75,
 				FontStyle: constants.RegularFontStyle,
 				FontColor: constants.BlackColor,
-				FontSize:  constants.RegularFontsize,
+				FontSize:  constants.RegularFontSize,
 				Fill:      false,
 				FillColor: domain.Color{},
 				Align:     constants.LeftAlign,
@@ -171,7 +220,7 @@ func (qb *QBEGenerator) mainHeader(policy *models.Policy) {
 				Width:     115,
 				FontStyle: constants.RegularFontStyle,
 				FontColor: constants.BlackColor,
-				FontSize:  constants.RegularFontsize,
+				FontSize:  constants.RegularFontSize,
 				Fill:      false,
 				FillColor: domain.Color{},
 				Align:     constants.LeftAlign,
@@ -183,7 +232,7 @@ func (qb *QBEGenerator) mainHeader(policy *models.Policy) {
 				Width:     75,
 				FontStyle: constants.RegularFontStyle,
 				FontColor: constants.BlackColor,
-				FontSize:  constants.RegularFontsize,
+				FontSize:  constants.RegularFontSize,
 				Fill:      false,
 				FillColor: domain.Color{},
 				Align:     constants.LeftAlign,
@@ -197,7 +246,7 @@ func (qb *QBEGenerator) mainHeader(policy *models.Policy) {
 				Width:     115,
 				FontStyle: constants.RegularFontStyle,
 				FontColor: constants.BlackColor,
-				FontSize:  constants.RegularFontsize,
+				FontSize:  constants.RegularFontSize,
 				Fill:      false,
 				FillColor: domain.Color{},
 				Align:     constants.LeftAlign,
@@ -209,7 +258,7 @@ func (qb *QBEGenerator) mainHeader(policy *models.Policy) {
 				Width:     75,
 				FontStyle: constants.RegularFontStyle,
 				FontColor: constants.BlackColor,
-				FontSize:  constants.RegularFontsize,
+				FontSize:  constants.RegularFontSize,
 				Fill:      false,
 				FillColor: domain.Color{},
 				Align:     constants.LeftAlign,
@@ -223,7 +272,7 @@ func (qb *QBEGenerator) mainHeader(policy *models.Policy) {
 				Width:     115,
 				FontStyle: constants.RegularFontStyle,
 				FontColor: constants.BlackColor,
-				FontSize:  constants.RegularFontsize,
+				FontSize:  constants.RegularFontSize,
 				Fill:      false,
 				FillColor: domain.Color{},
 				Align:     constants.LeftAlign,
@@ -235,7 +284,7 @@ func (qb *QBEGenerator) mainHeader(policy *models.Policy) {
 				Width:     75,
 				FontStyle: constants.RegularFontStyle,
 				FontColor: constants.BlackColor,
-				FontSize:  constants.RegularFontsize,
+				FontSize:  constants.RegularFontSize,
 				Fill:      false,
 				FillColor: domain.Color{},
 				Align:     constants.LeftAlign,
@@ -249,7 +298,7 @@ func (qb *QBEGenerator) mainHeader(policy *models.Policy) {
 				Width:     115,
 				FontStyle: constants.RegularFontStyle,
 				FontColor: constants.BlackColor,
-				FontSize:  constants.RegularFontsize,
+				FontSize:  constants.RegularFontSize,
 				Fill:      false,
 				FillColor: domain.Color{},
 				Align:     constants.LeftAlign,
@@ -261,7 +310,7 @@ func (qb *QBEGenerator) mainHeader(policy *models.Policy) {
 				Width:     75,
 				FontStyle: constants.RegularFontStyle,
 				FontColor: constants.BlackColor,
-				FontSize:  constants.RegularFontsize,
+				FontSize:  constants.RegularFontSize,
 				Fill:      false,
 				FillColor: domain.Color{},
 				Align:     constants.LeftAlign,
@@ -275,7 +324,7 @@ func (qb *QBEGenerator) mainHeader(policy *models.Policy) {
 				Width:     115,
 				FontStyle: constants.RegularFontStyle,
 				FontColor: constants.BlackColor,
-				FontSize:  constants.RegularFontsize,
+				FontSize:  constants.RegularFontSize,
 				Fill:      false,
 				FillColor: domain.Color{},
 				Align:     constants.LeftAlign,
@@ -287,7 +336,7 @@ func (qb *QBEGenerator) mainHeader(policy *models.Policy) {
 				Width:     75,
 				FontStyle: constants.RegularFontStyle,
 				FontColor: constants.BlackColor,
-				FontSize:  constants.RegularFontsize,
+				FontSize:  constants.RegularFontSize,
 				Fill:      false,
 				FillColor: domain.Color{},
 				Align:     constants.LeftAlign,
@@ -301,7 +350,7 @@ func (qb *QBEGenerator) mainHeader(policy *models.Policy) {
 				Width:     115,
 				FontStyle: constants.RegularFontStyle,
 				FontColor: constants.BlackColor,
-				FontSize:  constants.RegularFontsize,
+				FontSize:  constants.RegularFontSize,
 				Fill:      false,
 				FillColor: domain.Color{},
 				Align:     constants.LeftAlign,
@@ -313,7 +362,7 @@ func (qb *QBEGenerator) mainHeader(policy *models.Policy) {
 				Width:     75,
 				FontStyle: constants.RegularFontStyle,
 				FontColor: constants.BlackColor,
-				FontSize:  constants.RegularFontsize,
+				FontSize:  constants.RegularFontSize,
 				Fill:      false,
 				FillColor: domain.Color{},
 				Align:     constants.LeftAlign,
@@ -376,7 +425,7 @@ func (qb *QBEGenerator) introTable() {
 				Width:     95,
 				FontStyle: constants.BoldFontStyle,
 				FontColor: constants.BlackColor,
-				FontSize:  constants.RegularFontsize,
+				FontSize:  constants.RegularFontSize,
 				Fill:      false,
 				FillColor: domain.Color{},
 				Align:     constants.CenterAlign,
@@ -388,7 +437,7 @@ func (qb *QBEGenerator) introTable() {
 				Width:     95,
 				FontStyle: constants.BoldFontStyle,
 				FontColor: constants.BlackColor,
-				FontSize:  constants.RegularFontsize,
+				FontSize:  constants.RegularFontSize,
 				Fill:      false,
 				FillColor: domain.Color{},
 				Align:     constants.CenterAlign,
@@ -420,7 +469,7 @@ func (qb *QBEGenerator) whoWeAreTable() {
 				Text:      "QBE Europe SA/NV Rappresentanza generale per l’Italia,",
 				Height:    3.5,
 				Width:     93.5,
-				FontSize:  constants.RegularFontsize,
+				FontSize:  constants.RegularFontSize,
 				FontStyle: constants.BoldFontStyle,
 				FontColor: constants.BlackColor,
 				Fill:      false,
@@ -432,7 +481,7 @@ func (qb *QBEGenerator) whoWeAreTable() {
 				Text:      "impresa di assicurazione operante in Italia in regime di",
 				Height:    3.5,
 				Width:     96.5,
-				FontSize:  constants.RegularFontsize,
+				FontSize:  constants.RegularFontSize,
 				FontStyle: constants.RegularFontStyle,
 				FontColor: constants.BlackColor,
 				Fill:      false,
@@ -446,7 +495,7 @@ func (qb *QBEGenerator) whoWeAreTable() {
 				Text:      "libertà di stabilimento, autorizzata dalla Banca Nazionale del Belgio con licenza numero 3093, con sede legale in Place du Champ de Mars 5, BE 1050, Bruxelles, Belgio e sede secondaria in Italia, Via Melchiorre Gioia, 8, 20124, Milano (MI), R.E.A. MI-2538674, codice fiscale e p. iva 10532190963, Autorizzazione IVASS n. I.00147.",
 				Height:    3.5,
 				Width:     190,
-				FontSize:  constants.RegularFontsize,
+				FontSize:  constants.RegularFontSize,
 				FontStyle: constants.RegularFontStyle,
 				FontColor: constants.BlackColor,
 				Fill:      false,
@@ -460,7 +509,7 @@ func (qb *QBEGenerator) whoWeAreTable() {
 				Text:      " ",
 				Height:    5,
 				Width:     190,
-				FontSize:  constants.RegularFontsize,
+				FontSize:  constants.RegularFontSize,
 				FontStyle: constants.RegularFontStyle,
 				FontColor: constants.BlackColor,
 				Fill:      false,
@@ -474,7 +523,7 @@ func (qb *QBEGenerator) whoWeAreTable() {
 				Text:      "Wopta Assicurazioni S.r.l.",
 				Height:    3.5,
 				Width:     45,
-				FontSize:  constants.RegularFontsize,
+				FontSize:  constants.RegularFontSize,
 				FontStyle: constants.BoldFontStyle,
 				FontColor: constants.PinkColor,
 				Fill:      false,
@@ -486,7 +535,7 @@ func (qb *QBEGenerator) whoWeAreTable() {
 				Text:      "(nel testo anche “Wopta”) - intermediario assicurativo, soggetto al controllo dell’IVASS ed",
 				Height:    3.5,
 				Width:     145,
-				FontSize:  constants.RegularFontsize,
+				FontSize:  constants.RegularFontSize,
 				FontStyle: constants.RegularFontStyle,
 				FontColor: constants.BlackColor,
 				Fill:      false,
@@ -500,7 +549,7 @@ func (qb *QBEGenerator) whoWeAreTable() {
 				Text:      "iscritto dal 14.02.2022 al Registro Unico degli Intermediari, in Sezione A nr. A000701923, avente sede legale in Galleria del Corso, 1 – 20122 Milano (MI). Capitale sociale euro 120.000 - Codice Fiscale, Reg. Imprese e Partita IVA: 12072020964 - Iscritta al Registro delle imprese di Milano – REA MI 2638708",
 				Height:    3.5,
 				Width:     190,
-				FontSize:  constants.RegularFontsize,
+				FontSize:  constants.RegularFontSize,
 				FontStyle: constants.RegularFontStyle,
 				FontColor: constants.BlackColor,
 				Fill:      false,
@@ -514,7 +563,7 @@ func (qb *QBEGenerator) whoWeAreTable() {
 				Text:      " ",
 				Height:    5,
 				Width:     190,
-				FontSize:  constants.RegularFontsize,
+				FontSize:  constants.RegularFontSize,
 				FontStyle: constants.RegularFontStyle,
 				FontColor: constants.BlackColor,
 				Fill:      false,
@@ -528,7 +577,7 @@ func (qb *QBEGenerator) whoWeAreTable() {
 				Text:      "Commercial Combined ",
 				Height:    3.5,
 				Width:     40,
-				FontSize:  constants.RegularFontsize,
+				FontSize:  constants.RegularFontSize,
 				FontStyle: constants.BoldFontStyle,
 				FontColor: constants.BlackColor,
 				Fill:      false,
@@ -540,7 +589,7 @@ func (qb *QBEGenerator) whoWeAreTable() {
 				Text:      "Assicurazione multigaranzia per le imprese è un prodotto assicurativo di QBE Europe SA/NV",
 				Height:    3.5,
 				Width:     150,
-				FontSize:  constants.RegularFontsize,
+				FontSize:  constants.RegularFontSize,
 				FontStyle: constants.RegularFontStyle,
 				FontColor: constants.BlackColor,
 				Fill:      false,
@@ -554,7 +603,7 @@ func (qb *QBEGenerator) whoWeAreTable() {
 				Text:      "Rappresentanza Generale per l’Italia distribuito da Wopta Assicurazioni S.r.l.",
 				Height:    3.5,
 				Width:     190,
-				FontSize:  constants.RegularFontsize,
+				FontSize:  constants.RegularFontSize,
 				FontStyle: constants.RegularFontStyle,
 				FontColor: constants.BlackColor,
 				Fill:      false,
@@ -705,7 +754,7 @@ func (qb *QBEGenerator) insuredDetailsSection(policy *models.Policy) {
 				Text:      fmt.Sprintf(" \nSede %d\n ", i+1),
 				Height:    4.5,
 				Width:     40,
-				FontSize:  constants.RegularFontsize,
+				FontSize:  constants.RegularFontSize,
 				FontStyle: constants.BoldFontStyle,
 				FontColor: constants.BlackColor,
 				Fill:      false,
@@ -721,7 +770,7 @@ func (qb *QBEGenerator) insuredDetailsSection(policy *models.Policy) {
 					building.hasSprinkler, building.naics, building.naicsDetail),
 				Height:    4.5,
 				Width:     150,
-				FontSize:  constants.RegularFontsize,
+				FontSize:  constants.RegularFontSize,
 				FontStyle: constants.RegularFontStyle,
 				FontColor: constants.BlackColor,
 				Fill:      false,
@@ -738,7 +787,7 @@ func (qb *QBEGenerator) insuredDetailsSection(policy *models.Policy) {
 			Text:      " \nAttività\n ",
 			Height:    4.5,
 			Width:     40,
-			FontSize:  constants.RegularFontsize,
+			FontSize:  constants.RegularFontSize,
 			FontStyle: constants.BoldFontStyle,
 			FontColor: constants.BlackColor,
 			Fill:      false,
@@ -753,7 +802,7 @@ func (qb *QBEGenerator) insuredDetailsSection(policy *models.Policy) {
 				enterprise.workEmployerRemunaration, enterprise.totalBilled, enterprise.ownerTotalBilled),
 			Height:    4.5,
 			Width:     150,
-			FontSize:  constants.RegularFontsize,
+			FontSize:  constants.RegularFontSize,
 			FontStyle: constants.RegularFontStyle,
 			FontColor: constants.BlackColor,
 			Fill:      false,
@@ -769,7 +818,7 @@ func (qb *QBEGenerator) insuredDetailsSection(policy *models.Policy) {
 			Text:      " \n \nDescrizione del rischio\n \n ",
 			Height:    4.5,
 			Width:     40,
-			FontSize:  constants.RegularFontsize,
+			FontSize:  constants.RegularFontSize,
 			FontStyle: constants.BoldFontStyle,
 			FontColor: constants.BlackColor,
 			Fill:      false,
@@ -786,7 +835,7 @@ func (qb *QBEGenerator) insuredDetailsSection(policy *models.Policy) {
 				"'attività, incluse le abitazioni e le attività di carattere assistenziale e/o commerciale.",
 			Height:    4.5,
 			Width:     150,
-			FontSize:  constants.RegularFontsize,
+			FontSize:  constants.RegularFontSize,
 			FontStyle: constants.RegularFontStyle,
 			FontColor: constants.BlackColor,
 			Fill:      false,
@@ -799,6 +848,381 @@ func (qb *QBEGenerator) insuredDetailsSection(policy *models.Policy) {
 
 	qb.engine.DrawTable(table)
 
+}
+
+func (qb *QBEGenerator) guaranteesDetailsSection(policy *models.Policy) {
+	const emptyInfo string = "======"
+
+	type guaranteeInfo struct {
+		sumInsuredLimitOfIndemnity string
+		startDate                  string
+		duration                   string
+	}
+
+	buildingsData := make(map[string][]string, 5)
+	enterpriseData := make(map[string]guaranteeInfo)
+
+	buildingsSlugs := []string{fabbricatoGuaranteeSlug, rischioLocativoGuaranteeSlug, macchinariGuaranteeSlug,
+		merciGuaranteeSlug, merciAumentoGuaranteeSlug}
+
+	enterpriseSlugs := []string{merciAumentoEnterpriseGuaranteeSlug, ricorsoGuaranteeSlug, fenomenoGuaranteeSlug,
+		merciRefrigerazioneGuaranteeSlug,
+		guastiGuaranteeSlug, elettronicaGuaranteeSlug, furtoGuaranteeSlug, formulaGuaranteeSlug,
+		diariaGuaranteeSlug, maggioriGuaranteeSlug,
+		pigioniGuaranteeSlug, rctoGuaranteeSlug, rcpGuaranteeSlug, deoGuaranteeSlug, cyberGuanrateeSlug}
+
+	for _, slug := range buildingsSlugs {
+		i := 0
+		emptyData := make([]string, 5)
+		for i < 5 {
+			emptyData[i] = emptyInfo
+			i++
+		}
+
+		buildingsData[slug] = emptyData
+	}
+
+	for _, slug := range enterpriseSlugs {
+		enterpriseData[slug] = guaranteeInfo{
+			sumInsuredLimitOfIndemnity: emptyInfo,
+			startDate:                  emptyInfo,
+			duration:                   emptyInfo,
+		}
+	}
+
+	// TODO: fetch building data from policy
+
+	// TODO: fetch enterprise data from policy
+
+	table := make([][]domain.TableCell, 0)
+
+	tableHeader := [][]domain.TableCell{
+		{
+			{
+				Text:      "Le coperture assicurative che hai scelto (operative se indicata la Somma o il Massimale)",
+				Height:    4.5,
+				Width:     190,
+				FontSize:  constants.LargeFontSize,
+				FontStyle: constants.BoldFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.LeftAlign,
+				Border:    "",
+			},
+		},
+		{
+			{
+				Text:      "PARTITE, MASSIMALI, SOMME ASSICURATE – DANNI DIRETTI – sezione A - C",
+				Height:    4.5,
+				Width:     190,
+				FontSize:  constants.LargeFontSize,
+				FontStyle: constants.BoldFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      true,
+				FillColor: constants.GreyColor,
+				Align:     constants.CenterAlign,
+				Border:    "",
+			},
+		},
+		{
+			{
+				Text:      "Valori in euro",
+				Height:    4.5,
+				Width:     65,
+				FontSize:  constants.SmallFontSize,
+				FontStyle: constants.RegularFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.LeftAlign,
+				Border:    "T",
+			},
+			{
+				Text:      "Sede 1",
+				Height:    4.5,
+				Width:     25,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: constants.BoldFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.RightAlign,
+				Border:    "T",
+			},
+			{
+				Text:      "Sede 2",
+				Height:    4.5,
+				Width:     25,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: constants.BoldFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.RightAlign,
+				Border:    "T",
+			},
+			{
+				Text:      "Sede 3",
+				Height:    4.5,
+				Width:     25,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: constants.BoldFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.RightAlign,
+				Border:    "T",
+			},
+			{
+				Text:      "Sede 4",
+				Height:    4.5,
+				Width:     25,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: constants.BoldFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.RightAlign,
+				Border:    "T",
+			},
+			{
+				Text:      "Sede 5",
+				Height:    4.5,
+				Width:     25,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: constants.BoldFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.RightAlign,
+				Border:    "T",
+			},
+		},
+	}
+	table = append(table, tableHeader...)
+
+	for slug, data := range buildingsData {
+		row := make([]domain.TableCell, 6)
+		row[0] = domain.TableCell{
+			Text:      guaranteeNamesMap[slug],
+			Height:    4.5,
+			Width:     65,
+			FontSize:  constants.RegularFontSize,
+			FontStyle: constants.BoldFontStyle,
+			FontColor: constants.BlackColor,
+			Fill:      false,
+			FillColor: domain.Color{},
+			Align:     constants.RightAlign,
+			Border:    "T",
+		}
+		for _, building := range data {
+			row = append(row, domain.TableCell{
+				Text:      building,
+				Height:    4.5,
+				Width:     25,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: constants.RegularFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.RightAlign,
+				Border:    "T",
+			})
+		}
+		table = append(table, row)
+	}
+
+	for _, slug := range enterpriseSlugs[:6] {
+		row := []domain.TableCell{
+			{
+				Text:      guaranteeNamesMap[slug],
+				Height:    4.5,
+				Width:     65,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: constants.BoldFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.RightAlign,
+				Border:    "T",
+			},
+		}
+
+		info := enterpriseData[slug].sumInsuredLimitOfIndemnity
+		if slug == merciAumentoEnterpriseGuaranteeSlug {
+			info += " a partire dal " + enterpriseData[slug].startDate + " di ogni anno"
+		}
+
+		row = append(row, domain.TableCell{
+			Text:      info,
+			Height:    4.5,
+			Width:     125,
+			FontSize:  constants.RegularFontSize,
+			FontStyle: constants.RegularFontStyle,
+			FontColor: constants.BlackColor,
+			Fill:      false,
+			FillColor: domain.Color{},
+			Align:     constants.LeftAlign,
+			Border:    "T",
+		})
+		table = append(table, row)
+	}
+
+	table = append(table, []domain.TableCell{
+		{
+			Text:      "GARANZIE E SOMME ASSICURATE – DANNI INDIRETTI – sezione B",
+			Height:    4.5,
+			Width:     190,
+			FontSize:  constants.LargeFontSize,
+			FontStyle: constants.BoldFontStyle,
+			FontColor: constants.BlackColor,
+			Fill:      true,
+			FillColor: constants.GreyColor,
+			Align:     constants.CenterAlign,
+			Border:    "T",
+		},
+	})
+
+	for _, slug := range enterpriseSlugs[6:11] {
+		row := []domain.TableCell{
+			{
+				Text:      guaranteeNamesMap[slug],
+				Height:    4.5,
+				Width:     65,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: constants.BoldFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.RightAlign,
+				Border:    "T",
+			},
+		}
+
+		info := enterpriseData[slug].sumInsuredLimitOfIndemnity
+		if slug == diariaGuaranteeSlug {
+			info += " Periodo di indennizzo " + enterpriseData[slug].duration + " giorni"
+		}
+
+		row = append(row, domain.TableCell{
+			Text:      info,
+			Height:    4.5,
+			Width:     125,
+			FontSize:  constants.RegularFontSize,
+			FontStyle: constants.RegularFontStyle,
+			FontColor: constants.BlackColor,
+			Fill:      false,
+			FillColor: domain.Color{},
+			Align:     constants.LeftAlign,
+			Border:    "T",
+		})
+		table = append(table, row)
+	}
+
+	table = append(table, []domain.TableCell{
+		{
+			Text:      "GARANZIE E MASSIMALI RESPONSABILITA’ CIVILE E CYBER – sezioni D E F G H I",
+			Height:    4.5,
+			Width:     190,
+			FontSize:  constants.LargeFontSize,
+			FontStyle: constants.BoldFontStyle,
+			FontColor: constants.BlackColor,
+			Fill:      true,
+			FillColor: constants.GreyColor,
+			Align:     constants.CenterAlign,
+			Border:    "T",
+		},
+	})
+
+	for i := 11; i < len(enterpriseSlugs); i += 2 {
+		row := []domain.TableCell{
+			{
+				Text:      guaranteeNamesMap[enterpriseSlugs[i]],
+				Height:    4.5,
+				Width:     65,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: constants.BoldFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.LeftAlign,
+				Border:    "T",
+			},
+			{
+				Text:      enterpriseData[enterpriseSlugs[i]].sumInsuredLimitOfIndemnity,
+				Height:    4.5,
+				Width:     25,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: constants.RegularFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.RightAlign,
+				Border:    "T",
+			},
+			{
+				Text:      guaranteeNamesMap[enterpriseSlugs[i+1]],
+				Height:    4.5,
+				Width:     65,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: constants.BoldFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.LeftAlign,
+				Border:    "T",
+			},
+			{
+				Text:      enterpriseData[enterpriseSlugs[i+1]].sumInsuredLimitOfIndemnity,
+				Height:    4.5,
+				Width:     25,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: constants.RegularFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.RightAlign,
+				Border:    "T",
+			},
+		}
+
+		table = append(table, row)
+	}
+
+	qb.engine.DrawTable(table)
+
+	qb.engine.NewLine(5)
+
+	sumInsuredLimitOfIndemnity := "5.000.000"
+	if enterpriseData[rctoGuaranteeSlug].sumInsuredLimitOfIndemnity != "3000000" {
+		sumInsuredLimitOfIndemnity = "7.500.000"
+	}
+
+	qb.engine.WriteText(domain.TableCell{
+		Text:      "Il limite di esposizione massima annua della Compagnia, per la sezione Responsabilità Civile, è pari ad € " + sumInsuredLimitOfIndemnity,
+		Height:    3.5,
+		Width:     190,
+		FontSize:  constants.RegularFontSize,
+		FontStyle: constants.BoldFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "",
+	})
+	qb.engine.WriteText(domain.TableCell{
+		Text:      "a valere per tutte le garanzie e complessivamente per tutti gli Assicurati, per ogni sinistro, qualunque sia il numero delle persone decedute o lese o che abbiano subito danni a cose di loro proprietà.",
+		Height:    3.5,
+		Width:     190,
+		FontSize:  constants.RegularFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "",
+	})
 }
 
 func (qb *QBEGenerator) Contract(policy *models.Policy) ([]byte, error) {
@@ -819,6 +1243,12 @@ func (qb *QBEGenerator) Contract(policy *models.Policy) ([]byte, error) {
 	qb.engine.NewLine(10)
 
 	qb.insuredDetailsSection(policy)
+
+	qb.engine.NewPage()
+
+	qb.engine.NewLine(5)
+
+	qb.guaranteesDetailsSection(policy)
 
 	return qb.engine.RawDoc()
 }

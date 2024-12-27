@@ -46,7 +46,7 @@ func NewFpdf() *Fpdf {
 		signatureID: 0,
 		font:        constants.MontserratFont,
 		style:       constants.RegularFontStyle,
-		size:        constants.RegularFontsize,
+		size:        constants.RegularFontSize,
 		textColor:   constants.BlackColor,
 		drawColor:   constants.BlackColor,
 		fillColor:   constants.WhiteColor,
