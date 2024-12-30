@@ -43,8 +43,8 @@ var (
 		"contractorName":    "(REGEXP_CONTAINS(LOWER(JSON_VALUE(**tableAlias**.data, '$.contractor.name')), LOWER(@%s)))",
 		"contractorSurname": "(REGEXP_CONTAINS(LOWER(JSON_VALUE(**tableAlias**.data, '$.contractor.surname')), LOWER(@%s)))",
 
-		"startDateFrom": "(**tableAlias**.startDate >= @%s)",
-		"startDateTo":   "(**tableAlias**.startDate <= @%s)",
+		"startDateFrom": "(DATE_ADD(**tableAlias**.startDate, INTERVAL **tableAlias**.annuity YEAR) >= @%s)",
+		"startDateTo":   "(DATE_ADD(**tableAlias**.startDate, INTERVAL **tableAlias**.annuity YEAR) <= @%s)",
 		"company":       "(**tableAlias**.company = LOWER(@%s))",
 		"product":       "(**tableAlias**.name = LOWER(@%s))",
 		"producerUid":   "(**tableAlias**.producerUid IN (%s))",
