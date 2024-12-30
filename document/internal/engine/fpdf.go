@@ -55,6 +55,7 @@ func NewFpdf() *Fpdf {
 
 func (f *Fpdf) NewPage() {
 	f.pdf.AddPage()
+	f.NewLine(5)
 }
 
 func (f *Fpdf) NewLine(space float64) {
