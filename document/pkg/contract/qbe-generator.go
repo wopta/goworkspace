@@ -850,6 +850,7 @@ func (qb *QBEGenerator) insuredDetailsSection(policy *models.Policy) {
 
 }
 
+// TODO: parse policy info
 func (qb *QBEGenerator) guaranteesDetailsSection(policy *models.Policy) {
 	const emptyInfo string = "======"
 
@@ -1225,6 +1226,370 @@ func (qb *QBEGenerator) guaranteesDetailsSection(policy *models.Policy) {
 	})
 }
 
+func (qb *QBEGenerator) deductibleSection() {
+	const (
+		descriptionColumnWidth = 90
+		otherColumnWidth       = 50
+	)
+
+	type tableSection struct {
+		title   string
+		entries [][]string
+	}
+
+	type table struct {
+		header     []string
+		subHeaders []string
+		emptyLine  bool
+		sections   []tableSection
+		newPage    bool
+	}
+
+	parseSections := func(sections []tableSection) [][]domain.TableCell {
+		result := make([][]domain.TableCell, 0)
+
+		for sectionIndex, section := range sections {
+			result = append(result, []domain.TableCell{{
+				Text:      section.title,
+				Height:    4.5,
+				Width:     190,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: constants.BoldFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      true,
+				FillColor: constants.GreyColor,
+				Align:     constants.LeftAlign,
+				Border:    "TLR",
+			}})
+
+			borders := []string{"TL", "TLR"}
+
+			for entriesIndex, entries := range section.entries {
+				if sectionIndex == len(sections)-1 && entriesIndex == len(entries)-1 {
+					borders = []string{"TLB", "1"}
+				}
+
+				row := []domain.TableCell{
+					{
+						Text:      entries[0],
+						Height:    4.5,
+						Width:     25,
+						FontSize:  constants.MediumFontSize,
+						FontStyle: constants.RegularFontStyle,
+						FontColor: constants.BlackColor,
+						Fill:      false,
+						FillColor: domain.Color{},
+						Align:     constants.RightAlign,
+						Border:    borders[0],
+					},
+					{
+						Text:      entries[1],
+						Height:    4.5,
+						Width:     65,
+						FontSize:  constants.MediumFontSize,
+						FontStyle: constants.RegularFontStyle,
+						FontColor: constants.BlackColor,
+						Fill:      false,
+						FillColor: domain.Color{},
+						Align:     constants.LeftAlign,
+						Border:    borders[0],
+					},
+					{
+						Text:      entries[2],
+						Height:    4.5,
+						Width:     otherColumnWidth,
+						FontSize:  constants.MediumFontSize,
+						FontStyle: constants.RegularFontStyle,
+						FontColor: constants.BlackColor,
+						Fill:      false,
+						FillColor: domain.Color{},
+						Align:     constants.RightAlign,
+						Border:    borders[0],
+					},
+					{
+						Text:      entries[3],
+						Height:    4.5,
+						Width:     otherColumnWidth,
+						FontSize:  constants.MediumFontSize,
+						FontStyle: constants.RegularFontStyle,
+						FontColor: constants.BlackColor,
+						Fill:      false,
+						FillColor: domain.Color{},
+						Align:     constants.RightAlign,
+						Border:    borders[1],
+					},
+				}
+				result = append(result, row)
+			}
+		}
+
+		return result
+	}
+
+	parseTable := func(t table) [][]domain.TableCell {
+		result := make([][]domain.TableCell, 0)
+
+		if len(t.header) > 0 {
+			headerRow := []domain.TableCell{
+				{
+					Text:      t.header[0],
+					Height:    4.5,
+					Width:     descriptionColumnWidth,
+					FontSize:  constants.RegularFontSize,
+					FontStyle: constants.RegularFontStyle,
+					FontColor: constants.BlackColor,
+					Fill:      false,
+					FillColor: domain.Color{},
+					Align:     constants.LeftAlign,
+					Border:    "",
+				},
+				{
+					Text:      t.header[1],
+					Height:    4.5,
+					Width:     otherColumnWidth,
+					FontSize:  constants.RegularFontSize,
+					FontStyle: constants.BoldFontStyle,
+					FontColor: constants.BlackColor,
+					Fill:      true,
+					FillColor: constants.GreyColor,
+					Align:     constants.CenterAlign,
+					Border:    "TL",
+				},
+				{
+					Text:      t.header[2],
+					Height:    4.5,
+					Width:     otherColumnWidth,
+					FontSize:  constants.RegularFontSize,
+					FontStyle: constants.BoldFontStyle,
+					FontColor: constants.BlackColor,
+					Fill:      true,
+					FillColor: constants.GreyColor,
+					Align:     constants.CenterAlign,
+					Border:    "TLR",
+				},
+			}
+			result = append(result, headerRow)
+		}
+
+		if len(t.subHeaders) > 0 {
+			subHeaderRow := []domain.TableCell{
+				{
+					Text:      t.subHeaders[0],
+					Height:    4.5,
+					Width:     descriptionColumnWidth,
+					FontSize:  constants.RegularFontSize,
+					FontStyle: constants.BoldFontStyle,
+					FontColor: constants.BlackColor,
+					Fill:      true,
+					FillColor: constants.GreyColor,
+					Align:     constants.LeftAlign,
+					Border:    "TL",
+				},
+				{
+					Text:      t.subHeaders[1],
+					Height:    4.5,
+					Width:     otherColumnWidth,
+					FontSize:  constants.MediumFontSize,
+					FontStyle: constants.RegularFontStyle,
+					FontColor: constants.BlackColor,
+					Fill:      false,
+					FillColor: domain.Color{},
+					Align:     constants.RightAlign,
+					Border:    "TL",
+				},
+				{
+					Text:      t.subHeaders[2],
+					Height:    4.5,
+					Width:     otherColumnWidth,
+					FontSize:  constants.MediumFontSize,
+					FontStyle: constants.RegularFontStyle,
+					FontColor: constants.BlackColor,
+					Fill:      false,
+					FillColor: domain.Color{},
+					Align:     constants.RightAlign,
+					Border:    "TLR",
+				},
+			}
+			result = append(result, subHeaderRow)
+		}
+
+		if t.emptyLine {
+			result = append(result, []domain.TableCell{
+				{
+					Text:      " ",
+					Height:    4.5,
+					Width:     190,
+					FontSize:  constants.RegularFontSize,
+					FontStyle: constants.RegularFontStyle,
+					FontColor: constants.BlackColor,
+					Fill:      false,
+					FillColor: domain.Color{},
+					Align:     constants.LeftAlign,
+					Border:    "TLR",
+				},
+			})
+		}
+
+		sections := parseSections(t.sections)
+		result = append(result, sections...)
+
+		return result
+	}
+
+	qb.engine.WriteText(domain.TableCell{
+		Text:      "Franchigie, scoperti, limiti di indennizzo",
+		Height:    4.5,
+		Width:     190,
+		FontSize:  constants.LargeFontSize,
+		FontStyle: constants.BoldFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "",
+	})
+
+	qb.engine.NewLine(3)
+
+	rawTables := []table{
+		{
+			header:     []string{" ", "Limiti di indennizzo", "Scoperto/Franchigia"},
+			subHeaders: []string{"Limite di Polizza e franchigia frontale", "Somma assicurata", "€ 1.500"},
+			emptyLine:  true,
+			sections: []tableSection{
+				{
+					title: "SEZIONE A - INCENDIO E \"TUTTI I RISCHI\"",
+					entries: [][]string{
+						{"Art. A/01 - a", "Costi per demolire, sgomberare, trattare e trasportare.", "10% indennizzo max € 500." +
+							"000", "nessuna"},
+						{" ", "Sottolimite per Tossici e Nocivi", "€ 20.000", "nessuna"},
+						{"Art. A/01 - b", "Costi/Oneri di urbanizzazione", " 10% indennizzo max € 50.000", "nessuna"},
+						{"Art. A/01 - c", "Costi per rimuovere, trasportare, ricollocare i beni", "10% SA Contenuto max € 50." +
+							"000", "nessuna"},
+						{"Art. A/01 - d", "Onorari dei periti\nOnorari progettisti/consulenti/professionisti",
+							"10% indennizzo max €25.000\n10% indennizzo max € 25.000", "nessuna"},
+						{"Art. A/03.1", "Cose speciali come previste in Polizza (Disegni,modelli)",
+							"10% SA macchinari max €50.000", "Franchigia frontale"},
+						{"Art. A/03.2", "Eventi atmosferici", "70% SA max € 10.0000.000", "10% min € 5.0000"},
+						{"Art. A/03.3", "Grandine su fragili: lastre, fabbricati aperti da più lati", "€ 200.000",
+							"Franchigia frontale"},
+						{"Art. A/03.4", "Eventi sociopolitici (escluso terrorismo)", "80% SA max € 10.000.000",
+							"10% min. € 2.5000"},
+						{"Art. A/03.6", "Sovraccarico neve", "50% SA max € 2.000.000", "10% min. € 5.000"},
+						{"Art. A/03.7", "Valori", "€ 5.000", "€ 1.000"},
+						{"Art. A/03.8", "Acqua Condotta\nRicerca del guasto", "€ 500.000\n€ 10.000", "10% min € 1.000"},
+						{"Art. A/03.9", "Gelo", "€ 50.000", "Franchigia frontale"},
+					},
+				},
+				{
+					title: "SEZIONE A - CONDIZIONI PARTICOLARI SEMPRE OPERANTI",
+					entries: [][]string{
+						{"Art. A/11", "Acqua Piovana", "€ 20.000", "Franchigia frontale"},
+						{"Art. A/12", "Dispersione liquidi", "€ 50.000", "€ 5.000"},
+						{"Art. A/13", "Rigurgiti e Traboccamenti di Fogna", "€ 20.000", "Franchigia frontale"},
+						{"Art. A/14", "Rottura lastre", "€ 5.000", "€ 500"},
+						{"Art. A/15", "Decentramento merci e macchinari", "€ 500.000", "Franchigia frontale"},
+						{"Art. A/16", "Miscelazione accidentale delle merci", "€ 50.000", "€ 5.000"},
+						{"Art. A/17", "Colaggio da Impianti Automatici di Estinzione", "€ 100.000", "10% min € 2.500"},
+						{"Art. A/18", "Inondazione, Alluvione", "50% SA max € 7.000.000", "10% min € 10,000"},
+						{"Art. A/19", "Allagamento", "€ 500.000", "10% min € 2.500"},
+						{"Art. A/20", "Terremoto", " 50% SA max € 7.000.000", "10% min € 10.000"},
+						{"Art. A/21", "Terrorismo e Sabotaggio", "50% SA max € 5.000.000", "10% min € 5.000"},
+						{"Art. A/22", "Movimentazione Interna / Urto Veicoli", "€ 5.000", "€ 1.000"},
+						{"Art. A/23", "Fenomeno elettrico", "€ 10.000", "€ 1.500"},
+						{"Art. A/24", "Rischio Locativo", "€ 100.000", "nessuna"},
+						{"Art. A/25", "Ricorso dei Terzi", "€ 250.000", "nessuna"},
+						{"Art. A/26", "Apparecchiature Elettroniche", "50.000", "10% min € 1.500"},
+						{"Art. A/27", "Guasti alle Macchine", "50.000", "10% min € 5.000"},
+						{"Art. A/28", "Fuoriuscita materiale fuso", "10% merci max € 100.000", "10% min € 1.500"},
+					},
+				},
+			},
+			newPage: true,
+		},
+		{
+			header:     []string{" ", "Limiti di indennizzo", "Scoperto/Franchigia"},
+			subHeaders: []string{},
+			emptyLine:  false,
+			sections: []tableSection{
+				{
+					title: "SEZIONE A - GARANZIE AGGIUNTIVE",
+					entries: [][]string{
+						{"Art. A/29", "Aumento temporaneo merci", "Somma assicurata", "nessuna"},
+						{"Art. A/30", "Merci in refrigerazione", "Somma assicurata", "t10% min € 1.500"},
+					},
+				},
+				{
+					title: "SEZIONE B - DANNI INDIRETTI",
+					entries: [][]string{
+						{"Art. B/1", "Indennità aggiuntiva a percentuale", "Somma assicurata", "nessuna"},
+						{"Art. B/2", "Diaria Giornaliera", " ", "3 giorni"},
+						{"Art. B/3", "Maggiori costi", "Somma assicurata", "nessuna"},
+						{"Art. B/4", "Perdita pigioni", "Somma assicurata", "nessuna"},
+					},
+				},
+				{
+					title: "SEZIONE C - FURTO",
+					entries: [][]string{
+						{"Art. C/1 - 1/2", "Furto - Rapina - Estorsione", "€ 20.000", "€ 1.000"},
+						{" ", "Con i seguenti sottolimiti:", " ", " "},
+						{"Art. C/1 - 3", "Danni ai beni assicurati", "10% SA max € 5.000", "€ 500"},
+						{"Art. C/1 - 4", "Atti vandalici", "10% SA max € 5.000", "€ 500"},
+						{"Art. C/1 - 5", "Guasti cagionati dai ladri", "10% SA max € 10.000", "scoperto 10%"},
+						{"Art. C/1 - 6\na.\nb.", "Valori:\nOvunque riposti\nIn cassaforte o armadio corazzato",
+							" \n5% SA max € 5.000\n10% SA max € 10.000", " \n€ 250\n€1.000"},
+					},
+				},
+			},
+			newPage: false,
+		},
+		{
+			header:     []string{},
+			subHeaders: []string{},
+			emptyLine:  false,
+			sections: []tableSection{
+				{
+					title: "SEZIONE C - FURTO",
+					entries: [][]string{
+						{"Art. C/1 - 7", "Furto commesso da dipendenti", "10% SA max € 10.000", "10% min € 1.000 "},
+						{"Art. C/1 - 8", "Quadri, tappeti, oggetti d'arte", "10% SA max € 5.000 per oggetto",
+							"10% min € 500"},
+						{"Art. C/1 - 8", "Merci ed attrezzature presso terzi", "10% SA max € 20.000", "10% min € 1.000"},
+						{"Art. C/3", "Strumenti di chiusura dei locali", " ", "20% min € 1.000"},
+						{"Art. C/7", "Beni posti all'aperto", "5% SA max € 5.000", "€ 500"},
+						{"Art. C/8", "Beni presso mostre e fiere", "20% SA max € 20.000", "10% min € 1.000"},
+						{"Art. C/9", "Portavalori", "20% SA max € 10.000", "10%"},
+					},
+				},
+			},
+			newPage: false,
+		},
+	}
+
+	for index, t := range rawTables {
+		parsedTable := parseTable(t)
+		qb.engine.DrawTable(parsedTable)
+		if t.newPage {
+			qb.engine.NewPage()
+			continue
+		} else if index < len(rawTables)-1 {
+			qb.engine.NewLine(10)
+		}
+	}
+	qb.engine.WriteText(domain.TableCell{
+		Text:      "SA = Somma Assicurata",
+		Height:    4.5,
+		Width:     190,
+		FontSize:  constants.MediumFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "",
+	})
+}
+
 func (qb *QBEGenerator) Contract(policy *models.Policy) ([]byte, error) {
 	qb.mainHeader(policy)
 
@@ -1246,9 +1611,11 @@ func (qb *QBEGenerator) Contract(policy *models.Policy) ([]byte, error) {
 
 	qb.engine.NewPage()
 
-	qb.engine.NewLine(5)
-
 	qb.guaranteesDetailsSection(policy)
+
+	qb.engine.NewPage()
+
+	qb.deductibleSection()
 
 	return qb.engine.RawDoc()
 }
