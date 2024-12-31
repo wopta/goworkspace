@@ -57,7 +57,7 @@ var (
 		rctoGuaranteeSlug: "Responsabilità Civile verso Terzi (" +
 			"RCT) e verso Prestatori di lavoro (RCO)",
 		rcpGuaranteeSlug:   "Responsabilità Civile Prodotti (RCP) Ritiro prodotti",
-		deoGuaranteeSlug:   "Responsabilitu Amministratori Sindaci Dirigenti(D&O)",
+		deoGuaranteeSlug:   "Responsabilità Amministratori Sindaci Dirigenti (D&O)",
 		cyberGuanrateeSlug: "Cyber Response e Data Security",
 	}
 )
@@ -1138,7 +1138,12 @@ func (qb *QBEGenerator) guaranteesDetailsSection(policy *models.Policy) {
 		},
 	})
 
+	border := "T"
+
 	for i := 11; i < len(enterpriseSlugs); i += 2 {
+		if i == len(enterpriseSlugs)-2 {
+			border = "TB"
+		}
 		row := []domain.TableCell{
 			{
 				Text:      guaranteeNamesMap[enterpriseSlugs[i]],
@@ -1150,7 +1155,7 @@ func (qb *QBEGenerator) guaranteesDetailsSection(policy *models.Policy) {
 				Fill:      false,
 				FillColor: domain.Color{},
 				Align:     constants.LeftAlign,
-				Border:    "T",
+				Border:    border,
 			},
 			{
 				Text:      enterpriseData[enterpriseSlugs[i]].sumInsuredLimitOfIndemnity,
@@ -1162,7 +1167,19 @@ func (qb *QBEGenerator) guaranteesDetailsSection(policy *models.Policy) {
 				Fill:      false,
 				FillColor: domain.Color{},
 				Align:     constants.RightAlign,
-				Border:    "T",
+				Border:    border,
+			},
+			{
+				Text:      " ",
+				Height:    4.5,
+				Width:     5,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: constants.RegularFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.RightAlign,
+				Border:    border,
 			},
 			{
 				Text:      guaranteeNamesMap[enterpriseSlugs[i+1]],
@@ -1174,19 +1191,19 @@ func (qb *QBEGenerator) guaranteesDetailsSection(policy *models.Policy) {
 				Fill:      false,
 				FillColor: domain.Color{},
 				Align:     constants.LeftAlign,
-				Border:    "T",
+				Border:    border,
 			},
 			{
 				Text:      enterpriseData[enterpriseSlugs[i+1]].sumInsuredLimitOfIndemnity,
 				Height:    4.5,
-				Width:     25,
+				Width:     30,
 				FontSize:  constants.RegularFontSize,
 				FontStyle: constants.RegularFontStyle,
 				FontColor: constants.BlackColor,
 				Fill:      false,
 				FillColor: domain.Color{},
 				Align:     constants.RightAlign,
-				Border:    "T",
+				Border:    border,
 			},
 		}
 
