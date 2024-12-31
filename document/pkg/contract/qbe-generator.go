@@ -33,6 +33,7 @@ const (
 	deoGuaranteeSlug                    string = "deo"
 	cyberGuanrateeSlug                  string = "cyber"
 	rctGuaranteeSlug                    string = "rct"
+	ritiroGuaranteeSlug                 string = "ritiro"
 )
 
 var (
@@ -1596,13 +1597,10 @@ func (qb *QBEGenerator) dynamicDeductibleSection(policy *models.Policy) {
 		descriptionColumnWidth = 100
 		otherColumnWidth       = 45
 		target                 = 300000
-		//emptyField             = "====="
 	)
 
 	var (
 		rctSumInsuredLimitOfIndemnity, rcpSumInsuredLimitOfIndemnity float64
-		//rctStartDate, rcpStartDate, rcpStartDateUSA                  = emptyField,
-		//	emptyField, emptyField
 	)
 
 	type section struct {
@@ -1934,6 +1932,241 @@ func (qb *QBEGenerator) dynamicDeductibleSection(policy *models.Policy) {
 	qb.engine.NewLine(5)
 }
 
+func (qb *QBEGenerator) detailsSection(policy *models.Policy) {
+	const (
+		emptyField        = "====="
+		firstColumnWidth  = 65
+		secondColumnWidth = 45
+		thirdColumnWidth  = 80
+	)
+
+	type guaranteeStartDateInfo struct {
+		rct    string
+		rcp    string
+		rcpUsa string
+		ritiro string
+		deo    string
+	}
+
+	startDateInfo := guaranteeStartDateInfo{
+		rct:    emptyField,
+		rcp:    emptyField,
+		rcpUsa: emptyField,
+		ritiro: emptyField,
+		deo:    emptyField,
+	}
+
+	for _, asset := range policy.Assets {
+		if asset.Enterprise == nil {
+			continue
+		}
+
+		for _, guarantee := range asset.Guarantees {
+			if guarantee.Value.StartDate == nil {
+				continue
+			}
+			switch guarantee.Slug {
+			case rctGuaranteeSlug:
+				startDateInfo.rct = guarantee.Value.StartDate.Format(constants.DayMonthYearFormat)
+			case rcpGuaranteeSlug:
+				startDateInfo.rcp = guarantee.Value.StartDate.Format(constants.DayMonthYearFormat)
+				startDateInfo.rcpUsa = guarantee.Value.StartDate.Format(constants.DayMonthYearFormat)
+			case ritiroGuaranteeSlug:
+				startDateInfo.ritiro = guarantee.Value.StartDate.Format(constants.DayMonthYearFormat)
+			case deoGuaranteeSlug:
+				startDateInfo.deo = guarantee.Value.StartDate.Format(constants.DayMonthYearFormat)
+			}
+		}
+	}
+
+	parseEntries := func(entries [][]string) [][]domain.TableCell {
+		borders := []string{"TL", "TL", "TLR"}
+		result := make([][]domain.TableCell, 0, len(entries))
+		for index, entry := range entries {
+			if index == len(entries)-1 {
+				borders = []string{"TLB", "TLB", "1"}
+			}
+			row := []domain.TableCell{
+				{
+					Text:      entry[0],
+					Height:    4.5,
+					Width:     firstColumnWidth,
+					FontSize:  constants.MediumFontSize,
+					FontStyle: constants.RegularFontStyle,
+					FontColor: constants.BlackColor,
+					Fill:      false,
+					FillColor: domain.Color{},
+					Align:     constants.LeftAlign,
+					Border:    borders[0],
+				},
+				{
+					Text:      entry[1],
+					Height:    4.5,
+					Width:     secondColumnWidth,
+					FontSize:  constants.MediumFontSize,
+					FontStyle: constants.RegularFontStyle,
+					FontColor: constants.BlackColor,
+					Fill:      false,
+					FillColor: domain.Color{},
+					Align:     constants.LeftAlign,
+					Border:    borders[1],
+				},
+				{
+					Text:      entry[2],
+					Height:    4.5,
+					Width:     thirdColumnWidth,
+					FontSize:  constants.MediumFontSize,
+					FontStyle: constants.RegularFontStyle,
+					FontColor: constants.BlackColor,
+					Fill:      false,
+					FillColor: domain.Color{},
+					Align:     constants.LeftAlign,
+					Border:    borders[2],
+				},
+			}
+			result = append(result, row)
+		}
+		return result
+	}
+
+	qb.engine.WriteText(domain.TableCell{
+		Text:      "Dettagli di alcune sezioni",
+		Height:    4.5,
+		Width:     190,
+		FontSize:  constants.LargeFontSize,
+		FontStyle: constants.BoldFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "",
+	})
+
+	entries := [][]string{
+		{"RESPONSABILITA’ CIVILE E VERSO TERZI E PRESTATORI DI LAVORO", "Regime copertura", "LOSS OCCURRENCE"},
+		{"MALATTIE PROFESSIONALI", "Retroattività",
+			"L’Assicurazione vale per le conseguenze di fatti colposi commessi dopo la data del" +
+				" " + startDateInfo.rct},
+		{"RESPONSABILITA' CIVILE\nDA PRODOTTI DIFETTOSI",
+			"Regime copertura\nRetroattività – Mondo escluso USA Canada\nRetroattività – USA Canada",
+			"CLAIMS MADE\nL'Assicurazione vale per i danni verificatisi dopo la data del " + startDateInfo.rcp +
+				"\nL'Assicurazione vale per i danni verificatisi dopo la data del " + startDateInfo.rcpUsa + " purch" +
+				"é  relativi a prodotti descritti in Polizza consegnati a terzi dopo la stessa data. "},
+		{"RESPONSABILITA’ CIVILE\nVERSO TERZI E PRESTATORI DI LAVORO\nRESPONSABILITA' CIVILE\nDA PRODOTTI DIFETTOSI\n",
+			"Premio minimo", "Premio minimo indicato in Polizza calcolato sui parametri di fatturato e Prestatori di" +
+				" lavoro dichiarati"},
+	}
+
+	table := [][]domain.TableCell{
+		{
+			{
+				Text:      "SEZIONE",
+				Height:    4.5,
+				Width:     firstColumnWidth,
+				FontSize:  constants.LargeFontSize,
+				FontStyle: constants.BoldFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      true,
+				FillColor: constants.LightGreyColor,
+				Align:     constants.LeftAlign,
+				Border:    "TL",
+			},
+			{
+				Text:      "REQUISITO",
+				Height:    4.5,
+				Width:     secondColumnWidth,
+				FontSize:  constants.LargeFontSize,
+				FontStyle: constants.BoldFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      true,
+				FillColor: constants.LightGreyColor,
+				Align:     constants.CenterAlign,
+				Border:    "TL",
+			},
+			{
+				Text:      "CONDIZIONE",
+				Height:    4.5,
+				Width:     thirdColumnWidth,
+				FontSize:  constants.LargeFontSize,
+				FontStyle: constants.BoldFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      true,
+				FillColor: constants.LightGreyColor,
+				Align:     constants.CenterAlign,
+				Border:    "TLR",
+			},
+		},
+	}
+
+	table = append(table, parseEntries(entries)...)
+	qb.engine.DrawTable(table)
+
+	qb.engine.NewPage()
+
+	entries = [][]string{
+		{"RITIRO PRODOTTI", "Regime di copertura\n\nRetroattività\n\n",
+			"CLAIMS MADE\nL'Assicurazione vale per i danni verificatisi dopo la data del " + startDateInfo.
+				ritiro + " purché relativi a prodotti descritti in Polizza consegnati a terzi dopo la stessa data."},
+		{"RESPONSABILITÀ AMMINISTRATORI SINDACI DIRIGENTI (D&0)",
+			"Territorialità\nRetroattività\nData di continuità\nPremio addizionale per il maggior termine di notifica" +
+				"\nMaggior termine di notifica per amministratori cessati",
+			"12 mesi al 30% dell'ultimo premio pagato\n24 mesi al 60% dell'ultimo premio pagato\n36 mesi al 90% dell" +
+				"'ultimo premio pagato\n48 mesi al 120% dell'ultimo premio pagato\n60 mesi al 150% dell'ultimo premio" +
+				" pagato\n60 mesi"},
+		{"CYBER RESPONSE E DATA SECURITY", "Periodo di carenza Art. " +
+			"I/3 Cyber Business Interruption\nTerritorialità\nRetroattività\n\nIncident Response (*)\n\n",
+			"12 ore per ciascun sinistro\nUnione Economica Europea\nIllimitata\nOne Network Firm: Advant Nctm\nNumber" +
+				"+39 (02) 38.592.788\nEmail: OneCyberResponseLine.Italy@clydeco.com\n\n" +
+				"(*) Nel caso in cui venisse scoperto un presunto evento informatico, " +
+				"il Contraente potrà contattare il centralino, 24H su 24H, al numero o all'indirizzo mail sopraindicato. " +
+				"Il servizio è offerto da ADVANT Nctm"},
+	}
+
+	table = [][]domain.TableCell{
+		{
+			{
+				Text:      "SEZIONE",
+				Height:    4.5,
+				Width:     firstColumnWidth,
+				FontSize:  constants.LargeFontSize,
+				FontStyle: constants.BoldFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      true,
+				FillColor: constants.LightGreyColor,
+				Align:     constants.LeftAlign,
+				Border:    "TL",
+			},
+			{
+				Text:      "REQUISITO",
+				Height:    4.5,
+				Width:     secondColumnWidth,
+				FontSize:  constants.LargeFontSize,
+				FontStyle: constants.BoldFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      true,
+				FillColor: constants.LightGreyColor,
+				Align:     constants.CenterAlign,
+				Border:    "TL",
+			},
+			{
+				Text:      "CONDIZIONE",
+				Height:    4.5,
+				Width:     thirdColumnWidth,
+				FontSize:  constants.LargeFontSize,
+				FontStyle: constants.BoldFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      true,
+				FillColor: constants.LightGreyColor,
+				Align:     constants.CenterAlign,
+				Border:    "TLR",
+			},
+		},
+	}
+
+	table = append(table, parseEntries(entries)...)
+	qb.engine.DrawTable(table)
+}
+
 func (qb *QBEGenerator) Contract(policy *models.Policy) ([]byte, error) {
 	qb.mainHeader(policy)
 
@@ -1964,6 +2197,10 @@ func (qb *QBEGenerator) Contract(policy *models.Policy) ([]byte, error) {
 	qb.engine.NewLine(10)
 
 	qb.dynamicDeductibleSection(policy)
+
+	qb.engine.NewLine(10)
+
+	qb.detailsSection(policy)
 
 	return qb.engine.RawDoc()
 }
