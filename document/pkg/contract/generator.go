@@ -13,7 +13,7 @@ type baseGenerator struct {
 
 func (bg *baseGenerator) woptaHeader() {
 	bg.engine.SetHeader(func() {
-		bg.engine.InsertImage(lib.GetAssetPathByEnvV2()+"logo_qbe.png", 10, 6, 0, 10)
+		bg.engine.InsertImage(lib.GetAssetPathByEnvV2()+"logo_wopta.png", 10, 6, 0, 10)
 		bg.engine.NewLine(10)
 
 		if bg.isProposal {
