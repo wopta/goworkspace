@@ -1518,7 +1518,7 @@ func (qb *QBEGenerator) deductibleSection() {
 					title: "SEZIONE A - GARANZIE AGGIUNTIVE",
 					entries: [][]string{
 						{"Art. A/29", "Aumento temporaneo merci", "Somma assicurata", "nessuna"},
-						{"Art. A/30", "Merci in refrigerazione", "Somma assicurata", "t10% min € 1.500"},
+						{"Art. A/30", "Merci in refrigerazione", "Somma assicurata", "10% min € 1.500"},
 					},
 				},
 				{
