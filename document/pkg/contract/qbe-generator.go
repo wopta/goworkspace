@@ -109,7 +109,11 @@ func (qb *QBEGenerator) mainHeader(policy *models.Policy) {
 		phone:      "=======",
 	}
 
-	if policy.CodeCompany != "" {
+	policyCodePrefix := "I dati della tua Polizza nr. "
+	if qb.isProposal && policy.ProposalNumber != 0 {
+		policyCodePrefix = "I dati della tua Proposta nr. "
+		plcInfo.code = fmt.Sprintf("%d", policy.ProposalNumber)
+	} else if policy.CodeCompany != "" {
 		plcInfo.code = policy.CodeCompany
 	}
 
@@ -165,7 +169,7 @@ func (qb *QBEGenerator) mainHeader(policy *models.Policy) {
 	table := [][]domain.TableCell{
 		{
 			{
-				Text:      "I dati della tua Polizza nr. " + plcInfo.code,
+				Text:      policyCodePrefix + plcInfo.code,
 				Height:    constants.CellHeight,
 				Width:     115,
 				FontStyle: constants.BoldFontStyle,
@@ -1949,6 +1953,7 @@ func (qb *QBEGenerator) dynamicDeductibleSection(policy *models.Policy) {
 	qb.engine.NewLine(5)
 }
 
+// TODO: fix table layout
 func (qb *QBEGenerator) detailsSection(policy *models.Policy) {
 	const (
 		emptyField        = "====="
