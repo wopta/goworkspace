@@ -385,7 +385,7 @@ func (qb *QBEGenerator) mainHeader(policy *models.Policy) {
 		qb.engine.DrawTable(table)
 
 		if qb.isProposal {
-			qb.engine.DrawWatermark("PROPOSTA")
+			qb.engine.DrawWatermark(constants.Proposal)
 		}
 	})
 }
