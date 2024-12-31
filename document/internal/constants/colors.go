@@ -23,4 +23,9 @@ var (
 		G: 217,
 		B: 217,
 	}
+	LightGreyColor = domain.Color{
+		R: 242,
+		G: 242,
+		B: 242,
+	}
 )
