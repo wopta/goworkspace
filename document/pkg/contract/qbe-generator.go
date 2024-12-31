@@ -32,6 +32,7 @@ const (
 	rcpGuaranteeSlug                    string = "rcp"
 	deoGuaranteeSlug                    string = "deo"
 	cyberGuanrateeSlug                  string = "cyber"
+	rctGuaranteeSlug                    string = "rct"
 )
 
 var (
@@ -1590,6 +1591,349 @@ func (qb *QBEGenerator) deductibleSection() {
 	})
 }
 
+func (qb *QBEGenerator) dynamicDeductibleSection(policy *models.Policy) {
+	const (
+		descriptionColumnWidth = 100
+		otherColumnWidth       = 45
+		target                 = 300000
+		//emptyField             = "====="
+	)
+
+	var (
+		rctSumInsuredLimitOfIndemnity, rcpSumInsuredLimitOfIndemnity float64
+		//rctStartDate, rcpStartDate, rcpStartDateUSA                  = emptyField,
+		//	emptyField, emptyField
+	)
+
+	type section struct {
+		headers []string
+		entries [][]string
+	}
+
+	parseSections := func(sections []section) [][]domain.TableCell {
+		result := make([][]domain.TableCell, 0)
+
+		for sectionIndex, s := range sections {
+			if len(s.headers) > 0 {
+				row := []domain.TableCell{
+					{
+						Text:      s.headers[0],
+						Height:    4.5,
+						Width:     descriptionColumnWidth,
+						FontSize:  constants.RegularFontSize,
+						FontStyle: constants.BoldFontStyle,
+						FontColor: constants.BlackColor,
+						Fill:      true,
+						FillColor: constants.GreyColor,
+						Align:     constants.LeftAlign,
+						Border:    "TL",
+					},
+					{
+						Text:      s.headers[1],
+						Height:    4.5,
+						Width:     otherColumnWidth,
+						FontSize:  constants.RegularFontSize,
+						FontStyle: constants.BoldFontStyle,
+						FontColor: constants.BlackColor,
+						Fill:      true,
+						FillColor: constants.GreyColor,
+						Align:     constants.CenterAlign,
+						Border:    "TL",
+					},
+					{
+						Text:      s.headers[2],
+						Height:    4.5,
+						Width:     otherColumnWidth,
+						FontSize:  constants.RegularFontSize,
+						FontStyle: constants.BoldFontStyle,
+						FontColor: constants.BlackColor,
+						Fill:      true,
+						FillColor: constants.GreyColor,
+						Align:     constants.CenterAlign,
+						Border:    "TLR",
+					},
+				}
+				result = append(result, row)
+			}
+
+			borders := []string{"TL", "TLR"}
+
+			if len(s.entries) > 0 {
+				for entryIndex, entry := range s.entries {
+					if sectionIndex == len(sections)-1 && entryIndex == len(s.entries)-1 {
+						borders = []string{"TLB", "1"}
+					}
+					row := []domain.TableCell{
+						{
+							Text:      entry[0],
+							Height:    4.5,
+							Width:     descriptionColumnWidth,
+							FontSize:  constants.MediumFontSize,
+							FontStyle: constants.RegularFontStyle,
+							FontColor: constants.BlackColor,
+							Fill:      false,
+							FillColor: domain.Color{},
+							Align:     constants.LeftAlign,
+							Border:    borders[0],
+						},
+						{
+							Text:      entry[1],
+							Height:    4.5,
+							Width:     otherColumnWidth,
+							FontSize:  constants.MediumFontSize,
+							FontStyle: constants.RegularFontStyle,
+							FontColor: constants.BlackColor,
+							Fill:      false,
+							FillColor: domain.Color{},
+							Align:     constants.RightAlign,
+							Border:    borders[0],
+						},
+						{
+							Text:      entry[2],
+							Height:    4.5,
+							Width:     otherColumnWidth,
+							FontSize:  constants.MediumFontSize,
+							FontStyle: constants.RegularFontStyle,
+							FontColor: constants.BlackColor,
+							Fill:      false,
+							FillColor: domain.Color{},
+							Align:     constants.RightAlign,
+							Border:    borders[1],
+						},
+					}
+					result = append(result, row)
+				}
+			}
+		}
+
+		return result
+	}
+
+	for _, asset := range policy.Assets {
+		if asset.Enterprise != nil {
+			for _, guarantee := range asset.Guarantees {
+				if guarantee.Slug == rctGuaranteeSlug {
+					rctSumInsuredLimitOfIndemnity = guarantee.Value.SumInsuredLimitOfIndemnity
+					//rctStartDate = guarantee.Value.StartDate.Format(constants.DayMonthYearFormat)
+				} else if guarantee.Slug == rcpGuaranteeSlug {
+					rcpSumInsuredLimitOfIndemnity = guarantee.Value.SumInsuredLimitOfIndemnity
+					//rcpStartDate = guarantee.Value.StartDate.Format(constants.DayMonthYearFormat)
+					//rcpStartDateUSA = guarantee.Value.StartDate.Format(constants.
+					//	DayMonthYearFormat) // TODO: get startDate USA
+				}
+			}
+		}
+	}
+
+	rctSumInsuredLimitOfIndemnityString := lib.HumanaizePriceEuro(rctSumInsuredLimitOfIndemnity)
+	rcpSumInsuredLimitOfIndemnityString := lib.HumanaizePriceEuro(rcpSumInsuredLimitOfIndemnity)
+	// TODO: find better names
+	sumInsuredLimitA := rctSumInsuredLimitOfIndemnityString
+	sumInsuredLimitB := "€ 600.000"
+	sumInsuredLimitC := "€ 1.500.00"
+	sumInsuredLimitD := "€ 150.000"
+	sumInsuredLimitE := "€ 100.000"
+	sumInsuredLimitF := "€ 750.000"
+	sumInsuredLimitG := "€ 500.000"
+	if rctSumInsuredLimitOfIndemnity != target {
+		sumInsuredLimitA = "€ 500.000"
+		sumInsuredLimitB = "€ 1.000.000"
+		sumInsuredLimitC = "€ 2.500.000"
+		sumInsuredLimitD = "€ 250.000"
+		sumInsuredLimitE = "€ 150.000"
+		sumInsuredLimitF = "€ 1.500.000"
+		sumInsuredLimitG = "€ 1.000.000"
+	}
+
+	sections := []section{
+		{
+			headers: []string{"SEZIONE D - RESPONSABILITÀ CIVILE VERSO TERZI (RCT)", "Massimale per sinistro",
+				"Scoperto/Franchigia"},
+			entries: [][]string{
+				{"Art. D/1 Responsabilità Civile Terzi", rctSumInsuredLimitOfIndemnityString, "€ 1.000"},
+			},
+		},
+		{
+			headers: []string{"CONDIZIONI AGGIUNTIVE – SEMPRE OPERANTI", "Sottolimiti sinistro/anno",
+				"Scoperto / Franchigia"},
+			entries: [][]string{
+				{"Art. D/5.1  Committenza auto ed altri veicoli", rctSumInsuredLimitOfIndemnityString, "€ 1.000"},
+				{"Art. D/5.2  Aree adibite a parcheggi", rctSumInsuredLimitOfIndemnityString, "€ 1.000"},
+				{"Art. D/5.3 Installazione e/o Manutenzione", rctSumInsuredLimitOfIndemnityString, "€ 1.000"},
+				{"Art. D/5.4 Committenza lavori straordinari e committenza lavori", rctSumInsuredLimitOfIndemnityString,
+					"€ 1.000"},
+				{"Art. D/5.5 Cessione di lavori in appalto/subappalto – Resp.tà da Committenza",
+					rctSumInsuredLimitOfIndemnityString, "€ 1.000"},
+				{"Art. D/5.6 Cessione di lavori in appalto/subappalto – infortuni subiti da subappaltatori e loro" +
+					" dipendenti", rctSumInsuredLimitOfIndemnityString, "€ 1.000"},
+				{"Art. D/5.7  Danni da interruzioni o sospensioni di attività", sumInsuredLimitA, "€ 1.000"},
+				{"Art. D/5.8  Danni da furto", sumInsuredLimitA, "€ 1.000"},
+				{"Art. D/5.9  Danni alle cose di Terzi in ambito lavori", sumInsuredLimitB, "€ 1.000"},
+				{"Art. D/5.10 Responsabilità in materia di salute e sicurezza su lavoro",
+					rctSumInsuredLimitOfIndemnityString, "€ 1.000"},
+				{"Art. D/5.11 Responsabilità in materia di protezione dei dati personali",
+					rctSumInsuredLimitOfIndemnityString, "€ 1.000"},
+				{"Art. D/5.12 Danni da Incendio", sumInsuredLimitB, "€ 1.000"},
+				{"Art. D/5.13 Danni da circolazione all’interno del perimetro aziendale", sumInsuredLimitC, "€ 1.000"},
+			},
+		},
+	}
+
+	parsedTable := parseSections(sections)
+	qb.engine.DrawTable(parsedTable)
+
+	qb.engine.NewPage()
+
+	sections = []section{
+		{
+			headers: []string{"CONDIZIONI AGGIUNTIVE – SEMPRE OPERANTI", "Sottolimiti sinistro/anno",
+				"Scoperto/Franchigia"},
+			entries: [][]string{
+				{"Art. D/5.14 Danni a mezzi sotto carico e scarico", sumInsuredLimitB, "€ 1.000"},
+				{"Art. D/5.15 Responsabilità civile personale prestatori di lavoro",
+					rctSumInsuredLimitOfIndemnityString, "€ 1.000"},
+				{"Art. D/5.16 Danni a veicoli", sumInsuredLimitB, "€ 1.000"},
+				{"Art. D/5.17 Proprietà e/o conduzione di fabbricati", rctSumInsuredLimitOfIndemnityString, "€ 1.000"},
+				{"Art. D/5.18 Beni in leasing", rctSumInsuredLimitOfIndemnityString, "€ 1.000"},
+				{"Art. D/5.19 Danni a cose di prestatori di lavoro", sumInsuredLimitD, "€ 1.000"},
+				{"Art. D/5.20 Prestatori di lavoro terzi per crollo totale e/o parziale dei fabbricati",
+					rctSumInsuredLimitOfIndemnityString, "€ 1.000"},
+				{"Art. D/5.21 Mancato o insufficiente servizio di vigilanza", rctSumInsuredLimitOfIndemnityString,
+					"€ 1.000"},
+				{"Art. D/5.22 Macchinari e impianti azionati da persone non abilitate", rctSumInsuredLimitOfIndemnityString,
+					"€ 1.000"},
+				{"Art. D/5.23 Nuovi insediamenti, fusioni, incorporazioni, acquisti", rctSumInsuredLimitOfIndemnityString,
+					"€ 1.000"},
+				{"Art. D/5.24 Sorveglianza pulizia manutenzione riparazione e collaudo", rctSumInsuredLimitOfIndemnityString,
+					"€ 1.000"},
+				{"Art. D/5.25 Amministratori Terzi", rctSumInsuredLimitOfIndemnityString, "€ 1.000"},
+				{"Art. D/5.26 Qualifica di terzi a fornitori e clienti", rctSumInsuredLimitOfIndemnityString, "€ 1.000"},
+			},
+		},
+		{
+			headers: []string{"CONDIZIONI PARTICOLARI – SEMPRE OPERANTI", "Sottolimiti sinistro/anno",
+				"Scoperto/Franchigia"},
+			entries: [][]string{
+				{"Art. D/6.1 Danni a condutture tubature e impianti sotterranei", sumInsuredLimitE, "€ 1.000"},
+				{"Art. D/6.2 Danni da vibrazione, cedimento o franamento del terreno", sumInsuredLimitE, "€ 1.000"},
+				{"Art. D/6.3 Cose in consegna e custodia", sumInsuredLimitE, "€ 1.000"},
+				{"Art. D/6.4 Inquinamento improvviso ed accidentale", sumInsuredLimitE, "€ 1.000"},
+				{"Art. D/6.5 Cose di terzi sollevate, caricate, scaricate", sumInsuredLimitE, "€ 1.000"},
+				{"Art. D/6.6 Lavori di scavo e reinterro", sumInsuredLimitE, "€ 1.000"},
+				{"Art. D/6.7 Danni alle cose sulle quali si eseguono i lavori", sumInsuredLimitE, "€ 1.000"},
+				{"Art. D/6.8 Danni alle cose di Terzi in ambito lavori che per volume o peso possono essere rimosse",
+					sumInsuredLimitE, "€ 1.000"},
+				{"Art. D/6.9  Responsabilità civile postuma", sumInsuredLimitA, "€ 1.000"},
+				{"Art. D/6.10 Qualifica di Assicurato", rctSumInsuredLimitOfIndemnityString, "€ 1.000"},
+				{"Art. D/6.11 Smercio prodotti", rctSumInsuredLimitOfIndemnityString, "€ 1.000"},
+				{"Art. D/6.12 Integrativa auto", sumInsuredLimitC, "€ 1.000"},
+				{"Art. D/6.13 Fonti radioattive", sumInsuredLimitE, "€ 1.000"},
+				{"Art. D/6.14 Responsabilità civile incrociata", sumInsuredLimitE, "€ 1.000"},
+				{"Art. D/6.15 Cessione di lavori in appalto/subappalto – Responsabilità dell’Assicurato e dei" +
+					" subappaltatori", sumInsuredLimitC, "€ 1.000"},
+			},
+		},
+		{
+			headers: []string{"SEZIONE E – RESPONS. CIVILE VERSO PRESTATORI DI LAVORO (RCO)",
+				"Massimale per sinistro", "Franch. per Prest.re Lavoro"},
+			entries: [][]string{
+				{"Art E/1 Responsabilità Civile Verso prestatori di Lavoro\nper sinistro" +
+					"\nSottolimite per Prestatore di Lavoro",
+					"\n" + rctSumInsuredLimitOfIndemnityString + "\n" + sumInsuredLimitC,
+					"€ 2.500"},
+			},
+		},
+		{
+			headers: []string{"GARANZIA", "Sottolimiti sinistro/anno", "Franchigia"},
+			entries: [][]string{
+				{"Malattie Professionali\nSottolimite per Prestatore di Lavoro",
+					sumInsuredLimitF + "\n" + sumInsuredLimitG, "€ 2.500"},
+			},
+		},
+		{
+			headers: []string{"SEZIONE F - RESPONSABILITÀ CIVILE DA PRODOTTI DIFETTOSI (RCP)",
+				"Massimale sinistro/anno", "Franchigia"},
+			entries: [][]string{
+				{"Per sinistri verificatisi in qualsiasi paese, esclusi USA e Canada",
+					rcpSumInsuredLimitOfIndemnityString, "€ 5.000"},
+				{"Per sinistri verificatisi in USA e Canada e territori loro sotto la loro giurisdizione (" +
+					"esportazione occulta e/o indiretta)", "Nell'ambito massimale RC Prodotti Difettosi",
+					"10% min € 25.000"},
+			},
+		},
+	}
+
+	parsedTable = parseSections(sections)
+	qb.engine.DrawTable(parsedTable)
+
+	qb.engine.NewPage()
+
+	sections = []section{
+		{
+			headers: []string{"RISCHI INCLUSI (se attiva la relativa sezione)", "Sottolimiti sinistro/anno",
+				"Scoperto/Franchigia"},
+			entries: [][]string{
+				{"Art. F/4 -1 Inquinamento accidentale da prodotto, esclusi USA e Canada", "€ 500.000",
+					"come da franchigie sopra indicate per territorialità"},
+				{"Art. F/4 - 2 Danni da incendio", "€ 1.000.000", "come da franchigie sopra indicate per territorialità"},
+				{"Art. F/4 - 3 Danni al prodotto finito", "€ 1.500.000",
+					"come da franchigie sopra indicate per  territorialità"},
+				{"Art. F/4 -4 Danni al contenuto", "€ 1.500.000", "come da franchigie sopra indicate per  territorialità"},
+				{"Art. F4 - 5 Prodotti promozionali", "€ 3.000.000",
+					"come da franchigie sopra indicate per  territorialità"},
+			},
+		},
+		{
+			headers: []string{"CONDIZIONI PARTICOLARI (se attiva la relativa sezione)", "Sottolimiti sinistor/anno",
+				"Scoperto/Franchigia"},
+			entries: [][]string{
+				{"Art. F/6 Responsabilità Civile Postuma da installazione", sumInsuredLimitA, "10% min € 5.000"},
+				{"Art. F/7 Estensione validità territoriale Usa e Canada", "€ 1.000.000", "10% min € 25.000"},
+				{"Art. F/8 Danni patrimoniali puri", "€ 100.000", "10% min € 15.000"},
+			},
+		},
+		{
+			headers: []string{"SEZIONE G - RITIRO PRODOTTI (se attiva la relativa sezione)",
+				"Massimale sinistro/anno", "Scoperto/Franchigia"},
+			entries: [][]string{
+				{"Art . G/1 per sinistro, sinistro in serie, anno", "€ 250.000", "€ 10.000"},
+			},
+		},
+	}
+
+	parsedTable = parseSections(sections)
+	qb.engine.DrawTable(parsedTable)
+
+	sections = []section{
+		{
+			headers: []string{"SEZIONE H – RESPONSABILITÀ AMMINISTRATORI SINDACI DIRIGENTI (D&0)",
+				"Massimale sinistro/anno", "Scoperto/Franchigia"},
+			entries: [][]string{
+				{"Spese legali", "25% del Massimale D&O", "nessuna"},
+				{"Spese di Difesa per Inquinamento", "€ 50.000", "nessuna"},
+				{"Spese per Pubbliche relazioni", "€ 75.000", "nessuna"},
+				{"Costi di difesa in relazione a procedimenti di estradizione", "€ 75.000", "nessuna"},
+				{"Spese in sede cautelare o d'urgenza", "€ 75.000", "nessuna"},
+				{"Costi per la garanzia finanziaria sostitutiva della cauzione", "€ 50.000", "nessuna"},
+				{"Spese di emergenza", "€ 50.000", "nessuna"},
+				{"Presenza ad indagini ed esami", "€ 50.000", "nessuna"},
+			},
+		},
+		{
+			headers: []string{"SEZIONE I – CYBER RESPONSE E DATA SECURITY", "Massimale sinistro/anno",
+				"Scoperto/Franchigia"},
+			entries: [][]string{
+				{"Sezione I/A e I/B", "Massimale di Polizza", "€ 2.500"},
+			},
+		},
+	}
+
+	parsedTable = parseSections(sections)
+	qb.engine.DrawTable(parsedTable)
+
+	qb.engine.NewLine(5)
+}
+
 func (qb *QBEGenerator) Contract(policy *models.Policy) ([]byte, error) {
 	qb.mainHeader(policy)
 
@@ -1616,6 +1960,10 @@ func (qb *QBEGenerator) Contract(policy *models.Policy) ([]byte, error) {
 	qb.engine.NewPage()
 
 	qb.deductibleSection()
+
+	qb.engine.NewLine(10)
+
+	qb.dynamicDeductibleSection(policy)
 
 	return qb.engine.RawDoc()
 }
