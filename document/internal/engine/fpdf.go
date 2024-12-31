@@ -2,6 +2,7 @@ package engine
 
 import (
 	"bytes"
+	"strings"
 	"time"
 
 	"github.com/go-pdf/fpdf"
@@ -151,7 +152,7 @@ func (f *Fpdf) WriteText(cell domain.TableCell) {
 }
 
 func (f *Fpdf) DrawTable(table [][]domain.TableCell) {
-	for _, row := range table {
+	for rowIndex, row := range table {
 		maxNumLines := 1
 		for _, cell := range row {
 			f.style = cell.FontStyle
@@ -169,13 +170,24 @@ func (f *Fpdf) DrawTable(table [][]domain.TableCell) {
 			numLines := len(f.pdf.SplitText(cell.Text, cell.Width))
 			currentX, currentY := f.pdf.GetXY()
 
+			if numLines < maxNumLines && rowIndex < len(table) {
+				switch cell.Border {
+				case "1":
+					cell.Border = "TLR"
+				default:
+					cell.Border = strings.ReplaceAll(cell.Border, "B", "")
+				}
+			}
 			f.WriteText(cell)
 
 			emptyCell := deepcopy.Copy(cell).(domain.TableCell)
 			emptyCell.Text = ""
-			emptyCell.Border = ""
+			emptyCell.Border = strings.ReplaceAll(emptyCell.Border, "T", "")
 
 			for i := numLines; i < maxNumLines; i++ {
+				if rowIndex == len(table)-1 && i == maxNumLines-1 {
+					emptyCell.Border += "B"
+				}
 				f.pdf.SetX(currentX)
 				f.WriteText(emptyCell)
 			}
