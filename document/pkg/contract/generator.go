@@ -513,6 +513,7 @@ func (bg *baseGenerator) commercialConsentSection() {
 		}
 	}
 
+	bg.engine.SetDrawColor(constants.BlackColor)
 	bg.engine.WriteText(domain.TableCell{
 		Text:      "Consenso per finalità commerciali.",
 		Height:    3,
@@ -525,6 +526,7 @@ func (bg *baseGenerator) commercialConsentSection() {
 		Align:     constants.LeftAlign,
 		Border:    "",
 	})
+	bg.engine.NewLine(1)
 	bg.engine.WriteText(domain.TableCell{
 		Text:      "Il sottoscritto, letta e compresa l’informativa sul trattamento dei dati personali",
 		Height:    3,
