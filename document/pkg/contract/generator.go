@@ -610,10 +610,11 @@ func (bg *baseGenerator) commercialConsentSection(policy *models.Policy) {
 		Align:     constants.LeftAlign,
 		Border:    "",
 	})
+	bg.engine.NewLine(3)
 	bg.engine.WriteText(domain.TableCell{
 		Text:      bg.now.Format(constants.DayMonthYearFormat),
 		Height:    3,
-		Width:     190,
+		Width:     30,
 		FontSize:  constants.RegularFontSize,
 		FontStyle: constants.RegularFontStyle,
 		FontColor: constants.BlackColor,
@@ -623,6 +624,47 @@ func (bg *baseGenerator) commercialConsentSection(policy *models.Policy) {
 		Border:    "",
 	})
 	if !bg.isProposal {
-		// TODO: signature section
+		bg.signatureForm()
 	}
+
+}
+
+func (bg *baseGenerator) signatureForm() {
+	text := fmt.Sprintf("\"[[!sigField\"%d\":signer1:signature(sigType=\\\"Click2Sign\\\"):label"+
+		"(\\\"firma qui\\\"):size(width=150,height=60)]]\"", bg.signatureID)
+
+	bg.engine.SetY(bg.engine.GetY() - 3)
+	bg.engine.SetX(-90)
+	bg.engine.WriteText(domain.TableCell{
+		Text:      "Firma del Contraente",
+		Height:    3,
+		Width:     50,
+		FontSize:  constants.RegularFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.RightAlign,
+		Border:    "",
+	})
+	bg.engine.NewLine(15)
+	currentY := bg.engine.GetY()
+	bg.engine.DrawLine(120, currentY, 190, currentY, constants.ThinThickness, constants.BlackColor)
+	bg.engine.NewLine(2)
+	bg.engine.SetX(-135)
+	bg.engine.WriteText(domain.TableCell{
+		Text:      text,
+		Height:    3,
+		Width:     130,
+		FontSize:  constants.SmallFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.RightAlign,
+		Border:    "",
+	})
+	bg.engine.NewLine(7.5)
+
+	bg.signatureID++
 }

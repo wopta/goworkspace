@@ -69,7 +69,7 @@ type QBEGenerator struct {
 
 func NewQBEGenerator(engine *engine.Fpdf, isProposal bool) *QBEGenerator {
 	return &QBEGenerator{
-		&baseGenerator{engine: engine, isProposal: isProposal, now: time.Now()},
+		&baseGenerator{engine: engine, isProposal: isProposal, now: time.Now(), signatureID: 0},
 	}
 }
 
