@@ -2224,5 +2224,13 @@ func (qb *QBEGenerator) Contract(policy *models.Policy) ([]byte, error) {
 
 	qb.detailsSection(policy)
 
+	qb.woptaHeader()
+
+	qb.engine.NewPage()
+
+	qb.woptaFooter()
+
+	qb.woptaPrivacySection()
+
 	return qb.engine.RawDoc()
 }
