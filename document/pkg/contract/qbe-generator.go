@@ -81,6 +81,56 @@ func NewQBEGenerator(engine *engine.Fpdf, policy *models.Policy, node *models.Ne
 	}
 }
 
+func (qb *QBEGenerator) Contract() ([]byte, error) {
+	qb.mainHeader()
+
+	qb.engine.NewPage()
+
+	qb.mainFooter()
+
+	qb.engine.NewLine(10)
+
+	qb.introTable()
+
+	qb.engine.NewLine(10)
+
+	qb.whoWeAreTable()
+
+	qb.engine.NewLine(10)
+
+	qb.insuredDetailsSection()
+
+	qb.engine.NewPage()
+
+	qb.guaranteesDetailsSection()
+
+	qb.engine.NewPage()
+
+	qb.deductibleSection()
+
+	qb.engine.NewLine(10)
+
+	qb.dynamicDeductibleSection()
+
+	qb.engine.NewLine(10)
+
+	qb.detailsSection()
+
+	qb.annexSections()
+
+	qb.woptaHeader()
+
+	qb.woptaFooter()
+
+	qb.woptaPrivacySection()
+
+	qb.engine.NewLine(5)
+
+	qb.commercialConsentSection()
+
+	return qb.engine.RawDoc()
+}
+
 func (qb *QBEGenerator) mainHeader() {
 	type policyInfo struct {
 		code         string
@@ -2196,54 +2246,4 @@ func (qb *QBEGenerator) detailsSection() {
 
 	table = append(table, parseEntries(entries)...)
 	qb.engine.DrawTable(table)
-}
-
-func (qb *QBEGenerator) Contract() ([]byte, error) {
-	qb.mainHeader()
-
-	qb.engine.NewPage()
-
-	qb.mainFooter()
-
-	qb.engine.NewLine(10)
-
-	qb.introTable()
-
-	qb.engine.NewLine(10)
-
-	qb.whoWeAreTable()
-
-	qb.engine.NewLine(10)
-
-	qb.insuredDetailsSection()
-
-	qb.engine.NewPage()
-
-	qb.guaranteesDetailsSection()
-
-	qb.engine.NewPage()
-
-	qb.deductibleSection()
-
-	qb.engine.NewLine(10)
-
-	qb.dynamicDeductibleSection()
-
-	qb.engine.NewLine(10)
-
-	qb.detailsSection()
-
-	qb.annexSections()
-
-	qb.woptaHeader()
-
-	qb.woptaFooter()
-
-	qb.woptaPrivacySection()
-
-	qb.engine.NewLine(5)
-
-	qb.commercialConsentSection()
-
-	return qb.engine.RawDoc()
 }
