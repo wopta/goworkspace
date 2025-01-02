@@ -3,6 +3,7 @@ package contract
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/wopta/goworkspace/document/internal/constants"
 	"github.com/wopta/goworkspace/document/internal/domain"
@@ -68,7 +69,7 @@ type QBEGenerator struct {
 
 func NewQBEGenerator(engine *engine.Fpdf, isProposal bool) *QBEGenerator {
 	return &QBEGenerator{
-		&baseGenerator{engine: engine, isProposal: isProposal},
+		&baseGenerator{engine: engine, isProposal: isProposal, now: time.Now()},
 	}
 }
 
@@ -2231,6 +2232,10 @@ func (qb *QBEGenerator) Contract(policy *models.Policy) ([]byte, error) {
 	qb.woptaFooter()
 
 	qb.woptaPrivacySection()
+
+	qb.engine.NewLine(5)
+
+	qb.commercialConsentSection(policy)
 
 	return qb.engine.RawDoc()
 }
