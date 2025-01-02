@@ -626,7 +626,6 @@ func (bg *baseGenerator) commercialConsentSection(policy *models.Policy) {
 	if !bg.isProposal {
 		bg.signatureForm()
 	}
-
 }
 
 func (bg *baseGenerator) signatureForm() {
