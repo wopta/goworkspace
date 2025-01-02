@@ -716,6 +716,8 @@ func (bg *baseGenerator) annexSections() {
 
 	bg.annex3(producerInfo, proponetInfo, designationInfo)
 
+	bg.annex4(producerInfo, proponetInfo, designationInfo, annex4Section1Info)
+
 }
 
 // TODO: private
@@ -1195,6 +1197,153 @@ func (bg *baseGenerator) annex3(producerInfo, proponentInfo map[string]string, d
 				"Il contraente ha la facoltà di avvalersi di altri eventuali sistemi alternativi " +
 					"di risoluzione delle controversie previsti dalla normativa vigente nonché quelli indicati nei" +
 					" DIP aggiuntivi.",
+			},
+		},
+	}
+
+	for _, s := range sections {
+		bg.engine.NewLine(3)
+		bg.engine.WriteText(domain.TableCell{
+			Text:      s.title,
+			Height:    3,
+			Width:     190,
+			FontSize:  constants.LargeFontSize,
+			FontStyle: constants.BoldFontStyle,
+			FontColor: constants.BlackColor,
+			Fill:      false,
+			FillColor: domain.Color{},
+			Align:     constants.LeftAlign,
+			Border:    "",
+		})
+		bg.engine.NewLine(1)
+		for _, b := range s.body {
+			bg.engine.WriteText(domain.TableCell{
+				Text:      b,
+				Height:    3,
+				Width:     190,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: constants.RegularFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.LeftAlign,
+				Border:    "",
+			})
+			bg.engine.NewLine(1)
+		}
+	}
+
+	bg.engine.NewPage()
+}
+
+// TODO: private
+func (bg *baseGenerator) annex4(producerInfo, proponentInfo map[string]string, designation, annex4Section1Info string) {
+	type section struct {
+		title string
+		body  []string
+	}
+
+	bg.engine.WriteText(domain.TableCell{
+		Text:      "ALLEGATO 4 - INFORMAZIONI SULLA DISTRIBUZIONE\nDEL PRODOTTO ASSICURATIVO NON IBIP",
+		Height:    3,
+		Width:     190,
+		FontSize:  constants.LargeFontSize,
+		FontStyle: constants.BoldFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.CenterAlign,
+		Border:    "",
+	})
+	bg.engine.NewLine(3)
+
+	bg.engine.WriteText(domain.TableCell{
+		Text: "Il distributore ha l’obbligo di consegnare o trasmettere al contraente, prima " +
+			"della sottoscrizione di ciascuna proposta o, qualora non prevista, di ciascun contratto assicurativo, il " +
+			"presente documento, che contiene notizie sul modello e l’attività di distribuzione, sulla consulenza fornita " +
+			"e sulle remunerazioni percepite.",
+		Height:    3,
+		Width:     190,
+		FontSize:  constants.RegularFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "",
+	})
+	bg.engine.NewLine(3)
+
+	bg.engine.WriteText(domain.TableCell{
+		Text: "SEZIONE I - Informazioni generali sull’intermediario che entra in contatto con " +
+			"il contraente",
+		Height:    3,
+		Width:     190,
+		FontSize:  constants.LargeFontSize,
+		FontStyle: constants.BoldFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "",
+	})
+	bg.engine.NewLine(3)
+
+	bg.woptaTable(producerInfo, proponentInfo, designation)
+
+	bg.engine.WriteText(domain.TableCell{
+		Text: "Gli estremi identificativi e di iscrizione dell’Intermediario e dei soggetti che " +
+			"operano per lo stesso possono essere verificati consultando il Registro Unico degli Intermediari assicurativi " +
+			"e riassicurativi sul sito internet dell’IVASS (www.ivass.it)",
+		Height:    3,
+		Width:     190,
+		FontSize:  constants.RegularFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "",
+	})
+
+	sections := []section{
+		{
+			title: "SEZIONE I - Informazioni sul modello di distribuzione",
+			body:  []string{annex4Section1Info},
+		},
+		{
+			title: "SEZIONE II: Informazioni sull’attività di distribuzione e consulenza",
+			body: []string{
+				"Nello svolgimento dell’attività di distribuzione, l’intermediario non presta " +
+					"attività di consulenza prima della conclusione del contratto né fornisce al contraente una raccomandazione " +
+					"personalizzata ai sensi dell’art. 119-ter, comma 3, del decreto legislativo n. 209/2005 " +
+					"(Codice delle Assicurazioni Private)",
+				"L'attività di distribuzione assicurativa è svolta in assenza di obblighi " +
+					"contrattuali che impongano di offrire esclusivamente i contratti di una o più imprese di " +
+					"assicurazioni.",
+			},
+		},
+		{
+			title: "SEZIONE III - Informazioni relative alle remunerazioni",
+			body: []string{
+				"Per il prodotto intermediato, è corrisposto all’intermediario, da parte " +
+					"dell’impresa di assicurazione, un compenso sotto forma di commissione inclusa nel premio " +
+					"assicurativo.",
+				"L’informazione sopra resa riguarda i compensi complessivamente percepiti da tutti " +
+					"gli intermediari coinvolti nella distribuzione del prodotto.",
+			},
+		},
+		{
+			title: "SEZIONE IV – Informazioni sul pagamento dei premi",
+			body: []string{
+				"Relativamente a questo contratto i premi pagati dal Contraente " +
+					"all’intermediario e le somme destinate ai risarcimenti o ai pagamenti dovuti dalle Imprese di Assicurazione, " +
+					"se regolati per il tramite dell’intermediario costituiscono patrimonio autonomo e separato dal patrimonio " +
+					"dello stesso.",
+				"Indicare le modalità di pagamento ammesse",
+				"Sono consentiti, nei confronti dell'intermediario, esclusivamente bonifico e strumenti di " +
+					"pagamento elettronico, quali ad esempio, carte di credito e/o carte di debito, incluse le carte " +
+					"prepagate.",
 			},
 		},
 	}
