@@ -67,13 +67,21 @@ type QBEGenerator struct {
 	*baseGenerator
 }
 
-func NewQBEGenerator(engine *engine.Fpdf, isProposal bool) *QBEGenerator {
+func NewQBEGenerator(engine *engine.Fpdf, policy *models.Policy, node *models.NetworkNode, isProposal bool,
+) *QBEGenerator {
 	return &QBEGenerator{
-		&baseGenerator{engine: engine, isProposal: isProposal, now: time.Now(), signatureID: 0},
+		&baseGenerator{
+			engine:      engine,
+			isProposal:  isProposal,
+			now:         time.Now(),
+			signatureID: 0,
+			networkNode: node,
+			policy:      policy,
+		},
 	}
 }
 
-func (qb *QBEGenerator) mainHeader(policy *models.Policy) {
+func (qb *QBEGenerator) mainHeader() {
 	type policyInfo struct {
 		code         string
 		startDate    string
@@ -111,60 +119,60 @@ func (qb *QBEGenerator) mainHeader(policy *models.Policy) {
 	}
 
 	policyCodePrefix := "I dati della tua Polizza nr. "
-	if qb.isProposal && policy.ProposalNumber != 0 {
+	if qb.isProposal && qb.policy.ProposalNumber != 0 {
 		policyCodePrefix = "I dati della tua Proposta nr. "
-		plcInfo.code = fmt.Sprintf("%d", policy.ProposalNumber)
-	} else if policy.CodeCompany != "" {
-		plcInfo.code = policy.CodeCompany
+		plcInfo.code = fmt.Sprintf("%d", qb.policy.ProposalNumber)
+	} else if qb.policy.CodeCompany != "" {
+		plcInfo.code = qb.policy.CodeCompany
 	}
 
-	if !policy.StartDate.IsZero() {
-		plcInfo.startDate = policy.StartDate.Format(constants.DayMonthYearFormat)
+	if !qb.policy.StartDate.IsZero() {
+		plcInfo.startDate = qb.policy.StartDate.Format(constants.DayMonthYearFormat)
 	}
 
-	if !policy.EndDate.IsZero() {
-		plcInfo.endDate = policy.EndDate.Format(constants.DayMonthYearFormat)
+	if !qb.policy.EndDate.IsZero() {
+		plcInfo.endDate = qb.policy.EndDate.Format(constants.DayMonthYearFormat)
 	}
 
-	if _, ok := constants.PaymentSplitMap[policy.PaymentSplit]; ok {
-		plcInfo.paymentSplit = constants.PaymentSplitMap[policy.PaymentSplit]
+	if _, ok := constants.PaymentSplitMap[qb.policy.PaymentSplit]; ok {
+		plcInfo.paymentSplit = constants.PaymentSplitMap[qb.policy.PaymentSplit]
 	}
 
-	nextPayDate := lib.AddMonths(policy.StartDate.AddDate(policy.Annuity, 0, 0), 12)
-	if !nextPayDate.After(policy.EndDate) {
+	nextPayDate := lib.AddMonths(qb.policy.StartDate.AddDate(qb.policy.Annuity, 0, 0), 12)
+	if !nextPayDate.After(qb.policy.EndDate) {
 		plcInfo.nextPayment = nextPayDate.Format(constants.DayMonthYearFormat)
 	} else {
 		plcInfo.nextPayment = plcInfo.endDate
 	}
 
-	if policy.HasBond {
+	if qb.policy.HasBond {
 		plcInfo.hasBond = "SI"
 	}
 
-	if len(policy.Contractor.Name) != 0 {
-		ctrInfo.name = policy.Contractor.Name
+	if len(qb.policy.Contractor.Name) != 0 {
+		ctrInfo.name = qb.policy.Contractor.Name
 	}
 
-	if len(policy.Contractor.VatCode) != 0 {
-		ctrInfo.vatCode = policy.Contractor.VatCode
+	if len(qb.policy.Contractor.VatCode) != 0 {
+		ctrInfo.vatCode = qb.policy.Contractor.VatCode
 	}
 
-	if len(policy.Contractor.FiscalCode) != 0 {
-		ctrInfo.fiscalCode = policy.Contractor.FiscalCode
+	if len(qb.policy.Contractor.FiscalCode) != 0 {
+		ctrInfo.fiscalCode = qb.policy.Contractor.FiscalCode
 	}
 
-	if policy.Contractor.CompanyAddress != nil {
-		ctrInfo.address = fmt.Sprintf("%s %s\n%s %s (%s)", policy.Contractor.CompanyAddress.StreetName,
-			policy.Contractor.CompanyAddress.StreetNumber, policy.Contractor.CompanyAddress.PostalCode,
-			policy.Contractor.CompanyAddress.City, policy.Contractor.CompanyAddress.CityCode)
+	if qb.policy.Contractor.CompanyAddress != nil {
+		ctrInfo.address = fmt.Sprintf("%s %s\n%s %s (%s)", qb.policy.Contractor.CompanyAddress.StreetName,
+			qb.policy.Contractor.CompanyAddress.StreetNumber, qb.policy.Contractor.CompanyAddress.PostalCode,
+			qb.policy.Contractor.CompanyAddress.City, qb.policy.Contractor.CompanyAddress.CityCode)
 	}
 
-	if len(policy.Contractor.Mail) != 0 {
-		ctrInfo.mail = policy.Contractor.Mail
+	if len(qb.policy.Contractor.Mail) != 0 {
+		ctrInfo.mail = qb.policy.Contractor.Mail
 	}
 
-	if len(policy.Contractor.Phone) != 0 {
-		ctrInfo.phone = policy.Contractor.Phone
+	if len(qb.policy.Contractor.Phone) != 0 {
+		ctrInfo.phone = qb.policy.Contractor.Phone
 	}
 
 	table := [][]domain.TableCell{
@@ -623,7 +631,7 @@ func (qb *QBEGenerator) whoWeAreTable() {
 	qb.engine.DrawTable(whoWeAreTable)
 }
 
-func (qb *QBEGenerator) insuredDetailsSection(policy *models.Policy) {
+func (qb *QBEGenerator) insuredDetailsSection() {
 	type buildingInfo struct {
 		address          string
 		buildingMaterial string
@@ -673,7 +681,7 @@ func (qb *QBEGenerator) insuredDetailsSection(policy *models.Policy) {
 	enterprise := newEnterpriseInfo()
 
 	index := 0
-	for _, asset := range policy.Assets {
+	for _, asset := range qb.policy.Assets {
 		if asset.Building == nil {
 			continue
 		}
@@ -702,7 +710,7 @@ func (qb *QBEGenerator) insuredDetailsSection(policy *models.Policy) {
 		index++
 	}
 
-	for _, asset := range policy.Assets {
+	for _, asset := range qb.policy.Assets {
 		if asset.Enterprise == nil {
 			continue
 		}
@@ -858,7 +866,7 @@ func (qb *QBEGenerator) insuredDetailsSection(policy *models.Policy) {
 }
 
 // TODO: parse policy info
-func (qb *QBEGenerator) guaranteesDetailsSection(policy *models.Policy) {
+func (qb *QBEGenerator) guaranteesDetailsSection() {
 	const emptyInfo string = "======"
 
 	type guaranteeInfo struct {
@@ -1614,7 +1622,7 @@ func (qb *QBEGenerator) deductibleSection() {
 	})
 }
 
-func (qb *QBEGenerator) dynamicDeductibleSection(policy *models.Policy) {
+func (qb *QBEGenerator) dynamicDeductibleSection() {
 	const (
 		descriptionColumnWidth = 100
 		otherColumnWidth       = 45
@@ -1729,7 +1737,7 @@ func (qb *QBEGenerator) dynamicDeductibleSection(policy *models.Policy) {
 		return result
 	}
 
-	for _, asset := range policy.Assets {
+	for _, asset := range qb.policy.Assets {
 		if asset.Enterprise != nil {
 			for _, guarantee := range asset.Guarantees {
 				if guarantee.Slug == rctGuaranteeSlug {
@@ -1955,7 +1963,7 @@ func (qb *QBEGenerator) dynamicDeductibleSection(policy *models.Policy) {
 }
 
 // TODO: fix table layout
-func (qb *QBEGenerator) detailsSection(policy *models.Policy) {
+func (qb *QBEGenerator) detailsSection() {
 	const (
 		emptyField        = "====="
 		firstColumnWidth  = 65
@@ -1979,7 +1987,7 @@ func (qb *QBEGenerator) detailsSection(policy *models.Policy) {
 		deo:    emptyField,
 	}
 
-	for _, asset := range policy.Assets {
+	for _, asset := range qb.policy.Assets {
 		if asset.Enterprise == nil {
 			continue
 		}
@@ -2190,8 +2198,8 @@ func (qb *QBEGenerator) detailsSection(policy *models.Policy) {
 	qb.engine.DrawTable(table)
 }
 
-func (qb *QBEGenerator) Contract(policy *models.Policy) ([]byte, error) {
-	qb.mainHeader(policy)
+func (qb *QBEGenerator) Contract() ([]byte, error) {
+	qb.mainHeader()
 
 	qb.engine.NewPage()
 
@@ -2207,11 +2215,11 @@ func (qb *QBEGenerator) Contract(policy *models.Policy) ([]byte, error) {
 
 	qb.engine.NewLine(10)
 
-	qb.insuredDetailsSection(policy)
+	qb.insuredDetailsSection()
 
 	qb.engine.NewPage()
 
-	qb.guaranteesDetailsSection(policy)
+	qb.guaranteesDetailsSection()
 
 	qb.engine.NewPage()
 
@@ -2219,11 +2227,13 @@ func (qb *QBEGenerator) Contract(policy *models.Policy) ([]byte, error) {
 
 	qb.engine.NewLine(10)
 
-	qb.dynamicDeductibleSection(policy)
+	qb.dynamicDeductibleSection()
 
 	qb.engine.NewLine(10)
 
-	qb.detailsSection(policy)
+	qb.detailsSection()
+
+	qb.annexSections()
 
 	qb.woptaHeader()
 
@@ -2235,7 +2245,7 @@ func (qb *QBEGenerator) Contract(policy *models.Policy) ([]byte, error) {
 
 	qb.engine.NewLine(5)
 
-	qb.commercialConsentSection(policy)
+	qb.commercialConsentSection()
 
 	return qb.engine.RawDoc()
 }

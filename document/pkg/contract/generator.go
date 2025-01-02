@@ -502,7 +502,10 @@ func (bg *baseGenerator) commercialConsentSection() {
 
 	if bg.policy.Contractor.Consens != nil {
 		consent, err := bg.policy.ExtractConsens(key)
-		lib.CheckError(err)
+		if err != nil {
+			log.Println("Error extracting consens, ", key, err)
+			panic(err)
+		}
 
 		if consent.Answer {
 			consentText = "X"
@@ -711,8 +714,11 @@ func (bg *baseGenerator) annexSections() {
 
 	bg.engine.NewPage()
 
+	bg.annex3(producerInfo, proponetInfo, designationInfo)
+
 }
 
+// TODO: private
 func (bg *baseGenerator) productInfo() map[string]string {
 	producer := map[string]string{
 		"name":            "LOMAZZI MICHELE",
@@ -744,6 +750,7 @@ func (bg *baseGenerator) productInfo() map[string]string {
 	return producer
 }
 
+// TODO: private
 func (bg *baseGenerator) proponentInfo() map[string]string {
 	proponentInfo := make(map[string]string)
 
@@ -797,6 +804,7 @@ func (bg *baseGenerator) proponentInfo() map[string]string {
 	return proponentInfo
 }
 
+// TODO: private
 func (bg *baseGenerator) designationInfo() string {
 	var (
 		designation                           string
@@ -846,6 +854,7 @@ func (bg *baseGenerator) designationInfo() string {
 	return designation
 }
 
+// TODO: private
 func (bg *baseGenerator) annex4Section1Info() string {
 	var (
 		section1Info       string
@@ -880,4 +889,347 @@ func (bg *baseGenerator) annex4Section1Info() string {
 	log.Printf("annex 4 section 1 info: %s", section1Info)
 
 	return section1Info
+}
+
+func (bg *baseGenerator) woptaTable(producerInfo, proponentInfo map[string]string, designation string) {
+	type entry struct {
+		title string
+		body  string
+	}
+
+	table := make([][]domain.TableCell, 0)
+
+	parseEntries := func(entries []entry, last bool) [][]domain.TableCell {
+		result := make([][]domain.TableCell, 0)
+		borders := []string{"T", ""}
+		for index, e := range entries {
+			if last && index == len(entries)-1 {
+				borders = []string{"T", "B"}
+			}
+			row := [][]domain.TableCell{
+				{
+					{
+						Text:      e.title,
+						Height:    5,
+						Width:     190,
+						FontSize:  constants.SmallFontSize,
+						FontStyle: constants.RegularFontStyle,
+						FontColor: constants.BlackColor,
+						Fill:      false,
+						FillColor: domain.Color{},
+						Align:     constants.LeftAlign,
+						Border:    borders[0],
+					},
+				},
+				{
+					{
+						Text:      e.body,
+						Height:    5,
+						Width:     190,
+						FontSize:  constants.RegularFontSize,
+						FontStyle: constants.RegularFontStyle,
+						FontColor: constants.BlackColor,
+						Fill:      false,
+						FillColor: domain.Color{},
+						Align:     constants.LeftAlign,
+						Border:    borders[1],
+					},
+				},
+			}
+			result = append(result, row...)
+		}
+		return result
+	}
+
+	entries := []entry{
+		{
+			title: "DATI DELLA PERSONA FISICA CHE ENTRA IN CONTATTO CON IL CONTRAENTE",
+			body: producerInfo["name"] + " iscritto alla Sezione " +
+				producerInfo["ruiSection"] + " del RUI con numero " + producerInfo["ruiCode"] + " in data " +
+				producerInfo["ruiRegistration"],
+		},
+		{
+			title: "QUALIFICA",
+			body:  designation,
+		},
+		{
+			title: "SEDE LEGALE",
+			body:  designation,
+		},
+	}
+
+	table = append(table, parseEntries(entries, false)...)
+
+	table = append(table, [][]domain.TableCell{
+		{
+			{
+				Text:      "RECAPITI TELEFONICI",
+				Height:    5,
+				Width:     95,
+				FontSize:  constants.SmallFontSize,
+				FontStyle: constants.RegularFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.LeftAlign,
+				Border:    "T",
+			},
+			{
+				Text:      "E-MAIL",
+				Height:    5,
+				Width:     95,
+				FontSize:  constants.SmallFontSize,
+				FontStyle: constants.RegularFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.LeftAlign,
+				Border:    "T",
+			},
+		},
+		{
+			{
+				Text:      proponentInfo["phone"],
+				Height:    5,
+				Width:     95,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: constants.RegularFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.LeftAlign,
+				Border:    "",
+			},
+			{
+				Text:      proponentInfo["email"],
+				Height:    5,
+				Width:     95,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: constants.RegularFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.LeftAlign,
+				Border:    "",
+			},
+		},
+		{
+			{
+				Text:      "PEC",
+				Height:    5,
+				Width:     95,
+				FontSize:  constants.SmallFontSize,
+				FontStyle: constants.RegularFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.LeftAlign,
+				Border:    "T",
+			},
+			{
+				Text:      "SITO INTERNET",
+				Height:    5,
+				Width:     95,
+				FontSize:  constants.SmallFontSize,
+				FontStyle: constants.RegularFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.LeftAlign,
+				Border:    "T",
+			},
+		},
+		{
+			{
+				Text:      proponentInfo["pec"],
+				Height:    5,
+				Width:     95,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: constants.RegularFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.LeftAlign,
+				Border:    "",
+			},
+			{
+				Text:      proponentInfo["website"],
+				Height:    5,
+				Width:     95,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: constants.RegularFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.LeftAlign,
+				Border:    "",
+			},
+		},
+	}...)
+
+	entries = []entry{
+		{
+			title: "AUTORITÀ COMPETENTE ALLA VIGILANZA DELL’ATTIVITÀ SVOLTA",
+			body: "IVASS – Istituto per la Vigilanza sulle Assicurazioni - Via del Quirinale, " +
+				"21 - 00187 Roma",
+		},
+	}
+	table = append(table, parseEntries(entries, true)...)
+
+	bg.engine.SetDrawColor(constants.PinkColor)
+	bg.engine.DrawTable(table)
+	bg.engine.NewLine(2)
+}
+
+// TODO: private
+func (bg *baseGenerator) annex3(producerInfo, proponentInfo map[string]string, designation string) {
+	type section struct {
+		title string
+		body  []string
+	}
+
+	bg.engine.WriteText(domain.TableCell{
+		Text:      "ALLEGATO 3 - INFORMATIVA SUL DISTRIBUTORE",
+		Height:    3,
+		Width:     190,
+		FontSize:  constants.LargeFontSize,
+		FontStyle: constants.BoldFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.CenterAlign,
+		Border:    "",
+	})
+	bg.engine.NewLine(3)
+
+	bg.engine.WriteText(domain.TableCell{
+		Text: "Il distributore ha l’obbligo di consegnare/trasmettere al contraente il presente" +
+			" documento, prima della sottoscrizione della prima proposta o, qualora non prevista, del primo contratto di " +
+			"assicurazione, di metterlo a disposizione del pubblico nei propri locali, anche mediante apparecchiature " +
+			"tecnologiche, oppure di pubblicarlo sul proprio sito internet ove utilizzato per la promozione e collocamento " +
+			"di prodotti assicurativi, dando avviso della pubblicazione nei propri locali. In occasione di rinnovo o " +
+			"stipula di un nuovo contratto o di qualsiasi operazione avente ad oggetto un prodotto di investimento " +
+			"assicurativo il distributore consegna o trasmette le informazioni di cui all’Allegato 3 solo in caso di " +
+			"successive modifiche di rilievo delle stesse.",
+		Height:    3,
+		Width:     190,
+		FontSize:  constants.RegularFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "",
+	})
+	bg.engine.NewLine(3)
+
+	bg.engine.WriteText(domain.TableCell{
+		Text: "SEZIONE I - Informazioni generali sull’intermediario che entra in contatto con " +
+			"il contraente",
+		Height:    3,
+		Width:     190,
+		FontSize:  constants.LargeFontSize,
+		FontStyle: constants.BoldFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "",
+	})
+	bg.engine.NewLine(3)
+
+	bg.woptaTable(producerInfo, proponentInfo, designation)
+
+	bg.engine.WriteText(domain.TableCell{
+		Text: "Gli estremi identificativi e di iscrizione dell’Intermediario e dei soggetti che " +
+			"operano per lo stesso possono essere verificati consultando il Registro Unico degli Intermediari assicurativi " +
+			"e riassicurativi sul sito internet dell’IVASS (www.ivass.it)",
+		Height:    3,
+		Width:     190,
+		FontSize:  constants.RegularFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "",
+	})
+
+	sections := []section{
+		{
+			title: "SEZIONE II - Informazioni sull’attività svolta dall’intermediario assicurativo",
+			body: []string{
+				proponentInfo["name"] + " comunica di aver messo a disposizione nei propri " +
+					"locali l’elenco degli obblighi di comportamento cui adempie, come indicati nell’allegato 4-ter del Regolamento" +
+					" IVASS n. 40/2018.",
+				"Si comunica che nel caso di offerta fuori sede o nel caso in cui la fase " +
+					"precontrattuale si svolga mediante tecniche di comunicazione a distanza il contraente riceve l’elenco " +
+					"degli obblighi.",
+			},
+		},
+		{
+			title: "SEZIONE III - Informazioni relative a potenziali situazioni di conflitto " +
+				"d’interessi",
+			body: []string{
+				proponentInfo["name"] + " ed i soggetti che operano per la stessa non sono " +
+					"detentori di una partecipazione, diretta o indiretta, pari o superiore al 10% del capitale sociale o dei " +
+					"diritti di voto di alcuna Impresa di assicurazione.",
+				"Le Imprese di assicurazione o Imprese controllanti un’Impresa di assicurazione " +
+					"non sono detentrici di una partecipazione, diretta o indiretta, pari o superiore al 10% del capitale sociale " +
+					"o dei diritti di voto dell’Intermediario.",
+			},
+		},
+		{
+			title: "SEZIONE IV - Informazioni sugli strumenti di tutela del contraente",
+			body: []string{
+				"L’attività di distribuzione è garantita da un contratto di assicurazione della " +
+					"responsabilità civile che copre i danni arrecati ai contraenti da negligenze ed errori professionali " +
+					"dell’intermediario o da negligenze, errori professionali ed infedeltà dei dipendenti, dei collaboratori o " +
+					"delle persone del cui operato l’intermediario deve rispondere a norma di legge.",
+				"Il contraente ha la facoltà, ferma restando la possibilità di rivolgersi " +
+					"all’Autorità Giudiziaria, di inoltrare reclamo per iscritto all’intermediario, via posta all’indirizzo di " +
+					"sede legale o a mezzo mail alla PEC sopra indicati, oppure all’Impresa secondo le modalità e presso i " +
+					"recapiti indicati nel DIP aggiuntivo nella relativa sezione, nonché la possibilità, qualora non dovesse " +
+					"ritenersi soddisfatto dall’esito del reclamo o in caso di assenza di riscontro da parte dell’intermediario " +
+					"o dell’impresa entro il termine di legge, di rivolgersi all’IVASS secondo quanto indicato nei DIP aggiuntivi.",
+				"Il contraente ha la facoltà di avvalersi di altri eventuali sistemi alternativi " +
+					"di risoluzione delle controversie previsti dalla normativa vigente nonché quelli indicati nei" +
+					" DIP aggiuntivi.",
+			},
+		},
+	}
+
+	for _, s := range sections {
+		bg.engine.NewLine(3)
+		bg.engine.WriteText(domain.TableCell{
+			Text:      s.title,
+			Height:    3,
+			Width:     190,
+			FontSize:  constants.LargeFontSize,
+			FontStyle: constants.BoldFontStyle,
+			FontColor: constants.BlackColor,
+			Fill:      false,
+			FillColor: domain.Color{},
+			Align:     constants.LeftAlign,
+			Border:    "",
+		})
+		bg.engine.NewLine(1)
+		for _, b := range s.body {
+			bg.engine.WriteText(domain.TableCell{
+				Text:      b,
+				Height:    3,
+				Width:     190,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: constants.RegularFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.LeftAlign,
+				Border:    "",
+			})
+			bg.engine.NewLine(1)
+		}
+	}
+
+	bg.engine.NewPage()
 }
