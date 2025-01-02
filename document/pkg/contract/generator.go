@@ -2,16 +2,20 @@ package contract
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/wopta/goworkspace/document/internal/constants"
 	"github.com/wopta/goworkspace/document/internal/domain"
 	"github.com/wopta/goworkspace/document/internal/engine"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/models"
 )
 
 type baseGenerator struct {
-	engine     *engine.Fpdf
-	isProposal bool
+	engine      *engine.Fpdf
+	isProposal  bool
+	now         time.Time
+	signatureID uint32
 }
 
 func (bg *baseGenerator) woptaHeader() {
@@ -468,5 +472,157 @@ func (bg *baseGenerator) woptaPrivacySection() {
 		}
 		bg.engine.NewLine(rowHeight)
 	}
+}
 
+func (bg *baseGenerator) commercialConsentSection(policy *models.Policy) {
+	const (
+		key = 2
+	)
+
+	var (
+		consentText, notConsentText = " ", "X"
+	)
+
+	if policy.Contractor.Consens != nil {
+		consent, err := policy.ExtractConsens(key)
+		lib.CheckError(err)
+
+		if consent.Answer {
+			consentText = "X"
+			notConsentText = " "
+		}
+	}
+
+	bg.engine.WriteText(domain.TableCell{
+		Text:      "Consenso per finalità commerciali.",
+		Height:    3,
+		Width:     190,
+		FontSize:  constants.LargeFontSize,
+		FontStyle: constants.BoldFontStyle,
+		FontColor: constants.PinkColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "",
+	})
+	bg.engine.WriteText(domain.TableCell{
+		Text:      "Il sottoscritto, letta e compresa l’informativa sul trattamento dei dati personali",
+		Height:    3,
+		Width:     190,
+		FontSize:  constants.RegularFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "",
+	})
+	bg.engine.NewLine(2)
+	bg.engine.DrawTable([][]domain.TableCell{
+		{
+			{
+				Text:      " ",
+				Height:    4.5,
+				Width:     5,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: constants.RegularFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.LeftAlign,
+				Border:    "",
+			},
+			{
+				Text:      consentText,
+				Height:    4.5,
+				Width:     4.5,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: constants.RegularFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.CenterAlign,
+				Border:    "1",
+			},
+			{
+				Text:      "ACCONSENTE",
+				Height:    4.5,
+				Width:     30,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: constants.RegularFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.LeftAlign + "M",
+				Border:    "",
+			},
+			{
+				Text:      " ",
+				Height:    4.5,
+				Width:     20,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: constants.RegularFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.LeftAlign,
+				Border:    "",
+			},
+			{
+				Text:      notConsentText,
+				Height:    4.5,
+				Width:     4.5,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: constants.RegularFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.CenterAlign,
+				Border:    "1",
+			},
+			{
+				Text:      "NON ACCONSENTE",
+				Height:    4.5,
+				Width:     125,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: constants.RegularFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.LeftAlign + "M",
+				Border:    "",
+			},
+		},
+	})
+	bg.engine.NewLine(2)
+	bg.engine.WriteText(domain.TableCell{
+		Text: "al trattamento dei propri dati personali da parte di Wopta Assicurazioni per " +
+			"l’invio di comunicazioni e proposte commerciali e di marketing, incluso l’invio di newsletter e ricerche di " +
+			"mercato, attraverso strumenti automatizzati (sms, mms, e-mail, ecc.) e non (posta cartacea e telefono " +
+			"con operatore).",
+		Height:    3,
+		Width:     190,
+		FontSize:  constants.RegularFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "",
+	})
+	bg.engine.WriteText(domain.TableCell{
+		Text:      bg.now.Format(constants.DayMonthYearFormat),
+		Height:    3,
+		Width:     190,
+		FontSize:  constants.RegularFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "",
+	})
+	if !bg.isProposal {
+		// TODO: signature section
+	}
 }
