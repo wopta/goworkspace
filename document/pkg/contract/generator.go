@@ -716,8 +716,11 @@ func (bg *baseGenerator) annexSections() {
 
 	bg.annex3(producerInfo, proponetInfo, designationInfo)
 
+	bg.engine.NewPage()
+
 	bg.annex4(producerInfo, proponetInfo, designationInfo, annex4Section1Info)
 
+	bg.engine.NewPage()
 }
 
 // TODO: private
@@ -1232,8 +1235,6 @@ func (bg *baseGenerator) annex3(producerInfo, proponentInfo map[string]string, d
 			bg.engine.NewLine(1)
 		}
 	}
-
-	bg.engine.NewPage()
 }
 
 // TODO: private
@@ -1379,6 +1380,4 @@ func (bg *baseGenerator) annex4(producerInfo, proponentInfo map[string]string, d
 			bg.engine.NewLine(1)
 		}
 	}
-
-	bg.engine.NewPage()
 }

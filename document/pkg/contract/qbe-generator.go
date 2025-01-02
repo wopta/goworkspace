@@ -2237,8 +2237,6 @@ func (qb *QBEGenerator) Contract() ([]byte, error) {
 
 	qb.woptaHeader()
 
-	qb.engine.NewPage()
-
 	qb.woptaFooter()
 
 	qb.woptaPrivacySection()
