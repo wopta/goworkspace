@@ -105,8 +105,16 @@ func (f *Fpdf) SetX(x float64) {
 	f.pdf.SetX(x)
 }
 
+func (f *Fpdf) GetX() float64 {
+	return f.pdf.GetX()
+}
+
 func (f *Fpdf) SetY(y float64) {
 	f.pdf.SetY(y)
+}
+
+func (f *Fpdf) GetY() float64 {
+	return f.pdf.GetY()
 }
 
 func (f *Fpdf) DrawWatermark(text string) {
