@@ -2,6 +2,8 @@ package contract
 
 import (
 	"fmt"
+	"log"
+	"strings"
 	"time"
 
 	"github.com/wopta/goworkspace/document/internal/constants"
@@ -9,6 +11,7 @@ import (
 	"github.com/wopta/goworkspace/document/internal/engine"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
 )
 
 type baseGenerator struct {
@@ -16,6 +19,20 @@ type baseGenerator struct {
 	isProposal  bool
 	now         time.Time
 	signatureID uint32
+	networkNode *models.NetworkNode
+	policy      *models.Policy
+}
+
+func (bg *baseGenerator) emptyHeader() {
+	bg.engine.SetHeader(func() {
+		if bg.isProposal {
+			bg.engine.DrawWatermark(constants.Proposal)
+		}
+	})
+}
+
+func (bg *baseGenerator) emptyFooter() {
+	bg.engine.SetFooter(func() {})
 }
 
 func (bg *baseGenerator) woptaHeader() {
@@ -474,7 +491,7 @@ func (bg *baseGenerator) woptaPrivacySection() {
 	}
 }
 
-func (bg *baseGenerator) commercialConsentSection(policy *models.Policy) {
+func (bg *baseGenerator) commercialConsentSection() {
 	const (
 		key = 2
 	)
@@ -483,8 +500,8 @@ func (bg *baseGenerator) commercialConsentSection(policy *models.Policy) {
 		consentText, notConsentText = " ", "X"
 	)
 
-	if policy.Contractor.Consens != nil {
-		consent, err := policy.ExtractConsens(key)
+	if bg.policy.Contractor.Consens != nil {
+		consent, err := bg.policy.ExtractConsens(key)
 		lib.CheckError(err)
 
 		if consent.Answer {
@@ -666,4 +683,201 @@ func (bg *baseGenerator) signatureForm() {
 	bg.engine.NewLine(7.5)
 
 	bg.signatureID++
+}
+
+func (bg *baseGenerator) annexSections() {
+	if bg.networkNode != nil && !bg.networkNode.HasAnnex && bg.networkNode.Type != models.PartnershipNetworkNodeType {
+		return
+	}
+
+	if bg.networkNode == nil || bg.networkNode.Type == models.PartnershipNetworkNodeType || bg.networkNode.
+		IsMgaProponent {
+
+		bg.woptaHeader()
+
+		bg.woptaFooter()
+	} else {
+		bg.emptyHeader()
+
+		bg.emptyFooter()
+	}
+
+	producerInfo := bg.productInfo()
+	proponetInfo := bg.proponentInfo()
+	designationInfo := bg.designationInfo()
+	annex4Section1Info := bg.annex4Section1Info()
+
+	log.Println(producerInfo, proponetInfo, designationInfo, annex4Section1Info)
+
+	bg.engine.NewPage()
+
+}
+
+func (bg *baseGenerator) productInfo() map[string]string {
+	producer := map[string]string{
+		"name":            "LOMAZZI MICHELE",
+		"ruiSection":      "A",
+		"ruiCode":         "A000703480",
+		"ruiRegistration": "02.03.2022",
+	}
+
+	defer log.Printf("producer info: %+v", producer)
+
+	if bg.networkNode == nil || strings.EqualFold(bg.networkNode.Type, models.PartnershipNetworkNodeType) {
+		return producer
+	}
+
+	switch bg.networkNode.Type {
+	case models.AgentNetworkNodeType:
+		producer["name"] = strings.ToUpper(bg.networkNode.Agent.Surname) + " " + strings.ToUpper(bg.networkNode.Agent.
+			Name)
+		producer["ruiSection"] = bg.networkNode.Agent.RuiSection
+		producer["ruiCode"] = bg.networkNode.Agent.RuiCode
+		producer["ruiRegistration"] = bg.networkNode.Agent.RuiRegistration.Format("02.01.2006")
+	case models.AgencyNetworkNodeType:
+		producer["name"] = strings.ToUpper(bg.networkNode.Agency.Manager.Name) + " " + strings.ToUpper(bg.networkNode.
+			Agency.Manager.Surname)
+		producer["ruiSection"] = bg.networkNode.Agency.Manager.RuiSection
+		producer["ruiCode"] = bg.networkNode.Agency.Manager.RuiCode
+		producer["ruiRegistration"] = bg.networkNode.Agency.Manager.RuiRegistration.Format("02.01.2006")
+	}
+	return producer
+}
+
+func (bg *baseGenerator) proponentInfo() map[string]string {
+	proponentInfo := make(map[string]string)
+
+	defer log.Printf("proponent info: %+v", proponentInfo)
+
+	proponentInfo["name"] = "Wopta Assicurazioni Srl"
+
+	if bg.networkNode == nil || bg.networkNode.Type == models.PartnershipNetworkNodeType || bg.networkNode.
+		IsMgaProponent {
+		proponentInfo["address"] = "Galleria del Corso, 1 - 20122 MILANO (MI)"
+		proponentInfo["phone"] = "02.91.24.03.46"
+		proponentInfo["email"] = "info@wopta.it"
+		proponentInfo["pec"] = "woptaassicurazioni@legalmail.it"
+		proponentInfo["website"] = "wopta.it"
+	} else {
+		proponentNode := bg.networkNode
+		if proponentNode.WorksForUid != "" {
+			proponentNode = network.GetNetworkNodeByUid(proponentNode.WorksForUid)
+			if proponentNode == nil {
+				panic("could not find node for proponent with uid " + bg.networkNode.WorksForUid)
+			}
+		}
+
+		proponentInfo["address"] = "====="
+		proponentInfo["phone"] = "====="
+		proponentInfo["email"] = "====="
+		proponentInfo["pec"] = "====="
+		proponentInfo["website"] = "====="
+
+		if name := proponentNode.Agency.Name; name != "" {
+			proponentInfo["name"] = name
+		}
+
+		if address := proponentNode.GetAddress(); address != "" {
+			proponentInfo["address"] = address
+		}
+		if phone := proponentNode.Agency.Phone; phone != "" {
+			proponentInfo["phone"] = phone
+		}
+		if email := proponentNode.Mail; email != "" {
+			proponentInfo["email"] = email
+		}
+		if pec := proponentNode.Agency.Pec; pec != "" {
+			proponentInfo["pec"] = pec
+		}
+		if website := proponentNode.Agency.Website; website != "" {
+			proponentInfo["website"] = website
+		}
+	}
+
+	return proponentInfo
+}
+
+func (bg *baseGenerator) designationInfo() string {
+	var (
+		designation                           string
+		mgaProponentDirectDesignationFormat   = "%s %s"
+		mgaRuiInfo                            = "Wopta Assicurazioni Srl, Società iscritta alla Sezione A del RUI con numero A000701923 in data 14/02/2022"
+		designationDirectManager              = "Responsabile dell’attività di intermediazione assicurativa di"
+		mgaProponentIndirectDesignationFormat = "%s di %s, iscritta in sezione E del RUI con numero %s in data %s, che opera per conto di %s"
+		mgaEmitterDesignationFormat           = "%s dell’intermediario di %s iscritta alla sezione %s del RUI con numero %s in data %s"
+	)
+
+	if bg.networkNode == nil || bg.networkNode.Type == models.PartnershipNetworkNodeType {
+		designation = fmt.Sprintf(mgaProponentDirectDesignationFormat, designationDirectManager, mgaRuiInfo)
+	} else if bg.networkNode.IsMgaProponent {
+		if bg.networkNode.WorksForUid == models.WorksForMgaUid {
+			designation = fmt.Sprintf(mgaProponentDirectDesignationFormat, bg.networkNode.Designation, mgaRuiInfo)
+		} else {
+			worksForNode := bg.networkNode
+			if bg.networkNode.WorksForUid != "" {
+				worksForNode = network.GetNetworkNodeByUid(bg.networkNode.WorksForUid)
+			}
+			designation = fmt.Sprintf(
+				mgaProponentIndirectDesignationFormat,
+				bg.networkNode.Designation,
+				worksForNode.Agency.Name,
+				worksForNode.Agency.RuiCode,
+				worksForNode.Agency.RuiRegistration.Format(constants.DayMonthYearFormat),
+				mgaRuiInfo,
+			)
+		}
+	} else {
+		worksForNode := bg.networkNode
+		if bg.networkNode.WorksForUid != "" {
+			worksForNode = network.GetNetworkNodeByUid(bg.networkNode.WorksForUid)
+		}
+		designation = fmt.Sprintf(
+			mgaEmitterDesignationFormat,
+			bg.networkNode.Designation,
+			worksForNode.Agency.Name,
+			worksForNode.Agency.RuiSection,
+			worksForNode.Agency.RuiCode,
+			worksForNode.Agency.RuiRegistration.Format(constants.DayMonthYearFormat),
+		)
+	}
+
+	log.Printf("designation info: %+v", designation)
+
+	return designation
+}
+
+func (bg *baseGenerator) annex4Section1Info() string {
+	var (
+		section1Info       string
+		mgaProponentFormat = "Secondo quanto indicato nel modulo di proposta/polizza e documentazione " +
+			"precontrattuale ricevuta, la distribuzione  relativamente a questa proposta/contratto è svolta per " +
+			"conto della seguente impresa di assicurazione: %s"
+		mgaEmitterFormat = "Il contratto viene intermediato da %s, in qualità di soggetto proponente, che opera in " +
+			"virtù della collaborazione con Wopta Assicurazioni Srl (intermediario emittente dell'Impresa di " +
+			"Assicurazione %s, iscritto al RUI sezione A nr A000701923 dal 14.02.2022, ai sensi dell’articolo 22, " +
+			"comma 10, del decreto legge 18 ottobre 2012, n. 179, convertito nella legge 17 dicembre 2012, n. 221"
+	)
+
+	companyName := constants.CompanyMap[bg.policy.Company]
+
+	if bg.policy.Channel != models.NetworkChannel || bg.networkNode == nil || bg.networkNode.IsMgaProponent {
+		section1Info = fmt.Sprintf(
+			mgaProponentFormat,
+			companyName,
+		)
+	} else {
+		worksForNode := bg.networkNode
+		if bg.networkNode.WorksForUid != "" {
+			worksForNode = network.GetNetworkNodeByUid(bg.networkNode.WorksForUid)
+		}
+		section1Info = fmt.Sprintf(
+			mgaEmitterFormat,
+			worksForNode.Agency.Name,
+			companyName,
+		)
+	}
+
+	log.Printf("annex 4 section 1 info: %s", section1Info)
+
+	return section1Info
 }
