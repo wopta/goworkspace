@@ -723,6 +723,10 @@ func (bg *baseGenerator) annexSections() {
 	bg.annex4(producerInfo, proponetInfo, designationInfo, annex4Section1Info)
 
 	bg.engine.NewPage()
+
+	bg.annex4Ter(producerInfo, proponetInfo, designationInfo)
+
+	bg.engine.NewPage()
 }
 
 // TODO: private
@@ -1347,6 +1351,126 @@ func (bg *baseGenerator) annex4(producerInfo, proponentInfo map[string]string, d
 				"Sono consentiti, nei confronti dell'intermediario, esclusivamente bonifico e strumenti di " +
 					"pagamento elettronico, quali ad esempio, carte di credito e/o carte di debito, incluse le carte " +
 					"prepagate.",
+			},
+		},
+	}
+
+	for _, s := range sections {
+		bg.engine.NewLine(3)
+		bg.engine.WriteText(domain.TableCell{
+			Text:      s.title,
+			Height:    3,
+			Width:     190,
+			FontSize:  constants.LargeFontSize,
+			FontStyle: constants.BoldFontStyle,
+			FontColor: constants.BlackColor,
+			Fill:      false,
+			FillColor: domain.Color{},
+			Align:     constants.LeftAlign,
+			Border:    "",
+		})
+		bg.engine.NewLine(1)
+		for _, b := range s.body {
+			bg.engine.WriteText(domain.TableCell{
+				Text:      b,
+				Height:    3,
+				Width:     190,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: constants.RegularFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.LeftAlign,
+				Border:    "",
+			})
+			bg.engine.NewLine(1)
+		}
+	}
+}
+
+// TODO: private
+func (bg *baseGenerator) annex4Ter(producerInfo, proponentInfo map[string]string, designation string) {
+	type section struct {
+		title string
+		body  []string
+	}
+
+	bg.engine.WriteText(domain.TableCell{
+		Text:      "ALLEGATO 4 TER - ELENCO DELLE REGOLE DI COMPORTAMENTO DEL DISTRIBUTORE",
+		Height:    3,
+		Width:     190,
+		FontSize:  constants.LargeFontSize,
+		FontStyle: constants.BoldFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.CenterAlign,
+		Border:    "",
+	})
+	bg.engine.NewLine(3)
+
+	bg.engine.WriteText(domain.TableCell{
+		Text: "Il distributore ha l’obbligo di mettere a disposizione del pubblico il " +
+			"presente documento nei propri locali, anche mediante apparecchiature tecnologiche, oppure pubblicarlo su " +
+			"un sito internet ove utilizzato per la promozione e il collocamento di prodotti assicurativi, dando avviso " +
+			"della pubblicazione nei propri locali. Nel caso di offerta fuori sede o nel caso in cui la fase " +
+			"precontrattuale si svolga mediante tecniche di comunicazione a distanza, il distributore consegna o " +
+			"trasmette al contraente il presente documento prima della sottoscrizione della proposta o, qualora non " +
+			"prevista, del contratto di assicurazione.",
+		Height:    3,
+		Width:     190,
+		FontSize:  constants.RegularFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "",
+	})
+	bg.engine.NewLine(3)
+
+	bg.woptaTable(producerInfo, proponentInfo, designation)
+
+	bg.engine.WriteText(domain.TableCell{
+		Text: "Gli estremi identificativi e di iscrizione dell’Intermediario e dei soggetti che " +
+			"operano per lo stesso possono essere verificati consultando il Registro Unico degli Intermediari assicurativi " +
+			"e riassicurativi sul sito internet dell’IVASS (www.ivass.it)",
+		Height:    3,
+		Width:     190,
+		FontSize:  constants.RegularFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "",
+	})
+
+	sections := []section{
+		{
+			title: "Sezione I - Regole generali per la distribuzione di prodotti assicurativi",
+			body: []string{
+				"a. obbligo di consegna al contraente dell’allegato 3 al Regolamento IVASS " +
+					"n. 40 del 2 agosto 2018, prima della sottoscrizione della prima proposta o, qualora non prevista, del primo " +
+					"contratto di assicurazione, di metterlo a disposizione del pubblico nei locali del distributore, anche " +
+					"mediante apparecchiature tecnologiche, e di pubblicarlo sul sito internet, ove esistente",
+				"b. obbligo di consegna dell’allegato 4 al Regolamento IVASS n. 40 del 2 agosto " +
+					"2018, prima della sottoscrizione di ciascuna proposta di assicurazione o, qualora non prevista, del contratto " +
+					"di assicurazione",
+				"c. obbligo di consegnare copia della documentazione precontrattuale e " +
+					"contrattuale prevista dalle vigenti disposizioni, copia della polizza e di ogni altro atto o documento " +
+					"sottoscritto dal contraente",
+				"d. obbligo di proporre o raccomandare contratti coerenti con le richieste e le " +
+					"esigenze di copertura assicurativa e previdenziale del contraente o dell’assicurato, acquisendo a tal fine, " +
+					"ogni utile informazione",
+				"e. obbligo di valutare se il contraente rientra nel mercato di riferimento " +
+					"identificato per il contratto di assicurazione proposto e non appartiene alle categorie di clienti per i quali " +
+					"il prodotto non è compatibile, nonché l’obbligo di adottare opportune disposizioni per ottenere dai produttori" +
+					" le informazioni di cui all’articolo 30-decies comma 5 del Codice e per comprendere le caratteristiche e il " +
+					"mercato di riferimento individuato per ciascun prodotto",
+				"f. obbligo di fornire in forma chiara e comprensibile le informazioni " +
+					"oggettive sul prodotto, illustrandone le caratteristiche, la durata, i costi e i limiti della copertura ed " +
+					"ogni altro elemento utile a consentire al contraente di prendere una decisione informata",
 			},
 		},
 	}
