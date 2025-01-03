@@ -11,6 +11,7 @@ import (
 type BankAccountMovement struct {
 	Tenant         string         `firestore:"-" json:"tenant" bigquery:"tenant"`
 	Uid            string         `firestore:"-" json:"-" bigquery:"uid"`
+	Id            string         `firestore:"-" json:"id" bigquery:"id"`
 	Status         string         `firestore:"-" json:"-" bigquery:"status"`
 	Name           string         `firestore:"-" json:"name,omitempty" bigquery:"name"`             //h-Nome
 	Surname        string         `firestore:"-" json:"surname,omitempty" bigquery:"surname"`       //Cognome

@@ -94,10 +94,10 @@ func CheckScalapayData(r *http.Request) (BankAccountMovement, error) {
 		}
 	}
 
-	if obj.HypeId == "" {
-		return obj, GetErrorJson(400, "Bad request", "field HypeId miss")
+	if obj.Id == "" {
+		return obj, GetErrorJson(400, "Bad request", "field Id miss")
 	}
-	if obj.GuaranteesCode != "next" && obj.GuaranteesCode != "premium" {
+	if obj.GuaranteesCode != "base" && obj.GuaranteesCode != "premium" {
 		return obj, GetErrorJson(400, "Bad request", "field GuaranteesCode out of enum")
 	}
 
