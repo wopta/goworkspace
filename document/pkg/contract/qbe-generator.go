@@ -25,7 +25,7 @@ const (
 	guastiGuaranteeSlug                 string = "guasti"
 	elettronicaGuaranteeSlug            string = "elettronica"
 	furtoGuaranteeSlug                  string = "furto"
-	formulaGuaranteeSlug                string = "formula"
+	danniGuaranteeSlug                  string = "danni"
 	diariaGuaranteeSlug                 string = "diaria"
 	maggioriGuaranteeSlug               string = "maggiori"
 	pigioniGuaranteeSlug                string = "pigioni"
@@ -51,7 +51,7 @@ var (
 		guastiGuaranteeSlug:                 "Guasti alle macchine (in aumento A/27)",
 		elettronicaGuaranteeSlug:            "Apparecch.re Elettroniche (in aumento A/26)",
 		furtoGuaranteeSlug:                  "Furto, rapina, estorsione (in aumento C/1)",
-		formulaGuaranteeSlug:                "Danni indiretti - Formula",
+		danniGuaranteeSlug:                  "Danni indiretti - Formula",
 		diariaGuaranteeSlug:                 "Diaria Giornaliera",
 		maggioriGuaranteeSlug:               "Maggiori costi",
 		pigioniGuaranteeSlug:                "Perdita Pigioni",
@@ -136,9 +136,14 @@ func (qb *QBEGenerator) Contract() ([]byte, error) {
 
 	qb.emitResumeSection()
 
+	qb.engine.NewLine(5)
+
 	// TODO: add statements
 
-	// TODO: add claims
+	// TODO: remove me
+	qb.engine.NewPage()
+
+	qb.claimsStatement()
 
 	qb.annexSections()
 
@@ -957,7 +962,7 @@ func (qb *QBEGenerator) guaranteesDetailsSection() {
 
 	enterpriseSlugs := []string{merciAumentoEnterpriseGuaranteeSlug, ricorsoGuaranteeSlug, fenomenoGuaranteeSlug,
 		merciRefrigerazioneGuaranteeSlug,
-		guastiGuaranteeSlug, elettronicaGuaranteeSlug, furtoGuaranteeSlug, formulaGuaranteeSlug,
+		guastiGuaranteeSlug, elettronicaGuaranteeSlug, furtoGuaranteeSlug, danniGuaranteeSlug,
 		diariaGuaranteeSlug, maggioriGuaranteeSlug,
 		pigioniGuaranteeSlug, rctoGuaranteeSlug, rcpGuaranteeSlug, deoGuaranteeSlug, cyberGuanrateeSlug}
 
@@ -2639,4 +2644,254 @@ func (qb *QBEGenerator) resumeSection() {
 		Align:     constants.LeftAlign,
 		Border:    "",
 	})
+}
+
+func (qb *QBEGenerator) claimsStatement() {
+	const (
+		zeroClaims             = "0"
+		zeroClaimValue         = "€ 0,00"
+		descriptionColumnWidth = 50
+		quantityColumnWidth    = 30
+		valueColumnWidth       = 50
+		tabWidth               = 40
+	)
+
+	type claim struct {
+		description string
+		quantity    string
+		value       string
+	}
+
+	claimsMap := map[string]claim{
+		danniGuaranteeSlug: {
+			description: "Danni ai beni (escluso Furto)",
+			quantity:    zeroClaims,
+			value:       zeroClaimValue,
+		},
+		rcpGuaranteeSlug: {
+			description: "Responsabilità Civile",
+			quantity:    zeroClaims,
+			value:       zeroClaimValue,
+		},
+		furtoGuaranteeSlug: {
+			description: "Furto",
+			quantity:    zeroClaims,
+			value:       zeroClaimValue,
+		},
+		deoGuaranteeSlug: {
+			description: "D&O",
+			quantity:    zeroClaims,
+			value:       zeroClaimValue,
+		},
+		cyberGuanrateeSlug: {
+			description: "Cyber",
+			quantity:    zeroClaims,
+			value:       zeroClaimValue,
+		},
+	}
+
+	for _, declaredClaim := range qb.policy.DeclaredClaims {
+		if _, ok := claimsMap[declaredClaim.GuaranteeSlug]; !ok {
+			// TODO: improve this case handling
+			continue
+		}
+		quantity, value := 0, 0.0
+		for _, history := range declaredClaim.History {
+			quantity += history.Quantity
+			value += history.Value
+		}
+
+		claimsMap[declaredClaim.GuaranteeSlug] = claim{
+			quantity: fmt.Sprintf("%d", quantity),
+			value:    lib.HumanaizePriceEuro(value),
+		}
+	}
+
+	qb.engine.WriteText(domain.TableCell{
+		Text:      "Dichiarazioni da leggere con attenzione prima di firmare",
+		Height:    4.5,
+		Width:     190,
+		FontSize:  constants.LargeFontSize,
+		FontStyle: constants.BoldFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "",
+	})
+	qb.engine.NewLine(1)
+	qb.engine.WriteText(domain.TableCell{
+		Text: "Premesso di essere a conoscenza che le dichiarazioni non veritiere, inesatte o reticenti, " +
+			"da me rese, possono compromettere il diritto alla prestazione (come da art. 1892, 1893, 1894 c.c.), " +
+			"ai fini dell’efficacia delle garanzie",
+		Height:    4.5,
+		Width:     190,
+		FontSize:  constants.RegularFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "",
+	})
+	qb.engine.NewLine(1)
+	qb.engine.SetX(95)
+	qb.engine.WriteText(domain.TableCell{
+		Text:      "DICHIARO",
+		Height:    4.5,
+		Width:     18.75,
+		FontSize:  constants.RegularFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "B",
+	})
+	qb.engine.NewLine(1)
+	qb.engine.WriteText(domain.TableCell{
+		Text: "1. di agire in qualità di proprietario dei Beni indicati nella presente Scheda di Polizza o per conto" +
+			" altrui o di chi spetta;\n2. che i Beni descritti nella presente Scheda di Polizza non sono assicurati" +
+			" presso altre compagnie di assicurazioni;\n3. che l’attività assicurata, " +
+			"lo stato e le dichiarazioni relative al rischio, " +
+			"rispondono a quanto riportato nella presente Scheda di Polizza;\n4. che, " +
+			"sui medesimi rischi assicurati con la presente Polizza, nel quinquennio precedente:",
+		Height:    4.5,
+		Width:     190,
+		FontSize:  constants.RegularFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "",
+	})
+	qb.engine.NewLine(1)
+	qb.engine.SetX(14)
+	qb.engine.WriteText(domain.TableCell{
+		Text: "a) non vi sono state coperture assicurative annullate dall’assicuratore;\nb) si sono verificati" +
+			" eventi dannosi di importo liquidato come indicato nella tabella che segue:\n",
+		Height:    4.5,
+		Width:     180,
+		FontSize:  constants.RegularFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "",
+	})
+	qb.engine.NewLine(1)
+
+	qb.engine.SetX(tabWidth)
+	qb.engine.DrawTable([][]domain.TableCell{
+		{
+			{
+				Text:      " ",
+				Height:    4.5,
+				Width:     descriptionColumnWidth,
+				FontSize:  constants.MediumFontSize,
+				FontStyle: constants.BoldFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      true,
+				FillColor: constants.LightGreyColor,
+				Align:     constants.LeftAlign,
+				Border:    "TL",
+			},
+			{
+				Text:      "Numero",
+				Height:    4.5,
+				Width:     quantityColumnWidth,
+				FontSize:  constants.MediumFontSize,
+				FontStyle: constants.BoldFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      true,
+				FillColor: constants.LightGreyColor,
+				Align:     constants.CenterAlign,
+				Border:    "TL",
+			},
+			{
+				Text:      "Importo complessivo (euro)",
+				Height:    4.5,
+				Width:     valueColumnWidth,
+				FontSize:  constants.MediumFontSize,
+				FontStyle: constants.BoldFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      true,
+				FillColor: constants.LightGreyColor,
+				Align:     constants.CenterAlign,
+				Border:    "TLR",
+			},
+		},
+	})
+
+	guaranteeSlugs := []string{danniGuaranteeSlug, rcpGuaranteeSlug, furtoGuaranteeSlug, deoGuaranteeSlug,
+		cyberGuanrateeSlug}
+
+	borders := []string{"TL", "TL", "TLR"}
+	for index, slug := range guaranteeSlugs {
+		if index == len(guaranteeSlugs)-1 {
+			borders = []string{"TLB", "TLB", "1"}
+		}
+		qb.engine.SetX(tabWidth)
+		qb.engine.DrawTable([][]domain.TableCell{
+			{
+				{
+					Text:      claimsMap[slug].description,
+					Height:    4.5,
+					Width:     descriptionColumnWidth,
+					FontSize:  constants.MediumFontSize,
+					FontStyle: constants.RegularFontStyle,
+					FontColor: constants.BlackColor,
+					Fill:      false,
+					FillColor: domain.Color{},
+					Align:     constants.LeftAlign,
+					Border:    borders[0],
+				},
+				{
+					Text:      claimsMap[slug].quantity,
+					Height:    4.5,
+					Width:     quantityColumnWidth,
+					FontSize:  constants.MediumFontSize,
+					FontStyle: constants.RegularFontStyle,
+					FontColor: constants.BlackColor,
+					Fill:      false,
+					FillColor: domain.Color{},
+					Align:     constants.RightAlign,
+					Border:    borders[1],
+				},
+				{
+					Text:      claimsMap[slug].value,
+					Height:    4.5,
+					Width:     valueColumnWidth,
+					FontSize:  constants.MediumFontSize,
+					FontStyle: constants.RegularFontStyle,
+					FontColor: constants.BlackColor,
+					Fill:      false,
+					FillColor: domain.Color{},
+					Align:     constants.RightAlign,
+					Border:    borders[2],
+				},
+			},
+		})
+	}
+
+	qb.engine.NewLine(1)
+	qb.engine.WriteText(domain.TableCell{
+		Text: "5. al momento della stipula di questa Polizza non ha ricevuto comunicazioni, " +
+			"richieste e notifiche che possano configurare un sinistro relativo alle garanzie assicurate e di non" +
+			" essere a conoscenza di eventi o circostanze che possano dare origine ad una richiesta di risarcimento.",
+		Height:    4.5,
+		Width:     190,
+		FontSize:  constants.RegularFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "",
+	})
+	qb.engine.NewLine(5)
+	qb.signatureForm()
+
 }
