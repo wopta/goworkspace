@@ -112,7 +112,7 @@ func (qb *QBEGenerator) Contract() ([]byte, error) {
 
 	qb.dynamicDeductibleSection()
 
-	qb.engine.NewLine(10)
+	qb.engine.NewLine(5)
 
 	qb.detailsSection()
 
