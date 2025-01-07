@@ -1537,3 +1537,41 @@ func (bg *baseGenerator) howYouCanPaySection() {
 		Border:    "",
 	})
 }
+
+func (bg *baseGenerator) emitResumeSection() {
+	price := bg.policy.PriceGross
+	if bg.policy.PaymentSplit == string(models.PaySplitMonthly) {
+		price = bg.policy.PriceGrossMonthly
+	}
+
+	text := fmt.Sprintf("Polizza emessa a Milano il %s per un importo di euro %s quale prima rata alla firma, "+
+		"il cui pagamento a saldo è da effettuarsi con i metodi di pagamento sopra indicati. "+
+		"Costituisce quietanza di pagamento la mail di conferma che Wopta invierà al Contraente.",
+		bg.policy.StartDate.Format(constants.DayMonthYearFormat), lib.HumanaizePriceEuro(price))
+
+	bg.engine.WriteText(domain.TableCell{
+		Text:      "Emissione Polizza e pagamento della prima rata",
+		Height:    4.5,
+		Width:     190,
+		FontSize:  constants.LargeFontSize,
+		FontStyle: constants.BoldFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "",
+	})
+	bg.engine.NewLine(1)
+	bg.engine.WriteText(domain.TableCell{
+		Text:      text,
+		Height:    4.5,
+		Width:     190,
+		FontSize:  constants.RegularFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "",
+	})
+}
