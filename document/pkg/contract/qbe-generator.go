@@ -126,7 +126,7 @@ func (qb *QBEGenerator) Contract() ([]byte, error) {
 
 	qb.engine.NewPage()
 
-	// TODO: add resume table
+	qb.resumeSection()
 
 	// TODO: add statements
 
@@ -2358,6 +2358,277 @@ func (qb *QBEGenerator) bondSection() {
 	})
 }
 
+// TODO: parse data from policy
 func (qb *QBEGenerator) resumeSection() {
+	const (
+		emptyField       = "======"
+		no               = "NO"
+		yes              = "SI"
+		descriptionWidth = 90
+		cellWidth        = 25
+	)
 
+	type section struct {
+		description string
+		active      string
+		priceNet    string
+		taxAmount   string
+		priceGross  string
+	}
+
+	sections := []section{
+		{
+			description: "A - INCENDIO E \" TUTTI I RISCHI\"",
+			active:      no,
+			priceNet:    emptyField,
+			taxAmount:   emptyField,
+			priceGross:  emptyField,
+		},
+		{
+			description: "B - DANNI INDIRETTI",
+			active:      no,
+			priceNet:    emptyField,
+			taxAmount:   emptyField,
+			priceGross:  emptyField,
+		},
+		{
+			description: "C - FURTO",
+			active:      no,
+			priceNet:    emptyField,
+			taxAmount:   emptyField,
+			priceGross:  emptyField,
+		},
+		{
+			description: "D - RESPONSABILITA' CIVILE VERSO TERZI (RCT)",
+			active:      no,
+			priceNet:    emptyField,
+			taxAmount:   emptyField,
+			priceGross:  emptyField,
+		},
+		{
+			description: "E - RESP. CIVILE VERSO PRESTATORI DI LAVORO (RCO)",
+			active:      no,
+			priceNet:    emptyField,
+			taxAmount:   emptyField,
+			priceGross:  emptyField,
+		},
+		{
+			description: "F - RESP. CIVILE DA PRODOTTI DIFETTOSI (RCP)",
+			active:      no,
+			priceNet:    emptyField,
+			taxAmount:   emptyField,
+			priceGross:  emptyField,
+		},
+		{
+			description: "G - RITIRO PRODOTTI",
+			active:      no,
+			priceNet:    emptyField,
+			taxAmount:   emptyField,
+			priceGross:  emptyField,
+		},
+		{
+			description: "H - RESP. AMMINISTRATORI SINDACI DIRIGENTI (D&O)",
+			active:      no,
+			priceNet:    emptyField,
+			taxAmount:   emptyField,
+			priceGross:  emptyField,
+		},
+		{
+			description: "I - CYBER RESPONSE E DATA SECURITY",
+			active:      no,
+			priceNet:    emptyField,
+			taxAmount:   emptyField,
+			priceGross:  emptyField,
+		},
+		{
+			description: "TOTALE PREMIO ANNUALE",
+			active:      " ",
+			priceNet:    emptyField,
+			taxAmount:   emptyField,
+			priceGross:  emptyField,
+		},
+		{
+			description: "Rata alla firma della polizza",
+			active:      " ",
+			priceNet:    emptyField,
+			taxAmount:   emptyField,
+			priceGross:  emptyField,
+		},
+		{
+			description: "Rate successive alla prima",
+			active:      " ",
+			priceNet:    emptyField,
+			taxAmount:   emptyField,
+			priceGross:  emptyField,
+		},
+	}
+
+	table := make([][]domain.TableCell, 0)
+
+	table = append(table, []domain.TableCell{
+		{
+			Text:      "SEZIONI",
+			Height:    4.5,
+			Width:     descriptionWidth,
+			FontSize:  constants.RegularFontSize,
+			FontStyle: constants.BoldFontStyle,
+			FontColor: constants.BlackColor,
+			Fill:      false,
+			FillColor: domain.Color{},
+			Align:     constants.LeftAlign,
+			Border:    "",
+		},
+		{
+			Text:      "ATTIVATA",
+			Height:    4.5,
+			Width:     cellWidth,
+			FontSize:  constants.RegularFontSize,
+			FontStyle: constants.BoldFontStyle,
+			FontColor: constants.BlackColor,
+			Fill:      false,
+			FillColor: domain.Color{},
+			Align:     constants.CenterAlign,
+			Border:    "",
+		},
+		{
+			Text:      "Imponibile Euro",
+			Height:    4.5,
+			Width:     cellWidth,
+			FontSize:  constants.MediumFontSize,
+			FontStyle: constants.BoldFontStyle,
+			FontColor: constants.BlackColor,
+			Fill:      false,
+			FillColor: domain.Color{},
+			Align:     constants.LeftAlign,
+			Border:    "",
+		},
+		{
+			Text:      "Imposte Euro",
+			Height:    4.5,
+			Width:     cellWidth,
+			FontSize:  constants.MediumFontSize,
+			FontStyle: constants.BoldFontStyle,
+			FontColor: constants.BlackColor,
+			Fill:      false,
+			FillColor: domain.Color{},
+			Align:     constants.RightAlign,
+			Border:    "",
+		},
+		{
+			Text:      "Totale Euro",
+			Height:    4.5,
+			Width:     cellWidth,
+			FontSize:  constants.MediumFontSize,
+			FontStyle: constants.BoldFontStyle,
+			FontColor: constants.BlackColor,
+			Fill:      false,
+			FillColor: domain.Color{},
+			Align:     constants.RightAlign,
+			Border:    "",
+		},
+	})
+
+	border := "T"
+	fontStyle := constants.RegularFontStyle
+	for index, s := range sections {
+		if index == len(sections)-1 {
+			border = "TB"
+		}
+		if index > len(sections)-4 {
+			fontStyle = constants.BoldFontStyle
+		}
+		table = append(table, []domain.TableCell{
+			{
+				Text:      s.description,
+				Height:    4.5,
+				Width:     descriptionWidth,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: fontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.LeftAlign,
+				Border:    border,
+			},
+			{
+				Text:      s.active,
+				Height:    4.5,
+				Width:     cellWidth,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: fontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.CenterAlign,
+				Border:    border,
+			},
+			{
+				Text:      s.priceNet,
+				Height:    4.5,
+				Width:     cellWidth,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: fontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.RightAlign,
+				Border:    border,
+			},
+			{
+				Text:      s.taxAmount,
+				Height:    4.5,
+				Width:     cellWidth,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: fontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.RightAlign,
+				Border:    border,
+			},
+			{
+				Text:      s.priceGross,
+				Height:    4.5,
+				Width:     cellWidth,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: fontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.RightAlign,
+				Border:    border,
+			},
+		})
+	}
+
+	qb.engine.WriteText(domain.TableCell{
+		Text:      "Il Premio per tutte le coperture assicurative attivate sulla Polizza",
+		Height:    4.5,
+		Width:     190,
+		FontSize:  constants.LargeFontSize,
+		FontStyle: constants.BoldFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "",
+	})
+	qb.engine.NewLine(1)
+	qb.engine.DrawTable(table)
+	qb.engine.NewLine(0.75)
+	qb.engine.WriteText(domain.TableCell{
+		Text: "In caso di sostituzione, " +
+			"il premio alla firma è al netto dell’eventuale rimborso dei premi non goduti sulla polizza sostituita." +
+			"\nIn ogni caso il premio alla firma può tener conto dell’eventuale diversa durata rispetto alle rate" +
+			" successive.",
+		Height:    2.5,
+		Width:     190,
+		FontSize:  constants.MediumFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "",
+	})
 }
