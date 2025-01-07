@@ -11,7 +11,7 @@ import (
 type BankAccountMovement struct {
 	Tenant         string         `firestore:"-" json:"tenant" bigquery:"tenant"`
 	Uid            string         `firestore:"-" json:"-" bigquery:"uid"`
-	Id            string         `firestore:"-" json:"id" bigquery:"id"`
+	Id             string         `firestore:"-" json:"id" bigquery:"id"`
 	Status         string         `firestore:"-" json:"-" bigquery:"status"`
 	Name           string         `firestore:"-" json:"name,omitempty" bigquery:"name"`             //h-Nome
 	Surname        string         `firestore:"-" json:"surname,omitempty" bigquery:"surname"`       //Cognome
@@ -35,6 +35,7 @@ type BankAccountMovement struct {
 	CustomerId     string         `firestore:"-" json:"-" bigquery:"customerId"`
 	BanckAccountId string         `firestore:"-" json:"-" bigquery:"banckAccountId"`
 	PolicyName     string         `firestore:"-" json:"-" bigquery:"policyName"`
+	Daystart       string         `firestore:"-" json:"-" bigquery:"daystart"`
 }
 type ErrorResponse struct {
 	Code    int    `firestore:"-" json:"code,omitempty" bigquery:"name"`

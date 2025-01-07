@@ -6,10 +6,17 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 
 	"cloud.google.com/go/civil"
 	"github.com/google/uuid"
 	lib "github.com/wopta/goworkspace/lib"
+)
+
+const (
+	dataset       = "wopta_inclusive"
+	movementTable = "bank_account_movement"
+	usersTable    = "bank_account_users"
 )
 
 // TO DO security,payload,error,fasature
@@ -28,21 +35,21 @@ func BankAccountScalapayFx(resp http.ResponseWriter, r *http.Request) (string, i
 		return "", nil, e
 	}
 	obj = SetScalapayData(obj)
-	e = lib.InsertRowsBigQuery("wopta", dataMovement, obj)
+	e = lib.InsertRowsBigQuery(dataset, movementTable, obj)
 	if obj.MovementType == "insert" {
 
-		e = lib.InsertRowsBigQuery("wopta", dataBanckAccount, obj)
+		e = lib.InsertRowsBigQuery(dataset, usersTable, obj)
 	}
-	/*
-		layout := "2006-01-02"
-		if obj.MovementType == "delete" || obj.MovementType == "suspended" {
-			e = lib.UpdateRowBigQuery("wopta", dataBanckAccount, map[string]string{
-				"status":  obj.Status,
-				"endDate": obj.EndDate.Format(layout) + " 00:00:00",
-			}, "fiscalCode='"+obj.FiscalCode+"' and guaranteesCode='"+obj.GuaranteesCode+"'")
 
-		}
-	*/
+	layout := "2006-01-02"
+	if obj.MovementType == "delete" || obj.MovementType == "suspended" {
+		e = lib.UpdateRowBigQuery(dataset, usersTable, map[string]string{
+			"status":  obj.Status,
+			"endDate": obj.EndDate.Format(layout) + " 00:00:00",
+		}, "fiscalCode='"+obj.FiscalCode+"' and guaranteesCode='"+obj.GuaranteesCode+"'")
+
+	}
+
 	return `{"woptaUid":"` + obj.Uid + `"}`, nil, e
 }
 func CheckScalapayApikey(r *http.Request) error {
@@ -78,9 +85,9 @@ func CheckScalapayData(r *http.Request) (BankAccountMovement, error) {
 		}
 	}
 	if obj.MovementType == "delete" || obj.MovementType == "suspended" {
-		res, _ := QueryRowsBigQuery[BankAccountMovement]("wopta",
-			"inclusive_axa_bank_account",
-			"select * from `wopta."+dataMovement+"` where fiscalCode='"+obj.FiscalCode+"' and guaranteesCode ='"+obj.GuaranteesCode+"'")
+		res, _ := QueryRowsBigQuery[BankAccountMovement](dataset,
+			usersTable,
+			"select * from `"+dataset+"."+movementTable+"` where fiscalCode='"+obj.FiscalCode+"' and guaranteesCode ='"+obj.GuaranteesCode+"'")
 		log.Println(len(res))
 		if len(res) == 0 {
 			return obj, GetErrorJson(400, "Bad request", "insert movement miss")
@@ -118,10 +125,15 @@ func SetScalapayData(obj BankAccountMovement) BankAccountMovement {
 		obj.PolicyName = "Scalapay base"
 	}
 
-	obj.CustomerId = obj.HypeId
+	obj.CustomerId = obj.Id
 	if obj.MovementType == "insert" {
 
 		obj.Status = "active"
+
+		obj.Daystart = strconv.Itoa(obj.StartDate.Day())
+		if obj.StartDate.Day() == 29 && int(obj.StartDate.Month()) == 2 {
+			obj.Daystart = "28"
+		}
 	}
 	if obj.MovementType == "delete" {
 		obj.Status = "delete"
