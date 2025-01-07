@@ -67,8 +67,8 @@ type QBEGenerator struct {
 	*baseGenerator
 }
 
-func NewQBEGenerator(engine *engine.Fpdf, policy *models.Policy, node *models.NetworkNode, isProposal bool,
-) *QBEGenerator {
+func NewQBEGenerator(engine *engine.Fpdf, policy *models.Policy, node *models.NetworkNode,
+	isProposal bool) *QBEGenerator {
 	return &QBEGenerator{
 		&baseGenerator{
 			engine:      engine,
@@ -115,6 +115,16 @@ func (qb *QBEGenerator) Contract() ([]byte, error) {
 	qb.engine.NewLine(10)
 
 	qb.detailsSection()
+
+	qb.engine.NewLine(5)
+
+	qb.specialConditionsSection()
+
+	// TODO: add resume table
+
+	// TODO: add statements
+
+	// TODO: add claims
 
 	qb.annexSections()
 
@@ -2246,4 +2256,64 @@ func (qb *QBEGenerator) detailsSection() {
 
 	table = append(table, parseEntries(entries)...)
 	qb.engine.DrawTable(table)
+}
+
+// TODO: parse clause
+func (qb *QBEGenerator) specialConditionsSection() {
+	clause := "======"
+
+	qb.engine.WriteText(domain.TableCell{
+		Text:      "Condizioni Speciali in deroga alle Condizioni di Assicurazione",
+		Height:    4.5,
+		Width:     190,
+		FontSize:  constants.LargeFontSize,
+		FontStyle: constants.BoldFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "",
+	})
+	qb.engine.NewLine(1)
+
+	qb.engine.WriteText(domain.TableCell{
+		Text:      "In deroga a quanto riportato nelle Condizioni di Assicurazione, si concorda tra le Parti che:",
+		Height:    4.5,
+		Width:     190,
+		FontSize:  constants.RegularFontSize,
+		FontStyle: constants.BoldFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "",
+	})
+	qb.engine.NewLine(1)
+
+	qb.engine.WriteText(domain.TableCell{
+		Text:      clause,
+		Height:    4.5,
+		Width:     190,
+		FontSize:  constants.RegularFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "",
+	})
+	qb.engine.NewLine(1)
+
+	qb.engine.WriteText(domain.TableCell{
+		Text:      "Fermo tutto il resto non derogato da quanto precede.",
+		Height:    4.5,
+		Width:     190,
+		FontSize:  constants.RegularFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "",
+	})
 }
