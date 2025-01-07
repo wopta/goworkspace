@@ -128,6 +128,10 @@ func (qb *QBEGenerator) Contract() ([]byte, error) {
 
 	qb.resumeSection()
 
+	qb.engine.NewLine(5)
+
+	qb.howYouCanPaySection()
+
 	// TODO: add statements
 
 	// TODO: add claims

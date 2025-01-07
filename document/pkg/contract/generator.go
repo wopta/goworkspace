@@ -1507,3 +1507,33 @@ func (bg *baseGenerator) annex4Ter(producerInfo, proponentInfo map[string]string
 		}
 	}
 }
+
+func (bg *baseGenerator) howYouCanPaySection() {
+	bg.engine.WriteText(domain.TableCell{
+		Text:      "Come puoi pagare il premio",
+		Height:    4.5,
+		Width:     190,
+		FontSize:  constants.LargeFontSize,
+		FontStyle: constants.BoldFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "",
+	})
+	bg.engine.NewLine(1)
+	bg.engine.WriteText(domain.TableCell{
+		Text: "I mezzi di pagamento consentiti, nei confronti di Wopta, " +
+			"sono esclusivamente bonifico e strumenti di pagamento elettronico, quali ad esempio, " +
+			"carte di credito e/o carte di debito, incluse le carte prepagate.",
+		Height:    4.5,
+		Width:     190,
+		FontSize:  constants.RegularFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "",
+	})
+}
