@@ -120,6 +120,12 @@ func (qb *QBEGenerator) Contract() ([]byte, error) {
 
 	qb.specialConditionsSection()
 
+	qb.engine.NewLine(5)
+
+	qb.bondSection()
+
+	qb.engine.NewPage()
+
 	// TODO: add resume table
 
 	// TODO: add statements
@@ -2316,4 +2322,42 @@ func (qb *QBEGenerator) specialConditionsSection() {
 		Align:     constants.LeftAlign,
 		Border:    "",
 	})
+}
+
+// TODO: parse bond
+func (qb *QBEGenerator) bondSection() {
+	hasBondText := "NO"
+	bondText := "======"
+
+	qb.engine.WriteText(domain.TableCell{
+		Text:      "Clausola di Vincolo assicurativo " + hasBondText,
+		Height:    4.5,
+		Width:     190,
+		FontSize:  constants.LargeFontSize,
+		FontStyle: constants.BoldFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "",
+	})
+	qb.engine.NewLine(1)
+	qb.engine.WriteText(domain.TableCell{
+		Text: "La presente Polizza, a decorrere dal suo effetto, " +
+			"si intende vincolata a favore dell’Istituto Vincolatario " + bondText + " , " +
+			"alle condizioni tutte di cui all’Art. 28.",
+		Height:    4.5,
+		Width:     190,
+		FontSize:  constants.RegularFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "",
+	})
+}
+
+func (qb *QBEGenerator) resumeSection() {
+
 }
