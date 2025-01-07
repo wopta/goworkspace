@@ -2547,7 +2547,7 @@ func (qb *QBEGenerator) resumeSection() {
 		if index == len(sections)-1 {
 			border = "TB"
 		}
-		if index > len(sections)-4 {
+		if index > len(sections)-3 {
 			fontStyle = constants.BoldFontStyle
 		}
 		table = append(table, []domain.TableCell{
@@ -2892,6 +2892,8 @@ func (qb *QBEGenerator) claimsStatement() {
 		Border:    "",
 	})
 	qb.engine.NewLine(5)
-	qb.signatureForm()
 
+	if !qb.isProposal {
+		qb.signatureForm()
+	}
 }
