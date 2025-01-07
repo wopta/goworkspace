@@ -645,12 +645,13 @@ func (bg *baseGenerator) commercialConsentSection() {
 		Align:     constants.LeftAlign,
 		Border:    "",
 	})
-	if !bg.isProposal {
-		bg.signatureForm()
-	}
+	bg.signatureForm()
 }
 
 func (bg *baseGenerator) signatureForm() {
+	if !bg.isProposal {
+		return
+	}
 	text := fmt.Sprintf("\"[[!sigField\"%d\":signer1:signature(sigType=\\\"Click2Sign\\\"):label"+
 		"(\\\"firma qui\\\"):size(width=150,height=60)]]\"", bg.signatureID)
 

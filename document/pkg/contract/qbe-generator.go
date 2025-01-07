@@ -2893,7 +2893,5 @@ func (qb *QBEGenerator) claimsStatement() {
 	})
 	qb.engine.NewLine(5)
 
-	if !qb.isProposal {
-		qb.signatureForm()
-	}
+	qb.signatureForm()
 }
