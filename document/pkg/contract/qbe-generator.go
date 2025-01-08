@@ -2412,7 +2412,7 @@ func (qb *QBEGenerator) detailsSection() {
 	sixthRowY := qb.engine.GetY()
 	// First Column
 	qb.engine.WriteText(domain.TableCell{
-		Text:      " \n \nRITIRO PRODOTTI\n ",
+		Text:      " \n RITIRO PRODOTTI\n \n ",
 		Height:    4.5,
 		Width:     firstColumnWidth,
 		FontSize:  constants.MediumFontSize,

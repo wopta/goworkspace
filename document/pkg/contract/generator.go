@@ -649,13 +649,12 @@ func (bg *baseGenerator) commercialConsentSection() {
 }
 
 func (bg *baseGenerator) signatureForm() {
-	if !bg.isProposal {
+	if bg.isProposal {
 		return
 	}
 	text := fmt.Sprintf("\"[[!sigField\"%d\":signer1:signature(sigType=\\\"Click2Sign\\\"):label"+
 		"(\\\"firma qui\\\"):size(width=150,height=60)]]\"", bg.signatureID)
 
-	bg.engine.SetY(bg.engine.GetY() - 3)
 	bg.engine.SetX(-90)
 	bg.engine.WriteText(domain.TableCell{
 		Text:      "Firma del Contraente",
@@ -1575,4 +1574,77 @@ func (bg *baseGenerator) emitResumeSection() {
 		Align:     constants.LeftAlign,
 		Border:    "",
 	})
+}
+
+func (bg *baseGenerator) companySignature() {
+	type logoInfo struct {
+		path                string
+		x, y, width, height float64
+	}
+
+	type companyDetails struct {
+		description string
+		logo        logoInfo
+	}
+
+	companiesMap := map[string]companyDetails{
+		models.AxaCompany: {
+			description: "AXA France Vie\n(Rappresentanza Generale per l'Italia)",
+			logo: logoInfo{
+				path:   "signature_axa.png",
+				x:      35,
+				y:      9,
+				width:  30,
+				height: 8,
+			},
+		},
+		models.GlobalCompany: {
+			description: "Global Assistance",
+			logo: logoInfo{
+				path:   "signature_global.png",
+				x:      25,
+				y:      3,
+				width:  40,
+				height: 12,
+			},
+		},
+		models.SogessurCompany: {
+			description: "Sogessur SA\n(Rappresentanza Generale per l'Italia)",
+			logo: logoInfo{
+				path:   "signature_sogessur.png",
+				x:      40,
+				y:      9,
+				width:  10,
+				height: 10,
+			},
+		},
+		models.QBECompany: {
+			description: "QBE Europe SA/NV - Rappresentanza Generale per l’Italia",
+			logo: logoInfo{
+				path:   "signature_qbe.png",
+				x:      35,
+				y:      9,
+				width:  30,
+				height: 8,
+			},
+		},
+	}
+
+	logo := companiesMap[bg.policy.Company].logo
+
+	bg.engine.WriteText(domain.TableCell{
+		Text:      companiesMap[bg.policy.Company].description,
+		Height:    3,
+		Width:     70,
+		FontSize:  constants.RegularFontSize,
+		FontStyle: constants.BoldFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.CenterAlign,
+		Border:    "",
+	})
+	bg.engine.SetY(bg.engine.GetY() - 6)
+	bg.engine.InsertImage(lib.GetAssetPathByEnvV2()+logo.path, logo.x, bg.engine.GetY()+logo.y, logo.width,
+		logo.height)
 }
