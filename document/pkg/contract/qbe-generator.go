@@ -2041,13 +2041,14 @@ func (qb *QBEGenerator) dynamicDeductibleSection() {
 	qb.engine.NewLine(5)
 }
 
-// TODO: fix table layout
 func (qb *QBEGenerator) detailsSection() {
 	const (
 		emptyField        = "====="
 		firstColumnWidth  = 65
 		secondColumnWidth = 45
 		thirdColumnWidth  = 80
+		secondColumnX     = 75.0
+		thirdColumnX      = 120.0
 	)
 
 	type guaranteeStartDateInfo struct {
@@ -2089,56 +2090,6 @@ func (qb *QBEGenerator) detailsSection() {
 		}
 	}
 
-	parseEntries := func(entries [][]string) [][]domain.TableCell {
-		borders := []string{"TL", "TL", "TLR"}
-		result := make([][]domain.TableCell, 0, len(entries))
-		for index, entry := range entries {
-			if index == len(entries)-1 {
-				borders = []string{"TLB", "TLB", "1"}
-			}
-			row := []domain.TableCell{
-				{
-					Text:      entry[0],
-					Height:    4.5,
-					Width:     firstColumnWidth,
-					FontSize:  constants.MediumFontSize,
-					FontStyle: constants.RegularFontStyle,
-					FontColor: constants.BlackColor,
-					Fill:      false,
-					FillColor: domain.Color{},
-					Align:     constants.LeftAlign,
-					Border:    borders[0],
-				},
-				{
-					Text:      entry[1],
-					Height:    4.5,
-					Width:     secondColumnWidth,
-					FontSize:  constants.MediumFontSize,
-					FontStyle: constants.RegularFontStyle,
-					FontColor: constants.BlackColor,
-					Fill:      false,
-					FillColor: domain.Color{},
-					Align:     constants.LeftAlign,
-					Border:    borders[1],
-				},
-				{
-					Text:      entry[2],
-					Height:    4.5,
-					Width:     thirdColumnWidth,
-					FontSize:  constants.MediumFontSize,
-					FontStyle: constants.RegularFontStyle,
-					FontColor: constants.BlackColor,
-					Fill:      false,
-					FillColor: domain.Color{},
-					Align:     constants.LeftAlign,
-					Border:    borders[2],
-				},
-			}
-			result = append(result, row)
-		}
-		return result
-	}
-
 	qb.engine.WriteText(domain.TableCell{
 		Text:      "Dettagli di alcune sezioni",
 		Height:    4.5,
@@ -2152,22 +2103,8 @@ func (qb *QBEGenerator) detailsSection() {
 		Border:    "",
 	})
 
-	entries := [][]string{
-		{"RESPONSABILITA’ CIVILE E VERSO TERZI E PRESTATORI DI LAVORO", "Regime copertura", "LOSS OCCURRENCE"},
-		{"MALATTIE PROFESSIONALI", "Retroattività",
-			"L’Assicurazione vale per le conseguenze di fatti colposi commessi dopo la data del" +
-				" " + startDateInfo.rct},
-		{"RESPONSABILITA' CIVILE\nDA PRODOTTI DIFETTOSI",
-			"Regime copertura\nRetroattività – Mondo escluso USA Canada\nRetroattività – USA Canada",
-			"CLAIMS MADE\nL'Assicurazione vale per i danni verificatisi dopo la data del " + startDateInfo.rcp +
-				"\nL'Assicurazione vale per i danni verificatisi dopo la data del " + startDateInfo.rcpUsa + " purch" +
-				"é  relativi a prodotti descritti in Polizza consegnati a terzi dopo la stessa data. "},
-		{"RESPONSABILITA’ CIVILE\nVERSO TERZI E PRESTATORI DI LAVORO\nRESPONSABILITA' CIVILE\nDA PRODOTTI DIFETTOSI\n",
-			"Premio minimo", "Premio minimo indicato in Polizza calcolato sui parametri di fatturato e Prestatori di" +
-				" lavoro dichiarati"},
-	}
-
-	table := [][]domain.TableCell{
+	// First three rows
+	qb.engine.DrawTable([][]domain.TableCell{
 		{
 			{
 				Text:      "SEZIONE",
@@ -2206,33 +2143,231 @@ func (qb *QBEGenerator) detailsSection() {
 				Border:    "TLR",
 			},
 		},
-	}
+		{
+			{
+				Text:      "RESPONSABILITA’ CIVILE E VERSO TERZI E PRESTATORI DI LAVORO",
+				Height:    4.5,
+				Width:     firstColumnWidth,
+				FontSize:  constants.MediumFontSize,
+				FontStyle: constants.RegularFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.LeftAlign,
+				Border:    "TL",
+			},
+			{
+				Text:      "Regime copertura",
+				Height:    4.5,
+				Width:     secondColumnWidth,
+				FontSize:  constants.MediumFontSize,
+				FontStyle: constants.RegularFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.LeftAlign,
+				Border:    "TL",
+			},
+			{
+				Text:      "LOSS OCCURRENCE",
+				Height:    4.5,
+				Width:     thirdColumnWidth,
+				FontSize:  constants.MediumFontSize,
+				FontStyle: constants.RegularFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.LeftAlign,
+				Border:    "TLR",
+			},
+		},
+		{
+			{
+				Text:      "MALATTIE PROFESSIONALI",
+				Height:    4.5,
+				Width:     firstColumnWidth,
+				FontSize:  constants.MediumFontSize,
+				FontStyle: constants.RegularFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.LeftAlign,
+				Border:    "TL",
+			},
+			{
+				Text:      "Retroattività",
+				Height:    4.5,
+				Width:     secondColumnWidth,
+				FontSize:  constants.MediumFontSize,
+				FontStyle: constants.RegularFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.LeftAlign,
+				Border:    "TL",
+			},
+			{
+				Text: "L’Assicurazione vale per le conseguenze di fatti colposi commessi dopo la data del" +
+					" " + startDateInfo.rct,
+				Height:    4.5,
+				Width:     thirdColumnWidth,
+				FontSize:  constants.MediumFontSize,
+				FontStyle: constants.RegularFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.LeftAlign,
+				Border:    "TLR",
+			},
+		},
+	})
 
-	table = append(table, parseEntries(entries)...)
-	qb.engine.DrawTable(table)
+	// Fourth row
+	fourthRowY := qb.engine.GetY()
+	// First column
+	qb.engine.WriteText(domain.TableCell{
+		Text:      " \n \nRESPONSABILITA' CIVILE\nDA PRODOTTI DIFETTOSI\n \n ",
+		Height:    4.5,
+		Width:     firstColumnWidth,
+		FontSize:  constants.MediumFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "TL",
+	})
+	// Second column
+	qb.engine.SetY(fourthRowY)
+	qb.engine.SetX(secondColumnX)
+	qb.engine.WriteText(domain.TableCell{
+		Text:      "Regime copertura",
+		Height:    4.5,
+		Width:     secondColumnWidth,
+		FontSize:  constants.MediumFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "TL",
+	})
+	qb.engine.SetX(secondColumnX)
+	qb.engine.WriteText(domain.TableCell{
+		Text:      "Retroattività – Mondo escluso USA Canada",
+		Height:    4.5,
+		Width:     secondColumnWidth,
+		FontSize:  constants.MediumFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "TL",
+	})
+	qb.engine.SetX(secondColumnX)
+	qb.engine.WriteText(domain.TableCell{
+		Text:      " \nRetroattività – USA Canada\n ",
+		Height:    4.5,
+		Width:     secondColumnWidth,
+		FontSize:  constants.MediumFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "TL",
+	})
+	// Third column
+	qb.engine.SetY(fourthRowY)
+	qb.engine.SetX(thirdColumnX)
+	qb.engine.WriteText(domain.TableCell{
+		Text:      "CLAIMS MADE",
+		Height:    4.5,
+		Width:     thirdColumnWidth,
+		FontSize:  constants.MediumFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "TLR",
+	})
+	qb.engine.SetX(thirdColumnX)
+	qb.engine.WriteText(domain.TableCell{
+		Text:      "L'Assicurazione vale per i danni verificatisi dopo la data del " + startDateInfo.rcp,
+		Height:    4.5,
+		Width:     thirdColumnWidth,
+		FontSize:  constants.MediumFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "TLR",
+	})
+	qb.engine.SetX(thirdColumnX)
+	qb.engine.WriteText(domain.TableCell{
+		Text: "L'Assicurazione vale per i danni verificatisi dopo la data del " + startDateInfo.rcpUsa + " purch" +
+			"é  relativi a prodotti descritti in Polizza consegnati a terzi dopo la stessa data.",
+		Height:    4.5,
+		Width:     thirdColumnWidth,
+		FontSize:  constants.MediumFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "TLR",
+	})
+
+	// Fifth row
+	qb.engine.DrawTable([][]domain.TableCell{
+		{
+			{
+				Text: "RESPONSABILITA’ CIVILE\nVERSO TERZI E PRESTATORI DI LAVORO\nRESPONSABILITA' CIVILE\nDA" +
+					" PRODOTTI DIFETTOSI\n",
+				Height:    4.5,
+				Width:     firstColumnWidth,
+				FontSize:  constants.MediumFontSize,
+				FontStyle: constants.RegularFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.LeftAlign,
+				Border:    "TLB",
+			},
+			{
+				Text:      " \nPremio minimo\n ",
+				Height:    4.5,
+				Width:     secondColumnWidth,
+				FontSize:  constants.MediumFontSize,
+				FontStyle: constants.RegularFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.LeftAlign,
+				Border:    "TLB",
+			},
+			{
+				Text: " \nPremio minimo indicato in Polizza calcolato sui parametri di fatturato e Prestatori di" +
+					" lavoro dichiarati\n ",
+				Height:    4.5,
+				Width:     thirdColumnWidth,
+				FontSize:  constants.MediumFontSize,
+				FontStyle: constants.RegularFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.LeftAlign,
+				Border:    "1",
+			},
+		},
+	})
 
 	qb.engine.NewPage()
 
-	entries = [][]string{
-		{"RITIRO PRODOTTI", "Regime di copertura\n\nRetroattività\n\n",
-			"CLAIMS MADE\nL'Assicurazione vale per i danni verificatisi dopo la data del " + startDateInfo.
-				ritiro + " purché relativi a prodotti descritti in Polizza consegnati a terzi dopo la stessa data."},
-		{"RESPONSABILITÀ AMMINISTRATORI SINDACI DIRIGENTI (D&0)",
-			"Territorialità\nRetroattività\nData di continuità\nPremio addizionale per il maggior termine di notifica" +
-				"\nMaggior termine di notifica per amministratori cessati",
-			"12 mesi al 30% dell'ultimo premio pagato\n24 mesi al 60% dell'ultimo premio pagato\n36 mesi al 90% dell" +
-				"'ultimo premio pagato\n48 mesi al 120% dell'ultimo premio pagato\n60 mesi al 150% dell'ultimo premio" +
-				" pagato\n60 mesi"},
-		{"CYBER RESPONSE E DATA SECURITY", "Periodo di carenza Art. " +
-			"I/3 Cyber Business Interruption\nTerritorialità\nRetroattività\n\nIncident Response (*)\n\n",
-			"12 ore per ciascun sinistro\nUnione Economica Europea\nIllimitata\nOne Network Firm: Advant Nctm\nNumber" +
-				"+39 (02) 38.592.788\nEmail: OneCyberResponseLine.Italy@clydeco.com\n\n" +
-				"(*) Nel caso in cui venisse scoperto un presunto evento informatico, " +
-				"il Contraente potrà contattare il centralino, 24H su 24H, al numero o all'indirizzo mail sopraindicato. " +
-				"Il servizio è offerto da ADVANT Nctm"},
-	}
-
-	table = [][]domain.TableCell{
+	qb.engine.DrawTable([][]domain.TableCell{
 		{
 			{
 				Text:      "SEZIONE",
@@ -2271,10 +2406,359 @@ func (qb *QBEGenerator) detailsSection() {
 				Border:    "TLR",
 			},
 		},
-	}
+	})
 
-	table = append(table, parseEntries(entries)...)
-	qb.engine.DrawTable(table)
+	// Sixth row
+	sixthRowY := qb.engine.GetY()
+	// First Column
+	qb.engine.WriteText(domain.TableCell{
+		Text:      " \n \nRITIRO PRODOTTI\n ",
+		Height:    4.5,
+		Width:     firstColumnWidth,
+		FontSize:  constants.MediumFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "TL",
+	})
+	// Second Column
+	qb.engine.SetY(sixthRowY)
+	qb.engine.SetX(secondColumnX)
+	qb.engine.WriteText(domain.TableCell{
+		Text:      "Regime di copertura",
+		Height:    4.5,
+		Width:     secondColumnWidth,
+		FontSize:  constants.MediumFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "TL",
+	})
+	qb.engine.SetX(secondColumnX)
+	qb.engine.WriteText(domain.TableCell{
+		Text:      " \nRetroattività\n ",
+		Height:    4.5,
+		Width:     secondColumnWidth,
+		FontSize:  constants.MediumFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "TL",
+	})
+	// Third Column
+	qb.engine.SetY(sixthRowY)
+	qb.engine.SetX(thirdColumnX)
+	qb.engine.WriteText(domain.TableCell{
+		Text:      "CLAIMS MADE",
+		Height:    4.5,
+		Width:     thirdColumnWidth,
+		FontSize:  constants.MediumFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "TLR",
+	})
+	qb.engine.SetX(thirdColumnX)
+	qb.engine.WriteText(domain.TableCell{
+		Text: "L'Assicurazione vale per i danni verificatisi dopo la data del " + startDateInfo.
+			ritiro + " purché relativi a prodotti descritti in Polizza consegnati a terzi dopo la stessa data.",
+		Height:    4.5,
+		Width:     thirdColumnWidth,
+		FontSize:  constants.MediumFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "TLR",
+	})
+
+	// Seventh row
+	seventhRowY := qb.engine.GetY()
+	// First Column
+	qb.engine.WriteText(domain.TableCell{
+		Text:      " \n \n \n \nRESPONSABILITÀ AMMINISTRATORI\nSINDACI DIRIGENTI (D&0)\n \n \n \n ",
+		Height:    4.5,
+		Width:     firstColumnWidth,
+		FontSize:  constants.MediumFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "TL",
+	})
+	// Second Column
+	qb.engine.SetY(seventhRowY)
+	qb.engine.SetX(secondColumnX)
+	qb.engine.WriteText(domain.TableCell{
+		Text:      "Territorialità",
+		Height:    4.5,
+		Width:     secondColumnWidth,
+		FontSize:  constants.MediumFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "TL",
+	})
+	qb.engine.SetX(secondColumnX)
+	qb.engine.WriteText(domain.TableCell{
+		Text:      "Retroattività",
+		Height:    4.5,
+		Width:     secondColumnWidth,
+		FontSize:  constants.MediumFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "TL",
+	})
+	qb.engine.SetX(secondColumnX)
+	qb.engine.WriteText(domain.TableCell{
+		Text:      "Data di continuità",
+		Height:    4.5,
+		Width:     secondColumnWidth,
+		FontSize:  constants.MediumFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "TL",
+	})
+	qb.engine.SetX(secondColumnX)
+	qb.engine.WriteText(domain.TableCell{
+		Text:      " \n \nPremio addizionale per il maggior termine di notifica\n ",
+		Height:    4.5,
+		Width:     secondColumnWidth,
+		FontSize:  constants.MediumFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "TL",
+	})
+	qb.engine.SetX(secondColumnX)
+	qb.engine.WriteText(domain.TableCell{
+		Text:      "Maggior termine di notifica per amministratori cessati",
+		Height:    4.5,
+		Width:     secondColumnWidth,
+		FontSize:  constants.MediumFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "TL",
+	})
+	// Third Column
+	qb.engine.SetY(seventhRowY)
+	qb.engine.SetX(thirdColumnX)
+	qb.engine.WriteText(domain.TableCell{
+		Text:      "Unione Economica Europea",
+		Height:    4.5,
+		Width:     thirdColumnWidth,
+		FontSize:  constants.MediumFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "TLR",
+	})
+	qb.engine.SetX(thirdColumnX)
+	qb.engine.WriteText(domain.TableCell{
+		Text:      "Illimitata",
+		Height:    4.5,
+		Width:     thirdColumnWidth,
+		FontSize:  constants.MediumFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "TLR",
+	})
+	qb.engine.SetX(thirdColumnX)
+	qb.engine.WriteText(domain.TableCell{
+		Text:      startDateInfo.deo,
+		Height:    4.5,
+		Width:     thirdColumnWidth,
+		FontSize:  constants.MediumFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "TLR",
+	})
+	qb.engine.SetX(thirdColumnX)
+	qb.engine.WriteText(domain.TableCell{
+		Text: "12 mesi al 30% dell'ultimo premio pagato\n24 mesi al 60% dell'ultimo premio pagato\n36 mesi al 90% dell" +
+			"'ultimo premio pagato\n48 mesi al 120% dell'ultimo premio pagato\n60 mesi al 150% dell'ultimo premio" +
+			" pagato",
+		Height:    4.5,
+		Width:     thirdColumnWidth,
+		FontSize:  constants.MediumFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "TLR",
+	})
+	qb.engine.SetX(thirdColumnX)
+	qb.engine.WriteText(domain.TableCell{
+		Text:      "60 mesi\n ",
+		Height:    4.5,
+		Width:     thirdColumnWidth,
+		FontSize:  constants.MediumFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "TLR",
+	})
+
+	// Eighth row
+	eighthRowY := qb.engine.GetY()
+	// First Column
+	qb.engine.WriteText(domain.TableCell{
+		Text:      " \n \n \n \n \n \nCYBER RESPONSE E DATA SECURITY\n \n \n \n \n \n",
+		Height:    4.5,
+		Width:     firstColumnWidth,
+		FontSize:  constants.MediumFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "TLB",
+	})
+	// Second Column
+	qb.engine.SetY(eighthRowY)
+	qb.engine.SetX(secondColumnX)
+	qb.engine.WriteText(domain.TableCell{
+		Text:      "Periodo di carenza Art. I/3\nCyber Business interruption",
+		Height:    4.5,
+		Width:     secondColumnWidth,
+		FontSize:  constants.MediumFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "TL",
+	})
+	qb.engine.SetX(secondColumnX)
+	qb.engine.WriteText(domain.TableCell{
+		Text:      "Territorialità",
+		Height:    4.5,
+		Width:     secondColumnWidth,
+		FontSize:  constants.MediumFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "TL",
+	})
+	qb.engine.SetX(secondColumnX)
+	qb.engine.WriteText(domain.TableCell{
+		Text:      "Retroattività",
+		Height:    4.5,
+		Width:     secondColumnWidth,
+		FontSize:  constants.MediumFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "TL",
+	})
+	qb.engine.SetX(secondColumnX)
+	qb.engine.WriteText(domain.TableCell{
+		Text:      " \n \n \nIncident Response (*)\n \n \n \n ",
+		Height:    4.5,
+		Width:     secondColumnWidth,
+		FontSize:  constants.MediumFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "TLB",
+	})
+	// Third Column
+	qb.engine.SetY(eighthRowY)
+	qb.engine.SetX(thirdColumnX)
+	qb.engine.WriteText(domain.TableCell{
+		Text:      "12 ore per ciascun sinistro\n ",
+		Height:    4.5,
+		Width:     thirdColumnWidth,
+		FontSize:  constants.MediumFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "TLR",
+	})
+	qb.engine.SetX(thirdColumnX)
+	qb.engine.WriteText(domain.TableCell{
+		Text:      "Unione Economica Europea",
+		Height:    4.5,
+		Width:     thirdColumnWidth,
+		FontSize:  constants.MediumFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "TLR",
+	})
+	qb.engine.SetX(thirdColumnX)
+	qb.engine.WriteText(domain.TableCell{
+		Text:      "Illimitata",
+		Height:    4.5,
+		Width:     thirdColumnWidth,
+		FontSize:  constants.MediumFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "TLR",
+	})
+	qb.engine.SetX(thirdColumnX)
+	qb.engine.WriteText(domain.TableCell{
+		Text: "One Network Firm: Advant Nctm\nNumber+39 (02) 38.592.788\nEmail: OneCyberResponseLine." +
+			"Italy@clydeco.com\n \n (*) Nel caso in cui venisse scoperto un presunto evento\ninformatico, " +
+			"il Contraente potrà contattare il\ncentralino, 24H su 24H, " +
+			"al numero o all'indirizzo mail\nsopraindicato. Il servizio è offerto da ADVANT Nctm",
+		Height:    4.5,
+		Width:     thirdColumnWidth,
+		FontSize:  constants.MediumFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "1",
+	})
 }
 
 // TODO: parse clause
