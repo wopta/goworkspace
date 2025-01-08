@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-
 	"cloud.google.com/go/civil"
 	"github.com/google/uuid"
 	lib "github.com/wopta/goworkspace/lib"
@@ -17,6 +16,7 @@ const (
 	dataset       = "wopta_inclusive"
 	movementTable = "bank_account_movement"
 	usersTable    = "bank_account_users"
+	layout        = "2006-01-02"
 )
 
 // TO DO security,payload,error,fasature
@@ -37,11 +37,21 @@ func BankAccountScalapayFx(resp http.ResponseWriter, r *http.Request) (string, i
 	obj = SetScalapayData(obj)
 	e = lib.InsertRowsBigQuery(dataset, movementTable, obj)
 	if obj.MovementType == "insert" {
+		res, _ := QueryRowsBigQuery[BankAccountMovement](dataset,
+			usersTable,
+			"select * from `"+dataset+"."+movementTable+"` where fiscalCode='"+obj.FiscalCode+"' and guaranteesCode ='"+obj.GuaranteesCode+"' and id ='"+obj.Id+"'")
+		log.Println(len(res))
+		if len(res) == 0 {
+			e = lib.InsertRowsBigQuery(dataset, usersTable, obj)
+		} else {
+			e = lib.UpdateRowBigQuery(dataset, usersTable, map[string]string{
+				"status":  obj.Status,
+				"startDate": obj.StartDate.Format(layout) + " 00:00:00",
+			}, "fiscalCode='"+obj.FiscalCode+"' and guaranteesCode='"+obj.GuaranteesCode+"'")
+		}
 
-		e = lib.InsertRowsBigQuery(dataset, usersTable, obj)
 	}
 
-	layout := "2006-01-02"
 	if obj.MovementType == "delete" || obj.MovementType == "suspended" {
 		e = lib.UpdateRowBigQuery(dataset, usersTable, map[string]string{
 			"status":  obj.Status,
@@ -87,7 +97,7 @@ func CheckScalapayData(r *http.Request) (BankAccountMovement, error) {
 	if obj.MovementType == "delete" || obj.MovementType == "suspended" {
 		res, _ := QueryRowsBigQuery[BankAccountMovement](dataset,
 			usersTable,
-			"select * from `"+dataset+"."+movementTable+"` where fiscalCode='"+obj.FiscalCode+"' and guaranteesCode ='"+obj.GuaranteesCode+"'")
+			"select * from `"+dataset+"."+movementTable+"` where fiscalCode='"+obj.FiscalCode+"' and guaranteesCode ='"+obj.GuaranteesCode+"' and id ='"+obj.Id+"'")
 		log.Println(len(res))
 		if len(res) == 0 {
 			return obj, GetErrorJson(400, "Bad request", "insert movement miss")
@@ -127,9 +137,7 @@ func SetScalapayData(obj BankAccountMovement) BankAccountMovement {
 
 	obj.CustomerId = obj.Id
 	if obj.MovementType == "insert" {
-
 		obj.Status = "active"
-
 		obj.Daystart = strconv.Itoa(obj.StartDate.Day())
 		if obj.StartDate.Day() == 29 && int(obj.StartDate.Month()) == 2 {
 			obj.Daystart = "28"
