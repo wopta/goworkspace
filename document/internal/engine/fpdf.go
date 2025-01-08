@@ -178,6 +178,8 @@ func (f *Fpdf) DrawTable(table [][]domain.TableCell) {
 			numLines := len(f.pdf.SplitText(cell.Text, cell.Width))
 			currentX, currentY := f.pdf.GetXY()
 
+			hasBottomBorder := strings.Contains(cell.Border, "B") || cell.Border == "1"
+
 			if numLines < maxNumLines && rowIndex < len(table) {
 				switch cell.Border {
 				case "1":
@@ -193,7 +195,7 @@ func (f *Fpdf) DrawTable(table [][]domain.TableCell) {
 			emptyCell.Border = strings.ReplaceAll(emptyCell.Border, "T", "")
 
 			for i := numLines; i < maxNumLines; i++ {
-				if rowIndex == len(table)-1 && i == maxNumLines-1 {
+				if rowIndex == len(table)-1 && i == maxNumLines-1 && hasBottomBorder {
 					emptyCell.Border += "B"
 				}
 				f.pdf.SetX(currentX)
