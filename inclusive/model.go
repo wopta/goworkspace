@@ -23,7 +23,8 @@ type BankAccountMovement struct {
 	BigEndDate     civil.DateTime `bigquery:"endDate" firestore:"-" json:"-"`
 	Address        string         `firestore:"-" json:"address,omitempty" bigquery:"address"`
 	City           string         `firestore:"-" json:"city,omitempty" bigquery:"city"`
-	CityCode       string         `firestore:"-" json:"cityCode,omitempty" bigquery:"cityCode"`             //Data uscita ()
+	CityCode       string         `firestore:"-" json:"cityCode,omitempty" bigquery:"cityCode"`
+	PostalCode     string         `firestore:"-" json:"postalCode,omitempty" bigquery:"postalCode"`         //Data uscita ()
 	MovementType   string         `firestore:"-" json:"movementType,omitempty" bigquery:"movementType"`     //Movimento (ingresso o uscita)
 	PolicyNumber   string         `firestore:"-" json:"policyNumber,omitempty" bigquery:"policyNumber"`     //NUMERO POLIZZA
 	PolicyType     string         `firestore:"-" json:"policyType,omitempty" bigquery:"policyType"`         //TIPOLOGIA POLIZZA
