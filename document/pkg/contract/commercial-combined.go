@@ -63,13 +63,13 @@ var (
 	}
 )
 
-type QBEGenerator struct {
+type CommercialCombinedGenerator struct {
 	*baseGenerator
 }
 
-func NewQBEGenerator(engine *engine.Fpdf, policy *models.Policy, node *models.NetworkNode,
-	isProposal bool) *QBEGenerator {
-	return &QBEGenerator{
+func NewCommercialCombinedGenerator(engine *engine.Fpdf, policy *models.Policy, node *models.NetworkNode,
+	isProposal bool) *CommercialCombinedGenerator {
+	return &CommercialCombinedGenerator{
 		&baseGenerator{
 			engine:      engine,
 			isProposal:  isProposal,
@@ -81,95 +81,95 @@ func NewQBEGenerator(engine *engine.Fpdf, policy *models.Policy, node *models.Ne
 	}
 }
 
-func (qb *QBEGenerator) Contract() ([]byte, error) {
-	qb.mainHeader()
+func (ccg *CommercialCombinedGenerator) Contract() ([]byte, error) {
+	ccg.mainHeader()
 
-	qb.engine.NewPage()
+	ccg.engine.NewPage()
 
-	qb.mainFooter()
+	ccg.mainFooter()
 
-	qb.engine.NewLine(10)
+	ccg.engine.NewLine(10)
 
-	qb.introSection()
+	ccg.introSection()
 
-	qb.engine.NewLine(10)
+	ccg.engine.NewLine(10)
 
-	qb.whoWeAreSection()
+	ccg.whoWeAreSection()
 
-	qb.engine.NewLine(10)
+	ccg.engine.NewLine(10)
 
-	qb.insuredDetailsSection()
+	ccg.insuredDetailsSection()
 
-	qb.engine.NewPage()
+	ccg.engine.NewPage()
 
-	qb.guaranteesDetailsSection()
+	ccg.guaranteesDetailsSection()
 
-	qb.engine.NewPage()
+	ccg.engine.NewPage()
 
-	qb.deductibleSection()
+	ccg.deductibleSection()
 
-	qb.engine.NewLine(10)
+	ccg.engine.NewLine(10)
 
-	qb.dynamicDeductibleSection()
+	ccg.dynamicDeductibleSection()
 
-	qb.engine.NewLine(5)
+	ccg.engine.NewLine(5)
 
-	qb.detailsSection()
+	ccg.detailsSection()
 
-	qb.engine.NewLine(5)
+	ccg.engine.NewLine(5)
 
-	qb.specialConditionsSection()
+	ccg.specialConditionsSection()
 
-	qb.engine.NewLine(5)
+	ccg.engine.NewLine(5)
 
-	qb.bondSection()
+	ccg.bondSection()
 
-	qb.engine.NewPage()
+	ccg.engine.NewPage()
 
-	qb.resumeSection()
+	ccg.resumeSection()
 
-	qb.engine.NewLine(5)
+	ccg.engine.NewLine(5)
 
-	qb.howYouCanPaySection()
+	ccg.howYouCanPaySection()
 
-	qb.engine.NewLine(5)
+	ccg.engine.NewLine(5)
 
-	qb.emitResumeSection()
+	ccg.emitResumeSection()
 
-	qb.engine.NewLine(5)
+	ccg.engine.NewLine(5)
 
-	qb.statementsFirstPart()
+	ccg.statementsFirstPart()
 
-	qb.engine.NewPage()
+	ccg.engine.NewPage()
 
-	qb.claimsStatement()
+	ccg.claimsStatement()
 
-	qb.statementsSecondPart()
+	ccg.statementsSecondPart()
 
-	qb.engine.NewLine(3)
+	ccg.engine.NewLine(3)
 
-	qb.qbePrivacySection()
+	ccg.qbePrivacySection()
 
-	qb.engine.NewPage()
+	ccg.engine.NewPage()
 
-	qb.qbePersonalDataSection()
+	ccg.qbePersonalDataSection()
 
-	qb.engine.NewLine(5)
+	ccg.engine.NewLine(5)
 
-	qb.commercialConsentSection()
+	ccg.commercialConsentSection()
 
-	qb.annexSections()
+	ccg.annexSections()
 
-	qb.woptaHeader()
+	ccg.woptaHeader()
 
-	qb.woptaFooter()
+	ccg.woptaFooter()
 
-	qb.woptaPrivacySection()
+	ccg.woptaPrivacySection()
 
-	return qb.engine.RawDoc()
+	return ccg.engine.RawDoc()
 }
 
-func (qb *QBEGenerator) mainHeader() {
+func (ccg *CommercialCombinedGenerator) mainHeader() {
 	type policyInfo struct {
 		code         string
 		startDate    string
@@ -207,60 +207,60 @@ func (qb *QBEGenerator) mainHeader() {
 	}
 
 	policyCodePrefix := "I dati della tua Polizza nr. "
-	if qb.isProposal && qb.policy.ProposalNumber != 0 {
+	if ccg.isProposal && ccg.policy.ProposalNumber != 0 {
 		policyCodePrefix = "I dati della tua Proposta nr. "
-		plcInfo.code = fmt.Sprintf("%d", qb.policy.ProposalNumber)
-	} else if qb.policy.CodeCompany != "" {
-		plcInfo.code = qb.policy.CodeCompany
+		plcInfo.code = fmt.Sprintf("%d", ccg.policy.ProposalNumber)
+	} else if ccg.policy.CodeCompany != "" {
+		plcInfo.code = ccg.policy.CodeCompany
 	}
 
-	if !qb.policy.StartDate.IsZero() {
-		plcInfo.startDate = qb.policy.StartDate.Format(constants.DayMonthYearFormat)
+	if !ccg.policy.StartDate.IsZero() {
+		plcInfo.startDate = ccg.policy.StartDate.Format(constants.DayMonthYearFormat)
 	}
 
-	if !qb.policy.EndDate.IsZero() {
-		plcInfo.endDate = qb.policy.EndDate.Format(constants.DayMonthYearFormat)
+	if !ccg.policy.EndDate.IsZero() {
+		plcInfo.endDate = ccg.policy.EndDate.Format(constants.DayMonthYearFormat)
 	}
 
-	if _, ok := constants.PaymentSplitMap[qb.policy.PaymentSplit]; ok {
-		plcInfo.paymentSplit = constants.PaymentSplitMap[qb.policy.PaymentSplit]
+	if _, ok := constants.PaymentSplitMap[ccg.policy.PaymentSplit]; ok {
+		plcInfo.paymentSplit = constants.PaymentSplitMap[ccg.policy.PaymentSplit]
 	}
 
-	nextPayDate := lib.AddMonths(qb.policy.StartDate.AddDate(qb.policy.Annuity, 0, 0), 12)
-	if !nextPayDate.After(qb.policy.EndDate) {
+	nextPayDate := lib.AddMonths(ccg.policy.StartDate.AddDate(ccg.policy.Annuity, 0, 0), 12)
+	if !nextPayDate.After(ccg.policy.EndDate) {
 		plcInfo.nextPayment = nextPayDate.Format(constants.DayMonthYearFormat)
 	} else {
 		plcInfo.nextPayment = plcInfo.endDate
 	}
 
-	if qb.policy.HasBond {
+	if ccg.policy.HasBond {
 		plcInfo.hasBond = "SI"
 	}
 
-	if len(qb.policy.Contractor.Name) != 0 {
-		ctrInfo.name = qb.policy.Contractor.Name
+	if len(ccg.policy.Contractor.Name) != 0 {
+		ctrInfo.name = ccg.policy.Contractor.Name
 	}
 
-	if len(qb.policy.Contractor.VatCode) != 0 {
-		ctrInfo.vatCode = qb.policy.Contractor.VatCode
+	if len(ccg.policy.Contractor.VatCode) != 0 {
+		ctrInfo.vatCode = ccg.policy.Contractor.VatCode
 	}
 
-	if len(qb.policy.Contractor.FiscalCode) != 0 {
-		ctrInfo.fiscalCode = qb.policy.Contractor.FiscalCode
+	if len(ccg.policy.Contractor.FiscalCode) != 0 {
+		ctrInfo.fiscalCode = ccg.policy.Contractor.FiscalCode
 	}
 
-	if qb.policy.Contractor.CompanyAddress != nil {
-		ctrInfo.address = fmt.Sprintf("%s %s\n%s %s (%s)", qb.policy.Contractor.CompanyAddress.StreetName,
-			qb.policy.Contractor.CompanyAddress.StreetNumber, qb.policy.Contractor.CompanyAddress.PostalCode,
-			qb.policy.Contractor.CompanyAddress.City, qb.policy.Contractor.CompanyAddress.CityCode)
+	if ccg.policy.Contractor.CompanyAddress != nil {
+		ctrInfo.address = fmt.Sprintf("%s %s\n%s %s (%s)", ccg.policy.Contractor.CompanyAddress.StreetName,
+			ccg.policy.Contractor.CompanyAddress.StreetNumber, ccg.policy.Contractor.CompanyAddress.PostalCode,
+			ccg.policy.Contractor.CompanyAddress.City, ccg.policy.Contractor.CompanyAddress.CityCode)
 	}
 
-	if len(qb.policy.Contractor.Mail) != 0 {
-		ctrInfo.mail = qb.policy.Contractor.Mail
+	if len(ccg.policy.Contractor.Mail) != 0 {
+		ctrInfo.mail = ccg.policy.Contractor.Mail
 	}
 
-	if len(qb.policy.Contractor.Phone) != 0 {
-		ctrInfo.phone = qb.policy.Contractor.Phone
+	if len(ccg.policy.Contractor.Phone) != 0 {
+		ctrInfo.phone = ccg.policy.Contractor.Phone
 	}
 
 	table := [][]domain.TableCell{
@@ -474,27 +474,27 @@ func (qb *QBEGenerator) mainHeader() {
 		},
 	}
 
-	qb.engine.SetHeader(func() {
-		qb.engine.InsertImage(lib.GetAssetPathByEnvV2()+"logo_qbe.png", 75, 6.5, 22, 8)
-		qb.engine.DrawLine(102, 6.25, 102, 15, 0.25, constants.BlackColor)
-		qb.engine.InsertImage(lib.GetAssetPathByEnvV2()+"logo_wopta.png", 107.5, 5, 35, 12)
-		qb.engine.NewLine(7)
-		qb.engine.DrawTable(table)
+	ccg.engine.SetHeader(func() {
+		ccg.engine.InsertImage(lib.GetAssetPathByEnvV2()+"logo_qbe.png", 75, 6.5, 22, 8)
+		ccg.engine.DrawLine(102, 6.25, 102, 15, 0.25, constants.BlackColor)
+		ccg.engine.InsertImage(lib.GetAssetPathByEnvV2()+"logo_wopta.png", 107.5, 5, 35, 12)
+		ccg.engine.NewLine(7)
+		ccg.engine.DrawTable(table)
 
-		if qb.isProposal {
-			qb.engine.DrawWatermark(constants.Proposal)
+		if ccg.isProposal {
+			ccg.engine.DrawWatermark(constants.Proposal)
 		}
 	})
 }
 
-func (qb *QBEGenerator) mainFooter() {
+func (ccg *CommercialCombinedGenerator) mainFooter() {
 	text := "QBE Europe SA/NV, Rappresentanza Generale per l’Italia, Via Melchiorre Gioia 8 – 20124 Milano. R.E.A. MI-2538674. Codice fiscale/P.IVA 10532190963 Autorizzazione IVASS n. I.00147\n" +
 		"QBE Europe SA/NV è autorizzata dalla Banca Nazionale del Belgio con licenza numero 3093. Sede legale Place du Champ de Mars 5, BE 1050, Bruxelles, Belgio.   N. di registrazione 0690537456."
 
-	qb.engine.SetFooter(func() {
-		qb.engine.SetX(10)
-		qb.engine.SetY(-17)
-		qb.engine.WriteText(domain.TableCell{
+	ccg.engine.SetFooter(func() {
+		ccg.engine.SetX(10)
+		ccg.engine.SetY(-17)
+		ccg.engine.WriteText(domain.TableCell{
 			Text:      text,
 			Height:    3,
 			Width:     190,
@@ -506,8 +506,8 @@ func (qb *QBEGenerator) mainFooter() {
 			Align:     constants.LeftAlign,
 			Border:    "",
 		})
-		qb.engine.WriteText(domain.TableCell{
-			Text:      fmt.Sprintf("%d", qb.engine.PageNumber()),
+		ccg.engine.WriteText(domain.TableCell{
+			Text:      fmt.Sprintf("%d", ccg.engine.PageNumber()),
 			Height:    3,
 			Width:     0,
 			FontStyle: constants.RegularFontStyle,
@@ -519,7 +519,7 @@ func (qb *QBEGenerator) mainFooter() {
 	})
 }
 
-func (qb *QBEGenerator) introSection() {
+func (ccg *CommercialCombinedGenerator) introSection() {
 	introTable := [][]domain.TableCell{
 		{
 			{
@@ -548,10 +548,10 @@ func (qb *QBEGenerator) introSection() {
 			},
 		},
 	}
-	qb.engine.DrawTable(introTable)
+	ccg.engine.DrawTable(introTable)
 }
 
-func (qb *QBEGenerator) whoWeAreSection() {
+func (ccg *CommercialCombinedGenerator) whoWeAreSection() {
 	whoWeAreTable := [][]domain.TableCell{
 		{
 			{
@@ -716,10 +716,10 @@ func (qb *QBEGenerator) whoWeAreSection() {
 			},
 		},
 	}
-	qb.engine.DrawTable(whoWeAreTable)
+	ccg.engine.DrawTable(whoWeAreTable)
 }
 
-func (qb *QBEGenerator) insuredDetailsSection() {
+func (ccg *CommercialCombinedGenerator) insuredDetailsSection() {
 	type buildingInfo struct {
 		address          string
 		buildingMaterial string
@@ -769,7 +769,7 @@ func (qb *QBEGenerator) insuredDetailsSection() {
 	enterprise := newEnterpriseInfo()
 
 	index := 0
-	for _, asset := range qb.policy.Assets {
+	for _, asset := range ccg.policy.Assets {
 		if asset.Building == nil {
 			continue
 		}
@@ -798,7 +798,7 @@ func (qb *QBEGenerator) insuredDetailsSection() {
 		index++
 	}
 
-	for _, asset := range qb.policy.Assets {
+	for _, asset := range ccg.policy.Assets {
 		if asset.Enterprise == nil {
 			continue
 		}
@@ -949,12 +949,12 @@ func (qb *QBEGenerator) insuredDetailsSection() {
 	}
 	table = append(table, riskDescriptionRow)
 
-	qb.engine.DrawTable(table)
+	ccg.engine.DrawTable(table)
 
 }
 
 // TODO: parse policy info
-func (qb *QBEGenerator) guaranteesDetailsSection() {
+func (ccg *CommercialCombinedGenerator) guaranteesDetailsSection() {
 	const emptyInfo string = "======"
 
 	type guaranteeInfo struct {
@@ -1311,16 +1311,16 @@ func (qb *QBEGenerator) guaranteesDetailsSection() {
 		table = append(table, row)
 	}
 
-	qb.engine.DrawTable(table)
+	ccg.engine.DrawTable(table)
 
-	qb.engine.NewLine(5)
+	ccg.engine.NewLine(5)
 
 	sumInsuredLimitOfIndemnity := "5.000.000"
 	if enterpriseData[rctoGuaranteeSlug].sumInsuredLimitOfIndemnity != "3000000" {
 		sumInsuredLimitOfIndemnity = "7.500.000"
 	}
 
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      "Il limite di esposizione massima annua della Compagnia, per la sezione Responsabilità Civile, è pari ad € " + sumInsuredLimitOfIndemnity,
 		Height:    3.5,
 		Width:     190,
@@ -1332,7 +1332,7 @@ func (qb *QBEGenerator) guaranteesDetailsSection() {
 		Align:     constants.LeftAlign,
 		Border:    "",
 	})
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      "a valere per tutte le garanzie e complessivamente per tutti gli Assicurati, per ogni sinistro, qualunque sia il numero delle persone decedute o lese o che abbiano subito danni a cose di loro proprietà.",
 		Height:    3.5,
 		Width:     190,
@@ -1346,7 +1346,7 @@ func (qb *QBEGenerator) guaranteesDetailsSection() {
 	})
 }
 
-func (qb *QBEGenerator) deductibleSection() {
+func (ccg *CommercialCombinedGenerator) deductibleSection() {
 	const (
 		descriptionColumnWidth = 90
 		otherColumnWidth       = 50
@@ -1556,7 +1556,7 @@ func (qb *QBEGenerator) deductibleSection() {
 		return result
 	}
 
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      "Franchigie, scoperti, limiti di indennizzo",
 		Height:    4.5,
 		Width:     190,
@@ -1569,7 +1569,7 @@ func (qb *QBEGenerator) deductibleSection() {
 		Border:    "",
 	})
 
-	qb.engine.NewLine(3)
+	ccg.engine.NewLine(3)
 
 	rawTables := []table{
 		{
@@ -1688,15 +1688,15 @@ func (qb *QBEGenerator) deductibleSection() {
 
 	for index, t := range rawTables {
 		parsedTable := parseTable(t)
-		qb.engine.DrawTable(parsedTable)
+		ccg.engine.DrawTable(parsedTable)
 		if t.newPage {
-			qb.engine.NewPage()
+			ccg.engine.NewPage()
 			continue
 		} else if index < len(rawTables)-1 {
-			qb.engine.NewLine(10)
+			ccg.engine.NewLine(10)
 		}
 	}
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      "SA = Somma Assicurata",
 		Height:    4.5,
 		Width:     190,
@@ -1710,7 +1710,7 @@ func (qb *QBEGenerator) deductibleSection() {
 	})
 }
 
-func (qb *QBEGenerator) dynamicDeductibleSection() {
+func (ccg *CommercialCombinedGenerator) dynamicDeductibleSection() {
 	const (
 		descriptionColumnWidth = 100
 		otherColumnWidth       = 45
@@ -1825,7 +1825,7 @@ func (qb *QBEGenerator) dynamicDeductibleSection() {
 		return result
 	}
 
-	for _, asset := range qb.policy.Assets {
+	for _, asset := range ccg.policy.Assets {
 		if asset.Enterprise != nil {
 			for _, guarantee := range asset.Guarantees {
 				if guarantee.Slug == rctGuaranteeSlug {
@@ -1896,9 +1896,9 @@ func (qb *QBEGenerator) dynamicDeductibleSection() {
 	}
 
 	parsedTable := parseSections(sections)
-	qb.engine.DrawTable(parsedTable)
+	ccg.engine.DrawTable(parsedTable)
 
-	qb.engine.NewPage()
+	ccg.engine.NewPage()
 
 	sections = []section{
 		{
@@ -1980,9 +1980,9 @@ func (qb *QBEGenerator) dynamicDeductibleSection() {
 	}
 
 	parsedTable = parseSections(sections)
-	qb.engine.DrawTable(parsedTable)
+	ccg.engine.DrawTable(parsedTable)
 
-	qb.engine.NewPage()
+	ccg.engine.NewPage()
 
 	sections = []section{
 		{
@@ -2018,7 +2018,7 @@ func (qb *QBEGenerator) dynamicDeductibleSection() {
 	}
 
 	parsedTable = parseSections(sections)
-	qb.engine.DrawTable(parsedTable)
+	ccg.engine.DrawTable(parsedTable)
 
 	sections = []section{
 		{
@@ -2045,12 +2045,12 @@ func (qb *QBEGenerator) dynamicDeductibleSection() {
 	}
 
 	parsedTable = parseSections(sections)
-	qb.engine.DrawTable(parsedTable)
+	ccg.engine.DrawTable(parsedTable)
 
-	qb.engine.NewLine(5)
+	ccg.engine.NewLine(5)
 }
 
-func (qb *QBEGenerator) detailsSection() {
+func (ccg *CommercialCombinedGenerator) detailsSection() {
 	const (
 		emptyField        = "====="
 		firstColumnWidth  = 65
@@ -2076,7 +2076,7 @@ func (qb *QBEGenerator) detailsSection() {
 		deo:    emptyField,
 	}
 
-	for _, asset := range qb.policy.Assets {
+	for _, asset := range ccg.policy.Assets {
 		if asset.Enterprise == nil {
 			continue
 		}
@@ -2099,7 +2099,7 @@ func (qb *QBEGenerator) detailsSection() {
 		}
 	}
 
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      "Dettagli di alcune sezioni",
 		Height:    4.5,
 		Width:     190,
@@ -2113,7 +2113,7 @@ func (qb *QBEGenerator) detailsSection() {
 	})
 
 	// First three rows
-	qb.engine.DrawTable([][]domain.TableCell{
+	ccg.engine.DrawTable([][]domain.TableCell{
 		{
 			{
 				Text:      "SEZIONE",
@@ -2232,9 +2232,9 @@ func (qb *QBEGenerator) detailsSection() {
 	})
 
 	// Fourth row
-	fourthRowY := qb.engine.GetY()
+	fourthRowY := ccg.engine.GetY()
 	// First column
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      " \n \nRESPONSABILITA' CIVILE\nDA PRODOTTI DIFETTOSI\n \n ",
 		Height:    4.5,
 		Width:     firstColumnWidth,
@@ -2247,9 +2247,9 @@ func (qb *QBEGenerator) detailsSection() {
 		Border:    "TL",
 	})
 	// Second column
-	qb.engine.SetY(fourthRowY)
-	qb.engine.SetX(secondColumnX)
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.SetY(fourthRowY)
+	ccg.engine.SetX(secondColumnX)
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      "Regime copertura",
 		Height:    4.5,
 		Width:     secondColumnWidth,
@@ -2261,8 +2261,8 @@ func (qb *QBEGenerator) detailsSection() {
 		Align:     constants.LeftAlign,
 		Border:    "TL",
 	})
-	qb.engine.SetX(secondColumnX)
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.SetX(secondColumnX)
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      "Retroattività – Mondo escluso USA Canada",
 		Height:    4.5,
 		Width:     secondColumnWidth,
@@ -2274,8 +2274,8 @@ func (qb *QBEGenerator) detailsSection() {
 		Align:     constants.LeftAlign,
 		Border:    "TL",
 	})
-	qb.engine.SetX(secondColumnX)
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.SetX(secondColumnX)
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      " \nRetroattività – USA Canada\n ",
 		Height:    4.5,
 		Width:     secondColumnWidth,
@@ -2288,9 +2288,9 @@ func (qb *QBEGenerator) detailsSection() {
 		Border:    "TL",
 	})
 	// Third column
-	qb.engine.SetY(fourthRowY)
-	qb.engine.SetX(thirdColumnX)
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.SetY(fourthRowY)
+	ccg.engine.SetX(thirdColumnX)
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      "CLAIMS MADE",
 		Height:    4.5,
 		Width:     thirdColumnWidth,
@@ -2302,8 +2302,8 @@ func (qb *QBEGenerator) detailsSection() {
 		Align:     constants.LeftAlign,
 		Border:    "TLR",
 	})
-	qb.engine.SetX(thirdColumnX)
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.SetX(thirdColumnX)
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      "L'Assicurazione vale per i danni verificatisi dopo la data del " + startDateInfo.rcp,
 		Height:    4.5,
 		Width:     thirdColumnWidth,
@@ -2315,8 +2315,8 @@ func (qb *QBEGenerator) detailsSection() {
 		Align:     constants.LeftAlign,
 		Border:    "TLR",
 	})
-	qb.engine.SetX(thirdColumnX)
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.SetX(thirdColumnX)
+	ccg.engine.WriteText(domain.TableCell{
 		Text: "L'Assicurazione vale per i danni verificatisi dopo la data del " + startDateInfo.rcpUsa + " purch" +
 			"é  relativi a prodotti descritti in Polizza consegnati a terzi dopo la stessa data.",
 		Height:    4.5,
@@ -2331,7 +2331,7 @@ func (qb *QBEGenerator) detailsSection() {
 	})
 
 	// Fifth row
-	qb.engine.DrawTable([][]domain.TableCell{
+	ccg.engine.DrawTable([][]domain.TableCell{
 		{
 			{
 				Text: "RESPONSABILITA’ CIVILE\nVERSO TERZI E PRESTATORI DI LAVORO\nRESPONSABILITA' CIVILE\nDA" +
@@ -2374,9 +2374,9 @@ func (qb *QBEGenerator) detailsSection() {
 		},
 	})
 
-	qb.engine.NewPage()
+	ccg.engine.NewPage()
 
-	qb.engine.DrawTable([][]domain.TableCell{
+	ccg.engine.DrawTable([][]domain.TableCell{
 		{
 			{
 				Text:      "SEZIONE",
@@ -2418,9 +2418,9 @@ func (qb *QBEGenerator) detailsSection() {
 	})
 
 	// Sixth row
-	sixthRowY := qb.engine.GetY()
+	sixthRowY := ccg.engine.GetY()
 	// First Column
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      " \n RITIRO PRODOTTI\n \n ",
 		Height:    4.5,
 		Width:     firstColumnWidth,
@@ -2433,9 +2433,9 @@ func (qb *QBEGenerator) detailsSection() {
 		Border:    "TL",
 	})
 	// Second Column
-	qb.engine.SetY(sixthRowY)
-	qb.engine.SetX(secondColumnX)
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.SetY(sixthRowY)
+	ccg.engine.SetX(secondColumnX)
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      "Regime di copertura",
 		Height:    4.5,
 		Width:     secondColumnWidth,
@@ -2447,8 +2447,8 @@ func (qb *QBEGenerator) detailsSection() {
 		Align:     constants.LeftAlign,
 		Border:    "TL",
 	})
-	qb.engine.SetX(secondColumnX)
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.SetX(secondColumnX)
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      " \nRetroattività\n ",
 		Height:    4.5,
 		Width:     secondColumnWidth,
@@ -2461,9 +2461,9 @@ func (qb *QBEGenerator) detailsSection() {
 		Border:    "TL",
 	})
 	// Third Column
-	qb.engine.SetY(sixthRowY)
-	qb.engine.SetX(thirdColumnX)
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.SetY(sixthRowY)
+	ccg.engine.SetX(thirdColumnX)
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      "CLAIMS MADE",
 		Height:    4.5,
 		Width:     thirdColumnWidth,
@@ -2475,8 +2475,8 @@ func (qb *QBEGenerator) detailsSection() {
 		Align:     constants.LeftAlign,
 		Border:    "TLR",
 	})
-	qb.engine.SetX(thirdColumnX)
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.SetX(thirdColumnX)
+	ccg.engine.WriteText(domain.TableCell{
 		Text: "L'Assicurazione vale per i danni verificatisi dopo la data del " + startDateInfo.
 			ritiro + " purché relativi a prodotti descritti in Polizza consegnati a terzi dopo la stessa data.",
 		Height:    4.5,
@@ -2491,9 +2491,9 @@ func (qb *QBEGenerator) detailsSection() {
 	})
 
 	// Seventh row
-	seventhRowY := qb.engine.GetY()
+	seventhRowY := ccg.engine.GetY()
 	// First Column
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      " \n \n \n \nRESPONSABILITÀ AMMINISTRATORI\nSINDACI DIRIGENTI (D&0)\n \n \n \n ",
 		Height:    4.5,
 		Width:     firstColumnWidth,
@@ -2506,9 +2506,9 @@ func (qb *QBEGenerator) detailsSection() {
 		Border:    "TL",
 	})
 	// Second Column
-	qb.engine.SetY(seventhRowY)
-	qb.engine.SetX(secondColumnX)
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.SetY(seventhRowY)
+	ccg.engine.SetX(secondColumnX)
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      "Territorialità",
 		Height:    4.5,
 		Width:     secondColumnWidth,
@@ -2520,8 +2520,8 @@ func (qb *QBEGenerator) detailsSection() {
 		Align:     constants.LeftAlign,
 		Border:    "TL",
 	})
-	qb.engine.SetX(secondColumnX)
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.SetX(secondColumnX)
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      "Retroattività",
 		Height:    4.5,
 		Width:     secondColumnWidth,
@@ -2533,8 +2533,8 @@ func (qb *QBEGenerator) detailsSection() {
 		Align:     constants.LeftAlign,
 		Border:    "TL",
 	})
-	qb.engine.SetX(secondColumnX)
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.SetX(secondColumnX)
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      "Data di continuità",
 		Height:    4.5,
 		Width:     secondColumnWidth,
@@ -2546,8 +2546,8 @@ func (qb *QBEGenerator) detailsSection() {
 		Align:     constants.LeftAlign,
 		Border:    "TL",
 	})
-	qb.engine.SetX(secondColumnX)
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.SetX(secondColumnX)
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      " \n \nPremio addizionale per il maggior termine di notifica\n ",
 		Height:    4.5,
 		Width:     secondColumnWidth,
@@ -2559,8 +2559,8 @@ func (qb *QBEGenerator) detailsSection() {
 		Align:     constants.LeftAlign,
 		Border:    "TL",
 	})
-	qb.engine.SetX(secondColumnX)
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.SetX(secondColumnX)
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      "Maggior termine di notifica per amministratori cessati",
 		Height:    4.5,
 		Width:     secondColumnWidth,
@@ -2573,9 +2573,9 @@ func (qb *QBEGenerator) detailsSection() {
 		Border:    "TL",
 	})
 	// Third Column
-	qb.engine.SetY(seventhRowY)
-	qb.engine.SetX(thirdColumnX)
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.SetY(seventhRowY)
+	ccg.engine.SetX(thirdColumnX)
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      "Unione Economica Europea",
 		Height:    4.5,
 		Width:     thirdColumnWidth,
@@ -2587,8 +2587,8 @@ func (qb *QBEGenerator) detailsSection() {
 		Align:     constants.LeftAlign,
 		Border:    "TLR",
 	})
-	qb.engine.SetX(thirdColumnX)
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.SetX(thirdColumnX)
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      "Illimitata",
 		Height:    4.5,
 		Width:     thirdColumnWidth,
@@ -2600,8 +2600,8 @@ func (qb *QBEGenerator) detailsSection() {
 		Align:     constants.LeftAlign,
 		Border:    "TLR",
 	})
-	qb.engine.SetX(thirdColumnX)
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.SetX(thirdColumnX)
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      startDateInfo.deo,
 		Height:    4.5,
 		Width:     thirdColumnWidth,
@@ -2613,8 +2613,8 @@ func (qb *QBEGenerator) detailsSection() {
 		Align:     constants.LeftAlign,
 		Border:    "TLR",
 	})
-	qb.engine.SetX(thirdColumnX)
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.SetX(thirdColumnX)
+	ccg.engine.WriteText(domain.TableCell{
 		Text: "12 mesi al 30% dell'ultimo premio pagato\n24 mesi al 60% dell'ultimo premio pagato\n36 mesi al 90% dell" +
 			"'ultimo premio pagato\n48 mesi al 120% dell'ultimo premio pagato\n60 mesi al 150% dell'ultimo premio" +
 			" pagato",
@@ -2628,8 +2628,8 @@ func (qb *QBEGenerator) detailsSection() {
 		Align:     constants.LeftAlign,
 		Border:    "TLR",
 	})
-	qb.engine.SetX(thirdColumnX)
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.SetX(thirdColumnX)
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      "60 mesi\n ",
 		Height:    4.5,
 		Width:     thirdColumnWidth,
@@ -2643,9 +2643,9 @@ func (qb *QBEGenerator) detailsSection() {
 	})
 
 	// Eighth row
-	eighthRowY := qb.engine.GetY()
+	eighthRowY := ccg.engine.GetY()
 	// First Column
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      " \n \n \n \n \n \nCYBER RESPONSE E DATA SECURITY\n \n \n \n \n \n",
 		Height:    4.5,
 		Width:     firstColumnWidth,
@@ -2658,9 +2658,9 @@ func (qb *QBEGenerator) detailsSection() {
 		Border:    "TLB",
 	})
 	// Second Column
-	qb.engine.SetY(eighthRowY)
-	qb.engine.SetX(secondColumnX)
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.SetY(eighthRowY)
+	ccg.engine.SetX(secondColumnX)
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      "Periodo di carenza Art. I/3\nCyber Business interruption",
 		Height:    4.5,
 		Width:     secondColumnWidth,
@@ -2672,8 +2672,8 @@ func (qb *QBEGenerator) detailsSection() {
 		Align:     constants.LeftAlign,
 		Border:    "TL",
 	})
-	qb.engine.SetX(secondColumnX)
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.SetX(secondColumnX)
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      "Territorialità",
 		Height:    4.5,
 		Width:     secondColumnWidth,
@@ -2685,8 +2685,8 @@ func (qb *QBEGenerator) detailsSection() {
 		Align:     constants.LeftAlign,
 		Border:    "TL",
 	})
-	qb.engine.SetX(secondColumnX)
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.SetX(secondColumnX)
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      "Retroattività",
 		Height:    4.5,
 		Width:     secondColumnWidth,
@@ -2698,8 +2698,8 @@ func (qb *QBEGenerator) detailsSection() {
 		Align:     constants.LeftAlign,
 		Border:    "TL",
 	})
-	qb.engine.SetX(secondColumnX)
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.SetX(secondColumnX)
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      " \n \n \nIncident Response (*)\n \n \n \n ",
 		Height:    4.5,
 		Width:     secondColumnWidth,
@@ -2712,9 +2712,9 @@ func (qb *QBEGenerator) detailsSection() {
 		Border:    "TLB",
 	})
 	// Third Column
-	qb.engine.SetY(eighthRowY)
-	qb.engine.SetX(thirdColumnX)
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.SetY(eighthRowY)
+	ccg.engine.SetX(thirdColumnX)
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      "12 ore per ciascun sinistro\n ",
 		Height:    4.5,
 		Width:     thirdColumnWidth,
@@ -2726,8 +2726,8 @@ func (qb *QBEGenerator) detailsSection() {
 		Align:     constants.LeftAlign,
 		Border:    "TLR",
 	})
-	qb.engine.SetX(thirdColumnX)
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.SetX(thirdColumnX)
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      "Unione Economica Europea",
 		Height:    4.5,
 		Width:     thirdColumnWidth,
@@ -2739,8 +2739,8 @@ func (qb *QBEGenerator) detailsSection() {
 		Align:     constants.LeftAlign,
 		Border:    "TLR",
 	})
-	qb.engine.SetX(thirdColumnX)
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.SetX(thirdColumnX)
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      "Illimitata",
 		Height:    4.5,
 		Width:     thirdColumnWidth,
@@ -2752,8 +2752,8 @@ func (qb *QBEGenerator) detailsSection() {
 		Align:     constants.LeftAlign,
 		Border:    "TLR",
 	})
-	qb.engine.SetX(thirdColumnX)
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.SetX(thirdColumnX)
+	ccg.engine.WriteText(domain.TableCell{
 		Text: "One Network Firm: Advant Nctm\nNumber+39 (02) 38.592.788\nEmail: OneCyberResponseLine." +
 			"Italy@clydeco.com\n \n (*) Nel caso in cui venisse scoperto un presunto evento\ninformatico, " +
 			"il Contraente potrà contattare il\ncentralino, 24H su 24H, " +
@@ -2771,10 +2771,10 @@ func (qb *QBEGenerator) detailsSection() {
 }
 
 // TODO: parse clause
-func (qb *QBEGenerator) specialConditionsSection() {
+func (ccg *CommercialCombinedGenerator) specialConditionsSection() {
 	clause := "======"
 
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      "Condizioni Speciali in deroga alle Condizioni di Assicurazione",
 		Height:    4.5,
 		Width:     190,
@@ -2786,9 +2786,9 @@ func (qb *QBEGenerator) specialConditionsSection() {
 		Align:     constants.LeftAlign,
 		Border:    "",
 	})
-	qb.engine.NewLine(1)
+	ccg.engine.NewLine(1)
 
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      "In deroga a quanto riportato nelle Condizioni di Assicurazione, si concorda tra le Parti che:",
 		Height:    4.5,
 		Width:     190,
@@ -2800,9 +2800,9 @@ func (qb *QBEGenerator) specialConditionsSection() {
 		Align:     constants.LeftAlign,
 		Border:    "",
 	})
-	qb.engine.NewLine(1)
+	ccg.engine.NewLine(1)
 
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      clause,
 		Height:    4.5,
 		Width:     190,
@@ -2814,9 +2814,9 @@ func (qb *QBEGenerator) specialConditionsSection() {
 		Align:     constants.LeftAlign,
 		Border:    "",
 	})
-	qb.engine.NewLine(1)
+	ccg.engine.NewLine(1)
 
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      "Fermo tutto il resto non derogato da quanto precede.",
 		Height:    4.5,
 		Width:     190,
@@ -2831,11 +2831,11 @@ func (qb *QBEGenerator) specialConditionsSection() {
 }
 
 // TODO: parse bond
-func (qb *QBEGenerator) bondSection() {
+func (ccg *CommercialCombinedGenerator) bondSection() {
 	hasBondText := "NO"
 	bondText := "======"
 
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      "Clausola di Vincolo assicurativo " + hasBondText,
 		Height:    4.5,
 		Width:     190,
@@ -2847,8 +2847,8 @@ func (qb *QBEGenerator) bondSection() {
 		Align:     constants.LeftAlign,
 		Border:    "",
 	})
-	qb.engine.NewLine(1)
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.NewLine(1)
+	ccg.engine.WriteText(domain.TableCell{
 		Text: "La presente Polizza, a decorrere dal suo effetto, " +
 			"si intende vincolata a favore dell’Istituto Vincolatario " + bondText + " , " +
 			"alle condizioni tutte di cui all’Art. 28.",
@@ -2865,7 +2865,7 @@ func (qb *QBEGenerator) bondSection() {
 }
 
 // TODO: parse data from policy
-func (qb *QBEGenerator) resumeSection() {
+func (ccg *CommercialCombinedGenerator) resumeSection() {
 	const (
 		emptyField       = "======"
 		no               = "NO"
@@ -3107,7 +3107,7 @@ func (qb *QBEGenerator) resumeSection() {
 		})
 	}
 
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      "Il Premio per tutte le coperture assicurative attivate sulla Polizza",
 		Height:    4.5,
 		Width:     190,
@@ -3119,10 +3119,10 @@ func (qb *QBEGenerator) resumeSection() {
 		Align:     constants.LeftAlign,
 		Border:    "",
 	})
-	qb.engine.NewLine(1)
-	qb.engine.DrawTable(table)
-	qb.engine.NewLine(0.75)
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.NewLine(1)
+	ccg.engine.DrawTable(table)
+	ccg.engine.NewLine(0.75)
+	ccg.engine.WriteText(domain.TableCell{
 		Text: "In caso di sostituzione, " +
 			"il premio alla firma è al netto dell’eventuale rimborso dei premi non goduti sulla polizza sostituita." +
 			"\nIn ogni caso il premio alla firma può tener conto dell’eventuale diversa durata rispetto alle rate" +
@@ -3139,7 +3139,7 @@ func (qb *QBEGenerator) resumeSection() {
 	})
 }
 
-func (qb *QBEGenerator) claimsStatement() {
+func (ccg *CommercialCombinedGenerator) claimsStatement() {
 	const (
 		zeroClaims             = "0"
 		zeroClaimValue         = "€ 0,00"
@@ -3183,7 +3183,7 @@ func (qb *QBEGenerator) claimsStatement() {
 		},
 	}
 
-	for _, declaredClaim := range qb.policy.DeclaredClaims {
+	for _, declaredClaim := range ccg.policy.DeclaredClaims {
 		if _, ok := claimsMap[declaredClaim.GuaranteeSlug]; !ok {
 			// TODO: improve this case handling
 			continue
@@ -3200,7 +3200,7 @@ func (qb *QBEGenerator) claimsStatement() {
 		}
 	}
 
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      "Dichiarazioni da leggere con attenzione prima di firmare",
 		Height:    4.5,
 		Width:     190,
@@ -3212,8 +3212,8 @@ func (qb *QBEGenerator) claimsStatement() {
 		Align:     constants.LeftAlign,
 		Border:    "",
 	})
-	qb.engine.NewLine(1)
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.NewLine(1)
+	ccg.engine.WriteText(domain.TableCell{
 		Text: "Premesso di essere a conoscenza che le dichiarazioni non veritiere, inesatte o reticenti, " +
 			"da me rese, possono compromettere il diritto alla prestazione (come da art. 1892, 1893, 1894 c.c.), " +
 			"ai fini dell’efficacia delle garanzie",
@@ -3227,9 +3227,9 @@ func (qb *QBEGenerator) claimsStatement() {
 		Align:     constants.LeftAlign,
 		Border:    "",
 	})
-	qb.engine.NewLine(1)
-	qb.engine.SetX(95)
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.NewLine(1)
+	ccg.engine.SetX(95)
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      "DICHIARO",
 		Height:    4.5,
 		Width:     18.75,
@@ -3241,8 +3241,8 @@ func (qb *QBEGenerator) claimsStatement() {
 		Align:     constants.LeftAlign,
 		Border:    "B",
 	})
-	qb.engine.NewLine(1)
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.NewLine(1)
+	ccg.engine.WriteText(domain.TableCell{
 		Text: "1. di agire in qualità di proprietario dei Beni indicati nella presente Scheda di Polizza o per conto" +
 			" altrui o di chi spetta;\n2. che i Beni descritti nella presente Scheda di Polizza non sono assicurati" +
 			" presso altre compagnie di assicurazioni;\n3. che l’attività assicurata, " +
@@ -3259,9 +3259,9 @@ func (qb *QBEGenerator) claimsStatement() {
 		Align:     constants.LeftAlign,
 		Border:    "",
 	})
-	qb.engine.NewLine(1)
-	qb.engine.SetX(14)
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.NewLine(1)
+	ccg.engine.SetX(14)
+	ccg.engine.WriteText(domain.TableCell{
 		Text: "a) non vi sono state coperture assicurative annullate dall’assicuratore;\nb) si sono verificati" +
 			" eventi dannosi di importo liquidato come indicato nella tabella che segue:\n",
 		Height:    4.5,
@@ -3274,10 +3274,10 @@ func (qb *QBEGenerator) claimsStatement() {
 		Align:     constants.LeftAlign,
 		Border:    "",
 	})
-	qb.engine.NewLine(1)
+	ccg.engine.NewLine(1)
 
-	qb.engine.SetX(tabWidth)
-	qb.engine.DrawTable([][]domain.TableCell{
+	ccg.engine.SetX(tabWidth)
+	ccg.engine.DrawTable([][]domain.TableCell{
 		{
 			{
 				Text:      " ",
@@ -3326,8 +3326,8 @@ func (qb *QBEGenerator) claimsStatement() {
 		if index == len(guaranteeSlugs)-1 {
 			borders = []string{"TLB", "TLB", "1"}
 		}
-		qb.engine.SetX(tabWidth)
-		qb.engine.DrawTable([][]domain.TableCell{
+		ccg.engine.SetX(tabWidth)
+		ccg.engine.DrawTable([][]domain.TableCell{
 			{
 				{
 					Text:      claimsMap[slug].description,
@@ -3369,8 +3369,8 @@ func (qb *QBEGenerator) claimsStatement() {
 		})
 	}
 
-	qb.engine.NewLine(1)
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.NewLine(1)
+	ccg.engine.WriteText(domain.TableCell{
 		Text: "5. al momento della stipula di questa Polizza non ha ricevuto comunicazioni, " +
 			"richieste e notifiche che possano configurare un sinistro relativo alle garanzie assicurate e di non" +
 			" essere a conoscenza di eventi o circostanze che possano dare origine ad una richiesta di risarcimento.",
@@ -3384,33 +3384,33 @@ func (qb *QBEGenerator) claimsStatement() {
 		Align:     constants.LeftAlign,
 		Border:    "",
 	})
-	qb.engine.NewLine(5)
+	ccg.engine.NewLine(5)
 
-	qb.signatureForm()
+	ccg.signatureForm()
 }
 
-func (qb *QBEGenerator) statementsFirstPart() {
+func (ccg *CommercialCombinedGenerator) statementsFirstPart() {
 	const id = 1
-	statements := lib.SliceFilter(*qb.policy.Statements, func(statement models.Statement) bool {
+	statements := lib.SliceFilter(*ccg.policy.Statements, func(statement models.Statement) bool {
 		return statement.Id == id
 	})
 
-	qb.printStatement(statements[0])
+	ccg.printStatement(statements[0])
 }
 
-func (qb *QBEGenerator) statementsSecondPart() {
+func (ccg *CommercialCombinedGenerator) statementsSecondPart() {
 	const id = 1
-	statements := lib.SliceFilter(*qb.policy.Statements, func(statement models.Statement) bool {
+	statements := lib.SliceFilter(*ccg.policy.Statements, func(statement models.Statement) bool {
 		return statement.Id != id
 	})
 
 	for _, statement := range statements {
-		qb.printStatement(statement)
+		ccg.printStatement(statement)
 	}
 }
 
-func (qb *QBEGenerator) qbePrivacySection() {
-	qb.engine.WriteText(domain.TableCell{
+func (ccg *CommercialCombinedGenerator) qbePrivacySection() {
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      "DICHIARAZIONI E CONSENSI PRIVACY - assicuratore",
 		Height:    4.5,
 		Width:     190,
@@ -3422,8 +3422,8 @@ func (qb *QBEGenerator) qbePrivacySection() {
 		Align:     constants.LeftAlign,
 		Border:    "",
 	})
-	qb.engine.NewLine(1)
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.NewLine(1)
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      "Io sottoscritto dichiaro di avere perso visione dell’Informativa sul trattamento dei dati personali di QBE Europe SA/NV\nRappresentanza generale per l’Italia ai sensi dell’art. 13 del Regolamento UE n. 2016/679 (informativa resa all’interno del\nSet informativo contenente anche la Documentazione Informativa Precontrattuale, il Glossario e le Condizioni di\nAssicurazione) e di averne compreso i contenuti.",
 		Height:    4.5,
 		Width:     190,
@@ -3435,12 +3435,12 @@ func (qb *QBEGenerator) qbePrivacySection() {
 		Align:     constants.LeftAlign,
 		Border:    "",
 	})
-	qb.engine.NewLine(3)
-	qb.signatureForm()
+	ccg.engine.NewLine(3)
+	ccg.signatureForm()
 }
 
-func (qb *QBEGenerator) qbePersonalDataSection() {
-	qb.engine.WriteText(domain.TableCell{
+func (ccg *CommercialCombinedGenerator) qbePersonalDataSection() {
+	ccg.engine.WriteText(domain.TableCell{
 		Text:      "CONSENSO AL TRATTAMENTO DEI DATI PERSONALI E PARTICOLARI - assicuratore",
 		Height:    4.5,
 		Width:     190,
@@ -3452,8 +3452,8 @@ func (qb *QBEGenerator) qbePersonalDataSection() {
 		Align:     constants.LeftAlign,
 		Border:    "",
 	})
-	qb.engine.NewLine(1)
-	qb.engine.WriteText(domain.TableCell{
+	ccg.engine.NewLine(1)
+	ccg.engine.WriteText(domain.TableCell{
 		Text: "Presa visione dell’Informativa sul trattamento dei dati personali di QBE Europe SA/NV" +
 			" Rappresentanza generale per l’Italia, " +
 			"dichiaro di essere consapevole che il trattamento dei dati personali - anche relativi alla mia salute" +
@@ -3473,6 +3473,6 @@ func (qb *QBEGenerator) qbePersonalDataSection() {
 		Align:     constants.LeftAlign,
 		Border:    "",
 	})
-	qb.engine.NewLine(3)
-	qb.signatureForm()
+	ccg.engine.NewLine(3)
+	ccg.signatureForm()
 }
