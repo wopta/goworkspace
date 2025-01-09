@@ -3,6 +3,7 @@ package contract
 import (
 	"fmt"
 	"log"
+	"math"
 	"strings"
 	"time"
 
@@ -12,6 +13,10 @@ import (
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
+)
+
+const (
+	tabDimension = 15
 )
 
 type baseGenerator struct {
@@ -1647,4 +1652,318 @@ func (bg *baseGenerator) companySignature() {
 	bg.engine.SetY(bg.engine.GetY() - 6)
 	bg.engine.InsertImage(lib.GetAssetPathByEnvV2()+logo.path, logo.x, bg.engine.GetY()+logo.y, logo.width,
 		logo.height)
+}
+
+func (bg *baseGenerator) checkSurveySpace(survey models.Survey) {
+	var answer string
+	leftMargin, _, rightMargin, _ := bg.engine.GetMargins()
+	pageWidth, pageHeight := bg.engine.GetPageSize()
+	availableWidth := pageWidth - leftMargin - rightMargin - 2
+	requiredHeight := 5.0
+	currentY := bg.engine.GetY()
+
+	surveyTitle := survey.Title
+	surveySubtitle := survey.Subtitle
+
+	if surveyTitle != "" {
+		bg.engine.SetFontStyle(constants.BoldFontStyle)
+		bg.engine.SetFontSize(constants.LargeFontSize)
+		lines := bg.engine.SplitText(surveyTitle, availableWidth)
+		requiredHeight += 3.5 * float64(len(lines))
+	}
+	if surveySubtitle != "" {
+		bg.engine.SetFontStyle(constants.BoldFontStyle)
+		bg.engine.SetFontSize(constants.RegularFontSize)
+		lines := bg.engine.SplitText(surveySubtitle, availableWidth)
+		requiredHeight += 3.5 * float64(len(lines))
+	}
+
+	for _, question := range survey.Questions {
+		availableWidth = pageWidth - leftMargin - rightMargin - 2
+
+		questionText := question.Question
+
+		if question.IsBold {
+			bg.engine.SetFontStyle(constants.BoldFontStyle)
+			bg.engine.SetFontSize(constants.LargeFontSize)
+		} else {
+			bg.engine.SetFontStyle(constants.RegularFontStyle)
+			bg.engine.SetFontSize(constants.RegularFontSize)
+		}
+		if question.Indent {
+			availableWidth -= tabDimension / 2
+		}
+
+		if question.HasAnswer {
+			answer = "NO"
+			if *question.Answer {
+				answer = "SI"
+			}
+		}
+
+		lines := bg.engine.SplitText(questionText+answer, availableWidth)
+		requiredHeight += 3 * float64(len(lines))
+	}
+
+	if (!bg.isProposal && survey.ContractorSign) || survey.CompanySign {
+		requiredHeight += 35
+	}
+
+	if (pageHeight-18)-currentY < requiredHeight {
+		bg.engine.NewPage()
+	}
+}
+
+func (bg *baseGenerator) printSurvey(survey models.Survey) error {
+	var dotsString string
+	leftMargin, _, rightMargin, _ := bg.engine.GetMargins()
+	pageWidth, _ := bg.engine.GetPageSize()
+	availableWidth := pageWidth - leftMargin - rightMargin - 2
+
+	bg.checkSurveySpace(survey)
+
+	surveyTitle := survey.Title
+	surveySubtitle := survey.Subtitle
+
+	bg.engine.SetFontStyle(constants.BoldFontStyle)
+	bg.engine.SetFontSize(constants.RegularFontSize)
+	if survey.HasAnswer {
+		answer := "NO"
+		if *survey.Answer {
+			answer = "SI"
+		}
+
+		answerWidth := bg.engine.GetStringWidth(answer)
+		dotWidth := bg.engine.GetStringWidth(".")
+
+		var surveyWidth, paddingWidth float64
+		var lines []string
+		if surveyTitle != "" {
+			lines = bg.engine.SplitText(surveyTitle+answer, availableWidth)
+		} else if surveySubtitle != "" {
+			lines = bg.engine.SplitText(surveySubtitle+answer, availableWidth)
+		}
+
+		surveyWidth = bg.engine.GetStringWidth(lines[len(lines)-1])
+		paddingWidth = availableWidth - surveyWidth - answerWidth
+
+		dotsString = strings.Repeat(".", int(math.Max((paddingWidth/dotWidth)-2, 0))) + answer
+	}
+	if surveyTitle != "" {
+		bg.engine.WriteText(domain.TableCell{
+			Text:      surveyTitle + dotsString,
+			Height:    4,
+			Width:     190,
+			FontSize:  constants.LargeFontSize,
+			FontStyle: constants.BoldFontStyle,
+			FontColor: constants.PinkColor,
+			Fill:      false,
+			FillColor: domain.Color{},
+			Align:     constants.LeftAlign,
+			Border:    "",
+		})
+	}
+	if surveySubtitle != "" {
+		bg.engine.WriteText(domain.TableCell{
+			Text:      surveySubtitle + dotsString,
+			Height:    3.5,
+			Width:     availableWidth,
+			FontSize:  constants.RegularFontSize,
+			FontStyle: constants.BoldFontStyle,
+			FontColor: constants.BlackColor,
+			Fill:      false,
+			FillColor: domain.Color{},
+			Align:     constants.LeftAlign,
+			Border:    "",
+		})
+	}
+
+	for _, question := range survey.Questions {
+		dotsString = ""
+		availableWidth = pageWidth - leftMargin - rightMargin - 2
+		fontStyle := constants.RegularFontStyle
+		fontSize := constants.RegularFontSize
+
+		if question.IsBold {
+			fontStyle = constants.BoldFontStyle
+		}
+
+		if question.Indent {
+			bg.engine.SetX(tabDimension)
+			availableWidth -= tabDimension / 2
+		}
+
+		if question.HasAnswer {
+			var questionWidth, paddingWidth float64
+			answer := "NO"
+			if *question.Answer {
+				answer = "SI"
+			}
+
+			answerWidth := bg.engine.GetStringWidth(answer)
+			dotWidth := bg.engine.GetStringWidth(".")
+
+			lines := bg.engine.SplitText(question.Question+answer, availableWidth)
+
+			questionWidth = bg.engine.GetStringWidth(lines[len(lines)-1])
+			paddingWidth = availableWidth - questionWidth - answerWidth
+
+			dotsString = strings.Repeat(".", int(math.Max((paddingWidth/dotWidth)-2, 0))) + answer
+		}
+		bg.engine.WriteText(domain.TableCell{
+			Text:      question.Question + dotsString,
+			Height:    3.5,
+			Width:     availableWidth,
+			FontSize:  fontSize,
+			FontStyle: fontStyle,
+			FontColor: constants.BlackColor,
+			Fill:      false,
+			FillColor: domain.Color{},
+			Align:     constants.LeftAlign,
+			Border:    "",
+		})
+	}
+	bg.engine.NewLine(3)
+
+	if survey.CompanySign {
+		bg.companySignature()
+		if bg.isProposal {
+			bg.engine.NewLine(20)
+		}
+	}
+	if !bg.isProposal && survey.ContractorSign {
+		bg.signatureForm()
+		bg.engine.NewLine(10)
+	}
+	return nil
+}
+
+func (bg *baseGenerator) checkStatementSpace(statement models.Statement) {
+	leftMargin, _, rightMargin, _ := bg.engine.GetMargins()
+	pageWidth, pageHeight := bg.engine.GetPageSize()
+	availableWidth := pageWidth - leftMargin - rightMargin - 2
+	requiredHeight := 5.0
+	currentY := bg.engine.GetY()
+
+	title := statement.Title
+	subtitle := statement.Subtitle
+
+	if title != "" {
+		bg.engine.SetFontStyle(constants.BoldFontStyle)
+		bg.engine.SetFontSize(constants.LargeFontSize)
+		lines := bg.engine.SplitText(title, availableWidth)
+		requiredHeight += 3.5 * float64(len(lines))
+	}
+	if subtitle != "" {
+		bg.engine.SetFontStyle(constants.RegularFontStyle)
+		bg.engine.SetFontSize(constants.RegularFontSize)
+		lines := bg.engine.SplitText(subtitle, availableWidth)
+		requiredHeight += 3.5 * float64(len(lines))
+	}
+	for _, question := range statement.Questions {
+		availableWidth = pageWidth - leftMargin - rightMargin - 2
+
+		text := question.Question
+
+		if question.IsBold {
+			bg.engine.SetFontSize(constants.RegularFontSize)
+		} else {
+			bg.engine.SetFontStyle(constants.RegularFontStyle)
+		}
+		bg.engine.SetFontSize(constants.RegularFontSize)
+
+		if question.Indent {
+			availableWidth -= tabDimension / 2
+		}
+
+		answer := ""
+		if question.HasAnswer {
+			answer = "NO"
+			if *question.Answer {
+				answer = "SI"
+			}
+		}
+
+		lines := bg.engine.SplitText(text+answer, availableWidth)
+		requiredHeight += 3 * float64(len(lines))
+	}
+
+	if (!bg.isProposal && statement.ContractorSign) || statement.CompanySign {
+		requiredHeight += 35
+	}
+
+	if (pageHeight-18)-currentY < requiredHeight {
+		bg.engine.NewPage()
+	}
+}
+
+func (bg *baseGenerator) printStatement(statement models.Statement) {
+	bg.checkStatementSpace(statement)
+
+	title := statement.Title
+	subtitle := statement.Subtitle
+
+	if title != "" {
+		bg.engine.WriteText(domain.TableCell{
+			Text:      title,
+			Height:    4,
+			Width:     190,
+			FontSize:  constants.LargeFontSize,
+			FontStyle: constants.BoldFontStyle,
+			FontColor: constants.PinkColor,
+			Fill:      false,
+			FillColor: domain.Color{},
+			Align:     constants.LeftAlign,
+			Border:    "",
+		})
+	}
+	if subtitle != "" {
+		bg.engine.WriteText(domain.TableCell{
+			Text:      subtitle,
+			Height:    3.5,
+			Width:     190,
+			FontSize:  constants.RegularFontSize,
+			FontStyle: constants.RegularFontStyle,
+			FontColor: constants.BlackColor,
+			Fill:      false,
+			FillColor: domain.Color{},
+			Align:     constants.LeftAlign,
+			Border:    "",
+		})
+	}
+	for _, question := range statement.Questions {
+		text := question.Question
+		fontStyle := constants.RegularFontStyle
+		fontSize := constants.RegularFontSize
+		if question.IsBold {
+			fontStyle = constants.BoldFontStyle
+		}
+		if question.Indent {
+			bg.engine.SetX(tabDimension)
+		}
+		bg.engine.WriteText(domain.TableCell{
+			Text:      text,
+			Height:    3.5,
+			Width:     190,
+			FontSize:  fontSize,
+			FontStyle: fontStyle,
+			FontColor: constants.BlackColor,
+			Fill:      false,
+			FillColor: domain.Color{},
+			Align:     constants.LeftAlign,
+			Border:    "",
+		})
+	}
+	bg.engine.NewLine(3)
+
+	if statement.CompanySign {
+		bg.companySignature()
+		if bg.isProposal {
+			bg.engine.NewLine(20)
+		}
+	}
+	if !bg.isProposal && statement.ContractorSign {
+		bg.signatureForm()
+		bg.engine.NewLine(10)
+	}
 }

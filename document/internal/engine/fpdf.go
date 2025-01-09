@@ -238,3 +238,19 @@ func (f *Fpdf) DrawLine(startX, startY, endX, endY, lineWidth float64, color dom
 	f.pdf.SetLineWidth(lineWidth)
 	f.pdf.Line(startX, startY, endX, endY)
 }
+
+func (f *Fpdf) GetMargins() (float64, float64, float64, float64) {
+	return f.pdf.GetMargins()
+}
+
+func (f *Fpdf) GetPageSize() (float64, float64) {
+	return f.pdf.GetPageSize()
+}
+
+func (f *Fpdf) SplitText(text string, width float64) []string {
+	return f.pdf.SplitText(text, width)
+}
+
+func (f *Fpdf) GetStringWidth(text string) float64 {
+	return f.pdf.GetStringWidth(text)
+}
