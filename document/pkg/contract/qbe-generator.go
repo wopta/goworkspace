@@ -90,11 +90,11 @@ func (qb *QBEGenerator) Contract() ([]byte, error) {
 
 	qb.engine.NewLine(10)
 
-	qb.introTable()
+	qb.introSection()
 
 	qb.engine.NewLine(10)
 
-	qb.whoWeAreTable()
+	qb.whoWeAreSection()
 
 	qb.engine.NewLine(10)
 
@@ -519,7 +519,7 @@ func (qb *QBEGenerator) mainFooter() {
 	})
 }
 
-func (qb *QBEGenerator) introTable() {
+func (qb *QBEGenerator) introSection() {
 	introTable := [][]domain.TableCell{
 		{
 			{
@@ -551,7 +551,7 @@ func (qb *QBEGenerator) introTable() {
 	qb.engine.DrawTable(introTable)
 }
 
-func (qb *QBEGenerator) whoWeAreTable() {
+func (qb *QBEGenerator) whoWeAreSection() {
 	whoWeAreTable := [][]domain.TableCell{
 		{
 			{
@@ -1137,7 +1137,7 @@ func (qb *QBEGenerator) guaranteesDetailsSection() {
 		table = append(table, row)
 	}
 
-	for _, slug := range enterpriseSlugs[:6] {
+	for _, slug := range enterpriseSlugs[:7] {
 		row := []domain.TableCell{
 			{
 				Text:      guaranteeNamesMap[slug],
@@ -1188,7 +1188,7 @@ func (qb *QBEGenerator) guaranteesDetailsSection() {
 		},
 	})
 
-	for _, slug := range enterpriseSlugs[6:11] {
+	for _, slug := range enterpriseSlugs[7:11] {
 		row := []domain.TableCell{
 			{
 				Text:      guaranteeNamesMap[slug],
