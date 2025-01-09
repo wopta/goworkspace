@@ -138,12 +138,25 @@ func (qb *QBEGenerator) Contract() ([]byte, error) {
 
 	qb.engine.NewLine(5)
 
-	// TODO: add statements
+	qb.statementsFirstPart()
 
-	// TODO: remove me
 	qb.engine.NewPage()
 
 	qb.claimsStatement()
+
+	qb.statementsSecondPart()
+
+	qb.engine.NewLine(3)
+
+	qb.qbePrivacySection()
+
+	qb.engine.NewPage()
+
+	qb.qbePersonalDataSection()
+
+	qb.engine.NewLine(5)
+
+	qb.commercialConsentSection()
 
 	qb.annexSections()
 
@@ -152,10 +165,6 @@ func (qb *QBEGenerator) Contract() ([]byte, error) {
 	qb.woptaFooter()
 
 	qb.woptaPrivacySection()
-
-	qb.engine.NewLine(5)
-
-	qb.commercialConsentSection()
 
 	return qb.engine.RawDoc()
 }
@@ -3377,5 +3386,93 @@ func (qb *QBEGenerator) claimsStatement() {
 	})
 	qb.engine.NewLine(5)
 
+	qb.signatureForm()
+}
+
+func (qb *QBEGenerator) statementsFirstPart() {
+	const id = 1
+	statements := lib.SliceFilter(*qb.policy.Statements, func(statement models.Statement) bool {
+		return statement.Id == id
+	})
+
+	qb.printStatement(statements[0])
+}
+
+func (qb *QBEGenerator) statementsSecondPart() {
+	const id = 1
+	statements := lib.SliceFilter(*qb.policy.Statements, func(statement models.Statement) bool {
+		return statement.Id != id
+	})
+
+	for _, statement := range statements {
+		qb.printStatement(statement)
+	}
+}
+
+func (qb *QBEGenerator) qbePrivacySection() {
+	qb.engine.WriteText(domain.TableCell{
+		Text:      "DICHIARAZIONI E CONSENSI PRIVACY - assicuratore",
+		Height:    4.5,
+		Width:     190,
+		FontSize:  constants.LargeFontSize,
+		FontStyle: constants.BoldFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "",
+	})
+	qb.engine.NewLine(1)
+	qb.engine.WriteText(domain.TableCell{
+		Text:      "Io sottoscritto dichiaro di avere perso visione dell’Informativa sul trattamento dei dati personali di QBE Europe SA/NV\nRappresentanza generale per l’Italia ai sensi dell’art. 13 del Regolamento UE n. 2016/679 (informativa resa all’interno del\nSet informativo contenente anche la Documentazione Informativa Precontrattuale, il Glossario e le Condizioni di\nAssicurazione) e di averne compreso i contenuti.",
+		Height:    4.5,
+		Width:     190,
+		FontSize:  constants.RegularFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "",
+	})
+	qb.engine.NewLine(3)
+	qb.signatureForm()
+}
+
+func (qb *QBEGenerator) qbePersonalDataSection() {
+	qb.engine.WriteText(domain.TableCell{
+		Text:      "CONSENSO AL TRATTAMENTO DEI DATI PERSONALI E PARTICOLARI - assicuratore",
+		Height:    4.5,
+		Width:     190,
+		FontSize:  constants.LargeFontSize,
+		FontStyle: constants.BoldFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "",
+	})
+	qb.engine.NewLine(1)
+	qb.engine.WriteText(domain.TableCell{
+		Text: "Presa visione dell’Informativa sul trattamento dei dati personali di QBE Europe SA/NV" +
+			" Rappresentanza generale per l’Italia, " +
+			"dichiaro di essere consapevole che il trattamento dei dati personali - anche relativi alla mia salute" +
+			" - eventualmente forniti da parte di QBE Europe SA/NV Rappresentanza generale per l’Italia in qualità di" +
+			" Titolare del trattamento è necessario per l'adempimento delle Finalità Assicurative di cui all" +
+			"’Informativa sul trattamento dei dati personali e, pertanto, presto il consenso a tale trattamento. " +
+			"QBE Europe SA/NV Rappresentanza generale per l’Italia informa il Contraente della possibilità di" +
+			" revocare il suo consenso in qualsiasi momento. Tuttavia, in caso di revoca del consenso, " +
+			"il contratto assicurativo non potrà essere eseguito e/o concluso.",
+		Height:    4.5,
+		Width:     190,
+		FontSize:  constants.RegularFontSize,
+		FontStyle: constants.RegularFontStyle,
+		FontColor: constants.BlackColor,
+		Fill:      false,
+		FillColor: domain.Color{},
+		Align:     constants.LeftAlign,
+		Border:    "",
+	})
+	qb.engine.NewLine(3)
 	qb.signatureForm()
 }
