@@ -175,223 +175,70 @@ func (ccg *CommercialCombinedGenerator) Contract() ([]byte, error) {
 }
 
 func (ccg *CommercialCombinedGenerator) mainHeader() {
+	const (
+		firstColumnWidth  = 115
+		secondColumnWidth = 75
+	)
+
 	contractDTO := ccg.dto.ContractDTO
 	contractorDTO := ccg.dto.ContractorDTO
 
-	address := fmt.Sprintf("%s %s\n%s %s (%s)", contractorDTO.StreetName,
-		contractorDTO.StreetNumber, contractorDTO.PostalCode,
-		contractorDTO.City, contractorDTO.CityCode)
+	parser := func(rows [][]string) [][]domain.TableCell {
+		result := make([][]domain.TableCell, 0, len(rows))
 
-	table := [][]domain.TableCell{
-		{
-			{
-				Text:      contractDTO.CodeHeading + " " + contractDTO.Code,
-				Height:    constants.CellHeight,
-				Width:     115,
-				FontStyle: constants.BoldFontStyle,
-				FontColor: constants.BlackColor,
-				FontSize:  constants.RegularFontSize,
-				Fill:      false,
-				FillColor: domain.Color{},
-				Align:     constants.LeftAlign,
-				Border:    "",
-			},
-			{
-				Text:      "I tuoi dati",
-				Height:    constants.CellHeight,
-				Width:     75,
-				FontStyle: constants.BoldFontStyle,
-				FontColor: constants.BlackColor,
-				FontSize:  constants.RegularFontSize,
-				Fill:      false,
-				FillColor: domain.Color{},
-				Align:     constants.LeftAlign,
-				Border:    "",
-			},
-		},
-		{
-			{
-				Text:      "Decorre dal: " + contractDTO.StartDate + " ore 24:00",
-				Height:    constants.CellHeight,
-				Width:     115,
-				FontStyle: constants.RegularFontStyle,
-				FontColor: constants.BlackColor,
-				FontSize:  constants.RegularFontSize,
-				Fill:      false,
-				FillColor: domain.Color{},
-				Align:     constants.LeftAlign,
-				Border:    "",
-			},
-			{
-				Text:      "Contraente: " + contractorDTO.Name + " " + contractorDTO.Surname,
-				Height:    constants.CellHeight,
-				Width:     75,
-				FontStyle: constants.RegularFontStyle,
-				FontColor: constants.BlackColor,
-				FontSize:  constants.RegularFontSize,
-				Fill:      false,
-				FillColor: domain.Color{},
-				Align:     constants.LeftAlign,
-				Border:    "",
-			},
-		},
-		{
-			{
-				Text:      "Scade il: " + contractDTO.EndDate + " ore 24:00",
-				Height:    constants.CellHeight,
-				Width:     115,
-				FontStyle: constants.RegularFontStyle,
-				FontColor: constants.BlackColor,
-				FontSize:  constants.RegularFontSize,
-				Fill:      false,
-				FillColor: domain.Color{},
-				Align:     constants.LeftAlign,
-				Border:    "",
-			},
-			{
-				Text:      "P.IVA: " + contractorDTO.VatCode,
-				Height:    constants.CellHeight,
-				Width:     75,
-				FontStyle: constants.RegularFontStyle,
-				FontColor: constants.BlackColor,
-				FontSize:  constants.RegularFontSize,
-				Fill:      false,
-				FillColor: domain.Color{},
-				Align:     constants.LeftAlign,
-				Border:    "",
-			},
-		},
-		{
-			{
-				Text:      "Si rinnova a scadenza, salvo disdetta da inviare 30 giorni prima",
-				Height:    constants.CellHeight,
-				Width:     115,
-				FontStyle: constants.RegularFontStyle,
-				FontColor: constants.BlackColor,
-				FontSize:  constants.RegularFontSize,
-				Fill:      false,
-				FillColor: domain.Color{},
-				Align:     constants.LeftAlign,
-				Border:    "",
-			},
-			{
-				Text:      "Codice Fiscale: " + contractorDTO.FiscalCode,
-				Height:    constants.CellHeight,
-				Width:     75,
-				FontStyle: constants.RegularFontStyle,
-				FontColor: constants.BlackColor,
-				FontSize:  constants.RegularFontSize,
-				Fill:      false,
-				FillColor: domain.Color{},
-				Align:     constants.LeftAlign,
-				Border:    "",
-			},
-		},
-		{
-			{
-				Text:      "Frazionamento: " + contractDTO.PaymentSplit,
-				Height:    constants.CellHeight,
-				Width:     115,
-				FontStyle: constants.RegularFontStyle,
-				FontColor: constants.BlackColor,
-				FontSize:  constants.RegularFontSize,
-				Fill:      false,
-				FillColor: domain.Color{},
-				Align:     constants.LeftAlign,
-				Border:    "",
-			},
-			{
-				Text:      strings.Split("Indirizzo: "+address, "\n")[0],
-				Height:    constants.CellHeight,
-				Width:     75,
-				FontStyle: constants.RegularFontStyle,
-				FontColor: constants.BlackColor,
-				FontSize:  constants.RegularFontSize,
-				Fill:      false,
-				FillColor: domain.Color{},
-				Align:     constants.LeftAlign,
-				Border:    "",
-			},
-		},
-		{
-			{
-				Text:      "Prossimo pagamento il: " + contractDTO.NextPay,
-				Height:    constants.CellHeight,
-				Width:     115,
-				FontStyle: constants.RegularFontStyle,
-				FontColor: constants.BlackColor,
-				FontSize:  constants.RegularFontSize,
-				Fill:      false,
-				FillColor: domain.Color{},
-				Align:     constants.LeftAlign,
-				Border:    "",
-			},
-			{
-				Text:      strings.Split(address, "\n")[1],
-				Height:    constants.CellHeight,
-				Width:     75,
-				FontStyle: constants.RegularFontStyle,
-				FontColor: constants.BlackColor,
-				FontSize:  constants.RegularFontSize,
-				Fill:      false,
-				FillColor: domain.Color{},
-				Align:     constants.LeftAlign,
-				Border:    "",
-			},
-		},
-		{
-			{
-				Text:      "Sostituisce la Polizza: ======",
-				Height:    constants.CellHeight,
-				Width:     115,
-				FontStyle: constants.RegularFontStyle,
-				FontColor: constants.BlackColor,
-				FontSize:  constants.RegularFontSize,
-				Fill:      false,
-				FillColor: domain.Color{},
-				Align:     constants.LeftAlign,
-				Border:    "",
-			},
-			{
-				Text:      "Mail: " + contractorDTO.Mail,
-				Height:    constants.CellHeight,
-				Width:     75,
-				FontStyle: constants.RegularFontStyle,
-				FontColor: constants.BlackColor,
-				FontSize:  constants.RegularFontSize,
-				Fill:      false,
-				FillColor: domain.Color{},
-				Align:     constants.LeftAlign,
-				Border:    "",
-			},
-		},
-		{
-			{
-				Text:      "Presenza Vincolo: " + contractDTO.HasBond + " Convenzione: NO",
-				Height:    constants.CellHeight,
-				Width:     115,
-				FontStyle: constants.RegularFontStyle,
-				FontColor: constants.BlackColor,
-				FontSize:  constants.RegularFontSize,
-				Fill:      false,
-				FillColor: domain.Color{},
-				Align:     constants.LeftAlign,
-				Border:    "",
-			},
-			{
-				Text:      "Telefono: " + contractorDTO.Phone,
-				Height:    constants.CellHeight,
-				Width:     75,
-				FontStyle: constants.RegularFontStyle,
-				FontColor: constants.BlackColor,
-				FontSize:  constants.RegularFontSize,
-				Fill:      false,
-				FillColor: domain.Color{},
-				Align:     constants.LeftAlign,
-				Border:    "",
-			},
-		},
+		for index, row := range rows {
+			fontStyle := constants.RegularFontStyle
+			if index == 0 {
+				fontStyle = constants.BoldFontStyle
+			}
+			result = append(result, []domain.TableCell{
+				{
+					Text:      row[0],
+					Height:    constants.CellHeight,
+					Width:     firstColumnWidth,
+					FontStyle: fontStyle,
+					FontColor: constants.BlackColor,
+					FontSize:  constants.RegularFontSize,
+					Fill:      false,
+					FillColor: domain.Color{},
+					Align:     constants.LeftAlign,
+					Border:    "",
+				},
+				{
+					Text:      row[1],
+					Height:    constants.CellHeight,
+					Width:     secondColumnWidth,
+					FontStyle: fontStyle,
+					FontColor: constants.BlackColor,
+					FontSize:  constants.RegularFontSize,
+					Fill:      false,
+					FillColor: domain.Color{},
+					Align:     constants.LeftAlign,
+					Border:    "",
+				},
+			})
+		}
+		return result
 	}
+
+	address := strings.Split(fmt.Sprintf("%s %s\n%s %s (%s)", contractorDTO.StreetName,
+		contractorDTO.StreetNumber, contractorDTO.PostalCode,
+		contractorDTO.City, contractorDTO.CityCode), "\n")
+
+	rows := [][]string{
+		{contractDTO.CodeHeading + " " + contractDTO.Code, "I tuoi dati"},
+		{"Decorre dal: " + contractDTO.StartDate + " ore 24:00",
+			"Contraente: " + contractorDTO.Name + " " + contractorDTO.Surname},
+		{
+			"Scade il: " + contractDTO.EndDate + " ore 24:00", "P.IVA: " + contractorDTO.VatCode},
+		{"Si rinnova a scadenza, salvo disdetta da inviare 30 giorni prima", "Codice Fiscale: " + contractorDTO.FiscalCode},
+		{"Frazionamento: " + contractDTO.PaymentSplit, address[0]},
+		{"Prossimo pagamento il: " + contractDTO.NextPay, address[1]},
+		{"Sostituisce la Polizza: ======", "Mail: " + contractorDTO.Mail},
+		{"Presenza Vincolo: " + contractDTO.HasBond + " Convenzione: NO", "Telefono: " + contractorDTO.Phone},
+	}
+
+	table := parser(rows)
 
 	ccg.engine.SetHeader(func() {
 		ccg.engine.InsertImage(lib.GetAssetPathByEnvV2()+"logo_qbe.png", 75, 6.5, 22, 8)
