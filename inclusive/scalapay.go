@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+
 	"cloud.google.com/go/civil"
 	"github.com/google/uuid"
 	lib "github.com/wopta/goworkspace/lib"
@@ -14,14 +15,14 @@ import (
 
 const (
 	dataset       = "wopta_inclusive"
-	movementTable = "bank_account_movement"
-	usersTable    = "bank_account_users"
+	movementTable = "bank_account_movement_scalapay"
+	usersTable    = "bank_account_users_scalapay"
 	layout        = "2006-01-02"
 )
 
 // TO DO security,payload,error,fasature
 func BankAccountScalapayFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-
+	log.SetPrefix("BankAccountScalapayFx ")
 	var (
 		e   error
 		obj BankAccountMovement
@@ -39,13 +40,13 @@ func BankAccountScalapayFx(resp http.ResponseWriter, r *http.Request) (string, i
 	if obj.MovementType == "insert" {
 		res, _ := QueryRowsBigQuery[BankAccountMovement](dataset,
 			usersTable,
-			"select * from `"+dataset+"."+movementTable+"` where fiscalCode='"+obj.FiscalCode+"' and guaranteesCode ='"+obj.GuaranteesCode+"' and id ='"+obj.Id+"'")
+			"select * from `"+dataset+"."+usersTable+"` where fiscalCode='"+obj.FiscalCode+"' and guaranteesCode ='"+obj.GuaranteesCode+"' and id ='"+obj.Id+"'")
 		log.Println(len(res))
 		if len(res) == 0 {
 			e = lib.InsertRowsBigQuery(dataset, usersTable, obj)
 		} else {
 			e = lib.UpdateRowBigQuery(dataset, usersTable, map[string]string{
-				"status":  obj.Status,
+				"status":    obj.Status,
 				"startDate": obj.StartDate.Format(layout) + " 00:00:00",
 			}, "fiscalCode='"+obj.FiscalCode+"' and guaranteesCode='"+obj.GuaranteesCode+"'")
 		}
