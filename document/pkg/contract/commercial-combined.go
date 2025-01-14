@@ -486,64 +486,8 @@ func (ccg *CommercialCombinedGenerator) whoWeAreSection() {
 }
 
 func (ccg *CommercialCombinedGenerator) insuredDetailsSection() {
-	type buildingInfo struct {
-		address          string
-		buildingMaterial string
-		hasSandwichPanel string
-		hasAlarm         string
-		hasSprinkler     string
-		naics            string
-		naicsDetail      string
-	}
-
-	newBuildingInfo := func() *buildingInfo {
-		return &buildingInfo{
-			address:          "======",
-			buildingMaterial: "======",
-			hasSandwichPanel: "======",
-			hasAlarm:         "======",
-			hasSprinkler:     "======",
-			naics:            "======",
-			naicsDetail:      "======",
-		}
-	}
-
+	buildings := ccg.dto.BuildingsDTO
 	enterprise := ccg.dto.EnterpriseDTO
-
-	buildings := make([]*buildingInfo, 5)
-	for i := 0; i < 5; i++ {
-		buildings[i] = newBuildingInfo()
-	}
-
-	index := 0
-	for _, asset := range ccg.policy.Assets {
-		if asset.Building == nil {
-			continue
-		}
-
-		buildings[index].address = fmt.Sprintf("%s, %s - %s %s (%s)", asset.Building.Address,
-			asset.Building.StreetNumber, asset.Building.PostalCode, asset.Building.City, asset.Building.CityCode)
-		buildings[index].buildingMaterial = asset.Building.BuildingMaterial
-		buildings[index].hasSandwichPanel = "NO"
-		if asset.Building.HasSandwichPanel {
-			buildings[index].hasSandwichPanel = "SI"
-		}
-
-		buildings[index].hasAlarm = "NO"
-		if asset.Building.HasAlarm {
-			buildings[index].hasAlarm = "SI"
-		}
-
-		buildings[index].hasSprinkler = "NO"
-		if asset.Building.HasSprinkler {
-			buildings[index].hasSprinkler = "SI"
-		}
-
-		buildings[index].naics = asset.Building.Naics
-		buildings[index].naicsDetail = asset.Building.NaicsDetail
-
-		index++
-	}
 
 	table := make([][]domain.TableCell, 0)
 
@@ -570,6 +514,9 @@ func (ccg *CommercialCombinedGenerator) insuredDetailsSection() {
 			border = "TB"
 		}
 
+		address := fmt.Sprintf("%s, %s - %s %s (%s)", building.StreetName,
+			building.StreetNumber, building.PostalCode, building.City, building.CityCode)
+
 		row := []domain.TableCell{
 			{
 				Text:      fmt.Sprintf(" \nSede %d\n ", i+1),
@@ -587,8 +534,8 @@ func (ccg *CommercialCombinedGenerator) insuredDetailsSection() {
 				Text: fmt.Sprintf("Indirizzo: %s\nFabbricato in %s, "+
 					"pannelli sandwich: %s; Allarme antifurto: %s, Sprinkler: %s,"+
 					"\nAttività NAICS codice: %s Descrizione: %s",
-					building.address, building.buildingMaterial, building.hasSandwichPanel, building.hasAlarm,
-					building.hasSprinkler, building.naics, building.naicsDetail),
+					address, building.BuildingMaterial, building.HasSandwichPanel, building.HasAlarm,
+					building.HasSprinkler, building.Naics, building.NaicsDetail),
 				Height:    4.5,
 				Width:     150,
 				FontSize:  constants.RegularFontSize,
@@ -681,7 +628,6 @@ func (ccg *CommercialCombinedGenerator) insuredDetailsSection() {
 	table = append(table, riskDescriptionRow)
 
 	ccg.engine.DrawTable(table)
-
 }
 
 // TODO: parse policy info

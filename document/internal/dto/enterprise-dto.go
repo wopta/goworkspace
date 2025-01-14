@@ -24,18 +24,7 @@ func newEnterpriseDTO() *enterpriseDTO {
 	}
 }
 
-func (e *enterpriseDTO) fromPolicy(assets []models.Asset) {
-	var enterprise models.Enterprise
-	var guarantees []models.Guarante
-
-	for index, asset := range assets {
-		if asset.Enterprise != nil {
-			enterprise = *assets[index].Enterprise
-			guarantees = assets[index].Guarantees
-			break
-		}
-	}
-
+func (e *enterpriseDTO) fromPolicy(enterprise models.Enterprise, guarantees []models.Guarante) {
 	if enterprise.Revenue != 0.0 {
 		e.Revenue = enterprise.Revenue
 	}
@@ -50,14 +39,8 @@ func (e *enterpriseDTO) fromPolicy(assets []models.Asset) {
 	}
 
 	for _, guarantee := range guarantees {
-		guaranteeDTO := newGuaranteeDTO()
-		if len(guarantee.CompanyName) != 0 {
-			guaranteeDTO.Description = guarantee.CompanyName
-		}
-		guaranteeDTO.SumInsuredLimitOfIndemnity = guarantee.Value.SumInsuredLimitOfIndemnity
-		guaranteeDTO.LimitOfIndemnity = guarantee.Value.LimitOfIndemnity
-		guaranteeDTO.SumInsured = guarantee.Value.SumInsured
-
-		e.Guarantees[guarantee.Slug] = guaranteeDTO
+		dto := newGuaranteeDTO()
+		dto.fromPolicy(guarantee)
+		e.Guarantees[guarantee.Slug] = dto
 	}
 }
