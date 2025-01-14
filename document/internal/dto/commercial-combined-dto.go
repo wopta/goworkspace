@@ -11,15 +11,18 @@ const (
 )
 
 type CommercialCombinedDTO struct {
-	ContractDTO *contractDTO
+	ContractDTO   *contractDTO
+	ContractorDTO *contractorDTO
 }
 
 func NewCommercialCombinedDto() *CommercialCombinedDTO {
 	return &CommercialCombinedDTO{
-		ContractDTO: newContractDTO(),
+		ContractDTO:   newContractDTO(),
+		ContractorDTO: NewContractorDTO(),
 	}
 }
 
-func (cc *CommercialCombinedDTO) ParseFromPolicy(policy models.Policy, isProposal bool) {
-	cc.ContractDTO.parseFromPolicy(policy, isProposal)
+func (cc *CommercialCombinedDTO) FromPolicy(policy models.Policy, isProposal bool) {
+	cc.ContractDTO.fromPolicy(policy, isProposal)
+	cc.ContractorDTO.fromPolicy(policy.Contractor)
 }

@@ -31,7 +31,7 @@ func newContractDTO() *contractDTO {
 
 }
 
-func (c *contractDTO) parseFromPolicy(policy models.Policy, isProposal bool) {
+func (c *contractDTO) fromPolicy(policy models.Policy, isProposal bool) {
 	c.CodeHeading = "I dati della tua Proposta nr."
 	c.Code = strconv.Itoa(policy.ProposalNumber)
 

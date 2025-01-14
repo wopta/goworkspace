@@ -72,7 +72,7 @@ type CommercialCombinedGenerator struct {
 func NewCommercialCombinedGenerator(engine *engine.Fpdf, policy *models.Policy, node *models.NetworkNode,
 	isProposal bool) *CommercialCombinedGenerator {
 	commercialCombinedDTO := dto.NewCommercialCombinedDto()
-	commercialCombinedDTO.ParseFromPolicy(*policy, isProposal)
+	commercialCombinedDTO.FromPolicy(*policy, isProposal)
 	return &CommercialCombinedGenerator{
 		baseGenerator: &baseGenerator{
 			engine:      engine,
@@ -175,51 +175,12 @@ func (ccg *CommercialCombinedGenerator) Contract() ([]byte, error) {
 }
 
 func (ccg *CommercialCombinedGenerator) mainHeader() {
-	type contractorInfo struct {
-		name       string
-		fiscalCode string
-		vatCode    string
-		address    string
-		mail       string
-		phone      string
-	}
-
-	ctrInfo := contractorInfo{
-		name:       "=======",
-		fiscalCode: "=======",
-		vatCode:    "=======",
-		address:    "=======",
-		mail:       "=======",
-		phone:      "=======",
-	}
-
-	if len(ccg.policy.Contractor.Name) != 0 {
-		ctrInfo.name = ccg.policy.Contractor.Name
-	}
-
-	if len(ccg.policy.Contractor.VatCode) != 0 {
-		ctrInfo.vatCode = ccg.policy.Contractor.VatCode
-	}
-
-	if len(ccg.policy.Contractor.FiscalCode) != 0 {
-		ctrInfo.fiscalCode = ccg.policy.Contractor.FiscalCode
-	}
-
-	if ccg.policy.Contractor.CompanyAddress != nil {
-		ctrInfo.address = fmt.Sprintf("%s %s\n%s %s (%s)", ccg.policy.Contractor.CompanyAddress.StreetName,
-			ccg.policy.Contractor.CompanyAddress.StreetNumber, ccg.policy.Contractor.CompanyAddress.PostalCode,
-			ccg.policy.Contractor.CompanyAddress.City, ccg.policy.Contractor.CompanyAddress.CityCode)
-	}
-
-	if len(ccg.policy.Contractor.Mail) != 0 {
-		ctrInfo.mail = ccg.policy.Contractor.Mail
-	}
-
-	if len(ccg.policy.Contractor.Phone) != 0 {
-		ctrInfo.phone = ccg.policy.Contractor.Phone
-	}
-
 	contractDTO := ccg.dto.ContractDTO
+	contractorDTO := ccg.dto.ContractorDTO
+
+	address := fmt.Sprintf("%s %s\n%s %s (%s)", contractorDTO.StreetName,
+		contractorDTO.StreetNumber, contractorDTO.PostalCode,
+		contractorDTO.City, contractorDTO.CityCode)
 
 	table := [][]domain.TableCell{
 		{
@@ -262,7 +223,7 @@ func (ccg *CommercialCombinedGenerator) mainHeader() {
 				Border:    "",
 			},
 			{
-				Text:      "Contraente: " + ctrInfo.name,
+				Text:      "Contraente: " + contractorDTO.Name + " " + contractorDTO.Surname,
 				Height:    constants.CellHeight,
 				Width:     75,
 				FontStyle: constants.RegularFontStyle,
@@ -288,7 +249,7 @@ func (ccg *CommercialCombinedGenerator) mainHeader() {
 				Border:    "",
 			},
 			{
-				Text:      "P.IVA: " + ctrInfo.vatCode,
+				Text:      "P.IVA: " + contractorDTO.VatCode,
 				Height:    constants.CellHeight,
 				Width:     75,
 				FontStyle: constants.RegularFontStyle,
@@ -314,7 +275,7 @@ func (ccg *CommercialCombinedGenerator) mainHeader() {
 				Border:    "",
 			},
 			{
-				Text:      "Codice Fiscale: " + ctrInfo.fiscalCode,
+				Text:      "Codice Fiscale: " + contractorDTO.FiscalCode,
 				Height:    constants.CellHeight,
 				Width:     75,
 				FontStyle: constants.RegularFontStyle,
@@ -340,7 +301,7 @@ func (ccg *CommercialCombinedGenerator) mainHeader() {
 				Border:    "",
 			},
 			{
-				Text:      strings.Split("Indirizzo: "+ctrInfo.address, "\n")[0],
+				Text:      strings.Split("Indirizzo: "+address, "\n")[0],
 				Height:    constants.CellHeight,
 				Width:     75,
 				FontStyle: constants.RegularFontStyle,
@@ -366,7 +327,7 @@ func (ccg *CommercialCombinedGenerator) mainHeader() {
 				Border:    "",
 			},
 			{
-				Text:      strings.Split(ctrInfo.address, "\n")[1],
+				Text:      strings.Split(address, "\n")[1],
 				Height:    constants.CellHeight,
 				Width:     75,
 				FontStyle: constants.RegularFontStyle,
@@ -392,7 +353,7 @@ func (ccg *CommercialCombinedGenerator) mainHeader() {
 				Border:    "",
 			},
 			{
-				Text:      "Mail: " + ctrInfo.mail,
+				Text:      "Mail: " + contractorDTO.Mail,
 				Height:    constants.CellHeight,
 				Width:     75,
 				FontStyle: constants.RegularFontStyle,
@@ -418,7 +379,7 @@ func (ccg *CommercialCombinedGenerator) mainHeader() {
 				Border:    "",
 			},
 			{
-				Text:      "Telefono: " + ctrInfo.phone,
+				Text:      "Telefono: " + contractorDTO.Phone,
 				Height:    constants.CellHeight,
 				Width:     75,
 				FontStyle: constants.RegularFontStyle,
