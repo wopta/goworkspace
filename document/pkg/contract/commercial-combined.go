@@ -7,6 +7,7 @@ import (
 
 	"github.com/wopta/goworkspace/document/internal/constants"
 	"github.com/wopta/goworkspace/document/internal/domain"
+	"github.com/wopta/goworkspace/document/internal/dto"
 	"github.com/wopta/goworkspace/document/internal/engine"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
@@ -65,12 +66,15 @@ var (
 
 type CommercialCombinedGenerator struct {
 	*baseGenerator
+	dto *dto.CommercialCombinedDTO
 }
 
 func NewCommercialCombinedGenerator(engine *engine.Fpdf, policy *models.Policy, node *models.NetworkNode,
 	isProposal bool) *CommercialCombinedGenerator {
+	commercialCombinedDTO := dto.NewCommercialCombinedDto()
+	commercialCombinedDTO.ParseFromPolicy(*policy, isProposal)
 	return &CommercialCombinedGenerator{
-		&baseGenerator{
+		baseGenerator: &baseGenerator{
 			engine:      engine,
 			isProposal:  isProposal,
 			now:         time.Now(),
@@ -78,6 +82,7 @@ func NewCommercialCombinedGenerator(engine *engine.Fpdf, policy *models.Policy, 
 			networkNode: node,
 			policy:      policy,
 		},
+		dto: commercialCombinedDTO,
 	}
 }
 
@@ -170,15 +175,6 @@ func (ccg *CommercialCombinedGenerator) Contract() ([]byte, error) {
 }
 
 func (ccg *CommercialCombinedGenerator) mainHeader() {
-	type policyInfo struct {
-		code         string
-		startDate    string
-		endDate      string
-		paymentSplit string
-		nextPayment  string
-		hasBond      string
-	}
-
 	type contractorInfo struct {
 		name       string
 		fiscalCode string
@@ -188,15 +184,6 @@ func (ccg *CommercialCombinedGenerator) mainHeader() {
 		phone      string
 	}
 
-	plcInfo := policyInfo{
-		code:         "=======",
-		startDate:    "=======",
-		endDate:      "=======",
-		paymentSplit: "=======",
-		nextPayment:  "=======",
-		hasBond:      "NO",
-	}
-
 	ctrInfo := contractorInfo{
 		name:       "=======",
 		fiscalCode: "=======",
@@ -204,37 +191,6 @@ func (ccg *CommercialCombinedGenerator) mainHeader() {
 		address:    "=======",
 		mail:       "=======",
 		phone:      "=======",
-	}
-
-	policyCodePrefix := "I dati della tua Polizza nr. "
-	if ccg.isProposal && ccg.policy.ProposalNumber != 0 {
-		policyCodePrefix = "I dati della tua Proposta nr. "
-		plcInfo.code = fmt.Sprintf("%d", ccg.policy.ProposalNumber)
-	} else if ccg.policy.CodeCompany != "" {
-		plcInfo.code = ccg.policy.CodeCompany
-	}
-
-	if !ccg.policy.StartDate.IsZero() {
-		plcInfo.startDate = ccg.policy.StartDate.Format(constants.DayMonthYearFormat)
-	}
-
-	if !ccg.policy.EndDate.IsZero() {
-		plcInfo.endDate = ccg.policy.EndDate.Format(constants.DayMonthYearFormat)
-	}
-
-	if _, ok := constants.PaymentSplitMap[ccg.policy.PaymentSplit]; ok {
-		plcInfo.paymentSplit = constants.PaymentSplitMap[ccg.policy.PaymentSplit]
-	}
-
-	nextPayDate := lib.AddMonths(ccg.policy.StartDate.AddDate(ccg.policy.Annuity, 0, 0), 12)
-	if !nextPayDate.After(ccg.policy.EndDate) {
-		plcInfo.nextPayment = nextPayDate.Format(constants.DayMonthYearFormat)
-	} else {
-		plcInfo.nextPayment = plcInfo.endDate
-	}
-
-	if ccg.policy.HasBond {
-		plcInfo.hasBond = "SI"
 	}
 
 	if len(ccg.policy.Contractor.Name) != 0 {
@@ -263,10 +219,12 @@ func (ccg *CommercialCombinedGenerator) mainHeader() {
 		ctrInfo.phone = ccg.policy.Contractor.Phone
 	}
 
+	contractDTO := ccg.dto.ContractDTO
+
 	table := [][]domain.TableCell{
 		{
 			{
-				Text:      policyCodePrefix + plcInfo.code,
+				Text:      contractDTO.CodeHeading + " " + contractDTO.Code,
 				Height:    constants.CellHeight,
 				Width:     115,
 				FontStyle: constants.BoldFontStyle,
@@ -292,7 +250,7 @@ func (ccg *CommercialCombinedGenerator) mainHeader() {
 		},
 		{
 			{
-				Text:      "Decorre dal: " + plcInfo.startDate + " ore 24:00",
+				Text:      "Decorre dal: " + contractDTO.StartDate + " ore 24:00",
 				Height:    constants.CellHeight,
 				Width:     115,
 				FontStyle: constants.RegularFontStyle,
@@ -318,7 +276,7 @@ func (ccg *CommercialCombinedGenerator) mainHeader() {
 		},
 		{
 			{
-				Text:      "Scade il: " + plcInfo.endDate + " ore 24:00",
+				Text:      "Scade il: " + contractDTO.EndDate + " ore 24:00",
 				Height:    constants.CellHeight,
 				Width:     115,
 				FontStyle: constants.RegularFontStyle,
@@ -370,7 +328,7 @@ func (ccg *CommercialCombinedGenerator) mainHeader() {
 		},
 		{
 			{
-				Text:      "Frazionamento: " + plcInfo.paymentSplit,
+				Text:      "Frazionamento: " + contractDTO.PaymentSplit,
 				Height:    constants.CellHeight,
 				Width:     115,
 				FontStyle: constants.RegularFontStyle,
@@ -396,7 +354,7 @@ func (ccg *CommercialCombinedGenerator) mainHeader() {
 		},
 		{
 			{
-				Text:      "Prossimo pagamento il: " + plcInfo.nextPayment,
+				Text:      "Prossimo pagamento il: " + contractDTO.NextPay,
 				Height:    constants.CellHeight,
 				Width:     115,
 				FontStyle: constants.RegularFontStyle,
@@ -448,7 +406,7 @@ func (ccg *CommercialCombinedGenerator) mainHeader() {
 		},
 		{
 			{
-				Text:      "Presenza Vincolo: " + plcInfo.hasBond + " Convenzione: NO",
+				Text:      "Presenza Vincolo: " + contractDTO.HasBond + " Convenzione: NO",
 				Height:    constants.CellHeight,
 				Width:     115,
 				FontStyle: constants.RegularFontStyle,
