@@ -32,7 +32,7 @@ const (
 	pigioniGuaranteeSlug                string = "pigioni"
 	rctoGuaranteeSlug                   string = "rcto"
 	rcpGuaranteeSlug                    string = "rcp"
-	deoGuaranteeSlug                    string = "deo"
+	managementOrganizationGuaranteeSlug string = "management-organization"
 	cyberGuanrateeSlug                  string = "cyber"
 	rctGuaranteeSlug                    string = "rct"
 	ritiroGuaranteeSlug                 string = "ritiro"
@@ -58,9 +58,9 @@ var (
 		pigioniGuaranteeSlug:                "Perdita Pigioni",
 		rctoGuaranteeSlug: "Responsabilità Civile verso Terzi (" +
 			"RCT) e verso Prestatori di lavoro (RCO)",
-		rcpGuaranteeSlug:   "Responsabilità Civile Prodotti (RCP) Ritiro prodotti",
-		deoGuaranteeSlug:   "Responsabilità Amministratori Sindaci Dirigenti (D&O)",
-		cyberGuanrateeSlug: "Cyber Response e Data Security",
+		rcpGuaranteeSlug:                    "Responsabilità Civile Prodotti (RCP) Ritiro prodotti",
+		managementOrganizationGuaranteeSlug: "Responsabilità Amministratori Sindaci Dirigenti (D&O)",
+		cyberGuanrateeSlug:                  "Cyber Response e Data Security",
 	}
 )
 
@@ -496,15 +496,6 @@ func (ccg *CommercialCombinedGenerator) insuredDetailsSection() {
 		naicsDetail      string
 	}
 
-	type enterpriseInfo struct {
-		revenue                  string
-		northAmericanMarket      string
-		employer                 string
-		workEmployerRemunaration string
-		totalBilled              string
-		ownerTotalBilled         string
-	}
-
 	newBuildingInfo := func() *buildingInfo {
 		return &buildingInfo{
 			address:          "======",
@@ -516,23 +507,13 @@ func (ccg *CommercialCombinedGenerator) insuredDetailsSection() {
 			naicsDetail:      "======",
 		}
 	}
-	newEnterpriseInfo := func() *enterpriseInfo {
-		return &enterpriseInfo{
-			revenue:                  "======",
-			northAmericanMarket:      "======",
-			employer:                 "======",
-			workEmployerRemunaration: "======",
-			totalBilled:              "======",
-			ownerTotalBilled:         "======",
-		}
-	}
+
+	enterprise := ccg.dto.EnterpriseDTO
 
 	buildings := make([]*buildingInfo, 5)
 	for i := 0; i < 5; i++ {
 		buildings[i] = newBuildingInfo()
 	}
-
-	enterprise := newEnterpriseInfo()
 
 	index := 0
 	for _, asset := range ccg.policy.Assets {
@@ -562,35 +543,6 @@ func (ccg *CommercialCombinedGenerator) insuredDetailsSection() {
 		buildings[index].naicsDetail = asset.Building.NaicsDetail
 
 		index++
-	}
-
-	for _, asset := range ccg.policy.Assets {
-		if asset.Enterprise == nil {
-			continue
-		}
-
-		if asset.Enterprise.Revenue != 0.0 {
-			enterprise.revenue = lib.HumanaizePriceEuro(asset.Enterprise.Revenue)
-		}
-
-		if asset.Enterprise.NorthAmericanMarket != 0.0 {
-			enterprise.northAmericanMarket = lib.HumanaizePriceEuro(asset.Enterprise.NorthAmericanMarket)
-		}
-
-		if asset.Enterprise.Employer != 0 {
-			enterprise.employer = fmt.Sprintf("%d", asset.Enterprise.Employer)
-		}
-
-		if asset.Enterprise.WorkEmployersRemuneration != 0.0 {
-			enterprise.workEmployerRemunaration = lib.HumanaizePriceEuro(asset.Enterprise.WorkEmployersRemuneration)
-		}
-
-		if asset.Enterprise.TotalBilled != 0.0 {
-			enterprise.totalBilled = lib.HumanaizePriceEuro(asset.Enterprise.TotalBilled)
-		}
-
-		// TODO: add check on OwnerTotalBilled field
-
 	}
 
 	table := make([][]domain.TableCell, 0)
@@ -651,7 +603,19 @@ func (ccg *CommercialCombinedGenerator) insuredDetailsSection() {
 		table = append(table, row)
 	}
 
-	activityRow := []domain.TableCell{
+	limitOfIndemnity := "======"
+	sumInsured := "======"
+
+	if val, ok := enterprise.Guarantees[managementOrganizationGuaranteeSlug]; ok {
+		if val.LimitOfIndemnity != 0 {
+			limitOfIndemnity = lib.HumanaizePriceEuro(val.LimitOfIndemnity)
+		}
+		if val.SumInsured != 0 {
+			sumInsured = lib.HumanaizePriceEuro(val.SumInsured)
+		}
+	}
+
+	enterpriseRow := []domain.TableCell{
 		{
 			Text:      " \nAttività\n ",
 			Height:    4.5,
@@ -665,10 +629,11 @@ func (ccg *CommercialCombinedGenerator) insuredDetailsSection() {
 			Border:    "TB",
 		},
 		{
-			Text: fmt.Sprintf("Fatturato: %s di cui verso USA e Canada: %s\nPrestatori di lavoro nr: %s"+
+			Text: fmt.Sprintf("Fatturato: %s di cui verso USA e Canada: %s\nPrestatori di lavoro nr: %d"+
 				" - Retribuzioni: %s\nTotal Asset: %s di cui capitale proprio: %s",
-				enterprise.revenue, enterprise.northAmericanMarket, enterprise.employer,
-				enterprise.workEmployerRemunaration, enterprise.totalBilled, enterprise.ownerTotalBilled),
+				lib.HumanaizePriceEuro(enterprise.Revenue), lib.HumanaizePriceEuro(enterprise.NorthAmericanMarket),
+				enterprise.Employer, lib.HumanaizePriceEuro(enterprise.WorkEmployersRemuneration),
+				limitOfIndemnity, sumInsured),
 			Height:    4.5,
 			Width:     150,
 			FontSize:  constants.RegularFontSize,
@@ -680,7 +645,7 @@ func (ccg *CommercialCombinedGenerator) insuredDetailsSection() {
 			Border:    "TB",
 		},
 	}
-	table = append(table, activityRow)
+	table = append(table, enterpriseRow)
 
 	riskDescriptionRow := []domain.TableCell{
 		{
@@ -739,7 +704,7 @@ func (ccg *CommercialCombinedGenerator) guaranteesDetailsSection() {
 		merciRefrigerazioneGuaranteeSlug,
 		guastiGuaranteeSlug, elettronicaGuaranteeSlug, furtoGuaranteeSlug, danniGuaranteeSlug,
 		diariaGuaranteeSlug, maggioriGuaranteeSlug,
-		pigioniGuaranteeSlug, rctoGuaranteeSlug, rcpGuaranteeSlug, deoGuaranteeSlug, cyberGuanrateeSlug}
+		pigioniGuaranteeSlug, rctoGuaranteeSlug, rcpGuaranteeSlug, managementOrganizationGuaranteeSlug, cyberGuanrateeSlug}
 
 	for _, slug := range buildingsSlugs {
 		i := 0
@@ -1859,7 +1824,7 @@ func (ccg *CommercialCombinedGenerator) detailsSection() {
 				startDateInfo.rcpUsa = guarantee.Value.StartDate.Format(constants.DayMonthYearFormat)
 			case ritiroGuaranteeSlug:
 				startDateInfo.ritiro = guarantee.Value.StartDate.Format(constants.DayMonthYearFormat)
-			case deoGuaranteeSlug:
+			case managementOrganizationGuaranteeSlug:
 				startDateInfo.deo = guarantee.Value.StartDate.Format(constants.DayMonthYearFormat)
 			}
 		}
@@ -2937,7 +2902,7 @@ func (ccg *CommercialCombinedGenerator) claimsStatement() {
 			quantity:    zeroClaims,
 			value:       zeroClaimValue,
 		},
-		deoGuaranteeSlug: {
+		managementOrganizationGuaranteeSlug: {
 			description: "D&O",
 			quantity:    zeroClaims,
 			value:       zeroClaimValue,
@@ -3084,7 +3049,7 @@ func (ccg *CommercialCombinedGenerator) claimsStatement() {
 		},
 	})
 
-	guaranteeSlugs := []string{danniGuaranteeSlug, rcpGuaranteeSlug, furtoGuaranteeSlug, deoGuaranteeSlug,
+	guaranteeSlugs := []string{danniGuaranteeSlug, rcpGuaranteeSlug, furtoGuaranteeSlug, managementOrganizationGuaranteeSlug,
 		cyberGuanrateeSlug}
 
 	borders := []string{"TL", "TL", "TLR"}
