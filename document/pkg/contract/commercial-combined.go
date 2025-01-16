@@ -35,9 +35,9 @@ const (
 	lossRentGuaranteeSlug                         string = "loss-rent"                            // PERDITA PIGIONI
 	thirdPartyLiabilityWorkProvidersGuaranteeSlug string = "third-party-liability-work-providers" // RCT + RCO sostituisce RCT e RCTO
 	productLiabilityGuaranteeSlug                 string = "product-liability"                    // RCP
-	managementOrganizationGuaranteeSlug           string = "management-organization"
+	managementOrganizationGuaranteeSlug           string = "management-organization"              // D&O
 	cyberGuanrateeSlug                            string = "cyber"
-	productWithdrawalGuaranteeSlug                string = "product-withdrawal"
+	productWithdrawalGuaranteeSlug                string = "product-withdrawal" // RITIRO
 )
 
 var (
@@ -1704,7 +1704,6 @@ func (ccg *CommercialCombinedGenerator) dynamicDeductibleSection() {
 
 func (ccg *CommercialCombinedGenerator) detailsSection() {
 	const (
-		emptyField        = "====="
 		firstColumnWidth  = 65
 		secondColumnWidth = 45
 		thirdColumnWidth  = 80
@@ -1712,44 +1711,7 @@ func (ccg *CommercialCombinedGenerator) detailsSection() {
 		thirdColumnX      = 120.0
 	)
 
-	type guaranteeStartDateInfo struct {
-		rct    string
-		rcp    string
-		rcpUsa string
-		ritiro string
-		deo    string
-	}
-
-	startDateInfo := guaranteeStartDateInfo{
-		rct:    emptyField,
-		rcp:    emptyField,
-		rcpUsa: emptyField,
-		ritiro: emptyField,
-		deo:    emptyField,
-	}
-
-	for _, asset := range ccg.policy.Assets {
-		if asset.Enterprise == nil {
-			continue
-		}
-
-		for _, guarantee := range asset.Guarantees {
-			if guarantee.Value.StartDate == nil {
-				continue
-			}
-			switch guarantee.Slug {
-			case thirdPartyLiabilityWorkProvidersGuaranteeSlug:
-				startDateInfo.rct = guarantee.Value.StartDate.Format(constants.DayMonthYearFormat)
-			case productLiabilityGuaranteeSlug:
-				startDateInfo.rcp = guarantee.Value.StartDate.Format(constants.DayMonthYearFormat)
-				startDateInfo.rcpUsa = guarantee.Value.StartDate.Format(constants.DayMonthYearFormat)
-			case productWithdrawalGuaranteeSlug:
-				startDateInfo.ritiro = guarantee.Value.StartDate.Format(constants.DayMonthYearFormat)
-			case managementOrganizationGuaranteeSlug:
-				startDateInfo.deo = guarantee.Value.StartDate.Format(constants.DayMonthYearFormat)
-			}
-		}
-	}
+	guarantees := ccg.dto.EnterpriseDTO.Guarantees
 
 	ccg.engine.WriteText(domain.TableCell{
 		Text:      "Dettagli di alcune sezioni",
@@ -1869,7 +1831,7 @@ func (ccg *CommercialCombinedGenerator) detailsSection() {
 			},
 			{
 				Text: "L’Assicurazione vale per le conseguenze di fatti colposi commessi dopo la data del" +
-					" " + startDateInfo.rct,
+					" " + guarantees[thirdPartyLiabilityWorkProvidersGuaranteeSlug].StartDate,
 				Height:    4.5,
 				Width:     thirdColumnWidth,
 				FontSize:  constants.MediumFontSize,
@@ -1956,7 +1918,8 @@ func (ccg *CommercialCombinedGenerator) detailsSection() {
 	})
 	ccg.engine.SetX(thirdColumnX)
 	ccg.engine.WriteText(domain.TableCell{
-		Text:      "L'Assicurazione vale per i danni verificatisi dopo la data del " + startDateInfo.rcp,
+		Text: "L'Assicurazione vale per i danni verificatisi dopo la data del " +
+			guarantees[productLiabilityGuaranteeSlug].StartDate,
 		Height:    4.5,
 		Width:     thirdColumnWidth,
 		FontSize:  constants.MediumFontSize,
@@ -1969,7 +1932,8 @@ func (ccg *CommercialCombinedGenerator) detailsSection() {
 	})
 	ccg.engine.SetX(thirdColumnX)
 	ccg.engine.WriteText(domain.TableCell{
-		Text: "L'Assicurazione vale per i danni verificatisi dopo la data del " + startDateInfo.rcpUsa + " purch" +
+		// TODO: startDate USA
+		Text: "L'Assicurazione vale per i danni verificatisi dopo la data del " + guarantees[productLiabilityGuaranteeSlug].StartDate + " purch" +
 			"é  relativi a prodotti descritti in Polizza consegnati a terzi dopo la stessa data.",
 		Height:    4.5,
 		Width:     thirdColumnWidth,
@@ -2129,8 +2093,9 @@ func (ccg *CommercialCombinedGenerator) detailsSection() {
 	})
 	ccg.engine.SetX(thirdColumnX)
 	ccg.engine.WriteText(domain.TableCell{
-		Text: "L'Assicurazione vale per i danni verificatisi dopo la data del " + startDateInfo.
-			ritiro + " purché relativi a prodotti descritti in Polizza consegnati a terzi dopo la stessa data.",
+		Text: "L'Assicurazione vale per i danni verificatisi dopo la data del " +
+			guarantees[productWithdrawalGuaranteeSlug].
+				StartDate + " purché relativi a prodotti descritti in Polizza consegnati a terzi dopo la stessa data.",
 		Height:    4.5,
 		Width:     thirdColumnWidth,
 		FontSize:  constants.MediumFontSize,
@@ -2254,7 +2219,7 @@ func (ccg *CommercialCombinedGenerator) detailsSection() {
 	})
 	ccg.engine.SetX(thirdColumnX)
 	ccg.engine.WriteText(domain.TableCell{
-		Text:      startDateInfo.deo,
+		Text:      guarantees[managementOrganizationGuaranteeSlug].StartDate,
 		Height:    4.5,
 		Width:     thirdColumnWidth,
 		FontSize:  constants.MediumFontSize,
