@@ -28,12 +28,11 @@ const (
 	electronicEquipmentGuaranteeSlug        string = "electronic-equipment"     // ELETTRONICA
 	theftGuaranteeSlug                      string = "theft"                    // FURTO
 	//danniGuaranteeSlug                  string = "danni"
-	dailyAllowanceGuaranteeSlug         string = "daily-allowance"         // DIARIA GIORNALIERA
-	increasedCostGuaranteeSlug          string = "increased-cost"          // MAGGIORI COSTI
-	excludedFormulaGuaranteeSlug        string = "excluded-formula"        // FORMULA ESCLUSA
-	additionalCompensationGuaranteeSlug string = "additional-compensation" // DANNI INDIRETTI - FORMULA
-	lossRentGuaranteeSlug               string = "loss-rent"               // PERDITA PIGIONI
-	//rctoGuaranteeSlug                   string = "rcto"
+	dailyAllowanceGuaranteeSlug                   string = "daily-allowance"                      // DIARIA GIORNALIERA
+	increasedCostGuaranteeSlug                    string = "increased-cost"                       // MAGGIORI COSTI
+	excludedFormulaGuaranteeSlug                  string = "excluded-formula"                     // FORMULA ESCLUSA
+	additionalCompensationGuaranteeSlug           string = "additional-compensation"              // DANNI INDIRETTI - FORMULA
+	lossRentGuaranteeSlug                         string = "loss-rent"                            // PERDITA PIGIONI
 	thirdPartyLiabilityWorkProvidersGuaranteeSlug string = "third-party-liability-work-providers" // RCT + RCO sostituisce RCT e RCTO
 	productLiabilityGuaranteeSlug                 string = "product-liability"                    // RCP
 	managementOrganizationGuaranteeSlug           string = "management-organization"
@@ -1383,7 +1382,7 @@ func (ccg *CommercialCombinedGenerator) dynamicDeductibleSection() {
 	)
 
 	var (
-		rctSumInsuredLimitOfIndemnity, rcpSumInsuredLimitOfIndemnity float64
+		rctSumInsuredLimitOfIndemnity float64
 	)
 
 	type section struct {
@@ -1490,25 +1489,13 @@ func (ccg *CommercialCombinedGenerator) dynamicDeductibleSection() {
 		return result
 	}
 
-	for _, asset := range ccg.policy.Assets {
-		if asset.Enterprise != nil {
-			for _, guarantee := range asset.Guarantees {
-				if guarantee.Slug == thirdPartyLiabilityWorkProvidersGuaranteeSlug {
-					rctSumInsuredLimitOfIndemnity = guarantee.Value.SumInsuredLimitOfIndemnity
-					//rctStartDate = guarantee.Value.StartDate.Format(constants.DayMonthYearFormat)
-				} else if guarantee.Slug == productLiabilityGuaranteeSlug {
-					rcpSumInsuredLimitOfIndemnity = guarantee.Value.SumInsuredLimitOfIndemnity
-					//rcpStartDate = guarantee.Value.StartDate.Format(constants.DayMonthYearFormat)
-					//rcpStartDateUSA = guarantee.Value.StartDate.Format(constants.
-					//	DayMonthYearFormat) // TODO: get startDate USA
-				}
-			}
-		}
-	}
+	rctSumInsuredLimitOfIndemnityString := ccg.dto.EnterpriseDTO.
+		Guarantees[thirdPartyLiabilityWorkProvidersGuaranteeSlug].SumInsuredLimitOfIndemnity.Text
+	rctSumInsuredLimitOfIndemnity = ccg.dto.EnterpriseDTO.Guarantees[thirdPartyLiabilityWorkProvidersGuaranteeSlug].
+		SumInsuredLimitOfIndemnity.ValueFloat
+	rcpSumInsuredLimitOfIndemnityString := ccg.dto.EnterpriseDTO.
+		Guarantees[productLiabilityGuaranteeSlug].SumInsuredLimitOfIndemnity.Text
 
-	rctSumInsuredLimitOfIndemnityString := lib.HumanaizePriceEuro(rctSumInsuredLimitOfIndemnity)
-	rcpSumInsuredLimitOfIndemnityString := lib.HumanaizePriceEuro(rcpSumInsuredLimitOfIndemnity)
-	// TODO: find better names
 	sumInsuredLimitA := rctSumInsuredLimitOfIndemnityString
 	sumInsuredLimitB := "€ 600.000"
 	sumInsuredLimitC := "€ 1.500.00"
