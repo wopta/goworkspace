@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"slices"
 	"time"
 
 	"github.com/wopta/goworkspace/lib"
@@ -131,7 +132,8 @@ func checkIfPolicyIsLead(policy *models.Policy) error {
 		return nil
 	}
 
-	if recoveredPolicy.Status != models.PolicyStatusPartnershipLead && recoveredPolicy.Status != models.PolicyStatusInitLead {
+	allowedStatus := []string{models.PolicyStatusInit, models.PolicyStatusPartnershipLead, models.PolicyStatusInitLead}
+	if !slices.Contains(allowedStatus, recoveredPolicy.Status) {
 		log.Printf("[checkIfPolicyIsLead] error policy %s is not a lead", policy.Uid)
 		return errors.New("policy is not a lead")
 	}
