@@ -75,15 +75,12 @@ func lead(authToken models.AuthToken, policy *models.Policy) error {
 
 	log.Println("[lead] start ------------------------------------------------")
 
-	policyFire := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
-	guaranteFire := lib.GetDatasetByEnv(origin, lib.GuaranteeCollection)
-
 	if policy.Uid != "" {
 		if err = checkIfPolicyIsLead(policy); err != nil {
 			return err
 		}
 	} else {
-		policy.Uid = lib.NewDoc(policyFire)
+		policy.Uid = lib.NewDoc(lib.PolicyCollection)
 	}
 
 	if policy.Channel == "" {
@@ -105,14 +102,14 @@ func lead(authToken models.AuthToken, policy *models.Policy) error {
 	*policy = *state.Data
 
 	log.Println("[lead] saving lead to firestore...")
-	err = lib.SetFirestoreErr(policyFire, policy.Uid, policy)
+	err = lib.SetFirestoreErr(lib.PolicyCollection, policy.Uid, policy)
 	lib.CheckError(err)
 
 	log.Println("[lead] saving lead to bigquery...")
 	policy.BigquerySave(origin)
 
 	log.Println("[lead] saving guarantees to bigquery...")
-	models.SetGuaranteBigquery(*policy, "lead", guaranteFire)
+	models.SetGuaranteBigquery(*policy, "lead", lib.GuaranteeCollection)
 
 	log.Println("[lead] end --------------------------------------------------")
 	return err
