@@ -2,6 +2,7 @@ package contract
 
 import (
 	"fmt"
+	"log"
 	"strings"
 	"time"
 
@@ -14,51 +15,52 @@ import (
 )
 
 const (
-	fabbricatoGuaranteeSlug             string = "fabbricato"
-	rischioLocativoGuaranteeSlug        string = "rischio locativo"
-	macchinariGuaranteeSlug             string = "macchinari"
-	merciGuaranteeSlug                  string = "merci"
-	merciAumentoGuaranteeSlug           string = "merci in aumento"
-	merciAumentoEnterpriseGuaranteeSlug string = "merci in aumento-enterprise"
-	ricorsoGuaranteeSlug                string = "ricorso"
-	fenomenoGuaranteeSlug               string = "fenomeno"
-	merciRefrigerazioneGuaranteeSlug    string = "merci-refri"
-	guastiGuaranteeSlug                 string = "guasti"
-	elettronicaGuaranteeSlug            string = "elettronica"
-	furtoGuaranteeSlug                  string = "furto"
-	danniGuaranteeSlug                  string = "danni"
-	diariaGuaranteeSlug                 string = "diaria"
-	maggioriGuaranteeSlug               string = "maggiori"
-	pigioniGuaranteeSlug                string = "pigioni"
-	rctoGuaranteeSlug                   string = "rcto"
-	rcpGuaranteeSlug                    string = "rcp"
-	managementOrganizationGuaranteeSlug string = "management-organization"
-	cyberGuanrateeSlug                  string = "cyber"
-	rctGuaranteeSlug                    string = "rct"
-	ritiroGuaranteeSlug                 string = "ritiro"
+	buildingGuaranteeSlug                   string = "building"                 // FABBRICATO
+	rentalRiskGuaranteeSlug                 string = "rental-risk"              // RISCHIO LOCATIVO
+	machineryGuaranteeSlug                  string = "machinery"                // MACCHINARI
+	stockGuaranteeSlug                      string = "stock"                    // MERCI
+	stockTemporaryIncreaseGuaranteeSlug     string = "stock-temporary-increase" // MERCI IN AUMENTO
+	stockTemporaryIncreaseDaysGuaranteeSlug string = "stock-temporary-increase" // MERCI IN AUMENTO GIORNI
+	thirdPartyRecourseGuaranteeSlug         string = "third-party-recourse"     // RICORSO TERZI
+	electricalPhenomenonGuaranteeSlug       string = "electrical-phenomenon"    // FENOMENO ELETTRICO
+	refrigerationStockGuaranteeSlug         string = "refrigeration-stock"      // MERCI REFRIGERAZIONE
+	machineryBreakdownGuaranteeSlug         string = "machinery-breakdown"      // GUASTI
+	electronicEquipmentGuaranteeSlug        string = "electronic-equipment"     // ELETTRONICA
+	theftGuaranteeSlug                      string = "theft"                    // FURTO
+	//danniGuaranteeSlug                  string = "danni"
+	dailyAllowanceGuaranteeSlug         string = "daily-allowance"         // DIARIA GIORNALIERA
+	increasedCostGuaranteeSlug          string = "increased-cost"          // MAGGIORI COSTI
+	excludedFormulaGuaranteeSlug        string = "excluded-formula"        // FORMULA ESCLUSA
+	additionalCompensationGuaranteeSlug string = "additional-compensation" // DANNI INDIRETTI - FORMULA
+	lossRentGuaranteeSlug               string = "loss-rent"               // PERDITA PIGIONI
+	//rctoGuaranteeSlug                   string = "rcto"
+	thirdPartyLiabilityWorkProvidersGuaranteeSlug string = "third-party-liability-work-providers" // RCT + RCO sostituisce RCT e RCTO
+	productLiabilityGuaranteeSlug                 string = "product-liability"                    // RCP
+	managementOrganizationGuaranteeSlug           string = "management-organization"
+	cyberGuanrateeSlug                            string = "cyber"
+	productWithdrawalGuaranteeSlug                string = "product-withdrawal"
 )
 
 var (
 	guaranteeNamesMap = map[string]string{
-		fabbricatoGuaranteeSlug:             "Fabbricato",
-		rischioLocativoGuaranteeSlug:        "Rischio Locativo (in aumento A/24)",
-		macchinariGuaranteeSlug:             "Macchinari",
-		merciGuaranteeSlug:                  "Merci (importi fissi)",
-		merciAumentoGuaranteeSlug:           "Merci (Aumento temporaneo A/29)",
-		merciAumentoEnterpriseGuaranteeSlug: "Merci (Aumento temporaneo A/29) - giorni",
-		ricorsoGuaranteeSlug:                "Ricordo Terzi (in aumento A/25)",
-		fenomenoGuaranteeSlug:               "Fenomeno Elettrico (in aumento A/23)",
-		merciRefrigerazioneGuaranteeSlug:    "Merci in refrigerazione",
-		guastiGuaranteeSlug:                 "Guasti alle macchine (in aumento A/27)",
-		elettronicaGuaranteeSlug:            "Apparecch.re Elettroniche (in aumento A/26)",
-		furtoGuaranteeSlug:                  "Furto, rapina, estorsione (in aumento C/1)",
-		danniGuaranteeSlug:                  "Danni indiretti - Formula",
-		diariaGuaranteeSlug:                 "Diaria Giornaliera",
-		maggioriGuaranteeSlug:               "Maggiori costi",
-		pigioniGuaranteeSlug:                "Perdita Pigioni",
-		rctoGuaranteeSlug: "Responsabilità Civile verso Terzi (" +
+		buildingGuaranteeSlug:               "Fabbricato",
+		rentalRiskGuaranteeSlug:             "Rischio Locativo (in aumento A/24)",
+		machineryGuaranteeSlug:              "Macchinari",
+		stockGuaranteeSlug:                  "Merci (importi fissi)",
+		stockTemporaryIncreaseGuaranteeSlug: "Merci (Aumento temporaneo A/29)",
+		thirdPartyRecourseGuaranteeSlug:     "Ricordo Terzi (in aumento A/25)",
+		electricalPhenomenonGuaranteeSlug:   "Fenomeno Elettrico (in aumento A/23)",
+		refrigerationStockGuaranteeSlug:     "Merci in refrigerazione",
+		machineryBreakdownGuaranteeSlug:     "Guasti alle macchine (in aumento A/27)",
+		electronicEquipmentGuaranteeSlug:    "Apparecch.re Elettroniche (in aumento A/26)",
+		theftGuaranteeSlug:                  "Furto, rapina, estorsione (in aumento C/1)",
+		additionalCompensationGuaranteeSlug: "Danni indiretti - Formula",
+		dailyAllowanceGuaranteeSlug:         "Diaria Giornaliera",
+		increasedCostGuaranteeSlug:          "Maggiori costi",
+		lossRentGuaranteeSlug:               "Perdita Pigioni",
+		thirdPartyLiabilityWorkProvidersGuaranteeSlug: "Responsabilità Civile verso Terzi (" +
 			"RCT) e verso Prestatori di lavoro (RCO)",
-		rcpGuaranteeSlug:                    "Responsabilità Civile Prodotti (RCP) Ritiro prodotti",
+		productLiabilityGuaranteeSlug:       "Responsabilità Civile Prodotti (RCP) Ritiro prodotti",
 		managementOrganizationGuaranteeSlug: "Responsabilità Amministratori Sindaci Dirigenti (D&O)",
 		cyberGuanrateeSlug:                  "Cyber Response e Data Security",
 	}
@@ -70,9 +72,9 @@ type CommercialCombinedGenerator struct {
 }
 
 func NewCommercialCombinedGenerator(engine *engine.Fpdf, policy *models.Policy, node *models.NetworkNode,
-	isProposal bool) *CommercialCombinedGenerator {
+	product models.Product, isProposal bool) *CommercialCombinedGenerator {
 	commercialCombinedDTO := dto.NewCommercialCombinedDto()
-	commercialCombinedDTO.FromPolicy(*policy, isProposal)
+	commercialCombinedDTO.FromPolicy(*policy, product, isProposal)
 	return &CommercialCombinedGenerator{
 		baseGenerator: &baseGenerator{
 			engine:      engine,
@@ -550,17 +552,7 @@ func (ccg *CommercialCombinedGenerator) insuredDetailsSection() {
 		table = append(table, row)
 	}
 
-	limitOfIndemnity := "======"
-	sumInsured := "======"
-
-	if val, ok := enterprise.Guarantees[managementOrganizationGuaranteeSlug]; ok {
-		if val.LimitOfIndemnity != 0 {
-			limitOfIndemnity = lib.HumanaizePriceEuro(val.LimitOfIndemnity)
-		}
-		if val.SumInsured != 0 {
-			sumInsured = lib.HumanaizePriceEuro(val.SumInsured)
-		}
-	}
+	guarantee := enterprise.Guarantees[managementOrganizationGuaranteeSlug]
 
 	enterpriseRow := []domain.TableCell{
 		{
@@ -580,7 +572,7 @@ func (ccg *CommercialCombinedGenerator) insuredDetailsSection() {
 				" - Retribuzioni: %s\nTotal Asset: %s di cui capitale proprio: %s",
 				lib.HumanaizePriceEuro(enterprise.Revenue), lib.HumanaizePriceEuro(enterprise.NorthAmericanMarket),
 				enterprise.Employer, lib.HumanaizePriceEuro(enterprise.WorkEmployersRemuneration),
-				limitOfIndemnity, sumInsured),
+				guarantee.LimitOfIndemnity.Text, guarantee.SumInsured.Text),
 			Height:    4.5,
 			Width:     150,
 			FontSize:  constants.RegularFontSize,
@@ -630,50 +622,16 @@ func (ccg *CommercialCombinedGenerator) insuredDetailsSection() {
 	ccg.engine.DrawTable(table)
 }
 
-// TODO: parse policy info
 func (ccg *CommercialCombinedGenerator) guaranteesDetailsSection() {
-	const emptyInfo string = "======"
+	buildingsSlugs := []string{buildingGuaranteeSlug, rentalRiskGuaranteeSlug, machineryGuaranteeSlug,
+		stockGuaranteeSlug, stockTemporaryIncreaseGuaranteeSlug}
 
-	type guaranteeInfo struct {
-		sumInsuredLimitOfIndemnity string
-		startDate                  string
-		duration                   string
-	}
-
-	buildingsData := make(map[string][]string, 5)
-	enterpriseData := make(map[string]guaranteeInfo)
-
-	buildingsSlugs := []string{fabbricatoGuaranteeSlug, rischioLocativoGuaranteeSlug, macchinariGuaranteeSlug,
-		merciGuaranteeSlug, merciAumentoGuaranteeSlug}
-
-	enterpriseSlugs := []string{merciAumentoEnterpriseGuaranteeSlug, ricorsoGuaranteeSlug, fenomenoGuaranteeSlug,
-		merciRefrigerazioneGuaranteeSlug,
-		guastiGuaranteeSlug, elettronicaGuaranteeSlug, furtoGuaranteeSlug, danniGuaranteeSlug,
-		diariaGuaranteeSlug, maggioriGuaranteeSlug,
-		pigioniGuaranteeSlug, rctoGuaranteeSlug, rcpGuaranteeSlug, managementOrganizationGuaranteeSlug, cyberGuanrateeSlug}
-
-	for _, slug := range buildingsSlugs {
-		i := 0
-		emptyData := make([]string, 5)
-		for i < 5 {
-			emptyData[i] = emptyInfo
-			i++
-		}
-
-		buildingsData[slug] = emptyData
-	}
-
-	for _, slug := range enterpriseSlugs {
-		enterpriseData[slug] = guaranteeInfo{
-			sumInsuredLimitOfIndemnity: emptyInfo,
-			startDate:                  emptyInfo,
-			duration:                   emptyInfo,
-		}
-	}
-
-	// TODO: fetch building data from policy
-
-	// TODO: fetch enterprise data from policy
+	enterpriseSlugs := []string{thirdPartyRecourseGuaranteeSlug,
+		electricalPhenomenonGuaranteeSlug, refrigerationStockGuaranteeSlug, machineryBreakdownGuaranteeSlug,
+		electronicEquipmentGuaranteeSlug, theftGuaranteeSlug, additionalCompensationGuaranteeSlug,
+		dailyAllowanceGuaranteeSlug, increasedCostGuaranteeSlug, lossRentGuaranteeSlug,
+		thirdPartyLiabilityWorkProvidersGuaranteeSlug, productLiabilityGuaranteeSlug,
+		managementOrganizationGuaranteeSlug, cyberGuanrateeSlug}
 
 	table := make([][]domain.TableCell, 0)
 
@@ -783,10 +741,10 @@ func (ccg *CommercialCombinedGenerator) guaranteesDetailsSection() {
 	}
 	table = append(table, tableHeader...)
 
-	for slug, data := range buildingsData {
+	for _, slug := range buildingsSlugs {
 		row := make([]domain.TableCell, 6)
 		row[0] = domain.TableCell{
-			Text:      guaranteeNamesMap[slug],
+			Text:      ccg.dto.BuildingsDTO[0].Guarantees[slug].Description,
 			Height:    4.5,
 			Width:     65,
 			FontSize:  constants.RegularFontSize,
@@ -797,9 +755,9 @@ func (ccg *CommercialCombinedGenerator) guaranteesDetailsSection() {
 			Align:     constants.RightAlign,
 			Border:    "T",
 		}
-		for _, building := range data {
+		for _, building := range ccg.dto.BuildingsDTO {
 			row = append(row, domain.TableCell{
-				Text:      building,
+				Text:      building.Guarantees[slug].SumInsuredLimitOfIndemnity.Text,
 				Height:    4.5,
 				Width:     25,
 				FontSize:  constants.RegularFontSize,
@@ -814,10 +772,41 @@ func (ccg *CommercialCombinedGenerator) guaranteesDetailsSection() {
 		table = append(table, row)
 	}
 
-	for _, slug := range enterpriseSlugs[:7] {
+	table = append(table, []domain.TableCell{
+		{
+			Text:      "Merci (Aumento temporaneo A/29) - giorni",
+			Height:    4.5,
+			Width:     65,
+			FontSize:  constants.RegularFontSize,
+			FontStyle: constants.BoldFontStyle,
+			FontColor: constants.BlackColor,
+			Fill:      false,
+			FillColor: domain.Color{},
+			Align:     constants.RightAlign,
+			Border:    "T",
+		},
+		{
+			Text: fmt.Sprintf("%s a partire dal %s  di ogni anno",
+				ccg.dto.BuildingsDTO[0].Guarantees[stockTemporaryIncreaseGuaranteeSlug].
+					SumInsuredLimitOfIndemnity.Text, ccg.dto.BuildingsDTO[0].
+					Guarantees[stockTemporaryIncreaseGuaranteeSlug].StartDate),
+			Height:    4.5,
+			Width:     125,
+			FontSize:  constants.RegularFontSize,
+			FontStyle: constants.RegularFontStyle,
+			FontColor: constants.BlackColor,
+			Fill:      false,
+			FillColor: domain.Color{},
+			Align:     constants.LeftAlign,
+			Border:    "T",
+		},
+	})
+
+	for _, slug := range enterpriseSlugs[:6] {
+		log.Printf("Slug: %s", slug)
 		row := []domain.TableCell{
 			{
-				Text:      guaranteeNamesMap[slug],
+				Text:      ccg.dto.EnterpriseDTO.Guarantees[slug].Description,
 				Height:    4.5,
 				Width:     65,
 				FontSize:  constants.RegularFontSize,
@@ -830,13 +819,8 @@ func (ccg *CommercialCombinedGenerator) guaranteesDetailsSection() {
 			},
 		}
 
-		info := enterpriseData[slug].sumInsuredLimitOfIndemnity
-		if slug == merciAumentoEnterpriseGuaranteeSlug {
-			info += " a partire dal " + enterpriseData[slug].startDate + " di ogni anno"
-		}
-
 		row = append(row, domain.TableCell{
-			Text:      info,
+			Text:      ccg.dto.EnterpriseDTO.Guarantees[slug].SumInsuredLimitOfIndemnity.Text,
 			Height:    4.5,
 			Width:     125,
 			FontSize:  constants.RegularFontSize,
@@ -868,7 +852,7 @@ func (ccg *CommercialCombinedGenerator) guaranteesDetailsSection() {
 	for _, slug := range enterpriseSlugs[7:11] {
 		row := []domain.TableCell{
 			{
-				Text:      guaranteeNamesMap[slug],
+				Text:      ccg.dto.EnterpriseDTO.Guarantees[slug].Description,
 				Height:    4.5,
 				Width:     65,
 				FontSize:  constants.RegularFontSize,
@@ -881,9 +865,10 @@ func (ccg *CommercialCombinedGenerator) guaranteesDetailsSection() {
 			},
 		}
 
-		info := enterpriseData[slug].sumInsuredLimitOfIndemnity
-		if slug == diariaGuaranteeSlug {
-			info += " Periodo di indennizzo " + enterpriseData[slug].duration + " giorni"
+		info := ccg.dto.EnterpriseDTO.Guarantees[slug].SumInsuredLimitOfIndemnity.Text
+		if slug == dailyAllowanceGuaranteeSlug {
+			info += fmt.Sprintf(" Periodo di indennizzo %s giorni", ccg.dto.EnterpriseDTO.Guarantees[slug].
+				Duration.Text)
 		}
 
 		row = append(row, domain.TableCell{
@@ -918,13 +903,13 @@ func (ccg *CommercialCombinedGenerator) guaranteesDetailsSection() {
 
 	border := "T"
 
-	for i := 11; i < len(enterpriseSlugs); i += 2 {
+	for i := 10; i < len(enterpriseSlugs); i += 2 {
 		if i == len(enterpriseSlugs)-2 {
 			border = "TB"
 		}
 		row := []domain.TableCell{
 			{
-				Text:      guaranteeNamesMap[enterpriseSlugs[i]],
+				Text:      ccg.dto.EnterpriseDTO.Guarantees[enterpriseSlugs[i]].Description,
 				Height:    4.5,
 				Width:     65,
 				FontSize:  constants.RegularFontSize,
@@ -936,9 +921,10 @@ func (ccg *CommercialCombinedGenerator) guaranteesDetailsSection() {
 				Border:    border,
 			},
 			{
-				Text:      enterpriseData[enterpriseSlugs[i]].sumInsuredLimitOfIndemnity,
+				Text: ccg.dto.EnterpriseDTO.Guarantees[enterpriseSlugs[i]].
+					SumInsuredLimitOfIndemnity.Text,
 				Height:    4.5,
-				Width:     25,
+				Width:     30,
 				FontSize:  constants.RegularFontSize,
 				FontStyle: constants.RegularFontStyle,
 				FontColor: constants.BlackColor,
@@ -960,9 +946,9 @@ func (ccg *CommercialCombinedGenerator) guaranteesDetailsSection() {
 				Border:    border,
 			},
 			{
-				Text:      guaranteeNamesMap[enterpriseSlugs[i+1]],
+				Text:      ccg.dto.EnterpriseDTO.Guarantees[enterpriseSlugs[i+1]].Description,
 				Height:    4.5,
-				Width:     65,
+				Width:     60,
 				FontSize:  constants.RegularFontSize,
 				FontStyle: constants.BoldFontStyle,
 				FontColor: constants.BlackColor,
@@ -972,7 +958,8 @@ func (ccg *CommercialCombinedGenerator) guaranteesDetailsSection() {
 				Border:    border,
 			},
 			{
-				Text:      enterpriseData[enterpriseSlugs[i+1]].sumInsuredLimitOfIndemnity,
+				Text: ccg.dto.EnterpriseDTO.Guarantees[enterpriseSlugs[i+1]].
+					SumInsuredLimitOfIndemnity.Text,
 				Height:    4.5,
 				Width:     30,
 				FontSize:  constants.RegularFontSize,
@@ -993,7 +980,8 @@ func (ccg *CommercialCombinedGenerator) guaranteesDetailsSection() {
 	ccg.engine.NewLine(5)
 
 	sumInsuredLimitOfIndemnity := "5.000.000"
-	if enterpriseData[rctoGuaranteeSlug].sumInsuredLimitOfIndemnity != "3000000" {
+	if ccg.dto.EnterpriseDTO.Guarantees[thirdPartyLiabilityWorkProvidersGuaranteeSlug].
+		SumInsuredLimitOfIndemnity.ValueFloat != 3000000 {
 		sumInsuredLimitOfIndemnity = "7.500.000"
 	}
 
@@ -1505,10 +1493,10 @@ func (ccg *CommercialCombinedGenerator) dynamicDeductibleSection() {
 	for _, asset := range ccg.policy.Assets {
 		if asset.Enterprise != nil {
 			for _, guarantee := range asset.Guarantees {
-				if guarantee.Slug == rctGuaranteeSlug {
+				if guarantee.Slug == thirdPartyLiabilityWorkProvidersGuaranteeSlug {
 					rctSumInsuredLimitOfIndemnity = guarantee.Value.SumInsuredLimitOfIndemnity
 					//rctStartDate = guarantee.Value.StartDate.Format(constants.DayMonthYearFormat)
-				} else if guarantee.Slug == rcpGuaranteeSlug {
+				} else if guarantee.Slug == productLiabilityGuaranteeSlug {
 					rcpSumInsuredLimitOfIndemnity = guarantee.Value.SumInsuredLimitOfIndemnity
 					//rcpStartDate = guarantee.Value.StartDate.Format(constants.DayMonthYearFormat)
 					//rcpStartDateUSA = guarantee.Value.StartDate.Format(constants.
@@ -1763,12 +1751,12 @@ func (ccg *CommercialCombinedGenerator) detailsSection() {
 				continue
 			}
 			switch guarantee.Slug {
-			case rctGuaranteeSlug:
+			case thirdPartyLiabilityWorkProvidersGuaranteeSlug:
 				startDateInfo.rct = guarantee.Value.StartDate.Format(constants.DayMonthYearFormat)
-			case rcpGuaranteeSlug:
+			case productLiabilityGuaranteeSlug:
 				startDateInfo.rcp = guarantee.Value.StartDate.Format(constants.DayMonthYearFormat)
 				startDateInfo.rcpUsa = guarantee.Value.StartDate.Format(constants.DayMonthYearFormat)
-			case ritiroGuaranteeSlug:
+			case productWithdrawalGuaranteeSlug:
 				startDateInfo.ritiro = guarantee.Value.StartDate.Format(constants.DayMonthYearFormat)
 			case managementOrganizationGuaranteeSlug:
 				startDateInfo.deo = guarantee.Value.StartDate.Format(constants.DayMonthYearFormat)
@@ -2833,17 +2821,17 @@ func (ccg *CommercialCombinedGenerator) claimsStatement() {
 	}
 
 	claimsMap := map[string]claim{
-		danniGuaranteeSlug: {
+		additionalCompensationGuaranteeSlug: {
 			description: "Danni ai beni (escluso Furto)",
 			quantity:    zeroClaims,
 			value:       zeroClaimValue,
 		},
-		rcpGuaranteeSlug: {
+		productLiabilityGuaranteeSlug: {
 			description: "Responsabilità Civile",
 			quantity:    zeroClaims,
 			value:       zeroClaimValue,
 		},
-		furtoGuaranteeSlug: {
+		theftGuaranteeSlug: {
 			description: "Furto",
 			quantity:    zeroClaims,
 			value:       zeroClaimValue,
@@ -2995,7 +2983,7 @@ func (ccg *CommercialCombinedGenerator) claimsStatement() {
 		},
 	})
 
-	guaranteeSlugs := []string{danniGuaranteeSlug, rcpGuaranteeSlug, furtoGuaranteeSlug, managementOrganizationGuaranteeSlug,
+	guaranteeSlugs := []string{additionalCompensationGuaranteeSlug, productLiabilityGuaranteeSlug, theftGuaranteeSlug, managementOrganizationGuaranteeSlug,
 		cyberGuanrateeSlug}
 
 	borders := []string{"TL", "TL", "TLR"}

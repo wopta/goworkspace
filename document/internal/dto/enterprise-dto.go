@@ -11,7 +11,7 @@ type enterpriseDTO struct {
 	WorkEmployersRemuneration float64
 	TotalBilled               float64
 	OwnerTotalBilled          float64
-	Guarantees                map[string]*GuaranteeDTO
+	Guarantees                map[string]*guaranteeDTO
 }
 
 func newEnterpriseDTO() *enterpriseDTO {
@@ -20,7 +20,7 @@ func newEnterpriseDTO() *enterpriseDTO {
 		NorthAmericanMarket:       0,
 		Employer:                  0,
 		WorkEmployersRemuneration: 0,
-		Guarantees:                make(map[string]*GuaranteeDTO),
+		Guarantees:                make(map[string]*guaranteeDTO),
 	}
 }
 
@@ -39,8 +39,6 @@ func (e *enterpriseDTO) fromPolicy(enterprise models.Enterprise, guarantees []mo
 	}
 
 	for _, guarantee := range guarantees {
-		dto := newGuaranteeDTO()
-		dto.fromPolicy(guarantee)
-		e.Guarantees[guarantee.Slug] = dto
+		e.Guarantees[guarantee.Slug].fromPolicy(guarantee)
 	}
 }

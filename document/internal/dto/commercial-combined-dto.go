@@ -26,27 +26,43 @@ func NewCommercialCombinedDto() *CommercialCombinedDTO {
 	}
 }
 
-func (cc *CommercialCombinedDTO) FromPolicy(policy models.Policy, isProposal bool) {
+func (cc *CommercialCombinedDTO) FromPolicy(policy models.Policy, product models.Product, isProposal bool) {
+	var numBuildings int64
+
 	cc.ContractDTO.fromPolicy(policy, isProposal)
 	cc.ContractorDTO.fromPolicy(policy.Contractor)
 
-	buildings := make([]*buildingDTO, 0)
-	for index, asset := range policy.Assets {
-		if asset.Building != nil {
-			dto := newBuildingDTO()
-			dto.fromPolicy(*policy.Assets[index].Building, policy.Assets[index].Guarantees)
-			buildings = append(buildings, dto)
+	productGuarantees := product.Companies[0].GuaranteesMap
+
+	cc.BuildingsDTO = make([]*buildingDTO, 0, 5)
+	for i := 0; i < 5; i++ {
+		building := newBuildingDTO()
+		for _, guarantee := range productGuarantees {
+			if guarantee.Type == "building" {
+				newGuarantee := newGuaranteeDTO()
+				newGuarantee.Description = guarantee.CompanyName
+				building.Guarantees[guarantee.Slug] = newGuarantee
+			}
 		}
-		if asset.Enterprise != nil {
-			dto := newEnterpriseDTO()
-			dto.fromPolicy(*policy.Assets[index].Enterprise, policy.Assets[index].Guarantees)
-			cc.EnterpriseDTO = dto
+		cc.BuildingsDTO = append(cc.BuildingsDTO, building)
+	}
+
+	cc.EnterpriseDTO = newEnterpriseDTO()
+	for _, guarantee := range productGuarantees {
+		if guarantee.Type == "enterprise" {
+			newGuarantee := newGuaranteeDTO()
+			newGuarantee.Description = guarantee.CompanyName
+			cc.EnterpriseDTO.Guarantees[guarantee.Slug] = newGuarantee
 		}
 	}
 
-	numBuildings := len(buildings)
-	for i := 0; i < 5-numBuildings; i++ {
-		buildings = append(buildings, newBuildingDTO())
+	for index, asset := range policy.Assets {
+		if asset.Building != nil {
+			cc.BuildingsDTO[numBuildings].fromPolicy(*policy.Assets[index].Building, policy.Assets[index].Guarantees)
+			numBuildings++
+		}
+		if asset.Enterprise != nil {
+			cc.EnterpriseDTO.fromPolicy(*policy.Assets[index].Enterprise, policy.Assets[index].Guarantees)
+		}
 	}
-	cc.BuildingsDTO = buildings
 }

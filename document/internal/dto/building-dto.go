@@ -14,7 +14,7 @@ type buildingDTO struct {
 	HasSprinkler     string
 	Naics            string
 	NaicsDetail      string
-	Guarantees       map[string]*GuaranteeDTO
+	Guarantees       map[string]*guaranteeDTO
 }
 
 func newBuildingDTO() *buildingDTO {
@@ -30,7 +30,7 @@ func newBuildingDTO() *buildingDTO {
 		HasSprinkler:     no,
 		Naics:            emptyField,
 		NaicsDetail:      emptyField,
-		Guarantees:       make(map[string]*GuaranteeDTO),
+		Guarantees:       make(map[string]*guaranteeDTO),
 	}
 }
 
@@ -70,8 +70,6 @@ func (b *buildingDTO) fromPolicy(building models.Building, guarantees []models.G
 	}
 
 	for _, guarantee := range guarantees {
-		g := newGuaranteeDTO()
-		g.fromPolicy(guarantee)
-		b.Guarantees[guarantee.Slug] = g
+		b.Guarantees[guarantee.Slug].fromPolicy(guarantee)
 	}
 }
