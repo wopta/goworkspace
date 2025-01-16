@@ -40,31 +40,6 @@ const (
 	productWithdrawalGuaranteeSlug                string = "product-withdrawal" // RITIRO
 )
 
-var (
-	guaranteeNamesMap = map[string]string{
-		buildingGuaranteeSlug:               "Fabbricato",
-		rentalRiskGuaranteeSlug:             "Rischio Locativo (in aumento A/24)",
-		machineryGuaranteeSlug:              "Macchinari",
-		stockGuaranteeSlug:                  "Merci (importi fissi)",
-		stockTemporaryIncreaseGuaranteeSlug: "Merci (Aumento temporaneo A/29)",
-		thirdPartyRecourseGuaranteeSlug:     "Ricordo Terzi (in aumento A/25)",
-		electricalPhenomenonGuaranteeSlug:   "Fenomeno Elettrico (in aumento A/23)",
-		refrigerationStockGuaranteeSlug:     "Merci in refrigerazione",
-		machineryBreakdownGuaranteeSlug:     "Guasti alle macchine (in aumento A/27)",
-		electronicEquipmentGuaranteeSlug:    "Apparecch.re Elettroniche (in aumento A/26)",
-		theftGuaranteeSlug:                  "Furto, rapina, estorsione (in aumento C/1)",
-		additionalCompensationGuaranteeSlug: "Danni indiretti - Formula",
-		dailyAllowanceGuaranteeSlug:         "Diaria Giornaliera",
-		increasedCostGuaranteeSlug:          "Maggiori costi",
-		lossRentGuaranteeSlug:               "Perdita Pigioni",
-		thirdPartyLiabilityWorkProvidersGuaranteeSlug: "Responsabilità Civile verso Terzi (" +
-			"RCT) e verso Prestatori di lavoro (RCO)",
-		productLiabilityGuaranteeSlug:       "Responsabilità Civile Prodotti (RCP) Ritiro prodotti",
-		managementOrganizationGuaranteeSlug: "Responsabilità Amministratori Sindaci Dirigenti (D&O)",
-		cyberGuanrateeSlug:                  "Cyber Response e Data Security",
-	}
-)
-
 type CommercialCombinedGenerator struct {
 	*baseGenerator
 	dto *dto.CommercialCombinedDTO
@@ -1831,7 +1806,7 @@ func (ccg *CommercialCombinedGenerator) detailsSection() {
 			},
 			{
 				Text: "L’Assicurazione vale per le conseguenze di fatti colposi commessi dopo la data del" +
-					" " + guarantees[thirdPartyLiabilityWorkProvidersGuaranteeSlug].StartDate,
+					" " + guarantees[thirdPartyLiabilityWorkProvidersGuaranteeSlug].RetroactiveDate,
 				Height:    4.5,
 				Width:     thirdColumnWidth,
 				FontSize:  constants.MediumFontSize,
@@ -1919,7 +1894,7 @@ func (ccg *CommercialCombinedGenerator) detailsSection() {
 	ccg.engine.SetX(thirdColumnX)
 	ccg.engine.WriteText(domain.TableCell{
 		Text: "L'Assicurazione vale per i danni verificatisi dopo la data del " +
-			guarantees[productLiabilityGuaranteeSlug].StartDate,
+			guarantees[productLiabilityGuaranteeSlug].RetroactiveDate,
 		Height:    4.5,
 		Width:     thirdColumnWidth,
 		FontSize:  constants.MediumFontSize,
@@ -1932,8 +1907,7 @@ func (ccg *CommercialCombinedGenerator) detailsSection() {
 	})
 	ccg.engine.SetX(thirdColumnX)
 	ccg.engine.WriteText(domain.TableCell{
-		// TODO: startDate USA
-		Text: "L'Assicurazione vale per i danni verificatisi dopo la data del " + guarantees[productLiabilityGuaranteeSlug].StartDate + " purch" +
+		Text: "L'Assicurazione vale per i danni verificatisi dopo la data del " + guarantees[productLiabilityGuaranteeSlug].RetroactiveDateUsa + " purch" +
 			"é  relativi a prodotti descritti in Polizza consegnati a terzi dopo la stessa data.",
 		Height:    4.5,
 		Width:     thirdColumnWidth,

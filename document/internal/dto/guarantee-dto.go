@@ -29,6 +29,8 @@ type guaranteeDTO struct {
 	SumInsured                 numeric
 	StartDate                  string
 	Duration                   numeric
+	RetroactiveDate            string
+	RetroactiveDateUsa         string
 }
 
 func newGuaranteeDTO() *guaranteeDTO {
@@ -39,6 +41,8 @@ func newGuaranteeDTO() *guaranteeDTO {
 		SumInsured:                 newNumeric(),
 		StartDate:                  emptyField,
 		Duration:                   newNumeric(),
+		RetroactiveDate:            emptyField,
+		RetroactiveDateUsa:         emptyField,
 	}
 }
 
@@ -59,7 +63,13 @@ func (g *guaranteeDTO) fromPolicy(guarantee models.Guarante) {
 		g.StartDate = guarantee.Value.StartDate.Format(constants.DayMonthYearFormat)
 	}
 	if guarantee.Value.Duration != nil {
-		g.Duration.ValueInt = int64(guarantee.Value.Duration.Year)
+		g.Duration.ValueInt = int64(guarantee.Value.Duration.Day)
 		g.Duration.Text = fmt.Sprintf("%d", g.Duration.ValueInt)
+	}
+	if guarantee.Value.RetroactiveDate != nil && !guarantee.Value.RetroactiveDate.IsZero() {
+		g.RetroactiveDate = guarantee.Value.RetroactiveDate.Format(constants.DayMonthYearFormat)
+	}
+	if guarantee.Value.RetroactiveUsaCanDate != nil && !guarantee.Value.RetroactiveDate.IsZero() {
+		g.RetroactiveDateUsa = guarantee.Value.RetroactiveUsaCanDate.Format(constants.DayMonthYearFormat)
 	}
 }
