@@ -2421,13 +2421,9 @@ func (ccg *CommercialCombinedGenerator) specialConditionsSection() {
 	})
 }
 
-// TODO: parse bond
 func (ccg *CommercialCombinedGenerator) bondSection() {
-	hasBondText := "NO"
-	bondText := "======"
-
 	ccg.engine.WriteText(domain.TableCell{
-		Text:      "Clausola di Vincolo assicurativo " + hasBondText,
+		Text:      "Clausola di Vincolo assicurativo " + ccg.dto.Contract.HasBond,
 		Height:    4.5,
 		Width:     190,
 		FontSize:  constants.LargeFontSize,
@@ -2441,7 +2437,7 @@ func (ccg *CommercialCombinedGenerator) bondSection() {
 	ccg.engine.NewLine(1)
 	ccg.engine.WriteText(domain.TableCell{
 		Text: "La presente Polizza, a decorrere dal suo effetto, " +
-			"si intende vincolata a favore dell’Istituto Vincolatario " + bondText + " , " +
+			"si intende vincolata a favore dell’Istituto Vincolatario " + ccg.dto.Contract.BondText + " , " +
 			"alle condizioni tutte di cui all’Art. 28.",
 		Height:    4.5,
 		Width:     190,
@@ -2455,7 +2451,6 @@ func (ccg *CommercialCombinedGenerator) bondSection() {
 	})
 }
 
-// TODO: parse data from policy
 func (ccg *CommercialCombinedGenerator) resumeSection() {
 	const (
 		descriptionWidth = 90
