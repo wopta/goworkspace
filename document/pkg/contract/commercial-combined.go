@@ -2727,7 +2727,7 @@ func (ccg *CommercialCombinedGenerator) resumeSection() {
 				FontColor: constants.BlackColor,
 				Fill:      false,
 				FillColor: domain.Color{},
-				Align:     constants.RightAlign,
+				Align:     constants.LeftAlign,
 				Border:    "TB",
 			},
 			{
