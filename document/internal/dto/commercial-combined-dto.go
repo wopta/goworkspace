@@ -109,15 +109,15 @@ func (cc *CommercialCombinedDTO) FromPolicy(policy models.Policy, product models
 	cc.Prices.GrossText = lib.HumanaizePriceEuro(cc.Prices.Taxes)
 
 	sectionMap := map[string]string{
-		"A": "INCENDIO E \"TUTTI I RISCHI\"",
-		"B": "DANNI INDIRETTI",
-		"C": "FURTO",
-		"D": "RESPONSABILITÀ CIVILE VERSO TERZI (RCT)",
-		"E": "RESP. CIVILE VERSO PRESTATORI DI LAVORO (RCO)",
-		"F": "RESP. CIVILE DA PRODOTTI DIFETTOSI (RCP)",
-		"G": "RITIRO PRODOTTI",
-		"H": "RESP. AMMINISTRATORI SINDACI DIRIGENTI (D&O)",
-		"I": "CYBER RESPONSE E DATA SECURITY",
+		"A": "A - INCENDIO E \"TUTTI I RISCHI\"",
+		"B": "B - DANNI INDIRETTI",
+		"C": "C - FURTO",
+		"D": "D - RESPONSABILITÀ CIVILE VERSO TERZI (RCT)",
+		"E": "E - RESP. CIVILE VERSO PRESTATORI DI LAVORO (RCO)",
+		"F": "F - RESP. CIVILE DA PRODOTTI DIFETTOSI (RCP)",
+		"G": "G - RITIRO PRODOTTI",
+		"H": "H - RESP. AMMINISTRATORI SINDACI DIRIGENTI (D&O)",
+		"I": "I - CYBER RESPONSE E DATA SECURITY",
 	}
 
 	cc.PricesBySection = make(map[string]*section)
