@@ -14,11 +14,13 @@ const (
 )
 
 type CommercialCombinedDTO struct {
-	Contract   *contractDTO
-	Contractor *contractorDTO
-	Enterprise *enterpriseDTO
-	Buildings  []*buildingDTO
-	Claims     map[string]*claimDTO
+	Contract        *contractDTO
+	Contractor      *contractorDTO
+	Enterprise      *enterpriseDTO
+	Buildings       []*buildingDTO
+	Claims          map[string]*claimDTO
+	Prices          *priceDTO
+	PricesBySection map[string]*section
 }
 
 func NewCommercialCombinedDto() *CommercialCombinedDTO {
@@ -96,5 +98,76 @@ func (cc *CommercialCombinedDTO) FromPolicy(policy models.Policy, product models
 			cc.Claims[slug].Value.ValueFloat += history.Value
 			cc.Claims[slug].Value.Text = lib.HumanaizePriceEuro(cc.Claims[slug].Value.ValueFloat)
 		}
+	}
+
+	cc.Prices = newPriceDTO()
+	cc.Prices.Gross = policy.PriceGross
+	cc.Prices.GrossText = lib.HumanaizePriceEuro(cc.Prices.Gross)
+	cc.Prices.Net = policy.PriceNett
+	cc.Prices.GrossText = lib.HumanaizePriceEuro(cc.Prices.Net)
+	cc.Prices.Taxes = policy.TaxAmount
+	cc.Prices.GrossText = lib.HumanaizePriceEuro(cc.Prices.Taxes)
+
+	sectionMap := map[string]string{
+		"A": "INCENDIO E \"TUTTI I RISCHI\"",
+		"B": "DANNI INDIRETTI",
+		"C": "FURTO",
+		"D": "RESPONSABILITÀ CIVILE VERSO TERZI (RCT)",
+		"E": "RESP. CIVILE VERSO PRESTATORI DI LAVORO (RCO)",
+		"F": "RESP. CIVILE DA PRODOTTI DIFETTOSI (RCP)",
+		"G": "RITIRO PRODOTTI",
+		"H": "RESP. AMMINISTRATORI SINDACI DIRIGENTI (D&O)",
+		"I": "CYBER RESPONSE E DATA SECURITY",
+	}
+
+	cc.PricesBySection = make(map[string]*section)
+	for sectionKey, description := range sectionMap {
+		cc.PricesBySection[sectionKey] = newSection()
+		cc.PricesBySection[sectionKey].Description = description
+	}
+
+	groupSectionMap := map[string]string{
+		"Fabbricato":                                   "A",
+		"Contenuto (Merci e Macchinari)":               "A",
+		"Merci (aumento temporaneo)":                   "A",
+		"Furto, rapina, estorsione (in aumento)":       "C",
+		"Rischio locativo (in aumento)":                "A",
+		"Altre garanzie su Contenuto":                  "A",
+		"Ricorso terzi (in aumento)":                   "A",
+		"Danni indiretti":                              "B",
+		"Perdita Pigioni":                              "B",
+		"Responsabilità civile terzi":                  "D",
+		"Responsabilità civile prestatori lavoro":      "E",
+		"Responsabilità civile prodotti":               "F",
+		"Ritiro Prodotti":                              "G",
+		"Resp. Amministratori Sindaci Dirigenti (D&O)": "H",
+		"Cyber": "I",
+	}
+
+	for _, price := range policy.PriceGroup {
+		sectionKey := groupSectionMap[price.Name]
+		cc.PricesBySection[sectionKey].Price.Gross += price.Gross
+		cc.PricesBySection[sectionKey].Price.GrossText = lib.HumanaizePriceEuro(cc.PricesBySection[sectionKey].Price.Gross)
+		cc.PricesBySection[sectionKey].Price.Net += price.Net
+		cc.PricesBySection[sectionKey].Price.NetText = lib.HumanaizePriceEuro(cc.PricesBySection[sectionKey].Price.Net)
+		cc.PricesBySection[sectionKey].Price.Taxes += price.Tax
+		cc.PricesBySection[sectionKey].Price.TaxesText = lib.HumanaizePriceEuro(cc.PricesBySection[sectionKey].Price.Taxes)
+		if cc.PricesBySection[sectionKey].Active == no && cc.PricesBySection[sectionKey].Price.Gross > 0 {
+			cc.PricesBySection[sectionKey].Active = yes
+		}
+	}
+}
+
+type section struct {
+	Description string
+	Active      string
+	Price       *priceDTO
+}
+
+func newSection() *section {
+	return &section{
+		Description: emptyField,
+		Active:      no,
+		Price:       newPriceDTO(),
 	}
 }

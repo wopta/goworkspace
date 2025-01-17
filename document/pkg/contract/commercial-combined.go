@@ -2458,107 +2458,11 @@ func (ccg *CommercialCombinedGenerator) bondSection() {
 // TODO: parse data from policy
 func (ccg *CommercialCombinedGenerator) resumeSection() {
 	const (
-		emptyField       = "======"
-		no               = "NO"
-		yes              = "SI"
 		descriptionWidth = 90
 		cellWidth        = 25
 	)
 
-	type section struct {
-		description string
-		active      string
-		priceNet    string
-		taxAmount   string
-		priceGross  string
-	}
-
-	sections := []section{
-		{
-			description: "A - INCENDIO E \" TUTTI I RISCHI\"",
-			active:      no,
-			priceNet:    emptyField,
-			taxAmount:   emptyField,
-			priceGross:  emptyField,
-		},
-		{
-			description: "B - DANNI INDIRETTI",
-			active:      no,
-			priceNet:    emptyField,
-			taxAmount:   emptyField,
-			priceGross:  emptyField,
-		},
-		{
-			description: "C - FURTO",
-			active:      no,
-			priceNet:    emptyField,
-			taxAmount:   emptyField,
-			priceGross:  emptyField,
-		},
-		{
-			description: "D - RESPONSABILITA' CIVILE VERSO TERZI (RCT)",
-			active:      no,
-			priceNet:    emptyField,
-			taxAmount:   emptyField,
-			priceGross:  emptyField,
-		},
-		{
-			description: "E - RESP. CIVILE VERSO PRESTATORI DI LAVORO (RCO)",
-			active:      no,
-			priceNet:    emptyField,
-			taxAmount:   emptyField,
-			priceGross:  emptyField,
-		},
-		{
-			description: "F - RESP. CIVILE DA PRODOTTI DIFETTOSI (RCP)",
-			active:      no,
-			priceNet:    emptyField,
-			taxAmount:   emptyField,
-			priceGross:  emptyField,
-		},
-		{
-			description: "G - RITIRO PRODOTTI",
-			active:      no,
-			priceNet:    emptyField,
-			taxAmount:   emptyField,
-			priceGross:  emptyField,
-		},
-		{
-			description: "H - RESP. AMMINISTRATORI SINDACI DIRIGENTI (D&O)",
-			active:      no,
-			priceNet:    emptyField,
-			taxAmount:   emptyField,
-			priceGross:  emptyField,
-		},
-		{
-			description: "I - CYBER RESPONSE E DATA SECURITY",
-			active:      no,
-			priceNet:    emptyField,
-			taxAmount:   emptyField,
-			priceGross:  emptyField,
-		},
-		{
-			description: "TOTALE PREMIO ANNUALE",
-			active:      " ",
-			priceNet:    emptyField,
-			taxAmount:   emptyField,
-			priceGross:  emptyField,
-		},
-		{
-			description: "Rata alla firma della polizza",
-			active:      " ",
-			priceNet:    emptyField,
-			taxAmount:   emptyField,
-			priceGross:  emptyField,
-		},
-		{
-			description: "Rate successive alla prima",
-			active:      " ",
-			priceNet:    emptyField,
-			taxAmount:   emptyField,
-			priceGross:  emptyField,
-		},
-	}
+	sections := []string{"A", "B", "C", "D", "E", "F", "G", "H", "I"}
 
 	table := make([][]domain.TableCell, 0)
 
@@ -2627,16 +2531,11 @@ func (ccg *CommercialCombinedGenerator) resumeSection() {
 
 	border := "T"
 	fontStyle := constants.RegularFontStyle
-	for index, s := range sections {
-		if index == len(sections)-1 {
-			border = "TB"
-		}
-		if index > len(sections)-3 {
-			fontStyle = constants.BoldFontStyle
-		}
+	for _, sectionKey := range sections {
+		section := ccg.dto.PricesBySection[sectionKey]
 		table = append(table, []domain.TableCell{
 			{
-				Text:      s.description,
+				Text:      section.Description,
 				Height:    4.5,
 				Width:     descriptionWidth,
 				FontSize:  constants.RegularFontSize,
@@ -2648,7 +2547,7 @@ func (ccg *CommercialCombinedGenerator) resumeSection() {
 				Border:    border,
 			},
 			{
-				Text:      s.active,
+				Text:      section.Active,
 				Height:    4.5,
 				Width:     cellWidth,
 				FontSize:  constants.RegularFontSize,
@@ -2660,7 +2559,7 @@ func (ccg *CommercialCombinedGenerator) resumeSection() {
 				Border:    border,
 			},
 			{
-				Text:      s.priceNet,
+				Text:      section.Price.NetText,
 				Height:    4.5,
 				Width:     cellWidth,
 				FontSize:  constants.RegularFontSize,
@@ -2672,7 +2571,7 @@ func (ccg *CommercialCombinedGenerator) resumeSection() {
 				Border:    border,
 			},
 			{
-				Text:      s.taxAmount,
+				Text:      section.Price.TaxesText,
 				Height:    4.5,
 				Width:     cellWidth,
 				FontSize:  constants.RegularFontSize,
@@ -2684,7 +2583,7 @@ func (ccg *CommercialCombinedGenerator) resumeSection() {
 				Border:    border,
 			},
 			{
-				Text:      s.priceGross,
+				Text:      section.Price.GrossText,
 				Height:    4.5,
 				Width:     cellWidth,
 				FontSize:  constants.RegularFontSize,
@@ -2697,6 +2596,195 @@ func (ccg *CommercialCombinedGenerator) resumeSection() {
 			},
 		})
 	}
+
+	table = append(table, [][]domain.TableCell{
+		{
+			{
+				Text:      "TOTALE PREMIO ANNUALE",
+				Height:    4.5,
+				Width:     descriptionWidth,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: constants.RegularFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.LeftAlign,
+				Border:    "T",
+			},
+			{
+				Text:      " ",
+				Height:    4.5,
+				Width:     cellWidth,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: constants.RegularFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.RightAlign,
+				Border:    "T",
+			},
+			{
+				Text:      ccg.dto.Prices.NetText,
+				Height:    4.5,
+				Width:     cellWidth,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: constants.RegularFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.RightAlign,
+				Border:    "T",
+			},
+			{
+				Text:      ccg.dto.Prices.TaxesText,
+				Height:    4.5,
+				Width:     cellWidth,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: constants.RegularFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.RightAlign,
+				Border:    "T",
+			},
+			{
+				Text:      ccg.dto.Prices.GrossText,
+				Height:    4.5,
+				Width:     cellWidth,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: constants.RegularFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.RightAlign,
+				Border:    "T",
+			},
+		},
+		{
+			{
+				Text:      "Rata alla firma della polizza",
+				Height:    4.5,
+				Width:     descriptionWidth,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: constants.BoldFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.LeftAlign,
+				Border:    "T",
+			},
+			{
+				Text:      " ",
+				Height:    4.5,
+				Width:     cellWidth,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: constants.BoldFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.RightAlign,
+				Border:    "T",
+			},
+			{
+				Text:      ccg.dto.Prices.NetText,
+				Height:    4.5,
+				Width:     cellWidth,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: constants.BoldFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.RightAlign,
+				Border:    "T",
+			},
+			{
+				Text:      ccg.dto.Prices.TaxesText,
+				Height:    4.5,
+				Width:     cellWidth,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: constants.BoldFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.RightAlign,
+				Border:    "T",
+			},
+			{
+				Text:      ccg.dto.Prices.GrossText,
+				Height:    4.5,
+				Width:     cellWidth,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: constants.BoldFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.RightAlign,
+				Border:    "T",
+			},
+		},
+		{
+			{
+				Text:      "Rate successive alla prima",
+				Height:    4.5,
+				Width:     descriptionWidth,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: constants.BoldFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.RightAlign,
+				Border:    "TB",
+			},
+			{
+				Text:      " ",
+				Height:    4.5,
+				Width:     cellWidth,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: constants.BoldFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.RightAlign,
+				Border:    "TB",
+			},
+			{
+				Text:      ccg.dto.Prices.NetText,
+				Height:    4.5,
+				Width:     cellWidth,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: constants.BoldFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.RightAlign,
+				Border:    "TB",
+			},
+			{
+				Text:      ccg.dto.Prices.TaxesText,
+				Height:    4.5,
+				Width:     cellWidth,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: constants.BoldFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.RightAlign,
+				Border:    "TB",
+			},
+			{
+				Text:      ccg.dto.Prices.GrossText,
+				Height:    4.5,
+				Width:     cellWidth,
+				FontSize:  constants.RegularFontSize,
+				FontStyle: constants.BoldFontStyle,
+				FontColor: constants.BlackColor,
+				Fill:      false,
+				FillColor: domain.Color{},
+				Align:     constants.RightAlign,
+				Border:    "TB",
+			},
+		},
+	}...)
 
 	ccg.engine.WriteText(domain.TableCell{
 		Text:      "Il Premio per tutte le coperture assicurative attivate sulla Polizza",
