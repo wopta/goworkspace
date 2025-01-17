@@ -156,8 +156,8 @@ func (ccg *CommercialCombinedGenerator) mainHeader() {
 		secondColumnWidth = 75
 	)
 
-	contractDTO := ccg.dto.ContractDTO
-	contractorDTO := ccg.dto.ContractorDTO
+	contractDTO := ccg.dto.Contract
+	contractorDTO := ccg.dto.Contractor
 
 	parser := func(rows [][]string) [][]domain.TableCell {
 		result := make([][]domain.TableCell, 0, len(rows))
@@ -462,8 +462,8 @@ func (ccg *CommercialCombinedGenerator) whoWeAreSection() {
 }
 
 func (ccg *CommercialCombinedGenerator) insuredDetailsSection() {
-	buildings := ccg.dto.BuildingsDTO
-	enterprise := ccg.dto.EnterpriseDTO
+	buildings := ccg.dto.Buildings
+	enterprise := ccg.dto.Enterprise
 
 	table := make([][]domain.TableCell, 0)
 
@@ -718,7 +718,7 @@ func (ccg *CommercialCombinedGenerator) guaranteesDetailsSection() {
 	for _, slug := range buildingsSlugs {
 		row := make([]domain.TableCell, 6)
 		row[0] = domain.TableCell{
-			Text:      ccg.dto.BuildingsDTO[0].Guarantees[slug].Description,
+			Text:      ccg.dto.Buildings[0].Guarantees[slug].Description,
 			Height:    4.5,
 			Width:     65,
 			FontSize:  constants.RegularFontSize,
@@ -729,7 +729,7 @@ func (ccg *CommercialCombinedGenerator) guaranteesDetailsSection() {
 			Align:     constants.RightAlign,
 			Border:    "T",
 		}
-		for _, building := range ccg.dto.BuildingsDTO {
+		for _, building := range ccg.dto.Buildings {
 			row = append(row, domain.TableCell{
 				Text:      building.Guarantees[slug].SumInsuredLimitOfIndemnity.Text,
 				Height:    4.5,
@@ -761,8 +761,8 @@ func (ccg *CommercialCombinedGenerator) guaranteesDetailsSection() {
 		},
 		{
 			Text: fmt.Sprintf("%s a partire dal %s  di ogni anno",
-				ccg.dto.BuildingsDTO[0].Guarantees[stockTemporaryIncreaseGuaranteeSlug].
-					SumInsuredLimitOfIndemnity.Text, ccg.dto.BuildingsDTO[0].
+				ccg.dto.Buildings[0].Guarantees[stockTemporaryIncreaseGuaranteeSlug].
+					SumInsuredLimitOfIndemnity.Text, ccg.dto.Buildings[0].
 					Guarantees[stockTemporaryIncreaseGuaranteeSlug].StartDate),
 			Height:    4.5,
 			Width:     125,
@@ -780,7 +780,7 @@ func (ccg *CommercialCombinedGenerator) guaranteesDetailsSection() {
 		log.Printf("Slug: %s", slug)
 		row := []domain.TableCell{
 			{
-				Text:      ccg.dto.EnterpriseDTO.Guarantees[slug].Description,
+				Text:      ccg.dto.Enterprise.Guarantees[slug].Description,
 				Height:    4.5,
 				Width:     65,
 				FontSize:  constants.RegularFontSize,
@@ -794,7 +794,7 @@ func (ccg *CommercialCombinedGenerator) guaranteesDetailsSection() {
 		}
 
 		row = append(row, domain.TableCell{
-			Text:      ccg.dto.EnterpriseDTO.Guarantees[slug].SumInsuredLimitOfIndemnity.Text,
+			Text:      ccg.dto.Enterprise.Guarantees[slug].SumInsuredLimitOfIndemnity.Text,
 			Height:    4.5,
 			Width:     125,
 			FontSize:  constants.RegularFontSize,
@@ -826,7 +826,7 @@ func (ccg *CommercialCombinedGenerator) guaranteesDetailsSection() {
 	for _, slug := range enterpriseSlugs[7:11] {
 		row := []domain.TableCell{
 			{
-				Text:      ccg.dto.EnterpriseDTO.Guarantees[slug].Description,
+				Text:      ccg.dto.Enterprise.Guarantees[slug].Description,
 				Height:    4.5,
 				Width:     65,
 				FontSize:  constants.RegularFontSize,
@@ -839,9 +839,9 @@ func (ccg *CommercialCombinedGenerator) guaranteesDetailsSection() {
 			},
 		}
 
-		info := ccg.dto.EnterpriseDTO.Guarantees[slug].SumInsuredLimitOfIndemnity.Text
+		info := ccg.dto.Enterprise.Guarantees[slug].SumInsuredLimitOfIndemnity.Text
 		if slug == dailyAllowanceGuaranteeSlug {
-			info += fmt.Sprintf(" Periodo di indennizzo %s giorni", ccg.dto.EnterpriseDTO.Guarantees[slug].
+			info += fmt.Sprintf(" Periodo di indennizzo %s giorni", ccg.dto.Enterprise.Guarantees[slug].
 				Duration.Text)
 		}
 
@@ -883,7 +883,7 @@ func (ccg *CommercialCombinedGenerator) guaranteesDetailsSection() {
 		}
 		row := []domain.TableCell{
 			{
-				Text:      ccg.dto.EnterpriseDTO.Guarantees[enterpriseSlugs[i]].Description,
+				Text:      ccg.dto.Enterprise.Guarantees[enterpriseSlugs[i]].Description,
 				Height:    4.5,
 				Width:     65,
 				FontSize:  constants.RegularFontSize,
@@ -895,7 +895,7 @@ func (ccg *CommercialCombinedGenerator) guaranteesDetailsSection() {
 				Border:    border,
 			},
 			{
-				Text: ccg.dto.EnterpriseDTO.Guarantees[enterpriseSlugs[i]].
+				Text: ccg.dto.Enterprise.Guarantees[enterpriseSlugs[i]].
 					SumInsuredLimitOfIndemnity.Text,
 				Height:    4.5,
 				Width:     30,
@@ -920,7 +920,7 @@ func (ccg *CommercialCombinedGenerator) guaranteesDetailsSection() {
 				Border:    border,
 			},
 			{
-				Text:      ccg.dto.EnterpriseDTO.Guarantees[enterpriseSlugs[i+1]].Description,
+				Text:      ccg.dto.Enterprise.Guarantees[enterpriseSlugs[i+1]].Description,
 				Height:    4.5,
 				Width:     60,
 				FontSize:  constants.RegularFontSize,
@@ -932,7 +932,7 @@ func (ccg *CommercialCombinedGenerator) guaranteesDetailsSection() {
 				Border:    border,
 			},
 			{
-				Text: ccg.dto.EnterpriseDTO.Guarantees[enterpriseSlugs[i+1]].
+				Text: ccg.dto.Enterprise.Guarantees[enterpriseSlugs[i+1]].
 					SumInsuredLimitOfIndemnity.Text,
 				Height:    4.5,
 				Width:     30,
@@ -954,7 +954,7 @@ func (ccg *CommercialCombinedGenerator) guaranteesDetailsSection() {
 	ccg.engine.NewLine(5)
 
 	sumInsuredLimitOfIndemnity := "5.000.000"
-	if ccg.dto.EnterpriseDTO.Guarantees[thirdPartyLiabilityWorkProvidersGuaranteeSlug].
+	if ccg.dto.Enterprise.Guarantees[thirdPartyLiabilityWorkProvidersGuaranteeSlug].
 		SumInsuredLimitOfIndemnity.ValueFloat != 3000000 {
 		sumInsuredLimitOfIndemnity = "7.500.000"
 	}
@@ -1464,11 +1464,11 @@ func (ccg *CommercialCombinedGenerator) dynamicDeductibleSection() {
 		return result
 	}
 
-	rctSumInsuredLimitOfIndemnityString := ccg.dto.EnterpriseDTO.
+	rctSumInsuredLimitOfIndemnityString := ccg.dto.Enterprise.
 		Guarantees[thirdPartyLiabilityWorkProvidersGuaranteeSlug].SumInsuredLimitOfIndemnity.Text
-	rctSumInsuredLimitOfIndemnity = ccg.dto.EnterpriseDTO.Guarantees[thirdPartyLiabilityWorkProvidersGuaranteeSlug].
+	rctSumInsuredLimitOfIndemnity = ccg.dto.Enterprise.Guarantees[thirdPartyLiabilityWorkProvidersGuaranteeSlug].
 		SumInsuredLimitOfIndemnity.ValueFloat
-	rcpSumInsuredLimitOfIndemnityString := ccg.dto.EnterpriseDTO.
+	rcpSumInsuredLimitOfIndemnityString := ccg.dto.Enterprise.
 		Guarantees[productLiabilityGuaranteeSlug].SumInsuredLimitOfIndemnity.Text
 
 	sumInsuredLimitA := rctSumInsuredLimitOfIndemnityString
@@ -1686,7 +1686,7 @@ func (ccg *CommercialCombinedGenerator) detailsSection() {
 		thirdColumnX      = 120.0
 	)
 
-	guarantees := ccg.dto.EnterpriseDTO.Guarantees
+	guarantees := ccg.dto.Enterprise.Guarantees
 
 	ccg.engine.WriteText(domain.TableCell{
 		Text:      "Dettagli di alcune sezioni",
@@ -2732,64 +2732,11 @@ func (ccg *CommercialCombinedGenerator) resumeSection() {
 
 func (ccg *CommercialCombinedGenerator) claimsStatement() {
 	const (
-		zeroClaims             = "0"
-		zeroClaimValue         = "€ 0,00"
 		descriptionColumnWidth = 50
 		quantityColumnWidth    = 30
 		valueColumnWidth       = 50
 		tabWidth               = 40
 	)
-
-	type claim struct {
-		description string
-		quantity    string
-		value       string
-	}
-
-	claimsMap := map[string]claim{
-		additionalCompensationGuaranteeSlug: {
-			description: "Danni ai beni (escluso Furto)",
-			quantity:    zeroClaims,
-			value:       zeroClaimValue,
-		},
-		productLiabilityGuaranteeSlug: {
-			description: "Responsabilità Civile",
-			quantity:    zeroClaims,
-			value:       zeroClaimValue,
-		},
-		theftGuaranteeSlug: {
-			description: "Furto",
-			quantity:    zeroClaims,
-			value:       zeroClaimValue,
-		},
-		managementOrganizationGuaranteeSlug: {
-			description: "D&O",
-			quantity:    zeroClaims,
-			value:       zeroClaimValue,
-		},
-		cyberGuanrateeSlug: {
-			description: "Cyber",
-			quantity:    zeroClaims,
-			value:       zeroClaimValue,
-		},
-	}
-
-	for _, declaredClaim := range ccg.policy.DeclaredClaims {
-		if _, ok := claimsMap[declaredClaim.GuaranteeSlug]; !ok {
-			// TODO: improve this case handling
-			continue
-		}
-		quantity, value := 0, 0.0
-		for _, history := range declaredClaim.History {
-			quantity += history.Quantity
-			value += history.Value
-		}
-
-		claimsMap[declaredClaim.GuaranteeSlug] = claim{
-			quantity: fmt.Sprintf("%d", quantity),
-			value:    lib.HumanaizePriceEuro(value),
-		}
-	}
 
 	ccg.engine.WriteText(domain.TableCell{
 		Text:      "Dichiarazioni da leggere con attenzione prima di firmare",
@@ -2909,8 +2856,8 @@ func (ccg *CommercialCombinedGenerator) claimsStatement() {
 		},
 	})
 
-	guaranteeSlugs := []string{additionalCompensationGuaranteeSlug, productLiabilityGuaranteeSlug, theftGuaranteeSlug, managementOrganizationGuaranteeSlug,
-		cyberGuanrateeSlug}
+	guaranteeSlugs := []string{"property", "third-party-liability", "theft", "management-organization",
+		"cyber"}
 
 	borders := []string{"TL", "TL", "TLR"}
 	for index, slug := range guaranteeSlugs {
@@ -2921,7 +2868,7 @@ func (ccg *CommercialCombinedGenerator) claimsStatement() {
 		ccg.engine.DrawTable([][]domain.TableCell{
 			{
 				{
-					Text:      claimsMap[slug].description,
+					Text:      ccg.dto.Claims[slug].Description,
 					Height:    4.5,
 					Width:     descriptionColumnWidth,
 					FontSize:  constants.MediumFontSize,
@@ -2933,7 +2880,7 @@ func (ccg *CommercialCombinedGenerator) claimsStatement() {
 					Border:    borders[0],
 				},
 				{
-					Text:      claimsMap[slug].quantity,
+					Text:      ccg.dto.Claims[slug].Quantity.Text,
 					Height:    4.5,
 					Width:     quantityColumnWidth,
 					FontSize:  constants.MediumFontSize,
@@ -2945,7 +2892,7 @@ func (ccg *CommercialCombinedGenerator) claimsStatement() {
 					Border:    borders[1],
 				},
 				{
-					Text:      claimsMap[slug].value,
+					Text:      ccg.dto.Claims[slug].Value.Text,
 					Height:    4.5,
 					Width:     valueColumnWidth,
 					FontSize:  constants.MediumFontSize,
