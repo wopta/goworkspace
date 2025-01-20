@@ -2363,8 +2363,6 @@ func (ccg *CommercialCombinedGenerator) detailsSection() {
 
 // TODO: parse clause
 func (ccg *CommercialCombinedGenerator) specialConditionsSection() {
-	clause := "======"
-
 	ccg.engine.WriteText(domain.TableCell{
 		Text:      "Condizioni Speciali in deroga alle Condizioni di Assicurazione",
 		Height:    4.5,
@@ -2394,7 +2392,7 @@ func (ccg *CommercialCombinedGenerator) specialConditionsSection() {
 	ccg.engine.NewLine(1)
 
 	ccg.engine.WriteText(domain.TableCell{
-		Text:      clause,
+		Text:      ccg.dto.Contract.Clause,
 		Height:    4.5,
 		Width:     190,
 		FontSize:  constants.RegularFontSize,

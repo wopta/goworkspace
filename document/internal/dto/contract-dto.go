@@ -17,6 +17,7 @@ type contractDTO struct {
 	NextPay      string
 	HasBond      string
 	BondText     string
+	Clause       string
 }
 
 func newContractDTO() *contractDTO {
@@ -28,6 +29,8 @@ func newContractDTO() *contractDTO {
 		PaymentSplit: emptyField,
 		NextPay:      emptyField,
 		HasBond:      no,
+		BondText:     emptyField,
+		Clause:       emptyField,
 	}
 
 }
@@ -66,5 +69,9 @@ func (c *contractDTO) fromPolicy(policy models.Policy, isProposal bool) {
 	if policy.HasBond {
 		c.HasBond = yes
 		c.BondText = policy.Bond
+	}
+
+	if policy.Clause != "" {
+		c.Clause = policy.Clause
 	}
 }
