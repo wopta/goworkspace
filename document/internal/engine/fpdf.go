@@ -160,7 +160,7 @@ func (f *Fpdf) WriteText(cell domain.TableCell) {
 }
 
 func (f *Fpdf) DrawTable(table [][]domain.TableCell) {
-	for rowIndex, row := range table {
+	for _, row := range table {
 		maxNumLines := 1
 		for _, cell := range row {
 			f.style = cell.FontStyle
@@ -180,7 +180,7 @@ func (f *Fpdf) DrawTable(table [][]domain.TableCell) {
 
 			hasBottomBorder := strings.Contains(cell.Border, "B") || cell.Border == "1"
 
-			if numLines < maxNumLines && rowIndex < len(table) {
+			if numLines < maxNumLines {
 				switch cell.Border {
 				case "1":
 					cell.Border = "TLR"
@@ -195,7 +195,7 @@ func (f *Fpdf) DrawTable(table [][]domain.TableCell) {
 			emptyCell.Border = strings.ReplaceAll(emptyCell.Border, "T", "")
 
 			for i := numLines; i < maxNumLines; i++ {
-				if rowIndex == len(table)-1 && i == maxNumLines-1 && hasBottomBorder {
+				if i == maxNumLines-1 && hasBottomBorder {
 					emptyCell.Border += "B"
 				}
 				f.pdf.SetX(currentX)

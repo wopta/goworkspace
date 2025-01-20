@@ -25,9 +25,9 @@ func newBuildingDTO() *buildingDTO {
 		PostalCode:       emptyField,
 		CityCode:         emptyField,
 		BuildingMaterial: emptyField,
-		HasSandwichPanel: no,
-		HasAlarm:         no,
-		HasSprinkler:     no,
+		HasSandwichPanel: emptyField,
+		HasAlarm:         emptyField,
+		HasSprinkler:     emptyField,
 		Naics:            emptyField,
 		NaicsDetail:      emptyField,
 		Guarantees:       make(map[string]*guaranteeDTO),
@@ -55,12 +55,18 @@ func (b *buildingDTO) fromPolicy(building models.Building, guarantees []models.G
 	}
 	if building.HasSandwichPanel {
 		b.HasSandwichPanel = yes
+	} else {
+		b.HasSandwichPanel = no
 	}
 	if building.HasAlarm {
 		b.HasAlarm = yes
+	} else {
+		b.HasAlarm = no
 	}
 	if building.HasSprinkler {
 		b.HasSprinkler = yes
+	} else {
+		b.HasSprinkler = no
 	}
 	if building.Naics != "" {
 		b.Naics = building.Naics
