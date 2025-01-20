@@ -693,6 +693,7 @@ func resetCells() []Cell {
 		"C46", "C47", "C48", "C49", "C50", "C51", "C52",
 		"C58", "C59", "C61", "E58",
 		"C66", "C69", "C70", "F66", "F67", "F68", "F70", "G69",
+		"C93",
 	}
 	discountCellList := []string{"G80", "G81", "G82"}
 
