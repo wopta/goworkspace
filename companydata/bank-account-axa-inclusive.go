@@ -24,6 +24,9 @@ const (
 	dateString       = "2021-11-22"
 	layout           = "02/01/2006"
 	layoutQuery      = "2006-01-02"
+	dataset          = "wopta_inclusive"
+	movementTable    = "bank_account_movement"
+	usersTable       = "bank_account_users"
 )
 
 type BankAccountAxaInclusiveReq struct {
@@ -45,6 +48,7 @@ func BankAccountAxaInclusive(w http.ResponseWriter, r *http.Request) (string, in
 	now, upload = getRequestData(req)
 	setPolicy("180623", now, upload)
 	setPolicy("191123", now, upload)
+	setScalapayPolicy("51114", now, upload)
 	log.Println("---------------------end------------------------------")
 	return "", nil, e
 }
@@ -80,7 +84,7 @@ func setPolicy(code string, now time.Time, upload bool) {
 	}
 
 	filepath := code + "_" + strconv.Itoa(refDay.Year()) + fmt.Sprintf("%02d", int(refDay.Month())) + fmt.Sprintf("%02d", refDay.Day())
-	CreateExcel(result, "../tmp/"+filepath+".xlsx","Sheet1")
+	CreateExcel(result, "../tmp/"+filepath+".xlsx", "Sheet1")
 	lib.WriteCsv("../tmp/"+filepath+".csv", result, ';')
 	source, _ := os.ReadFile("../tmp/" + filepath + ".xlsx")
 	sourceCsv, _ := os.ReadFile("../tmp/" + filepath + ".csv")
@@ -113,10 +117,10 @@ func setInclusiveRow(mov inclusive.BankAccountMovement, codes map[string]map[str
 		mov.FiscalCode,           //    CODICE FISCALE / P.IVA ASSICURATO
 		mov.Surname,              //    COGNOME / RAGIONE SOCIALE ASSICURATO
 		mov.Name,                 //    NOME ASSICURATO
-		"",                       //    INDIRIZZO RESIDENZA ASSICURATO
-		"",                       //    CAP RESIDENZA ASSICURATO
-		"",                       //    CITTA' RESIDENZA ASSICURATO
-		"",                       //    PROVINCIA RESIDENZA ASSICURATO
+		mov.Address,              //    INDIRIZZO RESIDENZA ASSICURATO
+		mov.PostalCode,           //    CAP RESIDENZA ASSICURATO
+		mov.City,                 //    CITTA' RESIDENZA ASSICURATO
+		mov.CityCode,             //    PROVINCIA RESIDENZA ASSICURATO
 		birthDate.Format(layout), //    DATA DI NASCITA ASSICURATO 1980-12-09T00:00:00Z
 		startDate.Format(layout), //    DATA INIZIO VALIDITA' COPERTURA
 		mapEndDate(mov),          //    DATA FINE VALIDITA' COPERTURA
@@ -163,7 +167,7 @@ func getHeaderInclusiveBank() []string {
 		"NOME ASSICURATO",                      //    NOME ASSICURATO
 		"INDIRIZZO RESIDENZA ASSICURATO",       //    INDIRIZZO RESIDENZA ASSICURATO
 		"CAP RESIDENZA ASSICURATO",             //    CAP RESIDENZA ASSICURATO
-		" CITTA' RESIDENZA ASSICURATO",         //    CITTA' RESIDENZA ASSICURATO
+		"CITTA' RESIDENZA ASSICURATO",          //    CITTA' RESIDENZA ASSICURATO
 		"PROVINCIA RESIDENZA ASSICURATO",       //    PROVINCIA RESIDENZA ASSICURATO
 		"DATA DI NASCITA ASSICURATO",           //    DATA DI NASCITA ASSICURATO
 		"DATA INIZIO VALIDITA' COPERTURA",      //    DATA INIZIO VALIDITA' COPERTURA
@@ -202,6 +206,89 @@ func QueryRowsBigQuery[T any](query string) ([]T, error) {
 
 		res = append(res, row)
 
+	}
+
+}
+func setScalapayPolicy(code string, now time.Time, upload bool) {
+	var (
+		result [][]string
+		refDay time.Time
+	)
+	log.Println("----------------BankAccountAxaInclusive setPolicySCALAPAY-----------------")
+	header := []string{
+		"NUMERO POLIZZA",                       // NUMERO POLIZZA
+		"LOB",                                  //    LOB
+		"TIPOLOGIA POLIZZA",                    //    TIPOLOGIA POLIZZA
+		"CODICE CONFIGURAZIONE",                //    CODICE CONFIGURAZIONE
+		"TIPO OGGETTO ASSICURATO",              //    TIPO OGGETTO ASSICURATO
+		"IDENTIFICATIVO UNIVOCO APPLICAZIONE",  //    IDENTIFICATIVO UNIVOCO APPLICAZIONE
+		"CODICE FISCALE / P.IVA ASSICURATO",    //    CODICE FISCALE / P.IVA ASSICURATO
+		"COGNOME / RAGIONE SOCIALE ASSICURATO", //    COGNOME / RAGIONE SOCIALE ASSICURATO
+		"NOME ASSICURATO",                      //    NOME ASSICURATO
+		"INDIRIZZO RESIDENZA ASSICURATO",       //    INDIRIZZO RESIDENZA ASSICURATO
+		"CAP RESIDENZA ASSICURATO",             //    CAP RESIDENZA ASSICURATO
+		"CITTA' RESIDENZA ASSICURATO",          //    CITTA' RESIDENZA ASSICURATO
+		"PROVINCIA RESIDENZA ASSICURATO",       //    PROVINCIA RESIDENZA ASSICURATO          //    DATA DI NASCITA ASSICURATO
+		"DATA INIZIO VALIDITA' COPERTURA",      //    DATA INIZIO VALIDITA' COPERTURA
+		"DATA FINE VALIDITA' COPERTURA",
+		"DATA VENDITA", //    DATA FINE VALIDITA' COPERTURA
+		"TIPO MOVIMENTO",
+	}
+
+	refDay = now.AddDate(0, 0, -1)
+	log.Println("BankAccountAxaInclusive refMontly: ", refDay)
+	//from, e = time.Parse("2006-01-02", strconv.Itoa(now.Year())+"-"+fmt.Sprintf("%02d", int(now.Month()))+"-"+fmt.Sprintf("%02d", 1))
+	//query := "select * from `wopta." + dataMovement + "` where _PARTITIONTIME >'" + from.Format(layoutQuery) + " 00:00:00" + "' and _PARTITIONTIME <'" + to.Format(layoutQuery) + " 23:59:00" + "'"
+	query := "select * from `wopta_inclusive." + usersTable + "` where daystart ='" + strconv.Itoa(refDay.Day()) + "' and policyNumber='" + code + "' and status='active'"
+	log.Println("BankAccountAxaInclusive bigquery query: ", query)
+	bankaccountlist, e := QueryRowsBigQuery[inclusive.BankAccountMovement](query)
+	log.Println("BankAccountAxaInclusive bigquery error: ", e)
+	log.Println("BankAccountAxaInclusive len(bankaccountlist): ", len(bankaccountlist))
+	//result = append(result, getHeader())
+	result = append(result, header)
+
+	for i, mov := range bankaccountlist {
+		log.Println(i)
+		startDate, _ := time.Parse("2006-01-02", mov.BigStartDate.Date.String())
+		row := []string{
+			mov.PolicyNumber,         // NUMERO POLIZZA
+			"H",                      //    LOB
+			"C",                      //    TIPOLOGIA POLIZZA
+			"",                       //    CODICE CONFIGURAZIONE
+			"1",                      //    TIPO OGGETTO ASSICURATO
+			mov.Id,                   //    IDENTIFICATIVO UNIVOCO APPLICAZIONE
+			mov.FiscalCode,           //    CODICE FISCALE / P.IVA ASSICURATO
+			mov.Surname,              //    COGNOME / RAGIONE SOCIALE ASSICURATO
+			mov.Name,                 //    NOME ASSICURATO
+			mov.Address,              //    INDIRIZZO RESIDENZA ASSICURATO
+			mov.PostalCode,           //    CAP RESIDENZA ASSICURATO
+			mov.City,                 //    CITTA' RESIDENZA ASSICURATO
+			mov.CityCode,             //    PROVINCIA RESIDENZA ASSICURATO
+			startDate.Format(layout), //    DATA INIZIO VALIDITA' COPERTURA
+			mapEndDate(mov),          //    DATA FINE VALIDITA' COPERTURA
+			startDate.Format(layout), //    DATA INIZIO VALIDITA' COPERTURA
+			StringMapping(mov.MovementType, map[string]string{
+				"":          "A",
+				"active":    "A",
+				"insert":    "A",
+				"delete":    "E",
+				"suspended": "E",
+			})}
+
+		result = append(result, row)
+
+	}
+
+	filepath := code + "_" + strconv.Itoa(refDay.Year()) + fmt.Sprintf("%02d", int(refDay.Month())) + fmt.Sprintf("%02d", refDay.Day())
+	CreateExcel(result, "../tmp/"+filepath+".xlsx", "Sheet1")
+	lib.WriteCsv("../tmp/"+filepath+".csv", result, ';')
+	source, _ := os.ReadFile("../tmp/" + filepath + ".xlsx")
+	sourceCsv, _ := os.ReadFile("../tmp/" + filepath + ".csv")
+	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/axa/inclusive/scalapay/"+strconv.Itoa(refDay.Year())+"/"+fmt.Sprintf("%02d", int(refDay.Month()))+"/"+filepath+".xlsx", source)
+	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/axa/inclusive/scalapay/"+strconv.Itoa(refDay.Year())+"/"+fmt.Sprintf("%02d", int(refDay.Month()))+"/"+filepath+".csv", sourceCsv)
+	if upload {
+
+		AxaSftpUpload(filepath+".xlsx", "SCALAPAY/IN/")
 	}
 
 }

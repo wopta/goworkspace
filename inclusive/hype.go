@@ -1,11 +1,11 @@
 package inclusive
 
 import (
-	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
+
 	"log"
 	"net/http"
 	"os"
@@ -15,7 +15,6 @@ import (
 	"cloud.google.com/go/civil"
 	"github.com/google/uuid"
 	lib "github.com/wopta/goworkspace/lib"
-	"google.golang.org/api/iterator"
 )
 
 const (
@@ -29,20 +28,20 @@ const (
 
 // TO DO security,payload,error,fasature
 func BankAccountHypeFx(resp http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-
+	log.SetPrefix("BankAccountHypeFx ")
 	var (
 		e   error
 		obj BankAccountMovement
 	)
-	e = CheckApikey(r)
+	e = CheckHypeApikey(r)
 	if e != nil {
 		return "", nil, e
 	}
-	obj, e = CheckData(r)
+	obj, e = CheckHypeData(r)
 	if e != nil {
 		return "", nil, e
 	}
-	obj = SetData(obj)
+	obj = SetHypeData(obj)
 	e = lib.InsertRowsBigQuery("wopta", dataMovement, obj)
 	if obj.MovementType == "insert" {
 
@@ -71,47 +70,7 @@ func HypeImportMovementbankAccountFx(resp http.ResponseWriter, r *http.Request) 
 	return ``, nil, nil
 }
 
-type BankAccountMovement struct {
-	Uid            string         `firestore:"-" json:"-" bigquery:"uid"`
-	Status         string         `firestore:"-" json:"-" bigquery:"status"`
-	Name           string         `firestore:"-" json:"name,omitempty" bigquery:"name"`             //h-Nome
-	Surname        string         `firestore:"-" json:"surname,omitempty" bigquery:"surname"`       //Cognome
-	FiscalCode     string         `firestore:"-" json:"fiscalCode,omitempty" bigquery:"fiscalCode"` //Codice fiscale
-	HypeId         string         `firestore:"-" json:"hypeId,omitempty" bigquery:"hypeId"`         //h-Ultime 3 / 5 cifre conto corrente
-	StartDate      time.Time      `bigquery:"-" firestore:"-" json:"startDate,omitempty"`           //h-Data ingresso (inizio validità copertura)
-	EndDate        time.Time      `bigquery:"-" firestore:"-" json:"endDate,omitempty"`
-	BigStartDate   civil.DateTime `bigquery:"startDate" firestore:"-" json:"-"`                             //Data ingresso (inizio validità copertura)
-	BigEndDate     civil.DateTime `bigquery:"endDate" firestore:"-" json:"-"`                               //Data uscita ()
-	MovementType   string         `firestore:"-" json:"movementType,omitempty" bigquery:"movementType"`     //Movimento (ingresso o uscita)
-	PolicyNumber   string         `firestore:"-" json:"policyNumber,omitempty" bigquery:"policyNumber"`     //NUMERO POLIZZA
-	PolicyType     string         `firestore:"-" json:"policyType,omitempty" bigquery:"policyType"`         //TIPOLOGIA POLIZZA
-	GuaranteesCode string         `firestore:"-" json:"guaranteesCode,omitempty" bigquery:"guaranteesCode"` //CODICE CONFIGURAZIONE pacchetti
-	AssetType      string         `firestore:"-" json:"assetType,omitempty" bigquery:"assetType"`           //TIPO OGGETTO ASSICURATO
-	Customer       string         `firestore:"-" json:"-" bigquery:"customer"`
-	Company        string         `firestore:"-" json:"-" bigquery:"company"`   //Hype
-	PolicyUid      string         `firestore:"-" json:"-" bigquery:"policyUid"` //NUMERO POLIZZA
-	CustomerId     string         `firestore:"-" json:"-" bigquery:"customerId"`
-	BanckAccountId string         `firestore:"-" json:"-" bigquery:"banckAccountId"`
-	PolicyName     string         `firestore:"-" json:"-" bigquery:"policyName"`
-}
-type ErrorResponse struct {
-	Code    int    `firestore:"-" json:"code,omitempty" bigquery:"name"`
-	Type    string `firestore:"-" json:"type,omitempty" bigquery:"surname"`
-	Message string `firestore:"-" json:"message,omitempty" bigquery:"fiscalCode"`
-}
-
-func GetErrorJson(code int, typeEr string, message string) error {
-	var (
-		e     error
-		eResp ErrorResponse
-		b     []byte
-	)
-	eResp = ErrorResponse{Code: code, Type: typeEr, Message: message}
-	b, e = json.Marshal(eResp)
-	e = errors.New(string(b))
-	return e
-}
-func CheckApikey(r *http.Request) error {
+func CheckHypeApikey(r *http.Request) error {
 	apikey := os.Getenv("HYPE_APIKEY")
 	apikeyReq := r.Header.Get("api_key")
 	if apikey != apikeyReq {
@@ -119,8 +78,8 @@ func CheckApikey(r *http.Request) error {
 	}
 	return nil
 }
-func CheckData(r *http.Request) (BankAccountMovement, error) {
-	req := lib.ErrorByte(ioutil.ReadAll(r.Body))
+func CheckHypeData(r *http.Request) (BankAccountMovement, error) {
+	req := lib.ErrorByte(io.ReadAll(r.Body))
 	log.Println(r.Header)
 	log.Println(string(req))
 	var obj BankAccountMovement
@@ -169,7 +128,7 @@ func CheckData(r *http.Request) (BankAccountMovement, error) {
 
 	return obj, nil
 }
-func SetData(obj BankAccountMovement) BankAccountMovement {
+func SetHypeData(obj BankAccountMovement) BankAccountMovement {
 
 	obj.BigStartDate = civil.DateTimeOf(obj.StartDate)
 	obj.BigEndDate = civil.DateTimeOf(obj.EndDate)
@@ -209,44 +168,6 @@ func SetData(obj BankAccountMovement) BankAccountMovement {
 
 	return obj
 }
-func QueryRowsBigQuery[T any](datasetID string, tableID string, query string) ([]T, error) {
-	var (
-		res  []T
-		e    error
-		iter *bigquery.RowIterator
-	)
-	log.Println(query)
-	client := getBigqueryClient()
-	ctx := context.Background()
-	defer client.Close()
-	queryi := client.Query(query)
-	iter, e = queryi.Read(ctx)
-	log.Println(e)
-	for {
-		var row T
-		e := iter.Next(&row)
-
-		if e == iterator.Done {
-			log.Println(e)
-			return res, e
-		}
-		if e != nil {
-			log.Println(e)
-			return res, e
-		}
-
-		res = append(res, row)
-
-	}
-
-}
-
-func getBigqueryClient() *bigquery.Client {
-	ctx := context.Background()
-	client, err := bigquery.NewClient(ctx, os.Getenv("GOOGLE_PROJECT_ID"))
-	lib.CheckError(err)
-	return client
-}
 
 func HypeCount(date string, fiscalCode string, guaranteesCode string) {
 	var (
@@ -272,7 +193,7 @@ func HypeCount(date string, fiscalCode string, guaranteesCode string) {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("ext-wopta-service-key", os.Getenv("HYPE_APIKEY_OUT"))
 	res := lib.Httpclient(req)
-	reqAll := lib.ErrorByte(ioutil.ReadAll(res.Body))
+	reqAll := lib.ErrorByte(io.ReadAll(res.Body))
 	json.Unmarshal(reqAll, &countResponseModel)
 	log.Println(res)
 
@@ -280,13 +201,6 @@ func HypeCount(date string, fiscalCode string, guaranteesCode string) {
 
 func HypeReconciliation(date string, fiscalCode string, guaranteesCode string) {
 
-}
-
-type CountResponseModel struct {
-	Total     int `json:"total"`
-	Insert    int `json:"insert"`
-	Delete    int `json:"delete"`
-	Suspended int `json:"suspended"`
 }
 
 /*
@@ -345,12 +259,4 @@ func HypeImportMovementbankAccount() {
 	source, _ := ioutil.ReadFile("../tmp/" + filepath)
 	lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), "track/in/inclusive/bank-account/hype/"+filepath, source)
 
-}
-func InsertRowsBigQuery(datasetID string, tableID string, value interface{}) error {
-	client := getBigqueryClient()
-	defer client.Close()
-	inserter := client.Dataset(datasetID).Table(tableID).Inserter()
-	e := inserter.Put(context.Background(), value)
-	log.Println(e)
-	return e
 }

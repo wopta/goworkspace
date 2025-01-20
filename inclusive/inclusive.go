@@ -16,6 +16,12 @@ var inclusiveRoutes []lib.Route = []lib.Route{
 		Roles:   []string{},
 	},
 	{
+		Route:   "/bankaccount/v1/scalapay",
+		Handler: lib.ResponseLoggerWrapper(BankAccountScalapayFx),
+		Method:  http.MethodPost,
+		Roles:   []string{},
+	},
+	{
 		Route:   "/bankaccount/v1/hype/count",
 		Handler: lib.ResponseLoggerWrapper(CountHypeFx),
 		Method:  http.MethodPost,

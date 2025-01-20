@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"slices"
 	"time"
 
 	"github.com/wopta/goworkspace/lib"
@@ -75,15 +76,12 @@ func lead(authToken models.AuthToken, policy *models.Policy) error {
 
 	log.Println("[lead] start ------------------------------------------------")
 
-	policyFire := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
-	guaranteFire := lib.GetDatasetByEnv(origin, lib.GuaranteeCollection)
-
 	if policy.Uid != "" {
 		if err = checkIfPolicyIsLead(policy); err != nil {
 			return err
 		}
 	} else {
-		policy.Uid = lib.NewDoc(policyFire)
+		policy.Uid = lib.NewDoc(lib.PolicyCollection)
 	}
 
 	if policy.Channel == "" {
@@ -105,14 +103,14 @@ func lead(authToken models.AuthToken, policy *models.Policy) error {
 	*policy = *state.Data
 
 	log.Println("[lead] saving lead to firestore...")
-	err = lib.SetFirestoreErr(policyFire, policy.Uid, policy)
+	err = lib.SetFirestoreErr(lib.PolicyCollection, policy.Uid, policy)
 	lib.CheckError(err)
 
 	log.Println("[lead] saving lead to bigquery...")
 	policy.BigquerySave(origin)
 
 	log.Println("[lead] saving guarantees to bigquery...")
-	models.SetGuaranteBigquery(*policy, "lead", guaranteFire)
+	models.SetGuaranteBigquery(*policy, "lead", lib.GuaranteeCollection)
 
 	log.Println("[lead] end --------------------------------------------------")
 	return err
@@ -134,7 +132,8 @@ func checkIfPolicyIsLead(policy *models.Policy) error {
 		return nil
 	}
 
-	if recoveredPolicy.Status != models.PolicyStatusPartnershipLead && recoveredPolicy.Status != models.PolicyStatusInitLead {
+	allowedStatus := []string{models.PolicyStatusInit, models.PolicyStatusPartnershipLead, models.PolicyStatusInitLead}
+	if !slices.Contains(allowedStatus, recoveredPolicy.Status) {
 		log.Printf("[checkIfPolicyIsLead] error policy %s is not a lead", policy.Uid)
 		return errors.New("policy is not a lead")
 	}

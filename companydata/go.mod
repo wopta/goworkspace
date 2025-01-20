@@ -11,7 +11,7 @@ require (
 	github.com/go-gota/gota v0.12.0
 	github.com/google/uuid v1.6.0
 	github.com/oliveagle/jsonpath v0.0.0-20180606110733-2e52cf6e6852
-	github.com/wopta/goworkspace/inclusive v0.0.4
+	github.com/wopta/goworkspace/inclusive v0.0.5
 	github.com/wopta/goworkspace/lib v1.0.134
 	github.com/wopta/goworkspace/mail v1.0.131
 	github.com/wopta/goworkspace/models v1.2.22
