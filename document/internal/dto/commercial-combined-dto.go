@@ -14,13 +14,14 @@ const (
 )
 
 type CommercialCombinedDTO struct {
-	Contract        *contractDTO
-	Contractor      *contractorDTO
-	Enterprise      *enterpriseDTO
-	Buildings       []*buildingDTO
-	Claims          map[string]*claimDTO
-	Prices          *priceDTO
-	PricesBySection map[string]*section
+	Contract           *contractDTO
+	Contractor         *contractorDTO
+	Enterprise         *enterpriseDTO
+	Buildings          []*buildingDTO
+	Claims             map[string]*claimDTO
+	Prices             *priceDTO
+	PricesBySection    map[string]*section
+	HasExcludedFormula bool
 }
 
 func NewCommercialCombinedDto() *CommercialCombinedDTO {
@@ -61,6 +62,9 @@ func (cc *CommercialCombinedDTO) FromPolicy(policy models.Policy, product models
 		if guarantee.Type == "enterprise" {
 			newGuarantee := newGuaranteeDTO()
 			newGuarantee.Description = guarantee.CompanyName
+			if guarantee.Slug == "additional-compensation" {
+				newGuarantee.Description = "Danni Indiretti - Formula"
+			}
 			cc.Enterprise.Guarantees[guarantee.Slug] = newGuarantee
 		}
 	}
@@ -72,6 +76,12 @@ func (cc *CommercialCombinedDTO) FromPolicy(policy models.Policy, product models
 		}
 		if asset.Enterprise != nil {
 			cc.Enterprise.fromPolicy(*policy.Assets[index].Enterprise, policy.Assets[index].Guarantees)
+			for _, guarantee := range policy.Assets[index].Guarantees {
+				if guarantee.Slug == "excluded-formula" {
+					cc.HasExcludedFormula = true
+					break
+				}
+			}
 		}
 	}
 

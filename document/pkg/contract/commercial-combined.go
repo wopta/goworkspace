@@ -15,19 +15,18 @@ import (
 )
 
 const (
-	buildingGuaranteeSlug                   string = "building"                 // FABBRICATO
-	rentalRiskGuaranteeSlug                 string = "rental-risk"              // RISCHIO LOCATIVO
-	machineryGuaranteeSlug                  string = "machinery"                // MACCHINARI
-	stockGuaranteeSlug                      string = "stock"                    // MERCI
-	stockTemporaryIncreaseGuaranteeSlug     string = "stock-temporary-increase" // MERCI IN AUMENTO
-	stockTemporaryIncreaseDaysGuaranteeSlug string = "stock-temporary-increase" // MERCI IN AUMENTO GIORNI
-	thirdPartyRecourseGuaranteeSlug         string = "third-party-recourse"     // RICORSO TERZI
-	electricalPhenomenonGuaranteeSlug       string = "electrical-phenomenon"    // FENOMENO ELETTRICO
-	refrigerationStockGuaranteeSlug         string = "refrigeration-stock"      // MERCI REFRIGERAZIONE
-	machineryBreakdownGuaranteeSlug         string = "machinery-breakdown"      // GUASTI
-	electronicEquipmentGuaranteeSlug        string = "electronic-equipment"     // ELETTRONICA
-	theftGuaranteeSlug                      string = "theft"                    // FURTO
-	//danniGuaranteeSlug                  string = "danni"
+	buildingGuaranteeSlug                         string = "building"                             // FABBRICATO
+	rentalRiskGuaranteeSlug                       string = "rental-risk"                          // RISCHIO LOCATIVO
+	machineryGuaranteeSlug                        string = "machinery"                            // MACCHINARI
+	stockGuaranteeSlug                            string = "stock"                                // MERCI
+	stockTemporaryIncreaseGuaranteeSlug           string = "stock-temporary-increase"             // MERCI IN AUMENTO
+	stockTemporaryIncreaseDaysGuaranteeSlug       string = "stock-temporary-increase"             // MERCI IN AUMENTO GIORNI
+	thirdPartyRecourseGuaranteeSlug               string = "third-party-recourse"                 // RICORSO TERZI
+	electricalPhenomenonGuaranteeSlug             string = "electrical-phenomenon"                // FENOMENO ELETTRICO
+	refrigerationStockGuaranteeSlug               string = "refrigeration-stock"                  // MERCI REFRIGERAZIONE
+	machineryBreakdownGuaranteeSlug               string = "machinery-breakdown"                  // GUASTI
+	electronicEquipmentGuaranteeSlug              string = "electronic-equipment"                 // ELETTRONICA
+	theftGuaranteeSlug                            string = "theft"                                // FURTO
 	dailyAllowanceGuaranteeSlug                   string = "daily-allowance"                      // DIARIA GIORNALIERA
 	increasedCostGuaranteeSlug                    string = "increased-cost"                       // MAGGIORI COSTI
 	excludedFormulaGuaranteeSlug                  string = "excluded-formula"                     // FORMULA ESCLUSA
@@ -823,7 +822,7 @@ func (ccg *CommercialCombinedGenerator) guaranteesDetailsSection() {
 		},
 	})
 
-	for _, slug := range enterpriseSlugs[7:11] {
+	for _, slug := range enterpriseSlugs[6:11] {
 		row := []domain.TableCell{
 			{
 				Text:      ccg.dto.Enterprise.Guarantees[slug].Description,
@@ -843,6 +842,8 @@ func (ccg *CommercialCombinedGenerator) guaranteesDetailsSection() {
 		if slug == dailyAllowanceGuaranteeSlug {
 			info += fmt.Sprintf(" Periodo di indennizzo %s giorni", ccg.dto.Enterprise.Guarantees[slug].
 				Duration.Text)
+		} else if slug == additionalCompensationGuaranteeSlug && ccg.dto.HasExcludedFormula {
+			info = "ESCLUSA"
 		}
 
 		row = append(row, domain.TableCell{
