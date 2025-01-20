@@ -2,6 +2,7 @@ package engine
 
 import (
 	"bytes"
+	"os"
 	"strings"
 	"time"
 
@@ -253,4 +254,15 @@ func (f *Fpdf) SplitText(text string, width float64) []string {
 
 func (f *Fpdf) GetStringWidth(text string) float64 {
 	return f.pdf.GetStringWidth(text)
+}
+
+func (f *Fpdf) Save(filename string) (string, error) {
+	var out bytes.Buffer
+	err := f.pdf.Output(&out)
+	if err != nil {
+		return "", err
+	}
+
+	gsLink := lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, out.Bytes())
+	return gsLink, nil
 }

@@ -1967,3 +1967,13 @@ func (bg *baseGenerator) printStatement(statement models.Statement) {
 		bg.engine.NewLine(10)
 	}
 }
+
+func (bg *baseGenerator) Save() (string, error) {
+	filename := strings.ReplaceAll(fmt.Sprintf("%s/%s/"+models.ProposalDocumentFormat, "temp", bg.policy.Uid,
+		bg.policy.NameDesc, bg.policy.ProposalNumber), " ", "_")
+	if !bg.isProposal {
+		filename = strings.ReplaceAll(fmt.Sprintf("%s/%s/"+models.ContractDocumentFormat, "temp", bg.policy.Uid,
+			bg.policy.NameDesc, bg.policy.CodeCompany), " ", "_")
+	}
+	return bg.engine.Save(filename)
+}
