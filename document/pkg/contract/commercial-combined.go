@@ -2361,7 +2361,6 @@ func (ccg *CommercialCombinedGenerator) detailsSection() {
 	})
 }
 
-// TODO: parse clause
 func (ccg *CommercialCombinedGenerator) specialConditionsSection() {
 	ccg.engine.WriteText(domain.TableCell{
 		Text:      "Condizioni Speciali in deroga alle Condizioni di Assicurazione",
