@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -160,7 +161,7 @@ func receiptInfoBuilder(policy models.Policy, transaction models.Transaction) (d
 
 	policyInfo := document.PolicyInfo{
 		Company:            document.CompanyMap[policy.Company],
-		ProductDescription: policy.NameDesc,
+		ProductDescription: strings.ToUpper(policy.NameDesc),
 		Code:               policy.CodeCompany,
 	}
 
