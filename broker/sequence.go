@@ -30,6 +30,10 @@ func GetSequenceByCompany(name string, firePolicy string) (string, int, int) {
 		companyDefault = 1
 		companyPrefixLenght = `%07d`
 		companyPrefix = "G"
+	case "qbe": // TODO
+		companyDefault = 1
+		companyPrefixLenght = `%07d`
+		companyPrefix = "Q"
 	}
 
 	rn, e := lib.OrderWhereLimitFirestoreErr(firePolicy, "company", "numberCompany", "==", name, firestore.Desc, 1)
