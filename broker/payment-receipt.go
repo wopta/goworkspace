@@ -158,6 +158,12 @@ func paymentReceiptBuilder(transactionUID string, authToken lib.AuthToken, isRen
 func receiptInfoBuilder(policy models.Policy, transaction models.Transaction) (document.ReceiptInfo, error) {
 	const dateFormat = "02/01/2006"
 
+	policyInfo := document.PolicyInfo{
+		Company:            document.CompanyMap[policy.Company],
+		ProductDescription: policy.NameDesc,
+		Code:               policy.CodeCompany,
+	}
+
 	customerInfo := document.CustomerInfo{
 		Fullname:   policy.Contractor.Name + " " + policy.Contractor.Surname,
 		Address:    policy.Contractor.Residence.StreetName + " " + policy.Contractor.Residence.StreetNumber,
@@ -192,13 +198,13 @@ func receiptInfoBuilder(policy models.Policy, transaction models.Transaction) (d
 	}
 
 	transactionInfo := document.TransactionInfo{
-		PolicyCode:     policy.CodeCompany,
 		EffectiveDate:  effectiveDate.Format(dateFormat),
 		ExpirationDate: expirationDate.Format(dateFormat),
 		PriceGross:     transaction.Amount,
 	}
 
 	return document.ReceiptInfo{
+		PolicyInfo:   policyInfo,
 		CustomerInfo: customerInfo,
 		Transaction:  transactionInfo,
 	}, nil
