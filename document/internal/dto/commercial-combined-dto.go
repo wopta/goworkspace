@@ -25,10 +25,13 @@ type CommercialCombinedDTO struct {
 
 func NewCommercialCombinedDto() *CommercialCombinedDTO {
 	return &CommercialCombinedDTO{
-		Contract:   newContractDTO(),
-		Contractor: NewContractorDTO(),
-		Enterprise: newEnterpriseDTO(),
-		Buildings:  make([]*buildingDTO, 0),
+		Contract:        newContractDTO(),
+		Contractor:      NewContractorDTO(),
+		Enterprise:      newEnterpriseDTO(),
+		Buildings:       make([]*buildingDTO, 0),
+		Claims:          make(map[string]*claimDTO),
+		Prices:          newPriceDTO(),
+		PricesBySection: make(map[string]*section),
 	}
 }
 
@@ -72,7 +75,6 @@ func (cc *CommercialCombinedDTO) FromPolicy(policy models.Policy, product models
 		}
 	}
 
-	cc.Claims = make(map[string]*claimDTO)
 	// TODO: improve this
 	guaranteeDescriptionsMap := map[string]string{
 		"property":                "Danni ai beni (escluso Furto)",
@@ -100,7 +102,6 @@ func (cc *CommercialCombinedDTO) FromPolicy(policy models.Policy, product models
 		}
 	}
 
-	cc.Prices = newPriceDTO()
 	cc.Prices.Gross = policy.PriceGross
 	cc.Prices.GrossText = lib.HumanaizePriceEuro(cc.Prices.Gross)
 	cc.Prices.Net = policy.PriceNett
@@ -120,7 +121,6 @@ func (cc *CommercialCombinedDTO) FromPolicy(policy models.Policy, product models
 		"I": "I - CYBER RESPONSE E DATA SECURITY",
 	}
 
-	cc.PricesBySection = make(map[string]*section)
 	for sectionKey, description := range sectionMap {
 		cc.PricesBySection[sectionKey] = newSection()
 		cc.PricesBySection[sectionKey].Description = description
