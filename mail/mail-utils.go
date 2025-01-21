@@ -133,9 +133,23 @@ func GetEmailByChannel(policy *models.Policy) Address {
 }
 
 func GetContractorEmail(policy *models.Policy) Address {
+	name := policy.Contractor.Name + " " + policy.Contractor.Surname
+	address := policy.Contractor.Mail
+
+	if policy.Contractor.Type == models.UserLegalEntity {
+		// TODO: handle multiple target signatures
+		for _, c := range *policy.Contractors {
+			if c.IsSignatory {
+				name = c.Name + " " + c.Surname
+				address = c.Mail
+				break
+			}
+		}
+	}
+
 	return Address{
-		Name:    policy.Contractor.Name + " " + policy.Contractor.Surname,
-		Address: policy.Contractor.Mail,
+		Name:    name,
+		Address: address,
 	}
 }
 

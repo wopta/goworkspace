@@ -9,12 +9,12 @@ require (
 	github.com/wopta/goworkspace/bpmn v1.0.18
 	github.com/wopta/goworkspace/callback_out v1.0.36
 	github.com/wopta/goworkspace/lib v1.0.134
-	github.com/wopta/goworkspace/mail v1.0.137
+	github.com/wopta/goworkspace/mail v1.0.138
 	github.com/wopta/goworkspace/models v1.2.24
 	github.com/wopta/goworkspace/network v1.0.89
-	github.com/wopta/goworkspace/policy v1.0.145
+	github.com/wopta/goworkspace/policy v1.0.146
 	github.com/wopta/goworkspace/product v1.1.22
-	github.com/wopta/goworkspace/transaction v1.0.131
+	github.com/wopta/goworkspace/transaction v1.0.132
 )
 
 require (
