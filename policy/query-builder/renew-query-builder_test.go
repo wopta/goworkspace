@@ -8,7 +8,7 @@ import (
 )
 
 func TestQueryBuilder(t *testing.T) {
-	qb := query_builder.NewRenewQueryQueryBuilder("test-collection", "rp", func() string {
+	qb := query_builder.NewRenewQueryQueryBuilder(func() string {
 		return "test"
 	})
 	var testCases = []struct {
@@ -138,9 +138,7 @@ func TestQueryBuilder(t *testing.T) {
 }
 
 func TestQueryBuilderFail(t *testing.T) {
-	qb := query_builder.NewRenewQueryQueryBuilder("test-collection", "rp", func() string {
-		return "test"
-	})
+	qb := query_builder.NewRenewQueryQueryBuilder(func() string { return "test" })
 	var testCases = []struct {
 		name   string
 		params map[string]string

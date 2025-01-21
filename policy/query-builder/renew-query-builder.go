@@ -1,5 +1,7 @@
 package query_builder
 
+import "github.com/wopta/goworkspace/lib"
+
 var (
 	paramsHierarchy = []map[string][]string{
 		{"codeCompany": []string{"codeCompany", "producerUid"}},
@@ -50,9 +52,10 @@ type RenewQueryBuilder struct {
 	baseQueryBuilder
 }
 
-func NewRenewQueryQueryBuilder(tableName, tableAlias string, randomGenerator func() string) RenewQueryBuilder {
-	return RenewQueryBuilder{
-		newBaseQueryBuilder(tableName, tableAlias, randomGenerator, paramsHierarchy, paramsWhereClause, orClausesKeys),
+func NewRenewQueryQueryBuilder(randomGenerator func() string) *RenewQueryBuilder {
+	return &RenewQueryBuilder{
+		newBaseQueryBuilder(lib.RenewPolicyViewCollection, "rp", randomGenerator,
+			paramsHierarchy, paramsWhereClause, orClausesKeys),
 	}
 }
 

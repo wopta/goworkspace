@@ -44,7 +44,7 @@ func GetRenewPoliciesFx(w http.ResponseWriter, r *http.Request) (string, interfa
 		}
 	}
 
-	queryBuilder := query_builder.NewRenewQueryQueryBuilder(lib.RenewPolicyViewCollection, "rp", nil)
+	queryBuilder := query_builder.NewQueryBuilder("policy")
 	query, queryParams := queryBuilder.BuildQuery(paramsMap)
 	if query == "" {
 		log.Print("error generating query")
