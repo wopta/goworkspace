@@ -19,26 +19,27 @@ import (
 )
 
 const (
-	dataMovement     = "inclusive_bank_account_movement"
-	dataBanckAccount = "inclusive_bank_account"
-	dateString       = "2021-11-22"
-	layout           = "02/01/2006"
-	layoutQuery      = "2006-01-02"
-	dataset          = "wopta_inclusive"
-	movementTable    = "bank_account_movement"
-	usersTable       = "bank_account_users"
+	dataMovement       = "inclusive_bank_account_movement"
+	dataBanckAccount   = "inclusive_bank_account"
+	dateString         = "2021-11-22"
+	layout             = "02/01/2006"
+	layoutQuery        = "2006-01-02"
+	dataset            = "wopta_inclusive"
+	movementTable      = "bank_account_movement"
+	usersTableScalapay = "bank_account_users_scalapay"
 )
 
 type BankAccountAxaInclusiveReq struct {
 	Day string `firestore:"-" json:"day,omitempty" bigquery:"-"`
 }
 
-func BankAccountAxaInclusive(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+func BankAccountInclusive(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		now    time.Time
 		upload bool
 	)
-	log.Println("----------------BankAccountAxaInclusive-----------------")
+
+	log.SetPrefix("BankAccountInclusive ")
 	req := lib.ErrorByte(io.ReadAll(r.Body))
 	log.Println(r.Header)
 	log.Println(string(req))
@@ -60,16 +61,16 @@ func setPolicy(code string, now time.Time, upload bool) {
 		refDay time.Time
 	)
 
-	log.Println("----------------BankAccountAxaInclusive setPolicy-----------------")
+	log.SetPrefix("BankAccountInclusive setPolicy " + code)
 	refDay = now.AddDate(0, 0, -1)
-	log.Println("BankAccountAxaInclusive refMontly: ", refDay)
+	log.Println("  refMontly: ", refDay)
 	//from, e = time.Parse("2006-01-02", strconv.Itoa(now.Year())+"-"+fmt.Sprintf("%02d", int(now.Month()))+"-"+fmt.Sprintf("%02d", 1))
 	//query := "select * from `wopta." + dataMovement + "` where _PARTITIONTIME >'" + from.Format(layoutQuery) + " 00:00:00" + "' and _PARTITIONTIME <'" + to.Format(layoutQuery) + " 23:59:00" + "'"
 	query := "select * from `wopta." + dataMovement + "` where _PARTITIONTIME ='" + refDay.Format(layoutQuery) + "' and policyNumber='" + code + "'"
-	log.Println("BankAccountAxaInclusive bigquery query: ", query)
+	log.Println("  bigquery query: ", query)
 	bankaccountlist, e := QueryRowsBigQuery[inclusive.BankAccountMovement](query)
-	log.Println("BankAccountAxaInclusive bigquery error: ", e)
-	log.Println("BankAccountAxaInclusive len(bankaccountlist): ", len(bankaccountlist))
+	log.Println("  bigquery error: ", e)
+	log.Println("  len(bankaccountlist): ", len(bankaccountlist))
 	//result = append(result, getHeader())
 	result = append(result, getHeaderInclusiveBank())
 	b, err := os.ReadFile(lib.GetAssetPathByEnv("companyData") + "/reverse-codes.json")
@@ -214,7 +215,8 @@ func setScalapayPolicy(code string, now time.Time, upload bool) {
 		result [][]string
 		refDay time.Time
 	)
-	log.Println("----------------BankAccountAxaInclusive setPolicySCALAPAY-----------------")
+
+	log.SetPrefix("BankAccountInclusive setScalapayPolicy " + code)
 	header := []string{
 		"NUMERO POLIZZA",                       // NUMERO POLIZZA
 		"LOB",                                  //    LOB
@@ -236,14 +238,14 @@ func setScalapayPolicy(code string, now time.Time, upload bool) {
 	}
 
 	refDay = now.AddDate(0, 0, -1)
-	log.Println("BankAccountAxaInclusive refMontly: ", refDay)
+	log.Println("  refMontly: ", refDay)
 	//from, e = time.Parse("2006-01-02", strconv.Itoa(now.Year())+"-"+fmt.Sprintf("%02d", int(now.Month()))+"-"+fmt.Sprintf("%02d", 1))
 	//query := "select * from `wopta." + dataMovement + "` where _PARTITIONTIME >'" + from.Format(layoutQuery) + " 00:00:00" + "' and _PARTITIONTIME <'" + to.Format(layoutQuery) + " 23:59:00" + "'"
-	query := "select * from `wopta_inclusive." + usersTable + "` where daystart ='" + strconv.Itoa(refDay.Day()) + "' and policyNumber='" + code + "' and status='active'"
-	log.Println("BankAccountAxaInclusive bigquery query: ", query)
+	query := "select * from `wopta_inclusive." + usersTableScalapay + "` where daystart ='" + strconv.Itoa(refDay.Day()) + "' and policyNumber='" + code + "' and status='active'"
+	log.Println("  bigquery query: ", query)
 	bankaccountlist, e := QueryRowsBigQuery[inclusive.BankAccountMovement](query)
-	log.Println("BankAccountAxaInclusive bigquery error: ", e)
-	log.Println("BankAccountAxaInclusive len(bankaccountlist): ", len(bankaccountlist))
+	log.Println("  bigquery error: ", e)
+	log.Println("  len(bankaccountlist): ", len(bankaccountlist))
 	//result = append(result, getHeader())
 	result = append(result, header)
 

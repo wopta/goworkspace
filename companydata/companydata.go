@@ -54,7 +54,7 @@ var companydataRoutes []lib.Route = []lib.Route{
 	},
 	{
 		Route:   "/v1/axa/inclusive/bankaccount",
-		Handler: lib.ResponseLoggerWrapper(BankAccountAxaInclusive),
+		Handler: lib.ResponseLoggerWrapper(BankAccountInclusive),
 		Method:  http.MethodPost,
 		Roles:   []string{},
 	},
