@@ -58,10 +58,6 @@ var (
 	orClausesKeys = []string{"status", "payment"}
 )
 
-type QueryBuilder interface {
-	BuildQuery(map[string]string) (string, map[string]interface{})
-}
-
 type BigQueryQueryBuilder struct {
 	tableName       string
 	tableAlias      string
