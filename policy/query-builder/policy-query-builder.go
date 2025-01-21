@@ -11,13 +11,13 @@ var (
 		{"contractorName": []string{"contractorName", "contractorSurname", "producerUid"}},
 		{"contractorSurname": []string{"contractorName", "contractorSurname", "producerUid"}},
 
-		{"startDateFrom": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status"}},
-		{"startDateTo": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status"}},
-		{"company": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status"}},
-		{"product": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status"}},
-		{"producerUid": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status"}},
-		{"status": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status"}},
-		{"reserved": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status"}},
+		{"startDateFrom": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "rd"}},
+		{"startDateTo": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "rd"}},
+		{"company": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "rd"}},
+		{"product": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "rd"}},
+		{"producerUid": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "rd"}},
+		{"status": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "rd"}},
+		{"rd": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "rd"}},
 	}
 
 	policyParamsWhereClause = map[string]string{
@@ -64,5 +64,4 @@ func (pqb *policyQueryBuilder) BuildQuery(params map[string]string) (string, map
 	pqb.whereClauses = []string{"(**tableAlias**.isDeleted = false OR **tableAlias**." +
 		"isDeleted IS NULL)", "(**tableAlias**.companyEmit = true)"}
 	return pqb.baseQueryBuilder.BuildQuery(params)
-
 }
