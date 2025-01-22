@@ -1,14 +1,7 @@
 package policy
 
-import (
-	"strings"
-
-	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/policy/query-builder/internal/base"
-)
-
 var (
-	policyParamsHierarchy = []map[string][]string{
+	paramsHierarchy = []map[string][]string{
 		{"codeCompany": []string{"codeCompany", "producerUid"}},
 
 		{"insuredFiscalCode": []string{"insuredFiscalCode", "producerUid"}},
@@ -25,7 +18,7 @@ var (
 		{"rd": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "rd"}},
 	}
 
-	policyParamsWhereClause = map[string]string{
+	paramsWhereClause = map[string]string{
 		"codeCompany": "(**tableAlias**.codeCompany = @%s)",
 
 		"proposalNumber": "(**tableAlias**.proposalNumber = CAST(@%s AS INTEGER))",
@@ -51,31 +44,5 @@ var (
 		"deleted": "(**table.Alias**.isDeleted = true)",
 	}
 
-	policyOrClausesKeys = []string{"status"}
+	orClausesKeys = []string{"status"}
 )
-
-type QueryBuilder struct {
-	base.QueryBuilder
-}
-
-func NewQueryBuilder(randomGenerator func() string) *QueryBuilder {
-	return &QueryBuilder{
-		base.NewQueryBuilder(lib.PoliciesViewCollection, "p", randomGenerator,
-			policyParamsHierarchy, policyParamsWhereClause, policyOrClausesKeys),
-	}
-}
-
-func (qb *QueryBuilder) Build(params map[string]string) (string, map[string]interface{}) {
-	const (
-		deleteClause = "(**tableAlias**.isDeleted = false OR **tableAlias**." +
-			"isDeleted IS NULL)"
-		emitClause = "(**tableAlias**.companyEmit = true)"
-	)
-	qb.WhereClauses = []string{emitClause}
-	if val, ok := params["status"]; ok {
-		if !strings.Contains(val, "deleted") {
-			qb.WhereClauses = append(qb.WhereClauses, deleteClause)
-		}
-	}
-	return qb.QueryBuilder.Build(params)
-}
