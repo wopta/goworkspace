@@ -77,12 +77,6 @@ var brokerRoutes []lib.Route = []lib.Route{
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
-		Route:   "/policies/v1",
-		Handler: lib.ResponseLoggerWrapper(GetPoliciesFx),
-		Method:  http.MethodPost,
-		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleManager},
-	},
-	{
 		Route:   "/policy/transactions/v1/{policyUid}",
 		Handler: lib.ResponseLoggerWrapper(GetPolicyTransactionsFx),
 		Method:  http.MethodGet,
@@ -98,12 +92,6 @@ var brokerRoutes []lib.Route = []lib.Route{
 		Handler: lib.ResponseLoggerWrapper(AcceptanceFx),
 		Method:  http.MethodPut,
 		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleManager},
-	},
-	{
-		Route:   "/policies/auth/v1",
-		Handler: lib.ResponseLoggerWrapper(GetPoliciesByAuthFx),
-		Method:  http.MethodPost,
-		Roles:   []string{lib.UserRoleAgent, lib.UserRoleAgency},
 	},
 	{
 		Route:   "/policy/renew/v1/{uid}",
@@ -122,6 +110,14 @@ var brokerRoutes []lib.Route = []lib.Route{
 		Handler: lib.ResponseLoggerWrapper(InitFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
+	},
+	{
+		Route:       "/portfolio/{type}/{version}",
+		Method:      http.MethodGet,
+		Handler:     lib.ResponseLoggerWrapper(GetPortfolioFx),
+		Middlewares: nil,
+		Roles: []string{lib.UserRoleAdmin, lib.UserRoleManager, lib.UserRoleAreaManager, lib.UserRoleAgency,
+			lib.UserRoleAgent},
 	},
 }
 
