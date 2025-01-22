@@ -1,6 +1,10 @@
 package query_builder
 
-import "github.com/wopta/goworkspace/lib"
+import (
+	"strings"
+
+	"github.com/wopta/goworkspace/lib"
+)
 
 var (
 	policyParamsHierarchy = []map[string][]string{
@@ -61,7 +65,16 @@ func newPolicyQueryBuilder(randomGenerator func() string) *policyQueryBuilder {
 }
 
 func (pqb *policyQueryBuilder) BuildQuery(params map[string]string) (string, map[string]interface{}) {
-	pqb.whereClauses = []string{"(**tableAlias**.isDeleted = false OR **tableAlias**." +
-		"isDeleted IS NULL)", "(**tableAlias**.companyEmit = true)"}
+	const (
+		deleteClause = "(**tableAlias**.isDeleted = false OR **tableAlias**." +
+			"isDeleted IS NULL)"
+		emitClause = "(**tableAlias**.companyEmit = true)"
+	)
+	pqb.whereClauses = []string{emitClause}
+	if val, ok := params["status"]; ok {
+		if !strings.Contains(val, "deleted") {
+			pqb.whereClauses = append(pqb.whereClauses, deleteClause)
+		}
+	}
 	return pqb.baseQueryBuilder.BuildQuery(params)
 }
