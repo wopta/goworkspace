@@ -1,14 +1,14 @@
-package query_builder_test
+package renew_test
 
 import (
 	"strings"
 	"testing"
 
-	query_builder "github.com/wopta/goworkspace/policy/query-builder"
+	"github.com/wopta/goworkspace/policy/query-builder/internal/renew"
 )
 
 func TestQueryBuilder(t *testing.T) {
-	qb := query_builder.NewRenewQueryQueryBuilder(func() string {
+	qb := renew.NewQueryBuilder(func() string {
 		return "test"
 	})
 	var testCases = []struct {
@@ -126,7 +126,7 @@ func TestQueryBuilder(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			got, _ := qb.BuildQuery(tc.params)
+			got, _ := qb.Build(tc.params)
 
 			whereClauses := strings.TrimSpace(strings.Split(got, "WHERE ")[1])
 
@@ -138,7 +138,7 @@ func TestQueryBuilder(t *testing.T) {
 }
 
 func TestQueryBuilderFail(t *testing.T) {
-	qb := query_builder.NewRenewQueryQueryBuilder(func() string { return "test" })
+	qb := renew.NewQueryBuilder(func() string { return "test" })
 	var testCases = []struct {
 		name   string
 		params map[string]string
@@ -153,7 +153,7 @@ func TestQueryBuilderFail(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			got, _ := qb.BuildQuery(tc.params)
+			got, _ := qb.Build(tc.params)
 
 			if !strings.EqualFold(got, tc.want) {
 				t.Errorf("expected: %s, got: %s", tc.want, got)

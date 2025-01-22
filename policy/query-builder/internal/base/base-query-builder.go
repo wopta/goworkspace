@@ -1,4 +1,4 @@
-package query_builder
+package base
 
 import (
 	"bytes"
@@ -12,20 +12,20 @@ import (
 	"github.com/wopta/goworkspace/lib"
 )
 
-type baseQueryBuilder struct {
+type QueryBuilder struct {
 	tableName         string
 	tableAlias        string
 	randomGenerator   func() string
 	paramsHierarchy   []map[string][]string
 	paramsWhereClause map[string]string
 	orClausesKey      []string
-	whereClauses      []string
+	WhereClauses      []string
 	limit             uint64
 }
 
-func newBaseQueryBuilder(tableName, tableAlias string, randomGenerator func() string,
+func NewQueryBuilder(tableName, tableAlias string, randomGenerator func() string,
 	paramsHierarchy []map[string][]string, paramsWhereClause map[string]string,
-	orClausesKey []string) baseQueryBuilder {
+	orClausesKey []string) QueryBuilder {
 	if randomGenerator == nil {
 		randomGenerator = func() string {
 			var (
@@ -42,20 +42,20 @@ func newBaseQueryBuilder(tableName, tableAlias string, randomGenerator func() st
 			return string(s)
 		}
 	}
-	return baseQueryBuilder{
+	return QueryBuilder{
 		tableName:         tableName,
 		tableAlias:        tableAlias,
 		randomGenerator:   randomGenerator,
 		paramsHierarchy:   paramsHierarchy,
 		paramsWhereClause: paramsWhereClause,
 		orClausesKey:      orClausesKey,
-		whereClauses:      make([]string, 0),
+		WhereClauses:      make([]string, 0),
 	}
 }
 
-func (bq *baseQueryBuilder) getAllowedParams(params map[string]string) []string {
+func (qb *QueryBuilder) getAllowedParams(params map[string]string) []string {
 	paramsKeys := lib.GetMapKeys(params)
-	for _, value := range bq.paramsHierarchy {
+	for _, value := range qb.paramsHierarchy {
 		for k, v := range value {
 			if lib.SliceContains(paramsKeys, k) {
 				return v
@@ -65,7 +65,7 @@ func (bq *baseQueryBuilder) getAllowedParams(params map[string]string) []string 
 	return nil
 }
 
-func (bq *baseQueryBuilder) filterParams(params map[string]string, allowedParams []string) map[string]string {
+func (qb *QueryBuilder) filterParams(params map[string]string, allowedParams []string) map[string]string {
 	paramsKeys := lib.GetMapKeys(params)
 	for _, key := range paramsKeys {
 		if !lib.SliceContains(allowedParams, key) {
@@ -75,28 +75,28 @@ func (bq *baseQueryBuilder) filterParams(params map[string]string, allowedParams
 	return params
 }
 
-func (bq *baseQueryBuilder) processOrClauseParam(paramValue string) string {
+func (qb *QueryBuilder) processOrClauseParam(paramValue string) string {
 	whereClauses := make([]string, 0)
 	paramsValueList := strings.Split(paramValue, ",")
 	for _, status := range paramsValueList {
-		if val, ok := bq.paramsWhereClause[lib.TrimSpace(status)]; ok && val != "" {
+		if val, ok := qb.paramsWhereClause[lib.TrimSpace(status)]; ok && val != "" {
 			whereClauses = append(whereClauses, val)
 		}
 	}
 	return "(" + strings.Join(whereClauses, " OR ") + ")"
 }
 
-func (bq *baseQueryBuilder) processProducerUidParam(paramValue string, queryParams map[string]interface{}) string {
+func (qb *QueryBuilder) processProducerUidParam(paramValue string, queryParams map[string]interface{}) string {
 	tmp := make([]string, 0)
 	for _, uid := range strings.Split(paramValue, ",") {
-		randomIdentifier := bq.randomGenerator()
+		randomIdentifier := qb.randomGenerator()
 		queryParams[randomIdentifier] = lib.TrimSpace(uid)
 		tmp = append(tmp, fmt.Sprintf("@%s", randomIdentifier))
 	}
-	return fmt.Sprintf(paramsWhereClause["producerUid"], strings.Join(tmp, ", "))
+	return fmt.Sprintf(qb.paramsWhereClause["producerUid"], strings.Join(tmp, ", "))
 }
 
-func (bq *baseQueryBuilder) processParams(allowedParams []string, filteredParams map[string]string) ([]string, map[string]interface{}) {
+func (qb *QueryBuilder) processParams(allowedParams []string, filteredParams map[string]string) ([]string, map[string]interface{}) {
 	whereClauses := make([]string, 0)
 	queryParams := make(map[string]interface{})
 
@@ -106,15 +106,15 @@ func (bq *baseQueryBuilder) processParams(allowedParams []string, filteredParams
 			continue
 		}
 
-		if lib.SliceContains(bq.orClausesKey, paramKey) {
-			whereClause := bq.processOrClauseParam(filteredParams[paramKey])
+		if lib.SliceContains(qb.orClausesKey, paramKey) {
+			whereClause := qb.processOrClauseParam(filteredParams[paramKey])
 			whereClauses = append(whereClauses, whereClause)
 		} else if paramKey == "producerUid" {
-			whereClause := bq.processProducerUidParam(paramValue, queryParams)
+			whereClause := qb.processProducerUidParam(paramValue, queryParams)
 			whereClauses = append(whereClauses, whereClause)
 		} else {
-			randomIdentifier := bq.randomGenerator()
-			whereClauses = append(whereClauses, fmt.Sprintf(paramsWhereClause[paramKey], randomIdentifier))
+			randomIdentifier := qb.randomGenerator()
+			whereClauses = append(whereClauses, fmt.Sprintf(qb.paramsWhereClause[paramKey], randomIdentifier))
 			queryParams[randomIdentifier] = paramValue
 		}
 
@@ -122,7 +122,7 @@ func (bq *baseQueryBuilder) processParams(allowedParams []string, filteredParams
 	return whereClauses, queryParams
 }
 
-func (bq *baseQueryBuilder) extractLimit(params map[string]string) error {
+func (qb *QueryBuilder) extractLimit(params map[string]string) error {
 	var (
 		err   error
 		limit = 10
@@ -137,12 +137,12 @@ func (bq *baseQueryBuilder) extractLimit(params map[string]string) error {
 		}
 		delete(params, "limit")
 	}
-	bq.limit = uint64(limit)
+	qb.limit = uint64(limit)
 
 	return nil
 }
 
-func (bq *baseQueryBuilder) parseQuery() string {
+func (qb *QueryBuilder) parseQuery() string {
 	const queryPrefix = "SELECT **tableAlias**.uid, **tableAlias**.name AS productName, " +
 		"**tableAlias**.codeCompany, CAST(**tableAlias**.proposalNumber AS INT64) AS proposalNumber, " +
 		"**tableAlias**.nameDesc,**tableAlias**.status, RTRIM(COALESCE(JSON_VALUE(**tableAlias**.data, " +
@@ -160,19 +160,19 @@ func (bq *baseQueryBuilder) parseQuery() string {
 	)
 
 	rawQuery.WriteString(queryPrefix)
-	if len(bq.whereClauses) != 0 {
-		rawQuery.WriteString(strings.Join(bq.whereClauses, " AND "))
+	if len(qb.WhereClauses) != 0 {
+		rawQuery.WriteString(strings.Join(qb.WhereClauses, " AND "))
 	}
 	rawQuery.WriteString(fmt.Sprintf(" ORDER BY **tableAlias**.updateDate DESC"))
-	rawQuery.WriteString(fmt.Sprintf(" LIMIT %d", bq.limit))
+	rawQuery.WriteString(fmt.Sprintf(" LIMIT %d", qb.limit))
 
-	query := strings.ReplaceAll(rawQuery.String(), "**tableName**", bq.tableName)
-	query = strings.ReplaceAll(query, "**tableAlias**", bq.tableAlias)
+	query := strings.ReplaceAll(rawQuery.String(), "**tableName**", qb.tableName)
+	query = strings.ReplaceAll(query, "**tableAlias**", qb.tableAlias)
 
 	return query
 }
 
-func (bq *baseQueryBuilder) BuildQuery(params map[string]string) (string, map[string]interface{}) {
+func (qb *QueryBuilder) Build(params map[string]string) (string, map[string]interface{}) {
 	var (
 		err           error
 		query         string
@@ -181,25 +181,25 @@ func (bq *baseQueryBuilder) BuildQuery(params map[string]string) (string, map[st
 		queryParams   map[string]interface{}
 	)
 
-	err = bq.extractLimit(params)
+	err = qb.extractLimit(params)
 	if err != nil {
 		log.Printf("Error extracting limit: %v", err)
 	}
 
-	allowedParams = bq.getAllowedParams(params)
+	allowedParams = qb.getAllowedParams(params)
 	if allowedParams == nil {
 		return "", nil
 	}
 
-	filteredParams := bq.filterParams(params, allowedParams)
+	filteredParams := qb.filterParams(params, allowedParams)
 	if len(filteredParams) == 0 {
 		return "", nil
 	}
 
-	whereClauses, queryParams = bq.processParams(allowedParams, filteredParams)
-	bq.whereClauses = append(whereClauses, bq.whereClauses...)
+	whereClauses, queryParams = qb.processParams(allowedParams, filteredParams)
+	qb.WhereClauses = append(whereClauses, qb.WhereClauses...)
 
-	query = bq.parseQuery()
+	query = qb.parseQuery()
 
 	return query, queryParams
 }

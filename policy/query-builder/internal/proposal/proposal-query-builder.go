@@ -1,6 +1,9 @@
-package query_builder
+package proposal
 
-import "github.com/wopta/goworkspace/lib"
+import (
+	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/policy/query-builder/internal/base"
+)
 
 var (
 	proposalParamsHierarchy = []map[string][]string{
@@ -35,18 +38,18 @@ var (
 	proposalOrClausesKeys = []string{"rd", "buyable"}
 )
 
-type proposalQueryBuilder struct {
-	baseQueryBuilder
+type QueryBuilder struct {
+	base.QueryBuilder
 }
 
-func newProposalQueryBuilder(randomGenerator func() string) *proposalQueryBuilder {
-	return &proposalQueryBuilder{
-		newBaseQueryBuilder(lib.PoliciesViewCollection, "p", randomGenerator,
+func NewQueryBuilder(randomGenerator func() string) *QueryBuilder {
+	return &QueryBuilder{
+		base.NewQueryBuilder(lib.PoliciesViewCollection, "p", randomGenerator,
 			proposalParamsHierarchy, proposalParamsWhereClause, proposalOrClausesKeys),
 	}
 }
 
-func (pqb *proposalQueryBuilder) BuildQuery(params map[string]string) (string, map[string]interface{}) {
-	pqb.whereClauses = []string{"(**tableAlias**.proposalNumber > 0)", "(**tableAlias**.companyEmit = false)"}
-	return pqb.baseQueryBuilder.BuildQuery(params)
+func (qb *QueryBuilder) Build(params map[string]string) (string, map[string]interface{}) {
+	qb.WhereClauses = []string{"(**tableAlias**.proposalNumber > 0)", "(**tableAlias**.companyEmit = false)"}
+	return qb.QueryBuilder.Build(params)
 }
