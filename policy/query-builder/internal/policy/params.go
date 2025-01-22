@@ -33,15 +33,15 @@ var (
 		"company":       "(**tableAlias**.company = LOWER(@%s))",
 		"product":       "(**tableAlias**.name = LOWER(@%s))",
 		"producerUid":   "(**tableAlias**.producerUid IN (%s))",
-		"reservedYes":   "(**table.Alias**.isReserved = true)",
-		"reservedNo":    "(**table.Alias**.isReserved = false)",
-		"notSigned":     "(**table.Alias**.isSign = false)",
-		"unpaid":        "(**table.Alias**.isPay = false)",
-		"signedPaid":    "(**table.Alias**.isSign = true AND **table.Alias**.isPay = true)",
-		"unsolved": "(**table.Alias**.annuity > 0 AND **table.Alias**.isPay = false AND CURRENT_DATE(" +
-			") >= DATE_ADD(**table.Alias**.startDate, INTERVAL **table.Alias**.annuity YEAR))",
-		"renewed": "(**table.Alias**.isRenew = true AND **table.Alias**.isPay = true)",
-		"deleted": "(**table.Alias**.isDeleted = true)",
+		"reservedYes":   "(**tableAlias**.isReserved = true)",
+		"reservedNo":    "(**tableAlias**.isReserved = false)",
+		"notSigned":     "(**tableAlias**.isSign = false)",
+		"unpaid":        "(**tableAlias**.isPay = false)",
+		"signedPaid":    "(**tableAlias**.isSign = true AND **tableAlias**.isPay = true)",
+		"unsolved": "(**tableAlias**.annuity > 0 AND **tableAlias**.isPay = false AND CURRENT_DATE(" +
+			") >= DATE_ADD(**tableAlias**.startDate, INTERVAL **tableAlias**.annuity YEAR))",
+		"renewed": "(**tableAlias**.isRenew = true AND **tableAlias**.isPay = true)",
+		"deleted": "(**tableAlias**.isDeleted = true)",
 	}
 
 	orClausesKeys = []string{"status"}
