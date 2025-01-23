@@ -24,10 +24,10 @@ func (qb *QueryBuilder) Build(params map[string]string) (string, map[string]inte
 			"isDeleted IS NULL)"
 		emitClause = "(**tableAlias**.companyEmit = true)"
 	)
-	qb.WhereClauses = []string{emitClause}
+	qb.WhereClauses = []string{emitClause, deleteClause}
 	if val, ok := params["status"]; ok {
-		if !strings.Contains(val, "deleted") {
-			qb.WhereClauses = append(qb.WhereClauses, deleteClause)
+		if strings.Contains(val, "deleted") {
+			qb.WhereClauses = qb.WhereClauses[:1]
 		}
 	}
 	return qb.QueryBuilder.Build(params)
