@@ -26,9 +26,10 @@ var (
 
 		"proposalNumber": "(**tableAlias**.proposalNumber = CAST(@%s AS INTEGER))",
 
-		"insuredFiscalCode":    "(JSON_VALUE(**tableAlias**.data, '$.assets[0].person.fiscalCode') = @%s)",
+		"insuredFiscalCode": "(LOWER(JSON_VALUE(**tableAlias**.data, '$.assets[0].person.fiscalCode')) = LOWER(" +
+			"@%s))",
 		"contractorVatCode":    "(JSON_VALUE(**tableAlias**.data, '$.contractor.vatCode') = @%s)",
-		"contractorFiscalCode": "(**tableAlias**.contractorFiscalcode = @%s)",
+		"contractorFiscalCode": "(LOWER(**tableAlias**.contractorFiscalcode) = LOWER(@%s))",
 
 		"contractorName":    "(REGEXP_CONTAINS(LOWER(JSON_VALUE(**tableAlias**.data, '$.contractor.name')), LOWER(@%s)))",
 		"contractorSurname": "(REGEXP_CONTAINS(LOWER(JSON_VALUE(**tableAlias**.data, '$.contractor.surname')), LOWER(@%s)))",

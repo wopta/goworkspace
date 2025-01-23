@@ -7,18 +7,22 @@ var (
 		{"proposalNumber": []string{"proposalNumber", "producerUid"}},
 
 		{"insuredFiscalCode": []string{"insuredFiscalCode", "producerUid"}},
+		{"contractorVatCode": []string{"contractorVatCode", "producerUid"}},
+		{"contractorFiscalCode": []string{"contractorFiscalCode", "producerUid"}},
 
 		{"contractorName": []string{"contractorName", "contractorSurname", "producerUid"}},
 		{"contractorSurname": []string{"contractorName", "contractorSurname", "producerUid"}},
 
-		{"startDateFrom": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "payment", "renewMonth"}},
-		{"startDateTo": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "payment", "renewMonth"}},
-		{"company": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "payment", "renewMonth"}},
-		{"product": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "payment", "renewMonth"}},
-		{"producerUid": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "payment", "renewMonth"}},
-		{"status": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "payment", "renewMonth"}},
-		{"payment": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "payment", "renewMonth"}},
-		{"renewMonth": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "payment", "renewMonth"}},
+		{"startDateFrom": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "payment", "renewMonth", "contractorType"}},
+		{"startDateTo": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "payment", "renewMonth", "contractorType"}},
+		{"company": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "payment", "renewMonth", "contractorType"}},
+		{"product": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "payment", "renewMonth", "contractorType"}},
+		{"producerUid": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "payment", "renewMonth", "contractorType"}},
+		{"status": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "payment", "renewMonth", "contractorType"}},
+		{"payment": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "payment", "renewMonth", "contractorType"}},
+		{"renewMonth": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "payment", "renewMonth", "contractorType"}},
+		{"contractorType": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status",
+			"payment", "renewMonth", "contractorType"}},
 	}
 
 	paramsWhereClause = map[string]string{
@@ -26,7 +30,9 @@ var (
 
 		"proposalNumber": "(**tableAlias**.proposalNumber = CAST(@%s AS INTEGER))",
 
-		"insuredFiscalCode": "(JSON_VALUE(**tableAlias**.data, '$.assets[0].person.fiscalCode') = @%s)",
+		"insuredFiscalCode":    "(LOWER(JSON_VALUE(**tableAlias**.data, '$.assets[0].person.fiscalCode')) = LOWER(@%s))",
+		"contractorVatCode":    "(JSON_VALUE(**tableAlias**.data, '$.contractor.vatCode') = @%s)",
+		"contractorFiscalCode": "(LOWER(**tableAlias**.contractorFiscalcode) = LOWER(@%s))",
 
 		"contractorName":    "(REGEXP_CONTAINS(LOWER(JSON_VALUE(**tableAlias**.data, '$.contractor.name')), LOWER(@%s)))",
 		"contractorSurname": "(REGEXP_CONTAINS(LOWER(JSON_VALUE(**tableAlias**.data, '$.contractor.surname')), LOWER(@%s)))",
@@ -41,6 +47,13 @@ var (
 		"unpaid":        "(**tableAlias**.isPay = false)",
 		"recurrent":     "(**tableAlias**.hasMandate = true)",
 		"notRecurrent":  "(**tableAlias**.hasMandate = false OR **tableAlias**.hasMandate IS NULL)",
+		// contractorType
+		"enterprise": "(JSON_VALUE(**tableAlias**.data, '$.contractor.type') = 'legalEntity' AND (**tableAlias**." +
+			"contractorFiscalcode IS NULL OR **tableAlias**.contractorFiscalcode = ''))",
+		"individualCompany": "(JSON_VALUE(**tableAlias**.data, " +
+			"'$.contractor.type') = 'legalEntity' AND **tableAlias**.contractorFiscalcode != '')",
+		"physical": "(JSON_VALUE(p.data, '$.contractor.type') = 'individual' OR (JSON_VALUE(p.data, " +
+			"'$.contractor.type') = '') OR (JSON_VALUE(p.data, '$.contractor.type') IS NULL))",
 	}
 
 	orClausesKeys = []string{"status", "payment"}

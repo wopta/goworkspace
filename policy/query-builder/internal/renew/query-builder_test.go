@@ -31,7 +31,7 @@ func TestQueryBuilder(t *testing.T) {
 				"insuredFiscalCode": "LLLRRR85E05R94Z330F",
 				"producerCode":      "a1b2c3d4",
 			},
-			"(JSON_VALUE(rp.data, '$.assets[0].person.fiscalCode') = @test) AND " +
+			"(LOWER(JSON_VALUE(rp.data, '$.assets[0].person.fiscalCode')) = LOWER(@test)) AND " +
 				"(rp.isDeleted = false OR rp.isDeleted IS NULL) ORDER BY rp.updateDate DESC LIMIT 10",
 		},
 		{
@@ -126,7 +126,7 @@ func TestQueryBuilder(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			got, _ := qb.Build(tc.params)
+			got, _, _ := qb.Build(tc.params)
 
 			whereClauses := strings.TrimSpace(strings.Split(got, "WHERE ")[1])
 
@@ -153,7 +153,7 @@ func TestQueryBuilderFail(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			got, _ := qb.Build(tc.params)
+			got, _, _ := qb.Build(tc.params)
 
 			if !strings.EqualFold(got, tc.want) {
 				t.Errorf("expected: %s, got: %s", tc.want, got)
