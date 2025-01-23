@@ -5,17 +5,20 @@ var (
 		{"codeCompany": []string{"codeCompany", "producerUid"}},
 
 		{"insuredFiscalCode": []string{"insuredFiscalCode", "producerUid"}},
+		{"contractorVatCode": []string{"contractorVatCode", "producerUid"}},
+		{"contractorFiscalCode": []string{"contractorFiscalCode", "producerUid"}},
 
 		{"contractorName": []string{"contractorName", "contractorSurname", "producerUid"}},
 		{"contractorSurname": []string{"contractorName", "contractorSurname", "producerUid"}},
 
-		{"startDateFrom": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "rd"}},
-		{"startDateTo": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "rd"}},
-		{"company": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "rd"}},
-		{"product": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "rd"}},
-		{"producerUid": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "rd"}},
-		{"status": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "rd"}},
-		{"rd": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "rd"}},
+		{"startDateFrom": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "rd", "contractorType"}},
+		{"startDateTo": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "rd", "contractorType"}},
+		{"company": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "rd", "contractorType"}},
+		{"product": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "rd", "contractorType"}},
+		{"producerUid": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "rd", "contractorType"}},
+		{"status": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "rd", "contractorType"}},
+		{"rd": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "rd", "contractorType"}},
+		{"contractorType": []string{"startDateFrom", "startDateTo", "company", "product", "producerUid", "status", "rd", "contractorType"}},
 	}
 
 	paramsWhereClause = map[string]string{
@@ -23,7 +26,9 @@ var (
 
 		"proposalNumber": "(**tableAlias**.proposalNumber = CAST(@%s AS INTEGER))",
 
-		"insuredFiscalCode": "(JSON_VALUE(**tableAlias**.data, '$.assets[0].person.fiscalCode') = @%s)",
+		"insuredFiscalCode":    "(JSON_VALUE(**tableAlias**.data, '$.assets[0].person.fiscalCode') = @%s)",
+		"contractorVatCode":    "(JSON_VALUE(**tableAlias**.data, '$.contractor.vatCode') = @%s)",
+		"contractorFiscalCode": "(**tableAlias**.contractorFiscalcode = @%s)",
 
 		"contractorName":    "(REGEXP_CONTAINS(LOWER(JSON_VALUE(**tableAlias**.data, '$.contractor.name')), LOWER(@%s)))",
 		"contractorSurname": "(REGEXP_CONTAINS(LOWER(JSON_VALUE(**tableAlias**.data, '$.contractor.surname')), LOWER(@%s)))",
@@ -33,16 +38,28 @@ var (
 		"company":       "(**tableAlias**.company = LOWER(@%s))",
 		"product":       "(**tableAlias**.name = LOWER(@%s))",
 		"producerUid":   "(**tableAlias**.producerUid IN (%s))",
-		"reservedYes":   "(**tableAlias**.isReserved = true)",
-		"reservedNo":    "(**tableAlias**.isReserved = false)",
-		"notSigned":     "(**tableAlias**.isSign = false)",
-		"unpaid":        "(**tableAlias**.isPay = false)",
-		"signedPaid":    "(**tableAlias**.isSign = true AND **tableAlias**.isPay = true)",
+
+		// rd
+		"reservedYes": "(**tableAlias**.isReserved = true)",
+		"reservedNo":  "(**tableAlias**.isReserved = false)",
+
+		// status
+		"notSigned":  "(**tableAlias**.isSign = false)",
+		"unpaid":     "(**tableAlias**.isPay = false)",
+		"signedPaid": "(**tableAlias**.isSign = true AND **tableAlias**.isPay = true)",
 		"unsolved": "(**tableAlias**.annuity > 0 AND **tableAlias**.isPay = false AND CURRENT_DATE(" +
 			") >= DATE_ADD(**tableAlias**.startDate, INTERVAL **tableAlias**.annuity YEAR))",
 		"renewed": "(**tableAlias**.isRenew = true AND **tableAlias**.isPay = true)",
 		"deleted": "(**tableAlias**.isDeleted = true)",
+
+		// contractorType
+		"enterprise": "(JSON_VALUE(**tableAlias**.data, '$.contractor.type') = 'legalEntity' AND (**tableAlias**." +
+			"contractorFiscalcode IS NULL OR **tableAlias**.contractorFiscalcode = ''))",
+		"individualCompany": "(JSON_VALUE(**tableAlias**.data, " +
+			"'$.contractor.type') = 'legalEntity' AND **tableAlias**.contractorFiscalcode != '')",
+		"physical": "(JSON_VALUE(p.data, '$.contractor.type') = 'individual' OR (JSON_VALUE(p.data, " +
+			"'$.contractor.type') = '') OR (JSON_VALUE(p.data, '$.contractor.type') IS NULL))",
 	}
 
-	orClausesKeys = []string{"status"}
+	toBeTranslatedKeys = []string{"status", "rd", "contractorType"}
 )
