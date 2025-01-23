@@ -3,8 +3,6 @@ package broker
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"strings"
@@ -20,6 +18,10 @@ import (
 
 type RequestApprovalReq = BrokerBaseRequest
 
+const AlreadyInsured int = 9999
+
+var errNotAllowed = errors.New("operation not allowed")
+
 func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err    error
@@ -28,11 +30,15 @@ func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 	)
 
 	log.SetPrefix("[RequestApprovalFx] ")
-	defer log.SetPrefix("")
-
+	defer func() {
+		r.Body.Close()
+		if err != nil {
+			log.Printf("error: %s", err)
+		}
+		log.Println("Handler end ---------------------------------------------")
+		log.SetPrefix("")
+	}()
 	log.Println("Handler start -----------------------------------------------")
-
-	log.Println("loading authToken from idToken...")
 
 	token := r.Header.Get("Authorization")
 	authToken, err := lib.GetAuthTokenFromIdToken(token)
@@ -48,19 +54,12 @@ func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 		authToken.Email,
 	)
 
-	origin = r.Header.Get("Origin")
-	body := lib.ErrorByte(io.ReadAll(r.Body))
-	defer r.Body.Close()
-
-	err = json.Unmarshal(body, &req)
-	if err != nil {
-		log.Printf("error unmarshaling request body: %s", err.Error())
+	if err = json.NewDecoder(r.Body).Decode(&req); err != nil {
+		log.Printf("error decoding request body: %s", err)
 		return "", nil, err
 	}
 
-	log.Printf("fetching policy %s from Firestore...", req.PolicyUid)
-	policy, err = plc.GetPolicy(req.PolicyUid, origin)
-	if err != nil {
+	if policy, err = plc.GetPolicy(req.PolicyUid, origin); err != nil {
 		log.Printf("error fetching policy %s from Firestore...", req.PolicyUid)
 		return "", nil, err
 	}
@@ -68,27 +67,25 @@ func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 	if policy.ProducerUid != authToken.UserID {
 		log.Printf("user %s cannot request approval for policy %s because producer not equal to request user",
 			authToken.UserID, policy.Uid)
-		return "", nil, errors.New("operation not allowed")
+		err = errNotAllowed
+		return "", nil, err
 	}
 
 	allowedStatus := []string{models.PolicyStatusInitLead, models.PolicyStatusNeedsApproval}
-
 	if !policy.IsReserved || !lib.SliceContains(allowedStatus, policy.Status) {
 		log.Printf("cannot request approval for policy with status %s and isReserved %t", policy.Status, policy.IsReserved)
-		return "", nil, fmt.Errorf("cannot request approval for policy with status %s and isReserved %t", policy.Status, policy.IsReserved)
+		err = errNotAllowed
+		return "", nil, err
 	}
 
 	brokerUpdatePolicy(&policy, req)
 
-	err = requestApproval(&policy)
-	if err != nil {
-		log.Printf("error request approval: %s", err.Error())
+	if err = requestApproval(&policy); err != nil {
+		log.Println("error request approval")
 		return "", nil, err
 	}
 
 	jsonOut, err := policy.Marshal()
-
-	log.Println("Handler end -------------------------------------------------")
 
 	return string(jsonOut), policy, err
 }
@@ -129,9 +126,64 @@ func requestApproval(policy *models.Policy) error {
 	return err
 }
 
-func setRequestApprovalData(policy *models.Policy) {
+func setRequestApprovalData(policy *models.Policy) error {
+	const (
+		mgaApprovalFlow     = "MgaApprovalFlow"
+		companyApprovalFlow = "CompanyApprovalFlow"
+	)
+	var (
+		flow              string
+	)
 	log.Printf("[setRequestApprovalData] policy uid %s: reserved flow", policy.Uid)
 
+	isOldReserved := len(policy.ReservedInfo.Reasons) > 0
+
+	if isOldReserved {
+		oldRequestApproval(policy)
+		return nil
+	}
+
+	setProposalNumber(policy)
+	createProposalDoc := policy.Status == models.PolicyStatusInitLead
+
+	if policy.ReservedInfo.CompanyApproval.Mandatory {
+		flow = companyApprovalFlow
+	}
+	if policy.ReservedInfo.MgaApproval.Mandatory {
+		flow = mgaApprovalFlow
+	}
+
+	switch flow {
+	case mgaApprovalFlow:
+		requestMgaApproval(policy)
+	case companyApprovalFlow:
+		requestCompanyApproval(policy)
+	default:
+		log.Println("flow not set")
+		return errNotAllowed
+	}
+
+	for _, reason := range policy.ReservedInfo.ReservedReasons {
+		if reason.Id == AlreadyInsured {
+			policy.Status = models.PolicyStatusWaitForApprovalMga
+			break
+		}
+	}
+
+	reserved.SetReservedInfo(policy, mgaProduct)
+
+	if createProposalDoc {
+		plc.AddProposalDoc(origin, policy, networkNode, mgaProduct)
+	}
+
+	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
+	policy.Updated = time.Now().UTC()
+
+	return nil
+}
+
+// Fallback to old reserved structure
+func oldRequestApproval(policy *models.Policy) {
 	setProposalNumber(policy)
 
 	if policy.Status == models.PolicyStatusInitLead {
@@ -157,4 +209,16 @@ func setRequestApprovalData(policy *models.Policy) {
 
 	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
 	policy.Updated = time.Now().UTC()
+}
+
+func requestMgaApproval(policy *models.Policy) {
+	policy.Status = models.PolicyStatusWaitForApproval
+	policy.ReservedInfo.MgaApproval.Status = models.WaitingApproval
+	policy.ReservedInfo.MgaApproval.UpdateDate = time.Now().UTC()
+}
+
+func requestCompanyApproval(policy *models.Policy) {
+	policy.Status = models.PolicyStatusWaitForApprovalCompany
+	policy.ReservedInfo.CompanyApproval.Status = models.WaitingApproval
+	policy.ReservedInfo.CompanyApproval.UpdateDate = time.Now().UTC()
 }

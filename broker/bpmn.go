@@ -192,7 +192,10 @@ func setRequestApprovalBpmn(state *bpmn.State) error {
 	policy := state.Data
 	firePolicy := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
 
-	setRequestApprovalData(policy)
+	if err := setRequestApprovalData(policy); err != nil {
+		log.Println("[setRequestApproval] error requesting approval")
+		return err
+	}
 
 	log.Printf("[setRequestApproval] saving policy with uid %s to Firestore....", policy.Uid)
 	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)

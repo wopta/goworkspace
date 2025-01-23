@@ -216,6 +216,9 @@ func setLifeContactsDetails(policy *models.Policy) {
 }
 
 func setLifeReservedInfo(policy *models.Policy, product *models.Product) {
+	if len(policy.ReservedInfo.Documents) > 0 {
+		return
+	}
 	switch policy.ProductVersion {
 	default:
 		// TODO: how to handle the contents dinamically?

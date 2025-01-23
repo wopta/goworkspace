@@ -65,9 +65,9 @@ func GetSequenceByCompany(name string, firePolicy string) (string, int, int) {
 
 	return codeCompany, numberCompany, number
 }
-func GetSequenceProposal(name string, firePolicy string) int {
+func GetSequenceProposal() int {
 	var number int
-	r, e := lib.OrderLimitFirestoreErr(firePolicy, "proposalNumber", firestore.Desc, 1)
+	r, e := lib.OrderLimitFirestoreErr(lib.PolicyCollection, "proposalNumber", firestore.Desc, 1)
 	lib.CheckError(e)
 	policyCompany := models.PolicyToListData(r)
 	if len(policyCompany) == 0 {
