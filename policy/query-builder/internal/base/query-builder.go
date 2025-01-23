@@ -2,8 +2,8 @@ package base
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
-	"log"
 	"math/rand"
 	"strconv"
 	"strings"
@@ -13,19 +13,19 @@ import (
 )
 
 type QueryBuilder struct {
-	tableName         string
-	tableAlias        string
-	randomGenerator   func() string
-	paramsHierarchy   []map[string][]string
-	paramsWhereClause map[string]string
-	orClausesKey      []string
-	WhereClauses      []string
-	limit             uint64
+	tableName          string
+	tableAlias         string
+	randomGenerator    func() string
+	paramsHierarchy    []map[string][]string
+	paramsWhereClause  map[string]string
+	toBeTranslatedKeys []string
+	WhereClauses       []string
+	limit              uint64
 }
 
 func NewQueryBuilder(tableName, tableAlias string, randomGenerator func() string,
 	paramsHierarchy []map[string][]string, paramsWhereClause map[string]string,
-	orClausesKey []string) QueryBuilder {
+	toBeTranslatedKeys []string) QueryBuilder {
 	if randomGenerator == nil {
 		randomGenerator = func() string {
 			var (
@@ -43,39 +43,42 @@ func NewQueryBuilder(tableName, tableAlias string, randomGenerator func() string
 		}
 	}
 	return QueryBuilder{
-		tableName:         tableName,
-		tableAlias:        tableAlias,
-		randomGenerator:   randomGenerator,
-		paramsHierarchy:   paramsHierarchy,
-		paramsWhereClause: paramsWhereClause,
-		orClausesKey:      orClausesKey,
-		WhereClauses:      make([]string, 0),
+		tableName:          tableName,
+		tableAlias:         tableAlias,
+		randomGenerator:    randomGenerator,
+		paramsHierarchy:    paramsHierarchy,
+		paramsWhereClause:  paramsWhereClause,
+		toBeTranslatedKeys: toBeTranslatedKeys,
+		WhereClauses:       make([]string, 0),
 	}
 }
 
-func (qb *QueryBuilder) getAllowedParams(params map[string]string) []string {
+func (qb *QueryBuilder) getAllowedParams(params map[string]string) ([]string, error) {
 	paramsKeys := lib.GetMapKeys(params)
 	for _, value := range qb.paramsHierarchy {
 		for k, v := range value {
 			if lib.SliceContains(paramsKeys, k) {
-				return v
+				return v, nil
 			}
 		}
 	}
-	return nil
+	return nil, errors.New("parameters not allowed")
 }
 
-func (qb *QueryBuilder) filterParams(params map[string]string, allowedParams []string) map[string]string {
+func (qb *QueryBuilder) filterParams(params map[string]string, allowedParams []string) (map[string]string, error) {
 	paramsKeys := lib.GetMapKeys(params)
 	for _, key := range paramsKeys {
 		if !lib.SliceContains(allowedParams, key) {
 			delete(params, key)
 		}
 	}
-	return params
+	if len(params) == 0 {
+		return nil, errors.New("parameters not allowed")
+	}
+	return params, nil
 }
 
-func (qb *QueryBuilder) processOrClauseParam(paramValue string) string {
+func (qb *QueryBuilder) processToBeTranslatedParam(paramValue string) (string, error) {
 	whereClauses := make([]string, 0)
 	paramsValueList := strings.Split(paramValue, ",")
 	for _, status := range paramsValueList {
@@ -83,7 +86,11 @@ func (qb *QueryBuilder) processOrClauseParam(paramValue string) string {
 			whereClauses = append(whereClauses, val)
 		}
 	}
-	return "(" + strings.Join(whereClauses, " OR ") + ")"
+	if len(whereClauses) == 0 {
+		return "", errors.New("error processing params")
+	}
+
+	return "(" + strings.Join(whereClauses, " OR ") + ")", nil
 }
 
 func (qb *QueryBuilder) processProducerUidParam(paramValue string, queryParams map[string]interface{}) string {
@@ -96,7 +103,8 @@ func (qb *QueryBuilder) processProducerUidParam(paramValue string, queryParams m
 	return fmt.Sprintf(qb.paramsWhereClause["producerUid"], strings.Join(tmp, ", "))
 }
 
-func (qb *QueryBuilder) processParams(allowedParams []string, filteredParams map[string]string) ([]string, map[string]interface{}) {
+func (qb *QueryBuilder) processParams(allowedParams []string, filteredParams map[string]string) ([]string,
+	map[string]interface{}, error) {
 	whereClauses := make([]string, 0)
 	queryParams := make(map[string]interface{})
 
@@ -106,12 +114,17 @@ func (qb *QueryBuilder) processParams(allowedParams []string, filteredParams map
 			continue
 		}
 
-		if lib.SliceContains(qb.orClausesKey, paramKey) {
-			whereClause := qb.processOrClauseParam(filteredParams[paramKey])
+		if lib.SliceContains(qb.toBeTranslatedKeys, paramKey) {
+			whereClause, err := qb.processToBeTranslatedParam(filteredParams[paramKey])
+			if err != nil {
+				return nil, nil, err
+			}
 			whereClauses = append(whereClauses, whereClause)
 		} else if paramKey == "producerUid" {
 			whereClause := qb.processProducerUidParam(paramValue, queryParams)
-			whereClauses = append(whereClauses, whereClause)
+			if whereClause != "" {
+				whereClauses = append(whereClauses, whereClause)
+			}
 		} else {
 			randomIdentifier := qb.randomGenerator()
 			whereClauses = append(whereClauses, fmt.Sprintf(qb.paramsWhereClause[paramKey], randomIdentifier))
@@ -119,7 +132,7 @@ func (qb *QueryBuilder) processParams(allowedParams []string, filteredParams map
 		}
 
 	}
-	return whereClauses, queryParams
+	return whereClauses, queryParams, nil
 }
 
 func (qb *QueryBuilder) extractLimit(params map[string]string) error {
@@ -160,7 +173,7 @@ func (qb *QueryBuilder) parseQuery() string {
 	)
 
 	rawQuery.WriteString(queryPrefix)
-	if len(qb.WhereClauses) != 0 {
+	if len(qb.WhereClauses) > 1 {
 		rawQuery.WriteString(strings.Join(qb.WhereClauses, " AND "))
 	}
 	rawQuery.WriteString(fmt.Sprintf(" ORDER BY **tableAlias**.updateDate DESC"))
@@ -172,7 +185,7 @@ func (qb *QueryBuilder) parseQuery() string {
 	return query
 }
 
-func (qb *QueryBuilder) Build(params map[string]string) (string, map[string]interface{}) {
+func (qb *QueryBuilder) Build(params map[string]string) (string, map[string]interface{}, error) {
 	var (
 		err           error
 		query         string
@@ -183,23 +196,26 @@ func (qb *QueryBuilder) Build(params map[string]string) (string, map[string]inte
 
 	err = qb.extractLimit(params)
 	if err != nil {
-		log.Printf("Error extracting limit: %v", err)
+		return "", nil, fmt.Errorf("error extracting limit: %w", err)
 	}
 
-	allowedParams = qb.getAllowedParams(params)
-	if allowedParams == nil {
-		return "", nil
+	allowedParams, err = qb.getAllowedParams(params)
+	if err != nil {
+		return "", nil, err
 	}
 
-	filteredParams := qb.filterParams(params, allowedParams)
-	if len(filteredParams) == 0 {
-		return "", nil
+	filteredParams, err := qb.filterParams(params, allowedParams)
+	if err != nil {
+		return "", nil, err
 	}
 
-	whereClauses, queryParams = qb.processParams(allowedParams, filteredParams)
+	whereClauses, queryParams, err = qb.processParams(allowedParams, filteredParams)
+	if err != nil {
+		return "", nil, err
+	}
 	qb.WhereClauses = append(whereClauses, qb.WhereClauses...)
 
 	query = qb.parseQuery()
 
-	return query, queryParams
+	return query, queryParams, nil
 }

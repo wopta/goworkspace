@@ -14,11 +14,11 @@ type QueryBuilder struct {
 func NewQueryBuilder(randomGenerator func() string) *QueryBuilder {
 	return &QueryBuilder{
 		base.NewQueryBuilder(lib.PoliciesViewCollection, "p", randomGenerator,
-			paramsHierarchy, paramsWhereClause, orClausesKeys),
+			paramsHierarchy, paramsWhereClause, toBeTranslatedKeys),
 	}
 }
 
-func (qb *QueryBuilder) Build(params map[string]string) (string, map[string]interface{}) {
+func (qb *QueryBuilder) Build(params map[string]string) (string, map[string]interface{}, error) {
 	const (
 		deleteClause = "(**tableAlias**.isDeleted = false OR **tableAlias**." +
 			"isDeleted IS NULL)"

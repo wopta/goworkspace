@@ -3,6 +3,7 @@ package broker
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -56,6 +57,8 @@ func GetPortfolioFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 		return "", nil, errors.New("no query params")
 	}
 
+	log.Printf("input params: %v", paramsMap)
+
 	if paramsMap["producerUid"] == "" {
 		children, err := getNodeChildren(r)
 		if err != nil {
@@ -70,9 +73,9 @@ func GetPortfolioFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	if queryBuilder == nil {
 		return "", nil, errors.New("error initializing query builder")
 	}
-	query, queryParams := queryBuilder.Build(paramsMap)
-	if query == "" {
-		return "", nil, errors.New("error generating query")
+	query, queryParams, err := queryBuilder.Build(paramsMap)
+	if err != nil {
+		return "", nil, fmt.Errorf("error generating query: %v", err)
 	}
 
 	log.Printf("query: %s\nqueryParams: %+v", query, queryParams)

@@ -16,7 +16,7 @@ func NewQueryBuilder(randomGenerator func() string) *QueryBuilder {
 	}
 }
 
-func (qb *QueryBuilder) Build(params map[string]string) (string, map[string]interface{}) {
+func (qb *QueryBuilder) Build(params map[string]string) (string, map[string]interface{}, error) {
 	qb.WhereClauses = []string{"(**tableAlias**.isDeleted = false OR **tableAlias**." +
 		"isDeleted IS NULL)"}
 
