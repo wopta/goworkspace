@@ -164,34 +164,27 @@ func receiptInfoBuilder(policy models.Policy, transaction models.Transaction) (d
 	if policy.Contractor.Name != "" {
 		receiptInfo.CustomerInfo.Fullname = strings.TrimSpace(policy.Contractor.Name + " " + policy.Contractor.Surname)
 	}
-	if policy.Contractor.Type != models.UserLegalEntity && policy.Contractor.Residence != nil {
-		if policy.Contractor.Residence.StreetName != "" {
-			receiptInfo.CustomerInfo.Address = strings.TrimSpace(policy.Contractor.Residence.StreetName + " " + policy.Contractor.Residence.StreetNumber)
+
+	address := policy.Contractor.Residence
+	if policy.Contractor.Type == models.UserLegalEntity {
+		address = policy.Contractor.CompanyAddress
+	}
+
+	if address != nil {
+		if address.StreetName != "" {
+			receiptInfo.CustomerInfo.Address = strings.TrimSpace(address.StreetName + " " + address.StreetNumber)
 		}
-		if policy.Contractor.Residence.PostalCode != "" {
-			receiptInfo.CustomerInfo.PostalCode = policy.Contractor.Residence.PostalCode
+		if address.PostalCode != "" {
+			receiptInfo.CustomerInfo.PostalCode = address.PostalCode
 		}
-		if policy.Contractor.Residence.City != "" {
-			receiptInfo.CustomerInfo.City = policy.Contractor.Residence.City
+		if address.City != "" {
+			receiptInfo.CustomerInfo.City = address.City
 		}
-		if policy.Contractor.Residence.CityCode != "" {
-			receiptInfo.CustomerInfo.Province = policy.Contractor.Residence.CityCode
-		}
-	} else if policy.Contractor.Type == models.UserLegalEntity && policy.Contractor.CompanyAddress != nil {
-		if policy.Contractor.CompanyAddress.StreetName != "" {
-			receiptInfo.CustomerInfo.Address = strings.TrimSpace(policy.Contractor.CompanyAddress.StreetName + " " + policy.
-				Contractor.CompanyAddress.StreetNumber)
-		}
-		if policy.Contractor.CompanyAddress.PostalCode != "" {
-			receiptInfo.CustomerInfo.PostalCode = policy.Contractor.CompanyAddress.PostalCode
-		}
-		if policy.Contractor.CompanyAddress.City != "" {
-			receiptInfo.CustomerInfo.City = policy.Contractor.CompanyAddress.City
-		}
-		if policy.Contractor.CompanyAddress.CityCode != "" {
-			receiptInfo.CustomerInfo.Province = policy.Contractor.CompanyAddress.CityCode
+		if address.CityCode != "" {
+			receiptInfo.CustomerInfo.Province = address.CityCode
 		}
 	}
+
 	if policy.Contractor.Mail != "" {
 		receiptInfo.CustomerInfo.Email = policy.Contractor.Mail
 	}
