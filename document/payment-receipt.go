@@ -8,6 +8,8 @@ import (
 	"github.com/go-pdf/fpdf"
 )
 
+const emptyField = "======"
+
 type PolicyInfo struct {
 	Company            string
 	ProductDescription string
@@ -34,6 +36,30 @@ type ReceiptInfo struct {
 	PolicyInfo   PolicyInfo
 	CustomerInfo CustomerInfo
 	Transaction  TransactionInfo
+}
+
+func NewReceiptInfo() ReceiptInfo {
+	return ReceiptInfo{
+		PolicyInfo: PolicyInfo{
+			Company:            emptyField,
+			ProductDescription: emptyField,
+			Code:               emptyField,
+		},
+		CustomerInfo: CustomerInfo{
+			Fullname:   emptyField,
+			Address:    emptyField,
+			PostalCode: emptyField,
+			City:       emptyField,
+			Province:   emptyField,
+			Email:      emptyField,
+			Phone:      emptyField,
+		},
+		Transaction: TransactionInfo{
+			EffectiveDate:  emptyField,
+			ExpirationDate: emptyField,
+			PriceGross:     0,
+		},
+	}
 }
 
 func PaymentReceipt(info ReceiptInfo) ([]byte, error) {

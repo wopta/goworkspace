@@ -159,20 +159,47 @@ func paymentReceiptBuilder(transactionUID string, authToken lib.AuthToken, isRen
 func receiptInfoBuilder(policy models.Policy, transaction models.Transaction) (document.ReceiptInfo, error) {
 	const dateFormat = "02/01/2006"
 
-	policyInfo := document.PolicyInfo{
-		Company:            document.CompanyMap[policy.Company],
-		ProductDescription: strings.ToUpper(policy.NameDesc),
-		Code:               policy.CodeCompany,
+	receiptInfo := document.NewReceiptInfo()
+
+	if policy.Company != "" {
+		receiptInfo.PolicyInfo.Company = document.CompanyMap[policy.Company]
+	}
+	if policy.NameDesc != "" {
+		receiptInfo.PolicyInfo.ProductDescription = strings.ToUpper(policy.NameDesc)
+	}
+	if policy.CodeCompany != "" {
+		receiptInfo.PolicyInfo.Company = policy.CodeCompany
 	}
 
-	customerInfo := document.CustomerInfo{
-		Fullname:   policy.Contractor.Name + " " + policy.Contractor.Surname,
-		Address:    policy.Contractor.Residence.StreetName + " " + policy.Contractor.Residence.StreetNumber,
-		PostalCode: policy.Contractor.Residence.PostalCode,
-		City:       policy.Contractor.Residence.City,
-		Province:   policy.Contractor.Residence.CityCode,
-		Email:      policy.Contractor.Mail,
-		Phone:      policy.Contractor.Phone,
+	if policy.Contractor.Name != "" {
+		receiptInfo.CustomerInfo.Fullname = strings.TrimSpace(policy.Contractor.Name + " " + policy.Contractor.Surname)
+	}
+
+	address := policy.Contractor.Residence
+	if policy.Contractor.Type == models.UserLegalEntity {
+		address = policy.Contractor.CompanyAddress
+	}
+
+	if address != nil {
+		if address.StreetName != "" {
+			receiptInfo.CustomerInfo.Address = strings.TrimSpace(address.StreetName + " " + address.StreetNumber)
+		}
+		if address.PostalCode != "" {
+			receiptInfo.CustomerInfo.PostalCode = address.PostalCode
+		}
+		if address.City != "" {
+			receiptInfo.CustomerInfo.City = address.City
+		}
+		if address.CityCode != "" {
+			receiptInfo.CustomerInfo.Province = address.CityCode
+		}
+	}
+
+	if policy.Contractor.Mail != "" {
+		receiptInfo.CustomerInfo.Email = policy.Contractor.Mail
+	}
+	if policy.Contractor.Phone != "" {
+		receiptInfo.CustomerInfo.Phone = policy.Contractor.Phone
 	}
 
 	expirationDate := policy.EndDate
@@ -198,15 +225,9 @@ func receiptInfoBuilder(policy models.Policy, transaction models.Transaction) (d
 		expirationDate = tmpExpirationDate
 	}
 
-	transactionInfo := document.TransactionInfo{
-		EffectiveDate:  effectiveDate.Format(dateFormat),
-		ExpirationDate: expirationDate.Format(dateFormat),
-		PriceGross:     transaction.Amount,
-	}
+	receiptInfo.Transaction.EffectiveDate = effectiveDate.Format(dateFormat)
+	receiptInfo.Transaction.ExpirationDate = expirationDate.Format(dateFormat)
+	receiptInfo.Transaction.PriceGross = transaction.Amount
 
-	return document.ReceiptInfo{
-		PolicyInfo:   policyInfo,
-		CustomerInfo: customerInfo,
-		Transaction:  transactionInfo,
-	}, nil
+	return receiptInfo, nil
 }
