@@ -3,10 +3,11 @@ package models
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/wopta/goworkspace/lib"
 	"log"
 	"math"
 	"strings"
+
+	"github.com/wopta/goworkspace/lib"
 )
 
 const (
@@ -457,7 +458,7 @@ func (fx *Fx) HasAssetType(input map[string]interface{}, assetType string) bool 
 	return false
 }
 
-func (fx *Fx) HasGuaranteeInSlice(input map[string]interface{}, slugList... string) bool {
+func (fx *Fx) HasGuaranteeInSlice(input map[string]interface{}, slugList ...string) bool {
 	j, err := json.Marshal(input)
 	lib.CheckError(err)
 	var policy Policy
@@ -488,4 +489,13 @@ func (fx *Fx) GetSignatoryMail(input map[string]interface{}) string {
 	}
 	lib.CheckError(fmt.Errorf("signatory not found"))
 	return ""
+}
+
+func (fx *Fx) AppendReservedData(slice []ReservedData, id int, name, description string) []ReservedData {
+	data := ReservedData{
+		Id:          id,
+		Name:        name,
+		Description: description,
+	}
+	return append(slice, data)
 }
