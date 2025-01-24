@@ -52,6 +52,7 @@ func setProductBodyData(policy models.Policy, bodyData *BodyData) {
 	bodyData.PayUrl = policy.PayUrl
 	bodyData.PaymentMode = policy.PaymentMode
 	bodyData.ProposalNumber = policy.ProposalNumber
+	bodyData.PolicyUid = policy.Uid
 
 	switch policy.Name {
 	case models.PmiProduct:
