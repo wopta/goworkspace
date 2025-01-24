@@ -18,8 +18,6 @@ import (
 
 type RequestApprovalReq = BrokerBaseRequest
 
-const AlreadyInsured int = 9999
-
 var errNotAllowed = errors.New("operation not allowed")
 
 func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -164,7 +162,7 @@ func setRequestApprovalData(policy *models.Policy) error {
 	}
 
 	for _, reason := range policy.ReservedInfo.ReservedReasons {
-		if reason.Id == AlreadyInsured {
+		if reason.Id == reserved.AlreadyInsured {
 			policy.Status = models.PolicyStatusWaitForApprovalMga
 			break
 		}

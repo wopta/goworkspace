@@ -9,6 +9,8 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
+const AlreadyInsured int = 9999
+
 func GetReservedInfo(policy *models.Policy) (bool, *models.ReservedInfo) {
 	switch policy.Name {
 	case models.LifeProduct:
