@@ -3,6 +3,7 @@ package broker
 import (
 	"fmt"
 	"log"
+	"os"
 	"strings"
 
 	"github.com/wopta/goworkspace/bpmn"
@@ -215,6 +216,13 @@ func sendRequestApprovalMail(state *bpmn.State) error {
 		ccAddress = mail.GetNetworkNodeEmail(networkNode)
 	case models.ECommerceChannel:
 		toAddress = mail.Address{} // fail safe for not sending email on ecommerce reserved
+	}
+
+	if policy.Name == "qbe" {
+		toAddress = mail.Address{
+			Address: os.Getenv("QBE_RESERVED_MAIL"),
+		}
+		ccAddress = mail.Address{}
 	}
 
 	mail.SendMailReserved(*policy, fromAddress, toAddress, ccAddress, flowName,
