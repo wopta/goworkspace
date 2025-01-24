@@ -48,6 +48,7 @@ func personAssetExecutor(wrapper *PolicyReservedWrapper) (bool, *models.Reserved
 	if output.ReservedInfo == nil {
 		output.ReservedInfo = &models.ReservedInfo{
 			Reasons: make([]string, 0),
+			ReservedReasons: make([]models.ReservedData, 0),
 		}
 	}
 
@@ -62,6 +63,13 @@ func personAssetExecutor(wrapper *PolicyReservedWrapper) (bool, *models.Reserved
 		reason := fmt.Sprintf("Cliente già assicurato con le polizze numero %v", policies)
 		output.IsReserved = isCovered
 		output.ReservedInfo.Reasons = append(output.ReservedInfo.Reasons, reason)
+		output.ReservedInfo.MgaApproval.Mandatory = true
+		output.ReservedInfo.MgaApproval.Status = models.NeedsApproval
+		output.ReservedInfo.ReservedReasons = append(output.ReservedInfo.ReservedReasons, models.ReservedData{
+			Id: AlreadyInsured,
+			Name: "insured",
+			Description: reason,
+		})
 	}
 	jsonLog, _ := json.Marshal(output)
 	log.Printf("[personAssetExecutor] result: %v", string(jsonLog))

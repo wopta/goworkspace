@@ -7,7 +7,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/wopta/goworkspace/callback_out"
@@ -153,14 +152,7 @@ func setProposalData(policy *models.Policy) {
 	if policy.IsReserved {
 		log.Println("[setProposalData] setting NeedsApproval status")
 		policy.Status = models.PolicyStatusNeedsApproval
-
-		for _, reason := range policy.ReservedInfo.Reasons {
-			// TODO: add key/id for reasons so we do not have to cjeck string equallity
-			if !strings.HasPrefix(reason, "Cliente già assicurato") {
-				reserved.SetReservedInfo(policy, mgaProduct)
-				break
-			}
-		}
+		reserved.SetReservedInfo(policy, mgaProduct)
 	}
 
 	if policy.Statements == nil || len(*policy.Statements) == 0 {

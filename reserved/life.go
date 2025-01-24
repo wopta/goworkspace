@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"slices"
 	"strings"
 
 	"github.com/wopta/goworkspace/document"
@@ -203,26 +204,32 @@ func setLifeReservedDocument(policy *models.Policy, product *models.Product) {
 	policy.ReservedInfo.Documents = attachments
 }
 
-func setLifeContactsDetails(policy *models.Policy) {
-	policy.ReservedInfo.Contacts = []models.Contact{
-		{
-			Title:   "Tramite e-mail:",
-			Type:    "e-mail",
-			Address: "assunzione@wopta.it",
-			Subject: fmt.Sprintf("Oggetto: %s proposta %d - UNDERWRITING MEDICO - %s", policy.NameDesc, policy.ProposalNumber,
-				strings.ToUpper(policy.Contractor.Surname+" "+policy.Contractor.Name)),
-		},
-	}
-}
-
 func setLifeReservedInfo(policy *models.Policy, product *models.Product) {
-	if len(policy.ReservedInfo.Documents) > 0 {
+	alreadyHasDocuments := len(policy.ReservedInfo.Documents) > 0 || len(policy.ReservedInfo.Attachments) > 0
+	if alreadyHasDocuments {
 		return
 	}
+
+	var hasReservedReasons bool
+	// Retrocompatibility
+	if len(policy.ReservedInfo.Reasons) > 0 {
+		hasReservedReasons = slices.ContainsFunc(policy.ReservedInfo.Reasons, func(r string) bool {
+			return !strings.HasPrefix(r, "Cliente già assicurato")
+		})
+	}
+
+	if len(policy.ReservedInfo.ReservedReasons) > 0 {
+		hasReservedReasons = slices.ContainsFunc(policy.ReservedInfo.ReservedReasons, func(r models.ReservedData) bool {
+			return r.Id != AlreadyInsured
+		})
+	}
+	
+	if !hasReservedReasons {
+		return
+	}
+
 	switch policy.ProductVersion {
 	default:
-		// TODO: how to handle the contents dinamically?
-		setLifeContactsDetails(policy)
 		setLifeReservedDocument(policy, product)
 	}
 }
