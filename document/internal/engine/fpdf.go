@@ -144,12 +144,10 @@ func (f *Fpdf) WriteText(cell domain.TableCell) {
 	oldFillColor := f.fillColor
 
 	if cell.Fill {
-		f.fillColor = cell.FillColor
 		f.SetFillColor(cell.FillColor)
 	}
 
-	f.style = cell.FontStyle
-	f.SetFontStyle(f.style)
+	f.SetFontStyle(cell.FontStyle)
 	f.SetFontColor(cell.FontColor)
 	f.SetFontSize(cell.FontSize)
 	f.SetFontFamily(constants.MontserratFont)
@@ -164,8 +162,7 @@ func (f *Fpdf) DrawTable(table [][]domain.TableCell) {
 	for _, row := range table {
 		maxNumLines := 1
 		for _, cell := range row {
-			f.style = cell.FontStyle
-			f.SetFontStyle(f.style)
+			f.SetFontStyle(cell.FontStyle)
 			f.SetFontSize(cell.FontSize)
 			f.SetFontFamily(constants.MontserratFont)
 
@@ -257,12 +254,11 @@ func (f *Fpdf) GetStringWidth(text string) float64 {
 }
 
 func (f *Fpdf) Save(filename string) (string, error) {
-	var out bytes.Buffer
-	err := f.pdf.Output(&out)
+	rawDoc, err := f.RawDoc()
 	if err != nil {
 		return "", err
 	}
 
-	gsLink := lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, out.Bytes())
+	gsLink := lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, rawDoc)
 	return gsLink, nil
 }
