@@ -3,14 +3,14 @@ package dto
 import (
 	"strconv"
 
+	"github.com/wopta/goworkspace/document/internal/constants"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 )
 
 const (
-	emptyField = "======"
-	no         = "NO"
-	yes        = "SI"
+	no  = "NO"
+	yes = "SI"
 )
 
 type CommercialCombinedDTO struct {
@@ -175,7 +175,7 @@ type section struct {
 
 func newSection() *section {
 	return &section{
-		Description: emptyField,
+		Description: constants.EmptyField,
 		Active:      no,
 		Price:       newPriceDTO(),
 	}

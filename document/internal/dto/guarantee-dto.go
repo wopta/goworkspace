@@ -18,7 +18,7 @@ func newNumeric() numeric {
 	return numeric{
 		ValueFloat: 0,
 		ValueInt:   0,
-		Text:       emptyField,
+		Text:       constants.EmptyField,
 	}
 }
 
@@ -35,14 +35,14 @@ type guaranteeDTO struct {
 
 func newGuaranteeDTO() *guaranteeDTO {
 	return &guaranteeDTO{
-		Description:                emptyField,
+		Description:                constants.EmptyField,
 		SumInsuredLimitOfIndemnity: newNumeric(),
 		LimitOfIndemnity:           newNumeric(),
 		SumInsured:                 newNumeric(),
-		StartDate:                  emptyField,
+		StartDate:                  constants.EmptyField,
 		Duration:                   newNumeric(),
-		RetroactiveDate:            emptyField,
-		RetroactiveDateUsa:         emptyField,
+		RetroactiveDate:            constants.EmptyField,
+		RetroactiveDateUsa:         constants.EmptyField,
 	}
 }
 

@@ -1,6 +1,9 @@
 package dto
 
-import "github.com/wopta/goworkspace/models"
+import (
+	"github.com/wopta/goworkspace/document/internal/constants"
+	"github.com/wopta/goworkspace/models"
+)
 
 type buildingDTO struct {
 	StreetName       string
@@ -19,17 +22,17 @@ type buildingDTO struct {
 
 func newBuildingDTO() *buildingDTO {
 	return &buildingDTO{
-		StreetName:       emptyField,
-		StreetNumber:     emptyField,
-		City:             emptyField,
-		PostalCode:       emptyField,
-		CityCode:         emptyField,
-		BuildingMaterial: emptyField,
-		HasSandwichPanel: emptyField,
-		HasAlarm:         emptyField,
-		HasSprinkler:     emptyField,
-		Naics:            emptyField,
-		NaicsDetail:      emptyField,
+		StreetName:       constants.EmptyField,
+		StreetNumber:     constants.EmptyField,
+		City:             constants.EmptyField,
+		PostalCode:       constants.EmptyField,
+		CityCode:         constants.EmptyField,
+		BuildingMaterial: constants.EmptyField,
+		HasSandwichPanel: constants.EmptyField,
+		HasAlarm:         constants.EmptyField,
+		HasSprinkler:     constants.EmptyField,
+		Naics:            constants.EmptyField,
+		NaicsDetail:      constants.EmptyField,
 		Guarantees:       make(map[string]*guaranteeDTO),
 	}
 }

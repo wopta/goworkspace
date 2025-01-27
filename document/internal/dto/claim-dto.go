@@ -3,6 +3,7 @@ package dto
 import (
 	"fmt"
 
+	"github.com/wopta/goworkspace/document/internal/constants"
 	"github.com/wopta/goworkspace/lib"
 )
 
@@ -14,7 +15,7 @@ type claimDTO struct {
 
 func newClaimDTO() *claimDTO {
 	return &claimDTO{
-		Description: emptyField,
+		Description: constants.EmptyField,
 		Quantity: numeric{
 			ValueFloat: 0,
 			ValueInt:   0,

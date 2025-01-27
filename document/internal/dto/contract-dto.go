@@ -22,15 +22,15 @@ type contractDTO struct {
 
 func newContractDTO() *contractDTO {
 	return &contractDTO{
-		CodeHeading:  emptyField,
-		Code:         emptyField,
-		StartDate:    emptyField,
-		EndDate:      emptyField,
-		PaymentSplit: emptyField,
-		NextPay:      emptyField,
+		CodeHeading:  constants.EmptyField,
+		Code:         constants.EmptyField,
+		StartDate:    constants.EmptyField,
+		EndDate:      constants.EmptyField,
+		PaymentSplit: constants.EmptyField,
+		NextPay:      constants.EmptyField,
 		HasBond:      no,
-		BondText:     emptyField,
-		Clause:       emptyField,
+		BondText:     constants.EmptyField,
+		Clause:       constants.EmptyField,
 	}
 
 }
@@ -44,7 +44,7 @@ func (c *contractDTO) fromPolicy(policy models.Policy, isProposal bool) {
 		if policy.CodeCompany != "" {
 			c.Code = policy.CodeCompany
 		} else {
-			c.Code = emptyField
+			c.Code = constants.EmptyField
 		}
 	}
 

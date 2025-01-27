@@ -1,5 +1,6 @@
 package constants
 
 const (
-	Proposal = "PROPOSTA"
+	Proposal   = "PROPOSTA"
+	EmptyField = "====="
 )

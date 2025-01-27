@@ -789,11 +789,11 @@ func (bg *baseGenerator) proponentInfo() map[string]string {
 			}
 		}
 
-		proponentInfo["address"] = "====="
-		proponentInfo["phone"] = "====="
-		proponentInfo["email"] = "====="
-		proponentInfo["pec"] = "====="
-		proponentInfo["website"] = "====="
+		proponentInfo["address"] = constants.EmptyField
+		proponentInfo["phone"] = constants.EmptyField
+		proponentInfo["email"] = constants.EmptyField
+		proponentInfo["pec"] = constants.EmptyField
+		proponentInfo["website"] = constants.EmptyField
 
 		if name := proponentNode.Agency.Name; name != "" {
 			proponentInfo["name"] = name
@@ -868,7 +868,6 @@ func (bg *baseGenerator) designationInfo() string {
 	return designation
 }
 
-// TODO: private
 func (bg *baseGenerator) annex4Section1Info() string {
 	var (
 		section1Info       string
@@ -1095,7 +1094,6 @@ func (bg *baseGenerator) woptaTable(producerInfo, proponentInfo map[string]strin
 	bg.engine.NewLine(2)
 }
 
-// TODO: private
 func (bg *baseGenerator) annex3(producerInfo, proponentInfo map[string]string, designation string) {
 	type section struct {
 		title string
@@ -1246,7 +1244,6 @@ func (bg *baseGenerator) annex3(producerInfo, proponentInfo map[string]string, d
 	}
 }
 
-// TODO: private
 func (bg *baseGenerator) annex4(producerInfo, proponentInfo map[string]string, designation, annex4Section1Info string) {
 	type section struct {
 		title string
@@ -1391,7 +1388,6 @@ func (bg *baseGenerator) annex4(producerInfo, proponentInfo map[string]string, d
 	}
 }
 
-// TODO: private
 func (bg *baseGenerator) annex4Ter(producerInfo, proponentInfo map[string]string, designation string) {
 	type section struct {
 		title string
