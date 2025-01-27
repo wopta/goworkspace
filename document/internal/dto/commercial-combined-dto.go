@@ -85,8 +85,7 @@ func (cc *CommercialCombinedDTO) FromPolicy(policy models.Policy, product models
 		}
 	}
 
-	// TODO: improve this
-	guaranteeDescriptionsMap := map[string]string{
+	claimsDescriptionsMap := map[string]string{
 		"property":                "Danni ai beni (escluso Furto)",
 		"third-party-liability":   "Responsabilità Civile",
 		"theft":                   "Furto",
@@ -94,7 +93,7 @@ func (cc *CommercialCombinedDTO) FromPolicy(policy models.Policy, product models
 		"cyber":                   "Cyber",
 	}
 
-	for slug, description := range guaranteeDescriptionsMap {
+	for slug, description := range claimsDescriptionsMap {
 		cc.Claims[slug] = newClaimDTO()
 		cc.Claims[slug].Description = description
 	}
