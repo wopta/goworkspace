@@ -8,11 +8,6 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
-const (
-	no  = "NO"
-	yes = "SI"
-)
-
 type CommercialCombinedDTO struct {
 	Contract           *contractDTO
 	Contractor         *contractorDTO
@@ -161,8 +156,8 @@ func (cc *CommercialCombinedDTO) FromPolicy(policy models.Policy, product models
 		cc.PricesBySection[sectionKey].Price.NetText = lib.HumanaizePriceEuro(cc.PricesBySection[sectionKey].Price.Net)
 		cc.PricesBySection[sectionKey].Price.Taxes += price.Tax
 		cc.PricesBySection[sectionKey].Price.TaxesText = lib.HumanaizePriceEuro(cc.PricesBySection[sectionKey].Price.Taxes)
-		if cc.PricesBySection[sectionKey].Active == no && cc.PricesBySection[sectionKey].Price.Gross > 0 {
-			cc.PricesBySection[sectionKey].Active = yes
+		if cc.PricesBySection[sectionKey].Active == constants.No && cc.PricesBySection[sectionKey].Price.Gross > 0 {
+			cc.PricesBySection[sectionKey].Active = constants.Yes
 		}
 	}
 }
@@ -176,7 +171,7 @@ type section struct {
 func newSection() *section {
 	return &section{
 		Description: constants.EmptyField,
-		Active:      no,
+		Active:      constants.No,
 		Price:       newPriceDTO(),
 	}
 }

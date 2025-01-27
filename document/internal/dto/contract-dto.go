@@ -28,7 +28,7 @@ func newContractDTO() *contractDTO {
 		EndDate:      constants.EmptyField,
 		PaymentSplit: constants.EmptyField,
 		NextPay:      constants.EmptyField,
-		HasBond:      no,
+		HasBond:      constants.No,
 		BondText:     constants.EmptyField,
 		Clause:       constants.EmptyField,
 	}
@@ -67,7 +67,7 @@ func (c *contractDTO) fromPolicy(policy models.Policy, isProposal bool) {
 	}
 
 	if policy.HasBond {
-		c.HasBond = yes
+		c.HasBond = constants.Yes
 		c.BondText = policy.Bond
 	}
 

@@ -57,19 +57,19 @@ func (b *buildingDTO) fromPolicy(building models.Building, guarantees []models.G
 		b.BuildingMaterial = building.BuildingMaterial
 	}
 	if building.HasSandwichPanel {
-		b.HasSandwichPanel = yes
+		b.HasSandwichPanel = constants.Yes
 	} else {
-		b.HasSandwichPanel = no
+		b.HasSandwichPanel = constants.No
 	}
 	if building.HasAlarm {
-		b.HasAlarm = yes
+		b.HasAlarm = constants.Yes
 	} else {
-		b.HasAlarm = no
+		b.HasAlarm = constants.No
 	}
 	if building.HasSprinkler {
-		b.HasSprinkler = yes
+		b.HasSprinkler = constants.Yes
 	} else {
-		b.HasSprinkler = no
+		b.HasSprinkler = constants.No
 	}
 	if building.Naics != "" {
 		b.Naics = building.Naics
