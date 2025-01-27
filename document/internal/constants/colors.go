@@ -28,4 +28,9 @@ var (
 		G: 242,
 		B: 242,
 	}
+	WatermarkColor = domain.Color{
+		R: 206,
+		G: 216,
+		B: 232,
+	}
 )

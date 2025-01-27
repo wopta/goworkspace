@@ -126,7 +126,7 @@ func (f *Fpdf) DrawWatermark(text string) {
 	ctrX := 210.0 / 2.0
 	ctrY := 297.0 / 2.0
 	f.pdf.SetFont(string(constants.ArialFont), string(constants.BoldFontStyle), markFontHt)
-	f.pdf.SetTextColor(206, 216, 232)
+	f.pdf.SetTextColor(int(constants.WatermarkColor.R), int(constants.WatermarkColor.G), int(constants.WatermarkColor.B))
 	f.pdf.SetXY(10, markY)
 	f.pdf.TransformBegin()
 	f.pdf.TransformRotate(-45, ctrX, ctrY)
