@@ -107,7 +107,7 @@ func (bg *baseGenerator) woptaFooter() {
 				" ed iscritto alla Sezione A del Registro Unico degli Intermediari Assicurativi con numero" +
 				" A000701923. Consulta gli estremi dell’iscrizione al sito https://servizi.ivass.it/RuirPubblica/",
 			Height:    rowHeight,
-			Width:     190,
+			Width:     constants.FullPageWidth,
 			FontSize:  constants.SmallFontSize,
 			FontStyle: constants.RegularFontStyle,
 			FontColor: constants.BlackColor,
@@ -522,7 +522,7 @@ func (bg *baseGenerator) commercialConsentSection() {
 	bg.engine.WriteText(domain.TableCell{
 		Text:      "Consenso per finalità commerciali.",
 		Height:    3,
-		Width:     190,
+		Width:     constants.FullPageWidth,
 		FontSize:  constants.LargeFontSize,
 		FontStyle: constants.BoldFontStyle,
 		FontColor: constants.PinkColor,
@@ -535,7 +535,7 @@ func (bg *baseGenerator) commercialConsentSection() {
 	bg.engine.WriteText(domain.TableCell{
 		Text:      "Il sottoscritto, letta e compresa l’informativa sul trattamento dei dati personali",
 		Height:    3,
-		Width:     190,
+		Width:     constants.FullPageWidth,
 		FontSize:  constants.RegularFontSize,
 		FontStyle: constants.RegularFontStyle,
 		FontColor: constants.BlackColor,
@@ -628,7 +628,7 @@ func (bg *baseGenerator) commercialConsentSection() {
 			"mercato, attraverso strumenti automatizzati (sms, mms, e-mail, ecc.) e non (posta cartacea e telefono " +
 			"con operatore).",
 		Height:    3,
-		Width:     190,
+		Width:     constants.FullPageWidth,
 		FontSize:  constants.RegularFontSize,
 		FontStyle: constants.RegularFontStyle,
 		FontColor: constants.BlackColor,
@@ -734,7 +734,6 @@ func (bg *baseGenerator) annexSections() {
 	bg.engine.NewPage()
 }
 
-// TODO: private
 func (bg *baseGenerator) productInfo() map[string]string {
 	producer := map[string]string{
 		"name":            "LOMAZZI MICHELE",
@@ -820,7 +819,6 @@ func (bg *baseGenerator) proponentInfo() map[string]string {
 	return proponentInfo
 }
 
-// TODO: private
 func (bg *baseGenerator) designationInfo() string {
 	var (
 		designation                           string
@@ -927,7 +925,7 @@ func (bg *baseGenerator) woptaTable(producerInfo, proponentInfo map[string]strin
 					{
 						Text:      e.title,
 						Height:    5,
-						Width:     190,
+						Width:     constants.FullPageWidth,
 						FontSize:  constants.SmallFontSize,
 						FontStyle: constants.RegularFontStyle,
 						FontColor: constants.BlackColor,
@@ -941,7 +939,7 @@ func (bg *baseGenerator) woptaTable(producerInfo, proponentInfo map[string]strin
 					{
 						Text:      e.body,
 						Height:    5,
-						Width:     190,
+						Width:     constants.FullPageWidth,
 						FontSize:  constants.RegularFontSize,
 						FontStyle: constants.RegularFontStyle,
 						FontColor: constants.BlackColor,
@@ -1107,7 +1105,7 @@ func (bg *baseGenerator) annex3(producerInfo, proponentInfo map[string]string, d
 	bg.engine.WriteText(domain.TableCell{
 		Text:      "ALLEGATO 3 - INFORMATIVA SUL DISTRIBUTORE",
 		Height:    3,
-		Width:     190,
+		Width:     constants.FullPageWidth,
 		FontSize:  constants.LargeFontSize,
 		FontStyle: constants.BoldFontStyle,
 		FontColor: constants.BlackColor,
@@ -1128,7 +1126,7 @@ func (bg *baseGenerator) annex3(producerInfo, proponentInfo map[string]string, d
 			"assicurativo il distributore consegna o trasmette le informazioni di cui all’Allegato 3 solo in caso di " +
 			"successive modifiche di rilievo delle stesse.",
 		Height:    3,
-		Width:     190,
+		Width:     constants.FullPageWidth,
 		FontSize:  constants.RegularFontSize,
 		FontStyle: constants.RegularFontStyle,
 		FontColor: constants.BlackColor,
@@ -1143,7 +1141,7 @@ func (bg *baseGenerator) annex3(producerInfo, proponentInfo map[string]string, d
 		Text: "SEZIONE I - Informazioni generali sull’intermediario che entra in contatto con " +
 			"il contraente",
 		Height:    3,
-		Width:     190,
+		Width:     constants.FullPageWidth,
 		FontSize:  constants.LargeFontSize,
 		FontStyle: constants.BoldFontStyle,
 		FontColor: constants.BlackColor,
@@ -1161,7 +1159,7 @@ func (bg *baseGenerator) annex3(producerInfo, proponentInfo map[string]string, d
 			"operano per lo stesso possono essere verificati consultando il Registro Unico degli Intermediari assicurativi " +
 			"e riassicurativi sul sito internet dell’IVASS (www.ivass.it)",
 		Height:    3,
-		Width:     190,
+		Width:     constants.FullPageWidth,
 		FontSize:  constants.RegularFontSize,
 		FontStyle: constants.RegularFontStyle,
 		FontColor: constants.BlackColor,
@@ -1220,7 +1218,7 @@ func (bg *baseGenerator) annex3(producerInfo, proponentInfo map[string]string, d
 		bg.engine.WriteText(domain.TableCell{
 			Text:      s.title,
 			Height:    3,
-			Width:     190,
+			Width:     constants.FullPageWidth,
 			FontSize:  constants.LargeFontSize,
 			FontStyle: constants.BoldFontStyle,
 			FontColor: constants.BlackColor,
@@ -1234,7 +1232,7 @@ func (bg *baseGenerator) annex3(producerInfo, proponentInfo map[string]string, d
 			bg.engine.WriteText(domain.TableCell{
 				Text:      b,
 				Height:    3,
-				Width:     190,
+				Width:     constants.FullPageWidth,
 				FontSize:  constants.RegularFontSize,
 				FontStyle: constants.RegularFontStyle,
 				FontColor: constants.BlackColor,
@@ -1258,7 +1256,7 @@ func (bg *baseGenerator) annex4(producerInfo, proponentInfo map[string]string, d
 	bg.engine.WriteText(domain.TableCell{
 		Text:      "ALLEGATO 4 - INFORMAZIONI SULLA DISTRIBUZIONE\nDEL PRODOTTO ASSICURATIVO NON IBIP",
 		Height:    3,
-		Width:     190,
+		Width:     constants.FullPageWidth,
 		FontSize:  constants.LargeFontSize,
 		FontStyle: constants.BoldFontStyle,
 		FontColor: constants.BlackColor,
@@ -1275,7 +1273,7 @@ func (bg *baseGenerator) annex4(producerInfo, proponentInfo map[string]string, d
 			"presente documento, che contiene notizie sul modello e l’attività di distribuzione, sulla consulenza fornita " +
 			"e sulle remunerazioni percepite.",
 		Height:    3,
-		Width:     190,
+		Width:     constants.FullPageWidth,
 		FontSize:  constants.RegularFontSize,
 		FontStyle: constants.RegularFontStyle,
 		FontColor: constants.BlackColor,
@@ -1290,7 +1288,7 @@ func (bg *baseGenerator) annex4(producerInfo, proponentInfo map[string]string, d
 		Text: "SEZIONE I - Informazioni generali sull’intermediario che entra in contatto con " +
 			"il contraente",
 		Height:    3,
-		Width:     190,
+		Width:     constants.FullPageWidth,
 		FontSize:  constants.LargeFontSize,
 		FontStyle: constants.BoldFontStyle,
 		FontColor: constants.BlackColor,
@@ -1308,7 +1306,7 @@ func (bg *baseGenerator) annex4(producerInfo, proponentInfo map[string]string, d
 			"operano per lo stesso possono essere verificati consultando il Registro Unico degli Intermediari assicurativi " +
 			"e riassicurativi sul sito internet dell’IVASS (www.ivass.it)",
 		Height:    3,
-		Width:     190,
+		Width:     constants.FullPageWidth,
 		FontSize:  constants.RegularFontSize,
 		FontStyle: constants.RegularFontStyle,
 		FontColor: constants.BlackColor,
@@ -1365,7 +1363,7 @@ func (bg *baseGenerator) annex4(producerInfo, proponentInfo map[string]string, d
 		bg.engine.WriteText(domain.TableCell{
 			Text:      s.title,
 			Height:    3,
-			Width:     190,
+			Width:     constants.FullPageWidth,
 			FontSize:  constants.LargeFontSize,
 			FontStyle: constants.BoldFontStyle,
 			FontColor: constants.BlackColor,
@@ -1379,7 +1377,7 @@ func (bg *baseGenerator) annex4(producerInfo, proponentInfo map[string]string, d
 			bg.engine.WriteText(domain.TableCell{
 				Text:      b,
 				Height:    3,
-				Width:     190,
+				Width:     constants.FullPageWidth,
 				FontSize:  constants.RegularFontSize,
 				FontStyle: constants.RegularFontStyle,
 				FontColor: constants.BlackColor,
@@ -1403,7 +1401,7 @@ func (bg *baseGenerator) annex4Ter(producerInfo, proponentInfo map[string]string
 	bg.engine.WriteText(domain.TableCell{
 		Text:      "ALLEGATO 4 TER - ELENCO DELLE REGOLE DI COMPORTAMENTO DEL DISTRIBUTORE",
 		Height:    3,
-		Width:     190,
+		Width:     constants.FullPageWidth,
 		FontSize:  constants.LargeFontSize,
 		FontStyle: constants.BoldFontStyle,
 		FontColor: constants.BlackColor,
@@ -1423,7 +1421,7 @@ func (bg *baseGenerator) annex4Ter(producerInfo, proponentInfo map[string]string
 			"trasmette al contraente il presente documento prima della sottoscrizione della proposta o, qualora non " +
 			"prevista, del contratto di assicurazione.",
 		Height:    3,
-		Width:     190,
+		Width:     constants.FullPageWidth,
 		FontSize:  constants.RegularFontSize,
 		FontStyle: constants.RegularFontStyle,
 		FontColor: constants.BlackColor,
@@ -1441,7 +1439,7 @@ func (bg *baseGenerator) annex4Ter(producerInfo, proponentInfo map[string]string
 			"operano per lo stesso possono essere verificati consultando il Registro Unico degli Intermediari assicurativi " +
 			"e riassicurativi sul sito internet dell’IVASS (www.ivass.it)",
 		Height:    3,
-		Width:     190,
+		Width:     constants.FullPageWidth,
 		FontSize:  constants.RegularFontSize,
 		FontStyle: constants.RegularFontStyle,
 		FontColor: constants.BlackColor,
@@ -1485,7 +1483,7 @@ func (bg *baseGenerator) annex4Ter(producerInfo, proponentInfo map[string]string
 		bg.engine.WriteText(domain.TableCell{
 			Text:      s.title,
 			Height:    3,
-			Width:     190,
+			Width:     constants.FullPageWidth,
 			FontSize:  constants.LargeFontSize,
 			FontStyle: constants.BoldFontStyle,
 			FontColor: constants.BlackColor,
@@ -1499,7 +1497,7 @@ func (bg *baseGenerator) annex4Ter(producerInfo, proponentInfo map[string]string
 			bg.engine.WriteText(domain.TableCell{
 				Text:      b,
 				Height:    3,
-				Width:     190,
+				Width:     constants.FullPageWidth,
 				FontSize:  constants.RegularFontSize,
 				FontStyle: constants.RegularFontStyle,
 				FontColor: constants.BlackColor,
@@ -1517,7 +1515,7 @@ func (bg *baseGenerator) howYouCanPaySection() {
 	bg.engine.WriteText(domain.TableCell{
 		Text:      "Come puoi pagare il premio",
 		Height:    4.5,
-		Width:     190,
+		Width:     constants.FullPageWidth,
 		FontSize:  constants.LargeFontSize,
 		FontStyle: constants.BoldFontStyle,
 		FontColor: constants.BlackColor,
@@ -1532,7 +1530,7 @@ func (bg *baseGenerator) howYouCanPaySection() {
 			"sono esclusivamente bonifico e strumenti di pagamento elettronico, quali ad esempio, " +
 			"carte di credito e/o carte di debito, incluse le carte prepagate.",
 		Height:    4.5,
-		Width:     190,
+		Width:     constants.FullPageWidth,
 		FontSize:  constants.RegularFontSize,
 		FontStyle: constants.RegularFontStyle,
 		FontColor: constants.BlackColor,
@@ -1557,7 +1555,7 @@ func (bg *baseGenerator) emitResumeSection() {
 	bg.engine.WriteText(domain.TableCell{
 		Text:      "Emissione Polizza e pagamento della prima rata",
 		Height:    4.5,
-		Width:     190,
+		Width:     constants.FullPageWidth,
 		FontSize:  constants.LargeFontSize,
 		FontStyle: constants.BoldFontStyle,
 		FontColor: constants.BlackColor,
@@ -1570,7 +1568,7 @@ func (bg *baseGenerator) emitResumeSection() {
 	bg.engine.WriteText(domain.TableCell{
 		Text:      text,
 		Height:    4.5,
-		Width:     190,
+		Width:     constants.FullPageWidth,
 		FontSize:  constants.RegularFontSize,
 		FontStyle: constants.RegularFontStyle,
 		FontColor: constants.BlackColor,
@@ -1753,7 +1751,7 @@ func (bg *baseGenerator) printSurvey(survey models.Survey) error {
 		bg.engine.WriteText(domain.TableCell{
 			Text:      surveyTitle + dotsString,
 			Height:    4,
-			Width:     190,
+			Width:     constants.FullPageWidth,
 			FontSize:  constants.LargeFontSize,
 			FontStyle: constants.BoldFontStyle,
 			FontColor: constants.PinkColor,
@@ -1907,7 +1905,7 @@ func (bg *baseGenerator) printStatement(statement models.Statement) {
 		bg.engine.WriteText(domain.TableCell{
 			Text:      title,
 			Height:    4,
-			Width:     190,
+			Width:     constants.FullPageWidth,
 			FontSize:  constants.LargeFontSize,
 			FontStyle: constants.BoldFontStyle,
 			FontColor: constants.PinkColor,
@@ -1921,7 +1919,7 @@ func (bg *baseGenerator) printStatement(statement models.Statement) {
 		bg.engine.WriteText(domain.TableCell{
 			Text:      subtitle,
 			Height:    3.5,
-			Width:     190,
+			Width:     constants.FullPageWidth,
 			FontSize:  constants.RegularFontSize,
 			FontStyle: constants.RegularFontStyle,
 			FontColor: constants.BlackColor,
@@ -1944,7 +1942,7 @@ func (bg *baseGenerator) printStatement(statement models.Statement) {
 		bg.engine.WriteText(domain.TableCell{
 			Text:      text,
 			Height:    3.5,
-			Width:     190,
+			Width:     constants.FullPageWidth,
 			FontSize:  fontSize,
 			FontStyle: fontStyle,
 			FontColor: constants.BlackColor,
