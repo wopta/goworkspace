@@ -125,7 +125,7 @@ func (f *Fpdf) DrawWatermark(text string) {
 	markY := (297.0 - markLineHt) / 2.0
 	ctrX := 210.0 / 2.0
 	ctrY := 297.0 / 2.0
-	f.pdf.SetFont("Arial", "B", markFontHt)
+	f.pdf.SetFont(string(constants.ArialFont), string(constants.BoldFontStyle), markFontHt)
 	f.pdf.SetTextColor(206, 216, 232)
 	f.pdf.SetXY(10, markY)
 	f.pdf.TransformBegin()
