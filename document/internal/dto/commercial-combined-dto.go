@@ -117,7 +117,7 @@ func (cc *CommercialCombinedDTO) FromPolicy(policy models.Policy, product models
 	cc.Prices.Net = policy.PriceNett
 	cc.Prices.NetText = lib.HumanaizePriceEuro(cc.Prices.Net)
 	cc.Prices.Taxes = policy.TaxAmount
-	cc.Prices.GrossText = lib.HumanaizePriceEuro(cc.Prices.Taxes)
+	cc.Prices.TaxesText = lib.HumanaizePriceEuro(cc.Prices.Taxes)
 
 	sectionMap := map[string]string{
 		"A": "A - INCENDIO E \"TUTTI I RISCHI\"",
