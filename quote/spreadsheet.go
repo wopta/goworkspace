@@ -3,10 +3,12 @@ package quote
 import (
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
@@ -22,6 +24,10 @@ type QuoteSpreadsheet struct {
 	OutputCells []Cell
 	InitCells   []Cell
 }
+
+var (
+	originalSheetId, exportSheetId int64
+)
 
 func SpreadsheetsFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.SetPrefix("[SpreadsheetsFx] ")
@@ -39,7 +45,9 @@ func SpreadsheetsFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 
 func (qs *QuoteSpreadsheet) Spreadsheets() []Cell {
 	var (
-		path []byte
+		path               []byte
+		destinationSheetId = "1tMi7NYFZu7AnV4WkVrD0yzy1Dt3d-wVs0iZwlOcxLrg"
+		bucketSavePath     = "test/download/"
 	)
 
 	switch os.Getenv("env") {
@@ -64,8 +72,51 @@ func (qs *QuoteSpreadsheet) Spreadsheets() []Cell {
 	fmt.Printf("sheetClient: %v\n", sheetClient)
 	qs.setInitCells(sheetClient, ctx)
 	qs.setInputCells(sheetClient, ctx)
-	return qs.getOutput(sheetClient)
+	res := qs.getOutput(sheetClient)
+
+	ssRes, _ := sheetClient.Spreadsheets.Get(qs.Id).Context(ctx).Do()
+	for _, s := range ssRes.Sheets {
+		if s.Properties.Title == qs.SheetName {
+			originalSheetId = s.Properties.SheetId
+		}
+		if s.Properties.Title == "Export" {
+			exportSheetId = s.Properties.SheetId
+		}
+	}
+
+	sheetsToClear := make([]*sheets.Request, 0)
+	ssRes, _ = sheetClient.Spreadsheets.Get(destinationSheetId).Context(ctx).Do()
+	for _, s := range ssRes.Sheets {
+		if s.Properties.Title != "Sheet1" {
+			ds := sheets.DeleteSheetRequest{SheetId: s.Properties.SheetId}
+			sr := sheets.Request{DeleteSheet: &ds}
+			sheetsToClear = append(sheetsToClear, &sr)
+		}
+	}
+	_, err := sheetClient.Spreadsheets.BatchUpdate(destinationSheetId, &sheets.BatchUpdateSpreadsheetRequest{Requests: sheetsToClear}).Context(ctx).Do()
+	if err != nil {
+		log.Printf("unable to delete sheets from spreadsheet: %v", err)
+	}
+
+	_, err = sheetClient.Spreadsheets.Sheets.CopyTo(qs.Id, exportSheetId, &sheets.CopySheetToAnotherSpreadsheetRequest{
+		DestinationSpreadsheetId: destinationSheetId,
+	}).Context(ctx).Do()
+
+	// load from drive and save to bucket
+	doc, err := loadFromDrive(path, ctx, destinationSheetId)
+	if err != nil {
+		log.Printf("unable to load from GDrive: %v", err)
+		return res
+	}
+	err = saveToBucket(bucketSavePath+"proposta_"+time.Now().Format("2006-1-2_15:4:5")+".xls", doc)
+	if err != nil {
+		log.Printf("unable to save to bucket: %v", err)
+		return res
+	}
+
+	return res
 }
+
 func (qs *QuoteSpreadsheet) setInitCells(sheetClient *sheets.Service, ctx context.Context) {
 
 	rb := &sheets.BatchUpdateValuesRequest{
@@ -207,4 +258,47 @@ func CopySpreadsheet(path []byte, ctx context.Context, id string) (string, error
 	fmt.Printf("f.Id: %v\n", e)
 	fmt.Printf("f.Id: %v\n", f.Id)
 	return f.Id, nil
+}
+
+func loadFromDrive(path []byte, ctx context.Context, fileId string) ([]byte, error) {
+	googleDrive := &GoogleDrive{
+		CredentialsByte: path,
+		Ctx:             ctx,
+	}
+
+	driveClient, err := GoogleClient[*DriveService](googleDrive)
+	if err != nil {
+		return nil, fmt.Errorf("unable to create GDrive client: %v", err)
+	}
+
+	resp, err := driveClient.Svc.Files.Export(fileId, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet").Download()
+	if err != nil {
+		return nil, fmt.Errorf("error exporting file from GDrive: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("error getting response: http status is %d (%s)", resp.StatusCode, http.StatusText(resp.StatusCode))
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("error reading resp body: %v", err)
+	}
+
+	return body, nil
+}
+
+func saveToBucket(path string, file []byte) error {
+	_, err := lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), path, file)
+	if err != nil {
+		return fmt.Errorf("error uploading to bucket: %v", err)
+	}
+
+	// Set Content-Type, otherwise it will be saved as application/zip
+	err = lib.SetGoogleStorageObjectContentType(path, "application/vnd.ms-excel")
+	if err != nil {
+		return fmt.Errorf("error setting content type for obj %s: %v", path, err)
+	}
+	return nil
 }
