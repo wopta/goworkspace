@@ -115,7 +115,7 @@ func (cc *CommercialCombinedDTO) FromPolicy(policy models.Policy, product models
 	cc.Prices.Gross = policy.PriceGross
 	cc.Prices.GrossText = lib.HumanaizePriceEuro(cc.Prices.Gross)
 	cc.Prices.Net = policy.PriceNett
-	cc.Prices.GrossText = lib.HumanaizePriceEuro(cc.Prices.Net)
+	cc.Prices.NetText = lib.HumanaizePriceEuro(cc.Prices.Net)
 	cc.Prices.Taxes = policy.TaxAmount
 	cc.Prices.GrossText = lib.HumanaizePriceEuro(cc.Prices.Taxes)
 
