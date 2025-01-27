@@ -27,7 +27,7 @@ type CommercialCombinedDTO struct {
 func NewCommercialCombinedDto() *CommercialCombinedDTO {
 	return &CommercialCombinedDTO{
 		Contract:        newContractDTO(),
-		Contractor:      NewContractorDTO(),
+		Contractor:      newContractorDTO(),
 		Enterprise:      newEnterpriseDTO(),
 		Buildings:       make([]*buildingDTO, 0),
 		Claims:          make(map[string]*claimDTO),

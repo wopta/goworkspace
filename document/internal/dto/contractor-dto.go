@@ -16,7 +16,7 @@ type contractorDTO struct {
 	Phone        string
 }
 
-func NewContractorDTO() *contractorDTO {
+func newContractorDTO() *contractorDTO {
 	return &contractorDTO{
 		Name:         emptyField,
 		Surname:      "",
