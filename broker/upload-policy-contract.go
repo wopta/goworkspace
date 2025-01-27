@@ -11,6 +11,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	"github.com/wopta/goworkspace/network"
 	plc "github.com/wopta/goworkspace/policy"
 )
 
@@ -39,8 +40,9 @@ func UploadPolicyContractFx(w http.ResponseWriter, r *http.Request) (string, int
 		return "", nil, err
 	}
 
-	if policy.IsSign {
-		err = fmt.Errorf("cannot upload policy contract, policy %s is already signed", policyUid)
+	if !policy.CompanyEmit || policy.IsSign {
+		err = fmt.Errorf("cannot upload policy contract, policy %s companyEmit: %v isSign: %v", policyUid,
+			policy.CompanyEmit, policy.IsSign)
 		return "", nil, err
 	}
 
@@ -85,9 +87,26 @@ func UploadPolicyContractFx(w http.ResponseWriter, r *http.Request) (string, int
 		policy.Attachments = new([]models.Attachment)
 	}
 	*policy.Attachments = append(*policy.Attachments, att)
+
+	flow := models.ProviderMgaFlow
+	newStatus := models.PolicyStatusToPay
+	newStatusHistory := []string{models.PolicyStatusManualSigned, models.PolicyStatusSign, models.PolicyStatusToPay}
+
+	if policy.ProducerUid != "" {
+		node := network.GetNetworkNodeByUid(policy.ProducerUid)
+		if node != nil {
+			flow = node.GetWarrant().GetFlowName(policy.Name)
+		}
+	}
+
+	if flow == models.RemittanceMgaFlow {
+		newStatus = models.PolicyStatusSign
+		newStatusHistory = newStatusHistory[:len(newStatusHistory)-1]
+	}
+
 	policy.IsSign = true
-	policy.Status = models.PolicyStatusToPay
-	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusSign, policy.Status)
+	policy.Status = newStatus
+	policy.StatusHistory = append(policy.StatusHistory, newStatusHistory...)
 	policy.Updated = time.Now().UTC()
 
 	// TODO: expire link namirial for signature

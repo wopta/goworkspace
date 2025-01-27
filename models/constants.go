@@ -30,6 +30,7 @@ const (
 	PolicyStatusDraftRenew         = "DraftRenew"
 	PolicyStatusRenewed            = "Renewed"
 	PolicyStatusUnsolved           = "Unsolved"
+	PolicyStatusManualSigned       = "ManualSigned"
 )
 
 func GetWaitForApprovalStatusList() []string {
