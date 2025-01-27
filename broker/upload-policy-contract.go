@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
+	"slices"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -17,8 +19,10 @@ import (
 
 func UploadPolicyContractFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		err    error
-		policy models.Policy
+		err              error
+		policy           models.Policy
+		allowedMimeTypes = []string{"application/pdf", "image/png", "image/jpeg", "image/jpg", "image/webp", "image/png",
+			"application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/msword"}
 	)
 
 	log.SetPrefix("[UploadPolicyContractFx] ")
@@ -53,7 +57,11 @@ func UploadPolicyContractFx(w http.ResponseWriter, r *http.Request) (string, int
 	}
 
 	mimeType := r.PostFormValue("mimeType")
-	file, _, err := r.FormFile("bytes")
+	if !slices.Contains(allowedMimeTypes, mimeType) {
+		err = fmt.Errorf("cannot upload policy contract, invalid mime type: %s", mimeType)
+		return "", nil, err
+	}
+	file, fileheader, err := r.FormFile("bytes")
 	if err != nil {
 		err = fmt.Errorf("error getting file from request: %v", err)
 		return "", nil, err
@@ -68,7 +76,9 @@ func UploadPolicyContractFx(w http.ResponseWriter, r *http.Request) (string, int
 		return "", nil, err
 	}
 
-	filename := fmt.Sprintf("%s/%s/"+models.ContractDocumentFormat, "temp", policyUid, policy.NameDesc, policy.CodeCompany)
+	extension := filepath.Ext(fileheader.Filename)
+	filename := fmt.Sprintf("%s/%s/%s_Contratto_%s%s", "temp", policyUid,
+		policy.NameDesc, policy.CodeCompany, extension)
 	gsLink, err := lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, rawDoc)
 	if err != nil {
 		err = fmt.Errorf("error uploading document to GoogleBucket: %v", err)
