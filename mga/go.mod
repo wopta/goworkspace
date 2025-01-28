@@ -13,7 +13,7 @@ require (
 	github.com/wopta/goworkspace/mail v1.0.139
 	github.com/wopta/goworkspace/models v1.2.25
 	github.com/wopta/goworkspace/network v1.0.90
-	github.com/wopta/goworkspace/policy v1.0.149
+	github.com/wopta/goworkspace/policy v1.0.150
 	github.com/wopta/goworkspace/product v1.1.23
 	github.com/wopta/goworkspace/user v1.0.124
 )
