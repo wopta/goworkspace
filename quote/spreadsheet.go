@@ -28,7 +28,7 @@ type QuoteSpreadsheet struct {
 }
 
 var (
-	originalSheetId, exportSheetId int64
+	exportSheetId int64
 )
 
 /*func SpreadsheetsFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -81,7 +81,6 @@ func (qs *QuoteSpreadsheet) Spreadsheets(policy *models.Policy) []Cell {
 		return res
 	}
 
-	// load from drive and save to bucket
 	doc, err := loadFromDrive(path, ctx, qs.DestinationSheetId)
 	if err != nil {
 		log.Printf("unable to load from GDrive: %v", err)
@@ -99,9 +98,6 @@ func (qs *QuoteSpreadsheet) Spreadsheets(policy *models.Policy) []Cell {
 func clearUnwantedSheetsAndCopyToSpreadsheet(sheetClient *sheets.Service, qs *QuoteSpreadsheet, ctx context.Context) error {
 	ssRes, _ := sheetClient.Spreadsheets.Get(qs.Id).Context(ctx).Do()
 	for _, s := range ssRes.Sheets {
-		if s.Properties.Title == qs.SheetName {
-			originalSheetId = s.Properties.SheetId
-		}
 		if s.Properties.Title == qs.ExportedSheetName {
 			exportSheetId = s.Properties.SheetId
 		}
