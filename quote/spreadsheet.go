@@ -326,15 +326,10 @@ func loadFromDrive(path []byte, ctx context.Context, fileId string) ([]byte, err
 }
 
 func saveToBucket(path string, file []byte) error {
-	_, err := lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), path, file)
+	_, err := lib.PutToGoogleStorageWithSpecificContentType(os.Getenv("GOOGLE_STORAGE_BUCKET"), path, file, "application/vnd.ms-excel")
 	if err != nil {
 		return fmt.Errorf("error uploading to bucket: %v", err)
 	}
 
-	// Set Content-Type, otherwise it will be saved as application/zip
-	err = lib.SetGoogleStorageObjectContentType(path, "application/vnd.ms-excel")
-	if err != nil {
-		return fmt.Errorf("error setting content type for obj %s: %v", path, err)
-	}
 	return nil
 }

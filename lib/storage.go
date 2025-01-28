@@ -32,6 +32,23 @@ func PutToGoogleStorage(bucketname string, path string, file []byte) (string, er
 	return "gs://" + bucketname + "/" + path, e
 
 }
+
+func PutToGoogleStorageWithSpecificContentType(bucketName string, path string, file []byte, contentType string) (str string, err error) {
+	log.Println("PutToGoogleStorage")
+	client, ctx, err := GetGoogleStorageClient()
+	if err != nil {
+		return "", fmt.Errorf("unable to get google storage client: %v", err)
+	}
+	bucket := client.Bucket(bucketName)
+	write := bucket.Object(path).NewWriter(ctx)
+	defer func() {
+		err = write.Close()
+	}()
+	write.ContentType = contentType
+	_, _ = write.Write(file)
+	return "gs://" + bucketName + "/" + path, err
+}
+
 func GetFromGoogleStorage(bucket string, file string) ([]byte, error) {
 	//var credential models.Credential
 	log.Println("GetFromGoogleStorage")
@@ -115,32 +132,4 @@ func ListGoogleStorageFolderContent(folderPath string) ([]string, error) {
 	log.Println("[ListGoogleStorageFolderContent] function end --------------")
 
 	return filesList, nil
-}
-
-func SetGoogleStorageObjectContentType(object, newContentType string) error {
-	client, ctx, err := GetGoogleStorageClient()
-	if err != nil {
-		return fmt.Errorf("storage.NewClient: %w", err)
-	}
-	defer client.Close()
-
-	ctx, cancel := context.WithTimeout(ctx, time.Second*10)
-	defer cancel()
-
-	o := client.Bucket(os.Getenv("GOOGLE_STORAGE_BUCKET")).Object(object)
-
-	attrs, err := o.Attrs(ctx)
-	if err != nil {
-		return fmt.Errorf("object.Attrs: %w", err)
-	}
-
-	o = o.If(storage.Conditions{MetagenerationMatch: attrs.Metageneration})
-
-	objectAttrsToUpdate := storage.ObjectAttrsToUpdate{
-		ContentType: newContentType,
-	}
-	if _, err := o.Update(ctx, objectAttrsToUpdate); err != nil {
-		return fmt.Errorf("ObjectHandle(%q).Update: %w", object, err)
-	}
-	return nil
 }
