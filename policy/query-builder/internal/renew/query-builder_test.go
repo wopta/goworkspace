@@ -1,14 +1,14 @@
-package query_builder_test
+package renew_test
 
 import (
 	"strings"
 	"testing"
 
-	query_builder "github.com/wopta/goworkspace/policy/query-builder"
+	"github.com/wopta/goworkspace/policy/query-builder/internal/renew"
 )
 
 func TestQueryBuilder(t *testing.T) {
-	qb := query_builder.NewBigQueryQueryBuilder("test-collection", "rp", func() string {
+	qb := renew.NewQueryBuilder(func() string {
 		return "test"
 	})
 	var testCases = []struct {
@@ -31,7 +31,7 @@ func TestQueryBuilder(t *testing.T) {
 				"insuredFiscalCode": "LLLRRR85E05R94Z330F",
 				"producerCode":      "a1b2c3d4",
 			},
-			"(JSON_VALUE(rp.data, '$.assets[0].person.fiscalCode') = @test) AND " +
+			"(LOWER(JSON_VALUE(rp.data, '$.assets[0].person.fiscalCode')) = LOWER(@test)) AND " +
 				"(rp.isDeleted = false OR rp.isDeleted IS NULL) ORDER BY rp.updateDate DESC LIMIT 10",
 		},
 		{
@@ -126,7 +126,7 @@ func TestQueryBuilder(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			got, _ := qb.BuildQuery(tc.params)
+			got, _, _ := qb.Build(tc.params)
 
 			whereClauses := strings.TrimSpace(strings.Split(got, "WHERE ")[1])
 
@@ -138,9 +138,7 @@ func TestQueryBuilder(t *testing.T) {
 }
 
 func TestQueryBuilderFail(t *testing.T) {
-	qb := query_builder.NewBigQueryQueryBuilder("test-collection", "rp", func() string {
-		return "test"
-	})
+	qb := renew.NewQueryBuilder(func() string { return "test" })
 	var testCases = []struct {
 		name   string
 		params map[string]string
@@ -155,7 +153,7 @@ func TestQueryBuilderFail(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			got, _ := qb.BuildQuery(tc.params)
+			got, _, _ := qb.Build(tc.params)
 
 			if !strings.EqualFold(got, tc.want) {
 				t.Errorf("expected: %s, got: %s", tc.want, got)

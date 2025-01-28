@@ -35,20 +35,6 @@ var policyRoutes []lib.Route = []lib.Route{
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
-		Route:   "/node/v1/{nodeUid}",
-		Handler: lib.ResponseLoggerWrapper(GetNodePoliciesFx),
-		Method:  http.MethodPost,
-		Roles: []string{lib.UserRoleAdmin, lib.UserRoleManager, lib.UserRoleAreaManager,
-			lib.UserRoleAgency, lib.UserRoleAgent},
-	},
-	{
-		Route:   "/portfolio/v1",
-		Handler: lib.ResponseLoggerWrapper(GetPortfolioPoliciesFx),
-		Method:  http.MethodPost,
-		Roles: []string{lib.UserRoleAdmin, lib.UserRoleManager, lib.UserRoleAreaManager,
-			lib.UserRoleAgency, lib.UserRoleAgent},
-	},
-	{
 		Route:   "/media/upload/v1",
 		Handler: lib.ResponseLoggerWrapper(UploadPolicyMediaFx),
 		Method:  http.MethodPost,
@@ -58,12 +44,6 @@ var policyRoutes []lib.Route = []lib.Route{
 		Route:   "/media/v1",
 		Handler: lib.ResponseLoggerWrapper(GetPolicyMediaFx),
 		Method:  http.MethodPost,
-		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleManager, lib.UserRoleAgency, lib.UserRoleAgent},
-	},
-	{
-		Route:   "/renew/v1",
-		Handler: lib.ResponseLoggerWrapper(renew.GetRenewPoliciesFx),
-		Method:  http.MethodGet,
 		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleManager, lib.UserRoleAgency, lib.UserRoleAgent},
 	},
 	{
