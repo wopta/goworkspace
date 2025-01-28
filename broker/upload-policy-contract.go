@@ -65,17 +65,32 @@ func UploadPolicyContractFx(w http.ResponseWriter, r *http.Request) (string, int
 	}
 	defer file.Close()
 
-	log.Printf("policyUid: %s, mimeType: %s", policyUid, mimeType)
-
 	rawDoc, err := io.ReadAll(file)
 	if err != nil {
 		err = fmt.Errorf("error reading document from request: %v", err)
 		return "", nil, err
 	}
 
-	filename := fmt.Sprintf("%s/%s/"+models.ContractDocumentFormat, "temp", policyUid,
-		policy.NameDesc, policy.CodeCompany)
-	gsLink, err := lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, rawDoc)
+	flow := models.ProviderMgaFlow
+	pathPrefix := fmt.Sprintf("temp/%s/", policy.Uid)
+	filename := fmt.Sprintf(models.ContractDocumentFormat, policy.NameDesc, policy.CodeCompany)
+	newStatus := models.PolicyStatusToPay
+	newStatusHistory := []string{models.PolicyStatusManualSigned, models.PolicyStatusSign, models.PolicyStatusToPay}
+
+	if policy.ProducerUid != "" {
+		node := network.GetNetworkNodeByUid(policy.ProducerUid)
+		if node != nil {
+			flow = node.GetWarrant().GetFlowName(policy.Name)
+		}
+	}
+
+	if flow == models.RemittanceMgaFlow {
+		pathPrefix = fmt.Sprintf("assets/users/%s/", policy.Contractor.Uid)
+		newStatus = models.PolicyStatusSign
+		newStatusHistory = newStatusHistory[:len(newStatusHistory)-1]
+	}
+
+	gsLink, err := lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), pathPrefix+filename, rawDoc)
 	if err != nil {
 		err = fmt.Errorf("error uploading document to GoogleBucket: %v", err)
 		return "", nil, err
@@ -93,22 +108,6 @@ func UploadPolicyContractFx(w http.ResponseWriter, r *http.Request) (string, int
 		policy.Attachments = new([]models.Attachment)
 	}
 	*policy.Attachments = append(*policy.Attachments, att)
-
-	flow := models.ProviderMgaFlow
-	newStatus := models.PolicyStatusToPay
-	newStatusHistory := []string{models.PolicyStatusManualSigned, models.PolicyStatusSign, models.PolicyStatusToPay}
-
-	if policy.ProducerUid != "" {
-		node := network.GetNetworkNodeByUid(policy.ProducerUid)
-		if node != nil {
-			flow = node.GetWarrant().GetFlowName(policy.Name)
-		}
-	}
-
-	if flow == models.RemittanceMgaFlow {
-		newStatus = models.PolicyStatusSign
-		newStatusHistory = newStatusHistory[:len(newStatusHistory)-1]
-	}
 
 	policy.IsSign = true
 	policy.Status = newStatus
