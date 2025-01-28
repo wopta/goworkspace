@@ -41,13 +41,14 @@ var (
 		"producerUid":   "(**tableAlias**.producerUid IN (%s))",
 
 		// rd
-		"reservedYes": "(**tableAlias**.isReserved = true)",
-		"reservedNo":  "(**tableAlias**.isReserved = false)",
+		"reservedYes": "(**tableAlias**.isReserved = true AND **tableAlias**.annuity = 0)",
+		"reservedNo":  "(**tableAlias**.isReserved = false AND **tableAlias**.annuity = 0)",
 
 		// status
-		"notSigned":  "(**tableAlias**.isSign = false)",
-		"unpaid":     "(**tableAlias**.isPay = false) AND (**tableAlias**.isSign = true)",
-		"signedPaid": "(**tableAlias**.isSign = true AND **tableAlias**.isPay = true)",
+		"notSigned": "(**tableAlias**.isSign = false AND **tableAlias**.annuity = 0)",
+		"unpaid": "(**tableAlias**.isPay = false AND **tableAlias**.isSign = true AND **tableAlias**." +
+			"annuity = 0)",
+		"signedPaid": "(**tableAlias**.isSign = true AND **tableAlias**.isPay = true AND **tableAlias**.annuity = 0)",
 		"unsolved": "(**tableAlias**.annuity > 0 AND **tableAlias**.isPay = false AND CURRENT_DATE(" +
 			") >= DATE_ADD(**tableAlias**.startDate, INTERVAL **tableAlias**.annuity YEAR))",
 		"renewed": "(**tableAlias**.isRenew = true AND **tableAlias**.isPay = true)",
