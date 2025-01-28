@@ -124,6 +124,12 @@ var brokerRoutes []lib.Route = []lib.Route{
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAdmin},
 	},
+	{
+		Route: "/policy/v1/duplicate/{uid}",
+		Handler: lib.ResponseLoggerWrapper(DuplicateFx),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAdmin},
+	},
 }
 
 func init() {
