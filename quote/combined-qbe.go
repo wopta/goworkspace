@@ -37,11 +37,12 @@ func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	lib.CheckError(err)
 	inputCells = append(inputCells, setInputCell(policy)...)
 	qs := QuoteSpreadsheet{
-		Id:          "1tn0Jqce-r_JKdecExFOFVEJdGUaPYdGo31A9FOgvt-Y",
-		InputCells:  inputCells,
-		OutputCells: setOutputCell(),
-		InitCells:   resetCells(),
-		SheetName:   "Input dati Polizza",
+		Id:                 "1tn0Jqce-r_JKdecExFOFVEJdGUaPYdGo31A9FOgvt-Y",
+		DestinationSheetId: "1tMi7NYFZu7AnV4WkVrD0yzy1Dt3d-wVs0iZwlOcxLrg",
+		InputCells:         inputCells,
+		OutputCells:        setOutputCell(),
+		InitCells:          resetCells(),
+		SheetName:          "Input dati Polizza",
 	}
 	outCells := qs.Spreadsheets()
 	mapCellPolicy(policy, outCells)

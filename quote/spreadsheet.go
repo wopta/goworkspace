@@ -18,11 +18,12 @@ import (
 )
 
 type QuoteSpreadsheet struct {
-	SheetName   string
-	Id          string
-	InputCells  []Cell
-	OutputCells []Cell
-	InitCells   []Cell
+	SheetName          string
+	Id                 string
+	DestinationSheetId string
+	InputCells         []Cell
+	OutputCells        []Cell
+	InitCells          []Cell
 }
 
 var (
@@ -45,9 +46,8 @@ func SpreadsheetsFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 
 func (qs *QuoteSpreadsheet) Spreadsheets() []Cell {
 	var (
-		path               []byte
-		destinationSheetId = "1tMi7NYFZu7AnV4WkVrD0yzy1Dt3d-wVs0iZwlOcxLrg"
-		bucketSavePath     = "test/download/"
+		path           []byte
+		bucketSavePath = "test/download/"
 	)
 
 	switch os.Getenv("env") {
@@ -74,14 +74,14 @@ func (qs *QuoteSpreadsheet) Spreadsheets() []Cell {
 	qs.setInputCells(sheetClient, ctx)
 	res := qs.getOutput(sheetClient)
 
-	err := clearUnwantedSheetsAndCopyToSpreadsheet(sheetClient, qs, destinationSheetId, ctx)
+	err := clearUnwantedSheetsAndCopyToSpreadsheet(sheetClient, qs, ctx)
 	if err != nil {
 		log.Printf("unable to perform sheet operations: %v", err)
 		return res
 	}
 
 	// load from drive and save to bucket
-	doc, err := loadFromDrive(path, ctx, destinationSheetId)
+	doc, err := loadFromDrive(path, ctx, qs.DestinationSheetId)
 	if err != nil {
 		log.Printf("unable to load from GDrive: %v", err)
 		return res
@@ -95,7 +95,7 @@ func (qs *QuoteSpreadsheet) Spreadsheets() []Cell {
 	return res
 }
 
-func clearUnwantedSheetsAndCopyToSpreadsheet(sheetClient *sheets.Service, qs *QuoteSpreadsheet, destinationSheetId string, ctx context.Context) error {
+func clearUnwantedSheetsAndCopyToSpreadsheet(sheetClient *sheets.Service, qs *QuoteSpreadsheet, ctx context.Context) error {
 	ssRes, _ := sheetClient.Spreadsheets.Get(qs.Id).Context(ctx).Do()
 	for _, s := range ssRes.Sheets {
 		if s.Properties.Title == qs.SheetName {
@@ -108,7 +108,7 @@ func clearUnwantedSheetsAndCopyToSpreadsheet(sheetClient *sheets.Service, qs *Qu
 
 	clearUnwantedSheetsReq := make([]*sheets.Request, 0)
 	clearLastSheetReq := make([]*sheets.Request, 0)
-	ssRes, _ = sheetClient.Spreadsheets.Get(destinationSheetId).Context(ctx).Do()
+	ssRes, _ = sheetClient.Spreadsheets.Get(qs.DestinationSheetId).Context(ctx).Do()
 	for i, s := range ssRes.Sheets {
 		ds := sheets.DeleteSheetRequest{SheetId: s.Properties.SheetId}
 		sr := sheets.Request{DeleteSheet: &ds}
@@ -120,23 +120,23 @@ func clearUnwantedSheetsAndCopyToSpreadsheet(sheetClient *sheets.Service, qs *Qu
 	}
 
 	if len(clearUnwantedSheetsReq) != 0 {
-		_, err := sheetClient.Spreadsheets.BatchUpdate(destinationSheetId, &sheets.BatchUpdateSpreadsheetRequest{Requests: clearUnwantedSheetsReq}).Context(ctx).Do()
+		_, err := sheetClient.Spreadsheets.BatchUpdate(qs.DestinationSheetId, &sheets.BatchUpdateSpreadsheetRequest{Requests: clearUnwantedSheetsReq}).Context(ctx).Do()
 		if err != nil {
 			log.Printf("unable to delete sheets from spreadsheet: %v", err)
 		}
 	}
 
 	_, err := sheetClient.Spreadsheets.Sheets.CopyTo(qs.Id, exportSheetId, &sheets.CopySheetToAnotherSpreadsheetRequest{
-		DestinationSpreadsheetId: destinationSheetId,
+		DestinationSpreadsheetId: qs.DestinationSheetId,
 	}).Context(ctx).Do()
 
-	_, err = sheetClient.Spreadsheets.BatchUpdate(destinationSheetId, &sheets.BatchUpdateSpreadsheetRequest{Requests: clearLastSheetReq}).Context(ctx).Do()
+	_, err = sheetClient.Spreadsheets.BatchUpdate(qs.DestinationSheetId, &sheets.BatchUpdateSpreadsheetRequest{Requests: clearLastSheetReq}).Context(ctx).Do()
 	if err != nil {
 		log.Printf("unable to delete sheets from spreadsheet: %v", err)
 	}
 
 	// Rename sheet to "Exported"
-	ssRes, _ = sheetClient.Spreadsheets.Get(destinationSheetId).Context(ctx).Do()
+	ssRes, _ = sheetClient.Spreadsheets.Get(qs.DestinationSheetId).Context(ctx).Do()
 	sheetIdToRename := ssRes.Sheets[0].Properties.SheetId
 	renameSheetReq := make([]*sheets.Request, 0)
 	newSp := sheets.SheetProperties{SheetId: sheetIdToRename, Title: "Exported"}
@@ -144,7 +144,7 @@ func clearUnwantedSheetsAndCopyToSpreadsheet(sheetClient *sheets.Service, qs *Qu
 	dr := sheets.Request{UpdateSheetProperties: &rs}
 	renameSheetReq = append(renameSheetReq, &dr)
 
-	_, err = sheetClient.Spreadsheets.BatchUpdate(destinationSheetId, &sheets.BatchUpdateSpreadsheetRequest{Requests: renameSheetReq}).Context(ctx).Do()
+	_, err = sheetClient.Spreadsheets.BatchUpdate(qs.DestinationSheetId, &sheets.BatchUpdateSpreadsheetRequest{Requests: renameSheetReq}).Context(ctx).Do()
 	if err != nil {
 		log.Printf("unable to rename sheet: %v", err)
 	}
