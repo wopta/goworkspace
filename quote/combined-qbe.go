@@ -43,6 +43,7 @@ func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		OutputCells:        setOutputCell(),
 		InitCells:          resetCells(),
 		SheetName:          "Input dati Polizza",
+		ExportedSheetName:  "Export",
 	}
 	outCells := qs.Spreadsheets(policy)
 	mapCellPolicy(policy, outCells)

@@ -19,6 +19,7 @@ import (
 
 type QuoteSpreadsheet struct {
 	SheetName          string
+	ExportedSheetName  string
 	Id                 string
 	DestinationSheetId string
 	InputCells         []Cell
@@ -101,7 +102,7 @@ func clearUnwantedSheetsAndCopyToSpreadsheet(sheetClient *sheets.Service, qs *Qu
 		if s.Properties.Title == qs.SheetName {
 			originalSheetId = s.Properties.SheetId
 		}
-		if s.Properties.Title == "Export" {
+		if s.Properties.Title == qs.ExportedSheetName {
 			exportSheetId = s.Properties.SheetId
 		}
 	}
