@@ -35,6 +35,7 @@ type policyInfo struct {
 	EndDate        civil.DateTime `json:"endDate" bigquery:"endDate"`
 	PaymentSplit   string         `json:"paymentSplit" bigquery:"paymentSplit"`
 	HasMandate     bool           `json:"hasMandate" bigquery:"hasMandate"`
+	ContractorType string         `json:"contractorType" bigquery:"contractorType"`
 }
 
 func GetPortfolioFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {

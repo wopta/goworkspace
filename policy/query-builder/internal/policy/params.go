@@ -46,7 +46,7 @@ var (
 
 		// status
 		"notSigned":  "(**tableAlias**.isSign = false)",
-		"unpaid":     "(**tableAlias**.isPay = false)",
+		"unpaid":     "(**tableAlias**.isPay = false) AND (**tableAlias**.isSign = true)",
 		"signedPaid": "(**tableAlias**.isSign = true AND **tableAlias**.isPay = true)",
 		"unsolved": "(**tableAlias**.annuity > 0 AND **tableAlias**.isPay = false AND CURRENT_DATE(" +
 			") >= DATE_ADD(**tableAlias**.startDate, INTERVAL **tableAlias**.annuity YEAR))",
