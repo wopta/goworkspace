@@ -123,6 +123,12 @@ var brokerRoutes []lib.Route = []lib.Route{
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
 	},
+	{
+		Route:   "/policy/v1/contract/{uid}",
+		Handler: lib.ResponseLoggerWrapper(UploadPolicyContractFx),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAdmin},
+	},
 }
 
 func init() {
