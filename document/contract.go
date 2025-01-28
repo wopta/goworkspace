@@ -3,12 +3,15 @@ package document
 import (
 	"encoding/base64"
 	"encoding/json"
-	"github.com/go-pdf/fpdf"
-	"github.com/wopta/goworkspace/network"
-	prd "github.com/wopta/goworkspace/product"
 	"io"
 	"log"
 	"net/http"
+
+	"github.com/go-pdf/fpdf"
+	"github.com/wopta/goworkspace/document/internal/engine"
+	"github.com/wopta/goworkspace/document/pkg/contract"
+	"github.com/wopta/goworkspace/network"
+	prd "github.com/wopta/goworkspace/product"
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
@@ -53,6 +56,7 @@ func ContractObj(origin string, data models.Policy, networkNode *models.NetworkN
 
 	go func() {
 		var (
+			err      error
 			filename string
 			out      []byte
 		)
@@ -73,6 +77,18 @@ func ContractObj(origin string, data models.Policy, networkNode *models.NetworkN
 		case models.GapProduct:
 			pdf := initFpdf()
 			filename, out = gapContract(pdf, origin, &data, networkNode)
+		case models.CommercialCombinedProduct:
+			generator := contract.NewCommercialCombinedGenerator(engine.NewFpdf(), &data, networkNode, *product, false)
+			out, err = generator.Contract()
+			if err != nil {
+				log.Printf("error generating contract: %v", err)
+				return
+			}
+			filename, err = generator.Save()
+			if err != nil {
+				log.Printf("error generating contract: %v", err)
+				return
+			}
 		}
 
 		data.DocumentName = filename

@@ -173,6 +173,7 @@ const (
 	AxaCompany      string = "axa"
 	GlobalCompany   string = "global"
 	SogessurCompany string = "sogessur"
+	QBECompany      string = "qbe"
 )
 
 const (
