@@ -2,7 +2,6 @@ package callback
 
 import (
 	"log"
-	"slices"
 	"strings"
 
 	"github.com/wopta/goworkspace/bpmn"
@@ -109,9 +108,6 @@ func setSign(state *bpmn.State) error {
 
 func addContract(state *bpmn.State) error {
 	policy := state.Data
-	if slices.Contains(policy.StatusHistory, models.PolicyStatusManualSigned) {
-		return nil
-	}
 	plc.AddContract(policy, origin)
 
 	return nil
