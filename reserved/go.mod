@@ -10,7 +10,7 @@ require (
 	github.com/wopta/goworkspace/document v1.1.115
 	github.com/wopta/goworkspace/lib v1.0.135
 	github.com/wopta/goworkspace/models v1.2.25
-	github.com/wopta/goworkspace/policy v1.0.148
+	github.com/wopta/goworkspace/policy v1.0.149
 	github.com/wopta/goworkspace/product v1.1.23
 )
 
