@@ -112,15 +112,21 @@ var brokerRoutes []lib.Route = []lib.Route{
 		Roles:   []string{lib.UserRoleAll},
 	},
 	{
-		Route:       "/portfolio/{type}/{version}",
-		Method:      http.MethodGet,
-		Handler:     lib.ResponseLoggerWrapper(GetPortfolioFx),
+		Route:   "/portfolio/{type}/{version}",
+		Method:  http.MethodGet,
+		Handler: lib.ResponseLoggerWrapper(GetPortfolioFx),
 		Roles: []string{lib.UserRoleAdmin, lib.UserRoleManager, lib.UserRoleAreaManager, lib.UserRoleAgency,
 			lib.UserRoleAgent},
-  },
-  {
+	},
+	{
 		Route:   "/policy/v1/contract/{uid}",
 		Handler: lib.ResponseLoggerWrapper(UploadPolicyContractFx),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAdmin},
+	},
+	{
+		Route: "/policy/v1/duplicate/{uid}",
+		Handler: lib.ResponseLoggerWrapper(DuplicateFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAdmin},
 	},
