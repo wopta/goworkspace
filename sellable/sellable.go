@@ -25,6 +25,12 @@ var sellableRoutes []lib.Route = []lib.Route{
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAll},
 	},
+	{
+		Route:   "/v1/commercial-combined",
+		Handler: lib.ResponseLoggerWrapper(CommercialCombinedFx),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAll},
+	},
 }
 
 func init() {
