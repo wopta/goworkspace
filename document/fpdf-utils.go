@@ -29,7 +29,7 @@ const (
 )
 
 var (
-	companyMap map[string]string = map[string]string{
+	CompanyMap map[string]string = map[string]string{
 		models.AxaCompany:      "AXA FRANCE VIE S.A.",
 		models.SogessurCompany: "Sogessur SA",
 		models.GlobalCompany:   "Global Assistance",

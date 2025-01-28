@@ -3,14 +3,17 @@ package document
 import (
 	"encoding/base64"
 	"encoding/json"
+	"io"
+	"log"
+	"net/http"
+
 	"github.com/go-pdf/fpdf"
+	"github.com/wopta/goworkspace/document/internal/engine"
+	"github.com/wopta/goworkspace/document/pkg/contract"
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 	prd "github.com/wopta/goworkspace/product"
-	"io"
-	"log"
-	"net/http"
 )
 
 func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
@@ -55,6 +58,7 @@ func ProposalFx(w http.ResponseWriter, r *http.Request) (string, interface{}, er
 func Proposal(origin string, policy *models.Policy, networkNode *models.NetworkNode, product *models.Product) *DocumentResponse {
 	var (
 		pdf      *fpdf.Fpdf
+		err      error
 		rawDoc   []byte
 		filename string
 	)
@@ -78,6 +82,18 @@ func Proposal(origin string, policy *models.Policy, networkNode *models.NetworkN
 	case models.PersonaProduct:
 		log.Println("[Proposal] call personaProposal...")
 		filename, rawDoc = personaProposal(pdf, policy, networkNode, product)
+	case models.CommercialCombinedProduct:
+		generator := contract.NewCommercialCombinedGenerator(engine.NewFpdf(), policy, networkNode, *product, true)
+		rawDoc, err = generator.Contract()
+		if err != nil {
+			log.Printf("error generating contract: %v", err)
+			return nil
+		}
+		filename, err = generator.Save()
+		if err != nil {
+			log.Printf("error generating contract: %v", err)
+			return nil
+		}
 	}
 
 	log.Printf("[Proposal] proposal document generated for proposal n. %d", policy.ProposalNumber)

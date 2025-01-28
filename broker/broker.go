@@ -115,9 +115,14 @@ var brokerRoutes []lib.Route = []lib.Route{
 		Route:       "/portfolio/{type}/{version}",
 		Method:      http.MethodGet,
 		Handler:     lib.ResponseLoggerWrapper(GetPortfolioFx),
-		Middlewares: nil,
 		Roles: []string{lib.UserRoleAdmin, lib.UserRoleManager, lib.UserRoleAreaManager, lib.UserRoleAgency,
 			lib.UserRoleAgent},
+  },
+  {
+		Route:   "/policy/v1/contract/{uid}",
+		Handler: lib.ResponseLoggerWrapper(UploadPolicyContractFx),
+		Method:  http.MethodPost,
+		Roles:   []string{lib.UserRoleAdmin},
 	},
 }
 
