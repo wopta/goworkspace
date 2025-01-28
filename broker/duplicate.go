@@ -28,7 +28,7 @@ func DuplicateFx(_ http.ResponseWriter, r *http.Request) (string, any, error) {
 		responseBytes  []byte
 	)
 
-	log.SetPrefix("[AcceptanceFx]")
+	log.SetPrefix("[DuplicateFx]")
 	defer func() {
 		if err != nil {
 			log.Printf("error: %s", err.Error())
