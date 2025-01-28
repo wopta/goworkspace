@@ -74,6 +74,28 @@ func (qs *QuoteSpreadsheet) Spreadsheets() []Cell {
 	qs.setInputCells(sheetClient, ctx)
 	res := qs.getOutput(sheetClient)
 
+	err := clearUnwantedSheetsAndCopyToSpreadsheet(sheetClient, qs, destinationSheetId, ctx)
+	if err != nil {
+		log.Printf("unable to perform sheet operations: %v", err)
+		return res
+	}
+
+	// load from drive and save to bucket
+	doc, err := loadFromDrive(path, ctx, destinationSheetId)
+	if err != nil {
+		log.Printf("unable to load from GDrive: %v", err)
+		return res
+	}
+	err = saveToBucket(bucketSavePath+"proposta_"+time.Now().Format("2006-1-2_15:04:05")+".xls", doc)
+	if err != nil {
+		log.Printf("unable to save to bucket: %v", err)
+		return res
+	}
+
+	return res
+}
+
+func clearUnwantedSheetsAndCopyToSpreadsheet(sheetClient *sheets.Service, qs *QuoteSpreadsheet, destinationSheetId string, ctx context.Context) error {
 	ssRes, _ := sheetClient.Spreadsheets.Get(qs.Id).Context(ctx).Do()
 	for _, s := range ssRes.Sheets {
 		if s.Properties.Title == qs.SheetName {
@@ -84,37 +106,50 @@ func (qs *QuoteSpreadsheet) Spreadsheets() []Cell {
 		}
 	}
 
-	sheetsToClear := make([]*sheets.Request, 0)
+	clearUnwantedSheetsReq := make([]*sheets.Request, 0)
+	clearLastSheetReq := make([]*sheets.Request, 0)
 	ssRes, _ = sheetClient.Spreadsheets.Get(destinationSheetId).Context(ctx).Do()
-	for _, s := range ssRes.Sheets {
-		if s.Properties.Title != "Sheet1" {
-			ds := sheets.DeleteSheetRequest{SheetId: s.Properties.SheetId}
-			sr := sheets.Request{DeleteSheet: &ds}
-			sheetsToClear = append(sheetsToClear, &sr)
+	for i, s := range ssRes.Sheets {
+		ds := sheets.DeleteSheetRequest{SheetId: s.Properties.SheetId}
+		sr := sheets.Request{DeleteSheet: &ds}
+		if i == 0 {
+			clearLastSheetReq = append(clearLastSheetReq, &sr)
+		} else {
+			clearUnwantedSheetsReq = append(clearUnwantedSheetsReq, &sr)
 		}
 	}
-	_, err := sheetClient.Spreadsheets.BatchUpdate(destinationSheetId, &sheets.BatchUpdateSpreadsheetRequest{Requests: sheetsToClear}).Context(ctx).Do()
+
+	if len(clearUnwantedSheetsReq) != 0 {
+		_, err := sheetClient.Spreadsheets.BatchUpdate(destinationSheetId, &sheets.BatchUpdateSpreadsheetRequest{Requests: clearUnwantedSheetsReq}).Context(ctx).Do()
+		if err != nil {
+			log.Printf("unable to delete sheets from spreadsheet: %v", err)
+		}
+	}
+
+	_, err := sheetClient.Spreadsheets.Sheets.CopyTo(qs.Id, exportSheetId, &sheets.CopySheetToAnotherSpreadsheetRequest{
+		DestinationSpreadsheetId: destinationSheetId,
+	}).Context(ctx).Do()
+
+	_, err = sheetClient.Spreadsheets.BatchUpdate(destinationSheetId, &sheets.BatchUpdateSpreadsheetRequest{Requests: clearLastSheetReq}).Context(ctx).Do()
 	if err != nil {
 		log.Printf("unable to delete sheets from spreadsheet: %v", err)
 	}
 
-	_, err = sheetClient.Spreadsheets.Sheets.CopyTo(qs.Id, exportSheetId, &sheets.CopySheetToAnotherSpreadsheetRequest{
-		DestinationSpreadsheetId: destinationSheetId,
-	}).Context(ctx).Do()
+	// Rename sheet to "Exported"
+	ssRes, _ = sheetClient.Spreadsheets.Get(destinationSheetId).Context(ctx).Do()
+	sheetIdToRename := ssRes.Sheets[0].Properties.SheetId
+	renameSheetReq := make([]*sheets.Request, 0)
+	newSp := sheets.SheetProperties{SheetId: sheetIdToRename, Title: "Exported"}
+	rs := sheets.UpdateSheetPropertiesRequest{Properties: &newSp, Fields: "Title"}
+	dr := sheets.Request{UpdateSheetProperties: &rs}
+	renameSheetReq = append(renameSheetReq, &dr)
 
-	// load from drive and save to bucket
-	doc, err := loadFromDrive(path, ctx, destinationSheetId)
+	_, err = sheetClient.Spreadsheets.BatchUpdate(destinationSheetId, &sheets.BatchUpdateSpreadsheetRequest{Requests: renameSheetReq}).Context(ctx).Do()
 	if err != nil {
-		log.Printf("unable to load from GDrive: %v", err)
-		return res
-	}
-	err = saveToBucket(bucketSavePath+"proposta_"+time.Now().Format("2006-1-2_15:4:5")+".xls", doc)
-	if err != nil {
-		log.Printf("unable to save to bucket: %v", err)
-		return res
+		log.Printf("unable to rename sheet: %v", err)
 	}
 
-	return res
+	return nil
 }
 
 func (qs *QuoteSpreadsheet) setInitCells(sheetClient *sheets.Service, ctx context.Context) {
