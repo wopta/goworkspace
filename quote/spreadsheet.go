@@ -30,7 +30,7 @@ var (
 	originalSheetId, exportSheetId int64
 )
 
-func SpreadsheetsFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
+/*func SpreadsheetsFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	log.SetPrefix("[SpreadsheetsFx] ")
 	defer log.SetPrefix("")
 
@@ -42,9 +42,9 @@ func SpreadsheetsFx(w http.ResponseWriter, r *http.Request) (string, interface{}
 	log.Println("Handler end -------------------------------------------------")
 
 	return "", nil, nil
-}
+}*/
 
-func (qs *QuoteSpreadsheet) Spreadsheets() []Cell {
+func (qs *QuoteSpreadsheet) Spreadsheets(policy *models.Policy) []Cell {
 	var (
 		path           []byte
 		bucketSavePath = "test/download/"
@@ -86,7 +86,7 @@ func (qs *QuoteSpreadsheet) Spreadsheets() []Cell {
 		log.Printf("unable to load from GDrive: %v", err)
 		return res
 	}
-	err = saveToBucket(bucketSavePath+"proposta_"+time.Now().Format("2006-1-2_15:04:05")+".xls", doc)
+	err = saveToBucket(bucketSavePath+"quote_"+policy.Name+"_"+policy.Uid+"_"+time.Now().Format("2006-1-2_15:04:05")+".xls", doc)
 	if err != nil {
 		log.Printf("unable to save to bucket: %v", err)
 		return res

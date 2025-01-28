@@ -44,7 +44,7 @@ func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		InitCells:          resetCells(),
 		SheetName:          "Input dati Polizza",
 	}
-	outCells := qs.Spreadsheets()
+	outCells := qs.Spreadsheets(policy)
 	mapCellPolicy(policy, outCells)
 
 	policyJson, err := policy.Marshal()
