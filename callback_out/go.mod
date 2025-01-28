@@ -6,8 +6,8 @@ replace github.com/wopta/goworkspace/callback_out => ./
 
 require (
 	cloud.google.com/go v0.113.0
-	github.com/wopta/goworkspace/lib v1.0.134
-	github.com/wopta/goworkspace/models v1.2.24
+	github.com/wopta/goworkspace/lib v1.0.135
+	github.com/wopta/goworkspace/models v1.2.25
 )
 
 require (
