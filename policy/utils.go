@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"slices"
 	"strings"
 	"time"
 
@@ -129,6 +130,9 @@ func SetUserIntoPolicyContractor(policy *models.Policy, origin string) error {
 // Not sure if this is the right place
 // because it creates a dependency with document
 func AddContract(policy *models.Policy, origin string) error {
+	if slices.Contains(policy.StatusHistory, models.PolicyStatusManualSigned) {
+		return nil
+	}
 	gsLink := <-document.GetFileV6(*policy, policy.Uid)
 	filename := strings.ReplaceAll(fmt.Sprintf(models.ContractDocumentFormat, policy.NameDesc, policy.CodeCompany), " ", "_")
 	*policy.Attachments = append(*policy.Attachments, models.Attachment{
