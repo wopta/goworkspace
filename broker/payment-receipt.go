@@ -161,6 +161,16 @@ func receiptInfoBuilder(policy models.Policy, transaction models.Transaction) (d
 
 	receiptInfo := document.NewReceiptInfo()
 
+	if policy.Company != "" {
+		receiptInfo.PolicyInfo.Company = document.CompanyMap[policy.Company]
+	}
+	if policy.NameDesc != "" {
+		receiptInfo.PolicyInfo.ProductDescription = strings.ToUpper(policy.NameDesc)
+	}
+	if policy.CodeCompany != "" {
+		receiptInfo.PolicyInfo.Company = policy.CodeCompany
+	}
+
 	if policy.Contractor.Name != "" {
 		receiptInfo.CustomerInfo.Fullname = strings.TrimSpace(policy.Contractor.Name + " " + policy.Contractor.Surname)
 	}
@@ -215,9 +225,6 @@ func receiptInfoBuilder(policy models.Policy, transaction models.Transaction) (d
 		expirationDate = tmpExpirationDate
 	}
 
-	if policy.CodeCompany != "" {
-		receiptInfo.Transaction.PolicyCode = policy.CodeCompany
-	}
 	receiptInfo.Transaction.EffectiveDate = effectiveDate.Format(dateFormat)
 	receiptInfo.Transaction.ExpirationDate = expirationDate.Format(dateFormat)
 	receiptInfo.Transaction.PriceGross = transaction.Amount
