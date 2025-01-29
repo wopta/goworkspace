@@ -28,10 +28,6 @@ type QuoteSpreadsheet struct {
 	InitCells          []Cell
 }
 
-var (
-	exportSheetId int64
-)
-
 func (qs *QuoteSpreadsheet) Spreadsheets() []Cell {
 	var (
 		path           []byte
@@ -83,6 +79,8 @@ func (qs *QuoteSpreadsheet) Spreadsheets() []Cell {
 }
 
 func clearUnwantedSheetsAndCopyToSpreadsheet(sheetClient *sheets.Service, qs *QuoteSpreadsheet, ctx context.Context) error {
+	var exportSheetId int64
+
 	ssRes, _ := sheetClient.Spreadsheets.Get(qs.Id).Context(ctx).Do()
 	for _, s := range ssRes.Sheets {
 		if s.Properties.Title == qs.ExportedSheetName {
