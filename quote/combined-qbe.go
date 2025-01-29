@@ -2,6 +2,7 @@ package quote
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -44,8 +45,9 @@ func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		InitCells:          resetCells(),
 		SheetName:          "Input dati Polizza",
 		ExportedSheetName:  "Export",
+		ExportFilePrefix:   fmt.Sprintf("quote_%s_%s", policy.Name, policy.Uid),
 	}
-	outCells := qs.Spreadsheets(policy)
+	outCells := qs.Spreadsheets()
 	mapCellPolicy(policy, outCells)
 
 	policyJson, err := policy.Marshal()

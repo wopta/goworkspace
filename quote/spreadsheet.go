@@ -22,6 +22,7 @@ type QuoteSpreadsheet struct {
 	ExportedSheetName  string
 	Id                 string
 	DestinationSheetId string
+	ExportFilePrefix   string
 	InputCells         []Cell
 	OutputCells        []Cell
 	InitCells          []Cell
@@ -31,7 +32,7 @@ var (
 	exportSheetId int64
 )
 
-func (qs *QuoteSpreadsheet) Spreadsheets(policy *models.Policy) []Cell {
+func (qs *QuoteSpreadsheet) Spreadsheets() []Cell {
 	var (
 		path           []byte
 		bucketSavePath = "test/download/"
@@ -72,7 +73,7 @@ func (qs *QuoteSpreadsheet) Spreadsheets(policy *models.Policy) []Cell {
 		log.Printf("unable to load from GDrive: %v", err)
 		return res
 	}
-	err = saveToBucket(bucketSavePath+"quote_"+policy.Name+"_"+policy.Uid+"_"+time.Now().Format("2006-1-2_15:04:05")+".xls", doc)
+	err = saveToBucket(fmt.Sprintf("%s%s_%s.xls", bucketSavePath, qs.ExportFilePrefix, time.Now().Format("2006-1-2_15:04:05")), doc)
 	if err != nil {
 		log.Printf("unable to save to bucket: %v", err)
 		return res
