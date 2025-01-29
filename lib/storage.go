@@ -34,7 +34,6 @@ func PutToGoogleStorage(bucketname string, path string, file []byte) (string, er
 }
 
 func PutToGoogleStorageWithSpecificContentType(bucketName string, path string, file []byte, contentType string) (str string, err error) {
-	log.Println("PutToGoogleStorage")
 	client, ctx, err := GetGoogleStorageClient()
 	if err != nil {
 		return "", fmt.Errorf("unable to get google storage client: %v", err)

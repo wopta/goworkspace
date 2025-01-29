@@ -32,20 +32,6 @@ var (
 	exportSheetId int64
 )
 
-/*func SpreadsheetsFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.SetPrefix("[SpreadsheetsFx] ")
-	defer log.SetPrefix("")
-
-	log.Println("Handler start -----------------------------------------------")
-
-	qs := QuoteSpreadsheet{Id: "tn0Jqce-r_JKdecExFOFVEJdGUaPYdGo31A9FOgvt-Y"}
-	res := qs.Spreadsheets()
-	log.Println(res)
-	log.Println("Handler end -------------------------------------------------")
-
-	return "", nil, nil
-}*/
-
 func (qs *QuoteSpreadsheet) Spreadsheets(policy *models.Policy) []Cell {
 	var (
 		path           []byte
