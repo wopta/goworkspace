@@ -20,7 +20,6 @@ import (
 type QuoteSpreadsheet struct {
 	SheetName          string
 	ExportedSheetName  string
-	ExportedSheetTitle string
 	Id                 string
 	DestinationSheetId string
 	InputCells         []Cell
@@ -122,7 +121,7 @@ func clearUnwantedSheetsAndCopyToSpreadsheet(sheetClient *sheets.Service, qs *Qu
 	ssRes, _ = sheetClient.Spreadsheets.Get(qs.DestinationSheetId).Context(ctx).Do()
 	sheetIdToRename := ssRes.Sheets[0].Properties.SheetId
 	renameSheetReq := make([]*sheets.Request, 0)
-	newSp := sheets.SheetProperties{SheetId: sheetIdToRename, Title: qs.ExportedSheetTitle}
+	newSp := sheets.SheetProperties{SheetId: sheetIdToRename, Title: qs.ExportedSheetName}
 	rs := sheets.UpdateSheetPropertiesRequest{Properties: &newSp, Fields: "Title"}
 	dr := sheets.Request{UpdateSheetProperties: &rs}
 	renameSheetReq = append(renameSheetReq, &dr)
