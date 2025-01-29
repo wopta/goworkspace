@@ -31,8 +31,7 @@ func ResponseLoggerWrapper(handler func(w http.ResponseWriter, r *http.Request) 
 	return func(w http.ResponseWriter, r *http.Request) {
 		str, _, err := handler(w, r)
 		if err != nil {
-			w.Header().Set("Content-type", "text/plain")
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, fmt.Sprintf("{\"errorMessage\": \"%s\"}", err.Error()), http.StatusInternalServerError)
 			return
 		}
 		log.Printf("Response: %s", str)
