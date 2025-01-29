@@ -168,7 +168,7 @@ func receiptInfoBuilder(policy models.Policy, transaction models.Transaction) (d
 		receiptInfo.PolicyInfo.ProductDescription = strings.ToUpper(policy.NameDesc)
 	}
 	if policy.CodeCompany != "" {
-		receiptInfo.PolicyInfo.Company = policy.CodeCompany
+		receiptInfo.PolicyInfo.Code = policy.CodeCompany
 	}
 
 	if policy.Contractor.Name != "" {
