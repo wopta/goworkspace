@@ -459,7 +459,7 @@ func (fx *Fx) HasAssetType(input map[string]interface{}, assetType string) bool 
 	return false
 }
 
-func (fx *Fx) HasGuaranteeInSlice(input map[string]interface{}, slugList... string) bool {
+func (fx *Fx) HasGuaranteeInSlice(input map[string]interface{}, slugList ...string) bool {
 	j, err := json.Marshal(input)
 	lib.CheckError(err)
 	var policy Policy
