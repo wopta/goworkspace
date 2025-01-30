@@ -504,11 +504,11 @@ func (fx *Fx) SetReservedMga(r *ReservedInfo) {
 	r.MgaApproval.UpdateDate = time.Now().UTC()
 }
 
-func (fx *Fx) AppendReservedData(slice []ReservedData, id int, name, description string) []ReservedData {
+func (fx *Fx) AppendReservedData(r *ReservedInfo, id int64, name, description string) {
 	data := ReservedData{
-		Id:          id,
+		Id:          int(id),
 		Name:        name,
 		Description: description,
 	}
-	return append(slice, data)
+	r.ReservedReasons = append(r.ReservedReasons, data)
 }
