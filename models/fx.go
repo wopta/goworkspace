@@ -489,3 +489,12 @@ func (fx *Fx) GetSignatoryMail(input map[string]interface{}) string {
 	lib.CheckError(fmt.Errorf("signatory not found"))
 	return ""
 }
+
+func (fx *Fx) AppendReservedData(slice []ReservedData, id int, name, description string) []ReservedData {
+	data := ReservedData{
+		Id:          id,
+		Name:        name,
+		Description: description,
+	}
+	return append(slice, data)
+}
