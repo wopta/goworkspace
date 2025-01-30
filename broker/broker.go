@@ -119,7 +119,7 @@ var brokerRoutes []lib.Route = []lib.Route{
 			lib.UserRoleAgent},
 	},
 	{
-		Route:   "/policy/v1/contract/{uid}",
+		Route:   "/policy/v1/contract/upload/{uid}",
 		Handler: lib.ResponseLoggerWrapper(UploadPolicyContractFx),
 		Method:  http.MethodPost,
 		Roles:   []string{lib.UserRoleAdmin},
