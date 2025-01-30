@@ -47,8 +47,8 @@ func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		ExportedSheetName:  "Export",
 		ExportFilePrefix:   fmt.Sprintf("quote_%s_%s", policy.Name, policy.Uid),
 	}
-	outCells := qs.Spreadsheets()
-	mapCellPolicy(policy, outCells)
+	outCells, gsLink := qs.Spreadsheets()
+	mapCellPolicy(policy, outCells, gsLink)
 
 	policyJson, err := policy.Marshal()
 	log.Println("Response: ", string(policyJson))
@@ -103,8 +103,18 @@ func setOutputCell() []Cell {
 
 	return res
 }
-func mapCellPolicy(policy *models.Policy, cells []Cell) {
+func mapCellPolicy(policy *models.Policy, cells []Cell, gsLink string) {
 	var priceGroup []models.Price
+
+	var quoteAtt = models.Attachment{
+		Name:      "QUOTAZIONE",
+		FileName:  "Quotazione Excel",
+		MimeType:  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+		Link:      gsLink,
+		IsPrivate: true,
+		Section:   "other",
+		Note:      "",
+	}
 
 	policy.IsReserved = true
 	policy.Channel = "network"
@@ -336,6 +346,17 @@ func mapCellPolicy(policy *models.Policy, cells []Cell) {
 		}
 	}
 	policy.PriceGroup = priceGroup
+
+	if len(*policy.Attachments) == 0 {
+		*policy.Attachments = append(*policy.Attachments, quoteAtt)
+	} else {
+		for i := 0; i < len(*policy.Attachments); i++ {
+			if (*policy.Attachments)[i].Name == quoteAtt.Name {
+				(*policy.Attachments)[i].Link = gsLink
+			}
+		}
+	}
+
 }
 func setInputCell(policy *models.Policy) []Cell {
 	var inputCells []Cell

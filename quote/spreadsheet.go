@@ -28,7 +28,7 @@ type QuoteSpreadsheet struct {
 	InitCells          []Cell
 }
 
-func (qs *QuoteSpreadsheet) Spreadsheets() []Cell {
+func (qs *QuoteSpreadsheet) Spreadsheets() ([]Cell, string) {
 	var (
 		path           []byte
 		bucketSavePath = "test/download/"
@@ -61,21 +61,21 @@ func (qs *QuoteSpreadsheet) Spreadsheets() []Cell {
 	err := clearUnwantedSheetsAndCopyToSpreadsheet(sheetClient, qs, ctx)
 	if err != nil {
 		log.Printf("unable to perform sheet operations: %v", err)
-		return res
+		return res, ""
 	}
 
 	doc, err := loadFromDrive(path, ctx, qs.DestinationSheetId)
 	if err != nil {
 		log.Printf("unable to load from GDrive: %v", err)
-		return res
+		return res, ""
 	}
-	err = saveToBucket(fmt.Sprintf("%s%s_%s.xls", bucketSavePath, qs.ExportFilePrefix, time.Now().Format("2006-1-2_15:04:05")), doc)
+	gsLink, err := saveToBucket(fmt.Sprintf("%s%s_%s.xls", bucketSavePath, qs.ExportFilePrefix, time.Now().Format("2006-1-2_15:04:05")), doc)
 	if err != nil {
 		log.Printf("unable to save to bucket: %v", err)
-		return res
+		return res, ""
 	}
 
-	return res
+	return res, gsLink
 }
 
 func clearUnwantedSheetsAndCopyToSpreadsheet(sheetClient *sheets.Service, qs *QuoteSpreadsheet, ctx context.Context) error {
@@ -305,11 +305,11 @@ func loadFromDrive(path []byte, ctx context.Context, fileId string) ([]byte, err
 	return body, nil
 }
 
-func saveToBucket(path string, file []byte) error {
-	_, err := lib.PutToGoogleStorageWithSpecificContentType(os.Getenv("GOOGLE_STORAGE_BUCKET"), path, file, "application/vnd.ms-excel")
+func saveToBucket(path string, file []byte) (string, error) {
+	gsLink, err := lib.PutToGoogleStorageWithSpecificContentType(os.Getenv("GOOGLE_STORAGE_BUCKET"), path, file, "application/vnd.ms-excel")
 	if err != nil {
-		return fmt.Errorf("error uploading to bucket: %v", err)
+		return "", fmt.Errorf("error uploading to bucket: %v", err)
 	}
 
-	return nil
+	return gsLink, nil
 }
