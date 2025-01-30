@@ -3,10 +3,12 @@ package models
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/wopta/goworkspace/lib"
 	"log"
 	"math"
 	"strings"
+	"time"
+
+	"github.com/wopta/goworkspace/lib"
 )
 
 const (
@@ -488,6 +490,18 @@ func (fx *Fx) GetSignatoryMail(input map[string]interface{}) string {
 	}
 	lib.CheckError(fmt.Errorf("signatory not found"))
 	return ""
+}
+
+func (fx *Fx) SetReservedCompany(r *ReservedInfo) {
+	r.CompanyApproval.Mandatory = true
+	r.CompanyApproval.Status = NeedsApproval
+	r.CompanyApproval.UpdateDate = time.Now().UTC()
+}
+
+func (fx *Fx) SetReservedMga(r *ReservedInfo) {
+	r.MgaApproval.Mandatory = true
+	r.MgaApproval.Status = NeedsApproval
+	r.MgaApproval.UpdateDate = time.Now().UTC()
 }
 
 func (fx *Fx) AppendReservedData(slice []ReservedData, id int, name, description string) []ReservedData {
