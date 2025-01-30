@@ -57,8 +57,8 @@ var (
 			"contractorFiscalcode IS NULL OR **tableAlias**.contractorFiscalcode = ''))",
 		"individualCompany": "(JSON_VALUE(**tableAlias**.data, " +
 			"'$.contractor.type') = 'legalEntity' AND **tableAlias**.contractorFiscalcode != '')",
-		"physical": "(JSON_VALUE(p.data, '$.contractor.type') = 'individual' OR (JSON_VALUE(p.data, " +
-			"'$.contractor.type') = '') OR (JSON_VALUE(p.data, '$.contractor.type') IS NULL))",
+		"physical": "(JSON_VALUE(**tableAlias**.data, '$.contractor.type') = 'individual' OR (JSON_VALUE(**tableAlias**.data, " +
+			"'$.contractor.type') = '') OR (JSON_VALUE(**tableAlias**.data, '$.contractor.type') IS NULL))",
 	}
 
 	toBeTranslatedKeys = []string{"status", "payment", "contractorType"}
