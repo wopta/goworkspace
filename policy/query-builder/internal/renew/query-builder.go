@@ -12,7 +12,7 @@ type QueryBuilder struct {
 func NewQueryBuilder(randomGenerator func() string) *QueryBuilder {
 	return &QueryBuilder{
 		base.NewQueryBuilder(lib.RenewPolicyViewCollection, "rp", randomGenerator,
-			paramsHierarchy, paramsWhereClause, orClausesKeys),
+			paramsHierarchy, paramsWhereClause, toBeTranslatedKeys),
 	}
 }
 
