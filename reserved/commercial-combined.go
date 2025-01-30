@@ -1,6 +1,7 @@
 package reserved
 
 import (
+	"encoding/json"
 	"log"
 
 	"github.com/wopta/goworkspace/lib"
@@ -12,7 +13,7 @@ func commercialCombinedReserved(p *models.Policy) (bool, *models.ReservedInfo) {
 	log.Println("[commercialCombinedReserved]")
 
 	var output = ReservedRuleOutput{
-		IsReserved: false,
+		IsReserved:   false,
 		ReservedInfo: &models.ReservedInfo{},
 	}
 
@@ -32,5 +33,31 @@ func commercialCombinedReserved(p *models.Policy) (bool, *models.ReservedInfo) {
 }
 
 func getCCInputData(p *models.Policy) []byte {
-	return nil
+	var (
+		enterpriseAsset models.Asset
+		buildingsAssets = make([]models.Asset, 0)
+		in              = make(map[string]interface{})
+	)
+
+	in["revenue"] = float64(0)
+
+	for _, a := range p.Assets {
+		switch a.Type {
+		case models.AssetTypeEnterprise:
+			enterpriseAsset = a
+		case models.AssetTypeBuilding:
+			buildingsAssets = append(buildingsAssets, a)
+		}
+	}
+
+	if enterpriseAsset.Enterprise != nil {
+		in["revenue"] = enterpriseAsset.Enterprise.Revenue
+	}
+
+	out, err := json.Marshal(in)
+	if err != nil {
+		return nil
+	}
+
+	return out
 }
