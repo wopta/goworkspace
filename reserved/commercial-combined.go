@@ -92,7 +92,7 @@ func getCCInputData(p *models.Policy) []byte {
 				in["management-organization-asset"] = g.Value.LimitOfIndemnity
 				in["management-organization-capital"] = g.Value.SumInsured
 			}
-			if g.Value.Discount > 0 {
+			if g.Value.Discount != 0 {
 				in["hasDiscount"] = true
 			}
 		}
@@ -112,7 +112,7 @@ func getCCInputData(p *models.Policy) []byte {
 			default:
 				log.Printf("%T", v)
 			}
-			if g.Value.Discount > 0 {
+			if g.Value.Discount != 0 {
 				in["hasDiscount"] = true
 			}
 		}
