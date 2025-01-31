@@ -3,10 +3,12 @@ package quote
 import (
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
@@ -16,30 +18,20 @@ import (
 )
 
 type QuoteSpreadsheet struct {
-	SheetName   string
-	Id          string
-	InputCells  []Cell
-	OutputCells []Cell
-	InitCells   []Cell
+	SheetName          string
+	ExportedSheetName  string
+	Id                 string
+	DestinationSheetId string
+	ExportFilePrefix   string
+	InputCells         []Cell
+	OutputCells        []Cell
+	InitCells          []Cell
 }
 
-func SpreadsheetsFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
-	log.SetPrefix("[SpreadsheetsFx] ")
-	defer log.SetPrefix("")
-
-	log.Println("Handler start -----------------------------------------------")
-
-	qs := QuoteSpreadsheet{Id: "tn0Jqce-r_JKdecExFOFVEJdGUaPYdGo31A9FOgvt-Y"}
-	res := qs.Spreadsheets()
-	log.Println(res)
-	log.Println("Handler end -------------------------------------------------")
-
-	return "", nil, nil
-}
-
-func (qs *QuoteSpreadsheet) Spreadsheets() []Cell {
+func (qs *QuoteSpreadsheet) Spreadsheets() ([]Cell, string) {
 	var (
-		path []byte
+		path           []byte
+		bucketSavePath = "test/download/"
 	)
 
 	switch os.Getenv("env") {
@@ -64,8 +56,83 @@ func (qs *QuoteSpreadsheet) Spreadsheets() []Cell {
 	fmt.Printf("sheetClient: %v\n", sheetClient)
 	qs.setInitCells(sheetClient, ctx)
 	qs.setInputCells(sheetClient, ctx)
-	return qs.getOutput(sheetClient)
+	res := qs.getOutput(sheetClient)
+
+	err := clearUnwantedSheetsAndCopyToSpreadsheet(sheetClient, qs, ctx)
+	if err != nil {
+		log.Printf("unable to perform sheet operations: %v", err)
+		return res, ""
+	}
+
+	doc, err := loadFromDrive(path, ctx, qs.DestinationSheetId)
+	if err != nil {
+		log.Printf("unable to load from GDrive: %v", err)
+		return res, ""
+	}
+	gsLink, err := saveToBucket(fmt.Sprintf("%s%s_%s.xls", bucketSavePath, qs.ExportFilePrefix, time.Now().Format("2006-1-2_15:04:05")), doc)
+	if err != nil {
+		log.Printf("unable to save to bucket: %v", err)
+		return res, ""
+	}
+
+	return res, gsLink
 }
+
+func clearUnwantedSheetsAndCopyToSpreadsheet(sheetClient *sheets.Service, qs *QuoteSpreadsheet, ctx context.Context) error {
+	var exportSheetId int64
+
+	ssRes, _ := sheetClient.Spreadsheets.Get(qs.Id).Context(ctx).Do()
+	for _, s := range ssRes.Sheets {
+		if s.Properties.Title == qs.ExportedSheetName {
+			exportSheetId = s.Properties.SheetId
+		}
+	}
+
+	clearUnwantedSheetsReq := make([]*sheets.Request, 0)
+	clearLastSheetReq := make([]*sheets.Request, 0)
+	ssRes, _ = sheetClient.Spreadsheets.Get(qs.DestinationSheetId).Context(ctx).Do()
+	for i, s := range ssRes.Sheets {
+		ds := sheets.DeleteSheetRequest{SheetId: s.Properties.SheetId}
+		sr := sheets.Request{DeleteSheet: &ds}
+		if i == 0 {
+			clearLastSheetReq = append(clearLastSheetReq, &sr)
+		} else {
+			clearUnwantedSheetsReq = append(clearUnwantedSheetsReq, &sr)
+		}
+	}
+
+	if len(clearUnwantedSheetsReq) != 0 {
+		_, err := sheetClient.Spreadsheets.BatchUpdate(qs.DestinationSheetId, &sheets.BatchUpdateSpreadsheetRequest{Requests: clearUnwantedSheetsReq}).Context(ctx).Do()
+		if err != nil {
+			log.Printf("unable to delete sheets from spreadsheet: %v", err)
+		}
+	}
+
+	_, err := sheetClient.Spreadsheets.Sheets.CopyTo(qs.Id, exportSheetId, &sheets.CopySheetToAnotherSpreadsheetRequest{
+		DestinationSpreadsheetId: qs.DestinationSheetId,
+	}).Context(ctx).Do()
+
+	_, err = sheetClient.Spreadsheets.BatchUpdate(qs.DestinationSheetId, &sheets.BatchUpdateSpreadsheetRequest{Requests: clearLastSheetReq}).Context(ctx).Do()
+	if err != nil {
+		log.Printf("unable to delete sheets from spreadsheet: %v", err)
+	}
+
+	ssRes, _ = sheetClient.Spreadsheets.Get(qs.DestinationSheetId).Context(ctx).Do()
+	sheetIdToRename := ssRes.Sheets[0].Properties.SheetId
+	renameSheetReq := make([]*sheets.Request, 0)
+	newSp := sheets.SheetProperties{SheetId: sheetIdToRename, Title: qs.ExportedSheetName}
+	rs := sheets.UpdateSheetPropertiesRequest{Properties: &newSp, Fields: "Title"}
+	dr := sheets.Request{UpdateSheetProperties: &rs}
+	renameSheetReq = append(renameSheetReq, &dr)
+
+	_, err = sheetClient.Spreadsheets.BatchUpdate(qs.DestinationSheetId, &sheets.BatchUpdateSpreadsheetRequest{Requests: renameSheetReq}).Context(ctx).Do()
+	if err != nil {
+		log.Printf("unable to rename sheet: %v", err)
+	}
+
+	return nil
+}
+
 func (qs *QuoteSpreadsheet) setInitCells(sheetClient *sheets.Service, ctx context.Context) {
 
 	rb := &sheets.BatchUpdateValuesRequest{
@@ -207,4 +274,42 @@ func CopySpreadsheet(path []byte, ctx context.Context, id string) (string, error
 	fmt.Printf("f.Id: %v\n", e)
 	fmt.Printf("f.Id: %v\n", f.Id)
 	return f.Id, nil
+}
+
+func loadFromDrive(path []byte, ctx context.Context, fileId string) ([]byte, error) {
+	googleDrive := &GoogleDrive{
+		CredentialsByte: path,
+		Ctx:             ctx,
+	}
+
+	driveClient, err := GoogleClient[*DriveService](googleDrive)
+	if err != nil {
+		return nil, fmt.Errorf("unable to create GDrive client: %v", err)
+	}
+
+	resp, err := driveClient.Svc.Files.Export(fileId, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet").Download()
+	if err != nil {
+		return nil, fmt.Errorf("error exporting file from GDrive: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("error getting response: http status is %d (%s)", resp.StatusCode, http.StatusText(resp.StatusCode))
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("error reading resp body: %v", err)
+	}
+
+	return body, nil
+}
+
+func saveToBucket(path string, file []byte) (string, error) {
+	gsLink, err := lib.PutToGoogleStorageWithSpecificContentType(os.Getenv("GOOGLE_STORAGE_BUCKET"), path, file, "application/vnd.ms-excel")
+	if err != nil {
+		return "", fmt.Errorf("error uploading to bucket: %v", err)
+	}
+
+	return gsLink, nil
 }

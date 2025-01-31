@@ -43,18 +43,23 @@ var (
 		"product":       "(**tableAlias**.name = LOWER(@%s))",
 		"producerUid":   "(**tableAlias**.producerUid IN (%s))",
 		"renewMonth":    "(EXTRACT(MONTH FROM **tableAlias**.startDate) = CAST(@%s AS INTEGER))",
-		"paid":          "(**tableAlias**.isPay = true)",
-		"unpaid":        "(**tableAlias**.isPay = false)",
-		"recurrent":     "(**tableAlias**.hasMandate = true)",
-		"notRecurrent":  "(**tableAlias**.hasMandate = false OR **tableAlias**.hasMandate IS NULL)",
+
+		// status
+		"paid":   "(**tableAlias**.isPay = true)",
+		"unpaid": "(**tableAlias**.isPay = false)",
+
+		// payment
+		"recurrent":    "(**tableAlias**.hasMandate = true)",
+		"notRecurrent": "(**tableAlias**.hasMandate = false OR **tableAlias**.hasMandate IS NULL)",
+
 		// contractorType
 		"enterprise": "(JSON_VALUE(**tableAlias**.data, '$.contractor.type') = 'legalEntity' AND (**tableAlias**." +
 			"contractorFiscalcode IS NULL OR **tableAlias**.contractorFiscalcode = ''))",
 		"individualCompany": "(JSON_VALUE(**tableAlias**.data, " +
 			"'$.contractor.type') = 'legalEntity' AND **tableAlias**.contractorFiscalcode != '')",
-		"physical": "(JSON_VALUE(p.data, '$.contractor.type') = 'individual' OR (JSON_VALUE(p.data, " +
-			"'$.contractor.type') = '') OR (JSON_VALUE(p.data, '$.contractor.type') IS NULL))",
+		"physical": "(JSON_VALUE(**tableAlias**.data, '$.contractor.type') = 'individual' OR (JSON_VALUE(**tableAlias**.data, " +
+			"'$.contractor.type') = '') OR (JSON_VALUE(**tableAlias**.data, '$.contractor.type') IS NULL))",
 	}
 
-	orClausesKeys = []string{"status", "payment"}
+	toBeTranslatedKeys = []string{"status", "payment", "contractorType"}
 )

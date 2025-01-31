@@ -2,6 +2,7 @@ package quote
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -37,14 +38,17 @@ func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	lib.CheckError(err)
 	inputCells = append(inputCells, setInputCell(policy)...)
 	qs := QuoteSpreadsheet{
-		Id:          "1tn0Jqce-r_JKdecExFOFVEJdGUaPYdGo31A9FOgvt-Y",
-		InputCells:  inputCells,
-		OutputCells: setOutputCell(),
-		InitCells:   resetCells(),
-		SheetName:   "Input dati Polizza",
+		Id:                 "1tn0Jqce-r_JKdecExFOFVEJdGUaPYdGo31A9FOgvt-Y",
+		DestinationSheetId: "1tMi7NYFZu7AnV4WkVrD0yzy1Dt3d-wVs0iZwlOcxLrg",
+		InputCells:         inputCells,
+		OutputCells:        setOutputCell(),
+		InitCells:          resetCells(),
+		SheetName:          "Input dati Polizza",
+		ExportedSheetName:  "Export",
+		ExportFilePrefix:   fmt.Sprintf("quote_%s_%s", policy.Name, policy.Uid),
 	}
-	outCells := qs.Spreadsheets()
-	mapCellPolicy(policy, outCells)
+	outCells, gsLink := qs.Spreadsheets()
+	mapCellPolicy(policy, outCells, gsLink)
 
 	policyJson, err := policy.Marshal()
 	log.Println("Response: ", string(policyJson))
@@ -99,8 +103,18 @@ func setOutputCell() []Cell {
 
 	return res
 }
-func mapCellPolicy(policy *models.Policy, cells []Cell) {
+func mapCellPolicy(policy *models.Policy, cells []Cell, gsLink string) {
 	var priceGroup []models.Price
+
+	var quoteAtt = models.Attachment{
+		Name:      "QUOTAZIONE",
+		FileName:  "Quotazione Excel",
+		MimeType:  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+		Link:      gsLink,
+		IsPrivate: true,
+		Section:   "other",
+		Note:      "",
+	}
 
 	policy.IsReserved = true
 	policy.Channel = "network"
@@ -332,6 +346,17 @@ func mapCellPolicy(policy *models.Policy, cells []Cell) {
 		}
 	}
 	policy.PriceGroup = priceGroup
+
+	if len(*policy.Attachments) == 0 {
+		*policy.Attachments = append(*policy.Attachments, quoteAtt)
+	} else {
+		for i := 0; i < len(*policy.Attachments); i++ {
+			if (*policy.Attachments)[i].Name == quoteAtt.Name {
+				(*policy.Attachments)[i].Link = gsLink
+			}
+		}
+	}
+
 }
 func setInputCell(policy *models.Policy) []Cell {
 	var inputCells []Cell
