@@ -32,6 +32,22 @@ func PutToGoogleStorage(bucketname string, path string, file []byte) (string, er
 	return "gs://" + bucketname + "/" + path, e
 
 }
+
+func PutToGoogleStorageWithSpecificContentType(bucketName string, path string, file []byte, contentType string) (str string, err error) {
+	client, ctx, err := GetGoogleStorageClient()
+	if err != nil {
+		return "", fmt.Errorf("unable to get google storage client: %v", err)
+	}
+	bucket := client.Bucket(bucketName)
+	write := bucket.Object(path).NewWriter(ctx)
+	defer func() {
+		err = write.Close()
+	}()
+	write.ContentType = contentType
+	_, _ = write.Write(file)
+	return "gs://" + bucketName + "/" + path, err
+}
+
 func GetFromGoogleStorage(bucket string, file string) ([]byte, error) {
 	//var credential models.Credential
 	log.Println("GetFromGoogleStorage")
