@@ -280,3 +280,8 @@ const (
 	QuoteTypeFixed    = "fixed"
 	QuoteTypeVariable = "variable"
 )
+
+const (
+	AssetTypeEnterprise = "enterprise"
+	AssetTypeBuilding   = "building"
+)

@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -116,16 +117,28 @@ func mapCellPolicy(policy *models.Policy, cells []Cell, gsLink string) {
 		Note:      "",
 	}
 
-	policy.IsReserved = true
-	policy.Channel = "network"
-
 	policy.OffersPrices = map[string]map[string]*models.Price{
 		"default": {
 			"yearly":  &models.Price{},
 			"monthly": &models.Price{},
 		},
 	}
+
 	for _, cell := range cells {
+		v := cell.Value.(string)
+		if strings.HasPrefix(v, "Errore") {
+			reserved := models.ReservedData{
+				Id: 10,
+				Name: "quote",
+				Description: "Quotazione non effettuata",
+			}
+			if !slices.ContainsFunc(policy.ReservedInfo.ReservedReasons, func(r models.ReservedData) bool {
+				return r.Id == 10
+			}) {
+				policy.ReservedInfo.ReservedReasons = append(policy.ReservedInfo.ReservedReasons, reserved)
+			}
+		}
+
 		s, err := strconv.ParseFloat(strings.Trim(strings.Replace(strings.Replace(cell.Value.(string), ".", "", -1), ",", ".", -1), " "), 64)
 		log.Println(err)
 		switch cell.Cell {

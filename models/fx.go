@@ -3,10 +3,12 @@ package models
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/wopta/goworkspace/lib"
 	"log"
 	"math"
 	"strings"
+	"time"
+
+	"github.com/wopta/goworkspace/lib"
 )
 
 const (
@@ -457,7 +459,7 @@ func (fx *Fx) HasAssetType(input map[string]interface{}, assetType string) bool 
 	return false
 }
 
-func (fx *Fx) HasGuaranteeInSlice(input map[string]interface{}, slugList... string) bool {
+func (fx *Fx) HasGuaranteeInSlice(input map[string]interface{}, slugList ...string) bool {
 	j, err := json.Marshal(input)
 	lib.CheckError(err)
 	var policy Policy
@@ -488,4 +490,30 @@ func (fx *Fx) GetSignatoryMail(input map[string]interface{}) string {
 	}
 	lib.CheckError(fmt.Errorf("signatory not found"))
 	return ""
+}
+
+func (fx *Fx) SetReservedCompany(r *ReservedInfo) {
+	r.CompanyApproval.Mandatory = true
+	r.CompanyApproval.Status = NeedsApproval
+	r.CompanyApproval.UpdateDate = time.Now().UTC()
+}
+
+func (fx *Fx) SetReservedMga(r *ReservedInfo) {
+	r.MgaApproval.Mandatory = true
+	r.MgaApproval.Status = NeedsApproval
+	r.MgaApproval.UpdateDate = time.Now().UTC()
+}
+
+func (fx *Fx) AppendUniqueReservedData(r *ReservedInfo, id int64, name, description string) {
+	for _, r := range r.ReservedReasons {
+		if r.Id == int(id) {
+			return
+		}
+	}
+	data := ReservedData{
+		Id:          int(id),
+		Name:        name,
+		Description: description,
+	}
+	r.ReservedReasons = append(r.ReservedReasons, data)
 }
