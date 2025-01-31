@@ -3,15 +3,14 @@ package quote
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"slices"
 	"strconv"
 	"strings"
 
-	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	plc "github.com/wopta/goworkspace/policy"
 )
 
 const (
@@ -20,24 +19,29 @@ const (
 
 func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		policy     *models.Policy
+		err        error
+		reqPolicy  *models.Policy
+		dbPolicy   models.Policy
 		inputCells []Cell
 	)
 
 	log.SetPrefix("[CombinedQbeFx] ")
-	defer log.SetPrefix("")
-
 	log.Println("Handler start -----------------------------------------------")
 
-	req := lib.ErrorByte(io.ReadAll(r.Body))
+	if err = json.NewDecoder(r.Body).Decode(&reqPolicy); err != nil {
+		log.Println("error decoding request body")
+		return "", nil, err
+	}
 	defer r.Body.Close()
-	log.Println("Request: ", string(req))
-	err := json.Unmarshal(req, &policy)
-	lib.CheckError(err)
-	b, err := json.Marshal(policy)
-	log.Println("Request Marshal: ", string(b))
-	lib.CheckError(err)
-	inputCells = append(inputCells, setInputCell(policy)...)
+
+	if dbPolicy, err = plc.GetPolicy(reqPolicy.Uid, ""); err != nil {
+		log.Println("error getting policy from DB")
+		return "", nil, err
+	}
+
+	dbPolicy.Assets = reqPolicy.Assets
+
+	inputCells = append(inputCells, setInputCell(&dbPolicy)...)
 	qs := QuoteSpreadsheet{
 		Id:                 "1tn0Jqce-r_JKdecExFOFVEJdGUaPYdGo31A9FOgvt-Y",
 		DestinationSheetId: "1tMi7NYFZu7AnV4WkVrD0yzy1Dt3d-wVs0iZwlOcxLrg",
@@ -46,16 +50,16 @@ func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		InitCells:          resetCells(),
 		SheetName:          "Input dati Polizza",
 		ExportedSheetName:  "Export",
-		ExportFilePrefix:   fmt.Sprintf("quote_%s_%s", policy.Name, policy.Uid),
+		ExportFilePrefix:   fmt.Sprintf("quote_%s_%s", dbPolicy.Name, dbPolicy.Uid),
 	}
 	outCells, gsLink := qs.Spreadsheets()
-	mapCellPolicy(policy, outCells, gsLink)
+	mapCellPolicy(&dbPolicy, outCells, gsLink)
 
-	policyJson, err := policy.Marshal()
-	log.Println("Response: ", string(policyJson))
+	policyJson, err := dbPolicy.Marshal()
+
 	log.Println("Handler end -------------------------------------------------")
 
-	return string(policyJson), policy, err
+	return string(policyJson), dbPolicy, err
 }
 func setOutputCell() []Cell {
 
@@ -128,8 +132,8 @@ func mapCellPolicy(policy *models.Policy, cells []Cell, gsLink string) {
 		v := cell.Value.(string)
 		if strings.HasPrefix(v, "Errore") {
 			reserved := models.ReservedData{
-				Id: 10,
-				Name: "quote",
+				Id:          10,
+				Name:        "quote",
 				Description: "Quotazione non effettuata",
 			}
 			if !slices.ContainsFunc(policy.ReservedInfo.ReservedReasons, func(r models.ReservedData) bool {
@@ -360,10 +364,13 @@ func mapCellPolicy(policy *models.Policy, cells []Cell, gsLink string) {
 	}
 	policy.PriceGroup = priceGroup
 
+	if policy.Attachments ==  nil {
+		policy.Attachments = new([]models.Attachment)
+	}
 	if len(*policy.Attachments) == 0 {
 		*policy.Attachments = append(*policy.Attachments, quoteAtt)
 	} else {
-		for i := 0; i < len(*policy.Attachments); i++ {
+		for i := range *policy.Attachments {
 			if (*policy.Attachments)[i].Name == quoteAtt.Name {
 				(*policy.Attachments)[i].Link = gsLink
 			}
