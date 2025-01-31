@@ -3,6 +3,7 @@ package reserved
 import (
 	"encoding/json"
 	"log"
+	"slices"
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
@@ -58,12 +59,20 @@ func getCCInputData(p *models.Policy) []byte {
 	in["product-withdrawal"] = float64(0)
 	in["management-organization"] = float64(0)
 	in["cyber"] = float64(0)
+	in["management-organization-asset"] = float64(0)
+	in["management-organization-capital"] = float64(0)
 	// building guarantee
 	in["building"] = float64(0)
 	in["rental-risk"] = float64(0)
 	in["machinery"] = float64(0)
 	in["stock"] = float64(0)
 	in["stock-temporary-increase"] = float64(0)
+	in["sum"] = float64(0)
+	// policy
+	in["hasDiscount"] = false
+	in["hasBond"] = p.HasBond
+	in["hasClause"] = p.Clause != ""
+	in["naics"] = false
 
 	for _, a := range p.Assets {
 		switch a.Type {
@@ -79,11 +88,23 @@ func getCCInputData(p *models.Policy) []byte {
 		in["northAmericanMarket"] = enterpriseAsset.Enterprise.NorthAmericanMarket
 		for _, g := range enterpriseAsset.Guarantees {
 			in[g.Slug] = g.Value.SumInsuredLimitOfIndemnity
+			if g.Slug == "management-organization" {
+				in["management-organization-asset"] = g.Value.LimitOfIndemnity
+				in["management-organization-capital"] = g.Value.SumInsured
+			}
+			if g.Value.Discount > 0 {
+				in["hasDiscount"] = true
+			}
 		}
 	}
 
+	var sum float64
 	for _, b := range buildingsAssets {
 		for _, g := range b.Guarantees {
+			if slices.Contains([]string{"building", "machinery", "stock", "third-party-recourse",
+				"stock-temporary-increase", "daily-allowance", "additional-compensation", "increased-cost"}, g.Slug) {
+				sum += g.Value.SumInsuredLimitOfIndemnity
+			}
 			switch v := in[g.Slug].(type) {
 			case float64:
 				v += g.Value.SumInsuredLimitOfIndemnity
@@ -91,8 +112,15 @@ func getCCInputData(p *models.Policy) []byte {
 			default:
 				log.Printf("%T", v)
 			}
+			if g.Value.Discount > 0 {
+				in["hasDiscount"] = true
+			}
+		}
+		if !b.Building.IsNaicsSellable {
+			in["naics"] = true
 		}
 	}
+	in["sum"] = sum
 
 	out, err := json.Marshal(in)
 	if err != nil {
