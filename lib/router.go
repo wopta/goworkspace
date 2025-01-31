@@ -31,7 +31,14 @@ func ResponseLoggerWrapper(handler func(w http.ResponseWriter, r *http.Request) 
 	return func(w http.ResponseWriter, r *http.Request) {
 		str, _, err := handler(w, r)
 		if err != nil {
-			http.Error(w, fmt.Sprintf("{\"errorMessage\": \"%s\"}", err.Error()), http.StatusInternalServerError)
+			log.Printf("Error: %s", err.Error())
+			resp := map[string]string{
+				"errorMessage": err.Error(),
+			}
+			w.WriteHeader(http.StatusInternalServerError)
+			if err = json.NewEncoder(w).Encode(resp); err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
 			return
 		}
 		log.Printf("Response: %s", str)
