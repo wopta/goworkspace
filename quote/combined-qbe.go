@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	plc "github.com/wopta/goworkspace/policy"
 )
@@ -54,6 +55,12 @@ func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	}
 	outCells, gsLink := qs.Spreadsheets()
 	mapCellPolicy(&dbPolicy, outCells, gsLink)
+
+	if err = lib.SetFirestoreErr(lib.PolicyCollection, dbPolicy.Uid, dbPolicy); err != nil {
+		log.Println("error saving quote in policy")
+		return "", nil, err
+	}
+	dbPolicy.BigquerySave("")
 
 	policyJson, err := dbPolicy.Marshal()
 
@@ -367,16 +374,16 @@ func mapCellPolicy(policy *models.Policy, cells []Cell, gsLink string) {
 	if policy.Attachments ==  nil {
 		policy.Attachments = new([]models.Attachment)
 	}
-	if len(*policy.Attachments) == 0 {
+
+	quoteAttIdx := slices.IndexFunc(*policy.Attachments, func(a models.Attachment) bool {
+		return a.Name == quoteAtt.Name
+	})
+
+	if quoteAttIdx == -1 {
 		*policy.Attachments = append(*policy.Attachments, quoteAtt)
 	} else {
-		for i := range *policy.Attachments {
-			if (*policy.Attachments)[i].Name == quoteAtt.Name {
-				(*policy.Attachments)[i].Link = gsLink
-			}
-		}
+		(*policy.Attachments)[quoteAttIdx].Link = gsLink
 	}
-
 }
 func setInputCell(policy *models.Policy) []Cell {
 	var inputCells []Cell
