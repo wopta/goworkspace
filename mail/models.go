@@ -33,6 +33,7 @@ type BodyData struct {
 	RenewDate            string
 	PriceGross           string
 	HasMandate           bool
+	PolicyUid            string
 }
 
 type Attachment struct {
