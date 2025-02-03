@@ -253,12 +253,7 @@ func (f *Fpdf) GetStringWidth(text string) float64 {
 	return f.pdf.GetStringWidth(text)
 }
 
-func (f *Fpdf) Save(filename string) (string, error) {
-	rawDoc, err := f.RawDoc()
-	if err != nil {
-		return "", err
-	}
-
+func (f *Fpdf) Save(rawDoc []byte, filename string) (string, error) {
 	gsLink := lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, rawDoc)
 	return gsLink, nil
 }

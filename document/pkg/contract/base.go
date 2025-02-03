@@ -1962,12 +1962,12 @@ func (bg *baseGenerator) printStatement(statement models.Statement) {
 	}
 }
 
-func (bg *baseGenerator) Save() (string, error) {
+func (bg *baseGenerator) Save(rawDoc []byte) (string, error) {
 	filename := strings.ReplaceAll(fmt.Sprintf("%s/%s/"+models.ProposalDocumentFormat, "temp", bg.policy.Uid,
 		bg.policy.NameDesc, bg.policy.ProposalNumber), " ", "_")
 	if !bg.isProposal {
 		filename = strings.ReplaceAll(fmt.Sprintf("%s/%s/"+models.ContractDocumentFormat, "temp", bg.policy.Uid,
 			bg.policy.NameDesc, bg.policy.CodeCompany), " ", "_")
 	}
-	return bg.engine.Save(filename)
+	return bg.engine.Save(rawDoc, filename)
 }

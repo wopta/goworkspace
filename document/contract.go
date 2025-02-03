@@ -84,7 +84,7 @@ func ContractObj(origin string, data models.Policy, networkNode *models.NetworkN
 				log.Printf("error generating contract: %v", err)
 				return
 			}
-			filename, err = generator.Save()
+			filename, err = generator.Save(out)
 			if err != nil {
 				log.Printf("error generating contract: %v", err)
 				return

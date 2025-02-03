@@ -89,7 +89,7 @@ func Proposal(origin string, policy *models.Policy, networkNode *models.NetworkN
 			log.Printf("error generating contract: %v", err)
 			return nil
 		}
-		filename, err = generator.Save()
+		filename, err = generator.Save(rawDoc)
 		if err != nil {
 			log.Printf("error generating contract: %v", err)
 			return nil
