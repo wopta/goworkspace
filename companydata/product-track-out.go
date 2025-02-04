@@ -97,7 +97,7 @@ func (track Track) PolicyProductTrack(policies []models.Policy, event []Column) 
 
 	for _, policy := range policies {
 		if track.IsAssetFlat {
-			result = append(result, track.policyAssetRow(&policy, event)...)
+			result = append(result, track.policyFlatGuarante(&policy, event)...)
 		} else {
 			result = append(result, track.policyAssetRow(&policy, event)...)
 		}
@@ -223,6 +223,50 @@ func (track Track) policyAssetRow(policy *models.Policy, event []Column) [][]str
 		}
 
 	}
+	return result
+
+}
+func (track Track) policyFlatGuarante(policy *models.Policy, event []Column) [][]string {
+	var (
+		json_data interface{}
+		result    [][]string
+
+		err error
+	)
+	log.Println("policyFlatGuarante")
+	b, err := json.Marshal(policy)
+	lib.CheckError(err)
+	json.Unmarshal(b, &json_data)
+	log.Println(string(b))
+
+
+			var cells []string
+			for _, column := range event {
+
+				var resPaths []interface{}
+
+				for _, value := range column.Values {
+
+					if strings.Contains(value, "$.") {
+						
+						log.Println("column value guarantee: ", value)
+						resPath, err := jsonpath.JsonPathLookup(json_data, value)
+						resPaths = append(resPaths, resPath)
+						if err != nil {
+							log.Println(err)
+						}
+						log.Printf("column value %v - resPath: %v\n", value, resPath)
+					} else {
+						resPaths = append(resPaths, value)
+					}
+
+				}
+				resdata := checkMap(column, resPaths)
+				cells = append(cells, checkType(resdata))
+
+			}
+			result = append(result, cells)
+	
 	return result
 
 }
