@@ -366,7 +366,7 @@ func BigQuery[T any](from time.Time, to time.Time, db Database) []T {
 		} else if qe.QueryValue == "to" {
 			value = to
 		} else {
-			queryPar = queryPar + " " + qe.Field + " " + qe.Operator + " @" + qe.Field
+			queryPar = queryPar + " and " + qe.Field + " " + qe.Operator + " @" + qe.Field + " "
 			params[qe.Field] = qe.QueryValue
 		}
 
