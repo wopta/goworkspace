@@ -239,34 +239,33 @@ func (track Track) policyFlatGuarante(policy *models.Policy, event []Column) [][
 	json.Unmarshal(b, &json_data)
 	log.Println(string(b))
 
+	var cells []string
+	for _, column := range event {
 
-			var cells []string
-			for _, column := range event {
+		var resPaths []interface{}
 
-				var resPaths []interface{}
+		for _, value := range column.Values {
 
-				for _, value := range column.Values {
+			if strings.Contains(value, "$.") {
 
-					if strings.Contains(value, "$.") {
-						
-						log.Println("column value guarantee: ", value)
-						resPath, err := jsonpath.JsonPathLookup(json_data, value)
-						resPaths = append(resPaths, resPath)
-						if err != nil {
-							log.Println(err)
-						}
-						log.Printf("column value %v - resPath: %v\n", value, resPath)
-					} else {
-						resPaths = append(resPaths, value)
-					}
-
+				log.Println("column value guarantee: ", value)
+				resPath, err := jsonpath.JsonPathLookup(json_data, value)
+				resPaths = append(resPaths, resPath)
+				if err != nil {
+					log.Println(err)
 				}
-				resdata := checkMap(column, resPaths)
-				cells = append(cells, checkType(resdata))
-
+				log.Printf("column value %v - resPath: %v\n", value, resPath)
+			} else {
+				resPaths = append(resPaths, value)
 			}
-			result = append(result, cells)
-	
+
+		}
+		resdata := checkMap(column, resPaths)
+		cells = append(cells, checkType(resdata))
+
+	}
+	result = append(result, cells)
+
 	return result
 
 }
@@ -320,6 +319,8 @@ func query[T any](from time.Time, to time.Time, db Database) []T {
 
 	case "firestore":
 		res = firestoreQuery[T](from, to, db)
+	case "bigquery":
+		res = BigQuery[T](from, to, db)
 
 	}
 
@@ -351,25 +352,28 @@ func firestoreQuery[T any](from time.Time, to time.Time, db Database) []T {
 	return res
 }
 func BigQuery[T any](from time.Time, to time.Time, db Database) []T {
-	var value interface{}
+	var (
+		value    interface{}
+		queryPar string
+		params   map[string]interface{}
+	)
+	const layoutQuery = "2006-01-02"
+	params = make(map[string]interface{})
 	for _, qe := range db.Query {
 		value = qe.QueryValue
 		if qe.QueryValue == "from" {
 			value = from
-		}
-		if qe.QueryValue == "to" {
+		} else if qe.QueryValue == "to" {
 			value = to
+		} else {
+			queryPar = queryPar + " " + qe.Field + " " + qe.Operator + " @" + qe.Field
+			params[qe.Field] = qe.QueryValue
 		}
 
 	}
 
-	query := fmt.Sprintf("SELECT rootUid, ntr.parentUid, nodeUid, COALESCE(nnv.name, '') AS name, relativeLevel, "+
-		"ntr.creationDate  FROM `%s.%s` ntr INNER JOIN `%s.%s` nnv ON ntr.nodeUid = nnv.uid  "+
-		"WHERE nodeUid = @nodeUid ORDER BY relativeLevel", models.WoptaDataset,
-		models.NetworkTreeStructureTable, models.WoptaDataset, models.NetworkNodesView)
-	params := map[string]interface{}{
-		"nodeUid": value,
-	}
+	query := "SELECT *   FROM `" + os.Getenv("GOOGLE_PROJECT_ID") + "." + db.Dataset + "` " +
+		"WHERE startDate >= '" + from.Format(layoutQuery) + " 00:00:00'  and endDate >= '" + to.Format(layoutQuery) + " 00:00:00' " + queryPar
 
 	res, err := lib.QueryParametrizedRowsBigQuery[T](query, params)
 	if err != nil {
