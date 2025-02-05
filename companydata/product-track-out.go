@@ -372,7 +372,7 @@ func BigQuery[T any](from time.Time, to time.Time, db Database) []T {
 
 	}
 
-	query := "SELECT *   FROM `" + os.Getenv("GOOGLE_PROJECT_ID") + "." + db.Dataset + "` " +
+	query := "SELECT *   FROM `" + os.Getenv("GOOGLE_PROJECT_ID") + ".wopta." + db.Dataset + "` " +
 		"WHERE startDate >= '" + from.Format(layoutQuery) + " 00:00:00'  and endDate >= '" + to.Format(layoutQuery) + " 00:00:00' " + queryPar
 	log.Println(query)
 	res, err := lib.QueryParametrizedRowsBigQuery[T](query, params)
