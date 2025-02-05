@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -76,7 +75,7 @@ func UploadPolicyContractFx(w http.ResponseWriter, r *http.Request) (string, int
 
 	flow := models.ECommerceFlow
 	pathPrefix := fmt.Sprintf("temp/%s/", policy.Uid)
-	filename := strings.ReplaceAll(fmt.Sprintf(models.ContractDocumentFormat, policy.NameDesc, policy.CodeCompany), " ", "_")
+	filename := fmt.Sprintf(models.ContractDocumentFormat, policy.NameDesc, policy.CodeCompany)
 	newStatus := models.PolicyStatusToPay
 	newStatusHistory := []string{models.PolicyStatusManualSigned, models.PolicyStatusSign, models.PolicyStatusToPay}
 
@@ -95,7 +94,7 @@ func UploadPolicyContractFx(w http.ResponseWriter, r *http.Request) (string, int
 		newStatusHistory = newStatusHistory[:len(newStatusHistory)-1]
 	}
 
-	filePath := pathPrefix+filename
+	filePath := pathPrefix + filename
 
 	if _, err = lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filePath, rawDoc); err != nil {
 		err = fmt.Errorf("error uploading document to GoogleBucket: %v", err)
