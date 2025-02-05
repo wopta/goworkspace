@@ -53,10 +53,10 @@ func CommercialCombinedFx(_ http.ResponseWriter, r *http.Request) (string, any, 
 	out = ruleOutput.(*Out)
 
 	if out.Msg == "" {
-		return http.StatusText(http.StatusOK), nil, nil
+		return "{}", nil, nil
 	}
 
-	return "", nil, fmt.Errorf("policy not sellable by: %v", out.Msg)
+	return "{}", nil, fmt.Errorf("policy not sellable by: %v", out.Msg)
 }
 
 func getCommercialCombinedInputData(policy *models.Policy) ([]byte, error) {
