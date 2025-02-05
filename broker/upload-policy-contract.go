@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -73,7 +74,7 @@ func UploadPolicyContractFx(w http.ResponseWriter, r *http.Request) (string, int
 
 	flow := models.ECommerceFlow
 	pathPrefix := fmt.Sprintf("temp/%s/", policy.Uid)
-	filename := fmt.Sprintf(models.ContractDocumentFormat, policy.NameDesc, policy.CodeCompany)
+	filename := strings.ReplaceAll(fmt.Sprintf(models.ContractDocumentFormat, policy.NameDesc, policy.CodeCompany), " ", "_")
 	newStatus := models.PolicyStatusToPay
 	newStatusHistory := []string{models.PolicyStatusManualSigned, models.PolicyStatusSign, models.PolicyStatusToPay}
 
@@ -92,15 +93,14 @@ func UploadPolicyContractFx(w http.ResponseWriter, r *http.Request) (string, int
 		newStatusHistory = newStatusHistory[:len(newStatusHistory)-1]
 	}
 
-	gsLink, err := lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), pathPrefix+filename, rawDoc)
-	if err != nil {
+	if _, err = lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), pathPrefix+filename, rawDoc); err != nil {
 		err = fmt.Errorf("error uploading document to GoogleBucket: %v", err)
 		return "", nil, err
 	}
 
 	att := models.Attachment{
 		Name:      models.ContractNonDigitalAttachmentName,
-		Link:      gsLink,
+		Link:      filename,
 		FileName:  filename,
 		MimeType:  mimeType,
 		IsPrivate: false,
@@ -118,8 +118,7 @@ func UploadPolicyContractFx(w http.ResponseWriter, r *http.Request) (string, int
 
 	// TODO: expire link namirial for signature
 
-	err = lib.SetFirestoreErr(lib.PolicyCollection, policyUid, policy)
-	if err != nil {
+	if err = lib.SetFirestoreErr(lib.PolicyCollection, policyUid, policy); err != nil {
 		return "", nil, err
 	}
 
