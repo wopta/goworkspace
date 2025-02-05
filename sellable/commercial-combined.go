@@ -12,10 +12,6 @@ import (
 	"github.com/wopta/goworkspace/models"
 )
 
-type Out struct {
-	Msg string
-}
-
 func CommercialCombinedFx(_ http.ResponseWriter, r *http.Request) (string, any, error) {
 	var (
 		policy *models.Policy
@@ -45,6 +41,9 @@ func CommercialCombinedFx(_ http.ResponseWriter, r *http.Request) (string, any, 
 
 	fx := new(models.Fx)
 
+	type Out struct {
+		Msg string
+	}
 	var out = new(Out)
 	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, out, in, nil)
 	out = ruleOutput.(*Out)
