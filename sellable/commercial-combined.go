@@ -62,10 +62,10 @@ func CommercialCombinedFx(_ http.ResponseWriter, r *http.Request) (string, any, 
 func getCommercialCombinedInputData(policy *models.Policy) ([]byte, error) {
 	var numEmp = 0
 	var numBuild = 0
-	var missingMandatoryWarrant = false
+	var mandatoryWarrant = false
 	var mandatoryThirdParty = false
 	var buildingAndRental = false
-	var mandatoryWarrantList = []string{"building", "rental-risk", "machinery", "stock"} // "third-party-liability-work-providers"
+	var mandatoryWarrantList = []string{"building", "rental-risk", "machinery", "stock"}
 
 	for _, v := range policy.Assets {
 		if v.Type == models.AssetTypeEnterprise {
@@ -80,8 +80,8 @@ func getCommercialCombinedInputData(policy *models.Policy) ([]byte, error) {
 			numBuild++
 			var building, rentalRisk = false, false
 			for _, g := range v.Guarantees {
-				if !slices.Contains(mandatoryWarrantList, g.Slug) {
-					missingMandatoryWarrant = true
+				if slices.Contains(mandatoryWarrantList, g.Slug) {
+					mandatoryWarrant = true
 				}
 				if g.Slug == "building" {
 					building = true
@@ -99,7 +99,7 @@ func getCommercialCombinedInputData(policy *models.Policy) ([]byte, error) {
 	out := make(map[string]any)
 	out["numEmp"] = numEmp
 	out["numBuild"] = numBuild
-	out["missingMandatoryWarrant"] = missingMandatoryWarrant
+	out["mandatoryWarrant"] = mandatoryWarrant
 	out["buildingAndRental"] = buildingAndRental
 	out["mandatoryThirdParty"] = mandatoryThirdParty
 
