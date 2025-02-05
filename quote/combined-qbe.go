@@ -120,7 +120,7 @@ func mapCellPolicy(policy *models.Policy, cells []Cell, gsLink string) {
 
 	var quoteAtt = models.Attachment{
 		Name:      "QUOTAZIONE",
-		FileName:  "Quotazione Excel",
+		FileName:  "Quotazione Excel.xlsx",
 		MimeType:  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 		Link:      gsLink,
 		IsPrivate: true,
@@ -371,7 +371,7 @@ func mapCellPolicy(policy *models.Policy, cells []Cell, gsLink string) {
 	}
 	policy.PriceGroup = priceGroup
 
-	if policy.Attachments ==  nil {
+	if policy.Attachments == nil {
 		policy.Attachments = new([]models.Attachment)
 	}
 
