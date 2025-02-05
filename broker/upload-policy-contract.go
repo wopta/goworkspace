@@ -71,17 +71,19 @@ func UploadPolicyContractFx(w http.ResponseWriter, r *http.Request) (string, int
 		return "", nil, err
 	}
 
-	flow := models.ProviderMgaFlow
+	flow := models.ECommerceFlow
 	pathPrefix := fmt.Sprintf("temp/%s/", policy.Uid)
 	filename := fmt.Sprintf(models.ContractDocumentFormat, policy.NameDesc, policy.CodeCompany)
 	newStatus := models.PolicyStatusToPay
 	newStatusHistory := []string{models.PolicyStatusManualSigned, models.PolicyStatusSign, models.PolicyStatusToPay}
 
-	if policy.ProducerUid != "" {
-		node := network.GetNetworkNodeByUid(policy.ProducerUid)
-		if node != nil {
-			flow = node.GetWarrant().GetFlowName(policy.Name)
+	if policy.Channel == models.NetworkChannel {
+		var node *models.NetworkNode
+		if node = network.GetNetworkNodeByUid(policy.ProducerUid); node == nil {
+			err = fmt.Errorf("error getting node %s", policy.ProductUid)
+			return "", nil, err
 		}
+		flow = node.GetWarrant().GetFlowName(policy.Name)
 	}
 
 	if flow == models.RemittanceMgaFlow {
