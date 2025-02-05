@@ -54,6 +54,8 @@ func UploadPolicyContractFx(w http.ResponseWriter, r *http.Request) (string, int
 		return "", nil, fmt.Errorf("error parsing multipart form: %v", err)
 	}
 
+	note := r.PostFormValue("note")
+
 	mimeType := r.PostFormValue("mimeType")
 	if mimeType != pdfMimeType {
 		err = fmt.Errorf("cannot upload policy contract, invalid mime type: %s", mimeType)
@@ -107,6 +109,7 @@ func UploadPolicyContractFx(w http.ResponseWriter, r *http.Request) (string, int
 		MimeType:  mimeType,
 		IsPrivate: false,
 		Section:   models.DocumentSectionContracts,
+		Note:      note,
 	}
 	if policy.Attachments == nil {
 		policy.Attachments = new([]models.Attachment)
