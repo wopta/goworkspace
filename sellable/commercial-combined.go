@@ -21,7 +21,14 @@ func CommercialCombinedFx(_ http.ResponseWriter, r *http.Request) (string, any, 
 	log.Println("[CommercialCombinedFx] handler start ----------- ")
 
 	body := lib.ErrorByte(io.ReadAll(r.Body))
-	defer r.Body.Close()
+	defer func() {
+		err = r.Body.Close()
+		if err != nil {
+			log.Printf("error: %s", err.Error())
+		}
+		log.Println("Handler end ----------------------------------------------")
+		log.SetPrefix("")
+	}()
 	log.Printf("[CommercialCombinedFx] body: %s", string(body))
 
 	err = json.Unmarshal(body, &policy)
@@ -47,8 +54,6 @@ func CommercialCombinedFx(_ http.ResponseWriter, r *http.Request) (string, any, 
 	var out = new(Out)
 	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, out, in, nil)
 	out = ruleOutput.(*Out)
-
-	log.Println("[CommercialCombinedFx] handler end ----------------")
 
 	if out.Msg == "" {
 		return http.StatusText(http.StatusOK), nil, nil
