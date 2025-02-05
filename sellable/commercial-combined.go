@@ -16,8 +16,8 @@ func CommercialCombinedFx(_ http.ResponseWriter, r *http.Request) (string, any, 
 		policy *models.Policy
 		err    error
 	)
-
-	log.Println("[CommercialCombinedFx] handler start ----------- ")
+	log.SetPrefix("[CommercialCombinedFx]")
+	log.Println("handler start ----------- ")
 
 	defer func() {
 		err = r.Body.Close()
@@ -37,7 +37,7 @@ func CommercialCombinedFx(_ http.ResponseWriter, r *http.Request) (string, any, 
 
 	in, err := getCommercialCombinedInputData(policy)
 	if err != nil {
-		log.Printf("[Commercial-Combined] error getting input data: %s", err.Error())
+		log.Printf("error getting input data: %s", err.Error())
 		return "", nil, err
 	}
 
