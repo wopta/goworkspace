@@ -3,7 +3,6 @@ package sellable
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"slices"
@@ -20,7 +19,6 @@ func CommercialCombinedFx(_ http.ResponseWriter, r *http.Request) (string, any, 
 
 	log.Println("[CommercialCombinedFx] handler start ----------- ")
 
-	body := lib.ErrorByte(io.ReadAll(r.Body))
 	defer func() {
 		err = r.Body.Close()
 		if err != nil {
@@ -29,10 +27,9 @@ func CommercialCombinedFx(_ http.ResponseWriter, r *http.Request) (string, any, 
 		log.Println("Handler end ----------------------------------------------")
 		log.SetPrefix("")
 	}()
-	log.Printf("[CommercialCombinedFx] body: %s", string(body))
 
-	err = json.Unmarshal(body, &policy)
-	if err != nil {
+	if err = json.NewDecoder(r.Body).Decode(&policy); err != nil {
+		log.Printf("error decoding request body: %s", err)
 		return "", nil, err
 	}
 
