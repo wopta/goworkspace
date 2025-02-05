@@ -93,14 +93,16 @@ func UploadPolicyContractFx(w http.ResponseWriter, r *http.Request) (string, int
 		newStatusHistory = newStatusHistory[:len(newStatusHistory)-1]
 	}
 
-	if _, err = lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), pathPrefix+filename, rawDoc); err != nil {
+	filePath := pathPrefix+filename
+
+	if _, err = lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filePath, rawDoc); err != nil {
 		err = fmt.Errorf("error uploading document to GoogleBucket: %v", err)
 		return "", nil, err
 	}
 
 	att := models.Attachment{
 		Name:      models.ContractNonDigitalAttachmentName,
-		Link:      filename,
+		Link:      filePath,
 		FileName:  filename,
 		MimeType:  mimeType,
 		IsPrivate: false,
