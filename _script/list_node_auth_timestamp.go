@@ -18,6 +18,8 @@ import (
 func ListFacileBrokerLogin() {
 	log.Println("ListFacileBrokerLogin")
 
+	log.Printf("Executing script in env: %s", os.Getenv("env"))
+
 	log.Println("Getting all nodes from facile broker")
 	iterator, err := lib.QueryWhereFirestore(lib.NetworkNodesCollection, "callbackConfig.name", "==", "facileBrokerClient")
 	if err != nil {
@@ -90,7 +92,7 @@ func ListFacileBrokerLogin() {
 
 	log.Println("Writing info to CSV output")
 
-	filename := fmt.Sprintf("./_script/%s_facile-broker_auth-report.csv", os.Getenv("env"))
+	filename := fmt.Sprintf("./_script/%s_facile-broker_auth-report_%s.csv", os.Getenv("env"), time.Now().Format(time.RFC3339))
 
 	writer, err := os.Create(filename)
 	if err != nil {
