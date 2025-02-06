@@ -16,11 +16,11 @@ func CommercialCombinedFx(_ http.ResponseWriter, r *http.Request) (string, any, 
 		policy *models.Policy
 		err    error
 	)
-	log.SetPrefix("[CommercialCombinedFx]")
+	log.SetPrefix("[CommercialCombinedFx] ")
 	log.Println("handler start ----------- ")
 
 	defer func() {
-		err = r.Body.Close()
+		r.Body.Close()
 		if err != nil {
 			log.Printf("error: %s", err.Error())
 		}
