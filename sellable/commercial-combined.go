@@ -67,6 +67,11 @@ func getCommercialCombinedInputData(policy *models.Policy) ([]byte, error) {
 	var buildingAndRental = false
 	var mandatoryWarrantList = []string{"building", "rental-risk", "machinery", "stock"}
 
+	step, err := fromStepStringToInt(policy.Step)
+	if err != nil {
+		return nil, err
+	}
+
 	for _, v := range policy.Assets {
 		if v.Type == models.AssetTypeEnterprise {
 			numEmp = int(v.Enterprise.Employer)
@@ -97,6 +102,7 @@ func getCommercialCombinedInputData(policy *models.Policy) ([]byte, error) {
 	}
 
 	out := make(map[string]any)
+	out["step"] = step
 	out["numEmp"] = numEmp
 	out["numBuild"] = numBuild
 	out["mandatoryWarrant"] = mandatoryWarrant
@@ -106,4 +112,34 @@ func getCommercialCombinedInputData(policy *models.Policy) ([]byte, error) {
 	output, err := json.Marshal(out)
 
 	return output, err
+}
+
+func fromStepStringToInt(step string) (int, error) {
+	var (
+		intStep int
+		err     error = nil
+	)
+
+	switch step {
+	case "quotereffectivedate":
+		intStep = 0
+	case "quoterenterprisedata":
+		intStep = 1
+	case "quoterbuildingdata":
+		intStep = 2
+	case "quoterclaimshistory":
+		intStep = 3
+	case "qbeguaranteestep":
+		intStep = 4
+	case "quoterbondsandclauses":
+		intStep = 5
+	case "quotersignatorydata":
+		intStep = 6
+	case "quoterstatements":
+		intStep = 7
+	default:
+		err = fmt.Errorf("unable to parse step string %s", step)
+	}
+
+	return intStep, err
 }
