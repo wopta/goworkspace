@@ -78,8 +78,8 @@ func ListFacileBrokerLogin() {
 		for j := range res.Users {
 			nodes = append(nodes, NodeInfo{
 				Email:     res.Users[j].Email,
-				CreatedAt: time.Unix(res.Users[j].UserMetadata.CreationTimestamp/1000, 0).Format(time.RFC3339),
-				LastLogin: time.Unix(res.Users[j].UserMetadata.LastLogInTimestamp/1000, 0).Format(time.RFC3339),
+				CreatedAt: time.Unix(res.Users[j].UserMetadata.CreationTimestamp/1000, 0).Format(time.DateOnly),
+				LastLogin: time.Unix(res.Users[j].UserMetadata.LastLogInTimestamp/1000, 0).Format(time.DateOnly),
 			})
 		}
 		log.Printf("Batch %d: %d nodes not found", i+1, len(res.NotFound))
@@ -92,7 +92,7 @@ func ListFacileBrokerLogin() {
 
 	log.Println("Writing info to CSV output")
 
-	filename := fmt.Sprintf("./_script/%s_facile-broker_auth-report_%s.csv", os.Getenv("env"), time.Now().Format(time.RFC3339))
+	filename := fmt.Sprintf("./_script/%s_facile-broker_auth-report_%s.csv", os.Getenv("env"), time.Now().Format(time.DateOnly))
 
 	writer, err := os.Create(filename)
 	if err != nil {
