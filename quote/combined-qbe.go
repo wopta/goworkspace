@@ -12,6 +12,7 @@ import (
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	plc "github.com/wopta/goworkspace/policy"
+	"github.com/wopta/goworkspace/sellable"
 )
 
 const (
@@ -27,13 +28,20 @@ func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	)
 
 	log.SetPrefix("[CombinedQbeFx] ")
+	defer func() {
+		r.Body.Close()
+		if err != nil {
+			log.Printf("error: %s", err.Error())
+		}
+		log.Println("Handler end ---------------------------------------------")
+		log.SetPrefix("")
+	}()
 	log.Println("Handler start -----------------------------------------------")
 
 	if err = json.NewDecoder(r.Body).Decode(&reqPolicy); err != nil {
 		log.Println("error decoding request body")
 		return "", nil, err
 	}
-	defer r.Body.Close()
 
 	if dbPolicy, err = plc.GetPolicy(reqPolicy.Uid, ""); err != nil {
 		log.Println("error getting policy from DB")
@@ -41,6 +49,11 @@ func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	}
 
 	dbPolicy.Assets = reqPolicy.Assets
+
+	if err = sellable.CommercialCombined(&dbPolicy); err != nil {
+		log.Println("error on sellable")
+		return "", nil, err
+	}
 
 	inputCells = append(inputCells, setInputCell(&dbPolicy)...)
 	qs := QuoteSpreadsheet{
@@ -63,8 +76,6 @@ func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 	dbPolicy.BigquerySave("")
 
 	policyJson, err := dbPolicy.Marshal()
-
-	log.Println("Handler end -------------------------------------------------")
 
 	return string(policyJson), dbPolicy, err
 }
