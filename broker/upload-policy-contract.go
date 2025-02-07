@@ -53,6 +53,8 @@ func UploadPolicyContractFx(w http.ResponseWriter, r *http.Request) (string, int
 		return "", nil, fmt.Errorf("error parsing multipart form: %v", err)
 	}
 
+	note := r.PostFormValue("note")
+
 	mimeType := r.PostFormValue("mimeType")
 	if mimeType != pdfMimeType {
 		err = fmt.Errorf("cannot upload policy contract, invalid mime type: %s", mimeType)
@@ -71,17 +73,19 @@ func UploadPolicyContractFx(w http.ResponseWriter, r *http.Request) (string, int
 		return "", nil, err
 	}
 
-	flow := models.ProviderMgaFlow
+	flow := models.ECommerceFlow
 	pathPrefix := fmt.Sprintf("temp/%s/", policy.Uid)
 	filename := fmt.Sprintf(models.ContractDocumentFormat, policy.NameDesc, policy.CodeCompany)
 	newStatus := models.PolicyStatusToPay
 	newStatusHistory := []string{models.PolicyStatusManualSigned, models.PolicyStatusSign, models.PolicyStatusToPay}
 
-	if policy.ProducerUid != "" {
-		node := network.GetNetworkNodeByUid(policy.ProducerUid)
-		if node != nil {
-			flow = node.GetWarrant().GetFlowName(policy.Name)
+	if policy.Channel == models.NetworkChannel {
+		var node *models.NetworkNode
+		if node = network.GetNetworkNodeByUid(policy.ProducerUid); node == nil {
+			err = fmt.Errorf("error getting node %s", policy.ProductUid)
+			return "", nil, err
 		}
+		flow = node.GetWarrant().GetFlowName(policy.Name)
 	}
 
 	if flow == models.RemittanceMgaFlow {
@@ -90,19 +94,21 @@ func UploadPolicyContractFx(w http.ResponseWriter, r *http.Request) (string, int
 		newStatusHistory = newStatusHistory[:len(newStatusHistory)-1]
 	}
 
-	gsLink, err := lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), pathPrefix+filename, rawDoc)
-	if err != nil {
+	filePath := pathPrefix + filename
+
+	if _, err = lib.PutToGoogleStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filePath, rawDoc); err != nil {
 		err = fmt.Errorf("error uploading document to GoogleBucket: %v", err)
 		return "", nil, err
 	}
 
 	att := models.Attachment{
 		Name:      models.ContractNonDigitalAttachmentName,
-		Link:      gsLink,
+		Link:      filePath,
 		FileName:  filename,
 		MimeType:  mimeType,
 		IsPrivate: false,
 		Section:   models.DocumentSectionContracts,
+		Note:      note,
 	}
 	if policy.Attachments == nil {
 		policy.Attachments = new([]models.Attachment)
@@ -116,8 +122,7 @@ func UploadPolicyContractFx(w http.ResponseWriter, r *http.Request) (string, int
 
 	// TODO: expire link namirial for signature
 
-	err = lib.SetFirestoreErr(lib.PolicyCollection, policyUid, policy)
-	if err != nil {
+	if err = lib.SetFirestoreErr(lib.PolicyCollection, policyUid, policy); err != nil {
 		return "", nil, err
 	}
 
