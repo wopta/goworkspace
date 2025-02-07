@@ -17,46 +17,56 @@ func CommercialCombinedFx(_ http.ResponseWriter, r *http.Request) (string, any, 
 		err    error
 	)
 	log.SetPrefix("[CommercialCombinedFx] ")
-	log.Println("handler start ----------- ")
+	log.Println("Handler start -----------------------------------------------")
 
 	defer func() {
 		r.Body.Close()
 		if err != nil {
 			log.Printf("error: %s", err.Error())
 		}
-		log.Println("Handler end ----------------------------------------------")
+		log.Println("Handler end ---------------------------------------------")
 		log.SetPrefix("")
 	}()
 
 	if err = json.NewDecoder(r.Body).Decode(&policy); err != nil {
-		log.Printf("error decoding request body: %s", err)
+		log.Println("error decoding request body",)
 		return "", nil, err
 	}
 
 	policy.Normalize()
 
-	in, err := getCommercialCombinedInputData(policy)
-	if err != nil {
-		log.Printf("error getting input data: %s", err.Error())
-		return "", nil, err
-	}
-
-	rulesFile := lib.GetRulesFileV2(policy.Name, policy.ProductVersion, rulesFilename)
-
-	fx := new(models.Fx)
-
-	type Out struct {
-		Msg string
-	}
-	var out = new(Out)
-	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, out, in, nil)
-	out = ruleOutput.(*Out)
-
-	if out.Msg == "" {
+	if err = CommercialCombined(policy); err == nil {
 		return "{}", nil, nil
 	}
 
-	return "{}", nil, fmt.Errorf("policy not sellable by: %v", out.Msg)
+	return "", nil, fmt.Errorf("policy not sellable by: %v", err)
+}
+
+type SellableError struct {
+	Msg string
+}
+func (e *SellableError) Error() string {
+	return e.Msg
+}
+
+func CommercialCombined(p *models.Policy) error {
+	in, err := getCommercialCombinedInputData(p)
+	if err != nil {
+		return err
+	}
+
+	rulesFile := lib.GetRulesFileV2(p.Name, p.ProductVersion, rulesFilename)
+	fx := new(models.Fx)
+	out := new(SellableError)
+
+	_, ruleOutput := lib.RulesFromJsonV2(fx, rulesFile, out, in, nil)
+	out = ruleOutput.(*SellableError)
+
+	if out.Msg == "" {
+		return nil
+	}
+
+	return out
 }
 
 func getCommercialCombinedInputData(policy *models.Policy) ([]byte, error) {
