@@ -29,7 +29,6 @@ const (
 	theftGuaranteeSlug                            string = "theft"                                // FURTO
 	dailyAllowanceGuaranteeSlug                   string = "daily-allowance"                      // DIARIA GIORNALIERA
 	increasedCostGuaranteeSlug                    string = "increased-cost"                       // MAGGIORI COSTI
-	excludedFormulaGuaranteeSlug                  string = "excluded-formula"                     // FORMULA ESCLUSA
 	additionalCompensationGuaranteeSlug           string = "additional-compensation"              // DANNI INDIRETTI - FORMULA
 	lossRentGuaranteeSlug                         string = "loss-rent"                            // PERDITA PIGIONI
 	thirdPartyLiabilityWorkProvidersGuaranteeSlug string = "third-party-liability-work-providers" // RCT + RCO sostituisce RCT e RCTO

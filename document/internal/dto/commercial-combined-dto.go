@@ -1,6 +1,7 @@
 package dto
 
 import (
+	"slices"
 	"strconv"
 
 	"github.com/wopta/goworkspace/document/internal/constants"
@@ -71,11 +72,15 @@ func (cc *CommercialCombinedDTO) FromPolicy(policy models.Policy, product models
 		}
 		if asset.Enterprise != nil {
 			cc.Enterprise.fromPolicy(*policy.Assets[index].Enterprise, policy.Assets[index].Guarantees)
+			isExcluded := true
 			for _, guarantee := range policy.Assets[index].Guarantees {
-				if guarantee.Slug == "excluded-formula" {
-					cc.HasExcludedFormula = true
+				if slices.Contains([]string{"daily-allowance", "increased-cost", "additional-compensation"}, guarantee.Slug) {
+					isExcluded = false
 					break
 				}
+			}
+			if isExcluded {
+				cc.HasExcludedFormula = true
 			}
 		}
 	}

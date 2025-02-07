@@ -593,13 +593,6 @@ func getEnterpriseGuaranteCellsBySlug(guarante models.Guarante) []Cell {
 				Value: guarante.Value.SumInsuredLimitOfIndemnity,
 			},
 		}
-	case "excluded-formula":
-		cells = []Cell{
-			{
-				Cell:  "C57",
-				Value: "Esclusa",
-			},
-		}
 	case "daily-allowance":
 		cells = []Cell{
 			{
@@ -736,7 +729,7 @@ func resetCells() []Cell {
 	buildingsCellList := []string{
 		"C19", "C20", "C21", "C29", "C30", "C31", "C32", "C33", "C34", "C35", "C36", "C41", "C42", "C43", "C44", "C45",
 		"D19", "D20", "D21", "D29", "D30", "D31", "D32", "D33", "D34", "D35", "D36", "D41", "D42", "D43", "D44", "D45",
-		"E19", "E20", "E21", "E29", "E30", "E31", "E32", "E33", "E34", "E35", "E36", "E41", "E42", "E43", "E44", "E45",
+		"E19", "E20", "E21", "E29", "E30", "E31", "E32", "E33", "E34", "E35", "E36", "E41", "E42", "E43", "E44", "E45", "E46",
 		"F19", "F20", "F21", "F29", "F30", "F31", "F32", "F33", "F34", "F35", "F36", "F41", "F42", "F43", "F44", "F45",
 		"G19", "G20", "G21", "G29", "G30", "G31", "G32", "G33", "G34", "G35", "G36", "G41", "G42", "G43", "G44", "G45",
 	}
