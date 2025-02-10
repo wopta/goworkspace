@@ -124,65 +124,106 @@ func resetCells() []Cell {
 }
 
 func setOutputCell() []Cell {
+	cells := make([]Cell, 0)
+	cells = append(cells,
+		Cell{Cell: totalNetYearlyCellValue},
+		Cell{Cell: totalTaxAmountYearlyCellValue},
+		Cell{Cell: totalGrossYearlyCellValue},
+	)
+	for _, column := range []string{grossYearlyValueColumn, netYearlyValueColumn,
+		taxAmountYearlyValueColumn, taxValueColumn} {
+		cells = append(cells,
+			Cell{Cell: column + totalBuildingValueRow},
+			Cell{Cell: column + totalStockValueRow},
+			Cell{Cell: column + totalStockTemporaryIncreaseValueRow},
+			Cell{Cell: column + totalTheftValueRow},
+			Cell{Cell: column + totalRentalRiskValueRow},
+			Cell{Cell: column + totalOtherContentValueRow},
+			Cell{Cell: column + totalThirdPartyRecourseValueRow},
+			Cell{Cell: column + totalFormulaValueRow},
+			Cell{Cell: column + totalLossRentValueRow},
+			Cell{Cell: column + totalThirdPartyLiabilityValueRow},
+			Cell{Cell: column + totalWorkEmployersLiabilityValueRow},
+			Cell{Cell: column + totalProductLiabilityValueRow},
+			Cell{Cell: column + totalProductWithdrawalValueRow},
+			Cell{Cell: column + totalManagementOrganizationValueRow},
+			Cell{Cell: column + totalCyberValueRow},
+		)
+	}
+	return cells
+}
 
-	res := []Cell{{
-		Cell: "C81",
-	}, {
-		Cell: "C82",
-	}, {
-		Cell: "C83",
-	}, {
-		Cell: "C84",
-	}, {
-		Cell: "C85",
-	}, {
-		Cell: "C86",
-	}, {
-		Cell: "C87",
-	}, {
-		Cell: "C88",
-	}, {
-		Cell: "C89",
-	}, {
-		Cell: "C90",
-	}, {
-		Cell: "C91",
-	}, {
-		Cell: "C92",
-	}, {
-		Cell: "C93",
-	}, {
-		Cell: "C94",
-	}, {
-		Cell: "C95",
-	}, {
-		Cell: "C96",
-	}, {
-		Cell: "C97",
-	}, {
-		Cell: "C98",
-	}, {
-		Cell: "C99",
-	}, {
-		Cell: "C100",
-	},
+func mapCellByColumnAndSection(column, section string, priceGroup map[string]models.Price, cell Cell) {
+	var hasError bool
+	rawValue := cell.Value.(string)
+	parsedValue, err := parseCellValue(cell.Value)
+	if err != nil {
+		hasError = true
+		log.Printf("error parsing value: %s", err.Error())
 	}
 
-	return res
+	switch column {
+	case grossYearlyValueColumn:
+		if entry, ok := priceGroup[section]; ok && !hasError {
+			entry.Gross = parsedValue
+			priceGroup[section] = entry
+		}
+	case netYearlyValueColumn:
+		if entry, ok := priceGroup[section]; ok && !hasError {
+			entry.Net = parsedValue
+			priceGroup[section] = entry
+		}
+	case taxAmountYearlyValueColumn:
+		if entry, ok := priceGroup[section]; ok && !hasError {
+			entry.Tax = parsedValue
+			priceGroup[section] = entry
+		}
+	case taxValueColumn:
+		return
+	}
+
+	if hasError {
+		if entry, ok := priceGroup[section]; ok {
+			entry.Description = rawValue
+			priceGroup[section] = entry
+		}
+	}
+}
+
+func mapCellsToPriceGroup(cells []Cell) []models.Price {
+	priceGroup := make([]models.Price, 0)
+	priceGroupMap := make(map[string]models.Price)
+
+	for key, value := range totalBySectionMap {
+		priceGroupMap[key] = models.Price{Name: value}
+	}
+
+	for _, cell := range cells {
+		cellColumn := cell.Cell[0:1]
+		cellRow := cell.Cell[1:]
+		mapCellByColumnAndSection(cellColumn, cellRow, priceGroupMap, cell)
+	}
+
+	for _, value := range priceGroupMap {
+		priceGroup = append(priceGroup, value)
+	}
+
+	return priceGroup
 }
 
 func mapCellPolicy(policy *models.Policy, cells []Cell, gsLink string) {
-	var priceGroup []models.Price
-
-	var quoteAtt = models.Attachment{
-		Name:      "QUOTAZIONE",
-		FileName:  "Quotazione Excel.xlsx",
-		MimeType:  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-		Link:      gsLink,
-		IsPrivate: true,
-		Section:   "other",
-		Note:      "",
-	}
+	var (
+		hasQuoteError bool
+		quoteAtt      = models.Attachment{
+			Name:      "QUOTAZIONE",
+			FileName:  "Quotazione Excel.xlsx",
+			MimeType:  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+			Link:      gsLink,
+			IsPrivate: true,
+			Section:   "other",
+			Note:      "",
+		}
+	)
 
 	policy.OffersPrices = map[string]map[string]*models.Price{
 		"default": {
@@ -191,241 +232,40 @@ func mapCellPolicy(policy *models.Policy, cells []Cell, gsLink string) {
 		},
 	}
 
-	for _, cell := range cells {
-		v := cell.Value.(string)
-		if strings.HasPrefix(v, "Errore") {
-			reserved := models.ReservedData{
-				Id:          10,
-				Name:        "quote",
-				Description: "Quotazione non effettuata",
-			}
-			if !slices.ContainsFunc(policy.ReservedInfo.ReservedReasons, func(r models.ReservedData) bool {
-				return r.Id == 10
-			}) {
-				policy.ReservedInfo.ReservedReasons = append(policy.ReservedInfo.ReservedReasons, reserved)
-			}
+	policy.ReservedInfo.ReservedReasons = slices.DeleteFunc(policy.ReservedInfo.ReservedReasons, hasQuoteErrorFn)
+
+	policy.PriceGroup = mapCellsToPriceGroup(cells)
+
+	policyCells := slices.DeleteFunc(cells, func(c Cell) bool {
+		return !slices.Contains([]string{totalNetYearlyCellValue, totalTaxAmountYearlyCellValue, totalGrossYearlyCellValue}, c.Cell)
+	})
+
+	for _, cell := range policyCells {
+		parsedValue, err := parseCellValue(cell.Value)
+		if err != nil {
+			log.Printf("error parsing value: %s", err.Error())
+			continue
 		}
-
-		s, err := strconv.ParseFloat(strings.Trim(strings.Replace(strings.Replace(cell.Value.(string), ".", "", -1), ",", ".", -1), " "), 64)
-		log.Println(err)
 		switch cell.Cell {
-		case "C81":
-			if err == nil {
-				priceGroup = append(priceGroup, models.Price{
-					Name: "Fabbricato",
-					Net:  s,
-				})
-			} else {
-				priceGroup = append(priceGroup, models.Price{
-					Name:        "Fabbricato",
-					Description: cell.Value.(string),
-				})
-			}
-
-		case "C82":
-			if err == nil {
-				priceGroup = append(priceGroup, models.Price{
-					Name: "Contenuto (Merci e Macchinari)",
-					Net:  s,
-				})
-			} else {
-				priceGroup = append(priceGroup, models.Price{
-					Name:        "Contenuto (Merci e Macchinari)",
-					Description: cell.Value.(string),
-				})
-			}
-
-		case "C83":
-			if err == nil {
-				priceGroup = append(priceGroup, models.Price{
-					Name: "Merci (aumento temporaneo)",
-					Net:  s,
-				})
-			} else {
-				priceGroup = append(priceGroup, models.Price{
-					Name:        "Merci (aumento temporaneo)",
-					Description: cell.Value.(string),
-				})
-			}
-
-		case "C84":
-			if err == nil {
-				priceGroup = append(priceGroup, models.Price{
-					Name: "Furto, rapina, estorsione (in aumento)",
-					Net:  s,
-				})
-			} else {
-				priceGroup = append(priceGroup, models.Price{
-					Name:        "Furto, rapina, estorsione (in aumento)",
-					Description: cell.Value.(string),
-				})
-			}
-
-		case "C85":
-			if err == nil {
-				priceGroup = append(priceGroup, models.Price{
-					Name: "Rischio locativo (in aumento)",
-					Net:  s,
-				})
-			} else {
-				priceGroup = append(priceGroup, models.Price{
-					Name:        "Rischio locativo (in aumento)",
-					Description: cell.Value.(string),
-				})
-			}
-
-		case "C86":
-
-			log.Println(err)
-			if err == nil {
-				priceGroup = append(priceGroup, models.Price{
-					Name: "Altre garanzie su Contenuto",
-					Net:  s,
-				})
-			} else {
-				priceGroup = append(priceGroup, models.Price{
-					Name:        "Altre garanzie su Contenuto",
-					Description: cell.Value.(string),
-				})
-			}
-
-		case "C87":
-			if err == nil {
-				priceGroup = append(priceGroup, models.Price{
-					Name: "Ricorso terzi (in aumento)",
-					Net:  s,
-				})
-			} else {
-				priceGroup = append(priceGroup, models.Price{
-					Name:        "Ricorso terzi (in aumento)",
-					Description: cell.Value.(string),
-				})
-			}
-
-		case "C88":
-			if err == nil {
-				priceGroup = append(priceGroup, models.Price{
-					Name: "Danni indiretti",
-					Net:  s,
-				})
-			} else {
-				priceGroup = append(priceGroup, models.Price{
-					Name:        "Danni indiretti",
-					Description: cell.Value.(string),
-				})
-			}
-
-		case "C89":
-
-			log.Println(err)
-			priceGroup = append(priceGroup, models.Price{
-				Name: "Perdita Pigioni",
-				Net:  s,
-			})
-		case "C90":
-			if err == nil {
-				priceGroup = append(priceGroup, models.Price{
-					Name: "Responsabilità civile terzi",
-					Net:  s,
-				})
-			} else {
-				priceGroup = append(priceGroup, models.Price{
-					Name:        "Responsabilità civile terzi",
-					Description: cell.Value.(string),
-				})
-			}
-
-		case "C91":
-			if err == nil {
-				priceGroup = append(priceGroup, models.Price{
-					Name: "Responsabilità civile prestatori lavoro",
-					Net:  s,
-				})
-			} else {
-				priceGroup = append(priceGroup, models.Price{
-					Name:        "Responsabilità civile prestatori lavoro",
-					Description: cell.Value.(string),
-				})
-			}
-
-		case "C92":
-			if err == nil {
-				priceGroup = append(priceGroup, models.Price{
-					Name: "Responsabilità civile prodotti",
-					Net:  s,
-				})
-			} else {
-				priceGroup = append(priceGroup, models.Price{
-					Name:        "Responsabilità civile prodotti",
-					Description: cell.Value.(string),
-				})
-			}
-
-		case "C93":
-			if err == nil {
-				priceGroup = append(priceGroup, models.Price{
-					Name: "Ritiro Prodotti",
-					Net:  s,
-				})
-			} else {
-				priceGroup = append(priceGroup, models.Price{
-					Name:        "Ritiro Prodotti",
-					Description: cell.Value.(string),
-				})
-			}
-
-		case "C94":
-			if err == nil {
-				priceGroup = append(priceGroup, models.Price{
-					Name: "Resp. Amministratori Sindaci Dirigenti (D&O)",
-					Net:  s,
-				})
-			} else {
-				priceGroup = append(priceGroup, models.Price{
-					Name:        "Resp. Amministratori Sindaci Dirigenti (D&O)",
-					Description: cell.Value.(string),
-				})
-			}
-
-		case "C95":
-			if err == nil {
-				priceGroup = append(priceGroup, models.Price{
-					Name: "Cyber",
-					Net:  s,
-				})
-			} else {
-				priceGroup = append(priceGroup, models.Price{
-					Name:        "Cyber",
-					Description: cell.Value.(string),
-				})
-			}
-
-		case "C96":
-			if err == nil {
-
-				policy.OffersPrices["default"]["yearly"].Net = s
-				policy.PriceNett = s
-			}
-
-		case "C97":
-			if err == nil {
-				policy.TaxAmount = s
-			}
-
-		case "C98":
-			if err == nil {
-				policy.OffersPrices["default"]["yearly"].Gross = s
-			}
-
-		case "C99":
-
-		case "C100":
-
-		default:
-
+		case totalNetYearlyCellValue:
+			policy.OffersPrices["default"]["yearly"].Net = parsedValue
+			policy.PriceNett = parsedValue
+		case totalTaxAmountYearlyCellValue:
+			policy.TaxAmount = parsedValue
+		case totalGrossYearlyCellValue:
+			policy.OffersPrices["default"]["yearly"].Gross = parsedValue
+			policy.PriceGross = parsedValue
 		}
 	}
-	policy.PriceGroup = priceGroup
+
+	if hasQuoteError {
+		reserved := models.ReservedData{
+			Id:          quoteErrorReservedDataId,
+			Name:        "quote",
+			Description: "Quotazione non effettuata",
+		}
+		policy.ReservedInfo.ReservedReasons = append(policy.ReservedInfo.ReservedReasons, reserved)
+	}
 
 	if policy.Attachments == nil {
 		policy.Attachments = new([]models.Attachment)
@@ -659,6 +499,15 @@ func getBuildingGuaranteCellsBySlug(guarante models.Guarante, buildingColumn str
 	return cells
 }
 
+func parseCellValue(value interface{}) (float64, error) {
+	return strconv.ParseFloat(
+		strings.Trim(strings.Replace(strings.Replace(value.(string), ".", "", -1), ",", ".", -1), " "), 64)
+}
+
+func hasQuoteErrorFn(r models.ReservedData) bool {
+	return r.Id == quoteErrorReservedDataId
+}
+
 // Enterprise Guarantees Slugs
 const (
 	electricalPhenomenonGuaranteeSlug             string = "electrical-phenomenon"
@@ -783,8 +632,62 @@ const (
 	paymentSplitSemestralValue         = "Semestrale"
 )
 
+// Output Cells Column Indeces
 const (
-	dateFormat = "02/01/2006"
+	grossYearlyValueColumn     = "L"
+	netYearlyValueColumn       = "N"
+	taxAmountYearlyValueColumn = "P"
+	taxValueColumn             = "J"
+)
+
+// Output Cells Row Indeces
+const (
+	totalBuildingValueRow               = "81"
+	totalStockValueRow                  = "82"
+	totalStockTemporaryIncreaseValueRow = "83"
+	totalTheftValueRow                  = "84"
+	totalRentalRiskValueRow             = "85"
+	totalOtherContentValueRow           = "86"
+	totalThirdPartyRecourseValueRow     = "87"
+	totalFormulaValueRow                = "88"
+	totalLossRentValueRow               = "89"
+	totalThirdPartyLiabilityValueRow    = "90"
+	totalWorkEmployersLiabilityValueRow = "91"
+	totalProductLiabilityValueRow       = "92"
+	totalProductWithdrawalValueRow      = "93"
+	totalManagementOrganizationValueRow = "94"
+	totalCyberValueRow                  = "95"
+)
+
+// Output Cells Value Mapping
+const (
+	totalNetYearlyCellValue       = "C96"
+	totalTaxAmountYearlyCellValue = "C97"
+	totalGrossYearlyCellValue     = "C98"
+)
+
+// Price Group Section Names
+const (
+	totalBuildingPriceGroupTitle               = "Fabbricato"
+	totalStockPriceGroupTitle                  = "Contenuto (Merci e Macchinari)"
+	totalStockTemporaryIncreasePriceGroupTitle = "Merci (aumento temporaneo)"
+	totalTheftPriceGroupTitle                  = "Furto, rapina, estorsione (in aumento)"
+	totalRentalRiskPriceGroupTitle             = "Rischio locativo (in aumento)"
+	totalOtherContentPriceGroupTitle           = "Altre garanzie su Contenuto"
+	totalThirdPartyRecoursePriceGroupTitle     = "Ricorso terzi (in aumento)"
+	totalFormulaPriceGroupTitle                = "Danni indiretti"
+	totalLossRentPriceGroupTitle               = "Perdita Pigioni"
+	totalThirdPartyLiabilityPriceGroupTitle    = "Responsabilità civile terzi"
+	totalWorkEmployersLiabilityPriceGroupTitle = "Responsabilità civile prestatori lavoro"
+	totalProductLiabilityPriceGroupTitle       = "Responsabilità civile prodotti"
+	totalProductWithdrawalPriceGroupTitle      = "Ritiro Prodotti"
+	totalManagementOrganizationPriceGroupTitle = "Resp. Amministratori Sindaci Dirigenti (D&O)"
+	totalCyberPriceGroupTitle                  = "Cyber"
+)
+
+const (
+	dateFormat               = "02/01/2006"
+	quoteErrorReservedDataId = 10
 )
 
 var buildingMap = map[int]string{
@@ -803,4 +706,22 @@ var booleanMap = map[bool]string{
 var paymentSplitMap = map[string]string{
 	string(models.PaySplitYearly):    paymentSplitYearlyValue,
 	string(models.PaySplitSemestral): paymentSplitSemestralValue,
+}
+
+var totalBySectionMap = map[string]string{
+	totalBuildingValueRow:               totalBuildingPriceGroupTitle,
+	totalStockValueRow:                  totalStockPriceGroupTitle,
+	totalStockTemporaryIncreaseValueRow: totalStockTemporaryIncreasePriceGroupTitle,
+	totalTheftValueRow:                  totalTheftPriceGroupTitle,
+	totalRentalRiskValueRow:             totalRentalRiskPriceGroupTitle,
+	totalOtherContentValueRow:           totalOtherContentPriceGroupTitle,
+	totalThirdPartyRecourseValueRow:     totalThirdPartyRecoursePriceGroupTitle,
+	totalFormulaValueRow:                totalFormulaPriceGroupTitle,
+	totalLossRentValueRow:               totalLossRentPriceGroupTitle,
+	totalThirdPartyLiabilityValueRow:    totalThirdPartyLiabilityPriceGroupTitle,
+	totalWorkEmployersLiabilityValueRow: totalWorkEmployersLiabilityPriceGroupTitle,
+	totalProductLiabilityValueRow:       totalProductLiabilityPriceGroupTitle,
+	totalProductWithdrawalValueRow:      totalProductWithdrawalPriceGroupTitle,
+	totalManagementOrganizationValueRow: totalManagementOrganizationPriceGroupTitle,
+	totalCyberValueRow:                  totalCyberPriceGroupTitle,
 }
