@@ -15,10 +15,6 @@ import (
 	"github.com/wopta/goworkspace/sellable"
 )
 
-const (
-	dateFormat = "02/01/2006"
-)
-
 func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
 		err        error
@@ -79,6 +75,54 @@ func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 
 	return string(policyJson), dbPolicy, err
 }
+
+func resetCells() []Cell {
+	headingCellList := []string{producerValueCell, enterpriseNameValueCell, startDateValueCell, endDateValueCell, vatCodeValueCell}
+	buildingsCellList := make([]string, 0)
+	for _, column := range buildingMap {
+		buildingsCellList = append(buildingsCellList,
+			column+naicsCategoryValueRow, column+naicsDetailValueRow, column+naicsValueRow,
+			column+postalCodeValueRow, column+provinceValueRow, column+cityValueRow, column+addressValueRow,
+			column+buildingMaterialValueRow, column+sandwichPanelValueRow, column+alarmValueRow, column+sprinklerValueRow,
+			column+buildingValueRow, column+rentalRiskValueRow, column+machineryValueRow, column+stockValueRow, column+stockTemporaryIncreaseValueRow,
+		)
+	}
+	enterpriseCellList := []string{
+		employeeNumberValueCell, remunerationValueCell, revenueValueCell, revenueUsaCanValueCell,
+		stockTemporaryIncreaseDurationCell, thirdPartyRecourseValueCell, electricalPhenomenonValueCell,
+		refrigerationStockValueCell, machineryBreakdownValueCell, electronicEquipmentValueCell, theftValueCell,
+		dailyAllowanceValueCell, increasedCostValueCell, lossRentValueCell, stockTemporaryIncreaseDateCell,
+		dailyAllowanceDurationCell, thirdPartyLiabilityWorkProvidersValueCell, managementOrganizationTotalAssetCell,
+		managementOrganizationOwnCapitalCell, thirdPartyLiabilityWorkProvidersRetroactiveDateCell,
+		productLiabilityRetroactiveDateCell, productLiabilityRetroactiveDateUsaCanCell, managementOrganizationDateCell,
+		productWithdrawalDateCell,
+	}
+	discountCellList := []string{discountGoodsValueCell, discountTheftValueCell, discountLiabilityValueCell}
+
+	toEmptyCells := make([]string, 0)
+	toEmptyCells = append(toEmptyCells, headingCellList...)
+	toEmptyCells = append(toEmptyCells, buildingsCellList...)
+	toEmptyCells = append(toEmptyCells, enterpriseCellList...)
+	toEmptyCells = append(toEmptyCells, discountCellList...)
+
+	initializedCells := []Cell{
+		{Cell: firstRateMergerValueCell, Value: yesValue},
+		{Cell: paymentSplitValueCell, Value: paymentSplitYearlyValue},
+		{Cell: bondValueCell, Value: noValue},
+		{Cell: formulaValueCell, Value: formulaExcludedValue},
+		{Cell: productLiabilityValueCell, Value: noValue},
+		{Cell: managementOrganizationValueCell, Value: noValue},
+		{Cell: productWithdrawalChoiceCell, Value: noValue},
+		{Cell: cyberValueCell, Value: noValue},
+	}
+
+	for _, cell := range toEmptyCells {
+		initializedCells = append(initializedCells, Cell{cell, emptyValue})
+	}
+
+	return initializedCells
+}
+
 func setOutputCell() []Cell {
 
 	res := []Cell{{
@@ -126,6 +170,7 @@ func setOutputCell() []Cell {
 
 	return res
 }
+
 func mapCellPolicy(policy *models.Policy, cells []Cell, gsLink string) {
 	var priceGroup []models.Price
 
@@ -396,62 +441,35 @@ func mapCellPolicy(policy *models.Policy, cells []Cell, gsLink string) {
 		(*policy.Attachments)[quoteAttIdx].Link = gsLink
 	}
 }
+
 func setInputCell(policy *models.Policy) []Cell {
 	var inputCells []Cell
-	paymentSplits := map[string]string{
 
-		"yearly":    "Annuale",
-		"semestral": "Semestrale",
-	}
-	assEnterprise := getAssetByType(policy, "enterprise")
-	assBuildings := getAssetByType(policy, "building")
+	assEnterprise := getAssetByType(policy, models.AssetTypeEnterprise)
+	assBuildings := getAssetByType(policy, models.AssetTypeBuilding)
 
-	inputCells = append(inputCells, Cell{Cell: "C10", Value: policy.StartDate.Format(dateFormat)})
-	inputCells = append(inputCells, Cell{Cell: "C11", Value: policy.StartDate.AddDate(1, 0, 0).Format(dateFormat)})
+	inputCells = append(inputCells, Cell{Cell: startDateValueCell, Value: policy.StartDate.Format(dateFormat)})
+	inputCells = append(inputCells, Cell{Cell: paymentSplitValueCell, Value: paymentSplitMap[policy.PaymentSplit]})
+	inputCells = append(inputCells, Cell{Cell: endDateValueCell, Value: policy.EndDate.Format(dateFormat)})
+
 	inputCells = append(inputCells, setEnterpriseCell(assEnterprise[0])...)
-	inputCells = append(inputCells, Cell{Cell: "C24", Value: assEnterprise[0].Enterprise.Employer})
-	inputCells = append(inputCells, Cell{Cell: "C25", Value: assEnterprise[0].Enterprise.WorkEmployersRemuneration})
-	inputCells = append(inputCells, Cell{Cell: "C26", Value: assEnterprise[0].Enterprise.TotalBilled})
-	inputCells = append(inputCells, Cell{Cell: "C16", Value: paymentSplits[policy.PaymentSplit]})
-	if policy.PaymentSplit == "semestral" {
-		inputCells = append(inputCells, Cell{Cell: "C16", Value: "Semestrale"})
-	}
-	if policy.PaymentSplit == "yearly" {
-		inputCells = append(inputCells, Cell{Cell: "C16", Value: "Annuale"})
-	}
-	for _, eg := range assEnterprise[0].Guarantees {
 
-		inputCells = append(inputCells, getEnterpriseGuaranteCellsBySlug(eg)...)
-	}
 	for i, build := range assBuildings {
-		col := map[int]string{0: "C", 1: "D", 2: "E", 3: "F", 4: "G"}
+		buildingColumn := buildingMap[i]
+		inputCells = append(inputCells, Cell{Cell: buildingColumn + naicsCategoryValueRow, Value: build.Building.NaicsCategory})
+		inputCells = append(inputCells, Cell{Cell: buildingColumn + naicsDetailValueRow, Value: build.Building.NaicsDetail})
+		inputCells = append(inputCells, Cell{Cell: buildingColumn + naicsValueRow, Value: build.Building.Naics})
+		inputCells = append(inputCells, Cell{Cell: buildingColumn + postalCodeValueRow, Value: build.Building.BuildingAddress.PostalCode})
+		inputCells = append(inputCells, Cell{Cell: buildingColumn + provinceValueRow, Value: build.Building.BuildingAddress.Locality})
+		inputCells = append(inputCells, Cell{Cell: buildingColumn + cityValueRow, Value: build.Building.BuildingAddress.City})
+		inputCells = append(inputCells, Cell{Cell: buildingColumn + addressValueRow, Value: build.Building.BuildingAddress.StreetName})
+		inputCells = append(inputCells, Cell{Cell: buildingColumn + buildingMaterialValueRow, Value: build.Building.BuildingMaterial})
+		inputCells = append(inputCells, Cell{Cell: buildingColumn + sandwichPanelValueRow, Value: booleanMap[build.Building.HasSandwichPanel]})
+		inputCells = append(inputCells, Cell{Cell: buildingColumn + alarmValueRow, Value: booleanMap[build.Building.HasAlarm]})
+		inputCells = append(inputCells, Cell{Cell: buildingColumn + sprinklerValueRow, Value: booleanMap[build.Building.HasSprinkler]})
 		for _, bg := range build.Guarantees {
-			inputCells = append(inputCells, Cell{Cell: col[i] + "29", Value: build.Building.BuildingAddress.PostalCode})
-			inputCells = append(inputCells, Cell{Cell: col[i] + "30", Value: build.Building.BuildingAddress.Locality})
-			inputCells = append(inputCells, Cell{Cell: col[i] + "31", Value: build.Building.BuildingAddress.City})
-			inputCells = append(inputCells, Cell{Cell: col[i] + "32", Value: build.Building.BuildingAddress.StreetName})
-			inputCells = append(inputCells, Cell{Cell: col[i] + "19", Value: build.Building.NaicsCategory})
-			inputCells = append(inputCells, Cell{Cell: col[i] + "20", Value: build.Building.NaicsDetail})
-			inputCells = append(inputCells, Cell{Cell: col[i] + "21", Value: build.Building.Naics})
-			inputCells = append(inputCells, Cell{Cell: col[i] + "33", Value: build.Building.BuildingMaterial})
-			if build.Building.HasSandwichPanel {
-				inputCells = append(inputCells, Cell{Cell: col[i] + "34", Value: "SI"})
-			} else {
-				inputCells = append(inputCells, Cell{Cell: col[i] + "34", Value: "NO"})
-			}
-			if build.Building.HasAlarm {
-				inputCells = append(inputCells, Cell{Cell: col[i] + "35", Value: "SI"})
-			} else {
-				inputCells = append(inputCells, Cell{Cell: col[i] + "35", Value: "NO"})
-			}
-			if build.Building.HasSprinkler {
-				inputCells = append(inputCells, Cell{Cell: col[i] + "36", Value: "SI"})
-			} else {
-				inputCells = append(inputCells, Cell{Cell: col[i] + "36", Value: "NO"})
-			}
-			inputCells = append(inputCells, getBuildingGuaranteCellsBySlug(bg, i)...)
+			inputCells = append(inputCells, getBuildingGuaranteCellsBySlug(bg, buildingColumn)...)
 		}
-
 	}
 
 	for _, c := range inputCells {
@@ -460,319 +478,329 @@ func setInputCell(policy *models.Policy) []Cell {
 
 	return inputCells
 }
-func setEnterpriseCell(assets models.Asset) []Cell {
+
+func setEnterpriseCell(asset models.Asset) []Cell {
 	var inputCells []Cell
-
-	inputCells = append(inputCells, Cell{Cell: "E6", Value: assets.Enterprise.VatCode})
-	inputCells = append(inputCells, Cell{Cell: "C5", Value: assets.Enterprise.Name})
-
+	inputCells = append(inputCells, Cell{Cell: vatCodeValueCell, Value: asset.Enterprise.VatCode})
+	inputCells = append(inputCells, Cell{Cell: enterpriseNameValueCell, Value: asset.Enterprise.Name})
+	inputCells = append(inputCells, Cell{Cell: employeeNumberValueCell, Value: asset.Enterprise.Employer})
+	inputCells = append(inputCells, Cell{Cell: remunerationValueCell, Value: asset.Enterprise.WorkEmployersRemuneration})
+	inputCells = append(inputCells, Cell{Cell: revenueValueCell, Value: asset.Enterprise.TotalBilled})
+	inputCells = append(inputCells, Cell{Cell: revenueUsaCanValueCell, Value: asset.Enterprise.NorthAmericanMarket})
+	for _, eg := range asset.Guarantees {
+		inputCells = append(inputCells, getEnterpriseGuaranteCellsBySlug(eg)...)
+	}
 	return inputCells
 }
 
-func getAssetByType(policy *models.Policy, asstype string) []models.Asset {
-	var (
-		assets []models.Asset
-	)
+func getAssetByType(policy *models.Policy, assetType string) []models.Asset {
+	var assets []models.Asset
 	for _, asset := range policy.Assets {
-		if asset.Type == asstype {
+		if asset.Type == assetType {
 			assets = append(assets, asset)
 		}
-
 	}
 	return assets
 }
-func getAssetGuarante(assets *models.Asset, slug string) models.Guarante {
-	var (
-		guarante models.Guarante
-	)
-	for _, g := range assets.Guarantees {
-		if g.Slug == slug {
-			guarante = g
-		}
 
-	}
-	return guarante
-}
 func getEnterpriseGuaranteCellsBySlug(guarante models.Guarante) []Cell {
-	var (
-		cells []Cell
-	)
+	var cells []Cell
 	switch guarante.Slug {
-
-	case "electrical-phenomenon":
-		cells = []Cell{
-			{
-				Cell:  "C48",
-				Value: guarante.Value.SumInsuredLimitOfIndemnity,
-			},
-		}
-	case "refrigeration-stock":
-		cells = []Cell{
-			{
-				Cell:  "C49",
-				Value: guarante.Value.SumInsuredLimitOfIndemnity,
-			},
-		}
-	case "machinery-breakdown":
-		cells = []Cell{
-			{
-				Cell:  "C50",
-				Value: guarante.Value.SumInsuredLimitOfIndemnity,
-			},
-		}
-	case "electronic-equipment":
-		cells = []Cell{
-			{
-				Cell:  "C51",
-				Value: guarante.Value.SumInsuredLimitOfIndemnity,
-			},
-		}
-	case "theft":
-		cells = []Cell{
-			{
-				Cell:  "C52",
-				Value: guarante.Value.SumInsuredLimitOfIndemnity,
-			},
-			{
-				Cell:  "G81",
-				Value: int(guarante.Value.Discount),
-			},
-		}
-	case "third-party-recourse":
-		cells = []Cell{
-			{
-				Cell:  "C47",
-				Value: guarante.Value.SumInsuredLimitOfIndemnity,
-			},
-		}
-	case "third-party-liability-work-providers":
-		cells = []Cell{
-			{
-				Cell:  "C66",
-				Value: guarante.Value.SumInsuredLimitOfIndemnity,
-			},
-			{
-				Cell:  "F66",
-				Value: guarante.Value.RetroactiveDate.Format(dateFormat),
-			},
-			{
-				Cell:  "G82",
-				Value: int(guarante.Value.Discount),
-			},
-		}
-	case "product-liability":
-		cells = []Cell{
-			{
-				Cell:  "C67",
-				Value: guarante.Value.SumInsuredLimitOfIndemnity,
-			},
-			{
-				Cell:  "F67",
-				Value: guarante.Value.RetroactiveDate.Format(dateFormat),
-			},
-			{
-				Cell:  "F68",
-				Value: guarante.Value.RetroactiveUsaCanDate.Format(dateFormat),
-			},
-		}
-	case "management-organization":
-		cells = []Cell{
-			{
-				Cell:  "C69",
-				Value: guarante.Value.SumInsuredLimitOfIndemnity,
-			},
-			{
-				Cell:  "C70",
-				Value: guarante.Value.SumInsured,
-			}, {
-				Cell:  "C69",
-				Value: guarante.Value.LimitOfIndemnity,
-			},
-			{
-				Cell:  "C68",
-				Value: "SI",
-			},
-			{
-				Cell:  "F70",
-				Value: guarante.Value.StartDate.Format(dateFormat),
-			},
-		}
-	case "cyber":
-		cells = []Cell{
-			{
-				Cell:  "C74",
-				Value: guarante.Value.SumInsuredLimitOfIndemnity,
-			},
-		}
-	case "daily-allowance":
-		cells = []Cell{
-			{
-				Cell:  "C58",
-				Value: guarante.Value.SumInsuredLimitOfIndemnity,
-			}, {
-				Cell:  "C57",
-				Value: "Diaria Giornaliera",
-			},
-			{
-				Cell:  "E58",
-				Value: guarante.Value.Duration.Day,
-			},
-		}
-	case "additional-compensation":
-		cells = []Cell{
-
-			{
-				Cell:  "C57",
-				Value: "Indennità Aggiuntiva (+10%)",
-			},
-		}
-	case "increased-cost":
-		cells = []Cell{
-			{
-				Cell:  "C59",
-				Value: guarante.Value.SumInsuredLimitOfIndemnity,
-			},
-			{
-				Cell:  "C57",
-				Value: "Maggiori Costi",
-			},
-		}
-	case "loss-rent":
-		cells = []Cell{
-			{
-				Cell:  "C61",
-				Value: guarante.Value.SumInsuredLimitOfIndemnity,
-			},
-		}
-	case "management-organization-continuity":
-		cells = []Cell{
-			{
-				Cell:  "F70",
-				Value: guarante.Value.StartDate.Format(dateFormat),
-			},
-		}
-
-	case "product-withdrawal":
-		cells = []Cell{
-			{
-				Cell:  "F69",
-				Value: "SI",
-			},
-			{
-				Cell:  "C93",
-				Value: guarante.Value.SumInsuredLimitOfIndemnity,
-			},
-			{
-				Cell:  "G69",
-				Value: guarante.Value.StartDate.Format(dateFormat),
-			},
-		}
-
-	}
-
-	return cells
-}
-func getBuildingGuaranteCellsBySlug(guarante models.Guarante, colum int) []Cell {
-	var (
-		cells []Cell
-	)
-	col := map[int]string{0: "C", 1: "D", 2: "E", 3: "F", 4: "G"}
-	switch guarante.Slug {
-	case "building":
-		cells = []Cell{
-			{
-				Cell:  col[colum] + "41",
-				Value: guarante.Value.SumInsuredLimitOfIndemnity,
-			},
-			{
-				Cell:  "G80",
-				Value: int(guarante.Value.Discount),
-			},
-		}
-
-	case "rental-risk":
-		cells = []Cell{
-			{
-				Cell:  col[colum] + "42",
-				Value: guarante.Value.SumInsuredLimitOfIndemnity,
-			},
-		}
-	case "machinery":
-		cells = []Cell{
-			{
-				Cell:  col[colum] + "43",
-				Value: guarante.Value.SumInsuredLimitOfIndemnity,
-			},
-		}
-	case "stock":
-		cells = []Cell{
-			{
-				Cell:  col[colum] + "44",
-				Value: guarante.Value.SumInsuredLimitOfIndemnity,
-			},
-		}
-	case "stock-temporary-increase":
-		cells = []Cell{
-			{
-				Cell:  col[colum] + "45",
-				Value: guarante.Value.SumInsuredLimitOfIndemnity,
-			},
-		}
-		if guarante.Value.StartDateString != "" {
-			cells = append(cells, []Cell{
-
-				{
-					Cell:  "E46",
-					Value: guarante.Value.StartDateString,
-				},
-				{
-					Cell:  "C46",
-					Value: guarante.Value.Duration.Day,
-				}}...)
-		}
-
+	case electricalPhenomenonGuaranteeSlug:
+		cells = []Cell{{
+			Cell:  electricalPhenomenonValueCell,
+			Value: guarante.Value.SumInsuredLimitOfIndemnity,
+		}}
+	case refrigerationStockGuaranteeSlug:
+		cells = []Cell{{
+			Cell:  refrigerationStockValueCell,
+			Value: guarante.Value.SumInsuredLimitOfIndemnity,
+		}}
+	case machineryBreakdownGuaranteeSlug:
+		cells = []Cell{{
+			Cell:  machineryBreakdownValueCell,
+			Value: guarante.Value.SumInsuredLimitOfIndemnity,
+		}}
+	case electronicEquipmentGuaranteeSlug:
+		cells = []Cell{{
+			Cell:  electronicEquipmentValueCell,
+			Value: guarante.Value.SumInsuredLimitOfIndemnity,
+		}}
+	case theftGuaranteeSlug:
+		cells = []Cell{{
+			Cell:  theftValueCell,
+			Value: guarante.Value.SumInsuredLimitOfIndemnity,
+		}, {
+			Cell:  theftDiscountCell,
+			Value: int(guarante.Value.Discount),
+		}}
+	case thirdPartyRecourseGuaranteeSlug:
+		cells = []Cell{{
+			Cell:  thirdPartyRecourseValueCell,
+			Value: guarante.Value.SumInsuredLimitOfIndemnity,
+		}}
+	case thirdPartyLiabilityWorkProvidersGuaranteeSlug:
+		cells = []Cell{{
+			Cell:  thirdPartyLiabilityWorkProvidersValueCell,
+			Value: guarante.Value.SumInsuredLimitOfIndemnity,
+		}, {
+			Cell:  thirdPartyLiabilityWorkProvidersRetroactiveDateCell,
+			Value: guarante.Value.RetroactiveDate.Format(dateFormat),
+		}, {
+			Cell:  thirdPartyLiabilityWorkProvidersDiscountCell,
+			Value: int(guarante.Value.Discount),
+		}}
+	case productLiabilityGuaranteeSlug:
+		cells = []Cell{{
+			Cell:  productLiabilityValueCell,
+			Value: guarante.Value.SumInsuredLimitOfIndemnity,
+		}, {
+			Cell:  productLiabilityRetroactiveDateCell,
+			Value: guarante.Value.RetroactiveDate.Format(dateFormat),
+		}, {
+			Cell:  productLiabilityRetroactiveDateUsaCanCell,
+			Value: guarante.Value.RetroactiveUsaCanDate.Format(dateFormat),
+		}}
+	case managementOrganizationGuaranteeSlug:
+		cells = []Cell{{
+			Cell:  managementOrganizationValueCell,
+			Value: guarante.Value.SumInsuredLimitOfIndemnity,
+		}, {
+			Cell:  managementOrganizationTotalAssetCell,
+			Value: guarante.Value.LimitOfIndemnity,
+		}, {
+			Cell:  managementOrganizationOwnCapitalCell,
+			Value: guarante.Value.SumInsured,
+		}, {
+			Cell:  managementOrganizationDateCell,
+			Value: guarante.Value.StartDate.Format(dateFormat),
+		}}
+	case cyberGuranteeSlug:
+		cells = []Cell{{
+			Cell:  cyberValueCell,
+			Value: guarante.Value.SumInsuredLimitOfIndemnity,
+		}}
+	case dailyAllowanceGuaranteeSlug:
+		cells = []Cell{{
+			Cell:  dailyAllowanceValueCell,
+			Value: guarante.Value.SumInsuredLimitOfIndemnity,
+		}, {
+			Cell:  formulaValueCell,
+			Value: formulaDailyAllowanceValue,
+		}, {
+			Cell:  dailyAllowanceDurationCell,
+			Value: guarante.Value.Duration.Day,
+		}}
+	case additionalCompensationGuaranteeSlug:
+		cells = []Cell{{
+			Cell:  formulaValueCell,
+			Value: formulaAdditionalCompensationValue,
+		}}
+	case increasedCostGuaranteeSlug:
+		cells = []Cell{{
+			Cell:  increasedCostValueCell,
+			Value: guarante.Value.SumInsuredLimitOfIndemnity,
+		}, {
+			Cell:  formulaValueCell,
+			Value: formulaIncreasedCostValue,
+		}}
+	case lossRentGuaranteeSlug:
+		cells = []Cell{{
+			Cell:  lossRentValueCell,
+			Value: guarante.Value.SumInsuredLimitOfIndemnity,
+		}}
+	case productWithdrawalGuaranteeSlug:
+		cells = []Cell{{
+			Cell:  productWithdrawalChoiceCell,
+			Value: yesValue,
+		}, {
+			Cell:  productWithdrawalDateCell,
+			Value: guarante.Value.StartDate.Format(dateFormat),
+		}}
 	}
 	return cells
 }
 
-func resetCells() []Cell {
-	headingCellList := []string{"C4", "C5", "C6", "C7", "C8", "C9", "C10", "C11", "C15", "D9", "E6", "G6", "G8", "G9", "G10"}
-	buildingsCellList := []string{
-		"C19", "C20", "C21", "C29", "C30", "C31", "C32", "C33", "C34", "C35", "C36", "C41", "C42", "C43", "C44", "C45",
-		"D19", "D20", "D21", "D29", "D30", "D31", "D32", "D33", "D34", "D35", "D36", "D41", "D42", "D43", "D44", "D45",
-		"E19", "E20", "E21", "E29", "E30", "E31", "E32", "E33", "E34", "E35", "E36", "E41", "E42", "E43", "E44", "E45", "E46",
-		"F19", "F20", "F21", "F29", "F30", "F31", "F32", "F33", "F34", "F35", "F36", "F41", "F42", "F43", "F44", "F45",
-		"G19", "G20", "G21", "G29", "G30", "G31", "G32", "G33", "G34", "G35", "G36", "G41", "G42", "G43", "G44", "G45",
+func getBuildingGuaranteCellsBySlug(guarante models.Guarante, buildingColumn string) []Cell {
+	var cells []Cell
+	switch guarante.Slug {
+	case buildingGuaranteeSlug:
+		cells = []Cell{{
+			Cell:  buildingColumn + buildingValueRow,
+			Value: guarante.Value.SumInsuredLimitOfIndemnity,
+		}}
+	case rentalRiskGuaranteeSlug:
+		cells = []Cell{{
+			Cell:  buildingColumn + rentalRiskValueRow,
+			Value: guarante.Value.SumInsuredLimitOfIndemnity,
+		}}
+	case machineryGuaranteeSlug:
+		cells = []Cell{{
+			Cell:  buildingColumn + machineryValueRow,
+			Value: guarante.Value.SumInsuredLimitOfIndemnity,
+		}}
+	case stockGuaranteeSlug:
+		cells = []Cell{{
+			Cell:  buildingColumn + stockValueRow,
+			Value: guarante.Value.SumInsuredLimitOfIndemnity,
+		}}
+	case stockTemporaryIncreaseGuaranteeSlug:
+		cells = []Cell{{
+			Cell:  buildingColumn + stockTemporaryIncreaseValueRow,
+			Value: guarante.Value.SumInsuredLimitOfIndemnity,
+		}, {
+			Cell:  stockTemporaryIncreaseDateCell,
+			Value: guarante.Value.StartDateString,
+		}, {
+			Cell:  stockTemporaryIncreaseDurationCell,
+			Value: guarante.Value.Duration.Day,
+		}}
 	}
-	enterpriseCellList := []string{
-		"C24", "C25", "C26", "C27",
-		"C46", "C47", "C48", "C49", "C50", "C51", "C52",
-		"C58", "C59", "C61", "E58",
-		"C66", "C69", "C70", "F66", "F67", "F68", "F70", "G69",
-		"C93",
-	}
-	discountCellList := []string{"G80", "G81", "G82"}
+	return cells
+}
 
-	allCells := make([]string, 0)
-	allCells = append(allCells, headingCellList...)
-	allCells = append(allCells, buildingsCellList...)
-	allCells = append(allCells, enterpriseCellList...)
-	allCells = append(allCells, discountCellList...)
+// Enterprise Guarantees Slugs
+const (
+	electricalPhenomenonGuaranteeSlug             string = "electrical-phenomenon"
+	refrigerationStockGuaranteeSlug               string = "refrigeration-stock"
+	machineryBreakdownGuaranteeSlug               string = "machinery-breakdown"
+	electronicEquipmentGuaranteeSlug              string = "electronic-equipment"
+	theftGuaranteeSlug                            string = "theft"
+	thirdPartyRecourseGuaranteeSlug               string = "third-party-recourse"
+	thirdPartyLiabilityWorkProvidersGuaranteeSlug string = "third-party-liability-work-providers"
+	productLiabilityGuaranteeSlug                 string = "product-liability"
+	managementOrganizationGuaranteeSlug           string = "management-organization"
+	cyberGuranteeSlug                             string = "cyber"
+	dailyAllowanceGuaranteeSlug                   string = "daily-allowance"
+	additionalCompensationGuaranteeSlug           string = "additional-compensation"
+	increasedCostGuaranteeSlug                    string = "increased-cost"
+	lossRentGuaranteeSlug                         string = "loss-rent"
+	productWithdrawalGuaranteeSlug                string = "product-withdrawal"
+)
 
-	initializedCells := []Cell{
-		{Cell: "C14", Value: "SI"},
-		{Cell: "C16", Value: "Annuale"},
-		{Cell: "G11", Value: "NO"},
-		{Cell: "C57", Value: "Esclusa"},
-		{Cell: "C67", Value: "NO"},
-		{Cell: "C68", Value: "NO"},
-		{Cell: "F69", Value: "NO"},
-		{Cell: "C74", Value: "NO"},
-	}
+// Enterprise Guarantees Cell Mapping
+const (
+	electricalPhenomenonValueCell                       = "C48"
+	refrigerationStockValueCell                         = "C49"
+	machineryBreakdownValueCell                         = "C50"
+	electronicEquipmentValueCell                        = "C51"
+	theftValueCell                                      = "C52"
+	theftDiscountCell                                   = "G81"
+	thirdPartyRecourseValueCell                         = "C47"
+	thirdPartyLiabilityWorkProvidersValueCell           = "C66"
+	thirdPartyLiabilityWorkProvidersRetroactiveDateCell = "F66"
+	thirdPartyLiabilityWorkProvidersDiscountCell        = "G82"
+	productLiabilityValueCell                           = "C67"
+	productLiabilityRetroactiveDateCell                 = "F67"
+	productLiabilityRetroactiveDateUsaCanCell           = "F68"
+	managementOrganizationValueCell                     = "C68"
+	managementOrganizationTotalAssetCell                = "C69"
+	managementOrganizationOwnCapitalCell                = "C70"
+	managementOrganizationDateCell                      = "F70"
+	cyberValueCell                                      = "C74"
+	dailyAllowanceValueCell                             = "C58"
+	dailyAllowanceDurationCell                          = "E58"
+	increasedCostValueCell                              = "C59"
+	formulaValueCell                                    = "C57"
+	lossRentValueCell                                   = "C61"
+	productWithdrawalChoiceCell                         = "F69"
+	productWithdrawalDateCell                           = "G69"
+)
 
-	for _, cell := range allCells {
-		initializedCells = append(initializedCells, Cell{cell, ""})
-	}
+// Building Guarantees Slugs
+const (
+	buildingGuaranteeSlug               string = "building"
+	rentalRiskGuaranteeSlug             string = "rental-risk"
+	machineryGuaranteeSlug              string = "machinery"
+	stockGuaranteeSlug                  string = "stock"
+	stockTemporaryIncreaseGuaranteeSlug string = "stock-temporary-increase"
+)
 
-	return initializedCells
+// Building Number Column Indeces
+const (
+	building1ValueColumn = "C"
+	building2ValueColumn = "D"
+	building3ValueColumn = "E"
+	building4ValueColumn = "F"
+	building5ValueColumn = "G"
+)
+
+// Building Guarantees Row Indeces
+const (
+	naicsCategoryValueRow          = "19"
+	naicsDetailValueRow            = "20"
+	naicsValueRow                  = "21"
+	postalCodeValueRow             = "29"
+	provinceValueRow               = "30"
+	cityValueRow                   = "31"
+	addressValueRow                = "32"
+	buildingMaterialValueRow       = "33"
+	sandwichPanelValueRow          = "34"
+	alarmValueRow                  = "35"
+	sprinklerValueRow              = "36"
+	buildingValueRow               = "41"
+	rentalRiskValueRow             = "42"
+	machineryValueRow              = "43"
+	stockValueRow                  = "44"
+	stockTemporaryIncreaseValueRow = "45"
+)
+
+// Global Building Guarantees Cell mapping
+const (
+	stockTemporaryIncreaseDateCell     = "E46"
+	stockTemporaryIncreaseDurationCell = "C46"
+)
+
+// Global Policy Cell Mapping
+const (
+	producerValueCell          = "C4"
+	enterpriseNameValueCell    = "C5"
+	vatCodeValueCell           = "E6"
+	startDateValueCell         = "C10"
+	endDateValueCell           = "C11"
+	paymentSplitValueCell      = "C16"
+	employeeNumberValueCell    = "C24"
+	remunerationValueCell      = "C25"
+	revenueValueCell           = "C26"
+	revenueUsaCanValueCell     = "C27"
+	discountGoodsValueCell     = "G80"
+	discountTheftValueCell     = "G81"
+	discountLiabilityValueCell = "G82"
+	firstRateMergerValueCell   = "C14"
+	bondValueCell              = "G11"
+)
+
+// Standard Values
+const (
+	formulaDailyAllowanceValue         = "Diaria Giornaliera"
+	formulaAdditionalCompensationValue = "Indennità Aggiuntiva (+10%)"
+	formulaIncreasedCostValue          = "Maggiori Costi"
+	formulaExcludedValue               = "Esclusa"
+	yesValue                           = "SI"
+	noValue                            = "NO"
+	emptyValue                         = ""
+	paymentSplitYearlyValue            = "Annuale"
+	paymentSplitSemestralValue         = "Semestrale"
+)
+
+const (
+	dateFormat = "02/01/2006"
+)
+
+var buildingMap = map[int]string{
+	0: building1ValueColumn,
+	1: building2ValueColumn,
+	2: building3ValueColumn,
+	3: building4ValueColumn,
+	4: building5ValueColumn,
+}
+
+var booleanMap = map[bool]string{
+	true:  yesValue,
+	false: noValue,
+}
+
+var paymentSplitMap = map[string]string{
+	string(models.PaySplitYearly):    paymentSplitYearlyValue,
+	string(models.PaySplitSemestral): paymentSplitSemestralValue,
 }
