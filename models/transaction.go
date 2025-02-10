@@ -107,7 +107,7 @@ func (t *Transaction) Normalize() {
 func (t *Transaction) BigQueryParse() {
 	data, err := json.Marshal(t)
 	if err != nil {
-		log.Println("ERROR Transaction "+t.Uid+" Marshal: ", err)
+		log.Printf("ERROR Transaction %s marshal: %v", t.Uid, err)
 		return
 	}
 
@@ -121,12 +121,10 @@ func (t *Transaction) BigQueryParse() {
 }
 
 func (t *Transaction) BigQuerySave(origin string) {
-	fireTransactions := lib.GetDatasetByEnv(origin, TransactionsCollection)
-
 	t.BigQueryParse()
 	log.Println("Transaction save BigQuery: " + t.Uid)
 
-	err := lib.InsertRowsBigQuery(WoptaDataset, fireTransactions, t)
+	err := lib.InsertRowsBigQuery(WoptaDataset, lib.TransactionsCollection, t)
 	if err != nil {
 		log.Println("ERROR Transaction "+t.Uid+" save BigQuery: ", err)
 		return
