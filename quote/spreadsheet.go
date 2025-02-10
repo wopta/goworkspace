@@ -79,14 +79,19 @@ func (qs *QuoteSpreadsheet) Spreadsheets() ([]Cell, string) {
 }
 
 func clearUnwantedSheetsAndCopyToSpreadsheet(sheetClient *sheets.Service, qs *QuoteSpreadsheet, ctx context.Context) error {
-	var exportSheetId int64
+	var originalSheetId, exportSheetId int64
 
 	ssRes, _ := sheetClient.Spreadsheets.Get(qs.Id).Context(ctx).Do()
 	for _, s := range ssRes.Sheets {
+		if s.Properties.Title == qs.SheetName {
+			originalSheetId = s.Properties.SheetId
+		}
 		if s.Properties.Title == qs.ExportedSheetName {
 			exportSheetId = s.Properties.SheetId
 		}
 	}
+
+	qs.export(sheetClient, ctx, originalSheetId, exportSheetId)
 
 	clearUnwantedSheetsReq := make([]*sheets.Request, 0)
 	clearLastSheetReq := make([]*sheets.Request, 0)
@@ -131,6 +136,35 @@ func clearUnwantedSheetsAndCopyToSpreadsheet(sheetClient *sheets.Service, qs *Qu
 	}
 
 	return nil
+}
+
+func (qs *QuoteSpreadsheet) export(sheetClient *sheets.Service, ctx context.Context, originalSheetId, exportSheetId int64) {
+	requests := make([]*sheets.Request, 0)
+	requests = append(requests, &sheets.Request{
+		CopyPaste: &sheets.CopyPasteRequest{
+			Source: &sheets.GridRange{
+				SheetId:          originalSheetId,
+				StartColumnIndex: 0,
+				EndColumnIndex:   100,
+				StartRowIndex:    0,
+				EndRowIndex:      300,
+			},
+			Destination: &sheets.GridRange{
+				SheetId:          exportSheetId,
+				StartColumnIndex: 0,
+				EndColumnIndex:   100,
+				StartRowIndex:    0,
+				EndRowIndex:      300,
+			},
+			PasteType: "PASTE_VALUES",
+		},
+	})
+	if _, err := sheetClient.Spreadsheets.BatchUpdate(qs.Id, &sheets.BatchUpdateSpreadsheetRequest{
+		Requests: requests,
+	}).Context(ctx).Do(); err != nil {
+		log.Panic(err)
+	}
+
 }
 
 func (qs *QuoteSpreadsheet) setInitCells(sheetClient *sheets.Service, ctx context.Context) {
