@@ -8,6 +8,14 @@ import (
 	"github.com/go-pdf/fpdf"
 )
 
+const emptyField = "======"
+
+type PolicyInfo struct {
+	Company            string
+	ProductDescription string
+	Code               string
+}
+
 type CustomerInfo struct {
 	Fullname   string
 	Address    string
@@ -19,15 +27,39 @@ type CustomerInfo struct {
 }
 
 type TransactionInfo struct {
-	PolicyCode     string
 	EffectiveDate  string
 	ExpirationDate string
 	PriceGross     float64
 }
 
 type ReceiptInfo struct {
+	PolicyInfo   PolicyInfo
 	CustomerInfo CustomerInfo
 	Transaction  TransactionInfo
+}
+
+func NewReceiptInfo() ReceiptInfo {
+	return ReceiptInfo{
+		PolicyInfo: PolicyInfo{
+			Company:            emptyField,
+			ProductDescription: emptyField,
+			Code:               emptyField,
+		},
+		CustomerInfo: CustomerInfo{
+			Fullname:   emptyField,
+			Address:    emptyField,
+			PostalCode: emptyField,
+			City:       emptyField,
+			Province:   emptyField,
+			Email:      emptyField,
+			Phone:      emptyField,
+		},
+		Transaction: TransactionInfo{
+			EffectiveDate:  emptyField,
+			ExpirationDate: emptyField,
+			PriceGross:     0,
+		},
+	}
 }
 
 func PaymentReceipt(info ReceiptInfo) ([]byte, error) {
@@ -56,7 +88,7 @@ func PaymentReceipt(info ReceiptInfo) ([]byte, error) {
 
 	pdf.Ln(20)
 
-	text = "Oggetto: Quietanza di pagamento polizza n. " + info.Transaction.PolicyCode
+	text = "Oggetto: Quietanza di pagamento polizza n. " + info.PolicyInfo.Code
 
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 4, text, "", fpdf.AlignLeft, false)
@@ -77,7 +109,7 @@ func PaymentReceipt(info ReceiptInfo) ([]byte, error) {
 	text = "La ringraziamo e Le porgiamo i nostri più cordiali saluti."
 	pdf.MultiCell(0, 4, text, "", fpdf.AlignLeft, false)
 
-	pdf.Ln(20)
+	pdf.Ln(15)
 
 	text = "RICEVUTA DI PAGAMENTO DEL PREMIO"
 	setBlackBoldFont(pdf, standardTextSize)
@@ -89,7 +121,7 @@ func PaymentReceipt(info ReceiptInfo) ([]byte, error) {
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 4, text, "", fpdf.AlignLeft, false)
 
-	pdf.Ln(15)
+	pdf.Ln(7)
 
 	setBlackBoldFont(pdf, standardTextSize)
 
@@ -116,6 +148,30 @@ func PaymentReceipt(info ReceiptInfo) ([]byte, error) {
 				align:     fpdf.AlignLeft,
 				border:    "",
 			},
+		},
+		{
+			{
+				text:      "COMPAGNIA:",
+				height:    5,
+				width:     pdf.GetStringWidth("COMPAGNIA:"),
+				textBold:  true,
+				fill:      false,
+				fillColor: rgbColor{},
+				align:     fpdf.AlignLeft,
+				border:    "",
+			},
+			{
+				text:      info.PolicyInfo.Company,
+				height:    5,
+				width:     100 - pdf.GetStringWidth("COMPAGNIA:"),
+				textBold:  false,
+				fill:      false,
+				fillColor: rgbColor{},
+				align:     fpdf.AlignLeft,
+				border:    "",
+			},
+		},
+		{
 			{
 				text:      "N. POLIZZA:",
 				height:    5,
@@ -127,9 +183,31 @@ func PaymentReceipt(info ReceiptInfo) ([]byte, error) {
 				border:    "",
 			},
 			{
-				text:      info.Transaction.PolicyCode,
+				text:      info.PolicyInfo.Code,
 				height:    5,
 				width:     90 - pdf.GetStringWidth("N. POLIZZA:"),
+				textBold:  false,
+				fill:      false,
+				fillColor: rgbColor{},
+				align:     fpdf.AlignLeft,
+				border:    "",
+			},
+		},
+		{
+			{
+				text:      "DESCRIZIONE:",
+				height:    5,
+				width:     pdf.GetStringWidth("DESCRIZIONE:"),
+				textBold:  true,
+				fill:      false,
+				fillColor: rgbColor{},
+				align:     fpdf.AlignLeft,
+				border:    "",
+			},
+			{
+				text:      info.PolicyInfo.ProductDescription,
+				height:    5,
+				width:     90 - pdf.GetStringWidth("DESCRIZIONE:"),
 				textBold:  false,
 				fill:      false,
 				fillColor: rgbColor{},
@@ -158,6 +236,8 @@ func PaymentReceipt(info ReceiptInfo) ([]byte, error) {
 				align:     fpdf.AlignLeft,
 				border:    "",
 			},
+		},
+		{
 			{
 				text:      "VALIDITA’ COPERTURA FINO AL:",
 				height:    5,
@@ -205,7 +285,7 @@ func PaymentReceipt(info ReceiptInfo) ([]byte, error) {
 
 	tableDrawer(pdf, table)
 
-	pdf.Ln(15)
+	pdf.Ln(7)
 
 	text = fmt.Sprintf("Il premio relativo alla presente quietanza, pari a %s è stato incassato il "+
 		"_____._________._____ in ___________________", formattedPriceGross)

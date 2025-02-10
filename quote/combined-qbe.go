@@ -3,14 +3,16 @@ package quote
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
+	"slices"
 	"strconv"
 	"strings"
 
 	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
+	plc "github.com/wopta/goworkspace/policy"
+	"github.com/wopta/goworkspace/sellable"
 )
 
 const (
@@ -19,24 +21,41 @@ const (
 
 func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		policy     *models.Policy
+		err        error
+		reqPolicy  *models.Policy
+		dbPolicy   models.Policy
 		inputCells []Cell
 	)
 
 	log.SetPrefix("[CombinedQbeFx] ")
-	defer log.SetPrefix("")
-
+	defer func() {
+		r.Body.Close()
+		if err != nil {
+			log.Printf("error: %s", err.Error())
+		}
+		log.Println("Handler end ---------------------------------------------")
+		log.SetPrefix("")
+	}()
 	log.Println("Handler start -----------------------------------------------")
 
-	req := lib.ErrorByte(io.ReadAll(r.Body))
-	defer r.Body.Close()
-	log.Println("Request: ", string(req))
-	err := json.Unmarshal(req, &policy)
-	lib.CheckError(err)
-	b, err := json.Marshal(policy)
-	log.Println("Request Marshal: ", string(b))
-	lib.CheckError(err)
-	inputCells = append(inputCells, setInputCell(policy)...)
+	if err = json.NewDecoder(r.Body).Decode(&reqPolicy); err != nil {
+		log.Println("error decoding request body")
+		return "", nil, err
+	}
+
+	if dbPolicy, err = plc.GetPolicy(reqPolicy.Uid, ""); err != nil {
+		log.Println("error getting policy from DB")
+		return "", nil, err
+	}
+
+	dbPolicy.Assets = reqPolicy.Assets
+
+	if err = sellable.CommercialCombined(&dbPolicy); err != nil {
+		log.Println("error on sellable")
+		return "", nil, err
+	}
+
+	inputCells = append(inputCells, setInputCell(&dbPolicy)...)
 	qs := QuoteSpreadsheet{
 		Id:                 "1tn0Jqce-r_JKdecExFOFVEJdGUaPYdGo31A9FOgvt-Y",
 		DestinationSheetId: "1tMi7NYFZu7AnV4WkVrD0yzy1Dt3d-wVs0iZwlOcxLrg",
@@ -45,16 +64,20 @@ func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		InitCells:          resetCells(),
 		SheetName:          "Input dati Polizza",
 		ExportedSheetName:  "Export",
-		ExportFilePrefix:   fmt.Sprintf("quote_%s_%s", policy.Name, policy.Uid),
+		ExportFilePrefix:   fmt.Sprintf("quote_%s_%s", dbPolicy.Name, dbPolicy.Uid),
 	}
 	outCells, gsLink := qs.Spreadsheets()
-	mapCellPolicy(policy, outCells, gsLink)
+	mapCellPolicy(&dbPolicy, outCells, gsLink)
 
-	policyJson, err := policy.Marshal()
-	log.Println("Response: ", string(policyJson))
-	log.Println("Handler end -------------------------------------------------")
+	if err = lib.SetFirestoreErr(lib.PolicyCollection, dbPolicy.Uid, dbPolicy); err != nil {
+		log.Println("error saving quote in policy")
+		return "", nil, err
+	}
+	dbPolicy.BigquerySave("")
 
-	return string(policyJson), policy, err
+	policyJson, err := dbPolicy.Marshal()
+
+	return string(policyJson), dbPolicy, err
 }
 func setOutputCell() []Cell {
 
@@ -108,7 +131,7 @@ func mapCellPolicy(policy *models.Policy, cells []Cell, gsLink string) {
 
 	var quoteAtt = models.Attachment{
 		Name:      "QUOTAZIONE",
-		FileName:  "Quotazione Excel",
+		FileName:  "Quotazione Excel.xlsx",
 		MimeType:  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 		Link:      gsLink,
 		IsPrivate: true,
@@ -116,16 +139,28 @@ func mapCellPolicy(policy *models.Policy, cells []Cell, gsLink string) {
 		Note:      "",
 	}
 
-	policy.IsReserved = true
-	policy.Channel = "network"
-
 	policy.OffersPrices = map[string]map[string]*models.Price{
 		"default": {
 			"yearly":  &models.Price{},
 			"monthly": &models.Price{},
 		},
 	}
+
 	for _, cell := range cells {
+		v := cell.Value.(string)
+		if strings.HasPrefix(v, "Errore") {
+			reserved := models.ReservedData{
+				Id:          10,
+				Name:        "quote",
+				Description: "Quotazione non effettuata",
+			}
+			if !slices.ContainsFunc(policy.ReservedInfo.ReservedReasons, func(r models.ReservedData) bool {
+				return r.Id == 10
+			}) {
+				policy.ReservedInfo.ReservedReasons = append(policy.ReservedInfo.ReservedReasons, reserved)
+			}
+		}
+
 		s, err := strconv.ParseFloat(strings.Trim(strings.Replace(strings.Replace(cell.Value.(string), ".", "", -1), ",", ".", -1), " "), 64)
 		log.Println(err)
 		switch cell.Cell {
@@ -347,16 +382,19 @@ func mapCellPolicy(policy *models.Policy, cells []Cell, gsLink string) {
 	}
 	policy.PriceGroup = priceGroup
 
-	if len(*policy.Attachments) == 0 {
-		*policy.Attachments = append(*policy.Attachments, quoteAtt)
-	} else {
-		for i := 0; i < len(*policy.Attachments); i++ {
-			if (*policy.Attachments)[i].Name == quoteAtt.Name {
-				(*policy.Attachments)[i].Link = gsLink
-			}
-		}
+	if policy.Attachments == nil {
+		policy.Attachments = new([]models.Attachment)
 	}
 
+	quoteAttIdx := slices.IndexFunc(*policy.Attachments, func(a models.Attachment) bool {
+		return a.Name == quoteAtt.Name
+	})
+
+	if quoteAttIdx == -1 {
+		*policy.Attachments = append(*policy.Attachments, quoteAtt)
+	} else {
+		(*policy.Attachments)[quoteAttIdx].Link = gsLink
+	}
 }
 func setInputCell(policy *models.Policy) []Cell {
 	var inputCells []Cell
@@ -566,13 +604,6 @@ func getEnterpriseGuaranteCellsBySlug(guarante models.Guarante) []Cell {
 				Value: guarante.Value.SumInsuredLimitOfIndemnity,
 			},
 		}
-	case "excluded-formula":
-		cells = []Cell{
-			{
-				Cell:  "C57",
-				Value: "Esclusa",
-			},
-		}
 	case "daily-allowance":
 		cells = []Cell{
 			{
@@ -709,7 +740,7 @@ func resetCells() []Cell {
 	buildingsCellList := []string{
 		"C19", "C20", "C21", "C29", "C30", "C31", "C32", "C33", "C34", "C35", "C36", "C41", "C42", "C43", "C44", "C45",
 		"D19", "D20", "D21", "D29", "D30", "D31", "D32", "D33", "D34", "D35", "D36", "D41", "D42", "D43", "D44", "D45",
-		"E19", "E20", "E21", "E29", "E30", "E31", "E32", "E33", "E34", "E35", "E36", "E41", "E42", "E43", "E44", "E45",
+		"E19", "E20", "E21", "E29", "E30", "E31", "E32", "E33", "E34", "E35", "E36", "E41", "E42", "E43", "E44", "E45", "E46",
 		"F19", "F20", "F21", "F29", "F30", "F31", "F32", "F33", "F34", "F35", "F36", "F41", "F42", "F43", "F44", "F45",
 		"G19", "G20", "G21", "G29", "G30", "G31", "G32", "G33", "G34", "G35", "G36", "G41", "G42", "G43", "G44", "G45",
 	}
@@ -718,6 +749,7 @@ func resetCells() []Cell {
 		"C46", "C47", "C48", "C49", "C50", "C51", "C52",
 		"C58", "C59", "C61", "E58",
 		"C66", "C69", "C70", "F66", "F67", "F68", "F70", "G69",
+		"C93",
 	}
 	discountCellList := []string{"G80", "G81", "G82"}
 

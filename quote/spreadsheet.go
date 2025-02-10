@@ -69,7 +69,7 @@ func (qs *QuoteSpreadsheet) Spreadsheets() ([]Cell, string) {
 		log.Printf("unable to load from GDrive: %v", err)
 		return res, ""
 	}
-	gsLink, err := saveToBucket(fmt.Sprintf("%s%s_%s.xls", bucketSavePath, qs.ExportFilePrefix, time.Now().Format("2006-1-2_15:04:05")), doc)
+	gsLink, err := saveToBucket(fmt.Sprintf("%s%s_%s.xlsx", bucketSavePath, qs.ExportFilePrefix, time.Now().Format("2006-1-2_15:04:05")), doc)
 	if err != nil {
 		log.Printf("unable to save to bucket: %v", err)
 		return res, ""

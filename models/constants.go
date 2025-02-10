@@ -30,6 +30,7 @@ const (
 	PolicyStatusDraftRenew         = "DraftRenew"
 	PolicyStatusRenewed            = "Renewed"
 	PolicyStatusUnsolved           = "Unsolved"
+	PolicyStatusManualSigned       = "ManualSigned"
 )
 
 func GetWaitForApprovalStatusList() []string {
@@ -173,6 +174,7 @@ const (
 	AxaCompany      string = "axa"
 	GlobalCompany   string = "global"
 	SogessurCompany string = "sogessur"
+	QBECompany      string = "qbe"
 )
 
 const (
@@ -229,11 +231,12 @@ const (
 )
 
 const (
-	InformationSetAttachmentName  = "Precontrattuale"
-	ProposalAttachmentName        = "Proposta"
-	ContractAttachmentName        = "Contratto"
-	RvmInstructionsAttachmentName = "Scheda Rapporto Visita Medica"
-	RvmSurveyAttachmentName       = "Rapporto Visita Medica"
+	InformationSetAttachmentName     = "Precontrattuale"
+	ProposalAttachmentName           = "Proposta"
+	ContractAttachmentName           = "Contratto"
+	ContractNonDigitalAttachmentName = "Contratto non digitale"
+	RvmInstructionsAttachmentName    = "Scheda Rapporto Visita Medica"
+	RvmSurveyAttachmentName          = "Rapporto Visita Medica"
 )
 
 const (
@@ -276,4 +279,9 @@ const (
 const (
 	QuoteTypeFixed    = "fixed"
 	QuoteTypeVariable = "variable"
+)
+
+const (
+	AssetTypeEnterprise = "enterprise"
+	AssetTypeBuilding   = "building"
 )

@@ -127,6 +127,7 @@ func LifeAxaEmit(w http.ResponseWriter, r *http.Request) (string, interface{}, e
 	}
 	df := lib.CsvToDataframe(cabCsv)
 	query, e := lifeAxaEmitQuery.FirestoreWherefields("transactions")
+	log.Println("LifeAxalEmit error: ", e)
 	query2, e := lifeAxaEmitQuery2.FirestoreWherefields("transactions")
 	log.Println("LifeAxalEmit error: ", e)
 

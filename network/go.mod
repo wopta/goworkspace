@@ -10,8 +10,8 @@ require (
 	cloud.google.com/go/pubsub v1.38.0
 	github.com/GoogleCloudPlatform/functions-framework-go v1.8.1
 	github.com/go-chi/chi/v5 v5.0.12
-	github.com/wopta/goworkspace/lib v1.0.134
-	github.com/wopta/goworkspace/models v1.2.24
+	github.com/wopta/goworkspace/lib v1.0.138
+	github.com/wopta/goworkspace/models v1.2.28
 	google.golang.org/api v0.181.0
 )
 
