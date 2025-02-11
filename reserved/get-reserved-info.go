@@ -17,6 +17,8 @@ func GetReservedInfo(policy *models.Policy) (bool, *models.ReservedInfo) {
 		return lifeReserved(policy)
 	case models.PersonaProduct:
 		return personaReserved(policy)
+	case models.CommercialCombinedProduct:
+		return commercialCombinedReserved(policy)
 	default:
 		return false, nil
 	}

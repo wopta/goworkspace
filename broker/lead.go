@@ -184,7 +184,7 @@ func setLeadData(policy *models.Policy, product models.Product) {
 	setRenewInfo(policy, product)
 
 	log.Println("[setLeadData] add information set")
-	policy.Attachments = &[]models.Attachment{{
+	informationSet := models.Attachment{
 		Name:     "Precontrattuale",
 		FileName: "Precontrattuale.pdf",
 		Link: fmt.Sprintf(
@@ -192,7 +192,17 @@ func setLeadData(policy *models.Policy, product models.Product) {
 			policy.Name,
 			policy.ProductVersion,
 		),
-	}}
+	}
+	if policy.Attachments == nil {
+		policy.Attachments = new([]models.Attachment)
+	}
+	attIdx := slices.IndexFunc(*policy.Attachments, func(a models.Attachment) bool {
+		return a.Name == informationSet.Name
+	})
+	if attIdx == -1 {
+		*policy.Attachments = append(*policy.Attachments, informationSet)
+	}
+
 	log.Println("[setLeadData] end -------------------------------------------")
 }
 

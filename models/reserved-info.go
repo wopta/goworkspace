@@ -33,13 +33,12 @@ func (ri *ReservedInfo) Normalize() {
 	})
 }
 
-// TODO add tags
 type StakeholderApproval struct {
-	Mandatory       bool
-	Status          ApprovalStatus
-	AcceptanceDate  time.Time
-	AcceptanceNotes []string
-	UpdateDate      time.Time
+	Mandatory       bool           `json:"mandatory" firestore:"mandatory" bigquery:"-"`
+	Status          ApprovalStatus `json:"status" firestore:"status" bigquery:"-"`
+	AcceptanceDate  time.Time      `json:"acceptanceDate" firestore:"acceptanceDate" bigquery:"-"`
+	AcceptanceNotes []string       `json:"acceptanceNotes" firestore:"acceptanceNotes" bigquery:"-"`
+	UpdateDate      time.Time      `json:"updateDate" firestore:"updateDate" bigquery:"-"`
 }
 
 type ApprovalStatus string
@@ -51,11 +50,10 @@ const (
 	Rejected        ApprovalStatus = "Rejected"
 )
 
-// TODO add tags
 type ReservedData struct {
-	Id          int
-	Name        string
-	Description string
+	Id          int    `json:"id" firestore:"id" bigquery:"-"`
+	Name        string `json:"name" firestore:"name" bigquery:"-"`
+	Description string `json:"description" firestore:"description" bigquery:"-"`
 }
 
 // DEPRECATED
