@@ -204,8 +204,8 @@ func mapCellsToPriceGroup(cells []Cell) []models.Price {
 		mapCellByColumnAndSection(cellColumn, cellRow, priceGroupMap, cell)
 	}
 
-	for _, value := range priceGroupMap {
-		priceGroup = append(priceGroup, value)
+	for _, key := range totalBySectionOrder {
+		priceGroup = append(priceGroup, priceGroupMap[key])
 	}
 
 	return priceGroup
@@ -725,4 +725,22 @@ var totalBySectionMap = map[string]string{
 	totalProductWithdrawalValueRow:      totalProductWithdrawalPriceGroupTitle,
 	totalManagementOrganizationValueRow: totalManagementOrganizationPriceGroupTitle,
 	totalCyberValueRow:                  totalCyberPriceGroupTitle,
+}
+
+var totalBySectionOrder = []string{
+	totalBuildingValueRow,
+	totalStockValueRow,
+	totalStockTemporaryIncreaseValueRow,
+	totalTheftValueRow,
+	totalRentalRiskValueRow,
+	totalOtherContentValueRow,
+	totalThirdPartyRecourseValueRow,
+	totalFormulaValueRow,
+	totalLossRentValueRow,
+	totalThirdPartyLiabilityValueRow,
+	totalWorkEmployersLiabilityValueRow,
+	totalProductLiabilityValueRow,
+	totalProductWithdrawalValueRow,
+	totalManagementOrganizationValueRow,
+	totalCyberValueRow,
 }
