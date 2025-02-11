@@ -251,6 +251,7 @@ func mapCellPolicy(policy *models.Policy, cells []Cell, gsLink string) {
 			policy.OffersPrices["default"]["yearly"].Net = parsedValue
 			policy.PriceNett = parsedValue
 		case totalTaxAmountYearlyCellValue:
+			policy.OffersPrices["default"]["yearly"].Tax = parsedValue
 			policy.TaxAmount = parsedValue
 		case totalGrossYearlyCellValue:
 			policy.OffersPrices["default"]["yearly"].Gross = parsedValue
