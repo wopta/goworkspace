@@ -91,10 +91,10 @@ func saveProposal(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 		out      bytes.Buffer
 	)
 
-	if os.Getenv("env") == "local" {
+	/*if os.Getenv("env") == "local" {
 		err := pdf.OutputFileAndClose("./document/proposal.pdf")
 		lib.CheckError(err)
-	} else {
+	} else {*/
 		err := pdf.Output(&out)
 		lib.CheckError(err)
 		filename = strings.ReplaceAll(fmt.Sprintf("%s/%s/"+models.ProposalDocumentFormat, "temp", policy.Uid,
@@ -102,8 +102,8 @@ func saveProposal(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
 		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, out.Bytes())
 		lib.CheckError(err)
 		return filename, out.Bytes()
-	}
-	return "", nil
+	/*}
+	return "", nil*/
 }
 
 func saveReservedDocument(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte) {
@@ -112,10 +112,10 @@ func saveReservedDocument(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte
 		out      bytes.Buffer
 	)
 
-	if os.Getenv("env") == "local" {
+	/*if os.Getenv("env") == "local" {
 		err := pdf.OutputFileAndClose("./document/reserved_document.pdf")
 		lib.CheckError(err)
-	} else {
+	} else {*/
 		err := pdf.Output(&out)
 		lib.CheckError(err)
 		filename = strings.ReplaceAll(fmt.Sprintf("%s/%s/"+models.RvmInstructionsDocumentFormat, "temp",
@@ -123,8 +123,8 @@ func saveReservedDocument(pdf *fpdf.Fpdf, policy *models.Policy) (string, []byte
 		lib.PutToStorage(os.Getenv("GOOGLE_STORAGE_BUCKET"), filename, out.Bytes())
 		lib.CheckError(err)
 		return filename, out.Bytes()
-	}
-	return filename, nil
+	/*}
+	return filename, nil*/
 }
 
 func insertWatermark(pdf *fpdf.Fpdf, text string) {

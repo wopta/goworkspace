@@ -95,6 +95,10 @@ var (
 		Name:    "Assunzione",
 		Address: "assunzione@wopta.it",
 	}
+	AddressAssunzioneTest = Address{
+		Name:    "Assunzione Test",
+		Address: "assunzionetest@wopta.it",
+	}
 	AddressTechnology = Address{
 		Name:    "Technology",
 		Address: "technology@wopta.it",

@@ -201,7 +201,7 @@ func setLifeReservedDocument(policy *models.Policy, product *models.Product) {
 		Section:     models.DocumentSectionReserved,
 	})
 
-	policy.ReservedInfo.Documents = attachments
+	policy.ReservedInfo.Attachments = attachments
 }
 
 func setLifeReservedInfo(policy *models.Policy, product *models.Product) {

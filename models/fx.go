@@ -504,7 +504,13 @@ func (fx *Fx) SetReservedMga(r *ReservedInfo) {
 	r.MgaApproval.UpdateDate = time.Now().UTC()
 }
 
-func (fx *Fx) AppendUniqueReservedData(r *ReservedInfo, id int64, name, description string) {
+func (fx *Fx) SetReservedCustomer(r *ReservedInfo) {
+	r.CustomerApproval.Mandatory = true
+	r.CustomerApproval.Status = NeedsApproval
+	r.CustomerApproval.UpdateDate = time.Now().UTC()
+}
+
+func (fx *Fx) AppendUniqueReservedReason(r *ReservedInfo, id int64, name, description string) {
 	for _, r := range r.ReservedReasons {
 		if r.Id == int(id) {
 			return
@@ -516,4 +522,18 @@ func (fx *Fx) AppendUniqueReservedData(r *ReservedInfo, id int64, name, descript
 		Description: description,
 	}
 	r.ReservedReasons = append(r.ReservedReasons, data)
+}
+
+func (fx *Fx) AppendUniqueReservedDocument(r *ReservedInfo, id int64, name, description string) {
+	for _, r := range r.RequiredDocuments {
+		if r.Id == int(id) {
+			return
+		}
+	}
+	data := ReservedData{
+		Id:          int(id),
+		Name:        name,
+		Description: description,
+	}
+	r.RequiredDocuments = append(r.RequiredDocuments, data)
 }

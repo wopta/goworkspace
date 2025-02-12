@@ -10,9 +10,11 @@ import (
 
 	"github.com/wopta/goworkspace/callback_out"
 	"github.com/wopta/goworkspace/lib"
+	"github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 	plc "github.com/wopta/goworkspace/policy"
+	prd "github.com/wopta/goworkspace/product"
 	"github.com/wopta/goworkspace/reserved"
 )
 
@@ -78,106 +80,16 @@ func RequestApprovalFx(w http.ResponseWriter, r *http.Request) (string, interfac
 
 	brokerUpdatePolicy(&policy, req)
 
-	if err = requestApproval(&policy); err != nil {
+	var currentFlow string
+	if currentFlow, err = requestApproval(&policy); err != nil {
 		log.Println("error request approval")
 		return "", nil, err
 	}
+	sendRequestApprovalMail(&policy, currentFlow)
 
 	jsonOut, err := policy.Marshal()
 
 	return string(jsonOut), policy, err
-}
-
-func requestApproval(policy *models.Policy) error {
-	var (
-		err error
-	)
-
-	log.Println("[requestApproval] start -------------------------------------")
-
-	networkNode = network.GetNetworkNodeByUid(policy.ProducerUid)
-	if networkNode != nil {
-		warrant = networkNode.GetWarrant()
-	}
-
-	log.Println("[requestApproval] starting bpmn flow...")
-
-	state := runBrokerBpmn(policy, requestApprovalFlowKey)
-	if state == nil || state.Data == nil {
-		log.Println("[requestApproval] error bpmn - state not set")
-		return errors.New("error on bpmn - no data present")
-	}
-	if state.IsFailed {
-		log.Println("[requestApproval] error bpmn - state failed")
-		return nil
-	}
-
-	*policy = *state.Data
-
-	log.Printf("[requestApproval] saving policy with uid %s to bigquery...", policy.Uid)
-	policy.BigquerySave(origin)
-
-	callback_out.Execute(networkNode, *policy, callback_out.RequestApproval)
-
-	log.Println("[requestApproval] end ---------------------------------------")
-
-	return err
-}
-
-func setRequestApprovalData(policy *models.Policy) error {
-	const (
-		mgaApprovalFlow     = "MgaApprovalFlow"
-		companyApprovalFlow = "CompanyApprovalFlow"
-	)
-	var (
-		flow              string
-	)
-	log.Printf("[setRequestApprovalData] policy uid %s: reserved flow", policy.Uid)
-
-	isOldReserved := len(policy.ReservedInfo.Reasons) > 0
-
-	if isOldReserved {
-		oldRequestApproval(policy)
-		return nil
-	}
-
-	setProposalNumber(policy)
-	createProposalDoc := policy.Status == models.PolicyStatusInitLead
-
-	if policy.ReservedInfo.CompanyApproval.Mandatory {
-		flow = companyApprovalFlow
-	}
-	if policy.ReservedInfo.MgaApproval.Mandatory {
-		flow = mgaApprovalFlow
-	}
-
-	switch flow {
-	case mgaApprovalFlow:
-		requestMgaApproval(policy)
-	case companyApprovalFlow:
-		requestCompanyApproval(policy)
-	default:
-		log.Println("flow not set")
-		return errNotAllowed
-	}
-
-	for _, reason := range policy.ReservedInfo.ReservedReasons {
-		if reason.Id == reserved.AlreadyInsured {
-			policy.Status = models.PolicyStatusWaitForApprovalMga
-			break
-		}
-	}
-
-	reserved.SetReservedInfo(policy, mgaProduct)
-
-	if createProposalDoc {
-		plc.AddProposalDoc(origin, policy, networkNode, mgaProduct)
-	}
-
-	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
-	policy.Updated = time.Now().UTC()
-
-	return nil
 }
 
 // Fallback to old reserved structure
@@ -209,6 +121,12 @@ func oldRequestApproval(policy *models.Policy) {
 	policy.Updated = time.Now().UTC()
 }
 
+func requestCustomerApproval(policy *models.Policy) {
+	policy.Status = models.PolicyStatusWaitForApprovalCustomer
+	policy.ReservedInfo.CustomerApproval.Status = models.WaitingApproval
+	policy.ReservedInfo.CustomerApproval.UpdateDate = time.Now().UTC()
+}
+
 func requestMgaApproval(policy *models.Policy) {
 	policy.Status = models.PolicyStatusWaitForApproval
 	policy.ReservedInfo.MgaApproval.Status = models.WaitingApproval
@@ -219,4 +137,135 @@ func requestCompanyApproval(policy *models.Policy) {
 	policy.Status = models.PolicyStatusWaitForApprovalCompany
 	policy.ReservedInfo.CompanyApproval.Status = models.WaitingApproval
 	policy.ReservedInfo.CompanyApproval.UpdateDate = time.Now().UTC()
+}
+
+const (
+	oldFlow              = "oldFlow"
+	customerApprovalFlow = "CustomerApprovalFlow"
+	mgaApprovalFlow      = "MgaApprovalFlow"
+	companyApprovalFlow  = "CompanyApprovalFlow"
+)
+
+func getCurrentApprovalFlow(policy *models.Policy) string {
+	flow := ""
+	if policy.ReservedInfo.CompanyApproval.Mandatory {
+		flow = companyApprovalFlow
+	}
+	if policy.ReservedInfo.MgaApproval.Mandatory {
+		flow = mgaApprovalFlow
+	}
+	if policy.ReservedInfo.CustomerApproval.Mandatory {
+		flow = customerApprovalFlow
+	}
+	if len(policy.ReservedInfo.Reasons) > 0 {
+		flow = oldFlow
+	}
+	return flow
+}
+
+func requestApproval(policy *models.Policy) (string, error) {
+	var err error
+
+	flow := getCurrentApprovalFlow(policy)
+
+	if flow == oldFlow {
+		oldRequestApproval(policy)
+		return flow, nil
+	}
+
+	setProposalNumber(policy)
+	createProposalDoc := policy.Status == models.PolicyStatusInitLead
+
+	switch flow {
+	case customerApprovalFlow:
+		requestCustomerApproval(policy)
+	case mgaApprovalFlow:
+		requestMgaApproval(policy)
+	case companyApprovalFlow:
+		requestCompanyApproval(policy)
+	default:
+		return "", errors.New("approval flow not set")
+	}
+
+	for _, reason := range policy.ReservedInfo.ReservedReasons {
+		if reason.Id == reserved.AlreadyInsured {
+			policy.Status = models.PolicyStatusWaitForApprovalMga
+			break
+		}
+	}
+
+	product = prd.GetProductV2(policy.Name, policy.ProductVersion, models.MgaChannel, nil, nil)
+
+	reserved.SetReservedInfo(policy, product)
+
+	if createProposalDoc {
+		plc.AddProposalDoc(origin, policy, networkNode, product)
+	}
+
+	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
+	policy.Updated = time.Now().UTC()
+
+	if err := lib.SetFirestoreErr(lib.PolicyCollection, policy.Uid, policy); err != nil {
+		return "", err
+	}
+
+	policy.BigquerySave(origin)
+
+	callback_out.Execute(networkNode, *policy, callback_out.RequestApproval)
+
+	return flow, err
+}
+
+func sendRequestApprovalMail(policy *models.Policy, flow string) {
+	switch flow {
+	case oldFlow:
+		sendOldFlowRequestApprovalMail(policy)
+	case customerApprovalFlow:
+		sendOldFlowRequestApprovalMail(policy)
+	case mgaApprovalFlow:
+		sendMgaRequestApprovalMail(policy)
+	case companyApprovalFlow:
+		sendCompanyRequestApprovalMail(policy)
+	}
+}
+
+func sendOldFlowRequestApprovalMail(policy *models.Policy) {
+	var (
+		nn  *models.NetworkNode
+		wrt *models.Warrant
+	)
+
+	if policy.Status == models.PolicyStatusWaitForApprovalMga {
+		return
+	}
+
+	if nn = network.GetNetworkNodeByUid(policy.ProducerUid); nn != nil {
+		wrt = nn.GetWarrant()
+	}
+	flowName, _ := policy.GetFlow(nn, wrt)
+
+	from := mail.AddressAnna
+	to := mail.GetContractorEmail(policy)
+	cc := mail.Address{}
+	switch flowName {
+	case models.ProviderMgaFlow, models.RemittanceMgaFlow:
+		cc = mail.GetNetworkNodeEmail(nn)
+	case models.ECommerceChannel:
+		to = mail.Address{} // fail safe for not sending email on ecommerce reserved
+	}
+
+	mail.SendMailReserved(*policy, from, to, cc, flowName,
+		[]string{models.ProposalAttachmentName})
+}
+
+func sendMgaRequestApprovalMail(policy *models.Policy) {
+	from := mail.AddressAnna
+	to := mail.AddressAssunzioneTest
+	cc := mail.Address{}
+
+	mail.SendMailMgaRequestApproval(*policy, from, to, cc)
+}
+
+func sendCompanyRequestApprovalMail(policy *models.Policy) {
+	// TODO: implement
 }

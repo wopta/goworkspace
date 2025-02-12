@@ -21,6 +21,7 @@ const (
 	reservedApprovedTemplateType = "approved"
 	reservedRejectedTemplateType = "rejected"
 	renewDraftTemplateType       = "renew-draft"
+	reservedMgaApprovalTemplate  = "reserved-mga-approval"
 	linkFormat                   = "https://storage.googleapis.com/documents-public-dev/information-sets/%s/%s/Precontrattuale.pdf"
 )
 
@@ -171,7 +172,11 @@ func SendMailReserved(policy models.Policy, from, to, cc Address, flowName strin
 
 	messageBody := fillTemplate(templateFile, &bodyData)
 
-	for _, attachment := range policy.ReservedInfo.Documents {
+	att := make([]models.Attachment, 0)
+	att = append(att, policy.ReservedInfo.Attachments...)
+	att = append(att, policy.ReservedInfo.Documents...)
+
+	for _, attachment := range att {
 		if attachment.Byte == "" {
 			if strings.HasPrefix(attachment.Link, "gs://") {
 				rawDoc, err = lib.ReadFileFromGoogleStorage(attachment.Link)
@@ -186,7 +191,7 @@ func SendMailReserved(policy models.Policy, from, to, cc Address, flowName strin
 		}
 
 		at = append(at, Attachment{
-			Name:        strings.ReplaceAll(fmt.Sprintf("%s", attachment.FileName), "_", " "),
+			Name:        strings.ReplaceAll(attachment.FileName, "_", " "),
 			Link:        attachment.Link,
 			Byte:        attachment.Byte,
 			FileName:    attachment.FileName,
@@ -318,5 +323,31 @@ func SendMailRenewDraft(policy models.Policy, from, to, cc Address, flowName str
 		IsHtml:      true,
 		IsApp:       true,
 		Policy:      policy.Uid,
+	})
+}
+
+func SendMailMgaRequestApproval(policy models.Policy, from, to, cc Address) {
+	bodyData := getBodyData(policy)
+
+	templateFile := lib.GetFilesByEnv(fmt.Sprintf("mail/%s.html", reservedMgaApprovalTemplate))
+
+	messageBody := fillTemplate(templateFile, &bodyData)
+
+	title := fmt.Sprintf(
+		"Nuova richiesta di approvazione per %s - Proposta %d di %s",
+		bodyData.ProductName,
+		policy.ProposalNumber,
+		bodyData.ContractorName,
+	)
+
+	SendMail(MailRequest{
+		FromAddress:  from,
+		To:           []string{to.Address},
+		Cc:           cc.Address,
+		Message:      messageBody,
+		Title:        title,
+		SubTitle:     "",
+		Subject:      title,
+		IsHtml:       true,
 	})
 }

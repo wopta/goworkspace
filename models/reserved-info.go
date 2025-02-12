@@ -7,6 +7,7 @@ import (
 )
 
 type ReservedInfo struct {
+	CustomerApproval  StakeholderApproval `json:"customerApproval" firestore:"customerApproval" bigquery:"-"`
 	MgaApproval       StakeholderApproval `json:"mgaApproval" firestore:"mgaApproval" bigquery:"-"`
 	CompanyApproval   StakeholderApproval `json:"companyApproval" firestore:"companyApproval" bigquery:"-"`
 	ReservedReasons   []ReservedData      `json:"reservedReasons" firestore:"reservedReasons" bigquery:"-"`
