@@ -2,7 +2,7 @@ package _script
 
 import (
 	"errors"
-	"fmt"
+	"log"
 
 	"github.com/mohae/deepcopy"
 	"github.com/wopta/goworkspace/lib"
@@ -33,7 +33,7 @@ func CopyTransactionsToBigQuery() {
 	}
 }
 
-func CopyAllPoliciesTransactionToBigQuery() error {
+func CopyAllPoliciesTransactionToBigQuery() {
 	var policyUids = make([]string, 0)
 
 	queries := lib.Firequeries{
@@ -44,7 +44,8 @@ func CopyAllPoliciesTransactionToBigQuery() error {
 
 	iter, err := queries.FirestoreWherefields(lib.PolicyCollection)
 	if err != nil {
-		return fmt.Errorf("unable to query firestore policies: %w", err)
+		log.Printf("unable to query firestore policies: %s", err.Error())
+		return
 	}
 	defer iter.Stop()
 
@@ -54,13 +55,15 @@ func CopyAllPoliciesTransactionToBigQuery() error {
 			break
 		}
 		if err != nil {
-			return fmt.Errorf("unable to iterate over policies: %w", err)
+			log.Printf("unable to iterate over policies: %s", err.Error())
+			return
 		}
 
 		var policy models.Policy
 		err = doc.DataTo(&policy)
 		if err != nil {
-			return fmt.Errorf("unable to populate policy: %w", err)
+			log.Printf("unable to populate policy: %s", err.Error())
+			return
 		}
 
 		policyUids = append(policyUids, policy.Uid)
@@ -76,5 +79,5 @@ func CopyAllPoliciesTransactionToBigQuery() error {
 		}
 	}
 
-	return nil
+	log.Println("Finished copying all transactions to BigQuery")
 }
