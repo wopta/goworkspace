@@ -69,14 +69,21 @@ func CopyAllPoliciesTransactionToBigQuery() {
 		policyUids = append(policyUids, policy.Uid)
 	}
 
+	transactionsList := make([]models.Transaction, 0)
 	for _, uid := range policyUids {
 		transactions := transaction.GetPolicyTransactions("", uid)
 
-		for index, tr := range transactions {
+		for _, tr := range transactions {
 			t := deepcopy.Copy(tr).(models.Transaction)
-			t.BigQuerySave("")
-			transactions[index].BigQuerySave("")
+			t.BigQueryParse()
+			transactionsList = append(transactionsList, t)
 		}
+	}
+
+	err = lib.InsertRowsBigQuery(lib.WoptaDataset, lib.TransactionsCollection, transactionsList)
+	if err != nil {
+		log.Printf("unable to insert transaction list into BigQuery: %s", err.Error())
+		return
 	}
 
 	log.Println("Finished copying all transactions to BigQuery")
