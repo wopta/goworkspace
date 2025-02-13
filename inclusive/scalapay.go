@@ -19,7 +19,7 @@ const (
 	movementTable = "bank_account_movement_scalapay"
 	usersTable    = "bank_account_users_scalapay"
 	layout        = "2006-01-02"
-	layoutQuery      = "2006-01-02"
+	layoutQuery   = "2006-01-02"
 )
 
 // TO DO security,payload,error,fasature
@@ -44,7 +44,7 @@ func BankAccountScalapayFx(resp http.ResponseWriter, r *http.Request) (string, i
 		log.Println(e)
 		res, _ := QueryRowsBigQuery[BankAccountMovement](dataset,
 			usersTable,
-			"select * from `"+dataset+"."+usersTable+"` where fiscalCode='"+obj.FiscalCode+"' and guaranteesCode ='"+obj.GuaranteesCode+"' and id ='"+obj.Id+"'")
+			"select * from `"+dataset+"."+usersTable+"` where guaranteesCode ='"+obj.GuaranteesCode+"' and id ='"+obj.Id+"'")
 		log.Println(len(res))
 		if len(res) == 0 {
 			e = lib.InsertRowsBigQuery(dataset, usersTable, obj)
@@ -58,24 +58,24 @@ func BankAccountScalapayFx(resp http.ResponseWriter, r *http.Request) (string, i
 	}
 
 	if obj.MovementType == "delete" || obj.MovementType == "suspended" {
-		
+
 		refDay := time.Now()
 		res, _ := QueryRowsBigQuery[BankAccountMovement](dataset,
 			usersTable,
-			"select * from `"+dataset+"."+movementTable+"` where fiscalCode='"+obj.FiscalCode+"' and guaranteesCode ='"+obj.GuaranteesCode+"' and id ='"+obj.Id+"' and _PARTITIONTIME ='" + refDay.Format(layoutQuery) + "' and status ='insert'")
+			"select * from `"+dataset+"."+movementTable+"` where guaranteesCode ='"+obj.GuaranteesCode+"' and id ='"+obj.Id+"' and _PARTITIONTIME ='"+refDay.Format(layoutQuery)+"' and status ='insert'")
 		log.Println(len(res))
-		
+
 		if len(res) == 0 {
 			e = lib.InsertRowsBigQuery(dataset, movementTable, obj)
 			log.Println(e)
-		 
-		e = lib.UpdateRowBigQuery(dataset, usersTable, map[string]string{
-			"status":  obj.Status,
-			"endDate": obj.EndDate.Format(layout) + " 00:00:00",
-		}, "fiscalCode='"+obj.FiscalCode+"' and guaranteesCode='"+obj.GuaranteesCode+"'")
-	}else{
-		return "",nil, GetErrorJson(400, "Bad request", "field Movement insert same day for "+obj.FiscalCode)
-	}
+
+			e = lib.UpdateRowBigQuery(dataset, usersTable, map[string]string{
+				"status":  obj.Status,
+				"endDate": obj.EndDate.Format(layout) + " 00:00:00",
+			}, "fiscalCode='"+obj.FiscalCode+"' and guaranteesCode='"+obj.GuaranteesCode+"'")
+		} else {
+			return "", nil, GetErrorJson(400, "Bad request", "field Movement insert same day for "+obj.Id)
+		}
 
 	}
 
@@ -116,7 +116,7 @@ func CheckScalapayData(r *http.Request) (BankAccountMovement, error) {
 	if obj.MovementType == "delete" || obj.MovementType == "suspended" {
 		res, _ := QueryRowsBigQuery[BankAccountMovement](dataset,
 			usersTable,
-			"select * from `"+dataset+"."+movementTable+"` where fiscalCode='"+obj.FiscalCode+"' and guaranteesCode ='"+obj.GuaranteesCode+"' and id ='"+obj.Id+"'")
+			"select * from `"+dataset+"."+movementTable+"` where guaranteesCode ='"+obj.GuaranteesCode+"' and id ='"+obj.Id+"' and status ='insert'")
 		log.Println(len(res))
 		if len(res) == 0 {
 			return obj, GetErrorJson(400, "Bad request", "insert movement miss")
@@ -144,7 +144,7 @@ func SetScalapayData(obj BankAccountMovement) BankAccountMovement {
 	obj.BigStartDate = civil.DateTimeOf(obj.StartDate)
 	obj.BigEndDate = civil.DateTimeOf(obj.EndDate)
 	if obj.GuaranteesCode == "base" {
-		obj.PolicyNumber = "51114"
+		obj.PolicyNumber = "051114"
 		obj.Uid = uuid.New().String()
 		obj.Customer = "Scalapay"
 		obj.Company = "axa"
