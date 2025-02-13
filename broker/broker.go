@@ -91,7 +91,7 @@ var brokerRoutes []lib.Route = []lib.Route{
 		Route:   "/policy/reserved/v1/{policyUid}",
 		Handler: lib.ResponseLoggerWrapper(AcceptanceFx),
 		Method:  http.MethodPut,
-		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleManager},
+		Roles:   []string{lib.UserRoleAdmin, lib.UserRoleManager, lib.UserRoleCompany},
 	},
 	{
 		Route:   "/policy/renew/v1/{uid}",

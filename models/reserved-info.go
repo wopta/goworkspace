@@ -7,11 +7,13 @@ import (
 )
 
 type ReservedInfo struct {
+	CustomerApproval  StakeholderApproval `json:"customerApproval" firestore:"customerApproval" bigquery:"-"`
 	MgaApproval       StakeholderApproval `json:"mgaApproval" firestore:"mgaApproval" bigquery:"-"`
 	CompanyApproval   StakeholderApproval `json:"companyApproval" firestore:"companyApproval" bigquery:"-"`
 	ReservedReasons   []ReservedData      `json:"reservedReasons" firestore:"reservedReasons" bigquery:"-"`
 	RequiredDocuments []ReservedData      `json:"requiredDocuments" firestore:"requiredDocuments" bigquery:"-"`
 	Attachments       []Attachment        `json:"attachments" firestore:"attachments" bigquery:"-"`
+	Approved          bool                `json:"approved" firestore:"approved" bigquery:"-"`
 
 	// DEPRECATED FIELDS
 
@@ -50,7 +52,6 @@ const (
 	Rejected        ApprovalStatus = "Rejected"
 )
 
-// TODO add tags
 type ReservedData struct {
 	Id          int    `json:"id" firestore:"id" bigquery:"-"`
 	Name        string `json:"name" firestore:"name" bigquery:"-"`

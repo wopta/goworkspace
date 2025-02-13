@@ -67,14 +67,6 @@ func lifeReservedHeader(pdf *fpdf.Fpdf, policy *models.Policy) {
 	address := strings.ToUpper(contractor.Residence.StreetName + ", " + contractor.Residence.StreetNumber + "\n" +
 		contractor.Residence.PostalCode + " " + contractor.Residence.City + " (" + contractor.Residence.CityCode + ")")
 
-	if policy.PaymentSplit == string(models.PaySplitMonthly) {
-		expiryInfo = "Prima scandenza mensile il: " +
-			policyStartDate.AddDate(0, 1, 0).Format(dateLayout) + "\n"
-	} else if policy.PaymentSplit == string(models.PaySplitYear) {
-		expiryInfo = "Prima scadenza annuale il: " +
-			policyStartDate.AddDate(1, 0, 0).Format(dateLayout) + "\n"
-	}
-
 	contractorInfo := fmt.Sprintf("Contraente: %s\nC.F./P.IVA: %s\nIndirizzo: %s\nMail: %s\nTelefono: %s",
 		strings.ToUpper(contractor.Surname+" "+contractor.
 			Name), contractor.FiscalCode, strings.ToUpper(address), contractor.Mail, contractor.Phone)
@@ -132,36 +124,45 @@ func lifeReservedInsuranceLimitSection(pdf *fpdf.Fpdf) {
 }
 
 func lifeReservedInstructionsSection(pdf *fpdf.Fpdf, policy *models.Policy) {
+	var exams []string
+	// Retrocompatibility
+	if len(policy.ReservedInfo.RequiredExams) > 0 {
+		exams = policy.ReservedInfo.RequiredExams
+	}
+	if len(policy.ReservedInfo.RequiredDocuments) > 0 {
+		exams = lib.SliceMap(policy.ReservedInfo.RequiredDocuments, func(d models.ReservedData) string {
+			return d.Description
+		})
+	}
+
 	setBlackDrawColor(pdf)
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3.5, "", "LTR", fpdf.AlignCenter, false)
 	pdf.MultiCell(0, 3.5, "Da restituire alla compagnia assicurativa, unitamente al Rapporto Visita "+
 		"Medica compilato e firmato da te e da un medico", "LR", fpdf.AlignCenter, false)
 
-	for _, contact := range policy.ReservedInfo.Contacts {
-		setBlackBoldFont(pdf, standardTextSize)
-		pdf.MultiCell(0, 3.5, "", "LR", fpdf.AlignCenter, false)
-		pdf.MultiCell(0, 3.5, "", "LR", fpdf.AlignCenter, false)
-		pdf.MultiCell(0, 3.5, contact.Title, "LR", fpdf.AlignCenter, false)
-		setBlackRegularFont(pdf, standardTextSize)
-		pdf.MultiCell(0, 3.5, contact.Address, "LR", fpdf.AlignCenter, false)
-		pdf.MultiCell(0, 3.5, contact.Subject,
-			"LR", fpdf.AlignCenter,
-			false)
-	}
+	setBlackBoldFont(pdf, standardTextSize)
+	pdf.MultiCell(0, 3.5, "", "LR", fpdf.AlignCenter, false)
+	pdf.MultiCell(0, 3.5, "", "LR", fpdf.AlignCenter, false)
+	pdf.MultiCell(0, 3.5, "Tramite e-mail:", "LR", fpdf.AlignCenter, false)
+	setBlackRegularFont(pdf, standardTextSize)
+	pdf.MultiCell(0, 3.5, "assunzione@wopta.it", "LR", fpdf.AlignCenter, false)
+	pdf.MultiCell(0, 3.5, fmt.Sprintf("Oggetto: %s proposta %d - UNDERWRITING MEDICO - %s", policy.NameDesc,
+		policy.ProposalNumber, strings.ToUpper(policy.Contractor.Surname+" "+policy.Contractor.Name)), "LR",
+		fpdf.AlignCenter, false)
 
 	setBlackRegularFont(pdf, standardTextSize)
 	pdf.MultiCell(0, 3.5, "", "LR", fpdf.AlignCenter, false)
 	pdf.MultiCell(0, 3.5, "", "LR", fpdf.AlignCenter, false)
-	pdf.MultiCell(0, 3.5, fmt.Sprintf("1 - %s", policy.ReservedInfo.RequiredExams[0]), "LR", fpdf.AlignLeft, false)
+	pdf.MultiCell(0, 3.5, fmt.Sprintf("1 - %s", exams[0]), "LR", fpdf.AlignLeft, false)
 	pdf.MultiCell(0, 3.5, "", "LR", fpdf.AlignCenter, false)
 
-	if len(policy.ReservedInfo.RequiredExams) > 1 {
+	if len(exams) > 1 {
 		setBlackBoldFont(pdf, standardTextSize)
 		pdf.MultiCell(0, 3.5, "In caso di capitali assicurati tra i €400.000,00 ed €500.000,00 allegare "+
 			"altresì i seguenti esami medici:", "LR", fpdf.AlignLeft, false)
 
-		for index, medicalDocument := range policy.ReservedInfo.RequiredExams[1:] {
+		for index, medicalDocument := range exams[1:] {
 			setBlackRegularFont(pdf, standardTextSize)
 			pdf.MultiCell(0, 3.5, fmt.Sprintf("%d - %s", index+2, medicalDocument), "LR", fpdf.AlignLeft, false)
 		}

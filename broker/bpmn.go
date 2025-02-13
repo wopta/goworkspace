@@ -3,7 +3,7 @@ package broker
 import (
 	"fmt"
 	"log"
-	"os"
+	// "os"
 	"strings"
 
 	"github.com/wopta/goworkspace/bpmn"
@@ -28,7 +28,7 @@ const (
 	emitFlowKey            = "emit"
 	leadFlowKey            = "lead"
 	proposalFlowKey        = "proposal"
-	requestApprovalFlowKey = "requestApproval"
+	// requestApprovalFlowKey = "requestApproval"
 )
 
 func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
@@ -58,8 +58,8 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 		flow = flowFile.LeadFlow
 	case proposalFlowKey:
 		flow = flowFile.ProposalFlow
-	case requestApprovalFlowKey:
-		flow = flowFile.RequestApprovalFlow
+	// case requestApprovalFlowKey:
+	// 	flow = flowFile.RequestApprovalFlow
 	case emitFlowKey:
 		flow = flowFile.EmitFlow
 	default:
@@ -81,7 +81,7 @@ func runBrokerBpmn(policy *models.Policy, flowKey string) *bpmn.State {
 func addHandlers(state *bpmn.State) {
 	addLeadHandlers(state)
 	addProposalHandlers(state)
-	addRequestApprovalHandlers(state)
+	// addRequestApprovalHandlers(state)
 	addEmitHandlers(state)
 }
 
@@ -183,7 +183,7 @@ func sendProposalMail(state *bpmn.State) error {
 //	======================================
 //	REQUEST APPROVAL FUNCTIONS
 //	======================================
-
+/*
 func addRequestApprovalHandlers(state *bpmn.State) {
 	state.AddTaskHandler("setRequestApprovalData", setRequestApprovalBpmn)
 	state.AddTaskHandler("sendRequestApprovalMail", sendRequestApprovalMail)
@@ -193,7 +193,10 @@ func setRequestApprovalBpmn(state *bpmn.State) error {
 	policy := state.Data
 	firePolicy := lib.GetDatasetByEnv(origin, lib.PolicyCollection)
 
-	setRequestApprovalData(policy)
+	if err := setRequestApprovalData(policy); err != nil {
+		log.Println("[setRequestApproval] error requesting approval")
+		return err
+	}
 
 	log.Printf("[setRequestApproval] saving policy with uid %s to Firestore....", policy.Uid)
 	return lib.SetFirestoreErr(firePolicy, policy.Uid, policy)
@@ -226,7 +229,7 @@ func sendRequestApprovalMail(state *bpmn.State) error {
 		[]string{models.ProposalAttachmentName})
 	return nil
 }
-
+*/
 //	======================================
 //	EMIT FUNCTIONS
 //	======================================

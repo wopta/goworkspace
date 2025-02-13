@@ -11,6 +11,7 @@ const (
 	UserRoleAgency      string = "agency"
 	UserRoleAreaManager string = "area-manager"
 	UserRoleInternal    string = "internal"
+	UserRoleCompany     string = "company"
 )
 
 func GetAllRoles() []string {

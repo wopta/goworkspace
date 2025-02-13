@@ -66,7 +66,9 @@ func setProductBodyData(policy models.Policy, bodyData *BodyData) {
 		bodyData.ProductForm += "vita#contact-us"
 	case models.GapProduct:
 		bodyData.ProductName = "Auto Valore Protetto"
-		bodyData.ProductForm = "gap#contact-us"
+		bodyData.ProductForm += "gap#contact-us"
+	case models.CommercialCombinedProduct:
+		bodyData.ProductName = "Commercial Combined"
 	}
 
 	bodyData.InformationSetsUrl = fmt.Sprintf(
