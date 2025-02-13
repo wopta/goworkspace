@@ -1,6 +1,7 @@
 package broker
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -10,7 +11,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/wopta/goworkspace/callback_out"
 	"github.com/wopta/goworkspace/lib"
-	"github.com/wopta/goworkspace/mail"
+
+	// "github.com/wopta/goworkspace/mail"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/network"
 	plc "github.com/wopta/goworkspace/policy"
@@ -21,17 +23,12 @@ type AcceptancePayload struct {
 	Reasons string `json:"reasons"`
 }
 
-const (
-	approvalMga = "mga"
-	approvalCompany = "company"
-)
-
 func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, error) {
 	var (
-		err           error
-		payload       AcceptancePayload
-		policy        models.Policy
-		toAddress     mail.Address
+		err     error
+		payload AcceptancePayload
+		policy  models.Policy
+		// toAddress     mail.Address
 		callbackEvent string
 	)
 
@@ -85,17 +82,36 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 	// check auth type to see what level of approval
 	approvalType := ""
 	switch authToken.Type {
-	case lib.UserRoleAdmin:
-		approvalType = approvalMga
 	case lib.UserRoleCompany:
-		approvalType = approvalCompany
+		approvalType = companyApprovalFlow
+	case lib.UserRoleCustomer:
+		approvalType = customerApprovalFlow
+	case lib.UserRoleAdmin:
+		approvalType = mgaApprovalFlow
+		if policy.ReservedInfo.CustomerApproval.Mandatory && policy.ReservedInfo.CustomerApproval.Status != models.Approved {
+			approvalType = customerApprovalFlow
+		}
+	case lib.UserRoleAgent, lib.UserRoleAgency, lib.UserRoleAreaManager, lib.UserRoleManager:
+		if authToken.UserID == policy.ProducerUid || network.IsParentOf(authToken.UserID, policy.ProducerUid) {
+			approvalType = customerApprovalFlow
+		}
+	}
+
+	if approvalType == "" {
+		log.Println("approval flow not set")
+		err = errors.New("approval flow not set")
+		return "", nil, err
 	}
 
 	switch payload.Action {
 	case models.PolicyStatusRejected:
-		callbackEvent = rejectPolicy(&policy, approvalType, lib.ToUpper(payload.Reasons))
+		rejectPolicy(&policy, approvalType, lib.ToUpper(payload.Reasons))
+		callbackEvent = callback_out.Rejected
 	case models.PolicyStatusApproved:
-		callbackEvent = approvePolicy(&policy, approvalType, lib.ToUpper(payload.Reasons))
+		approvePolicy(&policy, approvalType, lib.ToUpper(payload.Reasons))
+		if policy.ReservedInfo.Approved {
+			callbackEvent = callback_out.Approved
+		}
 	default:
 		log.Printf("Unhandled action %s", payload.Action)
 		return "", nil, fmt.Errorf("unhandled action %s", payload.Action)
@@ -110,102 +126,175 @@ func AcceptanceFx(w http.ResponseWriter, r *http.Request) (string, interface{}, 
 
 	policy.BigquerySave(origin)
 
+	/*
 	log.Println("sending acceptance email...")
 
-	if callbackEvent != "" {
-		// TODO: we must deceide on the process itself for comunicating changes of state
-		// TODO: port acceptance into bpmn to keep code centralized and dynamic
-		if networkNode = network.GetNetworkNodeByUid(policy.ProducerUid); networkNode != nil {
-			warrant = networkNode.GetWarrant()
-		}
-		flowName, _ = policy.GetFlow(networkNode, warrant)
-		log.Printf("flowName '%s'", flowName)
-	
-		switch policy.Channel {
-		case models.MgaChannel:
-			toAddress = mail.Address{
-				Address: authToken.Email,
+		if callbackEvent != "" {
+			// TODO: we must deceide on the process itself for comunicating changes of state
+			// TODO: port acceptance into bpmn to keep code centralized and dynamic
+			if networkNode = network.GetNetworkNodeByUid(policy.ProducerUid); networkNode != nil {
+				warrant = networkNode.GetWarrant()
 			}
-		case models.NetworkChannel:
-			toAddress = mail.GetNetworkNodeEmail(networkNode)
-		default:
-			toAddress = mail.GetContractorEmail(&policy)
-		}
-	
-		log.Printf("toAddress '%s'", toAddress.String())
-	
-		mail.SendMailReservedResult(
-			policy,
-			mail.AddressAssunzione,
-			toAddress,
-			mail.Address{},
-			flowName,
-		)
-	
-		callback_out.Execute(networkNode, policy, callbackEvent)
-	}
+			flowName, _ = policy.GetFlow(networkNode, warrant)
+			log.Printf("flowName '%s'", flowName)
 
+			switch policy.Channel {
+			case models.MgaChannel:
+				toAddress = mail.Address{
+					Address: authToken.Email,
+				}
+			case models.NetworkChannel:
+				toAddress = mail.GetNetworkNodeEmail(networkNode)
+			default:
+				toAddress = mail.GetContractorEmail(&policy)
+			}
+
+			log.Printf("toAddress '%s'", toAddress.String())
+
+			mail.SendMailReservedResult(
+				policy,
+				mail.AddressAssunzione,
+				toAddress,
+				mail.Address{},
+				flowName,
+			)
+
+			callback_out.Execute(networkNode, policy, callbackEvent)
+		}
+	*/
+	callback_out.Execute(networkNode, policy, callbackEvent)
 
 	log.Println("Handler end -------------------------------------------------")
 
 	return "{}", nil, nil
 }
 
-func rejectPolicy(policy *models.Policy, approvalType, reasons string) (callbackOutEvent string) {
-	if approvalType == approvalMga {
-		policy.ReservedInfo.MgaApproval.Status = models.Rejected
-		policy.ReservedInfo.MgaApproval.AcceptanceDate = time.Now().UTC()
-		policy.ReservedInfo.MgaApproval.UpdateDate = time.Now().UTC()
-		policy.ReservedInfo.MgaApproval.AcceptanceNotes = append(policy.ReservedInfo.MgaApproval.AcceptanceNotes, reasons)
-		log.Printf("Policy Uid %s MGA REJECTED", policy.Uid)
+func rejectPolicy(policy *models.Policy, approvalFlow, reasons string) (callbackOutEvent string) {
+	switch approvalFlow {
+	case customerApprovalFlow:
+		customerRejectPolicy(policy, reasons)
+	case mgaApprovalFlow:
+		mgaRejectPolicy(policy, reasons)
+	case companyApprovalFlow:
+		companyRejectPolicy(policy, reasons)
 	}
-
-	if approvalType == approvalCompany {
-		policy.ReservedInfo.CompanyApproval.Status = models.Rejected
-		policy.ReservedInfo.CompanyApproval.AcceptanceDate = time.Now().UTC()
-		policy.ReservedInfo.CompanyApproval.UpdateDate = time.Now().UTC()
-		policy.ReservedInfo.CompanyApproval.AcceptanceNotes = append(policy.ReservedInfo.CompanyApproval.AcceptanceNotes, reasons)
-		log.Printf("Policy Uid %s COMPANY REJECTED", policy.Uid)
-	}
-
-	policy.Status = models.PolicyStatusRejected
-	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
-	policy.Updated = time.Now().UTC()
-
-	log.Printf("Policy Uid %s REJECTED", policy.Uid)
 	return callback_out.Rejected
 }
 
-func approvePolicy(policy *models.Policy, approvalType, reasons string) (callbackOutEvent string) {
-	if approvalType == approvalMga {
-		policy.ReservedInfo.MgaApproval.Status = models.Approved
-		policy.ReservedInfo.MgaApproval.AcceptanceDate = time.Now().UTC()
-		policy.ReservedInfo.MgaApproval.UpdateDate = time.Now().UTC()
-		policy.ReservedInfo.MgaApproval.AcceptanceNotes = append(policy.ReservedInfo.MgaApproval.AcceptanceNotes, reasons)
-		log.Printf("Policy Uid %s MGA APPROVED", policy.Uid)
+func approvePolicy(policy *models.Policy, approvalFlow, reasons string) {
+	switch approvalFlow {
+	case customerApprovalFlow:
+		customerApprovePolicy(policy, reasons)
+	case mgaApprovalFlow:
+		mgaApprovePolicy(policy, reasons)
+	case companyApprovalFlow:
+		companyApprovePolicy(policy, reasons)
 	}
+}
 
-	if approvalType == approvalCompany {
-		policy.ReservedInfo.CompanyApproval.Status = models.Approved
-		policy.ReservedInfo.CompanyApproval.AcceptanceDate = time.Now().UTC()
-		policy.ReservedInfo.CompanyApproval.UpdateDate = time.Now().UTC()
-		policy.ReservedInfo.CompanyApproval.AcceptanceNotes = append(policy.ReservedInfo.CompanyApproval.AcceptanceNotes, reasons)
-		log.Printf("Policy Uid %s COMPANY APPROVED", policy.Uid)
+func customerApprovePolicy(policy *models.Policy, reasons string) {
+	log.Println("policy customer approved")
+	now := time.Now().UTC()
+
+	policy.ReservedInfo.CustomerApproval.Status = models.Approved
+	policy.ReservedInfo.CustomerApproval.AcceptanceDate = now
+	policy.ReservedInfo.CustomerApproval.UpdateDate = now
+	policy.ReservedInfo.CustomerApproval.AcceptanceNotes = append(policy.ReservedInfo.CustomerApproval.AcceptanceNotes, reasons)
+	policy.Status = models.PolicyStatusCustomerApproved
+	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
+	policy.Updated = now
+
+	if policy.ReservedInfo.MgaApproval.Mandatory {
+		log.Println("policy waiting for mga approval")
+		policy.ReservedInfo.MgaApproval.Status = models.WaitingApproval
+		policy.ReservedInfo.MgaApproval.UpdateDate = now
+		policy.Status = models.PolicyStatusWaitForApproval
+		policy.StatusHistory = append(policy.StatusHistory, policy.Status)
 	}
+}
 
-	if approvalType == approvalMga && policy.ReservedInfo.CompanyApproval.Mandatory {
+func customerRejectPolicy(policy *models.Policy, reasons string) {
+	log.Println("policy customer rejected")
+	now := time.Now().UTC()
+
+	policy.ReservedInfo.CustomerApproval.Status = models.Rejected
+	policy.ReservedInfo.CustomerApproval.AcceptanceDate = now
+	policy.ReservedInfo.CustomerApproval.UpdateDate = now
+	policy.ReservedInfo.CustomerApproval.AcceptanceNotes = append(policy.ReservedInfo.CustomerApproval.AcceptanceNotes, reasons)
+	policy.Status = models.PolicyStatusRejected
+	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusCustomerRejected, policy.Status)
+	policy.Updated = now
+
+	log.Println("policy reserved rejected")
+}
+
+func mgaApprovePolicy(policy *models.Policy, reasons string) {
+	log.Println("policy mga approved")
+	now := time.Now().UTC()
+
+	policy.ReservedInfo.MgaApproval.Status = models.Approved
+	policy.ReservedInfo.MgaApproval.AcceptanceDate = now
+	policy.ReservedInfo.MgaApproval.UpdateDate = now
+	policy.ReservedInfo.MgaApproval.AcceptanceNotes = append(policy.ReservedInfo.MgaApproval.AcceptanceNotes, reasons)
+	policy.Status = models.PolicyStatusMgaApproved
+	policy.StatusHistory = append(policy.StatusHistory, policy.Status)
+
+	if policy.ReservedInfo.CompanyApproval.Mandatory {
+		log.Println("policy waiting for company approval")
 		policy.ReservedInfo.CompanyApproval.Status = models.WaitingApproval
-		policy.ReservedInfo.CompanyApproval.UpdateDate = time.Now().UTC()
-	}
-
-	policy.Updated = time.Now().UTC()
-
-	if approvalType == approvalCompany || approvalType == approvalMga && !policy.ReservedInfo.CompanyApproval.Mandatory {
+		policy.ReservedInfo.CompanyApproval.UpdateDate = now
+		policy.Status = models.PolicyStatusWaitForApprovalCompany
+		policy.StatusHistory = append(policy.StatusHistory, policy.Status)
+	} else {
+		log.Println("policy reserved approved")
 		policy.Status = models.PolicyStatusApproved
 		policy.StatusHistory = append(policy.StatusHistory, policy.Status)
-		log.Printf("Policy Uid %s APPROVED", policy.Uid)
-		return callback_out.Approved
 	}
 
-	return ""
+	policy.Updated = now
+}
+
+func mgaRejectPolicy(policy *models.Policy, reasons string) {
+	log.Println("policy mga rejected")
+	now := time.Now().UTC()
+
+	policy.ReservedInfo.MgaApproval.Status = models.Rejected
+	policy.ReservedInfo.MgaApproval.AcceptanceDate = now
+	policy.ReservedInfo.MgaApproval.UpdateDate = now
+	policy.ReservedInfo.MgaApproval.AcceptanceNotes = append(policy.ReservedInfo.MgaApproval.AcceptanceNotes, reasons)
+	policy.Status = models.PolicyStatusRejected
+	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusMgaRejected, policy.Status)
+	policy.Updated = now
+
+	log.Println("policy reserved rejected")
+}
+
+func companyApprovePolicy(policy *models.Policy, reasons string) {
+	log.Println("policy company approved")
+	now := time.Now().UTC()
+
+	policy.ReservedInfo.CompanyApproval.Status = models.Approved
+	policy.ReservedInfo.CompanyApproval.AcceptanceDate = now
+	policy.ReservedInfo.CompanyApproval.UpdateDate = now
+	policy.ReservedInfo.CompanyApproval.AcceptanceNotes = append(policy.ReservedInfo.CompanyApproval.AcceptanceNotes, reasons)
+	policy.Status = models.PolicyStatusApproved
+	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusCompanyApproved, policy.Status)
+	policy.Updated = now
+
+	log.Println("policy reserved approved")
+}
+
+func companyRejectPolicy(policy *models.Policy, reasons string) {
+	log.Println("policy company rejected")
+	now := time.Now().UTC()
+
+	policy.ReservedInfo.CompanyApproval.Status = models.Rejected
+	policy.ReservedInfo.CompanyApproval.AcceptanceDate = now
+	policy.ReservedInfo.CompanyApproval.UpdateDate = now
+	policy.ReservedInfo.CompanyApproval.AcceptanceNotes = append(policy.ReservedInfo.CompanyApproval.AcceptanceNotes, reasons)
+	policy.Status = models.PolicyStatusRejected
+	policy.StatusHistory = append(policy.StatusHistory, models.PolicyStatusCompanyRejected, policy.Status)
+	policy.Updated = now
+
+	log.Println("policy reserved rejected")
 }

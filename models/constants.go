@@ -19,6 +19,12 @@ const (
 	PolicyStatusWaitForApproval         = "WaitForApproval"         // Approval from MGA
 	PolicyStatusWaitForApprovalMga      = "WaitForApprovalMga"      // Approval from MGA for already insured client
 	PolicyStatusWaitForApprovalCompany  = "WaitForApprovalCompany"  // Approval from Company
+	PolicyStatusCompanyApproved         = "CompanyApproved"
+	PolicyStatusCompanyRejected         = "CompanyRejected"
+	PolicyStatusCustomerApproved        = "CustomerApproved"
+	PolicyStatusCustomerRejected        = "CustomerRejected"
+	PolicyStatusMgaApproved             = "MgaApproved"
+	PolicyStatusMgaRejected             = "MgaRejected"
 	PolicyStatusApproved                = "Approved"
 	PolicyStatusRejected                = "Rejected"
 	PolicyStatusToSign                  = "ToSign"

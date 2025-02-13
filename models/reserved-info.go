@@ -13,6 +13,7 @@ type ReservedInfo struct {
 	ReservedReasons   []ReservedData      `json:"reservedReasons" firestore:"reservedReasons" bigquery:"-"`
 	RequiredDocuments []ReservedData      `json:"requiredDocuments" firestore:"requiredDocuments" bigquery:"-"`
 	Attachments       []Attachment        `json:"attachments" firestore:"attachments" bigquery:"-"`
+	Approved          bool                `json:"approved" firestore:"approved" bigquery:"-"`
 
 	// DEPRECATED FIELDS
 
