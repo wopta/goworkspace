@@ -44,6 +44,7 @@ func CombinedQbeFx(w http.ResponseWriter, r *http.Request) (string, interface{},
 		return "", nil, err
 	}
 
+	dbPolicy.Step = reqPolicy.Step
 	dbPolicy.Assets = reqPolicy.Assets
 
 	if err = sellable.CommercialCombined(&dbPolicy); err != nil {

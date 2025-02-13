@@ -148,6 +148,17 @@ func setInclusiveRow(mov inclusive.BankAccountMovement, codes map[string]map[str
 
 	return result
 }
+func addMonthNow(mov inclusive.BankAccountMovement) string {
+	now := time.Now().AddDate(0, 0, -1)
+	if mov.MovementType == "delete" {
+		endDate, _ := time.Parse("2006-01-02", mov.BigEndDate.Date.String())
+		return endDate.Format(layout)
+	} else {
+		addMonth := now.AddDate(0, 1, 0)
+		return addMonth.Format(layout)
+	}
+	return "31/12/9999"
+}
 func mapEndDate(mov inclusive.BankAccountMovement) string {
 	if mov.MovementType == "delete" {
 		endDate, _ := time.Parse("2006-01-02", mov.BigEndDate.Date.String())
@@ -236,7 +247,9 @@ func setScalapayPolicy(code string, now time.Time, upload bool) {
 		"DATA VENDITA", //    DATA FINE VALIDITA' COPERTURA
 		"TIPO MOVIMENTO",
 	}
-
+	if code == "51114" {
+		code = "051114"
+	}
 	refDay = now.AddDate(0, 0, -1)
 	log.Println("  refMontly: ", refDay)
 	//from, e = time.Parse("2006-01-02", strconv.Itoa(now.Year())+"-"+fmt.Sprintf("%02d", int(now.Month()))+"-"+fmt.Sprintf("%02d", 1))
@@ -267,7 +280,7 @@ func setScalapayPolicy(code string, now time.Time, upload bool) {
 			mov.City,                 //    CITTA' RESIDENZA ASSICURATO
 			mov.CityCode,             //    PROVINCIA RESIDENZA ASSICURATO
 			startDate.Format(layout), //    DATA INIZIO VALIDITA' COPERTURA
-			mapEndDate(mov),          //    DATA FINE VALIDITA' COPERTURA
+			addMonthNow(mov),         //    DATA FINE VALIDITA' COPERTURA
 			startDate.Format(layout), //    DATA INIZIO VALIDITA' COPERTURA
 			StringMapping(mov.MovementType, map[string]string{
 				"":          "A",
