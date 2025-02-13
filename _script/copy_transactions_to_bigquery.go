@@ -88,18 +88,19 @@ func CopyAllPoliciesTransactionToBigQuery() {
 	log.Println("Finished copying all transactions to BigQuery")
 }
 
-func divideSliceIntoBatches[T any](slice []T, size int) ([][]T, error) {
-	if size < 1 {
-		return nil, errors.New("size must be greater than zero")
-	}
-	if len(slice) < size {
-		return nil, errors.New("size must be smaller than len(slice)")
+func divideSliceIntoBatches[T any](slice []T, batchSize int) ([][]T, error) {
+	if batchSize < 1 {
+		return nil, errors.New("batchSize must be greater than zero")
 	}
 
-	batches := make([][]T, 0, ((len(slice)-1)/size)+1)
+	batches := make([][]T, 0, ((len(slice)-1)/batchSize)+1)
+	if len(slice) < batchSize {
+		batches = append(batches, slice)
+		return batches, nil
+	}
 
-	for size < len(slice) {
-		slice, batches = slice[size:], append(batches, slice[0:size:size])
+	for batchSize < len(slice) {
+		slice, batches = slice[batchSize:], append(batches, slice[0:batchSize:batchSize])
 	}
 	batches = append(batches, slice)
 	return batches, nil
