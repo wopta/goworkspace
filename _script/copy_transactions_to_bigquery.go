@@ -34,17 +34,17 @@ func CopyTransactionsToBigQuery() {
 }
 
 func CopyAllPoliciesTransactionToBigQuery() {
-	var policyUids = make([]string, 0)
+	transactionsList := make([]models.Transaction, 0)
 
 	queries := lib.Firequeries{
 		Queries: []lib.Firequery{
-			{Field: "isDeleted", Operator: "==", QueryValue: false},
+			{Field: "isPay", Operator: "==", QueryValue: true},
 		},
 	}
 
-	iter, err := queries.FirestoreWherefields(lib.PolicyCollection)
+	iter, err := queries.FirestoreWherefields(lib.TransactionsCollection)
 	if err != nil {
-		log.Printf("unable to query firestore policies: %s", err.Error())
+		log.Printf("unable to query firestore transactions: %s", err.Error())
 		return
 	}
 	defer iter.Stop()
@@ -55,29 +55,19 @@ func CopyAllPoliciesTransactionToBigQuery() {
 			break
 		}
 		if err != nil {
-			log.Printf("unable to iterate over policies: %s", err.Error())
+			log.Printf("unable to iterate over transactions: %s", err.Error())
 			return
 		}
 
-		var policy models.Policy
-		err = doc.DataTo(&policy)
+		var trans models.Transaction
+		err = doc.DataTo(&trans)
 		if err != nil {
-			log.Printf("unable to populate policy: %s", err.Error())
+			log.Printf("unable to populate transaction: %s", err.Error())
 			return
 		}
 
-		policyUids = append(policyUids, policy.Uid)
-	}
-
-	transactionsList := make([]models.Transaction, 0)
-	for _, uid := range policyUids {
-		transactions := transaction.GetPolicyTransactions("", uid)
-
-		for _, tr := range transactions {
-			t := deepcopy.Copy(tr).(models.Transaction)
-			t.BigQueryParse()
-			transactionsList = append(transactionsList, t)
-		}
+		trans.BigQueryParse()
+		transactionsList = append(transactionsList, trans)
 	}
 
 	err = lib.InsertRowsBigQuery(lib.WoptaDataset, lib.TransactionsCollection, transactionsList)
