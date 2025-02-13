@@ -56,6 +56,7 @@ type Transaction struct {
 	BigEffectiveDate   bigquery.NullDateTime `json:"-" firestore:"-" bigquery:"effectiveDate"`
 	PayUrl             string                `json:"payUrl,omitempty" firestore:"payUrl,omitempty" bigquery:"payUrl"`
 	Annuity            int                   `json:"annuity" firestore:"annuity" bigquery:"annuity"`
+	Data               string                `json:"-" firestore:"-" bigquery:"data"`
 }
 
 func TransactionToListData(query *firestore.DocumentIterator) []Transaction {
@@ -104,6 +105,13 @@ func (t *Transaction) Normalize() {
 }
 
 func (t *Transaction) BigQueryParse() {
+	data, err := json.Marshal(t)
+	if err != nil {
+		log.Printf("ERROR Transaction %s marshal: %v", t.Uid, err)
+		return
+	}
+
+	t.Data = string(data)
 	t.BigPayDate = lib.GetBigQueryNullDateTime(t.PayDate)
 	t.BigTransactionDate = lib.GetBigQueryNullDateTime(t.TransactionDate)
 	t.BigCreationDate = civil.DateTimeOf(t.CreationDate)
@@ -113,17 +121,10 @@ func (t *Transaction) BigQueryParse() {
 }
 
 func (t *Transaction) BigQuerySave(origin string) {
-	fireTransactions := lib.GetDatasetByEnv(origin, TransactionsCollection)
-	transactionJson, err := json.Marshal(t)
-	if err != nil {
-		log.Println("ERROR Transaction "+t.Uid+" Marshal: ", err)
-		return
-	}
-	log.Println("Transaction: "+t.Uid, string(transactionJson))
 	t.BigQueryParse()
 	log.Println("Transaction save BigQuery: " + t.Uid)
 
-	err = lib.InsertRowsBigQuery(WoptaDataset, fireTransactions, t)
+	err := lib.InsertRowsBigQuery(WoptaDataset, lib.TransactionsCollection, t)
 	if err != nil {
 		log.Println("ERROR Transaction "+t.Uid+" save BigQuery: ", err)
 		return

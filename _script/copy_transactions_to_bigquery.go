@@ -1,9 +1,15 @@
 package _script
 
 import (
+	"errors"
+	"log"
+
 	"github.com/mohae/deepcopy"
+	"github.com/wopta/goworkspace/lib"
 	"github.com/wopta/goworkspace/models"
 	"github.com/wopta/goworkspace/transaction"
+	"google.golang.org/api/iterator"
+
 	"time"
 )
 
@@ -25,4 +31,77 @@ func CopyTransactionsToBigQuery() {
 		}
 		transactions[index].BigQuerySave("")
 	}
+}
+
+func CopyAllPoliciesTransactionToBigQuery() {
+	const batchSize = 100
+	transactionsList := make([]models.Transaction, 0)
+
+	queries := lib.Firequeries{
+		Queries: []lib.Firequery{
+			{Field: "isPay", Operator: "==", QueryValue: true},
+		},
+	}
+
+	iter, err := queries.FirestoreWherefields(lib.TransactionsCollection)
+	if err != nil {
+		log.Printf("unable to query firestore transactions: %s", err.Error())
+		return
+	}
+	defer iter.Stop()
+
+	for {
+		doc, err := iter.Next()
+		if errors.Is(err, iterator.Done) {
+			break
+		}
+		if err != nil {
+			log.Printf("unable to iterate over transactions: %s", err.Error())
+			return
+		}
+
+		var trans models.Transaction
+		err = doc.DataTo(&trans)
+		if err != nil {
+			log.Printf("unable to populate transaction: %s", err.Error())
+			return
+		}
+
+		trans.BigQueryParse()
+		transactionsList = append(transactionsList, trans)
+	}
+
+	batches, err := divideSliceIntoBatches(transactionsList, batchSize)
+	if err != nil {
+		log.Printf("unable to divide slice in batches (of size %d) : %s", batchSize, err.Error())
+		return
+	}
+
+	for _, batch := range batches {
+		err = lib.InsertRowsBigQuery(lib.WoptaDataset, lib.TransactionsCollection, batch)
+		if err != nil {
+			log.Printf("unable to insert transactions into BigQuery: %s", err.Error())
+			return
+		}
+	}
+
+	log.Println("Finished copying all transactions to BigQuery")
+}
+
+func divideSliceIntoBatches[T any](slice []T, batchSize int) ([][]T, error) {
+	if batchSize < 1 {
+		return nil, errors.New("batchSize must be greater than zero")
+	}
+
+	batches := make([][]T, 0, ((len(slice)-1)/batchSize)+1)
+	if len(slice) < batchSize {
+		batches = append(batches, slice)
+		return batches, nil
+	}
+
+	for batchSize < len(slice) {
+		slice, batches = slice[batchSize:], append(batches, slice[0:batchSize:batchSize])
+	}
+	batches = append(batches, slice)
+	return batches, nil
 }
