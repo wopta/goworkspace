@@ -34,6 +34,7 @@ func CopyTransactionsToBigQuery() {
 }
 
 func CopyAllPoliciesTransactionToBigQuery() {
+	const batchSize = 100
 	transactionsList := make([]models.Transaction, 0)
 
 	queries := lib.Firequeries{
@@ -70,11 +71,36 @@ func CopyAllPoliciesTransactionToBigQuery() {
 		transactionsList = append(transactionsList, trans)
 	}
 
-	err = lib.InsertRowsBigQuery(lib.WoptaDataset, lib.TransactionsCollection, transactionsList)
+	batches, err := divideSliceIntoBatches(transactionsList, batchSize)
 	if err != nil {
-		log.Printf("unable to insert transaction list into BigQuery: %s", err.Error())
+		log.Printf("unable to divide slice in batches (of size %d) : %s", batchSize, err.Error())
 		return
 	}
 
+	for _, batch := range batches {
+		err = lib.InsertRowsBigQuery(lib.WoptaDataset, lib.TransactionsCollection, batch)
+		if err != nil {
+			log.Printf("unable to insert transactions into BigQuery: %s", err.Error())
+			return
+		}
+	}
+
 	log.Println("Finished copying all transactions to BigQuery")
+}
+
+func divideSliceIntoBatches[T any](slice []T, size int) ([][]T, error) {
+	if size < 1 {
+		return nil, errors.New("size must be greater than zero")
+	}
+	if len(slice) < size {
+		return nil, errors.New("size must be smaller than len(slice)")
+	}
+
+	batches := make([][]T, 0, ((len(slice)-1)/size)+1)
+
+	for size < len(slice) {
+		slice, batches = slice[size:], append(batches, slice[0:size:size])
+	}
+	batches = append(batches, slice)
+	return batches, nil
 }
