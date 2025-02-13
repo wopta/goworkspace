@@ -247,7 +247,9 @@ func setScalapayPolicy(code string, now time.Time, upload bool) {
 		"DATA VENDITA", //    DATA FINE VALIDITA' COPERTURA
 		"TIPO MOVIMENTO",
 	}
-
+	if code == "51114" {
+		code = "051114"
+	}
 	refDay = now.AddDate(0, 0, -1)
 	log.Println("  refMontly: ", refDay)
 	//from, e = time.Parse("2006-01-02", strconv.Itoa(now.Year())+"-"+fmt.Sprintf("%02d", int(now.Month()))+"-"+fmt.Sprintf("%02d", 1))
