@@ -11,7 +11,7 @@ require (
 	github.com/wopta/goworkspace/lib v1.0.138
 	github.com/wopta/goworkspace/models v1.2.29
 	github.com/wopta/goworkspace/network v1.0.94
-	github.com/wopta/goworkspace/policy v1.0.161
+	github.com/wopta/goworkspace/policy v1.0.162
 	github.com/wopta/goworkspace/product v1.1.27
 )
 
