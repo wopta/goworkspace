@@ -8,8 +8,8 @@ require (
 	github.com/wopta/goworkspace/lib v1.0.138
 	github.com/wopta/goworkspace/mail v1.0.144
 	github.com/wopta/goworkspace/models v1.2.29
-	github.com/wopta/goworkspace/payment v1.0.284
-	github.com/wopta/goworkspace/transaction v1.0.147
+	github.com/wopta/goworkspace/payment v1.0.285
+	github.com/wopta/goworkspace/transaction v1.0.148
 	google.golang.org/api v0.181.0
 )
 
@@ -75,7 +75,7 @@ require (
 	github.com/ttacon/libphonenumber v1.2.1 // indirect
 	github.com/wopta/goworkspace/document v1.1.121 // indirect
 	github.com/wopta/goworkspace/network v1.0.94 // indirect
-	github.com/wopta/goworkspace/policy v1.0.161 // indirect
+	github.com/wopta/goworkspace/policy v1.0.162 // indirect
 	github.com/wopta/goworkspace/product v1.1.27 // indirect
 	github.com/wopta/goworkspace/wiseproxy v1.0.3 // indirect
 	github.com/xanzy/ssh-agent v0.2.1 // indirect
