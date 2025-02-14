@@ -29,7 +29,7 @@ func CommercialCombinedFx(_ http.ResponseWriter, r *http.Request) (string, any, 
 	}()
 
 	if err = json.NewDecoder(r.Body).Decode(&policy); err != nil {
-		log.Println("error decoding request body",)
+		log.Println("error decoding request body")
 		return "", nil, err
 	}
 
@@ -45,6 +45,7 @@ func CommercialCombinedFx(_ http.ResponseWriter, r *http.Request) (string, any, 
 type SellableError struct {
 	Msg string
 }
+
 func (e *SellableError) Error() string {
 	return e.Msg
 }
@@ -72,10 +73,10 @@ func CommercialCombined(p *models.Policy) error {
 func getCommercialCombinedInputData(policy *models.Policy) ([]byte, error) {
 	var numEmp = 0
 	var numBuild = 0
-	var mandatoryWarrant = false
+	var mandatoryGuarantee = true
 	var mandatoryThirdParty = false
 	var buildingAndRental = false
-	var mandatoryWarrantList = []string{"building", "rental-risk", "machinery", "stock"}
+	var mandatoryGuaranteesList = []string{"building", "rental-risk", "machinery", "stock"}
 
 	step, err := fromStepStringToInt(policy.Step)
 	if err != nil {
@@ -93,10 +94,10 @@ func getCommercialCombinedInputData(policy *models.Policy) ([]byte, error) {
 		}
 		if v.Type == models.AssetTypeBuilding {
 			numBuild++
-			var building, rentalRisk = false, false
+			var building, rentalRisk, checkMandatory = false, false, false
 			for _, g := range v.Guarantees {
-				if slices.Contains(mandatoryWarrantList, g.Slug) {
-					mandatoryWarrant = true
+				if slices.Contains(mandatoryGuaranteesList, g.Slug) {
+					checkMandatory = true
 				}
 				if g.Slug == "building" {
 					building = true
@@ -108,6 +109,9 @@ func getCommercialCombinedInputData(policy *models.Policy) ([]byte, error) {
 			if building && rentalRisk {
 				buildingAndRental = true
 			}
+			if checkMandatory == false {
+				mandatoryGuarantee = false
+			}
 		}
 	}
 
@@ -115,7 +119,7 @@ func getCommercialCombinedInputData(policy *models.Policy) ([]byte, error) {
 	out["step"] = step
 	out["numEmp"] = numEmp
 	out["numBuild"] = numBuild
-	out["mandatoryWarrant"] = mandatoryWarrant
+	out["mandatoryGuarantee"] = mandatoryGuarantee
 	out["buildingAndRental"] = buildingAndRental
 	out["mandatoryThirdParty"] = mandatoryThirdParty
 
