@@ -38,12 +38,10 @@ func UpdatePolicy(policy *models.Policy) (map[string]interface{}, error) {
 		input["priceNettMonthly"] = policy.PriceNettMonthly
 		input["priceGrossMonthly"] = policy.PriceGrossMonthly
 	case models.CommercialCombinedProduct:
-		// NOTE: remove qbe check for now.
-
-		//err := checkQbe(policy, input)
-		//if err != nil {
-		//	return nil, err
-		//}
+		err := checkQbe(policy, input)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	input["updated"] = time.Now().UTC()
@@ -52,32 +50,33 @@ func UpdatePolicy(policy *models.Policy) (map[string]interface{}, error) {
 }
 
 func checkQbe(p *models.Policy, i map[string]interface{}) error {
-	var err error
+	// NOTE: remove qbe check for now.
+	//var err error
 
-	err = checkQbeAssets(p)
-	if err != nil {
-		return err
-	}
-	err = checkQbeContractor(p)
-	if err != nil {
-		return err
-	}
-	err = checkDeclaredClaims(p.DeclaredClaims)
-	if err != nil {
-		return err
-	}
-	err = checkQbeBonds(p)
-	if err != nil {
-		return err
-	}
-	err = checkQbeStatements(p)
-	if err != nil {
-		return err
-	}
-	err = checkQbeSignatory(p)
-	if err != nil {
-		return err
-	}
+	//err = checkQbeAssets(p)
+	//if err != nil {
+	//	return err
+	//}
+	//err = checkQbeContractor(p)
+	//if err != nil {
+	//	return err
+	//}
+	//err = checkDeclaredClaims(p.DeclaredClaims)
+	//if err != nil {
+	//	return err
+	//}
+	//err = checkQbeBonds(p)
+	//if err != nil {
+	//	return err
+	//}
+	//err = checkQbeStatements(p)
+	//if err != nil {
+	//	return err
+	//}
+	//err = checkQbeSignatory(p)
+	//if err != nil {
+	//	return err
+	//}
 
 	i["startDate"] = p.StartDate
 	i["endDate"] = p.EndDate
