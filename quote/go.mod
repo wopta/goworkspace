@@ -12,7 +12,7 @@ require (
 	github.com/wopta/goworkspace/lib v1.0.138
 	github.com/wopta/goworkspace/models v1.2.29
 	github.com/wopta/goworkspace/network v1.0.94
-	github.com/wopta/goworkspace/sellable v1.0.125
+	github.com/wopta/goworkspace/sellable v1.0.126
 	github.com/xuri/excelize/v2 v2.8.1
 	google.golang.org/api v0.209.0
 	modernc.org/mathutil v1.5.0
