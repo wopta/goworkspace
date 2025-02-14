@@ -38,10 +38,12 @@ func UpdatePolicy(policy *models.Policy) (map[string]interface{}, error) {
 		input["priceNettMonthly"] = policy.PriceNettMonthly
 		input["priceGrossMonthly"] = policy.PriceGrossMonthly
 	case models.CommercialCombinedProduct:
-		err := checkQbe(policy, input)
-		if err != nil {
-			return nil, err
-		}
+		// NOTE: remove qbe check for now.
+
+		//err := checkQbe(policy, input)
+		//if err != nil {
+		//	return nil, err
+		//}
 	}
 
 	input["updated"] = time.Now().UTC()
