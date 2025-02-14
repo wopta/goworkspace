@@ -34,6 +34,8 @@ func CopyTransactionsToBigQuery() {
 }
 
 func CopyAllPoliciesTransactionToBigQuery() {
+	now := time.Now().UTC()
+
 	const batchSize = 100
 	transactionsList := make([]models.Transaction, 0)
 
@@ -66,7 +68,7 @@ func CopyAllPoliciesTransactionToBigQuery() {
 			log.Printf("unable to populate transaction: %s", err.Error())
 			return
 		}
-
+		trans.UpdateDate = now
 		trans.BigQueryParse()
 		transactionsList = append(transactionsList, trans)
 	}
@@ -76,8 +78,10 @@ func CopyAllPoliciesTransactionToBigQuery() {
 		log.Printf("unable to divide slice in batches (of size %d) : %s", batchSize, err.Error())
 		return
 	}
+	log.Printf("%d batches to save", len(batches))
 
-	for _, batch := range batches {
+	for i, batch := range batches {
+		log.Printf("saving batch %d ....", i+1)
 		err = lib.InsertRowsBigQuery(lib.WoptaDataset, lib.TransactionsCollection, batch)
 		if err != nil {
 			log.Printf("unable to insert transactions into BigQuery: %s", err.Error())
