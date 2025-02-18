@@ -84,6 +84,7 @@ func BankAccountScalapayFx(resp http.ResponseWriter, r *http.Request) (string, i
 func CheckScalapayApikey(r *http.Request) error {
 	apikey := os.Getenv("HYPE_APIKEY")
 	apikeyReq := r.Header.Get("api_key")
+	log.Println("apikeyReq: ", apikeyReq, " apikey: ", apikey)
 	if apikey != apikeyReq {
 		return GetErrorJson(401, "Unauthorized", "")
 	}
