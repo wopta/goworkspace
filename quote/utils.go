@@ -9,7 +9,7 @@ import (
 
 func removeOfferRate(policy *models.Policy, availableRates []string) {
 	for offerKey, offerValue := range policy.OffersPrices {
-		for rate, _ := range offerValue {
+		for rate := range offerValue {
 			if !lib.SliceContains(availableRates, rate) {
 				log.Printf("[removeOfferRate] removing rate %s", rate)
 				delete(policy.OffersPrices[offerKey], rate)

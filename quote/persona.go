@@ -332,7 +332,7 @@ func calculateIPMPrices(contractorAge int, guarantee *models.Guarante, personaTa
 
 	age := strconv.Itoa(contractorAge)
 
-	for offerKey, _ := range guarantee.Offer {
+	for offerKey := range guarantee.Offer {
 		guarantee.Offer[offerKey].PremiumNetYearly =
 			lib.RoundFloat((guarantee.Offer[offerKey].SumInsuredLimitOfIndemnity/1000)*tassi[age], 2)
 		guarantee.Offer[offerKey].PremiumTaxAmountYearly =
@@ -371,7 +371,7 @@ func applyDiscounts(policy *models.Policy) {
 		}
 	}
 
-	for assetIndex, _ := range policy.Assets {
+	for assetIndex := range policy.Assets {
 		for guaranteeIndex, guarantee := range policy.Assets[assetIndex].Guarantees {
 			for offerKey, offer := range guarantee.Offer {
 				policy.Assets[assetIndex].Guarantees[guaranteeIndex].Offer[offerKey].PremiumGrossYearly =
@@ -396,7 +396,7 @@ func applyDiscounts(policy *models.Policy) {
 }
 
 func calculatePersonaOfferPrices(policy *models.Policy) {
-	for offerKey, _ := range policy.OffersPrices {
+	for offerKey := range policy.OffersPrices {
 		for _, guarantee := range policy.Assets[0].Guarantees {
 			if guarantee.Offer[offerKey] != nil {
 				policy.OffersPrices[offerKey][string(models.PaySplitMonthly)].Net = lib.RoundFloat(policy.OffersPrices[offerKey][string(models.PaySplitMonthly)].Net+guarantee.Offer[offerKey].PremiumNetMonthly, 2)
@@ -483,7 +483,7 @@ func roundYearlyOfferPrices(policy *models.Policy, roundingGuarantees ...string)
 
 func roundToTwoDecimalPlaces(policy *models.Policy) {
 	for guaranteeIndex, guarantee := range policy.Assets[0].Guarantees {
-		for offerKey, _ := range guarantee.Offer {
+		for offerKey := range guarantee.Offer {
 			policy.Assets[0].Guarantees[guaranteeIndex].Offer[offerKey].PremiumNetMonthly =
 				lib.RoundFloat(guarantee.Offer[offerKey].PremiumNetMonthly, 2)
 			policy.Assets[0].Guarantees[guaranteeIndex].Offer[offerKey].PremiumTaxAmountMonthly =
