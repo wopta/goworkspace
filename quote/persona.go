@@ -57,7 +57,10 @@ func PersonaFx(w http.ResponseWriter, r *http.Request) (string, interface{}, err
 
 	log.Println("start quoting")
 
-	err = Persona(&policy, authToken.GetChannelByRoleV2(), networkNode, warrant, flow)
+	if err = Persona(&policy, authToken.GetChannelByRoleV2(), networkNode, warrant, flow); err != nil {
+		log.Printf("error on quote: %s", err.Error())
+		return "", nil, err
+	}
 
 	policyJson, err := policy.Marshal()
 
