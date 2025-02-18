@@ -351,6 +351,71 @@ func (nn *NetworkNode) GetFiscalCode() string {
 	return fiscalCode
 }
 
+func (nn *NetworkNode) GetManagerName() string {
+	var name string
+
+	switch nn.Type {
+	case AgencyNetworkNodeType:
+		name = fmt.Sprintf("%s %s", lib.Capitalize(nn.Agency.Manager.Name), lib.Capitalize(nn.Agency.Manager.Surname))
+	case BrokerNetworkNodeType:
+		name = fmt.Sprintf("%s %s", lib.Capitalize(nn.Broker.Manager.Name), lib.Capitalize(nn.Broker.Manager.Surname))
+	}
+
+	return name
+}
+
+func (nn *NetworkNode) GetManagerFiscalCode() string {
+	var fiscalCode string
+
+	switch nn.Type {
+	case AgencyNetworkNodeType:
+		fiscalCode = nn.Agency.Manager.FiscalCode
+	case BrokerNetworkNodeType:
+		fiscalCode = nn.Broker.Manager.FiscalCode
+	}
+
+	return fiscalCode
+}
+
+func (nn *NetworkNode) GetManagerRuiSection() string {
+	var ruiSection string
+
+	switch nn.Type {
+	case AgencyNetworkNodeType:
+		ruiSection = nn.Agency.Manager.RuiSection
+	case BrokerNetworkNodeType:
+		ruiSection = nn.Broker.Manager.RuiSection
+	}
+
+	return ruiSection
+}
+
+func (nn *NetworkNode) GetManagerRuiCode() string {
+	var ruiCode string
+
+	switch nn.Type {
+	case AgencyNetworkNodeType:
+		ruiCode = nn.Agency.Manager.RuiCode
+	case BrokerNetworkNodeType:
+		ruiCode = nn.Broker.Manager.RuiCode
+	}
+
+	return ruiCode
+}
+
+func (nn *NetworkNode) GetManagerRuiResgistration() time.Time {
+	var ruiRegistration time.Time
+
+	switch nn.Type {
+	case AgencyNetworkNodeType:
+		ruiRegistration = nn.Agency.Manager.RuiRegistration
+	case BrokerNetworkNodeType:
+		ruiRegistration = nn.Broker.Manager.RuiRegistration
+	}
+
+	return ruiRegistration
+}
+
 func (nn *NetworkNode) IsJwtProtected() bool {
 	c := nn.JwtConfig
 	return (c.KeyAlgorithm != "" && c.ContentEncryption != "") || c.SignatureAlgorithm != ""
