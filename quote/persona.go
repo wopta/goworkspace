@@ -309,20 +309,21 @@ func calculateRSCPrices(contractor models.Contractor, guarantee *models.Guarante
 	err := json.Unmarshal(personaTassi["RSC"], &tassi)
 	lib.CheckError(err)
 
-	sumInsuredLimitOfIndemnity :=
-		strconv.FormatFloat(guarantee.Offer["premium"].SumInsuredLimitOfIndemnity, 'f', -1, 64)
+	for offerKey := range guarantee.Offer {
+		sumInsuredLimitOfIndemnity :=
+			strconv.FormatFloat(guarantee.Offer[offerKey].SumInsuredLimitOfIndemnity, 'f', -1, 64)
 
-	guarantee.Offer["premium"].PremiumNetYearly =
-		lib.RoundFloat(tassi[guarantee.Type][contractor.RiskClass][sumInsuredLimitOfIndemnity], 2)
-	guarantee.Offer["premium"].PremiumTaxAmountYearly =
-		lib.RoundFloat((guarantee.Tax*guarantee.Offer["premium"].PremiumNetYearly)/100, 2)
-	guarantee.Offer["premium"].PremiumGrossYearly =
-		lib.RoundFloat(guarantee.Offer["premium"].PremiumTaxAmountYearly+guarantee.Offer["premium"].PremiumNetYearly, 2)
+		guarantee.Offer[offerKey].PremiumNetYearly =
+			lib.RoundFloat(tassi[guarantee.Type][contractor.RiskClass][sumInsuredLimitOfIndemnity], 2)
+		guarantee.Offer[offerKey].PremiumTaxAmountYearly =
+			lib.RoundFloat((guarantee.Tax*guarantee.Offer[offerKey].PremiumNetYearly)/100, 2)
+		guarantee.Offer[offerKey].PremiumGrossYearly =
+			lib.RoundFloat(guarantee.Offer[offerKey].PremiumTaxAmountYearly+guarantee.Offer[offerKey].PremiumNetYearly, 2)
 
-	guarantee.Offer["premium"].PremiumNetMonthly = lib.RoundFloat(guarantee.Offer["premium"].PremiumNetYearly/12, 2)
-	guarantee.Offer["premium"].PremiumTaxAmountMonthly = lib.RoundFloat(guarantee.Offer["premium"].PremiumTaxAmountYearly/12, 2)
-	guarantee.Offer["premium"].PremiumGrossMonthly = lib.RoundFloat(guarantee.Offer["premium"].PremiumGrossYearly/12, 2)
-
+		guarantee.Offer[offerKey].PremiumNetMonthly = lib.RoundFloat(guarantee.Offer[offerKey].PremiumNetYearly/12, 2)
+		guarantee.Offer[offerKey].PremiumTaxAmountMonthly = lib.RoundFloat(guarantee.Offer[offerKey].PremiumTaxAmountYearly/12, 2)
+		guarantee.Offer[offerKey].PremiumGrossMonthly = lib.RoundFloat(guarantee.Offer[offerKey].PremiumGrossYearly/12, 2)
+	}
 }
 
 func calculateIPMPrices(contractorAge int, guarantee *models.Guarante, personaTassi map[string]json.RawMessage) {
@@ -351,9 +352,7 @@ func calculateIPMPrices(contractorAge int, guarantee *models.Guarante, personaTa
 }
 
 func applyDiscounts(policy *models.Policy) {
-	numberOfGuarantees := map[string]int{
-		"base": 0, "your": 0, "premium": 0,
-	}
+	numberOfGuarantees := make(map[string]int)
 	numberOfInsured := len(policy.Assets)
 
 	guaranteesDiscount := map[int]float64{
